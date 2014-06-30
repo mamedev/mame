@@ -12,12 +12,38 @@
 #define __PPCCOM_H__
 
 #include "ppc.h"
-#include "cpu/vtlb.h"
+
+
+/***************************************************************************
+    DEBUGGING
+***************************************************************************/
+
+#define LOG_UML                         (0)
+#define LOG_NATIVE                      (0)
+
+#define DISABLE_FLAG_OPTIMIZATIONS      (0)
+#define DISABLE_FAST_REGISTERS          (0)
+#define SINGLE_INSTRUCTION_MODE         (0)
+
+#define PRINTF_EXCEPTIONS               (0)
+#define PRINTF_MMU                      (0)
+
+#define PROBE_ADDRESS                   ~0
 
 
 /***************************************************************************
     CONSTANTS
 ***************************************************************************/
+
+/* size of the execution code cache */
+#define CACHE_SIZE                      (32 * 1024 * 1024)
+
+/* compilation boundaries -- how far back/forward does the analysis extend? */
+#define COMPILE_BACKWARDS_BYTES         128
+#define COMPILE_FORWARDS_BYTES          512
+#define COMPILE_MAX_INSTRUCTIONS        ((COMPILE_BACKWARDS_BYTES/4) + (COMPILE_FORWARDS_BYTES/4))
+#define COMPILE_MAX_SEQUENCE            64
+
 
 /* core parameters */
 #define POWERPC_MIN_PAGE_SHIFT      12
@@ -42,39 +68,6 @@
 #define PPCCAP_MFIOC                0x40        /* TRUE if we have memory-forced I/O controller interface accesses */
 #define PPCCAP_601BAT               0x80        /* TRUE if we're doing 601-style BATs (unified I/D, different bit layout) */
 #define PPCCAP_604_MMU              0x100       /* TRUE if we have 604-class MMU features */
-
-/* PowerPC flavors */
-enum powerpc_flavor
-{
-	PPC_MODEL_403GA             = 0x00200000,
-	PPC_MODEL_403GB             = 0x00200100,
-	PPC_MODEL_403GC             = 0x00200200,
-	PPC_MODEL_403GCX            = 0x00201400,
-	PPC_MODEL_405GP             = 0x40110000,
-	PPC_MODEL_601               = 0x00010000,
-	PPC_MODEL_603               = 0x00030000,   /* "Wart" */
-	PPC_MODEL_604               = 0x00040000,   /* "Zephyr" */
-	PPC_MODEL_602               = 0x00050200,   /* "Galahad" */
-	PPC_MODEL_603E              = 0x00060103,   /* "Stretch", version 1.3 */
-	PPC_MODEL_603EV             = 0x00070000,   /* "Valiant" */
-	PPC_MODEL_603R              = 0x00071202,   /* "Goldeneye", version 2.1 */
-	PPC_MODEL_740               = 0x00080301,   /* "Arthur", version 3.1 */
-	PPC_MODEL_750               = PPC_MODEL_740,
-	PPC_MODEL_740P              = 0x00080202,   /* "Conan Doyle", version 1.2 */
-	PPC_MODEL_750P              = PPC_MODEL_740P,
-	PPC_MODEL_755               = 0x00083203,   /* "Goldfinger", version 2.3 */
-	PPC_MODEL_7400              = 0x000c0209,   /* "Max", version 2.9 */
-	PPC_MODEL_7410              = 0x800c1104,   /* "Nitro", version 3.4 */
-	PPC_MODEL_7450              = 0x80000201,   /* "Vger", version 2.1 */
-	PPC_MODEL_7451              = 0x80000203,   /* "Vger", version 2.3 */
-	PPC_MODEL_7441              = PPC_MODEL_7451,
-	PPC_MODEL_7455              = 0x80010303,   /* "Apollo 6", version 3.3 */
-	PPC_MODEL_7445              = PPC_MODEL_7455,
-	PPC_MODEL_7457              = 0x80020101,   /* "Apollo 7", version 1.1 */
-	PPC_MODEL_MPC8240           = 0x00810101,   /* "Kahlua" */
-	PPC_MODEL_MPC8241           = 0x80811014,   /* "Kahlua Lt" */
-	PPC_MODEL_MPC8245           = 0x80811014,   /* "Kahlua II" */
-};
 
 
 /* exception types */
@@ -484,131 +477,5 @@ enum
 #define G_XO(op)            ((op & M_XO) >> (31 - 30))
 
 
-
-/***************************************************************************
-    STRUCTURES & TYPEDEFS
-***************************************************************************/
-
-/* PowerPC 4XX-specific serial port state */
-struct ppc4xx_spu_state
-{
-	UINT8           regs[9];
-	UINT8           txbuf;
-	UINT8           rxbuf;
-	emu_timer *     timer;
-	UINT8           rxbuffer[256];
-	UINT32          rxin, rxout;
-	ppc4xx_spu_tx_handler tx_handler;
-};
-
-
-/* forward declaration of implementation-specific state */
-struct ppcimp_state;
-
-
-/* PowerPC state */
-struct powerpc_state
-{
-	/* core registers */
-	UINT32          pc;
-	int             icount;
-	UINT32          r[32];
-	double          f[32];
-	UINT32          cr[8];
-	UINT32          xerso;
-	UINT32          fpscr;
-	UINT32          msr;
-	UINT32          sr[16];
-	UINT32          spr[1024];
-	UINT32          dcr[256];
-
-	/* parameters for calls */
-	UINT32          param0;
-	UINT32          param1;
-
-	/* MMU */
-	vtlb_state *    vtlb;
-
-	/* architectural distinctions */
-	powerpc_flavor  flavor;
-	UINT32          cap;
-	UINT8           cache_line_size;
-	UINT32          tb_divisor;
-
-	/* PowerPC 4xx-specific state */
-	ppc4xx_spu_state spu;
-	emu_timer *     fit_timer;
-	emu_timer *     pit_timer;
-	emu_timer *     wdog_timer;
-	UINT32          pit_reload;
-	UINT32          irqstate;
-	emu_timer *     buffered_dma_timer[4];
-	int             buffered_dma_rate[4];
-
-	/* PowerPC 603-specific state */
-	UINT32          mmu603_cmp;
-	UINT32          mmu603_hash[2];
-	UINT32          mmu603_r[4];
-
-	/* internal stuff */
-	device_irq_acknowledge_delegate irq_callback;
-	legacy_cpu_device * device;
-	address_space *program;
-	direct_read_data *direct;
-	offs_t          codexor;
-	UINT32          irq_pending;
-	UINT32          system_clock;
-	UINT32          cpu_clock;
-	UINT64          tb_zero_cycles;
-	UINT64          dec_zero_cycles;
-	emu_timer *     decrementer_int_timer;
-
-	/* for use by specific implementations */
-	ppcimp_state *  impstate;
-
-	read32_delegate  dcr_read_func;
-	write32_delegate dcr_write_func;
-
-	ppc_dcstore_handler dcstore_handler;
-
-	ppc4xx_dma_read_handler ext_dma_read_handler[4];
-	ppc4xx_dma_write_handler ext_dma_write_handler[4];
-};
-
-
-
-/***************************************************************************
-    FUNCTION PROTOTYPES
-***************************************************************************/
-
-void ppccom_init(powerpc_state *ppc, powerpc_flavor flavor, UINT32 cap, int tb_divisor, legacy_cpu_device *device, device_irq_acknowledge_delegate irqcallback);
-void ppccom_exit(powerpc_state *ppc);
-
-void ppccom_reset(powerpc_state *ppc);
-offs_t ppccom_dasm(powerpc_state *ppc, char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
-
-int ppccom_translate_address(powerpc_state *ppc, address_spacenum space, int intention, offs_t *address);
-
-void ppccom_set_info(powerpc_state *ppc, UINT32 state, cpuinfo *info);
-void ppccom_get_info(powerpc_state *ppc, UINT32 state, cpuinfo *info);
-
-void ppccom_tlb_fill(powerpc_state *ppc);
-void ppccom_tlb_flush(powerpc_state *ppc);
-
-void ppccom_execute_tlbie(powerpc_state *ppc);
-void ppccom_execute_tlbia(powerpc_state *ppc);
-void ppccom_execute_tlbl(powerpc_state *ppc);
-void ppccom_execute_mftb(powerpc_state *ppc);
-void ppccom_execute_mfspr(powerpc_state *ppc);
-void ppccom_execute_mtspr(powerpc_state *ppc);
-void ppccom_execute_mfdcr(powerpc_state *ppc);
-void ppccom_execute_mtdcr(powerpc_state *ppc);
-
-void ppccom_update_fprf(powerpc_state *ppc);
-
-void ppccom_dcstore_callback(powerpc_state *ppc);
-
-void ppc4xx_set_info(powerpc_state *ppc, UINT32 state, cpuinfo *info);
-void ppc4xx_get_info(powerpc_state *ppc, UINT32 state, cpuinfo *info);
 
 #endif /* __PPCCOM_H__ */

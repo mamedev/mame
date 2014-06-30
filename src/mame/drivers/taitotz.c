@@ -547,7 +547,7 @@ public:
 	{
 	}
 
-	required_device<cpu_device> m_maincpu;
+	required_device<ppc_device> m_maincpu;
 	required_device<cpu_device> m_iocpu;
 	required_shared_ptr<UINT64> m_work_ram;
 	required_shared_ptr<UINT16> m_mbox_ram;
@@ -2641,10 +2641,10 @@ void taitotz_state::machine_reset()
 void taitotz_state::machine_start()
 {
 	/* set conservative DRC options */
-	ppcdrc_set_options(m_maincpu, PPCDRC_COMPATIBLE_OPTIONS);
+	m_maincpu->ppcdrc_set_options(PPCDRC_COMPATIBLE_OPTIONS);
 
 	/* configure fast RAM regions for DRC */
-	ppcdrc_add_fastram(m_maincpu, 0x40000000, 0x40ffffff, FALSE, m_work_ram);
+	m_maincpu->ppcdrc_add_fastram(0x40000000, 0x40ffffff, FALSE, m_work_ram);
 }
 
 
@@ -2658,16 +2658,10 @@ WRITE_LINE_MEMBER(taitotz_state::ide_interrupt)
 	m_iocpu->set_input_line(TLCS900_INT2, state);
 }
 
-static const powerpc_config ppc603e_config =
-{
-	XTAL_66_6667MHz        /* Multiplier 1.5, Bus = 66MHz, Core = 100MHz */
-};
-
-
 static MACHINE_CONFIG_START( taitotz, taitotz_state )
 	/* IBM EMPPC603eBG-100 */
 	MCFG_CPU_ADD("maincpu", PPC603E, 100000000)
-	MCFG_CPU_CONFIG(ppc603e_config)
+	MCFG_PPC_BUS_FREQUENCY(XTAL_66_6667MHz)    /* Multiplier 1.5, Bus = 66MHz, Core = 100MHz */
 	MCFG_CPU_PROGRAM_MAP(ppc603e_mem)
 
 	/* TMP95C063F I/O CPU */

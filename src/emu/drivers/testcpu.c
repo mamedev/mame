@@ -97,7 +97,7 @@ public:
 		m_space = &m_cpu->space(AS_PROGRAM);
 
 		// configure DRC in the most compatible mode
-		ppcdrc_set_options(m_cpu, PPCDRC_COMPATIBLE_OPTIONS);
+		m_cpu->ppcdrc_set_options(PPCDRC_COMPATIBLE_OPTIONS);
 
 		// set a timer to go off right away
 		timer_set(attotime::zero);
@@ -185,17 +185,11 @@ ADDRESS_MAP_END
 //  MACHINE DRIVERS
 //**************************************************************************
 
-static const powerpc_config ppc_config =
-{
-	// 603e, Stretch, 1.3
-	66000000        // Multiplier 1, Bus = 66MHz, Core = 66MHz
-};
-
 static MACHINE_CONFIG_START( testcpu, testcpu_state )
 
 	// CPUs
 	MCFG_CPU_ADD("maincpu", PPC603E, 66000000)
-	MCFG_CPU_CONFIG(ppc_config)
+	MCFG_PPC_BUS_FREQUENCY(66000000)  // Multiplier 1, Bus = 66MHz, Core = 66MHz
 	MCFG_CPU_PROGRAM_MAP(ppc_mem)
 MACHINE_CONFIG_END
 

@@ -1184,10 +1184,10 @@ static void configure_fast_ram(running_machine &machine)
 {
 	model3_state *state = machine.driver_data<model3_state>();
 	/* set conservative DRC options */
-	ppcdrc_set_options(machine.device("maincpu"), PPCDRC_COMPATIBLE_OPTIONS - PPCDRC_ACCURATE_SINGLES);
+	machine.device<ppc_device>("maincpu")->ppcdrc_set_options(PPCDRC_COMPATIBLE_OPTIONS - PPCDRC_ACCURATE_SINGLES);
 
 	/* configure fast RAM regions for DRC */
-	ppcdrc_add_fastram(machine.device("maincpu"), 0x00000000, 0x007fffff, FALSE, state->m_work_ram);
+	machine.device<ppc_device>("maincpu")->ppcdrc_add_fastram(0x00000000, 0x007fffff, FALSE, state->m_work_ram);
 }
 
 TIMER_CALLBACK_MEMBER(model3_state::model3_sound_timer_tick)
@@ -5380,27 +5380,9 @@ TIMER_DEVICE_CALLBACK_MEMBER(model3_state::model3_interrupt)
 		set_irq_line(0x0d, ASSERT_LINE);
 }
 
-static const powerpc_config model3_10 =
-{
-	/* 603e, Stretch, 1.3 */
-	66000000       /* Multiplier 1, Bus = 66MHz, Core = 66MHz */
-};
-
-static const powerpc_config model3_15 =
-{
-	/* 603e, Stretch, 1.3 */
-	66000000       /* Multiplier 1.5, Bus = 66MHz, Core = 100MHz */
-};
-
-static const powerpc_config model3_2x =
-{
-	/* 603e-PID7t, Goldeneye, 2.1 */
-	66000000       /* Multiplier 2.5, Bus = 66MHz, Core = 166MHz */
-};
-
 static MACHINE_CONFIG_START( model3_10, model3_state )
 	MCFG_CPU_ADD("maincpu", PPC603E, 66000000)
-	MCFG_CPU_CONFIG(model3_10)
+	MCFG_PPC_BUS_FREQUENCY(66000000)   /* Multiplier 1, Bus = 66MHz, Core = 66MHz */
 	MCFG_CPU_PROGRAM_MAP(model3_mem)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", model3_state, model3_interrupt, "screen", 0, 1)
 
@@ -5447,7 +5429,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( model3_15, model3_state )
 	MCFG_CPU_ADD("maincpu", PPC603E, 100000000)
-	MCFG_CPU_CONFIG(model3_15)
+	MCFG_PPC_BUS_FREQUENCY(66000000)       /* Multiplier 1.5, Bus = 66MHz, Core = 100MHz */
 	MCFG_CPU_PROGRAM_MAP(model3_mem)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", model3_state, model3_interrupt, "screen", 0, 1)
 
@@ -5498,7 +5480,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( model3_20, model3_state )
 	MCFG_CPU_ADD("maincpu", PPC603R, 166000000)
-	MCFG_CPU_CONFIG(model3_2x)
+	MCFG_PPC_BUS_FREQUENCY(66000000)    /* Multiplier 2.5, Bus = 66MHz, Core = 166MHz */
 	MCFG_CPU_PROGRAM_MAP(model3_mem)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", model3_state, model3_interrupt, "screen", 0, 1)
 
@@ -5535,7 +5517,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( model3_21, model3_state )
 	MCFG_CPU_ADD("maincpu", PPC603R, 166000000)
-	MCFG_CPU_CONFIG(model3_2x)
+	MCFG_PPC_BUS_FREQUENCY(66000000)    /* Multiplier 2.5, Bus = 66MHz, Core = 166MHz */
 	MCFG_CPU_PROGRAM_MAP(model3_mem)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", model3_state, model3_interrupt, "screen", 0, 1)
 

@@ -265,7 +265,7 @@ public:
 	static const int m_sound_timer_usec = 2400;
 
 	required_shared_ptr<UINT32> m_work_ram;
-	required_device<cpu_device> m_maincpu;
+	required_device<ppc_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<adsp21062_device> m_dsp;
 	optional_device<cpu_device> m_dsp2;
@@ -479,10 +479,10 @@ WRITE16_MEMBER(gticlub_state::soundtimer_count_w)
 MACHINE_START_MEMBER(gticlub_state,gticlub)
 {
 	/* set conservative DRC options */
-	ppcdrc_set_options(m_maincpu, PPCDRC_COMPATIBLE_OPTIONS);
+	m_maincpu->ppcdrc_set_options(PPCDRC_COMPATIBLE_OPTIONS);
 
 	/* configure fast RAM regions for DRC */
-	ppcdrc_add_fastram(m_maincpu, 0x00000000, 0x000fffff, FALSE, m_work_ram);
+	m_maincpu->ppcdrc_add_fastram(0x00000000, 0x000fffff, FALSE, m_work_ram);
 
 	m_sound_irq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gticlub_state::sound_irq), this));
 }

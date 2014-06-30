@@ -617,9 +617,9 @@ public:
 	{
 	}
 
-	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_subcpu;
-	required_device<cpu_device> m_gfxcpu;
+	required_device<ppc_device> m_maincpu;
+	required_device<ppc4xx_device> m_subcpu;
+	required_device<ppc_device> m_gfxcpu;
 	required_shared_ptr<UINT64> m_gfx_pagetable;
 	required_device<k001604_device> m_k001604;
 	required_device<ata_interface_device> m_ata;
@@ -1923,6 +1923,7 @@ static void sub_sound_dma_w(device_t *device, int width, UINT32 data)
 
 static void sub_jvs_w(device_t *device, UINT8 data)
 {
+	cobra_state *cobra = device->machine().driver_data<cobra_state>();
 	cobra_jvs_host *jvs = downcast<cobra_jvs_host *>(device->machine().device("cobra_jvs_host"));
 
 #if LOG_JVS
@@ -1947,7 +1948,7 @@ static void sub_jvs_w(device_t *device, UINT8 data)
 
 		for (int i=0; i < rec_size; i++)
 		{
-			ppc4xx_spu_receive_byte(device, rec_data[i]);
+			cobra->m_subcpu->ppc4xx_spu_receive_byte(rec_data[i]);
 		}
 	}
 }
@@ -3116,17 +3117,6 @@ INPUT_PORTS_START( cobra )
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_PLAYER(2)
 INPUT_PORTS_END
 
-static powerpc_config main_ppc_cfg =
-{
-	XTAL_66_6667MHz        /* Multiplier 1.5, Bus = 66MHz, Core = 100MHz */
-};
-
-static powerpc_config gfx_ppc_cfg =
-{
-	XTAL_66_6667MHz        /* Multiplier 1.5, Bus = 66MHz, Core = 100MHz */
-};
-
-
 WRITE_LINE_MEMBER(cobra_state::ide_interrupt)
 {
 	if (state == CLEAR_LINE)
@@ -3176,7 +3166,7 @@ static MACHINE_CONFIG_START( cobra, cobra_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", PPC603, 100000000)      /* 603EV, 100? MHz */
-	MCFG_CPU_CONFIG(main_ppc_cfg)
+	MCFG_PPC_BUS_FREQUENCY(XTAL_66_6667MHz)  /* Multiplier 1.5, Bus = 66MHz, Core = 100MHz */
 	MCFG_CPU_PROGRAM_MAP(cobra_main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", cobra_state,  cobra_vblank)
 
@@ -3184,7 +3174,7 @@ static MACHINE_CONFIG_START( cobra, cobra_state )
 	MCFG_CPU_PROGRAM_MAP(cobra_sub_map)
 
 	MCFG_CPU_ADD("gfxcpu", PPC604, 100000000)       /* 604, 100? MHz */
-	MCFG_CPU_CONFIG(gfx_ppc_cfg)
+	MCFG_PPC_BUS_FREQUENCY(XTAL_66_6667MHz)   /* Multiplier 1.5, Bus = 66MHz, Core = 100MHz */
 	MCFG_CPU_PROGRAM_MAP(cobra_gfx_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(15005))
@@ -3273,12 +3263,12 @@ DRIVER_INIT_MEMBER(cobra_state, cobra)
 								cobra_fifo::event_delegate(FUNC(cobra_state::s2mfifo_event_callback), this))
 								);
 
-	ppc_set_dcstore_callback(m_maincpu, main_cpu_dc_store);
+	m_maincpu->ppc_set_dcstore_callback(main_cpu_dc_store);
 
-	ppc_set_dcstore_callback(m_gfxcpu, gfx_cpu_dc_store);
+	m_gfxcpu->ppc_set_dcstore_callback(gfx_cpu_dc_store);
 
-	ppc4xx_set_dma_write_handler(m_subcpu, 0, sub_sound_dma_w, 44100);
-	ppc4xx_spu_set_tx_handler(m_subcpu, sub_jvs_w);
+	m_subcpu->ppc4xx_set_dma_write_handler(0, sub_sound_dma_w, 44100);
+	m_subcpu->ppc4xx_spu_set_tx_handler(sub_jvs_w);
 
 
 	m_comram[0] = auto_alloc_array(machine(), UINT32, 0x40000/4);

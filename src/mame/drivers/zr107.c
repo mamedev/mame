@@ -210,7 +210,7 @@ public:
 		m_konppc(*this, "konppc") { }
 
 
-	required_device<cpu_device> m_maincpu;
+	required_device<ppc_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<cpu_device> m_dsp;
 	optional_device<k001604_device> m_k001604;
@@ -457,10 +457,10 @@ WRITE32_MEMBER(zr107_state::ccu_w)
 void zr107_state::machine_start()
 {
 	/* set conservative DRC options */
-	ppcdrc_set_options(m_maincpu, PPCDRC_COMPATIBLE_OPTIONS);
+	m_maincpu->ppcdrc_set_options(PPCDRC_COMPATIBLE_OPTIONS);
 
 	/* configure fast RAM regions for DRC */
-	ppcdrc_add_fastram(m_maincpu, 0x00000000, 0x000fffff, FALSE, m_workram);
+	m_maincpu->ppcdrc_add_fastram(0x00000000, 0x000fffff, FALSE, m_workram);
 }
 
 static ADDRESS_MAP_START( zr107_map, AS_PROGRAM, 32, zr107_state )

@@ -363,7 +363,7 @@ public:
 	void mpc8240_epic_reset(void);
 	int ds2430_insert_cmd_bit(int bit);
 	void DS2430_w(int bit);
-	required_device<cpu_device> m_maincpu;
+	required_device<ppc_device> m_maincpu;
 	required_device<ata_interface_device> m_ata;
 };
 
@@ -1986,11 +1986,6 @@ INPUT_PORTS_END
 /*****************************************************************************/
 
 
-static const powerpc_config viper_ppc_cfg =
-{
-	100000000
-};
-
 INTERRUPT_GEN_MEMBER(viper_state::viper_vblank)
 {
 	mpc8240_interrupt(MPC8240_IRQ0);
@@ -2009,10 +2004,10 @@ void viper_state::machine_start()
 	mpc8240_epic_init();
 
 	/* set conservative DRC options */
-	ppcdrc_set_options(m_maincpu, PPCDRC_COMPATIBLE_OPTIONS);
+	m_maincpu->ppcdrc_set_options(PPCDRC_COMPATIBLE_OPTIONS);
 
 	/* configure fast RAM regions for DRC */
-	ppcdrc_add_fastram(m_maincpu, 0x00000000, 0x00ffffff, FALSE, workram);
+	m_maincpu->ppcdrc_add_fastram(0x00000000, 0x00ffffff, FALSE, workram);
 
 	ds2430_rom = (UINT8*)memregion("ds2430")->base();
 }
@@ -2033,7 +2028,7 @@ static MACHINE_CONFIG_START( viper, viper_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", MPC8240, 200000000)
-	MCFG_CPU_CONFIG(viper_ppc_cfg)
+	MCFG_PPC_BUS_FREQUENCY(100000000)
 	MCFG_CPU_PROGRAM_MAP(viper_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", viper_state,  viper_vblank)
 

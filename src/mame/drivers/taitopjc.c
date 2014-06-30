@@ -504,15 +504,9 @@ INTERRUPT_GEN_MEMBER(taitopjc_state::taitopjc_vbi)
 }
 
 
-static const powerpc_config ppc603e_config =
-{
-	XTAL_66_6667MHz        /* Multiplier 1.5, Bus = 66MHz, Core = 100MHz */
-};
-
-
 static MACHINE_CONFIG_START( taitopjc, taitopjc_state )
 	MCFG_CPU_ADD("maincpu", PPC603E, 100000000)
-	MCFG_CPU_CONFIG(ppc603e_config)
+	MCFG_PPC_BUS_FREQUENCY(XTAL_66_6667MHz)    /* Multiplier 1.5, Bus = 66MHz, Core = 100MHz */
 	MCFG_CPU_PROGRAM_MAP(ppc603e_mem)
 
 	/* TMP95C063F I/O CPU */

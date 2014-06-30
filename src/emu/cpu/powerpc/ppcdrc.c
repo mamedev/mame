@@ -16,6 +16,7 @@
 
 #include "emu.h"
 #include "debugger.h"
+#include "ppc.h"
 #include "ppccom.h"
 #include "ppcfe.h"
 #include "cpu/drcfe.h"
@@ -25,24 +26,6 @@
 using namespace uml;
 
 extern offs_t ppc_dasm_one(char *buffer, UINT32 pc, UINT32 op);
-
-
-
-/***************************************************************************
-    DEBUGGING
-***************************************************************************/
-
-#define LOG_UML                         (0)
-#define LOG_NATIVE                      (0)
-
-#define DISABLE_FLAG_OPTIMIZATIONS      (0)
-#define DISABLE_FAST_REGISTERS          (0)
-#define SINGLE_INSTRUCTION_MODE         (0)
-
-#define PRINTF_EXCEPTIONS               (0)
-#define PRINTF_MMU                      (0)
-
-#define PROBE_ADDRESS                   ~0
 
 
 
@@ -61,15 +44,6 @@ extern offs_t ppc_dasm_one(char *buffer, UINT32 pc, UINT32 op);
 #define MODE_PROTECTION                 0x02        /* 4XX */
 #define MODE_USER                       0x04
 
-/* size of the execution code cache */
-#define CACHE_SIZE                      (32 * 1024 * 1024)
-
-/* compilation boundaries -- how far back/forward does the analysis extend? */
-#define COMPILE_BACKWARDS_BYTES         128
-#define COMPILE_FORWARDS_BYTES          512
-#define COMPILE_MAX_INSTRUCTIONS        ((COMPILE_BACKWARDS_BYTES/4) + (COMPILE_FORWARDS_BYTES/4))
-#define COMPILE_MAX_SEQUENCE            64
-
 /* exit codes */
 #define EXECUTE_OUT_OF_CYCLES           0
 #define EXECUTE_MISSING_CODE            1
@@ -82,15 +56,15 @@ extern offs_t ppc_dasm_one(char *buffer, UINT32 pc, UINT32 op);
     MACROS
 ***************************************************************************/
 
-#define R32(reg)                ppc->impstate->regmap[reg]
-#define R32Z(reg)               (((reg) == 0) ? parameter(0) : ppc->impstate->regmap[reg])
-#define F64(reg)                ppc->impstate->fdregmap[reg]
-#define CR32(reg)               mem(&ppc->cr[reg])
-#define FPSCR32                 mem(&ppc->fpscr)
-#define MSR32                   mem(&ppc->msr)
-#define XERSO32                 mem(&ppc->xerso)
-#define SR32(reg)               mem(&ppc->sr[reg])
-#define SPR32(reg)              mem(&ppc->spr[reg])
+#define R32(reg)                m_regmap[reg]
+#define R32Z(reg)               (((reg) == 0) ? parameter(0) : m_regmap[reg])
+#define F64(reg)                m_fdregmap[reg]
+#define CR32(reg)               mem(&m_core->cr[reg])
+#define FPSCR32                 mem(&m_core->fpscr)
+#define MSR32                   mem(&m_core->msr)
+#define XERSO32                 mem(&m_core->xerso)
+#define SR32(reg)               mem(&m_core->sr[reg])
+#define SPR32(reg)              mem(&m_core->spr[reg])
 
 #define CRMASK(reg)             (0xf0000000 >> ((reg) * 4))
 
@@ -122,336 +96,15 @@ extern offs_t ppc_dasm_one(char *buffer, UINT32 pc, UINT32 op);
 
 
 /***************************************************************************
-    STRUCTURES & TYPEDEFS
-***************************************************************************/
-
-/* fast RAM info */
-struct fast_ram_info
-{
-	offs_t              start;                      /* start of the RAM block */
-	offs_t              end;                        /* end of the RAM block */
-	UINT8               readonly;                   /* TRUE if read-only */
-	void *              base;                       /* base in memory where the RAM lives */
-};
-
-
-/* hotspot info */
-struct hotspot_info
-{
-	offs_t              pc;                         /* PC to consider */
-	UINT32              opcode;                     /* required opcode at that PC */
-	UINT32              cycles;                     /* number of cycles to eat when hit */
-};
-
-
-/* internal compiler state */
-struct compiler_state
-{
-	UINT32              cycles;                     /* accumulated cycles */
-	UINT8               checkints;                  /* need to check interrupts before next instruction */
-	UINT8               checksoftints;              /* need to check software interrupts before next instruction */
-	code_label  labelnum;                   /* index for local labels */
-};
-
-
-/* PowerPC implementation state */
-struct ppcimp_state
-{
-	/* core state */
-	drc_cache *         cache;                      /* pointer to the DRC code cache */
-	drcuml_state *      drcuml;                     /* DRC UML generator state */
-	ppc_frontend *      drcfe;                      /* pointer to the DRC front-end state */
-	UINT32              drcoptions;                 /* configurable DRC options */
-
-	/* parameters for subroutines */
-	UINT32              mode;                       /* current global mode */
-	const char *        format;                     /* format string for printing */
-	UINT32              arg0;                       /* print_debug argument 1 */
-	UINT32              arg1;                       /* print_debug argument 2 */
-	UINT32              updateaddr;                 /* update address storage */
-	UINT32              swcount;                    /* counter for sw instructions */
-	UINT32              tempaddr;                   /* temporary address storage */
-	drcuml_ireg         tempdata;                   /* temporary data storage */
-	double              fp0;                        /* floating point 0 */
-
-	/* tables */
-	UINT8               fpmode[4];                  /* FPU mode table */
-	UINT8               sz_cr_table[32];            /* SZ CR table */
-	UINT8               cmp_cr_table[32];           /* CMP CR table */
-	UINT8               cmpl_cr_table[32];          /* CMPL CR table */
-	UINT8               fcmp_cr_table[32];          /* FCMP CR table */
-
-	/* internal stuff */
-	UINT8               cache_dirty;                /* true if we need to flush the cache */
-
-	/* register mappings */
-	parameter   regmap[32];                 /* parameter to register mappings for all 32 integer registers */
-	parameter   fdregmap[32];               /* parameter to register mappings for all 32 floating point registers */
-
-	/* subroutines */
-	code_handle *   entry;                      /* entry point */
-	code_handle *   nocode;                     /* nocode exception handler */
-	code_handle *   out_of_cycles;              /* out of cycles exception handler */
-	code_handle *   tlb_mismatch;               /* tlb mismatch handler */
-	code_handle *   swap_tgpr;                  /* swap TGPR handler */
-	code_handle *   lsw[8][32];                 /* lsw entries */
-	code_handle *   stsw[8][32];                /* stsw entries */
-	code_handle *   read8[8];                   /* read byte */
-	code_handle *   write8[8];                  /* write byte */
-	code_handle *   read16[8];                  /* read half */
-	code_handle *   read16mask[8];              /* read half */
-	code_handle *   write16[8];                 /* write half */
-	code_handle *   write16mask[8];             /* write half */
-	code_handle *   read32[8];                  /* read word */
-	code_handle *   read32align[8];             /* read word aligned */
-	code_handle *   read32mask[8];              /* read word */
-	code_handle *   write32[8];                 /* write word */
-	code_handle *   write32align[8];            /* write word aligned */
-	code_handle *   write32mask[8];             /* write word */
-	code_handle *   read64[8];                  /* read double */
-	code_handle *   read64mask[8];              /* read double */
-	code_handle *   write64[8];                 /* write double */
-	code_handle *   write64mask[8];             /* write double */
-	code_handle *   exception[EXCEPTION_COUNT]; /* array of exception handlers */
-	code_handle *   exception_norecover[EXCEPTION_COUNT];   /* array of exception handlers */
-
-	/* fast RAM */
-	UINT32              fastram_select;
-	fast_ram_info       fastram[PPC_MAX_FASTRAM];
-
-	/* hotspots */
-	UINT32              hotspot_select;
-	hotspot_info        hotspot[PPC_MAX_HOTSPOTS];
-};
-
-
-
-/***************************************************************************
-    FUNCTION PROTOTYPES
-***************************************************************************/
-
-static void code_flush_cache(powerpc_state *ppc);
-static void code_compile_block(powerpc_state *ppc, UINT8 mode, offs_t pc);
-
-static void cfunc_printf_exception(void *param);
-static void cfunc_printf_probe(void *param);
-
-static void static_generate_entry_point(powerpc_state *ppc);
-static void static_generate_nocode_handler(powerpc_state *ppc);
-static void static_generate_out_of_cycles(powerpc_state *ppc);
-static void static_generate_tlb_mismatch(powerpc_state *ppc);
-static void static_generate_exception(powerpc_state *ppc, UINT8 exception, int recover, const char *name);
-static void static_generate_memory_accessor(powerpc_state *ppc, int mode, int size, int iswrite, int ismasked, const char *name, code_handle *&handleptr, code_handle *masked);
-static void static_generate_swap_tgpr(powerpc_state *ppc);
-static void static_generate_lsw_entries(powerpc_state *ppc, int mode);
-static void static_generate_stsw_entries(powerpc_state *ppc, int mode);
-
-static void generate_update_mode(powerpc_state *ppc, drcuml_block *block);
-static void generate_update_cycles(powerpc_state *ppc, drcuml_block *block, compiler_state *compiler, parameter, int allow_exception);
-static void generate_checksum_block(powerpc_state *ppc, drcuml_block *block, compiler_state *compiler, const opcode_desc *seqhead, const opcode_desc *seqlast);
-static void generate_sequence_instruction(powerpc_state *ppc, drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-static int generate_opcode(powerpc_state *ppc, drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-static int generate_instruction_13(powerpc_state *ppc, drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-static int generate_instruction_1f(powerpc_state *ppc, drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-static int generate_instruction_3b(powerpc_state *ppc, drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-static int generate_instruction_3f(powerpc_state *ppc, drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-
-static void log_add_disasm_comment(drcuml_block *block, UINT32 pc, UINT32 op);
-static const char *log_desc_flags_to_string(UINT32 flags);
-static void log_register_list(drcuml_state *drcuml, const char *string, const UINT32 *reglist, const UINT32 *regnostarlist);
-static void log_opcode_desc(drcuml_state *drcuml, const opcode_desc *desclist, int indent);
-
-
-
-/***************************************************************************
-    PRIVATE GLOBAL VARIABLES
-***************************************************************************/
-
-/* lookup table for FP modes */
-static const UINT8 fpmode_source[4] =
-{
-	ROUND_ROUND,
-	ROUND_TRUNC,
-	ROUND_CEIL,
-	ROUND_FLOOR
-};
-
-/* flag lookup table for SZ */
-static const UINT8 sz_cr_table_source[32] =
-{
-	/* ..... */ 0x4,
-	/* ....C */ 0x4,
-	/* ...V. */ 0x4,
-	/* ...VC */ 0x4,
-	/* ..Z.. */ 0x2,
-	/* ..Z.C */ 0x2,
-	/* ..ZV. */ 0x2,
-	/* ..ZVC */ 0x2,
-	/* .S... */ 0x8,
-	/* .S..C */ 0x8,
-	/* .S.V. */ 0x8,
-	/* .S.VC */ 0x8,
-	/* .SZ.. */ 0x2,
-	/* .SZ.C */ 0x2,
-	/* .SZV. */ 0x2,
-	/* .SZVC */ 0x2,
-	/* U.... */ 0x4,
-	/* U...C */ 0x4,
-	/* U..V. */ 0x4,
-	/* U..VC */ 0x4,
-	/* U.Z.. */ 0x2,
-	/* U.Z.C */ 0x2,
-	/* U.ZV. */ 0x2,
-	/* U.ZVC */ 0x2,
-	/* US... */ 0x8,
-	/* US..C */ 0x8,
-	/* US.V. */ 0x8,
-	/* US.VC */ 0x8,
-	/* USZ.. */ 0x2,
-	/* USZ.C */ 0x2,
-	/* USZV. */ 0x2,
-	/* USZVC */ 0x2
-};
-
-/* flag lookup table for CMP */
-static const UINT8 cmp_cr_table_source[32] =
-{
-	/* ..... */ 0x4,
-	/* ....C */ 0x4,
-	/* ...V. */ 0x8,
-	/* ...VC */ 0x8,
-	/* ..Z.. */ 0x2,
-	/* ..Z.C */ 0x2,
-	/* ..ZV. */ 0x2,
-	/* ..ZVC */ 0x2,
-	/* .S... */ 0x8,
-	/* .S..C */ 0x8,
-	/* .S.V. */ 0x4,
-	/* .S.VC */ 0x4,
-	/* .SZ.. */ 0x2,
-	/* .SZ.C */ 0x2,
-	/* .SZV. */ 0x2,
-	/* .SZVC */ 0x2,
-	/* U.... */ 0x4,
-	/* U...C */ 0x4,
-	/* U..V. */ 0x8,
-	/* U..VC */ 0x8,
-	/* U.Z.. */ 0x2,
-	/* U.Z.C */ 0x2,
-	/* U.ZV. */ 0x2,
-	/* U.ZVC */ 0x2,
-	/* US... */ 0x8,
-	/* US..C */ 0x8,
-	/* US.V. */ 0x4,
-	/* US.VC */ 0x4,
-	/* USZ.. */ 0x2,
-	/* USZ.C */ 0x2,
-	/* USZV. */ 0x2,
-	/* USZVC */ 0x2
-};
-
-/* flag lookup table for CMPL */
-static const UINT8 cmpl_cr_table_source[32] =
-{
-	/* ..... */ 0x4,
-	/* ....C */ 0x8,
-	/* ...V. */ 0x4,
-	/* ...VC */ 0x8,
-	/* ..Z.. */ 0x2,
-	/* ..Z.C */ 0x2,
-	/* ..ZV. */ 0x2,
-	/* ..ZVC */ 0x2,
-	/* .S... */ 0x4,
-	/* .S..C */ 0x8,
-	/* .S.V. */ 0x4,
-	/* .S.VC */ 0x8,
-	/* .SZ.. */ 0x2,
-	/* .SZ.C */ 0x2,
-	/* .SZV. */ 0x2,
-	/* .SZVC */ 0x2,
-	/* U.... */ 0x4,
-	/* U...C */ 0x8,
-	/* U..V. */ 0x4,
-	/* U..VC */ 0x8,
-	/* U.Z.. */ 0x2,
-	/* U.Z.C */ 0x2,
-	/* U.ZV. */ 0x2,
-	/* U.ZVC */ 0x2,
-	/* US... */ 0x4,
-	/* US..C */ 0x8,
-	/* US.V. */ 0x4,
-	/* US.VC */ 0x8,
-	/* USZ.. */ 0x2,
-	/* USZ.C */ 0x2,
-	/* USZV. */ 0x2,
-	/* USZVC */ 0x2
-};
-
-/* flag lookup table for FCMP */
-static const UINT8 fcmp_cr_table_source[32] =
-{
-	/* ..... */ 0x4,
-	/* ....C */ 0x8,
-	/* ...V. */ 0x4,
-	/* ...VC */ 0x8,
-	/* ..Z.. */ 0x2,
-	/* ..Z.C */ 0xa,
-	/* ..ZV. */ 0x2,
-	/* ..ZVC */ 0xa,
-	/* .S... */ 0x4,
-	/* .S..C */ 0x8,
-	/* .S.V. */ 0x4,
-	/* .S.VC */ 0x8,
-	/* .SZ.. */ 0x2,
-	/* .SZ.C */ 0xa,
-	/* .SZV. */ 0x2,
-	/* .SZVC */ 0xa,
-	/* U.... */ 0x5,
-	/* U...C */ 0x9,
-	/* U..V. */ 0x5,
-	/* U..VC */ 0x9,
-	/* U.Z.. */ 0x3,
-	/* U.Z.C */ 0xb,
-	/* U.ZV. */ 0x3,
-	/* U.ZVC */ 0xb,
-	/* US... */ 0x5,
-	/* US..C */ 0x9,
-	/* US.V. */ 0x5,
-	/* US.VC */ 0x9,
-	/* USZ.. */ 0x3,
-	/* USZ.C */ 0xb,
-	/* USZV. */ 0x3,
-	/* USZVC */ 0xb
-};
-
-
-
-/***************************************************************************
     INLINE FUNCTIONS
 ***************************************************************************/
-
-INLINE powerpc_state *get_safe_token(device_t *device)
-{
-	assert(device != NULL);
-	assert(device->type() == PPC403GA ||
-			device->type() == PPC403GCX ||
-			device->type() == PPC405GP ||
-			device->type() == PPC601 ||
-			device->type() == PPC602 ||
-			device->type() == PPC603 ||
-			device->type() == PPC603E ||
-			device->type() == PPC603R ||
-			device->type() == PPC604 ||
-			device->type() == MPC8240);
-	return *(powerpc_state **)downcast<legacy_cpu_device *>(device)->token();
-}
 
 /*-------------------------------------------------
     alloc_handle - allocate a handle if not
     already allocated
 -------------------------------------------------*/
 
-INLINE void alloc_handle(drcuml_state *drcuml, code_handle **handleptr, const char *name)
+inline void ppc_device::alloc_handle(drcuml_state *drcuml, code_handle **handleptr, const char *name)
 {
 	if (*handleptr == NULL)
 		*handleptr = drcuml->handle_alloc(name);
@@ -463,13 +116,17 @@ INLINE void alloc_handle(drcuml_state *drcuml, code_handle **handleptr, const ch
     registers
 -------------------------------------------------*/
 
-INLINE void load_fast_iregs(powerpc_state *ppc, drcuml_block *block)
+inline void ppc_device::load_fast_iregs(drcuml_block *block)
 {
 	int regnum;
 
-	for (regnum = 0; regnum < ARRAY_LENGTH(ppc->impstate->regmap); regnum++)
-		if (ppc->impstate->regmap[regnum].is_int_register())
-			UML_MOV(block, ireg(ppc->impstate->regmap[regnum].ireg() - REG_I0), mem(&ppc->r[regnum]));
+	for (regnum = 0; regnum < ARRAY_LENGTH(m_regmap); regnum++)
+	{
+		if (m_regmap[regnum].is_int_register())
+		{
+			UML_MOV(block, ireg(m_regmap[regnum].ireg() - REG_I0), mem(&m_core->r[regnum]));
+		}
+	}
 }
 
 
@@ -478,13 +135,17 @@ INLINE void load_fast_iregs(powerpc_state *ppc, drcuml_block *block)
     registers
 -------------------------------------------------*/
 
-INLINE void save_fast_iregs(powerpc_state *ppc, drcuml_block *block)
+void ppc_device::save_fast_iregs(drcuml_block *block)
 {
 	int regnum;
 
-	for (regnum = 0; regnum < ARRAY_LENGTH(ppc->impstate->regmap); regnum++)
-		if (ppc->impstate->regmap[regnum].is_int_register())
-			UML_MOV(block, mem(&ppc->r[regnum]), ireg(ppc->impstate->regmap[regnum].ireg() - REG_I0));
+	for (regnum = 0; regnum < ARRAY_LENGTH(m_regmap); regnum++)
+	{
+		if (m_regmap[regnum].is_int_register())
+		{
+			UML_MOV(block, mem(&m_core->r[regnum]), ireg(m_regmap[regnum].ireg() - REG_I0));
+		}
+	}
 }
 
 
@@ -493,7 +154,7 @@ INLINE void save_fast_iregs(powerpc_state *ppc, drcuml_block *block)
     for an rlw* instruction
 -------------------------------------------------*/
 
-INLINE UINT32 compute_rlw_mask(UINT8 mb, UINT8 me)
+inline UINT32 ppc_device::compute_rlw_mask(UINT8 mb, UINT8 me)
 {
 	if (mb <= me)
 		return (0xffffffff >> mb) & (0xffffffff << (31 - me));
@@ -507,7 +168,7 @@ INLINE UINT32 compute_rlw_mask(UINT8 mb, UINT8 me)
     for a mtcrf/mfcrf instruction
 -------------------------------------------------*/
 
-INLINE UINT32 compute_crf_mask(UINT8 crm)
+inline UINT32 ppc_device::compute_crf_mask(UINT8 crm)
 {
 	UINT32 mask = 0;
 	if (crm & 0x80) mask |= 0xf0000000;
@@ -527,7 +188,7 @@ INLINE UINT32 compute_crf_mask(UINT8 crm)
     SPR field of an opcode
 -------------------------------------------------*/
 
-INLINE UINT32 compute_spr(UINT32 spr)
+inline UINT32 ppc_device::compute_spr(UINT32 spr)
 {
 	return ((spr >> 5) | (spr << 5)) & 0x3ff;
 }
@@ -539,247 +200,34 @@ INLINE UINT32 compute_spr(UINT32 spr)
 ***************************************************************************/
 
 /*-------------------------------------------------
-    ppcdrc_init - initialize the processor
--------------------------------------------------*/
-
-static void ppcdrc_init(powerpc_flavor flavor, UINT32 cap, int tb_divisor, legacy_cpu_device *device, device_irq_acknowledge_delegate irqcallback)
-{
-	powerpc_state *ppc;
-	drcbe_info beinfo;
-	UINT32 flags = 0;
-	drc_cache *cache;
-	int regnum;
-
-	/* allocate enough space for the cache and the core */
-	cache = auto_alloc(device->machine(), drc_cache(CACHE_SIZE + sizeof(*ppc)));
-
-	/* allocate the core from the near cache */
-	*(powerpc_state **)device->token() = ppc = (powerpc_state *)cache->alloc_near(sizeof(*ppc));
-	memset(ppc, 0, sizeof(*ppc));
-
-	/* initialize the core */
-	ppccom_init(ppc, flavor, cap, tb_divisor, device, irqcallback);
-
-	/* allocate the implementation-specific state from the full cache */
-	ppc->impstate = (ppcimp_state *)cache->alloc_near(sizeof(*ppc->impstate));
-	memset(ppc->impstate, 0, sizeof(*ppc->impstate));
-	ppc->impstate->cache = cache;
-
-	/* initialize the UML generator */
-	if (LOG_UML)
-		flags |= DRCUML_OPTION_LOG_UML;
-	if (LOG_NATIVE)
-		flags |= DRCUML_OPTION_LOG_NATIVE;
-	ppc->impstate->drcuml = auto_alloc(device->machine(), drcuml_state(*device, *cache, flags, 8, 32, 2));
-
-	/* add symbols for our stuff */
-	ppc->impstate->drcuml->symbol_add(&ppc->pc, sizeof(ppc->pc), "pc");
-	ppc->impstate->drcuml->symbol_add(&ppc->icount, sizeof(ppc->icount), "icount");
-	for (regnum = 0; regnum < 32; regnum++)
-	{
-		char buf[10];
-		sprintf(buf, "r%d", regnum);
-		ppc->impstate->drcuml->symbol_add(&ppc->r[regnum], sizeof(ppc->r[regnum]), buf);
-		sprintf(buf, "fpr%d", regnum);
-		ppc->impstate->drcuml->symbol_add(&ppc->f[regnum], sizeof(ppc->r[regnum]), buf);
-	}
-	for (regnum = 0; regnum < 8; regnum++)
-	{
-		char buf[10];
-		sprintf(buf, "cr%d", regnum);
-		ppc->impstate->drcuml->symbol_add(&ppc->cr[regnum], sizeof(ppc->cr[regnum]), buf);
-	}
-	ppc->impstate->drcuml->symbol_add(&ppc->xerso, sizeof(ppc->xerso), "xerso");
-	ppc->impstate->drcuml->symbol_add(&ppc->fpscr, sizeof(ppc->fpscr), "fpscr");
-	ppc->impstate->drcuml->symbol_add(&ppc->msr, sizeof(ppc->msr), "msr");
-	ppc->impstate->drcuml->symbol_add(&ppc->sr, sizeof(ppc->sr), "sr");
-	ppc->impstate->drcuml->symbol_add(&ppc->spr[SPR_XER], sizeof(ppc->spr[SPR_XER]), "xer");
-	ppc->impstate->drcuml->symbol_add(&ppc->spr[SPR_LR], sizeof(ppc->spr[SPR_LR]), "lr");
-	ppc->impstate->drcuml->symbol_add(&ppc->spr[SPR_CTR], sizeof(ppc->spr[SPR_CTR]), "ctr");
-	ppc->impstate->drcuml->symbol_add(&ppc->spr, sizeof(ppc->spr), "spr");
-	ppc->impstate->drcuml->symbol_add(&ppc->dcr, sizeof(ppc->dcr), "dcr");
-	ppc->impstate->drcuml->symbol_add(&ppc->param0, sizeof(ppc->param0), "param0");
-	ppc->impstate->drcuml->symbol_add(&ppc->param1, sizeof(ppc->param1), "param1");
-	ppc->impstate->drcuml->symbol_add(&ppc->irq_pending, sizeof(ppc->irq_pending), "irq_pending");
-	ppc->impstate->drcuml->symbol_add(&ppc->impstate->mode, sizeof(ppc->impstate->mode), "mode");
-	ppc->impstate->drcuml->symbol_add(&ppc->impstate->arg0, sizeof(ppc->impstate->arg0), "arg0");
-	ppc->impstate->drcuml->symbol_add(&ppc->impstate->arg1, sizeof(ppc->impstate->arg1), "arg1");
-	ppc->impstate->drcuml->symbol_add(&ppc->impstate->updateaddr, sizeof(ppc->impstate->updateaddr), "updateaddr");
-	ppc->impstate->drcuml->symbol_add(&ppc->impstate->swcount, sizeof(ppc->impstate->swcount), "swcount");
-	ppc->impstate->drcuml->symbol_add(&ppc->impstate->tempaddr, sizeof(ppc->impstate->tempaddr), "tempaddr");
-	ppc->impstate->drcuml->symbol_add(&ppc->impstate->tempdata, sizeof(ppc->impstate->tempdata), "tempdata");
-	ppc->impstate->drcuml->symbol_add(&ppc->impstate->fp0, sizeof(ppc->impstate->fp0), "fp0");
-	ppc->impstate->drcuml->symbol_add(&ppc->impstate->fpmode, sizeof(ppc->impstate->fpmode), "fpmode");
-	ppc->impstate->drcuml->symbol_add(&ppc->impstate->sz_cr_table, sizeof(ppc->impstate->sz_cr_table), "sz_cr_table");
-	ppc->impstate->drcuml->symbol_add(&ppc->impstate->cmp_cr_table, sizeof(ppc->impstate->cmp_cr_table), "cmp_cr_table");
-	ppc->impstate->drcuml->symbol_add(&ppc->impstate->cmpl_cr_table, sizeof(ppc->impstate->cmpl_cr_table), "cmpl_cr_table");
-	ppc->impstate->drcuml->symbol_add(&ppc->impstate->fcmp_cr_table, sizeof(ppc->impstate->fcmp_cr_table), "fcmp_cr_table");
-
-	/* initialize the front-end helper */
-	ppc->impstate->drcfe = auto_alloc(device->machine(), ppc_frontend(*ppc, COMPILE_BACKWARDS_BYTES, COMPILE_FORWARDS_BYTES, SINGLE_INSTRUCTION_MODE ? 1 : COMPILE_MAX_SEQUENCE));
-
-	/* initialize the implementation state tables */
-	memcpy(ppc->impstate->fpmode, fpmode_source, sizeof(fpmode_source));
-	memcpy(ppc->impstate->sz_cr_table, sz_cr_table_source, sizeof(sz_cr_table_source));
-	memcpy(ppc->impstate->cmp_cr_table, cmp_cr_table_source, sizeof(cmp_cr_table_source));
-	memcpy(ppc->impstate->cmpl_cr_table, cmpl_cr_table_source, sizeof(cmpl_cr_table_source));
-	memcpy(ppc->impstate->fcmp_cr_table, fcmp_cr_table_source, sizeof(fcmp_cr_table_source));
-
-	/* compute the register parameters */
-	for (regnum = 0; regnum < 32; regnum++)
-	{
-		ppc->impstate->regmap[regnum] = mem(&ppc->r[regnum]);
-		ppc->impstate->fdregmap[regnum] = mem(&ppc->f[regnum]);
-	}
-
-	/* if we have registers to spare, assign r0, r1, r2 to leftovers */
-	if (!DISABLE_FAST_REGISTERS)
-	{
-		ppc->impstate->drcuml->get_backend_info(beinfo);
-		if (beinfo.direct_iregs > 5)
-			ppc->impstate->regmap[0] = I5;
-		if (beinfo.direct_iregs > 6)
-			ppc->impstate->regmap[1] = I6;
-		if (beinfo.direct_iregs > 7)
-			ppc->impstate->regmap[2] = I7;
-	}
-
-	/* mark the cache dirty so it is updated on next execute */
-	ppc->impstate->cache_dirty = TRUE;
-}
-
-
-/*-------------------------------------------------
-    ppcdrc_reset - reset the processor
--------------------------------------------------*/
-
-static CPU_RESET( ppcdrc )
-{
-	powerpc_state *ppc = get_safe_token(device);
-
-	/* reset the common code and mark the cache dirty */
-	ppccom_reset(ppc);
-	ppc->impstate->mode = 0;
-	ppc->impstate->cache_dirty = TRUE;
-}
-
-
-/*-------------------------------------------------
     ppcdrc_execute - execute the CPU for the
     specified number of cycles
 -------------------------------------------------*/
 
-static CPU_EXECUTE( ppcdrc )
+void ppc_device::execute_run()
 {
-	powerpc_state *ppc = get_safe_token(device);
-	drcuml_state *drcuml = ppc->impstate->drcuml;
 	int execute_result;
 
 	/* reset the cache if dirty */
-	if (ppc->impstate->cache_dirty)
-		code_flush_cache(ppc);
-	ppc->impstate->cache_dirty = FALSE;
+	if (m_cache_dirty)
+		code_flush_cache();
+	m_cache_dirty = FALSE;
 
 	/* execute */
 	do
 	{
 		/* run as much as we can */
-		execute_result = drcuml->execute(*ppc->impstate->entry);
+		execute_result = m_drcuml->execute(*m_entry);
 
 		/* if we need to recompile, do it */
 		if (execute_result == EXECUTE_MISSING_CODE)
-			code_compile_block(ppc, ppc->impstate->mode, ppc->pc);
+			code_compile_block(m_core->mode, m_core->pc);
 		else if (execute_result == EXECUTE_UNMAPPED_CODE)
-			fatalerror("Attempted to execute unmapped code at PC=%08X\n", ppc->pc);
+			fatalerror("Attempted to execute unmapped code at PC=%08X\n", m_core->pc);
 		else if (execute_result == EXECUTE_RESET_CACHE)
-			code_flush_cache(ppc);
+			code_flush_cache();
 
 	} while (execute_result != EXECUTE_OUT_OF_CYCLES);
-}
-
-
-/*-------------------------------------------------
-    ppcdrc_exit - cleanup from execution
--------------------------------------------------*/
-
-static CPU_EXIT( ppcdrc )
-{
-	powerpc_state *ppc = get_safe_token(device);
-	ppccom_exit(ppc);
-
-	/* clean up the DRC */
-	auto_free(device->machine(), ppc->impstate->drcfe);
-	auto_free(device->machine(), ppc->impstate->drcuml);
-	auto_free(device->machine(), ppc->impstate->cache);
-}
-
-
-/*-------------------------------------------------
-    ppcdrc_translate - perform virtual-to-physical
-    address translation
--------------------------------------------------*/
-
-static CPU_TRANSLATE( ppcdrc )
-{
-	powerpc_state *ppc = get_safe_token(device);
-	return ppccom_translate_address(ppc, space, intention, address);
-}
-
-
-/*-------------------------------------------------
-    ppcdrc_dasm - disassemble an instruction
--------------------------------------------------*/
-
-static CPU_DISASSEMBLE( ppcdrc )
-{
-	powerpc_state *ppc = get_safe_token(device);
-	return ppccom_dasm(ppc, buffer, pc, oprom, opram);
-}
-
-
-/*-------------------------------------------------
-    ppcdrc_set_info - set information about a given
-    CPU instance
--------------------------------------------------*/
-
-static CPU_SET_INFO( ppcdrc )
-{
-	powerpc_state *ppc = get_safe_token(device);
-
-	/* --- everything is handled generically --- */
-	ppccom_set_info(ppc, state, info);
-}
-
-
-/*-------------------------------------------------
-    ppcdrc_get_info - return information about a given
-    CPU instance
--------------------------------------------------*/
-
-static CPU_GET_INFO( ppcdrc )
-{
-	powerpc_state *ppc = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
-	switch (state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_CONTEXT_SIZE:                  info->i = sizeof(powerpc_state *);              break;
-		case CPUINFO_INT_PREVIOUSPC:                    /* not implemented */                           break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_FCT_SET_INFO:                      info->setinfo = CPU_SET_INFO_NAME(ppcdrc);      break;
-		case CPUINFO_FCT_INIT:                          /* provided per-CPU */                          break;
-		case CPUINFO_FCT_RESET:                         info->reset = CPU_RESET_NAME(ppcdrc);           break;
-		case CPUINFO_FCT_EXIT:                          info->exit = CPU_EXIT_NAME(ppcdrc);             break;
-		case CPUINFO_FCT_EXECUTE:                       info->execute = CPU_EXECUTE_NAME(ppcdrc);       break;
-		case CPUINFO_FCT_DISASSEMBLE:                   info->disassemble = CPU_DISASSEMBLE_NAME(ppcdrc);break;
-		case CPUINFO_FCT_TRANSLATE:                     info->translate = CPU_TRANSLATE_NAME(ppcdrc);   break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_SOURCE_FILE:                       strcpy(info->s, __FILE__);                      break;
-
-		/* --- everything else is handled generically --- */
-		default:                                        ppccom_get_info(ppc, state, info);              break;
-	}
 }
 
 
@@ -787,10 +235,9 @@ static CPU_GET_INFO( ppcdrc )
     ppcdrc_set_options - configure DRC options
 -------------------------------------------------*/
 
-void ppcdrc_set_options(device_t *device, UINT32 options)
+void ppc_device::ppcdrc_set_options(UINT32 options)
 {
-	powerpc_state *ppc = get_safe_token(device);
-	ppc->impstate->drcoptions = options;
+	m_drcoptions = options;
 }
 
 
@@ -799,16 +246,15 @@ void ppcdrc_set_options(device_t *device, UINT32 options)
     region
 -------------------------------------------------*/
 
-void ppcdrc_add_fastram(device_t *device, offs_t start, offs_t end, UINT8 readonly, void *base)
+void ppc_device::ppcdrc_add_fastram(offs_t start, offs_t end, UINT8 readonly, void *base)
 {
-	powerpc_state *ppc = get_safe_token(device);
-	if (ppc->impstate->fastram_select < ARRAY_LENGTH(ppc->impstate->fastram))
+	if (m_fastram_select < ARRAY_LENGTH(m_fastram))
 	{
-		ppc->impstate->fastram[ppc->impstate->fastram_select].start = start;
-		ppc->impstate->fastram[ppc->impstate->fastram_select].end = end;
-		ppc->impstate->fastram[ppc->impstate->fastram_select].readonly = readonly;
-		ppc->impstate->fastram[ppc->impstate->fastram_select].base = base;
-		ppc->impstate->fastram_select++;
+		m_fastram[m_fastram_select].start = start;
+		m_fastram[m_fastram_select].end = end;
+		m_fastram[m_fastram_select].readonly = readonly;
+		m_fastram[m_fastram_select].base = base;
+		m_fastram_select++;
 	}
 }
 
@@ -817,15 +263,14 @@ void ppcdrc_add_fastram(device_t *device, offs_t start, offs_t end, UINT8 readon
     ppcdrc_add_hotspot - add a new hotspot
 -------------------------------------------------*/
 
-void ppcdrc_add_hotspot(device_t *device, offs_t pc, UINT32 opcode, UINT32 cycles)
+void ppc_device::ppcdrc_add_hotspot(offs_t pc, UINT32 opcode, UINT32 cycles)
 {
-	powerpc_state *ppc = get_safe_token(device);
-	if (ppc->impstate->hotspot_select < ARRAY_LENGTH(ppc->impstate->hotspot))
+	if (m_hotspot_select < ARRAY_LENGTH(m_hotspot))
 	{
-		ppc->impstate->hotspot[ppc->impstate->hotspot_select].pc = pc;
-		ppc->impstate->hotspot[ppc->impstate->hotspot_select].opcode = opcode;
-		ppc->impstate->hotspot[ppc->impstate->hotspot_select].cycles = cycles;
-		ppc->impstate->hotspot_select++;
+		m_hotspot[m_hotspot_select].pc = pc;
+		m_hotspot[m_hotspot_select].opcode = opcode;
+		m_hotspot[m_hotspot_select].cycles = cycles;
+		m_hotspot_select++;
 	}
 }
 
@@ -840,66 +285,63 @@ void ppcdrc_add_hotspot(device_t *device, offs_t pc, UINT32 opcode, UINT32 cycle
     regenerate static code
 -------------------------------------------------*/
 
-static void code_flush_cache(powerpc_state *ppc)
+void ppc_device::code_flush_cache()
 {
-	drcuml_state *drcuml = ppc->impstate->drcuml;
-	int mode;
-
 	/* empty the transient cache contents */
-	drcuml->reset();
+	m_drcuml->reset();
 
 	try
 	{
 		/* generate the entry point and out-of-cycles handlers */
-		static_generate_entry_point(ppc);
-		static_generate_nocode_handler(ppc);
-		static_generate_out_of_cycles(ppc);
-		static_generate_tlb_mismatch(ppc);
-		if (ppc->cap & PPCCAP_603_MMU)
-			static_generate_swap_tgpr(ppc);
+		static_generate_entry_point();
+		static_generate_nocode_handler();
+		static_generate_out_of_cycles();
+		static_generate_tlb_mismatch();
+		if (m_cap & PPCCAP_603_MMU)
+			static_generate_swap_tgpr();
 
 		/* append exception handlers for various types */
-		static_generate_exception(ppc, EXCEPTION_RESET,     TRUE,  "exception_reset");
-		static_generate_exception(ppc, EXCEPTION_MACHCHECK, TRUE,  "exception_machine_check");
-		static_generate_exception(ppc, EXCEPTION_DSI,       TRUE,  "exception_dsi");
-		static_generate_exception(ppc, EXCEPTION_ISI,       TRUE,  "exception_isi");
-		static_generate_exception(ppc, EXCEPTION_EI,        TRUE,  "exception_ei");
-		static_generate_exception(ppc, EXCEPTION_EI,        FALSE, "exception_ei_norecover");
-		static_generate_exception(ppc, EXCEPTION_ALIGN,     TRUE,  "exception_align");
-		static_generate_exception(ppc, EXCEPTION_PROGRAM,   TRUE,  "exception_program");
-		static_generate_exception(ppc, EXCEPTION_NOFPU,     TRUE,  "exception_fpu_unavailable");
-		static_generate_exception(ppc, EXCEPTION_DECREMENT, TRUE,  "exception_decrementer");
-		static_generate_exception(ppc, EXCEPTION_SYSCALL,   TRUE,  "exception_syscall");
-		static_generate_exception(ppc, EXCEPTION_TRACE,     TRUE,  "exception_trace");
-		static_generate_exception(ppc, EXCEPTION_FPASSIST,  TRUE,  "exception_floating_point_assist");
-		if (ppc->cap & PPCCAP_603_MMU)
+		static_generate_exception(EXCEPTION_RESET,     TRUE,  "exception_reset");
+		static_generate_exception(EXCEPTION_MACHCHECK, TRUE,  "exception_machine_check");
+		static_generate_exception(EXCEPTION_DSI,       TRUE,  "exception_dsi");
+		static_generate_exception(EXCEPTION_ISI,       TRUE,  "exception_isi");
+		static_generate_exception(EXCEPTION_EI,        TRUE,  "exception_ei");
+		static_generate_exception(EXCEPTION_EI,        FALSE, "exception_ei_norecover");
+		static_generate_exception(EXCEPTION_ALIGN,     TRUE,  "exception_align");
+		static_generate_exception(EXCEPTION_PROGRAM,   TRUE,  "exception_program");
+		static_generate_exception(EXCEPTION_NOFPU,     TRUE,  "exception_fpu_unavailable");
+		static_generate_exception(EXCEPTION_DECREMENT, TRUE,  "exception_decrementer");
+		static_generate_exception(EXCEPTION_SYSCALL,   TRUE,  "exception_syscall");
+		static_generate_exception(EXCEPTION_TRACE,     TRUE,  "exception_trace");
+		static_generate_exception(EXCEPTION_FPASSIST,  TRUE,  "exception_floating_point_assist");
+		if (m_cap & PPCCAP_603_MMU)
 		{
-			static_generate_exception(ppc, EXCEPTION_ITLBMISS,  TRUE,  "exception_itlb_miss");
-			static_generate_exception(ppc, EXCEPTION_DTLBMISSL, TRUE,  "exception_dtlb_miss_load");
-			static_generate_exception(ppc, EXCEPTION_DTLBMISSS, TRUE,  "exception_dtlb_miss_store");
+			static_generate_exception(EXCEPTION_ITLBMISS,  TRUE,  "exception_itlb_miss");
+			static_generate_exception(EXCEPTION_DTLBMISSL, TRUE,  "exception_dtlb_miss_load");
+			static_generate_exception(EXCEPTION_DTLBMISSS, TRUE,  "exception_dtlb_miss_store");
 		}
 
 		/* add subroutines for memory accesses */
-		for (mode = 0; mode < 8; mode++)
+		for (int mode = 0; mode < 8; mode++)
 		{
-			static_generate_memory_accessor(ppc, mode, 1, FALSE, FALSE, "read8",       ppc->impstate->read8[mode],       NULL);
-			static_generate_memory_accessor(ppc, mode, 1, TRUE,  FALSE, "write8",      ppc->impstate->write8[mode],      NULL);
-			static_generate_memory_accessor(ppc, mode, 2, FALSE, TRUE,  "read16mask",  ppc->impstate->read16mask[mode],  NULL);
-			static_generate_memory_accessor(ppc, mode, 2, FALSE, FALSE, "read16",      ppc->impstate->read16[mode],      ppc->impstate->read16mask[mode]);
-			static_generate_memory_accessor(ppc, mode, 2, TRUE,  TRUE,  "write16mask", ppc->impstate->write16mask[mode], NULL);
-			static_generate_memory_accessor(ppc, mode, 2, TRUE,  FALSE, "write16",     ppc->impstate->write16[mode],     ppc->impstate->write16mask[mode]);
-			static_generate_memory_accessor(ppc, mode, 4, FALSE, TRUE,  "read32mask",  ppc->impstate->read32mask[mode],  NULL);
-			static_generate_memory_accessor(ppc, mode, 4, FALSE, FALSE, "read32align", ppc->impstate->read32align[mode], NULL);
-			static_generate_memory_accessor(ppc, mode, 4, FALSE, FALSE, "read32",      ppc->impstate->read32[mode],      ppc->impstate->read32mask[mode]);
-			static_generate_memory_accessor(ppc, mode, 4, TRUE,  TRUE,  "write32mask", ppc->impstate->write32mask[mode], NULL);
-			static_generate_memory_accessor(ppc, mode, 4, TRUE,  FALSE, "write32align",ppc->impstate->write32align[mode],NULL);
-			static_generate_memory_accessor(ppc, mode, 4, TRUE,  FALSE, "write32",     ppc->impstate->write32[mode],     ppc->impstate->write32mask[mode]);
-			static_generate_memory_accessor(ppc, mode, 8, FALSE, TRUE,  "read64mask",  ppc->impstate->read64mask[mode],  NULL);
-			static_generate_memory_accessor(ppc, mode, 8, FALSE, FALSE, "read64",      ppc->impstate->read64[mode],      ppc->impstate->read64mask[mode]);
-			static_generate_memory_accessor(ppc, mode, 8, TRUE,  TRUE,  "write64mask", ppc->impstate->write64mask[mode], NULL);
-			static_generate_memory_accessor(ppc, mode, 8, TRUE,  FALSE, "write64",     ppc->impstate->write64[mode],     ppc->impstate->write64mask[mode]);
-			static_generate_lsw_entries(ppc, mode);
-			static_generate_stsw_entries(ppc, mode);
+			static_generate_memory_accessor(mode, 1, FALSE, FALSE, "read8",       m_read8[mode],       NULL);
+			static_generate_memory_accessor(mode, 1, TRUE,  FALSE, "write8",      m_write8[mode],      NULL);
+			static_generate_memory_accessor(mode, 2, FALSE, TRUE,  "read16mask",  m_read16mask[mode],  NULL);
+			static_generate_memory_accessor(mode, 2, FALSE, FALSE, "read16",      m_read16[mode],      m_read16mask[mode]);
+			static_generate_memory_accessor(mode, 2, TRUE,  TRUE,  "write16mask", m_write16mask[mode], NULL);
+			static_generate_memory_accessor(mode, 2, TRUE,  FALSE, "write16",     m_write16[mode],     m_write16mask[mode]);
+			static_generate_memory_accessor(mode, 4, FALSE, TRUE,  "read32mask",  m_read32mask[mode],  NULL);
+			static_generate_memory_accessor(mode, 4, FALSE, FALSE, "read32align", m_read32align[mode], NULL);
+			static_generate_memory_accessor(mode, 4, FALSE, FALSE, "read32",      m_read32[mode],      m_read32mask[mode]);
+			static_generate_memory_accessor(mode, 4, TRUE,  TRUE,  "write32mask", m_write32mask[mode], NULL);
+			static_generate_memory_accessor(mode, 4, TRUE,  FALSE, "write32align",m_write32align[mode],NULL);
+			static_generate_memory_accessor(mode, 4, TRUE,  FALSE, "write32",     m_write32[mode],     m_write32mask[mode]);
+			static_generate_memory_accessor(mode, 8, FALSE, TRUE,  "read64mask",  m_read64mask[mode],  NULL);
+			static_generate_memory_accessor(mode, 8, FALSE, FALSE, "read64",      m_read64[mode],      m_read64mask[mode]);
+			static_generate_memory_accessor(mode, 8, TRUE,  TRUE,  "write64mask", m_write64mask[mode], NULL);
+			static_generate_memory_accessor(mode, 8, TRUE,  FALSE, "write64",     m_write64[mode],     m_write64mask[mode]);
+			static_generate_lsw_entries(mode);
+			static_generate_stsw_entries(mode);
 		}
 	}
 	catch (drcuml_block::abort_compilation &)
@@ -914,9 +356,8 @@ static void code_flush_cache(powerpc_state *ppc)
     given mode at the specified pc
 -------------------------------------------------*/
 
-static void code_compile_block(powerpc_state *ppc, UINT8 mode, offs_t pc)
+void ppc_device::code_compile_block(UINT8 mode, offs_t pc)
 {
-	drcuml_state *drcuml = ppc->impstate->drcuml;
 	compiler_state compiler = { 0 };
 	const opcode_desc *seqhead, *seqlast;
 	const opcode_desc *desclist;
@@ -926,9 +367,9 @@ static void code_compile_block(powerpc_state *ppc, UINT8 mode, offs_t pc)
 	g_profiler.start(PROFILER_DRC_COMPILE);
 
 	/* get a description of this sequence */
-	desclist = ppc->impstate->drcfe->describe_code(pc);
+	desclist = m_drcfe->describe_code(pc);
 	if (LOG_UML || LOG_NATIVE)
-		log_opcode_desc(drcuml, desclist, 0);
+		log_opcode_desc(m_drcuml, desclist, 0);
 
 	bool succeeded = false;
 	while (!succeeded)
@@ -936,7 +377,7 @@ static void code_compile_block(powerpc_state *ppc, UINT8 mode, offs_t pc)
 		try
 		{
 			/* start the block */
-			block = drcuml->begin_block(4096);
+			block = m_drcuml->begin_block(4096);
 
 			/* loop until we get through all instruction sequences */
 			for (seqhead = desclist; seqhead != NULL; seqhead = seqlast->next())
@@ -955,7 +396,7 @@ static void code_compile_block(powerpc_state *ppc, UINT8 mode, offs_t pc)
 				assert(seqlast != NULL);
 
 				/* if we don't have a hash for this mode/pc, or if we are overriding all, add one */
-				if (override || !drcuml->hash_exists(mode, seqhead->pc))
+				if (override || !m_drcuml->hash_exists(mode, seqhead->pc))
 					UML_HASH(block, mode, seqhead->pc);                                             // hash    mode,pc
 
 				/* if we already have a hash, and this is the first sequence, assume that we */
@@ -970,14 +411,14 @@ static void code_compile_block(powerpc_state *ppc, UINT8 mode, offs_t pc)
 				else
 				{
 					UML_LABEL(block, seqhead->pc | 0x80000000);                                     // label   seqhead->pc | 0x80000000
-					UML_HASHJMP(block, ppc->impstate->mode, seqhead->pc, *ppc->impstate->nocode);
+					UML_HASHJMP(block, m_core->mode, seqhead->pc, *m_nocode);
 																									// hashjmp <mode>,seqhead->pc,nocode
 					continue;
 				}
 
 				/* validate this code block if we're not pointing into ROM */
-				if (ppc->program->get_write_ptr(seqhead->physpc) != NULL)
-					generate_checksum_block(ppc, block, &compiler, seqhead, seqlast);               // <checksum>
+				if (m_program->get_write_ptr(seqhead->physpc) != NULL)
+					generate_checksum_block(block, &compiler, seqhead, seqlast);               // <checksum>
 
 				/* label this instruction, if it may be jumped to locally */
 				if (seqhead->flags & OPFLAG_IS_BRANCH_TARGET)
@@ -985,7 +426,7 @@ static void code_compile_block(powerpc_state *ppc, UINT8 mode, offs_t pc)
 
 				/* iterate over instructions in the sequence and compile them */
 				for (curdesc = seqhead; curdesc != seqlast->next(); curdesc = curdesc->next())
-					generate_sequence_instruction(ppc, block, &compiler, curdesc);                  // <instruction>
+					generate_sequence_instruction(block, &compiler, curdesc);                  // <instruction>
 
 				/* if we need to return to the start, do it */
 				if (seqlast->flags & OPFLAG_RETURN_TO_START)
@@ -996,13 +437,13 @@ static void code_compile_block(powerpc_state *ppc, UINT8 mode, offs_t pc)
 					nextpc = seqlast->pc + (seqlast->skipslots + 1) * 4;
 
 				/* count off cycles and go there */
-				generate_update_cycles(ppc, block, &compiler, nextpc, TRUE);                    // <subtract cycles>
+				generate_update_cycles(block, &compiler, nextpc, TRUE);                    // <subtract cycles>
 
 				/* if the last instruction can change modes, use a variable mode; otherwise, assume the same mode */
 				if (seqlast->flags & OPFLAG_CAN_CHANGE_MODES)
-					UML_HASHJMP(block, mem(&ppc->impstate->mode), nextpc, *ppc->impstate->nocode);// hashjmp <mode>,nextpc,nocode
+					UML_HASHJMP(block, mem(&m_core->mode), nextpc, *m_nocode);// hashjmp <mode>,nextpc,nocode
 				else if (seqlast->next() == NULL || seqlast->next()->pc != nextpc)
-					UML_HASHJMP(block, ppc->impstate->mode, nextpc, *ppc->impstate->nocode);// hashjmp <mode>,nextpc,nocode
+					UML_HASHJMP(block, m_core->mode, nextpc, *m_nocode);// hashjmp <mode>,nextpc,nocode
 			}
 
 			/* end the sequence */
@@ -1013,7 +454,7 @@ static void code_compile_block(powerpc_state *ppc, UINT8 mode, offs_t pc)
 		catch (drcuml_block::abort_compilation &)
 		{
 			// flush the cache and try again
-			code_flush_cache(ppc);
+			code_flush_cache();
 		}
 	}
 }
@@ -1031,9 +472,14 @@ static void code_compile_block(powerpc_state *ppc, UINT8 mode, offs_t pc)
 
 static void cfunc_printf_exception(void *param)
 {
-	powerpc_state *ppc = (powerpc_state *)param;
-	printf("Exception: type=%2d EPC=%08X MSR=%08X\n", ppc->param0, ppc->spr[SPROEA_SRR0], ppc->spr[SPROEA_SRR1]);
-	cfunc_printf_probe(ppc);
+	ppc_device *ppc = (ppc_device *)param;
+	ppc->ppc_cfunc_printf_exception();
+}
+
+void ppc_device::ppc_cfunc_printf_exception()
+{
+	printf("Exception: type=%2d EPC=%08X MSR=%08X\n", m_core->param0, m_core->spr[SPROEA_SRR0], m_core->spr[SPROEA_SRR1]);
+	ppc_cfunc_printf_probe();
 }
 
 
@@ -1044,8 +490,13 @@ static void cfunc_printf_exception(void *param)
 
 static void cfunc_printf_debug(void *param)
 {
-	powerpc_state *ppc = (powerpc_state *)param;
-	printf(ppc->impstate->format, ppc->impstate->arg0, ppc->impstate->arg1);
+	ppc_device *ppc = (ppc_device *)param;
+	ppc->ppc_cfunc_printf_debug();
+}
+
+void ppc_device::ppc_cfunc_printf_debug()
+{
+	printf(m_core->format, m_core->arg0, m_arg1);
 }
 
 
@@ -1056,26 +507,29 @@ static void cfunc_printf_debug(void *param)
 
 static void cfunc_printf_probe(void *param)
 {
-	powerpc_state *ppc = (powerpc_state *)param;
-	UINT32 pc = (UINT32)(FPTR)param;
+	ppc_device *ppc = (ppc_device *)param;
+	ppc->ppc_cfunc_printf_probe();
+}
 
-	printf(" PC=%08X\n", pc);
+void ppc_device::ppc_cfunc_printf_probe()
+{
+	printf(" PC=%08X\n", m_core->pc);
 	printf(" r0=%08X  r1=%08X  r2=%08X  r3=%08X\n",
-		ppc->r[0], ppc->r[1], ppc->r[2], ppc->r[3]);
+		m_core->r[0], m_core->r[1], m_core->r[2], m_core->r[3]);
 	printf(" r4=%08X  r5=%08X  r6=%08X  r7=%08X\n",
-		ppc->r[4], ppc->r[5], ppc->r[6], ppc->r[7]);
+		m_core->r[4], m_core->r[5], m_core->r[6], m_core->r[7]);
 	printf(" r8=%08X  r9=%08X r10=%08X r11=%08X\n",
-		ppc->r[8], ppc->r[9], ppc->r[10], ppc->r[11]);
+		m_core->r[8], m_core->r[9], m_core->r[10], m_core->r[11]);
 	printf("r12=%08X r13=%08X r14=%08X r15=%08X\n",
-		ppc->r[12], ppc->r[13], ppc->r[14], ppc->r[15]);
+		m_core->r[12], m_core->r[13], m_core->r[14], m_core->r[15]);
 	printf("r16=%08X r17=%08X r18=%08X r19=%08X\n",
-		ppc->r[16], ppc->r[17], ppc->r[18], ppc->r[19]);
+		m_core->r[16], m_core->r[17], m_core->r[18], m_core->r[19]);
 	printf("r20=%08X r21=%08X r22=%08X r23=%08X\n",
-		ppc->r[20], ppc->r[21], ppc->r[22], ppc->r[23]);
+		m_core->r[20], m_core->r[21], m_core->r[22], m_core->r[23]);
 	printf("r24=%08X r25=%08X r26=%08X r27=%08X\n",
-		ppc->r[24], ppc->r[25], ppc->r[26], ppc->r[27]);
+		m_core->r[24], m_core->r[25], m_core->r[26], m_core->r[27]);
 	printf("r28=%08X r29=%08X r30=%08X r31=%08X\n",
-		ppc->r[28], ppc->r[29], ppc->r[30], ppc->r[31]);
+		m_core->r[28], m_core->r[29], m_core->r[30], m_core->r[31]);
 }
 
 
@@ -1086,11 +540,87 @@ static void cfunc_printf_probe(void *param)
 
 static void cfunc_unimplemented(void *param)
 {
-	powerpc_state *ppc = (powerpc_state *)param;
-	UINT32 opcode = ppc->impstate->arg0;
-	fatalerror("PC=%08X: Unimplemented op %08X\n", ppc->pc, opcode);
+	ppc_device *ppc = (ppc_device *)param;
+	ppc->ppc_cfunc_unimplemented();
 }
 
+void ppc_device::ppc_cfunc_unimplemented()
+{
+	UINT32 opcode = m_core->arg0;
+	fatalerror("PC=%08X: Unimplemented op %08X\n", m_core->pc, opcode);
+}
+
+static void cfunc_ppccom_tlb_fill(void *param)
+{
+	ppc_device *ppc = (ppc_device *)param;
+	ppc->ppccom_tlb_fill();
+}
+
+static void cfunc_ppccom_update_fprf(void *param)
+{
+	ppc_device *ppc = (ppc_device *)param;
+	ppc->ppccom_update_fprf();
+}
+
+static void cfunc_ppccom_dcstore_callback(void *param)
+{
+	ppc_device *ppc = (ppc_device *)param;
+	ppc->ppccom_dcstore_callback();
+}
+
+static void cfunc_ppccom_execute_tlbie(void *param)
+{
+	ppc_device *ppc = (ppc_device *)param;
+	ppc->ppccom_execute_tlbie();
+}
+
+static void cfunc_ppccom_execute_tlbia(void *param)
+{
+	ppc_device *ppc = (ppc_device *)param;
+	ppc->ppccom_execute_tlbia();
+}
+
+static void cfunc_ppccom_execute_tlbl(void *param)
+{
+	ppc_device *ppc = (ppc_device *)param;
+	ppc->ppccom_execute_tlbl();
+}
+
+static void cfunc_ppccom_execute_mfspr(void *param)
+{
+	ppc_device *ppc = (ppc_device *)param;
+	ppc->ppccom_execute_mfspr();
+}
+
+static void cfunc_ppccom_execute_mftb(void *param)
+{
+	ppc_device *ppc = (ppc_device *)param;
+	ppc->ppccom_execute_mftb();
+}
+
+static void cfunc_ppccom_execute_mtspr(void *param)
+{
+	ppc_device *ppc = (ppc_device *)param;
+	ppc->ppccom_execute_mtspr();
+}
+
+static void cfunc_ppccom_tlb_flush(void *param)
+{
+	ppc_device *ppc = (ppc_device *)param;
+	ppc->ppccom_tlb_flush();
+}
+
+static void cfunc_ppccom_execute_mfdcr(void *param)
+{
+	ppc_device *ppc = (ppc_device *)param;
+	ppc->ppccom_execute_mfdcr();
+}
+
+static void cfunc_ppccom_execute_mtdcr(void *param)
+{
+	ppc_device *ppc = (ppc_device *)param;
+	ppc->ppccom_execute_mtdcr();
+}
 
 
 /***************************************************************************
@@ -1102,42 +632,41 @@ static void cfunc_unimplemented(void *param)
     static entry point
 -------------------------------------------------*/
 
-static void static_generate_entry_point(powerpc_state *ppc)
+void ppc_device::static_generate_entry_point()
 {
-	drcuml_state *drcuml = ppc->impstate->drcuml;
 	code_label skip = 1;
 	drcuml_block *block;
 
 	/* begin generating */
-	block = drcuml->begin_block(20);
+	block = m_drcuml->begin_block(20);
 
 	/* forward references */
-	alloc_handle(drcuml, &ppc->impstate->nocode, "nocode");
-	alloc_handle(drcuml, &ppc->impstate->exception_norecover[EXCEPTION_EI], "exception_ei_norecover");
+	alloc_handle(m_drcuml, &m_nocode, "nocode");
+	alloc_handle(m_drcuml, &m_exception_norecover[EXCEPTION_EI], "exception_ei_norecover");
 
-	alloc_handle(drcuml, &ppc->impstate->entry, "entry");
-	UML_HANDLE(block, *ppc->impstate->entry);                                               // handle  entry
+	alloc_handle(m_drcuml, &m_entry, "entry");
+	UML_HANDLE(block, *m_entry);                                               // handle  entry
 
 	/* reset the FPU mode */
 	UML_AND(block, I0, FPSCR32, 3);                                             // and     i0,fpscr,3
-	UML_LOAD(block, I0, &ppc->impstate->fpmode[0], I0, SIZE_BYTE, SCALE_x1);        // load    i0,fpmode,i0,byte
+	UML_LOAD(block, I0, &m_fpmode[0], I0, SIZE_BYTE, SCALE_x1);        // load    i0,fpmode,i0,byte
 	UML_SETFMOD(block, I0);                                                         // setfmod i0
 
 	/* load fast integer registers */
-	load_fast_iregs(ppc, block);                                                            // <load fastregs>
+	load_fast_iregs(block);                                                            // <load fastregs>
 
 	/* check for interrupts */
-	UML_TEST(block, mem(&ppc->irq_pending), ~0);                                        // test    [irq_pending],0
+	UML_TEST(block, mem(&m_core->irq_pending), ~0);                                        // test    [irq_pending],0
 	UML_JMPc(block, COND_Z, skip);                                                          // jmp     skip,Z
 	UML_TEST(block, MSR32, MSR_EE);                                                 // test    msr,MSR_EE
 	UML_JMPc(block, COND_Z, skip);                                                          // jmp     skip,Z
-	UML_MOV(block, I0, mem(&ppc->pc));                                                  // mov     i0,pc
+	UML_MOV(block, I0, mem(&m_core->pc));                                                  // mov     i0,pc
 	UML_MOV(block, I1, 0);                                                      // mov     i1,0
-	UML_CALLH(block, *ppc->impstate->exception_norecover[EXCEPTION_EI]);                        // callh   exception_norecover
+	UML_CALLH(block, *m_exception_norecover[EXCEPTION_EI]);                        // callh   exception_norecover
 	UML_LABEL(block, skip);                                                             // skip:
 
 	/* generate a hash jump via the current mode and PC */
-	UML_HASHJMP(block, mem(&ppc->impstate->mode), mem(&ppc->pc), *ppc->impstate->nocode);   // hashjmp <mode>,<pc>,nocode
+	UML_HASHJMP(block, mem(&m_core->mode), mem(&m_core->pc), *m_nocode);   // hashjmp <mode>,<pc>,nocode
 
 	block->end();
 }
@@ -1148,20 +677,19 @@ static void static_generate_entry_point(powerpc_state *ppc)
     exception handler for "out of code"
 -------------------------------------------------*/
 
-static void static_generate_nocode_handler(powerpc_state *ppc)
+void ppc_device::static_generate_nocode_handler()
 {
-	drcuml_state *drcuml = ppc->impstate->drcuml;
 	drcuml_block *block;
 
 	/* begin generating */
-	block = drcuml->begin_block(10);
+	block = m_drcuml->begin_block(10);
 
 	/* generate a hash jump via the current mode and PC */
-	alloc_handle(drcuml, &ppc->impstate->nocode, "nocode");
-	UML_HANDLE(block, *ppc->impstate->nocode);                                              // handle  nocode
+	alloc_handle(m_drcuml, &m_nocode, "nocode");
+	UML_HANDLE(block, *m_nocode);                                              // handle  nocode
 	UML_GETEXP(block, I0);                                                              // getexp  i0
-	UML_MOV(block, mem(&ppc->pc), I0);                                                  // mov     [pc],i0
-	save_fast_iregs(ppc, block);                                                            // <save fastregs>
+	UML_MOV(block, mem(&m_core->pc), I0);                                                  // mov     [pc],i0
+	save_fast_iregs(block);                                                            // <save fastregs>
 	UML_EXIT(block, EXECUTE_MISSING_CODE);                                              // exit    EXECUTE_MISSING_CODE
 
 	block->end();
@@ -1173,20 +701,19 @@ static void static_generate_nocode_handler(powerpc_state *ppc)
     out of cycles exception handler
 -------------------------------------------------*/
 
-static void static_generate_out_of_cycles(powerpc_state *ppc)
+void ppc_device::static_generate_out_of_cycles()
 {
-	drcuml_state *drcuml = ppc->impstate->drcuml;
 	drcuml_block *block;
 
 	/* begin generating */
-	block = drcuml->begin_block(10);
+	block = m_drcuml->begin_block(10);
 
 	/* generate a hash jump via the current mode and PC */
-	alloc_handle(drcuml, &ppc->impstate->out_of_cycles, "out_of_cycles");
-	UML_HANDLE(block, *ppc->impstate->out_of_cycles);                                       // handle  out_of_cycles
+	alloc_handle(m_drcuml, &m_out_of_cycles, "out_of_cycles");
+	UML_HANDLE(block, *m_out_of_cycles);                                       // handle  out_of_cycles
 	UML_GETEXP(block, I0);                                                              // getexp  i0
-	UML_MOV(block, mem(&ppc->pc), I0);                                                  // mov     <pc>,i0
-	save_fast_iregs(ppc, block);                                                            // <save fastregs>
+	UML_MOV(block, mem(&m_core->pc), I0);                                                  // mov     <pc>,i0
+	save_fast_iregs(block);                                                            // <save fastregs>
 	UML_EXIT(block, EXECUTE_OUT_OF_CYCLES);                                         // exit    EXECUTE_OUT_OF_CYCLES
 
 	block->end();
@@ -1198,52 +725,51 @@ static void static_generate_out_of_cycles(powerpc_state *ppc)
     TLB mismatch handler
 -------------------------------------------------*/
 
-static void static_generate_tlb_mismatch(powerpc_state *ppc)
+void ppc_device::static_generate_tlb_mismatch()
 {
-	drcuml_state *drcuml = ppc->impstate->drcuml;
 	drcuml_block *block;
 	int isi, exit, label = 1;
 
 	/* forward references */
-	alloc_handle(drcuml, &ppc->impstate->exception[EXCEPTION_ISI], "exception_isi");
-	if (ppc->cap & PPCCAP_603_MMU)
-		alloc_handle(drcuml, &ppc->impstate->exception[EXCEPTION_ITLBMISS], "exception_itlb_miss");
+	alloc_handle(m_drcuml, &m_exception[EXCEPTION_ISI], "exception_isi");
+	if (m_cap & PPCCAP_603_MMU)
+		alloc_handle(m_drcuml, &m_exception[EXCEPTION_ITLBMISS], "exception_itlb_miss");
 
 	/* begin generating */
-	block = drcuml->begin_block(20);
+	block = m_drcuml->begin_block(20);
 
 	/* generate a hash jump via the current mode and PC */
-	alloc_handle(drcuml, &ppc->impstate->tlb_mismatch, "tlb_mismatch");
-	UML_HANDLE(block, *ppc->impstate->tlb_mismatch);                                            // handle  tlb_mismatch
+	alloc_handle(m_drcuml, &m_tlb_mismatch, "tlb_mismatch");
+	UML_HANDLE(block, *m_tlb_mismatch);                                            // handle  tlb_mismatch
 	UML_RECOVER(block, I0, MAPVAR_PC);                                                  // recover i0,PC
 	UML_SHR(block, I1, I0, 12);                                             // shr     i1,i0,12
-	UML_LOAD(block, I2, (void *)vtlb_table(ppc->vtlb), I1, SIZE_DWORD, SCALE_x4);   // load    i2,[vtlb],i1,dword
-	UML_MOV(block, mem(&ppc->param0), I0);                                              // mov     [param0],i0
-	UML_MOV(block, mem(&ppc->param1), TRANSLATE_FETCH);                             // mov     [param1],TRANSLATE_FETCH
-	UML_CALLC(block, (c_function)ppccom_tlb_fill, ppc);                                                 // callc   tlbfill,ppc
-	UML_LOAD(block, I1, (void *)vtlb_table(ppc->vtlb), I1, SIZE_DWORD, SCALE_x4);   // load    i1,[vtlb],i1,dword
+	UML_LOAD(block, I2, (void *)vtlb_table(m_vtlb), I1, SIZE_DWORD, SCALE_x4);   // load    i2,[vtlb],i1,dword
+	UML_MOV(block, mem(&m_core->param0), I0);                                              // mov     [param0],i0
+	UML_MOV(block, mem(&m_core->param1), TRANSLATE_FETCH);                             // mov     [param1],TRANSLATE_FETCH
+	UML_CALLC(block, (c_function)cfunc_ppccom_tlb_fill, this);                                                 // callc   tlbfill,ppc
+	UML_LOAD(block, I1, (void *)vtlb_table(m_vtlb), I1, SIZE_DWORD, SCALE_x4);   // load    i1,[vtlb],i1,dword
 	UML_TEST(block, I1, VTLB_FETCH_ALLOWED);                                        // test    i1,VTLB_FETCH_ALLOWED
 	UML_JMPc(block, COND_Z, isi = label++);                                                 // jmp     isi,z
 	UML_CMP(block, I2, 0);                                                      // cmp     i2,0
 	UML_JMPc(block, COND_NZ, exit = label++);                                                   // jmp     exit,nz
-	UML_HASHJMP(block, mem(&ppc->impstate->mode), I0, *ppc->impstate->nocode);          // hashjmp <mode>,i0,nocode
+	UML_HASHJMP(block, mem(&m_core->mode), I0, *m_nocode);          // hashjmp <mode>,i0,nocode
 	UML_LABEL(block, exit);                                                             // exit:
-	UML_MOV(block, mem(&ppc->pc), I0);                                                  // mov     <pc>,i0
-	save_fast_iregs(ppc, block);                                                            // <save fastregs>
+	UML_MOV(block, mem(&m_core->pc), I0);                                                  // mov     <pc>,i0
+	save_fast_iregs(block);                                                            // <save fastregs>
 	UML_EXIT(block, EXECUTE_MISSING_CODE);                                              // exit    EXECUTE_MISSING_CODE
 	UML_LABEL(block, isi);                                                              // isi:
-	if (!(ppc->cap & PPCCAP_603_MMU))
+	if (!(m_cap & PPCCAP_603_MMU))
 	{
-		UML_MOV(block, SPR32(SPROEA_DSISR), mem(&ppc->param0));                             // mov     [dsisr],[param0]
-		UML_EXH(block, *ppc->impstate->exception[EXCEPTION_ISI], I0);                   // exh     isi,i0
+		UML_MOV(block, SPR32(SPROEA_DSISR), mem(&m_core->param0));                             // mov     [dsisr],[param0]
+		UML_EXH(block, *m_exception[EXCEPTION_ISI], I0);                   // exh     isi,i0
 	}
 	else
 	{
 		UML_MOV(block, SPR32(SPR603_IMISS), I0);                                        // mov     [imiss],i0
-		UML_MOV(block, SPR32(SPR603_ICMP), mem(&ppc->mmu603_cmp));                          // mov     [icmp],[mmu603_cmp]
-		UML_MOV(block, SPR32(SPR603_HASH1), mem(&ppc->mmu603_hash[0]));                     // mov     [hash1],[mmu603_hash][0]
-		UML_MOV(block, SPR32(SPR603_HASH2), mem(&ppc->mmu603_hash[1]));                     // mov     [hash2],[mmu603_hash][1]
-		UML_EXH(block, *ppc->impstate->exception[EXCEPTION_ITLBMISS], I0);              // exh     itlbmiss,i0
+		UML_MOV(block, SPR32(SPR603_ICMP), mem(&m_core->mmu603_cmp));                          // mov     [icmp],[mmu603_cmp]
+		UML_MOV(block, SPR32(SPR603_HASH1), mem(&m_core->mmu603_hash[0]));                     // mov     [hash1],[mmu603_hash][0]
+		UML_MOV(block, SPR32(SPR603_HASH2), mem(&m_core->mmu603_hash[1]));                     // mov     [hash2],[mmu603_hash][1]
+		UML_EXH(block, *m_exception[EXCEPTION_ITLBMISS], I0);              // exh     itlbmiss,i0
 	}
 
 	block->end();
@@ -1255,19 +781,18 @@ static void static_generate_tlb_mismatch(powerpc_state *ppc)
     exception handler
 -------------------------------------------------*/
 
-static void static_generate_exception(powerpc_state *ppc, UINT8 exception, int recover, const char *name)
+void ppc_device::static_generate_exception(UINT8 exception, int recover, const char *name)
 {
-	drcuml_state *drcuml = ppc->impstate->drcuml;
-	code_handle *&exception_handle = recover ? ppc->impstate->exception[exception] : ppc->impstate->exception_norecover[exception];
+	code_handle *&exception_handle = recover ? m_exception[exception] : m_exception_norecover[exception];
 	UINT32 vector = exception << 8;
 	code_label label = 1;
 	drcuml_block *block;
 
 	/* begin generating */
-	block = drcuml->begin_block(1024);
+	block = m_drcuml->begin_block(1024);
 
 	/* add a global entry for this */
-	alloc_handle(drcuml, &exception_handle, name);
+	alloc_handle(m_drcuml, &exception_handle, name);
 	UML_HANDLE(block, *exception_handle);                                                   // handle  name
 
 	/* exception parameter is expected to be the fault address in this case */
@@ -1285,7 +810,7 @@ static void static_generate_exception(powerpc_state *ppc, UINT8 exception, int r
 	}
 
 	/* OEA handling of SRR exceptions */
-	if (ppc->cap & PPCCAP_OEA)
+	if (m_cap & PPCCAP_OEA)
 	{
 		UINT32 msrandmask = MSROEA_POW | MSR_EE | MSR_PR | MSROEA_FP | MSROEA_FE0 | MSROEA_SE | MSROEA_BE | MSROEA_FE1 | MSROEA_IR | MSROEA_DR | MSROEA_RI | MSR_LE;
 		UINT32 msrormask = 0;
@@ -1296,10 +821,10 @@ static void static_generate_exception(powerpc_state *ppc, UINT8 exception, int r
 		{
 			code_label not_decrementer;
 
-			UML_TEST(block, mem(&ppc->irq_pending), 0x01);                              // test    [irq_pending],0x01
+			UML_TEST(block, mem(&m_core->irq_pending), 0x01);                              // test    [irq_pending],0x01
 			UML_JMPc(block, COND_NZ, not_decrementer = label++);                                // jmp     not_decrementer,nz
 			UML_MOV(block, I3, EXCEPTION_DECREMENT << 8);                           // mov     i3,EXCEPTION_DECREMENT << 8
-			UML_AND(block, mem(&ppc->irq_pending), mem(&ppc->irq_pending), ~0x02);      // and     [irq_pending],[irq_pending],~0x02
+			UML_AND(block, mem(&m_core->irq_pending), mem(&m_core->irq_pending), ~0x02);      // and     [irq_pending],[irq_pending],~0x02
 			UML_LABEL(block, not_decrementer);                                          // not_decrementer:
 		}
 
@@ -1313,7 +838,7 @@ static void static_generate_exception(powerpc_state *ppc, UINT8 exception, int r
 			UML_GETEXP(block, I1);                                                      // getexp  i1
 			UML_OR(block, SPR32(SPROEA_SRR1), SPR32(SPROEA_SRR1), I1);                  // or      [srr1],[srr1],i1
 		}
-		if (ppc->cap & PPCCAP_603_MMU)
+		if (m_cap & PPCCAP_603_MMU)
 		{
 			if (exception == EXCEPTION_ITLBMISS)
 				UML_OR(block, SPR32(SPROEA_SRR1), SPR32(SPROEA_SRR1), 0x00040000);      // or      [srr1],0x00040000
@@ -1324,7 +849,7 @@ static void static_generate_exception(powerpc_state *ppc, UINT8 exception, int r
 		}
 
 		/* update MSR */
-		if (ppc->cap & PPCCAP_603_MMU)
+		if (m_cap & PPCCAP_603_MMU)
 		{
 			if (exception == EXCEPTION_ITLBMISS || exception == EXCEPTION_DTLBMISSL || exception == EXCEPTION_DTLBMISSS)
 				msrormask |= MSR603_TGPR;
@@ -1336,16 +861,16 @@ static void static_generate_exception(powerpc_state *ppc, UINT8 exception, int r
 		UML_OR(block, I2, I2, msrormask);                                   // or      i2,i2,ormask
 		UML_ROLINS(block, I2, I2, 16, MSR_LE);                          // rolins  i2,u2,16,MSR_LE
 		UML_MOV(block, MSR32, I2);                                                      // mov     [msr],i2
-		if (ppc->cap & PPCCAP_603_MMU)
+		if (m_cap & PPCCAP_603_MMU)
 		{
 			UML_XOR(block, I0, I0, I2);                                     // xor     i0,i0,i2
 			UML_TEST(block, I0, MSR603_TGPR);                                       // test    i0,tgpr
-			UML_CALLHc(block, COND_NZ, *ppc->impstate->swap_tgpr);                              // callh   swap_tgpr,nz
+			UML_CALLHc(block, COND_NZ, *m_swap_tgpr);                              // callh   swap_tgpr,nz
 		}
-		generate_update_mode(ppc, block);                                                   // <update mode>
+		generate_update_mode(block);                                                   // <update mode>
 
 		/* determine our target PC */
-		if (ppc->flavor == PPC_MODEL_602)
+		if (m_flavor == PPC_MODEL_602)
 			UML_MOV(block, I0, SPR32(SPR602_IBR));                                      // mov     i0,[ibr]
 		else
 			UML_MOV(block, I0, 0x00000000);                                     // mov     i0,0x00000000
@@ -1355,7 +880,7 @@ static void static_generate_exception(powerpc_state *ppc, UINT8 exception, int r
 	}
 
 	/* 4XX handling of exceptions */
-	if (ppc->cap & PPCCAP_4XX)
+	if (m_cap & PPCCAP_4XX)
 	{
 		/* check registers to see the real source of our exception (EI exceptions only) */
 		UML_MOV(block, I3, vector);                                             // mov     i3,vector
@@ -1397,7 +922,7 @@ static void static_generate_exception(powerpc_state *ppc, UINT8 exception, int r
 		/* finish updating MSR */
 		UML_ROLINS(block, I2, I2, 16, MSR_LE);                          // rolins  i2,u2,16,MSR_LE
 		UML_MOV(block, MSR32, I2);                                                      // mov     [msr],i2
-		generate_update_mode(ppc, block);                                                   // <update mode>
+		generate_update_mode(block);                                                   // <update mode>
 
 		/* program exception flags go to ESR */
 		if (exception == EXCEPTION_PROGRAM)
@@ -1415,14 +940,14 @@ static void static_generate_exception(powerpc_state *ppc, UINT8 exception, int r
 	if ((PRINTF_EXCEPTIONS && exception != EXCEPTION_EI && exception != EXCEPTION_SYSCALL) ||
 		(PRINTF_MMU && (exception == EXCEPTION_ISI || exception == EXCEPTION_DSI)))
 	{
-		UML_MOV(block, mem(&ppc->param0), exception);                                   // mov     [param0],exception
-		UML_CALLC(block, cfunc_printf_exception, ppc);                                      // callc   cfunc_printf_exception,ppc
+		UML_MOV(block, mem(&m_core->param0), exception);                                   // mov     [param0],exception
+		UML_CALLC(block, cfunc_printf_exception, this);                                      // callc   cfunc_printf_exception,ppc
 	}
 
 	/* adjust cycles */
-	UML_SUB(block, mem(&ppc->icount), mem(&ppc->icount), I1);                           // sub     icount,icount,cycles
-	UML_EXHc(block, COND_S, *ppc->impstate->out_of_cycles, I0);                         // exh     out_of_cycles,i0
-	UML_HASHJMP(block, mem(&ppc->impstate->mode), I0, *ppc->impstate->nocode);          // hashjmp <mode>,i0,nocode
+	UML_SUB(block, mem(&m_core->icount), mem(&m_core->icount), I1);                           // sub     icount,icount,cycles
+	UML_EXHc(block, COND_S, *m_out_of_cycles, I0);                         // exh     out_of_cycles,i0
+	UML_HASHJMP(block, mem(&m_core->mode), I0, *m_nocode);          // hashjmp <mode>,i0,nocode
 
 	block->end();
 }
@@ -1432,13 +957,12 @@ static void static_generate_exception(powerpc_state *ppc, UINT8 exception, int r
     static_generate_memory_accessor
 ------------------------------------------------------------------*/
 
-static void static_generate_memory_accessor(powerpc_state *ppc, int mode, int size, int iswrite, int ismasked, const char *name, code_handle *&handleptr, code_handle *masked)
+void ppc_device::static_generate_memory_accessor(int mode, int size, int iswrite, int ismasked, const char *name, code_handle *&handleptr, code_handle *masked)
 {
 	/* on entry, address is in I0; data for writes is in I1; masks are in I2 */
 	/* on exit, read result is in I0 */
 	/* routine trashes I0-I3 */
-	drcuml_state *drcuml = ppc->impstate->drcuml;
-	int fastxor = BYTE8_XOR_BE(0) >> (int)(ppc->device->space_config(AS_PROGRAM)->m_databus_width < 64);
+	int fastxor = BYTE8_XOR_BE(0) >> (int)(space_config(AS_PROGRAM)->m_databus_width < 64);
 	drcuml_block *block;
 	int translate_type;
 	int tlbreturn = 0;
@@ -1454,17 +978,17 @@ static void static_generate_memory_accessor(powerpc_state *ppc, int mode, int si
 		translate_type = iswrite ? TRANSLATE_WRITE : TRANSLATE_READ;
 
 	/* begin generating */
-	block = drcuml->begin_block(1024);
+	block = m_drcuml->begin_block(1024);
 
 	/* add a global entry for this */
-	alloc_handle(drcuml, &handleptr, name);
+	alloc_handle(m_drcuml, &handleptr, name);
 	UML_HANDLE(block, *handleptr);                                                          // handle  *handleptr
 
 	/* check for unaligned accesses and break into two */
 	if (!ismasked && size != 1)
 	{
 		/* in little-endian mode, anything misaligned generates an exception */
-		if ((mode & MODE_LITTLE_ENDIAN) || masked == NULL || !(ppc->cap & PPCCAP_MISALIGNED))
+		if ((mode & MODE_LITTLE_ENDIAN) || masked == NULL || !(m_cap & PPCCAP_MISALIGNED))
 		{
 			UML_TEST(block, I0, size - 1);                                      // test    i0,size-1
 			UML_JMPc(block, COND_NZ, alignex = label++);                                        // jmp     alignex,nz
@@ -1494,34 +1018,34 @@ static void static_generate_memory_accessor(powerpc_state *ppc, int mode, int si
 	}
 
 	/* general case: assume paging and perform a translation */
-	if (((ppc->cap & PPCCAP_OEA) && (mode & MODE_DATA_TRANSLATION)) || (iswrite && (ppc->cap & PPCCAP_4XX) && (mode & MODE_PROTECTION)))
+	if (((m_cap & PPCCAP_OEA) && (mode & MODE_DATA_TRANSLATION)) || (iswrite && (m_cap & PPCCAP_4XX) && (mode & MODE_PROTECTION)))
 	{
 		UML_SHR(block, I3, I0, 12);                                         // shr     i3,i0,12
-		UML_LOAD(block, I3, (void *)vtlb_table(ppc->vtlb), I3, SIZE_DWORD, SCALE_x4);// load    i3,[vtlb],i3,dword
+		UML_LOAD(block, I3, (void *)vtlb_table(m_vtlb), I3, SIZE_DWORD, SCALE_x4);// load    i3,[vtlb],i3,dword
 		UML_TEST(block, I3, (UINT64)1 << translate_type);                           // test    i3,1 << translate_type
 		UML_JMPc(block, COND_Z, tlbmiss = label++);                                         // jmp     tlbmiss,z
 		UML_LABEL(block, tlbreturn = label++);                                          // tlbreturn:
 		UML_ROLINS(block, I0, I3, 0, 0xfffff000);                       // rolins  i0,i3,0,0xfffff000
 	}
-	else if (ppc->cap & PPCCAP_4XX)
+	else if (m_cap & PPCCAP_4XX)
 		UML_AND(block, I0, I0, 0x7fffffff);                                 // and     i0,i0,0x7fffffff
 	UML_XOR(block, I0, I0, (mode & MODE_LITTLE_ENDIAN) ? (8 - size) : 0);   // xor     i0,i0,8-size
 
-	if ((ppc->device->machine().debug_flags & DEBUG_FLAG_ENABLED) != 0)
+	if ((machine().debug_flags & DEBUG_FLAG_ENABLED) != 0)
 		for (ramnum = 0; ramnum < PPC_MAX_FASTRAM; ramnum++)
-			if (ppc->impstate->fastram[ramnum].base != NULL && (!iswrite || !ppc->impstate->fastram[ramnum].readonly))
+			if (m_fastram[ramnum].base != NULL && (!iswrite || !m_fastram[ramnum].readonly))
 			{
-				void *fastbase = (UINT8 *)ppc->impstate->fastram[ramnum].base - ppc->impstate->fastram[ramnum].start;
+				void *fastbase = (UINT8 *)m_fastram[ramnum].base - m_fastram[ramnum].start;
 				UINT32 skip = label++;
 
-				if (ppc->impstate->fastram[ramnum].end != 0xffffffff)
+				if (m_fastram[ramnum].end != 0xffffffff)
 				{
-					UML_CMP(block, I0, ppc->impstate->fastram[ramnum].end);         // cmp     i0,end
+					UML_CMP(block, I0, m_fastram[ramnum].end);         // cmp     i0,end
 					UML_JMPc(block, COND_A, skip);                                              // ja      skip
 				}
-				if (ppc->impstate->fastram[ramnum].start != 0x00000000)
+				if (m_fastram[ramnum].start != 0x00000000)
 				{
-					UML_CMP(block, I0, ppc->impstate->fastram[ramnum].start);           // cmp     i0,fastram_start
+					UML_CMP(block, I0, m_fastram[ramnum].start);           // cmp     i0,fastram_start
 					UML_JMPc(block, COND_B, skip);                                              // jb      skip
 				}
 
@@ -1661,29 +1185,29 @@ static void static_generate_memory_accessor(powerpc_state *ppc, int mode, int si
 		{
 			if (iswrite)
 			{
-				UML_MOV(block, mem(&ppc->impstate->tempaddr), I0);                      // mov     [tempaddr],i0
-				UML_MOV(block, mem(&ppc->impstate->tempdata.w.l), I1);                  // mov     [tempdata],i1
+				UML_MOV(block, mem(&m_core->tempaddr), I0);                      // mov     [tempaddr],i0
+				UML_MOV(block, mem(&m_core->tempdata.w.l), I1);                  // mov     [tempdata],i1
 				UML_SUB(block, I0, I0, 1);                                  // sub     i0,i0,1
 				UML_SHR(block, I1, I1, 8);                                  // shr     i1,i1,8
 				UML_MOV(block, I2, 0x00ff);                                     // mov     i2,0x00ff
 				UML_CALLH(block, *masked);                                                  // callh   masked
-				UML_ADD(block, I0, mem(&ppc->impstate->tempaddr), 1);               // add     i0,[tempaddr],1
-				UML_SHL(block, I1, mem(&ppc->impstate->tempdata.w.l), 8);           // shl     i1,[tempdata],8
+				UML_ADD(block, I0, mem(&m_core->tempaddr), 1);               // add     i0,[tempaddr],1
+				UML_SHL(block, I1, mem(&m_core->tempdata.w.l), 8);           // shl     i1,[tempdata],8
 				UML_MOV(block, I2, 0xff00);                                     // mov     i2,0xff00
 				UML_CALLH(block, *masked);                                                  // callh   masked
 			}
 			else
 			{
-				UML_MOV(block, mem(&ppc->impstate->tempaddr), I0);                      // mov     [tempaddr],i0
+				UML_MOV(block, mem(&m_core->tempaddr), I0);                      // mov     [tempaddr],i0
 				UML_SUB(block, I0, I0, 1);                                  // sub     i0,i0,1
 				UML_MOV(block, I2, 0x00ff);                                     // mov     i2,0x00ff
 				UML_CALLH(block, *masked);                                                  // callh   masked
-				UML_SHL(block, mem(&ppc->impstate->tempdata.w.l), I0, 8);           // shl     [tempdata],i0,8
-				UML_ADD(block, I0, mem(&ppc->impstate->tempaddr), 1);               // add     i0,[tempaddr],1
+				UML_SHL(block, mem(&m_core->tempdata.w.l), I0, 8);           // shl     [tempdata],i0,8
+				UML_ADD(block, I0, mem(&m_core->tempaddr), 1);               // add     i0,[tempaddr],1
 				UML_MOV(block, I2, 0xff00);                                     // mov     i2,0xff00
 				UML_CALLH(block, *masked);                                                  // callh   masked
 				UML_SHR(block, I0, I0, 8);                                  // shr     i0,i0,8
-				UML_OR(block, I0, I0, mem(&ppc->impstate->tempdata.w.l));           // or      i0,i0,[tempdata]
+				UML_OR(block, I0, I0, mem(&m_core->tempdata.w.l));           // or      i0,i0,[tempdata]
 			}
 		}
 		else if (size == 4)
@@ -1691,16 +1215,16 @@ static void static_generate_memory_accessor(powerpc_state *ppc, int mode, int si
 			int offs2, offs3;
 			if (iswrite)
 			{
-				UML_MOV(block, mem(&ppc->impstate->tempaddr), I0);                      // mov     [tempaddr],i0
-				UML_MOV(block, mem(&ppc->impstate->tempdata.w.l), I1);                  // mov     [tempdata],i1
+				UML_MOV(block, mem(&m_core->tempaddr), I0);                      // mov     [tempaddr],i0
+				UML_MOV(block, mem(&m_core->tempdata.w.l), I1);                  // mov     [tempdata],i1
 				UML_TEST(block, I0, 2);                                         // test    i0,i0,2
 				UML_JMPc(block, COND_NZ, offs2 = label++);                                  // jnz     offs2
 				UML_SUB(block, I0, I0, 1);                                  // sub     i0,i0,1
 				UML_SHR(block, I1, I1, 8);                                  // shr     i1,i1,8
 				UML_MOV(block, I2, 0x00ffffff);                                 // mov     i2,0x00ffffff
 				UML_CALLH(block, *masked);                                                  // callh   masked
-				UML_ADD(block, I0, mem(&ppc->impstate->tempaddr), 3);               // add     i0,[tempaddr],3
-				UML_SHL(block, I1, mem(&ppc->impstate->tempdata.w.l), 24);      // shl     i1,[tempdata],24
+				UML_ADD(block, I0, mem(&m_core->tempaddr), 3);               // add     i0,[tempaddr],3
+				UML_SHL(block, I1, mem(&m_core->tempdata.w.l), 24);      // shl     i1,[tempdata],24
 				UML_MOV(block, I2, 0xff000000);                                 // mov     i2,0xff000000
 				UML_CALLH(block, *masked);                                                  // callh   masked
 				UML_RET(block);                                                             // ret
@@ -1711,8 +1235,8 @@ static void static_generate_memory_accessor(powerpc_state *ppc, int mode, int si
 				UML_SHR(block, I1, I1, 16);                                 // shr     i1,i1,16
 				UML_MOV(block, I2, 0x0000ffff);                                 // mov     i2,0x0000ffff
 				UML_CALLH(block, *masked);                                                  // callh   masked
-				UML_ADD(block, I0, mem(&ppc->impstate->tempaddr), 2);               // add     i0,[tempaddr],2
-				UML_SHL(block, I1, mem(&ppc->impstate->tempdata.w.l), 16);      // shl     i1,[tempdata],16
+				UML_ADD(block, I0, mem(&m_core->tempaddr), 2);               // add     i0,[tempaddr],2
+				UML_SHL(block, I1, mem(&m_core->tempdata.w.l), 16);      // shl     i1,[tempdata],16
 				UML_MOV(block, I2, 0xffff0000);                                 // mov     i2,0xffff0000
 				UML_CALLH(block, *masked);                                                  // callh   masked
 				UML_RET(block);                                                             // ret
@@ -1721,25 +1245,25 @@ static void static_generate_memory_accessor(powerpc_state *ppc, int mode, int si
 				UML_SHR(block, I1, I1, 24);                                 // shr     i1,i1,24
 				UML_MOV(block, I2, 0x000000ff);                                 // mov     i2,0x000000ff
 				UML_CALLH(block, *masked);                                                  // callh   masked
-				UML_ADD(block, I0, mem(&ppc->impstate->tempaddr), 1);               // add     i0,[tempaddr],1
-				UML_SHL(block, I1, mem(&ppc->impstate->tempdata.w.l), 8);           // shl     i1,[tempdata],8
+				UML_ADD(block, I0, mem(&m_core->tempaddr), 1);               // add     i0,[tempaddr],1
+				UML_SHL(block, I1, mem(&m_core->tempdata.w.l), 8);           // shl     i1,[tempdata],8
 				UML_MOV(block, I2, 0xffffff00);                                 // mov     i2,0xffffff00
 				UML_CALLH(block, *masked);                                                  // callh   masked
 			}
 			else
 			{
-				UML_MOV(block, mem(&ppc->impstate->tempaddr), I0);                      // mov     [tempaddr],i0
+				UML_MOV(block, mem(&m_core->tempaddr), I0);                      // mov     [tempaddr],i0
 				UML_TEST(block, I0, 2);                                         // test    i0,i0,2
 				UML_JMPc(block, COND_NZ, offs2 = label++);                                  // jnz     offs2
 				UML_SUB(block, I0, I0, 1);                                  // sub     i0,i0,1
 				UML_MOV(block, I2, 0x00ffffff);                                 // mov     i2,0x00ffffff
 				UML_CALLH(block, *masked);                                                  // callh   masked
-				UML_SHL(block, mem(&ppc->impstate->tempdata.w.l), I0, 8);           // shl     [tempdata],i0,8
-				UML_ADD(block, I0, mem(&ppc->impstate->tempaddr), 3);               // add     i0,[tempaddr],3
+				UML_SHL(block, mem(&m_core->tempdata.w.l), I0, 8);           // shl     [tempdata],i0,8
+				UML_ADD(block, I0, mem(&m_core->tempaddr), 3);               // add     i0,[tempaddr],3
 				UML_MOV(block, I2, 0xff000000);                                 // mov     i2,0xff000000
 				UML_CALLH(block, *masked);                                                  // callh   masked
 				UML_SHR(block, I0, I0, 24);                                 // shr     i0,i0,24
-				UML_OR(block, I0, I0, mem(&ppc->impstate->tempdata.w.l));           // or      i0,i0,[tempdata]
+				UML_OR(block, I0, I0, mem(&m_core->tempdata.w.l));           // or      i0,i0,[tempdata]
 				UML_RET(block);                                                             // ret
 				UML_LABEL(block, offs2);                                                // offs2:
 				UML_TEST(block, I0, 1);                                         // test    i0,i0,1
@@ -1747,50 +1271,50 @@ static void static_generate_memory_accessor(powerpc_state *ppc, int mode, int si
 				UML_SUB(block, I0, I0, 2);                                  // sub     i0,i0,2
 				UML_MOV(block, I2, 0x0000ffff);                                 // mov     i2,0x0000ffff
 				UML_CALLH(block, *masked);                                                  // callh   masked
-				UML_SHL(block, mem(&ppc->impstate->tempdata.w.l), I0, 16);      // shl     [tempdata],i0,16
-				UML_ADD(block, I0, mem(&ppc->impstate->tempaddr), 2);               // add     i0,[tempaddr],2
+				UML_SHL(block, mem(&m_core->tempdata.w.l), I0, 16);      // shl     [tempdata],i0,16
+				UML_ADD(block, I0, mem(&m_core->tempaddr), 2);               // add     i0,[tempaddr],2
 				UML_MOV(block, I2, 0xffff0000);                                 // mov     i2,0xffff0000
 				UML_CALLH(block, *masked);                                                  // callh   masked
 				UML_SHR(block, I0, I0, 16);                                 // shr     i0,i0,16
-				UML_OR(block, I0, I0, mem(&ppc->impstate->tempdata.w.l));           // or      i0,i0,[tempdata]
+				UML_OR(block, I0, I0, mem(&m_core->tempdata.w.l));           // or      i0,i0,[tempdata]
 				UML_RET(block);                                                             // ret
 				UML_LABEL(block, offs3);                                                // offs3:
 				UML_SUB(block, I0, I0, 3);                                  // sub     i0,i0,3
 				UML_MOV(block, I2, 0x000000ff);                                 // mov     i2,0x000000ff
 				UML_CALLH(block, *masked);                                                  // callh   masked
-				UML_SHL(block, mem(&ppc->impstate->tempdata.w.l), I0, 24);      // shl     [tempdata],i0,24
-				UML_ADD(block, I0, mem(&ppc->impstate->tempaddr), 1);               // add     i0,[tempaddr],1
+				UML_SHL(block, mem(&m_core->tempdata.w.l), I0, 24);      // shl     [tempdata],i0,24
+				UML_ADD(block, I0, mem(&m_core->tempaddr), 1);               // add     i0,[tempaddr],1
 				UML_MOV(block, I2, 0xffffff00);                                 // mov     i2,0xffffff00
 				UML_CALLH(block, *masked);                                                  // callh   masked
 				UML_SHR(block, I0, I0, 8);                                  // shr     i0,i0,8
-				UML_OR(block, I0, I0, mem(&ppc->impstate->tempdata.w.l));           // or      i0,i0,[tempdata]
+				UML_OR(block, I0, I0, mem(&m_core->tempdata.w.l));           // or      i0,i0,[tempdata]
 			}
 		}
 		else if (size == 8)
 		{
 			if (iswrite)
 			{
-				UML_MOV(block, mem(&ppc->impstate->tempaddr), I0);                      // mov     [tempaddr],i0
-				UML_DMOV(block, mem(&ppc->impstate->tempdata.d), I1);                   // dmov    [tempdata],i1
+				UML_MOV(block, mem(&m_core->tempaddr), I0);                      // mov     [tempaddr],i0
+				UML_DMOV(block, mem(&m_core->tempdata.d), I1);                   // dmov    [tempdata],i1
 				UML_DSHR(block, I1, I1, 32);                                            // dshr    i1,i1,32
 				UML_DMOV(block, I2, U64(0x00000000ffffffff));                           // dmov    i2,0x00000000ffffffff
 				UML_CALLH(block, *masked);                                              // callh   masked
-				UML_ADD(block, I0, mem(&ppc->impstate->tempaddr), 4);                   // add     i0,[tempaddr],4
-				UML_DSHL(block, I1, mem(&ppc->impstate->tempdata.d), 32);               // dshl    i1,[tempdata],32
+				UML_ADD(block, I0, mem(&m_core->tempaddr), 4);                   // add     i0,[tempaddr],4
+				UML_DSHL(block, I1, mem(&m_core->tempdata.d), 32);               // dshl    i1,[tempdata],32
 				UML_DMOV(block, I2, U64(0xffffffff00000000));                           // dmov    i2,0xffffffff00000000
 				UML_CALLH(block, *masked);                                              // callh   masked
 			}
 			else
 			{
-				UML_MOV(block, mem(&ppc->impstate->tempaddr), I0);                      // mov     [tempaddr],i0
+				UML_MOV(block, mem(&m_core->tempaddr), I0);                      // mov     [tempaddr],i0
 				UML_DMOV(block, I2, U64(0x00000000ffffffff));                           // mov     i2,0x00000000ffffffff
 				UML_CALLH(block, *masked);                                              // callh   masked
-				UML_DSHL(block, mem(&ppc->impstate->tempdata.d), I0, 32);               // dshl    [tempdata],i0,32
-				UML_ADD(block, I0, mem(&ppc->impstate->tempaddr), 4);                   // add     i0,[tempaddr],4
+				UML_DSHL(block, mem(&m_core->tempdata.d), I0, 32);               // dshl    [tempdata],i0,32
+				UML_ADD(block, I0, mem(&m_core->tempaddr), 4);                   // add     i0,[tempaddr],4
 				UML_DMOV(block, I2, U64(0xffffffff00000000));                           // dmov    i2,0xffffffff00000000
 				UML_CALLH(block, *masked);                                              // callh   masked
 				UML_DSHR(block, I0, I0, 32);                                            // dshr    i0,i0,32
-				UML_DOR(block, I0, I0, mem(&ppc->impstate->tempdata.d));                // dor     i0,i0,[tempdata]
+				UML_DOR(block, I0, I0, mem(&m_core->tempdata.d));                // dor     i0,i0,[tempdata]
 			}
 		}
 		UML_RET(block);                                                                     // ret
@@ -1801,46 +1325,46 @@ static void static_generate_memory_accessor(powerpc_state *ppc, int mode, int si
 	{
 		UML_LABEL(block, alignex);                                                      // alignex:
 		UML_RECOVER(block, SPR32(SPROEA_DSISR), MAPVAR_DSISR);                              // recover [dsisr],DSISR
-		UML_EXH(block, *ppc->impstate->exception[EXCEPTION_ALIGN], I0);                 // exh     align,i0
+		UML_EXH(block, *m_exception[EXCEPTION_ALIGN], I0);                 // exh     align,i0
 	}
 
 	/* handle a TLB miss */
 	if (tlbmiss != 0)
 	{
 		UML_LABEL(block, tlbmiss);                                                      // tlbmiss:
-		UML_MOV(block, mem(&ppc->param0), I0);                                          // mov     [param0],i0
-		UML_MOV(block, mem(&ppc->param1), translate_type);                              // mov     [param1],translate_type
-		UML_CALLC(block, (c_function)ppccom_tlb_fill, ppc);                                             // callc   tlbfill,ppc
+		UML_MOV(block, mem(&m_core->param0), I0);                                          // mov     [param0],i0
+		UML_MOV(block, mem(&m_core->param1), translate_type);                              // mov     [param1],translate_type
+		UML_CALLC(block, (c_function)cfunc_ppccom_tlb_fill, this);                                             // callc   tlbfill,ppc
 		UML_SHR(block, I3, I0, 12);                                         // shr     i3,i0,12
-		UML_LOAD(block, I3, (void *)vtlb_table(ppc->vtlb), I3, SIZE_DWORD, SCALE_x4);// load    i3,[vtlb],i3,dword
+		UML_LOAD(block, I3, (void *)vtlb_table(m_vtlb), I3, SIZE_DWORD, SCALE_x4);// load    i3,[vtlb],i3,dword
 		UML_TEST(block, I3, (UINT64)1 << translate_type);                           // test    i3,1 << translate_type
 		UML_JMPc(block, COND_NZ, tlbreturn);                                                    // jmp     tlbreturn,nz
 
 		/* 4XX case: protection exception */
-		if (ppc->cap & PPCCAP_4XX)
+		if (m_cap & PPCCAP_4XX)
 		{
 			UML_MOV(block, SPR32(SPR4XX_DEAR), I0);                                 // mov     [dear],i0
-			UML_EXH(block, *ppc->impstate->exception[EXCEPTION_DSI], I0);               // exh     dsi,i0
+			UML_EXH(block, *m_exception[EXCEPTION_DSI], I0);               // exh     dsi,i0
 		}
 
 		/* 603 case: TLBMISS exception */
-		else if (ppc->cap & PPCCAP_603_MMU)
+		else if (m_cap & PPCCAP_603_MMU)
 		{
 			UML_MOV(block, SPR32(SPR603_DMISS), I0);                                    // mov     [dmiss],i0
-			UML_MOV(block, SPR32(SPR603_DCMP), mem(&ppc->mmu603_cmp));                      // mov     [dcmp],[mmu603_cmp]
-			UML_MOV(block, SPR32(SPR603_HASH1), mem(&ppc->mmu603_hash[0]));                 // mov     [hash1],[mmu603_hash][0]
-			UML_MOV(block, SPR32(SPR603_HASH2), mem(&ppc->mmu603_hash[1]));                 // mov     [hash2],[mmu603_hash][1]
+			UML_MOV(block, SPR32(SPR603_DCMP), mem(&m_core->mmu603_cmp));                      // mov     [dcmp],[mmu603_cmp]
+			UML_MOV(block, SPR32(SPR603_HASH1), mem(&m_core->mmu603_hash[0]));                 // mov     [hash1],[mmu603_hash][0]
+			UML_MOV(block, SPR32(SPR603_HASH2), mem(&m_core->mmu603_hash[1]));                 // mov     [hash2],[mmu603_hash][1]
 			if (iswrite)
-				UML_EXH(block, *ppc->impstate->exception[EXCEPTION_DTLBMISSS], I0);     // exh     dtlbmisss,i0
+				UML_EXH(block, *m_exception[EXCEPTION_DTLBMISSS], I0);     // exh     dtlbmisss,i0
 			else
-				UML_EXH(block, *ppc->impstate->exception[EXCEPTION_DTLBMISSL], I0);     // exh     dtlbmissl,i0
+				UML_EXH(block, *m_exception[EXCEPTION_DTLBMISSL], I0);     // exh     dtlbmissl,i0
 		}
 
 		/* general case: DSI exception */
 		else
 		{
-			UML_MOV(block, SPR32(SPROEA_DSISR), mem(&ppc->param0));                         // mov     [dsisr],[param0]
-			UML_EXH(block, *ppc->impstate->exception[EXCEPTION_DSI], I0);               // exh     dsi,i0
+			UML_MOV(block, SPR32(SPROEA_DSISR), mem(&m_core->param0));                         // mov     [dsisr],[param0]
+			UML_EXH(block, *m_exception[EXCEPTION_DSI], I0);               // exh     dsi,i0
 		}
 	}
 
@@ -1853,23 +1377,22 @@ static void static_generate_memory_accessor(powerpc_state *ppc, int mode, int si
     subroutine to swap GPR0-3 with TGPR0-3
 -------------------------------------------------*/
 
-static void static_generate_swap_tgpr(powerpc_state *ppc)
+void ppc_device::static_generate_swap_tgpr()
 {
-	drcuml_state *drcuml = ppc->impstate->drcuml;
 	drcuml_block *block;
 	int regnum;
 
 	/* begin generating */
-	block = drcuml->begin_block(30);
+	block = m_drcuml->begin_block(30);
 
 	/* generate a hash jump via the current mode and PC */
-	alloc_handle(drcuml, &ppc->impstate->swap_tgpr, "swap_tgpr");
-	UML_HANDLE(block, *ppc->impstate->swap_tgpr);                                           // handle  swap_tgpr
+	alloc_handle(m_drcuml, &m_swap_tgpr, "swap_tgpr");
+	UML_HANDLE(block, *m_swap_tgpr);                                           // handle  swap_tgpr
 	for (regnum = 0; regnum < 4; regnum++)
 	{
 		UML_MOV(block, I1, R32(regnum));                                                // mov     i1,r[regnum]
-		UML_MOV(block, R32(regnum), mem(&ppc->mmu603_r[regnum]));                           // mov     r[regnum],mmu603_r[regnum]
-		UML_MOV(block, mem(&ppc->mmu603_r[regnum]), I1);                                // mov     mmu603_r[regnum],i1
+		UML_MOV(block, R32(regnum), mem(&m_core->mmu603_r[regnum]));                           // mov     r[regnum],mmu603_r[regnum]
+		UML_MOV(block, mem(&m_core->mmu603_r[regnum]), I1);                                // mov     mmu603_r[regnum],i1
 	}
 	UML_RET(block);                                                                         // ret
 
@@ -1883,14 +1406,13 @@ static void static_generate_swap_tgpr(powerpc_state *ppc)
     for each possible register
 -------------------------------------------------*/
 
-static void static_generate_lsw_entries(powerpc_state *ppc, int mode)
+void ppc_device::static_generate_lsw_entries(int mode)
 {
-	drcuml_state *drcuml = ppc->impstate->drcuml;
 	drcuml_block *block;
 	int regnum;
 
 	/* begin generating */
-	block = drcuml->begin_block(32 * 30);
+	block = m_drcuml->begin_block(32 * 30);
 
 	/* iterate over all possible registers */
 	for (regnum = 0; regnum < 32; regnum++)
@@ -1899,32 +1421,32 @@ static void static_generate_lsw_entries(powerpc_state *ppc, int mode)
 
 		/* allocate a handle */
 		sprintf(temp, "lsw%d", regnum);
-		alloc_handle(drcuml, &ppc->impstate->lsw[mode][regnum], temp);
-		UML_HANDLE(block, *ppc->impstate->lsw[mode][regnum]);                               // handle  lsw<regnum>
+		alloc_handle(m_drcuml, &m_lsw[mode][regnum], temp);
+		UML_HANDLE(block, *m_lsw[mode][regnum]);                               // handle  lsw<regnum>
 		UML_LABEL(block, regnum);                                                       // regnum:
-		UML_ADD(block, I0, mem(&ppc->impstate->updateaddr), 0);                 // add     i0,[updateaddr],0
-		UML_CALLH(block, *ppc->impstate->read8[mode]);                                      // callh   read8
+		UML_ADD(block, I0, mem(&m_core->updateaddr), 0);                 // add     i0,[updateaddr],0
+		UML_CALLH(block, *m_read8[mode]);                                      // callh   read8
 		UML_ROLAND(block, R32(regnum), I0, 24, 0xff000000);                 // roland  reg,i0,24,0xff000000
-		UML_SUB(block, mem(&ppc->impstate->swcount), mem(&ppc->impstate->swcount), 1);  // sub     [swcount],[swcount],1
+		UML_SUB(block, mem(&m_core->swcount), mem(&m_core->swcount), 1);  // sub     [swcount],[swcount],1
 		UML_RETc(block, COND_Z);                                                                // ret     z
-		UML_ADD(block, I0, mem(&ppc->impstate->updateaddr), 1);                 // add     i0,[updateaddr],1
-		UML_CALLH(block, *ppc->impstate->read8[mode]);                                      // callh   read8
+		UML_ADD(block, I0, mem(&m_core->updateaddr), 1);                 // add     i0,[updateaddr],1
+		UML_CALLH(block, *m_read8[mode]);                                      // callh   read8
 		UML_ROLAND(block, I0, I0, 16, 0x00ff0000);                      // roland  i0,i0,16,0x00ff0000
 		UML_OR(block, R32(regnum), R32(regnum), I0);                                    // or      reg,i0
-		UML_SUB(block, mem(&ppc->impstate->swcount), mem(&ppc->impstate->swcount), 1);  // sub     [swcount],[swcount],1
+		UML_SUB(block, mem(&m_core->swcount), mem(&m_core->swcount), 1);  // sub     [swcount],[swcount],1
 		UML_RETc(block, COND_Z);                                                                // ret     z
-		UML_ADD(block, I0, mem(&ppc->impstate->updateaddr), 2);                 // add     i0,[updateaddr],2
-		UML_CALLH(block, *ppc->impstate->read8[mode]);                                      // callh   read8
+		UML_ADD(block, I0, mem(&m_core->updateaddr), 2);                 // add     i0,[updateaddr],2
+		UML_CALLH(block, *m_read8[mode]);                                      // callh   read8
 		UML_ROLAND(block, I0, I0, 8, 0x0000ff00);                       // roland  i0,i0,8,0x0000ff00
 		UML_OR(block, R32(regnum), R32(regnum), I0);                                    // or      reg,i0
-		UML_SUB(block, mem(&ppc->impstate->swcount), mem(&ppc->impstate->swcount), 1);  // sub     [swcount],[swcount],1
+		UML_SUB(block, mem(&m_core->swcount), mem(&m_core->swcount), 1);  // sub     [swcount],[swcount],1
 		UML_RETc(block, COND_Z);                                                                // ret     z
-		UML_ADD(block, I0, mem(&ppc->impstate->updateaddr), 3);                 // add     i0,[updateaddr],3
-		UML_ADD(block, mem(&ppc->impstate->updateaddr), I0, 1);                 // add     [updateaddr],i0,1
-		UML_CALLH(block, *ppc->impstate->read8[mode]);                                      // callh   read8
+		UML_ADD(block, I0, mem(&m_core->updateaddr), 3);                 // add     i0,[updateaddr],3
+		UML_ADD(block, mem(&m_core->updateaddr), I0, 1);                 // add     [updateaddr],i0,1
+		UML_CALLH(block, *m_read8[mode]);                                      // callh   read8
 		UML_ROLAND(block, I0, I0, 0, 0x000000ff);                       // roland  i0,i0,0,0x000000ff
 		UML_OR(block, R32(regnum), R32(regnum), I0);                                    // or      reg,i0
-		UML_SUB(block, mem(&ppc->impstate->swcount), mem(&ppc->impstate->swcount), 1);  // sub     [swcount],[swcount],1
+		UML_SUB(block, mem(&m_core->swcount), mem(&m_core->swcount), 1);  // sub     [swcount],[swcount],1
 		UML_RETc(block, COND_Z);                                                                // ret     z
 		UML_JMP(block, (regnum + 1) % 32);                                                  // jmp     nextreg
 	}
@@ -1939,45 +1461,43 @@ static void static_generate_lsw_entries(powerpc_state *ppc, int mode)
     for each possible register
 -------------------------------------------------*/
 
-static void static_generate_stsw_entries(powerpc_state *ppc, int mode)
+void ppc_device::static_generate_stsw_entries(int mode)
 {
-	drcuml_state *drcuml = ppc->impstate->drcuml;
 	drcuml_block *block;
-	int regnum;
 
 	/* begin generating */
-	block = drcuml->begin_block(32 * 30);
+	block = m_drcuml->begin_block(32 * 30);
 
 	/* iterate over all possible registers */
-	for (regnum = 0; regnum < 32; regnum++)
+	for (int regnum = 0; regnum < 32; regnum++)
 	{
 		char temp[20];
 
 		/* allocate a handle */
 		sprintf(temp, "stsw%d", regnum);
-		alloc_handle(drcuml, &ppc->impstate->stsw[mode][regnum], temp);
-		UML_HANDLE(block, *ppc->impstate->stsw[mode][regnum]);                              // handle  stsw<regnum>
+		alloc_handle(m_drcuml, &m_stsw[mode][regnum], temp);
+		UML_HANDLE(block, *m_stsw[mode][regnum]);                              // handle  stsw<regnum>
 		UML_LABEL(block, regnum);                                                       // regnum:
-		UML_ADD(block, I0, mem(&ppc->impstate->updateaddr), 0);                 // add     i0,[updateaddr],0
+		UML_ADD(block, I0, mem(&m_core->updateaddr), 0);                 // add     i0,[updateaddr],0
 		UML_ROLAND(block, I1, R32(regnum), 8, 0xff);                            // roland  i1,regnum,8,0xff
-		UML_CALLH(block, *ppc->impstate->write8[mode]);                                     // callh   write8
-		UML_SUB(block, mem(&ppc->impstate->swcount), mem(&ppc->impstate->swcount), 1);  // sub     [swcount],[swcount],1
+		UML_CALLH(block, *m_write8[mode]);                                     // callh   write8
+		UML_SUB(block, mem(&m_core->swcount), mem(&m_core->swcount), 1);  // sub     [swcount],[swcount],1
 		UML_RETc(block, COND_Z);                                                                // ret     z
-		UML_ADD(block, I0, mem(&ppc->impstate->updateaddr), 1);                 // add     i0,[updateaddr],1
+		UML_ADD(block, I0, mem(&m_core->updateaddr), 1);                 // add     i0,[updateaddr],1
 		UML_ROLAND(block, I1, R32(regnum), 16, 0xff);                       // roland  i1,regnum,16,0xff
-		UML_CALLH(block, *ppc->impstate->write8[mode]);                                     // callh   write8
-		UML_SUB(block, mem(&ppc->impstate->swcount), mem(&ppc->impstate->swcount), 1);  // sub     [swcount],[swcount],1
+		UML_CALLH(block, *m_write8[mode]);                                     // callh   write8
+		UML_SUB(block, mem(&m_core->swcount), mem(&m_core->swcount), 1);  // sub     [swcount],[swcount],1
 		UML_RETc(block, COND_Z);                                                                // ret     z
-		UML_ADD(block, I0, mem(&ppc->impstate->updateaddr), 2);                 // add     i0,[updateaddr],2
+		UML_ADD(block, I0, mem(&m_core->updateaddr), 2);                 // add     i0,[updateaddr],2
 		UML_ROLAND(block, I1, R32(regnum), 24, 0xff);                       // roland  i1,regnum,24,0xff
-		UML_CALLH(block, *ppc->impstate->write8[mode]);                                     // callh   write8
-		UML_SUB(block, mem(&ppc->impstate->swcount), mem(&ppc->impstate->swcount), 1);  // sub     [swcount],[swcount],1
+		UML_CALLH(block, *m_write8[mode]);                                     // callh   write8
+		UML_SUB(block, mem(&m_core->swcount), mem(&m_core->swcount), 1);  // sub     [swcount],[swcount],1
 		UML_RETc(block, COND_Z);                                                                // ret     z
-		UML_ADD(block, I0, mem(&ppc->impstate->updateaddr), 3);                 // add     i0,[updateaddr],3
-		UML_ADD(block, mem(&ppc->impstate->updateaddr), I0, 1);                 // add     [updateaddr],i0,1
+		UML_ADD(block, I0, mem(&m_core->updateaddr), 3);                 // add     i0,[updateaddr],3
+		UML_ADD(block, mem(&m_core->updateaddr), I0, 1);                 // add     [updateaddr],i0,1
 		UML_ROLAND(block, I1, R32(regnum), 0, 0xff);                            // roland  i1,regnum,0,0xff
-		UML_CALLH(block, *ppc->impstate->write8[mode]);                                     // callh   write8
-		UML_SUB(block, mem(&ppc->impstate->swcount), mem(&ppc->impstate->swcount), 1);  // sub     [swcount],[swcount],1
+		UML_CALLH(block, *m_write8[mode]);                                     // callh   write8
+		UML_SUB(block, mem(&m_core->swcount), mem(&m_core->swcount), 1);  // sub     [swcount],[swcount],1
 		UML_RETc(block, COND_Z);                                                                // ret     z
 		UML_JMP(block, (regnum + 1) % 32);                                                  // jmp     nextreg
 	}
@@ -1996,20 +1516,20 @@ static void static_generate_stsw_entries(powerpc_state *ppc, int mode)
     on the MSR
 -------------------------------------------------*/
 
-static void generate_update_mode(powerpc_state *ppc, drcuml_block *block)
+void ppc_device::generate_update_mode(drcuml_block *block)
 {
 	/* LE in bit 0 of mode */
 	UML_AND(block, I0, MSR32, MSR_LE);                                          // and     i0,msr,MSR_LE
 
 	/* DR (OEA and 403GCX) in bit 1 of mode */
-	if ((ppc->cap & PPCCAP_OEA) || ppc->flavor == PPC_MODEL_403GCX)
+	if ((m_cap & PPCCAP_OEA) || m_flavor == PPC_MODEL_403GCX)
 	{
 		UML_ROLAND(block, I1, MSR32, 29, 0x02);                             // roland  i1,[msr],29,0x02
 		UML_OR(block, I0, I0, I1);                                          // or      i0,i0,i1
 	}
 
 	/* (4XX) in bit 1 of mode */
-	if (ppc->cap & PPCCAP_4XX)
+	if (m_cap & PPCCAP_4XX)
 	{
 		UML_ROLAND(block, I1, MSR32, 30, 0x02);                             // roland  i1,[msr],30,0x02
 		UML_OR(block, I0, I0, I1);                                          // or      i0,i0,i1
@@ -2017,7 +1537,7 @@ static void generate_update_mode(powerpc_state *ppc, drcuml_block *block)
 
 	/* PR in bit 2 of mode */
 	UML_ROLAND(block, I1, MSR32, 20, 0x04);                                 // roland  i1,[msr],20,0x04
-	UML_OR(block, mem(&ppc->impstate->mode), I0, I1);                               // or      [mode],i0,i1
+	UML_OR(block, mem(&m_core->mode), I0, I1);                               // or      [mode],i0,i1
 }
 
 
@@ -2027,7 +1547,7 @@ static void generate_update_mode(powerpc_state *ppc, drcuml_block *block)
     an exception if out
 -------------------------------------------------*/
 
-static void generate_update_cycles(powerpc_state *ppc, drcuml_block *block, compiler_state *compiler, parameter param, int allow_exception)
+void ppc_device::generate_update_cycles(drcuml_block *block, compiler_state *compiler, parameter param, int allow_exception)
 {
 	/* check full interrupts if pending */
 	if (compiler->checkints)
@@ -2035,23 +1555,23 @@ static void generate_update_cycles(powerpc_state *ppc, drcuml_block *block, comp
 		code_label skip;
 
 		compiler->checkints = FALSE;
-		UML_TEST(block, mem(&ppc->irq_pending), ~0);                                    // test    [irq_pending],0
+		UML_TEST(block, mem(&m_core->irq_pending), ~0);                                    // test    [irq_pending],0
 		UML_JMPc(block, COND_Z, skip = compiler->labelnum++);                                   // jmp     skip,Z
 		UML_TEST(block, MSR32, MSR_EE);                                             // test    [msr],MSR_EE
 		UML_JMPc(block, COND_Z, skip);                                                      // jmp     skip,Z
 		UML_MOV(block, I0, param);                                      // mov     i0,nextpc
 		UML_MOV(block, I1, compiler->cycles);                                       // mov     i1,cycles
-		UML_CALLH(block, *ppc->impstate->exception_norecover[EXCEPTION_EI]);                    // callh   interrupt_norecover
+		UML_CALLH(block, *m_exception_norecover[EXCEPTION_EI]);                    // callh   interrupt_norecover
 		UML_LABEL(block, skip);                                                         // skip:
 	}
 
 	/* account for cycles */
 	if (compiler->cycles > 0)
 	{
-		UML_SUB(block, mem(&ppc->icount), mem(&ppc->icount), MAPVAR_CYCLES);                // sub     icount,icount,cycles
+		UML_SUB(block, mem(&m_core->icount), mem(&m_core->icount), MAPVAR_CYCLES);                // sub     icount,icount,cycles
 		UML_MAPVAR(block, MAPVAR_CYCLES, 0);                                                // mapvar  cycles,0
 		if (allow_exception)
-			UML_EXHc(block, COND_S, *ppc->impstate->out_of_cycles, param);      // exh     out_of_cycles,nextpc
+			UML_EXHc(block, COND_S, *m_out_of_cycles, param);      // exh     out_of_cycles,nextpc
 	}
 	compiler->cycles = 0;
 }
@@ -2062,21 +1582,21 @@ static void generate_update_cycles(powerpc_state *ppc, drcuml_block *block, comp
     validate a sequence of opcodes
 -------------------------------------------------*/
 
-static void generate_checksum_block(powerpc_state *ppc, drcuml_block *block, compiler_state *compiler, const opcode_desc *seqhead, const opcode_desc *seqlast)
+void ppc_device::generate_checksum_block(drcuml_block *block, compiler_state *compiler, const opcode_desc *seqhead, const opcode_desc *seqlast)
 {
 	const opcode_desc *curdesc;
 	if (LOG_UML)
 		block->append_comment("[Validation for %08X]", seqhead->pc);                        // comment
 
 	/* loose verify or single instruction: just compare and fail */
-	if (!(ppc->impstate->drcoptions & PPCDRC_STRICT_VERIFY) || seqhead->next() == NULL)
+	if (!(m_drcoptions & PPCDRC_STRICT_VERIFY) || seqhead->next() == NULL)
 	{
 		if (!(seqhead->flags & OPFLAG_VIRTUAL_NOOP))
 		{
-			void *base = ppc->direct->read_decrypted_ptr(seqhead->physpc, ppc->codexor);
+			void *base = m_direct->read_decrypted_ptr(seqhead->physpc, m_codexor);
 			UML_LOAD(block, I0, base, 0, SIZE_DWORD, SCALE_x4);                 // load    i0,base,dword
 			UML_CMP(block, I0, seqhead->opptr.l[0]);                                // cmp     i0,*opptr
-			UML_EXHc(block, COND_NE, *ppc->impstate->nocode, seqhead->pc);              // exne    nocode,seqhead->pc
+			UML_EXHc(block, COND_NE, *m_nocode, seqhead->pc);              // exne    nocode,seqhead->pc
 		}
 	}
 
@@ -2087,26 +1607,26 @@ static void generate_checksum_block(powerpc_state *ppc, drcuml_block *block, com
 		for (curdesc = seqhead->next(); curdesc != seqlast->next(); curdesc = curdesc->next())
 			if (!(curdesc->flags & OPFLAG_VIRTUAL_NOOP))
 			{
-				void *base = ppc->direct->read_decrypted_ptr(seqhead->physpc, ppc->codexor);
+				void *base = m_direct->read_decrypted_ptr(seqhead->physpc, m_codexor);
 				UML_LOAD(block, I0, base, 0, SIZE_DWORD, SCALE_x4);             // load    i0,base,dword
 				UML_CMP(block, I0, curdesc->opptr.l[0]);                            // cmp     i0,*opptr
-				UML_EXHc(block, COND_NE, *ppc->impstate->nocode, seqhead->pc);          // exne    nocode,seqhead->pc
+				UML_EXHc(block, COND_NE, *m_nocode, seqhead->pc);          // exne    nocode,seqhead->pc
 			}
 #else
 		UINT32 sum = 0;
-		void *base = ppc->direct->read_decrypted_ptr(seqhead->physpc, ppc->codexor);
+		void *base = m_direct->read_decrypted_ptr(seqhead->physpc, m_codexor);
 		UML_LOAD(block, I0, base, 0, SIZE_DWORD, SCALE_x4);                     // load    i0,base,dword
 		sum += seqhead->opptr.l[0];
 		for (curdesc = seqhead->next(); curdesc != seqlast->next(); curdesc = curdesc->next())
 			if (!(curdesc->flags & OPFLAG_VIRTUAL_NOOP))
 			{
-				base = ppc->direct->read_decrypted_ptr(curdesc->physpc, ppc->codexor);
+				base = m_direct->read_decrypted_ptr(curdesc->physpc, m_codexor);
 				UML_LOAD(block, I1, base, 0, SIZE_DWORD, SCALE_x4);             // load    i1,base,dword
 				UML_ADD(block, I0, I0, I1);                                 // add     i0,i0,i1
 				sum += curdesc->opptr.l[0];
 			}
 		UML_CMP(block, I0, sum);                                                    // cmp     i0,sum
-		UML_EXHc(block, COND_NE, *ppc->impstate->nocode, seqhead->pc);                  // exne    nocode,seqhead->pc
+		UML_EXHc(block, COND_NE, *m_nocode, seqhead->pc);                  // exne    nocode,seqhead->pc
 #endif
 	}
 }
@@ -2117,7 +1637,7 @@ static void generate_checksum_block(powerpc_state *ppc, drcuml_block *block, com
     for a single instruction in a sequence
 -------------------------------------------------*/
 
-static void generate_sequence_instruction(powerpc_state *ppc, drcuml_block *block, compiler_state *compiler, const opcode_desc *desc)
+void ppc_device::generate_sequence_instruction(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc)
 {
 	int hotnum;
 
@@ -2133,9 +1653,9 @@ static void generate_sequence_instruction(powerpc_state *ppc, drcuml_block *bloc
 
 	/* is this a hotspot? */
 	for (hotnum = 0; hotnum < PPC_MAX_HOTSPOTS; hotnum++)
-		if (ppc->impstate->hotspot[hotnum].pc != 0 && desc->pc == ppc->impstate->hotspot[hotnum].pc && desc->opptr.l[0] == ppc->impstate->hotspot[hotnum].opcode)
+		if (m_hotspot[hotnum].pc != 0 && desc->pc == m_hotspot[hotnum].pc && desc->opptr.l[0] == m_hotspot[hotnum].opcode)
 		{
-			compiler->cycles += ppc->impstate->hotspot[hotnum].cycles;
+			compiler->cycles += m_hotspot[hotnum].cycles;
 			break;
 		}
 
@@ -2145,23 +1665,23 @@ static void generate_sequence_instruction(powerpc_state *ppc, drcuml_block *bloc
 	/* if we want a probe, add it here */
 	if (desc->pc == PROBE_ADDRESS)
 	{
-		UML_MOV(block, mem(&ppc->pc), desc->pc);                                        // mov     [pc],desc->pc
+		UML_MOV(block, mem(&m_core->pc), desc->pc);                                        // mov     [pc],desc->pc
 		UML_CALLC(block, cfunc_printf_probe, (void *)(FPTR)desc->pc);                                       // callc   cfunc_printf_probe,desc->pc
 	}
 
 	/* if we are debugging, call the debugger */
-	if ((ppc->device->machine().debug_flags & DEBUG_FLAG_ENABLED) != 0)
+	if ((machine().debug_flags & DEBUG_FLAG_ENABLED) != 0)
 	{
-		UML_MOV(block, mem(&ppc->pc), desc->pc);                                        // mov     [pc],desc->pc
-		save_fast_iregs(ppc, block);                                                        // <save fastregs>
+		UML_MOV(block, mem(&m_core->pc), desc->pc);                                        // mov     [pc],desc->pc
+		save_fast_iregs(block);                                                        // <save fastregs>
 		UML_DEBUG(block, desc->pc);                                                 // debug   desc->pc
 	}
 
 	/* if we hit an unmapped address, fatal error */
 	if (desc->flags & OPFLAG_COMPILER_UNMAPPED)
 	{
-		UML_MOV(block, mem(&ppc->pc), desc->pc);                                        // mov     [pc],desc->pc
-		save_fast_iregs(ppc, block);                                                        // <save fastregs>
+		UML_MOV(block, mem(&m_core->pc), desc->pc);                                        // mov     [pc],desc->pc
+		save_fast_iregs(block);                                                        // <save fastregs>
 		UML_EXIT(block, EXECUTE_UNMAPPED_CODE);                                     // exit    EXECUTE_UNMAPPED_CODE
 	}
 
@@ -2171,17 +1691,17 @@ static void generate_sequence_instruction(powerpc_state *ppc, drcuml_block *bloc
 		if (PRINTF_MMU)
 		{
 			const char *text = "Compiler page fault @ %08X\n";
-			UML_MOV(block, mem(&ppc->impstate->format), (FPTR)text);                    // mov     [format],text
-			UML_MOV(block, mem(&ppc->impstate->arg0), desc->pc);                        // mov     [arg0],desc->pc
-			UML_CALLC(block, cfunc_printf_debug, ppc);                                      // callc   printf_debug
+			UML_MOV(block, mem(&m_core->format), (FPTR)text);                    // mov     [format],text
+			UML_MOV(block, mem(&m_core->arg0), desc->pc);                        // mov     [arg0],desc->pc
+			UML_CALLC(block, cfunc_printf_debug, this);                                      // callc   printf_debug
 		}
-		UML_EXH(block, *ppc->impstate->tlb_mismatch, 0);                                // exh     tlb_mismatch,0
+		UML_EXH(block, *m_tlb_mismatch, 0);                                // exh     tlb_mismatch,0
 	}
 
 	/* validate our TLB entry at this PC; if we fail, we need to handle it */
-	if ((desc->flags & OPFLAG_VALIDATE_TLB) && (ppc->impstate->mode & MODE_DATA_TRANSLATION))
+	if ((desc->flags & OPFLAG_VALIDATE_TLB) && (m_core->mode & MODE_DATA_TRANSLATION))
 	{
-		const vtlb_entry *tlbtable = vtlb_table(ppc->vtlb);
+		const vtlb_entry *tlbtable = vtlb_table(m_vtlb);
 
 		/* if we currently have a valid TLB read entry, we just verify */
 		if (tlbtable[desc->pc >> 12] != 0)
@@ -2189,13 +1709,13 @@ static void generate_sequence_instruction(powerpc_state *ppc, drcuml_block *bloc
 			if (PRINTF_MMU)
 			{
 				const char *text = "Checking TLB at @ %08X\n";
-				UML_MOV(block, mem(&ppc->impstate->format), (FPTR)text);                // mov     [format],text
-				UML_MOV(block, mem(&ppc->impstate->arg0), desc->pc);                    // mov     [arg0],desc->pc
-				UML_CALLC(block, cfunc_printf_debug, ppc);                                  // callc   printf_debug
+				UML_MOV(block, mem(&m_core->format), (FPTR)text);                // mov     [format],text
+				UML_MOV(block, mem(&m_core->arg0), desc->pc);                    // mov     [arg0],desc->pc
+				UML_CALLC(block, cfunc_printf_debug, this);                                  // callc   printf_debug
 			}
 			UML_LOAD(block, I0, &tlbtable[desc->pc >> 12], 0, SIZE_DWORD, SCALE_x4);// load    i0,tlbtable[desc->pc >> 12],dword
 			UML_CMP(block, I0, tlbtable[desc->pc >> 12]);                           // cmp     i0,*tlbentry
-			UML_EXHc(block, COND_NE, *ppc->impstate->tlb_mismatch, 0);                  // exh     tlb_mismatch,0,NE
+			UML_EXHc(block, COND_NE, *m_tlb_mismatch, 0);                  // exh     tlb_mismatch,0,NE
 		}
 
 		/* otherwise, we generate an unconditional exception */
@@ -2204,31 +1724,31 @@ static void generate_sequence_instruction(powerpc_state *ppc, drcuml_block *bloc
 			if (PRINTF_MMU)
 			{
 				const char *text = "No valid TLB @ %08X\n";
-				UML_MOV(block, mem(&ppc->impstate->format), (FPTR)text);                // mov     [format],text
-				UML_MOV(block, mem(&ppc->impstate->arg0), desc->pc);                    // mov     [arg0],desc->pc
-				UML_CALLC(block, cfunc_printf_debug, ppc);                                  // callc   printf_debug
+				UML_MOV(block, mem(&m_core->format), (FPTR)text);                // mov     [format],text
+				UML_MOV(block, mem(&m_core->arg0), desc->pc);                    // mov     [arg0],desc->pc
+				UML_CALLC(block, cfunc_printf_debug, this);                                  // callc   printf_debug
 			}
-			UML_EXH(block, *ppc->impstate->tlb_mismatch, 0);                            // exh     tlb_mismatch,0
+			UML_EXH(block, *m_tlb_mismatch, 0);                            // exh     tlb_mismatch,0
 		}
 	}
 
 	/* if this is an invalid opcode, generate the exception now */
 	if (desc->flags & OPFLAG_INVALID_OPCODE)
-		UML_EXH(block, *ppc->impstate->exception[EXCEPTION_PROGRAM], 0x80000);          // exh    exception_program,0x80000
+		UML_EXH(block, *m_exception[EXCEPTION_PROGRAM], 0x80000);          // exh    exception_program,0x80000
 
 	/* if this is a privileged opcode in user mode, generate the exception */
-	else if ((desc->flags & OPFLAG_PRIVILEGED) && (ppc->impstate->mode & MODE_USER))
-		UML_EXH(block, *ppc->impstate->exception[EXCEPTION_PROGRAM], 0x40000);          // exh    exception_program,0x40000
+	else if ((desc->flags & OPFLAG_PRIVILEGED) && (m_core->mode & MODE_USER))
+		UML_EXH(block, *m_exception[EXCEPTION_PROGRAM], 0x40000);          // exh    exception_program,0x40000
 
 	/* otherwise, unless this is a virtual no-op, it's a regular instruction */
 	else if (!(desc->flags & OPFLAG_VIRTUAL_NOOP))
 	{
 		/* compile the instruction */
-		if (!generate_opcode(ppc, block, compiler, desc))
+		if (!generate_opcode(block, compiler, desc))
 		{
-			UML_MOV(block, mem(&ppc->pc), desc->pc);                                    // mov     [pc],desc->pc
-			UML_MOV(block, mem(&ppc->impstate->arg0), desc->opptr.l[0]);                // mov     [arg0],*desc->opptr.l
-			UML_CALLC(block, cfunc_unimplemented, ppc);                                     // callc   cfunc_unimplemented,ppc
+			UML_MOV(block, mem(&m_core->pc), desc->pc);                                    // mov     [pc],desc->pc
+			UML_MOV(block, mem(&m_core->arg0), desc->opptr.l[0]);                // mov     [arg0],*desc->opptr.l
+			UML_CALLC(block, cfunc_unimplemented, this);                                     // callc   cfunc_unimplemented,ppc
 		}
 	}
 }
@@ -2238,7 +1758,7 @@ static void generate_sequence_instruction(powerpc_state *ppc, drcuml_block *bloc
     generate_compute_flags - compute CR0 and/or XER flags
 ------------------------------------------------------------------*/
 
-static void generate_compute_flags(powerpc_state *ppc, drcuml_block *block, const opcode_desc *desc, int updatecr, UINT32 xermask, int invertcarry)
+void ppc_device::generate_compute_flags(drcuml_block *block, const opcode_desc *desc, int updatecr, UINT32 xermask, int invertcarry)
 {
 	UINT32 xerflags;
 
@@ -2260,7 +1780,7 @@ static void generate_compute_flags(powerpc_state *ppc, drcuml_block *block, cons
 	if (xermask == 0)
 	{
 		UML_GETFLGS(block, I0, FLAG_S | FLAG_Z);                                        // getflgs i0,sz
-		UML_LOAD(block, I0, ppc->impstate->sz_cr_table, I0, SIZE_BYTE, SCALE_x1);   // load    i0,sz_cr_table,i0,byte
+		UML_LOAD(block, I0, m_sz_cr_table, I0, SIZE_BYTE, SCALE_x1);   // load    i0,sz_cr_table,i0,byte
 		UML_OR(block, CR32(0), I0, XERSO32);                                            // or      [cr0],i0,[xerso]
 		return;
 	}
@@ -2287,7 +1807,7 @@ static void generate_compute_flags(powerpc_state *ppc, drcuml_block *block, cons
 
 	/* tricky case: both */
 	UML_GETFLGS(block, I0, FLAG_S | FLAG_Z | xerflags);                             // getflgs i0,SZ | xerflags
-	UML_LOAD(block, I1, ppc->impstate->sz_cr_table, I0, SIZE_BYTE, SCALE_x1);       // load    i1,sz_cr_table,i0,byte
+	UML_LOAD(block, I1, m_sz_cr_table, I0, SIZE_BYTE, SCALE_x1);       // load    i1,sz_cr_table,i0,byte
 	if (invertcarry && (xermask & XER_CA))
 		UML_XOR(block, I0, I0, FLAG_C);                                     // xor     i0,i0,FLAG_C
 	UML_ROLINS(block, SPR32(SPR_XER), I0, 29, xermask);                     // rolins  [xer],i0,29,xermask
@@ -2309,7 +1829,7 @@ static void generate_compute_flags(powerpc_state *ppc, drcuml_block *block, cons
     generate_shift_flags - compute S/Z flags for shifts
 -------------------------------------------------------*/
 
-static void generate_shift_flags(powerpc_state *ppc, drcuml_block *block, const opcode_desc *desc, UINT32 op)
+void ppc_device::generate_shift_flags(drcuml_block *block, const opcode_desc *desc, UINT32 op)
 {
 	UML_CMP(block, R32(G_RA(op)), 0);               // cmp ra, #0
 	UML_SETc(block, COND_Z, I1);                     // set Z, i1
@@ -2318,7 +1838,7 @@ static void generate_shift_flags(powerpc_state *ppc, drcuml_block *block, const 
 	UML_SHR(block, I2, R32(G_RA(op)), 28);          // shr i2, ra, #28
 	UML_AND(block, I2, I2, FLAG_S);                 // and i2, i2, FLAG_S (i2 now = FLAG_S)
 	UML_OR(block, I1, I1, I2);                      // or i1, i1, i2
-	UML_LOAD(block, I0, ppc->impstate->sz_cr_table, I1, SIZE_BYTE, SCALE_x1);   // load    i0,sz_cr_table,i0,byte
+	UML_LOAD(block, I0, m_sz_cr_table, I1, SIZE_BYTE, SCALE_x1);   // load    i0,sz_cr_table,i0,byte
 	UML_OR(block, CR32(0), I0, XERSO32);                                            // or      [cr0],i0,[xerso]
 }
 
@@ -2327,13 +1847,13 @@ static void generate_shift_flags(powerpc_state *ppc, drcuml_block *block, const 
     point status flags
 -------------------------------------------------*/
 
-static void generate_fp_flags(powerpc_state *ppc, drcuml_block *block, const opcode_desc *desc, int updatefprf)
+void ppc_device::generate_fp_flags(drcuml_block *block, const opcode_desc *desc, int updatefprf)
 {
 	/* for now, only handle the FPRF field */
 	if (updatefprf)
 	{
-		UML_MOV(block, mem(&ppc->param0), G_RD(desc->opptr.l[0]));
-		UML_CALLC(block, (c_function)ppccom_update_fprf, ppc);
+		UML_MOV(block, mem(&m_core->param0), G_RD(desc->opptr.l[0]));
+		UML_CALLC(block, (c_function)cfunc_ppccom_update_fprf, this);
 	}
 }
 
@@ -2342,18 +1862,18 @@ static void generate_fp_flags(powerpc_state *ppc, drcuml_block *block, const opc
     branch
 -------------------------------------------------*/
 
-static void generate_branch(powerpc_state *ppc, drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, int source, UINT8 link)
+void ppc_device::generate_branch(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, int source, UINT8 link)
 {
 	compiler_state compiler_temp = *compiler;
-	UINT32 *srcptr = &ppc->spr[source];
+	UINT32 *srcptr = &m_core->spr[source];
 
 	/* set the link if needed */
 	if (link)
 	{
 		if (desc->targetpc == BRANCH_TARGET_DYNAMIC && source == SPR_LR)
 		{
-			UML_MOV(block, mem(&ppc->impstate->tempaddr), mem(srcptr));                     // mov     [tempaddr],[lr]
-			srcptr = &ppc->impstate->tempaddr;
+			UML_MOV(block, mem(&m_core->tempaddr), mem(srcptr));                     // mov     [tempaddr],[lr]
+			srcptr = &m_core->tempaddr;
 		}
 		UML_MOV(block, SPR32(SPR_LR), desc->pc + 4);                                    // mov     [lr],desc->pc + 4
 	}
@@ -2361,17 +1881,17 @@ static void generate_branch(powerpc_state *ppc, drcuml_block *block, compiler_st
 	/* update the cycles and jump through the hash table to the target */
 	if (desc->targetpc != BRANCH_TARGET_DYNAMIC)
 	{
-		generate_update_cycles(ppc, block, &compiler_temp, desc->targetpc, TRUE);       // <subtract cycles>
+		generate_update_cycles(block, &compiler_temp, desc->targetpc, TRUE);       // <subtract cycles>
 		if (desc->flags & OPFLAG_INTRABLOCK_BRANCH)
 			UML_JMP(block, desc->targetpc | 0x80000000);                                    // jmp     desc->targetpc | 0x80000000
 		else
-			UML_HASHJMP(block, ppc->impstate->mode, desc->targetpc, *ppc->impstate->nocode);
+			UML_HASHJMP(block, m_core->mode, desc->targetpc, *m_nocode);
 																							// hashjmp <mode>,desc->targetpc,nocode
 	}
 	else
 	{
-		generate_update_cycles(ppc, block, &compiler_temp, mem(srcptr), TRUE);              // <subtract cycles>
-		UML_HASHJMP(block, ppc->impstate->mode, mem(srcptr), *ppc->impstate->nocode);   // hashjmp <mode>,<rsreg>,nocode
+		generate_update_cycles(block, &compiler_temp, mem(srcptr), TRUE);              // <subtract cycles>
+		UML_HASHJMP(block, m_core->mode, mem(srcptr), *m_nocode);   // hashjmp <mode>,<rsreg>,nocode
 	}
 
 	/* update the label */
@@ -2387,7 +1907,7 @@ static void generate_branch(powerpc_state *ppc, drcuml_block *block, compiler_st
     branch based on the BO and BI fields
 -------------------------------------------------*/
 
-static void generate_branch_bo(powerpc_state *ppc, drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, UINT32 bo, UINT32 bi, int source, int link)
+void ppc_device::generate_branch_bo(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, UINT32 bo, UINT32 bi, int source, int link)
 {
 	int skip = compiler->labelnum++;
 
@@ -2401,7 +1921,7 @@ static void generate_branch_bo(powerpc_state *ppc, drcuml_block *block, compiler
 		UML_TEST(block, CR32(bi / 4), 8 >> (bi % 4));                                   // test  cr32(bi/4),8 >> (bi % 4)
 		UML_JMPc(block, (bo & 0x08) ? COND_Z : COND_NZ, skip);                                  // jmp   skip,z/nz
 	}
-	generate_branch(ppc, block, compiler, desc, source, link);                              // <branch>
+	generate_branch(block, compiler, desc, source, link);                              // <branch>
 	UML_LABEL(block, skip);                                                             // skip:
 }
 
@@ -2411,11 +1931,10 @@ static void generate_branch_bo(powerpc_state *ppc, drcuml_block *block, compiler
     opcode
 -------------------------------------------------*/
 
-static int generate_opcode(powerpc_state *ppc, drcuml_block *block, compiler_state *compiler, const opcode_desc *desc)
+int ppc_device::generate_opcode(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc)
 {
 	UINT32 op = desc->opptr.l[0];
 	UINT32 opswitch = op >> 26;
-	int regnum;
 
 	switch (opswitch)
 	{
@@ -2428,15 +1947,15 @@ static int generate_opcode(powerpc_state *ppc, drcuml_block *block, compiler_sta
 		case 0x03:  /* TWI */
 			UML_CMP(block, R32(G_RA(op)), (INT16)G_SIMM(op));                           // cmp     ra,simm
 			if (G_TO(op) & 0x10)
-				UML_EXHc(block, COND_L, *ppc->impstate->exception[EXCEPTION_PROGRAM], 0x20000);// exh program,0x20000,l
+				UML_EXHc(block, COND_L, *m_exception[EXCEPTION_PROGRAM], 0x20000);// exh program,0x20000,l
 			if (G_TO(op) & 0x08)
-				UML_EXHc(block, COND_G, *ppc->impstate->exception[EXCEPTION_PROGRAM], 0x20000);// exh program,0x20000,g
+				UML_EXHc(block, COND_G, *m_exception[EXCEPTION_PROGRAM], 0x20000);// exh program,0x20000,g
 			if (G_TO(op) & 0x04)
-				UML_EXHc(block, COND_E, *ppc->impstate->exception[EXCEPTION_PROGRAM], 0x20000);// exh program,0x20000,e
+				UML_EXHc(block, COND_E, *m_exception[EXCEPTION_PROGRAM], 0x20000);// exh program,0x20000,e
 			if (G_TO(op) & 0x02)
-				UML_EXHc(block, COND_B,  *ppc->impstate->exception[EXCEPTION_PROGRAM], 0x20000);// exh program,0x20000,b
+				UML_EXHc(block, COND_B,  *m_exception[EXCEPTION_PROGRAM], 0x20000);// exh program,0x20000,b
 			if (G_TO(op) & 0x01)
-				UML_EXHc(block, COND_A,  *ppc->impstate->exception[EXCEPTION_PROGRAM], 0x20000);// exh program,0x20000,a
+				UML_EXHc(block, COND_A,  *m_exception[EXCEPTION_PROGRAM], 0x20000);// exh program,0x20000,a
 			return TRUE;
 
 		case 0x07:  /* MULLI */
@@ -2455,67 +1974,67 @@ static int generate_opcode(powerpc_state *ppc, drcuml_block *block, compiler_sta
 		case 0x0a:  /* CMPLI */
 			UML_CMP(block, R32(G_RA(op)), G_UIMM(op));                                  // cmp     ra,uimm
 			UML_GETFLGS(block, I0, FLAG_Z | FLAG_C);                                    // getflgs i0,zc
-			UML_LOAD(block, I0, ppc->impstate->cmpl_cr_table, I0, SIZE_BYTE, SCALE_x1);// load    i0,cmpl_cr_table,i0,byte
+			UML_LOAD(block, I0, m_cmpl_cr_table, I0, SIZE_BYTE, SCALE_x1);// load    i0,cmpl_cr_table,i0,byte
 			UML_OR(block, CR32(G_CRFD(op)), I0, XERSO32);                               // or      [crn],i0,[xerso]
 			return TRUE;
 
 		case 0x0b:  /* CMPI */
 			UML_CMP(block, R32(G_RA(op)), (INT16)G_SIMM(op));                           // cmp     ra,uimm
 			UML_GETFLGS(block, I0, FLAG_Z | FLAG_V | FLAG_C | FLAG_S);                          // getflgs i0,zvcs
-			UML_LOAD(block, I0, ppc->impstate->cmp_cr_table, I0, SIZE_BYTE, SCALE_x1);// load    i0,cmp_cr_table,i0,byte
+			UML_LOAD(block, I0, m_cmp_cr_table, I0, SIZE_BYTE, SCALE_x1);// load    i0,cmp_cr_table,i0,byte
 			UML_OR(block, CR32(G_CRFD(op)), I0, XERSO32);                               // or      [crn],i0,[xerso]
 			return TRUE;
 
 		case 0x08:  /* SUBFIC */
 			UML_SUB(block, R32(G_RD(op)), (INT16)G_SIMM(op), R32(G_RA(op)));            // sub     rd,simm,ra
-			generate_compute_flags(ppc, block, desc, FALSE, XER_CA, TRUE);                  // <update flags>
+			generate_compute_flags(block, desc, FALSE, XER_CA, TRUE);                  // <update flags>
 			return TRUE;
 
 		case 0x0c:  /* ADDIC */
 			UML_ADD(block, R32(G_RD(op)), R32(G_RA(op)), (INT16)G_SIMM(op));            // add     rd,ra,simm
-			generate_compute_flags(ppc, block, desc, FALSE, XER_CA, FALSE);                 // <update flags>
+			generate_compute_flags(block, desc, FALSE, XER_CA, FALSE);                 // <update flags>
 			return TRUE;
 
 		case 0x0d:  /* ADDIC. */
 			UML_ADD(block, R32(G_RD(op)), R32(G_RA(op)), (INT16)G_SIMM(op));            // add     rd,ra,simm
-			generate_compute_flags(ppc, block, desc, TRUE, XER_CA, FALSE);                  // <update flags>
+			generate_compute_flags(block, desc, TRUE, XER_CA, FALSE);                  // <update flags>
 			return TRUE;
 
 		case 0x10:  /* BCx */
-			generate_branch_bo(ppc, block, compiler, desc, G_BO(op), G_BI(op), 0, op & M_LK);// <branch conditional>
+			generate_branch_bo(block, compiler, desc, G_BO(op), G_BI(op), 0, op & M_LK);// <branch conditional>
 			return TRUE;
 
 		case 0x11:  /* SC */
 			UML_MAPVAR(block, MAPVAR_PC, desc->pc + 4);                                     // mapvar  PC,desc->pc+4
-			UML_EXH(block, *ppc->impstate->exception[EXCEPTION_SYSCALL], 0);            // exh     syscall,0
+			UML_EXH(block, *m_exception[EXCEPTION_SYSCALL], 0);            // exh     syscall,0
 			return TRUE;
 
 		case 0x12:  /* Bx */
-			generate_branch(ppc, block, compiler, desc, 0, op & M_LK);                      // <branch>
+			generate_branch(block, compiler, desc, 0, op & M_LK);                      // <branch>
 			return TRUE;
 
 		case 0x13:  /* 0x13 group */
-			return generate_instruction_13(ppc, block, compiler, desc);                     // <group13>
+			return generate_instruction_13(block, compiler, desc);                     // <group13>
 
 		case 0x14:  /* RLWIMIx */
 			UML_ROLINS(block, R32(G_RA(op)), R32(G_RS(op)), G_SH(op), compute_rlw_mask(G_MB(op), G_ME(op)));
 																							// rolins ra,rs,sh,mask
 			if (op & M_RC)
-				generate_compute_flags(ppc, block, desc, TRUE, 0, FALSE);                   // <update flags>
+				generate_compute_flags(block, desc, TRUE, 0, FALSE);                   // <update flags>
 			return TRUE;
 
 		case 0x15:  /* RLWINMx */
 			UML_ROLAND(block, R32(G_RA(op)), R32(G_RS(op)), G_SH(op), compute_rlw_mask(G_MB(op), G_ME(op)));
 																							// roland ra,rs,sh,mask
 			if (op & M_RC)
-				generate_compute_flags(ppc, block, desc, TRUE, 0, FALSE);                   // <update flags>
+				generate_compute_flags(block, desc, TRUE, 0, FALSE);                   // <update flags>
 			return TRUE;
 
 		case 0x17:  /* RLWNMx */
 			UML_ROLAND(block, R32(G_RA(op)), R32(G_RS(op)), R32(G_RB(op)), compute_rlw_mask(G_MB(op), G_ME(op)));
 																							// roland ra,rs,rb,mask
 			if (op & M_RC)
-				generate_compute_flags(ppc, block, desc, TRUE, 0, FALSE);                   // <update flags>
+				generate_compute_flags(block, desc, TRUE, 0, FALSE);                   // <update flags>
 			return TRUE;
 
 		case 0x18:  /* ORI */
@@ -2536,254 +2055,254 @@ static int generate_opcode(powerpc_state *ppc, drcuml_block *block, compiler_sta
 
 		case 0x1c:  /* ANDI. */
 			UML_AND(block, R32(G_RA(op)), R32(G_RS(op)), G_UIMM(op));                   // and     ra,rs,uimm
-			generate_compute_flags(ppc, block, desc, TRUE, 0, FALSE);                       // <update flags>
+			generate_compute_flags(block, desc, TRUE, 0, FALSE);                       // <update flags>
 			return TRUE;
 
 		case 0x1d:  /* ANDIS. */
 			UML_AND(block, R32(G_RA(op)), R32(G_RS(op)), G_UIMM(op) << 16);         // and  ra,rs,uimm << 16
-			generate_compute_flags(ppc, block, desc, TRUE, 0, FALSE);                       // <update flags>
+			generate_compute_flags(block, desc, TRUE, 0, FALSE);                       // <update flags>
 			return TRUE;
 
 		case 0x1f:  /* 0x1f group */
-			return generate_instruction_1f(ppc, block, compiler, desc);                     // <group1f>
+			return generate_instruction_1f(block, compiler, desc);                     // <group1f>
 
 		case 0x22:  /* LBZ */
 			UML_ADD(block, I0, R32Z(G_RA(op)), (INT16)G_SIMM(op));              // add     i0,ra,simm
 			UML_MAPVAR(block, MAPVAR_DSISR, DSISR_IMM(op));                                 // mapvar  dsisr,DSISR_IMM(op)
-			UML_CALLH(block, *ppc->impstate->read8[ppc->impstate->mode]);                   // callh   read8
+			UML_CALLH(block, *m_read8[m_core->mode]);                   // callh   read8
 			UML_AND(block, R32(G_RD(op)), I0, 0xff);                                // and     rd,i0,0xff
-			generate_update_cycles(ppc, block, compiler, desc->pc + 4, TRUE);           // <update cycles>
+			generate_update_cycles(block, compiler, desc->pc + 4, TRUE);           // <update cycles>
 			return TRUE;
 
 		case 0x28:  /* LHZ */
 			UML_ADD(block, I0, R32Z(G_RA(op)), (INT16)G_SIMM(op));              // add     i0,ra,simm
 			UML_MAPVAR(block, MAPVAR_DSISR, DSISR_IMM(op));                                 // mapvar  dsisr,DSISR_IMM(op)
-			UML_CALLH(block, *ppc->impstate->read16[ppc->impstate->mode]);                  // callh   read16
+			UML_CALLH(block, *m_read16[m_core->mode]);                  // callh   read16
 			UML_AND(block, R32(G_RD(op)), I0, 0xffff);                          // and     rd,i0,0xffff
-			generate_update_cycles(ppc, block, compiler, desc->pc + 4, TRUE);           // <update cycles>
+			generate_update_cycles(block, compiler, desc->pc + 4, TRUE);           // <update cycles>
 			return TRUE;
 
 		case 0x2a:  /* LHA */
 			UML_ADD(block, I0, R32Z(G_RA(op)), (INT16)G_SIMM(op));              // add     i0,ra,simm
 			UML_MAPVAR(block, MAPVAR_DSISR, DSISR_IMM(op));                                 // mapvar  dsisr,DSISR_IMM(op)
-			UML_CALLH(block, *ppc->impstate->read16[ppc->impstate->mode]);                  // callh   read16
+			UML_CALLH(block, *m_read16[m_core->mode]);                  // callh   read16
 			UML_SEXT(block, R32(G_RD(op)), I0, SIZE_WORD);                                  // sext    rd,i0,word
-			generate_update_cycles(ppc, block, compiler, desc->pc + 4, TRUE);           // <update cycles>
+			generate_update_cycles(block, compiler, desc->pc + 4, TRUE);           // <update cycles>
 			return TRUE;
 
 		case 0x20:  /* LWZ */
 			UML_ADD(block, I0, R32Z(G_RA(op)), (INT16)G_SIMM(op));              // add     i0,ra,simm
 			UML_MAPVAR(block, MAPVAR_DSISR, DSISR_IMM(op));                                 // mapvar  dsisr,DSISR_IMM(op)
-			UML_CALLH(block, *ppc->impstate->read32[ppc->impstate->mode]);                  // callh   read32
+			UML_CALLH(block, *m_read32[m_core->mode]);                  // callh   read32
 			UML_MOV(block, R32(G_RD(op)), I0);                                          // mov     rd,i0
-			generate_update_cycles(ppc, block, compiler, desc->pc + 4, TRUE);           // <update cycles>
+			generate_update_cycles(block, compiler, desc->pc + 4, TRUE);           // <update cycles>
 			return TRUE;
 
 		case 0x23:  /* LBZU */
 			UML_ADD(block, I0, R32(G_RA(op)), (INT16)G_SIMM(op));                   // add     i0,ra,simm
-			UML_MOV(block, mem(&ppc->impstate->updateaddr), I0);                        // mov     [updateaddr],i0
+			UML_MOV(block, mem(&m_core->updateaddr), I0);                        // mov     [updateaddr],i0
 			UML_MAPVAR(block, MAPVAR_DSISR, DSISR_IMMU(op));                                // mapvar  dsisr,DSISR_IMMU(op)
-			UML_CALLH(block, *ppc->impstate->read8[ppc->impstate->mode]);                   // callh   read8
+			UML_CALLH(block, *m_read8[m_core->mode]);                   // callh   read8
 			UML_AND(block, R32(G_RD(op)), I0, 0xff);                                // and     rd,i0,0xff
-			UML_MOV(block, R32(G_RA(op)), mem(&ppc->impstate->updateaddr));                 // mov     ra,[updateaddr]
-			generate_update_cycles(ppc, block, compiler, desc->pc + 4, TRUE);           // <update cycles>
+			UML_MOV(block, R32(G_RA(op)), mem(&m_core->updateaddr));                 // mov     ra,[updateaddr]
+			generate_update_cycles(block, compiler, desc->pc + 4, TRUE);           // <update cycles>
 			return TRUE;
 
 		case 0x29:  /* LHZU */
 			UML_ADD(block, I0, R32(G_RA(op)), (INT16)G_SIMM(op));                   // add     i0,ra,simm
-			UML_MOV(block, mem(&ppc->impstate->updateaddr), I0);                        // mov     [updateaddr],i0
+			UML_MOV(block, mem(&m_core->updateaddr), I0);                        // mov     [updateaddr],i0
 			UML_MAPVAR(block, MAPVAR_DSISR, DSISR_IMMU(op));                                // mapvar  dsisr,DSISR_IMMU(op)
-			UML_CALLH(block, *ppc->impstate->read16[ppc->impstate->mode]);                  // callh   read16
+			UML_CALLH(block, *m_read16[m_core->mode]);                  // callh   read16
 			UML_AND(block, R32(G_RD(op)), I0, 0xffff);                          // and     rd,i0,0xffff
-			UML_MOV(block, R32(G_RA(op)), mem(&ppc->impstate->updateaddr));                 // mov     ra,[updateaddr]
-			generate_update_cycles(ppc, block, compiler, desc->pc + 4, TRUE);           // <update cycles>
+			UML_MOV(block, R32(G_RA(op)), mem(&m_core->updateaddr));                 // mov     ra,[updateaddr]
+			generate_update_cycles(block, compiler, desc->pc + 4, TRUE);           // <update cycles>
 			return TRUE;
 
 		case 0x2b:  /* LHAU */
 			UML_ADD(block, I0, R32(G_RA(op)), (INT16)G_SIMM(op));                   // add     i0,ra,simm
-			UML_MOV(block, mem(&ppc->impstate->updateaddr), I0);                        // mov     [updateaddr],i0
+			UML_MOV(block, mem(&m_core->updateaddr), I0);                        // mov     [updateaddr],i0
 			UML_MAPVAR(block, MAPVAR_DSISR, DSISR_IMMU(op));                                // mapvar  dsisr,DSISR_IMMU(op)
-			UML_CALLH(block, *ppc->impstate->read16[ppc->impstate->mode]);                  // callh   read16
+			UML_CALLH(block, *m_read16[m_core->mode]);                  // callh   read16
 			UML_SEXT(block, R32(G_RD(op)), I0, SIZE_WORD);                                  // sext    rd,i0,word
-			UML_MOV(block, R32(G_RA(op)), mem(&ppc->impstate->updateaddr));                 // mov     ra,[updateaddr]
-			generate_update_cycles(ppc, block, compiler, desc->pc + 4, TRUE);           // <update cycles>
+			UML_MOV(block, R32(G_RA(op)), mem(&m_core->updateaddr));                 // mov     ra,[updateaddr]
+			generate_update_cycles(block, compiler, desc->pc + 4, TRUE);           // <update cycles>
 			return TRUE;
 
 		case 0x21:  /* LWZU */
 			UML_ADD(block, I0, R32(G_RA(op)), (INT16)G_SIMM(op));                   // add     i0,ra,simm
-			UML_MOV(block, mem(&ppc->impstate->updateaddr), I0);                        // mov     [updateaddr],i0
+			UML_MOV(block, mem(&m_core->updateaddr), I0);                        // mov     [updateaddr],i0
 			UML_MAPVAR(block, MAPVAR_DSISR, DSISR_IMMU(op));                                // mapvar  dsisr,DSISR_IMMU(op)
-			UML_CALLH(block, *ppc->impstate->read32[ppc->impstate->mode]);                  // callh   read32
+			UML_CALLH(block, *m_read32[m_core->mode]);                  // callh   read32
 			UML_MOV(block, R32(G_RD(op)), I0);                                          // mov     rd,i0
-			UML_MOV(block, R32(G_RA(op)), mem(&ppc->impstate->updateaddr));                 // mov     ra,[updateaddr]
-			generate_update_cycles(ppc, block, compiler, desc->pc + 4, TRUE);           // <update cycles>
+			UML_MOV(block, R32(G_RA(op)), mem(&m_core->updateaddr));                 // mov     ra,[updateaddr]
+			generate_update_cycles(block, compiler, desc->pc + 4, TRUE);           // <update cycles>
 			return TRUE;
 
 		case 0x26:  /* STB */
 			UML_ADD(block, I0, R32Z(G_RA(op)), (INT16)G_SIMM(op));              // add     i0,ra,simm
 			UML_AND(block, I1, R32(G_RS(op)), 0xff);                                // and     i1,rs,0xff
 			UML_MAPVAR(block, MAPVAR_DSISR, DSISR_IMM(op));                                 // mapvar  dsisr,DSISR_IMM(op)
-			UML_CALLH(block, *ppc->impstate->write8[ppc->impstate->mode]);                  // callh   write8
-			generate_update_cycles(ppc, block, compiler, desc->pc + 4, TRUE);           // <update cycles>
+			UML_CALLH(block, *m_write8[m_core->mode]);                  // callh   write8
+			generate_update_cycles(block, compiler, desc->pc + 4, TRUE);           // <update cycles>
 			return TRUE;
 
 		case 0x2c:  /* STH */
 			UML_ADD(block, I0, R32Z(G_RA(op)), (INT16)G_SIMM(op));              // add     i0,ra,simm
 			UML_AND(block, I1, R32(G_RS(op)), 0xffff);                          // and     i1,rs,0xffff
 			UML_MAPVAR(block, MAPVAR_DSISR, DSISR_IMM(op));                                 // mapvar  dsisr,DSISR_IMM(op)
-			UML_CALLH(block, *ppc->impstate->write16[ppc->impstate->mode]);                 // callh   write16
-			generate_update_cycles(ppc, block, compiler, desc->pc + 4, TRUE);           // <update cycles>
+			UML_CALLH(block, *m_write16[m_core->mode]);                 // callh   write16
+			generate_update_cycles(block, compiler, desc->pc + 4, TRUE);           // <update cycles>
 			return TRUE;
 
 		case 0x24:  /* STW */
 			UML_ADD(block, I0, R32Z(G_RA(op)), (INT16)G_SIMM(op));              // add     i0,ra,simm
 			UML_MOV(block, I1, R32(G_RS(op)));                                          // mov     i1,rs
 			UML_MAPVAR(block, MAPVAR_DSISR, DSISR_IMM(op));                                 // mapvar  dsisr,DSISR_IMM(op)
-			UML_CALLH(block, *ppc->impstate->write32[ppc->impstate->mode]);                 // callh   write32
-			generate_update_cycles(ppc, block, compiler, desc->pc + 4, TRUE);           // <update cycles>
+			UML_CALLH(block, *m_write32[m_core->mode]);                 // callh   write32
+			generate_update_cycles(block, compiler, desc->pc + 4, TRUE);           // <update cycles>
 			return TRUE;
 
 		case 0x27:  /* STBU */
 			UML_ADD(block, I0, R32(G_RA(op)), (INT16)G_SIMM(op));                   // add     i0,ra,simm
 			UML_AND(block, I1, R32(G_RS(op)), 0xff);                                // and     i1,rs,0xff
-			UML_MOV(block, mem(&ppc->impstate->updateaddr), I0);                        // mov     [updateaddr],i0
+			UML_MOV(block, mem(&m_core->updateaddr), I0);                        // mov     [updateaddr],i0
 			UML_MAPVAR(block, MAPVAR_DSISR, DSISR_IMMU(op));                                // mapvar  dsisr,DSISR_IMMU(op)
-			UML_CALLH(block, *ppc->impstate->write8[ppc->impstate->mode]);                  // callh   write8
-			UML_MOV(block, R32(G_RA(op)), mem(&ppc->impstate->updateaddr));                 // mov     ra,[updateaddr]
-			generate_update_cycles(ppc, block, compiler, desc->pc + 4, TRUE);           // <update cycles>
+			UML_CALLH(block, *m_write8[m_core->mode]);                  // callh   write8
+			UML_MOV(block, R32(G_RA(op)), mem(&m_core->updateaddr));                 // mov     ra,[updateaddr]
+			generate_update_cycles(block, compiler, desc->pc + 4, TRUE);           // <update cycles>
 			return TRUE;
 
 		case 0x2d:  /* STHU */
 			UML_ADD(block, I0, R32(G_RA(op)), (INT16)G_SIMM(op));                   // add     i0,ra,simm
 			UML_AND(block, I1, R32(G_RS(op)), 0xffff);                          // and     i1,rs,0xffff
-			UML_MOV(block, mem(&ppc->impstate->updateaddr), I0);                        // mov     [updateaddr],i0
+			UML_MOV(block, mem(&m_core->updateaddr), I0);                        // mov     [updateaddr],i0
 			UML_MAPVAR(block, MAPVAR_DSISR, DSISR_IMMU(op));                                // mapvar  dsisr,DSISR_IMMU(op)
-			UML_CALLH(block, *ppc->impstate->write16[ppc->impstate->mode]);                 // callh   write16
-			UML_MOV(block, R32(G_RA(op)), mem(&ppc->impstate->updateaddr));                 // mov     ra,[updateaddr]
-			generate_update_cycles(ppc, block, compiler, desc->pc + 4, TRUE);           // <update cycles>
+			UML_CALLH(block, *m_write16[m_core->mode]);                 // callh   write16
+			UML_MOV(block, R32(G_RA(op)), mem(&m_core->updateaddr));                 // mov     ra,[updateaddr]
+			generate_update_cycles(block, compiler, desc->pc + 4, TRUE);           // <update cycles>
 			return TRUE;
 
 		case 0x25:  /* STWU */
 			UML_ADD(block, I0, R32(G_RA(op)), (INT16)G_SIMM(op));                   // add     i0,ra,simm
 			UML_MOV(block, I1, R32(G_RS(op)));                                          // mov     i1,rs
-			UML_MOV(block, mem(&ppc->impstate->updateaddr), I0);                        // mov     [updateaddr],i0
+			UML_MOV(block, mem(&m_core->updateaddr), I0);                        // mov     [updateaddr],i0
 			UML_MAPVAR(block, MAPVAR_DSISR, DSISR_IMMU(op));                                // mapvar  dsisr,DSISR_IMMU(op)
-			UML_CALLH(block, *ppc->impstate->write32[ppc->impstate->mode]);                 // callh   write32
-			UML_MOV(block, R32(G_RA(op)), mem(&ppc->impstate->updateaddr));                 // mov     ra,[updateaddr]
-			generate_update_cycles(ppc, block, compiler, desc->pc + 4, TRUE);           // <update cycles>
+			UML_CALLH(block, *m_write32[m_core->mode]);                 // callh   write32
+			UML_MOV(block, R32(G_RA(op)), mem(&m_core->updateaddr));                 // mov     ra,[updateaddr]
+			generate_update_cycles(block, compiler, desc->pc + 4, TRUE);           // <update cycles>
 			return TRUE;
 
 		case 0x2e:  /* LMW */
 			UML_MAPVAR(block, MAPVAR_DSISR, DSISR_IMMU(op));                                // mapvar  dsisr,DSISR_IMMU(op)
-			UML_MOV(block, mem(&ppc->impstate->tempaddr), R32Z(G_RA(op)));                  // mov     [tempaddr],ra
-			for (regnum = G_RD(op); regnum < 32; regnum++)
+			UML_MOV(block, mem(&m_core->tempaddr), R32Z(G_RA(op)));                  // mov     [tempaddr],ra
+			for (int regnum = G_RD(op); regnum < 32; regnum++)
 			{
-				UML_ADD(block, I0, mem(&ppc->impstate->tempaddr), (INT16)G_SIMM(op) + 4 * (regnum - G_RD(op)));
+				UML_ADD(block, I0, mem(&m_core->tempaddr), (INT16)G_SIMM(op) + 4 * (regnum - G_RD(op)));
 																							// add     i0,[tempaddr],simm + 4*(regnum-rd)
-				UML_CALLH(block, *ppc->impstate->read32align[ppc->impstate->mode]);         // callh   read32align
+				UML_CALLH(block, *m_read32align[m_core->mode]);         // callh   read32align
 				UML_MOV(block, R32(regnum), I0);                                        // mov     regnum,i0
 			}
-			generate_update_cycles(ppc, block, compiler, desc->pc + 4, TRUE);           // <update cycles>
+			generate_update_cycles(block, compiler, desc->pc + 4, TRUE);           // <update cycles>
 			return TRUE;
 
 		case 0x2f:  /* STMW */
 			UML_MAPVAR(block, MAPVAR_DSISR, DSISR_IMMU(op));                                // mapvar  dsisr,DSISR_IMMU(op)
-			UML_MOV(block, mem(&ppc->impstate->tempaddr), R32Z(G_RA(op)));                  // mov     [tempaddr],ra
-			for (regnum = G_RS(op); regnum < 32; regnum++)
+			UML_MOV(block, mem(&m_core->tempaddr), R32Z(G_RA(op)));                  // mov     [tempaddr],ra
+			for (int regnum = G_RS(op); regnum < 32; regnum++)
 			{
-				UML_ADD(block, I0, mem(&ppc->impstate->tempaddr), (INT16)G_SIMM(op) + 4 * (regnum - G_RS(op)));
+				UML_ADD(block, I0, mem(&m_core->tempaddr), (INT16)G_SIMM(op) + 4 * (regnum - G_RS(op)));
 																							// add     i0,[tempaddr],simm + 4*(regnum-rs)
 				UML_MOV(block, I1, R32(regnum));                                        // mov     i1,regnum
-				UML_CALLH(block, *ppc->impstate->write32align[ppc->impstate->mode]);            // callh   write32align
+				UML_CALLH(block, *m_write32align[m_core->mode]);            // callh   write32align
 			}
-			generate_update_cycles(ppc, block, compiler, desc->pc + 4, TRUE);           // <update cycles>
+			generate_update_cycles(block, compiler, desc->pc + 4, TRUE);           // <update cycles>
 			return TRUE;
 
 		case 0x30:  /* LFS */
 			UML_ADD(block, I0, R32Z(G_RA(op)), (INT16)G_SIMM(op));              // add     i0,ra,simm
 			UML_MAPVAR(block, MAPVAR_DSISR, DSISR_IMM(op));                                 // mapvar  dsisr,DSISR_IMM(op)
-			UML_CALLH(block, *ppc->impstate->read32[ppc->impstate->mode]);                  // callh   read32
-			UML_MOV(block, mem(&ppc->impstate->tempdata.w.l), I0);                      // mov     [tempdata],i0
-			UML_FDFRFLT(block, F64(G_RD(op)), mem(&ppc->impstate->tempdata.w.l), SIZE_DWORD);   // fdfrflt fd,[tempdata],dword
-			generate_update_cycles(ppc, block, compiler, desc->pc + 4, TRUE);           // <update cycles>
+			UML_CALLH(block, *m_read32[m_core->mode]);                  // callh   read32
+			UML_MOV(block, mem(&m_core->tempdata.w.l), I0);                      // mov     [tempdata],i0
+			UML_FDFRFLT(block, F64(G_RD(op)), mem(&m_core->tempdata.w.l), SIZE_DWORD);   // fdfrflt fd,[tempdata],dword
+			generate_update_cycles(block, compiler, desc->pc + 4, TRUE);           // <update cycles>
 			return TRUE;
 
 		case 0x32:  /* LFD */
 			UML_ADD(block, I0, R32Z(G_RA(op)), (INT16)G_SIMM(op));              // add     i0,ra,simm
 			UML_MAPVAR(block, MAPVAR_DSISR, DSISR_IMM(op));                                 // mapvar  dsisr,DSISR_IMM(op)
-			UML_CALLH(block, *ppc->impstate->read64[ppc->impstate->mode]);                  // callh   read64
-			UML_DMOV(block, mem(&ppc->impstate->tempdata.d), I0);                       // dmov    [tempdata],i0
-			UML_FDMOV(block, F64(G_RD(op)), mem(&ppc->impstate->tempdata.d));               // fdmov   fd,[tempdata]
-			generate_update_cycles(ppc, block, compiler, desc->pc + 4, TRUE);           // <update cycles>
+			UML_CALLH(block, *m_read64[m_core->mode]);                  // callh   read64
+			UML_DMOV(block, mem(&m_core->tempdata.d), I0);                       // dmov    [tempdata],i0
+			UML_FDMOV(block, F64(G_RD(op)), mem(&m_core->tempdata.d));               // fdmov   fd,[tempdata]
+			generate_update_cycles(block, compiler, desc->pc + 4, TRUE);           // <update cycles>
 			return TRUE;
 
 		case 0x31:  /* LFSU */
 			UML_ADD(block, I0, R32(G_RA(op)), (INT16)G_SIMM(op));                   // add     i0,ra,simm
-			UML_MOV(block, mem(&ppc->impstate->updateaddr), I0);                        // mov     [updateaddr],i0
+			UML_MOV(block, mem(&m_core->updateaddr), I0);                        // mov     [updateaddr],i0
 			UML_MAPVAR(block, MAPVAR_DSISR, DSISR_IMMU(op));                                // mapvar  dsisr,DSISR_IMMU(op)
-			UML_CALLH(block, *ppc->impstate->read32[ppc->impstate->mode]);                  // callh   read32
-			UML_MOV(block, mem(&ppc->impstate->tempdata.w.l), I0);                      // mov     [tempdata],i0
-			UML_FDFRFLT(block, F64(G_RD(op)), mem(&ppc->impstate->tempdata.w.l), SIZE_DWORD);   // fdfrflt fd,[tempdata],dword
-			UML_MOV(block, R32(G_RA(op)), mem(&ppc->impstate->updateaddr));                 // mov     ra,[updateaddr]
-			generate_update_cycles(ppc, block, compiler, desc->pc + 4, TRUE);           // <update cycles>
+			UML_CALLH(block, *m_read32[m_core->mode]);                  // callh   read32
+			UML_MOV(block, mem(&m_core->tempdata.w.l), I0);                      // mov     [tempdata],i0
+			UML_FDFRFLT(block, F64(G_RD(op)), mem(&m_core->tempdata.w.l), SIZE_DWORD);   // fdfrflt fd,[tempdata],dword
+			UML_MOV(block, R32(G_RA(op)), mem(&m_core->updateaddr));                 // mov     ra,[updateaddr]
+			generate_update_cycles(block, compiler, desc->pc + 4, TRUE);           // <update cycles>
 			return TRUE;
 
 		case 0x33:  /* LFDU */
 			UML_ADD(block, I0, R32(G_RA(op)), (INT16)G_SIMM(op));                   // add     i0,ra,simm
-			UML_MOV(block, mem(&ppc->impstate->updateaddr), I0);                        // mov     [updateaddr],i0
+			UML_MOV(block, mem(&m_core->updateaddr), I0);                        // mov     [updateaddr],i0
 			UML_MAPVAR(block, MAPVAR_DSISR, DSISR_IMMU(op));                                // mapvar  dsisr,DSISR_IMMU(op)
-			UML_CALLH(block, *ppc->impstate->read64[ppc->impstate->mode]);                  // callh   read64
-			UML_DMOV(block, mem(&ppc->impstate->tempdata.d), I0);                       // dmov    [tempdata],i0
-			UML_FDMOV(block, F64(G_RD(op)), mem(&ppc->impstate->tempdata.d));               // fdmov   fd,[tempdata]
-			UML_MOV(block, R32(G_RA(op)), mem(&ppc->impstate->updateaddr));                 // mov     ra,[updateaddr]
-			generate_update_cycles(ppc, block, compiler, desc->pc + 4, TRUE);           // <update cycles>
+			UML_CALLH(block, *m_read64[m_core->mode]);                  // callh   read64
+			UML_DMOV(block, mem(&m_core->tempdata.d), I0);                       // dmov    [tempdata],i0
+			UML_FDMOV(block, F64(G_RD(op)), mem(&m_core->tempdata.d));               // fdmov   fd,[tempdata]
+			UML_MOV(block, R32(G_RA(op)), mem(&m_core->updateaddr));                 // mov     ra,[updateaddr]
+			generate_update_cycles(block, compiler, desc->pc + 4, TRUE);           // <update cycles>
 			return TRUE;
 
 		case 0x34:  /* STFS */
 			UML_ADD(block, I0, R32Z(G_RA(op)), (INT16)G_SIMM(op));              // add     i0,ra,simm
-			UML_FSFRFLT(block, mem(&ppc->impstate->tempdata.w.l), F64(G_RS(op)), SIZE_QWORD);   // fsfrflt [tempdata],rs,qword
-			UML_MOV(block, I1, mem(&ppc->impstate->tempdata.w.l));                      // mov     i1,[tempdata]
+			UML_FSFRFLT(block, mem(&m_core->tempdata.w.l), F64(G_RS(op)), SIZE_QWORD);   // fsfrflt [tempdata],rs,qword
+			UML_MOV(block, I1, mem(&m_core->tempdata.w.l));                      // mov     i1,[tempdata]
 			UML_MAPVAR(block, MAPVAR_DSISR, DSISR_IMM(op));                                 // mapvar  dsisr,DSISR_IMM(op)
-			UML_CALLH(block, *ppc->impstate->write32[ppc->impstate->mode]);                 // callh   write32
-			generate_update_cycles(ppc, block, compiler, desc->pc + 4, TRUE);           // <update cycles>
+			UML_CALLH(block, *m_write32[m_core->mode]);                 // callh   write32
+			generate_update_cycles(block, compiler, desc->pc + 4, TRUE);           // <update cycles>
 			return TRUE;
 
 		case 0x36:  /* STFD */
 			UML_ADD(block, I0, R32Z(G_RA(op)), (INT16)G_SIMM(op));              // add     i0,ra,simm
-			UML_FDMOV(block, mem(&ppc->impstate->tempdata.d), F64(G_RS(op)));               // fdmov   [tempdata],rs
-			UML_DMOV(block, I1, mem(&ppc->impstate->tempdata.d));                       // dmov    i1,[tempdata]
+			UML_FDMOV(block, mem(&m_core->tempdata.d), F64(G_RS(op)));               // fdmov   [tempdata],rs
+			UML_DMOV(block, I1, mem(&m_core->tempdata.d));                       // dmov    i1,[tempdata]
 			UML_MAPVAR(block, MAPVAR_DSISR, DSISR_IMM(op));                                 // mapvar  dsisr,DSISR_IMM(op)
-			UML_CALLH(block, *ppc->impstate->write64[ppc->impstate->mode]);                 // callh   write64
-			generate_update_cycles(ppc, block, compiler, desc->pc + 4, TRUE);           // <update cycles>
+			UML_CALLH(block, *m_write64[m_core->mode]);                 // callh   write64
+			generate_update_cycles(block, compiler, desc->pc + 4, TRUE);           // <update cycles>
 			return TRUE;
 
 		case 0x35:  /* STFSU */
 			UML_ADD(block, I0, R32(G_RA(op)), (INT16)G_SIMM(op));                   // add     i0,ra,simm
-			UML_FSFRFLT(block, mem(&ppc->impstate->tempdata.w.l), F64(G_RS(op)), SIZE_QWORD);   // fsfrflt [tempdata],rs,qword
-			UML_MOV(block, I1, mem(&ppc->impstate->tempdata.w.l));                      // mov     i1,[tempdata]
-			UML_MOV(block, mem(&ppc->impstate->updateaddr), I0);                        // mov     [updateaddr],i0
+			UML_FSFRFLT(block, mem(&m_core->tempdata.w.l), F64(G_RS(op)), SIZE_QWORD);   // fsfrflt [tempdata],rs,qword
+			UML_MOV(block, I1, mem(&m_core->tempdata.w.l));                      // mov     i1,[tempdata]
+			UML_MOV(block, mem(&m_core->updateaddr), I0);                        // mov     [updateaddr],i0
 			UML_MAPVAR(block, MAPVAR_DSISR, DSISR_IMMU(op));                                // mapvar  dsisr,DSISR_IMMU(op)
-			UML_CALLH(block, *ppc->impstate->write32[ppc->impstate->mode]);                 // callh   write32
-			UML_MOV(block, R32(G_RA(op)), mem(&ppc->impstate->updateaddr));                 // mov     ra,[updateaddr]
-			generate_update_cycles(ppc, block, compiler, desc->pc + 4, TRUE);           // <update cycles>
+			UML_CALLH(block, *m_write32[m_core->mode]);                 // callh   write32
+			UML_MOV(block, R32(G_RA(op)), mem(&m_core->updateaddr));                 // mov     ra,[updateaddr]
+			generate_update_cycles(block, compiler, desc->pc + 4, TRUE);           // <update cycles>
 			return TRUE;
 
 		case 0x37:  /* STFDU */
 			UML_ADD(block, I0, R32(G_RA(op)), (INT16)G_SIMM(op));                   // add     i0,ra,simm
-			UML_FDMOV(block, mem(&ppc->impstate->tempdata.d), F64(G_RS(op)));               // fdmov   [tempdata],rs
-			UML_DMOV(block, I1, mem(&ppc->impstate->tempdata.d));                       // dmov    i1,[tempdata]
-			UML_MOV(block, mem(&ppc->impstate->updateaddr), I0);                        // mov     [updateaddr],i0
+			UML_FDMOV(block, mem(&m_core->tempdata.d), F64(G_RS(op)));               // fdmov   [tempdata],rs
+			UML_DMOV(block, I1, mem(&m_core->tempdata.d));                       // dmov    i1,[tempdata]
+			UML_MOV(block, mem(&m_core->updateaddr), I0);                        // mov     [updateaddr],i0
 			UML_MAPVAR(block, MAPVAR_DSISR, DSISR_IMMU(op));                                // mapvar  dsisr,DSISR_IMMU(op)
-			UML_CALLH(block, *ppc->impstate->write64[ppc->impstate->mode]);                 // callh   write64
-			UML_MOV(block, R32(G_RA(op)), mem(&ppc->impstate->updateaddr));                 // mov     ra,[updateaddr]
-			generate_update_cycles(ppc, block, compiler, desc->pc + 4, TRUE);           // <update cycles>
+			UML_CALLH(block, *m_write64[m_core->mode]);                 // callh   write64
+			UML_MOV(block, R32(G_RA(op)), mem(&m_core->updateaddr));                 // mov     ra,[updateaddr]
+			generate_update_cycles(block, compiler, desc->pc + 4, TRUE);           // <update cycles>
 			return TRUE;
 
 		case 0x3b:  /* 0x3b group */
-			return generate_instruction_3b(ppc, block, compiler, desc);                     // <group3b>
+			return generate_instruction_3b(block, compiler, desc);                     // <group3b>
 
 		case 0x3f:  /* 0x3f group */
-			return generate_instruction_3f(ppc, block, compiler, desc);                     // <group3f>
+			return generate_instruction_3f(block, compiler, desc);                     // <group3f>
 	}
 
 	return FALSE;
@@ -2795,7 +2314,7 @@ static int generate_opcode(powerpc_state *ppc, drcuml_block *block, compiler_sta
     the 0x13 group
 -------------------------------------------------*/
 
-static int generate_instruction_13(powerpc_state *ppc, drcuml_block *block, compiler_state *compiler, const opcode_desc *desc)
+int ppc_device::generate_instruction_13(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc)
 {
 	UINT32 op = desc->opptr.l[0];
 	UINT32 opswitch = (op >> 1) & 0x3ff;
@@ -2803,11 +2322,11 @@ static int generate_instruction_13(powerpc_state *ppc, drcuml_block *block, comp
 	switch (opswitch)
 	{
 		case 0x010: /* BCLRx */
-			generate_branch_bo(ppc, block, compiler, desc, G_BO(op), G_BI(op), SPR_LR, op & M_LK);// <branch conditional>
+			generate_branch_bo(block, compiler, desc, G_BO(op), G_BI(op), SPR_LR, op & M_LK);// <branch conditional>
 			return TRUE;
 
 		case 0x210: /* BCCTRx */
-			generate_branch_bo(ppc, block, compiler, desc, G_BO(op), G_BI(op), SPR_CTR, op & M_LK);
+			generate_branch_bo(block, compiler, desc, G_BO(op), G_BI(op), SPR_CTR, op & M_LK);
 																							// <branch conditional>
 			return TRUE;
 
@@ -2885,9 +2404,9 @@ static int generate_instruction_13(powerpc_state *ppc, drcuml_block *block, comp
 			return TRUE;
 
 		case 0x032: /* RFI */
-			if (ppc->cap & PPCCAP_OEA)
+			if (m_cap & PPCCAP_OEA)
 			{
-				if (!(ppc->cap & PPCCAP_603_MMU))
+				if (!(m_cap & PPCCAP_603_MMU))
 					UML_ROLINS(block, MSR32, SPR32(SPROEA_SRR1), 0, 0x87c0ffff);    // rolins  [msr],[srr1],0,0x87c0ffff
 				else
 				{
@@ -2896,25 +2415,25 @@ static int generate_instruction_13(powerpc_state *ppc, drcuml_block *block, comp
 																							// rolins  [msr],[srr1],0,0x87c0ffff | MSR603_TGPR
 					UML_XOR(block, I0, I0, MSR32);                              // xor     i0,i0,[msr]
 					UML_TEST(block, I0, MSR603_TGPR);                               // test    i0,tgpr
-					UML_CALLHc(block, COND_NZ, *ppc->impstate->swap_tgpr);                      // callh   swap_tgpr,nz
+					UML_CALLHc(block, COND_NZ, *m_swap_tgpr);                      // callh   swap_tgpr,nz
 				}
 			}
-			else if (ppc->cap & PPCCAP_4XX)
+			else if (m_cap & PPCCAP_4XX)
 				UML_MOV(block, MSR32, SPR32(SPR4XX_SRR1));                                  // mov     [msr],[srr1]
-			generate_update_mode(ppc, block);                                               // <update mode>
+			generate_update_mode(block);                                               // <update mode>
 			compiler->checkints = TRUE;
-			generate_update_cycles(ppc, block, compiler, SPR32(SPROEA_SRR0), TRUE);         // <subtract cycles>
-			UML_HASHJMP(block, mem(&ppc->impstate->mode), SPR32(SPROEA_SRR0), *ppc->impstate->nocode);
+			generate_update_cycles(block, compiler, SPR32(SPROEA_SRR0), TRUE);         // <subtract cycles>
+			UML_HASHJMP(block, mem(&m_core->mode), SPR32(SPROEA_SRR0), *m_nocode);
 																							// hashjmp mode,[srr0],nocode
 			return TRUE;
 
 		case 0x033: /* RFCI */
-			assert(ppc->cap & PPCCAP_4XX);
+			assert(m_cap & PPCCAP_4XX);
 			UML_MOV(block, MSR32, SPR32(SPR4XX_SRR3));                                      // mov     [msr],[srr3]
-			generate_update_mode(ppc, block);                                               // <update mode>
+			generate_update_mode(block);                                               // <update mode>
 			compiler->checkints = TRUE;
-			generate_update_cycles(ppc, block, compiler, SPR32(SPR4XX_SRR2), TRUE);         // <subtract cycles>
-			UML_HASHJMP(block, mem(&ppc->impstate->mode), SPR32(SPR4XX_SRR2), *ppc->impstate->nocode);
+			generate_update_cycles(block, compiler, SPR32(SPR4XX_SRR2), TRUE);         // <subtract cycles>
+			UML_HASHJMP(block, mem(&m_core->mode), SPR32(SPR4XX_SRR2), *m_nocode);
 																							// hashjmp mode,[srr2],nocode
 			return TRUE;
 
@@ -2932,7 +2451,7 @@ static int generate_instruction_13(powerpc_state *ppc, drcuml_block *block, comp
     the 0x1f group
 -------------------------------------------------*/
 
-static int generate_instruction_1f(powerpc_state *ppc, drcuml_block *block, compiler_state *compiler, const opcode_desc *desc)
+int ppc_device::generate_instruction_1f(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc)
 {
 	UINT32 op = desc->opptr.l[0];
 	UINT32 opswitch = (op >> 1) & 0x3ff;
@@ -2971,28 +2490,28 @@ static int generate_instruction_1f(powerpc_state *ppc, drcuml_block *block, comp
 		case 0x004: /* TW */
 			UML_CMP(block, R32(G_RA(op)), R32(G_RB(op)));                                   // cmp     ra,rb
 			if (G_TO(op) & 0x10)
-				UML_EXHc(block, COND_L, *ppc->impstate->exception[EXCEPTION_PROGRAM], 0x20000);// exh program,0x20000,l
+				UML_EXHc(block, COND_L, *m_exception[EXCEPTION_PROGRAM], 0x20000);// exh program,0x20000,l
 			if (G_TO(op) & 0x08)
-				UML_EXHc(block, COND_G, *ppc->impstate->exception[EXCEPTION_PROGRAM], 0x20000);// exh program,0x20000,g
+				UML_EXHc(block, COND_G, *m_exception[EXCEPTION_PROGRAM], 0x20000);// exh program,0x20000,g
 			if (G_TO(op) & 0x04)
-				UML_EXHc(block, COND_E, *ppc->impstate->exception[EXCEPTION_PROGRAM], 0x20000);// exh program,0x20000,e
+				UML_EXHc(block, COND_E, *m_exception[EXCEPTION_PROGRAM], 0x20000);// exh program,0x20000,e
 			if (G_TO(op) & 0x02)
-				UML_EXHc(block, COND_B,  *ppc->impstate->exception[EXCEPTION_PROGRAM], 0x20000);// exh program,0x20000,b
+				UML_EXHc(block, COND_B,  *m_exception[EXCEPTION_PROGRAM], 0x20000);// exh program,0x20000,b
 			if (G_TO(op) & 0x01)
-				UML_EXHc(block, COND_A,  *ppc->impstate->exception[EXCEPTION_PROGRAM], 0x20000);// exh program,0x20000,a
+				UML_EXHc(block, COND_A,  *m_exception[EXCEPTION_PROGRAM], 0x20000);// exh program,0x20000,a
 			return TRUE;
 
 		case 0x10a: /* ADDx */
 		case 0x30a: /* ADDOx */
 			UML_ADD(block, R32(G_RD(op)), R32(G_RA(op)), R32(G_RB(op)));                    // add     rd,ra,rb
-			generate_compute_flags(ppc, block, desc, op & M_RC, ((op & M_OE) ? XER_OV : 0), FALSE);
+			generate_compute_flags(block, desc, op & M_RC, ((op & M_OE) ? XER_OV : 0), FALSE);
 																							// <update flags>
 			return TRUE;
 
 		case 0x00a: /* ADDCx */
 		case 0x20a: /* ADDCOx */
 			UML_ADD(block, R32(G_RD(op)), R32(G_RA(op)), R32(G_RB(op)));                    // add     rd,ra,rb
-			generate_compute_flags(ppc, block, desc, op & M_RC, XER_CA | ((op & M_OE) ? XER_OV : 0), FALSE);
+			generate_compute_flags(block, desc, op & M_RC, XER_CA | ((op & M_OE) ? XER_OV : 0), FALSE);
 																							// <update flags>
 			return TRUE;
 
@@ -3000,7 +2519,7 @@ static int generate_instruction_1f(powerpc_state *ppc, drcuml_block *block, comp
 		case 0x28a: /* ADDEOx */
 			UML_CARRY(block, SPR32(SPR_XER), 29);                                       // carry   [xer],XER_CA
 			UML_ADDC(block, R32(G_RD(op)), R32(G_RA(op)), R32(G_RB(op)));                   // addc    rd,ra,rb
-			generate_compute_flags(ppc, block, desc, op & M_RC, XER_CA | ((op & M_OE) ? XER_OV : 0), FALSE);
+			generate_compute_flags(block, desc, op & M_RC, XER_CA | ((op & M_OE) ? XER_OV : 0), FALSE);
 																							// <update flags>
 			return TRUE;
 
@@ -3008,7 +2527,7 @@ static int generate_instruction_1f(powerpc_state *ppc, drcuml_block *block, comp
 		case 0x2ca: /* ADDZEOx */
 			UML_CARRY(block, SPR32(SPR_XER), 29);                                       // carry   [xer],XER_CA
 			UML_ADDC(block, R32(G_RD(op)), R32(G_RA(op)), 0);                           // addc    rd,ra,0
-			generate_compute_flags(ppc, block, desc, op & M_RC, XER_CA | ((op & M_OE) ? XER_OV : 0), FALSE);
+			generate_compute_flags(block, desc, op & M_RC, XER_CA | ((op & M_OE) ? XER_OV : 0), FALSE);
 																							// <update flags>
 			return TRUE;
 
@@ -3016,21 +2535,21 @@ static int generate_instruction_1f(powerpc_state *ppc, drcuml_block *block, comp
 		case 0x2ea: /* ADDMEOx */
 			UML_CARRY(block, SPR32(SPR_XER), 29);                                       // carry   [xer],XER_CA
 			UML_ADDC(block, R32(G_RD(op)), R32(G_RA(op)), (UINT32)-1);                          // addc    rd,ra,-1
-			generate_compute_flags(ppc, block, desc, op & M_RC, XER_CA | ((op & M_OE) ? XER_OV : 0), FALSE);
+			generate_compute_flags(block, desc, op & M_RC, XER_CA | ((op & M_OE) ? XER_OV : 0), FALSE);
 																							// <update flags>
 			return TRUE;
 
 		case 0x028: /* SUBFx */
 		case 0x228: /* SUBFOx */
 			UML_SUB(block, R32(G_RD(op)), R32(G_RB(op)), R32(G_RA(op)));                    // sub     rd,rb,ra
-			generate_compute_flags(ppc, block, desc, op & M_RC, (op & M_OE) ? XER_OV : 0, TRUE);
+			generate_compute_flags(block, desc, op & M_RC, (op & M_OE) ? XER_OV : 0, TRUE);
 																							// <update flags>
 			return TRUE;
 
 		case 0x008: /* SUBFCx */
 		case 0x208: /* SUBFCOx */
 			UML_SUB(block, R32(G_RD(op)), R32(G_RB(op)), R32(G_RA(op)));                    // sub     rd,rb,ra
-			generate_compute_flags(ppc, block, desc, op & M_RC, XER_CA | ((op & M_OE) ? XER_OV : 0), TRUE);
+			generate_compute_flags(block, desc, op & M_RC, XER_CA | ((op & M_OE) ? XER_OV : 0), TRUE);
 																							// <update flags>
 			return TRUE;
 
@@ -3039,7 +2558,7 @@ static int generate_instruction_1f(powerpc_state *ppc, drcuml_block *block, comp
 			UML_XOR(block, I0, SPR32(SPR_XER), XER_CA);                         // xor     i0,[xer],XER_CA
 			UML_CARRY(block, I0, 29);                                               // carry   i0,XER_CA
 			UML_SUBB(block, R32(G_RD(op)), R32(G_RB(op)), R32(G_RA(op)));                   // subc    rd,rb,ra
-			generate_compute_flags(ppc, block, desc, op & M_RC, XER_CA | ((op & M_OE) ? XER_OV : 0), TRUE);
+			generate_compute_flags(block, desc, op & M_RC, XER_CA | ((op & M_OE) ? XER_OV : 0), TRUE);
 																							// <update flags>
 			return TRUE;
 
@@ -3048,7 +2567,7 @@ static int generate_instruction_1f(powerpc_state *ppc, drcuml_block *block, comp
 			UML_XOR(block, I0, SPR32(SPR_XER), XER_CA);                         // xor     i0,[xer],XER_CA
 			UML_CARRY(block, I0, 29);                                               // carry   i0,XER_CA
 			UML_SUBB(block, R32(G_RD(op)), 0, R32(G_RA(op)));                           // subc    rd,0,ra
-			generate_compute_flags(ppc, block, desc, op & M_RC, XER_CA | ((op & M_OE) ? XER_OV : 0), TRUE);
+			generate_compute_flags(block, desc, op & M_RC, XER_CA | ((op & M_OE) ? XER_OV : 0), TRUE);
 																							// <update flags>
 			return TRUE;
 
@@ -3057,28 +2576,28 @@ static int generate_instruction_1f(powerpc_state *ppc, drcuml_block *block, comp
 			UML_XOR(block, I0, SPR32(SPR_XER), XER_CA);                         // xor     i0,[xer],XER_CA
 			UML_CARRY(block, I0, 29);                                               // carry   i0,XER_CA
 			UML_SUBB(block, R32(G_RD(op)), (UINT32)-1, R32(G_RA(op)));                          // subc    rd,-1,ra
-			generate_compute_flags(ppc, block, desc, op & M_RC, XER_CA | ((op & M_OE) ? XER_OV : 0), TRUE);
+			generate_compute_flags(block, desc, op & M_RC, XER_CA | ((op & M_OE) ? XER_OV : 0), TRUE);
 																							// <update flags>
 			return TRUE;
 
 		case 0x068: /* NEGx */
 		case 0x268: /* NEGOx */
 			UML_SUB(block, R32(G_RD(op)), 0, R32(G_RA(op)));                            // sub     rd,0,ra
-			generate_compute_flags(ppc, block, desc, op & M_RC, (op & M_OE) ? XER_OV : 0, TRUE);
+			generate_compute_flags(block, desc, op & M_RC, (op & M_OE) ? XER_OV : 0, TRUE);
 																							// <update flags>
 			return TRUE;
 
 		case 0x000: /* CMP */
 			UML_CMP(block, R32(G_RA(op)), R32(G_RB(op)));                                   // cmp     ra,rb
 			UML_GETFLGS(block, I0, FLAG_Z | FLAG_V | FLAG_C | FLAG_S);                          // getflgs i0,zvcs
-			UML_LOAD(block, I0, ppc->impstate->cmp_cr_table, I0, SIZE_BYTE, SCALE_x1);// load    i0,cmp_cr_table,i0,byte
+			UML_LOAD(block, I0, m_cmp_cr_table, I0, SIZE_BYTE, SCALE_x1);// load    i0,cmp_cr_table,i0,byte
 			UML_OR(block, CR32(G_CRFD(op)), I0, XERSO32);                               // or      [crn],i0,[xerso]
 			return TRUE;
 
 		case 0x020: /* CMPL */
 			UML_CMP(block, R32(G_RA(op)), R32(G_RB(op)));                                   // cmp     ra,rb
 			UML_GETFLGS(block, I0, FLAG_Z | FLAG_C);                                    // getflgs i0,zc
-			UML_LOAD(block, I0, ppc->impstate->cmpl_cr_table, I0, SIZE_BYTE, SCALE_x1);// load    i0,cmpl_cr_table,i0,byte
+			UML_LOAD(block, I0, m_cmpl_cr_table, I0, SIZE_BYTE, SCALE_x1);// load    i0,cmpl_cr_table,i0,byte
 			UML_OR(block, CR32(G_CRFD(op)), I0, XERSO32);                               // or      [crn],i0,[xerso]
 			return TRUE;
 
@@ -3087,7 +2606,7 @@ static int generate_instruction_1f(powerpc_state *ppc, drcuml_block *block, comp
 			if (op & M_RC)
 			{
 				UML_TEST(block, R32(G_RD(op)), ~0);                                 // test    rd,~0
-				generate_compute_flags(ppc, block, desc, op & M_RC, 0, FALSE);              // <update flags>
+				generate_compute_flags(block, desc, op & M_RC, 0, FALSE);              // <update flags>
 			}
 			return TRUE;
 
@@ -3096,14 +2615,14 @@ static int generate_instruction_1f(powerpc_state *ppc, drcuml_block *block, comp
 			if (op & M_RC)
 			{
 				UML_TEST(block, R32(G_RD(op)), ~0);                                 // test    rd,~0
-				generate_compute_flags(ppc, block, desc, op & M_RC, 0, FALSE);              // <update flags>
+				generate_compute_flags(block, desc, op & M_RC, 0, FALSE);              // <update flags>
 			}
 			return TRUE;
 
 		case 0x0eb: /* MULLWx */
 		case 0x2eb: /* MULLWOx */
 			UML_MULS(block, R32(G_RD(op)), R32(G_RD(op)), R32(G_RA(op)), R32(G_RB(op)));    // muls    rd,rd,ra,rb
-			generate_compute_flags(ppc, block, desc, op & M_RC, ((op & M_OE) ? XER_OV : 0), FALSE);// <update flags>
+			generate_compute_flags(block, desc, op & M_RC, ((op & M_OE) ? XER_OV : 0), FALSE);// <update flags>
 			return TRUE;
 
 		case 0x1cb: /* DIVWUx */
@@ -3128,7 +2647,7 @@ static int generate_instruction_1f(powerpc_state *ppc, drcuml_block *block, comp
 
 			UML_LABEL(block, compiler->labelnum++);             // 0:
 			UML_DIVU(block, R32(G_RD(op)), R32(G_RD(op)), R32(G_RA(op)), R32(G_RB(op)));    // divu    rd,rd,ra,rb
-			generate_compute_flags(ppc, block, desc, op & M_RC, ((op & M_OE) ? XER_OV : 0), FALSE);// <update flags>
+			generate_compute_flags(block, desc, op & M_RC, ((op & M_OE) ? XER_OV : 0), FALSE);// <update flags>
 
 			UML_LABEL(block, compiler->labelnum++);             // 1:
 			return TRUE;
@@ -3181,54 +2700,54 @@ static int generate_instruction_1f(powerpc_state *ppc, drcuml_block *block, comp
 
 			UML_LABEL(block, compiler->labelnum++);             // 2:
 			UML_DIVS(block, R32(G_RD(op)), R32(G_RD(op)), R32(G_RA(op)), R32(G_RB(op)));    // divs    rd,rd,ra,rb
-			generate_compute_flags(ppc, block, desc, op & M_RC, ((op & M_OE) ? XER_OV : 0), FALSE);// <update flags>
+			generate_compute_flags(block, desc, op & M_RC, ((op & M_OE) ? XER_OV : 0), FALSE);// <update flags>
 
 			UML_LABEL(block, compiler->labelnum++);             // 3:
 			return TRUE;
 
 		case 0x01c: /* ANDx */
 			UML_AND(block, R32(G_RA(op)), R32(G_RS(op)), R32(G_RB(op)));                    // and     ra,rs,rb
-			generate_compute_flags(ppc, block, desc, op & M_RC, 0, FALSE);                  // <update flags>
+			generate_compute_flags(block, desc, op & M_RC, 0, FALSE);                  // <update flags>
 			return TRUE;
 
 		case 0x03c: /* ANDCx */
 			UML_XOR(block, I0, R32(G_RB(op)), ~0);                              // xor     i0,rb,~0
 			UML_AND(block, R32(G_RA(op)), R32(G_RS(op)), I0);                           // and     ra,rs,i0
-			generate_compute_flags(ppc, block, desc, op & M_RC, 0, FALSE);                  // <update flags>
+			generate_compute_flags(block, desc, op & M_RC, 0, FALSE);                  // <update flags>
 			return TRUE;
 
 		case 0x1dc: /* NANDx */
 			UML_AND(block, I0, R32(G_RS(op)), R32(G_RB(op)));                           // and     i0,rs,rb
 			UML_XOR(block, R32(G_RA(op)), I0, ~0);                              // xor     ra,i0,~0
-			generate_compute_flags(ppc, block, desc, op & M_RC, 0, FALSE);                  // <update flags>
+			generate_compute_flags(block, desc, op & M_RC, 0, FALSE);                  // <update flags>
 			return TRUE;
 
 		case 0x1bc: /* ORx */
 			UML_OR(block, R32(G_RA(op)), R32(G_RS(op)), R32(G_RB(op)));                     // or      ra,rs,rb
-			generate_compute_flags(ppc, block, desc, op & M_RC, 0, FALSE);                  // <update flags>
+			generate_compute_flags(block, desc, op & M_RC, 0, FALSE);                  // <update flags>
 			return TRUE;
 
 		case 0x19c: /* ORCx */
 			UML_XOR(block, I0, R32(G_RB(op)), ~0);                              // xor     i0,rb,~0
 			UML_OR(block, R32(G_RA(op)), R32(G_RS(op)), I0);                            // or      ra,rs,i0
-			generate_compute_flags(ppc, block, desc, op & M_RC, 0, FALSE);                  // <update flags>
+			generate_compute_flags(block, desc, op & M_RC, 0, FALSE);                  // <update flags>
 			return TRUE;
 
 		case 0x07c: /* NORx */
 			UML_OR(block, I0, R32(G_RS(op)), R32(G_RB(op)));                            // or      i0,rs,rb
 			UML_XOR(block, R32(G_RA(op)), I0, ~0);                              // xor     ra,i0,~0
-			generate_compute_flags(ppc, block, desc, op & M_RC, 0, FALSE);                  // <update flags>
+			generate_compute_flags(block, desc, op & M_RC, 0, FALSE);                  // <update flags>
 			return TRUE;
 
 		case 0x13c: /* XORx */
 			UML_XOR(block, R32(G_RA(op)), R32(G_RS(op)), R32(G_RB(op)));                    // xor     ra,rs,rb
-			generate_compute_flags(ppc, block, desc, op & M_RC, 0, FALSE);                  // <update flags>
+			generate_compute_flags(block, desc, op & M_RC, 0, FALSE);                  // <update flags>
 			return TRUE;
 
 		case 0x11c: /* EQVx */
 			UML_XOR(block, I0, R32(G_RS(op)), R32(G_RB(op)));                           // xor     i0,rs,rb
 			UML_XOR(block, R32(G_RA(op)), I0, ~0);                              // xor     ra,i0,~0
-			generate_compute_flags(ppc, block, desc, op & M_RC, 0, FALSE);                  // <update flags>
+			generate_compute_flags(block, desc, op & M_RC, 0, FALSE);                  // <update flags>
 			return TRUE;
 
 		case 0x018: /* SLWx */
@@ -3250,7 +2769,7 @@ static int generate_instruction_1f(powerpc_state *ppc, drcuml_block *block, comp
 			// calculate S and Z flags
 			if (op & M_RC)
 			{
-				generate_shift_flags(ppc, block, desc, op);
+				generate_shift_flags(block, desc, op);
 			}
 
 			UML_LABEL(block, compiler->labelnum++);             // 1:
@@ -3275,7 +2794,7 @@ static int generate_instruction_1f(powerpc_state *ppc, drcuml_block *block, comp
 			// calculate S and Z flags
 			if (op & M_RC)
 			{
-				generate_shift_flags(ppc, block, desc, op);
+				generate_shift_flags(block, desc, op);
 			}
 
 			UML_LABEL(block, compiler->labelnum++);             // 1:
@@ -3313,7 +2832,7 @@ static int generate_instruction_1f(powerpc_state *ppc, drcuml_block *block, comp
 			// calculate S and Z flags
 			if (op & M_RC)
 			{
-				generate_shift_flags(ppc, block, desc, op);
+				generate_shift_flags(block, desc, op);
 			}
 			return TRUE;
 
@@ -3330,178 +2849,178 @@ static int generate_instruction_1f(powerpc_state *ppc, drcuml_block *block, comp
 			// calculate S and Z flags
 			if (op & M_RC)
 			{
-				generate_shift_flags(ppc, block, desc, op);
+				generate_shift_flags(block, desc, op);
 			}
 			return TRUE;
 
 		case 0x01a: /* CNTLZWx */
 			UML_LZCNT(block, R32(G_RA(op)), R32(G_RS(op)));                                 // lzcnt   ra,rs
 			if (op & M_RC)
-				generate_compute_flags(ppc, block, desc, op & M_RC, 0, FALSE);              // <update flags>
+				generate_compute_flags(block, desc, op & M_RC, 0, FALSE);              // <update flags>
 			return TRUE;
 
 		case 0x3ba: /* EXTSBx */
 			UML_SEXT(block, R32(G_RA(op)), R32(G_RS(op)), SIZE_BYTE);                           // sext    ra,rs,byte
 			if (op & M_RC)
-				generate_compute_flags(ppc, block, desc, op & M_RC, 0, FALSE);              // <update flags>
+				generate_compute_flags(block, desc, op & M_RC, 0, FALSE);              // <update flags>
 			return TRUE;
 
 		case 0x39a: /* EXTSHx */
 			UML_SEXT(block, R32(G_RA(op)), R32(G_RS(op)), SIZE_WORD);                           // sext    ra,rs,word
 			if (op & M_RC)
-				generate_compute_flags(ppc, block, desc, op & M_RC, 0, FALSE);              // <update flags>
+				generate_compute_flags(block, desc, op & M_RC, 0, FALSE);              // <update flags>
 			return TRUE;
 
 		case 0x057: /* LBZX */
 			UML_ADD(block, I0, R32Z(G_RA(op)), R32(G_RB(op)));                          // add     i0,ra,rb
 			UML_MAPVAR(block, MAPVAR_DSISR, DSISR_IDX(op));                                 // mapvar  dsisr,DSISR_IDX(op)
-			UML_CALLH(block, *ppc->impstate->read8[ppc->impstate->mode]);                   // callh   read8
+			UML_CALLH(block, *m_read8[m_core->mode]);                   // callh   read8
 			UML_AND(block, R32(G_RD(op)), I0, 0xff);                                // and     rd,i0,0xff
-			generate_update_cycles(ppc, block, compiler, desc->pc + 4, TRUE);           // <update cycles>
+			generate_update_cycles(block, compiler, desc->pc + 4, TRUE);           // <update cycles>
 			return TRUE;
 
 		case 0x117: /* LHZX */
 			UML_ADD(block, I0, R32Z(G_RA(op)), R32(G_RB(op)));                          // add     i0,ra,rb
 			UML_MAPVAR(block, MAPVAR_DSISR, DSISR_IDX(op));                                 // mapvar  dsisr,DSISR_IDX(op)
-			UML_CALLH(block, *ppc->impstate->read16[ppc->impstate->mode]);                  // callh   read16
+			UML_CALLH(block, *m_read16[m_core->mode]);                  // callh   read16
 			UML_AND(block, R32(G_RD(op)), I0, 0xffff);                          // and     rd,i0,0xffff
-			generate_update_cycles(ppc, block, compiler, desc->pc + 4, TRUE);           // <update cycles>
+			generate_update_cycles(block, compiler, desc->pc + 4, TRUE);           // <update cycles>
 			return TRUE;
 
 		case 0x157: /* LHAX */
 			UML_ADD(block, I0, R32Z(G_RA(op)), R32(G_RB(op)));                          // add     i0,ra,rb
 			UML_MAPVAR(block, MAPVAR_DSISR, DSISR_IDX(op));                                 // mapvar  dsisr,DSISR_IDX(op)
-			UML_CALLH(block, *ppc->impstate->read16[ppc->impstate->mode]);                  // callh   read16
+			UML_CALLH(block, *m_read16[m_core->mode]);                  // callh   read16
 			UML_SEXT(block, R32(G_RD(op)), I0, SIZE_WORD);                                  // sext    rd,i0,word
-			generate_update_cycles(ppc, block, compiler, desc->pc + 4, TRUE);           // <update cycles>
+			generate_update_cycles(block, compiler, desc->pc + 4, TRUE);           // <update cycles>
 			return TRUE;
 
 		case 0x017: /* LWZX */
 			UML_ADD(block, I0, R32Z(G_RA(op)), R32(G_RB(op)));                          // add     i0,ra,rb
 			UML_MAPVAR(block, MAPVAR_DSISR, DSISR_IDX(op));                                 // mapvar  dsisr,DSISR_IDX(op)
-			UML_CALLH(block, *ppc->impstate->read32[ppc->impstate->mode]);                  // callh   read32
+			UML_CALLH(block, *m_read32[m_core->mode]);                  // callh   read32
 			UML_MOV(block, R32(G_RD(op)), I0);                                          // mov     rd,i0
-			generate_update_cycles(ppc, block, compiler, desc->pc + 4, TRUE);           // <update cycles>
+			generate_update_cycles(block, compiler, desc->pc + 4, TRUE);           // <update cycles>
 			return TRUE;
 
 		case 0x217: /* LFSX */
 			UML_ADD(block, I0, R32Z(G_RA(op)), R32(G_RB(op)));                          // add     i0,ra,rb
 			UML_MAPVAR(block, MAPVAR_DSISR, DSISR_IDX(op));                                 // mapvar  dsisr,DSISR_IDX(op)
-			UML_CALLH(block, *ppc->impstate->read32[ppc->impstate->mode]);                  // callh   read32
-			UML_MOV(block, mem(&ppc->impstate->tempdata.w.l), I0);                      // mov     [tempdata],i0
-			UML_FDFRFLT(block, F64(G_RD(op)), mem(&ppc->impstate->tempdata.w.l), SIZE_DWORD);   // fdfrflt fd,[tempdata],dword
-			generate_update_cycles(ppc, block, compiler, desc->pc + 4, TRUE);           // <update cycles>
+			UML_CALLH(block, *m_read32[m_core->mode]);                  // callh   read32
+			UML_MOV(block, mem(&m_core->tempdata.w.l), I0);                      // mov     [tempdata],i0
+			UML_FDFRFLT(block, F64(G_RD(op)), mem(&m_core->tempdata.w.l), SIZE_DWORD);   // fdfrflt fd,[tempdata],dword
+			generate_update_cycles(block, compiler, desc->pc + 4, TRUE);           // <update cycles>
 			return TRUE;
 
 		case 0x257: /* LFDX */
 			UML_ADD(block, I0, R32Z(G_RA(op)), R32(G_RB(op)));                          // add     i0,ra,rb
 			UML_MAPVAR(block, MAPVAR_DSISR, DSISR_IDX(op));                                 // mapvar  dsisr,DSISR_IDX(op)
-			UML_CALLH(block, *ppc->impstate->read64[ppc->impstate->mode]);                  // callh   read64
-			UML_DMOV(block, mem(&ppc->impstate->tempdata.d), I0);                       // dmov    [tempdata],i0
-			UML_FDMOV(block, F64(G_RD(op)), mem(&ppc->impstate->tempdata.d));               // fdmov   fd,[tempdata]
-			generate_update_cycles(ppc, block, compiler, desc->pc + 4, TRUE);           // <update cycles>
+			UML_CALLH(block, *m_read64[m_core->mode]);                  // callh   read64
+			UML_DMOV(block, mem(&m_core->tempdata.d), I0);                       // dmov    [tempdata],i0
+			UML_FDMOV(block, F64(G_RD(op)), mem(&m_core->tempdata.d));               // fdmov   fd,[tempdata]
+			generate_update_cycles(block, compiler, desc->pc + 4, TRUE);           // <update cycles>
 			return TRUE;
 
 		case 0x316: /* LHBRX */
 			UML_ADD(block, I0, R32Z(G_RA(op)), R32(G_RB(op)));                          // add     i0,ra,rb
 			UML_MAPVAR(block, MAPVAR_DSISR, DSISR_IDX(op));                                 // mapvar  dsisr,DSISR_IDX(op)
-			UML_CALLH(block, *ppc->impstate->read16[ppc->impstate->mode]);                  // callh   read16
+			UML_CALLH(block, *m_read16[m_core->mode]);                  // callh   read16
 			UML_BSWAP(block, I0, I0);                                               // bswap   i0,i0
 			UML_SHR(block, R32(G_RD(op)), I0, 16);                              // shr     rd,i0,16
-			generate_update_cycles(ppc, block, compiler, desc->pc + 4, TRUE);           // <update cycles>
+			generate_update_cycles(block, compiler, desc->pc + 4, TRUE);           // <update cycles>
 			return TRUE;
 
 		case 0x216: /* LWBRX */
 			UML_ADD(block, I0, R32Z(G_RA(op)), R32(G_RB(op)));                          // add     i0,ra,rb
 			UML_MAPVAR(block, MAPVAR_DSISR, DSISR_IDX(op));                                 // mapvar  dsisr,DSISR_IDX(op)
-			UML_CALLH(block, *ppc->impstate->read32align[ppc->impstate->mode]);             // callh   read32align
+			UML_CALLH(block, *m_read32align[m_core->mode]);             // callh   read32align
 			UML_BSWAP(block, R32(G_RD(op)), I0);                                        // bswap   rd,i0
-			generate_update_cycles(ppc, block, compiler, desc->pc + 4, TRUE);           // <update cycles>
+			generate_update_cycles(block, compiler, desc->pc + 4, TRUE);           // <update cycles>
 			return TRUE;
 
 		case 0x077: /* LBZUX */
 			UML_ADD(block, I0, R32(G_RA(op)), R32(G_RB(op)));                           // add     i0,ra,rb
-			UML_MOV(block, mem(&ppc->impstate->updateaddr), I0);                        // mov     [updateaddr],i0
+			UML_MOV(block, mem(&m_core->updateaddr), I0);                        // mov     [updateaddr],i0
 			UML_MAPVAR(block, MAPVAR_DSISR, DSISR_IDXU(op));                                // mapvar  dsisr,DSISR_IDXU(op)
-			UML_CALLH(block, *ppc->impstate->read8[ppc->impstate->mode]);                   // callh   read8
+			UML_CALLH(block, *m_read8[m_core->mode]);                   // callh   read8
 			UML_AND(block, R32(G_RD(op)), I0, 0xff);                                // and     rd,i0,0xff
-			UML_MOV(block, R32(G_RA(op)), mem(&ppc->impstate->updateaddr));                 // mov     ra,[updateaddr]
-			generate_update_cycles(ppc, block, compiler, desc->pc + 4, TRUE);           // <update cycles>
+			UML_MOV(block, R32(G_RA(op)), mem(&m_core->updateaddr));                 // mov     ra,[updateaddr]
+			generate_update_cycles(block, compiler, desc->pc + 4, TRUE);           // <update cycles>
 			return TRUE;
 
 		case 0x137: /* LHZUX */
 			UML_ADD(block, I0, R32(G_RA(op)), R32(G_RB(op)));                           // add     i0,ra,rb
-			UML_MOV(block, mem(&ppc->impstate->updateaddr), I0);                        // mov     [updateaddr],i0
+			UML_MOV(block, mem(&m_core->updateaddr), I0);                        // mov     [updateaddr],i0
 			UML_MAPVAR(block, MAPVAR_DSISR, DSISR_IDXU(op));                                // mapvar  dsisr,DSISR_IDXU(op)
-			UML_CALLH(block, *ppc->impstate->read16[ppc->impstate->mode]);                  // callh   read16
+			UML_CALLH(block, *m_read16[m_core->mode]);                  // callh   read16
 			UML_AND(block, R32(G_RD(op)), I0, 0xffff);                          // and     rd,i0,0xffff
-			UML_MOV(block, R32(G_RA(op)), mem(&ppc->impstate->updateaddr));                 // mov     ra,[updateaddr]
-			generate_update_cycles(ppc, block, compiler, desc->pc + 4, TRUE);           // <update cycles>
+			UML_MOV(block, R32(G_RA(op)), mem(&m_core->updateaddr));                 // mov     ra,[updateaddr]
+			generate_update_cycles(block, compiler, desc->pc + 4, TRUE);           // <update cycles>
 			return TRUE;
 
 		case 0x177: /* LHAUX */
 			UML_ADD(block, I0, R32(G_RA(op)), R32(G_RB(op)));                           // add     i0,ra,rb
-			UML_MOV(block, mem(&ppc->impstate->updateaddr), I0);                        // mov     [updateaddr],i0
+			UML_MOV(block, mem(&m_core->updateaddr), I0);                        // mov     [updateaddr],i0
 			UML_MAPVAR(block, MAPVAR_DSISR, DSISR_IDXU(op));                                // mapvar  dsisr,DSISR_IDXU(op)
-			UML_CALLH(block, *ppc->impstate->read16[ppc->impstate->mode]);                  // callh   read16
+			UML_CALLH(block, *m_read16[m_core->mode]);                  // callh   read16
 			UML_SEXT(block, R32(G_RD(op)), I0, SIZE_WORD);                                  // sext    rd,i0,word
-			UML_MOV(block, R32(G_RA(op)), mem(&ppc->impstate->updateaddr));                 // mov     ra,[updateaddr]
-			generate_update_cycles(ppc, block, compiler, desc->pc + 4, TRUE);           // <update cycles>
+			UML_MOV(block, R32(G_RA(op)), mem(&m_core->updateaddr));                 // mov     ra,[updateaddr]
+			generate_update_cycles(block, compiler, desc->pc + 4, TRUE);           // <update cycles>
 			return TRUE;
 
 		case 0x037: /* LWZUX */
 			UML_ADD(block, I0, R32(G_RA(op)), R32(G_RB(op)));                           // add     i0,ra,rb
-			UML_MOV(block, mem(&ppc->impstate->updateaddr), I0);                        // mov     [updateaddr],i0
+			UML_MOV(block, mem(&m_core->updateaddr), I0);                        // mov     [updateaddr],i0
 			UML_MAPVAR(block, MAPVAR_DSISR, DSISR_IDXU(op));                                // mapvar  dsisr,DSISR_IDXU(op)
-			UML_CALLH(block, *ppc->impstate->read32[ppc->impstate->mode]);                  // callh   read32
+			UML_CALLH(block, *m_read32[m_core->mode]);                  // callh   read32
 			UML_MOV(block, R32(G_RD(op)), I0);                                          // mov     rd,i0
-			UML_MOV(block, R32(G_RA(op)), mem(&ppc->impstate->updateaddr));                 // mov     ra,[updateaddr]
-			generate_update_cycles(ppc, block, compiler, desc->pc + 4, TRUE);           // <update cycles>
+			UML_MOV(block, R32(G_RA(op)), mem(&m_core->updateaddr));                 // mov     ra,[updateaddr]
+			generate_update_cycles(block, compiler, desc->pc + 4, TRUE);           // <update cycles>
 			return TRUE;
 
 		case 0x237: /* LFSUX */
 			UML_ADD(block, I0, R32(G_RA(op)), R32(G_RB(op)));                           // add     i0,ra,rb
-			UML_MOV(block, mem(&ppc->impstate->updateaddr), I0);                        // mov     [updateaddr],i0
+			UML_MOV(block, mem(&m_core->updateaddr), I0);                        // mov     [updateaddr],i0
 			UML_MAPVAR(block, MAPVAR_DSISR, DSISR_IDX(op));                                 // mapvar  dsisr,DSISR_IDX(op)
-			UML_CALLH(block, *ppc->impstate->read32[ppc->impstate->mode]);                  // callh   read32
-			UML_MOV(block, mem(&ppc->impstate->tempdata.w.l), I0);                      // mov     [tempdata],i0
-			UML_FDFRFLT(block, F64(G_RD(op)), mem(&ppc->impstate->tempdata.w.l), SIZE_DWORD);   // fdfrflt fd,[tempdata],dword
-			UML_MOV(block, R32(G_RA(op)), mem(&ppc->impstate->updateaddr));                 // mov     ra,[updateaddr]
-			generate_update_cycles(ppc, block, compiler, desc->pc + 4, TRUE);           // <update cycles>
+			UML_CALLH(block, *m_read32[m_core->mode]);                  // callh   read32
+			UML_MOV(block, mem(&m_core->tempdata.w.l), I0);                      // mov     [tempdata],i0
+			UML_FDFRFLT(block, F64(G_RD(op)), mem(&m_core->tempdata.w.l), SIZE_DWORD);   // fdfrflt fd,[tempdata],dword
+			UML_MOV(block, R32(G_RA(op)), mem(&m_core->updateaddr));                 // mov     ra,[updateaddr]
+			generate_update_cycles(block, compiler, desc->pc + 4, TRUE);           // <update cycles>
 			return TRUE;
 
 		case 0x277: /* LFDUX */
 			UML_ADD(block, I0, R32(G_RA(op)), R32(G_RB(op)));                           // add     i0,ra,rb
-			UML_MOV(block, mem(&ppc->impstate->updateaddr), I0);                        // mov     [updateaddr],i0
+			UML_MOV(block, mem(&m_core->updateaddr), I0);                        // mov     [updateaddr],i0
 			UML_MAPVAR(block, MAPVAR_DSISR, DSISR_IDX(op));                                 // mapvar  dsisr,DSISR_IDX(op)
-			UML_CALLH(block, *ppc->impstate->read64[ppc->impstate->mode]);                  // callh   read64
-			UML_DMOV(block, mem(&ppc->impstate->tempdata.d), I0);                       // dmov    [tempdata],i0
-			UML_FDMOV(block, F64(G_RD(op)), mem(&ppc->impstate->tempdata.d));               // fdmov   fd,[tempdata]
-			UML_MOV(block, R32(G_RA(op)), mem(&ppc->impstate->updateaddr));                 // mov     ra,[updateaddr]
-			generate_update_cycles(ppc, block, compiler, desc->pc + 4, TRUE);           // <update cycles>
+			UML_CALLH(block, *m_read64[m_core->mode]);                  // callh   read64
+			UML_DMOV(block, mem(&m_core->tempdata.d), I0);                       // dmov    [tempdata],i0
+			UML_FDMOV(block, F64(G_RD(op)), mem(&m_core->tempdata.d));               // fdmov   fd,[tempdata]
+			UML_MOV(block, R32(G_RA(op)), mem(&m_core->updateaddr));                 // mov     ra,[updateaddr]
+			generate_update_cycles(block, compiler, desc->pc + 4, TRUE);           // <update cycles>
 			return TRUE;
 
 		case 0x014: /* LWARX */
 			UML_ADD(block, I0, R32Z(G_RA(op)), R32(G_RB(op)));                          // add     i0,ra,rb
 			UML_MAPVAR(block, MAPVAR_DSISR, DSISR_IDX(op));                                 // mapvar  dsisr,DSISR_IDX(op)
-			UML_CALLH(block, *ppc->impstate->read32align[ppc->impstate->mode]);             // callh   read32align
+			UML_CALLH(block, *m_read32align[m_core->mode]);             // callh   read32align
 			UML_MOV(block, R32(G_RD(op)), I0);                                          // mov     rd,i0
-			generate_update_cycles(ppc, block, compiler, desc->pc + 4, TRUE);           // <update cycles>
+			generate_update_cycles(block, compiler, desc->pc + 4, TRUE);           // <update cycles>
 			return TRUE;
 
 		case 0x255: /* LSWI */
-			UML_MOV(block, mem(&ppc->impstate->updateaddr), R32Z(G_RA(op)));                // mov     [updateaddr],ra
-			UML_MOV(block, mem(&ppc->impstate->swcount), ((G_NB(op) - 1) & 0x1f) + 1);  // mov     [swcount],G_NB
-			UML_CALLH(block, *ppc->impstate->lsw[ppc->impstate->mode][G_RD(op)]);           // call    lsw[rd]
-			generate_update_cycles(ppc, block, compiler, desc->pc + 4, TRUE);           // <update cycles>
+			UML_MOV(block, mem(&m_core->updateaddr), R32Z(G_RA(op)));                // mov     [updateaddr],ra
+			UML_MOV(block, mem(&m_core->swcount), ((G_NB(op) - 1) & 0x1f) + 1);  // mov     [swcount],G_NB
+			UML_CALLH(block, *m_lsw[m_core->mode][G_RD(op)]);           // call    lsw[rd]
+			generate_update_cycles(block, compiler, desc->pc + 4, TRUE);           // <update cycles>
 			return TRUE;
 
 		case 0x215: /* LSWX */
-			UML_ADD(block, mem(&ppc->impstate->updateaddr), R32Z(G_RA(op)), R32(G_RB(op))); // add     [updateaddr],ra,rb
-			UML_AND(block, mem(&ppc->impstate->swcount), SPR32(SPR_XER), 0x7f);     // and     [swcount],[xer],0x7f
-			UML_SUB(block, mem(&ppc->icount), mem(&ppc->icount), mem(&ppc->impstate->swcount));// sub  icount,icount,[swcount]
-			UML_CALLHc(block, COND_NZ, *ppc->impstate->lsw[ppc->impstate->mode][G_RD(op)]); // call    lsw[rd],nz
-			generate_update_cycles(ppc, block, compiler, desc->pc + 4, TRUE);           // <update cycles>
+			UML_ADD(block, mem(&m_core->updateaddr), R32Z(G_RA(op)), R32(G_RB(op))); // add     [updateaddr],ra,rb
+			UML_AND(block, mem(&m_core->swcount), SPR32(SPR_XER), 0x7f);     // and     [swcount],[xer],0x7f
+			UML_SUB(block, mem(&m_core->icount), mem(&m_core->icount), mem(&m_core->swcount));// sub  icount,icount,[swcount]
+			UML_CALLHc(block, COND_NZ, *m_lsw[m_core->mode][G_RD(op)]); // call    lsw[rd],nz
+			generate_update_cycles(block, compiler, desc->pc + 4, TRUE);           // <update cycles>
 			return TRUE;
 
 		case 0x136: /* ECIWX */
@@ -3512,51 +3031,51 @@ static int generate_instruction_1f(powerpc_state *ppc, drcuml_block *block, comp
 			UML_ADD(block, I0, R32Z(G_RA(op)), R32(G_RB(op)));                          // add     i0,ra,rb
 			UML_AND(block, I1, R32(G_RS(op)), 0xff);                                // and     i1,rs,0xff
 			UML_MAPVAR(block, MAPVAR_DSISR, DSISR_IDX(op));                                 // mapvar  dsisr,DSISR_IDX(op)
-			UML_CALLH(block, *ppc->impstate->write8[ppc->impstate->mode]);                  // callh   write8
-			generate_update_cycles(ppc, block, compiler, desc->pc + 4, TRUE);           // <update cycles>
+			UML_CALLH(block, *m_write8[m_core->mode]);                  // callh   write8
+			generate_update_cycles(block, compiler, desc->pc + 4, TRUE);           // <update cycles>
 			return TRUE;
 
 		case 0x197: /* STHX */
 			UML_ADD(block, I0, R32Z(G_RA(op)), R32(G_RB(op)));                          // add     i0,ra,rb
 			UML_AND(block, I1, R32(G_RS(op)), 0xffff);                          // and     i1,rs
 			UML_MAPVAR(block, MAPVAR_DSISR, DSISR_IDX(op));                                 // mapvar  dsisr,DSISR_IDX(op)
-			UML_CALLH(block, *ppc->impstate->write16[ppc->impstate->mode]);                 // callh   write16
-			generate_update_cycles(ppc, block, compiler, desc->pc + 4, TRUE);           // <update cycles>
+			UML_CALLH(block, *m_write16[m_core->mode]);                 // callh   write16
+			generate_update_cycles(block, compiler, desc->pc + 4, TRUE);           // <update cycles>
 			return TRUE;
 
 		case 0x097: /* STWX */
 			UML_ADD(block, I0, R32Z(G_RA(op)), R32(G_RB(op)));                          // add     i0,ra,rb
 			UML_MOV(block, I1, R32(G_RS(op)));                                          // mov     i1,rs
 			UML_MAPVAR(block, MAPVAR_DSISR, DSISR_IDX(op));                                 // mapvar  dsisr,DSISR_IDX(op)
-			UML_CALLH(block, *ppc->impstate->write32[ppc->impstate->mode]);                 // callh   write32
-			generate_update_cycles(ppc, block, compiler, desc->pc + 4, TRUE);           // <update cycles>
+			UML_CALLH(block, *m_write32[m_core->mode]);                 // callh   write32
+			generate_update_cycles(block, compiler, desc->pc + 4, TRUE);           // <update cycles>
 			return TRUE;
 
 		case 0x297: /* STFSX */
 			UML_ADD(block, I0, R32Z(G_RA(op)), R32(G_RB(op)));                          // add     i0,ra,rb
-			UML_FSFRFLT(block, mem(&ppc->impstate->tempdata.w.l), F64(G_RS(op)), SIZE_QWORD);   // fsfrflt [tempdata],rs,qword
-			UML_MOV(block, I1, mem(&ppc->impstate->tempdata.w.l));                      // mov     i1,[tempdata]
+			UML_FSFRFLT(block, mem(&m_core->tempdata.w.l), F64(G_RS(op)), SIZE_QWORD);   // fsfrflt [tempdata],rs,qword
+			UML_MOV(block, I1, mem(&m_core->tempdata.w.l));                      // mov     i1,[tempdata]
 			UML_MAPVAR(block, MAPVAR_DSISR, DSISR_IDX(op));                                 // mapvar  dsisr,DSISR_IDX(op)
-			UML_CALLH(block, *ppc->impstate->write32[ppc->impstate->mode]);                 // callh   write32
-			generate_update_cycles(ppc, block, compiler, desc->pc + 4, TRUE);           // <update cycles>
+			UML_CALLH(block, *m_write32[m_core->mode]);                 // callh   write32
+			generate_update_cycles(block, compiler, desc->pc + 4, TRUE);           // <update cycles>
 			return TRUE;
 
 		case 0x3d7: /* STFIWX */
 			UML_ADD(block, I0, R32Z(G_RA(op)), R32(G_RB(op)));                          // add     i0,ra,rb
-			UML_FDMOV(block, mem(&ppc->impstate->tempdata.d), F64(G_RS(op)));               // fdmov   [tempdata],rs
-			UML_MOV(block, I1, mem(&ppc->impstate->tempdata.w.l));                      // mov     i1,[tempdata.lo]
+			UML_FDMOV(block, mem(&m_core->tempdata.d), F64(G_RS(op)));               // fdmov   [tempdata],rs
+			UML_MOV(block, I1, mem(&m_core->tempdata.w.l));                      // mov     i1,[tempdata.lo]
 			UML_MAPVAR(block, MAPVAR_DSISR, DSISR_IDX(op));                                 // mapvar  dsisr,DSISR_IDX(op)
-			UML_CALLH(block, *ppc->impstate->write32[ppc->impstate->mode]);                 // callh   write32
-			generate_update_cycles(ppc, block, compiler, desc->pc + 4, TRUE);           // <update cycles>
+			UML_CALLH(block, *m_write32[m_core->mode]);                 // callh   write32
+			generate_update_cycles(block, compiler, desc->pc + 4, TRUE);           // <update cycles>
 			return TRUE;
 
 		case 0x2d7: /* STFDX */
 			UML_ADD(block, I0, R32Z(G_RA(op)), R32(G_RB(op)));                          // add     i0,ra,rb
-			UML_FDMOV(block, mem(&ppc->impstate->tempdata.d), F64(G_RS(op)));               // fdmov   [tempdata],rs
-			UML_DMOV(block, I1, mem(&ppc->impstate->tempdata.d));                       // dmov    i1,[tempdata]
+			UML_FDMOV(block, mem(&m_core->tempdata.d), F64(G_RS(op)));               // fdmov   [tempdata],rs
+			UML_DMOV(block, I1, mem(&m_core->tempdata.d));                       // dmov    i1,[tempdata]
 			UML_MAPVAR(block, MAPVAR_DSISR, DSISR_IDX(op));                                 // mapvar  dsisr,DSISR_IDX(op)
-			UML_CALLH(block, *ppc->impstate->write64[ppc->impstate->mode]);                 // callh   write64
-			generate_update_cycles(ppc, block, compiler, desc->pc + 4, TRUE);           // <update cycles>
+			UML_CALLH(block, *m_write64[m_core->mode]);                 // callh   write64
+			generate_update_cycles(block, compiler, desc->pc + 4, TRUE);           // <update cycles>
 			return TRUE;
 
 		case 0x396: /* STHBRX */
@@ -3564,98 +3083,98 @@ static int generate_instruction_1f(powerpc_state *ppc, drcuml_block *block, comp
 			UML_BSWAP(block, I1, R32(G_RS(op)));                                        // bswap   i1,rs
 			UML_SHR(block, I1, I1, 16);                                     // shr     i1,i1,16
 			UML_MAPVAR(block, MAPVAR_DSISR, DSISR_IDX(op));                                 // mapvar  dsisr,DSISR_IDX(op)
-			UML_CALLH(block, *ppc->impstate->write16[ppc->impstate->mode]);                 // callh   write16
-			generate_update_cycles(ppc, block, compiler, desc->pc + 4, TRUE);           // <update cycles>
+			UML_CALLH(block, *m_write16[m_core->mode]);                 // callh   write16
+			generate_update_cycles(block, compiler, desc->pc + 4, TRUE);           // <update cycles>
 			return TRUE;
 
 		case 0x296: /* STWBRX */
 			UML_ADD(block, I0, R32Z(G_RA(op)), R32(G_RB(op)));                          // add     i0,ra,rb
 			UML_BSWAP(block, I1, R32(G_RS(op)));                                        // bswap   i1,rs
 			UML_MAPVAR(block, MAPVAR_DSISR, DSISR_IDX(op));                                 // mapvar  dsisr,DSISR_IDX(op)
-			UML_CALLH(block, *ppc->impstate->write32[ppc->impstate->mode]);                 // callh   write32
-			generate_update_cycles(ppc, block, compiler, desc->pc + 4, TRUE);           // <update cycles>
+			UML_CALLH(block, *m_write32[m_core->mode]);                 // callh   write32
+			generate_update_cycles(block, compiler, desc->pc + 4, TRUE);           // <update cycles>
 			return TRUE;
 
 		case 0x0f7: /* STBUX */
 			UML_ADD(block, I0, R32(G_RA(op)), R32(G_RB(op)));                           // add     i0,ra,rb
 			UML_AND(block, I1, R32(G_RS(op)), 0xff);                                // and     i1,rs,0xff
-			UML_MOV(block, mem(&ppc->impstate->updateaddr), I0);                        // mov     [updateaddr],i0
+			UML_MOV(block, mem(&m_core->updateaddr), I0);                        // mov     [updateaddr],i0
 			UML_MAPVAR(block, MAPVAR_DSISR, DSISR_IDX(op));                                 // mapvar  dsisr,DSISR_IDX(op)
-			UML_CALLH(block, *ppc->impstate->write8[ppc->impstate->mode]);                  // callh   write8
-			UML_MOV(block, R32(G_RA(op)), mem(&ppc->impstate->updateaddr));                 // mov     ra,[updateaddr]
-			generate_update_cycles(ppc, block, compiler, desc->pc + 4, TRUE);           // <update cycles>
+			UML_CALLH(block, *m_write8[m_core->mode]);                  // callh   write8
+			UML_MOV(block, R32(G_RA(op)), mem(&m_core->updateaddr));                 // mov     ra,[updateaddr]
+			generate_update_cycles(block, compiler, desc->pc + 4, TRUE);           // <update cycles>
 			return TRUE;
 
 		case 0x1b7: /* STHUX */
 			UML_ADD(block, I0, R32(G_RA(op)), R32(G_RB(op)));                           // add     i0,ra,rb
 			UML_AND(block, I1, R32(G_RS(op)), 0xffff);                          // and     i1,rs,0xffff
-			UML_MOV(block, mem(&ppc->impstate->updateaddr), I0);                        // mov     [updateaddr],i0
+			UML_MOV(block, mem(&m_core->updateaddr), I0);                        // mov     [updateaddr],i0
 			UML_MAPVAR(block, MAPVAR_DSISR, DSISR_IDX(op));                                 // mapvar  dsisr,DSISR_IDX(op)
-			UML_CALLH(block, *ppc->impstate->write16[ppc->impstate->mode]);                 // callh   write16
-			UML_MOV(block, R32(G_RA(op)), mem(&ppc->impstate->updateaddr));                 // mov     ra,[updateaddr]
-			generate_update_cycles(ppc, block, compiler, desc->pc + 4, TRUE);           // <update cycles>
+			UML_CALLH(block, *m_write16[m_core->mode]);                 // callh   write16
+			UML_MOV(block, R32(G_RA(op)), mem(&m_core->updateaddr));                 // mov     ra,[updateaddr]
+			generate_update_cycles(block, compiler, desc->pc + 4, TRUE);           // <update cycles>
 			return TRUE;
 
 		case 0x0b7: /* STWUX */
 			UML_ADD(block, I0, R32(G_RA(op)), R32(G_RB(op)));                           // add     i0,ra,rb
 			UML_MOV(block, I1, R32(G_RS(op)));                                          // mov     i1,rs
-			UML_MOV(block, mem(&ppc->impstate->updateaddr), I0);                        // mov     [updateaddr],i0
+			UML_MOV(block, mem(&m_core->updateaddr), I0);                        // mov     [updateaddr],i0
 			UML_MAPVAR(block, MAPVAR_DSISR, DSISR_IDXU(op));                                // mapvar  dsisr,DSISR_IDXU(op)
-			UML_CALLH(block, *ppc->impstate->write32[ppc->impstate->mode]);                 // callh   write32
-			UML_MOV(block, R32(G_RA(op)), mem(&ppc->impstate->updateaddr));                 // mov     ra,[updateaddr]
-			generate_update_cycles(ppc, block, compiler, desc->pc + 4, TRUE);           // <update cycles>
+			UML_CALLH(block, *m_write32[m_core->mode]);                 // callh   write32
+			UML_MOV(block, R32(G_RA(op)), mem(&m_core->updateaddr));                 // mov     ra,[updateaddr]
+			generate_update_cycles(block, compiler, desc->pc + 4, TRUE);           // <update cycles>
 			return TRUE;
 
 		case 0x2b7: /* STFSUX */
 			UML_ADD(block, I0, R32(G_RA(op)), R32(G_RB(op)));                           // add     i0,ra,rb
-			UML_FSFRFLT(block, mem(&ppc->impstate->tempdata.w.l), F64(G_RS(op)), SIZE_QWORD);   // fsfrflt [tempdata],rs,qword
-			UML_MOV(block, I1, mem(&ppc->impstate->tempdata.w.l));                      // mov     i1,[tempdata]
-			UML_MOV(block, mem(&ppc->impstate->updateaddr), I0);                        // mov     [updateaddr],i0
+			UML_FSFRFLT(block, mem(&m_core->tempdata.w.l), F64(G_RS(op)), SIZE_QWORD);   // fsfrflt [tempdata],rs,qword
+			UML_MOV(block, I1, mem(&m_core->tempdata.w.l));                      // mov     i1,[tempdata]
+			UML_MOV(block, mem(&m_core->updateaddr), I0);                        // mov     [updateaddr],i0
 			UML_MAPVAR(block, MAPVAR_DSISR, DSISR_IDX(op));                                 // mapvar  dsisr,DSISR_IDX(op)
-			UML_CALLH(block, *ppc->impstate->write32[ppc->impstate->mode]);                 // callh   write32
-			UML_MOV(block, R32(G_RA(op)), mem(&ppc->impstate->updateaddr));                 // mov     ra,[updateaddr]
-			generate_update_cycles(ppc, block, compiler, desc->pc + 4, TRUE);           // <update cycles>
+			UML_CALLH(block, *m_write32[m_core->mode]);                 // callh   write32
+			UML_MOV(block, R32(G_RA(op)), mem(&m_core->updateaddr));                 // mov     ra,[updateaddr]
+			generate_update_cycles(block, compiler, desc->pc + 4, TRUE);           // <update cycles>
 			return TRUE;
 
 		case 0x2f7: /* STFDUX */
 			UML_ADD(block, I0, R32(G_RA(op)), R32(G_RB(op)));                           // add     i0,ra,rb
-			UML_FDMOV(block, mem(&ppc->impstate->tempdata.d), F64(G_RS(op)));               // fdmov   [tempdata],rs
-			UML_DMOV(block, I1, mem(&ppc->impstate->tempdata.d));                       // dmov    i1,[tempdata]
-			UML_MOV(block, mem(&ppc->impstate->updateaddr), I0);                        // mov     [updateaddr],i0
+			UML_FDMOV(block, mem(&m_core->tempdata.d), F64(G_RS(op)));               // fdmov   [tempdata],rs
+			UML_DMOV(block, I1, mem(&m_core->tempdata.d));                       // dmov    i1,[tempdata]
+			UML_MOV(block, mem(&m_core->updateaddr), I0);                        // mov     [updateaddr],i0
 			UML_MAPVAR(block, MAPVAR_DSISR, DSISR_IDX(op));                                 // mapvar  dsisr,DSISR_IDX(op)
-			UML_CALLH(block, *ppc->impstate->write64[ppc->impstate->mode]);                 // callh   write64
-			UML_MOV(block, R32(G_RA(op)), mem(&ppc->impstate->updateaddr));                 // mov     ra,[updateaddr]
-			generate_update_cycles(ppc, block, compiler, desc->pc + 4, TRUE);           // <update cycles>
+			UML_CALLH(block, *m_write64[m_core->mode]);                 // callh   write64
+			UML_MOV(block, R32(G_RA(op)), mem(&m_core->updateaddr));                 // mov     ra,[updateaddr]
+			generate_update_cycles(block, compiler, desc->pc + 4, TRUE);           // <update cycles>
 			return TRUE;
 
 		case 0x096: /* STWCX. */
 			UML_ADD(block, I0, R32Z(G_RA(op)), R32(G_RB(op)));                          // add     i0,ra,rb
 			UML_MOV(block, I1, R32(G_RS(op)));                                          // mov     i1,rs
 			UML_MAPVAR(block, MAPVAR_DSISR, DSISR_IDX(op));                                 // mapvar  dsisr,DSISR_IDX(op)
-			UML_CALLH(block, *ppc->impstate->write32align[ppc->impstate->mode]);                // callh   write32align
-			generate_update_cycles(ppc, block, compiler, desc->pc + 4, TRUE);           // <update cycles>
+			UML_CALLH(block, *m_write32align[m_core->mode]);                // callh   write32align
+			generate_update_cycles(block, compiler, desc->pc + 4, TRUE);           // <update cycles>
 
 			UML_CMP(block, I0, I0);                                             // cmp     i0,i0
 			UML_GETFLGS(block, I0, FLAG_Z | FLAG_C | FLAG_S);                           // getflgs i0,zcs
-			UML_LOAD(block, I0, ppc->impstate->cmp_cr_table, I0, SIZE_BYTE, SCALE_x1);// load    i0,cmp_cr_table,i0,byte
+			UML_LOAD(block, I0, m_cmp_cr_table, I0, SIZE_BYTE, SCALE_x1);// load    i0,cmp_cr_table,i0,byte
 			UML_OR(block, CR32(G_CRFD(op)), I0, XERSO32);                               // or      [crn],i0,[xerso]
 
-			generate_compute_flags(ppc, block, desc, TRUE, 0, FALSE);                       // <update flags>
+			generate_compute_flags(block, desc, TRUE, 0, FALSE);                       // <update flags>
 			return TRUE;
 
 		case 0x2d5: /* STSWI */
-			UML_MOV(block, mem(&ppc->impstate->updateaddr), R32Z(G_RA(op)));                // mov     [updateaddr],ra
-			UML_MOV(block, mem(&ppc->impstate->swcount), ((G_NB(op) - 1) & 0x1f) + 1);  // mov     [swcount],G_NB
-			UML_CALLH(block, *ppc->impstate->stsw[ppc->impstate->mode][G_RD(op)]);          // call    stsw[rd]
-			generate_update_cycles(ppc, block, compiler, desc->pc + 4, TRUE);           // <update cycles>
+			UML_MOV(block, mem(&m_core->updateaddr), R32Z(G_RA(op)));                // mov     [updateaddr],ra
+			UML_MOV(block, mem(&m_core->swcount), ((G_NB(op) - 1) & 0x1f) + 1);  // mov     [swcount],G_NB
+			UML_CALLH(block, *m_stsw[m_core->mode][G_RD(op)]);          // call    stsw[rd]
+			generate_update_cycles(block, compiler, desc->pc + 4, TRUE);           // <update cycles>
 			return TRUE;
 
 		case 0x295: /* STSWX */
-			UML_ADD(block, mem(&ppc->impstate->updateaddr), R32Z(G_RA(op)), R32(G_RB(op))); // add     [updateaddr],ra,rb
-			UML_AND(block, mem(&ppc->impstate->swcount), SPR32(SPR_XER), 0x7f);     // and     [swcount],[xer],0x7f
-			UML_SUB(block, mem(&ppc->icount), mem(&ppc->icount), mem(&ppc->impstate->swcount));// sub  icount,icount,[swcount]
-			UML_CALLHc(block, COND_NZ, *ppc->impstate->stsw[ppc->impstate->mode][G_RD(op)]);    // call   stsw[rd]
-			generate_update_cycles(ppc, block, compiler, desc->pc + 4, TRUE);           // <update cycles>
+			UML_ADD(block, mem(&m_core->updateaddr), R32Z(G_RA(op)), R32(G_RB(op))); // add     [updateaddr],ra,rb
+			UML_AND(block, mem(&m_core->swcount), SPR32(SPR_XER), 0x7f);     // and     [swcount],[xer],0x7f
+			UML_SUB(block, mem(&m_core->icount), mem(&m_core->icount), mem(&m_core->swcount));// sub  icount,icount,[swcount]
+			UML_CALLHc(block, COND_NZ, *m_stsw[m_core->mode][G_RD(op)]);    // call   stsw[rd]
+			generate_update_cycles(block, compiler, desc->pc + 4, TRUE);           // <update cycles>
 			return TRUE;
 
 		case 0x1b6: /* ECOWX */
@@ -3664,8 +3183,8 @@ static int generate_instruction_1f(powerpc_state *ppc, drcuml_block *block, comp
 
 		case 0x036: /* DCBST */
 			UML_ADD(block, I0, R32Z(G_RA(op)), R32(G_RB(op)));                          // add     i0,ra,rb
-			UML_MOV(block, mem(&ppc->param0), I0);                                      // mov     [param0],i0
-			UML_CALLC(block, (c_function)ppccom_dcstore_callback, ppc);
+			UML_MOV(block, mem(&m_core->param0), I0);                                      // mov     [param0],i0
+			UML_CALLC(block, (c_function)cfunc_ppccom_dcstore_callback, this);
 			return TRUE;
 
 		case 0x056: /* DCBF */
@@ -3681,37 +3200,37 @@ static int generate_instruction_1f(powerpc_state *ppc, drcuml_block *block, comp
 
 		case 0x3f6: /* DCBZ */
 			UML_ADD(block, I0, R32Z(G_RA(op)), R32(G_RB(op)));                          // add     i0,ra,rb
-			UML_AND(block, mem(&ppc->impstate->tempaddr), I0, ~(ppc->cache_line_size - 1));
+			UML_AND(block, mem(&m_core->tempaddr), I0, ~(m_cache_line_size - 1));
 																							// and     [tempaddr],i0,~(cache_line_size - 1)
-			for (item = 0; item < ppc->cache_line_size / 8; item++)
+			for (item = 0; item < m_cache_line_size / 8; item++)
 			{
-				UML_ADD(block, I0, mem(&ppc->impstate->tempaddr), 8 * item);        // add     i0,[tempaddr],8*item
+				UML_ADD(block, I0, mem(&m_core->tempaddr), 8 * item);        // add     i0,[tempaddr],8*item
 				UML_DMOV(block, I1, 0);                                         // dmov    i1,0
-				UML_CALLH(block, *ppc->impstate->write64[ppc->impstate->mode]);             // callh   write64
+				UML_CALLH(block, *m_write64[m_core->mode]);             // callh   write64
 			}
 			return TRUE;
 
 		case 0x132: /* TLBIE */
-			UML_MOV(block, mem(&ppc->param0), R32(G_RB(op)));                               // mov     [param0],rb
-			UML_CALLC(block, (c_function)ppccom_execute_tlbie, ppc);                                    // callc   ppccom_execute_tlbie,ppc
+			UML_MOV(block, mem(&m_core->param0), R32(G_RB(op)));                               // mov     [param0],rb
+			UML_CALLC(block, (c_function)cfunc_ppccom_execute_tlbie, this);                                    // callc   ppccom_execute_tlbie,ppc
 			return TRUE;
 
 		case 0x172: /* TLBIA */
-			UML_CALLC(block, (c_function)ppccom_execute_tlbia, ppc);                                    // callc   ppccom_execute_tlbia,ppc
+			UML_CALLC(block, (c_function)cfunc_ppccom_execute_tlbia, this);                                    // callc   ppccom_execute_tlbia,ppc
 			return TRUE;
 
 		case 0x3d2: /* TLBLD */
-			assert(ppc->cap & PPCCAP_603_MMU);
-			UML_MOV(block, mem(&ppc->param0), R32(G_RB(op)));                               // mov     [param0],rb
-			UML_MOV(block, mem(&ppc->param1), 0);                                       // mov     [param1],0
-			UML_CALLC(block, (c_function)ppccom_execute_tlbl, ppc);                                     // callc   ppccom_execute_tlbl,ppc
+			assert(m_cap & PPCCAP_603_MMU);
+			UML_MOV(block, mem(&m_core->param0), R32(G_RB(op)));                               // mov     [param0],rb
+			UML_MOV(block, mem(&m_core->param1), 0);                                       // mov     [param1],0
+			UML_CALLC(block, (c_function)cfunc_ppccom_execute_tlbl, this);                                     // callc   ppccom_execute_tlbl,ppc
 			return TRUE;
 
 		case 0x3f2: /* TLBLI */
-			assert(ppc->cap & PPCCAP_603_MMU);
-			UML_MOV(block, mem(&ppc->param0), R32(G_RB(op)));                               // mov     [param0],rb
-			UML_MOV(block, mem(&ppc->param1), 1);                                       // mov     [param1],1
-			UML_CALLC(block, (c_function)ppccom_execute_tlbl, ppc);                                     // callc   ppccom_execute_tlbl,ppc
+			assert(m_cap & PPCCAP_603_MMU);
+			UML_MOV(block, mem(&m_core->param0), R32(G_RB(op)));                               // mov     [param0],rb
+			UML_MOV(block, mem(&m_core->param1), 1);                                       // mov     [param1],1
+			UML_CALLC(block, (c_function)cfunc_ppccom_execute_tlbl, this);                                     // callc   ppccom_execute_tlbl,ppc
 			return TRUE;
 
 		case 0x013: /* MFCR */
@@ -3747,13 +3266,13 @@ static int generate_instruction_1f(powerpc_state *ppc, drcuml_block *block, comp
 				UML_OR(block, R32(G_RD(op)), SPR32(spr), I0);                           // or      [rd],[xer],i0
 			}
 			else if (spr == SPROEA_PVR)
-				UML_MOV(block, R32(G_RD(op)), ppc->flavor);                         // mov     rd,flavor
+				UML_MOV(block, R32(G_RD(op)), m_flavor);                         // mov     rd,flavor
 			else
 			{
-				generate_update_cycles(ppc, block, compiler, desc->pc, TRUE);           // <update cycles>
-				UML_MOV(block, mem(&ppc->param0), spr);                             // mov     [param0],spr
-				UML_CALLC(block, (c_function)ppccom_execute_mfspr, ppc);                                // callc   ppccom_execute_mfspr,ppc
-				UML_MOV(block, R32(G_RD(op)), mem(&ppc->param1));                           // mov     rd,[param1]
+				generate_update_cycles(block, compiler, desc->pc, TRUE);           // <update cycles>
+				UML_MOV(block, mem(&m_core->param0), spr);                             // mov     [param0],spr
+				UML_CALLC(block, (c_function)cfunc_ppccom_execute_mfspr, this);                                // callc   ppccom_execute_mfspr,ppc
+				UML_MOV(block, R32(G_RD(op)), mem(&m_core->param1));                           // mov     rd,[param1]
 			}
 			return TRUE;
 		}
@@ -3764,7 +3283,7 @@ static int generate_instruction_1f(powerpc_state *ppc, drcuml_block *block, comp
 
 		case 0x293: /* MFSRIN */
 			UML_SHR(block, I0, R32(G_RB(op)), 28);                              // shr     i0,G_RB,28
-			UML_LOAD(block, R32(G_RD(op)), &ppc->sr[0], I0, SIZE_DWORD, SCALE_x4);      // load    rd,sr,i0,dword
+			UML_LOAD(block, R32(G_RD(op)), &m_core->sr[0], I0, SIZE_DWORD, SCALE_x4);      // load    rd,sr,i0,dword
 			return TRUE;
 
 		case 0x173: /* MFTB */
@@ -3772,10 +3291,10 @@ static int generate_instruction_1f(powerpc_state *ppc, drcuml_block *block, comp
 			UINT32 tbr = compute_spr(G_SPR(op));
 			if (tbr != SPRVEA_TBL_R && tbr != SPRVEA_TBU_R)
 				return FALSE;
-			generate_update_cycles(ppc, block, compiler, desc->pc, TRUE);               // <update cycles>
-			UML_MOV(block, mem(&ppc->param0), tbr);                                 // mov     [param0],tbr
-			UML_CALLC(block, (c_function)ppccom_execute_mftb, ppc);                                     // callc   ppccom_execute_mftb,ppc
-			UML_MOV(block, R32(G_RD(op)), mem(&ppc->param1));                               // mov     rd,[param1]
+			generate_update_cycles(block, compiler, desc->pc, TRUE);               // <update cycles>
+			UML_MOV(block, mem(&m_core->param0), tbr);                                 // mov     [param0],tbr
+			UML_CALLC(block, (c_function)cfunc_ppccom_execute_mftb, this);                                     // callc   ppccom_execute_mftb,ppc
+			UML_MOV(block, R32(G_RD(op)), mem(&m_core->param1));                               // mov     rd,[param1]
 			return TRUE;
 		}
 
@@ -3792,15 +3311,15 @@ static int generate_instruction_1f(powerpc_state *ppc, drcuml_block *block, comp
 			return TRUE;
 
 		case 0x092: /* MTMSR */
-			if (ppc->cap & PPCCAP_603_MMU)
+			if (m_cap & PPCCAP_603_MMU)
 				UML_XOR(block, I0, MSR32, R32(G_RS(op)));                               // xor     i0,msr32,rs
 			UML_MOV(block, MSR32, R32(G_RS(op)));                                           // mov     msr,rs
-			if (ppc->cap & PPCCAP_603_MMU)
+			if (m_cap & PPCCAP_603_MMU)
 			{
 				UML_TEST(block, I0, MSR603_TGPR);                                   // test    i0,tgpr
-				UML_CALLHc(block, COND_NZ, *ppc->impstate->swap_tgpr);                          // callh   swap_tgpr,nz
+				UML_CALLHc(block, COND_NZ, *m_swap_tgpr);                          // callh   swap_tgpr,nz
 			}
-			generate_update_mode(ppc, block);                                               // <update mode>
+			generate_update_mode(block);                                               // <update mode>
 			return TRUE;
 
 		case 0x1d3: /* MTSPR */
@@ -3817,25 +3336,25 @@ static int generate_instruction_1f(powerpc_state *ppc, drcuml_block *block, comp
 				;                                                                           // read only
 			else
 			{
-				generate_update_cycles(ppc, block, compiler, desc->pc, TRUE);           // <update cycles>
-				UML_MOV(block, mem(&ppc->param0), spr);                             // mov     [param0],spr
-				UML_MOV(block, mem(&ppc->param1), R32(G_RS(op)));                           // mov     [param1],rs
-				UML_CALLC(block, (c_function)ppccom_execute_mtspr, ppc);                                // callc   ppccom_execute_mtspr,ppc
+				generate_update_cycles(block, compiler, desc->pc, TRUE);           // <update cycles>
+				UML_MOV(block, mem(&m_core->param0), spr);                             // mov     [param0],spr
+				UML_MOV(block, mem(&m_core->param1), R32(G_RS(op)));                           // mov     [param1],rs
+				UML_CALLC(block, (c_function)cfunc_ppccom_execute_mtspr, this);                                // callc   ppccom_execute_mtspr,ppc
 				compiler->checkints = TRUE;
-				generate_update_cycles(ppc, block, compiler, desc->pc + 4, TRUE);       // <update cycles>
+				generate_update_cycles(block, compiler, desc->pc + 4, TRUE);       // <update cycles>
 			}
 			return TRUE;
 		}
 
 		case 0x0d2: /* MTSR */
 			UML_MOV(block, SR32(G_SR(op)), R32(G_RS(op)));                                  // mov     sr[G_SR],rs
-			UML_CALLC(block, (c_function)ppccom_tlb_flush, ppc);                                        // callc   ppccom_tlb_flush,ppc
+			UML_CALLC(block, (c_function)cfunc_ppccom_tlb_flush, this);                                        // callc   ppccom_tlb_flush,ppc
 			return TRUE;
 
 		case 0x0f2: /* MTSRIN */
 			UML_SHR(block, I0, R32(G_RB(op)), 28);                              // shr     i0,G_RB,28
-			UML_STORE(block, &ppc->sr[0], I0, R32(G_RS(op)), SIZE_DWORD, SCALE_x4); // store   sr,i0,rs,dword
-			UML_CALLC(block, (c_function)ppccom_tlb_flush, ppc);                            // callc   ppccom_tlb_flush,ppc
+			UML_STORE(block, &m_core->sr[0], I0, R32(G_RS(op)), SIZE_DWORD, SCALE_x4); // store   sr,i0,rs,dword
+			UML_CALLC(block, (c_function)cfunc_ppccom_tlb_flush, this);                            // callc   ppccom_tlb_flush,ppc
 			return TRUE;
 
 		case 0x200: /* MCRXR */
@@ -3849,54 +3368,54 @@ static int generate_instruction_1f(powerpc_state *ppc, drcuml_block *block, comp
 		case 0x106: /* ICBT */
 		case 0x1c6: /* DCCCI */
 		case 0x3c6: /* ICCCI */
-			assert(ppc->cap & PPCCAP_4XX);
+			assert(m_cap & PPCCAP_4XX);
 			/* effective no-nop */
 			return TRUE;
 
 		case 0x1e6: /* DCREAD */
 		case 0x3e6: /* ICREAD */
-			assert(ppc->cap & PPCCAP_4XX);
+			assert(m_cap & PPCCAP_4XX);
 			UML_MOV(block, R32(G_RT(op)), 0);                                           // mov     rt,0
 			return TRUE;
 
 		case 0x143: /* MFDCR */
 		{
 			UINT32 spr = compute_spr(G_SPR(op));
-			assert(ppc->cap & PPCCAP_4XX);
-			generate_update_cycles(ppc, block, compiler, desc->pc, TRUE);               // <update cycles>
-			UML_MOV(block, mem(&ppc->param0), spr);                                 // mov     [param0],spr
-			UML_CALLC(block, (c_function)ppccom_execute_mfdcr, ppc);                                    // callc   ppccom_execute_mfdcr,ppc
-			UML_MOV(block, R32(G_RD(op)), mem(&ppc->param1));                               // mov     rd,[param1]
+			assert(m_cap & PPCCAP_4XX);
+			generate_update_cycles(block, compiler, desc->pc, TRUE);               // <update cycles>
+			UML_MOV(block, mem(&m_core->param0), spr);                                 // mov     [param0],spr
+			UML_CALLC(block, (c_function)cfunc_ppccom_execute_mfdcr, this);                                    // callc   ppccom_execute_mfdcr,ppc
+			UML_MOV(block, R32(G_RD(op)), mem(&m_core->param1));                               // mov     rd,[param1]
 			return TRUE;
 		}
 
 		case 0x1c3: /* MTDCR */
 		{
 			UINT32 spr = compute_spr(G_SPR(op));
-			assert(ppc->cap & PPCCAP_4XX);
-			generate_update_cycles(ppc, block, compiler, desc->pc, TRUE);               // <update cycles>
-			UML_MOV(block, mem(&ppc->param0), spr);                                 // mov     [param0],spr
-			UML_MOV(block, mem(&ppc->param1), R32(G_RS(op)));                               // mov     [param1],rs
-			UML_CALLC(block, (c_function)ppccom_execute_mtdcr, ppc);                                    // callc   ppccom_execute_mtdcr,ppc
+			assert(m_cap & PPCCAP_4XX);
+			generate_update_cycles(block, compiler, desc->pc, TRUE);               // <update cycles>
+			UML_MOV(block, mem(&m_core->param0), spr);                                 // mov     [param0],spr
+			UML_MOV(block, mem(&m_core->param1), R32(G_RS(op)));                               // mov     [param1],rs
+			UML_CALLC(block, (c_function)cfunc_ppccom_execute_mtdcr, this);                                    // callc   ppccom_execute_mtdcr,ppc
 			compiler->checkints = TRUE;
-			generate_update_cycles(ppc, block, compiler, desc->pc + 4, TRUE);           // <update cycles>
+			generate_update_cycles(block, compiler, desc->pc + 4, TRUE);           // <update cycles>
 			return TRUE;
 		}
 
 		case 0x083: /* WRTEE */
-			assert(ppc->cap & PPCCAP_4XX);
+			assert(m_cap & PPCCAP_4XX);
 			UML_ROLINS(block, MSR32, R32(G_RS(op)), 0, MSR_EE);                 // rolins  msr,rs,0,MSR_EE
 			compiler->checkints = TRUE;
-			generate_update_cycles(ppc, block, compiler, desc->pc + 4, TRUE);           // <update cycles>
+			generate_update_cycles(block, compiler, desc->pc + 4, TRUE);           // <update cycles>
 			return TRUE;
 
 		case 0x0a3: /* WRTEEI */
-			assert(ppc->cap & PPCCAP_4XX);
+			assert(m_cap & PPCCAP_4XX);
 			if (op & MSR_EE)
 			{
 				UML_OR(block, MSR32, MSR32, MSR_EE);                                    // or      msr,msr,MSR_EE
 				compiler->checkints = TRUE;
-				generate_update_cycles(ppc, block, compiler, desc->pc + 4, TRUE);       // <update cycles>
+				generate_update_cycles(block, compiler, desc->pc + 4, TRUE);       // <update cycles>
 			}
 			else
 				UML_AND(block, MSR32, MSR32, ~MSR_EE);                                  // and     msr,msr,~MSR_EE
@@ -3917,7 +3436,7 @@ static int generate_instruction_1f(powerpc_state *ppc, drcuml_block *block, comp
     the 0x3b group
 -------------------------------------------------*/
 
-static int generate_instruction_3b(powerpc_state *ppc, drcuml_block *block, compiler_state *compiler, const opcode_desc *desc)
+int ppc_device::generate_instruction_3b(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc)
 {
 	UINT32 op = desc->opptr.l[0];
 	UINT32 opswitch = (op >> 1) & 0x1f;
@@ -3925,87 +3444,87 @@ static int generate_instruction_3b(powerpc_state *ppc, drcuml_block *block, comp
 	switch (opswitch)
 	{
 		case 0x15:  /* FADDSx */
-			if (!(ppc->impstate->drcoptions & PPCDRC_ACCURATE_SINGLES))
-				return generate_instruction_3f(ppc, block, compiler, desc);
+			if (!(m_drcoptions & PPCDRC_ACCURATE_SINGLES))
+				return generate_instruction_3f(block, compiler, desc);
 			UML_FDADD(block, F0, F64(G_RA(op)), F64(G_RB(op)));                     // fdadd   f0,ra,rb
 			UML_FDRNDS(block, F64(G_RD(op)), F0);                                       // fdrnds  rd,f0
-			generate_fp_flags(ppc, block, desc, TRUE);
+			generate_fp_flags(block, desc, TRUE);
 			return TRUE;
 
 		case 0x14:  /* FSUBSx */
-			if (!(ppc->impstate->drcoptions & PPCDRC_ACCURATE_SINGLES))
-				return generate_instruction_3f(ppc, block, compiler, desc);
+			if (!(m_drcoptions & PPCDRC_ACCURATE_SINGLES))
+				return generate_instruction_3f(block, compiler, desc);
 			UML_FDSUB(block, F0, F64(G_RA(op)), F64(G_RB(op)));                     // fdsub   f0,ra,rb
 			UML_FDRNDS(block, F64(G_RD(op)), F0);                                       // fdrnds  rd,f0
-			generate_fp_flags(ppc, block, desc, TRUE);
+			generate_fp_flags(block, desc, TRUE);
 			return TRUE;
 
 		case 0x19:  /* FMULSx */
-			if (!(ppc->impstate->drcoptions & PPCDRC_ACCURATE_SINGLES))
-				return generate_instruction_3f(ppc, block, compiler, desc);
+			if (!(m_drcoptions & PPCDRC_ACCURATE_SINGLES))
+				return generate_instruction_3f(block, compiler, desc);
 			UML_FDMUL(block, F0, F64(G_RA(op)), F64(G_REGC(op)));                       // fdmul   f0,ra,rc
 			UML_FDRNDS(block, F64(G_RD(op)), F0);                                       // fdrnds  rd,f0
-			generate_fp_flags(ppc, block, desc, TRUE);
+			generate_fp_flags(block, desc, TRUE);
 			return TRUE;
 
 		case 0x12:  /* FDIVSx */
-			if (!(ppc->impstate->drcoptions & PPCDRC_ACCURATE_SINGLES))
-				return generate_instruction_3f(ppc, block, compiler, desc);
+			if (!(m_drcoptions & PPCDRC_ACCURATE_SINGLES))
+				return generate_instruction_3f(block, compiler, desc);
 			UML_FDDIV(block, F0, F64(G_RA(op)), F64(G_RB(op)));                     // fddiv   f0,ra,rb
 			UML_FDRNDS(block, F64(G_RD(op)), F0);                                       // fdrnds  rd,f0
-			generate_fp_flags(ppc, block, desc, TRUE);
+			generate_fp_flags(block, desc, TRUE);
 			return TRUE;
 
 		case 0x16:  /* FSQRTSx */
-			if (!(ppc->impstate->drcoptions & PPCDRC_ACCURATE_SINGLES))
-				return generate_instruction_3f(ppc, block, compiler, desc);
+			if (!(m_drcoptions & PPCDRC_ACCURATE_SINGLES))
+				return generate_instruction_3f(block, compiler, desc);
 			UML_FDSQRT(block, F0, F64(G_RB(op)));                                       // fdsqrt  f0,rb
 			UML_FDRNDS(block, F64(G_RD(op)), F0);                                       // fdrnds  rd,f0
-			generate_fp_flags(ppc, block, desc, TRUE);
+			generate_fp_flags(block, desc, TRUE);
 			return TRUE;
 
 		case 0x18:  /* FRESx */
 			UML_FSFRFLT(block, F0, F64(G_RB(op)), SIZE_QWORD);                              // fsfrlt  f0,rb,qword
 			UML_FSRECIP(block, F0, F0);                                         // fsrecip f0,f0
 			UML_FDFRFLT(block, F64(G_RD(op)), F0, SIZE_DWORD);                              // fdfrflt rd,f0,dword
-			generate_fp_flags(ppc, block, desc, TRUE);
+			generate_fp_flags(block, desc, TRUE);
 			return TRUE;
 
 		case 0x1d:  /* FMADDSx */
-			if (!(ppc->impstate->drcoptions & PPCDRC_ACCURATE_SINGLES))
-				return generate_instruction_3f(ppc, block, compiler, desc);
+			if (!(m_drcoptions & PPCDRC_ACCURATE_SINGLES))
+				return generate_instruction_3f(block, compiler, desc);
 			UML_FDMUL(block, F0, F64(G_RA(op)), F64(G_REGC(op)));                       // fdmul   f0,ra,rc
 			UML_FDADD(block, F0, F0, F64(G_RB(op)));                                // fdadd   f0,f0,rb
 			UML_FDRNDS(block, F64(G_RD(op)), F0);                                       // fdrnds  rd,f0
-			generate_fp_flags(ppc, block, desc, TRUE);
+			generate_fp_flags(block, desc, TRUE);
 			return TRUE;
 
 		case 0x1c:  /* FMSUBSx */
-			if (!(ppc->impstate->drcoptions & PPCDRC_ACCURATE_SINGLES))
-				return generate_instruction_3f(ppc, block, compiler, desc);
+			if (!(m_drcoptions & PPCDRC_ACCURATE_SINGLES))
+				return generate_instruction_3f(block, compiler, desc);
 			UML_FDMUL(block, F0, F64(G_RA(op)), F64(G_REGC(op)));                       // fdmul   f0,ra,rc
 			UML_FDSUB(block, F0, F0, F64(G_RB(op)));                                // fdsub   f0,f0,rb
 			UML_FDRNDS(block, F64(G_RD(op)), F0);                                       // fdrnds  rd,f0
-			generate_fp_flags(ppc, block, desc, TRUE);
+			generate_fp_flags(block, desc, TRUE);
 			return TRUE;
 
 		case 0x1f:  /* FNMADDSx */
-			if (!(ppc->impstate->drcoptions & PPCDRC_ACCURATE_SINGLES))
-				return generate_instruction_3f(ppc, block, compiler, desc);
+			if (!(m_drcoptions & PPCDRC_ACCURATE_SINGLES))
+				return generate_instruction_3f(block, compiler, desc);
 			UML_FDMUL(block, F0, F64(G_RA(op)), F64(G_REGC(op)));                       // fdmul   f0,ra,rc
 			UML_FDADD(block, F0, F0, F64(G_RB(op)));                                // fdadd   f0,f0,rb
 			UML_FDNEG(block, F0, F0);                                               // fdneg   f0,f0
 			UML_FDRNDS(block, F64(G_RD(op)), F0);                                       // fdrnds  rd,f0
-			generate_fp_flags(ppc, block, desc, TRUE);
+			generate_fp_flags(block, desc, TRUE);
 			return TRUE;
 
 		case 0x1e:  /* FNMSUBSx */
-			if (!(ppc->impstate->drcoptions & PPCDRC_ACCURATE_SINGLES))
-				return generate_instruction_3f(ppc, block, compiler, desc);
+			if (!(m_drcoptions & PPCDRC_ACCURATE_SINGLES))
+				return generate_instruction_3f(block, compiler, desc);
 			UML_FDMUL(block, F0, F64(G_RA(op)), F64(G_REGC(op)));                       // fdmul   f0,ra,rc
 			UML_FDSUB(block, F0, F64(G_RB(op)), F0);                                // fdsub   f0,rb,f0
 			UML_FDRNDS(block, F64(G_RD(op)), F0);                                       // fdrnds  rd,f0
-			generate_fp_flags(ppc, block, desc, TRUE);
+			generate_fp_flags(block, desc, TRUE);
 			return TRUE;
 	}
 
@@ -4019,7 +3538,7 @@ static int generate_instruction_3b(powerpc_state *ppc, drcuml_block *block, comp
     the 0x3f group
 -------------------------------------------------*/
 
-static int generate_instruction_3f(powerpc_state *ppc, drcuml_block *block, compiler_state *compiler, const opcode_desc *desc)
+int ppc_device::generate_instruction_3f(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc)
 {
 	UINT32 op = desc->opptr.l[0];
 	UINT32 opswitch = (op >> 1) & 0x3ff;
@@ -4031,36 +3550,36 @@ static int generate_instruction_3f(powerpc_state *ppc, drcuml_block *block, comp
 		{
 			case 0x15:  /* FADDx */
 				UML_FDADD(block, F64(G_RD(op)), F64(G_RA(op)), F64(G_RB(op)));              // fdadd   rd,ra,rb
-				generate_fp_flags(ppc, block, desc, TRUE);
+				generate_fp_flags(block, desc, TRUE);
 				return TRUE;
 
 			case 0x14:  /* FSUBx */
 				UML_FDSUB(block, F64(G_RD(op)), F64(G_RA(op)), F64(G_RB(op)));              // fdsub   rd,ra,rb
-				generate_fp_flags(ppc, block, desc, TRUE);
+				generate_fp_flags(block, desc, TRUE);
 				return TRUE;
 
 			case 0x19:  /* FMULx */
 				UML_FDMUL(block, F64(G_RD(op)), F64(G_RA(op)), F64(G_REGC(op)));            // fdmul   rd,ra,rc
-				generate_fp_flags(ppc, block, desc, TRUE);
+				generate_fp_flags(block, desc, TRUE);
 				return TRUE;
 
 			case 0x12:  /* FDIVx */
 				UML_FDDIV(block, F64(G_RD(op)), F64(G_RA(op)), F64(G_RB(op)));              // fddiv   rd,ra,rb
-				generate_fp_flags(ppc, block, desc, TRUE);
+				generate_fp_flags(block, desc, TRUE);
 				return TRUE;
 
 			case 0x16:  /* FSQRTx */
 				UML_FDSQRT(block, F64(G_RD(op)), F64(G_RB(op)));                            // fdsqrt  rd,rb
-				generate_fp_flags(ppc, block, desc, TRUE);
+				generate_fp_flags(block, desc, TRUE);
 				return TRUE;
 
 			case 0x1a:  /* FRSQRTEx */
 				UML_FDRSQRT(block, F64(G_RD(op)), F64(G_RB(op)));                           // fdrsqrt rd,rb
-				generate_fp_flags(ppc, block, desc, TRUE);
+				generate_fp_flags(block, desc, TRUE);
 				return TRUE;
 
 			case 0x17:  /* FSELx */
-				UML_FDCMP(block, F64(G_RA(op)), mem(&ppc->impstate->fp0));                  // fdcmp   f0,ra,[fp0]
+				UML_FDCMP(block, F64(G_RA(op)), mem(&m_core->fp0));                  // fdcmp   f0,ra,[fp0]
 				UML_FDMOVc(block, COND_AE, F64(G_RD(op)), F64(G_REGC(op)));                 // fdmov   rd,rc,AE
 				UML_FDMOVc(block, COND_B, F64(G_RD(op)), F64(G_RB(op)));                        // fdmov   rd,rb,B
 				return TRUE;
@@ -4068,26 +3587,26 @@ static int generate_instruction_3f(powerpc_state *ppc, drcuml_block *block, comp
 			case 0x1d:  /* FMADDx */
 				UML_FDMUL(block, F0, F64(G_RA(op)), F64(G_REGC(op)));                   // fdmul   f0,ra,rc
 				UML_FDADD(block, F64(G_RD(op)), F0, F64(G_RB(op)));                 // fdadd   rd,f0,rb
-				generate_fp_flags(ppc, block, desc, TRUE);
+				generate_fp_flags(block, desc, TRUE);
 				return TRUE;
 
 			case 0x1f:  /* FNMADDx */
 				UML_FDMUL(block, F0, F64(G_RA(op)), F64(G_REGC(op)));                   // fdmul   f0,ra,rc
 				UML_FDADD(block, F0, F0, F64(G_RB(op)));                            // fdadd   f0,f0,rb
 				UML_FDNEG(block, F64(G_RD(op)), F0);                                    // fdneg   rd,f0
-				generate_fp_flags(ppc, block, desc, TRUE);
+				generate_fp_flags(block, desc, TRUE);
 				return TRUE;
 
 			case 0x1c:  /* FMSUBx */
 				UML_FDMUL(block, F0, F64(G_RA(op)), F64(G_REGC(op)));                   // fdmul   f0,ra,rc
 				UML_FDSUB(block, F64(G_RD(op)), F0, F64(G_RB(op)));                 // fdsub   rd,f0,rb
-				generate_fp_flags(ppc, block, desc, TRUE);
+				generate_fp_flags(block, desc, TRUE);
 				return TRUE;
 
 			case 0x1e:  /* FNMSUBx */
 				UML_FDMUL(block, F0, F64(G_RA(op)), F64(G_REGC(op)));                   // fdmul   f0,ra,rc
 				UML_FDSUB(block, F64(G_RD(op)), F64(G_RB(op)), F0);                 // fdsub   rd,rb,f0
-				generate_fp_flags(ppc, block, desc, TRUE);
+				generate_fp_flags(block, desc, TRUE);
 				return TRUE;
 		}
 	}
@@ -4104,25 +3623,25 @@ static int generate_instruction_3f(powerpc_state *ppc, drcuml_block *block, comp
 			case 0x020: /* FCMPO */
 				UML_FDCMP(block, F64(G_RA(op)), F64(G_RB(op)));                             // fdcmp   ra,rb
 				UML_GETFLGS(block, I0, FLAG_C | FLAG_Z | FLAG_U);                       // getflgs i0,czu
-				UML_LOAD(block, I0, ppc->impstate->fcmp_cr_table, I0, SIZE_BYTE, SCALE_x1);// load    i0,fcmp_cr_table,i0,byte
+				UML_LOAD(block, I0, m_fcmp_cr_table, I0, SIZE_BYTE, SCALE_x1);// load    i0,fcmp_cr_table,i0,byte
 				UML_OR(block, CR32(G_CRFD(op)), I0, XERSO32);                           // or      [crn],i0,[xerso]
 				return TRUE;
 
 			case 0x00c: /* FRSPx */
 				UML_FDRNDS(block, F64(G_RD(op)), F64(G_RB(op)));                            // fdrnds  rd,rb
-				generate_fp_flags(ppc, block, desc, TRUE);
+				generate_fp_flags(block, desc, TRUE);
 				return TRUE;
 
 			case 0x00e: /* FCTIWx */
 				UML_FDTOINT(block, I0, F64(G_RB(op)), SIZE_DWORD, ROUND_DEFAULT);                   // fdtoint i0,rb,dword,default
-				UML_DAND(block, mem(&ppc->impstate->tempdata.w.l), I0, 0xffffffff);// dand    i0,i0,0xffffffff
-				UML_FDMOV(block, F64(G_RD(op)), mem(&ppc->impstate->tempdata.w.l));         // fdmovr  rd,i0
+				UML_DAND(block, mem(&m_core->tempdata.w.l), I0, 0xffffffff);// dand    i0,i0,0xffffffff
+				UML_FDMOV(block, F64(G_RD(op)), mem(&m_core->tempdata.w.l));         // fdmovr  rd,i0
 				return TRUE;
 
 			case 0x00f: /* FCTIWZx */
 				UML_FDTOINT(block, I0, F64(G_RB(op)), SIZE_DWORD, ROUND_TRUNC);                 // fdtoint i0,rb,dword,default
-				UML_DAND(block, mem(&ppc->impstate->tempdata.w.l), I0, 0xffffffff);// dand    i0,i0,0xffffffff
-				UML_FDMOV(block, F64(G_RD(op)), mem(&ppc->impstate->tempdata.w.l));         // fdmovr  rd,i0
+				UML_DAND(block, mem(&m_core->tempdata.w.l), I0, 0xffffffff);// dand    i0,i0,0xffffffff
+				UML_FDMOV(block, F64(G_RD(op)), mem(&m_core->tempdata.w.l));         // fdmovr  rd,i0
 				return TRUE;
 
 			case 0x028: /* FNEGx */
@@ -4157,13 +3676,13 @@ static int generate_instruction_3f(powerpc_state *ppc, drcuml_block *block, comp
 				return TRUE;
 
 			case 0x247: /* MFFSx */
-				UML_MOV(block, mem(&ppc->impstate->tempdata.w.l), FPSCR32);                 // mov     [tempdata],fpscr
-				UML_FSMOV(block, F64(G_RD(op)), mem(&ppc->impstate->tempdata.d));           // fsmov   rd,fpscr
+				UML_MOV(block, mem(&m_core->tempdata.w.l), FPSCR32);                 // mov     [tempdata],fpscr
+				UML_FSMOV(block, F64(G_RD(op)), mem(&m_core->tempdata.d));           // fsmov   rd,fpscr
 				return TRUE;
 
 			case 0x2c7: /* MTFSFx */
-				UML_FDMOV(block, mem(&ppc->impstate->tempdata.d), F64(G_RB(op)));           // fdmov   [tempdata],fb
-				UML_ROLINS(block, FPSCR32, mem(&ppc->impstate->tempdata.w.l), 0, compute_crf_mask(G_FM(op)));
+				UML_FDMOV(block, mem(&m_core->tempdata.d), F64(G_RB(op)));           // fdmov   [tempdata],fb
+				UML_ROLINS(block, FPSCR32, mem(&m_core->tempdata.w.l), 0, compute_crf_mask(G_FM(op)));
 																							// rolins  fpscr,rb,0,crf_mask
 				return TRUE;
 
@@ -4188,7 +3707,7 @@ static int generate_instruction_3f(powerpc_state *ppc, drcuml_block *block, comp
     including disassembly of a PowerPC instruction
 -------------------------------------------------*/
 
-static void log_add_disasm_comment(drcuml_block *block, UINT32 pc, UINT32 op)
+void ppc_device::log_add_disasm_comment(drcuml_block *block, UINT32 pc, UINT32 op)
 {
 	char buffer[100];
 	if (LOG_UML)
@@ -4205,7 +3724,7 @@ static void log_add_disasm_comment(drcuml_block *block, UINT32 pc, UINT32 op)
     flags
 -------------------------------------------------*/
 
-static const char *log_desc_flags_to_string(UINT32 flags)
+const char *ppc_device::log_desc_flags_to_string(UINT32 flags)
 {
 	static char tempbuf[30];
 	char *dest = tempbuf;
@@ -4259,7 +3778,7 @@ static const char *log_desc_flags_to_string(UINT32 flags)
     log_register_list - log a list of GPR registers
 -------------------------------------------------*/
 
-static void log_register_list(drcuml_state *drcuml, const char *string, const UINT32 *reglist, const UINT32 *regnostarlist)
+void ppc_device::log_register_list(drcuml_state *drcuml, const char *string, const UINT32 *reglist, const UINT32 *regnostarlist)
 {
 	static const char *const crtext[4] = { "lt", "gt", "eq", "so" };
 	int count = 0;
@@ -4362,7 +3881,7 @@ static void log_register_list(drcuml_state *drcuml, const char *string, const UI
     log_opcode_desc - log a list of descriptions
 -------------------------------------------------*/
 
-static void log_opcode_desc(drcuml_state *drcuml, const opcode_desc *desclist, int indent)
+void ppc_device::log_opcode_desc(drcuml_state *drcuml, const opcode_desc *desclist, int indent)
 {
 	/* open the file, creating it if necessary */
 	if (indent == 0)
@@ -4401,431 +3920,3 @@ static void log_opcode_desc(drcuml_state *drcuml, const opcode_desc *desclist, i
 	}
 }
 
-
-
-/***************************************************************************
-    PPC 4XX VARIANTS
-***************************************************************************/
-
-/*-------------------------------------------------
-    ppcdrc4xx_get_info - PowerPC 4XX-specific
-    information getter
--------------------------------------------------*/
-
-static CPU_GET_INFO( ppcdrc4xx )
-{
-	powerpc_state *ppc = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
-	CPU_GET_INFO_CALL(ppcdrc);
-	ppc4xx_get_info(ppc, state, info);
-}
-
-
-/*-------------------------------------------------
-    ppcdrc4xx_set_info - PowerPC 4XX-specific
-    information setter
--------------------------------------------------*/
-
-static CPU_SET_INFO( ppcdrc4xx )
-{
-	powerpc_state *ppc = get_safe_token(device);
-	CPU_SET_INFO_CALL(ppcdrc);
-	ppc4xx_set_info(ppc, state, info);
-}
-
-
-/*-------------------------------------------------
-    ppc403ga_init - PowerPC 403GA-specific
-    initialization
--------------------------------------------------*/
-
-static CPU_INIT( ppc403ga )
-{
-	ppcdrc_init(PPC_MODEL_403GA, PPCCAP_4XX, 1, device, irqcallback);
-}
-
-
-/*-------------------------------------------------
-    ppc403ga_get_info - PowerPC 403GA-specific
-    information getter
--------------------------------------------------*/
-
-CPU_GET_INFO( ppc403ga )
-{
-	switch (state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_FCT_INIT:                          info->init = CPU_INIT_NAME(ppc403ga);               break;
-		case CPUINFO_FCT_SET_INFO:                      info->setinfo = CPU_SET_INFO_NAME(ppcdrc4xx);       break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:                          strcpy(info->s, "PowerPC 403GA");       break;
-		case CPUINFO_STR_SHORTNAME:                     strcpy(info->s, "ppc403ga");       break;
-
-		/* --- everything else is handled generically --- */
-		default:                                        CPU_GET_INFO_CALL(ppcdrc4xx);       break;
-	}
-}
-
-
-/*-------------------------------------------------
-    ppc403gcx_init - PowerPC 403GCX-specific
-    initialization
--------------------------------------------------*/
-
-static CPU_INIT( ppc403gcx )
-{
-	ppcdrc_init(PPC_MODEL_403GCX, PPCCAP_4XX, 1, device, irqcallback);
-}
-
-
-/*-------------------------------------------------
-    ppc403gcx_get_info - PowerPC 403GCX-specific
-    information getter
--------------------------------------------------*/
-
-CPU_GET_INFO( ppc403gcx )
-{
-	switch (state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_FCT_INIT:                          info->init = CPU_INIT_NAME(ppc403gcx);          break;
-		case CPUINFO_FCT_SET_INFO:                      info->setinfo = CPU_SET_INFO_NAME(ppcdrc4xx);       break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:                          strcpy(info->s, "PowerPC 403GCX");      break;
-		case CPUINFO_STR_SHORTNAME:                     strcpy(info->s, "ppc403gcx");       break;
-
-		/* --- everything else is handled generically --- */
-		default:                                        CPU_GET_INFO_CALL(ppcdrc4xx);       break;
-	}
-}
-
-
-
-/*-------------------------------------------------
-    ppc405gp_init - PowerPC 405GP-specific
-    initialization
--------------------------------------------------*/
-
-static CPU_INIT( ppc405gp )
-{
-	ppcdrc_init(PPC_MODEL_405GP, PPCCAP_4XX | PPCCAP_VEA, 1, device, irqcallback);
-}
-
-
-/*-------------------------------------------------
-    ppc405gp_get_info - PowerPC 405GP-specific
-    information getter
--------------------------------------------------*/
-
-CPU_GET_INFO( ppc405gp )
-{
-	switch (state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_FCT_INIT:                          info->init = CPU_INIT_NAME(ppc405gp);           break;
-		case CPUINFO_FCT_SET_INFO:                      info->setinfo = CPU_SET_INFO_NAME(ppcdrc4xx);       break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:                          strcpy(info->s, "PowerPC 405GP");       break;
-		case CPUINFO_STR_SHORTNAME:                     strcpy(info->s, "ppc405gp");       break;
-
-		/* --- everything else is handled generically --- */
-		default:                                        CPU_GET_INFO_CALL(ppcdrc4xx);       break;
-	}
-}
-
-
-/***************************************************************************
-    PPC 6XX VARIANTS
-***************************************************************************/
-
-/*-------------------------------------------------
-    ppc601_init - PowerPC 601-specific
-    initialization
--------------------------------------------------*/
-
-static CPU_INIT( ppc601 )
-{
-	ppcdrc_init(PPC_MODEL_601, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED | PPCCAP_MFIOC | PPCCAP_601BAT, 0/* no TB */, device, irqcallback);
-}
-
-
-/*-------------------------------------------------
-    ppc601_get_info - PowerPC 601-specific
-    information getter
--------------------------------------------------*/
-
-CPU_GET_INFO( ppc601 )
-{
-	switch (state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_FCT_INIT:                          info->init = CPU_INIT_NAME(ppc601);             break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:                          strcpy(info->s, "PowerPC 601");         break;
-		case CPUINFO_STR_SHORTNAME:                     strcpy(info->s, "ppc601");       break;
-
-		/* --- everything else is handled generically --- */
-		default:                                        CPU_GET_INFO_CALL(ppcdrc);          break;
-	}
-}
-
-
-/*-------------------------------------------------
-    ppc602_init - PowerPC 602-specific
-    initialization
--------------------------------------------------*/
-
-static CPU_INIT( ppc602 )
-{
-	ppcdrc_init(PPC_MODEL_602, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED | PPCCAP_603_MMU, 4, device, irqcallback);
-}
-
-
-/*-------------------------------------------------
-    ppc602_get_info - PowerPC 602-specific
-    information getter
--------------------------------------------------*/
-
-CPU_GET_INFO( ppc602 )
-{
-	switch (state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_FCT_INIT:                          info->init = CPU_INIT_NAME(ppc602);             break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:                          strcpy(info->s, "PowerPC 602");         break;
-		case CPUINFO_STR_SHORTNAME:                     strcpy(info->s, "ppc602");       break;
-
-		/* --- everything else is handled generically --- */
-		default:                                        CPU_GET_INFO_CALL(ppcdrc);          break;
-	}
-}
-
-
-/*-------------------------------------------------
-    ppc603_init - PowerPC 603-specific
-    initialization
--------------------------------------------------*/
-
-static CPU_INIT( ppc603 )
-{
-	ppcdrc_init(PPC_MODEL_603, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED | PPCCAP_603_MMU, 4, device, irqcallback);
-}
-
-
-/*-------------------------------------------------
-    ppc603_get_info - PowerPC 603-specific
-    information getter
--------------------------------------------------*/
-
-CPU_GET_INFO( ppc603 )
-{
-	switch (state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_FCT_INIT:                          info->init = CPU_INIT_NAME(ppc603);             break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:                          strcpy(info->s, "PowerPC 603");         break;
-		case CPUINFO_STR_SHORTNAME:                     strcpy(info->s, "ppc603");       break;
-
-		/* --- everything else is handled generically --- */
-		default:                                        CPU_GET_INFO_CALL(ppcdrc);          break;
-	}
-}
-
-
-/*-------------------------------------------------
-    ppc603e_init - PowerPC 603e-specific
-    initialization
--------------------------------------------------*/
-
-static CPU_INIT( ppc603e )
-{
-	ppcdrc_init(PPC_MODEL_603E, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED | PPCCAP_603_MMU, 4, device, irqcallback);
-}
-
-
-/*-------------------------------------------------
-    ppc603e_get_info - PowerPC 603e-specific
-    information getter
--------------------------------------------------*/
-
-CPU_GET_INFO( ppc603e )
-{
-	switch (state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_FCT_INIT:                          info->init = CPU_INIT_NAME(ppc603e);                break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:                          strcpy(info->s, "PowerPC 603e");        break;
-		case CPUINFO_STR_SHORTNAME:                     strcpy(info->s, "ppc603e");       break;
-
-		/* --- everything else is handled generically --- */
-		default:                                        CPU_GET_INFO_CALL(ppcdrc);          break;
-	}
-}
-
-
-/*-------------------------------------------------
-    ppc603r_init - PowerPC 603r-specific
-    initialization
--------------------------------------------------*/
-
-static CPU_INIT( ppc603r )
-{
-	ppcdrc_init(PPC_MODEL_603R, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED | PPCCAP_603_MMU, 4, device, irqcallback);
-}
-
-
-/*-------------------------------------------------
-    ppc603r_get_info - PowerPC 603r-specific
-    information getter
--------------------------------------------------*/
-
-CPU_GET_INFO( ppc603r )
-{
-	switch (state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_FCT_INIT:                          info->init = CPU_INIT_NAME(ppc603r);                break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:                          strcpy(info->s, "PowerPC 603R");        break;
-		case CPUINFO_STR_SHORTNAME:                     strcpy(info->s, "ppc603r");       break;
-
-		/* --- everything else is handled generically --- */
-		default:                                        CPU_GET_INFO_CALL(ppcdrc);          break;
-	}
-}
-
-
-/*-------------------------------------------------
-    ppc604_init - PowerPC 604-specific
-    initialization
--------------------------------------------------*/
-
-static CPU_INIT( ppc604 )
-{
-	ppcdrc_init(PPC_MODEL_604, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED | PPCCAP_604_MMU, 4, device, irqcallback);
-}
-
-
-/*-------------------------------------------------
-    ppc604_get_info - PowerPC 604-specific
-    information getter
--------------------------------------------------*/
-
-CPU_GET_INFO( ppc604 )
-{
-	switch (state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_FCT_INIT:                          info->init = CPU_INIT_NAME(ppc604);             break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:                          strcpy(info->s, "PowerPC 604");         break;
-		case CPUINFO_STR_SHORTNAME:                     strcpy(info->s, "ppc604");       break;
-
-		/* --- everything else is handled generically --- */
-		default:                                        CPU_GET_INFO_CALL(ppcdrc);          break;
-	}
-}
-
-
-
-/***************************************************************************
-    MPC VARIANTS
-***************************************************************************/
-
-/*-------------------------------------------------
-    mpc8240_init - PowerPC MPC8240-specific
-    initialization
--------------------------------------------------*/
-
-static CPU_INIT( mpc8240 )
-{
-	ppcdrc_init(PPC_MODEL_MPC8240, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED | PPCCAP_603_MMU, 4/* unknown */, device, irqcallback);
-}
-
-
-/*-------------------------------------------------
-    mpc8240_get_info - PowerPC MPC8240-specific
-    information getter
--------------------------------------------------*/
-
-CPU_GET_INFO( mpc8240 )
-{
-	switch (state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_FCT_INIT:                          info->init = CPU_INIT_NAME(mpc8240);                break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:                          strcpy(info->s, "PowerPC MPC8240");     break;
-		case CPUINFO_STR_SHORTNAME:                     strcpy(info->s, "mpc8240");       break;
-
-		/* --- everything else is handled generically --- */
-		default:                                        CPU_GET_INFO_CALL(ppcdrc);          break;
-	}
-}
-
-
-ppc403ga_device::ppc403ga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, UINT32 clock)
-	: ppc4xx_device(mconfig, type, tag, owner, clock, CPU_GET_INFO_NAME(ppc403ga))
-{
-}
-
-const device_type PPC403GA = &legacy_device_creator<ppc403ga_device>;
-
-ppc403gcx_device::ppc403gcx_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, UINT32 clock)
-	: ppc4xx_device(mconfig, type, tag, owner, clock, CPU_GET_INFO_NAME(ppc403gcx))
-{
-}
-
-const device_type PPC403GCX = &legacy_device_creator<ppc403gcx_device>;
-
-ppc405gp_device::ppc405gp_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, UINT32 clock)
-	: ppc4xx_device(mconfig, type, tag, owner, clock, CPU_GET_INFO_NAME(ppc405gp))
-{
-}
-
-const device_type PPC405GP = &legacy_device_creator<ppc405gp_device>;
-
-ppc4xx_device::ppc4xx_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, UINT32 clock, cpu_get_info_func info)
-	: legacy_cpu_device(mconfig, type, tag, owner, clock, info)
-{
-}
-
-DEFINE_LEGACY_CPU_DEVICE(PPC601, ppc601);
-DEFINE_LEGACY_CPU_DEVICE(PPC602, ppc602);
-DEFINE_LEGACY_CPU_DEVICE(PPC603, ppc603);
-DEFINE_LEGACY_CPU_DEVICE(PPC603E, ppc603e);
-DEFINE_LEGACY_CPU_DEVICE(PPC603R, ppc603r);
-DEFINE_LEGACY_CPU_DEVICE(PPC604, ppc604);
-DEFINE_LEGACY_CPU_DEVICE(MPC8240, mpc8240);

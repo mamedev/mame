@@ -256,7 +256,7 @@ public:
 	UINT8 m_led_reg0;
 	UINT8 m_led_reg1;
 	required_shared_ptr<UINT32> m_work_ram;
-	required_device<cpu_device> m_maincpu;
+	required_device<ppc_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<cpu_device> m_dsp;
 	required_device<k056800_device> m_k056800;
@@ -573,10 +573,10 @@ WRITE16_MEMBER(nwktr_state::soundtimer_count_w)
 void nwktr_state::machine_start()
 {
 	/* set conservative DRC options */
-	ppcdrc_set_options(m_maincpu, PPCDRC_COMPATIBLE_OPTIONS);
+	m_maincpu->ppcdrc_set_options(PPCDRC_COMPATIBLE_OPTIONS);
 
 	/* configure fast RAM regions for DRC */
-	ppcdrc_add_fastram(m_maincpu, 0x00000000, 0x003fffff, FALSE, m_work_ram);
+	m_maincpu->ppcdrc_add_fastram(0x00000000, 0x003fffff, FALSE, m_work_ram);
 
 	m_sound_irq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(nwktr_state::sound_irq), this));
 }

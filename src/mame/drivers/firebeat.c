@@ -181,7 +181,7 @@ public:
 		m_ata(*this, "ata")
 	{ }
 
-	required_device<cpu_device> m_maincpu;
+	required_device<ppc4xx_device> m_maincpu;
 	required_shared_ptr<UINT32> m_work_ram;
 	required_device<fujitsu_29f016a_device> m_flash_main;
 	required_device<fujitsu_29f016a_device> m_flash_snd1;
@@ -1483,10 +1483,10 @@ READ16_MEMBER(firebeat_state::spu_unk_r)
 MACHINE_START_MEMBER(firebeat_state,firebeat)
 {
 	/* set conservative DRC options */
-	ppcdrc_set_options(m_maincpu, PPCDRC_COMPATIBLE_OPTIONS);
+	m_maincpu->ppcdrc_set_options(PPCDRC_COMPATIBLE_OPTIONS);
 
 	/* configure fast RAM regions for DRC */
-	ppcdrc_add_fastram(m_maincpu, 0x00000000, 0x01ffffff, FALSE, m_work_ram);
+	m_maincpu->ppcdrc_add_fastram(0x00000000, 0x01ffffff, FALSE, m_work_ram);
 }
 
 static ADDRESS_MAP_START( firebeat_map, AS_PROGRAM, 32, firebeat_state )
@@ -1955,7 +1955,7 @@ static void security_w(device_t *device, UINT8 data)
 	firebeat_state *state = device->machine().driver_data<firebeat_state>();
 	int r = state->ibutton_w(data);
 	if (r >= 0)
-		ppc4xx_spu_receive_byte(state->m_maincpu, r);
+		state->m_maincpu->ppc4xx_spu_receive_byte(r);
 }
 
 /*****************************************************************************/
@@ -1983,7 +1983,7 @@ void firebeat_state::init_firebeat()
 
 	m_cur_cab_data = cab_data;
 
-	ppc4xx_spu_set_tx_handler(m_maincpu, security_w);
+	m_maincpu->ppc4xx_spu_set_tx_handler(security_w);
 
 	set_ibutton(rom);
 

@@ -17,7 +17,7 @@ public:
 	{
 	}
 
-	required_device<cpu_device> m_maincpu;
+	required_device<ppc4xx_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;
 
 	DECLARE_WRITE8_MEMBER ( dm7000_iic0_w );

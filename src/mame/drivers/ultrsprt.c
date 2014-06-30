@@ -25,7 +25,7 @@ public:
 	static const UINT32 VRAM_PAGES      = 2;
 	static const UINT32 VRAM_PAGE_BYTES = 512 * 1024;
 
-	required_device<cpu_device> m_maincpu;
+	required_device<ppc_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<k056800_device> m_k056800;
 	required_shared_ptr<UINT32> m_workram;
@@ -184,10 +184,10 @@ INPUT_PORTS_END
 void ultrsprt_state::machine_start()
 {
 	/* set conservative DRC options */
-	ppcdrc_set_options(m_maincpu, PPCDRC_COMPATIBLE_OPTIONS);
+	m_maincpu->ppcdrc_set_options(PPCDRC_COMPATIBLE_OPTIONS);
 
 	/* configure fast RAM regions for DRC */
-	ppcdrc_add_fastram(m_maincpu, 0xff000000, 0xff01ffff, FALSE, m_workram);
+	m_maincpu->ppcdrc_add_fastram(0xff000000, 0xff01ffff, FALSE, m_workram);
 
 	m_vram = auto_alloc_array(machine(), UINT8, VRAM_PAGE_BYTES * VRAM_PAGES);
 

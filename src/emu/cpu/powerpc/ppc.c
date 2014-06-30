@@ -109,34 +109,34 @@ static void ppc403_spu_w(UINT32 a, UINT8 d);
 #define AABIT           (op & 0x2)
 #define LKBIT           (op & 0x1)
 
-#define REG(x)          (ppc.r[x])
-#define LR              (ppc.lr)
-#define CTR             (ppc.ctr)
-#define XER             (ppc.xer)
-#define CR(x)           (ppc.cr[x])
-#define MSR             (ppc.msr)
-#define SRR0            (ppc.srr0)
-#define SRR1            (ppc.srr1)
-#define SRR2            (ppc.srr2)
-#define SRR3            (ppc.srr3)
-#define EVPR            (ppc.evpr)
-#define EXIER           (ppc.exier)
-#define EXISR           (ppc.exisr)
-#define DEC             (ppc.dec)
+#define REG(x)          (m_r[x])
+#define LR              (m_lr)
+#define CTR             (m_ctr)
+#define XER             (m_xer)
+#define CR(x)           (m_cr[x])
+#define MSR             (m_msr)
+#define SRR0            (m_srr0)
+#define SRR1            (m_srr1)
+#define SRR2            (m_srr2)
+#define SRR3            (m_srr3)
+#define EVPR            (m_evpr)
+#define EXIER           (m_exier)
+#define EXISR           (m_exisr)
+#define DEC             (m_dec)
 
 
 // Stuff added for the 6xx
-#define FPR(x)          (ppc.fpr[x])
+#define FPR(x)          (m_fpr[x])
 #define FM              ((op >> 17) & 0xFF)
 #define SPRF            (((op >> 6) & 0x3E0) | ((op >> 16) & 0x1F))
 
 
 #define CHECK_SUPERVISOR()          \
-	if((ppc.msr & 0x4000) != 0){    \
+	if((m_msr & 0x4000) != 0){    \
 	}
 
 #define CHECK_FPU_AVAILABLE()       \
-	if((ppc.msr & 0x2000) == 0){    \
+	if((m_msr & 0x2000) == 0){    \
 	}
 
 static UINT32       ppc_field_xlat[256];
@@ -154,7 +154,7 @@ static UINT32       ppc_field_xlat[256];
 
 
 #define BITMASK_0(n)    (UINT32)(((UINT64)1 << n) - 1)
-#define CRBIT(x)        ((ppc.cr[x / 4] & (1 << (3 - (x % 4)))) ? 1 : 0)
+#define CRBIT(x)        ((m_cr[x / 4] & (1 << (3 - (x % 4)))) ? 1 : 0)
 #define _BIT(n)         (1 << (n))
 #define GET_ROTATE_MASK(mb,me)      (ppc_rotate_mask[mb][me])
 #define ADD_CA(r,a,b)       ((UINT32)r < (UINT32)a)
@@ -195,163 +195,19 @@ static UINT32       ppc_field_xlat[256];
 #define BYTE_REVERSE16(x)   ((((x) >> 8) & 0xff) | (((x) << 8) & 0xff00))
 #define BYTE_REVERSE32(x)   ((((x) >> 24) & 0xff) | (((x) >> 8) & 0xff00) | (((x) << 8) & 0xff0000) | (((x) << 24) & 0xff000000))
 
-struct DMA_REGS {
-	UINT32 cr;
-	UINT32 da;
-	UINT32 sa;
-	UINT32 ct;
-	UINT32 cc;
-};
 
-struct SPU_REGS {
-	UINT8 spls;
-	UINT8 sphs;
-	UINT16 brd;
-	UINT8 spctl;
-	UINT8 sprc;
-	UINT8 sptc;
-	UINT8 sprb;
-	UINT8 sptb;
-	emu_timer *rx_timer;
-	emu_timer *tx_timer;
-};
-
-union FPR {
-	UINT64  id;
-	double  fd;
-};
-
-union FPR32 {
-	UINT32 i;
-	float f;
-};
-
-struct BATENT {
-	UINT32 u;
-	UINT32 l;
-};
-
-
-struct PPC_REGS {
-	UINT32 r[32];
-	UINT32 pc;
-	UINT32 npc;
-
-	UINT32 lr;
-	UINT32 ctr;
-	UINT32 xer;
-	UINT32 msr;
-	UINT8 cr[8];
-	UINT32 pvr;
-	UINT32 srr0;
-	UINT32 srr1;
-	UINT32 srr2;
-	UINT32 srr3;
-	UINT32 hid0;
-	UINT32 hid1;
-	UINT32 hid2;
-	UINT32 sdr1;
-	UINT32 sprg[4];
-
-	UINT32 dsisr;
-	UINT32 dar;
-	UINT32 ear;
-	UINT32 dmiss;
-	UINT32 dcmp;
-	UINT32 hash1;
-	UINT32 hash2;
-	UINT32 imiss;
-	UINT32 icmp;
-	UINT32 rpa;
-
-
-	BATENT ibat[4];
-	BATENT dbat[4];
-
-	UINT32 evpr;
-	UINT32 exier;
-	UINT32 exisr;
-	UINT32 bear;
-	UINT32 besr;
-	UINT32 iocr;
-	UINT32 br[8];
-	UINT32 iabr;
-	UINT32 esr;
-	UINT32 iccr;
-	UINT32 dccr;
-	UINT32 pit;
-	UINT32 pit_counter;
-	UINT32 pit_int_enable;
-	UINT32 tsr;
-	UINT32 dbsr;
-	UINT32 sgr;
-	UINT32 pid;
-	UINT32 pbl1, pbl2, pbu1, pbu2;
-	UINT32 fit_bit;
-	UINT32 fit_int_enable;
-	UINT32 wdt_bit;
-	UINT32 wdt_int_enable;
-	UINT32 dac1, dac2;
-	UINT32 iac1, iac2;
-
-	SPU_REGS spu;
-	DMA_REGS dma[4];
-	UINT32 dmasr;
-
-	int reserved;
-	UINT32 reserved_address;
-
-	int interrupt_pending;
-
-	UINT64 tb;          /* 56-bit timebase register */
-
-	device_irq_acknowledge_delegate irq_callback;
-	legacy_cpu_device *device;
-	address_space *program;
-
-	// STUFF added for the 6xx series
-	UINT32 dec, dec_frac;
-	UINT32 fpscr;
-
-	FPR fpr[32];
-	UINT32 sr[16];
-
-	int is603;
-	int is602;
-
-	/* PowerPC 602 specific registers */
-	UINT32 lt;
-	UINT32 sp;
-	UINT32 tcr;
-	UINT32 ibr;
-	UINT32 esasrr;
-	UINT32 sebr;
-	UINT32 ser;
-
-	/* PowerPC function pointers for memory accesses/exceptions */
-	jmp_buf exception_jmpbuf;
-	UINT8 (*read8)(address_space &space, offs_t address);
-	UINT16 (*read16)(address_space &space, offs_t address);
-	UINT32 (*read32)(address_space &space, offs_t address);
-	UINT64 (*read64)(address_space &space, offs_t address);
-	void (*write8)(address_space &space, offs_t address, UINT8 data);
-	void (*write16)(address_space &space, offs_t address, UINT16 data);
-	void (*write32)(address_space &space, offs_t address, UINT32 data);
-	void (*write64)(address_space &space, offs_t address, UINT64 data);
-	UINT16 (*read16_unaligned)(address_space &space, offs_t address);
-	UINT32 (*read32_unaligned)(address_space &space, offs_t address);
-	UINT64 (*read64_unaligned)(address_space &space, offs_t address);
-	void (*write16_unaligned)(address_space &space, offs_t address, UINT16 data);
-	void (*write32_unaligned)(address_space &space, offs_t address, UINT32 data);
-	void (*write64_unaligned)(address_space &space, offs_t address, UINT64 data);
-
-	void (* optable19[1024])(UINT32);
-	void (* optable31[1024])(UINT32);
-	void (* optable59[1024])(UINT32);
-	void (* optable63[1024])(UINT32);
-	void (* optable[64])(UINT32);
-};
-
+const device_type PPC403 = &device_creator<ppc403_device>;
+const device_type PPC405 = &device_creator<ppc405_device>;
+const device_type PPC601 = &device_creator<ppc601_device>;
+const device_type PPC602 = &device_creator<ppc602_device>;
+const device_type PPC603 = &device_creator<ppc603_device>;
+const device_type PPC603E = &device_creator<ppc603e_device>;
+const device_type PPC603R = &device_creator<ppc603r_device>;
+const device_type PPC604 = &device_creator<ppc604_device>;
+const device_type MPC8240 = &device_creator<mpc8240_device>;
+const device_type PPC403GA = &device_creator<ppc403ga_device>;
+const device_type PPC403GCX = &device_creator<ppc403gcx_device>;
+const device_type PPC405GP = &device_creator<ppc405gp_device>;
 
 
 struct PPC_OPCODE {
@@ -362,30 +218,104 @@ struct PPC_OPCODE {
 
 
 
-static int ppc_icount;
-static int ppc_tb_base_icount;
-static int ppc_dec_base_icount;
-static int ppc_dec_trigger_cycle;
-static int bus_freq_multiplier = 1;
-static PPC_REGS ppc;
 static UINT32 ppc_rotate_mask[32][32];
 
-#define ROPCODE(pc)         memory_decrypted_read_dword(ppc.program, pc)
-#define ROPCODE64(pc)       memory_decrypted_read_qword(ppc.program, DWORD_XOR_BE(pc))
+#define ROPCODE(pc)         memory_decrypted_read_dword(m_program, pc)
+#define ROPCODE64(pc)       memory_decrypted_read_qword(m_program, DWORD_XOR_BE(pc))
+
+
+ppc_device::ppc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, int address_bits, powerpc_flavor flavor, UINT32 cap, UINT32 tb_divisor)
+	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, __FILE__)
+	, m_program_config("program", ENDIANNESS_BIG, address_bits, 32)
+	, m_core(NULL)
+	, c_bus_frequency(0)
+	, m_bus_freq_multiplier(1)
+	, m_flavor(flavor)
+	, m_cap(cap)
+	, m_tb_divisor(tb_divisor)
+	, m_vtlb(NULL)
+	, m_cache(CACHE_SIZE + sizeof(internal_ppc_state))
+{
+}
+
+//ppc403_device::ppc403_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+//	: ppc_device(mconfig, PPC403, "PPC403", tag, owner, clock, "ppc403", 32)
+//{
+//}
+//
+//ppc405_device::ppc405_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+//	: ppc_device(mconfig, PPC405, "PPC405", tag, owner, clock, "ppc405", 32)
+//{
+//}
+
+ppc603_device::ppc603_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: ppc_device(mconfig, PPC603", "PowerPC 603", tag, owner, clock, "ppc603", 64, PPC_MODEL_603, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED | PPCCAP_603_MMU, 4)
+{
+}
+
+ppc603e_device::ppc603e_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: ppc_device(mconfig, PPC603E, "PowerPC 603e", tag, owner, clock, "ppc603e", 64, PPC_MODEL_603E, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED | PPCCAP_603_MMU, 4)
+{
+}
+
+ppc603r_device::ppc603r_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: ppc_device(mconfig, PPC603R, "PowerPC 603R", tag, owner, clock, "ppc603r", 64, PPC_MODEL_603R, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED | PPCCAP_603_MMU, 4)
+{
+}
+
+ppc602_device::ppc602_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: ppc_device(mconfig, PPC602, "PowerPC 602", tag, owner, clock, "ppc602", 64, PPC_MODEL_602, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED | PPCCAP_603_MMU, 4)
+{
+}
+
+mpc8240_device::mpc8240_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: ppc_device(mconfig, MPC8240, "PowerPC MPC8240", tag, owner, clock, "mpc8240", 64, PPC_MODEL_MPC8240, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED | PPCCAP_603_MMU, 4/* unknown */)
+{
+}
+
+ppc601_device::ppc601_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: ppc_device(mconfig, PPC601, "PowerPC 601", tag, owner, clock, "ppc601", 64, PPC_MODEL_601, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED | PPCCAP_MFIOC | PPCCAP_601BAT, 0/* no TB */)
+{
+}
+
+ppc604_device::ppc604_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: ppc_device(mconfig, PPC604, "PowerPC 604", tag, owner, clock, "ppc604", 64, PPC_MODEL_604, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED | PPCCAP_604_MMU, 4)
+{
+}
+
+ppc4xx_device::ppc4xx_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, powerpc_flavor flavor, UINT32 cap, UINT32 tb_divisor)
+	: ppc_device(mconfig, type, name, tag, owner, clock, shortname, 64, flavor, cap, tb_divisor) // TODO address bits, ppccom has 31 address bits??
+{
+}
+
+ppc403ga_device::ppc403ga_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: ppc4xx_device(mconfig, PPC403GA, "PowerPC 403GA", tag, owner, clock, "ppc403ga", PPC_MODEL_403GA, PPCCAP_4XX, 1)
+{
+}
+
+ppc403gcx_device::ppc403gcx_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: ppc4xx_device(mconfig, PPC403GCX, "PowerPC 403GCX", tag, owner, clock, "ppc403gcx", PPC_MODEL_403GCX, PPCCAP_4XX, 1)
+{
+}
+
+ppc405gp_device::ppc405gp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: ppc4xx_device(mconfig, PPC405GP, "PowerPC 405GP", tag, owner, clock, "ppc405gp", PPC_MODEL_405GP, PPCCAP_4XX | PPCCAP_VEA, 1)
+{
+}
 
 /*********************************************************************/
 
-INLINE int IS_PPC602(void)
+inline int ppc_device::IS_PPC602(void)
 {
-	return ppc.is602;
+	return m_is602;
 }
 
-INLINE int IS_PPC603(void)
+inline int ppc_device::IS_PPC603(void)
 {
-	return ppc.is603;
+	return m_is603;
 }
 
-INLINE int IS_PPC403(void)
+inline int ppc_device::IS_PPC403(void)
 {
 	return !IS_PPC602() && !IS_PPC603();
 }

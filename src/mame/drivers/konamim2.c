@@ -1148,11 +1148,6 @@ static INPUT_PORTS_START( m2 )
 INPUT_PORTS_END
 
 
-static const powerpc_config ppc602_config =
-{
-	33000000           /* Multiplier 2, Bus = 33MHz, Core = 66MHz */
-};
-
 INTERRUPT_GEN_MEMBER(konamim2_state::m2)
 {
 	if (m_irq_enable & 0x800000)
@@ -1172,12 +1167,12 @@ static MACHINE_CONFIG_START( m2, konamim2_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", PPC602, 66000000)   /* actually PPC602, 66MHz */
-	MCFG_CPU_CONFIG(ppc602_config)
+	MCFG_PPC_BUS_FREQUENCY(33000000)  /* Multiplier 2, Bus = 33MHz, Core = 66MHz */
 	MCFG_CPU_PROGRAM_MAP(m2_main)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", konamim2_state,  m2)
 
 	MCFG_CPU_ADD("sub", PPC602, 66000000)   /* actually PPC602, 66MHz */
-	MCFG_CPU_CONFIG(ppc602_config)
+	MCFG_PPC_BUS_FREQUENCY(33000000)  /* Multiplier 2, Bus = 33MHz, Core = 66MHz */
 	MCFG_CPU_PROGRAM_MAP(m2_main)
 
 	/* video hardware */

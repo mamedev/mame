@@ -439,7 +439,7 @@ public:
 	virtual void machine_start();
 	virtual void video_start();
 	UINT32 screen_update_triforce(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	required_device<cpu_device> m_maincpu;
+	required_device<ppc_device> m_maincpu;
 };
 
 READ64_MEMBER(triforce_state::gc_pi_r)
@@ -537,7 +537,7 @@ static void descrambler(UINT8* data, UINT32 size)
 void triforce_state::machine_start()
 {
 	/* set conservative DRC options */
-	ppcdrc_set_options(m_maincpu, PPCDRC_COMPATIBLE_OPTIONS);
+	m_maincpu->ppcdrc_set_options(PPCDRC_COMPATIBLE_OPTIONS);
 
 	UINT8 *rom = (UINT8*)memregion("maincpu")->base();
 	descrambler(&rom[0x100], 0x1afe00);
