@@ -886,6 +886,11 @@ void neogeo_state::neogeo_audio_cpu_banking_init(int set_entry)
 	UINT8 *rgn;
 	UINT32 address_mask;
 
+	rgn = memregion("audiocpu")->base();
+	if (!rgn)
+		printf("rgn not found?\n");
+
+
 	/* audio bios/cartridge selection */
 	m_bank_audio_main->configure_entry(1, memregion("audiocpu")->base());
 	if (memregion("audiobios"))
@@ -893,7 +898,7 @@ void neogeo_state::neogeo_audio_cpu_banking_init(int set_entry)
 	else /* on hardware with no SM1 ROM, the cart ROM is always enabled */
 		m_bank_audio_main->configure_entry(0, memregion("audiocpu")->base());
 	
-	if (set_entry || (m_type == NEOGEO_AES)) m_bank_audio_main->set_entry(0); // don't do this when changing slots
+	m_bank_audio_main->set_entry(m_use_cart_audio);
 
 	/* audio banking */
 	m_bank_audio_cart[0] = membank("audio_f000");
@@ -902,7 +907,7 @@ void neogeo_state::neogeo_audio_cpu_banking_init(int set_entry)
 	m_bank_audio_cart[3] = membank("audio_8000");
 
 	address_mask = (memregion("audiocpu")->bytes() - 0x10000 - 1) & 0x3ffff;
-	rgn = memregion("audiocpu")->base();
+	
 
 	for (region = 0; region < 4; region++)
 	{
@@ -956,8 +961,9 @@ WRITE8_MEMBER(neogeo_state::system_control_w)
 		case 0x05:
 			if (m_type == NEOGEO_MVS)
 			{
+				m_use_cart_audio = bit;
 				m_sprgen->neogeo_set_fixed_layer_source(bit);
-				m_bank_audio_main->set_entry(bit);
+				m_bank_audio_main->set_entry(m_use_cart_audio);
 			}
 			break;
 

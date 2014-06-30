@@ -202,6 +202,8 @@ protected:
 
 	int m_use_cart_vectors;
 
+	int m_use_cart_audio;
+
 	// cart slots
 	optional_device<neogeo_cart_slot_device> m_cartslot1;
 	optional_device<neogeo_cart_slot_device> m_cartslot2;
