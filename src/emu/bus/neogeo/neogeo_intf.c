@@ -7,7 +7,8 @@
 //-------------------------------------------------
 
 device_neogeo_cart_interface::device_neogeo_cart_interface(const machine_config &mconfig, device_t &device)
-	: device_slot_card_interface(mconfig, device),
+	: device_slot_card_interface(mconfig, device)
+	/*
 	m_rom(NULL),
 	m_fixed(NULL),
 	m_sprites(NULL),
@@ -16,6 +17,7 @@ device_neogeo_cart_interface::device_neogeo_cart_interface(const machine_config 
 	m_ym(NULL),
 	m_ymdelta(NULL),
 	m_audiocrypt(NULL)
+	*/
 {
 }
 

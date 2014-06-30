@@ -892,7 +892,8 @@ void neogeo_state::neogeo_audio_cpu_banking_init(int set_entry)
 		m_bank_audio_main->configure_entry(0, memregion("audiobios")->base());
 	else /* on hardware with no SM1 ROM, the cart ROM is always enabled */
 		m_bank_audio_main->configure_entry(0, memregion("audiocpu")->base());
-	if (set_entry) m_bank_audio_main->set_entry(0); // don't do this when changing slots
+	
+	if (set_entry || (m_type == NEOGEO_AES)) m_bank_audio_main->set_entry(0); // don't do this when changing slots
 
 	/* audio banking */
 	m_bank_audio_cart[0] = membank("audio_f000");
