@@ -887,9 +887,6 @@ void neogeo_state::neogeo_audio_cpu_banking_init(int set_entry)
 	UINT32 address_mask;
 
 	rgn = memregion("audiocpu")->base();
-	if (!rgn)
-		printf("rgn not found?\n");
-
 
 	/* audio bios/cartridge selection */
 	m_bank_audio_main->configure_entry(1, memregion("audiocpu")->base());
