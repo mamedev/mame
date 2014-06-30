@@ -176,19 +176,6 @@ enum
 //  MACROS
 //**************************************************************************
 
-// macro for declaring the configuration and device classes of a legacy CPU device
-#define DECLARE_LEGACY_CPU_DEVICE(name, basename)                                           \
-																							\
-CPU_GET_INFO( basename );                                                                   \
-																							\
-class basename##_device : public legacy_cpu_device                                          \
-{                                                                                           \
-public:                                                                                     \
-	basename##_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, UINT32 clock); \
-};                                                                                          \
-																							\
-extern const device_type name;
-
 // macro for defining the implementation needed for configuration and device classes
 #define DEFINE_LEGACY_CPU_DEVICE(name, basename)                                            \
 																							\
