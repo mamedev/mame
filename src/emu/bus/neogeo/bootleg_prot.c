@@ -190,6 +190,7 @@ READ16_MEMBER( ngbootleg_prot_device::kof10th_RAMB_r )
 
 READ16_MEMBER(ngbootleg_prot_device::kof10th_RAM2_r)
 {
+//	printf("kof10th_RAM2_r\n");
 	return m_cartridge_ram2[offset];
 }
 
@@ -228,6 +229,8 @@ void ngbootleg_prot_device::install_kof10th_protection (cpu_device* maincpu, neo
 	maincpu->space(AS_PROGRAM).install_read_handler(0x2fe000, 0x2fffff, read16_delegate(FUNC(ngbootleg_prot_device::kof10th_RAMB_r),this));
 	maincpu->space(AS_PROGRAM).install_write_handler(0x200000, 0x23ffff, write16_delegate(FUNC(ngbootleg_prot_device::kof10th_custom_w),this));
 	maincpu->space(AS_PROGRAM).install_write_handler(0x240000, 0x2fffff, write16_delegate(FUNC(ngbootleg_prot_device::kof10th_bankswitch_w),this));
+	memcpy(m_cartridge_ram2, cpurom + 0xe0000, 0x20000);
+
 }
 
 void ngbootleg_prot_device::decrypt_kof10th(UINT8* cpurom, UINT32 cpurom_size)
@@ -251,6 +254,7 @@ void ngbootleg_prot_device::decrypt_kof10th(UINT8* cpurom, UINT32 cpurom_size)
 	((UINT16*)src)[0x8bf4/2] = 0x4ef9; // Run code to change "S" data
 	((UINT16*)src)[0x8bf6/2] = 0x000d;
 	((UINT16*)src)[0x8bf8/2] = 0xf980;
+
 }
 
 
