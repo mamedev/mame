@@ -8,38 +8,23 @@
 	Laser DD 20
     Dick Smith Electronics X-7304
 
-    TODO: Broken currently, fix & modernize
-
 ***************************************************************************/
 
 #include "floppy.h"
 #include "formats/vtech1_dsk.h"
-
-
-//**************************************************************************
-//  CONSTANTS / MACROS
-//**************************************************************************
-
-#define VERBOSE	1
-
-#define PHI0(n) (((n) >> 0) & 1)
-#define PHI1(n) (((n) >> 1) & 1)
-#define PHI2(n) (((n) >> 2) & 1)
-#define PHI3(n) (((n) >> 3) & 1)
-
-
-//**************************************************************************
-//  FUNCTION PROTOTYPES
-//**************************************************************************
-
-static void laser_load_proc(device_image_interface &image);
-
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
 const device_type FLOPPY_CONTROLLER = &device_creator<floppy_controller_device>;
+
+DEVICE_ADDRESS_MAP_START(map, 8, floppy_controller_device)
+	AM_RANGE(0, 0) AM_WRITE(latch_w)
+	AM_RANGE(1, 1) AM_READ(shifter_r)
+	AM_RANGE(2, 2) AM_READ(rd_r)
+	AM_RANGE(3, 3) AM_READ(wpt_r)
+ADDRESS_MAP_END
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region
@@ -60,23 +45,24 @@ const rom_entry *floppy_controller_device::device_rom_region() const
 //  machine configurations
 //-------------------------------------------------
 
-static const floppy_interface laser_floppy_interface =
-{
-	FLOPPY_STANDARD_5_25_DSHD,
-	LEGACY_FLOPPY_OPTIONS_NAME(vtech1_only),
-	NULL
-};
+FLOPPY_FORMATS_MEMBER( floppy_controller_device::floppy_formats )
+	FLOPPY_MFI_FORMAT
+FLOPPY_FORMATS_END
+
+static SLOT_INTERFACE_START( laser_floppies )
+	SLOT_INTERFACE( "525", FLOPPY_525_SSSD )
+SLOT_INTERFACE_END
 
 static MACHINE_CONFIG_FRAGMENT( floppy_controller )
 	MCFG_MEMEXP_SLOT_ADD("mem")
-	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(laser_floppy_interface)
+	MCFG_FLOPPY_DRIVE_ADD("0", laser_floppies, "525", floppy_controller_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("1", laser_floppies, "525", floppy_controller_device::floppy_formats)
 MACHINE_CONFIG_END
 
 machine_config_constructor floppy_controller_device::device_mconfig_additions() const
 {
 	return MACHINE_CONFIG_NAME( floppy_controller );
 }
-
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -90,8 +76,8 @@ floppy_controller_device::floppy_controller_device(const machine_config &mconfig
 	device_t(mconfig, FLOPPY_CONTROLLER, "Laser/VZ Floppy Disk Controller", tag, owner, clock, "laserfdc", __FILE__),
 	device_memexp_interface(mconfig, *this),
 	m_memexp(*this, "mem"),
-	m_floppy0(*this, "floppy0"),
-	m_floppy1(*this, "floppy1")
+	m_floppy0(*this, "0"),
+	m_floppy1(*this, "1")
 {
 }
 
@@ -101,21 +87,23 @@ floppy_controller_device::floppy_controller_device(const machine_config &mconfig
 
 void floppy_controller_device::device_start()
 {
-	m_drive = -1;
-	m_fdc_track_x2[0] = 80;
-	m_fdc_track_x2[1] = 80;
-	m_fdc_wrprot[0] = 0x80;
-	m_fdc_wrprot[1] = 0x80;
-	m_fdc_status = 0;
-	m_fdc_edge = 0;
-	m_fdc_bits = 8;
-	m_fdc_start = 0;
-	m_fdc_write = 0;
-	m_fdc_offs = 0;
-	m_fdc_latch = 0;
+	save_item(NAME(m_latch));
+	save_item(NAME(m_shifter));
+	save_item(NAME(m_latching_inverter));
+	save_item(NAME(m_current_cyl));
+	save_item(NAME(m_last_latching_inverter_update_time));
+	save_item(NAME(m_write_start_time));
+	save_item(NAME(m_write_position));
 
-	m_floppy0->floppy_install_load_proc(laser_load_proc);
-	m_floppy1->floppy_install_load_proc(laser_load_proc);
+	// TODO: save m_write_buffer and rebuild m_floppy after load
+
+	UINT8 *bios = memregion("software")->base();
+
+	// Obvious bugs... must have worked by sheer luck and very subtle
+	// timings.  Our current z80 is not subtle enough.
+
+	bios[0x1678] = 0x75;
+	bios[0x1688] = 0x85;
 }
 
 //-------------------------------------------------
@@ -129,8 +117,17 @@ void floppy_controller_device::device_reset()
 
 	m_slot->m_program->install_rom(0x4000, 0x5fff, memregion("software")->base());
 
-	m_slot->m_io->install_read_handler(0x10, 0x1f, read8_delegate(FUNC(floppy_controller_device::floppy_r), this));
-	m_slot->m_io->install_write_handler(0x10, 0x1f, write8_delegate(FUNC(floppy_controller_device::floppy_w), this));
+	m_slot->m_io->install_device(0x10, 0x1f, *this, &floppy_controller_device::map);
+
+	m_latch = 0x00;
+	m_floppy = NULL;
+	m_current_cyl = 0;
+	m_shifter = 0x00;
+	m_latching_inverter = false;
+	m_last_latching_inverter_update_time = machine().time();
+	m_write_start_time = attotime::never;
+	m_write_position = 0;
+	memset(m_write_buffer, 0, sizeof(m_write_buffer));
 }
 
 
@@ -138,219 +135,169 @@ void floppy_controller_device::device_reset()
 //  IMPLEMENTATION
 //**************************************************************************
 
-int floppy_controller_device::get_floppy_id(device_image_interface *image)
+// latch at +0 is linked to:
+//  bits 0-3: track step motor phases
+//  bit  5:   write data (flux reversal on every level change)
+//  bit  6:   !write request
+//  bits 4,7: floppy select
+
+WRITE8_MEMBER(floppy_controller_device::latch_w)
 {
-	if (image == dynamic_cast<device_image_interface *>(m_floppy0.target()))
-		return 0;
-	if (image == dynamic_cast<device_image_interface *>(m_floppy1.target()))
-		return 1;
+	UINT8 diff = m_latch ^ data;
+	m_latch = data;
 
-	return -1;
-}
+	floppy_image_device *newflop = NULL;
+	if(m_latch & 0x10)
+		newflop = m_floppy0->get_device();
+	else if(m_latch & 0x80)
+		newflop = m_floppy1->get_device();
 
-device_image_interface *floppy_controller_device::get_floppy_device(int drive)
-{
-	device_image_interface *image = NULL;
-
-	switch (drive)
-	{
-	case 0:
-		image = dynamic_cast<device_image_interface *>(m_floppy0.target());
-		break;
-
-	case 1:
-		image = dynamic_cast<device_image_interface *>(m_floppy1.target());
-		break;
+	if(newflop != m_floppy) {
+		update_latching_inverter();
+		flush_writes();
+		if(m_floppy) {
+			m_floppy->mon_w(1);
+			m_floppy->setup_index_pulse_cb(floppy_image_device::index_pulse_cb());
+		}
+		if(newflop) {
+			newflop->set_rpm(85);
+			newflop->mon_w(0);
+			newflop->setup_index_pulse_cb(floppy_image_device::index_pulse_cb(FUNC(floppy_controller_device::index_callback), this));
+			m_current_cyl = newflop->get_cyl() << 1;
+		}
+		m_floppy = newflop;
 	}
 
-	return image;
-}
-
-static void laser_load_proc(device_image_interface &image)
-{
-	floppy_controller_device *fdc = dynamic_cast<floppy_controller_device *>(image.device().owner());
-
-	int id = fdc->get_floppy_id(&image);
-
-	if (!image.is_readonly())
-		fdc->m_fdc_wrprot[id] = 0x00;
-	else
-		fdc->m_fdc_wrprot[id] = 0x80;
-}
-
-void floppy_controller_device::get_track()
-{
-	device_image_interface *image = get_floppy_device(m_drive);
-
-	/* drive selected or and image file ok? */
-	if (m_drive >= 0 && image->exists())
-	{
-		int size, offs;
-		size = TRKSIZE_VZ;
-		offs = TRKSIZE_VZ * m_fdc_track_x2[m_drive]/2;
-		image->fseek(offs, SEEK_SET);
-			// some disks have slightly larger header, make sure we capture the checksum at the end of the track
-		size = image->fread(m_fdc_data, size+4);
-		if (VERBOSE)
-			logerror("get track @$%05x $%04x bytes\n", offs, size);
-	}
-	m_fdc_offs = 0;
-	m_fdc_write = 0;
-}
-
-void floppy_controller_device::put_track()
-{
-	/* drive selected and image file ok? */
-	if (m_drive >= 0 && floppy_get_device(machine(),m_drive) != NULL)
-	{
-		int size, offs;
-		device_image_interface *image = get_floppy_device(m_drive);
-		offs = TRKSIZE_VZ * m_fdc_track_x2[m_drive]/2;
-		image->fseek(offs + m_fdc_start, SEEK_SET);
-		size = image->fwrite(&m_fdc_data[m_fdc_start], m_fdc_write);
-		if (VERBOSE)
-			logerror("put track @$%05X+$%X $%04X/$%04X bytes\n", offs, m_fdc_start, size, m_fdc_write);
-	}
-}
-
-READ8_MEMBER( floppy_controller_device::floppy_r )
-{
-	int data = 0xff;
-
-	switch (offset)
-	{
-	case 1: /* data (read-only) */
-		if (m_fdc_bits > 0)
-		{
-			if( m_fdc_status & 0x80 )
-				m_fdc_bits--;
-			data = (m_data >> m_fdc_bits) & 0xff;
-			if (VERBOSE) {
-				logerror("vtech1_fdc_r bits %d%d%d%d%d%d%d%d\n",
-					(data>>7)&1,(data>>6)&1,(data>>5)&1,(data>>4)&1,
-					(data>>3)&1,(data>>2)&1,(data>>1)&1,(data>>0)&1 );
+	if(m_floppy) {
+		int cph = m_current_cyl & 3;
+		int pcyl = m_current_cyl;
+		if(!(m_latch & (1 << cph))) {
+			if(m_current_cyl < 84*2 && (m_latch & (1 << ((cph+1) & 3))))
+				m_current_cyl++;
+			if(m_current_cyl && (m_latch & (1 << ((cph+3) & 3))))
+				m_current_cyl--;
+			if(m_current_cyl != pcyl && !(m_current_cyl & 1)) {
+				m_floppy->dir_w(m_current_cyl < pcyl);
+				m_floppy->stp_w(true);
+				m_floppy->stp_w(false);
+				m_floppy->stp_w(true);
 			}
 		}
-		if (m_fdc_bits == 0)
-		{
-			m_data = m_fdc_data[m_fdc_offs];
-			if (VERBOSE)
-				logerror("vtech1_fdc_r %d : data ($%04X) $%02X\n", offset, m_fdc_offs, m_data);
-			if(m_fdc_status & 0x80)
-			{
-				m_fdc_bits = 8;
-				m_fdc_offs = (m_fdc_offs + 1) % TRKSIZE_FM;
-			}
-			m_fdc_status &= ~0x80;
-		}
-		break;
-	case 2: /* polling (read-only) */
-		/* fake */
-		if (m_drive >= 0)
-			m_fdc_status |= 0x80;
-		data = m_fdc_status;
-		break;
-	case 3: /* write protect status (read-only) */
-		if (m_drive >= 0)
-			data = m_fdc_wrprot[m_drive];
-		if (VERBOSE)
-			logerror("vtech1_fdc_r %d : write_protect $%02X\n", offset, data);
-		break;
 	}
-	return data;
+
+	if(diff & 0x40) {
+		if(!(m_latch & 0x40)) {
+			m_write_start_time = machine().time();
+			m_write_position = 0;
+			if(m_floppy)
+				m_floppy->set_write_splice(m_write_start_time);
+
+		} else {
+			update_latching_inverter();
+			flush_writes();
+			m_write_start_time = attotime::never;
+		}
+	}
+	if(!(m_latch & 0x40) && (diff & 0x20)) {
+		if(m_write_position == ARRAY_LENGTH(m_write_buffer)) {
+			update_latching_inverter();
+			flush_writes(true);
+		}
+		m_write_buffer[m_write_position++] = machine().time();
+	}
 }
 
-WRITE8_MEMBER( floppy_controller_device::floppy_w )
+
+// The read data line is connected to a flip/flop with inverted input
+// connected to the input.  That means it inverts its value on every
+// floppy flux reversal.  We'll call it a latching inverter.
+//
+// The latching inverter is connected to a 8-bits shift register.  On
+// reading the shifter address we get:
+// - the inverted inverter output is shifted through the lsb of the shift register
+// - the inverter is cleared
+
+READ8_MEMBER(floppy_controller_device::shifter_r)
 {
-	int drive;
+	update_latching_inverter();
+	m_shifter = (m_shifter << 1) | !m_latching_inverter;
+	m_latching_inverter = false;
+	return m_shifter;
+}
 
-	switch (offset)
-	{
-	case 0: /* latch (write-only) */
-		drive = (data & 0x10) ? 0 : (data & 0x80) ? 1 : -1;
-		if (drive != m_drive)
-		{
-			m_drive = drive;
-			if (m_drive >= 0)
-				get_track();
-		}
-		if (m_drive >= 0)
-		{
-			if ((PHI0(data) && !(PHI1(data) || PHI2(data) || PHI3(data)) && PHI1(m_fdc_latch)) ||
-				(PHI1(data) && !(PHI0(data) || PHI2(data) || PHI3(data)) && PHI2(m_fdc_latch)) ||
-				(PHI2(data) && !(PHI0(data) || PHI1(data) || PHI3(data)) && PHI3(m_fdc_latch)) ||
-				(PHI3(data) && !(PHI0(data) || PHI1(data) || PHI2(data)) && PHI0(m_fdc_latch)))
-			{
-				if (m_fdc_track_x2[m_drive] > 0)
-					m_fdc_track_x2[m_drive]--;
-				if (VERBOSE)
-					logerror("vtech1_fdc_w(%d) $%02X drive %d: stepout track #%2d.%d\n", offset, data, m_drive, m_fdc_track_x2[m_drive]/2,5*(m_fdc_track_x2[m_drive]&1));
-				if ((m_fdc_track_x2[m_drive] & 1) == 0)
-					get_track();
-			}
-			else
-			if ((PHI0(data) && !(PHI1(data) || PHI2(data) || PHI3(data)) && PHI3(m_fdc_latch)) ||
-				(PHI1(data) && !(PHI0(data) || PHI2(data) || PHI3(data)) && PHI0(m_fdc_latch)) ||
-				(PHI2(data) && !(PHI0(data) || PHI1(data) || PHI3(data)) && PHI1(m_fdc_latch)) ||
-				(PHI3(data) && !(PHI0(data) || PHI1(data) || PHI2(data)) && PHI2(m_fdc_latch)))
-			{
-				if (m_fdc_track_x2[m_drive] < 2*40)
-					m_fdc_track_x2[m_drive]++;
-				if (VERBOSE)
-					logerror("vtech1_fdc_w(%d) $%02X drive %d: stepin track #%2d.%d\n", offset, data, m_drive, m_fdc_track_x2[m_drive]/2,5*(m_fdc_track_x2[m_drive]&1));
-				if ((m_fdc_track_x2[m_drive] & 1) == 0)
-					get_track();
-			}
-			if ((data & 0x40) == 0)
-			{
-				m_data <<= 1;
-				if ((m_fdc_latch ^ data) & 0x20)
-					m_data |= 1;
-				if ((m_fdc_edge ^= 1) == 0)
-				{
-					m_fdc_bits--;
 
-					if (m_fdc_bits == 0)
-					{
-						UINT8 value = 0;
-						m_data &= 0xffff;
-						if (m_data & 0x4000 ) value |= 0x80;
-						if (m_data & 0x1000 ) value |= 0x40;
-						if (m_data & 0x0400 ) value |= 0x20;
-						if (m_data & 0x0100 ) value |= 0x10;
-						if (m_data & 0x0040 ) value |= 0x08;
-						if (m_data & 0x0010 ) value |= 0x04;
-						if (m_data & 0x0004 ) value |= 0x02;
-						if (m_data & 0x0001 ) value |= 0x01;
-						if (VERBOSE)
-							logerror("vtech1_fdc_w(%d) data($%04X) $%02X <- $%02X ($%04X)\n", offset, m_fdc_offs, m_fdc_data[m_fdc_offs], value, m_data);
-						m_fdc_data[m_fdc_offs] = value;
-						m_fdc_offs = (m_fdc_offs + 1) % TRKSIZE_FM;
-						m_fdc_write++;
-						m_fdc_bits = 8;
-					}
-				}
-			}
-			/* change of write signal? */
-			if ((m_fdc_latch ^ data) & 0x40)
-			{
-				/* falling edge? */
-				if (m_fdc_latch & 0x40)
-				{
-					m_fdc_start = m_fdc_offs;
-					m_fdc_edge = 0;
-				}
-				else
-				{
-					/* data written to track before? */
-					if (m_fdc_write)
-						put_track();
-				}
-				m_fdc_bits = 8;
-				m_fdc_write = 0;
-			}
-		}
-		m_fdc_latch = data;
-		break;
+// Linked to the latching inverter on bit 7, rest is floating
+READ8_MEMBER(floppy_controller_device::rd_r)
+{
+	update_latching_inverter();
+	return m_latching_inverter ? 0x80 : 0x00;
+}
+
+
+// Linked to wp signal on bit 7, rest is floating
+READ8_MEMBER(floppy_controller_device::wpt_r)
+{
+	return m_floppy && m_floppy->wpt_r() ? 0x80 : 0x00;
+}
+
+void floppy_controller_device::update_latching_inverter()
+{
+	attotime now = machine().time();
+	if(!m_floppy) {
+		m_last_latching_inverter_update_time = now;
+		return;
 	}
+
+	attotime when = m_last_latching_inverter_update_time;
+	for(;;) {
+		when = m_floppy->get_next_transition(when);
+		if(when == attotime::never || when > now)
+			break;
+		m_latching_inverter = !m_latching_inverter;
+	}
+	m_last_latching_inverter_update_time = now;
+}
+
+void floppy_controller_device::index_callback(floppy_image_device *floppy, int state)
+{
+	update_latching_inverter();
+	flush_writes(true);
+}
+
+void floppy_controller_device::flush_writes(bool keep_margin)
+{
+	if(!m_floppy || m_write_start_time == attotime::never)
+		return;
+
+	// Beware of time travel.  Index pulse callback (which flushes)
+	// can be called with a machine().time() inferior to the last
+	// m_write_buffer value if the calling cpu instructions are not
+	// suspendable.
+
+	attotime limit = machine().time();
+	int kept_pos = m_write_position;
+	int kept_count = 0;
+	while(kept_pos > 0 && m_write_buffer[kept_pos-1] >= limit) {
+		kept_pos--;
+		kept_count++;
+	}
+
+	if(keep_margin) {
+		attotime last = kept_pos ? m_write_buffer[kept_pos-1] : m_write_start_time;
+		attotime delta = limit-last;
+		delta = delta / 2;
+		limit = limit - delta;
+	}
+	m_write_position -= kept_count;
+	if(m_write_position && m_write_buffer[0] == m_write_start_time) {
+		if(m_write_position)
+			memmove(m_write_buffer, m_write_buffer+1, sizeof(m_write_buffer[0])*(m_write_position-1));
+		m_write_position--;
+	}
+	m_floppy->write_flux(m_write_start_time, limit, m_write_position, m_write_buffer);
+	m_write_start_time = limit;
+
+	if(kept_count != 0)
+		memmove(m_write_buffer, m_write_buffer+kept_pos, kept_count*sizeof(m_write_buffer[0]));
+	m_write_position = kept_count;
 }

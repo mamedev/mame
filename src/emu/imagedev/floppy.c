@@ -236,6 +236,7 @@ void floppy_image_device::set_rpm(float _rpm)
 
 	rpm = _rpm;
 	rev_time = attotime::from_double(60/rpm);
+	floppy_ratio_1 = int(1000*rpm/300+0.5);
 }
 
 void floppy_image_device::setup_write(floppy_image_format_t *_output_format)
@@ -450,7 +451,7 @@ attotime floppy_image_device::time_next_index()
 {
 	if(revolution_start_time.is_never())
 		return attotime::never;
-	return revolution_start_time + attotime::from_double(60/rpm);
+	return revolution_start_time + rev_time;
 }
 
 /* index pulses at rpm/60 Hz, and stays high for ~2ms at 300rpm */
@@ -471,12 +472,12 @@ void floppy_image_device::index_resync()
 		revolution_start_time += rev_time;
 		revolution_count++;
 	}
-	int position = (delta*(rpm/300)).as_ticks(1000000000);
+	int position = (delta*floppy_ratio_1).as_ticks(1000000000/1000);
 
-	int new_idx = position <= 20000;
+	int new_idx = position < 20000;
 
 	if(new_idx) {
-		attotime index_up_time = attotime::from_nsec(2000000*300.0/rpm+0.5);
+		attotime index_up_time = attotime::from_nsec((2000000*1000)/floppy_ratio_1);
 		index_timer->adjust(index_up_time - delta);
 	} else
 		index_timer->adjust(rev_time - delta);
@@ -570,7 +571,7 @@ UINT32 floppy_image_device::find_position(attotime &base, attotime when)
 		base -= rev_time;
 	}
 
-	return (delta*rpm/300.0).as_ticks(1000000000);
+	return (delta*floppy_ratio_1 + attotime::from_nsec(500)).as_ticks(1000000000/1000);
 }
 
 attotime floppy_image_device::get_next_transition(attotime from_when)
@@ -599,12 +600,13 @@ attotime floppy_image_device::get_next_transition(attotime from_when)
 	else
 		next_position = 200000000 + (buf[1] & floppy_image::TIME_MASK);
 
-	//  logerror("Floppy: cuspos=%d nextpos=%d\n", position, next_position);
-	return base + attotime::from_nsec(UINT64(next_position)*300./rpm);
+	return base + attotime::from_nsec((UINT64(next_position)*2000/floppy_ratio_1+1)/2);
 }
 
 void floppy_image_device::write_flux(attotime start, attotime end, int transition_count, const attotime *transitions)
 {
+	if(!image || mon)
+		return;
 	image_dirty = true;
 
 	attotime base;

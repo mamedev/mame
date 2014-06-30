@@ -160,6 +160,7 @@ protected:
 
 	/* rotation per minute => gives index pulse frequency */
 	float rpm;
+	int floppy_ratio_1; // rpm/300*1000
 
 	attotime revolution_start_time, rev_time;
 	UINT32 revolution_count;

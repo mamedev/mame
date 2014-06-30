@@ -17,7 +17,7 @@
 
 #include "emu.h"
 #include "memexp.h"
-#include "imagedev/flopdrv.h"
+#include "imagedev/floppy.h"
 
 
 //**************************************************************************
@@ -32,12 +32,14 @@ public:
 	// construction/destruction
 	floppy_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	DECLARE_READ8_MEMBER( floppy_r );
-	DECLARE_WRITE8_MEMBER( floppy_w );
+	DECLARE_ADDRESS_MAP(map, 8);
 
-	// accessed from loadproc
-	int get_floppy_id(device_image_interface *image);
-	UINT8 m_fdc_wrprot[2];
+	DECLARE_WRITE8_MEMBER(latch_w);
+	DECLARE_READ8_MEMBER(shifter_r);
+	DECLARE_READ8_MEMBER(rd_r);
+	DECLARE_READ8_MEMBER(wpt_r);
+
+	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
 protected:
 	virtual const rom_entry *device_rom_region() const;
@@ -45,29 +47,20 @@ protected:
 	virtual void device_start();
 	virtual void device_reset();
 
-private:
-	static const int TRKSIZE_VZ = 0x9a0;	// arbitrary (actually from analyzing format)
-	static const int TRKSIZE_FM = 3172;		// size of a standard FM mode track
-
-	device_image_interface *get_floppy_device(int drive);
-	void put_track();
-	void get_track();
-
 	required_device<memexp_slot_device> m_memexp;
-	required_device<legacy_floppy_image_device> m_floppy0;
-	required_device<legacy_floppy_image_device> m_floppy1;
+	required_device<floppy_connector> m_floppy0, m_floppy1;
+	floppy_image_device *m_floppy;
 
-	int m_drive;
-	UINT8 m_fdc_track_x2[2];
-	UINT8 m_fdc_status;
-	UINT8 m_fdc_data[TRKSIZE_FM];
-	int m_data;
-	int m_fdc_edge;
-	int m_fdc_bits;
-	int m_fdc_start;
-	int m_fdc_write;
-	int m_fdc_offs;
-	int m_fdc_latch;
+	UINT8 m_latch, m_shifter;
+	bool m_latching_inverter;
+	int m_current_cyl;
+	attotime m_last_latching_inverter_update_time;
+	attotime m_write_start_time, m_write_buffer[32];
+	int m_write_position;
+
+	void index_callback(floppy_image_device *floppy, int state);
+	void update_latching_inverter();
+	void flush_writes(bool keep_margin = false);
 };
 
 // device type definition
