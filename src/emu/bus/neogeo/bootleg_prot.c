@@ -15,6 +15,8 @@ ngbootleg_prot_device::ngbootleg_prot_device(const machine_config &mconfig, cons
 
 void ngbootleg_prot_device::device_start()
 {
+	memset(m_cartridge_ram, 0x00, 0x2000);
+
 	save_item(NAME(m_cartridge_ram));
 }
 
