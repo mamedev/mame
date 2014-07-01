@@ -499,7 +499,6 @@ void device_scheduler::timeslice()
 					// if the new local CPU time is less than our target, move the target up, but not before the base
 					if (exec->m_localtime < target)
 					{
-						assert(exec->m_localtime < target);
 						target = max(exec->m_localtime, m_basetime);
 						LOG(("         (new target)\n"));
 					}
