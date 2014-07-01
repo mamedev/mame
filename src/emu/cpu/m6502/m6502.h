@@ -61,7 +61,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( irq_line );
 	DECLARE_WRITE_LINE_MEMBER( nmi_line );
 
-	UINT64 get_cycle();
 	bool get_sync() const { return sync; }
 	void disable_direct() { direct_disabled = true; }
 
@@ -201,7 +200,6 @@ protected:
 	int icount;
 	bool nmi_state, irq_state, apu_irq_state, v_state;
 	bool irq_taken, sync, direct_disabled, inhibit_interrupts;
-	UINT64 end_cycles;
 
 	static const disasm_entry disasm_entries[0x100];
 
