@@ -8483,7 +8483,7 @@
 			<dataarea name="ymsnd" size="0x500000">
 				<rom name="316.v1" offset="0x000000" size="0x200000" crc="15c7f9e6" sha1="c51328a92dc7c612fd6c2f3841caee4fbd120f36" />
 				<rom name="316.v2" offset="0x200000" size="0x200000" crc="1b264559" sha1="50c28858304e51cdc60f425483a1d1d2bbfb2f8d" />
-				<rom name="316.v3" offset="0x200000" size="0x100000" crc="84b62c5d" sha1="30d7f2e16c6d602cebce5e9b4b8a5b2bde20af58" />
+				<rom name="316.v3" offset="0x400000" size="0x100000" crc="84b62c5d" sha1="30d7f2e16c6d602cebce5e9b4b8a5b2bde20af58" />
 			</dataarea>
 			<dataarea name="sprites" size="0x400000">
 				<rom loadflag="load16_byte" name="316.c1" offset="0x000000" size="0x200000" crc="cdd6600f" sha1="85649c199b32db7553012cb5a058a92bbbb7355a" />
