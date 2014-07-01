@@ -517,110 +517,42 @@ void fm7_state::fm77av_line_draw()
 	int x2 = m_alu.x1;
 	int y1 = m_alu.y0;
 	int y2 = m_alu.y1;
-	int horiz,vert;
-	int dirx,diry;
-	int rep;
+
+	int dx = abs(x2 - x1);
+	int dy = abs(y2 - y1);
+	int stepx, stepy;
+	int err,err2;
 	int byte_count = 0;
-	UINT16 old_addr = 0xffff;
-	UINT16 addr;
 
-	m_alu.busy = 1;
-
-	horiz = x2 - x1;
-	vert = y2 - y1;
-
-	if(horiz < 0)
-	{
-		dirx = -1;
-		horiz = -horiz;
-	}
+	if(x1 < x2)
+		stepx = 1;
 	else
-		dirx = 1;
-	if(vert < 0)
-	{
-		diry = -1;
-		vert = -vert;
-	}
+		stepx = -1;
+	if(y1 < y2)
+		stepy = 1;
 	else
-		diry = 1;
+		stepy = -1;
 
-	if(horiz == 0 && vert == 0)
+	err = dx - dy;
+
+	for(;;)
 	{
 		fm7_line_set_pixel(x1, y1);
-		byte_count = 1;
-	}
-	else if(horiz == 0)
-	{
-		for(;;)
+		byte_count++;
+
+		if(x1 == x2 && y1 == y2)
+			break;
+
+		err2 = 2*err;
+		if(err2 > -dy)
 		{
-			addr = fm7_line_set_pixel(x1, y1);
-			if(addr != old_addr)
-			{
-				byte_count++;
-				old_addr = addr;
-			}
-			if(y1 == y2)
-				break;
-			y1 += diry;
+			err -= dy;
+			x1 += stepx;
 		}
-	}
-	else if(vert == 0)
-	{
-		for(;;)
+		if(err2 < dx)
 		{
-			addr = fm7_line_set_pixel(x1, y1);
-			if(addr != old_addr)
-			{
-				byte_count++;
-				old_addr = addr;
-			}
-			if(x1 == x2)
-				break;
-			x1 += dirx;
-		}
-	}
-	else if(horiz >= vert)
-	{
-		rep = horiz >> 1;
-		for(;;)
-		{
-			addr = fm7_line_set_pixel(x1, y1);
-			if(addr != old_addr)
-			{
-				byte_count++;
-				old_addr = addr;
-			}
-			if(x1 == x2)
-				break;
-			x1 += dirx;
-			rep -= vert;
-			if(rep < 0)
-			{
-				rep += horiz;
-				y1 += diry;
-			}
-		}
-	}
-	else
-	{
-		rep = vert >> 1;
-		for(;;)
-		{
-			addr = fm7_line_set_pixel(x1, y1);
-			if(addr != old_addr)
-			{
-				byte_count++;
-				old_addr = addr;
-			}
-			if(y1 == y2)
-				break;
-			y1 += diry;
-			rep -= horiz;
-			if(rep < 0)
-			{
-				rep += vert;
-				x1 += dirx;
-			}
+			err += dx;
+			y1 += stepy;
 		}
 	}
 
