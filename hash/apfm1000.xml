@@ -162,7 +162,7 @@ $9C00 to $9FFF 1k empty space (39936 to 40959)
 				<rom name="apf1013a.bin" size="4096" crc="f25215a0" sha1="72da492092b883eb31cffb41ea353e919c86d285" offset="0" />
 				<rom name="apf1013b.bin" size="2048" crc="8c3a9faa" sha1="b3cfc23c65558ef7b67c9afa01a306c8123e227f" offset="0x1000" />
 			</dataarea>
-            <dataarea name="ram" size="1024">
+			<dataarea name="ram" size="1024">
 			</dataarea>
 		</part>
 	</software>

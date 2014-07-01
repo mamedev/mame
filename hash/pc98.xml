@@ -3325,7 +3325,7 @@ TODO:
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="csijapn1.fdi" size="1265664" crc="3f3baa31" sha1="35c455b54a4bd5e1e8f88a9ee8f630c6098d55c1" offset="0" />
-		</dataarea>
+			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
@@ -4179,7 +4179,7 @@ TODO:
 			<dataarea name="flop" size="1265664">
 				<rom name="dark gaiden_1.fdi" size="1265664" crc="14a00525" sha1="928d4969fdd9caf950f5931e734407a2c8b09f7e" offset="0" />
 			</dataarea>
-	</part>
+		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="dark gaiden_2.fdi" size="1265664" crc="a4a7ca7f" sha1="0b8c56f14b4cdfe5f2c4c983804faa64a8940e25" offset="0" />
