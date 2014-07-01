@@ -79,18 +79,7 @@ bool neogeo_cart_slot_device::call_load()
 			// create memory regions
 			len = get_software_region_length("maincpu");
 			m_cart->rom_alloc(len);	ROM = m_cart->get_rom_base();
-
-#ifdef LSB_FIRST
-			// software list ROM loading currently does not fix up endianness for us, so we need to do it by hand
-			UINT16 *src = (UINT16 *)get_software_region("maincpu");
-			UINT16 *dst = (UINT16 *)ROM;
-			for (int i = 0; i < len / 2; i++)
-			{
-				dst[i] = FLIPENDIAN_INT16(src[i]);
-			}
-#else
 			memcpy(ROM, get_software_region("maincpu"), len);
-#endif
 
 			len = get_software_region_length("fixed");
 			m_cart->fixed_alloc(len);	ROM8 = m_cart->get_fixed_base();

@@ -1112,12 +1112,42 @@ void softlist_parser::parse_part_start(const char *tagname, const char **attribu
 	// <dataarea name='' size=''>
 	if (strcmp(tagname, "dataarea") == 0)
 	{
-		static const char *attrnames[] = { "name", "size" };
+		static const char *attrnames[] = { "name", "size", "width", "endianness" };
 		const char *attrvalues[ARRAY_LENGTH(attrnames)] = { 0 };
 		parse_attributes(attributes, ARRAY_LENGTH(attrnames), attrnames, attrvalues);
 
 		if (attrvalues[0] != NULL && attrvalues[1] != NULL && strcmp(attrvalues[0], "") != 0 && strcmp(attrvalues[1], "") != 0)
-			add_rom_entry(attrvalues[0], NULL, 0, strtol(attrvalues[1], NULL, 0), ROMENTRYTYPE_REGION);
+		{
+			// handle region attributes
+			const char *width = attrvalues[2];
+			const char *endianness = attrvalues[3];
+			UINT32 regionflags = ROMENTRYTYPE_REGION;
+
+			if (width != NULL)
+			{
+				if (strcmp(width, "8") == 0)
+					regionflags |= ROMREGION_8BIT;
+				else if (strcmp(width, "16") == 0)
+					regionflags |= ROMREGION_16BIT;
+				else if (strcmp(width, "32") == 0)
+					regionflags |= ROMREGION_32BIT;
+				else if (strcmp(width, "64") == 0)
+					regionflags |= ROMREGION_64BIT;
+				else
+					parse_error("Invalid dataarea width");
+			}
+			if (endianness != NULL)
+			{
+				if (strcmp(endianness, "little") == 0)
+					regionflags |= ROMREGION_LE;
+				else if (strcmp(endianness, "big") == 0)
+					regionflags |= ROMREGION_BE;
+				else
+					parse_error("Invalid dataarea endianness");
+			}
+			
+			add_rom_entry(attrvalues[0], NULL, 0, strtol(attrvalues[1], NULL, 0), regionflags);
+		}
 		else
 			parse_error("Incomplete dataarea definition");
 	}
