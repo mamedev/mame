@@ -70,10 +70,14 @@ void a2bus_dx1_device::device_start()
 {
 	// set_a2bus_device makes m_slot valid
 	set_a2bus_device();
+
+	save_item(NAME(m_volume));
+	save_item(NAME(m_lastdac));
 }
 
 void a2bus_dx1_device::device_reset()
 {
+	m_volume = m_lastdac = 0;
 }
 
 UINT8 a2bus_dx1_device::read_c0nx(address_space &space, UINT8 offset)
@@ -98,10 +102,13 @@ void a2bus_dx1_device::write_c0nx(address_space &space, UINT8 offset, UINT8 data
 	switch (offset)
 	{
 		case 5:	// volume
+			m_volume = data;
+			m_dac->write_unsigned16(data*m_lastdac);
 			break;
 
 		case 6:
-			m_dac->write_unsigned8(data);
+			m_lastdac = data;
+			m_dac->write_unsigned16(data*m_volume);
 			break;
 	}
 }

@@ -41,6 +41,9 @@ protected:
 	virtual UINT8 read_c0nx(address_space &space, UINT8 offset);
 	virtual void write_c0nx(address_space &space, UINT8 offset, UINT8 data);
 	virtual bool take_c800();
+
+private:
+	UINT8 m_volume, m_lastdac;
 };
 
 // device type definition
