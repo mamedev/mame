@@ -1143,7 +1143,7 @@ bool i8086_common_cpu_device::common_op(UINT8 op)
 //
 // 		Instructions are used in the boot sector for some versions of 
 //		MS-DOS  (e.g. the DEC Rainbow-100 version of DOS 2.x)
-//		case 0x60:
+		case 0x60:
 		case 0x70: // i_jo
 			JMP( OF);
 			break;

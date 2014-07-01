@@ -8,13 +8,17 @@
     ---------------------
     Driver is based entirely on the DEC-100 'B' variant (DEC-190 and DEC-100 A models are treated as clones).
     While this is OK for the compatible -190, it doesn't do justice to ancient '100 A' hardware.
+RBCONVERT.ZIP has details on how model 'A' differs from version B.
 
-    Currently, there are several issues here:
+Issues with this driver:
     (1) Keyboard emulation incomplete (inhibits the system from booting with ERROR 50).
-    (2) after fixing (1), IRQ logic for 100-B should be verified (text in RBCONVERT.ZIP has details concerning -A versus -B.
+
+(2) IRQ / DMA / arbitration logic should be verified 
 	DMA (needed for 'Extended communication option') or Z80-8088 arbitration is non-existent (E11/E13 dumps anyone?).
-	(3) Read errors when booting CP/M 2.x or DOS 2.x (secondary boot; read errors beyond T >= 2).
-	Seek (+ verify) and a number of signals (TRACK > 43 TG43, INDEX etc.) do not work (diag.disk aborts drive test). 
+
+(3) Read errors when booting CPM 2 / DOS 2.x / DOS 3 (secondary boot loader finds errors on tracks >= 2). 
+Seek (+ verify) and a number of signals (TRACK > 43 TG43, INDEX etc.) appear to be incorrect (-> diag.disk aborts drive test).
+UCSD systems (fort_sys, pas_sys) and diag disks boot!
 
     - NOT WORKING: serial (ERROR 60).
     - NOT WORKING: printer interface (ERROR 40). Like error 60 not mission-critical.
@@ -378,7 +382,7 @@ FLOPPY_FORMATS_MEMBER( rainbow_state::floppy_formats )
 FLOPPY_FORMATS_END
 
 static SLOT_INTERFACE_START( rainbow_floppies ) 
-	SLOT_INTERFACE( "525qd", FLOPPY_525_SSQD )   // "525ssdd"
+	SLOT_INTERFACE("525qd", FLOPPY_525_SSQD)  
 SLOT_INTERFACE_END
 
 
@@ -414,7 +418,8 @@ void rainbow_state::machine_start()
 	rom[0xf4000 + 0x363b]= 0xeb;  // COND => JMPS
 
     if (rom[0xf4174] == 0x75)
-    {   rom[0xf4174] = 0xeb; // jmps  RAINBOW100_LOGO__loc_33D
+	{
+		rom[0xf4174] = 0xeb; // jmps  RAINBOW100_LOGO__loc_33D
         rom[0xf4175] = 0x08;
     }
 
@@ -559,7 +564,7 @@ static INPUT_PORTS_START( rainbow100b_in )
 #endif
 		PORT_START("MONITOR TYPE")
 		PORT_DIPNAME( 0x03, 0x03, "MONOCHROME MONITOR")
-		PORT_DIPSETTING(    0x01, "PAPER WHITE" )
+PORT_DIPSETTING(0x01, "WHITE")
 		PORT_DIPSETTING(    0x02, "GREEN" )
 		PORT_DIPSETTING(    0x03, "AMBER" )
 
@@ -640,7 +645,8 @@ void rainbow_state::machine_reset()
 	/* configure RAM */
 	address_space &program = m_maincpu->space(AS_PROGRAM);
     if (m_inp8->read() < END_OF_RAM)
-	{	program.unmap_readwrite(m_inp8->read(), END_OF_RAM);
+	{
+		program.unmap_readwrite(m_inp8->read(), END_OF_RAM);
 	}
 
 	// BIOS can't handle soft resets (=> triggers ERROR 16).
@@ -695,9 +701,6 @@ void rainbow_state::machine_reset()
 
 UINT32 rainbow_state::screen_update_rainbow(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	if (MOTOR_DISABLE_counter)
-		return 0;
-
 	m_crtc->palette_select( m_inp9->read() );
 
 	if ( m_SCREEN_BLANK )
@@ -1046,7 +1049,8 @@ WRITE8_MEMBER(rainbow_state::z80_diskcontrol_w)
 
 	floppy_connector *con = machine().device<floppy_connector>(names[drive]);
 	if (con)
-	{   m_floppy = con->get_device(); 
+	{
+		m_floppy = con->get_device();
 			if (m_floppy)
 			{  
 				selected_drive = drive; 
@@ -1073,7 +1077,8 @@ WRITE8_MEMBER(rainbow_state::z80_diskcontrol_w)
 				MOTOR_DISABLE_counter = 4800; // 2400 = 500 ms 
 
 //			m_fdc->set_force_ready(force_ready); 
-	} 	else
+	}
+	else
 	{
 //		    m_fdc->set_force_ready(false); 
 	} 
@@ -1090,8 +1095,10 @@ WRITE8_MEMBER(rainbow_state::z80_diskcontrol_w)
 		data = data & (255 -3);  
 		data = data | 8;  // MOTOR 0 OFF
 		data = data | 16; // MOTOR 1 OFF
-	}else
-	{	data = ( data & (255 -3) ) | m_unit;
+	}
+	else
+	{
+		data = (data & (255 - 3)) | m_unit;
 
  		if(m_unit < 2)
 			data = data & (255 - 8); // MOTOR 0 (for A or B)
@@ -1110,14 +1117,14 @@ READ8_MEMBER( rainbow_state::read_video_ram_r )
 INTERRUPT_GEN_MEMBER(rainbow_state::vblank_irq)
 {
 	raise_8088_irq(IRQ_8088_VBL);
+	m_crtc->notify_vblank(true);
 }
 
 WRITE_LINE_MEMBER( rainbow_state::clear_video_interrupt )
 {
 	lower_8088_irq(IRQ_8088_VBL);
+	m_crtc->notify_vblank(false);
 }
-
-
 
 READ8_MEMBER( rainbow_state::diagnostic_r ) // 8088 (port 0A READ). Fig.4-29 + table 4-15
 {
@@ -1346,7 +1353,7 @@ ROM_START( rainbow100a )
 	ROM_LOAD( "chargen.bin", 0x0000, 0x1000, CRC(1685e452) SHA1(bc299ff1cb74afcededf1a7beb9001188fdcf02f))
 ROM_END
 
-// ROM definition for 100-B (system module 70-1994-02, PSU H7842-D)
+// ROM definition for 100-B (system module 70-19974-02, PSU H7842-D)
 // Built until ~ May 1986 (see MP-01491-00)
 // - 32 K ROM (version 5.03)
 // - 128 K base and 896 K max. mem.

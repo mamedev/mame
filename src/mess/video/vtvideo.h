@@ -57,7 +57,7 @@ protected:
 
 	// dc012 attributes
 	UINT8 m_scroll_latch;
-	UINT8 m_scroll_latch_valid;
+	bool m_scroll_latch_valid;
 	UINT8 m_blink_flip_flop;
 	UINT8 m_reverse_field;
 	UINT8 m_basic_attribute;
@@ -71,6 +71,9 @@ protected:
 
 	const char *m_char_rom_tag; /* character rom region */
 	required_device<palette_device> m_palette;
+	
+	bool m_notify_vblank;
+	int m_last_scroll;
 };
 
 
@@ -84,6 +87,7 @@ public:
 
 	int MHFU(int);
 	void palette_select(int choice);
+	void notify_vblank(bool choice);
 protected:
 	virtual void display_char(bitmap_ind16 &bitmap, UINT8 code, int x, int y, UINT8 scroll_region, UINT8 display_type);
 	virtual void device_reset();

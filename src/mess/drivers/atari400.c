@@ -1745,10 +1745,10 @@ void a400_state::a800_setbank(int cart_mounted)
 				m_8000->set_base(m_region_lslot->base());
 				m_maincpu->space(AS_PROGRAM).unmap_write(0x8000, 0x9fff);
 
-				memcpy(m_region_maincpu->base() + 0x10000, m_region_lslot->base() + 0x2000, 0x2000);
+				memcpy(m_region_maincpu->base() + 0xa000, m_region_lslot->base() + 0x2000, 0x2000);
 			}
 			else if (m_a800_cart_type == A800_8K)
-				memcpy(m_region_maincpu->base() + 0x10000, m_region_lslot->base(), 0x2000);
+				memcpy(m_region_maincpu->base() + 0xa000, m_region_lslot->base(), 0x2000);
 			else
 				fatalerror("This type of cart is not supported yet in this driver. Please use a400 or a800.\n");
 		}
