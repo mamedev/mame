@@ -1056,7 +1056,7 @@ DRIVER_INIT_MEMBER(neogeo_state,neogeo)
 
 void neogeo_state::neogeo_postload()
 {
-	m_banked_cart->_set_main_cpu_bank_address();
+	m_bank_audio_main->set_entry(m_use_cart_audio);
 
 	if (m_type == NEOGEO_MVS) set_outputs();
 }
@@ -1104,6 +1104,9 @@ void neogeo_state::machine_start()
 	save_item(NAME(m_el_value));
 	save_item(NAME(m_led1_value));
 	save_item(NAME(m_led2_value));
+
+	save_item(NAME(m_use_cart_vectors));
+	save_item(NAME(m_use_cart_audio));
 
 	machine().save().register_postload(save_prepost_delegate(FUNC(neogeo_state::neogeo_postload), this));
 

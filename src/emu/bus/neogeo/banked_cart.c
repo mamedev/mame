@@ -14,10 +14,15 @@ neogeo_banked_cart_device::neogeo_banked_cart_device(const machine_config &mconf
 {
 }
 
+void neogeo_banked_cart_device::postload()
+{
+	_set_main_cpu_bank_address();
+}
 
 void neogeo_banked_cart_device::device_start()
 {
 	save_item(NAME(m_main_cpu_bank_address));
+	machine().save().register_postload(save_prepost_delegate(FUNC(neogeo_banked_cart_device::postload), this));
 }
 
 void neogeo_banked_cart_device::device_reset()

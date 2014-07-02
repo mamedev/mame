@@ -201,7 +201,6 @@ protected:
 
 
 	int m_use_cart_vectors;
-
 	int m_use_cart_audio;
 
 	// cart slots
