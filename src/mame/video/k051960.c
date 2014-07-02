@@ -110,7 +110,7 @@ GFXDECODE_MEMBER( k051960_device::gfxinfo_reverse )
 GFXDECODE_END
 
 GFXDECODE_MEMBER( k051960_device::gfxinfo_gradius3 )
-	GFXDECODE_DEVICE_RAM(DEVICE_SELF, 0, spritelayout_gradius3, 0, 1)
+	GFXDECODE_DEVICE(DEVICE_SELF, 0, spritelayout_gradius3, 0, 1)
 GFXDECODE_END
 
 
