@@ -959,7 +959,7 @@
 		<part name="cart" interface="neo_cart">
 			<!-- AES VERSION -->
 			<dataarea name="maincpu" width="16" endianness="big" size="0x100000">
-				<rom loadflag="load16_word_swap" name="016-hp1.p1" offset="0x080000" size="0x080000" crc="b774621e" sha1="7684b2e07163aec68cd083ef1d8900f855f6cb42" />
+				<rom loadflag="load16_word_swap" name="016-hp1.p1" offset="0x000000" size="0x080000" crc="b774621e" sha1="7684b2e07163aec68cd083ef1d8900f855f6cb42" />
 				<!-- TC534200 -->
 				<rom loadflag="load16_word_swap" name="016-p2.p2" offset="0x080000" size="0x020000" crc="12afdc2b" sha1="3a95f5910cbb9f17e63ddece995c6e120fa2f622" />
 				<!-- TC531024 -->
@@ -7478,7 +7478,7 @@
  NEO-MVS PROG 4096 / NEO-MVS CHA 42G-2
 ***************************************-->
 
-	<software name="puzzldpr">
+	<software name="puzzldpr" cloneof="puzzledp">
 		<description>Puzzle De Pon! R!</description>
 		<year>1997</year>
 		<publisher>Taito (Visco license)</publisher>
