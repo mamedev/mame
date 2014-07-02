@@ -59,7 +59,7 @@ static const translation_info gcc_translate[] =
 	{ 0,        "-O0",                      "/Od" },
 	{ 0,        "-O1",                      "/O2" },
 	{ 0,        "-O2",                      "/O2" },
-	{ 0,        "-O3",                      "/O2" },
+	{ 0,        "-O3",                      "/Ox" },
 	{ 0,        "-Os",                      "/O1" },
 	{ 0,        "-g*",                      "/Zi" },
 	{ VS2005,   "-fno-strict-aliasing",     "" },       // deprecated in VS2005
