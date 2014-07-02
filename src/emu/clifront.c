@@ -274,9 +274,9 @@ int cli_frontend::execute(int argc, char **argv)
 		osd_printf_error("Caught unhandled emulator exception\n");
 		m_result = MAMERR_FATALERROR;
 	}
-	catch (std::bad_alloc &)
+	catch (std::exception &ex)
 	{
-		osd_printf_error("Out of memory!\n");
+		osd_printf_error("Caught unhandled %s exception: %s\n", typeid(ex).name(), ex.what());
 		m_result = MAMERR_FATALERROR;
 	}
 	catch (...)
