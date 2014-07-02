@@ -606,6 +606,7 @@ static MACHINE_CONFIG_START( vic10, vic10_state )
 	// basic hardware
 	MCFG_CPU_ADD(M6510_TAG, M6510, XTAL_8MHz/8)
 	MCFG_CPU_PROGRAM_MAP(vic10_mem)
+	MCFG_M6502_DISABLE_DIRECT() // address decoding is 100% dynamic, no RAM/ROM banks
 	MCFG_M6510_PORT_CALLBACKS(READ8(vic10_state, cpu_r), WRITE8(vic10_state, cpu_w))
 	MCFG_M6510_PORT_PULLS(0x10, 0x20)
 	MCFG_QUANTUM_PERFECT_CPU(M6510_TAG)

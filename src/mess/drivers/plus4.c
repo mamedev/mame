@@ -738,6 +738,7 @@ static MACHINE_CONFIG_START( plus4, plus4_state )
 	// basic machine hardware
 	MCFG_CPU_ADD(MOS7501_TAG, M7501, 0)
 	MCFG_CPU_PROGRAM_MAP(plus4_mem)
+	MCFG_M6502_DISABLE_DIRECT() // address decoding is 100% dynamic, no RAM/ROM banks
 	MCFG_M7501_PORT_CALLBACKS(READ8(plus4_state, cpu_r), WRITE8(plus4_state, cpu_w))
 	MCFG_M7501_PORT_PULLS(0x00, 0xc0)
 	MCFG_QUANTUM_PERFECT_CPU(MOS7501_TAG)

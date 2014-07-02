@@ -720,6 +720,7 @@ static MACHINE_CONFIG_DERIVED( ntsc, vic20 )
 	// basic machine hardware
 	MCFG_CPU_ADD(M6502_TAG, M6502, MOS6560_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(vic20_mem)
+	MCFG_M6502_DISABLE_DIRECT() // address decoding is 100% dynamic, no RAM/ROM banks
 
 	// video/sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -749,6 +750,7 @@ static MACHINE_CONFIG_DERIVED( pal, vic20 )
 	// basic machine hardware
 	MCFG_CPU_ADD(M6502_TAG, M6502, MOS6561_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(vic20_mem)
+	MCFG_M6502_DISABLE_DIRECT() // address decoding is 100% dynamic, no RAM/ROM banks
 
 	// video/sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")

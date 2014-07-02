@@ -1996,6 +1996,7 @@ static MACHINE_CONFIG_START( p500_ntsc, p500_state )
 
 	// basic hardware
 	MCFG_CPU_ADD(M6509_TAG, M6509, XTAL_14_31818MHz/14)
+	MCFG_M6502_DISABLE_DIRECT() // address decoding is 100% dynamic, no RAM/ROM banks
 	MCFG_CPU_PROGRAM_MAP(p500_mem)
 	MCFG_QUANTUM_PERFECT_CPU(M6509_TAG)
 
@@ -2111,6 +2112,7 @@ static MACHINE_CONFIG_START( p500_pal, p500_state )
 
 	// basic hardware
 	MCFG_CPU_ADD(M6509_TAG, M6509, XTAL_17_734472MHz/18)
+	MCFG_M6502_DISABLE_DIRECT() // address decoding is 100% dynamic, no RAM/ROM banks
 	MCFG_CPU_PROGRAM_MAP(p500_mem)
 	MCFG_QUANTUM_PERFECT_CPU(M6509_TAG)
 
@@ -2223,6 +2225,7 @@ static MACHINE_CONFIG_START( cbm2lp_ntsc, cbm2_state )
 
 	// basic hardware
 	MCFG_CPU_ADD(M6509_TAG, M6509, XTAL_18MHz/9)
+	MCFG_M6502_DISABLE_DIRECT() // address decoding is 100% dynamic, no RAM/ROM banks
 	MCFG_CPU_PROGRAM_MAP(cbm2_mem)
 	MCFG_QUANTUM_PERFECT_CPU(M6509_TAG)
 

@@ -1408,6 +1408,7 @@ static MACHINE_CONFIG_START( pet, pet_state )
 	// basic machine hardware
 	MCFG_CPU_ADD(M6502_TAG, M6502, XTAL_8MHz/8)
 	MCFG_CPU_PROGRAM_MAP(pet2001_mem)
+	MCFG_M6502_DISABLE_DIRECT() // address decoding is 100% dynamic, no RAM/ROM banks
 
 	// video hardware
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
@@ -1834,6 +1835,7 @@ static MACHINE_CONFIG_START( pet80, pet80_state )
 	// basic machine hardware
 	MCFG_CPU_ADD(M6502_TAG, M6502, XTAL_16MHz/16)
 	MCFG_CPU_PROGRAM_MAP(pet2001_mem)
+	MCFG_M6502_DISABLE_DIRECT() // address decoding is 100% dynamic, no RAM/ROM banks
 
 	// video hardware
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
