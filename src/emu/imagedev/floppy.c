@@ -557,7 +557,7 @@ int floppy_image_device::find_index(UINT32 position, const UINT32 *buf, int buf_
 	}
 }
 
-UINT32 floppy_image_device::find_position(attotime &base, attotime when)
+UINT32 floppy_image_device::find_position(attotime &base, const attotime &when)
 {
 	base = revolution_start_time;
 	attotime delta = when - base;
@@ -574,7 +574,7 @@ UINT32 floppy_image_device::find_position(attotime &base, attotime when)
 	return (delta*floppy_ratio_1 + attotime::from_nsec(500)).as_ticks(1000000000/1000);
 }
 
-attotime floppy_image_device::get_next_transition(attotime from_when)
+attotime floppy_image_device::get_next_transition(const attotime &from_when)
 {
 	if(!image || mon)
 		return attotime::never;
@@ -603,7 +603,7 @@ attotime floppy_image_device::get_next_transition(attotime from_when)
 	return base + attotime::from_nsec((UINT64(next_position)*2000/floppy_ratio_1+1)/2);
 }
 
-void floppy_image_device::write_flux(attotime start, attotime end, int transition_count, const attotime *transitions)
+void floppy_image_device::write_flux(const attotime &start, const attotime &end, int transition_count, const attotime *transitions)
 {
 	if(!image || mon)
 		return;
@@ -762,7 +762,7 @@ void floppy_image_device::write_zone(UINT32 *buf, int &cells, int &index, UINT32
 	}
 }
 
-void floppy_image_device::set_write_splice(attotime when)
+void floppy_image_device::set_write_splice(const attotime &when)
 {
 	image_dirty = true;
 	attotime base;

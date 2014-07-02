@@ -166,19 +166,19 @@ void c64h156_device::rollback()
 	get_next_edge(cur_live.tm);
 }
 
-void c64h156_device::start_writing(attotime tm)
+void c64h156_device::start_writing(const attotime &tm)
 {
 	cur_live.write_start_time = tm;
 	cur_live.write_position = 0;
 }
 
-void c64h156_device::stop_writing(attotime tm)
+void c64h156_device::stop_writing(const attotime &tm)
 {
 	commit(tm);
 	cur_live.write_start_time = attotime::never;
 }
 
-bool c64h156_device::write_next_bit(bool bit, attotime limit)
+bool c64h156_device::write_next_bit(bool bit, const attotime &limit)
 {
 	if(cur_live.write_start_time.is_never()) {
 		cur_live.write_start_time = cur_live.tm;
@@ -197,7 +197,7 @@ bool c64h156_device::write_next_bit(bool bit, attotime limit)
 	return false;
 }
 
-void c64h156_device::commit(attotime tm)
+void c64h156_device::commit(const attotime &tm)
 {
 	if(cur_live.write_start_time.is_never() || tm == cur_live.write_start_time || !cur_live.write_position)
 		return;
@@ -261,7 +261,7 @@ void c64h156_device::live_abort()
 	cur_live.byte = 1;
 }
 
-void c64h156_device::live_run(attotime limit)
+void c64h156_device::live_run(const attotime &limit)
 {
 	if(cur_live.state == IDLE || cur_live.next_state != -1)
 		return;
@@ -378,12 +378,12 @@ void c64h156_device::live_run(attotime limit)
 	}
 }
 
-void c64h156_device::get_next_edge(attotime when)
+void c64h156_device::get_next_edge(const attotime &when)
 {
 	cur_live.edge = m_floppy->get_next_transition(when);
 }
 
-int c64h156_device::get_next_bit(attotime &tm, attotime limit)
+int c64h156_device::get_next_bit(attotime &tm, const attotime &limit)
 {
 	attotime next = tm + m_period;
 

@@ -208,19 +208,19 @@ void c2040_fdc_t::rollback()
 	get_next_edge(cur_live.tm);
 }
 
-void c2040_fdc_t::start_writing(attotime tm)
+void c2040_fdc_t::start_writing(const attotime &tm)
 {
 	cur_live.write_start_time = tm;
 	cur_live.write_position = 0;
 }
 
-void c2040_fdc_t::stop_writing(attotime tm)
+void c2040_fdc_t::stop_writing(const attotime &tm)
 {
 	commit(tm);
 	cur_live.write_start_time = attotime::never;
 }
 
-bool c2040_fdc_t::write_next_bit(bool bit, attotime limit)
+bool c2040_fdc_t::write_next_bit(bool bit, const attotime &limit)
 {
 	if(cur_live.write_start_time.is_never()) {
 		cur_live.write_start_time = cur_live.tm;
@@ -239,7 +239,7 @@ bool c2040_fdc_t::write_next_bit(bool bit, attotime limit)
 	return false;
 }
 
-void c2040_fdc_t::commit(attotime tm)
+void c2040_fdc_t::commit(const attotime &tm)
 {
 	if(cur_live.write_start_time.is_never() || tm == cur_live.write_start_time || !cur_live.write_position)
 		return;
@@ -305,7 +305,7 @@ void c2040_fdc_t::live_abort()
 	cur_live.error = 1;
 }
 
-void c2040_fdc_t::live_run(attotime limit)
+void c2040_fdc_t::live_run(const attotime &limit)
 {
 	if(cur_live.state == IDLE || cur_live.next_state != -1)
 		return;
@@ -438,14 +438,14 @@ void c2040_fdc_t::live_run(attotime limit)
 	}
 }
 
-void c2040_fdc_t::get_next_edge(attotime when)
+void c2040_fdc_t::get_next_edge(const attotime &when)
 {
 	floppy_image_device *floppy = get_floppy();
 
 	cur_live.edge = floppy ? floppy->get_next_transition(when) : attotime::never;
 }
 
-int c2040_fdc_t::get_next_bit(attotime &tm, attotime limit)
+int c2040_fdc_t::get_next_bit(attotime &tm, const attotime &limit)
 {
 	attotime next = tm + m_period;
 

@@ -188,7 +188,7 @@ void wd_fdc_t::dden_w(bool _dden)
 	}
 }
 
-astring wd_fdc_t::tts(attotime t)
+astring wd_fdc_t::tts(const attotime &t)
 {
 	char buf[256];
 	int nsec = t.attoseconds / ATTOSECONDS_PER_NANOSECOND;
@@ -1394,7 +1394,7 @@ void wd_fdc_t::live_abort()
 	cur_live.next_state = -1;
 }
 
-bool wd_fdc_t::read_one_bit(attotime limit)
+bool wd_fdc_t::read_one_bit(const attotime &limit)
 {
 	int bit = pll_get_next_bit(cur_live.tm, floppy, limit);
 	if(bit < 0)
@@ -1412,7 +1412,7 @@ bool wd_fdc_t::read_one_bit(attotime limit)
 	return false;
 }
 
-bool wd_fdc_t::write_one_bit(attotime limit)
+bool wd_fdc_t::write_one_bit(const attotime &limit)
 {
 	bool bit = cur_live.shift_reg & 0x8000;
 	if(pll_write_next_bit(bit, cur_live.tm, floppy, limit))
@@ -2092,23 +2092,23 @@ wd_fdc_analog_t::wd_fdc_analog_t(const machine_config &mconfig, device_type type
 	clock_ratio = 1;
 }
 
-void wd_fdc_analog_t::pll_reset(bool fm, attotime when)
+void wd_fdc_analog_t::pll_reset(bool fm, const attotime &when)
 {
 	cur_pll.reset(when);
 	cur_pll.set_clock(clocks_to_attotime(fm ? 4 : 2));
 }
 
-void wd_fdc_analog_t::pll_start_writing(attotime tm)
+void wd_fdc_analog_t::pll_start_writing(const attotime &tm)
 {
 	cur_pll.start_writing(tm);
 }
 
-void wd_fdc_analog_t::pll_commit(floppy_image_device *floppy, attotime tm)
+void wd_fdc_analog_t::pll_commit(floppy_image_device *floppy, const attotime &tm)
 {
 	cur_pll.commit(floppy, tm);
 }
 
-void wd_fdc_analog_t::pll_stop_writing(floppy_image_device *floppy, attotime tm)
+void wd_fdc_analog_t::pll_stop_writing(floppy_image_device *floppy, const attotime &tm)
 {
 	cur_pll.stop_writing(floppy, tm);
 }
@@ -2123,12 +2123,12 @@ void wd_fdc_analog_t::pll_retrieve_checkpoint()
 	cur_pll = checkpoint_pll;
 }
 
-int wd_fdc_analog_t::pll_get_next_bit(attotime &tm, floppy_image_device *floppy, attotime limit)
+int wd_fdc_analog_t::pll_get_next_bit(attotime &tm, floppy_image_device *floppy, const attotime &limit)
 {
 	return cur_pll.get_next_bit(tm, floppy, limit);
 }
 
-bool wd_fdc_analog_t::pll_write_next_bit(bool bit, attotime &tm, floppy_image_device *floppy, attotime limit)
+bool wd_fdc_analog_t::pll_write_next_bit(bool bit, attotime &tm, floppy_image_device *floppy, const attotime &limit)
 {
 	return cur_pll.write_next_bit(bit, tm, floppy, limit);
 }
@@ -2141,33 +2141,33 @@ wd_fdc_digital_t::wd_fdc_digital_t(const machine_config &mconfig, device_type ty
 
 const int wd_fdc_digital_t::wd_digital_step_times[4] = { 12000, 24000, 40000, 60000 };
 
-void wd_fdc_digital_t::pll_reset(bool fm, attotime when)
+void wd_fdc_digital_t::pll_reset(bool fm, const attotime &when)
 {
 	cur_pll.reset(when);
 	cur_pll.set_clock(clocks_to_attotime(fm ? 2 : 1)); // HACK
 }
 
-void wd_fdc_digital_t::pll_start_writing(attotime tm)
+void wd_fdc_digital_t::pll_start_writing(const attotime &tm)
 {
 	cur_pll.start_writing(tm);
 }
 
-void wd_fdc_digital_t::pll_commit(floppy_image_device *floppy, attotime tm)
+void wd_fdc_digital_t::pll_commit(floppy_image_device *floppy, const attotime &tm)
 {
 	cur_pll.commit(floppy, tm);
 }
 
-void wd_fdc_digital_t::pll_stop_writing(floppy_image_device *floppy, attotime tm)
+void wd_fdc_digital_t::pll_stop_writing(floppy_image_device *floppy, const attotime &tm)
 {
 	cur_pll.stop_writing(floppy, tm);
 }
 
-int wd_fdc_digital_t::pll_get_next_bit(attotime &tm, floppy_image_device *floppy, attotime limit)
+int wd_fdc_digital_t::pll_get_next_bit(attotime &tm, floppy_image_device *floppy, const attotime &limit)
 {
 	return cur_pll.get_next_bit(tm, floppy, limit);
 }
 
-bool wd_fdc_digital_t::pll_write_next_bit(bool bit, attotime &tm, floppy_image_device *floppy, attotime limit)
+bool wd_fdc_digital_t::pll_write_next_bit(bool bit, attotime &tm, floppy_image_device *floppy, const attotime &limit)
 {
 	return cur_pll.write_next_bit(bit, tm, floppy, limit);
 }
@@ -2182,13 +2182,13 @@ void wd_fdc_digital_t::pll_retrieve_checkpoint()
 	cur_pll = checkpoint_pll;
 }
 
-void wd_fdc_digital_t::digital_pll_t::set_clock(attotime period)
+void wd_fdc_digital_t::digital_pll_t::set_clock(const attotime &period)
 {
 	for(int i=0; i<42; i++)
 		delays[i] = period*(i+1);
 }
 
-void wd_fdc_digital_t::digital_pll_t::reset(attotime when)
+void wd_fdc_digital_t::digital_pll_t::reset(const attotime &when)
 {
 	counter = 0;
 	increment = 128;
@@ -2204,7 +2204,7 @@ void wd_fdc_digital_t::digital_pll_t::reset(attotime when)
 	write_start_time = attotime::never;
 }
 
-int wd_fdc_digital_t::digital_pll_t::get_next_bit(attotime &tm, floppy_image_device *floppy, attotime limit)
+int wd_fdc_digital_t::digital_pll_t::get_next_bit(attotime &tm, floppy_image_device *floppy, const attotime &limit)
 {
 	attotime when = floppy ? floppy->get_next_transition(ctime) : attotime::never;
 
@@ -2284,19 +2284,19 @@ int wd_fdc_digital_t::digital_pll_t::get_next_bit(attotime &tm, floppy_image_dev
 	return bit;
 }
 
-void wd_fdc_digital_t::digital_pll_t::start_writing(attotime tm)
+void wd_fdc_digital_t::digital_pll_t::start_writing(const attotime &tm)
 {
 	write_start_time = tm;
 	write_position = 0;
 }
 
-void wd_fdc_digital_t::digital_pll_t::stop_writing(floppy_image_device *floppy, attotime tm)
+void wd_fdc_digital_t::digital_pll_t::stop_writing(floppy_image_device *floppy, const attotime &tm)
 {
 	commit(floppy, tm);
 	write_start_time = attotime::never;
 }
 
-bool wd_fdc_digital_t::digital_pll_t::write_next_bit(bool bit, attotime &tm, floppy_image_device *floppy, attotime limit)
+bool wd_fdc_digital_t::digital_pll_t::write_next_bit(bool bit, attotime &tm, floppy_image_device *floppy, const attotime &limit)
 {
 	if(write_start_time.is_never()) {
 		write_start_time = ctime;
@@ -2326,7 +2326,7 @@ bool wd_fdc_digital_t::digital_pll_t::write_next_bit(bool bit, attotime &tm, flo
 	return false;
 }
 
-void wd_fdc_digital_t::digital_pll_t::commit(floppy_image_device *floppy, attotime tm)
+void wd_fdc_digital_t::digital_pll_t::commit(floppy_image_device *floppy, const attotime &tm)
 {
 	if(write_start_time.is_never() || tm == write_start_time)
 		return;

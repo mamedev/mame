@@ -195,12 +195,12 @@ protected:
 	virtual int calc_sector_size(UINT8 size, UINT8 command) const;
 	virtual int settle_time() const;
 
-	virtual void pll_reset(bool fm, attotime when) = 0;
-	virtual void pll_start_writing(attotime tm) = 0;
-	virtual void pll_commit(floppy_image_device *floppy, attotime tm) = 0;
-	virtual void pll_stop_writing(floppy_image_device *floppy, attotime tm) = 0;
-	virtual int pll_get_next_bit(attotime &tm, floppy_image_device *floppy, attotime limit) = 0;
-	virtual bool pll_write_next_bit(bool bit, attotime &tm, floppy_image_device *floppy, attotime limit) = 0;
+	virtual void pll_reset(bool fm, const attotime &when) = 0;
+	virtual void pll_start_writing(const attotime &tm) = 0;
+	virtual void pll_commit(floppy_image_device *floppy, const attotime &tm) = 0;
+	virtual void pll_stop_writing(floppy_image_device *floppy, const attotime &tm) = 0;
+	virtual int pll_get_next_bit(attotime &tm, floppy_image_device *floppy, const attotime &limit) = 0;
+	virtual bool pll_write_next_bit(bool bit, attotime &tm, floppy_image_device *floppy, const attotime &limit) = 0;
 	virtual void pll_save_checkpoint() = 0;
 	virtual void pll_retrieve_checkpoint() = 0;
 
@@ -370,7 +370,7 @@ private:
 	int format_last_byte_count;
 	astring format_description_string;
 
-	static astring tts(attotime t);
+	static astring tts(const attotime &t);
 	astring ttsn();
 
 	void delay_cycles(emu_timer *tm, int cycles);
@@ -419,8 +419,8 @@ private:
 	void live_delay(int state);
 	void live_sync();
 	void live_run(attotime limit = attotime::never);
-	bool read_one_bit(attotime limit);
-	bool write_one_bit(attotime limit);
+	bool read_one_bit(const attotime &limit);
+	bool write_one_bit(const attotime &limit);
 
 	void live_write_raw(UINT16 raw);
 	void live_write_mfm(UINT8 mfm);
@@ -435,12 +435,12 @@ public:
 	wd_fdc_analog_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 protected:
-	virtual void pll_reset(bool fm, attotime when);
-	virtual void pll_start_writing(attotime tm);
-	virtual void pll_commit(floppy_image_device *floppy, attotime tm);
-	virtual void pll_stop_writing(floppy_image_device *floppy, attotime tm);
-	virtual int pll_get_next_bit(attotime &tm, floppy_image_device *floppy, attotime limit);
-	virtual bool pll_write_next_bit(bool bit, attotime &tm, floppy_image_device *floppy, attotime limit);
+	virtual void pll_reset(bool fm, const attotime &when);
+	virtual void pll_start_writing(const attotime &tm);
+	virtual void pll_commit(floppy_image_device *floppy, const attotime &tm);
+	virtual void pll_stop_writing(floppy_image_device *floppy, const attotime &tm);
+	virtual int pll_get_next_bit(attotime &tm, floppy_image_device *floppy, const attotime &limit);
+	virtual bool pll_write_next_bit(bool bit, attotime &tm, floppy_image_device *floppy, const attotime &limit);
 	virtual void pll_save_checkpoint();
 	virtual void pll_retrieve_checkpoint();
 
@@ -455,12 +455,12 @@ public:
 protected:
 	static const int wd_digital_step_times[4];
 
-	virtual void pll_reset(bool fm, attotime when);
-	virtual void pll_start_writing(attotime tm);
-	virtual void pll_commit(floppy_image_device *floppy, attotime tm);
-	virtual void pll_stop_writing(floppy_image_device *floppy, attotime tm);
-	virtual int pll_get_next_bit(attotime &tm, floppy_image_device *floppy, attotime limit);
-	virtual bool pll_write_next_bit(bool bit, attotime &tm, floppy_image_device *floppy, attotime limit);
+	virtual void pll_reset(bool fm, const attotime &when);
+	virtual void pll_start_writing(const attotime &tm);
+	virtual void pll_commit(floppy_image_device *floppy, const attotime &tm);
+	virtual void pll_stop_writing(floppy_image_device *floppy, const attotime &tm);
+	virtual int pll_get_next_bit(attotime &tm, floppy_image_device *floppy, const attotime &limit);
+	virtual bool pll_write_next_bit(bool bit, attotime &tm, floppy_image_device *floppy, const attotime &limit);
 	virtual void pll_save_checkpoint();
 	virtual void pll_retrieve_checkpoint();
 
@@ -480,13 +480,13 @@ private:
 		attotime write_buffer[32];
 		int write_position;
 
-		void set_clock(attotime period);
-		void reset(attotime when);
-		int get_next_bit(attotime &tm, floppy_image_device *floppy, attotime limit);
-		bool write_next_bit(bool bit, attotime &tm, floppy_image_device *floppy, attotime limit);
-		void start_writing(attotime tm);
-		void commit(floppy_image_device *floppy, attotime tm);
-		void stop_writing(floppy_image_device *floppy, attotime tm);
+		void set_clock(const attotime &period);
+		void reset(const attotime &when);
+		int get_next_bit(attotime &tm, floppy_image_device *floppy, const attotime &limit);
+		bool write_next_bit(bool bit, attotime &tm, floppy_image_device *floppy, const attotime &limit);
+		void start_writing(const attotime &tm);
+		void commit(floppy_image_device *floppy, const attotime &tm);
+		void stop_writing(floppy_image_device *floppy, const attotime &tm);
 	};
 
 	digital_pll_t cur_pll, checkpoint_pll;

@@ -17,13 +17,13 @@ public:
 	int write_position;
 	int freq_hist;
 
-	void set_clock(attotime period);
-	void reset(attotime when);
-	int get_next_bit(attotime &tm, floppy_image_device *floppy, attotime limit);
-	bool write_next_bit(bool bit, attotime &tm, floppy_image_device *floppy, attotime limit);
-	void start_writing(attotime tm);
-	void commit(floppy_image_device *floppy, attotime tm);
-	void stop_writing(floppy_image_device *floppy, attotime tm);
+	void set_clock(const attotime &period);
+	void reset(const attotime &when);
+	int get_next_bit(attotime &tm, floppy_image_device *floppy, const attotime &limit);
+	bool write_next_bit(bool bit, attotime &tm, floppy_image_device *floppy, const attotime &limit);
+	void start_writing(const attotime &tm);
+	void commit(floppy_image_device *floppy, const attotime &tm);
+	void stop_writing(floppy_image_device *floppy, const attotime &tm);
 
 	astring tts(attotime tm);
 };

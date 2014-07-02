@@ -11,7 +11,7 @@ astring fdc_pll_t::tts(attotime t)
 	return buf;
 }
 
-void fdc_pll_t::set_clock(attotime _period)
+void fdc_pll_t::set_clock(const attotime &_period)
 {
 	period = _period;
 	period_adjust_base = period * 0.05;
@@ -19,7 +19,7 @@ void fdc_pll_t::set_clock(attotime _period)
 	max_period = period * 1.25;
 }
 
-void fdc_pll_t::reset(attotime when)
+void fdc_pll_t::reset(const attotime &when)
 {
 	ctime = when;
 	phase_adjust = attotime::zero;
@@ -28,19 +28,19 @@ void fdc_pll_t::reset(attotime when)
 	write_start_time = attotime::never;
 }
 
-void fdc_pll_t::start_writing(attotime tm)
+void fdc_pll_t::start_writing(const attotime &tm)
 {
 	write_start_time = tm;
 	write_position = 0;
 }
 
-void fdc_pll_t::stop_writing(floppy_image_device *floppy, attotime tm)
+void fdc_pll_t::stop_writing(floppy_image_device *floppy, const attotime &tm)
 {
 	commit(floppy, tm);
 	write_start_time = attotime::never;
 }
 
-void fdc_pll_t::commit(floppy_image_device *floppy, attotime tm)
+void fdc_pll_t::commit(floppy_image_device *floppy, const attotime &tm)
 {
 	if(write_start_time.is_never() || tm == write_start_time)
 		return;
@@ -51,7 +51,7 @@ void fdc_pll_t::commit(floppy_image_device *floppy, attotime tm)
 	write_position = 0;
 }
 
-int fdc_pll_t::get_next_bit(attotime &tm, floppy_image_device *floppy, attotime limit)
+int fdc_pll_t::get_next_bit(attotime &tm, floppy_image_device *floppy, const attotime &limit)
 {
 	attotime edge = floppy ? floppy->get_next_transition(ctime) : attotime::never;
 
@@ -112,7 +112,7 @@ int fdc_pll_t::get_next_bit(attotime &tm, floppy_image_device *floppy, attotime 
 	return 1;
 }
 
-bool fdc_pll_t::write_next_bit(bool bit, attotime &tm, floppy_image_device *floppy, attotime limit)
+bool fdc_pll_t::write_next_bit(bool bit, attotime &tm, floppy_image_device *floppy, const attotime &limit)
 {
 	if(write_start_time.is_never()) {
 		write_start_time = ctime;

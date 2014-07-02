@@ -186,16 +186,16 @@ private:
 	void live_start();
 	void checkpoint();
 	void rollback();
-	bool write_next_bit(bool bit, attotime limit);
-	void start_writing(attotime tm);
-	void commit(attotime tm);
-	void stop_writing(attotime tm);
+	bool write_next_bit(bool bit, const attotime &limit);
+	void start_writing(const attotime &tm);
+	void commit(const attotime &tm);
+	void stop_writing(const attotime &tm);
 	void live_delay(int state);
 	void live_sync();
 	void live_abort();
-	void live_run(attotime limit = attotime::never);
-	void get_next_edge(attotime when);
-	int get_next_bit(attotime &tm, attotime limit);
+	void live_run(const attotime &limit = attotime::never);
+	void get_next_edge(const attotime &when);
+	int get_next_bit(attotime &tm, const attotime &limit);
 };
 
 

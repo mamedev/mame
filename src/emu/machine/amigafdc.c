@@ -172,7 +172,7 @@ void amiga_fdc::live_abort()
 	cur_live.next_state = -1;
 }
 
-void amiga_fdc::live_run(attotime limit)
+void amiga_fdc::live_run(const attotime &limit)
 {
 	amiga_state *state = machine().driver_data<amiga_state>();
 
@@ -507,13 +507,13 @@ void amiga_fdc::index_callback(floppy_image_device *floppy, int state)
 	m_write_index(!state);
 }
 
-void amiga_fdc::pll_t::set_clock(attotime period)
+void amiga_fdc::pll_t::set_clock(const attotime &period)
 {
 	for(int i=0; i<38; i++)
 		delays[i] = period*(i+1);
 }
 
-void amiga_fdc::pll_t::reset(attotime when)
+void amiga_fdc::pll_t::reset(const attotime &when)
 {
 	counter = 0;
 	increment = 146;
@@ -527,7 +527,7 @@ void amiga_fdc::pll_t::reset(attotime when)
 	freq_sub  = 0x00;
 }
 
-int amiga_fdc::pll_t::get_next_bit(attotime &tm, floppy_image_device *floppy, attotime limit)
+int amiga_fdc::pll_t::get_next_bit(attotime &tm, floppy_image_device *floppy, const attotime &limit)
 {
 	attotime when = floppy ? floppy->get_next_transition(ctime) : attotime::never;
 
@@ -601,19 +601,19 @@ int amiga_fdc::pll_t::get_next_bit(attotime &tm, floppy_image_device *floppy, at
 	return bit;
 }
 
-void amiga_fdc::pll_t::start_writing(attotime tm)
+void amiga_fdc::pll_t::start_writing(const attotime & tm)
 {
 	write_start_time = tm;
 	write_position = 0;
 }
 
-void amiga_fdc::pll_t::stop_writing(floppy_image_device *floppy, attotime tm)
+void amiga_fdc::pll_t::stop_writing(floppy_image_device *floppy, const attotime &tm)
 {
 	commit(floppy, tm);
 	write_start_time = attotime::never;
 }
 
-bool amiga_fdc::pll_t::write_next_bit(bool bit, attotime &tm, floppy_image_device *floppy, attotime limit)
+bool amiga_fdc::pll_t::write_next_bit(bool bit, attotime &tm, floppy_image_device *floppy, const attotime &limit)
 {
 	if(write_start_time.is_never()) {
 		write_start_time = ctime;
@@ -644,7 +644,7 @@ bool amiga_fdc::pll_t::write_next_bit(bool bit, attotime &tm, floppy_image_devic
 }
 
 
-void amiga_fdc::pll_t::commit(floppy_image_device *floppy, attotime tm)
+void amiga_fdc::pll_t::commit(floppy_image_device *floppy, const attotime &tm)
 {
 	if(write_start_time.is_never() || tm == write_start_time)
 		return;

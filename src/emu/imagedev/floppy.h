@@ -112,9 +112,9 @@ public:
 
 	void index_resync();
 	attotime time_next_index();
-	attotime get_next_transition(attotime from_when);
-	void write_flux(attotime start, attotime end, int transition_count, const attotime *transitions);
-	void set_write_splice(attotime when);
+	attotime get_next_transition(const attotime &from_when);
+	void write_flux(const attotime &start, const attotime &end, int transition_count, const attotime *transitions);
+	void set_write_splice(const attotime &when);
 	UINT32 get_form_factor() const;
 	UINT32 get_variant() const;
 
@@ -175,7 +175,7 @@ protected:
 	ready_cb cur_ready_cb;
 	wpt_cb cur_wpt_cb;
 
-	UINT32 find_position(attotime &base, attotime when);
+	UINT32 find_position(attotime &base, const attotime &when);
 	int find_index(UINT32 position, const UINT32 *buf, int buf_size);
 	void write_zone(UINT32 *buf, int &cells, int &index, UINT32 spos, UINT32 epos, UINT32 mg);
 	void commit_image();

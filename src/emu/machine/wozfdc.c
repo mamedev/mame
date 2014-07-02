@@ -336,7 +336,7 @@ void wozfdc_device::control(int offset)
 		}
 }
 
-UINT64 wozfdc_device::time_to_cycles(attotime tm)
+UINT64 wozfdc_device::time_to_cycles(const attotime &tm)
 {
 	// Clock is falling edges of the ~2Mhz clock
 	// The 1021800 must be the controlling 6502's speed
@@ -365,7 +365,7 @@ void wozfdc_device::lss_start()
 	lss_predict();
 }
 
-void wozfdc_device::lss_delay(UINT64 cycles, attotime tm, UINT8 data_reg, UINT8 address, bool write_line_active)
+void wozfdc_device::lss_delay(UINT64 cycles, const attotime &tm, UINT8 data_reg, UINT8 address, bool write_line_active)
 {
 	if(data_reg & 0x80)
 		address |= 0x02;

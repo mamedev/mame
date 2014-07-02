@@ -66,13 +66,13 @@ private:
 		attotime write_buffer[32];
 		int write_position;
 
-		void set_clock(attotime period);
-		void reset(attotime when);
-		int get_next_bit(attotime &tm, floppy_image_device *floppy, attotime limit);
-		bool write_next_bit(bool bit, attotime &tm, floppy_image_device *floppy, attotime limit);
-		void start_writing(attotime tm);
-		void commit(floppy_image_device *floppy, attotime tm);
-		void stop_writing(floppy_image_device *floppy, attotime tm);
+		void set_clock(const attotime &period);
+		void reset(const attotime &when);
+		int get_next_bit(attotime &tm, floppy_image_device *floppy, const attotime &limit);
+		bool write_next_bit(bool bit, attotime &tm, floppy_image_device *floppy, const attotime &limit);
+		void start_writing(const attotime &tm);
+		void commit(floppy_image_device *floppy, const attotime &tm);
+		void stop_writing(floppy_image_device *floppy, const attotime &tm);
 	};
 
 	struct live_info {
@@ -111,7 +111,7 @@ private:
 	void live_delay(int state);
 	void live_sync();
 	void live_abort();
-	void live_run(attotime limit = attotime::never);
+	void live_run(const attotime &limit = attotime::never);
 };
 
 extern const device_type AMIGA_FDC;

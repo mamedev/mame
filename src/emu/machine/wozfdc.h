@@ -74,12 +74,12 @@ private:
 
 	void control(int offset);
 	void phase(int ph, bool on);
-	UINT64 time_to_cycles(attotime tm);
+	UINT64 time_to_cycles(const attotime &tm);
 	attotime cycles_to_time(UINT64 cycles);
 	void a3_update_drive_sel();
 
 	void lss_start();
-	void lss_delay(UINT64 cycles, attotime tm, UINT8 data_reg, UINT8 address, bool write_line_active);
+	void lss_delay(UINT64 cycles, const attotime &tm, UINT8 data_reg, UINT8 address, bool write_line_active);
 	void lss_delay(UINT64 cycles, UINT8 data_reg, UINT8 address, bool write_line_active);
 	void lss_sync();
 	void lss_predict(attotime limit = attotime::never);
