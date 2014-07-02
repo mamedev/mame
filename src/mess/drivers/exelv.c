@@ -451,13 +451,13 @@ WRITE8_MEMBER(exelv_state::tms7041_portd_w)
 
 static ADDRESS_MAP_START(tms7020_mem, AS_PROGRAM, 8, exelv_state)
 	AM_RANGE(0x0080, 0x00ff) AM_NOP
-    AM_RANGE(0x0124, 0x00124) AM_DEVREAD("tms3556", tms3556_device, vram_r)
-    AM_RANGE(0x0125, 0x00125) AM_DEVREAD("tms3556", tms3556_device, reg_r)
-    AM_RANGE(0x0128, 0x00128) AM_DEVREAD("tms3556", tms3556_device, initptr_r)
-    AM_RANGE(0x012d, 0x0012d) AM_DEVWRITE("tms3556", tms3556_device, reg_w)
-    AM_RANGE(0x012e, 0x0012e) AM_DEVWRITE("tms3556", tms3556_device, vram_w)
+    AM_RANGE(0x0124, 0x0124) AM_DEVREAD("tms3556", tms3556_device, vram_r)
+    AM_RANGE(0x0125, 0x0125) AM_DEVREAD("tms3556", tms3556_device, reg_r)
+    AM_RANGE(0x0128, 0x0128) AM_DEVREAD("tms3556", tms3556_device, initptr_r)
+    AM_RANGE(0x012d, 0x012d) AM_DEVWRITE("tms3556", tms3556_device, reg_w)
+    AM_RANGE(0x012e, 0x012e) AM_DEVWRITE("tms3556", tms3556_device, vram_w)
 
-	AM_RANGE(0x0130, 0x00130) AM_READWRITE(mailbox_wx319_r, mailbox_wx318_w)
+	AM_RANGE(0x0130, 0x0130) AM_READWRITE(mailbox_wx319_r, mailbox_wx318_w)
 	AM_RANGE(0x0200, 0x7fff) AM_ROMBANK("bank1")                                /* system ROM */
 	AM_RANGE(0x8000, 0xbfff) AM_NOP
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM                                     /* CPU RAM */
@@ -487,12 +487,12 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(tms7040_mem, AS_PROGRAM, 8, exelv_state)
 	AM_RANGE(0x0080, 0x00ff) AM_NOP
-    AM_RANGE(0x0124, 0x00124) AM_DEVREAD("tms3556", tms3556_device, vram_r)
-    AM_RANGE(0x0125, 0x00125) AM_DEVREAD("tms3556", tms3556_device, reg_r)
-    AM_RANGE(0x0128, 0x00128) AM_DEVREAD("tms3556", tms3556_device, initptr_r)
-    AM_RANGE(0x012d, 0x0012d) AM_DEVWRITE("tms3556", tms3556_device, reg_w)
-    AM_RANGE(0x012e, 0x0012e) AM_DEVWRITE("tms3556", tms3556_device, vram_w)
-	AM_RANGE(0x0130, 0x00130) AM_READWRITE(mailbox_wx319_r, mailbox_wx318_w)
+    AM_RANGE(0x0124, 0x0124) AM_DEVREAD("tms3556", tms3556_device, vram_r)
+    AM_RANGE(0x0125, 0x0125) AM_DEVREAD("tms3556", tms3556_device, reg_r)
+    AM_RANGE(0x0128, 0x0128) AM_DEVREAD("tms3556", tms3556_device, initptr_r)
+    AM_RANGE(0x012d, 0x012d) AM_DEVWRITE("tms3556", tms3556_device, reg_w)
+    AM_RANGE(0x012e, 0x012e) AM_DEVWRITE("tms3556", tms3556_device, vram_w)
+	AM_RANGE(0x0130, 0x0130) AM_READWRITE(mailbox_wx319_r, mailbox_wx318_w)
 	AM_RANGE(0x0200, 0x7fff) AM_ROMBANK("bank1")                                /* system ROM */
 	AM_RANGE(0x8000, 0xbfff) AM_NOP
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM                                     /* CPU RAM */

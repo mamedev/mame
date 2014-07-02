@@ -16,17 +16,14 @@
  *   - This entire notice must remain in the source code.
  *
  *****************************************************************************
+ *  Misc. improvements were done over the years by team MESS/MAME
+ *
  *  Currently this source emulates a TMS70x0, not any of the other variants
  *  Unimplemented is the MC pin which (in conjunection with IOCNT0 bits 7 and 6
  *  control the memory mapping.
  *
  *  This source implements the MC pin at Vss and mode bits in single chip mode.
  *****************************************************************************/
-
-// SJE: Changed all references to ICount to icount (to match MAME requirements)
-// SJE: Changed RM/WM macros to reference newly created tms7000 read/write handlers & removed unused SRM(cpustate) macro
-// SJE: Fixed a mistake in tms70x0_pf_w where the wrong register was referenced
-// SJE: Implemented internal register file
 
 #include "emu.h"
 #include "debugger.h"
@@ -36,8 +33,6 @@
 
 #define LOG(x)  do { if (VERBOSE) logerror x; } while (0)
 
-
-/* Static variables */
 
 #define RM(Addr) ((unsigned)m_program->read_byte(Addr))
 #define WM(Addr,Value) (m_program->write_byte(Addr, Value))
@@ -58,8 +53,7 @@ const device_type TMS7000_EXL = &device_creator<tms7000_exl_device>;
 
 
 static ADDRESS_MAP_START(tms7000_mem, AS_PROGRAM, 8, tms7000_device )
-	AM_RANGE(0x0000, 0x007f) AM_READWRITE(tms7000_internal_r, tms7000_internal_w) /* tms7000 internal RAM */
-	AM_RANGE(0x0080, 0x00ff) AM_NOP                                               /* reserved */
+	AM_RANGE(0x0000, 0x007f) AM_RAM
 	AM_RANGE(0x0100, 0x010f) AM_READWRITE(tms70x0_pf_r, tms70x0_pf_w)             /* tms7000 internal I/O ports */
 ADDRESS_MAP_END
 
@@ -158,7 +152,6 @@ void tms7000_device::device_start()
 	m_io = &space(AS_IO);
 
 	memset(m_pf, 0, 0x100);
-	memset(m_rf, 0, 0x80);
 	m_cycles_per_INT2 = 0;
 	m_t1_capture_latch = 0;
 	m_t1_prescaler = 0;
@@ -177,7 +170,6 @@ void tms7000_device::device_start()
 	save_item(NAME(m_irq_state));
 
 	/* Save register and perpherial file state */
-	save_item(NAME(m_rf));
 	save_item(NAME(m_pf));
 
 	/* Save timer state */
@@ -381,14 +373,6 @@ void tms7000_device::execute_run()
 /****************************************************************************
  * Trigger the event counter
  ****************************************************************************/
-void tms7000_device::tms7000_A6EC1()
-{
-	if( (m_pf[0x03] & 0x80) == 0x80 ) /* Is timer system active? */
-	{
-		if( (m_pf[0x03] & 0x40) == 0x40) /* Is event counter the timer source? */
-			tms7000_service_timer1();
-	}
-}
 
 void tms7000_device::tms7000_service_timer1()
 {
@@ -590,14 +574,4 @@ inline UINT8 tms7000_device::bcd_sub( UINT8 a, UINT8 b, UINT8 c )
 		pSR |= SR_C;
 	
 	return ret;
-}
-
-WRITE8_MEMBER( tms7000_device::tms7000_internal_w )
-{
-	m_rf[ offset ] = data;
-}
-
-READ8_MEMBER( tms7000_device::tms7000_internal_r )
-{
-	return m_rf[ offset ];
 }

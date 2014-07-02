@@ -25,10 +25,6 @@
 
 enum { TMS7000_PC=1, TMS7000_SP, TMS7000_ST, TMS7000_IDLE, TMS7000_T1_CL, TMS7000_T1_PS, TMS7000_T1_DEC };
 
-enum { TMS7000_VCC, TMS7000_VSS };
-
-enum { TMS7000_NMOS, TMS7000_CMOS };
-
 enum
 {
 	TMS7000_IRQ1_LINE = 0,   /* INT1 */
@@ -55,10 +51,6 @@ public:
 
 	DECLARE_WRITE8_MEMBER( tms70x0_pf_w );
 	DECLARE_READ8_MEMBER( tms70x0_pf_r );
-	DECLARE_WRITE8_MEMBER( tms7000_internal_w );
-	DECLARE_READ8_MEMBER( tms7000_internal_r );
-
-	void tms7000_A6EC1();
 
 protected:
 	// device-level overrides
@@ -99,7 +91,6 @@ private:
 	UINT8       m_sp;               /* Stack Pointer */
 	UINT8       m_sr;               /* Status Register */
 	UINT8       m_irq_state[3];     /* State of the three IRQs */
-	UINT8       m_rf[0x80];         /* Register file (SJE) */
 	UINT8       m_pf[0x100];        /* Perpherial file */
 
 	int         m_icount;
@@ -120,6 +111,8 @@ private:
 
 	void tms7000_check_IRQ_lines();
 	void tms7000_do_interrupt( UINT16 address, UINT8 line );
+	void tms7000_service_timer1();
+
 	void illegal();
 	void adc_b2a();
 	void adc_r2a();
@@ -349,7 +342,6 @@ private:
 	void xorp_a2p();
 	void xorp_b2p();
 	void xorp_i2p();
-	void tms7000_service_timer1();
 };
 
 

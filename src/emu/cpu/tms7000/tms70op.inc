@@ -17,14 +17,6 @@
  *
  *****************************************************************************/
 
-//SJE: Changed all references to ICount to icount (to match MAME requirements)
-//TJL: (From Gilles Fetis) JPZ in TI documentation was wrong:
-//     if ((pSR & SR_N) == 0 && (pSR & SR_Z) != 0)
-//     should be:
-//     if ((pSR & SR_N) == 0)
-
-#include "emu.h"
-
 void tms7000_device::illegal()
 {
 	/* This is a guess */
@@ -1808,6 +1800,10 @@ void tms7000_device::jp()
 
 void tms7000_device::jpz()
 {
+	// NOTE: JPZ in TI documentation was wrong:
+	//     if ((pSR & SR_N) == 0 && (pSR & SR_Z) != 0)
+	// should be:
+	//     if ((pSR & SR_N) == 0)
 	if ((pSR & SR_N) == 0)
 	{
 		INT8 s;
