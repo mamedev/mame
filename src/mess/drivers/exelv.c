@@ -78,12 +78,8 @@ public:
 	DECLARE_READ8_MEMBER( mailbox_wx319_r );
 	DECLARE_WRITE8_MEMBER( mailbox_wx318_w );
 	DECLARE_READ8_MEMBER( tms7020_porta_r );
-	DECLARE_WRITE8_MEMBER( tms7020_porta_w );
-	DECLARE_READ8_MEMBER( tms7020_portb_r );
 	DECLARE_WRITE8_MEMBER( tms7020_portb_w );
 	DECLARE_READ8_MEMBER( tms7041_porta_r );
-	DECLARE_WRITE8_MEMBER( tms7041_porta_w );
-	DECLARE_READ8_MEMBER( tms7041_portb_r );
 	DECLARE_WRITE8_MEMBER( tms7041_portb_w );
 	DECLARE_READ8_MEMBER( tms7041_portc_r );
 	DECLARE_WRITE8_MEMBER( tms7041_portc_w );
@@ -91,11 +87,9 @@ public:
 	DECLARE_WRITE8_MEMBER( tms7041_portd_w );
 
 	/* tms7020 i/o ports */
-	UINT8   m_tms7020_porta;
 	UINT8   m_tms7020_portb;
 
 	/* tms7041 i/o ports */
-	UINT8   m_tms7041_porta;
 	UINT8   m_tms7041_portb;
 	UINT8   m_tms7041_portc;
 	UINT8   m_tms7041_portd;
@@ -259,13 +253,6 @@ READ8_MEMBER(exelv_state::tms7020_porta_r)
 }
 
 
-WRITE8_MEMBER(exelv_state::tms7020_porta_w)
-{
-	logerror("tms7020_porta_w: data = 0x%02x\n", data);
-	m_tms7020_porta = data;
-}
-
-
 /*
     TMS7020 PORT B
     B0 - W - TMS7041 port A bit 2 (REV2)
@@ -277,13 +264,6 @@ WRITE8_MEMBER(exelv_state::tms7020_porta_w)
     B6 -
     B7 -
 */
-READ8_MEMBER(exelv_state::tms7020_portb_r)
-{
-	logerror("tms7020_portb_r\n");
-	return 0x00;
-}
-
-
 WRITE8_MEMBER(exelv_state::tms7020_portb_w)
 {
 	logerror("tms7020_portb_w: data = 0x%02x\n", data);
@@ -326,13 +306,6 @@ READ8_MEMBER(exelv_state::tms7041_porta_r)
 }
 
 
-WRITE8_MEMBER(exelv_state::tms7041_porta_w)
-{
-	logerror("tms7041_porta_w: data = 0x%02x\n", data);
-	m_tms7041_porta = data;
-}
-
-
 /*
     TMS7041 PORT B
     B0 - W - TMS5220 W
@@ -344,14 +317,6 @@ WRITE8_MEMBER(exelv_state::tms7041_porta_w)
     B6 - W - REV6 WX319-11
     B7 - W - TMS7020 port A bit 0 (REV3)
 */
-READ8_MEMBER(exelv_state::tms7041_portb_r)
-{
-	UINT8 data = 0xff;
-	logerror("tms7041_portb_r\n");
-	return data;
-}
-
-
 WRITE8_MEMBER(exelv_state::tms7041_portb_w)
 {
 	logerror("tms7041_portb_w: data = 0x%02x\n", data);
@@ -465,22 +430,8 @@ static ADDRESS_MAP_START(tms7020_mem, AS_PROGRAM, 8, exelv_state)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START(tms7020_port, AS_IO, 8, exelv_state)
-	AM_RANGE(TMS7000_PORTA, TMS7000_PORTA) AM_READWRITE(tms7020_porta_r, tms7020_porta_w)
-	AM_RANGE(TMS7000_PORTB, TMS7000_PORTB) AM_READWRITE(tms7020_portb_r, tms7020_portb_w)
-ADDRESS_MAP_END
-
-
 static ADDRESS_MAP_START(tms7041_map, AS_PROGRAM, 8, exelv_state)
 	AM_RANGE(0x0080, 0x00ff) AM_RAM
-ADDRESS_MAP_END
-
-
-static ADDRESS_MAP_START(tms7041_port, AS_IO, 8, exelv_state)
-	AM_RANGE(TMS7000_PORTA, TMS7000_PORTA)  AM_READWRITE(tms7041_porta_r, tms7041_porta_w)
-	AM_RANGE(TMS7000_PORTB, TMS7000_PORTB)  AM_READWRITE(tms7041_portb_r, tms7041_portb_w)
-	AM_RANGE(TMS7000_PORTC, TMS7000_PORTC)  AM_READWRITE(tms7041_portc_r, tms7041_portc_w)
-	AM_RANGE(TMS7000_PORTD, TMS7000_PORTD)  AM_READWRITE(tms7041_portd_r, tms7041_portd_w)
 ADDRESS_MAP_END
 
 
@@ -536,9 +487,7 @@ void exelv_state::machine_start()
 	membank("bank1")->set_entry(0);
 
 	/* register for state saving */
-	save_item(NAME(m_tms7020_porta));
 	save_item(NAME(m_tms7020_portb));
-	save_item(NAME(m_tms7041_porta));
 	save_item(NAME(m_tms7041_portb));
 	save_item(NAME(m_tms7041_portc));
 	save_item(NAME(m_tms7041_portd));
@@ -547,15 +496,22 @@ void exelv_state::machine_start()
 }
 
 static MACHINE_CONFIG_START( exl100, exelv_state )
+
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS7020_EXL, XTAL_4_9152MHz)
 	MCFG_CPU_PROGRAM_MAP(tms7020_mem)
-	MCFG_CPU_IO_MAP(tms7020_port)
+	MCFG_TMS7000_PORTA_READ_CB(READ8(exelv_state, tms7020_porta_r))
+	MCFG_TMS7000_PORTB_WRITE_CB(WRITE8(exelv_state, tms7020_portb_w))
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", exelv_state, exelv_hblank_interrupt, "screen", 0, 1)
 
 	MCFG_CPU_ADD("tms7041", TMS7040, XTAL_4_9152MHz) // should be TMS7041
 	MCFG_CPU_PROGRAM_MAP(tms7041_map)
-	MCFG_CPU_IO_MAP(tms7041_port)
+	MCFG_TMS7000_PORTA_READ_CB(READ8(exelv_state, tms7041_porta_r))
+	MCFG_TMS7000_PORTB_WRITE_CB(WRITE8(exelv_state, tms7041_portb_w))
+	MCFG_TMS7000_PORTC_READ_CB(READ8(exelv_state, tms7041_portc_r))
+	MCFG_TMS7000_PORTC_WRITE_CB(WRITE8(exelv_state, tms7041_portc_w))
+	MCFG_TMS7000_PORTD_READ_CB(READ8(exelv_state, tms7041_portd_r))
+	MCFG_TMS7000_PORTD_WRITE_CB(WRITE8(exelv_state, tms7041_portd_w))
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
@@ -598,15 +554,22 @@ MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_START( exeltel, exelv_state )
+
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS7040, XTAL_4_9152MHz)
 	MCFG_CPU_PROGRAM_MAP(tms7040_mem)
-	MCFG_CPU_IO_MAP(tms7020_port)
+	MCFG_TMS7000_PORTA_READ_CB(READ8(exelv_state, tms7020_porta_r))
+	MCFG_TMS7000_PORTB_WRITE_CB(WRITE8(exelv_state, tms7020_portb_w))
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", exelv_state, exelv_hblank_interrupt, "screen", 0, 1)
 
 	MCFG_CPU_ADD("tms7042", TMS7040, XTAL_4_9152MHz) // should be TMS7042
 	MCFG_CPU_PROGRAM_MAP(tms7042_map)
-	MCFG_CPU_IO_MAP(tms7041_port)
+	MCFG_TMS7000_PORTA_READ_CB(READ8(exelv_state, tms7041_porta_r))
+	MCFG_TMS7000_PORTB_WRITE_CB(WRITE8(exelv_state, tms7041_portb_w))
+	MCFG_TMS7000_PORTC_READ_CB(READ8(exelv_state, tms7041_portc_r))
+	MCFG_TMS7000_PORTC_WRITE_CB(WRITE8(exelv_state, tms7041_portc_w))
+	MCFG_TMS7000_PORTD_READ_CB(READ8(exelv_state, tms7041_portd_r))
+	MCFG_TMS7000_PORTD_WRITE_CB(WRITE8(exelv_state, tms7041_portd_w))
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
