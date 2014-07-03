@@ -14,6 +14,9 @@
 #include "cpu/mcs48/mcs48.h"
 #include "machine/upd765.h"
 #include "machine/am9517a.h"
+#include "machine/pit8253.h"
+#include "machine/dmv_keyb.h"
+#include "sound/speaker.h"
 #include "video/upd7220.h"
 #include "dmv.lh"
 
@@ -25,9 +28,12 @@ public:
 			m_maincpu(*this, "maincpu"),
 			m_hgdc(*this, "upd7220"),
 			m_dmac(*this, "dma8237"),
-			m_fdc(*this, "upd765"),
-			m_floppy0(*this, "upd765:0:525dd"),
-			m_floppy1(*this, "upd765:1:525dd"),
+			m_pit(*this, "pit8253"),
+			m_fdc(*this, "i8272"),
+			m_floppy0(*this, "i8272:0"),
+			m_floppy1(*this, "i8272:1"),
+			m_keyboard(*this, "keyboard"),
+			m_speaker(*this, "speaker"),
 			m_video_ram(*this, "video_ram"),
 			m_palette(*this, "palette")
 		{ }
@@ -35,9 +41,12 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<upd7220_device> m_hgdc;
 	required_device<am9517a_device> m_dmac;
-	required_device<upd765a_device> m_fdc;
-	required_device<floppy_image_device> m_floppy0;
-	required_device<floppy_image_device> m_floppy1;
+	required_device<pit8253_device> m_pit;
+	required_device<i8272a_device> m_fdc;
+	required_device<floppy_connector> m_floppy0;
+	required_device<floppy_connector> m_floppy1;
+	required_device<dmv_keyboard_device> m_keyboard;
+	required_device<speaker_sound_device> m_speaker;
 
 	virtual void video_start();
 	virtual void machine_start();
@@ -45,22 +54,38 @@ public:
 
 	DECLARE_WRITE8_MEMBER(leds_w);
 	DECLARE_WRITE_LINE_MEMBER(dma_hrq_changed);
+	DECLARE_WRITE_LINE_MEMBER(dmac_eop);
+	DECLARE_WRITE_LINE_MEMBER(dmac_dack3);
+	DECLARE_WRITE_LINE_MEMBER(fdc_irq);
+	DECLARE_WRITE_LINE_MEMBER(pit_out0);
 	DECLARE_WRITE8_MEMBER(fdd_motor_w);
 	DECLARE_READ8_MEMBER(sys_status_r);
-	DECLARE_READ8_MEMBER(kb_ctrl_mcu_r);
-	DECLARE_WRITE8_MEMBER(kb_ctrl_mcu_w);
-	DECLARE_READ8_MEMBER(fdc_dma_r);
-	DECLARE_WRITE8_MEMBER(fdc_dma_w);
+	DECLARE_WRITE8_MEMBER(tc_set_w);
 	DECLARE_READ8_MEMBER(memory_read_byte);
 	DECLARE_WRITE8_MEMBER(memory_write_byte);
+	DECLARE_WRITE8_MEMBER(ramsel_w);
+	DECLARE_WRITE8_MEMBER(romsel_w);
+	DECLARE_READ8_MEMBER(kb_mcu_port1_r);
+	DECLARE_WRITE8_MEMBER(kb_mcu_port1_w);
+	DECLARE_WRITE8_MEMBER(kb_mcu_port2_w);
 
 	required_shared_ptr<UINT8> m_video_ram;
 	required_device<palette_device> m_palette;
 
 	UPD7220_DISPLAY_PIXELS_MEMBER( hgdc_display_pixels );
 	UPD7220_DRAW_TEXT_LINE_MEMBER( hgdc_draw_text );
+
+	int         m_eop_line;
+	int         m_dack3_line;
+	int         m_sd_poll_state;
+	int         m_floppy_motor;
+	UINT8       m_ram[0x2000];
 };
 
+WRITE8_MEMBER(dmv_state::tc_set_w)
+{
+	m_fdc->tc_w(true);
+}
 
 WRITE8_MEMBER(dmv_state::leds_w)
 {
@@ -82,22 +107,24 @@ WRITE8_MEMBER(dmv_state::leds_w)
 		output_set_led_value(8-i, BIT(data, i));
 }
 
-READ8_MEMBER(dmv_state::fdc_dma_r)
+WRITE8_MEMBER(dmv_state::ramsel_w)
 {
-	return m_fdc->dma_r();
+	m_maincpu->space(AS_PROGRAM).install_ram(0x0000, 0x1fff, m_ram);
 }
 
-WRITE8_MEMBER(dmv_state::fdc_dma_w)
+WRITE8_MEMBER(dmv_state::romsel_w)
 {
-	m_fdc->dma_w(data);
+	m_maincpu->space(AS_PROGRAM).install_rom(0x0000, 0x1fff, memregion("maincpu")->base());
 }
 
 WRITE8_MEMBER(dmv_state::fdd_motor_w)
 {
-	// bit 0 defines the state of the FDD motor
+	m_pit->write_gate0(1);
+	m_pit->write_gate0(0);
 
-	m_floppy0->mon_w(!BIT(data, 0));
-	m_floppy1->mon_w(!BIT(data, 0));
+	m_floppy_motor = 0;
+	m_floppy0->get_device()->mon_w(m_floppy_motor);
+	m_floppy1->get_device()->mon_w(m_floppy_motor);
 }
 
 READ8_MEMBER(dmv_state::sys_status_r)
@@ -115,23 +142,19 @@ READ8_MEMBER(dmv_state::sys_status_r)
 	*/
 	UINT8 data = 0x00;
 
+	if (m_floppy_motor)
+		data |= 0x01;
+
 	// 16-bit CPU not available
 	data |= 0x02;
+
+	if (!m_floppy0->get_device()->ready_r())
+		data |= 0x04;
 
 	if (m_fdc->get_irq())
 		data |= 0x08;
 
 	return data;
-}
-
-READ8_MEMBER(dmv_state::kb_ctrl_mcu_r)
-{
-	return machine().device<upi41_cpu_device>("kb_ctrl_mcu")->upi41_master_r(space, offset);
-}
-
-WRITE8_MEMBER(dmv_state::kb_ctrl_mcu_w)
-{
-	machine().device<upi41_cpu_device>("kb_ctrl_mcu")->upi41_master_w(space, offset, data);
 }
 
 UPD7220_DISPLAY_PIXELS_MEMBER( dmv_state::hgdc_display_pixels )
@@ -188,28 +211,39 @@ static ADDRESS_MAP_START( dmv_io , AS_IO, 8, dmv_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(leds_w)
+	AM_RANGE(0x10, 0x10) AM_WRITE(ramsel_w)
+	AM_RANGE(0x11, 0x11) AM_WRITE(romsel_w)
+	AM_RANGE(0x12, 0x12) AM_WRITE(tc_set_w)
 	AM_RANGE(0x13, 0x13) AM_READ(sys_status_r)
 	AM_RANGE(0x14, 0x14) AM_WRITE(fdd_motor_w)
 	AM_RANGE(0x20, 0x2f) AM_DEVREADWRITE("dma8237", am9517a_device, read, write)
-	AM_RANGE(0x40, 0x41) AM_READWRITE(kb_ctrl_mcu_r, kb_ctrl_mcu_w)
-	AM_RANGE(0x50, 0x51) AM_DEVICE("upd765", upd765a_device, map)
+	AM_RANGE(0x40, 0x41) AM_DEVREADWRITE("kb_ctrl_mcu", upi41_cpu_device, upi41_master_r, upi41_master_w)
+	AM_RANGE(0x50, 0x51) AM_DEVICE("i8272", i8272a_device, map)
+	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE("pit8253", pit8253_device, read, write)
 	AM_RANGE(0xa0, 0xa1) AM_DEVREADWRITE("upd7220", upd7220_device, read, write)
 
-	//AM_RANGE(0x10, 0x11) boot ROM bankswitch (0x0000-0x1fff)
-	//AM_RANGE(0x12, 0x12) pulse FDC TC line
-	//AM_RANGE(0x80, 0x83) PIT8253
 	//AM_RANGE(0xe0, 0xe7) RAM bankswitch
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( dmv_keyboard_io, AS_IO, 8, dmv_state )
-	//AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) keyboard rows input
-	//AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) bits 0-3 kb cols out
-ADDRESS_MAP_END
+READ8_MEMBER(dmv_state::kb_mcu_port1_r)
+{
+	return !(m_keyboard->sd_poll_r() & !m_sd_poll_state);
+}
+
+WRITE8_MEMBER(dmv_state::kb_mcu_port1_w)
+{
+	m_sd_poll_state = BIT(data, 1);
+	m_keyboard->sd_poll_w(!m_sd_poll_state);
+}
+
+WRITE8_MEMBER(dmv_state::kb_mcu_port2_w)
+{
+	m_speaker->level_w(BIT(data, 0));
+}
 
 static ADDRESS_MAP_START( dmv_kb_ctrl_io, AS_IO, 8, dmv_state )
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_NOP   // bit 0 data from kb, bit 1 data to kb
-	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_NOP
+	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_READWRITE(kb_mcu_port1_r, kb_mcu_port1_w) // bit 0 data from kb, bit 1 data to kb
+	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_WRITE(kb_mcu_port2_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( upd7220_map, AS_0, 8, dmv_state )
@@ -227,6 +261,11 @@ void dmv_state::machine_start()
 
 void dmv_state::machine_reset()
 {
+	m_eop_line = 0;
+	m_dack3_line = 0;
+	m_sd_poll_state = 0;
+	m_floppy_motor = 1;
+	m_maincpu->space(AS_PROGRAM).install_rom(0x0000, 0x1fff, memregion("maincpu")->base());
 }
 
 void dmv_state::video_start()
@@ -264,6 +303,38 @@ WRITE_LINE_MEMBER( dmv_state::dma_hrq_changed )
 	m_dmac->hack_w(state);
 }
 
+WRITE_LINE_MEMBER( dmv_state::dmac_eop )
+{
+	if (!(m_dack3_line || m_eop_line) && (m_dack3_line || state))
+		m_fdc->tc_w(true);
+
+	m_eop_line = state;
+}
+
+WRITE_LINE_MEMBER( dmv_state::dmac_dack3 )
+{
+	if (!(m_dack3_line || m_eop_line) && (state || m_eop_line))
+		m_fdc->tc_w(true);
+
+	m_dack3_line = state;
+}
+
+WRITE_LINE_MEMBER( dmv_state::pit_out0 )
+{
+	if (!state)
+	{
+		m_floppy_motor = 1;
+		m_floppy0->get_device()->mon_w(m_floppy_motor);
+		m_floppy1->get_device()->mon_w(m_floppy_motor);
+	}
+}
+
+WRITE_LINE_MEMBER( dmv_state::fdc_irq )
+{
+	if (state)
+		m_fdc->tc_w(false);
+}
+
 READ8_MEMBER(dmv_state::memory_read_byte)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
@@ -273,22 +344,22 @@ READ8_MEMBER(dmv_state::memory_read_byte)
 WRITE8_MEMBER(dmv_state::memory_write_byte)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
-	return prog_space.write_byte(offset, data);
+	prog_space.write_byte(offset, data);
 }
 
 
 static MACHINE_CONFIG_START( dmv, dmv_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz)
+	MCFG_CPU_ADD("maincpu",Z80, XTAL_24MHz / 6)
 	MCFG_CPU_PROGRAM_MAP(dmv_mem)
 	MCFG_CPU_IO_MAP(dmv_io)
 
 	MCFG_CPU_ADD("kb_ctrl_mcu", I8741, XTAL_6MHz)
 	MCFG_CPU_IO_MAP(dmv_kb_ctrl_io)
 
-	MCFG_CPU_ADD("keyboard_mcu", I8741, XTAL_6MHz)
-	MCFG_CPU_IO_MAP(dmv_keyboard_io)
-	MCFG_DEVICE_DISABLE()
+	MCFG_QUANTUM_PERFECT_CPU("maincpu")
+
+	MCFG_DMV_KEYBOARD_ADD("keyboard")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -310,14 +381,29 @@ static MACHINE_CONFIG_START( dmv, dmv_state )
 
 	MCFG_DEVICE_ADD( "dma8237", AM9517A, XTAL_4MHz )
 	MCFG_I8237_OUT_HREQ_CB(WRITELINE(dmv_state, dma_hrq_changed))
+	MCFG_I8237_OUT_EOP_CB(WRITELINE(dmv_state, dmac_eop))
 	MCFG_I8237_IN_MEMR_CB(READ8(dmv_state, memory_read_byte))
 	MCFG_I8237_OUT_MEMW_CB(WRITE8(dmv_state, memory_write_byte))
-	MCFG_I8237_IN_IOR_3_CB(READ8(dmv_state, fdc_dma_r))
-	MCFG_I8237_OUT_IOW_3_CB(WRITE8(dmv_state, fdc_dma_w))
-	MCFG_UPD765A_ADD( "upd765", true, true )
+	MCFG_I8237_IN_IOR_3_CB(DEVREAD8("i8272", i8272a_device, mdma_r))
+	MCFG_I8237_OUT_IOW_3_CB(DEVWRITE8("i8272", i8272a_device, mdma_w))
+	MCFG_I8237_OUT_DACK_3_CB(WRITELINE(dmv_state, dmac_dack3))
+
+	MCFG_I8272A_ADD( "i8272", true )
+	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(dmv_state, fdc_irq))
 	MCFG_UPD765_DRQ_CALLBACK(DEVWRITELINE("dma8237", am9517a_device, dreq3_w))
-	MCFG_FLOPPY_DRIVE_ADD("upd765:0", dmv_floppies, "525dd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("upd765:1", dmv_floppies, "525dd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("i8272:0", dmv_floppies, "525dd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("i8272:1", dmv_floppies, "525dd", floppy_image_device::default_floppy_formats)
+
+	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
+	MCFG_PIT8253_CLK0(50)
+	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(dmv_state, pit_out0))
+	//MCFG_PIT8253_CLK2(XTAL_24MHz / 3 / 16)
+	//MCFG_PIT8253_OUT2_HANDLER(WRITELINE(dmv_state, timint_w))
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO( "mono" )
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -325,12 +411,8 @@ ROM_START( dmv )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "dmv_norm.bin", 0x0000, 0x2000, CRC(bf25f3f0) SHA1(0c7dd37704db4799e340cc836f887cd543e5c964))
 
-	ROM_REGION(0x400, "kb_ctrl_mcu", ROMREGION_ERASEFF)
+	ROM_REGION(0x400, "kb_ctrl_mcu", 0)
 	ROM_LOAD( "dmv_kb_ctrl_mcu.bin", 0x0000, 0x0400, CRC(a03af298) SHA1(144cba41294c46f5ca79b7ad8ced0e4408168775))
-
-		// i8741/8041 microcontroller inside the Keyboard
-	ROM_REGION(0x400, "keyboard_mcu", ROMREGION_ERASEFF)
-	ROM_LOAD( "dmv_kbmcu.bin", 0x0000, 0x0400, CRC(14e376de) SHA1 (ed09048ef03c602dba17ad6fcfe125c082c9bb17))
 ROM_END
 
 /* Driver */
