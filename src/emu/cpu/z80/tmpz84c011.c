@@ -66,11 +66,11 @@ void tmpz84c011_device::device_start()
 	m_outportsd.resolve_safe();
 	m_outportse.resolve_safe();
 
-	m_inportsa.resolve_safe(0);
-	m_inportsb.resolve_safe(0);
-	m_inportsc.resolve_safe(0);
-	m_inportsd.resolve_safe(0);
-	m_inportse.resolve_safe(0);
+	m_inportsa.resolve_safe(0xff);
+	m_inportsb.resolve_safe(0xff);
+	m_inportsc.resolve_safe(0xff);
+	m_inportsd.resolve_safe(0xff);
+	m_inportse.resolve_safe(0xff);
 
 	m_zc0_cb.resolve_safe();
 	m_zc1_cb.resolve_safe();

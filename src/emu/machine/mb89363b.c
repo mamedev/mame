@@ -158,16 +158,16 @@ machine_config_constructor mb89363b_device::device_mconfig_additions() const
 
 void mb89363b_device::device_start()
 {
-	m_in_a_pa_cb.resolve_safe(0);
-	m_in_a_pb_cb.resolve_safe(0);
-	m_in_a_pc_cb.resolve_safe(0);
+	m_in_a_pa_cb.resolve_safe(0xff);
+	m_in_a_pb_cb.resolve_safe(0xff);
+	m_in_a_pc_cb.resolve_safe(0xff);
 	m_out_a_pa_cb.resolve_safe();
 	m_out_a_pb_cb.resolve_safe();
 	m_out_a_pc_cb.resolve_safe();
 
-	m_in_b_pa_cb.resolve_safe(0);
-	m_in_b_pb_cb.resolve_safe(0);
-	m_in_b_pc_cb.resolve_safe(0);
+	m_in_b_pa_cb.resolve_safe(0xff);
+	m_in_b_pb_cb.resolve_safe(0xff);
+	m_in_b_pc_cb.resolve_safe(0xff);
 	m_out_b_pa_cb.resolve_safe();
 	m_out_b_pb_cb.resolve_safe();
 	m_out_b_pc_cb.resolve_safe();
