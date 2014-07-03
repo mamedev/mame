@@ -385,15 +385,19 @@ void c64h156_device::get_next_edge(const attotime &when)
 
 int c64h156_device::get_next_bit(attotime &tm, const attotime &limit)
 {
-	attotime next = tm + m_period;
+	int bit = 0;
+	if (!cur_live.edge.is_never())
+	{
+		attotime next = tm + m_period;
+		if (cur_live.edge < next)
+		{
+			bit = 1;
 
-	int bit = (cur_live.edge.is_never() || cur_live.edge >= next) ? 0 : 1;
+			cur_live.zero_counter = 0;
+			cur_live.cycles_until_random_flux = (rand() % 31) + 289;
 
-	if (bit) {
-		cur_live.zero_counter = 0;
-		cur_live.cycles_until_random_flux = (rand() % 31) + 289;
-
-		get_next_edge(next);
+			get_next_edge(next);
+		}
 	}
 
 	if (cur_live.zero_counter >= cur_live.cycles_until_random_flux) {
