@@ -794,7 +794,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static const tms34010_config tms_config_amerdart =
+static const tms340x0_config tms_config_amerdart =
 {
 	FALSE,                          /* halt on reset */
 	"screen",                       /* the screen operated on */
@@ -808,7 +808,7 @@ static const tms34010_config tms_config_amerdart =
 };
 
 
-static const tms34010_config tms_config_coolpool =
+static const tms340x0_config tms_config_coolpool =
 {
 	FALSE,                          /* halt on reset */
 	"screen",                       /* the screen operated on */
@@ -833,7 +833,7 @@ static MACHINE_CONFIG_START( amerdart, coolpool_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS34010, XTAL_40MHz)
-	MCFG_CPU_CONFIG(tms_config_amerdart)
+	MCFG_TMS340X0_CONFIG(tms_config_amerdart)
 	MCFG_CPU_PROGRAM_MAP(amerdart_map)
 
 	MCFG_CPU_ADD("dsp", TMS32015, XTAL_40MHz/2)
@@ -864,7 +864,7 @@ static MACHINE_CONFIG_START( coolpool, coolpool_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS34010, XTAL_40MHz)
-	MCFG_CPU_CONFIG(tms_config_coolpool)
+	MCFG_TMS340X0_CONFIG(tms_config_coolpool)
 	MCFG_CPU_PROGRAM_MAP(coolpool_map)
 
 	MCFG_CPU_ADD("dsp", TMS32026,XTAL_40MHz)

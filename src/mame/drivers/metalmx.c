@@ -688,7 +688,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static const tms34010_config gsp_config =
+static const tms340x0_config gsp_config =
 {
 	TRUE,                   /* halt on reset */
 	"screen",               /* the screen operated on */
@@ -715,7 +715,7 @@ static MACHINE_CONFIG_START( metalmx, metalmx_state )
 	MCFG_CPU_DATA_MAP(adsp_data_map)
 
 	MCFG_CPU_ADD("gsp", TMS34020, 40000000)         /* Unverified */
-	MCFG_CPU_CONFIG(gsp_config)
+	MCFG_TMS340X0_CONFIG(gsp_config)
 	MCFG_CPU_PROGRAM_MAP(gsp_map)
 
 	MCFG_CPU_ADD("dsp32c_1", DSP32C, 40000000)      /* Unverified */

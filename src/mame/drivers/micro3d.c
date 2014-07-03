@@ -286,7 +286,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static const tms34010_config vgb_config =
+static const tms340x0_config vgb_config =
 {
 	FALSE,                          /* halt on reset */
 	"screen",                       /* the screen operated on */
@@ -312,7 +312,7 @@ static MACHINE_CONFIG_START( micro3d, micro3d_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", micro3d_state,  micro3d_vblank)
 
 	MCFG_CPU_ADD("vgb", TMS34010, XTAL_40MHz)
-	MCFG_CPU_CONFIG(vgb_config)
+	MCFG_TMS340X0_CONFIG(vgb_config)
 	MCFG_CPU_PROGRAM_MAP(vgbmem)
 
 	MCFG_CPU_ADD("drmath", AM29000, XTAL_32MHz / 2)

@@ -79,7 +79,7 @@ void exterm_scanline_update(screen_device &screen, bitmap_ind16 &bitmap, int sca
 	int x;
 
 	/* get parameters for the slave CPU */
-	tms34010_get_display_params(state->m_slave, &fgparams);
+	state->m_slave->get_display_params(&fgparams);
 
 	/* compute info about the slave vram */
 	if (fgparams.enabled && scanline >= fgparams.veblnk && scanline < fgparams.vsblnk && fgparams.heblnk < fgparams.hsblnk)

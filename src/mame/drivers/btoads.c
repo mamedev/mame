@@ -299,7 +299,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static const tms34010_config tms_config =
+static const tms340x0_config tms_config =
 {
 	FALSE,                          /* halt on reset */
 	"screen",                       /* the screen operated on */
@@ -323,7 +323,7 @@ static const tms34010_config tms_config =
 static MACHINE_CONFIG_START( btoads, btoads_state )
 
 	MCFG_CPU_ADD("maincpu", TMS34020, CPU_CLOCK/2)
-	MCFG_CPU_CONFIG(tms_config)
+	MCFG_TMS340X0_CONFIG(tms_config)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 
 	MCFG_CPU_ADD("audiocpu", Z80, SOUND_CLOCK/4)

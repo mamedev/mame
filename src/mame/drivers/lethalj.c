@@ -629,7 +629,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static const tms34010_config tms_config =
+static const tms340x0_config tms_config =
 {
 	FALSE,                          /* halt on reset */
 	"screen",                       /* the screen operated on */
@@ -641,7 +641,7 @@ static const tms34010_config tms_config =
 	NULL                            /* read from shiftreg function */
 };
 
-static const tms34010_config tms_config_lethalj =
+static const tms340x0_config tms_config_lethalj =
 {
 	FALSE,                          /* halt on reset */
 	"screen",                       /* the screen operated on */
@@ -665,7 +665,7 @@ static MACHINE_CONFIG_START( gameroom, lethalj_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS34010, MASTER_CLOCK)
-	MCFG_CPU_CONFIG(tms_config)
+	MCFG_TMS340X0_CONFIG(tms_config)
 	MCFG_CPU_PROGRAM_MAP(lethalj_map)
 
 	MCFG_TICKET_DISPENSER_ADD("ticket", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH)
@@ -695,7 +695,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( lethalj, gameroom )
 
 	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CONFIG(tms_config_lethalj)
+	MCFG_TMS340X0_CONFIG(tms_config_lethalj)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_RAW_PARAMS(VIDEO_CLOCK_LETHALJ, 689, 0, 512, 259, 0, 236)

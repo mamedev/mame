@@ -90,7 +90,7 @@ static void m68k_gen_int(device_t *device, int state)
 }
 
 
-static const tms34010_config tms_config_megaphx =
+static const tms340x0_config tms_config_megaphx =
 {
 	TRUE,                          /* halt on reset */
 	"inder_vid:inder_screen",                       /* the screen operated on */
@@ -110,7 +110,7 @@ ADDRESS_MAP_END
 
 static MACHINE_CONFIG_FRAGMENT( inder_vid )
 	MCFG_CPU_ADD("tms", TMS34010, XTAL_40MHz)
-	MCFG_CPU_CONFIG(tms_config_megaphx)
+	MCFG_TMS340X0_CONFIG(tms_config_megaphx)
 	MCFG_CPU_PROGRAM_MAP(megaphx_tms_map)
 
 	MCFG_SCREEN_ADD("inder_screen", RASTER)

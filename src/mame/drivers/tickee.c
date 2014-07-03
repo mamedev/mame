@@ -735,7 +735,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static const tms34010_config tms_config =
+static const tms340x0_config tms_config =
 {
 	FALSE,                          /* halt on reset */
 	"screen",                       /* the screen operated on */
@@ -749,7 +749,7 @@ static const tms34010_config tms_config =
 };
 
 
-static const tms34010_config rapidfir_tms_config =
+static const tms340x0_config rapidfir_tms_config =
 {
 	FALSE,                          /* halt on reset */
 	"screen",                       /* the screen operated on */
@@ -774,7 +774,7 @@ static MACHINE_CONFIG_START( tickee, tickee_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS34010, XTAL_40MHz)
-	MCFG_CPU_CONFIG(tms_config)
+	MCFG_TMS340X0_CONFIG(tms_config)
 	MCFG_CPU_PROGRAM_MAP(tickee_map)
 
 	MCFG_MACHINE_RESET_OVERRIDE(tickee_state,tickee)
@@ -819,7 +819,7 @@ static MACHINE_CONFIG_START( rapidfir, tickee_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS34010, XTAL_50MHz)
-	MCFG_CPU_CONFIG(rapidfir_tms_config)
+	MCFG_TMS340X0_CONFIG(rapidfir_tms_config)
 	MCFG_CPU_PROGRAM_MAP(rapidfir_map)
 
 	MCFG_MACHINE_RESET_OVERRIDE(tickee_state,rapidfir)
@@ -846,7 +846,7 @@ static MACHINE_CONFIG_START( mouseatk, tickee_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS34010, XTAL_40MHz)
-	MCFG_CPU_CONFIG(tms_config)
+	MCFG_TMS340X0_CONFIG(tms_config)
 	MCFG_CPU_PROGRAM_MAP(mouseatk_map)
 
 	MCFG_MACHINE_RESET_OVERRIDE(tickee_state,tickee)

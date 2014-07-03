@@ -11,53 +11,53 @@
 
 
 #define LOG_GFX_OPS 0
-#define LOGGFX(x) do { if (LOG_GFX_OPS && tms->device->machine().input().code_pressed(KEYCODE_L)) logerror x; } while (0)
+#define LOGGFX(x) do { if (LOG_GFX_OPS && machine().input().code_pressed(KEYCODE_L)) logerror x; } while (0)
 
 
 /* Graphics Instructions */
 
-static void line(tms34010_state *tms, UINT16 op)
+void tms340x0_device::line(UINT16 op)
 {
-	if (!P_FLAG(tms))
+	if (!P_FLAG())
 	{
-		if (WINDOW_CHECKING(tms) != 0 && WINDOW_CHECKING(tms) != 3)
-			logerror("LINE XY  %08X - Window Checking Mode %d not supported\n", tms->pc, WINDOW_CHECKING(tms));
+		if (WINDOW_CHECKING() != 0 && WINDOW_CHECKING() != 3)
+			logerror("LINE XY  %08X - Window Checking Mode %d not supported\n", m_pc, WINDOW_CHECKING());
 
-		tms->st |= STBIT_P;
-		TEMP(tms) = (op & 0x80) ? 1 : 0;  /* boundary value depends on the algorithm */
-		LOGGFX(("%08X(%3d):LINE (%d,%d)-(%d,%d)\n", tms->pc, tms->screen->vpos(), DADDR_X(tms), DADDR_Y(tms), DADDR_X(tms) + DYDX_X(tms), DADDR_Y(tms) + DYDX_Y(tms)));
+		m_st |= STBIT_P;
+		TEMP() = (op & 0x80) ? 1 : 0;  /* boundary value depends on the algorithm */
+		LOGGFX(("%08X(%3d):LINE (%d,%d)-(%d,%d)\n", m_pc, m_screen->vpos(), DADDR_X(), DADDR_Y(), DADDR_X() + DYDX_X(), DADDR_Y() + DYDX_Y()));
 	}
 
-	if (COUNT(tms) > 0)
+	if (COUNT() > 0)
 	{
 		INT16 x1,y1;
 
-		COUNT(tms)--;
-		if (WINDOW_CHECKING(tms) != 3 ||
-			(DADDR_X(tms) >= WSTART_X(tms) && DADDR_X(tms) <= WEND_X(tms) &&
-				DADDR_Y(tms) >= WSTART_Y(tms) && DADDR_Y(tms) <= WEND_Y(tms)))
-			WPIXEL(tms,DXYTOL(tms,DADDR_XY(tms)),COLOR1(tms));
+		COUNT()--;
+		if (WINDOW_CHECKING() != 3 ||
+			(DADDR_X() >= WSTART_X() && DADDR_X() <= WEND_X() &&
+				DADDR_Y() >= WSTART_Y() && DADDR_Y() <= WEND_Y()))
+			WPIXEL(DXYTOL(DADDR_XY()),COLOR1());
 
-		if (SADDR(tms) >= TEMP(tms))
+		if (SADDR() >= TEMP())
 		{
-			SADDR(tms) += DYDX_Y(tms)*2 - DYDX_X(tms)*2;
-			x1 = INC1_X(tms);
-			y1 = INC1_Y(tms);
+			SADDR() += DYDX_Y()*2 - DYDX_X()*2;
+			x1 = INC1_X();
+			y1 = INC1_Y();
 		}
 		else
 		{
-			SADDR(tms) += DYDX_Y(tms)*2;
-			x1 = INC2_X(tms);
-			y1 = INC2_Y(tms);
+			SADDR() += DYDX_Y()*2;
+			x1 = INC2_X();
+			y1 = INC2_Y();
 		}
-		DADDR_X(tms) += x1;
-		DADDR_Y(tms) += y1;
+		DADDR_X() += x1;
+		DADDR_Y() += y1;
 
-		COUNT_UNKNOWN_CYCLES(tms,2);
-		tms->pc -= 0x10;  /* not done yet, check for interrupts and restart instruction */
+		COUNT_UNKNOWN_CYCLES(2);
+		m_pc -= 0x10;  /* not done yet, check for interrupts and restart instruction */
 		return;
 	}
-	tms->st &= ~STBIT_P;
+	m_st &= ~STBIT_P;
 }
 
 
@@ -70,10 +70,10 @@ cases:
 * directions (left->right/right->left, top->bottom/bottom->top)
 */
 
-static int apply_window(tms34010_state *tms, const char *inst_name,int srcbpp, UINT32 *srcaddr, XY *dst, int *dx, int *dy)
+int tms340x0_device::apply_window(const char *inst_name,int srcbpp, UINT32 *srcaddr, XY *dst, int *dx, int *dy)
 {
 	/* apply the window */
-	if (WINDOW_CHECKING(tms) == 0)
+	if (WINDOW_CHECKING() == 0)
 		return 0;
 	else
 	{
@@ -83,45 +83,45 @@ static int apply_window(tms34010_state *tms, const char *inst_name,int srcbpp, U
 		int ey = sy + *dy - 1;
 		int diff, cycles = 3;
 
-		if (WINDOW_CHECKING(tms) == 2)
-			logerror("%08x: %s apply_window window mode %d not supported!\n", tms->device->pc(), inst_name, WINDOW_CHECKING(tms));
+		if (WINDOW_CHECKING() == 2)
+			logerror("%08x: %s apply_window window mode %d not supported!\n", pc(), inst_name, WINDOW_CHECKING());
 
-		CLR_V(tms);
-		if (WINDOW_CHECKING(tms) == 1)
-			SET_V_LOG(tms, 1);
+		CLR_V();
+		if (WINDOW_CHECKING() == 1)
+			SET_V_LOG(1);
 
 		/* clip X */
-		diff = WSTART_X(tms) - sx;
+		diff = WSTART_X() - sx;
 		if (diff > 0)
 		{
 			if (srcaddr)
 				*srcaddr += diff * srcbpp;
 			sx += diff;
-			SET_V_LOG(tms, 1);
+			SET_V_LOG(1);
 		}
-		diff = ex - WEND_X(tms);
+		diff = ex - WEND_X();
 		if (diff > 0)
 		{
 			ex -= diff;
-			SET_V_LOG(tms, 1);
+			SET_V_LOG(1);
 		}
 
 
 		/* clip Y */
-		diff = WSTART_Y(tms) - sy;
+		diff = WSTART_Y() - sy;
 		if (diff > 0)
 		{
 			if (srcaddr)
-				*srcaddr += diff * tms->convsp;
+				*srcaddr += diff * m_convsp;
 
 			sy += diff;
-			SET_V_LOG(tms, 1);
+			SET_V_LOG(1);
 		}
-		diff = ey - WEND_Y(tms);
+		diff = ey - WEND_Y();
 		if (diff > 0)
 		{
 			ey -= diff;
-			SET_V_LOG(tms, 1);
+			SET_V_LOG(1);
 		}
 
 		/* compute cycles */
@@ -166,7 +166,7 @@ static int apply_window(tms34010_state *tms, const char *inst_name,int srcbpp, U
 
 *******************************************************************/
 
-static int compute_fill_cycles(int left_partials, int right_partials, int full_words, int op_timing)
+int tms340x0_device::compute_fill_cycles(int left_partials, int right_partials, int full_words, int op_timing)
 {
 	int dstwords;
 
@@ -177,7 +177,7 @@ static int compute_fill_cycles(int left_partials, int right_partials, int full_w
 	return (dstwords * op_timing);
 }
 
-static int compute_pixblt_cycles(int left_partials, int right_partials, int full_words, int op_timing)
+int tms340x0_device::compute_pixblt_cycles(int left_partials, int right_partials, int full_words, int op_timing)
 {
 	int srcwords, dstwords;
 
@@ -189,7 +189,7 @@ static int compute_pixblt_cycles(int left_partials, int right_partials, int full
 	return (dstwords * op_timing + srcwords * 2) + 2;
 }
 
-static int compute_pixblt_b_cycles(int left_partials, int right_partials, int full_words, int rows, int op_timing, int bpp)
+int tms340x0_device::compute_pixblt_b_cycles(int left_partials, int right_partials, int full_words, int rows, int op_timing, int bpp)
 {
 	int srcwords, dstwords;
 
@@ -203,519 +203,428 @@ static int compute_pixblt_b_cycles(int left_partials, int right_partials, int fu
 
 
 /* Shift register handling */
-static void memory_w(address_space &space, offs_t offset,UINT16 data)
+void tms340x0_device::memory_w(address_space &space, offs_t offset,UINT16 data)
 {
 	space.write_word(offset, data);
 }
 
-static UINT16 memory_r(address_space &space, offs_t offset)
+UINT16 tms340x0_device::memory_r(address_space &space, offs_t offset)
 {
 	return space.read_word(offset);
 }
 
-static void shiftreg_w(address_space &space, offs_t offset,UINT16 data)
+void tms340x0_device::shiftreg_w(address_space &space, offs_t offset,UINT16 data)
 {
-	tms34010_state *tms = get_safe_token(&space.device());
-	if (tms->config->from_shiftreg)
-		(*tms->config->from_shiftreg)(space, (UINT32)(offset << 3) & ~15, &tms->shiftreg[0]);
+	if (m_config->from_shiftreg)
+		(*m_config->from_shiftreg)(space, (UINT32)(offset << 3) & ~15, &m_shiftreg[0]);
 	else
-		logerror("From ShiftReg function not set. PC = %08X\n", tms->pc);
+		logerror("From ShiftReg function not set. PC = %08X\n", m_pc);
 }
 
-static UINT16 shiftreg_r(address_space &space, offs_t offset)
+UINT16 tms340x0_device::shiftreg_r(address_space &space, offs_t offset)
 {
-	tms34010_state *tms = get_safe_token(&space.device());
-	if (tms->config->to_shiftreg)
-		(*tms->config->to_shiftreg)(space, (UINT32)(offset << 3) & ~15, &tms->shiftreg[0]);
+	if (m_config->to_shiftreg)
+		(*m_config->to_shiftreg)(space, (UINT32)(offset << 3) & ~15, &m_shiftreg[0]);
 	else
-		logerror("To ShiftReg function not set. PC = %08X\n", tms->pc);
-	return tms->shiftreg[0];
+		logerror("To ShiftReg function not set. PC = %08X\n", m_pc);
+	return m_shiftreg[0];
 }
 
-static UINT16 dummy_shiftreg_r(address_space &space, offs_t offset)
+UINT16 tms340x0_device::dummy_shiftreg_r(address_space &space, offs_t offset)
 {
-	tms34010_state *tms = get_safe_token(&space.device());
-	return tms->shiftreg[0];
+	return m_shiftreg[0];
 }
 
 
 
 /* Pixel operations */
-static UINT32 pixel_op00(UINT32 dstpix, UINT32 mask, UINT32 srcpix) { return srcpix; }
-static UINT32 pixel_op01(UINT32 dstpix, UINT32 mask, UINT32 srcpix) { return srcpix & dstpix; }
-static UINT32 pixel_op02(UINT32 dstpix, UINT32 mask, UINT32 srcpix) { return srcpix & ~dstpix; }
-static UINT32 pixel_op03(UINT32 dstpix, UINT32 mask, UINT32 srcpix) { return 0; }
-static UINT32 pixel_op04(UINT32 dstpix, UINT32 mask, UINT32 srcpix) { return (srcpix | ~dstpix) & mask; }
-static UINT32 pixel_op05(UINT32 dstpix, UINT32 mask, UINT32 srcpix) { return ~(srcpix ^ dstpix) & mask; }
-static UINT32 pixel_op06(UINT32 dstpix, UINT32 mask, UINT32 srcpix) { return ~dstpix & mask; }
-static UINT32 pixel_op07(UINT32 dstpix, UINT32 mask, UINT32 srcpix) { return ~(srcpix | dstpix) & mask; }
-static UINT32 pixel_op08(UINT32 dstpix, UINT32 mask, UINT32 srcpix) { return (srcpix | dstpix) & mask; }
-static UINT32 pixel_op09(UINT32 dstpix, UINT32 mask, UINT32 srcpix) { return dstpix & mask; }
-static UINT32 pixel_op10(UINT32 dstpix, UINT32 mask, UINT32 srcpix) { return (srcpix ^ dstpix) & mask; }
-static UINT32 pixel_op11(UINT32 dstpix, UINT32 mask, UINT32 srcpix) { return (~srcpix & dstpix) & mask; }
-static UINT32 pixel_op12(UINT32 dstpix, UINT32 mask, UINT32 srcpix) { return mask; }
-static UINT32 pixel_op13(UINT32 dstpix, UINT32 mask, UINT32 srcpix) { return (~srcpix & dstpix) & mask; }
-static UINT32 pixel_op14(UINT32 dstpix, UINT32 mask, UINT32 srcpix) { return ~(srcpix & dstpix) & mask; }
-static UINT32 pixel_op15(UINT32 dstpix, UINT32 mask, UINT32 srcpix) { return srcpix ^ mask; }
-static UINT32 pixel_op16(UINT32 dstpix, UINT32 mask, UINT32 srcpix) { return (srcpix + dstpix) & mask; }
-static UINT32 pixel_op17(UINT32 dstpix, UINT32 mask, UINT32 srcpix) { INT32 tmp = srcpix + (dstpix & mask); return (tmp > mask) ? mask : tmp; }
-static UINT32 pixel_op18(UINT32 dstpix, UINT32 mask, UINT32 srcpix) { return (dstpix - srcpix) & mask; }
-static UINT32 pixel_op19(UINT32 dstpix, UINT32 mask, UINT32 srcpix) { INT32 tmp = srcpix - (dstpix & mask); return (tmp < 0) ? 0 : tmp; }
-static UINT32 pixel_op20(UINT32 dstpix, UINT32 mask, UINT32 srcpix) { dstpix &= mask; return (srcpix > dstpix) ? srcpix : dstpix; }
-static UINT32 pixel_op21(UINT32 dstpix, UINT32 mask, UINT32 srcpix) { dstpix &= mask; return (srcpix < dstpix) ? srcpix : dstpix; }
+UINT32 tms340x0_device::pixel_op00(UINT32 dstpix, UINT32 mask, UINT32 srcpix) { return srcpix; }
+UINT32 tms340x0_device::pixel_op01(UINT32 dstpix, UINT32 mask, UINT32 srcpix) { return srcpix & dstpix; }
+UINT32 tms340x0_device::pixel_op02(UINT32 dstpix, UINT32 mask, UINT32 srcpix) { return srcpix & ~dstpix; }
+UINT32 tms340x0_device::pixel_op03(UINT32 dstpix, UINT32 mask, UINT32 srcpix) { return 0; }
+UINT32 tms340x0_device::pixel_op04(UINT32 dstpix, UINT32 mask, UINT32 srcpix) { return (srcpix | ~dstpix) & mask; }
+UINT32 tms340x0_device::pixel_op05(UINT32 dstpix, UINT32 mask, UINT32 srcpix) { return ~(srcpix ^ dstpix) & mask; }
+UINT32 tms340x0_device::pixel_op06(UINT32 dstpix, UINT32 mask, UINT32 srcpix) { return ~dstpix & mask; }
+UINT32 tms340x0_device::pixel_op07(UINT32 dstpix, UINT32 mask, UINT32 srcpix) { return ~(srcpix | dstpix) & mask; }
+UINT32 tms340x0_device::pixel_op08(UINT32 dstpix, UINT32 mask, UINT32 srcpix) { return (srcpix | dstpix) & mask; }
+UINT32 tms340x0_device::pixel_op09(UINT32 dstpix, UINT32 mask, UINT32 srcpix) { return dstpix & mask; }
+UINT32 tms340x0_device::pixel_op10(UINT32 dstpix, UINT32 mask, UINT32 srcpix) { return (srcpix ^ dstpix) & mask; }
+UINT32 tms340x0_device::pixel_op11(UINT32 dstpix, UINT32 mask, UINT32 srcpix) { return (~srcpix & dstpix) & mask; }
+UINT32 tms340x0_device::pixel_op12(UINT32 dstpix, UINT32 mask, UINT32 srcpix) { return mask; }
+UINT32 tms340x0_device::pixel_op13(UINT32 dstpix, UINT32 mask, UINT32 srcpix) { return (~srcpix & dstpix) & mask; }
+UINT32 tms340x0_device::pixel_op14(UINT32 dstpix, UINT32 mask, UINT32 srcpix) { return ~(srcpix & dstpix) & mask; }
+UINT32 tms340x0_device::pixel_op15(UINT32 dstpix, UINT32 mask, UINT32 srcpix) { return srcpix ^ mask; }
+UINT32 tms340x0_device::pixel_op16(UINT32 dstpix, UINT32 mask, UINT32 srcpix) { return (srcpix + dstpix) & mask; }
+UINT32 tms340x0_device::pixel_op17(UINT32 dstpix, UINT32 mask, UINT32 srcpix) { INT32 tmp = srcpix + (dstpix & mask); return (tmp > mask) ? mask : tmp; }
+UINT32 tms340x0_device::pixel_op18(UINT32 dstpix, UINT32 mask, UINT32 srcpix) { return (dstpix - srcpix) & mask; }
+UINT32 tms340x0_device::pixel_op19(UINT32 dstpix, UINT32 mask, UINT32 srcpix) { INT32 tmp = srcpix - (dstpix & mask); return (tmp < 0) ? 0 : tmp; }
+UINT32 tms340x0_device::pixel_op20(UINT32 dstpix, UINT32 mask, UINT32 srcpix) { dstpix &= mask; return (srcpix > dstpix) ? srcpix : dstpix; }
+UINT32 tms340x0_device::pixel_op21(UINT32 dstpix, UINT32 mask, UINT32 srcpix) { dstpix &= mask; return (srcpix < dstpix) ? srcpix : dstpix; }
 
-static UINT32 (*const pixel_op_table[])(UINT32, UINT32, UINT32) =
+const tms340x0_device::pixel_op_func tms340x0_device::s_pixel_op_table[32] =
 {
-	pixel_op00, pixel_op01, pixel_op02, pixel_op03, pixel_op04, pixel_op05, pixel_op06, pixel_op07,
-	pixel_op08, pixel_op09, pixel_op10, pixel_op11, pixel_op12, pixel_op13, pixel_op14, pixel_op15,
-	pixel_op16, pixel_op17, pixel_op18, pixel_op19, pixel_op20, pixel_op21, pixel_op00, pixel_op00,
-	pixel_op00, pixel_op00, pixel_op00, pixel_op00, pixel_op00, pixel_op00, pixel_op00, pixel_op00
+	&tms340x0_device::pixel_op00, &tms340x0_device::pixel_op01, &tms340x0_device::pixel_op02, &tms340x0_device::pixel_op03, &tms340x0_device::pixel_op04, &tms340x0_device::pixel_op05, &tms340x0_device::pixel_op06, &tms340x0_device::pixel_op07,
+	&tms340x0_device::pixel_op08, &tms340x0_device::pixel_op09, &tms340x0_device::pixel_op10, &tms340x0_device::pixel_op11, &tms340x0_device::pixel_op12, &tms340x0_device::pixel_op13, &tms340x0_device::pixel_op14, &tms340x0_device::pixel_op15,
+	&tms340x0_device::pixel_op16, &tms340x0_device::pixel_op17, &tms340x0_device::pixel_op18, &tms340x0_device::pixel_op19, &tms340x0_device::pixel_op20, &tms340x0_device::pixel_op21, &tms340x0_device::pixel_op00, &tms340x0_device::pixel_op00,
+	&tms340x0_device::pixel_op00, &tms340x0_device::pixel_op00, &tms340x0_device::pixel_op00, &tms340x0_device::pixel_op00, &tms340x0_device::pixel_op00, &tms340x0_device::pixel_op00, &tms340x0_device::pixel_op00, &tms340x0_device::pixel_op00
 };
-static const UINT8 pixel_op_timing_table[] =
+const UINT8 tms340x0_device::s_pixel_op_timing_table[33] =
 {
 	2,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,5,5,6,5,5,2,2,2,2,2,2,2,2,2,2,2
 };
-static UINT32 (*pixel_op)(UINT32, UINT32, UINT32);
-static UINT32 pixel_op_timing;
-
-
-/* Blitters/fillers */
-static void pixblt_1_op0(tms34010_state *tms, int src_is_linear, int dst_is_linear);
-static void pixblt_2_op0(tms34010_state *tms, int src_is_linear, int dst_is_linear);
-static void pixblt_4_op0(tms34010_state *tms, int src_is_linear, int dst_is_linear);
-static void pixblt_8_op0(tms34010_state *tms, int src_is_linear, int dst_is_linear);
-static void pixblt_16_op0(tms34010_state *tms, int src_is_linear, int dst_is_linear);
-static void pixblt_r_1_op0(tms34010_state *tms, int src_is_linear, int dst_is_linear);
-static void pixblt_r_2_op0(tms34010_state *tms, int src_is_linear, int dst_is_linear);
-static void pixblt_r_4_op0(tms34010_state *tms, int src_is_linear, int dst_is_linear);
-static void pixblt_r_8_op0(tms34010_state *tms, int src_is_linear, int dst_is_linear);
-static void pixblt_r_16_op0(tms34010_state *tms, int src_is_linear, int dst_is_linear);
-static void pixblt_b_1_op0(tms34010_state *tms, int dst_is_linear);
-static void pixblt_b_2_op0(tms34010_state *tms, int dst_is_linear);
-static void pixblt_b_4_op0(tms34010_state *tms, int dst_is_linear);
-static void pixblt_b_8_op0(tms34010_state *tms, int dst_is_linear);
-static void pixblt_b_16_op0(tms34010_state *tms, int dst_is_linear);
-static void fill_1_op0(tms34010_state *tms, int dst_is_linear);
-static void fill_2_op0(tms34010_state *tms, int dst_is_linear);
-static void fill_4_op0(tms34010_state *tms, int dst_is_linear);
-static void fill_8_op0(tms34010_state *tms, int dst_is_linear);
-static void fill_16_op0(tms34010_state *tms, int dst_is_linear);
-
-static void pixblt_1_op0_trans(tms34010_state *tms, int src_is_linear, int dst_is_linear);
-static void pixblt_2_op0_trans(tms34010_state *tms, int src_is_linear, int dst_is_linear);
-static void pixblt_4_op0_trans(tms34010_state *tms, int src_is_linear, int dst_is_linear);
-static void pixblt_8_op0_trans(tms34010_state *tms, int src_is_linear, int dst_is_linear);
-static void pixblt_16_op0_trans(tms34010_state *tms, int src_is_linear, int dst_is_linear);
-static void pixblt_r_1_op0_trans(tms34010_state *tms, int src_is_linear, int dst_is_linear);
-static void pixblt_r_2_op0_trans(tms34010_state *tms, int src_is_linear, int dst_is_linear);
-static void pixblt_r_4_op0_trans(tms34010_state *tms, int src_is_linear, int dst_is_linear);
-static void pixblt_r_8_op0_trans(tms34010_state *tms, int src_is_linear, int dst_is_linear);
-static void pixblt_r_16_op0_trans(tms34010_state *tms, int src_is_linear, int dst_is_linear);
-static void pixblt_b_1_op0_trans(tms34010_state *tms, int dst_is_linear);
-static void pixblt_b_2_op0_trans(tms34010_state *tms, int dst_is_linear);
-static void pixblt_b_4_op0_trans(tms34010_state *tms, int dst_is_linear);
-static void pixblt_b_8_op0_trans(tms34010_state *tms, int dst_is_linear);
-static void pixblt_b_16_op0_trans(tms34010_state *tms, int dst_is_linear);
-static void fill_1_op0_trans(tms34010_state *tms, int dst_is_linear);
-static void fill_2_op0_trans(tms34010_state *tms, int dst_is_linear);
-static void fill_4_op0_trans(tms34010_state *tms, int dst_is_linear);
-static void fill_8_op0_trans(tms34010_state *tms, int dst_is_linear);
-static void fill_16_op0_trans(tms34010_state *tms, int dst_is_linear);
-
-static void pixblt_1_opx(tms34010_state *tms, int src_is_linear, int dst_is_linear);
-static void pixblt_2_opx(tms34010_state *tms, int src_is_linear, int dst_is_linear);
-static void pixblt_4_opx(tms34010_state *tms, int src_is_linear, int dst_is_linear);
-static void pixblt_8_opx(tms34010_state *tms, int src_is_linear, int dst_is_linear);
-static void pixblt_16_opx(tms34010_state *tms, int src_is_linear, int dst_is_linear);
-static void pixblt_r_1_opx(tms34010_state *tms, int src_is_linear, int dst_is_linear);
-static void pixblt_r_2_opx(tms34010_state *tms, int src_is_linear, int dst_is_linear);
-static void pixblt_r_4_opx(tms34010_state *tms, int src_is_linear, int dst_is_linear);
-static void pixblt_r_8_opx(tms34010_state *tms, int src_is_linear, int dst_is_linear);
-static void pixblt_r_16_opx(tms34010_state *tms, int src_is_linear, int dst_is_linear);
-static void pixblt_b_1_opx(tms34010_state *tms, int dst_is_linear);
-static void pixblt_b_2_opx(tms34010_state *tms, int dst_is_linear);
-static void pixblt_b_4_opx(tms34010_state *tms, int dst_is_linear);
-static void pixblt_b_8_opx(tms34010_state *tms, int dst_is_linear);
-static void pixblt_b_16_opx(tms34010_state *tms, int dst_is_linear);
-static void fill_1_opx(tms34010_state *tms, int dst_is_linear);
-static void fill_2_opx(tms34010_state *tms, int dst_is_linear);
-static void fill_4_opx(tms34010_state *tms, int dst_is_linear);
-static void fill_8_opx(tms34010_state *tms, int dst_is_linear);
-static void fill_16_opx(tms34010_state *tms, int dst_is_linear);
-
-static void pixblt_1_opx_trans(tms34010_state *tms, int src_is_linear, int dst_is_linear);
-static void pixblt_2_opx_trans(tms34010_state *tms, int src_is_linear, int dst_is_linear);
-static void pixblt_4_opx_trans(tms34010_state *tms, int src_is_linear, int dst_is_linear);
-static void pixblt_8_opx_trans(tms34010_state *tms, int src_is_linear, int dst_is_linear);
-static void pixblt_16_opx_trans(tms34010_state *tms, int src_is_linear, int dst_is_linear);
-static void pixblt_r_1_opx_trans(tms34010_state *tms, int src_is_linear, int dst_is_linear);
-static void pixblt_r_2_opx_trans(tms34010_state *tms, int src_is_linear, int dst_is_linear);
-static void pixblt_r_4_opx_trans(tms34010_state *tms, int src_is_linear, int dst_is_linear);
-static void pixblt_r_8_opx_trans(tms34010_state *tms, int src_is_linear, int dst_is_linear);
-static void pixblt_r_16_opx_trans(tms34010_state *tms, int src_is_linear, int dst_is_linear);
-static void pixblt_b_1_opx_trans(tms34010_state *tms, int dst_is_linear);
-static void pixblt_b_2_opx_trans(tms34010_state *tms, int dst_is_linear);
-static void pixblt_b_4_opx_trans(tms34010_state *tms, int dst_is_linear);
-static void pixblt_b_8_opx_trans(tms34010_state *tms, int dst_is_linear);
-static void pixblt_b_16_opx_trans(tms34010_state *tms, int dst_is_linear);
-static void fill_1_opx_trans(tms34010_state *tms, int dst_is_linear);
-static void fill_2_opx_trans(tms34010_state *tms, int dst_is_linear);
-static void fill_4_opx_trans(tms34010_state *tms, int dst_is_linear);
-static void fill_8_opx_trans(tms34010_state *tms, int dst_is_linear);
-static void fill_16_opx_trans(tms34010_state *tms, int dst_is_linear);
 
 
 /* tables */
-static void (*const pixblt_op_table[])(tms34010_state *, int, int) =
+const tms340x0_device::pixblt_op_func tms340x0_device::s_pixblt_op_table[] =
 {
-	pixblt_1_op0,   pixblt_1_op0_trans,     pixblt_1_opx,   pixblt_1_opx_trans,
-	pixblt_1_opx,   pixblt_1_opx_trans,     pixblt_1_opx,   pixblt_1_opx_trans,
-	pixblt_1_opx,   pixblt_1_opx_trans,     pixblt_1_opx,   pixblt_1_opx_trans,
-	pixblt_1_opx,   pixblt_1_opx_trans,     pixblt_1_opx,   pixblt_1_opx_trans,
-	pixblt_1_opx,   pixblt_1_opx_trans,     pixblt_1_opx,   pixblt_1_opx_trans,
-	pixblt_1_opx,   pixblt_1_opx_trans,     pixblt_1_opx,   pixblt_1_opx_trans,
-	pixblt_1_opx,   pixblt_1_opx_trans,     pixblt_1_opx,   pixblt_1_opx_trans,
-	pixblt_1_opx,   pixblt_1_opx_trans,     pixblt_1_opx,   pixblt_1_opx_trans,
-	pixblt_1_opx,   pixblt_1_opx_trans,     pixblt_1_opx,   pixblt_1_opx_trans,
-	pixblt_1_opx,   pixblt_1_opx_trans,     pixblt_1_opx,   pixblt_1_opx_trans,
-	pixblt_1_opx,   pixblt_1_opx_trans,     pixblt_1_opx,   pixblt_1_opx_trans,
-	pixblt_1_opx,   pixblt_1_opx_trans,     pixblt_1_opx,   pixblt_1_opx_trans,
-	pixblt_1_opx,   pixblt_1_opx_trans,     pixblt_1_opx,   pixblt_1_opx_trans,
-	pixblt_1_opx,   pixblt_1_opx_trans,     pixblt_1_opx,   pixblt_1_opx_trans,
-	pixblt_1_opx,   pixblt_1_opx_trans,     pixblt_1_opx,   pixblt_1_opx_trans,
-	pixblt_1_opx,   pixblt_1_opx_trans,     pixblt_1_opx,   pixblt_1_opx_trans,
+	&tms340x0_device::pixblt_1_op0,   &tms340x0_device::pixblt_1_op0_trans,     &tms340x0_device::pixblt_1_opx,   &tms340x0_device::pixblt_1_opx_trans,
+	&tms340x0_device::pixblt_1_opx,   &tms340x0_device::pixblt_1_opx_trans,     &tms340x0_device::pixblt_1_opx,   &tms340x0_device::pixblt_1_opx_trans,
+	&tms340x0_device::pixblt_1_opx,   &tms340x0_device::pixblt_1_opx_trans,     &tms340x0_device::pixblt_1_opx,   &tms340x0_device::pixblt_1_opx_trans,
+	&tms340x0_device::pixblt_1_opx,   &tms340x0_device::pixblt_1_opx_trans,     &tms340x0_device::pixblt_1_opx,   &tms340x0_device::pixblt_1_opx_trans,
+	&tms340x0_device::pixblt_1_opx,   &tms340x0_device::pixblt_1_opx_trans,     &tms340x0_device::pixblt_1_opx,   &tms340x0_device::pixblt_1_opx_trans,
+	&tms340x0_device::pixblt_1_opx,   &tms340x0_device::pixblt_1_opx_trans,     &tms340x0_device::pixblt_1_opx,   &tms340x0_device::pixblt_1_opx_trans,
+	&tms340x0_device::pixblt_1_opx,   &tms340x0_device::pixblt_1_opx_trans,     &tms340x0_device::pixblt_1_opx,   &tms340x0_device::pixblt_1_opx_trans,
+	&tms340x0_device::pixblt_1_opx,   &tms340x0_device::pixblt_1_opx_trans,     &tms340x0_device::pixblt_1_opx,   &tms340x0_device::pixblt_1_opx_trans,
+	&tms340x0_device::pixblt_1_opx,   &tms340x0_device::pixblt_1_opx_trans,     &tms340x0_device::pixblt_1_opx,   &tms340x0_device::pixblt_1_opx_trans,
+	&tms340x0_device::pixblt_1_opx,   &tms340x0_device::pixblt_1_opx_trans,     &tms340x0_device::pixblt_1_opx,   &tms340x0_device::pixblt_1_opx_trans,
+	&tms340x0_device::pixblt_1_opx,   &tms340x0_device::pixblt_1_opx_trans,     &tms340x0_device::pixblt_1_opx,   &tms340x0_device::pixblt_1_opx_trans,
+	&tms340x0_device::pixblt_1_opx,   &tms340x0_device::pixblt_1_opx_trans,     &tms340x0_device::pixblt_1_opx,   &tms340x0_device::pixblt_1_opx_trans,
+	&tms340x0_device::pixblt_1_opx,   &tms340x0_device::pixblt_1_opx_trans,     &tms340x0_device::pixblt_1_opx,   &tms340x0_device::pixblt_1_opx_trans,
+	&tms340x0_device::pixblt_1_opx,   &tms340x0_device::pixblt_1_opx_trans,     &tms340x0_device::pixblt_1_opx,   &tms340x0_device::pixblt_1_opx_trans,
+	&tms340x0_device::pixblt_1_opx,   &tms340x0_device::pixblt_1_opx_trans,     &tms340x0_device::pixblt_1_opx,   &tms340x0_device::pixblt_1_opx_trans,
+	&tms340x0_device::pixblt_1_opx,   &tms340x0_device::pixblt_1_opx_trans,     &tms340x0_device::pixblt_1_opx,   &tms340x0_device::pixblt_1_opx_trans,
 
-	pixblt_2_op0,   pixblt_2_op0_trans,     pixblt_2_opx,   pixblt_2_opx_trans,
-	pixblt_2_opx,   pixblt_2_opx_trans,     pixblt_2_opx,   pixblt_2_opx_trans,
-	pixblt_2_opx,   pixblt_2_opx_trans,     pixblt_2_opx,   pixblt_2_opx_trans,
-	pixblt_2_opx,   pixblt_2_opx_trans,     pixblt_2_opx,   pixblt_2_opx_trans,
-	pixblt_2_opx,   pixblt_2_opx_trans,     pixblt_2_opx,   pixblt_2_opx_trans,
-	pixblt_2_opx,   pixblt_2_opx_trans,     pixblt_2_opx,   pixblt_2_opx_trans,
-	pixblt_2_opx,   pixblt_2_opx_trans,     pixblt_2_opx,   pixblt_2_opx_trans,
-	pixblt_2_opx,   pixblt_2_opx_trans,     pixblt_2_opx,   pixblt_2_opx_trans,
-	pixblt_2_opx,   pixblt_2_opx_trans,     pixblt_2_opx,   pixblt_2_opx_trans,
-	pixblt_2_opx,   pixblt_2_opx_trans,     pixblt_2_opx,   pixblt_2_opx_trans,
-	pixblt_2_opx,   pixblt_2_opx_trans,     pixblt_2_opx,   pixblt_2_opx_trans,
-	pixblt_2_opx,   pixblt_2_opx_trans,     pixblt_2_opx,   pixblt_2_opx_trans,
-	pixblt_2_opx,   pixblt_2_opx_trans,     pixblt_2_opx,   pixblt_2_opx_trans,
-	pixblt_2_opx,   pixblt_2_opx_trans,     pixblt_2_opx,   pixblt_2_opx_trans,
-	pixblt_2_opx,   pixblt_2_opx_trans,     pixblt_2_opx,   pixblt_2_opx_trans,
-	pixblt_2_opx,   pixblt_2_opx_trans,     pixblt_2_opx,   pixblt_2_opx_trans,
+	&tms340x0_device::pixblt_2_op0,   &tms340x0_device::pixblt_2_op0_trans,     &tms340x0_device::pixblt_2_opx,   &tms340x0_device::pixblt_2_opx_trans,
+	&tms340x0_device::pixblt_2_opx,   &tms340x0_device::pixblt_2_opx_trans,     &tms340x0_device::pixblt_2_opx,   &tms340x0_device::pixblt_2_opx_trans,
+	&tms340x0_device::pixblt_2_opx,   &tms340x0_device::pixblt_2_opx_trans,     &tms340x0_device::pixblt_2_opx,   &tms340x0_device::pixblt_2_opx_trans,
+	&tms340x0_device::pixblt_2_opx,   &tms340x0_device::pixblt_2_opx_trans,     &tms340x0_device::pixblt_2_opx,   &tms340x0_device::pixblt_2_opx_trans,
+	&tms340x0_device::pixblt_2_opx,   &tms340x0_device::pixblt_2_opx_trans,     &tms340x0_device::pixblt_2_opx,   &tms340x0_device::pixblt_2_opx_trans,
+	&tms340x0_device::pixblt_2_opx,   &tms340x0_device::pixblt_2_opx_trans,     &tms340x0_device::pixblt_2_opx,   &tms340x0_device::pixblt_2_opx_trans,
+	&tms340x0_device::pixblt_2_opx,   &tms340x0_device::pixblt_2_opx_trans,     &tms340x0_device::pixblt_2_opx,   &tms340x0_device::pixblt_2_opx_trans,
+	&tms340x0_device::pixblt_2_opx,   &tms340x0_device::pixblt_2_opx_trans,     &tms340x0_device::pixblt_2_opx,   &tms340x0_device::pixblt_2_opx_trans,
+	&tms340x0_device::pixblt_2_opx,   &tms340x0_device::pixblt_2_opx_trans,     &tms340x0_device::pixblt_2_opx,   &tms340x0_device::pixblt_2_opx_trans,
+	&tms340x0_device::pixblt_2_opx,   &tms340x0_device::pixblt_2_opx_trans,     &tms340x0_device::pixblt_2_opx,   &tms340x0_device::pixblt_2_opx_trans,
+	&tms340x0_device::pixblt_2_opx,   &tms340x0_device::pixblt_2_opx_trans,     &tms340x0_device::pixblt_2_opx,   &tms340x0_device::pixblt_2_opx_trans,
+	&tms340x0_device::pixblt_2_opx,   &tms340x0_device::pixblt_2_opx_trans,     &tms340x0_device::pixblt_2_opx,   &tms340x0_device::pixblt_2_opx_trans,
+	&tms340x0_device::pixblt_2_opx,   &tms340x0_device::pixblt_2_opx_trans,     &tms340x0_device::pixblt_2_opx,   &tms340x0_device::pixblt_2_opx_trans,
+	&tms340x0_device::pixblt_2_opx,   &tms340x0_device::pixblt_2_opx_trans,     &tms340x0_device::pixblt_2_opx,   &tms340x0_device::pixblt_2_opx_trans,
+	&tms340x0_device::pixblt_2_opx,   &tms340x0_device::pixblt_2_opx_trans,     &tms340x0_device::pixblt_2_opx,   &tms340x0_device::pixblt_2_opx_trans,
+	&tms340x0_device::pixblt_2_opx,   &tms340x0_device::pixblt_2_opx_trans,     &tms340x0_device::pixblt_2_opx,   &tms340x0_device::pixblt_2_opx_trans,
 
-	pixblt_4_op0,   pixblt_4_op0_trans,     pixblt_4_opx,   pixblt_4_opx_trans,
-	pixblt_4_opx,   pixblt_4_opx_trans,     pixblt_4_opx,   pixblt_4_opx_trans,
-	pixblt_4_opx,   pixblt_4_opx_trans,     pixblt_4_opx,   pixblt_4_opx_trans,
-	pixblt_4_opx,   pixblt_4_opx_trans,     pixblt_4_opx,   pixblt_4_opx_trans,
-	pixblt_4_opx,   pixblt_4_opx_trans,     pixblt_4_opx,   pixblt_4_opx_trans,
-	pixblt_4_opx,   pixblt_4_opx_trans,     pixblt_4_opx,   pixblt_4_opx_trans,
-	pixblt_4_opx,   pixblt_4_opx_trans,     pixblt_4_opx,   pixblt_4_opx_trans,
-	pixblt_4_opx,   pixblt_4_opx_trans,     pixblt_4_opx,   pixblt_4_opx_trans,
-	pixblt_4_opx,   pixblt_4_opx_trans,     pixblt_4_opx,   pixblt_4_opx_trans,
-	pixblt_4_opx,   pixblt_4_opx_trans,     pixblt_4_opx,   pixblt_4_opx_trans,
-	pixblt_4_opx,   pixblt_4_opx_trans,     pixblt_4_opx,   pixblt_4_opx_trans,
-	pixblt_4_opx,   pixblt_4_opx_trans,     pixblt_4_opx,   pixblt_4_opx_trans,
-	pixblt_4_opx,   pixblt_4_opx_trans,     pixblt_4_opx,   pixblt_4_opx_trans,
-	pixblt_4_opx,   pixblt_4_opx_trans,     pixblt_4_opx,   pixblt_4_opx_trans,
-	pixblt_4_opx,   pixblt_4_opx_trans,     pixblt_4_opx,   pixblt_4_opx_trans,
-	pixblt_4_opx,   pixblt_4_opx_trans,     pixblt_4_opx,   pixblt_4_opx_trans,
+	&tms340x0_device::pixblt_4_op0,   &tms340x0_device::pixblt_4_op0_trans,     &tms340x0_device::pixblt_4_opx,   &tms340x0_device::pixblt_4_opx_trans,
+	&tms340x0_device::pixblt_4_opx,   &tms340x0_device::pixblt_4_opx_trans,     &tms340x0_device::pixblt_4_opx,   &tms340x0_device::pixblt_4_opx_trans,
+	&tms340x0_device::pixblt_4_opx,   &tms340x0_device::pixblt_4_opx_trans,     &tms340x0_device::pixblt_4_opx,   &tms340x0_device::pixblt_4_opx_trans,
+	&tms340x0_device::pixblt_4_opx,   &tms340x0_device::pixblt_4_opx_trans,     &tms340x0_device::pixblt_4_opx,   &tms340x0_device::pixblt_4_opx_trans,
+	&tms340x0_device::pixblt_4_opx,   &tms340x0_device::pixblt_4_opx_trans,     &tms340x0_device::pixblt_4_opx,   &tms340x0_device::pixblt_4_opx_trans,
+	&tms340x0_device::pixblt_4_opx,   &tms340x0_device::pixblt_4_opx_trans,     &tms340x0_device::pixblt_4_opx,   &tms340x0_device::pixblt_4_opx_trans,
+	&tms340x0_device::pixblt_4_opx,   &tms340x0_device::pixblt_4_opx_trans,     &tms340x0_device::pixblt_4_opx,   &tms340x0_device::pixblt_4_opx_trans,
+	&tms340x0_device::pixblt_4_opx,   &tms340x0_device::pixblt_4_opx_trans,     &tms340x0_device::pixblt_4_opx,   &tms340x0_device::pixblt_4_opx_trans,
+	&tms340x0_device::pixblt_4_opx,   &tms340x0_device::pixblt_4_opx_trans,     &tms340x0_device::pixblt_4_opx,   &tms340x0_device::pixblt_4_opx_trans,
+	&tms340x0_device::pixblt_4_opx,   &tms340x0_device::pixblt_4_opx_trans,     &tms340x0_device::pixblt_4_opx,   &tms340x0_device::pixblt_4_opx_trans,
+	&tms340x0_device::pixblt_4_opx,   &tms340x0_device::pixblt_4_opx_trans,     &tms340x0_device::pixblt_4_opx,   &tms340x0_device::pixblt_4_opx_trans,
+	&tms340x0_device::pixblt_4_opx,   &tms340x0_device::pixblt_4_opx_trans,     &tms340x0_device::pixblt_4_opx,   &tms340x0_device::pixblt_4_opx_trans,
+	&tms340x0_device::pixblt_4_opx,   &tms340x0_device::pixblt_4_opx_trans,     &tms340x0_device::pixblt_4_opx,   &tms340x0_device::pixblt_4_opx_trans,
+	&tms340x0_device::pixblt_4_opx,   &tms340x0_device::pixblt_4_opx_trans,     &tms340x0_device::pixblt_4_opx,   &tms340x0_device::pixblt_4_opx_trans,
+	&tms340x0_device::pixblt_4_opx,   &tms340x0_device::pixblt_4_opx_trans,     &tms340x0_device::pixblt_4_opx,   &tms340x0_device::pixblt_4_opx_trans,
+	&tms340x0_device::pixblt_4_opx,   &tms340x0_device::pixblt_4_opx_trans,     &tms340x0_device::pixblt_4_opx,   &tms340x0_device::pixblt_4_opx_trans,
 
-	pixblt_8_op0,   pixblt_8_op0_trans,     pixblt_8_opx,   pixblt_8_opx_trans,
-	pixblt_8_opx,   pixblt_8_opx_trans,     pixblt_8_opx,   pixblt_8_opx_trans,
-	pixblt_8_opx,   pixblt_8_opx_trans,     pixblt_8_opx,   pixblt_8_opx_trans,
-	pixblt_8_opx,   pixblt_8_opx_trans,     pixblt_8_opx,   pixblt_8_opx_trans,
-	pixblt_8_opx,   pixblt_8_opx_trans,     pixblt_8_opx,   pixblt_8_opx_trans,
-	pixblt_8_opx,   pixblt_8_opx_trans,     pixblt_8_opx,   pixblt_8_opx_trans,
-	pixblt_8_opx,   pixblt_8_opx_trans,     pixblt_8_opx,   pixblt_8_opx_trans,
-	pixblt_8_opx,   pixblt_8_opx_trans,     pixblt_8_opx,   pixblt_8_opx_trans,
-	pixblt_8_opx,   pixblt_8_opx_trans,     pixblt_8_opx,   pixblt_8_opx_trans,
-	pixblt_8_opx,   pixblt_8_opx_trans,     pixblt_8_opx,   pixblt_8_opx_trans,
-	pixblt_8_opx,   pixblt_8_opx_trans,     pixblt_8_opx,   pixblt_8_opx_trans,
-	pixblt_8_opx,   pixblt_8_opx_trans,     pixblt_8_opx,   pixblt_8_opx_trans,
-	pixblt_8_opx,   pixblt_8_opx_trans,     pixblt_8_opx,   pixblt_8_opx_trans,
-	pixblt_8_opx,   pixblt_8_opx_trans,     pixblt_8_opx,   pixblt_8_opx_trans,
-	pixblt_8_opx,   pixblt_8_opx_trans,     pixblt_8_opx,   pixblt_8_opx_trans,
-	pixblt_8_opx,   pixblt_8_opx_trans,     pixblt_8_opx,   pixblt_8_opx_trans,
+	&tms340x0_device::pixblt_8_op0,   &tms340x0_device::pixblt_8_op0_trans,     &tms340x0_device::pixblt_8_opx,   &tms340x0_device::pixblt_8_opx_trans,
+	&tms340x0_device::pixblt_8_opx,   &tms340x0_device::pixblt_8_opx_trans,     &tms340x0_device::pixblt_8_opx,   &tms340x0_device::pixblt_8_opx_trans,
+	&tms340x0_device::pixblt_8_opx,   &tms340x0_device::pixblt_8_opx_trans,     &tms340x0_device::pixblt_8_opx,   &tms340x0_device::pixblt_8_opx_trans,
+	&tms340x0_device::pixblt_8_opx,   &tms340x0_device::pixblt_8_opx_trans,     &tms340x0_device::pixblt_8_opx,   &tms340x0_device::pixblt_8_opx_trans,
+	&tms340x0_device::pixblt_8_opx,   &tms340x0_device::pixblt_8_opx_trans,     &tms340x0_device::pixblt_8_opx,   &tms340x0_device::pixblt_8_opx_trans,
+	&tms340x0_device::pixblt_8_opx,   &tms340x0_device::pixblt_8_opx_trans,     &tms340x0_device::pixblt_8_opx,   &tms340x0_device::pixblt_8_opx_trans,
+	&tms340x0_device::pixblt_8_opx,   &tms340x0_device::pixblt_8_opx_trans,     &tms340x0_device::pixblt_8_opx,   &tms340x0_device::pixblt_8_opx_trans,
+	&tms340x0_device::pixblt_8_opx,   &tms340x0_device::pixblt_8_opx_trans,     &tms340x0_device::pixblt_8_opx,   &tms340x0_device::pixblt_8_opx_trans,
+	&tms340x0_device::pixblt_8_opx,   &tms340x0_device::pixblt_8_opx_trans,     &tms340x0_device::pixblt_8_opx,   &tms340x0_device::pixblt_8_opx_trans,
+	&tms340x0_device::pixblt_8_opx,   &tms340x0_device::pixblt_8_opx_trans,     &tms340x0_device::pixblt_8_opx,   &tms340x0_device::pixblt_8_opx_trans,
+	&tms340x0_device::pixblt_8_opx,   &tms340x0_device::pixblt_8_opx_trans,     &tms340x0_device::pixblt_8_opx,   &tms340x0_device::pixblt_8_opx_trans,
+	&tms340x0_device::pixblt_8_opx,   &tms340x0_device::pixblt_8_opx_trans,     &tms340x0_device::pixblt_8_opx,   &tms340x0_device::pixblt_8_opx_trans,
+	&tms340x0_device::pixblt_8_opx,   &tms340x0_device::pixblt_8_opx_trans,     &tms340x0_device::pixblt_8_opx,   &tms340x0_device::pixblt_8_opx_trans,
+	&tms340x0_device::pixblt_8_opx,   &tms340x0_device::pixblt_8_opx_trans,     &tms340x0_device::pixblt_8_opx,   &tms340x0_device::pixblt_8_opx_trans,
+	&tms340x0_device::pixblt_8_opx,   &tms340x0_device::pixblt_8_opx_trans,     &tms340x0_device::pixblt_8_opx,   &tms340x0_device::pixblt_8_opx_trans,
+	&tms340x0_device::pixblt_8_opx,   &tms340x0_device::pixblt_8_opx_trans,     &tms340x0_device::pixblt_8_opx,   &tms340x0_device::pixblt_8_opx_trans,
 
-	pixblt_16_op0,  pixblt_16_op0_trans,    pixblt_16_opx,  pixblt_16_opx_trans,
-	pixblt_16_opx,  pixblt_16_opx_trans,    pixblt_16_opx,  pixblt_16_opx_trans,
-	pixblt_16_opx,  pixblt_16_opx_trans,    pixblt_16_opx,  pixblt_16_opx_trans,
-	pixblt_16_opx,  pixblt_16_opx_trans,    pixblt_16_opx,  pixblt_16_opx_trans,
-	pixblt_16_opx,  pixblt_16_opx_trans,    pixblt_16_opx,  pixblt_16_opx_trans,
-	pixblt_16_opx,  pixblt_16_opx_trans,    pixblt_16_opx,  pixblt_16_opx_trans,
-	pixblt_16_opx,  pixblt_16_opx_trans,    pixblt_16_opx,  pixblt_16_opx_trans,
-	pixblt_16_opx,  pixblt_16_opx_trans,    pixblt_16_opx,  pixblt_16_opx_trans,
-	pixblt_16_opx,  pixblt_16_opx_trans,    pixblt_16_opx,  pixblt_16_opx_trans,
-	pixblt_16_opx,  pixblt_16_opx_trans,    pixblt_16_opx,  pixblt_16_opx_trans,
-	pixblt_16_opx,  pixblt_16_opx_trans,    pixblt_16_opx,  pixblt_16_opx_trans,
-	pixblt_16_opx,  pixblt_16_opx_trans,    pixblt_16_opx,  pixblt_16_opx_trans,
-	pixblt_16_opx,  pixblt_16_opx_trans,    pixblt_16_opx,  pixblt_16_opx_trans,
-	pixblt_16_opx,  pixblt_16_opx_trans,    pixblt_16_opx,  pixblt_16_opx_trans,
-	pixblt_16_opx,  pixblt_16_opx_trans,    pixblt_16_opx,  pixblt_16_opx_trans,
-	pixblt_16_opx,  pixblt_16_opx_trans,    pixblt_16_opx,  pixblt_16_opx_trans
+	&tms340x0_device::pixblt_16_op0,  &tms340x0_device::pixblt_16_op0_trans,    &tms340x0_device::pixblt_16_opx,  &tms340x0_device::pixblt_16_opx_trans,
+	&tms340x0_device::pixblt_16_opx,  &tms340x0_device::pixblt_16_opx_trans,    &tms340x0_device::pixblt_16_opx,  &tms340x0_device::pixblt_16_opx_trans,
+	&tms340x0_device::pixblt_16_opx,  &tms340x0_device::pixblt_16_opx_trans,    &tms340x0_device::pixblt_16_opx,  &tms340x0_device::pixblt_16_opx_trans,
+	&tms340x0_device::pixblt_16_opx,  &tms340x0_device::pixblt_16_opx_trans,    &tms340x0_device::pixblt_16_opx,  &tms340x0_device::pixblt_16_opx_trans,
+	&tms340x0_device::pixblt_16_opx,  &tms340x0_device::pixblt_16_opx_trans,    &tms340x0_device::pixblt_16_opx,  &tms340x0_device::pixblt_16_opx_trans,
+	&tms340x0_device::pixblt_16_opx,  &tms340x0_device::pixblt_16_opx_trans,    &tms340x0_device::pixblt_16_opx,  &tms340x0_device::pixblt_16_opx_trans,
+	&tms340x0_device::pixblt_16_opx,  &tms340x0_device::pixblt_16_opx_trans,    &tms340x0_device::pixblt_16_opx,  &tms340x0_device::pixblt_16_opx_trans,
+	&tms340x0_device::pixblt_16_opx,  &tms340x0_device::pixblt_16_opx_trans,    &tms340x0_device::pixblt_16_opx,  &tms340x0_device::pixblt_16_opx_trans,
+	&tms340x0_device::pixblt_16_opx,  &tms340x0_device::pixblt_16_opx_trans,    &tms340x0_device::pixblt_16_opx,  &tms340x0_device::pixblt_16_opx_trans,
+	&tms340x0_device::pixblt_16_opx,  &tms340x0_device::pixblt_16_opx_trans,    &tms340x0_device::pixblt_16_opx,  &tms340x0_device::pixblt_16_opx_trans,
+	&tms340x0_device::pixblt_16_opx,  &tms340x0_device::pixblt_16_opx_trans,    &tms340x0_device::pixblt_16_opx,  &tms340x0_device::pixblt_16_opx_trans,
+	&tms340x0_device::pixblt_16_opx,  &tms340x0_device::pixblt_16_opx_trans,    &tms340x0_device::pixblt_16_opx,  &tms340x0_device::pixblt_16_opx_trans,
+	&tms340x0_device::pixblt_16_opx,  &tms340x0_device::pixblt_16_opx_trans,    &tms340x0_device::pixblt_16_opx,  &tms340x0_device::pixblt_16_opx_trans,
+	&tms340x0_device::pixblt_16_opx,  &tms340x0_device::pixblt_16_opx_trans,    &tms340x0_device::pixblt_16_opx,  &tms340x0_device::pixblt_16_opx_trans,
+	&tms340x0_device::pixblt_16_opx,  &tms340x0_device::pixblt_16_opx_trans,    &tms340x0_device::pixblt_16_opx,  &tms340x0_device::pixblt_16_opx_trans,
+	&tms340x0_device::pixblt_16_opx,  &tms340x0_device::pixblt_16_opx_trans,    &tms340x0_device::pixblt_16_opx,  &tms340x0_device::pixblt_16_opx_trans
 };
 
-static void (*const pixblt_r_op_table[])(tms34010_state *, int, int) =
+const tms340x0_device::pixblt_op_func tms340x0_device::s_pixblt_r_op_table[] =
 {
-	pixblt_r_1_op0, pixblt_r_1_op0_trans,   pixblt_r_1_opx, pixblt_r_1_opx_trans,
-	pixblt_r_1_opx, pixblt_r_1_opx_trans,   pixblt_r_1_opx, pixblt_r_1_opx_trans,
-	pixblt_r_1_opx, pixblt_r_1_opx_trans,   pixblt_r_1_opx, pixblt_r_1_opx_trans,
-	pixblt_r_1_opx, pixblt_r_1_opx_trans,   pixblt_r_1_opx, pixblt_r_1_opx_trans,
-	pixblt_r_1_opx, pixblt_r_1_opx_trans,   pixblt_r_1_opx, pixblt_r_1_opx_trans,
-	pixblt_r_1_opx, pixblt_r_1_opx_trans,   pixblt_r_1_opx, pixblt_r_1_opx_trans,
-	pixblt_r_1_opx, pixblt_r_1_opx_trans,   pixblt_r_1_opx, pixblt_r_1_opx_trans,
-	pixblt_r_1_opx, pixblt_r_1_opx_trans,   pixblt_r_1_opx, pixblt_r_1_opx_trans,
-	pixblt_r_1_opx, pixblt_r_1_opx_trans,   pixblt_r_1_opx, pixblt_r_1_opx_trans,
-	pixblt_r_1_opx, pixblt_r_1_opx_trans,   pixblt_r_1_opx, pixblt_r_1_opx_trans,
-	pixblt_r_1_opx, pixblt_r_1_opx_trans,   pixblt_r_1_opx, pixblt_r_1_opx_trans,
-	pixblt_r_1_opx, pixblt_r_1_opx_trans,   pixblt_r_1_opx, pixblt_r_1_opx_trans,
-	pixblt_r_1_opx, pixblt_r_1_opx_trans,   pixblt_r_1_opx, pixblt_r_1_opx_trans,
-	pixblt_r_1_opx, pixblt_r_1_opx_trans,   pixblt_r_1_opx, pixblt_r_1_opx_trans,
-	pixblt_r_1_opx, pixblt_r_1_opx_trans,   pixblt_r_1_opx, pixblt_r_1_opx_trans,
-	pixblt_r_1_opx, pixblt_r_1_opx_trans,   pixblt_r_1_opx, pixblt_r_1_opx_trans,
+	&tms340x0_device::pixblt_r_1_op0, &tms340x0_device::pixblt_r_1_op0_trans,   &tms340x0_device::pixblt_r_1_opx, &tms340x0_device::pixblt_r_1_opx_trans,
+	&tms340x0_device::pixblt_r_1_opx, &tms340x0_device::pixblt_r_1_opx_trans,   &tms340x0_device::pixblt_r_1_opx, &tms340x0_device::pixblt_r_1_opx_trans,
+	&tms340x0_device::pixblt_r_1_opx, &tms340x0_device::pixblt_r_1_opx_trans,   &tms340x0_device::pixblt_r_1_opx, &tms340x0_device::pixblt_r_1_opx_trans,
+	&tms340x0_device::pixblt_r_1_opx, &tms340x0_device::pixblt_r_1_opx_trans,   &tms340x0_device::pixblt_r_1_opx, &tms340x0_device::pixblt_r_1_opx_trans,
+	&tms340x0_device::pixblt_r_1_opx, &tms340x0_device::pixblt_r_1_opx_trans,   &tms340x0_device::pixblt_r_1_opx, &tms340x0_device::pixblt_r_1_opx_trans,
+	&tms340x0_device::pixblt_r_1_opx, &tms340x0_device::pixblt_r_1_opx_trans,   &tms340x0_device::pixblt_r_1_opx, &tms340x0_device::pixblt_r_1_opx_trans,
+	&tms340x0_device::pixblt_r_1_opx, &tms340x0_device::pixblt_r_1_opx_trans,   &tms340x0_device::pixblt_r_1_opx, &tms340x0_device::pixblt_r_1_opx_trans,
+	&tms340x0_device::pixblt_r_1_opx, &tms340x0_device::pixblt_r_1_opx_trans,   &tms340x0_device::pixblt_r_1_opx, &tms340x0_device::pixblt_r_1_opx_trans,
+	&tms340x0_device::pixblt_r_1_opx, &tms340x0_device::pixblt_r_1_opx_trans,   &tms340x0_device::pixblt_r_1_opx, &tms340x0_device::pixblt_r_1_opx_trans,
+	&tms340x0_device::pixblt_r_1_opx, &tms340x0_device::pixblt_r_1_opx_trans,   &tms340x0_device::pixblt_r_1_opx, &tms340x0_device::pixblt_r_1_opx_trans,
+	&tms340x0_device::pixblt_r_1_opx, &tms340x0_device::pixblt_r_1_opx_trans,   &tms340x0_device::pixblt_r_1_opx, &tms340x0_device::pixblt_r_1_opx_trans,
+	&tms340x0_device::pixblt_r_1_opx, &tms340x0_device::pixblt_r_1_opx_trans,   &tms340x0_device::pixblt_r_1_opx, &tms340x0_device::pixblt_r_1_opx_trans,
+	&tms340x0_device::pixblt_r_1_opx, &tms340x0_device::pixblt_r_1_opx_trans,   &tms340x0_device::pixblt_r_1_opx, &tms340x0_device::pixblt_r_1_opx_trans,
+	&tms340x0_device::pixblt_r_1_opx, &tms340x0_device::pixblt_r_1_opx_trans,   &tms340x0_device::pixblt_r_1_opx, &tms340x0_device::pixblt_r_1_opx_trans,
+	&tms340x0_device::pixblt_r_1_opx, &tms340x0_device::pixblt_r_1_opx_trans,   &tms340x0_device::pixblt_r_1_opx, &tms340x0_device::pixblt_r_1_opx_trans,
+	&tms340x0_device::pixblt_r_1_opx, &tms340x0_device::pixblt_r_1_opx_trans,   &tms340x0_device::pixblt_r_1_opx, &tms340x0_device::pixblt_r_1_opx_trans,
 
-	pixblt_r_2_op0, pixblt_r_2_op0_trans,   pixblt_r_2_opx, pixblt_r_2_opx_trans,
-	pixblt_r_2_opx, pixblt_r_2_opx_trans,   pixblt_r_2_opx, pixblt_r_2_opx_trans,
-	pixblt_r_2_opx, pixblt_r_2_opx_trans,   pixblt_r_2_opx, pixblt_r_2_opx_trans,
-	pixblt_r_2_opx, pixblt_r_2_opx_trans,   pixblt_r_2_opx, pixblt_r_2_opx_trans,
-	pixblt_r_2_opx, pixblt_r_2_opx_trans,   pixblt_r_2_opx, pixblt_r_2_opx_trans,
-	pixblt_r_2_opx, pixblt_r_2_opx_trans,   pixblt_r_2_opx, pixblt_r_2_opx_trans,
-	pixblt_r_2_opx, pixblt_r_2_opx_trans,   pixblt_r_2_opx, pixblt_r_2_opx_trans,
-	pixblt_r_2_opx, pixblt_r_2_opx_trans,   pixblt_r_2_opx, pixblt_r_2_opx_trans,
-	pixblt_r_2_opx, pixblt_r_2_opx_trans,   pixblt_r_2_opx, pixblt_r_2_opx_trans,
-	pixblt_r_2_opx, pixblt_r_2_opx_trans,   pixblt_r_2_opx, pixblt_r_2_opx_trans,
-	pixblt_r_2_opx, pixblt_r_2_opx_trans,   pixblt_r_2_opx, pixblt_r_2_opx_trans,
-	pixblt_r_2_opx, pixblt_r_2_opx_trans,   pixblt_r_2_opx, pixblt_r_2_opx_trans,
-	pixblt_r_2_opx, pixblt_r_2_opx_trans,   pixblt_r_2_opx, pixblt_r_2_opx_trans,
-	pixblt_r_2_opx, pixblt_r_2_opx_trans,   pixblt_r_2_opx, pixblt_r_2_opx_trans,
-	pixblt_r_2_opx, pixblt_r_2_opx_trans,   pixblt_r_2_opx, pixblt_r_2_opx_trans,
-	pixblt_r_2_opx, pixblt_r_2_opx_trans,   pixblt_r_2_opx, pixblt_r_2_opx_trans,
+	&tms340x0_device::pixblt_r_2_op0, &tms340x0_device::pixblt_r_2_op0_trans,   &tms340x0_device::pixblt_r_2_opx, &tms340x0_device::pixblt_r_2_opx_trans,
+	&tms340x0_device::pixblt_r_2_opx, &tms340x0_device::pixblt_r_2_opx_trans,   &tms340x0_device::pixblt_r_2_opx, &tms340x0_device::pixblt_r_2_opx_trans,
+	&tms340x0_device::pixblt_r_2_opx, &tms340x0_device::pixblt_r_2_opx_trans,   &tms340x0_device::pixblt_r_2_opx, &tms340x0_device::pixblt_r_2_opx_trans,
+	&tms340x0_device::pixblt_r_2_opx, &tms340x0_device::pixblt_r_2_opx_trans,   &tms340x0_device::pixblt_r_2_opx, &tms340x0_device::pixblt_r_2_opx_trans,
+	&tms340x0_device::pixblt_r_2_opx, &tms340x0_device::pixblt_r_2_opx_trans,   &tms340x0_device::pixblt_r_2_opx, &tms340x0_device::pixblt_r_2_opx_trans,
+	&tms340x0_device::pixblt_r_2_opx, &tms340x0_device::pixblt_r_2_opx_trans,   &tms340x0_device::pixblt_r_2_opx, &tms340x0_device::pixblt_r_2_opx_trans,
+	&tms340x0_device::pixblt_r_2_opx, &tms340x0_device::pixblt_r_2_opx_trans,   &tms340x0_device::pixblt_r_2_opx, &tms340x0_device::pixblt_r_2_opx_trans,
+	&tms340x0_device::pixblt_r_2_opx, &tms340x0_device::pixblt_r_2_opx_trans,   &tms340x0_device::pixblt_r_2_opx, &tms340x0_device::pixblt_r_2_opx_trans,
+	&tms340x0_device::pixblt_r_2_opx, &tms340x0_device::pixblt_r_2_opx_trans,   &tms340x0_device::pixblt_r_2_opx, &tms340x0_device::pixblt_r_2_opx_trans,
+	&tms340x0_device::pixblt_r_2_opx, &tms340x0_device::pixblt_r_2_opx_trans,   &tms340x0_device::pixblt_r_2_opx, &tms340x0_device::pixblt_r_2_opx_trans,
+	&tms340x0_device::pixblt_r_2_opx, &tms340x0_device::pixblt_r_2_opx_trans,   &tms340x0_device::pixblt_r_2_opx, &tms340x0_device::pixblt_r_2_opx_trans,
+	&tms340x0_device::pixblt_r_2_opx, &tms340x0_device::pixblt_r_2_opx_trans,   &tms340x0_device::pixblt_r_2_opx, &tms340x0_device::pixblt_r_2_opx_trans,
+	&tms340x0_device::pixblt_r_2_opx, &tms340x0_device::pixblt_r_2_opx_trans,   &tms340x0_device::pixblt_r_2_opx, &tms340x0_device::pixblt_r_2_opx_trans,
+	&tms340x0_device::pixblt_r_2_opx, &tms340x0_device::pixblt_r_2_opx_trans,   &tms340x0_device::pixblt_r_2_opx, &tms340x0_device::pixblt_r_2_opx_trans,
+	&tms340x0_device::pixblt_r_2_opx, &tms340x0_device::pixblt_r_2_opx_trans,   &tms340x0_device::pixblt_r_2_opx, &tms340x0_device::pixblt_r_2_opx_trans,
+	&tms340x0_device::pixblt_r_2_opx, &tms340x0_device::pixblt_r_2_opx_trans,   &tms340x0_device::pixblt_r_2_opx, &tms340x0_device::pixblt_r_2_opx_trans,
 
-	pixblt_r_4_op0, pixblt_r_4_op0_trans,   pixblt_r_4_opx, pixblt_r_4_opx_trans,
-	pixblt_r_4_opx, pixblt_r_4_opx_trans,   pixblt_r_4_opx, pixblt_r_4_opx_trans,
-	pixblt_r_4_opx, pixblt_r_4_opx_trans,   pixblt_r_4_opx, pixblt_r_4_opx_trans,
-	pixblt_r_4_opx, pixblt_r_4_opx_trans,   pixblt_r_4_opx, pixblt_r_4_opx_trans,
-	pixblt_r_4_opx, pixblt_r_4_opx_trans,   pixblt_r_4_opx, pixblt_r_4_opx_trans,
-	pixblt_r_4_opx, pixblt_r_4_opx_trans,   pixblt_r_4_opx, pixblt_r_4_opx_trans,
-	pixblt_r_4_opx, pixblt_r_4_opx_trans,   pixblt_r_4_opx, pixblt_r_4_opx_trans,
-	pixblt_r_4_opx, pixblt_r_4_opx_trans,   pixblt_r_4_opx, pixblt_r_4_opx_trans,
-	pixblt_r_4_opx, pixblt_r_4_opx_trans,   pixblt_r_4_opx, pixblt_r_4_opx_trans,
-	pixblt_r_4_opx, pixblt_r_4_opx_trans,   pixblt_r_4_opx, pixblt_r_4_opx_trans,
-	pixblt_r_4_opx, pixblt_r_4_opx_trans,   pixblt_r_4_opx, pixblt_r_4_opx_trans,
-	pixblt_r_4_opx, pixblt_r_4_opx_trans,   pixblt_r_4_opx, pixblt_r_4_opx_trans,
-	pixblt_r_4_opx, pixblt_r_4_opx_trans,   pixblt_r_4_opx, pixblt_r_4_opx_trans,
-	pixblt_r_4_opx, pixblt_r_4_opx_trans,   pixblt_r_4_opx, pixblt_r_4_opx_trans,
-	pixblt_r_4_opx, pixblt_r_4_opx_trans,   pixblt_r_4_opx, pixblt_r_4_opx_trans,
-	pixblt_r_4_opx, pixblt_r_4_opx_trans,   pixblt_r_4_opx, pixblt_r_4_opx_trans,
+	&tms340x0_device::pixblt_r_4_op0, &tms340x0_device::pixblt_r_4_op0_trans,   &tms340x0_device::pixblt_r_4_opx, &tms340x0_device::pixblt_r_4_opx_trans,
+	&tms340x0_device::pixblt_r_4_opx, &tms340x0_device::pixblt_r_4_opx_trans,   &tms340x0_device::pixblt_r_4_opx, &tms340x0_device::pixblt_r_4_opx_trans,
+	&tms340x0_device::pixblt_r_4_opx, &tms340x0_device::pixblt_r_4_opx_trans,   &tms340x0_device::pixblt_r_4_opx, &tms340x0_device::pixblt_r_4_opx_trans,
+	&tms340x0_device::pixblt_r_4_opx, &tms340x0_device::pixblt_r_4_opx_trans,   &tms340x0_device::pixblt_r_4_opx, &tms340x0_device::pixblt_r_4_opx_trans,
+	&tms340x0_device::pixblt_r_4_opx, &tms340x0_device::pixblt_r_4_opx_trans,   &tms340x0_device::pixblt_r_4_opx, &tms340x0_device::pixblt_r_4_opx_trans,
+	&tms340x0_device::pixblt_r_4_opx, &tms340x0_device::pixblt_r_4_opx_trans,   &tms340x0_device::pixblt_r_4_opx, &tms340x0_device::pixblt_r_4_opx_trans,
+	&tms340x0_device::pixblt_r_4_opx, &tms340x0_device::pixblt_r_4_opx_trans,   &tms340x0_device::pixblt_r_4_opx, &tms340x0_device::pixblt_r_4_opx_trans,
+	&tms340x0_device::pixblt_r_4_opx, &tms340x0_device::pixblt_r_4_opx_trans,   &tms340x0_device::pixblt_r_4_opx, &tms340x0_device::pixblt_r_4_opx_trans,
+	&tms340x0_device::pixblt_r_4_opx, &tms340x0_device::pixblt_r_4_opx_trans,   &tms340x0_device::pixblt_r_4_opx, &tms340x0_device::pixblt_r_4_opx_trans,
+	&tms340x0_device::pixblt_r_4_opx, &tms340x0_device::pixblt_r_4_opx_trans,   &tms340x0_device::pixblt_r_4_opx, &tms340x0_device::pixblt_r_4_opx_trans,
+	&tms340x0_device::pixblt_r_4_opx, &tms340x0_device::pixblt_r_4_opx_trans,   &tms340x0_device::pixblt_r_4_opx, &tms340x0_device::pixblt_r_4_opx_trans,
+	&tms340x0_device::pixblt_r_4_opx, &tms340x0_device::pixblt_r_4_opx_trans,   &tms340x0_device::pixblt_r_4_opx, &tms340x0_device::pixblt_r_4_opx_trans,
+	&tms340x0_device::pixblt_r_4_opx, &tms340x0_device::pixblt_r_4_opx_trans,   &tms340x0_device::pixblt_r_4_opx, &tms340x0_device::pixblt_r_4_opx_trans,
+	&tms340x0_device::pixblt_r_4_opx, &tms340x0_device::pixblt_r_4_opx_trans,   &tms340x0_device::pixblt_r_4_opx, &tms340x0_device::pixblt_r_4_opx_trans,
+	&tms340x0_device::pixblt_r_4_opx, &tms340x0_device::pixblt_r_4_opx_trans,   &tms340x0_device::pixblt_r_4_opx, &tms340x0_device::pixblt_r_4_opx_trans,
+	&tms340x0_device::pixblt_r_4_opx, &tms340x0_device::pixblt_r_4_opx_trans,   &tms340x0_device::pixblt_r_4_opx, &tms340x0_device::pixblt_r_4_opx_trans,
 
-	pixblt_r_8_op0, pixblt_r_8_op0_trans,   pixblt_r_8_opx, pixblt_r_8_opx_trans,
-	pixblt_r_8_opx, pixblt_r_8_opx_trans,   pixblt_r_8_opx, pixblt_r_8_opx_trans,
-	pixblt_r_8_opx, pixblt_r_8_opx_trans,   pixblt_r_8_opx, pixblt_r_8_opx_trans,
-	pixblt_r_8_opx, pixblt_r_8_opx_trans,   pixblt_r_8_opx, pixblt_r_8_opx_trans,
-	pixblt_r_8_opx, pixblt_r_8_opx_trans,   pixblt_r_8_opx, pixblt_r_8_opx_trans,
-	pixblt_r_8_opx, pixblt_r_8_opx_trans,   pixblt_r_8_opx, pixblt_r_8_opx_trans,
-	pixblt_r_8_opx, pixblt_r_8_opx_trans,   pixblt_r_8_opx, pixblt_r_8_opx_trans,
-	pixblt_r_8_opx, pixblt_r_8_opx_trans,   pixblt_r_8_opx, pixblt_r_8_opx_trans,
-	pixblt_r_8_opx, pixblt_r_8_opx_trans,   pixblt_r_8_opx, pixblt_r_8_opx_trans,
-	pixblt_r_8_opx, pixblt_r_8_opx_trans,   pixblt_r_8_opx, pixblt_r_8_opx_trans,
-	pixblt_r_8_opx, pixblt_r_8_opx_trans,   pixblt_r_8_opx, pixblt_r_8_opx_trans,
-	pixblt_r_8_opx, pixblt_r_8_opx_trans,   pixblt_r_8_opx, pixblt_r_8_opx_trans,
-	pixblt_r_8_opx, pixblt_r_8_opx_trans,   pixblt_r_8_opx, pixblt_r_8_opx_trans,
-	pixblt_r_8_opx, pixblt_r_8_opx_trans,   pixblt_r_8_opx, pixblt_r_8_opx_trans,
-	pixblt_r_8_opx, pixblt_r_8_opx_trans,   pixblt_r_8_opx, pixblt_r_8_opx_trans,
-	pixblt_r_8_opx, pixblt_r_8_opx_trans,   pixblt_r_8_opx, pixblt_r_8_opx_trans,
+	&tms340x0_device::pixblt_r_8_op0, &tms340x0_device::pixblt_r_8_op0_trans,   &tms340x0_device::pixblt_r_8_opx, &tms340x0_device::pixblt_r_8_opx_trans,
+	&tms340x0_device::pixblt_r_8_opx, &tms340x0_device::pixblt_r_8_opx_trans,   &tms340x0_device::pixblt_r_8_opx, &tms340x0_device::pixblt_r_8_opx_trans,
+	&tms340x0_device::pixblt_r_8_opx, &tms340x0_device::pixblt_r_8_opx_trans,   &tms340x0_device::pixblt_r_8_opx, &tms340x0_device::pixblt_r_8_opx_trans,
+	&tms340x0_device::pixblt_r_8_opx, &tms340x0_device::pixblt_r_8_opx_trans,   &tms340x0_device::pixblt_r_8_opx, &tms340x0_device::pixblt_r_8_opx_trans,
+	&tms340x0_device::pixblt_r_8_opx, &tms340x0_device::pixblt_r_8_opx_trans,   &tms340x0_device::pixblt_r_8_opx, &tms340x0_device::pixblt_r_8_opx_trans,
+	&tms340x0_device::pixblt_r_8_opx, &tms340x0_device::pixblt_r_8_opx_trans,   &tms340x0_device::pixblt_r_8_opx, &tms340x0_device::pixblt_r_8_opx_trans,
+	&tms340x0_device::pixblt_r_8_opx, &tms340x0_device::pixblt_r_8_opx_trans,   &tms340x0_device::pixblt_r_8_opx, &tms340x0_device::pixblt_r_8_opx_trans,
+	&tms340x0_device::pixblt_r_8_opx, &tms340x0_device::pixblt_r_8_opx_trans,   &tms340x0_device::pixblt_r_8_opx, &tms340x0_device::pixblt_r_8_opx_trans,
+	&tms340x0_device::pixblt_r_8_opx, &tms340x0_device::pixblt_r_8_opx_trans,   &tms340x0_device::pixblt_r_8_opx, &tms340x0_device::pixblt_r_8_opx_trans,
+	&tms340x0_device::pixblt_r_8_opx, &tms340x0_device::pixblt_r_8_opx_trans,   &tms340x0_device::pixblt_r_8_opx, &tms340x0_device::pixblt_r_8_opx_trans,
+	&tms340x0_device::pixblt_r_8_opx, &tms340x0_device::pixblt_r_8_opx_trans,   &tms340x0_device::pixblt_r_8_opx, &tms340x0_device::pixblt_r_8_opx_trans,
+	&tms340x0_device::pixblt_r_8_opx, &tms340x0_device::pixblt_r_8_opx_trans,   &tms340x0_device::pixblt_r_8_opx, &tms340x0_device::pixblt_r_8_opx_trans,
+	&tms340x0_device::pixblt_r_8_opx, &tms340x0_device::pixblt_r_8_opx_trans,   &tms340x0_device::pixblt_r_8_opx, &tms340x0_device::pixblt_r_8_opx_trans,
+	&tms340x0_device::pixblt_r_8_opx, &tms340x0_device::pixblt_r_8_opx_trans,   &tms340x0_device::pixblt_r_8_opx, &tms340x0_device::pixblt_r_8_opx_trans,
+	&tms340x0_device::pixblt_r_8_opx, &tms340x0_device::pixblt_r_8_opx_trans,   &tms340x0_device::pixblt_r_8_opx, &tms340x0_device::pixblt_r_8_opx_trans,
+	&tms340x0_device::pixblt_r_8_opx, &tms340x0_device::pixblt_r_8_opx_trans,   &tms340x0_device::pixblt_r_8_opx, &tms340x0_device::pixblt_r_8_opx_trans,
 
-	pixblt_r_16_op0,pixblt_r_16_op0_trans,  pixblt_r_16_opx,pixblt_r_16_opx_trans,
-	pixblt_r_16_opx,pixblt_r_16_opx_trans,  pixblt_r_16_opx,pixblt_r_16_opx_trans,
-	pixblt_r_16_opx,pixblt_r_16_opx_trans,  pixblt_r_16_opx,pixblt_r_16_opx_trans,
-	pixblt_r_16_opx,pixblt_r_16_opx_trans,  pixblt_r_16_opx,pixblt_r_16_opx_trans,
-	pixblt_r_16_opx,pixblt_r_16_opx_trans,  pixblt_r_16_opx,pixblt_r_16_opx_trans,
-	pixblt_r_16_opx,pixblt_r_16_opx_trans,  pixblt_r_16_opx,pixblt_r_16_opx_trans,
-	pixblt_r_16_opx,pixblt_r_16_opx_trans,  pixblt_r_16_opx,pixblt_r_16_opx_trans,
-	pixblt_r_16_opx,pixblt_r_16_opx_trans,  pixblt_r_16_opx,pixblt_r_16_opx_trans,
-	pixblt_r_16_opx,pixblt_r_16_opx_trans,  pixblt_r_16_opx,pixblt_r_16_opx_trans,
-	pixblt_r_16_opx,pixblt_r_16_opx_trans,  pixblt_r_16_opx,pixblt_r_16_opx_trans,
-	pixblt_r_16_opx,pixblt_r_16_opx_trans,  pixblt_r_16_opx,pixblt_r_16_opx_trans,
-	pixblt_r_16_opx,pixblt_r_16_opx_trans,  pixblt_r_16_opx,pixblt_r_16_opx_trans,
-	pixblt_r_16_opx,pixblt_r_16_opx_trans,  pixblt_r_16_opx,pixblt_r_16_opx_trans,
-	pixblt_r_16_opx,pixblt_r_16_opx_trans,  pixblt_r_16_opx,pixblt_r_16_opx_trans,
-	pixblt_r_16_opx,pixblt_r_16_opx_trans,  pixblt_r_16_opx,pixblt_r_16_opx_trans,
-	pixblt_r_16_opx,pixblt_r_16_opx_trans,  pixblt_r_16_opx,pixblt_r_16_opx_trans
+	&tms340x0_device::pixblt_r_16_op0,&tms340x0_device::pixblt_r_16_op0_trans,  &tms340x0_device::pixblt_r_16_opx,&tms340x0_device::pixblt_r_16_opx_trans,
+	&tms340x0_device::pixblt_r_16_opx,&tms340x0_device::pixblt_r_16_opx_trans,  &tms340x0_device::pixblt_r_16_opx,&tms340x0_device::pixblt_r_16_opx_trans,
+	&tms340x0_device::pixblt_r_16_opx,&tms340x0_device::pixblt_r_16_opx_trans,  &tms340x0_device::pixblt_r_16_opx,&tms340x0_device::pixblt_r_16_opx_trans,
+	&tms340x0_device::pixblt_r_16_opx,&tms340x0_device::pixblt_r_16_opx_trans,  &tms340x0_device::pixblt_r_16_opx,&tms340x0_device::pixblt_r_16_opx_trans,
+	&tms340x0_device::pixblt_r_16_opx,&tms340x0_device::pixblt_r_16_opx_trans,  &tms340x0_device::pixblt_r_16_opx,&tms340x0_device::pixblt_r_16_opx_trans,
+	&tms340x0_device::pixblt_r_16_opx,&tms340x0_device::pixblt_r_16_opx_trans,  &tms340x0_device::pixblt_r_16_opx,&tms340x0_device::pixblt_r_16_opx_trans,
+	&tms340x0_device::pixblt_r_16_opx,&tms340x0_device::pixblt_r_16_opx_trans,  &tms340x0_device::pixblt_r_16_opx,&tms340x0_device::pixblt_r_16_opx_trans,
+	&tms340x0_device::pixblt_r_16_opx,&tms340x0_device::pixblt_r_16_opx_trans,  &tms340x0_device::pixblt_r_16_opx,&tms340x0_device::pixblt_r_16_opx_trans,
+	&tms340x0_device::pixblt_r_16_opx,&tms340x0_device::pixblt_r_16_opx_trans,  &tms340x0_device::pixblt_r_16_opx,&tms340x0_device::pixblt_r_16_opx_trans,
+	&tms340x0_device::pixblt_r_16_opx,&tms340x0_device::pixblt_r_16_opx_trans,  &tms340x0_device::pixblt_r_16_opx,&tms340x0_device::pixblt_r_16_opx_trans,
+	&tms340x0_device::pixblt_r_16_opx,&tms340x0_device::pixblt_r_16_opx_trans,  &tms340x0_device::pixblt_r_16_opx,&tms340x0_device::pixblt_r_16_opx_trans,
+	&tms340x0_device::pixblt_r_16_opx,&tms340x0_device::pixblt_r_16_opx_trans,  &tms340x0_device::pixblt_r_16_opx,&tms340x0_device::pixblt_r_16_opx_trans,
+	&tms340x0_device::pixblt_r_16_opx,&tms340x0_device::pixblt_r_16_opx_trans,  &tms340x0_device::pixblt_r_16_opx,&tms340x0_device::pixblt_r_16_opx_trans,
+	&tms340x0_device::pixblt_r_16_opx,&tms340x0_device::pixblt_r_16_opx_trans,  &tms340x0_device::pixblt_r_16_opx,&tms340x0_device::pixblt_r_16_opx_trans,
+	&tms340x0_device::pixblt_r_16_opx,&tms340x0_device::pixblt_r_16_opx_trans,  &tms340x0_device::pixblt_r_16_opx,&tms340x0_device::pixblt_r_16_opx_trans,
+	&tms340x0_device::pixblt_r_16_opx,&tms340x0_device::pixblt_r_16_opx_trans,  &tms340x0_device::pixblt_r_16_opx,&tms340x0_device::pixblt_r_16_opx_trans
 };
 
-static void (*const pixblt_b_op_table[])(tms34010_state *, int) =
+const tms340x0_device::pixblt_b_op_func tms340x0_device::s_pixblt_b_op_table[] =
 {
-	pixblt_b_1_op0, pixblt_b_1_op0_trans,   pixblt_b_1_opx, pixblt_b_1_opx_trans,
-	pixblt_b_1_opx, pixblt_b_1_opx_trans,   pixblt_b_1_opx, pixblt_b_1_opx_trans,
-	pixblt_b_1_opx, pixblt_b_1_opx_trans,   pixblt_b_1_opx, pixblt_b_1_opx_trans,
-	pixblt_b_1_opx, pixblt_b_1_opx_trans,   pixblt_b_1_opx, pixblt_b_1_opx_trans,
-	pixblt_b_1_opx, pixblt_b_1_opx_trans,   pixblt_b_1_opx, pixblt_b_1_opx_trans,
-	pixblt_b_1_opx, pixblt_b_1_opx_trans,   pixblt_b_1_opx, pixblt_b_1_opx_trans,
-	pixblt_b_1_opx, pixblt_b_1_opx_trans,   pixblt_b_1_opx, pixblt_b_1_opx_trans,
-	pixblt_b_1_opx, pixblt_b_1_opx_trans,   pixblt_b_1_opx, pixblt_b_1_opx_trans,
-	pixblt_b_1_opx, pixblt_b_1_opx_trans,   pixblt_b_1_opx, pixblt_b_1_opx_trans,
-	pixblt_b_1_opx, pixblt_b_1_opx_trans,   pixblt_b_1_opx, pixblt_b_1_opx_trans,
-	pixblt_b_1_opx, pixblt_b_1_opx_trans,   pixblt_b_1_opx, pixblt_b_1_opx_trans,
-	pixblt_b_1_opx, pixblt_b_1_opx_trans,   pixblt_b_1_opx, pixblt_b_1_opx_trans,
-	pixblt_b_1_opx, pixblt_b_1_opx_trans,   pixblt_b_1_opx, pixblt_b_1_opx_trans,
-	pixblt_b_1_opx, pixblt_b_1_opx_trans,   pixblt_b_1_opx, pixblt_b_1_opx_trans,
-	pixblt_b_1_opx, pixblt_b_1_opx_trans,   pixblt_b_1_opx, pixblt_b_1_opx_trans,
-	pixblt_b_1_opx, pixblt_b_1_opx_trans,   pixblt_b_1_opx, pixblt_b_1_opx_trans,
+	&tms340x0_device::pixblt_b_1_op0, &tms340x0_device::pixblt_b_1_op0_trans,   &tms340x0_device::pixblt_b_1_opx, &tms340x0_device::pixblt_b_1_opx_trans,
+	&tms340x0_device::pixblt_b_1_opx, &tms340x0_device::pixblt_b_1_opx_trans,   &tms340x0_device::pixblt_b_1_opx, &tms340x0_device::pixblt_b_1_opx_trans,
+	&tms340x0_device::pixblt_b_1_opx, &tms340x0_device::pixblt_b_1_opx_trans,   &tms340x0_device::pixblt_b_1_opx, &tms340x0_device::pixblt_b_1_opx_trans,
+	&tms340x0_device::pixblt_b_1_opx, &tms340x0_device::pixblt_b_1_opx_trans,   &tms340x0_device::pixblt_b_1_opx, &tms340x0_device::pixblt_b_1_opx_trans,
+	&tms340x0_device::pixblt_b_1_opx, &tms340x0_device::pixblt_b_1_opx_trans,   &tms340x0_device::pixblt_b_1_opx, &tms340x0_device::pixblt_b_1_opx_trans,
+	&tms340x0_device::pixblt_b_1_opx, &tms340x0_device::pixblt_b_1_opx_trans,   &tms340x0_device::pixblt_b_1_opx, &tms340x0_device::pixblt_b_1_opx_trans,
+	&tms340x0_device::pixblt_b_1_opx, &tms340x0_device::pixblt_b_1_opx_trans,   &tms340x0_device::pixblt_b_1_opx, &tms340x0_device::pixblt_b_1_opx_trans,
+	&tms340x0_device::pixblt_b_1_opx, &tms340x0_device::pixblt_b_1_opx_trans,   &tms340x0_device::pixblt_b_1_opx, &tms340x0_device::pixblt_b_1_opx_trans,
+	&tms340x0_device::pixblt_b_1_opx, &tms340x0_device::pixblt_b_1_opx_trans,   &tms340x0_device::pixblt_b_1_opx, &tms340x0_device::pixblt_b_1_opx_trans,
+	&tms340x0_device::pixblt_b_1_opx, &tms340x0_device::pixblt_b_1_opx_trans,   &tms340x0_device::pixblt_b_1_opx, &tms340x0_device::pixblt_b_1_opx_trans,
+	&tms340x0_device::pixblt_b_1_opx, &tms340x0_device::pixblt_b_1_opx_trans,   &tms340x0_device::pixblt_b_1_opx, &tms340x0_device::pixblt_b_1_opx_trans,
+	&tms340x0_device::pixblt_b_1_opx, &tms340x0_device::pixblt_b_1_opx_trans,   &tms340x0_device::pixblt_b_1_opx, &tms340x0_device::pixblt_b_1_opx_trans,
+	&tms340x0_device::pixblt_b_1_opx, &tms340x0_device::pixblt_b_1_opx_trans,   &tms340x0_device::pixblt_b_1_opx, &tms340x0_device::pixblt_b_1_opx_trans,
+	&tms340x0_device::pixblt_b_1_opx, &tms340x0_device::pixblt_b_1_opx_trans,   &tms340x0_device::pixblt_b_1_opx, &tms340x0_device::pixblt_b_1_opx_trans,
+	&tms340x0_device::pixblt_b_1_opx, &tms340x0_device::pixblt_b_1_opx_trans,   &tms340x0_device::pixblt_b_1_opx, &tms340x0_device::pixblt_b_1_opx_trans,
+	&tms340x0_device::pixblt_b_1_opx, &tms340x0_device::pixblt_b_1_opx_trans,   &tms340x0_device::pixblt_b_1_opx, &tms340x0_device::pixblt_b_1_opx_trans,
 
-	pixblt_b_2_op0, pixblt_b_2_op0_trans,   pixblt_b_2_opx, pixblt_b_2_opx_trans,
-	pixblt_b_2_opx, pixblt_b_2_opx_trans,   pixblt_b_2_opx, pixblt_b_2_opx_trans,
-	pixblt_b_2_opx, pixblt_b_2_opx_trans,   pixblt_b_2_opx, pixblt_b_2_opx_trans,
-	pixblt_b_2_opx, pixblt_b_2_opx_trans,   pixblt_b_2_opx, pixblt_b_2_opx_trans,
-	pixblt_b_2_opx, pixblt_b_2_opx_trans,   pixblt_b_2_opx, pixblt_b_2_opx_trans,
-	pixblt_b_2_opx, pixblt_b_2_opx_trans,   pixblt_b_2_opx, pixblt_b_2_opx_trans,
-	pixblt_b_2_opx, pixblt_b_2_opx_trans,   pixblt_b_2_opx, pixblt_b_2_opx_trans,
-	pixblt_b_2_opx, pixblt_b_2_opx_trans,   pixblt_b_2_opx, pixblt_b_2_opx_trans,
-	pixblt_b_2_opx, pixblt_b_2_opx_trans,   pixblt_b_2_opx, pixblt_b_2_opx_trans,
-	pixblt_b_2_opx, pixblt_b_2_opx_trans,   pixblt_b_2_opx, pixblt_b_2_opx_trans,
-	pixblt_b_2_opx, pixblt_b_2_opx_trans,   pixblt_b_2_opx, pixblt_b_2_opx_trans,
-	pixblt_b_2_opx, pixblt_b_2_opx_trans,   pixblt_b_2_opx, pixblt_b_2_opx_trans,
-	pixblt_b_2_opx, pixblt_b_2_opx_trans,   pixblt_b_2_opx, pixblt_b_2_opx_trans,
-	pixblt_b_2_opx, pixblt_b_2_opx_trans,   pixblt_b_2_opx, pixblt_b_2_opx_trans,
-	pixblt_b_2_opx, pixblt_b_2_opx_trans,   pixblt_b_2_opx, pixblt_b_2_opx_trans,
-	pixblt_b_2_opx, pixblt_b_2_opx_trans,   pixblt_b_2_opx, pixblt_b_2_opx_trans,
+	&tms340x0_device::pixblt_b_2_op0, &tms340x0_device::pixblt_b_2_op0_trans,   &tms340x0_device::pixblt_b_2_opx, &tms340x0_device::pixblt_b_2_opx_trans,
+	&tms340x0_device::pixblt_b_2_opx, &tms340x0_device::pixblt_b_2_opx_trans,   &tms340x0_device::pixblt_b_2_opx, &tms340x0_device::pixblt_b_2_opx_trans,
+	&tms340x0_device::pixblt_b_2_opx, &tms340x0_device::pixblt_b_2_opx_trans,   &tms340x0_device::pixblt_b_2_opx, &tms340x0_device::pixblt_b_2_opx_trans,
+	&tms340x0_device::pixblt_b_2_opx, &tms340x0_device::pixblt_b_2_opx_trans,   &tms340x0_device::pixblt_b_2_opx, &tms340x0_device::pixblt_b_2_opx_trans,
+	&tms340x0_device::pixblt_b_2_opx, &tms340x0_device::pixblt_b_2_opx_trans,   &tms340x0_device::pixblt_b_2_opx, &tms340x0_device::pixblt_b_2_opx_trans,
+	&tms340x0_device::pixblt_b_2_opx, &tms340x0_device::pixblt_b_2_opx_trans,   &tms340x0_device::pixblt_b_2_opx, &tms340x0_device::pixblt_b_2_opx_trans,
+	&tms340x0_device::pixblt_b_2_opx, &tms340x0_device::pixblt_b_2_opx_trans,   &tms340x0_device::pixblt_b_2_opx, &tms340x0_device::pixblt_b_2_opx_trans,
+	&tms340x0_device::pixblt_b_2_opx, &tms340x0_device::pixblt_b_2_opx_trans,   &tms340x0_device::pixblt_b_2_opx, &tms340x0_device::pixblt_b_2_opx_trans,
+	&tms340x0_device::pixblt_b_2_opx, &tms340x0_device::pixblt_b_2_opx_trans,   &tms340x0_device::pixblt_b_2_opx, &tms340x0_device::pixblt_b_2_opx_trans,
+	&tms340x0_device::pixblt_b_2_opx, &tms340x0_device::pixblt_b_2_opx_trans,   &tms340x0_device::pixblt_b_2_opx, &tms340x0_device::pixblt_b_2_opx_trans,
+	&tms340x0_device::pixblt_b_2_opx, &tms340x0_device::pixblt_b_2_opx_trans,   &tms340x0_device::pixblt_b_2_opx, &tms340x0_device::pixblt_b_2_opx_trans,
+	&tms340x0_device::pixblt_b_2_opx, &tms340x0_device::pixblt_b_2_opx_trans,   &tms340x0_device::pixblt_b_2_opx, &tms340x0_device::pixblt_b_2_opx_trans,
+	&tms340x0_device::pixblt_b_2_opx, &tms340x0_device::pixblt_b_2_opx_trans,   &tms340x0_device::pixblt_b_2_opx, &tms340x0_device::pixblt_b_2_opx_trans,
+	&tms340x0_device::pixblt_b_2_opx, &tms340x0_device::pixblt_b_2_opx_trans,   &tms340x0_device::pixblt_b_2_opx, &tms340x0_device::pixblt_b_2_opx_trans,
+	&tms340x0_device::pixblt_b_2_opx, &tms340x0_device::pixblt_b_2_opx_trans,   &tms340x0_device::pixblt_b_2_opx, &tms340x0_device::pixblt_b_2_opx_trans,
+	&tms340x0_device::pixblt_b_2_opx, &tms340x0_device::pixblt_b_2_opx_trans,   &tms340x0_device::pixblt_b_2_opx, &tms340x0_device::pixblt_b_2_opx_trans,
 
-	pixblt_b_4_op0, pixblt_b_4_op0_trans,   pixblt_b_4_opx, pixblt_b_4_opx_trans,
-	pixblt_b_4_opx, pixblt_b_4_opx_trans,   pixblt_b_4_opx, pixblt_b_4_opx_trans,
-	pixblt_b_4_opx, pixblt_b_4_opx_trans,   pixblt_b_4_opx, pixblt_b_4_opx_trans,
-	pixblt_b_4_opx, pixblt_b_4_opx_trans,   pixblt_b_4_opx, pixblt_b_4_opx_trans,
-	pixblt_b_4_opx, pixblt_b_4_opx_trans,   pixblt_b_4_opx, pixblt_b_4_opx_trans,
-	pixblt_b_4_opx, pixblt_b_4_opx_trans,   pixblt_b_4_opx, pixblt_b_4_opx_trans,
-	pixblt_b_4_opx, pixblt_b_4_opx_trans,   pixblt_b_4_opx, pixblt_b_4_opx_trans,
-	pixblt_b_4_opx, pixblt_b_4_opx_trans,   pixblt_b_4_opx, pixblt_b_4_opx_trans,
-	pixblt_b_4_opx, pixblt_b_4_opx_trans,   pixblt_b_4_opx, pixblt_b_4_opx_trans,
-	pixblt_b_4_opx, pixblt_b_4_opx_trans,   pixblt_b_4_opx, pixblt_b_4_opx_trans,
-	pixblt_b_4_opx, pixblt_b_4_opx_trans,   pixblt_b_4_opx, pixblt_b_4_opx_trans,
-	pixblt_b_4_opx, pixblt_b_4_opx_trans,   pixblt_b_4_opx, pixblt_b_4_opx_trans,
-	pixblt_b_4_opx, pixblt_b_4_opx_trans,   pixblt_b_4_opx, pixblt_b_4_opx_trans,
-	pixblt_b_4_opx, pixblt_b_4_opx_trans,   pixblt_b_4_opx, pixblt_b_4_opx_trans,
-	pixblt_b_4_opx, pixblt_b_4_opx_trans,   pixblt_b_4_opx, pixblt_b_4_opx_trans,
-	pixblt_b_4_opx, pixblt_b_4_opx_trans,   pixblt_b_4_opx, pixblt_b_4_opx_trans,
+	&tms340x0_device::pixblt_b_4_op0, &tms340x0_device::pixblt_b_4_op0_trans,   &tms340x0_device::pixblt_b_4_opx, &tms340x0_device::pixblt_b_4_opx_trans,
+	&tms340x0_device::pixblt_b_4_opx, &tms340x0_device::pixblt_b_4_opx_trans,   &tms340x0_device::pixblt_b_4_opx, &tms340x0_device::pixblt_b_4_opx_trans,
+	&tms340x0_device::pixblt_b_4_opx, &tms340x0_device::pixblt_b_4_opx_trans,   &tms340x0_device::pixblt_b_4_opx, &tms340x0_device::pixblt_b_4_opx_trans,
+	&tms340x0_device::pixblt_b_4_opx, &tms340x0_device::pixblt_b_4_opx_trans,   &tms340x0_device::pixblt_b_4_opx, &tms340x0_device::pixblt_b_4_opx_trans,
+	&tms340x0_device::pixblt_b_4_opx, &tms340x0_device::pixblt_b_4_opx_trans,   &tms340x0_device::pixblt_b_4_opx, &tms340x0_device::pixblt_b_4_opx_trans,
+	&tms340x0_device::pixblt_b_4_opx, &tms340x0_device::pixblt_b_4_opx_trans,   &tms340x0_device::pixblt_b_4_opx, &tms340x0_device::pixblt_b_4_opx_trans,
+	&tms340x0_device::pixblt_b_4_opx, &tms340x0_device::pixblt_b_4_opx_trans,   &tms340x0_device::pixblt_b_4_opx, &tms340x0_device::pixblt_b_4_opx_trans,
+	&tms340x0_device::pixblt_b_4_opx, &tms340x0_device::pixblt_b_4_opx_trans,   &tms340x0_device::pixblt_b_4_opx, &tms340x0_device::pixblt_b_4_opx_trans,
+	&tms340x0_device::pixblt_b_4_opx, &tms340x0_device::pixblt_b_4_opx_trans,   &tms340x0_device::pixblt_b_4_opx, &tms340x0_device::pixblt_b_4_opx_trans,
+	&tms340x0_device::pixblt_b_4_opx, &tms340x0_device::pixblt_b_4_opx_trans,   &tms340x0_device::pixblt_b_4_opx, &tms340x0_device::pixblt_b_4_opx_trans,
+	&tms340x0_device::pixblt_b_4_opx, &tms340x0_device::pixblt_b_4_opx_trans,   &tms340x0_device::pixblt_b_4_opx, &tms340x0_device::pixblt_b_4_opx_trans,
+	&tms340x0_device::pixblt_b_4_opx, &tms340x0_device::pixblt_b_4_opx_trans,   &tms340x0_device::pixblt_b_4_opx, &tms340x0_device::pixblt_b_4_opx_trans,
+	&tms340x0_device::pixblt_b_4_opx, &tms340x0_device::pixblt_b_4_opx_trans,   &tms340x0_device::pixblt_b_4_opx, &tms340x0_device::pixblt_b_4_opx_trans,
+	&tms340x0_device::pixblt_b_4_opx, &tms340x0_device::pixblt_b_4_opx_trans,   &tms340x0_device::pixblt_b_4_opx, &tms340x0_device::pixblt_b_4_opx_trans,
+	&tms340x0_device::pixblt_b_4_opx, &tms340x0_device::pixblt_b_4_opx_trans,   &tms340x0_device::pixblt_b_4_opx, &tms340x0_device::pixblt_b_4_opx_trans,
+	&tms340x0_device::pixblt_b_4_opx, &tms340x0_device::pixblt_b_4_opx_trans,   &tms340x0_device::pixblt_b_4_opx, &tms340x0_device::pixblt_b_4_opx_trans,
 
-	pixblt_b_8_op0, pixblt_b_8_op0_trans,   pixblt_b_8_opx, pixblt_b_8_opx_trans,
-	pixblt_b_8_opx, pixblt_b_8_opx_trans,   pixblt_b_8_opx, pixblt_b_8_opx_trans,
-	pixblt_b_8_opx, pixblt_b_8_opx_trans,   pixblt_b_8_opx, pixblt_b_8_opx_trans,
-	pixblt_b_8_opx, pixblt_b_8_opx_trans,   pixblt_b_8_opx, pixblt_b_8_opx_trans,
-	pixblt_b_8_opx, pixblt_b_8_opx_trans,   pixblt_b_8_opx, pixblt_b_8_opx_trans,
-	pixblt_b_8_opx, pixblt_b_8_opx_trans,   pixblt_b_8_opx, pixblt_b_8_opx_trans,
-	pixblt_b_8_opx, pixblt_b_8_opx_trans,   pixblt_b_8_opx, pixblt_b_8_opx_trans,
-	pixblt_b_8_opx, pixblt_b_8_opx_trans,   pixblt_b_8_opx, pixblt_b_8_opx_trans,
-	pixblt_b_8_opx, pixblt_b_8_opx_trans,   pixblt_b_8_opx, pixblt_b_8_opx_trans,
-	pixblt_b_8_opx, pixblt_b_8_opx_trans,   pixblt_b_8_opx, pixblt_b_8_opx_trans,
-	pixblt_b_8_opx, pixblt_b_8_opx_trans,   pixblt_b_8_opx, pixblt_b_8_opx_trans,
-	pixblt_b_8_opx, pixblt_b_8_opx_trans,   pixblt_b_8_opx, pixblt_b_8_opx_trans,
-	pixblt_b_8_opx, pixblt_b_8_opx_trans,   pixblt_b_8_opx, pixblt_b_8_opx_trans,
-	pixblt_b_8_opx, pixblt_b_8_opx_trans,   pixblt_b_8_opx, pixblt_b_8_opx_trans,
-	pixblt_b_8_opx, pixblt_b_8_opx_trans,   pixblt_b_8_opx, pixblt_b_8_opx_trans,
-	pixblt_b_8_opx, pixblt_b_8_opx_trans,   pixblt_b_8_opx, pixblt_b_8_opx_trans,
+	&tms340x0_device::pixblt_b_8_op0, &tms340x0_device::pixblt_b_8_op0_trans,   &tms340x0_device::pixblt_b_8_opx, &tms340x0_device::pixblt_b_8_opx_trans,
+	&tms340x0_device::pixblt_b_8_opx, &tms340x0_device::pixblt_b_8_opx_trans,   &tms340x0_device::pixblt_b_8_opx, &tms340x0_device::pixblt_b_8_opx_trans,
+	&tms340x0_device::pixblt_b_8_opx, &tms340x0_device::pixblt_b_8_opx_trans,   &tms340x0_device::pixblt_b_8_opx, &tms340x0_device::pixblt_b_8_opx_trans,
+	&tms340x0_device::pixblt_b_8_opx, &tms340x0_device::pixblt_b_8_opx_trans,   &tms340x0_device::pixblt_b_8_opx, &tms340x0_device::pixblt_b_8_opx_trans,
+	&tms340x0_device::pixblt_b_8_opx, &tms340x0_device::pixblt_b_8_opx_trans,   &tms340x0_device::pixblt_b_8_opx, &tms340x0_device::pixblt_b_8_opx_trans,
+	&tms340x0_device::pixblt_b_8_opx, &tms340x0_device::pixblt_b_8_opx_trans,   &tms340x0_device::pixblt_b_8_opx, &tms340x0_device::pixblt_b_8_opx_trans,
+	&tms340x0_device::pixblt_b_8_opx, &tms340x0_device::pixblt_b_8_opx_trans,   &tms340x0_device::pixblt_b_8_opx, &tms340x0_device::pixblt_b_8_opx_trans,
+	&tms340x0_device::pixblt_b_8_opx, &tms340x0_device::pixblt_b_8_opx_trans,   &tms340x0_device::pixblt_b_8_opx, &tms340x0_device::pixblt_b_8_opx_trans,
+	&tms340x0_device::pixblt_b_8_opx, &tms340x0_device::pixblt_b_8_opx_trans,   &tms340x0_device::pixblt_b_8_opx, &tms340x0_device::pixblt_b_8_opx_trans,
+	&tms340x0_device::pixblt_b_8_opx, &tms340x0_device::pixblt_b_8_opx_trans,   &tms340x0_device::pixblt_b_8_opx, &tms340x0_device::pixblt_b_8_opx_trans,
+	&tms340x0_device::pixblt_b_8_opx, &tms340x0_device::pixblt_b_8_opx_trans,   &tms340x0_device::pixblt_b_8_opx, &tms340x0_device::pixblt_b_8_opx_trans,
+	&tms340x0_device::pixblt_b_8_opx, &tms340x0_device::pixblt_b_8_opx_trans,   &tms340x0_device::pixblt_b_8_opx, &tms340x0_device::pixblt_b_8_opx_trans,
+	&tms340x0_device::pixblt_b_8_opx, &tms340x0_device::pixblt_b_8_opx_trans,   &tms340x0_device::pixblt_b_8_opx, &tms340x0_device::pixblt_b_8_opx_trans,
+	&tms340x0_device::pixblt_b_8_opx, &tms340x0_device::pixblt_b_8_opx_trans,   &tms340x0_device::pixblt_b_8_opx, &tms340x0_device::pixblt_b_8_opx_trans,
+	&tms340x0_device::pixblt_b_8_opx, &tms340x0_device::pixblt_b_8_opx_trans,   &tms340x0_device::pixblt_b_8_opx, &tms340x0_device::pixblt_b_8_opx_trans,
+	&tms340x0_device::pixblt_b_8_opx, &tms340x0_device::pixblt_b_8_opx_trans,   &tms340x0_device::pixblt_b_8_opx, &tms340x0_device::pixblt_b_8_opx_trans,
 
-	pixblt_b_16_op0,pixblt_b_16_op0_trans,  pixblt_b_16_opx,pixblt_b_16_opx_trans,
-	pixblt_b_16_opx,pixblt_b_16_opx_trans,  pixblt_b_16_opx,pixblt_b_16_opx_trans,
-	pixblt_b_16_opx,pixblt_b_16_opx_trans,  pixblt_b_16_opx,pixblt_b_16_opx_trans,
-	pixblt_b_16_opx,pixblt_b_16_opx_trans,  pixblt_b_16_opx,pixblt_b_16_opx_trans,
-	pixblt_b_16_opx,pixblt_b_16_opx_trans,  pixblt_b_16_opx,pixblt_b_16_opx_trans,
-	pixblt_b_16_opx,pixblt_b_16_opx_trans,  pixblt_b_16_opx,pixblt_b_16_opx_trans,
-	pixblt_b_16_opx,pixblt_b_16_opx_trans,  pixblt_b_16_opx,pixblt_b_16_opx_trans,
-	pixblt_b_16_opx,pixblt_b_16_opx_trans,  pixblt_b_16_opx,pixblt_b_16_opx_trans,
-	pixblt_b_16_opx,pixblt_b_16_opx_trans,  pixblt_b_16_opx,pixblt_b_16_opx_trans,
-	pixblt_b_16_opx,pixblt_b_16_opx_trans,  pixblt_b_16_opx,pixblt_b_16_opx_trans,
-	pixblt_b_16_opx,pixblt_b_16_opx_trans,  pixblt_b_16_opx,pixblt_b_16_opx_trans,
-	pixblt_b_16_opx,pixblt_b_16_opx_trans,  pixblt_b_16_opx,pixblt_b_16_opx_trans,
-	pixblt_b_16_opx,pixblt_b_16_opx_trans,  pixblt_b_16_opx,pixblt_b_16_opx_trans,
-	pixblt_b_16_opx,pixblt_b_16_opx_trans,  pixblt_b_16_opx,pixblt_b_16_opx_trans,
-	pixblt_b_16_opx,pixblt_b_16_opx_trans,  pixblt_b_16_opx,pixblt_b_16_opx_trans,
-	pixblt_b_16_opx,pixblt_b_16_opx_trans,  pixblt_b_16_opx,pixblt_b_16_opx_trans
+	&tms340x0_device::pixblt_b_16_op0,&tms340x0_device::pixblt_b_16_op0_trans,  &tms340x0_device::pixblt_b_16_opx,&tms340x0_device::pixblt_b_16_opx_trans,
+	&tms340x0_device::pixblt_b_16_opx,&tms340x0_device::pixblt_b_16_opx_trans,  &tms340x0_device::pixblt_b_16_opx,&tms340x0_device::pixblt_b_16_opx_trans,
+	&tms340x0_device::pixblt_b_16_opx,&tms340x0_device::pixblt_b_16_opx_trans,  &tms340x0_device::pixblt_b_16_opx,&tms340x0_device::pixblt_b_16_opx_trans,
+	&tms340x0_device::pixblt_b_16_opx,&tms340x0_device::pixblt_b_16_opx_trans,  &tms340x0_device::pixblt_b_16_opx,&tms340x0_device::pixblt_b_16_opx_trans,
+	&tms340x0_device::pixblt_b_16_opx,&tms340x0_device::pixblt_b_16_opx_trans,  &tms340x0_device::pixblt_b_16_opx,&tms340x0_device::pixblt_b_16_opx_trans,
+	&tms340x0_device::pixblt_b_16_opx,&tms340x0_device::pixblt_b_16_opx_trans,  &tms340x0_device::pixblt_b_16_opx,&tms340x0_device::pixblt_b_16_opx_trans,
+	&tms340x0_device::pixblt_b_16_opx,&tms340x0_device::pixblt_b_16_opx_trans,  &tms340x0_device::pixblt_b_16_opx,&tms340x0_device::pixblt_b_16_opx_trans,
+	&tms340x0_device::pixblt_b_16_opx,&tms340x0_device::pixblt_b_16_opx_trans,  &tms340x0_device::pixblt_b_16_opx,&tms340x0_device::pixblt_b_16_opx_trans,
+	&tms340x0_device::pixblt_b_16_opx,&tms340x0_device::pixblt_b_16_opx_trans,  &tms340x0_device::pixblt_b_16_opx,&tms340x0_device::pixblt_b_16_opx_trans,
+	&tms340x0_device::pixblt_b_16_opx,&tms340x0_device::pixblt_b_16_opx_trans,  &tms340x0_device::pixblt_b_16_opx,&tms340x0_device::pixblt_b_16_opx_trans,
+	&tms340x0_device::pixblt_b_16_opx,&tms340x0_device::pixblt_b_16_opx_trans,  &tms340x0_device::pixblt_b_16_opx,&tms340x0_device::pixblt_b_16_opx_trans,
+	&tms340x0_device::pixblt_b_16_opx,&tms340x0_device::pixblt_b_16_opx_trans,  &tms340x0_device::pixblt_b_16_opx,&tms340x0_device::pixblt_b_16_opx_trans,
+	&tms340x0_device::pixblt_b_16_opx,&tms340x0_device::pixblt_b_16_opx_trans,  &tms340x0_device::pixblt_b_16_opx,&tms340x0_device::pixblt_b_16_opx_trans,
+	&tms340x0_device::pixblt_b_16_opx,&tms340x0_device::pixblt_b_16_opx_trans,  &tms340x0_device::pixblt_b_16_opx,&tms340x0_device::pixblt_b_16_opx_trans,
+	&tms340x0_device::pixblt_b_16_opx,&tms340x0_device::pixblt_b_16_opx_trans,  &tms340x0_device::pixblt_b_16_opx,&tms340x0_device::pixblt_b_16_opx_trans,
+	&tms340x0_device::pixblt_b_16_opx,&tms340x0_device::pixblt_b_16_opx_trans,  &tms340x0_device::pixblt_b_16_opx,&tms340x0_device::pixblt_b_16_opx_trans
 };
 
-static void (*const fill_op_table[])(tms34010_state *tms, int) =
+const tms340x0_device::pixblt_b_op_func tms340x0_device::s_fill_op_table[] =
 {
-	fill_1_op0,     fill_1_op0_trans,       fill_1_opx,     fill_1_opx_trans,
-	fill_1_opx,     fill_1_opx_trans,       fill_1_opx,     fill_1_opx_trans,
-	fill_1_opx,     fill_1_opx_trans,       fill_1_opx,     fill_1_opx_trans,
-	fill_1_opx,     fill_1_opx_trans,       fill_1_opx,     fill_1_opx_trans,
-	fill_1_opx,     fill_1_opx_trans,       fill_1_opx,     fill_1_opx_trans,
-	fill_1_opx,     fill_1_opx_trans,       fill_1_opx,     fill_1_opx_trans,
-	fill_1_opx,     fill_1_opx_trans,       fill_1_opx,     fill_1_opx_trans,
-	fill_1_opx,     fill_1_opx_trans,       fill_1_opx,     fill_1_opx_trans,
-	fill_1_opx,     fill_1_opx_trans,       fill_1_opx,     fill_1_opx_trans,
-	fill_1_opx,     fill_1_opx_trans,       fill_1_opx,     fill_1_opx_trans,
-	fill_1_opx,     fill_1_opx_trans,       fill_1_opx,     fill_1_opx_trans,
-	fill_1_opx,     fill_1_opx_trans,       fill_1_opx,     fill_1_opx_trans,
-	fill_1_opx,     fill_1_opx_trans,       fill_1_opx,     fill_1_opx_trans,
-	fill_1_opx,     fill_1_opx_trans,       fill_1_opx,     fill_1_opx_trans,
-	fill_1_opx,     fill_1_opx_trans,       fill_1_opx,     fill_1_opx_trans,
-	fill_1_opx,     fill_1_opx_trans,       fill_1_opx,     fill_1_opx_trans,
+	&tms340x0_device::fill_1_op0,     &tms340x0_device::fill_1_op0_trans,       &tms340x0_device::fill_1_opx,     &tms340x0_device::fill_1_opx_trans,
+	&tms340x0_device::fill_1_opx,     &tms340x0_device::fill_1_opx_trans,       &tms340x0_device::fill_1_opx,     &tms340x0_device::fill_1_opx_trans,
+	&tms340x0_device::fill_1_opx,     &tms340x0_device::fill_1_opx_trans,       &tms340x0_device::fill_1_opx,     &tms340x0_device::fill_1_opx_trans,
+	&tms340x0_device::fill_1_opx,     &tms340x0_device::fill_1_opx_trans,       &tms340x0_device::fill_1_opx,     &tms340x0_device::fill_1_opx_trans,
+	&tms340x0_device::fill_1_opx,     &tms340x0_device::fill_1_opx_trans,       &tms340x0_device::fill_1_opx,     &tms340x0_device::fill_1_opx_trans,
+	&tms340x0_device::fill_1_opx,     &tms340x0_device::fill_1_opx_trans,       &tms340x0_device::fill_1_opx,     &tms340x0_device::fill_1_opx_trans,
+	&tms340x0_device::fill_1_opx,     &tms340x0_device::fill_1_opx_trans,       &tms340x0_device::fill_1_opx,     &tms340x0_device::fill_1_opx_trans,
+	&tms340x0_device::fill_1_opx,     &tms340x0_device::fill_1_opx_trans,       &tms340x0_device::fill_1_opx,     &tms340x0_device::fill_1_opx_trans,
+	&tms340x0_device::fill_1_opx,     &tms340x0_device::fill_1_opx_trans,       &tms340x0_device::fill_1_opx,     &tms340x0_device::fill_1_opx_trans,
+	&tms340x0_device::fill_1_opx,     &tms340x0_device::fill_1_opx_trans,       &tms340x0_device::fill_1_opx,     &tms340x0_device::fill_1_opx_trans,
+	&tms340x0_device::fill_1_opx,     &tms340x0_device::fill_1_opx_trans,       &tms340x0_device::fill_1_opx,     &tms340x0_device::fill_1_opx_trans,
+	&tms340x0_device::fill_1_opx,     &tms340x0_device::fill_1_opx_trans,       &tms340x0_device::fill_1_opx,     &tms340x0_device::fill_1_opx_trans,
+	&tms340x0_device::fill_1_opx,     &tms340x0_device::fill_1_opx_trans,       &tms340x0_device::fill_1_opx,     &tms340x0_device::fill_1_opx_trans,
+	&tms340x0_device::fill_1_opx,     &tms340x0_device::fill_1_opx_trans,       &tms340x0_device::fill_1_opx,     &tms340x0_device::fill_1_opx_trans,
+	&tms340x0_device::fill_1_opx,     &tms340x0_device::fill_1_opx_trans,       &tms340x0_device::fill_1_opx,     &tms340x0_device::fill_1_opx_trans,
+	&tms340x0_device::fill_1_opx,     &tms340x0_device::fill_1_opx_trans,       &tms340x0_device::fill_1_opx,     &tms340x0_device::fill_1_opx_trans,
 
-	fill_2_op0,     fill_2_op0_trans,       fill_2_opx,     fill_2_opx_trans,
-	fill_2_opx,     fill_2_opx_trans,       fill_2_opx,     fill_2_opx_trans,
-	fill_2_opx,     fill_2_opx_trans,       fill_2_opx,     fill_2_opx_trans,
-	fill_2_opx,     fill_2_opx_trans,       fill_2_opx,     fill_2_opx_trans,
-	fill_2_opx,     fill_2_opx_trans,       fill_2_opx,     fill_2_opx_trans,
-	fill_2_opx,     fill_2_opx_trans,       fill_2_opx,     fill_2_opx_trans,
-	fill_2_opx,     fill_2_opx_trans,       fill_2_opx,     fill_2_opx_trans,
-	fill_2_opx,     fill_2_opx_trans,       fill_2_opx,     fill_2_opx_trans,
-	fill_2_opx,     fill_2_opx_trans,       fill_2_opx,     fill_2_opx_trans,
-	fill_2_opx,     fill_2_opx_trans,       fill_2_opx,     fill_2_opx_trans,
-	fill_2_opx,     fill_2_opx_trans,       fill_2_opx,     fill_2_opx_trans,
-	fill_2_opx,     fill_2_opx_trans,       fill_2_opx,     fill_2_opx_trans,
-	fill_2_opx,     fill_2_opx_trans,       fill_2_opx,     fill_2_opx_trans,
-	fill_2_opx,     fill_2_opx_trans,       fill_2_opx,     fill_2_opx_trans,
-	fill_2_opx,     fill_2_opx_trans,       fill_2_opx,     fill_2_opx_trans,
-	fill_2_opx,     fill_2_opx_trans,       fill_2_opx,     fill_2_opx_trans,
+	&tms340x0_device::fill_2_op0,     &tms340x0_device::fill_2_op0_trans,       &tms340x0_device::fill_2_opx,     &tms340x0_device::fill_2_opx_trans,
+	&tms340x0_device::fill_2_opx,     &tms340x0_device::fill_2_opx_trans,       &tms340x0_device::fill_2_opx,     &tms340x0_device::fill_2_opx_trans,
+	&tms340x0_device::fill_2_opx,     &tms340x0_device::fill_2_opx_trans,       &tms340x0_device::fill_2_opx,     &tms340x0_device::fill_2_opx_trans,
+	&tms340x0_device::fill_2_opx,     &tms340x0_device::fill_2_opx_trans,       &tms340x0_device::fill_2_opx,     &tms340x0_device::fill_2_opx_trans,
+	&tms340x0_device::fill_2_opx,     &tms340x0_device::fill_2_opx_trans,       &tms340x0_device::fill_2_opx,     &tms340x0_device::fill_2_opx_trans,
+	&tms340x0_device::fill_2_opx,     &tms340x0_device::fill_2_opx_trans,       &tms340x0_device::fill_2_opx,     &tms340x0_device::fill_2_opx_trans,
+	&tms340x0_device::fill_2_opx,     &tms340x0_device::fill_2_opx_trans,       &tms340x0_device::fill_2_opx,     &tms340x0_device::fill_2_opx_trans,
+	&tms340x0_device::fill_2_opx,     &tms340x0_device::fill_2_opx_trans,       &tms340x0_device::fill_2_opx,     &tms340x0_device::fill_2_opx_trans,
+	&tms340x0_device::fill_2_opx,     &tms340x0_device::fill_2_opx_trans,       &tms340x0_device::fill_2_opx,     &tms340x0_device::fill_2_opx_trans,
+	&tms340x0_device::fill_2_opx,     &tms340x0_device::fill_2_opx_trans,       &tms340x0_device::fill_2_opx,     &tms340x0_device::fill_2_opx_trans,
+	&tms340x0_device::fill_2_opx,     &tms340x0_device::fill_2_opx_trans,       &tms340x0_device::fill_2_opx,     &tms340x0_device::fill_2_opx_trans,
+	&tms340x0_device::fill_2_opx,     &tms340x0_device::fill_2_opx_trans,       &tms340x0_device::fill_2_opx,     &tms340x0_device::fill_2_opx_trans,
+	&tms340x0_device::fill_2_opx,     &tms340x0_device::fill_2_opx_trans,       &tms340x0_device::fill_2_opx,     &tms340x0_device::fill_2_opx_trans,
+	&tms340x0_device::fill_2_opx,     &tms340x0_device::fill_2_opx_trans,       &tms340x0_device::fill_2_opx,     &tms340x0_device::fill_2_opx_trans,
+	&tms340x0_device::fill_2_opx,     &tms340x0_device::fill_2_opx_trans,       &tms340x0_device::fill_2_opx,     &tms340x0_device::fill_2_opx_trans,
+	&tms340x0_device::fill_2_opx,     &tms340x0_device::fill_2_opx_trans,       &tms340x0_device::fill_2_opx,     &tms340x0_device::fill_2_opx_trans,
 
-	fill_4_op0,     fill_4_op0_trans,       fill_4_opx,     fill_4_opx_trans,
-	fill_4_opx,     fill_4_opx_trans,       fill_4_opx,     fill_4_opx_trans,
-	fill_4_opx,     fill_4_opx_trans,       fill_4_opx,     fill_4_opx_trans,
-	fill_4_opx,     fill_4_opx_trans,       fill_4_opx,     fill_4_opx_trans,
-	fill_4_opx,     fill_4_opx_trans,       fill_4_opx,     fill_4_opx_trans,
-	fill_4_opx,     fill_4_opx_trans,       fill_4_opx,     fill_4_opx_trans,
-	fill_4_opx,     fill_4_opx_trans,       fill_4_opx,     fill_4_opx_trans,
-	fill_4_opx,     fill_4_opx_trans,       fill_4_opx,     fill_4_opx_trans,
-	fill_4_opx,     fill_4_opx_trans,       fill_4_opx,     fill_4_opx_trans,
-	fill_4_opx,     fill_4_opx_trans,       fill_4_opx,     fill_4_opx_trans,
-	fill_4_opx,     fill_4_opx_trans,       fill_4_opx,     fill_4_opx_trans,
-	fill_4_opx,     fill_4_opx_trans,       fill_4_opx,     fill_4_opx_trans,
-	fill_4_opx,     fill_4_opx_trans,       fill_4_opx,     fill_4_opx_trans,
-	fill_4_opx,     fill_4_opx_trans,       fill_4_opx,     fill_4_opx_trans,
-	fill_4_opx,     fill_4_opx_trans,       fill_4_opx,     fill_4_opx_trans,
-	fill_4_opx,     fill_4_opx_trans,       fill_4_opx,     fill_4_opx_trans,
+	&tms340x0_device::fill_4_op0,     &tms340x0_device::fill_4_op0_trans,       &tms340x0_device::fill_4_opx,     &tms340x0_device::fill_4_opx_trans,
+	&tms340x0_device::fill_4_opx,     &tms340x0_device::fill_4_opx_trans,       &tms340x0_device::fill_4_opx,     &tms340x0_device::fill_4_opx_trans,
+	&tms340x0_device::fill_4_opx,     &tms340x0_device::fill_4_opx_trans,       &tms340x0_device::fill_4_opx,     &tms340x0_device::fill_4_opx_trans,
+	&tms340x0_device::fill_4_opx,     &tms340x0_device::fill_4_opx_trans,       &tms340x0_device::fill_4_opx,     &tms340x0_device::fill_4_opx_trans,
+	&tms340x0_device::fill_4_opx,     &tms340x0_device::fill_4_opx_trans,       &tms340x0_device::fill_4_opx,     &tms340x0_device::fill_4_opx_trans,
+	&tms340x0_device::fill_4_opx,     &tms340x0_device::fill_4_opx_trans,       &tms340x0_device::fill_4_opx,     &tms340x0_device::fill_4_opx_trans,
+	&tms340x0_device::fill_4_opx,     &tms340x0_device::fill_4_opx_trans,       &tms340x0_device::fill_4_opx,     &tms340x0_device::fill_4_opx_trans,
+	&tms340x0_device::fill_4_opx,     &tms340x0_device::fill_4_opx_trans,       &tms340x0_device::fill_4_opx,     &tms340x0_device::fill_4_opx_trans,
+	&tms340x0_device::fill_4_opx,     &tms340x0_device::fill_4_opx_trans,       &tms340x0_device::fill_4_opx,     &tms340x0_device::fill_4_opx_trans,
+	&tms340x0_device::fill_4_opx,     &tms340x0_device::fill_4_opx_trans,       &tms340x0_device::fill_4_opx,     &tms340x0_device::fill_4_opx_trans,
+	&tms340x0_device::fill_4_opx,     &tms340x0_device::fill_4_opx_trans,       &tms340x0_device::fill_4_opx,     &tms340x0_device::fill_4_opx_trans,
+	&tms340x0_device::fill_4_opx,     &tms340x0_device::fill_4_opx_trans,       &tms340x0_device::fill_4_opx,     &tms340x0_device::fill_4_opx_trans,
+	&tms340x0_device::fill_4_opx,     &tms340x0_device::fill_4_opx_trans,       &tms340x0_device::fill_4_opx,     &tms340x0_device::fill_4_opx_trans,
+	&tms340x0_device::fill_4_opx,     &tms340x0_device::fill_4_opx_trans,       &tms340x0_device::fill_4_opx,     &tms340x0_device::fill_4_opx_trans,
+	&tms340x0_device::fill_4_opx,     &tms340x0_device::fill_4_opx_trans,       &tms340x0_device::fill_4_opx,     &tms340x0_device::fill_4_opx_trans,
+	&tms340x0_device::fill_4_opx,     &tms340x0_device::fill_4_opx_trans,       &tms340x0_device::fill_4_opx,     &tms340x0_device::fill_4_opx_trans,
 
-	fill_8_op0,     fill_8_op0_trans,       fill_8_opx,     fill_8_opx_trans,
-	fill_8_opx,     fill_8_opx_trans,       fill_8_opx,     fill_8_opx_trans,
-	fill_8_opx,     fill_8_opx_trans,       fill_8_opx,     fill_8_opx_trans,
-	fill_8_opx,     fill_8_opx_trans,       fill_8_opx,     fill_8_opx_trans,
-	fill_8_opx,     fill_8_opx_trans,       fill_8_opx,     fill_8_opx_trans,
-	fill_8_opx,     fill_8_opx_trans,       fill_8_opx,     fill_8_opx_trans,
-	fill_8_opx,     fill_8_opx_trans,       fill_8_opx,     fill_8_opx_trans,
-	fill_8_opx,     fill_8_opx_trans,       fill_8_opx,     fill_8_opx_trans,
-	fill_8_opx,     fill_8_opx_trans,       fill_8_opx,     fill_8_opx_trans,
-	fill_8_opx,     fill_8_opx_trans,       fill_8_opx,     fill_8_opx_trans,
-	fill_8_opx,     fill_8_opx_trans,       fill_8_opx,     fill_8_opx_trans,
-	fill_8_opx,     fill_8_opx_trans,       fill_8_opx,     fill_8_opx_trans,
-	fill_8_opx,     fill_8_opx_trans,       fill_8_opx,     fill_8_opx_trans,
-	fill_8_opx,     fill_8_opx_trans,       fill_8_opx,     fill_8_opx_trans,
-	fill_8_opx,     fill_8_opx_trans,       fill_8_opx,     fill_8_opx_trans,
-	fill_8_opx,     fill_8_opx_trans,       fill_8_opx,     fill_8_opx_trans,
+	&tms340x0_device::fill_8_op0,     &tms340x0_device::fill_8_op0_trans,       &tms340x0_device::fill_8_opx,     &tms340x0_device::fill_8_opx_trans,
+	&tms340x0_device::fill_8_opx,     &tms340x0_device::fill_8_opx_trans,       &tms340x0_device::fill_8_opx,     &tms340x0_device::fill_8_opx_trans,
+	&tms340x0_device::fill_8_opx,     &tms340x0_device::fill_8_opx_trans,       &tms340x0_device::fill_8_opx,     &tms340x0_device::fill_8_opx_trans,
+	&tms340x0_device::fill_8_opx,     &tms340x0_device::fill_8_opx_trans,       &tms340x0_device::fill_8_opx,     &tms340x0_device::fill_8_opx_trans,
+	&tms340x0_device::fill_8_opx,     &tms340x0_device::fill_8_opx_trans,       &tms340x0_device::fill_8_opx,     &tms340x0_device::fill_8_opx_trans,
+	&tms340x0_device::fill_8_opx,     &tms340x0_device::fill_8_opx_trans,       &tms340x0_device::fill_8_opx,     &tms340x0_device::fill_8_opx_trans,
+	&tms340x0_device::fill_8_opx,     &tms340x0_device::fill_8_opx_trans,       &tms340x0_device::fill_8_opx,     &tms340x0_device::fill_8_opx_trans,
+	&tms340x0_device::fill_8_opx,     &tms340x0_device::fill_8_opx_trans,       &tms340x0_device::fill_8_opx,     &tms340x0_device::fill_8_opx_trans,
+	&tms340x0_device::fill_8_opx,     &tms340x0_device::fill_8_opx_trans,       &tms340x0_device::fill_8_opx,     &tms340x0_device::fill_8_opx_trans,
+	&tms340x0_device::fill_8_opx,     &tms340x0_device::fill_8_opx_trans,       &tms340x0_device::fill_8_opx,     &tms340x0_device::fill_8_opx_trans,
+	&tms340x0_device::fill_8_opx,     &tms340x0_device::fill_8_opx_trans,       &tms340x0_device::fill_8_opx,     &tms340x0_device::fill_8_opx_trans,
+	&tms340x0_device::fill_8_opx,     &tms340x0_device::fill_8_opx_trans,       &tms340x0_device::fill_8_opx,     &tms340x0_device::fill_8_opx_trans,
+	&tms340x0_device::fill_8_opx,     &tms340x0_device::fill_8_opx_trans,       &tms340x0_device::fill_8_opx,     &tms340x0_device::fill_8_opx_trans,
+	&tms340x0_device::fill_8_opx,     &tms340x0_device::fill_8_opx_trans,       &tms340x0_device::fill_8_opx,     &tms340x0_device::fill_8_opx_trans,
+	&tms340x0_device::fill_8_opx,     &tms340x0_device::fill_8_opx_trans,       &tms340x0_device::fill_8_opx,     &tms340x0_device::fill_8_opx_trans,
+	&tms340x0_device::fill_8_opx,     &tms340x0_device::fill_8_opx_trans,       &tms340x0_device::fill_8_opx,     &tms340x0_device::fill_8_opx_trans,
 
-	fill_16_op0,    fill_16_op0_trans,      fill_16_opx,    fill_16_opx_trans,
-	fill_16_opx,    fill_16_opx_trans,      fill_16_opx,    fill_16_opx_trans,
-	fill_16_opx,    fill_16_opx_trans,      fill_16_opx,    fill_16_opx_trans,
-	fill_16_opx,    fill_16_opx_trans,      fill_16_opx,    fill_16_opx_trans,
-	fill_16_opx,    fill_16_opx_trans,      fill_16_opx,    fill_16_opx_trans,
-	fill_16_opx,    fill_16_opx_trans,      fill_16_opx,    fill_16_opx_trans,
-	fill_16_opx,    fill_16_opx_trans,      fill_16_opx,    fill_16_opx_trans,
-	fill_16_opx,    fill_16_opx_trans,      fill_16_opx,    fill_16_opx_trans,
-	fill_16_opx,    fill_16_opx_trans,      fill_16_opx,    fill_16_opx_trans,
-	fill_16_opx,    fill_16_opx_trans,      fill_16_opx,    fill_16_opx_trans,
-	fill_16_opx,    fill_16_opx_trans,      fill_16_opx,    fill_16_opx_trans,
-	fill_16_opx,    fill_16_opx_trans,      fill_16_opx,    fill_16_opx_trans,
-	fill_16_opx,    fill_16_opx_trans,      fill_16_opx,    fill_16_opx_trans,
-	fill_16_opx,    fill_16_opx_trans,      fill_16_opx,    fill_16_opx_trans,
-	fill_16_opx,    fill_16_opx_trans,      fill_16_opx,    fill_16_opx_trans,
-	fill_16_opx,    fill_16_opx_trans,      fill_16_opx,    fill_16_opx_trans
+	&tms340x0_device::fill_16_op0,    &tms340x0_device::fill_16_op0_trans,      &tms340x0_device::fill_16_opx,    &tms340x0_device::fill_16_opx_trans,
+	&tms340x0_device::fill_16_opx,    &tms340x0_device::fill_16_opx_trans,      &tms340x0_device::fill_16_opx,    &tms340x0_device::fill_16_opx_trans,
+	&tms340x0_device::fill_16_opx,    &tms340x0_device::fill_16_opx_trans,      &tms340x0_device::fill_16_opx,    &tms340x0_device::fill_16_opx_trans,
+	&tms340x0_device::fill_16_opx,    &tms340x0_device::fill_16_opx_trans,      &tms340x0_device::fill_16_opx,    &tms340x0_device::fill_16_opx_trans,
+	&tms340x0_device::fill_16_opx,    &tms340x0_device::fill_16_opx_trans,      &tms340x0_device::fill_16_opx,    &tms340x0_device::fill_16_opx_trans,
+	&tms340x0_device::fill_16_opx,    &tms340x0_device::fill_16_opx_trans,      &tms340x0_device::fill_16_opx,    &tms340x0_device::fill_16_opx_trans,
+	&tms340x0_device::fill_16_opx,    &tms340x0_device::fill_16_opx_trans,      &tms340x0_device::fill_16_opx,    &tms340x0_device::fill_16_opx_trans,
+	&tms340x0_device::fill_16_opx,    &tms340x0_device::fill_16_opx_trans,      &tms340x0_device::fill_16_opx,    &tms340x0_device::fill_16_opx_trans,
+	&tms340x0_device::fill_16_opx,    &tms340x0_device::fill_16_opx_trans,      &tms340x0_device::fill_16_opx,    &tms340x0_device::fill_16_opx_trans,
+	&tms340x0_device::fill_16_opx,    &tms340x0_device::fill_16_opx_trans,      &tms340x0_device::fill_16_opx,    &tms340x0_device::fill_16_opx_trans,
+	&tms340x0_device::fill_16_opx,    &tms340x0_device::fill_16_opx_trans,      &tms340x0_device::fill_16_opx,    &tms340x0_device::fill_16_opx_trans,
+	&tms340x0_device::fill_16_opx,    &tms340x0_device::fill_16_opx_trans,      &tms340x0_device::fill_16_opx,    &tms340x0_device::fill_16_opx_trans,
+	&tms340x0_device::fill_16_opx,    &tms340x0_device::fill_16_opx_trans,      &tms340x0_device::fill_16_opx,    &tms340x0_device::fill_16_opx_trans,
+	&tms340x0_device::fill_16_opx,    &tms340x0_device::fill_16_opx_trans,      &tms340x0_device::fill_16_opx,    &tms340x0_device::fill_16_opx_trans,
+	&tms340x0_device::fill_16_opx,    &tms340x0_device::fill_16_opx_trans,      &tms340x0_device::fill_16_opx,    &tms340x0_device::fill_16_opx_trans,
+	&tms340x0_device::fill_16_opx,    &tms340x0_device::fill_16_opx_trans,      &tms340x0_device::fill_16_opx,    &tms340x0_device::fill_16_opx_trans
 };
 
 
@@ -768,8 +677,8 @@ static void (*const fill_op_table[])(tms34010_state *tms, int) =
 #undef PIXEL_OP
 
 
-#define PIXEL_OP(src, mask, pixel)      pixel = (*pixel_op)(src, mask, pixel)
-#define PIXEL_OP_TIMING                 pixel_op_timing
+#define PIXEL_OP(src, mask, pixel)      pixel = (this->*m_pixel_op)(src, mask, pixel)
+#define PIXEL_OP_TIMING                 m_pixel_op_timing
 #define PIXEL_OP_REQUIRES_SOURCE        1
 #define TRANSPARENCY                    0
 
@@ -861,9 +770,9 @@ static void (*const fill_op_table[])(tms34010_state *tms, int) =
 #undef PIXEL_OP
 
 
-#define PIXEL_OP(src, mask, pixel)      pixel = (*pixel_op)(src, mask, pixel)
+#define PIXEL_OP(src, mask, pixel)      pixel = (this->*m_pixel_op)(src, mask, pixel)
 #define PIXEL_OP_REQUIRES_SOURCE        1
-#define PIXEL_OP_TIMING                 (2+pixel_op_timing)
+#define PIXEL_OP_TIMING                 (2+m_pixel_op_timing)
 #define TRANSPARENCY                    1
 
 	/* 1bpp cases */
@@ -912,116 +821,116 @@ static const UINT8 pixelsize_lookup[32] =
 };
 
 
-static void pixblt_b_l(tms34010_state *tms, UINT16 op)
+void tms340x0_device::pixblt_b_l(UINT16 op)
 {
-	int psize = pixelsize_lookup[IOREG(tms, REG_PSIZE) & 0x1f];
-	int trans = (IOREG(tms, REG_CONTROL) & 0x20) >> 5;
-	int rop = (IOREG(tms, REG_CONTROL) >> 10) & 0x1f;
+	int psize = pixelsize_lookup[IOREG(REG_PSIZE) & 0x1f];
+	int trans = (IOREG(REG_CONTROL) & 0x20) >> 5;
+	int rop = (IOREG(REG_CONTROL) >> 10) & 0x1f;
 	int ix = trans | (rop << 1) | (psize << 6);
-	if (!P_FLAG(tms)) LOGGFX(("%08X(%3d):PIXBLT B,L (%dx%d) depth=%d\n", tms->pc, tms->screen->vpos(), DYDX_X(tms), DYDX_Y(tms), IOREG(tms, REG_PSIZE) ? IOREG(tms, REG_PSIZE) : 32));
-	pixel_op = pixel_op_table[rop];
-	pixel_op_timing = pixel_op_timing_table[rop];
-	(*pixblt_b_op_table[ix])(tms, 1);
+	if (!P_FLAG()) LOGGFX(("%08X(%3d):PIXBLT B,L (%dx%d) depth=%d\n", m_pc, m_screen->vpos(), DYDX_X(), DYDX_Y(), IOREG(REG_PSIZE) ? IOREG(REG_PSIZE) : 32));
+	m_pixel_op = s_pixel_op_table[rop];
+	m_pixel_op_timing = s_pixel_op_timing_table[rop];
+	(this->*s_pixblt_b_op_table[ix])(1);
 }
 
-static void pixblt_b_xy(tms34010_state *tms, UINT16 op)
+void tms340x0_device::pixblt_b_xy(UINT16 op)
 {
-	int psize = pixelsize_lookup[IOREG(tms, REG_PSIZE) & 0x1f];
-	int trans = (IOREG(tms, REG_CONTROL) & 0x20) >> 5;
-	int rop = (IOREG(tms, REG_CONTROL) >> 10) & 0x1f;
+	int psize = pixelsize_lookup[IOREG(REG_PSIZE) & 0x1f];
+	int trans = (IOREG(REG_CONTROL) & 0x20) >> 5;
+	int rop = (IOREG(REG_CONTROL) >> 10) & 0x1f;
 	int ix = trans | (rop << 1) | (psize << 6);
-	if (!P_FLAG(tms)) LOGGFX(("%08X(%3d):PIXBLT B,XY (%d,%d) (%dx%d) depth=%d\n", tms->pc, tms->screen->vpos(), DADDR_X(tms), DADDR_Y(tms), DYDX_X(tms), DYDX_Y(tms), IOREG(tms, REG_PSIZE) ? IOREG(tms, REG_PSIZE) : 32));
-	pixel_op = pixel_op_table[rop];
-	pixel_op_timing = pixel_op_timing_table[rop];
-	(*pixblt_b_op_table[ix])(tms, 0);
+	if (!P_FLAG()) LOGGFX(("%08X(%3d):PIXBLT B,XY (%d,%d) (%dx%d) depth=%d\n", m_pc, m_screen->vpos(), DADDR_X(), DADDR_Y(), DYDX_X(), DYDX_Y(), IOREG(REG_PSIZE) ? IOREG(REG_PSIZE) : 32));
+	m_pixel_op = s_pixel_op_table[rop];
+	m_pixel_op_timing = s_pixel_op_timing_table[rop];
+	(this->*s_pixblt_b_op_table[ix])(0);
 }
 
-static void pixblt_l_l(tms34010_state *tms, UINT16 op)
+void tms340x0_device::pixblt_l_l(UINT16 op)
 {
-	int psize = pixelsize_lookup[IOREG(tms, REG_PSIZE) & 0x1f];
-	int trans = (IOREG(tms, REG_CONTROL) & 0x20) >> 5;
-	int rop = (IOREG(tms, REG_CONTROL) >> 10) & 0x1f;
-	int pbh = (IOREG(tms, REG_CONTROL) >> 8) & 1;
+	int psize = pixelsize_lookup[IOREG(REG_PSIZE) & 0x1f];
+	int trans = (IOREG(REG_CONTROL) & 0x20) >> 5;
+	int rop = (IOREG(REG_CONTROL) >> 10) & 0x1f;
+	int pbh = (IOREG(REG_CONTROL) >> 8) & 1;
 	int ix = trans | (rop << 1) | (psize << 6);
-	if (!P_FLAG(tms)) LOGGFX(("%08X(%3d):PIXBLT L,L (%dx%d) depth=%d\n", tms->pc, tms->screen->vpos(), DYDX_X(tms), DYDX_Y(tms), IOREG(tms, REG_PSIZE) ? IOREG(tms, REG_PSIZE) : 32));
-	pixel_op = pixel_op_table[rop];
-	pixel_op_timing = pixel_op_timing_table[rop];
+	if (!P_FLAG()) LOGGFX(("%08X(%3d):PIXBLT L,L (%dx%d) depth=%d\n", m_pc, m_screen->vpos(), DYDX_X(), DYDX_Y(), IOREG(REG_PSIZE) ? IOREG(REG_PSIZE) : 32));
+	m_pixel_op = s_pixel_op_table[rop];
+	m_pixel_op_timing = s_pixel_op_timing_table[rop];
 	if (!pbh)
-		(*pixblt_op_table[ix])(tms, 1, 1);
+		(this->*s_pixblt_op_table[ix])(1, 1);
 	else
-		(*pixblt_r_op_table[ix])(tms, 1, 1);
+		(this->*s_pixblt_r_op_table[ix])(1, 1);
 }
 
-static void pixblt_l_xy(tms34010_state *tms, UINT16 op)
+void tms340x0_device::pixblt_l_xy(UINT16 op)
 {
-	int psize = pixelsize_lookup[IOREG(tms, REG_PSIZE) & 0x1f];
-	int trans = (IOREG(tms, REG_CONTROL) & 0x20) >> 5;
-	int rop = (IOREG(tms, REG_CONTROL) >> 10) & 0x1f;
-	int pbh = (IOREG(tms, REG_CONTROL) >> 8) & 1;
+	int psize = pixelsize_lookup[IOREG(REG_PSIZE) & 0x1f];
+	int trans = (IOREG(REG_CONTROL) & 0x20) >> 5;
+	int rop = (IOREG(REG_CONTROL) >> 10) & 0x1f;
+	int pbh = (IOREG(REG_CONTROL) >> 8) & 1;
 	int ix = trans | (rop << 1) | (psize << 6);
-	if (!P_FLAG(tms)) LOGGFX(("%08X(%3d):PIXBLT L,XY (%d,%d) (%dx%d) depth=%d\n", tms->pc, tms->screen->vpos(), DADDR_X(tms), DADDR_Y(tms), DYDX_X(tms), DYDX_Y(tms), IOREG(tms, REG_PSIZE) ? IOREG(tms, REG_PSIZE) : 32));
-	pixel_op = pixel_op_table[rop];
-	pixel_op_timing = pixel_op_timing_table[rop];
+	if (!P_FLAG()) LOGGFX(("%08X(%3d):PIXBLT L,XY (%d,%d) (%dx%d) depth=%d\n", m_pc, m_screen->vpos(), DADDR_X(), DADDR_Y(), DYDX_X(), DYDX_Y(), IOREG(REG_PSIZE) ? IOREG(REG_PSIZE) : 32));
+	m_pixel_op = s_pixel_op_table[rop];
+	m_pixel_op_timing = s_pixel_op_timing_table[rop];
 	if (!pbh)
-		(*pixblt_op_table[ix])(tms, 1, 0);
+		(this->*s_pixblt_op_table[ix])(1, 0);
 	else
-		(*pixblt_r_op_table[ix])(tms, 1, 0);
+		(this->*s_pixblt_r_op_table[ix])(1, 0);
 }
 
-static void pixblt_xy_l(tms34010_state *tms, UINT16 op)
+void tms340x0_device::pixblt_xy_l(UINT16 op)
 {
-	int psize = pixelsize_lookup[IOREG(tms, REG_PSIZE) & 0x1f];
-	int trans = (IOREG(tms, REG_CONTROL) & 0x20) >> 5;
-	int rop = (IOREG(tms, REG_CONTROL) >> 10) & 0x1f;
-	int pbh = (IOREG(tms, REG_CONTROL) >> 8) & 1;
+	int psize = pixelsize_lookup[IOREG(REG_PSIZE) & 0x1f];
+	int trans = (IOREG(REG_CONTROL) & 0x20) >> 5;
+	int rop = (IOREG(REG_CONTROL) >> 10) & 0x1f;
+	int pbh = (IOREG(REG_CONTROL) >> 8) & 1;
 	int ix = trans | (rop << 1) | (psize << 6);
-	if (!P_FLAG(tms)) LOGGFX(("%08X(%3d):PIXBLT XY,L (%dx%d) depth=%d\n", tms->pc, tms->screen->vpos(), DYDX_X(tms), DYDX_Y(tms), IOREG(tms, REG_PSIZE) ? IOREG(tms, REG_PSIZE) : 32));
-	pixel_op = pixel_op_table[rop];
-	pixel_op_timing = pixel_op_timing_table[rop];
+	if (!P_FLAG()) LOGGFX(("%08X(%3d):PIXBLT XY,L (%dx%d) depth=%d\n", m_pc, m_screen->vpos(), DYDX_X(), DYDX_Y(), IOREG(REG_PSIZE) ? IOREG(REG_PSIZE) : 32));
+	m_pixel_op = s_pixel_op_table[rop];
+	m_pixel_op_timing = s_pixel_op_timing_table[rop];
 	if (!pbh)
-		(*pixblt_op_table[ix])(tms, 0, 1);
+		(this->*s_pixblt_op_table[ix])(0, 1);
 	else
-		(*pixblt_r_op_table[ix])(tms, 0, 1);
+		(this->*s_pixblt_r_op_table[ix])(0, 1);
 }
 
-static void pixblt_xy_xy(tms34010_state *tms, UINT16 op)
+void tms340x0_device::pixblt_xy_xy(UINT16 op)
 {
-	int psize = pixelsize_lookup[IOREG(tms, REG_PSIZE) & 0x1f];
-	int trans = (IOREG(tms, REG_CONTROL) & 0x20) >> 5;
-	int rop = (IOREG(tms, REG_CONTROL) >> 10) & 0x1f;
-	int pbh = (IOREG(tms, REG_CONTROL) >> 8) & 1;
+	int psize = pixelsize_lookup[IOREG(REG_PSIZE) & 0x1f];
+	int trans = (IOREG(REG_CONTROL) & 0x20) >> 5;
+	int rop = (IOREG(REG_CONTROL) >> 10) & 0x1f;
+	int pbh = (IOREG(REG_CONTROL) >> 8) & 1;
 	int ix = trans | (rop << 1) | (psize << 6);
-	if (!P_FLAG(tms)) LOGGFX(("%08X(%3d):PIXBLT XY,XY (%dx%d) depth=%d\n", tms->pc, tms->screen->vpos(), DYDX_X(tms), DYDX_Y(tms), IOREG(tms, REG_PSIZE) ? IOREG(tms, REG_PSIZE) : 32));
-	pixel_op = pixel_op_table[rop];
-	pixel_op_timing = pixel_op_timing_table[rop];
+	if (!P_FLAG()) LOGGFX(("%08X(%3d):PIXBLT XY,XY (%dx%d) depth=%d\n", m_pc, m_screen->vpos(), DYDX_X(), DYDX_Y(), IOREG(REG_PSIZE) ? IOREG(REG_PSIZE) : 32));
+	m_pixel_op = s_pixel_op_table[rop];
+	m_pixel_op_timing = s_pixel_op_timing_table[rop];
 	if (!pbh)
-		(*pixblt_op_table[ix])(tms, 0, 0);
+		(this->*s_pixblt_op_table[ix])(0, 0);
 	else
-		(*pixblt_r_op_table[ix])(tms, 0, 0);
+		(this->*s_pixblt_r_op_table[ix])(0, 0);
 }
 
-static void fill_l(tms34010_state *tms, UINT16 op)
+void tms340x0_device::fill_l(UINT16 op)
 {
-	int psize = pixelsize_lookup[IOREG(tms, REG_PSIZE) & 0x1f];
-	int trans = (IOREG(tms, REG_CONTROL) & 0x20) >> 5;
-	int rop = (IOREG(tms, REG_CONTROL) >> 10) & 0x1f;
+	int psize = pixelsize_lookup[IOREG(REG_PSIZE) & 0x1f];
+	int trans = (IOREG(REG_CONTROL) & 0x20) >> 5;
+	int rop = (IOREG(REG_CONTROL) >> 10) & 0x1f;
 	int ix = trans | (rop << 1) | (psize << 6);
-	if (!P_FLAG(tms)) LOGGFX(("%08X(%3d):FILL L (%dx%d) depth=%d\n", tms->pc, tms->screen->vpos(), DYDX_X(tms), DYDX_Y(tms), IOREG(tms, REG_PSIZE) ? IOREG(tms, REG_PSIZE) : 32));
-	pixel_op = pixel_op_table[rop];
-	pixel_op_timing = pixel_op_timing_table[rop];
-	(*fill_op_table[ix])(tms, 1);
+	if (!P_FLAG()) LOGGFX(("%08X(%3d):FILL L (%dx%d) depth=%d\n", m_pc, m_screen->vpos(), DYDX_X(), DYDX_Y(), IOREG(REG_PSIZE) ? IOREG(REG_PSIZE) : 32));
+	m_pixel_op = s_pixel_op_table[rop];
+	m_pixel_op_timing = s_pixel_op_timing_table[rop];
+	(this->*s_fill_op_table[ix])(1);
 }
 
-static void fill_xy(tms34010_state *tms, UINT16 op)
+void tms340x0_device::fill_xy(UINT16 op)
 {
-	int psize = pixelsize_lookup[IOREG(tms, REG_PSIZE) & 0x1f];
-	int trans = (IOREG(tms, REG_CONTROL) & 0x20) >> 5;
-	int rop = (IOREG(tms, REG_CONTROL) >> 10) & 0x1f;
+	int psize = pixelsize_lookup[IOREG(REG_PSIZE) & 0x1f];
+	int trans = (IOREG(REG_CONTROL) & 0x20) >> 5;
+	int rop = (IOREG(REG_CONTROL) >> 10) & 0x1f;
 	int ix = trans | (rop << 1) | (psize << 6);
-	if (!P_FLAG(tms)) LOGGFX(("%08X(%3d):FILL XY (%d,%d) (%dx%d) depth=%d\n", tms->pc, tms->screen->vpos(), DADDR_X(tms), DADDR_Y(tms), DYDX_X(tms), DYDX_Y(tms), IOREG(tms, REG_PSIZE) ? IOREG(tms, REG_PSIZE) : 32));
-	pixel_op = pixel_op_table[rop];
-	pixel_op_timing = pixel_op_timing_table[rop];
-	(*fill_op_table[ix])(tms, 0);
+	if (!P_FLAG()) LOGGFX(("%08X(%3d):FILL XY (%d,%d) (%dx%d) depth=%d\n", m_pc, m_screen->vpos(), DADDR_X(), DADDR_Y(), DYDX_X(), DYDX_Y(), IOREG(REG_PSIZE) ? IOREG(REG_PSIZE) : 32));
+	m_pixel_op = s_pixel_op_table[rop];
+	m_pixel_op_timing = s_pixel_op_timing_table[rop];
+	(this->*s_fill_op_table[ix])(0);
 }
 
 
@@ -1034,78 +943,78 @@ static void fill_xy(tms34010_state *tms, UINT16 op)
 #define PIXELS_PER_WORD (16 / BITS_PER_PIXEL)
 #define PIXEL_MASK ((1 << BITS_PER_PIXEL) - 1)
 
-static void FUNCTION_NAME(pixblt)(tms34010_state *tms, int src_is_linear, int dst_is_linear)
+void FUNCTION_NAME(tms340x0_device::pixblt)(int src_is_linear, int dst_is_linear)
 {
 	/* if this is the first time through, perform the operation */
-	if (!P_FLAG(tms))
+	if (!P_FLAG())
 	{
 		int dx, dy, x, y, /*words,*/ yreverse;
-		void (*word_write)(address_space &space,offs_t address,UINT16 data);
-		UINT16 (*word_read)(address_space &space,offs_t address);
+		word_write_func word_write;
+		word_read_func word_read;
 		UINT32 readwrites = 0;
 		UINT32 saddr, daddr;
 		XY dstxy = { 0 };
 
 		/* determine read/write functions */
-		if (IOREG(tms, REG_DPYCTL) & 0x0800)
+		if (IOREG(REG_DPYCTL) & 0x0800)
 		{
-			word_write = shiftreg_w;
-			word_read = shiftreg_r;
+			word_write = &tms340x0_device::shiftreg_w;
+			word_read = &tms340x0_device::shiftreg_r;
 		}
 		else
 		{
-			word_write = memory_w;
-			word_read = memory_r;
+			word_write = &tms340x0_device::memory_w;
+			word_read = &tms340x0_device::memory_r;
 		}
 
 		/* compute the starting addresses */
-		saddr = src_is_linear ? SADDR(tms) : SXYTOL(tms,SADDR_XY(tms));
+		saddr = src_is_linear ? SADDR() : SXYTOL(SADDR_XY());
 
 		/* compute the bounds of the operation */
-		dx = (INT16)DYDX_X(tms);
-		dy = (INT16)DYDX_Y(tms);
+		dx = (INT16)DYDX_X();
+		dy = (INT16)DYDX_Y();
 
 		/* apply the window for non-linear destinations */
-		tms->gfxcycles = 7 + (src_is_linear ? 0 : 2);
+		m_gfxcycles = 7 + (src_is_linear ? 0 : 2);
 		if (!dst_is_linear)
 		{
-			dstxy = DADDR_XY(tms);
-			tms->gfxcycles += 2 + (!src_is_linear) + apply_window(tms, "PIXBLT", BITS_PER_PIXEL, &saddr, &dstxy, &dx, &dy);
-			daddr = DXYTOL(tms,dstxy);
+			dstxy = DADDR_XY();
+			m_gfxcycles += 2 + (!src_is_linear) + apply_window("PIXBLT", BITS_PER_PIXEL, &saddr, &dstxy, &dx, &dy);
+			daddr = DXYTOL(dstxy);
 		}
 		else
-			daddr = DADDR(tms);
+			daddr = DADDR();
 		daddr &= ~(BITS_PER_PIXEL - 1);
-		LOGGFX(("  saddr=%08X daddr=%08X sptch=%08X dptch=%08X\n", saddr, daddr, SPTCH(tms), DPTCH(tms)));
+		LOGGFX(("  saddr=%08X daddr=%08X sptch=%08X dptch=%08X\n", saddr, daddr, SPTCH(), DPTCH()));
 
 		/* bail if we're clipped */
 		if (dx <= 0 || dy <= 0)
 			return;
 
 		/* window mode 1: just return and interrupt if we are within the window */
-		if (WINDOW_CHECKING(tms) == 1 && !dst_is_linear)
+		if (WINDOW_CHECKING() == 1 && !dst_is_linear)
 		{
-			CLR_V(tms);
-			DADDR_XY(tms) = dstxy;
-			DYDX_X(tms) = dx;
-			DYDX_Y(tms) = dy;
-			IOREG(tms, REG_INTPEND) |= TMS34010_WV;
-			check_interrupt(tms);
+			CLR_V();
+			DADDR_XY() = dstxy;
+			DYDX_X() = dx;
+			DYDX_Y() = dy;
+			IOREG(REG_INTPEND) |= TMS34010_WV;
+			check_interrupt();
 			return;
 		}
 
 		/* handle flipping the addresses */
-		yreverse = (IOREG(tms, REG_CONTROL) >> 9) & 1;
+		yreverse = (IOREG(REG_CONTROL) >> 9) & 1;
 		if (!src_is_linear || !dst_is_linear)
 		{
 			if (yreverse)
 			{
-				saddr += (dy - 1) * tms->convsp;
-				daddr += (dy - 1) * tms->convdp;
+				saddr += (dy - 1) * m_convsp;
+				daddr += (dy - 1) * m_convdp;
 			}
 		}
 
-		tms->st |= STBIT_P;
+		m_st |= STBIT_P;
 
 		/* loop over rows */
 		for (y = 0; y < dy; y++)
@@ -1117,13 +1026,13 @@ static void FUNCTION_NAME(pixblt)(tms34010_state *tms, int src_is_linear, int ds
 			UINT32 srcword, dstword = 0;
 
 			/* fetch the initial source word */
-			srcword = (*word_read)(*tms->program, srcwordaddr++ << 1);
+			srcword = (this->*word_read)(*m_program, srcwordaddr++ << 1);
 			readwrites++;
 
 			/* fetch the initial dest word */
 			if (PIXEL_OP_REQUIRES_SOURCE || TRANSPARENCY || (daddr & 0x0f) != 0)
 			{
-				dstword = (*word_read)(*tms->program, dstwordaddr << 1);
+				dstword = (this->*word_read)(*m_program, dstwordaddr << 1);
 				readwrites++;
 			}
 
@@ -1136,7 +1045,7 @@ static void FUNCTION_NAME(pixblt)(tms34010_state *tms, int src_is_linear, int ds
 				/* fetch more words if necessary */
 				if (srcbit + BITS_PER_PIXEL > 16)
 				{
-					srcword |= (*word_read)(*tms->program, srcwordaddr++ << 1) << 16;
+					srcword |= (this->*word_read)(*m_program, srcwordaddr++ << 1) << 16;
 					readwrites++;
 				}
 
@@ -1153,7 +1062,7 @@ static void FUNCTION_NAME(pixblt)(tms34010_state *tms, int src_is_linear, int ds
 				if (PIXEL_OP_REQUIRES_SOURCE || TRANSPARENCY)
 					if (dstbit + BITS_PER_PIXEL > 16)
 					{
-						dstword |= (*word_read)(*tms->program, (dstwordaddr + 1) << 1) << 16;
+						dstword |= (this->*word_read)(*m_program, (dstwordaddr + 1) << 1) << 16;
 						readwrites++;
 					}
 
@@ -1168,7 +1077,7 @@ static void FUNCTION_NAME(pixblt)(tms34010_state *tms, int src_is_linear, int ds
 				dstbit += BITS_PER_PIXEL;
 				if (dstbit > 16)
 				{
-					(*word_write)(*tms->program, dstwordaddr++ << 1, dstword);
+					(this->*word_write)(*m_program, dstwordaddr++ << 1, dstword);
 					readwrites++;
 					dstbit -= 16;
 					dstword >>= 16;
@@ -1181,13 +1090,13 @@ static void FUNCTION_NAME(pixblt)(tms34010_state *tms, int src_is_linear, int ds
 				/* if we're right-partial, read and mask the remaining bits */
 				if (dstbit != 16)
 				{
-					UINT16 origdst = (*word_read)(*tms->program, dstwordaddr << 1);
+					UINT16 origdst = (this->*word_read)(*m_program, dstwordaddr << 1);
 					UINT16 mask = 0xffff << dstbit;
 					dstword = (dstword & ~mask) | (origdst & mask);
 					readwrites++;
 				}
 
-				(*word_write)(*tms->program, dstwordaddr++ << 1, dstword);
+				(this->*word_write)(*m_program, dstwordaddr++ << 1, dstword);
 				readwrites++;
 			}
 
@@ -1212,21 +1121,21 @@ static void FUNCTION_NAME(pixblt)(tms34010_state *tms, int src_is_linear, int ds
 				full_words /= PIXELS_PER_WORD;
 
 			/* compute cycles */
-			tms->gfxcycles += compute_pixblt_cycles(left_partials, right_partials, full_words, PIXEL_OP_TIMING);
+			m_gfxcycles += compute_pixblt_cycles(left_partials, right_partials, full_words, PIXEL_OP_TIMING);
 
 			/* use word addresses each row */
 			swordaddr = saddr >> 4;
 			dwordaddr = daddr >> 4;
 
 			/* fetch the initial source word */
-			srcword = (*word_read)(*tms->program, swordaddr++ << 1);
+			srcword = (this->*word_read)(*m_program, swordaddr++ << 1);
 			srcmask = PIXEL_MASK << (saddr & 15);
 
 			/* handle the left partial word */
 			if (left_partials != 0)
 			{
 				/* fetch the destination word */
-				dstword = (*word_read)(*tms->program, dwordaddr << 1);
+				dstword = (this->*word_read)(*m_program, dwordaddr << 1);
 				dstmask = PIXEL_MASK << (daddr & 15);
 
 				/* loop over partials */
@@ -1235,7 +1144,7 @@ static void FUNCTION_NAME(pixblt)(tms34010_state *tms, int src_is_linear, int ds
 					/* fetch another word if necessary */
 					if (srcmask == 0)
 					{
-						srcword = (*word_read)(*tms->program, swordaddr++ << 1);
+						srcword = (this->*word_read)(*m_program, swordaddr++ << 1);
 						srcmask = PIXEL_MASK;
 					}
 
@@ -1257,7 +1166,7 @@ static void FUNCTION_NAME(pixblt)(tms34010_state *tms, int src_is_linear, int ds
 				}
 
 				/* write the result */
-				(*word_write)(*tms->program, dwordaddr++ << 1, dstword);
+				(this->*word_write)(*m_program, dwordaddr++ << 1, dstword);
 			}
 
 			/* loop over full words */
@@ -1265,7 +1174,7 @@ static void FUNCTION_NAME(pixblt)(tms34010_state *tms, int src_is_linear, int ds
 			{
 				/* fetch the destination word (if necessary) */
 				if (PIXEL_OP_REQUIRES_SOURCE || TRANSPARENCY)
-					dstword = (*word_read)(*tms->program, dwordaddr << 1);
+					dstword = (this->*word_read)(*m_program, dwordaddr << 1);
 				else
 					dstword = 0;
 				dstmask = PIXEL_MASK;
@@ -1276,7 +1185,7 @@ static void FUNCTION_NAME(pixblt)(tms34010_state *tms, int src_is_linear, int ds
 					/* fetch another word if necessary */
 					if (srcmask == 0)
 					{
-						srcword = (*word_read)(*tms->program, swordaddr++ << 1);
+						srcword = (this->*word_read)(*m_program, swordaddr++ << 1);
 						srcmask = PIXEL_MASK;
 					}
 
@@ -1298,14 +1207,14 @@ static void FUNCTION_NAME(pixblt)(tms34010_state *tms, int src_is_linear, int ds
 				}
 
 				/* write the result */
-				(*word_write)(*tms->program, dwordaddr++ << 1, dstword);
+				(this->*word_write)(*m_program, dwordaddr++ << 1, dstword);
 			}
 
 			/* handle the right partial word */
 			if (right_partials != 0)
 			{
 				/* fetch the destination word */
-				dstword = (*word_read)(*tms->program, dwordaddr << 1);
+				dstword = (this->*word_read)(*m_program, dwordaddr << 1);
 				dstmask = PIXEL_MASK;
 
 				/* loop over partials */
@@ -1315,7 +1224,7 @@ static void FUNCTION_NAME(pixblt)(tms34010_state *tms, int src_is_linear, int ds
 					if (srcmask == 0)
 					{
 		LOGGFX(("  right fetch @ %08x\n", swordaddr));
-						srcword = (*word_read)(*tms->program, swordaddr++ << 1);
+						srcword = (this->*word_read)(*m_program, swordaddr++ << 1);
 						srcmask = PIXEL_MASK;
 					}
 
@@ -1337,128 +1246,128 @@ static void FUNCTION_NAME(pixblt)(tms34010_state *tms, int src_is_linear, int ds
 				}
 
 				/* write the result */
-				(*word_write)(*tms->program, dwordaddr++ << 1, dstword);
+				(this->*word_write)(*m_program, dwordaddr++ << 1, dstword);
 			}
 #endif
 
 			/* update for next row */
 			if (!yreverse)
 			{
-				saddr += SPTCH(tms);
-				daddr += DPTCH(tms);
+				saddr += SPTCH();
+				daddr += DPTCH();
 			}
 			else
 			{
-				saddr -= SPTCH(tms);
-				daddr -= DPTCH(tms);
+				saddr -= SPTCH();
+				daddr -= DPTCH();
 			}
 		}
 
-		tms->gfxcycles += readwrites * 2 + dx * dy * (PIXEL_OP_TIMING - 2);
+		m_gfxcycles += readwrites * 2 + dx * dy * (PIXEL_OP_TIMING - 2);
 
-		LOGGFX(("  (%d cycles)\n", tms->gfxcycles));
+		LOGGFX(("  (%d cycles)\n", m_gfxcycles));
 	}
 
 	/* eat cycles */
-	if (tms->gfxcycles > tms->icount)
+	if (m_gfxcycles > m_icount)
 	{
-		tms->gfxcycles -= tms->icount;
-		tms->icount = 0;
-		tms->pc -= 0x10;
+		m_gfxcycles -= m_icount;
+		m_icount = 0;
+		m_pc -= 0x10;
 	}
 	else
 	{
-		tms->icount -= tms->gfxcycles;
-		tms->st &= ~STBIT_P;
+		m_icount -= m_gfxcycles;
+		m_st &= ~STBIT_P;
 		if (src_is_linear && dst_is_linear)
-			SADDR(tms) += DYDX_Y(tms) * SPTCH(tms);
+			SADDR() += DYDX_Y() * SPTCH();
 		else if (src_is_linear)
-			SADDR(tms) += DYDX_Y(tms) * SPTCH(tms);
+			SADDR() += DYDX_Y() * SPTCH();
 		else
-			SADDR_Y(tms) += DYDX_Y(tms);
+			SADDR_Y() += DYDX_Y();
 		if (dst_is_linear)
-			DADDR(tms) += DYDX_Y(tms) * DPTCH(tms);
+			DADDR() += DYDX_Y() * DPTCH();
 		else
-			DADDR_Y(tms) += DYDX_Y(tms);
+			DADDR_Y() += DYDX_Y();
 	}
 }
 
-static void FUNCTION_NAME(pixblt_r)(tms34010_state *tms, int src_is_linear, int dst_is_linear)
+void FUNCTION_NAME(tms340x0_device::pixblt_r)(int src_is_linear, int dst_is_linear)
 {
 	/* if this is the first time through, perform the operation */
-	if (!P_FLAG(tms))
+	if (!P_FLAG())
 	{
 		int dx, dy, x, y, words, yreverse;
-		void (*word_write)(address_space &space,offs_t address,UINT16 data);
-		UINT16 (*word_read)(address_space &space,offs_t address);
+		word_write_func word_write;
+		word_read_func word_read;
 		UINT32 saddr, daddr;
 		XY dstxy = { 0 };
 
 		/* determine read/write functions */
-		if (IOREG(tms, REG_DPYCTL) & 0x0800)
+		if (IOREG(REG_DPYCTL) & 0x0800)
 		{
-			word_write = shiftreg_w;
-			word_read = shiftreg_r;
+			word_write = &tms340x0_device::shiftreg_w;
+			word_read = &tms340x0_device::shiftreg_r;
 		}
 		else
 		{
-			word_write = memory_w;
-			word_read = memory_r;
+			word_write = &tms340x0_device::memory_w;
+			word_read = &tms340x0_device::memory_r;
 		}
 
 		/* compute the starting addresses */
-		saddr = src_is_linear ? SADDR(tms) : SXYTOL(tms,SADDR_XY(tms));
+		saddr = src_is_linear ? SADDR() : SXYTOL(SADDR_XY());
 if ((saddr & (BITS_PER_PIXEL - 1)) != 0) osd_printf_debug("PIXBLT_R%d with odd saddr\n", BITS_PER_PIXEL);
 		saddr &= ~(BITS_PER_PIXEL - 1);
 
 		/* compute the bounds of the operation */
-		dx = (INT16)DYDX_X(tms);
-		dy = (INT16)DYDX_Y(tms);
+		dx = (INT16)DYDX_X();
+		dy = (INT16)DYDX_Y();
 
 		/* apply the window for non-linear destinations */
-		tms->gfxcycles = 7 + (src_is_linear ? 0 : 2);
+		m_gfxcycles = 7 + (src_is_linear ? 0 : 2);
 		if (!dst_is_linear)
 		{
-			dstxy = DADDR_XY(tms);
-			tms->gfxcycles += 2 + (!src_is_linear) + apply_window(tms, "PIXBLT R", BITS_PER_PIXEL, &saddr, &dstxy, &dx, &dy);
-			daddr = DXYTOL(tms,dstxy);
+			dstxy = DADDR_XY();
+			m_gfxcycles += 2 + (!src_is_linear) + apply_window("PIXBLT R", BITS_PER_PIXEL, &saddr, &dstxy, &dx, &dy);
+			daddr = DXYTOL(dstxy);
 		}
 		else
-			daddr = DADDR(tms);
+			daddr = DADDR();
 if ((daddr & (BITS_PER_PIXEL - 1)) != 0) osd_printf_debug("PIXBLT_R%d with odd daddr\n", BITS_PER_PIXEL);
 		daddr &= ~(BITS_PER_PIXEL - 1);
-		LOGGFX(("  saddr=%08X daddr=%08X sptch=%08X dptch=%08X\n", saddr, daddr, SPTCH(tms), DPTCH(tms)));
+		LOGGFX(("  saddr=%08X daddr=%08X sptch=%08X dptch=%08X\n", saddr, daddr, SPTCH(), DPTCH()));
 
 		/* bail if we're clipped */
 		if (dx <= 0 || dy <= 0)
 			return;
 
 		/* window mode 1: just return and interrupt if we are within the window */
-		if (WINDOW_CHECKING(tms) == 1 && !dst_is_linear)
+		if (WINDOW_CHECKING() == 1 && !dst_is_linear)
 		{
-			CLR_V(tms);
-			DADDR_XY(tms) = dstxy;
-			DYDX_X(tms) = dx;
-			DYDX_Y(tms) = dy;
-			IOREG(tms, REG_INTPEND) |= TMS34010_WV;
-			check_interrupt(tms);
+			CLR_V();
+			DADDR_XY() = dstxy;
+			DYDX_X() = dx;
+			DYDX_Y() = dy;
+			IOREG(REG_INTPEND) |= TMS34010_WV;
+			check_interrupt();
 			return;
 		}
 
 		/* handle flipping the addresses */
-		yreverse = (IOREG(tms, REG_CONTROL) >> 9) & 1;
+		yreverse = (IOREG(REG_CONTROL) >> 9) & 1;
 		if (!src_is_linear || !dst_is_linear)
 		{
 			saddr += dx * BITS_PER_PIXEL;
 			daddr += dx * BITS_PER_PIXEL;
 			if (yreverse)
 			{
-				saddr += (dy - 1) * tms->convsp;
-				daddr += (dy - 1) * tms->convdp;
+				saddr += (dy - 1) * m_convsp;
+				daddr += (dy - 1) * m_convdp;
 			}
 		}
 
-		tms->st |= STBIT_P;
+		m_st |= STBIT_P;
 
 		/* loop over rows */
 		for (y = 0; y < dy; y++)
@@ -1481,21 +1390,21 @@ if ((daddr & (BITS_PER_PIXEL - 1)) != 0) osd_printf_debug("PIXBLT_R%d with odd d
 				full_words /= PIXELS_PER_WORD;
 
 			/* compute cycles */
-			tms->gfxcycles += compute_pixblt_cycles(left_partials, right_partials, full_words, PIXEL_OP_TIMING);
+			m_gfxcycles += compute_pixblt_cycles(left_partials, right_partials, full_words, PIXEL_OP_TIMING);
 
 			/* use word addresses each row */
 			swordaddr = (saddr + 15) >> 4;
 			dwordaddr = (daddr + 15) >> 4;
 
 			/* fetch the initial source word */
-			srcword = (*word_read)(*tms->program, --swordaddr << 1);
+			srcword = (this->*word_read)(*m_program, --swordaddr << 1);
 			srcmask = PIXEL_MASK << ((saddr - BITS_PER_PIXEL) & 15);
 
 			/* handle the right partial word */
 			if (right_partials != 0)
 			{
 				/* fetch the destination word */
-				dstword = (*word_read)(*tms->program, --dwordaddr << 1);
+				dstword = (this->*word_read)(*m_program, --dwordaddr << 1);
 				dstmask = PIXEL_MASK << ((daddr - BITS_PER_PIXEL) & 15);
 
 				/* loop over partials */
@@ -1504,7 +1413,7 @@ if ((daddr & (BITS_PER_PIXEL - 1)) != 0) osd_printf_debug("PIXBLT_R%d with odd d
 					/* fetch source pixel if necessary */
 					if (srcmask == 0)
 					{
-						srcword = (*word_read)(*tms->program, --swordaddr << 1);
+						srcword = (this->*word_read)(*m_program, --swordaddr << 1);
 						srcmask = PIXEL_MASK << (16 - BITS_PER_PIXEL);
 					}
 
@@ -1526,7 +1435,7 @@ if ((daddr & (BITS_PER_PIXEL - 1)) != 0) osd_printf_debug("PIXBLT_R%d with odd d
 				}
 
 				/* write the result */
-				(*word_write)(*tms->program, dwordaddr << 1, dstword);
+				(this->*word_write)(*m_program, dwordaddr << 1, dstword);
 			}
 
 			/* loop over full words */
@@ -1535,7 +1444,7 @@ if ((daddr & (BITS_PER_PIXEL - 1)) != 0) osd_printf_debug("PIXBLT_R%d with odd d
 				/* fetch the destination word (if necessary) */
 				dwordaddr--;
 				if (PIXEL_OP_REQUIRES_SOURCE || TRANSPARENCY)
-					dstword = (*word_read)(*tms->program, dwordaddr << 1);
+					dstword = (this->*word_read)(*m_program, dwordaddr << 1);
 				else
 					dstword = 0;
 				dstmask = PIXEL_MASK << (16 - BITS_PER_PIXEL);
@@ -1546,7 +1455,7 @@ if ((daddr & (BITS_PER_PIXEL - 1)) != 0) osd_printf_debug("PIXBLT_R%d with odd d
 					/* fetch source pixel if necessary */
 					if (srcmask == 0)
 					{
-						srcword = (*word_read)(*tms->program, --swordaddr << 1);
+						srcword = (this->*word_read)(*m_program, --swordaddr << 1);
 						srcmask = PIXEL_MASK << (16 - BITS_PER_PIXEL);
 					}
 
@@ -1568,14 +1477,14 @@ if ((daddr & (BITS_PER_PIXEL - 1)) != 0) osd_printf_debug("PIXBLT_R%d with odd d
 				}
 
 				/* write the result */
-				(*word_write)(*tms->program, dwordaddr << 1, dstword);
+				(this->*word_write)(*m_program, dwordaddr << 1, dstword);
 			}
 
 			/* handle the left partial word */
 			if (left_partials != 0)
 			{
 				/* fetch the destination word */
-				dstword = (*word_read)(*tms->program, --dwordaddr << 1);
+				dstword = (this->*word_read)(*m_program, --dwordaddr << 1);
 				dstmask = PIXEL_MASK << (16 - BITS_PER_PIXEL);
 
 				/* loop over partials */
@@ -1584,7 +1493,7 @@ if ((daddr & (BITS_PER_PIXEL - 1)) != 0) osd_printf_debug("PIXBLT_R%d with odd d
 					/* fetch the source pixel if necessary */
 					if (srcmask == 0)
 					{
-						srcword = (*word_read)(*tms->program, --swordaddr << 1);
+						srcword = (this->*word_read)(*m_program, --swordaddr << 1);
 						srcmask = PIXEL_MASK << (16 - BITS_PER_PIXEL);
 					}
 
@@ -1606,104 +1515,104 @@ if ((daddr & (BITS_PER_PIXEL - 1)) != 0) osd_printf_debug("PIXBLT_R%d with odd d
 				}
 
 				/* write the result */
-				(*word_write)(*tms->program, dwordaddr << 1, dstword);
+				(this->*word_write)(*m_program, dwordaddr << 1, dstword);
 			}
 
 			/* update for next row */
 			if (!yreverse)
 			{
-				saddr += SPTCH(tms);
-				daddr += DPTCH(tms);
+				saddr += SPTCH();
+				daddr += DPTCH();
 			}
 			else
 			{
-				saddr -= SPTCH(tms);
-				daddr -= DPTCH(tms);
+				saddr -= SPTCH();
+				daddr -= DPTCH();
 			}
 		}
-		LOGGFX(("  (%d cycles)\n", tms->gfxcycles));
+		LOGGFX(("  (%d cycles)\n", m_gfxcycles));
 	}
 
 	/* eat cycles */
-	if (tms->gfxcycles > tms->icount)
+	if (m_gfxcycles > m_icount)
 	{
-		tms->gfxcycles -= tms->icount;
-		tms->icount = 0;
-		tms->pc -= 0x10;
+		m_gfxcycles -= m_icount;
+		m_icount = 0;
+		m_pc -= 0x10;
 	}
 	else
 	{
-		tms->icount -= tms->gfxcycles;
-		tms->st &= ~STBIT_P;
+		m_icount -= m_gfxcycles;
+		m_st &= ~STBIT_P;
 		if (src_is_linear && dst_is_linear)
-			SADDR(tms) += DYDX_Y(tms) * SPTCH(tms);
+			SADDR() += DYDX_Y() * SPTCH();
 		else if (src_is_linear)
-			SADDR(tms) += DYDX_Y(tms) * SPTCH(tms);
+			SADDR() += DYDX_Y() * SPTCH();
 		else
-			SADDR_Y(tms) += DYDX_Y(tms);
+			SADDR_Y() += DYDX_Y();
 		if (dst_is_linear)
-			DADDR(tms) += DYDX_Y(tms) * DPTCH(tms);
+			DADDR() += DYDX_Y() * DPTCH();
 		else
-			DADDR_Y(tms) += DYDX_Y(tms);
+			DADDR_Y() += DYDX_Y();
 	}
 }
 
-static void FUNCTION_NAME(pixblt_b)(tms34010_state *tms, int dst_is_linear)
+void FUNCTION_NAME(tms340x0_device::pixblt_b)(int dst_is_linear)
 {
 	/* if this is the first time through, perform the operation */
-	if (!P_FLAG(tms))
+	if (!P_FLAG())
 	{
 		int dx, dy, x, y, words, left_partials, right_partials, full_words;
-		void (*word_write)(address_space &space,offs_t address,UINT16 data);
-		UINT16 (*word_read)(address_space &space,offs_t address);
+		word_write_func word_write;
+		word_read_func word_read;
 		UINT32 saddr, daddr;
 		XY dstxy = { 0 };
 
 		/* determine read/write functions */
-		if (IOREG(tms, REG_DPYCTL) & 0x0800)
+		if (IOREG(REG_DPYCTL) & 0x0800)
 		{
-			word_write = shiftreg_w;
-			word_read = shiftreg_r;
+			word_write = &tms340x0_device::shiftreg_w;
+			word_read = &tms340x0_device::shiftreg_r;
 		}
 		else
 		{
-			word_write = memory_w;
-			word_read = memory_r;
+			word_write = &tms340x0_device::memory_w;
+			word_read = &tms340x0_device::memory_r;
 		}
 
 		/* compute the starting addresses */
-		saddr = SADDR(tms);
+		saddr = SADDR();
 
 		/* compute the bounds of the operation */
-		dx = (INT16)DYDX_X(tms);
-		dy = (INT16)DYDX_Y(tms);
+		dx = (INT16)DYDX_X();
+		dy = (INT16)DYDX_Y();
 
 		/* apply the window for non-linear destinations */
-		tms->gfxcycles = 4;
+		m_gfxcycles = 4;
 		if (!dst_is_linear)
 		{
-			dstxy = DADDR_XY(tms);
-			tms->gfxcycles += 2 + apply_window(tms, "PIXBLT B", 1, &saddr, &dstxy, &dx, &dy);
-			daddr = DXYTOL(tms,dstxy);
+			dstxy = DADDR_XY();
+			m_gfxcycles += 2 + apply_window("PIXBLT B", 1, &saddr, &dstxy, &dx, &dy);
+			daddr = DXYTOL(dstxy);
 		}
 		else
-			daddr = DADDR(tms);
+			daddr = DADDR();
 		daddr &= ~(BITS_PER_PIXEL - 1);
-		LOGGFX(("  saddr=%08X daddr=%08X sptch=%08X dptch=%08X\n", saddr, daddr, SPTCH(tms), DPTCH(tms)));
+		LOGGFX(("  saddr=%08X daddr=%08X sptch=%08X dptch=%08X\n", saddr, daddr, SPTCH(), DPTCH()));
 
 		/* bail if we're clipped */
 		if (dx <= 0 || dy <= 0)
 			return;
 
 		/* window mode 1: just return and interrupt if we are within the window */
-		if (WINDOW_CHECKING(tms) == 1 && !dst_is_linear)
+		if (WINDOW_CHECKING() == 1 && !dst_is_linear)
 		{
-			CLR_V(tms);
-			DADDR_XY(tms) = dstxy;
-			DYDX_X(tms) = dx;
-			DYDX_Y(tms) = dy;
-			IOREG(tms, REG_INTPEND) |= TMS34010_WV;
-			check_interrupt(tms);
+			CLR_V();
+			DADDR_XY() = dstxy;
+			DYDX_X() = dx;
+			DYDX_Y() = dy;
+			IOREG(REG_INTPEND) |= TMS34010_WV;
+			check_interrupt();
 			return;
 		}
 
@@ -1717,8 +1626,8 @@ static void FUNCTION_NAME(pixblt_b)(tms34010_state *tms, int dst_is_linear)
 			full_words /= PIXELS_PER_WORD;
 
 		/* compute cycles */
-		tms->gfxcycles += compute_pixblt_b_cycles(left_partials, right_partials, full_words, dy, PIXEL_OP_TIMING, BITS_PER_PIXEL);
-		tms->st |= STBIT_P;
+		m_gfxcycles += compute_pixblt_b_cycles(left_partials, right_partials, full_words, dy, PIXEL_OP_TIMING, BITS_PER_PIXEL);
+		m_st |= STBIT_P;
 
 		/* loop over rows */
 		for (y = 0; y < dy; y++)
@@ -1731,21 +1640,21 @@ static void FUNCTION_NAME(pixblt_b)(tms34010_state *tms, int dst_is_linear)
 			dwordaddr = daddr >> 4;
 
 			/* fetch the initial source word */
-			srcword = (*word_read)(*tms->program, swordaddr++ << 1);
+			srcword = (this->*word_read)(*m_program, swordaddr++ << 1);
 			srcmask = 1 << (saddr & 15);
 
 			/* handle the left partial word */
 			if (left_partials != 0)
 			{
 				/* fetch the destination word */
-				dstword = (*word_read)(*tms->program, dwordaddr << 1);
+				dstword = (this->*word_read)(*m_program, dwordaddr << 1);
 				dstmask = PIXEL_MASK << (daddr & 15);
 
 				/* loop over partials */
 				for (x = 0; x < left_partials; x++)
 				{
 					/* process the pixel */
-					pixel = (srcword & srcmask) ? COLOR1(tms) : COLOR0(tms);
+					pixel = (srcword & srcmask) ? COLOR1() : COLOR0();
 					pixel &= dstmask;
 					PIXEL_OP(dstword, dstmask, pixel);
 					if (!TRANSPARENCY || pixel != 0)
@@ -1755,7 +1664,7 @@ static void FUNCTION_NAME(pixblt_b)(tms34010_state *tms, int dst_is_linear)
 					srcmask <<= 1;
 					if (srcmask == 0)
 					{
-						srcword = (*word_read)(*tms->program, swordaddr++ << 1);
+						srcword = (this->*word_read)(*m_program, swordaddr++ << 1);
 						srcmask = 0x0001;
 					}
 
@@ -1764,7 +1673,7 @@ static void FUNCTION_NAME(pixblt_b)(tms34010_state *tms, int dst_is_linear)
 				}
 
 				/* write the result */
-				(*word_write)(*tms->program, dwordaddr++ << 1, dstword);
+				(this->*word_write)(*m_program, dwordaddr++ << 1, dstword);
 			}
 
 			/* loop over full words */
@@ -1772,7 +1681,7 @@ static void FUNCTION_NAME(pixblt_b)(tms34010_state *tms, int dst_is_linear)
 			{
 				/* fetch the destination word (if necessary) */
 				if (PIXEL_OP_REQUIRES_SOURCE || TRANSPARENCY)
-					dstword = (*word_read)(*tms->program, dwordaddr << 1);
+					dstword = (this->*word_read)(*m_program, dwordaddr << 1);
 				else
 					dstword = 0;
 				dstmask = PIXEL_MASK;
@@ -1781,7 +1690,7 @@ static void FUNCTION_NAME(pixblt_b)(tms34010_state *tms, int dst_is_linear)
 				for (x = 0; x < PIXELS_PER_WORD; x++)
 				{
 					/* process the pixel */
-					pixel = (srcword & srcmask) ? COLOR1(tms) : COLOR0(tms);
+					pixel = (srcword & srcmask) ? COLOR1() : COLOR0();
 					pixel &= dstmask;
 					PIXEL_OP(dstword, dstmask, pixel);
 					if (!TRANSPARENCY || pixel != 0)
@@ -1791,7 +1700,7 @@ static void FUNCTION_NAME(pixblt_b)(tms34010_state *tms, int dst_is_linear)
 					srcmask <<= 1;
 					if (srcmask == 0)
 					{
-						srcword = (*word_read)(*tms->program, swordaddr++ << 1);
+						srcword = (this->*word_read)(*m_program, swordaddr++ << 1);
 						srcmask = 0x0001;
 					}
 
@@ -1800,21 +1709,21 @@ static void FUNCTION_NAME(pixblt_b)(tms34010_state *tms, int dst_is_linear)
 				}
 
 				/* write the result */
-				(*word_write)(*tms->program, dwordaddr++ << 1, dstword);
+				(this->*word_write)(*m_program, dwordaddr++ << 1, dstword);
 			}
 
 			/* handle the right partial word */
 			if (right_partials != 0)
 			{
 				/* fetch the destination word */
-				dstword = (*word_read)(*tms->program, dwordaddr << 1);
+				dstword = (this->*word_read)(*m_program, dwordaddr << 1);
 				dstmask = PIXEL_MASK;
 
 				/* loop over partials */
 				for (x = 0; x < right_partials; x++)
 				{
 					/* process the pixel */
-					pixel = (srcword & srcmask) ? COLOR1(tms) : COLOR0(tms);
+					pixel = (srcword & srcmask) ? COLOR1() : COLOR0();
 					pixel &= dstmask;
 					PIXEL_OP(dstword, dstmask, pixel);
 					if (!TRANSPARENCY || pixel != 0)
@@ -1824,7 +1733,7 @@ static void FUNCTION_NAME(pixblt_b)(tms34010_state *tms, int dst_is_linear)
 					srcmask <<= 1;
 					if (srcmask == 0)
 					{
-						srcword = (*word_read)(*tms->program, swordaddr++ << 1);
+						srcword = (this->*word_read)(*m_program, swordaddr++ << 1);
 						srcmask = 0x0001;
 					}
 
@@ -1833,72 +1742,72 @@ static void FUNCTION_NAME(pixblt_b)(tms34010_state *tms, int dst_is_linear)
 				}
 
 				/* write the result */
-				(*word_write)(*tms->program, dwordaddr++ << 1, dstword);
+				(this->*word_write)(*m_program, dwordaddr++ << 1, dstword);
 			}
 
 			/* update for next row */
-			saddr += SPTCH(tms);
-			daddr += DPTCH(tms);
+			saddr += SPTCH();
+			daddr += DPTCH();
 		}
-		LOGGFX(("  (%d cycles)\n", tms->gfxcycles));
+		LOGGFX(("  (%d cycles)\n", m_gfxcycles));
 	}
 
 	/* eat cycles */
-	if (tms->gfxcycles > tms->icount)
+	if (m_gfxcycles > m_icount)
 	{
-		tms->gfxcycles -= tms->icount;
-		tms->icount = 0;
-		tms->pc -= 0x10;
+		m_gfxcycles -= m_icount;
+		m_icount = 0;
+		m_pc -= 0x10;
 	}
 	else
 	{
-		tms->icount -= tms->gfxcycles;
-		tms->st &= ~STBIT_P;
-		SADDR(tms) += DYDX_Y(tms) * SPTCH(tms);
+		m_icount -= m_gfxcycles;
+		m_st &= ~STBIT_P;
+		SADDR() += DYDX_Y() * SPTCH();
 		if (dst_is_linear)
-			DADDR(tms) += DYDX_Y(tms) * DPTCH(tms);
+			DADDR() += DYDX_Y() * DPTCH();
 		else
-			DADDR_Y(tms) += DYDX_Y(tms);
+			DADDR_Y() += DYDX_Y();
 	}
 }
 
-static void FUNCTION_NAME(fill)(tms34010_state *tms, int dst_is_linear)
+void FUNCTION_NAME(tms340x0_device::fill)(int dst_is_linear)
 {
 	/* if this is the first time through, perform the operation */
-	if (!P_FLAG(tms))
+	if (!P_FLAG())
 	{
 		int dx, dy, x, y, words, left_partials, right_partials, full_words;
-		void (*word_write)(address_space &space,offs_t address,UINT16 data);
-		UINT16 (*word_read)(address_space &space,offs_t address);
+		word_write_func word_write;
+		word_read_func word_read;
 		UINT32 daddr;
 		XY dstxy = { 0 };
 
 		/* determine read/write functions */
-		if (IOREG(tms, REG_DPYCTL) & 0x0800)
+		if (IOREG(REG_DPYCTL) & 0x0800)
 		{
-			word_write = shiftreg_w;
-			word_read = dummy_shiftreg_r;
+			word_write = &tms340x0_device::shiftreg_w;
+			word_read = &tms340x0_device::dummy_shiftreg_r;
 		}
 		else
 		{
-			word_write = memory_w;
-			word_read = memory_r;
+			word_write = &tms340x0_device::memory_w;
+			word_read = &tms340x0_device::memory_r;
 		}
 
 		/* compute the bounds of the operation */
-		dx = (INT16)DYDX_X(tms);
-		dy = (INT16)DYDX_Y(tms);
+		dx = (INT16)DYDX_X();
+		dy = (INT16)DYDX_Y();
 
 		/* apply the window for non-linear destinations */
-		tms->gfxcycles = 4;
+		m_gfxcycles = 4;
 		if (!dst_is_linear)
 		{
-			dstxy = DADDR_XY(tms);
-			tms->gfxcycles += 2 + apply_window(tms, "FILL", 0, NULL, &dstxy, &dx, &dy);
-			daddr = DXYTOL(tms,dstxy);
+			dstxy = DADDR_XY();
+			m_gfxcycles += 2 + apply_window("FILL", 0, NULL, &dstxy, &dx, &dy);
+			daddr = DXYTOL(dstxy);
 		}
 		else
-			daddr = DADDR(tms);
+			daddr = DADDR();
 		daddr &= ~(BITS_PER_PIXEL - 1);
 		LOGGFX(("  daddr=%08X\n", daddr));
 
@@ -1907,14 +1816,14 @@ static void FUNCTION_NAME(fill)(tms34010_state *tms, int dst_is_linear)
 			return;
 
 		/* window mode 1: just return and interrupt if we are within the window */
-		if (WINDOW_CHECKING(tms) == 1 && !dst_is_linear)
+		if (WINDOW_CHECKING() == 1 && !dst_is_linear)
 		{
-			CLR_V(tms);
-			DADDR_XY(tms) = dstxy;
-			DYDX_X(tms) = dx;
-			DYDX_Y(tms) = dy;
-			IOREG(tms, REG_INTPEND) |= TMS34010_WV;
-			check_interrupt(tms);
+			CLR_V();
+			DADDR_XY() = dstxy;
+			DYDX_X() = dx;
+			DYDX_Y() = dy;
+			IOREG(REG_INTPEND) |= TMS34010_WV;
+			check_interrupt();
 			return;
 		}
 
@@ -1928,8 +1837,8 @@ static void FUNCTION_NAME(fill)(tms34010_state *tms, int dst_is_linear)
 			full_words /= PIXELS_PER_WORD;
 
 		/* compute cycles */
-		tms->gfxcycles += 2;
-		tms->st |= STBIT_P;
+		m_gfxcycles += 2;
+		m_st |= STBIT_P;
 
 		/* loop over rows */
 		for (y = 0; y < dy; y++)
@@ -1941,20 +1850,20 @@ static void FUNCTION_NAME(fill)(tms34010_state *tms, int dst_is_linear)
 			dwordaddr = daddr >> 4;
 
 			/* compute cycles */
-			tms->gfxcycles += compute_fill_cycles(left_partials, right_partials, full_words, PIXEL_OP_TIMING);
+			m_gfxcycles += compute_fill_cycles(left_partials, right_partials, full_words, PIXEL_OP_TIMING);
 
 			/* handle the left partial word */
 			if (left_partials != 0)
 			{
 				/* fetch the destination word */
-				dstword = (*word_read)(*tms->program, dwordaddr << 1);
+				dstword = (this->*word_read)(*m_program, dwordaddr << 1);
 				dstmask = PIXEL_MASK << (daddr & 15);
 
 				/* loop over partials */
 				for (x = 0; x < left_partials; x++)
 				{
 					/* process the pixel */
-					pixel = COLOR1(tms) & dstmask;
+					pixel = COLOR1() & dstmask;
 					PIXEL_OP(dstword, dstmask, pixel);
 					if (!TRANSPARENCY || pixel != 0)
 						dstword = (dstword & ~dstmask) | pixel;
@@ -1964,7 +1873,7 @@ static void FUNCTION_NAME(fill)(tms34010_state *tms, int dst_is_linear)
 				}
 
 				/* write the result */
-				(*word_write)(*tms->program, dwordaddr++ << 1, dstword);
+				(this->*word_write)(*m_program, dwordaddr++ << 1, dstword);
 			}
 
 			/* loop over full words */
@@ -1972,7 +1881,7 @@ static void FUNCTION_NAME(fill)(tms34010_state *tms, int dst_is_linear)
 			{
 				/* fetch the destination word (if necessary) */
 				if (PIXEL_OP_REQUIRES_SOURCE || TRANSPARENCY)
-					dstword = (*word_read)(*tms->program, dwordaddr << 1);
+					dstword = (this->*word_read)(*m_program, dwordaddr << 1);
 				else
 					dstword = 0;
 				dstmask = PIXEL_MASK;
@@ -1981,7 +1890,7 @@ static void FUNCTION_NAME(fill)(tms34010_state *tms, int dst_is_linear)
 				for (x = 0; x < PIXELS_PER_WORD; x++)
 				{
 					/* process the pixel */
-					pixel = COLOR1(tms) & dstmask;
+					pixel = COLOR1() & dstmask;
 					PIXEL_OP(dstword, dstmask, pixel);
 					if (!TRANSPARENCY || pixel != 0)
 						dstword = (dstword & ~dstmask) | pixel;
@@ -1991,21 +1900,21 @@ static void FUNCTION_NAME(fill)(tms34010_state *tms, int dst_is_linear)
 				}
 
 				/* write the result */
-				(*word_write)(*tms->program, dwordaddr++ << 1, dstword);
+				(this->*word_write)(*m_program, dwordaddr++ << 1, dstword);
 			}
 
 			/* handle the right partial word */
 			if (right_partials != 0)
 			{
 				/* fetch the destination word */
-				dstword = (*word_read)(*tms->program, dwordaddr << 1);
+				dstword = (this->*word_read)(*m_program, dwordaddr << 1);
 				dstmask = PIXEL_MASK;
 
 				/* loop over partials */
 				for (x = 0; x < right_partials; x++)
 				{
 					/* process the pixel */
-					pixel = COLOR1(tms) & dstmask;
+					pixel = COLOR1() & dstmask;
 					PIXEL_OP(dstword, dstmask, pixel);
 					if (!TRANSPARENCY || pixel != 0)
 						dstword = (dstword & ~dstmask) | pixel;
@@ -2015,31 +1924,31 @@ static void FUNCTION_NAME(fill)(tms34010_state *tms, int dst_is_linear)
 				}
 
 				/* write the result */
-				(*word_write)(*tms->program, dwordaddr++ << 1, dstword);
+				(this->*word_write)(*m_program, dwordaddr++ << 1, dstword);
 			}
 
 			/* update for next row */
-			daddr += DPTCH(tms);
+			daddr += DPTCH();
 		}
 
-		LOGGFX(("  (%d cycles)\n", tms->gfxcycles));
+		LOGGFX(("  (%d cycles)\n", m_gfxcycles));
 	}
 
 	/* eat cycles */
-	if (tms->gfxcycles > tms->icount)
+	if (m_gfxcycles > m_icount)
 	{
-		tms->gfxcycles -= tms->icount;
-		tms->icount = 0;
-		tms->pc -= 0x10;
+		m_gfxcycles -= m_icount;
+		m_icount = 0;
+		m_pc -= 0x10;
 	}
 	else
 	{
-		tms->icount -= tms->gfxcycles;
-		tms->st &= ~STBIT_P;
+		m_icount -= m_gfxcycles;
+		m_st &= ~STBIT_P;
 		if (dst_is_linear)
-			DADDR(tms) += DYDX_Y(tms) * DPTCH(tms);
+			DADDR() += DYDX_Y() * DPTCH();
 		else
-			DADDR_Y(tms) += DYDX_Y(tms);
+			DADDR_Y() += DYDX_Y();
 	}
 }
 

@@ -1066,7 +1066,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static const tms34010_config zunit_tms_config =
+static const tms340x0_config zunit_tms_config =
 {
 	FALSE,                          /* halt on reset */
 	"screen",                       /* the screen operated on */
@@ -1079,7 +1079,7 @@ static const tms34010_config zunit_tms_config =
 	midyunit_from_shiftreg          /* read from shiftreg function */
 };
 
-static const tms34010_config yunit_tms_config =
+static const tms340x0_config yunit_tms_config =
 {
 	FALSE,                          /* halt on reset */
 	"screen",                       /* the screen operated on */
@@ -1104,7 +1104,7 @@ static MACHINE_CONFIG_START( zunit, midyunit_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS34010, FAST_MASTER_CLOCK)
-	MCFG_CPU_CONFIG(zunit_tms_config)
+	MCFG_TMS340X0_CONFIG(zunit_tms_config)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 
 	MCFG_MACHINE_RESET_OVERRIDE(midyunit_state,midyunit)
@@ -1140,7 +1140,7 @@ static MACHINE_CONFIG_START( yunit_core, midyunit_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS34010, SLOW_MASTER_CLOCK)
-	MCFG_CPU_CONFIG(yunit_tms_config)
+	MCFG_TMS340X0_CONFIG(yunit_tms_config)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 
 	MCFG_MACHINE_RESET_OVERRIDE(midyunit_state,midyunit)

@@ -338,7 +338,7 @@ Notes:
  *************************************/
 
 /* used on the medium-resolution driver boards */
-static const tms34010_config gsp_config_driver =
+static const tms340x0_config gsp_config_driver =
 {
 	TRUE,                           /* halt on reset */
 	"screen",                       /* the screen operated on */
@@ -353,7 +353,7 @@ static const tms34010_config gsp_config_driver =
 
 
 /* used on the low-resolution multisync boards for harddrivc, racedrivc, steeltal */
-static const tms34010_config gsp_config_multisync =
+static const tms340x0_config gsp_config_multisync =
 {
 	TRUE,                           /* halt on reset */
 	"screen",                       /* the screen operated on */
@@ -368,7 +368,7 @@ static const tms34010_config gsp_config_multisync =
 
 
 /* used on the low-resolution multisync board for stunrun */
-static const tms34010_config gsp_config_multisync_stunrun =
+static const tms340x0_config gsp_config_multisync_stunrun =
 {
 	TRUE,                           /* halt on reset */
 	"screen",                       /* the screen operated on */
@@ -382,7 +382,7 @@ static const tms34010_config gsp_config_multisync_stunrun =
 };
 
 
-static const tms34010_config msp_config =
+static const tms340x0_config msp_config =
 {
 	TRUE,                           /* halt on reset */
 	"screen",                       /* the screen operated on */
@@ -1296,7 +1296,7 @@ static MACHINE_CONFIG_START( driver_nomsp, harddriv_state )
 
 	MCFG_CPU_ADD("gsp", TMS34010, HARDDRIV_GSP_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(driver_gsp_map)
-	MCFG_CPU_CONFIG(gsp_config_driver)
+	MCFG_TMS340X0_CONFIG(gsp_config_driver)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(30000))
 
@@ -1328,7 +1328,7 @@ static MACHINE_CONFIG_DERIVED( driver_msp, driver_nomsp )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("msp", TMS34010, XTAL_50MHz)
 	MCFG_CPU_PROGRAM_MAP(driver_msp_map)
-	MCFG_CPU_CONFIG(msp_config)
+	MCFG_TMS340X0_CONFIG(msp_config)
 MACHINE_CONFIG_END
 
 
@@ -1340,7 +1340,7 @@ static MACHINE_CONFIG_DERIVED( multisync_nomsp, driver_nomsp )
 	MCFG_CPU_PROGRAM_MAP(multisync_68k_map)
 
 	MCFG_CPU_MODIFY("gsp")
-	MCFG_CPU_CONFIG(gsp_config_multisync)
+	MCFG_TMS340X0_CONFIG(gsp_config_multisync)
 	MCFG_CPU_PROGRAM_MAP(multisync_gsp_map)
 
 	/* video hardware */
@@ -1355,7 +1355,7 @@ static MACHINE_CONFIG_DERIVED( multisync_msp, multisync_nomsp )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("msp", TMS34010, XTAL_50MHz)
 	MCFG_CPU_PROGRAM_MAP(driver_msp_map)
-	MCFG_CPU_CONFIG(msp_config)
+	MCFG_TMS340X0_CONFIG(msp_config)
 MACHINE_CONFIG_END
 
 
@@ -1530,7 +1530,7 @@ static MACHINE_CONFIG_DERIVED( stunrun, multisync_nomsp )
 
 	/* basic machine hardware */        /* multisync board without MSP */
 	MCFG_CPU_MODIFY("gsp")
-	MCFG_CPU_CONFIG(gsp_config_multisync_stunrun)
+	MCFG_TMS340X0_CONFIG(gsp_config_multisync_stunrun)
 	MCFG_FRAGMENT_ADD( adsp )           /* ADSP board */
 
 	/* video hardware */

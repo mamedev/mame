@@ -826,7 +826,7 @@ static void jpmimpct_tms_irq(device_t *device, int state)
 	drvstate->update_irqs();
 }
 
-static const tms34010_config tms_config =
+static const tms340x0_config tms_config =
 {
 	TRUE,                       /* halt on reset */
 	"screen",                   /* the screen operated on */
@@ -851,7 +851,7 @@ static MACHINE_CONFIG_START( jpmimpct, jpmimpct_state )
 	MCFG_CPU_PROGRAM_MAP(m68k_program_map)
 
 	MCFG_CPU_ADD("dsp", TMS34010, 40000000)
-	MCFG_CPU_CONFIG(tms_config)
+	MCFG_TMS340X0_CONFIG(tms_config)
 	MCFG_CPU_PROGRAM_MAP(tms_program_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(30000))

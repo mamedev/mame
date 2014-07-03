@@ -400,7 +400,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static const tms34010_config master_config =
+static const tms340x0_config master_config =
 {
 	FALSE,                      /* halt on reset */
 	"screen",                   /* the screen operated on */
@@ -413,7 +413,7 @@ static const tms34010_config master_config =
 	exterm_from_shiftreg_master /* read from shiftreg function */
 };
 
-static const tms34010_config slave_config =
+static const tms340x0_config slave_config =
 {
 	TRUE,                       /* halt on reset */
 	"screen",                   /* the screen operated on */
@@ -438,11 +438,11 @@ static MACHINE_CONFIG_START( exterm, exterm_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS34010, 40000000)
-	MCFG_CPU_CONFIG(master_config)
+	MCFG_TMS340X0_CONFIG(master_config)
 	MCFG_CPU_PROGRAM_MAP(master_map)
 
 	MCFG_CPU_ADD("slave", TMS34010, 40000000)
-	MCFG_CPU_CONFIG(slave_config)
+	MCFG_TMS340X0_CONFIG(slave_config)
 	MCFG_CPU_PROGRAM_MAP(slave_map)
 
 	MCFG_CPU_ADD("audiocpu", M6502, 2000000)

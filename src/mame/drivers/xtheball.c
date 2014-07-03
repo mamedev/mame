@@ -322,7 +322,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static const tms34010_config tms_config =
+static const tms340x0_config tms_config =
 {
 	FALSE,                          /* halt on reset */
 	"screen",                       /* the screen operated on */
@@ -346,7 +346,7 @@ static const tms34010_config tms_config =
 static MACHINE_CONFIG_START( xtheball, xtheball_state )
 
 	MCFG_CPU_ADD("maincpu", TMS34010, 40000000)
-	MCFG_CPU_CONFIG(tms_config)
+	MCFG_TMS340X0_CONFIG(tms_config)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(xtheball_state, irq1_line_hold,  15000)
 

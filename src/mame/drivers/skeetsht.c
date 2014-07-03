@@ -219,7 +219,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static const tms34010_config tms_config =
+static const tms340x0_config tms_config =
 {
 	TRUE,                       /* halt on reset */
 	"screen",                   /* the screen operated on */
@@ -248,7 +248,7 @@ static MACHINE_CONFIG_START( skeetsht, skeetsht_state )
 	MCFG_MC68HC11_CONFIG( 0, 0x100, 0x01 )  // And 512 bytes EEPROM? (68HC11A1)
 
 	MCFG_CPU_ADD("tms", TMS34010, 48000000)
-	MCFG_CPU_CONFIG(tms_config)
+	MCFG_TMS340X0_CONFIG(tms_config)
 	MCFG_CPU_PROGRAM_MAP(tms_program_map)
 
 

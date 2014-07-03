@@ -64,7 +64,7 @@ static INPUT_PORTS_START( potgold )
 INPUT_PORTS_END
 
 
-static const tms34010_config tms_config =
+static const tms340x0_config tms_config =
 {
 	FALSE,                          /* halt on reset */
 	"screen",                       /* the screen operated on */
@@ -82,7 +82,7 @@ static MACHINE_CONFIG_START( potgold, potgold_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS34010, XTAL_40MHz)
-	MCFG_CPU_CONFIG(tms_config)
+	MCFG_TMS340X0_CONFIG(tms_config)
 	MCFG_CPU_PROGRAM_MAP(potgold_map)
 
 
