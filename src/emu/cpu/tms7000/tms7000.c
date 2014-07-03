@@ -49,12 +49,26 @@
 
 
 const device_type TMS7000 = &device_creator<tms7000_device>;
-const device_type TMS7000_EXL = &device_creator<tms7000_exl_device>;
-
+const device_type TMS7020 = &device_creator<tms7020_device>;
+const device_type TMS7020_EXL = &device_creator<tms7020_exl_device>;
+const device_type TMS7040 = &device_creator<tms7040_device>;
+const device_type TMS70C00 = &device_creator<tms70c00_device>;
+const device_type TMS70C20 = &device_creator<tms70c20_device>;
+const device_type TMS70C40 = &device_creator<tms70c40_device>;
 
 static ADDRESS_MAP_START(tms7000_mem, AS_PROGRAM, 8, tms7000_device )
-	AM_RANGE(0x0000, 0x007f) AM_RAM
+	AM_RANGE(0x0000, 0x007f) AM_RAM // 128 bytes internal RAM
 	AM_RANGE(0x0100, 0x010f) AM_READWRITE(tms70x0_pf_r, tms70x0_pf_w)             /* tms7000 internal I/O ports */
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START(tms7020_mem, AS_PROGRAM, 8, tms7000_device )
+	AM_RANGE(0xf000, 0xffff) AM_ROM // 2kB internal ROM
+	AM_IMPORT_FROM( tms7000_mem )
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START(tms7040_mem, AS_PROGRAM, 8, tms7000_device )
+	AM_RANGE(0xf000, 0xffff) AM_ROM // 4kB internal ROM
+	AM_IMPORT_FROM( tms7000_mem )
 ADDRESS_MAP_END
 
 
@@ -66,18 +80,41 @@ tms7000_device::tms7000_device(const machine_config &mconfig, const char *tag, d
 {
 }
 
-
-tms7000_device::tms7000_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+tms7000_device::tms7000_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, address_map_constructor internal, const opcode_func *opcode, const char *shortname, const char *source)
 	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
-	, m_program_config("program", ENDIANNESS_BIG, 8, 16, 0, ADDRESS_MAP_NAME(tms7000_mem))
+	, m_program_config("program", ENDIANNESS_BIG, 8, 16, 0, internal)
 	, m_io_config("io", ENDIANNESS_BIG, 8, 8, 0)
-	, m_opcode(s_opfn_exl)
+	, m_opcode(opcode)
 {
 }
 
+tms7020_device::tms7020_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: tms7000_device(mconfig, TMS7020, "TMS7020", tag, owner, clock, ADDRESS_MAP_NAME(tms7020_mem), s_opfn, "tms7020", __FILE__)
+{
+}
 
-tms7000_exl_device::tms7000_exl_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: tms7000_device(mconfig, TMS7000_EXL, "TMS7000_EXL", tag, owner, clock, "tms7000_exl", __FILE__)
+tms7020_exl_device::tms7020_exl_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: tms7000_device(mconfig, TMS7020_EXL, "TMS7020 (EXL 100)", tag, owner, clock, ADDRESS_MAP_NAME(tms7020_mem), s_opfn_exl, "tms7020_exl", __FILE__)
+{
+}
+
+tms7040_device::tms7040_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: tms7000_device(mconfig, TMS7040, "TMS7040", tag, owner, clock, ADDRESS_MAP_NAME(tms7040_mem), s_opfn, "tms7040", __FILE__)
+{
+}
+
+tms70c00_device::tms70c00_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: tms7000_device(mconfig, TMS70C00, "TMS70C00", tag, owner, clock, ADDRESS_MAP_NAME(tms7000_mem), s_opfn, "tms70c00", __FILE__)
+{
+}
+
+tms70c20_device::tms70c20_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: tms7000_device(mconfig, TMS70C20, "TMS70C20", tag, owner, clock, ADDRESS_MAP_NAME(tms7020_mem), s_opfn, "tms70c20", __FILE__)
+{
+}
+
+tms70c40_device::tms70c40_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: tms7000_device(mconfig, TMS70C40, "TMS70C40", tag, owner, clock, ADDRESS_MAP_NAME(tms7040_mem), s_opfn, "tms70c40", __FILE__)
 {
 }
 

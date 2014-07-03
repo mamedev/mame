@@ -45,9 +45,13 @@ enum
 class tms7000_device : public cpu_device
 {
 public:
+	typedef void ( tms7000_device::*opcode_func ) ();
+	static const opcode_func s_opfn[0x100];
+	static const opcode_func s_opfn_exl[0x100];
+
 	// construction/destruction
 	tms7000_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	tms7000_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	tms7000_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, address_map_constructor internal, const opcode_func *opcode, const char *shortname, const char *source);
 
 	DECLARE_WRITE8_MEMBER( tms70x0_pf_w );
 	DECLARE_READ8_MEMBER( tms70x0_pf_r );
@@ -79,9 +83,6 @@ private:
 	address_space_config m_program_config;
 	address_space_config m_io_config;
 
-	typedef void ( tms7000_device::*opcode_func ) ();
-	static const opcode_func s_opfn[0x100];
-	static const opcode_func s_opfn_exl[0x100];
 	const opcode_func *m_opcode;
 
 	inline UINT8 bcd_add( UINT8 a, UINT8 b, UINT8 c );
@@ -345,16 +346,55 @@ private:
 };
 
 
-class tms7000_exl_device : public tms7000_device
+class tms7020_device : public tms7000_device
 {
 public:
-	// construction/destruction
-	tms7000_exl_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	tms7020_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
+
+class tms7020_exl_device : public tms7000_device
+{
+public:
+	tms7020_exl_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
+
+class tms7040_device : public tms7000_device
+{
+public:
+	tms7040_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
+
+class tms70c00_device : public tms7000_device
+{
+public:
+	tms70c00_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
+
+class tms70c20_device : public tms7000_device
+{
+public:
+	tms70c20_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
+
+class tms70c40_device : public tms7000_device
+{
+public:
+	tms70c40_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 
 extern const device_type TMS7000;
-extern const device_type TMS7000_EXL;
+extern const device_type TMS7020;
+extern const device_type TMS7020_EXL;
+extern const device_type TMS7040;
+extern const device_type TMS70C00;
+extern const device_type TMS70C20;
+extern const device_type TMS70C40;
 
 
 #endif /* __TMS7000_H__ */
