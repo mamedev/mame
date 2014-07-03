@@ -55,6 +55,12 @@ const device_type TMS70C00 = &device_creator<tms70c00_device>;
 const device_type TMS70C20 = &device_creator<tms70c20_device>;
 const device_type TMS70C40 = &device_creator<tms70c40_device>;
 
+static ADDRESS_MAP_START(tms7000_io, AS_IO, 8, tms7000_device)
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(TMS7000_PORTA, TMS7000_PORTA) AM_WRITENOP
+	AM_RANGE(TMS7000_PORTB, TMS7000_PORTB) AM_READNOP
+ADDRESS_MAP_END
+
 static ADDRESS_MAP_START(tms7000_mem, AS_PROGRAM, 8, tms7000_device )
 	AM_RANGE(0x0000, 0x007f) AM_RAM // 128 bytes internal RAM
 	AM_RANGE(0x0100, 0x010f) AM_READWRITE(tms70x0_pf_r, tms70x0_pf_w)             /* tms7000 internal I/O ports */
@@ -72,28 +78,18 @@ ADDRESS_MAP_END
 
 
 tms7000_device::tms7000_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: cpu_device(mconfig, TMS7000, "TMS7000", tag, owner, clock, "tms7000", __FILE__),
-	m_program_config("program", ENDIANNESS_BIG, 8, 16, 0, ADDRESS_MAP_NAME(tms7000_mem)),
-	m_opcode(s_opfn),
-	m_inportsa(*this),
-	m_inportsc(*this),
-	m_inportsd(*this),
-	m_outportsb(*this),
-	m_outportsc(*this),
-	m_outportsd(*this)
+	: cpu_device(mconfig, TMS7000, "TMS7000", tag, owner, clock, "tms7000", __FILE__)
+	, m_program_config("program", ENDIANNESS_BIG, 8, 16, 0, ADDRESS_MAP_NAME(tms7000_mem))
+	, m_io_config("io", ENDIANNESS_BIG, 8, 8, 0, ADDRESS_MAP_NAME(tms7000_io))
+	, m_opcode(s_opfn)
 {
 }
 
 tms7000_device::tms7000_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, address_map_constructor internal, const opcode_func *opcode, const char *shortname, const char *source)
-	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source),
-	m_program_config("program", ENDIANNESS_BIG, 8, 16, 0, internal),
-	m_opcode(opcode),
-	m_inportsa(*this),
-	m_inportsc(*this),
-	m_inportsd(*this),
-	m_outportsb(*this),
-	m_outportsc(*this),
-	m_outportsd(*this)
+	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
+	, m_program_config("program", ENDIANNESS_BIG, 8, 16, 0, internal)
+	, m_io_config("io", ENDIANNESS_BIG, 8, 8, 0, ADDRESS_MAP_NAME(tms7000_io))
+	, m_opcode(opcode)
 {
 }
 
@@ -195,15 +191,7 @@ void tms7000_device::device_start()
 {
 	m_program = &space(AS_PROGRAM);
 	m_direct = &m_program->direct();
-
-	// resolve callbacks
-	m_inportsa.resolve_safe(0xff);
-	m_inportsc.resolve_safe(0xff);
-	m_inportsd.resolve_safe(0xff);
-
-	m_outportsb.resolve_safe();
-	m_outportsc.resolve_safe();
-	m_outportsd.resolve_safe();
+	m_io = &space(AS_IO);
 
 	memset(m_pf, 0, 0x100);
 	m_cycles_per_INT2 = 0;
@@ -492,19 +480,19 @@ WRITE8_MEMBER( tms7000_device::tms70x0_pf_w )   /* Perpherial file write */
 			break;
 
 		case 0x06: /* Port B write */
-			m_outportsb(data);
+			m_io->write_byte( TMS7000_PORTB, data );
 			m_pf[ 0x06 ] = data;
 			break;
 
 		case 0x08: /* Port C write */
 			temp1 = data & m_pf[ 0x09 ];    /* Mask off input bits */
-			m_outportsc(temp1);
+			m_io->write_byte( TMS7000_PORTC, temp1 );
 			m_pf[ 0x08 ] = temp1;
 			break;
 
 		case 0x0a: /* Port D write */
 			temp1 = data & m_pf[ 0x0b ];    /* Mask off input bits */
-			m_outportsd(temp1);
+			m_io->write_byte( TMS7000_PORTD, temp1 );
 			m_pf[ 0x0a ] = temp1;
 			break;
 
@@ -539,7 +527,7 @@ READ8_MEMBER( tms7000_device::tms70x0_pf_r )    /* Perpherial file read */
 			break;
 
 		case 0x04: /* Port A read */
-			result = m_inportsa();
+			result = m_io->read_byte( TMS7000_PORTA );
 			break;
 
 
@@ -550,14 +538,14 @@ READ8_MEMBER( tms7000_device::tms70x0_pf_r )    /* Perpherial file read */
 
 		case 0x08: /* Port C read */
 			temp1 = m_pf[ 0x08 ] & m_pf[ 0x09 ];    /* Get previous output bits */
-			temp2 = m_inportsc();           /* Read port */
+			temp2 = m_io->read_byte( TMS7000_PORTC );           /* Read port */
 			temp3 = temp2 & (~m_pf[ 0x09 ]);                /* Mask off output bits */
 			result = temp1 | temp3;                             /* OR together */
 			break;
 
 		case 0x0a: /* Port D read */
 			temp1 = m_pf[ 0x0a ] & m_pf[ 0x0b ];    /* Get previous output bits */
-			temp2 = m_inportsd();           /* Read port */
+			temp2 = m_io->read_byte( TMS7000_PORTD );           /* Read port */
 			temp3 = temp2 & (~m_pf[ 0x0b ]);                /* Mask off output bits */
 			result = temp1 | temp3;                             /* OR together */
 			break;

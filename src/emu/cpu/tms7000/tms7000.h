@@ -24,6 +24,7 @@
 
 #include "emu.h"
 
+
 enum { TMS7000_PC=1, TMS7000_SP, TMS7000_ST, TMS7000_IDLE, TMS7000_T1_CL, TMS7000_T1_PS, TMS7000_T1_DEC };
 
 enum
@@ -34,37 +35,14 @@ enum
 	TMS7000_IRQNONE = 255
 };
 
+enum
+{
+	TMS7000_PORTA = 0, /* read-only */
+	TMS7000_PORTB,     /* write-only */
+	TMS7000_PORTC,
+	TMS7000_PORTD
+};
 
-/***************************************************************************
-    DEVICE CONFIGURATION MACROS
-***************************************************************************/
-
-// I/O callbacks
-
-// (port A is read-only)
-#define MCFG_TMS7000_PORTA_READ_CB(_devcb) \
-	devcb = &tms7000_device::set_inportsa_cb(*device, DEVCB_##_devcb);
-
-#define MCFG_TMS7000_PORTC_READ_CB(_devcb) \
-	devcb = &tms7000_device::set_inportsc_cb(*device, DEVCB_##_devcb);
-
-#define MCFG_TMS7000_PORTD_READ_CB(_devcb) \
-	devcb = &tms7000_device::set_inportsd_cb(*device, DEVCB_##_devcb);
-
-// (port B is write-only)
-#define MCFG_TMS7000_PORTB_WRITE_CB(_devcb) \
-	devcb = &tms7000_device::set_outportsb_cb(*device, DEVCB_##_devcb);
-
-#define MCFG_TMS7000_PORTC_WRITE_CB(_devcb) \
-	devcb = &tms7000_device::set_outportsc_cb(*device, DEVCB_##_devcb);
-
-#define MCFG_TMS7000_PORTD_WRITE_CB(_devcb) \
-	devcb = &tms7000_device::set_outportsd_cb(*device, DEVCB_##_devcb);
-
-
-/***************************************************************************
-    TYPE DEFINITIONS
-***************************************************************************/
 
 class tms7000_device : public cpu_device
 {
@@ -76,15 +54,6 @@ public:
 	// construction/destruction
 	tms7000_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	tms7000_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, address_map_constructor internal, const opcode_func *opcode, const char *shortname, const char *source);
-
-	// static configuration helpers
-	template<class _Object> static devcb_base & set_inportsa_cb(device_t &device, _Object object) { return downcast<tms7000_device &>(device).m_inportsa.set_callback(object); }
-	template<class _Object> static devcb_base & set_inportsc_cb(device_t &device, _Object object) { return downcast<tms7000_device &>(device).m_inportsc.set_callback(object); }
-	template<class _Object> static devcb_base & set_inportsd_cb(device_t &device, _Object object) { return downcast<tms7000_device &>(device).m_inportsd.set_callback(object); }
-
-	template<class _Object> static devcb_base & set_outportsb_cb(device_t &device, _Object object) { return downcast<tms7000_device &>(device).m_outportsb.set_callback(object); }
-	template<class _Object> static devcb_base & set_outportsc_cb(device_t &device, _Object object) { return downcast<tms7000_device &>(device).m_outportsc.set_callback(object); }
-	template<class _Object> static devcb_base & set_outportsd_cb(device_t &device, _Object object) { return downcast<tms7000_device &>(device).m_outportsd.set_callback(object); }
 
 	DECLARE_WRITE8_MEMBER( tms70x0_pf_w );
 	DECLARE_READ8_MEMBER( tms70x0_pf_r );
@@ -102,7 +71,7 @@ protected:
 	virtual void execute_set_input(int inputnum, int state);
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const { return (spacenum == AS_PROGRAM) ? &m_program_config : NULL; }
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const { return (spacenum == AS_PROGRAM) ? &m_program_config : ( (spacenum == AS_IO) ? &m_io_config : NULL ); }
 
 	// device_state_interface overrides
 	void state_string_export(const device_state_entry &entry, astring &string);
@@ -114,6 +83,7 @@ protected:
 
 private:
 	address_space_config m_program_config;
+	address_space_config m_io_config;
 
 	const opcode_func *m_opcode;
 
@@ -136,17 +106,7 @@ private:
 
 	address_space *m_program;
 	direct_read_data *m_direct;
-
-	// callbacks
-	devcb_read8 m_inportsa;
-	devcb_read8 m_inportsc;
-	devcb_read8 m_inportsd;
-
-	devcb_write8 m_outportsb;
-	devcb_write8 m_outportsc;
-	devcb_write8 m_outportsd;
-	
-	/////////////////////////////////////////////////////////
+	address_space *m_io;
 
 	inline UINT16 RM16( UINT32 mAddr );
 	inline UINT16 RRF16( UINT32 mAddr );
