@@ -542,32 +542,11 @@ const char *mc6847_friend_device::describe_context(void)
 //**************************************************************************
 
 //-------------------------------------------------
-//  ROM( mc6847 )
-//-------------------------------------------------
-
-ROM_START( mc6847 )
-	ROM_REGION( 0x200, "chargen", 0 )
-	ROM_LOAD( "mc6847", 0x000, 0x200, CRC(9896fba7) SHA1(d0aa6d15278deda15610d290abc7b2f113ced91f) )
-ROM_END
-
-
-//-------------------------------------------------
-//  rom_region - device-specific ROM region
-//-------------------------------------------------
-
-const rom_entry *mc6847_base_device::device_rom_region() const
-{
-	return ROM_NAME( mc6847 );
-}
-
-
-//-------------------------------------------------
 //  ctor
 //-------------------------------------------------
 
 mc6847_base_device::mc6847_base_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const UINT8 *fontdata, double tpfs, const char *shortname, const char *source) :
 	mc6847_friend_device(mconfig, type, name, tag, owner, clock, fontdata, (type == MC6847T1_NTSC) || (type == MC6847T1_PAL), tpfs, 25+191, true, shortname, source),
-	m_char_rom(*this, "chargen"),
 	m_input_cb(*this),
 	m_black_and_white(false),
 	m_fixed_mode(0),
@@ -1863,25 +1842,6 @@ s68047_device::s68047_device(const machine_config &mconfig, const char *tag, dev
 }
 
 
-//-------------------------------------------------
-//  ROM( s68047 )
-//-------------------------------------------------
-
-ROM_START( s68047 )
-	ROM_REGION( 0x200, "chargen", 0 )
-	ROM_LOAD( "s68047", 0x000, 0x200, CRC(f6587f95) SHA1(a4578c6c1cc46b9d1cf9a3b43df74cb7b8c24757) )
-ROM_END
-
-
-//-------------------------------------------------
-//  rom_region - device-specific ROM region
-//-------------------------------------------------
-
-const rom_entry *s68047_device::device_rom_region() const
-{
-	return ROM_NAME( s68047 );
-}
-
 //
 // In the Bandai Super Vision 8000 there is a video setting
 // bit which causes black to be displayed as blue when css=1.
@@ -1928,24 +1888,4 @@ const UINT32 s68047_device::s_s68047_hack_palette[16] =
 m5c6847p1_device::m5c6847p1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: mc6847_base_device(mconfig, M5C6847P1, "M5C6847P-1", tag, owner, clock, ntsc_square_fontdata8x12, 262.5, "m5c6847p1", __FILE__)
 {
-}
-
-
-//-------------------------------------------------
-//  ROM( m5c6847p1 )
-//-------------------------------------------------
-
-ROM_START( m5c6847p1 )
-	ROM_REGION( 0x200, "chargen", 0 )
-	ROM_LOAD( "m5c6847p-1", 0x000, 0x200, CRC(540bafe5) SHA1(1b757eb1fa0b695c233b66aa283fb3d780ab9b8b) )
-ROM_END
-
-
-//-------------------------------------------------
-//  rom_region - device-specific ROM region
-//-------------------------------------------------
-
-const rom_entry *m5c6847p1_device::device_rom_region() const
-{
-	return ROM_NAME( m5c6847p1 );
 }

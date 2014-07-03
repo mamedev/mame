@@ -514,9 +514,6 @@ private:
 class mc6847_base_device : public mc6847_friend_device
 {
 public:
-	// optional information overrides
-	virtual const rom_entry *device_rom_region() const;
-
 	template<class _Object> static devcb_base &set_input_callback(device_t &device, _Object object) { return downcast<mc6847_base_device &>(device).m_input_cb.set_callback(object); }
 
 	static void set_get_fixed_mode(device_t &device, UINT8 mode) { downcast<mc6847_base_device &>(device).m_fixed_mode = mode; }
@@ -559,8 +556,6 @@ protected:
 	}
 
 private:
-	optional_memory_region m_char_rom;
-	
 	struct video_scanline
 	{
 		UINT8 m_sample_count;
@@ -683,9 +678,6 @@ class s68047_device : public mc6847_base_device
 {
 public:
 	s68047_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-
-	// optional information overrides
-	virtual const rom_entry *device_rom_region() const;
 	
 	void hack_black_becomes_blue(bool flag);
 
@@ -697,9 +689,6 @@ class m5c6847p1_device : public mc6847_base_device
 {
 public:	
 	m5c6847p1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-
-	// optional information overrides
-	virtual const rom_entry *device_rom_region() const;
 };
 
 
