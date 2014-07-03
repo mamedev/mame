@@ -431,7 +431,7 @@ void sandy_superqboard_t::write(address_space &space, offs_t offset, UINT8 data)
 				break;
 
 			case 5:
-				m_fdc->set_unscaled_clock(XTAL_16MHz >> !BIT(data, 0));
+				m_fdc->set_unscaled_clock(XTAL_16MHz / (BIT(data, 0) ? 1 : 2));
 				break;
 			}
 		}
