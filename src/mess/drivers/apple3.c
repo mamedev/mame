@@ -18,9 +18,7 @@
 #include "bus/rs232/rs232.h"
 #include "includes/apple3.h"
 #include "includes/apple2.h"
-#include "imagedev/flopdrv.h"
 #include "formats/ap2_dsk.h"
-#include "machine/appldriv.h"
 
 #include "bus/a2bus/a2cffa.h"
 #include "bus/a2bus/a2applicard.h"
@@ -29,18 +27,18 @@ static ADDRESS_MAP_START( apple3_map, AS_PROGRAM, 8, apple3_state )
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(apple3_memory_r, apple3_memory_w)
 ADDRESS_MAP_END
 
-static const floppy_interface apple3_floppy_interface =
-{
-	FLOPPY_STANDARD_5_25_DSHD,
-	LEGACY_FLOPPY_OPTIONS_NAME(apple2),
-	NULL
-};
-
 static SLOT_INTERFACE_START(apple3_cards)
 	SLOT_INTERFACE("cffa2", A2BUS_CFFA2_6502)  /* CFFA2000 Compact Flash for Apple II (www.dreher.net), 6502 firmware */
 	SLOT_INTERFACE("applicard", A2BUS_APPLICARD)    /* PCPI Applicard */
 SLOT_INTERFACE_END
 
+static SLOT_INTERFACE_START( a3_floppies )
+	SLOT_INTERFACE( "525", FLOPPY_525_SD )
+SLOT_INTERFACE_END
+
+FLOPPY_FORMATS_MEMBER( apple3_state::floppy_formats )
+	FLOPPY_A216S_FORMAT, FLOPPY_RWTS18_FORMAT
+FLOPPY_FORMATS_END
 
 static MACHINE_CONFIG_START( apple3, apple3_state )
 	/* basic machine hardware */
@@ -94,8 +92,11 @@ static MACHINE_CONFIG_START( apple3, apple3_state )
 	MCFG_A2BUS_SLOT_ADD("a2bus", "sl4", apple3_cards, NULL)
 
 	/* fdc */
-	MCFG_APPLEFDC_ADD("fdc", apple3_fdc_interface)
-	MCFG_LEGACY_FLOPPY_APPLE_4_DRIVES_ADD(apple3_floppy_interface,1,4)
+	MCFG_DEVICE_ADD("fdc", APPLEIII_FDC, 1021800*2)
+	MCFG_FLOPPY_DRIVE_ADD("0", a3_floppies, "525", apple3_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("1", a3_floppies, "525", apple3_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("2", a3_floppies, "525", apple3_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("3", a3_floppies, "525", apple3_state::floppy_formats)
 
 	/* acia */
 	MCFG_DEVICE_ADD("acia", MOS6551, 0)

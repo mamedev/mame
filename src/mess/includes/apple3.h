@@ -13,13 +13,15 @@
 #include "includes/apple2.h"
 #include "machine/ram.h"
 #include "bus/a2bus/a2bus.h"
-#include "machine/applefdc.h"
 #include "machine/mos6551.h"
 #include "machine/6522via.h"
 #include "machine/kb3600.h"
 #include "machine/mm58167.h"
 #include "sound/speaker.h"
 #include "sound/dac.h"
+#include "machine/wozfdc.h"
+#include "imagedev/floppy.h"
+#include "formats/flopimg.h"
 
 #define VAR_VM0         0x0001
 #define VAR_VM1         0x0002
@@ -56,7 +58,11 @@ public:
 		m_joy2x(*this, "joy_2_x"),
 		m_joy2y(*this, "joy_2_y"),
 		m_joybuttons(*this, "joy_buttons"),
-		m_pdltimer(*this, "pdltimer")
+		m_pdltimer(*this, "pdltimer"),
+		floppy0(*this, "0"),
+		floppy1(*this, "1"),
+		floppy2(*this, "2"),
+		floppy3(*this, "3")
 	{
 	}
 
@@ -65,7 +71,7 @@ public:
 	required_device<via6522_device> m_via_0;
 	required_device<via6522_device> m_via_1;
 	required_device<mos6551_device> m_acia;
-	required_device<applefdc_base_device> m_fdc;
+	required_device<appleiii_fdc> m_fdc;
 	required_device<ay3600_device> m_ay3600;
 	required_device<a2bus_device> m_a2bus;
 	required_device<mm58167_device> m_rtc;
@@ -75,6 +81,10 @@ public:
 	required_device<palette_device> m_palette;
 	required_ioport m_joy1x, m_joy1y, m_joy2x, m_joy2y, m_joybuttons;
 	required_device<timer_device> m_pdltimer;
+	required_device<floppy_connector> floppy0;
+	required_device<floppy_connector> floppy1;
+	required_device<floppy_connector> floppy2;
+	required_device<floppy_connector> floppy3;
 
 	DECLARE_READ8_MEMBER(apple3_memory_r);
 	DECLARE_WRITE8_MEMBER(apple3_memory_w);
@@ -117,6 +127,7 @@ public:
 	void apple3_postload();
 	TIMER_DEVICE_CALLBACK_MEMBER(paddle_timer);
 	void pdl_handler(int offset);
+	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
 	// these need to be public for now
 	UINT32 m_flags;
@@ -152,10 +163,5 @@ private:
 	bool m_ramp_active;
 	int m_pdl_charge;
 };
-
-
-/*----------- defined in machine/apple3.c -----------*/
-
-extern const applefdc_interface apple3_fdc_interface;
 
 #endif /* APPLE3_H_ */

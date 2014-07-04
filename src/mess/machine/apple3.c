@@ -45,10 +45,6 @@
 #include "emu.h"
 #include "includes/apple3.h"
 #include "includes/apple2.h"
-#include "machine/applefdc.h"
-#include "machine/appldriv.h"
-
-static void apple3_update_drives(device_t *device);
 
 #define LOG_MEMORY      1
 #define LOG_INDXADDR    1
@@ -240,11 +236,7 @@ READ8_MEMBER(apple3_state::apple3_c0xx_r)
 		case 0xD0: case 0xD1: case 0xD2: case 0xD3:
 		case 0xD4: case 0xD5: case 0xD6: case 0xD7:
 			/* external drive stuff */
-			if (offset & 1)
-				m_flags |= VAR_EXTA0 << ((offset - 0xD0) / 2);
-			else
-				m_flags &= ~(VAR_EXTA0 << ((offset - 0xD0) / 2));
-			apple3_update_drives(machine().device("fdc"));
+			m_fdc->read_c0dx(space, offset&0xf);
 			result = 0x00;
 			break;
 
@@ -256,7 +248,7 @@ READ8_MEMBER(apple3_state::apple3_c0xx_r)
 		case 0xE4: case 0xE5: case 0xE6: case 0xE7:
 		case 0xE8: case 0xE9: case 0xEA: case 0xEB:
 		case 0xEC: case 0xED: case 0xEE: case 0xEF:
-			result = m_fdc->read(offset);
+			result = m_fdc->read(space, offset&0xf);
 			break;
 
 		case 0xF0:
@@ -381,11 +373,7 @@ WRITE8_MEMBER(apple3_state::apple3_c0xx_w)
 		case 0xD0: case 0xD1: case 0xD2: case 0xD3:
 		case 0xD4: case 0xD5: case 0xD6: case 0xD7:
 			/* external drive stuff */
-			if (offset & 1)
-				m_flags |= VAR_EXTA0 << ((offset - 0xD0) / 2);
-			else
-				m_flags &= ~(VAR_EXTA0 << ((offset - 0xD0) / 2));
-			apple3_update_drives(machine().device("fdc"));
+			m_fdc->write_c0dx(space, offset&0xf, data);
 			break;
 
 		case 0xDB:
@@ -396,7 +384,7 @@ WRITE8_MEMBER(apple3_state::apple3_c0xx_w)
 		case 0xE4: case 0xE5: case 0xE6: case 0xE7:
 		case 0xE8: case 0xE9: case 0xEA: case 0xEB:
 		case 0xEC: case 0xED: case 0xEE: case 0xEF:
-			m_fdc->write(offset, data);
+			m_fdc->write(space, offset&0xf, data);
 			break;
 
 		case 0xF0:
@@ -412,25 +400,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(apple3_state::apple3_interrupt)
 {
 	m_via_1->write_cb1(machine().first_screen()->vblank());
 	m_via_1->write_cb2(machine().first_screen()->vblank());
-
-	// check reset
-	if (m_kbspecial->read() & 0x80)	// reset is pressed
-	{
-		// control-reset?
-		if (m_kbspecial->read() & 0x08)
-		{
-			m_maincpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-			m_maincpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
-		}
-		else	// plain reset is an NMI, if it's allowed
-		{
-			if (m_via_0_a & ENV_NMIENABLE)
-			{
-				m_maincpu->set_input_line(m6502_device::NMI_LINE, ASSERT_LINE); 
-				m_maincpu->set_input_line(m6502_device::NMI_LINE, CLEAR_LINE);
-			}
-		}
-	}
 }
 
 UINT8 *apple3_state::apple3_bankaddr(UINT16 bank, offs_t offset)
@@ -641,6 +610,8 @@ MACHINE_RESET_MEMBER(apple3_state,apple3)
 	m_cnxx_slot = -1;
 	m_analog_sel = 0;
 	m_ramp_active = false;
+
+	m_fdc->set_floppies_4(floppy0, floppy1, floppy2, floppy3);
 }
 
 
@@ -670,58 +641,9 @@ UINT8 *apple3_state::apple3_get_indexed_addr(offs_t offset)
 	return result;
 }
 
-static void apple3_update_drives(device_t *device)
-{
-	apple3_state *state = device->machine().driver_data<apple3_state>();
-	int enable_mask = 0x00;
-
-	if (state->m_enable_mask & 0x01)
-		enable_mask |= 0x01;
-
-	if (state->m_enable_mask & 0x02)
-	{
-		switch(state->m_flags & (VAR_EXTA0 | VAR_EXTA1))
-		{
-			case VAR_EXTA0:
-				enable_mask |= 0x02;
-				break;
-			case VAR_EXTA1:
-				enable_mask |= 0x04;
-				break;
-			case VAR_EXTA1|VAR_EXTA0:
-				enable_mask |= 0x08;
-				break;
-		}
-	}
-
-	apple525_set_enable_lines(device,enable_mask);
-}
-
-
-
-static void apple3_set_enable_lines(device_t *device,int enable_mask)
-{
-	apple3_state *state = device->machine().driver_data<apple3_state>();
-	state->m_enable_mask = enable_mask;
-	apple3_update_drives(device);
-}
-
-
-
-const applefdc_interface apple3_fdc_interface =
-{
-	apple525_set_lines,
-	apple3_set_enable_lines,
-	apple525_read_data,
-	apple525_write_data
-};
-
-
-
 DRIVER_INIT_MEMBER(apple3_state,apple3)
 {
 	m_enable_mask = 0;
-	apple3_update_drives(machine().device("fdc"));
 
 	m_flags = 0;
 	m_acia_irq = 0;

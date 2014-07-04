@@ -341,14 +341,14 @@ UINT64 wozfdc_device::time_to_cycles(const attotime &tm)
 	// Clock is falling edges of the ~2Mhz clock
 	// The 1021800 must be the controlling 6502's speed
 
-	UINT64 cycles = tm.as_ticks(1021800*2*2);
+	UINT64 cycles = tm.as_ticks(clock()*2);
 	cycles = (cycles+1) >> 1;
 	return cycles;
 }
 
 attotime wozfdc_device::cycles_to_time(UINT64 cycles)
 {
-	return attotime::from_ticks(cycles*2+1, 1021800*2*2);
+	return attotime::from_ticks(cycles*2+1, clock()*2);
 }
 
 void wozfdc_device::lss_start()

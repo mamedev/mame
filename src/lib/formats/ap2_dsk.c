@@ -612,6 +612,8 @@ bool a2_16sect_format::load(io_generic *io, UINT32 form_factor, floppy_image *im
 		int offset = 0;
 		static const unsigned char pascal_block1[4] = { 0x08, 0xa5, 0x0f, 0x29 };
 		static const unsigned char dos33_block1[4] = { 0xa2, 0x02, 0x8e, 0x52 };
+		static const unsigned char sos_block1[4] = { 0xc9, 0x20, 0xf0, 0x3e };
+		static const unsigned char a3a2emul_block1[6] = { 0x8d, 0xd0, 0x03, 0x4c, 0xc7, 0xa4 };
 
 		io_generic_read(io, sector_data, fpos, 256*16);
 
@@ -621,11 +623,20 @@ bool a2_16sect_format::load(io_generic *io, UINT32 form_factor, floppy_image *im
 			if (!memcmp("PRODOS", &sector_data[0x103], 6))
 			{
 				m_prodos_order = true;
-			}	// check SOS boot block
-			else if (!memcmp("SOS BOOT", &sector_data[0x3], 8))
+			}	// check for ProDOS order SOS disk
+			else if (!memcmp(sos_block1, &sector_data[0x100], 4)) 
 			{
 				m_prodos_order = true;
-			}	// check Apple II Pascal
+			}	// check for Apple III A2 emulator disk in ProDOS order
+			else if (!memcmp(a3a2emul_block1, &sector_data[0x100], 6)) 
+			{
+				m_prodos_order = true;
+			}	// check for PCPI Applicard software in ProDOS order
+			else if (!memcmp("COPYRIGHT (C) 1979, DIGITAL RESEARCH", &sector_data[0x118], 36)) 
+			{
+				printf("PCPI detected\n");
+				m_prodos_order = true;
+			}   // check Apple II Pascal
 			else if (!memcmp("SYSTEM.APPLE", &sector_data[0xd7], 12))
 			{
 				// Pascal discs can still be DOS order.
@@ -795,7 +806,6 @@ bool a2_16sect_format::save(io_generic *io, floppy_image *image)
 								hb = 0;
 
 						if(hb == 4) {
-								printf("hb = 4\n");
 								UINT8 h[11];
 								for(int i=0; i<11; i++)
 										h[i] = gb(buf, ts, pos, wrap);
