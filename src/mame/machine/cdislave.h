@@ -100,7 +100,7 @@ private:
 	// static internal members
 
 	// non-static internal members
-	void prepare_readback(attotime delay, UINT8 channel, UINT8 count, UINT8 data0, UINT8 data1, UINT8 data2, UINT8 data3, UINT8 cmd);
+	void prepare_readback(const attotime &delay, UINT8 channel, UINT8 count, UINT8 data0, UINT8 data1, UINT8 data2, UINT8 data3, UINT8 cmd);
 	void perform_mouse_update();
 	void set_mouse_position();
 };

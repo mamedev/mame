@@ -265,7 +265,7 @@ void hd63450_device::dma_transfer_start(int channel)
 	logerror("DMA: Transfer begins: size=0x%08x\n",m_transfer_size[channel]);
 }
 
-void hd63450_device::set_timer(int channel, attotime tm)
+void hd63450_device::set_timer(int channel, const attotime &tm)
 {
 	m_our_clock[channel] = tm;
 	if(m_in_progress[channel] != 0)

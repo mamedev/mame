@@ -317,7 +317,7 @@ void speaker_sound_device::level_w(int new_level)
 }
 
 
-void speaker_sound_device::update_interm_samples(attotime time, int volume)
+void speaker_sound_device::update_interm_samples(const attotime &time, int volume)
 {
 	double fraction;
 
@@ -400,7 +400,7 @@ void speaker_sound_device::init_next_interm_sample()
 }
 
 
-inline double speaker_sound_device::make_fraction(attotime a, attotime b, double timediv)
+inline double speaker_sound_device::make_fraction(const attotime &a, const attotime &b, double timediv)
 {
 	/* fraction = (a - b) / timediv */
 	return (a - b).as_double() / timediv;

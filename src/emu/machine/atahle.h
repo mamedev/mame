@@ -47,7 +47,7 @@ protected:
 	void set_dasp(int state);
 	void set_pdiag(int state);
 
-	void start_busy(attotime time, int param);
+	void start_busy(const attotime &time, int param);
 	void stop_busy();
 
 	int dev() { return (m_device_head & IDE_DEVICE_HEAD_DRV) >> 4; }

@@ -23,7 +23,7 @@ void h8_sci_device::set_info(const char *_intc_tag,int eri, int rxi, int txi, in
 	tei_int = tei;
 }
 
-void h8_sci_device::set_external_clock_period(attotime period)
+void h8_sci_device::set_external_clock_period(const attotime &period)
 {
 	external_clock_period = period;
 }

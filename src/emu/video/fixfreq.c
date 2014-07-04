@@ -189,7 +189,7 @@ void fixedfreq_device::recompute_parameters(bool postload)
 	screen().configure(m_htotal, m_vtotal, visarea, m_refresh.as_attoseconds());
 }
 
-void fixedfreq_device::update_screen_parameters(attotime refresh)
+void fixedfreq_device::update_screen_parameters(const attotime &refresh)
 {
 	rectangle visarea(
 //          m_hsync - m_hvisible,
@@ -203,7 +203,7 @@ void fixedfreq_device::update_screen_parameters(attotime refresh)
 	screen().configure(m_htotal, m_vtotal, visarea, m_refresh.as_attoseconds());
 }
 
-int fixedfreq_device::sync_separator(attotime time, double newval)
+int fixedfreq_device::sync_separator(const attotime &time, double newval)
 {
 	int last_vsync = m_sig_vsync;
 	int last_comp = m_sig_composite;

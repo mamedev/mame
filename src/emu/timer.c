@@ -68,7 +68,7 @@ void timer_device::static_configure_generic(device_t &device, timer_device_expir
 //  helper to set up a periodic timer
 //-------------------------------------------------
 
-void timer_device::static_configure_periodic(device_t &device, timer_device_expired_delegate callback, attotime period)
+void timer_device::static_configure_periodic(device_t &device, timer_device_expired_delegate callback, const attotime &period)
 {
 	timer_device &timer = downcast<timer_device &>(device);
 	timer.m_type = TIMER_TYPE_PERIODIC;
@@ -110,7 +110,7 @@ void timer_device::static_set_callback(device_t &device, timer_device_expired_de
 //  to set the starting delay
 //-------------------------------------------------
 
-void timer_device::static_set_start_delay(device_t &device, attotime delay)
+void timer_device::static_set_start_delay(device_t &device, const attotime &delay)
 {
 	timer_device &timer = downcast<timer_device &>(device);
 	timer.m_start_delay = delay;

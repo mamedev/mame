@@ -133,7 +133,7 @@ void eeprom_base_device::static_set_default_value(device_t &device, UINT32 value
 //  to set timing constants for various operations
 //-------------------------------------------------
 
-void eeprom_base_device::static_set_timing(device_t &device, timing_type type, attotime duration)
+void eeprom_base_device::static_set_timing(device_t &device, timing_type type, const attotime &duration)
 {
 	downcast<eeprom_base_device &>(device).m_operation_time[type] = duration;
 }

@@ -818,9 +818,9 @@ public:
 
 	// posting
 	void post(unicode_char ch);
-	void post(const unicode_char *text, size_t length = 0, attotime rate = attotime::zero);
-	void post_utf8(const char *text, size_t length = 0, attotime rate = attotime::zero);
-	void post_coded(const char *text, size_t length = 0, attotime rate = attotime::zero);
+	void post(const unicode_char *text, size_t length = 0, const attotime &rate = attotime::zero);
+	void post_utf8(const char *text, size_t length = 0, const attotime &rate = attotime::zero);
+	void post_coded(const char *text, size_t length = 0, const attotime &rate = attotime::zero);
 
 	void frame_update(ioport_port &port, ioport_value &digital);
 	const char *key_name(astring &string, unicode_char ch);
@@ -1419,13 +1419,13 @@ private:
 	template<typename _Type> _Type playback_read(_Type &result);
 	time_t playback_init();
 	void playback_end(const char *message = NULL);
-	void playback_frame(attotime curtime);
+	void playback_frame(const attotime &curtime);
 	void playback_port(ioport_port &port);
 
 	template<typename _Type> void record_write(_Type value);
 	void record_init();
 	void record_end(const char *message = NULL);
-	void record_frame(attotime curtime);
+	void record_frame(const attotime &curtime);
 	void record_port(ioport_port &port);
 
 	// internal state

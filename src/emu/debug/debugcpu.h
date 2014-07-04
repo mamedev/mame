@@ -177,7 +177,7 @@ public:
 
 
 	// hooks used by the rest of the system
-	void start_hook(attotime endtime);
+	void start_hook(const attotime &endtime);
 	void stop_hook();
 	void interrupt_hook(int irqline);
 	void exception_hook(int exception);

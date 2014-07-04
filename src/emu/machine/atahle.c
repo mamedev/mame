@@ -432,7 +432,7 @@ void ata_hle_device::set_pdiag(int state)
 	}
 }
 
-void ata_hle_device::start_busy(attotime time, int param)
+void ata_hle_device::start_busy(const attotime &time, int param)
 {
 	m_status |= IDE_STATUS_BSY;
 	m_busy_timer->adjust(time, param);

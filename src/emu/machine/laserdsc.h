@@ -232,8 +232,8 @@ protected:
 	};
 
 	// subclass overrides
-	virtual void player_vsync(const vbi_metadata &vbi, int fieldnum, attotime curtime) = 0;
-	virtual INT32 player_update(const vbi_metadata &vbi, int fieldnum, attotime curtime) = 0;
+	virtual void player_vsync(const vbi_metadata &vbi, int fieldnum, const attotime &curtime) = 0;
+	virtual INT32 player_update(const vbi_metadata &vbi, int fieldnum, const attotime &curtime) = 0;
 	virtual void player_overlay(bitmap_yuy16 &bitmap) = 0;
 
 	// device-level overrides
@@ -252,7 +252,7 @@ protected:
 	void set_slider_speed(INT32 tracks_per_vsync);
 	void advance_slider(INT32 numtracks);
 	slider_position get_slider_position();
-	INT32 generic_update(const vbi_metadata &vbi, int fieldnum, attotime curtime, player_state_info &curstate);
+	INT32 generic_update(const vbi_metadata &vbi, int fieldnum, const attotime &curtime, player_state_info &curstate);
 
 	// general helpers
 	bool is_start_of_frame(const vbi_metadata &vbi);

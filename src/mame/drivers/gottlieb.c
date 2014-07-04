@@ -535,7 +535,7 @@ void gottlieb_state::audio_process_clock(int logit)
 }
 
 
-void gottlieb_state::audio_handle_zero_crossing(attotime zerotime, int logit)
+void gottlieb_state::audio_handle_zero_crossing(const attotime &zerotime, int logit)
 {
 	/* compute time from last clock */
 	attotime deltaclock = zerotime - m_laserdisc_last_clock;

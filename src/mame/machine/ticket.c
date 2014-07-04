@@ -72,7 +72,7 @@ ticket_dispenser_device::~ticket_dispenser_device()
 //  for dispensing
 //-------------------------------------------------
 
-void ticket_dispenser_device::static_set_period(device_t &device, attotime period)
+void ticket_dispenser_device::static_set_period(device_t &device, const attotime &period)
 {
 	downcast<ticket_dispenser_device &>(device).m_period = period;
 }

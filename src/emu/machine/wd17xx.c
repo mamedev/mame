@@ -445,7 +445,7 @@ TIMER_CALLBACK_MEMBER( wd1770_device::wd17xx_data_callback )
 }
 
 
-void wd1770_device::wd17xx_set_busy(attotime duration)
+void wd1770_device::wd17xx_set_busy(const attotime &duration)
 {
 	m_status |= STA_1_BUSY;
 

@@ -21,7 +21,7 @@ public:
 	DECLARE_WRITE8_MEMBER( write );
 
 	void _IRQHandler(int irq);
-	void _timer_handler(int c, attotime period);
+	void _timer_handler(int c, const attotime &period);
 	void _ymf262_update_request();
 
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);

@@ -2333,7 +2333,7 @@ void upd765_family_device::general_continue(floppy_info &fi)
 	}
 }
 
-bool upd765_family_device::read_one_bit(attotime limit)
+bool upd765_family_device::read_one_bit(const attotime &limit)
 {
 	int bit = cur_live.pll.get_next_bit(cur_live.tm, cur_live.fi->dev, limit);
 	if(bit < 0)
@@ -2351,7 +2351,7 @@ bool upd765_family_device::read_one_bit(attotime limit)
 	return false;
 }
 
-bool upd765_family_device::write_one_bit(attotime limit)
+bool upd765_family_device::write_one_bit(const attotime &limit)
 {
 	bool bit = cur_live.shift_reg & 0x8000;
 	if(cur_live.pll.write_next_bit(bit, cur_live.tm, cur_live.fi->dev, limit))

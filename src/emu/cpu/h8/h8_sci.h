@@ -61,7 +61,7 @@ public:
 	h8_sci_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	void set_info(const char *intc, int eri, int rxi, int txi, int tei);
-	void set_external_clock_period(attotime _period);
+	void set_external_clock_period(const attotime &_period);
 
 	DECLARE_WRITE8_MEMBER(smr_w);
 	DECLARE_READ8_MEMBER(smr_r);

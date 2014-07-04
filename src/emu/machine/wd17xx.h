@@ -107,7 +107,7 @@ protected:
 	void wd17xx_set_intrq();
 	TIMER_CALLBACK_MEMBER( wd17xx_command_callback );
 	TIMER_CALLBACK_MEMBER( wd17xx_data_callback );
-	void wd17xx_set_busy(attotime duration);
+	void wd17xx_set_busy(const attotime &duration);
 	void wd17xx_command_restore();
 	void write_track();
 	void read_track();

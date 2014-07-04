@@ -104,7 +104,7 @@ public:
 	void spacefev_update_SN76477_status();
 	void sheriff_update_SN76477_status();
 	void update_SN76477_status();
-	void start_mono_flop( int n, attotime expire );
+	void start_mono_flop( int n, const attotime &expire );
 	void stop_mono_flop( int n );
 	TIMER_CALLBACK_MEMBER( stop_mono_flop_callback );
 	void spacefev_sound_pins_changed();

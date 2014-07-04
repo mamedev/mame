@@ -80,8 +80,8 @@ protected:
 	virtual machine_config_constructor device_mconfig_additions() const;
 
 	// subclass overrides
-	virtual void player_vsync(const vbi_metadata &vbi, int fieldnum, attotime curtime);
-	virtual INT32 player_update(const vbi_metadata &vbi, int fieldnum, attotime curtime);
+	virtual void player_vsync(const vbi_metadata &vbi, int fieldnum, const attotime &curtime);
+	virtual INT32 player_update(const vbi_metadata &vbi, int fieldnum, const attotime &curtime);
 	virtual void player_overlay(bitmap_yuy16 &bitmap) { }
 
 public:

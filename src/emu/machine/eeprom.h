@@ -67,7 +67,7 @@ public:
 	static void static_set_default_data(device_t &device, const UINT8 *data, UINT32 size);
 	static void static_set_default_data(device_t &device, const UINT16 *data, UINT32 size);
 	static void static_set_default_value(device_t &device, UINT32 value);
-	static void static_set_timing(device_t &device, timing_type type, attotime duration);
+	static void static_set_timing(device_t &device, timing_type type, const attotime &duration);
 
 	// read/write/erase data
 	UINT32 read(offs_t address);

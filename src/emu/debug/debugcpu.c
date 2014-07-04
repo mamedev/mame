@@ -1705,7 +1705,7 @@ device_debug::~device_debug()
 //  before beginning execution for the given device
 //-------------------------------------------------
 
-void device_debug::start_hook(attotime endtime)
+void device_debug::start_hook(const attotime &endtime)
 {
 	debugcpu_private *global = m_device.machine().debugcpu_data;
 

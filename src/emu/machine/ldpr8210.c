@@ -407,7 +407,7 @@ machine_config_constructor pioneer_pr8210_device::device_mconfig_additions() con
 //  start of the blanking period
 //-------------------------------------------------
 
-void pioneer_pr8210_device::player_vsync(const vbi_metadata &vbi, int fieldnum, attotime curtime)
+void pioneer_pr8210_device::player_vsync(const vbi_metadata &vbi, int fieldnum, const attotime &curtime)
 {
 	// logging
 	if (LOG_VBLANK_VBI)
@@ -432,7 +432,7 @@ void pioneer_pr8210_device::player_vsync(const vbi_metadata &vbi, int fieldnum, 
 //  first visible line of the frame
 //-------------------------------------------------
 
-INT32 pioneer_pr8210_device::player_update(const vbi_metadata &vbi, int fieldnum, attotime curtime)
+INT32 pioneer_pr8210_device::player_update(const vbi_metadata &vbi, int fieldnum, const attotime &curtime)
 {
 	// logging
 	if (LOG_VBLANK_VBI)
@@ -934,7 +934,7 @@ void simutrek_special_device::set_external_audio_squelch(int state)
 //  start of the blanking period
 //-------------------------------------------------
 
-void simutrek_special_device::player_vsync(const vbi_metadata &vbi, int fieldnum, attotime curtime)
+void simutrek_special_device::player_vsync(const vbi_metadata &vbi, int fieldnum, const attotime &curtime)
 {
 	// latch the control state after the second field
 	if (fieldnum == 1)

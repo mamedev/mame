@@ -84,7 +84,7 @@ public:
 	template<class _Object> static devcb_base &set_dma_write_3_callback(device_t &device, _Object object) { return downcast<hd63450_device &>(device).m_dma_write_3.set_callback(object); }
 
 	static void set_cpu_tag(device_t &device, const char *tag) { downcast<hd63450_device &>(device).m_cpu_tag = tag; }
-	static void set_our_clocks(device_t &device, attotime clk1, attotime clk2, attotime clk3, attotime clk4)
+	static void set_our_clocks(device_t &device, const attotime &clk1, const attotime &clk2, const attotime &clk3, const attotime &clk4)
 	{
 		hd63450_device &dev = downcast<hd63450_device &>(device);
 		dev.m_our_clock[0] = clk1;
@@ -92,7 +92,7 @@ public:
 		dev.m_our_clock[2] = clk3;
 		dev.m_our_clock[3] = clk4;
 	}
-	static void set_burst_clocks(device_t &device, attotime clk1, attotime clk2, attotime clk3, attotime clk4)
+	static void set_burst_clocks(device_t &device, const attotime &clk1, const attotime &clk2, const attotime &clk3, const attotime &clk4)
 	{
 		hd63450_device &dev = downcast<hd63450_device &>(device);
 		dev.m_burst_clock[0] = clk1;
@@ -109,7 +109,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(drq3_w);
 
 	void single_transfer(int x);
-	void set_timer(int channel, attotime tm);
+	void set_timer(int channel, const attotime &tm);
 	int get_vector(int channel);
 	int get_error_vector(int channel);
 

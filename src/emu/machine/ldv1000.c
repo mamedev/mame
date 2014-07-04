@@ -301,7 +301,7 @@ machine_config_constructor pioneer_ldv1000_device::device_mconfig_additions() co
 //  start of the blanking period
 //-------------------------------------------------
 
-void pioneer_ldv1000_device::player_vsync(const vbi_metadata &vbi, int fieldnum, attotime curtime)
+void pioneer_ldv1000_device::player_vsync(const vbi_metadata &vbi, int fieldnum, const attotime &curtime)
 {
 	// generate interrupts if we hit the edges
 	slider_position sliderpos = get_slider_position();
@@ -325,7 +325,7 @@ void pioneer_ldv1000_device::player_vsync(const vbi_metadata &vbi, int fieldnum,
 //  the first visible line of the frame
 //-------------------------------------------------
 
-INT32 pioneer_ldv1000_device::player_update(const vbi_metadata &vbi, int fieldnum, attotime curtime)
+INT32 pioneer_ldv1000_device::player_update(const vbi_metadata &vbi, int fieldnum, const attotime &curtime)
 {
 	if (LOG_FRAMES_SEEN)
 	{

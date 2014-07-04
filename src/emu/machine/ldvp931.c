@@ -307,7 +307,7 @@ machine_config_constructor phillips_22vp931_device::device_mconfig_additions() c
 //  start of the blanking period
 //-------------------------------------------------
 
-void phillips_22vp931_device::player_vsync(const vbi_metadata &vbi, int fieldnum, attotime curtime)
+void phillips_22vp931_device::player_vsync(const vbi_metadata &vbi, int fieldnum, const attotime &curtime)
 {
 	// reset our command counter (debugging only)
 	m_cmdcount = 0;
@@ -323,7 +323,7 @@ void phillips_22vp931_device::player_vsync(const vbi_metadata &vbi, int fieldnum
 //  the first visible line of the frame
 //-------------------------------------------------
 
-INT32 phillips_22vp931_device::player_update(const vbi_metadata &vbi, int fieldnum, attotime curtime)
+INT32 phillips_22vp931_device::player_update(const vbi_metadata &vbi, int fieldnum, const attotime &curtime)
 {
 	// set the first VBI timer to go at the start of line 16
 	timer_set(screen().time_until_pos(16*2), TID_VBI_DATA_FETCH, LASERDISC_CODE_LINE16 << 2);

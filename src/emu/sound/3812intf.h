@@ -26,7 +26,7 @@ public:
 	DECLARE_WRITE8_MEMBER( write_port_w );
 
 	void _IRQHandler(int irq);
-	void _timer_handler(int c, attotime period);
+	void _timer_handler(int c, const attotime &period);
 	void _ym3812_update_request();
 
 protected:

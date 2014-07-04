@@ -68,11 +68,11 @@ protected:
 	//virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
 	void recompute_parameters(bool postload);
-	void update_screen_parameters(attotime refresh);
+	void update_screen_parameters(const attotime &refresh);
 
 private:
 
-	int sync_separator(attotime time, double newval);
+	int sync_separator(const attotime &time, double newval);
 
 	int m_htotal;
 	int m_vtotal;

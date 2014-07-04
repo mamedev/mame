@@ -115,7 +115,7 @@ void device_execute_interface::static_set_vblank_int(device_t &device, device_in
 //  to set up periodic interrupts on the device
 //-------------------------------------------------
 
-void device_execute_interface::static_set_periodic_int(device_t &device, device_interrupt_delegate function, attotime rate)
+void device_execute_interface::static_set_periodic_int(device_t &device, device_interrupt_delegate function, const attotime &rate)
 {
 	device_execute_interface *exec;
 	if (!device.interface(exec))
@@ -265,7 +265,7 @@ if (TEMPLOG) printf("resume %s (%X)\n", device().tag(), reason);
 //  period of time
 //-------------------------------------------------
 
-void device_execute_interface::spin_until_time(attotime duration)
+void device_execute_interface::spin_until_time(const attotime &duration)
 {
 	static int timetrig = 0;
 

@@ -60,7 +60,7 @@ TIMER_CALLBACK_MEMBER( cdislave_device::trigger_readback_int )
 	m_interrupt_timer->adjust(attotime::never);
 }
 
-void cdislave_device::prepare_readback(attotime delay, UINT8 channel, UINT8 count, UINT8 data0, UINT8 data1, UINT8 data2, UINT8 data3, UINT8 cmd)
+void cdislave_device::prepare_readback(const attotime &delay, UINT8 channel, UINT8 count, UINT8 data0, UINT8 data1, UINT8 data2, UINT8 data3, UINT8 cmd)
 {
 	m_channel[channel].m_out_index = 0;
 	m_channel[channel].m_out_count = count;

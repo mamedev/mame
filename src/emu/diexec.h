@@ -142,7 +142,7 @@ public:
 	UINT32 min_cycles() const { return execute_min_cycles(); }
 	UINT32 max_cycles() const { return execute_max_cycles(); }
 	attotime cycles_to_attotime(UINT64 cycles) const { return device().clocks_to_attotime(cycles_to_clocks(cycles)); }
-	UINT64 attotime_to_cycles(attotime duration) const { return clocks_to_cycles(device().attotime_to_clocks(duration)); }
+	UINT64 attotime_to_cycles(const attotime &duration) const { return clocks_to_cycles(device().attotime_to_clocks(duration)); }
 	UINT32 input_lines() const { return execute_input_lines(); }
 	UINT32 default_irq_vector() const { return execute_default_irq_vector(); }
 	bool is_octal() const { return m_is_octal; }
@@ -150,7 +150,7 @@ public:
 	// static inline configuration helpers
 	static void static_set_disable(device_t &device);
 	static void static_set_vblank_int(device_t &device, device_interrupt_delegate function, const char *tag, int rate = 0);
-	static void static_set_periodic_int(device_t &device, device_interrupt_delegate function, attotime rate);
+	static void static_set_periodic_int(device_t &device, device_interrupt_delegate function, const attotime &rate);
 	static void static_set_irq_acknowledge_callback(device_t &device, device_irq_acknowledge_delegate callback);
 
 	// execution management
@@ -173,7 +173,7 @@ public:
 	void yield() { suspend(SUSPEND_REASON_TIMESLICE, false); }
 	void spin() { suspend(SUSPEND_REASON_TIMESLICE, true); }
 	void spin_until_trigger(int trigid) { suspend_until_trigger(trigid, true); }
-	void spin_until_time(attotime duration);
+	void spin_until_time(const attotime &duration);
 	void spin_until_interrupt() { spin_until_trigger(m_inttrigger); }
 
 	// triggers

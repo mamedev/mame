@@ -48,14 +48,14 @@ private:
 	// internal state
 
 	// Updates the composed volume array according to time
-	void update_interm_samples(attotime time, int volume);
+	void update_interm_samples(const attotime &time, int volume);
 
 	// Updates the composed volume array and returns final filtered volume of next stream sample
 	double update_interm_samples_get_filtered_volume(int volume);
 
 	void finalize_interm_sample(int volume);
 	void init_next_interm_sample();
-	inline double make_fraction(attotime a, attotime b, double timediv);
+	inline double make_fraction(const attotime &a, const attotime &b, double timediv);
 	double get_filtered_volume();
 
 	// Kernel (pulse response) for filtering across samples (while we avoid fancy filtering within samples)

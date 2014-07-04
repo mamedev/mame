@@ -49,13 +49,13 @@ void ym3526_device::device_timer(emu_timer &timer, device_timer_id id, int param
 	}
 }
 
-static void timer_handler(void *param,int c,attotime period)
+static void timer_handler(void *param,int c,const attotime &period)
 {
 	ym3526_device *ym3526 = (ym3526_device *) param;
 	ym3526->_timer_handler(c, period);
 }
 
-void ym3526_device::_timer_handler(int c,attotime period)
+void ym3526_device::_timer_handler(int c,const attotime &period)
 {
 	if( period == attotime::zero )
 	{   /* Reset FM Timer */

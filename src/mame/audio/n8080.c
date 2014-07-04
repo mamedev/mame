@@ -129,7 +129,7 @@ void n8080_state::update_SN76477_status()
 }
 
 
-void n8080_state::start_mono_flop( int n, attotime expire )
+void n8080_state::start_mono_flop( int n, const attotime &expire )
 {
 	m_mono_flop[n] = 1;
 

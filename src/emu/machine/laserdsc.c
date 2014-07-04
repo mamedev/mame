@@ -550,7 +550,7 @@ laserdisc_device::slider_position laserdisc_device::get_slider_position()
 //  that works for most situations
 //-------------------------------------------------
 
-INT32 laserdisc_device::generic_update(const vbi_metadata &vbi, int fieldnum, attotime curtime, player_state_info &newstate)
+INT32 laserdisc_device::generic_update(const vbi_metadata &vbi, int fieldnum, const attotime &curtime, player_state_info &newstate)
 {
 	INT32 advanceby = 0;
 	int frame;

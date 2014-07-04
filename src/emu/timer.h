@@ -85,10 +85,10 @@ public:
 
 	// inline configuration helpers
 	static void static_configure_generic(device_t &device, timer_device_expired_delegate callback);
-	static void static_configure_periodic(device_t &device, timer_device_expired_delegate callback, attotime period);
+	static void static_configure_periodic(device_t &device, timer_device_expired_delegate callback, const attotime &period);
 	static void static_configure_scanline(device_t &device, timer_device_expired_delegate callback, const char *screen, int first_vpos, int increment);
 	static void static_set_callback(device_t &device, timer_device_expired_delegate callback);
-	static void static_set_start_delay(device_t &device, attotime delay);
+	static void static_set_start_delay(device_t &device, const attotime &delay);
 	static void static_set_param(device_t &device, int param);
 	static void static_set_ptr(device_t &device, void *ptr);
 
@@ -104,7 +104,7 @@ public:
 
 	// adjustments
 	void reset() { adjust(attotime::never, 0, attotime::never); }
-	void adjust(attotime duration, INT32 param = 0, attotime period = attotime::never) { assert(m_type == TIMER_TYPE_GENERIC); m_timer->adjust(duration, param, period); }
+	void adjust(const attotime &duration, INT32 param = 0, const attotime &period = attotime::never) { assert(m_type == TIMER_TYPE_GENERIC); m_timer->adjust(duration, param, period); }
 
 	// timing information
 	attotime time_elapsed() const { return m_timer->elapsed(); }

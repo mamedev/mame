@@ -922,7 +922,7 @@ void natural_keyboard::post(unicode_char ch)
 //  post - post a unicode encoded string
 //-------------------------------------------------
 
-void natural_keyboard::post(const unicode_char *text, size_t length, attotime rate)
+void natural_keyboard::post(const unicode_char *text, size_t length, const attotime &rate)
 {
 	// set the fixed rate
 	m_current_rate = rate;
@@ -946,7 +946,7 @@ void natural_keyboard::post(const unicode_char *text, size_t length, attotime ra
 //  post_utf8 - post a UTF-8 encoded string
 //-------------------------------------------------
 
-void natural_keyboard::post_utf8(const char *text, size_t length, attotime rate)
+void natural_keyboard::post_utf8(const char *text, size_t length, const attotime &rate)
 {
 	// set the fixed rate
 	m_current_rate = rate;
@@ -979,7 +979,7 @@ void natural_keyboard::post_utf8(const char *text, size_t length, attotime rate)
 //  post_coded - post a coded string
 //-------------------------------------------------
 
-void natural_keyboard::post_coded(const char *text, size_t length, attotime rate)
+void natural_keyboard::post_coded(const char *text, size_t length, const attotime &rate)
 {
 	static const struct
 	{
@@ -3436,7 +3436,7 @@ void ioport_manager::playback_end(const char *message)
 //  playback
 //-------------------------------------------------
 
-void ioport_manager::playback_frame(attotime curtime)
+void ioport_manager::playback_frame(const attotime &curtime)
 {
 	// if playing back, fetch the information and verify
 	if (m_playback_file.is_open())
@@ -3575,7 +3575,7 @@ void ioport_manager::record_end(const char *message)
 //  recording
 //-------------------------------------------------
 
-void ioport_manager::record_frame(attotime curtime)
+void ioport_manager::record_frame(const attotime &curtime)
 {
 	// if recording, record information about the current frame
 	if (m_record_file.is_open())

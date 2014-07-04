@@ -110,7 +110,7 @@ public:
 	virtual ~device_t();
 
 	// getters
-	running_machine &machine() const { assert(m_machine != NULL); return *m_machine; }
+	running_machine &machine() const { /*assert(m_machine != NULL);*/ return *m_machine; }
 	const char *tag() const { return m_tag; }
 	const char *basetag() const { return m_basetag; }
 	device_type type() const { return m_type; }
@@ -180,11 +180,11 @@ public:
 	double clock_scale() const { return m_clock_scale; }
 	void set_clock_scale(double clockscale);
 	attotime clocks_to_attotime(UINT64 clocks) const;
-	UINT64 attotime_to_clocks(attotime duration) const;
+	UINT64 attotime_to_clocks(const attotime &duration) const;
 
 	// timer interfaces
 	emu_timer *timer_alloc(device_timer_id id = 0, void *ptr = NULL);
-	void timer_set(attotime duration, device_timer_id id = 0, int param = 0, void *ptr = NULL);
+	void timer_set(const attotime &duration, device_timer_id id = 0, int param = 0, void *ptr = NULL);
 	void synchronize(device_timer_id id = 0, int param = 0, void *ptr = NULL) { timer_set(attotime::zero, id, param, ptr); }
 	void timer_expired(emu_timer &timer, device_timer_id id, int param, void *ptr) { device_timer(timer, id, param, ptr); }
 

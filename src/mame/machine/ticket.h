@@ -57,7 +57,7 @@ public:
 	virtual ~ticket_dispenser_device();
 
 	// inline configuration helpers
-	static void static_set_period(device_t &device, attotime period);
+	static void static_set_period(device_t &device, const attotime &period);
 	static void static_set_senses(device_t &device, UINT8 motor_sense, UINT8 status_sense);
 
 	// read/write handlers

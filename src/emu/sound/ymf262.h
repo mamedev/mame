@@ -27,7 +27,7 @@ typedef INT8 OPL3SAMPLE;
 #endif
 */
 
-typedef void (*OPL3_TIMERHANDLER)(void *param,int timer,attotime period);
+typedef void (*OPL3_TIMERHANDLER)(void *param,int timer,const attotime &period);
 typedef void (*OPL3_IRQHANDLER)(void *param,int irq);
 typedef void (*OPL3_UPDATEHANDLER)(void *param,int min_interval_us);
 
