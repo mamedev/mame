@@ -75,7 +75,7 @@ INLINE void debugger_exception_hook(device_t *device, int exception)
     execution for the given CPU
 -------------------------------------------------*/
 
-INLINE void debugger_start_cpu_hook(device_t *device, attotime endtime)
+INLINE void debugger_start_cpu_hook(device_t *device, const attotime &endtime)
 {
 	if ((device->machine().debug_flags & DEBUG_FLAG_ENABLED) != 0)
 		device->debug()->start_hook(endtime);

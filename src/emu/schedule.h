@@ -79,8 +79,8 @@ public:
 	void set_ptr(void *ptr) { m_ptr = ptr; }
 
 	// control
-	void reset(attotime duration = attotime::never) { adjust(duration, m_param, m_period); }
-	void adjust(attotime duration, INT32 param = 0, attotime periodicity = attotime::never);
+	void reset(const attotime &duration = attotime::never) { adjust(duration, m_param, m_period); }
+	void adjust(attotime start_delay, INT32 param = 0, const attotime &periodicity = attotime::never);
 
 	// timing queries
 	attotime elapsed() const;
@@ -133,25 +133,25 @@ public:
 	// execution
 	void timeslice();
 	void abort_timeslice();
-	void trigger(int trigid, attotime after = attotime::zero);
-	void boost_interleave(attotime timeslice_time, attotime boost_duration);
+	void trigger(int trigid, const attotime &after = attotime::zero);
+	void boost_interleave(const attotime &timeslice_time, const attotime &boost_duration);
 	void suspend_resume_changed() { m_suspend_changes_pending = true; }
 
 	// timers, specified by callback/name
 	emu_timer *timer_alloc(timer_expired_delegate callback, void *ptr = NULL);
-	void timer_set(attotime duration, timer_expired_delegate callback, int param = 0, void *ptr = NULL);
-	void timer_pulse(attotime period, timer_expired_delegate callback, int param = 0, void *ptr = NULL);
+	void timer_set(const attotime &duration, timer_expired_delegate callback, int param = 0, void *ptr = NULL);
+	void timer_pulse(const attotime &period, timer_expired_delegate callback, int param = 0, void *ptr = NULL);
 	void synchronize(timer_expired_delegate callback = timer_expired_delegate(), int param = 0, void *ptr = NULL) { timer_set(attotime::zero, callback, param, ptr); }
 
 	// timers with old-skool callbacks
 	emu_timer *timer_alloc(timer_expired_func callback, const char *name, void *ptr = NULL) { return timer_alloc(timer_expired_delegate(callback, name, &machine()), ptr); }
-	void timer_set(attotime duration, timer_expired_func callback, const char *name, int param = 0, void *ptr = NULL) { timer_set(duration, timer_expired_delegate(callback, name, &machine()), param, ptr); }
-	void timer_pulse(attotime period, timer_expired_func callback, const char *name, int param = 0, void *ptr = NULL) { timer_pulse(period, timer_expired_delegate(callback, name, &machine()), param, ptr); }
+	void timer_set(const attotime &duration, timer_expired_func callback, const char *name, int param = 0, void *ptr = NULL) { timer_set(duration, timer_expired_delegate(callback, name, &machine()), param, ptr); }
+	void timer_pulse(const attotime &period, timer_expired_func callback, const char *name, int param = 0, void *ptr = NULL) { timer_pulse(period, timer_expired_delegate(callback, name, &machine()), param, ptr); }
 	void synchronize(timer_expired_func callback, const char *name = NULL, int param = 0, void *ptr = NULL) { timer_set(attotime::zero, callback, name, param, ptr); }
 
 	// timers, specified by device/id; generally devices should use the device_t methods instead
 	emu_timer *timer_alloc(device_t &device, device_timer_id id = 0, void *ptr = NULL);
-	void timer_set(attotime duration, device_t &device, device_timer_id id = 0, int param = 0, void *ptr = NULL);
+	void timer_set(const attotime &duration, device_t &device, device_timer_id id = 0, int param = 0, void *ptr = NULL);
 
 	// debugging
 	void dump_timers() const;
@@ -169,7 +169,7 @@ private:
 	void compute_perfect_interleave();
 	void rebuild_execute_list();
 	void apply_suspend_changes();
-	void add_scheduling_quantum(attotime quantum, attotime duration);
+	void add_scheduling_quantum(const attotime &quantum, const attotime &duration);
 
 	// timer helpers
 	emu_timer &timer_list_insert(emu_timer &timer);

@@ -983,7 +983,7 @@ void video_manager::update_refresh_speed()
 //  if we did not skip a frame
 //-------------------------------------------------
 
-void video_manager::recompute_speed(attotime emutime)
+void video_manager::recompute_speed(const attotime &emutime)
 {
 	// if we don't have a starting time yet, or if we're paused, reset our starting point
 	if (m_speed_last_realtime == 0 || machine().paused())

@@ -174,7 +174,7 @@ bool emu_timer::enable(bool enable)
 //  firings
 //-------------------------------------------------
 
-void emu_timer::adjust(attotime start_delay, INT32 param, attotime period)
+void emu_timer::adjust(attotime start_delay, INT32 param, const attotime &period)
 {
 	// if this is the callback timer, mark it modified
 	device_scheduler &scheduler = machine().scheduler();
@@ -532,7 +532,7 @@ void device_scheduler::abort_timeslice()
 //  trigger - generate a global trigger
 //-------------------------------------------------
 
-void device_scheduler::trigger(int trigid, attotime after)
+void device_scheduler::trigger(int trigid, const attotime &after)
 {
 	// ensure we have a list of executing devices
 	if (m_execute_list == NULL)
@@ -554,7 +554,7 @@ void device_scheduler::trigger(int trigid, attotime after)
 //  interleave factor
 //-------------------------------------------------
 
-void device_scheduler::boost_interleave(attotime timeslice_time, attotime boost_duration)
+void device_scheduler::boost_interleave(const attotime &timeslice_time, const attotime &boost_duration)
 {
 	// ignore timeslices > 1 second
 	if (timeslice_time.seconds > 0)
@@ -580,7 +580,7 @@ emu_timer *device_scheduler::timer_alloc(timer_expired_delegate callback, void *
 //  amount of time
 //-------------------------------------------------
 
-void device_scheduler::timer_set(attotime duration, timer_expired_delegate callback, int param, void *ptr)
+void device_scheduler::timer_set(const attotime &duration, timer_expired_delegate callback, int param, void *ptr)
 {
 	m_timer_allocator.alloc()->init(machine(), callback, ptr, true).adjust(duration, param);
 }
@@ -592,7 +592,7 @@ void device_scheduler::timer_set(attotime duration, timer_expired_delegate callb
 //  frequency
 //-------------------------------------------------
 
-void device_scheduler::timer_pulse(attotime period, timer_expired_delegate callback, int param, void *ptr)
+void device_scheduler::timer_pulse(const attotime &period, timer_expired_delegate callback, int param, void *ptr)
 {
 	m_timer_allocator.alloc()->init(machine(), callback, ptr, false).adjust(period, param, period);
 }
@@ -615,7 +615,7 @@ emu_timer *device_scheduler::timer_alloc(device_t &device, device_timer_id id, v
 //  time
 //-------------------------------------------------
 
-void device_scheduler::timer_set(attotime duration, device_t &device, device_timer_id id, int param, void *ptr)
+void device_scheduler::timer_set(const attotime &duration, device_t &device, device_timer_id id, int param, void *ptr)
 {
 	m_timer_allocator.alloc()->init(device, id, ptr, true).adjust(duration, param);
 }
@@ -931,7 +931,7 @@ inline void device_scheduler::execute_timers()
 //  that is in use
 //-------------------------------------------------
 
-void device_scheduler::add_scheduling_quantum(attotime quantum, attotime duration)
+void device_scheduler::add_scheduling_quantum(const attotime &quantum, const attotime &duration)
 {
 	assert(quantum.seconds == 0);
 
