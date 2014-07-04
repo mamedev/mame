@@ -71,6 +71,7 @@ class feversoc_state : public driver_device
 public:
 	feversoc_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
+		m_mainram(*this, "workram"),
 		m_spriteram(*this, "spriteram"),
 		m_maincpu(*this, "maincpu"),
 		m_oki(*this, "oki"),
@@ -78,6 +79,7 @@ public:
 		m_palette(*this, "palette") { }
 
 	UINT16 m_x;
+	required_shared_ptr<UINT32> m_mainram;
 	required_shared_ptr<UINT32> m_spriteram;
 	DECLARE_READ32_MEMBER(in0_r);
 	DECLARE_WRITE32_MEMBER(output_w);
@@ -85,7 +87,7 @@ public:
 	virtual void video_start();
 	UINT32 screen_update_feversoc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(feversoc_irq);
-	required_device<cpu_device> m_maincpu;
+	required_device<sh2_device> m_maincpu;
 	required_device<okim6295_device> m_oki;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
@@ -160,7 +162,7 @@ WRITE32_MEMBER(feversoc_state::output_w)
 
 static ADDRESS_MAP_START( feversoc_map, AS_PROGRAM, 32, feversoc_state )
 	AM_RANGE(0x00000000, 0x0003ffff) AM_ROM
-	AM_RANGE(0x02000000, 0x0203dfff) AM_RAM //work ram
+	AM_RANGE(0x02000000, 0x0203dfff) AM_RAM AM_SHARE("workram") //work ram
 	AM_RANGE(0x0203e000, 0x0203ffff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x06000000, 0x06000003) AM_WRITE(output_w)
 	AM_RANGE(0x06000004, 0x06000007) AM_WRITENOP //???
@@ -293,7 +295,14 @@ ROM_END
 
 DRIVER_INIT_MEMBER(feversoc_state,feversoc)
 {
+	UINT32 *rom = (UINT32 *)memregion("maincpu")->base();
+
 	seibuspi_rise11_sprite_decrypt_feversoc(memregion("gfx1")->base(), 0x200000);
+
+	m_maincpu->sh2drc_set_options(SH2DRC_FASTEST_OPTIONS);
+	m_maincpu->sh2drc_add_fastram(0x00000000, 0x0003ffff, 1, rom);
+	m_maincpu->sh2drc_add_fastram(0x02000000, 0x0203dfff, 0, &m_mainram[0]);
+	m_maincpu->sh2drc_add_fastram(0x0203e000, 0x0203ffff, 0, &m_spriteram[0]);
 }
 
 GAME( 2004, feversoc,  0,       feversoc,  feversoc, feversoc_state,  feversoc, ROT0, "Seibu Kaihatsu", "Fever Soccer", 0 )
