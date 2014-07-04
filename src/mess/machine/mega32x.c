@@ -208,6 +208,7 @@ sega_32x_device::sega_32x_device(const machine_config &mconfig, device_type type
 		m_slave_cpu(*this, "32x_slave_sh2"),
 		m_lch_pwm(*this, "lch_pwm"),
 		m_rch_pwm(*this, "rch_pwm"),
+		m_sh2_shared(*this, "sh2_shared"),
 		m_palette(*this)
 {
 }
@@ -1923,6 +1924,15 @@ void sega_32x_device::device_reset()
 // checking if these help brutal, they don't.
 	m_master_cpu->sh2drc_set_options(SH2DRC_COMPATIBLE_OPTIONS);
 	m_slave_cpu->sh2drc_set_options(SH2DRC_COMPATIBLE_OPTIONS);
+
+	UINT32 *cart = (UINT32 *)memregion(":gamecart_sh2")->base();
+
+	m_master_cpu->sh2drc_add_fastram(0x06000000, 0x0603ffff, 0, &m_sh2_shared[0]);
+	m_master_cpu->sh2drc_add_fastram(0x02000000, 0x023fffff, 0, cart);
+	m_master_cpu->sh2drc_add_fastram(0x22000000, 0x223fffff, 0, cart);
+	m_slave_cpu->sh2drc_add_fastram(0x06000000, 0x0603ffff, 0, &m_sh2_shared[0]);
+	m_slave_cpu->sh2drc_add_fastram(0x02000000, 0x023fffff, 0, cart);
+	m_slave_cpu->sh2drc_add_fastram(0x22000000, 0x223fffff, 0, cart);
 
 
 // install these now, otherwise we'll get the following (incorrect) warnings on startup..

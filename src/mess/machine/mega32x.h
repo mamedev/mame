@@ -36,6 +36,8 @@ public:
 	required_device<dac_device> m_lch_pwm;
 	required_device<dac_device> m_rch_pwm;
 
+	required_shared_ptr<UINT32> m_sh2_shared;
+
 	void pause_cpu();
 
 	// set some variables at start, depending on region (shall be moved to a device interface?)
