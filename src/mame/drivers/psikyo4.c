@@ -945,6 +945,11 @@ DRIVER_INIT_MEMBER(psikyo4_state,hotgmck)
 	UINT8 *RAM = memregion("maincpu")->base();
 	membank("bank1")->set_base(&RAM[0x100000]);
 	install_hotgmck_pcm_bank();    // Banked PCM ROM
+
+	UINT32 *rom = (UINT32 *)memregion("maincpu")->base();
+	m_maincpu->sh2drc_add_fastram(0x00000000, 0x000fffff, 1, rom);
+	m_maincpu->sh2drc_add_fastram(0x03000000, 0x030037ff, 0, &m_spriteram[0]);
+	m_maincpu->sh2drc_add_fastram(0x06000000, 0x060fffff, 0, &m_ram[0]);
 }
 
 
