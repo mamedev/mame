@@ -126,13 +126,8 @@ ROMs -
 
 ----------------------------------------------------------------*/
 
-#include "emu.h"
-
-#include "cpu/sh2/sh2.h"
-#include "machine/eepromser.h"
-#include "sound/ymf278b.h"
-#include "rendlay.h"
 #include "includes/psikyo4.h"
+#include "rendlay.h"
 
 
 static const gfx_layout layout_16x16x8 =
