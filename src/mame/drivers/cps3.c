@@ -801,6 +801,10 @@ void cps3_state::init_crypt(UINT32 key1, UINT32 key2, int altEncryption)
 
 	// set strict verify
 	m_maincpu->sh2drc_set_options(SH2DRC_STRICT_VERIFY);
+	m_maincpu->sh2drc_add_fastram(0x02000000, 0x0207ffff, 0, &m_mainram[0]);
+	m_maincpu->sh2drc_add_fastram(0x04000000, 0x0407ffff, 0, &m_spriteram[0]);
+	m_maincpu->sh2drc_add_fastram(0x040C0020, 0x040C002b, 0, &m_tilemap20_regs_base[0]);
+	m_maincpu->sh2drc_add_fastram(0x040C0030, 0x040C003b, 0, &m_tilemap30_regs_base[0]);
 
 	cps3_decrypt_bios();
 	m_decrypted_gamerom = auto_alloc_array(machine(), UINT32, 0x1000000/4);

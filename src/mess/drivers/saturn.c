@@ -9,7 +9,7 @@
     Many thanks to Guru, Fabien, Runik and Charles MacDonald for the help given.
 
 ===================================================================================================
-
+ 
 Notes:
 -To enter into an Advanced Test Mode,keep pressed the Test Button (F2) on the start-up.
 -Memo: Some tests done on the original & working PCB,to be implemented:
@@ -808,6 +808,13 @@ void sat_console_state::saturn_init_driver(int rgn)
 	// set compatible options
 	m_maincpu->sh2drc_set_options(SH2DRC_STRICT_VERIFY|SH2DRC_STRICT_PCREL);
 	m_slave->sh2drc_set_options(SH2DRC_STRICT_VERIFY|SH2DRC_STRICT_PCREL);
+
+	m_maincpu->sh2drc_add_fastram(0x00000000, 0x0007ffff, 1, &m_rom[0]);
+	m_maincpu->sh2drc_add_fastram(0x00200000, 0x002fffff, 0, &m_workram_l[0]);
+	m_maincpu->sh2drc_add_fastram(0x06000000, 0x060fffff, 0, &m_workram_h[0]);
+	m_slave->sh2drc_add_fastram(0x00000000, 0x0007ffff, 1, &m_rom[0]);
+	m_slave->sh2drc_add_fastram(0x00200000, 0x002fffff, 0, &m_workram_l[0]);
+	m_slave->sh2drc_add_fastram(0x06000000, 0x060fffff, 0, &m_workram_h[0]);
 
 	/* amount of time to boost interleave for on MINIT / SINIT, needed for communication to work */
 	m_minit_boost = 400;

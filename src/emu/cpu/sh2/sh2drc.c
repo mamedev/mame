@@ -934,7 +934,6 @@ void sh2_device::static_generate_memory_accessor(int size, int iswrite, const ch
 
 	UML_LABEL(block, label++);              // label:
 
-#if 0   // DO NOT ENABLE - SEVERE AARON DAMAGE
 	for (int ramnum = 0; ramnum < SH2_MAX_FASTRAM; ramnum++)
 	{
 		if (m_fastram[ramnum].base != NULL && (!iswrite || !m_fastram[ramnum].readonly))
@@ -956,12 +955,12 @@ void sh2_device::static_generate_memory_accessor(int size, int iswrite, const ch
 			{
 				if (size == 1)
 				{
-					UML_XOR(block, I0, I0, BYTE4_XOR_LE(0));
+					UML_XOR(block, I0, I0, BYTE4_XOR_BE(0));
 					UML_LOAD(block, I0, fastbase, I0, SIZE_BYTE, SCALE_x1);             // load    i0,fastbase,i0,byte
 				}
 				else if (size == 2)
 				{
-					UML_XOR(block, I0, I0, WORD_XOR_LE(0));
+					UML_XOR(block, I0, I0, WORD_XOR_BE(0));
 					UML_LOAD(block, I0, fastbase, I0, SIZE_WORD, SCALE_x1);         // load    i0,fastbase,i0,word_x1
 				}
 				else if (size == 4)
@@ -974,12 +973,12 @@ void sh2_device::static_generate_memory_accessor(int size, int iswrite, const ch
 			{
 				if (size == 1)
 				{
-					UML_XOR(block, I0, I0, BYTE4_XOR_LE(0));
+					UML_XOR(block, I0, I0, BYTE4_XOR_BE(0));
 					UML_STORE(block, fastbase, I0, I1, SIZE_BYTE, SCALE_x1);// store   fastbase,i0,i1,byte
 				}
 				else if (size == 2)
 				{
-					UML_XOR(block, I0, I0, WORD_XOR_LE(0));
+					UML_XOR(block, I0, I0, WORD_XOR_BE(0));
 					UML_STORE(block, fastbase, I0, I1, SIZE_WORD, SCALE_x1);// store   fastbase,i0,i1,word_x1
 				}
 				else if (size == 4)
@@ -992,7 +991,6 @@ void sh2_device::static_generate_memory_accessor(int size, int iswrite, const ch
 			UML_LABEL(block, skip);                                             // skip:
 		}
 	}
-#endif
 
 	if (iswrite)
 	{

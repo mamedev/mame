@@ -946,6 +946,9 @@ void skns_state::init_skns()
 {
 	// init DRC to fastest options
 	m_maincpu->sh2drc_set_options(SH2DRC_FASTEST_OPTIONS);
+	m_maincpu->sh2drc_add_fastram(0x02000000, 0x02003fff, 0, &m_spriteram[0]);
+	m_maincpu->sh2drc_add_fastram(0x02100000, 0x0210003f, 0, &m_spc_regs[0]);
+	m_maincpu->sh2drc_add_fastram(0x02600000, 0x02607fff, 0, &m_v3slc_ram[0]);
 }
 
 void skns_state::set_drc_pcflush(UINT32 addr)
