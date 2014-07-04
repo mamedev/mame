@@ -15,6 +15,7 @@ class saturn_state : public driver_device
 public:
 	saturn_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
+			m_rom(*this, "share6"),
 			m_workram_l(*this, "workram_l"),
 			m_workram_h(*this, "workram_h"),
 			m_sound_ram(*this, "sound_ram"),
@@ -29,6 +30,7 @@ public:
 	{
 	}
 
+	required_shared_ptr<UINT32> m_rom;
 	required_shared_ptr<UINT32> m_workram_l;
 	required_shared_ptr<UINT32> m_workram_h;
 	required_shared_ptr<UINT16> m_sound_ram;
