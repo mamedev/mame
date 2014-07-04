@@ -1169,15 +1169,30 @@ ROM_START( tgm2p )
 	ROM_LOAD( "tgm2p.default.nv", 0x000, 0x100, CRC(b2328b40) SHA1(e6cda4d6f4e91b9f78d2ca84a5eee6c3bd03fe02) )
 ROM_END
 
+void psikyosh_state::ps3_init()
+{
+	m_maincpu->sh2drc_add_fastram(0x03004000, 0x0300ffff, 0, &m_bgram[0]);
+	m_maincpu->sh2drc_add_fastram(0x03050000, 0x030501ff, 0, &m_zoomram[0]);
+	m_maincpu->sh2drc_add_fastram(0x06000000, 0x060fffff, 0, &m_ram[0]);
+}
+
+void psikyosh_state::ps5_init()
+{
+	m_maincpu->sh2drc_add_fastram(0x04004000, 0x0400ffff, 0, &m_bgram[0]);
+	m_maincpu->sh2drc_add_fastram(0x04050000, 0x040501ff, 0, &m_zoomram[0]);
+	m_maincpu->sh2drc_add_fastram(0x06000000, 0x060fffff, 0, &m_ram[0]);
+}
 
 DRIVER_INIT_MEMBER(psikyosh_state,soldivid)
 {
 	m_maincpu->sh2drc_set_options(SH2DRC_FASTEST_OPTIONS);
+	ps3_init();
 }
 
 DRIVER_INIT_MEMBER(psikyosh_state,s1945ii)
 {
 	m_maincpu->sh2drc_set_options(SH2DRC_FASTEST_OPTIONS);
+	ps3_init();
 }
 
 DRIVER_INIT_MEMBER(psikyosh_state,daraku)
@@ -1185,11 +1200,13 @@ DRIVER_INIT_MEMBER(psikyosh_state,daraku)
 	UINT8 *RAM = memregion("maincpu")->base();
 	membank("bank1")->set_base(&RAM[0x100000]);
 	m_maincpu->sh2drc_set_options(SH2DRC_FASTEST_OPTIONS);
+	ps3_init();
 }
 
 DRIVER_INIT_MEMBER(psikyosh_state,sbomberb)
 {
 	m_maincpu->sh2drc_set_options(SH2DRC_FASTEST_OPTIONS);
+	ps3_init();
 }
 
 DRIVER_INIT_MEMBER(psikyosh_state,gunbird2)
@@ -1197,6 +1214,7 @@ DRIVER_INIT_MEMBER(psikyosh_state,gunbird2)
 	UINT8 *RAM = memregion("maincpu")->base();
 	membank("bank1")->set_base(&RAM[0x100000]);
 	m_maincpu->sh2drc_set_options(SH2DRC_FASTEST_OPTIONS);
+	ps5_init();
 }
 
 DRIVER_INIT_MEMBER(psikyosh_state,s1945iii)
@@ -1204,21 +1222,25 @@ DRIVER_INIT_MEMBER(psikyosh_state,s1945iii)
 	UINT8 *RAM = memregion("maincpu")->base();
 	membank("bank1")->set_base(&RAM[0x100000]);
 	m_maincpu->sh2drc_set_options(SH2DRC_FASTEST_OPTIONS);
+	ps5_init();
 }
 
 DRIVER_INIT_MEMBER(psikyosh_state,dragnblz)
 {
 	m_maincpu->sh2drc_set_options(SH2DRC_FASTEST_OPTIONS);
+	ps5_init();
 }
 
 DRIVER_INIT_MEMBER(psikyosh_state,gnbarich)
 {
 	m_maincpu->sh2drc_set_options(SH2DRC_FASTEST_OPTIONS);
+	ps5_init();
 }
 
 DRIVER_INIT_MEMBER(psikyosh_state,tgm2)
 {
 	m_maincpu->sh2drc_set_options(SH2DRC_FASTEST_OPTIONS);
+	ps5_init();
 }
 
 DRIVER_INIT_MEMBER(psikyosh_state,mjgtaste)
@@ -1226,6 +1248,7 @@ DRIVER_INIT_MEMBER(psikyosh_state,mjgtaste)
 	m_maincpu->sh2drc_set_options(SH2DRC_FASTEST_OPTIONS);
 	/* needs to install mahjong controls too (can select joystick in test mode tho) */
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x03000000, 0x03000003, read32_delegate(FUNC(psikyosh_state::mjgtaste_input_r),this));
+	ps5_init();
 }
 
 
