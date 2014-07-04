@@ -311,6 +311,7 @@ public:
 		m_sound_dma(*this, "sound_dma"),
 		m_soundram(*this, "soundram"),
 		m_soundram2(*this, "soundram2"),
+		m_rom(*this, "share1"),
 		m_io_an0(*this, "AN0"),
 		m_io_an1(*this, "AN1"),
 		m_io_an2(*this, "AN2"),
@@ -356,6 +357,7 @@ public:
 	required_shared_ptr<UINT32> m_sound_dma;
 	required_shared_ptr<UINT16> m_soundram;
 	required_shared_ptr<UINT16> m_soundram2;
+	required_shared_ptr<UINT32> m_rom;
 	required_ioport m_io_an0;
 	required_ioport m_io_an1;
 	required_ioport m_io_an2;
@@ -3706,6 +3708,12 @@ DRIVER_INIT_MEMBER(coolridr_state,coolridr)
 
 	m_maincpu->sh2drc_set_options(SH2DRC_FASTEST_OPTIONS);
 	m_subcpu->sh2drc_set_options(SH2DRC_FASTEST_OPTIONS);
+
+	// work around the hack when mapping the workram directly
+	m_maincpu->sh2drc_add_fastram(0x06000000, 0x060d7fff, 0, &m_sysh1_workram_h[0]);
+	m_maincpu->sh2drc_add_fastram(0x060d9000, 0x060fffff, 0, &m_sysh1_workram_h[0xd9000/4]);
+	m_maincpu->sh2drc_add_fastram(0x00000000, 0x001fffff, 1, &m_rom[0]);
+	m_maincpu->sh2drc_add_fastram(0x20000000, 0x201fffff, 1, &m_rom[0]); 
 }
 
 GAME( 1995, coolridr,    0, coolridr,    coolridr, coolridr_state,    coolridr, ROT0,  "Sega", "Cool Riders",GAME_IMPERFECT_SOUND) // region is set in test mode, this set is for Japan, USA and Export (all regions)
