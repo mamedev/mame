@@ -415,7 +415,7 @@ void device_scheduler::timeslice()
 	bool call_debugger = ((machine().debug_flags & DEBUG_FLAG_ENABLED) != 0);
 
 	// build the execution list if we don't have one yet
-	if (m_execute_list == NULL)
+	if (UNEXPECTED(m_execute_list == NULL))
 		rebuild_execute_list();
 
 	// if the current quantum has expired, find a new one
@@ -439,11 +439,12 @@ void device_scheduler::timeslice()
 		if (m_suspend_changes_pending)
 			apply_suspend_changes();
 
-		// loop over non-suspended CPUs
+		// loop over all CPUs
 		for (device_execute_interface *exec = m_execute_list; exec != NULL; exec = exec->m_nextexec)
 		{
-			// only process if our target is later than the CPU's current time (coarse check)
-			if (target.seconds >= exec->m_localtime.seconds)
+			// only process if this CPU is executing or truly halted (not yielding)
+			// and if our target is later than the CPU's current time (coarse check)
+			if (EXPECTED((exec->m_suspend == 0 || exec->m_eatcycles) && target.seconds >= exec->m_localtime.seconds))
 			{
 				// compute how many attoseconds to execute this CPU
 				attoseconds_t delta = target.attoseconds - exec->m_localtime.attoseconds;
