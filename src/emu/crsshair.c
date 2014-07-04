@@ -154,9 +154,10 @@ static void create_bitmap(running_machine &machine, int player)
 	rgb_t color = crosshair_colors[player];
 
 	/* if we have a bitmap and texture for this player, kill it */
-	if (global.bitmap[player] == NULL)
+	if (global.bitmap[player] == NULL) {
 		global.bitmap[player] = global_alloc(bitmap_argb32);
-	machine.render().texture_free(global.texture[player]);
+		global.texture[player] = machine.render().texture_alloc(render_texture::hq_scale);
+	}
 
 	emu_file crossfile(machine.options().crosshair_path(), OPEN_FLAG_READ);
 	if (global.name[player][0] != 0)
@@ -197,8 +198,7 @@ static void create_bitmap(running_machine &machine, int player)
 		}
 	}
 
-	/* create a texture to reference the bitmap */
-	global.texture[player] = machine.render().texture_alloc(render_texture::hq_scale);
+	/* reference the new bitmap */
 	global.texture[player]->set_bitmap(*global.bitmap[player], global.bitmap[player]->cliprect(), TEXFORMAT_ARGB32);
 }
 
@@ -303,8 +303,6 @@ void crosshair_get_user_settings(running_machine &machine, UINT8 player, crossha
 
 void crosshair_set_user_settings(running_machine &machine, UINT8 player, crosshair_user_settings *settings)
 {
-	int changed = FALSE;
-
 	global.auto_time = settings->auto_time;
 	global.used[player] = settings->used;
 	global.mode[player] = settings->mode;
@@ -314,9 +312,9 @@ void crosshair_set_user_settings(running_machine &machine, UINT8 player, crossha
 	global.visible[player] = (settings->mode == CROSSHAIR_VISIBILITY_ON) ? TRUE : FALSE;
 
 	/* update bitmap if name has changed */
-	changed = strcmp(settings->name, global.name[player]);
+	int changed = strcmp(settings->name, global.name[player]);
 	strcpy(global.name[player], settings->name);
-	if (changed)
+	if (changed != 0)
 		create_bitmap(machine, player);
 }
 

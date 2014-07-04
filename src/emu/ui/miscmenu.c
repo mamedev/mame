@@ -1931,7 +1931,7 @@ void ui_menu_crosshair::handle()
 	{
 		crosshair_user_settings settings;
 		crosshair_item_data *data = (crosshair_item_data *)menu_event->itemref;
-		int changed = false;
+		bool changed = false;
 		//int set_def = false;
 		int newval = data->cur;
 
@@ -1985,21 +1985,23 @@ void ui_menu_crosshair::handle()
 		/* crosshair graphic name */
 		if (data->type == CROSSHAIR_ITEM_PIC)
 		{
-			if (menu_event->iptkey == IPT_UI_SELECT)
+			switch (menu_event->iptkey)
 			{
-				/* clear the name string to reset to default crosshair */
-				settings.name[0] = 0;
-				changed = true;
-			}
-			else if (menu_event->iptkey == IPT_UI_LEFT)
-			{
-				strcpy(settings.name, data->last_name);
-				changed = true;
-			}
-			else if (menu_event->iptkey == IPT_UI_RIGHT)
-			{
-				strcpy(settings.name, data->next_name);
-				changed = true;
+				case IPT_UI_SELECT:
+					/* clear the name string to reset to default crosshair */
+					settings.name[0] = 0;
+					changed = true;
+					break;
+
+				case IPT_UI_LEFT:
+					strcpy(settings.name, data->last_name);
+					changed = true;
+					break;
+
+				case IPT_UI_RIGHT:
+					strcpy(settings.name, data->next_name);
+					changed = true;
+					break;
 			}
 		}
 
