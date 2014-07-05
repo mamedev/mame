@@ -159,7 +159,6 @@ UINT8 v25_common_device::fetchop()
 
 void v25_common_device::device_reset()
 {
-	int tmp;
 	attotime time;
 
 	m_ip = 0;
@@ -201,8 +200,7 @@ void v25_common_device::device_reset()
 	m_PCK = 8;
 	m_IDB = 0xFFE00;
 
-	set_clock_scale(1.0 / m_PCK);
-	tmp = m_PCK << m_TB;
+	int tmp = m_PCK << m_TB;
 	time = attotime::from_hz(unscaled_clock()) * tmp;
 	m_timers[3]->adjust(time, INTTB, time);
 
@@ -435,6 +433,8 @@ void v25_common_device::device_start()
 		Mod_RM.RM.w[i] = wreg_name[i & 7];
 		Mod_RM.RM.b[i] = breg_name[i & 7];
 	}
+
+	m_PCK = 8;
 
 	m_no_interrupt = 0;
 	m_prefetch_count = 0;

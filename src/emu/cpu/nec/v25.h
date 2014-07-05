@@ -41,8 +41,11 @@ protected:
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
+	virtual void device_post_load() { notify_clock_changed(); }
 
 	// device_execute_interface overrides
+	virtual UINT64 execute_clocks_to_cycles(UINT64 clocks) const { return clocks / m_PCK; }
+	virtual UINT64 execute_cycles_to_clocks(UINT64 cycles) const { return cycles * m_PCK; }
 	virtual UINT32 execute_min_cycles() const { return 1; }
 	virtual UINT32 execute_max_cycles() const { return 80; }
 	virtual UINT32 execute_input_lines() const { return 1; }

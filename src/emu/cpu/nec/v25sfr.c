@@ -192,8 +192,8 @@ void v25_common_device::write_sfr(unsigned o, UINT8 d)
 			{
 				if(d & 0x80)
 				{
-					tmp = m_TM0 * ((d & 0x40) ? 128 : 12 );
-					time = attotime::from_hz(clock()) * tmp;
+					tmp = m_PCK * m_TM0 * ((d & 0x40) ? 128 : 12 );
+					time = attotime::from_hz(unscaled_clock()) * tmp;
 					m_timers[0]->adjust(time, INTTU0);
 				}
 				else
@@ -201,8 +201,8 @@ void v25_common_device::write_sfr(unsigned o, UINT8 d)
 
 				if(d & 0x20)
 				{
-					tmp = m_MD0 * ((d & 0x10) ? 128 : 12 );
-					time = attotime::from_hz(clock()) * tmp;
+					tmp = m_PCK * m_MD0 * ((d & 0x10) ? 128 : 12 );
+					time = attotime::from_hz(unscaled_clock()) * tmp;
 					m_timers[1]->adjust(time, INTTU1);
 				}
 				else
@@ -212,8 +212,8 @@ void v25_common_device::write_sfr(unsigned o, UINT8 d)
 			{
 				if(d & 0x80)
 				{
-					tmp = m_MD0 * ((d & 0x40) ? 128 : 6 );
-					time = attotime::from_hz(clock()) * tmp;
+					tmp = m_PCK * m_MD0 * ((d & 0x40) ? 128 : 6 );
+					time = attotime::from_hz(unscaled_clock()) * tmp;
 					m_timers[0]->adjust(time, INTTU0, time);
 					m_timers[1]->adjust(attotime::never);
 					m_TM0 = m_MD0;
@@ -229,8 +229,8 @@ void v25_common_device::write_sfr(unsigned o, UINT8 d)
 			m_TMC1 = d & 0xC0;
 			if(d & 0x80)
 			{
-				tmp = m_MD1 * ((d & 0x40) ? 128 : 6 );
-				time = attotime::from_hz(clock()) * tmp;
+				tmp = m_PCK * m_MD1 * ((d & 0x40) ? 128 : 6 );
+				time = attotime::from_hz(unscaled_clock()) * tmp;
 				m_timers[2]->adjust(time, INTTU2, time);
 				m_TM1 = m_MD1;
 			}
@@ -261,10 +261,10 @@ void v25_common_device::write_sfr(unsigned o, UINT8 d)
 				logerror("        Warning: invalid clock divider\n");
 				m_PCK = 8;
 			}
-			set_clock_scale(1.0 / m_PCK);
 			tmp = m_PCK << m_TB;
 			time = attotime::from_hz(unscaled_clock()) * tmp;
 			m_timers[3]->adjust(time, INTTB, time);
+			notify_clock_changed(); /* make device_execute_interface pick up the new clocks_to_cycles() */
 			logerror("        Internal RAM %sabled\n", (m_RAMEN ? "en" : "dis"));
 			logerror("        Time base set to 2^%d\n", m_TB);
 			logerror("        Clock divider set to %d\n", m_PCK);
