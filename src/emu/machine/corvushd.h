@@ -425,6 +425,18 @@ private:
 			UINT8   code;       // Command Code
 			UINT8   pattern[512]; // Pattern to be written
 		} format_drive_revbh_command;
+		//
+		// Verify Drive command (Prep Mode 0x07)
+		//
+		// On the real Corvus controller, this is a variable length response.  If the 
+		// number of bad sectors is greater than zero, an additional four bytes will 
+		// follow for each bad sector.  We don't emulate bad sectors, so we always 
+		// return a count of 0.  That makes this a fixed length response of 2 bytes.
+		//
+		struct {
+			UINT8   status;       // Disk access status
+			UINT8   bad_sectors;  // Number of bad sectors (always zero)
+		} verify_drive_response;		
 	} m_buffer;
 
 	// Structure of Block #1, the Disk Parameter Block

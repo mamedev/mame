@@ -1020,6 +1020,10 @@ void corvus_hdc_t::corvus_process_command_packet(bool invalid_command_flag) {
 					m_buffer.drive_param_response.status =
 						corvus_format_drive(m_buffer.format_drive_revbh_command.pattern, m_offset - 512);
 					break;
+				case PREP_VERIFY:
+					m_buffer.verify_drive_response.status = STAT_SUCCESS;
+					m_buffer.verify_drive_response.bad_sectors = 0; 
+					break;
 				default:
 					m_xmit_bytes = 1;
 					m_buffer.single_byte_response.status = STAT_FAULT | STAT_FATAL_ERR;
@@ -1241,7 +1245,7 @@ void corvus_hdc_t::device_start() {
 	corvus_prep_cmd[PREP_FILL_DRIVE_OMNI].recv_bytes = 3;
 	corvus_prep_cmd[PREP_FILL_DRIVE_OMNI].xmit_bytes = 1;
 	corvus_prep_cmd[PREP_VERIFY].recv_bytes = 1;
-	corvus_prep_cmd[PREP_VERIFY].xmit_bytes = 0;
+	corvus_prep_cmd[PREP_VERIFY].xmit_bytes = 2;
 	corvus_prep_cmd[PREP_READ_FIRMWARE].recv_bytes = 2;
 	corvus_prep_cmd[PREP_READ_FIRMWARE].xmit_bytes = 513;
 	corvus_prep_cmd[PREP_WRITE_FIRMWARE].recv_bytes = 514;
