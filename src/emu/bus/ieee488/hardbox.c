@@ -33,9 +33,8 @@
     change it to 20.
 
     After accepting the drive size, it will prompt if you want to perform
-    a format check.  This requires uploading code into the Corvus, which
-    the high level emulation of the Corvus does not support.  Enter "n"
-    to skip the format check.
+    a format check.  This is optional.  If you enter "y" to proceed with
+    the format check, it will always report no bad sectors.
 
     Enter "y" to proceed with the format.  After it has completed, the
     program will exit back to BASIC.  The drive should now be usable.
