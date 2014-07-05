@@ -4500,10 +4500,10 @@ Game Rules:
   2. Blackjack pays 2 for 1, all other wins pay 2 for 1
   3. Bet returned on pushes
   4. Player wins on six (6) cards totaling 21 or less
-  5. Splits allowed on 1st two cards if a pair, Aces only receive one card
+  5. Split allowed on 1st two cards if a pair, Aces only receive one card
   6. Insurance if dealer has an Ace showing
   7. Surrender only on 1st two cards and if dealer has no Ace (pays 1/2 of original bet)
-  8. Double Down only the 1st two cards
+  8. Double Down only on the 1st two cards
   9. Insurances pays 3 for 1
 
 Optimum percentage payout: 98.3%
