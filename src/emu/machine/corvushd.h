@@ -356,7 +356,8 @@ private:
 		//
 		struct {
 			UINT8   status;                     // Status code returned by command executed
-			UINT8   firmware[32];               // Firmware message
+			UINT8   firmware_desc[31];          // Firmware string description
+			UINT8   firmware_rev;               // Firmware revision number
 			UINT8   rom_version;                // ROM Version
 			struct {
 				UINT8   sectors_per_track;      // Sectors/Track

@@ -89,7 +89,7 @@ corvus_hdc_t::corvus_hdc_t(const machine_config &mconfig, const char *tag, devic
 
 #define VERBOSE 0
 #define VERBOSE_RESPONSES 0
-#define VERSION 1
+#define ROM_VERSION 1           // Controller ROM version
 #define MAX_COMMAND_SIZE 4096   // The maximum size of a command packet (the controller only has 5K of RAM...)
 #define SPARE_TRACKS 7          // This is a Rev B drive, so 7 it is
 #define CALLBACK_CTH_MODE 1     // Set to Controller-to-Host mode when callback fires
@@ -690,8 +690,18 @@ UINT8 corvus_hdc_t::corvus_get_drive_parameters(UINT8 drv) {
 	//
 	// Build up the parameter packet
 	//
-	strcpy((char *) m_buffer.drive_param_response.firmware, "V18.4AP   -- CONST II - 11/82  %");   // Pulled from some firmware...
-	m_buffer.drive_param_response.rom_version = VERSION;
+
+	// This firmware string and revision were taken from the Corvus firmware
+	// file CORVB184.CLR found on the SSE SoftBox distribution disk.
+	strcpy((char *) m_buffer.drive_param_response.firmware_desc, "V18.4     -- CONST II - 11/82  ");   
+	m_buffer.drive_param_response.firmware_rev = 37;
+
+	// Controller ROM version
+	m_buffer.drive_param_response.rom_version = ROM_VERSION;
+
+	//
+ 	// Track information
+	//
 	m_buffer.drive_param_response.track_info.sectors_per_track = m_sectors_per_track;
 	m_buffer.drive_param_response.track_info.tracks_per_cylinder = m_tracks_per_cylinder;
 	m_buffer.drive_param_response.track_info.cylinders_per_drive.msb = (m_cylinders_per_drive & 0xff00) >> 8;
