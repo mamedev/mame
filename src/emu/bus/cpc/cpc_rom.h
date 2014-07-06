@@ -68,7 +68,7 @@ public:
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const;
 
-	UINT8* base(UINT8 slot) { if(slot >=1 && slot <= 6) return m_rom[slot]->base(); else return NULL; }
+	UINT8* base(UINT8 slot) { if(slot >=1 && slot <= 8) return m_rom[slot]->base(); else return NULL; }
 
 protected:
 	// device-level overrides
@@ -78,7 +78,7 @@ protected:
 private:
 	//cpc_expansion_slot_device *m_slot;
 
-	rom_image_device* m_rom[6];
+	rom_image_device* m_rom[8];
 };
 
 // device type definition

@@ -310,6 +310,7 @@ protected:
 	void kccomp_reset_machine();
 	void update_psg();
 	void amstrad_common_init();
+	void enumerate_roms();
 	unsigned char kccomp_get_colour_element(int colour_value);
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
