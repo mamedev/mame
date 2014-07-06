@@ -106,7 +106,7 @@ public:
 	virtual void machine_reset();
 
 	void check_interrupts();
-	void read_pla(offs_t offset, offs_t va, int rw, int aec, int ba, int *casram, int *basic, int *kernal, int *charom, int *grw, int *io, int *roml, int *romh);
+	int read_pla(offs_t offset, offs_t va, int rw, int aec, int ba);
 	UINT8 read_memory(address_space &space, offs_t offset, offs_t va, int aec, int ba);
 	void write_memory(address_space &space, offs_t offset, UINT8 data, int aec, int ba);
 

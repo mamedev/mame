@@ -228,11 +228,11 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER( lp_w );
 
-	DECLARE_READ_LINE_MEMBER( phi0_r );
-	DECLARE_READ_LINE_MEMBER( ba_r );
-	DECLARE_READ_LINE_MEMBER( aec_r );
+	DECLARE_READ_LINE_MEMBER( phi0_r ) { return m_phi0; } // phi 0
+	DECLARE_READ_LINE_MEMBER( ba_r )   { return m_ba; }   // bus available
+	DECLARE_READ_LINE_MEMBER( aec_r )  { return m_aec; }  // address enable control
 
-	UINT8 bus_r();
+	UINT8 bus_r() { return m_last_data; }
 
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 

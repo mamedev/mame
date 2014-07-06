@@ -32,6 +32,19 @@
 #define VA13 BIT(va, 13)
 #define VA12 BIT(va, 12)
 
+enum
+{
+	PLA_OUT_CASRAM = 0,
+	PLA_OUT_BASIC  = 1,
+	PLA_OUT_KERNAL = 2,
+	PLA_OUT_CHAROM = 3,
+	PLA_OUT_GRW    = 4,
+	PLA_OUT_IO     = 5,
+	PLA_OUT_ROML   = 6,
+	PLA_OUT_ROMH   = 7
+};
+
+
 QUICKLOAD_LOAD_MEMBER( c64_state, cbm_c64 )
 {
 	return general_cbm_loadsnap(image, file_type, quickload_size, m_maincpu->space(AS_PROGRAM), 0, cbm_quick_sethiaddress);
@@ -66,7 +79,7 @@ void c64_state::check_interrupts()
 //  read_pla -
 //-------------------------------------------------
 
-void c64_state::read_pla(offs_t offset, offs_t va, int rw, int aec, int ba, int *casram, int *basic, int *kernal, int *charom, int *grw, int *io, int *roml, int *romh)
+int c64_state::read_pla(offs_t offset, offs_t va, int rw, int aec, int ba)
 {
 	//int ba = m_vic->ba_r();
 	//int aec = !m_vic->aec_r();
@@ -78,16 +91,7 @@ void c64_state::read_pla(offs_t offset, offs_t va, int rw, int aec, int ba, int 
 	UINT32 input = VA12 << 15 | VA13 << 14 | game << 13 | exrom << 12 | rw << 11 | aec << 10 | ba << 9 | A12 << 8 |
 		A13 << 7 | A14 << 6 | A15 << 5 | m_va14 << 4 | m_charen << 3 | m_hiram << 2 | m_loram << 1 | cas;
 
-	UINT32 data = m_pla->read(input);
-
-	*casram = BIT(data, 0);
-	*basic = BIT(data, 1);
-	*kernal = BIT(data, 2);
-	*charom = BIT(data, 3);
-	*grw = BIT(data, 4);
-	*io = BIT(data, 5);
-	*roml = BIT(data, 6);
-	*romh = BIT(data, 7);
+	return m_pla->read(input);
 }
 
 
@@ -98,11 +102,10 @@ void c64_state::read_pla(offs_t offset, offs_t va, int rw, int aec, int ba, int 
 UINT8 c64_state::read_memory(address_space &space, offs_t offset, offs_t va, int aec, int ba)
 {
 	int rw = 1;
-	int casram, basic, kernal, charom, grw, io, roml, romh;
 	int io1 = 1, io2 = 1;
 	int sphi2 = m_vic->phi0_r();
 
-	read_pla(offset, va, rw, !aec, ba, &casram, &basic, &kernal, &charom, &grw, &io, &roml, &romh);
+	int plaout = read_pla(offset, va, rw, !aec, ba);
 
 	UINT8 data = 0xff;
 
@@ -111,7 +114,7 @@ UINT8 c64_state::read_memory(address_space &space, offs_t offset, offs_t va, int
 		data = m_vic->bus_r();
 	}
 
-	if (!casram)
+	if (!BIT(plaout, PLA_OUT_CASRAM))
 	{
 		if (aec)
 		{
@@ -122,7 +125,7 @@ UINT8 c64_state::read_memory(address_space &space, offs_t offset, offs_t va, int
 			data = m_ram->pointer()[(!m_va15 << 15) | (!m_va14 << 14) | va];
 		}
 	}
-	if (!basic)
+	if (!BIT(plaout, PLA_OUT_BASIC))
 	{
 		if (m_basic != NULL)
 		{
@@ -133,7 +136,7 @@ UINT8 c64_state::read_memory(address_space &space, offs_t offset, offs_t va, int
 			data = m_kernal->base()[offset & 0x1fff];
 		}
 	}
-	if (!kernal)
+	if (!BIT(plaout, PLA_OUT_KERNAL))
 	{
 		if (m_basic != NULL)
 		{
@@ -144,49 +147,55 @@ UINT8 c64_state::read_memory(address_space &space, offs_t offset, offs_t va, int
 			data = m_kernal->base()[0x2000 | (offset & 0x1fff)];
 		}
 	}
-	if (!charom)
+	if (!BIT(plaout, PLA_OUT_CHAROM))
 	{
 		data = m_charom->base()[offset & 0xfff];
 	}
-	if (!io)
+	if (!BIT(plaout, PLA_OUT_IO))
 	{
-		switch ((offset >> 10) & 0x03)
+		switch ((offset >> 8) & 0x0f)
 		{
-		case 0: // VIC
+		case 0:
+		case 1:
+		case 2:
+		case 3: // VIC
 			data = m_vic->read(space, offset & 0x3f);
 			break;
 
-		case 1: // SID
+		case 4:
+		case 5:
+		case 6:
+		case 7: // SID
 			data = m_sid->read(space, offset & 0x1f);
 			break;
 
-		case 2: // COLOR
+		case 0x8:
+		case 0x9:
+		case 0xa:
+		case 0xb: // COLOR
 			data = m_color_ram[offset & 0x3ff] & 0x0f;
 			break;
 
-		case 3: // CIAS
-			switch ((offset >> 8) & 0x03)
-			{
-			case 0: // CIA1
-				data = m_cia1->read(space, offset & 0x0f);
-				break;
+		case 0xc: // CIA1
+			data = m_cia1->read(space, offset & 0x0f);
+			break;
 
-			case 1: // CIA2
-				data = m_cia2->read(space, offset & 0x0f);
-				break;
+		case 0xd: // CIA2
+			data = m_cia2->read(space, offset & 0x0f);
+			break;
 
-			case 2: // I/O1
-				io1 = 0;
-				break;
+		case 0xe: // I/O1
+			io1 = 0;
+			break;
 
-			case 3: // I/O2
-				io2 = 0;
-				break;
-			}
+		case 0xf: // I/O2
+			io2 = 0;
 			break;
 		}
 	}
 
+	int roml = BIT(plaout, PLA_OUT_ROML);
+	int romh = BIT(plaout, PLA_OUT_ROMH);
 	return m_exp->cd_r(space, offset, data, sphi2, ba, roml, romh, io1, io2);
 }
 
@@ -198,12 +207,11 @@ UINT8 c64_state::read_memory(address_space &space, offs_t offset, offs_t va, int
 void c64_state::write_memory(address_space &space, offs_t offset, UINT8 data, int aec, int ba)
 {
 	int rw = 0;
-	int casram, basic, kernal, charom, grw, io, roml, romh;
 	offs_t va = 0;
 	int io1 = 1, io2 = 1;
 	int sphi2 = m_vic->phi0_r();
 
-	read_pla(offset, va, rw, !aec, ba, &casram, &basic, &kernal, &charom, &grw, &io, &roml, &romh);
+	int plaout = read_pla(offset, va, rw, !aec, ba);
 
 	if (offset < 0x0002)
 	{
@@ -211,49 +219,55 @@ void c64_state::write_memory(address_space &space, offs_t offset, UINT8 data, in
 		data = m_vic->bus_r();
 	}
 
-	if (!casram)
+	if (!BIT(plaout, PLA_OUT_CASRAM))
 	{
 		m_ram->pointer()[offset] = data;
 	}
-	if (!io)
+	if (!BIT(plaout, PLA_OUT_IO))
 	{
-		switch ((offset >> 10) & 0x03)
+		switch ((offset >> 8) & 0x0f)
 		{
-		case 0: // VIC
+		case 0:
+		case 1:
+		case 2:
+		case 3: // VIC
 			m_vic->write(space, offset & 0x3f, data);
 			break;
 
-		case 1: // SID
+		case 4:
+		case 5:
+		case 6:
+		case 7: // SID
 			m_sid->write(space, offset & 0x1f, data);
 			break;
 
-		case 2: // COLOR
-			if (!grw) m_color_ram[offset & 0x3ff] = data & 0x0f;
+		case 0x8:
+		case 0x9:
+		case 0xa:
+		case 0xb: // COLOR
+			if (!BIT(plaout, PLA_OUT_GRW)) m_color_ram[offset & 0x3ff] = data & 0x0f;
 			break;
 
-		case 3: // CIAS
-			switch ((offset >> 8) & 0x03)
-			{
-			case 0: // CIA1
-				m_cia1->write(space, offset & 0x0f, data);
-				break;
+		case 0xc: // CIA1
+			m_cia1->write(space, offset & 0x0f, data);
+			break;
 
-			case 1: // CIA2
-				m_cia2->write(space, offset & 0x0f, data);
-				break;
+		case 0xd: // CIA2
+			m_cia2->write(space, offset & 0x0f, data);
+			break;
 
-			case 2: // I/O1
-				io1 = 0;
-				break;
+		case 0xe: // I/O1
+			io1 = 0;
+			break;
 
-			case 3: // I/O2
-				io2 = 0;
-				break;
-			}
+		case 0xf: // I/O2
+			io2 = 0;
 			break;
 		}
 	}
 
+	int roml = BIT(plaout, PLA_OUT_ROML);
+	int romh = BIT(plaout, PLA_OUT_ROMH);
 	m_exp->cd_w(space, offset, data, sphi2, ba, roml, romh, io1, io2);
 }
 
