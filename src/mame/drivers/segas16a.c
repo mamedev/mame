@@ -2878,7 +2878,48 @@ ROM_START( sdi )
 	ROM_LOAD( "epr-10759.12", 0x0000, 0x8000, CRC(d7f9649f) SHA1(ce4abe7dd7e33da048569d7817063345fab75ea7) )
 
 	ROM_REGION( 0x2000, "maincpu:key", 0 ) // decryption key
-	ROM_LOAD( "317-0027.key", 0x0000, 0x2000, BAD_DUMP CRC(9a5307b2) SHA1(2fcc576ed95b96ff6ea71252c3fab33b8b3fc1f5) )
+	ROM_LOAD( "317-0027.key", 0x0000, 0x2000, CRC(6f022730) SHA1(68461abff8808b7ba294083d4e297fef37d8fb9b) )
+ROM_END
+
+//*************************************************************************************************************************
+//  SDI, Sega System 16A
+//  CPU: FD1089B (317-0027)
+//
+//  ROM board: 834-6284-03 SDI
+//
+ROM_START( sdia )
+	ROM_REGION( 0x40000, "maincpu", 0 ) // 68000 code
+	ROM_LOAD16_BYTE( "epr-10881.43", 0x000000, 0x8000, CRC(3455a6a0) SHA1(2cf32da891424caf95ec93bf572993c1031e1aa8) )
+	ROM_LOAD16_BYTE( "epr-10879.26", 0x000001, 0x8000, CRC(3ec416de) SHA1(245b9436e42170322a38424dc176801d25653e3e) )
+	ROM_LOAD16_BYTE( "epr-10882.42", 0x010000, 0x8000, CRC(f2ac1cec) SHA1(e174ec9bc175d2e914c40b9ae2217627aee8c78e) )
+	ROM_LOAD16_BYTE( "epr-10880.25", 0x010001, 0x8000, CRC(67e088a2) SHA1(8f6d26141b1ae99cdab4f66ad8b4ef2c96912dce) )
+	ROM_LOAD16_BYTE( "epr-10755.41", 0x020000, 0x8000, CRC(405e3969) SHA1(6d8c3bd06d35c971f7db005dffa2e83cae1378f8) )
+	ROM_LOAD16_BYTE( "epr-10752.24", 0x020001, 0x8000, CRC(77453740) SHA1(9032463e5e14c3c610c31e2eb6e2c962df9adf46) )
+
+	ROM_REGION( 0x30000, "gfx1", 0 ) // tiles
+	ROM_LOAD( "epr-10756.95", 0x00000, 0x10000, CRC(44d8a506) SHA1(363d49dcb65ac0093f3ed3b259b1bc45f0291e9d) )
+	ROM_LOAD( "epr-10757.94", 0x10000, 0x10000, CRC(497e1740) SHA1(95b166a9db46a27087e417c1b2cbb76bee2e64a7) )
+	ROM_LOAD( "epr-10758.93", 0x20000, 0x10000, CRC(61d61486) SHA1(d48ff87216947b78903cd98a10436babdf8b75a0) )
+
+	ROM_REGION16_BE( 0x70000, "sprites", 0 ) // sprites
+	ROM_LOAD16_BYTE( "epr-10760.10", 0x00001, 0x08000, CRC(30e2c50a) SHA1(1fb9e69d4cb97fdcb0f98c2a7ede246aaa4ac382) )
+	ROM_CONTINUE(                    0x40001, 0x08000 )
+	ROM_LOAD16_BYTE( "epr-10763.11", 0x00000, 0x08000, CRC(794e3e8b) SHA1(91ca1cb9aabf99adc8426feed4494a992afb8c4a) )
+	ROM_CONTINUE(                    0x40000, 0x08000 )
+	ROM_LOAD16_BYTE( "epr-10761.17", 0x10001, 0x08000, CRC(6a8b3fd0) SHA1(a122d3cb0b3263714f026e57d85b0dbf6cb110d7) )
+	ROM_CONTINUE(                    0x50001, 0x08000 )
+	ROM_LOAD16_BYTE( "epr-10764.18", 0x10000, 0x08000, CRC(602da5d5) SHA1(d32cdde7d86c4561e7bfa547d7d7995ce9a43c24) )
+	ROM_CONTINUE(                    0x50000, 0x08000 )
+	ROM_LOAD16_BYTE( "epr-10762.23", 0x20001, 0x08000, CRC(b9de3aeb) SHA1(2f7a55a8377e831338a884f8962d6ab2757e8c9b) )
+	ROM_CONTINUE(                    0x60001, 0x08000 )
+	ROM_LOAD16_BYTE( "epr-10765.24", 0x20000, 0x08000, CRC(0a73a057) SHA1(7f31124c67541a245e069e5b6aac59935d99a9a9) )
+	ROM_CONTINUE(                    0x60000, 0x08000 )
+
+	ROM_REGION( 0x10000, "soundcpu", 0 ) // sound CPU
+	ROM_LOAD( "epr-10759.12", 0x0000, 0x8000, CRC(d7f9649f) SHA1(ce4abe7dd7e33da048569d7817063345fab75ea7) )
+
+	ROM_REGION( 0x2000, "maincpu:key", 0 ) // decryption key
+	ROM_LOAD( "317-0027.key", 0x0000, 0x2000, CRC(6f022730) SHA1(68461abff8808b7ba294083d4e297fef37d8fb9b) )
 ROM_END
 
 
@@ -3511,7 +3552,8 @@ GAME( 1986, fantzone1,  fantzone, system16a_no7751,         fantzone,   segas16a
 GAME( 1986, fantzonep,  fantzone, system16a_no7751,         fantzone,   segas16a_state,fantzonep,   ROT0,   "Sega", "Fantasy Zone (317-5000)", GAME_SUPPORTS_SAVE )
 GAME( 1986, fantzonepr, fantzone, system16a_no7751,         fantzone,   segas16a_state,generic,     ROT0,   "Sega", "Fantasy Zone (prototype)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE ) // bad / missing gfx roms
 GAME( 1988, passsht16a, passsht,  system16a_fd1094,         passsht16a, segas16a_state,passsht16a,  ROT270, "Sega", "Passing Shot (Japan, 4 Players, System 16A, FD1094 317-0071)", GAME_SUPPORTS_SAVE )
-GAME( 1987, sdi,        0,        system16a_fd1089b_no7751, sdi,        segas16a_state,sdi,         ROT0,   "Sega", "SDI - Strategic Defense Initiative (Japan, old, System 16A, FD1089B 317-0027)", GAME_SUPPORTS_SAVE )
+GAME( 1987, sdi,        0,        system16a_fd1089b_no7751, sdi,        segas16a_state,sdi,         ROT0,   "Sega", "SDI - Strategic Defense Initiative (Japan, newer, System 16A, FD1089B 317-0027)", GAME_SUPPORTS_SAVE )
+GAME( 1987, sdia,     sdi,        system16a_fd1089b_no7751, sdi,        segas16a_state,sdi,         ROT0,   "Sega", "SDI - Strategic Defense Initiative (Japan, old, System 16A, FD1089B 317-0027)", GAME_SUPPORTS_SAVE )
 GAME( 1987, shinobi,    0,        system16a,                shinobi,    segas16a_state,generic,     ROT0,   "Sega", "Shinobi (set 6, System 16A, unprotected)", GAME_SUPPORTS_SAVE )
 GAME( 1987, shinobi1,   shinobi,  system16a_fd1094,         shinobi,    segas16a_state,generic,     ROT0,   "Sega", "Shinobi (set 1, System 16A, FD1094 317-0050)", GAME_SUPPORTS_SAVE )
 GAME( 1987, shinobls,   shinobi,  system16a,                shinobi,    segas16a_state,generic,     ROT0,   "bootleg (Star)", "Shinobi (Star bootleg, System 16A)", GAME_SUPPORTS_SAVE )
