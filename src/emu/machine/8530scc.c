@@ -142,7 +142,8 @@ void scc8530_t::device_timer(emu_timer &timer, device_timer_id id, int param, vo
 	// reset timer according to current register values
 	if (rate)
 	{
-		timer.adjust(attotime::from_hz(rate), 0, attotime::from_hz(rate));
+		attotime attorate = attotime::from_hz(rate);
+		timer.adjust(attorate, 0, attorate);
 	}
 	else
 	{
