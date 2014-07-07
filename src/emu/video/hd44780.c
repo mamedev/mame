@@ -6,6 +6,7 @@
 
         TODO:
         - dump internal CGROM
+        - emulate osc pin, determine video timings and busy flag duration from it
 
 ***************************************************************************/
 
@@ -396,8 +397,9 @@ WRITE8_MEMBER(hd44780_device::control_write)
 		m_ir = data;
 	}
 
-	if (BIT(m_ir, 7))           // set DDRAM address
+	if (BIT(m_ir, 7))
 	{
+		// set DDRAM address
 		m_active_ram = DDRAM;
 		m_ac = m_ir & 0x7f;
 
@@ -411,17 +413,21 @@ WRITE8_MEMBER(hd44780_device::control_write)
 		set_busy_flag(37);
 
 		if (LOG) logerror("HD44780 '%s': set DDRAM address %x\n", tag(), m_ac);
+		return;
 	}
-	else if (BIT(m_ir, 6))      // set CGRAM address
+	else if (BIT(m_ir, 6))
 	{
+		// set CGRAM address
 		m_active_ram = CGRAM;
 		m_ac = m_ir & 0x3f;
 		set_busy_flag(37);
 
 		if (LOG) logerror("HD44780 '%s': set CGRAM address %x\n", tag(), m_ac);
+		return;
 	}
-	else if (BIT(m_ir, 5))      // function set
+	else if (BIT(m_ir, 5))
 	{
+		// function set
 		if (!m_first_cmd && m_data_len == (BIT(m_ir, 4) ? 8 : 4) && (m_char_size != (BIT(m_ir, 2) ? 10 : 8) || m_num_line != (BIT(m_ir, 3) + 1)))
 		{
 			logerror("HD44780 '%s': function set cannot be executed after other instructions unless the interface data length is changed\n", tag());
@@ -436,8 +442,9 @@ WRITE8_MEMBER(hd44780_device::control_write)
 		if (LOG) logerror("HD44780 '%s': char size 5x%d, data len %d, lines %d\n", tag(), m_char_size, m_data_len, m_num_line);
 		return;
 	}
-	else if (BIT(m_ir, 4))      // cursor or display shift
+	else if (BIT(m_ir, 4))
 	{
+		// cursor or display shift
 		int direct = (BIT(m_ir, 2)) ? +1 : -1;
 
 		if (LOG) logerror("HD44780 '%s': %s shift %d\n", tag(), BIT(m_ir, 3) ? "display" : "cursor",  direct);
@@ -449,8 +456,9 @@ WRITE8_MEMBER(hd44780_device::control_write)
 
 		set_busy_flag(37);
 	}
-	else if (BIT(m_ir, 3))      // display on/off control
+	else if (BIT(m_ir, 3))
 	{
+		// display on/off control
 		m_display_on = BIT(m_ir, 2);
 		m_cursor_on  = BIT(m_ir, 1);
 		m_blink_on   = BIT(m_ir, 0);
@@ -458,16 +466,18 @@ WRITE8_MEMBER(hd44780_device::control_write)
 
 		if (LOG) logerror("HD44780 '%s': display %d, cursor %d, blink %d\n", tag(), m_display_on, m_cursor_on, m_blink_on);
 	}
-	else if (BIT(m_ir, 2))      // entry mode set
+	else if (BIT(m_ir, 2))
 	{
+		// entry mode set
 		m_direction = (BIT(m_ir, 1)) ? +1 : -1;
 		m_shift_on  = BIT(m_ir, 0);
 		set_busy_flag(37);
 
 		if (LOG) logerror("HD44780 '%s': entry mode set: direction %d, shift %d\n", tag(), m_direction, m_shift_on);
 	}
-	else if (BIT(m_ir, 1))      // return home
+	else if (BIT(m_ir, 1))
 	{
+		// return home
 		if (LOG) logerror("HD44780 '%s': return home\n", tag());
 
 		m_ac         = 0;
@@ -476,8 +486,9 @@ WRITE8_MEMBER(hd44780_device::control_write)
 		m_disp_shift = 0;
 		set_busy_flag(1520);
 	}
-	else if (BIT(m_ir, 0))      // clear display
+	else if (BIT(m_ir, 0))
 	{
+		// clear display
 		if (LOG) logerror("HD44780 '%s': clear display\n", tag());
 
 		m_ac         = 0;
