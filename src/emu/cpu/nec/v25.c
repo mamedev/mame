@@ -52,6 +52,7 @@ v25_common_device::v25_common_device(const machine_config &mconfig, device_type 
 	, m_program_config("program", ENDIANNESS_LITTLE, is_16bit ? 16 : 8, 20, 0)
 	, m_io_config("io", ENDIANNESS_LITTLE, is_16bit ? 16 : 8, 17, 0)
 	, m_fetch_xor(fetch_xor)
+	, m_PCK(8)
 	, m_prefetch_size(prefetch_size)
 	, m_prefetch_cycles(prefetch_cycles)
 	, m_chip_type(chip_type)
@@ -433,8 +434,6 @@ void v25_common_device::device_start()
 		Mod_RM.RM.w[i] = wreg_name[i & 7];
 		Mod_RM.RM.b[i] = breg_name[i & 7];
 	}
-
-	m_PCK = 8;
 
 	m_no_interrupt = 0;
 	m_prefetch_count = 0;
