@@ -1916,6 +1916,7 @@ $(MESSOBJ)/ti.a:                \
 	$(MESS_VIDEO)/avigo.o       \
 	$(MESS_DRIVERS)/avigo.o     \
 	$(MESS_DRIVERS)/evmbug.o    \
+	$(MESS_DRIVERS)/cc40.o      \
 
 $(MESSOBJ)/tiger.a:             \
 	$(MESS_DRIVERS)/gamecom.o   \

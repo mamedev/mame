@@ -1020,6 +1020,7 @@ ti990_4   // 1976 TI 990/4
 ti990_4v   // 1976 TI 990/4 with video display terminal
 990189  // 1978 TM 990/189
 990189v   // 1980 TM 990/189 with Color Video Board
+cc40      // 1983 TI CC-40
 
 ti99_224  // 1983 TI 99/2 (24kb ROMs)
 ti99_232  // 1983 TI 99/2 (32kb ROMs)
