@@ -127,29 +127,15 @@ UINT8 c64_state::read_memory(address_space &space, offs_t offset, offs_t va, int
 	}
 	if (!BIT(plaout, PLA_OUT_BASIC))
 	{
-		if (m_basic != NULL)
-		{
-			data = m_basic->base()[offset & 0x1fff];
-		}
-		else
-		{
-			data = m_kernal->base()[offset & 0x1fff];
-		}
+		data = m_basic[offset & 0x1fff];
 	}
 	if (!BIT(plaout, PLA_OUT_KERNAL))
 	{
-		if (m_basic != NULL)
-		{
-			data = m_kernal->base()[offset & 0x1fff];
-		}
-		else
-		{
-			data = m_kernal->base()[0x2000 | (offset & 0x1fff)];
-		}
+		data = m_kernal[offset & 0x1fff];
 	}
 	if (!BIT(plaout, PLA_OUT_CHAROM))
 	{
-		data = m_charom->base()[offset & 0xfff];
+		data = m_charom[offset & 0xfff];
 	}
 	if (!BIT(plaout, PLA_OUT_IO))
 	{
@@ -1043,6 +1029,19 @@ SLOT_INTERFACE_END
 
 void c64_state::machine_start()
 {
+	// get pointers to ROMs
+	if (memregion("basic") != NULL)
+	{
+		m_basic = memregion("basic")->base();
+		m_kernal = memregion("kernal")->base();
+	}
+	else
+	{
+		m_basic = memregion("kernal")->base();
+		m_kernal = &m_basic[0x2000];
+	}
+	m_charom = memregion("charom")->base();
+
 	// allocate memory
 	m_color_ram.allocate(0x400);
 
@@ -1496,7 +1495,7 @@ ROM_START( c64 )
 	ROM_REGION( 0x2000, "basic", 0 )
 	ROM_LOAD( "901226-01.u3", 0x0000, 0x2000, CRC(f833d117) SHA1(79015323128650c742a3694c9429aa91f355905e) )
 
-	ROM_REGION( 0x4000, "kernal", 0 )
+	ROM_REGION( 0x2000, "kernal", 0 )
 	ROM_DEFAULT_BIOS("r3")
 	ROM_SYSTEM_BIOS(0, "r1", "Kernal rev. 1" )
 	ROMX_LOAD( "901227-01.u4", 0x0000, 0x2000, CRC(dce782fa) SHA1(87cc04d61fc748b82df09856847bb5c2754a2033), ROM_BIOS(1) )
@@ -1552,12 +1551,10 @@ ROM_START( c64 )
 	ROMX_LOAD( "exos3.u4", 0x0000, 0x2000, CRC(4e54d020) SHA1(f8931b7c0b26807f4de0cc241f0b1e2c8f5271e9), ROM_BIOS(26) )
 	ROM_SYSTEM_BIOS(26, "exos4", "EXOS v4" )
 	ROMX_LOAD( "exos4.u4", 0x0000, 0x2000, CRC(d5cf83a9) SHA1(d5f03a5c0e9d00032d4751ecc6bcd6385879c9c7), ROM_BIOS(27) )
-	ROM_SYSTEM_BIOS(27, "pdc", "ProLogic-DOS Classic" )
-	ROMX_LOAD( "pdc.u4", 0x0000, 0x4000, CRC(6b653b9c) SHA1(0f44a9c62619424a0cd48a90e1b377b987b494e0), ROM_BIOS(28) )
-	ROM_SYSTEM_BIOS(28, "digidos", "DigiDOS" )
-	ROMX_LOAD( "digidos.u4", 0x0000, 0x2000, CRC(2b0c8e89) SHA1(542d6f61c318bced0642e7c2d4d3b34a0f13e634), ROM_BIOS(29) )
-	ROM_SYSTEM_BIOS(29, "magnum", "Magnum Load" )
-	ROMX_LOAD( "magnum.u4", 0x0000, 0x2000, CRC(b2cffcc6) SHA1(827c782c1723b5d0992c05c00738ae4b2133b641), ROM_BIOS(30) )
+	ROM_SYSTEM_BIOS(27, "digidos", "DigiDOS" )
+	ROMX_LOAD( "digidos.u4", 0x0000, 0x2000, CRC(2b0c8e89) SHA1(542d6f61c318bced0642e7c2d4d3b34a0f13e634), ROM_BIOS(28) )
+	ROM_SYSTEM_BIOS(28, "magnum", "Magnum Load" )
+	ROMX_LOAD( "magnum.u4", 0x0000, 0x2000, CRC(b2cffcc6) SHA1(827c782c1723b5d0992c05c00738ae4b2133b641), ROM_BIOS(29) )
 
 	ROM_REGION( 0x1000, "charom", 0 )
 	ROM_LOAD( "901225-01.u5", 0x0000, 0x1000, CRC(ec4272ee) SHA1(adc7c31e18c7c7413d54802ef2f4193da14711aa) )
@@ -1707,7 +1704,11 @@ ROM_END
 
 ROM_START( c64c )
 	ROM_REGION( 0x4000, "kernal", 0 )
-	ROM_LOAD( "251913-01.u4", 0x0000, 0x4000, CRC(0010ec31) SHA1(765372a0e16cbb0adf23a07b80f6b682b39fbf88) )
+	ROM_DEFAULT_BIOS("kernal")
+	ROM_SYSTEM_BIOS(0, "cbm", "Original" )
+	ROMX_LOAD( "251913-01.u4", 0x0000, 0x4000, CRC(0010ec31) SHA1(765372a0e16cbb0adf23a07b80f6b682b39fbf88), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS(1, "pdc", "ProLogic-DOS Classic" )
+	ROMX_LOAD( "pdc.u4", 0x0000, 0x4000, CRC(6b653b9c) SHA1(0f44a9c62619424a0cd48a90e1b377b987b494e0), ROM_BIOS(2) )
 
 	ROM_REGION( 0x1000, "charom", 0 )
 	ROM_LOAD( "901225-01.u5", 0x0000, 0x1000, CRC(ec4272ee) SHA1(adc7c31e18c7c7413d54802ef2f4193da14711aa) )

@@ -49,9 +49,6 @@ public:
 			m_user(*this, PET_USER_PORT_TAG),
 			m_ram(*this, RAM_TAG),
 			m_cassette(*this, PET_DATASSETTE_PORT_TAG),
-			m_basic(*this, "basic"),
-			m_kernal(*this, "kernal"),
-			m_charom(*this, "charom"),
 			m_color_ram(*this, "color_ram"),
 			m_row0(*this, "ROW0"),
 			m_row1(*this, "ROW1"),
@@ -75,6 +72,11 @@ public:
 			m_exp_nmi(CLEAR_LINE)
 	{ }
 
+	// ROM
+	UINT8 *m_basic;
+	UINT8 *m_kernal;
+	UINT8 *m_charom;
+
 	required_device<m6510_device> m_maincpu;
 	required_device<pls100_device> m_pla;
 	required_device<mos6566_device> m_vic;
@@ -88,9 +90,6 @@ public:
 	required_device<pet_user_port_device> m_user;
 	required_device<ram_device> m_ram;
 	optional_device<pet_datassette_port_device> m_cassette;
-	optional_memory_region m_basic;
-	required_memory_region m_kernal;
-	required_memory_region m_charom;
 	optional_shared_ptr<UINT8> m_color_ram;
 	optional_ioport m_row0;
 	optional_ioport m_row1;
