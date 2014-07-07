@@ -54,12 +54,20 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( sh4robot )
 INPUT_PORTS_END
-static const struct sh4_config sh4cpu_config = {  1,  0,  1,  0,  0,  0,  1,  1,  0, 200000000 };
 
 static MACHINE_CONFIG_START( sh4robot, sh4robot_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SH4LE, 200000000) // SH7750
-	MCFG_CPU_CONFIG(sh4cpu_config)
+	MCFG_SH4_MD0(1)
+	MCFG_SH4_MD1(0)
+	MCFG_SH4_MD2(1)
+	MCFG_SH4_MD3(0)
+	MCFG_SH4_MD4(0)
+	MCFG_SH4_MD5(1)
+	MCFG_SH4_MD6(0)
+	MCFG_SH4_MD7(1)
+	MCFG_SH4_MD8(0)
+	MCFG_SH4_CLOCK(200000000)
 	MCFG_CPU_PROGRAM_MAP(sh4robot_mem)
 	MCFG_CPU_IO_MAP(sh4robot_io)
 

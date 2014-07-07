@@ -233,174 +233,172 @@ static const int sh3_intevt2_exception_codes[] =
 
 
 
-void sh4_change_register_bank(sh4_state *sh4, int to)
+void sh34_base_device::sh4_change_register_bank(int to)
 {
-int s;
+	int s;
 
 	if (to) // 0 -> 1
 	{
 		for (s = 0;s < 8;s++)
 		{
-			sh4->rbnk[0][s] = sh4->r[s];
-			sh4->r[s] = sh4->rbnk[1][s];
+			m_rbnk[0][s] = m_r[s];
+			m_r[s] = m_rbnk[1][s];
 		}
 	}
 	else // 1 -> 0
 	{
 		for (s = 0;s < 8;s++)
 		{
-			sh4->rbnk[1][s] = sh4->r[s];
-			sh4->r[s] = sh4->rbnk[0][s];
+			m_rbnk[1][s] = m_r[s];
+			m_r[s] = m_rbnk[0][s];
 		}
 	}
 }
 
-void sh4_swap_fp_registers(sh4_state *sh4)
+void sh34_base_device::sh4_swap_fp_registers()
 {
-int s;
-UINT32 z;
+	int s;
+	UINT32 z;
 
 	for (s = 0;s <= 15;s++)
 	{
-		z = sh4->fr[s];
-		sh4->fr[s] = sh4->xf[s];
-		sh4->xf[s] = z;
+		z = m_fr[s];
+		m_fr[s] = m_xf[s];
+		m_xf[s] = z;
 	}
 }
 
-#ifdef LSB_FIRST
-void sh4_swap_fp_couples(sh4_state *sh4)
+void sh34_base_device::sh4_swap_fp_couples()
 {
-int s;
-UINT32 z;
+	int s;
+	UINT32 z;
 
 	for (s = 0;s <= 15;s = s+2)
 	{
-		z = sh4->fr[s];
-		sh4->fr[s] = sh4->fr[s + 1];
-		sh4->fr[s + 1] = z;
-		z = sh4->xf[s];
-		sh4->xf[s] = sh4->xf[s + 1];
-		sh4->xf[s + 1] = z;
+		z = m_fr[s];
+		m_fr[s] = m_fr[s + 1];
+		m_fr[s + 1] = z;
+		z = m_xf[s];
+		m_xf[s] = m_xf[s + 1];
+		m_xf[s + 1] = z;
 	}
 }
-#endif
 
-void sh4_syncronize_register_bank(sh4_state *sh4, int to)
+void sh34_base_device::sh4_syncronize_register_bank(int to)
 {
-int s;
+	int s;
 
 	for (s = 0;s < 8;s++)
 	{
-		sh4->rbnk[to][s] = sh4->r[s];
+		m_rbnk[to][s] = m_r[s];
 	}
 }
 
-void sh4_default_exception_priorities(sh4_state *sh4) // setup default priorities for exceptions
+void sh34_base_device::sh4_default_exception_priorities() // setup default priorities for exceptions
 {
-int a;
+	int a;
 
 	for (a=0;a <= SH4_INTC_NMI;a++)
-		sh4->exception_priority[a] = exception_priority_default[a];
+		m_exception_priority[a] = exception_priority_default[a];
 	for (a=SH4_INTC_IRLn0;a <= SH4_INTC_IRLnE;a++)
-		sh4->exception_priority[a] = INTPRI(15-(a-SH4_INTC_IRLn0), a);
-	sh4->exception_priority[SH4_INTC_IRL0] = INTPRI(13, SH4_INTC_IRL0);
-	sh4->exception_priority[SH4_INTC_IRL1] = INTPRI(10, SH4_INTC_IRL1);
-	sh4->exception_priority[SH4_INTC_IRL2] = INTPRI(7, SH4_INTC_IRL2);
-	sh4->exception_priority[SH4_INTC_IRL3] = INTPRI(4, SH4_INTC_IRL3);
+		m_exception_priority[a] = INTPRI(15-(a-SH4_INTC_IRLn0), a);
+	m_exception_priority[SH4_INTC_IRL0] = INTPRI(13, SH4_INTC_IRL0);
+	m_exception_priority[SH4_INTC_IRL1] = INTPRI(10, SH4_INTC_IRL1);
+	m_exception_priority[SH4_INTC_IRL2] = INTPRI(7, SH4_INTC_IRL2);
+	m_exception_priority[SH4_INTC_IRL3] = INTPRI(4, SH4_INTC_IRL3);
 	for (a=SH4_INTC_HUDI;a <= SH4_INTC_ROVI;a++)
-		sh4->exception_priority[a] = INTPRI(0, a);
+		m_exception_priority[a] = INTPRI(0, a);
 }
 
-void sh4_exception_recompute(sh4_state *sh4) // checks if there is any interrupt with high enough priority
+void sh34_base_device::sh4_exception_recompute() // checks if there is any interrupt with high enough priority
 {
 	int a,z;
 
-	sh4->test_irq = 0;
-	if ((!sh4->pending_irq) || ((sh4->sr & BL) && (sh4->exception_requesting[SH4_INTC_NMI] == 0)))
+	m_test_irq = 0;
+	if ((!m_pending_irq) || ((m_sr & BL) && (m_exception_requesting[SH4_INTC_NMI] == 0)))
 		return;
-	z = (sh4->sr >> 4) & 15;
+	z = (m_sr >> 4) & 15;
 	for (a=0;a <= SH4_INTC_ROVI;a++)
 	{
-		if (sh4->exception_requesting[a])
+		if (m_exception_requesting[a])
 		{
-			int pri = (((int)sh4->exception_priority[a] >> 8) & 255);
+			int pri = (((int)m_exception_priority[a] >> 8) & 255);
 			//logerror("pri is %02x z is %02x\n",pri,z);
 			if (pri > z)
 			{
 				//logerror("will test\n");
-				sh4->test_irq = 1; // will check for exception at end of instructions
+				m_test_irq = 1; // will check for exception at end of instructions
 				break;
 			}
 		}
 	}
 }
 
-void sh4_exception_request(sh4_state *sh4, int exception) // start requesting an exception
+void sh34_base_device::sh4_exception_request(int exception) // start requesting an exception
 {
 	//logerror("sh4_exception_request a\n");
-	if (!sh4->exception_requesting[exception])
+	if (!m_exception_requesting[exception])
 	{
 		//logerror("sh4_exception_request b\n");
-		sh4->exception_requesting[exception] = 1;
-		sh4->pending_irq++;
-		sh4_exception_recompute(sh4);
+		m_exception_requesting[exception] = 1;
+		m_pending_irq++;
+		sh4_exception_recompute();
 	}
 }
 
-void sh4_exception_unrequest(sh4_state *sh4, int exception) // stop requesting an exception
+void sh34_base_device::sh4_exception_unrequest(int exception) // stop requesting an exception
 {
-	if (sh4->exception_requesting[exception])
+	if (m_exception_requesting[exception])
 	{
-		sh4->exception_requesting[exception] = 0;
-		sh4->pending_irq--;
-		sh4_exception_recompute(sh4);
+		m_exception_requesting[exception] = 0;
+		m_pending_irq--;
+		sh4_exception_recompute();
 	}
 }
 
-void sh4_exception_checkunrequest(sh4_state *sh4, int exception)
+void sh34_base_device::sh4_exception_checkunrequest(int exception)
 {
 	if (exception == SH4_INTC_NMI)
-		sh4_exception_unrequest(sh4, exception);
+		sh4_exception_unrequest(exception);
 	if ((exception == SH4_INTC_DMTE0) || (exception == SH4_INTC_DMTE1) ||
 		(exception == SH4_INTC_DMTE2) || (exception == SH4_INTC_DMTE3))
-		sh4_exception_unrequest(sh4, exception);
+		sh4_exception_unrequest(exception);
 }
 
-void sh4_exception(sh4_state *sh4, const char *message, int exception) // handle exception
+void sh34_base_device::sh4_exception(const char *message, int exception) // handle exception
 {
 	UINT32 vector;
 
 
-	if (sh4->cpu_type == CPU_TYPE_SH4)
+	if (m_cpu_type == CPU_TYPE_SH4)
 	{
 		if (exception < SH4_INTC_NMI)
 			return; // Not yet supported
 		if (exception == SH4_INTC_NMI) {
-			if ((sh4->sr & BL) && (!(sh4->m[ICR] & 0x200)))
+			if ((m_sr & BL) && (!(m_m[ICR] & 0x200)))
 				return;
 
-			sh4->m[ICR] &= ~0x200;
-			sh4->m[INTEVT] = 0x1c0;
+			m_m[ICR] &= ~0x200;
+			m_m[INTEVT] = 0x1c0;
 
 
 			vector = 0x600;
-			sh4->irq_callback(*sh4->device, INPUT_LINE_NMI);
-			LOG(("SH-4 '%s' nmi exception after [%s]\n", sh4->device->tag(), message));
+			standard_irq_callback(INPUT_LINE_NMI);
+			LOG(("SH-4 '%s' nmi exception after [%s]\n", tag(), message));
 		} else {
-	//      if ((sh4->m[ICR] & 0x4000) && (sh4->nmi_line_state == ASSERT_LINE))
+	//      if ((m_m[ICR] & 0x4000) && (m_nmi_line_state == ASSERT_LINE))
 	//          return;
-			if (sh4->sr & BL)
+			if (m_sr & BL)
 				return;
-			if (((sh4->exception_priority[exception] >> 8) & 255) <= ((sh4->sr >> 4) & 15))
+			if (((m_exception_priority[exception] >> 8) & 255) <= ((m_sr >> 4) & 15))
 				return;
-			sh4->m[INTEVT] = exception_codes[exception];
+			m_m[INTEVT] = exception_codes[exception];
 			vector = 0x600;
 			if ((exception >= SH4_INTC_IRL0) && (exception <= SH4_INTC_IRL3))
-				sh4->irq_callback(*sh4->device, SH4_INTC_IRL0-exception+SH4_IRL0);
+				standard_irq_callback(SH4_INTC_IRL0-exception+SH4_IRL0);
 			else
-				sh4->irq_callback(*sh4->device, SH4_IRL3+1);
-			LOG(("SH-4 '%s' interrupt exception #%d after [%s]\n", sh4->device->tag(), exception, message));
+				standard_irq_callback(SH4_IRL3+1);
+			LOG(("SH-4 '%s' interrupt exception #%d after [%s]\n", tag(), exception, message));
 		}
 	}
 	else /* SH3 exceptions */
@@ -415,116 +413,114 @@ void sh4_exception(sh4_state *sh4, const char *message, int exception) // handle
 		}
 		else
 		{
-			if (sh4->sr & BL)
+			if (m_sr & BL)
 				return;
-			if (((sh4->exception_priority[exception] >> 8) & 255) <= ((sh4->sr >> 4) & 15))
+			if (((m_exception_priority[exception] >> 8) & 255) <= ((m_sr >> 4) & 15))
 				return;
 
 
 			vector = 0x600;
 
 			if ((exception >= SH4_INTC_IRL0) && (exception <= SH4_INTC_IRL3))
-				sh4->irq_callback(*sh4->device, SH4_INTC_IRL0-exception+SH4_IRL0);
+				standard_irq_callback(SH4_INTC_IRL0-exception+SH4_IRL0);
 			else
-				sh4->irq_callback(*sh4->device, SH4_IRL3+1);
+				standard_irq_callback(SH4_IRL3+1);
 
 			if (sh3_intevt2_exception_codes[exception]==-1)
 				fatalerror("sh3_intevt2_exception_codes unpopulated for exception %02x\n", exception);
 
-			sh4->m_sh3internal_lower[INTEVT2] = sh3_intevt2_exception_codes[exception];
-			sh4->m_sh3internal_upper[SH3_EXPEVT_ADDR] = exception_codes[exception];
+			m_sh3internal_lower[INTEVT2] = sh3_intevt2_exception_codes[exception];
+			m_sh3internal_upper[SH3_EXPEVT_ADDR] = exception_codes[exception];
 
 
-			LOG(("SH-3 '%s' interrupt exception #%d after [%s]\n", sh4->device->tag(), exception, message));
+			LOG(("SH-3 '%s' interrupt exception #%d after [%s]\n", tag(), exception, message));
 		}
 
 		/***** END ASSUME THIS TO BE WRONG FOR NOW *****/
 	}
-	sh4_exception_checkunrequest(sh4, exception);
+	sh4_exception_checkunrequest(exception);
 
-	sh4->spc = sh4->pc;
-	sh4->ssr = sh4->sr;
-	sh4->sgr = sh4->r[15];
+	m_spc = m_pc;
+	m_ssr = m_sr;
+	m_sgr = m_r[15];
 
-	sh4->sr |= MD;
-	if ((sh4->device->machine().debug_flags & DEBUG_FLAG_ENABLED) != 0)
-		sh4_syncronize_register_bank(sh4, (sh4->sr & sRB) >> 29);
-	if (!(sh4->sr & sRB))
-		sh4_change_register_bank(sh4, 1);
-	sh4->sr |= sRB;
-	sh4->sr |= BL;
-	sh4_exception_recompute(sh4);
+	m_sr |= MD;
+	if ((machine().debug_flags & DEBUG_FLAG_ENABLED) != 0)
+		sh4_syncronize_register_bank((m_sr & sRB) >> 29);
+	if (!(m_sr & sRB))
+		sh4_change_register_bank(1);
+	m_sr |= sRB;
+	m_sr |= BL;
+	sh4_exception_recompute();
 
 	/* fetch PC */
-	sh4->pc = sh4->vbr + vector;
+	m_pc = m_vbr + vector;
 	/* wake up if a sleep opcode is triggered */
-	if(sh4->sleep_mode == 1) { sh4->sleep_mode = 2; }
+	if(m_sleep_mode == 1) { m_sleep_mode = 2; }
 }
 
 
-static UINT32 compute_ticks_refresh_timer(emu_timer *timer, int hertz, int base, int divisor)
+UINT32 sh34_base_device::compute_ticks_refresh_timer(emu_timer *timer, int hertz, int base, int divisor)
 {
 	// elapsed:total = x : ticks
-	// x=elapsed*tics/total -> x=elapsed*(double)100000000/rtcnt_div[(sh4->m[RTCSR] >> 3) & 7]
-	// ticks/total=ticks / ((rtcnt_div[(sh4->m[RTCSR] >> 3) & 7] * ticks) / 100000000)=1/((rtcnt_div[(sh4->m[RTCSR] >> 3) & 7] / 100000000)=100000000/rtcnt_div[(sh4->m[RTCSR] >> 3) & 7]
+	// x=elapsed*tics/total -> x=elapsed*(double)100000000/rtcnt_div[(m_m[RTCSR] >> 3) & 7]
+	// ticks/total=ticks / ((rtcnt_div[(m_m[RTCSR] >> 3) & 7] * ticks) / 100000000)=1/((rtcnt_div[(m_m[RTCSR] >> 3) & 7] / 100000000)=100000000/rtcnt_div[(m_m[RTCSR] >> 3) & 7]
 	return base + (UINT32)((timer->elapsed().as_double() * (double)hertz) / (double)divisor);
 }
 
-static void sh4_refresh_timer_recompute(sh4_state *sh4)
+void sh34_base_device::sh4_refresh_timer_recompute()
 {
-UINT32 ticks;
+	UINT32 ticks;
 
-	if (sh4->cpu_type != CPU_TYPE_SH4)
-		fatalerror("sh4_refresh_timer_recompute uses sh4->m[] with SH3\n");
+	if (m_cpu_type != CPU_TYPE_SH4)
+		fatalerror("sh4_refresh_timer_recompute uses m_m[] with SH3\n");
 
 
 	//if rtcnt < rtcor then rtcor-rtcnt
 	//if rtcnt >= rtcor then 256-rtcnt+rtcor=256+rtcor-rtcnt
-	ticks = sh4->m[RTCOR]-sh4->m[RTCNT];
+	ticks = m_m[RTCOR]-m_m[RTCNT];
 	if (ticks <= 0)
 		ticks = 256 + ticks;
-	sh4->refresh_timer->adjust(attotime::from_hz(sh4->bus_clock) * rtcnt_div[(sh4->m[RTCSR] >> 3) & 7] * ticks);
-	sh4->refresh_timer_base = sh4->m[RTCNT];
+	m_refresh_timer->adjust(attotime::from_hz(m_bus_clock) * rtcnt_div[(m_m[RTCSR] >> 3) & 7] * ticks);
+	m_refresh_timer_base = m_m[RTCNT];
 }
 
 
-static TIMER_CALLBACK( sh4_refresh_timer_callback )
+TIMER_CALLBACK_MEMBER( sh34_base_device::sh4_refresh_timer_callback )
 {
-	sh4_state *sh4 = (sh4_state *)ptr;
+	if (m_cpu_type != CPU_TYPE_SH4)
+		fatalerror("sh4_refresh_timer_callback uses m_m[] with SH3\n");
 
-	if (sh4->cpu_type != CPU_TYPE_SH4)
-		fatalerror("sh4_refresh_timer_callback uses sh4->m[] with SH3\n");
-
-	sh4->m[RTCNT] = 0;
-	sh4_refresh_timer_recompute(sh4);
-	sh4->m[RTCSR] |= 128;
-	if ((sh4->m[MCR] & 4) && !(sh4->m[MCR] & 2))
+	m_m[RTCNT] = 0;
+	sh4_refresh_timer_recompute();
+	m_m[RTCSR] |= 128;
+	if ((m_m[MCR] & 4) && !(m_m[MCR] & 2))
 	{
-		sh4->m[RFCR] = (sh4->m[RFCR] + 1) & 1023;
-		if (((sh4->m[RTCSR] & 1) && (sh4->m[RFCR] == 512)) || (sh4->m[RFCR] == 0))
+		m_m[RFCR] = (m_m[RFCR] + 1) & 1023;
+		if (((m_m[RTCSR] & 1) && (m_m[RFCR] == 512)) || (m_m[RFCR] == 0))
 		{
-			sh4->m[RFCR] = 0;
-			sh4->m[RTCSR] |= 4;
+			m_m[RFCR] = 0;
+			m_m[RTCSR] |= 4;
 		}
 	}
 }
 
-static void increment_rtc_time(sh4_state *sh4, int mode)
+void sh34_base_device::increment_rtc_time(int mode)
 {
 	int carry, year, leap, days;
 
-	if (sh4->cpu_type != CPU_TYPE_SH4)
-		fatalerror("increment_rtc_time uses sh4->m[] with SH3\n");
+	if (m_cpu_type != CPU_TYPE_SH4)
+		fatalerror("increment_rtc_time uses m_m[] with SH3\n");
 
 	if (mode == 0)
 	{
 		carry = 0;
-		sh4->m[RSECCNT] = sh4->m[RSECCNT] + 1;
-		if ((sh4->m[RSECCNT] & 0xf) == 0xa)
-			sh4->m[RSECCNT] = sh4->m[RSECCNT] + 6;
-		if (sh4->m[RSECCNT] == 0x60)
+		m_m[RSECCNT] = m_m[RSECCNT] + 1;
+		if ((m_m[RSECCNT] & 0xf) == 0xa)
+			m_m[RSECCNT] = m_m[RSECCNT] + 6;
+		if (m_m[RSECCNT] == 0x60)
 		{
-			sh4->m[RSECCNT] = 0;
+			m_m[RSECCNT] = 0;
 			carry=1;
 		}
 		else
@@ -533,34 +529,34 @@ static void increment_rtc_time(sh4_state *sh4, int mode)
 	else
 		carry = 1;
 
-	sh4->m[RMINCNT] = sh4->m[RMINCNT] + carry;
-	if ((sh4->m[RMINCNT] & 0xf) == 0xa)
-		sh4->m[RMINCNT] = sh4->m[RMINCNT] + 6;
+	m_m[RMINCNT] = m_m[RMINCNT] + carry;
+	if ((m_m[RMINCNT] & 0xf) == 0xa)
+		m_m[RMINCNT] = m_m[RMINCNT] + 6;
 	carry=0;
-	if (sh4->m[RMINCNT] == 0x60)
+	if (m_m[RMINCNT] == 0x60)
 	{
-		sh4->m[RMINCNT] = 0;
+		m_m[RMINCNT] = 0;
 		carry = 1;
 	}
 
-	sh4->m[RHRCNT] = sh4->m[RHRCNT] + carry;
-	if ((sh4->m[RHRCNT] & 0xf) == 0xa)
-		sh4->m[RHRCNT] = sh4->m[RHRCNT] + 6;
+	m_m[RHRCNT] = m_m[RHRCNT] + carry;
+	if ((m_m[RHRCNT] & 0xf) == 0xa)
+		m_m[RHRCNT] = m_m[RHRCNT] + 6;
 	carry = 0;
-	if (sh4->m[RHRCNT] == 0x24)
+	if (m_m[RHRCNT] == 0x24)
 	{
-		sh4->m[RHRCNT] = 0;
+		m_m[RHRCNT] = 0;
 		carry = 1;
 	}
 
-	sh4->m[RWKCNT] = sh4->m[RWKCNT] + carry;
-	if (sh4->m[RWKCNT] == 0x7)
+	m_m[RWKCNT] = m_m[RWKCNT] + carry;
+	if (m_m[RWKCNT] == 0x7)
 	{
-		sh4->m[RWKCNT] = 0;
+		m_m[RWKCNT] = 0;
 	}
 
 	days = 0;
-	year = (sh4->m[RYRCNT] & 0xf) + ((sh4->m[RYRCNT] & 0xf0) >> 4)*10 + ((sh4->m[RYRCNT] & 0xf00) >> 8)*100 + ((sh4->m[RYRCNT] & 0xf000) >> 12)*1000;
+	year = (m_m[RYRCNT] & 0xf) + ((m_m[RYRCNT] & 0xf0) >> 4)*10 + ((m_m[RYRCNT] & 0xf00) >> 8)*100 + ((m_m[RYRCNT] & 0xf000) >> 12)*1000;
 	leap = 0;
 	if (!(year%100))
 	{
@@ -569,115 +565,112 @@ static void increment_rtc_time(sh4_state *sh4, int mode)
 	}
 	else if (!(year%4))
 		leap = 1;
-	if (sh4->m[RMONCNT] != 2)
+	if (m_m[RMONCNT] != 2)
 		leap = 0;
-	if (sh4->m[RMONCNT])
-		days = daysmonth[(sh4->m[RMONCNT] & 0xf) + ((sh4->m[RMONCNT] & 0xf0) >> 4)*10 - 1];
+	if (m_m[RMONCNT])
+		days = daysmonth[(m_m[RMONCNT] & 0xf) + ((m_m[RMONCNT] & 0xf0) >> 4)*10 - 1];
 
-	sh4->m[RDAYCNT] = sh4->m[RDAYCNT] + carry;
-	if ((sh4->m[RDAYCNT] & 0xf) == 0xa)
-		sh4->m[RDAYCNT] = sh4->m[RDAYCNT] + 6;
+	m_m[RDAYCNT] = m_m[RDAYCNT] + carry;
+	if ((m_m[RDAYCNT] & 0xf) == 0xa)
+		m_m[RDAYCNT] = m_m[RDAYCNT] + 6;
 	carry = 0;
-	if (sh4->m[RDAYCNT] > (days+leap))
+	if (m_m[RDAYCNT] > (days+leap))
 	{
-		sh4->m[RDAYCNT] = 1;
+		m_m[RDAYCNT] = 1;
 		carry = 1;
 	}
 
-	sh4->m[RMONCNT] = sh4->m[RMONCNT] + carry;
-	if ((sh4->m[RMONCNT] & 0xf) == 0xa)
-		sh4->m[RMONCNT] = sh4->m[RMONCNT] + 6;
+	m_m[RMONCNT] = m_m[RMONCNT] + carry;
+	if ((m_m[RMONCNT] & 0xf) == 0xa)
+		m_m[RMONCNT] = m_m[RMONCNT] + 6;
 	carry=0;
-	if (sh4->m[RMONCNT] == 0x13)
+	if (m_m[RMONCNT] == 0x13)
 	{
-		sh4->m[RMONCNT] = 1;
+		m_m[RMONCNT] = 1;
 		carry = 1;
 	}
 
-	sh4->m[RYRCNT] = sh4->m[RYRCNT] + carry;
-	if ((sh4->m[RYRCNT] & 0xf) >= 0xa)
-		sh4->m[RYRCNT] = sh4->m[RYRCNT] + 6;
-	if ((sh4->m[RYRCNT] & 0xf0) >= 0xa0)
-		sh4->m[RYRCNT] = sh4->m[RYRCNT] + 0x60;
-	if ((sh4->m[RYRCNT] & 0xf00) >= 0xa00)
-		sh4->m[RYRCNT] = sh4->m[RYRCNT] + 0x600;
-	if ((sh4->m[RYRCNT] & 0xf000) >= 0xa000)
-		sh4->m[RYRCNT] = 0;
+	m_m[RYRCNT] = m_m[RYRCNT] + carry;
+	if ((m_m[RYRCNT] & 0xf) >= 0xa)
+		m_m[RYRCNT] = m_m[RYRCNT] + 6;
+	if ((m_m[RYRCNT] & 0xf0) >= 0xa0)
+		m_m[RYRCNT] = m_m[RYRCNT] + 0x60;
+	if ((m_m[RYRCNT] & 0xf00) >= 0xa00)
+		m_m[RYRCNT] = m_m[RYRCNT] + 0x600;
+	if ((m_m[RYRCNT] & 0xf000) >= 0xa000)
+		m_m[RYRCNT] = 0;
 }
 
-static TIMER_CALLBACK( sh4_rtc_timer_callback )
+TIMER_CALLBACK_MEMBER( sh34_base_device::sh4_rtc_timer_callback )
 {
-	sh4_state *sh4 = (sh4_state *)ptr;
-
-	if (sh4->cpu_type != CPU_TYPE_SH4)
+	if (m_cpu_type != CPU_TYPE_SH4)
 	{
-		logerror("sh4_rtc_timer_callback uses sh4->m[] with SH3\n");
+		logerror("sh4_rtc_timer_callback uses m_m[] with SH3\n");
 		return;
 	}
 
-	sh4->rtc_timer->adjust(attotime::from_hz(128));
-	sh4->m[R64CNT] = (sh4->m[R64CNT]+1) & 0x7f;
-	if (sh4->m[R64CNT] == 64)
+	m_rtc_timer->adjust(attotime::from_hz(128));
+	m_m[R64CNT] = (m_m[R64CNT]+1) & 0x7f;
+	if (m_m[R64CNT] == 64)
 	{
-		sh4->m[RCR1] |= 0x80;
-		increment_rtc_time(sh4, 0);
-		//sh4_exception_request(sh4, SH4_INTC_NMI); // TEST
+		m_m[RCR1] |= 0x80;
+		increment_rtc_time(0);
+		//sh4_exception_request(SH4_INTC_NMI); // TEST
 	}
 }
 
 
-static void sh4_dmac_nmi(sh4_state *sh4) // manage dma when nmi gets asserted
+void sh34_base_device::sh4_dmac_nmi() // manage dma when nmi gets asserted
 {
 	int s;
 
-	sh4->SH4_DMAOR |= DMAOR_NMIF;
+	m_SH4_DMAOR |= DMAOR_NMIF;
 	for (s = 0;s < 4;s++)
 	{
-		if (sh4->dma_timer_active[s])
+		if (m_dma_timer_active[s])
 		{
 			logerror("SH4: DMA %d cancelled due to NMI but all data transferred", s);
-			sh4->dma_timer[s]->adjust(attotime::never, s);
-			sh4->dma_timer_active[s] = 0;
+			m_dma_timer[s]->adjust(attotime::never, s);
+			m_dma_timer_active[s] = 0;
 		}
 	}
 }
 
-void sh4_handler_ipra_w(sh4_state *sh4, UINT32 data, UINT32 mem_mask)
+void sh34_base_device::sh4_handler_ipra_w(UINT32 data, UINT32 mem_mask)
 {
-	COMBINE_DATA(&sh4->SH4_IPRA);
+	COMBINE_DATA(&m_SH4_IPRA);
 	/* 15 - 12 TMU0 */
 	/* 11 -  8 TMU1 */
 	/*  7 -  4 TMU2 */
 	/*  3 -  0 RTC  */
-	sh4->exception_priority[SH4_INTC_ATI]     = INTPRI(sh4->SH4_IPRA & 0x000f, SH4_INTC_ATI);
-	sh4->exception_priority[SH4_INTC_PRI]     = INTPRI(sh4->SH4_IPRA & 0x000f, SH4_INTC_PRI);
-	sh4->exception_priority[SH4_INTC_CUI]     = INTPRI(sh4->SH4_IPRA & 0x000f, SH4_INTC_CUI);
+	m_exception_priority[SH4_INTC_ATI]     = INTPRI(m_SH4_IPRA & 0x000f, SH4_INTC_ATI);
+	m_exception_priority[SH4_INTC_PRI]     = INTPRI(m_SH4_IPRA & 0x000f, SH4_INTC_PRI);
+	m_exception_priority[SH4_INTC_CUI]     = INTPRI(m_SH4_IPRA & 0x000f, SH4_INTC_CUI);
 
-	sh4->exception_priority[SH4_INTC_TUNI2]  = INTPRI((sh4->SH4_IPRA & 0x00f0) >> 4, SH4_INTC_TUNI2);
-	sh4->exception_priority[SH4_INTC_TICPI2] = INTPRI((sh4->SH4_IPRA & 0x00f0) >> 4, SH4_INTC_TICPI2);
+	m_exception_priority[SH4_INTC_TUNI2]  = INTPRI((m_SH4_IPRA & 0x00f0) >> 4, SH4_INTC_TUNI2);
+	m_exception_priority[SH4_INTC_TICPI2] = INTPRI((m_SH4_IPRA & 0x00f0) >> 4, SH4_INTC_TICPI2);
 
-	sh4->exception_priority[SH4_INTC_TUNI1]  = INTPRI((sh4->SH4_IPRA & 0x0f00) >> 8, SH4_INTC_TUNI1);
+	m_exception_priority[SH4_INTC_TUNI1]  = INTPRI((m_SH4_IPRA & 0x0f00) >> 8, SH4_INTC_TUNI1);
 
-	sh4->exception_priority[SH4_INTC_TUNI0]  = INTPRI((sh4->SH4_IPRA & 0xf000) >> 12, SH4_INTC_TUNI0);
+	m_exception_priority[SH4_INTC_TUNI0]  = INTPRI((m_SH4_IPRA & 0xf000) >> 12, SH4_INTC_TUNI0);
 
-	logerror("setting priorities TMU0 %01x TMU1 %01x TMU2 %01x RTC %01x\n", (sh4->SH4_IPRA & 0xf000)>>12, (sh4->SH4_IPRA & 0x0f00)>>8, (sh4->SH4_IPRA & 0x00f0)>>4, (sh4->SH4_IPRA & 0x000f)>>0);
+	logerror("setting priorities TMU0 %01x TMU1 %01x TMU2 %01x RTC %01x\n", (m_SH4_IPRA & 0xf000)>>12, (m_SH4_IPRA & 0x0f00)>>8, (m_SH4_IPRA & 0x00f0)>>4, (m_SH4_IPRA & 0x000f)>>0);
 
-	sh4_exception_recompute(sh4);
+	sh4_exception_recompute();
 }
 
 
-WRITE32_MEMBER( sh4_device::sh4_internal_w )
+WRITE32_MEMBER( sh4_base_device::sh4_internal_w )
 {
-	sh4_state *sh4 = get_safe_token(this);
 	int a;
 	UINT32 addr = (offset << 2) + 0xfe000000;
 	offset = ((addr & 0xfc) >> 2) | ((addr & 0x1fe0000) >> 11);
 
-	if (sh4->cpu_type != CPU_TYPE_SH4)
-		fatalerror("sh4_internal_w uses sh4->m[] with SH3\n");
+	if (m_cpu_type != CPU_TYPE_SH4)
+		fatalerror("sh4_internal_w uses m_m[] with SH3\n");
 
-	UINT32 old = sh4->m[offset];
-	COMBINE_DATA(sh4->m+offset);
+	UINT32 old = m_m[offset];
+	COMBINE_DATA(m_m+offset);
 
 //  printf("sh4_internal_w:  Write %08x (%x), %08x @ %08x\n", 0xfe000000+((offset & 0x3fc0) << 11)+((offset & 0x3f) << 2), offset, data, mem_mask);
 
@@ -689,157 +682,157 @@ WRITE32_MEMBER( sh4_device::sh4_internal_w )
 			printf("SH4 MMU Enabled\n");
 			printf("If you're seeing this, but running something other than a Naomi GD-ROM game then chances are it won't work\n");
 			printf("The MMU emulation is a hack specific to that system\n");
-			sh4->sh4_mmu_enabled = 1;
+			m_sh4_mmu_enabled = 1;
 
 			// should be a different bit!
 			{
 				int i;
 				for (i=0;i<64;i++)
 				{
-					sh4->sh4_tlb_address[i] = 0;
-					sh4->sh4_tlb_data[i] = 0;
+					m_sh4_tlb_address[i] = 0;
+					m_sh4_tlb_data[i] = 0;
 				}
 
 			}
 		}
 		else
 		{
-			sh4->sh4_mmu_enabled = 0;
+			m_sh4_mmu_enabled = 0;
 		}
 
 		break;
 
 		// Memory refresh
 	case RTCSR:
-		sh4->m[RTCSR] &= 255;
+		m_m[RTCSR] &= 255;
 		if ((old >> 3) & 7)
-			sh4->m[RTCNT] = compute_ticks_refresh_timer(sh4->refresh_timer, sh4->bus_clock, sh4->refresh_timer_base, rtcnt_div[(old >> 3) & 7]) & 0xff;
-		if ((sh4->m[RTCSR] >> 3) & 7)
+			m_m[RTCNT] = compute_ticks_refresh_timer(m_refresh_timer, m_bus_clock, m_refresh_timer_base, rtcnt_div[(old >> 3) & 7]) & 0xff;
+		if ((m_m[RTCSR] >> 3) & 7)
 		{ // activated
-			sh4_refresh_timer_recompute(sh4);
+			sh4_refresh_timer_recompute();
 		}
 		else
 		{
-			sh4->refresh_timer->adjust(attotime::never);
+			m_refresh_timer->adjust(attotime::never);
 		}
 		break;
 
 	case RTCNT:
-		sh4->m[RTCNT] &= 255;
-		if ((sh4->m[RTCSR] >> 3) & 7)
+		m_m[RTCNT] &= 255;
+		if ((m_m[RTCSR] >> 3) & 7)
 		{ // active
-			sh4_refresh_timer_recompute(sh4);
+			sh4_refresh_timer_recompute();
 		}
 		break;
 
 	case RTCOR:
-		sh4->m[RTCOR] &= 255;
-		if ((sh4->m[RTCSR] >> 3) & 7)
+		m_m[RTCOR] &= 255;
+		if ((m_m[RTCSR] >> 3) & 7)
 		{ // active
-			sh4->m[RTCNT] = compute_ticks_refresh_timer(sh4->refresh_timer, sh4->bus_clock, sh4->refresh_timer_base, rtcnt_div[(sh4->m[RTCSR] >> 3) & 7]) & 0xff;
-			sh4_refresh_timer_recompute(sh4);
+			m_m[RTCNT] = compute_ticks_refresh_timer(m_refresh_timer, m_bus_clock, m_refresh_timer_base, rtcnt_div[(m_m[RTCSR] >> 3) & 7]) & 0xff;
+			sh4_refresh_timer_recompute();
 		}
 		break;
 
 	case RFCR:
-		sh4->m[RFCR] &= 1023;
+		m_m[RFCR] &= 1023;
 		break;
 
 		// RTC
 	case RCR1:
-		if ((sh4->m[RCR1] & 8) && (~old & 8)) // 0 -> 1
-			sh4->m[RCR1] ^= 1;
+		if ((m_m[RCR1] & 8) && (~old & 8)) // 0 -> 1
+			m_m[RCR1] ^= 1;
 		break;
 
 	case RCR2:
-		if (sh4->m[RCR2] & 2)
+		if (m_m[RCR2] & 2)
 		{
-			sh4->m[R64CNT] = 0;
-			sh4->m[RCR2] ^= 2;
+			m_m[R64CNT] = 0;
+			m_m[RCR2] ^= 2;
 		}
-		if (sh4->m[RCR2] & 4)
+		if (m_m[RCR2] & 4)
 		{
-			sh4->m[R64CNT] = 0;
-			if (sh4->m[RSECCNT] >= 30)
-				increment_rtc_time(sh4, 1);
-			sh4->m[RSECCNT] = 0;
+			m_m[R64CNT] = 0;
+			if (m_m[RSECCNT] >= 30)
+				increment_rtc_time(1);
+			m_m[RSECCNT] = 0;
 		}
-		if ((sh4->m[RCR2] & 8) && (~old & 8))
+		if ((m_m[RCR2] & 8) && (~old & 8))
 		{ // 0 -> 1
-			sh4->rtc_timer->adjust(attotime::from_hz(128));
+			m_rtc_timer->adjust(attotime::from_hz(128));
 		}
-		else if (~(sh4->m[RCR2]) & 8)
+		else if (~(m_m[RCR2]) & 8)
 		{ // 0
-			sh4->rtc_timer->adjust(attotime::never);
+			m_rtc_timer->adjust(attotime::never);
 		}
 		break;
 
 /*********************************************************************************************************************
         TMU (Timer Unit)
 *********************************************************************************************************************/
-	case SH4_TSTR_ADDR: sh4_handle_tstr_addr_w(sh4,data,mem_mask);   break;
-	case SH4_TCR0_ADDR: sh4_handle_tcr0_addr_w(sh4,data,mem_mask);   break;
-	case SH4_TCR1_ADDR: sh4_handle_tcr1_addr_w(sh4,data,mem_mask);   break;
-	case SH4_TCR2_ADDR: sh4_handle_tcr2_addr_w(sh4,data,mem_mask);   break;
-	case SH4_TCOR0_ADDR: sh4_handle_tcor0_addr_w(sh4,data,mem_mask); break;
-	case SH4_TCNT0_ADDR: sh4_handle_tcnt0_addr_w(sh4,data,mem_mask); break;
-	case SH4_TCOR1_ADDR: sh4_handle_tcor1_addr_w(sh4,data,mem_mask); break;
-	case SH4_TCNT1_ADDR: sh4_handle_tcnt1_addr_w(sh4,data,mem_mask); break;
-	case SH4_TCOR2_ADDR: sh4_handle_tcor2_addr_w(sh4,data,mem_mask); break;
-	case SH4_TCNT2_ADDR: sh4_handle_tcnt2_addr_w(sh4,data,mem_mask); break;
-	case SH4_TOCR_ADDR: sh4_handle_tocr_addr_w(sh4,data,mem_mask);   break; // not supported
-	case SH4_TCPR2_ADDR: sh4_handle_tcpr2_addr_w(sh4,data,mem_mask); break; // not supported
+	case SH4_TSTR_ADDR: sh4_handle_tstr_addr_w(data,mem_mask);   break;
+	case SH4_TCR0_ADDR: sh4_handle_tcr0_addr_w(data,mem_mask);   break;
+	case SH4_TCR1_ADDR: sh4_handle_tcr1_addr_w(data,mem_mask);   break;
+	case SH4_TCR2_ADDR: sh4_handle_tcr2_addr_w(data,mem_mask);   break;
+	case SH4_TCOR0_ADDR: sh4_handle_tcor0_addr_w(data,mem_mask); break;
+	case SH4_TCNT0_ADDR: sh4_handle_tcnt0_addr_w(data,mem_mask); break;
+	case SH4_TCOR1_ADDR: sh4_handle_tcor1_addr_w(data,mem_mask); break;
+	case SH4_TCNT1_ADDR: sh4_handle_tcnt1_addr_w(data,mem_mask); break;
+	case SH4_TCOR2_ADDR: sh4_handle_tcor2_addr_w(data,mem_mask); break;
+	case SH4_TCNT2_ADDR: sh4_handle_tcnt2_addr_w(data,mem_mask); break;
+	case SH4_TOCR_ADDR: sh4_handle_tocr_addr_w(data,mem_mask);   break; // not supported
+	case SH4_TCPR2_ADDR: sh4_handle_tcpr2_addr_w(data,mem_mask); break; // not supported
 /*********************************************************************************************************************
         INTC (Interrupt Controller)
 *********************************************************************************************************************/
 	case ICR:
-		sh4->m[ICR] = (sh4->m[ICR] & 0x7fff) | (old & 0x8000);
+		m_m[ICR] = (m_m[ICR] & 0x7fff) | (old & 0x8000);
 		break;
-	case IPRA: sh4_handler_ipra_w(sh4, data, mem_mask); break;
+	case IPRA: sh4_handler_ipra_w(data, mem_mask); break;
 	case IPRB:
-		sh4->exception_priority[SH4_INTC_SCI1ERI] = INTPRI((sh4->m[IPRB] & 0x00f0) >> 4, SH4_INTC_SCI1ERI);
-		sh4->exception_priority[SH4_INTC_SCI1RXI] = INTPRI((sh4->m[IPRB] & 0x00f0) >> 4, SH4_INTC_SCI1RXI);
-		sh4->exception_priority[SH4_INTC_SCI1TXI] = INTPRI((sh4->m[IPRB] & 0x00f0) >> 4, SH4_INTC_SCI1TXI);
-		sh4->exception_priority[SH4_INTC_SCI1TEI] = INTPRI((sh4->m[IPRB] & 0x00f0) >> 4, SH4_INTC_SCI1TEI);
-		sh4->exception_priority[SH4_INTC_RCMI] = INTPRI((sh4->m[IPRB] & 0x0f00) >> 8, SH4_INTC_RCMI);
-		sh4->exception_priority[SH4_INTC_ROVI] = INTPRI((sh4->m[IPRB] & 0x0f00) >> 8, SH4_INTC_ROVI);
-		sh4->exception_priority[SH4_INTC_ITI] = INTPRI((sh4->m[IPRB] & 0xf000) >> 12, SH4_INTC_ITI);
-		sh4_exception_recompute(sh4);
+		m_exception_priority[SH4_INTC_SCI1ERI] = INTPRI((m_m[IPRB] & 0x00f0) >> 4, SH4_INTC_SCI1ERI);
+		m_exception_priority[SH4_INTC_SCI1RXI] = INTPRI((m_m[IPRB] & 0x00f0) >> 4, SH4_INTC_SCI1RXI);
+		m_exception_priority[SH4_INTC_SCI1TXI] = INTPRI((m_m[IPRB] & 0x00f0) >> 4, SH4_INTC_SCI1TXI);
+		m_exception_priority[SH4_INTC_SCI1TEI] = INTPRI((m_m[IPRB] & 0x00f0) >> 4, SH4_INTC_SCI1TEI);
+		m_exception_priority[SH4_INTC_RCMI] = INTPRI((m_m[IPRB] & 0x0f00) >> 8, SH4_INTC_RCMI);
+		m_exception_priority[SH4_INTC_ROVI] = INTPRI((m_m[IPRB] & 0x0f00) >> 8, SH4_INTC_ROVI);
+		m_exception_priority[SH4_INTC_ITI] = INTPRI((m_m[IPRB] & 0xf000) >> 12, SH4_INTC_ITI);
+		sh4_exception_recompute();
 		break;
 	case IPRC:
-		sh4->exception_priority[SH4_INTC_HUDI] = INTPRI(sh4->m[IPRC] & 0x000f, SH4_INTC_HUDI);
-		sh4->exception_priority[SH4_INTC_SCIFERI] = INTPRI((sh4->m[IPRC] & 0x00f0) >> 4, SH4_INTC_SCIFERI);
-		sh4->exception_priority[SH4_INTC_SCIFRXI] = INTPRI((sh4->m[IPRC] & 0x00f0) >> 4, SH4_INTC_SCIFRXI);
-		sh4->exception_priority[SH4_INTC_SCIFBRI] = INTPRI((sh4->m[IPRC] & 0x00f0) >> 4, SH4_INTC_SCIFBRI);
-		sh4->exception_priority[SH4_INTC_SCIFTXI] = INTPRI((sh4->m[IPRC] & 0x00f0) >> 4, SH4_INTC_SCIFTXI);
-		sh4->exception_priority[SH4_INTC_DMTE0] = INTPRI((sh4->m[IPRC] & 0x0f00) >> 8, SH4_INTC_DMTE0);
-		sh4->exception_priority[SH4_INTC_DMTE1] = INTPRI((sh4->m[IPRC] & 0x0f00) >> 8, SH4_INTC_DMTE1);
-		sh4->exception_priority[SH4_INTC_DMTE2] = INTPRI((sh4->m[IPRC] & 0x0f00) >> 8, SH4_INTC_DMTE2);
-		sh4->exception_priority[SH4_INTC_DMTE3] = INTPRI((sh4->m[IPRC] & 0x0f00) >> 8, SH4_INTC_DMTE3);
-		sh4->exception_priority[SH4_INTC_DMAE] = INTPRI((sh4->m[IPRC] & 0x0f00) >> 8, SH4_INTC_DMAE);
-		sh4->exception_priority[SH4_INTC_GPOI] = INTPRI((sh4->m[IPRC] & 0xf000) >> 12, SH4_INTC_GPOI);
-		sh4_exception_recompute(sh4);
+		m_exception_priority[SH4_INTC_HUDI] = INTPRI(m_m[IPRC] & 0x000f, SH4_INTC_HUDI);
+		m_exception_priority[SH4_INTC_SCIFERI] = INTPRI((m_m[IPRC] & 0x00f0) >> 4, SH4_INTC_SCIFERI);
+		m_exception_priority[SH4_INTC_SCIFRXI] = INTPRI((m_m[IPRC] & 0x00f0) >> 4, SH4_INTC_SCIFRXI);
+		m_exception_priority[SH4_INTC_SCIFBRI] = INTPRI((m_m[IPRC] & 0x00f0) >> 4, SH4_INTC_SCIFBRI);
+		m_exception_priority[SH4_INTC_SCIFTXI] = INTPRI((m_m[IPRC] & 0x00f0) >> 4, SH4_INTC_SCIFTXI);
+		m_exception_priority[SH4_INTC_DMTE0] = INTPRI((m_m[IPRC] & 0x0f00) >> 8, SH4_INTC_DMTE0);
+		m_exception_priority[SH4_INTC_DMTE1] = INTPRI((m_m[IPRC] & 0x0f00) >> 8, SH4_INTC_DMTE1);
+		m_exception_priority[SH4_INTC_DMTE2] = INTPRI((m_m[IPRC] & 0x0f00) >> 8, SH4_INTC_DMTE2);
+		m_exception_priority[SH4_INTC_DMTE3] = INTPRI((m_m[IPRC] & 0x0f00) >> 8, SH4_INTC_DMTE3);
+		m_exception_priority[SH4_INTC_DMAE] = INTPRI((m_m[IPRC] & 0x0f00) >> 8, SH4_INTC_DMAE);
+		m_exception_priority[SH4_INTC_GPOI] = INTPRI((m_m[IPRC] & 0xf000) >> 12, SH4_INTC_GPOI);
+		sh4_exception_recompute();
 		break;
 /*********************************************************************************************************************
         DMAC (DMA Controller)
 *********************************************************************************************************************/
-	case SH4_SAR0_ADDR: sh4_handle_sar0_addr_w(sh4,data,mem_mask);   break;
-	case SH4_SAR1_ADDR: sh4_handle_sar1_addr_w(sh4,data,mem_mask);   break;
-	case SH4_SAR2_ADDR: sh4_handle_sar2_addr_w(sh4,data,mem_mask);   break;
-	case SH4_SAR3_ADDR: sh4_handle_sar3_addr_w(sh4,data,mem_mask);   break;
-	case SH4_DAR0_ADDR: sh4_handle_dar0_addr_w(sh4,data,mem_mask);   break;
-	case SH4_DAR1_ADDR: sh4_handle_dar1_addr_w(sh4,data,mem_mask);   break;
-	case SH4_DAR2_ADDR: sh4_handle_dar2_addr_w(sh4,data,mem_mask);   break;
-	case SH4_DAR3_ADDR: sh4_handle_dar3_addr_w(sh4,data,mem_mask);   break;
-	case SH4_DMATCR0_ADDR: sh4_handle_dmatcr0_addr_w(sh4,data,mem_mask);   break;
-	case SH4_DMATCR1_ADDR: sh4_handle_dmatcr1_addr_w(sh4,data,mem_mask);   break;
-	case SH4_DMATCR2_ADDR: sh4_handle_dmatcr2_addr_w(sh4,data,mem_mask);   break;
-	case SH4_DMATCR3_ADDR: sh4_handle_dmatcr3_addr_w(sh4,data,mem_mask);   break;
-	case SH4_CHCR0_ADDR: sh4_handle_chcr0_addr_w(sh4,data,mem_mask);   break;
-	case SH4_CHCR1_ADDR: sh4_handle_chcr1_addr_w(sh4,data,mem_mask);   break;
-	case SH4_CHCR2_ADDR: sh4_handle_chcr2_addr_w(sh4,data,mem_mask);   break;
-	case SH4_CHCR3_ADDR: sh4_handle_chcr3_addr_w(sh4,data,mem_mask);   break;
-	case SH4_DMAOR_ADDR: sh4_handle_dmaor_addr_w(sh4,data,mem_mask);   break;
+	case SH4_SAR0_ADDR: sh4_handle_sar0_addr_w(data,mem_mask);   break;
+	case SH4_SAR1_ADDR: sh4_handle_sar1_addr_w(data,mem_mask);   break;
+	case SH4_SAR2_ADDR: sh4_handle_sar2_addr_w(data,mem_mask);   break;
+	case SH4_SAR3_ADDR: sh4_handle_sar3_addr_w(data,mem_mask);   break;
+	case SH4_DAR0_ADDR: sh4_handle_dar0_addr_w(data,mem_mask);   break;
+	case SH4_DAR1_ADDR: sh4_handle_dar1_addr_w(data,mem_mask);   break;
+	case SH4_DAR2_ADDR: sh4_handle_dar2_addr_w(data,mem_mask);   break;
+	case SH4_DAR3_ADDR: sh4_handle_dar3_addr_w(data,mem_mask);   break;
+	case SH4_DMATCR0_ADDR: sh4_handle_dmatcr0_addr_w(data,mem_mask);   break;
+	case SH4_DMATCR1_ADDR: sh4_handle_dmatcr1_addr_w(data,mem_mask);   break;
+	case SH4_DMATCR2_ADDR: sh4_handle_dmatcr2_addr_w(data,mem_mask);   break;
+	case SH4_DMATCR3_ADDR: sh4_handle_dmatcr3_addr_w(data,mem_mask);   break;
+	case SH4_CHCR0_ADDR: sh4_handle_chcr0_addr_w(data,mem_mask);   break;
+	case SH4_CHCR1_ADDR: sh4_handle_chcr1_addr_w(data,mem_mask);   break;
+	case SH4_CHCR2_ADDR: sh4_handle_chcr2_addr_w(data,mem_mask);   break;
+	case SH4_CHCR3_ADDR: sh4_handle_chcr3_addr_w(data,mem_mask);   break;
+	case SH4_DMAOR_ADDR: sh4_handle_dmaor_addr_w(data,mem_mask);   break;
 /*********************************************************************************************************************
         Store Queues
 *********************************************************************************************************************/
@@ -850,36 +843,36 @@ WRITE32_MEMBER( sh4_device::sh4_internal_w )
         I/O
 *********************************************************************************************************************/
 	case PCTRA:
-		sh4->ioport16_pullup = 0;
-		sh4->ioport16_direction = 0;
+		m_ioport16_pullup = 0;
+		m_ioport16_direction = 0;
 		for (a=0;a < 16;a++) {
-			sh4->ioport16_direction |= (sh4->m[PCTRA] & (1 << (a*2))) >> a;
-			sh4->ioport16_pullup |= (sh4->m[PCTRA] & (1 << (a*2+1))) >> (a+1);
+			m_ioport16_direction |= (m_m[PCTRA] & (1 << (a*2))) >> a;
+			m_ioport16_pullup |= (m_m[PCTRA] & (1 << (a*2+1))) >> (a+1);
 		}
-		sh4->ioport16_direction &= 0xffff;
-		sh4->ioport16_pullup = (sh4->ioport16_pullup | sh4->ioport16_direction) ^ 0xffff;
-		if (sh4->m[BCR2] & 1)
-			sh4->io->write_dword(SH4_IOPORT_16, (UINT64)(sh4->m[PDTRA] & sh4->ioport16_direction) | ((UINT64)sh4->m[PCTRA] << 16));
+		m_ioport16_direction &= 0xffff;
+		m_ioport16_pullup = (m_ioport16_pullup | m_ioport16_direction) ^ 0xffff;
+		if (m_m[BCR2] & 1)
+			m_io->write_dword(SH4_IOPORT_16, (UINT64)(m_m[PDTRA] & m_ioport16_direction) | ((UINT64)m_m[PCTRA] << 16));
 		break;
 	case PDTRA:
-		if (sh4->m[BCR2] & 1)
-			sh4->io->write_dword(SH4_IOPORT_16, (UINT64)(sh4->m[PDTRA] & sh4->ioport16_direction) | ((UINT64)sh4->m[PCTRA] << 16));
+		if (m_m[BCR2] & 1)
+			m_io->write_dword(SH4_IOPORT_16, (UINT64)(m_m[PDTRA] & m_ioport16_direction) | ((UINT64)m_m[PCTRA] << 16));
 		break;
 	case PCTRB:
-		sh4->ioport4_pullup = 0;
-		sh4->ioport4_direction = 0;
+		m_ioport4_pullup = 0;
+		m_ioport4_direction = 0;
 		for (a=0;a < 4;a++) {
-			sh4->ioport4_direction |= (sh4->m[PCTRB] & (1 << (a*2))) >> a;
-			sh4->ioport4_pullup |= (sh4->m[PCTRB] & (1 << (a*2+1))) >> (a+1);
+			m_ioport4_direction |= (m_m[PCTRB] & (1 << (a*2))) >> a;
+			m_ioport4_pullup |= (m_m[PCTRB] & (1 << (a*2+1))) >> (a+1);
 		}
-		sh4->ioport4_direction &= 0xf;
-		sh4->ioport4_pullup = (sh4->ioport4_pullup | sh4->ioport4_direction) ^ 0xf;
-		if (sh4->m[BCR2] & 1)
-			sh4->io->write_dword(SH4_IOPORT_4, (sh4->m[PDTRB] & sh4->ioport4_direction) | (sh4->m[PCTRB] << 16));
+		m_ioport4_direction &= 0xf;
+		m_ioport4_pullup = (m_ioport4_pullup | m_ioport4_direction) ^ 0xf;
+		if (m_m[BCR2] & 1)
+			m_io->write_dword(SH4_IOPORT_4, (m_m[PDTRB] & m_ioport4_direction) | (m_m[PCTRB] << 16));
 		break;
 	case PDTRB:
-		if (sh4->m[BCR2] & 1)
-			sh4->io->write_dword(SH4_IOPORT_4, (sh4->m[PDTRB] & sh4->ioport4_direction) | (sh4->m[PCTRB] << 16));
+		if (m_m[BCR2] & 1)
+			m_io->write_dword(SH4_IOPORT_4, (m_m[PDTRB] & m_ioport4_direction) | (m_m[PCTRB] << 16));
 		break;
 
 	case SCBRR2:
@@ -894,12 +887,10 @@ WRITE32_MEMBER( sh4_device::sh4_internal_w )
 	}
 }
 
-READ32_MEMBER( sh4_device::sh4_internal_r )
+READ32_MEMBER( sh4_base_device::sh4_internal_r )
 {
-	sh4_state *sh4 = get_safe_token(this);
-
-	if (sh4->cpu_type != CPU_TYPE_SH4)
-		fatalerror("sh4_internal_r uses sh4->m[] with SH3\n");
+	if (m_cpu_type != CPU_TYPE_SH4)
+		fatalerror("sh4_internal_r uses m_m[] with SH3\n");
 
 	UINT32 addr = (offset << 2) + 0xfe000000;
 	offset = ((addr & 0xfc) >> 2) | ((addr & 0x1fe0000) >> 11);
@@ -915,100 +906,98 @@ READ32_MEMBER( sh4_device::sh4_internal_r )
 	case IPRD:
 		return 0x00000000;  // SH7750 ignores writes here and always returns zero
 	case RTCNT:
-		if ((sh4->m[RTCSR] >> 3) & 7)
+		if ((m_m[RTCSR] >> 3) & 7)
 		{ // activated
-			//((double)rtcnt_div[(sh4->m[RTCSR] >> 3) & 7] / (double)100000000)
-			//return (refresh_timer_base + (sh4->refresh_timer->elapsed() * (double)100000000) / (double)rtcnt_div[(sh4->m[RTCSR] >> 3) & 7]) & 0xff;
-			return compute_ticks_refresh_timer(sh4->refresh_timer, sh4->bus_clock, sh4->refresh_timer_base, rtcnt_div[(sh4->m[RTCSR] >> 3) & 7]) & 0xff;
+			//((double)rtcnt_div[(m_m[RTCSR] >> 3) & 7] / (double)100000000)
+			//return (refresh_timer_base + (m_refresh_timer->elapsed() * (double)100000000) / (double)rtcnt_div[(m_m[RTCSR] >> 3) & 7]) & 0xff;
+			return compute_ticks_refresh_timer(m_refresh_timer, m_bus_clock, m_refresh_timer_base, rtcnt_div[(m_m[RTCSR] >> 3) & 7]) & 0xff;
 		}
 		else
-			return sh4->m[RTCNT];
+			return m_m[RTCNT];
 
 /*********************************************************************************************************************
         INTC (Interrupt Controller)
 *********************************************************************************************************************/
 
 	case IPRA:
-		return sh4->SH4_IPRA;
+		return m_SH4_IPRA;
 
 /*********************************************************************************************************************
         TMU (Timer Unit)
 *********************************************************************************************************************/
-	case SH4_TSTR_ADDR:  return sh4_handle_tstr_addr_r(sh4, mem_mask);
-	case SH4_TCR0_ADDR:  return sh4_handle_tcr0_addr_r(sh4, mem_mask);
-	case SH4_TCR1_ADDR:  return sh4_handle_tcr1_addr_r(sh4, mem_mask);
-	case SH4_TCR2_ADDR:  return sh4_handle_tcr2_addr_r(sh4, mem_mask);
-	case SH4_TCNT0_ADDR: return sh4_handle_tcnt0_addr_r(sh4, mem_mask);
-	case SH4_TCNT1_ADDR: return sh4_handle_tcnt1_addr_r(sh4, mem_mask);
-	case SH4_TCNT2_ADDR: return sh4_handle_tcnt2_addr_r(sh4, mem_mask);
-	case SH4_TCOR0_ADDR: return sh4_handle_tcor0_addr_r(sh4, mem_mask);
-	case SH4_TCOR1_ADDR: return sh4_handle_tcor1_addr_r(sh4, mem_mask);
-	case SH4_TCOR2_ADDR: return sh4_handle_tcor2_addr_r(sh4, mem_mask);
-	case SH4_TOCR_ADDR:  return sh4_handle_tocr_addr_r(sh4, mem_mask); // not supported
-	case SH4_TCPR2_ADDR: return sh4_handle_tcpr2_addr_r(sh4, mem_mask); // not supported
+	case SH4_TSTR_ADDR:  return sh4_handle_tstr_addr_r(mem_mask);
+	case SH4_TCR0_ADDR:  return sh4_handle_tcr0_addr_r(mem_mask);
+	case SH4_TCR1_ADDR:  return sh4_handle_tcr1_addr_r(mem_mask);
+	case SH4_TCR2_ADDR:  return sh4_handle_tcr2_addr_r(mem_mask);
+	case SH4_TCNT0_ADDR: return sh4_handle_tcnt0_addr_r(mem_mask);
+	case SH4_TCNT1_ADDR: return sh4_handle_tcnt1_addr_r(mem_mask);
+	case SH4_TCNT2_ADDR: return sh4_handle_tcnt2_addr_r(mem_mask);
+	case SH4_TCOR0_ADDR: return sh4_handle_tcor0_addr_r(mem_mask);
+	case SH4_TCOR1_ADDR: return sh4_handle_tcor1_addr_r(mem_mask);
+	case SH4_TCOR2_ADDR: return sh4_handle_tcor2_addr_r(mem_mask);
+	case SH4_TOCR_ADDR:  return sh4_handle_tocr_addr_r(mem_mask); // not supported
+	case SH4_TCPR2_ADDR: return sh4_handle_tcpr2_addr_r(mem_mask); // not supported
 /*********************************************************************************************************************
         DMAC (DMA Controller)
 *********************************************************************************************************************/
-	case SH4_SAR0_ADDR: return sh4_handle_sar0_addr_r(sh4,mem_mask);
-	case SH4_SAR1_ADDR: return sh4_handle_sar1_addr_r(sh4,mem_mask);
-	case SH4_SAR2_ADDR: return sh4_handle_sar2_addr_r(sh4,mem_mask);
-	case SH4_SAR3_ADDR: return sh4_handle_sar3_addr_r(sh4,mem_mask);
-	case SH4_DAR0_ADDR: return sh4_handle_dar0_addr_r(sh4,mem_mask);
-	case SH4_DAR1_ADDR: return sh4_handle_dar1_addr_r(sh4,mem_mask);
-	case SH4_DAR2_ADDR: return sh4_handle_dar2_addr_r(sh4,mem_mask);
-	case SH4_DAR3_ADDR: return sh4_handle_dar3_addr_r(sh4,mem_mask);
-	case SH4_DMATCR0_ADDR: return sh4_handle_dmatcr0_addr_r(sh4,mem_mask);
-	case SH4_DMATCR1_ADDR: return sh4_handle_dmatcr1_addr_r(sh4,mem_mask);
-	case SH4_DMATCR2_ADDR: return sh4_handle_dmatcr2_addr_r(sh4,mem_mask);
-	case SH4_DMATCR3_ADDR: return sh4_handle_dmatcr3_addr_r(sh4,mem_mask);
-	case SH4_CHCR0_ADDR: return sh4_handle_chcr0_addr_r(sh4,mem_mask);
-	case SH4_CHCR1_ADDR: return sh4_handle_chcr1_addr_r(sh4,mem_mask);
-	case SH4_CHCR2_ADDR: return sh4_handle_chcr2_addr_r(sh4,mem_mask);
-	case SH4_CHCR3_ADDR: return sh4_handle_chcr3_addr_r(sh4,mem_mask);
-	case SH4_DMAOR_ADDR: return sh4_handle_dmaor_addr_r(sh4,mem_mask);
+	case SH4_SAR0_ADDR: return sh4_handle_sar0_addr_r(mem_mask);
+	case SH4_SAR1_ADDR: return sh4_handle_sar1_addr_r(mem_mask);
+	case SH4_SAR2_ADDR: return sh4_handle_sar2_addr_r(mem_mask);
+	case SH4_SAR3_ADDR: return sh4_handle_sar3_addr_r(mem_mask);
+	case SH4_DAR0_ADDR: return sh4_handle_dar0_addr_r(mem_mask);
+	case SH4_DAR1_ADDR: return sh4_handle_dar1_addr_r(mem_mask);
+	case SH4_DAR2_ADDR: return sh4_handle_dar2_addr_r(mem_mask);
+	case SH4_DAR3_ADDR: return sh4_handle_dar3_addr_r(mem_mask);
+	case SH4_DMATCR0_ADDR: return sh4_handle_dmatcr0_addr_r(mem_mask);
+	case SH4_DMATCR1_ADDR: return sh4_handle_dmatcr1_addr_r(mem_mask);
+	case SH4_DMATCR2_ADDR: return sh4_handle_dmatcr2_addr_r(mem_mask);
+	case SH4_DMATCR3_ADDR: return sh4_handle_dmatcr3_addr_r(mem_mask);
+	case SH4_CHCR0_ADDR: return sh4_handle_chcr0_addr_r(mem_mask);
+	case SH4_CHCR1_ADDR: return sh4_handle_chcr1_addr_r(mem_mask);
+	case SH4_CHCR2_ADDR: return sh4_handle_chcr2_addr_r(mem_mask);
+	case SH4_CHCR3_ADDR: return sh4_handle_chcr3_addr_r(mem_mask);
+	case SH4_DMAOR_ADDR: return sh4_handle_dmaor_addr_r(mem_mask);
 /*********************************************************************************************************************
         I/O Ports
 *********************************************************************************************************************/
 
 	case PDTRA:
-		if (sh4->m[BCR2] & 1)
-			return (sh4->io->read_dword(SH4_IOPORT_16) & ~sh4->ioport16_direction) | (sh4->m[PDTRA] & sh4->ioport16_direction);
+		if (m_m[BCR2] & 1)
+			return (m_io->read_dword(SH4_IOPORT_16) & ~m_ioport16_direction) | (m_m[PDTRA] & m_ioport16_direction);
 		break;
 	case PDTRB:
-		if (sh4->m[BCR2] & 1)
-			return (sh4->io->read_dword(SH4_IOPORT_4) & ~sh4->ioport4_direction) | (sh4->m[PDTRB] & sh4->ioport4_direction);
+		if (m_m[BCR2] & 1)
+			return (m_io->read_dword(SH4_IOPORT_4) & ~m_ioport4_direction) | (m_m[PDTRB] & m_ioport4_direction);
 		break;
 
 		// SCIF (UART with FIFO)
 	case SCFSR2:
 		return 0x60; //read-only status register
 	}
-	return sh4->m[offset];
+	return m_m[offset];
 }
 
-void sh4_set_frt_input(device_t *device, int state)
+void sh34_base_device::sh4_set_frt_input(int state)
 {
-	sh4_state *sh4 = get_safe_token(device);
-
-	if (sh4->cpu_type != CPU_TYPE_SH4)
-		fatalerror("sh4_set_frt_input uses sh4->m[] with SH3\n");
+	if (m_cpu_type != CPU_TYPE_SH4)
+		fatalerror("sh4_set_frt_input uses m_m[] with SH3\n");
 
 	if(state == PULSE_LINE)
 	{
-		sh4_set_frt_input(device, ASSERT_LINE);
-		sh4_set_frt_input(device, CLEAR_LINE);
+		sh4_set_frt_input(ASSERT_LINE);
+		sh4_set_frt_input(CLEAR_LINE);
 		return;
 	}
 
-	if(sh4->frt_input == state) {
+	if(m_frt_input == state) {
 		return;
 	}
 
-	sh4->frt_input = state;
+	m_frt_input = state;
 
-	if (sh4->cpu_type == CPU_TYPE_SH4)
+	if (m_cpu_type == CPU_TYPE_SH4)
 	{
-		if(sh4->m[5] & 0x8000) {
+		if(m_m[5] & 0x8000) {
 			if(state == CLEAR_LINE) {
 				return;
 			}
@@ -1020,32 +1009,30 @@ void sh4_set_frt_input(device_t *device, int state)
 	}
 	else
 	{
-		fatalerror("sh4_set_frt_input uses sh4->m[] with SH3\n");
+		fatalerror("sh4_set_frt_input uses m_m[] with SH3\n");
 	}
 
 #if 0
 	sh4_timer_resync();
-	sh4->icr = sh4->frc;
-	sh4->m[4] |= ICF;
-	logerror("SH4 '%s': ICF activated (%x)\n", sh4->device->tag(), sh4->pc & AM);
+	m_icr = m_frc;
+	m_m[4] |= ICF;
+	logerror("SH4 '%s': ICF activated (%x)\n", tag(), m_pc & AM);
 	sh4_recalc_irq();
 #endif
 }
 
-void sh4_set_irln_input(device_t *device, int value)
+void sh34_base_device::sh4_set_irln_input(int value)
 {
-	sh4_state *sh4 = get_safe_token(device);
-
-	if (sh4->irln == value)
+	if (m_irln == value)
 		return;
-	sh4->irln = value;
-	device->execute().set_input_line(SH4_IRLn, ASSERT_LINE);
-	device->execute().set_input_line(SH4_IRLn, CLEAR_LINE);
+	m_irln = value;
+	set_input_line(SH4_IRLn, ASSERT_LINE);
+	set_input_line(SH4_IRLn, CLEAR_LINE);
 }
 
-void sh4_set_irq_line(sh4_state *sh4, int irqline, int state) // set state of external interrupt line
+void sh34_base_device::execute_set_input(int irqline, int state) // set state of external interrupt line
 {
-	if (sh4->cpu_type == CPU_TYPE_SH3)
+	if (m_cpu_type == CPU_TYPE_SH3)
 	{
 		/***** ASSUME THIS TO BE WRONG FOR NOW *****/
 
@@ -1057,19 +1044,19 @@ void sh4_set_irq_line(sh4_state *sh4, int irqline, int state) // set state of ex
 		{
 			//if (irqline > SH4_IRL3)
 			//  return;
-			if (sh4->irq_line_state[irqline] == state)
+			if (m_irq_line_state[irqline] == state)
 				return;
-			sh4->irq_line_state[irqline] = state;
+			m_irq_line_state[irqline] = state;
 
 			if( state == CLEAR_LINE )
 			{
-				LOG(("SH-4 '%s' cleared external irq IRL%d\n", sh4->device->tag(), irqline));
-				sh4_exception_unrequest(sh4, SH4_INTC_IRL0+irqline-SH4_IRL0);
+				LOG(("SH-4 '%s' cleared external irq IRL%d\n", tag(), irqline));
+				sh4_exception_unrequest(SH4_INTC_IRL0+irqline-SH4_IRL0);
 			}
 			else
 			{
-				LOG(("SH-4 '%s' assert external irq IRL%d\n", sh4->device->tag(), irqline));
-				sh4_exception_request(sh4, SH4_INTC_IRL0+irqline-SH4_IRL0);
+				LOG(("SH-4 '%s' assert external irq IRL%d\n", tag(), irqline));
+				sh4_exception_request(SH4_INTC_IRL0+irqline-SH4_IRL0);
 			}
 
 		}
@@ -1082,147 +1069,122 @@ void sh4_set_irq_line(sh4_state *sh4, int irqline, int state) // set state of ex
 
 		if (irqline == INPUT_LINE_NMI)
 		{
-			if (sh4->nmi_line_state == state)
+			if (m_nmi_line_state == state)
 				return;
-			if (sh4->m[ICR] & 0x100)
+			if (m_m[ICR] & 0x100)
 			{
-				if ((state == CLEAR_LINE) && (sh4->nmi_line_state == ASSERT_LINE))  // rising
+				if ((state == CLEAR_LINE) && (m_nmi_line_state == ASSERT_LINE))  // rising
 				{
-					LOG(("SH-4 '%s' assert nmi\n", sh4->device->tag()));
-					sh4_exception_request(sh4, SH4_INTC_NMI);
-					sh4_dmac_nmi(sh4);
+					LOG(("SH-4 '%s' assert nmi\n", tag()));
+					sh4_exception_request(SH4_INTC_NMI);
+					sh4_dmac_nmi();
 				}
 			}
 			else
 			{
-				if ((state == ASSERT_LINE) && (sh4->nmi_line_state == CLEAR_LINE)) // falling
+				if ((state == ASSERT_LINE) && (m_nmi_line_state == CLEAR_LINE)) // falling
 				{
-					LOG(("SH-4 '%s' assert nmi\n", sh4->device->tag()));
-					sh4_exception_request(sh4, SH4_INTC_NMI);
-					sh4_dmac_nmi(sh4);
+					LOG(("SH-4 '%s' assert nmi\n", tag()));
+					sh4_exception_request(SH4_INTC_NMI);
+					sh4_dmac_nmi();
 				}
 			}
 			if (state == CLEAR_LINE)
-				sh4->m[ICR] ^= 0x8000;
+				m_m[ICR] ^= 0x8000;
 			else
-				sh4->m[ICR] |= 0x8000;
-			sh4->nmi_line_state = state;
+				m_m[ICR] |= 0x8000;
+			m_nmi_line_state = state;
 		}
 		else
 		{
-			if (sh4->m[ICR] & 0x80) // four independent external interrupt sources
+			if (m_m[ICR] & 0x80) // four independent external interrupt sources
 			{
 				if (irqline > SH4_IRL3)
 					return;
-				if (sh4->irq_line_state[irqline] == state)
+				if (m_irq_line_state[irqline] == state)
 					return;
-				sh4->irq_line_state[irqline] = state;
+				m_irq_line_state[irqline] = state;
 
 				if( state == CLEAR_LINE )
 				{
-					LOG(("SH-4 '%s' cleared external irq IRL%d\n", sh4->device->tag(), irqline));
-					sh4_exception_unrequest(sh4, SH4_INTC_IRL0+irqline-SH4_IRL0);
+					LOG(("SH-4 '%s' cleared external irq IRL%d\n", tag(), irqline));
+					sh4_exception_unrequest(SH4_INTC_IRL0+irqline-SH4_IRL0);
 				}
 				else
 				{
-					LOG(("SH-4 '%s' assert external irq IRL%d\n", sh4->device->tag(), irqline));
-					sh4_exception_request(sh4, SH4_INTC_IRL0+irqline-SH4_IRL0);
+					LOG(("SH-4 '%s' assert external irq IRL%d\n", tag(), irqline));
+					sh4_exception_request(SH4_INTC_IRL0+irqline-SH4_IRL0);
 				}
 			}
 			else // level-encoded interrupt
 			{
 				if (irqline != SH4_IRLn)
 					return;
-				if ((sh4->irln > 15) || (sh4->irln < 0))
+				if ((m_irln > 15) || (m_irln < 0))
 					return;
 				for (s = 0; s < 15; s++)
-					sh4_exception_unrequest(sh4, SH4_INTC_IRLn0+s);
-				if (sh4->irln < 15)
-					sh4_exception_request(sh4, SH4_INTC_IRLn0+sh4->irln);
-				LOG(("SH-4 '%s' IRLn0-IRLn3 level #%d\n", sh4->device->tag(), sh4->irln));
+					sh4_exception_unrequest(SH4_INTC_IRLn0+s);
+				if (m_irln < 15)
+					sh4_exception_request(SH4_INTC_IRLn0+m_irln);
+				LOG(("SH-4 '%s' IRLn0-IRLn3 level #%d\n", tag(), m_irln));
 			}
 		}
-		if (sh4->test_irq && (!sh4->delay))
-			sh4_check_pending_irq(sh4, "sh4_set_irq_line");
+		if (m_test_irq && (!m_delay))
+			sh4_check_pending_irq("sh4_set_irq_line");
 	}
 }
 
-void sh4_parse_configuration(sh4_state *sh4, const struct sh4_config *conf)
+void sh34_base_device::sh4_parse_configuration()
 {
-	if(conf)
+	if(c_clock > 0)
 	{
-		switch((conf->md2 << 2) | (conf->md1 << 1) | (conf->md0))
+		switch((c_md2 << 2) | (c_md1 << 1) | (c_md0))
 		{
 		case 0:
-			sh4->cpu_clock = conf->clock;
-			sh4->bus_clock = conf->clock / 4;
-			sh4->pm_clock = conf->clock / 4;
+			m_cpu_clock = c_clock;
+			m_bus_clock = c_clock / 4;
+			m_pm_clock = c_clock / 4;
 			break;
 		case 1:
-			sh4->cpu_clock = conf->clock;
-			sh4->bus_clock = conf->clock / 6;
-			sh4->pm_clock = conf->clock / 6;
+			m_cpu_clock = c_clock;
+			m_bus_clock = c_clock / 6;
+			m_pm_clock = c_clock / 6;
 			break;
 		case 2:
-			sh4->cpu_clock = conf->clock;
-			sh4->bus_clock = conf->clock / 3;
-			sh4->pm_clock = conf->clock / 6;
+			m_cpu_clock = c_clock;
+			m_bus_clock = c_clock / 3;
+			m_pm_clock = c_clock / 6;
 			break;
 		case 3:
-			sh4->cpu_clock = conf->clock;
-			sh4->bus_clock = conf->clock / 3;
-			sh4->pm_clock = conf->clock / 6;
+			m_cpu_clock = c_clock;
+			m_bus_clock = c_clock / 3;
+			m_pm_clock = c_clock / 6;
 			break;
 		case 4:
-			sh4->cpu_clock = conf->clock;
-			sh4->bus_clock = conf->clock / 2;
-			sh4->pm_clock = conf->clock / 4;
+			m_cpu_clock = c_clock;
+			m_bus_clock = c_clock / 2;
+			m_pm_clock = c_clock / 4;
 			break;
 		case 5:
-			sh4->cpu_clock = conf->clock;
-			sh4->bus_clock = conf->clock / 2;
-			sh4->pm_clock = conf->clock / 4;
+			m_cpu_clock = c_clock;
+			m_bus_clock = c_clock / 2;
+			m_pm_clock = c_clock / 4;
 			break;
 		}
-		sh4->is_slave = (~(conf->md7)) & 1;
+		m_is_slave = (~(c_md7)) & 1;
 	}
 	else
 	{
-		sh4->cpu_clock = 200000000;
-		sh4->bus_clock = 100000000;
-		sh4->pm_clock = 50000000;
-		sh4->is_slave = 0;
+		m_cpu_clock = 200000000;
+		m_bus_clock = 100000000;
+		m_pm_clock = 50000000;
+		m_is_slave = 0;
 	}
 }
 
-void sh4_common_init(device_t *device)
+UINT32 sh34_base_device::sh4_getsqremap(UINT32 address)
 {
-	sh4_state *sh4 = get_safe_token(device);
-	int i;
-
-	for (i=0; i<3; i++)
-	{
-		sh4->timer[i] = device->machine().scheduler().timer_alloc(FUNC(sh4_timer_callback), sh4);
-		sh4->timer[i]->adjust(attotime::never, i);
-	}
-
-	for (i=0; i<4; i++)
-	{
-		sh4->dma_timer[i] = device->machine().scheduler().timer_alloc(FUNC(sh4_dmac_callback), sh4);
-		sh4->dma_timer[i]->adjust(attotime::never, i);
-	}
-
-	sh4->refresh_timer = device->machine().scheduler().timer_alloc(FUNC(sh4_refresh_timer_callback), sh4);
-	sh4->refresh_timer->adjust(attotime::never);
-	sh4->refresh_timer_base = 0;
-
-	sh4->rtc_timer = device->machine().scheduler().timer_alloc(FUNC(sh4_rtc_timer_callback), sh4);
-	sh4->rtc_timer->adjust(attotime::never);
-}
-
-UINT32 sh4_getsqremap(sh4_state *sh4, UINT32 address)
-{
-	if (!sh4->sh4_mmu_enabled)
+	if (!m_sh4_mmu_enabled)
 		return address;
 	else
 	{
@@ -1231,9 +1193,9 @@ UINT32 sh4_getsqremap(sh4_state *sh4, UINT32 address)
 
 		for (i=0;i<64;i++)
 		{
-			UINT32 topcmp = sh4->sh4_tlb_address[i]&0xfff00000;
+			UINT32 topcmp = m_sh4_tlb_address[i]&0xfff00000;
 			if (topcmp==topaddr)
-				return (address&0x000fffff) | ((sh4->sh4_tlb_data[i])&0xfff00000);
+				return (address&0x000fffff) | ((m_sh4_tlb_data[i])&0xfff00000);
 		}
 
 	}
@@ -1241,38 +1203,34 @@ UINT32 sh4_getsqremap(sh4_state *sh4, UINT32 address)
 	return address;
 }
 
-READ64_MEMBER( sh4_device::sh4_tlb_r )
+READ64_MEMBER( sh4_base_device::sh4_tlb_r )
 {
-	sh4_state *sh4 = get_safe_token(this);
-
 	int offs = offset*8;
 
 	if (offs >= 0x01000000)
 	{
 		UINT8 i = (offs>>8)&63;
-		return sh4->sh4_tlb_data[i];
+		return m_sh4_tlb_data[i];
 	}
 	else
 	{
 		UINT8 i = (offs>>8)&63;
-		return sh4->sh4_tlb_address[i];
+		return m_sh4_tlb_address[i];
 	}
 }
 
-WRITE64_MEMBER( sh4_device::sh4_tlb_w )
+WRITE64_MEMBER( sh4_base_device::sh4_tlb_w )
 {
-	sh4_state *sh4 = get_safe_token(this);
-
 	int offs = offset*8;
 
 	if (offs >= 0x01000000)
 	{
 		UINT8 i = (offs>>8)&63;
-		sh4->sh4_tlb_data[i]  = data&0xffffffff;
+		m_sh4_tlb_data[i]  = data&0xffffffff;
 	}
 	else
 	{
 		UINT8 i = (offs>>8)&63;
-		sh4->sh4_tlb_address[i] = data&0xffffffff;
+		m_sh4_tlb_address[i] = data&0xffffffff;
 	}
 }

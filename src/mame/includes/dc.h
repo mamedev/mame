@@ -77,7 +77,7 @@ class dc_state : public driver_device
 	DECLARE_WRITE8_MEMBER( g1_irq );
 	DECLARE_WRITE8_MEMBER( pvr_irq );
 
-	required_device<cpu_device> m_maincpu;
+	required_device<sh4_base_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
 	required_device<powervr2_device> m_powervr2;
 	required_device<maple_dc_device> m_maple;

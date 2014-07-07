@@ -120,7 +120,7 @@ void maple_dc_device::dma_step()
 			ddtdata.direction = 0;       // 0 source to buffer, 1 buffer to source
 			ddtdata.channel   = 0;
 			ddtdata.mode      = -1;      // copy from/to buffer
-			sh4_dma_ddt(cpu, &ddtdata);
+			cpu->sh4_dma_ddt(&ddtdata);
 			dma_adr += 8;
 
 			dma_endflag    = header[0] & 0x80000000;
@@ -136,7 +136,7 @@ void maple_dc_device::dma_step()
 			ddtdata.direction = 0;       // 0 source to buffer, 1 buffer to source
 			ddtdata.channel   = 0;
 			ddtdata.mode      = -1;      // copy from/to buffer
-			sh4_dma_ddt(cpu, &ddtdata);
+			cpu->sh4_dma_ddt(&ddtdata);
 			dma_adr += length*4;
 
 			switch(pattern) {
@@ -191,7 +191,7 @@ void maple_dc_device::dma_step()
 			ddtdata.direction   = 1;        // 0 source to buffer, 1 buffer to source
 			ddtdata.channel     = 0;
 			ddtdata.mode        = -1;       // copy from/to buffer
-			sh4_dma_ddt(cpu, &ddtdata);
+			cpu->sh4_dma_ddt(&ddtdata);
 			dma_state = dma_endflag ? DMA_DONE : DMA_SEND;
 			break;
 		}
@@ -216,7 +216,7 @@ void maple_dc_device::dma_step()
 				ddtdata.direction   = 1;        // 0 source to buffer, 1 buffer to source
 				ddtdata.channel     = 0;
 				ddtdata.mode        = -1;       // copy from/to buffer
-				sh4_dma_ddt(cpu, &ddtdata);
+				cpu->sh4_dma_ddt(&ddtdata);
 				dma_dest += length*4;
 			}
 

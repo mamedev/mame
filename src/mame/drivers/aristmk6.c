@@ -130,12 +130,20 @@ INPUT_PORTS_END
 // ?
 #define ARISTMK6_CPU_CLOCK XTAL_200MHz
 // ?
-static const struct sh4_config sh4cpu_config = {  1,  0,  1,  0,  0,  0,  1,  1,  0, ARISTMK6_CPU_CLOCK };
 
 static MACHINE_CONFIG_START( aristmk6, aristmk6_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SH4LE, ARISTMK6_CPU_CLOCK)
-	MCFG_CPU_CONFIG(sh4cpu_config)
+	MCFG_SH4_MD0(1)
+	MCFG_SH4_MD1(0)
+	MCFG_SH4_MD2(1)
+	MCFG_SH4_MD3(0)
+	MCFG_SH4_MD4(0)
+	MCFG_SH4_MD5(1)
+	MCFG_SH4_MD6(0)
+	MCFG_SH4_MD7(1)
+	MCFG_SH4_MD8(0)
+	MCFG_SH4_CLOCK(ARISTMK6_CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(aristmk6_map)
 	MCFG_CPU_IO_MAP(aristmk6_port)
 //  MCFG_DEVICE_DISABLE()

@@ -1491,8 +1491,6 @@ Sushi Bar
 #include "includes/naomi.h"
 
 #define CPU_CLOCK (200000000)
-												/* MD2 MD1 MD0 MD6 MD4 MD3 MD5 MD7 MD8 */
-static const struct sh4_config sh4cpu_config = {  1,  0,  1,  0,  0,  0,  1,  1,  0, CPU_CLOCK };
 
 READ64_MEMBER(naomi_state::naomi_arm_r )
 {
@@ -2547,7 +2545,16 @@ MACHINE_RESET_MEMBER(naomi_state,naomi)
 static MACHINE_CONFIG_START( naomi_aw_base, naomi_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SH4LE, CPU_CLOCK) // SH4!!!
-	MCFG_CPU_CONFIG(sh4cpu_config)
+	MCFG_SH4_MD0(1)
+	MCFG_SH4_MD1(0)
+	MCFG_SH4_MD2(1)
+	MCFG_SH4_MD3(0)
+	MCFG_SH4_MD4(0)
+	MCFG_SH4_MD5(1)
+	MCFG_SH4_MD6(0)
+	MCFG_SH4_MD7(1)
+	MCFG_SH4_MD8(0)
+	MCFG_SH4_CLOCK(CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(naomi_map)
 	MCFG_CPU_IO_MAP(naomi_port)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", dc_state, dc_scanline, "screen", 0, 1)

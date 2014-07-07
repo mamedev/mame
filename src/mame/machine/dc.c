@@ -88,7 +88,7 @@ void dc_state::generic_dma(UINT32 main_adr, void *dma_ptr, UINT32 length, UINT32
 	ddt.direction = to_mainram;
 	ddt.channel = 0;
 	ddt.mode = -1;
-	sh4_dma_ddt(m_maincpu, &ddt);
+	m_maincpu->sh4_dma_ddt(&ddt);
 }
 
 TIMER_CALLBACK_MEMBER(dc_state::aica_dma_irq)
@@ -332,7 +332,7 @@ void dc_state::dc_update_interrupt_status()
 	}
 
 	level=dc_compute_interrupt_level();
-	sh4_set_irln_input(m_maincpu, 15-level);
+	m_maincpu->sh4_set_irln_input(15-level);
 
 	/* Wave DMA HW trigger */
 	if(m_wave_dma.flag && ((m_wave_dma.sel & 2) == 2))
@@ -407,7 +407,7 @@ WRITE64_MEMBER(dc_state::dc_sysctrl_w )
 				ddtdata.direction=0;
 				ddtdata.channel=2;
 				ddtdata.mode=25; //011001
-				sh4_dma_ddt(m_maincpu,&ddtdata);
+				m_maincpu->sh4_dma_ddt(&ddtdata);
 				#if DEBUG_SYSCTRL
 				if ((address >= 0x11000000) && (address <= 0x11FFFFFF))
 					if (dc_sysctrl_regs[SB_LMMODE0])

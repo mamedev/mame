@@ -35,141 +35,23 @@ class sh4_frontend;
 #define NMIPRI()            EXPPRI(3,0,16,SH4_INTC_NMI)
 #define INTPRI(p,n)         EXPPRI(4,2,p,n)
 
-#define FP_RS(r) sh4->fr[(r)] // binary representation of single precision floating point register r
-#define FP_RFS(r) *( (float  *)(sh4->fr+(r)) ) // single precision floating point register r
-#define FP_RFD(r) *( (double *)(sh4->fr+(r)) ) // double precision floating point register r
-#define FP_XS(r) sh4->xf[(r)] // binary representation of extended single precision floating point register r
-#define FP_XFS(r) *( (float  *)(sh4->xf+(r)) ) // single precision extended floating point register r
-#define FP_XFD(r) *( (double *)(sh4->xf+(r)) ) // double precision extended floating point register r
+#define FP_RS(r) m_fr[(r)] // binary representation of single precision floating point register r
+#define FP_RFS(r) *( (float  *)(m_fr+(r)) ) // single precision floating point register r
+#define FP_RFD(r) *( (double *)(m_fr+(r)) ) // double precision floating point register r
+#define FP_XS(r) m_xf[(r)] // binary representation of extended single precision floating point register r
+#define FP_XFS(r) *( (float  *)(m_xf+(r)) ) // single precision extended floating point register r
+#define FP_XFD(r) *( (double *)(m_xf+(r)) ) // double precision extended floating point register r
 #ifdef LSB_FIRST
-#define FP_RS2(r) sh4->fr[(r) ^ sh4->fpu_pr]
-#define FP_RFS2(r) *( (float  *)(sh4->fr+((r) ^ sh4->fpu_pr)) )
-#define FP_XS2(r) sh4->xf[(r) ^ sh4->fpu_pr]
-#define FP_XFS2(r) *( (float  *)(sh4->xf+((r) ^ sh4->fpu_pr)) )
+#define FP_RS2(r) m_fr[(r) ^ m_fpu_pr]
+#define FP_RFS2(r) *( (float  *)(m_fr+((r) ^ m_fpu_pr)) )
+#define FP_XS2(r) m_xf[(r) ^ m_fpu_pr]
+#define FP_XFS2(r) *( (float  *)(m_xf+((r) ^ m_fpu_pr)) )
 #endif
 
 
+#ifdef USE_SH4DRC
 struct sh4_state
 {
-	UINT32  ppc;
-	UINT32  pc, spc;
-	UINT32  pr;
-	UINT32  sr, ssr;
-	UINT32  gbr, vbr;
-	UINT32  mach, macl;
-	UINT32  r[16], rbnk[2][8], sgr;
-	UINT32  fr[16], xf[16];
-	UINT32  ea;
-	UINT32  delay;
-	UINT32  cpu_off;
-	UINT32  pending_irq;
-	UINT32  test_irq;
-	UINT32  fpscr;
-	UINT32  fpul;
-	UINT32  dbr;
-
-	UINT32  exception_priority[128];
-	int     exception_requesting[128];
-
-	INT8    irq_line_state[17];
-	device_irq_acknowledge_delegate irq_callback;
-	legacy_cpu_device *device;
-	address_space *internal;
-	address_space *program;
-	direct_read_data *direct;
-	address_space *io;
-
-	// sh4 internal
-	UINT32 m[16384];
-
-	// timer regs handled manually for reuse
-	UINT32 SH4_TSTR;
-	UINT32 SH4_TCNT0;
-	UINT32 SH4_TCNT1;
-	UINT32 SH4_TCNT2;
-	UINT32 SH4_TCR0;
-	UINT32 SH4_TCR1;
-	UINT32 SH4_TCR2;
-	UINT32 SH4_TCOR0;
-	UINT32 SH4_TCOR1;
-	UINT32 SH4_TCOR2;
-	UINT32 SH4_TOCR;
-	UINT32 SH4_TCPR2;
-
-	// INTC regs
-	UINT32 SH4_IPRA;
-
-	UINT32 SH4_IPRC;
-
-	// DMAC regs
-	UINT32 SH4_SAR0;
-	UINT32 SH4_SAR1;
-	UINT32 SH4_SAR2;
-	UINT32 SH4_SAR3;
-
-	UINT32 SH4_DAR0;
-	UINT32 SH4_DAR1;
-	UINT32 SH4_DAR2;
-	UINT32 SH4_DAR3;
-
-	UINT32 SH4_CHCR0;
-	UINT32 SH4_CHCR1;
-	UINT32 SH4_CHCR2;
-	UINT32 SH4_CHCR3;
-
-	UINT32 SH4_DMATCR0;
-	UINT32 SH4_DMATCR1;
-	UINT32 SH4_DMATCR2;
-	UINT32 SH4_DMATCR3;
-
-	UINT32 SH4_DMAOR;
-
-
-	INT8    nmi_line_state;
-
-	UINT8 sleep_mode;
-
-	int     frt_input;
-	int     irln;
-	int     internal_irq_level;
-	int     internal_irq_vector;
-
-	emu_timer *dma_timer[4];
-	emu_timer *refresh_timer;
-	emu_timer *rtc_timer;
-	emu_timer *timer[3];
-	UINT32  refresh_timer_base;
-	int     dma_timer_active[4];
-	UINT32  dma_source[4];
-	UINT32  dma_destination[4];
-	UINT32  dma_count[4];
-	int     dma_wordsize[4];
-	int     dma_source_increment[4];
-	int     dma_destination_increment[4];
-	int     dma_mode[4];
-
-	int     sh4_icount;
-	int     is_slave;
-	int     cpu_clock, bus_clock, pm_clock;
-	int     fpu_sz, fpu_pr;
-	int     ioport16_pullup, ioport16_direction;
-	int     ioport4_pullup, ioport4_direction;
-
-	void    (*ftcsr_read_callback)(UINT32 data);
-
-
-	/* This MMU simulation is good for the simple remap used on Naomi GD-ROM SQ access *ONLY* */
-	UINT32 sh4_tlb_address[64];
-	UINT32 sh4_tlb_data[64];
-	UINT8 sh4_mmu_enabled;
-
-	int cpu_type;
-
-	// sh3 internal
-	UINT32  m_sh3internal_upper[0x3000/4];
-	UINT32  m_sh3internal_lower[0x1000];
-
-#ifdef USE_SH4DRC
 	int icount;
 
 	int pcfsel;                 // last pcflush entry set
@@ -207,8 +89,8 @@ struct sh4_state
 
 	UINT32 prefadr;
 	UINT32 target;
-#endif
 };
+#endif
 
 #ifdef USE_SH4DRC
 class sh4_frontend : public drc_frontend
@@ -231,22 +113,6 @@ private:
 
 	sh4_state &m_context;
 };
-
-INLINE sh4_state *get_safe_token(device_t *device)
-{
-	assert(device != NULL);
-	assert(device->type() == SH3LE || device->type() == SH3BE ||
-			device->type() == SH4LE || device->type() == SH4BE );
-	return *(sh4_state **)downcast<legacy_cpu_device *>(device)->token();
-}
-#else
-INLINE sh4_state *get_safe_token(device_t *device)
-{
-	assert(device != NULL);
-	assert(device->type() == SH3LE || device->type() == SH3BE ||
-			device->type() == SH4LE || device->type() == SH4BE );
-	return (sh4_state *)downcast<legacy_cpu_device *>(device)->token();
-}
 #endif
 
 
@@ -302,45 +168,5 @@ enum
 #define REGFLAG_SSR                     (1 << 10)
 #define REGFLAG_SPC                     (1 << 11)
 
-void sh4_exception_recompute(sh4_state *sh4); // checks if there is any interrupt with high enough priority
-void sh4_exception_request(sh4_state *sh4, int exception); // start requesting an exception
-void sh4_exception_unrequest(sh4_state *sh4, int exception); // stop requesting an exception
-void sh4_exception_checkunrequest(sh4_state *sh4, int exception);
-void sh4_exception(sh4_state *sh4, const char *message, int exception); // handle exception
-void sh4_change_register_bank(sh4_state *sh4, int to);
-void sh4_syncronize_register_bank(sh4_state *sh4, int to);
-void sh4_swap_fp_registers(sh4_state *sh4);
-void sh4_default_exception_priorities(sh4_state *sh4); // setup default priorities for exceptions
-void sh4_parse_configuration(sh4_state *sh4, const struct sh4_config *conf);
-void sh4_set_irq_line(sh4_state *sh4, int irqline, int state); // set state of external interrupt line
-#ifdef LSB_FIRST
-void sh4_swap_fp_couples(sh4_state *sh4);
-#endif
-void sh4_common_init(device_t *device);
-UINT32 sh4_getsqremap(sh4_state *sh4, UINT32 address);
-void sh4_handler_ipra_w(sh4_state *sh4, UINT32 data, UINT32 mem_mask);
-
-INLINE void sh4_check_pending_irq(sh4_state *sh4, const char *message) // look for highest priority active exception and handle it
-{
-	int a,irq,z;
-
-	irq = 0;
-	z = -1;
-	for (a=0;a <= SH4_INTC_ROVI;a++)
-	{
-		if (sh4->exception_requesting[a])
-		{
-			if ((int)sh4->exception_priority[a] > z)
-			{
-				z = sh4->exception_priority[a];
-				irq = a;
-			}
-		}
-	}
-	if (z >= 0)
-	{
-		sh4_exception(sh4, message, irq);
-	}
-}
 
 #endif /* __SH4COMN_H__ */

@@ -11,43 +11,42 @@ static const int dmasize[8] = { 8, 1, 2, 4, 32, 0, 0, 0 };
 
 static const int sh3_dmasize[4] = { 1, 2, 4, 16 };
 
-TIMER_CALLBACK( sh4_dmac_callback )
+TIMER_CALLBACK_MEMBER( sh34_base_device::sh4_dmac_callback )
 {
-	sh4_state *sh4 = (sh4_state *)ptr;
 	int channel = param;
 
-	LOG(("SH4 '%s': DMA %d complete\n", sh4->device->tag(), channel));
-	sh4->dma_timer_active[channel] = 0;
+	LOG(("SH4 '%s': DMA %d complete\n", tag(), channel));
+	m_dma_timer_active[channel] = 0;
 	switch (channel)
 	{
 	case 0:
-		sh4->SH4_DMATCR0 = 0;
-		sh4->SH4_CHCR0 |= CHCR_TE;
-		if (sh4->SH4_CHCR0 & CHCR_IE)
-			sh4_exception_request(sh4, SH4_INTC_DMTE0);
+		m_SH4_DMATCR0 = 0;
+		m_SH4_CHCR0 |= CHCR_TE;
+		if (m_SH4_CHCR0 & CHCR_IE)
+			sh4_exception_request(SH4_INTC_DMTE0);
 		break;
 	case 1:
-		sh4->SH4_DMATCR1 = 0;
-		sh4->SH4_CHCR1 |= CHCR_TE;
-		if (sh4->SH4_CHCR1 & CHCR_IE)
-			sh4_exception_request(sh4, SH4_INTC_DMTE1);
+		m_SH4_DMATCR1 = 0;
+		m_SH4_CHCR1 |= CHCR_TE;
+		if (m_SH4_CHCR1 & CHCR_IE)
+			sh4_exception_request(SH4_INTC_DMTE1);
 		break;
 	case 2:
-		sh4->SH4_DMATCR2 = 0;
-		sh4->SH4_CHCR2 |= CHCR_TE;
-		if (sh4->SH4_CHCR2 & CHCR_IE)
-			sh4_exception_request(sh4, SH4_INTC_DMTE2);
+		m_SH4_DMATCR2 = 0;
+		m_SH4_CHCR2 |= CHCR_TE;
+		if (m_SH4_CHCR2 & CHCR_IE)
+			sh4_exception_request(SH4_INTC_DMTE2);
 		break;
 	case 3:
-		sh4->SH4_DMATCR3 = 0;
-		sh4->SH4_CHCR3 |= CHCR_TE;
-		if (sh4->SH4_CHCR3 & CHCR_IE)
-			sh4_exception_request(sh4, SH4_INTC_DMTE3);
+		m_SH4_DMATCR3 = 0;
+		m_SH4_CHCR3 |= CHCR_TE;
+		if (m_SH4_CHCR3 & CHCR_IE)
+			sh4_exception_request(SH4_INTC_DMTE3);
 		break;
 	}
 }
 
-static int sh4_dma_transfer(sh4_state *sh4, int channel, int timermode, UINT32 chcr, UINT32 *sar, UINT32 *dar, UINT32 *dmatcr)
+int sh34_base_device::sh4_dma_transfer(int channel, int timermode, UINT32 chcr, UINT32 *sar, UINT32 *dar, UINT32 *dmatcr)
 {
 	int incs, incd, size;
 	UINT32 src, dst, count;
@@ -55,7 +54,7 @@ static int sh4_dma_transfer(sh4_state *sh4, int channel, int timermode, UINT32 c
 	incd = (chcr & CHCR_DM) >> 14;
 	incs = (chcr & CHCR_SM) >> 12;
 
-	if (sh4->cpu_type == CPU_TYPE_SH4)
+	if (m_cpu_type == CPU_TYPE_SH4)
 	{
 		size = dmasize[(chcr & CHCR_TS) >> 4];
 	}
@@ -79,13 +78,13 @@ static int sh4_dma_transfer(sh4_state *sh4, int channel, int timermode, UINT32 c
 
 	if (timermode == 1) // timer actvated after a time based on the number of words to transfer
 	{
-		sh4->dma_timer_active[channel] = 1;
-		sh4->dma_timer[channel]->adjust(sh4->device->cycles_to_attotime(2*count+1), channel);
+		m_dma_timer_active[channel] = 1;
+		m_dma_timer[channel]->adjust(cycles_to_attotime(2*count+1), channel);
 	}
 	else if (timermode == 2) // timer activated immediately
 	{
-		sh4->dma_timer_active[channel] = 1;
-		sh4->dma_timer[channel]->adjust(attotime::zero, channel);
+		m_dma_timer_active[channel] = 1;
+		m_dma_timer[channel]->adjust(attotime::zero, channel);
 	}
 
 	src &= AM;
@@ -100,7 +99,7 @@ static int sh4_dma_transfer(sh4_state *sh4, int channel, int timermode, UINT32 c
 				src --;
 			if(incd == 2)
 				dst --;
-			sh4->program->write_byte(dst, sh4->program->read_byte(src));
+			m_program->write_byte(dst, m_program->read_byte(src));
 			if(incs == 1)
 				src ++;
 			if(incd == 1)
@@ -116,7 +115,7 @@ static int sh4_dma_transfer(sh4_state *sh4, int channel, int timermode, UINT32 c
 				src -= 2;
 			if(incd == 2)
 				dst -= 2;
-			sh4->program->write_word(dst, sh4->program->read_word(src));
+			m_program->write_word(dst, m_program->read_word(src));
 			if(incs == 1)
 				src += 2;
 			if(incd == 1)
@@ -132,7 +131,7 @@ static int sh4_dma_transfer(sh4_state *sh4, int channel, int timermode, UINT32 c
 				src -= 8;
 			if(incd == 2)
 				dst -= 8;
-			sh4->program->write_qword(dst, sh4->program->read_qword(src));
+			m_program->write_qword(dst, m_program->read_qword(src));
 			if(incs == 1)
 				src += 8;
 			if(incd == 1)
@@ -149,7 +148,7 @@ static int sh4_dma_transfer(sh4_state *sh4, int channel, int timermode, UINT32 c
 				src -= 4;
 			if(incd == 2)
 				dst -= 4;
-			sh4->program->write_dword(dst, sh4->program->read_dword(src));
+			m_program->write_dword(dst, m_program->read_dword(src));
 			if(incs == 1)
 				src += 4;
 			if(incd == 1)
@@ -166,10 +165,10 @@ static int sh4_dma_transfer(sh4_state *sh4, int channel, int timermode, UINT32 c
 				src -= 32;
 			if(incd == 2)
 				dst -= 32;
-			sh4->program->write_qword(dst, sh4->program->read_qword(src));
-			sh4->program->write_qword(dst+8, sh4->program->read_qword(src+8));
-			sh4->program->write_qword(dst+16, sh4->program->read_qword(src+16));
-			sh4->program->write_qword(dst+24, sh4->program->read_qword(src+24));
+			m_program->write_qword(dst, m_program->read_qword(src));
+			m_program->write_qword(dst+8, m_program->read_qword(src+8));
+			m_program->write_qword(dst+16, m_program->read_qword(src+16));
+			m_program->write_qword(dst+24, m_program->read_qword(src+24));
 			if(incs == 1)
 				src += 32;
 			if(incd == 1)
@@ -183,7 +182,7 @@ static int sh4_dma_transfer(sh4_state *sh4, int channel, int timermode, UINT32 c
 	return 1;
 }
 
-static int sh4_dma_transfer_device(sh4_state *sh4, int channel, UINT32 chcr, UINT32 *sar, UINT32 *dar, UINT32 *dmatcr)
+int sh34_base_device::sh4_dma_transfer_device(int channel, UINT32 chcr, UINT32 *sar, UINT32 *dar, UINT32 *dmatcr)
 {
 	int incs, incd, size, mod;
 	UINT32 src, dst, count;
@@ -192,7 +191,7 @@ static int sh4_dma_transfer_device(sh4_state *sh4, int channel, UINT32 chcr, UIN
 	incs = (chcr & CHCR_SM) >> 12;
 
 
-	if (sh4->cpu_type == CPU_TYPE_SH4)
+	if (m_cpu_type == CPU_TYPE_SH4)
 	{
 		size = dmasize[(chcr & CHCR_TS) >> 4];
 	}
@@ -215,207 +214,205 @@ static int sh4_dma_transfer_device(sh4_state *sh4, int channel, UINT32 chcr, UIN
 
 	LOG(("SH4: DMA %d start device<->memory %x, %x, %x, %04x, %d, %d, %d\n", channel, src, dst, count, chcr, incs, incd, size));
 
-	sh4->dma_timer_active[channel] = 1;
+	m_dma_timer_active[channel] = 1;
 
 	src &= AM;
 	dst &= AM;
 
 	// remember parameters
-	sh4->dma_source[channel]=src;
-	sh4->dma_destination[channel]=dst;
-	sh4->dma_count[channel]=count;
-	sh4->dma_wordsize[channel]=size;
-	sh4->dma_source_increment[channel]=incs;
-	sh4->dma_destination_increment[channel]=incd;
-	sh4->dma_mode[channel]=mod;
+	m_dma_source[channel]=src;
+	m_dma_destination[channel]=dst;
+	m_dma_count[channel]=count;
+	m_dma_wordsize[channel]=size;
+	m_dma_source_increment[channel]=incs;
+	m_dma_destination_increment[channel]=incd;
+	m_dma_mode[channel]=mod;
 
 	// inform device its ready to transfer
-	sh4->io->write_dword(SH4_IOPORT_DMA, channel | (mod << 16));
+	m_io->write_dword(SH4_IOPORT_DMA, channel | (mod << 16));
 	return 1;
 }
 
-static void sh4_dmac_check(sh4_state *sh4, int channel)
+void sh34_base_device::sh4_dmac_check(int channel)
 {
 	UINT32 dmatcr, chcr, sar, dar;
 
 	switch (channel)
 	{
 	case 0:
-		sar = sh4->SH4_SAR0;
-		dar = sh4->SH4_DAR0;
-		chcr = sh4->SH4_CHCR0;
-		dmatcr = sh4->SH4_DMATCR0;
+		sar = m_SH4_SAR0;
+		dar = m_SH4_DAR0;
+		chcr = m_SH4_CHCR0;
+		dmatcr = m_SH4_DMATCR0;
 		break;
 	case 1:
-		sar = sh4->SH4_SAR1;
-		dar = sh4->SH4_DAR1;
-		chcr = sh4->SH4_CHCR1;
-		dmatcr = sh4->SH4_DMATCR1;
+		sar = m_SH4_SAR1;
+		dar = m_SH4_DAR1;
+		chcr = m_SH4_CHCR1;
+		dmatcr = m_SH4_DMATCR1;
 		break;
 	case 2:
-		sar = sh4->SH4_SAR2;
-		dar = sh4->SH4_DAR2;
-		chcr = sh4->SH4_CHCR2;
-		dmatcr = sh4->SH4_DMATCR2;
+		sar = m_SH4_SAR2;
+		dar = m_SH4_DAR2;
+		chcr = m_SH4_CHCR2;
+		dmatcr = m_SH4_DMATCR2;
 		break;
 	case 3:
-		sar = sh4->SH4_SAR3;
-		dar = sh4->SH4_DAR3;
-		chcr = sh4->SH4_CHCR3;
-		dmatcr = sh4->SH4_DMATCR3;
+		sar = m_SH4_SAR3;
+		dar = m_SH4_DAR3;
+		chcr = m_SH4_CHCR3;
+		dmatcr = m_SH4_DMATCR3;
 		break;
 	default:
 		return;
 	}
-	if (chcr & sh4->SH4_DMAOR & DMAOR_DME)
+	if (chcr & m_SH4_DMAOR & DMAOR_DME)
 	{
 		if ((((chcr & CHCR_RS) >> 8) < 2) || (((chcr & CHCR_RS) >> 8) > 6))
 			return;
-		if (!sh4->dma_timer_active[channel] && !(chcr & CHCR_TE) && !(sh4->SH4_DMAOR & (DMAOR_AE | DMAOR_NMIF)))
+		if (!m_dma_timer_active[channel] && !(chcr & CHCR_TE) && !(m_SH4_DMAOR & (DMAOR_AE | DMAOR_NMIF)))
 		{
 			if (((chcr & CHCR_RS) >> 8) > 3)
-				sh4_dma_transfer(sh4, channel, 1, chcr, &sar, &dar, &dmatcr);
-			else if ((sh4->SH4_DMAOR & DMAOR_DDT) == 0)
-				sh4_dma_transfer_device(sh4, channel, chcr, &sar, &dar, &dmatcr); // tell device we are ready to transfer
+				sh4_dma_transfer(channel, 1, chcr, &sar, &dar, &dmatcr);
+			else if ((m_SH4_DMAOR & DMAOR_DDT) == 0)
+				sh4_dma_transfer_device(channel, chcr, &sar, &dar, &dmatcr); // tell device we are ready to transfer
 		}
 	}
 	else
 	{
-		if (sh4->dma_timer_active[channel])
+		if (m_dma_timer_active[channel])
 		{
 			logerror("SH4: DMA %d cancelled in-flight but all data transferred", channel);
-			sh4->dma_timer[channel]->adjust(attotime::never, channel);
-			sh4->dma_timer_active[channel] = 0;
+			m_dma_timer[channel]->adjust(attotime::never, channel);
+			m_dma_timer_active[channel] = 0;
 		}
 	}
 }
 
 
 // called by drivers to transfer data in a cpu<->device dma. 'device' must be a SH4 cpu
-int sh4_dma_data(device_t *device, struct sh4_device_dma *s)
+int sh34_base_device::sh4_dma_data(struct sh4_device_dma *s)
 {
 	UINT32 pos, len, siz;
 	int channel = s->channel;
 	void *data = s->buffer;
 
-	sh4_state *sh4 = get_safe_token(device);
-
-	if (!sh4->dma_timer_active[channel])
+	if (!m_dma_timer_active[channel])
 		return 0;
 
-	if (sh4->dma_mode[channel] == 2)
+	if (m_dma_mode[channel] == 2)
 	{
 		// device receives data
-		len = sh4->dma_count[channel];
+		len = m_dma_count[channel];
 		if (s->length < len)
 			len = s->length;
-		siz = sh4->dma_wordsize[channel];
+		siz = m_dma_wordsize[channel];
 		for (pos = 0;pos < len;pos++) {
 			switch (siz)
 			{
 			case 8:
-				if (sh4->dma_source_increment[channel] == 2)
-					sh4->dma_source[channel] -= 8;
-				*(UINT64 *)data = sh4->program->read_qword(sh4->dma_source[channel] & ~7);
-				if (sh4->dma_source_increment[channel] == 1)
-					sh4->dma_source[channel] += 8;
+				if (m_dma_source_increment[channel] == 2)
+					m_dma_source[channel] -= 8;
+				*(UINT64 *)data = m_program->read_qword(m_dma_source[channel] & ~7);
+				if (m_dma_source_increment[channel] == 1)
+					m_dma_source[channel] += 8;
 				break;
 			case 1:
-				if (sh4->dma_source_increment[channel] == 2)
-					sh4->dma_source[channel]--;
-				*(UINT8 *)data = sh4->program->read_byte(sh4->dma_source[channel]);
-				if (sh4->dma_source_increment[channel] == 1)
-					sh4->dma_source[channel]++;
+				if (m_dma_source_increment[channel] == 2)
+					m_dma_source[channel]--;
+				*(UINT8 *)data = m_program->read_byte(m_dma_source[channel]);
+				if (m_dma_source_increment[channel] == 1)
+					m_dma_source[channel]++;
 				break;
 			case 2:
-				if (sh4->dma_source_increment[channel] == 2)
-					sh4->dma_source[channel] -= 2;
-				*(UINT16 *)data = sh4->program->read_word(sh4->dma_source[channel] & ~1);
-				if (sh4->dma_source_increment[channel] == 1)
-					sh4->dma_source[channel] += 2;
+				if (m_dma_source_increment[channel] == 2)
+					m_dma_source[channel] -= 2;
+				*(UINT16 *)data = m_program->read_word(m_dma_source[channel] & ~1);
+				if (m_dma_source_increment[channel] == 1)
+					m_dma_source[channel] += 2;
 				break;
 			case 4:
-				if (sh4->dma_source_increment[channel] == 2)
-					sh4->dma_source[channel] -= 4;
-				*(UINT32 *)data = sh4->program->read_dword(sh4->dma_source[channel] & ~3);
-				if (sh4->dma_source_increment[channel] == 1)
-					sh4->dma_source[channel] += 4;
+				if (m_dma_source_increment[channel] == 2)
+					m_dma_source[channel] -= 4;
+				*(UINT32 *)data = m_program->read_dword(m_dma_source[channel] & ~3);
+				if (m_dma_source_increment[channel] == 1)
+					m_dma_source[channel] += 4;
 				break;
 			case 32:
-				if (sh4->dma_source_increment[channel] == 2)
-					sh4->dma_source[channel] -= 32;
-				*(UINT64 *)data = sh4->program->read_qword(sh4->dma_source[channel] & ~31);
-				*((UINT64 *)data+1) = sh4->program->read_qword((sh4->dma_source[channel] & ~31)+8);
-				*((UINT64 *)data+2) = sh4->program->read_qword((sh4->dma_source[channel] & ~31)+16);
-				*((UINT64 *)data+3) = sh4->program->read_qword((sh4->dma_source[channel] & ~31)+24);
-				if (sh4->dma_source_increment[channel] == 1)
-					sh4->dma_source[channel] += 32;
+				if (m_dma_source_increment[channel] == 2)
+					m_dma_source[channel] -= 32;
+				*(UINT64 *)data = m_program->read_qword(m_dma_source[channel] & ~31);
+				*((UINT64 *)data+1) = m_program->read_qword((m_dma_source[channel] & ~31)+8);
+				*((UINT64 *)data+2) = m_program->read_qword((m_dma_source[channel] & ~31)+16);
+				*((UINT64 *)data+3) = m_program->read_qword((m_dma_source[channel] & ~31)+24);
+				if (m_dma_source_increment[channel] == 1)
+					m_dma_source[channel] += 32;
 				break;
 			}
-			sh4->dma_count[channel]--;
+			m_dma_count[channel]--;
 		}
-		if (sh4->dma_count[channel] == 0) // all data transferred ?
+		if (m_dma_count[channel] == 0) // all data transferred ?
 		{
-			sh4->dma_timer[channel]->adjust(attotime::zero, channel);
+			m_dma_timer[channel]->adjust(attotime::zero, channel);
 			return 2;
 		}
 		return 1;
 	}
-	else if (sh4->dma_mode[channel] == 3)
+	else if (m_dma_mode[channel] == 3)
 	{
 		// device sends data
-		len = sh4->dma_count[channel];
+		len = m_dma_count[channel];
 		if (s->length < len)
 			len = s->length;
-		siz = sh4->dma_wordsize[channel];
+		siz = m_dma_wordsize[channel];
 		for (pos = 0;pos < len;pos++) {
 			switch (siz)
 			{
 			case 8:
-				if (sh4->dma_destination_increment[channel] == 2)
-					sh4->dma_destination[channel]-=8;
-				sh4->program->write_qword(sh4->dma_destination[channel] & ~7, *(UINT64 *)data);
-				if (sh4->dma_destination_increment[channel] == 1)
-					sh4->dma_destination[channel]+=8;
+				if (m_dma_destination_increment[channel] == 2)
+					m_dma_destination[channel]-=8;
+				m_program->write_qword(m_dma_destination[channel] & ~7, *(UINT64 *)data);
+				if (m_dma_destination_increment[channel] == 1)
+					m_dma_destination[channel]+=8;
 				break;
 			case 1:
-				if (sh4->dma_destination_increment[channel] == 2)
-					sh4->dma_destination[channel]--;
-				sh4->program->write_byte(sh4->dma_destination[channel], *(UINT8 *)data);
-				if (sh4->dma_destination_increment[channel] == 1)
-					sh4->dma_destination[channel]++;
+				if (m_dma_destination_increment[channel] == 2)
+					m_dma_destination[channel]--;
+				m_program->write_byte(m_dma_destination[channel], *(UINT8 *)data);
+				if (m_dma_destination_increment[channel] == 1)
+					m_dma_destination[channel]++;
 				break;
 			case 2:
-				if (sh4->dma_destination_increment[channel] == 2)
-					sh4->dma_destination[channel]-=2;
-				sh4->program->write_word(sh4->dma_destination[channel] & ~1, *(UINT16 *)data);
-				if (sh4->dma_destination_increment[channel] == 1)
-					sh4->dma_destination[channel]+=2;
+				if (m_dma_destination_increment[channel] == 2)
+					m_dma_destination[channel]-=2;
+				m_program->write_word(m_dma_destination[channel] & ~1, *(UINT16 *)data);
+				if (m_dma_destination_increment[channel] == 1)
+					m_dma_destination[channel]+=2;
 				break;
 			case 4:
-				if (sh4->dma_destination_increment[channel] == 2)
-					sh4->dma_destination[channel]-=4;
-				sh4->program->write_dword(sh4->dma_destination[channel] & ~3, *(UINT32 *)data);
-				if (sh4->dma_destination_increment[channel] == 1)
-					sh4->dma_destination[channel]+=4;
+				if (m_dma_destination_increment[channel] == 2)
+					m_dma_destination[channel]-=4;
+				m_program->write_dword(m_dma_destination[channel] & ~3, *(UINT32 *)data);
+				if (m_dma_destination_increment[channel] == 1)
+					m_dma_destination[channel]+=4;
 				break;
 			case 32:
-				if (sh4->dma_destination_increment[channel] == 2)
-					sh4->dma_destination[channel]-=32;
-				sh4->program->write_qword(sh4->dma_destination[channel] & ~31, *(UINT64 *)data);
-				sh4->program->write_qword((sh4->dma_destination[channel] & ~31)+8, *((UINT64 *)data+1));
-				sh4->program->write_qword((sh4->dma_destination[channel] & ~31)+16, *((UINT64 *)data+2));
-				sh4->program->write_qword((sh4->dma_destination[channel] & ~31)+24, *((UINT64 *)data+3));
-				if (sh4->dma_destination_increment[channel] == 1)
-					sh4->dma_destination[channel]+=32;
+				if (m_dma_destination_increment[channel] == 2)
+					m_dma_destination[channel]-=32;
+				m_program->write_qword(m_dma_destination[channel] & ~31, *(UINT64 *)data);
+				m_program->write_qword((m_dma_destination[channel] & ~31)+8, *((UINT64 *)data+1));
+				m_program->write_qword((m_dma_destination[channel] & ~31)+16, *((UINT64 *)data+2));
+				m_program->write_qword((m_dma_destination[channel] & ~31)+24, *((UINT64 *)data+3));
+				if (m_dma_destination_increment[channel] == 1)
+					m_dma_destination[channel]+=32;
 				break;
 			}
-			sh4->dma_count[channel]--;
+			m_dma_count[channel]--;
 		}
 
-		if (sh4->dma_count[channel] == 0) // all data transferred ?
+		if (m_dma_count[channel] == 0) // all data transferred ?
 		{
-			sh4->dma_timer[channel]->adjust(attotime::zero, channel);
+			m_dma_timer[channel]->adjust(attotime::zero, channel);
 			return 2;
 		}
 		return 1;
@@ -424,83 +421,82 @@ int sh4_dma_data(device_t *device, struct sh4_device_dma *s)
 		return 0;
 }
 
-// called by drivers to transfer data in a DDT dma. 'device' must be a SH4 cpu
-void sh4_dma_ddt(device_t *device, struct sh4_ddt_dma *s)
+// called by drivers to transfer data in a DDT dma.
+void sh34_base_device::sh4_dma_ddt(struct sh4_ddt_dma *s)
 {
-	sh4_state *sh4 = get_safe_token(device);
 	UINT32 chcr;
 	UINT32 *p32bits;
 	UINT64 *p32bytes;
 	UINT32 pos,len,siz;
 
-	if (sh4->cpu_type != CPU_TYPE_SH4)
-		fatalerror("sh4_dma_ddt uses sh4->m[] with SH3\n");
+	if (m_cpu_type != CPU_TYPE_SH4)
+		fatalerror("sh4_dma_ddt uses m_m[] with SH3\n");
 
-	if (sh4->dma_timer_active[s->channel])
+	if (m_dma_timer_active[s->channel])
 		return;
 	if (s->mode >= 0) {
 		switch (s->channel)
 		{
 		case 0:
 			if (s->mode & 1)
-				s->source = sh4->SH4_SAR0;
+				s->source = m_SH4_SAR0;
 			if (s->mode & 2)
-				sh4->SH4_SAR0 = s->source;
+				m_SH4_SAR0 = s->source;
 			if (s->mode & 4)
-				s->destination = sh4->SH4_DAR0;
+				s->destination = m_SH4_DAR0;
 			if (s->mode & 8)
-				sh4->SH4_DAR0 = s->destination;
+				m_SH4_DAR0 = s->destination;
 			break;
 		case 1:
 			if (s->mode & 1)
-				s->source = sh4->SH4_SAR1;
+				s->source = m_SH4_SAR1;
 			if (s->mode & 2)
-				sh4->SH4_SAR1 = s->source;
+				m_SH4_SAR1 = s->source;
 			if (s->mode & 4)
-				s->destination = sh4->SH4_DAR1;
+				s->destination = m_SH4_DAR1;
 			if (s->mode & 8)
-				sh4->SH4_DAR1 = s->destination;
+				m_SH4_DAR1 = s->destination;
 			break;
 		case 2:
 			if (s->mode & 1)
-				s->source = sh4->SH4_SAR2;
+				s->source = m_SH4_SAR2;
 			if (s->mode & 2)
-				sh4->SH4_SAR2 = s->source;
+				m_SH4_SAR2 = s->source;
 			if (s->mode & 4)
-				s->destination = sh4->SH4_DAR2;
+				s->destination = m_SH4_DAR2;
 			if (s->mode & 8)
-				sh4->SH4_DAR2 = s->destination;
+				m_SH4_DAR2 = s->destination;
 			break;
 		case 3:
 		default:
 			if (s->mode & 1)
-				s->source = sh4->SH4_SAR3;
+				s->source = m_SH4_SAR3;
 			if (s->mode & 2)
-				sh4->SH4_SAR3 = s->source;
+				m_SH4_SAR3 = s->source;
 			if (s->mode & 4)
-				s->destination = sh4->SH4_DAR3;
+				s->destination = m_SH4_DAR3;
 			if (s->mode & 8)
-				sh4->SH4_DAR3 = s->destination;
+				m_SH4_DAR3 = s->destination;
 			break;
 		}
 		switch (s->channel)
 		{
 		case 0:
-			chcr = sh4->SH4_CHCR0;
-			len = sh4->SH4_DMATCR0;
+			chcr = m_SH4_CHCR0;
+			len = m_SH4_DMATCR0;
 			break;
 		case 1:
-			chcr = sh4->SH4_CHCR1;
-			len = sh4->SH4_DMATCR1;
+			chcr = m_SH4_CHCR1;
+			len = m_SH4_DMATCR1;
 			break;
 		case 2:
-			chcr = sh4->SH4_CHCR2;
-			len = sh4->SH4_DMATCR2;
+			chcr = m_SH4_CHCR2;
+			len = m_SH4_DMATCR2;
 			break;
 		case 3:
 		default:
-			chcr = sh4->SH4_CHCR3;
-			len = sh4->SH4_DMATCR3;
+			chcr = m_SH4_CHCR3;
+			len = m_SH4_DMATCR3;
 			break;
 		}
 		if ((s->direction) == 0) {
@@ -510,7 +506,7 @@ void sh4_dma_ddt(device_t *device, struct sh4_ddt_dma *s)
 		}
 
 
-		if (sh4->cpu_type == CPU_TYPE_SH4)
+		if (m_cpu_type == CPU_TYPE_SH4)
 		{
 			//siz = dmasize[(chcr & CHCR_TS) >> 4];
 			siz = dmasize[(chcr >> 4) & 7];
@@ -524,14 +520,14 @@ void sh4_dma_ddt(device_t *device, struct sh4_ddt_dma *s)
 		if (siz && (s->size))
 			if ((len * siz) != (s->length * s->size))
 				return;
-		sh4_dma_transfer(sh4, s->channel, 0, chcr, &s->source, &s->destination, &len);
+		sh4_dma_transfer(s->channel, 0, chcr, &s->source, &s->destination, &len);
 	} else {
 		if (s->size == 4) {
 			if ((s->direction) == 0) {
 				len = s->length;
 				p32bits = (UINT32 *)(s->buffer);
 				for (pos = 0;pos < len;pos++) {
-					*p32bits = sh4->program->read_dword(s->source);
+					*p32bits = m_program->read_dword(s->source);
 					p32bits++;
 					s->source = s->source + 4;
 				}
@@ -539,7 +535,7 @@ void sh4_dma_ddt(device_t *device, struct sh4_ddt_dma *s)
 				len = s->length;
 				p32bits = (UINT32 *)(s->buffer);
 				for (pos = 0;pos < len;pos++) {
-					sh4->program->write_dword(s->destination, *p32bits);
+					m_program->write_dword(s->destination, *p32bits);
 					p32bits++;
 					s->destination = s->destination + 4;
 				}
@@ -550,7 +546,7 @@ void sh4_dma_ddt(device_t *device, struct sh4_ddt_dma *s)
 				len = s->length * 4;
 				p32bytes = (UINT64 *)(s->buffer);
 				for (pos = 0;pos < len;pos++) {
-					*p32bytes = sh4->program->read_qword(s->source);
+					*p32bytes = m_program->read_qword(s->source);
 					p32bytes++;
 					s->destination = s->destination + 8;
 				}
@@ -558,7 +554,7 @@ void sh4_dma_ddt(device_t *device, struct sh4_ddt_dma *s)
 				len = s->length * 4;
 				p32bytes = (UINT64 *)(s->buffer);
 				for (pos = 0;pos < len;pos++) {
-					sh4->program->write_qword(s->destination, *p32bytes);
+					m_program->write_qword(s->destination, *p32bytes);
 					p32bytes++;
 					s->destination = s->destination + 8;
 				}
@@ -568,119 +564,102 @@ void sh4_dma_ddt(device_t *device, struct sh4_ddt_dma *s)
 }
 
 
-	void sh4_handle_sar0_addr_w(sh4_state *sh4, UINT32 data, UINT32 mem_mask)
+	void sh34_base_device::sh4_handle_sar0_addr_w(UINT32 data, UINT32 mem_mask)
 {
-	COMBINE_DATA(&sh4->SH4_SAR0);
+	COMBINE_DATA(&m_SH4_SAR0);
 }
 
-	void sh4_handle_sar1_addr_w(sh4_state *sh4, UINT32 data, UINT32 mem_mask)
+	void sh34_base_device::sh4_handle_sar1_addr_w(UINT32 data, UINT32 mem_mask)
 {
-	COMBINE_DATA(&sh4->SH4_SAR1);
+	COMBINE_DATA(&m_SH4_SAR1);
 }
 
-	void sh4_handle_sar2_addr_w(sh4_state *sh4, UINT32 data, UINT32 mem_mask)
+	void sh34_base_device::sh4_handle_sar2_addr_w(UINT32 data, UINT32 mem_mask)
 {
-	COMBINE_DATA(&sh4->SH4_SAR2);
+	COMBINE_DATA(&m_SH4_SAR2);
 }
 
-	void sh4_handle_sar3_addr_w(sh4_state *sh4, UINT32 data, UINT32 mem_mask)
+	void sh34_base_device::sh4_handle_sar3_addr_w(UINT32 data, UINT32 mem_mask)
 {
-	COMBINE_DATA(&sh4->SH4_SAR3);
+	COMBINE_DATA(&m_SH4_SAR3);
 }
 
-	void sh4_handle_dar0_addr_w(sh4_state *sh4, UINT32 data, UINT32 mem_mask)
+	void sh34_base_device::sh4_handle_dar0_addr_w(UINT32 data, UINT32 mem_mask)
 {
-	COMBINE_DATA(&sh4->SH4_DAR0);
+	COMBINE_DATA(&m_SH4_DAR0);
 }
 
-	void sh4_handle_dar1_addr_w(sh4_state *sh4, UINT32 data, UINT32 mem_mask)
+	void sh34_base_device::sh4_handle_dar1_addr_w(UINT32 data, UINT32 mem_mask)
 {
-	COMBINE_DATA(&sh4->SH4_DAR1);
+	COMBINE_DATA(&m_SH4_DAR1);
 }
 
-	void sh4_handle_dar2_addr_w(sh4_state *sh4, UINT32 data, UINT32 mem_mask)
+	void sh34_base_device::sh4_handle_dar2_addr_w(UINT32 data, UINT32 mem_mask)
 {
-	COMBINE_DATA(&sh4->SH4_DAR2);
+	COMBINE_DATA(&m_SH4_DAR2);
 }
 
-	void sh4_handle_dar3_addr_w(sh4_state *sh4, UINT32 data, UINT32 mem_mask)
+	void sh34_base_device::sh4_handle_dar3_addr_w(UINT32 data, UINT32 mem_mask)
 {
-	COMBINE_DATA(&sh4->SH4_DAR3);
+	COMBINE_DATA(&m_SH4_DAR3);
 }
 
-	void sh4_handle_dmatcr0_addr_w(sh4_state *sh4, UINT32 data, UINT32 mem_mask)
+	void sh34_base_device::sh4_handle_dmatcr0_addr_w(UINT32 data, UINT32 mem_mask)
 {
-	COMBINE_DATA(&sh4->SH4_DMATCR0);
+	COMBINE_DATA(&m_SH4_DMATCR0);
 }
 
-	void sh4_handle_dmatcr1_addr_w(sh4_state *sh4, UINT32 data, UINT32 mem_mask)
+	void sh34_base_device::sh4_handle_dmatcr1_addr_w(UINT32 data, UINT32 mem_mask)
 {
-	COMBINE_DATA(&sh4->SH4_DMATCR1);
+	COMBINE_DATA(&m_SH4_DMATCR1);
 }
 
-	void sh4_handle_dmatcr2_addr_w(sh4_state *sh4, UINT32 data, UINT32 mem_mask)
+	void sh34_base_device::sh4_handle_dmatcr2_addr_w(UINT32 data, UINT32 mem_mask)
 {
-	COMBINE_DATA(&sh4->SH4_DMATCR2);
+	COMBINE_DATA(&m_SH4_DMATCR2);
 }
 
-	void sh4_handle_dmatcr3_addr_w(sh4_state *sh4, UINT32 data, UINT32 mem_mask)
+	void sh34_base_device::sh4_handle_dmatcr3_addr_w(UINT32 data, UINT32 mem_mask)
 {
-	COMBINE_DATA(&sh4->SH4_DMATCR3);
+	COMBINE_DATA(&m_SH4_DMATCR3);
 }
 
-	void sh4_handle_chcr0_addr_w(sh4_state *sh4, UINT32 data, UINT32 mem_mask)
+	void sh34_base_device::sh4_handle_chcr0_addr_w(UINT32 data, UINT32 mem_mask)
 {
-	COMBINE_DATA(&sh4->SH4_CHCR0);
-	sh4_dmac_check(sh4, 0);
+	COMBINE_DATA(&m_SH4_CHCR0);
+	sh4_dmac_check(0);
 }
 
-	void sh4_handle_chcr1_addr_w(sh4_state *sh4, UINT32 data, UINT32 mem_mask)
+	void sh34_base_device::sh4_handle_chcr1_addr_w(UINT32 data, UINT32 mem_mask)
 {
-	COMBINE_DATA(&sh4->SH4_CHCR1);
-	sh4_dmac_check(sh4, 1);
+	COMBINE_DATA(&m_SH4_CHCR1);
+	sh4_dmac_check(1);
 }
 
-	void sh4_handle_chcr2_addr_w(sh4_state *sh4, UINT32 data, UINT32 mem_mask)
+	void sh34_base_device::sh4_handle_chcr2_addr_w(UINT32 data, UINT32 mem_mask)
 {
-	COMBINE_DATA(&sh4->SH4_CHCR2);
-	sh4_dmac_check(sh4, 2);
+	COMBINE_DATA(&m_SH4_CHCR2);
+	sh4_dmac_check(2);
 }
 
-	void sh4_handle_chcr3_addr_w(sh4_state *sh4, UINT32 data, UINT32 mem_mask)
+	void sh34_base_device::sh4_handle_chcr3_addr_w(UINT32 data, UINT32 mem_mask)
 {
-	COMBINE_DATA(&sh4->SH4_CHCR3);
-	sh4_dmac_check(sh4, 3);
+	COMBINE_DATA(&m_SH4_CHCR3);
+	sh4_dmac_check(3);
 }
 
-	void sh4_handle_dmaor_addr_w(sh4_state *sh4, UINT32 data, UINT32 mem_mask)
+	void sh34_base_device::sh4_handle_dmaor_addr_w(UINT32 data, UINT32 mem_mask)
 {
-	UINT32 old = sh4->SH4_DMAOR;
-	COMBINE_DATA(&sh4->SH4_DMAOR);
+	UINT32 old = m_SH4_DMAOR;
+	COMBINE_DATA(&m_SH4_DMAOR);
 
-	if ((sh4->SH4_DMAOR & DMAOR_AE) && (~old & DMAOR_AE))
-		sh4->SH4_DMAOR &= ~DMAOR_AE;
-	if ((sh4->SH4_DMAOR & DMAOR_NMIF) && (~old & DMAOR_NMIF))
-		sh4->SH4_DMAOR &= ~DMAOR_NMIF;
-	sh4_dmac_check(sh4, 0);
-	sh4_dmac_check(sh4, 1);
-	sh4_dmac_check(sh4, 2);
-	sh4_dmac_check(sh4, 3);
+	if ((m_SH4_DMAOR & DMAOR_AE) && (~old & DMAOR_AE))
+		m_SH4_DMAOR &= ~DMAOR_AE;
+	if ((m_SH4_DMAOR & DMAOR_NMIF) && (~old & DMAOR_NMIF))
+		m_SH4_DMAOR &= ~DMAOR_NMIF;
+	sh4_dmac_check(0);
+	sh4_dmac_check(1);
+	sh4_dmac_check(2);
+	sh4_dmac_check(3);
 }
 
-	UINT32 sh4_handle_sar0_addr_r(sh4_state *sh4, UINT32 mem_mask) { return sh4->SH4_SAR0; }
-	UINT32 sh4_handle_sar1_addr_r(sh4_state *sh4, UINT32 mem_mask) { return sh4->SH4_SAR1; }
-	UINT32 sh4_handle_sar2_addr_r(sh4_state *sh4, UINT32 mem_mask) { return sh4->SH4_SAR2; }
-	UINT32 sh4_handle_sar3_addr_r(sh4_state *sh4, UINT32 mem_mask) { return sh4->SH4_SAR3; }
-	UINT32 sh4_handle_dar0_addr_r(sh4_state *sh4, UINT32 mem_mask) { return sh4->SH4_DAR0; }
-	UINT32 sh4_handle_dar1_addr_r(sh4_state *sh4, UINT32 mem_mask) { return sh4->SH4_DAR1; }
-	UINT32 sh4_handle_dar2_addr_r(sh4_state *sh4, UINT32 mem_mask) { return sh4->SH4_DAR2; }
-	UINT32 sh4_handle_dar3_addr_r(sh4_state *sh4, UINT32 mem_mask) { return sh4->SH4_DAR3; }
-	UINT32 sh4_handle_dmatcr0_addr_r(sh4_state *sh4, UINT32 mem_mask) { return sh4->SH4_DMATCR0; }
-	UINT32 sh4_handle_dmatcr1_addr_r(sh4_state *sh4, UINT32 mem_mask) { return sh4->SH4_DMATCR1; }
-	UINT32 sh4_handle_dmatcr2_addr_r(sh4_state *sh4, UINT32 mem_mask) { return sh4->SH4_DMATCR2; }
-	UINT32 sh4_handle_dmatcr3_addr_r(sh4_state *sh4, UINT32 mem_mask) { return sh4->SH4_DMATCR3; }
-	UINT32 sh4_handle_chcr0_addr_r(sh4_state *sh4, UINT32 mem_mask) { return sh4->SH4_CHCR0; }
-	UINT32 sh4_handle_chcr1_addr_r(sh4_state *sh4, UINT32 mem_mask) { return sh4->SH4_CHCR1; }
-	UINT32 sh4_handle_chcr2_addr_r(sh4_state *sh4, UINT32 mem_mask) { return sh4->SH4_CHCR2; }
-	UINT32 sh4_handle_chcr3_addr_r(sh4_state *sh4, UINT32 mem_mask) { return sh4->SH4_CHCR3; }
-	UINT32 sh4_handle_dmaor_addr_r(sh4_state *sh4, UINT32 mem_mask) { return sh4->SH4_DMAOR; }

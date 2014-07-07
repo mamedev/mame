@@ -404,24 +404,6 @@ static INPUT_PORTS_START( cv1k )
 INPUT_PORTS_END
 
 
-
-// none of this is verified
-// (the sh3 is different to the sh4 anyway, should be changed)
-static const struct sh4_config sh4cpu_config = {
-	0, // md2 (clock divders)
-	0, // md1 (clock divders)
-	0, // md0 (clock divders)
-	0,
-	0,
-	0,
-	1,
-	1, // md7 (master?)
-	0,
-	CPU_CLOCK // influences music sequencing in ddpdfk at least
-};
-
-
-
 INTERRUPT_GEN_MEMBER(cv1k_state::cv1k_interrupt)
 {
 	m_maincpu->set_input_line(2, HOLD_LINE);
@@ -439,7 +421,16 @@ MACHINE_RESET_MEMBER( cv1k_state, cv1k )
 static MACHINE_CONFIG_START( cv1k, cv1k_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SH3BE, CPU_CLOCK)
-	MCFG_CPU_CONFIG(sh4cpu_config)
+	MCFG_SH4_MD0(0)  // none of this is verified
+	MCFG_SH4_MD1(0)  // (the sh3 is different to the sh4 anyway, should be changed)
+	MCFG_SH4_MD2(0)
+	MCFG_SH4_MD3(0)
+	MCFG_SH4_MD4(0)
+	MCFG_SH4_MD5(1)
+	MCFG_SH4_MD6(0)
+	MCFG_SH4_MD7(1)
+	MCFG_SH4_MD8(0)
+	MCFG_SH4_CLOCK(CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(cv1k_map)
 	MCFG_CPU_IO_MAP(cv1k_port)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cv1k_state, cv1k_interrupt)
@@ -473,7 +464,16 @@ static MACHINE_CONFIG_DERIVED( cv1k_d, cv1k )
 	MCFG_DEVICE_REMOVE("maincpu")
 
 	MCFG_CPU_ADD("maincpu", SH3BE, CPU_CLOCK)
-	MCFG_CPU_CONFIG(sh4cpu_config)
+	MCFG_SH4_MD0(0)  // none of this is verified
+	MCFG_SH4_MD1(0)  // (the sh3 is different to the sh4 anyway, should be changed)
+	MCFG_SH4_MD2(0)
+	MCFG_SH4_MD3(0)
+	MCFG_SH4_MD4(0)
+	MCFG_SH4_MD5(1)
+	MCFG_SH4_MD6(0)
+	MCFG_SH4_MD7(1)
+	MCFG_SH4_MD8(0)
+	MCFG_SH4_CLOCK(CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(cv1k_d_map)
 	MCFG_CPU_IO_MAP(cv1k_port)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cv1k_state, cv1k_interrupt)
