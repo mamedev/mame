@@ -145,7 +145,7 @@ DEVICE_IMAGE_LOAD_MEMBER( myvision_state, cart )
 
 		if (filesize != 0x4000 && filesize != 0x6000)
 		{
-			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Incorrect or not support cartridge size");
+			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Incorrect or unsupported cartridge size");
 			return IMAGE_INIT_FAIL;
 		}
 
