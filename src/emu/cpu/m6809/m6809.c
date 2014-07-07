@@ -249,7 +249,7 @@ void m6809_base_device::device_post_load()
 			set_regop8(m_d.b.h);
 			break;
 		case M6809_B:
-			set_regop8(m_d.b.h);
+			set_regop8(m_d.b.l);
 			break;
 		case M6809_D:
 			set_regop16(m_d);
