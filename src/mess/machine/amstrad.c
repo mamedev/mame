@@ -3075,6 +3075,13 @@ MACHINE_START_MEMBER(amstrad_state,kccomp)
 {
 	m_system_type = SYSTEM_CPC;
 	m_centronics->write_data7(0);
+
+	m_gate_array.de = 0;
+	m_gate_array.draw_p = NULL;
+	m_gate_array.hsync = 0;
+	m_gate_array.vsync = 0;
+
+	timer_set(attotime::zero, TIMER_SET_RESOLUTION);
 }
 
 
