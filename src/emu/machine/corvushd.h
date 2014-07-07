@@ -407,7 +407,7 @@ private:
 		struct {
 			UINT8	code;               // Command code
 			UINT8	drive;              // Drive number (starts at 1)
-			UINT8 	prep_block[512];    // Z80 machine code payload
+			UINT8 	prep_block[512];    // Machine code payload
 		} prep_mode_command;
 		//
 		// Read Firmware command (Prep Mode 0x32)

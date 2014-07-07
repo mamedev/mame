@@ -224,7 +224,7 @@ bool corvus_hdc_t::parse_hdc_command(UINT8 data) {
 			//
 			// Prep Commands
 			//
-			case PREP_MODE_SELECT:              // Apparently I need to be able to do this while in Prep mode
+			case PREP_MODE_SELECT:              
 			case PREP_RESET_DRIVE:
 			case PREP_FORMAT_DRIVE:
 			case PREP_FILL_DRIVE_OMNI:
@@ -766,19 +766,38 @@ UINT8 corvus_hdc_t::corvus_read_boot_block(UINT8 block) {
 //
 // Enter prep mode.  In prep mode, only prep mode commands may be executed.
 //
-// The "prep block" is 512 bytes of Z80 machine code that the host sends to
-// the controller.  The controller will jump to this code after receiving it,
+// A "prep block" is 512 bytes of machine code that the host sends to the 
+// controller.  The controller will jump to this code after receiving it,
 // and it is what actually implements prep mode commands.  This HLE ignores
 // the prep block from the host.  
 //
+// On the Rev B/H drives (which we emulate), a prep block is Z80 machine
+// code and only one prep block can be sent.  Sending the "put drive into
+// prep mode" command (0x11) when already in prep mode is an error.  The
+// prep block sent by the Corvus program DIAG.COM on the SSE SoftBox
+// distribution disk returns error 0x8f (unrecognized command) for this case.
+//
+// On the OmniDrive and Bank, a prep block is 6801 machine code.  These
+// controllers allow multiple prep blocks to be sent.  The first time the 
+// "put drive into prep mode" command is sent puts the drive into prep mode.
+// The command can then be sent again up to 3 times with more prep blocks.  
+// (Mass Storage GTI, pages 50-51)
+//
 // Pass:
 //      drv:        Corvus drive id (1..15) to be prepped
-//      prep_block: 512 bytes of Z80 machine code, contents ignored
+//      prep_block: 512 bytes of machine code, contents ignored
 //
 // Returns:
 //      Status of command
 //
 UINT8 corvus_hdc_t::corvus_enter_prep_mode(UINT8 drv, UINT8 *prep_block) {
+	// on rev b/h drives, sending the "put drive into prep mode" 
+	// command when already in prep mode is an error.
+	if (m_prep_mode) {
+		logerror("corvus_enter_prep_mode: Attempt to enter prep mode while in prep mode\n");
+		return STAT_FATAL_ERR | STAT_ILL_CMD_OP_CODE;
+	}
+
 	// check if drive is valid
 	if (!corvus_hdc_file(drv)) {
 		logerror("corvus_enter_prep_mode: Failure returned by corvus_hdc_file(%d)\n", drv);
@@ -1060,6 +1079,8 @@ void corvus_hdc_t::corvus_process_command_packet(bool invalid_command_flag) {
 		} else {    // In Prep mode
 			switch(m_buffer.command.code) {
 				case PREP_MODE_SELECT:
+					// when already in prep mode, some drives allow this command to
+					// be sent again.  see corvus_enter_prep_mode() for details.
 					m_buffer.single_byte_response.status =
 						corvus_enter_prep_mode(m_buffer.prep_mode_command.drive, 
 							m_buffer.prep_mode_command.prep_block);
