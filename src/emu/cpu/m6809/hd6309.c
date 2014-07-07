@@ -143,7 +143,7 @@ void hd6309_device::device_start()
 	state_add(HD6309_E,         "E",            m_w.b.h).mask(0xff);
 	state_add(HD6309_F,         "F",            m_w.b.l).mask(0xff);
 	state_add(HD6309_W,         "W",            m_w.w).mask(0xffff);
-	state_add(HD6309_V,         "V",            m_w.w).mask(0xffff);
+	state_add(HD6309_V,         "V",            m_v.w).mask(0xffff);
 	state_add(HD6309_MD,        "MD",           m_md).mask(0xff);
 
 	// initialize variables
