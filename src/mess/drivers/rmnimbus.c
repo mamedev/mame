@@ -82,13 +82,11 @@ INPUT_PORTS_END
 static ADDRESS_MAP_START(nimbus_iocpu_mem, AS_PROGRAM, 8, rmnimbus_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	//AM_RANGE(0x2000, 0x7fff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( nimbus_iocpu_io , AS_IO, 8, rmnimbus_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000, 0x000FF) AM_READWRITE(nimbus_pc8031_iou_r, nimbus_pc8031_iou_w)
-	//AM_RANGE(0x00010, 0x07fff) AM_RAM
 	AM_RANGE(0x20000, 0x20004) AM_READWRITE(nimbus_pc8031_port_r, nimbus_pc8031_port_w)
 ADDRESS_MAP_END
 

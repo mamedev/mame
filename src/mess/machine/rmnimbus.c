@@ -64,16 +64,63 @@ chdman createhd -o ST125N.chd -chs 407,4,26 -ss 512
 /* Defines, constants, and global variables                                */
 /*-------------------------------------------------------------------------*/
 
-#define LOG_KEYBOARD        0
+/* External int vectors for chained interrupts */
+#define EXTERNAL_INT_DISK       0x80
+#define EXTERNAL_INT_MSM5205    0x84
+#define EXTERNAL_INT_MOUSE_YU   0x88
+#define EXTERNAL_INT_MOUSE_YD   0x89
+#define EXTERNAL_INT_MOUSE_XL   0x8A
+#define EXTERNAL_INT_MOUSE_XR   0x8B
+#define EXTERNAL_INT_PC8031_8C  0x8c
+#define EXTERNAL_INT_PC8031_8E  0x8E
+#define EXTERNAL_INT_PC8031_8F  0x8F
+
+#define HDC_DRQ_MASK        0x40
+#define FDC_SIDE()          ((m_nimbus_drives.reg400 & 0x10) >> 4)
+#define FDC_MOTOR()         ((m_nimbus_drives.reg400 & 0x20) >> 5)
+#define FDC_DRIVE()         (fdc_driveno(m_nimbus_drives.reg400 & 0x0f))
+#define HDC_DRQ_ENABLED()   ((m_nimbus_drives.reg400 & 0x40) ? 1 : 0)
+#define FDC_DRQ_ENABLED()   ((m_nimbus_drives.reg400 & 0x80) ? 1 : 0)
+
+/* 8031/8051 Peripheral controller */
+
+#define IPC_OUT_ADDR        0X01
+#define IPC_OUT_READ_PEND   0X02
+#define IPC_OUT_BYTE_AVAIL  0X04
+
+#define IPC_IN_ADDR         0X01
+#define IPC_IN_BYTE_AVAIL   0X02
+#define IPC_IN_READ_PEND    0X04
+
+/* IO unit */
+
+#define DISK_INT_ENABLE         0x01
+#define MSM5205_INT_ENABLE      0x04
+#define MOUSE_INT_ENABLE        0x08
+#define PC8031_INT_ENABLE       0x10
+
+enum
+{
+	MOUSE_PHASE_STATIC = 0,
+	MOUSE_PHASE_POSITIVE,
+	MOUSE_PHASE_NEGATIVE
+};
+
+#define MOUSE_INT_ENABLED(state)     (((state)->m_iou_reg092 & MOUSE_INT_ENABLE) ? 1 : 0)
+
+#define VIA_INT                 0x03
+
+#define LINEAR_ADDR(seg,ofs)    ((seg<<4)+ofs)
+
+#define OUTPUT_SEGOFS(mess,seg,ofs)  logerror("%s=%04X:%04X [%08X]\n",mess,seg,ofs,((seg<<4)+ofs))
+
 #define LOG_SIO             0
-#define LOG_DISK_FDD        0
 #define LOG_DISK_HDD        0
 #define LOG_DISK            0
 #define LOG_PC8031          0
 #define LOG_PC8031_186      0
 #define LOG_PC8031_PORT     0
 #define LOG_IOU             0
-#define LOG_SOUND           0
 #define LOG_RAM             0
 
 /* Debugging */
