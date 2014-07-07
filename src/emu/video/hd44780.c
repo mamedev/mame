@@ -124,7 +124,7 @@ void hd44780_device::device_start()
 
 void hd44780_device::device_reset()
 {
-	memset(m_ddram, 0x20, sizeof(m_ddram)); // can't use 0 here as it would show CGRAM instead of blank space on a soft reset
+	memset(m_ddram, 0x20, sizeof(m_ddram)); // filled with SPACE char
 	memset(m_cgram, 0, sizeof(m_cgram));
 
 	m_ac         = 0;
@@ -184,53 +184,41 @@ void hd44780_device::set_busy_flag(UINT16 usec)
 	m_busy_timer->adjust( attotime::from_usec( usec ) );
 }
 
-void hd44780_device::update_ac(int direction)
+void hd44780_device::correct_ac()
 {
 	if (m_active_ram == DDRAM)
 	{
-		if (direction == 1)
-		{
-			if (m_num_line == 2 && m_ac == 0x27)
-				m_ac = 0x40;
-			else if ((m_num_line == 2 && m_ac == 0x67) || (m_num_line == 1 && m_ac == 0x4f))
-				m_ac = 0x00;
-			else
-				m_ac = (m_ac + direction) & 0x7f;
-		}
-		else
-		{
-			if (m_num_line == 2 && m_ac == 0x00)
-				m_ac = 0x67;
-			else if (m_num_line == 1 && m_ac == 0x00)
-				m_ac = 0x4f;
-			else if (m_num_line == 2 && m_ac == 0x40)
-				m_ac = 0x27;
-			else
-				m_ac = (m_ac + direction) & 0x7f;
-		}
+		int max_ac = (m_num_line == 1) ? 0x4f : 0x67;
+		
+		if (m_ac > max_ac)
+			m_ac -= max_ac + 1;
+		else if (m_ac < 0)
+			m_ac = max_ac;
+		else if (m_num_line == 2 && m_ac > 0x27 && m_ac < 0x40)
+			m_ac = 0x40 + (m_ac - 0x28);
 	}
 	else
-	{
-		m_ac = (m_ac + direction) & 0x3f;
-	}
+		m_ac &= 0x3f;
+}
+
+void hd44780_device::update_ac(int direction)
+{
+	if (m_active_ram == DDRAM && m_num_line == 2 && direction == -1 && m_ac == 0x40)
+		m_ac = 0x27;
+	else
+		m_ac += direction;
+
+	correct_ac();
 }
 
 void hd44780_device::shift_display(int direction)
 {
-	if (direction == 1)
-	{
-		if (m_disp_shift == 0x4f)
-			m_disp_shift = 0x00;
-		else
-			m_disp_shift++;
-	}
-	else
-	{
-		if (m_disp_shift == 0x00)
-			m_disp_shift = 0x4f;
-		else
-			m_disp_shift--;
-	}
+	m_disp_shift += direction;
+	
+	if (m_disp_shift == 0x50)
+		m_disp_shift = 0;
+	else if (m_disp_shift == -1)
+		m_disp_shift = 0x4f;
 }
 
 void hd44780_device::update_nibble(int rs, int rw)
@@ -402,14 +390,7 @@ WRITE8_MEMBER(hd44780_device::control_write)
 		// set DDRAM address
 		m_active_ram = DDRAM;
 		m_ac = m_ir & 0x7f;
-
-		if (m_num_line == 2 && m_ac > 0x27 && m_ac < 0x40)
-			m_ac = 0x40 + (m_ac - 0x28);
-		else if (m_num_line == 2 && m_ac > 0x67)
-			m_ac = 0x00 + (m_ac - 0x68);
-		else if (m_num_line == 1 && m_ac > 0x4f)
-			m_ac = 0x00 + (m_ac - 0x50);
-
+		correct_ac();
 		set_busy_flag(37);
 
 		if (LOG) logerror("HD44780 '%s': set DDRAM address %x\n", tag(), m_ac);
@@ -437,6 +418,7 @@ WRITE8_MEMBER(hd44780_device::control_write)
 		m_char_size = BIT(m_ir, 2) ? 10 : 8;
 		m_data_len  = BIT(m_ir, 4) ? 8 : 4;
 		m_num_line  = BIT(m_ir, 3) + 1;
+		correct_ac();
 		set_busy_flag(37);
 
 		if (LOG) logerror("HD44780 '%s': char size 5x%d, data len %d, lines %d\n", tag(), m_char_size, m_data_len, m_num_line);
@@ -445,14 +427,14 @@ WRITE8_MEMBER(hd44780_device::control_write)
 	else if (BIT(m_ir, 4))
 	{
 		// cursor or display shift
-		int direct = (BIT(m_ir, 2)) ? +1 : -1;
+		int direction = (BIT(m_ir, 2)) ? +1 : -1;
 
-		if (LOG) logerror("HD44780 '%s': %s shift %d\n", tag(), BIT(m_ir, 3) ? "display" : "cursor",  direct);
+		if (LOG) logerror("HD44780 '%s': %s shift %d\n", tag(), BIT(m_ir, 3) ? "display" : "cursor", direction);
 
 		if (BIT(m_ir, 3))
-			shift_display(direct);
+			shift_display(direction);
 		else
-			update_ac(direct);
+			update_ac(direction);
 
 		set_busy_flag(37);
 	}
