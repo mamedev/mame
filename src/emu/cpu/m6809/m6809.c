@@ -165,6 +165,8 @@ void m6809_base_device::device_start()
 	save_item(NAME(m_x.w));
 	save_item(NAME(m_y.w));
 	save_item(NAME(m_cc));
+	save_item(NAME(m_temp.w));
+	save_item(NAME(m_opcode));
 	save_item(NAME(m_nmi_asserted));
 	save_item(NAME(m_nmi_line));
 	save_item(NAME(m_firq_line));
