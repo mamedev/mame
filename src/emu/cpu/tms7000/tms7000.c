@@ -56,7 +56,6 @@ const device_type TMS70C20 = &device_creator<tms70c20_device>;
 const device_type TMS70C40 = &device_creator<tms70c40_device>;
 
 static ADDRESS_MAP_START(tms7000_io, AS_IO, 8, tms7000_device)
-	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(TMS7000_PORTA, TMS7000_PORTA) AM_WRITENOP
 	AM_RANGE(TMS7000_PORTB, TMS7000_PORTB) AM_READNOP
 ADDRESS_MAP_END
@@ -78,18 +77,18 @@ ADDRESS_MAP_END
 
 
 tms7000_device::tms7000_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: cpu_device(mconfig, TMS7000, "TMS7000", tag, owner, clock, "tms7000", __FILE__)
-	, m_program_config("program", ENDIANNESS_BIG, 8, 16, 0, ADDRESS_MAP_NAME(tms7000_mem))
-	, m_io_config("io", ENDIANNESS_BIG, 8, 8, 0, ADDRESS_MAP_NAME(tms7000_io))
-	, m_opcode(s_opfn)
+	: cpu_device(mconfig, TMS7000, "TMS7000", tag, owner, clock, "tms7000", __FILE__),
+	m_program_config("program", ENDIANNESS_BIG, 8, 16, 0, ADDRESS_MAP_NAME(tms7000_mem)),
+	m_io_config("io", ENDIANNESS_BIG, 8, 8, 0, ADDRESS_MAP_NAME(tms7000_io)),
+	m_opcode(s_opfn)
 {
 }
 
 tms7000_device::tms7000_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, address_map_constructor internal, const opcode_func *opcode, const char *shortname, const char *source)
-	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
-	, m_program_config("program", ENDIANNESS_BIG, 8, 16, 0, internal)
-	, m_io_config("io", ENDIANNESS_BIG, 8, 8, 0, ADDRESS_MAP_NAME(tms7000_io))
-	, m_opcode(opcode)
+	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source),
+	m_program_config("program", ENDIANNESS_BIG, 8, 16, 0, internal),
+	m_io_config("io", ENDIANNESS_BIG, 8, 8, 0, ADDRESS_MAP_NAME(tms7000_io)),
+	m_opcode(opcode)
 {
 }
 
@@ -99,7 +98,7 @@ tms7020_device::tms7020_device(const machine_config &mconfig, const char *tag, d
 }
 
 tms7020_exl_device::tms7020_exl_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: tms7000_device(mconfig, TMS7020_EXL, "TMS7020 (EXL 100)", tag, owner, clock, ADDRESS_MAP_NAME(tms7020_mem), s_opfn_exl, "tms7020_exl", __FILE__)
+	: tms7000_device(mconfig, TMS7020_EXL, "TMS7020 (EXL)", tag, owner, clock, ADDRESS_MAP_NAME(tms7020_mem), s_opfn_exl, "tms7020_exl", __FILE__)
 {
 }
 

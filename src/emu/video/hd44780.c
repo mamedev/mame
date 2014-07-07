@@ -252,12 +252,12 @@ inline void hd44780_device::pixel_update(bitmap_ind16 &bitmap, UINT8 line, UINT8
 	}
 	else
 	{
-		UINT8 line_heigh = (m_char_size == 8) ? m_char_size : m_char_size + 1;
+		UINT8 line_height = (m_char_size == 8) ? m_char_size : m_char_size + 1;
 
 		if (m_lines <= 2)
 		{
 			if (pos < m_chars)
-				bitmap.pix16(line * (line_heigh+1) + y, pos * 6 + x) = state;
+				bitmap.pix16(line * (line_height + 1) + y, pos * 6 + x) = state;
 		}
 		else if (m_lines <= 4)
 		{
@@ -270,7 +270,7 @@ inline void hd44780_device::pixel_update(bitmap_ind16 &bitmap, UINT8 line, UINT8
 				}
 
 				if (line < m_lines)
-					bitmap.pix16(line * (line_heigh+1) + y, pos * 6 + x) = state;
+					bitmap.pix16(line * (line_height + 1) + y, pos * 6 + x) = state;
 			}
 		}
 		else
