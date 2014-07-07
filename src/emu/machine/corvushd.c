@@ -1008,8 +1008,8 @@ void corvus_hdc_t::corvus_process_command_packet(bool invalid_command_flag) {
 					break;
 				case READ_SECTOR_256:
 				case READ_CHUNK_256:
-					m_buffer.read_256_reponse.status =
-						corvus_read_logical_sector(&m_buffer.read_sector_command.dadr, m_buffer.read_256_reponse.data, 256);
+					m_buffer.read_256_response.status =
+						corvus_read_logical_sector(&m_buffer.read_sector_command.dadr, m_buffer.read_256_response.data, 256);
 					break;
 				case READ_CHUNK_512:
 					m_buffer.read_512_response.status =

@@ -266,7 +266,7 @@ private:
 		struct {
 			UINT8   status;     // Status code returned by command executed
 			UINT8   data[256];  // Data returned from read
-		} read_256_reponse;
+		} read_256_response;
 		//
 		// 512-byte Read Sector response
 		//
