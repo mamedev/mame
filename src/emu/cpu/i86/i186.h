@@ -88,7 +88,6 @@ private:
 
 	struct dma_state
 	{
-		bool        drq_delay;
 		bool        drq_state;
 		UINT32      source;
 		UINT32      dest;
@@ -117,8 +116,6 @@ private:
 	static const device_timer_id TIMER_TIME0 = 3;
 	static const device_timer_id TIMER_TIME1 = 4;
 	static const device_timer_id TIMER_TIME2 = 5;
-	static const device_timer_id TIMER_DMA0 = 6;
-	static const device_timer_id TIMER_DMA1 = 7;
 
 	struct timer_state  m_timer[3];
 	struct dma_state    m_dma[2];

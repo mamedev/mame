@@ -1026,8 +1026,7 @@ WRITE_LINE_MEMBER(rmnimbus_state::nimbus_fdc_drq_w)
 	if(LOG_DISK)
 		logerror("nimbus_drives_drq_w(%d)\n", state);
 
-	if(state && FDC_DRQ_ENABLED())
-		m_maincpu->drq1_w(state);
+	m_maincpu->drq1_w(state && FDC_DRQ_ENABLED());
 }
 
 UINT8 rmnimbus_state::fdc_driveno(UINT8 drivesel)

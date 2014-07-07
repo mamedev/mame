@@ -120,8 +120,7 @@ static MACHINE_CONFIG_START( nimbus, rmnimbus_state )
 	//MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_SCANLINE)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", SCREEN_NO_COLOURS)
-	MCFG_PALETTE_INIT_OWNER(rmnimbus_state, rmnimbus)
+	MCFG_PALETTE_ADD("palette", 16)
 
 	/* Backing storage */
 	MCFG_WD2793x_ADD(FDC_TAG, 1000000)

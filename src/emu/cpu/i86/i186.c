@@ -10,9 +10,7 @@
 #define LOG_INTERRUPTS      0
 #define LOG_INTERRUPTS_EXT  0
 #define LOG_TIMER           0
-#define LOG_OPTIMIZATION    0
 #define LOG_DMA             0
-#define CPU_RESUME_TRIGGER  7123
 
 /* external int priority masks */
 
@@ -608,8 +606,6 @@ void i80186_cpu_device::device_start()
 	m_timer[0].time_timer = timer_alloc(TIMER_TIME0);
 	m_timer[1].time_timer = timer_alloc(TIMER_TIME1);
 	m_timer[2].time_timer = timer_alloc(TIMER_TIME2);
-	m_dma[0].finish_timer = timer_alloc(TIMER_DMA0);
-	m_dma[1].finish_timer = timer_alloc(TIMER_DMA1);
 
 	m_out_tmrout0_func.resolve_safe();
 	m_out_tmrout1_func.resolve_safe();
@@ -637,8 +633,6 @@ void i80186_cpu_device::device_reset()
 	m_intr.status            = 0x0000;
 	m_intr.poll_status       = 0x0000;
 	m_reloc = 0x20ff;
-	m_dma[0].drq_delay = false;
-	m_dma[1].drq_delay = false;
 	m_dma[0].drq_state = false;
 	m_dma[1].drq_state = false;
 	for(int i = 0; i < ARRAY_LENGTH(m_timer); ++i)
@@ -647,6 +641,7 @@ void i80186_cpu_device::device_reset()
 		m_timer[i].time_timer_active = 0;
 		m_timer[i].maxA = 0;
 		m_timer[i].maxB = 0;
+		m_timer[i].count = 0;
 	}
 }
 
@@ -826,6 +821,7 @@ void i80186_cpu_device::update_interrupt_state()
 
 		/* check external interrupts */
 		for (IntNo = 0; IntNo < 4; IntNo++)
+		{
 			if ((m_intr.ext[IntNo] & 0x0F) == Priority)
 			{
 				if (LOG_INTERRUPTS)
@@ -838,6 +834,12 @@ void i80186_cpu_device::update_interrupt_state()
 				/* if there's something pending, generate an interrupt */
 				if (m_intr.request & (0x10 << IntNo))
 				{
+					if((IntNo >= 2) && (m_intr.ext[IntNo - 2] & EXTINT_CTRL_CASCADE))
+					{
+						logerror("i186: %06x: irq %d use when set for cascade mode\n", pc(), IntNo);
+						m_intr.request &= ~(0x10 << IntNo);
+						continue;
+					}
 					/* otherwise, generate an interrupt for this request */
 					new_vector = 0x0c + IntNo;
 
@@ -845,7 +847,10 @@ void i80186_cpu_device::update_interrupt_state()
 					m_intr.ack_mask = 0x0010 << IntNo;
 					goto generate_int;
 				}
+				else if ((m_intr.in_service & (0x10 << IntNo)) && (m_intr.ext[IntNo] & EXTINT_CTRL_SFNM))
+					return; // if an irq is in service and sfnm is enabled, stop here
 			}
+		}
 	}
 	return;
 
@@ -855,8 +860,6 @@ generate_int:
 	if (!m_intr.pending)
 		set_input_line(0, ASSERT_LINE);
 	m_intr.pending = 1;
-	machine().scheduler().trigger(CPU_RESUME_TRIGGER);
-	if (LOG_OPTIMIZATION) logerror("  - trigger due to interrupt pending\n");
 	if (LOG_INTERRUPTS) logerror("(%f) **** Requesting interrupt vector %02X\n", machine().time().as_double(), new_vector);
 }
 
@@ -920,6 +923,7 @@ void i80186_cpu_device::handle_eoi(int data)
 				}
 		}
 	}
+	update_interrupt_state();
 }
 
 /* Trigger an external interrupt, optionally supplying the vector to take */
@@ -928,10 +932,13 @@ void i80186_cpu_device::external_int(UINT16 intno, int state, UINT8 vector)
 	if (LOG_INTERRUPTS_EXT) logerror("generating external int %02X, vector %02X\n",intno,vector);
 
 	if(!state)
-		return;
+	{
+		m_intr.request &= ~(0x010 << intno);
+		m_intr.ack_mask &= ~(0x0010 << intno);
+	}
+	else // Turn on the requested request bit and handle interrupt
+		m_intr.request |= (0x010 << intno);
 
-	// Turn on the requested request bit and handle interrupt
-	m_intr.request |= (0x010 << intno);
 	update_interrupt_state();
 }
 
@@ -1013,17 +1020,6 @@ void i80186_cpu_device::device_timer(emu_timer &timer, device_timer_id id, int p
 			}
 			else
 				t->int_timer->adjust(attotime::never, which);
-			break;
-		}
-		case TIMER_DMA0:
-		case TIMER_DMA1:
-		{
-			int which = param;
-			struct dma_state *d = &m_dma[which];
-
-			d->drq_delay = false;
-			if(d->drq_state)
-				drq_callback(which);
 			break;
 		}
 		case TIMER_TIME0:
@@ -1227,9 +1223,6 @@ void i80186_cpu_device::drq_callback(int which)
 	UINT8   dma_byte;
 	UINT8   incdec_size;
 
-	if(dma->drq_delay)
-		return;
-
 	if (LOG_DMA>1)
 		logerror("Control=%04X, src=%05X, dest=%05X, count=%04X\n",dma->control,dma->source,dma->dest,dma->count);
 
@@ -1282,7 +1275,7 @@ void i80186_cpu_device::drq_callback(int which)
 	dma->count -= 1;
 
 	// Terminate if count is zero, and terminate flag set
-	if((dma->control & TERMINATE_ON_ZERO) && (dma->count==0))
+	if(((dma->control & TERMINATE_ON_ZERO) || !(dma->control & SYNC_MASK)) && (dma->count==0))
 	{
 		dma->control &= ~ST_STOP;
 		if (LOG_DMA) logerror("DMA terminated\n");
@@ -1295,9 +1288,6 @@ void i80186_cpu_device::drq_callback(int which)
 		m_intr.request |= 0x04 << which;
 		update_interrupt_state();
 	}
-
-//  dma->finish_timer->adjust(attotime::from_hz(clock()/8), 0);
-//  dma->drq_delay = true;
 }
 
 READ16_MEMBER(i80186_cpu_device::internal_port_r)

@@ -39,11 +39,13 @@ READ16_MEMBER(dectalk_isa_device::host_irq_r)
 
 READ8_MEMBER(dectalk_isa_device::dma_r)
 {
+	m_cpu->drq1_w(0);
 	return m_dma;
 }
 
 WRITE8_MEMBER(dectalk_isa_device::dma_w)
 {
+	m_cpu->drq1_w(0);
 	m_dma = data;
 }
 
@@ -71,6 +73,7 @@ WRITE16_MEMBER(dectalk_isa_device::output_ctl_w)
 READ16_MEMBER(dectalk_isa_device::dsp_dma_r)
 {
 	m_bio = ASSERT_LINE;
+	m_cpu->drq1_w(0);
 	return m_dsp_dma;
 }
 

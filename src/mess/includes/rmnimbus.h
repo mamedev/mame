@@ -20,13 +20,6 @@
 #define MAINCPU_TAG "maincpu"
 #define IOCPU_TAG   "iocpu"
 
-#define SCREEN_WIDTH_PIXELS     640
-#define SCREEN_HEIGHT_LINES     250
-#define SCREEN_NO_COLOURS       16
-
-#define NO_VIDREGS              (0x30/2)
-
-
 /* Nimbus specific */
 
 /* External int vectors for chained interupts */
@@ -191,10 +184,8 @@ public:
 	UINT8 m_last_playmode;
 	UINT8 m_ay8910_a;
 	UINT8 m_sio_int_state;
-	UINT16 m_vidregs[NO_VIDREGS];
-	UINT8 m_bpp;
-	UINT16 m_pixel_mask;
-	UINT8 m_hs_count;
+	UINT16 m_vidregs[24];
+	UINT16 m_x, m_y;
 	UINT32 m_debug_video;
 	UINT8 m_vector;
 	UINT8 m_eeprom_bits;
@@ -202,8 +193,6 @@ public:
 
 	DECLARE_READ8_MEMBER(nimbus_mcu_r);
 	DECLARE_WRITE8_MEMBER(nimbus_mcu_w);
-	DECLARE_READ16_MEMBER(nimbus_io_r);
-	DECLARE_WRITE16_MEMBER(nimbus_io_w);
 	DECLARE_READ8_MEMBER(scsi_r);
 	DECLARE_WRITE8_MEMBER(scsi_w);
 	DECLARE_WRITE8_MEMBER(fdc_ctl_w);
@@ -225,7 +214,6 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	virtual void video_reset();
-	DECLARE_PALETTE_INIT(rmnimbus);
 	UINT32 screen_update_nimbus(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(sio_interrupt);
 	DECLARE_WRITE_LINE_MEMBER(nimbus_fdc_intrq_w);
@@ -241,15 +229,17 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(write_scsi_iena);
 
 	UINT8 get_pixel(UINT16 x, UINT16 y);
-	UINT16 read_pixel_line(UINT16 x, UINT16 y, UINT8 width);
+	UINT16 read_pixel_line(UINT16 x, UINT16 y, UINT8 pixels, UINT8 bpp);
 	UINT16 read_pixel_data(UINT16 x, UINT16 y);
 	void set_pixel(UINT16 x, UINT16 y, UINT8 colour);
 	void set_pixel40(UINT16 x, UINT16 y, UINT8 colour);
-	void write_pixel_line(UINT16 x, UINT16 y, UINT16    data, UINT8 width);
-	void move_pixel_line(UINT16 x, UINT16 y, UINT16    data, UINT8 width);
+	void write_pixel_line(UINT16 x, UINT16 y, UINT16, UINT8 pixels, UINT8 bpp);
+	void move_pixel_line(UINT16 x, UINT16 y, UINT8 width);
 	void write_pixel_data(UINT16 x, UINT16 y, UINT16    data);
 	void write_reg_004();
 	void write_reg_006();
+	void write_reg_00A();
+	void write_reg_00E();
 	void write_reg_010();
 	void write_reg_012();
 	void write_reg_014();
@@ -258,7 +248,7 @@ public:
 	void write_reg_01C();
 	void write_reg_01E();
 	void write_reg_026();
-	void change_palette(UINT8 bank, UINT16 colours, UINT8 regno);
+	void change_palette(UINT8 bank, UINT16 colours);
 	void external_int(UINT16 intno, UINT8 vector);
 	DECLARE_READ8_MEMBER(cascade_callback);
 	void *get_dssi_ptr(address_space &space, UINT16   ds, UINT16 si);
@@ -271,7 +261,7 @@ public:
 	void hdc_post_rw();
 	void hdc_drq();
 	void pc8031_reset();
-	void ipc_dumpregs();
+	//void ipc_dumpregs();
 	void iou_reset();
 	void rmni_sound_reset();
 	void mouse_js_reset();
