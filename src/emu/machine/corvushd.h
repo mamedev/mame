@@ -206,7 +206,9 @@ private:
 	};
 
 	UINT8   m_status;             // Controller status byte (DIRECTION + BUSY/READY)
+	// Prep mode
 	bool    m_prep_mode;          // Whether the controller is in Prep Mode or not
+	UINT8   m_prep_drv;           // If in prep mode, Corvus drive id (1..15) being prepped
 	// Physical drive info
 	UINT8   m_sectors_per_track;  // Number of sectors per track for this drive
 	UINT8   m_tracks_per_cylinder;// Number of tracks per cylinder (heads)
@@ -400,6 +402,14 @@ private:
 			UINT8   boot_block; // Which boot block to read (0-7)
 		} old_boot_command;
 		//
+		// Put drive into prep mode command (0x11)
+		//
+		struct {
+			UINT8	code;               // Command code
+			UINT8	drive;              // Drive number (starts at 1)
+			UINT8 	prep_block[512];    // Z80 machine code payload
+		} prep_mode_command;
+		//
 		// Read Firmware command (Prep Mode 0x32)
 		//
 		struct {
@@ -499,6 +509,8 @@ private:
 	UINT8 corvus_init_semaphore_table();
 	UINT8 corvus_get_drive_parameters(UINT8 drv);
 	UINT8 corvus_read_boot_block(UINT8 block);
+	UINT8 corvus_enter_prep_mode(UINT8 drv, UINT8 *prep_block);
+	UINT8 corvus_exit_prep_mode();
 	UINT8 corvus_read_firmware_block(UINT8 head, UINT8 sector);
 	UINT8 corvus_write_firmware_block(UINT8 head, UINT8 sector, UINT8 *buffer);
 	UINT8 corvus_format_drive(UINT8 *pattern, UINT16 len);

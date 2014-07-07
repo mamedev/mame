@@ -74,6 +74,7 @@ corvus_hdc_t::corvus_hdc_t(const machine_config &mconfig, const char *tag, devic
 	device_t(mconfig, CORVUS_HDC, "Corvus Flat Cable HDC", tag, owner, clock, "corvus_hdc", __FILE__),
 	m_status(0),
 	m_prep_mode(false),
+	m_prep_drv(0),
 	m_sectors_per_track(0),
 	m_tracks_per_cylinder(0),
 	m_cylinders_per_drive(0),
@@ -761,7 +762,58 @@ UINT8 corvus_hdc_t::corvus_read_boot_block(UINT8 block) {
 
 
 //
-// Corvus_Read_Firmware_Block
+// corvus_enter_prep_mode
+//
+// Enter prep mode.  In prep mode, only prep mode commands may be executed.
+//
+// The "prep block" is 512 bytes of Z80 machine code that the host sends to
+// the controller.  The controller will jump to this code after receiving it,
+// and it is what actually implements prep mode commands.  This HLE ignores
+// the prep block from the host.  
+//
+// Pass:
+//      drv:        Corvus drive id (1..15) to be prepped
+//      prep_block: 512 bytes of Z80 machine code, contents ignored
+//
+// Returns:
+//      Status of command
+//
+UINT8 corvus_hdc_t::corvus_enter_prep_mode(UINT8 drv, UINT8 *prep_block) {
+	// check if drive is valid
+	if (!corvus_hdc_file(drv)) {
+		logerror("corvus_enter_prep_mode: Failure returned by corvus_hdc_file(%d)\n", drv);
+		return STAT_FATAL_ERR | STAT_DRIVE_NOT_ONLINE;
+	}
+
+	LOG(("corvus_enter_prep_mode: Prep mode entered for drive %d, prep block follows:\n", drv));
+	LOG_BUFFER(prep_block, 512);
+
+	m_prep_mode = true;
+	m_prep_drv = drv;
+	return STAT_SUCCESS;	
+}
+
+
+
+//
+// corvus_exit_prep_mode (Prep Mode Only)
+//
+// Exit from prep mode and return to normal command mode.
+//
+// Returns:
+//      Status of command (always success)
+//
+UINT8 corvus_hdc_t::corvus_exit_prep_mode() {
+	LOG(("corvus_exit_prep_mode: Prep mode exited\n"));
+	m_prep_mode = false;
+	m_prep_drv = 0;
+	return STAT_SUCCESS;	
+}
+
+
+
+//
+// Corvus_Read_Firmware_Block (Prep Mode Only)
 //
 // Reads firmware information from the first cylinder of the drive
 //
@@ -781,14 +833,14 @@ UINT8 corvus_hdc_t::corvus_read_firmware_block(UINT8 head, UINT8 sector) {
 	LOG(("corvus_read_firmware_block: Reading firmware head: 0x%2.2x, sector: 0x%2.2x, relative_sector: 0x%2.2x\n",
 		head, sector, relative_sector));
 
-	status = corvus_read_sector(1, relative_sector, m_buffer.read_512_response.data, 512);        // TODO: Which drive should Prep Mode talk to ???
+	status = corvus_read_sector(m_prep_drv, relative_sector, m_buffer.read_512_response.data, 512);        
 	return status;
 }
 
 
 
 //
-// Corvus_Write_Firmware_Block
+// Corvus_Write_Firmware_Block (Prep Mode Only)
 //
 // Writes firmware information to the first cylinder of the drive
 //
@@ -809,14 +861,14 @@ UINT8 corvus_hdc_t::corvus_write_firmware_block(UINT8 head, UINT8 sector, UINT8 
 	LOG(("corvus_write_firmware_block: Writing firmware head: 0x%2.2x, sector: 0x%2.2x, relative_sector: 0x%2.2x\n",
 		head, sector, relative_sector));
 
-	status = corvus_write_sector(1, relative_sector, buffer, 512); // TODO: Which drive should Prep Mode talk to ???
+	status = corvus_write_sector(m_prep_drv, relative_sector, buffer, 512); 
 	return status;
 }
 
 
 
 //
-// Corvus_Format_Drive
+// Corvus_Format_Drive (Prep Mode Only)
 //
 // Write the pattern provided across the entire disk
 //
@@ -833,7 +885,7 @@ UINT8 corvus_hdc_t::corvus_format_drive(UINT8 *pattern, UINT16 len) {
 	UINT8   tbuffer[512];
 
 	// Set up m_tracks_per_cylinder and m_sectors_per_track
-	corvus_hdc_file(1);
+	corvus_hdc_file(m_prep_drv);
 
 	max_sector = m_sectors_per_track * m_tracks_per_cylinder * m_cylinders_per_drive;
 
@@ -849,7 +901,7 @@ UINT8 corvus_hdc_t::corvus_format_drive(UINT8 *pattern, UINT16 len) {
 	LOG_BUFFER(pattern, 512);
 
 	for(sector = 0; sector <= max_sector; sector++) {
-		status = corvus_write_sector(1, sector, pattern, 512);
+		status = corvus_write_sector(m_prep_drv, sector, pattern, 512);
 		if(status != STAT_SUCCESS) {
 			logerror("corvus_format_drive: Error while formatting drive in corvus_write_sector--sector: 0x%5.5x, status: 0x%x2.2x\n",
 				sector, status);
@@ -995,8 +1047,9 @@ void corvus_hdc_t::corvus_process_command_packet(bool invalid_command_flag) {
 						corvus_get_drive_parameters(m_buffer.get_drive_parameters_command.drive);
 					break;
 				case PREP_MODE_SELECT:
-					m_prep_mode = true;
-					m_buffer.single_byte_response.status = STAT_SUCCESS;
+					m_buffer.single_byte_response.status =
+						corvus_enter_prep_mode(m_buffer.prep_mode_command.drive, 
+							m_buffer.prep_mode_command.prep_block);
 					break;
 				default:
 					m_xmit_bytes = 1;                      // Return a fatal status
@@ -1007,12 +1060,13 @@ void corvus_hdc_t::corvus_process_command_packet(bool invalid_command_flag) {
 		} else {    // In Prep mode
 			switch(m_buffer.command.code) {
 				case PREP_MODE_SELECT:
-					m_prep_mode = true;
-					m_buffer.single_byte_response.status = STAT_SUCCESS;
+					m_buffer.single_byte_response.status =
+						corvus_enter_prep_mode(m_buffer.prep_mode_command.drive, 
+							m_buffer.prep_mode_command.prep_block);
 					break;
 				case PREP_RESET_DRIVE:
-					m_prep_mode = false;
-					m_buffer.single_byte_response.status = STAT_SUCCESS;
+					m_buffer.single_byte_response.status = 
+						corvus_exit_prep_mode();
 					break;
 				case PREP_READ_FIRMWARE:
 					m_buffer.drive_param_response.status =
