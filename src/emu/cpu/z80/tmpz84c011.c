@@ -66,11 +66,11 @@ void tmpz84c011_device::device_start()
 	m_outportsd.resolve_safe();
 	m_outportse.resolve_safe();
 
-	m_inportsa.resolve_safe(0xff);
-	m_inportsb.resolve_safe(0xff);
-	m_inportsc.resolve_safe(0xff);
-	m_inportsd.resolve_safe(0xff);
-	m_inportse.resolve_safe(0xff);
+	m_inportsa.resolve_safe(0);
+	m_inportsb.resolve_safe(0);
+	m_inportsc.resolve_safe(0);
+	m_inportsd.resolve_safe(0);
+	m_inportse.resolve_safe(0);
 
 	m_zc0_cb.resolve_safe();
 	m_zc1_cb.resolve_safe();
@@ -99,11 +99,11 @@ void tmpz84c011_device::device_reset()
 	z80_device::device_reset();
 
 	// initialize I/O
-	tmpz84c011_dir_pa_w(*m_io, 0, 0); tmpz84c011_pa_w(*m_io, 0, 0xff);
-	tmpz84c011_dir_pb_w(*m_io, 0, 0); tmpz84c011_pb_w(*m_io, 0, 0xff);
-	tmpz84c011_dir_pc_w(*m_io, 0, 0); tmpz84c011_pc_w(*m_io, 0, 0xff);
-	tmpz84c011_dir_pd_w(*m_io, 0, 0); tmpz84c011_pd_w(*m_io, 0, 0xff);
-	tmpz84c011_dir_pe_w(*m_io, 0, 0); tmpz84c011_pe_w(*m_io, 0, 0xff);
+	tmpz84c011_dir_pa_w(*m_io, 0, 0); tmpz84c011_pa_w(*m_io, 0, 0);
+	tmpz84c011_dir_pb_w(*m_io, 0, 0); tmpz84c011_pb_w(*m_io, 0, 0);
+	tmpz84c011_dir_pc_w(*m_io, 0, 0); tmpz84c011_pc_w(*m_io, 0, 0);
+	tmpz84c011_dir_pd_w(*m_io, 0, 0); tmpz84c011_pd_w(*m_io, 0, 0);
+	tmpz84c011_dir_pe_w(*m_io, 0, 0); tmpz84c011_pe_w(*m_io, 0, 0);
 }
 
 
@@ -136,30 +136,30 @@ READ8_MEMBER(tmpz84c011_device::tmpz84c011_pe_r)
 WRITE8_MEMBER(tmpz84c011_device::tmpz84c011_pa_w)
 {
 	m_pio_latch[0] = data;
-	m_outportsa(data | ~m_pio_dir[0]);
+	m_outportsa(data & m_pio_dir[0]);
 }
 
 WRITE8_MEMBER(tmpz84c011_device::tmpz84c011_pb_w)
 {
 	m_pio_latch[1] = data;
-	m_outportsb(data | ~m_pio_dir[1]);
+	m_outportsb(data & m_pio_dir[1]);
 }
 WRITE8_MEMBER(tmpz84c011_device::tmpz84c011_pc_w)
 {
 	m_pio_latch[2] = data;
-	m_outportsc(data | ~m_pio_dir[2]);
+	m_outportsc(data & m_pio_dir[2]);
 }
 
 WRITE8_MEMBER(tmpz84c011_device::tmpz84c011_pd_w)
 {
 	m_pio_latch[3] = data;
-	m_outportsd(data | ~m_pio_dir[3]);
+	m_outportsd(data & m_pio_dir[3]);
 }
 
 WRITE8_MEMBER(tmpz84c011_device::tmpz84c011_pe_w)
 {
 	m_pio_latch[4] = data;
-	m_outportse(data | ~m_pio_dir[4]);
+	m_outportse(data & m_pio_dir[4]);
 }
 
 READ8_MEMBER(tmpz84c011_device::tmpz84c011_dir_pa_r)
