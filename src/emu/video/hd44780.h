@@ -115,7 +115,7 @@ private:
 	bool        m_cursor_on;      // cursor on/off
 	bool        m_blink_on;       // blink on/off
 	bool        m_shift_on;       // shift on/off
-	UINT8       m_disp_shift;     // display shift
+	int         m_disp_shift;     // display shift
 	int         m_direction;      // auto increment/decrement (-1 or +1)
 	UINT8       m_data_len;       // interface data length 4 or 8 bit
 	UINT8       m_num_line;       // number of lines
