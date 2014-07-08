@@ -68,19 +68,15 @@
  * will NOT work out of the box since RV = RV(RD).
  *
  * The following approach will be used going forward based on die pictures
- * of the AY8910 done by Dr Stack van Hay:
- *
+ * of the AY8910 done by Dr. Stack van Hay:
  *
  *
  *              5V
  *             _| D
  *          G |      NMOS
- *     Vg ---||
+ *     Vg ---||               Kn depends on volume selected
  *            |_  S Vs
  *               |
- *               Z
- *               Z Resistor Value for RV
- *               Z
  *               |
  *               +---> VO Output signal
  *               |
@@ -94,17 +90,17 @@
  *
  *  Id = Kn * (Vgs - Vtn)^2
  *
- *  Using Id = Vs / (RV + RD)
+ *  Using Id = Vs / RD
  *
- *  Vs = Kn * (RV + RD) * (Vg - Vs - Vtn)^2
+ *  Vs = Kn * RD  * (Vg - Vs - Vtn)^2
  *
  *  finally using Vg' = Vg - Vtn
  *
- *  Vs = Vg' + 1 / (2 * Kn * (RV + RD)) - sqrt((Vg' + 1 / (2 * Kn * (RV + RD)))^2 - Vg'^2)
+ *  Vs = Vg' + 1 / (2 * Kn * RD) - sqrt((Vg' + 1 / (2 * Kn * RD))^2 - Vg'^2)
  *
- *  and thus
+ *  and finally
  *
- *  VO = Vs * RD / (RV + RD)
+ *  VO = Vs
  *
  *  and this can be used to re-Thenevin to 5V
  *
@@ -112,7 +108,6 @@
  *
  *  The RV and Kn parameter are derived using least squares to match
  *  calculation results with measurements.
- *
  *
  *  FIXME:
  *  There is voltage of 60 mV measured with the EX520 (Ri ~ 10M). This may
