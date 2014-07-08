@@ -684,6 +684,7 @@ void device_scheduler::postload()
 		timer_list_insert(*timer);
 
 	m_suspend_changes_pending = true;
+	rebuild_execute_list();
 
 	// report the timer state after a log
 	logerror("After resetting/reordering timers:\n");
