@@ -678,6 +678,7 @@ void paradise_state::machine_start()
 
 	save_item(NAME(m_palbank));
 	save_item(NAME(m_priority));
+	save_item(NAME(irq_count));
 }
 
 void paradise_state::machine_reset()
