@@ -114,7 +114,7 @@
     317-0021  FD1089A [2] Alex Kidd            40000b ?
     317-0022  FD1089A [1] Dunk Shot            40000d 030000-ffffff
     317-0024  FD1089B [1] Time Scanner         40000f 000000-02ffff
-    317-0027  FD1089B [2] SDI                  400011 ?
+    317-0027  FD1089B [1] SDI                  400011 000000-03ffff
     317-0028  FD1089A [2] Defense              400011 ?
     317-0033  FD1089A [1] Alien Syndrome       400013 030000-ffffff
     317-0037  FD1089B [2] Alien Syndrome       400013 030000-ffffff
