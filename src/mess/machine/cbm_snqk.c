@@ -87,9 +87,11 @@ error:
 
 void cbm_quick_sethiaddress( address_space &space, UINT16 hiaddress )
 {
+	space.write_byte(0xae, hiaddress & 0xff);
 	space.write_byte(0x31, hiaddress & 0xff);
 	space.write_byte(0x2f, hiaddress & 0xff);
 	space.write_byte(0x2d, hiaddress & 0xff);
+	space.write_byte(0xaf, hiaddress >> 8);
 	space.write_byte(0x32, hiaddress >> 8);
 	space.write_byte(0x30, hiaddress >> 8);
 	space.write_byte(0x2e, hiaddress >> 8);

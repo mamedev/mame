@@ -176,7 +176,7 @@ Muscle Bomber: The Body Explosion* (Japan 930713)                  91634B-2   MB
 Muscle Bomber Duo: Ultimate Team Battle* (World 931206)      1993  91635B-?   MB63B    BPRG1   IOB1  ?            CPS-B-21  DL-0921-10014          IOC1
 Muscle Bomber Duo: Heat Up Warriors* (Japan 931206)                91634B-2   MB63B    BPRG1   IOB1  92641C-1     CPS-B-21  DL-0921-10014          IOC1
 
-Ken Sei Mogura (Japan ??????)                                1994  ?          ?                ?     ?            ?         ?
+Ken Sei Mogura: Street Fighter II (Japan 940418, Ver 1.00)   1994  91634B-2   KNM10B   BPRG1   IOB1  92631C-6     CPS-B-21  DL-0921-10014  C632    IOC1
 
 Pnickies (Japan 940608)                                      1994  89625B-1   PKB10B           IOB1  92631C-6     CPS-B-21  DL-0921-10014  C632    IOC1
 
@@ -1581,7 +1581,8 @@ static const struct CPS1config cps1_config_table[]=
 	{"cps2",        CPS_B_21_DEF, mapper_cps2 },
 
 	/* CPS1 board + extra support boards */
-	{"kenseim",       CPS_B_21_DEF, mapper_KNM10B }, // wrong, need to convert equations from PAL
+
+	{"kenseim",     CPS_B_21_DEF, mapper_KNM10B },	// wrong, need to convert equations from PAL
 
 	{0}     /* End of table */
 };

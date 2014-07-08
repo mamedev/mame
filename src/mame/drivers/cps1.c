@@ -11631,5 +11631,4 @@ CONS( 1995, sfzch,  0, 0,     cps1_12MHz, sfzch,      cps_state, cps1,     "Capc
 CONS( 1995, sfach,  sfzch, 0, cps1_12MHz, sfzch,      cps_state, cps1,     "Capcom", "Street Fighter Alpha: Warriors' Dreams (CPS Changer, Publicity USA 950727)", 0 )
 CONS( 1995, sfzbch, sfzch, 0, cps1_12MHz, sfzch,      cps_state, cps1,     "Capcom", "Street Fighter Zero (CPS Changer, Brazil 950727)", 0 )
 
-// Kensei Mogura - see kenseim.c
-
+// Ken Sei Mogura: Street Fighter II - see kenseim.c
