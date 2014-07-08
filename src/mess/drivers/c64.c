@@ -1704,7 +1704,7 @@ ROM_END
 
 ROM_START( c64c )
 	ROM_REGION( 0x4000, "kernal", 0 )
-	ROM_DEFAULT_BIOS("kernal")
+	ROM_DEFAULT_BIOS("cbm")
 	ROM_SYSTEM_BIOS(0, "cbm", "Original" )
 	ROMX_LOAD( "251913-01.u4", 0x0000, 0x4000, CRC(0010ec31) SHA1(765372a0e16cbb0adf23a07b80f6b682b39fbf88), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS(1, "pdc", "ProLogic-DOS Classic" )
