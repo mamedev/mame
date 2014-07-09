@@ -187,7 +187,9 @@ public:
 		m_blitter(*this, "blitter"),
 		m_serflash(*this, "game"),
 		m_eeprom(*this, "eeprom"),
-		cv1k_ram(*this, "mainram") { }
+		cv1k_ram(*this, "mainram"),
+		m_blitrate(*this, "BLITRATE"),
+		m_eepromout(*this, "EEPROMOUT") { }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<epic12_device> m_blitter;
@@ -214,6 +216,9 @@ public:
 	DECLARE_DRIVER_INIT(mushisam);
 	DECLARE_DRIVER_INIT(mushisama);
 	DECLARE_DRIVER_INIT(espgal2);
+
+	required_ioport m_blitrate;
+	required_ioport m_eepromout;
 };
 
 
@@ -226,7 +231,7 @@ public:
 
 UINT32 cv1k_state::screen_update_cv1k(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	epic12_device::set_delay_scale(m_blitter, ioport(":BLITRATE")->read());
+	epic12_device::set_delay_scale(m_blitter, m_blitrate->read());
 
 	m_blitter->draw_screen(bitmap,cliprect);
 	return 0;
@@ -306,7 +311,7 @@ WRITE8_MEMBER( cv1k_state::serial_rtc_eeprom_w )
 	switch (offset)
 	{
 		case 0x01:
-			space.machine().root_device().ioport("EEPROMOUT")->write(data, 0xff);
+			m_eepromout->write(data, 0xff);
 			break;
 		case 0x03:
 			m_serflash->flash_enab_w(space,offset,data);
