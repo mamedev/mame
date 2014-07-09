@@ -756,7 +756,7 @@ ROM_START( tigeroad ) /* ECT program roms */
 	ROM_LOAD( "tr_13.7l", 0x0000, 0x8000, CRC(a79be1eb) SHA1(4191ccd48f7650930f9a4c2be0790239d7420bb1) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "trprom.9e", 0x0000, 0x0100, CRC(ec80ae36) SHA1(397ec8fc1b106c8b8d4bf6798aa429e8768a101a) )    /* priority (not used) */
+	ROM_LOAD( "tr.9e", 0x0000, 0x0100, CRC(ec80ae36) SHA1(397ec8fc1b106c8b8d4bf6798aa429e8768a101a) )    /* priority (not used) - N82S129A or compatible */
 ROM_END
 
 ROM_START( tigeroadu ) /* US ROMSTAR program roms */
@@ -792,7 +792,7 @@ ROM_START( tigeroadu ) /* US ROMSTAR program roms */
 	ROM_LOAD( "tr_13.7l", 0x0000, 0x8000, CRC(a79be1eb) SHA1(4191ccd48f7650930f9a4c2be0790239d7420bb1) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "trprom.9e", 0x0000, 0x0100, CRC(ec80ae36) SHA1(397ec8fc1b106c8b8d4bf6798aa429e8768a101a) )    /* priority (not used) */
+	ROM_LOAD( "tr.9e", 0x0000, 0x0100, CRC(ec80ae36) SHA1(397ec8fc1b106c8b8d4bf6798aa429e8768a101a) )    /* priority (not used) - N82S129A or compatible */
 ROM_END
 
 ROM_START( toramich )
@@ -829,7 +829,7 @@ ROM_START( toramich )
 	ROM_LOAD( "tr_13.7l", 0x0000, 0x8000, CRC(a79be1eb) SHA1(4191ccd48f7650930f9a4c2be0790239d7420bb1) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "trprom.9e", 0x0000, 0x0100, CRC(ec80ae36) SHA1(397ec8fc1b106c8b8d4bf6798aa429e8768a101a) )    /* priority (not used) */
+	ROM_LOAD( "tr.9e", 0x0000, 0x0100, CRC(ec80ae36) SHA1(397ec8fc1b106c8b8d4bf6798aa429e8768a101a) )    /* priority (not used) - N82S129A or compatible */
 ROM_END
 
 ROM_START( tigeroadb )
