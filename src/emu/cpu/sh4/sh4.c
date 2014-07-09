@@ -228,7 +228,7 @@ UINT32 abs;
 }
 #endif
 
-UINT8 sh34_base_device::RB(offs_t A)
+inline UINT8 sh34_base_device::RB(offs_t A)
 {
 	if (A >= 0xe0000000)
 		return m_program->read_byte(A);
@@ -236,7 +236,7 @@ UINT8 sh34_base_device::RB(offs_t A)
 	return m_program->read_byte(A & AM);
 }
 
-UINT16 sh34_base_device::RW(offs_t A)
+inline UINT16 sh34_base_device::RW(offs_t A)
 {
 	if (A >= 0xe0000000)
 		return m_program->read_word(A);
@@ -244,7 +244,7 @@ UINT16 sh34_base_device::RW(offs_t A)
 	return m_program->read_word(A & AM);
 }
 
-UINT32 sh34_base_device::RL(offs_t A)
+inline UINT32 sh34_base_device::RL(offs_t A)
 {
 	if (A >= 0xe0000000)
 		return m_program->read_dword(A);
@@ -252,7 +252,7 @@ UINT32 sh34_base_device::RL(offs_t A)
 	return m_program->read_dword(A & AM);
 }
 
-void sh34_base_device::WB(offs_t A, UINT8 V)
+inline void sh34_base_device::WB(offs_t A, UINT8 V)
 {
 	if (A >= 0xe0000000)
 	{
@@ -263,7 +263,7 @@ void sh34_base_device::WB(offs_t A, UINT8 V)
 	m_program->write_byte(A & AM,V);
 }
 
-void sh34_base_device::WW(offs_t A, UINT16 V)
+inline void sh34_base_device::WW(offs_t A, UINT16 V)
 {
 	if (A >= 0xe0000000)
 	{
@@ -274,7 +274,7 @@ void sh34_base_device::WW(offs_t A, UINT16 V)
 	m_program->write_word(A & AM,V);
 }
 
-void sh34_base_device::WL(offs_t A, UINT32 V)
+inline void sh34_base_device::WL(offs_t A, UINT32 V)
 {
 	if (A >= 0xe0000000)
 	{
