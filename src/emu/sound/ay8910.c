@@ -545,11 +545,19 @@ INLINE void build_mosfet_resistor_table(const ay8910_device::mosfet_param &par, 
         const double Vd = 5.0;
         const double Vg = par.m_Vg - par.m_Vth;
         const double kn = par.m_Kn[j] / 1.0e6;
-        const double p2 = 1.0 / (2.0 * kn * rd);
-        const double Vs = Vg + p2 - sqrt(p2 * p2 - Vg * Vg);
+        const double p2 = 1.0 / (2.0 * kn * rd) + Vg;
+        const double Vs = p2 - sqrt(p2 * p2 - Vg * Vg);
 
         const double res = rd * ( Vd / Vs - 1.0);
-        tab[j] = res;
+        /* FXIME: That's the biggest value we can stream on to netlist. Have to find a different
+         *        approach.
+         */
+
+        if (res > (1 << 21))
+            tab[j] = (1 << 21);
+        else
+            tab[j] = res;
+        //printf("%d %f %10d\n", j, rd / (res + rd) * 5.0, tab[j]);
     }
 }
 
@@ -834,7 +842,7 @@ void ay8910_device::build_mixer_table()
 	    for (chan=0; chan < AY8910_NUM_CHANNELS; chan++)
 		{
 			build_mosfet_resistor_table(ay8910_mosfet_param, m_res_load[chan], m_vol_table[chan]);
-			build_mosfet_resistor_table(ay8910_mosfet_param, m_res_load[chan], m_vol_table[chan]);
+			build_mosfet_resistor_table(ay8910_mosfet_param, m_res_load[chan], m_env_table[chan]);
 		}
 	}
 	else
