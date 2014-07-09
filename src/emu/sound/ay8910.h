@@ -133,7 +133,15 @@ public:
 		int    res_count;
 		double res[32];
 	};
-	
+
+    struct mosfet_param
+    {
+        double m_Vth;
+        double m_Vg;
+        int    m_count;
+        double m_Kn[32];
+    };
+
 	void ay8910_write_ym(int addr, int data);
 	int ay8910_read_ym();
 	void ay8910_reset_ym();
@@ -154,6 +162,7 @@ private:
 	void ay8910_statesave();
 
 	// internal state
+	psg_type_t m_type;
 	int m_streams;
 	int m_ioports;
 	int m_ready;

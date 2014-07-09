@@ -88,13 +88,13 @@
  *
  *  Whilst conducting, the FET operates in saturation mode:
  *
- *  Id = Kn * (Vgs - Vtn)^2
+ *  Id = Kn * (Vgs - Vth)^2
  *
  *  Using Id = Vs / RD
  *
- *  Vs = Kn * RD  * (Vg - Vs - Vtn)^2
+ *  Vs = Kn * RD  * (Vg - Vs - Vth)^2
  *
- *  finally using Vg' = Vg - Vtn
+ *  finally using Vg' = Vg - Vth
  *
  *  Vs = Vg' + 1 / (2 * Kn * RD) - sqrt((Vg' + 1 / (2 * Kn * RD))^2 - Vg'^2)
  *
@@ -386,13 +386,42 @@ static const ay8910_device::ay_ym_param ay8910_param =
  * RD was measured on a real chip to be 8m Ohm, RU was 0.8m Ohm.
  */
 
+
 static const ay8910_device::ay_ym_param ay8910_param =
 {
-	800000, 8000000,
-	16,
-	{ 15950, 15350, 15090, 14760, 14275, 13620, 12890, 11370,
-		10600,  8590,  7190,  5985,  4820,  3945,  3017,  2345 }
+    800000, 8000000,
+    16,
+    { 15950, 15350, 15090, 14760, 14275, 13620, 12890, 11370,
+        10600,  8590,  7190,  5985,  4820,  3945,  3017,  2345 }
 };
+
+static const ay8910_device::mosfet_param ay8910_mosfet_param =
+{
+    1.465385778,
+    4.9,
+    16,
+    {
+          0.00076,
+          0.80536,
+          1.13106,
+          1.65952,
+          2.42261,
+          3.60536,
+          5.34893,
+          8.96871,
+         10.97202,
+         19.32370,
+         29.01935,
+         38.82026,
+         55.50539,
+         78.44395,
+        109.49257,
+        153.72985,
+    }
+};
+
+
+
 
 /*************************************
  *
@@ -492,7 +521,7 @@ INLINE void build_single_table(double rl, const ay8910_device::ay_ym_param *par,
 
 }
 
-INLINE void build_resisor_table(const ay8910_device::ay_ym_param *par, INT32 *tab, int zero_is_off)
+INLINE void build_resistor_table(const ay8910_device::ay_ym_param *par, INT32 *tab, int zero_is_off)
 {
 	int j;
 
@@ -505,6 +534,23 @@ INLINE void build_resisor_table(const ay8910_device::ay_ym_param *par, INT32 *ta
 		else
 			tab[j] = par->res[j];
 	}
+}
+
+INLINE void build_mosfet_resistor_table(const ay8910_device::mosfet_param &par, const double rd, INT32 *tab)
+{
+    int j;
+
+    for (j=0; j < par.m_count; j++)
+    {
+        const double Vd = 5.0;
+        const double Vg = par.m_Vg - par.m_Vth;
+        const double kn = par.m_Kn[j] / 1.0e6;
+        const double p2 = 1.0 / (2.0 * kn * rd);
+        const double Vs = Vg + p2 - sqrt(p2 * p2 - Vg * Vg);
+
+        const double res = rd * ( Vd / Vs - 1.0);
+        tab[j] = res;
+    }
 }
 
 
@@ -782,10 +828,13 @@ void ay8910_device::build_mixer_table()
 
 	if ((m_flags & AY8910_RESISTOR_OUTPUT) != 0)
 	{
-		for (chan=0; chan < AY8910_NUM_CHANNELS; chan++)
+	    if (m_type != PSG_TYPE_AY)
+	        fatalerror("AY8910_RESISTOR_OUTPUT currently only supported for AY8910 devices.");
+
+	    for (chan=0; chan < AY8910_NUM_CHANNELS; chan++)
 		{
-			build_resisor_table(m_par, m_vol_table[chan], m_zero_is_off);
-			build_resisor_table(m_par_env, m_env_table[chan], 0);
+			build_mosfet_resistor_table(ay8910_mosfet_param, m_res_load[chan], m_vol_table[chan]);
+			build_mosfet_resistor_table(ay8910_mosfet_param, m_res_load[chan], m_vol_table[chan]);
 		}
 	}
 	else
@@ -1075,6 +1124,7 @@ const device_type AY8910 = &device_creator<ay8910_device>;
 ay8910_device::ay8910_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, AY8910, "AY-3-8910A", tag, owner, clock, "ay8910", __FILE__),
 		device_sound_interface(mconfig, *this),
+        m_type(PSG_TYPE_AY),
 		m_streams(3),
 		m_ioports(2),
 		m_ready(0),
@@ -1116,6 +1166,7 @@ ay8910_device::ay8910_device(const machine_config &mconfig, device_type type, co
 							 psg_type_t psg_type, int streams, int ioports, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_sound_interface(mconfig, *this),
+        m_type(psg_type),
 		m_streams(streams),
 		m_ioports(ioports),
 		m_ready(0),
