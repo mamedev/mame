@@ -86,6 +86,7 @@
 /* macros to access memory */
 #define IMMBYTE(b) {b = M_RDOP_ARG(PC++);}
 #define IMMWORD(w) {w.d = 0; w.b.h = M_RDOP_ARG(PC); w.b.l = M_RDOP_ARG(PC+1); PC+=2;}
+#define SKIPBYTE() {M_RDOP_ARG(PC++);}
 
 #define PUSHBYTE(b) wr_s_handler_b(&b)
 #define PUSHWORD(w) wr_s_handler_w(&w)
@@ -192,7 +193,7 @@ const UINT8 m6805_base_device::m_flags8d[256]= /* decrement */
 #define IDX1BYTE(b) {INDEXED1; b = RM(EAD);}
 #define IDX2BYTE(b) {INDEXED2; b = RM(EAD);}
 /* Macros for branch instructions */
-#define BRANCH(f) { UINT8 t; IMMBYTE(t); if(f) { PC += SIGNED(t); if (t == 0xfe) { /* speed up busy loops */ if(m_icount > 0) m_icount = 0; } } }
+#define BRANCH(f) { UINT8 t; IMMBYTE(t); if(f) { PC += SIGNED(t); } }
 
 /* what they say it is ... */
 const UINT8 m6805_base_device::m_cycles1[] =
@@ -414,6 +415,12 @@ m6805_base_device::m6805_base_device(const machine_config &mconfig, const char *
 
 void m6805_base_device::device_start()
 {
+	m_program = &space(AS_PROGRAM);
+	m_direct = &m_program->direct();
+
+	// set our instruction counter
+	m_icountptr = &m_icount;
+
 	// register our state for the debugger
 	astring tempstr;
 	state_add(STATE_GENPC,     "GENPC",     m_pc.w.l).noshow();
@@ -424,6 +431,10 @@ void m6805_base_device::device_start()
 	state_add(M6805_X,         "X",         m_x).mask(0xff);
 	state_add(M6805_CC,        "CC",        m_cc).mask(0xff);
 
+	// register for savestates
+	save_item(NAME(EA));
+	save_item(NAME(SP_MASK));
+	save_item(NAME(SP_LOW));
 	save_item(NAME(A));
 	save_item(NAME(PC));
 	save_item(NAME(S));
@@ -431,13 +442,7 @@ void m6805_base_device::device_start()
 	save_item(NAME(CC));
 	save_item(NAME(m_pending_interrupts));
 	save_item(NAME(m_irq_state));
-
-	m_program = &space(AS_PROGRAM);
-	m_direct = &m_program->direct();
-
-	// set our instruction counter
-	m_icountptr = &m_icount;
-	m_icount = 50000;
+	save_item(NAME(m_nmi_state));
 }
 
 
@@ -455,8 +460,6 @@ void m6805_base_device::device_reset()
 
 	memset(m_irq_state, 0, sizeof(int) * 9);
 	m_nmi_state = 0;
-
-	m_icount = 50000;
 
 	m_program = &space(AS_PROGRAM);
 	m_direct = &m_program->direct();
