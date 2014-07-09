@@ -396,7 +396,10 @@ void nec_common_device::device_start()
 	save_item(NAME(m_nmi_state));
 	save_item(NAME(m_irq_state));
 	save_item(NAME(m_poll_state));
+	save_item(NAME(m_no_interrupt));
 	save_item(NAME(m_halted));
+	save_item(NAME(m_prefetch_count));
+	save_item(NAME(m_prefetch_reset));
 
 	m_program = &space(AS_PROGRAM);
 	m_direct = &m_program->direct();
