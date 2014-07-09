@@ -215,7 +215,6 @@ static CPU_INIT( dsp56k )
 	device->save_item(NAME(cpustate->bootstrap_mode));
 	device->save_item(NAME(cpustate->repFlag));
 	device->save_item(NAME(cpustate->repAddr));
-	device->save_item(NAME(cpustate->icount));
 	device->save_item(NAME(cpustate->ppc));
 	device->save_item(NAME(cpustate->op));
 	device->save_item(NAME(cpustate->interrupt_cycles));

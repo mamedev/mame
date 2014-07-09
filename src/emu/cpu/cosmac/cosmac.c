@@ -385,7 +385,6 @@ void cosmac_device::device_start()
 	save_item(NAME(m_df));
 	save_item(NAME(m_ie));
 	save_item(NAME(m_q));
-	save_item(NAME(m_icount));
 
 	// set our instruction counter
 	m_icountptr = &m_icount;

@@ -647,7 +647,6 @@ avr8_device::avr8_device(const machine_config &mconfig, const char *name, const 
 		m_spi_prescale_count(0),
 		m_addr_mask(addr_mask),
 		m_interrupt_pending(false),
-		m_icount(0),
 		m_elapsed_cycles(0)
 {
 	// Allocate & setup
@@ -829,7 +828,6 @@ void avr8_device::device_start()
 	save_item(NAME(m_timer_prescale_count[5]));
 	save_item(NAME(m_addr_mask));
 	save_item(NAME(m_interrupt_pending));
-	save_item(NAME(m_icount));
 	save_item(NAME(m_elapsed_cycles));
 
 	// set our instruction counter

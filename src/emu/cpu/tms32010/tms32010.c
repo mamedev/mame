@@ -833,7 +833,6 @@ void tms32010_device::device_start()
 	save_item(NAME(m_STACK[2]));
 	save_item(NAME(m_STACK[3]));
 	save_item(NAME(m_INTF));
-	save_item(NAME(m_icount));
 	save_item(NAME(m_opcode.d));
 	save_item(NAME(m_oldacc.d));
 	save_item(NAME(m_memaccess));

@@ -127,7 +127,6 @@ void am29000_cpu_device::device_start()
 	m_cfg = (PRL_AM29000 | PRL_REV_D) << CFG_PRL_SHIFT;
 
 	/* Register state for saving */
-	save_item(NAME(m_icount));
 	save_item(NAME(m_pc));
 	save_item(NAME(m_r));
 	save_item(NAME(m_tlb));

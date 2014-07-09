@@ -2664,7 +2664,6 @@ void tlcs90_device::device_start()
 	save_item(NAME(m_after_EI));
 	save_item(NAME(m_irq_state));
 	save_item(NAME(m_irq_mask));
-	save_item(NAME(m_icount));
 	save_item(NAME(m_extra_cycles));
 
 	save_item(NAME(m_internal_registers));

@@ -406,7 +406,6 @@ void mc68hc11_cpu_device::device_start()
 	save_item(NAME(m_ram_position));
 	save_item(NAME(m_reg_position));
 	save_item(NAME(m_irq_state));
-	save_item(NAME(m_icount));
 	save_item(NAME(m_has_extended_io));
 	save_item(NAME(m_internal_ram_size));
 	save_item(NAME(m_init_value));

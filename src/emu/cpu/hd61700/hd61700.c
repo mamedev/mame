@@ -144,7 +144,6 @@ void hd61700_cpu_device::device_start()
 	save_item(NAME(m_irq_status));
 	save_item(NAME(m_state));
 	save_item(NAME(prev_ua));
-	save_item(NAME(m_icount));
 	save_item(NAME(m_regsir));
 	save_item(NAME(m_reg8bit));
 	save_item(NAME(m_reg16bit));
@@ -203,7 +202,6 @@ void hd61700_cpu_device::device_reset()
 	m_curpc = 0x0000;
 	set_pc(0x0000);
 	m_flags = FLAG_SW;
-	m_icount = 0;
 	m_state = 0;
 	m_irq_status = 0;
 	prev_ua = 0;

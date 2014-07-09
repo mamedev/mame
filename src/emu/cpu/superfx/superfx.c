@@ -652,8 +652,6 @@ void superfx_device::device_start()
 		save_item(NAME(m_pixelcache[i].data), i);
 	}
 
-	save_item(NAME(m_icount));
-
 	state_add( SUPERFX_PC,      "PC",      m_debugger_temp).callimport().callexport().formatstr("%06X");
 	state_add( SUPERFX_DREG,    "DREG",    m_dreg_idx).mask(0xf).formatstr("%02u");
 	state_add( SUPERFX_SREG,    "SREG",    m_sreg_idx).mask(0xf).formatstr("%02u");

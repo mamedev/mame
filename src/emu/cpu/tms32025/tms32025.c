@@ -1686,7 +1686,6 @@ void tms32025_device::device_start()
 
 	save_item(NAME(m_oldacc));
 	save_item(NAME(m_memaccess));
-	save_item(NAME(m_icount));
 	save_item(NAME(m_mHackIgnoreARP));
 
 	save_item(NAME(m_idle));
