@@ -2864,7 +2864,30 @@ void amstrad_state::enumerate_roms()
 	}
 
 	/* enumerate expansion ROMs */
-	// TODO: get ROMs from expansion devices (that aren't ROMboxes)
+
+	/* find any expansion devices that have a 'exp_rom' region */
+	cpc_expansion_slot_device* exp_port = m_exp;
+
+	while(exp_port != NULL)
+	{
+		device_t* temp;
+
+		temp = dynamic_cast<device_t*>(exp_port->get_card_device());
+		if(temp != NULL)
+		{
+			if(temp->memregion("exp_rom")->base() != NULL)
+			{
+				int num = temp->memregion("exp_rom")->bytes() / 0x4000;
+				for(i=0;i<num;i++)
+				{
+					m_Amstrad_ROM_Table[m_rom_count] = temp->memregion("exp_rom")->base()+0x4000*i;
+					NEXT_ROM_SLOT
+				}
+			}
+		}
+		exp_port = temp->subdevice<cpc_expansion_slot_device>("exp");
+	}
+
 
 	/* add ROMs from ROMbox expansion */
 	romexp = get_expansion_device(machine(),"rom");

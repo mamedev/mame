@@ -86,10 +86,13 @@ ROM_START( cpc_ssa1 )
 	ROM_LOAD( "sp0256-al2.bin",   0x1000, 0x0800, CRC(b504ac15) SHA1(e60fcb5fa16ff3f3b69d36c7a6e955744d3feafc) )
 ROM_END
 
-// Available in ROM and cassette versions.  For now, we'll let the user choose to load the software via ROM (using a ROM box slot device) or cassette.
+// Available in ROM and cassette versions.  We'll add the ROM for convenience.
 ROM_START( cpc_dkspeech )
 	ROM_REGION( 0x10000, "sp0256", 0 )
 	ROM_LOAD( "sp0256-al2.bin",   0x1000, 0x0800, CRC(b504ac15) SHA1(e60fcb5fa16ff3f3b69d36c7a6e955744d3feafc) )
+
+	ROM_REGION( 0x4000, "exp_rom", 0 )
+	ROM_LOAD( "dkspeech.rom",   0x0000, 0x4000, CRC(4957c2f5) SHA1(bf28e07d5fada3678faab77f582b802164e82f62) )
 ROM_END
 
 //-------------------------------------------------
