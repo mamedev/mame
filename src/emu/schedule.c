@@ -19,6 +19,7 @@
 #define VERBOSE 0
 
 #define LOG(x)  do { if (VERBOSE) logerror x; } while (0)
+#define PRECISION
 
 
 
@@ -292,7 +293,7 @@ inline void emu_timer::schedule_next_period()
 
 void emu_timer::dump() const
 {
-	logerror("%p: en=%d temp=%d exp=%15s start=%15s per=%15s param=%d ptr=%p", this, m_enabled, m_temporary, m_expire.as_string(), m_start.as_string(), m_period.as_string(), m_param, m_ptr);
+	logerror("%p: en=%d temp=%d exp=%15s start=%15s per=%15s param=%d ptr=%p", this, m_enabled, m_temporary, m_expire.as_string(PRECISION), m_start.as_string(PRECISION), m_period.as_string(PRECISION), m_param, m_ptr);
 	if (m_device == NULL)
 		logerror(" cb=%s\n", m_callback.name());
 	else
@@ -433,7 +434,7 @@ void device_scheduler::timeslice()
 			target = m_timer_list->m_expire;
 
 		LOG(("------------------\n"));
-		LOG(("cpu_timeslice: target = %s\n", target.as_string()));
+		LOG(("cpu_timeslice: target = %s\n", target.as_string(PRECISION)));
 
 		// do we have pending suspension changes?
 		if (m_suspend_changes_pending)
@@ -459,7 +460,7 @@ void device_scheduler::timeslice()
 				{
 					// compute how many cycles we want to execute
 					int ran = exec->m_cycles_running = divu_64x32((UINT64)delta >> exec->m_divshift, exec->m_divisor);
-					LOG(("  cpu '%s': %d cycles\n", exec->device().tag(), exec->m_cycles_running));
+					LOG(("  cpu '%s': %"I64FMT"d (%d cycles)\n", exec->device().tag(), delta, exec->m_cycles_running));
 
 					// if we're not suspended, actually execute
 					if (exec->m_suspend == 0)
@@ -495,7 +496,7 @@ void device_scheduler::timeslice()
 					attotime delta = attotime(0, exec->m_attoseconds_per_cycle * ran);
 					assert(delta >= attotime::zero);
 					exec->m_localtime += delta;
-					LOG(("         %d ran, %d total, time = %s\n", ran, (INT32)exec->m_totalcycles, exec->m_localtime.as_string()));
+					LOG(("         %d ran, %d total, time = %s\n", ran, (INT32)exec->m_totalcycles, exec->m_localtime.as_string(PRECISION)));
 
 					// if the new local CPU time is less than our target, move the target up, but not before the base
 					if (exec->m_localtime < target)
@@ -874,7 +875,7 @@ emu_timer &device_scheduler::timer_list_remove(emu_timer &timer)
 
 inline void device_scheduler::execute_timers()
 {
-	LOG(("execute_timers: new=%s head->expire=%s\n", m_basetime.as_string(), m_timer_list->m_expire.as_string()));
+	LOG(("execute_timers: new=%s head->expire=%s\n", m_basetime.as_string(PRECISION), m_timer_list->m_expire.as_string(PRECISION)));
 
 	// now process any timers that are overdue
 	while (m_timer_list->m_expire <= m_basetime)
@@ -897,7 +898,7 @@ inline void device_scheduler::execute_timers()
 
 			if (timer.m_device != NULL)
 			{
-				LOG(("execute_timers: timer device %s timer %d\n", timer.m_device->name(), timer.m_id));
+				LOG(("execute_timers: timer device %s timer %d\n", timer.m_device->tag(), timer.m_id));
 				timer.m_device->timer_expired(timer, timer.m_id, timer.m_param, timer.m_ptr);
 			}
 			else if (!timer.m_callback.isnull())
@@ -978,7 +979,7 @@ void device_scheduler::add_scheduling_quantum(const attotime &quantum, const att
 void device_scheduler::dump_timers() const
 {
 	logerror("=============================================\n");
-	logerror("Timer Dump: Time = %15s\n", time().as_string());
+	logerror("Timer Dump: Time = %15s\n", time().as_string(PRECISION));
 	for (emu_timer *timer = first_timer(); timer != NULL; timer = timer->next())
 		timer->dump();
 	logerror("=============================================\n");
