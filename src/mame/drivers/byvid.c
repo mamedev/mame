@@ -6,12 +6,22 @@
     Granny & the Gators
     A blend of arcade video game, and pinball.
 
-ToDo:
+ToDo (babypac):
 - No sound
 - No inputs
 - Mechanical
 - Artwork
 - Beeper needs to be replaced by a red LED when artwork gets done.
+
+ToDo (granny):
+- All of the above, plus:
+- Doesn't boot.
+- It has 2xTMS9928 but only 1 screen. The outputs need to be
+  blended with transparency. The '9' test screen will have
+  coloured stripes overlaid with the text names.
+- The RAM layout is incorrect.
+- No schematic found.
+- DIP names are different.
 
 ***************************************************************/
 
@@ -35,6 +45,8 @@ public:
 		, m_pia_u7(*this, "pia_u7")
 		, m_pia_u10(*this, "pia_u10")
 		, m_pia_u11(*this, "pia_u11")
+		, m_crtc(*this, "crtc")
+		, m_crtc2(*this, "crtc2")
 		, m_beep(*this, "beeper")
 	{ }
 
@@ -66,6 +78,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(u11_cb2_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(u10_timer);
 	TIMER_DEVICE_CALLBACK_MEMBER(u11_timer);
+	DECLARE_WRITE8_MEMBER(granny_crtc_w);
 private:
 	UINT8 m_mpu_to_vid;
 	UINT8 m_vid_to_mpu;
@@ -85,7 +98,9 @@ private:
 	required_device<pia6821_device> m_pia_u7;
 	required_device<pia6821_device> m_pia_u10;
 	required_device<pia6821_device> m_pia_u11;
-	optional_device<beep_device> m_beep;
+	required_device<tms9928a_device> m_crtc;
+	optional_device<tms9928a_device> m_crtc2; // for Granny only
+	optional_device<beep_device> m_beep; // temp
 };
 
 
@@ -105,10 +120,22 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( video_map, AS_PROGRAM, 8, by133_state ) // U8 Vidiot
 	AM_RANGE(0x0000, 0x1fff) AM_READWRITE(sound_data_r,sound_data_w)
 	AM_RANGE(0x2000, 0x2003) AM_MIRROR(0x0ffc) AM_DEVREADWRITE("pia_u7", pia6821_device, read, write) // PIA U7 Vidiot
-	AM_RANGE(0x4000, 0x4000) AM_MIRROR(0x0ffe) AM_DEVREADWRITE("tms9928a", tms9928a_device, vram_read, vram_write)
-	AM_RANGE(0x4001, 0x4001) AM_MIRROR(0x0ffe) AM_DEVREADWRITE("tms9928a", tms9928a_device, register_read, register_write)
+	AM_RANGE(0x4000, 0x4000) AM_MIRROR(0x0ffe) AM_DEVREADWRITE("crtc", tms9928a_device, vram_read, vram_write)
+	AM_RANGE(0x4001, 0x4001) AM_MIRROR(0x0ffe) AM_DEVREADWRITE("crtc", tms9928a_device, register_read, register_write)
 	AM_RANGE(0x6000, 0x63ff) AM_MIRROR(0x1c00) AM_RAM
 	AM_RANGE(0x8000, 0xffff) AM_ROM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( granny_map, AS_PROGRAM, 8, by133_state )
+	AM_RANGE(0x0000, 0x0001) AM_READWRITE(sound_data_r,sound_data_w)
+	AM_RANGE(0x0002, 0x0002) AM_DEVREADWRITE("crtc", tms9928a_device, vram_read, vram_write)
+	AM_RANGE(0x0003, 0x0003) AM_DEVREADWRITE("crtc", tms9928a_device, register_read, register_write)
+	AM_RANGE(0x0004, 0x0004) AM_DEVREADWRITE("crtc2", tms9928a_device, vram_read, vram_write)
+	AM_RANGE(0x0005, 0x0005) AM_DEVREADWRITE("crtc2", tms9928a_device, register_read, register_write)
+	AM_RANGE(0x0006, 0x0007) AM_WRITE(granny_crtc_w) // can write to both at once
+	AM_RANGE(0x0008, 0x000b) AM_DEVREADWRITE("pia_u7", pia6821_device, read, write)
+	AM_RANGE(0x0300, 0x3fff) AM_RAM
+	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, by133_state ) // U27 Vidiot
@@ -153,7 +180,7 @@ static INPUT_PORTS_START( by133 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE4 ) PORT_NAME("Self Test") PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, by133_state, self_test, 0)
 
 	PORT_START("DSW0")
-	PORT_DIPNAME( 0x01, 0x00, "S01")
+	PORT_DIPNAME( 0x01, 0x00, "S01") // S1-5: 32 combinations of coins/credits of a coin slot. S9-13 other slot.
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
 	PORT_DIPSETTING(    0x01, DEF_STR( On ))
 	PORT_DIPNAME( 0x02, 0x00, "S02")
@@ -168,15 +195,15 @@ static INPUT_PORTS_START( by133 )
 	PORT_DIPNAME( 0x10, 0x00, "S05")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
 	PORT_DIPSETTING(    0x10, DEF_STR( On ))
-	PORT_DIPNAME( 0x20, 0x00, "S06")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
-	PORT_DIPSETTING(    0x20, DEF_STR( On ))
-	PORT_DIPNAME( 0x40, 0x00, "S07")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
-	PORT_DIPSETTING(    0x40, DEF_STR( On ))
-	PORT_DIPNAME( 0x80, 0x00, "S08")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
-	PORT_DIPSETTING(    0x80, DEF_STR( On ))
+	PORT_DIPNAME( 0x20, 0x20, "Remember centre arrows")
+	PORT_DIPSETTING(    0x00, DEF_STR( No ))
+	PORT_DIPSETTING(    0x20, DEF_STR( Yes ))
+	PORT_DIPNAME( 0x40, 0x40, "Cherry at start of game")
+	PORT_DIPSETTING(    0x00, DEF_STR( No ))
+	PORT_DIPSETTING(    0x40, DEF_STR( Yes ))
+	PORT_DIPNAME( 0x80, 0x80, "Side tunnel open at start of game")
+	PORT_DIPSETTING(    0x00, DEF_STR( No ))
+	PORT_DIPSETTING(    0x80, DEF_STR( Yes ))
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x01, 0x00, "S09")
@@ -194,15 +221,15 @@ static INPUT_PORTS_START( by133 )
 	PORT_DIPNAME( 0x10, 0x00, "S13")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
 	PORT_DIPSETTING(    0x10, DEF_STR( On ))
-	PORT_DIPNAME( 0x20, 0x00, "S14")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
-	PORT_DIPSETTING(    0x20, DEF_STR( On ))
-	PORT_DIPNAME( 0x40, 0x00, "S15")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
-	PORT_DIPSETTING(    0x40, DEF_STR( On ))
-	PORT_DIPNAME( 0x80, 0x00, "S16")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
-	PORT_DIPSETTING(    0x80, DEF_STR( On ))
+	PORT_DIPNAME( 0x20, 0x00, "After 3 balls without score the ball is lost")
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ))
+	PORT_DIPSETTING(    0x20, DEF_STR( No ))
+	PORT_DIPNAME( 0x40, 0x40, "Remember energisers")
+	PORT_DIPSETTING(    0x00, DEF_STR( No ))
+	PORT_DIPSETTING(    0x40, DEF_STR( Yes ))
+	PORT_DIPNAME( 0x80, 0x00, "Disable video")
+	PORT_DIPSETTING(    0x00, DEF_STR( No ))
+	PORT_DIPSETTING(    0x80, DEF_STR( Yes ))
 
 	PORT_START("DSW2")
 	PORT_DIPNAME( 0x01, 0x00, "S17")
@@ -220,15 +247,13 @@ static INPUT_PORTS_START( by133 )
 	PORT_DIPNAME( 0x10, 0x00, "S21")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
 	PORT_DIPSETTING(    0x10, DEF_STR( On ))
-	PORT_DIPNAME( 0x20, 0x00, "S22")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
-	PORT_DIPSETTING(    0x20, DEF_STR( On ))
-	PORT_DIPNAME( 0x40, 0x00, "S23")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
-	PORT_DIPSETTING(    0x40, DEF_STR( On ))
-	PORT_DIPNAME( 0x80, 0x00, "S24")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
-	PORT_DIPSETTING(    0x80, DEF_STR( On ))
+	PORT_DIPNAME( 0x60, 0x00, "Special after x mazes")
+	PORT_DIPSETTING(    0x00, "3") // also 0x40
+	PORT_DIPSETTING(    0x20, "4")
+	PORT_DIPSETTING(    0x60, "5")
+	PORT_DIPNAME( 0x80, 0x80, "Remember centre arrows")
+	PORT_DIPSETTING(    0x00, DEF_STR( No ))
+	PORT_DIPSETTING(    0x80, DEF_STR( Yes ))
 
 	PORT_START("DSW3")
 	PORT_DIPNAME( 0x01, 0x00, "S25")
@@ -237,7 +262,7 @@ static INPUT_PORTS_START( by133 )
 	PORT_DIPNAME( 0x02, 0x00, "S26")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
 	PORT_DIPSETTING(    0x02, DEF_STR( On ))
-	PORT_DIPNAME( 0x04, 0x00, "S27")
+	PORT_DIPNAME( 0x04, 0x04, "Credits displayed")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
 	PORT_DIPSETTING(    0x04, DEF_STR( On ))
 	PORT_DIPNAME( 0x08, 0x00, "S28")
@@ -249,14 +274,67 @@ static INPUT_PORTS_START( by133 )
 	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Free_Play ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
 	PORT_DIPSETTING(    0x20, DEF_STR( On ))
-	PORT_DIPNAME( 0x40, 0x00, "S31")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
-	PORT_DIPSETTING(    0x40, DEF_STR( On ))
-	PORT_DIPNAME( 0x80, 0x00, "S32")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
-	PORT_DIPSETTING(    0x80, DEF_STR( On ))
+	PORT_DIPNAME( 0xC0, 0x40, DEF_STR( Lives ))
+	PORT_DIPSETTING(    0xC0, "2")
+	PORT_DIPSETTING(    0x00, "3")
+	PORT_DIPSETTING(    0x80, "4")
+	PORT_DIPSETTING(    0x40, "5")
+
+	PORT_START("X0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Right Flipper EOS")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START2 )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Rebounds")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_START1)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Right Spinner")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Left Spinner")
+
+	PORT_START("X1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN2 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN1 )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_TILT )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Slam Tilt")
+
+	PORT_START("X2")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("R. Top Loop Lane")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("L. Top Loop Lane")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Tunnel Outlane")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Fruits Outlane")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("R. Inside Outlane")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("L. Inside Outlane")
+
+	PORT_START("X3")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("#5 Drop Target (R.)")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("#4 Drop Target")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("#3 Drop Target")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("#2 Drop Target")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("#1 Drop Target (L.)")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Outhole")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("R. Maze Saucer")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("L. Maze Saucer")
 INPUT_PORTS_END
 
+
+WRITE8_MEMBER( by133_state::granny_crtc_w )
+{
+	if (offset)
+	{
+		m_crtc->register_write(space, 0, data);
+		m_crtc2->register_write(space, 0, data);
+	}
+	else
+	{
+		m_crtc->vram_write(space, 0, data);
+		m_crtc2->vram_write(space, 0, data);
+	}
+}
 
 READ8_MEMBER( by133_state::sound_data_r )
 {//printf("%X ",m_mpu_to_vid);
@@ -361,6 +439,18 @@ READ8_MEMBER( by133_state::u10_b_r )
 
 	UINT8 data = 0;
 
+	if (BIT(m_u10_a, 0))
+		data |= ioport("X0")->read();
+
+	if (BIT(m_u10_a, 1))
+		data |= ioport("X1")->read();
+
+	if (BIT(m_u10_a, 2))
+		data |= ioport("X2")->read();
+
+	if (BIT(m_u10_a, 3))
+		data |= ioport("X3")->read();
+
 	if (BIT(m_u10_a, 5))
 		data |= ioport("DSW0")->read();
 
@@ -462,7 +552,7 @@ static MACHINE_CONFIG_START( by133, by133_state )
 	MCFG_PIA_CB2_HANDLER(WRITELINE(by133_state, u10_cb2_w))
 	MCFG_PIA_IRQA_HANDLER(DEVWRITELINE("maincpu", m6800_cpu_device, irq_line))
 	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE("maincpu", m6800_cpu_device, irq_line))
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("babypac1", by133_state, u10_timer, attotime::from_hz(120)) // mains freq
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("babypac1", by133_state, u10_timer, attotime::from_hz(120)) // mains freq*2
 
 	MCFG_DEVICE_ADD("pia_u11", PIA6821, 0)
 	MCFG_PIA_READPA_HANDLER(READ8(by133_state, u11_a_r))
@@ -473,14 +563,14 @@ static MACHINE_CONFIG_START( by133, by133_state )
 	MCFG_PIA_CB2_HANDLER(WRITELINE(by133_state, u11_cb2_w))
 	MCFG_PIA_IRQA_HANDLER(DEVWRITELINE("maincpu", m6800_cpu_device, irq_line))
 	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE("maincpu", m6800_cpu_device, irq_line))
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("babypac2", by133_state, u11_timer, attotime::from_hz(634)) // 555 timer
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("babypac2", by133_state, u11_timer, attotime::from_hz(634)) // 555 timer*2
 
 	/* video hardware */
-	MCFG_DEVICE_ADD( "tms9928a", TMS9928A, XTAL_10_738635MHz / 2 )
+	MCFG_DEVICE_ADD( "crtc", TMS9928A, XTAL_10_738635MHz / 2 )
 	MCFG_TMS9928A_VRAM_SIZE(0x4000)
 	MCFG_TMS9928A_OUT_INT_LINE_CB(DEVWRITELINE("videocpu", m6809e_device, irq_line))
 	MCFG_TMS9928A_SCREEN_ADD_NTSC( "screen" )
-	MCFG_SCREEN_UPDATE_DEVICE( "tms9928a", tms9928a_device, screen_update )
+	MCFG_SCREEN_UPDATE_DEVICE( "crtc", tms9928a_device, screen_update )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -490,6 +580,18 @@ static MACHINE_CONFIG_START( by133, by133_state )
 	MCFG_SOUND_ADD("beeper", BEEP, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "beee", 0.10)
 MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( granny, by133 )
+	MCFG_CPU_MODIFY( "videocpu" )
+	MCFG_CPU_PROGRAM_MAP(granny_map)
+
+	MCFG_DEVICE_ADD( "crtc2", TMS9928A, XTAL_10_738635MHz / 2 )
+	MCFG_TMS9928A_VRAM_SIZE(0x4000)
+	MCFG_TMS9928A_OUT_INT_LINE_CB(DEVWRITELINE("videocpu", m6809e_device, irq_line))
+	MCFG_TMS9928A_SCREEN_ADD_NTSC( "screen2" ) // there is only 1 screen
+	MCFG_SCREEN_UPDATE_DEVICE( "crtc2", tms9928a_device, screen_update )
+MACHINE_CONFIG_END
+
 
 /*-----------------------------------------------------
 / Baby Pacman (Video/Pinball Combo) (BY133-891:  10/82)
@@ -547,4 +649,4 @@ ROM_END
 
 GAME( 1982, babypac,  0,        by133,  by133, driver_device,  0,  ROT90, "Dave Nutting Associates / Bally", "Baby Pac-Man (set 1)", GAME_IS_SKELETON_MECHANICAL)
 GAME( 1982, babypac2, babypac,  by133,  by133, driver_device,  0,  ROT90, "Dave Nutting Associates / Bally", "Baby Pac-Man (set 2)", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1984, granny,   0,        by133,  by133, driver_device,  0,  ROT0,  "Bally", "Granny and the Gators", GAME_IS_SKELETON_MECHANICAL)
+GAME( 1984, granny,   0,        granny, by133, driver_device,  0,  ROT0,  "Bally", "Granny and the Gators", GAME_IS_SKELETON_MECHANICAL)
