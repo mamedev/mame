@@ -360,3 +360,4 @@ void minx_cpu_device::CALL( UINT16 arg )
 #define AD2_Y8  UINT32 addr2 = ( m_YI << 16 ) | ( m_Y + rdop() )
 #define AD2_XL  UINT32 addr2 = ( m_XI << 16 ) | ( m_X + ( m_HL & 0x00FF ) )
 #define AD2_YL  UINT32 addr2 = ( m_YI << 16 ) | ( m_Y + ( m_HL & 0x00FF ) )
+

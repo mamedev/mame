@@ -177,14 +177,11 @@ UINT16 minx_cpu_device::rdop16()
 
 void minx_cpu_device::execute_run()
 {
-//  UINT32  oldpc;
-	UINT8   op;
 
 	do
 	{
 		m_curpc = GET_MINX_PC;
 		debugger_instruction_hook(this, m_curpc);
-//      oldpc = GET_MINX_PC;
 
 		if ( m_interrupt_pending )
 		{
@@ -210,9 +207,7 @@ void minx_cpu_device::execute_run()
 		}
 		else
 		{
-			op = rdop();
-			(this->*insnminx[op])();
-			m_icount -= insnminx_cycles[op];
+			execute_one();
 		}
 	} while ( m_icount > 0 );
 }
