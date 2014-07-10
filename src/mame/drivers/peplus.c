@@ -2042,8 +2042,8 @@ ROM_START( pepp0083 ) /* Normal board : Tens or Better (PP0083) */
 /*
 PayTable  10s+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
 ----------------------------------------------------------
-  P39B     1     1    3    5    7  11  50 100 250    800
-  % Range: 91.0-93.0%  Optimum: 95.0%  Hit Frequency: 47.2%
+  P39D     1     1    3    5    7  11  50 100 250    940
+  % Range: 90.6-92.6%  Optimum: 94.6%  Hit Frequency: 48.6%
      Programs Available: PP0083
 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -6549,9 +6549,12 @@ ROM_START( pex2031p ) /* Superboard : Lucky Deal Poker (X002031P+XP000112) */
                                       5-K 2-4
 PayTable   Js+  2PR  3K  STR  FL  FH  4K  4K  4A  SF  RF  (Bonus)
 -----------------------------------------------------------------
-  P567AL    1    1    3   4    6  10  25  40  80  50 250    800
-  % Range: 90.8-92.8%  Optimum: 94.8%  Hit Frequency: 44.9%
+  P566AL    1    1    3   5    7   9  25  40  80  50 250    800
+  % Range: 93.0-95.0%  Optimum: 97.0%  Hit Frequency: 42.9%
      Programs Available: X002031P
+
+Straights or Better on the initial deal PAY DOUBLE!
+
 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "xp000112.u67",   0x00000, 0x10000, CRC(c1ae96ad) SHA1(da109602f0fbe9b225cdcd60be0613fd41014864) )
@@ -6981,8 +6984,8 @@ ROM_START( pex2172p ) /* Superboard : Ace$ Bonus Poker (X002172P+XP000112) */
                                       5-K 2-4
 PayTable   Js+  2PR  3K  STR  FL  FH  4K  4K  4A  SA$  SF  RF  (Bonus)
 ----------------------------------------------------------------------
-  P903A     1    2    3   4    5   7  25  40  80  250  50 250    800
-  % Range: 94.3-96.3%  Optimum: 98.3%  Hit Frequency: 45.7%
+  P789AM    1    2    3   4    5   7  25  40  80  250  50 250    800
+  % Range: 94.3-96.3%  Optimum: 98.3%  Hit Frequency: 45.5%
      Programs Available: X002172P
 
 SA$ - Sequential ACE$ pays the same as RF
