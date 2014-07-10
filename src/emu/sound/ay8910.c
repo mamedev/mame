@@ -521,6 +521,7 @@ INLINE void build_single_table(double rl, const ay8910_device::ay_ym_param *par,
 
 }
 
+#ifdef UNUSED_FUNCTION
 INLINE void build_resistor_table(const ay8910_device::ay_ym_param *par, INT32 *tab, int zero_is_off)
 {
 	int j;
@@ -535,6 +536,7 @@ INLINE void build_resistor_table(const ay8910_device::ay_ym_param *par, INT32 *t
 			tab[j] = par->res[j];
 	}
 }
+#endif
 
 INLINE void build_mosfet_resistor_table(const ay8910_device::mosfet_param &par, const double rd, INT32 *tab)
 {
