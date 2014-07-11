@@ -642,7 +642,7 @@ stream_sample_t *sound_stream::generate_resampled_data(stream_input &input, UINT
 	// grab data from the output
 	stream_output &output = *input.m_source;
 	sound_stream &input_stream = *output.m_stream;
-	int gain = (input.m_gain * input.m_user_gain * output.m_gain) >> 16;
+	INT64 gain = (input.m_gain * input.m_user_gain * output.m_gain) >> 16;
 
 	// determine the time at which the current sample begins, accounting for the
 	// latency we calculated between the input and output streams
@@ -673,7 +673,7 @@ stream_sample_t *sound_stream::generate_resampled_data(stream_input &input, UINT
 		while (numsamples--)
 		{
 			// compute the sample
-			stream_sample_t sample = *source++;
+			INT64 sample = *source++;
 			*dest++ = (sample * gain) >> 8;
 		}
 	}
@@ -700,7 +700,7 @@ stream_sample_t *sound_stream::generate_resampled_data(stream_input &input, UINT
 			int endfrac = nextfrac >> (FRAC_BITS - 12);
 
 			// blend between the two samples accordingly
-			stream_sample_t sample = (source[0] * (0x1000 - startfrac) + source[1] * (endfrac - 0x1000)) / (endfrac - startfrac);
+			INT64 sample = ((INT64) source[0] * (0x1000 - startfrac) + (INT64) source[1] * (endfrac - 0x1000)) / (endfrac - startfrac);
 			*dest++ = (sample * gain) >> 8;
 
 			// advance
@@ -716,19 +716,19 @@ stream_sample_t *sound_stream::generate_resampled_data(stream_input &input, UINT
 		int smallstep = step >> (FRAC_BITS - 8);
 		while (numsamples--)
 		{
-			int remainder = smallstep;
+			INT64 remainder = smallstep;
 			int tpos = 0;
 
 			// compute the sample
-			int scale = (FRAC_ONE - basefrac) >> (FRAC_BITS - 8);
-			stream_sample_t sample = source[tpos++] * scale;
+			INT64 scale = (FRAC_ONE - basefrac) >> (FRAC_BITS - 8);
+			INT64 sample = (INT64) source[tpos++] * scale;
 			remainder -= scale;
 			while (remainder > 0x100)
 			{
-				sample += source[tpos++] * 0x100;
+				sample += (INT64) source[tpos++] * (INT64) 0x100;
 				remainder -= 0x100;
 			}
-			sample += source[tpos] * remainder;
+			sample += (INT64) source[tpos] * remainder;
 			sample /= smallstep;
 
 			*dest++ = (sample * gain) >> 8;
