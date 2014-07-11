@@ -354,6 +354,7 @@ void brkthru_state::machine_start()
 	save_item(NAME(m_bgscroll));
 	save_item(NAME(m_bgbasecolor));
 	save_item(NAME(m_flipscreen));
+	save_item(NAME(m_nmi_mask));
 }
 
 void brkthru_state::machine_reset()
@@ -361,6 +362,7 @@ void brkthru_state::machine_reset()
 	m_bgscroll = 0;
 	m_bgbasecolor = 0;
 	m_flipscreen = 0;
+	m_nmi_mask = 0;
 }
 
 INTERRUPT_GEN_MEMBER(brkthru_state::vblank_irq)
