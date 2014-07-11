@@ -81,30 +81,17 @@ void seta001_device::device_start()
 
 	m_transpen = 0;
 	m_colorbase = 0;
-
 	m_spritelimit = 0x1ff;
-
-	m_bgflag = 0x00;
 
 	m_bankcallback = NULL;
 
-	save_item(NAME(m_spritectrl));
-	save_pointer(NAME(m_spriteylow), 0x300);
-	save_pointer(NAME(m_spritecodelow), 0x2000);
-	save_pointer(NAME(m_spritecodehigh), 0x2000);
-	save_item(NAME(m_bgflag));
-	save_item(NAME(m_fg_flipxoffs));
-	save_item(NAME(m_fg_noflipxoffs));
-	save_item(NAME(m_fg_flipyoffs));
-	save_item(NAME(m_fg_noflipyoffs));
-	save_item(NAME(m_bg_flipyoffs));
-	save_item(NAME(m_bg_noflipyoffs));
-	save_item(NAME(m_bg_flipxoffs));
-	save_item(NAME(m_bg_noflipxoffs));
-	save_item(NAME(m_transpen));
-	save_item(NAME(m_colorbase));
-	save_item(NAME(m_spritelimit));
+	m_bgflag = 0x00;
 
+	save_item(NAME(m_bgflag));
+	save_item(NAME(m_spritectrl));
+	save_item(NAME(m_spriteylow));
+	save_item(NAME(m_spritecodelow));
+	save_item(NAME(m_spritecodehigh));
 }
 
 void seta001_device::device_reset()
