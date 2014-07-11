@@ -4532,7 +4532,7 @@ Known to exist:
 	ROM_LOAD( "cap707.u50", 0x0000, 0x0100, CRC(9851ba36) SHA1(5a0a43c1e212ae8c173102ede9c57a3d95752f99) )
 ROM_END
 
-ROM_START( peke1012 ) /* Normal board : Keno 1-10 Spot (KE1012) - Payout 90.27% */
+ROM_START( peke1012 ) /* Normal board : Keno 1-10 Spot (KE1012) - Payout 90.27%, Paytable 90-P */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ke1012_576-a3u.u68",   0x00000, 0x10000, CRC(470e8c10) SHA1(f8a65a3a73477e9e9d2f582eeefa93b470497dfa) ) /* Game Version: 576, Library Version: A3U */
 
@@ -4546,7 +4546,7 @@ ROM_START( peke1012 ) /* Normal board : Keno 1-10 Spot (KE1012) - Payout 90.27% 
 	ROM_LOAD( "cap1267.u50", 0x0000, 0x0100, CRC(7051db57) SHA1(76751a3cc47d506983205decb07e99ca0c178a42) )
 ROM_END
 
-ROM_START( peke1013 ) /* Normal board : Keno 2-10 Spot (KE1013) - Payout 91.97% */
+ROM_START( peke1013 ) /* Normal board : Keno 2-10 Spot (KE1013) - Payout 91.97%, Paytable 91-D */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ke1013_590-a77.u68",   0x00000, 0x10000, CRC(3b178f94) SHA1(c601150a728d750b73f949ba6e2d2979c4c4be2e) ) /* Game Version: 590, Library Version: A77 */
 
