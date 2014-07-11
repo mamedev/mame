@@ -916,6 +916,7 @@ VIDEO_START_MEMBER(dkong_state,dkong_base)
 	m_sprite_bank = 0;
 	m_vidhw = -1;
 
+	save_item(NAME(m_vidhw));
 	save_item(NAME(m_gfx_bank));
 	save_item(NAME(m_palette_bank));
 	save_item(NAME(m_sprite_bank));
@@ -923,6 +924,26 @@ VIDEO_START_MEMBER(dkong_state,dkong_base)
 
 	save_item(NAME(m_grid_col));
 	save_item(NAME(m_flip));
+
+	// TRS01 TRS02
+    save_item(NAME(m_sig30Hz));
+    save_item(NAME(m_blue_level));
+    save_item(NAME(m_cv1));
+    save_item(NAME(m_cv2));
+    save_item(NAME(m_vg1));
+    save_item(NAME(m_vg2));
+    save_item(NAME(m_vg3));
+    save_item(NAME(m_cv3));
+    save_item(NAME(m_cv4));
+
+    save_item(NAME(m_lfsr_5I));
+    save_item(NAME(m_grid_sig));
+    save_item(NAME(m_rflip_sig));
+    save_item(NAME(m_star_ff));
+    save_item(NAME(m_counter));
+    save_item(NAME(m_pixelcnt));
+    save_item(NAME(m_bg_bits));
+
 }
 
 VIDEO_START_MEMBER(dkong_state,dkong)
