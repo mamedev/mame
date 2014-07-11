@@ -7,11 +7,14 @@
     A blend of arcade video game, and pinball.
 
 ToDo (babypac):
+- You can play the video portion but try not to use the lower
+  escape chutes. If you do, alternate between pressing X and
+  right-shift until you are returned to the maze.
 - No sound
-- No inputs
+- Playfield inputs
 - Mechanical
 - Artwork
-- Beeper needs to be replaced by a red LED when artwork gets done.
+- Beeper needs to be replaced by a red LED when artwork is done.
 
 ToDo (granny):
 - All of the above, plus:
@@ -19,7 +22,6 @@ ToDo (granny):
 - It has 2xTMS9928 but only 1 screen. The outputs need to be
   blended with transparency. The '9' test screen will have
   coloured stripes overlaid with the text names.
-- The RAM layout is incorrect.
 - No schematic found.
 - DIP names are different.
 
@@ -32,6 +34,7 @@ ToDo (granny):
 #include "video/tms9928a.h"
 #include "machine/6821pia.h"
 #include "sound/dac.h"
+#include "machine/nvram.h"
 #include "sound/beep.h"
 
 class by133_state : public driver_device
@@ -109,7 +112,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, by133_state ) // U9 MPU
 	AM_RANGE(0x0000, 0x007f) AM_RAM // 128x8 in MC6810 U7 MPU
 	AM_RANGE(0x0088, 0x008b) AM_DEVREADWRITE("pia_u10", pia6821_device, read, write) // PIA U10 MPU
 	AM_RANGE(0x0090, 0x0093) AM_DEVREADWRITE("pia_u11", pia6821_device, read, write) // PIA U11 MPU
-	AM_RANGE(0x0200, 0x03ff) AM_RAM // 256x4 in 5101L U8 MPU, battery backed (D4-7 are data, A4-8 are address)
+	AM_RANGE(0x0200, 0x03ff) AM_RAM AM_SHARE("nvram") // 256x4 in 5101L U8 MPU, battery backed (D4-7 are data, A4-8 are address)
 	AM_RANGE(0x1000, 0x17ff) AM_ROM AM_REGION("roms", 0x0000)
 	AM_RANGE(0x1800, 0x1fff) AM_ROM AM_REGION("roms", 0x1000)
 	AM_RANGE(0x5000, 0x57ff) AM_ROM AM_REGION("roms", 0x0800)
@@ -134,7 +137,8 @@ static ADDRESS_MAP_START( granny_map, AS_PROGRAM, 8, by133_state )
 	AM_RANGE(0x0005, 0x0005) AM_DEVREADWRITE("crtc2", tms9928a_device, register_read, register_write)
 	AM_RANGE(0x0006, 0x0007) AM_WRITE(granny_crtc_w) // can write to both at once
 	AM_RANGE(0x0008, 0x000b) AM_DEVREADWRITE("pia_u7", pia6821_device, read, write)
-	AM_RANGE(0x0300, 0x3fff) AM_RAM
+	AM_RANGE(0x2000, 0x27ff) AM_RAM
+	AM_RANGE(0x2801, 0x2801) AM_READNOP // The '9' test reads this location constantly and throws away the result
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -144,7 +148,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_portmap, AS_IO, 8, by133_state )
 	AM_RANGE(M6801_PORT1, M6801_PORT1) AM_DEVWRITE("dac", dac_device, write_unsigned8) // P10-P17
-	AM_RANGE(M6801_PORT2, M6801_PORT2) AM_READWRITE(m6803_port2_r, m6803_port2_w) // P20-P24
+	AM_RANGE(M6801_PORT2, M6801_PORT2) AM_READWRITE(m6803_port2_r, m6803_port2_w) // P20-P24 sound command in
 ADDRESS_MAP_END
 
 
@@ -160,7 +164,6 @@ INPUT_CHANGED_MEMBER( by133_state::sound_test )
 		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-// doesn't appear to do anything
 INPUT_CHANGED_MEMBER( by133_state::activity_test )
 {
 	if(newval)
@@ -178,6 +181,7 @@ static INPUT_PORTS_START( by133 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Sound Test") PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, by133_state, sound_test, 0)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE3 ) PORT_NAME("Activity") PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, by133_state, activity_test, 0)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE4 ) PORT_NAME("Self Test") PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, by133_state, self_test, 0)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_F2) PORT_NAME("Power")
 
 	PORT_START("DSW0")
 	PORT_DIPNAME( 0x01, 0x00, "S01") // S1-5: 32 combinations of coins/credits of a coin slot. S9-13 other slot.
@@ -280,13 +284,20 @@ static INPUT_PORTS_START( by133 )
 	PORT_DIPSETTING(    0x80, "4")
 	PORT_DIPSETTING(    0x40, "5")
 
+	PORT_START("JOY")
+	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_4WAY
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_4WAY
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_4WAY
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_4WAY
+
 	PORT_START("X0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Right Flipper EOS")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Right Flipper EOS") PORT_CODE(KEYCODE_RSHIFT)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START2 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Rebounds")
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_START1)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Right Spinner")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Left Spinner")
 
@@ -316,7 +327,7 @@ static INPUT_PORTS_START( by133 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("#3 Drop Target")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("#2 Drop Target")
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("#1 Drop Target (L.)")
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Outhole")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Outhole") PORT_CODE(KEYCODE_X)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("R. Maze Saucer")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("L. Maze Saucer")
 INPUT_PORTS_END
@@ -337,7 +348,7 @@ WRITE8_MEMBER( by133_state::granny_crtc_w )
 }
 
 READ8_MEMBER( by133_state::sound_data_r )
-{//printf("%X ",m_mpu_to_vid);
+{
 	return m_mpu_to_vid;
 }
 
@@ -348,7 +359,6 @@ WRITE8_MEMBER( by133_state::sound_data_w )
 
 READ8_MEMBER( by133_state::m6803_port2_r )
 {
-	//printf("%X %s\n",m_u7_b,machine().describe_context());
 	//machine().scheduler().synchronize();
 	return (m_u7_b << 1) | 0;
 }
@@ -380,9 +390,6 @@ WRITE_LINE_MEMBER( by133_state::u7_cb2_w )
 	// red led
 	m_beep->set_frequency(950);
 	m_beep->set_state(state);
-	//address_space &space = m_audiocpu->space(AS_PROGRAM);
-	//m_audiocpu->m6801_io_r(space, 3, ((m_u7_b << 1) | (UINT8)state) );
-	m_audiocpu->set_input_line(M6801_TIN_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 WRITE_LINE_MEMBER( by133_state::u10_cb2_w )
@@ -408,6 +415,12 @@ WRITE8_MEMBER( by133_state::u7_a_w )
 
 READ8_MEMBER( by133_state::u7_b_r )
 {
+	if (BIT(m_u7_a, 7)) // bits 6 and 7 work; pinmame uses 7
+		m_u7_b |= ioport("JOY")->read();
+
+	if (BIT(m_u7_a, 6)) // Granny has a power button? according to Pinmame
+		m_u7_b = ioport("TEST")->read() & 0x80;
+
 	return m_u7_b;
 }
 
@@ -532,6 +545,8 @@ static MACHINE_CONFIG_START( by133, by133_state )
 	MCFG_CPU_ADD("audiocpu", M6803, XTAL_3_579545MHz)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(sound_portmap)
+
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_DEVICE_ADD("pia_u7", PIA6821, 0)
 	MCFG_PIA_READPA_HANDLER(READ8(by133_state, u7_a_r))
