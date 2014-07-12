@@ -90,7 +90,6 @@ public:
 	UINT8 m_iou_reg092;
 	UINT8 m_last_playmode;
 	UINT8 m_ay8910_a;
-	UINT8 m_sio_int_state;
 	UINT16 m_x, m_y, m_yline;
 	UINT8 m_colours, m_mode, m_op;
 	UINT32 m_debug_video;
@@ -126,7 +125,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(nimbus_fdc_intrq_w);
 	DECLARE_WRITE_LINE_MEMBER(nimbus_fdc_drq_w);
 	DECLARE_WRITE8_MEMBER(nimbus_via_write_portb);
-	DECLARE_WRITE_LINE_MEMBER(nimbus_via_irq_w);
 	DECLARE_WRITE_LINE_MEMBER(write_scsi_bsy);
 	DECLARE_WRITE_LINE_MEMBER(write_scsi_cd);
 	DECLARE_WRITE_LINE_MEMBER(write_scsi_io);
@@ -144,9 +142,8 @@ public:
 	void move_pixel_line(UINT16 x, UINT16 y, UINT8 width);
 	void write_pixel_data(UINT16 x, UINT16 y, UINT16    data);
 	void change_palette(UINT8 bank, UINT16 colours);
-	void external_int(UINT16 intno, UINT8 vector);
+	void external_int(UINT8 vector, bool state);
 	DECLARE_READ8_MEMBER(cascade_callback);
-	void *get_dssi_ptr(address_space &space, UINT16   ds, UINT16 si);
 	void nimbus_bank_memory();
 	void memory_reset();
 	void fdc_reset();
@@ -160,6 +157,7 @@ public:
 	void iou_reset();
 	void rmni_sound_reset();
 	void mouse_js_reset();
+	void check_scsi_irq();
 
 	int m_scsi_iena;
 	int m_scsi_msg;
@@ -182,7 +180,6 @@ public:
 		UINT8   reg418;
 
 		UINT8   drq_ff;
-		UINT8   int_ff;
 	} m_nimbus_drives;
 
 	/* 8031 Peripheral controler */

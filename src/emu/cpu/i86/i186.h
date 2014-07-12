@@ -24,10 +24,10 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(drq1_w) { if(state) drq_callback(1); m_dma[1].drq_state = state; }
 	DECLARE_WRITE_LINE_MEMBER(tmrin0_w) { if(state && (m_timer[0].control & 0x8004) == 0x8004) { inc_timer(0); } }
 	DECLARE_WRITE_LINE_MEMBER(tmrin1_w) { if(state && (m_timer[1].control & 0x8004) == 0x8004) { inc_timer(1); } }
-	DECLARE_WRITE_LINE_MEMBER(int0_w) { external_int(0, state, 0); }
-	DECLARE_WRITE_LINE_MEMBER(int1_w) { external_int(1, state, 0); }
-	DECLARE_WRITE_LINE_MEMBER(int2_w) { external_int(2, state, 0); }
-	DECLARE_WRITE_LINE_MEMBER(int3_w) { external_int(3, state, 0); }
+	DECLARE_WRITE_LINE_MEMBER(int0_w) { external_int(0, state); }
+	DECLARE_WRITE_LINE_MEMBER(int1_w) { external_int(1, state); }
+	DECLARE_WRITE_LINE_MEMBER(int2_w) { external_int(2, state); }
+	DECLARE_WRITE_LINE_MEMBER(int3_w) { external_int(3, state); }
 
 	// device_memory_interface overrides
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const { return (spacenum == AS_PROGRAM) ? &m_program_config : ( (spacenum == AS_IO) ? &m_io_config : NULL ); }
@@ -55,7 +55,7 @@ protected:
 private:
 	void update_interrupt_state();
 	void handle_eoi(int data);
-	void external_int(UINT16 intno, int state, UINT8 vector);
+	void external_int(UINT16 intno, int state);
 	void internal_timer_sync(int which);
 	void internal_timer_update(int which,int new_count,int new_maxA,int new_maxB,int new_control);
 	void update_dma_control(int which, int new_control);
@@ -81,9 +81,6 @@ private:
 		bool        active_count;
 		UINT16      count;
 		emu_timer   *int_timer;
-		emu_timer   *time_timer;
-		UINT8       time_timer_active;
-		attotime    last_time;
 	};
 
 	struct dma_state
@@ -108,6 +105,7 @@ private:
 		UINT16  timer;
 		UINT16  dma[2];
 		UINT16  ext[4];
+		UINT8   ext_state;
 	};
 
 	static const device_timer_id TIMER_INT0 = 0;

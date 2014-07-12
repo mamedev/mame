@@ -108,8 +108,6 @@ enum
 
 #define MOUSE_INT_ENABLED(state)     (((state)->m_iou_reg092 & MOUSE_INT_ENABLE) ? 1 : 0)
 
-#define VIA_INT                 0x03
-
 #define LINEAR_ADDR(seg,ofs)    ((seg<<4)+ofs)
 
 #define OUTPUT_SEGOFS(mess,seg,ofs)  logerror("%s=%04X:%04X [%08X]\n",mess,seg,ofs,((seg<<4)+ofs))
@@ -168,7 +166,6 @@ struct t_nimbus_brush
 };
 
 
-static void execute_debug_irq(running_machine &machine, int ref, int params, const char *param[]);
 static void nimbus_debug(running_machine &machine, int ref, int params, const char *param[]);
 
 static int instruction_hook(device_t &device, offs_t curpc);
@@ -181,30 +178,20 @@ static void decode_dssi_f_set_new_clt(device_t *device,UINT16  ds, UINT16 si, UI
 static void decode_dssi_f_plonk_char(device_t *device,UINT16  ds, UINT16 si, UINT8 raw_flag);
 static void decode_dssi_f_rw_sectors(device_t *device,UINT16  ds, UINT16 si, UINT8 raw_flag);
 
-void rmnimbus_state::external_int(UINT16 intno, UINT8 vector)
+void rmnimbus_state::external_int(UINT8 vector, bool state)
 {
+
+	if(!state && (vector != m_vector))
+		return;
+
 	m_vector = vector;
-	switch(intno)
-	{
-		case 0:
-			m_maincpu->int0_w(1);
-			break;
-		case 1:
-			m_maincpu->int1_w(1);
-			break;
-		case 2:
-			m_maincpu->int2_w(1);
-			break;
-		case 3:
-			m_maincpu->int3_w(1);
-			break;
-		default:
-			return;
-	}
+
+	m_maincpu->int0_w(state);
 }
 
 READ8_MEMBER(rmnimbus_state::cascade_callback)
 {
+	m_maincpu->int0_w(0);
 	return m_vector;
 }
 
@@ -237,7 +224,6 @@ void rmnimbus_state::machine_start()
 	/* setup debug commands */
 	if (machine().debug_flags & DEBUG_FLAG_ENABLED)
 	{
-		debug_console_register_command(machine(), "nimbus_irq", CMDFLAG_NONE, 0, 0, 2, execute_debug_irq);
 		debug_console_register_command(machine(), "nimbus_debug", CMDFLAG_NONE, 0, 0, 1, nimbus_debug);
 
 		/* set up the instruction hook */
@@ -246,26 +232,6 @@ void rmnimbus_state::machine_start()
 
 	m_debug_machine=DEBUG_NONE;
 	m_fdc->dden_w(0);
-}
-
-static void execute_debug_irq(running_machine &machine, int ref, int params, const char *param[])
-{
-	rmnimbus_state *state = machine.driver_data<rmnimbus_state>();
-	int IntNo;
-	int Vector;
-
-	if(params>1)
-	{
-		sscanf(param[0],"%X",&IntNo);
-		sscanf(param[1],"%X",&Vector);
-
-		debug_console_printf(machine,"triggering IRQ%d, Vector=%02X\n",IntNo,Vector);
-		state->external_int(IntNo,Vector);
-	}
-	else
-	{
-		debug_console_printf(machine,"Error, you must supply an intno and vector to trigger\n");
-	}
 }
 
 static void nimbus_debug(running_machine &machine, int ref, int params, const char *param[])
@@ -655,7 +621,7 @@ static void decode_subbios(device_t *device,offs_t pc, UINT8 raw_flag)
 	}
 }
 
-void *rmnimbus_state::get_dssi_ptr(address_space &space, UINT16   ds, UINT16 si)
+static inline void *get_dssi_ptr(address_space &space, UINT16   ds, UINT16 si)
 {
 	int             addr;
 
@@ -675,7 +641,7 @@ static void decode_dssi_generic(device_t *device,UINT16  ds, UINT16 si, UINT8 ra
 	if(raw_flag)
 		return;
 
-	params=(UINT16  *)state->get_dssi_ptr(space,ds,si);
+	params=(UINT16  *)get_dssi_ptr(space,ds,si);
 
 	for(count=0; count<10; count++)
 		logerror("%04X ",params[count]);
@@ -694,7 +660,7 @@ static void decode_dssi_f_fill_area(device_t *device,UINT16  ds, UINT16 si, UINT
 	t_nimbus_brush  *brush;
 	int             cocount;
 
-	area_params = (t_area_params   *)state->get_dssi_ptr(space,ds,si);
+	area_params = (t_area_params   *)get_dssi_ptr(space,ds,si);
 
 	if (!raw_flag)
 		OUTPUT_SEGOFS("SegBrush:OfsBrush",area_params->seg_brush,area_params->ofs_brush);
@@ -750,7 +716,7 @@ static void decode_dssi_f_plot_character_string(device_t *device,UINT16  ds, UIN
 	if(raw_flag)
 		return;
 
-	plot_string_params=(t_plot_string_params   *)state->get_dssi_ptr(space,ds,si);
+	plot_string_params=(t_plot_string_params   *)get_dssi_ptr(space,ds,si);
 
 	OUTPUT_SEGOFS("SegFont:OfsFont",plot_string_params->seg_font,plot_string_params->ofs_font);
 	OUTPUT_SEGOFS("SegData:OfsData",plot_string_params->seg_data,plot_string_params->ofs_data);
@@ -774,7 +740,7 @@ static void decode_dssi_f_set_new_clt(device_t *device,UINT16  ds, UINT16 si, UI
 	address_space &space = state->m_maincpu->space(AS_PROGRAM);
 	UINT16  *new_colours;
 	int     colour;
-	new_colours=(UINT16  *)state->get_dssi_ptr(space,ds,si);
+	new_colours=(UINT16  *)get_dssi_ptr(space,ds,si);
 
 	if(raw_flag)
 		return;
@@ -791,7 +757,7 @@ static void decode_dssi_f_plonk_char(device_t *device,UINT16  ds, UINT16 si, UIN
 	rmnimbus_state  *state = device->machine().driver_data<rmnimbus_state>();
 	address_space &space = state->m_maincpu->space(AS_PROGRAM);
 	UINT16  *params;
-	params=(UINT16  *)state->get_dssi_ptr(space,ds,si);
+	params=(UINT16  *)get_dssi_ptr(space,ds,si);
 
 	if(raw_flag)
 		return;
@@ -811,7 +777,7 @@ static void decode_dssi_f_rw_sectors(device_t *device,UINT16  ds, UINT16 si, UIN
 	if(raw_flag)
 		return;
 
-	params=(UINT16  *)state->get_dssi_ptr(space,ds,si);
+	params=(UINT16  *)get_dssi_ptr(space,ds,si);
 
 	for(param_no=0;param_no<16;param_no++)
 		logerror("%04X ",params[param_no]);
@@ -1035,14 +1001,7 @@ WRITE_LINE_MEMBER(rmnimbus_state::sio_interrupt)
 	if(LOG_SIO)
 		logerror("SIO Interrupt state=%02X\n",state);
 
-	// Don't re-trigger if already active !
-	if(state!=m_sio_int_state)
-	{
-		m_sio_int_state=state;
-
-		if(state)
-			external_int(0, m_z80sio->m1_r());
-	}
+	external_int(m_z80sio->m1_r(), state);
 }
 
 /* Floppy disk */
@@ -1051,7 +1010,6 @@ void rmnimbus_state::fdc_reset()
 {
 	m_nimbus_drives.reg400=0;
 	m_scsi_ctrl_out->write(0);
-	m_nimbus_drives.int_ff=0;
 }
 
 WRITE_LINE_MEMBER(rmnimbus_state::nimbus_fdc_intrq_w)
@@ -1061,10 +1019,7 @@ WRITE_LINE_MEMBER(rmnimbus_state::nimbus_fdc_intrq_w)
 
 	if(m_iou_reg092 & DISK_INT_ENABLE)
 	{
-		m_nimbus_drives.int_ff=state;
-
-		if(state)
-			external_int(0,EXTERNAL_INT_DISK);
+		external_int(EXTERNAL_INT_DISK,state);
 	}
 }
 
@@ -1119,10 +1074,10 @@ READ8_MEMBER(rmnimbus_state::scsi_r)
 	switch(offset*2)
 	{
 		case 0x00 :
-			result |= !m_scsi_req << 7;
-			result |= !m_scsi_cd << 6;
-			result |= !m_scsi_io << 5;
-			result |= !m_scsi_bsy << 4;
+			result |= m_scsi_req << 7;
+			result |= m_scsi_cd << 6;
+			result |= m_scsi_io << 5;
+			result |= m_scsi_bsy << 4;
 			result |= m_scsi_msg << 3;
 			if(floppy)
 			{
@@ -1196,11 +1151,11 @@ WRITE8_MEMBER(rmnimbus_state::scsi_w)
 
 	switch(offset*2)
 	{
-		case 0x10 :
+		case 0x00 :
 			m_scsi_ctrl_out->write(data);
 			break;
 
-		case 0x18 :
+		case 0x08 :
 			m_scsi_data_out->write(data);
 			hdc_post_rw();
 			break;
@@ -1210,21 +1165,28 @@ WRITE8_MEMBER(rmnimbus_state::scsi_w)
 void rmnimbus_state::hdc_reset()
 {
 	m_nimbus_drives.drq_ff=0;
+	m_scsi_iena = 0;
+	m_scsi_msg = 0;
+	m_scsi_bsy = 0;
+	m_scsi_io = 0;
+	m_scsi_cd = 0;
+	m_scsi_req = 0;
+}
+
+void rmnimbus_state::check_scsi_irq()
+{
+	nimbus_fdc_intrq_w(m_scsi_io && m_scsi_cd && m_scsi_req && m_scsi_iena);
 }
 
 WRITE_LINE_MEMBER(rmnimbus_state::write_scsi_iena)
 {
-	int last = m_scsi_iena;
 	m_scsi_iena = state;
-
-	// If we enable the HDC interupt, and an interrupt is pending, go deal with it.
-	if (m_scsi_iena && !last && !m_scsi_io && !m_scsi_cd && !m_scsi_req)
-		nimbus_fdc_intrq_w(1);
+	check_scsi_irq();
 }
 
 void rmnimbus_state::hdc_post_rw()
 {
-	if(!m_scsi_req)
+	if(m_scsi_req)
 		m_scsibus->write_ack(1);
 
 	m_nimbus_drives.drq_ff=0;
@@ -1246,6 +1208,7 @@ WRITE_LINE_MEMBER( rmnimbus_state::write_scsi_bsy )
 WRITE_LINE_MEMBER( rmnimbus_state::write_scsi_cd )
 {
 	m_scsi_cd = state;
+	check_scsi_irq();
 }
 
 WRITE_LINE_MEMBER( rmnimbus_state::write_scsi_io )
@@ -1256,6 +1219,7 @@ WRITE_LINE_MEMBER( rmnimbus_state::write_scsi_io )
 	{
 		m_scsi_data_out->write(0);
 	}
+	check_scsi_irq();
 }
 
 WRITE_LINE_MEMBER( rmnimbus_state::write_scsi_msg )
@@ -1280,6 +1244,7 @@ WRITE_LINE_MEMBER( rmnimbus_state::write_scsi_req )
 	{
 		m_scsibus->write_ack(0);
 	}
+	check_scsi_irq();
 }
 
 /* 8031/8051 Peripheral controler 80186 side */
@@ -1369,7 +1334,7 @@ READ8_MEMBER(rmnimbus_state::nimbus_pc8031_iou_r)
 	}
 
 	if(((offset==2) || (offset==3)) && (m_iou_reg092 & PC8031_INT_ENABLE))
-		external_int(0,EXTERNAL_INT_PC8031_8C);
+		external_int(EXTERNAL_INT_PC8031_8C, true);
 
 	if(LOG_PC8031)
 		logerror("8031: PCIOR %04X read of %04X returns %02X\n",pc,offset,result);
@@ -1403,7 +1368,7 @@ WRITE8_MEMBER(rmnimbus_state::nimbus_pc8031_iou_w)
 						m_ipc_interface.status_out  &= ~IPC_OUT_ADDR;
 						m_ipc_interface.status_in   |= IPC_IN_READ_PEND;
 						if(m_iou_reg092 & PC8031_INT_ENABLE)
-						external_int(0,EXTERNAL_INT_PC8031_8F);
+							external_int(EXTERNAL_INT_PC8031_8F, true);
 						break;
 
 		case 0x03   : m_ipc_interface.ipc_out=data;
@@ -1411,7 +1376,7 @@ WRITE8_MEMBER(rmnimbus_state::nimbus_pc8031_iou_w)
 						m_ipc_interface.status_out   |= IPC_OUT_ADDR;
 						m_ipc_interface.status_in    |= IPC_IN_READ_PEND;
 						if(m_iou_reg092 & PC8031_INT_ENABLE)
-						external_int(0,EXTERNAL_INT_PC8031_8E);
+							external_int(EXTERNAL_INT_PC8031_8E, true);
 						break;
 	}
 }
@@ -1545,7 +1510,7 @@ WRITE8_MEMBER(rmnimbus_state::nimbus_sound_ay8910_portb_w)
 WRITE_LINE_MEMBER(rmnimbus_state::nimbus_msm5205_vck)
 {
 	if(m_iou_reg092 & MSM5205_INT_ENABLE)
-		external_int(0,EXTERNAL_INT_MSM5205);
+		external_int(EXTERNAL_INT_MSM5205,state);
 }
 
 static const int MOUSE_XYA[3][4] = { { 0, 0, 0, 0 }, { 1, 1, 0, 0 }, { 0, 1, 1, 0 } };
@@ -1663,7 +1628,7 @@ void rmnimbus_state::device_timer(emu_timer &timer, device_timer_id id, int para
 		{
 			xint=mxa ? EXTERNAL_INT_MOUSE_XR : EXTERNAL_INT_MOUSE_XL;
 
-			external_int(0,xint);
+			external_int(xint, true);
 
 //            logerror("Xint:%02X, mxb=%02X\n",xint,mxb);
 		}
@@ -1673,7 +1638,7 @@ void rmnimbus_state::device_timer(emu_timer &timer, device_timer_id id, int para
 		{
 			yint=myb ? EXTERNAL_INT_MOUSE_YU : EXTERNAL_INT_MOUSE_YD;
 
-			external_int(0,yint);
+			external_int(yint, true);
 //            logerror("Yint:%02X, myb=%02X\n",yint,myb);
 		}
 	}
@@ -1750,10 +1715,4 @@ collector output only. It usially acts as the printer strobe line.
 /* USER VIA 6522 port B is connected to the BBC user port */
 WRITE8_MEMBER(rmnimbus_state::nimbus_via_write_portb)
 {
-}
-
-WRITE_LINE_MEMBER(rmnimbus_state::nimbus_via_irq_w)
-{
-	if(state)
-		external_int(VIA_INT,0x00);
 }
