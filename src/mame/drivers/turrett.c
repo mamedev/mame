@@ -321,7 +321,7 @@ class turrett_hdd : public ide_hdd_device
 {
 public:
 	turrett_hdd(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-		: ide_hdd_device(mconfig, TURRETT_HARDDISK, "Turrett Tower HDD", tag, owner, clock, "turrett_hdd", __FILE__)
+		: ide_hdd_device(mconfig, TURRETT_HARDDISK, "HDD Turrett Tower", tag, owner, clock, "turrett_hdd", __FILE__)
 	{
 	}
 

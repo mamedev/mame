@@ -164,7 +164,7 @@ s3_vga_device::s3_vga_device(const machine_config &mconfig, device_type type, co
 }
 
 gamtor_vga_device::gamtor_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: svga_device(mconfig, GAMTOR_VGA, "GAMTOR_VGA", tag, owner, clock, "gamtor_vga", __FILE__)
+	: svga_device(mconfig, GAMTOR_VGA, "GAMTOR VGA", tag, owner, clock, "gamtor_vga", __FILE__)
 {
 }
 
