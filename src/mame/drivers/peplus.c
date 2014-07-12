@@ -6216,7 +6216,7 @@ Some call this a 4 of a Kind Bonus Poker with all 4K paying the same. Internally
 	ROM_LOAD( "capx1321.u43", 0x0000, 0x0200, CRC(4b57569f) SHA1(fa29c0f627e7ce79951ec6dadec114864144f37d) )
 ROM_END
 
-ROM_START( pex0550p ) /* Superboard : Joker Poker (X002461P+XP000055) */
+ROM_START( pex0550p ) /* Superboard : Joker Poker (X000550P+XP000055) */
 /*
                                        w/J     w/oJ
 PayTable   2P  3K  STR  FL  FH  4K  SF  RF  5K  RF  (Bonus)
