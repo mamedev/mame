@@ -1754,6 +1754,17 @@ PayTable  10s+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
 ROM_END
 
 ROM_START( pepp0051 ) /* Normal board : Joker Poker (PP0051) */
+/*
+                                            w/J     w/oJ
+PayTable   Ks+  2P  3K  STR  FL  FH  4K  SF  RF  5K  RF  (Bonus)
+----------------------------------------------------------------
+  P17A      1    1   2   3    4   5  20  40 100 200 500    800
+  % Range: 91.5-93.5%  Optimum: 95.5%  Hit Frequency: 44.7%
+     Programs Available: PP0051
+
+Superseded by PP0428 (Non Double-up) / PP0459
+
+*/
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "pp0051_554-544.u68",   0x00000, 0x8000, CRC(66329607) SHA1(bc980257645225a24cd71a10b4a4cb592f878b3b) ) /* Game Version: 554, Library Version: 544, Video Lib Ver: 544 */
 	ROM_RELOAD(                       0x08000, 0x8000) /* 32K version built using earlier gaming libraries */
@@ -1771,7 +1782,7 @@ ROM_END
 ROM_START( pepp0053 ) /* Normal board : Joker Poker (Aces or Better) (PP0053) */
 /*
                                             w/J     w/oJ
-PayTable   As+  2P  3K  STR  FL  FH  4K  SF  RF  5K  RF  (Bonus)
+PayTable    As  2P  3K  STR  FL  FH  4K  SF  RF  5K  RF  (Bonus)
 ----------------------------------------------------------------
   P18B      1    1   2   3    5   6  20  50 100 200 500   1000
   % Range: 90.6-92.6%  Optimum: 94.6%  Hit Frequency: 39.2%
@@ -1907,7 +1918,7 @@ ROM_START( pepp0059 ) /* Normal board : Two Pair or Better (PP0059) */
 PayTable  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
 ----------------------------------------------------
    FA      2    3    5    7  11  50 100 250    800
-  % Range: 89.5-91.5%  Optimum: 93.5%  Hit Frequency: 24.1%
+  % Range: 89.5-91.5%  Optimum: 93.5%  Hit Frequency: 38.8%
      Programs Available: PP0059, PP0424 - Non Double-up Only
 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -1928,7 +1939,7 @@ ROM_START( pepp0059a ) /* Normal board : Two Pair or Better (PP0059) */
 PayTable  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
 ----------------------------------------------------
    FA      2    3    5    7  11  50 100 250    800
-  % Range: 89.5-91.5%  Optimum: 93.5%  Hit Frequency: 24.1%
+  % Range: 89.5-91.5%  Optimum: 93.5%  Hit Frequency: 38.8%
      Programs Available: PP0059, PP0424 - Non Double-up Only
 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -2010,6 +2021,14 @@ PayTable  10s+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
 ROM_END
 
 ROM_START( pepp0064 ) /* Normal board : Joker Poker (PP0064) */
+/*
+                                            w/J     w/oJ
+PayTable   Ks+  2P  3K  STR  FL  FH  4K  SF  RF  5K  RF  (Bonus)
+----------------------------------------------------------------
+  ????      1    1   2   3    4   5  20  40 100 200 500    ???
+     Programs Available: PP0064
+
+*/
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "pp0064_666-515.u68",   0x00000, 0x8000, CRC(56409362) SHA1(3400734da785edac2af14d8b645f7e3ed04f96a0) ) /* Game Version: 666, Library Version: 515, Video Lib Ver: 515 */
 	ROM_RELOAD(                       0x08000, 0x8000) /* 32K version built using earlier gaming libraries */
@@ -2025,6 +2044,17 @@ ROM_START( pepp0064 ) /* Normal board : Joker Poker (PP0064) */
 ROM_END
 
 ROM_START( pepp0065 ) /* Normal board : Joker Poker (Aces or Better) (PP0065) */
+/*
+                                            w/J     w/oJ
+PayTable   As   2P  3K  STR  FL  FH  4K  SF  RF  5K  RF  (Bonus)
+----------------------------------------------------------------
+  P18A      1    1   2   3    5   6  20  50 100 200 500    800
+  % Range: 89.8-91.8%  Optimum: 93.8%  Hit Frequency: 37.6%
+     Programs Available: PP0065
+
+Superseded by PP0429 (Non Double-up) / PP0458
+
+*/
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "pp0065_944-a00.u68",   0x00000, 0x10000, CRC(76c1a367) SHA1(ea8be9241e9925b5a4206db6875e1572f85fa5fe) ) /* Game Version: 944, Library Version: A00 */
 
@@ -2125,7 +2155,8 @@ ROM_START( pepp0120 ) /* Normal board : Wild Sevens Poker (PP0120) */
                                         w/7 Four w/o7
 PayTable   3K   STR  FL  FH  4K  SF  5K  RF  7s   RF  (Bonus)
 -------------------------------------------------------------
-  ????      1    2    3   4   4   9  ??  25 200  250    ???
+  ????      1    2    3   4   4   9  12  20 200  250    800
+  % Range: 93.1-95.1%  Optimum: 97.1%  Hit Frequency: 44.1%
      Programs Available: PP0120
 */
 
@@ -2741,6 +2772,13 @@ PayTable   3K   STR  FL  FH  4K  SF  5K  RF  4D  RF  (Bonus)
 ROM_END
 
 ROM_START( pepp0230 ) /* Normal board : Standard Draw Poker (PP0230) */
+/*
+PayTable   Js+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
+----------------------------------------------------------
+   BA       1    2    3    4    5   8  25  50 250    800
+  % Range: 93.8-95.8%  Optimum: 97.8%  Hit Frequency: 45.3%
+     Programs Available: PP0230
+*/
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "pp0230_715-702.u68",   0x00000, 0x10000, CRC(0272d8d6) SHA1(659f9149ab5e26283eaccd31588183c21c291adb) ) /* Game Version: 715, Library Version: 702 */
 
@@ -2781,8 +2819,12 @@ ROM_START( pepp0249 ) /* Normal board : Deuces Wild Poker (PP0249) */
                                         w/D     w/oD
 PayTable   3K   STR  FL  FH  4K  SF  5K  RF  4D  RF  (Bonus)
 ------------------------------------------------------------
-  ????      1    2    3   4   4  ??  ??  25 200 250    ???
+  P129A     1    2    3   4   4  10  16  25 200 250    800
+  % Range: 95.7-97.7%  Optimum: 99.7%  Hit Frequency: 44.3%
      Programs Available: PP0249
+
+Superseded by PP0469
+
 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "pp0249_600-550.u68",   0x00000, 0x8000, CRC(39cab612) SHA1(6ef2e533df40d9ac331dc9e2fd3bf17187f70414) ) /* Game Version: 600, Library Version: 550, Video Lib Ver: 550 */
@@ -2802,7 +2844,7 @@ ROM_START( pepp0250 ) /* Normal board : Double Down Stud Poker (PP0250) */
 /*
 PayTable  6s-10s  Js+  2PR  3K   STR  FL  FH  4K  SF   RF  (Bonus)
 ------------------------------------------------------------------
-  ????      1      2    3    4    6    6  12  50 200  1000   ???
+  ????      1      2    3    4    6    6  12  50 200  1000  4000
 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "pp0250_733-778.u68",   0x00000, 0x10000, CRC(4c919598) SHA1(fe73503c6ccb3c5746fb96be58cd5b740c819713) ) /* Game Version: 733, Library Version: 778 */
@@ -3169,7 +3211,7 @@ ROM_END
 ROM_START( pepp0429 ) /* Normal board : Joker Poker (Aces or Better) (No Double-up) (PP0429) */
 /*
                                             w/J     w/oJ
-PayTable   As+  2P  3K  STR  FL  FH  4K  SF  RF  5K  RF  (Bonus)
+PayTable   As   2P  3K  STR  FL  FH  4K  SF  RF  5K  RF  (Bonus)
 ----------------------------------------------------------------
   P18A      1    1   2   3    5   6  20  50 100 200 500    800
   % Range: 89.8-91.8%  Optimum: 93.8%  Hit Frequency: 37.6%
@@ -3384,7 +3426,7 @@ ROM_END
 ROM_START( pepp0458 ) /* Normal board : Joker Poker (Aces or Better) (PP0458) */
 /*
                                             w/J     w/oJ
-PayTable   As+  2P  3K  STR  FL  FH  4K  SF  RF  5K  RF  (Bonus)
+PayTable   As   2P  3K  STR  FL  FH  4K  SF  RF  5K  RF  (Bonus)
 ----------------------------------------------------------------
   P18A      1    1   2   3    5   6  20  50 100 200 500    800
   % Range: 89.8-91.8%  Optimum: 93.8%  Hit Frequency: 37.6%
@@ -3666,6 +3708,14 @@ PayTable   Js+  2PR  3K  STR  FL  FH  4K  4K  4A  SF  RF  (Bonus)
 ROM_END
 
 ROM_START( pepp0531 ) /* Normal board : Joker Poker (PP0531) */
+/*
+                                            w/J     w/oJ
+PayTable   Ks+  2P  3K  STR  FL  FH  4K  SF  RF  5K  RF  (Bonus)
+----------------------------------------------------------------
+ P182A      1    1   2   3    5   8  15  50 100 200 400    800
+  % Range: 93.6-95.6%  Optimum: 97.6%  Hit Frequency: 44.1%
+     Programs Available: PP0531
+*/
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "pp0531_979-a0c.u68",   0x00000, 0x10000, CRC(6138e095) SHA1(6075613b5d818c26cdc5da1d05cff3af5d4cbf01) ) /* Game Version: 979, Library Version: A0C */
 
@@ -3751,7 +3801,8 @@ ROM_START( pepp0542 ) /* Normal board : One Eyed Jacks (PP0542) Use SET001 to se
                                              Wild    Wild
 PayTable    As  2PR  3K  STR  FL  FH  4K  SF  RF  5K  RF  (Bonus)
 -----------------------------------------------------------------
-  ????       1   1    1   2    4   5  10  ??  ??  ?? 250    800
+  ????       1   1    1   2    4   5  10  50 100 100 400   1600
+  % Range: 94.8-96.8%  Optimum: 98.8%  Hit Frequency: 44.5%
 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "pp0542_905-923.u68",   0x00000, 0x10000, CRC(f4fe3db5) SHA1(18521a569aae8d89e82f9709edc03badae153dd4) ) /* Game Version: 905, Library Version: 923 */
@@ -3923,7 +3974,7 @@ ROM_START( pepp0760 ) /* Normal board : Double Down Stud Poker (PP0760) */
 /*
 PayTable  8s-10s  Js+  2PR  3K   STR  FL  FH  4K  SF   RF  (Bonus)
 ------------------------------------------------------------------
-  ????      1      2    3    4    6    9  12  50 200  1000   ???
+  ????      1      2    3    4    6    9  12  50 200  1000  4000
 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "pp0760_a4v-a6d.u68",   0x00000, 0x10000, CRC(1c26076c) SHA1(612ac66bbb0827b81dc9c6bc23fa7558445481bc) ) /* Game Version: A4V, Library Version: A6D */
