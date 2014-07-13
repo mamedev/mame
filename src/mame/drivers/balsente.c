@@ -1410,6 +1410,29 @@ ROM_START( snakepit )
 ROM_END
 
 
+ROM_START( snakepit2 )
+	ROM_REGION( 0x40000, "maincpu", 0 )     /* 64k for code for the first CPU, plus 128k of banked ROMs */
+	ROM_LOAD( "ab0.bin", 0x10000, 0x2000, CRC(5aa86081) SHA1(e65e256661b13a0631398e115dd02fce281bafa4) )
+	ROM_LOAD( "ab1.bin", 0x12000, 0x2000, CRC(588228b8) SHA1(b64032a4fd1f52179d38e2073380bba6ec321302) )
+	ROM_LOAD( "ab2.bin", 0x14000, 0x2000, CRC(d573e33e) SHA1(47ff4f2f28f3d1830da82bef09ebc9b4f5cedaa5) )
+	ROM_LOAD( "ab3.bin", 0x16000, 0x2000, CRC(0e3b6cfe) SHA1(2bac5869d1ed01744a7fc07679fc59307e845f97) )
+	ROM_LOAD( "ab4.bin", 0x18000, 0x2000, CRC(5de588a7) SHA1(aebd6710bee56fdfa15916404f120469ab710de0) )
+	ROM_LOAD( "ab5.bin", 0x1a000, 0x2000, CRC(2a1d9d8f) SHA1(3364f4bc507576323560bf14fc99036c47d0297c) )
+	ROM_LOAD( "cd.bin",  0x2c000, 0x2000, CRC(f357172e) SHA1(822012360526459e85196692e4cb408fe25fb1cc) )
+	ROM_LOAD( "ef.bin",  0x2e000, 0x2000, CRC(5e9d1de2) SHA1(5a04c4444aed9c2677fc85ad733fec69398403d6) )
+
+	SOUNDBOARD_ROMS
+
+	ROM_REGION( 0x10000, "gfx1", 0 )        /* up to 64k of sprites */
+	ROM_LOAD( "gr0.bin", 0x00000, 0x2000, CRC(f77fd85d) SHA1(f8e69d1d0030412d6129a8ebfee40b3f1f189d8d) )
+	ROM_LOAD( "gr1.bin", 0x02000, 0x2000, CRC(3ad10334) SHA1(1d82a7948fbee627c80a9e03ade90e57972a6a31) )
+	ROM_LOAD( "gr2.bin", 0x04000, 0x2000, CRC(24887703) SHA1(089f077400c9a3e3f5b43e8aa60b41160e296d52) )
+	ROM_LOAD( "gr3.bin", 0x06000, 0x2000, CRC(c6703ec2) SHA1(0f5d7c17ee508f8fea316b7f92cdd7cc174b155f) )
+
+	MOTHERBOARD_PALS
+ROM_END
+
+
 ROM_START( snakjack )
 	ROM_REGION( 0x40000, "maincpu", 0 )     /* 64k for code for the first CPU, plus 128k of banked ROMs */
 	ROM_LOAD( "rom-ab0.u9a", 0x10000, 0x2000, CRC(da2dd119) SHA1(85ae452b137e69e051fa66648f295d180339794e) )
@@ -2224,6 +2247,7 @@ GAME( 1984, trivia12, triviag1, balsente, triviag1, balsente_state, triviag1, RO
 /* Board: Unknown (From a picture on eBay Snacks'n Jaxson does not match any documented types here.) */
 GAME( 1984, otwalls,  0,        balsente, otwalls, balsente_state,  otwalls,  ROT0, "Bally/Sente",  "Off the Wall (Sente)", GAME_SUPPORTS_SAVE )
 GAME( 1984, snakepit, 0,        balsente, sentetst, balsente_state, snakepit, ROT0, "Bally/Sente",  "Snake Pit", GAME_SUPPORTS_SAVE )
+GAME( 1983, snakepit2,snakepit, balsente, sentetst, balsente_state, snakepit, ROT0, "Sente Technologies Inc.",  "Snake Pit (9/14/84)", GAME_SUPPORTS_SAVE )
 GAME( 1984, snakjack, 0,        balsente, snakjack, balsente_state, snakjack, ROT0, "Bally/Sente",  "Snacks'n Jaxson", GAME_SUPPORTS_SAVE )
 
 /* Board: 006-8025-01-0B Rev B */
