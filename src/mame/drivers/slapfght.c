@@ -764,28 +764,28 @@ void slapfght_state::machine_start()
 	m_main_irq_enabled = false;
 	m_sound_nmi_enabled = false;
 
-	bool m_mcu_sent = false;
-	bool m_main_sent = false;
-	UINT8 m_from_main = 0;
-	UINT8 m_from_mcu = 0;
-	UINT8 m_portA_in = 0;
-	UINT8 m_portA_out = 0;
-	UINT8 m_ddrA = 0;
-	UINT8 m_portB_in = 0;
-	UINT8 m_portB_out = 0;
-	UINT8 m_ddrB = 0;
-	UINT8 m_portC_in = 0;
-	UINT8 m_portC_out = 0;
-	UINT8 m_ddrC = 0;
+	m_mcu_sent = false;
+	m_main_sent = false;
+	m_from_main = 0;
+	m_from_mcu = 0;
+	m_portA_in = 0;
+	m_portA_out = 0;
+	m_ddrA = 0;
+	m_portB_in = 0;
+	m_portB_out = 0;
+	m_ddrB = 0;
+	m_portC_in = 0;
+	m_portC_out = 0;
+	m_ddrC = 0;
 
-	int m_getstar_status = 0;
-	int m_getstar_sequence_index = 0;
-	int m_getstar_status_state = 0;
-	UINT8 m_getstar_cmd = 0;
-	UINT8 m_gs_a = 0;
-	UINT8 m_gs_d = 0;
-	UINT8 m_gs_e = 0;
-	UINT8 m_tigerhb_cmd = 0;
+	m_getstar_status = 0;
+	m_getstar_sequence_index = 0;
+	m_getstar_status_state = 0;
+	m_getstar_cmd = 0;
+	m_gs_a = 0;
+	m_gs_d = 0;
+	m_gs_e = 0;
+	m_tigerhb_cmd = 0;
 
 	// savestates
 	save_item(NAME(m_palette_bank));
