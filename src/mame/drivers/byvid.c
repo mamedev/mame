@@ -6,6 +6,24 @@
     Granny & the Gators
     A blend of arcade video game, and pinball.
 
+Babypac uses a MPU4 board containing the main cpu, and a Vidiot
+board containing the video and sound cpus, and the video controller
+and the sound DAC and amp.
+
+Granny uses the MPU4 board, but it has a Vidiot Deluxe for the
+video, and a Cheep Squeek sound board. The manual incorrectly
+describes the babypac vidiot board, which is of little use.
+
+Debug trick to get granny to work:
+>mame granny -debug
+focus 1
+g
+After 10 beeps it will get stuck in a loop, so press enter.
+pc=e1f1
+g
+The game boots up, insert a coin, you can play.
+
+
 ToDo (babypac):
 - You can play the video portion but try not to use the lower
   escape chutes. If you do, alternate between pressing X and
@@ -17,13 +35,17 @@ ToDo (babypac):
 - Beeper needs to be replaced by a red LED when artwork is done.
 
 ToDo (granny):
-- All of the above, plus:
-- Doesn't boot.
+- No sound
+- Playfield inputs
+- Mechanical
+- Artwork
+- Beeper needs to be replaced by a red LED when artwork is done.
+- Doesn't boot (test of TMS9928 fails).
 - It has 2xTMS9928 but only 1 screen. The outputs need to be
   blended with transparency. The '9' test screen will have
   coloured stripes overlaid with the text names.
 - No schematic found.
-- DIP names are different.
+
 
 ***************************************************************/
 
@@ -462,14 +484,12 @@ static INPUT_PORTS_START( granny )
 	PORT_DIPSETTING(    0x80, "4")
 	PORT_DIPSETTING(    0x40, "5")
 
-	PORT_START("JOY") // these inputs are not confirmed
+	PORT_START("JOY")
 	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_4WAY
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_4WAY
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_4WAY
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_4WAY
-	//PORT_BIT( 0x??, IP_ACTIVE_HIGH, IPT_START1 )
-	//PORT_BIT( 0x??, IP_ACTIVE_HIGH, IPT_START2 )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_START1 )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_START2 )
 
 	PORT_START("X0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Canoe Rollover Button 1")
@@ -603,7 +623,7 @@ READ8_MEMBER( by133_state::u7_b_r )
 	if (BIT(m_u7_a, 7)) // bits 6 and 7 work; pinmame uses 7
 		m_u7_b |= m_io_joy->read();
 
-	if (BIT(m_u7_a, 6)) // Granny has a power button? according to Pinmame
+	if (BIT(m_u7_a, 6)) // Granny has a power button? according to Pinmame. Tested - doesn't do anything.
 		m_u7_b = m_io_test->read() & 0x80;
 
 	return m_u7_b;
