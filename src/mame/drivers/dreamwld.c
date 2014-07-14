@@ -611,10 +611,10 @@ MACHINE_CONFIG_END
 
 ROM_START( dreamwld )
 	ROM_REGION( 0x200000, "maincpu", 0 )
-	ROM_LOAD32_BYTE( "1.bin", 0x000002, 0x040000, CRC(35c94ee5) SHA1(3440a65a807622b619c97bc2a88fd7d875c26f66) )
-	ROM_LOAD32_BYTE( "2.bin", 0x000003, 0x040000, CRC(5409e7fc) SHA1(2f94a6a8e4c94b36b43f0b94d58525f594339a9d) )
 	ROM_LOAD32_BYTE( "3.bin", 0x000000, 0x040000, CRC(e8f7ae78) SHA1(cfd393cec6dec967c82e1131547b7e7fdc5d814f) )
 	ROM_LOAD32_BYTE( "4.bin", 0x000001, 0x040000, CRC(3ef5d51b) SHA1(82a00b4ff7155f6d5553870dfd510fed9469d9b5) )
+	ROM_LOAD32_BYTE( "1.bin", 0x000002, 0x040000, CRC(35c94ee5) SHA1(3440a65a807622b619c97bc2a88fd7d875c26f66) )
+	ROM_LOAD32_BYTE( "2.bin", 0x000003, 0x040000, CRC(5409e7fc) SHA1(2f94a6a8e4c94b36b43f0b94d58525f594339a9d) )
 
 	ROM_REGION( 0x10000, "cpu1", 0 ) /* 87C52 MCU Code */
 	ROM_LOAD( "87c52.mcu", 0x00000, 0x10000 , NO_DUMP ) /* can't be dumped. */
@@ -648,6 +648,66 @@ ROM_START( dreamwld )
 	ROM_REGION( 0x10000, "unknown", 0 ) /* ???? - not decoded seems to be in blocks of 0x41 bytes.. */
 	ROM_LOAD( "11.bin", 0x000000, 0x10000, CRC(0da8db45) SHA1(7d5bd71c5b0b28ff74c732edd7c662f46f2ab25b) )
 ROM_END
+
+/*
+
+Rolling Crush - this is the same PCB as Dream World with one of the OKIs positions left unpopulated.
+
+Here are the dumps from a (original???) Rolling Crush (version 1.07.E 1999/02/11) PCB.Game seems to be a rip-off
+of Puzz Loop from Mitchell,  infact there is a piece of tape on the solder side which says 'P. LOOP' and a sticker with 02/1999 date.Manifacturer is TRUST.
+All EPROMS four 27C2000 (program code), one 27C4000 (6295 samples), 
+one MASK 27C512(GFX), two 27C160(GFX) and two 27C010 (GFX) are not labeled.
+Main CPU is a 68EC020FG16 in QFP package
+There are also a Atmel AT89C52 MCU (dumped as well since it seems not secured) and two Actel A40MX04 FPGAs as well as a lot of PLDs (three GAL22V10B and nine PALCE20V8H), don't know 
+if secured.
+
+Main CPU 68EC020FG16           @ 16MHz
+AD-65 (OKI MSM6295 rebadged)   @ 1MHz
+Atmel AT89C52 MCU              @ 16MHZ
+
+
+V-SYNC                         @57.793 Hz
+H-SYNC                         @ (floating) 15.19 - 15.27KHz
+
+
+
+*/
+
+ROM_START( rolcrush )
+	ROM_REGION( 0x200000, "maincpu", 0 )
+	ROM_LOAD32_BYTE( "mx27c2000_4.bin", 0x000000, 0x040000, CRC(c47f0540) SHA1(76712f41046e5852ad6be6dbf171cf34471e2409) )
+	ROM_LOAD32_BYTE( "mx27c2000_3.bin", 0x000001, 0x040000, CRC(7af59294) SHA1(f36b3d100e0d963bf51b7fbe8c4a0bdcf2180ba0) )
+	ROM_LOAD32_BYTE( "mx27c2000_2.bin", 0x000002, 0x040000, CRC(5eb24adb) SHA1(0329a02e18490bfe72ff34a64722d7316814720b) )
+	ROM_LOAD32_BYTE( "mx27c2000_1.bin", 0x000003, 0x040000, CRC(a37e15b2) SHA1(f0fc945a894d6ed58daf05390a17051d0f3cda20) )
+
+	ROM_REGION( 0x10000, "cpu1", 0 ) /* 87C52 MCU Code */
+	ROM_LOAD( "87c52.mcu", 0x00000, 0x10000 , NO_DUMP ) /* can't be dumped. */
+
+	ROM_REGION( 0x10000, "user1", ROMREGION_ERASE00 ) /* Protection data  */
+//	ROM_LOAD( "protdata.bin", 0x000, 0x6c9 ,  CRC(1) SHA1(1) ) /* extracted */
+
+	ROM_REGION( 0x100000, "oki1", 0 ) /* OKI Samples - 1st chip*/
+	ROM_LOAD( "mx27c4000_5.bin", 0x000000, 0x80000, CRC(7afa6adb) SHA1(d4049e1068a5f7abf0e14d0b9fbbbc6dfb5d0170) )
+	ROM_RELOAD(0x80000,0x80000) // for the banks
+
+	ROM_REGION( 0x100000, "oki2", ROMREGION_ERASE00 ) /* OKI Samples - 2nd chip (neither OKI or rom is present, empty sockets) */
+	/* not populared */
+
+	ROM_REGION( 0x400000, "gfx1", 0 ) /* Sprite Tiles - decoded */
+	ROM_LOAD16_WORD_SWAP( "m27c160.8.bin", 0x000000, 0x200000, CRC(a509bc36) SHA1(aaa008e07e4b24ff9dbcee5925d6516d1662931c) )
+
+	ROM_REGION( 0x200000, "gfx2", 0 ) /* BG Tiles - decoded */
+	ROM_LOAD16_WORD_SWAP( "m27c160.10.bin",0x000000, 0x200000, CRC(739b0cb0) SHA1(a7cc48502d84218586afa7276fa7ba759242f05e) )
+
+	ROM_REGION( 0x040000, "spritelut", 0 ) /* Sprite Code Lookup ... */
+	ROM_LOAD16_BYTE( "tms27c010_7.bin", 0x000000, 0x020000, CRC(4cb84384) SHA1(8dd02e2d9829c15cb19654779d2217a7d53d5971) )
+	ROM_LOAD16_BYTE( "tms27c010_6.bin", 0x000001, 0x020000, CRC(0c9d197a) SHA1(da057c8d08f41c4a5b9cb4f8f00de7e1461d98f0) )
+
+	ROM_REGION( 0x10000, "unknown", 0 ) /* ???? - not decoded seems to be in blocks of 0x41 bytes.. */
+	ROM_LOAD( "mx27c512.9.bin", 0x000000, 0x10000, CRC(0da8db45) SHA1(7d5bd71c5b0b28ff74c732edd7c662f46f2ab25b) )
+ROM_END
+
+/* Baryon is a slightly different PCB, doesn't have a position for the 2nd OKI */
 
 ROM_START( baryon )
 	ROM_REGION( 0x100000, "maincpu", 0 )
@@ -685,4 +745,5 @@ ROM_END
 
 
 GAME( 1997, baryon,   0, baryon,   dreamwld, driver_device, 0, ROT270,  "SemiCom", "Baryon - Future Assault", GAME_SUPPORTS_SAVE )
-GAME( 2000, dreamwld, 0, dreamwld, dreamwld, driver_device, 0, ROT0,  "SemiCom", "Dream World", GAME_SUPPORTS_SAVE )
+GAME( 2000, dreamwld, 0, dreamwld, dreamwld, driver_device, 0, ROT0,    "SemiCom", "Dream World", GAME_SUPPORTS_SAVE )
+GAME( 1999, rolcrush, 0, baryon,   dreamwld, driver_device, 0, ROT0,    "Trust / Semicom",   "Rolling Crush (version 1.07.E - 1999/02/11)", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
