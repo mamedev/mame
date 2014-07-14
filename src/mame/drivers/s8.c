@@ -30,6 +30,7 @@
       display.
 
 ToDo:
+- Make Still Crazy layout.
 - Get Still Crazy coin-in to register.
   Workaround:
   - Start in debug mode, g to run the game, go to memory view and enter credits
@@ -120,7 +121,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( s8_audio_map, AS_PROGRAM, 8, s8_state )
 	AM_RANGE(0x0000, 0x00ff) AM_RAM
-	AM_RANGE(0x2000, 0x2003) AM_DEVREADWRITE("pias", pia6821_device, read, write) // stillcra sounds
+	AM_RANGE(0x2000, 0x2003) AM_DEVREADWRITE("pias", pia6821_device, read, write) // scrzy_l1 sounds
 	AM_RANGE(0x4000, 0x4003) AM_DEVREADWRITE("pias", pia6821_device, read, write) // pfevr sounds
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -409,7 +410,7 @@ ROM_END
 /*----------------------------
 / Still Crazy (#543) 06/1984
 /-----------------------------*/
-ROM_START(stillcra)
+ROM_START(scrzy_l1)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD("ic20.bin", 0x6000, 0x2000, CRC(b0df42e6) SHA1(bb10268d7b820d1de0c20e1b79aba558badd072b) )
 
@@ -419,4 +420,4 @@ ROM_END
 
 GAME(1984,pfevr_l2, 0,        s8, s8, driver_device, 0, ROT0, "Williams", "Pennant Fever (L-2)", GAME_MECHANICAL)
 GAME(1984,pfevr_p3, pfevr_l2, s8, s8, driver_device, 0, ROT0, "Williams", "Pennant Fever (P-3)", GAME_MECHANICAL)
-GAME(1984,stillcra, 0,        s8, s8, driver_device, 0, ROT0, "Williams", "Still Crazy", GAME_MECHANICAL | GAME_NOT_WORKING)
+GAME(1984,scrzy_l1, 0,        s8, s8, driver_device, 0, ROT0, "Williams", "Still Crazy", GAME_MECHANICAL | GAME_NOT_WORKING)
