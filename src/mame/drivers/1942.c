@@ -84,7 +84,9 @@ static NETLIST_START(nl_1942)
 
 	SOLVER(Solver, 48000)
 	ANALOG_INPUT(V5, 5)
-    PARAM(Solver.ACCURACY, 1e-7)
+    PARAM(Solver.ACCURACY, 1e-6)
+    PARAM(Solver.GS_LOOPS, 6)
+    PARAM(Solver.SOR_FACTOR, 1.0)
     //PARAM(Solver.DYNAMIC_TS, 1)
     //PARAM(Solver.LTE, 5e-8)
 
@@ -570,7 +572,8 @@ static MACHINE_CONFIG_START( 1942, _1942_state )
 
 	/* NETLIST configuration using internal AY8910 resistor values */
 
-	MCFG_SOUND_ADD("snd_nl", NETLIST_SOUND, 48000)
+    /* Minimize resampling between ay8910 and netlist */
+	MCFG_SOUND_ADD("snd_nl", NETLIST_SOUND, AUDIO_CLOCK / 8 / 2)
 	MCFG_NETLIST_SETUP(nl_1942)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 5.0)
 	MCFG_NETLIST_STREAM_INPUT("snd_nl", 0, "R_AY1_1.R")
