@@ -20,14 +20,12 @@ public:
 		m_head_layersize(*this, "head_layersize"),
 		m_headpanic_platform_x(*this, "platform_x"),
 		m_headpanic_platform_y(*this, "platform_y"),
-		m_sprgen(*this, "spritegen"),
-		m_eeprom(*this, "eeprom"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
-		m_gfxdecode(*this, "gfxdecode") {
-		m_tilemap0_color = 0;
-		m_tilemap1_color = 0;
-	}
+		m_gfxdecode(*this, "gfxdecode"),
+		m_sprgen(*this, "spritegen"),
+		m_eeprom(*this, "eeprom")
+		{}
 
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_vram_0;
@@ -38,7 +36,6 @@ public:
 	required_shared_ptr<UINT16> m_head_layersize;
 	required_shared_ptr<UINT16> m_headpanic_platform_x;
 	required_shared_ptr<UINT16> m_headpanic_platform_y;
-	optional_device<decospr_device> m_sprgen;
 //  UINT16 *       m_paletteram;  // currently this uses generic palette handling
 
 	/* video-related */
@@ -50,7 +47,12 @@ public:
 	int           m_tilemap1_color;
 
 	/* devices */
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	optional_device<decospr_device> m_sprgen;
 	optional_device<eeprom_serial_93cxx_device> m_eeprom;
+	
 	DECLARE_WRITE16_MEMBER(esd16_sound_command_w);
 	DECLARE_WRITE16_MEMBER(hedpanic_platform_w);
 	DECLARE_READ16_MEMBER(esd_eeprom_r);
@@ -70,8 +72,4 @@ public:
 	virtual void video_start();
 	UINT32 screen_update_hedpanic(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECOSPR_PRIORITY_CB_MEMBER(hedpanic_pri_callback);
-
-	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_audiocpu;
-	required_device<gfxdecode_device> m_gfxdecode;
 };

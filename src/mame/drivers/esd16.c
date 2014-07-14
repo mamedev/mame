@@ -585,11 +585,13 @@ void esd16_state::machine_start()
 	membank("bank1")->configure_entries(0, 16, &AUDIO[0x0000], 0x4000);
 
 	save_item(NAME(m_tilemap0_color));
+	save_item(NAME(m_tilemap1_color));
 }
 
 void esd16_state::machine_reset()
 {
 	m_tilemap0_color = 0;
+	m_tilemap1_color = 0;
 }
 
 DECOSPR_PRIORITY_CB_MEMBER(esd16_state::hedpanic_pri_callback)
