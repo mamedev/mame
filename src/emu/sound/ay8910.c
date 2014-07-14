@@ -521,23 +521,6 @@ INLINE void build_single_table(double rl, const ay8910_device::ay_ym_param *par,
 
 }
 
-#ifdef UNUSED_FUNCTION
-INLINE void build_resistor_table(const ay8910_device::ay_ym_param *par, INT32 *tab, int zero_is_off)
-{
-	int j;
-
-	for (j=0; j < par->res_count; j++)
-	{
-		if (zero_is_off && j == 0)
-		{
-			tab[j] = 1e6;
-		}
-		else
-			tab[j] = par->res[j];
-	}
-}
-#endif
-
 INLINE void build_mosfet_resistor_table(const ay8910_device::mosfet_param &par, const double rd, INT32 *tab)
 {
     int j;
@@ -551,12 +534,10 @@ INLINE void build_mosfet_resistor_table(const ay8910_device::mosfet_param &par, 
         const double Vs = p2 - sqrt(p2 * p2 - Vg * Vg);
 
         const double res = rd * ( Vd / Vs - 1.0);
-        /* FXIME: That's the biggest value we can stream on to netlist. Have to find a different
-         *        approach.
-         */
+        /* That's the biggest value we can stream on to netlist. */
 
-        if (res > (1 << 21))
-            tab[j] = (1 << 21);
+        if (res > (1 << 28))
+            tab[j] = (1 << 28);
         else
             tab[j] = res;
         //printf("%d %f %10d\n", j, rd / (res + rd) * 5.0, tab[j]);
@@ -815,11 +796,6 @@ void ay8910_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 		else
 		{
 			*(buf[0]++) = mix_3D();
-#if 0
-			*(buf[0]) = (  vol_enabled[0] * m_vol_table[m_Vol[0]]
-							+ vol_enabled[1] * m_vol_table[m_Vol[1]]
-							+ vol_enabled[2] * m_vol_table[m_Vol[2]]) / m_step;
-#endif
 		}
 		samples--;
 	}
