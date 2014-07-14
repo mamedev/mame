@@ -2750,7 +2750,7 @@ ROM_START( pepp0224 ) /* Normal board : Deuces Wild Poker (No Double-up) (PP0224
                                         w/D     w/oD
 PayTable   3K   STR  FL  FH  4K  SF  5K  RF  4D  RF  (Bonus)
 ------------------------------------------------------------
-  P47A      1    2    2   3   4  13  16  22 200 250    800
+  P47A      1    2    2   3   4  13  16  25 200 250    800
   % Range: 92.8-94.8%  Optimum: 96.8%  Hit Frequency: 44.9%
      Programs Available: PP0290, X000224P & PP0224 - Non Double-up Only
 */
@@ -2772,7 +2772,7 @@ ROM_START( pepp0224a ) /* Normal board : Deuces Wild Poker (No Double-up) (PP022
                                         w/D     w/oD
 PayTable   3K   STR  FL  FH  4K  SF  5K  RF  4D  RF  (Bonus)
 ------------------------------------------------------------
-  P47A      1    2    2   3   4  13  16  22 200 250    800
+  P47A      1    2    2   3   4  13  16  25 200 250    800
   % Range: 92.8-94.8%  Optimum: 96.8%  Hit Frequency: 44.9%
      Programs Available: PP0290, X000224P & PP0224 - Non Double-up Only
 */
@@ -5742,7 +5742,7 @@ ROM_START( pex0224p ) /* Superboard : Deuces Wild Poker (X000224P+XP000053) */
                                         w/D     w/oD
 PayTable   3K   STR  FL  FH  4K  SF  5K  RF  4D  RF  (Bonus)
 ------------------------------------------------------------
-  P47A      1    2    2   3   4  13  16  22 200 250    800
+  P47A      1    2    2   3   4  13  16  25 200 250    800
   % Range: 92.8-94.8%  Optimum: 96.8%  Hit Frequency: 44.9%
      Programs Available: PP0290, X000224P & PP0224 - Non Double-up Only
 */
