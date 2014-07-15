@@ -170,8 +170,9 @@ int machine_manager::execute()
 	bool exit_pending = false;
 	int error = MAMERR_NONE;
 
+	m_lua.initialize();
 	if (m_options.console()) {
-		m_lua.initialize();
+		m_lua.start_console();
 	}
 	while (error == MAMERR_NONE && !exit_pending)
 	{

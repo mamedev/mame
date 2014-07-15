@@ -29,6 +29,7 @@ public:
 	~lua_engine();
 
 	void initialize();
+	void start_console();
 	void load_script(const char *filename);
 	void load_string(const char *value);
 
