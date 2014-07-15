@@ -158,6 +158,21 @@ void i8275_device::device_start()
 	save_item(NAME(m_fifo_next));
 	save_item(NAME(m_buffer_dma));
 	save_item(NAME(m_lpen));
+	save_item(NAME(m_hlgt));
+	save_item(NAME(m_vsp));
+	save_item(NAME(m_gpa));
+	save_item(NAME(m_rvv));
+	save_item(NAME(m_lten));
+	save_item(NAME(m_scanline));
+	save_item(NAME(m_irq_scanline));
+	save_item(NAME(m_vrtc_scanline));
+	save_item(NAME(m_vrtc_drq_scanline));
+	save_item(NAME(m_du));
+	save_item(NAME(m_dma_stop));
+	save_item(NAME(m_end_of_screen));
+	save_item(NAME(m_cursor_blink));
+	save_item(NAME(m_char_blink));
+	save_item(NAME(m_stored_attr));
 }
 
 
