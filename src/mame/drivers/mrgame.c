@@ -10,6 +10,10 @@ ToDo:
 - Support for unknown M114 audio processor
 - Support for electronic volume control
 - Audio rom banking
+- Wrong colours
+- Bad scrolling
+- No sound
+- wcup90 needs different address maps and display
 
 *****************************************************************************************/
 
@@ -18,6 +22,7 @@ ToDo:
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "machine/nvram.h"
+#include "video/resnet.h"
 #include "sound/tms5220.h"
 #include "sound/dac.h"
 #include "machine/i8255.h"
@@ -27,23 +32,48 @@ class mrgame_state : public driver_device
 public:
 	mrgame_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
+		, m_palette(*this, "palette")
+		, m_p_videoram(*this, "videoram")
+		, m_p_objectram(*this, "objectram")
+		, m_gfxdecode(*this, "gfxdecode")
 		, m_maincpu(*this, "maincpu")
 		, m_audiocpu1(*this, "audiocpu1")
 		, m_audiocpu2(*this, "audiocpu2")
 	{ }
 
+	DECLARE_PALETTE_INIT(mrgame);
 	DECLARE_DRIVER_INIT(mrgame);
 	DECLARE_WRITE8_MEMBER(ack1_w);
 	DECLARE_WRITE8_MEMBER(ack2_w);
+	DECLARE_WRITE8_MEMBER(portb_w);
+	DECLARE_WRITE8_MEMBER(row_w);
 	DECLARE_WRITE8_MEMBER(sound_w);
+	DECLARE_WRITE8_MEMBER(triple_w);
+	DECLARE_WRITE8_MEMBER(video_w);
+	DECLARE_WRITE8_MEMBER(video_ctrl_w);
+	DECLARE_READ8_MEMBER(col_r);
 	DECLARE_READ8_MEMBER(sound_r);
+	DECLARE_READ8_MEMBER(porta_r);
+	DECLARE_READ8_MEMBER(portc_r);
 	DECLARE_READ8_MEMBER(rsw_r);
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_timer);
+	UINT32 screen_update_mrgame(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	required_device<palette_device> m_palette;
+	required_shared_ptr<UINT8> m_p_videoram;
+	required_shared_ptr<UINT8> m_p_objectram;
+	required_device<gfxdecode_device> m_gfxdecode;
 private:
 	bool m_ack1;
 	bool m_ack2;
+	bool m_ackv;
 	UINT8 m_irq_state;
+	UINT8 m_row_data;
 	UINT8 m_sound_data;
+	UINT8 m_gfx_bank;
+	UINT8 m_video_data;
+	UINT8 m_video_status;
+	UINT8 m_video_ctrl[8];
+	const UINT8 *m_p_chargen;
 	virtual void machine_reset();
 	required_device<m68000_device> m_maincpu;
 	required_device<z80_device> m_audiocpu1;
@@ -56,21 +86,22 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, mrgame_state )
 	AM_RANGE(0x020000, 0x02ffff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x030000, 0x030001) AM_READ8(rsw_r, 0xff) //RSW ACK
 	AM_RANGE(0x030002, 0x030003) AM_WRITE8(sound_w, 0xff) //W SOUND
-	AM_RANGE(0x030004, 0x030005) //W VID
-	AM_RANGE(0x030006, 0x030007) //W CS
-	AM_RANGE(0x030008, 0x030009) //W DATA
-	AM_RANGE(0x03000a, 0x03000b) AM_WRITENOP //W ROW
-	AM_RANGE(0x03000c, 0x03000d) //R COL
-	AM_RANGE(0x03000e, 0x03000f) //EXT ADD
+	AM_RANGE(0x030004, 0x030005) AM_WRITE8(video_w, 0xff00) //W VID
+	AM_RANGE(0x030006, 0x030007) AM_WRITE8(triple_w, 0xff) //W CS
+	AM_RANGE(0x030008, 0x030009) AM_WRITENOP //W DATA - lamp/sol data
+	AM_RANGE(0x03000a, 0x03000b) AM_WRITE8(row_w, 0xff) //W ROW
+	AM_RANGE(0x03000c, 0x03000d) AM_READ8(col_r, 0xff) //R COL
+	AM_RANGE(0x03000e, 0x03000f) AM_WRITENOP //EXT ADD - lamp/sol data
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( video_map, AS_PROGRAM, 8, mrgame_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM AM_REGION("video", 0)
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
-	AM_RANGE(0x4800, 0x4fff) AM_RAM
-	AM_RANGE(0x5000, 0x57ff) AM_RAM
-	AM_RANGE(0x6800, 0x6fff) AM_RAM
-	AM_RANGE(0x8100, 0x8103) AM_MIRROR(0x7efc) AM_DEVREADWRITE("ppi", i8255_device, read, write)
+	AM_RANGE(0x4800, 0x4bff) AM_MIRROR(0x0400) AM_RAM AM_SHARE("videoram")
+	AM_RANGE(0x5000, 0x50ff) AM_MIRROR(0x0700) AM_RAM AM_SHARE("objectram")
+	AM_RANGE(0x6800, 0x6807) AM_MIRROR(0x07f8) AM_WRITE(video_ctrl_w)
+	AM_RANGE(0x7000, 0x77ff) AM_READNOP //AFR - looks like a watchdog
+	AM_RANGE(0x8100, 0x8103) AM_MIRROR(0x7efc) AM_DEVREADWRITE("ppi", i8255_device, read, write) 
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( audio1_map, AS_PROGRAM, 8, mrgame_state )
@@ -80,7 +111,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( audio1_io, AS_IO, 8, mrgame_state )
 	ADDRESS_MAP_GLOBAL_MASK(3)
-	AM_RANGE(0x0000, 0x0000) //AM_DEVWRITE("dac", dac_device, write_unsigned8) //DA1. The DC output might be an electronic volume control of the M114's output.
+	AM_RANGE(0x0000, 0x0000) AM_WRITENOP //AM_DEVWRITE("dac", dac_device, write_unsigned8) //DA1. The DC output might be an electronic volume control of the M114's output.
 	AM_RANGE(0x0001, 0x0001) AM_READ(sound_r) //IN1
 	AM_RANGE(0x0002, 0x0002) AM_WRITE(ack1_w) //AKL1
 	AM_RANGE(0x0003, 0x0003) AM_WRITENOP //SGS pass data to M114
@@ -105,13 +136,27 @@ static INPUT_PORTS_START( mrgame )
 	PORT_DIPNAME( 0x01, 0x00, "M01")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ))
 	PORT_DIPSETTING(    0x00, DEF_STR( On ))
-	PORT_DIPNAME( 0x02, 0x00, "M02")
+	PORT_DIPNAME( 0x02, 0x02, "M02")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ))
 	PORT_DIPSETTING(    0x00, DEF_STR( On ))
-	PORT_DIPNAME( 0x04, 0x00, "M03")
+	PORT_DIPNAME( 0x04, 0x04, "M03")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ))
 	PORT_DIPSETTING(    0x00, DEF_STR( On ))
-	PORT_DIPNAME( 0x08, 0x00, "M04")
+	PORT_DIPNAME( 0x08, 0x08, "M04")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ))
+	PORT_DIPSETTING(    0x00, DEF_STR( On ))
+
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x01, 0x00, "V01")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ))
+	PORT_DIPSETTING(    0x00, DEF_STR( On ))
+	PORT_DIPNAME( 0x02, 0x02, "V02")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ))
+	PORT_DIPSETTING(    0x00, DEF_STR( On ))
+	PORT_DIPNAME( 0x04, 0x04, "V03")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ))
+	PORT_DIPSETTING(    0x00, DEF_STR( On ))
+	PORT_DIPNAME( 0x08, 0x08, "V04")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ))
 	PORT_DIPSETTING(    0x00, DEF_STR( On ))
 INPUT_PORTS_END
@@ -119,6 +164,20 @@ INPUT_PORTS_END
 READ8_MEMBER( mrgame_state::rsw_r )
 {
 	return ioport("DSW0")->read() | ((UINT8)m_ack1 << 5) | ((UINT8)m_ack2 << 4);
+}
+
+// this is like a keyboard, energise a row and read the column data
+READ8_MEMBER( mrgame_state::col_r )
+{
+	if (m_row_data == 7)
+		return m_video_status;
+
+	return 0xff;
+}
+
+WRITE8_MEMBER( mrgame_state::row_w )
+{
+	m_row_data = data & 7;
 }
 
 READ8_MEMBER( mrgame_state::sound_r )
@@ -133,6 +192,32 @@ WRITE8_MEMBER( mrgame_state::sound_w )
 	m_audiocpu2->set_input_line(INPUT_LINE_NMI, BIT(data, 7) ? CLEAR_LINE : ASSERT_LINE);
 }
 
+// this produces 24 outputs from three driver chips to drive lamps & solenoids
+WRITE8_MEMBER( mrgame_state::triple_w )
+{
+	if ((data & 0x18)==0)
+		m_ackv = BIT(data, 7);
+}
+
+WRITE8_MEMBER( mrgame_state::video_w )
+{
+	m_video_data = data;
+}
+
+WRITE8_MEMBER( mrgame_state::video_ctrl_w )
+{
+	m_video_ctrl[offset] = data;
+
+	if (offset == 0)
+		m_gfx_bank = (m_gfx_bank & 6) | BIT(data, 0);
+	else
+	if (offset == 3)
+		m_gfx_bank = (m_gfx_bank & 5) | (BIT(data, 0) << 1);
+	else
+	if (offset == 4)
+		m_gfx_bank = (m_gfx_bank & 3) | (BIT(data, 0) << 2);
+}
+
 WRITE8_MEMBER( mrgame_state::ack1_w )
 {
 	m_ack1 = BIT(data, 0);
@@ -143,10 +228,34 @@ WRITE8_MEMBER( mrgame_state::ack2_w )
 	m_ack2 = BIT(data, 0);
 }
 
+READ8_MEMBER( mrgame_state::porta_r )
+{
+	return m_video_data;
+}
+
+WRITE8_MEMBER( mrgame_state::portb_w )
+{
+	m_video_status = data;
+	m_ackv = 0;
+}
+
+READ8_MEMBER( mrgame_state::portc_r )
+{
+	return ioport("DSW1")->read() | ((UINT8)m_ackv << 4);
+}
+
 void mrgame_state::machine_reset()
 {
 	m_sound_data = 0xff;
 	m_irq_state = 0xff;
+	m_video_data = 0;
+	m_gfx_bank = 0;
+	m_video_status = 0;
+	m_ack1 = 0;
+	m_ack2 = 0;
+	m_ackv = 0;
+	m_row_data = 0;
+	m_p_chargen = memregion("chargen")->base();
 }
 
 DRIVER_INIT_MEMBER( mrgame_state, mrgame )
@@ -172,12 +281,126 @@ TIMER_DEVICE_CALLBACK_MEMBER( mrgame_state::irq_timer )
 	}
 }
 
+// layouts from pinmame
+static const gfx_layout charlayout =
+{
+	8, 8,
+	4096,
+	2,
+	{ 0, 0x8000*8 },
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	{ 0, 8, 16, 24, 32, 40, 48, 56 },
+	8*8
+};
+
+static const gfx_layout spritelayout =
+{
+	16, 16,
+	1024,
+	2,
+	{ 0, 0x8000*8 },
+	{ 0, 1, 2, 3, 4, 5, 6, 7, 64, 65, 66, 67, 68, 69, 70, 71 },
+	{ 0, 8, 16, 24, 32, 40, 48, 56, 128, 136, 144, 152, 160, 168, 176, 184 },
+	32*8
+};
+
+static GFXDECODE_START( mrgame )
+	GFXDECODE_ENTRY( "chargen", 0, charlayout, 3, 1 )
+	GFXDECODE_ENTRY( "chargen", 0, spritelayout, 3, 1 )
+GFXDECODE_END
+
+// this gives bad colours although it looks right
+PALETTE_INIT_MEMBER( mrgame_state, mrgame)
+{
+	static const int resistances[3] = { 1000, 470, 220 };
+	double rweights[3], gweights[3], bweights[2];
+	UINT8 i, bit0, bit1, bit2, r, g, b;
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+
+	/* compute the color output resistor weights */
+	compute_resistor_weights(0,	255, -1.0,
+			3, &resistances[0], rweights, 0, 0,
+			3, &resistances[0], gweights, 0, 0,
+			2, &resistances[1], bweights, 0, 0);
+
+	/* create a lookup table for the palette */
+	for (i = 0; i < 32; i++)
+	{
+		/* red component */
+		bit0 = BIT(color_prom[i], 0);
+		bit1 = BIT(color_prom[i], 1);
+		bit2 = BIT(color_prom[i], 2);
+		r = combine_3_weights(rweights, bit0, bit1, bit2);
+
+		/* green component */
+		bit0 = BIT(color_prom[i], 3);
+		bit1 = BIT(color_prom[i], 4);
+		bit2 = BIT(color_prom[i], 5);
+		g = combine_3_weights(gweights, bit0, bit1, bit2);
+
+		/* blue component */
+		bit0 = BIT(color_prom[i], 6);
+		bit1 = BIT(color_prom[i], 7);
+		b = combine_2_weights(bweights, bit0, bit1);
+
+		palette.set_pen_color(i, rgb_t(r, g, b));
+	}
+}
+
+// most of this came from pinmame as the diagram doesn't make a lot of sense
+UINT32 mrgame_state::screen_update_mrgame(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	UINT8 y,ptr,col;
+	UINT16 sy=0,x,chr;
+	bool flipx,flipy;
+
+	// text
+	for (y = 0; y < 32; y++)
+	{
+		ptr = 1;
+		for (x = 0; x < 32; x++)
+		{
+			col = m_p_objectram[ptr];
+			ptr+=2;
+			chr = m_p_videoram[x+y*32] + (m_gfx_bank << 8);
+
+			m_gfxdecode->gfx(0)->opaque(bitmap,cliprect,
+				chr,
+				col,
+				0,0,
+				x*8,y*8);
+		}
+	}
+
+	// sprites
+	for (ptr = 0x40; ptr < 0x60; ptr += 4)
+	{
+		x = m_p_objectram[ptr + 3] + 1;
+		sy = 255 - m_p_objectram[ptr];
+		flipx = BIT(m_p_objectram[ptr + 1], 6);
+		flipy = BIT(m_p_objectram[ptr + 1], 7);
+		chr = (m_p_objectram[ptr + 1] & 0x3f) + (m_gfx_bank << 8);
+		col = m_p_objectram[ptr + 2];
+
+		if ((sy > 16) && (x > 24))
+			m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
+				chr,
+				col,
+				flipx,flipy,
+				x,sy-16,0);
+	}
+
+	return 0;
+}
+
 static MACHINE_CONFIG_START( mrgame, mrgame_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_6MHz)
 	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_CPU_PERIODIC_INT_DRIVER(mrgame_state, irq1_line_hold, 183)
 	MCFG_CPU_ADD("videocpu", Z80, XTAL_18_432MHz/6)
 	MCFG_CPU_PROGRAM_MAP(video_map)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", mrgame_state, nmi_line_pulse)
 	MCFG_CPU_ADD("audiocpu1", Z80, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(audio1_map)
 	MCFG_CPU_IO_MAP(audio1_io)
@@ -187,6 +410,19 @@ static MACHINE_CONFIG_START( mrgame, mrgame_state )
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
+	/* video hardware */
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_SIZE(256, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0, 255, 0, 247)
+	MCFG_SCREEN_UPDATE_DRIVER(mrgame_state, screen_update_mrgame)
+	MCFG_SCREEN_PALETTE("palette")
+	MCFG_PALETTE_ADD_INIT_BLACK("palette", 32)
+	MCFG_PALETTE_INIT_OWNER(mrgame_state, mrgame)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mrgame)
+
+	/* Sound */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MCFG_DAC_ADD("dacl")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
@@ -197,8 +433,12 @@ static MACHINE_CONFIG_START( mrgame, mrgame_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_timer", mrgame_state, irq_timer, attotime::from_hz(16000)) //
+	/* Devices */
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_timer", mrgame_state, irq_timer, attotime::from_hz(16000)) //ugh
 	MCFG_DEVICE_ADD("ppi", I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(READ8(mrgame_state, porta_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(mrgame_state, portb_w))
+	MCFG_I8255_IN_PORTC_CB(READ8(mrgame_state, portc_r))
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------------------------
@@ -212,7 +452,7 @@ ROM_START(dakar)
 	ROM_REGION(0x10000, "video", 0)
 	ROM_LOAD("vid_ic14.rom", 0x00000, 0x8000, CRC(88a9ca81) SHA1(9660d416b2b8f1937cda7bca51bd287641c7730c))
 
-	ROM_REGION( 0x10000, "gfx1", 0 )
+	ROM_REGION( 0x10000, "chargen", 0 )
 	ROM_LOAD("vid_ic55.rom", 0x0000, 0x8000, CRC(3c68b448) SHA1(f416f00d2de0c71c021fec0e9702ba79b761d5e7))
 	ROM_LOAD("vid_ic56.rom", 0x8000, 0x8000, CRC(0aac43e9) SHA1(28edfeddb2d54e40425488bad37e3819e4488b0b))
 
@@ -242,7 +482,7 @@ ROM_START(motrshow)
 	ROM_REGION(0x10000, "video", 0)
 	ROM_LOAD("vid_ic14.rom", 0x00000, 0x8000, CRC(1d4568e2) SHA1(bfc2bb59708ce3a09f9a1b3460ed8d5269840c97))
 
-	ROM_REGION( 0x10000, "gfx1", 0 )
+	ROM_REGION( 0x10000, "chargen", 0 )
 	ROM_LOAD("vid_ic55.rom", 0x0000, 0x8000, CRC(c27a4ded) SHA1(9c2c9b17f1e71afb74bdfbdcbabb99ef935d32db))
 	ROM_LOAD("vid_ic56.rom", 0x8000, 0x8000, CRC(1664ec8d) SHA1(e7b15acdac7dfc51b668e908ca95f02a2b569737))
 
@@ -268,7 +508,7 @@ ROM_START(motrshowa)
 	ROM_REGION(0x10000, "video", 0)
 	ROM_LOAD("vid_ic14.rom", 0x00000, 0x8000, CRC(1d4568e2) SHA1(bfc2bb59708ce3a09f9a1b3460ed8d5269840c97))
 
-	ROM_REGION( 0x10000, "gfx1", 0 )
+	ROM_REGION( 0x10000, "chargen", 0 )
 	ROM_LOAD("vid_ic55.rom", 0x0000, 0x8000, CRC(c27a4ded) SHA1(9c2c9b17f1e71afb74bdfbdcbabb99ef935d32db))
 	ROM_LOAD("vid_ic56.rom", 0x8000, 0x8000, CRC(1664ec8d) SHA1(e7b15acdac7dfc51b668e908ca95f02a2b569737))
 
@@ -297,7 +537,7 @@ ROM_START(macattck)
 	ROM_REGION(0x10000, "video", 0)
 	ROM_LOAD("vid_ic91.rom", 0x00000, 0x8000, CRC(42d2ba01) SHA1(c13d38c2798575760461912cef65dde57dfd938c))
 
-	ROM_REGION( 0x30000, "gfx1", 0 )
+	ROM_REGION( 0x30000, "chargen", 0 )
 	ROM_LOAD("vid_ic14.rom", 0x00000, 0x8000, CRC(f6e047fb) SHA1(6be712dda60257b9e7014315c8fee19812622bf6))
 	ROM_LOAD("vid_ic15.rom", 0x08000, 0x8000, CRC(405a8f54) SHA1(4d58915763db3c3be2bfc166be1a12285ff2c38b))
 	ROM_LOAD("vid_ic16.rom", 0x10000, 0x8000, CRC(063ea783) SHA1(385dbfcc8ecd3a784f9a8752d00e060b48d70d6a))
@@ -329,7 +569,7 @@ ROM_START(wcup90)
 	ROM_REGION(0x10000, "video", 0)
 	ROM_LOAD("vid_ic91.rom", 0x00000, 0x8000, CRC(3287ad20) SHA1(d5a453efc7292670073f157dca04897be857b8ed))
 
-	ROM_REGION( 0x30000, "gfx1", 0 )
+	ROM_REGION( 0x30000, "chargen", 0 )
 	ROM_LOAD("vid_ic14.rom", 0x00000, 0x8000, CRC(a101d562) SHA1(ad9ad3968f13169572ec60e22e84acf43382b51e))
 	ROM_LOAD("vid_ic15.rom", 0x08000, 0x8000, CRC(40791e7a) SHA1(788760b8527df48d1825be88099491b6e94f0a19))
 	ROM_LOAD("vid_ic16.rom", 0x10000, 0x8000, CRC(a7214157) SHA1(a4660180e8491a37028fec8533cf13daf839a7c4))
