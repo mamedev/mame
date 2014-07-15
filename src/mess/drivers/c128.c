@@ -33,12 +33,34 @@
 #define VMA5 BIT(vma, 13)
 #define VMA4 BIT(vma, 12)
 
+enum
+{
+	PLA_OUT_SDEN = 0,
+	PLA_OUT_ROM4 = 1,
+	PLA_OUT_ROM2 = 2,
+	PLA_OUT_DIR = 3,
+	PLA_OUT_ROML = 4,
+	PLA_OUT_ROMH = 5,
+	PLA_OUT_CLRBANK = 6,
+	PLA_OUT_FROM1 = 7,
+	PLA_OUT_ROM3 = 8,
+	PLA_OUT_ROM1 = 9,
+	PLA_OUT_IOCS = 10,
+	PLA_OUT_DWE = 11,
+	PLA_OUT_CASENB = 12,
+	PLA_OUT_VIC = 13,
+	PLA_OUT_IOACC = 14,
+	PLA_OUT_GWE = 15,
+	PLA_OUT_COLORRAM = 16,
+	PLA_OUT_CHAROM = 17
+};
 
 
 QUICKLOAD_LOAD_MEMBER( c128_state, cbm_c64 )
 {
 	return general_cbm_loadsnap(image, file_type, quickload_size, m_maincpu->space(AS_PROGRAM), 0, cbm_quick_sethiaddress);
 }
+
 
 //**************************************************************************
 //  INTERRUPTS
@@ -72,9 +94,7 @@ inline void c128_state::check_interrupts()
 //  read_pla -
 //-------------------------------------------------
 
-void c128_state::read_pla(offs_t offset, offs_t ca, offs_t vma, int ba, int rw, int aec, int z80io, int ms3, int ms2, int ms1, int ms0,
-		int *sden, int *dir, int *gwe, int *rom1, int *rom2, int *rom3, int *rom4, int *charom, int *colorram, int *vic,
-		int *from1, int *romh, int *roml, int *dwe, int *ioacc, int *clrbank, int *iocs, int *casenb)
+int c128_state::read_pla(offs_t offset, offs_t ca, offs_t vma, int ba, int rw, int aec, int z80io, int ms3, int ms2, int ms1, int ms0)
 {
 	int _128_256 = 1;
 	int dmaack = 1;
@@ -89,28 +109,7 @@ void c128_state::read_pla(offs_t offset, offs_t ca, offs_t vma, int ba, int rw, 
 		m_exrom << 15 | m_game << 14 | rw << 13 | aec << 12 | A10 << 11 | A11 << 10 | A12 << 9 | A13 << 8 |
 		A14 << 7 | A15 << 6 | z80io << 5 | m_z80en << 4 | ms3 << 3 | vicfix << 2 | dmaack << 1 | _128_256;
 
-	UINT32 data = m_pla->read(input);
-
-	*sden = BIT(data, 0);
-	*rom4 = BIT(data, 1);
-	*rom2 = BIT(data, 2);
-	*dir = BIT(data, 3);
-	*roml = BIT(data, 4);
-	*romh = BIT(data, 5);
-	*clrbank = BIT(data, 6);
-	*from1 = BIT(data, 7);
-	*rom3 = BIT(data, 8);
-	*rom1 = BIT(data, 9);
-	*iocs = BIT(data, 10);
-	*dwe = BIT(data, 11);
-	*casenb = BIT(data, 12);
-	*vic = BIT(data, 13);
-	*ioacc = BIT(data, 14);
-	*gwe = BIT(data, 15);
-	*colorram = BIT(data, 16);
-	*charom = BIT(data, 17);
-
-	m_clrbank = *clrbank;
+	return m_pla->read(input);
 }
 
 
@@ -121,8 +120,6 @@ void c128_state::read_pla(offs_t offset, offs_t ca, offs_t vma, int ba, int rw, 
 UINT8 c128_state::read_memory(address_space &space, offs_t offset, offs_t vma, int ba, int aec, int z80io)
 {
 	int rw = 1, ms0 = 1, ms1 = 1, ms2 = 1, ms3 = 1, cas0 = 1, cas1 = 1;
-	int sden = 1, dir = 1, gwe = 1, rom1 = 1, rom2 = 1, rom3 = 1, rom4 = 1, charom = 1, colorram = 1, vic = 1,
-		from1 = 1, romh = 1, roml = 1, dwe = 1, ioacc = 1, clrbank = 1, iocs = 1, casenb = 1;
 	int io1 = 1, io2 = 1;
 	int sphi2 = m_vic->phi0_r();
 
@@ -148,11 +145,11 @@ UINT8 c128_state::read_memory(address_space &space, offs_t offset, offs_t vma, i
 
 	offs_t ca = ta | sa;
 
-	read_pla(offset, ca, vma, ba, rw, aec, z80io, ms3, ms2, ms1, ms0,
-		&sden, &dir, &gwe, &rom1, &rom2, &rom3, &rom4, &charom, &colorram, &vic,
-		&from1, &romh, &roml, &dwe, &ioacc, &clrbank, &iocs, &casenb);
+	int plaout = read_pla(offset, ca, vma, ba, rw, aec, z80io, ms3, ms2, ms1, ms0);
 
-	if (!casenb)
+	m_clrbank = BIT(plaout, PLA_OUT_CLRBANK);
+
+	if (!BIT(plaout, PLA_OUT_CASENB))
 	{
 		if (!cas0)
 		{
@@ -163,41 +160,41 @@ UINT8 c128_state::read_memory(address_space &space, offs_t offset, offs_t vma, i
 			data = m_ram->pointer()[0x10000 | ma];
 		}
 	}
-	if (!rom1)
+	if (!BIT(plaout, PLA_OUT_ROM1))
 	{
 		// CR: data = m_rom1[(ms3 << 14) | ((BIT(ta, 14) && BIT(offset, 13)) << 13) | (ta & 0x1000) | (offset & 0xfff)];
 		data = m_rom->base()[((BIT(ta, 14) && BIT(offset, 13)) << 13) | (ta & 0x1000) | (offset & 0xfff)];
 	}
-	if (!rom2)
+	if (!BIT(plaout, PLA_OUT_ROM2))
 	{
 		data = m_rom->base()[0x4000 | (offset & 0x3fff)];
 	}
-	if (!rom3)
+	if (!BIT(plaout, PLA_OUT_ROM3))
 	{
 		// CR: data = m_rom3[(BIT(offset, 15) << 14) | (offset & 0x3fff)];
 		data = m_rom->base()[0x8000 | (offset & 0x3fff)];
 	}
-	if (!rom4)
+	if (!BIT(plaout, PLA_OUT_ROM4))
 	{
 		data = m_rom->base()[0xc000 | (ta & 0x1000) | (offset & 0x2fff)];
 	}
-	if (!charom)
+	if (!BIT(plaout, PLA_OUT_CHAROM))
 	{
 		data = m_charom->base()[(ms3 << 12) | (ta & 0xf00) | sa];
 	}
-	if (!colorram && aec)
+	if (!BIT(plaout, PLA_OUT_COLORRAM) && aec)
 	{
-		data = m_color_ram[(clrbank << 10) | (ta & 0x300) | sa] & 0x0f;
+		data = m_color_ram[(m_clrbank << 10) | (ta & 0x300) | sa] & 0x0f;
 	}
-	if (!vic)
+	if (!BIT(plaout, PLA_OUT_VIC))
 	{
 		data = m_vic->read(space, offset & 0x3f);
 	}
-	if (!from1)
+	if (!BIT(plaout, PLA_OUT_FROM1))
 	{
 		data = m_from->base()[offset & 0x7fff];
 	}
-	if (!iocs && BIT(offset, 10))
+	if (!BIT(plaout, PLA_OUT_IOCS) && BIT(offset, 10))
 	{
 		switch ((BIT(offset, 11) << 2) | ((offset >> 8) & 0x03))
 		{
@@ -234,6 +231,9 @@ UINT8 c128_state::read_memory(address_space &space, offs_t offset, offs_t vma, i
 		}
 	}
 
+	int roml = BIT(plaout, PLA_OUT_ROML);
+	int romh = BIT(plaout, PLA_OUT_ROMH);
+
 	data = m_exp->cd_r(space, ca, data, sphi2, ba, roml, romh, io1, io2);
 
 	return m_mmu->read(offset, data);
@@ -247,8 +247,6 @@ UINT8 c128_state::read_memory(address_space &space, offs_t offset, offs_t vma, i
 void c128_state::write_memory(address_space &space, offs_t offset, offs_t vma, UINT8 data, int ba, int aec, int z80io)
 {
 	int rw = 0, ms0 = 1, ms1 = 1, ms2 = 1, ms3 = 1, cas0 = 1, cas1 = 1;
-	int sden = 1, dir = 1, gwe = 1, rom1 = 1, rom2 = 1, rom3 = 1, rom4 = 1, charom = 1, colorram = 1, vic = 1,
-		from1 = 1, romh = 1, roml = 1, dwe = 1, ioacc = 1, clrbank = 1, iocs = 1, casenb = 1;
 	int io1 = 1, io2 = 1;
 	int sphi2 = m_vic->phi0_r();
 
@@ -257,11 +255,11 @@ void c128_state::write_memory(address_space &space, offs_t offset, offs_t vma, U
 	offs_t ma = ta | (offset & 0xff);
 	offs_t sa = offset & 0xff;
 
-	read_pla(offset, ca, vma, ba, rw, aec, z80io, ms3, ms2, ms1, ms0,
-		&sden, &dir, &gwe, &rom1, &rom2, &rom3, &rom4, &charom, &colorram, &vic,
-		&from1, &romh, &roml, &dwe, &ioacc, &clrbank, &iocs, &casenb);
+	int plaout = read_pla(offset, ca, vma, ba, rw, aec, z80io, ms3, ms2, ms1, ms0);
 
-	if (!casenb && !dwe)
+	m_clrbank = BIT(plaout, PLA_OUT_CLRBANK);
+
+	if (!BIT(plaout, PLA_OUT_CASENB) && !BIT(plaout, PLA_OUT_DWE))
 	{
 		if (!cas0)
 		{
@@ -272,15 +270,15 @@ void c128_state::write_memory(address_space &space, offs_t offset, offs_t vma, U
 			m_ram->pointer()[0x10000 | ma] = data;
 		}
 	}
-	if (!colorram && !gwe)
+	if (!BIT(plaout, PLA_OUT_COLORRAM) && !BIT(plaout, PLA_OUT_GWE))
 	{
-		m_color_ram[(clrbank << 10) | (ta & 0x300) | sa] = data & 0x0f;
+		m_color_ram[(m_clrbank << 10) | (ta & 0x300) | sa] = data & 0x0f;
 	}
-	if (!vic)
+	if (!BIT(plaout, PLA_OUT_VIC))
 	{
 		m_vic->write(space, offset & 0x3f, data);
 	}
-	if (!iocs && BIT(offset, 10))
+	if (!BIT(plaout, PLA_OUT_IOCS) && BIT(offset, 10))
 	{
 		switch ((BIT(offset, 11) << 2) | ((offset >> 8) & 0x03))
 		{
@@ -316,6 +314,9 @@ void c128_state::write_memory(address_space &space, offs_t offset, offs_t vma, U
 			break;
 		}
 	}
+
+	int roml = BIT(plaout, PLA_OUT_ROML);
+	int romh = BIT(plaout, PLA_OUT_ROMH);
 
 	m_exp->cd_w(space, ca, data, sphi2, ba, roml, romh, io1, io2);
 
