@@ -151,7 +151,7 @@ public:
 	void hdc_reset();
 	void hdc_ctrl_write(UINT8 data);
 	void hdc_post_rw();
-	void hdc_drq();
+	void hdc_drq(bool state);
 	void pc8031_reset();
 	//void ipc_dumpregs();
 	void iou_reset();
@@ -177,9 +177,6 @@ public:
 	struct
 	{
 		UINT8   reg400;
-		UINT8   reg418;
-
-		UINT8   drq_ff;
 	} m_nimbus_drives;
 
 	/* 8031 Peripheral controler */
@@ -189,9 +186,6 @@ public:
 		UINT8   ipc_out;
 		UINT8   status_in;
 		UINT8   status_out;
-		UINT8   int_8c_pending;
-		UINT8   int_8e_pending;
-		UINT8   int_8f_pending;
 	} m_ipc_interface;
 
 	/* Mouse/Joystick */

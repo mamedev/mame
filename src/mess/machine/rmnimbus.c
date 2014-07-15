@@ -6,8 +6,6 @@
     Phill Harvey-Smith
     2009-11-29.
 
-    80186 internal DMA/Timer/PIC code borrowed from Compis driver.
-    Perhaps this needs merging into the 80186 core.....
 */
 
 /*
@@ -1131,7 +1129,7 @@ WRITE8_MEMBER(rmnimbus_state::fdc_ctl_w)
 
 	// if we enable hdc drq with a pending condition, act on it
 	if((data & HDC_DRQ_MASK) && (~reg400_old & HDC_DRQ_MASK))
-		hdc_drq();
+		hdc_drq(true);
 }
 
 /*
@@ -1164,7 +1162,6 @@ WRITE8_MEMBER(rmnimbus_state::scsi_w)
 
 void rmnimbus_state::hdc_reset()
 {
-	m_nimbus_drives.drq_ff=0;
 	m_scsi_iena = 0;
 	m_scsi_msg = 0;
 	m_scsi_bsy = 0;
@@ -1188,16 +1185,11 @@ void rmnimbus_state::hdc_post_rw()
 {
 	if(m_scsi_req)
 		m_scsibus->write_ack(1);
-
-	m_nimbus_drives.drq_ff=0;
 }
 
-void rmnimbus_state::hdc_drq()
+void rmnimbus_state::hdc_drq(bool state)
 {
-	if(HDC_DRQ_ENABLED() && m_nimbus_drives.drq_ff)
-	{
-		m_maincpu->drq1_w(1);
-	}
+	m_maincpu->drq1_w(HDC_DRQ_ENABLED() && !m_scsi_cd && state);
 }
 
 WRITE_LINE_MEMBER( rmnimbus_state::write_scsi_bsy )
@@ -1234,14 +1226,14 @@ WRITE_LINE_MEMBER( rmnimbus_state::write_scsi_req )
 
 	if (state)
 	{
-		if (m_scsi_cd && last)
+		if (!m_scsi_cd && !last)
 		{
-			m_nimbus_drives.drq_ff=1;
-			hdc_drq();
+			hdc_drq(true);
 		}
 	}
 	else
 	{
+		hdc_drq(false);
 		m_scsibus->write_ack(0);
 	}
 	check_scsi_irq();

@@ -113,6 +113,15 @@ void SCSI_PORT_DEVICE::device_start()
 	m_data5_handler.resolve_safe();
 	m_data6_handler.resolve_safe();
 	m_data7_handler.resolve_safe();
+
+	m_data0_handler(0);
+	m_data1_handler(0);
+	m_data2_handler(0);
+	m_data3_handler(0);
+	m_data4_handler(0);
+	m_data5_handler(0);
+	m_data6_handler(0);
+	m_data7_handler(0);
 }
 
 void SCSI_PORT_DEVICE::update_bsy()

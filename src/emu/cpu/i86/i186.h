@@ -111,9 +111,6 @@ private:
 	static const device_timer_id TIMER_INT0 = 0;
 	static const device_timer_id TIMER_INT1 = 1;
 	static const device_timer_id TIMER_INT2 = 2;
-	static const device_timer_id TIMER_TIME0 = 3;
-	static const device_timer_id TIMER_TIME1 = 4;
-	static const device_timer_id TIMER_TIME2 = 5;
 
 	struct timer_state  m_timer[3];
 	struct dma_state    m_dma[2];
