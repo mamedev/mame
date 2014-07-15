@@ -42,7 +42,7 @@ bool flex_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 {
 	int spt = info.last_sec;
 	int bps = 256;
-	int cell_count = 100000;
+	int cell_count = 50000;
 	int offset = 0;
 	int head_num = 1;
 	int total_tracks = info.last_trk+1;
@@ -55,6 +55,8 @@ bool flex_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 	if(total_tracks == 80 && spt == 40)  // 800kB
 		double_sided = true;
 	if(total_tracks == 80 && spt == 72)  // 1.44MB
+		double_sided = true;
+	if(spt >= 20)
 		double_sided = true;
 
 	if(double_sided)
