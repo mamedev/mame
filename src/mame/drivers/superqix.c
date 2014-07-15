@@ -527,6 +527,7 @@ void superqix_state::machine_init_common()
 	save_item(NAME(m_from_mcu));
 	save_item(NAME(m_from_z80));
 	save_item(NAME(m_portb));
+	save_item(NAME(m_nmi_mask));
 
 	// hotsmash ???
 	save_item(NAME(m_portA_in));
