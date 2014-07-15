@@ -137,6 +137,7 @@ void battlane_state::video_start()
 {
 	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(battlane_state::get_tile_info_bg),this), tilemap_mapper_delegate(FUNC(battlane_state::battlane_tilemap_scan_rows_2x2),this), 16, 16, 32, 32);
 	m_screen_bitmap.allocate(32 * 8, 32 * 8);
+	save_item(NAME(m_screen_bitmap));
 }
 
 void battlane_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
