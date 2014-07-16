@@ -25,7 +25,6 @@ ToDo:
 - Support for electronic volume control
 - Audio rom banking
 - Wrong colours
-- Bad scrolling
 - Most sounds missing due to unemulated M114 chip
 - wcup90 is different hardware and there's no schematic
 
@@ -76,6 +75,7 @@ public:
 	DECLARE_READ8_MEMBER(rsw_r);
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_timer);
 	UINT32 screen_update_mrgame(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	bitmap_ind16 *m_tile_bitmap;
 	required_device<palette_device> m_palette;
 	required_shared_ptr<UINT8> m_p_videoram;
 	required_shared_ptr<UINT8> m_p_objectram;
@@ -91,7 +91,7 @@ private:
 	UINT8 m_video_data;
 	UINT8 m_video_status;
 	UINT8 m_video_ctrl[8];
-	const UINT8 *m_p_chargen;
+	virtual void machine_start();
 	virtual void machine_reset();
 	required_device<m68000_device> m_maincpu;
 	required_device<z80_device> m_audiocpu1;
@@ -292,6 +292,11 @@ READ8_MEMBER( mrgame_state::portc_r )
 	return m_io_dsw1->read() | ((UINT8)m_ackv << 4);
 }
 
+void mrgame_state::machine_start()
+{
+	m_tile_bitmap=auto_bitmap_ind16_alloc(machine(),256,256);
+}
+
 void mrgame_state::machine_reset()
 {
 	m_sound_data = 0xff;
@@ -303,7 +308,6 @@ void mrgame_state::machine_reset()
 	m_ack2 = 0;
 	m_ackv = 0;
 	m_row_data = 0;
-	m_p_chargen = memregion("chargen")->base();
 }
 
 DRIVER_INIT_MEMBER( mrgame_state, mrgame )
@@ -398,21 +402,22 @@ PALETTE_INIT_MEMBER( mrgame_state, mrgame)
 // most of this came from pinmame as the diagram doesn't make a lot of sense
 UINT32 mrgame_state::screen_update_mrgame(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 y,ptr,col;
-	UINT16 sy=0,x,chr;
+	UINT8 x,y,ptr=0,col;
+	INT32 scrolly[32];
+	UINT16 chr;
 	bool flipx,flipy;
 
 	// text
-	for (y = 0; y < 32; y++)
+	for (x = 0; x < 32; x++)
 	{
-		ptr = 1;
-		for (x = 0; x < 32; x++)
-		{
-			col = m_p_objectram[ptr];
-			ptr+=2;
-			chr = m_p_videoram[x+y*32] + (m_gfx_bank << 8);
+		scrolly[x] = -m_p_objectram[ptr++];
+		col = m_p_objectram[ptr++];
 
-			m_gfxdecode->gfx(0)->opaque(bitmap,cliprect,
+		for (y = 0; y < 32; y++)
+		{
+			chr = m_p_videoram[x+y*32] | (m_gfx_bank << 8);
+
+			m_gfxdecode->gfx(0)->opaque(*m_tile_bitmap, m_tile_bitmap->cliprect(),
 				chr,
 				col,
 				0,0,
@@ -420,22 +425,26 @@ UINT32 mrgame_state::screen_update_mrgame(screen_device &screen, bitmap_ind16 &b
 		}
 	}
 
+	// scroll each column as needed
+	copyscrollbitmap(bitmap,*m_tile_bitmap,0,0,32,scrolly,cliprect);
+
+
 	// sprites
 	for (ptr = 0x40; ptr < 0x60; ptr += 4)
 	{
 		x = m_p_objectram[ptr + 3] + 1;
-		sy = 255 - m_p_objectram[ptr];
+		y = 255 - m_p_objectram[ptr];
 		flipx = BIT(m_p_objectram[ptr + 1], 6);
 		flipy = BIT(m_p_objectram[ptr + 1], 7);
-		chr = (m_p_objectram[ptr + 1] & 0x3f) + (m_gfx_bank << 8);
+		chr = (m_p_objectram[ptr + 1] & 0x3f) | (m_gfx_bank << 6);
 		col = m_p_objectram[ptr + 2];
 
-		if ((sy > 16) && (x > 24))
+		if ((y > 16) && (x > 24))
 			m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 				chr,
 				col,
 				flipx,flipy,
-				x,sy-16,0);
+				x,y-16,0);
 	}
 
 	return 0;
@@ -463,7 +472,7 @@ static MACHINE_CONFIG_START( mrgame, mrgame_state )
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 255, 0, 247) // If you align with X on test screen some info is chopped off
+	MCFG_SCREEN_VISIBLE_AREA(0, 255, 8, 247) // If you align with X on test screen some info is chopped off
 	MCFG_SCREEN_UPDATE_DRIVER(mrgame_state, screen_update_mrgame)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_PALETTE_ADD_INIT_BLACK("palette", 32)
@@ -520,7 +529,7 @@ ROM_START(dakar)
 ROM_END
 
 /*-------------------------------------------------------------------
-/ Motor Show (1988?)
+/ Motor Show (1989)
 /-------------------------------------------------------------------*/
 ROM_START(motrshow)
 	ROM_REGION(0x10000, "roms", 0)
@@ -643,7 +652,7 @@ ROM_END
 
 
 GAME(1988,  dakar,     0,         mrgame,  mrgame, mrgame_state,  mrgame,  ROT0,  "Mr Game",    "Dakar",                      GAME_IS_SKELETON_MECHANICAL)
-GAME(1988,  motrshow,  0,         mrgame,  mrgame, mrgame_state,  mrgame,  ROT0,  "Mr Game",    "Motor Show (set 1)",         GAME_IS_SKELETON_MECHANICAL)
-GAME(1988,  motrshowa, motrshow,  mrgame,  mrgame, mrgame_state,  mrgame,  ROT0,  "Mr Game",    "Motor Show (set 2)",         GAME_IS_SKELETON_MECHANICAL)
+GAME(1989,  motrshow,  0,         mrgame,  mrgame, mrgame_state,  mrgame,  ROT0,  "Mr Game",    "Motor Show (set 1)",         GAME_IS_SKELETON_MECHANICAL)
+GAME(1989,  motrshowa, motrshow,  mrgame,  mrgame, mrgame_state,  mrgame,  ROT0,  "Mr Game",    "Motor Show (set 2)",         GAME_IS_SKELETON_MECHANICAL)
 GAME(1990,  macattck,  0,         mrgame,  mrgame, mrgame_state,  mrgame,  ROT0,  "Mr Game",    "Mac Attack",                 GAME_IS_SKELETON_MECHANICAL)
 GAME(1990,  wcup90,    0,         mrgame,  mrgame, mrgame_state,  mrgame,  ROT0,  "Mr Game",    "World Cup 90",               GAME_IS_SKELETON_MECHANICAL)
