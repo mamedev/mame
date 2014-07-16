@@ -71,7 +71,6 @@ public:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
-	device_t *m_speech;
 	optional_device<dac_device> m_dac2;
 	optional_device<dac_device> m_dac3;
 	optional_device<tms5110_device> m_tms5110;

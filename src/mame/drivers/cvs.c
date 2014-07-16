@@ -944,9 +944,6 @@ MACHINE_START_MEMBER(cvs_state,cvs)
 
 	start_393hz_timer();
 
-	/* set devices */
-	m_speech = machine().device("speech");
-
 	/* register state save */
 	save_item(NAME(m_color_ram));
 	save_item(NAME(m_palette_ram));
@@ -954,6 +951,7 @@ MACHINE_START_MEMBER(cvs_state,cvs)
 	save_item(NAME(m_character_banking_mode));
 	save_item(NAME(m_character_ram_page_start));
 	save_item(NAME(m_speech_rom_bit_address));
+	save_item(NAME(m_s2650_flag));
 	save_item(NAME(m_cvs_393hz_clock));
 	save_item(NAME(m_collision_register));
 	save_item(NAME(m_total_stars));
@@ -988,7 +986,7 @@ static MACHINE_CONFIG_START( cvs, cvs_state )
 	MCFG_CPU_PROGRAM_MAP(cvs_dac_cpu_map)
 	MCFG_CPU_IO_MAP(cvs_dac_cpu_io_map)
 
-	MCFG_CPU_ADD("speech", S2650, XTAL_14_31818MHz/16)
+	MCFG_CPU_ADD("speechcpu", S2650, XTAL_14_31818MHz/16)
 	MCFG_CPU_PROGRAM_MAP(cvs_speech_cpu_map)
 	MCFG_CPU_IO_MAP(cvs_speech_cpu_io_map)
 
@@ -1054,7 +1052,7 @@ MACHINE_CONFIG_END
  *************************************/
 
 #define CVS_COMMON_ROMS                                                                                             \
-	ROM_REGION( 0x8000, "speech", 0 )                                                                   \
+	ROM_REGION( 0x8000, "speechcpu", 0 )                                                                   \
 	ROM_LOAD( "5b.bin",     0x0000, 0x0800, CRC(f055a624) SHA1(5dfe89d7271092e665cdd5cd59d15a2b70f92f43) )  \
 																											\
 	ROM_REGION( 0x0820, "proms", 0 )                                                                    \
