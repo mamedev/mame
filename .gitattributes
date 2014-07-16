@@ -2251,7 +2251,6 @@ src/emu/cpu/tms7000/7000dasm.c svneol=native#text/plain
 src/emu/cpu/tms7000/tms7000.c svneol=native#text/plain
 src/emu/cpu/tms7000/tms7000.h svneol=native#text/plain
 src/emu/cpu/tms7000/tms70op.inc svneol=native#text/plain
-src/emu/cpu/tms7000/tms70tb.inc svneol=native#text/plain
 src/emu/cpu/tms9900/9900dasm.c svneol=native#text/plain
 src/emu/cpu/tms9900/99xxcore.h svneol=native#text/plain
 src/emu/cpu/tms9900/ti990_10.c svneol=native#text/plain

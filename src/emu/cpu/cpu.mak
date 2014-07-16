@@ -2011,8 +2011,7 @@ endif
 
 $(CPUOBJ)/tms7000/tms7000.o:    $(CPUSRC)/tms7000/tms7000.h \
 								$(CPUSRC)/tms7000/tms7000.c \
-								$(CPUSRC)/tms7000/tms70op.inc \
-								$(CPUSRC)/tms7000/tms70tb.inc
+								$(CPUSRC)/tms7000/tms70op.inc
 
 $(CPUOBJ)/tms7000/7000dasm.o:   $(CPUSRC)/tms7000/tms7000.h \
 								$(CPUSRC)/tms7000/7000dasm.c

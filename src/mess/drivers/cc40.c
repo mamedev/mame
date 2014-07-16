@@ -36,7 +36,7 @@
 
   HM6116LP-4    - Hitachi 2KB SRAM
   HN61256PC09   - Hitachi DIP-28 32KB CMOS Mask PROM
-  TMX70C20N2L   - Texas Instruments TMS70C20 CPU (128 bytes RAM, 2KB ROM) @ 2.5MHz - "X" implies prototype?
+  TMX70C20N2L   - Texas Instruments TMS70C20 CPU (128 bytes RAM, 2KB ROM) @ 2.5MHz - "X" implies prototype
   AMI 8304BXH   - 74-pin QFP AMI Gate Array
   HD44100H      - 60-pin QFP Hitachi HD44100 LCD Driver
   HD44780A00    - 80-pin TFP Hitachi HD44780 LCD Controller

@@ -223,7 +223,7 @@ static DEVICE_IMAGE_UNLOAD( exelv_cart )
 
 READ8_MEMBER(exelv_state::mailbox_wx319_r)
 {
-    logerror("[TMS7220] reading mailbox %d", m_wx319);
+    logerror("[TMS7220] reading mailbox %d\n", m_wx319);
 	return m_wx319;
 }
 
@@ -325,7 +325,7 @@ WRITE8_MEMBER(exelv_state::tms7041_portb_w)
 	m_tms5220c->rsq_w((data & 0x02) ? 1 : 0);
 
     logerror("TMS7020 %s int1\n",((data & 0x04) ? "clear" : "assert"));
-	m_maincpu->set_input_line(TMS7000_IRQ1_LINE, (data & 0x04) ? CLEAR_LINE : ASSERT_LINE);
+	m_maincpu->set_input_line(TMS7000_INT1_LINE, (data & 0x04) ? CLEAR_LINE : ASSERT_LINE);
 
 	/* Check for low->high transition on B6 */
 	if (!(m_tms7041_portb & 0x40) && (data & 0x40))
@@ -434,11 +434,6 @@ static ADDRESS_MAP_START(tms7020_port, AS_IO, 8, exelv_state)
 	AM_RANGE(TMS7000_PORTB, TMS7000_PORTB) AM_WRITE(tms7020_portb_w)
 ADDRESS_MAP_END
 
-
-static ADDRESS_MAP_START(tms7041_map, AS_PROGRAM, 8, exelv_state)
-	AM_RANGE(0x0080, 0x00ff) AM_RAM
-ADDRESS_MAP_END
-
 static ADDRESS_MAP_START(tms7041_port, AS_IO, 8, exelv_state)
 	AM_RANGE(TMS7000_PORTA, TMS7000_PORTA) AM_READ(tms7041_porta_r)
 	AM_RANGE(TMS7000_PORTB, TMS7000_PORTB) AM_WRITE(tms7041_portb_w)
@@ -459,11 +454,6 @@ static ADDRESS_MAP_START(tms7040_mem, AS_PROGRAM, 8, exelv_state)
 	AM_RANGE(0x8000, 0xbfff) AM_NOP
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM                                     /* CPU RAM */
 	AM_RANGE(0xc800, 0xefff) AM_NOP
-ADDRESS_MAP_END
-
-
-static ADDRESS_MAP_START(tms7042_map, AS_PROGRAM, 8, exelv_state)
-	AM_RANGE(0x0080, 0x00ff) AM_RAM
 ADDRESS_MAP_END
 
 
@@ -515,8 +505,7 @@ static MACHINE_CONFIG_START( exl100, exelv_state )
 	MCFG_CPU_IO_MAP(tms7020_port)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", exelv_state, exelv_hblank_interrupt, "screen", 0, 1)
 
-	MCFG_CPU_ADD("tms7041", TMS7040, XTAL_4_9152MHz) // should be TMS7041
-	MCFG_CPU_PROGRAM_MAP(tms7041_map)
+	MCFG_CPU_ADD("tms7041", TMS7041, XTAL_4_9152MHz)
 	MCFG_CPU_IO_MAP(tms7041_port)
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
@@ -567,8 +556,7 @@ static MACHINE_CONFIG_START( exeltel, exelv_state )
 	MCFG_CPU_IO_MAP(tms7020_port)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", exelv_state, exelv_hblank_interrupt, "screen", 0, 1)
 
-	MCFG_CPU_ADD("tms7042", TMS7040, XTAL_4_9152MHz) // should be TMS7042
-	MCFG_CPU_PROGRAM_MAP(tms7042_map)
+	MCFG_CPU_ADD("tms7042", TMS7042, XTAL_4_9152MHz)
 	MCFG_CPU_IO_MAP(tms7041_port)
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
