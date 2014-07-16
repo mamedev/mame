@@ -1437,22 +1437,54 @@ ROM_START( abc806 )
 	ROM_LOAD( "abc t6-11.7c", 0x0000, 0x1000, CRC(b17c51c5) SHA1(e466e80ec989fbd522c89a67d274b8f0bed1ff72) ) // 64 90243-01
 
 	ROM_REGION( 0x200, "rad", 0 )
-	ROM_LOAD( "64 90241-01.9b", 0x000, 0x200, NO_DUMP ) // "RAD" 7621/7643 (82S131/82S137), character line address
+	ROM_LOAD( "60 90241-01.9b", 0x000, 0x200, CRC(ad549ebb) SHA1(4fe228ce3b84ed6f0ffd5431f2f33b94c3e5268b) ) // "RAD" 7621/7643 (82S131/82S137), character line address
 
 	ROM_REGION( 0x20, "hru", 0 )
-	ROM_LOAD( "64 90128-01.6e", 0x00, 0x20, NO_DUMP ) // "HRU I" 7603 (82S123), HR horizontal timing and video memory access
+	ROM_LOAD( "60 90128-01.6e", 0x00, 0x20, CRC(d970a972) SHA1(c47fdd61fccc68368d42f03a01c7af90ab1fe1ab) ) // "HRU I" 7603 (82S123), HR horizontal timing and video memory access
 
 	ROM_REGION( 0x200, "hru2", 0 )
-	ROM_LOAD( "64 90127-01.12g", 0x000, 0x200, CRC(8e9d7cdc) SHA1(4ad16dc0992e31cdb2e644c7be81d334a56f7ad6) ) // "HRU II" 7621 (82S131), ABC800C HR compatibility mode palette
+	ROM_LOAD( "60 90127-01.12g", 0x000, 0x200, CRC(8e9d7cdc) SHA1(4ad16dc0992e31cdb2e644c7be81d334a56f7ad6) ) // "HRU II" 7621 (82S131), ABC800C HR compatibility mode palette
 
-	ROM_REGION( 0x400, "v50", 0 )
-	ROM_LOAD( "64 90242-01.7e", 0x000, 0x200, NO_DUMP ) // "V50" 7621 (82S131), HR vertical timing 50Hz
-	ROM_LOAD( "64 90319-01.7e", 0x200, 0x200, NO_DUMP ) // "V60" 7621 (82S131), HR vertical timing 60Hz
+	ROM_REGION( 0x200, "v50", 0 )
+	ROM_LOAD( "60 90242-01.7e", 0x000, 0x200, CRC(788a56d8) SHA1(d81e55cdddc36f5d41bf0a33104c75fac590b764) ) // "V50" 7621 (82S131), HR vertical timing 50Hz
+	
+	//ROM_REGION( 0x200, "v60", 0 )
+	//ROM_LOAD( "60 90319-01.7e", 0x000, 0x200, NO_DUMP ) // "V60" 7621 (82S131), HR vertical timing 60Hz
 
-	ROM_REGION( 0x400, "plds", 0 )
-	ROM_LOAD( "64 90225-01.11c", 0x000, 0x400, NO_DUMP ) // "VIDEO ATTRIBUTE" 40033A (?)
-	ROM_LOAD( "64 90239-01.1b",  0x000, 0x400, NO_DUMP ) // "ABC P3-11" PAL16R4, color encoder
-	ROM_LOAD( "64 90240-01.2d",  0x000, 0x400, NO_DUMP ) // "ABC P4-11" PAL16L8, memory mapper
+	ROM_REGION( 0x400, "att_hand", 0 )
+	/*
+		1   E6P (RAD A8)
+		2   THP (chargen A12)
+		3   CCLK
+		4   B0 (TX ATT 6)
+		5   B1 (TX ATT 7)
+		6   CONDP (40/80)
+		7   B2 (TX ATT 0)
+		8   B3 (TX ATT 1)
+		9   ULP (RAD A5)
+		10  FLP (RAD A6)
+		11  F2P (RTF)
+		12
+		13  F3P (GTF)
+		14  F4P (BTF)
+		15  B5P (RTB)
+		16  B4 (TX ATT 2)
+		17  B5 (TX ATT 3)
+		18  B6 (TX ATT 4)
+		19  B7 (TX ATT 5)
+		20  LP (*DEN+3)
+		21  B6P (GTB)
+		22  B7P (BTB)
+		23  E5P (RAD A7)
+		24
+	*/
+	ROM_LOAD( "60 90225-01.11c", 0x000, 0x400, NO_DUMP ) // "VIDEO ATTRIBUTE" 40033A (?)
+
+	ROM_REGION( 0x400, "abc_p3", 0 )
+	ROM_LOAD( "60 90239-01.1b",  0x000, 0x400, NO_DUMP ) // "ABC P3-11" PAL16R4, color encoder
+
+	ROM_REGION( 0x400, "abc_p4", 0 )
+	ROM_LOAD( "60 90240-01.2d",  0x000, 0x400, NO_DUMP ) // "ABC P4-11" PAL16L8, memory mapper
 ROM_END
 
 

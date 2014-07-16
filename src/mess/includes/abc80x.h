@@ -70,25 +70,25 @@
 class abc800_state : public driver_device
 {
 public:
-	abc800_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, Z80_TAG),
-			m_ctc(*this, Z80CTC_TAG),
-			m_dart(*this, Z80DART_TAG),
-			m_sio(*this, Z80SIO_TAG),
-			m_discrete(*this, "discrete"),
-			m_cassette(*this, "cassette"),
-			m_ram(*this, RAM_TAG),
-			m_rom(*this, Z80_TAG),
-			m_video_ram(*this, "video_ram"),
-			m_char_ram(*this, "char_ram"),
-			m_io_sb(*this, "SB"),
-			m_ctc_z0(0),
-			m_sio_txcb(0),
-			m_sio_txdb(1),
-			m_sio_rtsb(1),
-			m_dfd_out(0),
-			m_tape_ctr(4)
+	abc800_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, Z80_TAG),
+		m_ctc(*this, Z80CTC_TAG),
+		m_dart(*this, Z80DART_TAG),
+		m_sio(*this, Z80SIO_TAG),
+		m_discrete(*this, "discrete"),
+		m_cassette(*this, "cassette"),
+		m_ram(*this, RAM_TAG),
+		m_rom(*this, Z80_TAG),
+		m_video_ram(*this, "video_ram"),
+		m_char_ram(*this, "char_ram"),
+		m_io_sb(*this, "SB"),
+		m_ctc_z0(0),
+		m_sio_txcb(0),
+		m_sio_txdb(1),
+		m_sio_rtsb(1),
+		m_dfd_out(0),
+		m_tape_ctr(4)
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -222,12 +222,12 @@ public:
 class abc802_state : public abc800_state
 {
 public:
-	abc802_state(const machine_config &mconfig, device_type type, const char *tag)
-		: abc800_state(mconfig, type, tag),
-			m_crtc(*this, MC6845_TAG),
-			m_palette(*this, "palette"),
-			m_char_rom(*this, MC6845_TAG),
-			m_config(*this, "CONFIG")
+	abc802_state(const machine_config &mconfig, device_type type, const char *tag) :
+		abc800_state(mconfig, type, tag),
+		m_crtc(*this, MC6845_TAG),
+		m_palette(*this, "palette"),
+		m_char_rom(*this, MC6845_TAG),
+		m_config(*this, "CONFIG")
 	{ }
 
 	required_device<mc6845_device> m_crtc;
@@ -266,15 +266,15 @@ public:
 class abc806_state : public abc800_state
 {
 public:
-	abc806_state(const machine_config &mconfig, device_type type, const char *tag)
-		: abc800_state(mconfig, type, tag),
-			m_crtc(*this, MC6845_TAG),
-			m_palette(*this, "palette"),
-			m_rtc(*this, E0516_TAG),
-			m_rad_prom(*this, "rad"),
-			m_hru2_prom(*this, "hru"),
-			m_char_rom(*this, MC6845_TAG),
-			m_attr_ram(*this, "attr_ram")
+	abc806_state(const machine_config &mconfig, device_type type, const char *tag) :
+		abc800_state(mconfig, type, tag),
+		m_crtc(*this, MC6845_TAG),
+		m_palette(*this, "palette"),
+		m_rtc(*this, E0516_TAG),
+		m_rad_prom(*this, "rad"),
+		m_hru2_prom(*this, "hru"),
+		m_char_rom(*this, MC6845_TAG),
+		m_attr_ram(*this, "attr_ram")
 	{ }
 
 	required_device<mc6845_device> m_crtc;

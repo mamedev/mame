@@ -10,6 +10,7 @@
 
     TODO:
 
+	- hook up RAD prom
     - flashing
     - double height
     - underline
