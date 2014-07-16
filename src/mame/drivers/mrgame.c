@@ -5,15 +5,29 @@
     These games have a M68000 and 3x Z80, and a M114 Sound IC.
     They have a video screen upon which the scores and other info is displayed.
 
+Status:
+- motrshow, motrshowa, dakar working in the electronic sense, but not mechanically
+- macattck most roms are missing
+- wcup90 different hardware, not coded
+
+How to set up the machine (motrshow, motrshowa, dakar):
+- These machines need to be loaded with default settings before they can accept coins
+- Press - key (minus in main keyboard)
+- Press again until you see test 25 (Motor Show) or test 23 (Dakar)
+- In the dipswitch menu turn off the Ram Protect switch
+- Press Left shift and Right shift together (game stops responding)
+- Turn the Ram Protect Switch back on
+- Press F3 or reboot
+- The default settings have been loaded and you can insert coins
+- However, the game cannot be played due to missing balls.
+
 ToDo:
-- Everything
-- Support for unknown M114 audio processor
 - Support for electronic volume control
 - Audio rom banking
 - Wrong colours
 - Bad scrolling
-- No sound
-- wcup90 needs different address maps and display
+- Most sounds missing due to unemulated M114 chip
+- wcup90 is different hardware and there's no schematic
 
 *****************************************************************************************/
 
@@ -39,6 +53,10 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_audiocpu1(*this, "audiocpu1")
 		, m_audiocpu2(*this, "audiocpu2")
+		, m_io_dsw0(*this, "DSW0")
+		, m_io_dsw1(*this, "DSW1")
+		, m_io_x0(*this, "X0")
+		, m_io_x1(*this, "X1")
 	{ }
 
 	DECLARE_PALETTE_INIT(mrgame);
@@ -78,6 +96,10 @@ private:
 	required_device<m68000_device> m_maincpu;
 	required_device<z80_device> m_audiocpu1;
 	required_device<z80_device> m_audiocpu2;
+	required_ioport m_io_dsw0;
+	required_ioport m_io_dsw1;
+	required_ioport m_io_x0;
+	required_ioport m_io_x1;
 };
 
 
@@ -133,44 +155,70 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( mrgame )
 	PORT_START("DSW0")
-	PORT_DIPNAME( 0x01, 0x00, "M01")
+	PORT_DIPNAME( 0x01, 0x00, "Ram Protect")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ))
 	PORT_DIPSETTING(    0x00, DEF_STR( On ))
-	PORT_DIPNAME( 0x02, 0x02, "M02")
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ))
-	PORT_DIPSETTING(    0x00, DEF_STR( On ))
-	PORT_DIPNAME( 0x04, 0x04, "M03")
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ))
-	PORT_DIPSETTING(    0x00, DEF_STR( On ))
-	PORT_DIPNAME( 0x08, 0x08, "M04")
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ))
-	PORT_DIPSETTING(    0x00, DEF_STR( On ))
+	PORT_DIPNAME( 0x0e, 0x0e, "Country")
+	PORT_DIPSETTING(    0x00, "Italy 1")
+	PORT_DIPSETTING(    0x02, "Italy")
+	PORT_DIPSETTING(    0x04, "Great Britain")
+	PORT_DIPSETTING(    0x06, "France")
+	PORT_DIPSETTING(    0x08, "Germany")
+	PORT_DIPSETTING(    0x0a, "Belgium")
+	PORT_DIPSETTING(    0x0c, "Yugoslavia")
+	PORT_DIPSETTING(    0x0e, "U.S.A.")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("R. Flipper") PORT_CODE(KEYCODE_RSHIFT)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("L. Flipper") PORT_CODE(KEYCODE_LSHIFT)
 
+	// These dips are only documented for Motor Show
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x01, 0x00, "V01")
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ))
-	PORT_DIPSETTING(    0x00, DEF_STR( On ))
-	PORT_DIPNAME( 0x02, 0x02, "V02")
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ))
-	PORT_DIPSETTING(    0x00, DEF_STR( On ))
-	PORT_DIPNAME( 0x04, 0x04, "V03")
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ))
-	PORT_DIPSETTING(    0x00, DEF_STR( On ))
-	PORT_DIPNAME( 0x08, 0x08, "V04")
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ))
-	PORT_DIPSETTING(    0x00, DEF_STR( On ))
+	PORT_DIPNAME( 0x01, 0x00, "Test Game")
+	PORT_DIPSETTING(    0x01, "Connected")
+	PORT_DIPSETTING(    0x00, "Disconnected")
+	PORT_DIPNAME( 0x02, 0x02, "Dragster")
+	PORT_DIPSETTING(    0x02, DEF_STR( Easy ))
+	PORT_DIPSETTING(    0x00, DEF_STR( Hard ))
+	PORT_DIPNAME( 0x04, 0x04, "F.1.")
+	PORT_DIPSETTING(    0x04, DEF_STR( Easy ))
+	PORT_DIPSETTING(    0x00, DEF_STR( Hard ))
+	PORT_DIPNAME( 0x08, 0x08, "Motocross")
+	PORT_DIPSETTING(    0x08, DEF_STR( Easy ))
+	PORT_DIPSETTING(    0x00, DEF_STR( Hard ))
+
+	PORT_START("X0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Advance Test")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 ) PORT_NAME("Return Test")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_TILT )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN3 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("X1")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_TILT )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE4 ) PORT_NAME("Factory Burn Test")
+	PORT_BIT( 0xe9, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 READ8_MEMBER( mrgame_state::rsw_r )
 {
-	return ioport("DSW0")->read() | ((UINT8)m_ack1 << 5) | ((UINT8)m_ack2 << 4);
+	return m_io_dsw0->read() | ((UINT8)m_ack1 << 5) | ((UINT8)m_ack2 << 4);
 }
 
 // this is like a keyboard, energise a row and read the column data
 READ8_MEMBER( mrgame_state::col_r )
 {
+	if (m_row_data == 0)
+		return m_io_x0->read();
+	else
+	if (m_row_data == 1)
+		return m_io_x1->read();
+	else
 	if (m_row_data == 7)
 		return m_video_status;
+	else
 
 	return 0xff;
 }
@@ -241,7 +289,7 @@ WRITE8_MEMBER( mrgame_state::portb_w )
 
 READ8_MEMBER( mrgame_state::portc_r )
 {
-	return ioport("DSW1")->read() | ((UINT8)m_ackv << 4);
+	return m_io_dsw1->read() | ((UINT8)m_ackv << 4);
 }
 
 void mrgame_state::machine_reset()
@@ -415,7 +463,7 @@ static MACHINE_CONFIG_START( mrgame, mrgame_state )
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 255, 0, 247)
+	MCFG_SCREEN_VISIBLE_AREA(0, 255, 0, 247) // If you align with X on test screen some info is chopped off
 	MCFG_SCREEN_UPDATE_DRIVER(mrgame_state, screen_update_mrgame)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_PALETTE_ADD_INIT_BLACK("palette", 32)
