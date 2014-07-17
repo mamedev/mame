@@ -1130,7 +1130,7 @@ static int drawogl_window_draw(sdl_window_info *window, UINT32 dc, int update)
 	render_primitive *prim;
 	texture_info *texture=NULL;
 	float vofs, hofs;
-	int  pendingPrimitive=GL_NO_PRIMITIVE, curPrimitive=GL_NO_PRIMITIVE, scrnum = 0, is_vector;
+	int  pendingPrimitive=GL_NO_PRIMITIVE, curPrimitive=GL_NO_PRIMITIVE, scrnum, is_vector;
 	const screen_device *screen;
 
 	if (video_config.novideo)
@@ -1157,10 +1157,6 @@ static int drawogl_window_draw(sdl_window_info *window, UINT32 dc, int update)
 					drawogl_destroy_all_textures(window);
 				}
 				break;
-			}
-			else
-			{
-				scrnum++;
 			}
 		}
 	}
