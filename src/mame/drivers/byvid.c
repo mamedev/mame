@@ -41,9 +41,7 @@ ToDo (granny):
 - Artwork
 - Beeper needs to be replaced by a red LED when artwork is done.
 - Doesn't boot (test of TMS9928 fails).
-- It has 2xTMS9928 but only 1 screen. The outputs need to be
-  blended with transparency. The '9' test screen will have
-  coloured stripes overlaid with the text names.
+- Screen blending needs improvement
 - No schematic found.
 
 
@@ -115,6 +113,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(u10_timer);
 	TIMER_DEVICE_CALLBACK_MEMBER(u11_timer);
 	DECLARE_WRITE8_MEMBER(granny_crtc_w);
+	UINT32 screen_update_granny(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 private:
 	UINT8 m_mpu_to_vid;
 	UINT8 m_vid_to_mpu;
@@ -742,6 +741,14 @@ void by133_state::machine_reset()
 	m_beep->set_state(0);
 }
 
+UINT32 by133_state::screen_update_granny(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	//bitmap.fill(0xff000000, cliprect);
+	copybitmap(bitmap, m_crtc->get_bitmap(), 0, 0, 0, 0, cliprect);
+	copybitmap_trans(bitmap, m_crtc2->get_bitmap(), 0, 0, 0, 0, cliprect, 0xff000000);
+	return 0;
+}
+
 static MACHINE_CONFIG_START( babypac, by133_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6800, XTAL_3_579545MHz/4) // no xtal, just 2 chips
@@ -808,11 +815,17 @@ static MACHINE_CONFIG_DERIVED( granny, babypac )
 	MCFG_CPU_MODIFY( "videocpu" )
 	MCFG_CPU_PROGRAM_MAP(granny_map)
 
+	MCFG_DEVICE_REMOVE("screen")
+
 	MCFG_DEVICE_ADD( "crtc2", TMS9928A, XTAL_10_738635MHz / 2 )
 	MCFG_TMS9928A_VRAM_SIZE(0x4000)
 	MCFG_TMS9928A_OUT_INT_LINE_CB(DEVWRITELINE("videocpu", m6809e_device, irq_line))
-	MCFG_TMS9928A_SCREEN_ADD_NTSC( "screen2" ) // there is only 1 screen
-	MCFG_SCREEN_UPDATE_DEVICE( "crtc2", tms9928a_device, screen_update )
+	MCFG_VIDEO_SET_SCREEN("screen")
+
+	MCFG_SCREEN_ADD( "screen", RASTER )
+	MCFG_SCREEN_RAW_PARAMS( XTAL_10_738635MHz / 2, TMS9928A_TOTAL_HORZ, TMS9928A_HORZ_DISPLAY_START-12, TMS9928A_HORZ_DISPLAY_START + 256 + 12, \
+			TMS9928A_TOTAL_VERT_NTSC, TMS9928A_VERT_DISPLAY_START_NTSC - 12, TMS9928A_VERT_DISPLAY_START_NTSC + 192 + 12 )
+	MCFG_SCREEN_UPDATE_DRIVER(by133_state, screen_update_granny)
 MACHINE_CONFIG_END
 
 
