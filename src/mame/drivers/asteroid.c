@@ -227,9 +227,8 @@ WRITE8_MEMBER(asteroid_state::llander_led_w)
 	{
 		"lamp0", "lamp1", "lamp2", "lamp3", "lamp4"
 	};
-	int i;
 
-	for (i = 0; i < 5; i++)
+	for (int i = 0; i < 5; i++)
 		output_set_value(lampname[i], (data >> (4 - i)) & 1);
 }
 
@@ -395,6 +394,7 @@ static INPUT_PORTS_START( asteroidb )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_CODE(KEYCODE_SPACE) PORT_CODE(JOYCODE_BUTTON3)            /* hyperspace */
 INPUT_PORTS_END
 
+
 static INPUT_PORTS_START( aerolitos )
 	PORT_INCLUDE( asteroid )
 
@@ -404,7 +404,6 @@ static INPUT_PORTS_START( aerolitos )
 	PORT_DIPSETTING (   0x01, DEF_STR( German ) )
 	PORT_DIPSETTING (   0x02, DEF_STR( French ) )
 	PORT_DIPSETTING (   0x03, DEF_STR( Spanish ) )
-
 INPUT_PORTS_END
 
 
@@ -604,6 +603,37 @@ static INPUT_PORTS_START( llander1 )
 	PORT_DIPSETTING (   0x40, "600" )
 	PORT_DIPSETTING (   0x80, "750" )
 	PORT_DIPSETTING (   0xc0, "900" )
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( llandert )
+	PORT_START("IN0")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN1")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("DSW1")
+	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x00, "P8:1" ) // lock up
+	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x00, "P8:2" ) // lock up
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x00, "P8:4" ) // lock up
+	PORT_DIPNAME( 0x24, 0x00, "Parameter 1" )   PORT_DIPLOCATION("P8:3,6")
+	PORT_DIPSETTING (   0x00, "0" )
+	PORT_DIPSETTING (   0x04, "1" )
+	PORT_DIPSETTING (   0x20, "2" )
+	PORT_DIPSETTING (   0x24, "Invalid" )
+	PORT_DIPNAME( 0xd0, 0x40, "Parameter 2" )   PORT_DIPLOCATION("P8:5,7,8")
+	PORT_DIPSETTING (   0x00, "0" )
+	PORT_DIPSETTING (   0x40, "1" )
+	PORT_DIPSETTING (   0x80, "2" )
+	PORT_DIPSETTING (   0xc0, "3" )
+	PORT_DIPSETTING (   0x10, "4" )
+	PORT_DIPSETTING (   0x50, "5" )
+	PORT_DIPSETTING (   0x90, "6" )
+	PORT_DIPSETTING (   0xd0, "7" )
+
+	PORT_START("THRUST")
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
 
@@ -954,6 +984,22 @@ ROM_START( llander1 )
 	ROM_LOAD( "034602-01.c8",  0x0000, 0x0100, CRC(97953db8) SHA1(8cbded64d1dd35b18c4d5cece00f77e7b2cab2ad) )
 ROM_END
 
+ROM_START( llandert )
+	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_LOAD( "llprom0.de1",   0x6800, 0x0800, CRC(b5302947) SHA1(622245053682b838762b4eb04be5d4bbed5e78ef) )
+	ROM_LOAD( "llprom1.c1",    0x7000, 0x0800, CRC(761a5b45) SHA1(dde08ef856caed4b017bfbb8e3f3260747c0a1e5) )
+	ROM_LOAD( "llprom2.b1",    0x7800, 0x0800, CRC(9ec62656) SHA1(2247fd187d0aa7305d7326722c99578ad20718fa) )
+
+	/* Vector ROM */
+	ROM_LOAD( "llvrom0.r3",    0x4800, 0x0800, CRC(c307b42a) SHA1(6872c7671f4ab314962892b3cf93cc9d6c380ee2) ) // unused
+	ROM_LOAD( "llvrom1.np3",   0x5000, 0x0800, CRC(ace6b2be) SHA1(afdf4e6fc4be23197977e67c04b9baf9597756a0) ) // unused
+	ROM_LOAD( "llvrom2.m3",    0x5800, 0x0800, CRC(56c38219) SHA1(714878c0b24c9657c972a2ba25e790a4d3b81d64) ) // unused, filled with garbage? (it is not the language rom)
+
+	/* DVG PROM */
+	ROM_REGION( 0x100, "user1", 0 )
+	ROM_LOAD( "034602-01.c8",  0x0000, 0x0100, CRC(97953db8) SHA1(8cbded64d1dd35b18c4d5cece00f77e7b2cab2ad) ) // taken from parent
+ROM_END
+
 
 
 /*************************************
@@ -999,3 +1045,4 @@ GAMEL(1980, astdelux1, astdelux,  astdelux,  astdelux,  driver_device,  0,      
 
 GAME( 1979, llander,   0,         llander,   llander,   driver_device,  0,         ROT0, "Atari",   "Lunar Lander (rev 2)",     GAME_SUPPORTS_SAVE )
 GAME( 1979, llander1,  llander,   llander,   llander1,  driver_device,  0,         ROT0, "Atari",   "Lunar Lander (rev 1)",     GAME_SUPPORTS_SAVE )
+GAME( 1979, llandert,  llander,   llander,   llandert,  driver_device,  0,         ROT0, "Atari",   "Lunar Lander (screen test)", GAME_SUPPORTS_SAVE ) // no copyright shown, assume it's an in-house diagnostics romset (PCB came from a seller that has had Atari prototypes in his possession before)
