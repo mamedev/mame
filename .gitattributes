@@ -6424,6 +6424,7 @@ src/mame/layout/30test.lay svneol=native#text/xml
 src/mame/layout/3bagflnz.lay svneol=native#text/xml
 src/mame/layout/3bagflvt.lay svneol=native#text/xml
 src/mame/layout/abaseb.lay svneol=native#text/xml
+src/mame/layout/ace.lay svneol=native#text/xml
 src/mame/layout/aces1.lay svneol=native#text/xml
 src/mame/layout/ampoker2.lay svneol=native#text/xml
 src/mame/layout/arcwins.lay svneol=native#text/xml

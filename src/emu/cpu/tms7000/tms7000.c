@@ -30,9 +30,6 @@
 #include "debugger.h"
 #include "tms7000.h"
 
-#define VERBOSE 0
-
-#define LOG(x)  do { if (VERBOSE) logerror x; } while (0)
 
 // flag helpers
 #define SR_C        0x80 /* Carry */
