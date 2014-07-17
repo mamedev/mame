@@ -31,6 +31,7 @@ VIDEO_START_MEMBER(qix_state,qix)
 	save_item(NAME(m_flip));
 	save_item(NAME(m_palette_bank));
 	save_item(NAME(m_leds));
+	save_item(NAME(m_pens));
 }
 
 
