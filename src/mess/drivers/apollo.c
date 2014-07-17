@@ -919,6 +919,10 @@ void apollo_state::machine_reset()
 
 	// we can't do this any more
 	#if 0
+	// set configuration
+	omti8621_device::set_verbose(apollo_config(APOLLO_CONF_DISK_TRACE));
+	threecom3c505_device::set_verbose(apollo_config(APOLLO_CONF_NET_TRACE));
+
 	if (apollo_config(APOLLO_CONF_NODE_ID))
 	{
 		UINT8 db[0x50];

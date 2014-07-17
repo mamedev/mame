@@ -40,7 +40,7 @@ public:
 	DECLARE_READ16_MEMBER(read);
 	DECLARE_WRITE16_MEMBER(write);
 
-	void set_verbose(int on_off);
+	static void set_verbose(int on_off);
 
 	// get sector diskaddr of logical unit lun into data_buffer
 	UINT32 get_sector(INT32 diskaddr, UINT8 *data_buffer, UINT32 length, UINT8 lun);
