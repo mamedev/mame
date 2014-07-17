@@ -570,6 +570,9 @@ static int drawogl_window_create(sdl_window_info *window, int width, int height)
 	window->width = sdl->sdlsurf->w;
 	window->height = sdl->sdlsurf->h;
 
+	window->screen_width = 0;
+	window->screen_height = 0;
+
 	if ( (video_config.mode  == VIDEO_MODE_OPENGL) && !(sdl->sdlsurf->flags & SDL_OPENGL) )
 	{
 		osd_printf_error("OpenGL not supported on this driver!\n");
@@ -763,6 +766,7 @@ static void drawogl_window_resize(sdl_window_info *window, int width, int height
 
 	sdl->sdlsurf = SDL_SetVideoMode(width, height, 0,
 			SDL_SWSURFACE | SDL_ANYFORMAT | sdl->extra_flags);
+
 	window->width = sdl->sdlsurf->w;
 	window->height = sdl->sdlsurf->h;
 #endif
@@ -1136,7 +1140,32 @@ static int drawogl_window_draw(sdl_window_info *window, UINT32 dc, int update)
 
 #if (SDLMAME_SDL2)
 	SDL_GL_MakeCurrent(window->sdl_window, sdl->gl_context_id);
+#else
+	if (!sdl->init_context)
+	{
+		screen_device_iterator myiter(window->machine().root_device()); 
+		for (screen = myiter.first(); screen != NULL; screen = myiter.next())
+		{
+			if (window->index == 0)
+			{
+				if ((screen->width() != window->screen_width) || (screen->height() != window->screen_height))
+				{
+					window->screen_width = screen->width();
+					window->screen_height = screen->height();
+
+					// force all textures to be regenerated
+					drawogl_destroy_all_textures(window);
+				}
+				break;
+			}
+			else
+			{
+				scrnum++;
+			}
+		}
+	}
 #endif
+
 	if (sdl->init_context)
 	{
 		// do some one-time OpenGL setup

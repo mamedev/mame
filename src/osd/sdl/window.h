@@ -96,6 +96,9 @@ struct sdl_window_info
 	int                 resize_width;
 	int                 resize_height;
 	osd_ticks_t         last_resize;
+#else
+	int					screen_width;
+	int 				screen_height;
 #endif
 };
 
