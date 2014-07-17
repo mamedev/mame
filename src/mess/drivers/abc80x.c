@@ -1464,7 +1464,7 @@ ROM_START( abc806 )
 		9   ULP (RAD A5)
 		10  FLP (RAD A6)
 		11  F2P (RTF)
-		12
+		12  GND
 		13  F3P (GTF)
 		14  F4P (BTF)
 		15  B5P (RTB)
@@ -1476,15 +1476,15 @@ ROM_START( abc806 )
 		21  B6P (GTB)
 		22  B7P (BTB)
 		23  E5P (RAD A7)
-		24
+		24  Vcc
 	*/
 	ROM_LOAD( "60 90225-01.11c", 0x000, 0x400, NO_DUMP ) // "VIDEO ATTRIBUTE" 40033A (?)
 
-	ROM_REGION( 0x400, "abc_p3", 0 )
-	ROM_LOAD( "60 90239-01.1b",  0x000, 0x400, NO_DUMP ) // "ABC P3-11" PAL16R4, color encoder
+	ROM_REGION( 0x104, "abc_p3", 0 )
+	ROM_LOAD( "60 90239-01.1b",  0x000, 0x104, CRC(f3d0ba00) SHA1(bcc0ee26ecac0028aef6bf5cb308133b509bb360) ) // "ABC P3-11" PAL16R4, color encoder
 
-	ROM_REGION( 0x400, "abc_p4", 0 )
-	ROM_LOAD( "60 90240-01.2d",  0x000, 0x400, NO_DUMP ) // "ABC P4-11" PAL16L8, memory mapper
+	ROM_REGION( 0x104, "abc_p4", 0 )
+	ROM_LOAD( "60 90240-01.2d",  0x000, 0x104, CRC(3cc5518d) SHA1(343cf951d01c9d361b695bb4e80eaadf0820b6bc) ) // "ABC P4-11" PAL16L8, memory mapper
 ROM_END
 
 
