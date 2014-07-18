@@ -1,3 +1,4 @@
+#include "machine/bankdev.h"
 #include "video/decbac06.h"
 #include "video/decmxc06.h"
 #include "sound/msm5205.h"
@@ -16,6 +17,7 @@ public:
 		m_tilegen2(*this, "tilegen2"),
 		m_tilegen3(*this, "tilegen3"),
 		m_spritegen(*this, "spritegen"),
+		m_pfprotect(*this, "pfprotect"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_subcpu(*this, "sub"),
@@ -34,6 +36,8 @@ public:
 	optional_device<deco_bac06_device> m_tilegen3;
 	optional_device<deco_mxc06_device> m_spritegen;
 
+	optional_device<address_map_bank_device> m_pfprotect;
+
 	int m_GAME;
 	int m_i8751_return;
 	int m_i8751_command;
@@ -47,7 +51,6 @@ public:
 	DECLARE_WRITE16_MEMBER(dec0_control_w);
 	DECLARE_WRITE16_MEMBER(slyspy_control_w);
 	DECLARE_WRITE16_MEMBER(midres_sound_w);
-	DECLARE_WRITE16_MEMBER(unmapped_w);
 	DECLARE_READ16_MEMBER(slyspy_controls_r);
 	DECLARE_READ16_MEMBER(slyspy_protection_r);
 	DECLARE_WRITE16_MEMBER(slyspy_state_w);
@@ -91,7 +94,6 @@ public:
 	void dec0_i8751_write(int data);
 	void dec0_i8751_reset();
 	void h6280_decrypt(const char *cputag);
-	void slyspy_set_protection_map( int type);
 	DECLARE_WRITE_LINE_MEMBER(sound_irq);
 	DECLARE_WRITE_LINE_MEMBER(sound_irq2);
 	required_device<cpu_device> m_maincpu;

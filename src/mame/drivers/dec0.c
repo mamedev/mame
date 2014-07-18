@@ -166,7 +166,6 @@ Notes:
 #include "sound/2203intf.h"
 #include "sound/3812intf.h"
 #include "sound/okim6295.h"
-#include "sound/msm5205.h"
 
 
 /******************************************************************************/
@@ -396,100 +395,52 @@ READ16_MEMBER(dec0_state::slyspy_protection_r)
 
 */
 
-WRITE16_MEMBER(dec0_state::unmapped_w)
-{
-	// fall through for unmapped protection areas
-	logerror("unmapped memory write to %04x = %04x in mode %d\n", 0x240000+offset*2, data, m_slyspy_state);
-}
-
-void slyspy_set_protection_map(running_machine& machine, int type);
-
 WRITE16_MEMBER(dec0_state::slyspy_state_w)
 {
-	m_slyspy_state=0;
-	slyspy_set_protection_map(m_slyspy_state);
+	m_slyspy_state = 0;
+	m_pfprotect->set_bank(m_slyspy_state);
 }
 
 READ16_MEMBER(dec0_state::slyspy_state_r)
 {
-	m_slyspy_state++;
-	m_slyspy_state=m_slyspy_state%4;
-	slyspy_set_protection_map(m_slyspy_state);
+	m_slyspy_state = (m_slyspy_state + 1) % 4;
+	m_pfprotect->set_bank(m_slyspy_state);
 
 	return 0; /* Value doesn't mater */
 }
 
-void dec0_state::slyspy_set_protection_map( int type)
-{
-	address_space& space = m_maincpu->space(AS_PROGRAM);
 
-	space.install_write_handler( 0x240000, 0x24ffff, write16_delegate(FUNC(dec0_state::unmapped_w),this));
-
-	space.install_write_handler( 0x24a000, 0x24a001, write16_delegate(FUNC(dec0_state::slyspy_state_w),this));
-	space.install_read_handler( 0x244000, 0x244001, read16_delegate(FUNC(dec0_state::slyspy_state_r),this));
-
-	switch (type)
-	{
-		case 0:
-			space.install_write_handler(0x240000, 0x240007, write16_delegate(FUNC(deco_bac06_device::pf_control_0_w), (deco_bac06_device*)m_tilegen2));
-			space.install_write_handler(0x240010, 0x240017, write16_delegate(FUNC(deco_bac06_device::pf_control_1_w), (deco_bac06_device*)m_tilegen2));
-
-			space.install_write_handler(0x242000, 0x24207f, write16_delegate(FUNC(deco_bac06_device::pf_colscroll_w), (deco_bac06_device*)m_tilegen2));
-			space.install_write_handler(0x242400, 0x2427ff, write16_delegate(FUNC(deco_bac06_device::pf_rowscroll_w), (deco_bac06_device*)m_tilegen2));
-
-			space.install_write_handler(0x246000, 0x247fff, write16_delegate(FUNC(deco_bac06_device::pf_data_w), (deco_bac06_device*)m_tilegen2));
-
-			space.install_write_handler(0x248000, 0x280007, write16_delegate(FUNC(deco_bac06_device::pf_control_0_w), (deco_bac06_device*)m_tilegen1));
-			space.install_write_handler(0x248010, 0x280017, write16_delegate(FUNC(deco_bac06_device::pf_control_1_w), (deco_bac06_device*)m_tilegen1));
-
-			space.install_write_handler(0x24c000, 0x24c07f, write16_delegate(FUNC(deco_bac06_device::pf_colscroll_w), (deco_bac06_device*)m_tilegen1));
-			space.install_write_handler(0x24c400, 0x24c7ff, write16_delegate(FUNC(deco_bac06_device::pf_rowscroll_w), (deco_bac06_device*)m_tilegen1));
-
-			space.install_write_handler(0x24e000, 0x24ffff, write16_delegate(FUNC(deco_bac06_device::pf_data_w), (deco_bac06_device*)m_tilegen1));
-
-			break;
-
-		case 1:
-			// 0x240000 - 0x241fff not mapped
-			// 0x242000 - 0x243fff not mapped
-			// 0x246000 - 0x247fff not mapped
-			space.install_write_handler(0x248000, 0x249fff, write16_delegate(FUNC(deco_bac06_device::pf_data_w), (deco_bac06_device*)m_tilegen1));
-			space.install_write_handler(0x24c000, 0x24dfff, write16_delegate(FUNC(deco_bac06_device::pf_data_w), (deco_bac06_device*)m_tilegen2));
-			// 0x24e000 - 0x24ffff not mapped
-			break;
-
-		case 2:
-			space.install_write_handler(0x240000, 0x241fff, write16_delegate(FUNC(deco_bac06_device::pf_data_w), (deco_bac06_device*)m_tilegen2));
-			space.install_write_handler(0x242000, 0x243fff, write16_delegate(FUNC(deco_bac06_device::pf_data_w), (deco_bac06_device*)m_tilegen1));
-			// 0x242000 - 0x243fff not mapped
-			// 0x246000 - 0x247fff not mapped
-			// 0x248000 - 0x249fff not mapped
-			// 0x24c000 - 0x24dfff not mapped
-			space.install_write_handler(0x24e000, 0x24ffff, write16_delegate(FUNC(deco_bac06_device::pf_data_w), (deco_bac06_device*)m_tilegen1));
-			break;
-
-		case 3:
-			space.install_write_handler(0x240000, 0x241fff, write16_delegate(FUNC(deco_bac06_device::pf_data_w), (deco_bac06_device*)m_tilegen1));
-			// 0x242000 - 0x243fff not mapped
-			// 0x246000 - 0x247fff not mapped
-			space.install_write_handler(0x248000, 0x249fff, write16_delegate(FUNC(deco_bac06_device::pf_data_w), (deco_bac06_device*)m_tilegen2));
-			// 0x24c000 - 0x24dfff not mapped
-			// 0x24e000 - 0x24ffff not mapped
-			break;
-	}
-
-}
-
-
-
-
-
-
+static ADDRESS_MAP_START( slyspy_protection_map, AS_PROGRAM, 16, dec0_state )
+	AM_RANGE(0x04000, 0x04001) AM_MIRROR(0x30000) AM_READ(slyspy_state_r)
+	AM_RANGE(0x0a000, 0x0a001) AM_MIRROR(0x30000) AM_WRITE(slyspy_state_w)
+	// Default state (called by Traps 1, 3, 4, 7, C)
+	AM_RANGE(0x00000, 0x00007) AM_DEVWRITE("tilegen2", deco_bac06_device, pf_control_0_w)
+	AM_RANGE(0x00010, 0x00017) AM_DEVWRITE("tilegen2", deco_bac06_device, pf_control_1_w)
+	AM_RANGE(0x02000, 0x0207f) AM_DEVWRITE("tilegen2", deco_bac06_device, pf_colscroll_w)
+	AM_RANGE(0x02400, 0x027ff) AM_DEVWRITE("tilegen2", deco_bac06_device, pf_rowscroll_w)
+	AM_RANGE(0x06000, 0x07fff) AM_DEVWRITE("tilegen2", deco_bac06_device, pf_data_w)
+	AM_RANGE(0x08000, 0x08007) AM_DEVWRITE("tilegen1", deco_bac06_device, pf_control_0_w)
+	AM_RANGE(0x08010, 0x08017) AM_DEVWRITE("tilegen1", deco_bac06_device, pf_control_1_w)
+	AM_RANGE(0x0c000, 0x0c07f) AM_DEVWRITE("tilegen1", deco_bac06_device, pf_colscroll_w)
+	AM_RANGE(0x0c400, 0x0c7ff) AM_DEVWRITE("tilegen1", deco_bac06_device, pf_rowscroll_w)
+	AM_RANGE(0x0e000, 0x0ffff) AM_DEVWRITE("tilegen1", deco_bac06_device, pf_data_w)
+	// State 1 (Called by Trap 9)
+	AM_RANGE(0x18000, 0x19fff) AM_DEVWRITE("tilegen1", deco_bac06_device, pf_data_w)
+	AM_RANGE(0x1c000, 0x1dfff) AM_DEVWRITE("tilegen2", deco_bac06_device, pf_data_w)
+	// State 2 (Called by Trap A)
+	AM_RANGE(0x20000, 0x21fff) AM_DEVWRITE("tilegen2", deco_bac06_device, pf_data_w)
+	AM_RANGE(0x22000, 0x23fff) AM_DEVWRITE("tilegen1", deco_bac06_device, pf_data_w)
+	AM_RANGE(0x2e000, 0x2ffff) AM_DEVWRITE("tilegen1", deco_bac06_device, pf_data_w)
+	// State 3 (Called by Trap B)
+	AM_RANGE(0x30000, 0x31fff) AM_DEVWRITE("tilegen1", deco_bac06_device, pf_data_w)
+	AM_RANGE(0x38000, 0x39fff) AM_DEVWRITE("tilegen2", deco_bac06_device, pf_data_w)
+ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( slyspy_map, AS_PROGRAM, 16, dec0_state )
 	AM_RANGE(0x000000, 0x05ffff) AM_ROM
 
-	/* The location of p1 & pf2 can change in the 240000 - 24ffff region according to protection */
+	/* The location of pf1 & pf2 can change in the 240000 - 24ffff region according to protection */
+	AM_RANGE(0x240000, 0x24ffff) AM_DEVICE("pfprotect", address_map_bank_device, amap16)
 
 	/* Pf3 is unaffected by protection */
 	AM_RANGE(0x300000, 0x300007) AM_DEVWRITE("tilegen3", deco_bac06_device, pf_control_0_w)
@@ -1618,7 +1569,8 @@ MACHINE_CONFIG_END
 MACHINE_RESET_MEMBER(dec0_state,slyspy)
 {
 	// set initial memory map
-	slyspy_set_protection_map(0);
+	m_slyspy_state = 0;
+	m_pfprotect->set_bank(m_slyspy_state);
 }
 
 static MACHINE_CONFIG_DERIVED( slyspy, dec1 )
@@ -1630,6 +1582,13 @@ static MACHINE_CONFIG_DERIVED( slyspy, dec1 )
 
 	MCFG_CPU_ADD("audiocpu", H6280, XTAL_12MHz/2/3) /* verified on pcb (6Mhz is XIN on pin 10 of H6280, verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(slyspy_s_map)
+
+	MCFG_DEVICE_ADD("pfprotect", ADDRESS_MAP_BANK, 0)
+	MCFG_DEVICE_PROGRAM_MAP(slyspy_protection_map)
+	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
+	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(16)
+	MCFG_ADDRESS_MAP_BANK_ADDRBUS_WIDTH(18)
+	MCFG_ADDRESS_MAP_BANK_STRIDE(0x10000)
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
