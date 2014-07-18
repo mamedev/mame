@@ -14082,7 +14082,7 @@ GAME(  199?, chry10,    0,        chrygld,  chry10,   goldstar_state, chry10,   
 GAME(  199?, goldfrui,  goldstar, goldfrui, goldstar, driver_device,  0,         ROT0, "bootleg",           "Gold Fruit",                                  0 )                  // maybe fullname should be 'Gold Fruit (main 40%)'
 GAME(  2001, super9,    goldstar, super9,   goldstar, goldstar_state, super9,    ROT0, "Playmark",          "Super Nove (Playmark)",                       GAME_NOT_WORKING)    // need to decode gfx and see the program loops/reset...
 GAME(  2001, wcherry,   0,        wcherry,  chrygld,  goldstar_state, wcherry,   ROT0, "bootleg",           "Win Cherry (ver 0.16 - 19990219)",            GAME_NOT_WORKING)
-GAME(  199?, star100,   0,        star100,  star100,  driver_device,  0,         ROT0, "Sang Ho",           "Star 100",                                    GAME_IMPERFECT_COLORS )
+GAME(  199?, star100,   0,        star100,  star100,  driver_device,  0,         ROT0, "Sang Ho",           "Ming Xing 100 (Star 100)",                    GAME_IMPERFECT_COLORS )
 GAME(  1997, crazybon,  0,        star100,  crazybon, driver_device,  0,         ROT0, "Sang Ho",           "Crazy Bonus 2000",                            GAME_NOT_WORKING)
 
 
