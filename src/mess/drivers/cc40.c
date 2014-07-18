@@ -45,7 +45,8 @@
   
 
   TODO:
-  - x
+  - HD44100 is not accessed by the CPU, is it connected to the HD44780?
+    Probably responsible for the LCD indicators, how?
 
 ***************************************************************************/
 
@@ -74,6 +75,8 @@ public:
 	UINT8 m_banks;
 	UINT8 m_clock_control;
 	UINT8 m_key_select;
+	
+	void update_lcd_indicator(UINT8 y, UINT8 x, int state);
 
 	DECLARE_READ8_MEMBER(bus_control_r);
 	DECLARE_WRITE8_MEMBER(bus_control_w);
@@ -104,6 +107,27 @@ PALETTE_INIT_MEMBER(cc40_state, cc40)
 	palette.set_pen_color(0, rgb_t(138, 146, 148));
 	palette.set_pen_color(1, rgb_t(92, 83, 88));
 }
+
+void cc40_state::update_lcd_indicator(UINT8 y, UINT8 x, int state)
+{
+	;
+}
+
+static HD44780_PIXEL_UPDATE(cc40_pixel_update)
+{
+	if (line == 1 && pos == 15)
+	{
+		// the last char is used to control lcd indicators
+		cc40_state *driver_state = device.machine().driver_data<cc40_state>();
+		driver_state->update_lcd_indicator(y, x, state);
+	}
+	else if (line < 2 && pos < 16)
+	{
+		// internal: 2*16, external: 1*31 + indicators
+		bitmap.pix16(y, line*16*6 + pos*6 + x) = state;
+	}
+}
+
 
 
 /***************************************************************************
@@ -372,8 +396,8 @@ static MACHINE_CONFIG_START( cc40, cc40_state )
 	MCFG_SCREEN_ADD("screen", LCD)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
-	MCFG_SCREEN_SIZE(6*16, 9*2)
-	MCFG_SCREEN_VISIBLE_AREA(0, 6*16-1, 0, 9*2-1)
+	MCFG_SCREEN_SIZE(6*31, 9*1)
+	MCFG_SCREEN_VISIBLE_AREA(0, 6*31-1, 0, 9*1-1)
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 	MCFG_SCREEN_UPDATE_DEVICE("hd44780", hd44780_device, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
@@ -383,6 +407,7 @@ static MACHINE_CONFIG_START( cc40, cc40_state )
 
 	MCFG_HD44780_ADD("hd44780")
 	MCFG_HD44780_LCD_SIZE(2, 16) // internal: 2*16, external: 1*31 + indicators
+	MCFG_HD44780_PIXEL_UPDATE_CB(cc40_pixel_update)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
