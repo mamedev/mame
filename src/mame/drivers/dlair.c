@@ -41,7 +41,7 @@
 #include "machine/ldv1000.h"
 #include "machine/ldstub.h"
 #include "machine/z80ctc.h"
-#include "machine/z80sio.h"
+#include "machine/z80dart.h"
 #include "sound/ay8910.h"
 #include "sound/speaker.h"
 #include "dlair.lh"
@@ -52,16 +52,25 @@ class dlair_state : public driver_device
 public:
 	dlair_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
-		m_ldv1000(*this, "ld_ldv1000"),
-		m_pr7820(*this, "ld_pr7820"),
-		m_22vp932(*this, "ld_22vp932") ,
-		m_videoram(*this, "videoram"),
 		m_maincpu(*this, "maincpu"),
 		m_speaker(*this, "speaker"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")
+		m_palette(*this, "palette"),
+		m_ldv1000(*this, "ld_ldv1000"),
+		m_pr7820(*this, "ld_pr7820"),
+		m_22vp932(*this, "ld_22vp932"),
+		m_videoram(*this, "videoram")
 	{
 	}
+
+	required_device<cpu_device> m_maincpu;
+	optional_device<speaker_sound_device> m_speaker;
+	optional_device<gfxdecode_device> m_gfxdecode;
+	optional_device<palette_device> m_palette;
+	optional_device<pioneer_ldv1000_device> m_ldv1000;
+	optional_device<pioneer_pr7820_device> m_pr7820;
+	optional_device<phillips_22vp932_device> m_22vp932;
+	optional_shared_ptr<UINT8> m_videoram;
 
 	void laserdisc_data_w(UINT8 data)
 	{
@@ -102,10 +111,6 @@ public:
 		return CLEAR_LINE;
 	}
 
-	optional_device<pioneer_ldv1000_device> m_ldv1000;
-	optional_device<pioneer_pr7820_device> m_pr7820;
-	optional_device<phillips_22vp932_device> m_22vp932;
-	optional_shared_ptr<UINT8> m_videoram;
 	UINT8 m_last_misc;
 	UINT8 m_laserdisc_data;
 	DECLARE_WRITE8_MEMBER(misc_w);
@@ -123,13 +128,6 @@ public:
 	DECLARE_PALETTE_INIT(dleuro);
 	UINT32 screen_update_dleuro(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(write_speaker);
-	DECLARE_WRITE_LINE_MEMBER(dleuro_interrupt);
-	DECLARE_WRITE16_MEMBER(serial_transmit);
-	DECLARE_READ16_MEMBER(serial_receive);
-	required_device<cpu_device> m_maincpu;
-	optional_device<speaker_sound_device> m_speaker;
-	optional_device<gfxdecode_device> m_gfxdecode;
-	optional_device<palette_device> m_palette;
 };
 
 
@@ -164,29 +162,6 @@ static const UINT8 led_map[16] =
  *  Z80 peripheral interfaces
  *
  *************************************/
-
-WRITE_LINE_MEMBER(dlair_state::dleuro_interrupt)
-{
-	m_maincpu->set_input_line(0, state);
-}
-
-
-WRITE16_MEMBER(dlair_state::serial_transmit)
-{
-	laserdisc_data_w(data);
-}
-
-
-READ16_MEMBER(dlair_state::serial_receive)
-{
-	/* if we still have data to send, do it now */
-	if (offset == 0 && laserdisc_data_available_r() == ASSERT_LINE)
-		return laserdisc_data_r();
-
-	return -1;
-}
-
-
 
 WRITE_LINE_MEMBER(dlair_state::write_speaker)
 {
@@ -428,7 +403,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( dleuro_io_map, AS_IO, 8, dlair_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x03) AM_MIRROR(0x7c) AM_DEVREADWRITE("ctc", z80ctc_device, read, write)
-	AM_RANGE(0x80, 0x83) AM_MIRROR(0x7c) AM_DEVREADWRITE("sio", z80sio_device, read_alt, write_alt)
+	AM_RANGE(0x80, 0x83) AM_MIRROR(0x7c) AM_DEVREADWRITE("sio", z80dart_device, ba_cd_r, ba_cd_w)
 ADDRESS_MAP_END
 
 
@@ -730,10 +705,9 @@ static MACHINE_CONFIG_START( dleuro, dlair_state )
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 	MCFG_Z80CTC_ZC0_CB(WRITELINE(dlair_state, write_speaker))
 
-	MCFG_DEVICE_ADD("sio", Z80SIO, MASTER_CLOCK_EURO/4 /* same as "maincpu" */)
-	MCFG_Z80SIO_INT_CALLBACK(WRITELINE(dlair_state, dleuro_interrupt))
-	MCFG_Z80SIO_TRANSMIT_CALLBACK(WRITE16(dlair_state,serial_transmit))
-	MCFG_Z80SIO_RECEIVE_CALLBACK(READ16(dlair_state,serial_receive))
+	MCFG_Z80SIO0_ADD("sio", MASTER_CLOCK_EURO/4 /* same as "maincpu" */, 0, 0, 0, 0)
+	MCFG_Z80DART_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	// TODO: hook up tx and rx callbacks
 
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_hz(MASTER_CLOCK_EURO/(16*16*16*16*16*8)))
 
