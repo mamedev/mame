@@ -9,39 +9,6 @@ Note: this hardware is a copy of Psikyo's 68020 based hardware,
       transparent pen modification.  This makes it rather hard to
       merge with psikyo.c and it should probably be left separate.
 
-Dream World
-SemiCom, 2000
-
-PCB Layout
-----------
-
-|-------------------------------------------------|
-|    M6295  ROM5    62256   ACTEL           ROM10 |
-|VOL M6295  ROM6    62256   A40MX04               |
-|    PAL  PAL       32MHz                         |
-| 62256  62256              PAL                   |
-| ROM1 ROM3       68EC020   PAL    PAL            |
-| ROM2 ROM4                 PAL    PAL            |
-|J 62256 62256              PAL                   |
-|A                          PAL    27MHz          |
-|M                                 PAL            |
-|M                         ACTEL    M5M44260      |
-|A             6116        A40MX04  M5M44260      |
-|              6116                               |
-|                          PAL                    |
-|              6264        PAL                    |
-|              6264                               |
-| DSW1                      ROM11                 |
-|        8752        ROM7   ROM9                  |
-| DSW2               ROM8                         |
-|-------------------------------------------------|
-Notes:
-      68020 @ 16.0MHz [32/2]
-      M6295 (both) @ 1.0MHz [32/32]. pin 7 LOW
-      8752 @ 16.0MHz [32/2]
-      HSync @ 15.2kHz
-      VSync @ 58Hz
-
 
 Stephh's notes (based on the game M68EC020 code and some tests) :
 
@@ -119,7 +86,6 @@ Stephh's notes (based on the game M68EC020 code and some tests) :
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
 
-#define MASTER_CLOCK 32000000
 
 class dreamwld_state : public driver_device
 {
@@ -529,6 +495,19 @@ static INPUT_PORTS_START( dreamwld )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( baryon )
+	PORT_INCLUDE(dreamwld)
+
+	PORT_MODIFY("DSW")
+	PORT_DIPNAME( 0x0004, 0x0004, "Bomb Stock" ) PORT_DIPLOCATION("SW2:3")
+	PORT_DIPSETTING(      0x0004, "2" )
+	PORT_DIPSETTING(      0x0000, "3" )
+	PORT_DIPNAME( 0x0100, 0x0000, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+INPUT_PORTS_END
+
+
 static INPUT_PORTS_START( rolcrush )
 	PORT_START("INPUTS")
 	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -556,51 +535,37 @@ static INPUT_PORTS_START( rolcrush )
 	PORT_BIT( 0xffff0000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "DSW")
 
 	PORT_START("DSW")
-	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
+	PORT_DIPUNUSED_DIPLOC( 0x0001, IP_ACTIVE_LOW, "SW2:1" ) /* As listed in service mode, but tested */
+	PORT_DIPUNUSED_DIPLOC( 0x0002, IP_ACTIVE_LOW, "SW2:2" ) /* These might have some use, requires investigation of code */
+	PORT_DIPUNUSED_DIPLOC( 0x0004, IP_ACTIVE_LOW, "SW2:3" )
+	PORT_DIPUNUSED_DIPLOC( 0x0008, IP_ACTIVE_LOW, "SW2:4" )
+	PORT_DIPUNUSED_DIPLOC( 0x0010, IP_ACTIVE_LOW, "SW2:5" )
+	PORT_DIPUNUSED_DIPLOC( 0x0020, IP_ACTIVE_LOW, "SW2:6" )
+	PORT_DIPUNUSED_DIPLOC( 0x0040, IP_ACTIVE_LOW, "SW2:7" )
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Free_Play ) )    PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x0100, 0x0000, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0e00, 0x0e00, DEF_STR( Coinage ) )      PORT_DIPLOCATION("SW1:2,3,4")
+	PORT_DIPSETTING(      0x0000, DEF_STR( 5C_1C ) )
+	PORT_DIPSETTING(      0x0200, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(      0x0400, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(      0x0600, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(      0x0e00, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(      0x0a00, DEF_STR( 2C_3C ) )
+	PORT_DIPSETTING(      0x0c00, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(      0x0800, DEF_STR( 1C_3C ) )
+	PORT_DIPNAME( 0x7000, 0x7000, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW1:5,6,7")
+	PORT_DIPSETTING(      0x2000, "Level 1" )
+	PORT_DIPSETTING(      0x1000, "Level 2" )
+ 	PORT_DIPSETTING(      0x0000, "Level 3" )
+	PORT_DIPSETTING(      0x7000, "Level 4" )
+	PORT_DIPSETTING(      0x6000, "Level 5" )
+	PORT_DIPSETTING(      0x5000, "Level 6" )
+	PORT_DIPSETTING(      0x4000, "Level 7" )
+	PORT_DIPSETTING(      0x3000, "Level 8" )
 	PORT_SERVICE_DIPLOC( 0x8000, IP_ACTIVE_LOW, "SW1:8" )
 INPUT_PORTS_END
 
@@ -624,7 +589,6 @@ static GFXDECODE_START( dreamwld )
 GFXDECODE_END
 
 
-
 void dreamwld_state::machine_start()
 {
 	save_item(NAME(m_protindex));
@@ -640,12 +604,10 @@ void dreamwld_state::machine_reset()
 }
 
 
-
-
 static MACHINE_CONFIG_START( baryon, dreamwld_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68EC020, MASTER_CLOCK/2)
+	MCFG_CPU_ADD("maincpu", M68EC020, XTAL_32MHz/2) /* 16MHz verified */
 	MCFG_CPU_PROGRAM_MAP(baryon_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", dreamwld_state,  irq4_line_hold)
 
@@ -668,7 +630,7 @@ static MACHINE_CONFIG_START( baryon, dreamwld_state )
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_OKIM6295_ADD("oki1", MASTER_CLOCK/32, OKIM6295_PIN7_LOW)
+	MCFG_OKIM6295_ADD("oki1", XTAL_32MHz/32, OKIM6295_PIN7_LOW) /* 1MHz verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 MACHINE_CONFIG_END
@@ -680,10 +642,50 @@ static MACHINE_CONFIG_DERIVED( dreamwld, baryon )
 	MCFG_CPU_PROGRAM_MAP(dreamwld_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", dreamwld_state,  irq4_line_hold)
 
-	MCFG_OKIM6295_ADD("oki2", MASTER_CLOCK/32, OKIM6295_PIN7_LOW)
+	MCFG_OKIM6295_ADD("oki2", XTAL_32MHz/32, OKIM6295_PIN7_LOW) /* 1MHz verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 MACHINE_CONFIG_END
+
+
+/*
+
+Dream World
+SemiCom, 2000
+
+PCB Layout
+----------
+
+|-------------------------------------------------|
+|    M6295  ROM5    62256   ACTEL           ROM10 |
+|VOL M6295  ROM6    62256   A40MX04               |
+|    PAL  PAL       32MHz                         |
+| 62256  62256              PAL                   |
+| ROM1 ROM3       68EC020   PAL    PAL            |
+| ROM2 ROM4                 PAL    PAL            |
+|J 62256 62256              PAL                   |
+|A                          PAL    27MHz          |
+|M                                 PAL            |
+|M                         ACTEL    M5M44260      |
+|A             6116        A40MX04  M5M44260      |
+|              6116                               |
+|                          PAL                    |
+|              6264        PAL                    |
+|              6264                               |
+| DSW1                      ROM11                 |
+|        8752        ROM7   ROM9    27C160*       |
+| DSW2               ROM8   27C160* 27C160*       |
+|-------------------------------------------------|
+
+* denotes unpopulated components
+
+Notes:
+      68020 @ 16.0MHz [32/2]
+      M6295 (both) @ 1.0MHz [32/32]. pin 7 LOW
+      8752 @ 16.0MHz [32/2]
+      HSync @ 15.2kHz
+      VSync @ 58Hz
+*/
 
 ROM_START( dreamwld )
 	ROM_REGION( 0x200000, "maincpu", 0 )
@@ -727,25 +729,43 @@ ROM_END
 
 /*
 
-Rolling Crush - this is the same PCB as Dream World with one of the OKIs positions left unpopulated.
+Rolling Crush
+Trust / Semicom, 1999
 
-Here are the dumps from a (original???) Rolling Crush (version 1.07.E 1999/02/11) PCB.Game seems to be a rip-off
-of Puzz Loop from Mitchell,  infact there is a piece of tape on the solder side which says 'P. LOOP' and a sticker with 02/1999 date.Manifacturer is TRUST.
-All EPROMS four 27C2000 (program code), one 27C4000 (6295 samples), 
-one MASK 27C512(GFX), two 27C160(GFX) and two 27C010 (GFX) are not labeled.
-Main CPU is a 68EC020FG16 in QFP package
-There are also a Atmel AT89C52 MCU (secured) and two Actel A40MX04 FPGAs as well as a lot of PLDs (three GAL22V10B and nine PALCE20V8H), don't know 
-if secured.
+PCB Layout
+----------
+
+|-------------------------------------------------|
+|    M6295* 27C40*  62256   ACTEL           ROM10 |
+|VOL M6295  ROM6    62256   A40MX04               |
+|    PAL  PAL       32MHz                         |
+| 62256  62256              PAL                   |
+| ROM2 ROM4       68EC020   PAL    PAL            |
+| ROM1 ROM3                 PAL    PAL            |
+|J 62256 62256              PAL                   |
+|A                          PAL    27MHz          |
+|M                                 PAL            |
+|M                         ACTEL    M5M44260      |
+|A             6116        A40MX04  M5M44260      |
+|              6116                               |
+|                          PAL                    |
+|              6264        PAL                    |
+|              6264                               |
+| DSW1                      ROM9                  |
+|        8752        ROM7   ROM8    27C160*       |
+| DSW2               ROM6   27C160* 27C160*       |
+|-------------------------------------------------|
+
+Same PCB as Dream World except one OKI M6295 and it's sample rom are unpopulated
+
+* denotes unpopulated components
 
 Main CPU 68EC020FG16           @ 16MHz
 AD-65 (OKI MSM6295 rebadged)   @ 1MHz
-Atmel AT89C52 MCU              @ 16MHZ
-
+Atmel AT89C52 MCU (secured)    @ 16MHZ
 
 V-SYNC                         @57.793 Hz
 H-SYNC                         @ (floating) 15.19 - 15.27KHz
-
-
 
 */
 
@@ -783,14 +803,47 @@ ROM_START( rolcrush )
 	ROM_LOAD( "mx27c512.9.bin", 0x000000, 0x10000, CRC(0da8db45) SHA1(7d5bd71c5b0b28ff74c732edd7c662f46f2ab25b) )
 ROM_END
 
-/* Baryon is a slightly different PCB, doesn't have a position for the 2nd OKI */
+/*
+
+Baryon
+Semicom, 1997
+
+PCB Layout
+----------
+
+|-------------------------------------------------|
+|           ROM1   62256   ACTEL            ROM2  |
+|VOL        M6295  62256   A40MX04                |
+|    PAL  PAL              32MHz                  |
+| 62256  62256                PAL                 |
+| ROM3 ROM4         68EC020   PAL    PAL          |
+| ROM5 ROM6                   PAL    PAL          |
+|J 62256 62256                PAL                 |
+|A                            PAL    27MHz        |
+|M                                 PAL            |
+|M                         ACTEL    M5M44260      |
+|A             6116        A40MX04  M5M44260      |
+|              6116                               |
+|                          PAL                    |
+|              6264        PAL                    |
+|              6264                               |
+| DSW1                      ROM7                  |
+|       P87C52       ROM8   ROM9    27C160*       |
+| DSW2               ROM10  ROM11   27C160*       |
+|-------------------------------------------------|
+
+Baryon is a slightly different PCB, doesn't have a position for a 2nd OKI
+
+* denotes unpopulated components
+
+*/
 
 ROM_START( baryon )
 	ROM_REGION( 0x100000, "maincpu", 0 )
-	ROM_LOAD32_BYTE( "3.bin", 0x000002, 0x040000, CRC(046d4231) SHA1(05056efe5fec7f43c400f05278de516b01be0fdf) )
 	ROM_LOAD32_BYTE( "4.bin", 0x000000, 0x040000, CRC(59e0df20) SHA1(ff12f4adcf731f6984db7d0fbdd7fcc71ce66aa4) )
-	ROM_LOAD32_BYTE( "5.bin", 0x000003, 0x040000, CRC(63d5e7cb) SHA1(269bf5ffe10f2464f823c4d377921e19cfb8bc46) )
 	ROM_LOAD32_BYTE( "6.bin", 0x000001, 0x040000, CRC(abccbb3d) SHA1(01524f094543d872d775306024f51258a11e9240) )
+	ROM_LOAD32_BYTE( "3.bin", 0x000002, 0x040000, CRC(046d4231) SHA1(05056efe5fec7f43c400f05278de516b01be0fdf) )
+	ROM_LOAD32_BYTE( "5.bin", 0x000003, 0x040000, CRC(63d5e7cb) SHA1(269bf5ffe10f2464f823c4d377921e19cfb8bc46) )
 
 	ROM_REGION( 0x10000, "cpu1", 0 ) /* 87C52 MCU Code */
 	ROM_LOAD( "87c52.mcu", 0x00000, 0x10000 , NO_DUMP ) /* can't be dumped. */
@@ -818,8 +871,6 @@ ROM_START( baryon )
 ROM_END
 
 
-
-
-GAME( 1997, baryon,   0, baryon,   dreamwld, driver_device, 0, ROT270,  "SemiCom", "Baryon - Future Assault", GAME_SUPPORTS_SAVE )
-GAME( 2000, dreamwld, 0, dreamwld, dreamwld, driver_device, 0, ROT0,    "SemiCom", "Dream World", GAME_SUPPORTS_SAVE )
-GAME( 1999, rolcrush, 0, baryon,   rolcrush, driver_device, 0, ROT0,    "Trust / Semicom",   "Rolling Crush (version 1.07.E - 1999/02/11)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS ) // wrong linescroll
+GAME( 1997, baryon,   0, baryon,   baryon,   driver_device, 0, ROT270, "SemiCom",         "Baryon - Future Assault", GAME_SUPPORTS_SAVE )
+GAME( 2000, dreamwld, 0, dreamwld, dreamwld, driver_device, 0, ROT0,   "SemiCom",         "Dream World", GAME_SUPPORTS_SAVE )
+GAME( 1999, rolcrush, 0, baryon,   rolcrush, driver_device, 0, ROT0,   "Trust / Semicom", "Rolling Crush (version 1.07.E - 1999/02/11)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS ) // wrong linescroll
