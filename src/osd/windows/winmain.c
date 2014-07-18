@@ -240,9 +240,9 @@ static running_machine *g_current_machine;
 
 //static HANDLE mm_task = NULL;
 //static DWORD task_index = 0;
-static int timeresult;
+static int timeresult = !TIMERR_NOERROR;
 //static MMRESULT result;
-static TIMECAPS caps;
+static TIMECAPS timecaps;
 
 static sampling_profiler *profiler = NULL;
 static symbol_manager *symbols = NULL;
@@ -647,9 +647,12 @@ void windows_osd_interface::init(running_machine &machine)
 
 	// crank up the multimedia timer resolution to its max
 	// this gives the system much finer timeslices
-	timeresult = timeGetDevCaps(&caps, sizeof(caps));
-	if (timeresult == TIMERR_NOERROR)
-		timeBeginPeriod(caps.wPeriodMin);
+	if (!options.sleep())
+	{
+		timeresult = timeGetDevCaps(&timecaps, sizeof(timecaps));
+		if (timeresult == TIMERR_NOERROR)
+			timeBeginPeriod(timecaps.wPeriodMin);
+	}
 
 	// set our multimedia tasks if we can
 //      if (av_set_mm_thread_characteristics != NULL)
@@ -723,7 +726,7 @@ void windows_osd_interface::osd_exit()
 
 	// restore the timer resolution
 	if (timeresult == TIMERR_NOERROR)
-		timeEndPeriod(caps.wPeriodMin);
+		timeEndPeriod(timecaps.wPeriodMin);
 
 	// one last pass at events
 	winwindow_process_events(machine(), 0, 0);
