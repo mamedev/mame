@@ -55,6 +55,8 @@
 #include "video/hd44780.h"
 #include "sound/dac.h"
 
+#include "cc40.lh"
+
 
 class cc40_state : public driver_device
 {
@@ -398,7 +400,7 @@ static MACHINE_CONFIG_START( cc40, cc40_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
 	MCFG_SCREEN_SIZE(6*31, 9*1)
 	MCFG_SCREEN_VISIBLE_AREA(0, 6*31-1, 0, 9*1-1)
-	MCFG_DEFAULT_LAYOUT(layout_lcd)
+	MCFG_DEFAULT_LAYOUT(layout_cc40)
 	MCFG_SCREEN_UPDATE_DEVICE("hd44780", hd44780_device, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 

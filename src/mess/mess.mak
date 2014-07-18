@@ -2258,6 +2258,7 @@ $(MESS_DRIVERS)/babbage.o:  $(MESS_LAYOUT)/babbage.lh
 $(MESS_DRIVERS)/bbc.o:      $(MESS_LAYOUT)/bbc.lh
 $(MESS_DRIVERS)/beta.o:     $(MESS_LAYOUT)/beta.lh
 $(MESS_DRIVERS)/bob85.o:    $(MESS_LAYOUT)/bob85.lh
+$(MESS_DRIVERS)/cc40.o:     $(MESS_LAYOUT)/cc40.lh
 $(MAME_DRIVERS)/cdi.o:      $(MAME_LAYOUT)/cdi.lh
 $(MESS_DRIVERS)/chessmst.o: $(MESS_LAYOUT)/chessmst.lh
 $(MESS_DRIVERS)/chesstrv.o: $(MESS_LAYOUT)/chesstrv.lh \
