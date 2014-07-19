@@ -23,6 +23,7 @@
  *  - memory modes with IOCNT0, currently ignored
  *  - timer event counter mode (timer control register, bit 6)
  *  - TMS70x1/2 serial port and timer 3
+ *  - TMS70C46 is same as TMS70C40, except with support for memory mapped I/O?
  *  - when they're needed, add TMS70Cx2, TMS7742, TMS77C82, SE70xxx
  *
  *****************************************************************************/
@@ -50,6 +51,7 @@ const device_type TMS7040 = &device_creator<tms7040_device>;
 const device_type TMS70C00 = &device_creator<tms70c00_device>;
 const device_type TMS70C20 = &device_creator<tms70c20_device>;
 const device_type TMS70C40 = &device_creator<tms70c40_device>;
+const device_type TMS70C46 = &device_creator<tms70c46_device>;
 const device_type TMS7001 = &device_creator<tms7001_device>;
 const device_type TMS7041 = &device_creator<tms7041_device>;
 const device_type TMS7002 = &device_creator<tms7002_device>;
@@ -146,6 +148,11 @@ tms70c20_device::tms70c20_device(const machine_config &mconfig, const char *tag,
 
 tms70c40_device::tms70c40_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: tms7000_device(mconfig, TMS70C40, "TMS70C40", tag, owner, clock, ADDRESS_MAP_NAME(tms7040_mem), TMS7000_CHIP_IS_CMOS, "tms70c40", __FILE__)
+{
+}
+
+tms70c46_device::tms70c46_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: tms7000_device(mconfig, TMS70C46, "TMS70C46", tag, owner, clock, ADDRESS_MAP_NAME(tms7040_mem), TMS7000_CHIP_IS_CMOS, "tms70c46", __FILE__)
 {
 }
 
