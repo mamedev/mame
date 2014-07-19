@@ -14,22 +14,9 @@ Granny uses the MPU4 board, but it has a Vidiot Deluxe for the
 video, and a Cheep Squeek sound board. The manual incorrectly
 describes the babypac vidiot board, which is of little use.
 
-Debug trick to get granny to work:
->mame granny -debug
-focus 1
-g
-After 10 beeps it will get stuck in a loop, so press enter.
-pc=e1f1
-g
-The game boots up, insert a coin, you can play.
-
 
 ToDo (babypac):
-- You can play the video portion but try not to use the lower
-  escape chutes. If you do, alternate between pressing X and
-  right-shift until you are returned to the maze.
 - No sound
-- Playfield inputs
 - Mechanical
 - Artwork
 - Beeper needs to be replaced by a red LED when artwork is done.
@@ -40,7 +27,7 @@ ToDo (granny):
 - Mechanical
 - Artwork
 - Beeper needs to be replaced by a red LED when artwork is done.
-- Doesn't boot (test of TMS9928 fails).
+- Video CPU type and clock needs verification.
 - Screen blending needs improvement
 - No schematic found.
 
@@ -812,7 +799,8 @@ static MACHINE_CONFIG_START( babypac, by133_state )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( granny, babypac )
-	MCFG_CPU_MODIFY( "videocpu" )
+	MCFG_DEVICE_REMOVE("videocpu")
+	MCFG_CPU_ADD("videocpu", M6809E, XTAL_8MHz) //??
 	MCFG_CPU_PROGRAM_MAP(granny_map)
 
 	MCFG_DEVICE_REMOVE("screen")
