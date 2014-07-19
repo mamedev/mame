@@ -639,12 +639,9 @@ void windows_osd_interface::init(running_machine &machine)
 
 	// crank up the multimedia timer resolution to its max
 	// this gives the system much finer timeslices
-	if (!options.sleep())
-	{
-		timeresult = timeGetDevCaps(&timecaps, sizeof(timecaps));
-		if (timeresult == TIMERR_NOERROR)
-			timeBeginPeriod(timecaps.wPeriodMin);
-	}
+	timeresult = timeGetDevCaps(&timecaps, sizeof(timecaps));
+	if (timeresult == TIMERR_NOERROR)
+		timeBeginPeriod(timecaps.wPeriodMin);
 
 	// if a watchdog thread is requested, create one
 	int watchdog = options.watchdog();
