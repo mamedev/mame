@@ -18,13 +18,12 @@ How to set up the machine (motrshow, motrshowa, dakar):
 - Press Left shift and Right shift together (game stops responding)
 - Turn the Ram Protect Switch back on
 - Press F3 or reboot
-- The default settings have been loaded and you can insert coins
+- The default settings have been saved to nvram and you can insert coins
 - However, the game cannot be played due to missing balls.
 
 ToDo:
 - Support for electronic volume control
 - Audio rom banking
-- Wrong colours
 - Most sounds missing due to unemulated M114 chip
 - wcup90 is different hardware and there's no schematic
 
@@ -84,6 +83,7 @@ private:
 	bool m_ack1;
 	bool m_ack2;
 	bool m_ackv;
+	bool m_flip;
 	UINT8 m_irq_state;
 	UINT8 m_row_data;
 	UINT8 m_sound_data;
@@ -264,6 +264,9 @@ WRITE8_MEMBER( mrgame_state::video_ctrl_w )
 	else
 	if (offset == 4)
 		m_gfx_bank = (m_gfx_bank & 3) | (BIT(data, 0) << 2);
+	else
+	if (offset == 6)
+		m_flip = BIT(data, 0);
 }
 
 WRITE8_MEMBER( mrgame_state::ack1_w )
@@ -307,6 +310,7 @@ void mrgame_state::machine_reset()
 	m_ack1 = 0;
 	m_ack2 = 0;
 	m_ackv = 0;
+	m_flip = 0;
 	m_row_data = 0;
 }
 
@@ -357,8 +361,8 @@ static const gfx_layout spritelayout =
 };
 
 static GFXDECODE_START( mrgame )
-	GFXDECODE_ENTRY( "chargen", 0, charlayout, 3, 1 )
-	GFXDECODE_ENTRY( "chargen", 0, spritelayout, 3, 1 )
+	GFXDECODE_ENTRY( "chargen", 0, charlayout, 0, 16 )
+	GFXDECODE_ENTRY( "chargen", 0, spritelayout, 0, 16 )
 GFXDECODE_END
 
 // this gives bad colours although it looks right
@@ -396,6 +400,7 @@ PALETTE_INIT_MEMBER( mrgame_state, mrgame)
 		b = combine_2_weights(bweights, bit0, bit1);
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
+		palette.set_pen_color(i+32, rgb_t(r, g, b));
 	}
 }
 
@@ -420,7 +425,7 @@ UINT32 mrgame_state::screen_update_mrgame(screen_device &screen, bitmap_ind16 &b
 			m_gfxdecode->gfx(0)->opaque(*m_tile_bitmap, m_tile_bitmap->cliprect(),
 				chr,
 				col,
-				0,0,
+				m_flip,0,
 				x*8,y*8);
 		}
 	}
@@ -475,7 +480,7 @@ static MACHINE_CONFIG_START( mrgame, mrgame_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 8, 247) // If you align with X on test screen some info is chopped off
 	MCFG_SCREEN_UPDATE_DRIVER(mrgame_state, screen_update_mrgame)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_PALETTE_ADD_INIT_BLACK("palette", 32)
+	MCFG_PALETTE_ADD("palette", 64)
 	MCFG_PALETTE_INIT_OWNER(mrgame_state, mrgame)
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mrgame)
 
