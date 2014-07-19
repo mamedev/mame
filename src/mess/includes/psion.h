@@ -84,4 +84,21 @@ public:
 	static HD44780_PIXEL_UPDATE(lz_pixel_update);
 };
 
+
+class psion1_state : public psion_state
+{
+public:
+	psion1_state(const machine_config &mconfig, device_type type, const char *tag)
+		: psion_state(mconfig, type, tag)
+		{ }
+
+	virtual void machine_reset();
+
+	DECLARE_READ8_MEMBER( reset_kb_counter_r );
+	DECLARE_READ8_MEMBER( inc_kb_counter_r );
+	DECLARE_READ8_MEMBER( switchoff_r );
+
+	static HD44780_PIXEL_UPDATE(psion1_pixel_update);
+};
+
 #endif  // _PSION_H_
