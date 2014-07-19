@@ -29,11 +29,26 @@
 		</disk>
 	</element> 
 
-	<element name="text_level_l"><text string="LEVEL GAUGE" align="2"><color red="1" green="0.86666" blue="0" /></text></element>
-	<element name="text_level_r"><text string="LEVEL GAUGE" align="1"><color red="1" green="0.86666" blue="0" /></text></element>
-	<element name="text_ryu"><text string="Ryu"><color red="0" green="0" blue="0" /></text></element>
-	<element name="text_chunli"><text string="Chun-Li"><color red="0" green="0" blue="0" /></text></element>
-	<element name="text_start"><text string="Start"><color red="0.3" green="0.3" blue="0.3" /></text></element>
+	<element name="text_level_l">
+		<rect><color red="0" green="0.13333" blue="0.86666" /></rect>
+		<text string="LEVEL GAUGE" align="2"><color red="1" green="0.86666" blue="0" /></text>
+	</element>
+	<element name="text_level_r">
+		<rect><color red="0" green="0.13333" blue="0.86666" /></rect>
+		<text string="LEVEL GAUGE" align="1"><color red="1" green="0.86666" blue="0" /></text>
+	</element>
+	<element name="text_ryu">
+		<rect><color red="0.92" green="0.92" blue="0.92" /></rect>
+		<text string="Ryu"><color red="0" green="0" blue="0" /></text>
+	</element>
+	<element name="text_chunli">
+		<rect><color red="0.92" green="0.92" blue="0.92" /></rect>
+		<text string="Chun-Li"><color red="0" green="0" blue="0" /></text>
+	</element>
+	<element name="text_start">
+		<rect><color red="0.92" green="0.92" blue="0.92" /></rect>
+		<text string="Start"><color red="0.3" green="0.3" blue="0.3" /></text>
+	</element>
 
  	<element name="mole_sim_red" defstate="0">
 		<disk state = "0"><color blue="0.05" green="0.05" red="0.20" /></disk>
@@ -261,7 +276,7 @@
 			<bounds x="6" y="254" width="105" height="8" />
 		</bezel>
 		<bezel element="text_level_l">
-			<bounds x="0" y="263" width="107" height="8" />
+			<bounds x="7" y="263" width="100" height="8" />
 		</bezel>
 
 		<bezel name="lamp1" element="powerled">
@@ -340,10 +355,10 @@
 	<!-- start buttons -->
 
 		<bezel element="text_ryu">
-			<bounds x="115" y="254" width="30" height="6"/>
+			<bounds x="118" y="254" width="24" height="6"/>
 		</bezel>
  		<bezel element="text_start">
-			<bounds x="115" y="261" width="30" height="6"/>
+			<bounds x="118" y="261" width="24" height="6"/>
 		</bezel>
 
 		<bezel element="disk_black">
@@ -354,10 +369,10 @@
 		</bezel>
 
 		<bezel element="text_chunli">
-			<bounds x="177" y="254" width="30" height="6"/>
+			<bounds x="180" y="254" width="24" height="6"/>
 		</bezel>
  		<bezel element="text_start">
-			<bounds x="177" y="261" width="30" height="6"/>
+			<bounds x="180" y="261" width="24" height="6"/>
 		</bezel> 
 
 		<bezel element="disk_black">

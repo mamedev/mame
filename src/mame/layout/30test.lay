@@ -80,69 +80,82 @@
 <!-- define text -->
 
 	<element name="text_score">
+		<rect><color red="0.95" green="0.8" blue="0.1" /></rect>
 		<text string="SCORE">
 			<color red="0.1" green="0.35" blue="0.8" />
 		</text>
 	</element>
 	<element name="text_time">
+		<rect><color red="0.95" green="0.8" blue="0.1" /></rect>
 		<text string="TIME">
 			<color red="0.1" green="0.35" blue="0.8" />
 		</text>
 	</element>
 	<element name="text_best">
+		<rect><color red="0.95" green="0.8" blue="0.1" /></rect>
 		<text string="BEST">
 			<color red="0.1" green="0.35" blue="0.8" />
 		</text>
 	</element>
 
 	<element name="text_1">
+		<rect><color red="0.95" green="0.8" blue="0.1" /></rect>
 		<text string="1." align="2">
 			<color red="0.1" green="0.35" blue="0.8" />
 		</text>
 	</element>
 	<element name="text_2">
+		<rect><color red="0.95" green="0.8" blue="0.1" /></rect>
 		<text string="2." align="2">
 			<color red="0.1" green="0.35" blue="0.8" />
 		</text>
 	</element>
 	<element name="text_3">
+		<rect><color red="0.95" green="0.8" blue="0.1" /></rect>
 		<text string="3." align="2">
 			<color red="0.1" green="0.35" blue="0.8" />
 		</text>
 	</element>
 
 	<element name="text_rank1">
+		<rect><color red="0.95" green="0.8" blue="0.1" /></rect>
 		<text string="great!!" align="1">
 			<color red="0.1" green="0.35" blue="0.8" />
 		</text>
 	</element>
 	<element name="text_rank2">
+		<rect><color red="0.95" green="0.8" blue="0.1" /></rect>
 		<text string="pretty good" align="1">
 			<color red="0.1" green="0.35" blue="0.8" />
 		</text>
 	</element>
 	<element name="text_rank3">
+		<rect><color red="0.95" green="0.8" blue="0.1" /></rect>
 		<text string="not bad" align="1">
 			<color red="0.1" green="0.35" blue="0.8" />
 		</text>
 	</element>
 	<element name="text_rank4">
+		<rect><color red="0.95" green="0.8" blue="0.1" /></rect>
 		<text string="mediocre" align="1">
 			<color red="0.1" green="0.35" blue="0.8" />
 		</text>
 	</element>
 	<element name="text_rank5">
+		<rect><color red="0.95" green="0.8" blue="0.1" /></rect>
 		<text string="pretty bad" align="1">
 			<color red="0.1" green="0.35" blue="0.8" />
 		</text>
 	</element>
 	<element name="text_rank6">
+		<rect><color red="0.95" green="0.8" blue="0.1" /></rect>
 		<text string="awful" align="1">
 			<color red="0.1" green="0.35" blue="0.8" />
 		</text>
 	</element>
 
 	<element name="text_gameover">
+		<rect><color red="0.95" green="0.8" blue="0.1" /></rect>
 		<text string="game over" align="1">
 			<color red="0.1" green="0.35" blue="0.8" />
 		</text>
@@ -256,13 +269,13 @@
 		</bezel>
 
 		<bezel element="text_1">
-			<bounds x="63" y="25.5" width="10" height="7" />
+			<bounds x="68" y="25.5" width="5" height="7" />
 		</bezel>
 		<bezel element="text_2">
-			<bounds x="63" y="43.5" width="10" height="7" />
+			<bounds x="68" y="43.5" width="5" height="7" />
 		</bezel>
 		<bezel element="text_3">
-			<bounds x="63" y="61.5" width="10" height="7" />
+			<bounds x="68" y="61.5" width="5" height="7" />
 		</bezel>
 
 		<bezel element="static_blue">
