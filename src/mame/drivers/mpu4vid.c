@@ -273,6 +273,7 @@ public:
 	DECLARE_DRIVER_INIT(crmaze3a);
 	DECLARE_DRIVER_INIT(skiltrek);
 	DECLARE_DRIVER_INIT(crmaze3);
+	DECLARE_DRIVER_INIT(cybcas);
 	DECLARE_MACHINE_START(mpu4_vid);
 	DECLARE_MACHINE_RESET(mpu4_vid);
 	DECLARE_VIDEO_START(mpu4_vid);
@@ -1815,6 +1816,29 @@ DRIVER_INIT_MEMBER(mpu4vid_state,prizeinv)
 	m_reels = 0;//currently no hybrid games
 	m_current_chr_table = prizeinv_data;
 }
+
+static const bwb_chr_table cybcas_data1[5] = {
+//Magic number 724A
+
+// PAL Codes
+// 0   1   2  3  4  5  6  7  8
+// ??  ?? 20 0F 24 3C 36 27 09
+
+	{0x67},{0x17},{0x0f},{0x24},{0x3c},
+};
+
+static mpu4_chr_table cybcas_data[8] = {
+{0xEF, 0x02},{0x81, 0x00},{0xCE, 0x00},{0x00, 0x2e},
+{0x06, 0x20},{0xC6, 0x0f},{0xF8, 0x24},{0x8E, 0x3c},
+};
+
+DRIVER_INIT_MEMBER(mpu4vid_state,cybcas)
+{
+	//no idea what this should be, use blues boys table for now
+	m_bwb_chr_table1 = cybcas_data1;
+	m_current_chr_table = cybcas_data;
+}
+
 
 void mpu4vid_state::mpu4vid_char_cheat( int address)
 {
@@ -3782,7 +3806,7 @@ GAME(  199?,v4frfact,   v4bios,     crmaze,     crmaze, mpu4vid_state,      crma
 
 /* Nova - is this the same video board? One of the games displays 'Resetting' but the others do nothing interesting and access strange addresses */
 /* All contain BwB video in the BIOS rom tho */
-GAME(  199?,v4cybcas,   0,          bwbvid5,    mpu4, driver_device,        0,          ROT0, "Nova","Cyber Casino (Nova) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?,v4cybcas,   0,          bwbvid5,    mpu4, mpu4vid_state,        cybcas,     ROT0, "Nova","Cyber Casino (Nova) (MPU4 Video)",GAME_FLAGS )
 GAME(  199?,v4miami,    0,          bwbvid5,    mpu4, driver_device,        0,          ROT0, "Nova","Miami Dice (Nova) (MPU4 Video)",GAME_FLAGS )
 GAME(  199?,v4missis,   0,          bwbvid5,    mpu4, driver_device,        0,          ROT0, "Nova","Mississippi Lady (Nova) (MPU4 Video)",GAME_FLAGS )
 GAME(  199?,v4picdil,   0,          bwbvid5,    mpu4, driver_device,        0,          ROT0, "Nova","Piccadilly Nights (Nova) (MPU4 Video)",GAME_FLAGS )
