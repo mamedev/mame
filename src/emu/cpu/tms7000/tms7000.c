@@ -318,51 +318,53 @@ void tms7000_device::device_reset()
 //  interrupts
 //-------------------------------------------------
 
-void tms7000_device::execute_set_input(int irqline, int state)
+void tms7000_device::execute_set_input(int extline, int state)
 {
-	assert(irqline == TMS7000_INT1_LINE || irqline == TMS7000_INT3_LINE);
+	if (extline != TMS7000_INT1_LINE && extline != TMS7000_INT3_LINE)
+		return;
+
 	bool irqstate = (state == CLEAR_LINE) ? false : true;
 
 	// reverse polarity (70cx2-only)
-	if (m_io_control[2] & (0x01 << (4 * irqline)))
+	if (m_io_control[2] & (0x01 << (4 * extline)))
 		irqstate = !irqstate;
 
-	if (m_irq_state[irqline] != irqstate)
+	if (m_irq_state[extline] != irqstate)
 	{
-		m_irq_state[irqline] = irqstate;
+		m_irq_state[extline] = irqstate;
 		
 		// set/clear internal irq flag
-		flag_ext_interrupt(irqline);
+		flag_ext_interrupt(extline);
 		
-		if (m_irq_state[irqline])
+		if (m_irq_state[extline])
 		{
 			// latch timer 1 on INT3
-			if (irqline == TMS7000_INT3_LINE)
+			if (extline == TMS7000_INT3_LINE)
 				m_timer_capture_latch[0] = m_timer_decrementer[0];
 
 			// on 70cx2, latch timer 2 on INT1
-			if (irqline == TMS7000_INT1_LINE && chip_is_family_70cx2())
+			if (extline == TMS7000_INT1_LINE && chip_is_family_70cx2())
 				m_timer_capture_latch[1] = m_timer_decrementer[1];
 			
 			// clear external if it's edge-triggered (70cx2-only)
-			if (m_io_control[2] & (0x02 << (4 * irqline)))
-				m_irq_state[irqline] = false;
+			if (m_io_control[2] & (0x02 << (4 * extline)))
+				m_irq_state[extline] = false;
 
 			check_interrupts();
 		}
 	}
 }
 
-void tms7000_device::flag_ext_interrupt(int irqline)
+void tms7000_device::flag_ext_interrupt(int extline)
 {
-	if (irqline != TMS7000_INT1_LINE && irqline != TMS7000_INT3_LINE)
+	if (extline != TMS7000_INT1_LINE && extline != TMS7000_INT3_LINE)
 		return;
 
 	// set/clear for pending external interrupt
-	if (m_irq_state[irqline])
-		m_io_control[0] |= (0x02 << (4 * irqline));
+	if (m_irq_state[extline])
+		m_io_control[0] |= (0x02 << (4 * extline));
 	else
-		m_io_control[0] &= ~(0x02 << (4 * irqline));
+		m_io_control[0] &= ~(0x02 << (4 * extline));
 }
 
 void tms7000_device::check_interrupts()
@@ -381,8 +383,9 @@ void tms7000_device::check_interrupts()
 		{
 			// ack
 			m_io_control[irqline > 2] &= ~(0x02 << shift);
-			
-			flag_ext_interrupt(irqline);
+			if (irqline == 0 || irqline == 2)
+				flag_ext_interrupt(irqline / 2);
+
 			do_interrupt(irqline);
 			return;
 		}
@@ -509,7 +512,7 @@ READ8_MEMBER(tms7000_device::tms7000_pf_r)
 			return m_port_ddr[offset / 2 - 2];
 
 		default:
-			logerror("%s: tms7000_pf_r @ $%04x\n", tag(), offset);
+			logerror("'%s' (%04X): tms7000_pf_r @ $%04x\n", tag(), m_pc, offset);
 			break;
 	}
 
@@ -593,7 +596,7 @@ WRITE8_MEMBER(tms7000_device::tms7000_pf_w)
 			break;
 
 		default:
-			logerror("%s: tms7000_pf_w @ $%04x = $%02x\n", tag(), offset, data);
+			logerror("'%s' (%04X): tms7000_pf_w @ $%04x = $%02x\n", tag(), m_pc, offset, data);
 			break;
 	}
 }

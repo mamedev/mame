@@ -57,8 +57,8 @@ public:
 	tms7000_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	tms7000_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, address_map_constructor internal, UINT32 info_flags, const char *shortname, const char *source);
 
-	DECLARE_READ8_MEMBER(tms7000_unmapped_rf_r) { logerror("%s: unmapped_rf_r @ $%04x\n", tag(), offset + 0x80); return 0; };
-	DECLARE_WRITE8_MEMBER(tms7000_unmapped_rf_w) { logerror("%s: unmapped_rf_w @ $%04x = $%02x\n", tag(), offset + 0x80, data); };
+	DECLARE_READ8_MEMBER(tms7000_unmapped_rf_r) { logerror("'%s' (%04X): unmapped_rf_r @ $%04x\n", tag(), m_pc, offset + 0x80); return 0; };
+	DECLARE_WRITE8_MEMBER(tms7000_unmapped_rf_w) { logerror("'%s' (%04X): unmapped_rf_w @ $%04x = $%02x\n", tag(), m_pc, offset + 0x80, data); };
 
 	DECLARE_READ8_MEMBER(tms7000_pf_r);
 	DECLARE_WRITE8_MEMBER(tms7000_pf_w);
@@ -83,7 +83,7 @@ protected:
 	virtual UINT32 execute_max_cycles() const { return 49; }
 	virtual UINT32 execute_input_lines() const { return 2; }
 	virtual void execute_run();
-	virtual void execute_set_input(int irqline, int state);
+	virtual void execute_set_input(int extline, int state);
 
 	// device_memory_interface overrides
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const { return (spacenum == AS_PROGRAM) ? &m_program_config : ( (spacenum == AS_IO) ? &m_io_config : NULL ); }
@@ -128,7 +128,7 @@ protected:
 	UINT8 m_port_latch[4];
 	UINT8 m_port_ddr[4];
 	
-	void flag_ext_interrupt(int irqline);
+	void flag_ext_interrupt(int extline);
 	void check_interrupts();
 	void do_interrupt(int irqline);
 	
