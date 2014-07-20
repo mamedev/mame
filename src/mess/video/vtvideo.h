@@ -65,7 +65,7 @@ protected:
 	UINT8 m_columns;
 	UINT8 m_height;
 	UINT8 m_height_MAX;
-	UINT8 m_skip_lines;
+	UINT8 m_fill_lines;
 	UINT8 m_frequency;
 	UINT8 m_interlaced;
 
@@ -74,6 +74,8 @@ protected:
 	
 	bool m_notify_vblank;
 	int m_last_scroll;
+
+	bool m_linedoubler;
 };
 
 
