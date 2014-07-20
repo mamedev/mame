@@ -5477,15 +5477,10 @@ ROM_END
 
 //*************************************************************************************************************************
 //  Center Court, Sega System 16B
-//  CPU: 68000
+//  CPU: 68000 + MC8123 (317-???? - what is the label?)
 //  ROM Board No. 171-5358
+//  Note: prototype board, checksums handwritten on prg roms, EPR stickers present on other roms, but handwritten locations instead of numbers
 //
-// prototype board, checksums handwritten on prg roms, EPR stickers present on other roms, but handwritten locations 
-// instead of numbers
-//
-// uses encrypted MC8123 for sound
-
-
 ROM_START( cencourt )
 	ROM_REGION( 0x20000, "maincpu", 0 ) // 68000 code
 	ROM_LOAD16_BYTE( "a4_56f6.bin", 0x000000, 0x10000, CRC(7116dce6) SHA1(058faf5f1980f811e2e1d5f7d09660ff51b0c0dc) )
@@ -5513,10 +5508,8 @@ ROM_START( cencourt )
 	ROM_LOAD( "epr-a-10.bin", 0x30000, 0x08000, CRC(10263746) SHA1(1f981fb185c6a9795208ecdcfba36cf892a99ed5) ) // == epr-11860.a10
 	ROM_LOAD( "epr-a-11.bin", 0x40000, 0x08000, CRC(38b54a71) SHA1(68ec4ef5b115844214ff2213be1ce6678904fbd2) ) // == epr-11861.a11
 
-	ROM_LOAD( "epr-11857.a7",  0x00000, 0x08000, CRC(789edc06) SHA1(8c89c94e503513c287807d187de78a7fbd75a7cf) ) // temporary (from parent until above is decrypted)
-
 	ROM_REGION( 0x2000, "mcu", 0 ) // MC8123 key
-	ROM_LOAD( "cencourt_mc8123.key",  0x0000, 0x2000, NO_DUMP)
+	ROM_LOAD( "317-xxxx.key",  0x0000, 0x2000, CRC(2be5c90b) SHA1(e98d989237f2b001950b876efdb21c1507162830) )
 ROM_END
 
 
@@ -6712,6 +6705,12 @@ DRIVER_INIT_MEMBER(segas16b_state,passshtj_5358)
 	m_custom_io_r = read16_delegate(FUNC(segas16b_state::passshtj_custom_io_r), this);
 }
 
+DRIVER_INIT_MEMBER(segas16b_state,cencourt_5358)
+{
+	DRIVER_INIT_CALL(passshtj_5358);
+	mc8123_decrypt_rom(machine(), "soundcpu", "mcu", NULL, 0);
+}
+
 DRIVER_INIT_MEMBER(segas16b_state,sdi_5358_small)
 {
 	DRIVER_INIT_CALL(generic_5358_small);
@@ -6840,7 +6839,7 @@ GAME( 1989, mvpj,       mvp,      system16b_fd1094,     mvp,     segas16b_state,
 GAME( 1988, passsht,    0,        system16b_fd1094,    passsht,  segas16b_state,generic_5358,       ROT270, "Sega", "Passing Shot (World, 2 Players, FD1094 317-0080)", 0 )
 GAME( 1988, passshta,   passsht,  system16b_fd1094,    passshtj, segas16b_state,passshtj_5358,      ROT270, "Sega", "Passing Shot (World, 4 Players, FD1094 317-0074)", 0 )
 GAME( 1988, passshtj,   passsht,  system16b_fd1094,    passshtj, segas16b_state,passshtj_5358,      ROT270, "Sega", "Passing Shot (Japan, 4 Players, FD1094 317-0070)", 0 )
-GAME( 1988, cencourt,   passsht,  system16b,           cencourt, segas16b_state,passshtj_5358,      ROT270, "Sega", "Center Court (prototype, MC-8123B)", 0 )
+GAME( 1988, cencourt,   passsht,  system16b,           cencourt, segas16b_state,cencourt_5358,      ROT270, "Sega", "Center Court (prototype, MC-8123B)", 0 )
 
 GAME( 1991, riotcity,   0,        system16b,           riotcity, segas16b_state,generic_5704,       ROT0,   "Sega / Westone", "Riot City (Japan)", 0 )
 
