@@ -282,7 +282,9 @@ ToDo:
     data, though track 0 is just a disk "unique" identifier for the cat
     meaning 404480 usable bytes
   * (Once the floppy is working I'd declare the system working)
-- Centronics port finishing touches: verify where the paper out, slct/err, and IPP pins map in memory
+- Centronics port finishing touches: verify where the paper out, slct/err, and
+  IPP pins map in memory. The firmware doesn't actually use them, but they must
+  map somewhere as they connect to the ASIC.
 - RS232C port and Modem "port" connected to the DUART's two ports
   These are currently optionally debug-logged but don't connect anywhere
 - DTMF generator chip (connected to DUART 'user output' pins OP4,5,6,7)
@@ -314,7 +316,7 @@ ToDo:
 
 * Swyft
 - Figure out the keyboard (interrupts are involved? or maybe an NMI on a
-  timer/vblank? It iss possible this uses a similar 'keyboard read int'
+  timer/vblank? It is possible this uses a similar 'keyboard read int'
   to what the cat does)
 - get the keyboard scanning actually working; the VIAs are going nuts right now.
 - Beeper (on one of the vias?)
@@ -705,11 +707,11 @@ READ16_MEMBER( cat_state::cat_keyboard_r )
 {
 	UINT16 retVal = 0;
 	// Read country code
-	if (m_pr_cont == 0x0900)
+	if ((m_pr_cont&0xFF00) == 0x0900)
 		retVal = m_dipsw->read();
 
 	// Regular keyboard read
-	if (m_pr_cont == 0x0800 || m_pr_cont == 0x0a00)
+	if ((m_pr_cont&0xFF00) == 0x0800 || (m_pr_cont&0xFF00) == 0x0a00)
 	{
 		retVal=0xff00;
 		switch(m_keyboard_line)
@@ -725,7 +727,7 @@ READ16_MEMBER( cat_state::cat_keyboard_r )
 		}
 	}
 #if 0
-	if ((m_pr_cont != 0x0800) && (m_pr_cont != 0x0900) && (m_pr_cont != 0x0a00))
+	if (((m_pr_cont&0xFF00) != 0x0800) && ((m_pr_cont&0xFF00) != 0x0900) && ((m_pr_cont&0xFF00) != 0x0a00))
 	{
 		fprintf(stderr,"Read from keyboard in %06X with unexpected pr_cont %04X\n", 0x80000a+(offset<<1), m_pr_cont);
 	}
@@ -938,7 +940,6 @@ static ADDRESS_MAP_START(cat_mem, AS_PROGRAM, 16, cat_state)
 	AM_RANGE(0x80000c, 0x80000d) AM_READ(cat_0080_r) AM_MIRROR(0x18FFE0) // Open bus?
 	AM_RANGE(0x80000e, 0x80000f) AM_READWRITE(cat_battery_r,cat_printer_control_w) AM_MIRROR(0x18FFE0) // Centronics Printer Control, keyboard led and country code enable
 	AM_RANGE(0x800010, 0x80001f) AM_READ(cat_0080_r) AM_MIRROR(0x18FFE0) // Open bus?
-	//AM_RANGE(0x810000, 0x81001f) AM_DEVREADWRITE8("duartn68681", mc68681_device, read, write, 0xff00 ) AM_MIRROR(0x18FFE0)
 	AM_RANGE(0x810000, 0x81001f) AM_DEVREADWRITE8("duartn68681", mc68681_device, read, write, 0xff ) AM_MIRROR(0x18FFE0)
 	AM_RANGE(0x820000, 0x82003f) AM_READWRITE(cat_modem_r,cat_modem_w) AM_MIRROR(0x18FFC0) // AMI S35213 Modem Chip, all access is on bit 7
 	AM_RANGE(0x830000, 0x830001) AM_READ(cat_6ms_counter_r) AM_MIRROR(0x18FFFE) // 16bit 6ms counter clocked by output of another 16bit counter clocked at 10mhz
