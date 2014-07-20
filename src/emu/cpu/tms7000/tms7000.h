@@ -23,6 +23,7 @@
 #define __TMS7000_H__
 
 #include "emu.h"
+#include "debugger.h"
 
 
 enum { TMS7000_PC=1, TMS7000_SP, TMS7000_ST };
@@ -57,7 +58,7 @@ public:
 	tms7000_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	tms7000_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, address_map_constructor internal, UINT32 info_flags, const char *shortname, const char *source);
 
-	DECLARE_READ8_MEMBER(tms7000_unmapped_rf_r) { logerror("'%s' (%04X): unmapped_rf_r @ $%04x\n", tag(), m_pc, offset + 0x80); return 0; };
+	DECLARE_READ8_MEMBER(tms7000_unmapped_rf_r) { if (!space.debugger_access()) logerror("'%s' (%04X): unmapped_rf_r @ $%04x\n", tag(), m_pc, offset + 0x80); return 0; };
 	DECLARE_WRITE8_MEMBER(tms7000_unmapped_rf_w) { logerror("'%s' (%04X): unmapped_rf_w @ $%04x = $%02x\n", tag(), m_pc, offset + 0x80, data); };
 
 	DECLARE_READ8_MEMBER(tms7000_pf_r);

@@ -20,14 +20,13 @@
  *
  *  TODO:
  *  - dump CROM and emulate cpu at microinstruction level
- *  - memory modes with IOCNT0, currently ignored
+ *  - memory modes with IOCNT0, currently always running in full expansion mode
  *  - timer event counter mode (timer control register, bit 6)
  *  - TMS70x1/2 serial port and timer 3
  *  - when they're needed, add TMS70Cx2, TMS7742, TMS77C82, SE70xxx
  *
  *****************************************************************************/
 
-#include "debugger.h"
 #include "tms7000.h"
 
 // 7000 is the most basic one, 128 bytes internal RAM and no internal ROM.
@@ -54,6 +53,9 @@ const device_type TMS7001 = &device_creator<tms7001_device>;
 const device_type TMS7041 = &device_creator<tms7041_device>;
 const device_type TMS7002 = &device_creator<tms7002_device>;
 const device_type TMS7042 = &device_creator<tms7042_device>;
+
+// 70Cx2 is an update to 70x2 with some extra features. Due to some changes
+// in peripheral file I/O, it is not backward compatible to 70x2.
 
 
 // flag helpers
@@ -514,7 +516,9 @@ READ8_MEMBER(tms7000_device::tms7000_pf_r)
 		{
 			// note: port B is write-only, reading it returns the output value as if ddr is 0xff
 			int port = offset / 2 - 2;
-			return (m_io->read_byte(port) & ~m_port_ddr[port]) | (m_port_latch[port] & m_port_ddr[port]);
+			if (!space.debugger_access())
+				return (m_io->read_byte(port) & ~m_port_ddr[port]) | (m_port_latch[port] & m_port_ddr[port]);
+			break;
 		}
 		
 		// port direction (note: 7000 doesn't support it for port A)
@@ -522,7 +526,8 @@ READ8_MEMBER(tms7000_device::tms7000_pf_r)
 			return m_port_ddr[offset / 2 - 2];
 
 		default:
-			logerror("'%s' (%04X): tms7000_pf_r @ $%04x\n", tag(), m_pc, offset);
+			if (!space.debugger_access())
+				logerror("'%s' (%04X): tms7000_pf_r @ $%04x\n", tag(), m_pc, offset);
 			break;
 	}
 

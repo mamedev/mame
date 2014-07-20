@@ -50,13 +50,13 @@
   provided that the machine is turned off properly. If a program is running,
   you may have to press BREAK before turning the CC-40 off.
   
-  To run a cartridge that doesn't automatically boot, use the command
-  run"dir" to see which program(s) can be loaded. Load a program with
-  run"<shortname of program in list>"
+  To run a cartridge, usually the command run"dir" shows which program(s)
+  can be loaded. Load a program by pressing the RUN key while viewing the list,
+  or manually with the command run"<shortname of program in list>"
 
 
   TODO:
-  - some strange bugs with cartridge software, maybe TMS7000 bug?
+  - some strange bugs with Games I cartridge, bad dump or emulation bug?
   - other RAM configurations (6KB(default), 12KB, 18KB, external)
   - Hexbus interface and peripherals
   - HD44100 is not accessed by the CPU, is it connected to the HD44780?
@@ -309,9 +309,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, cc40_state )
 	AM_RANGE(0x1000, 0x17ff) AM_RAM AM_SHARE("nvram2")
 	AM_RANGE(0x3000, 0x37ff) AM_RAM AM_SHARE("nvram3")
 
-	AM_RANGE(0x0000, 0x4fff) AM_UNMAP // cartridge rom is at $5000-$cfff - direct address, not relative
-	AM_RANGE(0x0000, 0xcfff) AM_MASK(0x7fff) AM_ROMBANK("cartbank")
-
+	AM_RANGE(0x5000, 0xcfff) AM_ROMBANK("cartbank")
 	AM_RANGE(0xd000, 0xefff) AM_ROMBANK("sysbank")
 ADDRESS_MAP_END
 
