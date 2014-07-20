@@ -1049,6 +1049,7 @@ avigo_it     // 1997 Avigo (Italian)
 
 // Texas Instruments Calculators
 ti73      // 1990 TI-73
+ti74      // 1986 TI-74
 ti81      // 1990 TI-81 (Z80 2 MHz)
 ti81v2  // 1990 TI-81 (Z80 2 MHz)
 ti85      // 1992 TI-85 (Z80 6 MHz)
@@ -1065,6 +1066,10 @@ ti92p    // 1999 TI-92 Plus
 v200      // 2002 Voyage 200 PLT
 ti89t    // 2004 TI-89 Titanium
 evmbug
+
+// Exelvision (founded by former TI employees)
+exl100
+exeltel
 
 // NEC
 pc6001
@@ -1848,10 +1853,6 @@ poly8813
 
 // Bondwell
 bw2
-
-// Exeltel
-exl100
-exeltel
 
 // Comx World Operations Ltd
 comx35p
