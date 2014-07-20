@@ -2,27 +2,23 @@
 <mamelayout version="2">
 
 	<element name="static_black">
-		<rect>
-			<color red="0.0" green="0.0" blue="0.0" />
-		</rect>
+		<rect><color red="0.0" green="0.0" blue="0.0" /></rect>
 	</element>
 	<element name="static_orange">
-		<rect>
-			<color red="0.85" green="0.30" blue="0.10" />
-		</rect>
+		<rect><color red="0.85" green="0.30" blue="0.10" /></rect>
 	</element>
 	<element name="static_blue">
-		<rect>
-			<color red="0.08" green="0.17" blue="0.52" />
-		</rect>
+		<rect><color red="0.08" green="0.17" blue="0.52" /></rect>
 	</element>
 
 	<element name="text1">
+		<rect><color red="0.08" green="0.17" blue="0.52" /></rect>
 		<text string="FORMATION">
 			<color red="1.0" green="1.0" blue="1.0" />
 		</text>
 	</element>
 	<element name="text2">
+		<rect><color red="0.08" green="0.17" blue="0.52" /></rect>
 		<text string="NUMBER">
 			<color red="1.0" green="1.0" blue="1.0" />
 		</text>

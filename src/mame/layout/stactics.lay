@@ -85,6 +85,9 @@
 		</text>
 	</element>
 	<element name="energy_b_text">
+		<rect>
+			<color red="1.0" green="1.0" blue="0" />
+		</rect>
 		<text string="ENERGY BARRIER BUTTON">
 			<color red="0" green="0" blue="0" />
 		</text>
@@ -469,7 +472,7 @@
 					<bounds x="-60" y="604" width="200" height="24" />
 		</bezel>
 		<bezel element="energy_b_text">
-					<bounds x="-60" y="608" width="216" height="15" />
+					<bounds x="-59" y="608" width="198" height="15" />
 		</bezel>
 
 		<bezel name="barrier_lamp" element="yellow_disc">

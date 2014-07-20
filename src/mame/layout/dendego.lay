@@ -4,61 +4,36 @@
 <!-- define elements -->
 
 	<element name="static_black">
-		<rect>
-			<color red="0.0" green="0.0" blue="0.0" />
-		</rect>
+		<rect><color red="0.0" green="0.0" blue="0.0" /></rect>
 	</element>
 	<element name="static_darkgray">
-		<rect>
-			<color red="0.25" green="0.25" blue="0.25" />
-		</rect>
+		<rect><color red="0.25" green="0.25" blue="0.25" /></rect>
 	</element>
 	<element name="static_lightgray">
-		<rect>
-			<color red="0.6" green="0.6" blue="0.6" />
-		</rect>
+		<rect><color red="0.6" green="0.6" blue="0.6" /></rect>
 	</element>
 	<element name="static_white">
-		<rect>
-			<color red="0.85" green="0.85" blue="0.85" />
-		</rect>
+		<rect><color red="0.85" green="0.85" blue="0.85" /></rect>
 	</element>
 	<element name="static_yellow">
-		<rect>
-			<color red="0.8" green="0.8" blue="0.1" />
-		</rect>
+		<rect><color red="0.8" green="0.8" blue="0.1" /></rect>
 	</element>
 	<element name="static_blue">
-		<rect>
-			<color red="0.2" green="0.5" blue="0.8" />
-		</rect>
+		<rect><color red="0.2" green="0.5" blue="0.8" /></rect>
 	</element>
 
 
 <!-- panel text -->
 
-	<element name="text_power">
-		<text string="PWR">
-			<color red="0.0" green="0.0" blue="0.0" />
-		</text>
-	</element>
-	<element name="text_normal">
-		<text string="OK">
-			<color red="0.0" green="0.0" blue="0.0" />
-		</text>
-	</element>
-	<element name="text_emergency">
-		<text string="EME">
-			<color red="0.0" green="0.0" blue="0.0" />
-		</text>
-	</element>
 	<element name="text_door">
+		<rect><color red="0.6" green="0.6" blue="0.6" /></rect>
 		<text string="doors" align="1">
 			<color red="0.0" green="0.0" blue="0.0" />
 		</text>
 	</element>
 
 	<element name="text_lets">
+		<rect><color red="0.85" green="0.85" blue="0.85" /></rect>
 		<text string="LET'S GO BY TRAIN!" align="1">
 			<color red="0.3" green="0.6" blue="0.9" />
 		</text>
@@ -68,32 +43,38 @@
 <!-- throttle -->
 
 	<element name="text_throttle">
+		<rect><color red="0.25" green="0.25" blue="0.25" /></rect>
 		<text string="THROTTLE:" align="1">
 			<color red="0.8" green="0.8" blue="0.8" />
 		</text>
 	</element>
 	<element name="text_dot">
+		<rect><color red="0.25" green="0.25" blue="0.25" /></rect>
 		<text string="." align="1">
 			<color red="1.0" green="1.0" blue="0.0" />
 		</text>
 	</element>
 	<element name="text_kmh">
+		<rect><color red="0.25" green="0.25" blue="0.25" /></rect>
 		<text string="km/h" align="1">
 			<color red="1.0" green="1.0" blue="0.0" />
 		</text>
 	</element>
 
 	<element name="counter_throttle" defstate="0">
+		<rect><color red="0.25" green="0.25" blue="0.25" /></rect>
 		<simplecounter maxstate="9" digits="1" align="1">
 			<color red="1.0" green="1.0" blue="1.0" />
 		</simplecounter>
 	</element>
 	<element name="counter_speed1" defstate="0">
+		<rect><color red="0.25" green="0.25" blue="0.25" /></rect>
 		<simplecounter maxstate="999" digits="3" align="1">
 			<color red="1.0" green="1.0" blue="0.0" />
 		</simplecounter>
 	</element>
 	<element name="counter_speed2" defstate="0">
+		<rect><color red="0.25" green="0.25" blue="0.25" /></rect>
 		<simplecounter maxstate="9" digits="1" align="1">
 			<color red="1.0" green="1.0" blue="0.0" />
 		</simplecounter>
@@ -103,22 +84,26 @@
 <!-- brake -->
 
 	<element name="text_brake">
+		<rect><color red="0.25" green="0.25" blue="0.25" /></rect>
 		<text string="BRAKE:" align="1">
 			<color red="0.8" green="0.8" blue="0.8" />
 		</text>
 	</element>
 	<element name="text_kpa">
+		<rect><color red="0.25" green="0.25" blue="0.25" /></rect>
 		<text string="kPa" align="1">
 			<color red="1.0" green="1.0" blue="0.0" />
 		</text>
 	</element>
 
 	<element name="counter_brake" defstate="0">
+		<rect><color red="0.25" green="0.25" blue="0.25" /></rect>
 		<simplecounter maxstate="99" digits="2" align="1">
 			<color red="1.0" green="1.0" blue="1.0" />
 		</simplecounter>
 	</element>
 	<element name="counter_pressure" defstate="0">
+		<rect><color red="0.25" green="0.25" blue="0.25" /></rect>
 		<simplecounter maxstate="9999" digits="4" align="1">
 			<color red="1.0" green="1.0" blue="0.0" />
 		</simplecounter>
@@ -128,37 +113,47 @@
 <!-- lamps -->
 
 	<element name="lamp_rect_white" defstate="0">
-		<rect state="1">
-			<color red="1.0" green="1.0" blue="1.0" />
-		</rect>
-		<rect state="0">
-			<color red="0.2" green="0.2" blue="0.2" />
-		</rect>
+		<rect state="1"><color red="1.0" green="1.0" blue="1.0" /></rect>
+		<rect state="0"><color red="0.2" green="0.2" blue="0.2" /></rect>
 	</element>
-	<element name="lamp_rect_red" defstate="0">
-		<rect state="1">
-			<color red="1.0" green="0.1" blue="0.1" />
-		</rect>
-		<rect state="0">
-			<color red="0.3" green="0.0" blue="0.0" />
-		</rect>
+
+	<element name="lamp_power" defstate="0">
+		<rect state="1"><color red="1.0" green="1.0" blue="1.0" /></rect>
+		<rect state="0"><color red="0.2" green="0.2" blue="0.2" /></rect>
+		<text string="PWR">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.333" width="1.0" height="0.333" />
+		</text>
 	</element>
+
+	<element name="lamp_normal" defstate="0">
+		<rect state="1"><color red="1.0" green="1.0" blue="1.0" /></rect>
+		<rect state="0"><color red="0.2" green="0.2" blue="0.2" /></rect>
+		<text string="OK">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.333" width="1.0" height="0.333" />
+		</text>
+	</element>
+
+	<element name="lamp_emergency" defstate="0">
+		<rect state="1"><color red="1.0" green="0.1" blue="0.1" /></rect>
+		<rect state="0"><color red="0.3" green="0.0" blue="0.0" /></rect>
+		<text string="EME">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.333" width="1.0" height="0.333" />
+		</text>
+	</element>
+
 	<element name="lamp_disk_white" defstate="0">
-		<disk state="1">
-			<color red="1.0" green="1.0" blue="1.0" />
-		</disk>
-		<disk state="0">
-			<color red="0.2" green="0.2" blue="0.2" />
-		</disk>
+		<disk state="1"><color red="1.0" green="1.0" blue="1.0" /></disk>
+		<disk state="0"><color red="0.2" green="0.2" blue="0.2" /></disk>
 	</element>
+
 	<element name="lamp_disk_yellow" defstate="0">
-		<disk state="1">
-			<color red="1.0" green="1.0" blue="0.3" />
-		</disk>
-		<disk state="0">
-			<color red="0.2" green="0.2" blue="0.0" />
-		</disk>
+		<disk state="1"><color red="1.0" green="1.0" blue="0.3" /></disk>
+		<disk state="0"><color red="0.2" green="0.2" blue="0.0" /></disk>
 	</element>
+
 	<element name="lamp_disk_red" defstate="0">
 		<disk>
 			<color red="0.0" green="0.0" blue="0.0" />
@@ -202,41 +197,32 @@
 			<bounds left="245" right="380" top="302" bottom="330" />
 		</bezel>
 		<bezel element="static_black">
-			<bounds left="245" right="245.5" top="302" bottom="330" />
+			<bounds left="244.75" right="245.5" top="302" bottom="330" />
 		</bezel>
 		<bezel element="static_black">
-			<bounds left="380" right="380.5" top="302" bottom="330" />
+			<bounds left="379.25" right="380.5" top="302" bottom="330" />
 		</bezel>
 		<bezel element="static_blue">
 			<bounds left="360" right="380" top="302" bottom="330" />
 		</bezel>
 
 		<bezel element="text_lets">
-			<bounds x="264" y="306" width="120" height="10" />
+			<bounds x="264" y="306" width="85" height="10" />
 		</bezel>
 
 
 <!-- lamps -->
 
-		<bezel name="lamp4" element="lamp_rect_white">
+		<bezel name="lamp4" element="lamp_power">
 			<bounds x="8" y="304" width="17" height="24" />
 		</bezel>
-		<bezel element="text_power">
-			<bounds x="8" y="312" width="17" height="9" />
-		</bezel>
 
-		<bezel name="lamp2" element="lamp_rect_white">
+		<bezel name="lamp2" element="lamp_normal">
 			<bounds x="31" y="304" width="17" height="24" />
 		</bezel>
-		<bezel element="text_normal">
-			<bounds x="31" y="312" width="17" height="9" />
-		</bezel>
 
-		<bezel name="lamp3" element="lamp_rect_red">
+		<bezel name="lamp3" element="lamp_emergency">
 			<bounds x="54" y="304" width="17" height="24" />
-		</bezel>
-		<bezel element="text_emergency">
-			<bounds x="54" y="312" width="17" height="9" />
 		</bezel>
 
 		<bezel name="lamp1" element="lamp_disk_white">
@@ -287,14 +273,14 @@
 			<bounds x="180" y="306" width="40" height="10" />
 		</bezel>
 		<bezel name="counter1" element="counter_brake">
-			<bounds x="209" y="306" width="20" height="10" />
+			<bounds x="209" y="306" width="12" height="10" />
 		</bezel>
 
 		<bezel name="counter4" element="counter_pressure">
 			<bounds x="180" y="316" width="30" height="10" />
 		</bezel>
 		<bezel element="text_kpa">
-			<bounds x="201" y="316" width="30" height="10" />
+			<bounds x="201" y="316" width="18" height="10" />
 		</bezel>
 
 	</view>

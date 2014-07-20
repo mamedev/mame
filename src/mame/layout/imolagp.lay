@@ -10,59 +10,39 @@
 	</element>
 
 	<element name="static_black">
-		<rect>
-			<color red="0.0" green="0.0" blue="0.0" />
-		</rect>
+		<rect><color red="0.0" green="0.0" blue="0.0" /></rect>
 	</element>
 
 	<element name="static_gray">
-		<rect>
-			<color red="0.6" green="0.6" blue="0.6" />
-		</rect>
+		<rect><color red="0.6" green="0.6" blue="0.6" /></rect>
 	</element>
 
 	<element name="static_white">
-		<rect>
-			<color red="0.95" green="0.95" blue="0.95" />
-		</rect>
+		<rect><color red="0.95" green="0.95" blue="0.95" /></rect>
 	</element>
 	<element name="disk_white">
-		<disk>
-			<color red="0.95" green="0.95" blue="0.95" />
-		</disk>
+		<disk><color red="0.95" green="0.95" blue="0.95" /></disk>
 	</element>
 
 	<element name="static_red">
-		<rect>
-			<color red="0.8" green="0.1" blue="0.0" />
-		</rect>
+		<rect><color red="0.8" green="0.1" blue="0.0" /></rect>
 	</element>
 	<element name="disk_red">
-		<disk>
-			<color red="0.8" green="0.1" blue="0.0" />
-		</disk>
+		<disk><color red="0.8" green="0.1" blue="0.0" /></disk>
 	</element>
 
 	<element name="static_green">
-		<rect>
-			<color red="0.15" green="0.8" blue="0.1" />
-		</rect>
+		<rect><color red="0.15" green="0.8" blue="0.1" /></rect>
 	</element>
 	<element name="disk_green">
-		<disk>
-			<color red="0.15" green="0.8" blue="0.1" />
-		</disk>
+		<disk><color red="0.15" green="0.8" blue="0.1" /></disk>
 	</element>
 
 	<element name="static_yellow">
-		<rect>
-			<color red="0.8" green="0.75" blue="0.1" />
-		</rect>
+		<rect><color red="0.8" green="0.75" blue="0.1" /></rect>
 	</element>
 	<element name="disk_yellow">
-		<disk>
-			<color red="0.8" green="0.75" blue="0.1" />
-		</disk>
+		<disk><color red="0.8" green="0.75" blue="0.1" /></disk>
 	</element>
 
 
@@ -86,53 +66,63 @@
 	</element>
 
 	<element name="text_s">
+		<rect><color red="0.8" green="0.1" blue="0.0" /></rect>
 		<text string="S">
 			<color red="1.0" green="1.0" blue="1.0" />
 		</text>
 	</element>
 	<element name="text_c">
+		<rect><color red="0.8" green="0.1" blue="0.0" /></rect>
 		<text string="C">
 			<color red="1.0" green="1.0" blue="1.0" />
 		</text>
 	</element>
 	<element name="text_o">
+		<rect><color red="0.8" green="0.1" blue="0.0" /></rect>
 		<text string="O">
 			<color red="1.0" green="1.0" blue="1.0" />
 		</text>
 	</element>
 	<element name="text_r">
+		<rect><color red="0.8" green="0.1" blue="0.0" /></rect>
 		<text string="R">
 			<color red="1.0" green="1.0" blue="1.0" />
 		</text>
 	</element>
 	<element name="text_e">
+		<rect><color red="0.8" green="0.1" blue="0.0" /></rect>
 		<text string="E">
 			<color red="1.0" green="1.0" blue="1.0" />
 		</text>
 	</element>
 
 	<element name="text_i">
+		<rect><color red="0.8" green="0.1" blue="0.0" /></rect>
 		<text string="I">
 			<color red="1.0" green="1.0" blue="1.0" />
 		</text>
 	</element>
 	<element name="text_n">
+		<rect><color red="0.8" green="0.1" blue="0.0" /></rect>
 		<text string="N">
 			<color red="1.0" green="1.0" blue="1.0" />
 		</text>
 	</element>
 	<element name="text_f">
+		<rect><color red="0.8" green="0.1" blue="0.0" /></rect>
 		<text string="F">
 			<color red="1.0" green="1.0" blue="1.0" />
 		</text>
 	</element>
 
 	<element name="text_h">
+		<rect><color red="0.8" green="0.1" blue="0.0" /></rect>
 		<text string="H">
 			<color red="1.0" green="1.0" blue="1.0" />
 		</text>
 	</element>
 	<element name="text_g">
+		<rect><color red="0.8" green="0.1" blue="0.0" /></rect>
 		<text string="G">
 			<color red="1.0" green="1.0" blue="1.0" />
 		</text>
@@ -491,34 +481,34 @@
 			<bounds x="199" y="-115" width="14" height="99" />
 		</bezel>
 		<bezel element="text_h">
-			<bounds x="199" y="-113" width="14" height="9" />
+			<bounds x="200" y="-113" width="12" height="9" />
 		</bezel>
 		<bezel element="text_i">
-			<bounds x="199" y="-103.5" width="14" height="9" />
+			<bounds x="200" y="-103.5" width="12" height="9" />
 		</bezel>
 		<bezel element="text_g">
-			<bounds x="199" y="-94" width="14" height="9" />
+			<bounds x="200" y="-94" width="12" height="9" />
 		</bezel>
 		<bezel element="text_h">
-			<bounds x="199" y="-84.5" width="14" height="9" />
+			<bounds x="200" y="-84.5" width="12" height="9" />
 		</bezel>
 		<bezel element="text_s">
-			<bounds x="199" y="-75" width="14" height="9" />
+			<bounds x="200" y="-75" width="12" height="9" />
 		</bezel>
 		<bezel element="text_c">
-			<bounds x="199" y="-65.5" width="14" height="9" />
+			<bounds x="200" y="-65.5" width="12" height="9" />
 		</bezel>
 		<bezel element="text_o">
-			<bounds x="199" y="-56" width="14" height="9" />
+			<bounds x="200" y="-56" width="12" height="9" />
 		</bezel>
 		<bezel element="text_r">
-			<bounds x="199" y="-46.5" width="14" height="9" />
+			<bounds x="200" y="-46.5" width="12" height="9" />
 		</bezel>
 		<bezel element="text_e">
-			<bounds x="199" y="-37" width="14" height="9" />
+			<bounds x="200" y="-37" width="12" height="9" />
 		</bezel>
 		<bezel element="text_s">
-			<bounds x="199" y="-27.5" width="14" height="9" />
+			<bounds x="200" y="-27.5" width="12" height="9" />
 		</bezel>
 
 
