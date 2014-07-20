@@ -17584,7 +17584,7 @@ more investigation needed...
 	</software>
 
 	<software name="mariowar">
-		<description>Mario to Wario (Jpn)</description>
+		<description>Mario &amp; Wario (Jpn)</description>
 		<year>1993</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="SHVC-WE" />
@@ -17605,7 +17605,7 @@ more investigation needed...
 	</software>
 
 	<software name="mariowara" cloneof="mariowar">
-		<description>Mario to Wario (Jpn, Alt)</description>
+		<description>Mario &amp; Wario (Jpn, Alt)</description>
 		<year>1993</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="SHVC-WE" />
