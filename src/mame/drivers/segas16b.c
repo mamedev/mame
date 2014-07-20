@@ -5476,10 +5476,11 @@ ROM_START( passshtj )
 ROM_END
 
 //*************************************************************************************************************************
-//  Center Court, Sega System 16B
+//  Center Court (World, 4 Players - Prototype / Location Test), Sega System 16B
 //  CPU: 68000 + MC8123 (handwritten label "CENTER COURT 7/13 - '88")
 //  ROM Board No. 171-5358 (with a Sega ID sticker 834-6618-01, conversion or actual Sega ID# ???)
-//  Note: prototype board, checksums handwritten on prg roms, EPR stickers present on other roms, but handwritten locations instead of numbers
+//  Note: prototype; checksums handwritten on prg roms, EPR stickers present on other roms, but handwritten locations instead of numbers
+//        The PCB was found in a 4 player cocktail cabinet with full Center Court artwork & instruction cards - Likely a location test unit.
 //
 ROM_START( cencourt )
 	ROM_REGION( 0x20000, "maincpu", 0 ) // 68000 code
@@ -6839,7 +6840,7 @@ GAME( 1989, mvpj,       mvp,      system16b_fd1094,     mvp,     segas16b_state,
 GAME( 1988, passsht,    0,        system16b_fd1094,    passsht,  segas16b_state,generic_5358,       ROT270, "Sega", "Passing Shot (World, 2 Players, FD1094 317-0080)", 0 )
 GAME( 1988, passshta,   passsht,  system16b_fd1094,    passshtj, segas16b_state,passshtj_5358,      ROT270, "Sega", "Passing Shot (World, 4 Players, FD1094 317-0074)", 0 )
 GAME( 1988, passshtj,   passsht,  system16b_fd1094,    passshtj, segas16b_state,passshtj_5358,      ROT270, "Sega", "Passing Shot (Japan, 4 Players, FD1094 317-0070)", 0 )
-GAME( 1988, cencourt,   passsht,  system16b,           cencourt, segas16b_state,cencourt_5358,      ROT270, "Sega", "Center Court (prototype, MC-8123B)", 0 )
+GAME( 1988, cencourt,   passsht,  system16b,           cencourt, segas16b_state,cencourt_5358,      ROT270, "Sega", "Center Court (World, 4 Players, prototype, MC-8123B)", 0 )
 
 GAME( 1991, riotcity,   0,        system16b,           riotcity, segas16b_state,generic_5704,       ROT0,   "Sega / Westone", "Riot City (Japan)", 0 )
 
