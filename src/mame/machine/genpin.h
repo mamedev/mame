@@ -14,9 +14,10 @@ static const char *const genpin_sample_names[] =
 	"chime1",
 	"chime2",
 	"chime3",
-	"coinin",
+	"chime4",
 	"hole",
 	"knocker",
+	"coinin",
 	0   /* end of array */
 };
 
@@ -34,8 +35,8 @@ class genpin_class : public driver_device
 {
 public:
 	genpin_class(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-	m_samples(*this, "samples")
+		: driver_device(mconfig, type, tag)
+		, m_samples(*this, "samples")
 	{ }
 
 	required_device<samples_device> m_samples;
