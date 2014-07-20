@@ -6475,6 +6475,22 @@
 		</part>
 	</software>
 
+	<software name="supsnap5" cloneof="snapshot" supported="no">
+		<description>Super Snapshot (v5.x)</description>
+		<year>1989</year>
+		<publisher>LMS Tech</publisher>
+
+		<part name="cart" interface="c64_cart">
+			<feature name="slot" value="supersnap5" />
+			<feature name="exrom" value="1" />
+			<feature name="game" value="1" />
+
+			<dataarea name="roml" size="0x10000">
+				<rom name="2c" size="0x10000" crc="6766ae59" sha1="43f3ba654be03eec0d52e4790b39bea9383bd2b2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="supsnap501" cloneof="snapshot" supported="no">
 		<description>Super Snapshot (v5.01, NTSC)</description>
 		<year>1990</year>
