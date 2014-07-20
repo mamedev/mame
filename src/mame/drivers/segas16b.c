@@ -5477,39 +5477,39 @@ ROM_END
 
 //*************************************************************************************************************************
 //  Center Court, Sega System 16B
-//  CPU: 68000 + MC8123 (317-???? - what is the label?)
-//  ROM Board No. 171-5358
+//  CPU: 68000 + MC8123 (handwritten label "CENTER COURT 7/13 - '88")
+//  ROM Board No. 171-5358 (with a Sega ID sticker 834-6618-01, conversion or actual Sega ID# ???)
 //  Note: prototype board, checksums handwritten on prg roms, EPR stickers present on other roms, but handwritten locations instead of numbers
 //
 ROM_START( cencourt )
 	ROM_REGION( 0x20000, "maincpu", 0 ) // 68000 code
-	ROM_LOAD16_BYTE( "a4_56f6.bin", 0x000000, 0x10000, CRC(7116dce6) SHA1(058faf5f1980f811e2e1d5f7d09660ff51b0c0dc) )
-	ROM_LOAD16_BYTE( "a1_478b.bin", 0x000001, 0x10000, CRC(37beb770) SHA1(694a7f7977226997e06a198b311b355505e45b0b) )
+	ROM_LOAD16_BYTE( "a4_56f6.a4", 0x000000, 0x10000, CRC(7116dce6) SHA1(058faf5f1980f811e2e1d5f7d09660ff51b0c0dc) )
+	ROM_LOAD16_BYTE( "a1_478b.a1", 0x000001, 0x10000, CRC(37beb770) SHA1(694a7f7977226997e06a198b311b355505e45b0b) )
 
 	ROM_REGION( 0x30000, "gfx1", 0 ) // tiles
-	ROM_LOAD( "epr-b-9.bin",  0x00000, 0x10000, CRC(9a55cd88) SHA1(4a6cf4aa5dde8d50148381aee8c141c98bb86fe8) )
-	ROM_LOAD( "epr-b-10.bin", 0x10000, 0x10000, CRC(fc13ca35) SHA1(3dc9d7c7f28d5605c6ce93243c79f63839aec8f4) )
-	ROM_LOAD( "epr-b-11.bin", 0x20000, 0x10000, CRC(1503c203) SHA1(95e9634bdcfd8027c1b0a47fa87736180ec39b08) )
+	ROM_LOAD( "epr-b-9.b9",  0x00000, 0x10000, CRC(9a55cd88) SHA1(4a6cf4aa5dde8d50148381aee8c141c98bb86fe8) )
+	ROM_LOAD( "epr-b-10.b10", 0x10000, 0x10000, CRC(fc13ca35) SHA1(3dc9d7c7f28d5605c6ce93243c79f63839aec8f4) )
+	ROM_LOAD( "epr-b-11.b11", 0x20000, 0x10000, CRC(1503c203) SHA1(95e9634bdcfd8027c1b0a47fa87736180ec39b08) )
 
 	ROM_REGION16_BE( 0x80000, "sprites", 0 ) // sprites
-	ROM_LOAD16_BYTE( "epr-b-1.bin",  0x00001, 0x10000, CRC(b18bfccf) SHA1(7bce8da08849f5d0f580a2cdc905f0094c83fe13) )
-	ROM_LOAD16_BYTE( "epr-b-5.bin",  0x00000, 0x10000, CRC(3481a8e8) SHA1(13b972af6d4bc3d47258b3ff810e091f3b98a02b) )
-	ROM_LOAD16_BYTE( "epr-b-2.bin",  0x20001, 0x10000, CRC(61a996c0) SHA1(22fb91c1a0102a10b68133051c593eef8ac5748f) )
-	ROM_LOAD16_BYTE( "epr-b-6.bin",  0x20000, 0x10000, CRC(2116bcb1) SHA1(b5fee6b2dca5e51ff1e4d4466ca0802bef662bc4) )
-	ROM_LOAD16_BYTE( "epr-b-3.bin",  0x40001, 0x10000, CRC(69a2e109) SHA1(2a3c4af711c5cf02deaac5236c8088cdadcd85cd) )
-	ROM_LOAD16_BYTE( "epr-b-7.bin",  0x40000, 0x10000, CRC(ccf6b09f) SHA1(d8173b189356245a6b7bdec370829e8580b13c93) )
-	ROM_LOAD16_BYTE( "epr-b-4.bin",  0x60001, 0x10000, CRC(bdf63cd2) SHA1(2a7af7046d66a9542d8ae9fce93a6088a8ff0938) )
-	ROM_LOAD16_BYTE( "epr-b-8.bin",  0x60000, 0x10000, CRC(88a90641) SHA1(15c127a3cbf86807f181cb87967ce8825102b645) )
+	ROM_LOAD16_BYTE( "epr-b-1.b1",  0x00001, 0x10000, CRC(b18bfccf) SHA1(7bce8da08849f5d0f580a2cdc905f0094c83fe13) )
+	ROM_LOAD16_BYTE( "epr-b-5.b5",  0x00000, 0x10000, CRC(3481a8e8) SHA1(13b972af6d4bc3d47258b3ff810e091f3b98a02b) )
+	ROM_LOAD16_BYTE( "epr-b-2.b2",  0x20001, 0x10000, CRC(61a996c0) SHA1(22fb91c1a0102a10b68133051c593eef8ac5748f) )
+	ROM_LOAD16_BYTE( "epr-b-6.b6",  0x20000, 0x10000, CRC(2116bcb1) SHA1(b5fee6b2dca5e51ff1e4d4466ca0802bef662bc4) )
+	ROM_LOAD16_BYTE( "epr-b-3.b3",  0x40001, 0x10000, CRC(69a2e109) SHA1(2a3c4af711c5cf02deaac5236c8088cdadcd85cd) )
+	ROM_LOAD16_BYTE( "epr-b-7.b7",  0x40000, 0x10000, CRC(ccf6b09f) SHA1(d8173b189356245a6b7bdec370829e8580b13c93) )
+	ROM_LOAD16_BYTE( "epr-b-4.b4",  0x60001, 0x10000, CRC(bdf63cd2) SHA1(2a7af7046d66a9542d8ae9fce93a6088a8ff0938) )
+	ROM_LOAD16_BYTE( "epr-b-8.b8",  0x60000, 0x10000, CRC(88a90641) SHA1(15c127a3cbf86807f181cb87967ce8825102b645) )
 
 	ROM_REGION( 0x50000, "soundcpu", 0 ) // sound CPU
-	ROM_LOAD( "epr-a-7.bin",  0x00000, 0x08000, CRC(9e1b81c6) SHA1(fde901dad473c0b3fd3c153f0739998a67ed05d6) ) // encrypted
-	ROM_LOAD( "epr-a-8.bin",  0x10000, 0x08000, CRC(08ab0018) SHA1(0685f80a7d403208c9cfffea3f2035324f3924fe) ) // == epr-11858.a8
-	ROM_LOAD( "epr-a-9.bin",  0x20000, 0x08000, CRC(8673e01b) SHA1(e79183ab30e683fdf61ced2e9dbe010567c324cb) ) // == epr-11859.a9
-	ROM_LOAD( "epr-a-10.bin", 0x30000, 0x08000, CRC(10263746) SHA1(1f981fb185c6a9795208ecdcfba36cf892a99ed5) ) // == epr-11860.a10
-	ROM_LOAD( "epr-a-11.bin", 0x40000, 0x08000, CRC(38b54a71) SHA1(68ec4ef5b115844214ff2213be1ce6678904fbd2) ) // == epr-11861.a11
+	ROM_LOAD( "epr-a-7.a7",   0x00000, 0x08000, CRC(9e1b81c6) SHA1(fde901dad473c0b3fd3c153f0739998a67ed05d6) ) // encrypted
+	ROM_LOAD( "epr-a-8.a8",   0x10000, 0x08000, CRC(08ab0018) SHA1(0685f80a7d403208c9cfffea3f2035324f3924fe) ) // == epr-11858.a8
+	ROM_LOAD( "epr-a-9.a9",   0x20000, 0x08000, CRC(8673e01b) SHA1(e79183ab30e683fdf61ced2e9dbe010567c324cb) ) // == epr-11859.a9
+	ROM_LOAD( "epr-a-10.a10", 0x30000, 0x08000, CRC(10263746) SHA1(1f981fb185c6a9795208ecdcfba36cf892a99ed5) ) // == epr-11860.a10
+	ROM_LOAD( "epr-a-11.a11", 0x40000, 0x08000, CRC(38b54a71) SHA1(68ec4ef5b115844214ff2213be1ce6678904fbd2) ) // == epr-11861.a11
 
 	ROM_REGION( 0x2000, "mcu", 0 ) // MC8123 key
-	ROM_LOAD( "317-xxxx.key",  0x0000, 0x2000, CRC(2be5c90b) SHA1(e98d989237f2b001950b876efdb21c1507162830) )
+	ROM_LOAD( "mc-8123b_center_court.key",  0x0000, 0x2000, CRC(2be5c90b) SHA1(e98d989237f2b001950b876efdb21c1507162830) ) // No official 317-xxxx number
 ROM_END
 
 
