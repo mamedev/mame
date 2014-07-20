@@ -418,7 +418,7 @@ WRITE16_MEMBER(geniusiq_state::gfx_base_w)
 
 WRITE16_MEMBER(geniusiq_state::gfx_idx_w)
 {
-	UINT16 *gfx = ((UINT16 *)(*memregion("maincpu"))) + ((m_gfx_base + data*32)>>1);
+	UINT16 *gfx = ((UINT16 *)(*memregion("maincpu"))) + ((m_gfx_base + (data & 0xff)*32)>>1);
 
 	// first 16 bits are used to define the character size
 	UINT8 gfx_heigh = (gfx[0]>>0) & 0xff;
