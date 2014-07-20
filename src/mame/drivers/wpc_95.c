@@ -301,7 +301,7 @@ bool wpc_95_state::afm_led_handler(int sid, bool state)
 			bool prev_state = serial_out1_state & mask;
 			if(prev_state != serial_data1_state) {
 				char buffer[32];
-				sprintf(buffer, "Saucer led %d", serial_clock_counter);
+				sprintf(buffer, "l:Saucer led %d", serial_clock_counter);
 				output_set_value(buffer, serial_data1_state);
 				if(serial_data1_state)
 					serial_out1_state |= mask;
@@ -541,7 +541,7 @@ static INPUT_PORTS_START( afm )
 	PORT_START("SW.3")
     PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("MARTI\"A\"N")
     PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("MARTIA\"N\"")
-    PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("MAR\"T\"IN")
+    PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("MAR\"T\"IAN")
     PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("MART\"I\"AN")
     PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("L motor bank")
     PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("C motor bank")

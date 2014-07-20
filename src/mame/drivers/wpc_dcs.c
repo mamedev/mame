@@ -1,122 +1,381 @@
 
 /* Williams WPC with DCS sound */
 
-#include "includes/wpc_pin.h"
+#include "emu.h"
+#include "cpu/m6809/m6809.h"
 #include "audio/dcs.h"
+#include "machine/nvram.h"
+#include "video/wpc_dmd.h"
+#include "machine/wpc_shift.h"
+#include "machine/wpc_lamp.h"
+#include "machine/wpc_out.h"
+
+
+class wpc_dcs_state : public driver_device
+{
+public:
+	wpc_dcs_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
+		  maincpu(*this, "maincpu"),
+		  dcs(*this, "dcs"),
+		  rombank(*this, "rombank"),
+		  mainram(*this, "mainram"),
+		  nvram(*this, "nvram"),
+		  lamp(*this, "lamp"),
+		  out(*this, "out"),
+		  swarray(*this, "SW")
+	{ }
+
+	DECLARE_WRITE8_MEMBER(bank_w);
+	DECLARE_WRITE8_MEMBER(watchdog_w);
+	DECLARE_WRITE8_MEMBER(irq_ack_w);
+	DECLARE_READ8_MEMBER(firq_src_r);
+	DECLARE_READ8_MEMBER(zc_r);
+	DECLARE_READ8_MEMBER(dcs_data_r);
+	DECLARE_WRITE8_MEMBER(dcs_data_w);
+	DECLARE_READ8_MEMBER(dcs_ctrl_r);
+	DECLARE_WRITE8_MEMBER(dcs_reset_w);
+	DECLARE_READ8_MEMBER(rtc_r);
+	DECLARE_READ8_MEMBER(switches_r);
+	DECLARE_WRITE8_MEMBER(switches_w);
+
+	void init();
+	DECLARE_DRIVER_INIT(dm);
+	DECLARE_DRIVER_INIT(ij);
+	DECLARE_DRIVER_INIT(jd);
+	DECLARE_DRIVER_INIT(pop);
+	DECLARE_DRIVER_INIT(sttng);
+	DECLARE_DRIVER_INIT(afv);
+
+	DECLARE_WRITE_LINE_MEMBER(scanline_irq);
+	TIMER_DEVICE_CALLBACK_MEMBER(zc_timer);
+
+protected:
+	// devices
+	required_device<cpu_device> maincpu;
+	required_device<dcs_audio_8k_device> dcs;
+	required_memory_bank rombank;
+	required_shared_ptr<UINT8> mainram;
+	required_device<nvram_device> nvram;
+	required_device<wpc_lamp_device> lamp;
+	required_device<wpc_out_device> out;
+	required_ioport_array<8> swarray;
+
+	// driver_device overrides
+	virtual void machine_reset();
+
+private:
+	UINT8 firq_src, zc, switch_col;
+	UINT16 rtc_base_day;
+};
 
 static ADDRESS_MAP_START( wpc_dcs_map, AS_PROGRAM, 8, wpc_dcs_state )
-	AM_RANGE(0x0000, 0x2fff) AM_READWRITE(ram_r,ram_w)
-	AM_RANGE(0x3000, 0x31ff) AM_RAMBANK("dmdbank1")
-	AM_RANGE(0x3200, 0x33ff) AM_RAMBANK("dmdbank2")
-	AM_RANGE(0x3400, 0x35ff) AM_RAMBANK("dmdbank3")
-	AM_RANGE(0x3600, 0x37ff) AM_RAMBANK("dmdbank4")
-	AM_RANGE(0x3800, 0x39ff) AM_RAMBANK("dmdbank5")
-	AM_RANGE(0x3a00, 0x3bff) AM_RAMBANK("dmdbank6")
-	AM_RANGE(0x3c00, 0x3faf) AM_RAM
-	AM_RANGE(0x3fb0, 0x3fff) AM_DEVREADWRITE("wpc",wpc_device,read,write) // WPC device
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("cpubank")
-	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("fixedbank")
+	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_SHARE("mainram")
+
+	AM_RANGE(0x3000, 0x31ff) AM_RAMBANK("dmd0")
+	AM_RANGE(0x3200, 0x33ff) AM_RAMBANK("dmd2")
+	AM_RANGE(0x3400, 0x35ff) AM_RAMBANK("dmd4")
+	AM_RANGE(0x3600, 0x37ff) AM_RAMBANK("dmd6")
+	AM_RANGE(0x3800, 0x39ff) AM_RAMBANK("dmd8")
+	AM_RANGE(0x3a00, 0x3bff) AM_RAMBANK("dmda")
+
+	AM_RANGE(0x3fb8, 0x3fbf) AM_DEVICE("dmd", wpc_dmd_device, registers)
+
+	AM_RANGE(0x3fd4, 0x3fd4) AM_READ_PORT("FLIPPERS") AM_DEVWRITE("out", wpc_out_device, out4_w)
+
+	AM_RANGE(0x3fdc, 0x3fdc) AM_READWRITE(dcs_data_r, dcs_data_w)
+	AM_RANGE(0x3fdd, 0x3fdd) AM_READWRITE(dcs_ctrl_r, dcs_reset_w)
+
+	AM_RANGE(0x3fe0, 0x3fe3) AM_DEVWRITE("out", wpc_out_device, out_w)
+	AM_RANGE(0x3fe4, 0x3fe4) AM_READNOP AM_DEVWRITE("lamp", wpc_lamp_device, row_w)
+	AM_RANGE(0x3fe5, 0x3fe5) AM_READNOP AM_DEVWRITE("lamp", wpc_lamp_device, col_w)
+	AM_RANGE(0x3fe6, 0x3fe6) AM_DEVWRITE("out", wpc_out_device, gi_w)
+	AM_RANGE(0x3fe7, 0x3fe7) AM_READ_PORT("DSW")
+	AM_RANGE(0x3fe8, 0x3fe8) AM_READ_PORT("DOOR")
+	AM_RANGE(0x3fe9, 0x3fe9) AM_READ(switches_r)
+	AM_RANGE(0x3fea, 0x3fea) AM_WRITE(switches_w)
+
+	AM_RANGE(0x3ff2, 0x3ff2) AM_DEVWRITE("out", wpc_out_device, led_w)
+	AM_RANGE(0x3ff3, 0x3ff3) AM_READNOP AM_WRITE(irq_ack_w)
+	AM_RANGE(0x3ff4, 0x3ff7) AM_DEVICE("shift", wpc_shift_device, registers)
+	AM_RANGE(0x3ff8, 0x3ff8) AM_READ(firq_src_r) AM_WRITENOP // ack?
+	AM_RANGE(0x3ffa, 0x3ffb) AM_READ(rtc_r)
+	AM_RANGE(0x3ffc, 0x3ffc) AM_WRITE(bank_w)
+	AM_RANGE(0x3ffd, 0x3ffe) AM_NOP // memory protection stuff?
+	AM_RANGE(0x3fff, 0x3fff) AM_READWRITE(zc_r, watchdog_w)
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("rombank")
+	AM_RANGE(0x8000, 0xffff) AM_ROM AM_REGION("maincpu", 0x78000)
 ADDRESS_MAP_END
 
+READ8_MEMBER(wpc_dcs_state::dcs_data_r)
+{
+	return dcs->data_r();
+}
+
+WRITE8_MEMBER(wpc_dcs_state::dcs_data_w)
+{
+	dcs->data_w(data);
+}
+
+READ8_MEMBER(wpc_dcs_state::dcs_ctrl_r)
+{
+	return dcs->control_r();
+}
+
+WRITE8_MEMBER(wpc_dcs_state::dcs_reset_w)
+{
+	dcs->reset_w(0);
+	dcs->reset_w(1);
+}
+
+READ8_MEMBER(wpc_dcs_state::switches_r)
+{
+	UINT8 res = 0xff;
+	for(int i=0; i<8; i++)
+		if(switch_col & (1 << i))
+			res &= swarray[i]->read();
+	return res;
+}
+
+WRITE8_MEMBER(wpc_dcs_state::switches_w)
+{
+	switch_col = data;
+}
+
+READ8_MEMBER(wpc_dcs_state::rtc_r)
+{
+	system_time systime;
+	machine().base_datetime(systime);
+
+	// This may get wonky if the game is running on year change.  Find
+	// something better to do at that time.
+
+	UINT8 day = (systime.local_time.day - rtc_base_day) & 31;
+	UINT8 hour = systime.local_time.hour;
+	UINT8 min = systime.local_time.minute;
+
+	switch(offset) {
+	case 0:
+		return ((day & 7) << 5) | hour;
+	case 1:
+		return ((day & 0x18) << 3) | min;
+	default:
+		return 0xff;
+	}
+}
+
+READ8_MEMBER(wpc_dcs_state::firq_src_r)
+{
+	return firq_src;
+}
+
+READ8_MEMBER(wpc_dcs_state::zc_r)
+{
+	UINT8 res = zc;
+	zc &= 0x7f;
+	return res;
+}
+
+TIMER_DEVICE_CALLBACK_MEMBER(wpc_dcs_state::zc_timer)
+{
+	zc |= 0x80;
+}
+
+WRITE8_MEMBER(wpc_dcs_state::bank_w)
+{
+	rombank->set_entry(data & 0x1f);
+}
+
+WRITE8_MEMBER(wpc_dcs_state::watchdog_w)
+{
+	// Mhhh?  Maybe it's not 3ff3, maybe it's going down by itself...
+	maincpu->set_input_line(0, CLEAR_LINE);
+}
+
+WRITE_LINE_MEMBER(wpc_dcs_state::scanline_irq)
+{
+	firq_src = 0x00;
+	maincpu->set_input_line(1, state);
+}
+
+WRITE8_MEMBER(wpc_dcs_state::irq_ack_w)
+{
+	maincpu->set_input_line(0, CLEAR_LINE);
+	maincpu->set_input_line(1, CLEAR_LINE);
+}
+
+void wpc_dcs_state::machine_reset()
+{
+	firq_src = 0x00;
+	zc = 0x00;
+	switch_col = 0x00;
+
+	/* The hardware seems to only have a minute/hour/day counter.  It
+	   keeps the current day in nvram, and as long as you start the
+	   machine at least once every 32 days (the day counter is 5 bits)
+	   it updates it correctly.
+
+	   So setup the correct memory zone to avoid the system bitching,
+	   and requiring the user to fix it.
+	*/
+	system_time systime;
+	machine().base_datetime(systime);
+	mainram[0x1800] = systime.local_time.year >> 8;
+	mainram[0x1801] = systime.local_time.year;
+	mainram[0x1802] = systime.local_time.month+1;
+	mainram[0x1803] = systime.local_time.mday;
+	mainram[0x1804] = systime.local_time.weekday+1;
+	mainram[0x1805] = 0;
+	mainram[0x1806] = 1;
+	UINT16 checksum = 0;
+	for(int i=0x1800; i<=0x1806; i++)
+		checksum += mainram[i];
+	checksum = ~checksum;
+	mainram[0x1807] = checksum >> 8;
+	mainram[0x1808] = checksum;
+	rtc_base_day = systime.local_time.day;
+}
+
+void wpc_dcs_state::init()
+{
+	rombank->configure_entries(0, 0x20, memregion("maincpu")->base(), 0x4000);
+	nvram->set_base(mainram, mainram.bytes());
+
+	save_item(NAME(firq_src));
+	save_item(NAME(zc));
+	save_item(NAME(switch_col));
+
+	// rtc_base_day not saved to give the system a better chance to
+	// survive reload some days after unscathed.
+}
+
+DRIVER_INIT_MEMBER(wpc_dcs_state, dm)
+{
+	lamp->set_names(NULL);
+	out->set_names(NULL);
+	init();
+}
+
+DRIVER_INIT_MEMBER(wpc_dcs_state, ij)
+{
+	lamp->set_names(NULL);
+	out->set_names(NULL);
+	init();
+}
+
+DRIVER_INIT_MEMBER(wpc_dcs_state, jd)
+{
+	lamp->set_names(NULL);
+	out->set_names(NULL);
+	init();
+}
+
+DRIVER_INIT_MEMBER(wpc_dcs_state, pop)
+{
+	lamp->set_names(NULL);
+	out->set_names(NULL);
+	init();
+}
+
+DRIVER_INIT_MEMBER(wpc_dcs_state, sttng)
+{
+	lamp->set_names(NULL);
+	out->set_names(NULL);
+	init();
+}
+
+DRIVER_INIT_MEMBER(wpc_dcs_state, afv)
+{
+	lamp->set_names(NULL);
+	out->set_names(NULL);
+	init();
+}
+
 static INPUT_PORTS_START( wpc_dcs )
-	PORT_START("INP0")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_START("SW.0")
+    PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_START2) PORT_NAME("Launch button")
+    PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_UNUSED)
+    PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_START1) PORT_NAME("Start button")
+    PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Plumb bob tilt")
+    PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_UNUSED)
+    PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Left outlane")
+    PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Right return")
+    PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Shooter lane")
 
-	PORT_START("INP1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER )  PORT_CODE(KEYCODE_SLASH_PAD)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER )  PORT_CODE(KEYCODE_ASTERISK)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_TILT )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER )  PORT_CODE(KEYCODE_7_PAD)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER )  PORT_CODE(KEYCODE_8_PAD)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER )  PORT_CODE(KEYCODE_9_PAD)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER )  PORT_CODE(KEYCODE_5_PAD)
+	PORT_START("SW.1")
+    PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Slam tilt")
+    PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Coin door closed") PORT_TOGGLE PORT_CODE(KEYCODE_F1)
+    PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_UNUSED)
+    PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_UNUSED)
+    PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_UNUSED)
+    PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Left return")
+    PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Right outlane")
+    PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNUSED)
 
-	PORT_START("INP2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_A)  // slam tilt
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_S) PORT_TOGGLE  // coin door closed
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_D)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER )  // always closed
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_G)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_H)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_J)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_K)
+	PORT_START("SW.2")
+    PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Trough eject")
+    PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Trough ball 1")
+    PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Trough ball 2")
+    PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Trough ball 3")
+    PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Trough ball 4")
+    PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Left popper")
+    PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Right popper")
+    PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Left top lane")
 
-	PORT_START("INP4")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_L)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Z)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_C)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_V)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_B)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_N)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_M)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_COMMA)
+	PORT_START("SW.3")
+    PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("MARTI\"A\"N")
+    PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("MARTIA\"N\"")
+    PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("MAR\"T\"IN")
+    PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("MART\"I\"AN")
+    PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("L motor bank")
+    PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("C motor bank")
+    PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("R motor bank")
+    PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Right top lane")
 
-	PORT_START("INP8")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_STOP)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_SLASH)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_COLON)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_QUOTE)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_X)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_MINUS)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_EQUALS)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_BACKSPACE)
+	PORT_START("SW.4")
+    PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Left slingshot")
+    PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Right slingshot")
+    PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Left jet")
+    PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Bottom jet")
+    PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Right jet")
+    PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("\"M\"ARTIAN")
+    PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("M\"A\"RTIAN")
+    PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("MA\"R\"TIAN")
 
-	PORT_START("INP10")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_OPENBRACE)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_CLOSEBRACE)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_BACKSLASH)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_ENTER)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_LEFT)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_RIGHT)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_UP)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_DOWN)
+	PORT_START("SW.5")
+    PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("L ramp enter")
+    PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("C ramp enter")
+    PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("R ramp enter")
+    PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("L ramp exit")
+    PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("R ramp exit")
+    PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Motor bank down")
+    PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Motor bank up")
+    PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNUSED)
 
-	PORT_START("INP20")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Q)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_W)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_E)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_R)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Y)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_U)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_I)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_O)
+	PORT_START("SW.6")
+    PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Right loop hi")
+    PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Right loop lo")
+    PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Left loop hi")
+    PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Left loop lo")
+    PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("L saucer tgt")
+    PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("R saucer tgt")
+    PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Drop target")
+    PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Center trough")
 
-	PORT_START("INP40")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_LALT)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_0_PAD)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_1_PAD)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_2_PAD)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_3_PAD)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_4_PAD)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_6_PAD)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_START("SW.7")
+    PORT_BIT(0xff, IP_ACTIVE_HIGH, IPT_UNUSED)
 
-	PORT_START("INP80")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_START("DOOR")
+    PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_COIN1) PORT_NAME("Left coin chute")
+    PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_COIN2) PORT_NAME("Center coin chute")
+    PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_COIN3) PORT_NAME("Right coin chute")
+    PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_COIN4) PORT_NAME("4th coin chute")
+    PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_SERVICE1) PORT_NAME("Service credit/Escape")
+    PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Volume Down/Down") PORT_CODE(KEYCODE_DOWN)
+    PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Volume Up/Up") PORT_CODE(KEYCODE_UP)
+    PORT_SERVICE_NO_TOGGLE(0x80, IP_ACTIVE_HIGH ) PORT_NAME("Begin test/Enter")
 
-	PORT_START("COIN")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN3 )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN4 )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Service / Escape") PORT_CODE(KEYCODE_DEL_PAD)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_VOLUME_DOWN ) PORT_CODE(KEYCODE_MINUS_PAD)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_VOLUME_UP ) PORT_CODE(KEYCODE_PLUS_PAD)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Begin Test / Enter") PORT_CODE(KEYCODE_ENTER_PAD)
-
-	// DCS games tend to use unneeded inputs here for extra switches (like STTNG putting the spinner switch here)
-/*  PORT_START("FLIP")
-    PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Right Flipper EOS") PORT_CODE(KEYCODE_RSHIFT)
-    PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Right Flipper Button") PORT_CODE(KEYCODE_RSHIFT)
-    PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Left Flipper EOS") PORT_CODE(KEYCODE_LSHIFT)
-    PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Left Flipper Button") PORT_CODE(KEYCODE_LSHIFT)
-    PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Upper Right Flipper EOS") PORT_CODE(KEYCODE_RSHIFT)
-    PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Upper Right Flipper Button") PORT_CODE(KEYCODE_RSHIFT)
-    PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Upper Left Flipper EOS") PORT_CODE(KEYCODE_LSHIFT)
-    PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Upper Left Flipper Button") PORT_CODE(KEYCODE_LSHIFT)
-*/
-	PORT_START("DIPS")
+	PORT_START("DSW")
 	PORT_DIPNAME(0x01,0x01,"Switch 1") PORT_DIPLOCATION("SWA:1")
 	PORT_DIPSETTING(0x00,DEF_STR( Off ))
 	PORT_DIPSETTING(0x01,DEF_STR( On ))
@@ -146,66 +405,41 @@ static INPUT_PORTS_START( wpc_dcs )
 	PORT_DIPSETTING(0xd0,"Europe")
 	PORT_DIPSETTING(0xe0,"Spain")
 	PORT_DIPSETTING(0xf0,"USA 2")
+
+	PORT_START("FLIPPERS")
+    PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("R Flipper EOS")
+    PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("R Flipper Button")
+    PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("L Flipper EOS")
+    PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("L Flipper Button")
+    PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_UNUSED)
+    PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("UR Flipper Button")
+    PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNUSED)
+    PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("UL Flipper Button")
+
 INPUT_PORTS_END
-
-READ8_MEMBER(wpc_dcs_state::wpc_dcs_sound_ctrl_r)
-{
-	return m_dcs->control_r();
-}
-
-WRITE8_MEMBER(wpc_dcs_state::wpc_dcs_sound_ctrl_w)
-{
-	m_dcs->reset_w(1);
-	m_dcs->reset_w(0);
-}
-
-READ8_MEMBER(wpc_dcs_state::wpc_dcs_sound_data_r)
-{
-	return m_dcs->data_r();
-}
-
-WRITE8_MEMBER(wpc_dcs_state::wpc_dcs_sound_data_w)
-{
-	m_dcs->data_w(data << 8);
-}
-
-
-DRIVER_INIT_MEMBER(wpc_dcs_state,wpc_dcs)
-{
-	wpc_flip2_state::init_wpc_flip2();
-	m_send = false;
-}
 
 static MACHINE_CONFIG_START( wpc_dcs, wpc_dcs_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809, 2000000)
+	MCFG_CPU_ADD("maincpu", M6809, XTAL_8MHz/4)
 	MCFG_CPU_PROGRAM_MAP(wpc_dcs_map)
 
-	MCFG_WMS_WPC_ADD("wpc")
-	MCFG_WPC_IRQ_ACKNOWLEDGE(WRITELINE(wpc_dot_state,wpc_irq_w))
-	MCFG_WPC_FIRQ_ACKNOWLEDGE(WRITELINE(wpc_dot_state,wpc_firq_w))
-	MCFG_WPC_ROMBANK(WRITE8(wpc_dot_state,wpc_rombank_w))
-	MCFG_WPC_SOUND_CTRL(READ8(wpc_dcs_state,wpc_dcs_sound_ctrl_r),WRITE8(wpc_dcs_state,wpc_dcs_sound_ctrl_w))
-	MCFG_WPC_SOUND_DATA(READ8(wpc_dcs_state,wpc_dcs_sound_data_r),WRITE8(wpc_dcs_state,wpc_dcs_sound_data_w))
-	MCFG_WPC_DMDBANK(WRITE8(wpc_dot_state,wpc_dmdbank_w))
+	MCFG_CPU_PERIODIC_INT_DRIVER(wpc_dcs_state, irq0_line_assert, XTAL_8MHz/8192.0)
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("zero_crossing", wpc_dcs_state, zc_timer, attotime::from_hz(120)) // Mains power zero crossing
 
-	MCFG_DEFAULT_LAYOUT(layout_lcd)
+	MCFG_WPC_LAMP_ADD("lamp")
+	MCFG_WPC_OUT_ADD("out", 3)
+	MCFG_WPC_SHIFT_ADD("shift")
+	MCFG_WPC_DMD_ADD("dmd", WRITELINE(wpc_dcs_state, scanline_irq))
 
-	MCFG_DEVICE_ADD("dcs", DCS_AUDIO_WPC, 0)
-
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_SIZE(128, 32)
-	MCFG_SCREEN_VISIBLE_AREA(0, 128-1, 0, 32-1)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_UPDATE_DRIVER(wpc_dot_state, screen_update)
+	MCFG_NVRAM_ADD_0FILL("nvram")
+	MCFG_DEVICE_ADD("dcs", DCS_AUDIO_8K, 0)
 MACHINE_CONFIG_END
 
 /*-------------
 / Demolition Man
 /--------------*/
 ROM_START(dm_pa2)
-	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
-	ROM_REGION(0x80000, "code", 0)
+	ROM_REGION(0x80000, "maincpu", 0)
 	ROM_LOAD("u6-pa2.rom", 0x00000, 0x80000, CRC(862be56a) SHA1(95e1f899963762cb1a9de4eb5d6d57183ed1da38))
 	ROM_REGION16_LE(0x1000000, "dcs",0)
 	ROM_LOAD16_BYTE("dmsndp4.u2", 0x000000, 0x080000, CRC(8581116b) SHA1(ab24fa4aadf27761c9013adb84cfef9bfda27d44))
@@ -217,8 +451,7 @@ ROM_START(dm_pa2)
 ROM_END
 
 ROM_START(dm_px5)
-	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
-	ROM_REGION(0x80000, "code", 0)
+	ROM_REGION(0x80000, "maincpu", 0)
 	ROM_LOAD("dman_px5.rom", 0x00000, 0x80000, CRC(42673371) SHA1(77570902c1ca13956fa65214184bce79bcc67173))
 	ROM_REGION16_LE(0x1000000, "dcs",0)
 	ROM_LOAD16_BYTE("dmsndp4.u2", 0x000000, 0x080000, CRC(8581116b) SHA1(ab24fa4aadf27761c9013adb84cfef9bfda27d44))
@@ -230,8 +463,7 @@ ROM_START(dm_px5)
 ROM_END
 
 ROM_START(dm_la1)
-	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
-	ROM_REGION(0x80000, "code", 0)
+	ROM_REGION(0x80000, "maincpu", 0)
 	ROM_LOAD("dman_la1.rom", 0x00000, 0x80000, CRC(be7c1965) SHA1(ed3b1016febc819b8c9f34953067bf0cdf3f33e6))
 	ROM_REGION16_LE(0x1000000, "dcs", 0)
 	ROM_LOAD16_BYTE("dm_u2_s.l1", 0x000000, 0x080000, CRC(f72dc72e) SHA1(a1267c32f70b4bfe6058d7e28d82006541fe3d6c))
@@ -243,8 +475,7 @@ ROM_START(dm_la1)
 ROM_END
 
 ROM_START(dm_lx3)
-	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
-	ROM_REGION(0x80000, "code", 0)
+	ROM_REGION(0x80000, "maincpu", 0)
 	ROM_LOAD("dman_lx3.rom", 0x00000, 0x80000, CRC(5aa57674) SHA1(e02d91a705799866bd741b998d93413ec5bced25))
 	ROM_REGION16_LE(0x1000000, "dcs",0)
 	ROM_LOAD16_BYTE("dm_u2_s.l2", 0x000000, 0x080000, CRC(85fb8bce) SHA1(f2e912113d08b230e32aeeb4143485f266574fa2))
@@ -256,8 +487,7 @@ ROM_START(dm_lx3)
 ROM_END
 
 ROM_START(dm_lx4)
-	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
-	ROM_REGION(0x80000, "code", 0)
+	ROM_REGION(0x80000, "maincpu", 0)
 	ROM_LOAD("dman_lx4.rom", 0x00000, 0x80000, CRC(c2d0f493) SHA1(26ee970827dd96f3b3c56aa548cf7629ed6a16c1))
 	ROM_REGION16_LE(0x1000000, "dcs",0)
 	ROM_LOAD16_BYTE("dm_u2_s.l2", 0x000000, 0x080000, CRC(85fb8bce) SHA1(f2e912113d08b230e32aeeb4143485f266574fa2))
@@ -269,8 +499,7 @@ ROM_START(dm_lx4)
 ROM_END
 
 ROM_START(dm_h5)
-	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
-	ROM_REGION(0x80000, "code", 0)
+	ROM_REGION(0x80000, "maincpu", 0)
 	ROM_LOAD("dman_h5.rom", 0x00000, 0x80000, CRC(bdcc62f7) SHA1(d6f3181970f3f71a876e9a2166156eb8fc405af0))
 	ROM_REGION16_LE(0x1000000, "dcs",0)
 	ROM_LOAD16_BYTE("dm.2", 0x000000, 0x080000, CRC(03dae358) SHA1(e6ab35a0c530eda90bd2d65af7bff82af08c39f3))
@@ -284,8 +513,7 @@ ROM_START(dm_h5)
 ROM_END
 
 ROM_START(dm_h6)
-	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
-	ROM_REGION(0x80000, "code", 0)
+	ROM_REGION(0x80000, "maincpu", 0)
 	ROM_LOAD("dman_h6.rom", 0x00000, 0x80000, CRC(3a079b80) SHA1(94a7ee94819ec878ced5e07745bf52b6c65e06c9))
 	ROM_REGION16_LE(0x1000000, "dcs",0)
 	ROM_LOAD16_BYTE("dm.2", 0x000000, 0x080000, CRC(03dae358) SHA1(e6ab35a0c530eda90bd2d65af7bff82af08c39f3))
@@ -302,8 +530,7 @@ ROM_END
 /  Indiana Jones
 /------------------*/
 ROM_START(ij_l7)
-	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
-	ROM_REGION(0x80000, "code", 0)
+	ROM_REGION(0x80000, "maincpu", 0)
 	ROM_LOAD("ijone_l7.rom", 0x00000, 0x80000, CRC(4658c877) SHA1(b47ab064ff954bd182919f714ed8930cf0bed896))
 	ROM_REGION16_LE(0x1000000, "dcs", 0)
 	ROM_LOAD16_BYTE("ijsnd_l3.u2", 0x000000, 0x080000, CRC(fbd91a0d) SHA1(8d9a74f04f6088f18dfbb578893410abc21a0e42))
@@ -316,8 +543,7 @@ ROM_START(ij_l7)
 ROM_END
 
 ROM_START(ij_lg7)
-	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
-	ROM_REGION(0x80000, "code", 0)
+	ROM_REGION(0x80000, "maincpu", 0)
 	ROM_LOAD("u6-lg7.rom", 0x00000, 0x80000, CRC(c168a9f7) SHA1(732cc0863da06bce3d9793d57d67ba03c4c2f4d7))
 	ROM_REGION16_LE(0x1000000, "dcs", 0)
 	ROM_LOAD16_BYTE("ijsnd_l3.u2", 0x000000, 0x080000, CRC(fbd91a0d) SHA1(8d9a74f04f6088f18dfbb578893410abc21a0e42))
@@ -330,8 +556,7 @@ ROM_START(ij_lg7)
 ROM_END
 
 ROM_START(ij_l6)
-	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
-	ROM_REGION(0x80000, "code", 0)
+	ROM_REGION(0x80000, "maincpu", 0)
 	ROM_LOAD("ijone_l6.rom", 0x00000, 0x80000, CRC(8c44b880) SHA1(9bc2cd91ea4d98e6509d6c1e2e34622e83c5a4d7))
 	ROM_REGION16_LE(0x1000000, "dcs", 0)
 	ROM_LOAD16_BYTE("ijsnd_l3.u2", 0x000000, 0x080000, CRC(fbd91a0d) SHA1(8d9a74f04f6088f18dfbb578893410abc21a0e42))
@@ -344,8 +569,7 @@ ROM_START(ij_l6)
 ROM_END
 
 ROM_START(ij_l5)
-	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
-	ROM_REGION(0x80000, "code", 0)
+	ROM_REGION(0x80000, "maincpu", 0)
 	ROM_LOAD("ijone_l5.rom", 0x00000, 0x80000, CRC(bf46ff92) SHA1(1afb1aadf115ae7d7f54bfea1fcca71a9de6ebb0))
 	ROM_REGION16_LE(0x1000000, "dcs", 0)
 	ROM_LOAD16_BYTE("ijsnd_l2.u2", 0x000000, 0x080000, CRC(508d27c5) SHA1(da9787905c6f11d16e9a62047f15c5780017b551))
@@ -358,8 +582,7 @@ ROM_START(ij_l5)
 ROM_END
 
 ROM_START(ij_l4)
-	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
-	ROM_REGION(0x80000, "code", 0)
+	ROM_REGION(0x80000, "maincpu", 0)
 	ROM_LOAD("ij_l4.u6", 0x00000, 0x80000, CRC(5f2c3130) SHA1(b748932a1c0ac622e00744314fafef857f59026d))
 	ROM_REGION16_LE(0x1000000, "dcs", 0)
 	ROM_LOAD16_BYTE("ijsnd_l2.u2", 0x000000, 0x080000, CRC(508d27c5) SHA1(da9787905c6f11d16e9a62047f15c5780017b551))
@@ -372,8 +595,7 @@ ROM_START(ij_l4)
 ROM_END
 
 ROM_START(ij_l3)
-	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
-	ROM_REGION(0x80000, "code", 0)
+	ROM_REGION(0x80000, "maincpu", 0)
 	ROM_LOAD("ijone_l3.rom", 0x00000, 0x80000, CRC(0555c593) SHA1(1a73946fff9ae40e5499fcfa2d9f8330a25b8bae))
 	ROM_REGION16_LE(0x1000000, "dcs", 0)
 	ROM_LOAD16_BYTE("ijsnd_l1.u2", 0x000000, 0x080000, CRC(89061ade) SHA1(0bd5ec961c780c4d46296aee7f2cb63b72e990f5))
@@ -389,8 +611,7 @@ ROM_END
 /  Judge Dredd
 /------------------*/
 ROM_START(jd_l7)
-	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
-	ROM_REGION(0x80000, "code", 0)
+	ROM_REGION(0x80000, "maincpu", 0)
 	ROM_LOAD("jdrd_l7.rom", 0x00000, 0x80000, CRC(87b2a5c3) SHA1(e487e9ff78353ee96d5fb5f036b1a6cef586f5b4))
 	ROM_REGION16_LE(0x1000000, "dcs",0)
 	ROM_LOAD16_BYTE("jdsnd_u2.bin", 0x000000, 0x080000, CRC(d8f453c6) SHA1(5dd677fde46436dbf2d2e9058f06dd3048600234))
@@ -404,8 +625,7 @@ ROM_START(jd_l7)
 ROM_END
 
 ROM_START(jd_l1)
-	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
-	ROM_REGION(0x80000, "code", 0)
+	ROM_REGION(0x80000, "maincpu", 0)
 	ROM_LOAD("jd_l1.u6", 0x00000, 0x80000, CRC(09a4b1d8) SHA1(9f941bbeb6e58d918d374694c7ff2a67f1084cc0))
 	ROM_REGION16_LE(0x1000000, "dcs",0)
 	ROM_LOAD16_BYTE("jdsnd_u2.bin", 0x000000, 0x080000, CRC(d8f453c6) SHA1(5dd677fde46436dbf2d2e9058f06dd3048600234))
@@ -419,8 +639,7 @@ ROM_START(jd_l1)
 ROM_END
 
 ROM_START(jd_l6)
-	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
-	ROM_REGION(0x80000, "code", 0)
+	ROM_REGION(0x80000, "maincpu", 0)
 	ROM_LOAD("jd_l6.u6", 0x00000, 0x80000, CRC(0a74cba4) SHA1(1872fd86bbfa772eac9cc2ef2634a90b72b3d5e2))
 	ROM_REGION16_LE(0x1000000, "dcs",0)
 	ROM_LOAD16_BYTE("jdsnd_u2.bin", 0x000000, 0x080000, CRC(d8f453c6) SHA1(5dd677fde46436dbf2d2e9058f06dd3048600234))
@@ -434,8 +653,7 @@ ROM_START(jd_l6)
 ROM_END
 
 ROM_START(jd_l5)
-	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
-	ROM_REGION(0x80000, "code", 0)
+	ROM_REGION(0x80000, "maincpu", 0)
 	ROM_LOAD("jd_l5.u6", 0x00000, 0x80000, CRC(879b091e) SHA1(eaf1c86c0e72e8cdfa9ac942fc54ef4f70a65175))
 	ROM_REGION16_LE(0x1000000, "dcs",0)
 	ROM_LOAD16_BYTE("jdsnd_u2.bin", 0x000000, 0x080000, CRC(d8f453c6) SHA1(5dd677fde46436dbf2d2e9058f06dd3048600234))
@@ -449,8 +667,7 @@ ROM_START(jd_l5)
 ROM_END
 
 ROM_START(jd_l4)
-	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
-	ROM_REGION(0x80000, "code", 0)
+	ROM_REGION(0x80000, "maincpu", 0)
 	ROM_LOAD("jd_l4.u6", 0x00000, 0x80000, CRC(cc6f1068) SHA1(aef2a2eeb9110074eebff91318179ce97aba14ba))
 	ROM_REGION16_LE(0x1000000, "dcs",0)
 	ROM_LOAD16_BYTE("jdsnd_u2.bin", 0x000000, 0x080000, CRC(d8f453c6) SHA1(5dd677fde46436dbf2d2e9058f06dd3048600234))
@@ -467,8 +684,7 @@ ROM_END
 / Popeye Saves The Earth
 /------------------*/
 ROM_START(pop_lx5)
-	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
-	ROM_REGION(0x80000, "code", 0)
+	ROM_REGION(0x80000, "maincpu", 0)
 	ROM_LOAD("peye_lx5.rom", 0x00000, 0x80000, CRC(ee1f7a67) SHA1(f02518546de93256b00bc1f5b92452a10f9e56dd))
 	ROM_REGION16_LE(0x1000000, "dcs", 0)
 	ROM_LOAD16_BYTE("popsndl2.u2", 0x000000, 0x080000, CRC(00590f2d) SHA1(540ad9825dbaace55bf36a6cee98bef06f240e15))
@@ -480,8 +696,7 @@ ROM_START(pop_lx5)
 ROM_END
 
 ROM_START(pop_pa3)
-	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
-	ROM_REGION(0x80000, "code", 0)
+	ROM_REGION(0x80000, "maincpu", 0)
 	ROM_LOAD("peye_pa3.rom", 0x00000, 0x80000, CRC(1cee3ae7) SHA1(e5b05fcf8aac98993940a2cda2552ff93ee3a518))
 	ROM_REGION16_LE(0x1000000, "dcs", 0)
 	ROM_LOAD16_BYTE("popsndp0.u2", 0x000000, 0x080000, CRC(1e3a98a4) SHA1(2f871f354df7684d0b4aa31e2d2bb4035072bb4a))
@@ -493,8 +708,7 @@ ROM_START(pop_pa3)
 ROM_END
 
 ROM_START(pop_la4)
-	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
-	ROM_REGION(0x80000, "code", 0)
+	ROM_REGION(0x80000, "maincpu", 0)
 	ROM_LOAD("peye_la4.rom", 0x00000, 0x80000, CRC(11cedcf7) SHA1(e0219060cf09a757edf19875a224801b3179664c))
 	ROM_REGION16_LE(0x1000000, "dcs", 0)
 	ROM_LOAD16_BYTE("popsndl2.u2", 0x000000, 0x080000, CRC(00590f2d) SHA1(540ad9825dbaace55bf36a6cee98bef06f240e15))
@@ -510,8 +724,7 @@ ROM_END
 / Star Trek: The Next Generation
 /------------------*/
 ROM_START(sttng_l7)
-	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
-	ROM_REGION(0x80000, "code", 0)
+	ROM_REGION(0x80000, "maincpu", 0)
 	ROM_LOAD("trek_lx7.rom", 0x00000, 0x80000, CRC(d439fdbb) SHA1(12d1c72cd6cc18db53e51ebb4c1e55ca9bcf9908))
 	ROM_REGION16_LE(0x1000000, "dcs",0)
 	ROM_LOAD16_BYTE("ng_u2_s.l1", 0x000000, 0x080000, CRC(c3bd7bf5) SHA1(2476ff90232a52d667a407fac81ee4db028b94e5))
@@ -524,8 +737,7 @@ ROM_START(sttng_l7)
 ROM_END
 
 ROM_START(sttng_x7)
-	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
-	ROM_REGION(0x80000, "code", 0)
+	ROM_REGION(0x80000, "maincpu", 0)
 	ROM_LOAD("trek_x7.rom", 0x00000, 0x80000, CRC(4e71c9c7) SHA1(8a7ec42dfb4a6902ba745548b40e84de5305c295))
 	ROM_REGION16_LE(0x1000000, "dcs", 0)
 	ROM_LOAD16_BYTE("ngs_u2.rom", 0x000000, 0x080000, CRC(e9fe68fe) SHA1(3d7631aa5ddd52f7c3c00cd091e212430faea249))
@@ -538,8 +750,7 @@ ROM_START(sttng_x7)
 ROM_END
 
 ROM_START(sttng_s7)
-	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
-	ROM_REGION(0x80000, "code", 0)
+	ROM_REGION(0x80000, "maincpu", 0)
 	ROM_LOAD("trek_lx7.rom", 0x00000, 0x80000, CRC(d439fdbb) SHA1(12d1c72cd6cc18db53e51ebb4c1e55ca9bcf9908))
 	ROM_REGION16_LE(0x1000000, "dcs", 0)
 	ROM_LOAD16_BYTE("su2-sp1.rom", 0x000000, 0x080000, CRC(bdef8b2c) SHA1(188d8d2a652844e9885bd9e9ad4143927ddc6fee))
@@ -552,8 +763,7 @@ ROM_START(sttng_s7)
 ROM_END
 
 ROM_START(sttng_p8)
-	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
-	ROM_REGION(0x80000, "code", 0)
+	ROM_REGION(0x80000, "maincpu", 0)
 	ROM_LOAD("sttng_p8.u6", 0x00000, 0x80000, CRC(bf599f45) SHA1(ec660f99030f89bdfe3d04cc38fd450d6bbedf7d))
 	ROM_REGION16_LE(0x1000000, "dcs",0)
 	ROM_LOAD16_BYTE("ng_u2_s.l1", 0x000000, 0x080000, CRC(c3bd7bf5) SHA1(2476ff90232a52d667a407fac81ee4db028b94e5))
@@ -566,8 +776,7 @@ ROM_START(sttng_p8)
 ROM_END
 
 ROM_START(sttng_p5)
-	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
-	ROM_REGION(0x80000, "code", 0)
+	ROM_REGION(0x80000, "maincpu", 0)
 	ROM_LOAD("sttng_p5.u6", 0x00000, 0x80000, CRC(c1b80a8e) SHA1(90dd99efd41ec5405c631ad374a369f9fcb7217e))
 	ROM_REGION16_LE(0x1000000, "dcs",0)
 	ROM_LOAD16_BYTE("ng_u2_s.l1", 0x000000, 0x080000, CRC(c3bd7bf5) SHA1(2476ff90232a52d667a407fac81ee4db028b94e5))
@@ -580,8 +789,7 @@ ROM_START(sttng_p5)
 ROM_END
 
 ROM_START(sttng_p4)
-	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
-	ROM_REGION(0x80000, "code", 0)
+	ROM_REGION(0x80000, "maincpu", 0)
 	ROM_LOAD("sttng_p4.u6", 0x00000, 0x80000, CRC(836774f0) SHA1(5784f77eaad41ccf07446874720be146fd562c68))
 	ROM_REGION16_LE(0x1000000, "dcs",0)
 	ROM_LOAD16_BYTE("ng_u2_s.l1", 0x000000, 0x080000, CRC(c3bd7bf5) SHA1(2476ff90232a52d667a407fac81ee4db028b94e5))
@@ -594,8 +802,7 @@ ROM_START(sttng_p4)
 ROM_END
 
 ROM_START(sttng_g7)
-	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
-	ROM_REGION(0x80000, "code", 0)
+	ROM_REGION(0x80000, "maincpu", 0)
 	ROM_LOAD("trek_lg7.rom", 0x00000, 0x80000, CRC(e723b8a1) SHA1(77c3f8ea378772ce45bb8de818069fc08cbc4574))
 	ROM_REGION16_LE(0x1000000, "dcs",0)
 	ROM_LOAD16_BYTE("ng_u2_s.l1", 0x000000, 0x080000, CRC(c3bd7bf5) SHA1(2476ff90232a52d667a407fac81ee4db028b94e5))
@@ -608,8 +815,7 @@ ROM_START(sttng_g7)
 ROM_END
 
 ROM_START(sttng_l1)
-	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
-	ROM_REGION(0x80000, "code", 0)
+	ROM_REGION(0x80000, "maincpu", 0)
 	ROM_LOAD("trek_lx1.rom", 0x00000, 0x80000, CRC(390befc0) SHA1(2059891e3fc3034d600274c3915371123c964d28))
 	ROM_REGION16_LE(0x1000000, "dcs",0)
 	ROM_LOAD16_BYTE("ng_u2_s.l1", 0x000000, 0x080000, CRC(c3bd7bf5) SHA1(2476ff90232a52d667a407fac81ee4db028b94e5))
@@ -622,8 +828,7 @@ ROM_START(sttng_l1)
 ROM_END
 
 ROM_START(sttng_l2)
-	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
-	ROM_REGION(0x80000, "code", 0)
+	ROM_REGION(0x80000, "maincpu", 0)
 	ROM_LOAD("trek_lx2.rom", 0x00000, 0x80000, CRC(e2557554) SHA1(7d8502ab9df340d60fd72e6964740bc7a2da2065))
 	ROM_REGION16_LE(0x1000000, "dcs",0)
 	ROM_LOAD16_BYTE("ng_u2_s.l1", 0x000000, 0x080000, CRC(c3bd7bf5) SHA1(2476ff90232a52d667a407fac81ee4db028b94e5))
@@ -636,8 +841,7 @@ ROM_START(sttng_l2)
 ROM_END
 
 ROM_START(sttng_l3)
-	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
-	ROM_REGION(0x80000, "code", 0)
+	ROM_REGION(0x80000, "maincpu", 0)
 	ROM_LOAD("trek_lx3.rom", 0x00000, 0x80000, CRC(400e7887) SHA1(23d5e9796f0c3c66121da53088df6f5275348f4a))
 	ROM_REGION16_LE(0x1000000, "dcs",0)
 	ROM_LOAD16_BYTE("ng_u2_s.l1", 0x000000, 0x080000, CRC(c3bd7bf5) SHA1(2476ff90232a52d667a407fac81ee4db028b94e5))
@@ -654,42 +858,41 @@ ROM_END
 / Addams Family Values (Coin Dropper)
 /--------------*/
 ROM_START(afv_l4)
-	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
-	ROM_REGION(0x80000, "code", 0)
+	ROM_REGION(0x80000, "maincpu", 0)
 	ROM_LOAD("afv_u6.l4", 0x00000, 0x80000, CRC(37369339) SHA1(e44a91faca80ffa00d6db78e2df7aa9bf14e957c))
 	ROM_REGION16_LE(0x1000000, "dcs", 0)
 	ROM_LOAD16_BYTE("afv_su2.l1", 0x000000, 0x080000, CRC(1aa878fc) SHA1(59a89071001b5da6ab56d691721a015773f5f0b5))
 ROM_END
 
-GAME(1994,  dm_lx4,     0,          wpc_dcs,    wpc_dcs, wpc_dcs_state, wpc_dcs,    ROT0,   "Williams",             "Demolition Man (LX-4)",                GAME_IS_SKELETON_MECHANICAL)
-GAME(1994,  dm_pa2,     dm_lx4,     wpc_dcs,    wpc_dcs, wpc_dcs_state, wpc_dcs,    ROT0,   "Williams",             "Demolition Man (PA-2)",                GAME_IS_SKELETON_MECHANICAL)
-GAME(1994,  dm_px5,     dm_lx4,     wpc_dcs,    wpc_dcs, wpc_dcs_state, wpc_dcs,    ROT0,   "Williams",             "Demolition Man (PX-5)",                GAME_IS_SKELETON_MECHANICAL)
-GAME(1994,  dm_la1,     dm_lx4,     wpc_dcs,    wpc_dcs, wpc_dcs_state, wpc_dcs,    ROT0,   "Williams",             "Demolition Man (LA-1)",                GAME_IS_SKELETON_MECHANICAL)
-GAME(1994,  dm_lx3,     dm_lx4,     wpc_dcs,    wpc_dcs, wpc_dcs_state, wpc_dcs,    ROT0,   "Williams",             "Demolition Man (LX-3)",                GAME_IS_SKELETON_MECHANICAL)
-GAME(1995,  dm_h5,      dm_lx4,     wpc_dcs,    wpc_dcs, wpc_dcs_state, wpc_dcs,    ROT0,   "Williams",             "Demolition Man (H-5)",             GAME_IS_SKELETON_MECHANICAL)
-GAME(1995,  dm_h6,      dm_lx4,     wpc_dcs,    wpc_dcs, wpc_dcs_state, wpc_dcs,    ROT0,   "Williams",             "Demolition Man (H-6)",             GAME_IS_SKELETON_MECHANICAL)
-GAME(1993,  ij_l7,      0,          wpc_dcs,    wpc_dcs, wpc_dcs_state, wpc_dcs,    ROT0,   "Williams",             "Indiana Jones (L-7)",              GAME_IS_SKELETON_MECHANICAL)
-GAME(1993,  ij_lg7,     ij_l7,      wpc_dcs,    wpc_dcs, wpc_dcs_state, wpc_dcs,    ROT0,   "Williams",             "Indiana Jones (LG-7)",             GAME_IS_SKELETON_MECHANICAL)
-GAME(1993,  ij_l6,      ij_l7,      wpc_dcs,    wpc_dcs, wpc_dcs_state, wpc_dcs,    ROT0,   "Williams",             "Indiana Jones (L-6)",              GAME_IS_SKELETON_MECHANICAL)
-GAME(1993,  ij_l5,      ij_l7,      wpc_dcs,    wpc_dcs, wpc_dcs_state, wpc_dcs,    ROT0,   "Williams",             "Indiana Jones (L-5)",              GAME_IS_SKELETON_MECHANICAL)
-GAME(1993,  ij_l4,      ij_l7,      wpc_dcs,    wpc_dcs, wpc_dcs_state, wpc_dcs,    ROT0,   "Williams",             "Indiana Jones (L-4)",              GAME_IS_SKELETON_MECHANICAL)
-GAME(1993,  ij_l3,      ij_l7,      wpc_dcs,    wpc_dcs, wpc_dcs_state, wpc_dcs,    ROT0,   "Williams",             "Indiana Jones (L-3)",              GAME_IS_SKELETON_MECHANICAL)
-GAME(1993,  jd_l7,      0,          wpc_dcs,    wpc_dcs, wpc_dcs_state, wpc_dcs,    ROT0,   "Bally",                "Judge Dredd (L-7)",                GAME_IS_SKELETON_MECHANICAL)
-GAME(1993,  jd_l1,      jd_l7,      wpc_dcs,    wpc_dcs, wpc_dcs_state, wpc_dcs,    ROT0,   "Bally",                "Judge Dredd (L-1)",                GAME_IS_SKELETON_MECHANICAL)
-GAME(1993,  jd_l6,      jd_l7,      wpc_dcs,    wpc_dcs, wpc_dcs_state, wpc_dcs,    ROT0,   "Bally",                "Judge Dredd (L-6)",                GAME_IS_SKELETON_MECHANICAL)
-GAME(1993,  jd_l5,      jd_l7,      wpc_dcs,    wpc_dcs, wpc_dcs_state, wpc_dcs,    ROT0,   "Bally",                "Judge Dredd (L-5)",                GAME_IS_SKELETON_MECHANICAL)
-GAME(1993,  jd_l4,      jd_l7,      wpc_dcs,    wpc_dcs, wpc_dcs_state, wpc_dcs,    ROT0,   "Bally",                "Judge Dredd (L-4)",                GAME_IS_SKELETON_MECHANICAL)
-GAME(1994,  pop_lx5,    0,          wpc_dcs,    wpc_dcs, wpc_dcs_state, wpc_dcs,    ROT0,   "Bally",                "Popeye Saves The Earth (LX-5)",                GAME_IS_SKELETON_MECHANICAL)
-GAME(1994,  pop_la4,    pop_lx5,    wpc_dcs,    wpc_dcs, wpc_dcs_state, wpc_dcs,    ROT0,   "Bally",                "Popeye Saves The Earth (LA-4)",                GAME_IS_SKELETON_MECHANICAL)
-GAME(1994,  pop_pa3,    pop_lx5,    wpc_dcs,    wpc_dcs, wpc_dcs_state, wpc_dcs,    ROT0,   "Bally",                "Popeye Saves The Earth (PA-3)",                GAME_IS_SKELETON_MECHANICAL)
-GAME(1994,  sttng_l7,   0,          wpc_dcs,    wpc_dcs, wpc_dcs_state, wpc_dcs,    ROT0,   "Williams",             "Star Trek: The Next Generation (LX-7)",                GAME_IS_SKELETON_MECHANICAL)
-GAME(1994,  sttng_x7,   sttng_l7,   wpc_dcs,    wpc_dcs, wpc_dcs_state, wpc_dcs,    ROT0,   "Williams",             "Star Trek: The Next Generation (LX-7 Special)",                GAME_IS_SKELETON_MECHANICAL)
-GAME(1993,  sttng_p8,   sttng_l7,   wpc_dcs,    wpc_dcs, wpc_dcs_state, wpc_dcs,    ROT0,   "Williams",             "Star Trek: The Next Generation (P-8)",             GAME_IS_SKELETON_MECHANICAL)
-GAME(1993,  sttng_p5,   sttng_l7,   wpc_dcs,    wpc_dcs, wpc_dcs_state, wpc_dcs,    ROT0,   "Williams",             "Star Trek: The Next Generation (P-5)",             GAME_IS_SKELETON_MECHANICAL)
-GAME(1993,  sttng_p4,   sttng_l7,   wpc_dcs,    wpc_dcs, wpc_dcs_state, wpc_dcs,    ROT0,   "Williams",             "Star Trek: The Next Generation (P-4)",             GAME_IS_SKELETON_MECHANICAL)
-GAME(1994,  sttng_s7,   sttng_l7,   wpc_dcs,    wpc_dcs, wpc_dcs_state, wpc_dcs,    ROT0,   "Williams",             "Star Trek: The Next Generation (LX-7) SP1",                GAME_IS_SKELETON_MECHANICAL)
-GAME(1994,  sttng_g7,   sttng_l7,   wpc_dcs,    wpc_dcs, wpc_dcs_state, wpc_dcs,    ROT0,   "Williams",             "Star Trek: The Next Generation (LG-7)",                GAME_IS_SKELETON_MECHANICAL)
-GAME(1993,  sttng_l1,   sttng_l7,   wpc_dcs,    wpc_dcs, wpc_dcs_state, wpc_dcs,    ROT0,   "Williams",             "Star Trek: The Next Generation (LX-1)",                GAME_IS_SKELETON_MECHANICAL)
-GAME(1993,  sttng_l2,   sttng_l7,   wpc_dcs,    wpc_dcs, wpc_dcs_state, wpc_dcs,    ROT0,   "Williams",             "Star Trek: The Next Generation (LX-2)",                GAME_IS_SKELETON_MECHANICAL)
-GAME(1994,  sttng_l3,   sttng_l7,   wpc_dcs,    wpc_dcs, wpc_dcs_state, wpc_dcs,    ROT0,   "Williams",             "Star Trek: The Next Generation (LX-3)",                GAME_IS_SKELETON_MECHANICAL)
-GAME(1993,  afv_l4,     0,          wpc_dcs,    wpc_dcs, wpc_dcs_state, wpc_dcs,    ROT0,   "Williams",             "Addams Family Values (Coin Dropper L-4)",              GAME_IS_SKELETON_MECHANICAL)
+GAME(1994,  dm_lx4,     0,          wpc_dcs,    wpc_dcs, wpc_dcs_state, dm,    ROT0,   "Williams",  "Demolition Man (LX-4)",                            GAME_MECHANICAL)
+GAME(1994,  dm_pa2,     dm_lx4,     wpc_dcs,    wpc_dcs, wpc_dcs_state, dm,    ROT0,   "Williams",  "Demolition Man (PA-2)",                            GAME_MECHANICAL)
+GAME(1994,  dm_px5,     dm_lx4,     wpc_dcs,    wpc_dcs, wpc_dcs_state, dm,    ROT0,   "Williams",  "Demolition Man (PX-5)",                            GAME_MECHANICAL)
+GAME(1994,  dm_la1,     dm_lx4,     wpc_dcs,    wpc_dcs, wpc_dcs_state, dm,    ROT0,   "Williams",  "Demolition Man (LA-1)",                            GAME_MECHANICAL)
+GAME(1994,  dm_lx3,     dm_lx4,     wpc_dcs,    wpc_dcs, wpc_dcs_state, dm,    ROT0,   "Williams",  "Demolition Man (LX-3)",                            GAME_MECHANICAL)
+GAME(1995,  dm_h5,      dm_lx4,     wpc_dcs,    wpc_dcs, wpc_dcs_state, dm,    ROT0,   "Williams",  "Demolition Man (H-5)",                             GAME_MECHANICAL)
+GAME(1995,  dm_h6,      dm_lx4,     wpc_dcs,    wpc_dcs, wpc_dcs_state, dm,    ROT0,   "Williams",  "Demolition Man (H-6)",                             GAME_MECHANICAL)
+GAME(1993,  ij_l7,      0,          wpc_dcs,    wpc_dcs, wpc_dcs_state, ij,    ROT0,   "Williams",  "Indiana Jones (L-7)",                              GAME_MECHANICAL)
+GAME(1993,  ij_lg7,     ij_l7,      wpc_dcs,    wpc_dcs, wpc_dcs_state, ij,    ROT0,   "Williams",  "Indiana Jones (LG-7)",                             GAME_MECHANICAL)
+GAME(1993,  ij_l6,      ij_l7,      wpc_dcs,    wpc_dcs, wpc_dcs_state, ij,    ROT0,   "Williams",  "Indiana Jones (L-6)",                              GAME_MECHANICAL)
+GAME(1993,  ij_l5,      ij_l7,      wpc_dcs,    wpc_dcs, wpc_dcs_state, ij,    ROT0,   "Williams",  "Indiana Jones (L-5)",                              GAME_MECHANICAL)
+GAME(1993,  ij_l4,      ij_l7,      wpc_dcs,    wpc_dcs, wpc_dcs_state, ij,    ROT0,   "Williams",  "Indiana Jones (L-4)",                              GAME_MECHANICAL)
+GAME(1993,  ij_l3,      ij_l7,      wpc_dcs,    wpc_dcs, wpc_dcs_state, ij,    ROT0,   "Williams",  "Indiana Jones (L-3)",                              GAME_MECHANICAL)
+GAME(1993,  jd_l7,      0,          wpc_dcs,    wpc_dcs, wpc_dcs_state, jd,    ROT0,   "Bally",     "Judge Dredd (L-7)",                                GAME_MECHANICAL)
+GAME(1993,  jd_l1,      jd_l7,      wpc_dcs,    wpc_dcs, wpc_dcs_state, jd,    ROT0,   "Bally",     "Judge Dredd (L-1)",                                GAME_MECHANICAL)
+GAME(1993,  jd_l6,      jd_l7,      wpc_dcs,    wpc_dcs, wpc_dcs_state, jd,    ROT0,   "Bally",     "Judge Dredd (L-6)",                                GAME_MECHANICAL)
+GAME(1993,  jd_l5,      jd_l7,      wpc_dcs,    wpc_dcs, wpc_dcs_state, jd,    ROT0,   "Bally",     "Judge Dredd (L-5)",                                GAME_MECHANICAL)
+GAME(1993,  jd_l4,      jd_l7,      wpc_dcs,    wpc_dcs, wpc_dcs_state, jd,    ROT0,   "Bally",     "Judge Dredd (L-4)",                                GAME_MECHANICAL)
+GAME(1994,  pop_lx5,    0,          wpc_dcs,    wpc_dcs, wpc_dcs_state, pop,   ROT0,   "Bally",     "Popeye Saves The Earth (LX-5)",                    GAME_MECHANICAL)
+GAME(1994,  pop_la4,    pop_lx5,    wpc_dcs,    wpc_dcs, wpc_dcs_state, pop,   ROT0,   "Bally",     "Popeye Saves The Earth (LA-4)",                    GAME_MECHANICAL)
+GAME(1994,  pop_pa3,    pop_lx5,    wpc_dcs,    wpc_dcs, wpc_dcs_state, pop,   ROT0,   "Bally",     "Popeye Saves The Earth (PA-3)",                    GAME_MECHANICAL)
+GAME(1994,  sttng_l7,   0,          wpc_dcs,    wpc_dcs, wpc_dcs_state, sttng, ROT0,   "Williams",  "Star Trek: The Next Generation (LX-7)",            GAME_MECHANICAL)
+GAME(1994,  sttng_x7,   sttng_l7,   wpc_dcs,    wpc_dcs, wpc_dcs_state, sttng, ROT0,   "Williams",  "Star Trek: The Next Generation (LX-7 Special)",    GAME_MECHANICAL)
+GAME(1993,  sttng_p8,   sttng_l7,   wpc_dcs,    wpc_dcs, wpc_dcs_state, sttng, ROT0,   "Williams",  "Star Trek: The Next Generation (P-8)",             GAME_MECHANICAL)
+GAME(1993,  sttng_p5,   sttng_l7,   wpc_dcs,    wpc_dcs, wpc_dcs_state, sttng, ROT0,   "Williams",  "Star Trek: The Next Generation (P-5)",             GAME_MECHANICAL)
+GAME(1993,  sttng_p4,   sttng_l7,   wpc_dcs,    wpc_dcs, wpc_dcs_state, sttng, ROT0,   "Williams",  "Star Trek: The Next Generation (P-4)",             GAME_MECHANICAL)
+GAME(1994,  sttng_s7,   sttng_l7,   wpc_dcs,    wpc_dcs, wpc_dcs_state, sttng, ROT0,   "Williams",  "Star Trek: The Next Generation (LX-7) SP1",        GAME_MECHANICAL)
+GAME(1994,  sttng_g7,   sttng_l7,   wpc_dcs,    wpc_dcs, wpc_dcs_state, sttng, ROT0,   "Williams",  "Star Trek: The Next Generation (LG-7)",            GAME_MECHANICAL)
+GAME(1993,  sttng_l1,   sttng_l7,   wpc_dcs,    wpc_dcs, wpc_dcs_state, sttng, ROT0,   "Williams",  "Star Trek: The Next Generation (LX-1)",            GAME_MECHANICAL)
+GAME(1993,  sttng_l2,   sttng_l7,   wpc_dcs,    wpc_dcs, wpc_dcs_state, sttng, ROT0,   "Williams",  "Star Trek: The Next Generation (LX-2)",            GAME_MECHANICAL)
+GAME(1994,  sttng_l3,   sttng_l7,   wpc_dcs,    wpc_dcs, wpc_dcs_state, sttng, ROT0,   "Williams",  "Star Trek: The Next Generation (LX-3)",            GAME_MECHANICAL)
+GAME(1993,  afv_l4,     0,          wpc_dcs,    wpc_dcs, wpc_dcs_state, afv,   ROT0,   "Williams",  "Addams Family Values (Coin Dropper L-4)",          GAME_MECHANICAL)

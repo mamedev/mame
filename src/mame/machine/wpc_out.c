@@ -49,7 +49,7 @@ void wpc_out_device::send_output(int sid, int state)
 
 	char buffer[32];
 	const char *name;
-	if(names && names[sid-1])
+	if(names && names[sid-1] && strcmp(names[sid-1], "s:"))
 		name = names[sid-1];
 	else {
 		sprintf(buffer, "u:output %02d", sid);
@@ -63,8 +63,6 @@ void wpc_out_device::send_output(int sid, int state)
 
 WRITE8_MEMBER(wpc_out_device::out_w)
 {
-	logerror("%s: out_w %d, %02x (%04x)\n", tag(), offset, data, space.device().safe_pc());
-
 	first_after_led = false;
 	UINT8 diff = state[offset] ^ data;
 	state[offset] = data;

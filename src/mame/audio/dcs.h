@@ -34,12 +34,12 @@ public:
 	void set_fifo_callbacks(read16_delegate fifo_data_r, read16_delegate fifo_status_r, write_line_delegate fifo_reset_w);
 	void set_io_callbacks(write_line_delegate output_full_cb, write_line_delegate input_empty_cb);
 
-	UINT8 data_r();
+	UINT16 data_r();
 	void ack_w();
 	int data2_r();
 	int control_r();
 
-	void data_w(UINT8 data);
+	void data_w(UINT16 data);
 	void reset_w(int state);
 
 	void fifo_notify(int count, int max);
@@ -74,12 +74,14 @@ public:
 	DECLARE_WRITE16_MEMBER( denver_w );
 	DECLARE_READ16_MEMBER( latch_status_r );
 	DECLARE_READ16_MEMBER( fifo_input_r );
-	void dcs_delayed_data_w(UINT8 data);
+	void dcs_delayed_data_w(UINT16 data);
 	TIMER_CALLBACK_MEMBER( dcs_delayed_data_w_callback );
 	DECLARE_WRITE16_MEMBER( input_latch_ack_w );
 	DECLARE_READ16_MEMBER( input_latch_r );
+	DECLARE_READ32_MEMBER( input_latch32_r );
 	TIMER_CALLBACK_MEMBER( latch_delayed_w );
 	DECLARE_WRITE16_MEMBER( output_latch_w );
+	DECLARE_WRITE32_MEMBER( output_latch32_w );
 	void delayed_ack_w();
 	TIMER_CALLBACK_MEMBER( delayed_ack_w_callback );
 	TIMER_CALLBACK_MEMBER( output_control_delayed_w );
@@ -171,9 +173,9 @@ protected:
 	/* I/O with the host */
 	UINT8       m_auto_ack;
 	UINT16      m_latch_control;
-	UINT8       m_input_data;
-	UINT8       m_output_data;
-	UINT8       m_pre_output_data;
+	UINT16      m_input_data;
+	UINT16      m_output_data;
+	UINT16      m_pre_output_data;
 	UINT16      m_output_control;
 	UINT64      m_output_control_cycles;
 	UINT8       m_last_output_full;
