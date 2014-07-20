@@ -65,6 +65,7 @@ public:
 	DECLARE_READ8_MEMBER(playmark_snd_flag_r);
 	DECLARE_WRITE8_MEMBER(playmark_oki_w);
 	DECLARE_WRITE8_MEMBER(playmark_snd_control_w);
+	DECLARE_WRITE8_MEMBER(hrdtimes_snd_control_w);
 	DECLARE_READ8_MEMBER(PIC16C5X_T0_clk_r);
 	DECLARE_WRITE16_MEMBER(wbeachvl_txvideoram_w);
 	DECLARE_WRITE16_MEMBER(wbeachvl_fgvideoram_w);

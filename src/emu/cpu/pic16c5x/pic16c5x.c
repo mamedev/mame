@@ -840,7 +840,7 @@ void pic16c5x_device::device_start()
 	state_add( PIC16C5x_TRSB, "TRSB", m_TRISB).formatstr("%02X");
 	state_add( PIC16C5x_TRSC, "TRSC", m_TRISC).formatstr("%02X");
 	state_add( PIC16C5x_FSR,  "FSR",  m_debugger_temp).mask(0xff).callimport().callexport().formatstr("%02X");
-	state_add( PIC16C5x_PSCL, "PSCL:%c%02X", m_debugger_temp).callimport().formatstr("%3s");
+	state_add( PIC16C5x_PSCL, "PSCL", m_debugger_temp).callimport().formatstr("%3s");
 
 	state_add( STATE_GENPC, "GENPC", m_PC).noshow();
 	state_add( STATE_GENFLAGS, "GENFLAGS", m_OPTION).formatstr("%13s").noshow();

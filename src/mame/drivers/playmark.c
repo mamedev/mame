@@ -35,11 +35,7 @@ Original Bugs:
 - World Beach Volley histogram functions don't work.
 
 
-Hot Mind is currently missing the sound MCU internal program dump.
-So for now we're using PIC16C57 program code from Big Twin with modifications
-to correct the music playback sequencing.
-
-Lucky Boom is currently missing the sound MCU internal program dump.
+HotMind and Lucky Boom are currently missing the sound MCU internal program dump.
 So for now we're using PIC16C57 program code from Excelsior with modifications
 to correct the music playback sequencing and also allow sound effect samples to
 play on any of the three available sample channels. The fourth channel is reserved
@@ -229,8 +225,7 @@ WRITE8_MEMBER(playmark_state::playmark_oki_w)
 
 WRITE8_MEMBER(playmark_state::playmark_snd_control_w)
 {
-	/*  This port controls communications to and from the 68K, and the OKI
-	    device.
+	/*  This port controls communications to and from the 68K and the OKI device.
 
 	    bit legend
 	    7w  ???  (No read or writes to Port B)
@@ -242,6 +237,31 @@ WRITE8_MEMBER(playmark_state::playmark_snd_control_w)
 	    1   Not used
 	    0   Not used
 	*/
+	m_oki_control = data;
+
+	if ((data & 0x38) == 0x18)
+	{
+//		logerror("PC$%03x Writing %02x to OKI1, PortC=%02x, Code=%02x\n",space.device().safe_pcbase(),m_oki_command,m_oki_control,m_snd_command);
+		m_oki->write(space, 0, m_oki_command);
+	}
+}
+
+WRITE8_MEMBER(playmark_state::hrdtimes_snd_control_w)
+{
+	/*  This port controls communications to and from the 68K and the OKI device. See playmark_snd_control_w above. OKI banking is also handled here. */
+
+	if (m_old_oki_bank != (data & 3))
+	{
+//		logerror("PC$%03x Writing %02x to PortC (OKI bank select bits). Previous bank was %02x\n",space.device().safe_pcbase(),(data&3),m_old_oki_bank);
+
+		m_old_oki_bank = data & 3;
+
+		if ((m_old_oki_bank * 0x40000) < memregion("oki")->bytes())
+		{
+			m_oki->set_bank_base(0x40000 * m_old_oki_bank);
+		}
+	}
+
 	m_oki_control = data;
 
 	if ((data & 0x38) == 0x18)
@@ -353,10 +373,11 @@ static ADDRESS_MAP_START( hrdtimes_main_map, AS_PROGRAM, 16, playmark_state )
 	AM_RANGE(0x106000, 0x107fff) AM_RAM
 	AM_RANGE(0x108000, 0x109fff) AM_RAM_WRITE(hrdtimes_txvideoram_w) AM_SHARE("videoram1") // 64*64?
 	AM_RANGE(0x10a000, 0x10bfff) AM_RAM
+	AM_RANGE(0x10c000, 0x10ffff) AM_RAM // Unused
 	AM_RANGE(0x110000, 0x11000d) AM_WRITE(hrdtimes_scroll_w)
 	AM_RANGE(0x200000, 0x200fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x280000, 0x2807ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE(0x280800, 0x280fff) AM_RAM // unused
+	AM_RANGE(0x280800, 0x280fff) AM_RAM // Unused
 	AM_RANGE(0x300010, 0x300011) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x300012, 0x300013) AM_READ_PORT("P1")
 	AM_RANGE(0x300014, 0x300015) AM_READ_PORT("P2")
@@ -413,6 +434,13 @@ static ADDRESS_MAP_START( playmark_sound_io_map, AS_IO, 8, playmark_state )
 	AM_RANGE(0x00, 0x00) AM_WRITE(playmark_oki_banking_w)
 	AM_RANGE(0x01, 0x01) AM_READWRITE(playmark_snd_command_r, playmark_oki_w)
 	AM_RANGE(0x02, 0x02) AM_READWRITE(playmark_snd_flag_r, playmark_snd_control_w)
+	AM_RANGE(PIC16C5x_T0, PIC16C5x_T0) AM_READ(PIC16C5X_T0_clk_r)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( hrdtimes_sound_io_map, AS_IO, 8, playmark_state )
+	AM_RANGE(0x00, 0x00) AM_NOP		/* AM_WRITE(playmark_oki_banking_w)  Banking data output but not wired. Port 2 (Port C) is wired to the OKI banking instead */
+	AM_RANGE(0x01, 0x01) AM_READWRITE(playmark_snd_command_r, playmark_oki_w)
+	AM_RANGE(0x02, 0x02) AM_READWRITE(playmark_snd_flag_r, hrdtimes_snd_control_w)
 	AM_RANGE(PIC16C5x_T0, PIC16C5x_T0) AM_READ(PIC16C5X_T0_clk_r)
 ADDRESS_MAP_END
 
@@ -1352,7 +1380,7 @@ static MACHINE_CONFIG_START( hrdtimes, playmark_state )
 
 	MCFG_CPU_ADD("audiocpu", PIC16C57, XTAL_24MHz/2)    /* verified on pcb */
 	/* Program and Data Maps are internal to the MCU */
-	MCFG_CPU_IO_MAP(playmark_sound_io_map)
+	MCFG_CPU_IO_MAP(hrdtimes_sound_io_map)
 	MCFG_DEVICE_DISABLE()       /* Internal code is not dumped yet */
 
 	MCFG_MACHINE_START_OVERRIDE(playmark_state,playmark)
@@ -1389,7 +1417,7 @@ static MACHINE_CONFIG_START( hotmind, playmark_state )
 
 	MCFG_CPU_ADD("audiocpu", PIC16C57, XTAL_24MHz/2)    /* verified on pcb */
 	/* Program and Data Maps are internal to the MCU */
-	MCFG_CPU_IO_MAP(playmark_sound_io_map)
+	MCFG_CPU_IO_MAP(hrdtimes_sound_io_map)
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 	MCFG_EEPROM_SERIAL_DEFAULT_VALUE(0)
@@ -1431,7 +1459,7 @@ static MACHINE_CONFIG_START( luckboomh, playmark_state )
 
 	MCFG_CPU_ADD("audiocpu", PIC16C57, XTAL_24MHz/2)    /* verified on pcb */
 	/* Program and Data Maps are internal to the MCU */
-	MCFG_CPU_IO_MAP(playmark_sound_io_map)
+	MCFG_CPU_IO_MAP(hrdtimes_sound_io_map)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -1753,7 +1781,10 @@ ROM_START( hrdtimes )
 	ROM_LOAD16_BYTE( "32.u66",       0x00001, 0x80000, CRC(f2c6b382) SHA1(d73affed091a261c4bfe17f409657e0a46b6c163) )
 
 	ROM_REGION( 0x1000, "audiocpu", ROMREGION_ERASE00 ) /* sound (PIC16C57) */
-	ROM_LOAD( "pic16c57",     0x0000, 0x1000, NO_DUMP )
+	/* ROM will be copied here by the init code from "user1" */
+
+	ROM_REGION( 0x3000, "user1", 0 )
+	ROM_LOAD( "pic16c57.hex",     0x0000, 0x1000, NO_DUMP )
 
 	ROM_REGION( 0x200000, "gfx1", 0 )
 	ROM_LOAD16_BYTE( "33.u36",       0x000000, 0x80000, CRC(d1239ce5) SHA1(8e966a39a47f66c5e904ec4357c751e896ed47cb) )
@@ -1767,18 +1798,17 @@ ROM_START( hrdtimes )
 	ROM_LOAD16_BYTE( "35.u84",       0x100000, 0x80000, CRC(7bde46ec) SHA1(1d26d268e1fc937e23ae7d93a1f86386b899a0c2) )
 	ROM_LOAD16_BYTE( "39.u83",       0x100001, 0x80000, CRC(a0bae586) SHA1(0b2bb0c5c51b2717b820f0176d5775df21652667) )
 
-	ROM_REGION( 0x80000, "user2", 0 )   /* OKIM6295 samples */
-	ROM_LOAD( "30.io13",      0x00000, 0x80000, CRC(fa5e50ae) SHA1(f3bd87c83fca9269cc2f19db1fbf55540c96f931) )
-
 	/* $00000-$20000 stays the same in all sound banks, */
 	/* the second half of the bank is what gets switched */
-	ROM_REGION( 0xc0000, "oki", 0 ) /* Samples */
-	ROM_COPY( "user2", 0x000000, 0x000000, 0x020000)
-	ROM_COPY( "user2", 0x020000, 0x020000, 0x020000)
-	ROM_COPY( "user2", 0x000000, 0x040000, 0x020000)
-	ROM_COPY( "user2", 0x040000, 0x060000, 0x020000)
-	ROM_COPY( "user2", 0x000000, 0x080000, 0x020000)
-	ROM_COPY( "user2", 0x060000, 0x0a0000, 0x020000)
+	ROM_REGION( 0x100000, "oki", 0 ) /* Samples */
+	ROM_LOAD( "30.io13",      0x00000, 0x20000, CRC(fa5e50ae) SHA1(f3bd87c83fca9269cc2f19db1fbf55540c96f931) )
+	ROM_CONTINUE(             0x60000, 0x20000 )
+	ROM_CONTINUE(             0xa0000, 0x20000 )
+	ROM_CONTINUE(             0xe0000, 0x20000 )
+	ROM_COPY( "oki", 0x00000, 0x20000, 0x20000 )
+	ROM_COPY( "oki", 0x00000, 0x40000, 0x20000 )
+	ROM_COPY( "oki", 0x00000, 0x80000, 0x20000 )
+	ROM_COPY( "oki", 0x00000, 0xc0000, 0x20000 )
 ROM_END
 
 /* Different revision of the PCB, uses larger gfx ROMs, however the content is the same */
@@ -1789,7 +1819,10 @@ ROM_START( hrdtimesa )
 	ROM_LOAD16_BYTE( "u66.bin",       0x00001, 0x80000, CRC(041ec30a) SHA1(00476ebd0a64cbd027be159cae7666d2df6d11ba) )
 
 	ROM_REGION( 0x1000, "audiocpu", ROMREGION_ERASE00 ) /* sound (PIC16C57) */
-	ROM_LOAD( "pic16c57",     0x0000, 0x1000, NO_DUMP )
+	/* ROM will be copied here by the init code from "user1" */
+
+	ROM_REGION( 0x3000, "user1", 0 )
+	ROM_LOAD( "pic16c57.hex",     0x0000, 0x1000, NO_DUMP )
 
 	ROM_REGION( 0x200000, "gfx1", 0 )
 	ROM_LOAD( "fh1_playmark_ht", 0x000000, 0x100000, CRC(3cca02b0) SHA1(22c57f4192bf81dd26caa6adfb1c80665bdc305c) )
@@ -1799,18 +1832,17 @@ ROM_START( hrdtimesa )
 	ROM_LOAD( "mh1_playmark_ht", 0x000000, 0x100000, CRC(927e5989) SHA1(b01444a3ff57cc2e10594e23c0343c956ed3ee32) )
 	ROM_LOAD( "mh2_playmark_ht", 0x100000, 0x100000, CRC(e76f001b) SHA1(217c06ca3618275c22e33cfe318ec6c970d4862c) )
 
-	ROM_REGION( 0x80000, "user2", 0 )   /* OKIM6295 samples */
-	ROM_LOAD( "io13.bin",      0x00000, 0x80000, CRC(fa5e50ae) SHA1(f3bd87c83fca9269cc2f19db1fbf55540c96f931) )
-
 	/* $00000-$20000 stays the same in all sound banks, */
 	/* the second half of the bank is what gets switched */
-	ROM_REGION( 0xc0000, "oki", 0 ) /* Samples */
-	ROM_COPY( "user2", 0x000000, 0x000000, 0x020000)
-	ROM_COPY( "user2", 0x020000, 0x020000, 0x020000)
-	ROM_COPY( "user2", 0x000000, 0x040000, 0x020000)
-	ROM_COPY( "user2", 0x040000, 0x060000, 0x020000)
-	ROM_COPY( "user2", 0x000000, 0x080000, 0x020000)
-	ROM_COPY( "user2", 0x060000, 0x0a0000, 0x020000)
+	ROM_REGION( 0x100000, "oki", 0 ) /* Samples */
+	ROM_LOAD( "io13.bin",     0x00000, 0x20000, CRC(fa5e50ae) SHA1(f3bd87c83fca9269cc2f19db1fbf55540c96f931) )
+	ROM_CONTINUE(             0x60000, 0x20000 )
+	ROM_CONTINUE(             0xa0000, 0x20000 )
+	ROM_CONTINUE(             0xe0000, 0x20000 )
+	ROM_COPY( "oki", 0x00000, 0x20000, 0x20000 )
+	ROM_COPY( "oki", 0x00000, 0x40000, 0x20000 )
+	ROM_COPY( "oki", 0x00000, 0x80000, 0x20000 )
+	ROM_COPY( "oki", 0x00000, 0xc0000, 0x20000 )
 ROM_END
 
 /*
@@ -1866,7 +1898,7 @@ ROM_START( hotmind )
 
 	ROM_REGION( 0x3000, "user1", 0 )
 	ROM_LOAD( "hotmind_pic16c57-hs_io15.hex", 0x0000, 0x2d4c, BAD_DUMP CRC(f3300d13) SHA1(78892453c7374ea3d1606cdb81197cc466e2a8c5) )  // protected, contains upper nibble?
-	ROM_LOAD( "hotmind_pic16c57.hex",         0x0000, 0x2d4c, BAD_DUMP CRC(9aa269bf) SHA1(4f8112199b2aa327d98e10b9da54443df7caa17a) )  // Using modified BigTwin PIC code to make it suite this game
+	ROM_LOAD( "hotmind_pic16c57.hex",         0x0000, 0x2d4c, BAD_DUMP CRC(11957803) SHA1(c2f87659819bfcf3a5b43fbccf81988c43b9c9c8) )  // Using modified Excelsior PIC code to make it suite this game
 
 	ROM_REGION( 0x080000, "gfx1", 0 )
 	ROM_LOAD16_BYTE( "23.u36",       0x000000, 0x10000, CRC(ddcf60b9) SHA1(0c0fbc44131cb7d36c21bf5aead87b498c5684f5) )
@@ -1884,8 +1916,11 @@ ROM_START( hotmind )
 	ROM_LOAD16_BYTE( "25.u84",       0x40000, 0x20000, CRC(c4fd4445) SHA1(ab0c5a328a312740595b5c92a1050527140518f3) )
 	ROM_LOAD16_BYTE( "29.u83",       0x40001, 0x20000, CRC(0bebfb53) SHA1(d4342f808141b70af98c370004153a31d120e2a4) )
 
-	ROM_REGION( 0x40000, "oki", 0 ) /* Samples */
-	ROM_LOAD( "20.io13",      0x00000, 0x40000, CRC(0bf3a3e5) SHA1(2ae06f37a6bcd20bc5fbaa90d970aba2ebf3cf5a) )
+	ROM_REGION( 0x80000, "oki", 0 ) /* Samples */
+	ROM_LOAD( "20.io13",      0x00000, 0x20000, CRC(0bf3a3e5) SHA1(2ae06f37a6bcd20bc5fbaa90d970aba2ebf3cf5a) )
+	ROM_CONTINUE(             0x60000, 0x20000 )
+	ROM_COPY( "oki", 0x00000, 0x20000, 0x20000 )
+	ROM_COPY( "oki", 0x00000, 0x40000, 0x20000 )
 
 	ROM_REGION( 0x8000, "plds", 0 )		/* These were read protected */
 	ROM_LOAD( "palce16v8h-25-pc4_u58.jed",   0x0000, 0xb89,  BAD_DUMP CRC(ba88c1da) SHA1(9b55e96eee44a467bdfbf760137ccb2fb3afedf0) )
@@ -1906,7 +1941,7 @@ ROM_START( luckboomh )
 	ROM_LOAD( "luckyboom_pic16c57-hs_io15.bin",  0x00000, 0x2000, BAD_DUMP CRC(c4b9c78e) SHA1(e85766383b22a62f19bf272d86d53c7fb1eb5ac4) ) // protected, contains upper nibble?
 
 	ROM_REGION( 0x3000, "user1", 0 )
-	ROM_LOAD( "luckyboom_pic16c57.hex", 0x0000, 0x2d4c, BAD_DUMP CRC(01a317e9) SHA1(5352b31f346c84fd7f9deca6ab56efdfb4d93daa) )  // Using modified Excelsior PIC code to make it suite this game
+	ROM_LOAD( "luckyboom_pic16c57.hex", 0x0000, 0x2d4c, BAD_DUMP CRC(5c4b5c39) SHA1(d24a097bb4a134406dd95d3ad5ed912f81a6a849) )  // Using modified Excelsior PIC code to make it suite this game
 
 	ROM_REGION( 0x080000, "gfx1", 0 )
 	ROM_LOAD16_BYTE( "23.u36",       0x000000, 0x10000, CRC(71840dd9) SHA1(9d0a75555dedb6fd28bb7c04b863f3ef5a1f8aac) )
@@ -1924,8 +1959,11 @@ ROM_START( luckboomh )
 	ROM_LOAD16_BYTE( "25.u84",       0x40000, 0x20000, CRC(e1ab5cf5) SHA1(f76d00537cfd6f09439e44071875bf021622fd07) )
 	ROM_LOAD16_BYTE( "29.u83",       0x40001, 0x20000, CRC(9572d2d4) SHA1(90d55b1f13dc93041160530e8c1ce8def6e02bcf) )
 
-	ROM_REGION( 0x40000, "oki", 0 ) /* Samples */
-	ROM_LOAD( "20.io13",      0x00000, 0x40000, CRC(0d42c0a3) SHA1(1b1d4c7dcbb063e8bf133063770b753947d1a017) )
+	ROM_REGION( 0x80000, "oki", 0 ) /* Samples */
+	ROM_LOAD( "20.io13",      0x00000, 0x20000, CRC(0d42c0a3) SHA1(1b1d4c7dcbb063e8bf133063770b753947d1a017) )
+	ROM_CONTINUE(             0x60000, 0x20000 )
+	ROM_COPY( "oki", 0x00000, 0x20000, 0x20000 )
+	ROM_COPY( "oki", 0x00000, 0x40000, 0x20000 )
 ROM_END
 
 
