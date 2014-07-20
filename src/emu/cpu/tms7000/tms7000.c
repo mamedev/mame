@@ -23,13 +23,37 @@
  *  - memory modes with IOCNT0, currently ignored
  *  - timer event counter mode (timer control register, bit 6)
  *  - TMS70x1/2 serial port and timer 3
- *  - TMS70C46 is same as TMS70C40, except with support for memory mapped I/O?
  *  - when they're needed, add TMS70Cx2, TMS7742, TMS77C82, SE70xxx
  *
  *****************************************************************************/
 
 #include "debugger.h"
 #include "tms7000.h"
+
+// 7000 is the most basic one, 128 bytes internal RAM and no internal ROM.
+// 7020 and 7040 are same, but with 2KB and 4KB internal ROM respectively.
+const device_type TMS7000 = &device_creator<tms7000_device>;
+const device_type TMS7020 = &device_creator<tms7020_device>;
+const device_type TMS7040 = &device_creator<tms7040_device>;
+
+// Exelvision (spinoff of TI) 7020 added one custom opcode.
+const device_type TMS7020_EXL = &device_creator<tms7020_exl_device>;
+
+// CMOS devices biggest difference in a 'real world' setting is that the power
+// requirements are much lower. This obviously has no use in software emulation.
+const device_type TMS70C00 = &device_creator<tms70c00_device>;
+const device_type TMS70C20 = &device_creator<tms70c20_device>;
+const device_type TMS70C40 = &device_creator<tms70c40_device>;
+
+// 70C46 is same as 70C40, except with support for memory mapped I/O?
+const device_type TMS70C46 = &device_creator<tms70c46_device>;
+
+// 70x1 features more peripheral I/O, the main addition being a serial port.
+// 70x2 is the same, just with twice more RAM (256 bytes)
+const device_type TMS7001 = &device_creator<tms7001_device>;
+const device_type TMS7041 = &device_creator<tms7041_device>;
+const device_type TMS7002 = &device_creator<tms7002_device>;
+const device_type TMS7042 = &device_creator<tms7042_device>;
 
 
 // flag helpers
@@ -42,20 +66,6 @@
 #define SET_C(x)    m_sr = (m_sr & 0x7f) | ((x) >> 1 & 0x80)
 #define SET_NZ(x)   m_sr = (m_sr & 0x9f) | ((x) >> 1 & 0x40) | (((x) & 0xff) ? 0 : 0x20)
 #define SET_CNZ(x)  m_sr = (m_sr & 0x1f) | ((x) >> 1 & 0xc0) | (((x) & 0xff) ? 0 : 0x20)
-
-
-const device_type TMS7000 = &device_creator<tms7000_device>;
-const device_type TMS7020 = &device_creator<tms7020_device>;
-const device_type TMS7020_EXL = &device_creator<tms7020_exl_device>;
-const device_type TMS7040 = &device_creator<tms7040_device>;
-const device_type TMS70C00 = &device_creator<tms70c00_device>;
-const device_type TMS70C20 = &device_creator<tms70c20_device>;
-const device_type TMS70C40 = &device_creator<tms70c40_device>;
-const device_type TMS70C46 = &device_creator<tms70c46_device>;
-const device_type TMS7001 = &device_creator<tms7001_device>;
-const device_type TMS7041 = &device_creator<tms7041_device>;
-const device_type TMS7002 = &device_creator<tms7002_device>;
-const device_type TMS7042 = &device_creator<tms7042_device>;
 
 
 // internal memory maps
