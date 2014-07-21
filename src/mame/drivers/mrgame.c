@@ -365,7 +365,6 @@ static GFXDECODE_START( mrgame )
 	GFXDECODE_ENTRY( "chargen", 0, spritelayout, 0, 16 )
 GFXDECODE_END
 
-// this gives bad colours although it looks right
 PALETTE_INIT_MEMBER( mrgame_state, mrgame)
 {
 	static const int resistances[3] = { 1000, 470, 220 };
@@ -656,8 +655,8 @@ ROM_START(wcup90)
 ROM_END
 
 
-GAME(1988,  dakar,     0,         mrgame,  mrgame, mrgame_state,  mrgame,  ROT0,  "Mr Game",    "Dakar",                      GAME_IS_SKELETON_MECHANICAL)
-GAME(1989,  motrshow,  0,         mrgame,  mrgame, mrgame_state,  mrgame,  ROT0,  "Mr Game",    "Motor Show (set 1)",         GAME_IS_SKELETON_MECHANICAL)
-GAME(1989,  motrshowa, motrshow,  mrgame,  mrgame, mrgame_state,  mrgame,  ROT0,  "Mr Game",    "Motor Show (set 2)",         GAME_IS_SKELETON_MECHANICAL)
-GAME(1990,  macattck,  0,         mrgame,  mrgame, mrgame_state,  mrgame,  ROT0,  "Mr Game",    "Mac Attack",                 GAME_IS_SKELETON_MECHANICAL)
-GAME(1990,  wcup90,    0,         mrgame,  mrgame, mrgame_state,  mrgame,  ROT0,  "Mr Game",    "World Cup 90",               GAME_IS_SKELETON_MECHANICAL)
+GAME(1988,  dakar,     0,         mrgame,  mrgame, mrgame_state,  mrgame,  ROT0,  "Mr Game", "Dakar", GAME_MECHANICAL | GAME_IMPERFECT_SOUND )
+GAME(1989,  motrshow,  0,         mrgame,  mrgame, mrgame_state,  mrgame,  ROT0,  "Mr Game", "Motor Show (set 1)", GAME_MECHANICAL | GAME_IMPERFECT_SOUND )
+GAME(1989,  motrshowa, motrshow,  mrgame,  mrgame, mrgame_state,  mrgame,  ROT0,  "Mr Game", "Motor Show (set 2)", GAME_MECHANICAL | GAME_IMPERFECT_SOUND )
+GAME(1990,  macattck,  0,         mrgame,  mrgame, mrgame_state,  mrgame,  ROT0,  "Mr Game", "Mac Attack", GAME_IS_SKELETON_MECHANICAL)
+GAME(1990,  wcup90,    0,         mrgame,  mrgame, mrgame_state,  mrgame,  ROT0,  "Mr Game", "World Cup 90", GAME_IS_SKELETON_MECHANICAL)
