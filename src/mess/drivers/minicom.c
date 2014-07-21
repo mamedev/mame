@@ -91,26 +91,26 @@ READ8_MEMBER(minicom_state::minicom_io_r)
 {
     switch (offset)
     {
-				case 1:
-					//P1.3 seems to be an indicator of whether or not we have a printer device attached.
-					// at address 0xABF the code checks this flag in order to decide which string to display:
-					// "MINIPRINT IS RESET" or "MINICOM IS RESET"
-					return PRINTER_ATTACHED << 3;
+		case 1:
+			//P1.3 seems to be an indicator of whether or not we have a printer device attached.
+			// at address 0xABF the code checks this flag in order to decide which string to display:
+			// "MINIPRINT IS RESET" or "MINICOM IS RESET"
+			return PRINTER_ATTACHED << 3;
         case 2:
-//					return 0; //para a palestra no Garoa... :-)
-					return 1; //to skip the "NO POWER" warning. I'm not sure why.
-				default:
+//			return 0; //para a palestra no Garoa... :-)
+			return 1; //to skip the "NO POWER" warning. I'm not sure why.
+		default:
 #if LOG_IO_PORTS
-					printf("Unhandled I/O Read at offset 0x%02X (return 0)\n", offset);
+			printf("Unhandled I/O Read at offset 0x%02X (return 0)\n", offset);
 #endif
-					return 0;
+			return 0;
 		}
 }
 
 #if LOG_IO_PORTS
 static void printbits(UINT8 v) {
-  int i;
-  for(i = 7; i >= 0; i--) putchar('0' + ((v >> i) & 1));
+	int i;
+	for(i = 7; i >= 0; i--) putchar('0' + ((v >> i) & 1));
 }
 #endif
 
@@ -134,17 +134,19 @@ WRITE8_MEMBER(minicom_state::minicom_io_w)
             if (data != m_p[offset])
             {
 #if LOG_IO_PORTS
-								UINT8 changed = m_p[offset] ^ data;
-								if (changed ^ P1_UNKNOWN_BITS){
+				UINT8 changed = m_p[offset] ^ data;
+				if (changed ^ P1_UNKNOWN_BITS)
+				{
 	                printf("Write to P1: %02X changed: (        ) (", data);
-									printbits(changed);
-									printf(") (        ) (        )\n");
-								}
+					printbits(changed);
+					printf(") (        ) (        )\n");
+				}
 #endif
-								if (FALLING_EDGE(m_p[offset], data, 2)){
-									m_digit_index--;
-									if (m_digit_index<0) m_digit_index = 19;
-								}
+				if (FALLING_EDGE(m_p[offset], data, 2))
+				{
+					m_digit_index--;
+					if (m_digit_index<0) m_digit_index = 19;
+				}
                 m_p[offset]=data;
             }
             break;
@@ -154,12 +156,13 @@ WRITE8_MEMBER(minicom_state::minicom_io_w)
             if (data != m_p[offset])
             {
 #if LOG_IO_PORTS
-								UINT8 changed = m_p[offset] ^ data;
-								if (changed ^ P2_UNKNOWN_BITS){
+				UINT8 changed = m_p[offset] ^ data;
+				if (changed ^ P2_UNKNOWN_BITS)
+				{
 	                printf("Write to P2: %02X changed: (        ) (        ) (", data);
-									printbits(changed);
-									printf(") (        )\n");
-								}
+					printbits(changed);
+					printf(") (        )\n");
+				}
 #endif
                 m_p[offset]=data;
             }
@@ -169,28 +172,32 @@ WRITE8_MEMBER(minicom_state::minicom_io_w)
         {
             if (data != m_p[offset])
             {
-								UINT8 changed = m_p[offset] ^ data;
+				UINT8 changed = m_p[offset] ^ data;
 #if LOG_IO_PORTS
-								if (changed ^ P3_UNKNOWN_BITS){
+				if (changed ^ P3_UNKNOWN_BITS)
+				{
 	                printf("Write to P3: %02X changed: (        ) (        ) (        ) (", data);
-									printbits(changed);
-									printf(")\n");
-								}
+					printbits(changed);
+					printf(")\n");
+				}
 #endif
 
-								if (FALLING_EDGE(m_p[offset], data, 4)){ //P3.4 = T0
-									m_display_data &= 0xFF00;
-									m_display_data |= m_p[0];
-								}
+				if (FALLING_EDGE(m_p[offset], data, 4)) //P3.4 = T0
+				{
+					m_display_data &= 0xFF00;
+					m_display_data |= m_p[0];
+				}
 
-								if (FALLING_EDGE(m_p[offset], data, 5)){ //P3.5 = T1
-									m_display_data &= 0xFF;
-									m_display_data |= (m_p[0] << 8);
-								}
+				if (FALLING_EDGE(m_p[offset], data, 5)) //P3.5 = T1
+				{
+					m_display_data &= 0xFF;
+					m_display_data |= (m_p[0] << 8);
+				}
 
-								if (BIT(changed,4) || BIT(changed,5)){
-									output_set_digit_value(m_digit_index, BITSWAP16(m_display_data,  9,  1,  3, 11, 12,  4,  2, 10, 14, 6,  7, 5,  0, 15,  13, 8) & 0x3FFF);
-								}
+				if (BIT(changed,4) || BIT(changed,5))
+				{
+					output_set_digit_value(m_digit_index, BITSWAP16(m_display_data,  9,  1,  3, 11, 12,  4,  2, 10, 14, 6,  7, 5,  0, 15,  13, 8) & 0x3FFF);
+				}
                 m_p[offset]=data;
             }
             break;
