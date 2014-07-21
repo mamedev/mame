@@ -27,10 +27,10 @@ class spectra_state : public genpin_class
 {
 public:
 	spectra_state(const machine_config &mconfig, device_type type, const char *tag)
-		: genpin_class(mconfig, type, tag),
-	m_maincpu(*this, "maincpu"),
-	m_snsnd(*this, "snsnd"),
-	m_p_ram(*this, "ram")
+		: genpin_class(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_snsnd(*this, "snsnd")
+		, m_p_ram(*this, "nvram")
 	{ }
 
 	DECLARE_READ8_MEMBER(porta_r);
@@ -39,27 +39,22 @@ public:
 	DECLARE_WRITE8_MEMBER(portb_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(nmitimer);
 	TIMER_DEVICE_CALLBACK_MEMBER(outtimer);
-protected:
-
-	// devices
-	required_device<cpu_device> m_maincpu;
-	required_device<sn76477_device> m_snsnd;
-	required_shared_ptr<UINT8> m_p_ram;
-
-	// driver_device overrides
-	virtual void machine_reset();
 private:
 	UINT8 m_porta;
 	UINT8 m_portb;
 	UINT8 m_t_c;
 	UINT8 m_out_offs;
+	virtual void machine_reset();
+	required_device<cpu_device> m_maincpu;
+	required_device<sn76477_device> m_snsnd;
+	required_shared_ptr<UINT8> m_p_ram;
 };
 
 
 static ADDRESS_MAP_START( spectra_map, AS_PROGRAM, 8, spectra_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xfff)
-	AM_RANGE(0x0000, 0x00ff) AM_RAM AM_SHARE("ram") // battery backed, 2x 5101L
+	AM_RANGE(0x0000, 0x00ff) AM_RAM AM_SHARE("nvram") // battery backed, 2x 5101L
 	AM_RANGE(0x0100, 0x017f) AM_RAM // RIOT RAM
 	AM_RANGE(0x0180, 0x019f) AM_DEVREADWRITE("riot", riot6532_device, read, write)
 	AM_RANGE(0x0400, 0x0fff) AM_ROM
@@ -148,7 +143,7 @@ WRITE8_MEMBER( spectra_state::portb_w )
 	if (BIT(data, 1)) vco -= 0.625;
 	if (BIT(data, 2)) vco -= 1.25;
 	if (BIT(data, 3)) vco -= 2.5;
-	m_snsnd->vco_voltage_w(5.4 - vco);
+	m_snsnd->vco_voltage_w(5.3125 - vco);
 	m_snsnd->enable_w(!BIT(data, 4)); // strobe: toggles enable
 	m_snsnd->envelope_1_w(!BIT(data, 5)); //decay: toggles envelope
 	m_snsnd->vco_w(BIT(data, 6)); // "phaser" sound: VCO toggled
@@ -238,7 +233,7 @@ static MACHINE_CONFIG_START( spectra, spectra_state )
 	MCFG_RIOT6532_OUT_PB_CB(WRITE8(spectra_state, portb_w))
 	MCFG_RIOT6532_IRQ_CB(INPUTLINE("maincpu", M6502_IRQ_LINE))
 
-	MCFG_NVRAM_ADD_1FILL("ram")
+	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("nmitimer", spectra_state, nmitimer, attotime::from_hz(120))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("outtimer", spectra_state, outtimer, attotime::from_hz(1200))
