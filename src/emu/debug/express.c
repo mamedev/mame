@@ -559,7 +559,8 @@ void symbol_table::set_memory_value(const char *name, expression_space space, UI
 //-------------------------------------------------
 
 parsed_expression::parsed_expression(symbol_table *symtable, const char *expression, UINT64 *result)
-	: m_symtable(symtable)
+	: m_symtable(symtable),
+	m_token_stack_ptr(0)
 {
 	// if we got an expression parse it
 	if (expression != NULL)
