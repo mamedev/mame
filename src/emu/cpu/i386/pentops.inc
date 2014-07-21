@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Ville Linde, Barry Rodewald, Carl, Phil Bennett
 // Pentium+ specific opcodes
 
 extern flag float32_is_nan( float32 a ); // since its not defined in softfloat.h

@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Ville Linde, Barry Rodewald, Carl, Phil Bennett
 #pragma once
 
 #ifndef __I386INTF_H__

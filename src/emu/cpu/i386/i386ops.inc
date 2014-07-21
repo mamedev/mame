@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Ville Linde, Barry Rodewald, Carl, Phil Bennett
 UINT8 i386_device::i386_shift_rotate8(UINT8 modrm, UINT32 value, UINT8 shift)
 {
 	UINT32 src = value & 0xff;

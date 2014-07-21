@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Phil Bennett
 /***************************************************************************
 
     x87 FPU emulation

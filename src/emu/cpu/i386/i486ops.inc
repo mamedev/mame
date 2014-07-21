@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Ville Linde, Barry Rodewald, Carl, Phil Bennett
 // Intel 486+ specific opcodes
 
 void i386_device::i486_cpuid()             // Opcode 0x0F A2
