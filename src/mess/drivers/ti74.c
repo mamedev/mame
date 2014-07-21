@@ -133,4 +133,4 @@ ROM_START( ti74 )
 ROM_END
 
 
-COMP( 1986, ti74, 0, 0, ti74, ti74, driver_device, 0, "Texas Instruments", "TI-74", GAME_IS_SKELETON )
+COMP( 1985, ti74, 0, 0, ti74, ti74, driver_device, 0, "Texas Instruments", "TI-74 Basicalc", GAME_IS_SKELETON )
