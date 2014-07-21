@@ -2,7 +2,7 @@
 // copyright-holders:hap
 /***************************************************************************
 
-  TI-74
+  TI-74 BASICALC
 
 
   TODO:
@@ -96,7 +96,7 @@ void ti74_state::machine_start()
 static MACHINE_CONFIG_START( ti74, ti74_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS70C46, 2500000)
+	MCFG_CPU_ADD("maincpu", TMS70C46, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 
 	/* video hardware */
@@ -133,4 +133,4 @@ ROM_START( ti74 )
 ROM_END
 
 
-COMP( 1985, ti74, 0, 0, ti74, ti74, driver_device, 0, "Texas Instruments", "TI-74 Basicalc", GAME_IS_SKELETON )
+COMP( 1985, ti74, 0, 0, ti74, ti74, driver_device, 0, "Texas Instruments", "TI-74 BASICALC", GAME_IS_SKELETON )

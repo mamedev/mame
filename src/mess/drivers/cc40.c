@@ -26,8 +26,8 @@
   |                                                         |
   |                                                         |
   |             HM6116LP-4                    TMX70C20N2L   |
-  |                                                         |
-  |                              AMI 8304BXH                |
+  |                                      5MHz               |
+  |                             AMI 1041036-1               |
   |             HN61256PC09                                 |
   |                                             *Cartridge  |
   |                                           ---------------
@@ -36,10 +36,10 @@
   |*HEXBUS|
   ---------
 
-  HM6116LP-4    - Hitachi 2KB SRAM
+  HM6116LP-4    - Hitachi 2KB SRAM (newer 18KB version has two HM6264 8KB chips)
   HN61256PC09   - Hitachi DIP-28 32KB CMOS Mask PROM
   TMX70C20N2L   - Texas Instruments TMS70C20 CPU (128 bytes RAM, 2KB ROM) @ 2.5MHz - "X" implies prototype
-  AMI 8304BXH   - 74-pin QFP AMI Gate Array
+  AMI 1041036-1 - 68-pin QFP AMI Gate Array
   HD44100H      - 60-pin QFP Hitachi HD44100 LCD Driver
   HD44780A00    - 80-pin TFP Hitachi HD44780 LCD Controller
   
@@ -48,17 +48,22 @@
   
   CC-40 is powered by 4 AA batteries. These will also save internal RAM,
   provided that the machine is turned off properly. If a program is running,
-  you may have to press BREAK before turning the CC-40 off.
+  you may have to press [BREAK] before turning the CC-40 off.
   
-  To run a cartridge, usually the command run"dir" shows which program(s)
-  can be loaded. Load a program by pressing the RUN key while viewing the list,
-  or manually with the command run"<shortname of program in list>"
+  To run a cartridge, usually the command RUN "DIR" shows which program(s)
+  can be loaded. Load a program by pressing the [RUN] key while viewing the list,
+  or manually with the command RUN "<shortname of program in list>"
 
 
   TODO:
   - some strange bugs with Games I cartridge, bad dump or emulation bug?
-  - other RAM configurations (6KB(default), 12KB, 18KB, external)
+  - other RAM configurations (6KB(default), 18KB, external)
   - Hexbus interface and peripherals
+    * HX-1000: color plotter
+    * HX-1010: thermal printer
+    * HX-3000: RS-232 interface
+    * HX-3100: modem
+    * HX-3200: Centronics printer interface
   - HD44100 is not accessed by the CPU, is it connected to the HD44780?
     Probably responsible for the LCD indicators, how?
 
@@ -452,7 +457,7 @@ void cc40_state::machine_start()
 static MACHINE_CONFIG_START( cc40, cc40_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS70C20, XTAL_2_5MHz)
+	MCFG_CPU_ADD("maincpu", TMS70C20, XTAL_5MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(main_io_map)
 

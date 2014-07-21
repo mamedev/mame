@@ -45,6 +45,7 @@ const device_type TMS70C20 = &device_creator<tms70c20_device>;
 const device_type TMS70C40 = &device_creator<tms70c40_device>;
 
 // 70C46 is same as 70C40, except with support for memory mapped I/O?
+// note: may also be labeled TMC70009
 const device_type TMS70C46 = &device_creator<tms70c46_device>;
 
 // 70x1 features more peripheral I/O, the main addition being a serial port.
