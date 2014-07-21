@@ -705,11 +705,11 @@ ROM_START( dreamwld )
 	  ram.  The interrupt vectors point at the code placed in RAM. */
 	ROM_LOAD( "protdata.bin", 0x000, 0x6c9 ,  CRC(f284b2fd) SHA1(9e8096c8aa8a288683f002311b38787b120748d1) ) /* extracted */
 
-	ROM_REGION( 0x100000, "oki1", 0 ) /* OKI Samples - 1st chip*/
+	ROM_REGION( 0x100000, "oki1", 0 ) /* OKI Samples - 1st chip */
 	ROM_LOAD( "5.bin", 0x000000, 0x80000, CRC(9689570a) SHA1(4414233da8f46214ca7e9022df70953922a63aa4) )
 	ROM_RELOAD(0x80000,0x80000) // for the banks
 
-	ROM_REGION( 0x100000, "oki2", 0 ) /* OKI Samples - 2nd chip*/
+	ROM_REGION( 0x100000, "oki2", 0 ) /* OKI Samples - 2nd chip */
 	ROM_LOAD( "6.bin", 0x000000, 0x80000, CRC(c8b91f30) SHA1(706004ca56d0a74bc7a3dfd73a21cdc09eb90f05) )
 	ROM_RELOAD(0x80000,0x80000) // for the banks
 
@@ -730,7 +730,7 @@ ROM_END
 /*
 
 Rolling Crush
-Trust / Semicom, 1999
+Trust / SemiCom, 1999
 
 PCB Layout
 ----------
@@ -806,7 +806,7 @@ ROM_END
 /*
 
 Baryon
-Semicom, 1997
+SemiCom, 1997
 
 PCB Layout
 ----------
@@ -873,4 +873,4 @@ ROM_END
 
 GAME( 1997, baryon,   0, baryon,   baryon,   driver_device, 0, ROT270, "SemiCom",         "Baryon - Future Assault", GAME_SUPPORTS_SAVE )
 GAME( 2000, dreamwld, 0, dreamwld, dreamwld, driver_device, 0, ROT0,   "SemiCom",         "Dream World", GAME_SUPPORTS_SAVE )
-GAME( 1999, rolcrush, 0, baryon,   rolcrush, driver_device, 0, ROT0,   "Trust / Semicom", "Rolling Crush (version 1.07.E - 1999/02/11)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS ) // wrong linescroll
+GAME( 1999, rolcrush, 0, baryon,   rolcrush, driver_device, 0, ROT0,   "Trust / SemiCom", "Rolling Crush (version 1.07.E - 1999/02/11)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS ) // wrong linescroll
