@@ -794,6 +794,7 @@ DRVLIBS += \
 	$(MESSOBJ)/toshiba.a \
 	$(MESSOBJ)/trainer.a \
 	$(MESSOBJ)/trs.a \
+	$(MESSOBJ)/ultratec.a \
 	$(MESSOBJ)/unisys.a \
 	$(MESSOBJ)/veb.a \
 	$(MESSOBJ)/vidbrain.a \
@@ -1969,6 +1970,9 @@ $(MESSOBJ)/trs.a:               \
 	$(MESS_DRIVERS)/tandy2k.o   \
 	$(MESS_MACHINE)/tandy2kb.o  \
 
+$(MESSOBJ)/ultratec.a:        \
+	$(MESS_DRIVERS)/minicom.o   \
+
 $(MESSOBJ)/unisys.a:            \
 	$(MESS_DRIVERS)/univac.o    \
 
@@ -2294,6 +2298,7 @@ $(MESS_MACHINE)/megacd.o:   $(MESS_LAYOUT)/megacd.lh
 $(MESS_DRIVERS)/mekd2.o:    $(MESS_LAYOUT)/mekd2.lh
 $(MESS_DRIVERS)/mephisto.o: $(MESS_LAYOUT)/mephisto.lh
 $(MESS_DRIVERS)/merlin.o:   $(MESS_LAYOUT)/merlin.lh
+$(MESS_DRIVERS)/minicom.o:   $(MESS_LAYOUT)/minicom.lh
 $(MESS_DRIVERS)/mirage.o:   $(MESS_LAYOUT)/mirage.lh
 $(MESS_DRIVERS)/mk1.o:      $(MESS_LAYOUT)/mk1.lh
 $(MESS_DRIVERS)/mk14.o:     $(MESS_LAYOUT)/mk14.lh

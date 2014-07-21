@@ -1,0 +1,113 @@
+<?xml version="1.0"?>
+<mamelayout version="2">
+	<element name="digit" defstate="0">
+		<led14seg>
+			<color red="0.0" green="0.75" blue="0.75" />
+		</led14seg>
+	</element>
+
+	<element name="led" defstate="0">
+		<disk state="1">
+			<color red="0.75" green="0.0" blue="0.0" />
+		</disk>
+		<disk state="0">
+			<color red="0.09375" green="0.0" blue="0.0" />
+		</disk>
+	</element>
+
+	<element name="background">
+		<rect>
+			<bounds left="0" top="0" right="1" bottom="1" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</rect>
+	</element>
+
+	<view name="Default Layout">
+		<!-- Black background -->
+		<bezel element="background">
+			<bounds left="00" top="00" right="1380" bottom="130" />
+		</bezel>
+
+		<!-- 20 digits -->
+		<bezel name="digit0" element="digit">
+			<bounds x="0" y="15" width="50" height="80" />
+		</bezel>
+
+		<bezel name="digit1" element="digit">
+			<bounds x="70" y="15" width="50" height="80" />
+		</bezel>
+
+		<bezel name="digit2" element="digit">
+			<bounds x="140" y="15" width="50" height="80" />
+		</bezel>
+
+		<bezel name="digit3" element="digit">
+			<bounds x="210" y="15" width="50" height="80" />
+		</bezel>
+
+		<bezel name="digit4" element="digit">
+			<bounds x="280" y="15" width="50" height="80" />
+		</bezel>
+
+		<bezel name="digit5" element="digit">
+			<bounds x="350" y="15" width="50" height="80" />
+		</bezel>
+
+		<bezel name="digit6" element="digit">
+			<bounds x="420" y="15" width="50" height="80" />
+		</bezel>
+
+		<bezel name="digit7" element="digit">
+			<bounds x="490" y="15" width="50" height="80" />
+		</bezel>
+
+		<bezel name="digit8" element="digit">
+			<bounds x="560" y="15" width="50" height="80" />
+		</bezel>
+
+		<bezel name="digit9" element="digit">
+			<bounds x="630" y="15" width="50" height="80" />
+		</bezel>
+
+		<bezel name="digit10" element="digit">
+			<bounds x="700" y="15" width="50" height="80" />
+		</bezel>
+
+		<bezel name="digit11" element="digit">
+			<bounds x="770" y="15" width="50" height="80" />
+		</bezel>
+
+		<bezel name="digit12" element="digit">
+			<bounds x="840" y="15" width="50" height="80" />
+		</bezel>
+
+		<bezel name="digit13" element="digit">
+			<bounds x="910" y="15" width="50" height="80" />
+		</bezel>
+
+		<bezel name="digit14" element="digit">
+			<bounds x="980" y="15" width="50" height="80" />
+		</bezel>
+
+		<bezel name="digit15" element="digit">
+			<bounds x="1050" y="15" width="50" height="80" />
+		</bezel>
+
+		<bezel name="digit16" element="digit">
+			<bounds x="1120" y="15" width="50" height="80" />
+		</bezel>
+
+		<bezel name="digit17" element="digit">
+			<bounds x="1190" y="15" width="50" height="80" />
+		</bezel>
+
+		<bezel name="digit18" element="digit">
+			<bounds x="1260" y="15" width="50" height="80" />
+		</bezel>
+
+		<bezel name="digit19" element="digit">
+			<bounds x="1330" y="15" width="50" height="80" />
+		</bezel>
+
+	</view>
+</mamelayout>
