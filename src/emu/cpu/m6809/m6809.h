@@ -129,6 +129,9 @@ protected:
 	UINT8                       m_opcode;
 
 	// other internal state
+	UINT8 *                     m_reg8;
+	PAIR16 *                    m_reg16;
+	int                         m_reg;
 	bool                        m_nmi_line;
 	bool                        m_nmi_asserted;
 	bool                        m_firq_line;
@@ -146,10 +149,10 @@ protected:
 	void eat_remaining();
 
 	// read a byte from given memory location
-	ATTR_FORCE_INLINE UINT8 read_memory(UINT16 address)             { eat(1); return m_program->read_byte(address); }
+	ATTR_FORCE_INLINE UINT8 read_memory(UINT16 address)             { eat(1); return m_addrspace[AS_PROGRAM]->read_byte(address); }
 
 	// write a byte to given memory location
-	ATTR_FORCE_INLINE void write_memory(UINT16 address, UINT8 data) { eat(1); m_program->write_byte(address, data); }
+	ATTR_FORCE_INLINE void write_memory(UINT16 address, UINT8 data) { eat(1); m_addrspace[AS_PROGRAM]->write_byte(address, data); }
 
 	// read_opcode() is like read_memory() except it is used for reading opcodes. In  the case of a system
 	// with memory mapped I/O, this function can be used  to greatly speed up emulation.
@@ -241,14 +244,10 @@ protected:
 private:
 	// address spaces
 	const address_space_config  m_program_config;
-	address_space *             m_program;
 	direct_read_data *          m_direct;
 
 	// other state
 	UINT32                      m_state;
-	int                         m_reg;
-	UINT8 *                     m_reg8;
-	PAIR16 *                    m_reg16;
 	bool                        m_cond;
 
 	// incidentals

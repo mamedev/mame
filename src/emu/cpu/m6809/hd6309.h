@@ -33,6 +33,8 @@ protected:
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
+	virtual void device_pre_save();
+	virtual void device_post_load();
 
 	// device_execute_interface overrides
 	virtual void execute_run();
@@ -133,7 +135,9 @@ enum
 	HD6309_F,
 	HD6309_W,
 	HD6309_V,
-	HD6309_MD
+	HD6309_MD,
+	HD6309_ZERO_BYTE,
+	HD6309_ZERO_WORD
 };
 
 #define HD6309_IRQ_LINE  0   /* IRQ line number */

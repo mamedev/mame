@@ -122,8 +122,7 @@ m6809_base_device::m6809_base_device(const machine_config &mconfig, const char *
 
 void m6809_base_device::device_start()
 {
-	m_program = &space(AS_PROGRAM);
-	m_direct = &m_program->direct();
+	m_direct = &m_addrspace[AS_PROGRAM]->direct();
 
 	m_lic_func.resolve_safe();
 
@@ -202,8 +201,8 @@ void m6809_base_device::device_reset()
 	m_cc |= CC_I;       // IRQ disabled
 	m_cc |= CC_F;       // FIRQ disabled
 
-	m_pc.b.h = m_program->read_byte(VECTOR_RESET_FFFE + 0);
-	m_pc.b.l = m_program->read_byte(VECTOR_RESET_FFFE + 1);
+	m_pc.b.h = m_addrspace[AS_PROGRAM]->read_byte(VECTOR_RESET_FFFE + 0);
+	m_pc.b.l = m_addrspace[AS_PROGRAM]->read_byte(VECTOR_RESET_FFFE + 1);
 
 	// reset sub-instruction state
 	reset_state();

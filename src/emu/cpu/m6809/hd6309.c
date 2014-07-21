@@ -174,6 +174,101 @@ void hd6309_device::device_reset()
 }
 
 
+//-------------------------------------------------
+//  device_pre_save - device-specific pre-save
+//-------------------------------------------------
+
+void hd6309_device::device_pre_save()
+{
+	if      (m_reg8 == &m_d.b.h)	m_reg = HD6309_A;
+	else if (m_reg8 == &m_d.b.l)	m_reg = HD6309_B;
+	else if (m_reg8 == &m_w.b.h)	m_reg = HD6309_E;
+	else if (m_reg8 == &m_w.b.l)	m_reg = HD6309_F;
+	else if (m_reg8 == &m_cc)		m_reg = HD6309_CC;
+	else if (m_reg8 == &m_dp)		m_reg = HD6309_DP;
+	else if (m_reg8 == &m_md)		m_reg = HD6309_MD;
+	else if (m_reg8 == &m_temp.b.l)	m_reg = HD6309_ZERO_BYTE;
+
+	else if (m_reg16 == &m_d)		m_reg = HD6309_D;
+	else if (m_reg16 == &m_x)		m_reg = HD6309_X;
+	else if (m_reg16 == &m_y)		m_reg = HD6309_Y;
+	else if (m_reg16 == &m_u)		m_reg = HD6309_U;
+	else if (m_reg16 == &m_s)		m_reg = HD6309_S;
+	else if (m_reg16 == &m_pc)		m_reg = HD6309_PC;
+	else if (m_reg16 == &m_w)		m_reg = HD6309_W;
+	else if (m_reg16 == &m_v)		m_reg = HD6309_V;
+	else if (m_reg16 == &m_temp)	m_reg = HD6309_ZERO_WORD;
+	else
+		m_reg = 0;
+}
+
+
+//-------------------------------------------------
+//  device_post_load - device-specific post-load
+//-------------------------------------------------
+
+void hd6309_device::device_post_load()
+{
+	m_reg8 = NULL;
+	m_reg16 = NULL;
+
+	switch(m_reg)
+	{
+		case HD6309_A:
+			set_regop8(m_d.b.h);
+			break;
+		case HD6309_B:
+			set_regop8(m_d.b.l);
+			break;
+		case HD6309_E:
+			set_regop8(m_w.b.h);
+			break;
+		case HD6309_F:
+			set_regop8(m_w.b.l);
+			break;
+		case HD6309_CC:
+			set_regop8(m_cc);
+			break;
+		case HD6309_DP:
+			set_regop8(m_dp);
+			break;
+		case HD6309_MD:
+			set_regop8(m_md);
+			break;
+		case HD6309_ZERO_BYTE:
+			set_regop8(m_temp.b.l);
+			break;
+
+		case HD6309_D:
+			set_regop16(m_d);
+			break;
+		case HD6309_X:
+			set_regop16(m_x);
+			break;
+		case HD6309_Y:
+			set_regop16(m_y);
+			break;
+		case HD6309_U:
+			set_regop16(m_u);
+			break;
+		case HD6309_S:
+			set_regop16(m_s);
+			break;
+		case HD6309_PC:
+			set_regop16(m_pc);
+			break;
+		case HD6309_W:
+			set_regop16(m_w);
+			break;
+		case HD6309_V:
+			set_regop16(m_v);
+			break;
+		case HD6309_ZERO_WORD:
+			set_regop16(m_temp);
+			break;
+	}
+}
+
 
 //-------------------------------------------------
 //  disasm_min_opcode_bytes - return the length
