@@ -41,8 +41,6 @@ Segment data is sent to each 14seg digit by first writing half of the data to po
 #include "cpu/mcs51/mcs51.h"
 #include "minicom.lh"
 
-UINT16 display_data;
-
 class minicom_state : public driver_device
 {
 public:
@@ -55,7 +53,9 @@ public:
 	DECLARE_READ8_MEMBER(minicom_io_r);
 	DECLARE_DRIVER_INIT(minicom);
 private:
-	int digit_index;
+	UINT8 m_p[4];
+	UINT16 m_display_data;
+	int m_digit_index;
 	virtual void machine_start();
 	virtual void machine_reset();
 	required_device<cpu_device> m_maincpu;
@@ -67,15 +67,23 @@ ADDRESS_MAP_END
 
 void minicom_state::machine_start()
 {
+	// zerofill
+	memset(m_p, 0, 4);
+	m_digit_index = 0;
+	m_display_data = 0;
+	
+	// register for savestates
+	save_item(NAME(m_p));
+	save_item(NAME(m_digit_index));
+	save_item(NAME(m_display_data));
 }
 
 void minicom_state::machine_reset()
 {
-	int i;
-	digit_index = 19;
-	display_data = 0;
+	m_digit_index = 19;
+	m_display_data = 0;
 
-	for (i=0; i<20; i++)
+	for (int i=0; i<20; i++)
 		output_set_digit_value(i, 0);
 }
 
@@ -100,7 +108,7 @@ READ8_MEMBER(minicom_state::minicom_io_r)
 }
 
 #if LOG_IO_PORTS
-static void printbits(unsigned char v) {
+static void printbits(UINT8 v) {
   int i;
   for(i = 7; i >= 0; i--) putchar('0' + ((v >> i) & 1));
 }
@@ -114,55 +122,54 @@ static void printbits(unsigned char v) {
 #define P3_UNKNOWN_BITS (0xFF & ~((1 << 4)|(1 << 5)))
 WRITE8_MEMBER(minicom_state::minicom_io_w)
 {
-    static UINT8 p0=0, p1=0, p2=0, p3=0;
     switch (offset)
     {
         case 0x00:
         {
-            p0=data;
+            m_p[offset]=data;
             break;
         }
         case 0x01:
         {
-            if (data != p1)
+            if (data != m_p[offset])
             {
 #if LOG_IO_PORTS
-								char changed = p1 ^ data;
+								UINT8 changed = m_p[offset] ^ data;
 								if (changed ^ P1_UNKNOWN_BITS){
 	                printf("Write to P1: %02X changed: (        ) (", data);
 									printbits(changed);
 									printf(") (        ) (        )\n");
 								}
 #endif
-								if (FALLING_EDGE(p1, data, 2)){
-									digit_index--;
-									if (digit_index<0) digit_index = 19;
+								if (FALLING_EDGE(m_p[offset], data, 2)){
+									m_digit_index--;
+									if (m_digit_index<0) m_digit_index = 19;
 								}
-                p1=data;
+                m_p[offset]=data;
             }
             break;
         }
         case 0x02:
         {
-            if (data != p2)
+            if (data != m_p[offset])
             {
 #if LOG_IO_PORTS
-								char changed = p2 ^ data;
+								UINT8 changed = m_p[offset] ^ data;
 								if (changed ^ P2_UNKNOWN_BITS){
 	                printf("Write to P2: %02X changed: (        ) (        ) (", data);
 									printbits(changed);
 									printf(") (        )\n");
 								}
 #endif
-                p2=data;
+                m_p[offset]=data;
             }
             break;
         }
         case 0x03:
         {
-            if (data != p3)
+            if (data != m_p[offset])
             {
-								char changed = p3 ^ data;
+								UINT8 changed = m_p[offset] ^ data;
 #if LOG_IO_PORTS
 								if (changed ^ P3_UNKNOWN_BITS){
 	                printf("Write to P3: %02X changed: (        ) (        ) (        ) (", data);
@@ -171,20 +178,20 @@ WRITE8_MEMBER(minicom_state::minicom_io_w)
 								}
 #endif
 
-								if (FALLING_EDGE(p3, data, 4)){ //P3.4 = T0
-									display_data &= 0xFF00;
-									display_data |= p0;
+								if (FALLING_EDGE(m_p[offset], data, 4)){ //P3.4 = T0
+									m_display_data &= 0xFF00;
+									m_display_data |= m_p[0];
 								}
 
-								if (FALLING_EDGE(p3, data, 5)){ //P3.5 = T1
-									display_data &= 0xFF;
-									display_data |= (p0 << 8);
+								if (FALLING_EDGE(m_p[offset], data, 5)){ //P3.5 = T1
+									m_display_data &= 0xFF;
+									m_display_data |= (m_p[0] << 8);
 								}
 
 								if (BIT(changed,4) || BIT(changed,5)){
-									output_set_digit_value(digit_index, BITSWAP16(display_data,  9,  1,  3, 11, 12,  4,  2, 10, 14, 6,  7, 5,  0, 15,  13, 8) & 0x3FFF);
+									output_set_digit_value(m_digit_index, BITSWAP16(m_display_data,  9,  1,  3, 11, 12,  4,  2, 10, 14, 6,  7, 5,  0, 15,  13, 8) & 0x3FFF);
 								}
-                p3=data;
+                m_p[offset]=data;
             }
             break;
         }
