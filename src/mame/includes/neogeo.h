@@ -45,6 +45,7 @@ public:
 		m_memcard(*this, "memcard"),
 		m_sprgen(*this, "spritegen"),
 		m_use_cart_vectors(0),
+		m_use_cart_audio(0),
 		m_cartslot1(*this, "cartslot1"),
 		m_cartslot2(*this, "cartslot2"),
 		m_cartslot3(*this, "cartslot3"),

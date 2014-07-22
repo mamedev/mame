@@ -5482,6 +5482,10 @@ ROM_END
 //  Note: prototype; checksums handwritten on prg roms, EPR stickers present on other roms, but handwritten locations instead of numbers
 //        The PCB was found in a 4 player cocktail cabinet with full Center Court artwork & instruction cards - Likely a location test unit.
 //
+//  The following bugs are confirmed to happen on real hardware (due to game being a prototype)
+//   Memory test option in test mode does not work (incomplete code in the 68k program)
+//   Music fails to play at first if you insert a coin when credits == 0 (bug in the Z80 program)
+
 ROM_START( cencourt )
 	ROM_REGION( 0x20000, "maincpu", 0 ) // 68000 code
 	ROM_LOAD16_BYTE( "a4_56f6.a4", 0x000000, 0x10000, CRC(7116dce6) SHA1(058faf5f1980f811e2e1d5f7d09660ff51b0c0dc) )
