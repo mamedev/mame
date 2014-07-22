@@ -1,6 +1,6 @@
 /***************************************************************************************************
 
-  Sky Lancer / Butterfly / Mad Zoo / Super Star '97
+  Sky Lancer / Butterfly / Mad Zoo / Super Star 97
   Bordun International.
 
   Original preliminary driver by Luca Elia.
@@ -1607,7 +1607,7 @@ ROM_START( neraidou )
 ROM_END
 
 /*
-  Super Star '97
+  Super Star 97
   Bordun International.
 
   For amusement only (as seen in the title).
@@ -1673,4 +1673,4 @@ GAME( 1995, madzoo,   0,       skylncr,  skylncr,  skylncr_state,  skylncr, ROT0
 GAME( 1995, leader,   0,       skylncr,  leader,   skylncr_state,  skylncr, ROT0, "bootleg",              "Leader (version Z 2E, Greece)",                  0 )
 GAME( 199?, gallag50, 0,       skylncr,  gallag50, skylncr_state,  skylncr, ROT0, "bootleg",              "Gallag Video Game / Petalouda (Butterfly, x50)", 0 )
 GAME( 199?, neraidou, 0,       neraidou, neraidou, skylncr_state,  skylncr, ROT0, "bootleg",              "Neraidoula (Fairy Butterfly)",                   0 )
-GAME( 199?, sstar97,  0,       sstar97,  sstar97,  skylncr_state,  skylncr, ROT0, "Bordun International", "Super Star '97 (version V153B)",                 0 )
+GAME( 199?, sstar97,  0,       sstar97,  sstar97,  skylncr_state,  skylncr, ROT0, "Bordun International", "Super Star 97 / Ming Xing 97 (version V153B)",   0 )
