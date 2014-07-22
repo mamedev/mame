@@ -417,6 +417,12 @@ endif
 # add an ARCH define
 DEFS += -DSDLMAME_ARCH="$(ARCHOPTS)" -DSYNC_IMPLEMENTATION=$(SYNC_IMPLEMENTATION)
 
+# Add JavaScript sound module for Emscripten compiles
+
+ifeq ($(TARGETOS),emscripten)
+OSDOBJS += $(OSDOBJ)/modules/sound/js_sound.o
+endif
+
 #-------------------------------------------------
 # Generic defines and additions
 #-------------------------------------------------
