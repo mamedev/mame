@@ -113,7 +113,7 @@ private:
 	devcb_read8        m_in_a_pa_cb;
 	devcb_read8        m_in_a_pb_cb;
 	devcb_read8        m_in_a_pc_cb;
-	
+
 	devcb_write8       m_out_a_pa_cb;
 	devcb_write8       m_out_a_pb_cb;
 	devcb_write8       m_out_a_pc_cb;
@@ -121,7 +121,7 @@ private:
 	devcb_read8        m_in_b_pa_cb;
 	devcb_read8        m_in_b_pb_cb;
 	devcb_read8        m_in_b_pc_cb;
-	
+
 	devcb_write8       m_out_b_pa_cb;
 	devcb_write8       m_out_b_pb_cb;
 	devcb_write8       m_out_b_pc_cb;

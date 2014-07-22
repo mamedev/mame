@@ -14,7 +14,7 @@
 #include "cpcexp.h"
 
 class cpc_rs232_device : public device_t,
-					 	 public device_cpc_expansion_card_interface
+							public device_cpc_expansion_card_interface
 {
 public:
 	// construction/destruction

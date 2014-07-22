@@ -84,8 +84,8 @@ private:
 	UINT8 m_nibble_shift;     /* nibble select */
 	sound_stream *m_stream;   /* which stream are we playing on? */
 
-	UINT8 m_output_bits;      /* D/A precision is 10-bits but 12-bit data can be 
-							   output serially to an external DAC */
+	UINT8 m_output_bits;      /* D/A precision is 10-bits but 12-bit data can be
+                               output serially to an external DAC */
 
 	INT32 m_signal;
 	INT32 m_step;

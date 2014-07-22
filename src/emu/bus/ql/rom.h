@@ -64,16 +64,16 @@ public:
 	device_ql_rom_cartridge_card_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_ql_rom_cartridge_card_interface();
 
-    virtual void romoeh_w(int state) { m_romoeh = state; }
-    virtual UINT8 read(address_space &space, offs_t offset, UINT8 data) { return data; }
-    virtual void write(address_space &space, offs_t offset, UINT8 data) { }
+	virtual void romoeh_w(int state) { m_romoeh = state; }
+	virtual UINT8 read(address_space &space, offs_t offset, UINT8 data) { return data; }
+	virtual void write(address_space &space, offs_t offset, UINT8 data) { }
 
 protected:
 	ql_rom_cartridge_slot_t *m_slot;
 
 	optional_shared_ptr<UINT8> m_rom;
 
-    int m_romoeh;
+	int m_romoeh;
 };
 
 

@@ -39,13 +39,13 @@
 #define TMS9928A_VERT_DISPLAY_START_PAL     (13 + 51)
 #define TMS9928A_VERT_DISPLAY_START_NTSC    (13 + 27)
 
-//	MCFG_DEVICE_ADD(_tag, _variant, XTAL_10_738635MHz / 2 )
+//  MCFG_DEVICE_ADD(_tag, _variant, XTAL_10_738635MHz / 2 )
 
 #define MCFG_TMS9928A_VRAM_SIZE(_size) \
 	tms9928a_device::set_vram_size(*device, _size);
 
 #define MCFG_TMS9928A_OUT_INT_LINE_CB(_devcb) \
-	devcb = &tms9928a_device::set_out_int_line_callback(*device, DEVCB_##_devcb);		
+	devcb = &tms9928a_device::set_out_int_line_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_TMS9928A_SET_SCREEN MCFG_VIDEO_SET_SCREEN
 
@@ -85,7 +85,7 @@ public:
 
 	static void set_vram_size(device_t &device, int vram_size) { downcast<tms9928a_device &>(device).m_vram_size = vram_size; }
 	template<class _Object> static devcb_base &set_out_int_line_callback(device_t &device, _Object object) { return downcast<tms9928a_device &>(device).m_out_int_line_cb.set_callback(object); }
-	
+
 	DECLARE_READ8_MEMBER( vram_read );
 	DECLARE_WRITE8_MEMBER( vram_write );
 	DECLARE_READ8_MEMBER( register_read );
@@ -115,7 +115,7 @@ private:
 	void set_palette();
 
 	static const device_timer_id TIMER_LINE = 0;
-	
+
 	int                 m_vram_size;    /* 4K, 8K, or 16K. This should be replaced by fetching data from an address space? */
 	devcb_write_line   m_out_int_line_cb; /* Callback is called whenever the state of the INT output changes */
 

@@ -52,7 +52,7 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	optional_device<decospr_device> m_sprgen;
 	optional_device<eeprom_serial_93cxx_device> m_eeprom;
-	
+
 	DECLARE_WRITE16_MEMBER(esd16_sound_command_w);
 	DECLARE_WRITE16_MEMBER(hedpanic_platform_w);
 	DECLARE_READ16_MEMBER(esd_eeprom_r);

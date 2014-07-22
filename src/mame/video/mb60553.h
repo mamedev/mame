@@ -8,7 +8,7 @@ public:
 	mb60553_zooming_tilemap_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
 	static void set_gfx_region(device_t &device, int gfxregion);
-	
+
 	tilemap_t* m_tmap;
 	UINT16* m_vram;
 	UINT16 m_regs[8];

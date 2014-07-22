@@ -1,7 +1,7 @@
 /**********************************************************************
 
-    Rockwell 10937/10957 interface and simlar chips 
-	Emulation by J.Wallace
+    Rockwell 10937/10957 interface and simlar chips
+    Emulation by J.Wallace
     OKI MSC1937 is a clone of this chip, with many others.
 
 **********************************************************************/
@@ -12,7 +12,7 @@
 
 #define MCFG_ROC10937_ADD(_tag,_val) \
 		MCFG_DEVICE_ADD(_tag, ROC10937,60)\
-		MCFG_ROC10937_PORT(_val) 
+		MCFG_ROC10937_PORT(_val)
 
 #define MCFG_ROC10937_PORT(_val) \
 	roc10937_t::static_set_value(*device, _val);
@@ -21,8 +21,8 @@
 
 #define MCFG_ROC10957_ADD(_tag,_val) \
 		MCFG_DEVICE_ADD(_tag, ROC10957,60)\
-		MCFG_ROC10957_PORT(_val) 
-		
+		MCFG_ROC10957_PORT(_val)
+
 #define MCFG_ROC10957_PORT(_val) \
 	roc10957_t::static_set_value(*device, _val);
 #define MCFG_ROC10957_REMOVE(_tag) \
@@ -30,8 +30,8 @@
 
 #define MCFG_MSC1937_ADD(_tag,_val) \
 		MCFG_DEVICE_ADD(_tag, ROC10937,60)\
-		MCFG_MSC1937_PORT(_val) 
-		
+		MCFG_MSC1937_PORT(_val)
+
 #define MCFG_MSC1937_PORT(_val) \
 	MCFG_ROC10937_PORT(_val)
 
@@ -40,7 +40,7 @@
 
 #define MCFG_S16LF01_ADD(_tag,_val) \
 		MCFG_DEVICE_ADD(_tag, S16LF01,60)\
-		MCFG_S16LF01_PORT(_val) 
+		MCFG_S16LF01_PORT(_val)
 
 #define MCFG_S16LF01_PORT(_val) \
 	MCFG_ROC10937_PORT(_val)

@@ -1,13 +1,13 @@
 /***************************************************************************
 
-	Commodore A2232
+    Commodore A2232
 
     license: MAME, GPL-2.0+
     copyright-holders: Dirk Best
 
-	Zorro-II Serial Card
+    Zorro-II Serial Card
 
-	Provides the Amiga with 7 additional RS232 ports.
+    Provides the Amiga with 7 additional RS232 ports.
 
 ***************************************************************************/
 

@@ -37,21 +37,21 @@ enum pstate_data_type_e {
 
 template<typename _ItemType> struct nl_datatype
 {
-    static const pstate_data_type_e type = pstate_data_type_e(NOT_SUPPORTED);
-    static const bool is_ptr = false;
+	static const pstate_data_type_e type = pstate_data_type_e(NOT_SUPPORTED);
+	static const bool is_ptr = false;
 };
 
 template<typename _ItemType> struct nl_datatype<_ItemType *>
 {
-    static const pstate_data_type_e type = pstate_data_type_e(NOT_SUPPORTED);
-    static const bool is_ptr = true;
+	static const pstate_data_type_e type = pstate_data_type_e(NOT_SUPPORTED);
+	static const bool is_ptr = true;
 };
 
 //template<typename _ItemType> struct type_checker<_ItemType*> { static const bool is_atom = false; static const bool is_pointer = true; };
 
 #define NETLIST_SAVE_TYPE(TYPE, TYPEDESC) \
-        template<> struct nl_datatype<TYPE>{ static const pstate_data_type_e type = pstate_data_type_e(TYPEDESC); static const bool is_ptr = false;}; \
-        template<> struct nl_datatype<TYPE *>{ static const pstate_data_type_e type = pstate_data_type_e(TYPEDESC); static const bool is_ptr = true;};
+		template<> struct nl_datatype<TYPE>{ static const pstate_data_type_e type = pstate_data_type_e(TYPEDESC); static const bool is_ptr = false;}; \
+		template<> struct nl_datatype<TYPE *>{ static const pstate_data_type_e type = pstate_data_type_e(TYPEDESC); static const bool is_ptr = true;};
 
 NETLIST_SAVE_TYPE(char, DT_INT8);
 NETLIST_SAVE_TYPE(double, DT_DOUBLE);
@@ -104,10 +104,10 @@ struct pstate_entry_t
 	template<typename T>
 	T *resolved()
 	{
-	    if (m_is_ptr)
-	        return *static_cast<T **>(m_ptr);
-	    else
-	        return static_cast<T *>(m_ptr);
+		if (m_is_ptr)
+			return *static_cast<T **>(m_ptr);
+		else
+			return static_cast<T *>(m_ptr);
 	}
 };
 

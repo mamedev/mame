@@ -456,9 +456,9 @@ protected:
 	UINT16              m_mask_table[0x4000];
 	UINT16              m_reverse_table[0x4000];
 
-	devcb_read32        	m_sport_rx_cb;    // callback for serial receive
-	devcb_write32        	m_sport_tx_cb;    // callback for serial transmit
-	devcb_write_line     	m_timer_fired_cb;          // callback for timer fired
+	devcb_read32            m_sport_rx_cb;    // callback for serial receive
+	devcb_write32           m_sport_tx_cb;    // callback for serial transmit
+	devcb_write_line        m_timer_fired_cb;          // callback for timer fired
 
 	// debugging
 #if ADSP_TRACK_HOTSPOTS

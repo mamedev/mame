@@ -17,7 +17,7 @@ typedef device_delegate<void (int *code, int *color, int *priority)> k05324x_cb_
 	k05324x_device::set_offsets(*device, _xoffs, _yoffs);
 
 
-class k05324x_device : public device_t, 
+class k05324x_device : public device_t,
 							public device_gfx_interface
 {
 	static const gfx_layout spritelayout;

@@ -27,7 +27,7 @@
 #define ZX8302_TAG  "ic23"
 #define RS232_A_TAG "ser1"
 #define RS232_B_TAG "ser2"
-#define QIMI_TAG	"qimi"
+#define QIMI_TAG    "qimi"
 
 #define X1 XTAL_15MHz
 #define X2 XTAL_32_768kHz

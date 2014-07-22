@@ -1038,7 +1038,7 @@ kept for now until finding out what those bytes affect...
         <info name="alt_title" value="スーパーレイドック(THE LINKS NETWORK VERSION)" />
         <part name="cart" interface="msx_cart">
             <feature name="pcb" value="TA6228" />
-			<feature name="slot" value="ascii8" />
+            <feature name="slot" value="ascii8" />
             <feature name="mapper" value="M60002-0125SP" />
             <dataarea name="rom" size="262144">
                 <rom name="lh532045" size="262144" crc="" sha1="" offset="0" />
@@ -1071,7 +1071,7 @@ kept for now until finding out what those bytes affect...
         <info name="alt_title" value="シンセサウルス" />
         <part name="cart" interface="msx_cart">
             <feature name="pcb" value="TAS-1M-008S" />
-			<feature name="slot" value="ascii8" />
+            <feature name="slot" value="ascii8" />
             <feature name="mapper" value="LZ93A13" />
             <dataarea name="rom" size="131072">
                 <rom name="m5m27512p" size="131072" crc="" sha1="" offset="0" />
@@ -1088,7 +1088,7 @@ kept for now until finding out what those bytes affect...
         <info name="alt_title" value="シンセサウルス" />
         <part name="cart" interface="msx_cart">
             <feature name="pcb" value="TAS-2M008-E2M" />
-			<feature name="slot" value="ascii8" />
+            <feature name="slot" value="ascii8" />
             <feature name="mapper" value="LZ93A13" />
             <dataarea name="rom" size="262144">
                 <rom name="m5m27512p" size="131072" crc="" sha1="" offset="0" />
@@ -14568,31 +14568,31 @@ kept for now until finding out what those bytes affect...
 <!--
 This memory is currently declared as a memory region inside the nms1205 implementation otherwise the
 legacy FM implementations cannot find it.
-			<dataarea name="ram" size="32768">
-			</dataarea>
+            <dataarea name="ram" size="32768">
+            </dataarea>
 -->
 		</part>
 	</software>
 
 <!--
-	<software name="nms1205v10" cloneof="nms1205" supported="no">
-	<description>Philips NMS-1205 Music Module v1.0</description>
-		<year>198?</year>
-		<publisher>Philips</publisher>
-		<part name="cart" interface="msx_cart">
-			<feature name="slot" value="msxaud_nms1205" />
-			<dataarea name="rom" size="32768">
-				<!- - SUM16: 53BF - ->
-				<rom name="nms1205_53bf.bin" size="32768" crc="6e68bd44" sha1="146d9738b6d534277dab9b41a07556ffec9065b9" status="baddump" offset="0" />
-			</dataarea>
+    <software name="nms1205v10" cloneof="nms1205" supported="no">
+    <description>Philips NMS-1205 Music Module v1.0</description>
+        <year>198?</year>
+        <publisher>Philips</publisher>
+        <part name="cart" interface="msx_cart">
+            <feature name="slot" value="msxaud_nms1205" />
+            <dataarea name="rom" size="32768">
+                <!- - SUM16: 53BF - ->
+                <rom name="nms1205_53bf.bin" size="32768" crc="6e68bd44" sha1="146d9738b6d534277dab9b41a07556ffec9065b9" status="baddump" offset="0" />
+            </dataarea>
 <!- -
 This memory is currently declared as a memory region inside the nms1205 implementation otherwise the
 legacy FM implementations cannot find it.
-			<dataarea name="ram" size="32768">
-			</dataarea>
+            <dataarea name="ram" size="32768">
+            </dataarea>
 - ->
-		</part>
-	</software>
+        </part>
+    </software>
 -->
 
 <!-- Dictionary ROMs? -->

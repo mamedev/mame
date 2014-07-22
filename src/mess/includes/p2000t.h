@@ -23,7 +23,7 @@ public:
 			m_gfxdecode(*this, "gfxdecode"),
 			m_palette(*this, "palette"),
 			m_videoram(*this, "videoram"),
-			m_keyboard(*this, "KEY")	{ }
+			m_keyboard(*this, "KEY")    { }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;

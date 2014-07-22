@@ -1780,7 +1780,7 @@ DASMOBJS += $(CPUOBJ)/upd7810/upd7810_dasm.o
 endif
 
 $(CPUOBJ)/upd7810/upd7810_opcodes.o: $(CPUSRC)/upd7810/upd7810_opcodes.c \
-                                     $(CPUSRC)/upd7810/upd7810_macros.h
+										$(CPUSRC)/upd7810/upd7810_macros.h
 
 $(CPUOBJ)/upd7810/upd7810.o:    $(CPUSRC)/upd7810/upd7810.c \
 								$(CPUSRC)/upd7810/upd7810.h \

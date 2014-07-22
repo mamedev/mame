@@ -7,7 +7,7 @@ class tecmo_mix_device : public device_t,
 {
 public:
 	tecmo_mix_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	void mix_bitmaps(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, palette_device* palette, bitmap_ind16* bitmap_bg, bitmap_ind16* bitmap_fg, bitmap_ind16* bitmap_tx, bitmap_ind16* bitmap_sp);
 	static void set_mixer_shifts(device_t &device, int sprpri_shift, int sprbln_shift, int sprcol_shift);
 	static void set_blendcols(device_t &device, int bgblend_comp, int fgblend_comp, int txblend_comp, int spblend_comp);
@@ -70,5 +70,3 @@ extern const device_type TECMO_MIXER;
 
 #define MCFG_TECMO_MIXER_BGPEN(_bgpen) \
 	tecmo_mix_device::set_bgpen(*device, _bgpen);
-
-

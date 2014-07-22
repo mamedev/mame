@@ -41,7 +41,7 @@ public:
 	static void set_pf2_col_bank(device_t &device, int bank) { downcast<deco16ic_device &>(device).m_pf2_colour_bank = bank; }
 	static void set_pf12_8x8_bank(device_t &device, int bank) { downcast<deco16ic_device &>(device).m_pf12_8x8_gfx_bank = bank; }
 	static void set_pf12_16x16_bank(device_t &device, int bank) { downcast<deco16ic_device &>(device).m_pf12_16x16_gfx_bank = bank; }
-	
+
 
 	DECLARE_WRITE16_MEMBER( pf1_data_w );
 	DECLARE_WRITE16_MEMBER( pf2_data_w );
@@ -144,7 +144,7 @@ private:
 	int m_pf1_colour_bank, m_pf2_colour_bank;
 	int m_pf1_colourmask, m_pf2_colourmask;
 	int m_pf12_8x8_gfx_bank, m_pf12_16x16_gfx_bank;
-	
+
 	TILEMAP_MAPPER_MEMBER(deco16_scan_rows);
 	TILE_GET_INFO_MEMBER(get_pf2_tile_info);
 	TILE_GET_INFO_MEMBER(get_pf1_tile_info);

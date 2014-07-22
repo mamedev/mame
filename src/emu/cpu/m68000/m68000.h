@@ -252,14 +252,14 @@ public:
 	const UINT8* cyc_exception;
 
 	/* Callbacks to host */
-	device_irq_acknowledge_delegate int_ack_callback;	/* Interrupt Acknowledge */
-	write32_delegate bkpt_ack_callback;					/* Breakpoint Acknowledge */
-	write_line_delegate reset_instr_callback;			/* Called when a RESET instruction is encountered */
-	write32_delegate cmpild_instr_callback;				/* Called when a CMPI.L #v, Dn instruction is encountered */
-	write_line_delegate rte_instr_callback;				/* Called when a RTE instruction is encountered */
-	write8_delegate tas_write_callback;					/* Called instead of normal write8 by the TAS instruction,
-															allowing writeback to be disabled globally or selectively
-															or other side effects to be implemented */
+	device_irq_acknowledge_delegate int_ack_callback;   /* Interrupt Acknowledge */
+	write32_delegate bkpt_ack_callback;                 /* Breakpoint Acknowledge */
+	write_line_delegate reset_instr_callback;           /* Called when a RESET instruction is encountered */
+	write32_delegate cmpild_instr_callback;             /* Called when a CMPI.L #v, Dn instruction is encountered */
+	write_line_delegate rte_instr_callback;             /* Called when a RTE instruction is encountered */
+	write8_delegate tas_write_callback;                 /* Called instead of normal write8 by the TAS instruction,
+                                                            allowing writeback to be disabled globally or selectively
+                                                            or other side effects to be implemented */
 
 	address_space *program;
 

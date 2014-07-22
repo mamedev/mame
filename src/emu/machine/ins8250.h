@@ -18,14 +18,14 @@ class ins8250_uart_device : public device_t,
 {
 public:
 	ins8250_uart_device(const machine_config &mconfig, device_type type, const char* name, const char *tag, device_t *owner, UINT32 clock, const char *shortname);
-	
+
 	template<class _Object> static devcb_base &set_out_tx_callback(device_t &device, _Object object) { return downcast<ins8250_uart_device &>(device).m_out_tx_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_out_dtr_callback(device_t &device, _Object object) { return downcast<ins8250_uart_device &>(device).m_out_dtr_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_out_rts_callback(device_t &device, _Object object) { return downcast<ins8250_uart_device &>(device).m_out_rts_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_out_int_callback(device_t &device, _Object object) { return downcast<ins8250_uart_device &>(device).m_out_int_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_out_out1_callback(device_t &device, _Object object) { return downcast<ins8250_uart_device &>(device).m_out_out1_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_out_out2_callback(device_t &device, _Object object) { return downcast<ins8250_uart_device &>(device).m_out_out2_cb.set_callback(object); }
-	
+
 	DECLARE_WRITE8_MEMBER( ins8250_w );
 	DECLARE_READ8_MEMBER( ins8250_r );
 	DECLARE_WRITE_LINE_MEMBER( dcd_w );

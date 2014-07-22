@@ -40,6 +40,3 @@ extern const device_type VS920A;
 
 #define MCFG_VS920A_GFXDECODE(_gfxtag) \
 	vs920a_text_tilemap_device::static_set_gfxdecode_tag(*device, "^" _gfxtag);
-
-
-

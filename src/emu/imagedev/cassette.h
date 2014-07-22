@@ -107,7 +107,7 @@ private:
 	const struct CassetteFormat*    const *m_formats;
 	const struct CassetteOptions    *m_create_opts;
 	cassette_state                  m_default_state;
-	const char *                    m_interface;	
+	const char *                    m_interface;
 };
 
 // device type definition
@@ -124,17 +124,17 @@ typedef device_type_iterator<&device_creator<cassette_image_device>, cassette_im
 
 #define MCFG_CASSETTE_MODIFY(_tag) \
 	MCFG_DEVICE_MODIFY(_tag)
-	
-#define MCFG_CASSETTE_FORMATS(_formats)	\
+
+#define MCFG_CASSETTE_FORMATS(_formats) \
 	cassette_image_device::static_set_formats(*device, _formats);
 
-#define MCFG_CASSETTE_CREATE_OPTS(_create_opts)	\
+#define MCFG_CASSETTE_CREATE_OPTS(_create_opts) \
 	cassette_image_device::static_set_create_opts(*device, _create_opts);
 
-#define MCFG_CASSETTE_DEFAULT_STATE(_state)	\
+#define MCFG_CASSETTE_DEFAULT_STATE(_state) \
 	cassette_image_device::static_set_default_state(*device, (cassette_state) (_state));
 
-#define MCFG_CASSETTE_INTERFACE(_interface)	\
+#define MCFG_CASSETTE_INTERFACE(_interface) \
 	cassette_image_device::static_set_interface(*device, _interface);
 
 #endif /* CASSETTE_H */

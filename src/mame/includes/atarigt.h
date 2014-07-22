@@ -72,9 +72,9 @@ public:
 	DECLARE_READ32_MEMBER(colorram_protection_r);
 	DECLARE_WRITE32_MEMBER(colorram_protection_w);
 	DECLARE_WRITE32_MEMBER(tmek_pf_w);
-	
+
 	DECLARE_WRITE8_MEMBER(cage_irq_callback);
-	
+
 	void atarigt_colorram_w(offs_t address, UINT16 data, UINT16 mem_mask);
 	UINT16 atarigt_colorram_r(offs_t address);
 	DECLARE_DRIVER_INIT(primrage);

@@ -130,7 +130,7 @@ public:
 	write16_delegate        m_wproto16;             // 16-bit write proto-delegate
 	write32_delegate        m_wproto32;             // 32-bit write proto-delegate
 	write64_delegate        m_wproto64;             // 64-bit write proto-delegate
-	
+
 	setoffset_delegate       m_soproto;              // set offset proto-delegate
 	address_map_delegate    m_submap_delegate;
 	int                     m_submap_bits;

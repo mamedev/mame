@@ -1,7 +1,7 @@
 //------------------------------------------------------------------------------
 /*
   https://github.com/vinniefalco/LuaBridge
-  
+
   Copyright 2012, Vinnie Falco <vinnie.falco@gmail.com>
   Copyright 2007, Nathan Reed
 
@@ -26,19 +26,19 @@
   SOFTWARE.
 
   This file incorporates work covered by the following copyright and
-  permission notice:  
+  permission notice:
 
     The Loki Library
     Copyright (c) 2001 by Andrei Alexandrescu
     This code accompanies the book:
-    Alexandrescu, Andrei. "Modern C++ Design: Generic Programming and Design 
+    Alexandrescu, Andrei. "Modern C++ Design: Generic Programming and Design
         Patterns Applied". Copyright (c) 2001. Addison-Wesley.
-    Permission to use, copy, modify, distribute and sell this software for any 
-        purpose is hereby granted without fee, provided that the above copyright 
-        notice appear in all copies and that both that copyright notice and this 
+    Permission to use, copy, modify, distribute and sell this software for any
+        purpose is hereby granted without fee, provided that the above copyright
+        notice appear in all copies and that both that copyright notice and this
         permission notice appear in supporting documentation.
-    The author or Addison-Welsey Longman make no representations about the 
-        suitability of this software for any purpose. It is provided "as is" 
+    The author or Addison-Welsey Longman make no representations about the
+        suitability of this software for any purpose. It is provided "as is"
         without express or implied warranty.
 */
 //==============================================================================
@@ -59,10 +59,10 @@ struct TypeList
 template <typename List>
 struct TypeListValues
 {
-  static std::string const tostring (bool)
-  {
-    return "";
-  }
+	static std::string const tostring (bool)
+	{
+	return "";
+	}
 };
 
 /**
@@ -71,25 +71,25 @@ struct TypeListValues
 template <typename Head, typename Tail>
 struct TypeListValues <TypeList <Head, Tail> >
 {
-  Head hd;
-  TypeListValues <Tail> tl;
+	Head hd;
+	TypeListValues <Tail> tl;
 
-  TypeListValues (Head hd_, TypeListValues <Tail> const& tl_)
-    : hd (hd_), tl (tl_)
-  {
-  }
+	TypeListValues (Head hd_, TypeListValues <Tail> const& tl_)
+	: hd (hd_), tl (tl_)
+	{
+	}
 
-  static std::string const tostring (bool comma = false)
-  {
-    std::string s;
+	static std::string const tostring (bool comma = false)
+	{
+	std::string s;
 
-    if (comma)
-      s = ", ";
+	if (comma)
+		s = ", ";
 
-    s = s + typeid (Head).name ();
+	s = s + typeid (Head).name ();
 
-    return s + TypeListValues <Tail>::tostring (true);
-  }
+	return s + TypeListValues <Tail>::tostring (true);
+	}
 };
 
 // Specializations of type/value list for head types that are references and
@@ -99,49 +99,49 @@ struct TypeListValues <TypeList <Head, Tail> >
 template <typename Head, typename Tail>
 struct TypeListValues <TypeList <Head&, Tail> >
 {
-  Head hd;
-  TypeListValues <Tail> tl;
+	Head hd;
+	TypeListValues <Tail> tl;
 
-  TypeListValues (Head& hd_, TypeListValues <Tail> const& tl_)
-    : hd (hd_), tl (tl_)
-  {
-  }
+	TypeListValues (Head& hd_, TypeListValues <Tail> const& tl_)
+	: hd (hd_), tl (tl_)
+	{
+	}
 
-  static std::string const tostring (bool comma = false)
-  {
-    std::string s;
+	static std::string const tostring (bool comma = false)
+	{
+	std::string s;
 
-    if (comma)
-      s = ", ";
+	if (comma)
+		s = ", ";
 
-    s = s + typeid (Head).name () + "&";
+	s = s + typeid (Head).name () + "&";
 
-    return s + TypeListValues <Tail>::tostring (true);
-  }
+	return s + TypeListValues <Tail>::tostring (true);
+	}
 };
 
 template <typename Head, typename Tail>
 struct TypeListValues <TypeList <Head const&, Tail> >
 {
-  Head hd;
-  TypeListValues <Tail> tl;
+	Head hd;
+	TypeListValues <Tail> tl;
 
-  TypeListValues (Head const& hd_, const TypeListValues <Tail>& tl_)
-    : hd (hd_), tl (tl_)
-  {
-  }
+	TypeListValues (Head const& hd_, const TypeListValues <Tail>& tl_)
+	: hd (hd_), tl (tl_)
+	{
+	}
 
-  static std::string const tostring (bool comma = false)
-  {
-    std::string s;
+	static std::string const tostring (bool comma = false)
+	{
+	std::string s;
 
-    if (comma)
-      s = ", ";
+	if (comma)
+		s = ", ";
 
-    s = s + typeid (Head).name () + " const&";
+	s = s + typeid (Head).name () + " const&";
 
-    return s + TypeListValues <Tail>::tostring (true);
-  }
+	return s + TypeListValues <Tail>::tostring (true);
+	}
 };
 
 //==============================================================================
@@ -157,18 +157,18 @@ struct ArgList
 template <int Start>
 struct ArgList <None, Start> : public TypeListValues <None>
 {
-  ArgList (lua_State*)
-  {
-  }
+	ArgList (lua_State*)
+	{
+	}
 };
 
 template <typename Head, typename Tail, int Start>
 struct ArgList <TypeList <Head, Tail>, Start>
-  : public TypeListValues <TypeList <Head, Tail> >
+	: public TypeListValues <TypeList <Head, Tail> >
 {
-  ArgList (lua_State* L)
-    : TypeListValues <TypeList <Head, Tail> > (Stack <Head>::get (L, Start),
-                                            ArgList <Tail, Start + 1> (L))
-  {
-  }
+	ArgList (lua_State* L)
+	: TypeListValues <TypeList <Head, Tail> > (Stack <Head>::get (L, Start),
+											ArgList <Tail, Start + 1> (L))
+	{
+	}
 };

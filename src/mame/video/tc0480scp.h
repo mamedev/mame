@@ -31,7 +31,7 @@ public:
 		dev.m_flip_xoffs = x_offset;
 		dev.m_flip_yoffs = y_offset;
 	}
-	
+
 	/* When writing a driver, pass zero for the text and flip offsets initially:
 	then tweak them once you have the 4 bg layer positions correct. Col_base
 	may be needed when tilemaps use a palette area from sprites. */
@@ -89,9 +89,9 @@ private:
 	int              m_x_offset, m_y_offset;
 	int              m_text_xoffs, m_text_yoffs;
 	int              m_flip_xoffs, m_flip_yoffs;
-	
+
 	int              m_col_base;
-	
+
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 

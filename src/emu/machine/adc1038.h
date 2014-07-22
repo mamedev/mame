@@ -49,7 +49,7 @@ private:
 	int m_data_out;
 	int m_adc_data;
 	int m_sars;
-	
+
 	int m_gticlub_hack;
 	adc1038_input_delegate       m_input_cb;
 };

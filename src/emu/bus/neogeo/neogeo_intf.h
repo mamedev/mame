@@ -49,7 +49,7 @@ public:
 	void ym_alloc(UINT32 size) { if (m_ym == NULL) m_ym.resize(size/sizeof(UINT8)); }
 	UINT8* get_ym_base() { return m_ym; }
 	UINT32  get_ym_size() { return m_ym.bytes(); }
-	
+
 	void ymdelta_alloc(UINT32 size) { if (m_ymdelta == NULL) m_ymdelta.resize(size/sizeof(UINT8)); }
 	UINT8* get_ymdelta_base() { return m_ymdelta; }
 	UINT32  get_ymdelta_size() { return m_ymdelta.bytes(); }
@@ -74,4 +74,3 @@ protected:
 };
 
 #endif
-

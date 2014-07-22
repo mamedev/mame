@@ -53,7 +53,7 @@ public:
 	template<class _Object> static devcb_base &set_output_buffer_empty_callback(device_t &device, _Object object) { return downcast<at_keyboard_controller_device &>(device).m_output_buffer_empty_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_keyboard_clock_callback(device_t &device, _Object object) { return downcast<at_keyboard_controller_device &>(device).m_keyboard_clock_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_keyboard_data_callback(device_t &device, _Object object) { return downcast<at_keyboard_controller_device &>(device).m_keyboard_data_cb.set_callback(object); }
-	
+
 	// internal 8042 interface
 	DECLARE_READ8_MEMBER( t0_r );
 	DECLARE_READ8_MEMBER( t1_r );
@@ -78,7 +78,7 @@ protected:
 
 	virtual const rom_entry *device_rom_region() const;
 	virtual machine_config_constructor device_mconfig_additions() const;
-	
+
 private:
 	// internal state
 	upi41_cpu_device *m_cpu;

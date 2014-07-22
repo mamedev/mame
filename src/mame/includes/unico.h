@@ -56,5 +56,5 @@ public:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	optional_shared_ptr<UINT16> m_generic_paletteram_16;
-	optional_shared_ptr<UINT32> m_generic_paletteram_32;	
+	optional_shared_ptr<UINT32> m_generic_paletteram_32;
 };

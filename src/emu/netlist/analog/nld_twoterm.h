@@ -88,7 +88,7 @@ class NETLIB_NAME(twoterm) : public netlist_device_t
 {
 public:
 	ATTR_COLD NETLIB_NAME(twoterm)(const family_t afamily);
-    ATTR_COLD NETLIB_NAME(twoterm)();
+	ATTR_COLD NETLIB_NAME(twoterm)();
 
 	netlist_terminal_t m_P;
 	netlist_terminal_t m_N;
@@ -99,21 +99,21 @@ public:
 
 	ATTR_HOT inline void set(const double G, const double V, const double I)
 	{
-	    /*      GO, GT, I                */
+		/*      GO, GT, I                */
 		m_P.set( G,  G, (  V) * G - I);
 		m_N.set( G,  G, ( -V) * G + I);
 	}
 
 	ATTR_HOT inline double deltaV() const
 	{
-	    return m_P.net().as_analog().Q_Analog() - m_N.net().as_analog().Q_Analog();
+		return m_P.net().as_analog().Q_Analog() - m_N.net().as_analog().Q_Analog();
 	}
 
 	ATTR_HOT void set_mat(double a11, double a12, double a21, double a22, double r1, double r2)
 	{
-        /*      GO, GT, I                */
-	    m_P.set(-a12, a11, -r1);
-	    m_N.set(-a21, a22, -r2);
+		/*      GO, GT, I                */
+		m_P.set(-a12, a11, -r1);
+		m_N.set(-a21, a22, -r2);
 	}
 
 protected:
@@ -135,7 +135,7 @@ public:
 
 	inline void set_R(const double R)
 	{
-	    set(1.0 / R, 0.0, 0.0);
+		set(1.0 / R, 0.0, 0.0);
 	}
 
 protected:

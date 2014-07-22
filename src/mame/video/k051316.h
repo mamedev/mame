@@ -36,7 +36,7 @@ public:
 	DECLARE_GFXDECODE_MEMBER(gfxinfo7);
 	DECLARE_GFXDECODE_MEMBER(gfxinfo8);
 	DECLARE_GFXDECODE_MEMBER(gfxinfo4_ram);
-	
+
 	// static configuration
 	static void set_k051316_callback(device_t &device, k051316_cb_delegate callback) { downcast<k051316_device &>(device).m_k051316_cb = callback; }
 	static void set_wrap(device_t &device, int wrap) { downcast<k051316_device &>(device).m_wrap = wrap; }

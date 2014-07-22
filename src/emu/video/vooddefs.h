@@ -3400,10 +3400,10 @@ do                                                                              
 	/* add clocal or alocal to alpha */                                         \
 	if (FBZCP_CCA_ADD_ACLOCAL(FBZCOLORPATH))                                    \
 		a += c_local.rgb.a;                                                     \
-                                                                                \
+																				\
 	/* clamp */                                                                 \
 	CLAMP(a, 0x00, 0xff);                                                       \
-	                                                                            \
+																				\
 	/* invert */                                                                \
 	if (FBZCP_CCA_INVERT_OUTPUT(FBZCOLORPATH))                                  \
 		a ^= 0xff;                                                              \

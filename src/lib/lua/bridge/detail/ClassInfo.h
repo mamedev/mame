@@ -1,7 +1,7 @@
 //------------------------------------------------------------------------------
 /*
   https://github.com/vinniefalco/LuaBridge
-  
+
   Copyright 2012, Vinnie Falco <vinnie.falco@gmail.com>
 
   License: The MIT License (http://www.opensource.org/licenses/mit-license.php)
@@ -36,38 +36,37 @@ template <class T>
 class ClassInfo
 {
 public:
-  /** Get the key for the static table.
+	/** Get the key for the static table.
 
-      The static table holds the static data members, static properties, and
-      static member functions for a class.
-  */
-  static void const* getStaticKey ()
-  {
-    static char value;
-    return &value;
-  }
+	  The static table holds the static data members, static properties, and
+	  static member functions for a class.
+	*/
+	static void const* getStaticKey ()
+	{
+	static char value;
+	return &value;
+	}
 
-  /** Get the key for the class table.
+	/** Get the key for the class table.
 
-      The class table holds the data members, properties, and member functions
-      of a class. Read-only data and properties, and const member functions are
-      also placed here (to save a lookup in the const table).
-  */
-  static void const* getClassKey ()
-  {
-    static char value;
-    return &value;
-  }
+	  The class table holds the data members, properties, and member functions
+	  of a class. Read-only data and properties, and const member functions are
+	  also placed here (to save a lookup in the const table).
+	*/
+	static void const* getClassKey ()
+	{
+	static char value;
+	return &value;
+	}
 
-  /** Get the key for the const table.
+	/** Get the key for the const table.
 
-      The const table holds read-only data members and properties, and const
-      member functions of a class.
-  */
-  static void const* getConstKey ()
-  {
-    static char value;
-    return &value;
-  }
+	  The const table holds read-only data members and properties, and const
+	  member functions of a class.
+	*/
+	static void const* getConstKey ()
+	{
+	static char value;
+	return &value;
+	}
 };
-

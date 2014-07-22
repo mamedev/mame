@@ -46,7 +46,7 @@ struct coco_cartridge_line
 	cococart_line_value         value;
 	int                         line;
 	int                         q_count;
-	devcb_write_line   	    *callback;
+	devcb_write_line        *callback;
 };
 
 // ======================> cococart_base_update_delegate
@@ -56,13 +56,13 @@ typedef delegate<void (UINT8 *)> cococart_base_update_delegate;
 
 #define MCFG_COCO_CARTRIDGE_CART_CB(_devcb) \
 	devcb = &cococart_slot_device::static_set_cart_callback(*device, DEVCB_##_devcb);
- 
+
 #define MCFG_COCO_CARTRIDGE_NMI_CB(_devcb) \
 	devcb = &cococart_slot_device::static_set_nmi_callback(*device, DEVCB_##_devcb);
- 
+
 #define MCFG_COCO_CARTRIDGE_HALT_CB(_devcb) \
 	devcb = &cococart_slot_device::static_set_halt_callback(*device, DEVCB_##_devcb);
- 
+
 
 // ======================> cococart_slot_device
 class device_cococart_interface;
@@ -78,7 +78,7 @@ public:
 	template<class _Object> static devcb_base &static_set_cart_callback(device_t &device, _Object object)  { return downcast<cococart_slot_device &>(device).m_cart_callback.set_callback(object); }
 	template<class _Object> static devcb_base &static_set_nmi_callback(device_t &device, _Object object)  { return downcast<cococart_slot_device &>(device).m_nmi_callback.set_callback(object); }
 	template<class _Object> static devcb_base &static_set_halt_callback(device_t &device, _Object object)  { return downcast<cococart_slot_device &>(device).m_halt_callback.set_callback(object); }
-	
+
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_config_complete();
@@ -128,10 +128,10 @@ private:
 	coco_cartridge_line         m_cart_line;
 	coco_cartridge_line         m_nmi_line;
 	coco_cartridge_line         m_halt_line;
-public:	
-	devcb_write_line   	    m_cart_callback;
-	devcb_write_line    	    m_nmi_callback;
-	devcb_write_line    		m_halt_callback;
+public:
+	devcb_write_line        m_cart_callback;
+	devcb_write_line            m_nmi_callback;
+	devcb_write_line            m_halt_callback;
 private:
 	// cartridge
 	device_cococart_interface   *m_cart;

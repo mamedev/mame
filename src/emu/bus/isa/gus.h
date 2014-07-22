@@ -61,22 +61,22 @@
 
 #define MCFG_GF1_TIMER2_IRQ_HANDLER(_devcb) \
 	devcb = &gf1_device::set_timer2_irq_handler(*device, DEVCB_##_devcb);
-	
+
 #define MCFG_GF1_SB_IRQ_HANDLER(_devcb) \
 	devcb = &gf1_device::set_sb_irq_handler(*device, DEVCB_##_devcb);
 
 #define MCFG_GF1_DMA_IRQ_HANDLER(_devcb) \
 	devcb = &gf1_device::set_dma_irq_handler(*device, DEVCB_##_devcb);
-	
+
 #define MCFG_GF1_DRQ1_HANDLER(_devcb) \
 	devcb = &gf1_device::set_drq1_handler(*device, DEVCB_##_devcb);
-	
+
 #define MCFG_GF1_DRQ2_HANDLER(_devcb) \
 	devcb = &gf1_device::set_drq2_handler(*device, DEVCB_##_devcb);
-	
+
 #define MCFG_GF1_NMI_HANDLER(_devcb) \
 	devcb = &gf1_device::set_nmi_handler(*device, DEVCB_##_devcb);
-	
+
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************

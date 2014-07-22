@@ -47,7 +47,7 @@ class nesapu_device : public device_t,
 public:
 	nesapu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~nesapu_device() {}
-	
+
 	static void set_cpu_tag(device_t &device, const char *tag) { downcast<nesapu_device &>(device).m_cpu_tag = tag; }
 
 	DECLARE_READ8_MEMBER( read );

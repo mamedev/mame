@@ -1,11 +1,11 @@
 /***************************************************************************
 
-	Commodore A590 / A2091
+    Commodore A590 / A2091
 
     license: MAME, GPL-2.0+
     copyright-holders: Dirk Best
 
-	DMAC based SCSI controller for the Amiga 500 and Zorro-II
+    DMAC based SCSI controller for the Amiga 500 and Zorro-II
 
 ***************************************************************************/
 

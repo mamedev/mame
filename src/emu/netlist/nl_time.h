@@ -40,7 +40,7 @@ public:
 	ATTR_HOT friend inline bool operator<(const netlist_time &left, const netlist_time &right);
 	ATTR_HOT friend inline bool operator>=(const netlist_time &left, const netlist_time &right);
 	ATTR_HOT friend inline bool operator<=(const netlist_time &left, const netlist_time &right);
-    ATTR_HOT friend inline bool operator!=(const netlist_time &left, const netlist_time &right);
+	ATTR_HOT friend inline bool operator!=(const netlist_time &left, const netlist_time &right);
 
 	ATTR_HOT inline const netlist_time &operator=(const netlist_time &right) { m_time = right.m_time; return *this; }
 	ATTR_HOT inline const netlist_time &operator=(const double &right) { m_time = (INTERNALTYPE) ( right * (double) RESOLUTION); return *this; }
@@ -114,7 +114,7 @@ ATTR_HOT inline bool operator>=(const netlist_time &left, const netlist_time &ri
 
 ATTR_HOT inline bool operator!=(const netlist_time &left, const netlist_time &right)
 {
-    return (left.m_time != right.m_time);
+	return (left.m_time != right.m_time);
 }
 
 #endif /* NLTIME_H_ */

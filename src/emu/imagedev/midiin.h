@@ -27,7 +27,7 @@ public:
 	midiin_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	template<class _Object> static devcb_base &set_input_callback(device_t &device, _Object object) { return downcast<midiin_device &>(device).m_input_cb.set_callback(object); }
-	
+
 	// image-level overrides
 	virtual bool call_load();
 	virtual void call_unload();

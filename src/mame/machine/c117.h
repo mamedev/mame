@@ -12,10 +12,10 @@
 //**************************************************************************
 
 #define MCFG_CUS117_CPUS(_maincpu, _subcpu) \
-        namco_c117_device::set_cpu_tags(*device, _maincpu, _subcpu);
+		namco_c117_device::set_cpu_tags(*device, _maincpu, _subcpu);
 
 #define MCFG_CUS117_SUBRES_CB(_devcb) \
-        devcb = &namco_c117_device::set_subres_cb(*device, DEVCB_##_devcb);
+		devcb = &namco_c117_device::set_subres_cb(*device, DEVCB_##_devcb);
 
 
 //***************************************************************************

@@ -359,7 +359,7 @@ private:
 	/* core state */
 	internal_mips3_state *m_core;
 
-    /* internal stuff */
+	/* internal stuff */
 	UINT32      m_ppc;
 	UINT32      m_nextpc;
 	UINT32      m_pcbase;
@@ -444,7 +444,7 @@ private:
 
 	/* fast RAM */
 	UINT32              m_fastram_select;
-	struct 
+	struct
 	{
 		offs_t              start;                      /* start of the RAM block */
 		offs_t              end;                        /* end of the RAM block */

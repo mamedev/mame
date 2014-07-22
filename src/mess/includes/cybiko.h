@@ -89,7 +89,7 @@ public:
 	required_device<pcf8593_device> m_rtc;
 	required_device<ram_device> m_ram;
 	optional_device<at45db041_device> m_flash1;
-	required_device<nvram_device> 	m_nvram;
+	required_device<nvram_device>   m_nvram;
 	DECLARE_DRIVER_INIT(cybikoxt);
 	DECLARE_DRIVER_INIT(cybiko);
 	virtual void machine_start();

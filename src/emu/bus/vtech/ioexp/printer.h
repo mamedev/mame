@@ -1,6 +1,6 @@
 /***************************************************************************
 
-	VTech Laser/VZ Printer Interface
+    VTech Laser/VZ Printer Interface
 
     license: MAME, GPL-2.0+
     copyright-holders: Dirk Best

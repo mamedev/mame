@@ -29,7 +29,7 @@ public:
 		dev.m_width = w;
 		dev.m_height = h;
 	}
-	
+
 	// device interface
 	DECLARE_WRITE8_MEMBER(control_write);
 	DECLARE_READ8_MEMBER(control_read);

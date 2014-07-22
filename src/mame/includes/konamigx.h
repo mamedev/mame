@@ -34,9 +34,9 @@ public:
 		m_an0(*this, "AN0"),
 		m_an1(*this, "AN1"),
 		m_light0_x(*this, "LIGHT0_X"),
-		m_light0_y(*this, "LIGHT0_Y"),	
+		m_light0_y(*this, "LIGHT0_Y"),
 		m_light1_x(*this, "LIGHT1_X"),
-		m_light1_y(*this, "LIGHT1_Y"),	
+		m_light1_y(*this, "LIGHT1_Y"),
 		m_eepromout(*this, "EEPROMOUT"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
@@ -162,7 +162,7 @@ public:
 
 	void konamigx_mixer_init(screen_device &screen, int objdma);
 	void konamigx_objdma(void);
-	
+
 	void fantjour_dma_install();
 
 	void konamigx_mixer_primode(int mode);
@@ -225,4 +225,3 @@ extern UINT16 konamigx_wrport2;
 #define GXSUB_4BPP      0x04    //  16 colors
 #define GXSUB_5BPP      0x05    //  32 colors
 #define GXSUB_8BPP      0x08    // 256 colors
-

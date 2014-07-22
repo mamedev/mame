@@ -78,7 +78,7 @@ public:
 	required_device<palette_device> m_palette;
 	optional_device<dcs_audio_device> m_dcs;
 	required_shared_ptr<UINT16> m_generic_paletteram_16;
-	
+
 	void register_state_saving();
 	void init_tunit_generic(int sound);
 	void init_nbajam_common(int te_protection);

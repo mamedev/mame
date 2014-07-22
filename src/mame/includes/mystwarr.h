@@ -20,7 +20,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<k053252_device> m_k053252;
 	required_device<k056832_device> m_k056832;
-	required_device<k055673_device> m_k055673;	
+	required_device<k055673_device> m_k055673;
 	required_shared_ptr<UINT16> m_gx_workram;
 	optional_shared_ptr<UINT16> m_spriteram;
 

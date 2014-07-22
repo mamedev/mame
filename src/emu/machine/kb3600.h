@@ -137,7 +137,7 @@ private:
 	int m_b;                    // output buffer
 	int m_ako;                  // any key down
 
-	int m_x_mask[9];			// mask of what keys are down
+	int m_x_mask[9];            // mask of what keys are down
 
 	// timers
 	emu_timer *m_scan_timer;    // keyboard scan timer

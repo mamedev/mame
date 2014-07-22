@@ -2,7 +2,7 @@
 // copyright-holders:Curt Coder
 /**********************************************************************
 
-	Cumana Floppy Disk Interface emulation    
+    Cumana Floppy Disk Interface emulation
 
     Copyright MESS Team.
     Visit http://mamedev.org for licensing and usage restrictions.
@@ -25,7 +25,7 @@
 // ======================> cumana_floppy_disk_interface_t
 
 class cumana_floppy_disk_interface_t : public device_t,
-			   						   public device_ql_expansion_card_interface
+										public device_ql_expansion_card_interface
 {
 public:
 	// construction/destruction

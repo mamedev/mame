@@ -59,20 +59,20 @@ class crtc_ega_device : public device_t,
 public:
 	crtc_ega_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	template<class _Object> static devcb_base &set_res_out_de_callback(device_t &device, _Object object) 
+	template<class _Object> static devcb_base &set_res_out_de_callback(device_t &device, _Object object)
 						{ return downcast<crtc_ega_device &>(device).m_res_out_de_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_res_out_hsync_callback(device_t &device, _Object object) 
+	template<class _Object> static devcb_base &set_res_out_hsync_callback(device_t &device, _Object object)
 						{ return downcast<crtc_ega_device &>(device).m_res_out_hsync_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_res_out_vsync_callback(device_t &device, _Object object) 
+	template<class _Object> static devcb_base &set_res_out_vsync_callback(device_t &device, _Object object)
 						{ return downcast<crtc_ega_device &>(device).m_res_out_vsync_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_res_out_vblank_callback(device_t &device, _Object object) 
+	template<class _Object> static devcb_base &set_res_out_vblank_callback(device_t &device, _Object object)
 						{ return downcast<crtc_ega_device &>(device).m_res_out_vblank_cb.set_callback(object); }
 
 	static void set_begin_update_callback(device_t &device, crtc_ega_begin_update_delegate callback) { downcast<crtc_ega_device &>(device).m_begin_update_cb = callback; }
 	static void set_row_update_callback(device_t &device, crtc_ega_row_update_delegate callback) { downcast<crtc_ega_device &>(device).m_row_update_cb = callback; }
 	static void set_end_update_callback(device_t &device, crtc_ega_end_update_delegate callback) { downcast<crtc_ega_device &>(device).m_end_update_cb = callback; }
 	static void set_hpixels_per_column(device_t &device, int hpixels_per_column) { downcast<crtc_ega_device &>(device).m_hpixels_per_column = hpixels_per_column; }
-	
+
 	/* select one of the registers for reading or writing */
 	DECLARE_WRITE8_MEMBER( address_w );
 
@@ -119,16 +119,16 @@ private:
 	 optionally return a pointer that will be passed to the
 	 update and tear down callbacks */
 	crtc_ega_begin_update_delegate      m_begin_update_cb;
-	
+
 	/* this gets called for every row, the driver must output
 	 x_count * hpixels_per_column pixels.
 	 cursor_x indicates the character position where the cursor is, or -1
 	 if there is no cursor on this row */
 	crtc_ega_row_update_delegate        m_row_update_cb;
-	
+
 	/* if specified, this gets called after all row updating is complete */
 	crtc_ega_end_update_delegate        m_end_update_cb;
-	
+
 	/* ega/vga register file */
 	UINT8   m_horiz_char_total; /* 0x00 */
 	UINT8   m_horiz_disp;           /* 0x01 */

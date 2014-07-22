@@ -61,13 +61,13 @@
 
 #define MCFG_TTL74123_RESISTOR_VALUE(_value) \
 	ttl74123_device::set_resistor_value(*device, _value);
-	
+
 #define MCFG_TTL74123_CAPACITOR_VALUE(_value) \
 	ttl74123_device::set_capacitor_value(*device, _value);
 
 #define MCFG_TTL74123_A_PIN_VALUE(_value) \
 	ttl74123_device::set_a_pin_value(*device, _value);
-	
+
 #define MCFG_TTL74123_B_PIN_VALUE(_value) \
 	ttl74123_device::set_b_pin_value(*device, _value);
 
@@ -75,7 +75,7 @@
 	ttl74123_device::set_clear_pin_value(*device, _value);
 
 #define MCFG_TTL74123_OUTPUT_CHANGED_CB(_devcb) \
-    devcb = &ttl74123_device::set_output_changed_callback(*device, DEVCB_##_devcb);
+	devcb = &ttl74123_device::set_output_changed_callback(*device, DEVCB_##_devcb);
 
 /* constants for the different ways the cap/res can be connected.
    This determines the formula for calculating the pulse width */
@@ -103,7 +103,7 @@ public:
 	static void set_b_pin_value(device_t &device, int value) { downcast<ttl74123_device &>(device).m_b = value; }
 	static void set_clear_pin_value(device_t &device, int value) { downcast<ttl74123_device &>(device).m_clear = value; }
 	template<class _Object> static devcb_base &set_output_changed_callback(device_t &device, _Object object) { return downcast<ttl74123_device &>(device).m_output_changed_cb.set_callback(object); }
-	
+
 	DECLARE_WRITE8_MEMBER(a_w);
 	DECLARE_WRITE8_MEMBER(b_w);
 	DECLARE_WRITE8_MEMBER(clear_w);

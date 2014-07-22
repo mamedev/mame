@@ -54,7 +54,7 @@ public:
 	DECLARE_WRITE8_MEMBER(cpu_portb_w);
 	DECLARE_WRITE8_MEMBER(cpu_portc_w);
 	DECLARE_WRITE8_MEMBER(cpu_porte_w);
-	
+
 	DECLARE_READ16_MEMBER(niyanpai_dipsw_r);
 	DECLARE_READ16_MEMBER(musobana_inputport_0_r);
 	DECLARE_WRITE16_MEMBER(musobana_inputport_w);

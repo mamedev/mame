@@ -12,26 +12,26 @@
 #include "lstate.h"
 
 
-#define sizestring(s)	(sizeof(union TString)+((s)->len+1)*sizeof(char))
+#define sizestring(s)   (sizeof(union TString)+((s)->len+1)*sizeof(char))
 
-#define sizeudata(u)	(sizeof(union Udata)+(u)->len)
+#define sizeudata(u)    (sizeof(union Udata)+(u)->len)
 
-#define luaS_newliteral(L, s)	(luaS_newlstr(L, "" s, \
-                                 (sizeof(s)/sizeof(char))-1))
+#define luaS_newliteral(L, s)   (luaS_newlstr(L, "" s, \
+									(sizeof(s)/sizeof(char))-1))
 
-#define luaS_fix(s)	l_setbit((s)->tsv.marked, FIXEDBIT)
+#define luaS_fix(s) l_setbit((s)->tsv.marked, FIXEDBIT)
 
 
 /*
 ** test whether a string is a reserved word
 */
-#define isreserved(s)	((s)->tsv.tt == LUA_TSHRSTR && (s)->tsv.extra > 0)
+#define isreserved(s)   ((s)->tsv.tt == LUA_TSHRSTR && (s)->tsv.extra > 0)
 
 
 /*
 ** equality for short strings, which are always internalized
 */
-#define eqshrstr(a,b)	check_exp((a)->tsv.tt == LUA_TSHRSTR, (a) == (b))
+#define eqshrstr(a,b)   check_exp((a)->tsv.tt == LUA_TSHRSTR, (a) == (b))
 
 
 LUAI_FUNC unsigned int luaS_hash (const char *str, size_t l, unsigned int seed);

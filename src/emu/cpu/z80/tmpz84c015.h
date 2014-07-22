@@ -122,10 +122,10 @@ public:
 	template<class _Object> static devcb_base &set_out_syncb_callback(device_t &device, _Object object) { return downcast<tmpz84c015_device &>(device).m_out_syncb_cb.set_callback(object); }
 
 	template<class _Object> static devcb_base &set_out_rxdrqa_callback(device_t &device, _Object object) { return downcast<tmpz84c015_device &>(device).m_out_rxdrqa_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_txdrqa_callback(device_t &device, _Object object) { return downcast<tmpz84c015_device &>(device).m_out_txdrqa_cb.set_callback(object); }	
+	template<class _Object> static devcb_base &set_out_txdrqa_callback(device_t &device, _Object object) { return downcast<tmpz84c015_device &>(device).m_out_txdrqa_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_out_rxdrqb_callback(device_t &device, _Object object) { return downcast<tmpz84c015_device &>(device).m_out_rxdrqb_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_txdrqb_callback(device_t &device, _Object object) { return downcast<tmpz84c015_device &>(device).m_out_txdrqb_cb.set_callback(object); }	
-	
+	template<class _Object> static devcb_base &set_out_txdrqb_callback(device_t &device, _Object object) { return downcast<tmpz84c015_device &>(device).m_out_txdrqb_cb.set_callback(object); }
+
 	template<class _Object> static devcb_base &set_zc0_callback(device_t &device, _Object object) { return downcast<tmpz84c015_device &>(device).m_zc0_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_zc1_callback(device_t &device, _Object object) { return downcast<tmpz84c015_device &>(device).m_zc1_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_zc2_callback(device_t &device, _Object object) { return downcast<tmpz84c015_device &>(device).m_zc2_cb.set_callback(object); }
@@ -171,7 +171,7 @@ public:
 	DECLARE_READ8_MEMBER( pa_r ) { return m_pio->pa_r(space, offset, mem_mask); }
 	DECLARE_WRITE8_MEMBER( pb_w ) { m_pio->pb_w(space, offset, data, mem_mask); }
 	DECLARE_READ8_MEMBER( pb_r ) { return m_pio->pb_r(space, offset, mem_mask); }
-	
+
 	/////////////////////////////////////////////////////////
 
 	DECLARE_WRITE8_MEMBER( irq_priority_w );
@@ -204,7 +204,7 @@ public:
 	DECLARE_READ8_MEMBER( in_pb_cb_trampoline_r ) { return m_in_pb_cb(); }
 	DECLARE_WRITE8_MEMBER( out_pb_cb_trampoline_w ) { m_out_pb_cb(data); }
 	DECLARE_WRITE_LINE_MEMBER( out_brdy_cb_trampoline_w ) { m_out_brdy_cb(state); }
-	
+
 protected:
 	// device-level overrides
 	virtual machine_config_constructor device_mconfig_additions() const;
@@ -231,20 +231,20 @@ private:
 
 	// internal state
 	UINT8 m_irq_priority;
-	
+
 	// callbacks
 	devcb_write_line m_out_txda_cb;
 	devcb_write_line m_out_dtra_cb;
 	devcb_write_line m_out_rtsa_cb;
 	devcb_write_line m_out_wrdya_cb;
 	devcb_write_line m_out_synca_cb;
-	
+
 	devcb_write_line m_out_txdb_cb;
 	devcb_write_line m_out_dtrb_cb;
 	devcb_write_line m_out_rtsb_cb;
 	devcb_write_line m_out_wrdyb_cb;
 	devcb_write_line m_out_syncb_cb;
-	
+
 	devcb_write_line m_out_rxdrqa_cb;
 	devcb_write_line m_out_txdrqa_cb;
 	devcb_write_line m_out_rxdrqb_cb;
@@ -257,7 +257,7 @@ private:
 	devcb_read8 m_in_pa_cb;
 	devcb_write8 m_out_pa_cb;
 	devcb_write_line m_out_ardy_cb;
-	
+
 	devcb_read8 m_in_pb_cb;
 	devcb_write8 m_out_pb_cb;
 	devcb_write_line m_out_brdy_cb;

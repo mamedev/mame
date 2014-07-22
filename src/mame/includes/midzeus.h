@@ -82,7 +82,7 @@ private:
 	void zeus_draw_quad(int long_fmt, const UINT32 *databuffer, UINT32 texdata, int logit);
 
 	void log_fifo_command(const UINT32 *data, int numwords, const char *suffix);
-	void log_waveram(UINT32 length_and_base);	
+	void log_waveram(UINT32 length_and_base);
 };
 
 
@@ -96,13 +96,13 @@ public:
 	UINT32 screen_update_midzeus2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_READ32_MEMBER( zeus2_r );
 	DECLARE_WRITE32_MEMBER( zeus2_w );
-private:	
+private:
 	void exit_handler2();
 	void zeus2_register32_w(offs_t offset, UINT32 data, int logit);
 	void zeus2_register_update(offs_t offset, UINT32 oldval, int logit);
 	int zeus2_fifo_process(const UINT32 *data, int numwords);
 	void zeus2_pointer_write(UINT8 which, UINT32 value);
 	void zeus2_draw_model(UINT32 baseaddr, UINT16 count, int logit);
-	void zeus2_draw_quad(const UINT32 *databuffer, UINT32 texoffs, int logit);	
+	void zeus2_draw_quad(const UINT32 *databuffer, UINT32 texoffs, int logit);
 	void log_fifo_command(const UINT32 *data, int numwords, const char *suffix);
 };

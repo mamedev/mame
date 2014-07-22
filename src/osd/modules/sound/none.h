@@ -21,7 +21,7 @@ public:
 	// construction/destruction
 	sound_none(const osd_interface &osd);
 	virtual ~sound_none() { }
-	
+
 	virtual void update_audio_stream(const INT16 *buffer, int samples_this_frame) { }
 	virtual void set_mastervolume(int attenuation) { }
 };

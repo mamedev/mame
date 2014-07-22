@@ -31,8 +31,8 @@ public:
 	template<class _Object> static devcb_base &set_irq_wr_callback(device_t &device, _Object object) { return downcast<i8271_device &>(device).m_write_irq.set_callback(object); }
 	template<class _Object> static devcb_base &set_drq_wr_callback(device_t &device, _Object object) { return downcast<i8271_device &>(device).m_write_drq.set_callback(object); }
 
-	static void set_floppy_tags(device_t &device, const char *tag1, const char *tag2) 
-	{ 
+	static void set_floppy_tags(device_t &device, const char *tag1, const char *tag2)
+	{
 		i8271_device &dev = downcast<i8271_device &>(device);
 		dev.m_floppy_tag1 = tag1;
 		dev.m_floppy_tag2 = tag2;

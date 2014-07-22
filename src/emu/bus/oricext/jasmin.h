@@ -28,7 +28,7 @@ protected:
 	bool side_sel, fdc_reset, ram_access, rom_access, select[4];
 	UINT8 *jasmin_rom;
 	floppy_image_device *cur_floppy, *floppies[4];
-	
+
 	virtual void device_start();
 	virtual void device_reset();
 	const rom_entry *device_rom_region() const;

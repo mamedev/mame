@@ -57,7 +57,7 @@
 NETLIB_SUBDEVICE(7474sub,
 	netlist_ttl_input_t m_CLK;
 
-    netlist_state_t<UINT8> m_nextD;
+	netlist_state_t<UINT8> m_nextD;
 	netlist_ttl_output_t m_Q;
 	netlist_ttl_output_t m_QQ;
 

@@ -18,7 +18,7 @@
 		NET_REGISTER_DEV(VCCS, _name)
 
 #define CCCS(_name)                                                                \
-        NET_REGISTER_DEV(CCCS, _name)
+		NET_REGISTER_DEV(CCCS, _name)
 
 #define VCVS(_name)                                                                \
 		NET_REGISTER_DEV(VCVS, _name)
@@ -104,18 +104,18 @@ protected:
 class NETLIB_NAME(CCCS) : public NETLIB_NAME(VCCS)
 {
 public:
-    ATTR_COLD NETLIB_NAME(CCCS)()
-    : NETLIB_NAME(VCCS)(CCCS), m_gfac(1.0) {  }
-    //ATTR_COLD NETLIB_NAME(CCCS)(const family_t afamily)
-    //: netlist_device_t(afamily), m_gfac(1.0) {  }
+	ATTR_COLD NETLIB_NAME(CCCS)()
+	: NETLIB_NAME(VCCS)(CCCS), m_gfac(1.0) {  }
+	//ATTR_COLD NETLIB_NAME(CCCS)(const family_t afamily)
+	//: netlist_device_t(afamily), m_gfac(1.0) {  }
 
 protected:
-    ATTR_COLD virtual void start();
-    ATTR_COLD virtual void reset();
-    ATTR_COLD virtual void update_param();
-    ATTR_HOT ATTR_ALIGN void update();
+	ATTR_COLD virtual void start();
+	ATTR_COLD virtual void reset();
+	ATTR_COLD virtual void update_param();
+	ATTR_HOT ATTR_ALIGN void update();
 
-    double m_gfac;
+	double m_gfac;
 };
 
 

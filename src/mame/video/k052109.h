@@ -95,7 +95,7 @@ private:
 
 	UINT8 *m_char_rom;
 	UINT32 m_char_size;
-	
+
 	k052109_cb_delegate m_k052109_cb;
 
 	TILE_GET_INFO_MEMBER(get_tile_info0);

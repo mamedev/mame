@@ -4,8 +4,7 @@
 #include "slot.h"
 
 #define MCFG_MSX_SLOT_RAM_ADD(_tag, _startpage, _numpages) \
-	MCFG_MSX_INTERNAL_SLOT_ADD(_tag, MSX_SLOT_RAM, _startpage, _numpages) \
-
+	MCFG_MSX_INTERNAL_SLOT_ADD(_tag, MSX_SLOT_RAM, _startpage, _numpages)
 class msx_slot_ram_device : public device_t,
 							public msx_internal_slot_interface
 {

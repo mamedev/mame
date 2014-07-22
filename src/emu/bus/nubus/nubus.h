@@ -38,7 +38,7 @@
 
 #define MCFG_NUBUS_OUT_IRQE_CB(_devcb) \
 	devcb = &nubus_device::set_out_irqe_callback(*device, DEVCB_##_devcb);
-	
+
 #define MCFG_NUBUS_SLOT_ADD(_nbtag, _tag, _slot_intf, _def_slot) \
 	MCFG_DEVICE_ADD(_tag, NUBUS_SLOT, 0) \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false) \
@@ -88,7 +88,7 @@ public:
 	nubus_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	nubus_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 	~nubus_device() { m_device_list.detach_all(); }
-	
+
 	// inline configuration
 	static void static_set_cputag(device_t &device, const char *tag);
 	template<class _Object> static devcb_base &set_out_irq9_callback(device_t &device, _Object object) { return downcast<nubus_device &>(device).m_out_irq9_cb.set_callback(object); }

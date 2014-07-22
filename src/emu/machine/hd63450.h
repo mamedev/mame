@@ -100,7 +100,7 @@ public:
 		dev.m_burst_clock[2] = clk3;
 		dev.m_burst_clock[3] = clk4;
 	}
-	
+
 	DECLARE_READ16_MEMBER( read );
 	DECLARE_WRITE16_MEMBER( write );
 	DECLARE_WRITE_LINE_MEMBER(drq0_w);
@@ -133,7 +133,7 @@ private:
 	const char *m_cpu_tag;
 	attotime m_our_clock[4];
 	attotime m_burst_clock[4];
-	
+
 	// internal state
 	hd63450_regs m_reg[4];
 	emu_timer* m_timer[4];  // for timing data reading/writing each channel

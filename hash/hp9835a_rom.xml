@@ -2,7 +2,7 @@
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 
 <softwarelist name="hp9835a_rom" description="HP 9835A/B Option ROMs">
-	
+
 	<software name="mass">
 		<description>Mass Storage</description>
 		<year>198?</year>
@@ -16,7 +16,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="io">
 		<description>I/O</description>
 		<year>198?</year>
@@ -32,7 +32,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="asmexec">
 		<description>Assembly Execution</description>
 		<year>198?</year>
@@ -45,7 +45,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="asmdev">
 		<description>Assembly Language Development &amp; Execution</description>
 		<year>198?</year>

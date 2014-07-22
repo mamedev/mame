@@ -64,13 +64,13 @@
 
 
 #define MCFG_QL_EXPANSION_SLOT_IPL0L_CALLBACK(_write) \
-    devcb = &ql_expansion_slot_t::set_ipl0l_wr_callback(*device, DEVCB_##_write);
+	devcb = &ql_expansion_slot_t::set_ipl0l_wr_callback(*device, DEVCB_##_write);
 
 #define MCFG_QL_EXPANSION_SLOT_IPL1L_CALLBACK(_write) \
-    devcb = &ql_expansion_slot_t::set_ipl1l_wr_callback(*device, DEVCB_##_write);
+	devcb = &ql_expansion_slot_t::set_ipl1l_wr_callback(*device, DEVCB_##_write);
 
 #define MCFG_QL_EXPANSION_SLOT_BERRL_CALLBACK(_write) \
-    devcb = &ql_expansion_slot_t::set_berrl_wr_callback(*device, DEVCB_##_write);
+	devcb = &ql_expansion_slot_t::set_berrl_wr_callback(*device, DEVCB_##_write);
 
 #define MCFG_QL_EXPANSION_SLOT_EXTINTL_CALLBACK(_write) \
 	devcb = &ql_expansion_slot_t::set_extintl_wr_callback(*device, DEVCB_##_write);
@@ -93,14 +93,14 @@ public:
 	// construction/destruction
 	device_ql_expansion_card_interface(const machine_config &mconfig, device_t &device);
 
-    virtual void romoeh_w(int state) { m_romoeh = state; }
-    virtual UINT8 read(address_space &space, offs_t offset, UINT8 data) { return data; }
-    virtual void write(address_space &space, offs_t offset, UINT8 data) { }
+	virtual void romoeh_w(int state) { m_romoeh = state; }
+	virtual UINT8 read(address_space &space, offs_t offset, UINT8 data) { return data; }
+	virtual void write(address_space &space, offs_t offset, UINT8 data) { }
 
 protected:
 	ql_expansion_slot_t  *m_slot;
 
-    int m_romoeh;
+	int m_romoeh;
 };
 
 
@@ -113,31 +113,31 @@ public:
 	// construction/destruction
 	ql_expansion_slot_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-    template<class _Object> static devcb_base &set_ipl0l_wr_callback(device_t &device, _Object object) { return downcast<ql_expansion_slot_t &>(device).m_write_ipl0l.set_callback(object); }
-    template<class _Object> static devcb_base &set_ipl1l_wr_callback(device_t &device, _Object object) { return downcast<ql_expansion_slot_t &>(device).m_write_ipl1l.set_callback(object); }
-    template<class _Object> static devcb_base &set_berrl_wr_callback(device_t &device, _Object object) { return downcast<ql_expansion_slot_t &>(device).m_write_berrl.set_callback(object); }
+	template<class _Object> static devcb_base &set_ipl0l_wr_callback(device_t &device, _Object object) { return downcast<ql_expansion_slot_t &>(device).m_write_ipl0l.set_callback(object); }
+	template<class _Object> static devcb_base &set_ipl1l_wr_callback(device_t &device, _Object object) { return downcast<ql_expansion_slot_t &>(device).m_write_ipl1l.set_callback(object); }
+	template<class _Object> static devcb_base &set_berrl_wr_callback(device_t &device, _Object object) { return downcast<ql_expansion_slot_t &>(device).m_write_berrl.set_callback(object); }
 	template<class _Object> static devcb_base &set_extintl_wr_callback(device_t &device, _Object object) { return downcast<ql_expansion_slot_t &>(device).m_write_extintl.set_callback(object); }
 
-    // computer interface
-    UINT8 read(address_space &space, offs_t offset, UINT8 data) { if (m_card) data = m_card->read(space, offset, data); return data; }
-    void write(address_space &space, offs_t offset, UINT8 data) { if (m_card) m_card->write(space, offset, data); }
-    DECLARE_WRITE_LINE_MEMBER( romoeh_w ) { if (m_card) m_card->romoeh_w(state); }
+	// computer interface
+	UINT8 read(address_space &space, offs_t offset, UINT8 data) { if (m_card) data = m_card->read(space, offset, data); return data; }
+	void write(address_space &space, offs_t offset, UINT8 data) { if (m_card) m_card->write(space, offset, data); }
+	DECLARE_WRITE_LINE_MEMBER( romoeh_w ) { if (m_card) m_card->romoeh_w(state); }
 
-    // card interface
-    DECLARE_WRITE_LINE_MEMBER( ipl0l_w ) { m_write_ipl0l(state); }
-    DECLARE_WRITE_LINE_MEMBER( ipl1l_w ) { m_write_ipl1l(state); }
-    DECLARE_WRITE_LINE_MEMBER( berrl_w ) { m_write_berrl(state); }
+	// card interface
+	DECLARE_WRITE_LINE_MEMBER( ipl0l_w ) { m_write_ipl0l(state); }
+	DECLARE_WRITE_LINE_MEMBER( ipl1l_w ) { m_write_ipl1l(state); }
+	DECLARE_WRITE_LINE_MEMBER( berrl_w ) { m_write_berrl(state); }
 	DECLARE_WRITE_LINE_MEMBER( extintl_w ) { m_write_extintl(state); }
 
 protected:
 	// device-level overrides
 	virtual void device_start();
-    virtual void device_reset() { if (get_card_device()) get_card_device()->reset(); }
+	virtual void device_reset() { if (get_card_device()) get_card_device()->reset(); }
 
 	devcb_write_line   m_write_ipl0l;
-    devcb_write_line   m_write_ipl1l;
-    devcb_write_line   m_write_berrl;
-    devcb_write_line   m_write_extintl;
+	devcb_write_line   m_write_ipl1l;
+	devcb_write_line   m_write_berrl;
+	devcb_write_line   m_write_extintl;
 
 	device_ql_expansion_card_interface *m_card;
 };

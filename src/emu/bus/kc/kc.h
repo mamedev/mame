@@ -49,7 +49,7 @@ public:
 	template<class _Object> static devcb_base &set_out_irq_callback(device_t &device, _Object object) { return downcast<kcexp_slot_device &>(device).m_out_irq_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_out_nmi_callback(device_t &device, _Object object) { return downcast<kcexp_slot_device &>(device).m_out_nmi_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_out_halt_callback(device_t &device, _Object object) { return downcast<kcexp_slot_device &>(device).m_out_halt_cb.set_callback(object); }
-	
+
 	// device-level overrides
 	virtual void device_start();
 
@@ -127,7 +127,7 @@ extern const device_type KCCART_SLOT;
 
 #define MCFG_KCEXP_SLOT_NEXT_SLOT(_next_slot_tag) \
 	kcexp_slot_device::static_set_next_slot(*device, _next_slot_tag);
-	
+
 
 #define MCFG_KCCART_SLOT_OUT_IRQ_CB(_devcb) \
 	devcb = &kccart_slot_device::set_out_irq_callback(*device, DEVCB_##_devcb);
@@ -141,12 +141,12 @@ extern const device_type KCCART_SLOT;
 #define MCFG_KCCART_SLOT_NEXT_SLOT(_next_slot_tag) \
 	kccart_slot_device::static_set_next_slot(*device, _next_slot_tag);
 
-// #define MCFG_KC85_EXPANSION_ADD(_tag,_next_slot_tag,_config,_slot_intf,_def_slot) 
-//	MCFG_DEVICE_ADD(_tag, KCEXP_SLOT, 0) 
-//	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false) 
+// #define MCFG_KC85_EXPANSION_ADD(_tag,_next_slot_tag,_config,_slot_intf,_def_slot)
+//  MCFG_DEVICE_ADD(_tag, KCEXP_SLOT, 0)
+//  MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
 
 // #define MCFG_KC85_CARTRIDGE_ADD(_tag,_next_slot_tag,_config,_slot_intf,_def_slot)
-//	MCFG_DEVICE_ADD(_tag, KCCART_SLOT, 0) 
-//	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false) 
+//  MCFG_DEVICE_ADD(_tag, KCCART_SLOT, 0)
+//  MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
 
 #endif /* __KCEXP_H__ */

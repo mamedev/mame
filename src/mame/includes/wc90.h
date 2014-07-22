@@ -28,7 +28,7 @@ public:
 		m_sprgen(*this, "spritegen")
 	{ }
 
-	
+
 
 	required_shared_ptr<UINT8> m_fgvideoram;
 	required_shared_ptr<UINT8> m_bgvideoram;

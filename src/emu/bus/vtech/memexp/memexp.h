@@ -1,34 +1,34 @@
 /***************************************************************************
 
-	VTech Laser/VZ Memory Expansion Slot
+    VTech Laser/VZ Memory Expansion Slot
 
     license: MAME, GPL-2.0+
     copyright-holders: Dirk Best
 
-	44-pin slot
+    44-pin slot
 
-	22  GND             23  NC
-	21  +5VDC           24  A11
-	20  /IORQ           25  A12
-	19  /RD             26  A13
-	18  /NMI            27  A14
-	17  /WAIT           28  A15
-	16  /MI             29  CLK
-	15  /RFSH           30  D4
-	14  D7              31  D3
-	13  D2              32  D5
-	12  A1              33  D6
-	11  A2              34  NC
-	10  A3              35  A0
-	 9  A4              36  D0
-	 8  A5              37  D1
-	 7  A6              38  /INT
-	 6  A7              39  /HALT
-	 5  A8              40  /MERQ
-	 4  A9              41  /WR
-	 3  A10             42  /NC
-	 2  /RESET          43  +9VDC
-	 1  GND             44  NC
+    22  GND             23  NC
+    21  +5VDC           24  A11
+    20  /IORQ           25  A12
+    19  /RD             26  A13
+    18  /NMI            27  A14
+    17  /WAIT           28  A15
+    16  /MI             29  CLK
+    15  /RFSH           30  D4
+    14  D7              31  D3
+    13  D2              32  D5
+    12  A1              33  D6
+    11  A2              34  NC
+    10  A3              35  A0
+     9  A4              36  D0
+     8  A5              37  D1
+     7  A6              38  /INT
+     6  A7              39  /HALT
+     5  A8              40  /MERQ
+     4  A9              41  /WR
+     3  A10             42  /NC
+     2  /RESET          43  +9VDC
+     1  GND             44  NC
 
 ***************************************************************************/
 

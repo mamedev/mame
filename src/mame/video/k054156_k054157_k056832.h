@@ -53,7 +53,7 @@ public:
 		dev.m_djmain_hack = djmain_hack;
 		dev.m_k055555_tag = k055555;
 	}
-	
+
 	// static configuration
 	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
 	static void static_set_palette_tag(device_t &device, const char *tag);
@@ -141,9 +141,9 @@ private:
 	int                m_bpp;
 	int                m_big;
 	int                m_djmain_hack;
-	
+
 	const char         *m_k055555_tag;    // tbyahhoo uses the k056832 together with a k055555
-	
+
 
 	// ROM readback involves reading 2 halves of a word
 	// from the same location in a row.  Reading the

@@ -454,7 +454,7 @@ public:
 	/* DS III/IV board */
 	TIMER_DEVICE_CALLBACK_MEMBER( ds3sdsp_internal_timer_callback );
 	TIMER_DEVICE_CALLBACK_MEMBER( ds3xdsp_internal_timer_callback );
-	
+
 };
 
 

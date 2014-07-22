@@ -695,20 +695,20 @@ protected:
 //class ppc403_device : public ppc_device
 //{
 //public:
-//	ppc403_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+//  ppc403_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 //
 //protected:
-//	virtual UINT32 execute_input_lines() const { return 8; }
+//  virtual UINT32 execute_input_lines() const { return 8; }
 //};
 //
 //
 //class ppc405_device : public ppc_device
 //{
 //public:
-//	ppc405_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+//  ppc405_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 //
 //protected:
-//	virtual UINT32 execute_input_lines() const { return 8; }
+//  virtual UINT32 execute_input_lines() const { return 8; }
 //};
 
 

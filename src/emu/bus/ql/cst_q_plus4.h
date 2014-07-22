@@ -26,7 +26,7 @@
 // ======================> cst_q_plus4_t
 
 class cst_q_plus4_t : public device_t,
-			   		  public device_ql_expansion_card_interface
+						public device_ql_expansion_card_interface
 {
 public:
 	// construction/destruction

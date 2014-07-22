@@ -92,7 +92,7 @@
 
 #define MCFG_ISA_BUS_IOCHCK(_iochck) \
 	downcast<isa8_device *>(device)->set_iochck_callback(DEVCB_##_iochck);
-	
+
 #define MCFG_ISA_OUT_IRQ2_CB(_devcb) \
 	devcb = &isa8_device::set_out_irq2_callback(*device, DEVCB_##_devcb);
 
@@ -119,7 +119,7 @@
 
 #define MCFG_ISA_OUT_DRQ3_CB(_devcb) \
 	devcb = &isa8_device::set_out_drq3_callback(*device, DEVCB_##_devcb);
-	
+
 
 #define MCFG_ISA_OUT_IRQ10_CB(_devcb) \
 	devcb = &isa16_device::set_out_irq10_callback(*device, DEVCB_##_devcb);
@@ -354,7 +354,7 @@ public:
 	template<class _Object> static devcb_base &set_out_drq5_callback(device_t &device, _Object object) { return downcast<isa16_device &>(device).m_out_drq5_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_out_drq6_callback(device_t &device, _Object object) { return downcast<isa16_device &>(device).m_out_drq6_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_out_drq7_callback(device_t &device, _Object object) { return downcast<isa16_device &>(device).m_out_drq7_cb.set_callback(object); }
-	
+
 	void install16_device(offs_t start, offs_t end, offs_t mask, offs_t mirror, read16_delegate rhandler, write16_delegate whandler);
 
 	// for ISA16, put the 16-bit configs in the primary slots and the 8-bit configs in the secondary

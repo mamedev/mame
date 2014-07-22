@@ -79,7 +79,7 @@ public:
 	// construction/destruction
 	iq151cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	virtual ~iq151cart_slot_device();
-	
+
 	template<class _Object> static devcb_base &set_out_irq0_callback(device_t &device, _Object object) { return downcast<iq151cart_slot_device &>(device).m_out_irq0_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_out_irq1_callback(device_t &device, _Object object) { return downcast<iq151cart_slot_device &>(device).m_out_irq1_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_out_irq2_callback(device_t &device, _Object object) { return downcast<iq151cart_slot_device &>(device).m_out_irq2_cb.set_callback(object); }

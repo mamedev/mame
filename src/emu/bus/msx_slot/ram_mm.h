@@ -41,4 +41,3 @@ private:
 extern const device_type MSX_SLOT_RAM_MM;
 
 #endif
-

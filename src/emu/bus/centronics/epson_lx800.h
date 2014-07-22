@@ -29,7 +29,7 @@
 // ======================> epson_lx800_t
 
 class epson_lx800_t :  public device_t,
-					   public device_centronics_peripheral_interface
+						public device_centronics_peripheral_interface
 {
 public:
 	// construction/destruction

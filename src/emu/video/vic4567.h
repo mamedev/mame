@@ -135,7 +135,7 @@ public:
 	template<class _Object> static devcb_base &set_lightpen_x_callback(device_t &device, _Object object) { return downcast<vic3_device &>(device).m_lightpen_x_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_lightpen_y_callback(device_t &device, _Object object) { return downcast<vic3_device &>(device).m_lightpen_y_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_c64_mem_r_callback(device_t &device, _Object object) { return downcast<vic3_device &>(device).m_c64_mem_r_cb.set_callback(object); }
-	
+
 	DECLARE_WRITE8_MEMBER(port_w);
 	DECLARE_WRITE8_MEMBER(palette_w);
 	DECLARE_READ8_MEMBER(port_r);
@@ -221,7 +221,7 @@ private:
 	devcb_read8 m_lightpen_button_cb;
 	devcb_read8 m_lightpen_x_cb;
 	devcb_read8 m_lightpen_y_cb;
-	
+
 	/* C64 memory access */
 	devcb_read8      m_c64_mem_r_cb;
 
@@ -239,10 +239,10 @@ extern const device_type VIC3;
 
 #define MCFG_VIC3_CPU(_tag) \
 	vic3_device::static_set_cpu_tag(*device, "^"_tag);
-	
+
 #define MCFG_VIC3_TYPE(_type) \
 	vic3_device::set_vic3_type(*device, _type);
-	
+
 #define MCFG_VIC3_DMA_READ_CB(_devcb) \
 	devcb = &vic3_device::set_dma_read_callback(*device, DEVCB_##_devcb);
 

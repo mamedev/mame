@@ -46,7 +46,7 @@ public:
 	virtual DECLARE_WRITE_LINE_MEMBER( input_d ) { output_4(state); }
 	virtual DECLARE_WRITE_LINE_MEMBER( input_k ) { output_9(state); }
 	virtual DECLARE_WRITE_LINE_MEMBER( input_l ) { output_10(state); }
-	
+
 protected:
 	// device-level overrides
 	virtual void device_start();

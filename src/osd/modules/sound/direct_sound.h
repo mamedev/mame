@@ -28,7 +28,7 @@ public:
 	// construction/destruction
 	sound_direct_sound(const osd_interface &osd);
 	virtual ~sound_direct_sound();
-	
+
 	virtual void update_audio_stream(const INT16 *buffer, int samples_this_frame);
 	virtual void set_mastervolume(int attenuation);
 
@@ -36,8 +36,8 @@ public:
 	void         dsound_kill();
 	HRESULT      dsound_create_buffers();
 	void         dsound_destroy_buffers();
-	void 		 copy_sample_data(const INT16 *data, int bytes_to_copy);
-private:	
+	void         copy_sample_data(const INT16 *data, int bytes_to_copy);
+private:
 };
 
 extern const osd_sound_type OSD_SOUND_DIRECT_SOUND;

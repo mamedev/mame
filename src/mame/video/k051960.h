@@ -2,7 +2,7 @@
 #ifndef __K051960_H__
 #define __K051960_H__
 
-enum 
+enum
 {
 	K051960_PLANEORDER_BASE = 0,
 	K051960_PLANEORDER_MIA,
@@ -29,7 +29,7 @@ class k051960_device : public device_t,
 	DECLARE_GFXDECODE_MEMBER(gfxinfo);
 	DECLARE_GFXDECODE_MEMBER(gfxinfo_reverse);
 	DECLARE_GFXDECODE_MEMBER(gfxinfo_gradius3);
-	
+
 public:
 	k051960_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~k051960_device() {}
@@ -73,12 +73,12 @@ protected:
 private:
 	// internal state
 	UINT8    *m_ram;
-	
+
 	UINT8 *m_sprite_rom;
 	UINT32 m_sprite_size;
-	
+
 	k051960_cb_delegate m_k051960_cb;
-	
+
 	UINT8    m_spriterombank[3];
 	int      m_romoffset;
 	int      m_spriteflip, m_readroms;

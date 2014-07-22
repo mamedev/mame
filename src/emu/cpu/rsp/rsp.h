@@ -145,13 +145,13 @@ union ACCUMULATOR_REG
 
 #define MCFG_RSP_DP_REG_R_CB(_devcb) \
 	devcb = &rsp_cpu_device::static_set_dp_reg_r_callback(*device, DEVCB_##_devcb);
- 
+
 #define MCFG_RSP_DP_REG_W_CB(_devcb) \
 	devcb = &rsp_cpu_device::static_set_dp_reg_w_callback(*device, DEVCB_##_devcb);
- 
+
 #define MCFG_RSP_SP_REG_R_CB(_devcb) \
 	devcb = &rsp_cpu_device::static_set_sp_reg_r_callback(*device, DEVCB_##_devcb);
- 
+
 #define MCFG_RSP_SP_REG_W_CB(_devcb) \
 	devcb = &rsp_cpu_device::static_set_sp_reg_w_callback(*device, DEVCB_##_devcb);
 
@@ -163,7 +163,7 @@ class rsp_cpu_device : public legacy_cpu_device
 protected:
 	// construction/destruction
 	rsp_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, UINT32 clock, cpu_get_info_func info);
-	
+
 public:
 	void resolve_cb();
 	template<class _Object> static devcb_base &static_set_dp_reg_r_callback(device_t &device, _Object object) { return downcast<rsp_cpu_device &>(device).dp_reg_r_func.set_callback(object); }
@@ -171,13 +171,13 @@ public:
 	template<class _Object> static devcb_base &static_set_sp_reg_r_callback(device_t &device, _Object object) { return downcast<rsp_cpu_device &>(device).sp_reg_r_func.set_callback(object); }
 	template<class _Object> static devcb_base &static_set_sp_reg_w_callback(device_t &device, _Object object) { return downcast<rsp_cpu_device &>(device).sp_reg_w_func.set_callback(object); }
 	template<class _Object> static devcb_base &static_set_status_callback(device_t &device, _Object object) { return downcast<rsp_cpu_device &>(device).sp_set_status_func.set_callback(object); }
-	
+
 
 	devcb_read32 dp_reg_r_func;
 	devcb_write32 dp_reg_w_func;
 	devcb_read32 sp_reg_r_func;
 	devcb_write32 sp_reg_w_func;
-	devcb_write32 sp_set_status_func;	
+	devcb_write32 sp_set_status_func;
 };
 
 

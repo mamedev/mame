@@ -84,7 +84,7 @@ public:
 	template<class _Object> static devcb_base &set_in_rl_callback(device_t &device, _Object object) { return downcast<i8279_device &>(device).m_in_rl_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_in_shift_callback(device_t &device, _Object object) { return downcast<i8279_device &>(device).m_in_shift_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_in_ctrl_callback(device_t &device, _Object object) { return downcast<i8279_device &>(device).m_in_ctrl_cb.set_callback(object); }
-	
+
 	// read & write handlers
 	DECLARE_READ8_MEMBER(status_r);
 	DECLARE_READ8_MEMBER(data_r);
@@ -115,7 +115,7 @@ private:
 	devcb_write8        m_out_sl_cb;        // Scanlines SL0-3
 	devcb_write8        m_out_disp_cb;      // B0-3,A0-3
 	devcb_write_line    m_out_bd_cb;        // BD
-	devcb_read8     	m_in_rl_cb;     	// kbd readlines RL0-7
+	devcb_read8         m_in_rl_cb;         // kbd readlines RL0-7
 	devcb_read_line     m_in_shift_cb;      // Shift key
 	devcb_read_line     m_in_ctrl_cb;       // Ctrl-Strobe line
 

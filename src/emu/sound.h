@@ -23,7 +23,7 @@
 //**************************************************************************
 
 const int STREAM_SYNC       = -1;       // special rate value indicating a one-sample-at-a-time stream
-                                        // with actual rate defined by its input
+										// with actual rate defined by its input
 
 //**************************************************************************
 //  MACROS

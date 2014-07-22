@@ -20,7 +20,7 @@ Acorn Archimedes KART interface
 
 #define MCFG_AAKART_OUT_RX_CB(_devcb) \
 	devcb = &aakart_device::set_out_rx_callback(*device, DEVCB_##_devcb);
-	
+
 
 enum{
 	STATUS_NORMAL = 0,
@@ -42,15 +42,15 @@ class aakart_device : public device_t
 public:
 	// construction/destruction
 	aakart_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	template<class _Object> static devcb_base &set_out_tx_callback(device_t &device, _Object object) { return downcast<aakart_device &>(device).m_out_tx_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_out_rx_callback(device_t &device, _Object object) { return downcast<aakart_device &>(device).m_out_rx_cb.set_callback(object); }
 
 	// I/O operations
 	DECLARE_WRITE8_MEMBER( write );
 	DECLARE_READ8_MEMBER( read );
-    void send_keycode_down(UINT8 row, UINT8 col);
-    void send_keycode_up(UINT8 row, UINT8 col);
+	void send_keycode_down(UINT8 row, UINT8 col);
+	void send_keycode_up(UINT8 row, UINT8 col);
 protected:
 	// device-level overrides
 	virtual void device_validity_check(validity_checker &valid) const;
@@ -77,9 +77,9 @@ private:
 	UINT8 m_status;
 	UINT8 m_mouse_enable;
 	UINT8 m_keyb_enable;
-    UINT8 m_keyb_row;
-    UINT8 m_keyb_col;
-    UINT8 m_keyb_state;
+	UINT8 m_keyb_row;
+	UINT8 m_keyb_col;
+	UINT8 m_keyb_state;
 
 };
 

@@ -97,7 +97,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( trg1 ) { m_ctc->trg1(state); }
 	DECLARE_WRITE_LINE_MEMBER( trg2 ) { m_ctc->trg2(state); }
 	DECLARE_WRITE_LINE_MEMBER( trg3 ) { m_ctc->trg3(state); }
-	
+
 	/////////////////////////////////////////////////////////
 
 	DECLARE_READ8_MEMBER( tmpz84c011_pa_r );

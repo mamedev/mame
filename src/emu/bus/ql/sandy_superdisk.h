@@ -28,7 +28,7 @@
 // ======================> sandy_super_disk_device
 
 class sandy_super_disk_t : public device_t,
-			   			   public device_ql_expansion_card_interface
+							public device_ql_expansion_card_interface
 {
 public:
 	// construction/destruction

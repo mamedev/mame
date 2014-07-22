@@ -19,7 +19,7 @@ public:
 		dev.m_bg_yoffs = y_offset;
 	}
 	static void set_bgflip_yoffs(device_t &device, int offs) { downcast<tc0080vco_device &>(device).m_bg_flip_yoffs = offs; }
-	
+
 	DECLARE_READ16_MEMBER( word_r );
 	DECLARE_WRITE16_MEMBER( word_w );
 
@@ -65,7 +65,7 @@ private:
 	tilemap_t      *m_tilemap[3];
 
 	INT32          m_flipscreen;
-	
+
 	int            m_gfxnum;
 	int            m_txnum;
 	int            m_bg_xoffs, m_bg_yoffs;

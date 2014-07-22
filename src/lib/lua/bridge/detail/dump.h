@@ -13,7 +13,7 @@ std::string dumpLuaState(lua_State *L) {
 			ostr << "  " << i << ": '" << lua_tostring(L, i) << "'\n";
 			break;
 		case LUA_TBOOLEAN:
-			ostr << "  " << i << ": " << 
+			ostr << "  " << i << ": " <<
 					(lua_toboolean(L, i) ? "true" : "false") << "\n";
 			break;
 		case LUA_TNUMBER:

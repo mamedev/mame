@@ -170,7 +170,7 @@ private:
 	attotime            m_mng_frame_period;         // period of a single movie frame
 	attotime            m_mng_next_frame_time;      // time of next frame
 	UINT32              m_mng_frame;                // current movie frame number
-	
+
 	// movie recording - AVI
 	avi_file *          m_avi_file;                 // handle to the open movie file
 	attotime            m_avi_frame_period;         // period of a single movie frame

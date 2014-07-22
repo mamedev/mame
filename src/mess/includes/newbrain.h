@@ -251,7 +251,7 @@ public:
 	ADC0808_ANALOG_READ_CB(adc_vref_pos_r);
 	ADC0808_ANALOG_READ_CB(adc_vref_neg_r);
 	ADC0808_ANALOG_READ_CB(adc_input_r);
-	
+
 	TIMER_DEVICE_CALLBACK_MEMBER(ctc_c2_tick);
 
 	void bankswitch();

@@ -38,13 +38,13 @@ class segapcm_device : public device_t,
 public:
 	segapcm_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~segapcm_device() { }
-	
+
 	// static configuration
 	static void set_bank(device_t &device, int bank) { downcast<segapcm_device &>(device).m_bank = bank; }
-	
+
 	DECLARE_WRITE8_MEMBER( sega_pcm_w );
 	DECLARE_READ8_MEMBER( sega_pcm_r );
-	
+
 protected:
 	// device-level overrides
 	virtual void device_start();

@@ -98,7 +98,7 @@ public:
 
 	NETLIB_UPDATE_TERMINALS()
 	{
-	    const double m = (is_qtype( BJT_NPN) ? 1 : -1);
+		const double m = (is_qtype( BJT_NPN) ? 1 : -1);
 
 		const int new_state = (m_RB.deltaV() * m > m_V ) ? 1 : 0;
 		if (m_state_on ^ new_state)
@@ -122,7 +122,7 @@ public:
 			m_RB.set(gb, v,   0.0);
 			m_RC.set(gc, 0.0, 0.0);
 			//m_RB.update_dev();
-            //m_RC.update_dev();
+			//m_RC.update_dev();
 			m_state_on = new_state;
 		}
 	}
@@ -164,7 +164,7 @@ public:
 		m_D_EB(netlist_object_t::ANALOG),
 		m_D_EC(netlist_object_t::ANALOG),
 		m_alpha_f(0),
-	    m_alpha_r(0)
+		m_alpha_r(0)
 		{ }
 
 	NETLIB_UPDATE_TERMINALS()

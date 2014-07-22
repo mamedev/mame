@@ -106,7 +106,7 @@ protected:
 	virtual bool take_c800() { return false; }
 
 private:
-	a2bus_mcms1_device *m_card1;	// card 1 for passthrough
+	a2bus_mcms1_device *m_card1;    // card 1 for passthrough
 	mcms_device *m_engine;
 };
 

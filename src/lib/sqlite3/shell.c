@@ -3848,4 +3848,4 @@ int main(int argc, char **argv){
 	}
 	sqlite3_free(data.zFreeOnClose);
 	return rc;
-} 
+}

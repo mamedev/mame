@@ -23,8 +23,7 @@
 //**************************************************************************
 
 #define MCFG_DMAC_ADD(_tag, _clock) \
-	MCFG_DEVICE_ADD(_tag, DMAC, _clock) \
-
+	MCFG_DEVICE_ADD(_tag, DMAC, _clock)
 #define MCFG_DMAC_CFGOUT_HANDLER(_devcb) \
 	devcb = &dmac_device::set_cfgout_handler(*device, DEVCB_##_devcb);
 
@@ -109,25 +108,25 @@ private:
 	// control register flags
 	enum
 	{
-		CNTR_TCEN  = 0x80,	// terminal count enable
-		CNTR_PREST = 0x40,	// peripheral reset
-		CNTR_PDMD  = 0x20, 	// peripheral device mode select (1=scsi, 0=xt)
-		CNTR_INTEN = 0x10,	// interrupt enable
-		CNTR_DDIR  = 0x08 	// device direction (1=rd host, wr to peripheral)
+		CNTR_TCEN  = 0x80,  // terminal count enable
+		CNTR_PREST = 0x40,  // peripheral reset
+		CNTR_PDMD  = 0x20,  // peripheral device mode select (1=scsi, 0=xt)
+		CNTR_INTEN = 0x10,  // interrupt enable
+		CNTR_DDIR  = 0x08   // device direction (1=rd host, wr to peripheral)
 	};
 
 	// interrupt status register
 	enum
 	{
-		ISTR_INTX   = 0x100,	// xt interrupt pending
-		ISTR_INT_F  = 0x080,	// interrupt follow
-		ISTR_INTS   = 0x040,	// scsi peripheral interrupt
-		ISTR_E_INT  = 0x020,	// end-of-process interrupt
-		ISTR_INT_P  = 0x010,	// interrupt pending
-		ISTR_UE_INT = 0x008,	// under-run fifo error interrupt
-		ISTR_OE_INT = 0x004,	// over-run fifo error interrupt
-		ISTR_FF_FLG = 0x002,	// fifo-full flag
-		ISTR_FE_FLG = 0x001		// fifo-empty flag
+		ISTR_INTX   = 0x100,    // xt interrupt pending
+		ISTR_INT_F  = 0x080,    // interrupt follow
+		ISTR_INTS   = 0x040,    // scsi peripheral interrupt
+		ISTR_E_INT  = 0x020,    // end-of-process interrupt
+		ISTR_INT_P  = 0x010,    // interrupt pending
+		ISTR_UE_INT = 0x008,    // under-run fifo error interrupt
+		ISTR_OE_INT = 0x004,    // over-run fifo error interrupt
+		ISTR_FF_FLG = 0x002,    // fifo-full flag
+		ISTR_FE_FLG = 0x001     // fifo-empty flag
 	};
 
 	static const int ISTR_INT_MASK = 0x1fc;
@@ -153,10 +152,10 @@ private:
 	int m_rst;
 
 	// register
-	UINT16 m_cntr;	// control register
-	UINT16 m_istr;	// interrupt status register
-	UINT32 m_wtc;	// word transfer count
-	UINT32 m_acr;	// address control register
+	UINT16 m_cntr;  // control register
+	UINT16 m_istr;  // interrupt status register
+	UINT32 m_wtc;   // word transfer count
+	UINT32 m_acr;   // address control register
 
 	bool m_dma_active;
 

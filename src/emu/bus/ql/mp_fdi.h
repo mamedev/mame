@@ -25,7 +25,7 @@
 // ======================> micro_peripherals_floppy_disk_interface_t
 
 class micro_peripherals_floppy_disk_interface_t : public device_t,
-			   									  public device_ql_expansion_card_interface
+													public device_ql_expansion_card_interface
 {
 public:
 	// construction/destruction

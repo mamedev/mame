@@ -84,10 +84,10 @@ extern const device_type DIABLO;
 	MCFG_DEVICE_CONFIG(_config)
 
 #define MCFG_DIABLO_LOAD(_class,_method)                                \
-    diablo_image_device::static_set_device_load(*device, device_image_load_delegate(&DEVICE_IMAGE_LOAD_NAME(_class,_method), #_class "::device_image_load_" #_method, downcast<_class *>(owner)));
+	diablo_image_device::static_set_device_load(*device, device_image_load_delegate(&DEVICE_IMAGE_LOAD_NAME(_class,_method), #_class "::device_image_load_" #_method, downcast<_class *>(owner)));
 
 #define MCFG_DIABLO_UNLOAD(_class,_method)                            \
-    diablo_image_device::static_set_device_unload(*device, device_image_func_delegate(&DEVICE_IMAGE_UNLOAD_NAME(_class,_method), #_class "::device_image_unload_" #_method, downcast<_class *>(owner)));
+	diablo_image_device::static_set_device_unload(*device, device_image_func_delegate(&DEVICE_IMAGE_UNLOAD_NAME(_class,_method), #_class "::device_image_unload_" #_method, downcast<_class *>(owner)));
 
 #define MCFG_DIABLO_INTERFACE(_interface)                         \
 	diablo_image_device::static_set_interface(*device, _interface);

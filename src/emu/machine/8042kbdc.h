@@ -40,7 +40,7 @@ enum kbdc8042_type_t
 	devcb = &kbdc8042_device::set_output_buffer_empty_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_KBDC8042_SPEAKER_CB(_devcb) \
-    devcb = &kbdc8042_device::set_speaker_callback(*device, DEVCB_##_devcb);
+	devcb = &kbdc8042_device::set_speaker_callback(*device, DEVCB_##_devcb);
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -55,7 +55,7 @@ public:
 	kbdc8042_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	virtual machine_config_constructor device_mconfig_additions() const;
-	
+
 	static void set_keyboard_type(device_t &device, kbdc8042_type_t keybtype) { downcast<kbdc8042_device &>(device).m_keybtype = keybtype; }
 	template<class _Object> static devcb_base &set_system_reset_callback(device_t &device, _Object object) { return downcast<kbdc8042_device &>(device).m_system_reset_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_gate_a20_callback(device_t &device, _Object object) { return downcast<kbdc8042_device &>(device).m_gate_a20_cb.set_callback(object); }
@@ -109,7 +109,7 @@ protected:
 	required_device<at_keyboard_device> m_keyboard_dev;
 
 	kbdc8042_type_t     m_keybtype;
-	
+
 	devcb_write_line    m_system_reset_cb;
 	devcb_write_line    m_gate_a20_cb;
 	devcb_write_line    m_input_buffer_full_cb;

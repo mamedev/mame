@@ -73,7 +73,7 @@
 
 #define MCFG_MSX_LAYOUT_DISK2(_tag, _prim, _sec, _page, _numpages, _region, _offset) \
 	MCFG_MSX_SLOT_DISK2_ADD(_tag, _page, _numpages, _region, _offset, "fdc", "fdc:0", "fdc:1") \
-	msx_state::install_slot_pages(*owner, _prim, _sec, _page, _numpages + 1, device);	/* Memory mapped FDC registers are also accessible through page 2 */
+	msx_state::install_slot_pages(*owner, _prim, _sec, _page, _numpages + 1, device);   /* Memory mapped FDC registers are also accessible through page 2 */
 
 #define MCFG_MSX_LAYOUT_DISK3(_tag, _prim, _sec, _page, _numpages, _region, _offset) \
 	MCFG_MSX_SLOT_DISK3_ADD(_tag, _page, _numpages, _region, _offset, "fdc", "fdc:0", "fdc:1") \
@@ -163,7 +163,7 @@ public:
 	}
 
 	// static configuration helpers
-	static void install_slot_pages(device_t &owner, UINT8 prim, UINT8 sec, UINT8 page, UINT8 numpages, device_t *device); 
+	static void install_slot_pages(device_t &owner, UINT8 prim, UINT8 sec, UINT8 page, UINT8 numpages, device_t *device);
 
 	DECLARE_ADDRESS_MAP(switched_device_map, 8);
 	DECLARE_WRITE8_MEMBER(msx_sec_slot_w);

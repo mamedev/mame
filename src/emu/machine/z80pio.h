@@ -92,7 +92,7 @@ public:
 	template<class _Object> static devcb_base &set_in_pb_callback(device_t &device, _Object object) { return downcast<z80pio_device &>(device).m_in_pb_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_out_pb_callback(device_t &device, _Object object) { return downcast<z80pio_device &>(device).m_out_pb_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_out_brdy_callback(device_t &device, _Object object) { return downcast<z80pio_device &>(device).m_out_brdy_cb.set_callback(object); }
-	
+
 	// I/O line access
 	int rdy(int which) { return m_port[which].rdy(); }
 	void strobe(int which, bool state) { m_port[which].strobe(state); }
@@ -206,7 +206,7 @@ private:
 	devcb_read8         m_in_pa_cb;
 	devcb_write8        m_out_pa_cb;
 	devcb_write_line    m_out_ardy_cb;
-	
+
 	devcb_read8         m_in_pb_cb;
 	devcb_write8        m_out_pb_cb;
 	devcb_write_line    m_out_brdy_cb;

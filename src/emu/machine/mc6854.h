@@ -47,7 +47,7 @@ public:
 	static void set_out_frame_callback(device_t &device, mc6854_out_frame_delegate callback) { downcast<mc6854_device &>(device).m_out_frame_cb = callback; }
 	template<class _Object> static devcb_base &set_out_rts_callback(device_t &device, _Object object) { return downcast<mc6854_device &>(device).m_out_rts_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_out_dtr_callback(device_t &device, _Object object) { return downcast<mc6854_device &>(device).m_out_dtr_cb.set_callback(object); }
-	
+
 	/* interface to CPU via address/data bus*/
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
@@ -74,13 +74,13 @@ protected:
 private:
 	// internal state
 	devcb_write_line  m_out_irq_cb; /* interrupt request */
-	
+
 	/* low-level, bit-based interface */
 	devcb_write_line  m_out_txd_cb; /* transmit bit */
-	 
-	 /* high-level, frame-based interface */
-	mc6854_out_frame_delegate	m_out_frame_cb;
-	
+
+		/* high-level, frame-based interface */
+	mc6854_out_frame_delegate   m_out_frame_cb;
+
 	/* control lines */
 	devcb_write_line  m_out_rts_cb; /* 1 = transmitting, 0 = idle */
 	devcb_write_line  m_out_dtr_cb; /* 1 = data transmit ready, 0 = busy */

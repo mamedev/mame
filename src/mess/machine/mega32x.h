@@ -205,7 +205,7 @@ private:
 	int m_current_fifo_read_pos;
 	int m_fifo_block_a_full;
 	int m_fifo_block_b_full;
-	
+
 	required_device<palette_device> m_palette;
 };
 

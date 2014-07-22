@@ -2437,7 +2437,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/wms.o \
 	$(DRIVERS)/xtom3d.o \
 	$(DRIVERS)/xyonix.o $(VIDEO)/xyonix.o \
-	
+
 
 #-------------------------------------------------
 # layout dependencies
@@ -2521,7 +2521,7 @@ $(DRIVERS)/bfm_sc4.o:   $(LAYOUT)/bfm_sc4.lh \
 			$(LAYOUT)/sc4_dmd.lh \
 			$(LAYOUT)/sc4dnd.lh \
 			$(LAYOUT)/sc4dndtp.lh \
-			$(LAYOUT)/sc4dnddw.lh		
+			$(LAYOUT)/sc4dnddw.lh
 
 $(DRIVERS)/bfm_sc5.o:   $(LAYOUT)/bfm_sc5.lh
 

@@ -32,7 +32,7 @@
 
 #define MCFG_A2BUS_OUT_INH_CB(_devcb) \
 	devcb = &a2bus_device::set_out_inh_callback(*device, DEVCB_##_devcb);
-	
+
 #define MCFG_A2BUS_SLOT_ADD(_nbtag, _tag, _slot_intf, _def_slot) \
 	MCFG_DEVICE_ADD(_tag, A2BUS_SLOT, 0) \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false) \
@@ -83,7 +83,7 @@ public:
 	// construction/destruction
 	a2bus_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	a2bus_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
-	
+
 	// inline configuration
 	static void static_set_cputag(device_t &device, const char *tag);
 	template<class _Object> static devcb_base &set_out_irq_callback(device_t &device, _Object object) { return downcast<a2bus_device &>(device).m_out_irq_cb.set_callback(object); }
@@ -104,7 +104,7 @@ protected:
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
-	
+
 	// internal state
 	cpu_device   *m_maincpu;
 

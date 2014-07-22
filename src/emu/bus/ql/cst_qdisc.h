@@ -25,7 +25,7 @@
 // ======================> cst_ql_disc_interface_t
 
 class cst_ql_disc_interface_t : public device_t,
-			   					public device_ql_expansion_card_interface
+								public device_ql_expansion_card_interface
 {
 public:
 	// construction/destruction

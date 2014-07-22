@@ -44,12 +44,12 @@ private:
 		int cb;
 
 		hook();
-	    void set(lua_State *L, int idx);
+		void set(lua_State *L, int idx);
 		lua_State *precall();
 		void call(lua_engine *engine, lua_State *T, int nparam);
 		bool active() const { return L != NULL; }
 	};
-	
+
 	static const char *const tname_ioport;
 
 	// internal state
@@ -58,7 +58,7 @@ private:
 
 	hook hook_output_cb;
 	bool output_notifier_set;
-	
+
 	static lua_engine*  luaThis;
 
 	std::map<lua_State *, std::pair<lua_State *, int> > thread_registry;
@@ -93,7 +93,7 @@ private:
 	static void *checkparam(lua_State *L, int idx, const char *tname);
 	static void *getparam(lua_State *L, int idx, const char *tname);
 	static void push(lua_State *L, void *p, const char *tname);
-	
+
 	int report(int status);
 	int docall(int narg, int nres);
 	int incomplete(int status) ;

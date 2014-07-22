@@ -11,8 +11,7 @@ extern const device_type MSX_SLOT_BUNSETSU;
 #define MCFG_MSX_SLOT_BUNSETSU_ADD(_tag, _startpage, _numpages, _region, _offset, _bunsetsu_region_tag) \
 	MCFG_MSX_INTERNAL_SLOT_ADD(_tag, MSX_SLOT_BUNSETSU, _startpage, _numpages) \
 	msx_slot_rom_device::set_rom_start(*device, _region, _offset); \
-	msx_slot_bunsetsu_device::set_bunsetsu_region_tag(*device, _bunsetsu_region_tag); \
-
+	msx_slot_bunsetsu_device::set_bunsetsu_region_tag(*device, _bunsetsu_region_tag);
 class msx_slot_bunsetsu_device : public msx_slot_rom_device
 {
 public:
@@ -35,4 +34,3 @@ private:
 
 
 #endif
-

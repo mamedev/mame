@@ -82,5 +82,5 @@ public:
 	required_device<tecmo_mix_device> m_mixer;
 
 
-	
+
 };

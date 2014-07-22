@@ -3262,7 +3262,7 @@ Beyond that last category are the roms waiting to be classified.
 	</software>
 
 	<software name="contra3p" cloneof="sprobot">
-		<!-- Notes: this rom image was released in 2014 without any documentation, despite its name, it is a prototype of Contra III 
+		<!-- Notes: this rom image was released in 2014 without any documentation, despite its name, it is a prototype of Contra III
 		            the rom was overdumped to 4MiB likely due to header based dumping tools, the right size "should be" 1MiB -->
 		<description>Contra IV - The Alien Wars (USA, Prototype)</description>
 		<year>1992</year>

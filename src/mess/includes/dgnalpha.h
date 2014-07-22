@@ -52,7 +52,7 @@ public:
 	DECLARE_WRITE8_MEMBER( pia2_pa_w );
 	DECLARE_WRITE_LINE_MEMBER( pia2_firq_a );
 	DECLARE_WRITE_LINE_MEMBER( pia2_firq_b );
-	
+
 	/* psg */
 	DECLARE_READ8_MEMBER( psg_porta_read );
 	DECLARE_WRITE8_MEMBER( psg_porta_write );

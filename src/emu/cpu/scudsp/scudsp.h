@@ -61,11 +61,11 @@ class scudsp_cpu_device :  public cpu_device
 public:
 	// construction/destruction
 	scudsp_cpu_device(const machine_config &mconfig, const char *_tag, device_t *_owner, UINT32 _clock);
-	
+
 	template<class _Object> static devcb_base &set_out_irq_callback(device_t &device, _Object object) { return downcast<scudsp_cpu_device &>(device).m_out_irq_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_in_dma_callback(device_t &device, _Object object) { return downcast<scudsp_cpu_device &>(device).m_in_dma_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_out_dma_callback(device_t &device, _Object object) { return downcast<scudsp_cpu_device &>(device).m_out_dma_cb.set_callback(object); }
-	
+
 	/* port 0 */
 	DECLARE_READ32_MEMBER( program_control_r );
 	DECLARE_WRITE32_MEMBER( program_control_w );
@@ -104,7 +104,7 @@ protected:
 	devcb_write_line     m_out_irq_cb;
 	devcb_read16         m_in_dma_cb;
 	devcb_write16        m_out_dma_cb;
-	
+
 private:
 	address_space_config m_program_config;
 	address_space_config m_data_config;

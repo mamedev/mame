@@ -74,21 +74,21 @@ public:
 
 	ATTR_HOT inline void remove(const _Element elem)
 	{
-        entry_t * i = m_end - 1;
-        while (i > &m_list[0])
-        {
-            if (i->object() == elem)
-            {
-                m_end--;
-                while (i < m_end)
-                {
-                    *i = *(i+1);
-                    i++;
-                }
-                return;
-            }
-            i--;
-        }
+		entry_t * i = m_end - 1;
+		while (i > &m_list[0])
+		{
+			if (i->object() == elem)
+			{
+				m_end--;
+				while (i < m_end)
+				{
+					*i = *(i+1);
+					i++;
+				}
+				return;
+			}
+			i--;
+		}
 	}
 
 	ATTR_COLD void clear()

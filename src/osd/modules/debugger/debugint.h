@@ -22,7 +22,7 @@ public:
 	// construction/destruction
 	debugger_internal(const osd_interface &osd);
 	virtual ~debugger_internal() { }
-	
+
 	virtual void init_debugger();
 	virtual void wait_for_debugger(device_t &device, bool firststop);
 	virtual void debugger_update();

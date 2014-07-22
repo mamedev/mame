@@ -40,7 +40,7 @@ protected:
 	floppy_image_device *floppies[4];
 	UINT8 port_314;
 	bool intrq_state, drq_state, hld_state;
-	
+
 	virtual void device_start();
 	virtual void device_reset();
 	const rom_entry *device_rom_region() const;

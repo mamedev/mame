@@ -51,7 +51,7 @@ public:
 		dev.m_banks[2] = offs3;
 		dev.m_banks[3] = offs4;
 	}
-	
+
 protected:
 	// device-level overrides
 	virtual void device_start();

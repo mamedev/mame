@@ -49,7 +49,7 @@ public:
 	template<class _Object> static devcb_base &set_out_pc_callback(device_t &device, _Object object) { return downcast<tpi6525_device &>(device).m_out_pc_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_out_ca_callback(device_t &device, _Object object) { return downcast<tpi6525_device &>(device).m_out_ca_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_out_cb_callback(device_t &device, _Object object) { return downcast<tpi6525_device &>(device).m_out_cb_cb.set_callback(object); }
-	
+
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
 

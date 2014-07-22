@@ -106,7 +106,7 @@ class wpc_dcs_state : public wpc_flip2_state
 public:
 	wpc_dcs_state(const machine_config &mconfig, device_type type, const char *tag)
 		: wpc_flip2_state(mconfig, type, tag),
-		  m_dcs(*this, "dcs")
+			m_dcs(*this, "dcs")
 	{ }
 public:
 
@@ -115,7 +115,7 @@ public:
 	DECLARE_WRITE8_MEMBER(wpc_dcs_sound_ctrl_w);
 	DECLARE_READ8_MEMBER(wpc_dcs_sound_data_r);
 	DECLARE_WRITE8_MEMBER(wpc_dcs_sound_data_w);
-	
+
 	required_device<dcs_audio_wpc_device> m_dcs;
 private:
 	bool m_send;

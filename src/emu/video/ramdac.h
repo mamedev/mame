@@ -73,7 +73,7 @@ private:
 
 	const address_space_config      m_space_config;
 	required_device<palette_device> m_palette;
-	
+
 	UINT8 m_split_read_reg; // read register index is separated, seen in rltennis
 };
 

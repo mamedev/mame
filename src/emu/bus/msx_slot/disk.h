@@ -103,9 +103,9 @@ protected:
 class msx_slot_tc8566_disk_device : public msx_slot_disk_device
 {
 public:
-    msx_slot_tc8566_disk_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	msx_slot_tc8566_disk_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
-    virtual void device_start();
+	virtual void device_start();
 
 protected:
 	tc8566af_device *m_fdc;
@@ -185,7 +185,7 @@ public:
 	DECLARE_READ8_MEMBER(io_read);
 	DECLARE_WRITE8_MEMBER(io_write);
 
-    void post_load();
+	void post_load();
 
 private:
 	UINT8 m_control;
@@ -195,4 +195,3 @@ private:
 
 
 #endif
-

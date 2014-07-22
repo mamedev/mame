@@ -39,23 +39,23 @@ enum
 ***************************************************************************/
 
 #define MCFG_VOODOO_FBMEM(_value) \
-	voodoo_device::static_set_fbmem(*device, _value); 
+	voodoo_device::static_set_fbmem(*device, _value);
 
 #define MCFG_VOODOO_TMUMEM(_value1, _value2) \
-	voodoo_device::static_set_tmumem(*device, _value1, _value2); 
+	voodoo_device::static_set_tmumem(*device, _value1, _value2);
 
 #define MCFG_VOODOO_SCREEN_TAG(_tag) \
-	voodoo_device::static_set_screen_tag(*device, _tag); 
+	voodoo_device::static_set_screen_tag(*device, _tag);
 
 #define MCFG_VOODOO_CPU_TAG(_tag) \
-	voodoo_device::static_set_cpu_tag(*device, _tag); 
+	voodoo_device::static_set_cpu_tag(*device, _tag);
 
 #define MCFG_VOODOO_VBLANK_CB(_devcb) \
 	devcb = &voodoo_device::static_set_vblank_callback(*device, DEVCB_##_devcb);
- 
+
 #define MCFG_VOODOO_STALL_CB(_devcb) \
 	devcb = &voodoo_device::static_set_stall_callback(*device, DEVCB_##_devcb);
- 
+
 
 /***************************************************************************
     FUNCTION PROTOTYPES
@@ -81,14 +81,14 @@ public:
 	static void static_set_cpu_tag(device_t &device, const char *tag) { downcast<voodoo_device &>(device).m_cputag = tag; }
 	template<class _Object> static devcb_base &static_set_vblank_callback(device_t &device, _Object object) { return downcast<voodoo_device &>(device).m_vblank.set_callback(object); }
 	template<class _Object> static devcb_base &static_set_stall_callback(device_t &device, _Object object)  { return downcast<voodoo_device &>(device).m_stall.set_callback(object); }
-	
+
 	DECLARE_READ32_MEMBER( voodoo_r );
 	DECLARE_WRITE32_MEMBER( voodoo_w );
 
 	// access to legacy token
 	struct voodoo_state *token() const { assert(m_token != NULL); return m_token; }
 	void common_start_voodoo(UINT8 type);
-	
+
 	UINT8               m_fbmem;
 	UINT8               m_tmumem0;
 	UINT8               m_tmumem1;
@@ -96,7 +96,7 @@ public:
 	const char *        m_cputag;
 	devcb_write_line   m_vblank;
 	devcb_write_line   m_stall;
-	
+
 protected:
 	// device-level overrides
 	virtual void device_config_complete();

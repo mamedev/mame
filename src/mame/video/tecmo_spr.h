@@ -11,7 +11,7 @@ public:
 
 	// gaiden.c / spbactn.c / tecmo16.c sprites
 	void gaiden_draw_sprites(screen_device &screen, gfxdecode_device *gfxdecode, const rectangle &cliprect, UINT16* spriteram, int sprite_sizey, int spr_offset_y, int flip_screen, bitmap_ind16 &sprite_bitmap);
-	
+
 	// tecmo.c sprites
 	void draw_sprites_8bit(screen_device &screen, bitmap_ind16 &bitmap, gfxdecode_device *gfxdecode, const rectangle &cliprect, UINT8* spriteram, int size, int video_type, int flip_screen);
 
@@ -40,6 +40,3 @@ extern const device_type TECMO_SPRITE;
 
 #define MCFG_TECMO_SPRITE_BOOTLEG(_bootleg) \
 	tecmo_spr_device::set_bootleg(*device, _bootleg);
-
-
-

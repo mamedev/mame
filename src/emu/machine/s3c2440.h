@@ -18,16 +18,16 @@
 
 #define MCFG_S3C2440_CORE_PIN_R_CB(_devcb) \
 	devcb = &s3c2440_device::set_core_pin_r_callback(*device, DEVCB_##_devcb);
- 
+
 #define MCFG_S3C2440_CORE_PIN_W_CB(_devcb) \
 	devcb = &s3c2440_device::set_core_pin_w_callback(*device, DEVCB_##_devcb);
-	
+
 #define MCFG_S3C2440_GPIO_PORT_R_CB(_devcb) \
 	devcb = &s3c2440_device::set_gpio_port_r_callback(*device, DEVCB_##_devcb);
-	
+
 #define MCFG_S3C2440_GPIO_PORT_W_CB(_devcb) \
 	devcb = &s3c2440_device::set_gpio_port_w_callback(*device, DEVCB_##_devcb);
-	
+
 #define MCFG_S3C2440_I2C_SCL_W_CB(_devcb) \
 	devcb = &s3c2440_device::set_i2c_scl_w_callback(*device, DEVCB_##_devcb);
 
@@ -54,7 +54,7 @@
 
 #define MCFG_S3C2440_NAND_DATA_W_CB(_devcb) \
 	devcb = &s3c2440_device::set_nand_data_w_callback(*device, DEVCB_##_devcb);
-	
+
 #define MCFG_S3C2440_LCD_FLAGS(_flags) \
 	s3c2440_device::set_lcd_flags(*device, _flags);
 

@@ -16,7 +16,7 @@ class kof98_prot_device :  public device_t
 public:
 	// construction/destruction
 	kof98_prot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	void kof98_decrypt_68k(UINT8* cpurom, UINT32 cpurom_size);
 	void install_kof98_protection(cpu_device* maincpu);
 	DECLARE_WRITE16_MEMBER(kof98_prot_w);
@@ -36,7 +36,3 @@ private:
 };
 
 #endif
-
-
-
-

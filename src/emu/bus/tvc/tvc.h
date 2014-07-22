@@ -89,7 +89,7 @@ public:
 	// construction/destruction
 	tvcexp_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	virtual ~tvcexp_slot_device();
-	
+
 	template<class _Object> static devcb_base &set_out_irq_callback(device_t &device, _Object object) { return downcast<tvcexp_slot_device &>(device).m_out_irq_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_out_nmi_callback(device_t &device, _Object object) { return downcast<tvcexp_slot_device &>(device).m_out_nmi_cb.set_callback(object); }
 
@@ -124,5 +124,5 @@ extern const device_type TVCEXP_SLOT;
 
 #define MCFG_TVCEXP_SLOT_OUT_NMI_CB(_devcb) \
 	devcb = &tvcexp_slot_device::set_out_nmi_callback(*device, DEVCB_##_devcb);
-	
+
 #endif /* __TVCEXP_H__ */

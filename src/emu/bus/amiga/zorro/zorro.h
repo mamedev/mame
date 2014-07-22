@@ -1,140 +1,140 @@
 /***************************************************************************
 
-	Amiga Zorro Slots
+    Amiga Zorro Slots
 
     license: MAME, GPL-2.0+
     copyright-holders: Dirk Best
 
-	86-pin Expansion Slot (Zorro-I), Zorro-II, Zorro-III
+    86-pin Expansion Slot (Zorro-I), Zorro-II, Zorro-III
 
-	86-pin Expansion Slot
+    86-pin Expansion Slot
 
-	 2  Ground           1  Ground
-	 4  Ground           3  Ground
-	 6  +5VDC            5  +5VDC
-	 8  -5VDC            7  N/C
-	10  +12VDC           9  N/C *1
-	12  CFGIN           11  N/C *2
-	14  /C3 Clock       13  Ground
-	16  /C1 Clock       15  CDAC
-	18  XRDY            17  /OVR
-	20  N/C *3          19  /INT2
-	22  /INT6           21  A5
-	24  A4              23  A6
-	26  A3              25  Ground
-	28  A7              27  A2
-	30  A8              29  A1
-	32  A9              31  FC0
-	34  A10             33  FC1
-	36  A11             35  FC2
-	38  A12             37  Ground
-	40  /IPL0           39  A13
-	42  /IPL1           41  A14
-	44  /IPL2           43  A15
-	46  /BEER           45  A16
-	48  /VPA            47  A17
-	50  E Clock         49  Ground
-	52  A18             51  /VMA
-	54  A19             53  /RST
-	56  A20             55  /HLT
-	58  A21             57  A22
-	60  /BR *4          59  A23
-	62  /BGACK          61  Ground
-	64  /BG *5          63  D15
-	66  /DTACK          65  D14
-	68  R/W             67  D13
-	70  /LDS            69  D12
-	72  /UDS            71  D11
-	74  /AS             73  Ground
-	76  D10             75  D0
-	78  D9              77  D1
-	80  D8              79  D2
-	82  D7              81  D3
-	84  D6              83  D4
-	86  D5              85  Ground
+     2  Ground           1  Ground
+     4  Ground           3  Ground
+     6  +5VDC            5  +5VDC
+     8  -5VDC            7  N/C
+    10  +12VDC           9  N/C *1
+    12  CFGIN           11  N/C *2
+    14  /C3 Clock       13  Ground
+    16  /C1 Clock       15  CDAC
+    18  XRDY            17  /OVR
+    20  N/C *3          19  /INT2
+    22  /INT6           21  A5
+    24  A4              23  A6
+    26  A3              25  Ground
+    28  A7              27  A2
+    30  A8              29  A1
+    32  A9              31  FC0
+    34  A10             33  FC1
+    36  A11             35  FC2
+    38  A12             37  Ground
+    40  /IPL0           39  A13
+    42  /IPL1           41  A14
+    44  /IPL2           43  A15
+    46  /BEER           45  A16
+    48  /VPA            47  A17
+    50  E Clock         49  Ground
+    52  A18             51  /VMA
+    54  A19             53  /RST
+    56  A20             55  /HLT
+    58  A21             57  A22
+    60  /BR *4          59  A23
+    62  /BGACK          61  Ground
+    64  /BG *5          63  D15
+    66  /DTACK          65  D14
+    68  R/W             67  D13
+    70  /LDS            69  D12
+    72  /UDS            71  D11
+    74  /AS             73  Ground
+    76  D10             75  D0
+    78  D9              77  D1
+    80  D8              79  D2
+    82  D7              81  D3
+    84  D6              83  D4
+    86  D5              85  Ground
 
-	*1  28 MHz Clock on A2000 and B2000
-	*2  /COPCFG on B2000
-	*3  /PALOPE on A1000, /BOSS on B2000
-	*4  /CBR on B2000
-	*5  /CBG on B2000
+    *1  28 MHz Clock on A2000 and B2000
+    *2  /COPCFG on B2000
+    *3  /PALOPE on A1000, /BOSS on B2000
+    *4  /CBR on B2000
+    *5  /CBG on B2000
 
-	Zorro-II (differences only)
+    Zorro-II (differences only)
 
-	 7  /OWN
-	 9  /SLAVEn
-	11  /CFGOUTn
-	12  /CFGINn
-	20  -12VDC
-	40  /EINT7
-	42  /EINT5
-	44  /EINT4
-	60  /BRn
-	64  /BGn
+     7  /OWN
+     9  /SLAVEn
+    11  /CFGOUTn
+    12  /CFGINn
+    20  -12VDC
+    40  /EINT7
+    42  /EINT5
+    44  /EINT4
+    60  /BRn
+    64  /BGn
 
-	88  Ground          87  Ground
-	90  Ground          89  Ground
-	92  7 MHz           91  Ground
-	94  /BURST          93  DOE
-	96  /EINT1          95  /BG *5
-	98  N/C             97  N/C
+    88  Ground          87  Ground
+    90  Ground          89  Ground
+    92  7 MHz           91  Ground
+    94  /BURST          93  DOE
+    96  /EINT1          95  /BG *5
+    98  N/C             97  N/C
    100  Ground          99  Ground
 
-	*6  /GBG on B2000
+    *6  /GBG on B2000
 
-	Zorro-III
+    Zorro-III
 
-	The Zorro-III is a multiplexed Zorro-II bus with address- and
-	data phases. Signals changes as follows:
+    The Zorro-III is a multiplexed Zorro-II bus with address- and
+    data phases. Signals changes as follows:
 
-	17  /CINH
-	18  /MTCR
-	29  /LOCK
-	30  AD8 (D0)
-	32  AD9 (D1)
-	34  AD10 (D2)
-	36  AD11 (D3)
-	38  AD12 (D4)
-	39  AD13 (D5)
-	40  Reserved
-	41  AD14 (D6)
-	42  Reserved
-	43  AD15 (D7)
-	44  Reserved
-	45  AD16 (D8)
-	47  AD17 (D9)
-	48  /MTACK
-	51  /DS0
-	52  AD18 (D10)
-	54  AD19 (D11)
-	56  AD20 (D12)
-	57  AD22 (D14)
-	58  AD21 (D13)
-	59  AD23 (D15)
-	63  AD31
-	65  AD30
-	67  AD29
-	69  AD28
-	70  /DS2
-	71  AD27
-	72  /DS3
-	74  /CCS
-	75  SD0 (D16)
-	76  AD26
-	77  SD1 (D17)
-	78  AD25
-	79  SD2 (D18)
-	80  AD24
-	81  SD3 (D19)
-	82  SD7 (D23)
-	83  SD4 (D20)
-	84  SD6 (D22)
-	86  SD5 (D21)
-	91  Sense Z3
-	94  /IORST
-	95  /BCLR
-	97  /FCS
-	98  /DS1
+    17  /CINH
+    18  /MTCR
+    29  /LOCK
+    30  AD8 (D0)
+    32  AD9 (D1)
+    34  AD10 (D2)
+    36  AD11 (D3)
+    38  AD12 (D4)
+    39  AD13 (D5)
+    40  Reserved
+    41  AD14 (D6)
+    42  Reserved
+    43  AD15 (D7)
+    44  Reserved
+    45  AD16 (D8)
+    47  AD17 (D9)
+    48  /MTACK
+    51  /DS0
+    52  AD18 (D10)
+    54  AD19 (D11)
+    56  AD20 (D12)
+    57  AD22 (D14)
+    58  AD21 (D13)
+    59  AD23 (D15)
+    63  AD31
+    65  AD30
+    67  AD29
+    69  AD28
+    70  /DS2
+    71  AD27
+    72  /DS3
+    74  /CCS
+    75  SD0 (D16)
+    76  AD26
+    77  SD1 (D17)
+    78  AD25
+    79  SD2 (D18)
+    80  AD24
+    81  SD3 (D19)
+    82  SD7 (D23)
+    83  SD4 (D20)
+    84  SD6 (D22)
+    86  SD5 (D21)
+    91  Sense Z3
+    94  /IORST
+    95  /BCLR
+    97  /FCS
+    98  /DS1
 
 
 ***************************************************************************/

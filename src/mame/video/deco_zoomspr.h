@@ -36,4 +36,3 @@ extern const device_type DECO_ZOOMSPR;
 
 #define MCFG_DECO_ZOOMSPR_GFXDECODE(_gfxtag) \
 	deco_zoomspr_device::static_set_gfxdecode_tag(*device, "^" _gfxtag);
-

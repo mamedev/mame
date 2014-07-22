@@ -22,7 +22,7 @@ public:
 	void neogeo_bootleg_sx_decrypt(UINT8* fixed, UINT32 fixed_size, int value);
 	void kog_px_decrypt(UINT8* cpurom, UINT32 cpurom_size);
 	void kof97oro_px_decode(UINT8* cpurom, UINT32 cpurom_size);
-	void kof10thBankswitch(address_space &space, UINT16	nBank);
+	void kof10thBankswitch(address_space &space, UINT16 nBank);
 	DECLARE_READ16_MEMBER(kof10th_RAM2_r);
 	DECLARE_READ16_MEMBER(kof10th_RAMB_r);
 	DECLARE_WRITE16_MEMBER(kof10th_custom_w);
@@ -95,6 +95,3 @@ private:
 };
 
 #endif
-
-
-

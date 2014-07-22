@@ -85,7 +85,7 @@ public:
 	// construction/destruction
 	z88cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	virtual ~z88cart_slot_device();
-	
+
 	template<class _Object> static devcb_base &set_out_flp_callback(device_t &device, _Object object) { return downcast<z88cart_slot_device &>(device).m_out_flp_cb.set_callback(object); }
 
 	// device-level overrides
@@ -134,5 +134,5 @@ extern const device_type Z88CART_SLOT;
 
 #define MCFG_Z88CART_SLOT_OUT_FLP_CB(_devcb) \
 		devcb = &z88cart_slot_device::set_out_flp_callback(*device, DEVCB_##_devcb);
-	
+
 #endif /* __Z88CART_H__ */

@@ -63,7 +63,7 @@
 		<description>Kundregister</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		
+
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="79143">
 				<rom name="fd2_bifak.imd" size="79143" crc="a741ad5d" sha1="a0cb8cc31a30fcbea258dd5249845819930e60c2" offset="0" />

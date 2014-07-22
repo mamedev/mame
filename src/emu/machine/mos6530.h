@@ -79,10 +79,10 @@ private:
 	// internal state
 	devcb_read8    m_in_pa_cb;
 	devcb_write8   m_out_pa_cb;
-	
+
 	devcb_read8    m_in_pb_cb;
 	devcb_write8   m_out_pb_cb;
-	
+
 	mos6530_port    m_port[2];
 
 	UINT8           m_irqstate;

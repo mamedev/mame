@@ -94,7 +94,7 @@ public:
 	template<class _Object> static devcb_base &set_out_tbo_callback(device_t &device, _Object object) { return downcast<z80sti_device &>(device).m_out_tbo_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_out_tco_callback(device_t &device, _Object object) { return downcast<z80sti_device &>(device).m_out_tco_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_out_tdo_callback(device_t &device, _Object object) { return downcast<z80sti_device &>(device).m_out_tdo_cb.set_callback(object); }
-	
+
 	static void set_rx_clock(device_t &device, int clock) { downcast<z80sti_device &>(device).m_rx_clock = clock; }
 	static void set_tx_clock(device_t &device, int clock) { downcast<z80sti_device &>(device).m_tx_clock = clock; }
 
@@ -201,15 +201,15 @@ private:
 	void gpip_input(int bit, int state);
 
 	// device callbacks
-	devcb_write_line        m_out_int_cb;	// this gets called on each change of the _INT pin (pin 17)
-	devcb_read8             m_in_gpio_cb;	// this is called on each read of the GPIO pins
-	devcb_write8            m_out_gpio_cb;	// this is called on each write of the GPIO pins
-	devcb_write_line        m_out_so_cb;	// this gets called for each change of the SO pin (pin 37)
-	devcb_write_line        m_out_tao_cb;	// this gets called for each change of the TAO pin (pin 1)
-	devcb_write_line        m_out_tbo_cb;	// this gets called for each change of the TBO pin (pin 2)
-	devcb_write_line        m_out_tco_cb;	// this gets called for each change of the TCO pin (pin 3)
-	devcb_write_line        m_out_tdo_cb;	// this gets called for each change of the TDO pin (pin 4)
-	
+	devcb_write_line        m_out_int_cb;   // this gets called on each change of the _INT pin (pin 17)
+	devcb_read8             m_in_gpio_cb;   // this is called on each read of the GPIO pins
+	devcb_write8            m_out_gpio_cb;  // this is called on each write of the GPIO pins
+	devcb_write_line        m_out_so_cb;    // this gets called for each change of the SO pin (pin 37)
+	devcb_write_line        m_out_tao_cb;   // this gets called for each change of the TAO pin (pin 1)
+	devcb_write_line        m_out_tbo_cb;   // this gets called for each change of the TBO pin (pin 2)
+	devcb_write_line        m_out_tco_cb;   // this gets called for each change of the TCO pin (pin 3)
+	devcb_write_line        m_out_tdo_cb;   // this gets called for each change of the TDO pin (pin 4)
+
 	int m_rx_clock;                     // serial receive clock
 	int m_tx_clock;                     // serial transmit clock
 

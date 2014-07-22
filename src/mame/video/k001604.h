@@ -18,7 +18,7 @@ public:
 	static void set_roz_size(device_t &device, int size) { downcast<k001604_device &>(device).m_roz_size = size; }
 	static void set_txt_mem_offset(device_t &device, int offs) { downcast<k001604_device &>(device).m_txt_mem_offset = offs; }
 	static void set_roz_mem_offset(device_t &device, int offs) { downcast<k001604_device &>(device).m_roz_mem_offset = offs; }
-	
+
 	void draw_back_layer( bitmap_rgb32 &bitmap, const rectangle &cliprect );
 	void draw_front_layer( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect );
 	DECLARE_WRITE32_MEMBER( tile_w );

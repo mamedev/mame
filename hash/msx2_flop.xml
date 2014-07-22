@@ -297,16 +297,16 @@ The following floppies came with the machines.
 	</software>
 
 <!--
-	<software name="">
-		<description></description>
-		<year></year>
-		<publisher></publisher>
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="737280">
-				<rom name="" size="737280" crc="" sha1="" offset="0" />
-			</dataarea>
-		</part>
-	</software>
+    <software name="">
+        <description></description>
+        <year></year>
+        <publisher></publisher>
+        <part name="flop1" interface="floppy_3_5">
+            <dataarea name="flop" size="737280">
+                <rom name="" size="737280" crc="" sha1="" offset="0" />
+            </dataarea>
+        </part>
+    </software>
 -->
 
 	<software name="arc">

@@ -199,7 +199,7 @@ public:
 	virtual void video_register();
 	virtual void sound_register();
 	virtual void debugger_register();
-	
+
 	virtual bool video_init();
 	virtual bool input_init();
 	virtual void input_pause();

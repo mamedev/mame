@@ -23,11 +23,11 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-	
+
 	required_shared_ptr<UINT16> m_videoram;
 	required_shared_ptr<UINT16> m_bitmapram;
 	required_shared_ptr<UINT16> m_spriteram;
-	
+
 	UINT8 m_sound_data;
 	UINT8 m_sound_busy;
 	UINT8 m_ym2151_irq;
@@ -59,7 +59,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_bg1_tile_info);
 	virtual void machine_start();
 	virtual void machine_reset();
-	
+
 	DECLARE_VIDEO_START(rpunch);
 	DECLARE_VIDEO_START(svolley);
 

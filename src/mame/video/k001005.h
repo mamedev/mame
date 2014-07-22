@@ -134,7 +134,7 @@ private:
 	int m_fifo_read_ptr;
 	int m_fifo_write_ptr;
 	UINT32 m_reg_far_z;
-	
+
 
 	k001005_renderer *m_renderer;
 };

@@ -54,7 +54,7 @@ public:
 		dev.m_floppy_drive_tags[2] = tag3;
 		dev.m_floppy_drive_tags[3] = tag4;
 	}
-	
+
 	void set_drive(UINT8 drive); // set current drive (0-3)
 
 	DECLARE_READ8_MEMBER( status_r );

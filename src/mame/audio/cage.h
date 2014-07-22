@@ -19,7 +19,7 @@
 
 #define MCFG_ATARI_CAGE_SPEEDUP(_speedup) \
 	atari_cage_device::static_set_speedup(*device, _speedup);
-		
+
 class atari_cage_device : public device_t
 {
 public:
@@ -32,15 +32,15 @@ public:
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const;
-	
+
 	void reset_w(int state);
 
 	UINT16 main_r();
 	void main_w(UINT16 data);
 
 	UINT16 control_r();
-	void control_w(UINT16 data);	
-	
+	void control_w(UINT16 data);
+
 	TIMER_DEVICE_CALLBACK_MEMBER( dma_timer_callback );
 	void update_dma_state(address_space &space);
 	TIMER_DEVICE_CALLBACK_MEMBER( cage_timer_callback );
@@ -58,8 +58,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();	
-	
+	virtual void device_start();
+
 private:
 	cpu_device *m_cpu;
 	attotime m_cpu_h1_clock_period;
@@ -85,7 +85,7 @@ private:
 
 	UINT32 *m_speedup_ram;
 	dmadac_sound_device *m_dmadac[4];
-	
+
 	offs_t m_speedup;
 };
 
@@ -98,10 +98,10 @@ class atari_cage_seattle_device : public atari_cage_device
 public:
 	// construction/destruction
 	atari_cage_seattle_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const;
-		
+
 };
 
 // device type definition

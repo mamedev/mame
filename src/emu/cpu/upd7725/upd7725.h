@@ -63,7 +63,7 @@ class upd96050_device;
 
 #define MCFG_NECDSP_OUT_DRQ_CB(_devcb) \
 	devcb = &necdsp_device::set_out_drq_callback(*device, DEVCB_##_devcb);
-	
+
 
 // ======================> necdsp_device
 
@@ -86,7 +86,7 @@ public:
 	//template<class _Object> static devcb_base &set_out_so_callback(device_t &device, _Object object) { return downcast<necdsp_device &>(device).m_out_so_cb.set_callback(object); }
 	//template<class _Object> static devcb_base &set_out_sorq_callback(device_t &device, _Object object) { return downcast<necdsp_device &>(device).m_out_sorq_cb.set_callback(object); }
 	//template<class _Object> static devcb_base &set_out_drq_callback(device_t &device, _Object object) { return downcast<necdsp_device &>(device).m_out_drq_cb.set_callback(object); }
-	
+
 	UINT8 snesdsp_read(bool mode);
 	void snesdsp_write(bool mode, UINT8 data);
 

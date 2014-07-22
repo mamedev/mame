@@ -485,10 +485,10 @@ public:
 	template<class _Object> static devcb_base &set_out_syncb_callback(device_t &device, _Object object) { return downcast<z80dart_device &>(device).m_out_syncb_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_out_int_callback(device_t &device, _Object object) { return downcast<z80dart_device &>(device).m_out_int_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_out_rxdrqa_callback(device_t &device, _Object object) { return downcast<z80dart_device &>(device).m_out_rxdrqa_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_txdrqa_callback(device_t &device, _Object object) { return downcast<z80dart_device &>(device).m_out_txdrqa_cb.set_callback(object); }	
+	template<class _Object> static devcb_base &set_out_txdrqa_callback(device_t &device, _Object object) { return downcast<z80dart_device &>(device).m_out_txdrqa_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_out_rxdrqb_callback(device_t &device, _Object object) { return downcast<z80dart_device &>(device).m_out_rxdrqb_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_txdrqb_callback(device_t &device, _Object object) { return downcast<z80dart_device &>(device).m_out_txdrqb_cb.set_callback(object); }	
-	
+	template<class _Object> static devcb_base &set_out_txdrqb_callback(device_t &device, _Object object) { return downcast<z80dart_device &>(device).m_out_txdrqb_cb.set_callback(object); }
+
 	static void configure_channels(device_t &device, int rxa, int txa, int rxb, int txb)
 	{
 		z80dart_device &dev = downcast<z80dart_device &>(device);
@@ -497,7 +497,7 @@ public:
 		dev.m_rxcb = rxb;
 		dev.m_txcb = txb;
 	}
-	
+
 	DECLARE_READ8_MEMBER( cd_ba_r );
 	DECLARE_WRITE8_MEMBER( cd_ba_w );
 	DECLARE_READ8_MEMBER( ba_cd_r );
@@ -565,19 +565,19 @@ protected:
 	int m_txca;
 	int m_rxcb;
 	int m_txcb;
-	
+
 	devcb_write_line    m_out_txda_cb;
 	devcb_write_line    m_out_dtra_cb;
 	devcb_write_line    m_out_rtsa_cb;
 	devcb_write_line    m_out_wrdya_cb;
 	devcb_write_line    m_out_synca_cb;
-	
+
 	devcb_write_line    m_out_txdb_cb;
 	devcb_write_line    m_out_dtrb_cb;
 	devcb_write_line    m_out_rtsb_cb;
 	devcb_write_line    m_out_wrdyb_cb;
 	devcb_write_line    m_out_syncb_cb;
-	
+
 	devcb_write_line    m_out_int_cb;
 	devcb_write_line    m_out_rxdrqa_cb;
 	devcb_write_line    m_out_txdrqa_cb;

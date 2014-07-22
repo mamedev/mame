@@ -41,7 +41,7 @@ public:
 		int intensity;
 		UINT32 color;
 	};
-		
+
 	required_device<cpu_device> m_maincpu;
 	optional_device<lsi53c810_device> m_lsi53c810;
 	required_device<cpu_device> m_audiocpu;

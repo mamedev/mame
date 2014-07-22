@@ -32,7 +32,7 @@ public:
 		dev.m_flip_text_xoffs = x_offset;
 		dev.m_flip_text_yoffs = y_offset;
 	}
-	
+
 	#define TC0100SCN_SINGLE_VDU    1024
 
 	/* Function to set separate color banks for the three tilemapped layers.
@@ -104,7 +104,7 @@ private:
 	int          m_flip_text_xoffs, m_flip_text_yoffs;
 	int          m_multiscrn_xoffs;
 	int          m_multiscrn_hack;
-	
+
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 

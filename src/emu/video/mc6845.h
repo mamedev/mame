@@ -67,7 +67,7 @@ typedef device_delegate<void (bitmap_rgb32 &bitmap, const rectangle &cliprect)> 
 #define MC6845_BEGIN_UPDATE(name)  void name(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 
 typedef device_delegate<void (bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT16 ma, UINT8 ra,
-							  UINT16 y, UINT8 x_count, INT8 cursor_x, int de, int hbp, int vbp)> mc6845_update_row_delegate;
+								UINT16 y, UINT8 x_count, INT8 cursor_x, int de, int hbp, int vbp)> mc6845_update_row_delegate;
 #define MC6845_UPDATE_ROW(name)     void name(bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT16 ma, UINT8 ra, \
 												UINT16 y, UINT8 x_count, INT8 cursor_x, int de, int hbp, int vbp)
 
@@ -97,7 +97,7 @@ public:
 	mc6845_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 	static void set_show_border_area(device_t &device, bool show) { downcast<mc6845_device &>(device).m_show_border_area = show; }
-	static void set_visarea_adjust(device_t &device, int min_x, int max_x, int min_y, int max_y) 
+	static void set_visarea_adjust(device_t &device, int min_x, int max_x, int min_y, int max_y)
 	{
 		mc6845_device &dev = downcast<mc6845_device &>(device);
 		dev.m_visarea_adjust_min_x = min_x;
@@ -116,7 +116,7 @@ public:
 	template<class _Object> static devcb_base &set_out_cur_callback(device_t &device, _Object object) { return downcast<mc6845_device &>(device).m_out_cur_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_out_hsync_callback(device_t &device, _Object object) { return downcast<mc6845_device &>(device).m_out_hsync_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_out_vsync_callback(device_t &device, _Object object) { return downcast<mc6845_device &>(device).m_out_vsync_cb.set_callback(object); }
-	
+
 	/* select one of the registers for reading or writing */
 	DECLARE_WRITE8_MEMBER( address_w );
 
@@ -238,7 +238,7 @@ protected:
 	emu_timer *m_light_pen_latch_timer;
 	emu_timer *m_upd_adr_timer;
 	emu_timer *m_upd_trans_timer;
-	
+
 	/* computed values - do NOT state save these! */
 	/* These computed are used to define the screen parameters for a driver */
 	UINT16  m_horiz_pix_total;
@@ -271,45 +271,45 @@ protected:
 	/************************
 	 interface CRTC - driver
 	 ************************/
-	
+
 	bool m_show_border_area;        /* visible screen area (false) active display (true) active display + blanking */
-	
+
 	/* visible screen area adjustment */
 	int m_visarea_adjust_min_x;
 	int m_visarea_adjust_max_x;
 	int m_visarea_adjust_min_y;
 	int m_visarea_adjust_max_y;
-	
+
 	int m_hpixels_per_column;       /* number of pixels per video memory address */
 
 	/* if specified, this gets called before any pixel update,
 	 optionally return a pointer that will be passed to the
 	 update and tear down callbacks */
 	mc6845_begin_update_delegate m_begin_update_cb;
-	
+
 	/* this gets called for every row, the driver must output
 	 x_count * hpixels_per_column pixels.
 	 cursor_x indicates the character position where the cursor is, or -1
 	 if there is no cursor on this row */
 	mc6845_update_row_delegate  m_update_row_cb;
-	
+
 	/* if specified, this gets called after all row updating is complete */
 	mc6845_end_update_delegate  m_end_update_cb;
-	
+
 	/* Called whenever the update address changes
 	 * For vblank/hblank timing strobe indicates the physical update.
 	 * vblank/hblank timing not supported yet! */
 	mc6845_on_update_addr_changed_delegate m_on_update_addr_changed_cb;
-	
+
 	/* if specified, this gets called for every change of the disply enable pin (pin 18) */
 	devcb_write_line            m_out_de_cb;
-	
+
 	/* if specified, this gets called for every change of the cursor pin (pin 19) */
 	devcb_write_line            m_out_cur_cb;
-	
+
 	/* if specified, this gets called for every change of the HSYNC pin (pin 39) */
 	devcb_write_line            m_out_hsync_cb;
-	
+
 	/* if specified, this gets called for every change of the VSYNC pin (pin 40) */
 	devcb_write_line            m_out_vsync_cb;
 };

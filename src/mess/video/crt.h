@@ -60,11 +60,11 @@ public:
 		dev.m_window_width = width;
 		dev.m_window_height = height;
 	}
-	
+
 	void plot(int x, int y);
 	void eof();
 	void update(bitmap_ind16 &bitmap);
-	
+
 protected:
 	// device-level overrides
 	virtual void device_start();

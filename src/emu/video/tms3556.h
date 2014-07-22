@@ -108,14 +108,14 @@ private:
 
 	// register interface
 	int m_reg_access_phase;
-	
+
 	int m_row_col_written;
 	int m_bamp_written;
 	int m_colrow;
-    dma_mode_tt m_vdp_acmpxy_mode;
-    UINT16 m_vdp_acmpxy;
-    UINT16 m_vdp_acmp;
-    int m_init_read;
+	dma_mode_tt m_vdp_acmpxy_mode;
+	UINT16 m_vdp_acmpxy;
+	UINT16 m_vdp_acmp;
+	int m_init_read;
 
 	int m_scanline;             // scanline counter
 	int m_blink, m_blink_count; // blinking

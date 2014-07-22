@@ -6,8 +6,8 @@
 #ifndef WPC_OUT_H
 #define WPC_OUT_H
 
-#define MCFG_WPC_OUT_ADD( _tag, _count )	\
-	MCFG_DEVICE_ADD( _tag, WPC_OUT, 0 )		\
+#define MCFG_WPC_OUT_ADD( _tag, _count )    \
+	MCFG_DEVICE_ADD( _tag, WPC_OUT, 0 )     \
 		downcast<wpc_out_device *>(device)->set_gi_count(_count);
 
 class wpc_out_device : public device_t

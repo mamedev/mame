@@ -20,9 +20,9 @@ public:
 	// construction/destruction
 	midway_serial_pic_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	midway_serial_pic_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
-	
+
 	static void static_set_upper(device_t &device, int upper) { downcast<midway_serial_pic_device &>(device).m_upper = upper; }
-		
+
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
 	DECLARE_READ8_MEMBER( status_r );
@@ -30,13 +30,13 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();	
-	
+	virtual void device_start();
+
 	void generate_serial_data(int upper);
 	void serial_register_state();
-	
+
 	UINT8   m_data[16]; // reused by other devices
-	int		m_upper;
+	int     m_upper;
 private:
 	UINT8   m_buff;
 	UINT8   m_idx;
@@ -51,13 +51,13 @@ extern const device_type MIDWAY_SERIAL_PIC;
 
 #define MCFG_MIDWAY_SERIAL_PIC_UPPER(_upper) \
 	midway_serial_pic_device::static_set_upper(*device, _upper);
-	
+
 /* 2nd generation Midway serial/NVRAM/RTC PIC */
 
 // ======================> midway_serial_pic2_device
 
 class midway_serial_pic2_device : public midway_serial_pic_device,
-								  public device_nvram_interface
+									public device_nvram_interface
 {
 public:
 	// construction/destruction
@@ -65,7 +65,7 @@ public:
 	midway_serial_pic2_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 	static void static_set_yearoffs(device_t &device, int yearoffs) { downcast<midway_serial_pic2_device &>(device).m_yearoffs = yearoffs; }
-	
+
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
 	DECLARE_READ8_MEMBER( status_r );
@@ -80,12 +80,12 @@ protected:
 	virtual void nvram_default();
 	virtual void nvram_read(emu_file &file);
 	virtual void nvram_write(emu_file &file);
-		
+
 private:
 
 	void pic_register_state();
 	TIMER_CALLBACK_MEMBER( reset_timer );
-	
+
 	UINT16  m_latch;
 	attotime m_latch_expire_time;
 	UINT8   m_state;
@@ -106,7 +106,7 @@ private:
 // device type definition
 extern const device_type MIDWAY_SERIAL_PIC2;
 
-#define MCFG_MIDWAY_SERIAL_PIC2_UPPER	MCFG_MIDWAY_SERIAL_PIC_UPPER
+#define MCFG_MIDWAY_SERIAL_PIC2_UPPER   MCFG_MIDWAY_SERIAL_PIC_UPPER
 
 #define MCFG_MIDWAY_SERIAL_PIC2_YEAR_OFFS(_yearoffs) \
 	midway_serial_pic2_device::static_set_yearoffs(*device, _yearoffs);
@@ -124,7 +124,7 @@ public:
 	static void static_set_shuffle(device_t &device, UINT8 shuffle) { downcast<midway_ioasic_device &>(device).m_shuffle_type = shuffle; }
 	static void static_set_shuffle_default(device_t &device, UINT8 shuffle) { downcast<midway_ioasic_device &>(device).m_shuffle_default = shuffle; }
 	static void static_set_auto_ack(device_t &device, UINT8 auto_ack) { downcast<midway_ioasic_device &>(device).m_auto_ack = auto_ack; }
-	template<class _Object> static devcb_base &set_irqhandler_callback(device_t &device, _Object object) { return downcast<midway_ioasic_device &>(device).m_irq_callback.set_callback(object); }	
+	template<class _Object> static devcb_base &set_irqhandler_callback(device_t &device, _Object object) { return downcast<midway_ioasic_device &>(device).m_irq_callback.set_callback(object); }
 
 	void set_shuffle_state(int state);
 	void fifo_w(UINT16 data);
@@ -136,14 +136,14 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER(ioasic_input_empty);
 	DECLARE_WRITE_LINE_MEMBER(ioasic_output_full);
-	
+
 	DECLARE_READ32_MEMBER( read );
 	DECLARE_WRITE32_MEMBER( write );
 	DECLARE_READ32_MEMBER( packed_r );
 	DECLARE_WRITE32_MEMBER( packed_w );
 
 	DECLARE_WRITE8_MEMBER(cage_irq_handler);
-	
+
 	void ioasic_reset();
 
 protected:
@@ -174,7 +174,7 @@ private:
 	UINT16  m_fifo_out;
 	UINT16  m_fifo_bytes;
 	offs_t  m_fifo_force_buffer_empty_pc;
-	
+
 	atari_cage_device *m_cage;
 	dcs_audio_device *m_dcs;
 };
@@ -183,13 +183,13 @@ private:
 // device type definition
 extern const device_type MIDWAY_IOASIC;
 
-#define MCFG_MIDWAY_IOASIC_UPPER	MCFG_MIDWAY_SERIAL_PIC_UPPER
+#define MCFG_MIDWAY_IOASIC_UPPER    MCFG_MIDWAY_SERIAL_PIC_UPPER
 
 #define MCFG_MIDWAY_IOASIC_YEAR_OFFS MCFG_MIDWAY_SERIAL_PIC2_YEAR_OFFS
 
 #define MCFG_MIDWAY_IOASIC_SHUFFLE(_shuffle) \
 	midway_ioasic_device::static_set_shuffle(*device, _shuffle);
-	
+
 #define MCFG_MIDWAY_IOASIC_SHUFFLE_DEFAULT(_shuffle) \
 	midway_ioasic_device::static_set_shuffle_default(*device, _shuffle);
 
@@ -198,8 +198,8 @@ extern const device_type MIDWAY_IOASIC;
 
 #define MCFG_MIDWAY_IOASIC_AUTO_ACK(_ack) \
 	midway_ioasic_device::static_set_auto_ack(*device, _ack);
-	
-	
+
+
 enum
 {
 	MIDWAY_IOASIC_STANDARD = 0,

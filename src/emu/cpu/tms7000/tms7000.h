@@ -65,7 +65,7 @@ public:
 	DECLARE_WRITE8_MEMBER(tms7000_pf_w);
 	DECLARE_READ8_MEMBER(tms7002_pf_r) { return tms7000_pf_r(space, offset + 0x10); }
 	DECLARE_WRITE8_MEMBER(tms7002_pf_w) { tms7000_pf_w(space, offset + 0x10, data); }
-	
+
 	bool chip_is_cmos() { return (m_info_flags & TMS7000_CHIP_IS_CMOS) ? true : false; }
 	UINT32 chip_get_family() { return m_info_flags & TMS7000_CHIP_FAMILY_MASK; }
 	bool chip_is_family_70x0() { return chip_get_family() == TMS7000_CHIP_FAMILY_70X0; }
@@ -128,17 +128,17 @@ protected:
 
 	UINT8 m_port_latch[4];
 	UINT8 m_port_ddr[4];
-	
+
 	void flag_ext_interrupt(int extline);
 	void check_interrupts();
 	void do_interrupt(int irqline);
-	
+
 	TIMER_CALLBACK_MEMBER(simple_timer_cb);
 	void timer_run(int tmr);
 	void timer_reload(int tmr);
 	void timer_tick_pre(int tmr);
 	void timer_tick_low(int tmr);
-	
+
 	// internal read/write
 	inline UINT8 read_r8(UINT8 address) { return m_program->read_byte(address); }
 	inline void write_r8(UINT8 address, UINT8 data) { m_program->write_byte(address, data); }
@@ -160,7 +160,7 @@ protected:
 	inline void push8(UINT8 data) { m_program->write_byte(++m_sp, data); }
 	inline UINT16 pull16() { UINT16 ret = m_program->read_byte(m_sp--); return ret | m_program->read_byte(m_sp--) << 8; }
 	inline void push16(UINT16 data) { m_program->write_byte(++m_sp, data >> 8 & 0xff); m_program->write_byte(++m_sp, data & 0xff); }
-	
+
 	// opcode handlers
 	void br_dir();
 	void br_inx();
@@ -202,7 +202,7 @@ protected:
 	void stsp();
 	void trap(UINT8 address);
 	void illegal(UINT8 op);
-	
+
 	typedef int (tms7000_device::*op_func)(UINT8, UINT8);
 	int op_clr(UINT8 param1, UINT8 param2);
 	int op_dec(UINT8 param1, UINT8 param2);
@@ -214,7 +214,7 @@ protected:
 	int op_rrc(UINT8 param1, UINT8 param2);
 	int op_swap(UINT8 param1, UINT8 param2);
 	int op_xchb(UINT8 param1, UINT8 param2);
-	
+
 	int op_adc(UINT8 param1, UINT8 param2);
 	int op_add(UINT8 param1, UINT8 param2);
 	int op_and(UINT8 param1, UINT8 param2);
@@ -227,7 +227,7 @@ protected:
 	int op_sbb(UINT8 param1, UINT8 param2);
 	int op_sub(UINT8 param1, UINT8 param2);
 	int op_xor(UINT8 param1, UINT8 param2);
-	
+
 	inline void shortbranch(bool check);
 	inline void jmp(bool check);
 	int op_djnz(UINT8 param1, UINT8 param2);

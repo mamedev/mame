@@ -1,12 +1,12 @@
 /***************************************************************************
 
-	Akiko
+    Akiko
 
-	Used in the Amiga CD32
+    Used in the Amiga CD32
 
-	- CD-ROM controller
-	- Builtin 1KB NVRAM
-	- Chunky to planar converter
+    - CD-ROM controller
+    - Builtin 1KB NVRAM
+    - Chunky to planar converter
 
 ***************************************************************************/
 
@@ -74,7 +74,7 @@ protected:
 	virtual machine_config_constructor device_mconfig_additions() const;
 
 private:
-    // 1X CDROM sector time in msec (300KBps)
+	// 1X CDROM sector time in msec (300KBps)
 	static const int CD_SECTOR_TIME = (1000/((150*1024)/2048));
 
 	// internal state

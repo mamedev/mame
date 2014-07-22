@@ -836,7 +836,7 @@ LZ93A13 (32 pin) - 8KB banks
         <info name="alt_title" value="ミケランジェロⅡ" />
         <part name="cart" interface="msx_cart">
             <feature name="pcb" value="1M-8KB" />
-			<feature name="slot" value="ascii8" />
+            <feature name="slot" value="ascii8" />
             <feature name="mapper" value="NEOS MR6401" />
             <dataarea name="rom" size="131072">
                 <rom name="rp231024d" size="131072" crc="" sha1="" offset="0" />
@@ -3167,7 +3167,7 @@ LZ93A13 (32 pin) - 8KB banks
 		</part>
 	</software>
 
-	<!-- This is the sound cartridge that came with the game SD Snatcher. This should eventually be 
+	<!-- This is the sound cartridge that came with the game SD Snatcher. This should eventually be
 	     combined in one software description including the Sound cartridge and the floppies.
 	     This sound cartridge can _not_ be used with the MSX Game Collections from Konami.
 	-->
@@ -3177,7 +3177,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<publisher>Konami</publisher>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="sound_sdsnatch" />
-			<dataarea name="ram" size="65536">      
+			<dataarea name="ram" size="65536">
 			</dataarea>
 		</part>
 	</software>

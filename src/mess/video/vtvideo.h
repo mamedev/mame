@@ -71,7 +71,7 @@ protected:
 
 	const char *m_char_rom_tag; /* character rom region */
 	required_device<palette_device> m_palette;
-	
+
 	bool m_notify_vblank;
 	int m_last_scroll;
 

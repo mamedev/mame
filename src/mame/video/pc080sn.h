@@ -19,7 +19,7 @@ public:
 		dev.m_x_offset = x_offset;
 		dev.m_y_offset = y_offset;
 	}
-	
+
 	DECLARE_READ16_MEMBER( word_r );
 	DECLARE_WRITE16_MEMBER( word_w );
 	DECLARE_WRITE16_MEMBER( xscroll_word_w );
@@ -65,7 +65,7 @@ public:
 	int            m_x_offset, m_y_offset;
 	int            m_y_invert;
 	int            m_dblwidth;
-	
+
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 };

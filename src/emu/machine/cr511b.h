@@ -1,33 +1,33 @@
 /***************************************************************************
 
-	CR-511-B CD-ROM drive
+    CR-511-B CD-ROM drive
 
     license: MAME, GPL-2.0+
     copyright-holders: Dirk Best
 
-	CD-ROM drive with a custom MKE/Panasonic interface as used in the
-	Commodore CDTV and early SoundBlaster cards.
+    CD-ROM drive with a custom MKE/Panasonic interface as used in the
+    Commodore CDTV and early SoundBlaster cards.
 
-	 1 _RESET      2  GND
-	 3  EFFK       4  SCCK
-	 5  SBCP       6  SCOR
-	 7  GND        8  GND
-	 9  C16M      10  GND
-	11 _XAEN      12  GND
-	13  EMPASIS   14  D0
-	15  LRCK      16  DSCK
-	17 _MUTE      18  GND
-	19 _BUSY      20 _STCH
-	21 _ENABLE    22  DRQ
-	23 _HWR       24  GND
-	25 _DTEN      26 _HRD
-	27 _STEN      28 _CMD
-	29 _EOP       30  GND
-	31  DB7       32  GND
-	33  DB6       34  DB5
-	35  DB4       36  GND
-	37  DB3       38  DB2
-	39  DB1       40  DB0
+     1 _RESET      2  GND
+     3  EFFK       4  SCCK
+     5  SBCP       6  SCOR
+     7  GND        8  GND
+     9  C16M      10  GND
+    11 _XAEN      12  GND
+    13  EMPASIS   14  D0
+    15  LRCK      16  DSCK
+    17 _MUTE      18  GND
+    19 _BUSY      20 _STCH
+    21 _ENABLE    22  DRQ
+    23 _HWR       24  GND
+    25 _DTEN      26 _HRD
+    27 _STEN      28 _CMD
+    29 _EOP       30  GND
+    31  DB7       32  GND
+    33  DB6       34  DB5
+    35  DB4       36  GND
+    37  DB3       38  DB2
+    39  DB1       40  DB0
 
 ***************************************************************************/
 
@@ -46,8 +46,7 @@
 //**************************************************************************
 
 #define MCFG_CR511B_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, CR511B, 0) \
-
+	MCFG_DEVICE_ADD(_tag, CR511B, 0)
 #define MCFG_CR511B_STCH_HANDLER(_devcb) \
 	devcb = &cr511b_device::set_stch_handler(*device, DEVCB_##_devcb);
 

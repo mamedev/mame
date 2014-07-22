@@ -27,7 +27,7 @@
 // ======================> ql_trump_card_t
 
 class ql_trump_card_t : public device_t,
-			   			public device_ql_expansion_card_interface
+						public device_ql_expansion_card_interface
 {
 public:
 	// construction/destruction

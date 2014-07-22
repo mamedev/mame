@@ -330,8 +330,8 @@ protected:
 	virtual void device_reset();
 
 private:
-	 UINT8 m_csrb;
-	 UINT8 m_ip6;
+		UINT8 m_csrb;
+		UINT8 m_ip6;
 };
 
 extern const device_type APOLLO_SIO;

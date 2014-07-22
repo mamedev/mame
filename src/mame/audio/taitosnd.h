@@ -37,12 +37,12 @@ public:
 	DECLARE_WRITE8_MEMBER( slave_port_w );
 	DECLARE_READ8_MEMBER( slave_comm_r );
 	DECLARE_WRITE8_MEMBER( slave_comm_w );
-	
+
 protected:
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
-	
+
 private:
 	void update_nmi();
 

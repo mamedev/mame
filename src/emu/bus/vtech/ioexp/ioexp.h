@@ -1,27 +1,27 @@
 /***************************************************************************
 
-	VTech Laser/VZ I/O Expansion Slot
+    VTech Laser/VZ I/O Expansion Slot
 
     license: MAME, GPL-2.0+
     copyright-holders: Dirk Best
 
-	30-pin slot
+    30-pin slot
 
-	15  GND             16  NC
-	14  /WR             17  NC
-	13  A3              18  NC
-	12  A6              19  +5VDC
-	11  A2              20  NC
-	10  A5              21  D4
-	 9  D0              22  D5
-	 8  D2              23  D7
-	 7  D6              24  D1
-	 6  D3              25  /RD
-	 5  /IORQ           26  A1
-	 4  +5VDC           27  A4
-	 3  NC              28  A0
-	 2  NC              29  A7
-	 1  NC              30  NC
+    15  GND             16  NC
+    14  /WR             17  NC
+    13  A3              18  NC
+    12  A6              19  +5VDC
+    11  A2              20  NC
+    10  A5              21  D4
+     9  D0              22  D5
+     8  D2              23  D7
+     7  D6              24  D1
+     6  D3              25  /RD
+     5  /IORQ           26  A1
+     4  +5VDC           27  A4
+     3  NC              28  A0
+     2  NC              29  A7
+     1  NC              30  NC
 
 ***************************************************************************/
 

@@ -30,7 +30,7 @@
 #define SC45_BUTTON_MATRIX_7_0 IPT_BUTTON13
 #define SC45_BUTTON_MATRIX_7_1 IPT_BUTTON14
 #define SC45_BUTTON_MATRIX_7_2 IPT_BUTTON15
-#define SC45_BUTTON_MATRIX_7_3 IPT_BUTTON16 
+#define SC45_BUTTON_MATRIX_7_3 IPT_BUTTON16
 #define SC45_BUTTON_MATRIX_7_4 IPT_MAHJONG_A // having more buttons would make sense and be cleaner but as a temporary solution (these are meant to be driven more by the clickable layouts anyway).....
 #define SC45_BUTTON_MATRIX_7_5 IPT_MAHJONG_B
 
@@ -578,7 +578,7 @@ public:
 	DECLARE_MACHINE_RESET(sc4);
 
 	DECLARE_WRITE_LINE_MEMBER(bfm_sc4_irqhandler);
-	
+
 	void bfm_sc4_68307_porta_w(address_space &space, bool dedicated, UINT8 data, UINT8 line_mask);
 	DECLARE_WRITE8_MEMBER( bfm_sc4_reel3_w );
 	DECLARE_WRITE8_MEMBER( bfm_sc4_reel4_w );
@@ -731,7 +731,7 @@ INPUT_PORTS_EXTERN( sc4_raw );
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) ) \
 	PORT_DIPSETTING(      0x0010, DEF_STR( On ) ) \
 	PORT_MODIFY("IN-18") \
-	PORT_DIPNAME( 0x0001, 0x0000, "IN 18-0 (DSW11)" ) /* DIL11 18.0	 */ \
+	PORT_DIPNAME( 0x0001, 0x0000, "IN 18-0 (DSW11)" ) /* DIL11 18.0  */ \
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) ) \
 	PORT_DIPSETTING(      0x0001, DEF_STR( On ) ) \
 	PORT_DIPNAME( 0x0002, 0x0000, "IN 18-1 (DSW12)" ) /* DIL12 18.1 */ \

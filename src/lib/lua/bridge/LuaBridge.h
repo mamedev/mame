@@ -1,7 +1,7 @@
 //------------------------------------------------------------------------------
 /*
   https://github.com/vinniefalco/LuaBridge
-  
+
   Copyright 2012, Vinnie Falco <vinnie.falco@gmail.com>
   Copyright 2007, Nathan Reed
 
@@ -45,7 +45,6 @@
 
 namespace luabridge
 {
-
 // Forward declaration
 //
 template <class T>
@@ -73,31 +72,31 @@ class LuaRef;
 class Security
 {
 public:
-  static bool hideMetatables ()
-  {
-    return getSettings().hideMetatables;
-  }
+	static bool hideMetatables ()
+	{
+	return getSettings().hideMetatables;
+	}
 
-  static void setHideMetatables (bool shouldHide)
-  {
-    getSettings().hideMetatables = shouldHide;
-  }
+	static void setHideMetatables (bool shouldHide)
+	{
+	getSettings().hideMetatables = shouldHide;
+	}
 
 private:
-  struct Settings
-  {
-    Settings () : hideMetatables (true)
-    {
-    }
+	struct Settings
+	{
+	Settings () : hideMetatables (true)
+	{
+	}
 
-    bool hideMetatables;
-  };
+	bool hideMetatables;
+	};
 
-  static Settings& getSettings ()
-  {
-    static Settings settings;
-    return settings;
-  }
+	static Settings& getSettings ()
+	{
+	static Settings settings;
+	return settings;
+	}
 };
 
 #include "detail/Userdata.h"
@@ -111,7 +110,7 @@ private:
 template <class T>
 inline void push (lua_State* L, T t)
 {
-  Stack <T>::push (L, t);
+	Stack <T>::push (L, t);
 }
 
 //------------------------------------------------------------------------------
@@ -124,8 +123,8 @@ inline void push (lua_State* L, T t)
 template <class T>
 inline void setGlobal (lua_State* L, T t, char const* name)
 {
-  push (L, t);
-  lua_setglobal (L, name);
+	push (L, t);
+	lua_setglobal (L, name);
 }
 
 //------------------------------------------------------------------------------
@@ -134,7 +133,7 @@ inline void setGlobal (lua_State* L, T t, char const* name)
 */
 inline void setHideMetatables (bool shouldHide)
 {
-  Security::setHideMetatables (shouldHide);
+	Security::setHideMetatables (shouldHide);
 }
 
 }

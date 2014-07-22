@@ -18,7 +18,7 @@ public:
 		dev.m_x_offset = x_offset;
 		dev.m_y_offset = y_offset;
 	}
-	
+
 	DECLARE_READ16_MEMBER( word_r );
 	DECLARE_WRITE16_MEMBER( word_w );
 

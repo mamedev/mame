@@ -28,7 +28,7 @@ public:
 		dev.m_xoff = x_offset;
 		dev.m_yoff = y_offset;
 	}
-	
+
 	DECLARE_WRITE16_MEMBER( ctrl_w );
 	DECLARE_READ16_MEMBER( ctrl_r );
 	DECLARE_WRITE16_MEMBER( linectrl_w );

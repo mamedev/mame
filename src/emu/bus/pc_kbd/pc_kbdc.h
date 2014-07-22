@@ -24,7 +24,7 @@ set the data line and then set the clock line.
 
 #define MCFG_PC_KBDC_OUT_DATA_CB(_devcb) \
 	devcb = &pc_kbdc_device::set_out_data_callback(*device, DEVCB_##_devcb);
-	
+
 #define MCFG_PC_KBDC_SLOT_ADD(_kbdc_tag, _tag, _slot_intf, _def_slot) \
 	MCFG_DEVICE_ADD(_tag, PC_KBDC_SLOT, 0 ) \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false) \
@@ -67,7 +67,7 @@ public:
 
 	template<class _Object> static devcb_base &set_out_clock_callback(device_t &device, _Object object) { return downcast<pc_kbdc_device &>(device).m_out_clock_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_out_data_callback(device_t &device, _Object object) { return downcast<pc_kbdc_device &>(device).m_out_data_cb.set_callback(object); }
-	
+
 	void set_keyboard(device_pc_kbd_interface *keyboard);
 
 	int clock_signal() { return m_clock_state; }

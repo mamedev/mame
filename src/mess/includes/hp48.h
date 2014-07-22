@@ -182,11 +182,11 @@ public:
 
 	static void set_port_config(device_t &device, int port, int module, int max_size)
 	{
-		downcast<hp48_port_image_device &>(device).m_port = port; 
+		downcast<hp48_port_image_device &>(device).m_port = port;
 		downcast<hp48_port_image_device &>(device).m_module = module;
 		downcast<hp48_port_image_device &>(device).m_max_size = max_size;
 	}
-	
+
 	// image-level overrides
 	virtual iodevice_t image_type() const { return IO_MEMCARD; }
 

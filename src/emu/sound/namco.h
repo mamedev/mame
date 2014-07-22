@@ -40,7 +40,7 @@ public:
 	// static configuration
 	static void set_voices(device_t &device, int voices) { downcast<namco_audio_device &>(device).m_voices = voices; }
 	static void set_stereo(device_t &device, int stereo) { downcast<namco_audio_device &>(device).m_stereo = stereo; }
-	
+
 protected:
 	// device-level overrides
 	virtual void device_start();

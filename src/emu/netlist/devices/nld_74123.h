@@ -39,16 +39,16 @@ public:
 	netlist_ttl_input_t m_B;
 	netlist_ttl_input_t m_CLRQ;
 	netlist_ttl_output_t m_Q;
-    netlist_ttl_output_t m_QQ;
+	netlist_ttl_output_t m_QQ;
 
-    netlist_analog_input_t m_CV;
+	netlist_analog_input_t m_CV;
 
-    netlist_state_t<netlist_sig_t> m_last_trig;
-    netlist_state_t<UINT8>         m_state;
-    netlist_state_t<double>        m_KP;
+	netlist_state_t<netlist_sig_t> m_last_trig;
+	netlist_state_t<UINT8>         m_state;
+	netlist_state_t<double>        m_KP;
 
-    netlist_param_double_t m_K;
-    netlist_param_double_t m_RI;
+	netlist_param_double_t m_K;
+	netlist_param_double_t m_RI;
 
 );
 
@@ -57,8 +57,8 @@ public:
 
 NETLIB_DEVICE(74123_dip,
 
-    NETLIB_NAME(74123) m_1;
-    NETLIB_NAME(74123) m_2;
+	NETLIB_NAME(74123) m_1;
+	NETLIB_NAME(74123) m_2;
 
 );
 

@@ -80,8 +80,8 @@ protected:
 
 	void set_variant(int variant);
 
-	UINT8 m_talk_status; 
-	sound_stream *m_stream; 
+	UINT8 m_talk_status;
+	sound_stream *m_stream;
 
 private:
 	void new_int_write(UINT8 rc, UINT8 m0, UINT8 m1, UINT8 addr);
@@ -107,7 +107,7 @@ private:
 	UINT8 m_CTL_pins;
 	UINT8 m_speaking_now;
 
-	
+
 	UINT8 m_state;
 
 	/* Rom interface */
@@ -259,7 +259,7 @@ public:
 	static void set_stop_bit(device_t &device, UINT8 stop_bit) { downcast<tmsprom_device &>(device).m_stop_bit = stop_bit; }
 	template<class _Object> static devcb_base &set_pdc_callback(device_t &device, _Object object) { return downcast<tmsprom_device &>(device).m_pdc_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_ctl_callback(device_t &device, _Object object) { return downcast<tmsprom_device &>(device).m_ctl_cb.set_callback(object); }
-	
+
 	DECLARE_WRITE_LINE_MEMBER( m0_w );
 	DECLARE_READ_LINE_MEMBER( data_r );
 
@@ -314,25 +314,25 @@ extern const device_type TMSPROM;
 
 #define MCFG_TMSPROM_ROM_SIZE(_size) \
 	tmsprom_device::set_rom_size(*device, _size);
-	
+
 #define MCFG_TMSPROM_PDC_BIT(_bit) \
 	tmsprom_device::set_pdc_bit(*device, _bit);
-	
+
 #define MCFG_TMSPROM_CTL1_BIT(_bit) \
 	tmsprom_device::set_ctl1_bit(*device, _bit);
 
 #define MCFG_TMSPROM_CTL2_BIT(_bit) \
 	tmsprom_device::set_ctl2_bit(*device, _bit);
-	
+
 #define MCFG_TMSPROM_CTL4_BIT(_bit) \
 	tmsprom_device::set_ctl4_bit(*device, _bit);
-	
+
 #define MCFG_TMSPROM_CTL8_BIT(_bit) \
 	tmsprom_device::set_ctl8_bit(*device, _bit);
 
 #define MCFG_TMSPROM_RESET_BIT(_bit) \
 	tmsprom_device::set_reset_bit(*device, _bit);
-	
+
 #define MCFG_TMSPROM_STOP_BIT(_bit) \
 	tmsprom_device::set_stop_bit(*device, _bit);
 
@@ -340,6 +340,6 @@ extern const device_type TMSPROM;
 	devcb = &tmsprom_device::set_pdc_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_TMSPROM_CTL_CB(_devcb) \
-    devcb = &tmsprom_device::set_ctl_callback(*device, DEVCB_##_devcb);
+	devcb = &tmsprom_device::set_ctl_callback(*device, DEVCB_##_devcb);
 
 #endif /* __TMS5110_H__ */

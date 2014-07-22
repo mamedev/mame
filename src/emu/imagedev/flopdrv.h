@@ -95,7 +95,7 @@ public:
 	~legacy_floppy_image_device();
 
 	template<class _Object> static devcb_base &set_out_idx_func(device_t &device, _Object object) { return downcast<legacy_floppy_image_device &>(device).m_out_idx_func.set_callback(object); }
-	
+
 	virtual bool call_load();
 	virtual bool call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry) {   return load_software(swlist, swname, start_entry); }
 	virtual bool call_create(int format_type, option_resolution *format_options);

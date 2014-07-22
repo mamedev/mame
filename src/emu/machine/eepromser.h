@@ -59,7 +59,7 @@
 // X24c44 16 bit ram/eeprom combo
 #define MCFG_EEPROM_SERIAL_X24C44_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, EEPROM_SERIAL_X24C44_16BIT, 0)
-	
+
 // optional enable for streaming reads
 #define MCFG_EEPROM_SERIAL_ENABLE_STREAMING() \
 	eeprom_serial_base_device::static_enable_streaming(*device);
@@ -144,7 +144,7 @@ protected:
 	virtual void handle_event(eeprom_event event);
 	virtual void parse_command_and_address() = 0;
 	virtual void execute_command();
-	
+
 
 	// configuration state
 	UINT8           m_command_address_bits;     // number of address bits in a command
@@ -219,7 +219,7 @@ protected:
 class eeprom_serial_x24c44_device : public eeprom_serial_base_device
 {
 		//async recall not implemented
-		//async store not implemented 
+		//async store not implemented
 protected:
 	// construction/destruction
 	eeprom_serial_x24c44_device(const machine_config &mconfig, device_type devtype, const char *name, const char *tag, device_t *owner, const char *shortname, const char *file);
@@ -227,7 +227,7 @@ protected:
 public:
 	// read handlers
 	DECLARE_READ_LINE_MEMBER(do_read);          // DO
-	
+
 	// write handlers
 	DECLARE_WRITE_LINE_MEMBER(cs_write);        // CS signal (active high)
 	DECLARE_WRITE_LINE_MEMBER(clk_write);       // CLK signal (active high)
@@ -283,6 +283,6 @@ DECLARE_SERIAL_EEPROM_DEVICE(93cxx, 93c86, 93C86, 8)
 DECLARE_SERIAL_EEPROM_DEVICE(er5911, er5911, ER5911, 8)
 DECLARE_SERIAL_EEPROM_DEVICE(er5911, er5911, ER5911, 16)
 
-// X24c44 8 bit 32byte ram/eeprom combo	
+// X24c44 8 bit 32byte ram/eeprom combo
 DECLARE_SERIAL_EEPROM_DEVICE(x24c44, x24c44, X24C44, 16)
 #endif

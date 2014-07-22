@@ -78,7 +78,7 @@ public:
 		dev.m_dx = dx;
 		dev.m_dy = dy;
 	}
-	
+
 	void clear_all();
 
 	DECLARE_READ16_MEMBER( k055673_rom_word_r );

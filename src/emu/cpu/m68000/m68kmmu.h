@@ -774,12 +774,12 @@ INLINE UINT32 get_dt3_table_entry(m68000_base_device *m68k, UINT32 tptr, UINT8 f
 
 				if (!(ptest))
 				{
-					page_entry |= 0x8;	// always set the U bit
+					page_entry |= 0x8;  // always set the U bit
 
 					// if we're writing, the M bit comes into play
 					if (!m68k->mmu_tmp_rw)
 					{
-						page_entry |= 0x10;	// set Modified
+						page_entry |= 0x10; // set Modified
 					}
 
 					// if these updates resulted in a change, write the entry back where we found it
@@ -795,7 +795,7 @@ INLINE UINT32 get_dt3_table_entry(m68000_base_device *m68k, UINT32 tptr, UINT8 f
 					// SR:         B  G U1 U0 S CM CM M 0 W T R
 					m68k->mmu_tmp_sr |= ((addr_out & ~0xfff) || (page_entry & 0x7f4));
 				}
-				break; 
+				break;
 
 			case 2: // shouldn't happen
 				fatalerror("68040: got indirect final page pointer, shouldn't be possible\n");

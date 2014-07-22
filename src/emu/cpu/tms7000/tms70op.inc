@@ -307,19 +307,19 @@ int tms7000_device::op_dac(UINT8 param1, UINT8 param2)
 	UINT8 l1 = param1 >> 0 & 0xf;
 	UINT8 h2 = param2 >> 4 & 0xf;
 	UINT8 l2 = param2 >> 0 & 0xf;
-	
+
 	// compute bcd constant
 	UINT8 d = ((l1 + l2 + c) < 10) ? 0 : 1;
 	if ((h1 + h2) == 9)
 		d |= 2;
 	else if ((h1 + h2) > 9)
 		d |= 4;
-	
+
 	UINT8 t = param1 + param2 + c + lut_bcd_out[d];
 	SET_CNZ(t);
 	if (d > 2)
 		m_sr |= SR_C;
-	
+
 	return t;
 }
 
@@ -344,7 +344,7 @@ int tms7000_device::op_dsb(UINT8 param1, UINT8 param2)
 	SET_CNZ(t);
 	if (d <= 2)
 		m_sr |= SR_C;
-	
+
 	return t;
 }
 

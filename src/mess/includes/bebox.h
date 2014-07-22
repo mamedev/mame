@@ -110,7 +110,7 @@ public:
 	LSI53C810_DMA_CB(scsi_dma_callback);
 
 	void bebox_set_irq_bit(unsigned int interrupt_bit, int val);
-	void bebox_update_interrupts();	
+	void bebox_update_interrupts();
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);

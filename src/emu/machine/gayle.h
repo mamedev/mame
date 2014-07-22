@@ -1,11 +1,11 @@
 /***************************************************************************
 
-	GAYLE
+    GAYLE
 
     license: MAME, GPL-2.0+
     copyright-holders: Dirk Best
 
-	Gate array used in the Amiga 600 and Amiga 1200 computers.
+    Gate array used in the Amiga 600 and Amiga 1200 computers.
 
 ***************************************************************************/
 
@@ -87,10 +87,10 @@ protected:
 private:
 	enum
 	{
-		GAYLE_CS = 0,	// interrupt status
-		GAYLE_IRQ,		// interrupt change
-		GAYLE_INTEN,	// interrupt enable register
-		GAYLE_CFG		// config register
+		GAYLE_CS = 0,   // interrupt status
+		GAYLE_IRQ,      // interrupt change
+		GAYLE_INTEN,    // interrupt enable register
+		GAYLE_CFG       // config register
 	};
 
 	devcb_write_line m_int2_w;

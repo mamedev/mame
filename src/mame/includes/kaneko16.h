@@ -68,7 +68,7 @@ public:
 	DECLARE_READ16_MEMBER(kaneko16_ay2_YM2149_r);
 	DECLARE_WRITE16_MEMBER(kaneko16_ay2_YM2149_w);
 	DECLARE_WRITE16_MEMBER(bakubrkr_oki_bank_sw);
-	
+
 	DECLARE_READ8_MEMBER(eeprom_r);
 	DECLARE_WRITE8_MEMBER(eeprom_w);
 

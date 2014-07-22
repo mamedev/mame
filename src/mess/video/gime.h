@@ -203,7 +203,7 @@ private:
 	const char *m_maincpu_tag;  /* tag of main CPU */
 	const char *m_ram_tag;      /* tag of RAM device */
 	const char *m_ext_tag;      /* tag of expansion device */
-	
+
 	// timer constants
 	static const device_timer_id TIMER_FRAME = 0;
 	static const device_timer_id TIMER_HSYNC_OFF = 1;

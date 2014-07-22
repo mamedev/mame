@@ -10,16 +10,16 @@
 #include "lobject.h"
 
 
-#define gnode(t,i)	(&(t)->node[i])
-#define gkey(n)		(&(n)->i_key.tvk)
-#define gval(n)		(&(n)->i_val)
-#define gnext(n)	((n)->i_key.nk.next)
+#define gnode(t,i)  (&(t)->node[i])
+#define gkey(n)     (&(n)->i_key.tvk)
+#define gval(n)     (&(n)->i_val)
+#define gnext(n)    ((n)->i_key.nk.next)
 
-#define invalidateTMcache(t)	((t)->flags = 0)
+#define invalidateTMcache(t)    ((t)->flags = 0)
 
 /* returns the key, given the value of a table entry */
 #define keyfromval(v) \
-  (gkey(cast(Node *, cast(char *, (v)) - offsetof(Node, i_val))))
+	(gkey(cast(Node *, cast(char *, (v)) - offsetof(Node, i_val))))
 
 
 LUAI_FUNC const TValue *luaH_getint (Table *t, int key);

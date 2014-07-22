@@ -57,7 +57,7 @@ public:
 	DECLARE_READ8_MEMBER( pc_aga_videoram_r );
 
 	MC6845_UPDATE_ROW( aga_update_row );
-	MC6845_UPDATE_ROW( mda_text_inten_update_row ); 
+	MC6845_UPDATE_ROW( mda_text_inten_update_row );
 	MC6845_UPDATE_ROW( mda_text_blink_update_row );
 	MC6845_UPDATE_ROW( cga_text_inten_update_row );
 	MC6845_UPDATE_ROW( cga_text_inten_alt_update_row );

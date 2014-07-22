@@ -26,7 +26,7 @@ class upd71071_device : public device_t
 public:
 	upd71071_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~upd71071_device() {}
-	
+
 	static void static_set_cpu_tag(device_t &device, const char *tag) { downcast<upd71071_device &>(device).m_cpu.set_tag(tag); }
 	static void set_clock(device_t &device, int clock) { downcast<upd71071_device &>(device).m_upd_clock = clock; }
 	template<class _Object> static devcb_base &set_out_hreq_callback(device_t &device, _Object object) { return downcast<upd71071_device &>(device).m_out_hreq_cb.set_callback(object); }
@@ -98,7 +98,7 @@ extern const device_type UPD71071;
 
 #define MCFG_UPD71071_CLOCK(_clk) \
 	upd71071_device::set_clock(*device, _clk);
-	
+
 #define MCFG_UPD71071_OUT_HREQ_CB(_devcb) \
 	devcb = &upd71071_device::set_out_hreq_callback(*device, DEVCB_##_devcb);
 

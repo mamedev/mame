@@ -25,7 +25,7 @@
 // ======================> miracle_hard_disk_t
 
 class miracle_hard_disk_t : public device_t,
-			   				public device_ql_rom_cartridge_card_interface
+							public device_ql_rom_cartridge_card_interface
 {
 public:
 	// construction/destruction

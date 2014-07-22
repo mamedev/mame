@@ -34,16 +34,16 @@
 		NET_REGISTER_DEV(4020, _name)                                          \
 		NET_CONNECT(_name, IP, _IP)                                            \
 		NET_CONNECT(_name, RESET,  _RESET)                                     \
-        NET_CONNECT(_name, VDD,  _VDD)                                         \
-        NET_CONNECT(_name, VSS,  _VSS)
+		NET_CONNECT(_name, VDD,  _VDD)                                         \
+		NET_CONNECT(_name, VSS,  _VSS)
 
 #define CD_4020_DIP(_name)                                                     \
 		NET_REGISTER_DEV(4020_dip, _name)
 
 NETLIB_SUBDEVICE(4020_sub,
 
-    NETLIB_LOGIC_FAMILY(CD4000)
-    ATTR_HOT void update_outputs(const UINT16 cnt);
+	NETLIB_LOGIC_FAMILY(CD4000)
+	ATTR_HOT void update_outputs(const UINT16 cnt);
 
 	netlist_ttl_input_t m_IP;
 
@@ -53,10 +53,10 @@ NETLIB_SUBDEVICE(4020_sub,
 );
 
 NETLIB_DEVICE(4020,
-    NETLIB_LOGIC_FAMILY(CD4000)
+	NETLIB_LOGIC_FAMILY(CD4000)
 	NETLIB_NAME(4020_sub) sub;
-    NETLIB_NAME(vdd_vss) m_supply;
-    netlist_ttl_input_t m_RESET;
+	NETLIB_NAME(vdd_vss) m_supply;
+	netlist_ttl_input_t m_RESET;
 );
 
 NETLIB_DEVICE_DERIVED(4020_dip, 4020,

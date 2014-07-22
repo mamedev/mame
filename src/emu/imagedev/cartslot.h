@@ -42,7 +42,7 @@ public:
 	static void static_set_extensions(device_t &device, const char *_extensions) { downcast<cartslot_image_device &>(device).m_extensions = _extensions; }
 	static void static_set_interface(device_t &device, const char *_interface) { downcast<cartslot_image_device &>(device).m_interface = _interface; }
 	static void static_set_must_be_loaded(device_t &device, bool _must_be_loaded) { downcast<cartslot_image_device &>(device).m_must_be_loaded = _must_be_loaded; }
-	
+
 	// image-level overrides
 	virtual bool call_load();
 	virtual void call_unload();
@@ -102,10 +102,10 @@ extern const device_type CARTSLOT;
 	cartslot_image_device::static_set_must_be_loaded(*device, TRUE);
 
 #define MCFG_CARTSLOT_LOAD(_class,_method)                                \
-    cartslot_image_device::static_set_device_load(*device, device_image_load_delegate(&DEVICE_IMAGE_LOAD_NAME(_class,_method), #_class "::device_image_load_" #_method, downcast<_class *>(owner)));
+	cartslot_image_device::static_set_device_load(*device, device_image_load_delegate(&DEVICE_IMAGE_LOAD_NAME(_class,_method), #_class "::device_image_load_" #_method, downcast<_class *>(owner)));
 
 #define MCFG_CARTSLOT_UNLOAD(_class,_method)                            \
-    cartslot_image_device::static_set_device_unload(*device, device_image_func_delegate(&DEVICE_IMAGE_UNLOAD_NAME(_class,_method), #_class "::device_image_unload_" #_method, downcast<_class *>(owner)));
+	cartslot_image_device::static_set_device_unload(*device, device_image_func_delegate(&DEVICE_IMAGE_UNLOAD_NAME(_class,_method), #_class "::device_image_unload_" #_method, downcast<_class *>(owner)));
 
 #define MCFG_CARTSLOT_PARTIALHASH(_partialhash)                  \
 	cartslot_image_device::static_set_partialhash(*device, _partialhash);

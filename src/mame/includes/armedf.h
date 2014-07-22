@@ -21,7 +21,7 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<buffered_spriteram16_device> m_spriteram;
-	
+
 	/* memory pointers */
 	UINT8 *m_text_videoram;
 	required_shared_ptr<UINT16> m_spr_pal_clut;

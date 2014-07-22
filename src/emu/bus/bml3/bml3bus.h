@@ -21,7 +21,7 @@
 
 #define MCFG_BML3BUS_CPU(_cputag) \
 	bml3bus_device::static_set_cputag(*device, _cputag);
-	
+
 #define MCFG_BML3BUS_OUT_NMI_CB(_devcb) \
 	devcb = &bml3bus_device::set_out_nmi_callback(*device, DEVCB_##_devcb);
 
@@ -79,7 +79,7 @@ public:
 	// construction/destruction
 	bml3bus_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	bml3bus_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
-	
+
 	// inline configuration
 	static void static_set_cputag(device_t &device, const char *tag);
 	template<class _Object> static devcb_base &set_out_nmi_callback(device_t &device, _Object object) { return downcast<bml3bus_device &>(device).m_out_nmi_cb.set_callback(object); }

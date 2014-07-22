@@ -62,7 +62,7 @@ public:
 	~rf5c68_device() { }
 
 	static void set_end_callback(device_t &device, rf5c68_sample_end_cb_delegate callback) { downcast<rf5c68_device &>(device).m_sample_end_cb = callback; }
-	
+
 protected:
 	// device-level overrides
 	virtual void device_start();

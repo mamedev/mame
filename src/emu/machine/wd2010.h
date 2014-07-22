@@ -87,7 +87,7 @@ public:
 	template<class _Object> static devcb_base &set_in_wf_callback(device_t &device, _Object object) { return downcast<wd2010_device &>(device).m_in_wf_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_in_tk000_callback(device_t &device, _Object object) { return downcast<wd2010_device &>(device).m_in_tk000_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_in_sc_callback(device_t &device, _Object object) { return downcast<wd2010_device &>(device).m_in_sc_cb.set_callback(object); }
-	
+
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
 

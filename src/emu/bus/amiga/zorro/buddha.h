@@ -1,11 +1,11 @@
 /***************************************************************************
 
-	Buddha
+    Buddha
 
     license: MAME, GPL-2.0+
     copyright-holders: Dirk Best
 
-	Zorro-II IDE controller
+    Zorro-II IDE controller
 
 ***************************************************************************/
 

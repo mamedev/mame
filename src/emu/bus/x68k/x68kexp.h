@@ -85,7 +85,7 @@
 
 #define MCFG_X68K_EXPANSION_SLOT_OUT_RESET_CB(_devcb) \
 	devcb = &x68k_expansion_slot_device::set_out_reset_callback(*device, DEVCB_##_devcb);
-	
+
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -115,7 +115,7 @@ public:
 	// construction/destruction
 	x68k_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	virtual ~x68k_expansion_slot_device();
-	
+
 	template<class _Object> static devcb_base &set_out_irq2_callback(device_t &device, _Object object) { return downcast<x68k_expansion_slot_device &>(device).m_out_irq2_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_out_irq4_callback(device_t &device, _Object object) { return downcast<x68k_expansion_slot_device &>(device).m_out_irq4_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_out_nmi_callback(device_t &device, _Object object) { return downcast<x68k_expansion_slot_device &>(device).m_out_nmi_cb.set_callback(object); }

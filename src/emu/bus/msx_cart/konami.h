@@ -94,22 +94,22 @@ private:
 
 
 class msx_cart_synthesizer : public device_t
-                        , public msx_cart_interface
+						, public msx_cart_interface
 {
 public:
-    msx_cart_synthesizer(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	msx_cart_synthesizer(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-    // device-level overrides
-    virtual void device_start();
+	// device-level overrides
+	virtual void device_start();
 	virtual machine_config_constructor device_mconfig_additions() const;
 
-    virtual void initialize_cartridge();
+	virtual void initialize_cartridge();
 
-    virtual DECLARE_READ8_MEMBER(read_cart);
-    virtual DECLARE_WRITE8_MEMBER(write_cart);
+	virtual DECLARE_READ8_MEMBER(read_cart);
+	virtual DECLARE_WRITE8_MEMBER(write_cart);
 
 private:
-    UINT8 *m_bank_base;
+	UINT8 *m_bank_base;
 	required_device<dac_device> m_dac;
 };
 

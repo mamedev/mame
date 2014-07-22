@@ -44,5 +44,5 @@ public:
 	required_device<cpu_device> m_audiocpu;
 	required_device<palette_device> m_palette;
 	required_shared_ptr<UINT16> m_generic_paletteram_16;
-	required_shared_ptr<UINT16> m_generic_paletteram2_16;	
+	required_shared_ptr<UINT16> m_generic_paletteram2_16;
 };

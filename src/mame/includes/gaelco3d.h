@@ -69,7 +69,7 @@ public:
 		m_serial(*this, "serial"),
 		m_screen(*this, "screen"),
 		m_paletteram16(*this, "paletteram"),
-		m_paletteram32(*this, "paletteram")	{ }
+		m_paletteram32(*this, "paletteram") { }
 
 	required_shared_ptr<UINT32> m_adsp_ram_base;
 	required_shared_ptr<UINT16> m_m68k_ram_base;

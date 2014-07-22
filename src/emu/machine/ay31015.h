@@ -68,7 +68,7 @@ public:
 	template<class _Object> static devcb_base &set_read_si_callback(device_t &device, _Object object) { return downcast<ay31015_device &>(device).m_read_si_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_write_so_callback(device_t &device, _Object object) { return downcast<ay31015_device &>(device).m_write_so_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_status_changed_callback(device_t &device, _Object object) { return downcast<ay31015_device &>(device).m_status_changed_cb.set_callback(object); }
-	
+
 	/* Set an input pin */
 	void set_input_pin( ay31015_input_pin_t pin, int data );
 
@@ -164,7 +164,7 @@ extern const device_type AY51013;   // For AY-3-1014, AY-5-1013 and AY-6-1013 va
 
 #define MCFG_AY31015_TX_CLOCK(_txclk) \
 	ay31015_device::set_tx_clock(*device, _txclk);
-	
+
 #define MCFG_AY31015_RX_CLOCK(_rxclk) \
 	ay31015_device::set_rx_clock(*device, _rxclk);
 
@@ -175,12 +175,12 @@ extern const device_type AY51013;   // For AY-3-1014, AY-5-1013 and AY-6-1013 va
 	devcb = &ay31015_device::set_write_so_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_AY31015_STATUS_CHANGED_CB(_devcb) \
-    devcb = &ay31015_device::set_status_changed_callback(*device, DEVCB_##_devcb);
-	
+	devcb = &ay31015_device::set_status_changed_callback(*device, DEVCB_##_devcb);
+
 
 #define MCFG_AY51013_TX_CLOCK(_txclk) \
 	ay51013_device::set_tx_clock(*device, _txclk);
-	
+
 #define MCFG_AY51013_RX_CLOCK(_rxclk) \
 	ay51013_device::set_rx_clock(*device, _rxclk);
 
@@ -191,6 +191,6 @@ extern const device_type AY51013;   // For AY-3-1014, AY-5-1013 and AY-6-1013 va
 	devcb = &ay51013_device::set_write_so_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_AY51013_STATUS_CHANGED_CB(_devcb) \
-    devcb = &ay51013_device::set_status_changed_callback(*device, DEVCB_##_devcb);
+	devcb = &ay51013_device::set_status_changed_callback(*device, DEVCB_##_devcb);
 
 #endif

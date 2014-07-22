@@ -37,7 +37,7 @@
 		NET_REGISTER_DEV(gnd, GND)
 
 #define DUMMY_INPUT(_name)                                                     \
-        NET_REGISTER_DEV(dummy_input, _name)
+		NET_REGISTER_DEV(dummy_input, _name)
 
 // -----------------------------------------------------------------------------
 // mainclock
@@ -122,28 +122,28 @@ private:
 class NETLIB_NAME(dummy_input) : public netlist_device_t
 {
 public:
-    ATTR_COLD NETLIB_NAME(dummy_input)()
-            : netlist_device_t(DUMMY) { }
+	ATTR_COLD NETLIB_NAME(dummy_input)()
+			: netlist_device_t(DUMMY) { }
 
-    ATTR_COLD virtual ~NETLIB_NAME(dummy_input)() {}
+	ATTR_COLD virtual ~NETLIB_NAME(dummy_input)() {}
 
 protected:
 
-    ATTR_COLD void start()
-    {
-        register_input("I", m_I);
-    }
+	ATTR_COLD void start()
+	{
+		register_input("I", m_I);
+	}
 
-    ATTR_COLD void reset()
-    {
-    }
+	ATTR_COLD void reset()
+	{
+	}
 
-    ATTR_HOT ATTR_ALIGN void update()
-    {
-    }
+	ATTR_HOT ATTR_ALIGN void update()
+	{
+	}
 
 private:
-    netlist_analog_input_t m_I;
+	netlist_analog_input_t m_I;
 
 };
 
@@ -216,12 +216,12 @@ protected:
 		register_input("I", m_I);
 	}
 
-    ATTR_COLD virtual const netlist_logic_family_desc_t *logic_family()
-    {
-        return m_logic_family;
-    }
+	ATTR_COLD virtual const netlist_logic_family_desc_t *logic_family()
+	{
+		return m_logic_family;
+	}
 
-    const netlist_logic_family_desc_t *m_logic_family;
+	const netlist_logic_family_desc_t *m_logic_family;
 private:
 };
 
@@ -266,8 +266,8 @@ class nld_d_to_a_proxy : public nld_base_d_to_a_proxy
 {
 public:
 	ATTR_COLD nld_d_to_a_proxy(netlist_output_t &out_proxied)
-    : nld_base_d_to_a_proxy(out_proxied)
-    , m_RV(TWOTERM)
+	: nld_base_d_to_a_proxy(out_proxied)
+	, m_RV(TWOTERM)
 	, m_last_state(-1)
 	{
 	}

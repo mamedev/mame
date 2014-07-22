@@ -32,7 +32,7 @@ public:
 		dev.m_x_offset = x_offset;
 		dev.m_y_offset = y_offset;
 	}
-	
+
 	// returns a BITMAP_FORMAT_IND16 bitmap the size of the screen
 	// D0-D2 of each pixel is the pixel color
 	// D3 indicates whether the S2636 drew this pixel - 0 = not drawn, 1 = drawn
@@ -65,7 +65,7 @@ private:
 	int        m_work_ram_size;
 	int        m_y_offset;
 	int        m_x_offset;
-	
+
 	int check_collision( int spriteno1, int spriteno2, const rectangle &cliprect );
 };
 

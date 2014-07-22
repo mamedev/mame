@@ -88,6 +88,5 @@ extern const input_device_default DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_7)[];
 	MCFG_DEVICE_MODIFY(_tag ) \
 	MCFG_SLOT_OPTION_ADD( _option, _type ) \
 	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS( _option, _id ) \
-	MCFG_SLOT_DEFAULT_OPTION( _option ) \
-
+	MCFG_SLOT_DEFAULT_OPTION( _option )
 #endif

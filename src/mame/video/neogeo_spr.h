@@ -20,7 +20,7 @@ class neosprite_base_device : public device_t
 {
 public:
 	neosprite_base_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock,  device_type type);
-//	neosprite_base_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+//  neosprite_base_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	virtual void optimize_sprite_data();
 	virtual void set_optimized_sprite_data(UINT8* sprdata, UINT32 mask);
@@ -70,10 +70,10 @@ public:
 
 	emu_timer  *m_auto_animation_timer;
 	emu_timer  *m_sprite_line_timer;
-	
+
 	TIMER_CALLBACK_MEMBER(auto_animation_timer_callback);
 	TIMER_CALLBACK_MEMBER(sprite_line_timer_callback);
-	
+
 
 	int m_bppshift; // 4 for 4bpp gfx (NeoGeo) 8 for 8bpp gfx (Midas)
 
@@ -128,7 +128,7 @@ class neosprite_midas_device : public neosprite_base_device
 {
 public:
 	neosprite_midas_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	virtual void draw_pixel(int romaddr, UINT32* dst, const pen_t *line_pens);
 
 	UINT16* m_videoram_buffer;
@@ -142,5 +142,3 @@ public:
 };
 
 extern const device_type NEOGEO_SPRITE_MIDAS;
-
-

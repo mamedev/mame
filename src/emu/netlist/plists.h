@@ -26,19 +26,19 @@ public:
 	{
 		m_num_elements = numElements;
 		if (m_num_elements == 0)
-		    m_list = NULL;
+			m_list = NULL;
 		else
-		    m_list = new _ListClass[m_num_elements];
+			m_list = new _ListClass[m_num_elements];
 		m_count = 0;
 	}
 
 	ATTR_COLD plinearlist_t(const plinearlist_t &rhs)
 	{
 		m_num_elements = rhs.capacity();
-        if (m_num_elements == 0)
-            m_list = NULL;
-        else
-            m_list = new _ListClass[m_num_elements];
+		if (m_num_elements == 0)
+			m_list = NULL;
+		else
+			m_list = new _ListClass[m_num_elements];
 		m_count = 0;
 		for (int i=0; i<rhs.count(); i++)
 		{
@@ -59,31 +59,31 @@ public:
 
 	ATTR_COLD ~plinearlist_t()
 	{
-	    if (m_list != NULL)
-	        delete[] m_list;
-	    m_list = NULL;
+		if (m_list != NULL)
+			delete[] m_list;
+		m_list = NULL;
 	}
 
 	ATTR_HOT inline operator _ListClass *  () { return m_list; }
-    ATTR_HOT inline operator const _ListClass * () const { return m_list; }
+	ATTR_HOT inline operator const _ListClass * () const { return m_list; }
 
-    /* using the [] operator will not allow gcc to vectorize code because
-     * basically a pointer is returned.
-     * array works around this.
-     */
+	/* using the [] operator will not allow gcc to vectorize code because
+	 * basically a pointer is returned.
+	 * array works around this.
+	 */
 
-    ATTR_HOT inline _ListClass *array() { return m_list; }
+	ATTR_HOT inline _ListClass *array() { return m_list; }
 
-    ATTR_HOT inline _ListClass& operator[](const int index) { return m_list[index]; }
-    ATTR_HOT inline const _ListClass& operator[](const int index) const { return m_list[index]; }
+	ATTR_HOT inline _ListClass& operator[](const int index) { return m_list[index]; }
+	ATTR_HOT inline const _ListClass& operator[](const int index) const { return m_list[index]; }
 
 	ATTR_HOT inline void add(const _ListClass &elem)
 	{
 		if (m_count >= m_num_elements){
-		    int new_size = m_num_elements * 2;
-		    if (new_size < 32)
-		        new_size = 32;
-            resize(new_size);
+			int new_size = m_num_elements * 2;
+			if (new_size < 32)
+				new_size = 32;
+			resize(new_size);
 		}
 
 		m_list[m_count++] = elem;
@@ -116,14 +116,14 @@ public:
 		}
 	}
 
-    ATTR_HOT inline void swap(const int pos1, const int pos2)
-    {
-        assert((pos1>=0) && (pos1<m_count));
-        assert((pos2>=0) && (pos2<m_count));
-        _ListClass tmp = m_list[pos1];
-        m_list[pos1] = m_list[pos2];
-        m_list[pos2] =tmp;
-    }
+	ATTR_HOT inline void swap(const int pos1, const int pos2)
+	{
+		assert((pos1>=0) && (pos1<m_count));
+		assert((pos2>=0) && (pos2<m_count));
+		_ListClass tmp = m_list[pos1];
+		m_list[pos1] = m_list[pos2];
+		m_list[pos2] =tmp;
+	}
 
 	ATTR_HOT inline bool contains(const _ListClass &elem) const
 	{
@@ -163,34 +163,34 @@ public:
 	}
 
 private:
-    ATTR_HOT inline void resize(const int new_size)
-    {
-        int cnt = count();
-        if (new_size > 0)
-        {
-            _ListClass *m_new = new _ListClass[new_size];
-            _ListClass *pd = m_new;
+	ATTR_HOT inline void resize(const int new_size)
+	{
+		int cnt = count();
+		if (new_size > 0)
+		{
+			_ListClass *m_new = new _ListClass[new_size];
+			_ListClass *pd = m_new;
 
-            if (cnt > new_size)
-                cnt = new_size;
-            for (_ListClass *ps = m_list; ps < m_list + cnt; ps++, pd++)
-                *pd = *ps;
-            if (m_list != NULL)
-                delete[] m_list;
-            m_list = m_new;
-            m_count = cnt;
-        }
-        else
-        {
-            if (m_list != NULL)
-                delete[] m_list;
-            m_list = NULL;
-            m_count = 0;
-        }
-        m_num_elements = new_size;
-    }
+			if (cnt > new_size)
+				cnt = new_size;
+			for (_ListClass *ps = m_list; ps < m_list + cnt; ps++, pd++)
+				*pd = *ps;
+			if (m_list != NULL)
+				delete[] m_list;
+			m_list = m_new;
+			m_count = cnt;
+		}
+		else
+		{
+			if (m_list != NULL)
+				delete[] m_list;
+			m_list = NULL;
+			m_count = 0;
+		}
+		m_num_elements = new_size;
+	}
 
-    int m_count;
+	int m_count;
 	_ListClass * m_list /* ATTR_ALIGN */;
 	int m_num_elements;
 };
@@ -203,35 +203,35 @@ template <class _C>
 class pnamedlist_t : public plinearlist_t<_C>
 {
 public:
-    _C find(const pstring name) const
-    {
-        for (int i=0; i < this->count(); i++)
-            if (get_name((*this)[i]) == name)
-                return (*this)[i];
-        return _C(NULL);
-    }
+	_C find(const pstring name) const
+	{
+		for (int i=0; i < this->count(); i++)
+			if (get_name((*this)[i]) == name)
+				return (*this)[i];
+		return _C(NULL);
+	}
 
-    void remove_by_name(const pstring name)
-    {
-        plinearlist_t<_C>::remove(find(name));
-    }
+	void remove_by_name(const pstring name)
+	{
+		plinearlist_t<_C>::remove(find(name));
+	}
 
-    bool add(_C dev, bool allow_duplicate)
-    {
-        if (allow_duplicate)
-            plinearlist_t<_C>::add(dev);
-        else
-        {
-            if (!(this->find(get_name(dev)) == _C(NULL)))
-                return false;
-            plinearlist_t<_C>::add(dev);
-        }
-        return true;
-    }
+	bool add(_C dev, bool allow_duplicate)
+	{
+		if (allow_duplicate)
+			plinearlist_t<_C>::add(dev);
+		else
+		{
+			if (!(this->find(get_name(dev)) == _C(NULL)))
+				return false;
+			plinearlist_t<_C>::add(dev);
+		}
+		return true;
+	}
 
 private:
-    template <typename T> static const pstring get_name(T &elem) { return elem.name(); }
-    template <typename T> static const pstring get_name(T *elem) { return elem->name(); }
+	template <typename T> static const pstring get_name(T &elem) { return elem.name(); }
+	template <typename T> static const pstring get_name(T *elem) { return elem->name(); }
 
 };
 

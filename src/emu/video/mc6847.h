@@ -269,11 +269,11 @@ protected:
 	// callbacks
 	devcb_write_line   m_write_hsync;
 	devcb_write_line   m_write_fsync;
-	
+
 	/* if specified, this reads the external char rom off of the driver state */
 	// moved here from mc6847_base_device so to be useable in GIME
 	mc6847_get_char_rom_delegate m_charrom_cb;
-	
+
 	// incidentals
 	character_map m_character_map;
 	artifacter m_artifacter;
@@ -546,7 +546,7 @@ protected:
 	virtual void field_sync_changed(bool line);
 	virtual void record_body_scanline(UINT16 physical_scanline, UINT16 scanline);
 	virtual void record_partial_body_scanline(UINT16 physical_scanline, UINT16 logical_scanline, INT32 start_clock, INT32 end_clock);
-	
+
 	void set_custom_palette(const pixel_t *custom_palette)
 	{
 		if ( m_palette != m_bw_palette )
@@ -568,7 +568,7 @@ private:
 	static const UINT32 s_palette[PALETTE_LENGTH];
 
 	// callbacks
-	
+
 	/* if specified, this gets called whenever reading a byte (offs_t ~0 specifies DA* entering the tristate mode) */
 	devcb_read8 m_input_cb;
 
@@ -616,7 +616,7 @@ private:
 
 	// setup functions
 	void setup_fixed_mode();
-	
+
 	// runtime functions
 	void record_body_scanline(UINT16 physical_scanline, UINT16 scanline, INT32 start_pos, INT32 end_pos);
 	pixel_t border_value(UINT8 mode, const pixel_t *palette, bool is_mc6847t1);
@@ -678,7 +678,7 @@ class s68047_device : public mc6847_base_device
 {
 public:
 	s68047_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	void hack_black_becomes_blue(bool flag);
 
 private:
@@ -687,7 +687,7 @@ private:
 
 class m5c6847p1_device : public mc6847_base_device
 {
-public:	
+public:
 	m5c6847p1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 

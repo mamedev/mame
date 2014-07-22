@@ -65,7 +65,7 @@ public:
 	template<class _Object> static devcb_base &set_zc0_callback(device_t &device, _Object object) { return downcast<z80ctc_device &>(device).m_zc0_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_zc1_callback(device_t &device, _Object object) { return downcast<z80ctc_device &>(device).m_zc1_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_zc2_callback(device_t &device, _Object object) { return downcast<z80ctc_device &>(device).m_zc2_cb.set_callback(object); }
-	
+
 	// read/write handlers
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
@@ -124,7 +124,7 @@ private:
 	devcb_write_line   m_zc1_cb;               // channel 1 zero crossing callbacks
 	devcb_write_line   m_zc2_cb;               // channel 2 zero crossing callbacks
 	devcb_write_line   m_zc3_cb;               // channel 3 zero crossing callbacks = NULL ?
-	
+
 	UINT8               m_vector;               // interrupt vector
 	attotime            m_period16;             // 16/system clock
 	attotime            m_period256;            // 256/system clock

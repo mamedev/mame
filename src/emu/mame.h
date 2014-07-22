@@ -92,27 +92,27 @@ public:
 	emu_options &options() const { return m_options; }
 	web_engine *web() { return &m_web; }
 	lua_engine *lua() { return &m_lua; }
-	
+
 	running_machine *machine() { return m_machine; }
 
 	void set_machine(running_machine *machine) { m_machine = machine; }
-	
+
 	void update_machine();
-	
+
 	/* execute as configured by the OPTION_SYSTEMNAME option on the specified options */
 	int execute();
 	void schedule_new_driver(const game_driver &driver);
 private:
 	osd_interface &         m_osd;                  // reference to OSD system
 	emu_options &           m_options;              // reference to options
-	
-	web_engine 				m_web;
-	lua_engine 		  		m_lua;
-	
-	const game_driver *     m_new_driver_pending;   // pointer to the next pending driver	
-	
-	running_machine *m_machine;	
-	static machine_manager* m_manager;	
+
+	web_engine              m_web;
+	lua_engine              m_lua;
+
+	const game_driver *     m_new_driver_pending;   // pointer to the next pending driver
+
+	running_machine *m_machine;
+	static machine_manager* m_manager;
 };
 
 //**************************************************************************

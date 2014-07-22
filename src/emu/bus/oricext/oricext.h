@@ -10,7 +10,7 @@
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
 
-#define MCFG_ORICEXT_ADD(_tag, _slot_intf, _def_slot, _cputag, _irq)	\
+#define MCFG_ORICEXT_ADD(_tag, _slot_intf, _def_slot, _cputag, _irq)    \
 	MCFG_DEVICE_ADD(_tag, ORICEXT_CONNECTOR, 0) \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false) \
 	downcast<oricext_connector *>(device)->set_cputag(_cputag); \
@@ -20,7 +20,7 @@
 class oricext_device;
 
 class oricext_connector: public device_t,
-						 public device_slot_interface
+							public device_slot_interface
 {
 public:
 	oricext_connector(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
@@ -38,7 +38,7 @@ protected:
 };
 
 class oricext_device : public device_t,
-					   public device_slot_card_interface
+						public device_slot_card_interface
 {
 public:
 	oricext_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);

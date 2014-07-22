@@ -13,12 +13,12 @@ class ATTR_ALIGNED(64) netlist_matrix_solver_direct1_t: public netlist_matrix_so
 {
 public:
 
-    netlist_matrix_solver_direct1_t(const netlist_solver_parameters_t &params)
-      : netlist_matrix_solver_direct_t<1, 1>(params, 1)
-      {}
-    ATTR_HOT inline int vsolve_non_dynamic();
+	netlist_matrix_solver_direct1_t(const netlist_solver_parameters_t &params)
+		: netlist_matrix_solver_direct_t<1, 1>(params, 1)
+		{}
+	ATTR_HOT inline int vsolve_non_dynamic();
 protected:
-    ATTR_HOT virtual double vsolve();
+	ATTR_HOT virtual double vsolve();
 private:
 };
 
@@ -28,30 +28,29 @@ private:
 
 ATTR_HOT double netlist_matrix_solver_direct1_t::vsolve()
 {
-    solve_base<netlist_matrix_solver_direct1_t>(this);
-    return this->compute_next_timestep();
+	solve_base<netlist_matrix_solver_direct1_t>(this);
+	return this->compute_next_timestep();
 }
 
 ATTR_HOT inline int netlist_matrix_solver_direct1_t::vsolve_non_dynamic()
 {
+	netlist_analog_net_t *net = m_nets[0];
+	this->build_LE();
+	//NL_VERBOSE_OUT(("%f %f\n", new_val, m_RHS[0] / m_A[0][0]);
 
-    netlist_analog_net_t *net = m_nets[0];
-    this->build_LE();
-    //NL_VERBOSE_OUT(("%f %f\n", new_val, m_RHS[0] / m_A[0][0]);
+	double new_val =  m_RHS[0] / m_A[0][0];
 
-    double new_val =  m_RHS[0] / m_A[0][0];
+	double e = (new_val - net->m_cur_Analog);
+	double cerr = fabs(e);
 
-    double e = (new_val - net->m_cur_Analog);
-    double cerr = fabs(e);
+	net->m_cur_Analog = new_val;
 
-    net->m_cur_Analog = new_val;
-
-    if (is_dynamic() && (cerr  > m_params.m_accuracy))
-    {
-        return 2;
-    }
-    else
-        return 1;
+	if (is_dynamic() && (cerr  > m_params.m_accuracy))
+	{
+		return 2;
+	}
+	else
+		return 1;
 
 }
 

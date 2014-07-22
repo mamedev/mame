@@ -1,6 +1,6 @@
 /***************************************************************************
 
-	VTech Laser Joystick Interface
+    VTech Laser Joystick Interface
 
     license: MAME, GPL-2.0+
     copyright-holders: Dirk Best

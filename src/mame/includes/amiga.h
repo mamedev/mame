@@ -254,7 +254,7 @@ Ernesto Corvi & Mariusz Wojcieszek
 #define REG_COLOR29     (0x1BA/2)   /* W    D    Color table 29 */
 #define REG_COLOR30     (0x1BC/2)   /* W    D    Color table 30 */
 #define REG_COLOR31     (0x1BE/2)   /* W    D    Color table 31 */
-#define REG_BEAMCON0	(0x1dc/2)	// W  A      Programmable signal generator (ECS Agnus)
+#define REG_BEAMCON0    (0x1dc/2)   // W  A      Programmable signal generator (ECS Agnus)
 #define REG_DIWHIGH     (0x1E4/2)   /* W  A D    Display window upper bits for start/stop */
 #define REG_FMODE       (0x1FC/2)   /* W  A D    Fetch mode */
 
@@ -316,9 +316,9 @@ Ernesto Corvi & Mariusz Wojcieszek
 
 
 // chipset
-#define IS_OCS(state)	(state->m_denise_id == 0xff)
-#define IS_ECS(state)	(state->m_denise_id == 0xfc)
-#define IS_AGA(state)	(state->m_denise_id == 0xf8)
+#define IS_OCS(state)   (state->m_denise_id == 0xff)
+#define IS_ECS(state)   (state->m_denise_id == 0xfc)
+#define IS_AGA(state)   (state->m_denise_id == 0xf8)
 
 
 class amiga_state : public driver_device
@@ -378,7 +378,7 @@ public:
 	UINT16 (*m_chip_ram_r)(amiga_state *state, offs_t offset);
 	void (*m_chip_ram_w)(amiga_state *state, offs_t offset, UINT16 data);
 
-	
+
 	/* sprite states */
 	UINT8 m_sprite_comparitor_enable_mask;
 	UINT8 m_sprite_dma_reload_mask;
@@ -446,7 +446,7 @@ public:
 	DECLARE_READ8_MEMBER( cia_1_port_a_read );
 	DECLARE_WRITE8_MEMBER( cia_1_port_a_write );
 	DECLARE_WRITE_LINE_MEMBER( cia_1_irq );
-	
+
 	DECLARE_WRITE_LINE_MEMBER( rs232_rx_w );
 	DECLARE_WRITE_LINE_MEMBER( rs232_dcd_w );
 	DECLARE_WRITE_LINE_MEMBER( rs232_dsr_w );
@@ -518,7 +518,7 @@ protected:
 	// denise/lisa chip id
 	enum
 	{
-		DENISE    = 0xffff,	// actually this register doesn't exist on ocs
+		DENISE    = 0xffff, // actually this register doesn't exist on ocs
 		DENISE_HR = 0x00fc,
 		LISA      = 0x00f8
 	};
@@ -593,27 +593,27 @@ private:
 
 	enum
 	{
-		VPOSR_LOF = 0x8000	// long frame
+		VPOSR_LOF = 0x8000  // long frame
 	};
 
 	enum
 	{
-		ADKCON_UARTBRK = 0x800	// send break
+		ADKCON_UARTBRK = 0x800  // send break
 	};
 
 	// serial port flags
 	enum
 	{
-		SERDATR_RXD   = 0x0800,	// serial data
-		SERDATR_TSRE  = 0x1000,	// transmit ready
-		SERDATR_TBE   = 0x2000,	// transmit buffer empty
-		SERDATR_RBF   = 0x4000,	// receive buffer full
-		SERDATR_OVRUN = 0x8000	// receive buffer overrun
+		SERDATR_RXD   = 0x0800, // serial data
+		SERDATR_TSRE  = 0x1000, // transmit ready
+		SERDATR_TBE   = 0x2000, // transmit buffer empty
+		SERDATR_RBF   = 0x4000, // receive buffer full
+		SERDATR_OVRUN = 0x8000  // receive buffer overrun
 	};
 
 	enum
 	{
-		SERPER_LONG = 0x8000	// 9-bit mode
+		SERPER_LONG = 0x8000    // 9-bit mode
 	};
 
 	// pot counters

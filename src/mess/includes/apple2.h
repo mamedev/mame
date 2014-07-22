@@ -77,8 +77,8 @@ enum machine_type_t
 	APPLE_II,           // Apple II/II+
 	APPLE_IIE,          // Apple IIe with aux slots
 	APPLE_IIGS,         // Apple IIgs
-	APPLE_IIC,			// Apple IIc
-	APPLE_IICPLUS,		// Apple IIc+
+	APPLE_IIC,          // Apple IIc
+	APPLE_IICPLUS,      // Apple IIc+
 	TK2000,             // Microdigital TK2000
 	LASER128,           // Laser 128/128EX/128EX2
 	SPACE84,            // "Space 84" with flipped text mode

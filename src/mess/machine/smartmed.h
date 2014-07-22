@@ -43,11 +43,11 @@ enum pointer_sm_mode_t
 // "Sequential Row Read is available only on K9F5608U0D_Y,P,V,F or K9F5608D0D_Y,P"
 enum
 {
-	NAND_CHIP_K9F5608U0D = 0,	// K9F5608U0D
-	NAND_CHIP_K9F5608U0D_J,		// K9F5608U0D-Jxxx
-	NAND_CHIP_K9F5608U0B,		// K9F5608U0B
-	NAND_CHIP_K9F1G08U0B,		// K9F1G08U0B
-	NAND_CHIP_K9LAG08U0M		// K9LAG08U0M
+	NAND_CHIP_K9F5608U0D = 0,   // K9F5608U0D
+	NAND_CHIP_K9F5608U0D_J,     // K9F5608U0D-Jxxx
+	NAND_CHIP_K9F5608U0B,       // K9F5608U0B
+	NAND_CHIP_K9F1G08U0B,       // K9F1G08U0B
+	NAND_CHIP_K9LAG08U0M        // K9LAG08U0M
 };
 
 // ======================> nand_device
@@ -133,7 +133,7 @@ public:
 				break;
 		}
 	}
-	
+
 	int is_present();
 	int is_protected();
 	int is_busy();
@@ -186,7 +186,7 @@ protected:
 	int m_col_address_cycles;
 	int m_row_address_cycles;
 	int m_sequential_row_read;
-	
+
 	devcb_write_line m_write_rnb;
 
 	#ifdef SMARTMEDIA_IMAGE_SAVE

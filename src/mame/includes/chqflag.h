@@ -47,7 +47,7 @@ public:
 	required_device<k051316_device> m_k051316_1;
 	required_device<k051316_device> m_k051316_2;
 	required_device<palette_device> m_palette;
-	
+
 	DECLARE_WRITE8_MEMBER(chqflag_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(chqflag_vreg_w);
 	DECLARE_WRITE8_MEMBER(select_analog_ctrl_w);

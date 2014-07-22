@@ -15,12 +15,10 @@ public:
 
 protected:
 	UINT8* m_ram;
-	
+
 	virtual void device_start();
 	virtual void device_reset();
 private:
 };
 
 extern const device_type EXCELLENT_SPRITE;
-
-

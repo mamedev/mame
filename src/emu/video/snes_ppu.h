@@ -54,7 +54,7 @@ enum
 struct SNES_SCANLINE
 {
 	int enable, clip;
-	
+
 	UINT16 buffer[SNES_SCR_WIDTH];
 	UINT8  priority[SNES_SCR_WIDTH];
 	UINT8  layer[SNES_SCR_WIDTH];
@@ -74,9 +74,9 @@ public:
 	template<class _Object> static devcb_base &static_set_open_bus_callback(device_t &device, _Object object) { return downcast<snes_ppu_device &>(device).m_openbus_cb.set_callback(object); }
 
 	UINT8 m_regs[0x40];
-	
+
 	SNES_SCANLINE m_scanlines[2];
-	
+
 	struct
 	{
 		/* clipmasks */
@@ -85,23 +85,23 @@ public:
 		UINT8 wlog_mask;
 		/* color math enabled */
 		UINT8 color_math;
-		
+
 		UINT8 charmap;
 		UINT8 tilemap;
 		UINT8 tilemap_size;
-		
+
 		UINT8 tile_size;
 		UINT8 mosaic_enabled;   // actually used only for layers 0->3!
-		
+
 		UINT8 main_window_enabled;
 		UINT8 sub_window_enabled;
 		UINT8 main_bg_enabled;
 		UINT8 sub_bg_enabled;
-		
+
 		UINT16 hoffs;
 		UINT16 voffs;
 	} m_layer[6]; // this is for the BG1 - BG2 - BG3 - BG4 - OBJ - color layers
-	
+
 	struct
 	{
 		UINT8 address_low;
@@ -119,7 +119,7 @@ public:
 		UINT8 flip;
 		UINT16 write_latch;
 	} m_oam;
-	
+
 	struct
 	{
 		UINT16 latch_horz;
@@ -129,7 +129,7 @@ public:
 		UINT8 last_visible_line;
 		UINT8 interlace_count;
 	} m_beam;
-	
+
 	struct
 	{
 		UINT8 repeat;
@@ -145,7 +145,7 @@ public:
 		UINT16 ver_offset;
 		UINT8 extbg;
 	} m_mode7;
-	
+
 	struct OAM
 	{
 		UINT16 tile;
@@ -153,19 +153,19 @@ public:
 		UINT8 size, vflip, hflip, priority_bits, pal;
 		int height, width;
 	};
-	
+
 	struct OAM m_oam_spritelist[SNES_SCR_WIDTH / 2];
-	
+
 	UINT8 m_oam_itemlist[32];
-	
+
 	struct TILELIST {
 		INT16 x;
 		UINT16 priority, pal, tileaddr;
 		int hflip;
 	};
-	
+
 	struct TILELIST m_oam_tilelist[34];
-	
+
 #if SNES_LAYER_DEBUG
 	struct DEBUGOPTS
 	{
@@ -180,7 +180,7 @@ public:
 	};
 	struct DEBUGOPTS m_debug_options;
 #endif
-	
+
 	UINT8 m_mosaic_size;
 	UINT8 m_clip_to_black;
 	UINT8 m_prevent_color_math;
@@ -188,13 +188,13 @@ public:
 	UINT8 m_bg3_priority_bit;
 	UINT8 m_direct_color;
 	UINT8 m_ppu_last_scroll;      /* as per Anomie's doc and Theme Park, all scroll regs shares (but mode 7 ones) the same
-								   'previous' scroll value */
+                                   'previous' scroll value */
 	UINT8 m_mode7_last_scroll;    /* as per Anomie's doc mode 7 scroll regs use a different value, shared with mode 7 matrix! */
-	
+
 	UINT8 m_ppu1_open_bus, m_ppu2_open_bus;
 	UINT8 m_ppu1_version, m_ppu2_version;
 	UINT8 m_window1_left, m_window1_right, m_window2_left, m_window2_right;
-	
+
 	UINT16 m_mosaic_table[16][4096];
 	UINT8 m_clipmasks[6][SNES_SCR_WIDTH];
 	UINT8 m_update_windows;
@@ -209,7 +209,7 @@ public:
 	UINT8 m_color_modes;
 	UINT8 m_stat77;
 	UINT8 m_stat78;
-	
+
 	UINT16                m_htmult;     /* in 512 wide, we run HTOTAL double and halve it on latching */
 	UINT16                m_cgram_address;  /* CGRAM address */
 	UINT8                 m_read_ophct;
@@ -221,7 +221,7 @@ public:
 	UINT16                m_vram_fgr_shift;
 	UINT16                m_vram_read_buffer;
 	UINT16                m_vmadd;
-	
+
 	inline UINT16 get_bgcolor(UINT8 direct_colors, UINT16 palette, UINT8 color);
 	inline void set_scanline_pixel(int screen, INT16 x, UINT16 color, UINT8 priority, UINT8 layer, int blend);
 	inline void draw_bgtile_lores(UINT8 layer, INT16 ii, UINT8 colour, UINT16 pal, UINT8 direct_colors, UINT8 priority);
@@ -249,15 +249,15 @@ public:
 	void update_offsets(void);
 	inline void draw_blend(UINT16 offset, UINT16 *colour, UINT8 prevent_color_math, UINT8 black_pen_clip, int switch_screens);
 	void refresh_scanline(running_machine &machine, bitmap_rgb32 &bitmap, UINT16 curline);
-	
+
 	void latch_counters(running_machine &machine);
 	void dynamic_res_change(running_machine &machine);
 	inline UINT32 get_vram_address(running_machine &machine);
 	UINT8 dbg_video(running_machine &machine, UINT16 curline);
-	
+
 	UINT8 read(address_space &space, UINT32 offset, UINT8 wrio_bit7);
 	void write(address_space &space, UINT32 offset, UINT8 data);
-	
+
 	DECLARE_READ8_MEMBER( oam_read );
 	DECLARE_WRITE8_MEMBER( oam_write );
 	DECLARE_READ8_MEMBER( cgram_read );
@@ -271,7 +271,7 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start();
-	virtual void device_reset() {};	
+	virtual void device_reset() {};
 
 private:
 	devcb_read16  m_openbus_cb;

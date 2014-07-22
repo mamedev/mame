@@ -1,6 +1,6 @@
 /*********************************************************************
 
-	!!! DEPRECATED, USE src/emu/wd_fdc.h FOR NEW DRIVERS !!!
+    !!! DEPRECATED, USE src/emu/wd_fdc.h FOR NEW DRIVERS !!!
 
     wd17xx.h
 
@@ -54,7 +54,7 @@ public:
 	template<class _Object> static devcb_base &set_intrq_wr_callback(device_t &device, _Object object) { return downcast<wd1770_device &>(device).m_out_intrq_func.set_callback(object); }
 	template<class _Object> static devcb_base &set_drq_wr_callback(device_t &device, _Object object) { return downcast<wd1770_device &>(device).m_out_drq_func.set_callback(object); }
 	template<class _Object> static devcb_base &set_dden_rd_callback(device_t &device, _Object object) { return downcast<wd1770_device &>(device).m_in_dden_func.set_callback(object); }
-	
+
 	static void set_drive_tags(device_t &device, const char *tag1, const char *tag2, const char *tag3, const char *tag4)
 	{
 		wd1770_device &dev = downcast<wd1770_device &>(device);
@@ -63,7 +63,7 @@ public:
 		dev.m_floppy_drive_tags[2] = tag3;
 		dev.m_floppy_drive_tags[3] = tag4;
 	}
-	
+
 	/* the following are not strictly part of the wd179x hardware/emulation
 	but will be put here for now until the flopdrv code has been finalised more */
 	void set_drive(UINT8);     /* set drive wd179x is accessing */
@@ -130,7 +130,7 @@ protected:
 	devcb_write_line m_out_intrq_func;
 	devcb_write_line m_out_drq_func;
 	devcb_read_line m_in_dden_func;
-	
+
 	const char *m_floppy_drive_tags[4];
 
 	/* input lines */

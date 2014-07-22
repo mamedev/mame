@@ -221,7 +221,7 @@ class gb_rom_licheng_device : public gb_rom_mbc5_device
 public:
 	// construction/destruction
 	gb_rom_licheng_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	virtual DECLARE_WRITE8_MEMBER(write_bank);
 };
 

@@ -45,7 +45,7 @@ public:
 	template<class _Object> static devcb_base &set_b_tx_cb(device_t &device, _Object object) { return downcast<m68307cpu_device &>(device).write_b_tx.set_callback(object); }
 	template<class _Object> static devcb_base &set_inport_cb(device_t &device, _Object object) { return downcast<m68307cpu_device &>(device).read_inport.set_callback(object); }
 	template<class _Object> static devcb_base &set_outport_cb(device_t &device, _Object object) { return downcast<m68307cpu_device &>(device).write_outport.set_callback(object); }
-	
+
 	DECLARE_WRITE_LINE_MEMBER(m68307_duart_irq_handler);
 	DECLARE_WRITE_LINE_MEMBER(m68307_duart_txa){ write_a_tx(state); }
 	DECLARE_WRITE_LINE_MEMBER(m68307_duart_txb){ write_b_tx(state);  }
@@ -69,7 +69,7 @@ public:
 	/* 68307 peripheral modules */
 	m68307_sim*    m68307SIM;
 	m68307_mbus*   m68307MBUS;
-//	m68307_serial* m68307SERIAL;
+//  m68307_serial* m68307SERIAL;
 	m68307_timer*  m68307TIMER;
 
 	UINT16 m68307_base;
@@ -94,7 +94,7 @@ public:
 	/* callbacks for internal ports */
 	void set_port_callbacks(m68307_porta_read_delegate porta_r, m68307_porta_write_delegate porta_w, m68307_portb_read_delegate portb_r, m68307_portb_write_delegate portb_w);
 	void set_interrupt(int level, int vector);
-	UINT16 get_cs(offs_t address);	
+	UINT16 get_cs(offs_t address);
 	void timer0_interrupt();
 	void timer1_interrupt();
 	void serial_interrupt(int vector);

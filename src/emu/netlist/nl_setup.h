@@ -83,7 +83,7 @@ public:
 	struct link_t
 	{
 		link_t() { }
-        link_t(void *) { }
+		link_t(void *) { }
 		// Copy constructor
 		link_t(const link_t &from)
 		{

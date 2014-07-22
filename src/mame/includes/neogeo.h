@@ -121,7 +121,7 @@ protected:
 	void set_outputs(  );
 	void set_output_latch( UINT8 data );
 	void set_output_data( UINT8 data );
-	
+
 
 
 
@@ -154,7 +154,7 @@ protected:
 	required_device<screen_device> m_screen;
 	optional_device<palette_device> m_palette;
 	optional_device<ng_memcard_device> m_memcard;
-	
+
 	// configuration
 	enum {NEOGEO_MVS, NEOGEO_AES, NEOGEO_CD} m_type;
 
@@ -495,5 +495,3 @@ ADDRESS_MAP_EXTERN(neogeo_main_map,16);
 #define ROM_Y_ZOOM \
 	ROM_REGION( 0x20000, "zoomy", 0 ) \
 	ROM_LOAD( "000-lo.lo", 0x00000, 0x20000, CRC(5a86cff2) SHA1(5992277debadeb64d1c1c64b0a92d9293eaf7e4a) )
-
-

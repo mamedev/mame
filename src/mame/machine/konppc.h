@@ -23,11 +23,11 @@ public:
 
 	static void static_set_num_boards(device_t &device, int num) { downcast<konppc_device &>(device).num_cgboards = num; }
 	static void static_set_cbboard_type(device_t &device, int cgtype) { downcast<konppc_device &>(device).cgboard_type = cgtype; }
-	
+
 	void set_cgboard_id(int board_id);
 	int get_cgboard_id(void);
 	void set_cgboard_texture_bank(int board, const char *bank, UINT8 *rom);
-	
+
 
 	// read/write
 	DECLARE_READ32_MEMBER( cgboard_dsp_comm_r_ppc );
@@ -58,7 +58,7 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start();
-	
+
 	UINT32 dsp_comm_sharc_r(int board, int offset);
 	void dsp_comm_sharc_w(address_space &space, int board, int offset, UINT32 data);
 	UINT32 dsp_shared_ram_r_sharc(int board, int offset);
@@ -67,31 +67,31 @@ protected:
 	UINT32 nwk_fifo_r(address_space &space, int board);
 	void nwk_fifo_w(int board, UINT32 data);
 private:
-	// internal state	
+	// internal state
 	UINT32 dsp_comm_ppc[MAX_CG_BOARDS][2];
 	UINT32 dsp_comm_sharc[MAX_CG_BOARDS][2];
 	UINT8 dsp_shared_ram_bank[MAX_CG_BOARDS];
-	
+
 	INT32 cgboard_id;
 	INT32 cgboard_type;
 	INT32 num_cgboards;
-	
-	UINT32 *dsp_shared_ram[MAX_CG_BOARDS];	
-	
+
+	UINT32 *dsp_shared_ram[MAX_CG_BOARDS];
+
 	UINT32 dsp_state[MAX_CG_BOARDS];
 	UINT32 nwk_device_sel[MAX_CG_BOARDS];
 	const char *texture_bank[MAX_CG_BOARDS];
-	
+
 	int nwk_fifo_half_full_r;
 	int nwk_fifo_half_full_w;
 	int nwk_fifo_full;
 	int nwk_fifo_mask;
-	
+
 	UINT32 *nwk_fifo[MAX_CG_BOARDS];
 	INT32 nwk_fifo_read_ptr[MAX_CG_BOARDS];
 	INT32 nwk_fifo_write_ptr[MAX_CG_BOARDS];
-	
-	UINT32 *nwk_ram[MAX_CG_BOARDS];	
+
+	UINT32 *nwk_ram[MAX_CG_BOARDS];
 };
 
 

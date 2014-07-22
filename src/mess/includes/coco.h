@@ -130,7 +130,7 @@ public:
 
 	// floating bus
 	DECLARE_READ8_MEMBER( floating_bus_read )   { return floating_bus_read(); }
-	
+
 	DECLARE_WRITE_LINE_MEMBER( cart_w ) { cart_w((bool) state); }
 protected:
 	// device-level overrides

@@ -2,7 +2,7 @@
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 
 <softwarelist name="hp9845b_rom" description="HP 9845B/T/C Option ROMs">
-	
+
 	<software name="mass">
 		<description>Mass Storage (Rev B)</description>
 		<year>198?</year>
@@ -16,7 +16,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="massc" cloneof="mass">
 		<description>Mass Storage (Rev C)</description>
 		<year>198?</year>
@@ -30,7 +30,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="massd" cloneof="mass">
 		<description>Mass Storage (Rev D)</description>
 		<year>198?</year>
@@ -45,7 +45,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="graphics">
 		<description>Graphics</description>
 		<year>198?</year>
@@ -59,7 +59,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="iolpu">
 		<description>I/O LPU (Rev A)</description>
 		<year>198?</year>
@@ -73,7 +73,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="iolpub" cloneof="iolpu">
 		<description>I/O LPU (Rev B)</description>
 		<year>198?</year>
@@ -87,7 +87,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="ioppu">
 		<description>I/O PPU (Rev B)</description>
 		<year>198?</year>
@@ -101,7 +101,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="ioppuc" cloneof="ioppu">
 		<description>I/O PPU (Rev C)</description>
 		<year>198?</year>
@@ -115,7 +115,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="advprog">
 		<description>Advanced Programming</description>
 		<year>198?</year>
@@ -128,7 +128,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="asmexec">
 		<description>Assembly Execution</description>
 		<year>198?</year>
@@ -142,7 +142,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="asmdev">
 		<description>Assembly Development &amp; Execution</description>
 		<year>198?</year>
@@ -158,7 +158,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="image45">
 		<description>IMAGE/45 Database Manager (Rev B)</description>
 		<year>198?</year>
@@ -178,7 +178,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="image45c" cloneof="image45">
 		<description>IMAGE/45 Database Manager (Rev C)</description>
 		<year>198?</year>
@@ -198,7 +198,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="strucprg">
 		<description>Structured Programming</description>
 		<year>198?</year>
@@ -211,7 +211,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="resmgmt">
 		<description>Resource Management</description>
 		<year>198?</year>
@@ -229,7 +229,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="test">
 		<description>Test ROM</description>
 		<year>198?</year>
@@ -243,7 +243,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="datacomm">
 		<description>BASIC Datacomm</description>
 		<year>198?</year>
@@ -259,7 +259,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="bisync">
 		<description>RJE Bisync</description>
 		<year>198?</year>
@@ -273,7 +273,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="colorgfx">
 		<description>Color Graphics</description>
 		<year>198?</year>
@@ -289,7 +289,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="enhgfx">
 		<description>Enhanced Graphics (Rev A)</description>
 		<year>198?</year>
@@ -306,7 +306,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="enhgfxb" cloneof="enhgfx">
 		<description>Enhanced Graphics (Rev B)</description>
 		<year>198?</year>

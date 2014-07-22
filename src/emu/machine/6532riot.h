@@ -50,7 +50,7 @@ public:
 	template<class _Object> static devcb_base &set_in_pb_callback(device_t &device, _Object object) { return downcast<riot6532_device &>(device).m_in_pb_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_out_pb_callback(device_t &device, _Object object) { return downcast<riot6532_device &>(device).m_out_pb_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_irq_callback(device_t &device, _Object object) { return downcast<riot6532_device &>(device).m_irq_cb.set_callback(object); }
-	
+
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
 
@@ -75,8 +75,8 @@ protected:
 		UINT8                   m_in;
 		UINT8                   m_out;
 		UINT8                   m_ddr;
-		devcb_read8         	*m_in_cb;
-		devcb_write8        	*m_out_cb;
+		devcb_read8             *m_in_cb;
+		devcb_write8            *m_out_cb;
 	};
 
 	// device-level overrides
@@ -100,7 +100,7 @@ private:
 	devcb_read8         m_in_pb_cb;
 	devcb_write8        m_out_pb_cb;
 	devcb_write_line    m_irq_cb;
-	
+
 	UINT8           m_irqstate;
 	UINT8           m_irqenable;
 	int             m_irq;

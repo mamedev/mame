@@ -1915,15 +1915,15 @@ TABLE_FUNCTION(void, set_reg, (int regnum, uint val))
 
 
 #if EXECUTION_MODE == EXECUTION_MODE_E
-#define g65816i_correct_mode()	(FLAG_E == EFLAG_SET)
+#define g65816i_correct_mode()  (FLAG_E == EFLAG_SET)
 #elif EXECUTION_MODE == EXECUTION_MODE_M0X0
-#define g65816i_correct_mode()	((FLAG_E == EFLAG_CLEAR) && (FLAG_M == MFLAG_CLEAR) && (FLAG_X == XFLAG_CLEAR))
+#define g65816i_correct_mode()  ((FLAG_E == EFLAG_CLEAR) && (FLAG_M == MFLAG_CLEAR) && (FLAG_X == XFLAG_CLEAR))
 #elif EXECUTION_MODE == EXECUTION_MODE_M0X1
-#define g65816i_correct_mode()	((FLAG_E == EFLAG_CLEAR) && (FLAG_M == MFLAG_CLEAR) && (FLAG_X == XFLAG_SET))
+#define g65816i_correct_mode()  ((FLAG_E == EFLAG_CLEAR) && (FLAG_M == MFLAG_CLEAR) && (FLAG_X == XFLAG_SET))
 #elif EXECUTION_MODE == EXECUTION_MODE_M1X0
-#define g65816i_correct_mode()	((FLAG_E == EFLAG_CLEAR) && (FLAG_M == MFLAG_SET) && (FLAG_X == XFLAG_CLEAR))
+#define g65816i_correct_mode()  ((FLAG_E == EFLAG_CLEAR) && (FLAG_M == MFLAG_SET) && (FLAG_X == XFLAG_CLEAR))
 #elif EXECUTION_MODE == EXECUTION_MODE_M1X1
-#define g65816i_correct_mode()	((FLAG_E == EFLAG_CLEAR) && (FLAG_M == MFLAG_SET) && (FLAG_X == XFLAG_SET))
+#define g65816i_correct_mode()  ((FLAG_E == EFLAG_CLEAR) && (FLAG_M == MFLAG_SET) && (FLAG_X == XFLAG_SET))
 #else
 #error Invalid EXECUTION_MODE
 #endif

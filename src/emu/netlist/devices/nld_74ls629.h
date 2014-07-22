@@ -41,7 +41,7 @@ NETLIB_SUBDEVICE(SN74LS629clk,
 
 	netlist_time m_inc;
 	netlist_state_t<netlist_sig_t> m_enableq;
-    netlist_state_t<netlist_sig_t> m_out;
+	netlist_state_t<netlist_sig_t> m_out;
 );
 
 NETLIB_DEVICE_WITH_PARAMS(SN74LS629,

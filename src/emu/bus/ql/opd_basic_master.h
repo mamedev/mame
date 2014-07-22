@@ -25,7 +25,7 @@
 // ======================> opd_basic_master_t
 
 class opd_basic_master_t : public device_t,
-			   			   public device_ql_expansion_card_interface
+							public device_ql_expansion_card_interface
 {
 public:
 	// construction/destruction

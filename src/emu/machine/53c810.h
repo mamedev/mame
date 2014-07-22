@@ -22,7 +22,7 @@ public:
 	static void set_irq_callback(device_t &device, lsi53c810_irq_delegate callback) { downcast<lsi53c810_device &>(device).m_irq_cb = callback; }
 	static void set_dma_callback(device_t &device, lsi53c810_dma_delegate callback) { downcast<lsi53c810_device &>(device).m_dma_cb = callback; }
 	static void set_fetch_callback(device_t &device, lsi53c810_fetch_delegate callback) { downcast<lsi53c810_device &>(device).m_fetch_cb = callback; }
-	
+
 	void lsi53c810_read_data(int bytes, UINT8 *pData);
 	void lsi53c810_write_data(int bytes, UINT8 *pData);
 

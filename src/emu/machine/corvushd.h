@@ -405,9 +405,9 @@ private:
 		// Put drive into prep mode command (0x11)
 		//
 		struct {
-			UINT8	code;               // Command code
-			UINT8	drive;              // Drive number (starts at 1)
-			UINT8 	prep_block[512];    // Machine code payload
+			UINT8   code;               // Command code
+			UINT8   drive;              // Drive number (starts at 1)
+			UINT8   prep_block[512];    // Machine code payload
 		} prep_mode_command;
 		//
 		// Read Firmware command (Prep Mode 0x32)
@@ -439,15 +439,15 @@ private:
 		//
 		// Verify Drive command (Prep Mode 0x07)
 		//
-		// On the real Corvus controller, this is a variable length response.  If the 
-		// number of bad sectors is greater than zero, an additional four bytes will 
-		// follow for each bad sector.  We don't emulate bad sectors, so we always 
+		// On the real Corvus controller, this is a variable length response.  If the
+		// number of bad sectors is greater than zero, an additional four bytes will
+		// follow for each bad sector.  We don't emulate bad sectors, so we always
 		// return a count of 0.  That makes this a fixed length response of 2 bytes.
 		//
 		struct {
 			UINT8   status;       // Disk access status
 			UINT8   bad_sectors;  // Number of bad sectors (always zero)
-		} verify_drive_response;		
+		} verify_drive_response;
 	} m_buffer;
 
 	// Structure of Block #1, the Disk Parameter Block

@@ -30,7 +30,7 @@ public:
 		dev.m_xoffset = x_offset;
 		dev.m_yoffset = y_offset;
 	}
-	
+
 	DECLARE_WRITE8_MEMBER ( spriteram_w );
 	DECLARE_READ8_MEMBER( spriteram_r );
 	DECLARE_WRITE16_MEMBER( spriteram_LSB_w );
