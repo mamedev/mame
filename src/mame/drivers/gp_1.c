@@ -11,6 +11,7 @@
 #include "cpu/z80/z80daisy.h"
 #include "machine/i8255.h"
 #include "machine/z80ctc.h"
+#include "gp_1.lh"
 
 class gp_1_state : public genpin_class
 {
@@ -29,7 +30,7 @@ public:
 private:
 	UINT8 m_u14;
 	UINT8 m_digit;
-	UINT8 m_sol;
+	UINT8 m_segment;
 	virtual void machine_reset();
 	required_device<cpu_device> m_maincpu;
 	required_device<z80ctc_device> m_ctc;
@@ -48,149 +49,146 @@ static ADDRESS_MAP_START( gp_1_io, AS_IO, 8, gp_1_state )
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( gp_1 )
-	PORT_START("TEST")
-	//PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Self Test") PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, gp_1_state, self_test, 0)
-
 	PORT_START("DSW0")
-	PORT_DIPNAME( 0x01, 0x01, "S01") // S1-5: 32 combinations of coins/credits of coin slot 1.
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ))
-	PORT_DIPSETTING(    0x00, DEF_STR( On ))
-	PORT_DIPNAME( 0x02, 0x00, "S02")
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ))
-	PORT_DIPSETTING(    0x00, DEF_STR( On ))
-	PORT_DIPNAME( 0x04, 0x04, "S03")
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ))
-	PORT_DIPSETTING(    0x00, DEF_STR( On ))
-	PORT_DIPNAME( 0x08, 0x08, "S04")
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ))
-	PORT_DIPSETTING(    0x00, DEF_STR( On ))
-	PORT_DIPNAME( 0x10, 0x10, "S05")
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ))
-	PORT_DIPSETTING(    0x00, DEF_STR( On ))
-	PORT_DIPNAME( 0x20, 0x20, "S06")
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ))
-	PORT_DIPSETTING(    0x00, DEF_STR( On ))
-	PORT_DIPNAME( 0x40, 0x40, "S07")
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ))
-	PORT_DIPSETTING(    0x00, DEF_STR( On ))
-	PORT_DIPNAME( 0x80, 0x80, "Free Play")
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ))
-	PORT_DIPSETTING(    0x00, DEF_STR( On ))
+	PORT_DIPNAME( 0x01, 0x00, "S01") // S1-5: 32 combinations of coins/credits of coin slot 1.
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
+	PORT_DIPSETTING(    0x01, DEF_STR( On ))
+	PORT_DIPNAME( 0x02, 0x02, "S02")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
+	PORT_DIPSETTING(    0x02, DEF_STR( On ))
+	PORT_DIPNAME( 0x04, 0x00, "S03")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
+	PORT_DIPSETTING(    0x04, DEF_STR( On ))
+	PORT_DIPNAME( 0x08, 0x00, "S04")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
+	PORT_DIPSETTING(    0x08, DEF_STR( On ))
+	PORT_DIPNAME( 0x10, 0x00, "S05")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
+	PORT_DIPSETTING(    0x10, DEF_STR( On ))
+	PORT_DIPNAME( 0x20, 0x00, "S06")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
+	PORT_DIPSETTING(    0x20, DEF_STR( On ))
+	PORT_DIPNAME( 0x40, 0x00, "S07")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
+	PORT_DIPSETTING(    0x40, DEF_STR( On ))
+	PORT_DIPNAME( 0x80, 0x00, "Free Play")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
+	PORT_DIPSETTING(    0x80, DEF_STR( On ))
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x01, 0x01, "S09") // S09-12 determine coinage for slot 2
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ))
-	PORT_DIPSETTING(    0x00, DEF_STR( On ))
-	PORT_DIPNAME( 0x02, 0x02, "S10")
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ))
-	PORT_DIPSETTING(    0x00, DEF_STR( On ))
-	PORT_DIPNAME( 0x04, 0x04, "S11")
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ))
-	PORT_DIPSETTING(    0x00, DEF_STR( On ))
-	PORT_DIPNAME( 0x08, 0x08, "S12")
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ))
-	PORT_DIPSETTING(    0x00, DEF_STR( On ))
-	PORT_DIPNAME( 0x10, 0x10, "S13")
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ))
-	PORT_DIPSETTING(    0x00, DEF_STR( On ))
-	PORT_DIPNAME( 0x20, 0x20, "S14")
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ))
-	PORT_DIPSETTING(    0x00, DEF_STR( On ))
-	PORT_DIPNAME( 0x40, 0x40, "S15")
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ))
-	PORT_DIPSETTING(    0x00, DEF_STR( On ))
+	PORT_DIPNAME( 0x01, 0x00, "S09") // S09-12 determine coinage for slot 2
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
+	PORT_DIPSETTING(    0x01, DEF_STR( On ))
+	PORT_DIPNAME( 0x02, 0x00, "S10")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
+	PORT_DIPSETTING(    0x02, DEF_STR( On ))
+	PORT_DIPNAME( 0x04, 0x00, "S11")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
+	PORT_DIPSETTING(    0x04, DEF_STR( On ))
+	PORT_DIPNAME( 0x08, 0x00, "S12")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
+	PORT_DIPSETTING(    0x08, DEF_STR( On ))
+	PORT_DIPNAME( 0x10, 0x00, "S13")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
+	PORT_DIPSETTING(    0x10, DEF_STR( On ))
+	PORT_DIPNAME( 0x20, 0x00, "S14")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
+	PORT_DIPSETTING(    0x20, DEF_STR( On ))
+	PORT_DIPNAME( 0x40, 0x00, "S15")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
+	PORT_DIPSETTING(    0x40, DEF_STR( On ))
 	PORT_DIPNAME( 0x80, 0x00, "Play Tunes")
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ))
-	PORT_DIPSETTING(    0x00, DEF_STR( On ))
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
+	PORT_DIPSETTING(    0x80, DEF_STR( On ))
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x01, 0x01, "S17") // S17-21 coins for slot 3
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ))
-	PORT_DIPSETTING(    0x00, DEF_STR( On ))
-	PORT_DIPNAME( 0x02, 0x00, "S18")
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ))
-	PORT_DIPSETTING(    0x00, DEF_STR( On ))
-	PORT_DIPNAME( 0x04, 0x04, "S19")
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ))
-	PORT_DIPSETTING(    0x00, DEF_STR( On ))
-	PORT_DIPNAME( 0x08, 0x08, "S20")
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ))
-	PORT_DIPSETTING(    0x00, DEF_STR( On ))
-	PORT_DIPNAME( 0x10, 0x10, "S21")
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ))
-	PORT_DIPSETTING(    0x00, DEF_STR( On ))
-	PORT_DIPNAME( 0x20, 0x20, "S22")
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ))
-	PORT_DIPSETTING(    0x00, DEF_STR( On ))
-	PORT_DIPNAME( 0x40, 0x40, "S23")
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ))
-	PORT_DIPSETTING(    0x00, DEF_STR( On ))
-	PORT_DIPNAME( 0x80, 0x80, "S24")
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ))
-	PORT_DIPSETTING(    0x00, DEF_STR( On ))
+	PORT_DIPNAME( 0x01, 0x00, "S17") // S17-21 coins for slot 3
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
+	PORT_DIPSETTING(    0x01, DEF_STR( On ))
+	PORT_DIPNAME( 0x02, 0x02, "S18")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
+	PORT_DIPSETTING(    0x02, DEF_STR( On ))
+	PORT_DIPNAME( 0x04, 0x00, "S19")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
+	PORT_DIPSETTING(    0x04, DEF_STR( On ))
+	PORT_DIPNAME( 0x08, 0x00, "S20")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
+	PORT_DIPSETTING(    0x08, DEF_STR( On ))
+	PORT_DIPNAME( 0x10, 0x00, "S21")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
+	PORT_DIPSETTING(    0x10, DEF_STR( On ))
+	PORT_DIPNAME( 0x20, 0x00, "S22")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
+	PORT_DIPSETTING(    0x20, DEF_STR( On ))
+	PORT_DIPNAME( 0x40, 0x00, "S23")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
+	PORT_DIPSETTING(    0x40, DEF_STR( On ))
+	PORT_DIPNAME( 0x80, 0x00, "S24")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
+	PORT_DIPSETTING(    0x80, DEF_STR( On ))
 
 	PORT_START("DSW3")
-	PORT_DIPNAME( 0x07, 0x00, "Max number of credits")
-	PORT_DIPSETTING(    0x07, "5" )
-	PORT_DIPSETTING(    0x06, "10")
-	PORT_DIPSETTING(    0x05, "15")
-	PORT_DIPSETTING(    0x04, "20")
-	PORT_DIPSETTING(    0x03, "25")
-	PORT_DIPSETTING(    0x02, "30")
-	PORT_DIPSETTING(    0x01, "35")
-	PORT_DIPSETTING(    0x00, "40")
-	PORT_DIPNAME( 0x08, 0x00, "Balls")
-	PORT_DIPSETTING(    0x00, "5")
-	PORT_DIPSETTING(    0x08, "3")
-	PORT_DIPNAME( 0x10, 0x00, "Award")
-	PORT_DIPSETTING(    0x00, "Replay")
-	PORT_DIPSETTING(    0x10, "Extra Ball")
-	PORT_DIPNAME( 0x20, 0x00, "Match")
-	PORT_DIPSETTING(    0x00, DEF_STR( On ))
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ))
-	PORT_DIPNAME( 0xC0, 0x40, "Credits for exceeding high score")
-	PORT_DIPSETTING(    0xC0, "0")
-	PORT_DIPSETTING(    0x80, "1")
-	PORT_DIPSETTING(    0x40, "2")
+	PORT_DIPNAME( 0x07, 0x07, "Max number of credits")
+	PORT_DIPSETTING(    0x00, "5" )
+	PORT_DIPSETTING(    0x01, "10")
+	PORT_DIPSETTING(    0x02, "15")
+	PORT_DIPSETTING(    0x03, "20")
+	PORT_DIPSETTING(    0x04, "25")
+	PORT_DIPSETTING(    0x05, "30")
+	PORT_DIPSETTING(    0x06, "35")
+	PORT_DIPSETTING(    0x07, "40")
+	PORT_DIPNAME( 0x08, 0x08, "Balls")
 	PORT_DIPSETTING(    0x00, "3")
+	PORT_DIPSETTING(    0x08, "5")
+	PORT_DIPNAME( 0x10, 0x10, "Award")
+	PORT_DIPSETTING(    0x00, "Extra Ball")
+	PORT_DIPSETTING(    0x10, "Replay")
+	PORT_DIPNAME( 0x20, 0x20, "Match")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
+	PORT_DIPSETTING(    0x20, DEF_STR( On ))
+	PORT_DIPNAME( 0xC0, 0x80, "Credits for exceeding high score")
+	PORT_DIPSETTING(    0x00, "0")
+	PORT_DIPSETTING(    0x40, "1")
+	PORT_DIPSETTING(    0x80, "2")
+	PORT_DIPSETTING(    0xC0, "3")
 
 	PORT_START("X7")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Accounting Reset")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_TILT1 ) PORT_NAME("Slam Tilt")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN3 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_TILT )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_NAME("Accounting Reset")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START1 )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_TILT1 ) PORT_NAME("Slam Tilt")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN2 )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN3 )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN1 )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_TILT )
 
 	PORT_START("X8")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("L and R Target") PORT_CODE(KEYCODE_A)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Spinner C") PORT_CODE(KEYCODE_S)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Outhole") PORT_CODE(KEYCODE_X)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Spinner B") PORT_CODE(KEYCODE_D)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("R. Slingshot") PORT_CODE(KEYCODE_F)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Special when lit") PORT_CODE(KEYCODE_G)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("L. Slingshot") PORT_CODE(KEYCODE_H)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Extra when lit") PORT_CODE(KEYCODE_J)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("L and R Target") PORT_CODE(KEYCODE_A)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Spinner C") PORT_CODE(KEYCODE_S)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Outhole") PORT_CODE(KEYCODE_X)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Spinner B") PORT_CODE(KEYCODE_D)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("R. Slingshot") PORT_CODE(KEYCODE_F)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Special when lit") PORT_CODE(KEYCODE_G)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("L. Slingshot") PORT_CODE(KEYCODE_H)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Extra when lit") PORT_CODE(KEYCODE_J)
 
 	PORT_START("X9")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("R. Spinner") PORT_CODE(KEYCODE_K)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("1000 and advance") PORT_CODE(KEYCODE_L)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Advance and Change") PORT_CODE(KEYCODE_Z)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("L. Bumper") PORT_CODE(KEYCODE_C)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("R. Bumper") PORT_CODE(KEYCODE_V)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("L. Spinner") PORT_CODE(KEYCODE_B)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Spinner A") PORT_CODE(KEYCODE_N)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("R. Spinner") PORT_CODE(KEYCODE_K)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("1000 and advance") PORT_CODE(KEYCODE_L)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Advance and Change") PORT_CODE(KEYCODE_Z)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("L. Bumper") PORT_CODE(KEYCODE_C)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("R. Bumper") PORT_CODE(KEYCODE_V)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("L. Spinner") PORT_CODE(KEYCODE_B)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Spinner A") PORT_CODE(KEYCODE_N)
 
 	PORT_START("XA")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("1000 Rollover") PORT_CODE(KEYCODE_M)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("1000 Rollover") PORT_CODE(KEYCODE_M)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE1 )
+	PORT_BIT( 0xfc, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("XB")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
 READ8_MEMBER( gp_1_state::portb_r )
@@ -222,10 +220,10 @@ READ8_MEMBER( gp_1_state::portb_r )
 WRITE8_MEMBER( gp_1_state::porta_w )
 {
 	m_u14 = data >> 4;
+	/*if (m_u14 >= 8)*/ m_segment = data & 15;
 	if ((data > 0x0f) && (data < 0x30))
 	{
-		m_sol = data;
-		switch (m_sol)
+		switch (data)
 		{
 			case 0x10:
 				break;
@@ -265,24 +263,29 @@ WRITE8_MEMBER( gp_1_state::porta_w )
 				break;
 		}
 	}
+	static const UINT8 patterns[16] = { 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7c,0x07,0x7f,0x67,0x58,0x4c,0x62,0x69,0x78,0x00 }; // 7448
+	if ((m_u14 >= 8) && (m_u14 <= 11))
+	{
+		output_set_digit_value(m_digit+(m_u14-8)*8, patterns[m_segment]);
+	}
 }
 
 WRITE8_MEMBER( gp_1_state::portc_w )
 {
-	if (BIT(data, 4))
-		m_digit = data & 7;
-	else
-		m_digit = 0xff;
+	output_set_value("led0", BIT(data, 3));
+
+	m_digit = data & 7;
+	static const UINT8 patterns[16] = { 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7c,0x07,0x7f,0x67,0x58,0x4c,0x62,0x69,0x78,0x00 }; // 7448
+	if ((m_digit) && (m_u14 >= 8) && (m_u14 <= 11))
+	{
+		output_set_digit_value(m_digit+(m_u14-8)*8, patterns[m_segment]);
+	}
 }
 
 void gp_1_state::machine_reset()
 {
 	m_u14 = 0;
 	m_digit = 0xff;
-}
-
-DRIVER_INIT_MEMBER(gp_1_state,gp_1)
-{
 }
 
 // zero-cross detection
@@ -304,6 +307,9 @@ static MACHINE_CONFIG_START( gp_1, gp_1_state )
 	MCFG_CPU_PROGRAM_MAP(gp_1_map)
 	MCFG_CPU_IO_MAP(gp_1_io)
 	MCFG_CPU_CONFIG(daisy_chain)
+
+	/* Video */
+	MCFG_DEFAULT_LAYOUT(layout_gp_1)
 
 	/* Sound */
 	MCFG_FRAGMENT_ADD( genpin_audio )
@@ -371,12 +377,12 @@ ROM_START(startrip)
 	ROM_LOAD( "startrip.u13", 0x0800, 0x0800, CRC(b941a1a8) SHA1(a43f8acadb3db3e2274162d5305e30006f912339))
 ROM_END
 
-GAME(1978, gp_110,   0,        gp_1,     gp_1,     gp_1_state,  gp_1,   ROT0, "Game Plan", "Model 110",    GAME_IS_BIOS_ROOT)
-GAME(1978, blvelvet, gp_110,   gp_1,     gp_1,     gp_1_state,  gp_1,   ROT0, "Game Plan", "Black Velvet", GAME_IS_SKELETON_MECHANICAL)
-GAME(1978, camlight, gp_110,   gp_1,     gp_1,     gp_1_state,  gp_1,   ROT0, "Game Plan", "Camel Lights", GAME_IS_SKELETON_MECHANICAL)
-GAME(1978, foxylady, gp_110,   gp_1,     gp_1,     gp_1_state,  gp_1,   ROT0, "Game Plan", "Foxy Lady",    GAME_IS_SKELETON_MECHANICAL)
-GAME(1978, real,     gp_110,   gp_1,     gp_1,     gp_1_state,  gp_1,   ROT0, "Game Plan", "Real",         GAME_IS_SKELETON_MECHANICAL)
-GAME(1978, rio,      gp_110,   gp_1,     gp_1,     gp_1_state,  gp_1,   ROT0, "Game Plan", "Rio",          GAME_IS_SKELETON_MECHANICAL)
-GAME(1978, chucklck, gp_110,   gp_1,     gp_1,     gp_1_state,  gp_1,   ROT0, "Game Plan", "Chuck-A-Luck", GAME_IS_SKELETON_MECHANICAL)
-GAME(1979, famlyfun, 0,        gp_1,     gp_1,     gp_1_state,  gp_1,   ROT0, "Game Plan", "Family Fun!",  GAME_IS_SKELETON_MECHANICAL)
-GAME(1979, startrip, 0,        gp_1,     gp_1,     gp_1_state,  gp_1,   ROT0, "Game Plan", "Star Trip",    GAME_IS_SKELETON_MECHANICAL)
+GAME(1978, gp_110,   0,        gp_1,     gp_1,     driver_device, 0,   ROT0, "Game Plan", "Model 110",    GAME_IS_BIOS_ROOT)
+GAME(1978, blvelvet, gp_110,   gp_1,     gp_1,     driver_device, 0,   ROT0, "Game Plan", "Black Velvet", GAME_IS_SKELETON_MECHANICAL)
+GAME(1978, camlight, gp_110,   gp_1,     gp_1,     driver_device, 0,   ROT0, "Game Plan", "Camel Lights", GAME_IS_SKELETON_MECHANICAL)
+GAME(1978, foxylady, gp_110,   gp_1,     gp_1,     driver_device, 0,   ROT0, "Game Plan", "Foxy Lady",    GAME_IS_SKELETON_MECHANICAL)
+GAME(1978, real,     gp_110,   gp_1,     gp_1,     driver_device, 0,   ROT0, "Game Plan", "Real",         GAME_IS_SKELETON_MECHANICAL)
+GAME(1978, rio,      gp_110,   gp_1,     gp_1,     driver_device, 0,   ROT0, "Game Plan", "Rio",          GAME_IS_SKELETON_MECHANICAL)
+GAME(1978, chucklck, gp_110,   gp_1,     gp_1,     driver_device, 0,   ROT0, "Game Plan", "Chuck-A-Luck", GAME_IS_SKELETON_MECHANICAL)
+GAME(1979, famlyfun, 0,        gp_1,     gp_1,     driver_device, 0,   ROT0, "Game Plan", "Family Fun!",  GAME_IS_SKELETON_MECHANICAL)
+GAME(1979, startrip, 0,        gp_1,     gp_1,     driver_device, 0,   ROT0, "Game Plan", "Star Trip",    GAME_IS_SKELETON_MECHANICAL)

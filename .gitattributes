@@ -6516,6 +6516,7 @@ src/mame/layout/goldenc.lay svneol=native#text/xml
 src/mame/layout/goldnpkr.lay svneol=native#text/xml
 src/mame/layout/goldstar.lay svneol=native#text/xml
 src/mame/layout/gorf.lay svneol=native#text/xml
+src/mame/layout/gp_1.lay svneol=native#text/plain
 src/mame/layout/grchamp.lay svneol=native#text/xml
 src/mame/layout/gridiron.lay svneol=native#text/xml
 src/mame/layout/gunchamp.lay svneol=native#text/xml
