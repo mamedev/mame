@@ -202,6 +202,7 @@ READ16_MEMBER(kaneko_hit_device::kaneko_hit_type0_r)
 WRITE16_MEMBER(kaneko_hit_device::kaneko_hit_type0_w)
 {
 	calc1_hit_t &hit = m_hit;
+	data &= mem_mask;
 
 	switch (offset)
 	{
@@ -294,6 +295,7 @@ READ16_MEMBER(kaneko_hit_device::kaneko_hit_type1_r)
 WRITE16_MEMBER(kaneko_hit_device::kaneko_hit_type1_w)
 {
 	calc1_hit_t &hit = m_hit;
+	data &= mem_mask;
 
 	switch (offset)
 	{
@@ -365,6 +367,8 @@ INT16 kaneko_hit_device::calc_compute_y(calc1_hit_t &hit)
 WRITE16_MEMBER(kaneko_hit_device::kaneko_hit_type2_w)
 {
 	calc3_hit_t &hit3 = m_hit3;
+	data &= mem_mask;
+
 	int idx=offset*4;
 	switch (idx)
 	{
