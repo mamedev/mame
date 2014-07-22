@@ -58,4 +58,3 @@ WRITE8_MEMBER(msx_cart_superloderunner::banking)
 	m_selected_bank = data;
 	restore_banks();
 }
-

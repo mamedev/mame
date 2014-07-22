@@ -25,14 +25,14 @@ void msx_cart_nomapper::initialize_cartridge()
 	// determine start address
 	// default to $4000
 	m_start_address = 0x4000;
-	
+
 	switch (size)
 	{
 		/* 8KB/16KB */
 		case 0x2000: case 0x4000:
 		{
 			UINT16 start = rom[3] << 8 | rom[2];
-			
+
 			// start address of $0000: call address in the $4000 region: $4000, else $8000
 			if (start == 0)
 			{
@@ -41,11 +41,11 @@ void msx_cart_nomapper::initialize_cartridge()
 				else
 					m_start_address = 0x8000;
 			}
-			
+
 			// start address in the $8000 region: $8000, else default
 			else if ((start & 0xc000) == 0x8000)
 				m_start_address = 0x8000;
-			
+
 			break;
 		}
 
@@ -55,12 +55,12 @@ void msx_cart_nomapper::initialize_cartridge()
 			if (rom[0] != 'A' && rom[1] != 'B' && rom[0x4000] == 'A' && rom[0x4001] == 'B')
 			{
 				UINT16 start = rom[0x4003] << 8 | rom[0x4002];
-				
+
 				// start address of $0000 and call address in the $4000 region, or start address outside the $8000 region: $0000, else default
 				if ((start == 0 && (rom[0x4005] & 0xc0) == 0x40) || start < 0x8000 || start >= 0xc000)
 					m_start_address = 0;
 			}
-			
+
 			break;
 
 		/* 48KB */
@@ -70,9 +70,9 @@ void msx_cart_nomapper::initialize_cartridge()
 				m_start_address = 0x4000;
 			else
 				m_start_address = 0;
-			
+
 			break;
-		
+
 		/* 64KB */
 		default:
 			m_start_address = 0;
@@ -90,4 +90,3 @@ READ8_MEMBER(msx_cart_nomapper::read_cart)
 	}
 	return 0xff;
 }
-

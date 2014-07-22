@@ -140,13 +140,13 @@ INPUT_PORTS_END
 
 void mbc200_state::machine_start()
 {
-//	floppy_image_device *floppy = NULL;
-//	floppy = m_floppy0->get_device();
+//  floppy_image_device *floppy = NULL;
+//  floppy = m_floppy0->get_device();
 // floppy1 not supported currently
-//	m_fdc->set_floppy(floppy);
+//  m_fdc->set_floppy(floppy);
 
-//	if (floppy)
-//		floppy->mon_w(0);
+//  if (floppy)
+//      floppy->mon_w(0);
 
 	m_floppy0->floppy_mon_w(0);
 	m_floppy1->floppy_mon_w(0);
@@ -169,7 +169,7 @@ static const floppy_interface mbc200_floppy_interface =
 };
 
 //static SLOT_INTERFACE_START( mbc200_floppies )
-//	SLOT_INTERFACE( "525dd", FLOPPY_525_SSDD )
+//  SLOT_INTERFACE( "525dd", FLOPPY_525_SSDD )
 //SLOT_INTERFACE_END
 
 MC6845_UPDATE_ROW( mbc200_state::update_row )

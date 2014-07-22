@@ -208,7 +208,7 @@ public:
 	DECLARE_DRIVER_INIT(ryukobou);
 	TIMER_DEVICE_CALLBACK_MEMBER(lev5_timer_irq_cb);
 	TIMER_DEVICE_CALLBACK_MEMBER(lhb_timer_irq_cb);
-	TIMER_DEVICE_CALLBACK_MEMBER(lev3_timer_irq_cb);	
+	TIMER_DEVICE_CALLBACK_MEMBER(lev3_timer_irq_cb);
 	virtual void video_start();
 	UINT32 screen_update_igs011(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_vbowl(screen_device &screen, bool state);

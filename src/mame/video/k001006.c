@@ -31,7 +31,6 @@ k001006_device::k001006_device(const machine_config &mconfig, const char *tag, d
 
 void k001006_device::device_config_complete()
 {
-
 }
 
 //-------------------------------------------------
@@ -46,7 +45,7 @@ void k001006_device::device_start()
 
 	m_gfxrom = machine().root_device().memregion(m_gfx_region)->base();
 	m_texrom = auto_alloc_array(machine(), UINT8, 0x800000);
-	
+
 	preprocess_texture_data(m_texrom, m_gfxrom, 0x800000, m_tex_layout);
 
 	save_pointer(NAME(m_pal_ram), 0x800*sizeof(UINT16));

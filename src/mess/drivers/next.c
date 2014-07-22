@@ -13,7 +13,7 @@
 
     - Really implement the MO, it's only faking it for the startup test right now
 
-	- Fix the networking
+    - Fix the networking
 
     - Find out why netbsd goes to hell even before loading the kernel
 

@@ -16,7 +16,6 @@ sbp_prot_device::sbp_prot_device(const machine_config &mconfig, const char *tag,
 
 void sbp_prot_device::device_start()
 {
-
 }
 
 void sbp_prot_device::device_reset()

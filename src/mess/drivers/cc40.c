@@ -42,14 +42,14 @@
   AMI 1041036-1 - 68-pin QFP AMI Gate Array
   HD44100H      - 60-pin QFP Hitachi HD44100 LCD Driver
   HD44780A00    - 80-pin TFP Hitachi HD44780 LCD Controller
-  
+
   *             - indicates that it's on the other side of the PCB
-  
-  
+
+
   CC-40 is powered by 4 AA batteries. These will also save internal RAM,
   provided that the machine is turned off properly. If a program is running,
   you may have to press [BREAK] before turning the CC-40 off.
-  
+
   To run a cartridge, usually the command RUN "DIR" shows which program(s)
   can be loaded. Load a program by pressing the [RUN] key while viewing the list,
   or manually with the command RUN "<shortname of program in list>"
@@ -90,14 +90,14 @@ public:
 
 	required_device<tms70c20_device> m_maincpu;
 	required_device<dac_device> m_dac;
-	
+
 	ioport_port *m_key_matrix[8];
 
 	UINT8 m_power;
 	UINT8 m_banks;
 	UINT8 m_clock_control;
 	UINT8 m_key_select;
-	
+
 	void update_lcd_indicator(UINT8 y, UINT8 x, int state);
 
 	DECLARE_READ8_MEMBER(bus_control_r);
@@ -215,7 +215,7 @@ WRITE8_MEMBER(cc40_state::power_w)
 {
 	// d0: power-on hold latch
 	m_power = data & 1;
-	
+
 	// stop running
 	if (!m_power)
 		m_maincpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
@@ -242,7 +242,7 @@ WRITE8_MEMBER(cc40_state::bankswitch_w)
 {
 	// d0-d1: system rom bankswitch
 	membank("sysbank")->set_entry(data & 3);
-	
+
 	// d2-d3: cartridge rom bankswitch
 	membank("cartbank")->set_entry(data >> 2 & 3);
 
@@ -271,7 +271,7 @@ WRITE8_MEMBER(cc40_state::clock_w)
 		// high to low
 		m_maincpu->set_clock_scale(1);
 	}
-	
+
 	m_clock_control = data & 0x0f;
 }
 
@@ -285,7 +285,7 @@ READ8_MEMBER(cc40_state::keyboard_r)
 		if (m_key_select >> i & 1)
 			ret |= m_key_matrix[i]->read();
 	}
-	
+
 	return ret;
 }
 
@@ -427,7 +427,7 @@ INPUT_PORTS_END
 void cc40_state::machine_reset()
 {
 	m_power = 1;
-	
+
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	bankswitch_w(space, 0, 0);
 }
@@ -437,7 +437,7 @@ void cc40_state::machine_start()
 	static const char *const tags[] = { "IN0", "IN1", "IN2", "IN3", "IN4", "IN5", "IN6", "IN7" };
 	for (int i = 0; i < 8; i++)
 		m_key_matrix[i] = ioport(tags[i]);
-	
+
 	membank("sysbank")->configure_entries(0, 4, memregion("system")->base(), 0x2000);
 	membank("cartbank")->configure_entries(0, 4, memregion("user1")->base(), 0x8000);
 
@@ -446,7 +446,7 @@ void cc40_state::machine_start()
 	m_banks = 0;
 	m_clock_control = 0;
 	m_key_select = 0;
-	
+
 	// register for savestates
 	save_item(NAME(m_power));
 	save_item(NAME(m_banks));
@@ -511,7 +511,7 @@ ROM_START( cc40 )
 
 	ROM_REGION( 0x8000, "system", 0 )
 	ROM_LOAD( "cc40.bin",     0x0000, 0x8000, CRC(f5322fab) SHA1(1b5c4052a53654363c458f75eac7a27f0752def6) ) // system rom, banked
-	
+
 	ROM_REGION( 0x20000, "user1", ROMREGION_ERASEFF ) // cartridge area, max 4*32KB
 ROM_END
 

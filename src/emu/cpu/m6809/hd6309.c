@@ -180,24 +180,24 @@ void hd6309_device::device_reset()
 
 void hd6309_device::device_pre_save()
 {
-	if      (m_reg8 == &m_d.b.h)	m_reg = HD6309_A;
-	else if (m_reg8 == &m_d.b.l)	m_reg = HD6309_B;
-	else if (m_reg8 == &m_w.b.h)	m_reg = HD6309_E;
-	else if (m_reg8 == &m_w.b.l)	m_reg = HD6309_F;
-	else if (m_reg8 == &m_cc)		m_reg = HD6309_CC;
-	else if (m_reg8 == &m_dp)		m_reg = HD6309_DP;
-	else if (m_reg8 == &m_md)		m_reg = HD6309_MD;
-	else if (m_reg8 == &m_temp.b.l)	m_reg = HD6309_ZERO_BYTE;
+	if      (m_reg8 == &m_d.b.h)    m_reg = HD6309_A;
+	else if (m_reg8 == &m_d.b.l)    m_reg = HD6309_B;
+	else if (m_reg8 == &m_w.b.h)    m_reg = HD6309_E;
+	else if (m_reg8 == &m_w.b.l)    m_reg = HD6309_F;
+	else if (m_reg8 == &m_cc)       m_reg = HD6309_CC;
+	else if (m_reg8 == &m_dp)       m_reg = HD6309_DP;
+	else if (m_reg8 == &m_md)       m_reg = HD6309_MD;
+	else if (m_reg8 == &m_temp.b.l) m_reg = HD6309_ZERO_BYTE;
 
-	else if (m_reg16 == &m_d)		m_reg = HD6309_D;
-	else if (m_reg16 == &m_x)		m_reg = HD6309_X;
-	else if (m_reg16 == &m_y)		m_reg = HD6309_Y;
-	else if (m_reg16 == &m_u)		m_reg = HD6309_U;
-	else if (m_reg16 == &m_s)		m_reg = HD6309_S;
-	else if (m_reg16 == &m_pc)		m_reg = HD6309_PC;
-	else if (m_reg16 == &m_w)		m_reg = HD6309_W;
-	else if (m_reg16 == &m_v)		m_reg = HD6309_V;
-	else if (m_reg16 == &m_temp)	m_reg = HD6309_ZERO_WORD;
+	else if (m_reg16 == &m_d)       m_reg = HD6309_D;
+	else if (m_reg16 == &m_x)       m_reg = HD6309_X;
+	else if (m_reg16 == &m_y)       m_reg = HD6309_Y;
+	else if (m_reg16 == &m_u)       m_reg = HD6309_U;
+	else if (m_reg16 == &m_s)       m_reg = HD6309_S;
+	else if (m_reg16 == &m_pc)      m_reg = HD6309_PC;
+	else if (m_reg16 == &m_w)       m_reg = HD6309_W;
+	else if (m_reg16 == &m_v)       m_reg = HD6309_V;
+	else if (m_reg16 == &m_temp)    m_reg = HD6309_ZERO_WORD;
 	else
 		m_reg = 0;
 }

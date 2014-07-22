@@ -177,7 +177,7 @@ file_error osd_get_full_path(char **dst, const char *path)
 		*dst = (char *)osd_malloc_array(strlen(path) + 1);
 		if (*dst != NULL)
 			strcpy(*dst, path);
-	}	
+	}
 
 	return FILERR_NONE;
 }

@@ -1712,7 +1712,7 @@ static MACHINE_CONFIG_START( captaven, deco32_state )
 	MCFG_DECO16IC_GFXDECODE("gfxdecode")
 	MCFG_DECO16IC_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("tilegen2", DECO16IC, 0)	// pf3 is in 8bpp mode, pf4 is not used
+	MCFG_DEVICE_ADD("tilegen2", DECO16IC, 0)    // pf3 is in 8bpp mode, pf4 is not used
 	MCFG_DECO16IC_SPLIT(0)
 	MCFG_DECO16IC_WIDTH12(0)
 	MCFG_DECO16IC_PF1_TRANS_MASK(0xff)
@@ -1777,7 +1777,7 @@ DECO16IC_BANK_CB_MEMBER(deco32_state::fghthist_bank_callback)
 {
 	bank = bank >> 4;
 	bank = (bank & 1) | ((bank & 4) >> 1) | ((bank & 2) << 1);
-	
+
 	return bank * 0x1000;
 }
 
@@ -2129,7 +2129,7 @@ static MACHINE_CONFIG_START( lockload, dragngun_state )
 
 	MCFG_DEVICE_ADD("tilegen2", DECO16IC, 0)
 	MCFG_DECO16IC_SPLIT(0)
-	MCFG_DECO16IC_WIDTH12(0)	// lockload definitely wants pf34 half width..
+	MCFG_DECO16IC_WIDTH12(0)    // lockload definitely wants pf34 half width..
 	MCFG_DECO16IC_PF1_TRANS_MASK(0xff)
 	MCFG_DECO16IC_PF2_TRANS_MASK(0xff)
 	MCFG_DECO16IC_PF1_COL_BANK(0x04)
@@ -2146,7 +2146,7 @@ static MACHINE_CONFIG_START( lockload, dragngun_state )
 	MCFG_DEVICE_ADD("spritegen_zoom", DECO_ZOOMSPR, 0)
 	MCFG_DECO_ZOOMSPR_GFXDECODE("gfxdecode")
 	MCFG_DECO_ZOOMSPR_PALETTE("palette")
-	
+
 	MCFG_DECO146_ADD("ioprot")
 	MCFG_DECO146_SET_SOUNDLATCH_CALLBACK(deco32_state, deco32_sound_cb)
 	MCFG_DECO146_SET_INTERFACE_SCRAMBLE_REVERSE

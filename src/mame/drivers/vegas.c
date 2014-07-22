@@ -475,7 +475,7 @@ public:
 	required_shared_ptr<UINT32> m_rombase;
 	required_device<dcs_audio_device> m_dcs;
 	required_device<midway_ioasic_device> m_ioasic;
-	
+
 	UINT16 m_nile_irq_state;
 	UINT16 m_ide_irq_state;
 	UINT32 m_pci_bridge_regs[0x40];
@@ -1564,7 +1564,7 @@ void vegas_state::remap_dynamic_addresses()
 
 	/* the build the list of stuff */
 	m_dynamic_count = 0;
-	
+
 	/* DCS2 */
 	base = m_nile_regs[NREG_DCS2] & 0x1fffff00;
 	if (base >= m_rambase.bytes())
@@ -2265,7 +2265,7 @@ static MACHINE_CONFIG_DERIVED( vegasban, vegascore )
 	MCFG_VOODOO_FBMEM(16)
 	MCFG_VOODOO_SCREEN_TAG("screen")
 	MCFG_VOODOO_CPU_TAG("maincpu")
-	MCFG_VOODOO_VBLANK_CB(WRITELINE(vegas_state,vblank_assert))	
+	MCFG_VOODOO_VBLANK_CB(WRITELINE(vegas_state,vblank_assert))
 MACHINE_CONFIG_END
 
 
@@ -2303,7 +2303,7 @@ MACHINE_CONFIG_END
 // Per driver configs
 
 static MACHINE_CONFIG_DERIVED( gauntleg, vegas )
-	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_2104, 0)	
+	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_2104, 0)
 	MCFG_DCS2_AUDIO_DRAM_IN_MB(4)
 	MCFG_DCS2_AUDIO_POLLING_OFFSET(0x0b5d)
 
@@ -2316,7 +2316,7 @@ static MACHINE_CONFIG_DERIVED( gauntleg, vegas )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( gauntdl, vegas )
-	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_2104, 0)	
+	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_2104, 0)
 	MCFG_DCS2_AUDIO_DRAM_IN_MB(4)
 	MCFG_DCS2_AUDIO_POLLING_OFFSET(0x0b5d)
 
@@ -2329,7 +2329,7 @@ static MACHINE_CONFIG_DERIVED( gauntdl, vegas )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( warfa, vegas250 )
-	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_2104, 0)	
+	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_2104, 0)
 	MCFG_DCS2_AUDIO_DRAM_IN_MB(4)
 	MCFG_DCS2_AUDIO_POLLING_OFFSET(0x0b5d)
 
@@ -2342,7 +2342,7 @@ static MACHINE_CONFIG_DERIVED( warfa, vegas250 )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( tenthdeg, vegas )
-	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_2104, 0)	
+	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_2104, 0)
 	MCFG_DCS2_AUDIO_DRAM_IN_MB(4)
 	MCFG_DCS2_AUDIO_POLLING_OFFSET(0x0afb)
 
@@ -2355,7 +2355,7 @@ static MACHINE_CONFIG_DERIVED( tenthdeg, vegas )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( roadburn, vegas32m )
-	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_DSIO, 0)	
+	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_DSIO, 0)
 	MCFG_DCS2_AUDIO_DRAM_IN_MB(4)
 	MCFG_DCS2_AUDIO_POLLING_OFFSET(0) /* no place to hook :-( */
 
@@ -2368,7 +2368,7 @@ static MACHINE_CONFIG_DERIVED( roadburn, vegas32m )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( nbashowt, vegasban )
-	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_2104, 0)	
+	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_2104, 0)
 	MCFG_DCS2_AUDIO_DRAM_IN_MB(4)
 
 	MCFG_DEVICE_ADD("ioasic", MIDWAY_IOASIC, 0)
@@ -2380,7 +2380,7 @@ static MACHINE_CONFIG_DERIVED( nbashowt, vegasban )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( nbanfl, vegasban )
-	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_2104, 0)	
+	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_2104, 0)
 	MCFG_DCS2_AUDIO_DRAM_IN_MB(4)
 
 	MCFG_DEVICE_ADD("ioasic", MIDWAY_IOASIC, 0)
@@ -2392,7 +2392,7 @@ static MACHINE_CONFIG_DERIVED( nbanfl, vegasban )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( sf2049 , denver )
-	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_DENVER, 0)	
+	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_DENVER, 0)
 	MCFG_DCS2_AUDIO_DRAM_IN_MB(8)
 
 	MCFG_DEVICE_ADD("ioasic", MIDWAY_IOASIC, 0)
@@ -2404,7 +2404,7 @@ static MACHINE_CONFIG_DERIVED( sf2049 , denver )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( sf2049se, denver )
-	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_DENVER, 0)	
+	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_DENVER, 0)
 	MCFG_DCS2_AUDIO_DRAM_IN_MB(8)
 
 	MCFG_DEVICE_ADD("ioasic", MIDWAY_IOASIC, 0)
@@ -2416,7 +2416,7 @@ static MACHINE_CONFIG_DERIVED( sf2049se, denver )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( sf2049te, denver )
-	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_DENVER, 0)	
+	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_DENVER, 0)
 	MCFG_DCS2_AUDIO_DRAM_IN_MB(8)
 
 	MCFG_DEVICE_ADD("ioasic", MIDWAY_IOASIC, 0)
@@ -2428,7 +2428,7 @@ static MACHINE_CONFIG_DERIVED( sf2049te, denver )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( cartfury, vegasv3 )
-	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_2104, 0)	
+	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_2104, 0)
 	MCFG_DCS2_AUDIO_DRAM_IN_MB(4)
 
 	MCFG_DEVICE_ADD("ioasic", MIDWAY_IOASIC, 0)

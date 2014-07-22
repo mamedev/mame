@@ -389,35 +389,35 @@ static const ay8910_device::ay_ym_param ay8910_param =
 
 static const ay8910_device::ay_ym_param ay8910_param =
 {
-    800000, 8000000,
-    16,
-    { 15950, 15350, 15090, 14760, 14275, 13620, 12890, 11370,
-        10600,  8590,  7190,  5985,  4820,  3945,  3017,  2345 }
+	800000, 8000000,
+	16,
+	{ 15950, 15350, 15090, 14760, 14275, 13620, 12890, 11370,
+		10600,  8590,  7190,  5985,  4820,  3945,  3017,  2345 }
 };
 
 static const ay8910_device::mosfet_param ay8910_mosfet_param =
 {
-    1.465385778,
-    4.9,
-    16,
-    {
-          0.00076,
-          0.80536,
-          1.13106,
-          1.65952,
-          2.42261,
-          3.60536,
-          5.34893,
-          8.96871,
-         10.97202,
-         19.32370,
-         29.01935,
-         38.82026,
-         55.50539,
-         78.44395,
-        109.49257,
-        153.72985,
-    }
+	1.465385778,
+	4.9,
+	16,
+	{
+			0.00076,
+			0.80536,
+			1.13106,
+			1.65952,
+			2.42261,
+			3.60536,
+			5.34893,
+			8.96871,
+			10.97202,
+			19.32370,
+			29.01935,
+			38.82026,
+			55.50539,
+			78.44395,
+		109.49257,
+		153.72985,
+	}
 };
 
 
@@ -523,25 +523,25 @@ INLINE void build_single_table(double rl, const ay8910_device::ay_ym_param *par,
 
 INLINE void build_mosfet_resistor_table(const ay8910_device::mosfet_param &par, const double rd, INT32 *tab)
 {
-    int j;
+	int j;
 
-    for (j=0; j < par.m_count; j++)
-    {
-        const double Vd = 5.0;
-        const double Vg = par.m_Vg - par.m_Vth;
-        const double kn = par.m_Kn[j] / 1.0e6;
-        const double p2 = 1.0 / (2.0 * kn * rd) + Vg;
-        const double Vs = p2 - sqrt(p2 * p2 - Vg * Vg);
+	for (j=0; j < par.m_count; j++)
+	{
+		const double Vd = 5.0;
+		const double Vg = par.m_Vg - par.m_Vth;
+		const double kn = par.m_Kn[j] / 1.0e6;
+		const double p2 = 1.0 / (2.0 * kn * rd) + Vg;
+		const double Vs = p2 - sqrt(p2 * p2 - Vg * Vg);
 
-        const double res = rd * ( Vd / Vs - 1.0);
-        /* That's the biggest value we can stream on to netlist. */
+		const double res = rd * ( Vd / Vs - 1.0);
+		/* That's the biggest value we can stream on to netlist. */
 
-        if (res > (1 << 28))
-            tab[j] = (1 << 28);
-        else
-            tab[j] = res;
-        //printf("%d %f %10d\n", j, rd / (res + rd) * 5.0, tab[j]);
-    }
+		if (res > (1 << 28))
+			tab[j] = (1 << 28);
+		else
+			tab[j] = res;
+		//printf("%d %f %10d\n", j, rd / (res + rd) * 5.0, tab[j]);
+	}
 }
 
 
@@ -814,10 +814,10 @@ void ay8910_device::build_mixer_table()
 
 	if ((m_flags & AY8910_RESISTOR_OUTPUT) != 0)
 	{
-	    if (m_type != PSG_TYPE_AY)
-	        fatalerror("AY8910_RESISTOR_OUTPUT currently only supported for AY8910 devices.");
+		if (m_type != PSG_TYPE_AY)
+			fatalerror("AY8910_RESISTOR_OUTPUT currently only supported for AY8910 devices.");
 
-	    for (chan=0; chan < AY8910_NUM_CHANNELS; chan++)
+		for (chan=0; chan < AY8910_NUM_CHANNELS; chan++)
 		{
 			build_mosfet_resistor_table(ay8910_mosfet_param, m_res_load[chan], m_vol_table[chan]);
 			build_mosfet_resistor_table(ay8910_mosfet_param, m_res_load[chan], m_env_table[chan]);
@@ -1110,7 +1110,7 @@ const device_type AY8910 = &device_creator<ay8910_device>;
 ay8910_device::ay8910_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, AY8910, "AY-3-8910A", tag, owner, clock, "ay8910", __FILE__),
 		device_sound_interface(mconfig, *this),
-        m_type(PSG_TYPE_AY),
+		m_type(PSG_TYPE_AY),
 		m_streams(3),
 		m_ioports(2),
 		m_ready(0),
@@ -1149,10 +1149,10 @@ ay8910_device::ay8910_device(const machine_config &mconfig, const char *tag, dev
 }
 
 ay8910_device::ay8910_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock,
-							 psg_type_t psg_type, int streams, int ioports, const char *shortname, const char *source)
+								psg_type_t psg_type, int streams, int ioports, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_sound_interface(mconfig, *this),
-        m_type(psg_type),
+		m_type(psg_type),
 		m_streams(streams),
 		m_ioports(ioports),
 		m_ready(0),

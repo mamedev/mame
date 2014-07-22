@@ -281,7 +281,7 @@ void debugger_qt::wait_for_debugger(device_t &device, bool firststop)
 
 	if (firststop)
 	{
-		bring_main_window_to_front(); 
+		bring_main_window_to_front();
 	}
 
 	// Set the main window to display the proper cpu
@@ -338,4 +338,3 @@ void debugger_qt::debugger_update()
 void debugger_qt::debugger_exit()
 {
 }
-

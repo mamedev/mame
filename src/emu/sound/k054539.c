@@ -491,11 +491,11 @@ READ8_MEMBER(k054539_device::read)
 void k054539_device::device_start()
 {
 	m_timer = timer_alloc(0);
-	
+
 	// resolve / bind callbacks
 	m_timer_handler.resolve_safe();
 	m_apan_cb.bind_relative_to(*owner());
-	
+
 	for (int i = 0; i < 8; i++)
 		gain[i] = 1.0;
 

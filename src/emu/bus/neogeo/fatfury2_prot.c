@@ -106,4 +106,3 @@ void fatfury2_prot_device::fatfury2_install_protection(cpu_device* maincpu, neog
 	m_fatfury2_prot_data = 0;
 
 }
-

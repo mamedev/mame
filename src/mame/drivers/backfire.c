@@ -99,7 +99,7 @@ public:
 	void descramble_sound();
 	DECO16IC_BANK_CB_MEMBER(bank_callback);
 	DECOSPR_PRIORITY_CB_MEMBER(pri_callback);
-						   
+
 	required_ioport m_io_in0;
 	required_ioport m_io_in1;
 	required_ioport m_io_in2;

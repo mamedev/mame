@@ -1,17 +1,17 @@
 /***************************************************************************
 
-	Datel Action Replay
+    Datel Action Replay
 
     license: MAME, GPL-2.0+
     copyright-holders: Dirk Best
 
-	Freezer cartridge for Amiga 500 and Amiga 2000
+    Freezer cartridge for Amiga 500 and Amiga 2000
 
-	Skeleton device, just loads the ROMs and generates the NMI
-	for now.
+    Skeleton device, just loads the ROMs and generates the NMI
+    for now.
 
-	Hardware notes:
-	- http://www.mways.co.uk/amiga/howtocode/text/actionreplay.php
+    Hardware notes:
+    - http://www.mways.co.uk/amiga/howtocode/text/actionreplay.php
 
 ***************************************************************************/
 

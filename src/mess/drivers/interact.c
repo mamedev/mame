@@ -160,7 +160,7 @@ static MACHINE_CONFIG_START( interact, interact_state )
 	MCFG_CASSETTE_FORMATS(hector_cassette_formats)
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MASK_SPEAKER)
 	MCFG_CASSETTE_INTERFACE("interact_cass")
-	
+
 	MCFG_SOFTWARE_LIST_ADD("cass_list","interact")
 
 	/* printer */

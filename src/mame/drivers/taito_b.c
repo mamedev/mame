@@ -2145,7 +2145,7 @@ static MACHINE_CONFIG_START( crimec, taitob_state )
 
 	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL_16MHz/2)  /* 8 MHz */
 	MCFG_YM2610_IRQ_HANDLER(WRITELINE(taitob_state, irqhandler))
-	
+
 	MCFG_SOUND_ROUTE(0, "mono", 0.25)
 	MCFG_SOUND_ROUTE(1, "mono", 1.0)
 	MCFG_SOUND_ROUTE(2, "mono", 1.0)
@@ -2264,7 +2264,7 @@ static MACHINE_CONFIG_START( rambo3p, taitob_state )
 
 	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL_16MHz/2)   /* verified on pcb */
 	MCFG_YM2610_IRQ_HANDLER(WRITELINE(taitob_state, irqhandler))
-	
+
 	MCFG_SOUND_ROUTE(0, "mono", 0.25)
 	MCFG_SOUND_ROUTE(1, "mono", 1.0)
 	MCFG_SOUND_ROUTE(2, "mono", 1.0)

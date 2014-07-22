@@ -405,87 +405,87 @@ WRITE_LINE_MEMBER( cdtv_state::tpi_int_w )
 // ocs chipset (agnus with support for 512k or 1mb chip ram, denise)
 DRIVER_INIT_MEMBER( a1000_state, pal )
 {
-	m_agnus_id = AGNUS_PAL;		// 8367
-	m_denise_id = DENISE;		// 8362
+	m_agnus_id = AGNUS_PAL;     // 8367
+	m_denise_id = DENISE;       // 8362
 }
 
 DRIVER_INIT_MEMBER( a1000_state, ntsc )
 {
-	m_agnus_id = AGNUS_NTSC;	// 8361
-	m_denise_id = DENISE;		// 8362
+	m_agnus_id = AGNUS_NTSC;    // 8361
+	m_denise_id = DENISE;       // 8362
 }
 
 DRIVER_INIT_MEMBER( a2000_state, pal )
 {
-	m_agnus_id = AGNUS_PAL;		// 8371 (later versions 8372A)
-	m_denise_id = DENISE;		// 8362
+	m_agnus_id = AGNUS_PAL;     // 8371 (later versions 8372A)
+	m_denise_id = DENISE;       // 8362
 }
 
 DRIVER_INIT_MEMBER( a2000_state, ntsc )
 {
-	m_agnus_id = AGNUS_NTSC;	// 8370 (later versions 8372A)
-	m_denise_id = DENISE;		// 8362
+	m_agnus_id = AGNUS_NTSC;    // 8370 (later versions 8372A)
+	m_denise_id = DENISE;       // 8362
 }
 
 DRIVER_INIT_MEMBER( a500_state, pal )
 {
-	m_agnus_id = AGNUS_PAL;		// 8371 (later versions 8372A)
-	m_denise_id = DENISE;		// 8362
+	m_agnus_id = AGNUS_PAL;     // 8371 (later versions 8372A)
+	m_denise_id = DENISE;       // 8362
 }
 
 DRIVER_INIT_MEMBER( a500_state, ntsc )
 {
-	m_agnus_id = AGNUS_NTSC;	// 8370 (later versions 8372A)
-	m_denise_id = DENISE;		// 8362
+	m_agnus_id = AGNUS_NTSC;    // 8370 (later versions 8372A)
+	m_denise_id = DENISE;       // 8362
 }
 
 DRIVER_INIT_MEMBER( cdtv_state, pal )
 {
-	m_agnus_id = AGNUS_HR_PAL;	// 8372A
-	m_denise_id = DENISE;		// 8362
+	m_agnus_id = AGNUS_HR_PAL;  // 8372A
+	m_denise_id = DENISE;       // 8362
 }
 
 DRIVER_INIT_MEMBER( cdtv_state, ntsc )
 {
-	m_agnus_id = AGNUS_HR_NTSC;	// 8372A
-	m_denise_id = DENISE;		// 8362
+	m_agnus_id = AGNUS_HR_NTSC; // 8372A
+	m_denise_id = DENISE;       // 8362
 }
 
 // ecs chipset (agnus with support for 2mb chip ram, super denise)
 DRIVER_INIT_MEMBER( a3000_state, pal )
 {
-	m_agnus_id = AGNUS_HR_PAL_NEW;	// 8372B (early versions: 8372AB)
-	m_denise_id = DENISE_HR;		// 8373
+	m_agnus_id = AGNUS_HR_PAL_NEW;  // 8372B (early versions: 8372AB)
+	m_denise_id = DENISE_HR;        // 8373
 }
 
 DRIVER_INIT_MEMBER( a3000_state, ntsc )
 {
-	m_agnus_id = AGNUS_HR_NTSC_NEW;	// 8372B (early versions: 8372AB)
-	m_denise_id = DENISE_HR;		// 8373
+	m_agnus_id = AGNUS_HR_NTSC_NEW; // 8372B (early versions: 8372AB)
+	m_denise_id = DENISE_HR;        // 8373
 }
 
 DRIVER_INIT_MEMBER( a500p_state, pal )
 {
-	m_agnus_id = AGNUS_HR_PAL;	// 8375 (390544-01)
-	m_denise_id = DENISE_HR;	// 8373
+	m_agnus_id = AGNUS_HR_PAL;  // 8375 (390544-01)
+	m_denise_id = DENISE_HR;    // 8373
 }
 
 DRIVER_INIT_MEMBER( a500p_state, ntsc )
 {
-	m_agnus_id = AGNUS_HR_NTSC;	// 8375 (390544-02)
-	m_denise_id = DENISE_HR;	// 8373
+	m_agnus_id = AGNUS_HR_NTSC; // 8375 (390544-02)
+	m_denise_id = DENISE_HR;    // 8373
 }
 
 DRIVER_INIT_MEMBER( a600_state, pal )
 {
-	m_agnus_id = AGNUS_HR_PAL;	// 8375 (390544-01)
-	m_denise_id = DENISE_HR;	// 8373
+	m_agnus_id = AGNUS_HR_PAL;  // 8375 (390544-01)
+	m_denise_id = DENISE_HR;    // 8373
 }
 
 DRIVER_INIT_MEMBER( a600_state, ntsc )
 {
-	m_agnus_id = AGNUS_HR_NTSC;	// 8375 (390544-02)
-	m_denise_id = DENISE_HR;	// 8373
+	m_agnus_id = AGNUS_HR_NTSC; // 8375 (390544-02)
+	m_denise_id = DENISE_HR;    // 8373
 }
 
 // aga chipset (alice and lisa)
@@ -2029,7 +2029,7 @@ ROM_END
 
 ROM_START( cd32 )
 	ROM_REGION32_BE(0x100000, "kickstart", 0)
-//	ROM_LOAD16_WORD("391640-03.u6a", 0x000000, 0x100000, CRC(a4fbc94a) SHA1(816ce6c5077875850c7d43452230a9ba3a2902db)) // todo: this is the real dump
+//  ROM_LOAD16_WORD("391640-03.u6a", 0x000000, 0x100000, CRC(a4fbc94a) SHA1(816ce6c5077875850c7d43452230a9ba3a2902db)) // todo: this is the real dump
 	ROM_LOAD16_WORD("391640-03.u6a", 0x000000, 0x100000, CRC(d3837ae4) SHA1(06807db3181637455f4d46582d9972afec8956d9))
 ROM_END
 

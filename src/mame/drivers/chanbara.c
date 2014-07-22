@@ -409,8 +409,8 @@ static MACHINE_CONFIG_START( chanbara, chanbara_state )
 
 	MCFG_SOUND_ADD("ymsnd", YM2203, 12000000/8)
 	MCFG_YM2203_IRQ_HANDLER(WRITELINE(chanbara_state, sound_irq))
-	
-	
+
+
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(chanbara_state, chanbara_ay_out_0_w))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(chanbara_state, chanbara_ay_out_1_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)

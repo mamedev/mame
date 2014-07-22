@@ -1,9 +1,9 @@
 /***************************************************************************
- 
+
   sun3.c: preliminary driver for Sun 3 and Sun 3x models.
- 
+
   status: 3/80 POSTs, 3/460 needs its unique RTC chip (also used by non-3x Sun 3s).
- 
+
   TODO:
     - Z8530 SCC needs to actually speak serial so we can hook up the mouse and keyboard.
     - Improve interrupt controller emulation.
@@ -13,8 +13,8 @@
     - AM7990 LANCE chip support for everyone.
     - Figure out how the parallel printer port maps to Centronics and make it so.
     - Much more...
- 
- 
+
+
     Sun-3 Models
     ------------
 
@@ -218,7 +218,7 @@
                         factor. Serial and keyboard ports. External RAM,
                         framebuffer, and SCSI/ethernet boards
                         available.
- 
+
     Sun3X notes from NetBSD and Linux:
 
     RAM_END    0x40000000
@@ -234,7 +234,7 @@
     IDPROM1    0x61000c00 (3/470)
     MEMREG     0x61001000
     INTERREG   0x61001400
-    SCC1	   0x62000000 (keyboard/mouse)
+    SCC1       0x62000000 (keyboard/mouse)
     SCC2       0x62002000 (serial console)
     EEPROM     0x64000000
     IDPROM2    0x640007d8 (3/80)
@@ -261,7 +261,7 @@
     +---+---+---+---+---+---+---+---+---+---+---+---+---+---.---.---+
     |BT |FPP|DMA| 0 |VID|RES|FPA|DIA| 0 |CCH|IOC|LBK|DCH|  UNUSED   |
     +---+---+---+---+---+---+---+---+---+---+---+---+---+---.---.---+
- 
+
     Where: DCH = debug mode for system cache
     LBK = VME loopback
     IOC = I/O cache enable
@@ -273,9 +273,9 @@
     DMA = enable system DVMA
     FPP = enable 68881/2 FPU
     BT  = 0 for boot state, 1 for normal state
- 
+
     bad '030 MMU mapping: L fef82000 -> P 00000000
- 
+
 ****************************************************************************/
 
 #include "emu.h"
@@ -291,16 +291,16 @@
 #include "formats/mfi_dsk.h"
 
 #define TIMEKEEPER_TAG  "timekpr"
-#define SCC1_TAG		"scc1"
-#define SCC2_TAG		"scc2"
-#define ESP_TAG			"esp"
-#define FDC_TAG			"fdc"
+#define SCC1_TAG        "scc1"
+#define SCC2_TAG        "scc2"
+#define ESP_TAG         "esp"
+#define FDC_TAG         "fdc"
 
 class sun3_state : public driver_device
 {
 public:
 	sun3_state(const machine_config &mconfig, device_type type, const char *tag)
-	  : driver_device(mconfig, type, tag),
+		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_scc1(*this, SCC1_TAG),
 		m_scc2(*this, SCC2_TAG),
@@ -376,7 +376,7 @@ static ADDRESS_MAP_START(sun3_80_mem, AS_PROGRAM, 32, sun3_state)
 	AM_RANGE(0x61000800, 0x61000803) AM_READWRITE(diag_r, diag_w)
 	AM_RANGE(0x61001000, 0x61001003) AM_READWRITE(memreg_r, memreg_w)
 	AM_RANGE(0x61001004, 0x61001007) AM_READWRITE(memrerraddr_r, memrerraddr_w)
-	AM_RANGE(0x61001400, 0x61001403) AM_READWRITE(irqctrl_r, irqctrl_w) 
+	AM_RANGE(0x61001400, 0x61001403) AM_READWRITE(irqctrl_r, irqctrl_w)
 	AM_RANGE(0x62000000, 0x6200000f) AM_READWRITE8(scc1_r, scc1_w, 0xff00ff00)
 	AM_RANGE(0x62002000, 0x6200200f) AM_READWRITE8(scc2_r, scc2_w, 0xff00ff00)
 	AM_RANGE(0x63000000, 0x6301ffff) AM_ROM AM_REGION("user1",0)
@@ -400,7 +400,7 @@ static ADDRESS_MAP_START(sun3_460_mem, AS_PROGRAM, 32, sun3_state)
 	AM_RANGE(0x61000800, 0x61000803) AM_READWRITE(diag_r, diag_w)
 	AM_RANGE(0x61001000, 0x61001003) AM_READWRITE(memreg_r, memreg_w)
 	AM_RANGE(0x61001004, 0x61001007) AM_READWRITE(memrerraddr_r, memrerraddr_w)
-	AM_RANGE(0x61001400, 0x61001403) AM_READWRITE(irqctrl_r, irqctrl_w) 
+	AM_RANGE(0x61001400, 0x61001403) AM_READWRITE(irqctrl_r, irqctrl_w)
 	AM_RANGE(0x62000000, 0x6200000f) AM_READWRITE8(scc1_r, scc1_w, 0xff00ff00)
 	AM_RANGE(0x62002000, 0x6200200f) AM_READWRITE8(scc2_r, scc2_w, 0xff00ff00)
 	AM_RANGE(0x63000000, 0x6301ffff) AM_ROM AM_REGION("user1",0)
@@ -411,7 +411,7 @@ ADDRESS_MAP_END
 
 READ32_MEMBER( sun3_state::p4id_r )
 {
-	return (1<<24);	// 0 = hires bw2 1600x1280, 1 = bw2 1152x900, 0x45 is "Ibis" color, blt 0x68 is "Lego" color
+	return (1<<24); // 0 = hires bw2 1600x1280, 1 = bw2 1152x900, 0x45 is "Ibis" color, blt 0x68 is "Lego" color
 }
 
 WRITE32_MEMBER( sun3_state::fdc_control_w )
@@ -491,11 +491,11 @@ WRITE32_MEMBER(sun3_state::ramwrite_w)
 				m_memreg &= ~0x0c;
 				break;
 
-			case 0xffffffff:	// no address adjust, show all 4 lanes as problematic
+			case 0xffffffff:    // no address adjust, show all 4 lanes as problematic
 				break;
 		}
 
-		m_bInBusErr = true;	// prevent recursion
+		m_bInBusErr = true; // prevent recursion
 		m_maincpu->set_input_line_and_vector(M68K_IRQ_7, ASSERT_LINE, 2);
 	}
 
@@ -535,7 +535,7 @@ READ32_MEMBER(sun3_state::enable_r)
 
 WRITE32_MEMBER(sun3_state::enable_w)
 {
-//	printf("sun3x: %08x to enable (mask %08x)\n", data, mem_mask);
+//  printf("sun3x: %08x to enable (mask %08x)\n", data, mem_mask);
 	COMBINE_DATA(&m_enable);
 }
 
@@ -548,7 +548,7 @@ READ32_MEMBER(sun3_state::buserr_r)
 
 WRITE32_MEMBER(sun3_state::buserr_w)
 {
-//	printf("sun3x: %08x to buserr (mask %08x)\n", data, mem_mask);
+//  printf("sun3x: %08x to buserr (mask %08x)\n", data, mem_mask);
 	COMBINE_DATA(&m_buserr);
 }
 
@@ -559,7 +559,7 @@ READ32_MEMBER(sun3_state::diag_r)
 
 WRITE32_MEMBER(sun3_state::diag_w)
 {
-//	printf("sun3x: %08x to diag (mask %08x)\n", data, mem_mask);
+//  printf("sun3x: %08x to diag (mask %08x)\n", data, mem_mask);
 	COMBINE_DATA(&m_diag);
 }
 
@@ -570,7 +570,7 @@ READ32_MEMBER(sun3_state::printer_r)
 
 WRITE32_MEMBER(sun3_state::printer_w)
 {
-//	printf("sun3x: %08x to printer (mask %08x)\n", data, mem_mask);
+//  printf("sun3x: %08x to printer (mask %08x)\n", data, mem_mask);
 	COMBINE_DATA(&m_printer);
 }
 
@@ -581,7 +581,7 @@ READ32_MEMBER(sun3_state::irqctrl_r)
 
 WRITE32_MEMBER(sun3_state::irqctrl_w)
 {
-//	printf("sun3x: %08x to interrupt control (mask %08x)\n", data, mem_mask);
+//  printf("sun3x: %08x to interrupt control (mask %08x)\n", data, mem_mask);
 	COMBINE_DATA(&m_irqctrl);
 
 	if (data & 0x01000000)
@@ -603,7 +603,7 @@ WRITE32_MEMBER(sun3_state::irqctrl_w)
 			m_maincpu->set_input_line(M68K_IRQ_7, CLEAR_LINE);
 		}
 	}
-	else	// master enable clear, clear all interrupts
+	else    // master enable clear, clear all interrupts
 	{
 		m_maincpu->set_input_line(M68K_IRQ_1, CLEAR_LINE);
 		m_maincpu->set_input_line(M68K_IRQ_2, CLEAR_LINE);
@@ -622,7 +622,7 @@ READ32_MEMBER(sun3_state::memreg_r)
 
 WRITE32_MEMBER(sun3_state::memreg_w)
 {
-//	printf("sun3x: %08x to memory control (mask %08x)\n", data, mem_mask);
+//  printf("sun3x: %08x to memory control (mask %08x)\n", data, mem_mask);
 	COMBINE_DATA(&m_memreg);
 }
 
@@ -635,7 +635,7 @@ READ32_MEMBER(sun3_state::memrerraddr_r)
 
 WRITE32_MEMBER(sun3_state::memrerraddr_w)
 {
-//	printf("sun3x: %08x to memory error address (mask %08x)\n", data, mem_mask);
+//  printf("sun3x: %08x to memory error address (mask %08x)\n", data, mem_mask);
 	COMBINE_DATA(&m_memerraddr);
 }
 
@@ -941,7 +941,7 @@ Sun 3/80 V3.0.3 Bootprom
 
 	// default NVRAM: includes valid settings for console on framebuffer, boot from SCSI disk, Ethernet ID, more
 	ROM_REGION( 0x800, TIMEKEEPER_TAG, 0 )
-	ROM_LOAD( "timekpr_380.bin", 0x000000, 0x000800, CRC(e76f1aae) SHA1(8e7c36e3928887a94a8133e8416ee4126c31edd7) ) 
+	ROM_LOAD( "timekpr_380.bin", 0x000000, 0x000800, CRC(e76f1aae) SHA1(8e7c36e3928887a94a8133e8416ee4126c31edd7) )
 ROM_END
 
 ROM_START( sun3_460 )

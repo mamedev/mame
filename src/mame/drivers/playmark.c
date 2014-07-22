@@ -107,7 +107,7 @@ WRITE16_MEMBER(playmark_state::hotmind_coin_eeprom_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-//		if (data & 0x80) logerror("PC$%06x Writing unknown bits %02x to the Coin/EEPROM port\n", space.device().safe_pcbase(), data);
+//      if (data & 0x80) logerror("PC$%06x Writing unknown bits %02x to the Coin/EEPROM port\n", space.device().safe_pcbase(), data);
 
 		if (data) {
 			if ((m_dispenser_latch & 0x80) == 0) m_dispenser_latch = 0;
@@ -122,8 +122,8 @@ WRITE16_MEMBER(playmark_state::hotmind_coin_eeprom_w)
 		}
 		machine().device<ticket_dispenser_device>("ticket")->write(space, 0, (data & 0x08) ? 0x80 : 0);
 
-		coin_counter_w(machine(), 0, data & 0x20);		/* Coin In counter - transistor driven */
-		coin_counter_w(machine(), 1, data & 0x40);		/* Token/Ticket Out counter - transistor driven */
+		coin_counter_w(machine(), 0, data & 0x20);      /* Coin In counter - transistor driven */
+		coin_counter_w(machine(), 1, data & 0x40);      /* Token/Ticket Out counter - transistor driven */
 
 		m_eeprom->cs_write((data & 1) ? ASSERT_LINE : CLEAR_LINE);
 		m_eeprom->di_write((data & 4) >> 2);
@@ -135,7 +135,7 @@ WRITE16_MEMBER(playmark_state::luckboomh_dispenser_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-//		if (data & 0x87) logerror("PC$%06x Writing unknown bits %02x to the Coin/EEPROM port\n", space.device().safe_pcbase(), data);
+//      if (data & 0x87) logerror("PC$%06x Writing unknown bits %02x to the Coin/EEPROM port\n", space.device().safe_pcbase(), data);
 
 		if (data) {
 			if ((m_dispenser_latch & 0x80) == 0) m_dispenser_latch = 0;
@@ -150,8 +150,8 @@ WRITE16_MEMBER(playmark_state::luckboomh_dispenser_w)
 		}
 		machine().device<ticket_dispenser_device>("ticket")->write(space, 0, (data & 0x08) ? 0x80 : 0);
 
-		coin_counter_w(machine(), 0, data & 0x20);		/* Coin In counter - transistor driven */
-		coin_counter_w(machine(), 1, data & 0x40);		/* Token/Ticket Out counter - transistor driven */
+		coin_counter_w(machine(), 0, data & 0x20);      /* Coin In counter - transistor driven */
+		coin_counter_w(machine(), 1, data & 0x40);      /* Token/Ticket Out counter - transistor driven */
 	}
 }
 
@@ -165,7 +165,7 @@ WRITE16_MEMBER(playmark_state::playmark_snd_command_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-//		logerror("PC$%06x 68K Writing sound command %02x to OKI\n",space.device().safe_pcbase(), data);
+//      logerror("PC$%06x 68K Writing sound command %02x to OKI\n",space.device().safe_pcbase(), data);
 
 		m_snd_command = (data & 0xff);
 		m_snd_flag = 1;
@@ -180,12 +180,12 @@ READ8_MEMBER(playmark_state::playmark_snd_command_r)
 	if ((m_oki_control & 0x38) == 0x30)
 	{
 		data = m_snd_command;
-//		logerror("PC$%03x PortB reading %02x from the 68K\n", space.device().safe_pcbase(), data);
+//      logerror("PC$%03x PortB reading %02x from the 68K\n", space.device().safe_pcbase(), data);
 	}
 	else if ((m_oki_control & 0x38) == 0x28)
 	{
 		data = (m_oki->read(space, 0) & 0x0f);
-//		logerror("PC$%03x PortB reading %02x from the OKI status port\n", space.device().safe_pcbase(), data);
+//      logerror("PC$%03x PortB reading %02x from the OKI status port\n", space.device().safe_pcbase(), data);
 	}
 
 	return data;
@@ -241,7 +241,7 @@ WRITE8_MEMBER(playmark_state::playmark_snd_control_w)
 
 	if ((data & 0x38) == 0x18)
 	{
-//		logerror("PC$%03x Writing %02x to OKI1, PortC=%02x, Code=%02x\n",space.device().safe_pcbase(),m_oki_command,m_oki_control,m_snd_command);
+//      logerror("PC$%03x Writing %02x to OKI1, PortC=%02x, Code=%02x\n",space.device().safe_pcbase(),m_oki_command,m_oki_control,m_snd_command);
 		m_oki->write(space, 0, m_oki_command);
 	}
 }
@@ -252,7 +252,7 @@ WRITE8_MEMBER(playmark_state::hrdtimes_snd_control_w)
 
 	if (m_old_oki_bank != (data & 3))
 	{
-//		logerror("PC$%03x Writing %02x to PortC (OKI bank select bits). Previous bank was %02x\n",space.device().safe_pcbase(),(data&3),m_old_oki_bank);
+//      logerror("PC$%03x Writing %02x to PortC (OKI bank select bits). Previous bank was %02x\n",space.device().safe_pcbase(),(data&3),m_old_oki_bank);
 
 		m_old_oki_bank = data & 3;
 
@@ -266,7 +266,7 @@ WRITE8_MEMBER(playmark_state::hrdtimes_snd_control_w)
 
 	if ((data & 0x38) == 0x18)
 	{
-//		logerror("PC$%03x Writing %02x to OKI1, PortC=%02x, Code=%02x\n",space.device().safe_pcbase(),m_oki_command,m_oki_control,m_snd_command);
+//      logerror("PC$%03x Writing %02x to OKI1, PortC=%02x, Code=%02x\n",space.device().safe_pcbase(),m_oki_command,m_oki_control,m_snd_command);
 		m_oki->write(space, 0, m_oki_command);
 	}
 }
@@ -338,7 +338,7 @@ static ADDRESS_MAP_START( wbeachvl_main_map, AS_PROGRAM, 16, playmark_state )
 	AM_RANGE(0x710018, 0x710019) AM_READ_PORT("P3")
 	AM_RANGE(0x71001a, 0x71001b) AM_READ_PORT("P4")
 //  AM_RANGE(0x71001c, 0x71001d) AM_READ(playmark_snd_status???)
-//	AM_RANGE(0x71001e, 0x71001f) AM_WRITE(playmark_snd_command_w)
+//  AM_RANGE(0x71001e, 0x71001f) AM_WRITE(playmark_snd_command_w)
 	AM_RANGE(0x780000, 0x780fff) AM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
@@ -384,7 +384,7 @@ static ADDRESS_MAP_START( hrdtimes_main_map, AS_PROGRAM, 16, playmark_state )
 	AM_RANGE(0x300016, 0x300017) AM_WRITE(hrdtimes_coin_w)
 	AM_RANGE(0x30001a, 0x30001b) AM_READ_PORT("DSW2")
 	AM_RANGE(0x30001c, 0x30001d) AM_READ_PORT("DSW1")
-//	AM_RANGE(0x30001e, 0x30001f) AM_WRITE(playmark_snd_command_w)
+//  AM_RANGE(0x30001e, 0x30001f) AM_WRITE(playmark_snd_command_w)
 	AM_RANGE(0x304000, 0x304001) AM_WRITENOP        /* watchdog? irq ack? */
 ADDRESS_MAP_END
 
@@ -438,7 +438,7 @@ static ADDRESS_MAP_START( playmark_sound_io_map, AS_IO, 8, playmark_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hrdtimes_sound_io_map, AS_IO, 8, playmark_state )
-	AM_RANGE(0x00, 0x00) AM_NOP		/* AM_WRITE(playmark_oki_banking_w)  Banking data output but not wired. Port 2 (Port C) is wired to the OKI banking instead */
+	AM_RANGE(0x00, 0x00) AM_NOP     /* AM_WRITE(playmark_oki_banking_w)  Banking data output but not wired. Port 2 (Port C) is wired to the OKI banking instead */
 	AM_RANGE(0x01, 0x01) AM_READWRITE(playmark_snd_command_r, playmark_oki_w)
 	AM_RANGE(0x02, 0x02) AM_READWRITE(playmark_snd_flag_r, hrdtimes_snd_control_w)
 	AM_RANGE(PIC16C5x_T0, PIC16C5x_T0) AM_READ(PIC16C5X_T0_clk_r)
@@ -904,7 +904,7 @@ static INPUT_PORTS_START( hotmind )
 
 	PORT_START("DISPENSER")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )	// Wired to Token dispenser connector, but doesn't seem to affect anything.
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )    // Wired to Token dispenser connector, but doesn't seem to affect anything.
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Token Dispenser Empty") PORT_CODE(KEYCODE_N)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("token",  ticket_dispenser_device, line_r)
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Ticket Dispenser Empty") PORT_CODE(KEYCODE_T)
@@ -1922,7 +1922,7 @@ ROM_START( hotmind )
 	ROM_COPY( "oki", 0x00000, 0x20000, 0x20000 )
 	ROM_COPY( "oki", 0x00000, 0x40000, 0x20000 )
 
-	ROM_REGION( 0x8000, "plds", 0 )		/* These were read protected */
+	ROM_REGION( 0x8000, "plds", 0 )     /* These were read protected */
 	ROM_LOAD( "palce16v8h-25-pc4_u58.jed",   0x0000, 0xb89,  BAD_DUMP CRC(ba88c1da) SHA1(9b55e96eee44a467bdfbf760137ccb2fb3afedf0) )
 	ROM_LOAD( "palce16v8h-25-pc4_u182.jed",  0x0000, 0xb89,  BAD_DUMP CRC(ba88c1da) SHA1(9b55e96eee44a467bdfbf760137ccb2fb3afedf0) )
 	ROM_LOAD( "palce16v8h-25-pc4_jamma.jed", 0x0000, 0xb89,  BAD_DUMP CRC(ba88c1da) SHA1(9b55e96eee44a467bdfbf760137ccb2fb3afedf0) )  // On the Jamma Expansion board
@@ -1953,7 +1953,7 @@ ROM_START( luckboomh )
 	ROM_LOAD16_BYTE( "28.u40",       0x040001, 0x10000, CRC(40e65ed1) SHA1(bc75eb816c58eb0f983bb0eaee854c54e306e1da) )
 	ROM_CONTINUE(                    0x060001, 0x10000 )
 
-	ROM_REGION( 0x80000, "gfx2", 0 )	/* Sprites */
+	ROM_REGION( 0x80000, "gfx2", 0 )    /* Sprites */
 	ROM_LOAD16_BYTE( "26.u86",       0x00000, 0x20000, CRC(d3ee7d82) SHA1(b0b3df19d60430e7a9fa29fdfff2183a32986d2d) )
 	ROM_LOAD16_BYTE( "30.u85",       0x00001, 0x20000, CRC(4b8a9558) SHA1(9f0f2d8f50f21cf188ad778c3a0a68ec23380b23) )
 	ROM_LOAD16_BYTE( "25.u84",       0x40000, 0x20000, CRC(e1ab5cf5) SHA1(f76d00537cfd6f09439e44071875bf021622fd07) )

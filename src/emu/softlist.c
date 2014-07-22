@@ -1145,7 +1145,7 @@ void softlist_parser::parse_part_start(const char *tagname, const char **attribu
 				else
 					parse_error("Invalid dataarea endianness");
 			}
-			
+
 			add_rom_entry(attrvalues[0], NULL, 0, strtol(attrvalues[1], NULL, 0), regionflags);
 		}
 		else

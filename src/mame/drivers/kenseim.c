@@ -124,7 +124,7 @@ D9  | 8
 D8  | 9
 D7  | 10
 D6  | 11
-D5  | 12 
+D5  | 12
 D4  | 13
 D3  | 14
 D2  | 15
@@ -152,13 +152,13 @@ public:
 		m_to_68k_cmd_low(0),
 		m_to_68k_cmd_d9(0),
 		m_to_68k_cmd_req(0),
-		m_to_68k_cmd_LVm(0),	
+		m_to_68k_cmd_LVm(0),
 		m_from68k_ack(0),
 		m_from68k_st4(0),
 		m_from68k_st3(0),
 		m_from68k_st2(0)
 
-	{ 
+	{
 		for (int i = 0; i < 6; i++)
 		{
 			mole_state_a[i] = 0x00;
@@ -190,7 +190,7 @@ public:
 			sprintf(temp, "molea_%d", i);
 			output_set_value(temp, mole_state_a[i]);
 		}
-		
+
 		for (int i = 0; i < 6; i++)
 		{
 			char temp[32];
@@ -226,7 +226,7 @@ public:
 	UINT8 m_to_68k_cmd_d9;
 	UINT8 m_to_68k_cmd_req;
 	UINT8 m_to_68k_cmd_LVm;
-	
+
 
 	int m_from68k_ack;
 	int m_from68k_st4;
@@ -258,7 +258,7 @@ public:
 void kenseim_state::set_leds(UINT32 ledstates)
 {
 	for (int i=0; i<20; i++)
-		output_set_lamp_value(i+1, ((ledstates & (1 << i)) != 0));	
+		output_set_lamp_value(i+1, ((ledstates & (1 << i)) != 0));
 }
 
 // could be wrong
@@ -266,11 +266,10 @@ WRITE8_MEMBER(kenseim_state::mb8936_portc_w)
 {
 	// I'm guessing these are the 20 'power meter' LEDs, 10 for each player? (it writes 42 times, with the last write being some terminator?)
 
-//	printf("%s mb8936 write %02x to port C but no handler assigned (serial data?)\n", machine().describe_context(), data);
+//  printf("%s mb8936 write %02x to port C but no handler assigned (serial data?)\n", machine().describe_context(), data);
 
 	if (data & 0x08)
 	{
-
 		if (data & 0x02)
 		{
 			if (data & 0x04)
@@ -317,7 +316,7 @@ WRITE8_MEMBER(kenseim_state::mb8936_porta_w) // maybe molesa output? (6-bits?)
 
 	update_moles();
 
-} 
+}
 
 WRITE8_MEMBER(kenseim_state::mb8936_portb_w) // maybe molesb output? (6-bits?)
 {
@@ -503,35 +502,35 @@ static INPUT_PORTS_START( kenseim )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED /*IPT_COIN1*/ ) // n/c
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED /*IPT_COIN2*/ ) // n/c
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, kenseim_state, kenseim_cmd_9_r, NULL) //	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 ) // D9
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, kenseim_state, kenseim_cmd_9_r, NULL) //   PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 ) // D9
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN ) // n/c?
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, kenseim_state, kenseim_cmd_req_r, NULL) //	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 ) // REQ
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, kenseim_state, kenseim_cmd_LVm_r, NULL) //	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 ) // LVm
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, kenseim_state, kenseim_cmd_req_r, NULL) // PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 ) // REQ
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, kenseim_state, kenseim_cmd_LVm_r, NULL) // PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 ) // LVm
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED ) // PORT_SERVICE( 0x40, IP_ACTIVE_LOW ) n/c
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN ) // n/c?
 
 	PORT_START("IN1")
-//	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1) // D5
-//	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1) // D6
-//	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1) // D7
-//	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1) // D8
+//  PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1) // D5
+//  PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1) // D6
+//  PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1) // D7
+//  PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1) // D8
 	PORT_BIT( 0x000f, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, kenseim_state, kenseim_cmd_5678_r, NULL)
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNUSED/*IPT_BUTTON1*/ ) /*PORT_PLAYER(1)*/ // n/c
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNUSED/*IPT_BUTTON2*/ ) /*PORT_PLAYER(1)*/ // n/c
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNUSED/*IPT_BUTTON3*/ ) /*PORT_PLAYER(1)*/ // n/c
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN ) // n/c?
 
-//	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2) // D1
-//	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2) // D2
-//	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2) // D3
-//	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2) // D4
+//  PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2) // D1
+//  PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2) // D2
+//  PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2) // D3
+//  PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2) // D4
 	PORT_BIT( 0x0f00, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, kenseim_state, kenseim_cmd_1234_r, NULL)
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNUSED /*IPT_BUTTON1*/ ) /*PORT_PLAYER(2)*/ // n/c
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNUSED /*IPT_BUTTON2*/ ) /*PORT_PLAYER(2)*/ // n/c
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNUSED /*IPT_BUTTON3*/ ) /*PORT_PLAYER(2)*/ // n/c
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN ) // n/c?
 
-	// most of the regular CPS1 dips are unused  
+	// most of the regular CPS1 dips are unused
 	PORT_START("DSWA")
 	PORT_DIPUNUSED_DIPLOC( 0x01, 0x01, "CPSA SW(A):1" )
 	PORT_DIPUNUSED_DIPLOC( 0x02, 0x02, "CPSA SW(A):2" )
@@ -699,4 +698,3 @@ DRIVER_INIT_MEMBER(kenseim_state,kenseim)
 // 1994.04.18 is from extra PCB rom, Siguma or Sigma? (Siguma is in the ROM)
 // the CPS1 board roms contain "M O G U R A   9 2 0 9 2 4" strings suggesting that part of the code was developed earlier
 GAMEL( 1994, kenseim,       0,        kenseim, kenseim,      kenseim_state,   kenseim,     ROT0,   "Capcom / Togo / Sigma", "Ken Sei Mogura: Street Fighter II (Japan 940418, Ver 1.00)", GAME_CLICKABLE_ARTWORK, layout_kenseim )
-

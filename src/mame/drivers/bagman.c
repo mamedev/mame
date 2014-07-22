@@ -443,7 +443,7 @@ static MACHINE_CONFIG_START( bagman, bagman_state )
 	MCFG_TMSPROM_STOP_BIT(7)        /* bit # of stop */
 	MCFG_TMSPROM_PDC_CB(DEVWRITELINE("tms", tms5110_device, pdc_w))        /* tms pdc func */
 	MCFG_TMSPROM_CTL_CB(DEVWRITE8("tms", tms5110_device, ctl_w))      /* tms ctl func */
-	
+
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 

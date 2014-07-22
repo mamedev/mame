@@ -305,66 +305,66 @@
 
     driver      FD1094      SP plain  SP enc    PC plain  PC enc    States Used (majority one marked with asterisk, if known)
     --------    --------    --------  --------  --------  --------  ---------------------
-    aceattac    317-0059    00000000  A711AF59  00000414  AF59AACD  00 12 17 31 45 90 FC* 
-    aceattaca   317-0060    00000000  A711AF59  00000400  AF59EADD  00 17 31 45 90 FC* 
-    altbeast5   317-0069    FFFFFF00  B2F7F299  00000400  CCDDEF58  00 0F 18 20 93* A7 D8 
-    altbeastj1  317-0065    FFFFFF00  C9C5F299  00000400  CCDDECDD  00 09 12 67* 99 FC 
-    altbeastj3  317-0068    FFFFFF00  B2F7F299  00000400  CCDDEF58  00 0F 18 20 93* A7 D8 
-    astorm      317-0154    FFFFFF00  B297F23F  00000400  BD5999DD  00 1F 48* 5F 66 ED 
-    astorm3     317-0148    FFFFFF00  ED9FF23F  00000400  FC58B9DC  00 06 36 50 CC D9* 
-    astormj     317-0146    FFFFFF00  ED8CF23F  00000400  FC58BC59  00 10 29* 44 CE DF 
-    astormu     317-0147    FFFFFF00  B297F23F  00000400  55334533  00 19 2D 46 58* DF 
-    bayroute    317-0116    00504000  5EB40000  00001000  5533A184  00 04* 11 18 
-    bayroutej   317-0115    00504000  56150000  00001000  85948DCF  00 05* 12 16 
-    bloxeed     317-0139    00000000  5D92A711  00001D38  BD59FFE8  00 49 53 55 56* DF 
-    bullet      317-0041    00000000  57355D96  00001882  8DDC8CF4  00 12 21 69* FE 
-    cltchitr    317-0176    00000000  A711A711  00000416  AF59EBCD  00 01* 80 FC 
-    cltchitrj   317-0175    00000000  5F94A711  00000416  AF59AFFB  00 03 19* 91 
-    cotton      317-0181a   00204000  5DB20000  00000716  CCDD0716  00 0E* 73 
-    cottonj     317-0179b   00204000  5DB20000  00000720  CCDD0720  00 0E* 73 
-    cottonu     317-0180    00204000  5DB20000  00000716  A1840716  00 0E* 73 
-    ddcrew      317-0190    00000000  AF595D92  00000408  BD59FD7F  00 07 16* 17 
-    ddcrew1     317-0187    00000000  5F945D96  00000408  8DDCE758  00 04 07* 13 91 
-    ddcrew2     317-0184    00000000  AF595D92  00000408  5533FD7F  00 07 12* 16 22 
-    ddcrewj     317-0185    00000000  5F945D92  00000408  5533FD7F  00 06 07* 09 91 
-    ddcrewu     317-0186    00000000  AF59A711  00000408  8DDCC381  00 01 07 5F 91* 
-    ddux        317-0096    00000000  5F94AF59  00000406  AF5987A0  00 21 28 70* D9 
-    desertbr    317-0196    00000000  55335D92  00001838  5533F46A  00 3C 4A 82 DA* 
-    desertbrj   317-0194    00000000  55335D92  00001838  BD59E720  00 3C 4A 82 DA* 
-    eswat       317-0130    00000000  A711AF59  00000400  5533BC59  00 05 0C EC FA* 
-    eswatj      317-0128    00000000  A711AF59  00000400  55334735  00 55 63 CB* D5 
-    eswatu      317-0129    00000000  5537AF59  00000400  55334735  00 0A 12 C3* CC 
-    exctleag    317-0079    00000000  5537AF59  00000410  83018384  00 02 39 4B 85 98 E5* 
-    fpoint      317-0127a   00000000  AF59AF59  00001A40  8DDC9960  00 15* 35 5F 82 DB 
-    fpoint1     317-0127a   00000000  AF59AF59  00001A40  8DDC9960  00 15* 35 5F 82 DB 
-    goldnaxe1   317-0110    FFFFFF00  ED62F2B9  00000400  AF59A785  00 19 2E 31 48* 5D 
-    goldnaxe3   317-0120    FFFFFF00  ED62F2B9  00000400  AF59A785  00 0A 0D 44 C7 EF* 
-    goldnaxej   317-0121    FFFFFF00  C9D6F2B9  00000400  AF59A785  00 12* 35 58 7A 9E 
-    goldnaxeu   317-0122    FFFFFF00  E53AF2B9  00000400  A184A196  00 03 51* 72 99 F6 
-    hwchampj    317-0046    00000000  5D925D96  000008AC  AF59AA41  00 8B* E3 
-    lghost      317-0166    00000000  5F94A711  00000404  EE588241  00 A2 DC E0* 
-    lghostu     317-0165    00000000  AF59A711  00000404  EE58C340  00 56 C4 DE* 
-    mvp         317-0143    00000000  5F94A711  00000416  BD59DC5B  00 19* 20 88 98 
-    mwalk       317-0159    FFFFFF00  C9C7F23F  00000400  5533BD7F  00 39 51* AA CC 
-    mwalkj      317-0157    FFFFFF00  B2F7F23F  00000400  5533BD7F  00 20 88 99 CF* 
-    mwalku      317-0158    FFFFFF00  C572F23F  00000400  8DDC8DDD  00 49* 90 C0 DE 
-    passsht     317-0080    00000000  AF59AF59  00003202  C2003923  00 11 52* 96 EE 
-    passshta    317-0074    00000000  AF59AF59  000031E4  C2003F8C  00 12* 47 83 A7 
-    passshtj    317-0070    00000000  5D92AF59  000031E4  C2003F8C  00 12 59 83* FE 
-    pontoon     317-0153    00000000  A7115D92  00000E0C  FC585979  00 19 70 DC* FC 
-    ryukyu      317-5023    00203800  AF49D30B  0000042E  FC5863B5  00 DC* EF 
-    shinobi2    317-0049    FFFFFF00  C9C5F25F  00000400  AF598395  00 53 88 98 9B 9C* F1 
-    sonicbom    317-0053    00000000  5735AF59  00001000  FC587133  00* 
-    suprleag    317-0045    00000000  A711AF59  0000108E  BD59CE5B  00 12* 34 56 AB CD 
+    aceattac    317-0059    00000000  A711AF59  00000414  AF59AACD  00 12 17 31 45 90 FC*
+    aceattaca   317-0060    00000000  A711AF59  00000400  AF59EADD  00 17 31 45 90 FC*
+    altbeast5   317-0069    FFFFFF00  B2F7F299  00000400  CCDDEF58  00 0F 18 20 93* A7 D8
+    altbeastj1  317-0065    FFFFFF00  C9C5F299  00000400  CCDDECDD  00 09 12 67* 99 FC
+    altbeastj3  317-0068    FFFFFF00  B2F7F299  00000400  CCDDEF58  00 0F 18 20 93* A7 D8
+    astorm      317-0154    FFFFFF00  B297F23F  00000400  BD5999DD  00 1F 48* 5F 66 ED
+    astorm3     317-0148    FFFFFF00  ED9FF23F  00000400  FC58B9DC  00 06 36 50 CC D9*
+    astormj     317-0146    FFFFFF00  ED8CF23F  00000400  FC58BC59  00 10 29* 44 CE DF
+    astormu     317-0147    FFFFFF00  B297F23F  00000400  55334533  00 19 2D 46 58* DF
+    bayroute    317-0116    00504000  5EB40000  00001000  5533A184  00 04* 11 18
+    bayroutej   317-0115    00504000  56150000  00001000  85948DCF  00 05* 12 16
+    bloxeed     317-0139    00000000  5D92A711  00001D38  BD59FFE8  00 49 53 55 56* DF
+    bullet      317-0041    00000000  57355D96  00001882  8DDC8CF4  00 12 21 69* FE
+    cltchitr    317-0176    00000000  A711A711  00000416  AF59EBCD  00 01* 80 FC
+    cltchitrj   317-0175    00000000  5F94A711  00000416  AF59AFFB  00 03 19* 91
+    cotton      317-0181a   00204000  5DB20000  00000716  CCDD0716  00 0E* 73
+    cottonj     317-0179b   00204000  5DB20000  00000720  CCDD0720  00 0E* 73
+    cottonu     317-0180    00204000  5DB20000  00000716  A1840716  00 0E* 73
+    ddcrew      317-0190    00000000  AF595D92  00000408  BD59FD7F  00 07 16* 17
+    ddcrew1     317-0187    00000000  5F945D96  00000408  8DDCE758  00 04 07* 13 91
+    ddcrew2     317-0184    00000000  AF595D92  00000408  5533FD7F  00 07 12* 16 22
+    ddcrewj     317-0185    00000000  5F945D92  00000408  5533FD7F  00 06 07* 09 91
+    ddcrewu     317-0186    00000000  AF59A711  00000408  8DDCC381  00 01 07 5F 91*
+    ddux        317-0096    00000000  5F94AF59  00000406  AF5987A0  00 21 28 70* D9
+    desertbr    317-0196    00000000  55335D92  00001838  5533F46A  00 3C 4A 82 DA*
+    desertbrj   317-0194    00000000  55335D92  00001838  BD59E720  00 3C 4A 82 DA*
+    eswat       317-0130    00000000  A711AF59  00000400  5533BC59  00 05 0C EC FA*
+    eswatj      317-0128    00000000  A711AF59  00000400  55334735  00 55 63 CB* D5
+    eswatu      317-0129    00000000  5537AF59  00000400  55334735  00 0A 12 C3* CC
+    exctleag    317-0079    00000000  5537AF59  00000410  83018384  00 02 39 4B 85 98 E5*
+    fpoint      317-0127a   00000000  AF59AF59  00001A40  8DDC9960  00 15* 35 5F 82 DB
+    fpoint1     317-0127a   00000000  AF59AF59  00001A40  8DDC9960  00 15* 35 5F 82 DB
+    goldnaxe1   317-0110    FFFFFF00  ED62F2B9  00000400  AF59A785  00 19 2E 31 48* 5D
+    goldnaxe3   317-0120    FFFFFF00  ED62F2B9  00000400  AF59A785  00 0A 0D 44 C7 EF*
+    goldnaxej   317-0121    FFFFFF00  C9D6F2B9  00000400  AF59A785  00 12* 35 58 7A 9E
+    goldnaxeu   317-0122    FFFFFF00  E53AF2B9  00000400  A184A196  00 03 51* 72 99 F6
+    hwchampj    317-0046    00000000  5D925D96  000008AC  AF59AA41  00 8B* E3
+    lghost      317-0166    00000000  5F94A711  00000404  EE588241  00 A2 DC E0*
+    lghostu     317-0165    00000000  AF59A711  00000404  EE58C340  00 56 C4 DE*
+    mvp         317-0143    00000000  5F94A711  00000416  BD59DC5B  00 19* 20 88 98
+    mwalk       317-0159    FFFFFF00  C9C7F23F  00000400  5533BD7F  00 39 51* AA CC
+    mwalkj      317-0157    FFFFFF00  B2F7F23F  00000400  5533BD7F  00 20 88 99 CF*
+    mwalku      317-0158    FFFFFF00  C572F23F  00000400  8DDC8DDD  00 49* 90 C0 DE
+    passsht     317-0080    00000000  AF59AF59  00003202  C2003923  00 11 52* 96 EE
+    passshta    317-0074    00000000  AF59AF59  000031E4  C2003F8C  00 12* 47 83 A7
+    passshtj    317-0070    00000000  5D92AF59  000031E4  C2003F8C  00 12 59 83* FE
+    pontoon     317-0153    00000000  A7115D92  00000E0C  FC585979  00 19 70 DC* FC
+    ryukyu      317-5023    00203800  AF49D30B  0000042E  FC5863B5  00 DC* EF
+    shinobi2    317-0049    FFFFFF00  C9C5F25F  00000400  AF598395  00 53 88 98 9B 9C* F1
+    sonicbom    317-0053    00000000  5735AF59  00001000  FC587133  00*
+    suprleag    317-0045    00000000  A711AF59  0000108E  BD59CE5B  00 12* 34 56 AB CD
     tetris1     317-0091    00000000  5D92AF59  00000410  AF59AE58  99 25 42 5B 68 FC
-    tetris2     317-0092    00000000  5735AF59  00000410  AF598685  00 10 52 74 97* FC 
+    tetris2     317-0092    00000000  5735AF59  00000410  AF598685  00 10 52 74 97* FC
     wb32        317-0085    FFFFFF7E  B2F78997  00000500  AF590500  00 10 13 26 77
-    wb33        317-0089    FFFFFF7E  E5C78997  00000500  AF590500  00 23 40 52 71* 
-    wb34        317-0087    FFFFFF7E  B2978997  00000500  AF590500  00 11* 64 69 82 
-    wrestwar1   317-0090    00000000  5D96AF59  00000414  8301AE18  00 12* A7 AB CC F9 FC 
-    wrestwar2   317-0102    00000000  5D96AF59  00000414  EE588E5B  00 12* A7 AB CC F9 FC 
-    wwallyj     317-0197b   00000000  AF595D96  00000416  CCDDCE5B  00 16* 32 3F 43 
-    wwallyja    317-0197a   00000000  AF595D96  00000416  CCDDCE5B  00 16* 32 3F 43 
+    wb33        317-0089    FFFFFF7E  E5C78997  00000500  AF590500  00 23 40 52 71*
+    wb34        317-0087    FFFFFF7E  B2978997  00000500  AF590500  00 11* 64 69 82
+    wrestwar1   317-0090    00000000  5D96AF59  00000414  8301AE18  00 12* A7 AB CC F9 FC
+    wrestwar2   317-0102    00000000  5D96AF59  00000414  EE588E5B  00 12* A7 AB CC F9 FC
+    wwallyj     317-0197b   00000000  AF595D96  00000416  CCDDCE5B  00 16* 32 3F 43
+    wwallyja    317-0197a   00000000  AF595D96  00000416  CCDDCE5B  00 16* 32 3F 43
 
 *****************************************************************************/
 
@@ -822,68 +822,68 @@ UINT16 fd1094_device::decrypt_one(offs_t address, UINT16 val, const UINT8 *main_
 	UINT8 key_7a = BIT(mainkey,7) ^ BIT(gkey2,4);
 
 
-    if (val & 0x8000)           // block invariant: val & 0x8000 != 0
-    {
-        val = BITSWAP16(val, 15, 9,10,13, 3,12, 0,14, 6, 5, 2,11, 8, 1, 4, 7);
-        
-        if (!global_xor1)   if (~val & 0x0800)  val ^= 0x3002;                                      // 1,12,13
-                            if (~val & 0x0020)  val ^= 0x0044;                                      // 2,6
-        if (!key_1b)        if (~val & 0x0400)  val ^= 0x0890;                                      // 4,7,11
-        if (!global_swap2)  if (!key_0c)        val ^= 0x0308;                                      // 3,8,9
-                                                val ^= 0x6561;
-        
-        if (!key_2b)        val = BITSWAP16(val,15,10,13,12,11,14,9,8,7,6,0,4,3,2,1,5);             // 0-5, 10-14
-    }
-    
-    if (val & 0x4000)           // block invariant: val & 0x4000 != 0
-    {
-        val = BITSWAP16(val, 13,14, 7, 0, 8, 6, 4, 2, 1,15, 3,11,12,10, 5, 9);
-        
-        if (!global_xor0)   if (val & 0x0010)   val ^= 0x0468;                                      // 3,5,6,10
-        if (!key_3a)        if (val & 0x0100)   val ^= 0x0081;                                      // 0,7
-        if (!key_6a)        if (val & 0x0004)   val ^= 0x0100;                                      // 8
-        if (!key_5b)        if (!key_0b)        val ^= 0x3012;                                      // 1,4,12,13
-                                                val ^= 0x3523;
-                                                
-        if (!global_swap0b) val = BITSWAP16(val, 2,14,13,12, 9,10,11, 8, 7, 6, 5, 4, 3,15, 1, 0);   // 2-15, 9-11
-    }
-    
-    if (val & 0x2000)           // block invariant: val & 0x2000 != 0
-    {
-        val = BITSWAP16(val, 10, 2,13, 7, 8, 0, 3,14, 6,15, 1,11, 9, 4, 5,12);
-        
-        if (!key_4a)        if (val & 0x0800)   val ^= 0x010c;                                      // 2,3,8
-        if (!key_1a)        if (val & 0x0080)   val ^= 0x1000;                                      // 12
-        if (!key_7a)        if (val & 0x0400)   val ^= 0x0a21;                                      // 0,5,9,11
-        if (!key_4b)        if (!key_0a)        val ^= 0x0080;                                      // 7
-        if (!global_swap0a) if (!key_6b)        val ^= 0xc000;                                      // 14,15
-                                                val ^= 0x99a5;
-                                                
-        if (!key_5b)        val = BITSWAP16(val,15,14,13,12,11, 1, 9, 8, 7,10, 5, 6, 3, 2, 4, 0);   // 1,4,6,10
-    }
+	if (val & 0x8000)           // block invariant: val & 0x8000 != 0
+	{
+		val = BITSWAP16(val, 15, 9,10,13, 3,12, 0,14, 6, 5, 2,11, 8, 1, 4, 7);
+
+		if (!global_xor1)   if (~val & 0x0800)  val ^= 0x3002;                                      // 1,12,13
+							if (~val & 0x0020)  val ^= 0x0044;                                      // 2,6
+		if (!key_1b)        if (~val & 0x0400)  val ^= 0x0890;                                      // 4,7,11
+		if (!global_swap2)  if (!key_0c)        val ^= 0x0308;                                      // 3,8,9
+												val ^= 0x6561;
+
+		if (!key_2b)        val = BITSWAP16(val,15,10,13,12,11,14,9,8,7,6,0,4,3,2,1,5);             // 0-5, 10-14
+	}
+
+	if (val & 0x4000)           // block invariant: val & 0x4000 != 0
+	{
+		val = BITSWAP16(val, 13,14, 7, 0, 8, 6, 4, 2, 1,15, 3,11,12,10, 5, 9);
+
+		if (!global_xor0)   if (val & 0x0010)   val ^= 0x0468;                                      // 3,5,6,10
+		if (!key_3a)        if (val & 0x0100)   val ^= 0x0081;                                      // 0,7
+		if (!key_6a)        if (val & 0x0004)   val ^= 0x0100;                                      // 8
+		if (!key_5b)        if (!key_0b)        val ^= 0x3012;                                      // 1,4,12,13
+												val ^= 0x3523;
+
+		if (!global_swap0b) val = BITSWAP16(val, 2,14,13,12, 9,10,11, 8, 7, 6, 5, 4, 3,15, 1, 0);   // 2-15, 9-11
+	}
+
+	if (val & 0x2000)           // block invariant: val & 0x2000 != 0
+	{
+		val = BITSWAP16(val, 10, 2,13, 7, 8, 0, 3,14, 6,15, 1,11, 9, 4, 5,12);
+
+		if (!key_4a)        if (val & 0x0800)   val ^= 0x010c;                                      // 2,3,8
+		if (!key_1a)        if (val & 0x0080)   val ^= 0x1000;                                      // 12
+		if (!key_7a)        if (val & 0x0400)   val ^= 0x0a21;                                      // 0,5,9,11
+		if (!key_4b)        if (!key_0a)        val ^= 0x0080;                                      // 7
+		if (!global_swap0a) if (!key_6b)        val ^= 0xc000;                                      // 14,15
+												val ^= 0x99a5;
+
+		if (!key_5b)        val = BITSWAP16(val,15,14,13,12,11, 1, 9, 8, 7,10, 5, 6, 3, 2, 4, 0);   // 1,4,6,10
+	}
 
 	if (val & 0xe000)           // block invariant: val & 0xe000 != 0
 	{
-        val = BITSWAP16(val,15,13,14, 5, 6, 0, 9,10, 4,11, 1, 2,12, 3, 7, 8);
-        
-        val ^= 0x17ff;
-        
+		val = BITSWAP16(val,15,13,14, 5, 6, 0, 9,10, 4,11, 1, 2,12, 3, 7, 8);
+
+		val ^= 0x17ff;
+
 		if (!global_swap4)  val = BITSWAP16(val, 15,14,13, 6,11,10, 9, 5, 7,12, 8, 4, 3, 2, 1, 0);  // 5-8, 6-12
 		if (!global_swap3)  val = BITSWAP16(val, 13,15,14,12,11,10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0);  // 15-14-13
 		if (!global_swap2)  val = BITSWAP16(val, 15,14,13,12,11, 2, 9, 8,10, 6, 5, 4, 3, 0, 1, 7);  // 10-2-0-7
 		if (!key_3b)        val = BITSWAP16(val, 15,14,13,12,11,10, 4, 8, 7, 6, 5, 9, 1, 2, 3, 0);  // 9-4, 3-1
-        if (!key_2a)        val = BITSWAP16(val, 13,14,15,12,11,10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0);  // 13-15
-        
+		if (!key_2a)        val = BITSWAP16(val, 13,14,15,12,11,10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0);  // 13-15
+
 		if (!global_swap1)  val = BITSWAP16(val, 15,14,13,12, 9, 8,11,10, 7, 6, 5, 4, 3, 2, 1, 0);  // 11...8
 		if (!key_5a)        val = BITSWAP16(val, 15,14,13,12,11,10, 9, 8, 4, 5, 7, 6, 3, 2, 1, 0);  // 7...4
 		if (!global_swap0a) val = BITSWAP16(val, 15,14,13,12,11,10, 9, 8, 7, 6, 5, 4, 0, 3, 2, 1);  // 3...0
 	}
-    
-    val = BITSWAP16(val, 12,15,14,13,11,10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0);
 
-    if ((val & 0xb080) == 0x8000) val ^= 0x4000;
-    if ((val & 0xf000) == 0xc000) val ^= 0x0080;
-    if ((val & 0xb100) == 0x0000) val ^= 0x4000;
+	val = BITSWAP16(val, 12,15,14,13,11,10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0);
+
+	if ((val & 0xb080) == 0x8000) val ^= 0x4000;
+	if ((val & 0xf000) == 0xc000) val ^= 0x0080;
+	if ((val & 0xb100) == 0x0000) val ^= 0x4000;
 
 	// mask out opcodes doing PC-relative addressing, replace them with FFFF
 	if ((m_masked_opcodes_lookup[key_F][val >> 4] >> ((val >> 1) & 7)) & 1)

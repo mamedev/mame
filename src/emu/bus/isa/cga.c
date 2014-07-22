@@ -180,7 +180,7 @@ MC6845_UPDATE_ROW( isa8_cga_device::crtc_update_row )
 {
 	if (m_update_row_type == -1)
 		return;
-	
+
 	switch (m_update_row_type)
 	{
 		case CGA_TEXT_INTEN:
@@ -221,7 +221,7 @@ MC6845_UPDATE_ROW( isa8_cga_pc1512_device::crtc_update_row )
 {
 	if (m_update_row_type == -1)
 		return;
-	
+
 	switch (m_update_row_type)
 	{
 		case PC1512_GFX_4BPP:

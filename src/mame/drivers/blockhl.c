@@ -186,21 +186,21 @@ WRITE8_MEMBER( blockhl_state::banking_callback )
 	/* bits 0-1 = ROM bank */
 	m_rombank = data & 0x03;
 	membank("bank1")->set_entry(m_rombank);
-	
+
 	/* bits 3/4 = coin counters */
 	coin_counter_w(machine(), 0, data & 0x08);
 	coin_counter_w(machine(), 1, data & 0x10);
-	
+
 	/* bit 5 = select palette RAM or work RAM at 5800-5fff */
 	m_palette_selected = ~data & 0x20;
-	
+
 	/* bit 6 = enable char ROM reading through the video RAM */
 	m_k052109->set_rmrd_line((data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
-	
+
 	/* bit 7 used but unknown */
-	
+
 	/* other bits unknown */
-	
+
 	if ((data & 0x84) != 0x80)
 		logerror("%04x: setlines %02x\n", machine().device("maincpu")->safe_pc(), data);
 }

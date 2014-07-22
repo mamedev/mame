@@ -91,8 +91,3 @@ void mslugx_prot_device::mslugx_install_protection(cpu_device* maincpu)
 	maincpu->space(AS_PROGRAM).install_readwrite_handler(0x2fffe0, 0x2fffef, read16_delegate(FUNC(mslugx_prot_device::mslugx_protection_16_r),this), write16_delegate(FUNC(mslugx_prot_device::mslugx_protection_16_w),this));
 
 }
-
-
-
-
-

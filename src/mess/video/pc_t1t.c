@@ -427,7 +427,7 @@ MC6845_UPDATE_ROW( pc_t1t_device::crtc_update_row )
 {
 	if (m_update_row_type == -1)
 		return;
-	
+
 	switch (m_update_row_type)
 	{
 		case T1000_TEXT_INTEN:
@@ -456,7 +456,7 @@ MC6845_UPDATE_ROW( pcvideo_pcjr_device::crtc_update_row )
 {
 	if (m_update_row_type == -1)
 		return;
-	
+
 	switch (m_update_row_type)
 	{
 		case PCJX_TEXT:

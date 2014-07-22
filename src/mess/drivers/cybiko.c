@@ -154,7 +154,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( cybikoxt_io, AS_IO, 16, cybiko_state )
 	AM_RANGE(h8_device::PORT_A, h8_device::PORT_A) AM_READ(xtpower_r)
 	AM_RANGE(h8_device::PORT_F, h8_device::PORT_F) AM_READWRITE(xtclock_r, xtclock_w)
-ADDRESS_MAP_END 								 
+ADDRESS_MAP_END
 
 /////////////////
 // INPUT PORTS //
@@ -360,7 +360,7 @@ static MACHINE_CONFIG_START( cybikov1, cybiko_state )
 	MCFG_AT45DBXXX_SO_CALLBACK(DEVWRITELINE("maincpu:sci1", h8_sci_device, rx_w))
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
-	
+
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("512K")
@@ -397,7 +397,7 @@ static MACHINE_CONFIG_DERIVED( cybikoxt, cybikov1)
 
 	// machine
 	MCFG_DEVICE_REMOVE("flash1")
-	MCFG_SST_39VF400A_ADD("flashxt")	
+	MCFG_SST_39VF400A_ADD("flashxt")
 
 	/* internal ram */
 	MCFG_RAM_MODIFY(RAM_TAG)

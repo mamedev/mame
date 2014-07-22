@@ -46,7 +46,7 @@ void galspnbl_state::mix_sprite_layer(screen_device &screen, bitmap_ind16 &bitma
 			UINT16 sprpixel = (sd2[x]);
 			//UINT16 sprpri = (sprpixel >> 8) & 3;
 			UINT16 sprpri = (sprpixel >> 9) & 1; // only upper priority bit matters on the bootleg hw?
-			
+
 			sprpixel &= 0xff;
 
 			if (sprpixel & 0xf)
@@ -55,7 +55,7 @@ void galspnbl_state::mix_sprite_layer(screen_device &screen, bitmap_ind16 &bitma
 					dd[x] = sprpixel;
 			}
 
-			//	UINT16 sprbln = (sprpixel >> 10) & 1; // we handle 'blending' from the original as a simple on/off flicker in the bootleg sprite function, I don't think the bootleg hw can blend
+			//  UINT16 sprbln = (sprpixel >> 10) & 1; // we handle 'blending' from the original as a simple on/off flicker in the bootleg sprite function, I don't think the bootleg hw can blend
 		}
 	}
 }

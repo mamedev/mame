@@ -359,15 +359,15 @@ private:
 	required_device<cdda_device> m_cdda;
 
 	typedef void (cubo_state::*input_hack_func)();
-    input_hack_func m_input_hack;
+	input_hack_func m_input_hack;
 
-    void cndypuzl_input_hack();
-    void haremchl_input_hack();
-    void lsrquiz_input_hack();
-    void lsrquiz2_input_hack();
-    void lasstixx_input_hack();
-    void mgnumber_input_hack();
-    void mgprem11_input_hack();
+	void cndypuzl_input_hack();
+	void haremchl_input_hack();
+	void lsrquiz_input_hack();
+	void lsrquiz2_input_hack();
+	void lasstixx_input_hack();
+	void mgnumber_input_hack();
+	void mgprem11_input_hack();
 };
 
 static void handle_cd32_joystick_cia(running_machine &machine, UINT8 pra, UINT8 dra);

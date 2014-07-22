@@ -16,7 +16,6 @@ kof98_prot_device::kof98_prot_device(const machine_config &mconfig, const char *
 
 void kof98_prot_device::device_start()
 {
-
 }
 
 void kof98_prot_device::device_reset()
@@ -137,5 +136,3 @@ void kof98_prot_device::install_kof98_protection(cpu_device* maincpu)
 
 	maincpu->space(AS_PROGRAM).install_write_handler(0x20aaaa, 0x20aaab, write16_delegate(FUNC(kof98_prot_device::kof98_prot_w),this));
 }
-
-

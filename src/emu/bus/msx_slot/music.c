@@ -45,4 +45,3 @@ WRITE8_MEMBER(msx_slot_music_device::write_ym2413)
 {
 	m_ym2413->write(space, offset & 1, data);
 }
-

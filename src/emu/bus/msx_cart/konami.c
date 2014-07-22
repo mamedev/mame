@@ -712,17 +712,17 @@ WRITE8_MEMBER(msx_cart_konami_sound::write_cart)
 			}
 			switch (offset & 0x1800)
 			{
-				case 0x1000:		// 0x9000-0x97ff
+				case 0x1000:        // 0x9000-0x97ff
 					m_selected_bank[2] = data;
 					m_scc_active = ( ( data & 0x3f ) == 0x3f );
 					setup_bank(2);
 					break;
 
-				case 0x1800:		// 0x9800-0x9fff
+				case 0x1800:        // 0x9800-0x9fff
 					if ( m_scc_active )
 					{
 						offset &= 0xff;
-	
+
 						if (offset < 0x80)
 						{
 							m_k052539->k051649_waveform_w(space, offset, data);
@@ -837,7 +837,7 @@ void msx_cart_konami_sound_snatcher::initialize_cartridge()
 	// The Snatcher Sound cartridge has 64KB RAM available by selecting ram banks 0-7
 
 	for (int i = 0; i < 8; i++)
-	{   
+	{
 		m_ram_bank[i] = get_ram_base() + i * 0x2000;
 	}
 }
@@ -933,4 +933,3 @@ READ8_MEMBER(msx_cart_keyboard_master::io_00_r)
 {
 	return m_vlm5030->bsy() ? 0x10 : 0x00;
 }
-

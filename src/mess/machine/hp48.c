@@ -682,7 +682,7 @@ TIMER_CALLBACK_MEMBER(hp48_state::hp48_timer2_cb)
         NCE1         256KB ROM      512KB ROM         2MB flash ROM
 
 
-   - NCE1 (ROM) cannot be configured, it is always visible at addresses 
+   - NCE1 (ROM) cannot be configured, it is always visible at addresses
    00000-7ffff not covered by higher priority modules.
 
    - only the address of HDW (I/O) can be configured, its size is constant
@@ -712,7 +712,7 @@ void hp48_state::hp48_apply_modules()
 		LOG(( "hp48_apply_modules: high ROM bank is %i\n", bank_hi ));
 		space.install_read_bank( 0x00000, 0x3ffff, 0, 0x80000, "bank5" );
 		space.install_read_bank( 0x40000, 0x7ffff, 0, 0x80000, "bank6" );
-		if ( m_rom ) 
+		if ( m_rom )
 		{
 			membank("bank5")->set_base( m_rom + bank_lo * 0x40000 );
 			membank("bank6")->set_base( m_rom + bank_hi * 0x40000 );
@@ -743,7 +743,7 @@ void hp48_state::hp48_apply_modules()
 			LOG(( "hp48_apply_modules: A19 disabled, NCE3 %s\n", nce3_enable ? "enabled" : "disabled" ));
 			space.install_read_bank( 0, 0x7ffff, 0, 0x80000, "bank5" );
 		}
-		if ( m_rom ) 
+		if ( m_rom )
 			membank("bank5")->set_base( m_rom );
 	}
 	else

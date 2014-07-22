@@ -110,15 +110,15 @@ void k001005_renderer::set_param(k001005_param param, UINT32 value)
 {
 	switch (param)
 	{
-		case K001005_LIGHT_R:		m_light_r = value; break;
-		case K001005_LIGHT_G:		m_light_g = value; break;
-		case K001005_LIGHT_B:		m_light_b = value; break;
-		case K001005_AMBIENT_R:		m_ambient_r = value; break;
-		case K001005_AMBIENT_G:		m_ambient_g = value; break;
-		case K001005_AMBIENT_B:		m_ambient_b = value; break;
-		case K001005_FOG_R:			m_fog_r = value; break;
-		case K001005_FOG_G:			m_fog_g = value; break;
-		case K001005_FOG_B:			m_fog_b = value; break;
+		case K001005_LIGHT_R:       m_light_r = value; break;
+		case K001005_LIGHT_G:       m_light_g = value; break;
+		case K001005_LIGHT_B:       m_light_b = value; break;
+		case K001005_AMBIENT_R:     m_ambient_r = value; break;
+		case K001005_AMBIENT_G:     m_ambient_g = value; break;
+		case K001005_AMBIENT_B:     m_ambient_b = value; break;
+		case K001005_FOG_R:         m_fog_r = value; break;
+		case K001005_FOG_G:         m_fog_g = value; break;
+		case K001005_FOG_B:         m_fog_b = value; break;
 		case K001005_FAR_Z:
 		{
 			UINT32 fz = value << 11;
@@ -896,7 +896,7 @@ void k001005_renderer::draw_scanline_2d(INT32 scanline, const extent_t &extent, 
 
 void k001005_renderer::draw_scanline_2d_tex(INT32 scanline, const extent_t &extent, const k001005_polydata &extradata, int threadid)
 {
-	//	int pal_chip = (extradata.texture_palette & 0x8) ? 1 : 0;
+	//  int pal_chip = (extradata.texture_palette & 0x8) ? 1 : 0;
 	k001006_device *k001006 = downcast<k001006_device*>(m_k001006);
 
 	int tex_page = extradata.texture_page * 0x40000;
@@ -999,7 +999,7 @@ void k001005_renderer::draw_scanline(INT32 scanline, const extent_t &extent, con
 
 void k001005_renderer::draw_scanline_tex(INT32 scanline, const extent_t &extent, const k001005_polydata &extradata, int threadid)
 {
-//	int pal_chip = (extradata.texture_palette & 0x8) ? 1 : 0;
+//  int pal_chip = (extradata.texture_palette & 0x8) ? 1 : 0;
 	k001006_device *k001006 = downcast<k001006_device*>(m_k001006);
 
 	int tex_page = extradata.texture_page * 0x40000;
@@ -1259,7 +1259,7 @@ READ32_MEMBER( k001005_device::read )
 		case 0x000:         // FIFO read, high 16 bits
 		{
 			//osd_printf_debug("FIFO_r0: %08X\n", m_fifo_read_ptr);
-			UINT16 value = m_fifo[m_fifo_read_ptr] >> 16;		
+			UINT16 value = m_fifo[m_fifo_read_ptr] >> 16;
 			return value;
 		}
 
@@ -1370,7 +1370,7 @@ WRITE32_MEMBER( k001005_device::write )
 			break;
 		}
 
-		case 0x100:		break;
+		case 0x100:     break;
 
 		case 0x101:     break;      // viewport x and width?
 		case 0x102:     break;      // viewport y and height?
@@ -1452,7 +1452,7 @@ WRITE32_MEMBER( k001005_device::write )
 
 void k001005_device::draw( bitmap_rgb32 &bitmap, const rectangle &cliprect )
 {
-	m_renderer->draw(bitmap, cliprect);	
+	m_renderer->draw(bitmap, cliprect);
 }
 
 void k001005_device::set_texel_chip(device_t &device, const char *tag)

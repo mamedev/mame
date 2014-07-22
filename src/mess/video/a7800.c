@@ -4,8 +4,8 @@
 
   Routines to control the Atari 7800 video hardware
 
-    2014-05-06 Mike Saarna Added interrupts to DMA cycle eating. Updates to 
-			   	LL, OL, and spin accounting for HALT behavior.
+    2014-05-06 Mike Saarna Added interrupts to DMA cycle eating. Updates to
+                LL, OL, and spin accounting for HALT behavior.
 
     2014-03-24 Mike Saarna Fixed DMA regarding startup, shutdown and
                             cycle stealing.
@@ -133,13 +133,13 @@ void a7800_state::maria_draw_scanline()
 	{
 		if(READ_MEM(m_maria_dll+3) & 0x80)
 			maria_cycles=40; // DMA + maria interrupt overhead
- 		else
+		else
 			maria_cycles=19; // DMA
-	 }
-	 else
-	 {
-	        maria_cycles = 16; // DMA
-       	 }
+		}
+		else
+		{
+			maria_cycles = 16; // DMA
+			}
 
 	cells = 0;
 
@@ -215,7 +215,7 @@ void a7800_state::maria_draw_scanline()
 	// Spin the CPU for Maria DMA, if it's not already spinning for WSYNC.
 	// MARIA generates the 6502 clock by dividing its own clock by 4. It needs to HALT and unHALT
 	// the 6502 on ths same clock phase, so MARIA will wait until its clock divides evenly by 4.
-	// To spin until an even divisor, we just round-up any would-be truncations by adding 3.  
+	// To spin until an even divisor, we just round-up any would-be truncations by adding 3.
 	if ( ! m_maria_wsync )
 		m_maincpu->spin_until_time(m_maincpu->cycles_to_attotime((maria_cycles+3)/4));
 

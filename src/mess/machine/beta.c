@@ -142,7 +142,7 @@ WRITE8_MEMBER(beta_disk_device::param_w)
 {
 	const char *floppy_tags[4] = { FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3 };
 
-	if (m_betadisk_active == 1) 
+	if (m_betadisk_active == 1)
 	{
 		m_wd179x->set_drive(data & 3);
 		m_wd179x->set_side ((data & 0x10) ? 0 : 1 );

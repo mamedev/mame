@@ -1,6 +1,6 @@
-/* This is the tilemap chip used by Grand Striker, Tecmo World Cup '94 and V Goal Soccer for the backgrounds 
+/* This is the tilemap chip used by Grand Striker, Tecmo World Cup '94 and V Goal Soccer for the backgrounds
 
-  the actual line scroll / zoom is not properly understood 
+  the actual line scroll / zoom is not properly understood
 
   interestingly the chip seems to require doubled up ROMs (2 copies of each ROM) to draw just the single layer.
 
@@ -38,7 +38,6 @@ void mb60553_zooming_tilemap_device::device_start()
 
 void mb60553_zooming_tilemap_device::device_reset()
 {
-
 }
 
 
@@ -119,7 +118,6 @@ TILE_GET_INFO_MEMBER(mb60553_zooming_tilemap_device::get_tile_info)
 
 void mb60553_zooming_tilemap_device::reg_written( int num_reg)
 {
-
 	switch (num_reg)
 	{
 	case 0:
@@ -338,6 +336,3 @@ READ16_MEMBER(mb60553_zooming_tilemap_device::line_r)
 {
 	return m_lineram[offset];
 }
-
-
-

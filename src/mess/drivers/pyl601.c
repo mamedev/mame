@@ -547,7 +547,7 @@ static MACHINE_CONFIG_START( pyl601, pyl601_state )
 	/* Devices */
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", XTAL_2MHz)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)	/* ? */
+	MCFG_MC6845_CHAR_WIDTH(8)   /* ? */
 	MCFG_MC6845_UPDATE_ROW_CB(pyl601_state, pyl601_update_row)
 
 	MCFG_UPD765A_ADD("upd765", true, true)
@@ -569,7 +569,7 @@ static MACHINE_CONFIG_DERIVED( pyl601a, pyl601 )
 	MCFG_DEVICE_REMOVE("crtc")
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", XTAL_2MHz)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)	/* ? */
+	MCFG_MC6845_CHAR_WIDTH(8)   /* ? */
 	MCFG_MC6845_UPDATE_ROW_CB(pyl601_state, pyl601a_update_row)
 MACHINE_CONFIG_END
 

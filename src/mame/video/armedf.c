@@ -128,7 +128,7 @@ VIDEO_START_MEMBER(armedf_state,terraf)
 
 	m_text_videoram = auto_alloc_array(machine(), UINT8, 0x1000);
 	memset(m_text_videoram, 0x00, 0x1000);
-	
+
 	save_pointer(NAME(m_text_videoram), 0x1000);
 }
 
@@ -150,7 +150,7 @@ VIDEO_START_MEMBER(armedf_state,armedf)
 
 	m_text_videoram = auto_alloc_array(machine(), UINT8, 0x1000);
 	memset(m_text_videoram, 0x00, 0x1000);
-	
+
 	save_pointer(NAME(m_text_videoram), 0x1000);
 }
 

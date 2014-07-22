@@ -835,7 +835,7 @@ static MACHINE_CONFIG_START( amaticmg, amaticmg_state )
 	MCFG_I8255_IN_PORTB_CB(IOPORT("SW1"))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(amaticmg_state, out_c_w))
 
-//	MCFG_DEVICE_ADD("ppi8255_2", I8255A, 0)
+//  MCFG_DEVICE_ADD("ppi8255_2", I8255A, 0)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

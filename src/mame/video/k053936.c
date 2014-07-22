@@ -233,7 +233,7 @@ k053936_device::k053936_device(const machine_config &mconfig, const char *tag, d
 	m_ctrl(NULL),
 	m_linectrl(NULL),
 	m_wrap(0),
-	m_xoff(0), 
+	m_xoff(0),
 	m_yoff(0)
 {
 }

@@ -30,7 +30,7 @@
 ***************************************************************************************
 
   PCB Layout...
- 
+
   .------------------------------------------------------------------------------------.
   |     A             B             C              D              E          F         |
   |                  .-----. .-----. .-----. .-----. .-----. .-----.                   |
@@ -125,7 +125,7 @@
                                         |                             | 0.1 uf |    |
                                         |   R 2.2                     '--| |---'   -+-
                                         '--/\/\/\/--.                              GND
-                                                    |                 
+                                                    |
                                                    -+-
                                                    GND
 
@@ -211,43 +211,43 @@ public:
 
 static NETLIST_START(nl_cocoloco)
 
-    /* Standard stuff */
+	/* Standard stuff */
 
-    SOLVER(Solver, 48000)
-    PARAM(Solver.ACCURACY, 1e-5)
-    ANALOG_INPUT(V5, 5)
+	SOLVER(Solver, 48000)
+	PARAM(Solver.ACCURACY, 1e-5)
+	ANALOG_INPUT(V5, 5)
 
-    /* AY 8910 internal resistors */
+	/* AY 8910 internal resistors */
 
-    RES(R_AY1_1, 1000);
-    RES(R_AY1_2, 1000);
-    RES(R_AY1_3, 1000);
+	RES(R_AY1_1, 1000);
+	RES(R_AY1_2, 1000);
+	RES(R_AY1_3, 1000);
 
-    RES(R1, 4700)
-    RES(R2, 4700)
-    RES(R3, 4700)
-    RES(RAMP, 150000)
-    //RES(RAMP, 150)
-    POT(P1, 5000)
-    PARAM(P1.DIAL, 0.5) // 50%
+	RES(R1, 4700)
+	RES(R2, 4700)
+	RES(R3, 4700)
+	RES(RAMP, 150000)
+	//RES(RAMP, 150)
+	POT(P1, 5000)
+	PARAM(P1.DIAL, 0.5) // 50%
 
-    CAP(C1, 10e-6)
+	CAP(C1, 10e-6)
 
-    NET_C(V5, R_AY1_1.1, R_AY1_2.1, R_AY1_3.1)
+	NET_C(V5, R_AY1_1.1, R_AY1_2.1, R_AY1_3.1)
 
-    NET_C(R_AY1_1.2, R1.1)
-    NET_C(R_AY1_2.2, R2.1)
-    NET_C(R_AY1_3.2, R3.1)
+	NET_C(R_AY1_1.2, R1.1)
+	NET_C(R_AY1_2.2, R2.1)
+	NET_C(R_AY1_3.2, R3.1)
 
-    NET_C(R1.2, R2.2, R3.2, P1.1)
+	NET_C(R1.2, R2.2, R3.2, P1.1)
 
-    NET_C(P1.3, RAMP.2, GND)
-    NET_C(P1.2, C1.1)
-    NET_C(C1.2, RAMP.1)
+	NET_C(P1.3, RAMP.2, GND)
+	NET_C(P1.2, C1.1)
+	NET_C(C1.2, RAMP.1)
 #if 0
-    CAP(C2, 0.1e-6)
-    NET_C(C2.2, GND)
-    NET_C(C2.1, RAMP.1)
+	CAP(C2, 0.1e-6)
+	NET_C(C2.2, GND)
+	NET_C(C2.1, RAMP.1)
 #endif
 NETLIST_END()
 
@@ -339,10 +339,10 @@ WRITE8_MEMBER( cocoloco_state::cocoloco_vbank_w )
 WRITE8_MEMBER( cocoloco_state::cocoloco_vram_clear_w )
 {
 	/* ??? */
-//	for(int i=0;i<0x8000;i++)
-//		m_videoram[i] = 0;
+//  for(int i=0;i<0x8000;i++)
+//      m_videoram[i] = 0;
 
-//	popmessage("A005 writes: %02X", data);
+//  popmessage("A005 writes: %02X", data);
 }
 
 
@@ -354,8 +354,8 @@ WRITE8_MEMBER( cocoloco_state::cocoloco_coin_counter_w )
     xxxx -xxx   Unknown.
 
     The coin counter gives 2 pulses for each coin inserted.
-	They explain in a sheet that the coin in for 50 pesetas
-	behaves like 2x 25 pesetas (1 duro) coins, so has sense.
+    They explain in a sheet that the coin in for 50 pesetas
+    behaves like 2x 25 pesetas (1 duro) coins, so has sense.
 */
 	coin_counter_w(machine(), 0, data & 0x08);
 }
@@ -367,7 +367,7 @@ WRITE8_MEMBER( cocoloco_state::cocoloco_coin_counter_w )
 
 static ADDRESS_MAP_START( cocoloco_map, AS_PROGRAM, 8, cocoloco_state )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
-	AM_RANGE(0x2000, 0x3fff) AM_READWRITE(cocoloco_vram_r, cocoloco_vram_w)		// 256 x 256 x 1
+	AM_RANGE(0x2000, 0x3fff) AM_READWRITE(cocoloco_vram_r, cocoloco_vram_w)     // 256 x 256 x 1
 	AM_RANGE(0x6001, 0x6001) AM_DEVREAD("ay8910", ay8910_device, data_r)
 	AM_RANGE(0x6002, 0x6002) AM_DEVWRITE("ay8910", ay8910_device, data_w)
 	AM_RANGE(0x6003, 0x6003) AM_DEVWRITE("ay8910", ay8910_device, address_w)
@@ -414,37 +414,37 @@ static INPUT_PORTS_START( cocoloco )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 
 	PORT_START("DSW1") // DSW1 @4B
-	PORT_DIPNAME( 0x01, 0x00, "Char Speed" )					PORT_DIPLOCATION("DSW1:!1")
+	PORT_DIPNAME( 0x01, 0x00, "Char Speed" )                    PORT_DIPLOCATION("DSW1:!1")
 	PORT_DIPSETTING(    0x00, "Fast" )
 	PORT_DIPSETTING(    0x01, "Slow" )
-	PORT_DIPNAME( 0x02, 0x00, "Monsters Speed" )				PORT_DIPLOCATION("DSW1:!2")
+	PORT_DIPNAME( 0x02, 0x00, "Monsters Speed" )                PORT_DIPLOCATION("DSW1:!2")
 	PORT_DIPSETTING(    0x00, "Fast" )
 	PORT_DIPSETTING(    0x02, "Slow" )
-	PORT_DIPNAME( 0x0c, 0x00, "Monsters: Time before go out" )	PORT_DIPLOCATION("DSW1:!3,!4")
+	PORT_DIPNAME( 0x0c, 0x00, "Monsters: Time before go out" )  PORT_DIPLOCATION("DSW1:!3,!4")
 	PORT_DIPSETTING(    0x00, "Long" )
 	PORT_DIPSETTING(    0x04, "Medium-Long" )
 	PORT_DIPSETTING(    0x08, "Medium-Short" )
 	PORT_DIPSETTING(    0x0c, "Short" )
-	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )				// switches 5-6-7-8 marked as unused.
+	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )             // switches 5-6-7-8 marked as unused.
 
 	PORT_START("DSW2") // DSW2 @5C
-	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Coinage ) )			PORT_DIPLOCATION("DSW2:!1,!2")
+	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Coinage ) )          PORT_DIPLOCATION("DSW2:!1,!2")
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_5C ) )
-	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Bonus_Life ) )		PORT_DIPLOCATION("DSW2:!3,!4")
+	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Bonus_Life ) )       PORT_DIPLOCATION("DSW2:!3,!4")
 	PORT_DIPSETTING(    0x00, "10000 Points" )
 	PORT_DIPSETTING(    0x04, "15000 Points" )
 	PORT_DIPSETTING(    0x08, "20000 Points" )
 	PORT_DIPSETTING(    0x0c, "30000 Points" )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Lives ) )			PORT_DIPLOCATION("DSW2:!5")
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Lives ) )            PORT_DIPLOCATION("DSW2:!5")
 	PORT_DIPSETTING(    0x00, "2" )
 	PORT_DIPSETTING(    0x10, "3" )
-	PORT_DIPNAME( 0x20, 0x00, "Monsters" )					PORT_DIPLOCATION("DSW2:!6")
+	PORT_DIPNAME( 0x20, 0x00, "Monsters" )                  PORT_DIPLOCATION("DSW2:!6")
 	PORT_DIPSETTING(    0x00, "4" )
 	PORT_DIPSETTING(    0x20, "5" )
-	PORT_DIPNAME( 0xc0, 0x00, "Vitamine Time" )				PORT_DIPLOCATION("DSW2:!7,!8")
+	PORT_DIPNAME( 0xc0, 0x00, "Vitamine Time" )             PORT_DIPLOCATION("DSW2:!7,!8")
 	PORT_DIPSETTING(    0x00, "Long" )
 	PORT_DIPSETTING(    0x40, "Medium-Long" )
 	PORT_DIPSETTING(    0x80, "Medium-Short" )
@@ -459,7 +459,7 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_START( cocoloco, cocoloco_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, CPU_CLOCK) 	/* confirmed */
+	MCFG_CPU_ADD("maincpu", M6502, CPU_CLOCK)   /* confirmed */
 	MCFG_CPU_PROGRAM_MAP(cocoloco_map)
 
 	/* video hardware */
@@ -473,26 +473,26 @@ static MACHINE_CONFIG_START( cocoloco, cocoloco_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("ay8910", AY8910, SND_CLOCK)	/* confirmed */
+	MCFG_SOUND_ADD("ay8910", AY8910, SND_CLOCK) /* confirmed */
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
-    MCFG_AY8910_OUTPUT_TYPE(AY8910_RESISTOR_OUTPUT)
-    MCFG_SOUND_ROUTE_EX(0, "snd_nl", 1.0, 0)
-    MCFG_SOUND_ROUTE_EX(1, "snd_nl", 1.0, 1)
-    MCFG_SOUND_ROUTE_EX(2, "snd_nl", 1.0, 2)
+	MCFG_AY8910_OUTPUT_TYPE(AY8910_RESISTOR_OUTPUT)
+	MCFG_SOUND_ROUTE_EX(0, "snd_nl", 1.0, 0)
+	MCFG_SOUND_ROUTE_EX(1, "snd_nl", 1.0, 1)
+	MCFG_SOUND_ROUTE_EX(2, "snd_nl", 1.0, 2)
 
-    /* NETLIST configuration using internal AY8910 resistor values */
+	/* NETLIST configuration using internal AY8910 resistor values */
 
-    MCFG_SOUND_ADD("snd_nl", NETLIST_SOUND, 48000)
-    MCFG_NETLIST_SETUP(nl_cocoloco)
-    MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("snd_nl", NETLIST_SOUND, 48000)
+	MCFG_NETLIST_SETUP(nl_cocoloco)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-    MCFG_NETLIST_STREAM_INPUT("snd_nl", 0, "R_AY1_1.R")
-    MCFG_NETLIST_STREAM_INPUT("snd_nl", 1, "R_AY1_2.R")
-    MCFG_NETLIST_STREAM_INPUT("snd_nl", 2, "R_AY1_3.R")
+	MCFG_NETLIST_STREAM_INPUT("snd_nl", 0, "R_AY1_1.R")
+	MCFG_NETLIST_STREAM_INPUT("snd_nl", 1, "R_AY1_2.R")
+	MCFG_NETLIST_STREAM_INPUT("snd_nl", 2, "R_AY1_3.R")
 
-    MCFG_NETLIST_STREAM_OUTPUT("snd_nl", 0, "RAMP.1")
-    MCFG_NETLIST_ANALOG_MULT_OFFSET(30000.0 * 1.5, 0)
+	MCFG_NETLIST_STREAM_OUTPUT("snd_nl", 0, "RAMP.1")
+	MCFG_NETLIST_ANALOG_MULT_OFFSET(30000.0 * 1.5, 0)
 
 MACHINE_CONFIG_END
 

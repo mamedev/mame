@@ -165,4 +165,3 @@ WRITE8_MEMBER(msx_matsushita_device::io_write)
 			break;
 	}
 }
-

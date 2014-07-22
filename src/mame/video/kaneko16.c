@@ -196,14 +196,14 @@ void kaneko16_berlwall_state::kaneko16_render_15bpp_bitmap(bitmap_rgb32 &bitmap,
 	if (!m_bg15_bitmap[0].valid())
 		return;
 
-	int select	=	m_bg15_select[ 0 ];
-	int scroll	=	m_bg15_scroll[ 0 ];
+	int select  =   m_bg15_select[ 0 ];
+	int scroll  =   m_bg15_scroll[ 0 ];
 
-	int screen	=	select & 0x1f;
-	int flip	=	select & 0x20;
+	int screen  =   select & 0x1f;
+	int flip    =   select & 0x20;
 
-	int scrollx	=	(scroll >> 0) & 0xff;
-	int scrolly	=	(scroll >> 8) & 0xff;
+	int scrollx =   (scroll >> 0) & 0xff;
+	int scrolly =   (scroll >> 8) & 0xff;
 
 	if (!flip)
 	{
@@ -222,8 +222,8 @@ void kaneko16_berlwall_state::kaneko16_render_15bpp_bitmap(bitmap_rgb32 &bitmap,
 
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		if (!flip)	srcbitmap = &m_bg15_bitmap[screen].pix16(        (y - scrolly) & 0xff  );
-		else		srcbitmap = &m_bg15_bitmap[screen].pix16( 255 - ((y - scrolly) & 0xff) );
+		if (!flip)  srcbitmap = &m_bg15_bitmap[screen].pix16(        (y - scrolly) & 0xff  );
+		else        srcbitmap = &m_bg15_bitmap[screen].pix16( 255 - ((y - scrolly) & 0xff) );
 
 		dstbitmap = &bitmap.pix32(y);
 
@@ -231,8 +231,8 @@ void kaneko16_berlwall_state::kaneko16_render_15bpp_bitmap(bitmap_rgb32 &bitmap,
 		{
 			UINT16 pix;
 
-			if (!flip)	pix = srcbitmap[        (x - scrollx) & 0xff  ];
-			else		pix = srcbitmap[ 255 - ((x - scrollx) & 0xff) ];
+			if (!flip)  pix = srcbitmap[        (x - scrollx) & 0xff  ];
+			else        pix = srcbitmap[ 255 - ((x - scrollx) & 0xff) ];
 
 			dstbitmap[x] = pal[pix];
 		}

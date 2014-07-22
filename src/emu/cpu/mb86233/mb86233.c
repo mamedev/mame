@@ -360,7 +360,7 @@ void mb86233_cpu_device::ALU( UINT32 alu)
 		break;
 
 		case 0x0F:  /* D = int(D) */
-	    	switch((m_fpucontrol>>1)&3)
+			switch((m_fpucontrol>>1)&3)
 			{
 				//case 0: GETD().i = floor(GETD().f+0.5f); break;
 				//case 1: GETD().i = ceil(GETD().f); break;

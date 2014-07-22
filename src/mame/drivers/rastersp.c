@@ -102,7 +102,7 @@ public:
 	required_device<timer_device>   m_tms_timer1;
 	required_device<timer_device>   m_tms_tx_timer;
 	required_device<palette_device> m_palette;
-	required_device<nvram_device> 	m_nvram;
+	required_device<nvram_device>   m_nvram;
 
 	DECLARE_WRITE32_MEMBER(cyrix_cache_w);
 	DECLARE_READ8_MEMBER(nvram_r);

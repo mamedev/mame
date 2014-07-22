@@ -1228,15 +1228,15 @@ static MACHINE_CONFIG_START( noraut_base, norautp_state )
 
 	//MCFG_DEVICE_ADD("ppi8255_2", I8255, 0)
 	/* (c0-c3) Group A Mode 2 (5-lines handshacked bidirectional port)
-     Group B Mode 0, output;  (see below for lines PC0-PC2) */
-	//MCFG_I8255_IN_PORTA_CB(READ8(norautp_state, vram_data_r))	// VRAM data read
-	//MCFG_I8255_OUT_PORTA_CB(WRITE8(norautp_state, vram_data_w))	// VRAM data write
-	//MCFG_I8255_OUT_PORTB_CB(WRITE8(norautp_state, vram_addr_w))	// VRAM address write
+	 Group B Mode 0, output;  (see below for lines PC0-PC2) */
+	//MCFG_I8255_IN_PORTA_CB(READ8(norautp_state, vram_data_r)) // VRAM data read
+	//MCFG_I8255_OUT_PORTA_CB(WRITE8(norautp_state, vram_data_w))   // VRAM data write
+	//MCFG_I8255_OUT_PORTB_CB(WRITE8(norautp_state, vram_addr_w))   // VRAM address write
 	//MCFG_I8255_IN_PORTC_CB(READ8(norautp_state, ppi2_portc_r))
 	//MCFG_I8255_OUT_PORTC_CB(WRITE8(norautp_state, ppi2_portc_w))
 	/*  PPI-2 is configured as mixed mode2 and mode0 output.
-     It means that port A should be bidirectional and port B just as output.
-     Port C as hshk regs, and P0-P2 as input (norautp, norautjp) or output (other sets). */
+	 It means that port A should be bidirectional and port B just as output.
+	 Port C as hshk regs, and P0-P2 as input (norautp, norautjp) or output (other sets). */
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -3438,16 +3438,16 @@ ROM_END
 
 /*
 ROM_START( pkii_dm )
-	ROM_REGION( 0x10000, "maincpu", 0 ) // no stack, call's RET go to PC=0
-	ROM_LOAD( "12.u12", 0x0000, 0x1000, CRC(048e70d8) SHA1(f0eb16ba68455638de2ce68f51f305a13d0df287) )
-	ROM_LOAD( "13.u18", 0x1000, 0x1000, CRC(06cf6789) SHA1(587d883c399348b518e3be4d1dc2581824055328) )
+    ROM_REGION( 0x10000, "maincpu", 0 ) // no stack, call's RET go to PC=0
+    ROM_LOAD( "12.u12", 0x0000, 0x1000, CRC(048e70d8) SHA1(f0eb16ba68455638de2ce68f51f305a13d0df287) )
+    ROM_LOAD( "13.u18", 0x1000, 0x1000, CRC(06cf6789) SHA1(587d883c399348b518e3be4d1dc2581824055328) )
 
-	ROM_REGION( 0x1000,  "gfx", 0 )
-	ROM_FILL(                 0x0000, 0x0800, 0xff )
-	ROM_LOAD( "cgw-f506.u31", 0x0800, 0x0800, CRC(412fc492) SHA1(094ea0ffd0c22274cfe164f07c009ffe022331fd) )
+    ROM_REGION( 0x1000,  "gfx", 0 )
+    ROM_FILL(                 0x0000, 0x0800, 0xff )
+    ROM_LOAD( "cgw-f506.u31", 0x0800, 0x0800, CRC(412fc492) SHA1(094ea0ffd0c22274cfe164f07c009ffe022331fd) )
 
-	ROM_REGION( 0x0200,  "proms", 0 )
-	ROM_LOAD( "63s141n.u51",  0x0000, 0x0100, CRC(88302127) SHA1(aed1273974917673405f1234ab64e6f8b3856c34) )
+    ROM_REGION( 0x0200,  "proms", 0 )
+    ROM_LOAD( "63s141n.u51",  0x0000, 0x0100, CRC(88302127) SHA1(aed1273974917673405f1234ab64e6f8b3856c34) )
 ROM_END
 */
 

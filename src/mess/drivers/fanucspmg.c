@@ -456,14 +456,14 @@ The arrows denote direction of data flow.
               |      /-->| Graphic memory|------|                             |
               |      |   |---------------|      |                             |     |----------------|
               |      |                          |         |--------|          |<--->|RS232C interface|---CN2
-              |   	 |		                    |         | BOOT   |<-------->|     |----------------|
+              |      |                          |         | BOOT   |<-------->|     |----------------|
               |      |                          |         | EPROM  |          |
               |      |   |----------------|     |         |--------|          |     |----------------|
               |<-----|-->|Character memory|--|  |                             |<--->|RS232C interface|---CN3
               |      |-->|----------------|  |  |         |--------|          |     |----------------|
               |      |                       |  |         |Main RAM|<-------->|
               |      |                       |  |         |--------|          |     |----------------|
-              |      |	                     |  |                             |<--->|RS232C interface|---CN4
+              |      |                       |  |                             |<--->|RS232C interface|---CN4
               |      |                       |  |                             |     |----------------|
 |---------|   |      |                       \/ \/                            |
 |Keyboard |   \/     \---|---------------------------|                        |     |-----------------|  CN9  |--------|
@@ -485,15 +485,15 @@ The arrows denote direction of data flow.
     - Shared RAM is 8k, but there are 2 6264s on the sub board.  Is shared RAM
        banked?
 
-	To boot a floppy put "bp fc5fa,1,{ip=c682;g}" and "bp fc6d7,1,{ip=c755;g}"
-	into the debugger.
+    To boot a floppy put "bp fc5fa,1,{ip=c682;g}" and "bp fc6d7,1,{ip=c755;g}"
+    into the debugger.
 
-	At NMI: f8008 must have bit 7 clear and bit 6 set (e008 on 8085)
-			f8009 must not equal 0x01 (e009 on 8085)
+    At NMI: f8008 must have bit 7 clear and bit 6 set (e008 on 8085)
+            f8009 must not equal 0x01 (e009 on 8085)
 
-			8085 sets f8008 to keyboard row 0 AND 0xf3
-			 "     "  f8009 to keyboard row 1
- 
+            8085 sets f8008 to keyboard row 0 AND 0xf3
+             "     "  f8009 to keyboard row 1
+
 ****************************************************************************/
 
 #include "emu.h"
@@ -671,14 +671,14 @@ WRITE8_MEMBER(fanucspmg_state::dma_page_w)
 
 READ16_MEMBER(fanucspmg_state::magic_r)
 {
-	return 0x0041;	// 31 = memory error
+	return 0x0041;  // 31 = memory error
 }
 
 static ADDRESS_MAP_START(maincpu_mem, AS_PROGRAM, 16, fanucspmg_state)
 	AM_RANGE(0x00000, 0x7ffff) AM_RAM   // main RAM
 
-	AM_RANGE(0x80000, 0x81fff) AM_RAM	// believed to be shared RAM with a CPU inside the Program File
-	AM_RANGE(0x88000, 0x88001) AM_NOP	// Program File "ready" bit
+	AM_RANGE(0x80000, 0x81fff) AM_RAM   // believed to be shared RAM with a CPU inside the Program File
+	AM_RANGE(0x88000, 0x88001) AM_NOP   // Program File "ready" bit
 
 	AM_RANGE(0xf0000, 0xf0003) AM_DEVREADWRITE8(PIC0_TAG, pic8259_device, read, write, 0x00ff)
 	AM_RANGE(0xf0004, 0xf0007) AM_DEVICE8(FDC_TAG, upd765a_device, map, 0x00ff)
@@ -831,7 +831,7 @@ MC6845_UPDATE_ROW( fanucspmg_state::crtc_update_row )
 		if (m_video_ctrl & 0x02)
 		{
 			if (offset <= 0x5ff)
-			{   															  
+			{
 				UINT8 chr = m_vram[offset + 0x600];
 				UINT8 attr = m_vram[offset];
 				UINT8 data = chargen[ chr + (ra * 256) ];
@@ -879,9 +879,9 @@ MC6845_UPDATE_ROW( fanucspmg_state::crtc_update_row_mono )
 		if (m_video_ctrl & 0x02)
 		{
 			if (offset <= 0x5ff)
-			{   															  
+			{
 				UINT8 chr = m_vram[offset + 0x600];
-//				UINT8 attr = m_vram[offset];
+//              UINT8 attr = m_vram[offset];
 				UINT8 data = chargen[ chr + (ra * 256) ];
 				UINT32 fg = 0xff00;
 				UINT32 bg = 0;
@@ -995,14 +995,14 @@ ROM_END
 
 ROM_START( fanucspgm )
 	ROM_REGION(0x4000, MAINCPU_TAG, 0)
-	ROM_LOAD16_BYTE( "a25_001a.33e", 0x000000, 0x002000, CRC(81159267) SHA1(f5d53cc6e929f57e8c3747f80fc74d4b1643222d) ) 
-	ROM_LOAD16_BYTE( "a25_002a.35e", 0x000001, 0x002000, CRC(4fb82c4d) SHA1(eb75e9a2d3c8e4ad56a74624ee8c52c785bd0da6) ) 
+	ROM_LOAD16_BYTE( "a25_001a.33e", 0x000000, 0x002000, CRC(81159267) SHA1(f5d53cc6e929f57e8c3747f80fc74d4b1643222d) )
+	ROM_LOAD16_BYTE( "a25_002a.35e", 0x000001, 0x002000, CRC(4fb82c4d) SHA1(eb75e9a2d3c8e4ad56a74624ee8c52c785bd0da6) )
 
 	ROM_REGION(0x4000, SUBCPU_TAG, 0)
-	ROM_LOAD( "a21_010f.17d", 0x000000, 0x002000, CRC(ef192717) SHA1(7fb3f7ca290d2437ae5956700f88c801018ce1cc) ) 
+	ROM_LOAD( "a21_010f.17d", 0x000000, 0x002000, CRC(ef192717) SHA1(7fb3f7ca290d2437ae5956700f88c801018ce1cc) )
 
 	ROM_REGION(0x8000, CHARGEN_TAG, 0)
-	ROM_LOAD( "a22_020b.5g",  0x000000, 0x002000, CRC(7b5f8e20) SHA1(9de607e541d8aad2d1ea56321270bb8466b16e3d) ) 
+	ROM_LOAD( "a22_020b.5g",  0x000000, 0x002000, CRC(7b5f8e20) SHA1(9de607e541d8aad2d1ea56321270bb8466b16e3d) )
 ROM_END
 
 /* Driver */

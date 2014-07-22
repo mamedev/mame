@@ -75,4 +75,3 @@ WRITE8_MEMBER(msx_cart_hfox::write_cart)
 			break;
 	}
 }
-

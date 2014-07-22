@@ -1141,8 +1141,8 @@ bool i8086_common_cpu_device::common_op(UINT8 op)
 // - 0x60 - 0x6f are an alias to 0x70 - 0x7f.
 // - 0xc0,  0xc1, 0xc8, 0xc9 are also aliases where the CPU ignores BIT 1 (*).
 //
-// 		Instructions are used in the boot sector for some versions of 
-//		MS-DOS  (e.g. the DEC Rainbow-100 version of DOS 2.x)
+//      Instructions are used in the boot sector for some versions of
+//      MS-DOS  (e.g. the DEC Rainbow-100 version of DOS 2.x)
 		case 0x60:
 		case 0x70: // i_jo
 			JMP( OF);
@@ -1672,7 +1672,7 @@ bool i8086_common_cpu_device::common_op(UINT8 op)
 			CLK(MOV_RI16);
 			break;
 
-        case 0xc0: // 0xc0 is 0xc2 - see (*)
+		case 0xc0: // 0xc0 is 0xc2 - see (*)
 		case 0xc2: // i_ret_d16
 			{
 				UINT32 count = fetch_word();
@@ -1725,7 +1725,7 @@ bool i8086_common_cpu_device::common_op(UINT8 op)
 			}
 			break;
 
-        case 0xc9:  // 0xc9 = 0xcb  - see (*)
+		case 0xc9:  // 0xc9 = 0xcb  - see (*)
 		case 0xcb: // i_retf
 			m_ip = POP();
 			m_sregs[CS] = POP();

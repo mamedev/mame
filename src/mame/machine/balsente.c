@@ -211,13 +211,13 @@ inline void balsente_state::noise_gen_chip(int chip, int count, short *buffer)
 	/* noise generator runs at 100kHz */
 	UINT32 step = (100000 << 14) / CEM3394_SAMPLE_RATE;
 	UINT32 noise_counter = m_noise_position[chip];
-	
+
 	while (count--)
 	{
 		*buffer++ = m_poly17[(noise_counter >> 14) & POLY17_SIZE] << 12;
 		noise_counter += step;
 	}
-	
+
 	/* remember the noise position */
 	m_noise_position[chip] = noise_counter;
 }

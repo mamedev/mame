@@ -698,7 +698,7 @@ static MACHINE_CONFIG_START( ace, ace_state )
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_FORMATS(ace_cassette_formats)
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED)
-	
+
 	MCFG_SNAPSHOT_ADD("snapshot", ace_state, ace, "ace", 1)
 
 	MCFG_DEVICE_ADD(I8255_TAG, I8255A, 0)

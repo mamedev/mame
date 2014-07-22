@@ -56,24 +56,24 @@
 
 /*
     PPC -> TLCS Commands:
-		0x5010:            ?										RTC?
-		0x5020:            ?										RTC?
-		0x6000:			   ?										Backup RAM init?
+        0x5010:            ?                                        RTC?
+        0x5020:            ?                                        RTC?
+        0x6000:            ?                                        Backup RAM init?
         0x6010:            ?                                        Backup RAM Read. Address in io_shared[0x1d00].
         0x6020:            ?                                        Backup RAM Write. Address in io_shared[0x1d00].
-		0x6030:            ?										?
-		0x6040:            ?										?
-		0x4000:            ?										Sound?
-		0x4001:            ?
-		0x4002:            ?
-		0x4003:            ?
-		0x4004:            ?
-		0xf055:
-		0xf0ff:
-		0xf000:
-		0xf001:
-		0xf010:
-		0xf020:
+        0x6030:            ?                                        ?
+        0x6040:            ?                                        ?
+        0x4000:            ?                                        Sound?
+        0x4001:            ?
+        0x4002:            ?
+        0x4003:            ?
+        0x4004:            ?
+        0xf055:
+        0xf0ff:
+        0xf000:
+        0xf001:
+        0xf010:
+        0xf020:
 
 */
 
@@ -83,8 +83,8 @@
 #include "cpu/mn10200/mn10200.h"
 #include "machine/nvram.h"
 
-#define LOG_TLCS_TO_PPC_COMMANDS		1
-#define LOG_PPC_TO_TLCS_COMMANDS		1
+#define LOG_TLCS_TO_PPC_COMMANDS        1
+#define LOG_PPC_TO_TLCS_COMMANDS        1
 
 
 static UINT32 jc_char_ram[0x2000];
@@ -269,7 +269,7 @@ WRITE64_MEMBER(taitopjc_state::ppc_common_w)
 {
 	UINT32 address = offset * 2;
 
-//	logerror("ppc_common_w: %08X, %I64X, %I64X\n", offset, data, mem_mask);
+//  logerror("ppc_common_w: %08X, %I64X, %I64X\n", offset, data, mem_mask);
 
 	if (ACCESSING_BITS_48_63)
 	{
@@ -422,7 +422,7 @@ WRITE8_MEMBER(taitopjc_state::tlcs_common_w)
 #if LOG_TLCS_TO_PPC_COMMANDS
 		printf("TLCS -> PPC cmd %04X\n", m_io_share_ram[0xffe]);
 #endif
-	
+
 		m_iocpu->set_input_line(TLCS900_INT1, CLEAR_LINE);
 		m_maincpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
 	}
@@ -472,7 +472,7 @@ WRITE16_MEMBER(taitopjc_state::tlcs_unk_w)
 static ADDRESS_MAP_START( tlcs900h_mem, AS_PROGRAM, 16, taitopjc_state )
 	AM_RANGE(0x010000, 0x02ffff) AM_RAM     // Work RAM
 	AM_RANGE(0x040000, 0x0400ff) AM_READWRITE8(tlcs_sound_r, tlcs_sound_w, 0xffff)
-	AM_RANGE(0x044000, 0x045fff) AM_RAM AM_SHARE("nvram") 
+	AM_RANGE(0x044000, 0x045fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x060000, 0x061fff) AM_READWRITE8(tlcs_common_r, tlcs_common_w, 0xffff)
 	AM_RANGE(0x06c000, 0x06c00f) AM_WRITE(tlcs_unk_w)
 	AM_RANGE(0xfc0000, 0xffffff) AM_ROM AM_REGION("io_cpu", 0)
@@ -536,7 +536,7 @@ MACHINE_CONFIG_END
 DRIVER_INIT_MEMBER(taitopjc_state, optiger)
 {
 	UINT8 *rom = (UINT8*)memregion("io_cpu")->base();
-	
+
 	// skip sound check
 	rom[0x217] = 0x00;
 	rom[0x218] = 0x00;

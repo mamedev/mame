@@ -17,7 +17,7 @@
 //  MACROS/CONSTANTS
 //**************************************************************************
 
-#define WD1772_TAG		"wd1772"
+#define WD1772_TAG      "wd1772"
 
 
 
@@ -238,27 +238,27 @@ void ql_trump_card_t::write(address_space &space, offs_t offset, UINT8 data)
 	{
 		m_fdc->write(space, offset & 0x03, data);
 	}
-	
+
 	if (offset == 0x1e000)
 	{
 		/*
 
-			bit		description
+		    bit     description
 
-			0 		DRIVE1
-			1 		DRIVE0
-			2 		MOTOR
-			3 		SIDE
-			4 		
-			5 		
-			6 		
-			7 		
+		    0       DRIVE1
+		    1       DRIVE0
+		    2       MOTOR
+		    3       SIDE
+		    4
+		    5
+		    6
+		    7
 
 		*/
 
 		floppy_image_device *floppy = NULL;
 
-		if (BIT(data, 1)) 
+		if (BIT(data, 1))
 		{
 			floppy = m_floppy0->get_device();
 		}

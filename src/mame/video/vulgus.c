@@ -165,7 +165,7 @@ WRITE8_MEMBER(vulgus_state::vulgus_palette_bank_w)
 void vulgus_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	gfx_element *gfx = m_gfxdecode->gfx(2);
-	
+
 	for (int offs = m_spriteram.bytes() - 4; offs >= 0; offs -= 4)
 	{
 		int code = m_spriteram[offs];
@@ -174,10 +174,10 @@ void vulgus_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 		int sx = m_spriteram[offs + 3];
 		bool flip = flip_screen() ? true : false;
 		int dir = 1;
-		
+
 		if (sy == 0)
 			continue;
-		
+
 		if (flip)
 		{
 			sx = 240 - sx;

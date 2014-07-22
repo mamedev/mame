@@ -238,7 +238,7 @@ WRITE16_MEMBER(jpmsys5_state::jpm_upd7759_w)
 		}
 		case 1:
 		{
-			//Reset 0x04, data 0x02, clock 
+			//Reset 0x04, data 0x02, clock
 			m_vfd->por(data & 0x04);
 			m_vfd->data(data & 0x02);
 			m_vfd->sclk(data & 0x01);

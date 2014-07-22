@@ -53,7 +53,7 @@ pc080sn_device::pc080sn_device(const machine_config &mconfig, const char *tag, d
 	: device_t(mconfig, PC080SN, "Taito PC080SN", tag, owner, clock, "pc080sn", __FILE__),
 	m_ram(NULL),
 	m_gfxnum(0),
-	m_x_offset(0), 
+	m_x_offset(0),
 	m_y_offset(0),
 	m_y_invert(0),
 	m_dblwidth(0),

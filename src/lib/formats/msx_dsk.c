@@ -71,4 +71,3 @@ const msx_format::format msx_format::formats[] = {
 };
 
 const floppy_format_type FLOPPY_MSX_FORMAT = &floppy_image_format_creator<msx_format>;
-

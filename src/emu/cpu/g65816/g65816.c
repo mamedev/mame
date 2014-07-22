@@ -133,7 +133,7 @@ ADDRESS_MAP_END
 
 
 _5a22_device::_5a22_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : g65816_device(mconfig, _5A22, "5A22", tag, owner, clock, "5a22", __FILE__, CPU_TYPE_5A22, ADDRESS_MAP_NAME(_5a22_map))
+	: g65816_device(mconfig, _5A22, "5A22", tag, owner, clock, "5a22", __FILE__, CPU_TYPE_5A22, ADDRESS_MAP_NAME(_5a22_map))
 {
 }
 
@@ -149,10 +149,10 @@ void g65816_device::g65816i_set_execution_mode(uint mode)
 		case 3: FTABLE_OPCODES = g65816i_opcodes_M1X1; break;
 		case 4: FTABLE_OPCODES = g65816i_opcodes_E; break;
 	}
-    FTABLE_GET_REG = s_g65816_get_reg[mode];
-    FTABLE_SET_REG = s_g65816_set_reg[mode];
-    FTABLE_SET_LINE = s_g65816_set_line[mode];
-    FTABLE_EXECUTE = s_g65816_execute[mode];
+	FTABLE_GET_REG = s_g65816_get_reg[mode];
+	FTABLE_SET_REG = s_g65816_set_reg[mode];
+	FTABLE_SET_LINE = s_g65816_set_line[mode];
+	FTABLE_EXECUTE = s_g65816_execute[mode];
 }
 
 
@@ -941,13 +941,13 @@ void g65816_device::state_export(const device_state_entry &entry)
 			break;
 		case G65816_P:
 			m_debugger_temp = (m_flag_n&0x80)         |
-			                  ((m_flag_v>>1)&0x40)    |
-			                  m_flag_m                |
-			                  m_flag_x                |
-			                  m_flag_d                |
-			                  m_flag_i                |
-			                  ((!m_flag_z)<<1)        |
-			                  ((m_flag_c>>8)&1);
+								((m_flag_v>>1)&0x40)    |
+								m_flag_m                |
+								m_flag_x                |
+								m_flag_d                |
+								m_flag_i                |
+								((!m_flag_z)<<1)        |
+								((m_flag_c>>8)&1);
 			break;
 		case G65816_A:
 			m_debugger_temp = m_a | m_b;
@@ -1028,11 +1028,11 @@ void _5a22_device::state_import(const device_state_entry &entry)
 
 void _5a22_device::state_export(const device_state_entry &entry)
 {
-    switch (entry.index())
-    {
-        case _5A22_FASTROM:
-            m_debugger_temp = g65816_get_reg(_5A22_FASTROM);
-            break;
+	switch (entry.index())
+	{
+		case _5A22_FASTROM:
+			m_debugger_temp = g65816_get_reg(_5A22_FASTROM);
+			break;
 		default:
 			g65816_device::state_export(entry);
 			break;

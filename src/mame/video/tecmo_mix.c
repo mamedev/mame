@@ -34,12 +34,6 @@ tecmo_mix_device::tecmo_mix_device(const machine_config &mconfig, const char *ta
 
 void tecmo_mix_device::device_start()
 {
-
-
-
-
-
-
 }
 
 void tecmo_mix_device::device_reset()
@@ -133,7 +127,6 @@ void tecmo_mix_device::mix_bitmaps(screen_device &screen, bitmap_rgb32 &bitmap, 
 			{
 				if (m_sprpri == (0 ^ m_revspritetile)) // behind all
 				{
-
 					if (fgpixel & 0xf) // is the fg used?
 					{
 						if (fgbln)
@@ -180,7 +173,7 @@ void tecmo_mix_device::mix_bitmaps(screen_device &screen, bitmap_rgb32 &bitmap, 
 							}
 							else
 							{
-								// fg is used and blended with opaque sprite						
+								// fg is used and blended with opaque sprite
 								dd[x] = paldata[fgpixel + m_fgblend_source] + paldata[sprpixel + m_spblend_comp];
 							}
 						}
@@ -230,10 +223,10 @@ void tecmo_mix_device::mix_bitmaps(screen_device &screen, bitmap_rgb32 &bitmap, 
 						{
 							// blended sprite over solid bg pixel
 							dd[x] = paldata[bgpixel + m_bgblend_comp] + paldata[sprpixel + m_spblend_source];
-						//	dd[x] =  rand();
+						//  dd[x] =  rand();
 						}
-						
-						
+
+
 
 					}
 					else
@@ -265,13 +258,13 @@ void tecmo_mix_device::mix_bitmaps(screen_device &screen, bitmap_rgb32 &bitmap, 
 					{
 						// needs if bgpixel & 0xf check?
 						dd[x] = paldata[fgpixel + m_fgblend_source] + paldata[bgpixel + m_bgblend_comp];
-				
+
 					}
 					else
 					{
 						dd[x] = paldata[fgpixel + m_fgregular_comp];
 					}
-					
+
 				}
 				else if (bgpixel & 0x0f)
 				{

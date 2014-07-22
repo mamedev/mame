@@ -131,7 +131,7 @@ void tecmo_spr_device::gaiden_draw_sprites(screen_device &screen, gfxdecode_devi
 		}
 
 		if (enabled)
-		{				
+		{
 			UINT32 flipx = (attributes & 1);
 			UINT32 flipy = (attributes & 2);
 
@@ -183,7 +183,7 @@ void tecmo_spr_device::gaiden_draw_sprites(screen_device &screen, gfxdecode_devi
 			// this contains the blend bit and the priority bits, the spbactn proto uses 0x0300 for priority, spbactn uses 0x0030, others use 0x00c0
 			color |= (source[attributes_word] & 0x03f0);
 			bitmap = &sprite_bitmap;
-	
+
 
 			for (row = 0; row < sizey; row++)
 			{
@@ -198,9 +198,9 @@ void tecmo_spr_device::gaiden_draw_sprites(screen_device &screen, gfxdecode_devi
 						flipx, flipy,
 						sx, sy,
 						0);
-					
+
 				}
-			}	
+			}
 		}
 		source += sourceinc;
 	}
@@ -214,19 +214,19 @@ void tecmo_spr_device::gaiden_draw_sprites(screen_device &screen, gfxdecode_devi
  *  byte     bit        usage
  * --------+-76543210-+----------------
          0 | xxxxx--- | bank / upper tile bits
-		   | -----x-- | enable
-		   | ------x- | flip y
-		   | -------x | flip x
-		 1 | xxxxxxxx | tile number (low bits)
-		 2 | ------xx | size
-		 3 | xx-------| priority
-		   | --x----- | upper y co-ord
-		   | ---x---- | upper x co-ord
-		   | ----xxxx | colour
-		 4 | xxxxxxxx | ypos
-		 5 | xxxxxxxx | xpos
-		 6 | -------- |
-		 7 | -------- |
+           | -----x-- | enable
+           | ------x- | flip y
+           | -------x | flip x
+         1 | xxxxxxxx | tile number (low bits)
+         2 | ------xx | size
+         3 | xx-------| priority
+           | --x----- | upper y co-ord
+           | ---x---- | upper x co-ord
+           | ----xxxx | colour
+         4 | xxxxxxxx | ypos
+         5 | xxxxxxxx | xpos
+         6 | -------- |
+         7 | -------- |
 
 */
 
@@ -302,7 +302,7 @@ void tecmo_spr_device::draw_sprites_8bit(screen_device &screen, bitmap_ind16 &bi
  *
  *  byte     bit        usage
  * --------+-76543210-+----------------
-    
+
 
 
 */
@@ -326,7 +326,7 @@ void tecmo_spr_device::draw_wc90_sprites(bitmap_ind16 &bitmap, const rectangle &
 				if (xpos >= 0x0300) xpos -= 0x0400;
 
 				flags = spriteram[offs+4];
-				
+
 				int sizex = 1 << ((flags >> 0) & 3);
 				int sizey = 1 << ((flags >> 2) & 3);
 

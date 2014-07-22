@@ -472,7 +472,7 @@ static MACHINE_CONFIG_DERIVED( pleiads, phoenix )
 	MCFG_TMS36XX_TYPE(TMS3615)
 	MCFG_TMS36XX_DECAY_TIMES(0.33, 0.33, 0, 0.33, 0, 0.33)
 	// NOTE: it's unknown if the TMS3615 mixes more than one voice internally.
-	// A wav taken from Pop Flamer sounds like there are at least no 'odd' 
+	// A wav taken from Pop Flamer sounds like there are at least no 'odd'
 	// harmonics (5 1/3' and 2 2/3')
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
@@ -1144,7 +1144,7 @@ ROM_START( pleiadsi )
 	ROM_LOAD( "9 2716.bin",     0x0000, 0x0800, CRC(85866607) SHA1(cd240bd056f761b2f9e2142049434f02cae3e315) )
 	ROM_LOAD( "10 2716.bin",    0x0800, 0x0800, CRC(a841d511) SHA1(8349008ab1d8ef08775b54170c37deb1d391fffc) )
 
-	ROM_REGION( 0x0200, "proms", 0 ) // not present in dump, assuming to be the same, matches screenshots, note reverse order to most sets, same as pleiadsb2. 
+	ROM_REGION( 0x0200, "proms", 0 ) // not present in dump, assuming to be the same, matches screenshots, note reverse order to most sets, same as pleiadsb2.
 	ROM_LOAD( "7611-5.26",    0x0000, 0x0100, CRC(7a1bcb1e) SHA1(bdfab316ea26e2063879e7aa78b6ae2b55eb95c8) )   /* palette low bits */
 	ROM_LOAD( "7611-5.33",    0x0100, 0x0100, CRC(e38eeb83) SHA1(252880d80425b2e697146e76efdc6cb9f3ba0378) )   /* palette high bits */
 ROM_END

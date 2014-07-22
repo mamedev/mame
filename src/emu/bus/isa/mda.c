@@ -362,7 +362,7 @@ MC6845_UPDATE_ROW( isa8_mda_device::crtc_update_row )
 {
 	if (m_update_row_type == -1)
 		return;
-	
+
 	switch (m_update_row_type)
 	{
 		case MDA_TEXT_INTEN:
@@ -379,7 +379,7 @@ MC6845_UPDATE_ROW( isa8_hercules_device::crtc_update_row )
 {
 	if (m_update_row_type == -1)
 		return;
-	
+
 	switch (m_update_row_type)
 	{
 		case HERCULES_GFX_BLINK:

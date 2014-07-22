@@ -1328,4 +1328,3 @@ void midzeus2_state::log_fifo_command(const UINT32 *data, int numwords, const ch
 		logerror(" %08X", data[wordnum]);
 	logerror("%s", suffix);
 }
-

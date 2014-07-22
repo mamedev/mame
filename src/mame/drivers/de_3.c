@@ -1126,7 +1126,7 @@ GAME(1992,  trek_120,       trek_201,   de_3_dmd1,   de_3, de_3_state,   de_3,  
 GAME(1992,  trek_110,       trek_201,   de_3_dmd1,   de_3, de_3_state,   de_3,   ROT0,   "Data East",    "Star Trek 25th Anniversary (1.10)",                GAME_IS_SKELETON_MECHANICAL)
 GAME(1992,  trek_11a,       trek_201,   de_3_dmd1,   de_3, de_3_state,   de_3,   ROT0,   "Data East",    "Star Trek 25th Anniversary (1.10 Alpha Display)",  GAME_IS_SKELETON_MECHANICAL)
 GAME(1992,  stwr_104,       0,          de_3_dmd2,   de_3, de_3_state,   de_3,   ROT0,   "Data East",    "Star Wars (1.04)",             GAME_IS_SKELETON_MECHANICAL)
-GAME(1992,  stwr_103,       stwr_104,   de_3_dmd2,   de_3, de_3_state,   de_3,   ROT0,   "Data East",    "Star Wars (1.03)",		     GAME_IS_SKELETON_MECHANICAL)
+GAME(1992,  stwr_103,       stwr_104,   de_3_dmd2,   de_3, de_3_state,   de_3,   ROT0,   "Data East",    "Star Wars (1.03)",             GAME_IS_SKELETON_MECHANICAL)
 GAME(1992,  stwr_g11,       stwr_104,   de_3_dmd2,   de_3, de_3_state,   de_3,   ROT0,   "Data East",    "Star Wars (1.01 Germany)",     GAME_IS_SKELETON_MECHANICAL)
 GAME(1992,  stwr_a14,       stwr_104,   de_3_dmd2,   de_3, de_3_state,   de_3,   ROT0,   "Data East",    "Star Wars (Display Rev.1.04)", GAME_IS_SKELETON_MECHANICAL)
 GAME(1992,  stwr_102,       stwr_104,   de_3_dmd2,   de_3, de_3_state,   de_3,   ROT0,   "Data East",    "Star Wars (1.02)",             GAME_IS_SKELETON_MECHANICAL)

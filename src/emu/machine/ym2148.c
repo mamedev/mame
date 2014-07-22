@@ -124,7 +124,7 @@ void ym2148_device::update_irq()
 	}
 	if ((m_status & STATUS_TRANSMIT_READY) && (m_control & CONTROL_TRANSMIT_IRQ_ENABLE))
 	{
-//		m_irq_state = ASSERT_LINE;
+//      m_irq_state = ASSERT_LINE;
 	}
 
 	m_irq_handler(m_irq_state);
@@ -205,4 +205,3 @@ WRITE_LINE_MEMBER(ym2148_device::write_rxd)
 {
 	m_rxd = state;
 }
-

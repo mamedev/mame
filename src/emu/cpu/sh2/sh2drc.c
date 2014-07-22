@@ -2978,4 +2978,3 @@ void sh2_device::sh2drc_add_fastram(offs_t start, offs_t end, UINT8 readonly, vo
 		m_fastram_select++;
 	}
 }
-

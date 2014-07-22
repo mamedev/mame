@@ -350,7 +350,7 @@ static MACHINE_CONFIG_START( dbz, dbz_state )
 
 	MCFG_DEVICE_ADD("k053246", K053246, 0)
 	MCFG_K053246_CB(dbz_state, sprite_callback)
-	MCFG_K053246_CONFIG("gfx2", 3, NORMAL_PLANE_ORDER, -87, 32)	// or -52, 16?
+	MCFG_K053246_CONFIG("gfx2", 3, NORMAL_PLANE_ORDER, -87, 32) // or -52, 16?
 	MCFG_K053246_GFXDECODE("gfxdecode")
 	MCFG_K053246_PALETTE("palette")
 

@@ -136,7 +136,7 @@ void msx_cart_ascii16::initialize_cartridge()
 	UINT32 size = get_rom_size();
 
 	if ( size > 256 * 0x4000 )
-	{   
+	{
 		fatalerror("ascii16: ROM is too big\n");
 	}
 
@@ -371,7 +371,7 @@ void msx_cart_ascii16_sram::initialize_cartridge()
 	UINT32 size = get_rom_size();
 
 	if ( size > 128 * 0x4000 )
-	{   
+	{
 		fatalerror("ascii16_sram: ROM is too big\n");
 	}
 
@@ -439,4 +439,3 @@ WRITE8_MEMBER(msx_cart_ascii16_sram::write_cart)
 		}
 	}
 }
-

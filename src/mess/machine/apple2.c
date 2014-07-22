@@ -354,7 +354,7 @@ READ8_MEMBER(apple2_state::apple2_c080_r)
 				offset &= 0xf;
 				if (offset >= 8 && offset <= 0xb)
 				{
-					return m_acia1->read(space, offset-8); 
+					return m_acia1->read(space, offset-8);
 				}
 			}
 			else if (slot == 2)
@@ -362,7 +362,7 @@ READ8_MEMBER(apple2_state::apple2_c080_r)
 				offset &= 0xf;
 				if (offset >= 8 && offset <= 0xb)
 				{
-					return m_acia2->read(space, offset-8); 
+					return m_acia2->read(space, offset-8);
 				}
 			}
 		}

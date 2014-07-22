@@ -236,7 +236,6 @@ void sma_prot_device::reset_sma_rng()
 
 void sma_prot_device::sma_install_random_read_handler(cpu_device* maincpu, int addr1, int addr2 )
 {
-
 	maincpu->space(AS_PROGRAM).install_read_handler(addr1, addr1 + 1, read16_delegate(FUNC(sma_prot_device::sma_random_r),this));
 	maincpu->space(AS_PROGRAM).install_read_handler(addr2, addr2 + 1, read16_delegate(FUNC(sma_prot_device::sma_random_r),this));
 }
@@ -459,5 +458,3 @@ void sma_prot_device::kof2000_decrypt_68k(UINT8* base)
 		rom[i] = rom[0x73a000/2 + BITSWAP24(i,23,22,21,20,19,18,8,4,15,13,3,14,16,2,6,17,7,12,10,0,5,11,1,9)];
 	}
 }
-
-

@@ -76,4 +76,3 @@ WRITE8_MEMBER(msx_slot_ram_mm_device::write_mapper_bank)
 	m_bank_selected[offset] = data;
 	m_bank_base[offset] = m_ram + 0x4000 * ( m_bank_selected[offset] & m_bank_mask );
 }
-

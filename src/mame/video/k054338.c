@@ -111,7 +111,7 @@ void k054338_device::fill_solid_bg( bitmap_rgb32 &bitmap, const rectangle &clipr
 // Unified k054338/K055555 BG color fill (see p.67)
 void k054338_device::fill_backcolor(bitmap_rgb32 &bitmap, const rectangle &cliprect, const pen_t *pal_ptr, int mode)
 {
-	if ((mode & 0x02) == 0)	// solid fill
+	if ((mode & 0x02) == 0) // solid fill
 	{
 		bitmap.fill(*pal_ptr, cliprect);
 	}
@@ -120,7 +120,7 @@ void k054338_device::fill_backcolor(bitmap_rgb32 &bitmap, const rectangle &clipr
 		UINT32 *dst_ptr = &bitmap.pix32(cliprect.min_y);
 		int dst_pitch = bitmap.rowpixels();
 
-		if ((mode & 0x01) == 0)	// vertical gradient fill
+		if ((mode & 0x01) == 0) // vertical gradient fill
 		{
 			pal_ptr += cliprect.min_y;
 			for(int y = cliprect.min_y; y <= cliprect.max_y; y++)
@@ -134,7 +134,7 @@ void k054338_device::fill_backcolor(bitmap_rgb32 &bitmap, const rectangle &clipr
 				dst_ptr += dst_pitch;
 			}
 		}
-		else	// horizontal gradient fill
+		else    // horizontal gradient fill
 		{
 			int width = cliprect.width() * sizeof(UINT32);
 			pal_ptr += cliprect.min_x;

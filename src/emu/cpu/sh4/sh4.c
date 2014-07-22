@@ -3193,7 +3193,7 @@ const sh34_base_device::sh4ophandler sh34_base_device::s_upper4bits[256] =
 	/* j = 0x9000 */
 	SH4OP(MOVWI),      SH4OP(MOVWI),      SH4OP(MOVWI),      SH4OP(MOVWI),      SH4OP(MOVWI),      SH4OP(MOVWI),      SH4OP(MOVWI),      SH4OP(MOVWI),
 	SH4OP(MOVWI),      SH4OP(MOVWI),      SH4OP(MOVWI),      SH4OP(MOVWI),      SH4OP(MOVWI),      SH4OP(MOVWI),      SH4OP(MOVWI),      SH4OP(MOVWI),
-	 /* j = 0xa000 */
+		/* j = 0xa000 */
 	SH4OP(BRA),        SH4OP(BRA),        SH4OP(BRA),        SH4OP(BRA),        SH4OP(BRA),        SH4OP(BRA),        SH4OP(BRA),        SH4OP(BRA),
 	SH4OP(BRA),        SH4OP(BRA),        SH4OP(BRA),        SH4OP(BRA),        SH4OP(BRA),        SH4OP(BRA),        SH4OP(BRA),        SH4OP(BRA),
 	/* j = 0xb000 */
@@ -3968,4 +3968,3 @@ void sh34_base_device::sh4_set_ftcsr_callback(sh4_ftcsr_callback callback)
 {
 	m_ftcsr_read_callback = callback;
 }
-

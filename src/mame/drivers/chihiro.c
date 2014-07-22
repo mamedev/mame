@@ -449,7 +449,7 @@ public:
 		UINT32 gpdsp_sgblocks;
 		UINT32 gpdsp_address;
 		UINT32 epdsp_sgaddress; // encoder processor scatter-gather
-		UINT32 epdsp_sgblocks; 
+		UINT32 epdsp_sgblocks;
 		UINT32 unknown_sgaddress;
 		UINT32 unknown_sgblocks;
 		int voice_number;
@@ -3345,13 +3345,13 @@ void nv2a_renderer::geforce_exec_method(address_space & space,UINT32 chanel,UINT
 	// Vertex program (shader)
 	if (maddress == 0x1e94) {
 		/*if (data == 2)
-			logerror("Enabled vertex program\n");
+		    logerror("Enabled vertex program\n");
 		else if (data == 4)
-			logerror("Enabled fixed function pipeline\n");
+		    logerror("Enabled fixed function pipeline\n");
 		else if (data == 6)
-			logerror("Enabled both fixed function pipeline and vertex program ?\n");
+		    logerror("Enabled both fixed function pipeline and vertex program ?\n");
 		else
-			logerror("Unknown value %d to method 0x1e94\n",data);*/
+		    logerror("Unknown value %d to method 0x1e94\n",data);*/
 		vertex_pipeline = data & 6;
 		countlen--;
 	}
@@ -5373,8 +5373,8 @@ Peripheral String 0000000
 Product Number    GDX-0001
 Version           V1.004
 Release Date      20021029
-Manufacturer ID	
-TOC	DISC
+Manufacturer ID
+TOC DISC
 Track        Start Sector  End Sector  Track Size
 track01.bin           150         599     1058400
 track02.raw           750        2101     3179904
@@ -5405,8 +5405,8 @@ Peripheral String 0000000
 Product Number    GDX-0002B
 Version           V3.000
 Release Date      20030224
-Manufacturer ID	
-TOC	DISC
+Manufacturer ID
+TOC DISC
 Track        Start Sector  End Sector  Track Size
 track01.bin           150         599     1058400
 track02.raw           750        2101     3179904
@@ -5485,12 +5485,12 @@ Peripheral String 0000000
 Product Number    GDX-0006G
 Version           V8.000
 Release Date      20050202
-Manufacturer ID	
-TOC	DISC
+Manufacturer ID
+TOC DISC
 Track        Start Sector  End Sector  Track Size
 track01.bin           150         599     1058400
-track02.raw 750	2101	3179904
-track03.bin	45150	549299	1185760800
+track02.raw 750 2101    3179904
+track03.bin 45150   549299  1185760800
 */
 ROM_START( mj2 )
 	CHIHIRO_BIOS
@@ -5627,8 +5627,8 @@ Peripheral String 0000000
 Product Number    GDX-0024A
 Version           V2.000
 Release Date      20090331
-Manufacturer ID	
-TOC	DISC
+Manufacturer ID
+TOC DISC
 Track        Start Sector  End Sector  Track Size
 track01.bin           150        8740    20206032
 track02.raw          8891       10242     3179904

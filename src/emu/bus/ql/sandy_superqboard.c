@@ -17,9 +17,9 @@
 //  MACROS/CONSTANTS
 //**************************************************************************
 
-#define WD1772_TAG		"ic3"
-#define TTL74273_TAG	"ic10"
-#define CENTRONICS_TAG	"j2"
+#define WD1772_TAG      "ic3"
+#define TTL74273_TAG    "ic10"
+#define CENTRONICS_TAG  "j2"
 
 
 
@@ -289,7 +289,7 @@ void sandy_superqboard_t::device_reset()
 
 	m_latch->write(0);
 	m_centronics->write_strobe(1);
-	
+
 	m_fd6 = 0;
 	m_fd7 = 0;
 	m_status = 0;
@@ -313,20 +313,20 @@ UINT8 sandy_superqboard_t::read(address_space &space, offs_t offset, UINT8 data)
 			case 0:
 				data = m_fdc->read(space, offset & 0x03);
 				break;
-			
+
 			case 3:
 				/*
 
-					bit		description
+				    bit     description
 
-					0 		BUSY
-					1 		mouse pin 8 (middle button)
-					2 		mouse pin 1 (right button)
-					3 		mouse pin 2 (left button)
-					4 		mouse pin 4 flip-flop Q (Y direction)
-					5 		mouse pin 3 flip-flop Q (X direction)
-					6 		INT3 (Y interrupt)
-					7 		INT2 (X interrupt)
+				    0       BUSY
+				    1       mouse pin 8 (middle button)
+				    2       mouse pin 1 (right button)
+				    3       mouse pin 2 (left button)
+				    4       mouse pin 4 flip-flop Q (Y direction)
+				    5       mouse pin 3 flip-flop Q (X direction)
+				    6       INT3 (Y interrupt)
+				    7       INT2 (X interrupt)
 
 				*/
 
@@ -378,22 +378,22 @@ void sandy_superqboard_t::write(address_space &space, offs_t offset, UINT8 data)
 				{
 				/*
 
-					bit		description
+				    bit     description
 
-					0 		SIDE ONE
-					1 		DSEL0
-					2 		DSEL1
-					3 		M ON0
-					4 		/DDEN
-					5 		STROBE inverted
-					6 		enable printer interrupt (GAL pin 11)
-					7 		enable mouse interrupt (GAL pin 9)
+				    0       SIDE ONE
+				    1       DSEL0
+				    2       DSEL1
+				    3       M ON0
+				    4       /DDEN
+				    5       STROBE inverted
+				    6       enable printer interrupt (GAL pin 11)
+				    7       enable mouse interrupt (GAL pin 9)
 
 				*/
 
 				floppy_image_device *floppy = NULL;
 
-				if (BIT(data, 1)) 
+				if (BIT(data, 1))
 				{
 					floppy = m_floppy0->get_device();
 				}

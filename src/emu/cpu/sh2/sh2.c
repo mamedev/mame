@@ -149,7 +149,7 @@ const device_type SH2 = &device_creator<sh2_device>;
 
 READ32_MEMBER(sh2_device::sh2_internal_a5)
 {
-    return 0xa5a5a5a5;
+	return 0xa5a5a5a5;
 }
 
 
@@ -158,8 +158,8 @@ READ32_MEMBER(sh2_device::sh2_internal_a5)
 -------------------------------------------------*/
 
 static ADDRESS_MAP_START( sh2_internal_map, AS_PROGRAM, 32, sh2_device )
-    AM_RANGE(0x40000000, 0xbfffffff) AM_READ(sh2_internal_a5)
-    AM_RANGE(0xe0000000, 0xffffffff) AM_READWRITE(sh2_internal_r, sh2_internal_w)
+	AM_RANGE(0x40000000, 0xbfffffff) AM_READ(sh2_internal_a5)
+	AM_RANGE(0xe0000000, 0xffffffff) AM_READWRITE(sh2_internal_r, sh2_internal_w)
 ADDRESS_MAP_END
 
 
@@ -170,7 +170,7 @@ sh2_device::sh2_device(const machine_config &mconfig, const char *tag, device_t 
 	, m_cpu_type(CPU_TYPE_SH2)
 	, m_cache(CACHE_SIZE + sizeof(internal_sh2_state))
 	, m_drcuml(NULL)
-//	, m_drcuml(*this, m_cache, ( LOG_UML ? DRCUML_OPTION_LOG_UML : 0 ) | ( LOG_NATIVE ? DRCUML_OPTION_LOG_NATIVE : 0 ), 1, 32, 1)
+//  , m_drcuml(*this, m_cache, ( LOG_UML ? DRCUML_OPTION_LOG_UML : 0 ) | ( LOG_NATIVE ? DRCUML_OPTION_LOG_NATIVE : 0 ), 1, 32, 1)
 	, m_drcfe(NULL)
 	, m_drcoptions(0)
 	, m_sh2_state(NULL)
@@ -207,7 +207,7 @@ sh2_device::sh2_device(const machine_config &mconfig, device_type type, const ch
 	, m_cpu_type(cpu_type)
 	, m_cache(CACHE_SIZE + sizeof(internal_sh2_state))
 	, m_drcuml(NULL)
-//	, m_drcuml(*this, m_cache, ( LOG_UML ? DRCUML_OPTION_LOG_UML : 0 ) | ( LOG_NATIVE ? DRCUML_OPTION_LOG_NATIVE : 0 ), 1, 32, 1)
+//  , m_drcuml(*this, m_cache, ( LOG_UML ? DRCUML_OPTION_LOG_UML : 0 ) | ( LOG_NATIVE ? DRCUML_OPTION_LOG_NATIVE : 0 ), 1, 32, 1)
 	, m_drcfe(NULL)
 	, m_drcoptions(0)
 	, m_sh2_state(NULL)
@@ -2586,11 +2586,11 @@ void sh2_device::device_start()
 	/* initialize the front-end helper */
 	m_drcfe = auto_alloc(machine(), sh2_frontend(this, COMPILE_BACKWARDS_BYTES, COMPILE_FORWARDS_BYTES, SINGLE_INSTRUCTION_MODE ? 1 : COMPILE_MAX_SEQUENCE));
 
-    /* compute the register parameters */
-    for (int regnum = 0; regnum < 16; regnum++)
-    {
-        m_regmap[regnum] = uml::mem(&m_sh2_state->r[regnum]);
-    }
+	/* compute the register parameters */
+	for (int regnum = 0; regnum < 16; regnum++)
+	{
+		m_regmap[regnum] = uml::mem(&m_sh2_state->r[regnum]);
+	}
 
 	/* if we have registers to spare, assign r0, r1, r2 to leftovers */
 	/* WARNING: do not use synthetic registers that are mapped here! */
@@ -2712,4 +2712,3 @@ void sh2_device::execute_set_input(int irqline, int state)
 
 #include "sh2comn.c"
 #include "sh2drc.c"
-

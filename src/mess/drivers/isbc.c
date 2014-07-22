@@ -199,7 +199,7 @@ static MACHINE_CONFIG_START( isbc86, isbc_state )
 	MCFG_CPU_PROGRAM_MAP(isbc86_mem)
 	MCFG_CPU_IO_MAP(isbc_io)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic_0", pic8259_device, inta_cb)
-	
+
 	MCFG_PIC8259_ADD("pic_0", INPUTLINE(":maincpu", 0), VCC, NULL)
 
 	MCFG_DEVICE_ADD("pit", PIT8253, 0)
@@ -231,7 +231,7 @@ static MACHINE_CONFIG_START( rpc86, isbc_state )
 	MCFG_CPU_PROGRAM_MAP(rpc86_mem)
 	MCFG_CPU_IO_MAP(rpc86_io)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic_0", pic8259_device, inta_cb)
-	
+
 	MCFG_PIC8259_ADD("pic_0", INPUTLINE(":maincpu", 0), VCC, NULL)
 
 	MCFG_DEVICE_ADD("pit", PIT8253, 0)
@@ -266,7 +266,7 @@ static MACHINE_CONFIG_START( isbc286, isbc_state )
 	MCFG_CPU_PROGRAM_MAP(isbc286_mem)
 	MCFG_CPU_IO_MAP(isbc286_io)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic_0", pic8259_device, inta_cb)
-	
+
 	MCFG_PIC8259_ADD("pic_0", INPUTLINE(":maincpu", 0), VCC, READ8(isbc_state, get_slave_ack))
 	MCFG_PIC8259_ADD("pic_1", DEVWRITELINE("pic_0", pic8259_device, ir7_w), GND, NULL)
 

@@ -29,4 +29,3 @@ device_neogeo_cart_interface::device_neogeo_cart_interface(const machine_config 
 device_neogeo_cart_interface::~device_neogeo_cart_interface()
 {
 }
-

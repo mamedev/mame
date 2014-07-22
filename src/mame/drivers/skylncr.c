@@ -174,7 +174,7 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	optional_shared_ptr<UINT8> m_generic_paletteram_8;
-	optional_shared_ptr<UINT8> m_generic_paletteram2_8;	
+	optional_shared_ptr<UINT8> m_generic_paletteram2_8;
 };
 
 
@@ -205,7 +205,7 @@ TILE_GET_INFO_MEMBER(skylncr_state::get_tile_info)
 TILE_GET_INFO_MEMBER(skylncr_state::get_reel_1_tile_info)
 {
 	UINT16 code = m_reeltiles_1_ram[ tile_index ] + (m_reeltileshigh_1_ram[ tile_index ] << 8);
-	int pal = (code & 0x8000) >> 15;		
+	int pal = (code & 0x8000) >> 15;
 	SET_TILE_INFO_MEMBER(1, code&0x7fff, pal^1, TILE_FLIPYX( 0 ));
 }
 
@@ -611,7 +611,7 @@ static const gfx_layout layout8x32x8_alt2 =  /* for neraidov */
 		RGN_FRAC(1,2)+8*1, 8*1,
 		RGN_FRAC(1,2)+8*0, 8*0,
 		RGN_FRAC(1,2)+8*3, 8*3,
-		RGN_FRAC(1,2)+8*2, 8*2 
+		RGN_FRAC(1,2)+8*2, 8*2
 	},
 	{
 		STEP16(0,8*4),
@@ -634,7 +634,7 @@ GFXDECODE_END
 static GFXDECODE_START( neraidou )
 	GFXDECODE_ENTRY( "gfx1", 0, layout8x8x8_alt,    0, 2 )
 	GFXDECODE_ENTRY( "gfx2", 0, layout8x32x8_alt2,  0, 2 )
-//	GFXDECODE_ENTRY( "gfx2", 0, layout8x32x8_alt,   0x100, 1 )
+//  GFXDECODE_ENTRY( "gfx2", 0, layout8x32x8_alt,   0x100, 1 )
 GFXDECODE_END
 
 static GFXDECODE_START( sstar97 )
@@ -834,12 +834,12 @@ static INPUT_PORTS_START( leader )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )
 
 	PORT_START("DSW1")  /* $02 (PPI0 port C) */
-	PORT_DIPNAME( 0x11, 0x11, "Butterfly Max Mul" )		PORT_DIPLOCATION("DSW-A:!4,!5")
+	PORT_DIPNAME( 0x11, 0x11, "Butterfly Max Mul" )     PORT_DIPLOCATION("DSW-A:!4,!5")
 	PORT_DIPSETTING(    0x11, "5" )
 	PORT_DIPSETTING(    0x01, "7" )
 	PORT_DIPSETTING(    0x10, "8" )
 	PORT_DIPSETTING(    0x00, "12" )
-	PORT_DIPNAME( 0x0e, 0x00, "Main Win Rate" )			PORT_DIPLOCATION("DSW-A:!6,!7,!8")
+	PORT_DIPNAME( 0x0e, 0x00, "Main Win Rate" )         PORT_DIPLOCATION("DSW-A:!6,!7,!8")
 	PORT_DIPSETTING(    0x0e, "55%" )
 	PORT_DIPSETTING(    0x0c, "60%" )
 	PORT_DIPSETTING(    0x0a, "65%" )
@@ -848,42 +848,42 @@ static INPUT_PORTS_START( leader )
 	PORT_DIPSETTING(    0x04, "80%" )
 	PORT_DIPSETTING(    0x02, "85%" )
 	PORT_DIPSETTING(    0x00, "90%" )
-	PORT_DIPNAME( 0x20, 0x00, "Reels Speed" )			PORT_DIPLOCATION("DSW-A:!3")
+	PORT_DIPNAME( 0x20, 0x00, "Reels Speed" )           PORT_DIPLOCATION("DSW-A:!3")
 	PORT_DIPSETTING(    0x20, "Slow" )
 	PORT_DIPSETTING(    0x00, "Fast" )
-	PORT_DIPNAME( 0x40, 0x00, "Bonus Score" )			PORT_DIPLOCATION("DSW-A:!2")
+	PORT_DIPNAME( 0x40, 0x00, "Bonus Score" )           PORT_DIPLOCATION("DSW-A:!2")
 	PORT_DIPSETTING(    0x40, "24" )
 	PORT_DIPSETTING(    0x00, "32" )
-	PORT_DIPNAME( 0x80, 0x00, "Key Out" )				PORT_DIPLOCATION("DSW-A:!1")
+	PORT_DIPNAME( 0x80, 0x00, "Key Out" )               PORT_DIPLOCATION("DSW-A:!1")
 	PORT_DIPSETTING(    0x00, "x1" )
 	PORT_DIPSETTING(    0x80, "x100" )
 
 	PORT_START("DSW2")  /* $10 (PPI1 port A) */
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )		PORT_DIPLOCATION("DSW-B:1")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )      PORT_DIPLOCATION("DSW-B:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )		PORT_DIPLOCATION("DSW-B:2")
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )      PORT_DIPLOCATION("DSW-B:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, "Double-Up" )				PORT_DIPLOCATION("DSW-B:3")
+	PORT_DIPNAME( 0x04, 0x04, "Double-Up" )             PORT_DIPLOCATION("DSW-B:3")
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x18, 0x18, "Refund Coin Limit" )		PORT_DIPLOCATION("DSW-B:4,5")
+	PORT_DIPNAME( 0x18, 0x18, "Refund Coin Limit" )     PORT_DIPLOCATION("DSW-B:4,5")
 	PORT_DIPSETTING(    0x00, "0" )
 	PORT_DIPSETTING(    0x18, "1000" )
 	PORT_DIPSETTING(    0x10, "2000" )
 	PORT_DIPSETTING(    0x08, "5000" )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )		PORT_DIPLOCATION("DSW-B:6")
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )      PORT_DIPLOCATION("DSW-B:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0xc0, 0xc0, "Butterfly Win Rate" )	PORT_DIPLOCATION("DSW-B:7,8")
+	PORT_DIPNAME( 0xc0, 0xc0, "Butterfly Win Rate" )    PORT_DIPLOCATION("DSW-B:7,8")
 	PORT_DIPSETTING(    0xc0, "15%" )
 	PORT_DIPSETTING(    0x80, "20%" )
 	PORT_DIPSETTING(    0x40, "25%" )
 	PORT_DIPSETTING(    0x00, "30%" )
 
 	PORT_START("DSW3")  /* AY8910 port A */
-	PORT_DIPNAME( 0x07, 0x07, "Coinage A, B & C" )		PORT_DIPLOCATION("DSW-D:1,2,3")
+	PORT_DIPNAME( 0x07, 0x07, "Coinage A, B & C" )      PORT_DIPLOCATION("DSW-D:1,2,3")
 	PORT_DIPSETTING(    0x00, "1 Coin / 1 Credit" )
 	PORT_DIPSETTING(    0x01, "1 Coin / 5 Credits" )
 	PORT_DIPSETTING(    0x02, "1 Coin / 10 Credits" )
@@ -892,22 +892,22 @@ static INPUT_PORTS_START( leader )
 	PORT_DIPSETTING(    0x05, "1 Coin / 40 Credits" )
 	PORT_DIPSETTING(    0x06, "1 Coin / 50 Credits" )
 	PORT_DIPSETTING(    0x07, "1 Coin / 100 Credit" )
-	PORT_DIPNAME( 0x18, 0x00, "Credit Limit" )			PORT_DIPLOCATION("DSW-D:4,5")
+	PORT_DIPNAME( 0x18, 0x00, "Credit Limit" )          PORT_DIPLOCATION("DSW-D:4,5")
 	PORT_DIPSETTING(    0x00, "120000" )
 	PORT_DIPSETTING(    0x08, "100000" )
 	PORT_DIPSETTING(    0x10, "80000" )
 	PORT_DIPSETTING(    0x18, "50000" )
-	PORT_DIPNAME( 0x20, 0x20, "Max Win Bonus" )			PORT_DIPLOCATION("DSW-D:6")
+	PORT_DIPNAME( 0x20, 0x20, "Max Win Bonus" )         PORT_DIPLOCATION("DSW-D:6")
 	PORT_DIPSETTING(    0x20, "10000" )
 	PORT_DIPSETTING(    0x00, "20000" )
-	PORT_DIPNAME( 0xc0, 0xc0, "Minimum Bet" )			PORT_DIPLOCATION("DSW-D:7,8")
+	PORT_DIPNAME( 0xc0, 0xc0, "Minimum Bet" )           PORT_DIPLOCATION("DSW-D:7,8")
 	PORT_DIPSETTING(    0xc0, "8" )
 	PORT_DIPSETTING(    0x80, "16" )
 	PORT_DIPSETTING(    0x40, "32" )
 	PORT_DIPSETTING(    0x00, "64" )
 
 	PORT_START("DSW4")  /* AY8910 port B */
-	PORT_DIPNAME( 0x07, 0x07, "Remote Credits" )			PORT_DIPLOCATION("DSW-C:1,2,3")
+	PORT_DIPNAME( 0x07, 0x07, "Remote Credits" )            PORT_DIPLOCATION("DSW-C:1,2,3")
 	PORT_DIPSETTING(    0x00, "1 Pulse / 100 Credits" )
 	PORT_DIPSETTING(    0x01, "1 Pulse / 110 Credits" )
 	PORT_DIPSETTING(    0x02, "1 Pulse / 120 Credits" )
@@ -916,18 +916,18 @@ static INPUT_PORTS_START( leader )
 	PORT_DIPSETTING(    0x05, "1 Pulse / 400 Credits" )
 	PORT_DIPSETTING(    0x06, "1 Pulse / 500 Credits" )
 	PORT_DIPSETTING(    0x07, "1 Pulse / 1000 Credits" )
-	PORT_DIPNAME( 0x18, 0x18, "High Bet Limit" )			PORT_DIPLOCATION("DSW-C:4,5")
+	PORT_DIPNAME( 0x18, 0x18, "High Bet Limit" )            PORT_DIPLOCATION("DSW-C:4,5")
 	PORT_DIPSETTING(    0x18, "32" )
 	PORT_DIPSETTING(    0x10, "50" )
 	PORT_DIPSETTING(    0x08, "72" )
 	PORT_DIPSETTING(    0x00, "96" )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )			PORT_DIPLOCATION("DSW-C:6")
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )          PORT_DIPLOCATION("DSW-C:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )			PORT_DIPLOCATION("DSW-C:7")
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )          PORT_DIPLOCATION("DSW-C:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, "Coin Lock" )					PORT_DIPLOCATION("DSW-C:8")
+	PORT_DIPNAME( 0x80, 0x00, "Coin Lock" )                 PORT_DIPLOCATION("DSW-C:8")
 	PORT_DIPSETTING(    0x80, "Locked" )
 	PORT_DIPSETTING(    0x00, "Normal" )
 INPUT_PORTS_END
@@ -976,7 +976,7 @@ static INPUT_PORTS_START( neraidou )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )
 
 	PORT_START("DSW1")  /* $02 (PPI0 port C) */
-	PORT_DIPNAME( 0x01, 0x01, "Hardware Type (could be inverted)" )	// leave it off, otherwise the game works bad and resets
+	PORT_DIPNAME( 0x01, 0x01, "Hardware Type (could be inverted)" ) // leave it off, otherwise the game works bad and resets
 	PORT_DIPSETTING(    0x01, "Rolla" )
 	PORT_DIPSETTING(    0x00, "Sky" )
 	PORT_DIPNAME( 0x0e, 0x0e, "Main Game Percentage" )
@@ -1120,7 +1120,7 @@ static INPUT_PORTS_START( gallag50 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )
 
 	PORT_START("DSW1")  /* $02 (PPI0 port C) */
-	PORT_DIPNAME( 0x01, 0x01, "Hardware Type (could be inverted)" )	// leave it off, otherwise the game works bad and resets
+	PORT_DIPNAME( 0x01, 0x01, "Hardware Type (could be inverted)" ) // leave it off, otherwise the game works bad and resets
 	PORT_DIPSETTING(    0x01, "Rolla" )
 	PORT_DIPSETTING(    0x00, "Sky" )
 	PORT_DIPNAME( 0x0e, 0x0e, "Main Game Percentage" )
@@ -1161,7 +1161,7 @@ static INPUT_PORTS_START( gallag50 )
 	PORT_DIPNAME( 0x10, 0x00, "Title" )
 	PORT_DIPSETTING(    0x10, "Petalouda (Greek for Butterfly)" )
 	PORT_DIPSETTING(    0x00, "Gallag" )
-	PORT_DIPNAME( 0x20, 0x20, "Alt GFX Decode (For different HW)" )		// could be a mix with 08 'Rolla GFX'
+	PORT_DIPNAME( 0x20, 0x20, "Alt GFX Decode (For different HW)" )     // could be a mix with 08 'Rolla GFX'
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0xc0, 0xc0, "Butterfly Win Rate" )
@@ -1502,10 +1502,10 @@ ROM_START( mbutrfly )
 	ROM_LOAD16_BYTE( "mb.u35", 0x40001, 0x20000, CRC(fdaa2288) SHA1(199323c2bd2af0d9b1d254a330670e2845f21dd9) )
 
 	ROM_REGION( 0x80000, "gfx2", 0 )
-	ROM_LOAD16_BYTE( "mb.u52", 0x00000, 0x20000, CRC(15051537) SHA1(086c38c05c605f297a7bc470eb51763a7648e72c) )	// identical to butterfly.
-	ROM_LOAD16_BYTE( "mb.u54", 0x00001, 0x20000, CRC(8e34d029) SHA1(ae316f2f34768938a07d62db110ce59d2751abaa) )	// identical to butterfly.
-	ROM_LOAD16_BYTE( "mb.u56", 0x40000, 0x20000, CRC(21ca47f8) SHA1(b192be06a2eb817776309580dc64fd76772a8d50) )	// this one is straight fixed for reel tiles 6C-DF.
-	ROM_LOAD16_BYTE( "mb.u58", 0x40001, 0x20000, CRC(21ca47f8) SHA1(b192be06a2eb817776309580dc64fd76772a8d50) )	// identical to butterfly.
+	ROM_LOAD16_BYTE( "mb.u52", 0x00000, 0x20000, CRC(15051537) SHA1(086c38c05c605f297a7bc470eb51763a7648e72c) ) // identical to butterfly.
+	ROM_LOAD16_BYTE( "mb.u54", 0x00001, 0x20000, CRC(8e34d029) SHA1(ae316f2f34768938a07d62db110ce59d2751abaa) ) // identical to butterfly.
+	ROM_LOAD16_BYTE( "mb.u56", 0x40000, 0x20000, CRC(21ca47f8) SHA1(b192be06a2eb817776309580dc64fd76772a8d50) ) // this one is straight fixed for reel tiles 6C-DF.
+	ROM_LOAD16_BYTE( "mb.u58", 0x40001, 0x20000, CRC(21ca47f8) SHA1(b192be06a2eb817776309580dc64fd76772a8d50) ) // identical to butterfly.
 ROM_END
 
 ROM_START( gallag50 )

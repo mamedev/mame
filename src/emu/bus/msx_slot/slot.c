@@ -32,4 +32,3 @@ void msx_internal_slot_interface::set_size(device_t &device, UINT32 size)
 	dev.m_size = size;
 	dev.m_end_address = dev.m_start_address + dev.m_size;
 }
-

@@ -74,4 +74,3 @@ WRITE8_MEMBER(msx_cart_rtype::write_cart)
 		m_bank_base[1] = get_rom_base() + m_selected_bank * 0x4000;
 	}
 }
-

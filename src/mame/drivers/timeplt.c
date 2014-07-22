@@ -501,7 +501,7 @@ static MACHINE_CONFIG_DERIVED( chkun, bikkuric )
 	/* sound hardware */
 	MCFG_SOUND_MODIFY("ay2")
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(timeplt_state, chkun_sound_w))
-	
+
 	MCFG_TC8830F_ADD("tc8830f", XTAL_512kHz)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 MACHINE_CONFIG_END

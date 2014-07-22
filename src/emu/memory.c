@@ -4976,4 +4976,3 @@ void handler_entry_write::write_stub_64(address_space &space, offs_t offset, UIN
 		}
 	}
 }
-

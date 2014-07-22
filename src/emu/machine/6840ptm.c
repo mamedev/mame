@@ -89,13 +89,13 @@ void ptm6840_device::device_start()
 	m_out1_cb.resolve_safe();
 	m_out2_cb.resolve_safe();
 	m_irq_cb.resolve_safe();
-	
+
 	for (int i = 0; i < 3; i++)
 	{
 		if ( m_external_clock[i] == 0 )
 			m_external_clock[i] = 1;
 	}
-		
+
 	m_timer[0] = timer_alloc(0);
 	m_timer[1] = timer_alloc(1);
 	m_timer[2] = timer_alloc(2);

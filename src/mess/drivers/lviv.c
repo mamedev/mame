@@ -466,7 +466,7 @@ static MACHINE_CONFIG_START( lviv, lviv_state )
 	MCFG_CASSETTE_FORMATS(lviv_lvt_format)
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED)
 	MCFG_CASSETTE_INTERFACE("lviv_cass")
-	
+
 	MCFG_SOFTWARE_LIST_ADD("cass_list","lviv")
 
 	/* internal ram */

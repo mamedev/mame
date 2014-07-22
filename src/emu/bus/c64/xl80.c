@@ -84,25 +84,25 @@ const rom_entry *c64_xl80_device::device_rom_region() const
 MC6845_UPDATE_ROW( c64_xl80_device::crtc_update_row )
 {
 	const pen_t *pen = m_palette->pens();
-	
+
 	for (int column = 0; column < x_count; column++)
 	{
 		UINT8 code = m_ram[((ma + column) & 0x7ff)];
 		UINT16 addr = (code << 3) | (ra & 0x07);
 		UINT8 data = m_char_rom->base()[addr & 0x7ff];
-		
+
 		if (column == cursor_x)
 		{
 			data = 0xff;
 		}
-		
+
 		for (int bit = 0; bit < 8; bit++)
 		{
 			int x = (column * 8) + bit;
 			int color = BIT(data, 7) && de;
-			
+
 			bitmap.pix32(vbp + y, hbp + x) = pen[color];
-			
+
 			data <<= 1;
 		}
 	}

@@ -32,7 +32,7 @@ Stephh's notes (based on the game M68000 code and some tests) :
 
   - Reset the game while pressing START1 to enter the "test mode"
 
-  
+
 ***************************************************************************/
 
 #include "emu.h"

@@ -15,7 +15,6 @@ kof2002_prot_device::kof2002_prot_device(const machine_config &mconfig, const ch
 
 void kof2002_prot_device::device_start()
 {
-
 }
 
 void kof2002_prot_device::device_reset()
@@ -80,5 +79,3 @@ void kof2002_prot_device::samsh5sp_decrypt_68k(UINT8* cpurom, UINT32 cpurom_size
 		memcpy( src+i*0x80000, dst+sec[i], 0x80000 );
 	}
 }
-
-

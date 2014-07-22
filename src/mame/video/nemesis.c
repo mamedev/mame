@@ -168,7 +168,7 @@ WRITE16_MEMBER(nemesis_state::salamand_control_port_word_w)
 
 void nemesis_state::create_palette_lookups()
 {
-    // driver is 74LS09 (AND gates with open collector)
+	// driver is 74LS09 (AND gates with open collector)
 
 	static const res_net_info nemesis_net_info =
 	{

@@ -773,7 +773,7 @@ DECOSPR_PRIORITY_CB_MEMBER(rohga_state::rohga_pri_callback)
 		case 0x6000: return 0xf0 | 0xcc;
 		case 0x2000: return 0;//0xf0|0xcc; /* Perhaps 0xf0|0xcc|0xaa (Sprite under bottom layer) */
 	}
-	
+
 	return 0;
 }
 
@@ -787,7 +787,7 @@ DECOSPR_COLOUR_CB_MEMBER(rohga_state::schmeisr_col_callback)
 	UINT16 colour = ((col >> 9) & 0xf) << 2;
 	if (col & 0x8000)
 		colour++;
-	
+
 	return colour;
 }
 
@@ -1124,7 +1124,7 @@ static MACHINE_CONFIG_START( schmeisr, rohga_state )
 
 	MCFG_DEVICE_ADD("spritegen1", DECO_SPRITE, 0)
 	MCFG_DECO_SPRITE_PRIORITY_CB(rohga_state, rohga_pri_callback)
-	MCFG_DECO_SPRITE_COLOUR_CB(rohga_state, schmeisr_col_callback)	// wire mods on pcb...
+	MCFG_DECO_SPRITE_COLOUR_CB(rohga_state, schmeisr_col_callback)  // wire mods on pcb...
 	MCFG_DECO_SPRITE_GFX_REGION(3)
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
 	MCFG_DECO_SPRITE_PALETTE("palette")

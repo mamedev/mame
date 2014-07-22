@@ -2718,26 +2718,26 @@ static INPUT_PORTS_START( rcdino4 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("DSW")
-	PORT_DIPNAME( 0x01, 0x01, "Test Mode" )				PORT_DIPLOCATION("SW1:8")
+	PORT_DIPNAME( 0x01, 0x01, "Test Mode" )             PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "Royal Flush" )			PORT_DIPLOCATION("SW1:7")
+	PORT_DIPNAME( 0x02, 0x02, "Royal Flush" )           PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x02, DEF_STR( Yes ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
-	PORT_DIPNAME( 0x04, 0x04, "5 of a Kind" )			PORT_DIPLOCATION("SW1:6")
+	PORT_DIPNAME( 0x04, 0x04, "5 of a Kind" )           PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x04, DEF_STR( Yes ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
-	PORT_DIPNAME( 0x18, 0x08, DEF_STR( Coinage ) )		PORT_DIPLOCATION("SW1:5,4")
+	PORT_DIPNAME( 0x18, 0x08, DEF_STR( Coinage ) )      PORT_DIPLOCATION("SW1:5,4")
 	PORT_DIPSETTING(    0x08, "1C-10C" )
 	PORT_DIPSETTING(    0x10, "1C-1C" )
 	PORT_DIPSETTING(    0x18, "1C-2C" )
 	PORT_DIPSETTING(    0x00, "1C-5C" )
-	PORT_DIPNAME( 0x60, 0x60, "Payment Type" )			PORT_DIPLOCATION("SW1:3,2")
+	PORT_DIPNAME( 0x60, 0x60, "Payment Type" )          PORT_DIPLOCATION("SW1:3,2")
 	PORT_DIPSETTING(    0x00, "Ticket + Hopper" )
 	PORT_DIPSETTING(    0x20, "Ticket" )
 	PORT_DIPSETTING(    0x40, "Hopper" )
 	PORT_DIPSETTING(    0x60, "Ticket + Hopper" )
-	PORT_DIPNAME( 0x80, 0x80, "Pagamenti (Payment)" )	PORT_DIPLOCATION("SW1:1")
+	PORT_DIPNAME( 0x80, 0x80, "Pagamenti (Payment)" )   PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x80, "Pagamenti (Payment) A" )
 	PORT_DIPSETTING(    0x00, "Pagamenti (Payment) B" )
 INPUT_PORTS_END
@@ -6218,86 +6218,86 @@ static void decrypt_rcdino4(UINT8 *rom, int size, UINT8 *gfxrom, int sizeg, UINT
 
 static UINT8 rcdino4_add[] =
 {
-/*		0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f*/
-/*0*/	1, 9, 9, 9, 9, 2, 9, 9, 1, 2, 1, 9, 9, 3, 9, 9,
-/*1*/	2, 2, 9, 9, 9, 9, 9, 9, 1, 9, 1, 9, 9, 9, 9, 9,
-/*2*/	3, 9, 9, 9, 9, 2, 2, 9, 1, 2, 1, 9, 9, 3, 3, 9,
-/*3*/	2, 9, 9, 9, 9, 9, 9, 9, 1, 9, 1, 9, 9, 3, 9, 9,
-/*4*/	1, 9, 9, 9, 9, 2, 9, 9, 1, 2, 1, 9, 3, 3, 9, 9,
-/*5*/	9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 1, 9, 9, 9, 9, 9,
-/*6*/	1, 9, 9, 9, 2, 2, 9, 9, 1, 2, 1, 9, 3, 3, 3, 9,
-/*7*/	9, 2, 9, 9, 9, 9, 9, 9, 9, 3, 1, 9, 9, 3, 9, 9,
-/*8*/	2, 9, 9, 9, 2, 2, 2, 9, 1, 9, 1, 9, 9, 3, 3, 9,
-/*9*/	2, 2, 9, 9, 9, 2, 9, 9, 1, 3, 9, 9, 3, 3, 3, 9,
-/*a*/	2, 9, 2, 9, 2, 2, 2, 9, 1, 2, 1, 9, 9, 3, 3, 2,
-/*b*/	2, 2, 9, 9, 9, 2, 9, 9, 9, 3, 9, 9, 9, 3, 9, 9,
-/*c*/	2, 9, 9, 9, 2, 2, 2, 9, 1, 2, 1, 9, 3, 3, 3, 9,
-/*d*/	2, 9, 9, 9, 9, 9, 9, 9, 1, 9, 1, 9, 9, 3, 9, 9,
-/*e*/	2, 9, 9, 9, 2, 9, 2, 9, 1, 2, 1, 9, 3, 9, 3, 9,
-/*f*/	2, 9, 9, 9, 9, 2, 9, 9, 1, 3, 1, 9, 9, 3, 9, 9
+/*      0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f*/
+/*0*/   1, 9, 9, 9, 9, 2, 9, 9, 1, 2, 1, 9, 9, 3, 9, 9,
+/*1*/   2, 2, 9, 9, 9, 9, 9, 9, 1, 9, 1, 9, 9, 9, 9, 9,
+/*2*/   3, 9, 9, 9, 9, 2, 2, 9, 1, 2, 1, 9, 9, 3, 3, 9,
+/*3*/   2, 9, 9, 9, 9, 9, 9, 9, 1, 9, 1, 9, 9, 3, 9, 9,
+/*4*/   1, 9, 9, 9, 9, 2, 9, 9, 1, 2, 1, 9, 3, 3, 9, 9,
+/*5*/   9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 1, 9, 9, 9, 9, 9,
+/*6*/   1, 9, 9, 9, 2, 2, 9, 9, 1, 2, 1, 9, 3, 3, 3, 9,
+/*7*/   9, 2, 9, 9, 9, 9, 9, 9, 9, 3, 1, 9, 9, 3, 9, 9,
+/*8*/   2, 9, 9, 9, 2, 2, 2, 9, 1, 9, 1, 9, 9, 3, 3, 9,
+/*9*/   2, 2, 9, 9, 9, 2, 9, 9, 1, 3, 9, 9, 3, 3, 3, 9,
+/*a*/   2, 9, 2, 9, 2, 2, 2, 9, 1, 2, 1, 9, 9, 3, 3, 2,
+/*b*/   2, 2, 9, 9, 9, 2, 9, 9, 9, 3, 9, 9, 9, 3, 9, 9,
+/*c*/   2, 9, 9, 9, 2, 2, 2, 9, 1, 2, 1, 9, 3, 3, 3, 9,
+/*d*/   2, 9, 9, 9, 9, 9, 9, 9, 1, 9, 1, 9, 9, 3, 9, 9,
+/*e*/   2, 9, 9, 9, 2, 9, 2, 9, 1, 2, 1, 9, 3, 9, 3, 9,
+/*f*/   2, 9, 9, 9, 9, 2, 9, 9, 1, 3, 1, 9, 9, 3, 9, 9
 };
 
 static UINT8 rcdino4_keys40[] =
 {
-/*	40    41    42    43    44    45    46    47    48    49    4a    4b    4c    4d*/
+/*  40    41    42    43    44    45    46    47    48    49    4a    4b    4c    4d*/
 	0x36, 0x54, 0x47, 0x6b, 0xce, 0x95, 0xa2, 0x66, 0x3a, 0x46, 0x53, 0xd7, 0xc4, 0xa4,
-/*	4e    4f*/
+/*  4e    4f*/
 	0x00, 0x00,
-/*	50*/
+/*  50*/
 	0x56
 };
 
 static UINT8 rcdino4_keys80[] =
 {
-/*	81    82    83    84    85 */
- 	0xb8, 0x32, 0x1c, 0x23, 0xe2,
-/*	86    87    88    89    8a    8b    8c    8d    8e    8f    90    91*/
+/*  81    82    83    84    85 */
+	0xb8, 0x32, 0x1c, 0x23, 0xe2,
+/*  86    87    88    89    8a    8b    8c    8d    8e    8f    90    91*/
 	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-/*	92    93    94    95    96    97 */
+/*  92    93    94    95    96    97 */
 	0x4c, 0x00, 0x3d, 0x00, 0xd9, 0x16,
-/*	98    99    9a    9b    9c    9d    9e    9f    a0    a1    a2    a3*/
+/*  98    99    9a    9b    9c    9d    9e    9f    a0    a1    a2    a3*/
 	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-/*	a4    a5    a6*/
+/*  a4    a5    a6*/
 	0x5e, 0x73, 0x69,
-/*	a7    a8    a9*/
+/*  a7    a8    a9*/
 	0x00, 0x00, 0x00,
-/*	aa*/
+/*  aa*/
 	0xa6,
-/*	ab    ac    ad    ae    af*/
+/*  ab    ac    ad    ae    af*/
 	0x00, 0x00, 0x00, 0x00, 0x00,
-/*	b0    b1*/
+/*  b0    b1*/
 	0xc3, 0x40,
-/*	b2    b3    b4    b5    b6    b7    b8    b9    ba    bb    bc    bd    be    bf    c0    c1    c2*/
+/*  b2    b3    b4    b5    b6    b7    b8    b9    ba    bb    bc    bd    be    bf    c0    c1    c2*/
 	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-/*	c3    c4    c5*/
+/*  c3    c4    c5*/
 	0x92, 0xb7, 0x24,
-/*	c6    c7    c8    c9*/
+/*  c6    c7    c8    c9*/
 	0x00, 0x00, 0x00, 0x00,
-/*	ca*/
+/*  ca*/
 	0x62,
-/*	cb    cc    cd    ce    cf*/
+/*  cb    cc    cd    ce    cf*/
 	0x00, 0x00, 0x00, 0x00, 0x00,
-/*	d0*/
+/*  d0*/
 	0x84,
-/*	d1*/
+/*  d1*/
 	0x00,
-/*	d2*/
+/*  d2*/
 	0xaa,
-/*	d3    d4    d5*/
+/*  d3    d4    d5*/
 	0x00, 0x00, 0x00,
-/*	d6*/
+/*  d6*/
 	0xea,
-/*	d7    d8    d9    da    db    dc    dd    de    df*/
+/*  d7    d8    d9    da    db    dc    dd    de    df*/
 	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-/*	e0*/
+/*  e0*/
 	0x17,
-/*	e1    e2    e3*/
+/*  e1    e2    e3*/
 	0x00, 0x00, 0x00,
-/*	e4*/
+/*  e4*/
 	0xc0,
-/*	e5    e6    e7    e8    e9    ea    eb    ec    ed    ee    ef    f0    f1    f2    f3    f4    f5    f6    f7*/
+/*  e5    e6    e7    e8    e9    ea    eb    ec    ed    ee    ef    f0    f1    f2    f3    f4    f5    f6    f7*/
 	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-/*	f8    f9    fa    fb    fc    fd    fe*/
+/*  f8    f9    fa    fb    fc    fd    fe*/
 	0x06, 0x1e, 0x28, 0x5a, 0xcf, 0x79, 0x11
 };
 
@@ -6368,44 +6368,44 @@ DRIVER_INIT_MEMBER(funworld_state, rcdino4)
 			add = rcdino4_add[c];
 
 			if (((i == 0x81)
-			  && (j >= 0xa3) && (j <= 0xb1) /* text string */
-			    )
-			 || ((i == 0x82)
-			  && (j >= 0x35) && (j <= 0x53) /* table of addresses */
-			    )
-			 || ((i == 0x85)
-			  && (j >= 0x7e) && (j <= 0x8d) /* '0'-'9', 'A'-'F' */
-			    )
-			 || ((i == 0x94)
-			  && (((j >= 0x4a) && (j <= 0x86)) /* zeroes */
-		 	   || ((j >= 0xbf) && (j <= 0xc1)) /* set of masks */
-			     )
-			    )
-			 || ((i == 0x96)
-			  && (j >= 0x39) && (j <= 0x3e) /* set of masks */
-			    )
-			 || ((i == 0xa6)
-			  && (j >= 0x30) && (j <= 0x32) /* set of masks */
-			    )
-			 || ((i == 0xaa)
-			  && (j >= 0xf2) /* table of addresses */
-			    )
-			 || ((i == 0xc3)
-			  && (j >= 0x70) && (j <= 0xaf) /* set of masks */
-			    )
-			 || ((i == 0xc4)
-			  && (j >= 0xdc) /* zeroes and things */
-			    )
-			 || ((i == 0xd0)
-			  && (j >= 0xd2) /* text and zeroes */
-			    )
-			 || ((i == 0xd2)
-			  && ((j <= 0x2f) /* text and zeroes */
-			   || ((j >= 0x84) && (j <= 0xaf)) /* text and zeroes */
-			     )
-			    )
-			 || (add == 9)
-			   )
+				&& (j >= 0xa3) && (j <= 0xb1) /* text string */
+				)
+				|| ((i == 0x82)
+				&& (j >= 0x35) && (j <= 0x53) /* table of addresses */
+				)
+				|| ((i == 0x85)
+				&& (j >= 0x7e) && (j <= 0x8d) /* '0'-'9', 'A'-'F' */
+				)
+				|| ((i == 0x94)
+				&& (((j >= 0x4a) && (j <= 0x86)) /* zeroes */
+				|| ((j >= 0xbf) && (j <= 0xc1)) /* set of masks */
+					)
+				)
+				|| ((i == 0x96)
+				&& (j >= 0x39) && (j <= 0x3e) /* set of masks */
+				)
+				|| ((i == 0xa6)
+				&& (j >= 0x30) && (j <= 0x32) /* set of masks */
+				)
+				|| ((i == 0xaa)
+				&& (j >= 0xf2) /* table of addresses */
+				)
+				|| ((i == 0xc3)
+				&& (j >= 0x70) && (j <= 0xaf) /* set of masks */
+				)
+				|| ((i == 0xc4)
+				&& (j >= 0xdc) /* zeroes and things */
+				)
+				|| ((i == 0xd0)
+				&& (j >= 0xd2) /* text and zeroes */
+				)
+				|| ((i == 0xd2)
+				&& ((j <= 0x2f) /* text and zeroes */
+				|| ((j >= 0x84) && (j <= 0xaf)) /* text and zeroes */
+					)
+				)
+				|| (add == 9)
+				)
 			{
 				++j;
 			}
@@ -6421,9 +6421,9 @@ DRIVER_INIT_MEMBER(funworld_state, rcdino4)
 		do {} while (!rcdino4_keys80[++i - 0x81]);
 
 		if ((i == 0xa4)
-		 || (i == 0xb0)
-		 || (i == 0xf8)
-		   )
+			|| (i == 0xb0)
+			|| (i == 0xf8)
+			)
 		{
 			j = 0; /* re-align offset after skipping some pages */
 		}

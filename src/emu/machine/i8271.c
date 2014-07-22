@@ -1046,7 +1046,7 @@ void i8271_device::command_execute()
 
 			/* these two do not appear to be set at all! ?? */
 
-			if (m_floppy[0]) 
+			if (m_floppy[0])
 			{
 				if (m_floppy[0]->floppy_drive_get_flag_state(FLOPPY_DRIVE_READY))
 				{
@@ -1054,7 +1054,7 @@ void i8271_device::command_execute()
 				}
 			}
 
-			if (m_floppy[1]) 
+			if (m_floppy[1])
 			{
 				if (m_floppy[1]->floppy_drive_get_flag_state(FLOPPY_DRIVE_READY))
 				{

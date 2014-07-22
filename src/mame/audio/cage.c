@@ -104,7 +104,7 @@ static const char *const register_names[] =
  *  Initialization
  *
  *************************************/
- 
+
 const device_type ATARI_CAGE = &device_creator<atari_cage_device>;
 
 
@@ -581,7 +581,6 @@ void atari_cage_device::control_w(UINT16 data)
 
 WRITE32_MEMBER( atari_cage_device::speedup_w )
 {
-
 	space.device().execute().eat_cycles(100);
 	COMBINE_DATA(&m_speedup_ram[offset]);
 }

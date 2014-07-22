@@ -189,7 +189,7 @@ deco16ic_device::deco16ic_device(const machine_config &mconfig, const char *tag,
 		m_pf2_colour_bank(0),
 		m_pf1_colourmask(0xf),
 		m_pf2_colourmask(0xf),
-		m_pf12_8x8_gfx_bank(0), 
+		m_pf12_8x8_gfx_bank(0),
 		m_pf12_16x16_gfx_bank(0),
 		m_gfxdecode(*this),
 		m_palette(*this)

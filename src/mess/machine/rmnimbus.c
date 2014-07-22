@@ -178,7 +178,6 @@ static void decode_dssi_f_rw_sectors(device_t *device,UINT16  ds, UINT16 si, UIN
 
 void rmnimbus_state::external_int(UINT8 vector, bool state)
 {
-
 	if(!state && (vector != m_vector))
 		return;
 

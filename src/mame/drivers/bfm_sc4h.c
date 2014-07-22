@@ -22,29 +22,29 @@
     see bfm_sc4.c
 
     The hopper(s) are not currently emulated, many of the games can
-	be operated in 'Door Open' mode granting you free credits.
+    be operated in 'Door Open' mode granting you free credits.
 
-	Most games will show a RAM error on first boot due, after that they
-	will initialize their NVRAM.
+    Most games will show a RAM error on first boot due, after that they
+    will initialize their NVRAM.
 
-	If 'Read Meters' is shown press the 'Cancel' button (this moves around
-	per game, so where it maps might not be obvious)  Doing this will allow
-	the games to run in Door Open mode, pressing 'Start' (also moves around)
-	will allow you to test the game.  Not all games have this feature.
+    If 'Read Meters' is shown press the 'Cancel' button (this moves around
+    per game, so where it maps might not be obvious)  Doing this will allow
+    the games to run in Door Open mode, pressing 'Start' (also moves around)
+    will allow you to test the game.  Not all games have this feature.
 
-	Pressing the service key ('Green Button') often allows test mode to be
-	entered, some games have more comprehensive tests than others.
+    Pressing the service key ('Green Button') often allows test mode to be
+    entered, some games have more comprehensive tests than others.
 
-	Various (poorly programmed) sets require specific Jackpot 'keys' etc. to
-	boot and won't even warn you if they're invalid, others allow you to
-	set options if keys are not present. (again the buttons to do so move
-	between games)
+    Various (poorly programmed) sets require specific Jackpot 'keys' etc. to
+    boot and won't even warn you if they're invalid, others allow you to
+    set options if keys are not present. (again the buttons to do so move
+    between games)
 
-	Many games have missing sound roms, incorrect sound roms, or badly
-	dumped sound roms.  We also have several dumps where only sound roms
-	are present.
+    Many games have missing sound roms, incorrect sound roms, or badly
+    dumped sound roms.  We also have several dumps where only sound roms
+    are present.
 
-	Many of the titles here were also released on the SC5 platform.
+    Many of the titles here were also released on the SC5 platform.
 
 */
 
@@ -723,7 +723,7 @@ MACHINE_CONFIG_START( sc4, sc4_state )
 
 	MCFG_BFMBDA_ADD("vfd0",0)
 
-//	MCFG_DEFAULT_LAYOUT(layout_bfm_sc4)
+//  MCFG_DEFAULT_LAYOUT(layout_bfm_sc4)
 
 	MCFG_SOUND_ADD("ymz", YMZ280B, 16000000) // ?? Mhz
 	MCFG_YMZ280B_IRQ_HANDLER(WRITELINE(sc4_state, bfm_sc4_irqhandler))
@@ -942,7 +942,7 @@ INPUT_PORTS_START( sc4_raw ) // completley unmapped, but named inputs for all th
 	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
 	PORT_BIT(           0xffe0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-	PORT_START("IN-10") 
+	PORT_START("IN-10")
 	PORT_DIPNAME( 0x01, 0x00, "IN 10-0 (STRB 10 Data 0)" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
@@ -980,7 +980,7 @@ INPUT_PORTS_START( sc4_raw ) // completley unmapped, but named inputs for all th
 	PORT_BIT(           0xffe0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	// where are 11,12,13,14,15 ?
-	
+
 	PORT_START("IN-16")
 	PORT_DIPNAME( 0x01, 0x00, "IN 16-0 (STRB 16 Data 0)" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
@@ -1098,12 +1098,12 @@ INPUT_PORTS_START( sc4_base ) // just some fairly generic defaults we map to gam
 	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_3) PORT_NAME("IN2-3")
 	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_4) PORT_NAME("IN2-4")
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_5) PORT_NAME("IN2-5")
-	
+
 	PORT_MODIFY("IN-3")
 	PORT_DIPNAME( 0x04, 0x00, "IN 3-2 (STK 4  3.2)" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, "IN 3-3 (STK 2  3.3)" ) 
+	PORT_DIPNAME( 0x08, 0x00, "IN 3-3 (STK 2  3.3)" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
 	PORT_DIPNAME( 0x10, 0x00, "IN 3-4 (STK 3  3.4)" )
@@ -1178,7 +1178,7 @@ INPUT_PORTS_START( sc4_base ) // just some fairly generic defaults we map to gam
 	PORT_DIPNAME( 0x0004, 0x0000, "Service Door" ) // SERDOR20.2
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0004, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0008, 0x0000, "Cashbox Door" ) // CSHDOR20.3	
+	PORT_DIPNAME( 0x0008, 0x0000, "Cashbox Door" ) // CSHDOR20.3
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0008, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0010, 0x0000, "Hopper DMP" ) // HOPDMP20.4

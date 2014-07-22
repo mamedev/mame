@@ -2,7 +2,7 @@
 
     Toshiba TMPZ84C011, MPUZ80/TLCS-Z80 ASSP Family
     Z80 CPU, CTC, CGC, I/O8x5
-    
+
     TODO:
     - CGC (clock generator/controller)
 

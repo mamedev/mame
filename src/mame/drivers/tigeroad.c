@@ -31,7 +31,7 @@ With 'Debug Mode' on button 2 advances a level, button 3 goes back.
 
 The microcontroller mainly controls the animation of the enemy robots,
 the communication between the 68000 and MCU is probably not emulated
-100% correct but it works. 
+100% correct but it works.
 
 Emulation by Bryan McPhail, mish@tendril.co.uk
 
@@ -68,7 +68,7 @@ WRITE8_MEMBER(tigeroad_state::msm5205_w)
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, tigeroad_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	
+
 	AM_RANGE(0xfe0800, 0xfe0cff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xfe0d00, 0xfe1807) AM_RAM     /* still part of OBJ RAM */
 	AM_RANGE(0xfe4000, 0xfe4001) AM_READ_PORT("P1_P2") AM_WRITE(tigeroad_videoctrl_w)   /* char bank, coin counters, + ? */
@@ -77,7 +77,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, tigeroad_state )
 	AM_RANGE(0xfe8000, 0xfe8003) AM_WRITE(tigeroad_scroll_w)
 	AM_RANGE(0xfe800e, 0xfe800f) AM_WRITEONLY    /* fe800e = watchdog or IRQ acknowledge */
 	AM_RANGE(0xfec000, 0xfec7ff) AM_RAM_WRITE(tigeroad_videoram_w) AM_SHARE("videoram")
-	
+
 	AM_RANGE(0xff8000, 0xff87ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0xffc000, 0xffffff) AM_RAM AM_SHARE("ram16")
 ADDRESS_MAP_END
@@ -93,7 +93,7 @@ static ADDRESS_MAP_START( bballs_map, AS_PROGRAM, 16, tigeroad_state )
 	AM_RANGE(0xe8000, 0xe8003) AM_WRITE(tigeroad_scroll_w)
 	AM_RANGE(0xe800e, 0xe800f) AM_WRITENOP /* ? */
 	AM_RANGE(0xec000, 0xec7ff) AM_RAM_WRITE(tigeroad_videoram_w) AM_SHARE("videoram")
-	
+
 	AM_RANGE(0xf8000, 0xf87ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0xfc000, 0xfffff) AM_RAM AM_SHARE("ram16")
 ADDRESS_MAP_END
@@ -564,7 +564,7 @@ static const gfx_layout sprite_layout =
 
 static GFXDECODE_START( tigeroad )
 	GFXDECODE_ENTRY( "text", 0, text_layout,      0x300, 16 )
-	GFXDECODE_ENTRY( "tiles", 0, tile_layout,     0x100, 16 ) 
+	GFXDECODE_ENTRY( "tiles", 0, tile_layout,     0x100, 16 )
 	GFXDECODE_ENTRY( "sprites", 0, sprite_layout, 0x200, 16 )
 GFXDECODE_END
 
@@ -1177,5 +1177,3 @@ GAME( 1990, pushmant, pushman, pushman, pushman, tigeroad_state, pushman, ROT0, 
 
 GAME( 1991, bballs,   0,       bballs,  bballs, tigeroad_state,  bballs, ROT0, "Comad", "Bouncing Balls", GAME_SUPPORTS_SAVE )
 GAME( 1991, bballsa,  bballs,  bballs,  bballs, tigeroad_state,  bballs, ROT0, "Comad", "Bouncing Balls (Adult)", GAME_SUPPORTS_SAVE )
-
-

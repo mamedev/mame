@@ -397,7 +397,6 @@ sdl_osd_interface::~sdl_osd_interface()
 
 void sdl_osd_interface::osd_exit()
 {
-
 	osd_interface::osd_exit();
 
 	if (!SDLMAME_INIT_IN_WORKER_THREAD)

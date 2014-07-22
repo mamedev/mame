@@ -938,7 +938,7 @@ static MACHINE_CONFIG_START( p7_base, pasopia7_state )
 	MCFG_DEVICE_ADD("z80ctc", Z80CTC, XTAL_4MHz)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 	MCFG_Z80CTC_ZC0_CB(DEVWRITELINE("z80ctc", z80ctc_device, trg1))
-	MCFG_Z80CTC_ZC1_CB(DEVWRITELINE("z80ctc", z80ctc_device, trg2))	// beep interface
+	MCFG_Z80CTC_ZC1_CB(DEVWRITELINE("z80ctc", z80ctc_device, trg2)) // beep interface
 	MCFG_Z80CTC_ZC2_CB(DEVWRITELINE("z80ctc", z80ctc_device, trg3))
 
 	MCFG_DEVICE_ADD("z80pio", Z80PIO, XTAL_4MHz)

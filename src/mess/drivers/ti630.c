@@ -14,18 +14,18 @@
    * LCD works
 
 ================
-	Messages displayed on screen are in brazilian portuguese.
- 	During boot, it says:
+    Messages displayed on screen are in brazilian portuguese.
+    During boot, it says:
 
 "TI auto-test."
 "Wait!"
 
-	Then it says:
+    Then it says:
 
 "Initializing..."
 "Wait!"
 
-	And finally:
+    And finally:
 
 "TI did not receive"
 "the dial tone"
@@ -108,54 +108,54 @@ READ8_MEMBER(ti630_state::ti630_io_r)
 
 WRITE8_MEMBER(ti630_state::ti630_io_w)
 {
-    static UINT8 p0=0, p1=0, p2=0, p3=0;
-    switch (offset)
-    {
-        case 0x00:
-        {
-            if (data != p0)
-            {
-                p0=data;
+	static UINT8 p0=0, p1=0, p2=0, p3=0;
+	switch (offset)
+	{
+		case 0x00:
+		{
+			if (data != p0)
+			{
+				p0=data;
 #if LOG_IO_PORTS
-                printf("Write to P0: %02X\n", data);
+				printf("Write to P0: %02X\n", data);
 #endif
-            }
-            break;
-        }
-        case 0x01:
-        {
-            if (data != p1)
-            {
-                p1=data;
+			}
+			break;
+		}
+		case 0x01:
+		{
+			if (data != p1)
+			{
+				p1=data;
 #if LOG_IO_PORTS
-                printf("Write to P1: %02X\n", data);
+				printf("Write to P1: %02X\n", data);
 #endif
-            }
-            break;
-        }
-        case 0x02:
-        {
-            if (data != p2)
-            {
-                p2=data;
+			}
+			break;
+		}
+		case 0x02:
+		{
+			if (data != p2)
+			{
+				p2=data;
 #if LOG_IO_PORTS
-                printf("Write to P2: %02X\n", data);
+				printf("Write to P2: %02X\n", data);
 #endif
-            }
-            break;
-        }
-        case 0x03:
-        {
-            if (data != p3)
-            {
-                p3=data;
+			}
+			break;
+		}
+		case 0x03:
+		{
+			if (data != p3)
+			{
+				p3=data;
 #if LOG_IO_PORTS
-                printf("Write to P3: %02X\n", data);
+				printf("Write to P3: %02X\n", data);
 #endif
-            }
-            break;
-        }
-    }
+			}
+			break;
+		}
+	}
 }
 
 PALETTE_INIT_MEMBER(ti630_state, ti630)

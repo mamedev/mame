@@ -192,16 +192,16 @@ WRITE8_MEMBER( fp1100_state::irq_mask_w )
 
 WRITE8_MEMBER( fp1100_state::main_to_sub_w )
 {
-//	machine().scheduler().synchronize(); // force resync
-//	m_subcpu->set_input_line(UPD7810_INTF2, ASSERT_LINE);
+//  machine().scheduler().synchronize(); // force resync
+//  m_subcpu->set_input_line(UPD7810_INTF2, ASSERT_LINE);
 	m_sub_latch = data;
-	if (LOG) printf("%s: From main:%X\n",machine().describe_context(),data); 
+	if (LOG) printf("%s: From main:%X\n",machine().describe_context(),data);
 }
 
 READ8_MEMBER( fp1100_state::sub_to_main_r )
 {
-//	machine().scheduler().synchronize(); // force resync
-//	m_maincpu->set_input_line(0, CLEAR_LINE);
+//  machine().scheduler().synchronize(); // force resync
+//  m_maincpu->set_input_line(0, CLEAR_LINE);
 	if (LOG) printf("%s: To main:%X\n",machine().describe_context(),m_main_latch);
 	return m_main_latch;
 }
@@ -235,16 +235,16 @@ ADDRESS_MAP_END
 
 READ8_MEMBER( fp1100_state::main_to_sub_r )
 {
-//	machine().scheduler().synchronize(); // force resync
-//	m_subcpu->set_input_line(UPD7810_INTF2, CLEAR_LINE);
+//  machine().scheduler().synchronize(); // force resync
+//  m_subcpu->set_input_line(UPD7810_INTF2, CLEAR_LINE);
 	if (LOG) printf("%s: To sub:%X\n",machine().describe_context(),m_sub_latch);
 	return m_sub_latch;
 }
 
 WRITE8_MEMBER( fp1100_state::sub_to_main_w )
 {
-//	machine().scheduler().synchronize(); // force resync
-//	m_maincpu->set_input_line_and_vector(0, ASSERT_LINE, 0xf0);
+//  machine().scheduler().synchronize(); // force resync
+//  m_maincpu->set_input_line_and_vector(0, ASSERT_LINE, 0xf0);
 	m_main_latch = data;
 	if (LOG) printf("%s: From sub:%X\n",machine().describe_context(),data);
 }
@@ -594,8 +594,8 @@ TIMER_DEVICE_CALLBACK_MEMBER( fp1100_state::timer_c )
 
 INTERRUPT_GEN_MEMBER(fp1100_state::fp1100_vblank_irq)
 {
-//	if BIT(m_irq_mask, 4)
-//		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xf8);
+//  if BIT(m_irq_mask, 4)
+//      m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xf8);
 }
 
 MACHINE_RESET_MEMBER( fp1100_state, fp1100 )

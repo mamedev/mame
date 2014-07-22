@@ -887,4 +887,3 @@ void sh2_device::sh2_exception(const char *message, int irqline)
 
 	if(m_sh2_state->sleep_mode == 1) { m_sh2_state->sleep_mode = 2; }
 }
-

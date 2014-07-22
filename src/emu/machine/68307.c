@@ -15,7 +15,7 @@
 READ8_MEMBER( m68307cpu_device::m68307_internal_serial_r )
 {
 	m68307cpu_device *m68k = this;
-	
+
 	if (offset&1) return m_duart->read(*m68k->program, offset>>1);
 	return 0x0000;
 }

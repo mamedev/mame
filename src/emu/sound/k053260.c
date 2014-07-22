@@ -92,8 +92,7 @@ void k053260_device::device_start()
 
 void k053260_device::device_reset()
 {
-
-	for (int i = 0; i < 4; i++) 
+	for (int i = 0; i < 4; i++)
 	{
 		m_channels[i].rate = 0;
 		m_channels[i].size = 0;

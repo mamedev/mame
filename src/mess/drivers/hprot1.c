@@ -15,7 +15,7 @@
    * new derivative "CARD II PCB rev.6"
    * fixed LCD rendering (now both lines are displayed properly)
    * inverted logic of the inputs so that now we can navigate the menu
- 
+
    2014 JAN 03 [Felipe Sanches]:
    * Initial driver skeleton
    * Address lines bitswaping
@@ -126,7 +126,7 @@ static ADDRESS_MAP_START(i80c31_io, AS_IO, 8, hprot1_state)
 	AM_RANGE(0xc020,0xc020) AM_MIRROR(0x13cf) AM_DEVREAD("hd44780", hd44780_device, control_read)
 	AM_RANGE(0xc030,0xc030) AM_MIRROR(0x13cf) AM_DEVREAD("hd44780", hd44780_device, data_read)
 /*TODO: attach the watchdog/brownout reset device:
-	AM_RANGE(0xe000,0xe0??) AM_MIRROR(?) AM_DEVREAD("adm965an", adm965an_device, data_read) */
+    AM_RANGE(0xe000,0xe0??) AM_MIRROR(?) AM_DEVREAD("adm965an", adm965an_device, data_read) */
 
 	//AM_RANGE(MCS51_PORT_P0, MCS51_PORT_P3) AM_READWRITE(henry_io_r, henry_io_w)
 	AM_RANGE(MCS51_PORT_P0, MCS51_PORT_P3) AM_READ(henry_io_r)
@@ -147,24 +147,24 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( hprot_jumpers )
 /*
-There is a set of 3 jumpers that switch the communications circuitry between a 
+There is a set of 3 jumpers that switch the communications circuitry between a
 RS232 chip (U8: MAX232AN) and a differential bus transceiver (U7: SN65176BP)
 
-It seems that all three jumpers must select the same configuration: 
+It seems that all three jumpers must select the same configuration:
 eighter differential bus or RS232.
 And I don't see yet how this could affect the emulation of the device, so, for now, I'll
 simply leave this note here but not actually include this details in the driver code.
 
-	PORT_START("jumpers")
-	PORT_DIPNAME( 0x01, 0x01, "TX")
-	PORT_DIPSETTING(    0x01, "differential bus")
-	PORT_DIPSETTING(    0x00, "RS232")
-	PORT_DIPNAME( 0x02, 0x02, "RX")
-	PORT_DIPSETTING(    0x02, "differential bus")
-	PORT_DIPSETTING(    0x00, "RS232")
-	PORT_DIPNAME( 0x04, 0x04, "CPU-TX")
-	PORT_DIPSETTING(    0x04, "differential bus")
-	PORT_DIPSETTING(    0x00, "RS232")
+    PORT_START("jumpers")
+    PORT_DIPNAME( 0x01, 0x01, "TX")
+    PORT_DIPSETTING(    0x01, "differential bus")
+    PORT_DIPSETTING(    0x00, "RS232")
+    PORT_DIPNAME( 0x02, 0x02, "RX")
+    PORT_DIPSETTING(    0x02, "differential bus")
+    PORT_DIPSETTING(    0x00, "RS232")
+    PORT_DIPNAME( 0x04, 0x04, "CPU-TX")
+    PORT_DIPSETTING(    0x04, "differential bus")
+    PORT_DIPSETTING(    0x00, "RS232")
 */
 INPUT_PORTS_END
 
@@ -337,7 +337,7 @@ static MACHINE_CONFIG_DERIVED( hprotr8a, hprot1 )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* TODO: add an RS232 interface (emulate MAX232N chip)
- (the board has GND/VCC/RX/TX pins available in a connector) */
+	(the board has GND/VCC/RX/TX pins available in a connector) */
 
 	/* TODO: add an I2C interface (the board has GND/VCC/SDA/SCL pins available in a connector) */
 MACHINE_CONFIG_END

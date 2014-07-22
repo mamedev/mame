@@ -1019,7 +1019,7 @@ static MACHINE_CONFIG_START( bml3_common, bml3_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* slot devices */
-	MCFG_DEVICE_ADD("bml3bus", BML3BUS, 0) 
+	MCFG_DEVICE_ADD("bml3bus", BML3BUS, 0)
 	MCFG_BML3BUS_CPU("maincpu")
 	MCFG_BML3BUS_OUT_NMI_CB(WRITELINE(bml3_state, bml3bus_nmi_w))
 	MCFG_BML3BUS_OUT_IRQ_CB(WRITELINE(bml3_state, bml3bus_irq_w))

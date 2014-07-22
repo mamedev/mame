@@ -137,7 +137,7 @@ void z80ctc_device::device_start()
 	m_zc1_cb.resolve_safe();
 	m_zc2_cb.resolve_safe();
 	m_zc3_cb.resolve_safe();
-	
+
 	// start each channel
 	m_channel[0].start(this, 0);
 	m_channel[1].start(this, 1);
@@ -520,7 +520,7 @@ void z80ctc_device::ctc_channel::timer_callback()
 			m_device->m_zc3_cb(0);
 			break;
 	}
-	
+
 	// reset the down counter
 	m_down = m_tconst;
 }

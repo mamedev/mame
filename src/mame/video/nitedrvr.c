@@ -52,7 +52,7 @@ void nitedrvr_state::draw_roadway(bitmap_ind16 &bitmap, const rectangle &cliprec
 UINT32 nitedrvr_state::screen_update_nitedrvr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0, cliprect);
-	
+
 	// don't wrap playfield
 	rectangle clip = cliprect;
 	if (clip.max_y > 31) clip.max_y = 31;

@@ -592,7 +592,7 @@ static MACHINE_CONFIG_DERIVED( model1, trs80 )      // model I, level II
 	MCFG_CASSETTE_MODIFY( "cassette" )
 	MCFG_CASSETTE_FORMATS(trs80l2_cassette_formats)
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY)
-	
+
 	MCFG_QUICKLOAD_ADD("quickload", trs80_state, trs80_cmd, "cmd", 0.5)
 
 	MCFG_DEVICE_ADD("wd179x", FD1793, 0) // should be FD1771 or FD1791 but inverted data lines are too tricky to fix now

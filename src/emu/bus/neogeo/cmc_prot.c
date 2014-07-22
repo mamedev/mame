@@ -15,7 +15,6 @@ cmc_prot_device::cmc_prot_device(const machine_config &mconfig, const char *tag,
 
 void cmc_prot_device::device_start()
 {
-
 }
 
 void cmc_prot_device::device_reset()
@@ -786,4 +785,3 @@ void cmc_prot_device::neogeo_cmc50_m1_decrypt(UINT8* romcrypt, UINT32 romcrypt_s
 	}
 	#endif
 }
-

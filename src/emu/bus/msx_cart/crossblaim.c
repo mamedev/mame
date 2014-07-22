@@ -78,4 +78,3 @@ WRITE8_MEMBER(msx_cart_crossblaim::write_cart)
 	}
 	setup_bank();
 }
-

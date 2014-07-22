@@ -22,7 +22,7 @@ const device_type NG_MEMCARD = &device_creator<ng_memcard_device>;
 
 ng_memcard_device::ng_memcard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, NG_MEMCARD, "NEOGEO Memory Card", tag, owner, clock, "ng_memcard", __FILE__),
-	  device_image_interface(mconfig, *this)
+		device_image_interface(mconfig, *this)
 {
 }
 
@@ -63,7 +63,7 @@ bool ng_memcard_device::call_load()
 	size_t ret = fread(m_memcard_data, 0x800);
 	if(ret != 0x800)
 		return IMAGE_INIT_FAIL;
-		
+
 	return IMAGE_INIT_PASS;
 }
 
@@ -74,13 +74,13 @@ void ng_memcard_device::call_unload()
 }
 
 bool ng_memcard_device::call_create(int format_type, option_resolution *format_options)
-{	
+{
 	memset(m_memcard_data, 0, 0x800);
-	
+
 	size_t ret = fwrite(m_memcard_data, 0x800);
 	if(ret != 0x800)
 		return IMAGE_INIT_FAIL;
-	
+
 	return IMAGE_INIT_PASS;
 }
 

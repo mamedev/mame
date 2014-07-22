@@ -5666,13 +5666,13 @@ static void dump_rasterizer_stats(voodoo_state *v)
 
 voodoo_device::voodoo_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-	  m_fbmem(0),
-	  m_tmumem0(0),
-	  m_tmumem1(0),
-	  m_screen(NULL),
-	  m_cputag(NULL),
-	  m_vblank(*this),
-	  m_stall(*this)
+		m_fbmem(0),
+		m_tmumem0(0),
+		m_tmumem1(0),
+		m_screen(NULL),
+		m_cputag(NULL),
+		m_vblank(*this),
+		m_stall(*this)
 {
 	m_token = global_alloc_clear(voodoo_state);
 }

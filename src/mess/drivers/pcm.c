@@ -298,7 +298,7 @@ static MACHINE_CONFIG_START( pcm, pcm_state )
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 	// ZC0 : SIO channel A clock
 	// ZC1 : SIO channel B clock
-	MCFG_Z80CTC_ZC2_CB(WRITELINE(pcm_state, pcm_82_w))	// speaker
+	MCFG_Z80CTC_ZC2_CB(WRITELINE(pcm_state, pcm_82_w))  // speaker
 MACHINE_CONFIG_END
 
 /* ROM definition */

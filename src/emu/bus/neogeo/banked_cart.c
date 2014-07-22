@@ -47,14 +47,14 @@ void neogeo_banked_cart_device::_set_main_cpu_bank_address(void)
 
 	if (!m_bank_cartridge)
 		printf("bank_cartridge is null\n");
-	
+
 	if (m_region && m_bank_cartridge) m_bank_cartridge->set_base(m_region + m_main_cpu_bank_address);
 }
 
 
 void neogeo_banked_cart_device::neogeo_set_main_cpu_bank_address( UINT32 bank_address )
 {
-//	if (LOG_MAIN_CPU_BANKING) logerror("MAIN CPU PC %06x: neogeo_set_main_cpu_bank_address %06x\n", m_maincpu->pc(), bank_address);
+//  if (LOG_MAIN_CPU_BANKING) logerror("MAIN CPU PC %06x: neogeo_set_main_cpu_bank_address %06x\n", m_maincpu->pc(), bank_address);
 
 	m_main_cpu_bank_address = bank_address;
 
@@ -96,11 +96,10 @@ void neogeo_banked_cart_device::install_banks(running_machine& machine, cpu_devi
 {
 	maincpu->space(AS_PROGRAM).install_read_bank(0x200000, 0x2fffff, 0, 0, "cartridge");
 	maincpu->space(AS_PROGRAM).install_write_handler(0x2ffff0, 0x2fffff, write16_delegate(FUNC(neogeo_banked_cart_device::main_cpu_bank_select_w),this));
-	
+
 	m_bank_cartridge = machine.root_device().membank("cartridge");
 	m_region = region;
 	m_region_size = region_size;
 
 	init_banks();
 }
-

@@ -821,7 +821,7 @@ static INPUT_PORTS_START( trailblz )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( supnudg2 )    /* need to find the button 'B' to be playable */
-        PORT_INCLUDE ( trailblz )
+		PORT_INCLUDE ( trailblz )
 
 	PORT_MODIFY("PIA0.A")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )  PORT_NAME("1 Pound (5 credits)")    // coin x 5

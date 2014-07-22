@@ -60,4 +60,3 @@ READ8_MEMBER(msx_cart_arc::io_7f_r)
 {
 	return ((m_7f & 0x03) == 0x03) ? 0xda : 0xff;
 }
-

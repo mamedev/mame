@@ -355,27 +355,27 @@ READ8_MEMBER(bfm_sc1_state::nec_r)
 
 WRITE8_MEMBER(bfm_sc1_state::vfd_w)
 {
-/*	int changed = m_vfd_latch ^ data;
+/*  int changed = m_vfd_latch ^ data;
 
-	m_vfd_latch = data;
+    m_vfd_latch = data;
 
-	if ( changed )
-	{
-		if ( changed & VFD_RESET )
-		{ // vfd reset line changed
-			if ( !(data & VFD_RESET) )
-			{ // reset the vfd
-			m_vfd0->reset();
-			}
-		}
-		if ( changed & VFD_CLOCK1 )
-		{ // clock line changed
-			if ( !(data & VFD_CLOCK1) && (data & VFD_RESET) )
-			{ // new data clocked into vfd
-				m_vfd0->shift_data(data & VFD_DATA );
-			}
-		}
-	}
+    if ( changed )
+    {
+        if ( changed & VFD_RESET )
+        { // vfd reset line changed
+            if ( !(data & VFD_RESET) )
+            { // reset the vfd
+            m_vfd0->reset();
+            }
+        }
+        if ( changed & VFD_CLOCK1 )
+        { // clock line changed
+            if ( !(data & VFD_CLOCK1) && (data & VFD_RESET) )
+            { // new data clocked into vfd
+                m_vfd0->shift_data(data & VFD_DATA );
+            }
+        }
+    }
 */
 	m_vfd0->por(data & VFD_RESET);
 	m_vfd0->data(data & VFD_DATA);

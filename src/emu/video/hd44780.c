@@ -189,7 +189,7 @@ void hd44780_device::correct_ac()
 	if (m_active_ram == DDRAM)
 	{
 		int max_ac = (m_num_line == 1) ? 0x4f : 0x67;
-		
+
 		if (m_ac > max_ac)
 			m_ac -= max_ac + 1;
 		else if (m_ac < 0)
@@ -214,7 +214,7 @@ void hd44780_device::update_ac(int direction)
 void hd44780_device::shift_display(int direction)
 {
 	m_disp_shift += direction;
-	
+
 	if (m_disp_shift == 0x50)
 		m_disp_shift = 0;
 	else if (m_disp_shift == -1)

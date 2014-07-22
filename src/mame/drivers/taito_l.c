@@ -1861,7 +1861,7 @@ static MACHINE_CONFIG_START( kurikint, taitol_state )
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_13_33056MHz/2)    /* verified freq on pin122 of TC0090LVC cpu */
 	MCFG_CPU_PROGRAM_MAP(kurikint_map)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(taitol_state,irq_callback)
-	
+
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", taitol_state, vbl_interrupt, "screen", 0, 1)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_12MHz/3)        /* verified on pcb */

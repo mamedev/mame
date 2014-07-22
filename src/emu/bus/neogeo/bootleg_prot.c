@@ -192,7 +192,7 @@ READ16_MEMBER( ngbootleg_prot_device::kof10th_RAMB_r )
 
 READ16_MEMBER(ngbootleg_prot_device::kof10th_RAM2_r)
 {
-//	printf("kof10th_RAM2_r\n");
+//  printf("kof10th_RAM2_r\n");
 	return m_cartridge_ram2[offset];
 }
 
@@ -1128,4 +1128,3 @@ void ngbootleg_prot_device::matrimbl_decrypt(UINT8* sprrom, UINT32 sprrom_size, 
 	/* decrypt gfx */
 	cthd2003_c(sprrom,sprrom_size, 0 );
 }
-

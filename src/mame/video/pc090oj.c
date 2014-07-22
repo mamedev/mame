@@ -80,7 +80,7 @@ pc090oj_device::pc090oj_device(const machine_config &mconfig, const char *tag, d
 	m_ram(NULL),
 	m_ram_buffered(0),
 	m_gfxnum(0),
-	m_x_offset(0), 
+	m_x_offset(0),
 	m_y_offset(0),
 	m_use_buffer(0),
 	m_gfxdecode(*this),

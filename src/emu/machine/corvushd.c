@@ -224,7 +224,7 @@ bool corvus_hdc_t::parse_hdc_command(UINT8 data) {
 			//
 			// Prep Commands
 			//
-			case PREP_MODE_SELECT:              
+			case PREP_MODE_SELECT:
 			case PREP_RESET_DRIVE:
 			case PREP_FORMAT_DRIVE:
 			case PREP_FILL_DRIVE_OMNI:
@@ -692,14 +692,14 @@ UINT8 corvus_hdc_t::corvus_get_drive_parameters(UINT8 drv) {
 
 	// This firmware string and revision were taken from the Corvus firmware
 	// file CORVB184.CLR found on the SSE SoftBox distribution disk.
-	strcpy((char *) m_buffer.drive_param_response.firmware_desc, "V18.4     -- CONST II - 11/82  ");   
+	strcpy((char *) m_buffer.drive_param_response.firmware_desc, "V18.4     -- CONST II - 11/82  ");
 	m_buffer.drive_param_response.firmware_rev = 37;
 
 	// Controller ROM version
 	m_buffer.drive_param_response.rom_version = ROM_VERSION;
 
 	//
- 	// Track information
+	// Track information
 	//
 	m_buffer.drive_param_response.track_info.sectors_per_track = m_sectors_per_track;
 	m_buffer.drive_param_response.track_info.tracks_per_cylinder = m_tracks_per_cylinder;
@@ -766,10 +766,10 @@ UINT8 corvus_hdc_t::corvus_read_boot_block(UINT8 block) {
 //
 // Enter prep mode.  In prep mode, only prep mode commands may be executed.
 //
-// A "prep block" is 512 bytes of machine code that the host sends to the 
+// A "prep block" is 512 bytes of machine code that the host sends to the
 // controller.  The controller will jump to this code after receiving it,
 // and it is what actually implements prep mode commands.  This HLE ignores
-// the prep block from the host.  
+// the prep block from the host.
 //
 // On the Rev B/H drives (which we emulate), a prep block is Z80 machine
 // code and only one prep block can be sent.  Sending the "put drive into
@@ -778,9 +778,9 @@ UINT8 corvus_hdc_t::corvus_read_boot_block(UINT8 block) {
 // distribution disk returns error 0x8f (unrecognized command) for this case.
 //
 // On the OmniDrive and Bank, a prep block is 6801 machine code.  These
-// controllers allow multiple prep blocks to be sent.  The first time the 
+// controllers allow multiple prep blocks to be sent.  The first time the
 // "put drive into prep mode" command is sent puts the drive into prep mode.
-// The command can then be sent again up to 3 times with more prep blocks.  
+// The command can then be sent again up to 3 times with more prep blocks.
 // (Mass Storage GTI, pages 50-51)
 //
 // Pass:
@@ -791,7 +791,7 @@ UINT8 corvus_hdc_t::corvus_read_boot_block(UINT8 block) {
 //      Status of command
 //
 UINT8 corvus_hdc_t::corvus_enter_prep_mode(UINT8 drv, UINT8 *prep_block) {
-	// on rev b/h drives, sending the "put drive into prep mode" 
+	// on rev b/h drives, sending the "put drive into prep mode"
 	// command when already in prep mode is an error.
 	if (m_prep_mode) {
 		logerror("corvus_enter_prep_mode: Attempt to enter prep mode while in prep mode\n");
@@ -809,7 +809,7 @@ UINT8 corvus_hdc_t::corvus_enter_prep_mode(UINT8 drv, UINT8 *prep_block) {
 
 	m_prep_mode = true;
 	m_prep_drv = drv;
-	return STAT_SUCCESS;	
+	return STAT_SUCCESS;
 }
 
 
@@ -826,7 +826,7 @@ UINT8 corvus_hdc_t::corvus_exit_prep_mode() {
 	LOG(("corvus_exit_prep_mode: Prep mode exited\n"));
 	m_prep_mode = false;
 	m_prep_drv = 0;
-	return STAT_SUCCESS;	
+	return STAT_SUCCESS;
 }
 
 
@@ -852,7 +852,7 @@ UINT8 corvus_hdc_t::corvus_read_firmware_block(UINT8 head, UINT8 sector) {
 	LOG(("corvus_read_firmware_block: Reading firmware head: 0x%2.2x, sector: 0x%2.2x, relative_sector: 0x%2.2x\n",
 		head, sector, relative_sector));
 
-	status = corvus_read_sector(m_prep_drv, relative_sector, m_buffer.read_512_response.data, 512);        
+	status = corvus_read_sector(m_prep_drv, relative_sector, m_buffer.read_512_response.data, 512);
 	return status;
 }
 
@@ -880,7 +880,7 @@ UINT8 corvus_hdc_t::corvus_write_firmware_block(UINT8 head, UINT8 sector, UINT8 
 	LOG(("corvus_write_firmware_block: Writing firmware head: 0x%2.2x, sector: 0x%2.2x, relative_sector: 0x%2.2x\n",
 		head, sector, relative_sector));
 
-	status = corvus_write_sector(m_prep_drv, relative_sector, buffer, 512); 
+	status = corvus_write_sector(m_prep_drv, relative_sector, buffer, 512);
 	return status;
 }
 
@@ -1067,7 +1067,7 @@ void corvus_hdc_t::corvus_process_command_packet(bool invalid_command_flag) {
 					break;
 				case PREP_MODE_SELECT:
 					m_buffer.single_byte_response.status =
-						corvus_enter_prep_mode(m_buffer.prep_mode_command.drive, 
+						corvus_enter_prep_mode(m_buffer.prep_mode_command.drive,
 							m_buffer.prep_mode_command.prep_block);
 					break;
 				default:
@@ -1082,11 +1082,11 @@ void corvus_hdc_t::corvus_process_command_packet(bool invalid_command_flag) {
 					// when already in prep mode, some drives allow this command to
 					// be sent again.  see corvus_enter_prep_mode() for details.
 					m_buffer.single_byte_response.status =
-						corvus_enter_prep_mode(m_buffer.prep_mode_command.drive, 
+						corvus_enter_prep_mode(m_buffer.prep_mode_command.drive,
 							m_buffer.prep_mode_command.prep_block);
 					break;
 				case PREP_RESET_DRIVE:
-					m_buffer.single_byte_response.status = 
+					m_buffer.single_byte_response.status =
 						corvus_exit_prep_mode();
 					break;
 				case PREP_READ_FIRMWARE:
@@ -1105,7 +1105,7 @@ void corvus_hdc_t::corvus_process_command_packet(bool invalid_command_flag) {
 					break;
 				case PREP_VERIFY:
 					m_buffer.verify_drive_response.status = STAT_SUCCESS;
-					m_buffer.verify_drive_response.bad_sectors = 0; 
+					m_buffer.verify_drive_response.bad_sectors = 0;
 					break;
 				default:
 					m_xmit_bytes = 1;

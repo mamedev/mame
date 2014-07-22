@@ -9,11 +9,11 @@
 nld_7400::truthtable_t nld_7400::m_ttbl;
 
 const char *nld_7400::m_desc[] = {
-        "A,B,PQ,PA,PB|Q",
-        "0,X,X,X,X|1|22",
-        "X,0,X,X,X|1|22",
-        "1,1,X,X,X|0|15",
-        ""
+		"A,B,PQ,PA,PB|Q",
+		"0,X,X,X,X|1|22",
+		"X,0,X,X,X|1|22",
+		"1,1,X,X,X|0|15",
+		""
 };
 
 #endif

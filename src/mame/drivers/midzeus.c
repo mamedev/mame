@@ -1104,10 +1104,10 @@ static MACHINE_CONFIG_START( midzeus, midzeus_state )
 
 	/* sound hardware */
 	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_2104, 0)
-		
+
 	MCFG_DEVICE_ADD("ioasic", MIDWAY_IOASIC, 0)
-	MCFG_MIDWAY_IOASIC_SHUFFLE(MIDWAY_IOASIC_STANDARD)	
-	MCFG_MIDWAY_SERIAL_PIC2_YEAR_OFFS(94)	
+	MCFG_MIDWAY_IOASIC_SHUFFLE(MIDWAY_IOASIC_STANDARD)
+	MCFG_MIDWAY_SERIAL_PIC2_YEAR_OFFS(94)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( mk4, midzeus )
@@ -1129,7 +1129,7 @@ ADDRESS_MAP_END
 static MACHINE_CONFIG_DERIVED( invasn, midzeus )
 	MCFG_CPU_ADD("pic", PIC16C57, 8000000)  /* ? */
 	MCFG_CPU_IO_MAP(pic_io_map)
-	
+
 	MCFG_DEVICE_MODIFY("ioasic")
 	MCFG_MIDWAY_IOASIC_UPPER(468/* or 488 */)
 MACHINE_CONFIG_END
@@ -1157,7 +1157,7 @@ static MACHINE_CONFIG_START( midzeus2, midzeus2_state )
 	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_2104, 0)
 
 	MCFG_M48T35_ADD( "m48t35" )
-	
+
 	MCFG_DEVICE_ADD("ioasic", MIDWAY_IOASIC, 0)
 	MCFG_MIDWAY_IOASIC_SHUFFLE(MIDWAY_IOASIC_STANDARD)
 	MCFG_MIDWAY_SERIAL_PIC2_YEAR_OFFS(99)
@@ -1527,9 +1527,9 @@ DRIVER_INIT_MEMBER(midzeus_state,thegrid)
  *
  *************************************/
 
-GAME(  1997, mk4,      0,        mk4, 	   mk4,      midzeus_state, mk4,      ROT0, "Midway", "Mortal Kombat 4 (version 3.0)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
-GAME(  1997, mk4a,     mk4,      mk4,  	   mk4,      midzeus_state, mk4,      ROT0, "Midway", "Mortal Kombat 4 (version 2.1)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
-GAME(  1997, mk4b,     mk4,      mk4,  	   mk4,      midzeus_state, mk4,      ROT0, "Midway", "Mortal Kombat 4 (version 1.0)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME(  1997, mk4,      0,        mk4,      mk4,      midzeus_state, mk4,      ROT0, "Midway", "Mortal Kombat 4 (version 3.0)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME(  1997, mk4a,     mk4,      mk4,      mk4,      midzeus_state, mk4,      ROT0, "Midway", "Mortal Kombat 4 (version 2.1)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME(  1997, mk4b,     mk4,      mk4,      mk4,      midzeus_state, mk4,      ROT0, "Midway", "Mortal Kombat 4 (version 1.0)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
 GAME(  1999, invasnab, 0,        invasn,   invasn,   midzeus_state, invasn,   ROT0, "Midway", "Invasion - The Abductors (version 5.0)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
 GAME(  1999, invasnab4,invasnab, invasn,   invasn,   midzeus_state, invasn,   ROT0, "Midway", "Invasion - The Abductors (version 4.0)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
 GAME(  1999, invasnab3,invasnab, invasn,   invasn,   midzeus_state, invasn,   ROT0, "Midway", "Invasion - The Abductors (version 3.0)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )

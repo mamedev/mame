@@ -306,7 +306,7 @@ machine_config_constructor isa8_aga_device::device_mconfig_additions() const
  *************************************/
 
 /* colors need fixing in the mda_text_* functions ! */
-MC6845_UPDATE_ROW( isa8_aga_device::mda_text_inten_update_row ) 
+MC6845_UPDATE_ROW( isa8_aga_device::mda_text_inten_update_row )
 {
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 	UINT8 *videoram = m_videoram;
@@ -367,7 +367,7 @@ MC6845_UPDATE_ROW( isa8_aga_device::mda_text_inten_update_row )
 }
 
 
-MC6845_UPDATE_ROW( isa8_aga_device::mda_text_blink_update_row ) 
+MC6845_UPDATE_ROW( isa8_aga_device::mda_text_blink_update_row )
 {
 	UINT8 *videoram = m_videoram;
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
@@ -429,7 +429,7 @@ MC6845_UPDATE_ROW( isa8_aga_device::mda_text_blink_update_row )
 }
 
 
-MC6845_UPDATE_ROW( isa8_aga_device::cga_text_inten_update_row ) 
+MC6845_UPDATE_ROW( isa8_aga_device::cga_text_inten_update_row )
 {
 	UINT8 *videoram = m_videoram;
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
@@ -460,7 +460,7 @@ MC6845_UPDATE_ROW( isa8_aga_device::cga_text_inten_update_row )
 	}
 }
 
-MC6845_UPDATE_ROW( isa8_aga_device::cga_text_inten_alt_update_row ) 
+MC6845_UPDATE_ROW( isa8_aga_device::cga_text_inten_alt_update_row )
 {
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 	UINT8 *videoram = m_videoram;
@@ -490,7 +490,7 @@ MC6845_UPDATE_ROW( isa8_aga_device::cga_text_inten_alt_update_row )
 	}
 }
 
-MC6845_UPDATE_ROW( isa8_aga_device::cga_text_blink_update_row ) 
+MC6845_UPDATE_ROW( isa8_aga_device::cga_text_blink_update_row )
 {
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 	UINT8 *videoram = m_videoram;
@@ -524,7 +524,7 @@ MC6845_UPDATE_ROW( isa8_aga_device::cga_text_blink_update_row )
 	}
 }
 
-MC6845_UPDATE_ROW( isa8_aga_device::cga_text_blink_alt_update_row ) 
+MC6845_UPDATE_ROW( isa8_aga_device::cga_text_blink_alt_update_row )
 {
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 	UINT8 *videoram = m_videoram;
@@ -560,7 +560,7 @@ MC6845_UPDATE_ROW( isa8_aga_device::cga_text_blink_alt_update_row )
 	}
 }
 
-MC6845_UPDATE_ROW( isa8_aga_device::cga_gfx_4bppl_update_row ) 
+MC6845_UPDATE_ROW( isa8_aga_device::cga_gfx_4bppl_update_row )
 {
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 	UINT8 *videoram = m_videoram;
@@ -586,7 +586,7 @@ MC6845_UPDATE_ROW( isa8_aga_device::cga_gfx_4bppl_update_row )
 	}
 }
 
-MC6845_UPDATE_ROW( isa8_aga_device::cga_gfx_4bpph_update_row ) 
+MC6845_UPDATE_ROW( isa8_aga_device::cga_gfx_4bpph_update_row )
 {
 	UINT8 *videoram = m_videoram;
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
@@ -620,7 +620,7 @@ MC6845_UPDATE_ROW( isa8_aga_device::cga_gfx_4bpph_update_row )
 	}
 }
 
-MC6845_UPDATE_ROW( isa8_aga_device::cga_gfx_2bpp_update_row ) 
+MC6845_UPDATE_ROW( isa8_aga_device::cga_gfx_2bpp_update_row )
 {
 	UINT8 *videoram = m_videoram;
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
@@ -646,7 +646,7 @@ MC6845_UPDATE_ROW( isa8_aga_device::cga_gfx_2bpp_update_row )
 	}
 }
 
-MC6845_UPDATE_ROW( isa8_aga_device::cga_gfx_1bpp_update_row ) 
+MC6845_UPDATE_ROW( isa8_aga_device::cga_gfx_1bpp_update_row )
 {
 	UINT8 *videoram = m_videoram;
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
@@ -723,7 +723,7 @@ WRITE8_MEMBER ( isa8_aga_device::pc_aga_mda_w )
 			case 8:
 				m_mda_mode_control = data;
 
-				switch (m_mda_mode_control & 0x2a) 
+				switch (m_mda_mode_control & 0x2a)
 				{
 				case 0x08:
 					m_update_row_type = MDA_TEXT_INTEN;
@@ -807,7 +807,7 @@ WRITE8_MEMBER (isa8_aga_device:: pc_aga_cga_w )
 			break;
 		case 8:
 			m_cga_mode_control = data;
-				
+
 			//logerror("mode set to %02X\n", m_cga_mode_control & 0x3F );
 			switch ( m_cga_mode_control & 0x3F ) {
 			case 0x08: case 0x09: case 0x0C: case 0x0D:

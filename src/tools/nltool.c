@@ -67,9 +67,9 @@ void CLIB_DECL logerror(const char *format, ...)
 
 void report_bad_cast(const std::type_info &src_type, const std::type_info &dst_type)
 {
-    printf("Error: bad downcast<> or device<>.  Tried to convert a %s to a %s, which are incompatible.\n",
-            src_type.name(), dst_type.name());
-    throw;
+	printf("Error: bad downcast<> or device<>.  Tried to convert a %s to a %s, which are incompatible.\n",
+			src_type.name(), dst_type.name());
+	throw;
 }
 
 struct options_entry oplist[] =

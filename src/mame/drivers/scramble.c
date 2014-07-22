@@ -1573,8 +1573,8 @@ static MACHINE_CONFIG_DERIVED( triplep, scramble )
 	/* sound hardware */
 	MCFG_SOUND_MODIFY("8910.1")
 	MCFG_SOUND_CLOCK(18432000/12) // triple punch/knock out ay clock is 1.535MHz, derived from main cpu xtal; verified on hardware
-	
-	
+
+
 	MCFG_SOUND_ROUTES_RESET()
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 

@@ -16,7 +16,7 @@
     VRAM        256kbyte (4Display/Access bank)
 
     PaletteRAM  96kbyte
-	
+
     Display     320(x)*224(y)
 
     Sprite      16(x)*240(y(max))*380(max) (96 sprite/line(max))
@@ -605,10 +605,9 @@ void midas_state::machine_start()
 
 void midas_state::machine_reset()
 {
-
 }
 
-	
+
 
 
 WRITE_LINE_MEMBER(midas_state::livequiz_irqhandler)

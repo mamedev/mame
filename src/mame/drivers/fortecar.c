@@ -659,7 +659,7 @@ static MACHINE_CONFIG_START( fortecar, fortecar_state )
 
 	MCFG_DEVICE_ADD("fcppi0", I8255A, 0)
 	/*  Init with 0x9a... A, B and high C as input
-     Serial Eprom connected to Port C */
+	 Serial Eprom connected to Port C */
 	MCFG_I8255_IN_PORTA_CB(IOPORT("SYSTEM"))
 	MCFG_I8255_IN_PORTB_CB(IOPORT("INPUT"))
 	MCFG_I8255_IN_PORTC_CB(READ8(fortecar_state, ppi0_portc_r))

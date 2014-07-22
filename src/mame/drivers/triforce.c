@@ -621,9 +621,9 @@ Regions           J
 Peripheral String 0000000
 Product Number    GDT-0004E
 Version           V5.002
-Release Date      20031203 
- 
-PIC16C621A-20/P (317-0362-COM) 
+Release Date      20031203
+
+PIC16C621A-20/P (317-0362-COM)
 Sticker: 253-5508-0362
 */
 ROM_START( fzeroax )
@@ -645,10 +645,10 @@ Peripheral String 0000000
 Product Number    GDT-0004C
 Version           V3.000
 Release Date      20030611
- 
-PIC16C621A-20/P (317-0362-COM) 
+
+PIC16C621A-20/P (317-0362-COM)
 Sticker: 253-5508-0362
-*/ 
+*/
 ROM_START( fzeroaxc )
 	TRIFORCE_BIOS
 
@@ -816,8 +816,8 @@ Peripheral String 0000000
 Product Number    GDT-0021
 Version           V1.003
 Release Date      20060131
-Manufacturer ID  
-Ring Code   
+Manufacturer ID
+Ring Code
 BIN               BLL.BIN
 KEY               ABFBD902FBD980E5
 GDI Structure     3
@@ -825,20 +825,20 @@ GDI Structure     3
 2   450 0 2352 track02.raw 0
 3 45000 4 2352 track03.bin 0
 
-Files Infos : 
+Files Infos :
 disc.gdi    - size         87 - md5 b3ecdf113fd42344dd84142679e4cb36 - sha1 9d50b816d3f69ad192f5986ab487769965c2e082
 track01.bin - size     705600 - md5 0fa0aff28e75130cc9364e11755d0881 - sha1 647ff196eff7c220e1aa7829f87494d557c90be4
 track02.raw - size    3179904 - md5 32a6bba6f49385515c6649bb78f8e9c4 - sha1 27c8184e6d40c48fe6466bfb4171969eaf6baab3
 track03.bin - size 1185760800 - md5 8b67fe537a66fa849686df074531cb30 - sha1 153f638f5b67741687186835573ab485400f91bf
 
 ROM_START( vs42k6ex )
-	TRIFORCE_BIOS
+    TRIFORCE_BIOS
 
-	DISK_REGION( "gdrom" )
-	DISK_IMAGE_READONLY( "gdt-0021", 0, NO_DUMP ) disc.gdi is missing from available romset, it is impossible to create CHD with CHDMAN
+    DISK_REGION( "gdrom" )
+    DISK_IMAGE_READONLY( "gdt-0021", 0, NO_DUMP ) disc.gdi is missing from available romset, it is impossible to create CHD with CHDMAN
 
-	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
-	ROM_LOAD("gdt-0021.data", 0x00, 0x50, NO_DUMP )
+    ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
+    ROM_LOAD("gdt-0021.data", 0x00, 0x50, NO_DUMP )
 ROM_END
 */
 
@@ -848,19 +848,19 @@ Product Number GDT-0022A
 Hardware       Tri-Force
 Sec Key        253-5508-0567
 Pic            317-0567-COM
-Ver            0001 
+Ver            0001
 Boot File      BRN.BIN
 GD Unlock      70 1F 71 1F
 DES Key        D96446469BDCE9C1
 
 ROM_START( tcfboxa )
-	TRIFORCE_BIOS
+    TRIFORCE_BIOS
 
-	DISK_REGION( "gdrom" )
-	DISK_IMAGE_READONLY( "gdt-0022", 0, NO_DUMP ) disc.gdi is missing from available romset, it is impossible to create CHD with CHDMAN
+    DISK_REGION( "gdrom" )
+    DISK_IMAGE_READONLY( "gdt-0022", 0, NO_DUMP ) disc.gdi is missing from available romset, it is impossible to create CHD with CHDMAN
 
-	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
-	ROM_LOAD("317-0567-com.data", 0x00, 0x50, NO_DUMP )
+    ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
+    ROM_LOAD("317-0567-com.data", 0x00, 0x50, NO_DUMP )
 ROM_END
 */
 
@@ -879,42 +879,42 @@ ROM_START( mkartagp )
 ROM_END
 
 /*
- 
+
 MK21 Ver.A
 Number on ROM PCB  837-14343R4S0
 Number on Actel ProAsic  315-6419B
-Number on Key Chip (PIC)  235-5509-5128 
- 
-*/ 
+Number on Key Chip (PIC)  235-5509-5128
+
+*/
 
 ROM_START( mkartag2 )
 	TRIFORCE_BIOS
 
 	ROM_REGION(0x21200000, "rom_board", 0)
-	ROM_LOAD( "ic9_mx29lv400cttc.bin", 0x00000000, 0x0080000, CRC(2bb9f1fe) SHA1(935511d93a0ab06436b0674bef90c790c100e0b1) ) 
-	ROM_LOAD( "ic1_k9f1208u0b.bin",    0x01000000, 0x4200000, CRC(e52f17ef) SHA1(1e007d3136cacb89c396b8261e3978956cc21bdd) ) 
-	ROM_LOAD( "ic2_k9f1208u0b.bin",    0x04200000, 0x4200000, CRC(8a6a2649) SHA1(fd4318e7fb5020c499e06fdb1996b8d40161b674) ) 
-	ROM_LOAD( "ic3_k9f1208u0b.bin",    0x08400000, 0x4200000, CRC(8fd44a29) SHA1(9392bc4da6541960a83e9c7b3ab4f36bc5564fb7) ) 
-	ROM_LOAD( "ic4_k9f1208u0b.bin",    0x0c600000, 0x4200000, CRC(ae3fb198) SHA1(c9c0beb9f6875dbf7ce015454a59481524ef3ef6) ) 
-	ROM_LOAD( "ic5_k9f1208u0b.bin",    0x10800000, 0x4200000, CRC(e9208514) SHA1(ad0ed3e681cd78a61d7ad3af83db20e364bb47fd) ) 
-	ROM_LOAD( "ic6_k9f1208u0b.bin",    0x14c00000, 0x4200000, CRC(7363697c) SHA1(997c96d0b41774a24a2e0427a703bc295e784187) ) 
-	ROM_LOAD( "ic7_k9f1208u0b.bin",    0x18e00000, 0x4200000, CRC(407da1d2) SHA1(c185ebd2f3d8654d8fd394c56ac9bfff7e49f125) ) 
-	ROM_LOAD( "ic8_k9f1208u0b.bin",    0x1d000000, 0x4200000, CRC(9ab76062) SHA1(36a6317c646da5cf682d46ca438ce05e600bc354) ) 
+	ROM_LOAD( "ic9_mx29lv400cttc.bin", 0x00000000, 0x0080000, CRC(2bb9f1fe) SHA1(935511d93a0ab06436b0674bef90c790c100e0b1) )
+	ROM_LOAD( "ic1_k9f1208u0b.bin",    0x01000000, 0x4200000, CRC(e52f17ef) SHA1(1e007d3136cacb89c396b8261e3978956cc21bdd) )
+	ROM_LOAD( "ic2_k9f1208u0b.bin",    0x04200000, 0x4200000, CRC(8a6a2649) SHA1(fd4318e7fb5020c499e06fdb1996b8d40161b674) )
+	ROM_LOAD( "ic3_k9f1208u0b.bin",    0x08400000, 0x4200000, CRC(8fd44a29) SHA1(9392bc4da6541960a83e9c7b3ab4f36bc5564fb7) )
+	ROM_LOAD( "ic4_k9f1208u0b.bin",    0x0c600000, 0x4200000, CRC(ae3fb198) SHA1(c9c0beb9f6875dbf7ce015454a59481524ef3ef6) )
+	ROM_LOAD( "ic5_k9f1208u0b.bin",    0x10800000, 0x4200000, CRC(e9208514) SHA1(ad0ed3e681cd78a61d7ad3af83db20e364bb47fd) )
+	ROM_LOAD( "ic6_k9f1208u0b.bin",    0x14c00000, 0x4200000, CRC(7363697c) SHA1(997c96d0b41774a24a2e0427a703bc295e784187) )
+	ROM_LOAD( "ic7_k9f1208u0b.bin",    0x18e00000, 0x4200000, CRC(407da1d2) SHA1(c185ebd2f3d8654d8fd394c56ac9bfff7e49f125) )
+	ROM_LOAD( "ic8_k9f1208u0b.bin",    0x1d000000, 0x4200000, CRC(9ab76062) SHA1(36a6317c646da5cf682d46ca438ce05e600bc354) )
 ROM_END
 
 ROM_START( mkartag2a )
 	TRIFORCE_BIOS
 
 	ROM_REGION(0x21200000, "rom_board", 0)
-	ROM_LOAD( "ic9_mx29lv400cttc(__alt).bin", 0x00000000, 0x0080000, CRC(ff854fd0) SHA1(0e42aff9a60aacd200b7a29d4d180abdab6a732e) ) 
-	ROM_LOAD( "ic1_k9f1208u0b(__alt).bin",    0x01000000, 0x4200000, CRC(c5624816) SHA1(d6f2a2ff9e9e14d857a0ec810521c378ba1fabd5) ) 
-	ROM_LOAD( "ic2_k9f1208u0b(__alt).bin",    0x04200000, 0x4200000, CRC(44e59a1f) SHA1(68a8c1178a33e23446980ec84486bc614f830dad) ) 
-	ROM_LOAD( "ic3_k9f1208u0b(__alt).bin",    0x08400000, 0x4200000, CRC(6688e7f9) SHA1(7d1e60806c02fd765dd0981e790a698a29050aae) ) 
-	ROM_LOAD( "ic4_k9f1208u0b(__alt).bin",    0x0c600000, 0x4200000, CRC(e043eac2) SHA1(0108d940a852ff03e919170957f2bca2c1a88a03) ) 
-	ROM_LOAD( "ic5_k9f1208u0b(__alt).bin",    0x10800000, 0x4200000, CRC(20882926) SHA1(c802de32ca24bf4e9fbabf47fed23a91b3d614ac) ) 
-	ROM_LOAD( "ic6_k9f1208u0b(__alt).bin",    0x14c00000, 0x4200000, CRC(14171ba4) SHA1(3ddace539cd8a4b53a1ef03238e8404db7dcd85e) ) 
-	ROM_LOAD( "ic7_k9f1208u0b(__alt).bin",    0x18e00000, 0x4200000, CRC(bd0199df) SHA1(aafb171e9f5a4c8dc2ef55ba344a0eb310c63467) ) 
-	ROM_LOAD( "ic8_k9f1208u0b(__alt).bin",    0x1d000000, 0x4200000, CRC(8ad6c7ae) SHA1(749b99a944f62aefb895a622c029656c69b3c736) ) 
+	ROM_LOAD( "ic9_mx29lv400cttc(__alt).bin", 0x00000000, 0x0080000, CRC(ff854fd0) SHA1(0e42aff9a60aacd200b7a29d4d180abdab6a732e) )
+	ROM_LOAD( "ic1_k9f1208u0b(__alt).bin",    0x01000000, 0x4200000, CRC(c5624816) SHA1(d6f2a2ff9e9e14d857a0ec810521c378ba1fabd5) )
+	ROM_LOAD( "ic2_k9f1208u0b(__alt).bin",    0x04200000, 0x4200000, CRC(44e59a1f) SHA1(68a8c1178a33e23446980ec84486bc614f830dad) )
+	ROM_LOAD( "ic3_k9f1208u0b(__alt).bin",    0x08400000, 0x4200000, CRC(6688e7f9) SHA1(7d1e60806c02fd765dd0981e790a698a29050aae) )
+	ROM_LOAD( "ic4_k9f1208u0b(__alt).bin",    0x0c600000, 0x4200000, CRC(e043eac2) SHA1(0108d940a852ff03e919170957f2bca2c1a88a03) )
+	ROM_LOAD( "ic5_k9f1208u0b(__alt).bin",    0x10800000, 0x4200000, CRC(20882926) SHA1(c802de32ca24bf4e9fbabf47fed23a91b3d614ac) )
+	ROM_LOAD( "ic6_k9f1208u0b(__alt).bin",    0x14c00000, 0x4200000, CRC(14171ba4) SHA1(3ddace539cd8a4b53a1ef03238e8404db7dcd85e) )
+	ROM_LOAD( "ic7_k9f1208u0b(__alt).bin",    0x18e00000, 0x4200000, CRC(bd0199df) SHA1(aafb171e9f5a4c8dc2ef55ba344a0eb310c63467) )
+	ROM_LOAD( "ic8_k9f1208u0b(__alt).bin",    0x1d000000, 0x4200000, CRC(8ad6c7ae) SHA1(749b99a944f62aefb895a622c029656c69b3c736) )
 ROM_END
 
 /* Main board */

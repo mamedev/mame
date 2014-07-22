@@ -1,11 +1,11 @@
 /***************************************************************************
 
-	GAYLE
+    GAYLE
 
     license: MAME, GPL-2.0+
     copyright-holders: Dirk Best
 
-	Gate array used in the Amiga 600 and Amiga 1200 computers.
+    Gate array used in the Amiga 600 and Amiga 1200 computers.
 
 ***************************************************************************/
 

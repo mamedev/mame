@@ -2237,7 +2237,7 @@ UINT32 alto2_cpu_device::alu_74181(UINT32 a, UINT32 b, UINT8 smc)
 	case SMC(1,1,1,1, 1, 1):
 		f = (a) | cout;
 		break;
-	
+
 	default:
 		f = 0;
 		break;

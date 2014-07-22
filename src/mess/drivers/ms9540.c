@@ -85,7 +85,7 @@ static MACHINE_CONFIG_START( ms9540, ms9540_state )
 	/* video hardware */
 	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
 	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(WRITE8(ms9540_state, kbd_put))
-	
+
 MACHINE_CONFIG_END
 
 /* ROM definition */

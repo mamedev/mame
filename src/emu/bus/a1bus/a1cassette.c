@@ -3,7 +3,7 @@
     a1cassette.c
 
     Apple I Cassette Interface
- 
+
 *********************************************************************/
 
 #include "a1cassette.h"
@@ -196,4 +196,3 @@ WRITE8_MEMBER(a1bus_cassette_device::cassette_w)
 
 	cassette_toggle_output();
 }
-

@@ -327,7 +327,7 @@ VIDEO_START_MEMBER(mappy_state,mappy)
 
 	m_bg_tilemap->configure_groups(*m_gfxdecode->gfx(0), 31);
 	m_bg_tilemap->set_scroll_cols(36);
-	
+
 	save_item(NAME(m_scroll));
 }
 

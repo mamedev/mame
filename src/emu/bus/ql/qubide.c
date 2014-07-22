@@ -269,7 +269,7 @@ void qubide_t::write(address_space &space, offs_t offset, UINT8 data)
 			case 0: case 0x0e: case 0x0f:
 				m_ata->write_cs1(space, 0x05, data, 0xff);
 				break;
-			
+
 			case 0x08: case 0x0a: case 0x0c:
 				m_ata_data = (data << 8) | (m_ata_data & 0xff);
 				break;

@@ -763,7 +763,6 @@ WRITE_LINE_MEMBER(eeprom_serial_er5911_device::di_write) { base_di_write(state);
 eeprom_serial_x24c44_device::eeprom_serial_x24c44_device(const machine_config &mconfig, device_type devtype, const char *name, const char *tag, device_t *owner, const char *shortname, const char *file)
 	: eeprom_serial_base_device(mconfig, devtype, name, tag, owner, shortname, file)
 {
-
 }
 
 
@@ -785,7 +784,7 @@ void eeprom_serial_x24c44_device::device_start()
 	m_ram_length=0xf;
 
 	for (i=0;i<16;i++){
-		m_ram_data[i]=read(i);	//autoreload at power up
+		m_ram_data[i]=read(i);  //autoreload at power up
 	}
 	m_reading=0;
 	m_store_latch=0;
@@ -828,7 +827,7 @@ void eeprom_serial_x24c44_device::copy_ram_to_eeprom(){
 	}else{
 		LOG0(("Store command with store latch not set!\n"));
 	}
-	
+
 }
 
 //-------------------------------------------------
@@ -902,7 +901,7 @@ void eeprom_serial_x24c44_device::execute_command()
 			copy_ram_to_eeprom();
 			set_state(STATE_IN_RESET);
 			break;
-			
+
 		default:
 			throw emu_fatalerror("execute_command called with invalid command %d\n", m_command);
 	}
@@ -959,16 +958,16 @@ void eeprom_serial_x24c44_device::handle_event(eeprom_event event)
 			{
 				// if we have enough bits for a command + address, check it out
 				m_command_address_accum = (m_command_address_accum << 1) | m_di_state;
-	
+
 				m_bits_accum=m_bits_accum+1;
-				
+
 				if (m_bits_accum == 2 + m_command_address_bits){
 					//read command is only 2 bits all other are 3 bits!!!
 
 						parse_command_and_address_2_bit();
 
 				}
-				
+
 				if (!m_reading){
 				if (m_bits_accum == 3 + m_command_address_bits){
 					execute_command();
@@ -983,23 +982,20 @@ void eeprom_serial_x24c44_device::handle_event(eeprom_event event)
 		case STATE_READING_DATA:
 			if (event == EVENT_CLK_RISING_EDGE)
 			{
-			
 				int bit_index = m_bits_accum++;
 
 				if (bit_index % m_data_bits == 0 && (bit_index == 0 || m_streaming_enabled)){
-
 					m_shift_register=m_ram_data[m_address];
-					
+
 					//m_shift_register=BITSWAP16(m_shift_register,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15);
 					//m_shift_register=BITSWAP16(m_shift_register,7,6,5,4,3,2,1,0,15,14,13,12,11,10,9,8);
 					m_shift_register= BITSWAP16(m_shift_register,8,9,10,11,12,13,14,15,0,1,2,3,4,5,6,7);
 
 					m_shift_register=m_shift_register<<16;
-					
+
 					LOG1(("read from RAM addr %02X data(from ram) %04X ,m_shift_register vale %04X \n",m_address,m_ram_data[m_address],m_shift_register));
 					}
 				else{
-				
 					m_shift_register = (m_shift_register << 1) | 1;
 
 				}
@@ -1023,10 +1019,8 @@ void eeprom_serial_x24c44_device::handle_event(eeprom_event event)
 		case STATE_WAIT_FOR_DATA:
 			if (event == EVENT_CLK_RISING_EDGE)
 			{
-				
 				m_shift_register = (m_shift_register << 1) | m_di_state;
 				if (++m_bits_accum == m_data_bits){
-								
 				//m_shift_register=BITSWAP16(m_shift_register, 0, 1, 2, 3, 4, 5,6,7, 8, 9,10,11,12,13,14,15);
 				//m_shift_register=BITSWAP16(m_shift_register, 7, 6, 5, 4, 3, 2,1,0,15,14,13,12,11,10, 9, 8);
 				m_shift_register=BITSWAP16(m_shift_register,8,9,10,11,12,13,14,15,0,1,2,3,4,5,6,7);
@@ -1042,7 +1036,7 @@ void eeprom_serial_x24c44_device::handle_event(eeprom_event event)
 			}
 			break;
 
-			
+
 		// CS is asserted; waiting for completion; watch for CS falling
 		case STATE_WAIT_FOR_COMPLETION:
 			if (event == EVENT_CS_FALLING_EDGE)
@@ -1059,7 +1053,6 @@ void eeprom_serial_x24c44_device::handle_event(eeprom_event event)
 
 void eeprom_serial_x24c44_device::parse_command_and_address()
 {
-
 	//command is start_bit - 4bit_address - 3bit_command
 
 	// set the defaults
@@ -1068,27 +1061,27 @@ void eeprom_serial_x24c44_device::parse_command_and_address()
 	m_address = (m_command_address_accum >> 3) & 0x0f;
 
 	LOG1(("EEPROM: command= %04X, address %02X\n", m_command_address_accum& 0x07, m_address));
-	
+
 	switch (m_command_address_accum & 0x07)
 	{
-		case 0:	//reset write enable latch
+		case 0: //reset write enable latch
 				LOG0(("Lock eeprom\n"));
-				m_command = COMMAND_LOCK;	break;
+				m_command = COMMAND_LOCK;   break;
 		case 3: //write data into ram
 				LOG0(("Write to ram\n"));
-				m_command = COMMAND_WRITE;	break;
+				m_command = COMMAND_WRITE;  break;
 		case 4: //set write enable latch
 				LOG0(("Unlock eeprom\n"));
-				m_command = COMMAND_UNLOCK;	break;
+				m_command = COMMAND_UNLOCK; break;
 		case 1: //store ram data in eeprom
 				LOG0(("copy ram to eeprom\n"));
 				m_command = COMMAND_COPY_RAM_TO_EEPROM;   break;
 		case 5: //reload eeprom data into ram
 				LOG0(("copy eeprom to ram\n"));
-				m_command = COMMAND_COPY_EEPROM_TO_RAM;	break;
+				m_command = COMMAND_COPY_EEPROM_TO_RAM; break;
 		case 2: //reserved (Sleep on x2444)
 			m_command = COMMAND_INVALID;
-				break;				
+				break;
 
 	}
 
@@ -1096,10 +1089,7 @@ void eeprom_serial_x24c44_device::parse_command_and_address()
 
 void eeprom_serial_x24c44_device::parse_command_and_address_2_bit()
 {
-
-	
 	if ((m_command_address_accum & 0x03) == 0x03){
-		
 		m_command = COMMAND_READ;
 		m_address = ((m_command_address_accum >> 2) & 0x0f);
 		m_shift_register = 0;
@@ -1108,7 +1098,7 @@ void eeprom_serial_x24c44_device::parse_command_and_address_2_bit()
 		m_reading=1;
 		m_bits_accum=0;
 	}
-	
+
 	// warn about out-of-range addresses
 	if (m_address >= (1 << m_address_bits))
 		LOG1(("EEPROM: out-of-range address 0x%X provided (maximum should be 0x%X)\n", m_address, (1 << m_address_bits) - 1));

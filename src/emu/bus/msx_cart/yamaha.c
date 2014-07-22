@@ -147,7 +147,7 @@ READ8_MEMBER(msx_cart_sfg::read_cart)
 	switch (offset & 0x3fff)
 	{
 		case 0x3ff0:     // YM-2151 status read
-		case 0x3ff1:	 // YM-2151 status read mirror?
+		case 0x3ff1:     // YM-2151 status read mirror?
 			return m_ym2151->status_r(space, 0);
 
 		case 0x3ff2:     // YM-2148 keyboard column read
@@ -155,8 +155,8 @@ READ8_MEMBER(msx_cart_sfg::read_cart)
 		case 0x3ff4:     // YM-2148 --
 		case 0x3ff5:     // YM-2148 MIDI UART data read register
 		case 0x3ff6:     // YM-2148 MIDI UART status register
-		                 // ------x- - 1 = received a byte/receive buffer full?
-		                 // -------x - 1 = ready to send next byte/send buffer empty?
+							// ------x- - 1 = received a byte/receive buffer full?
+							// -------x - 1 = ready to send next byte/send buffer empty?
 			return m_ym2148->read(space, offset & 7);
 	}
 
@@ -186,13 +186,13 @@ WRITE8_MEMBER(msx_cart_sfg::write_cart)
 		case 0x3ff4:   // YM-2148 External IRQ vector
 		case 0x3ff5:   // YM-2148 MIDI UART data write register
 		case 0x3ff6:   // YM-2148 MIDI UART command register
-		               // On startup the sfg01 writes 0x80
-		               // followed by 0x05.
-		               // Other write seen in the code: 0x15
-		               // 
-		               // x------- - 1 = reset
-		               // -----x-- - 1 = enable receiving / sending midi data
-		               // -------x - 1 = enable receiving / sending midi data
+						// On startup the sfg01 writes 0x80
+						// followed by 0x05.
+						// Other write seen in the code: 0x15
+						//
+						// x------- - 1 = reset
+						// -----x-- - 1 = enable receiving / sending midi data
+						// -------x - 1 = enable receiving / sending midi data
 			m_ym2148->write(space, offset & 7, data);
 			break;
 
@@ -201,4 +201,3 @@ WRITE8_MEMBER(msx_cart_sfg::write_cart)
 			break;
 	}
 }
-

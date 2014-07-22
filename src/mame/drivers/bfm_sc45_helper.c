@@ -141,7 +141,7 @@ bool compare_input_code(running_machine &machine, int addr)
 	if ((rom[0] != 0x48e7) || (rom[1] != 0x3020) || (rom[2] != 0x322f) || (rom[3] != 0x0010) || (rom[4] != 0x227c))
 		return false;
 
- 	if ((rom[7] != 0x4242) || (rom[8] != 0x2449) || (rom[9] != 0x3639))
+	if ((rom[7] != 0x4242) || (rom[8] != 0x2449) || (rom[9] != 0x3639))
 		return false;
 
 	return true;
@@ -175,7 +175,6 @@ int find_input_strings(running_machine &machine)
 
 		if (found==true)
 		{
-
 			startblock = (rom[i + 5] << 16) | rom[i + 6];
 			endblock = (rom[i + 10] << 16) | rom[i + 11];
 			sc45helperlog("------------ INPUTS -----------------\n");
@@ -189,7 +188,7 @@ int find_input_strings(running_machine &machine)
 					UINT16 portpos = rom[j + 0];
 					int port = (portpos & 0x1f);
 					int pos = (portpos >> 5);
-					
+
 					UINT16 unk2 = rom[j + 1];
 					UINT32 stringaddr = (rom[j + 2] << 16) | rom[j + 3];
 
@@ -208,7 +207,7 @@ int find_input_strings(running_machine &machine)
 						{
 							tempstring.cat(chr);
 						}
-							
+
 					}
 
 					tempstring.trimspace();
@@ -232,11 +231,11 @@ int find_input_strings(running_machine &machine)
 					}
 					//else
 					//{
-					//	printf("invalid port position?\n");
+					//  printf("invalid port position?\n");
 					//}
-					
 
-					
+
+
 					sc45helperlog("%s", tempstring.cstr());
 
 					sc45helperlog("\n");
@@ -298,7 +297,7 @@ int find_input_strings(running_machine &machine)
 	int buttons_used = 1;
 
 	printf("INPUT_PORTS_START( %s ) // this structure is generated\n", machine.system().name);
-	printf("	PORT_INCLUDE( sc4_base )\n");
+	printf("    PORT_INCLUDE( sc4_base )\n");
 
 	for (int i = 0; i < 32; i++)
 	{
@@ -310,54 +309,54 @@ int find_input_strings(running_machine &machine)
 			{
 				if (thisportused == 0)
 				{
-					printf("	PORT_MODIFY(\"IN-%d\")\n", i);
+					printf("    PORT_MODIFY(\"IN-%d\")\n", i);
 					thisportused = 1;
 				}
 
 				if (ignoreports[i][j] > 0)
 				{
-					printf("	PORT_BIT( 0x%04x, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_%d_%d ) PORT_NAME(\"%s\")\n", 1 << j, i,j/*ignoreports[i][j]*/, sc4inputs[i][j].name.cstr());
+					printf("    PORT_BIT( 0x%04x, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_%d_%d ) PORT_NAME(\"%s\")\n", 1 << j, i,j/*ignoreports[i][j]*/, sc4inputs[i][j].name.cstr());
 					buttons_used++;
 				}
 				else if (ignoreports[i][j] == -3)
 				{
-					printf("	// 0x%04x - \"%s\" // standard input (motherboard)\n", 1 << j, sc4inputs[i][j].name.cstr());
+					printf("    // 0x%04x - \"%s\" // standard input (motherboard)\n", 1 << j, sc4inputs[i][j].name.cstr());
 				}
 				else if (ignoreports[i][j] == -2)
 				{
-					printf("	// 0x%04x - \"%s\" // standard input (expected here)\n", 1 << j, sc4inputs[i][j].name.cstr());
+					printf("    // 0x%04x - \"%s\" // standard input (expected here)\n", 1 << j, sc4inputs[i][j].name.cstr());
 				}
 				else if (ignoreports[i][j] == -1)
 				{
-					printf("	// 0x%04x - \"%s\" // unexpected here\n", 1 << j, sc4inputs[i][j].name.cstr());
+					printf("    // 0x%04x - \"%s\" // unexpected here\n", 1 << j, sc4inputs[i][j].name.cstr());
 				}
 				else if (ignoreports[i][j] == -4)
 				{
-					printf("	// 0x%04x - \"%s\" // known extended input, mapping not understood\n", 1 << j, sc4inputs[i][j].name.cstr());
+					printf("    // 0x%04x - \"%s\" // known extended input, mapping not understood\n", 1 << j, sc4inputs[i][j].name.cstr());
 				}
 				else if (ignoreports[i][j] == -5)
 				{
-					printf("	// 0x%04x - \"%s\" // known extended input, usually 'top up'\n", 1 << j, sc4inputs[i][j].name.cstr());
+					printf("    // 0x%04x - \"%s\" // known extended input, usually 'top up'\n", 1 << j, sc4inputs[i][j].name.cstr());
 				}
 				else if (ignoreports[i][j] == -6)
 				{
-					printf("	// 0x%04x - \"%s\" // known extended input, usually 'hopper low'\n", 1 << j, sc4inputs[i][j].name.cstr());
+					printf("    // 0x%04x - \"%s\" // known extended input, usually 'hopper low'\n", 1 << j, sc4inputs[i][j].name.cstr());
 				}
 				else if (ignoreports[i][j] == -7)
 				{
-					printf("	// 0x%04x - \"%s\" // known extended input, usually 'hopper fit'\n", 1 << j, sc4inputs[i][j].name.cstr());
+					printf("    // 0x%04x - \"%s\" // known extended input, usually 'hopper fit'\n", 1 << j, sc4inputs[i][j].name.cstr());
 				}
 				else if (ignoreports[i][j] == -8)
 				{
-					printf("	// 0x%04x - \"%s\" // known extended(?) input, sometimes 'top up'\n", 1 << j, sc4inputs[i][j].name.cstr());
+					printf("    // 0x%04x - \"%s\" // known extended(?) input, sometimes 'top up'\n", 1 << j, sc4inputs[i][j].name.cstr());
 				}
 				else if (ignoreports[i][j] == -9)
 				{
-					printf("	// 0x%04x - \"%s\" // known extended(?) input, sometimes 'hop hi'\n", 1 << j, sc4inputs[i][j].name.cstr());
+					printf("    // 0x%04x - \"%s\" // known extended(?) input, sometimes 'hop hi'\n", 1 << j, sc4inputs[i][j].name.cstr());
 				}
 				else if (ignoreports[i][j] == -10)
 				{
-					printf("	// 0x%04x - \"%s\" // known extended(?) input, sometimes 'hop top'\n", 1 << j, sc4inputs[i][j].name.cstr());
+					printf("    // 0x%04x - \"%s\" // known extended(?) input, sometimes 'hop top'\n", 1 << j, sc4inputs[i][j].name.cstr());
 				}
 				buttons_used++;
 			}
@@ -404,7 +403,6 @@ void set_clickable_temp(running_machine &machine, astring teststring, int clickp
 
 int find_lamp_strings(running_machine &machine)
 {
-
 	int startblock = -1;
 	int endblock = -1;
 
@@ -428,7 +426,7 @@ int find_lamp_strings(running_machine &machine)
 
 	if (startblock == -1)
 		return 0;
-	
+
 
 
 	for (int y = 0; y < 16; y++)
@@ -463,7 +461,7 @@ int find_lamp_strings(running_machine &machine)
 	UINT16 *rom = (UINT16*)machine.root_device().memregion( "maincpu" )->base();
 	UINT8 *rom8 = machine.root_device().memregion( "maincpu" )->base();
 
-//	sc45helperlog("------------ LAMPS -----------------\n");
+//  sc45helperlog("------------ LAMPS -----------------\n");
 
 	if (endblock > startblock)
 	{
@@ -476,7 +474,7 @@ int find_lamp_strings(running_machine &machine)
 			UINT32 stringaddr = (rom[j + 1] << 16) | rom[j + 2];
 
 			//sc45helperlog("(row %02d, col %02d, unused %02x) addr %08x  ", row,col, (portpos&0xff00)>>8, stringaddr);
-				
+
 			astring tempstring;
 
 			for (int k = stringaddr; k < stringaddr + 10; k++)
@@ -491,7 +489,7 @@ int find_lamp_strings(running_machine &machine)
 				{
 					tempstring.cat(chr);
 				}
-							
+
 			}
 
 			if (lamps[row][col].used == false)
@@ -538,7 +536,7 @@ int find_lamp_strings(running_machine &machine)
 		for (int x = 0; x < 6; x++)
 		{
 			sc45helperlog("<element name=\"inputlabel%d-%d\"><text string=\"%s\"><color red=\"1.0\" green=\"1.0\" blue=\"1.0\" /></text></element>\n", realy,x,sc4inputs[realy][x].name.cstr());
-	
+
 		}
 	}
 	sc45helperlog("\n");
@@ -606,13 +604,13 @@ int find_lamp_strings(running_machine &machine)
 
 	// try to find some specific named elements and move them around
 	d = 0;
-	
+
 	for (int reel = 0; reel < 8; reel++)
 	{
 		char tempname[32];
 		sprintf(tempname, "reel%d ", reel+1);
-	
-	
+
+
 		for (int pos = 0; pos < 3; pos++)
 		{
 			char tempname2[32];
@@ -626,7 +624,6 @@ int find_lamp_strings(running_machine &machine)
 			{
 				for (int x = 0; x < 16; x++)
 				{
-
 					if (!strcmp(tempname2, lamps[y][x].lampname_alt.cstr()))
 					{
 						//sc45helperlog("%s found\n", tempname2);
@@ -637,7 +634,7 @@ int find_lamp_strings(running_machine &machine)
 						lamps[y][x].width = 50;
 						lamps[y][x].height = 17;
 						lamps[y][x].lamptypename = "reellamp";
-						
+
 
 					}
 					else
@@ -669,7 +666,7 @@ int find_lamp_strings(running_machine &machine)
 		set_clickable_temp(machine, "cash bust", 8, 0x04);
 
 		// no 'refill' lamp?
-		
+
 
 	}
 
@@ -692,7 +689,7 @@ int find_lamp_strings(running_machine &machine)
 		}
 	}
 
-	// print out a simple matrix of some of the most common inputs, 
+	// print out a simple matrix of some of the most common inputs,
 	d = 0;
 	for (int y = 0; y < 7; y++)
 	{
@@ -777,7 +774,7 @@ int find_lamp_strings(running_machine &machine)
 
 	return 0;
 }
-		
+
 
 int find_reel_strings(running_machine &machine)
 {
@@ -787,7 +784,7 @@ int find_reel_strings(running_machine &machine)
 	dynamic_array<int> reelsizes;
 
 	// these are for sc4dnd ONLY, need to work out how the code calculates them
-	
+
 	// this list is 4 * 16 symbols for the regular reels, 12 symbols for the number spin, and 2 groups of 16 depending on jackpot/stake keys used for the prize reel
 	// code that points at these is likely to be complex because it's conditional on the game code / mode..
 	if (!strcmp(machine.system().name, "sc4dnd"))
@@ -841,7 +838,7 @@ int find_reel_strings(running_machine &machine)
 
 	if (startblock == -1)
 		return 0;
-	
+
 
 
 
@@ -868,11 +865,11 @@ int find_reel_strings(running_machine &machine)
 			if (current_symbols == 0)
 			{
 				int shifted = ((0x10000 / 16) * 11 ) + 692;
-			//	sc45helperlog("REEL %d\n", which_reel+1);
+			//  sc45helperlog("REEL %d\n", which_reel+1);
 				sc45helperlog("<element name=\"SteppersReel%d\" defstate=\"0\">\n", which_reel+1);
 				sc45helperlog("<reel stateoffset=\"%d\" symbollist=\"", shifted);
 			}
-			
+
 			UINT32 stringaddr = (rom[j + 0] << 16) | rom[j + 1];
 			stringaddr &= 0xfffff;
 
@@ -880,7 +877,7 @@ int find_reel_strings(running_machine &machine)
 				continue;
 
 			//sc45helperlog("addr %08x  ", stringaddr);
-			
+
 			astring tempstring;
 
 			for (int k = stringaddr; k < stringaddr + 10; k++)
@@ -895,7 +892,7 @@ int find_reel_strings(running_machine &machine)
 				{
 					tempstring.cat(chr);
 				}
-							
+
 			}
 
 			tempstring.trimspace();
@@ -908,7 +905,7 @@ int find_reel_strings(running_machine &machine)
 			}
 
 			sc45helperlog("%s", tempstring.cstr());
-		
+
 
 
 			//sc45helperlog("\n");

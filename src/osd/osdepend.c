@@ -37,7 +37,7 @@ const options_entry osd_options::s_option_entries[] =
 	// video options
 	{ NULL,                                   NULL,       OPTION_HEADER,     "OSD VIDEO OPTIONS" },
 // OS X can be trusted to have working hardware OpenGL, so default to it on for the best user experience
-	{ OSDOPTION_VIDEO,                   	  OSDOPTVAL_AUTO,  	  OPTION_STRING,     "video output method: " },
+	{ OSDOPTION_VIDEO,                        OSDOPTVAL_AUTO,     OPTION_STRING,     "video output method: " },
 	{ OSDOPTION_NUMSCREENS "(1-4)",           "1",        OPTION_INTEGER,    "number of screens to create; usually, you want just one" },
 	{ OSDOPTION_WINDOW ";w",                  "0",        OPTION_BOOLEAN,    "enable window mode; otherwise, full screen mode is assumed" },
 	{ OSDOPTION_MAXIMIZE ";max",              "1",        OPTION_BOOLEAN,    "default to maximized windows; otherwise, windows will be minimized" },
@@ -79,7 +79,7 @@ const options_entry osd_options::s_option_entries[] =
 
 	// sound options
 	{ NULL,                                   NULL,  OPTION_HEADER,     "OSD SOUND OPTIONS" },
-	{ OSDOPTION_SOUND,                        OSDOPTVAL_AUTO, OPTION_STRING,     "sound output method: " },	
+	{ OSDOPTION_SOUND,                        OSDOPTVAL_AUTO, OPTION_STRING,     "sound output method: " },
 	{ OSDOPTION_AUDIO_LATENCY "(1-5)",        "2",   OPTION_INTEGER,    "set audio latency (increase to reduce glitches, decrease for responsiveness)" },
 
 	// End of list
@@ -106,47 +106,47 @@ void osd_options::add_osd_options()
 
 osd_interface::osd_interface()
 	: m_machine(NULL),
-	  m_sound(NULL),
-	  m_debugger(NULL)
+		m_sound(NULL),
+		m_debugger(NULL)
 
 {
 }
 
 void osd_interface::update_option(osd_options &options, const char * key, dynamic_array<const char *> &values)
 {
-	astring current_value(options.description(key));	
+	astring current_value(options.description(key));
 	astring new_option_value("");
 	for (int index = 0; index < values.count(); index++)
 	{
 		astring t(values[index]);
-		if (new_option_value.len() > 0) 
+		if (new_option_value.len() > 0)
 		{
 			if( index != (values.count()-1))
 				new_option_value.cat(", ");
 			else
-				new_option_value.cat(" or ");		
+				new_option_value.cat(" or ");
 		}
-		new_option_value.cat(t);		
+		new_option_value.cat(t);
 	}
 	// TODO: core_strdup() is leaked
-	options.set_description(key, core_strdup(current_value.cat(new_option_value).cstr()));	
+	options.set_description(key, core_strdup(current_value.cat(new_option_value).cstr()));
 }
-	
+
 void osd_interface::register_options(osd_options &options)
 {
 	// Register video options and update options
-	video_options_add("none", NULL);	
+	video_options_add("none", NULL);
 	video_register();
 	update_option(options, OSDOPTION_VIDEO, m_video_names);
-	
+
 	// Register sound options and update options
-	sound_options_add("none", OSD_SOUND_NONE);	
+	sound_options_add("none", OSD_SOUND_NONE);
 	sound_register();
 	update_option(options, OSDOPTION_SOUND, m_sound_names);
-	
+
 	// Register debugger options and update options
-	debugger_options_add("none", OSD_DEBUGGER_NONE);	
-	debugger_options_add("internal", OSD_DEBUGGER_INTERNAL);	
+	debugger_options_add("none", OSD_DEBUGGER_NONE);
+	debugger_options_add("internal", OSD_DEBUGGER_INTERNAL);
 	debugger_register();
 	update_option(options, OSDOPTION_DEBUGGER, m_debugger_names);
 }
@@ -158,7 +158,6 @@ void osd_interface::register_options(osd_options &options)
 
 osd_interface::~osd_interface()
 {
-
 	for(int i= 0; i < m_video_names.count(); ++i)
 		osd_free(const_cast<char*>(m_video_names[i]));
 	//m_video_options,reset();
@@ -210,12 +209,12 @@ void osd_interface::init(running_machine &machine)
 	//
 
 	m_machine = &machine;
-	
+
 	osd_options &options = downcast<osd_options &>(machine.options());
 	// extract the verbose printing option
 	if (options.verbose())
 		g_print_verbose = true;
-		
+
 	// ensure we get called on the way out
 	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(osd_interface::osd_exit), this));
 }
@@ -251,13 +250,13 @@ void osd_interface::init_debugger()
 	// create all of its structures.
 	//
 	osd_debugger_type debugger = m_debugger_options.find(machine().options().debugger());
-	if (debugger==NULL) 
+	if (debugger==NULL)
 	{
 		osd_printf_warning("debugger_init: option %s not found switching to auto\n",machine().options().debugger());
 		debugger = m_debugger_options.find("auto");
 	}
 	m_debugger = (*debugger)(*this);
-	
+
 	m_debugger->init_debugger();
 }
 
@@ -397,7 +396,7 @@ void osd_interface::init_subsystems()
 		osd_printf_error("video_init: Initialization failed!\n\n\n");
 		fflush(stderr);
 		fflush(stdout);
-		exit(-1);	
+		exit(-1);
 	}
 
 	sound_init();
@@ -405,7 +404,7 @@ void osd_interface::init_subsystems()
 	// we need pause callbacks
 	machine().add_notifier(MACHINE_NOTIFY_PAUSE, machine_notify_delegate(FUNC(osd_interface::input_pause), this));
 	machine().add_notifier(MACHINE_NOTIFY_RESUME, machine_notify_delegate(FUNC(osd_interface::input_resume), this));
-	
+
 	output_init();
 #ifdef USE_NETWORK
 	network_init();
@@ -421,7 +420,7 @@ bool osd_interface::video_init()
 bool osd_interface::sound_init()
 {
 	osd_sound_type sound = m_sound_options.find(machine().options().sound());
-	if (sound==NULL) 
+	if (sound==NULL)
 	{
 		osd_printf_warning("sound_init: option %s not found switching to auto\n",machine().options().sound());
 		sound = m_sound_options.find("auto");
@@ -491,7 +490,7 @@ void osd_interface::exit_subsystems()
 	midi_exit();
 	debugger_exit();
 }
-	
+
 void osd_interface::video_exit()
 {
 }
@@ -575,4 +574,3 @@ osd_debugger_interface::osd_debugger_interface(const osd_interface &osd)
 osd_debugger_interface::~osd_debugger_interface()
 {
 }
-

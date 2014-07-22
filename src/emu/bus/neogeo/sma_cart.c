@@ -173,5 +173,3 @@ void neogeo_sma_kof2000_cart::activate_cart(ACTIVATE_CART_PARAMS)
 	m_banked_cart->install_banks(machine, maincpu, cpuregion, cpuregion_size);
 	m_sma_prot->kof2000_install_protection(maincpu, m_banked_cart);
 }
-
-

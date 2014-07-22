@@ -148,7 +148,7 @@ READ8_MEMBER(nbmj9195_state::mscoutm_cpu_portb_r)
 			& ioport("KEY3")->read() & ioport("KEY4")->read());
 		break;
 	}
-	
+
 	return 0xff;
 }
 
@@ -2796,8 +2796,7 @@ static const z80_daisy_config daisy_chain_sound[] =
 	MCFG_TMPZ84C011_PORTB_WRITE_CB(WRITE8(nbmj9195_state, soundcpu_dac1_w)) \
 	MCFG_TMPZ84C011_PORTC_WRITE_CB(WRITE8(nbmj9195_state, soundcpu_dac2_w)) \
 	MCFG_TMPZ84C011_PORTD_READ_CB(READ8(nbmj9195_state, soundcpu_portd_r)) \
-	MCFG_TMPZ84C011_PORTE_WRITE_CB(WRITE8(nbmj9195_state, soundcpu_porte_w)) \
-
+	MCFG_TMPZ84C011_PORTE_WRITE_CB(WRITE8(nbmj9195_state, soundcpu_porte_w))
 #define MSCOUTM_TMZ84C011_SOUND_PORTS \
 	MCFG_TMPZ84C011_PORTA_WRITE_CB(WRITE8(nbmj9195_state, soundcpu_porta_w)) \
 	MCFG_TMPZ84C011_PORTB_WRITE_CB(WRITE8(nbmj9195_state, soundcpu_dac2_w)) \
@@ -2812,8 +2811,7 @@ static const z80_daisy_config daisy_chain_sound[] =
 	MCFG_TMPZ84C011_PORTB_READ_CB(READ8(nbmj9195_state, mscoutm_cpu_portb_r)) \
 	MCFG_TMPZ84C011_PORTC_READ_CB(READ8(nbmj9195_state, mscoutm_cpu_portc_r)) \
 	MCFG_TMPZ84C011_PORTD_WRITE_CB(WRITE8(nbmj9195_state, mscoutm_cpu_portd_w)) \
-	MCFG_TMPZ84C011_PORTE_WRITE_CB(WRITE8(nbmj9195_state, mscoutm_cpu_porte_w)) \
-
+	MCFG_TMPZ84C011_PORTE_WRITE_CB(WRITE8(nbmj9195_state, mscoutm_cpu_porte_w))
 
 #define OTHERS_TMZ84C011_MAIN_PORTS \
 	MCFG_TMPZ84C011_PORTA_READ_CB(READ8(nbmj9195_state, others_cpu_porta_r)) \
@@ -2821,8 +2819,7 @@ static const z80_daisy_config daisy_chain_sound[] =
 	MCFG_TMPZ84C011_PORTC_READ_CB(READ8(nbmj9195_state, others_cpu_portc_r)) \
 	MCFG_TMPZ84C011_PORTC_WRITE_CB(WRITE8(nbmj9195_state, others_cpu_portc_w)) \
 	MCFG_TMPZ84C011_PORTD_WRITE_CB(WRITE8(nbmj9195_state, others_cpu_portd_w)) \
-	MCFG_TMPZ84C011_PORTE_WRITE_CB(WRITE8(nbmj9195_state, others_cpu_porte_w)) \
-
+	MCFG_TMPZ84C011_PORTE_WRITE_CB(WRITE8(nbmj9195_state, others_cpu_porte_w))
 
 static MACHINE_CONFIG_START( NBMJDRV1_base, nbmj9195_state )
 

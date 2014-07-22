@@ -389,4 +389,3 @@ void sound_direct_sound::dsound_destroy_buffers(void)
 		IDirectSoundBuffer_Release(primary_buffer);
 	primary_buffer = NULL;
 }
-

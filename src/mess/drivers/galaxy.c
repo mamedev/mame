@@ -171,7 +171,7 @@ static MACHINE_CONFIG_START( galaxy, galaxy_state )
 	MCFG_CPU_PROGRAM_MAP(galaxy_mem)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", galaxy_state,  galaxy_interrupt)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(galaxy_state,galaxy_irq_callback)
-	
+
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_PALETTE("palette")
@@ -198,7 +198,7 @@ static MACHINE_CONFIG_START( galaxy, galaxy_state )
 	MCFG_CASSETTE_FORMATS(gtp_cassette_formats)
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED)
 	MCFG_CASSETTE_INTERFACE("galaxy_cass")
-	
+
 	MCFG_SOFTWARE_LIST_ADD("cass_list","galaxy")
 
 	/* internal ram */
@@ -214,7 +214,7 @@ static MACHINE_CONFIG_START( galaxyp, galaxy_state )
 	MCFG_CPU_IO_MAP(galaxyp_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", galaxy_state,  galaxy_interrupt)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(galaxy_state,galaxy_irq_callback)
-	
+
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_PALETTE("palette")
@@ -242,7 +242,7 @@ static MACHINE_CONFIG_START( galaxyp, galaxy_state )
 	MCFG_CASSETTE_FORMATS(gtp_cassette_formats)
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED)
 	MCFG_CASSETTE_INTERFACE("galaxy_cass")
-	
+
 	MCFG_SOFTWARE_LIST_ADD("cass_list","galaxy")
 
 	/* internal ram */

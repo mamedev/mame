@@ -281,7 +281,7 @@ static MACHINE_CONFIG_START( nascom1, nascom1_state )
 	MCFG_AY31015_RX_CLOCK(( XTAL_16MHz / 16 ) / 256)
 	MCFG_AY51013_READ_SI_CB(READ8(nascom1_state, nascom1_hd6402_si))
 	MCFG_AY51013_WRITE_SO_CB(WRITE8(nascom1_state, nascom1_hd6402_so))
-	
+
 	MCFG_DEVICE_ADD("z80pio", Z80PIO, XTAL_16MHz/8)
 
 	/* devices */

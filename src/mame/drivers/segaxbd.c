@@ -642,7 +642,7 @@ void segaxbd_state::machine_reset()
 {
 	m_segaic16vid->segaic16_tilemap_reset(*m_screen);
 
-	// hook the RESET line, which resets CPU #1	
+	// hook the RESET line, which resets CPU #1
 	m_maincpu->set_reset_callback(write_line_delegate(FUNC(segaxbd_state::m68k_reset_callback),this));
 
 	// start timers to track interrupts

@@ -7,8 +7,8 @@
  *  ATi Graphics Ultra Pro ISA Video card
  *   - ATi 68800-3 (Mach32, combined VGA and 8514/A)
  *
- *	ATi mach64 ISA Video card
- *	 - ATi 88800 (Mach64, combined VGA and 8514/A)
+ *  ATi mach64 ISA Video card
+ *   - ATi 88800 (Mach64, combined VGA and 8514/A)
  *
  *  Created on: 9/09/2012
  */

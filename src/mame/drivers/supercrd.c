@@ -435,8 +435,8 @@ static MACHINE_CONFIG_START( supercrd, supercrd_state )
 	MCFG_VIDEO_START_OVERRIDE(supercrd_state, supercrd)
 
 //  MCFG_MC6845_ADD("crtc", MC6845, "screen", MASTER_CLOCK/8)
-//	MCFG_MC6845_SHOW_BORDER_AREA(false)
-//	MCFG_MC6845_CHAR_WIDTH(4)
+//  MCFG_MC6845_SHOW_BORDER_AREA(false)
+//  MCFG_MC6845_CHAR_WIDTH(4)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

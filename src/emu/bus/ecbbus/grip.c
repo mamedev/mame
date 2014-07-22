@@ -232,12 +232,12 @@ MC6845_UPDATE_ROW( grip_device::crtc_update_row )
 	{
 		UINT16 address = (m_page << 12) | (((ma + column) & 0xfff) << 3) | (ra & 0x07);
 		UINT8 data = m_video_ram[address];
-		
+
 		for (int bit = 0; bit < 8; bit++)
 		{
 			int x = (column * 8) + bit;
 			int color = (m_flash ? 0 : BIT(data, bit)) && de;
-			
+
 			bitmap.pix32(vbp + y, hbp + x) = m_palette->pen(color);
 		}
 	}

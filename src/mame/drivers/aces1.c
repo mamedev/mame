@@ -260,21 +260,21 @@ static MACHINE_CONFIG_START( aces1, aces1_state )
 
 	// 0xafb0 IC24 - lamps, 7segs
 	MCFG_DEVICE_ADD("ic24", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(aces1_state, ic24_write_a))	// 7segs
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(aces1_state, ic24_write_b))	// lamps
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(aces1_state, ic24_write_c))	// strobe
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(aces1_state, ic24_write_a))  // 7segs
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(aces1_state, ic24_write_b))  // lamps
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(aces1_state, ic24_write_c))  // strobe
 
 	// 0xafd0 IC25 - lamps, meters, reel comms (writes)
 	MCFG_DEVICE_ADD("ic25", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(aces1_state, ic25_write_a))	// extra lamps
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(aces1_state, ic25_write_b))	// meters, extra lamp select
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(aces1_state, ic25_write_c))	// reel write, extra lamp strobe
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(aces1_state, ic25_write_a))  // extra lamps
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(aces1_state, ic25_write_b))  // meters, extra lamp select
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(aces1_state, ic25_write_c))  // reel write, extra lamp strobe
 
 	// 0xafe0 IC37 - doors, coins, reel optics (reads)
 	MCFG_DEVICE_ADD("ic37", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(aces1_state, ic37_read_a))	// extra lamps
-	MCFG_I8255_IN_PORTB_CB(READ8(aces1_state, ic37_read_b))	// meters, extra lamp select
-	MCFG_I8255_IN_PORTC_CB(READ8(aces1_state, ic37_read_c))	// reel write, extra lamp strobe
+	MCFG_I8255_IN_PORTA_CB(READ8(aces1_state, ic37_read_a)) // extra lamps
+	MCFG_I8255_IN_PORTB_CB(READ8(aces1_state, ic37_read_b)) // meters, extra lamp select
+	MCFG_I8255_IN_PORTC_CB(READ8(aces1_state, ic37_read_c)) // reel write, extra lamp strobe
 
 	MCFG_DEFAULT_LAYOUT(layout_aces1)
 
@@ -337,8 +337,8 @@ ROM_START( ac1taklv )
 ROM_END
 
 ROM_START( ac1cshtw ) // Cash Towers, same ROM as above, original machine apparently plays the same, reskinned machine?
-    ROM_REGION( 0x8000, "maincpu", 0 )
-    ROM_LOAD( "ctp1.bin", 0x0000, 0x8000, CRC(2fabb08f) SHA1(b737930e428f9258ab22394229c2b5039edf8f97) )
+	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_LOAD( "ctp1.bin", 0x0000, 0x8000, CRC(2fabb08f) SHA1(b737930e428f9258ab22394229c2b5039edf8f97) )
 ROM_END
 
 

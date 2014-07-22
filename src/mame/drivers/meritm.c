@@ -1045,7 +1045,7 @@ static MACHINE_CONFIG_START( meritm_crt250, meritm_state )
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", meritm_state, meritm_interrupt, "screen", 0, 1)
 
 	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(meritm_state, meritm_crt250_port_b_w))	// used LMP x DRIVE
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(meritm_state, meritm_crt250_port_b_w))   // used LMP x DRIVE
 	MCFG_I8255_IN_PORTC_CB(READ8(meritm_state, meritm_8255_port_c_r))
 
 	MCFG_DEVICE_ADD("z80pio_0", Z80PIO, SYSTEM_CLK/6)

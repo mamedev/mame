@@ -286,7 +286,7 @@ void i8255_device::device_start()
 	m_out_pa_cb.resolve_safe();
 	m_out_pb_cb.resolve_safe();
 	m_out_pc_cb.resolve_safe();
-	
+
 	// register for state saving
 	save_item(NAME(m_control));
 	save_item(NAME(m_output));
@@ -522,7 +522,7 @@ void i8255_device::write_mode1(int port, UINT8 data)
 			m_out_pb_cb((offs_t)0, m_output[port]);
 		else
 			m_out_pc_cb((offs_t)0, m_output[port]);
-		
+
 		// set output buffer full flag
 		set_obf(port, 0);
 

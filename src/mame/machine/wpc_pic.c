@@ -51,7 +51,7 @@ void wpc_pic_device::check_game_id()
 		v = v & 0xffffff;
 		if(v == cmp)
 			logerror("%s: Detected game id %03d\n", tag(), i);
-	}		
+	}
 }
 
 WRITE8_MEMBER(wpc_pic_device::write)

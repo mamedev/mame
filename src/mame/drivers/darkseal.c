@@ -246,7 +246,7 @@ static MACHINE_CONFIG_START( darkseal, darkseal_state )
 
 	MCFG_DEVICE_ADD("tilegen1", DECO16IC, 0)
 	MCFG_DECO16IC_SPLIT(0)
-	MCFG_DECO16IC_WIDTH12(3)	 // both these tilemaps need to be twice the y size of usual!
+	MCFG_DECO16IC_WIDTH12(3)     // both these tilemaps need to be twice the y size of usual!
 	MCFG_DECO16IC_PF1_TRANS_MASK(0x0f)
 	MCFG_DECO16IC_PF2_TRANS_MASK(0x0f)
 	MCFG_DECO16IC_PF1_COL_BANK(0x00)

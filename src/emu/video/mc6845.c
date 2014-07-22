@@ -1517,28 +1517,28 @@ UINT8 mos8563_device::draw_scanline(int y, bitmap_rgb32 &bitmap, const rectangle
 MC6845_UPDATE_ROW( mos8563_device::vdc_update_row )
 {
 	const pen_t *pen = m_palette->pens();
-	
+
 	ra += (m_vert_scroll & 0x0f);
 	ra &= 0x0f;
-	
+
 	UINT8 cth = (m_horiz_char >> 4) + (HSS_DBL ? 0 : 1);
 	UINT8 cdh = (m_horiz_char & 0x0f) + (HSS_DBL ? 0 : 1);
 	UINT8 cdv = m_vert_char_disp;
-	
+
 	for (int column = 0; column < x_count; column++)
 	{
 		UINT8 code = read_videoram(ma + column);
 		UINT8 attr = 0;
-		
+
 		int fg = m_color >> 4;
 		int bg = m_color & 0x0f;
-		
+
 		if (HSS_ATTR)
 		{
 			offs_t attr_addr = m_attribute_addr + ma + column;
 			attr = read_videoram(attr_addr);
 		}
-		
+
 		if (HSS_TEXT)
 		{
 			if (HSS_ATTR)
@@ -1546,15 +1546,15 @@ MC6845_UPDATE_ROW( mos8563_device::vdc_update_row )
 				fg = ATTR_FOREGROUND;
 				bg = ATTR_BACKGROUND;
 			}
-			
+
 			if (VSS_RVS) code ^= 0xff;
-			
+
 			for (int bit = 0; bit < cdh; bit++)
 			{
 				int x = (m_horiz_scroll & 0x0f) - cth + (column * cth) + bit;
 				if (x < 0) x = 0;
 				int color = BIT(code, 7) ? fg : bg;
-				
+
 				bitmap.pix32(vbp + y, hbp + x) = pen[de ? color : 0];
 			}
 		}
@@ -1564,9 +1564,9 @@ MC6845_UPDATE_ROW( mos8563_device::vdc_update_row )
 			{
 				fg = ATTR_COLOR;
 			}
-			
+
 			offs_t font_addr;
-			
+
 			if (m_max_ras_addr < 16)
 			{
 				font_addr = ((m_char_base_addr & 0xe0) << 8) | (ATTR_ALTERNATE_CHARSET << 12) | (code << 4) | (ra & 0x0f);
@@ -1575,24 +1575,24 @@ MC6845_UPDATE_ROW( mos8563_device::vdc_update_row )
 			{
 				font_addr = ((m_char_base_addr & 0xc0) << 8) | (ATTR_ALTERNATE_CHARSET << 13) | (code << 5) | (ra & 0x1f);
 			}
-			
+
 			UINT8 data = read_videoram(font_addr);
-			
+
 			if (ra >= cdv) data = 0;
 			if (ATTR_UNDERLINE && (ra == m_underline_ras)) data = 0xff;
 			if (ATTR_BLINK && !m_char_blink_state) data = 0;
 			if (ATTR_REVERSE) data ^= 0xff;
 			if (column == cursor_x) data ^= 0xff;
 			if (VSS_RVS) data ^= 0xff;
-			
+
 			for (int bit = 0; bit < cdh; bit++)
 			{
 				int x = (m_horiz_scroll & 0x0f) - cth + (column * cth) + bit;
 				if (x < 0) x = 0;
 				int color = BIT(data, 7) ? fg : bg;
-				
+
 				bitmap.pix32(vbp + y, hbp + x) = pen[de ? color : 0];
-				
+
 				if ((bit < 8) || !HSS_SEMI) data <<= 1;
 			}
 		}

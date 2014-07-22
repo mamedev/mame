@@ -228,7 +228,7 @@ VIDEO_START_MEMBER(tetrisp2_state,tetrisp2)
 	// should be smaller and mirrored like m32 I guess
 	m_priority = auto_alloc_array(machine(), UINT8, 0x40000);
 	ms32_rearrange_sprites(machine(), "gfx1");
-	
+
 	save_item(NAME(m_flipscreen_old));
 	save_pointer(NAME(m_priority), 0x40000);
 }
@@ -254,7 +254,7 @@ VIDEO_START_MEMBER(tetrisp2_state,rockntread)
 	// should be smaller and mirrored like m32 I guess
 	m_priority = auto_alloc_array(machine(), UINT8, 0x40000);
 	ms32_rearrange_sprites(machine(), "gfx1");
-	
+
 	save_item(NAME(m_flipscreen_old));
 	save_pointer(NAME(m_priority), 0x40000);
 }

@@ -33,4 +33,3 @@ WRITE8_MEMBER(msx_slot_ram_device::write)
 		m_ram[offset - m_start_address] = data;
 	}
 }
-

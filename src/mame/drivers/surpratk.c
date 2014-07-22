@@ -156,7 +156,7 @@ void surpratk_state::machine_reset()
 
 WRITE8_MEMBER( surpratk_state::banking_callback )
 {
-//	logerror("%04x: setlines %02x\n", machine().device("maincpu")->safe_pc(), data);
+//  logerror("%04x: setlines %02x\n", machine().device("maincpu")->safe_pc(), data);
 	membank("bank1")->set_entry(data & 0x1f);
 }
 

@@ -294,4 +294,3 @@ WRITE8_MEMBER(msx_cart_korean_126in1::write_cart)
 		setup_bank(bank);
 	}
 }
-

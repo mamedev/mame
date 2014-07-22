@@ -1,5 +1,5 @@
-/* 
-	Excellent Systems Sprite chip
+/*
+    Excellent Systems Sprite chip
 
   is this original hw or a clone of something?
 
@@ -50,7 +50,7 @@ void excellent_spr_device::device_reset()
 
 /****************************************************************
                      SPRITE DRAW ROUTINE
-					 (8-bit)
+                     (8-bit)
 
     Word |     Bit(s)      | Use
     -----+-----------------+-----------------
@@ -71,7 +71,6 @@ void excellent_spr_device::device_reset()
 
 void excellent_spr_device::aquarium_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, gfxdecode_device *gfxdecode, int y_offs )
 {
-
 	int offs, chain_pos;
 	int x, y, curx, cury;
 	UINT8 col, flipx, flipy, chain;
@@ -156,7 +155,7 @@ void excellent_spr_device::gcpinbal_draw_sprites( screen_device &screen, bitmap_
 	UINT8 *spriteram = m_ram;
 	int offs, chain_pos;
 	int x, y, curx, cury;
-//	int priority = 0;
+//  int priority = 0;
 	UINT8 col, flipx, flipy, chain;
 	UINT16 code;
 
@@ -219,4 +218,3 @@ void excellent_spr_device::gcpinbal_draw_sprites( screen_device &screen, bitmap_
 	}
 #endif
 }
-

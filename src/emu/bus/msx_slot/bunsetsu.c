@@ -74,4 +74,3 @@ WRITE8_MEMBER(msx_slot_bunsetsu_device::write)
 			break;
 	}
 }
-

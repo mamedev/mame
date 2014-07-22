@@ -68,4 +68,3 @@ WRITE8_MEMBER(msx_cart_super_swangi::write_cart)
 		logerror("msx_cart_super_swangi: unhandled write %02x to %04x\n", data, offset);
 	}
 }
-

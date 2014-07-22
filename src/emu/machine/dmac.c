@@ -462,6 +462,5 @@ WRITE_LINE_MEMBER( dmac_device::xdreq_w )
 
 	if (m_dma_active)
 	{
-
 	}
 }

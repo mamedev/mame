@@ -704,7 +704,7 @@ static MACHINE_CONFIG_START( cliffhgr, cliffhgr_state )
 
 	/* start with the TMS9928a video configuration */
 	MCFG_DEVICE_ADD( "tms9928a", TMS9128, XTAL_10_738635MHz / 2 )   /* TMS9128NL on the board */
- 	MCFG_TMS9928A_VRAM_SIZE(0x4000)
+	MCFG_TMS9928A_VRAM_SIZE(0x4000)
 	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(cliffhgr_state, vdp_interrupt))
 
 	/* override video rendering and raw screen info */

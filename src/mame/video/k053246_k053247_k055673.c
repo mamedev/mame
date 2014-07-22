@@ -965,7 +965,7 @@ void k055673_device::device_start()
 {
 	int gfx_index;
 	UINT32 total;
-	
+
 	static const gfx_layout spritelayout =  /* System GX sprite layout */
 	{
 		16,16,
@@ -1013,15 +1013,15 @@ void k055673_device::device_start()
 	long i;
 	UINT16 *alt_k055673_rom;
 	int size4;
-	
+
 	/* find first empty slot to decode gfx */
 	for (gfx_index = 0; gfx_index < MAX_GFX_ELEMENTS; gfx_index++)
 		if (m_gfxdecode->gfx(gfx_index) == 0)
 			break;
 	assert(gfx_index != MAX_GFX_ELEMENTS);
-	
+
 	alt_k055673_rom = (UINT16 *)machine().root_device().memregion(m_memory_region)->base();
-	
+
 	/* decode the graphics */
 	switch (m_plane_order)
 	{
@@ -1042,42 +1042,42 @@ void k055673_device::device_start()
 				*d++ = *s1++;
 				*d++ = *s2++;
 			}
-			
+
 			total = size4 / 128;
 			konami_decode_gfx(machine(), m_gfxdecode, m_palette, gfx_index, (UINT8 *)alt_k055673_rom, total, &spritelayout, 5);
 			break;
-			
+
 		case K055673_LAYOUT_RNG:
 			total = machine().root_device().memregion(m_memory_region)->bytes() / (16*16/2);
 			konami_decode_gfx(machine(), m_gfxdecode, m_palette, gfx_index, (UINT8 *)alt_k055673_rom, total, &spritelayout2, 4);
 			break;
-			
+
 		case K055673_LAYOUT_LE2:
 			total = machine().root_device().memregion(m_memory_region)->bytes() / (16*16);
 			konami_decode_gfx(machine(), m_gfxdecode, m_palette, gfx_index, (UINT8 *)alt_k055673_rom, total, &spritelayout3, 8);
 			break;
-			
+
 		case K055673_LAYOUT_GX6:
 			total = machine().root_device().memregion(m_memory_region)->bytes() / (16*16*6/8);
 			konami_decode_gfx(machine(), m_gfxdecode, m_palette, gfx_index, (UINT8 *)alt_k055673_rom, total, &spritelayout4, 6);
 			break;
-			
+
 		default:
 			fatalerror("Unsupported layout\n");
 	}
-	
+
 	if (VERBOSE && !(m_palette->shadows_enabled()))
 		popmessage("driver should use VIDEO_HAS_SHADOWS");
-	
+
 	m_z_rejection = -1;
 	m_gfx = m_gfxdecode->gfx(gfx_index);
 	m_objcha_line = CLEAR_LINE;
 	m_ram = auto_alloc_array(machine(), UINT16, 0x1000/2);
-	
+
 	memset(m_ram,  0, 0x1000);
 	memset(m_kx46_regs, 0, 8);
 	memset(m_kx47_regs, 0, 32);
-	
+
 	machine().save().save_pointer(NAME(m_ram), 0x800);
 	machine().save().save_item(NAME(m_kx46_regs));
 	machine().save().save_item(NAME(m_kx47_regs));
@@ -1258,4 +1258,3 @@ READ32_MEMBER( k053247_device::k053247_reg_long_r )
 	offset <<= 1;
 	return (k053247_reg_word_r( space, offset + 1, 0xffff) | k053247_reg_word_r( space, offset, 0xffff) << 16);
 }
-

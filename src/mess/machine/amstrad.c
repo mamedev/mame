@@ -2822,7 +2822,7 @@ static const UINT8 amstrad_cycle_table_ex[256]=
 		8,  0,  0,  0,  8,  0,  0,  0,  8,  0,  0,  0,  8,  0,  0,  0
 };
 
-#define NEXT_ROM_SLOT 	m_rom_count++; \
+#define NEXT_ROM_SLOT   m_rom_count++; \
 						if(slot3 && m_rom_count == 3) m_rom_count++; \
 						if(slot7 && m_rom_count == 7) m_rom_count++;
 

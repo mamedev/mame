@@ -1,12 +1,12 @@
 /***************************************************************************
 
-	CR-511-B CD-ROM drive
+    CR-511-B CD-ROM drive
 
     license: MAME, GPL-2.0+
     copyright-holders: Dirk Best
 
-	CD-ROM drive with a custom MKE/Panasonic interface as used in the
-	Commodore CDTV and early SoundBlaster cards.
+    CD-ROM drive with a custom MKE/Panasonic interface as used in the
+    Commodore CDTV and early SoundBlaster cards.
 
 ***************************************************************************/
 
@@ -109,7 +109,6 @@ READ8_MEMBER( cr511b_device::read )
 
 WRITE8_MEMBER ( cr511b_device::write )
 {
-
 }
 
 WRITE_LINE_MEMBER( cr511b_device::enable_w )

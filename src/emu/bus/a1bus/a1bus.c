@@ -4,7 +4,7 @@
 
   license: BSD-3-Clause
   copyright-holders: R. Belmont
- 
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -203,4 +203,3 @@ void device_a1bus_card_interface::install_bank(offs_t start, offs_t end, offs_t 
 {
 	m_a1bus->install_bank(start, end, mask, mirror, tag, data);
 }
-

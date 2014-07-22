@@ -737,7 +737,7 @@ static MACHINE_CONFIG_START( metalmx, metalmx_state )
 
 	MCFG_DEVICE_ADD("cage", ATARI_CAGE, 0)
 	MCFG_ATARI_CAGE_SPEEDUP(0) // TODO: speedup address
-	MCFG_ATARI_CAGE_IRQ_CALLBACK(WRITE8(metalmx_state,cage_irq_callback))	
+	MCFG_ATARI_CAGE_IRQ_CALLBACK(WRITE8(metalmx_state,cage_irq_callback))
 MACHINE_CONFIG_END
 
 

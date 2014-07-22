@@ -421,7 +421,7 @@ WRITE8_MEMBER(msx_slot_disk2_device::write)
 
 
 msx_slot_disk3_device::msx_slot_disk3_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : msx_slot_tc8566_disk_device(mconfig, MSX_SLOT_DISK3, "MSX Internal floppy type 3", tag, owner, clock, "msx_slot_disk3", __FILE__)
+	: msx_slot_tc8566_disk_device(mconfig, MSX_SLOT_DISK3, "MSX Internal floppy type 3", tag, owner, clock, "msx_slot_disk3", __FILE__)
 {
 }
 
@@ -459,7 +459,7 @@ READ8_MEMBER(msx_slot_disk3_device::read)
 			return m_fdc->fifo_r(space, 5);
 	}
 
-    return msx_slot_rom_device::read(space, offset);
+	return msx_slot_rom_device::read(space, offset);
 }
 
 
@@ -638,5 +638,3 @@ WRITE8_MEMBER(msx_slot_disk5_device::io_write)
 			break;
 	}
 }
-
-

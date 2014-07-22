@@ -223,14 +223,14 @@ void tms7000_device::device_start()
 	{
 		m_timer_handle[tmr] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tms7000_device::simple_timer_cb), this));
 		m_timer_handle[tmr]->adjust(attotime::never, tmr);
-		
+
 		m_timer_data[tmr] = 0;
 		m_timer_control[tmr] = 0;
 		m_timer_decrementer[tmr] = 0;
 		m_timer_prescaler[tmr] = 0;
 		m_timer_capture_latch[tmr] = 0;
 	}
-	
+
 	// register for savestates
 	save_item(NAME(m_irq_state));
 	save_item(NAME(m_idle_state));
@@ -274,7 +274,7 @@ void tms7000_device::state_string_export(const device_state_entry &entry, astrin
 				m_sr & 0x01 ? '?':'.'
 			);
 			break;
-		
+
 		default: break;
 	}
 }
@@ -306,13 +306,13 @@ void tms7000_device::device_reset()
 	write_p(0x05, 0x00); // ddr a
 	write_p(0x09, 0x00); // ddr c
 	write_p(0x0b, 0x00); // ddr d
-	
+
 	if (!chip_is_cmos())
 	{
 		write_p(0x08, 0xff); // port c
 		write_p(0x0a, 0xff); // port d
 	}
-	
+
 	// when _RESET goes inactive (0 to 1)
 	m_sr = 0;
 
@@ -345,10 +345,10 @@ void tms7000_device::execute_set_input(int extline, int state)
 	if (m_irq_state[extline] != irqstate)
 	{
 		m_irq_state[extline] = irqstate;
-		
+
 		// set/clear internal irq flag
 		flag_ext_interrupt(extline);
-		
+
 		if (m_irq_state[extline])
 		{
 			// latch timer 1 on INT3
@@ -358,7 +358,7 @@ void tms7000_device::execute_set_input(int extline, int state)
 			// on 70cx2, latch timer 2 on INT1
 			if (extline == TMS7000_INT1_LINE && chip_is_family_70cx2())
 				m_timer_capture_latch[1] = m_timer_decrementer[1];
-			
+
 			// clear external if it's edge-triggered (70cx2-only)
 			if (m_io_control[2] & (0x02 << (4 * extline)))
 				m_irq_state[extline] = false;
@@ -385,7 +385,7 @@ void tms7000_device::check_interrupts()
 	// global interrupt bit
 	if (!(m_sr & SR_I))
 		return;
-	
+
 	// check for and handle interrupt
 	for (int irqline = 0; irqline < 5; irqline++)
 	{
@@ -445,7 +445,7 @@ void tms7000_device::timer_reload(int tmr)
 {
 	// stop possible running timer
 	m_timer_handle[tmr]->adjust(attotime::never, tmr);
-	
+
 	if (m_timer_control[tmr] & 0x80)
 	{
 		m_timer_decrementer[tmr] = m_timer_data[tmr];
@@ -472,7 +472,7 @@ void tms7000_device::timer_tick_low(int tmr)
 
 		// set INT2/INT5
 		m_io_control[tmr] |= 0x08;
-		
+
 		// cascaded timer
 		if (tmr == 0 && (m_timer_control[1] & 0xa0) == 0xa0)
 			timer_tick_pre(tmr + 1);
@@ -482,7 +482,7 @@ void tms7000_device::timer_tick_low(int tmr)
 TIMER_CALLBACK_MEMBER(tms7000_device::simple_timer_cb)
 {
 	int tmr = param;
-	
+
 	// tick and restart timer
 	timer_tick_low(tmr);
 	timer_run(tmr);
@@ -521,7 +521,7 @@ READ8_MEMBER(tms7000_device::tms7000_pf_r)
 				return (m_io->read_byte(port) & ~m_port_ddr[port]) | (m_port_latch[port] & m_port_ddr[port]);
 			break;
 		}
-		
+
 		// port direction (note: 7000 doesn't support it for port A)
 		case 0x05: case 0x09: case 0x0b:
 			return m_port_ddr[offset / 2 - 2];
@@ -545,16 +545,16 @@ WRITE8_MEMBER(tms7000_device::tms7000_pf_w)
 			// d1,d3,d5: INT1,2,3 flag (write 1 to clear flag)
 			// d6-d7: memory mode (currently not implemented)
 			m_io_control[0] = (m_io_control[0] & (~data & 0x2a)) | (data & 0xd5);
-			
+
 			// possibly need to reactivate flags
 			if (data & 0x02)
 				flag_ext_interrupt(TMS7000_INT1_LINE);
 			if (data & 0x20)
 				flag_ext_interrupt(TMS7000_INT3_LINE);
-			
+
 			check_interrupts();
 			break;
-		
+
 		// i/o control (IOCNT1)
 		case 0x10:
 			// d0,d2: INT4,5 enable
@@ -568,7 +568,7 @@ WRITE8_MEMBER(tms7000_device::tms7000_pf_w)
 			// decrementer reload value
 			m_timer_data[offset >> 4] = data;
 			break;
-		
+
 		// timer 1/2 control
 		case 0x03:
 			// d5: t1: cmos low-power mode when IDLE opcode is used (not emulated)
@@ -587,11 +587,11 @@ WRITE8_MEMBER(tms7000_device::tms7000_pf_w)
 			// d7: stop/start timer
 			m_timer_control[offset >> 4] = data;
 			timer_reload(offset >> 4);
-			
+
 			// on cmos chip, clear INT2/INT5 as well
 			if (~data & 0x80 && chip_is_cmos())
 				m_io_control[offset >> 4] &= ~0x08;
-			
+
 			break;
 
 		// port data (note: 7000 doesn't support it for port A)
@@ -604,7 +604,7 @@ WRITE8_MEMBER(tms7000_device::tms7000_pf_w)
 			m_port_latch[port] = data;
 			break;
 		}
-		
+
 		// port direction (note: 7000 doesn't support it for port A)
 		case 0x05: case 0x09: case 0x0b:
 			// note: changing port direction does not change(refresh) the output pins
@@ -652,7 +652,7 @@ void tms7000_device::execute_one(UINT8 op)
 		case 0x0b: reti(); break;
 		case 0x0d: ldsp(); break;
 		case 0x0e: push_st(); break;
-		
+
 		case 0x12: am_r2a(&tms7000_device::op_mov); break;
 		case 0x13: am_r2a(&tms7000_device::op_and); break;
 		case 0x14: am_r2a(&tms7000_device::op_or); break;
@@ -757,7 +757,7 @@ void tms7000_device::execute_one(UINT8 op)
 		case 0x7d: am_i2r(&tms7000_device::op_cmp); break;
 		case 0x7e: am_i2r(&tms7000_device::op_dac); break;
 		case 0x7f: am_i2r(&tms7000_device::op_dsb); break;
-		
+
 		case 0x80: am_p2a(&tms7000_device::op_mov); break;
 		case 0x82: am_a2p(&tms7000_device::op_mov); break;
 		case 0x83: am_a2p(&tms7000_device::op_and); break;
@@ -798,7 +798,7 @@ void tms7000_device::execute_one(UINT8 op)
 		case 0xac: br_inx(); break;
 		case 0xad: cmpa_inx(); break;
 		case 0xae: call_inx(); break;
-		
+
 		case 0xb0: am_a2a(&tms7000_device::op_mov); break; // aka clrc/tsta
 		case 0xb1: am_b2a(&tms7000_device::op_mov); break; // undocumented
 		case 0xb2: am_a(&tms7000_device::op_dec); break;
@@ -849,7 +849,7 @@ void tms7000_device::execute_one(UINT8 op)
 		case 0xdd: am_r(&tms7000_device::op_rrc); break;
 		case 0xde: am_r(&tms7000_device::op_rl); break;
 		case 0xdf: am_r(&tms7000_device::op_rlc); break;
-		
+
 		case 0xe0: jmp(true); break;
 		case 0xe1: jmp(m_sr & SR_N); break; // jn/jlt
 		case 0xe2: jmp(m_sr & SR_Z); break; // jz/jeq
@@ -863,7 +863,7 @@ void tms7000_device::execute_one(UINT8 op)
 		case 0xf0: case 0xf1: case 0xf2: case 0xf3: case 0xf4: case 0xf5: case 0xf6: case 0xf7:
 		case 0xf8: case 0xf9: case 0xfa: case 0xfb: case 0xfc: case 0xfd: case 0xfe: case 0xff:
 			trap(op << 1); break;
-		
+
 		default: illegal(op); break;
 	}
 }

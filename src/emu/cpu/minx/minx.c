@@ -177,7 +177,6 @@ UINT16 minx_cpu_device::rdop16()
 
 void minx_cpu_device::execute_run()
 {
-
 	do
 	{
 		m_curpc = GET_MINX_PC;

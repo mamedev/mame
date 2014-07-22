@@ -152,8 +152,8 @@ static MACHINE_CONFIG_START( kingpin, kingpin_state )
 	/* video hardware */
 	MCFG_DEVICE_ADD( "tms9928a", TMS9928A, XTAL_10_738635MHz / 2 )
 	MCFG_TMS9928A_VRAM_SIZE(0x4000)
-	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(kingpin_state, vdp_interrupt))	
-	
+	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(kingpin_state, vdp_interrupt))
+
 	MCFG_TMS9928A_SCREEN_ADD_NTSC( "screen" )
 	MCFG_SCREEN_UPDATE_DEVICE( "tms9928a", tms9928a_device, screen_update )
 

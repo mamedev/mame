@@ -22,12 +22,12 @@ NETLIB_RESET(nicRSFF)
 
 NETLIB_UPDATE(nicRSFF)
 {
-    if (!INPLOGIC(m_S))
-    {
-        OUTLOGIC(m_Q,  1, NLTIME_FROM_NS(20));
-        OUTLOGIC(m_QQ, 0, NLTIME_FROM_NS(20));
-    }
-    else if (!INPLOGIC(m_R))
+	if (!INPLOGIC(m_S))
+	{
+		OUTLOGIC(m_Q,  1, NLTIME_FROM_NS(20));
+		OUTLOGIC(m_QQ, 0, NLTIME_FROM_NS(20));
+	}
+	else if (!INPLOGIC(m_R))
 	{
 		OUTLOGIC(m_Q,  0, NLTIME_FROM_NS(20));
 		OUTLOGIC(m_QQ, 1, NLTIME_FROM_NS(20));

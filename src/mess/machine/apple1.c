@@ -400,5 +400,3 @@ TIMER_CALLBACK_MEMBER(apple1_state::apple1_dsp_ready_end)
 	   another display write. */
 	pia->cb1_w(1);
 }
-
-

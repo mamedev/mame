@@ -97,13 +97,13 @@ INPUT_PORTS_START( apollo_config )
 		PORT_CONFSETTING(0x00, DEF_STR ( Off ) )
 		PORT_CONFSETTING(APOLLO_CONF_25_YEARS_AGO, DEF_STR ( On ) )
 
-//		PORT_CONFNAME(APOLLO_CONF_NODE_ID, APOLLO_CONF_NODE_ID, "Node ID from Disk")
-//		PORT_CONFSETTING(0x00, DEF_STR ( Off ) )
-//		PORT_CONFSETTING(APOLLO_CONF_NODE_ID, DEF_STR ( On ) )
+//      PORT_CONFNAME(APOLLO_CONF_NODE_ID, APOLLO_CONF_NODE_ID, "Node ID from Disk")
+//      PORT_CONFSETTING(0x00, DEF_STR ( Off ) )
+//      PORT_CONFSETTING(APOLLO_CONF_NODE_ID, DEF_STR ( On ) )
 
-//		PORT_CONFNAME(APOLLO_CONF_IDLE_SLEEP, 0x00, "Idle Sleep")
-//		PORT_CONFSETTING(0x00, DEF_STR ( Off ) )
-//		PORT_CONFSETTING(APOLLO_CONF_IDLE_SLEEP, DEF_STR ( On ) )
+//      PORT_CONFNAME(APOLLO_CONF_IDLE_SLEEP, 0x00, "Idle Sleep")
+//      PORT_CONFSETTING(0x00, DEF_STR ( Off ) )
+//      PORT_CONFSETTING(APOLLO_CONF_IDLE_SLEEP, DEF_STR ( On ) )
 
 		PORT_CONFNAME(APOLLO_CONF_TRAP_TRACE, 0x00, "Trap Trace")
 		PORT_CONFSETTING(0x00, DEF_STR ( Off ) )
@@ -113,13 +113,13 @@ INPUT_PORTS_START( apollo_config )
 		PORT_CONFSETTING(0x00, DEF_STR ( Off ) )
 		PORT_CONFSETTING(APOLLO_CONF_FPU_TRACE, DEF_STR ( On ) )
 
-//		PORT_CONFNAME(APOLLO_CONF_DISK_TRACE, 0x00, "Disk Trace")
-//		PORT_CONFSETTING(0x00, DEF_STR ( Off ) )
-//		PORT_CONFSETTING(APOLLO_CONF_DISK_TRACE, DEF_STR ( On ) )
+//      PORT_CONFNAME(APOLLO_CONF_DISK_TRACE, 0x00, "Disk Trace")
+//      PORT_CONFSETTING(0x00, DEF_STR ( Off ) )
+//      PORT_CONFSETTING(APOLLO_CONF_DISK_TRACE, DEF_STR ( On ) )
 
-//		PORT_CONFNAME(APOLLO_CONF_NET_TRACE, 0x00, "Network Trace")
-//		PORT_CONFSETTING(0x00, DEF_STR ( Off ) )
-//		PORT_CONFSETTING(APOLLO_CONF_NET_TRACE, DEF_STR ( On ) )
+//      PORT_CONFNAME(APOLLO_CONF_NET_TRACE, 0x00, "Network Trace")
+//      PORT_CONFSETTING(0x00, DEF_STR ( Off ) )
+//      PORT_CONFSETTING(APOLLO_CONF_NET_TRACE, DEF_STR ( On ) )
 
 INPUT_PORTS_END
 
@@ -740,7 +740,7 @@ void apollo_sio::device_reset()
 	ip3_w((input_data & 0x08) ? ASSERT_LINE : CLEAR_LINE);
 	ip4_w((input_data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
 	ip5_w((input_data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
-//	ip6_w((input_data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
+//  ip6_w((input_data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
 
 	// MC2681 has IP[6] (instead of /IACK on MC68681)
 	m_ip6 = (input_data & 0x40) ? ASSERT_LINE : CLEAR_LINE;
@@ -829,7 +829,7 @@ WRITE_LINE_MEMBER(apollo_state::sio_irq_handler)
 
 WRITE8_MEMBER(apollo_state::sio_output)
 {
-//	CLOG2(("apollo_sio - sio_output %02x", data));
+//  CLOG2(("apollo_sio - sio_output %02x", data));
 
 	if ((data & 0x80) != (sio_output_data & 0x80))
 	{

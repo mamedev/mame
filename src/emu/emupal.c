@@ -433,7 +433,7 @@ void palette_device::device_start()
 			if (share_ext != NULL)
 				m_paletteram_ext.set_membits(m_membits);
 		}
-		
+
 		// override endianness if provided
 		if (m_endianness_supplied)
 		{

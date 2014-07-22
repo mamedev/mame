@@ -292,7 +292,7 @@ void running_machine::start()
 
 	// allocate autoboot timer
 	m_autoboot_timer = scheduler().timer_alloc(timer_expired_delegate(FUNC(running_machine::autoboot_callback), this));
-	
+
 	manager().update_machine();
 }
 

@@ -2,7 +2,7 @@
 
     Toshiba TMPZ84C015, MPUZ80/TLCS-Z80 ASSP Family
     Z80 CPU, SIO, CTC, CGC, PIO, WDT
-    
+
     TODO:
     - SIO configuration, or should that be up to the driver?
     - CGC (clock generator/controller)
@@ -133,13 +133,13 @@ void tmpz84c015_device::device_post_load()
 WRITE8_MEMBER(tmpz84c015_device::irq_priority_w)
 {
 	data &= 7;
-	
+
 	if (data > 5)
 	{
 		logerror("tmpz84c015: irq_priority_w undefined state %X\n", data);
 		data &= 3; // guess
 	}
-	
+
 	if (m_irq_priority != data)
 	{
 		static const char *dev[3] = { "tmpz84c015_ctc", "tmpz84c015_sio", "tmpz84c015_pio" };
@@ -152,7 +152,7 @@ WRITE8_MEMBER(tmpz84c015_device::irq_priority_w)
 			{ 2, 0, 1 }, // 4: pio -> ctc -> sio -> ext
 			{ 1, 2, 0 }  // 5: sio -> pio -> ctc -> ext
 		};
-		
+
 		// reconfigure first 3 entries in daisy chain
 		const z80_daisy_config daisy_chain[] =
 		{
@@ -162,13 +162,13 @@ WRITE8_MEMBER(tmpz84c015_device::irq_priority_w)
 			{ NULL }
 		};
 		m_daisy.init(this, daisy_chain);
-		
+
 		m_irq_priority = data;
 	}
 }
 
 static MACHINE_CONFIG_FRAGMENT( tmpz84c015 )
-	
+
 	/* basic machine hardware */
 	MCFG_Z80SIO0_ADD("tmpz84c015_sio", DERIVED_CLOCK(1,1), 0, 0, 0, 0)
 	MCFG_Z80DART_OUT_INT_CB(INPUTLINE(DEVICE_SELF, INPUT_LINE_IRQ0))

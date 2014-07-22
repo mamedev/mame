@@ -84,7 +84,7 @@ public:
 	required_device<palette_device> m_palette;
 	optional_shared_ptr<UINT8> m_generic_paletteram_8;
 	optional_shared_ptr<UINT16> m_generic_paletteram_16;
-	
+
 	void igs025_to_igs022_callback( void );
 
 	int m_toggle;

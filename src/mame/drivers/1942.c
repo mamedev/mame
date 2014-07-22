@@ -84,11 +84,11 @@ static NETLIST_START(nl_1942)
 
 	SOLVER(Solver, 48000)
 	ANALOG_INPUT(V5, 5)
-    PARAM(Solver.ACCURACY, 1e-6)
-    PARAM(Solver.GS_LOOPS, 6)
-    PARAM(Solver.SOR_FACTOR, 1.0)
-    //PARAM(Solver.DYNAMIC_TS, 1)
-    //PARAM(Solver.LTE, 5e-8)
+	PARAM(Solver.ACCURACY, 1e-6)
+	PARAM(Solver.GS_LOOPS, 6)
+	PARAM(Solver.SOR_FACTOR, 1.0)
+	//PARAM(Solver.DYNAMIC_TS, 1)
+	//PARAM(Solver.LTE, 5e-8)
 
 	/* AY 8910 internal resistors */
 
@@ -143,9 +143,9 @@ static NETLIST_START(nl_1942)
 
 	NET_C(CC6.1, VR.2)
 	NET_C(CC6.2, R1.1)
-    CAP(CC3, 220e-6)
-    NET_C(R1.2, CC3.1)
-    NET_C(CC3.2, GND)
+	CAP(CC3, 220e-6)
+	NET_C(R1.2, CC3.1)
+	NET_C(CC3.2, GND)
 
 NETLIST_END()
 
@@ -556,23 +556,23 @@ static MACHINE_CONFIG_START( 1942, _1942_state )
 
 	MCFG_SOUND_ADD("ay1", AY8910, AUDIO_CLOCK)  /* 1.5 MHz */
 	MCFG_AY8910_OUTPUT_TYPE(AY8910_RESISTOR_OUTPUT)
-    MCFG_AY8910_RES_LOADS(10000.0, 10000.0, 10000.0)
-	
+	MCFG_AY8910_RES_LOADS(10000.0, 10000.0, 10000.0)
+
 	MCFG_SOUND_ROUTE_EX(0, "snd_nl", 1.0, 0)
 	MCFG_SOUND_ROUTE_EX(1, "snd_nl", 1.0, 1)
 	MCFG_SOUND_ROUTE_EX(2, "snd_nl", 1.0, 2)
 
 	MCFG_SOUND_ADD("ay2", AY8910, AUDIO_CLOCK)  /* 1.5 MHz */
 	MCFG_AY8910_OUTPUT_TYPE(AY8910_RESISTOR_OUTPUT)
-    MCFG_AY8910_RES_LOADS(10000.0, 10000.0, 10000.0)
-	
+	MCFG_AY8910_RES_LOADS(10000.0, 10000.0, 10000.0)
+
 	MCFG_SOUND_ROUTE_EX(0, "snd_nl", 1.0, 3)
 	MCFG_SOUND_ROUTE_EX(1, "snd_nl", 1.0, 4)
 	MCFG_SOUND_ROUTE_EX(2, "snd_nl", 1.0, 5)
 
 	/* NETLIST configuration using internal AY8910 resistor values */
 
-    /* Minimize resampling between ay8910 and netlist */
+	/* Minimize resampling between ay8910 and netlist */
 	MCFG_SOUND_ADD("snd_nl", NETLIST_SOUND, AUDIO_CLOCK / 8 / 2)
 	MCFG_NETLIST_SETUP(nl_1942)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 5.0)
@@ -921,7 +921,7 @@ DRIVER_INIT_MEMBER(_1942_state,1942)
 GAME( 1984, 1942,     0,    1942, 1942, _1942_state, 1942, ROT270, "Capcom", "1942 (Revision B)", GAME_SUPPORTS_SAVE )
 GAME( 1984, 1942a,    1942, 1942, 1942, _1942_state, 1942, ROT270, "Capcom", "1942 (Revision A)", GAME_SUPPORTS_SAVE )
 GAME( 1984, 1942abl,  1942, 1942, 1942, _1942_state, 1942, ROT270, "bootleg", "1942 (Revision A, bootleg)", GAME_SUPPORTS_SAVE ) // data is the same as 1942a set, different rom format
-GAME( 198?, 1942h,    1942, 1942, 1942, _1942_state, 1942, ROT270, "hack (Two Bit Score?)", "42", GAME_SUPPORTS_SAVE ) 
+GAME( 198?, 1942h,    1942, 1942, 1942, _1942_state, 1942, ROT270, "hack (Two Bit Score?)", "42", GAME_SUPPORTS_SAVE )
 GAME( 1984, 1942b,    1942, 1942, 1942, _1942_state, 1942, ROT270, "Capcom", "1942 (First Version)", GAME_SUPPORTS_SAVE )
 GAME( 1985, 1942w,    1942, 1942, 1942, _1942_state, 1942, ROT270, "Capcom (Williams Electronics license)", "1942 (Williams Electronics license)", GAME_SUPPORTS_SAVE ) /* Based on 1942 (Revision B) */
 GAME( 1984, 1942p,    1942, 1942p,1942p,_1942_state, 1942, ROT270, "Capcom", "1942 (prototype)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )

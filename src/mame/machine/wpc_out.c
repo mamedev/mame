@@ -136,7 +136,7 @@ void wpc_out_device::device_timer(emu_timer &timer, device_timer_id id, int para
 {
 	gi_update();
 	for(int i=0; i<gi_count; i++) {
-		//		fprintf(stderr, "gi[%d] = %d\n", i, gi_time[i]);
+		//      fprintf(stderr, "gi[%d] = %d\n", i, gi_time[i]);
 		gi_time[i] = 0;
 	}
 }

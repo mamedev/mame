@@ -543,14 +543,14 @@ int base_gb_cart_slot_device::get_cart_type(UINT8 *ROM, UINT32 len)
 
 		if (count == 4876)
 		{
-//			printf("Li Cheng %d\n", count);
+//          printf("Li Cheng %d\n", count);
 			type = GB_MBC_LICHENG;
 		}
 		if (count == 4138 || count == 4125)
 		{
 			// Zhi Huan Wang uses 4138
 			// most sintax use 4125
-//			printf("Sintax %d!\n", count);
+//          printf("Sintax %d!\n", count);
 			type = GB_MBC_SINTAX;
 		}
 	}

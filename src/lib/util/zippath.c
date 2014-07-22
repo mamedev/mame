@@ -394,8 +394,8 @@ static int is_7z_file(const char *path)
 	const char *s = strrchr(path, '.');
 	return (s != NULL) && !core_stricmp(s, ".7z");
 }
-	
-	
+
+
 /*-------------------------------------------------
     is_zip_file - tests to see if this file is a
     ZIP file

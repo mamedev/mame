@@ -13,7 +13,7 @@
     Apple 2 disc drives for storage.
 
     This driver originally by Paul Cook, rewritten by Kevin Thacker,
-	re-rewritten by Olivier Galibert.
+    re-rewritten by Olivier Galibert.
 
 *********************************************************************/
 
@@ -46,21 +46,21 @@ public:
 
 	oric_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, "maincpu"),
-		  m_psg(*this, "ay8912"),
-		  m_centronics(*this, "centronics"),
-		  m_cent_data_out(*this, "cent_data_out"),
-		  m_cassette(*this, "cassette"),
-		  m_via(*this, "via6522"),
-		  m_ram(*this, "ram"),
-		  m_rom(*this, "maincpu"),
-		  m_bank_c000_r(*this, "bank_c000_r"),
-		  m_bank_e000_r(*this, "bank_e000_r"),
-		  m_bank_f800_r(*this, "bank_f800_r"),
-		  m_bank_c000_w(*this, "bank_c000_w"),
-		  m_bank_e000_w(*this, "bank_e000_w"),
-		  m_bank_f800_w(*this, "bank_f800_w"),
-		  m_config(*this, "CONFIG") { }
+			m_maincpu(*this, "maincpu"),
+			m_psg(*this, "ay8912"),
+			m_centronics(*this, "centronics"),
+			m_cent_data_out(*this, "cent_data_out"),
+			m_cassette(*this, "cassette"),
+			m_via(*this, "via6522"),
+			m_ram(*this, "ram"),
+			m_rom(*this, "maincpu"),
+			m_bank_c000_r(*this, "bank_c000_r"),
+			m_bank_e000_r(*this, "bank_e000_r"),
+			m_bank_f800_r(*this, "bank_f800_r"),
+			m_bank_c000_w(*this, "bank_c000_w"),
+			m_bank_e000_w(*this, "bank_e000_w"),
+			m_bank_f800_w(*this, "bank_f800_w"),
+			m_config(*this, "CONFIG") { }
 
 	DECLARE_INPUT_CHANGED_MEMBER(nmi_pressed);
 	DECLARE_WRITE8_MEMBER(via_a_w);
@@ -120,7 +120,7 @@ public:
 		m_telmon24(*this, "telmon24"),
 		m_joy1(*this, "JOY1"),
 		m_joy2(*this, "JOY2")
- { }
+	{ }
 
 	DECLARE_WRITE8_MEMBER(via2_a_w);
 	DECLARE_WRITE8_MEMBER(via2_b_w);
@@ -307,7 +307,7 @@ void oric_state::update_irq()
 
 INPUT_CHANGED_MEMBER(oric_state::nmi_pressed)
 {
-	m_maincpu->set_input_line(m6502_device::NMI_LINE, newval ? ASSERT_LINE : CLEAR_LINE);	
+	m_maincpu->set_input_line(m6502_device::NMI_LINE, newval ? ASSERT_LINE : CLEAR_LINE);
 }
 
 WRITE8_MEMBER(oric_state::via_a_w)
@@ -323,7 +323,7 @@ WRITE8_MEMBER(oric_state::via_b_w)
 	update_keyboard();
 	m_centronics->write_strobe(data & 0x10 ? 1 : 0);
 	m_cassette->change_state(data & 0x40 ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED,
-							 CASSETTE_MOTOR_DISABLED);
+								CASSETTE_MOTOR_DISABLED);
 	m_cassette->output(data & 0x80 ? -1.0 : +1.0);
 }
 
@@ -426,11 +426,11 @@ void telestrat_state::machine_reset()
 void telestrat_state::update_irq()
 {
 	m_maincpu->set_input_line(m6502_device::IRQ_LINE,
-							  m_via_irq ||
-							  m_ext_irq ||
-							  (m_fdc_irq && (m_port_314 & P_IRQEN)) ||
-							  m_via2_irq ||
-							  m_acia_irq ? ASSERT_LINE : CLEAR_LINE);
+								m_via_irq ||
+								m_ext_irq ||
+								(m_fdc_irq && (m_port_314 & P_IRQEN)) ||
+								m_via2_irq ||
+								m_acia_irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 WRITE8_MEMBER(telestrat_state::via2_a_w)
@@ -801,7 +801,7 @@ static MACHINE_CONFIG_START( oric, oric_state )
 	MCFG_CASSETTE_ADD( "cassette" )
 	MCFG_CASSETTE_FORMATS(oric_cassette_formats)
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED)
-	
+
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("tape_timer", oric_state, update_tape, attotime::from_hz(4800))
 
 	/* via */
@@ -933,8 +933,8 @@ ROM_END
 ROM_START(prav8d)
 	ROM_REGION(0x4000, "maincpu", 0)   /* 0x10000 + 0x04000 + 0x00100 + 0x00200 */
 	ROM_LOAD( "pravetzt.rom", 0, 0x4000, CRC(58079502) SHA1(7afc276cb118adff72e4f16698f94bf3b2c64146) )
-//	ROM_LOAD_OPTIONAL( "8ddoslo.rom", 0x014000, 0x0100, CRC(0c82f636) SHA1(b29d151a0dfa3c7cd50439b51d0a8f95559bc2b6) )
-//	ROM_LOAD_OPTIONAL( "8ddoshi.rom", 0x014100, 0x0200, CRC(66309641) SHA1(9c2e82b3c4d385ade6215fcb89f8b92e6fd2bf4b) )
+//  ROM_LOAD_OPTIONAL( "8ddoslo.rom", 0x014000, 0x0100, CRC(0c82f636) SHA1(b29d151a0dfa3c7cd50439b51d0a8f95559bc2b6) )
+//  ROM_LOAD_OPTIONAL( "8ddoshi.rom", 0x014100, 0x0200, CRC(66309641) SHA1(9c2e82b3c4d385ade6215fcb89f8b92e6fd2bf4b) )
 ROM_END
 
 ROM_START(prav8dd)
@@ -943,8 +943,8 @@ ROM_START(prav8dd)
 	ROMX_LOAD( "8d.rom",       0, 0x4000, CRC(b48973ef) SHA1(fd47c977fc215a3b577596a7483df53e8a1e9c83), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 1, "radosoft", "RadoSoft Disk ROM, 1992")
 	ROMX_LOAD( "pravetzd.rom", 0, 0x4000, CRC(f8d23821) SHA1(f87ad3c5832773b6e0614905552a80c98dc8e2a5), ROM_BIOS(2) )
-//	ROM_LOAD_OPTIONAL( "8ddoslo.rom", 0x014000, 0x0100, CRC(0c82f636) SHA1(b29d151a0dfa3c7cd50439b51d0a8f95559bc2b6) )
-//	ROM_LOAD_OPTIONAL( "8ddoshi.rom", 0x014100, 0x0200, CRC(66309641) SHA1(9c2e82b3c4d385ade6215fcb89f8b92e6fd2bf4b) )
+//  ROM_LOAD_OPTIONAL( "8ddoslo.rom", 0x014000, 0x0100, CRC(0c82f636) SHA1(b29d151a0dfa3c7cd50439b51d0a8f95559bc2b6) )
+//  ROM_LOAD_OPTIONAL( "8ddoshi.rom", 0x014100, 0x0200, CRC(66309641) SHA1(9c2e82b3c4d385ade6215fcb89f8b92e6fd2bf4b) )
 ROM_END
 
 

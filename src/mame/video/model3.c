@@ -718,7 +718,7 @@ void model3_state::real3d_display_list1_dma(UINT32 src, UINT32 dst, int length, 
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	int d = (dst & 0xffffff) / 4;
-	for (int i = 0; i < length; i += 4) 
+	for (int i = 0; i < length; i += 4)
 	{
 		UINT32 w;
 		if (byteswap) {
@@ -735,7 +735,7 @@ void model3_state::real3d_display_list2_dma(UINT32 src, UINT32 dst, int length, 
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	int d = (dst & 0xffffff) / 4;
-	for (int i = 0; i < length; i += 4) 
+	for (int i = 0; i < length; i += 4)
 	{
 		UINT32 w;
 		if (byteswap) {
@@ -768,7 +768,7 @@ void model3_state::real3d_vrom_texture_dma(UINT32 src, UINT32 dst, int length, i
 void model3_state::real3d_texture_fifo_dma(UINT32 src, int length, int byteswap)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
-	for (int i = 0; i < length; i += 4) 
+	for (int i = 0; i < length; i += 4)
 	{
 		UINT32 w;
 		if (byteswap) {
@@ -786,7 +786,7 @@ void model3_state::real3d_polygon_ram_dma(UINT32 src, UINT32 dst, int length, in
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	int d = (dst & 0xffffff) / 4;
-	for (int i = 0; i < length; i += 4) 
+	for (int i = 0; i < length; i += 4)
 	{
 		UINT32 w;
 		if (byteswap) {

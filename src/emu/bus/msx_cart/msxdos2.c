@@ -63,4 +63,3 @@ WRITE8_MEMBER(msx_cart_msxdos2::write_cart)
 		restore_banks();
 	}
 }
-

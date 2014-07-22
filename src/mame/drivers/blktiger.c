@@ -600,11 +600,11 @@ DRIVER_INIT_MEMBER(blktiger_state,blktigerb3)
 	UINT8 *src = memregion("audiocpu")->base();
 	int len = 0x8000;
 	dynamic_buffer buffer(len);
-	
+
 	for (int i = 0; i < len; i++)
 	{
 		int addr;
-		
+
 		addr = BITSWAP16(i, 15,14,13,12,11,10,9,8, 3,4,5,6, 7,2,1,0);
 		buffer[i] = src[addr];
 

@@ -307,7 +307,7 @@ UINT8 riot6532_device::reg_r(UINT8 offset, bool debugger_access)
 			if (!(*port->m_in_cb).isnull())
 			{
 				port->m_in = (*port->m_in_cb)(0);
-			
+
 				/* changes to port A need to update the PA7 state */
 				if (port == &m_port[0])
 				{

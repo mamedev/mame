@@ -224,7 +224,7 @@ void i8275_device::device_timer(emu_timer &timer, device_timer_id id, int param,
 			//if (LOG) logerror("I8275 '%s' y %u x %u VRTC 0\n", tag(), y, x);
 			m_write_vrtc(0);
 		}
-		
+
 		if (m_scanline <= (m_vrtc_scanline - SCANLINES_PER_ROW))
 		{
 			if (lc == 0)
@@ -233,9 +233,9 @@ void i8275_device::device_timer(emu_timer &timer, device_timer_id id, int param,
 				{
 					m_status |= ST_DU;
 					m_du = true;
-					
+
 					//if (LOG) logerror("I8275 '%s' y %u x %u DMA Underrun\n", tag(), y, x);
-					
+
 					m_write_drq(0);
 				}
 
@@ -254,7 +254,7 @@ void i8275_device::device_timer(emu_timer &timer, device_timer_id id, int param,
 				}
 			}
 		}
-		
+
 		if (m_scanline == m_irq_scanline)
 		{
 			if (m_status & ST_IE)
@@ -264,7 +264,7 @@ void i8275_device::device_timer(emu_timer &timer, device_timer_id id, int param,
 				m_write_irq(ASSERT_LINE);
 			}
 		}
-		
+
 		if (m_scanline == m_vrtc_scanline)
 		{
 			//if (LOG) logerror("I8275 '%s' y %u x %u VRTC 1\n", tag(), y, x);
@@ -288,7 +288,7 @@ void i8275_device::device_timer(emu_timer &timer, device_timer_id id, int param,
 			m_char_blink &= 0x3f;
 			m_stored_attr = 0;
 		}
-		
+
 		if (m_scanline == m_vrtc_drq_scanline)
 		{
 			// swap line buffers
@@ -614,7 +614,7 @@ WRITE8_MEMBER( i8275_device::dack_w )
 			}
 			else
 			{
-				m_drq_on_timer->adjust(attotime::zero);	
+				m_drq_on_timer->adjust(attotime::zero);
 			}
 		}
 

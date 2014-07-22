@@ -111,4 +111,3 @@ WRITE8_MEMBER(msx_cart_majutsushi::write_cart)
 			break;
 	}
 }
-

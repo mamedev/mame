@@ -288,13 +288,13 @@ void rsp_cpu_device::resolve_cb()
 	sp_reg_w_func.resolve();
 	sp_set_status_func.resolve();
 }
-	
+
 static CPU_INIT( rsp )
 {
 	rsp_state *rsp = get_safe_token(device);
 	int regIdx;
-	int accumIdx;	
-	
+	int accumIdx;
+
 	if (LOG_INSTRUCTION_EXECUTION)
 		rsp->exec_output = fopen("rsp_execute.txt", "wt");
 
@@ -3259,11 +3259,11 @@ CPU_GET_INFO( rsp_int )
 
 rsp_cpu_device::rsp_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, UINT32 clock, cpu_get_info_func get_info)
 	: legacy_cpu_device(mconfig, type, tag, owner, clock, get_info),
-	  dp_reg_r_func(*this),
-	  dp_reg_w_func(*this),
-	  sp_reg_r_func(*this),
-	  sp_reg_w_func(*this),
-	  sp_set_status_func(*this)
+		dp_reg_r_func(*this),
+		dp_reg_w_func(*this),
+		sp_reg_r_func(*this),
+		sp_reg_w_func(*this),
+		sp_set_status_func(*this)
 {
 }
 

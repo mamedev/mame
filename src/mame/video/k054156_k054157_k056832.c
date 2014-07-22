@@ -377,7 +377,7 @@ void k056832_device::device_start()
 	create_tilemaps(machine());
 
 	finalize_init(machine());
-	
+
 	// bind callbacks
 	m_k056832_cb.bind_relative_to(*owner());
 }
@@ -2572,4 +2572,3 @@ int k056832_device::get_layer_association(void)
 {
 	return(m_layer_association);
 }
-

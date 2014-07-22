@@ -163,8 +163,8 @@ static MACHINE_CONFIG_START( jpmmps, jpmmps_state )
 	MCFG_DEVICE_ADD("ppi8255_ic21", I8255, 0)
 
 	MCFG_DEVICE_ADD("ppi8255_ic22", I8255, 0)
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(jpmmps_state, jpmmps_psg_buf_w))	// SN chip data
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(jpmmps_state, jpmmps_ic22_portc_w))	// C3 is last meter, C2 latches in data
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(jpmmps_state, jpmmps_psg_buf_w)) // SN chip data
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(jpmmps_state, jpmmps_ic22_portc_w))  // C3 is last meter, C2 latches in data
 
 	MCFG_DEVICE_ADD("ppi8255_ic25", I8255, 0)
 

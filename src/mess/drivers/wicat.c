@@ -10,9 +10,9 @@ Wicat - various systems.
 
 /*
 
-	TODO:
+    TODO:
 
-	- video DMA is done line by line and needs to be in perfect sync
+    - video DMA is done line by line and needs to be in perfect sync
 
 */
 

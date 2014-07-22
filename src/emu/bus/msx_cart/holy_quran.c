@@ -115,4 +115,3 @@ WRITE8_MEMBER(msx_cart_holy_quran::write_cart)
 			break;
 	}
 }
-

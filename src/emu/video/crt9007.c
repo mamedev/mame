@@ -431,8 +431,8 @@ inline void crt9007_t::recompute_parameters()
 
 	//if (LOG)
 	//{
-	//	logerror("CRT9007 '%s' Screen: %u x %u @ %f Hz\n", tag(), horiz_pix_total, vert_pix_total, 1 / ATTOSECONDS_TO_DOUBLE(refresh));
-	//	logerror("CRT9007 '%s' Visible Area: (%u, %u) - (%u, %u)\n", tag(), visarea.min_x, visarea.min_y, visarea.max_x, visarea.max_y);
+	//  logerror("CRT9007 '%s' Screen: %u x %u @ %f Hz\n", tag(), horiz_pix_total, vert_pix_total, 1 / ATTOSECONDS_TO_DOUBLE(refresh));
+	//  logerror("CRT9007 '%s' Visible Area: (%u, %u) - (%u, %u)\n", tag(), visarea.min_x, visarea.min_y, visarea.max_x, visarea.max_y);
 	//}
 
 	//m_screen->configure(horiz_pix_total, vert_pix_total, visarea, refresh);

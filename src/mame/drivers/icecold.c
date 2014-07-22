@@ -352,10 +352,10 @@ static MACHINE_CONFIG_START( icecold, icecold_state )
 
 	MCFG_DEVICE_ADD("i8279", I8279, XTAL_6MHz/4)
 	MCFG_I8279_OUT_IRQ_CB(DEVWRITELINE("pia0", pia6821_device, cb1_w)) // irq
-	MCFG_I8279_OUT_SL_CB(WRITE8(icecold_state, scanlines_w))	    // scan SL lines
+	MCFG_I8279_OUT_SL_CB(WRITE8(icecold_state, scanlines_w))        // scan SL lines
 	MCFG_I8279_OUT_DISP_CB(WRITE8(icecold_state, digit_w))         // display A&B
-	MCFG_I8279_IN_RL_CB(READ8(icecold_state, kbd_r))    	        // kbd RL lines
-	
+	MCFG_I8279_IN_RL_CB(READ8(icecold_state, kbd_r))                // kbd RL lines
+
 	// 30Hz signal from CH-C of ay0
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("sint_timer", icecold_state, icecold_sint_timer, attotime::from_hz(30))
 

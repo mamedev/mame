@@ -204,7 +204,7 @@ ROM_START(mystcasta)
 	ROM_LOAD("u5.bin", 0x00000, 0x40000, CRC(e5126980) SHA1(2c6d412c87bf27098dae4351958d84e8f9348423))
 	ROM_RELOAD( 0x80000, 0x40000)
 	ROM_LOAD("u6.bin", 0x40000, 0x40000, CRC(eb241633) SHA1(8e5db75b32ed2ea74088615bbe1403d4c8feafbd))
-	ROM_RELOAD( 0xc0000, 0x40000)	
+	ROM_RELOAD( 0xc0000, 0x40000)
 ROM_END
 
 /*-------------------------------------------------------------------

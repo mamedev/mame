@@ -685,7 +685,7 @@ static MACHINE_CONFIG_START( savquest, savquest_state )
 	MCFG_VOODOO_TMUMEM(4,4)
 	MCFG_VOODOO_SCREEN_TAG("screen")
 	MCFG_VOODOO_CPU_TAG("maincpu")
-	MCFG_VOODOO_VBLANK_CB(WRITELINE(savquest_state,vblank_assert))	
+	MCFG_VOODOO_VBLANK_CB(WRITELINE(savquest_state,vblank_assert))
 MACHINE_CONFIG_END
 
 ROM_START( savquest )

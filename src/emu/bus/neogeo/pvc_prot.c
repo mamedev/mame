@@ -312,6 +312,3 @@ void pvc_prot_device::kof2003h_decrypt_68k(UINT8* rom, UINT32 size)
 	memcpy (&rom[0x100000], &buf[0x800000], 0x100000);
 	memcpy (&rom[0x200000], &buf[0x100000], 0x700000);
 }
-
-
-

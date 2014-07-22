@@ -153,7 +153,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(wpc_dmd_device::scanline_timer)
 			base++;
 		}
 	}
-	
+
 	cur_scanline = (cur_scanline+1) & 0x1f;
 	scanline_cb(cur_scanline == (firq_scanline & 0x1f));
 }

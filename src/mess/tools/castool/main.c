@@ -88,7 +88,7 @@ const struct SupportedCassetteFormats formats[] = {
 	{"rka", rka_cassette_formats               ,"Apogee"},
 	{"rkm", rkm_cassette_formats               ,"Mikrosha"},
 	{"rkp", rkp_cassette_formats               ,"Partner"},
-	{"sc3000", sc3000_cassette_formats		   ,"Sega SC-3000"},
+	{"sc3000", sc3000_cassette_formats         ,"Sega SC-3000"},
 	{"sordm5", sordm5_cassette_formats         ,"Sord M5"},
 	{"svi", svi_cassette_formats               ,"SVI"},
 	{"to7", to7_cassette_formats               ,"Thomson TO"},

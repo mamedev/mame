@@ -1020,7 +1020,7 @@ static MACHINE_CONFIG_START( mystwarr, mystwarr_state )
 	MCFG_DEVICE_ADD("k054338", K054338, 0)
 	MCFG_K054338_ALPHAINV(1)
 	MCFG_K054338_MIXER("k055555")
-	
+
 	MCFG_VIDEO_START_OVERRIDE(mystwarr_state, mystwarr)
 
 	/* sound hardware */

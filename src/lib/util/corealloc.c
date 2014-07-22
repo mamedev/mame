@@ -181,7 +181,7 @@ void free_file_line(void *memory, const char *file, int line, bool array)
 
 //-------------------------------------------------
 //  track_memory - enables or disables the memory
-//	tracking
+//  tracking
 //-------------------------------------------------
 
 void track_memory(bool track)

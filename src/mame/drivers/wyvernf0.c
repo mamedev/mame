@@ -6,10 +6,10 @@ driver by Luca Elia
 
 Typical Taito mid-80s hardware but with dual video outputs.
 
-Sound board:	Z80, 2 x YM2149, OKI M5232
-CPU board:		Z80, ROM and RAM, 68705P5 MCU (protected)
-OBJ board:		ROMs and RAM
-Video board:	ROMs and RAM, 4 x Fujitsu MB112S146 (also used on arkanoid, lkage)
+Sound board:    Z80, 2 x YM2149, OKI M5232
+CPU board:      Z80, ROM and RAM, 68705P5 MCU (protected)
+OBJ board:      ROMs and RAM
+Video board:    ROMs and RAM, 4 x Fujitsu MB112S146 (also used on arkanoid, lkage)
 
 The rest is just common logic, there's no custom chips.
 
@@ -99,14 +99,14 @@ public:
 
     Video
 
-	Note:   if MAME_DEBUG is defined, pressing Z with:
+    Note:   if MAME_DEBUG is defined, pressing Z with:
 
-					Q       Shows the background tilemap
-					W       Shows the foreground tilemap
-					A       Shows the background sprites
-					S       Shows the foreground sprites
+                    Q       Shows the background tilemap
+                    W       Shows the foreground tilemap
+                    A       Shows the background sprites
+                    S       Shows the foreground sprites
 
-			Keys can be used together!
+            Keys can be used together!
 
 ***************************************************************************/
 
@@ -191,9 +191,9 @@ yyyyyyyy fccccccc xf??pppp xxxxxxxx
 		int sx, sy, code, color;
 
 		sx = sprram[offs + 3] - ((sprram[offs + 2] & 0x80) << 1);
-		sy = 256 - 8 - sprram[offs + 0] - 23;	// center player sprite: 256 - 8 - 0x71 + dy = 256/2-32/2 -> dy = -23
+		sy = 256 - 8 - sprram[offs + 0] - 23;   // center player sprite: 256 - 8 - 0x71 + dy = 256/2-32/2 -> dy = -23
 
-		int flipx = sprram[offs + 2] & 0x40;	// maybe
+		int flipx = sprram[offs + 2] & 0x40;    // maybe
 		int flipy = sprram[offs + 1] & 0x80;
 
 		if (flip_screen_x())
@@ -262,12 +262,12 @@ if (machine().input().code_pressed(KEYCODE_Z))
 	bitmap.fill(0, cliprect);
 
 	// background monitor
-	if (layers_ctrl & 1)	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-	if (layers_ctrl & 4)	draw_sprites(bitmap, cliprect, false);
+	if (layers_ctrl & 1)    m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	if (layers_ctrl & 4)    draw_sprites(bitmap, cliprect, false);
 
 	// foreground monitor
-	if (layers_ctrl & 8)	draw_sprites(bitmap, cliprect, true);
-	if (layers_ctrl & 2)	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	if (layers_ctrl & 8)    draw_sprites(bitmap, cliprect, true);
+	if (layers_ctrl & 2)    m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	return 0;
 }
@@ -283,7 +283,7 @@ READ8_MEMBER(wyvernf0_state::fake_mcu_r)
 	int result = 0;
 
 	if ((m_mcu_val & 0x73) == 0x73)
-		result = 0x42;	// at boot
+		result = 0x42;  // at boot
 
 	return result;
 }
@@ -404,7 +404,7 @@ static ADDRESS_MAP_START( wyvernf0_map, AS_PROGRAM, 8, wyvernf0_state )
 
 	AM_RANGE(0xd800, 0xdbff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 
-	AM_RANGE(0xdc00, 0xdc00) AM_WRITENOP	// irq ack?
+	AM_RANGE(0xdc00, 0xdc00) AM_WRITENOP    // irq ack?
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, wyvernf0_state )
@@ -431,7 +431,7 @@ ADDRESS_MAP_END
 ***************************************************************************/
 
 static INPUT_PORTS_START( wyvernf0 )
-	PORT_START("DSW1")	// d600 -> 800c
+	PORT_START("DSW1")  // d600 -> 800c
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Bonus_Life ) )
 	PORT_DIPSETTING(    0x00, "?? 0" )
 	PORT_DIPSETTING(    0x01, "?? 1" )
@@ -453,7 +453,7 @@ static INPUT_PORTS_START( wyvernf0 )
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Cocktail ) )
 
-	PORT_START("DSW2")	// d601 -> 800d
+	PORT_START("DSW2")  // d601 -> 800d
 	PORT_DIPNAME( 0x0f, 0x00, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING(    0x0f, DEF_STR( 9C_1C ) )
 	PORT_DIPSETTING(    0x0e, DEF_STR( 8C_1C ) )
@@ -489,13 +489,13 @@ static INPUT_PORTS_START( wyvernf0 )
 	PORT_DIPSETTING(    0x60, DEF_STR( 1C_7C ) )
 	PORT_DIPSETTING(    0x70, DEF_STR( 1C_8C ) )
 
-	PORT_START("DSW3") 	// d602 -> 800e
+	PORT_START("DSW3")  // d602 -> 800e
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x00, "0" )
 	PORT_DIPSETTING(    0x01, "1" )
 	PORT_DIPSETTING(    0x02, "2" )
 	PORT_DIPSETTING(    0x03, "3" )
-	PORT_DIPUNKNOWN( 0x04, 0x04 )	// *
+	PORT_DIPUNKNOWN( 0x04, 0x04 )   // *
 	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Demo_Sounds ) ) /* Music at every other title screen */
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -512,7 +512,7 @@ static INPUT_PORTS_START( wyvernf0 )
 	PORT_DIPSETTING(    0x00, "1" )
 	PORT_DIPSETTING(    0x80, "2" )
 
-	PORT_START("SYSTEM")	// d603 -> 800f / 8023
+	PORT_START("SYSTEM")    // d603 -> 800f / 8023
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1         )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2         )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SERVICE1       )
@@ -522,7 +522,7 @@ static INPUT_PORTS_START( wyvernf0 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN         )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN         )
 
-	PORT_START("JOY1")	// d604 -> 8010 / 8024
+	PORT_START("JOY1")  // d604 -> 8010 / 8024
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN        )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN        )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT  ) PORT_PLAYER(1)
@@ -532,7 +532,7 @@ static INPUT_PORTS_START( wyvernf0 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN        )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN        )
 
-	PORT_START("FIRE1")	// d605 -> 8011 / 8025
+	PORT_START("FIRE1") // d605 -> 8011 / 8025
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN        )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN        )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN        )
@@ -542,7 +542,7 @@ static INPUT_PORTS_START( wyvernf0 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN        )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN        )
 
-	PORT_START("JOY2")	// d606 -> 8012 / 8026
+	PORT_START("JOY2")  // d606 -> 8012 / 8026
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN        )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN        )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT  ) PORT_PLAYER(2)
@@ -552,7 +552,7 @@ static INPUT_PORTS_START( wyvernf0 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN        )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN        )
 
-	PORT_START("FIRE2")	// d607 -> 8013 / 8027
+	PORT_START("FIRE2") // d607 -> 8013 / 8027
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN        )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN        )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN        )
@@ -633,10 +633,10 @@ static MACHINE_CONFIG_START( wyvernf0, wyvernf0_state )
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(wyvernf0_state, irq0_line_hold, 60*2)  // IRQ generated by ??? (drives music tempo), NMI by main cpu
 
-//	MCFG_CPU_ADD("mcu", M68705, 4000000) // ?
-//	MCFG_CPU_PROGRAM_MAP(mcu_map)
+//  MCFG_CPU_ADD("mcu", M68705, 4000000) // ?
+//  MCFG_CPU_PROGRAM_MAP(mcu_map)
 
-//	MCFG_QUANTUM_TIME(attotime::from_hz(6000)) // 100 CPU slices per second to synchronize between the MCU and the main CPU
+//  MCFG_QUANTUM_TIME(attotime::from_hz(6000)) // 100 CPU slices per second to synchronize between the MCU and the main CPU
 
 	MCFG_MACHINE_START_OVERRIDE(wyvernf0_state,wyvernf0)
 	MCFG_MACHINE_RESET_OVERRIDE(wyvernf0_state,wyvernf0)
@@ -669,7 +669,7 @@ static MACHINE_CONFIG_START( wyvernf0, wyvernf0_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 
 	// music
-	MCFG_SOUND_ADD("msm", MSM5232, 2000000)	// ?
+	MCFG_SOUND_ADD("msm", MSM5232, 2000000) // ?
 	MCFG_MSM5232_SET_CAPACITORS(0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6) /* default 0.39 uF capacitors (not verified) */
 	MCFG_SOUND_ROUTE(0, "mono", 1.0)    // pin 28  2'-1
 	MCFG_SOUND_ROUTE(1, "mono", 1.0)    // pin 29  4'-1

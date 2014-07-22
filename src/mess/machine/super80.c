@@ -57,15 +57,15 @@ TIMER_DEVICE_CALLBACK_MEMBER( super80_state::timer_k )
 }
 
 /* cassette load circuit
-	This "emulates" U79 CD4046BCN PLL chip and U1 LM311P op-amp. U79 converts a frequency to a voltage,
-	and U1 amplifies that voltage to digital levels. U1 has a trimpot connected, to set the midpoint.
+    This "emulates" U79 CD4046BCN PLL chip and U1 LM311P op-amp. U79 converts a frequency to a voltage,
+    and U1 amplifies that voltage to digital levels. U1 has a trimpot connected, to set the midpoint.
 
-	The MDS homebrew input circuit consists of 2 op-amps followed by a D-flipflop.
-	The "read-any-system" cassette circuit is a CA3140 op-amp, the smarts being done in software.
+    The MDS homebrew input circuit consists of 2 op-amps followed by a D-flipflop.
+    The "read-any-system" cassette circuit is a CA3140 op-amp, the smarts being done in software.
 
-	bit 0 = original system (U79 and U1)
-	bit 1 = MDS fast system
-	bit 2 = CA3140 */
+    bit 0 = original system (U79 and U1)
+    bit 1 = MDS fast system
+    bit 2 = CA3140 */
 TIMER_DEVICE_CALLBACK_MEMBER( super80_state::timer_p )
 {
 	UINT8 cass_ws=0;

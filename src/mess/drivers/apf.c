@@ -491,7 +491,7 @@ DEVICE_IMAGE_LOAD_MEMBER( apf_state, apf_cart )
 {
 	UINT8 *ROM = memregion("cart")->base();
 	UINT32 cart_size;
-	
+
 	if (image.software_entry() == NULL)
 	{
 		cart_size = image.length();
@@ -502,7 +502,7 @@ DEVICE_IMAGE_LOAD_MEMBER( apf_state, apf_cart )
 		}
 
 		image.fread(ROM, cart_size);
-		
+
 		// attempt to identify Space Destroyer, which needs 1K of additional RAM
 		if (cart_size == 0x1800)
 		{
@@ -527,7 +527,7 @@ DEVICE_IMAGE_LOAD_MEMBER( apf_state, apf_cart )
 			m_cart_ram.resize(image.get_software_region_length("ram"));
 		}
 	}
-	
+
 	return IMAGE_INIT_PASS;
 }
 
@@ -611,7 +611,7 @@ static MACHINE_CONFIG_DERIVED( apfimag, apfm1000 )
 	MCFG_CASSETTE_ADD( "cassette" )
 	MCFG_CASSETTE_FORMATS(apf_cassette_formats)
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY)
-	
+
 	MCFG_FD1771x_ADD("fdc", 1000000) // guess
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", apf_floppies, "525dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", apf_floppies, "525dd", floppy_image_device::default_floppy_formats)

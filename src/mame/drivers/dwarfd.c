@@ -579,7 +579,7 @@ I8275_DRAW_CHARACTER_MEMBER(dwarfd_state::display_pixels)
 		m_back_color = false;
 
 	//if(!linecount)
-	//	logerror("%d %d %02x %02x %02x %02x %02x %02x %02x\n", x/8, y/8, charcode, lineattr, lten, rvv, vsp, gpa, hlgt);
+	//  logerror("%d %d %02x %02x %02x %02x %02x %02x %02x\n", x/8, y/8, charcode, lineattr, lten, rvv, vsp, gpa, hlgt);
 
 	for(i=0;i<8;i+=2)
 	{
@@ -603,7 +603,7 @@ I8275_DRAW_CHARACTER_MEMBER(dwarfd_state::qc_display_pixels)
 		m_back_color = false;
 
 	//if(!linecount)
-	//	logerror("%d %d %02x %02x %02x %02x %02x %02x %02x\n", x/8, y/8, charcode, lineattr, lten, rvv, vsp, gpa, hlgt);
+	//  logerror("%d %d %02x %02x %02x %02x %02x %02x %02x\n", x/8, y/8, charcode, lineattr, lten, rvv, vsp, gpa, hlgt);
 
 	for(i=0;i<8;i+=2)
 	{

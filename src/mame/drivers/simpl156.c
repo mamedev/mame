@@ -394,7 +394,7 @@ static MACHINE_CONFIG_START( chainrec, simpl156_state )
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 	MCFG_PALETTE_MEMBITS(16)
-	
+
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", simpl156)
 
 	MCFG_DEVICE_ADD("tilegen1", DECO16IC, 0)

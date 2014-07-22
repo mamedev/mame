@@ -165,22 +165,22 @@ MC6845_UPDATE_ROW(abc1600_mover_device::crtc_update_row)
 {
 	int x = 0;
 	const pen_t *pen = m_palette->pens();
-	
+
 	for (int column = 0; column < x_count; column += 2)
 	{
 		UINT16 dma = get_crtca(ma, ra, column);
-		
+
 		// data is read out of video RAM in nibble mode by strobing CAS 4 times
 		for (int cas = 0; cas < 4; cas++)
 		{
 			UINT16 data = read_videoram(dma + cas);
-			
+
 			for (int bit = 0; bit < 16; bit++)
 			{
 				int color = ((BIT(data, 15) ^ PIX_POL) && !BLANK) && de;
-				
+
 				bitmap.pix32(vbp + y, hbp + x++) = pen[color];
-				
+
 				data <<= 1;
 			}
 		}

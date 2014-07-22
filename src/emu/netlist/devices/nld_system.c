@@ -89,49 +89,49 @@ NETLIB_UPDATE_PARAM(analog_input)
 
 ATTR_COLD void nld_d_to_a_proxy::start()
 {
-    nld_base_d_to_a_proxy::start();
+	nld_base_d_to_a_proxy::start();
 
-    register_sub(m_RV, "RV");
-    register_terminal("1", m_RV.m_P);
-    register_terminal("2", m_RV.m_N);
+	register_sub(m_RV, "RV");
+	register_terminal("1", m_RV.m_P);
+	register_terminal("2", m_RV.m_N);
 
-    register_output("_Q", m_Q);
-    register_subalias("Q", m_RV.m_P);
+	register_output("_Q", m_Q);
+	register_subalias("Q", m_RV.m_P);
 
-    connect(m_RV.m_N, m_Q);
-    m_Q.initial(0.0);
+	connect(m_RV.m_N, m_Q);
+	m_Q.initial(0.0);
 }
 
 ATTR_COLD void nld_d_to_a_proxy::reset()
 {
-    m_RV.do_reset();
+	m_RV.do_reset();
 }
 
 ATTR_COLD netlist_core_terminal_t &nld_d_to_a_proxy::out()
 {
-    return m_RV.m_P;
+	return m_RV.m_P;
 }
 
 ATTR_HOT ATTR_ALIGN void nld_d_to_a_proxy::update()
 {
-    const int state = INPLOGIC(m_I);
-    if (state != m_last_state)
-    {
-        m_last_state = state;
-        const double R = state ? m_logic_family->m_R_high : m_logic_family->m_R_low;
-        const double V = state ? m_logic_family->m_high_V : m_logic_family->m_low_V;
+	const int state = INPLOGIC(m_I);
+	if (state != m_last_state)
+	{
+		m_last_state = state;
+		const double R = state ? m_logic_family->m_R_high : m_logic_family->m_R_low;
+		const double V = state ? m_logic_family->m_high_V : m_logic_family->m_low_V;
 
-        // We only need to update the net first if this is a time stepping net
-        if (m_RV.m_P.net().as_analog().solver()->is_timestep())
-        {
-            m_RV.update_dev();
-            m_RV.set(1.0 / R, V, 0.0);
-            m_RV.m_P.schedule_after(NLTIME_FROM_NS(1));
-        }
-        else
-        {
-            m_RV.set(1.0 / R, V, 0.0);
-            m_RV.update_dev();
-        }
-    }
+		// We only need to update the net first if this is a time stepping net
+		if (m_RV.m_P.net().as_analog().solver()->is_timestep())
+		{
+			m_RV.update_dev();
+			m_RV.set(1.0 / R, V, 0.0);
+			m_RV.m_P.schedule_after(NLTIME_FROM_NS(1));
+		}
+		else
+		{
+			m_RV.set(1.0 / R, V, 0.0);
+			m_RV.update_dev();
+		}
+	}
 }

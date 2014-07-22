@@ -37,7 +37,7 @@ rf5c68_device::rf5c68_device(const machine_config &mconfig, const char *tag, dev
 void rf5c68_device::device_start()
 {
 	m_sample_end_cb.bind_relative_to(*owner());
-	
+
 	/* allocate memory for the chip */
 	memset(m_data, 0xff, sizeof(m_data));
 

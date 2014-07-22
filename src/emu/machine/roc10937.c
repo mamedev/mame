@@ -199,17 +199,17 @@ void rocvfd_t::update_display()
 	}
 }
 
-WRITE_LINE_MEMBER( rocvfd_t::sclk ) 
-{ 
-	shift_clock(state); 
+WRITE_LINE_MEMBER( rocvfd_t::sclk )
+{
+	shift_clock(state);
 }
 
-WRITE_LINE_MEMBER( rocvfd_t::data ) 
-{ 
+WRITE_LINE_MEMBER( rocvfd_t::data )
+{
 	m_data = state;
 }
 
-WRITE_LINE_MEMBER( rocvfd_t::por ) 
+WRITE_LINE_MEMBER( rocvfd_t::por )
 {
 	//If line goes low, reset mode is engaged, until such a time as it goes high again.
 	if (!state)

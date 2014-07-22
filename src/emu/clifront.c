@@ -197,7 +197,7 @@ int cli_frontend::execute(int argc, char **argv)
 				throw emu_fatalerror(MAMERR_FATALERROR, NULL);
 			}
 		}
-		
+
 		m_options.parse_standard_inis(option_errors);
 		// parse the command line, adding any system-specific options
 		if (!m_options.parse_command_line(argc, argv, option_errors))
@@ -232,7 +232,7 @@ int cli_frontend::execute(int argc, char **argv)
 			}
 			if (option_errors)
 				osd_printf_error("Error in command line:\n%s\n", option_errors.trimspace().cstr());
-		
+
 			// if we can't find it, give an appropriate error
 			const game_driver *system = m_options.system();
 			if (system == NULL && *(m_options.system_name()) != 0)

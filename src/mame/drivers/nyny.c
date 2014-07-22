@@ -624,7 +624,7 @@ static MACHINE_CONFIG_START( nyny, nyny_state )
 	MCFG_TTL74123_B_PIN_VALUE(1)                  /* B pin - pulled high */
 	MCFG_TTL74123_CLEAR_PIN_VALUE(1)                  /* Clear pin - pulled high */
 	MCFG_TTL74123_OUTPUT_CHANGED_CB(WRITE8(nyny_state, ic48_1_74123_output_changed))
-	
+
 	MCFG_DEVICE_ADD("pia1", PIA6821, 0)
 	MCFG_PIA_READPA_HANDLER(IOPORT("IN0"))
 	MCFG_PIA_READPB_HANDLER(IOPORT("IN1"))

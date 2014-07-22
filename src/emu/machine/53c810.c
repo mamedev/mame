@@ -608,9 +608,9 @@ void lsi53c810_device::lsi53c810_reg_w(int offset, UINT8 data)
 
 void lsi53c810_device::add_opcode(UINT8 op, UINT8 mask, opcode_handler_delegate handler)
 {
-	for (int i = 0; i < 256; i++) 
+	for (int i = 0; i < 256; i++)
 	{
-		if ((i & mask) == op) 
+		if ((i & mask) == op)
 		{
 			dma_opcode[i] = handler;
 		}
@@ -629,7 +629,7 @@ void lsi53c810_device::device_start()
 	m_irq_cb.bind_relative_to(*owner());
 	m_dma_cb.bind_relative_to(*owner());
 	m_fetch_cb.bind_relative_to(*owner());
-	
+
 	for (int i = 0; i < 256; i++)
 	{
 		dma_opcode[i] = opcode_handler_delegate(FUNC(lsi53c810_device::dmaop_invalid), this);

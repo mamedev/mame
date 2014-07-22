@@ -300,12 +300,12 @@ public:
 		m_avg(*this, "avg"),
 		m_rom(*this, "maincpu"),
 		m_knob_p1(*this, TEMPEST_KNOB_P1_TAG),
-        m_knob_p2(*this, TEMPEST_KNOB_P2_TAG),
-        m_buttons_p1(*this, TEMPEST_BUTTONS_P1_TAG),
-        m_buttons_p2(*this, TEMPEST_BUTTONS_P2_TAG),
-        m_in1(*this, "IN1/DSW0"),
-        m_in2(*this, "IN2")
-    { }
+		m_knob_p2(*this, TEMPEST_KNOB_P2_TAG),
+		m_buttons_p1(*this, TEMPEST_BUTTONS_P1_TAG),
+		m_buttons_p2(*this, TEMPEST_BUTTONS_P2_TAG),
+		m_in1(*this, "IN1/DSW0"),
+		m_in2(*this, "IN2")
+	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<mathbox_device> m_mathbox;
@@ -313,13 +313,13 @@ public:
 	required_memory_region m_rom;
 
 	required_ioport m_knob_p1;
-    required_ioport m_knob_p2;
-    required_ioport m_buttons_p1;
-    required_ioport m_buttons_p2;
-    required_ioport m_in1;
-    required_ioport m_in2;
+	required_ioport m_knob_p2;
+	required_ioport m_buttons_p1;
+	required_ioport m_buttons_p2;
+	required_ioport m_in1;
+	required_ioport m_in2;
 
-    UINT8 m_player_select;
+	UINT8 m_player_select;
 	DECLARE_WRITE8_MEMBER(wdclr_w);
 	DECLARE_WRITE8_MEMBER(tempest_led_w);
 	DECLARE_WRITE8_MEMBER(tempest_coin_w);
@@ -329,9 +329,9 @@ public:
 	DECLARE_READ8_MEMBER(input_port_1_bit_r);
 	DECLARE_READ8_MEMBER(input_port_2_bit_r);
 
-    DECLARE_READ8_MEMBER(rom_ae1f_r);
+	DECLARE_READ8_MEMBER(rom_ae1f_r);
 
-    virtual void machine_start();
+	virtual void machine_start();
 };
 
 
@@ -365,7 +365,7 @@ CUSTOM_INPUT_MEMBER(tempest_state::tempest_knob_r)
 
 CUSTOM_INPUT_MEMBER(tempest_state::tempest_buttons_r)
 {
-    return (m_player_select == 0) ? m_buttons_p1->read() : m_buttons_p2->read();
+	return (m_player_select == 0) ? m_buttons_p1->read() : m_buttons_p2->read();
 }
 
 
@@ -428,8 +428,8 @@ READ8_MEMBER(tempest_state::rom_ae1f_r)
 	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(100));
 	machine().scheduler().abort_timeslice();
 
-    const UINT8 *rom = m_rom->base();
-    return rom[0xae1f];
+	const UINT8 *rom = m_rom->base();
+	return rom[0xae1f];
 }
 
 
@@ -454,8 +454,8 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, tempest_state )
 	AM_RANGE(0x60c0, 0x60cf) AM_DEVREADWRITE("pokey1", pokey_device, read, write)
 	AM_RANGE(0x60d0, 0x60df) AM_DEVREADWRITE("pokey2", pokey_device, read, write)
 	AM_RANGE(0x60e0, 0x60e0) AM_WRITE(tempest_led_w)
-    AM_RANGE(0xae1f, 0xae1f) AM_READ(rom_ae1f_r)
-    AM_RANGE(0x9000, 0xdfff) AM_ROM
+	AM_RANGE(0xae1f, 0xae1f) AM_READ(rom_ae1f_r)
+	AM_RANGE(0x9000, 0xdfff) AM_ROM
 	AM_RANGE(0xf000, 0xffff) AM_ROM /* for the reset / interrupt vectors */
 ADDRESS_MAP_END
 

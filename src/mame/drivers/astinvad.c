@@ -337,7 +337,7 @@ WRITE8_MEMBER(astinvad_state::kamikaze_sound1_w)
 	// d4: bonus sound generator
 	// d5: sound enabled
 	// other bits: unused
-	
+
 	int bits_gone_hi = data & ~m_sound_state[0];
 	m_sound_state[0] = data;
 
@@ -347,7 +347,7 @@ WRITE8_MEMBER(astinvad_state::kamikaze_sound1_w)
 	if (bits_gone_hi & 0x04) m_samples->start(2, SND_BASEHIT);
 	if (bits_gone_hi & 0x08) m_samples->start(3, SND_INVADERHIT);
 	if (bits_gone_hi & 0x10) m_samples->start(3, SND_INVADERHIT);
-	
+
 	machine().sound().system_enable(data & 0x20);
 }
 
@@ -671,7 +671,7 @@ static MACHINE_CONFIG_DERIVED( spcking2, kamikaze )
 	MCFG_I8255_OUT_PORTA_CB(WRITE8(astinvad_state, spcking2_sound1_w))
 	MCFG_I8255_OUT_PORTB_CB(WRITE8(astinvad_state, spcking2_sound2_w))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(astinvad_state, spcking2_sound3_w))
-	
+
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_RAW_PARAMS(VIDEO_CLOCK, 320, 0, 256, 256, 16, 240)

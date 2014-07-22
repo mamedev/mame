@@ -1400,7 +1400,7 @@ static MACHINE_CONFIG_START( px4, px4_state )
 	// external cassette
 	MCFG_CASSETTE_ADD("extcas")
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_DISABLED)
-	
+
 	MCFG_TIMER_DRIVER_ADD("extcas_timer", px4_state, ext_cassette_read)
 
 	// sio port

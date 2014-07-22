@@ -687,7 +687,7 @@ WRITE8_MEMBER( by133_state::u11_a_w )
 {
 	m_u11_a = data;
 	m_pia_u7->ca1_w(BIT(data, 1));
-  	m_pia_u7->ca2_w(BIT(data, 2));
+	m_pia_u7->ca2_w(BIT(data, 2));
 }
 
 READ8_MEMBER( by133_state::u11_b_r )
@@ -705,7 +705,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( by133_state::u10_timer )
 {
 	m_u10_timer ^= 1;
 	m_pia_u10->cb1_w(m_u10_timer);
-}	
+}
 
 // 555 timer for display refresh
 TIMER_DEVICE_CALLBACK_MEMBER( by133_state::u11_timer )

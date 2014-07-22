@@ -33,4 +33,3 @@ void debugger_none::debugger_update()
 void debugger_none::debugger_exit()
 {
 }
-

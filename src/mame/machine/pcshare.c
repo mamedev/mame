@@ -136,7 +136,7 @@ WRITE_LINE_MEMBER( pcat_base_state::at_pit8254_out2_changed )
 }
 
 
- ADDRESS_MAP_START( pcat32_io_common, AS_IO, 32, pcat_base_state )
+	ADDRESS_MAP_START( pcat32_io_common, AS_IO, 32, pcat_base_state )
 	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE8("dma8237_1", am9517a_device, read, write, 0xffffffff)
 	AM_RANGE(0x0020, 0x003f) AM_DEVREADWRITE8("pic8259_1", pic8259_device, read, write, 0xffffffff)
 	AM_RANGE(0x0040, 0x005f) AM_DEVREADWRITE8("pit8254", pit8254_device, read, write, 0xffffffff)

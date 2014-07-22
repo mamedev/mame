@@ -1,11 +1,11 @@
 /***************************************************************************
 
-	VTech Laser/VZ Memory Expansion Slot
+    VTech Laser/VZ Memory Expansion Slot
 
     license: MAME, GPL-2.0+
     copyright-holders: Dirk Best
 
-	44-pin slot
+    44-pin slot
 
 ***************************************************************************/
 

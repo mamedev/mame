@@ -221,4 +221,3 @@ void radio86_state::video_start()
 {
 	m_charmap = memregion("gfx1")->base();
 }
-

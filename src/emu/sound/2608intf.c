@@ -128,7 +128,7 @@ void ym2608_device::device_post_load()
 void ym2608_device::device_start()
 {
 	ay8910_device::device_start();
-	
+
 	int rate = clock()/72;
 	void *pcmbufa;
 	int  pcmsizea;

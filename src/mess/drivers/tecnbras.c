@@ -5,11 +5,11 @@
   TECNBRAS dot matrix display (70x7 pixels)
   Driver by Felipe Correa da Silva Sanches <juca@members.fsf.org>
 
-	The display is composed of 14 blocks of 5x7 LEDs
+    The display is composed of 14 blocks of 5x7 LEDs
 
-	These LEDs are driven by several 74xx chips:
-	* one 74138
-	* several 74164 and ULN2003 chips
+    These LEDs are driven by several 74xx chips:
+    * one 74138
+    * several 74164 and ULN2003 chips
 
   Changelog:
 
@@ -34,11 +34,11 @@ public:
 	DECLARE_WRITE8_MEMBER(set_x_position_w);
 	DECLARE_WRITE8_MEMBER(print_column_w);
 
-//	DECLARE_WRITE8_MEMBER(tecnbras_io_w);
-//	DECLARE_READ8_MEMBER(tecnbras_io_r);
+//  DECLARE_WRITE8_MEMBER(tecnbras_io_w);
+//  DECLARE_READ8_MEMBER(tecnbras_io_r);
 	DECLARE_DRIVER_INIT(tecnbras);
 private:
-	int m_xcoord; 
+	int m_xcoord;
 	char m_digit[14][7];
 	virtual void machine_start();
 	virtual void machine_reset();
@@ -84,11 +84,11 @@ WRITE8_MEMBER(tecnbras_state::print_column_w)
 void tecnbras_state::machine_start()
 {
 /*
-	for (int x=0; x<14; x++){
-		for (int y=0; y<7; y++){
-			output_set_indexed_value("dmd_", x*7 + y, y);
-		}
-	}
+    for (int x=0; x<14; x++){
+        for (int y=0; y<7; y++){
+            output_set_indexed_value("dmd_", x*7 + y, y);
+        }
+    }
 */
 }
 
@@ -103,17 +103,17 @@ static MACHINE_CONFIG_START( tecnbras, tecnbras_state )
 	MCFG_CPU_IO_MAP(i80c31_io)
 
 /* TODO: Add an I2C RTC (Phillips PCF8583P)
-   pin 6 (SCL): cpu T0/P3.4 (pin 14) 
+   pin 6 (SCL): cpu T0/P3.4 (pin 14)
    pin 5 (SDA): cpu T1/P3.5 (pin 15)
 */
 
 /*
-	TODO: Add a speaker
-	CPU P1.0 (pin 1)
+    TODO: Add a speaker
+    CPU P1.0 (pin 1)
 */
 
 /*
-	TODO: Add a communications port to receive commands from the remote control
+    TODO: Add a communications port to receive commands from the remote control
 */
 
 	/* video hardware */

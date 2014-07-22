@@ -662,4 +662,3 @@ void sh34_base_device::sh4_dma_ddt(struct sh4_ddt_dma *s)
 	sh4_dmac_check(2);
 	sh4_dmac_check(3);
 }
-

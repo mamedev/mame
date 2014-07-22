@@ -69,8 +69,8 @@
 
 
         TODO: I/O is generally a nightmare, probably needs a rebuild at the address level.
-			  Inputs need a sort out.
-			  Some games require dongles for security, need to figure this out.
+              Inputs need a sort out.
+              Some games require dongles for security, need to figure this out.
 ******************************************************************************************/
 #include "emu.h"
 #include "includes/maygay1b.h"
@@ -469,7 +469,7 @@ WRITE8_MEMBER( maygay1b_state::scanlines_w )
 WRITE8_MEMBER( maygay1b_state::lamp_data_w )
 {
 	//The two A/B ports are merged back into one, to make one row of 8 lamps.
-	
+
 	if (m_old_lamp_strobe != m_lamp_strobe)
 	{
 		// Because of the nature of the lamping circuit, there is an element of persistance
@@ -482,7 +482,7 @@ WRITE8_MEMBER( maygay1b_state::lamp_data_w )
 		}
 		m_old_lamp_strobe = m_lamp_strobe;
 	}
-	
+
 }
 
 READ8_MEMBER( maygay1b_state::kbd_r )
@@ -494,7 +494,7 @@ READ8_MEMBER( maygay1b_state::kbd_r )
 WRITE8_MEMBER( maygay1b_state::lamp_data_2_w )
 {
 	//The two A/B ports are merged back into one, to make one row of 8 lamps.
-	
+
 	if (m_old_lamp_strobe2 != m_lamp_strobe2)
 	{
 		// Because of the nature of the lamping circuit, there is an element of persistance
@@ -507,7 +507,7 @@ WRITE8_MEMBER( maygay1b_state::lamp_data_2_w )
 		}
 		m_old_lamp_strobe2 = m_lamp_strobe2;
 	}
-	
+
 }
 
 // machine driver for maygay m1 board /////////////////////////////////
@@ -541,12 +541,12 @@ MACHINE_CONFIG_START( maygay_m1, maygay1b_state )
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("nmitimer", maygay1b_state, maygay1b_nmitimer_callback, attotime::from_hz(75)) // freq?
 	MCFG_DEVICE_ADD("i8279", I8279, M1_MASTER_CLOCK/4)    // unknown clock
-	MCFG_I8279_OUT_SL_CB(WRITE8(maygay1b_state, scanlines_w))	// scan SL lines
-	MCFG_I8279_OUT_DISP_CB(WRITE8(maygay1b_state, lamp_data_w))		// display A&B
-	MCFG_I8279_IN_RL_CB(READ8(maygay1b_state, kbd_r))			// kbd RL lines
-	MCFG_DEVICE_ADD("i8279_2", I8279, M1_MASTER_CLOCK/4)		// unknown clock
-	MCFG_I8279_OUT_DISP_CB(WRITE8(maygay1b_state, lamp_data_2_w))		// display A&B
-	
+	MCFG_I8279_OUT_SL_CB(WRITE8(maygay1b_state, scanlines_w))   // scan SL lines
+	MCFG_I8279_OUT_DISP_CB(WRITE8(maygay1b_state, lamp_data_w))     // display A&B
+	MCFG_I8279_IN_RL_CB(READ8(maygay1b_state, kbd_r))           // kbd RL lines
+	MCFG_DEVICE_ADD("i8279_2", I8279, M1_MASTER_CLOCK/4)        // unknown clock
+	MCFG_I8279_OUT_DISP_CB(WRITE8(maygay1b_state, lamp_data_2_w))       // display A&B
+
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_DEFAULT_LAYOUT(layout_maygay1b)

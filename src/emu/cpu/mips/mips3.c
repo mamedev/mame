@@ -2988,4 +2988,3 @@ void mips3_device::sdr_le(UINT32 op)
 	UINT64 mask = U64(0xffffffffffffffff) << shift;
 	WDOUBLE_MASKED(offs & ~7, RTVAL64 << shift, mask);
 }
-

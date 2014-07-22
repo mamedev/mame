@@ -67,7 +67,7 @@ void neogeo_state::set_pens()
 {
 	const pen_t *pen_base = m_palette->pens() + m_palette_bank + (m_screen_shadow ? 0x2000 : 0);
 	m_sprgen->set_pens(pen_base);
-	m_bg_pen = pen_base + 0xfff; 
+	m_bg_pen = pen_base + 0xfff;
 }
 
 
@@ -104,7 +104,7 @@ WRITE16_MEMBER(neogeo_state::neogeo_paletteram_w)
 	m_palette->set_pen_color(offset,
 								m_palette_lookup[r][dark],
 								m_palette_lookup[g][dark],
-								m_palette_lookup[b][dark]);	// normal
+								m_palette_lookup[b][dark]); // normal
 
 	m_palette->set_pen_color(offset + 0x2000,
 								m_palette_lookup[r][dark+2],
@@ -147,7 +147,6 @@ void neogeo_state::video_start()
 
 void neogeo_state::video_reset()
 {
-
 }
 
 
@@ -274,5 +273,3 @@ WRITE16_MEMBER(neogeo_state::neogeo_video_register_w)
 		}
 	}
 }
-
-

@@ -180,8 +180,8 @@ MC6845_UPDATE_ROW( bbc_state::crtc_update_row )
 			if (((ma>>13)&1)==0)
 			{
 				m_Teletext_Latch=0;
-			} 
-			else 
+			}
+			else
 			{
 				m_Teletext_Latch=(m_BBC_Video_RAM[calculate_video_address(ma+x_pos,ra)]);
 			}

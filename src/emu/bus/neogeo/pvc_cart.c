@@ -135,10 +135,3 @@ void neogeo_pvc_kof2003h_cart::decrypt_all(DECRYPT_ALL_PARAMS)
 	m_cmc_prot->neogeo_cmc50_m1_decrypt(audiocrypt_region, audiocrypt_region_size, audiocpu_region, audio_region_size);
 	m_cmc_prot->kof2000_neogeo_gfx_decrypt(spr_region, spr_region_size, fix_region, fix_region_size, KOF2003_GFX_KEY);
 }
-
-
-
-	
-	
-	
-

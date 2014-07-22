@@ -230,12 +230,12 @@ ppc_device::ppc_device(const machine_config &mconfig, device_type type, const ch
 }
 
 //ppc403_device::ppc403_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-//	: ppc_device(mconfig, PPC403, "PPC403", tag, owner, clock, "ppc403", 32?, 64?)
+//  : ppc_device(mconfig, PPC403, "PPC403", tag, owner, clock, "ppc403", 32?, 64?)
 //{
 //}
 //
 //ppc405_device::ppc405_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-//	: ppc_device(mconfig, PPC405, "PPC405", tag, owner, clock, "ppc405", 32?, 64?)
+//  : ppc_device(mconfig, PPC405, "PPC405", tag, owner, clock, "ppc405", 32?, 64?)
 //{
 //}
 
@@ -2886,4 +2886,3 @@ void ppc4xx_device::ppc4xx_set_dcr_write_handler(write32_delegate dcr_write_func
 {
 	m_dcr_write_func = dcr_write_func;
 }
-

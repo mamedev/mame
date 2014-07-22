@@ -48,15 +48,15 @@ NETLIB_START(9316_subABCD)
 
 NETLIB_RESET(9316_subABCD)
 {
-    m_A.inactivate();
-    m_B.inactivate();
-    m_C.inactivate();
-    m_D.inactivate();
+	m_A.inactivate();
+	m_B.inactivate();
+	m_C.inactivate();
+	m_D.inactivate();
 }
 
 ATTR_HOT inline UINT8 NETLIB_NAME(9316_subABCD::read_ABCD)()
 {
-    return (INPLOGIC_PASSIVE(m_D) << 3) | (INPLOGIC_PASSIVE(m_C) << 2) | (INPLOGIC_PASSIVE(m_B) << 1) | (INPLOGIC_PASSIVE(m_A) << 0);
+	return (INPLOGIC_PASSIVE(m_D) << 3) | (INPLOGIC_PASSIVE(m_C) << 2) | (INPLOGIC_PASSIVE(m_B) << 1) | (INPLOGIC_PASSIVE(m_A) << 0);
 }
 
 NETLIB_UPDATE(9316_subABCD)

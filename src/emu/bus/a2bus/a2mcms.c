@@ -7,7 +7,7 @@
     Implementation of the Mountain Computer Music System.
     This was sold standalone and also used as part of the alphaSyntauri
     and SoundChaser systems.
- 
+
 *********************************************************************/
 
 #include "a2mcms.h"
@@ -35,7 +35,7 @@ const device_type MCMS = &device_creator<mcms_device>;
 const device_type A2BUS_MCMS1 = &device_creator<a2bus_mcms1_device>;
 const device_type A2BUS_MCMS2 = &device_creator<a2bus_mcms2_device>;
 
-#define ENGINE_TAG	"engine"
+#define ENGINE_TAG  "engine"
 
 #define MCFG_MCMS_IRQ_CALLBACK(_cb) \
 	devcb = &mcms_device::set_irq_cb(*device, DEVCB_##_cb);
@@ -109,7 +109,7 @@ UINT8 a2bus_mcms1_device::read_c0nx(address_space &space, UINT8 offset)
 		m_mcms->control_w(space, CTRL_IRQS, 1);
 	}
 
-	return 0xff; 
+	return 0xff;
 }
 
 // read at Cn00: light gun in bit 7, bits 0-5 = 'random' number
@@ -130,7 +130,7 @@ void a2bus_mcms1_device::write_cnxx(address_space &space, UINT8 offset, UINT8 da
 mcms_device *a2bus_mcms1_device::get_engine(void)
 {
 	return m_mcms;
-}   
+}
 
 WRITE_LINE_MEMBER(a2bus_mcms1_device::irq_w)
 {
@@ -208,7 +208,7 @@ void a2bus_mcms2_device::write_cnxx(address_space &space, UINT8 offset, UINT8 da
 
 
 /*
-	Sound device implementation 
+    Sound device implementation
 */
 
 mcms_device::mcms_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
@@ -257,13 +257,13 @@ void mcms_device::device_timer(emu_timer &timer, device_timer_id tid, int param,
 {
 	if (tid == 0)
 	{
-		m_write_irq(ASSERT_LINE); 
+		m_write_irq(ASSERT_LINE);
 		// clear this IRQ in 10 cycles (?)
 		m_clrtimer->adjust(attotime::from_usec(10), 0);
 	}
 	else if (tid == 1)
 	{
-		m_write_irq(CLEAR_LINE); 
+		m_write_irq(CLEAR_LINE);
 	}
 }
 
@@ -307,7 +307,7 @@ void mcms_device::sound_stream_update(sound_stream &stream, stream_sample_t **in
 	}
 	else
 	{
-		for (i = 0; i < samples; i++) 
+		for (i = 0; i < samples; i++)
 		{
 			outL[i] = outR[i] = 0;
 		}
@@ -319,18 +319,18 @@ WRITE8_MEMBER(mcms_device::voiceregs_w)
 	m_stream->update();
 	if (offset >= 0x20)
 	{
-		if (offset & 1)	// amp
+		if (offset & 1) // amp
 		{
 			m_vols[(offset-0x21)/2] = data;
 		}
-		else	// wavetable page
+		else    // wavetable page
 		{
 			m_table[(offset-0x20)/2] = data;
 		}
 	}
 	else
 	{
-		if (offset & 1)	// freq L
+		if (offset & 1) // freq L
 		{
 			if (offset == 0x1f)
 			{
@@ -344,7 +344,7 @@ WRITE8_MEMBER(mcms_device::voiceregs_w)
 				m_freq[reg] |= data;
 			}
 		}
-		else	// freq H
+		else    // freq H
 		{
 			int reg = (offset/2);
 			m_freq[reg] &= 0x00ff;
@@ -369,12 +369,12 @@ WRITE8_MEMBER(mcms_device::control_w)
 			}
 			else
 			{
-				m_timer->adjust(attotime::zero, 0, attotime::from_hz(125)); 
+				m_timer->adjust(attotime::zero, 0, attotime::from_hz(125));
 			}
 			break;
 
 		case CTRL_DMA:
-			m_enabled = (data == 0) ? false : true; 
+			m_enabled = (data == 0) ? false : true;
 			break;
 
 		case CTRL_MASTERVOL:
@@ -382,4 +382,3 @@ WRITE8_MEMBER(mcms_device::control_w)
 			break;
 	}
 }
-

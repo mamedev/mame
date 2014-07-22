@@ -21,7 +21,7 @@
 
 const device_type A2BUS_DISKIING = &device_creator<a2bus_diskiing_device>;
 
-#define WOZFDC_TAG		   "wozfdc"
+#define WOZFDC_TAG         "wozfdc"
 #define DISKII_ROM_REGION  "diskii_rom"
 
 static SLOT_INTERFACE_START( a2_floppies )
@@ -120,4 +120,3 @@ UINT8 a2bus_diskiing_device::read_cnxx(address_space &space, UINT8 offset)
 {
 	return m_rom[offset];
 }
-

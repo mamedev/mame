@@ -32,7 +32,7 @@ cassette_image_device::cassette_image_device(const machine_config &mconfig, cons
 	m_formats(cassette_default_formats),
 	m_create_opts(NULL),
 	m_default_state(CASSETTE_PLAY),
-	m_interface(NULL)	
+	m_interface(NULL)
 {
 }
 

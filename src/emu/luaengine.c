@@ -44,7 +44,7 @@ const char *const lua_engine::tname_ioport = "lua.ioport";
 lua_engine* lua_engine::luaThis = NULL;
 
 
-static void lstop(lua_State *L, lua_Debug *ar) 
+static void lstop(lua_State *L, lua_Debug *ar)
 {
 	(void)ar;  /* unused arg. */
 	lua_sethook(L, NULL, 0, 0);
@@ -52,15 +52,15 @@ static void lstop(lua_State *L, lua_Debug *ar)
 }
 
 
-static void laction(int i) 
+static void laction(int i)
 {
 	signal(i, SIG_DFL); /* if another SIGINT happens before lstop,
-							  terminate process (default action) */
+                              terminate process (default action) */
 	lua_sethook(globalL, lstop, LUA_MASKCALL | LUA_MASKRET | LUA_MASKCOUNT, 1);
 }
 
 int lua_engine::report(int status) {
-	if (status != LUA_OK && !lua_isnil(m_lua_state, -1)) 
+	if (status != LUA_OK && !lua_isnil(m_lua_state, -1))
 	{
 		const char *msg = lua_tostring(m_lua_state, -1);
 		if (msg == NULL) msg = "(error object is not a string)";
@@ -73,21 +73,21 @@ int lua_engine::report(int status) {
 }
 
 
-static int traceback (lua_State *L) 
+static int traceback (lua_State *L)
 {
-  const char *msg = lua_tostring(L, 1);
-  if (msg)
-    luaL_traceback(L, L, msg, 1);
-  else if (!lua_isnoneornil(L, 1)) 
-  {  /* is there an error object? */
-    if (!luaL_callmeta(L, 1, "__tostring"))  /* try its 'tostring' metamethod */
-      lua_pushliteral(L, "(no error message)");
-  }
-  return 1;
+	const char *msg = lua_tostring(L, 1);
+	if (msg)
+	luaL_traceback(L, L, msg, 1);
+	else if (!lua_isnoneornil(L, 1))
+	{  /* is there an error object? */
+	if (!luaL_callmeta(L, 1, "__tostring"))  /* try its 'tostring' metamethod */
+		lua_pushliteral(L, "(no error message)");
+	}
+	return 1;
 }
 
 
-int lua_engine::docall(int narg, int nres) 
+int lua_engine::docall(int narg, int nres)
 {
 	int status;
 	int base = lua_gettop(m_lua_state) - narg;  /* function index */
@@ -105,13 +105,13 @@ int lua_engine::docall(int narg, int nres)
 #define EOFMARK     "<eof>"
 #define marklen     (sizeof(EOFMARK)/sizeof(char) - 1)
 
-int lua_engine::incomplete(int status) 
+int lua_engine::incomplete(int status)
 {
-	if (status == LUA_ERRSYNTAX) 
+	if (status == LUA_ERRSYNTAX)
 	{
 		size_t lmsg;
 		const char *msg = lua_tolstring(m_lua_state, -1, &lmsg);
-		if (lmsg >= marklen && strcmp(msg + lmsg - marklen, EOFMARK) == 0) 
+		if (lmsg >= marklen && strcmp(msg + lmsg - marklen, EOFMARK) == 0)
 		{
 			lua_pop(m_lua_state, 1);
 			return 1;
@@ -192,7 +192,7 @@ int lua_engine::l_ioport_write(lua_State *L)
 {
 	ioport_field *field = static_cast<ioport_field *>(getparam(L, 1, tname_ioport));
 	luaL_argcheck(L, lua_isnumber(L, 2), 2, "value expected");
-    field->set_value(lua_tointeger(L, 2));
+	field->set_value(lua_tointeger(L, 2));
 	return 0;
 }
 
@@ -225,16 +225,16 @@ int lua_engine::l_emu_time(lua_State *L)
 
 void lua_engine::emu_after_done(void *_h, INT32 param)
 {
-    hook *h = static_cast<hook *>(_h);
-    h->call(this, h->precall(), 0);
-    delete h;
+	hook *h = static_cast<hook *>(_h);
+	h->call(this, h->precall(), 0);
+	delete h;
 }
 
 int lua_engine::emu_after(lua_State *L)
 {
 	luaL_argcheck(L, lua_isnumber(L, 1), 1, "waiting duration expected");
-    struct hook *h = new hook;
-    h->set(L, 2);
+	struct hook *h = new hook;
+	h->set(L, 2);
 	machine().scheduler().timer_set(attotime::from_double(lua_tonumber(L, 1)), timer_expired_delegate(FUNC(lua_engine::emu_after_done), this), 0, h);
 	return 0;
 }
@@ -291,37 +291,37 @@ int lua_engine::l_emu_hook_output(lua_State *L)
 
 void *lua_engine::checkparam(lua_State *L, int idx, const char *tname)
 {
-  const char *name;
+	const char *name;
 
-  if(!lua_getmetatable(L, idx))
-    return 0;
+	if(!lua_getmetatable(L, idx))
+	return 0;
 
-  lua_rawget(L, LUA_REGISTRYINDEX);
-  name = lua_tostring(L, -1);
-  if(!name || strcmp(name, tname)) {
-    lua_pop(L, 1);
-    return 0;
-  }
-  lua_pop(L, 1);
+	lua_rawget(L, LUA_REGISTRYINDEX);
+	name = lua_tostring(L, -1);
+	if(!name || strcmp(name, tname)) {
+	lua_pop(L, 1);
+	return 0;
+	}
+	lua_pop(L, 1);
 
-  return *static_cast<void **>(lua_touserdata(L, idx));
+	return *static_cast<void **>(lua_touserdata(L, idx));
 }
 
 void *lua_engine::getparam(lua_State *L, int idx, const char *tname)
 {
 	void *p = checkparam(L, idx, tname);
-  char msg[256];
-  sprintf(msg, "%s expected", tname);
-  luaL_argcheck(L, p, idx, msg);
-  return p;
+	char msg[256];
+	sprintf(msg, "%s expected", tname);
+	luaL_argcheck(L, p, idx, msg);
+	return p;
 }
 
 void lua_engine::push(lua_State *L, void *p, const char *tname)
 {
-  void **pp = static_cast<void **>(lua_newuserdata(L, sizeof(void *)));
-  *pp = p;
-  luaL_getmetatable(L, tname);
-  lua_setmetatable(L, -2);
+	void **pp = static_cast<void **>(lua_newuserdata(L, sizeof(void *)));
+	*pp = p;
+	luaL_getmetatable(L, tname);
+	lua_setmetatable(L, -2);
 }
 
 int lua_engine::l_emu_exit(lua_State *L)
@@ -333,10 +333,10 @@ int lua_engine::l_emu_exit(lua_State *L)
 int lua_engine::l_emu_start(lua_State *L)
 {
 	const char *system_name = luaL_checkstring(L,1);
-	
+
 	int index = driver_list::find(system_name);
 	if (index != -1) {
-		machine_manager::instance()->schedule_new_driver(driver_list::driver(index));	
+		machine_manager::instance()->schedule_new_driver(driver_list::driver(index));
 		luaThis->machine().schedule_hard_reset();
 	}
 	return 1;
@@ -377,14 +377,14 @@ void lua_engine::serve_lua()
 	fflush(stdout);
 	char buff[LUA_MAXINPUT];
 	astring oldbuff;
-	
+
 	const char *b = LUA_PROMPT;
-	
+
 	do {
 		// Wait for input
-		fputs(b, stdout); fflush(stdout);  /* show prompt */ 		
+		fputs(b, stdout); fflush(stdout);  /* show prompt */
 		fgets(buff, LUA_MAXINPUT, stdin);
-		
+
 		// Create message
 		osd_lock_acquire(lock);
 		if (msg.ready == 0) {
@@ -395,7 +395,7 @@ void lua_engine::serve_lua()
 			msg.done = 0;
 		}
 		osd_lock_release(lock);
-		
+
 		// Wait for response
 		int done = 0;
 		do {
@@ -417,7 +417,7 @@ void lua_engine::serve_lua()
 		}
 		msg.done = 0;
 		osd_lock_release(lock);
-		
+
 	} while (1);
 }
 
@@ -439,16 +439,16 @@ lua_engine::lua_engine()
 	luaThis = this;
 	m_lua_state = luaL_newstate();  /* create state */
 	output_notifier_set = false;
-	
+
 	luaL_checkversion(m_lua_state);
 	lua_gc(m_lua_state, LUA_GCSTOP, 0);  /* stop collector during initialization */
 	luaL_openlibs(m_lua_state);  /* open libraries */
-	
+
 	luaopen_lsqlite3(m_lua_state);
-	
+
 	luaopen_ioport(m_lua_state);
 
-	lua_gc(m_lua_state, LUA_GCRESTART, 0);		
+	lua_gc(m_lua_state, LUA_GCRESTART, 0);
 	msg.ready = 0;
 	msg.status = 0;
 	msg.done = 0;
@@ -466,9 +466,9 @@ lua_engine::~lua_engine()
 
 
 void lua_engine::update_machine()
-{	
+{
 	lua_newtable(m_lua_state);
-	if (m_machine!=NULL) 
+	if (m_machine!=NULL)
 	{
 		// Create the ioport array
 		ioport_port *port = machine().ioport().first_port();
@@ -501,8 +501,8 @@ void lua_engine::initialize()
 			.addCFunction ("time",        l_emu_time )
 			.addCFunction ("wait",        l_emu_wait )
 			.addCFunction ("after",       l_emu_after )
-			.addCFunction ("exit",		  l_emu_exit )
-			.addCFunction ("start", 	  l_emu_start )
+			.addCFunction ("exit",        l_emu_exit )
+			.addCFunction ("start",       l_emu_start )
 			.beginClass <machine_manager> ("manager")
 				.addFunction ("machine", &machine_manager::machine)
 				.addFunction ("options", &machine_manager::options)
@@ -531,8 +531,8 @@ void lua_engine::start_console()
 
 void lua_engine::periodic_check()
 {
-  osd_lock_acquire(lock);
-  if (msg.ready == 1) {
+	osd_lock_acquire(lock);
+	if (msg.ready == 1) {
 	lua_settop(m_lua_state, 0);
 	int status = luaL_loadbuffer(m_lua_state, msg.text.cstr(), strlen(msg.text.cstr()), "=stdin");
 	if (incomplete(status)==0)  /* cannot try to add lines? */
@@ -548,19 +548,19 @@ void lua_engine::periodic_check()
 				luai_writestringerror("%s\n", lua_pushfstring(m_lua_state,
 				"error calling " LUA_QL("print") " (%s)",
 				lua_tostring(m_lua_state, -1)));
-	  }	
+		}
 	}
-	else 
+	else
 	{
-	  status = -1;
+		status = -1;
 	}
 	msg.status = status;
 	msg.response = msg.text;
 	msg.text = "";
 	msg.ready = 0;
 	msg.done = 1;
-  }
-  osd_lock_release(lock);
+	}
+	osd_lock_release(lock);
 }
 
 //-------------------------------------------------
@@ -570,7 +570,7 @@ void lua_engine::periodic_check()
 void lua_engine::close()
 {
 	lua_settop(m_lua_state, 0);  /* clear stack */
-	lua_close(m_lua_state);	
+	lua_close(m_lua_state);
 }
 
 //-------------------------------------------------
@@ -580,7 +580,7 @@ void lua_engine::close()
 void lua_engine::load_script(const char *filename)
 {
 	int s = luaL_loadfile(m_lua_state, filename);
-	report(s);	
+	report(s);
 	update_machine();
 	start();
 }
@@ -592,7 +592,7 @@ void lua_engine::load_script(const char *filename)
 void lua_engine::load_string(const char *value)
 {
 	int s = luaL_loadstring(m_lua_state, value);
-	report(s);	
+	report(s);
 	update_machine();
 	start();
 }
@@ -605,4 +605,3 @@ void lua_engine::start()
 {
 	resume(m_lua_state);
 }
-

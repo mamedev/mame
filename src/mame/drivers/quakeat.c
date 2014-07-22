@@ -110,7 +110,6 @@ INPUT_PORTS_END
 
 void quakeat_state::machine_start()
 {
-
 }
 /*************************************************************/
 

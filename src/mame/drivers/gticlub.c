@@ -260,7 +260,7 @@ public:
 		m_k001006_2(*this, "k001006_2"),
 		m_generic_paletteram_32(*this, "paletteram"),
 		m_konppc(*this, "konppc") { }
-		
+
 	// TODO: Needs verification on real hardware
 	static const int m_sound_timer_usec = 2400;
 
@@ -995,7 +995,7 @@ static MACHINE_CONFIG_START( gticlub, gticlub_state )
 	MCFG_RF5C400_ADD("rfsnd", XTAL_33_8688MHz/2)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-	
+
 	MCFG_DEVICE_ADD("konppc", KONPPC, 0)
 	MCFG_KONPPC_CGBOARD_NUMBER(1)
 	MCFG_KONPPC_CGBOARD_TYPE(CGBOARD_TYPE_GTICLUB)
@@ -1074,7 +1074,7 @@ static MACHINE_CONFIG_START( hangplt, gticlub_state )
 	MCFG_VOODOO_SCREEN_TAG("lscreen")
 	MCFG_VOODOO_CPU_TAG("dsp")
 	MCFG_VOODOO_VBLANK_CB(WRITELINE(gticlub_state,voodoo_vblank_0))
-	
+
 	MCFG_DEVICE_ADD("voodoo1", VOODOO_1, STD_VOODOO_1_CLOCK)
 	MCFG_VOODOO_FBMEM(2)
 	MCFG_VOODOO_TMUMEM(2,2)
@@ -1133,7 +1133,7 @@ static MACHINE_CONFIG_START( hangplt, gticlub_state )
 	MCFG_RF5C400_ADD("rfsnd", XTAL_33_8688MHz/2)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-	
+
 	MCFG_DEVICE_ADD("konppc", KONPPC, 0)
 	MCFG_KONPPC_CGBOARD_NUMBER(2)
 	MCFG_KONPPC_CGBOARD_TYPE(CGBOARD_TYPE_HANGPLT)

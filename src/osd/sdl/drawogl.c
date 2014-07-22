@@ -1143,7 +1143,7 @@ static int drawogl_window_draw(sdl_window_info *window, UINT32 dc, int update)
 #else
 	if (!sdl->init_context)
 	{
-		screen_device_iterator myiter(window->machine().root_device()); 
+		screen_device_iterator myiter(window->machine().root_device());
 		for (screen = myiter.first(); screen != NULL; screen = myiter.next())
 		{
 			if (window->index == 0)
@@ -1166,9 +1166,9 @@ static int drawogl_window_draw(sdl_window_info *window, UINT32 dc, int update)
 	{
 		// do some one-time OpenGL setup
 #if (SDLMAME_SDL2)
-	    // FIXME: SRGB conversion is working on SDL2, may be of use
-	    // when we eventually target gamma and monitor profiles.
-        //glEnable(GL_FRAMEBUFFER_SRGB);
+		// FIXME: SRGB conversion is working on SDL2, may be of use
+		// when we eventually target gamma and monitor profiles.
+		//glEnable(GL_FRAMEBUFFER_SRGB);
 #endif
 		glShadeModel(GL_SMOOTH);
 		glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
@@ -1644,13 +1644,13 @@ static void texture_compute_type_subroutine(sdl_info *sdl, const render_texinfo 
 	}
 
 	if ( texture->type == TEXTURE_TYPE_NONE && sdl->useglsl &&
-		 texture->xprescale == 1 && texture->yprescale == 1 &&
-		 texsource->rowpixels <= sdl->texture_max_width )
-	 {
-		 texture->type      = TEXTURE_TYPE_SHADER;
-		 texture->texTarget = GL_TEXTURE_2D;
-		 texture->texpow2   = sdl->texpoweroftwo;
-	 }
+			texture->xprescale == 1 && texture->yprescale == 1 &&
+			texsource->rowpixels <= sdl->texture_max_width )
+		{
+			texture->type      = TEXTURE_TYPE_SHADER;
+			texture->texTarget = GL_TEXTURE_2D;
+			texture->texpow2   = sdl->texpoweroftwo;
+		}
 
 	// determine if we can skip the copy step
 	// if this was not already decided by the shader condition above
@@ -2312,7 +2312,7 @@ INLINE void copyline_palette16(UINT32 *dst, const UINT16 *src, int width, const 
 	{
 		int srcpix = *src++;
 		for (int x2 = 0; x2 < xprescale; x2++)
-			*dst++ = 0xff000000 | palette[srcpix]; 
+			*dst++ = 0xff000000 | palette[srcpix];
 	}
 	if (xborderpix)
 		*dst++ = 0xff000000 | palette[*--src];
@@ -2604,7 +2604,7 @@ static void texture_set_data(texture_info *texture, const render_texinfo *texsou
 		{
 			for (y2 = 0; y2 < texture->yprescale; y2++)
 			{
-				dst = (UINT8 *)(texture->data + (y * texture->yprescale + texture->borderpix + y2) * texture->rawwidth); 
+				dst = (UINT8 *)(texture->data + (y * texture->yprescale + texture->borderpix + y2) * texture->rawwidth);
 
 				switch (PRIMFLAG_GET_TEXFORMAT(flags))
 				{

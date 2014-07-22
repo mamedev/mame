@@ -39,7 +39,7 @@
             bits 0-5: 6-bit audio DAC output
             bit 6: screen blank
             bit 7: OR of NMI from slots
- 
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -157,27 +157,27 @@ READ8_MEMBER(apple3_state::apple3_c0xx_r)
 			pdl_handler(offset);
 			break;
 
-		case 0x60:	// joystick switch 0
+		case 0x60:  // joystick switch 0
 		case 0x68:
 			result = (m_joybuttons->read() & 1) ? 0x80 : 0x00;
 			break;
 
-		case 0x61:	// joystick switch 1 (margin switch for Silentype) 
+		case 0x61:  // joystick switch 1 (margin switch for Silentype)
 		case 0x69:
 			result = (m_joybuttons->read() & 4) ? 0x80 : 0x00;
 			break;
 
-		case 0x62:	// joystick switch 2
+		case 0x62:  // joystick switch 2
 		case 0x6a:
 			result = (m_joybuttons->read() & 2) ? 0x80 : 0x00;
 			break;
 
-		case 0x63:	// joystick switch 3 (serial clock for silentype)
+		case 0x63:  // joystick switch 3 (serial clock for silentype)
 		case 0x6b:
 			result = (m_joybuttons->read() & 8) ? 0x80 : 0x00;
 			break;
 
-		case 0x66:	// paddle A/D conversion done (bit 7 = 1 while counting, 0 when done)
+		case 0x66:  // paddle A/D conversion done (bit 7 = 1 while counting, 0 when done)
 		case 0x6e:
 			return m_ramp_active ? 0x80 : 0x00;
 			break;
@@ -1197,7 +1197,7 @@ void apple3_state::pdl_handler(int offset)
 			}
 			m_pdltimer->adjust(attotime::from_hz(1000000.0));
 			m_ramp_active = true;
-			break; 
+			break;
 
 		case 0x5e:
 			m_analog_sel &= ~2;
@@ -1231,4 +1231,3 @@ TIMER_DEVICE_CALLBACK_MEMBER(apple3_state::paddle_timer)
 		m_pdltimer->adjust(attotime::from_hz(1000000.0));
 	}
 }
-

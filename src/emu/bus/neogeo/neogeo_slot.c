@@ -78,29 +78,29 @@ bool neogeo_cart_slot_device::call_load()
 		{
 			// create memory regions
 			len = get_software_region_length("maincpu");
-			m_cart->rom_alloc(len);	ROM = m_cart->get_rom_base();
+			m_cart->rom_alloc(len); ROM = m_cart->get_rom_base();
 			memcpy(ROM, get_software_region("maincpu"), len);
 
 			len = get_software_region_length("fixed");
-			m_cart->fixed_alloc(len);	ROM8 = m_cart->get_fixed_base();
+			m_cart->fixed_alloc(len);   ROM8 = m_cart->get_fixed_base();
 			memcpy(ROM8, get_software_region("fixed"), len);
 
 			if (get_software_region("audiocpu") != NULL)
 			{
 				len = get_software_region_length("audiocpu");
-				m_cart->audio_alloc(len + 0x10000);	ROM8 = m_cart->get_audio_base();
+				m_cart->audio_alloc(len + 0x10000); ROM8 = m_cart->get_audio_base();
 				memcpy(ROM8, get_software_region("audiocpu"), len);
 				memcpy(ROM8 + 0x10000, get_software_region("audiocpu"), len); // avoid reloading in XML, should just improve banking instead tho?
 			}
 
 			len = get_software_region_length("ymsnd");
-			m_cart->ym_alloc(len);	ROM8 = m_cart->get_ym_base();
+			m_cart->ym_alloc(len);  ROM8 = m_cart->get_ym_base();
 			memcpy(ROM8, get_software_region("ymsnd"), len);
 
 			if (get_software_region("ymsnd.deltat") != NULL)
 			{
 				len = get_software_region_length("ymsnd.deltat");
-				m_cart->ymdelta_alloc(len);	ROM8 = m_cart->get_ymdelta_base();
+				m_cart->ymdelta_alloc(len); ROM8 = m_cart->get_ymdelta_base();
 				memcpy(ROM8, get_software_region("ymsnd.deltat"), len);
 			}
 			else
@@ -110,13 +110,13 @@ bool neogeo_cart_slot_device::call_load()
 
 
 			len = get_software_region_length("sprites");
-			m_cart->sprites_alloc(len);	ROM8 = m_cart->get_sprites_base();
+			m_cart->sprites_alloc(len); ROM8 = m_cart->get_sprites_base();
 			memcpy(ROM8, get_software_region("sprites"), len);
 
 			if (get_software_region("audiocrypt") != NULL)  // encrypted Z80 code
 			{
 				len = get_software_region_length("audiocrypt");
-				m_cart->audiocrypt_alloc(len);	ROM8 = m_cart->get_audiocrypt_base();
+				m_cart->audiocrypt_alloc(len);  ROM8 = m_cart->get_audiocrypt_base();
 				memcpy(ROM8, get_software_region("audiocrypt"), len);
 				// allocate the audiocpu region to decrypt data into
 				m_cart->audio_alloc(len + 0x10000);

@@ -1136,7 +1136,7 @@ static MACHINE_CONFIG_START( bullet, bullet_state )
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
 	MCFG_Z80PIO_OUT_PA_CB(DEVWRITE8("cent_data_out", output_latch_device, write))
 	MCFG_Z80PIO_IN_PB_CB(READ8(bullet_state, pio_pb_r))
-	
+
 	MCFG_MB8877x_ADD(MB8877_TAG, XTAL_16MHz/16)
 	MCFG_WD_FDC_INTRQ_CALLBACK(DEVWRITELINE(Z80DART_TAG, z80dart_device, dcda_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(bullet_state, fdc_drq_w))

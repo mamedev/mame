@@ -84,4 +84,3 @@ void pcm2_prot_device::neo_pcm2_swap(UINT8* ymrom, UINT32 ymsize, int value)
 		src[j]=buf[d]^xordata[value][j&0x7];
 	}
 }
-

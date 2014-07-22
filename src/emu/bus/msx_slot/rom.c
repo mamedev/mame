@@ -62,5 +62,3 @@ READ8_MEMBER(msx_slot_rom_device::read)
 	}
 	return 0xFF;
 }
-
-

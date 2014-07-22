@@ -7,30 +7,30 @@
     Hardware and protection reverse-engineering and general assistance by ElSemi.
     MAME driver by R. Belmont, Olivier Galibert, and ElSemi.
 
-	TODO (updated as for April 2014):
-	- all Model 2B games: FIFO comms looks way wrong, and 3d is mostly missing/incomplete. Games also tends to stalls at some point, culprit might be when i960 tries
-	  to use a burst type opcode read;
-	- Inputs needs device-ification and clean-ups;
-	- Sound comms actually passes thru a 8251-compatible device, hook it up;
-	- daytona: runs at half speed in gameplay;
-	- desert: several 3d bugs, presumably down to FIFO;
-	- dynamcop: stalls at stage select screen;
-	- fvipers: enables timers, but then irq register is empty, hence it crashes with an "interrupt halt" at POST (regression);
-	- lastbrnx: uses external DMA port 0 for uploading SHARC program, hook-up might not be 100% right;
-	- lastbrnx: uses a shitload of unsupported SHARC opcodes (compute_fmul_avg, shift operation 0x11, ALU operation 0x89 (compute_favg));
-	- lastbrnx: eventually crashes in attract mode, geo_parse_nn_s() is the culprit apparently;
-	- manxtt: missing 3d;
-	- motoraid: stalls after course select;
-	- pltkidsa: after few secs of gameplay, background 3d disappears and everything reports a collision against the player;
-	- skytargt: MAME hardlocks after disclaimer screen;
-	- srallyc: opponent cars flickers like wild;
-	- vcop: lightgun input is offsetted;
-	- vcop: sound dies at enter initial screen (i.e. after played the game once);
-	- vcop: tilemap priority bug at stage select screen;
-	- vf2: stalls after disclaimer screen;
-	- vstriker: countdown in team select goes way too fast ...
-	- vstriker: ... meanwhile gameplay is way too slow!?
-	- zeroguna: stalls after some seconds of gameplay;
+    TODO (updated as for April 2014):
+    - all Model 2B games: FIFO comms looks way wrong, and 3d is mostly missing/incomplete. Games also tends to stalls at some point, culprit might be when i960 tries
+      to use a burst type opcode read;
+    - Inputs needs device-ification and clean-ups;
+    - Sound comms actually passes thru a 8251-compatible device, hook it up;
+    - daytona: runs at half speed in gameplay;
+    - desert: several 3d bugs, presumably down to FIFO;
+    - dynamcop: stalls at stage select screen;
+    - fvipers: enables timers, but then irq register is empty, hence it crashes with an "interrupt halt" at POST (regression);
+    - lastbrnx: uses external DMA port 0 for uploading SHARC program, hook-up might not be 100% right;
+    - lastbrnx: uses a shitload of unsupported SHARC opcodes (compute_fmul_avg, shift operation 0x11, ALU operation 0x89 (compute_favg));
+    - lastbrnx: eventually crashes in attract mode, geo_parse_nn_s() is the culprit apparently;
+    - manxtt: missing 3d;
+    - motoraid: stalls after course select;
+    - pltkidsa: after few secs of gameplay, background 3d disappears and everything reports a collision against the player;
+    - skytargt: MAME hardlocks after disclaimer screen;
+    - srallyc: opponent cars flickers like wild;
+    - vcop: lightgun input is offsetted;
+    - vcop: sound dies at enter initial screen (i.e. after played the game once);
+    - vcop: tilemap priority bug at stage select screen;
+    - vf2: stalls after disclaimer screen;
+    - vstriker: countdown in team select goes way too fast ...
+    - vstriker: ... meanwhile gameplay is way too slow!?
+    - zeroguna: stalls after some seconds of gameplay;
 
     OK (controls may be wrong/missing/incomplete)
     --
@@ -548,14 +548,14 @@ CUSTOM_INPUT_MEMBER(model2_state::_1c0001c_r)
 	return iptval;
 }
 
-/*	PORT_DIPSETTING(    0x00, "0" ) // 0: neutral
-	PORT_DIPSETTING(    0x10, "1" ) // 2nd gear
-	PORT_DIPSETTING(    0x20, "2" ) // 1st gear
-	PORT_DIPSETTING(    0x30, "3" )
-	PORT_DIPSETTING(    0x40, "4" )
-	PORT_DIPSETTING(    0x50, "5" ) // 4th gear
-	PORT_DIPSETTING(    0x60, "6" ) // 3rd gear
-	PORT_DIPSETTING(    0x70, "7" )*/
+/*  PORT_DIPSETTING(    0x00, "0" ) // 0: neutral
+    PORT_DIPSETTING(    0x10, "1" ) // 2nd gear
+    PORT_DIPSETTING(    0x20, "2" ) // 1st gear
+    PORT_DIPSETTING(    0x30, "3" )
+    PORT_DIPSETTING(    0x40, "4" )
+    PORT_DIPSETTING(    0x50, "5" ) // 4th gear
+    PORT_DIPSETTING(    0x60, "6" ) // 3rd gear
+    PORT_DIPSETTING(    0x70, "7" )*/
 
 /* Used specifically by Sega Rally, others might be different */
 CUSTOM_INPUT_MEMBER(model2_state::srallyc_gearbox_r)
@@ -774,8 +774,8 @@ WRITE32_MEMBER(model2_state::copro_fifo_w)
 	}
 	else
 	{
-//		if(m_coprocnt == 0)
-//			return;
+//      if(m_coprocnt == 0)
+//          return;
 
 		//osd_printf_debug("copro_fifo_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, space.device().safe_pc());
 		if (m_dsp_type == DSP_TYPE_SHARC)

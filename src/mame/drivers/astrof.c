@@ -1161,7 +1161,7 @@ ROM_START( acombat3 )
 	ROM_LOAD( "c.bin",  0xe400, 0x0400, CRC(0101ab24) SHA1(90e99001ef6890fbc76b4f58cc54df12dfa79e2e) )
 	ROM_LOAD( "b(__acombat3).bin",  0xe800, 0x0400, CRC(4b847950) SHA1(49de63ac72dff22b962fc7b8d7b1c97939072b4a) ) // b.bin
 	ROM_LOAD( "a(__acombat3).bin",  0xec00, 0x0400, CRC(7eb7969b) SHA1(1aaf7af67b544d01a66a1f3d0eda8d42d2c5bb5d) ) // a.bin
- 	ROM_LOAD( "j.bin",  0xf000, 0x0400, CRC(a7e2b47e) SHA1(97eda53dfc7f1914f7df36c13747d1d824b62734) )
+	ROM_LOAD( "j.bin",  0xf000, 0x0400, CRC(a7e2b47e) SHA1(97eda53dfc7f1914f7df36c13747d1d824b62734) )
 	ROM_LOAD( "h.bin",  0xf400, 0x0400, CRC(261ca943) SHA1(17136843f74d2236a5f81f2261b166c02dde138d) )
 	ROM_LOAD( "f.bin",  0xf800, 0x0400, CRC(6ce39b64) SHA1(ba99ddc2d1208afd3f27a9749dac1faca645bbdc) )
 	ROM_LOAD( "e.bin",  0xfc00, 0x0400, CRC(2acae469) SHA1(80019bc645a9919f9ec455452ea3e588d61a563f) )

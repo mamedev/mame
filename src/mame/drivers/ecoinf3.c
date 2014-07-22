@@ -681,7 +681,7 @@ static MACHINE_CONFIG_START( ecoinf3_pyramid, ecoinf3_state )
 	MCFG_I8255_IN_PORTA_CB(READ8(ecoinf3_state, ppi8255_intf_a_read_a))
 	MCFG_I8255_OUT_PORTA_CB(WRITE8(ecoinf3_state, ppi8255_intf_a_write_a_strobedat0))
 	MCFG_I8255_IN_PORTB_CB(READ8(ecoinf3_state, ppi8255_intf_a_read_b))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(ecoinf3_state, ppi8255_intf_a_write_b_strobedat1))	
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(ecoinf3_state, ppi8255_intf_a_write_b_strobedat1))
 	MCFG_I8255_IN_PORTC_CB(READ8(ecoinf3_state, ppi8255_intf_a_read_c))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(ecoinf3_state, ppi8255_intf_a_write_c_strobe))
 
@@ -711,11 +711,11 @@ static MACHINE_CONFIG_START( ecoinf3_pyramid, ecoinf3_state )
 
 	MCFG_DEVICE_ADD("ppi8255_e", I8255, 0)
 	MCFG_I8255_IN_PORTA_CB(READ8(ecoinf3_state, ppi8255_intf_e_read_a))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(ecoinf3_state, ppi8255_intf_e_write_a_alpha_display))	// alpha display characters
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(ecoinf3_state, ppi8255_intf_e_write_a_alpha_display))    // alpha display characters
 	MCFG_I8255_IN_PORTB_CB(READ8(ecoinf3_state, ppi8255_intf_e_read_b))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(ecoinf3_state, ppi8255_intf_e_write_b))	// not written at an appropriate time for it to be a 'send' address for the text
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(ecoinf3_state, ppi8255_intf_e_write_b))  // not written at an appropriate time for it to be a 'send' address for the text
 	MCFG_I8255_IN_PORTC_CB(READ8(ecoinf3_state, ppi8255_intf_e_read_c))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(ecoinf3_state, ppi8255_intf_e_write_c))	// not written at an appropriate time for it to be a 'send' address for the text
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(ecoinf3_state, ppi8255_intf_e_write_c))  // not written at an appropriate time for it to be a 'send' address for the text
 
 	MCFG_DEVICE_ADD("ppi8255_f", I8255, 0)
 	MCFG_I8255_IN_PORTA_CB(READ8(ecoinf3_state, ppi8255_intf_f_read_a))

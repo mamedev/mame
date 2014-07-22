@@ -779,7 +779,7 @@ void dcs_audio_device::dcs_register_state()
 		machine().save().register_postload(save_prepost_delegate(FUNC(dcs_audio_device::sdrc_remap_memory), this));
 }
 
- 
+
 //-------------------------------------------------
 //  dcs_audio_device - constructor
 //-------------------------------------------------
@@ -911,7 +911,7 @@ void dcs2_audio_device::device_start()
 	}
 	if (m_cpu != NULL && !m_cpu->started())
 		throw device_missing_dependencies();
-	
+
 	m_program = &m_cpu->space(AS_PROGRAM);
 	m_data = &m_cpu->space(AS_DATA);
 	m_channels = 2;
@@ -1450,7 +1450,7 @@ void dcs_audio_device::reset_w(int state)
 	/* going high halts the CPU */
 	if (state)
 	{
-		//		logerror("%s: DCS reset = %d\n", machine().describe_context(), state);
+		//      logerror("%s: DCS reset = %d\n", machine().describe_context(), state);
 
 		/* just run through the init code again */
 		machine().scheduler().synchronize(timer_expired_delegate(FUNC(dcs_audio_device::dcs_reset),this));
@@ -2444,7 +2444,7 @@ dcs2_audio_device::dcs2_audio_device(const machine_config &mconfig, device_type 
 {
 }
 
-	
+
 const device_type DCS2_AUDIO_2115 = &device_creator<dcs2_audio_2115_device>;
 
 //-------------------------------------------------
@@ -2509,5 +2509,3 @@ machine_config_constructor dcs2_audio_denver_device::device_mconfig_additions() 
 {
 	return MACHINE_CONFIG_NAME( dcs2_audio_denver );
 }
-
-

@@ -57,9 +57,9 @@ static const char *rdregs[16] = {
 	"Command",              // 3
 	"Status",               // 4
 	"Interrupt Status",     // 5
-	"Internal State",		// 6
-	"Current FIFO/Internal State",	// 7
-	"Control Register 1",	// 8
+	"Internal State",       // 6
+	"Current FIFO/Internal State",  // 7
+	"Control Register 1",   // 8
 	"0x9",
 	"0xA",
 	"Control Register 2",
@@ -434,7 +434,7 @@ READ8_MEMBER( ncr539x_device::read )
 WRITE8_MEMBER( ncr539x_device::write )
 {
 	#if VERBOSE
-	//if (offset != 2) 
+	//if (offset != 2)
 	printf("539x: Write %02x @ %s (%02x) (PC=%x)\n", data, wrregs[offset], offset, space.device().safe_pc());
 	#endif
 

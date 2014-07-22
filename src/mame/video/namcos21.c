@@ -127,22 +127,22 @@ VIDEO_START_MEMBER(namcos21_state,namcos21)
 }
 
 
-/*	Palette:
-	    0x0000..0x1fff  sprite palettes (0x10 sets of 0x100 colors)
+/*  Palette:
+        0x0000..0x1fff  sprite palettes (0x10 sets of 0x100 colors)
 
-	    0x2000..0x3fff  polygon palette bank0 (0x10 sets of 0x200 colors)
-	        (in starblade, some palette animation effects are performed here)
+        0x2000..0x3fff  polygon palette bank0 (0x10 sets of 0x200 colors)
+            (in starblade, some palette animation effects are performed here)
 
-	    0x4000..0x5fff  polygon palette bank1 (0x10 sets of 0x200 colors)
+        0x4000..0x5fff  polygon palette bank1 (0x10 sets of 0x200 colors)
 
-	    0x6000..0x7fff  polygon palette bank2 (0x10 sets of 0x200 colors)
+        0x6000..0x7fff  polygon palette bank2 (0x10 sets of 0x200 colors)
 
-	    The polygon-dedicated color sets within a bank typically increase in
-	    intensity from very dark to full intensity.
+        The polygon-dedicated color sets within a bank typically increase in
+        intensity from very dark to full intensity.
 
-	    Probably the selected palette is determined by most significant bits of z-code.
-	    This is not yet hooked up.
-	*/
+        Probably the selected palette is determined by most significant bits of z-code.
+        This is not yet hooked up.
+    */
 
 
 UINT32 namcos21_state::screen_update_namcos21(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

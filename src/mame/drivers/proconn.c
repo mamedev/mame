@@ -266,7 +266,7 @@ INPUT_PORTS_END
 WRITE16_MEMBER(proconn_state::serial_transmit)
 {
 //Don't like the look of this, should be a clock somewhere
- 
+
 	// should probably be in the pios above
 
 	if (offset == 0)
@@ -275,7 +275,7 @@ WRITE16_MEMBER(proconn_state::serial_transmit)
 		{
 			m_vfd->data(data & (1<<i));
 			m_vfd->sclk(1);
-			m_vfd->sclk(0);		
+			m_vfd->sclk(0);
 		}
 	}
 }

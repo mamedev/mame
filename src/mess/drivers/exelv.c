@@ -99,9 +99,9 @@ public:
 	UINT8   m_wx319;    /* data of 74sl374 labeled wx319 */
 	DECLARE_PALETTE_INIT(exelv);
 	TIMER_DEVICE_CALLBACK_MEMBER(exelv_hblank_interrupt);
-	
+
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( exelvision_cartridge );
-	
+
 };
 
 
@@ -223,7 +223,7 @@ static DEVICE_IMAGE_UNLOAD( exelv_cart )
 
 READ8_MEMBER(exelv_state::mailbox_wx319_r)
 {
-    logerror("[TMS7220] reading mailbox %d\n", m_wx319);
+	logerror("[TMS7220] reading mailbox %d\n", m_wx319);
 	return m_wx319;
 }
 
@@ -285,23 +285,23 @@ WRITE8_MEMBER(exelv_state::tms7020_portb_w)
 READ8_MEMBER(exelv_state::tms7041_porta_r)
 {
 	UINT8 data = 0x00;
-    static UINT8 data_last=0;
+	static UINT8 data_last=0;
 
-    // TMS5220 OK
+	// TMS5220 OK
 	data |= m_tms5220c->intq_r() ? 0x08 : 0x00; // A3
 	data |= m_tms5220c->readyq_r() ? 0x80 : 0x00; // A7
 
-    // TMS7220
+	// TMS7220
 	data |= (m_tms7020_portb & 0x01 ) ? 0x04 : 0x00; // A2
 	data |= (m_tms7020_portb & 0x02) ? 0x10 : 0x00; // A4
-	
+
 	// SERIAL PORT
 
-    if (data!=data_last) {
-	    logerror("tms7041_porta_r %x\n",data);
-    }
-    data_last=data;
-    
+	if (data!=data_last) {
+		logerror("tms7041_porta_r %x\n",data);
+	}
+	data_last=data;
+
 	return data;
 }
 
@@ -324,7 +324,7 @@ WRITE8_MEMBER(exelv_state::tms7041_portb_w)
 	m_tms5220c->wsq_w((data & 0x01) ? 1 : 0);
 	m_tms5220c->rsq_w((data & 0x02) ? 1 : 0);
 
-    logerror("TMS7020 %s int1\n",((data & 0x04) ? "clear" : "assert"));
+	logerror("TMS7020 %s int1\n",((data & 0x04) ? "clear" : "assert"));
 	m_maincpu->set_input_line(TMS7000_INT1_LINE, (data & 0x04) ? CLEAR_LINE : ASSERT_LINE);
 
 	/* Check for low->high transition on B6 */
@@ -375,7 +375,7 @@ WRITE8_MEMBER(exelv_state::tms7041_portc_w)
 READ8_MEMBER(exelv_state::tms7041_portd_r)
 {
 	UINT8 data = 0xff;
-	data=m_tms5220c->status_r(space, 0, data); 
+	data=m_tms5220c->status_r(space, 0, data);
 	logerror("tms7041_portd_r\n");
 	return data;
 }
@@ -416,11 +416,11 @@ WRITE8_MEMBER(exelv_state::tms7041_portd_w)
 
 static ADDRESS_MAP_START(tms7020_mem, AS_PROGRAM, 8, exelv_state)
 	AM_RANGE(0x0080, 0x00ff) AM_NOP
-    AM_RANGE(0x0124, 0x0124) AM_DEVREAD("tms3556", tms3556_device, vram_r)
-    AM_RANGE(0x0125, 0x0125) AM_DEVREAD("tms3556", tms3556_device, reg_r)
-    AM_RANGE(0x0128, 0x0128) AM_DEVREAD("tms3556", tms3556_device, initptr_r)
-    AM_RANGE(0x012d, 0x012d) AM_DEVWRITE("tms3556", tms3556_device, reg_w)
-    AM_RANGE(0x012e, 0x012e) AM_DEVWRITE("tms3556", tms3556_device, vram_w)
+	AM_RANGE(0x0124, 0x0124) AM_DEVREAD("tms3556", tms3556_device, vram_r)
+	AM_RANGE(0x0125, 0x0125) AM_DEVREAD("tms3556", tms3556_device, reg_r)
+	AM_RANGE(0x0128, 0x0128) AM_DEVREAD("tms3556", tms3556_device, initptr_r)
+	AM_RANGE(0x012d, 0x012d) AM_DEVWRITE("tms3556", tms3556_device, reg_w)
+	AM_RANGE(0x012e, 0x012e) AM_DEVWRITE("tms3556", tms3556_device, vram_w)
 
 	AM_RANGE(0x0130, 0x0130) AM_READWRITE(mailbox_wx319_r, mailbox_wx318_w)
 	AM_RANGE(0x0200, 0x7fff) AM_ROMBANK("bank1")                                /* system ROM */
@@ -444,11 +444,11 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(tms7040_mem, AS_PROGRAM, 8, exelv_state)
 	AM_RANGE(0x0080, 0x00ff) AM_NOP
-    AM_RANGE(0x0124, 0x0124) AM_DEVREAD("tms3556", tms3556_device, vram_r)
-    AM_RANGE(0x0125, 0x0125) AM_DEVREAD("tms3556", tms3556_device, reg_r)
-    AM_RANGE(0x0128, 0x0128) AM_DEVREAD("tms3556", tms3556_device, initptr_r)
-    AM_RANGE(0x012d, 0x012d) AM_DEVWRITE("tms3556", tms3556_device, reg_w)
-    AM_RANGE(0x012e, 0x012e) AM_DEVWRITE("tms3556", tms3556_device, vram_w)
+	AM_RANGE(0x0124, 0x0124) AM_DEVREAD("tms3556", tms3556_device, vram_r)
+	AM_RANGE(0x0125, 0x0125) AM_DEVREAD("tms3556", tms3556_device, reg_r)
+	AM_RANGE(0x0128, 0x0128) AM_DEVREAD("tms3556", tms3556_device, initptr_r)
+	AM_RANGE(0x012d, 0x012d) AM_DEVWRITE("tms3556", tms3556_device, reg_w)
+	AM_RANGE(0x012e, 0x012e) AM_DEVWRITE("tms3556", tms3556_device, vram_w)
 	AM_RANGE(0x0130, 0x0130) AM_READWRITE(mailbox_wx319_r, mailbox_wx318_w)
 	AM_RANGE(0x0200, 0x7fff) AM_ROMBANK("bank1")                                /* system ROM */
 	AM_RANGE(0x8000, 0xbfff) AM_NOP
@@ -537,7 +537,7 @@ static MACHINE_CONFIG_START( exl100, exelv_state )
 	MCFG_SOUND_ADD("tms5220c", TMS5220C, 640000)
 	// MCFG_TMS52XX_SPEECHROM("vsm")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-	
+
 /* cartridge */
 	MCFG_CARTSLOT_ADD("cart")
 	MCFG_CARTSLOT_EXTENSION_LIST("bin,rom")
@@ -600,7 +600,7 @@ ROM_START(exl100)
 
 	ROM_REGION(0x10000, "tms7041", 0)
 	ROM_LOAD("exl100_7041.bin", 0xf000, 0x1000, CRC(38f6fc7a) SHA1(b71d545664a974d8ad39bdf600c5b9884c3efab6))           /* TMS7041 internal ROM, correct  */
-//	ROM_REGION(0x8000, "vsm", 0)
+//  ROM_REGION(0x8000, "vsm", 0)
 
 	ROM_REGION(0x10000, "user1", ROMREGION_ERASEFF)         /* cartridge area */
 ROM_END
@@ -627,4 +627,3 @@ ROM_END
 /*   YEAR   NAME     PARENT      COMPAT  MACHINE     INPUT   INIT    COMPANY         FULLNAME */
 COMP(1984,  exl100,  0,          0,      exl100,     exelv, driver_device,  0,       "Exelvision",   "EXL 100",  GAME_NOT_WORKING)
 COMP(1986,  exeltel, exl100,     0,      exeltel,    exelv, driver_device,  0,       "Exelvision",   "Exeltel",  GAME_NOT_WORKING)
-

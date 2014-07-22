@@ -434,13 +434,13 @@ WRITE_LINE_MEMBER(gimix_state::fdc_drq_w)
 		{
 			// write to disk
 			m_fdc->data_w(m_ram->read(m_dma_current_addr));
-//			logerror("DMA: read from RAM %05x\n",m_dma_current_addr);
+//          logerror("DMA: read from RAM %05x\n",m_dma_current_addr);
 		}
 		else
 		{
 			// read from disk
 			m_ram->write(m_dma_current_addr,m_fdc->data_r());
-//			logerror("DMA: write to RAM %05x\n",m_dma_current_addr);
+//          logerror("DMA: write to RAM %05x\n",m_dma_current_addr);
 		}
 		m_dma_current_addr++;
 	}
@@ -621,15 +621,15 @@ ROM_START( gimix )
 	/* CPU board U4: gimixf8.bin  - checksum 68DB - 2716 - GMXBUG09 V2.1 | (c)1981 GIMIX | $F800 I2716 */
 		ROM_LOAD( "gimixf8.u4",  0x000000, 0x000800, CRC(7d60f838) SHA1(eb7546e8bbf50d33e181f3e86c3e4c5c9032cab2) )
 /* CPU board U5: gimixv14.bin - checksum 97E2 - 2716 - GIMIX 6809 | AUTOBOOT | V1.4 I2716 */
-        ROM_LOAD( "gimixv14.u5", 0x000800, 0x000800, CRC(f795b8b9) SHA1(eda2de51cc298d94b36605437d900ce971b3b276) )
+		ROM_LOAD( "gimixv14.u5", 0x000800, 0x000800, CRC(f795b8b9) SHA1(eda2de51cc298d94b36605437d900ce971b3b276) )
 /* CPU board U6: os9l1v11.bin - checksum 2C84 - 2716 - OS-9tmL1 V1 | GIMIX P1 " (c)1982 MSC
    CPU board U7: os9l1v12.bin - checksum 7694 - 2716 - OS-9tmL1 V1 | GIMIX P2-68 | (c)1982 MSC */
-        ROM_LOAD( "os9l1v11.u6", 0x001000, 0x000800, CRC(0d6527a0) SHA1(1435a22581c6e9e0ae338071a72eed646f429530) )
-        ROM_LOAD( "os9l1v12.u7", 0x001800, 0x000800, CRC(b3c65feb) SHA1(19d1ea1e84473b25c95cbb8449e6b9828567e998) )
+		ROM_LOAD( "os9l1v11.u6", 0x001000, 0x000800, CRC(0d6527a0) SHA1(1435a22581c6e9e0ae338071a72eed646f429530) )
+		ROM_LOAD( "os9l1v12.u7", 0x001800, 0x000800, CRC(b3c65feb) SHA1(19d1ea1e84473b25c95cbb8449e6b9828567e998) )
 
 /* Hard drive controller board 2 (XEBEC board) 11H: gimixhd.bin - checksum 2436 - 2732 - 104521D */
-   	ROM_REGION( 0x10000, "xebec", 0)
-        ROM_LOAD( "gimixhd.h11",  0x000000, 0x001000, CRC(35c12201) SHA1(51ac9052f9757d79c7f5bd3aa5d8421e98cfcc37) )
+	ROM_REGION( 0x10000, "xebec", 0)
+		ROM_LOAD( "gimixhd.h11",  0x000000, 0x001000, CRC(35c12201) SHA1(51ac9052f9757d79c7f5bd3aa5d8421e98cfcc37) )
 ROM_END
 
 COMP( 1980, gimix,    0,      0,      gimix,        gimix, driver_device, 0,      "Gimix",  "Gimix 6809 System",  GAME_IS_SKELETON | GAME_NOT_WORKING | GAME_NO_SOUND )

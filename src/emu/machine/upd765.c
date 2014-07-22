@@ -2523,5 +2523,3 @@ WRITE8_MEMBER(tc8566af_device::cr1_w)
 		tc_w((m_cr1 & 0x01) ? true : false);
 	}
 }
-
-

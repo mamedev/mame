@@ -243,7 +243,7 @@ public:
 			UINT8 *_dest = reinterpret_cast<UINT8 *>(dest);
 
 			for (int chdlba = 0; chdlba < lenlba; chdlba++)
-			{	
+			{
 				// find current frame's track number
 				int tracknum = m_toc->numtrks;
 				for (int track = 0; track < m_toc->numtrks; track++)

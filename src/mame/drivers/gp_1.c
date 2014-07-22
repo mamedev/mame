@@ -290,7 +290,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( gp_1_state::zero_timer )
 {
 	m_ctc->trg2(0);
 	m_ctc->trg2(1);
-}	
+}
 
 static const z80_daisy_config daisy_chain[] =
 {

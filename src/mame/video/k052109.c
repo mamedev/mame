@@ -220,18 +220,18 @@ void k052109_device::device_start()
 	m_videoram2_F = &m_ram[0x4000];
 	m_videoram2_A = &m_ram[0x4800];
 	m_videoram2_B = &m_ram[0x5000];
-	
+
 	m_tilemap[0] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(k052109_device::get_tile_info0),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 	m_tilemap[1] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(k052109_device::get_tile_info1),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 	m_tilemap[2] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(k052109_device::get_tile_info2),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
-	
+
 	m_tilemap[0]->set_transparent_pen(0);
 	m_tilemap[1]->set_transparent_pen(0);
 	m_tilemap[2]->set_transparent_pen(0);
-	
+
 	// bind callbacks
 	m_k052109_cb.bind_relative_to(*owner());
-	
+
 	save_pointer(NAME(m_ram), 0x6000);
 	save_item(NAME(m_rmrd_line));
 	save_item(NAME(m_romsubbank));
@@ -292,7 +292,7 @@ READ8_MEMBER( k052109_device::read )
 	else    /* Punk Shot and TMNT read from 0000-1fff, Aliens from 2000-3fff */
 	{
 		assert (m_char_size != 0);
-		
+
 		int code = (offset & 0x1fff) >> 5;
 		int color = m_romsubbank;
 		int flags = 0;

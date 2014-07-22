@@ -2,8 +2,8 @@
 
     a1cffa.c
 
-	Rich Dreher's Compact Flash for Apple I
- 
+    Rich Dreher's Compact Flash for Apple I
+
 *********************************************************************/
 
 #include "a1cffa.h"
@@ -153,4 +153,3 @@ WRITE8_MEMBER(a1bus_cffa_device::cffa_w)
 
 	}
 }
-

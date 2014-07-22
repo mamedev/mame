@@ -1,13 +1,13 @@
 /***************************************************************************
 
-	Akiko
+    Akiko
 
-	ASIC used in the Amiga CD32. Commodore Part number 391563-01.
+    ASIC used in the Amiga CD32. Commodore Part number 391563-01.
 
-	- CD-ROM controller
-	- Builtin 1KB NVRAM
-	- Chunky to planar converter
-	- 2x CIA chips
+    - CD-ROM controller
+    - Builtin 1KB NVRAM
+    - Chunky to planar converter
+    - 2x CIA chips
 
 ***************************************************************************/
 

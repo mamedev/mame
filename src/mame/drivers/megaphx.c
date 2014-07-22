@@ -349,10 +349,10 @@ WRITE8_MEMBER(megaphx_state::port_c_w)
 
 
 static ADDRESS_MAP_START( megaphx_pic_io_map, AS_IO, 8, megaphx_state )
-//	AM_RANGE(0x00, 0x00) AM_WRITE(playmark_oki_banking_w)
-//	AM_RANGE(0x01, 0x01) AM_READWRITE(playmark_snd_command_r, playmark_oki_w)
-//	AM_RANGE(0x02, 0x02) AM_READWRITE(playmark_snd_flag_r, playmark_snd_control_w)
-//	AM_RANGE(PIC16C5x_T0, PIC16C5x_T0) AM_READ(PIC16C5X_T0_clk_r)
+//  AM_RANGE(0x00, 0x00) AM_WRITE(playmark_oki_banking_w)
+//  AM_RANGE(0x01, 0x01) AM_READWRITE(playmark_snd_command_r, playmark_oki_w)
+//  AM_RANGE(0x02, 0x02) AM_READWRITE(playmark_snd_flag_r, playmark_snd_control_w)
+//  AM_RANGE(PIC16C5x_T0, PIC16C5x_T0) AM_READ(PIC16C5X_T0_clk_r)
 ADDRESS_MAP_END
 
 

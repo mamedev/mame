@@ -350,7 +350,7 @@ static void build_command_line(int argc, char *argv[])
 	// identify the version number of the EXE
 	if (!icl_compile)
 		exe_version = get_exe_version(executable);
-	else 
+	else
 		exe_version = 0x00110000; // assume this for ICL
 
 	// special cases

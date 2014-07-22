@@ -1330,7 +1330,7 @@ WRITE_LINE_MEMBER(mpu4_state::pia_ic8_cb2_w)
 	LOG_IC8(("%s: IC8 PIA write CB2 (alpha clock) %02X\n", machine().describe_context(), state & 0xFF));
 
 	// DM Data pin B
-	
+
 	m_vfd->sclk(!state);
 }
 
@@ -2600,7 +2600,7 @@ MACHINE_CONFIG_FRAGMENT( mpu4_common )
 	MCFG_PTM6840_OUT1_CB(WRITE8(mpu4_state, ic2_o2_callback))
 	MCFG_PTM6840_OUT2_CB(WRITE8(mpu4_state, ic2_o3_callback))
 	MCFG_PTM6840_IRQ_CB(WRITELINE(mpu4_state, cpu0_irq))
-	
+
 	MCFG_DEVICE_ADD("pia_ic3", PIA6821, 0)
 	MCFG_PIA_WRITEPA_HANDLER(WRITE8(mpu4_state, pia_ic3_porta_w))
 	MCFG_PIA_WRITEPB_HANDLER(WRITE8(mpu4_state, pia_ic3_portb_w))

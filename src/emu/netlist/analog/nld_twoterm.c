@@ -40,17 +40,17 @@ ATTR_COLD void netlist_generic_diode::save(pstring name, netlist_object_t &paren
 // ----------------------------------------------------------------------------------------
 
 ATTR_COLD NETLIB_NAME(twoterm)::NETLIB_NAME(twoterm)(const family_t afamily)
-        : netlist_device_t(afamily)
+		: netlist_device_t(afamily)
 {
 	m_P.m_otherterm = &m_N;
 	m_N.m_otherterm = &m_P;
 }
 
 ATTR_COLD NETLIB_NAME(twoterm)::NETLIB_NAME(twoterm)()
-        : netlist_device_t(TWOTERM)
+		: netlist_device_t(TWOTERM)
 {
-    m_P.m_otherterm = &m_N;
-    m_N.m_otherterm = &m_P;
+	m_P.m_otherterm = &m_N;
+	m_N.m_otherterm = &m_P;
 }
 
 NETLIB_START(twoterm)
@@ -113,9 +113,9 @@ NETLIB_UPDATE_PARAM(R)
 {
 	//printf("updating %s to %f\n", name().cstr(), m_R.Value());
 
-    // FIXME: Only attached nets should be brought up to current time
-    //netlist().solver()->update_to_current_time(); // bring up current time
-    update_dev();
+	// FIXME: Only attached nets should be brought up to current time
+	//netlist().solver()->update_to_current_time(); // bring up current time
+	update_dev();
 	if (m_R.Value() > 1e-9)
 		set_R(m_R.Value());
 	else
@@ -162,12 +162,12 @@ NETLIB_UPDATE_PARAM(POT)
 		v = (exp(v) - 1.0) / (exp(1.0) - 1.0);
 
 	// FIXME: Only attached nets should be brought up to current time
-    //netlist().solver()->update_to_current_time(); // bring up current time
+	//netlist().solver()->update_to_current_time(); // bring up current time
 
-    m_R1.update_dev();
-    m_R2.update_dev();
+	m_R1.update_dev();
+	m_R2.update_dev();
 
-    m_R1.set_R(MAX(m_R.Value() * v, netlist().gmin()));
+	m_R1.set_R(MAX(m_R.Value() * v, netlist().gmin()));
 	m_R2.set_R(MAX(m_R.Value() * (1.0 - v), netlist().gmin()));
 
 }

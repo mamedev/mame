@@ -170,10 +170,10 @@ static MACHINE_CONFIG_START( sdk86, sdk86_state )
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(sdk86_state, write_usart_clock))
 
 	MCFG_DEVICE_ADD("i8279", I8279, 2500000) // based on divider
-	MCFG_I8279_OUT_SL_CB(WRITE8(sdk86_state, scanlines_w))			// scan SL lines
-	MCFG_I8279_OUT_DISP_CB(WRITE8(sdk86_state, digit_w))			// display A&B
-	MCFG_I8279_IN_RL_CB(READ8(sdk86_state, kbd_r))					// kbd RL lines
-	MCFG_I8279_IN_SHIFT_CB(GND)										// Shift key
+	MCFG_I8279_OUT_SL_CB(WRITE8(sdk86_state, scanlines_w))          // scan SL lines
+	MCFG_I8279_OUT_DISP_CB(WRITE8(sdk86_state, digit_w))            // display A&B
+	MCFG_I8279_IN_RL_CB(READ8(sdk86_state, kbd_r))                  // kbd RL lines
+	MCFG_I8279_IN_SHIFT_CB(GND)                                     // Shift key
 	MCFG_I8279_IN_CTRL_CB(GND)
 
 MACHINE_CONFIG_END

@@ -512,7 +512,7 @@ WRITE8_MEMBER( maygayv1_state::strobe_w )
 WRITE8_MEMBER( maygayv1_state::lamp_data_w )
 {
 	//The two A/B ports are merged back into one, to make one row of 8 lamps.
-	
+
 	if (m_old_lamp_strobe != m_lamp_strobe)
 	{
 		// Because of the nature of the lamping circuit, there is an element of persistance
@@ -525,7 +525,7 @@ WRITE8_MEMBER( maygayv1_state::lamp_data_w )
 		}
 		m_old_lamp_strobe = m_lamp_strobe;
 	}
-	
+
 }
 
 READ8_MEMBER( maygayv1_state::kbd_r )
@@ -897,10 +897,10 @@ static MACHINE_CONFIG_START( maygayv1, maygayv1_state )
 	MCFG_MC68681_A_TX_CALLBACK(WRITELINE(maygayv1_state, duart_txa))
 
 	MCFG_DEVICE_ADD("i8279", I8279, MASTER_CLOCK/4)    // unknown clock
-	MCFG_I8279_OUT_SL_CB(WRITE8(maygayv1_state, strobe_w))		// scan SL lines
-	MCFG_I8279_OUT_DISP_CB(WRITE8(maygayv1_state, lamp_data_w))	// display A&B
-	MCFG_I8279_IN_RL_CB(READ8(maygayv1_state, kbd_r))					// kbd RL lines
-	
+	MCFG_I8279_OUT_SL_CB(WRITE8(maygayv1_state, strobe_w))      // scan SL lines
+	MCFG_I8279_OUT_DISP_CB(WRITE8(maygayv1_state, lamp_data_w)) // display A&B
+	MCFG_I8279_IN_RL_CB(READ8(maygayv1_state, kbd_r))                   // kbd RL lines
+
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymsnd",YM2413, MASTER_CLOCK / 4)

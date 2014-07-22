@@ -151,11 +151,11 @@ MC6845_BEGIN_UPDATE( tapatune_state::crtc_begin_update )
 		int r = m_paletteram[3 * i + 0];
 		int g = m_paletteram[3 * i + 1];
 		int b = m_paletteram[3 * i + 2];
-		
+
 		r = pal6bit(r);
 		g = pal6bit(g);
 		b = pal6bit(b);
-		
+
 		m_pens[i] = rgb_t(r, g, b);
 	}
 }
@@ -513,7 +513,7 @@ static MACHINE_CONFIG_START( tapatune, tapatune_state )
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
-	
+
 	MCFG_MC6845_ADD("crtc", H46505, "screen", XTAL_24MHz / 16)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(5)

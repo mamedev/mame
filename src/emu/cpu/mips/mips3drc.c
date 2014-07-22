@@ -3246,4 +3246,3 @@ void mips3_device::log_opcode_desc(drcuml_state *drcuml, const opcode_desc *desc
 			drcuml->log_printf("-----\n");
 	}
 }
-

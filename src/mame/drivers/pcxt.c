@@ -741,7 +741,7 @@ static MACHINE_CONFIG_FRAGMENT(pcxt)
 	MCFG_ISA_OUT_DRQ1_CB(DEVWRITELINE("dma8237_1", am9517a_device, dreq1_w))
 	MCFG_ISA_OUT_DRQ2_CB(DEVWRITELINE("dma8237_1", am9517a_device, dreq2_w))
 	MCFG_ISA_OUT_DRQ3_CB(DEVWRITELINE("dma8237_1", am9517a_device, dreq3_w))
-	
+
 	/*Sound Hardware*/
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 

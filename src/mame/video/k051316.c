@@ -243,18 +243,18 @@ void k051316_device::wraparound_enable( int status )
 
 ***************************************************************************/
 
-TILE_GET_INFO_MEMBER(k051316_device::get_tile_info) 
-{ 
+TILE_GET_INFO_MEMBER(k051316_device::get_tile_info)
+{
 	int code = m_ram[tile_index];
 	int color = m_ram[tile_index + 0x400];
 	int flags = 0;
-	
+
 	m_k051316_cb(&code, &color, &flags);
-	
+
 	SET_TILE_INFO_MEMBER(0,
-						 code,
-						 color,
-						 flags);	
+							code,
+							color,
+							flags);
 }
 
 

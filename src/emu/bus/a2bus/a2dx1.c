@@ -5,7 +5,7 @@
     a2dx1.c
 
     Implementation of the Decillionix DX-1 sampler card
-						  
+
 *********************************************************************/
 
 #include "a2dx1.h"
@@ -84,13 +84,13 @@ UINT8 a2bus_dx1_device::read_c0nx(address_space &space, UINT8 offset)
 {
 	switch (offset)
 	{
-		case 1:	// ADC input
+		case 1: // ADC input
 			return 0;
 
 		case 3: // busy flag
-			return 0x80;	// indicate not busy
+			return 0x80;    // indicate not busy
 
-		case 7:	// 1-bit ADC input (bit 7 of c0n1, probably)
+		case 7: // 1-bit ADC input (bit 7 of c0n1, probably)
 			return 0;
 	}
 
@@ -101,7 +101,7 @@ void a2bus_dx1_device::write_c0nx(address_space &space, UINT8 offset, UINT8 data
 {
 	switch (offset)
 	{
-		case 5:	// volume
+		case 5: // volume
 			m_volume = data;
 			m_dac->write_unsigned16(data*m_lastdac);
 			break;

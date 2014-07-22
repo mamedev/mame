@@ -512,7 +512,7 @@ ROM_START( vz200de )
 ROM_END
 
 #define rom_laser200    rom_laser110
-#define rom_fellow  	rom_laser110
+#define rom_fellow      rom_laser110
 
 // It's possible that the Texet TX-8000 came with BASIC V1.0, but this needs to be verified
 #define rom_tx8000  rom_laser110
@@ -541,7 +541,7 @@ ROM_START( laser310 )
 	ROMX_LOAD("vtechv21.u12", 0x0000, 0x4000, CRC(f7df980f) SHA1(5ba14a7a2eedca331b033901080fa5d205e245ea), ROM_BIOS(2))
 ROM_END
 
-#define rom_vz300   	rom_laser310
+#define rom_vz300       rom_laser310
 #define rom_laser310h   rom_laser310
 
 

@@ -659,7 +659,7 @@ static MACHINE_CONFIG_DERIVED(eps, vfx)
 	MCFG_FLOPPY_DRIVE_ADD("wd1772:0", ensoniq_floppies, "35dd", esq5505_state::floppy_formats)
 
 	MCFG_DEVICE_ADD("mc68450", HD63450, 0)   // MC68450 compatible
-	MCFG_HD63450_CPU("maincpu")	// CPU - 68000
+	MCFG_HD63450_CPU("maincpu") // CPU - 68000
 	MCFG_HD63450_CLOCKS(attotime::from_usec(32), attotime::from_nsec(450), attotime::from_usec(4), attotime::from_hz(15625/2))
 	MCFG_HD63450_BURST_CLOCKS(attotime::from_usec(32), attotime::from_nsec(450), attotime::from_nsec(50), attotime::from_nsec(50))
 	MCFG_HD63450_DMA_END_CB(WRITE8(esq5505_state, dma_end))

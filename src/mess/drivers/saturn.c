@@ -9,7 +9,7 @@
     Many thanks to Guru, Fabien, Runik and Charles MacDonald for the help given.
 
 ===================================================================================================
- 
+
 Notes:
 -To enter into an Advanced Test Mode,keep pressed the Test Button (F2) on the start-up.
 -Memo: Some tests done on the original & working PCB,to be implemented:

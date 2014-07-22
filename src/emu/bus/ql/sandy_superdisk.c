@@ -17,9 +17,9 @@
 //  MACROS/CONSTANTS
 //**************************************************************************
 
-#define WD1772_TAG		"wd1772"
-#define TTL74273_TAG	"ttl74273"
-#define CENTRONICS_TAG	"centronics"
+#define WD1772_TAG      "wd1772"
+#define TTL74273_TAG    "ttl74273"
+#define CENTRONICS_TAG  "centronics"
 
 
 
@@ -170,20 +170,20 @@ UINT8 sandy_super_disk_t::read(address_space &space, offs_t offset, UINT8 data)
 			case 0:
 				data = m_fdc->read(space, offset & 0x03);
 				break;
-			
+
 			case 3:
 				/*
 
-					bit		description
+				    bit     description
 
-					0 		BUSY
-					1 		
-					2 		
-					3 		
-					4 		
-					5 		
-					6 		
-					7 		
+				    0       BUSY
+				    1
+				    2
+				    3
+				    4
+				    5
+				    6
+				    7
 
 				*/
 
@@ -221,22 +221,22 @@ void sandy_super_disk_t::write(address_space &space, offs_t offset, UINT8 data)
 				{
 				/*
 
-					bit		description
+				    bit     description
 
-					0 		SIDE ONE
-					1 		DSEL0
-					2 		DSEL1
-					3 		M ON0
-					4 		/DDEN
-					5 		STROBE inverted
-					6 		enable printer interrupt
-					7 		
+				    0       SIDE ONE
+				    1       DSEL0
+				    2       DSEL1
+				    3       M ON0
+				    4       /DDEN
+				    5       STROBE inverted
+				    6       enable printer interrupt
+				    7
 
 				*/
 
 				floppy_image_device *floppy = NULL;
 
-				if (BIT(data, 1)) 
+				if (BIT(data, 1))
 				{
 					floppy = m_floppy0->get_device();
 				}

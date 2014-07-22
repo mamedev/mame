@@ -322,8 +322,8 @@ static MACHINE_CONFIG_START( zorba, zorba_state )
 	/* devices */
 	MCFG_DEVICE_ADD("dma", Z80DMA, XTAL_24MHz/6)
 	// busack on cpu connects to bai pin
-	MCFG_Z80DMA_OUT_BUSREQ_CB(WRITELINE(zorba_state, busreq_w))	 //connects to busreq on cpu
-	MCFG_Z80DMA_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))	// connects to IRQ0 on cpu
+	MCFG_Z80DMA_OUT_BUSREQ_CB(WRITELINE(zorba_state, busreq_w))  //connects to busreq on cpu
+	MCFG_Z80DMA_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))   // connects to IRQ0 on cpu
 	//ba0 - not connected
 	MCFG_Z80DMA_IN_MREQ_CB(READ8(zorba_state, memory_read_byte))
 	MCFG_Z80DMA_OUT_MREQ_CB(WRITE8(zorba_state, memory_write_byte))

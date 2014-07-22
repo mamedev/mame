@@ -57,23 +57,23 @@ const device_type WANGPC_LVC = &device_creator<wangpc_lvc_device>;
 MC6845_UPDATE_ROW( wangpc_lvc_device::crtc_update_row )
 {
 	offs_t scroll_y = (((m_scroll >> 8) + 0x15) & 0xff) * 0x80;
-	
+
 	if (OPTION_80_COL)
 	{
 		for (int column = 0; column < x_count; column++)
 		{
 			offs_t addr = scroll_y + (m_scroll & 0x3f) + ((ma / 80) * 0x480) + (((ra & 0x0f) << 7) | (column & 0x7f));
 			UINT16 data = m_video_ram[addr & 0x7fff];
-			
+
 			for (int bit = 0; bit < 8; bit++)
 			{
 				int x = (column * 8) + bit;
 				int color = (BIT(data, 15) << 1) | BIT(data, 7);
-				
+
 				if (column == cursor_x) color = 0x03;
-				
+
 				bitmap.pix32(vbp + y, hbp + x) = de ? m_palette[color] : rgb_t::black;
-				
+
 				data <<= 1;
 			}
 		}
@@ -82,23 +82,23 @@ MC6845_UPDATE_ROW( wangpc_lvc_device::crtc_update_row )
 	{
 		//offs_t addr = scroll_y + ((m_scroll & 0x3f) << 1) + ((ma / 40) * 0x480) + (((ra & 0x0f) << 7));
 		offs_t addr = scroll_y + ((m_scroll & 0x3f) << 1) + (y * 0x80);
-		
+
 		for (int column = 0; column < x_count; column++)
 		{
 			UINT32 data = (m_video_ram[(addr + 1) & 0x7fff] << 16) | m_video_ram[addr & 0x7fff];
-			
+
 			for (int bit = 0; bit < 8; bit++)
 			{
 				int x = (column * 8) + bit;
 				int color = (BIT(data, 31) << 3) | (BIT(data, 23) << 2) | (BIT(data, 15) << 1) | BIT(data, 7);
-				
+
 				if (column == cursor_x) color = 0x03;
-				
+
 				bitmap.pix32(vbp + y, hbp + x) = de ? m_palette[color] : rgb_t::black;
-				
+
 				data <<= 1;
 			}
-			
+
 			addr += 2;
 		}
 	}

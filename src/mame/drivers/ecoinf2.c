@@ -527,14 +527,14 @@ static MACHINE_CONFIG_START( ecoinf2_oxo, ecoinf2_state )
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(ecoinf2_state, ppi8255_ic24_write_c_inhibits))
 
 	MCFG_DEVICE_ADD("ic22_inpt", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(ecoinf2_state, ppi8255_ic22_read_a_levels))	// manual says level switches
+	MCFG_I8255_IN_PORTA_CB(READ8(ecoinf2_state, ppi8255_ic22_read_a_levels))    // manual says level switches
 	MCFG_I8255_IN_PORTB_CB(READ8(ecoinf2_state, ppi8255_ic22_read_b_coins))
-	MCFG_I8255_IN_PORTC_CB(READ8(ecoinf2_state, ppi8255_ic22_read_c_misc))	// 0x20 appears to be meter power
+	MCFG_I8255_IN_PORTC_CB(READ8(ecoinf2_state, ppi8255_ic22_read_c_misc))  // 0x20 appears to be meter power
 
 	MCFG_DEVICE_ADD("ic23_reel", I8255, 0)
 	MCFG_I8255_OUT_PORTA_CB(WRITE8(ecoinf2_state, ppi8255_ic23_write_a_reel01))
 	MCFG_I8255_OUT_PORTB_CB(WRITE8(ecoinf2_state, ppi8255_ic23_write_b_reel23))
-	MCFG_I8255_IN_PORTC_CB(READ8(ecoinf2_state, ppi8255_ic23_read_c_key))	// optos and keys
+	MCFG_I8255_IN_PORTC_CB(READ8(ecoinf2_state, ppi8255_ic23_read_c_key))   // optos and keys
 
 	MCFG_DEVICE_ADD("ic13_leds", I8255, 0)
 	MCFG_I8255_OUT_PORTA_CB(WRITE8(ecoinf2_state, ppi8255_ic13_write_a_strobedat0))

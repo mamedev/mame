@@ -358,7 +358,7 @@ static MACHINE_CONFIG_START( sanremo, sanremo_state )
 
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", CRTC_CLOCK)
 	// *** MC6845 init ***
-	// 
+	//
 	// Register:   00    01    02    03    04    05    06    07    08    09    10    11    12    13    14    15    16    17
 	// Value:     0x45  0x30  0x36  0x0A  0x28  0x00  0x26  0x27  0x00  0x07  0x20  0x0B  0x00  0x00  0x00  0x00  0x00  0x00.
 	MCFG_MC6845_SHOW_BORDER_AREA(false)

@@ -7,7 +7,7 @@
 
 ATTR_HOT inline void NETLIB_NAME(7474sub)::newstate(const UINT8 stateQ, const UINT8 stateQQ)
 {
-    // 0: High-to-low 40 ns, 1: Low-to-high 25 ns
+	// 0: High-to-low 40 ns, 1: Low-to-high 25 ns
 	static const netlist_time delay[2] = { NLTIME_FROM_NS(40), NLTIME_FROM_NS(25) };
 	OUTLOGIC(m_Q, stateQ, delay[stateQ]);
 	OUTLOGIC(m_QQ, stateQQ, delay[stateQQ]);
@@ -25,11 +25,11 @@ NETLIB_UPDATE(7474sub)
 NETLIB_UPDATE(7474)
 {
 	if (INPLOGIC(m_PREQ) && INPLOGIC(m_CLRQ))
-    {
-        m_D.activate();
-        sub.m_nextD = INPLOGIC(m_D);
-        sub.m_CLK.activate_lh();
-    }
+	{
+		m_D.activate();
+		sub.m_nextD = INPLOGIC(m_D);
+		sub.m_CLK.activate_lh();
+	}
 	else if (!INPLOGIC(m_PREQ))
 	{
 		sub.newstate(1, 0);
@@ -43,11 +43,11 @@ NETLIB_UPDATE(7474)
 		m_D.inactivate();
 	}
 	else
-    {
-        sub.newstate(1, 1);
-        sub.m_CLK.inactivate();
-        m_D.inactivate();
-    }
+	{
+		sub.newstate(1, 1);
+		sub.m_CLK.inactivate();
+		m_D.inactivate();
+	}
 }
 
 NETLIB_START(7474)

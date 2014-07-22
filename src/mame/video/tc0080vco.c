@@ -97,7 +97,7 @@ tc0080vco_device::tc0080vco_device(const machine_config &mconfig, const char *ta
 	m_flipscreen(0),
 	m_gfxnum(0),
 	m_txnum(0),
-	m_bg_xoffs(0), 
+	m_bg_xoffs(0),
 	m_bg_yoffs(0),
 	m_bg_flip_yoffs(0),
 	m_has_fg0(1),

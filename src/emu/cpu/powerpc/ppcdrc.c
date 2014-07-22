@@ -3919,4 +3919,3 @@ void ppc_device::log_opcode_desc(drcuml_state *drcuml, const opcode_desc *descli
 			drcuml->log_printf("-----\n");
 	}
 }
-

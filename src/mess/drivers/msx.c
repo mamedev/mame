@@ -1224,7 +1224,7 @@ static MACHINE_CONFIG_START( msx, msx_state )
 
 	/* cassette */
 	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_CASSETTE_FORMATS(fmsx_cassette_formats)	
+	MCFG_CASSETTE_FORMATS(fmsx_cassette_formats)
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY)
 	MCFG_CASSETTE_INTERFACE("msx_cass")
 
@@ -1236,7 +1236,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( msx_ntsc, msx )
 	/* Video hardware */
 	MCFG_DEVICE_ADD( "tms9928a", TMS9928A, XTAL_10_738635MHz / 2 )
- 	MCFG_TMS9928A_VRAM_SIZE(0x4000)
+	MCFG_TMS9928A_VRAM_SIZE(0x4000)
 	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(msx_state,msx_irq_source0))
 	MCFG_TMS9928A_SCREEN_ADD_NTSC( "screen" )
 	MCFG_SCREEN_UPDATE_DEVICE("tms9928a", tms9928a_device, screen_update)
@@ -1246,7 +1246,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( msx_pal, msx )
 	/* Video hardware */
 	MCFG_DEVICE_ADD( "tms9928a", TMS9929A, XTAL_10_738635MHz / 2 )
- 	MCFG_TMS9928A_VRAM_SIZE(0x4000)
+	MCFG_TMS9928A_VRAM_SIZE(0x4000)
 	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(msx_state,msx_irq_source0))
 	MCFG_TMS9928A_SCREEN_ADD_PAL( "screen" )
 	MCFG_SCREEN_UPDATE_DEVICE("tms9928a", tms9928a_device, screen_update)
@@ -1316,7 +1316,7 @@ static MACHINE_CONFIG_START( msx2, msx_state )
 
 	/* cassette */
 	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_CASSETTE_FORMATS(fmsx_cassette_formats)	
+	MCFG_CASSETTE_FORMATS(fmsx_cassette_formats)
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY)
 	MCFG_CASSETTE_INTERFACE("msx_cass")
 
@@ -1384,7 +1384,7 @@ static MACHINE_CONFIG_START( msx2p, msx_state )
 
 	/* cassette */
 	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_CASSETTE_FORMATS(fmsx_cassette_formats)	
+	MCFG_CASSETTE_FORMATS(fmsx_cassette_formats)
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY)
 	MCFG_CASSETTE_INTERFACE("msx_cass")
 
@@ -1462,9 +1462,9 @@ static MACHINE_CONFIG_DERIVED( canonv10, msx_pal )
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
 
-    MCFG_MSX_LAYOUT_ROM("bios", 0, 0, 0, 2, "maincpu", 0x0000)
+	MCFG_MSX_LAYOUT_ROM("bios", 0, 0, 0, 2, "maincpu", 0x0000)
 	MCFG_MSX_LAYOUT_CARTRIDGE("cartslot1", 1, 0)
-    MCFG_MSX_LAYOUT_RAM("ram", 2, 0, 3, 1)   /* 16KB RAM */
+	MCFG_MSX_LAYOUT_RAM("ram", 2, 0, 3, 1)   /* 16KB RAM */
 	MCFG_MSX_LAYOUT_CARTRIDGE("cartslot12", 3, 0)
 
 	MCFG_FRAGMENT_ADD( msx1_cartlist )
@@ -1481,7 +1481,7 @@ static MACHINE_CONFIG_DERIVED( canonv20, msx_pal )
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
 
-    MCFG_MSX_LAYOUT_ROM("bios", 0, 0, 0, 2, "maincpu", 0x0000)
+	MCFG_MSX_LAYOUT_ROM("bios", 0, 0, 0, 2, "maincpu", 0x0000)
 	MCFG_MSX_LAYOUT_CARTRIDGE("cartslot1", 1, 0)
 	MCFG_MSX_LAYOUT_RAM("ram", 2, 0, 0, 4)  /* 64KB RAM */
 	MCFG_MSX_LAYOUT_CARTRIDGE("cartslot2", 3, 0)
@@ -1497,7 +1497,7 @@ ROM_START (pv16)
 ROM_END
 
 static MACHINE_CONFIG_DERIVED( pv16, msx_ntsc )
-    // AY8910
+	// AY8910
 	// FDC: None, 0 drives
 	// 1 Cartridge slot
 	// No printer port
@@ -2540,7 +2540,7 @@ MACHINE_CONFIG_END
 ROM_START (svi728)
 	ROM_REGION (0xc000, "maincpu", 0)
 	ROM_LOAD ("728bios.rom", 0x0000, 0x8000, CRC(1ce9246c) SHA1(ea6a82cf8c6e65eb30b98755c8577cde8d9186c0))
-//	ROM_LOAD ("707disk.rom", 0x8000, 0x4000, CRC(f9978853) SHA1(6aa856cc56eb98863c9da7a566571605682b5c6b))
+//  ROM_LOAD ("707disk.rom", 0x8000, 0x4000, CRC(f9978853) SHA1(6aa856cc56eb98863c9da7a566571605682b5c6b))
 ROM_END
 
 static MACHINE_CONFIG_DERIVED( svi728, msx_pal )
@@ -4573,7 +4573,7 @@ static MACHINE_CONFIG_DERIVED( hbf500p, msx2_pal )
 	MCFG_MSX_LAYOUT_RAM("ram2", 0, 2, 0, 2)   /* 32KB RAM */
 	MCFG_MSX_LAYOUT_CARTRIDGE("cartslot1", 1, 0)
 	MCFG_MSX_LAYOUT_CARTRIDGE("cartslot2", 2, 0)
-	MCFG_MSX_LAYOUT_ROM("empty", 3, 0, 0, 4, "maincpu", 0x10000)	 // Empty? or is this the 3rd cartridge/expansion slot ? 0x10000 used to be the "special" loading spot for the fmpac rom
+	MCFG_MSX_LAYOUT_ROM("empty", 3, 0, 0, 4, "maincpu", 0x10000)     // Empty? or is this the 3rd cartridge/expansion slot ? 0x10000 used to be the "special" loading spot for the fmpac rom
 
 	MCFG_FRAGMENT_ADD( msx2_cartlist )
 MACHINE_CONFIG_END
@@ -4730,7 +4730,7 @@ static MACHINE_CONFIG_DERIVED( hbf900, msx2 )
 	MCFG_MSX_LAYOUT_DISK1("disk", 3, 0, 1, 1, "maincpu", 0xc000)
 	MCFG_MSX_LAYOUT_RAM_MM("ram_mm", 3, 1, 0x40000)   /* 256KB Mapper RAM */
 	MCFG_MSX_RAMIO_SET_BITS(0x80)
-	MCFG_MSX_LAYOUT_ROM("empty", 3, 3, 1, 1, "maincpu", 0x10000)	// Empty/unknown, optional fmpac rom used to be loaded here, or should the util rom be loaded?
+	MCFG_MSX_LAYOUT_ROM("empty", 3, 3, 1, 1, "maincpu", 0x10000)    // Empty/unknown, optional fmpac rom used to be loaded here, or should the util rom be loaded?
 
 	MCFG_FRAGMENT_ADD( msx_wd2793_force_ready )
 	MCFG_FRAGMENT_ADD( msx_2_35_dd_drive )
@@ -4844,7 +4844,7 @@ static MACHINE_CONFIG_DERIVED( hbf9s, msx2_pal )
 	// YM2149 (in S-1985 MSX Engine)
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
-    // S-1985 MSX Engine
+	// S-1985 MSX Engine
 
 	MCFG_MSX_LAYOUT_ROM("bios", 0, 0, 0, 2, "maincpu", 0x0000)
 	MCFG_MSX_LAYOUT_CARTRIDGE("cartslot1", 1, 0)
@@ -4955,7 +4955,7 @@ static MACHINE_CONFIG_DERIVED( tpc310, msx2_pal )
 
 	MCFG_MSX_LAYOUT_ROM("bios", 0, 0, 0, 2, "maincpu", 0x0000)
 	MCFG_MSX_LAYOUT_RAM_MM("ram_mm", 1, 0, 0x20000)   /* 128KB Mapper RAM */
-   	MCFG_MSX_RAMIO_SET_BITS(0x80)
+	MCFG_MSX_RAMIO_SET_BITS(0x80)
 	MCFG_MSX_LAYOUT_CARTRIDGE("cartslot", 2, 0)
 	MCFG_MSX_LAYOUT_ROM("ext", 3, 0, 0, 1, "maincpu", 0x8000)
 	MCFG_MSX_LAYOUT_ROM("turbo", 3, 0, 1, 1, "maincpu", 0x20000)
@@ -5210,8 +5210,8 @@ ROM_END
 static MACHINE_CONFIG_DERIVED( expert3t, msx2p )
 	// AY8910
 	// FDC: wd2793?, 1 or 2? drives
-    // 4 Cartridge/Expansion slots?
-    // FM/YM2413 built-in
+	// 4 Cartridge/Expansion slots?
+	// FM/YM2413 built-in
 
 	MCFG_MSX_LAYOUT_ROM("bios", 0, 0, 0, 2, "maincpu", 0x0000)
 	MCFG_MSX_LAYOUT_CARTRIDGE("cartslot1", 1, 0)
@@ -5750,9 +5750,9 @@ ROM_END
 static MACHINE_CONFIG_DERIVED( fsa1gt, msx2 )
 	// AY8910/YM2149?
 	// FDC: tc8566af, 1 3.5" DSDD drive
-    // 2 Cartridge slots
-    // FM built-in
-    // MIDI
+	// 2 Cartridge slots
+	// FM built-in
+	// MIDI
 
 	MCFG_MSX_LAYOUT_ROM("bios", 0, 0, 0, 2, "maincpu", 0x0000)
 	MCFG_MSX_LAYOUT_MUSIC("mus", 0, 2, 1, 1, "maincpu", 0x38000)
@@ -5793,8 +5793,8 @@ ROM_END
 static MACHINE_CONFIG_DERIVED( fsa1st, msx2 )
 	// AY8910/YM2149?
 	// FDC: tc8566af, 1 3.5" DSDD drive
-    // 2 Cartridge slots
-    // FM built-in
+	// 2 Cartridge slots
+	// FM built-in
 
 	MCFG_MSX_LAYOUT_ROM("bios", 0, 0, 0, 2, "maincpu", 0x0000)
 	MCFG_MSX_LAYOUT_MUSIC("mus", 0, 2, 1, 1, "maincpu", 0x38000)

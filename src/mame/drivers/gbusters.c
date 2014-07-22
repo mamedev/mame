@@ -262,13 +262,13 @@ WRITE8_MEMBER( gbusters_state::banking_callback )
 {
 	/* bits 0-3 ROM bank */
 	membank("bank1")->set_entry(data & 0x0f);
-	
+
 	if (data & 0xf0)
 	{
 		//logerror("%04x: (lines) write %02x\n",device->safe_pc(), data);
 		//popmessage("lines = %02x", data);
 	}
-	
+
 	/* other bits unknown */
 }
 
@@ -337,8 +337,8 @@ ROM_START( gbusters )
 	ROM_LOAD32_WORD( "878c07.h27", 0x00000, 0x40000, CRC(eeed912c) SHA1(b2e27610b38f3fc9c2cdad600b03c8bae4fb9138) )
 	ROM_LOAD32_WORD( "878c08.k27", 0x00002, 0x40000, CRC(4d14626d) SHA1(226b1d83fb82586302be0a67737a427475856537) )
 
-	ROM_REGION( 0x80000, "k051960", 0 )		/* sprites */
-	ROM_LOAD32_WORD( "878c05.h5", 0x00000, 0x40000, CRC(01f4aea5) SHA1(124123823be6bd597805484539d821aaaadde2c0) ) 
+	ROM_REGION( 0x80000, "k051960", 0 )     /* sprites */
+	ROM_LOAD32_WORD( "878c05.h5", 0x00000, 0x40000, CRC(01f4aea5) SHA1(124123823be6bd597805484539d821aaaadde2c0) )
 	ROM_LOAD32_WORD( "878c06.k5", 0x00002, 0x40000, CRC(edfaaaaf) SHA1(67468c4ce47e8d43d58de8d3b50b048c66508156) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
@@ -361,7 +361,7 @@ ROM_START( gbustersa )
 	ROM_LOAD32_WORD( "878c07.h27", 0x00000, 0x40000, CRC(eeed912c) SHA1(b2e27610b38f3fc9c2cdad600b03c8bae4fb9138) )
 	ROM_LOAD32_WORD( "878c08.k27", 0x00002, 0x40000, CRC(4d14626d) SHA1(226b1d83fb82586302be0a67737a427475856537) )
 
-	ROM_REGION( 0x80000, "k051960", 0 )		/* sprites */
+	ROM_REGION( 0x80000, "k051960", 0 )     /* sprites */
 	ROM_LOAD32_WORD( "878c05.h5", 0x00000, 0x40000, CRC(01f4aea5) SHA1(124123823be6bd597805484539d821aaaadde2c0) )
 	ROM_LOAD32_WORD( "878c06.k5", 0x00002, 0x40000, CRC(edfaaaaf) SHA1(67468c4ce47e8d43d58de8d3b50b048c66508156) )
 
@@ -385,7 +385,7 @@ ROM_START( crazycop )
 	ROM_LOAD32_WORD( "878c07.h27", 0x00000, 0x40000, CRC(eeed912c) SHA1(b2e27610b38f3fc9c2cdad600b03c8bae4fb9138) )
 	ROM_LOAD32_WORD( "878c08.k27", 0x00002, 0x40000, CRC(4d14626d) SHA1(226b1d83fb82586302be0a67737a427475856537) )
 
-	ROM_REGION( 0x80000, "k051960", 0 )		/* sprites */
+	ROM_REGION( 0x80000, "k051960", 0 )     /* sprites */
 	ROM_LOAD32_WORD( "878c05.h5", 0x00000, 0x40000, CRC(01f4aea5) SHA1(124123823be6bd597805484539d821aaaadde2c0) )
 	ROM_LOAD32_WORD( "878c06.k5", 0x00002, 0x40000, CRC(edfaaaaf) SHA1(67468c4ce47e8d43d58de8d3b50b048c66508156) )
 

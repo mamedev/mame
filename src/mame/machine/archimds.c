@@ -606,7 +606,7 @@ WRITE32_MEMBER( archimedes_state::ioc_ctrl_w )
 			---- ---x I2C data
 			*/
 			//if(data & 0x40)
-			//	popmessage("Muting sound, contact MAME/MESSdev");
+			//  popmessage("Muting sound, contact MAME/MESSdev");
 			break;
 
 		case KART:
@@ -761,8 +761,8 @@ READ32_MEMBER(archimedes_state::archimedes_ioc_r)
 							case 0x18: return 0xff; // FDC latch B
 							case 0x40: return 0xff; // FDC latch A
 							case 0x50: return 0; //fdc type, new model returns 5 here
-                            case 0x70: return 0x0F;
-                            case 0x74: return 0xFF; // unknown
+							case 0x70: return 0x0F;
+							case 0x74: return 0xFF; // unknown
 //                          case 0x78: /* joystick */
 //                          case 0x7c:
 						}
@@ -916,9 +916,9 @@ void archimedes_state::vidc_dynamic_res_change()
 			visarea.max_y = (m_vidc_regs[VIDC_VBER] - m_vidc_regs[VIDC_VBSR]) * (m_vidc_interlace+1);
 
 			//logerror("Configuring: htotal %d vtotal %d border %d x %d display %d x %d\n",
-			//	m_vidc_regs[VIDC_HCR], m_vidc_regs[VIDC_VCR],
-			//	visarea.max_x, visarea.max_y,
-			//	m_vidc_regs[VIDC_HDER]-m_vidc_regs[VIDC_HDSR],m_vidc_regs[VIDC_VDER]-m_vidc_regs[VIDC_VDSR]+1);
+			//  m_vidc_regs[VIDC_HCR], m_vidc_regs[VIDC_VCR],
+			//  visarea.max_x, visarea.max_y,
+			//  m_vidc_regs[VIDC_HDER]-m_vidc_regs[VIDC_HDSR],m_vidc_regs[VIDC_VDER]-m_vidc_regs[VIDC_VDSR]+1);
 
 			/* FIXME: pixel clock */
 			refresh = HZ_TO_ATTOSECONDS(pixel_rate[m_vidc_pixel_clk]*2) * m_vidc_regs[VIDC_HCR] * m_vidc_regs[VIDC_VCR];

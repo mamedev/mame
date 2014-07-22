@@ -75,25 +75,25 @@ MC6845_UPDATE_ROW( wangpc_mvc_device::crtc_update_row )
 	{
 		offs_t addr = (y * 50) + sx;
 		UINT16 data = m_bitmap_ram[addr];
-		
+
 		for (int bit = 0; bit < 16; bit++)
 		{
 			int x = (sx * 16) + bit;
 			int color = BIT(data, 15) && de;
-			
+
 			bitmap.pix32(vbp + y, hbp + x) = PALETTE_MVC[color];
-			
+
 			data <<= 1;
 		}
 	}
-	
+
 	for (int column = 0; column < x_count; column++)
 	{
 		UINT16 code = m_video_ram[((ma + column) & 0x7ff)];
 		UINT8 attr = code & 0xff;
-		
+
 		UINT8 new_ra = ra + 1;
-		
+
 		if (ATTR_SUPERSCRIPT)
 		{
 			new_ra = ra + 3;
@@ -102,23 +102,23 @@ MC6845_UPDATE_ROW( wangpc_mvc_device::crtc_update_row )
 		{
 			new_ra = ra;
 		}
-		
+
 		offs_t addr = ((code >> 8) << 4) | (new_ra & 0x0f);
 		UINT16 data = m_char_ram[addr & 0xfff];
-		
+
 		if ((column == cursor_x) || (!ra && ATTR_OVERSCORE) || ((ra == 9) && ATTR_UNDERSCORE))
 		{
 			data = 0xffff;
 		}
-		
+
 		for (int bit = 0; bit < 10; bit++)
 		{
 			int x = (column * 10) + bit;
 			int color = ((BIT(data, 9) & !ATTR_BLANK) ^ ATTR_REVERSE);
-			
+
 			if ((color | bitmap.pix32(vbp + y, hbp + x)) & ATTR_BOLD) color = 2;
 			if (color) bitmap.pix32(vbp + y, hbp + x) = de ? PALETTE_MVC[color] : rgb_t::black;
-			
+
 			data <<= 1;
 		}
 	}

@@ -1447,36 +1447,36 @@ ROM_START( abc806 )
 
 	ROM_REGION( 0x200, "v50", 0 )
 	ROM_LOAD( "60 90242-01.7e", 0x000, 0x200, CRC(788a56d8) SHA1(d81e55cdddc36f5d41bf0a33104c75fac590b764) ) // "V50" 7621 (82S131), HR vertical timing 50Hz
-	
+
 	//ROM_REGION( 0x200, "v60", 0 )
 	//ROM_LOAD( "60 90319-01.7e", 0x000, 0x200, NO_DUMP ) // "V60" 7621 (82S131), HR vertical timing 60Hz
 
 	ROM_REGION( 0x400, "att_hand", 0 )
 	/*
-		1   E6P (RAD A8)
-		2   THP (chargen A12)
-		3   CCLK
-		4   B0 (TX ATT 6)
-		5   B1 (TX ATT 7)
-		6   CONDP (40/80)
-		7   B2 (TX ATT 0)
-		8   B3 (TX ATT 1)
-		9   ULP (RAD A5)
-		10  FLP (RAD A6)
-		11  F2P (RTF)
-		12  GND
-		13  F3P (GTF)
-		14  F4P (BTF)
-		15  B5P (RTB)
-		16  B4 (TX ATT 2)
-		17  B5 (TX ATT 3)
-		18  B6 (TX ATT 4)
-		19  B7 (TX ATT 5)
-		20  LP (*DEN+3)
-		21  B6P (GTB)
-		22  B7P (BTB)
-		23  E5P (RAD A7)
-		24  Vcc
+	    1   E6P (RAD A8)
+	    2   THP (chargen A12)
+	    3   CCLK
+	    4   B0 (TX ATT 6)
+	    5   B1 (TX ATT 7)
+	    6   CONDP (40/80)
+	    7   B2 (TX ATT 0)
+	    8   B3 (TX ATT 1)
+	    9   ULP (RAD A5)
+	    10  FLP (RAD A6)
+	    11  F2P (RTF)
+	    12  GND
+	    13  F3P (GTF)
+	    14  F4P (BTF)
+	    15  B5P (RTB)
+	    16  B4 (TX ATT 2)
+	    17  B5 (TX ATT 3)
+	    18  B6 (TX ATT 4)
+	    19  B7 (TX ATT 5)
+	    20  LP (*DEN+3)
+	    21  B6P (GTB)
+	    22  B7P (BTB)
+	    23  E5P (RAD A7)
+	    24  Vcc
 	*/
 	ROM_LOAD( "60 90225-01.11c", 0x000, 0x400, NO_DUMP ) // "VIDEO ATTRIBUTE" 40033A (?)
 

@@ -18,4 +18,3 @@ void msx_switched_device::device_start()
 	space.install_read_handler(start, end, read8_delegate(FUNC(msx_switched_device::io_read), this));
 	space.install_write_handler(start, end, write8_delegate(FUNC(msx_switched_device::io_write), this));
 }
-

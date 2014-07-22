@@ -361,5 +361,3 @@ void neogeo_bootleg_kog_cart::decrypt_all(DECRYPT_ALL_PARAMS)
 	m_bootleg_prot->neogeo_bootleg_sx_decrypt(fix_region, fix_region_size,1);
 	m_bootleg_prot->neogeo_bootleg_cx_decrypt(spr_region, spr_region_size);
 }
-
-

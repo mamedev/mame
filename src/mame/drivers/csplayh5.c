@@ -60,7 +60,7 @@ public:
 	DECLARE_READ16_MEMBER(test_r);
 	DECLARE_READ8_MEMBER(csplayh5_sound_r);
 	DECLARE_WRITE8_MEMBER(csplayh5_soundclr_w);
-	
+
 	DECLARE_READ8_MEMBER(soundcpu_portd_r);
 	DECLARE_WRITE8_MEMBER(soundcpu_porta_w);
 	DECLARE_WRITE8_MEMBER(soundcpu_dac2_w);
@@ -460,7 +460,7 @@ static MACHINE_CONFIG_START( csplayh5, csplayh5_state )
 	MCFG_CPU_ADD("maincpu",M68000,16000000) /* TMP68301-16 */
 	MCFG_CPU_PROGRAM_MAP(csplayh5_map)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("tmp68301",tmp68301_device,irq_callback)
-	
+
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", csplayh5_state, csplayh5_irq, "screen", 0, 1)
 
 	MCFG_DEVICE_ADD("tmp68301", TMP68301, 0)

@@ -44,7 +44,7 @@ PALETTE_INIT_MEMBER(k2ge_device, k2ge)
 READ8_MEMBER( k1ge_device::read )
 {
 	assert(offset < 0x4000);
-	
+
 	UINT8 data = m_vram[offset];
 
 	switch( offset )
@@ -63,7 +63,7 @@ READ8_MEMBER( k1ge_device::read )
 WRITE8_MEMBER( k1ge_device::write )
 {
 	assert(offset < 0x4000);
-	
+
 	switch( offset )
 	{
 	case 0x000:

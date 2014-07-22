@@ -717,7 +717,7 @@ static MACHINE_CONFIG_START( einstein, einstein_state )
 
 	/* video hardware */
 	MCFG_DEVICE_ADD( "tms9929a", TMS9929A, XTAL_10_738635MHz / 2 )
-	MCFG_TMS9928A_VRAM_SIZE(0x4000)	/* 16k RAM, provided by IC i040 and i041 */
+	MCFG_TMS9928A_VRAM_SIZE(0x4000) /* 16k RAM, provided by IC i040 and i041 */
 	MCFG_TMS9928A_SET_SCREEN( "screen" )
 	MCFG_TMS9928A_SCREEN_ADD_PAL( "screen" )
 	MCFG_SCREEN_UPDATE_DEVICE( "tms9929a", tms9929a_device, screen_update )

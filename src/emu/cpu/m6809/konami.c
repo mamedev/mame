@@ -98,7 +98,7 @@ konami_cpu_device::konami_cpu_device(const machine_config &mconfig, const char *
 void konami_cpu_device::device_start()
 {
 	super::device_start();
-	
+
 	// resolve callbacks
 	m_set_lines.resolve();
 }
@@ -377,4 +377,3 @@ void konami_cpu_device::execute_run()
 		execute_one();
 	} while(m_icount > 0);
 }
-

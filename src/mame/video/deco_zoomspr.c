@@ -188,7 +188,7 @@ inline void deco_zoomspr_device::dragngun_drawgfxzoom(
 								UINT8 *pri = &pri_bitmap.pix8(y);
 								UINT32 *tmapcolor = &dest_bmp.pix32(y);
 
-								
+
 								int x, x_index = x_index_base;
 								for( x=sx; x<ex; x++ )
 								{
@@ -279,8 +279,8 @@ void deco_zoomspr_device::dragngun_draw_sprites( bitmap_rgb32 &bitmap, const rec
 	*/
 
 	/* Sprite global disable bit - can't be, it's set in lockload calibration menu where the targets are sprites */
-//	if (dragngun_sprite_ctrl&0x40000000)
-//		return;
+//  if (dragngun_sprite_ctrl&0x40000000)
+//      return;
 
 	for (offs = 0;offs < 0x800;offs += 8)
 	{
@@ -316,12 +316,12 @@ void deco_zoomspr_device::dragngun_draw_sprites( bitmap_rgb32 &bitmap, const rec
 		colour = spritedata[offs+6]&0x1f;
 
 		int priority = (spritedata[offs + 6] & 0x60) >> 5;
-		
 
-		
 
-//		printf("%02x\n", priority);
-		
+
+
+//      printf("%02x\n", priority);
+
 		if (priority == 0) priority = 7;
 		else if (priority == 1) priority = 7; // set to 1 to have the 'masking effect' with the dragon on the dragngun attract mode, but that breaks the player select where it needs to be 3, probably missing some bits..
 		else if (priority == 2) priority = 7;
@@ -415,7 +415,7 @@ void deco_zoomspr_device::dragngun_draw_sprites( bitmap_rgb32 &bitmap, const rec
 				ypos+=zoomy<<4;
 		}
 	}
-		
+
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		UINT32 *src = &temp_bitmap.pix32(y);
@@ -434,4 +434,3 @@ void deco_zoomspr_device::dragngun_draw_sprites( bitmap_rgb32 &bitmap, const rec
 	}
 
 }
-

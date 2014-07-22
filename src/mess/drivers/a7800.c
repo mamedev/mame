@@ -83,8 +83,8 @@
 
     2014/03/25 Mike Saarna  Fixed Riot Timer
 
-    2014/05/06 Mike Saarna/Robert Tuccitto Brought initial Maria cycle counts 
-+	        inline from measurements taken with logic analyzer and tests.
+    2014/05/06 Mike Saarna/Robert Tuccitto Brought initial Maria cycle counts
++           inline from measurements taken with logic analyzer and tests.
 ***************************************************************************/
 
 #include "emu.h"

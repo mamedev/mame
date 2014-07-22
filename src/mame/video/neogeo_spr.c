@@ -9,8 +9,8 @@
 
 /*
 neosprite_base_device::neosprite_base_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, NEOGEO_SPRITE_BASE, "Neogeo Sprites", tag, owner, clock, "neospritebase", __FILE__),
-	m_bppshift(4)
+    : device_t(mconfig, NEOGEO_SPRITE_BASE, "Neogeo Sprites", tag, owner, clock, "neospritebase", __FILE__),
+    m_bppshift(4)
 {
 
 }
@@ -20,12 +20,10 @@ neosprite_base_device::neosprite_base_device(const machine_config &mconfig, cons
 	: device_t(mconfig, type, "Neogeo Sprites", tag, owner, clock, "neosprite", __FILE__),
 	m_bppshift(4)
 {
-
 }
 
 void neosprite_base_device::device_start()
 {
-
 	m_videoram = auto_alloc_array(machine(), UINT16, 0x8000 + 0x800);
 	m_videoram_drawsource = m_videoram;
 
@@ -235,7 +233,7 @@ void neosprite_base_device::draw_fixed_layer( bitmap_rgb32 &bitmap, int scanline
 			int gfx_offset = ((code << 5) | (scanline & 0x07)) & addr_mask;
 
 			const pen_t *char_pens;
-			
+
 			char_pens = &m_pens[code_and_palette >> 12 << m_bppshift];
 
 
@@ -355,7 +353,7 @@ void neosprite_base_device::draw_sprites( bitmap_rgb32 &bitmap, int scanline )
 		{
 			y = 0x200 - (y_control >> 7);
 			x = m_videoram_drawsource[0x8400 | sprite_number] >> 7;
-			
+
 			zoom_y = (zoom_control & 0xff);
 
 			zoom_x = (zoom_control >> 8) & 0x0f;
@@ -430,7 +428,7 @@ void neosprite_base_device::draw_sprites( bitmap_rgb32 &bitmap, int scanline )
 
 			/* compute offset in gfx ROM and mask it to the number of bits available */
 			int gfx_base = ((code << 8) | (sprite_y << 4)) & m_sprite_gfx_address_mask;
-			
+
 
 			line_pens = &m_pens[attr >> 8 << m_bppshift];
 
@@ -656,7 +654,6 @@ const device_type NEOGEO_SPRITE_REGULAR = &device_creator<neosprite_regular_devi
 neosprite_regular_device::neosprite_regular_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: neosprite_base_device(mconfig, tag, owner, clock, NEOGEO_SPRITE_REGULAR)
 {
-
 }
 
 
@@ -675,7 +672,7 @@ void neosprite_regular_device::set_sprite_region(UINT8* region_sprites, UINT32 r
 	{
 		fatalerror("please use power of 2 region sizes with neosprite_base_device to ensure masking works correctly");
 	}
-		
+
 	m_sprite_gfx_address_mask = mask;
 }
 
@@ -683,11 +680,11 @@ inline void neosprite_regular_device::draw_pixel(int romaddr, UINT32* dst, const
 {
 	const UINT8* src = m_region_sprites + (((romaddr &~0xff)>>1) | (((romaddr&0x8)^0x8)<<3) | ((romaddr & 0xf0)  >> 2));
 	const int x = romaddr & 0x7;
-	
+
 	const UINT8 gfx = (((src[0x3] >> x) & 0x01) << 3) |
-			    	  (((src[0x1] >> x) & 0x01) << 2) |
-				      (((src[0x2] >> x) & 0x01) << 1) |
-				      (((src[0x0] >> x) & 0x01) << 0);
+						(((src[0x1] >> x) & 0x01) << 2) |
+						(((src[0x2] >> x) & 0x01) << 1) |
+						(((src[0x0] >> x) & 0x01) << 0);
 
 	if (gfx)
 		*dst = line_pens[gfx];
@@ -753,8 +750,8 @@ inline void neosprite_midas_device::draw_pixel(int romaddr, UINT32* dst, const p
 {
 	const UINT8* src = m_region_sprites + (((romaddr &~0xff)) | (((romaddr&0x8)^0x8)<<4) | ((romaddr & 0xf0)  >> 1));
 	const int x = romaddr & 0x7;
-	
-	const UINT8 gfx =	(((src[0x7] >> x) & 0x01) << 7) |
+
+	const UINT8 gfx =   (((src[0x7] >> x) & 0x01) << 7) |
 						(((src[0x6] >> x) & 0x01) << 6) |
 						(((src[0x5] >> x) & 0x01) << 5) |
 						(((src[0x4] >> x) & 0x01) << 4) |
@@ -774,7 +771,7 @@ void neosprite_midas_device::device_start()
 
 	m_videoram_buffer = auto_alloc_array(machine(), UINT16, 0x8000 + 0x800);
 	m_videoram_drawsource = m_videoram_buffer;
-	
+
 	memset(m_videoram_buffer, 0x00, (0x8000 + 0x800) * sizeof(UINT16));
 
 }
@@ -787,7 +784,7 @@ void neosprite_midas_device::buffer_vram()
 inline void neosprite_midas_device::draw_fixed_layer_2pixels(UINT32*&pixel_addr, int offset, UINT8* gfx_base, const pen_t* char_pens)
 {
 	UINT8 data;
-	
+
 	data = ((gfx_base[(offset * 2)+0] & 0x0f)<<0) | ((gfx_base[(offset * 2)+1] & 0x0f)<<4);
 	if (data)
 		*pixel_addr = char_pens[data];
@@ -806,4 +803,3 @@ void neosprite_midas_device::set_sprite_region(UINT8* region_sprites, UINT32 reg
 	UINT32 mask = get_region_mask(m_region_sprites, m_region_sprites_size);
 	m_sprite_gfx_address_mask = mask;
 }
-

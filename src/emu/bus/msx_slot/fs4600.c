@@ -159,4 +159,3 @@ WRITE8_MEMBER(msx_slot_fs4600_device::write)
 		}
 	}
 }
-

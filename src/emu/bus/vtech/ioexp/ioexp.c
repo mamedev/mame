@@ -1,11 +1,11 @@
 /***************************************************************************
 
-	VTech Laser/VZ I/O Expansion Slot
+    VTech Laser/VZ I/O Expansion Slot
 
     license: MAME, GPL-2.0+
     copyright-holders: Dirk Best
 
-	30-pin slot
+    30-pin slot
 
 ***************************************************************************/
 

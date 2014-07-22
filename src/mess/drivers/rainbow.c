@@ -13,10 +13,10 @@ RBCONVERT.ZIP has details on how model 'A' differs from version B.
 Issues with this driver:
     (1) Keyboard emulation incomplete (inhibits the system from booting with ERROR 50).
 
-(2) IRQ / DMA / arbitration logic should be verified 
-	DMA (needed for 'Extended communication option') or Z80-8088 arbitration is non-existent (E11/E13 dumps anyone?).
+(2) IRQ / DMA / arbitration logic should be verified
+    DMA (needed for 'Extended communication option') or Z80-8088 arbitration is non-existent (E11/E13 dumps anyone?).
 
-(3) Read errors when booting CPM 2 / DOS 2.x / DOS 3 (secondary boot loader finds errors on tracks >= 2). 
+(3) Read errors when booting CPM 2 / DOS 2.x / DOS 3 (secondary boot loader finds errors on tracks >= 2).
 Seek (+ verify) and a number of signals (TRACK > 43 TG43, INDEX etc.) appear to be incorrect (-> diag.disk aborts drive test).
 UCSD systems (fort_sys, pas_sys) and diag disks boot!
 
@@ -28,10 +28,10 @@ UCSD systems (fort_sys, pas_sys) and diag disks boot!
                     MHFU gets active if the 8088 has not acknowledged a video processor interrupt within approx. 108 milliseconds
 
     - TO BE IMPLEMENTED AS SLOT DEVICES (for now, DIP settings affect 'system_parameter_r' only and are disabled):
-            * Color graphics option (uses NEC upd7220 GDC). 		REFERENCE: Programmer's Reference: AA-AE36A-TV.
-            Either 384 x 240 x 16 or 800 x 240 x 4 colors (out of 4096). 8 × 64 K video RAM. Pallette limited to 4 colors on 100-A.
+            * Color graphics option (uses NEC upd7220 GDC).         REFERENCE: Programmer's Reference: AA-AE36A-TV.
+            Either 384 x 240 x 16 or 800 x 240 x 4 colors (out of 4096). 8 ? 64 K video RAM. Pallette limited to 4 colors on 100-A.
 
-            * Extended communication option (occupies BUNDLE_OPTION ports)	REFERENCE: AA-V172A-TV + Addendum AV-Y890A-TV.
+            * Extended communication option (occupies BUNDLE_OPTION ports)  REFERENCE: AA-V172A-TV + Addendum AV-Y890A-TV.
             See also NEWCOM1.DOC in RBETECDOC.ZIP.   Board connected to the front rightmost expansion slot (1 of the expansion
             ports used by the hard disk controller). Thus can't be added to a system that includes the DEC RD50/51.
             => 2 ports, a high-speed RS-422 half-duplex interface (port A) + lower-speed RS-423 full/half-duplex interface
@@ -42,11 +42,11 @@ UCSD systems (fort_sys, pas_sys) and diag disks boot!
                     Plugs into the NVM chip socket on a 100-A and into the Boot ROM on the 100-B (there is a socket
                     on the ClikClok for the NVM / ROM chip). Came with software for 'all versions of MS-DOS'.
 
-            * 8087	Numerical Data Coprocessor daughterboard.		REFERENCE: EK-PCNDP-IN-PRE
+            * 8087  Numerical Data Coprocessor daughterboard.       REFERENCE: EK-PCNDP-IN-PRE
                     Daughterboard, to be plugged into the expansion port where the memory expansion card usually sits.
                     If a memory adapter board is present, it has to be plugged into a connector atop the 8087 copro board.
                     The 8088 is put into the CPU socket on the coprocessor board.
-					=> see MATH test on 'Design Maturity Diagnostics' disk <=
+                    => see MATH test on 'Design Maturity Diagnostics' disk <=
 
             * Suitable Solutions TURBOW286: 12 Mhz, 68-pin, low power AMD N80L286-12 and WAYLAND/EDSUN EL286-88-10-B ( 80286 to 8088 Processor Signal Converter )
               plus DC 7174 or DT 7174 (barely readable). Add-on card, replaces main 8088 cpu (via ribbon cable). Patched V5.03 BOOT ROM labeled 'TBSS1.3 - 3ED4'.
@@ -207,8 +207,8 @@ W17 pulls J1 serial  port pin 1 to GND when set (chassis to logical GND).
 #include "video/vtvideo.h"
 
 #include "machine/wd_fdc.h"
-#include "formats/rx50_dsk.h" 
-#include "imagedev/flopdrv.h" 
+#include "formats/rx50_dsk.h"
+#include "imagedev/flopdrv.h"
 
 #include "machine/i8251.h"
 #include "machine/clock.h"
@@ -218,7 +218,7 @@ W17 pulls J1 serial  port pin 1 to GND when set (chassis to logical GND).
 #include "rainbow.lh" // BEZEL - LAYOUT with LEDs for diag 1-7, keyboard 8-11 and floppy 20-23
 
 #define LK201_TAG   "lk201"
-#define FD1793_TAG  "fd1793x"  
+#define FD1793_TAG  "fd1793x"
 #define INVALID_DRIVE 255
 
 class rainbow_state : public driver_device
@@ -243,7 +243,7 @@ public:
 		m_crtc(*this, "vt100_video"),
 		m_i8088(*this, "maincpu"),
 		m_z80(*this, "subcpu"),
-		m_fdc(*this, FD1793_TAG), 
+		m_fdc(*this, FD1793_TAG),
 		m_kbd8251(*this, "kbdser"),
 		m_lk201(*this, LK201_TAG),
 		m_p_ram(*this, "p_ram"),
@@ -299,21 +299,21 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(write_keyboard_clock);
 	TIMER_DEVICE_CALLBACK_MEMBER(motor_tick);
 
-	DECLARE_FLOPPY_FORMATS( floppy_formats ); 
+	DECLARE_FLOPPY_FORMATS( floppy_formats );
 protected:
 	virtual void machine_start();
 
 private:
 	enum
 	{
-        IRQ_8088_MAILBOX = 0,   // vector 0x27/a7	(lowest priority)
-        IRQ_8088_KBD,           // vector 0x26/a6	KEYBOARD (8251A) Interrupt
-//		IRQ_EXT_COMM,			// vector 0x25		[OPTION BOARD] Interrupt from external COMM.BOARD (non DMA)
-//		IRQ_COMM_PRN_7201,		// vector 0x24		COMM./PRINTER (7201) IRQ
-//		IRQ_EXT_DMAC,			// vector 0x23		[OPTION BOARD] : from external COMM.BOARD (DMA Control IRQ)
-//		IRQ_GRF,				// vector 0x22		GRAPHICS IRQ
-//		IRQ_SH_10_BDL,			// vector 0x21		BUNDLE IRQ (hard disc / COMM.BOARD) : Pin 23 of expansion connector J4
-        IRQ_8088_VBL,           // vector 0x20/a0	(highest priority)
+		IRQ_8088_MAILBOX = 0,   // vector 0x27/a7   (lowest priority)
+		IRQ_8088_KBD,           // vector 0x26/a6   KEYBOARD (8251A) Interrupt
+//      IRQ_EXT_COMM,           // vector 0x25      [OPTION BOARD] Interrupt from external COMM.BOARD (non DMA)
+//      IRQ_COMM_PRN_7201,      // vector 0x24      COMM./PRINTER (7201) IRQ
+//      IRQ_EXT_DMAC,           // vector 0x23      [OPTION BOARD] : from external COMM.BOARD (DMA Control IRQ)
+//      IRQ_GRF,                // vector 0x22      GRAPHICS IRQ
+//      IRQ_SH_10_BDL,          // vector 0x21      BUNDLE IRQ (hard disc / COMM.BOARD) : Pin 23 of expansion connector J4
+		IRQ_8088_VBL,           // vector 0x20/a0   (highest priority)
 		IRQ_8088_MAX
 	};
 
@@ -381,8 +381,8 @@ FLOPPY_FORMATS_MEMBER( rainbow_state::floppy_formats )
 	FLOPPY_RX50IMG_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( rainbow_floppies ) 
-	SLOT_INTERFACE("525qd", FLOPPY_525_SSQD)  
+static SLOT_INTERFACE_START( rainbow_floppies )
+	SLOT_INTERFACE("525qd", FLOPPY_525_SSQD)
 SLOT_INTERFACE_END
 
 
@@ -417,17 +417,17 @@ void rainbow_state::machine_start()
 
 	rom[0xf4000 + 0x363b]= 0xeb;  // COND => JMPS
 
-    if (rom[0xf4174] == 0x75)
+	if (rom[0xf4174] == 0x75)
 	{
 		rom[0xf4174] = 0xeb; // jmps  RAINBOW100_LOGO__loc_33D
-        rom[0xf4175] = 0x08;
-    }
+		rom[0xf4175] = 0x08;
+	}
 
-    if (rom[0xf4000 + 0x3ffc] == 0x31) // 100-B
-        rom[0xf4384] = 0xeb; // JMPS  =>  BOOT80
+	if (rom[0xf4000 + 0x3ffc] == 0x31) // 100-B
+		rom[0xf4384] = 0xeb; // JMPS  =>  BOOT80
 
-    if (rom[0xf4000 + 0x3ffc] == 0x35) // v5.05
-        rom[0xf437b] = 0xeb;
+	if (rom[0xf4000 + 0x3ffc] == 0x35) // v5.05
+		rom[0xf437b] = 0xeb;
 #endif
 
 #ifdef KEYBOARD_WORKAROUND
@@ -482,37 +482,37 @@ static ADDRESS_MAP_START( rainbow8088_io , AS_IO, 8, rainbow_state)
 	AM_RANGE(0x11, 0x11) AM_DEVREADWRITE("kbdser", i8251_device, status_r, control_w)
 
 	// UNMAPPED:
-    // 0x20 -> 0x2f ***** EXTENDED COMM. OPTION / Option Select 1.
-    // See boot rom @1EA6: 0x27 (<- RESET EXTENDED COMM OPTION  )
-    // ===========================================================
+	// 0x20 -> 0x2f ***** EXTENDED COMM. OPTION / Option Select 1.
+	// See boot rom @1EA6: 0x27 (<- RESET EXTENDED COMM OPTION  )
+	// ===========================================================
 	// 0x30 -> 0x3f ***** EXTENDED COMM. OPTION / Option Select 3.
 	// ===========================================================
-    // 0x40  COMMUNICATIONS DATA REGISTER (MPSC)  
+	// 0x40  COMMUNICATIONS DATA REGISTER (MPSC)
 	// 0x41  PRINTER DATA REGISTER (MPSC)
 	// 0x42  COMMUNICATIONS CONTROL / STATUS REGISTER (MPSC)
 	// 0x43  PRINTER CONTROL / STATUS REGISTER (MPSC)
-    // ===========================================================
-    // 0x50 - 0x57 ***** COLOR GRAPHICS OPTION:
-    //  50h   Graphics option software reset.  Any write to this
-    //        port also resynchronizes the read/modify/write memory
-    //        cycles of the Graphics Option to those of the GDC (*)
+	// ===========================================================
+	// 0x50 - 0x57 ***** COLOR GRAPHICS OPTION:
+	//  50h   Graphics option software reset.  Any write to this
+	//        port also resynchronizes the read/modify/write memory
+	//        cycles of the Graphics Option to those of the GDC (*)
 	//                                       * see boot ROM @1EB4/8
-    //  51h   Data written to this port is loaded into the area
-    //        selected by the previous write to port 53h.
+	//  51h   Data written to this port is loaded into the area
+	//        selected by the previous write to port 53h.
 
-    //  52h   Data written to this port is loaded into the Write Buffer.
+	//  52h   Data written to this port is loaded into the Write Buffer.
 
-    //  53h   Data written to this port provides address selection
-    //        for indirect addressing (see Indirect Register).
+	//  53h   Data written to this port provides address selection
+	//        for indirect addressing (see Indirect Register).
 
-    //  54h   Data written to this port is loaded into the low-order
-    //        byte of the Write Mask.
+	//  54h   Data written to this port is loaded into the low-order
+	//        byte of the Write Mask.
 
-    //  55h   Data written to this port is loaded into the high-order
-    //        byte of the Write Mask.
+	//  55h   Data written to this port is loaded into the high-order
+	//        byte of the Write Mask.
 
-    //  56h   Data written to this port is loaded into the GDC's FIFO
-    //        Buffer and flagged as a parameter.
+	//  56h   Data written to this port is loaded into the GDC's FIFO
+	//        Buffer and flagged as a parameter.
 	// ===========================================================
 	// 0x60 -> 0x6f ***** EXTENDED COMM. OPTION / Option Select 2.
 	// ===========================================================
@@ -520,7 +520,7 @@ static ADDRESS_MAP_START( rainbow8088_io , AS_IO, 8, rainbow_state)
 	// ------ Rainbow uses 'WD 1010 AL' (Western Digital 1983)
 	//        Register compatible to WD2010 (present in MESS)
 	// R/W REGISTERS 60 - 68 (?)
-    AM_RANGE (0x68, 0x68) AM_READ(hd_status_68_r)
+	AM_RANGE (0x68, 0x68) AM_READ(hd_status_68_r)
 	// ===========================================================
 	// HARD DISC SIZES AND LIMITS
 	//   HARDWARE:
@@ -551,7 +551,7 @@ static ADDRESS_MAP_START( rainbowz80_io, AS_IO, 8, rainbow_state)
 	AM_RANGE(0x20, 0x20) AM_READWRITE(z80_generalstat_r, z80_diskdiag_read_w) // read to port 0x20 used by MS-DOS 2.x diskette loader.
 	AM_RANGE(0x21, 0x21) AM_READWRITE(z80_generalstat_r, z80_diskdiag_write_w)
 	AM_RANGE(0x40, 0x40) AM_READWRITE(z80_diskstatus_r, z80_diskcontrol_w)
-	AM_RANGE(0x60, 0x63)   AM_DEVREADWRITE(FD1793_TAG, fd1793_t, read, write) 
+	AM_RANGE(0x60, 0x63)   AM_DEVREADWRITE(FD1793_TAG, fd1793_t, read, write)
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -572,7 +572,7 @@ PORT_DIPSETTING(0x01, "WHITE")
 		PORT_START("MEMORY PRESENT")
 		PORT_DIPNAME( 0xF0000, 0x20000, "MEMORY PRESENT")
 		PORT_DIPSETTING(    0x10000, "64  K (MINIMUM ON 100-A)" ) // see BOARD_RAM
-        PORT_DIPSETTING(    0x20000, "128 K (MINIMUM ON 100-B)" )
+		PORT_DIPSETTING(    0x20000, "128 K (MINIMUM ON 100-B)" )
 		PORT_DIPSETTING(    0x30000, "192 K (MEMORY OPTION)" )
 		PORT_DIPSETTING(    0x40000, "256 K (MEMORY OPTION)" )
 		PORT_DIPSETTING(    0x50000, "320 K (MEMORY OPTION)" )
@@ -589,11 +589,11 @@ PORT_DIPSETTING(0x01, "WHITE")
 	// Floppy is always 'on', BUNDLE + GRAPHICS are not implemented yet:
 		PORT_START("FLOPPY CONTROLLER")
 		PORT_DIPNAME( 0x01, 0x01, "FLOPPY CONTROLLER") PORT_TOGGLE
-        PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+		PORT_DIPSETTING(    0x01, DEF_STR( On ) )
 
-    //	BUNDLE_OPTION: EXT.COMM.card -or- hard disk controller (marketed later).
-    //		   - hard disc and COMM.extension exclude each other!
-    //         - connector J4 has 4 select lines (Option Select 1-4)
+	//  BUNDLE_OPTION: EXT.COMM.card -or- hard disk controller (marketed later).
+	//         - hard disc and COMM.extension exclude each other!
+	//         - connector J4 has 4 select lines (Option Select 1-4)
 		PORT_START("BUNDLE OPTION")
 		PORT_DIPNAME( 0x00, 0x00, "BUNDLE OPTION") PORT_TOGGLE
 		PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
@@ -604,8 +604,8 @@ PORT_DIPSETTING(0x01, "WHITE")
 		PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 		PORT_DIPSETTING(    0x01, DEF_STR( On ) )
 
-	// W13 - W18 are used for factory tests	and affect the boot process -
-    PORT_START("W13")
+	// W13 - W18 are used for factory tests and affect the boot process -
+	PORT_START("W13")
 		PORT_DIPNAME( 0x02, 0x02, "W13 (FACTORY TEST A, LEAVE OFF)") PORT_TOGGLE
 		PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 		PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -644,7 +644,7 @@ void rainbow_state::machine_reset()
 
 	/* configure RAM */
 	address_space &program = m_maincpu->space(AS_PROGRAM);
-    if (m_inp8->read() < END_OF_RAM)
+	if (m_inp8->read() < END_OF_RAM)
 	{
 		program.unmap_readwrite(m_inp8->read(), END_OF_RAM);
 	}
@@ -713,7 +713,7 @@ UINT32 rainbow_state::screen_update_rainbow(screen_device &screen, bitmap_ind16 
 // Interrupt handling and arbitration.  See 3.1.3.8 OF PC-100 spec.
 void rainbow_state::update_8088_irqs()
 {
-    static const int vectors[] = { 0x27, 0x26, 0x20 };
+	static const int vectors[] = { 0x27, 0x26, 0x20 };
 
 	if (m_irq_mask != 0)
 	{
@@ -820,11 +820,11 @@ READ8_MEMBER(rainbow_state::system_parameter_r)
     B F G M
     ( 1 means NOT present; 4-7 reserved )
 */
-    return	( ((m_inp5->read() == 1)		? 0 : 1)  |
-		 ((m_inp6->read() == 1)		? 0 : 2)  |
-		 ((m_inp7->read() == 1)		? 0 : 4)  |
-              ((m_inp8->read() > BOARD_RAM)	? 0 : 8)  | 
-              16 | 32 | 64 | 128 // to be verified.
+	return  ( ((m_inp5->read() == 1)        ? 0 : 1)  |
+			((m_inp6->read() == 1)      ? 0 : 2)  |
+			((m_inp7->read() == 1)      ? 0 : 4)  |
+				((m_inp8->read() > BOARD_RAM)   ? 0 : 8)  |
+				16 | 32 | 64 | 128 // to be verified.
 		);
 }
 
@@ -842,9 +842,9 @@ READ8_MEMBER(rainbow_state::comm_control_r)
 	int data;
 	if (COLD_BOOT == 2)
 		data = 0;
-	else 
+	else
 		data = m_crtc->MHFU(1);
-	
+
 	return (  ( (data > 0) ? 0x00 : 0x20) |// (L): status of MHFU flag => bit pos.5
 					(   (INT88)    ? 0x00 : 0x40 ) |               // (L)
 					(   (INTZ80)   ? 0x00 : 0x80 )                 // (L)
@@ -935,11 +935,11 @@ D2 : INT88 L: (bit reads the INT88 bit sent by Z80 to interrupt 8088)
 D1 : INTZ80 L: (bit reads the INTZ80 bit sent by 8088 to interrupt Z80)
 D0 : ZFLIP L: (read from the diagnostic control register of Z80A)
 */
-    static int last_track;
+	static int last_track;
 	int track = m_fdc->track_r( space, 0);
 	int fdc_step = 0;
-	int	fdc_ready =	0;
-	int	tk00 = 0;
+	int fdc_ready = 0;
+	int tk00 = 0;
 
 	if(m_unit != INVALID_DRIVE)
 	{
@@ -947,20 +947,20 @@ D0 : ZFLIP L: (read from the diagnostic control register of Z80A)
 			fdc_step = 1;
 		last_track = track;
 
-		fdc_ready =	m_floppy->ready_r();
-		tk00 = ( m_floppy->trk00_r() != CLEAR_LINE ); 
+		fdc_ready = m_floppy->ready_r();
+		tk00 = ( m_floppy->trk00_r() != CLEAR_LINE );
 	}
 
 	int last_dir = 0;      // FAKE LAST_DIR + WRITE_GATE FOR NOW.
 	int fdc_write_gate = 1;
 
-	 // ***** ALL LOW ACTIVE - EXCEPT tk00 :
+		// ***** ALL LOW ACTIVE - EXCEPT tk00 :
 	int data=(
-		      (  (fdc_step)             ? 0x00 : 0x80 )        |  
-              (  (fdc_write_gate == 1)  ? 0x00 : 0x40 )		   |
-			  (  (tk00)                 ? 0x20 : 0x00 )        |
-			  (  (last_dir == 1)        ? 0x00 : 0x10 )        |
-			  (  (fdc_ready)            ? 0x00 : 0x08 )        |
+				(  (fdc_step)             ? 0x00 : 0x80 )        |
+				(  (fdc_write_gate == 1)  ? 0x00 : 0x40 )          |
+				(  (tk00)                 ? 0x20 : 0x00 )        |
+				(  (last_dir == 1)        ? 0x00 : 0x10 )        |
+				(  (fdc_ready)            ? 0x00 : 0x08 )        |
 				(   (INT88)    ? 0x00 : 0x04 )                     |
 				(   (INTZ80)   ? 0x00 : 0x02 )                     |
 				(  (m_zflip)  ? 0x00 : 0x01 )
@@ -1052,16 +1052,16 @@ WRITE8_MEMBER(rainbow_state::z80_diskcontrol_w)
 	{
 		m_floppy = con->get_device();
 			if (m_floppy)
-			{  
-				selected_drive = drive; 
+			{
+				selected_drive = drive;
 
 				m_fdc->set_floppy(m_floppy);  // Sets new  _image device_
 				m_floppy->set_rpm(300.);
 
 				// RX50 board has additional 'side select' - ignored by WD emulation?
 				m_floppy->ss_w((data & 20) ? 1 : 0);
-			} 
-	} 
+			}
+	}
 
 	output_set_value("driveled0",  (selected_drive == 0) ? 1 : 0 );
 	output_set_value("driveled1",  (selected_drive == 1) ? 1 : 0 );
@@ -1074,25 +1074,25 @@ WRITE8_MEMBER(rainbow_state::z80_diskcontrol_w)
 			m_unit = selected_drive;
 
 			if (MOTOR_DISABLE_counter == 0) // "one shot"
-				MOTOR_DISABLE_counter = 4800; // 2400 = 500 ms 
+				MOTOR_DISABLE_counter = 4800; // 2400 = 500 ms
 
-//			m_fdc->set_force_ready(force_ready); 
+//          m_fdc->set_force_ready(force_ready);
 	}
 	else
 	{
-//		    m_fdc->set_force_ready(false); 
-	} 
+//          m_fdc->set_force_ready(false);
+	}
 
 			for(int f_num=0; f_num <= 3; f_num++)
 			{
 				floppy_connector *con = machine().device<floppy_connector>(names[f_num]);
-				floppy_image_device *tmp_floppy = con->get_device(); 
-				tmp_floppy->mon_w( (f_num == m_unit) ? CLEAR_LINE : ASSERT_LINE ); 
+				floppy_image_device *tmp_floppy = con->get_device();
+				tmp_floppy->mon_w( (f_num == m_unit) ? CLEAR_LINE : ASSERT_LINE );
 	}
 
 	if(m_unit == INVALID_DRIVE)
-	{	
-		data = data & (255 -3);  
+	{
+		data = data & (255 -3);
 		data = data | 8;  // MOTOR 0 OFF
 		data = data | 16; // MOTOR 1 OFF
 	}
@@ -1100,7 +1100,7 @@ WRITE8_MEMBER(rainbow_state::z80_diskcontrol_w)
 	{
 		data = (data & (255 - 3)) | m_unit;
 
- 		if(m_unit < 2)
+		if(m_unit < 2)
 			data = data & (255 - 8); // MOTOR 0 (for A or B)
 
 		if(m_unit > 1)
@@ -1159,19 +1159,19 @@ WRITE8_MEMBER( rainbow_state::diagnostic_w ) // 8088 (port 0A WRITTEN). Fig.4-28
 
 	if(m_unit != INVALID_DRIVE)
 	{
-		if ( (m_diagnostic & 1) && !(data & 1) )  
-		{  	  
+		if ( (m_diagnostic & 1) && !(data & 1) )
+		{
 			m_fdc->soft_reset();
-		}	
+		}
 
-		if ( !(m_diagnostic & 1) && (data & 1) )  
-	    {   
+		if ( !(m_diagnostic & 1) && (data & 1) )
+		{
 			m_fdc->soft_reset(); // See formatter description p.197 or 5-13
 		}
 	}
 	// MISSING BITS (* not vital for normal operation, see diag.disk) -
 	// BIT 2: GRF VID SEL (0 = system module; 1 = graphics option)
-	// BIT 3: PARITY TEST (1 = enables parity test on memory option board)       
+	// BIT 3: PARITY TEST (1 = enables parity test on memory option board)
 	// * BIT 4: DIAG LOOPBACK (0 at power-up; 1 directs RX50 and DC12 output to printer port)
 	// * BIT 5: PORT LOOPBACK (1 enables loopback for COMM, PRINTER, KEYBOARD ports)
 
@@ -1308,12 +1308,12 @@ static MACHINE_CONFIG_START( rainbow, rainbow_state )
 	MCFG_VT_VIDEO_RAM_CALLBACK(READ8(rainbow_state, read_video_ram_r))
 	MCFG_VT_VIDEO_CLEAR_VIDEO_INTERRUPT_CALLBACK(WRITELINE(rainbow_state, clear_video_interrupt))
 
-	MCFG_FD1793x_ADD(FD1793_TAG, XTAL_24_0734MHz / 24) // no separate 1 Mhz quartz 
+	MCFG_FD1793x_ADD(FD1793_TAG, XTAL_24_0734MHz / 24) // no separate 1 Mhz quartz
 	MCFG_WD_FDC_FORCE_READY
 	MCFG_FLOPPY_DRIVE_ADD(FD1793_TAG ":0", rainbow_floppies, "525qd", rainbow_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(FD1793_TAG ":1", rainbow_floppies, "525qd", rainbow_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(FD1793_TAG ":2", rainbow_floppies, "525qd", rainbow_state::floppy_formats) 
-	MCFG_FLOPPY_DRIVE_ADD(FD1793_TAG ":3", rainbow_floppies, "525qd", rainbow_state::floppy_formats)  
+	MCFG_FLOPPY_DRIVE_ADD(FD1793_TAG ":2", rainbow_floppies, "525qd", rainbow_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(FD1793_TAG ":3", rainbow_floppies, "525qd", rainbow_state::floppy_formats)
 	MCFG_SOFTWARE_LIST_ADD("flop_list","rainbow")
 
 	MCFG_DEVICE_ADD("kbdser", I8251, 0)

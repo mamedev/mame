@@ -134,12 +134,12 @@ static INPUT_PORTS_START( ms0515 )
 INPUT_PORTS_END
 /*
 static LEGACY_FLOPPY_OPTIONS_START(ms0515)
-	LEGACY_FLOPPY_OPTION(ms0515, "dsk", "MS0515 disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
-		HEADS([1])
-		TRACKS([80])
-		SECTORS([10])
-		SECTOR_LENGTH([512])
-		FIRST_SECTOR_ID([0]))
+    LEGACY_FLOPPY_OPTION(ms0515, "dsk", "MS0515 disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
+        HEADS([1])
+        TRACKS([80])
+        SECTORS([10])
+        SECTOR_LENGTH([512])
+        FIRST_SECTOR_ID([0]))
 LEGACY_FLOPPY_OPTIONS_END
 */
 

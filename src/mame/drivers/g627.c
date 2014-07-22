@@ -301,18 +301,18 @@ ROM_END
 
 ROM_START(rota_115)
 	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
-    ROM_LOAD("v115-a.bin", 0x0000, 0x0800, CRC(474884b3) SHA1(b7919bf2e3a3897c1180373cccf88240c57b5645))
-    ROM_LOAD("v115-b.bin", 0x0800, 0x0800, CRC(8779fc6c) SHA1(df00f58d38b4eca68603247ae69009e13cfa31fb))
-    ROM_LOAD("v115-c.bin", 0x1000, 0x0800, CRC(54b420f9) SHA1(597bb9f8ad0b20babc696175e9fbcecf2d5d799d))
+	ROM_LOAD("v115-a.bin", 0x0000, 0x0800, CRC(474884b3) SHA1(b7919bf2e3a3897c1180373cccf88240c57b5645))
+	ROM_LOAD("v115-b.bin", 0x0800, 0x0800, CRC(8779fc6c) SHA1(df00f58d38b4eca68603247ae69009e13cfa31fb))
+	ROM_LOAD("v115-c.bin", 0x1000, 0x0800, CRC(54b420f9) SHA1(597bb9f8ad0b20babc696175e9fbcecf2d5d799d))
 ROM_END
 
 ROM_START(rota_101)
 	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
-    ROM_LOAD("v101-a.bin", 0x0000, 0x0800, CRC(e89f3de6) SHA1(0b62220a24e176f2d7838da080b447a3df9ce05d))
-    ROM_LOAD("v101-b.bin", 0x0800, 0x0800, CRC(0690670b) SHA1(6399a7df707d644d0b7fe7b4fea6fb5091a9883d))
-    ROM_LOAD("v101-c.bin", 0x1000, 0x0800, CRC(c7e85638) SHA1(b59805d8b558ab8f5ea5b4b9261e862afca4b9d3))
+	ROM_LOAD("v101-a.bin", 0x0000, 0x0800, CRC(e89f3de6) SHA1(0b62220a24e176f2d7838da080b447a3df9ce05d))
+	ROM_LOAD("v101-b.bin", 0x0800, 0x0800, CRC(0690670b) SHA1(6399a7df707d644d0b7fe7b4fea6fb5091a9883d))
+	ROM_LOAD("v101-c.bin", 0x1000, 0x0800, CRC(c7e85638) SHA1(b59805d8b558ab8f5ea5b4b9261e862afca4b9d3))
 ROM_END
 
-GAME(1978,  rotation,  0,  		  g627,  g627, driver_device,  0,  ROT0,  "Midway", "Rotation VIII (v. 1.17)", GAME_MECHANICAL )
+GAME(1978,  rotation,  0,         g627,  g627, driver_device,  0,  ROT0,  "Midway", "Rotation VIII (v. 1.17)", GAME_MECHANICAL )
 GAME(1978,  rota_115,  rotation,  g627,  g627, driver_device,  0,  ROT0,  "Midway", "Rotation VIII (v. 1.15)", GAME_MECHANICAL )
 GAME(1978,  rota_101,  rotation,  g627,  g627, driver_device,  0,  ROT0,  "Midway", "Rotation VIII (v. 1.01)", GAME_MECHANICAL )

@@ -1465,7 +1465,7 @@ static MACHINE_CONFIG_START( lucky74, lucky74_state )
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	// Each 82C255 behaves like 2x 8255 (in mode 0). Since MAME doesn't support it yet, I replaced 
+	// Each 82C255 behaves like 2x 8255 (in mode 0). Since MAME doesn't support it yet, I replaced
 	// both 82C255 with 4x 8255...
 	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
 	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))

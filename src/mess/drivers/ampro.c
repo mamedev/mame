@@ -166,8 +166,8 @@ static MACHINE_CONFIG_START( ampro, ampro_state )
 	/* Devices */
 	MCFG_DEVICE_ADD("z80ctc", Z80CTC, XTAL_16MHz / 4)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80CTC_ZC0_CB(WRITELINE(ampro_state, ctc_z0_w))	// Z80DART Ch A, SIO Ch A
-	MCFG_Z80CTC_ZC1_CB(DEVWRITELINE("z80dart", z80dart_device, rxtxcb_w))	// SIO Ch B
+	MCFG_Z80CTC_ZC0_CB(WRITELINE(ampro_state, ctc_z0_w))    // Z80DART Ch A, SIO Ch A
+	MCFG_Z80CTC_ZC1_CB(DEVWRITELINE("z80dart", z80dart_device, rxtxcb_w))   // SIO Ch B
 
 	MCFG_Z80DART_ADD("z80dart", XTAL_16MHz / 4, 0, 0, 0, 0 )
 	MCFG_Z80DART_OUT_TXDA_CB(DEVWRITELINE("rs232", rs232_port_device, write_txd))

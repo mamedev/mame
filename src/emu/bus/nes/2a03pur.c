@@ -68,29 +68,29 @@ void nes_2a03pur_device::pcb_reset()
 
  In MESS: supported.
 
- This mapper supports up to 1MB of PRG-ROM, in 4k 
- banks located at $8000, $9000, $A000, $B000, $C000, 
- $D000, $E000, and $F000. Each bank is selected by n 
- 8-bit register at $5FF8, $5FF9, $5FFA, $5FFB, $5FFC, 
- $5FFD, $5FFE, and $5FFF, respectively, just like NSF 
- banking. These registers are mirrored across the 
- entire $5000-$5FFF region (the register is selected 
- by the low 3 bits), but it is recommended to use the 
- original addresses. The mirroring is merely a 
+ This mapper supports up to 1MB of PRG-ROM, in 4k
+ banks located at $8000, $9000, $A000, $B000, $C000,
+ $D000, $E000, and $F000. Each bank is selected by n
+ 8-bit register at $5FF8, $5FF9, $5FFA, $5FFB, $5FFC,
+ $5FFD, $5FFE, and $5FFF, respectively, just like NSF
+ banking. These registers are mirrored across the
+ entire $5000-$5FFF region (the register is selected
+ by the low 3 bits), but it is recommended to use the
+ original addresses. The mirroring is merely a
  convenience for the hardware implementation.
- 
- The 8kb CHR region may be RAM or ROM. This project 
- uses CHR-RAM, and the board used by infiniteneslives 
+
+ The 8kb CHR region may be RAM or ROM. This project
+ uses CHR-RAM, and the board used by infiniteneslives
  for this project may only support CHR-RAM.
- 
- At power-on, the mapper automatically sets all bits 
- in the $5FFF bank register, placing the highest bank 
- in $F000. This occurs on power-on but not on reset, 
- so any bank that is mapped to $F000 after power-on 
+
+ At power-on, the mapper automatically sets all bits
+ in the $5FFF bank register, placing the highest bank
+ in $F000. This occurs on power-on but not on reset,
+ so any bank that is mapped to $F000 after power-on
  should contain a valid reset vector.
- 
- At present, the project uses iNES mapper 30 to 
- designate this mapper. No mapper number has been 
+
+ At present, the project uses iNES mapper 30 to
+ designate this mapper. No mapper number has been
  officially reserved yet.
  -------------------------------------------------*/
 

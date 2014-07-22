@@ -176,7 +176,7 @@ WRITE8_MEMBER( ql_state::write )
 	}
 	if (offset >= 0x20000 && offset < 0x40000)
 	{
-		 m_zx8301->data_w(space, offset & 0x1ffff, data);
+			m_zx8301->data_w(space, offset & 0x1ffff, data);
 	}
 	if (m_qimi_enabled)
 	{

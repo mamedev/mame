@@ -125,11 +125,11 @@ static MACHINE_CONFIG_START( sdk85, sdk85_state )
 
 	/* Devices */
 	MCFG_DEVICE_ADD("i8279", I8279, 3100000) // based on divider
-	MCFG_I8279_OUT_IRQ_CB(INPUTLINE("maincpu", I8085_RST55_LINE))	// irq
-	MCFG_I8279_OUT_SL_CB(WRITE8(sdk85_state, scanlines_w))			// scan SL lines
-	MCFG_I8279_OUT_DISP_CB(WRITE8(sdk85_state, digit_w))			// display A&B
-	MCFG_I8279_IN_RL_CB(READ8(sdk85_state, kbd_r))					// kbd RL lines
-	MCFG_I8279_IN_SHIFT_CB(VCC)										// Shift key
+	MCFG_I8279_OUT_IRQ_CB(INPUTLINE("maincpu", I8085_RST55_LINE))   // irq
+	MCFG_I8279_OUT_SL_CB(WRITE8(sdk85_state, scanlines_w))          // scan SL lines
+	MCFG_I8279_OUT_DISP_CB(WRITE8(sdk85_state, digit_w))            // display A&B
+	MCFG_I8279_IN_RL_CB(READ8(sdk85_state, kbd_r))                  // kbd RL lines
+	MCFG_I8279_IN_SHIFT_CB(VCC)                                     // Shift key
 	MCFG_I8279_IN_CTRL_CB(VCC)
 MACHINE_CONFIG_END
 

@@ -65,7 +65,7 @@ static ADDRESS_MAP_START(fb01_io, AS_IO, 8, fb01_state)
 	AM_RANGE(0x00, 0x00) AM_DEVWRITE("ym2164", ym2151_device, register_w)
 	AM_RANGE(0x01, 0x01) AM_DEVREADWRITE("ym2164", ym2151_device, status_r, data_w)
 
- 	// 10-11  USART uPD71051C  4MHz & 4MHz / 8
+	// 10-11  USART uPD71051C  4MHz & 4MHz / 8
 	AM_RANGE(0x10, 0x10) AM_DEVREADWRITE("upd71051", i8251_device, data_r, data_w)
 	AM_RANGE(0x11, 0x11) AM_DEVREADWRITE("upd71051", i8251_device, status_r, control_w)
 
@@ -224,4 +224,3 @@ ROM_END
 
 /*    YEAR  NAME  PARENT  COMPAT   MACHINE  INPUT  INIT                  COMPANY   FULLNAME  FLAGS */
 CONS( 1986, fb01, 0,      0,       fb01,    fb01,  driver_device,   0,   "Yamaha", "FB-01",  GAME_SUPPORTS_SAVE )
-

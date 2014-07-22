@@ -1638,4 +1638,3 @@ offs_t tms34020_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 
 
 	return CPU_DISASSEMBLE_NAME(tms34020)(this, buffer, pc, oprom, opram, options);
 }
-

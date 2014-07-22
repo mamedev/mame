@@ -91,66 +91,66 @@ void aakart_device::device_reset()
 
 void aakart_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-    if(id == TX_TIMER && m_new_command & 1)
-    {
-        switch(m_tx_latch)
-        {
-            case 0x00:
-            case 0x02:
-            case 0x03:
-            case 0x07:
-                // ---- -x-- scroll lock
-                // ---- --x- num lock
-                // ---- ---x caps lock
-                break;
-            case 0x20:
-                m_rx = 0x81;
-                m_out_tx_cb(ASSERT_LINE);
-                break;
-            case 0x30:
-            case 0x31:
-            case 0x32:
-            case 0x33:
-                m_keyb_enable = m_tx_latch & 1;
-                m_mouse_enable = (m_tx_latch & 2) >> 1;
-                if(m_keyb_enable & 1 && m_keyb_state & 1)
-                {
-                    //printf("Got row\n");
-                    m_rx = m_keyb_row;
-                    m_out_tx_cb(ASSERT_LINE);
-                }
+	if(id == TX_TIMER && m_new_command & 1)
+	{
+		switch(m_tx_latch)
+		{
+			case 0x00:
+			case 0x02:
+			case 0x03:
+			case 0x07:
+				// ---- -x-- scroll lock
+				// ---- --x- num lock
+				// ---- ---x caps lock
+				break;
+			case 0x20:
+				m_rx = 0x81;
+				m_out_tx_cb(ASSERT_LINE);
+				break;
+			case 0x30:
+			case 0x31:
+			case 0x32:
+			case 0x33:
+				m_keyb_enable = m_tx_latch & 1;
+				m_mouse_enable = (m_tx_latch & 2) >> 1;
+				if(m_keyb_enable & 1 && m_keyb_state & 1)
+				{
+					//printf("Got row\n");
+					m_rx = m_keyb_row;
+					m_out_tx_cb(ASSERT_LINE);
+				}
 
-                break;
-            case 0x3f:
-                if(m_keyb_enable & 1 && m_keyb_state & 1)
-                {
-                    //printf("Got col\n");
-                    m_rx = m_keyb_col;
-                    m_out_tx_cb(ASSERT_LINE);
-                    m_keyb_state = 0;
-                }
+				break;
+			case 0x3f:
+				if(m_keyb_enable & 1 && m_keyb_state & 1)
+				{
+					//printf("Got col\n");
+					m_rx = m_keyb_col;
+					m_out_tx_cb(ASSERT_LINE);
+					m_keyb_state = 0;
+				}
 
-                break;
-            case 0xfd:
-                m_rx = 0xfd;
-                m_out_tx_cb(ASSERT_LINE);
-                break;
-            case 0xfe:
-                m_rx = 0xfe;
-                m_out_tx_cb(ASSERT_LINE);
-                break;
-            case 0xff:
-                m_rx = 0xff;
-                m_out_tx_cb(ASSERT_LINE);
-                break;
-            default:
-                //printf("%02x %02x %02x\n",m_tx_latch,m_rx_latch,m_keyb_enable);
-                break;
-        }
+				break;
+			case 0xfd:
+				m_rx = 0xfd;
+				m_out_tx_cb(ASSERT_LINE);
+				break;
+			case 0xfe:
+				m_rx = 0xfe;
+				m_out_tx_cb(ASSERT_LINE);
+				break;
+			case 0xff:
+				m_rx = 0xff;
+				m_out_tx_cb(ASSERT_LINE);
+				break;
+			default:
+				//printf("%02x %02x %02x\n",m_tx_latch,m_rx_latch,m_keyb_enable);
+				break;
+		}
 
-        //m_new_command &= ~1;
-        m_out_rx_cb(ASSERT_LINE);
-    }
+		//m_new_command &= ~1;
+		m_out_rx_cb(ASSERT_LINE);
+	}
 
 }
 
@@ -162,8 +162,8 @@ void aakart_device::device_timer(emu_timer &timer, device_timer_id id, int param
 
 READ8_MEMBER( aakart_device::read )
 {
-    m_out_tx_cb(CLEAR_LINE);
-    //debugger_break(machine());
+	m_out_tx_cb(CLEAR_LINE);
+	//debugger_break(machine());
 	return m_rx;
 }
 
@@ -172,22 +172,22 @@ WRITE8_MEMBER( aakart_device::write )
 	// if(m_new_command) printf("skip cmd %02x\n",data);
 
 	m_tx_latch = data;
-    m_out_rx_cb(CLEAR_LINE);
-    m_new_command |= 1;
+	m_out_rx_cb(CLEAR_LINE);
+	m_new_command |= 1;
 }
 
 void aakart_device::send_keycode_down(UINT8 row, UINT8 col)
 {
-    //printf("keycode down\n");
-    m_keyb_row = row | 0xc0;
-    m_keyb_col = col | 0xc0;
-    m_keyb_state = 1;
+	//printf("keycode down\n");
+	m_keyb_row = row | 0xc0;
+	m_keyb_col = col | 0xc0;
+	m_keyb_state = 1;
 }
 
 void aakart_device::send_keycode_up(UINT8 row, UINT8 col)
 {
-    //printf("keycode up\n");
-    m_keyb_row = row | 0xd0;
-    m_keyb_col = col | 0xd0;
-    m_keyb_state = 1;
+	//printf("keycode up\n");
+	m_keyb_row = row | 0xd0;
+	m_keyb_col = col | 0xd0;
+	m_keyb_state = 1;
 }

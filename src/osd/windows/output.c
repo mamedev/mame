@@ -128,7 +128,7 @@ bool windows_osd_interface::output_init()
 
 	// register a notifier for output changes
 	output_set_notifier(NULL, notifier_callback, NULL);
-	
+
 	return true;
 }
 

@@ -217,11 +217,11 @@ void snes_ppu_device::device_start()
 #if SNES_LAYER_DEBUG
 	memset(&m_debug_options, 0, sizeof(m_debug_options));
 #endif
-	
+
 	m_vram = auto_alloc_array(machine(), UINT8, SNES_VRAM_SIZE);
 	m_cgram = auto_alloc_array(machine(), UINT16, SNES_CGRAM_SIZE/2);
 	m_oam_ram = auto_alloc_array(machine(), UINT16, SNES_OAM_SIZE/2);
-	
+
 	/* Inititialize registers/variables */
 	m_update_windows = 1;
 	m_beam.latch_vert = 0;
@@ -232,27 +232,27 @@ void snes_ppu_device::device_start()
 	m_mode = 0;
 	m_ppu1_version = 1;  // 5C77 chip version number, read by STAT77, only '1' is known
 	m_ppu2_version = 3;  // 5C78 chip version number, read by STAT78, only '2' & '3' encountered so far.
-	
+
 	m_cgram_address = 0;
 	m_read_ophct = 0;
 	m_read_opvct = 0;
-	
+
 	PPU_REG(VMAIN) = 0x80;
 	// what about other regs?
-	
+
 	/* Inititialize mosaic table */
 	for (int j = 0; j < 16; j++)
 	{
 		for (int i = 0; i < 4096; i++)
 			m_mosaic_table[j][i] = (i / (j + 1)) * (j + 1);
 	}
-	
+
 	/* Init VRAM */
 	memset(m_vram, 0, SNES_VRAM_SIZE);
-	
+
 	/* Init Palette RAM */
 	memset((UINT8 *)m_cgram, 0, SNES_CGRAM_SIZE);
-	
+
 	/* Init oam RAM */
 	memset((UINT8 *)m_oam_ram, 0xff, SNES_OAM_SIZE);
 
@@ -268,7 +268,7 @@ void snes_ppu_device::device_start()
 		save_item(NAME(m_scanlines[i].layer), i);
 		save_item(NAME(m_scanlines[i].blend_exception), i);
 	}
-	
+
 	for (int i = 0; i < 6; i++)
 	{
 		save_item(NAME(m_layer[i].window1_enabled), i);
@@ -288,10 +288,10 @@ void snes_ppu_device::device_start()
 		save_item(NAME(m_layer[i].sub_bg_enabled), i);
 		save_item(NAME(m_layer[i].hoffs), i);
 		save_item(NAME(m_layer[i].voffs), i);
-		
+
 		save_item(NAME(m_clipmasks[i]), i);
 	}
-	
+
 	save_item(NAME(m_oam.address_low));
 	save_item(NAME(m_oam.address_high));
 	save_item(NAME(m_oam.saved_address_low));
@@ -306,14 +306,14 @@ void snes_ppu_device::device_start()
 	save_item(NAME(m_oam.first_sprite));
 	save_item(NAME(m_oam.flip));
 	save_item(NAME(m_oam.write_latch));
-	
+
 	save_item(NAME(m_beam.latch_horz));
 	save_item(NAME(m_beam.latch_vert));
 	save_item(NAME(m_beam.current_horz));
 	save_item(NAME(m_beam.current_vert));
 	save_item(NAME(m_beam.last_visible_line));
 	save_item(NAME(m_beam.interlace_count));
-	
+
 	save_item(NAME(m_mode7.repeat));
 	save_item(NAME(m_mode7.hflip));
 	save_item(NAME(m_mode7.vflip));
@@ -326,7 +326,7 @@ void snes_ppu_device::device_start()
 	save_item(NAME(m_mode7.hor_offset));
 	save_item(NAME(m_mode7.ver_offset));
 	save_item(NAME(m_mode7.extbg));
-	
+
 	save_item(NAME(m_mosaic_size));
 	save_item(NAME(m_clip_to_black));
 	save_item(NAME(m_prevent_color_math));
@@ -335,7 +335,7 @@ void snes_ppu_device::device_start()
 	save_item(NAME(m_direct_color));
 	save_item(NAME(m_ppu_last_scroll));
 	save_item(NAME(m_mode7_last_scroll));
-	
+
 	save_item(NAME(m_ppu1_open_bus));
 	save_item(NAME(m_ppu2_open_bus));
 	save_item(NAME(m_ppu1_version));
@@ -344,7 +344,7 @@ void snes_ppu_device::device_start()
 	save_item(NAME(m_window1_right));
 	save_item(NAME(m_window2_left));
 	save_item(NAME(m_window2_right));
-	
+
 	save_item(NAME(m_update_windows));
 	save_item(NAME(m_update_offsets));
 	save_item(NAME(m_update_oam_list));
@@ -357,7 +357,7 @@ void snes_ppu_device::device_start()
 	save_item(NAME(m_color_modes));
 	save_item(NAME(m_stat77));
 	save_item(NAME(m_stat78));
-	
+
 	save_item(NAME(m_htmult));
 	save_item(NAME(m_cgram_address));
 	save_item(NAME(m_read_ophct));
@@ -369,9 +369,9 @@ void snes_ppu_device::device_start()
 	save_item(NAME(m_vram_fgr_shift));
 	save_item(NAME(m_vram_read_buffer));
 	save_item(NAME(m_vmadd));
-	
+
 	save_item(NAME(m_regs));
-	
+
 	save_pointer(NAME(m_vram), SNES_VRAM_SIZE);
 	save_pointer(NAME(m_cgram), SNES_CGRAM_SIZE/2);
 	save_pointer(NAME(m_oam_ram), SNES_OAM_SIZE/2);

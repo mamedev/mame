@@ -818,7 +818,7 @@ DECOSPR_PRIORITY_CB_MEMBER(cninja_state::pri_callback)
 		case 0x8000: return 0xf0 | 0xcc;
 		case 0xc000: return 0xf0 | 0xcc; /* Perhaps 0xf0|0xcc|0xaa (Sprite under bottom layer) */
 	}
-	
+
 	return 0;
 }
 

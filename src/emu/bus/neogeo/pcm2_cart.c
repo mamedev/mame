@@ -131,5 +131,3 @@ void neogeo_pcm2_pnyaa_cart::decrypt_all(DECRYPT_ALL_PARAMS)
 	m_cmc_prot->kof2000_neogeo_gfx_decrypt(spr_region, spr_region_size, fix_region, fix_region_size, PNYAA_GFX_KEY);
 	m_pcm2_prot->neo_pcm2_snk_1999(ym_region, ym_region_size, 4);
 }
-
-

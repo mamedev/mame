@@ -1,6 +1,6 @@
 /***************************************************************************
 
-	VTech Laser/VZ Laser Memory Expansions
+    VTech Laser/VZ Laser Memory Expansions
 
     license: MAME, GPL-2.0+
     copyright-holders: Dirk Best

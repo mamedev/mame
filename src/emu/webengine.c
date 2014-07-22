@@ -103,7 +103,7 @@ int web_engine::json_slider_handler(struct mg_connection *conn)
 		array.append(data);
 	}
 
-	// add all sliders 
+	// add all sliders
 	for (curslider = (slider_state*)machine().osd().get_slider_list(); curslider != NULL; curslider = curslider->next)
 	{
 		INT32 curval = (*curslider->update)(machine(), curslider->arg, &tempstring, SLIDER_NOCHANGE);
@@ -258,7 +258,7 @@ int web_engine::begin_request_handler(struct mg_connection *conn)
 		file.close();
 		mg_send_header(conn, "Cache-Control", "no-cache, no-store, must-revalidate");
 		mg_send_header(conn, "Pragma", "no-cache");
-		mg_send_header(conn, "Expires", "0");			 
+		mg_send_header(conn, "Expires", "0");
 		mg_send_file(conn, fullpath.cstr());
 		return MG_MORE; // It is important to return MG_MORE after mg_send_file!
 	}
@@ -266,35 +266,35 @@ int web_engine::begin_request_handler(struct mg_connection *conn)
 }
 
 static int ev_handler(struct mg_connection *conn, enum mg_event ev) {
-  if (ev == MG_REQUEST) {
+	if (ev == MG_REQUEST) {
 	if (conn->is_websocket) {
 		// This handler is called for each incoming websocket frame, one or more
 		// times for connection lifetime.
 		// Echo websocket data back to the client.
 		return conn->content_len == 4 && !memcmp(conn->content, "exit", 4) ? MG_FALSE : MG_TRUE;
-    } else {
-		web_engine *engine = static_cast<web_engine *>(conn->server_param);	
+	} else {
+		web_engine *engine = static_cast<web_engine *>(conn->server_param);
 		return engine->begin_request_handler(conn);
 	}
-  } else if (ev== MG_WS_CONNECT) {
+	} else if (ev== MG_WS_CONNECT) {
 	// New websocket connection. Send connection ID back to the client.
 	mg_websocket_printf(conn, WEBSOCKET_OPCODE_TEXT, "update_machine");
 	return MG_FALSE;
-  } else if (ev == MG_AUTH) {
-    return MG_TRUE;
-  } else {
-    return MG_FALSE;
-  }
+	} else if (ev == MG_AUTH) {
+	return MG_TRUE;
+	} else {
+	return MG_FALSE;
+	}
 }
 
 static int iterate_callback(struct mg_connection *c, enum mg_event ev) {
-  if (ev == MG_POLL && c->is_websocket) {
-    char buf[20];
-    int len = snprintf(buf, sizeof(buf), "%lu",
-     (unsigned long) * (time_t *) c->callback_param);
-    mg_websocket_write(c, 1, buf, len);
-  }
-  return MG_TRUE;
+	if (ev == MG_POLL && c->is_websocket) {
+	char buf[20];
+	int len = snprintf(buf, sizeof(buf), "%lu",
+		(unsigned long) * (time_t *) c->callback_param);
+	mg_websocket_write(c, 1, buf, len);
+	}
+	return MG_TRUE;
 }
 
 static void *serve(void *server) {
@@ -304,7 +304,7 @@ static void *serve(void *server) {
 	if (current_timer - last_timer > 0) {
 		last_timer = current_timer;
 		mg_iterate_over_connections((struct mg_server *)server, iterate_callback, &current_timer);
-	}  
+	}
 	return NULL;
 }
 
@@ -322,10 +322,10 @@ web_engine::web_engine(emu_options &options)
 {
 	if (m_options.http()) {
 		m_server = mg_create_server(this, ev_handler);
-		
+
 		mg_set_option(m_server, "listening_port", options.http_port());
 		mg_set_option(m_server, "document_root",  options.http_path());
-		
+
 		mg_start_thread(serve, m_server);
 	}
 
@@ -349,15 +349,15 @@ void web_engine::close()
 {
 	m_exiting_core = 1;
 	// Cleanup, and free server instance
-	mg_destroy_server(&m_server);	
+	mg_destroy_server(&m_server);
 }
 
 static int websocket_callback(struct mg_connection *c, enum mg_event ev) {
-  if (c->is_websocket) {
-    const char *message = (const char *)c->callback_param;
-    mg_websocket_write(c, 1, message, strlen(message));
-  }
-  return MG_TRUE;
+	if (c->is_websocket) {
+	const char *message = (const char *)c->callback_param;
+	mg_websocket_write(c, 1, message, strlen(message));
+	}
+	return MG_TRUE;
 }
 
 void web_engine::push_message(const char *message)

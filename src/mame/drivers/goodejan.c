@@ -49,19 +49,19 @@ Notes:
 
 
 Diagnostic Menu:
-	Press and keep P1 Start and Reset
-	You'll see cross hatch test screen, then press P1 Start again.
+    Press and keep P1 Start and Reset
+    You'll see cross hatch test screen, then press P1 Start again.
 
 
 Secret menu hack [totmejan only] (I couldn't find official way to enter, so it's a hack):
-	Mame internal debugger:
-	PC=ECFFD ; 'SECRET MENU'
-	Keys: BACKSPC, ENTER, Z, P1 START
+    Mame internal debugger:
+    PC=ECFFD ; 'SECRET MENU'
+    Keys: BACKSPC, ENTER, Z, P1 START
 
-	PC=E2EE2; 'TODAY: DATA' screen
-	Keys: Z
+    PC=E2EE2; 'TODAY: DATA' screen
+    Keys: Z
 
-	PC=ECC72; 'HMODE' screen
+    PC=ECC72; 'HMODE' screen
 
 
 *******************************************************************************************/
@@ -496,8 +496,8 @@ static INPUT_PORTS_START( goodejan )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
-/*	These games seems have 2 DIP Switches, DIPSW-A and DIPSW-B
-	Game reads these switches at port C000h (16 bit) with two calls (subroutine 0EF522h [totmejan])
+/*  These games seems have 2 DIP Switches, DIPSW-A and DIPSW-B
+    Game reads these switches at port C000h (16 bit) with two calls (subroutine 0EF522h [totmejan])
         Needs to be rearranged and cleaned up (DSW1 current holds all dips and DSW2 appears to be additional inputs) */
 
 	PORT_START("DSW1")
@@ -527,7 +527,7 @@ static INPUT_PORTS_START( goodejan )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPUNKNOWN_DIPLOC( 0x0080, 0x0080, "DSWA:8" )
 
-        PORT_DIPNAME( 0x0300, 0x0100, "Starting Points" )             PORT_DIPLOCATION("DSWB:1,2")
+		PORT_DIPNAME( 0x0300, 0x0100, "Starting Points" )             PORT_DIPLOCATION("DSWB:1,2")
 	PORT_DIPSETTING(      0x0300, "1500" )
 	PORT_DIPSETTING(      0x0200, "2000" )
 	PORT_DIPSETTING(      0x0100, "1000" )
@@ -535,11 +535,11 @@ static INPUT_PORTS_START( goodejan )
 
 	PORT_DIPUNKNOWN_DIPLOC( 0x0400, 0x0400, "DSWB:3" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x0800, 0x0800, "DSWB:4" )
-/*	[totmejan] Game definitely uses these, reads these 2 bits and stores at address 01A28h as 0-1st bit;
-	Sub-routine at E7C19h does some arithmetic operations depending on these.
-	I cound't understand whats going on. Call performs just before dealing tiles. */
+/*  [totmejan] Game definitely uses these, reads these 2 bits and stores at address 01A28h as 0-1st bit;
+    Sub-routine at E7C19h does some arithmetic operations depending on these.
+    I cound't understand whats going on. Call performs just before dealing tiles. */
 
-	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Demo_Sounds ) )        PORT_DIPLOCATION("DSWB:5") 
+	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Demo_Sounds ) )        PORT_DIPLOCATION("DSWB:5")
 	PORT_DIPSETTING(      0x1000, DEF_STR( On ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPNAME( 0x2000, 0x2000, "Explicit Scenes" )             PORT_DIPLOCATION("DSWB:6")
@@ -549,8 +549,8 @@ static INPUT_PORTS_START( goodejan )
 	PORT_DIPUNKNOWN_DIPLOC( 0x8000, 0x8000, "DSWB:8" )
 
 	PORT_START("DSW2")
-        PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_SERVICE1 )
-        PORT_BIT( 0xfffe, IP_ACTIVE_LOW, IPT_UNKNOWN ) // 0x0002 must be kept low to work as service coin
+		PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_SERVICE1 )
+		PORT_BIT( 0xfffe, IP_ACTIVE_LOW, IPT_UNKNOWN ) // 0x0002 must be kept low to work as service coin
 INPUT_PORTS_END
 
 

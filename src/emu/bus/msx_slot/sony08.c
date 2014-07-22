@@ -186,4 +186,3 @@ WRITE8_MEMBER(msx_slot_sony08_device::write)
 			break;
 	}
 }
-

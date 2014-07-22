@@ -238,7 +238,7 @@ void amiga_fdc::live_run(const attotime &limit)
 					if(adkcon & 0x0400) {
 						if(dma_state == DMA_WAIT_START) {
 							cur_live.bit_counter = 0;
-							
+
 							if(!(dsklen & 0x3fff))
 								dma_done();
 							else if(dsklen & 0x4000) {
@@ -286,23 +286,23 @@ void amiga_fdc::live_run(const attotime &limit)
 				if(cur_live.bit_counter != 8)
 					fatalerror("amiga_fdc::live_run - cur_live.bit_counter != 8\n");
 				cur_live.bit_counter = 0;
-				
+
 				switch(dma_state) {
 				case DMA_IDLE:
 				case DMA_WAIT_START:
 					break;
-					
+
 				case DMA_RUNNING_BYTE_0:
 					dma_state = DMA_RUNNING_BYTE_1;
 					break;
-					
+
 				case DMA_RUNNING_BYTE_1: {
 					dma_value = dma_read();
 					break;
 				}
 				}
 			}
-				
+
 			cur_live.state = RUNNING;
 			checkpoint();
 			break;
@@ -331,7 +331,7 @@ void amiga_fdc::dma_check()
 					cur_live.bit_counter = 0;
 					dma_value = dma_read();
 				}
-			}			
+			}
 		} else {
 			dskbyt |= 0x4000;
 			if(dsklen & 0x4000)

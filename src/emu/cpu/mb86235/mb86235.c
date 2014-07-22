@@ -76,7 +76,6 @@ void mb86235_cpu_device::device_start()
 
 void mb86235_cpu_device::device_reset()
 {
-
 }
 
 #if 0

@@ -34,13 +34,13 @@ mach32_8514a_device::mach32_8514a_device(const machine_config &mconfig, device_t
 // SVGA device
 mach32_device::mach32_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: ati_vga_device(mconfig, ATIMACH32, "ATi mach32", tag, owner, clock, "mach32", __FILE__),
-	  m_8514a(*this,"8514a")
+		m_8514a(*this,"8514a")
 {
 }
 
 mach32_device::mach32_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: ati_vga_device(mconfig, type, name, tag, owner, clock, shortname, source),
-	  m_8514a(*this,"8514a")
+		m_8514a(*this,"8514a")
 {
 }
 
@@ -98,13 +98,13 @@ mach64_8514a_device::mach64_8514a_device(const machine_config &mconfig, device_t
 // SVGA device
 mach64_device::mach64_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: mach32_device(mconfig, ATIMACH64, "ATi mach64", tag, owner, clock, "mach64", __FILE__),
-	  m_8514a(*this,"8514a")
+		m_8514a(*this,"8514a")
 {
 }
 
 mach64_device::mach64_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: mach32_device(mconfig, type, name, tag, owner, clock, shortname, source),
-	  m_8514a(*this,"8514a")
+		m_8514a(*this,"8514a")
 {
 }
 

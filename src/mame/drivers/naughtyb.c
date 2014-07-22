@@ -429,7 +429,7 @@ static MACHINE_CONFIG_START( naughtyb, naughtyb_state )
 	MCFG_TMS36XX_TYPE(TMS3615)
 	MCFG_TMS36XX_DECAY_TIMES(0.15, 0.20, 0, 0, 0, 0)
 	// NOTE: it's unknown if the TMS3615 mixes more than one voice internally.
-	// A wav taken from Pop Flamer sounds like there are at least no 'odd' 
+	// A wav taken from Pop Flamer sounds like there are at least no 'odd'
 	// harmonics (5 1/3' and 2 2/3')
 	MCFG_SOUND_ROUTE(0, "mono", 0.60)
 
@@ -466,7 +466,7 @@ static MACHINE_CONFIG_START( popflame, naughtyb_state )
 	MCFG_TMS36XX_TYPE(TMS3615)
 	MCFG_TMS36XX_DECAY_TIMES(0.15, 0.20, 0, 0, 0, 0)
 	// NOTE: it's unknown if the TMS3615 mixes more than one voice internally.
-	// A wav taken from Pop Flamer sounds like there are at least no 'odd' 
+	// A wav taken from Pop Flamer sounds like there are at least no 'odd'
 	// harmonics (5 1/3' and 2 2/3')
 	MCFG_SOUND_ROUTE(0, "mono", 0.60)
 

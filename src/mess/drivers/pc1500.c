@@ -36,7 +36,7 @@ public:
 	required_shared_ptr<UINT8> m_lcd_data;
 	required_ioport_array<8> m_keyboard;
 	required_ioport m_io_on;
-	
+
 	UINT8 m_kb_matrix;
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -72,7 +72,7 @@ READ8_MEMBER( pc1500_state::pc1500_kb_r )
 	UINT8 data = 0xff;
 
 	if (!started()) return 0;
-	
+
 	for (int i = 0; i < 8; i++)
 	{
 		if (!BIT(m_kb_matrix, i))

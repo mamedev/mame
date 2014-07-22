@@ -537,12 +537,12 @@ READ8_MEMBER(mpu4vid_state::ef9369_r )
 	{
 		UINT16 col = pal.clut[pal.addr >> 1];
 
-/*		if ((pal.addr & 1) == 0)
-			return col & 0xff;
-		else
-			return col >> 8;
-			*/
-			
+/*      if ((pal.addr & 1) == 0)
+            return col & 0xff;
+        else
+            return col >> 8;
+            */
+
 	return col;
 	}
 	else
@@ -604,7 +604,7 @@ WRITE8_MEMBER(mpu4vid_state::bt471_w )
 			break;
 		}
 
-      default:
+		default:
 		{
 			popmessage("Bt471: Unhandled write access (offset:%x, data:%x)", offset, data);
 		}

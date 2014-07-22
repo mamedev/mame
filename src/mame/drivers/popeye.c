@@ -53,7 +53,7 @@ static NETLIST_START(nl_popeye)
 
 	SOLVER(Solver, 48000)
 	PARAM(Solver.ACCURACY, 1e-5)
-    PARAM(Solver.LTE,     5e-2) // Default is not enough for paddle control
+	PARAM(Solver.LTE,     5e-2) // Default is not enough for paddle control
 	ANALOG_INPUT(V5, 5)
 
 	/* AY 8910 internal resistors */
@@ -482,7 +482,7 @@ static MACHINE_CONFIG_DERIVED( popeye, skyskipr )
 	MCFG_SOUND_MODIFY("aysnd")
 	MCFG_SOUND_ROUTES_RESET()
 	MCFG_AY8910_OUTPUT_TYPE(AY8910_RESISTOR_OUTPUT) /* Does Sky Skipper have the same filtering? */
-    MCFG_AY8910_RES_LOADS(2000.0, 2000.0, 2000.0)
+	MCFG_AY8910_RES_LOADS(2000.0, 2000.0, 2000.0)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW0"))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(popeye_state, popeye_portB_w))
 	MCFG_SOUND_ROUTE_EX(0, "snd_nl", 1.0, 0)

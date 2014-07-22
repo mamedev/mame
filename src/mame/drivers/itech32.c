@@ -1666,7 +1666,7 @@ static MACHINE_CONFIG_START( timekill, itech32_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 	MCFG_SCREEN_RAW_PARAMS(VIDEO_CLOCK, 508, 0, 384, 262, 0, 240) // most games configure the screen this way
-//	MCFG_SCREEN_RAW_PARAMS(VIDEO_CLOCK, 508, 0, 384, 286, 0, 256) // sftm, wcbowl and shufshot configure it this way
+//  MCFG_SCREEN_RAW_PARAMS(VIDEO_CLOCK, 508, 0, 384, 286, 0, 256) // sftm, wcbowl and shufshot configure it this way
 	MCFG_SCREEN_UPDATE_DRIVER(itech32_state, screen_update_itech32)
 	MCFG_SCREEN_PALETTE("palette")
 

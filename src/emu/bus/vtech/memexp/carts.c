@@ -1,6 +1,6 @@
 /***************************************************************************
 
-	VTech Laser/VZ Memory Expansion Slot Devices
+    VTech Laser/VZ Memory Expansion Slot Devices
 
 ***************************************************************************/
 

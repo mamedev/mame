@@ -36,25 +36,25 @@ SLOT_INTERFACE_START(neogeo_cart)
 	/* only CMC50 for gfx (& audiocpu)  */
 	SLOT_INTERFACE_INTERNAL("r_cmc_kof2001",  NEOGEO_CMC_KOF2001_CART)
 	SLOT_INTERFACE_INTERNAL("r_cmc_kof2000n",  NEOGEO_CMC_KOF2000N_CART)
-	/* CMC50 for gfx (& audiocpu) + NEOPCM2 for YM scramble  */	
+	/* CMC50 for gfx (& audiocpu) + NEOPCM2 for YM scramble  */
 	SLOT_INTERFACE_INTERNAL("r_pc2_mslug4",  NEOGEO_PCM2_MSLUG4_CART)
 	SLOT_INTERFACE_INTERNAL("r_pc2_rotd",  NEOGEO_PCM2_ROTD_CART)
 	SLOT_INTERFACE_INTERNAL("r_pc2_pnyaa",  NEOGEO_PCM2_PNYAA_CART)
 	SLOT_INTERFACE_INTERNAL("r_ms4plus",  NEOGEO_PCM2_MS4PLUS_CART) // regular encryption but external S1 rom
 
-	/* CMC50 for gfx (& audiocpu) + NEOPCM2 for YM scramble + additonal prg scramble  */	
+	/* CMC50 for gfx (& audiocpu) + NEOPCM2 for YM scramble + additonal prg scramble  */
 	SLOT_INTERFACE_INTERNAL("r_k2_kof2002",  NEOGEO_KOF2002_KOF2002_CART)
 	SLOT_INTERFACE_INTERNAL("r_k2_matrim",  NEOGEO_KOF2002_MATRIM_CART)
 	SLOT_INTERFACE_INTERNAL("r_k2_samsh5",  NEOGEO_KOF2002_SAMSHO5_CART)
 	SLOT_INTERFACE_INTERNAL("r_k2_sams5s",  NEOGEO_KOF2002_SAMSHO5SP_CART)
 	SLOT_INTERFACE_INTERNAL("r_kf2k2pls",  NEOGEO_KOF2002_KF2K2PLS_CART) // regular encryption but external S1 rom
 
-	/* CMC50 for gfx (& audiocpu) + NEOPCM2 for YM scramble + PVC protection/encryption */	
+	/* CMC50 for gfx (& audiocpu) + NEOPCM2 for YM scramble + PVC protection/encryption */
 	SLOT_INTERFACE_INTERNAL("r_pv_mslug5",  NEOGEO_PVC_MSLUG5_CART)
 	SLOT_INTERFACE_INTERNAL("r_pv_svc",  NEOGEO_PVC_SVC_CART)
 	SLOT_INTERFACE_INTERNAL("r_pv_kf2k3",  NEOGEO_PVC_KOF2003_CART)
 	SLOT_INTERFACE_INTERNAL("r_pv_kf2k3h",  NEOGEO_PVC_KOF2003H_CART)
-	
+
 	/* 100% bootleg logic */
 	SLOT_INTERFACE_INTERNAL("r_garoubl",  NEOGEO_BOOTLEG_GAROUBL_CART)
 	SLOT_INTERFACE_INTERNAL("r_cthd2003",  NEOGEO_BOOTLEG_CTHD2003_CART)
@@ -85,11 +85,11 @@ SLOT_INTERFACE_START(neogeo_cart)
 	SLOT_INTERFACE_INTERNAL("r_kf2k3bl",  NEOGEO_BOOTLEG_HYBRID_KF2K3BL_CART)
 	SLOT_INTERFACE_INTERNAL("r_kf2k3pl",  NEOGEO_BOOTLEG_HYBRID_KF2K3PL_CART)
 	SLOT_INTERFACE_INTERNAL("r_kf2k3upl",  NEOGEO_BOOTLEG_HYBRID_KF2K3UPL_CART)
-	
-	
-	
-	
-	
-	
+
+
+
+
+
+
 
 SLOT_INTERFACE_END

@@ -8,9 +8,9 @@ or for the case of a computer with an inbuilt (not serial) ascii keyboard.
 Example of usage in a driver.
 
 In MACHINE_CONFIG
-    	
-	MCFG_DEVICE_ADD(KEYBOARD_TAG, GENERIC_KEYBOARD, 0)
-	MCFG_GENERIC_KEYBOARD_CB(WRITE8(xxx_state, kbd_put))
+
+    MCFG_DEVICE_ADD(KEYBOARD_TAG, GENERIC_KEYBOARD, 0)
+    MCFG_GENERIC_KEYBOARD_CB(WRITE8(xxx_state, kbd_put))
 
 In the code:
 

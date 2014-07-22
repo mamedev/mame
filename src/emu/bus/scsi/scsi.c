@@ -74,7 +74,7 @@ machine_config_constructor SCSI_PORT_DEVICE::device_mconfig_additions() const
 
 void SCSI_PORT_DEVICE::device_start()
 {
-	const char *deviceName[] = 
+	const char *deviceName[] =
 	{
 		SCSI_PORT_DEVICE1,
 		SCSI_PORT_DEVICE2,

@@ -36,4 +36,3 @@ WRITE8_MEMBER(msx_systemflags_device::write)
 {
 	m_system_flags = data;
 }
-

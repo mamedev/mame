@@ -17,7 +17,7 @@ const device_type CPC_PDS = &device_creator<cpc_pds_device>;
 
 
 static MACHINE_CONFIG_FRAGMENT( cpc_pds )
-	MCFG_DEVICE_ADD("pio", Z80PIO, XTAL_4MHz)	// no clock on the PCB, so will presume that it uses the CPC's clock
+	MCFG_DEVICE_ADD("pio", Z80PIO, XTAL_4MHz)   // no clock on the PCB, so will presume that it uses the CPC's clock
 
 	// no pass-through seen on remake PCBs, unknown if actual hardware had a pass-through port or not
 MACHINE_CONFIG_END

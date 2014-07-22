@@ -328,7 +328,7 @@ WRITE8_MEMBER( xerox820ii_state::rdpio_pb_w )
 
 	    bit     description
 
-		0       NBSY
+	    0       NBSY
 	    1       NMSG
 	    2       NC/D
 	    3       NREQ

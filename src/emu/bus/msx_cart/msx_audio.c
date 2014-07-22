@@ -180,9 +180,9 @@ WRITE_LINE_MEMBER(msx_cart_msx_audio_nms1205::irq_write)
 {
 	// Trigger IRQ on the maincpu
 	// The 8950 seems to trigger an irq on reset, this causes an infinite loop of continuously triggering
-    // the MSX's interrupt handler. The 8950 irq will never be cleared the nms1205's irq handler hook hasn't
+	// the MSX's interrupt handler. The 8950 irq will never be cleared the nms1205's irq handler hook hasn't
 	// been installed yet.
-//	m_out_irq_cb(state);
+//  m_out_irq_cb(state);
 }
 
 
@@ -383,4 +383,3 @@ READ8_MEMBER(msx_cart_msx_audio_fsca1::y8950_io_r)
 {
 	return m_io_config->read();
 }
-

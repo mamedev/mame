@@ -419,9 +419,9 @@ static MACHINE_CONFIG_START( altos5, altos5_state )
 
 	MCFG_DEVICE_ADD("z80ctc", Z80CTC, XTAL_8MHz / 2)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80CTC_ZC0_CB(DEVWRITELINE("z80sio", z80dart_device, rxtxcb_w))	// SIO Ch B
-	MCFG_Z80CTC_ZC1_CB(WRITELINE(altos5_state, ctc_z1_w))		// Z80DART Ch A, SIO Ch A
-	MCFG_Z80CTC_ZC2_CB(DEVWRITELINE("z80dart", z80dart_device, rxtxcb_w))		// Z80DART Ch B
+	MCFG_Z80CTC_ZC0_CB(DEVWRITELINE("z80sio", z80dart_device, rxtxcb_w))    // SIO Ch B
+	MCFG_Z80CTC_ZC1_CB(WRITELINE(altos5_state, ctc_z1_w))       // Z80DART Ch A, SIO Ch A
+	MCFG_Z80CTC_ZC2_CB(DEVWRITELINE("z80dart", z80dart_device, rxtxcb_w))       // Z80DART Ch B
 
 	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "terminal")
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("z80sio", z80dart_device, rxb_w))

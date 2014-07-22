@@ -124,7 +124,7 @@ static const char *const phasenames[] =
 
 void scsihle_device::data_out(UINT8 data)
 {
-//	printf( "%s data out %02x\n", tag(), data );
+//  printf( "%s data out %02x\n", tag(), data );
 	output_data0(BIT(data, 0));
 	output_data1(BIT(data, 1));
 	output_data2(BIT(data, 2));
@@ -396,7 +396,7 @@ void scsihle_device::scsi_change_phase(UINT8 newphase)
 
 WRITE_LINE_MEMBER( scsihle_device::input_sel )
 {
-//	printf( "sel %d %d %02x\n", state, m_phase, m_input_data );
+//  printf( "sel %d %d %02x\n", state, m_phase, m_input_data );
 	switch (m_phase)
 	{
 	case SCSI_PHASE_BUS_FREE:

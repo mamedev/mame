@@ -178,4 +178,3 @@ WRITE8_MEMBER(msx_slot_panasonic08_device::write)
 			break;
 	}
 }
-

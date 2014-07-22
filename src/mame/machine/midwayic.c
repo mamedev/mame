@@ -225,13 +225,13 @@ midway_serial_pic2_device::midway_serial_pic2_device(const machine_config &mconf
 	m_time_index(0),
 	m_time_just_written(0),
 	m_yearoffs(0),
-	m_time_write_timer(NULL)	
+	m_time_write_timer(NULL)
 {
 	memset(m_buffer,0,sizeof(m_buffer));
 	memset(m_time_buf,0,sizeof(m_time_buf));
 	memset(m_nvram,0,sizeof(m_nvram));
 	memset(m_default_nvram,0,sizeof(m_default_nvram));
-	
+
 }
 
 midway_serial_pic2_device::midway_serial_pic2_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
@@ -241,11 +241,11 @@ midway_serial_pic2_device::midway_serial_pic2_device(const machine_config &mconf
 	m_state(0),
 	m_index(0),
 	m_total(0),
-	m_nvram_addr(0),	
+	m_nvram_addr(0),
 	m_time_index(0),
 	m_time_just_written(0),
 	m_yearoffs(0),
-	m_time_write_timer(NULL)	
+	m_time_write_timer(NULL)
 {
 	memset(m_buffer,0,sizeof(m_buffer));
 	memset(m_time_buf,0,sizeof(m_time_buf));
@@ -531,12 +531,12 @@ void midway_serial_pic2_device::nvram_default()
 }
 
 void midway_serial_pic2_device::nvram_read(emu_file &file)
-{ 
+{
 	file.read(m_nvram, sizeof(m_nvram));
 }
 
-void midway_serial_pic2_device::nvram_write(emu_file &file) 
-{ 
+void midway_serial_pic2_device::nvram_write(emu_file &file)
+{
 	file.write(m_nvram, sizeof(m_nvram));
 }
 
@@ -608,7 +608,7 @@ midway_ioasic_device::midway_ioasic_device(const machine_config &mconfig, const 
 	m_fifo_in(0),
 	m_fifo_out(0),
 	m_fifo_bytes(0),
-	m_fifo_force_buffer_empty_pc(0),	
+	m_fifo_force_buffer_empty_pc(0),
 	m_cage(NULL),
 	m_dcs(NULL)
 {
@@ -641,10 +641,10 @@ void midway_ioasic_device::device_start()
 
 	/* do we have a DCS2 sound chip connected? (most likely) */
 	m_dcs = machine().device<dcs_audio_device>("dcs");
-	m_has_dcs = (m_dcs != NULL);		
+	m_has_dcs = (m_dcs != NULL);
 	m_cage = machine().device<atari_cage_device>("cage");
 	m_has_cage = (m_cage != NULL);
-	
+
 	m_dcs_cpu = m_dcs->subdevice("dcs2");
 	if (m_dcs_cpu == NULL)
 		m_dcs_cpu = m_dcs->subdevice("dsio");
@@ -665,10 +665,10 @@ void midway_ioasic_device::device_start()
 	/* configure the fifo */
 	if (m_has_dcs)
 	{
-		m_dcs->set_fifo_callbacks(read16_delegate(FUNC(midway_ioasic_device::fifo_r),this), 
-			read16_delegate(FUNC(midway_ioasic_device::fifo_status_r),this), 
+		m_dcs->set_fifo_callbacks(read16_delegate(FUNC(midway_ioasic_device::fifo_r),this),
+			read16_delegate(FUNC(midway_ioasic_device::fifo_status_r),this),
 			write_line_delegate(FUNC(midway_ioasic_device::fifo_reset_w),this));
-		m_dcs->set_io_callbacks(write_line_delegate(FUNC(midway_ioasic_device::ioasic_output_full),this), 
+		m_dcs->set_io_callbacks(write_line_delegate(FUNC(midway_ioasic_device::ioasic_output_full),this),
 			write_line_delegate(FUNC(midway_ioasic_device::ioasic_input_empty),this));
 	}
 	fifo_reset_w(1);

@@ -549,7 +549,7 @@ void windows_osd_interface::sound_register()
 	sound_options_add("dsound", OSD_SOUND_DIRECT_SOUND);
 #if (USE_SDL)
 	sound_options_add("sdl", OSD_SOUND_SDL);
-#endif	
+#endif
 	sound_options_add("auto", OSD_SOUND_DIRECT_SOUND); // making Direct Sound audio default one
 }
 
@@ -622,7 +622,7 @@ void windows_osd_interface::init(running_machine &machine)
 
 	// initialize the subsystems
 	osd_interface::init_subsystems();
-	
+
 	// notify listeners of screen configuration
 	astring tempstring;
 	for (win_window_info *info = win_window_list; info != NULL; info = info->next)
@@ -683,7 +683,7 @@ void windows_osd_interface::osd_exit()
 	win_cleanup_sockets();
 
 	osd_interface::osd_exit();
-	
+
 	// take down the watchdog thread if it exists
 	if (watchdog_thread != NULL)
 	{

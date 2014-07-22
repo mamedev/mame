@@ -10,8 +10,8 @@
 static ADDRESS_MAP_START( main_map_noslot, AS_PROGRAM, 16, neogeo_state )
 	AM_RANGE(0x000000, 0x00007f) AM_READ(banked_vectors_r)
 	AM_RANGE(0x000080, 0x0fffff) AM_ROM
-//	AM_RANGE(0x200000, 0x2fffff) AM_ROMBANK("cartridge")
-//	AM_RANGE(0x2ffff0, 0x2fffff) AM_WRITE(main_cpu_bank_select_w)
+//  AM_RANGE(0x200000, 0x2fffff) AM_ROMBANK("cartridge")
+//  AM_RANGE(0x2ffff0, 0x2fffff) AM_WRITE(main_cpu_bank_select_w)
 	AM_IMPORT_FROM( neogeo_main_map )
 ADDRESS_MAP_END
 
@@ -8480,7 +8480,7 @@ ROM_END
  *
  *************************************/
 
- // macros allow code below to be copy+pasted into slot devices more easily
+	// macros allow code below to be copy+pasted into slot devices more easily
 #define cpuregion memregion("maincpu")->base()
 #define cpuregion_size memregion("maincpu")->bytes()
 #define spr_region memregion("sprites")->base()
@@ -9824,4 +9824,3 @@ GAME( 2004, sbp,        neogeo,   neogeo_noslot,   neogeo, neogeo_noslot_state, 
 /* N.C.I - LE CORTEX */
 // Bang Bang Busters (c)2010 - MVS?/AES
 // Treasure of the Caribbean (c)2011 - MVS?/AES
-

@@ -1122,7 +1122,7 @@ MACHINE_RESET_MEMBER(ng_aes_state,neocd)
  *************************************/
 
 static ADDRESS_MAP_START( aes_main_map, AS_PROGRAM, 16, ng_aes_state )
-//	AM_RANGE(0x000000, 0x00007f) AM_ROMBANK("vectors")
+//  AM_RANGE(0x000000, 0x00007f) AM_ROMBANK("vectors")
 	AM_RANGE(0x000000, 0x00007f) AM_READ(neogeo_slot_rom_low_bectors_r)
 	AM_RANGE(0x000080, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_MIRROR(0x0f0000) AM_RAM
@@ -1149,8 +1149,8 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( neocd_main_map, AS_PROGRAM, 16, ng_aes_state )
-//	AM_RANGE(0x000000, 0x00007f) AM_READ_BANK("vectors") // writes will fall through to area below
-	AM_RANGE(0x000000, 0x00007f) AM_READ(banked_vectors_r)	
+//  AM_RANGE(0x000000, 0x00007f) AM_READ_BANK("vectors") // writes will fall through to area below
+	AM_RANGE(0x000000, 0x00007f) AM_READ(banked_vectors_r)
 	AM_RANGE(0x000000, 0x1fffff) AM_RAM AM_REGION("maincpu", 0x00000)
 
 	AM_RANGE(0x300000, 0x300001) AM_MIRROR(0x01fffe) AM_READ(aes_in0_r)

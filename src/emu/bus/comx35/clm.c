@@ -107,18 +107,18 @@ MC6845_UPDATE_ROW( comx_clm_device::crtc_update_row )
 		UINT8 code = m_video_ram[((ma + column) & 0x7ff)];
 		UINT16 addr = (code << 3) | (ra & 0x07);
 		UINT8 data = m_char_rom->base()[addr & 0x7ff];
-		
+
 		if (BIT(ra, 3) && column == cursor_x)
 		{
 			data = 0xff;
 		}
-		
+
 		for (int bit = 0; bit < 8; bit++)
 		{
 			int x = (column * 8) + bit;
-			
+
 			bitmap.pix32(vbp + y, hbp + x) = m_palette->pen(BIT(data, 7) && de);
-			
+
 			data <<= 1;
 		}
 	}

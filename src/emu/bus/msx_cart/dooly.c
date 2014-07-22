@@ -63,4 +63,3 @@ WRITE8_MEMBER(msx_cart_dooly::write_cart)
 		}
 	}
 }
-

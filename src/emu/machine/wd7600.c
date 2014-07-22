@@ -284,20 +284,20 @@ WRITE_LINE_MEMBER( wd7600_device::ctc_out2_w )
 // Keyboard
 WRITE8_MEMBER( wd7600_device::keyb_data_w )
 {
-//	if(LOG) logerror("WD7600 '%s': keyboard data write %02x\n", tag(), data);
+//  if(LOG) logerror("WD7600 '%s': keyboard data write %02x\n", tag(), data);
 	m_keybc->data_w(space,0,data);
 }
 
 READ8_MEMBER( wd7600_device::keyb_data_r )
 {
 	UINT8 ret = m_keybc->data_r(space,0);
-//	if(LOG) logerror("WD7600 '%s': keyboard data read %02x\n", tag(), ret);
+//  if(LOG) logerror("WD7600 '%s': keyboard data read %02x\n", tag(), ret);
 	return ret;
 }
 
 WRITE8_MEMBER( wd7600_device::keyb_cmd_w )
 {
-//	if(LOG) logerror("WD7600 '%s': keyboard command %02x\n", tag(), data);
+//  if(LOG) logerror("WD7600 '%s': keyboard command %02x\n", tag(), data);
 	m_keybc->command_w(space,0,data);
 }
 

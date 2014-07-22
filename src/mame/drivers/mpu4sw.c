@@ -994,8 +994,8 @@ GAME_CUSTOM( 199?, m4eaw__bx, m4eaw,  "eun01y.p1",                0x0000, 0x0100
 ROM_START( m4eaw__bz ) \
 	ROM_REGION( 0x010000, "maincpu", 0 )
 	ROM_LOAD( "everyones a winner v2-5p", 0x8000, 0x008000, CRC(eb8f2fc5) SHA1(0d3614bd5ff561d17bef0d1e620f2f812b8fed5b))
-	M4EAW_EXTRA_ROMS 
-ROM_END 
+	M4EAW_EXTRA_ROMS
+ROM_END
 
 GAME(199?, m4eaw__bz, m4eaw ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,"Barcrest","Everyone's A Winner (Barcrest) (MPU4) (set 99)",GAME_FLAGS )
 

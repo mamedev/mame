@@ -155,4 +155,3 @@ WRITE8_MEMBER(msx_cart_halnote::write_cart)
 			break;
 	}
 }
-

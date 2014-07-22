@@ -2,8 +2,8 @@
 // copyright-holders: Felipe Sanches
 /***************************************************************************
 
-	Ultratec Minicom IV
-	http://www.ultratec.com/ttys/non-printing/minicom.php
+    Ultratec Minicom IV
+    http://www.ultratec.com/ttys/non-printing/minicom.php
 
   Driver by Felipe Sanches
 
@@ -26,7 +26,7 @@ Segment data is sent to each 14seg digit by first writing half of the data to po
  toggling T0 and then the other half of data is written to P0 again but toggling T1 afterwards.
 
   Changelog:
- 
+
    2014 JUL 19 [Felipe Sanches]:
    * Got the display working except for a few glitches
 
@@ -71,7 +71,7 @@ void minicom_state::machine_start()
 	memset(m_p, 0, 4);
 	m_digit_index = 0;
 	m_display_data = 0;
-	
+
 	// register for savestates
 	save_item(NAME(m_p));
 	save_item(NAME(m_digit_index));
@@ -89,15 +89,15 @@ void minicom_state::machine_reset()
 
 READ8_MEMBER(minicom_state::minicom_io_r)
 {
-    switch (offset)
-    {
+	switch (offset)
+	{
 		case 1:
 			//P1.3 seems to be an indicator of whether or not we have a printer device attached.
 			// at address 0xABF the code checks this flag in order to decide which string to display:
 			// "MINIPRINT IS RESET" or "MINICOM IS RESET"
 			return PRINTER_ATTACHED << 3;
-        case 2:
-//			return 0; //para a palestra no Garoa... :-)
+		case 2:
+//          return 0; //para a palestra no Garoa... :-)
 			return 1; //to skip the "NO POWER" warning. I'm not sure why.
 		default:
 #if LOG_IO_PORTS
@@ -122,22 +122,22 @@ static void printbits(UINT8 v) {
 #define P3_UNKNOWN_BITS (0xFF & ~((1 << 4)|(1 << 5)))
 WRITE8_MEMBER(minicom_state::minicom_io_w)
 {
-    switch (offset)
-    {
-        case 0x00:
-        {
-            m_p[offset]=data;
-            break;
-        }
-        case 0x01:
-        {
-            if (data != m_p[offset])
-            {
+	switch (offset)
+	{
+		case 0x00:
+		{
+			m_p[offset]=data;
+			break;
+		}
+		case 0x01:
+		{
+			if (data != m_p[offset])
+			{
 #if LOG_IO_PORTS
 				UINT8 changed = m_p[offset] ^ data;
 				if (changed ^ P1_UNKNOWN_BITS)
 				{
-	                printf("Write to P1: %02X changed: (        ) (", data);
+					printf("Write to P1: %02X changed: (        ) (", data);
 					printbits(changed);
 					printf(") (        ) (        )\n");
 				}
@@ -147,36 +147,36 @@ WRITE8_MEMBER(minicom_state::minicom_io_w)
 					m_digit_index--;
 					if (m_digit_index<0) m_digit_index = 19;
 				}
-                m_p[offset]=data;
-            }
-            break;
-        }
-        case 0x02:
-        {
-            if (data != m_p[offset])
-            {
+				m_p[offset]=data;
+			}
+			break;
+		}
+		case 0x02:
+		{
+			if (data != m_p[offset])
+			{
 #if LOG_IO_PORTS
 				UINT8 changed = m_p[offset] ^ data;
 				if (changed ^ P2_UNKNOWN_BITS)
 				{
-	                printf("Write to P2: %02X changed: (        ) (        ) (", data);
+					printf("Write to P2: %02X changed: (        ) (        ) (", data);
 					printbits(changed);
 					printf(") (        )\n");
 				}
 #endif
-                m_p[offset]=data;
-            }
-            break;
-        }
-        case 0x03:
-        {
-            if (data != m_p[offset])
-            {
+				m_p[offset]=data;
+			}
+			break;
+		}
+		case 0x03:
+		{
+			if (data != m_p[offset])
+			{
 				UINT8 changed = m_p[offset] ^ data;
 #if LOG_IO_PORTS
 				if (changed ^ P3_UNKNOWN_BITS)
 				{
-	                printf("Write to P3: %02X changed: (        ) (        ) (        ) (", data);
+					printf("Write to P3: %02X changed: (        ) (        ) (        ) (", data);
 					printbits(changed);
 					printf(")\n");
 				}
@@ -198,11 +198,11 @@ WRITE8_MEMBER(minicom_state::minicom_io_w)
 				{
 					output_set_digit_value(m_digit_index, BITSWAP16(m_display_data,  9,  1,  3, 11, 12,  4,  2, 10, 14, 6,  7, 5,  0, 15,  13, 8) & 0x3FFF);
 				}
-                m_p[offset]=data;
-            }
-            break;
-        }
-    }
+				m_p[offset]=data;
+			}
+			break;
+		}
+	}
 }
 
 DRIVER_INIT_MEMBER( minicom_state, minicom )
@@ -216,7 +216,7 @@ static MACHINE_CONFIG_START( minicom, minicom_state )
 
 	/* video hardware */
 	/* fluorescent 14-segment display forming a row of 20 characters */
-	MCFG_DEFAULT_LAYOUT(layout_minicom) 
+	MCFG_DEFAULT_LAYOUT(layout_minicom)
 
 /* TODO: Map the keyboard rows/cols inputs (43-key, 4-row keyboard) */
 
@@ -230,4 +230,4 @@ ROM_END
 
 /*    YEAR  NAME      PARENT  COMPAT  MACHINE     INPUT     CLASS          INIT     COMPANY     FULLNAME         FLAGS */
 COMP( 1997, minicom,   0,     0,      minicom,    0,        minicom_state, minicom, "Ultratec", "Minicom IV",    GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND) /* fw release data: 11th Aug 1997 */
-//COMP( 2002, minicom,   0,     0,      minicom,    0,        minicom_state, minicom, "Ultratec", "Minicom IV",    GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND) /* fw release data: 19th Apr 2002 - Seen at a subway station in São Paulo, Brazil (Metrô Trianon MASP) */
+//COMP( 2002, minicom,   0,     0,      minicom,    0,        minicom_state, minicom, "Ultratec", "Minicom IV",    GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND) /* fw release data: 19th Apr 2002 - Seen at a subway station in S??o Paulo, Brazil (Metr?? Trianon MASP) */

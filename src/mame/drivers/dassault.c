@@ -520,7 +520,7 @@ static MACHINE_CONFIG_START( dassault, dassault_state )
 	MCFG_DECO16IC_BANK2_CB(dassault_state, bank_callback)
 	MCFG_DECO16IC_PF12_8X8_BANK(0)
 	MCFG_DECO16IC_PF12_16X16_BANK(2)
-	
+
 	MCFG_DECO16IC_GFXDECODE("gfxdecode")
 	MCFG_DECO16IC_PALETTE("palette")
 

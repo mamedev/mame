@@ -175,7 +175,7 @@ void decospr_device::device_start()
 {
 	m_pri_cb.bind_relative_to(*owner());
 	m_col_cb.bind_relative_to(*owner());
-	
+
 	m_alt_format = 0;
 	m_pixmask = 0xf;
 	m_raw_shift = 4; // set to 8 on tattass / nslashers for the custom mixing (because they have 5bpp sprites, and shifting by 4 isn't good enough)

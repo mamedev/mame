@@ -512,7 +512,7 @@ READ16_MEMBER(magicard_state::philips_66470_r)
 			UINT8 vdisp;
 			vdisp = m_screen->vpos() < 256;
 
-          	return (m_pcab_vregs[offset] & 0xff7f) | vdisp<<7; //TODO
+			return (m_pcab_vregs[offset] & 0xff7f) | vdisp<<7; //TODO
 		}
 	}
 

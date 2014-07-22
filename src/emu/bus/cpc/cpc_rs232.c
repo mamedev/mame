@@ -33,7 +33,7 @@ static MACHINE_CONFIG_FRAGMENT( cpc_rs232 )
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("dart",z80dart_device,rxa_w))
 	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("dart",z80dart_device,dcda_w))
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("dart",z80dart_device,ctsa_w))
-//	MCFG_RS232_RI_HANDLER(DEVWRITELINE("dart",z80dart_device,ria_w))
+//  MCFG_RS232_RI_HANDLER(DEVWRITELINE("dart",z80dart_device,ria_w))
 
 	// pass-through
 	MCFG_DEVICE_ADD("exp", CPC_EXPANSION_SLOT, 0)

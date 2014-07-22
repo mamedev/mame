@@ -3889,7 +3889,7 @@ ROM_START( altbeastj1 )
 
 	ROM_REGION( 0x2000, "maincpu:key", 0 ) // decryption key
 	// reconstructed key; some of the RNG-independent bits could be incorrect
-    ROM_LOAD( "317-0065.key", 0x0000, 0x2000, BAD_DUMP CRC(9e0f619d) SHA1(b0392e84d1c9af681dc9bb2ca3636e7cc41a605b) )
+	ROM_LOAD( "317-0065.key", 0x0000, 0x2000, BAD_DUMP CRC(9e0f619d) SHA1(b0392e84d1c9af681dc9bb2ca3636e7cc41a605b) )
 
 	ROM_REGION( 0x60000, "gfx1", 0 ) // tiles
 	ROM_LOAD( "opr-11674.a14", 0x00000, 0x20000, CRC(a57a66d5) SHA1(5103583d48997abad12a0c5fee26431c486ced52) )

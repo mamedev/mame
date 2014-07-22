@@ -62,4 +62,3 @@ WRITE8_MEMBER(msx_s1985_device::io_write)
 			break;
 	}
 }
-

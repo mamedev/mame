@@ -51,7 +51,7 @@ NETLIB_START(SN74LS629clk)
 
 	save(NAME(m_enableq));
 	save(NAME(m_inc));
-    save(NAME(m_out));
+	save(NAME(m_out));
 }
 
 NETLIB_RESET(SN74LS629clk)
@@ -65,7 +65,7 @@ NETLIB_UPDATE(SN74LS629clk)
 {
 	if (!m_enableq)
 	{
-	    m_out = m_out ^ 1;
+		m_out = m_out ^ 1;
 		OUTLOGIC(m_Y, m_out, m_inc);
 	}
 	else
@@ -103,7 +103,7 @@ NETLIB_RESET(SN74LS629)
 NETLIB_UPDATE(SN74LS629)
 {
 	{
-	    // recompute
+		// recompute
 		double  freq;
 		double  v_freq_2, v_freq_3, v_freq_4;
 		double  v_freq = INPANALOG(m_FC);

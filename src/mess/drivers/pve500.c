@@ -11,9 +11,9 @@
   Notes:
   One can induce the self-diagnose by booting the device holding LEARN and P2-RESET buttons togheter
   With the default keyboard map, this can be done by holding keys L and S while pressing F3.
-	(Don't forget to unlock the keyboard by using the UI TOGGLE key)
+    (Don't forget to unlock the keyboard by using the UI TOGGLE key)
 
-	This self-diagnose routine displays the value C817, which is the checksum value of the subcpu ROM
+    This self-diagnose routine displays the value C817, which is the checksum value of the subcpu ROM
   and afterwards it displays the following message:
 
   SELFdIAG Error___ _F3 F3_CtC3c
@@ -21,17 +21,17 @@
   which means it detected an error in the CTC circuitry (it means we're emulating it wrong!)
   F3 is the coordinate of the subcpu EEPROM chip in the PCB.
 
-	According to the service manual, this error code means: "ICF3 CTC CH-3 counter operation failure (No interruption)"
+    According to the service manual, this error code means: "ICF3 CTC CH-3 counter operation failure (No interruption)"
 
   Known issues:
   There's still an annoying blinking in the 7-seg display.
 
   Changelog:
 
-	 2014 JUN 24 [Felipe Sanches]:
+     2014 JUN 24 [Felipe Sanches]:
    * figured out the multiplexing signals for the 7seg display
 
-	 2014 JUN 23 [Felipe Sanches]:
+     2014 JUN 23 [Felipe Sanches]:
    * hooked-up the RS422 ports
 
    2014 JAN 14 [Felipe Sanches]:
@@ -269,7 +269,7 @@ WRITE8_MEMBER(pve500_state::dualport_ram_right_w)
 
 READ8_MEMBER(pve500_state::io_expander_r)
 {
-//	printf("READ IO_EXPANDER_PORT%c\n", 'A'+offset);
+//  printf("READ IO_EXPANDER_PORT%c\n", 'A'+offset);
 	switch (offset){
 		case IO_EXPANDER_PORTA:
 			return io_SC;
@@ -351,7 +351,7 @@ printf("io_expander_w: PORTA (io_SC=%02X)\n", data);
 }
 
 static MACHINE_CONFIG_START( pve500, pve500_state )
-  /* Main CPU */
+	/* Main CPU */
 	MCFG_CPU_ADD("maincpu", TMPZ84C015, XTAL_12MHz / 2) /* TMPZ84C015BF-6 */
 	MCFG_CPU_PROGRAM_MAP(maincpu_prg)
 	MCFG_CPU_IO_MAP(maincpu_io)
@@ -369,7 +369,7 @@ static MACHINE_CONFIG_START( pve500, pve500_state )
 	MCFG_Z80DART_OUT_TXDA_CB(DEVWRITELINE("player2", rs232_port_device, write_txd))
 	MCFG_Z80DART_OUT_TXDB_CB(DEVWRITELINE("edl_inout", rs232_port_device, write_txd))
 
-  /* Secondary CPU */
+	/* Secondary CPU */
 	MCFG_CPU_ADD("subcpu", TMPZ84C015, XTAL_12MHz / 2) /* TMPZ84C015BF-6 */
 	MCFG_CPU_PROGRAM_MAP(subcpu_prg)
 	MCFG_CPU_IO_MAP(subcpu_io)

@@ -379,7 +379,7 @@ static MACHINE_CONFIG_START( re900, re900_state )
 
 	/* video hardware */
 	MCFG_DEVICE_ADD( "tms9128", TMS9128, XTAL_10_738635MHz / 2 )   /* TMS9128NL on the board */
- 	MCFG_TMS9928A_VRAM_SIZE(0x4000)
+	MCFG_TMS9928A_VRAM_SIZE(0x4000)
 	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(re900_state, vdp_interrupt))
 	MCFG_TMS9928A_SCREEN_ADD_NTSC( "screen" )
 	MCFG_SCREEN_UPDATE_DEVICE( "tms9128", tms9128_device, screen_update )

@@ -981,7 +981,7 @@ static SLOT_INTERFACE_START(apple2_cards)
 	SLOT_INTERFACE("corvus", A2BUS_CORVUS)  /* Corvus flat-cable HDD interface (must go in slot 6) */
 	SLOT_INTERFACE("mcms1", A2BUS_MCMS1)  /* Mountain Computer Music System, card 1 of 2 */
 	SLOT_INTERFACE("mcms2", A2BUS_MCMS2)  /* Mountain Computer Music System, card 2 of 2.  must be in card 1's slot + 1! */
-	SLOT_INTERFACE("dx1", A2BUS_DX1)	/* Decillonix DX-1 sampler card */
+	SLOT_INTERFACE("dx1", A2BUS_DX1)    /* Decillonix DX-1 sampler card */
 SLOT_INTERFACE_END
 
 static SLOT_INTERFACE_START(apple2eaux_cards)
@@ -1062,7 +1062,7 @@ static MACHINE_CONFIG_DERIVED( apple2, apple2_common )
 	/* default configuration: on real machine is present also in configurations */
 	/* with less memory, provided that the language card is installed           */
 	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED)	
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( apple2p, apple2_common )
@@ -1078,7 +1078,7 @@ static MACHINE_CONFIG_DERIVED( apple2p, apple2_common )
 	/* default configuration: on real machine is present also in configurations */
 	/* with less memory, provided that the language card is installed           */
 	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED)	
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( apple2e, apple2_common )
@@ -1162,11 +1162,11 @@ static MACHINE_CONFIG_DERIVED( apple2c, apple2ee )
 	MCFG_A2BUS_SLOT_REMOVE("sl7")
 
 	MCFG_DEVICE_ADD(IIC_ACIA1_TAG, MOS6551, 0)
-	MCFG_MOS6551_XTAL(XTAL_14_31818MHz / 8)	// ~1.789 MHz
+	MCFG_MOS6551_XTAL(XTAL_14_31818MHz / 8) // ~1.789 MHz
 	MCFG_MOS6551_TXD_HANDLER(DEVWRITELINE(PRINTER_PORT_TAG, rs232_port_device, write_txd))
 
 	MCFG_DEVICE_ADD(IIC_ACIA2_TAG, MOS6551, 0)
-	MCFG_MOS6551_XTAL(XTAL_1_8432MHz)	// matches SSC so modem software is compatible
+	MCFG_MOS6551_XTAL(XTAL_1_8432MHz)   // matches SSC so modem software is compatible
 	MCFG_MOS6551_TXD_HANDLER(DEVWRITELINE("modem", rs232_port_device, write_txd))
 
 	MCFG_RS232_PORT_ADD(PRINTER_PORT_TAG, default_rs232_devices, NULL)

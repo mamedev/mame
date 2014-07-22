@@ -274,7 +274,7 @@ void pokey_device::device_start()
 	{
 		m_POTx[i] = 0;
 	}
-	
+
 	m_pot0_r_cb.resolve();
 	m_pot1_r_cb.resolve();
 	m_pot2_r_cb.resolve();

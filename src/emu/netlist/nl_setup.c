@@ -92,9 +92,9 @@ netlist_device_t *netlist_setup_t::register_dev(netlist_device_t *dev, const pst
 template <class T>
 static void remove_start_with(T &hm, pstring &sw)
 {
-    for (int i = hm.count() - 1; i >= 0; i++)
-    {
-        pstring x = hm[i]->name();
+	for (int i = hm.count() - 1; i >= 0; i++)
+	{
+		pstring x = hm[i]->name();
 		if (sw.equals(x.substr(0, sw.len())))
 		{
 			NL_VERBOSE_OUT(("removing %s\n", hm[i]->name().cstr()));
@@ -167,8 +167,8 @@ pstring netlist_setup_t::objtype_as_astr(netlist_object_t &in) const
 		case netlist_terminal_t::NETLIST:
 			return "NETLIST";
 			break;
-        case netlist_terminal_t::QUEUE:
-            return "QUEUE";
+		case netlist_terminal_t::QUEUE:
+			return "QUEUE";
 			break;
 	}
 	// FIXME: noreturn
@@ -264,9 +264,9 @@ void netlist_setup_t::register_object(netlist_device_t &dev, const pstring &name
 		case netlist_terminal_t::NETLIST:
 			netlist().error("Netlist registration not yet supported - %s\n", name.cstr());
 			break;
-        case netlist_terminal_t::QUEUE:
-            netlist().error("QUEUE registration not yet supported - %s\n", name.cstr());
-            break;
+		case netlist_terminal_t::QUEUE:
+			netlist().error("QUEUE registration not yet supported - %s\n", name.cstr());
+			break;
 	}
 }
 
@@ -407,7 +407,7 @@ nld_base_d_to_a_proxy *netlist_setup_t::get_d_a_proxy(netlist_output_t &out)
 
 		for (int i = 0; i < out.net().m_core_terms.count(); i++)
 		{
-	        netlist_core_terminal_t *p = out.net().m_core_terms[i];
+			netlist_core_terminal_t *p = out.net().m_core_terms[i];
 			p->clear_net(); // de-link from all nets ...
 			connect(proxy->out(), *p);
 		}
@@ -444,10 +444,10 @@ void netlist_setup_t::connect_input_output(netlist_input_t &in, netlist_output_t
 	}
 	else
 	{
-	    if (in.has_net())
-	        out.net().merge_net(&in.net());
-	    else
-	        out.net().register_con(in);
+		if (in.has_net())
+			out.net().merge_net(&in.net());
+		else
+			out.net().register_con(in);
 	}
 }
 
@@ -485,7 +485,7 @@ void netlist_setup_t::connect_terminal_output(netlist_terminal_t &in, netlist_ou
 {
 	if (out.isFamily(netlist_terminal_t::ANALOG))
 	{
-	    NL_VERBOSE_OUT(("connect_terminal_output: %s %s\n", in.name().cstr(), out.name().cstr()));
+		NL_VERBOSE_OUT(("connect_terminal_output: %s %s\n", in.name().cstr(), out.name().cstr()));
 		/* no proxy needed, just merge existing terminal net */
 		if (in.has_net())
 			out.net().merge_net(&in.net());
@@ -650,14 +650,14 @@ void netlist_setup_t::resolve_inputs()
 	pstring errstr("");
 
 	netlist().log("looking for terminals not connected ...");
-    for (int i = 0; i < m_terminals.count(); i++)
-    {
+	for (int i = 0; i < m_terminals.count(); i++)
+	{
 		if (!m_terminals[i]->has_net())
 			errstr += pstring::sprintf("Found terminal %s without a net\n",
-			        m_terminals[i]->name().cstr());
+					m_terminals[i]->name().cstr());
 		else if (m_terminals[i]->net().num_cons() == 0)
 			netlist().warning("Found terminal %s without connections",
-			        m_terminals[i]->name().cstr());
+					m_terminals[i]->name().cstr());
 	}
 	if (errstr != "")
 		netlist().error("%s", errstr.cstr());

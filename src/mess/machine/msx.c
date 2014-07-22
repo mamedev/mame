@@ -527,4 +527,3 @@ WRITE8_MEMBER( msx_state::msx_switched_w )
 		this->space().write_byte( (m_current_switched_device << 8) | offset, data );
 	}
 }
-

@@ -31,8 +31,8 @@
 
 #define FG_COLOUR       (m_colours&0x0F)
 #define BG_COLOUR       ((m_colours&0xF0)>>4)
-#define SELECT_COL(x,c)	(IS_80COL ? ((((x) & 1) ? ((c) << 2) : (c)) & 0xC) : (c))
-#define FILL_WORD(c)	(((c) << 12) | ((c) << 8) | ((c) << 4) | (c))
+#define SELECT_COL(x,c) (IS_80COL ? ((((x) & 1) ? ((c) << 2) : (c)) & 0xC) : (c))
+#define FILL_WORD(c)    (((c) << 12) | ((c) << 8) | ((c) << 4) | (c))
 
 #define IS_80COL        (m_mode&0x10)
 #define IS_XOR          (m_op&8)

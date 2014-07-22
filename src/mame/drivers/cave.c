@@ -2101,7 +2101,7 @@ static MACHINE_CONFIG_START( donpachi, cave_state )
 	MCFG_DEVICE_ADD("nmk112", NMK112, 0)
 	MCFG_NMK112_ROM0("oki1")
 	MCFG_NMK112_ROM1("oki2")
-	MCFG_NMK112_DISABLE_PAGEMASK(1 << 0)	// chip #0 (music) is not paged
+	MCFG_NMK112_DISABLE_PAGEMASK(1 << 0)    // chip #0 (music) is not paged
 MACHINE_CONFIG_END
 
 

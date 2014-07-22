@@ -1735,7 +1735,7 @@ static MACHINE_CONFIG_DERIVED_CLASS( joust2, williams2, joust2_state )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(williams2_d000_rom_map)
-	
+
 	MCFG_WILLIAMS_CVSD_SOUND_ADD("cvsd")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 

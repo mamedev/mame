@@ -229,7 +229,7 @@ FLOPPY_FORMATS_END
 // and a PC BIOS to make the card bootable on a PC.
 // we have the Z8 program, we still need the PC BIOS.
 ROM_START( omti8621 )
-	ROM_REGION(0x4000, OMTI_CPU_REGION, 0)	// disassembles fine as Z8 code
+	ROM_REGION(0x4000, OMTI_CPU_REGION, 0)  // disassembles fine as Z8 code
 	ROM_LOAD( "omti_8621_102640-b.bin", 0x000000, 0x004000, CRC(e6f20dbb) SHA1(cf1990ad72eac6b296485410f5fa3309a0d6d078) )
 
 	ROM_REGION(0x1000, OMTI_BIOS_REGION, 0)
@@ -875,7 +875,7 @@ void omti8621_device::do_command(const UINT8 cdb[], const UINT16 cdb_length)
 		set_data_transfer(disk->m_esdi_defect_list, sizeof(disk->m_esdi_defect_list));
 		break;
 
-#if 0	// this command seems unused by Domain/OS, and it's unclear what the intent of the code is (it makes some versions of GCC quite unhappy)
+#if 0   // this command seems unused by Domain/OS, and it's unclear what the intent of the code is (it makes some versions of GCC quite unhappy)
 	case OMTI_CMD_ASSIGN_ALTERNATE_TRACK: // 0x11
 		log_data();
 		alternate_track_address[0] = get_disk_track(cdb);
@@ -1212,7 +1212,7 @@ UINT32 omti8621_device::get_sector(INT32 diskaddr, UINT8 *data_buffer, UINT32 le
 	}
 	else
 	{
-//		LOG1(("omti8621_get_sector %x on lun %d", diskaddr, lun));
+//      LOG1(("omti8621_get_sector %x on lun %d", diskaddr, lun));
 
 		// restrict length to size of 1 sector (i.e. 1024 Byte)
 		length = length < OMTI_DISK_SECTOR_SIZE ? length  : OMTI_DISK_SECTOR_SIZE;

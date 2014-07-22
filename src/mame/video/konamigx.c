@@ -1195,7 +1195,7 @@ void konamigx_state::common_init()
 VIDEO_START_MEMBER(konamigx_state, konamigx_5bpp)
 {
 	common_init();
-	
+
 	if (!strcmp(machine().system().name,"tbyahhoo"))
 		gx_tilemode = 1;
 	else if (!strcmp(machine().system().name,"crzcross") || !strcmp(machine().system().name,"puzldama"))

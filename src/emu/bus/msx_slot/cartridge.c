@@ -137,10 +137,10 @@ bool msx_slot_cartridge_device::call_load()
 		else
 		{
 			UINT32 length = this->length();
-			
+
 			// determine how much space to allocate
 			UINT32 length_aligned = 0x10000;
-			
+
 			if (length <= 0x2000)
 				length_aligned = 0x2000;
 			else if (length <= 0x4000)
@@ -165,7 +165,7 @@ bool msx_slot_cartridge_device::call_load()
 				return IMAGE_INIT_FAIL;
 			}
 
-			// Check if there's some mapper related 
+			// Check if there's some mapper related
 			astring extrainfo;
 			if (hashfile_extrainfo(*this, extrainfo))
 			{
@@ -349,7 +349,7 @@ READ8_MEMBER(msx_slot_cartridge_device::read)
 	{
 		return m_cartridge->read_cart(space, offset);
 	}
-    return 0xFF;
+	return 0xFF;
 }
 
 
@@ -365,7 +365,7 @@ WRITE8_MEMBER(msx_slot_cartridge_device::write)
 
 
 msx_slot_yamaha_expansion_device::msx_slot_yamaha_expansion_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : msx_slot_cartridge_device(mconfig, MSX_SLOT_YAMAHA_EXPANSION, "MSX Yamaha Expansion slot", tag, owner, clock, "msx_slot_yamaha_expansion", __FILE__)
+	: msx_slot_cartridge_device(mconfig, MSX_SLOT_YAMAHA_EXPANSION, "MSX Yamaha Expansion slot", tag, owner, clock, "msx_slot_yamaha_expansion", __FILE__)
 {
 }
 
@@ -379,5 +379,3 @@ void msx_slot_yamaha_expansion_device::device_start()
 		m_cartridge->set_out_irq_cb(DEVCB_WRITELINE(msx_slot_cartridge_device, irq_out));
 	}
 }
-
-
