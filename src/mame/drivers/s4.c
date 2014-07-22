@@ -292,9 +292,8 @@ WRITE8_MEMBER( s4_state::sol1_w )
 		if (BIT(data, 2))
 			m_samples->start(3, 3); // 1000 chime
 
-		// we don't have a 10k chime in samples yet
-		//if (BIT(data, 3))
-			//m_samples->start(1, x); // 10k chime
+		if (BIT(data, 3))
+			m_samples->start(1, 4); // 10k chime
 	}
 	else
 	{
