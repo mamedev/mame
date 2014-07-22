@@ -298,7 +298,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( dcs_8k_program_map, AS_PROGRAM, 32, dcs_audio_device )
 	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_SHARE("dcsint")
 	AM_RANGE(0x0800, 0x1fff) AM_RAM AM_SHARE("dcsext")
-	AM_RANGE(0x3000, 0x3003) AM_READWRITE(input_latch32_r, output_latch32_w)
+	AM_RANGE(0x3000, 0x3003) AM_READWRITE(input_latch32_r, output_latch32_w) // why?
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dcs_8k_data_map, AS_DATA, 16, dcs_audio_device )
@@ -306,6 +306,7 @@ static ADDRESS_MAP_START( dcs_8k_data_map, AS_DATA, 16, dcs_audio_device )
 	AM_RANGE(0x0800, 0x1fff) AM_READWRITE(dcs_dataram_r, dcs_dataram_w)
 	AM_RANGE(0x2000, 0x2fff) AM_ROMBANK("databank")
 	AM_RANGE(0x3000, 0x3000) AM_WRITE(dcs_data_bank_select_w)
+	AM_RANGE(0x3400, 0x3403) AM_READWRITE(input_latch_r, output_latch_w) // mk3 etc. need this
 	AM_RANGE(0x3800, 0x39ff) AM_RAM
 	AM_RANGE(0x3fe0, 0x3fff) AM_READWRITE(adsp_control_r, adsp_control_w)
 ADDRESS_MAP_END
@@ -1439,7 +1440,7 @@ int dcs_audio_device::control_r()
 	/* only boost for DCS2 boards */
 	if (!m_auto_ack && !m_transfer.hle_enabled)
 		machine().scheduler().boost_interleave(attotime::from_nsec(500), attotime::from_usec(5));
-	if (m_rev == 1 || m_rev == 15)
+	if ( /* m_rev == 1 || */ m_rev == 15) // == 1 check breaks mk3
 		return IS_OUTPUT_FULL() ? 0x80 : 0x00;
 	return m_latch_control;
 }
@@ -1578,6 +1579,7 @@ WRITE16_MEMBER( dcs_audio_device::output_latch_w )
 	m_pre_output_data = data;
 	if (LOG_DCS_IO)
 		logerror("%08X:output_latch_w(%04X) (empty=%d)\n", space.device().safe_pc(), data, IS_OUTPUT_EMPTY());
+
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(dcs_audio_device::latch_delayed_w),this), data>>8);
 }
 
@@ -1586,7 +1588,7 @@ WRITE32_MEMBER( dcs_audio_device::output_latch32_w )
 	m_pre_output_data = data >> 8;
 	if (LOG_DCS_IO)
 		logerror("%08X:output_latch32_w(%04X) (empty=%d)\n", space.device().safe_pc(), data>>8, IS_OUTPUT_EMPTY());
-		logerror("%08X:output_latch32_w(%04X) (empty=%d)\n", space.device().safe_pc(), data>>8, IS_OUTPUT_EMPTY());
+
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(dcs_audio_device::latch_delayed_w),this), data>>8);
 }
 
