@@ -3130,6 +3130,26 @@ ROM_START( astormb2 )
 	ROM_LOAD( "n82s123n.123",  0x0100, 0x0020, CRC(58bcf8bd) SHA1(e4d3d179b08c0f3424a6bec0f15058fb1b56f8d8) )
 ROM_END
 
+/*
+
+Michael Jackson's Mooonwalker bootleg - Complete Dump
+
+This romset comes from a bootleg pcb.This is the complement of which lacks in the existing set (mwalkbl)
+Hardware info:
+Main cpu 68000P10
+Sound cpu Z80A
+Sound ic OKi6295
+Osc 20 Mhz and 8 Mhz
+Rom definition:
+mwb5snd - sound program
+mwb10snd to mwb15snd - adpcm samples
+mwb16obj to mwb31obj - sprites/objects
+Rest of eproms (main program and tiles/bg) are identical of existing set and original set respectively.
+Note - sound section was been heavily modified: sound program to use only samples and some musics are cut (not present).Sprite eproms are splitted from original set.
+Eproms are 27512, 27010
+
+*/
+
 
 ROM_START( mwalkbl )
 	ROM_REGION( 0x080000, "maincpu", 0 ) /* 68000 code */
@@ -3148,15 +3168,37 @@ ROM_START( mwalkbl )
 	ROM_LOAD( "mpr13218.b3", 0x80000, 0x40000, CRC(56d3393c) SHA1(50a2d065060692c9ecaa56046a781cb21d93e554) )
 
 	ROM_REGION16_BE( 0x200000, "sprites", 0 ) /* sprites */
-	ROM_LOAD16_BYTE( "mpr13224.b11", 0x000001, 0x40000, CRC(c59f107b) SHA1(10fa60fca6e34eda277c483bb1c0e81bb88c8a47) )
-	ROM_LOAD16_BYTE( "mpr13231.a11", 0x000000, 0x40000, CRC(a5e96346) SHA1(a854f4dd5dc16975373255110fdb8ab3d121b1af) )
-	ROM_LOAD16_BYTE( "mpr13223.b10", 0x080001, 0x40000, CRC(364f60ff) SHA1(9ac887ec0b2e32b504b7c6a5f3bb1ce3fe41a15a) )
-	ROM_LOAD16_BYTE( "mpr13230.a10", 0x080000, 0x40000, CRC(9550091f) SHA1(bb6e898f7b540e130fd338c10f74609a7604cef4) )
-	ROM_LOAD16_BYTE( "mpr13222.b9",  0x100001, 0x40000, CRC(523df3ed) SHA1(2e496125e75decd674c3a08404fbdb53791a965d) )
-	ROM_LOAD16_BYTE( "mpr13229.a9",  0x100000, 0x40000, CRC(f40dc45d) SHA1(e9468cef428f52ecdf6837c6d9a9fea934e7676c) )
-	ROM_LOAD16_BYTE( "epr13221.b8",  0x180001, 0x40000, CRC(9ae7546a) SHA1(5413b0131881b0b32bac8de51da9a299835014bb) )
-	ROM_LOAD16_BYTE( "epr13228.a8",  0x180000, 0x40000, CRC(de3786be) SHA1(2279bb390aa3efab9aeee0a643e5cb6a4f5933b6) )
+	ROM_LOAD16_BYTE( "mwb22obj.bin", 0x000001, 0x20000, CRC(57f533d9) SHA1(9cb4412974a86ee2f472cbdad9acf1f9d83489a6) )
+	ROM_LOAD16_BYTE( "mwb29obj.bin", 0x000000, 0x20000, CRC(54988614) SHA1(40c7dc8a5df48412c6d97f330c47cad6a3150542) )
+	ROM_LOAD16_BYTE( "mwb20obj.bin", 0x080001, 0x20000, CRC(542d217a) SHA1(153c32a263d6df5254ce1a5f8c72a1803e430899) )
+	ROM_LOAD16_BYTE( "mwb27obj.bin", 0x080000, 0x20000, CRC(f249363a) SHA1(ae52ceb67eb943fc6da9a0819a5bbd8fdddfda4b) )
+	ROM_LOAD16_BYTE( "mwb18obj.bin",  0x100001, 0x20000, CRC(78d7410d) SHA1(d4b18fa62252960b5d1fdcc2b61fb535b6821101) )
+	ROM_LOAD16_BYTE( "mwb25obj.bin",  0x100000, 0x20000, CRC(a8f8190f) SHA1(be9d4c61cf3f09c20354fd7a1841ae0beac4639d) )
+	ROM_LOAD16_BYTE( "mwb16obj.bin",  0x180001, 0x20000, CRC(160611d3) SHA1(c091b197635e8d35c8b605189597e5f9749ed7fb) )
+	ROM_LOAD16_BYTE( "mwb23obj.bin",  0x180000, 0x20000, CRC(786f9f76) SHA1(19adc8731625ca0b53fff85cc2f9c6118ad61cf2) )
+	ROM_LOAD16_BYTE( "mwb31obj.bin", 0x040001, 0x20000, CRC(9cf9f268) SHA1(85c6e62c4d7d2f8e6222986c049ae752f4338da8) )
+	ROM_LOAD16_BYTE( "mwb30obj.bin", 0x040000, 0x20000, CRC(1a819d08) SHA1(cf12f3f1c964232d57d02578bf96a7e1e9438768) )
+	ROM_LOAD16_BYTE( "mwb21obj.bin", 0x0c0001, 0x20000, CRC(bc0f0a21) SHA1(c5d28de33f520f91b15df645d28072b1b6f638a5) )
+	ROM_LOAD16_BYTE( "mwb28obj.bin", 0x0c0000, 0x20000, CRC(12dc375b) SHA1(7958120eb6c9c5a1b8bd6ad8a8119189eab8d851) )
+	ROM_LOAD16_BYTE( "mwb19obj.bin",  0x140001, 0x20000, CRC(4e91d106) SHA1(a137f8a46d55e4f17165a2a5cb625e77132ca773) )
+	ROM_LOAD16_BYTE( "mwb26obj.bin",  0x140000, 0x20000, CRC(660d43b2) SHA1(eb4cd62642b63d0120fda6598bdc7f39c4b7a8ea) )
+	ROM_LOAD16_BYTE( "mwb17obj.bin",  0x1c0001, 0x20000, CRC(97353bad) SHA1(ea830478c96237a95382367bf60c765f4f6bb67e) )
+	ROM_LOAD16_BYTE( "mwb24obj.bin",  0x1c0000, 0x20000, CRC(a0ec7855) SHA1(f4e69eccfc3f93bd1531c4674afb1eade6ddc08c) )
 
+	ROM_REGION( 0xc0000, "bootz80", 0 ) /* new z80 program */
+	ROM_LOAD( "mwb5snd.bin", 0x00000, 0x08000, CRC(f8f9817e) SHA1(e23595891cee84c5bce15021ce0643acb4520da9) )
+	ROM_CONTINUE(0x0000, 0x8000) // first half is empty
+   
+	ROM_REGION( 0xc0000, "bootoki", 0 ) /* 6295 samples */
+	ROM_LOAD( "mwb10snd.bin", 0x00000, 0x20000, CRC(5325c4e6) SHA1(d6e3e6a34f5b8a63eece877dc8fe03f534f74cff) ) // sample table in here
+	ROM_LOAD( "mwb11snd.bin", 0x20000, 0x10000, CRC(6f2b6250) SHA1(de3b0a553a195ef9b120b768a98628837f0d0a2d) ) // why is this smaller? is it correct?
+	ROM_LOAD( "mwb12snd.bin", 0x40000, 0x20000, CRC(239a4c59) SHA1(323ded2fe7c50f400c21332b1adefe2df7ba7fad) )
+	ROM_LOAD( "mwb13snd.bin", 0x60000, 0x20000, CRC(9af67cc4) SHA1(bc9fbbea63b0c15c0f47e12c83a5aba35c6897c5) )
+	ROM_LOAD( "mwb14snd.bin", 0x80000, 0x20000, CRC(9d8f84ad) SHA1(1e1e645dcf974edb58adc58f0ead9041bb0af0a7) )
+	ROM_LOAD( "mwb15snd.bin", 0xa0000, 0x20000, CRC(05d5abcb) SHA1(c8ac197a655c8f8fa0f4a38cbc4b7adbf256cd48) )
+
+
+// original sound roms, SHOULD NOT BE LOADING THESE BUT EMULATION IS STILL USING THEM
 	ROM_REGION( 0x100000, "soundcpu", 0 ) /* sound CPU */
 	ROM_LOAD( "epr13225.a4", 0x10000, 0x20000, CRC(56c2e82b) SHA1(d5755a1bb6e889d274dc60e883d4d65f12fdc877) )
 	ROM_LOAD( "mpr13219.b4", 0x30000, 0x40000, CRC(19e2061f) SHA1(2dcf1718a43dab4da53b4f67722664e70ddd2169) )
