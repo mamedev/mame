@@ -239,17 +239,17 @@ ppc_device::ppc_device(const machine_config &mconfig, device_type type, const ch
 }
 
 //ppc403_device::ppc403_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-//	: ppc_device(mconfig, PPC403, "PPC403", tag, owner, clock, "ppc403", 32)
+//  : ppc_device(mconfig, PPC403, "PPC403", tag, owner, clock, "ppc403", 32)
 //{
 //}
 //
 //ppc405_device::ppc405_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-//	: ppc_device(mconfig, PPC405, "PPC405", tag, owner, clock, "ppc405", 32)
+//  : ppc_device(mconfig, PPC405, "PPC405", tag, owner, clock, "ppc405", 32)
 //{
 //}
 
 ppc603_device::ppc603_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: ppc_device(mconfig, PPC603", "PowerPC 603", tag, owner, clock, "ppc603", 64, PPC_MODEL_603, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED | PPCCAP_603_MMU, 4)
+	: ppc_device(mconfig, PPC603, "PowerPC 603", tag, owner, clock, "ppc603", 64, PPC_MODEL_603, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED | PPCCAP_603_MMU, 4)
 {
 }
 
