@@ -27,6 +27,9 @@ Segment data is sent to each 14seg digit by first writing half of the data to po
 
   Changelog:
 
+   2014 JUL 22 [Felipe Sanches]:
+   * Fixing alignment of 14-seg display multiplexation
+
    2014 JUL 19 [Felipe Sanches]:
    * Got the display working except for a few glitches
 
@@ -126,7 +129,20 @@ WRITE8_MEMBER(minicom_state::minicom_io_w)
 	{
 		case 0x00:
 		{
-			m_p[offset]=data;
+			if (data != m_p[offset])
+			{
+				m_p[offset]=data;
+
+				//Bit P0.1 is the serial-input of a 20-bit shift register (made of a couple of chained UCN5810AF chips)
+				//We are emulating the display based on the assumption that the firmware will multiplex it by defining one digit at a given time
+				//It would be better (in terms of being closer to the actual hardware) to emulate the 20 bit shift register and update all digits
+				//for which a bit is TTL high. It seems to me that in the real hardware that would result in dimmer brightness in the display and it
+				//does not seem trivial to me to implement this using our current layout system. I'm leaving this note to whoever finds it exciting
+				//to explore these possibilities (perhaps myself in the future?).
+				if (BIT(data,1)){
+					m_digit_index = 0;
+				}
+			}
 			break;
 		}
 		case 0x01:
