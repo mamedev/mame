@@ -79,7 +79,7 @@ public:
 		m_maincpu(*this, "maincpu")
 	{ }
 
-	required_device<tms70c46_device> m_maincpu;
+	required_device<tms70c40_device> m_maincpu;
 
 	ioport_port *m_key_matrix[8];
 	emu_timer *m_poweron_timer;
@@ -416,7 +416,7 @@ void ti74_state::machine_start()
 static MACHINE_CONFIG_START( ti74, ti74_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS70C46, XTAL_4MHz)
+	MCFG_CPU_ADD("maincpu", TMS70C40, XTAL_4MHz) // C70009 is a TMS70C40 underneath
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(main_io_map)
 

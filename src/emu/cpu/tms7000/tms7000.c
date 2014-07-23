@@ -44,10 +44,6 @@ const device_type TMS70C00 = &device_creator<tms70c00_device>;
 const device_type TMS70C20 = &device_creator<tms70c20_device>;
 const device_type TMS70C40 = &device_creator<tms70c40_device>;
 
-// 70C46 is same as 70C40, except with support for memory mapped I/O?
-// note: may also be labeled TMC70009
-const device_type TMS70C46 = &device_creator<tms70c46_device>;
-
 // 70x1 features more peripheral I/O, the main addition being a serial port.
 // 70x2 is the same, just with twice more RAM (256 bytes)
 const device_type TMS7001 = &device_creator<tms7001_device>;
@@ -161,11 +157,6 @@ tms70c20_device::tms70c20_device(const machine_config &mconfig, const char *tag,
 
 tms70c40_device::tms70c40_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: tms7000_device(mconfig, TMS70C40, "TMS70C40", tag, owner, clock, ADDRESS_MAP_NAME(tms7040_mem), TMS7000_CHIP_IS_CMOS, "tms70c40", __FILE__)
-{
-}
-
-tms70c46_device::tms70c46_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: tms7000_device(mconfig, TMS70C46, "TMS70C46", tag, owner, clock, ADDRESS_MAP_NAME(tms7040_mem), TMS7000_CHIP_IS_CMOS, "tms70c46", __FILE__)
 {
 }
 

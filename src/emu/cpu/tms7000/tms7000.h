@@ -304,13 +304,6 @@ public:
 };
 
 
-class tms70c46_device : public tms7000_device
-{
-public:
-	tms70c46_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-};
-
-
 class tms7001_device : public tms7000_device
 {
 public:
@@ -346,7 +339,6 @@ extern const device_type TMS7040;
 extern const device_type TMS70C00;
 extern const device_type TMS70C20;
 extern const device_type TMS70C40;
-extern const device_type TMS70C46;
 extern const device_type TMS7001;
 extern const device_type TMS7041;
 extern const device_type TMS7002;
