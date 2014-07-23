@@ -180,6 +180,7 @@ static HD44780_PIXEL_UPDATE(ti74_pixel_update)
 	else if (line < 2 && pos < 16)
 	{
 		// internal: 2*16, external: 1*31 + indicators
+		if (y == 7) y++; // the cursor is slightly below the 5x7 character
 		bitmap.pix16(1 + y, 1 + line*16*6 + pos*6 + x) = state;
 	}
 }
@@ -425,8 +426,8 @@ static MACHINE_CONFIG_START( ti74, ti74_state )
 	MCFG_SCREEN_ADD("screen", LCD)
 	MCFG_SCREEN_REFRESH_RATE(60) // arbitrary
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
-	MCFG_SCREEN_SIZE(6*31+1, 9*1+1)
-	MCFG_SCREEN_VISIBLE_AREA(0, 6*31, 0, 9*1)
+	MCFG_SCREEN_SIZE(6*31+1, 9*1+1+1)
+	MCFG_SCREEN_VISIBLE_AREA(0, 6*31, 0, 9*1+1)
 	MCFG_DEFAULT_LAYOUT(layout_ti74)
 	MCFG_SCREEN_UPDATE_DEVICE("hd44780", hd44780_device, screen_update)
 	MCFG_SCREEN_PALETTE("palette")

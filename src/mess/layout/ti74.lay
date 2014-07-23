@@ -148,10 +148,10 @@
 
 
 	<view name="Internal Layout">
-		<bounds left="0" top="0" right="189" bottom="28" />
+		<bounds left="0" top="0" right="189" bottom="29" />
 
 		<screen index="0">
-			<bounds x="1" y="9" width="187" height="10" />
+			<bounds x="1" y="9" width="187" height="11" />
 		</screen>
 
 <!-- draw background around lcd screen matrix part -->
@@ -160,13 +160,13 @@
 			<bounds left="0" top="0" right="188" bottom="9.25" />
 		</bezel>
 		<bezel element="static_bg">
-			<bounds left="0" top="0" right="1.25" bottom="28" />
+			<bounds left="0" top="0" right="1.25" bottom="29" />
 		</bezel>
 		<bezel element="static_bg">
-			<bounds left="187.75" top="0" right="189" bottom="28" />
+			<bounds left="187.75" top="0" right="189" bottom="29" />
 		</bezel>
 		<bezel element="static_bg">
-			<bounds left="0" top="18.75" right="188" bottom="28" />
+			<bounds left="0" top="19.75" right="188" bottom="29" />
 		</bezel>
 
 <!-- draw top row of lcd indicators -->
@@ -201,22 +201,22 @@
 <!-- draw bottom row of lcd indicators -->
 
 		<bezel name="lamp63" element="ind_basic">
-			<bounds x="16" y="22" width="20" height="5" />
+			<bounds x="16" y="23" width="20" height="5" />
 		</bezel>
 		<bezel name="lamp64" element="ind_calc">
-			<bounds x="43" y="22" width="20" height="5" />
+			<bounds x="43" y="23" width="20" height="5" />
 		</bezel>
 		<bezel name="lamp1" element="ind_deg">
-			<bounds x="70" y="22" width="20" height="5" />
+			<bounds x="70" y="23" width="20" height="5" />
 		</bezel>
 		<bezel name="lamp62" element="ind_rad">
-			<bounds x="97" y="22" width="20" height="5" />
+			<bounds x="97" y="23" width="20" height="5" />
 		</bezel>
 		<bezel name="lamp53" element="ind_grad">
-			<bounds x="124" y="22" width="20" height="5" />
+			<bounds x="124" y="23" width="20" height="5" />
 		</bezel>
 		<bezel name="lamp54" element="ind_stat">
-			<bounds x="151" y="22" width="20" height="5" />
+			<bounds x="151" y="23" width="20" height="5" />
 		</bezel>
 
 	</view>

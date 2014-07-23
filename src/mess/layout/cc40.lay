@@ -138,10 +138,10 @@
 
 
 	<view name="Internal Layout">
-		<bounds left="0" top="0" right="189" bottom="32" />
+		<bounds left="0" top="0" right="189" bottom="33" />
 
 		<screen index="0">
-			<bounds x="1" y="11" width="187" height="10" />
+			<bounds x="1" y="11" width="187" height="11" />
 		</screen>
 
 <!-- draw background around lcd screen matrix part -->
@@ -150,13 +150,13 @@
 			<bounds left="0" top="0" right="188" bottom="11.25" />
 		</bezel>
 		<bezel element="static_bg">
-			<bounds left="0" top="0" right="1.25" bottom="32" />
+			<bounds left="0" top="0" right="1.25" bottom="33" />
 		</bezel>
 		<bezel element="static_bg">
-			<bounds left="187.75" top="0" right="189" bottom="32" />
+			<bounds left="187.75" top="0" right="189" bottom="33" />
 		</bezel>
 		<bezel element="static_bg">
-			<bounds left="0" top="20.75" right="188" bottom="32" />
+			<bounds left="0" top="21.75" right="188" bottom="33" />
 		</bezel>
 
 <!-- draw top row of lcd indicators -->
@@ -197,30 +197,30 @@
 <!-- draw bottom row of lcd indicators -->
 
 		<bezel name="lamp60" element="ind_error">
-			<bounds x="7" y="24" width="20" height="5" />
+			<bounds x="7" y="25" width="20" height="5" />
 		</bezel>
 
 		<bezel name="lamp61" element="ind_user">
-			<bounds x="29" y="26" width="20" height="5" />
+			<bounds x="29" y="27" width="20" height="5" />
 		</bezel>
 		<bezel name="lamp62" element="ind_user">
-			<bounds x="51" y="26" width="20" height="5" />
+			<bounds x="51" y="27" width="20" height="5" />
 		</bezel>
 		<bezel name="lamp63" element="ind_user">
-			<bounds x="73" y="26" width="20" height="5" />
+			<bounds x="73" y="27" width="20" height="5" />
 		</bezel>
 		<bezel name="lamp50" element="ind_user">
-			<bounds x="95" y="26" width="20" height="5" />
+			<bounds x="95" y="27" width="20" height="5" />
 		</bezel>
 		<bezel name="lamp51" element="ind_user">
-			<bounds x="117" y="26" width="20" height="5" />
+			<bounds x="117" y="27" width="20" height="5" />
 		</bezel>
 		<bezel name="lamp52" element="ind_user">
-			<bounds x="139" y="26" width="20" height="5" />
+			<bounds x="139" y="27" width="20" height="5" />
 		</bezel>
 
 		<bezel name="lamp53" element="ind_low">
-			<bounds x="165" y="25.5" width="12" height="5" />
+			<bounds x="165" y="26.5" width="12" height="5" />
 		</bezel>
 
 
