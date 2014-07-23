@@ -311,7 +311,7 @@ int main(int argc, char *argv[])
 			}
 
 			/* convert spaces to tabs, if used for indenting */
-			while (spaces > 0 && (!in_multiline_comment || col < indent_multiline_comment) && (col == 0 || modified[dst-1] == 0x09))
+			while (spaces > 0 && (!in_multiline_comment || col < indent_multiline_comment) && (col == 0 || modified[dst-1] == 0x09) && !in_c_string)
 			{
 				modified[dst++] = 0x09;
 				spaces -= tab_size;
