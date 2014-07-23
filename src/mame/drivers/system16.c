@@ -3188,7 +3188,7 @@ ROM_START( mwalkbl )
 	ROM_REGION( 0xc0000, "bootz80", 0 ) /* new z80 program */
 	ROM_LOAD( "mwb5snd.bin", 0x00000, 0x08000, CRC(f8f9817e) SHA1(e23595891cee84c5bce15021ce0643acb4520da9) )
 	ROM_CONTINUE(0x0000, 0x8000) // first half is empty
-   
+
 	ROM_REGION( 0xc0000, "bootoki", 0 ) /* 6295 samples */
 	ROM_LOAD( "mwb10snd.bin", 0x00000, 0x20000, CRC(5325c4e6) SHA1(d6e3e6a34f5b8a63eece877dc8fe03f534f74cff) ) // sample table in here
 	ROM_LOAD( "mwb11snd.bin", 0x20000, 0x10000, CRC(6f2b6250) SHA1(de3b0a553a195ef9b120b768a98628837f0d0a2d) ) // why is this smaller? is it correct?
