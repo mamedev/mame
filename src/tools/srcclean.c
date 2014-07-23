@@ -260,7 +260,7 @@ int main(int argc, char *argv[])
 			/* we are no longer in a C++-style comment */
 			in_singleline_comment = false;
 
-			if (in_c_string)
+			if (in_c_string && modified[dst-3] != '\\')
 			{
 				printf("Error: unterminated string literal: %x (%s)\n", src, argv[1]);
 				return 1;
