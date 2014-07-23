@@ -3,11 +3,12 @@
 /***************************************************************************
 
   Texas Instruments Compact Computer 40 (aka CC-40)
+  hardware family: CC-40 -> CC-40+(unreleased) -> TI-74 BASICALC -> TI-95 PROCALC
 
   ---------------------------------------------
   | ---------------------------------------   |
   | |                                     |   |
-  | | LCD 1 line, 31 chars + indicators   |   |
+  | | LCD 1 line, 31 chars + 18 indicators|   |
   | |                                     |   ---------------
   | ---------------------------------------                 |
   |                                                         |
@@ -38,7 +39,7 @@
 
   HM6116LP-4    - Hitachi 2KB SRAM (newer 18KB version has two HM6264 8KB chips)
   HN61256PC09   - Hitachi DIP-28 32KB CMOS Mask PROM
-  TMX70C20N2L   - Texas Instruments TMS70C20 CPU (128 bytes RAM, 2KB ROM) @ 2.5MHz - "X" implies prototype
+  TMX70C20N2L   - Texas Instruments TMS70C20 CPU (128 bytes RAM, 2KB ROM) @ 2.5MHz, 40 pins - "X" implies prototype
   AMI 1041036-1 - 68-pin QFP AMI Gate Array
   HD44100H      - 60-pin QFP Hitachi HD44100 LCD Driver
   HD44780A00    - 80-pin TFP Hitachi HD44780 LCD Controller
@@ -58,14 +59,13 @@
   TODO:
   - some strange bugs with Games I cartridge, bad dump or emulation bug?
   - other RAM configurations (6KB(default), 18KB, external)
+  - understand bus_control_r/w
   - Hexbus interface and peripherals
     * HX-1000: color plotter
     * HX-1010: thermal printer
     * HX-3000: RS-232 interface
     * HX-3100: modem
     * HX-3200: Centronics printer interface
-  - HD44100 is not accessed by the CPU, is it connected to the HD44780?
-    Probably responsible for the LCD indicators, how?
 
 ***************************************************************************/
 
@@ -101,6 +101,7 @@ public:
 	void update_lcd_indicator(UINT8 y, UINT8 x, int state);
 
 	DECLARE_READ8_MEMBER(bus_control_r);
+	DECLARE_WRITE8_MEMBER(bus_control_w);
 	DECLARE_WRITE8_MEMBER(power_w);
 	DECLARE_WRITE8_MEMBER(sound_w);
 	DECLARE_READ8_MEMBER(battery_r);
@@ -116,6 +117,7 @@ public:
 	DECLARE_PALETTE_INIT(cc40);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cc40_cartridge);
 };
+
 
 
 /***************************************************************************
@@ -135,7 +137,7 @@ DEVICE_IMAGE_LOAD_MEMBER(cc40_state, cc40_cartridge)
 		size = image.get_software_region_length("rom");
 
 	// max size is 4*32KB
-	if (size >= 0x20000)
+	if (size > 0x20000)
 	{
 		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Invalid file size");
 		return IMAGE_INIT_FAIL;
@@ -209,6 +211,11 @@ READ8_MEMBER(cc40_state::bus_control_r)
 	// describing system hardware configuration, but there doesn't seem to be any indication
 	// that it's used at all.
 	return 0x4c;
+}
+
+WRITE8_MEMBER(cc40_state::bus_control_w)
+{
+	;
 }
 
 WRITE8_MEMBER(cc40_state::power_w)
@@ -299,7 +306,7 @@ WRITE8_MEMBER(cc40_state::keyboard_w)
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, cc40_state )
 	ADDRESS_MAP_UNMAP_HIGH
 
-	AM_RANGE(0x0110, 0x0110) AM_READ(bus_control_r)
+	AM_RANGE(0x0110, 0x0110) AM_READWRITE(bus_control_r, bus_control_w)
 	AM_RANGE(0x0111, 0x0111) AM_WRITE(power_w)
 	AM_RANGE(0x0112, 0x0112) AM_NOP // hexbus data
 	AM_RANGE(0x0113, 0x0113) AM_NOP // hexbus available

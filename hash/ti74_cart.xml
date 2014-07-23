@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<softwarelist name="ti74_cart" description="TI-74 cartridges">
+
+<!--
+
+    Not dumped yet:
+    - Chemical Engineering
+    - Finance
+    - Mathematics
+    - Statistics
+
+    Not included in list:
+    - 8KB RAM, battery backed
+
+-->
+
+
+	<software name="pascal">
+		<description>Learn Pascal</description>
+		<year>1985</year>
+		<publisher>Texas Instruments</publisher>
+		<info name="usage" value="Load with RUN &quot;PASCAL&quot;" />
+		<part name="cart" interface="ti74_cart">
+			<dataarea name="rom" size="0x8000">
+				<rom name="pascal.bin" size="0x8000" crc="e4135cff" sha1="eab92188fb19545f677ede926c2c0b6af26b7e25" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>
