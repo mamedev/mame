@@ -439,7 +439,7 @@ static const gfx_layout sprite_layout =
 	16,16,
 	RGN_FRAC(1,2),
 	2,
-	{ 0,RGN_FRAC(1,2) },
+	{ RGN_FRAC(1,2),0 },
 	{ STEP8(0,1),STEP8(64,1) },
 	{ STEP8(0,8),STEP8(128,8) },
 	16*16
@@ -708,8 +708,8 @@ ROM_START( grchamp )
 	ROM_LOAD( "gm08",   0x1000, 0x1000, CRC(224d880c) SHA1(68aaaa0213d09cf34ba50c91d8c031d041f8a76f) )
 
 	ROM_REGION( 0x2000, "gfx1", 0 ) /* characters/sprites */
-	ROM_LOAD( "gm01",   0x0000, 0x1000, CRC(846f8e89) SHA1(346bfd69268606fde27643b4d135b481536b73b1) )
-	ROM_LOAD( "gm02",   0x1000, 0x1000, CRC(5911948d) SHA1(6f3a9a7f8d6a04b8e6d83756764c9c4185983d9b) )
+	ROM_LOAD( "gm02",   0x0000, 0x1000, CRC(5911948d) SHA1(6f3a9a7f8d6a04b8e6d83756764c9c4185983d9b) )
+	ROM_LOAD( "gm01",   0x1000, 0x1000, CRC(846f8e89) SHA1(346bfd69268606fde27643b4d135b481536b73b1) )
 
 	ROM_REGION( 0x2000, "gfx2", 0 ) /* left tiles */
 	ROM_LOAD( "gr20",   0x0000, 0x1000, CRC(88ba2c03) SHA1(4dfd136f122663223043c6cd79566f8eeec72681) )
