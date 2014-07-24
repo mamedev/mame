@@ -2604,6 +2604,7 @@ $(DRIVERS)/funworld.o:  $(LAYOUT)/jollycrd.lh \
 
 $(DRIVERS)/g627.o:      $(LAYOUT)/g627.lh
 $(DRIVERS)/gp_1.o:      $(LAYOUT)/gp_1.lh
+$(DRIVERS)/gp_2.o:      $(LAYOUT)/gp_2.lh
 
 $(DRIVERS)/galaxi.o:    $(LAYOUT)/galaxi.lh
 

@@ -13,8 +13,8 @@ games at the start of ball 1.
 
 
 ToDo:
-- Family Fun / Star Trip, the chimes have been replaced by a SN76477, not yet
-  emulated.
+- Family Fun / Star Trip / Vegas, the chimes have been replaced by a SN76477,
+  not yet emulated.
 
 ********************************************************************************/
 
@@ -69,7 +69,7 @@ private:
 
 
 static ADDRESS_MAP_START( gp_1_map, AS_PROGRAM, 8, gp_1_state )
-	AM_RANGE(0x0000, 0x0fff) AM_ROM
+	AM_RANGE(0x0000, 0x0fff) AM_ROM AM_REGION("roms", 0)
 	AM_RANGE(0x8c00, 0x8cff) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
 
@@ -403,7 +403,7 @@ MACHINE_CONFIG_END
 
 
 ROM_START( gp_110 )
-	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_REGION(0x1000, "roms", 0)
 	ROM_LOAD( "a-110.u12", 0x0000, 0x0800, CRC(ed0d518b) SHA1(8f3ca8792ad907c660d9149a1aa3a3528c7573e3))
 	ROM_LOAD( "b1-110.u13", 0x0800, 0x0800, CRC(a223f2e8) SHA1(767e15e19e11399935c890c1d1034dccf1ad7f92))
 ROM_END
@@ -439,7 +439,7 @@ ROM_END
 / Family Fun! (April 1979) - Model: Cocktail #120
 /-------------------------------------------------------------------*/
 ROM_START(famlyfun)
-	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_REGION(0x1000, "roms", 0)
 	ROM_LOAD( "family.u12", 0x0000, 0x0800, CRC(98f27fdf) SHA1(8bcff1e13b9b978f91110f1e83a3288723930a1d))
 	ROM_LOAD( "family.u13", 0x0800, 0x0800, CRC(b941a1a8) SHA1(a43f8acadb3db3e2274162d5305e30006f912339))
 ROM_END
@@ -448,9 +448,18 @@ ROM_END
 / Star Trip (April 1979) - Model: Cocktail #120
 /-------------------------------------------------------------------*/
 ROM_START(startrip)
-	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_REGION(0x1000, "roms", 0)
 	ROM_LOAD( "startrip.u12", 0x0000, 0x0800, CRC(98f27fdf) SHA1(8bcff1e13b9b978f91110f1e83a3288723930a1d))
 	ROM_LOAD( "startrip.u13", 0x0800, 0x0800, CRC(b941a1a8) SHA1(a43f8acadb3db3e2274162d5305e30006f912339))
+ROM_END
+
+/*-------------------------------------------------------------------
+/ Vegas (August 1979) - Cocktail Model #140
+/-------------------------------------------------------------------*/
+ROM_START(vegasgp)
+	ROM_REGION(0x1000, "roms", 0)
+	ROM_LOAD( "140a.12", 0x0000, 0x0800, CRC(2c00bc19) SHA1(521d4b44f46dea0a08e90cd3aea5799462215863))
+	ROM_LOAD( "140b.13", 0x0800, 0x0800, CRC(cf26d67b) SHA1(05481e880e23a7bc1d1716b52ac1effc0db437f2))
 ROM_END
 
 GAME(1978, gp_110,   0,        gp_1,     gp_1,     driver_device, 0,   ROT0, "Game Plan", "Model 110",    GAME_IS_BIOS_ROOT)
@@ -462,3 +471,4 @@ GAME(1978, rio,      gp_110,   gp_1,     gp_1,     driver_device, 0,   ROT0, "Ga
 GAME(1978, chucklck, gp_110,   gp_1,     gp_1,     driver_device, 0,   ROT0, "Game Plan", "Chuck-A-Luck", GAME_MECHANICAL)
 GAME(1979, famlyfun, 0,        gp_1,     gp_1,     driver_device, 0,   ROT0, "Game Plan", "Family Fun!",  GAME_MECHANICAL | GAME_IMPERFECT_SOUND )
 GAME(1979, startrip, 0,        gp_1,     gp_1,     driver_device, 0,   ROT0, "Game Plan", "Star Trip",    GAME_MECHANICAL | GAME_IMPERFECT_SOUND )
+GAME(1979, vegasgp,  0,        gp_1,     gp_1,     driver_device, 0,   ROT0, "Game Plan", "Vegas (Game Plan)", GAME_MECHANICAL | GAME_IMPERFECT_SOUND )
