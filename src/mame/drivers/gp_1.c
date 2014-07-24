@@ -4,12 +4,17 @@
     Game Plan MPU-1
     These are "cocktail" cabinets, although there is only one seating position.
 
+When first turned on, you need to press 9 to enter the setup program, then keep
+pressing 9 until 05 shows in the balls display. Press the credit button to set
+the first high score at which a free credit is awarded. Then press 9 to set the
+2nd high score, then 9 to set the 3rd high score. Keep pressing 9 until you exit
+back to normal operation. If this setup is not done, each player will get 3 free
+games at the start of ball 1.
+
+
 ToDo:
-- Player 4 score doesn't show
-- Tens digit of credits doesn't show
-- The machine awards 3 free credits per player at the start of ball 1.
-- Nothing specific done with Family Fun / Star Trip, although they seem to work
-  just as well as the others.
+- Family Fun / Star Trip, the chimes have been replaced by a SN76477, not yet
+  emulated.
 
 ********************************************************************************/
 
@@ -333,12 +338,15 @@ WRITE8_MEMBER( gp_1_state::porta_w )
 	}
 
 	static const UINT8 patterns[16] = { 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7c,0x07,0x7f,0x67,0x58,0x4c,0x62,0x69,0x78,0 }; // 7448
-	if (m_u14 >= 8)
+	if (m_digit == 7)
+		m_segment[m_u14] = data & 15; // only 8,9,10,11 are needed
+	else
+	if (m_u14 == 8)
 	{
-		if (m_digit == 7)
-			m_segment[m_u14] = data & 15;
-		else
-			output_set_digit_value(m_digit+(m_u14-8)*8, patterns[m_segment[m_u14]]);
+		output_set_digit_value(m_digit, patterns[m_segment[8]]);
+		output_set_digit_value(m_digit+8, patterns[m_segment[9]]);
+		output_set_digit_value(m_digit+16, patterns[m_segment[10]]);
+		output_set_digit_value(m_digit+24, patterns[m_segment[11]]);
 	}
 }
 
@@ -446,11 +454,11 @@ ROM_START(startrip)
 ROM_END
 
 GAME(1978, gp_110,   0,        gp_1,     gp_1,     driver_device, 0,   ROT0, "Game Plan", "Model 110",    GAME_IS_BIOS_ROOT)
-GAME(1978, blvelvet, gp_110,   gp_1,     gp_1,     driver_device, 0,   ROT0, "Game Plan", "Black Velvet", GAME_IS_SKELETON_MECHANICAL)
-GAME(1978, camlight, gp_110,   gp_1,     gp_1,     driver_device, 0,   ROT0, "Game Plan", "Camel Lights", GAME_IS_SKELETON_MECHANICAL)
-GAME(1978, foxylady, gp_110,   gp_1,     gp_1,     driver_device, 0,   ROT0, "Game Plan", "Foxy Lady",    GAME_IS_SKELETON_MECHANICAL)
-GAME(1978, real,     gp_110,   gp_1,     gp_1,     driver_device, 0,   ROT0, "Game Plan", "Real",         GAME_IS_SKELETON_MECHANICAL)
-GAME(1978, rio,      gp_110,   gp_1,     gp_1,     driver_device, 0,   ROT0, "Game Plan", "Rio",          GAME_IS_SKELETON_MECHANICAL)
-GAME(1978, chucklck, gp_110,   gp_1,     gp_1,     driver_device, 0,   ROT0, "Game Plan", "Chuck-A-Luck", GAME_IS_SKELETON_MECHANICAL)
-GAME(1979, famlyfun, 0,        gp_1,     gp_1,     driver_device, 0,   ROT0, "Game Plan", "Family Fun!",  GAME_IS_SKELETON_MECHANICAL)
-GAME(1979, startrip, 0,        gp_1,     gp_1,     driver_device, 0,   ROT0, "Game Plan", "Star Trip",    GAME_IS_SKELETON_MECHANICAL)
+GAME(1978, blvelvet, gp_110,   gp_1,     gp_1,     driver_device, 0,   ROT0, "Game Plan", "Black Velvet", GAME_MECHANICAL)
+GAME(1978, camlight, gp_110,   gp_1,     gp_1,     driver_device, 0,   ROT0, "Game Plan", "Camel Lights", GAME_MECHANICAL)
+GAME(1978, foxylady, gp_110,   gp_1,     gp_1,     driver_device, 0,   ROT0, "Game Plan", "Foxy Lady",    GAME_MECHANICAL)
+GAME(1978, real,     gp_110,   gp_1,     gp_1,     driver_device, 0,   ROT0, "Game Plan", "Real",         GAME_MECHANICAL)
+GAME(1978, rio,      gp_110,   gp_1,     gp_1,     driver_device, 0,   ROT0, "Game Plan", "Rio",          GAME_MECHANICAL)
+GAME(1978, chucklck, gp_110,   gp_1,     gp_1,     driver_device, 0,   ROT0, "Game Plan", "Chuck-A-Luck", GAME_MECHANICAL)
+GAME(1979, famlyfun, 0,        gp_1,     gp_1,     driver_device, 0,   ROT0, "Game Plan", "Family Fun!",  GAME_MECHANICAL | GAME_IMPERFECT_SOUND )
+GAME(1979, startrip, 0,        gp_1,     gp_1,     driver_device, 0,   ROT0, "Game Plan", "Star Trip",    GAME_MECHANICAL | GAME_IMPERFECT_SOUND )
