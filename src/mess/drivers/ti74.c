@@ -3,6 +3,7 @@
 /***************************************************************************
 
   Texas Instruments TI-74 BASICALC
+  Texas Instruments TI-95 PROCALC
   hardware family: CC-40 -> TI-74 BASICALC -> TI-95 PROCALC
 
           DOCK-BUS
@@ -27,15 +28,15 @@
   |                                            |
   |                                            |
   ----------                                   |
-           |-----------------------------------|
-           ||                                 ||
-           || LCD 1 line, 31 chars + 14 indic.||
-           ||                                 ||
-           |-----------------------------------|
+           | ----------------------------------|
+           | |                                ||
+           | |          LCD screen            ||
+           | |                                ||
+           | ----------------------------------|
            -------------------------------------
 
   IC1 HN61256PC93 - Hitachi DIP-28 32KB CMOS Mask PROM
-  IC2 C70009      - Texas Instruments TMS70C40 with some TI custom I/O mods, 54 pins (also seen labeled TMS70C46)
+  IC2 C70009      - Texas Instruments TMS70C40 with some TI custom I/O mods, 54 pins (C70011 in case of TI-95)
                     running at max 4MHz. 128 bytes internal RAM, 4KB internal ROM
   IC3 HM6264LP-15 - Hitachi 8KB SRAM (battery backed)
   RC4193N         - Micropower Switching Regulator
@@ -48,12 +49,12 @@
   Overall, the hardware is very similar to TI CC-40. A lot has been shuffled around
   to cut down on complexity (and probably for protection too).
   
-  TI-74 is powered by 4 AAA batteries. These will also save internal RAM,
+  The machine is powered by 4 AAA batteries. These will also save internal RAM,
   provided that the machine is turned off properly.
   
   
   TODO:
-  - control_r/w clock divider (currently always running full speed)
+  - it runs too fast due to missing clock divider emulation in TMS70C46
   - external ram cartridge
   - DOCK-BUS interface and peripherals
     * CI-7 cassette interface
@@ -79,24 +80,19 @@ public:
 		m_maincpu(*this, "maincpu")
 	{ }
 
-	required_device<tms70c40_device> m_maincpu;
+	required_device<tms70c46_device> m_maincpu;
 
 	ioport_port *m_key_matrix[8];
 	emu_timer *m_poweron_timer;
 
-	UINT8 m_control;
 	UINT8 m_key_select;
-	UINT16 m_ext_address;
 	UINT8 m_power;
 
 	void update_lcd_indicator(UINT8 y, UINT8 x, int state);
 
-	DECLARE_READ8_MEMBER(control_r);
-	DECLARE_WRITE8_MEMBER(control_w);
 	DECLARE_READ8_MEMBER(keyboard_r);
 	DECLARE_WRITE8_MEMBER(keyboard_w);
 	DECLARE_WRITE8_MEMBER(bankswitch_w);
-	DECLARE_WRITE8_MEMBER(ext_address_w);
 
 	virtual void machine_reset();
 	virtual void machine_start();
@@ -193,17 +189,6 @@ static HD44780_PIXEL_UPDATE(ti74_pixel_update)
 
 ***************************************************************************/
 
-READ8_MEMBER(ti74_state::control_r)
-{
-	return m_control;
-}
-
-WRITE8_MEMBER(ti74_state::control_w)
-{
-	// ? clock divider related
-	m_control = data;
-}
-
 READ8_MEMBER(ti74_state::keyboard_r)
 {
 	UINT8 ret = 0;
@@ -236,29 +221,13 @@ WRITE8_MEMBER(ti74_state::bankswitch_w)
 		m_maincpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE); // stop running
 	}
 	
-	// other bits: N/C
-}
-
-WRITE8_MEMBER(ti74_state::ext_address_w)
-{
-	// set external memory addressbus (DOCK-BUS related)
-	if (offset)
-		m_ext_address = (m_ext_address & 0xff00) | data;
-	else
-		m_ext_address = (m_ext_address & 0x00ff) | data << 8;
+	// d3: N/C
 }
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, ti74_state )
 	ADDRESS_MAP_UNMAP_HIGH
-
-	AM_RANGE(0x010c, 0x010c) AM_WRITE(keyboard_w) AM_READNOP
-	AM_RANGE(0x010d, 0x010d) AM_NOP // ? DOCK-BUS related
-	AM_RANGE(0x010e, 0x010e) AM_NOP // ? DOCK-BUS related
-	AM_RANGE(0x010f, 0x010f) AM_NOP // ? DOCK-BUS related
-	AM_RANGE(0x0118, 0x0118) AM_READWRITE(control_r, control_w)
-
+	AM_RANGE(0x010d, 0x010f) AM_NOP // DOCK-BUS
 	AM_RANGE(0x1000, 0x1001) AM_DEVREADWRITE("hd44780", hd44780_device, read, write)
-
 	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_SHARE("6264.ic3")
 	AM_RANGE(0x4000, 0xbfff) AM_ROM AM_REGION("user1", 0)
 	AM_RANGE(0xc000, 0xdfff) AM_ROMBANK("sysbank")
@@ -267,7 +236,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( main_io_map, AS_IO, 8, ti74_state )
 	AM_RANGE(TMS7000_PORTA, TMS7000_PORTA) AM_READ(keyboard_r)
 	AM_RANGE(TMS7000_PORTB, TMS7000_PORTB) AM_WRITE(bankswitch_w)
-	AM_RANGE(TMS7000_PORTC, TMS7000_PORTD) AM_WRITE(ext_address_w)
+	AM_RANGE(TMS7000_PORTE, TMS7000_PORTE) AM_WRITE(keyboard_w) AM_READNOP
 ADDRESS_MAP_END
 
 
@@ -401,22 +370,18 @@ void ti74_state::machine_start()
 	m_poweron_timer->adjust(attotime::never);
 
 	// zerofill
-	m_control = 0;
 	m_key_select = 0;
-	m_ext_address = 0;
 	m_power = 0;
 
 	// register for savestates
-	save_item(NAME(m_control));
 	save_item(NAME(m_key_select));
-	save_item(NAME(m_ext_address));
 	save_item(NAME(m_power));
 }
 
 static MACHINE_CONFIG_START( ti74, ti74_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS70C40, XTAL_4MHz) // C70009 is a TMS70C40 underneath
+	MCFG_CPU_ADD("maincpu", TMS70C46, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(main_io_map)
 
@@ -458,10 +423,10 @@ MACHINE_CONFIG_END
 
 ROM_START( ti74 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "tms70c46.ic2", 0xf000, 0x1000, CRC(55a2f7c0) SHA1(530e3de42f2e304c8f4805ad389f38a459ec4e33) ) // internal cpu rom
+	ROM_LOAD( "c70009.ic2", 0xf000, 0x1000, CRC(55a2f7c0) SHA1(530e3de42f2e304c8f4805ad389f38a459ec4e33) ) // internal cpu rom
 
 	ROM_REGION( 0x8000, "system", 0 )
-	ROM_LOAD( "001060281-1.ic1", 0x0000, 0x8000, CRC(019aaa2f) SHA1(04a1e694a49d50602e45a7834846de4d9f7d587d) ) // system rom, banked
+	ROM_LOAD( "hn61256pc93.ic1", 0x0000, 0x8000, CRC(019aaa2f) SHA1(04a1e694a49d50602e45a7834846de4d9f7d587d) ) // system rom, banked
 
 	ROM_REGION( 0x8000, "user1", ROMREGION_ERASEFF ) // cartridge area
 ROM_END

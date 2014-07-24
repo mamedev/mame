@@ -40,7 +40,8 @@ enum
 	TMS7000_PORTA = 0,      /* read-only on 70x0 */
 	TMS7000_PORTB,          /* write-only */
 	TMS7000_PORTC,
-	TMS7000_PORTD
+	TMS7000_PORTD,
+	TMS7000_PORTE           /* TMS70C46 only */
 };
 
 // chip info flags
@@ -87,7 +88,7 @@ protected:
 	virtual void execute_set_input(int extline, int state);
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const { return (spacenum == AS_PROGRAM) ? &m_program_config : ( (spacenum == AS_IO) ? &m_io_config : NULL ); }
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const { return (spacenum == AS_PROGRAM) ? &m_program_config : ( (spacenum == AS_IO) ? &m_io_config : ( (spacenum == AS_DATA) ? &m_data_config : NULL ) ); }
 
 	// device_state_interface overrides
 	void state_string_export(const device_state_entry &entry, astring &string);
@@ -101,12 +102,14 @@ protected:
 
 	address_space_config m_program_config;
 	address_space_config m_io_config;
+	address_space_config m_data_config;
 
 	UINT32 m_info_flags;
 
 	address_space *m_program;
 	direct_read_data *m_direct;
 	address_space *m_io;
+	address_space *m_data;
 	int m_icount;
 
 	bool m_irq_state[2];
@@ -268,6 +271,7 @@ class tms7020_exl_device : public tms7000_device
 {
 public:
 	tms7020_exl_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
 protected:
 	virtual void execute_one(UINT8 op);
 
@@ -301,6 +305,30 @@ class tms70c40_device : public tms7000_device
 {
 public:
 	tms70c40_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
+
+class tms70c46_device : public tms7000_device
+{
+public:
+	tms70c46_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	DECLARE_READ8_MEMBER(control_r);
+	DECLARE_WRITE8_MEMBER(control_w);
+
+	// extra 64KB external memory bus, or extra i/o port
+	DECLARE_WRITE8_MEMBER(e_bus_address_lo_w) { m_e_bus_address = (m_e_bus_address & 0xff00) | data; }
+	DECLARE_WRITE8_MEMBER(e_bus_address_hi_w) { m_e_bus_address = (m_e_bus_address & 0x00ff) | data << 8; }
+	DECLARE_READ8_MEMBER(e_bus_data_r) { return (m_control & 0x20) ? m_data->read_byte(m_e_bus_address) : m_io->read_byte(TMS7000_PORTE); }
+	DECLARE_WRITE8_MEMBER(e_bus_data_w) { if (m_control & 0x20) m_data->write_byte(m_e_bus_address, data); else m_io->write_byte(TMS7000_PORTE, data); }
+
+protected:
+	// device-level overrides
+	virtual void device_start();
+
+private:
+	UINT16 m_e_bus_address;
+	UINT8 m_control;
 };
 
 
@@ -339,6 +367,7 @@ extern const device_type TMS7040;
 extern const device_type TMS70C00;
 extern const device_type TMS70C20;
 extern const device_type TMS70C40;
+extern const device_type TMS70C46;
 extern const device_type TMS7001;
 extern const device_type TMS7041;
 extern const device_type TMS7002;
