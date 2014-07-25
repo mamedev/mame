@@ -53,6 +53,33 @@ Sound :
 
   bits 3-7 - not connected
 
+***************************************************************************
+
+  Unknown Pac-Man gambling game.
+  
+  How to play...
+
+  Just coin up using Gambling Coin In (key 7). All ghosts will be placed
+  around the center. (each ghost represent a number/card).
+
+  Bet using START, and once done, press UP, to allow the pacman eat all ghosts,
+  revealing the five numbers (like italian poker games without cards).
+
+  Now you have an arrow as cursor. Place it under the each number you want to
+  discard and press START to eliminate the number and place the representative
+  ghost again around.
+
+  Once done, just press UP again, and pacman will re-eat the new placed 
+  ghosts, revealing the new numbers (as a new deal).
+
+  If you have a winning hand, you can press DOWN to get a Double-Up.
+  Choose left or right for Big and Small. If you win, you'll double the bet
+  amount. If you lose, your pacman will die.
+
+  Coin with A or B to exit the gambling game and play the ultra-adictive
+  pacman front game again!...
+
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -262,9 +289,9 @@ static INPUT_PORTS_START( unkpacg )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) //  1 credits / initiate minigame
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 ) //  5 credits / initiate gambling
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN3 ) // 10 credits
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_NAME("Front Game Coin A")		//  1 credits / initiate minigame
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_NAME("Gambling Game Coin In")	//  5 credits / initiate gambling
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_NAME("Front Game Coin B")		// 10 credits
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -275,12 +302,12 @@ static INPUT_PORTS_START( unkpacg )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
 	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )         PORT_NAME("Start / Discard")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_NAME("UP / Deal")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_NAME("Left / Small")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_NAME("Right / Big")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_NAME("Down / Double-Up")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
