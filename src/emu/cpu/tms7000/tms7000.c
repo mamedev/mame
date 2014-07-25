@@ -23,6 +23,7 @@
  *  - memory modes with IOCNT0, currently always running in full expansion mode
  *  - timer event counter mode (timer control register, bit 6)
  *  - TMS70x1/2 serial port and timer 3
+ *  - TMS70C46 external memory mode is via "E" bus instead of configuring IOCNT0
  *  - TMS70C46 clock divider (don't know which part of the memorymap is slow)
  *  - TMS70C46 INT3 on keypress
  *  - when they're needed, add TMS70Cx2, TMS7742, TMS77C82, SE70xxx
@@ -118,12 +119,6 @@ static ADDRESS_MAP_START(tms7042_mem, AS_PROGRAM, 8, tms7000_device )
 	AM_IMPORT_FROM( tms7002_mem )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(tms70c46_io, AS_IO, 8, tms70c46_device)
-	AM_RANGE(TMS7000_PORTC, TMS7000_PORTC) AM_WRITE(e_bus_address_lo_w)
-	AM_RANGE(TMS7000_PORTD, TMS7000_PORTD) AM_WRITE(e_bus_address_hi_w)
-	AM_IMPORT_FROM( tms7000_io )
-ADDRESS_MAP_END
-
 static ADDRESS_MAP_START(tms70c46_mem, AS_PROGRAM, 8, tms70c46_device )
 	AM_RANGE(0x010c, 0x010c) AM_READWRITE(e_bus_data_r, e_bus_data_w)
 //	AM_RANGE(0x010d, 0x010d) --> to outside --> DOCK-BUS available
@@ -139,7 +134,6 @@ tms7000_device::tms7000_device(const machine_config &mconfig, const char *tag, d
 	: cpu_device(mconfig, TMS7000, "TMS7000", tag, owner, clock, "tms7000", __FILE__),
 	m_program_config("program", ENDIANNESS_BIG, 8, 16, 0, ADDRESS_MAP_NAME(tms7000_mem)),
 	m_io_config("io", ENDIANNESS_BIG, 8, 8, 0, ADDRESS_MAP_NAME(tms7000_io)),
-	m_data_config("data", ENDIANNESS_BIG, 8, 16, 0),
 	m_info_flags(0)
 {
 }
@@ -148,7 +142,6 @@ tms7000_device::tms7000_device(const machine_config &mconfig, device_type type, 
 	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source),
 	m_program_config("program", ENDIANNESS_BIG, 8, 16, 0, internal),
 	m_io_config("io", ENDIANNESS_BIG, 8, 8, 0, ADDRESS_MAP_NAME(tms7000_io)),
-	m_data_config("data", ENDIANNESS_BIG, 8, 16, 0),
 	m_info_flags(info_flags)
 {
 }
@@ -206,7 +199,6 @@ tms7042_device::tms7042_device(const machine_config &mconfig, const char *tag, d
 tms70c46_device::tms70c46_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: tms7000_device(mconfig, TMS70C46, "TMS70C46", tag, owner, clock, ADDRESS_MAP_NAME(tms70c46_mem), TMS7000_CHIP_IS_CMOS, "tms70c46", __FILE__)
 {
-	m_io_config = address_space_config("io", ENDIANNESS_BIG, 8, 8, 0, ADDRESS_MAP_NAME(tms70c46_io));
 }
 
 
@@ -220,7 +212,6 @@ void tms7000_device::device_start()
 	m_program = &space(AS_PROGRAM);
 	m_direct = &m_program->direct();
 	m_io = &space(AS_IO);
-	m_data = &space(AS_DATA);
 
 	m_icountptr = &m_icount;
 
@@ -906,14 +897,20 @@ void tms7020_exl_device::execute_one(UINT8 op)
 void tms70c46_device::device_start()
 {
 	// init/zerofill
-	m_e_bus_address = 0;
 	m_control = 0;
 	
 	// register for savestates
-	save_item(NAME(m_e_bus_address));
 	save_item(NAME(m_control));
 
 	tms7000_device::device_start();
+}
+
+void tms70c46_device::device_reset()
+{
+	m_control = 0;
+	m_io->write_byte(TMS7000_PORTE, 0xff);
+	
+	tms7000_device::device_reset();
 }
 
 READ8_MEMBER(tms70c46_device::control_r)
@@ -924,6 +921,9 @@ READ8_MEMBER(tms70c46_device::control_r)
 WRITE8_MEMBER(tms70c46_device::control_w)
 {
 	// d5: enable external databus
+	if (~m_control & data & 0x20)
+		m_io->write_byte(TMS7000_PORTE, 0xff); // go into high impedance
+	
 	// d4: enable clock divider when accessing slow memory
 	// d0-d3: clock divider
 	m_control = data;

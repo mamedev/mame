@@ -285,9 +285,6 @@ static ADDRESS_MAP_START( main_io_map, AS_IO, 8, ti74_state )
 	AM_RANGE(TMS7000_PORTE, TMS7000_PORTE) AM_WRITE(keyboard_w) AM_READNOP
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( e_map, AS_DATA, 8, ti74_state )
-ADDRESS_MAP_END
-
 
 
 /***************************************************************************
@@ -490,7 +487,7 @@ void ti74_state::machine_start()
 
 	// zerofill
 	m_key_select = 0;
-	m_power = 0;
+	m_power = 1;
 
 	// register for savestates
 	save_item(NAME(m_key_select));
@@ -503,7 +500,6 @@ static MACHINE_CONFIG_START( ti74, ti74_state )
 	MCFG_CPU_ADD("maincpu", TMS70C46, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(main_io_map)
-	MCFG_CPU_DATA_MAP(e_map)
 
 	MCFG_NVRAM_ADD_0FILL("6264.ic3")
 
@@ -539,7 +535,6 @@ static MACHINE_CONFIG_START( ti95, ti74_state )
 	MCFG_CPU_ADD("maincpu", TMS70C46, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(main_io_map)
-	MCFG_CPU_DATA_MAP(e_map)
 
 	MCFG_NVRAM_ADD_0FILL("6264.ic3")
 

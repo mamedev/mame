@@ -88,7 +88,7 @@ protected:
 	virtual void execute_set_input(int extline, int state);
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const { return (spacenum == AS_PROGRAM) ? &m_program_config : ( (spacenum == AS_IO) ? &m_io_config : ( (spacenum == AS_DATA) ? &m_data_config : NULL ) ); }
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const { return (spacenum == AS_PROGRAM) ? &m_program_config : ( (spacenum == AS_IO) ? &m_io_config : NULL ); }
 
 	// device_state_interface overrides
 	void state_string_export(const device_state_entry &entry, astring &string);
@@ -102,14 +102,12 @@ protected:
 
 	address_space_config m_program_config;
 	address_space_config m_io_config;
-	address_space_config m_data_config; // TMS70C46 only, the "E" bus
 
 	UINT32 m_info_flags;
 
 	address_space *m_program;
 	direct_read_data *m_direct;
 	address_space *m_io;
-	address_space *m_data;
 	int m_icount;
 
 	bool m_irq_state[2];
@@ -316,18 +314,16 @@ public:
 	DECLARE_READ8_MEMBER(control_r);
 	DECLARE_WRITE8_MEMBER(control_w);
 
-	// extra 64KB external memory bus, or extra i/o port
-	DECLARE_WRITE8_MEMBER(e_bus_address_lo_w) { m_e_bus_address = (m_e_bus_address & 0xff00) | data; }
-	DECLARE_WRITE8_MEMBER(e_bus_address_hi_w) { m_e_bus_address = (m_e_bus_address & 0x00ff) | data << 8; }
-	DECLARE_READ8_MEMBER(e_bus_data_r) { return (space.debugger_access()) ? 0 : ((m_control & 0x20) ? m_data->read_byte(m_e_bus_address) : m_io->read_byte(TMS7000_PORTE)); }
-	DECLARE_WRITE8_MEMBER(e_bus_data_w) { if (m_control & 0x20) m_data->write_byte(m_e_bus_address, data); else m_io->write_byte(TMS7000_PORTE, data); }
+	// access I/O port E if databus is disabled
+	DECLARE_READ8_MEMBER(e_bus_data_r) { return (space.debugger_access()) ? 0xff : ((m_control & 0x20) ? 0xff : m_io->read_byte(TMS7000_PORTE)); }
+	DECLARE_WRITE8_MEMBER(e_bus_data_w) { if (~m_control & 0x20) m_io->write_byte(TMS7000_PORTE, data); }
 
 protected:
 	// device-level overrides
 	virtual void device_start();
+	virtual void device_reset();
 
 private:
-	UINT16 m_e_bus_address;
 	UINT8 m_control;
 };
 
