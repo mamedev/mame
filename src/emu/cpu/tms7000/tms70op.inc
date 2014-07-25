@@ -274,7 +274,7 @@ int tms7000_device::op_or(UINT8 param1, UINT8 param2)
 
 int tms7000_device::op_sbb(UINT8 param1, UINT8 param2)
 {
-	UINT8 t = param1 - param2 - (!GET_C());
+	UINT16 t = param1 - param2 - (!GET_C());
 	SET_NZ(t);
 	SET_C(~t);
 	return t;

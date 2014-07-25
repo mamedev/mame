@@ -66,7 +66,7 @@
 		<info name="usage" value="Load with RUN &quot;DIR&quot;, then load program from list" />
 		<part name="cart" interface="cc40_cart">
 			<dataarea name="rom" size="0x8000">
-				<rom name="games1.bin" size="0x8000" crc="54b52a26" sha1="1ad4c414b3aba73e10e30a2c2a2de8e92f96d46b" offset="0" status="baddump" />
+				<rom name="games1.bin" size="0x8000" crc="54b52a26" sha1="1ad4c414b3aba73e10e30a2c2a2de8e92f96d46b" offset="0" />
 			</dataarea>
 		</part>
 	</software>

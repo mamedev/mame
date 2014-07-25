@@ -57,7 +57,6 @@
 
 
   TODO:
-  - some strange bugs with Games I cartridge, bad dump or emulation bug?
   - other RAM configurations (6KB(default), 18KB, external)
   - understand bus_control_r/w
   - Hexbus interface and peripherals
