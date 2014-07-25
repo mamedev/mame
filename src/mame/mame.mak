@@ -1421,7 +1421,7 @@ $(MAMEOBJ)/meadows.a: \
 	$(DRIVERS)/warpsped.o
 
 $(MAMEOBJ)/merit.a: \
-	$(DRIVERS)/mpoker.o \
+	$(DRIVERS)/mgames.o \
 	$(DRIVERS)/merit.o \
 	$(DRIVERS)/meritm.o \
 
@@ -2674,7 +2674,7 @@ $(DRIVERS)/mcr.o:       $(LAYOUT)/dpoker.lh
 $(DRIVERS)/mcr3.o:      $(LAYOUT)/spyhunt.lh \
 			$(LAYOUT)/turbotag.lh
 
-$(DRIVERS)/mpoker.o:    $(LAYOUT)/mpoker.lh
+$(DRIVERS)/mgames.o:    $(LAYOUT)/mgames.lh
 
 $(DRIVERS)/mpu3.o:      $(LAYOUT)/mpu3.lh
 

@@ -1,19 +1,78 @@
 // license:?
-// copyright-holders:Angelo Salese, Roberto Fresca,David Haywood
+// copyright-holders:Angelo Salese, Roberto Fresca, David Haywood
 /*********************************************************************************
 
-  Merit Industries Multi-Poker (1981)
+  Merit Industries Match Games (1981)
   -----------------------------------
 
   Driver by Angelo Salese, David Haywood & Roberto Fresca.
 
   Maybe the first Merit videopoker.
-  The system has 4 different themed videopokers selectable through DIP switches:
+  The system has 4 different themed skill games, selectable through DIP switches:
 
   * "The Frog Pond"
   * "Pharaohs"
   * "Wild Bulls"
   * "The White Knight"
+
+**********************************************************************************
+
+  From the Flyer...
+
+  FOR AMUSEMENT ONLY.
+
+  The ingenious Match Games offers something for everyone. Four captivating themes
+  with brillant graphics, challenging play action, an enticing bonus feature and a
+  host of options to tailor the game to any location.
+
+  Match Games is today's perfect alternative in adult video skill games...
+
+
+  MATCH GAMES...
+
+  Unique and captivating graphics start the fun out right.
+  Players score skills points as they match the amusing characters to winning color
+  and number combinations. Play appeal stays high as new characters are introduced.
+
+  "Wild" characters liven the action even more and build special bonus points, co-
+  llected on a 5-way number match. The appeal is irresistable... Players stay hoo-
+  ked in for lot more action (and more earnings) for you!.
+
+
+  GAME THEMES:
+
+  Match Games aknowledges every scoring combination by displaying its own special
+  name keyed to each game theme.
+
+  Every time 2 "Wild" characters pop up together, special bonus symbols appear,
+  increasing bonus by 5 points.
+
+  * "THE WHITE KNIGHT" features knights in armor with colores plumes and wild
+                       'White Knights'.
+
+  * "THE FROG POND" stars colorful and humorous frogs perched on top of mushrooms.
+
+  * "WILD BULLS" is based around multi-colored sets of bulls with 2 wild 'Red Bulls'.
+
+  * "PHARAOHS" features an Egyptian look with comical mummies as the wild characters.
+
+
+  FEATURES:
+
+  - Four game themes (operator selected).
+  - "Wild" characters.
+  - Bonus Feature, with color keyed graphics.
+  - Adjustable game difficulty settings.
+  - Adjustable play limit (1-10-20-50).
+  - On screen bookkeeping.
+  - Battery backup.
+  - Hi quality 13" monitor.
+  - Complete schematics.
+  - Easy front access servicing.
+  - All plywood construction.
+  - Top drop coin entry.
+  - Hi security cash box.
+
 
 **********************************************************************************
 
@@ -30,29 +89,29 @@
 
 
   MAIN BOARD:
-   _________________________   ___________________   __________________________
-  |                         |_|||||||||||||||||||||_|                          |
-  |                                  J2                       -|4.7 Ohm 10% |- |
-  |                                                            |____________|  |
+  .------------------------. .-------------------. .---------------------------.
+  |                        | ||||||||||||||||||||| |           .------------.  |
+  |                        '-'        J2         '-'          -|4.7 Ohm 10% |- |
+  |                                                            '------------'  |
   |                                                                            |
-  |         DSW (8)                 _|___|___|___|_               LM340K-5     |
+  |         DSW (8)                .-+-.-+-.-+-.-+-.              LM340K-5     |
   |                                |   |   |   |   |              7805K        |
-  |                                | 4x4700uF 16V  |    KBL005                 |
-  |                                |   |   |   |   |     8137                  |
+  |                                | 4x 4700uF 16V |    KBL005                 |
+  |                                |  capacitors   |     8137                  |
   |                                |   |   |   |   |      AC                   |
-  |                                |___|___|___|___|                           |
-  |                                  |   |   |   |                             |
+  |                                '-+-'-+-'-+-'-+-'                           |
+  |                                                                            |
   |                                                                            |
   |    74LS253N  74LS253N 74LS253N 74LS253                                     |
-  |                                                _____________               |
+  |                                               .-------------.              |
   |                                               | 4700uF 35V  |   MC7812CT   |
-  |                                              -|  Capacitor  |-             |
-  |                                               |_____________|              |
-  |                                                                            |
-  |                                                                            |
-  |                _____________________                                       |
-  |               |    B A T T E R Y    |                                -     |
-  |  _            |_____________________|                    74LS04N     -     |
+  |                                              -|  capacitor  |-             |
+  |                                               '-------------'              |
+  |               .------------------.                                         |
+  |               |    AA BATTERY    |                                         |
+  |               |------------------|                                         |
+  |               |    AA BATTERY    |                                   -     |
+  | .-.           '------------------'                       74LS04N     -     |
   | | |                                                                  - J1  |
   | | |       74LS04N  74LS02N  74LS74N   74LS02N 74LS132N               -     |
   | | |                                                                  -     |
@@ -64,21 +123,21 @@
   | | |                                                18.000 OSC              |
   | | |                74LS367N 74LS161N 74LS161N  74LS04N    DM7404N          |
   | | |                                                                        |
-  | | |        74LS245PC             _________     74LS74N    LM3302N          |
-  | | |                             | Z80 CPU |                                |
-  | | |        74LS245PC            |___U1____|   MM2114N-3  74LS174N 74LS166J |
-  | | |                                                                 _____  |
-  | |_|        74LS138N       74LS245PC 74LS245PC MM2114N-3  74LS157N  |_U68_| |
-  |                                                                            |
-  |            SCM5101E                 74LS245PC MM2114N-3  74LS174N   _____  |
-  |                             _____                                  |_U67_| |
-  |            SCM5101E        |_U18_|  74LS157N  MM2114N-3  74LS138N   _____  |
-  |     _____    _____          _____                                  |_U66_| |
-  |    |_U16_|  |_U13_|        |_U19_|  74LS157N             74LS161N          |
-  |     _____    _____          _____                                   _____  |
-  |    |_U15_|  |_U14_|        |_U17_|  74LS157N             74LS157N  |_U65_| |
-  |                                                                            |
-  |____________________________________________________________________________|
+  | | |        74LS245PC        .-------------.    74LS74N    LM3302N          |
+  | | |                         |   Z80 CPU   |                                |
+  | | |        74LS245PC        '-------------'   MM2114N-3  74LS174N 74LS166J |
+  | | |                                                                .-----. |
+  | '-'        74LS138N       74LS245PC 74LS245PC MM2114N-3  74LS157N  | U68 | |
+  |                                                                    '-----' |
+  |            SCM5101E                 74LS245PC MM2114N-3  74LS174N  .-----. |
+  |                            .-----.                                 | U67 | |
+  |            SCM5101E        |-U18-|  74LS157N  MM2114N-3  74LS138N  |-----| |
+  |    .-----.  .-----.        |-----|                                 | U66 | |
+  |    |-U16-|  |-U13-|        |-U19-|  74LS157N             74LS161N  '-----' |
+  |    |-----|  |-----|        |-----|                                 .-----. |
+  |    |-U15-|  |-U14-|        |-U17-|  74LS157N             74LS157N  | U65 | |
+  |    '-----'  '-----'        '-----'                                 '-----' |
+  '----------------------------------------------------------------------------'
 
 
   U13 = MLTI 0    U68 = CGM 0
@@ -93,8 +152,9 @@
 
 
   VIDEO I/O BOARD CRT810:
-                          ____________________
-   _______________________|||||||||||||||||||||______________________
+                          .-------------------.
+                          |||||||||||||||||||||
+  .-----------------------'                   '----------------------.
   |                                                                  |
   |                                                          LM380N  |
   |                                                                  |
@@ -106,9 +166,9 @@
   |                                                                  |
   | 74LS259N     74LS259N     74LS259N     74LS259N                  |
   |                                                                  |
-  |________________                                  ________________|
+  '----------------.                                .----------------'
                    ||||||||||||||||||||||||||||||||||
-                   ---------------------------------
+                   '--------------------------------'
                            To J4 on Main Board
 
   LM380N = 2.5W Audio Power Amplifier.
@@ -173,13 +233,13 @@
 #include "cpu/z80/z80.h"
 //#include "sound/dac.h"
 #include "machine/nvram.h"
-#include "mpoker.lh"
+#include "mgames.lh"
 
 
-class mpoker_state : public driver_device
+class mgames_state : public driver_device
 {
 public:
-	mpoker_state(const machine_config &mconfig, device_type type, const char *tag)
+	mgames_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_video(*this, "video"),
 		m_maincpu(*this, "maincpu"),
@@ -201,19 +261,19 @@ public:
 	DECLARE_WRITE8_MEMBER(outport7_w);
 	DECLARE_WRITE8_MEMBER(sound_w);
 	virtual void video_start();
-	DECLARE_PALETTE_INIT(mpoker);
-	UINT32 screen_update_mpoker(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	DECLARE_PALETTE_INIT(mgames);
+	UINT32 screen_update_mgames(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 };
 
 
-void mpoker_state::video_start()
+void mgames_state::video_start()
 {
 }
 
-UINT32 mpoker_state::screen_update_mpoker(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 mgames_state::screen_update_mgames(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int y,x;
 	int count;
@@ -234,7 +294,7 @@ UINT32 mpoker_state::screen_update_mpoker(screen_device &screen, bitmap_ind16 &b
 	return 0;
 }
 
-PALETTE_INIT_MEMBER(mpoker_state, mpoker)
+PALETTE_INIT_MEMBER(mgames_state, mgames)
 {
 	int i;
 
@@ -251,7 +311,7 @@ PALETTE_INIT_MEMBER(mpoker_state, mpoker)
 	}
 }
 
-READ8_MEMBER(mpoker_state::mixport_r)
+READ8_MEMBER(mgames_state::mixport_r)
 {
 /*  - bits -
     7654 3210
@@ -284,7 +344,7 @@ READ8_MEMBER(mpoker_state::mixport_r)
     xxx- ----   Unknown.
 */
 
-//WRITE8_MEMBER(mpoker_state::muxed_w)
+//WRITE8_MEMBER(mgames_state::muxed_w)
 //{
 //  popmessage("written : %02X %02X %02X %02X %02X %02X %02X %02X", data & 0x01, data & 0x02, data & 0x04, data & 0x08, data & 0x10, data & 0x20, data & 0x40, data & 0x80);
 //}
@@ -301,7 +361,7 @@ READ8_MEMBER(mpoker_state::mixport_r)
     xxx- ----   Unknown.
 */
 
-WRITE8_MEMBER(mpoker_state::outport0_w)
+WRITE8_MEMBER(mgames_state::outport0_w)
 {
 	output_set_lamp_value(1, (data & 1));           /* Lamp 1 - BET */
 	output_set_lamp_value(5, (data >> 1) & 1);      /* Lamp 5 - HOLD 1 */
@@ -322,7 +382,7 @@ WRITE8_MEMBER(mpoker_state::outport0_w)
     xxx- ----   Unknown.
 */
 
-WRITE8_MEMBER(mpoker_state::outport1_w)
+WRITE8_MEMBER(mgames_state::outport1_w)
 {
 	output_set_lamp_value(2, (data & 1));           /* Lamp 2 - DEAL */
 	output_set_lamp_value(6, (data >> 1) & 1);      /* Lamp 6 - HOLD 2 */
@@ -343,7 +403,7 @@ WRITE8_MEMBER(mpoker_state::outport1_w)
     xxx- ----   Unknown.
 */
 
-WRITE8_MEMBER(mpoker_state::outport2_w)
+WRITE8_MEMBER(mgames_state::outport2_w)
 {
 	output_set_lamp_value(3, (data & 1));           /* Lamp 3 - CANCEL */
 	output_set_lamp_value(7, (data >> 1) & 1);      /* Lamp 7 - HOLD 3 */
@@ -364,7 +424,7 @@ WRITE8_MEMBER(mpoker_state::outport2_w)
     xxx- ----   Unknown.
 */
 
-WRITE8_MEMBER(mpoker_state::outport3_w)
+WRITE8_MEMBER(mgames_state::outport3_w)
 {
 	output_set_lamp_value(4, (data & 1));           /* Lamp 4 - STAND */
 	output_set_lamp_value(8, (data >> 1) & 1);      /* Lamp 8 - HOLD 4 */
@@ -385,7 +445,7 @@ WRITE8_MEMBER(mpoker_state::outport3_w)
     xxx- ----   Unknown.
 */
 
-WRITE8_MEMBER(mpoker_state::outport4_w)
+WRITE8_MEMBER(mgames_state::outport4_w)
 {
 	output_set_lamp_value(9, (data >> 1) & 1);      /* Lamp 9 - HOLD 5 */
 
@@ -405,7 +465,7 @@ WRITE8_MEMBER(mpoker_state::outport4_w)
     xxx- ----   Unknown.
 */
 
-WRITE8_MEMBER(mpoker_state::outport5_w)
+WRITE8_MEMBER(mgames_state::outport5_w)
 {
 	m_output[5] = data;
 	popmessage("outport5 : %02X %02X %02X %02X %02X %02X %02X %02X", m_output[0], m_output[1], m_output[2], m_output[3], m_output[4], m_output[5], m_output[6], m_output[7]);
@@ -423,7 +483,7 @@ WRITE8_MEMBER(mpoker_state::outport5_w)
     xxx- ----   Unknown.
 */
 
-WRITE8_MEMBER(mpoker_state::outport6_w)
+WRITE8_MEMBER(mgames_state::outport6_w)
 {
 	coin_counter_w(machine(), 1, data & 0x02);  /* Payout pulse */
 
@@ -443,7 +503,7 @@ WRITE8_MEMBER(mpoker_state::outport6_w)
     xxx- ----   Unknown.
 */
 
-WRITE8_MEMBER(mpoker_state::outport7_w)
+WRITE8_MEMBER(mgames_state::outport7_w)
 {
 	coin_counter_w(machine(), 0, data & 0x02);  /* Coin pulse */
 
@@ -474,13 +534,13 @@ WRITE8_MEMBER(mpoker_state::outport7_w)
    05   | ---- | ---- | ---- | bit2
 
 
-WRITE8_MEMBER(mpoker_state::sound_w)
+WRITE8_MEMBER(mgames_state::sound_w)
 //{
 //  m_dac->write_unsigned8(data);
 //}
 */
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, mpoker_state )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, mgames_state )
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
 //  AM_RANGE(0x0158, 0x0158) AM_WRITE (muxed_w)
 	AM_RANGE(0x3800, 0x38ff) AM_RAM AM_SHARE("nvram")   /* NVRAM = 2x SCM5101E */
@@ -497,10 +557,10 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, mpoker_state )
 	AM_RANGE(0x8005, 0x8005) AM_WRITE(outport5_w)
 	AM_RANGE(0x8006, 0x8006) AM_WRITE(outport6_w)
 	AM_RANGE(0x8007, 0x8007) AM_WRITE(outport7_w)
-
 ADDRESS_MAP_END
 
-static INPUT_PORTS_START( mpoker )
+
+static INPUT_PORTS_START( mgames )
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_BET )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL )
@@ -585,15 +645,16 @@ static const gfx_layout tiles16x16_layout =
 	16*16
 };
 
-static GFXDECODE_START( mpoker )
+static GFXDECODE_START( mgames )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles16x16_layout, 0, 0x100 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( mpoker, mpoker_state )
+
+static MACHINE_CONFIG_START( mgames, mgames_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,MASTER_CLOCK/6)      /* 3 MHz? */
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", mpoker_state,  irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", mgames_state,  irq0_line_hold)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -603,12 +664,12 @@ static MACHINE_CONFIG_START( mpoker, mpoker_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
-	MCFG_SCREEN_UPDATE_DRIVER(mpoker_state, screen_update_mpoker)
+	MCFG_SCREEN_UPDATE_DRIVER(mgames_state, screen_update_mgames)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mpoker)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mgames)
 	MCFG_PALETTE_ADD("palette", 0x200)
-	MCFG_PALETTE_INIT_OWNER(mpoker_state, mpoker)
+	MCFG_PALETTE_INIT_OWNER(mgames_state, mgames)
 
 	/* sound hardware */
 //  MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -616,7 +677,8 @@ static MACHINE_CONFIG_START( mpoker, mpoker_state )
 //  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-ROM_START( mpoker )
+
+ROM_START( mgames )
 	ROM_REGION( 0x3000, "maincpu", 0 )
 	ROM_LOAD( "u13_mlt10_mk2716j.bin", 0x0000, 0x0800, CRC(ce2da863) SHA1(ddb921ac2fdd965138a91757843d3035144a7007) )
 	ROM_LOAD( "u14_mlt11_mk2716j.bin", 0x0800, 0x0800, CRC(1382d166) SHA1(a8e7339f94d65b9540a8c16190a28ff0af48ccb4) )
@@ -637,5 +699,5 @@ ROM_END
 *      Game Drivers      *
 *************************/
 
-/*     YEAR  NAME      PARENT  MACHINE   INPUT     INIT   ROT    COMPANY  FULLNAME      FLAGS...                           LAYOUT  */
-GAMEL( 1981, mpoker,   0,      mpoker,   mpoker, driver_device,   0,     ROT0, "Merit", "Multi-Poker", GAME_WRONG_COLORS | GAME_NO_SOUND, layout_mpoker )
+/*     YEAR  NAME      PARENT  MACHINE   INPUT   STATE          INIT   ROT    COMPANY  FULLNAME      FLAGS...                           LAYOUT  */
+GAMEL( 1981, mgames,   0,      mgames,   mgames, driver_device, 0,     ROT0, "Merit", "Match Games", GAME_WRONG_COLORS | GAME_NO_SOUND, layout_mgames )
