@@ -8751,6 +8751,7 @@ src/mess/layout/pve500.lay svneol=native#text/xml
 src/mess/layout/px4.lay svneol=native#text/xml
 src/mess/layout/px8.lay svneol=native#text/xml
 src/mess/layout/rainbow.lay svneol=native#text/xml
+src/mess/layout/rainbow.lh svneol=native#text/plain
 src/mess/layout/ravens.lay svneol=native#text/xml
 src/mess/layout/savia84.lay svneol=native#text/xml
 src/mess/layout/sc1.lay svneol=native#text/xml
