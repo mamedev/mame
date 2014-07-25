@@ -600,6 +600,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
+				<!-- TODO: Identical SHA1 of cbug52.  Is this image for 39 or 52? -->
 				<rom name="cbug39.d80" size="533248" crc="6e7560bb" sha1="316e1601cad5f74d84e1346518e5cbfa7b5f211e" offset="0" />
 			</dataarea>
 		</part>
@@ -792,6 +793,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
+				<!-- TODO: Identical SHA1 of cbug39.  Is this image for 39 or 52? -->
 				<rom name="cbug52.d80" size="533248" crc="6e7560bb" sha1="316e1601cad5f74d84e1346518e5cbfa7b5f211e" offset="0" />
 			</dataarea>
 		</part>
@@ -1477,18 +1479,6 @@
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
 				<rom name="cbugm80.d80" size="533248" crc="75076703" sha1="9a30721bffc6dd16b92372e99fd45339775a7b1a" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="cbugm81">
-		<description>CBUG #M81</description>
-		<year>1983</year>
-		<publisher>Chicago B128 Users Group</publisher>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="533248">
-				<rom name="cbugm81.d80" size="533248" crc="b9d5ef05" sha1="160719d5acb1423391848a5cd40d7a891b1a1efd" offset="0" />
 			</dataarea>
 		</part>
 	</software>
