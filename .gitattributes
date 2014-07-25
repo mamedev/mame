@@ -8772,6 +8772,7 @@ src/mess/layout/tavernie.lay svneol=native#text/xml
 src/mess/layout/tec1.lay svneol=native#text/xml
 src/mess/layout/tecnbras.lay svneol=native#text/plain
 src/mess/layout/ti74.lay svneol=native#text/xml
+src/mess/layout/ti95.lay svneol=native#text/xml
 src/mess/layout/tk80.lay svneol=native#text/xml
 src/mess/layout/tm990189.lay svneol=native#text/xml
 src/mess/layout/tm990189v.lay svneol=native#text/xml

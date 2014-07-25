@@ -10,126 +10,126 @@
 	<element name="ind_left" defstate="0">
 		<rect><color red="0.5412" green="0.57255" blue="0.5804" /></rect>
 		<text string="&lt;" align="1" state="0">
-			<color red="0.494" green="0.501" blue="0.522" />
+			<color red="0.515" green="0.537" blue="0.548" />
 		</text>
 		<text string="&lt;" align="1" state="1">
-			<color red="0.361" green="0.325" blue="0.345" />
+			<color red="0.361" green="0.326" blue="0.346" />
 		</text>
 	</element>
 
 	<element name="ind_right" defstate="0">
 		<rect><color red="0.5412" green="0.57255" blue="0.5804" /></rect>
 		<text string="&gt;" align="2" state="0">
-			<color red="0.494" green="0.501" blue="0.522" />
+			<color red="0.515" green="0.537" blue="0.548" />
 		</text>
 		<text string="&gt;" align="2" state="1">
-			<color red="0.361" green="0.325" blue="0.345" />
+			<color red="0.361" green="0.326" blue="0.346" />
 		</text>
 	</element>
 
 	<element name="ind_shift" defstate="0">
 		<rect><color red="0.5412" green="0.57255" blue="0.5804" /></rect>
 		<text string="SHIFT" state="0">
-			<color red="0.494" green="0.501" blue="0.522" />
+			<color red="0.515" green="0.537" blue="0.548" />
 		</text>
 		<text string="SHIFT" state="1">
-			<color red="0.361" green="0.325" blue="0.345" />
+			<color red="0.361" green="0.326" blue="0.346" />
 		</text>
 	</element>
 
 	<element name="ind_ctl" defstate="0">
 		<rect><color red="0.5412" green="0.57255" blue="0.5804" /></rect>
 		<text string="CTL" state="0">
-			<color red="0.494" green="0.501" blue="0.522" />
+			<color red="0.515" green="0.537" blue="0.548" />
 		</text>
 		<text string="CTL" state="1">
-			<color red="0.361" green="0.325" blue="0.345" />
+			<color red="0.361" green="0.326" blue="0.346" />
 		</text>
 	</element>
 
 	<element name="ind_fn" defstate="0">
 		<rect><color red="0.5412" green="0.57255" blue="0.5804" /></rect>
 		<text string="FN" state="0">
-			<color red="0.494" green="0.501" blue="0.522" />
+			<color red="0.515" green="0.537" blue="0.548" />
 		</text>
 		<text string="FN" state="1">
-			<color red="0.361" green="0.325" blue="0.345" />
+			<color red="0.361" green="0.326" blue="0.346" />
 		</text>
 	</element>
 
 	<element name="ind_deg" defstate="0">
 		<rect><color red="0.5412" green="0.57255" blue="0.5804" /></rect>
 		<text string="DEG" state="0">
-			<color red="0.494" green="0.501" blue="0.522" />
+			<color red="0.515" green="0.537" blue="0.548" />
 		</text>
 		<text string="DEG" state="1">
-			<color red="0.361" green="0.325" blue="0.345" />
+			<color red="0.361" green="0.326" blue="0.346" />
 		</text>
 	</element>
 
 	<element name="ind_rad" defstate="0">
 		<rect><color red="0.5412" green="0.57255" blue="0.5804" /></rect>
 		<text string="RAD" state="0">
-			<color red="0.494" green="0.501" blue="0.522" />
+			<color red="0.515" green="0.537" blue="0.548" />
 		</text>
 		<text string="RAD" state="1">
-			<color red="0.361" green="0.325" blue="0.345" />
+			<color red="0.361" green="0.326" blue="0.346" />
 		</text>
 	</element>
 
 	<element name="ind_grad" defstate="0">
 		<rect><color red="0.5412" green="0.57255" blue="0.5804" /></rect>
 		<text string="GRAD" state="0">
-			<color red="0.494" green="0.501" blue="0.522" />
+			<color red="0.515" green="0.537" blue="0.548" />
 		</text>
 		<text string="GRAD" state="1">
-			<color red="0.361" green="0.325" blue="0.345" />
+			<color red="0.361" green="0.326" blue="0.346" />
 		</text>
 	</element>
 
 	<element name="ind_io" defstate="0">
 		<rect><color red="0.5412" green="0.57255" blue="0.5804" /></rect>
 		<text string="I/O" state="0">
-			<color red="0.494" green="0.501" blue="0.522" />
+			<color red="0.515" green="0.537" blue="0.548" />
 		</text>
 		<text string="I/O" state="1">
-			<color red="0.361" green="0.325" blue="0.345" />
+			<color red="0.361" green="0.326" blue="0.346" />
 		</text>
 	</element>
 
 	<element name="ind_ucl" defstate="0">
 		<rect><color red="0.5412" green="0.57255" blue="0.5804" /></rect>
 		<text string="UCL" state="0">
-			<color red="0.494" green="0.501" blue="0.522" />
+			<color red="0.515" green="0.537" blue="0.548" />
 		</text>
 		<text string="UCL" state="1">
-			<color red="0.361" green="0.325" blue="0.345" />
+			<color red="0.361" green="0.326" blue="0.346" />
 		</text>
 	</element>
 
 	<element name="ind_error" defstate="0">
 		<rect><color red="0.5412" green="0.57255" blue="0.5804" /></rect>
 		<text string="ERROR" state="0">
-			<color red="0.494" green="0.501" blue="0.522" />
+			<color red="0.515" green="0.537" blue="0.548" />
 		</text>
 		<text string="ERROR" state="1">
-			<color red="0.361" green="0.325" blue="0.345" />
+			<color red="0.361" green="0.326" blue="0.346" />
 		</text>
 	</element>
 
 	<element name="ind_user" defstate="0">
 		<rect><color red="0.5412" green="0.57255" blue="0.5804" /></rect>
 		<text string="v" state="0">
-			<color red="0.494" green="0.501" blue="0.522" />
+			<color red="0.515" green="0.537" blue="0.548" />
 		</text>
 		<text string="v" state="1">
-			<color red="0.361" green="0.325" blue="0.345" />
+			<color red="0.361" green="0.326" blue="0.346" />
 		</text>
 	</element>
 
 	<element name="ind_low" defstate="0">
-		<rect state="0"><color red="0.494" green="0.501" blue="0.522" /></rect>
-		<rect state="1"><color red="0.361" green="0.325" blue="0.345" /></rect>
+		<rect state="0"><color red="0.515" green="0.537" blue="0.548" /></rect>
+		<rect state="1"><color red="0.361" green="0.326" blue="0.346" /></rect>
 		<text string="LOW">
 			<color red="0.5412" green="0.57255" blue="0.5804" />
 		</text>

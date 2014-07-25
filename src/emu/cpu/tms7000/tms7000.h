@@ -102,7 +102,7 @@ protected:
 
 	address_space_config m_program_config;
 	address_space_config m_io_config;
-	address_space_config m_data_config;
+	address_space_config m_data_config; // TMS70C46 only, the "E" bus
 
 	UINT32 m_info_flags;
 
@@ -319,7 +319,7 @@ public:
 	// extra 64KB external memory bus, or extra i/o port
 	DECLARE_WRITE8_MEMBER(e_bus_address_lo_w) { m_e_bus_address = (m_e_bus_address & 0xff00) | data; }
 	DECLARE_WRITE8_MEMBER(e_bus_address_hi_w) { m_e_bus_address = (m_e_bus_address & 0x00ff) | data << 8; }
-	DECLARE_READ8_MEMBER(e_bus_data_r) { return (m_control & 0x20) ? m_data->read_byte(m_e_bus_address) : m_io->read_byte(TMS7000_PORTE); }
+	DECLARE_READ8_MEMBER(e_bus_data_r) { return (space.debugger_access()) ? 0 : ((m_control & 0x20) ? m_data->read_byte(m_e_bus_address) : m_io->read_byte(TMS7000_PORTE)); }
 	DECLARE_WRITE8_MEMBER(e_bus_data_w) { if (m_control & 0x20) m_data->write_byte(m_e_bus_address, data); else m_io->write_byte(TMS7000_PORTE, data); }
 
 protected:

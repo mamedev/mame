@@ -8,7 +8,7 @@
   ---------------------------------------------
   | ---------------------------------------   |
   | |                                     |   |
-  | | LCD 1 line, 31 chars + 18 indicators|   |
+  | |             LCD screen              |   |
   | |                                     |   ---------------
   | ---------------------------------------                 |
   |                                                         |
@@ -166,8 +166,9 @@ DEVICE_IMAGE_LOAD_MEMBER(cc40_state, cc40_cartridge)
 
 PALETTE_INIT_MEMBER(cc40_state, cc40)
 {
-	palette.set_pen_color(0, rgb_t(138, 146, 148));
-	palette.set_pen_color(1, rgb_t(92, 83, 88));
+	palette.set_pen_color(0, rgb_t(138, 146, 148)); // background
+	palette.set_pen_color(1, rgb_t(92, 83, 88)); // lcd pixel on
+	palette.set_pen_color(2, rgb_t(131, 136, 139)); // lcd pixel off
 }
 
 void cc40_state::update_lcd_indicator(UINT8 y, UINT8 x, int state)
@@ -183,17 +184,21 @@ void cc40_state::update_lcd_indicator(UINT8 y, UINT8 x, int state)
 
 static HD44780_PIXEL_UPDATE(cc40_pixel_update)
 {
+	// char size is 5x7 + cursor
+	if (x > 4 || y > 7)
+		return;
+
 	if (line == 1 && pos == 15)
 	{
-		// the last char is used to control lcd indicators
+		// the last char is used to control the 18 lcd indicators
 		cc40_state *driver_state = device.machine().driver_data<cc40_state>();
 		driver_state->update_lcd_indicator(y, x, state);
 	}
 	else if (line < 2 && pos < 16)
 	{
-		// internal: 2*16, external: 1*31 + indicators
-		if (y == 7) y++; // the cursor is slightly below the 5x7 character
-		bitmap.pix16(1 + y, 1 + line*16*6 + pos*6 + x) = state;
+		// internal: 2*16, external: 1*31
+		if (y == 7) y++; // the cursor is slightly below the character
+		bitmap.pix16(1 + y, 1 + line*16*6 + pos*6 + x) = state ? 1 : 2;
 	}
 }
 
@@ -339,9 +344,9 @@ ADDRESS_MAP_END
 ***************************************************************************/
 
 static INPUT_PORTS_START( cc40 )
-	// 8x8 keyboard matrix, RESET and ON buttons are not on it
-	// The numpad number keys are shared with the ones on the main keyboard.
-	// Unused entries are not connected, but some might have a purpose for factory testing(?)
+	// 8x8 keyboard matrix, RESET and ON buttons are not on it. Unused entries are not connected, but some might have a purpose for factory testing(?)
+	// The numpad number keys are shared with the ones on the main keyboard, also on the real machine.
+	// PORT_NAME lists functions under [SHIFT] as secondaries.
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_1_PAD) PORT_CODE(KEYCODE_1) PORT_CHAR('1') PORT_CHAR('!')
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2_PAD) PORT_CODE(KEYCODE_2) PORT_CHAR('2') PORT_CHAR('"')
@@ -394,7 +399,7 @@ static INPUT_PORTS_START( cc40 )
 
 	PORT_START("IN5")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD) PORT_CHAR('0') PORT_CHAR('\'')
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_DEL) PORT_CHAR(UCHAR_MAMEKEY(HOME)) PORT_NAME("CLR  UCL")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_DEL) PORT_CHAR(UCHAR_MAMEKEY(END)) PORT_NAME("CLR  UCL")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_LEFT) PORT_CHAR(UCHAR_MAMEKEY(LEFT)) PORT_CHAR(UCHAR_MAMEKEY(DEL)) PORT_NAME("LEFT  DEL")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_RIGHT) PORT_CHAR(UCHAR_MAMEKEY(RIGHT)) PORT_CHAR(UCHAR_MAMEKEY(INSERT)) PORT_NAME("RIGHT  INS")
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_UP) PORT_CHAR(UCHAR_MAMEKEY(UP)) PORT_NAME("UP  PB")
@@ -415,11 +420,11 @@ static INPUT_PORTS_START( cc40 )
 	PORT_START("IN7")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_LCONTROL) PORT_CODE(KEYCODE_RCONTROL) PORT_CHAR(UCHAR_SHIFT_2) PORT_NAME("CTL")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_SHIFT_1) PORT_NAME("SHIFT")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_END) PORT_CHAR(UCHAR_MAMEKEY(END)) PORT_NAME("BREAK")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_HOME) PORT_CHAR(UCHAR_MAMEKEY(PGDN)) PORT_NAME("RUN")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_END) PORT_CHAR(UCHAR_MAMEKEY(PAUSE)) PORT_NAME("BREAK")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_HOME) PORT_CHAR(UCHAR_MAMEKEY(HOME)) PORT_NAME("RUN")
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_LALT) PORT_CODE(KEYCODE_RALT) PORT_CHAR(UCHAR_MAMEKEY(PGUP)) PORT_NAME("FN")
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F1) PORT_CHAR(UCHAR_MAMEKEY(F1)) PORT_NAME("OFF")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_LALT) PORT_CODE(KEYCODE_RALT) PORT_CHAR(UCHAR_MAMEKEY(F1)) PORT_NAME("FN")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PGDN) PORT_CHAR(UCHAR_MAMEKEY(PGDN)) PORT_NAME("OFF")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
@@ -482,11 +487,11 @@ static MACHINE_CONFIG_START( cc40, cc40_state )
 	MCFG_SCREEN_UPDATE_DEVICE("hd44780", hd44780_device, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 2)
+	MCFG_PALETTE_ADD("palette", 3)
 	MCFG_PALETTE_INIT_OWNER(cc40_state, cc40)
 
 	MCFG_HD44780_ADD("hd44780")
-	MCFG_HD44780_LCD_SIZE(2, 16) // internal: 2*16, external: 1*31 + indicators
+	MCFG_HD44780_LCD_SIZE(2, 16) // 2*16 internal
 	MCFG_HD44780_PIXEL_UPDATE_CB(cc40_pixel_update)
 
 	/* sound hardware */
@@ -497,7 +502,7 @@ static MACHINE_CONFIG_START( cc40, cc40_state )
 
 	/* cartridge */
 	MCFG_CARTSLOT_ADD("cart")
-	MCFG_CARTSLOT_EXTENSION_LIST("bin,rom")
+	MCFG_CARTSLOT_EXTENSION_LIST("bin,rom,256")
 	MCFG_CARTSLOT_NOT_MANDATORY
 	MCFG_CARTSLOT_LOAD(cc40_state, cc40_cartridge)
 	MCFG_CARTSLOT_INTERFACE("cc40_cart")
@@ -517,7 +522,7 @@ ROM_START( cc40 )
 	ROM_LOAD( "tms70c20.bin", 0xf800, 0x0800, CRC(a21bf6ab) SHA1(3da8435ecbee143e7fa149ee8e1c92949bade1d8) ) // internal cpu rom
 
 	ROM_REGION( 0x8000, "system", 0 )
-	ROM_LOAD( "cc40.bin",     0x0000, 0x8000, CRC(f5322fab) SHA1(1b5c4052a53654363c458f75eac7a27f0752def6) ) // system rom, banked
+	ROM_LOAD( "hn61256pc09.bin", 0x0000, 0x8000, CRC(f5322fab) SHA1(1b5c4052a53654363c458f75eac7a27f0752def6) ) // system rom, banked
 
 	ROM_REGION( 0x20000, "user1", ROMREGION_ERASEFF ) // cartridge area, max 4*32KB
 ROM_END
