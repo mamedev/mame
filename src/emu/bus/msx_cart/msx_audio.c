@@ -45,13 +45,15 @@ TODO:
 - NMS1205/FSCA1: Add muting of dac and y8950 based on io config writes.
 
 
-For testing the sample ram:
+For testing the sample ram (playback of a cuckoo sound, the volume of the sound is quite low):
 - Disable firmware on the fs-ca1
-- call audio
-- call copy pcm(#a, b)
-- call play pcm (x)
+- Execute the following basic commands:
+  - CALL AUDIO
+  - CALL COPY PCM(#1,0)
+  - CALL PLAY PCM(0)
 
 See also http://www.mccm.hetlab.tk/millennium/milc/gc/topic_26.htm (dutch)
+and/or http://ngs.no.coocan.jp/doc/wiki.cgi/datapack?page=4.2+MSX-AUDIO+%B3%C8%C4%A5BASIC (japanese)
 
 
 **********************************************************************************/
