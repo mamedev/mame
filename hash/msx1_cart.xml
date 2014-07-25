@@ -14535,10 +14535,20 @@ kept for now until finding out what those bytes affect...
 			<feature name="slot" value="msxaud_fsca1" />
 			<feature name="mapper" value="NOMAPPER" />
 			<dataarea name="rom" size="131072">
-				<rom name="msx audio (japan) (fs-ca1) (program).rom" size="131072" crc="90e893ba" sha1="930eae7057af1652abae794072b296a59decd61b" offset="0" />
+				<!--
+					20140725:
+					There are 3 versions of this rom floating around:
+					930eae7057af1652abae794072b296a59decd61b - a "dirty" dump; it seems to be a direct memory copy made on an MSX and contains RAM contents at 3000-3FFF and 7000-7FFF
+					a45692849acf29ddb653707a62747985439f6d4f - RAM areas are set to FFs
+					36d47cf70618fdb460f97a8ceb75013ec4529063 - A dump made using an eeprom reader. This dump differs one bit with the dump above (offset 8a49, bit 3)
+					By looking the code it is not yet possible to say which one is 100% correct, so marking it as baddump for the moment.
+				-->
+				<rom name="msx audio (japan) (fs-ca1) (program).rom" size="131072" crc="78584d2e" sha1="a45692849acf29ddb653707a62747985439f6d4f" status="baddump" offset="0" />
 			</dataarea>
+			<!-- uPD4364C - is actually an 8KB SRAM chip, but only 4KB is used -->
 			<dataarea name="sram" size="4096">
 			</dataarea>
+			<!-- uPD41256 (or compatible) 256kbit chip for sample ram -->
 		</part>
 	</software>
 
