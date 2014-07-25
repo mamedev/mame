@@ -805,6 +805,7 @@ static const struct game_keys keys_table[] =
 	{ "pgear",    { 0x9d4c0b8a,0x39081f9e }, 0x100000 },    // 3039 0080 4020  move.w  $00804020,D0
 	{ "pgearr1",  { 0x9d4c0b8a,0x39081f9e }, 0x100000 },    // 3039 0080 4020  move.w  $00804020,D0
 	{ "armwara",  { 0x1f9e9d4c,0x0b8a3908 }, 0x100000 },    // 3039 0080 4020  move.w  $00804020,D0
+	{ "armwarar1",{ 0x1f9e9d4c,0x0b8a3908 }, 0x100000 },    // 3039 0080 4020  move.w  $00804020,D0
 	{ "avsp",     { 0x15208f79,0x4ade6cb3 }, 0x100000 },    // 0C80 1234 5678  cmpi.l  #$12345678,D0
 	{ "avspu",    { 0xb4f61089,0xccf75a23 }, 0x100000 },    // 0C80 1234 5678  cmpi.l  #$12345678,D0
 	{ "avspj",    { 0xe9dcb8fa,0x51372064 }, 0x100000 },    // 0C80 1234 5678  cmpi.l  #$12345678,D0

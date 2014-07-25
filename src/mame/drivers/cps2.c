@@ -1689,6 +1689,37 @@ ROM_END
 
 ROM_START( armwara )
 	ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code */
+	ROM_LOAD16_WORD_SWAP( "pwga.03b", 0x000000, 0x80000, CRC(347743e1) SHA1(0cf27209792e70c361e2981b82a4d37643d1b298) )
+	ROM_LOAD16_WORD_SWAP( "pwga.04b", 0x080000, 0x80000, CRC(42dbfb2e) SHA1(cbb7ac2a97de977394eb015f3582ea72432a4529) )
+	ROM_LOAD16_WORD_SWAP( "pwga.05b", 0x100000, 0x80000, CRC(835fbe73) SHA1(6218aa1b480105ffabded980c92679fafb19b824) )
+	ROM_LOAD16_WORD_SWAP( "pwg.06",   0x180000, 0x80000, CRC(87a60ce8) SHA1(e2085c7c8c6792d055dbbb023c7f4e4aa38ae924) )
+	ROM_LOAD16_WORD_SWAP( "pwg.07",   0x200000, 0x80000, CRC(f7b148df) SHA1(f369669713cf647222094c570a2eacd48a8637cf) )
+	ROM_LOAD16_WORD_SWAP( "pwg.08",   0x280000, 0x80000, CRC(cc62823e) SHA1(edaf9bebdfc65ae5414090abd6844176eec39a00) )
+	ROM_LOAD16_WORD_SWAP( "pwg.09a",  0x300000, 0x80000, CRC(4c26baee) SHA1(685f050206b9b904ce6a1ae9a8e8f019012cea43) )
+	ROM_LOAD16_WORD_SWAP( "pwg.10",   0x380000, 0x80000, CRC(07c4fb28) SHA1(58a1ff3d105be7df833dd4f32973766649efcbcf) )
+
+	ROM_REGION( 0x1400000, "gfx", 0 )
+	ROMX_LOAD( "pwg.13m",   0x0000000, 0x400000, CRC(ae8fe08e) SHA1(b6f09663dcda69b5d7ac13e4afaf1efd692fb61e) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "pwg.15m",   0x0000002, 0x400000, CRC(db560f58) SHA1(0c3716b32eb24544ff5d16b5dcadce195cd10d00) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "pwg.17m",   0x0000004, 0x400000, CRC(bc475b94) SHA1(a157664450895a146a532581dd6f4b63dff21c86) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "pwg.19m",   0x0000006, 0x400000, CRC(07439ff7) SHA1(f71e07c6d77c32828f5e319268b24b13a1a4b0c2) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "pwg.14m",   0x1000000, 0x100000, CRC(c3f9ba63) SHA1(66191a52c39daa89b17ede5804ee41c028036f14) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "pwg.16m",   0x1000002, 0x100000, CRC(815b0e7b) SHA1(549785daac3122253fb94f6541bc7016147f5306) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "pwg.18m",   0x1000004, 0x100000, CRC(0109c71b) SHA1(eb51284ee0c85ff8f605fe1d166b7aa202be1344) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "pwg.20m",   0x1000006, 0x100000, CRC(eb75ffbe) SHA1(e9d1deca60be696ac5bff2017fb5de3525e5239a) , ROM_GROUPWORD | ROM_SKIP(6) )
+
+	ROM_REGION( QSOUND_SIZE, "audiocpu", 0 ) /* 64k for the audio CPU (+banks) */
+	ROM_LOAD( "pwg.01",   0x00000, 0x08000, CRC(18a5c0e4) SHA1(bb1353dd74884aaeec9b5f1d0b284d9cad53c0ff) )
+	ROM_CONTINUE(         0x10000, 0x18000 )
+	ROM_LOAD( "pwg.02",   0x28000, 0x20000, CRC(c9dfffa6) SHA1(64e71028befe9a2514074be765dd020e1d2ea70b) )
+
+	ROM_REGION( 0x400000, "qsound", 0 ) /* QSound samples */
+	ROM_LOAD16_WORD_SWAP( "pwg.11m",   0x000000, 0x200000, CRC(a78f7433) SHA1(e47ffba7b9dac9d0dda985c5d966194be18260f7) )
+	ROM_LOAD16_WORD_SWAP( "pwg.12m",   0x200000, 0x200000, CRC(77438ed0) SHA1(733ca6c6a792e66e2aa12c5fc06dd459527afe4b) )
+ROM_END
+
+ROM_START( armwarar1 )
+	ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code */
 	ROM_LOAD16_WORD_SWAP( "pwga.03a", 0x000000, 0x80000, CRC(8d474ab1) SHA1(46baa3a263189001cfc6003fcb346a1996be8b24) )
 	ROM_LOAD16_WORD_SWAP( "pwga.04a", 0x080000, 0x80000, CRC(81b5aec7) SHA1(f1371149a00e7c52d022d5c0cb6f8821c6474d35) )
 	ROM_LOAD16_WORD_SWAP( "pwga.05a", 0x100000, 0x80000, CRC(2618e819) SHA1(58c857988e0ad2839d936d3e405637d8e2a45fe9) )
@@ -8529,7 +8560,8 @@ GAME( 1994, armwaru,    armwar,   cps2, cps2_3p3b, cps_state, cps2,     ROT0,   
 GAME( 1994, armwaru1,   armwar,   cps2, cps2_3p3b, cps_state, cps2,     ROT0,   "Capcom", "Armored Warriors (USA 940920)", GAME_SUPPORTS_SAVE )
 GAME( 1994, pgear,      armwar,   cps2, cps2_3p3b, cps_state, cps2,     ROT0,   "Capcom", "Powered Gear: Strategic Variant Armor Equipment (Japan 941024)", GAME_SUPPORTS_SAVE )
 GAME( 1994, pgearr1,    armwar,   cps2, cps2_3p3b, cps_state, cps2,     ROT0,   "Capcom", "Powered Gear: Strategic Variant Armor Equipment (Japan 940916)", GAME_SUPPORTS_SAVE )
-GAME( 1994, armwara,    armwar,   cps2, cps2_3p3b, cps_state, cps2,     ROT0,   "Capcom", "Armored Warriors (Asia 940920)", GAME_SUPPORTS_SAVE )
+GAME( 1994, armwara,    armwar,   cps2, cps2_3p3b, cps_state, cps2,     ROT0,   "Capcom", "Armored Warriors (Asia 941024)", GAME_SUPPORTS_SAVE )
+GAME( 1994, armwarar1,  armwar,   cps2, cps2_3p3b, cps_state, cps2,     ROT0,   "Capcom", "Armored Warriors (Asia 940920)", GAME_SUPPORTS_SAVE )
 GAME( 1994, xmcota,     0,        cps2, cps2_2p6b, cps_state, cps2,     ROT0,   "Capcom", "X-Men: Children of the Atom (Euro 950331)", GAME_SUPPORTS_SAVE )
 GAME( 1994, xmcotar1,   xmcota,   cps2, cps2_2p6b, cps_state, cps2,     ROT0,   "Capcom", "X-Men: Children of the Atom (Euro 950105)", GAME_SUPPORTS_SAVE )
 GAME( 1994, xmcotau,    xmcota,   cps2, cps2_2p6b, cps_state, cps2,     ROT0,   "Capcom", "X-Men: Children of the Atom (USA 950105)", GAME_SUPPORTS_SAVE )
