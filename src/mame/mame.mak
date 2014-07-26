@@ -2690,6 +2690,8 @@ $(DRIVERS)/mpu4vid.o:   $(LAYOUT)/crmaze2p.lh \
 
 $(DRIVERS)/mpu4plasma.o:    $(LAYOUT)/mpu4plasma.lh \
 
+$(DRIVERS)/mpu5hw.o:  $(LAYOUT)/mpu5.lh
+
 $(DRIVERS)/mw18w.o:     $(LAYOUT)/18w.lh
 
 $(DRIVERS)/mw8080bw.o:  $(LAYOUT)/280zzzap.lh \

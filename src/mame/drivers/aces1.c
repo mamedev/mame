@@ -9,7 +9,7 @@ total rom size 0x8000
 ram at 0x8000-0x87ff
 lots of reads from 0xe000 at the start
 
-JPM style Reel MCU?
+JPM style Reel MCU? Certainly reel data seems to be muxed together in aweird way
 
  Hardware overview
   - Z80
@@ -27,6 +27,7 @@ JPM style Reel MCU?
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "machine/i8255.h"
+#include "machine/steppers.h"
 #include "video/awpvid.h"
 #include "aces1.lh"
 
@@ -36,11 +37,22 @@ class aces1_state : public driver_device
 public:
 	aces1_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu")
+			m_maincpu(*this, "maincpu"),
+			m_io1_port(*this, "IO1"),
+			m_io2_port(*this, "IO2"),
+			m_io3_port(*this, "IO3"),
+			m_io4_port(*this, "IO4"),
+			m_io5_port(*this, "IO5"),
+			m_io6_port(*this, "IO6"),
+			m_io7_port(*this, "IO7"),
+			m_io8_port(*this, "IO8")
 	{ }
 	int m_input_strobe;
 	int m_lamp_strobe;
 	int m_led_strobe;
+	int m_reel_clock[4];
+	int m_reel_phase[4];
+	int m_reel_count[4];
 
 	DECLARE_READ8_MEMBER( aces1_unk_r )
 	{
@@ -122,26 +134,80 @@ public:
 
 	DECLARE_WRITE8_MEMBER(ic25_write_c)
 	{
-	//  printf("reels, extender strobe %02x\n", data);
+		//There needs to be some way of connecting these values to stepper coils, or doing the MCU properly
+		// We should be able to see an enable clock, a sense and a full/half step selector, we don't have the half step visible it seems.
+		
+		//3 1 16 14
+		int phases[] = {0x05,0x01,0x09,0x08,0x0a,0x02,0x06,0x04,};
+		for (int reel=0; reel <4; reel++)
+		{
+			int clock = (data & (1<<reel));
+			if (m_reel_clock[reel] != clock)
+			{
+				if (clock != 0)
+				{
+					int sense = ((data & (4 + (1<<reel))) ? -2:2);
+					m_reel_phase[reel] = ((m_reel_phase[reel] + sense + 8) % 8);
+					stepper_update(reel, phases[m_reel_phase[reel]]);
+					m_reel_clock[reel] = clock;
+					if ( m_reel_phase[reel] % 4 ==0)
+					{
+						m_reel_count[reel]=1;
+					}
+					else
+					{
+						m_reel_count[reel]=0;
+					}
+					logerror("Reel %x Enable %x Sense %i Phase %x Data  %x\n",reel, clock, sense, m_reel_phase[reel],phases[m_reel_phase[reel]]  );
+				}
+				else
+				{
+					logerror("Reel %x Enable %x \n",reel, clock  );
+				}
+			}
+//			logerror("Reel %x Enable %x Sense %i \n",reel, (data & (1<<reel)), (data & (4 + (1<<reel))) ? 1:-1  );
+		}
+		
+		
+//	  printf("reels, extender strobe %02x\n", data);
 	}
 
 	DECLARE_READ8_MEMBER( ic37_read_a )
 	{
-		return 0xff;
+		//Should be coins and doors
+		return ioport("COINS")->read();
 	}
 
 	DECLARE_READ8_MEMBER( ic37_read_b )
 	{
-		return 0xff;
+		ioport_port * portnames[] = { m_io1_port, m_io2_port, m_io3_port, m_io4_port, m_io5_port, m_io6_port, m_io7_port, m_io8_port,m_io1_port, m_io2_port, m_io3_port, m_io4_port, m_io5_port, m_io6_port, m_io7_port, m_io8_port };
+
+		return (portnames[m_input_strobe])->read();
 	}
 
 	DECLARE_READ8_MEMBER( ic37_read_c )
 	{
-		return 0xff;
+		int pattern =0;
+		int action =0;
+		for (int reel = 0; reel < 4; reel++)
+		{
+			if (stepper_optic_state(reel)) pattern |= 1<<reel;
+			if (m_reel_count[reel]) action |= 1<<reel;
+		}
+		
+		return ((pattern << 4) | action);
 	}
 
 	// devices
 	required_device<cpu_device> m_maincpu;
+	required_ioport m_io1_port;
+	required_ioport m_io2_port;
+	required_ioport m_io3_port;
+	required_ioport m_io4_port;
+	required_ioport m_io5_port;
+	required_ioport m_io6_port;
+	required_ioport m_io7_port;
+	required_ioport m_io8_port;
 
 	DECLARE_DRIVER_INIT(aces1);
 	virtual void machine_start();
@@ -170,6 +236,16 @@ TIMER_CALLBACK_MEMBER(aces1_state::m_aces1_nmi_timer_callback)
 
 void aces1_state::machine_start()
 {
+	stepper_config(machine(), 0, &starpoint_interface_48step);
+	stepper_config(machine(), 1, &starpoint_interface_48step);
+	stepper_config(machine(), 2, &starpoint_interface_48step);
+	stepper_config(machine(), 3, &starpoint_interface_48step);
+
+	for (int reel=0; reel <4; reel++)
+	{
+		m_reel_clock[reel] =0;
+		m_reel_phase[reel] =0;
+	}
 	m_aces1_irq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(aces1_state::m_aces1_irq_timer_callback),this), 0);
 	m_aces1_nmi_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(aces1_state::m_aces1_nmi_timer_callback),this), 0);
 }
@@ -198,6 +274,96 @@ ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( aces1 )
+	PORT_START("COINS")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_NAME("10p")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_NAME("20p")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_NAME("50p")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN4 ) PORT_NAME("100p")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IO1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IO2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IO3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+	
+	PORT_START("IO4")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IO5")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IO6")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IO7")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+	
+	PORT_START("IO8")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+	
 	PORT_START("DSWA")
 	PORT_DIPNAME( 0x01, 0x01, "DSWA" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )

@@ -6565,6 +6565,7 @@ src/mame/layout/mpu3.lay svneol=native#text/xml
 src/mame/layout/mpu4.lay svneol=native#text/xml
 src/mame/layout/mpu4ext.lay svneol=native#text/xml
 src/mame/layout/mpu4plasma.lay svneol=native#text/xml
+src/mame/layout/mpu5.lay svneol=native#text/xml
 src/mame/layout/musicsrt.lay svneol=native#text/xml
 src/mame/layout/namcofl.lay svneol=native#text/xml
 src/mame/layout/navarone.lay svneol=native#text/xml
