@@ -23,6 +23,7 @@
  *  - memory modes with IOCNT0, currently always running in full expansion mode
  *  - timer event counter mode (timer control register, bit 6)
  *  - TMS70x1/2 serial port and timer 3
+ *  - TMS70C46 DOCK-BUS comms with external pins
  *  - TMS70C46 external memory mode is via "E" bus instead of configuring IOCNT0
  *  - TMS70C46 clock divider (don't know which part of the memorymap is slow)
  *  - TMS70C46 INT3 on keypress
@@ -121,9 +122,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(tms70c46_mem, AS_PROGRAM, 8, tms70c46_device )
 	AM_RANGE(0x010c, 0x010c) AM_READWRITE(e_bus_data_r, e_bus_data_w)
-//	AM_RANGE(0x010d, 0x010d) --> to outside --> DOCK-BUS available
-//	AM_RANGE(0x010e, 0x010e) --> to outside --> DOCK-BUS data (d0-d3)
-//	AM_RANGE(0x010f, 0x010f) --> to outside --> DOCK-BUS handshake
+	AM_RANGE(0x010d, 0x010d) AM_NOP // ? always writes $FF before checking keyboard... maybe INT3 ack?
+	AM_RANGE(0x010e, 0x010e) AM_READWRITE(dockbus_data_r, dockbus_data_w)
+	AM_RANGE(0x010f, 0x010f) AM_READWRITE(dockbus_status_r, dockbus_status_w)
 	AM_RANGE(0x0118, 0x0118) AM_READWRITE(control_r, control_w)
 	AM_IMPORT_FROM( tms7040_mem )
 ADDRESS_MAP_END
@@ -927,4 +928,31 @@ WRITE8_MEMBER(tms70c46_device::control_w)
 	// d4: enable clock divider when accessing slow memory
 	// d0-d3: clock divider
 	m_control = data;
+}
+
+// DOCK-BUS: TODO..
+// right now pretend that nothing is connected
+// external pins are HD0-HD3(data), HSK(handshake), BAV(bus available)
+
+READ8_MEMBER(tms70c46_device::dockbus_status_r)
+{
+	// d0: slave HSK low
+	// d1: slave BAV low
+	// d3: IRQ active
+	return 0;
+}
+
+WRITE8_MEMBER(tms70c46_device::dockbus_status_w)
+{
+	// d0: master HSK low (setting it low(1) also clears IRQ)
+	// d1: master BAV low
+}
+
+READ8_MEMBER(tms70c46_device::dockbus_data_r)
+{
+	return 0xff;
+}
+
+WRITE8_MEMBER(tms70c46_device::dockbus_data_w)
+{
 }

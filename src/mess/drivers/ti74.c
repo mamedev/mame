@@ -62,8 +62,7 @@
   TODO:
   - it runs too fast due to missing clock divider emulation in TMS70C46
   - external ram cartridge
-  - TI-95 I/O indicator is always on (dockbus)
-  - is battery low/ok status also on dockbus? setting INT1 on reset seems to clear it
+  - battery low/ok status.. setting INT1 on reset seems to clear it
   - DOCK-BUS interface and peripherals, compatible with both TI-74 and TI-95
     * CI-7 cassette interface
     * PC-324 thermal printer
@@ -272,7 +271,6 @@ WRITE8_MEMBER(ti74_state::bankswitch_w)
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, ti74_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x010d, 0x010f) AM_NOP // DOCK-BUS
 	AM_RANGE(0x1000, 0x1001) AM_DEVREADWRITE("hd44780", hd44780_device, read, write)
 	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_SHARE("6264.ic3")
 	AM_RANGE(0x4000, 0xbfff) AM_ROM AM_REGION("user1", 0)
