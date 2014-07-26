@@ -2,7 +2,7 @@
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <softwarelist name="horizon" description="NorthStar Horizon diskettes">
 
-	<software name="c145_54">
+	<software name="c145_54" supported="no">
 		<description>LifeBoat CP/M 1.45 - 54k</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -14,7 +14,7 @@
 		</part>
 	</software>
 
-	<software name="c223_52">
+	<software name="c223_52" supported="no">
 		<description>LifeBoat CP/M 2.23 - 52k</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -26,7 +26,7 @@
 		</part>
 	</software>
 
-	<software name="c223_56">
+	<software name="c223_56" supported="no">>
 		<description>LifeBoat CP/M 2.23 - 56k</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -38,7 +38,7 @@
 		</part>
 	</software>
 
-	<software name="c223a_24">
+	<software name="c223a_24" supported="no">>
 		<description>n2212</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -50,7 +50,7 @@
 		</part>
 	</software>
 
-	<software name="dmf">
+	<software name="dmf" supported="no">
 		<description>DMF</description>
 		<year>198?</year>
 		<publisher>Dave Dunfield</publisher>
@@ -80,7 +80,7 @@
 		</part>
 	</software>
 
-	<software name="forth">
+	<software name="forth" supported="no">
 		<description>Forth</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -98,7 +98,7 @@
 		</part>
 	</software>
 
-	<software name="hd221ird">
+	<software name="hd221ird" supported="no">
 		<description>NorthStar HDOS 2.2.1 H Initial Recovery Disk</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -110,7 +110,7 @@
 		</part>
 	</software>
 
-	<software name="hd221sd">
+	<software name="hd221sd" supported="no">
 		<description>NorthStar HDOS 2.2.0 H System Disk</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -122,7 +122,7 @@
 		</part>
 	</software>
 
-	<software name="horhd1b">
+	<software name="horhd1b" supported="no">
 		<description>NorthStar HORIZON-HD System Diskette R1.B</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -134,7 +134,7 @@
 		</part>
 	</software>
 
-	<software name="insua211">
+	<software name="insua211" supported="no">
 		<description>INSUA NorthStar DOS 2.1.1 QuadDensity</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -146,7 +146,7 @@
 		</part>
 	</software>
 
-	<software name="mcd96r7">
+	<software name="mcd96r7" supported="no">
 		<description>Micro Complex DOS96R7</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -158,7 +158,7 @@
 		</part>
 	</software>
 
-	<software name="nsmcutil">
+	<software name="nsmcutil" supported="no">
 		<description>NSM Utilities</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -188,7 +188,7 @@
 		</part>
 	</software>
 
-	<software name="mcdos70d">
+	<software name="mcdos70d" supported="no">
 		<description>Micro Complex Dos 7.0</description>
 		<year>1980</year>
 		<publisher>Micro Complex</publisher>
@@ -200,7 +200,7 @@
 		</part>
 	</software>
 
-	<software name="n2212_64">
+	<software name="n2212_64" supported="no">
 		<description>NorthStar CP/M 2.2 release 1.20 - 64k</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -212,7 +212,7 @@
 		</part>
 	</software>
 
-	<software name="n22a_56">
+	<software name="n22a_56" supported="no">
 		<description>NorthStar CP/M 2.2 release A - 56k</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -224,7 +224,7 @@
 		</part>
 	</software>
 
-	<software name="nsdos20s">
+	<software name="nsdos20s" supported="no">
 		<description>NorthStar DOS 2.0 Single Density (DOS only)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -236,7 +236,7 @@
 		</part>
 	</software>
 
-	<software name="nsdos40s">
+	<software name="nsdos40s" supported="no">
 		<description>NorthStar DOS 4.0 Single Density</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -248,7 +248,7 @@
 		</part>
 	</software>
 
-	<software name="nsdos50d">
+	<software name="nsdos50d" supported="no">
 		<description>NorthStar DOS 5.0 Double Density</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -260,7 +260,7 @@
 		</part>
 	</software>
 
-	<software name="nsdos51q">
+	<software name="nsdos51q" supported="no">
 		<description>NorthStar DOS 5.1 Quad Density (Unconfigured I/O)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -272,7 +272,7 @@
 		</part>
 	</software>
 
-	<software name="nsdos51s">
+	<software name="nsdos51s" supported="no">
 		<description>NorthStar DOS 5.1 Single Density</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -284,7 +284,7 @@
 		</part>
 	</software>
 
-	<software name="nsdos52q">
+	<software name="nsdos52q" supported="no">
 		<description>NorthStar DOS 5.2 Quad Density</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -296,7 +296,7 @@
 		</part>
 	</software>
 
-	<software name="pascal">
+	<software name="pascal" supported="no">
 		<description>UCSD Pascal 1.5</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -330,7 +330,7 @@
 		</part>
 	</software>
 
-	<software name="td130">
+	<software name="td130" supported="no">
 		<description>TurboDos 1.30 1.1.1 QH</description>
 		<year>1984</year>
 		<publisher>North Star Computers</publisher>
@@ -365,7 +365,7 @@
 		</part>
 	</software>
 
-	<software name="td130a" cloneof="td130">
+	<software name="td130a" cloneof="td130" supported="no">
 		<description>TurboDos 1.30 1.1.1 QH (Alt)</description>
 		<year>1984</year>
 		<publisher>North Star Computers</publisher>
@@ -400,7 +400,7 @@
 		</part>
 	</software>
 
-	<software name="v2212_56">
+	<software name="v2212_56" supported="no">
 		<description>NorthStar CP/M 2.2 release 1.20 - 56k for Vector/3P+S</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -412,7 +412,7 @@
 		</part>
 	</software>
 
-	<software name="vinsua">
+	<software name="vinsua" supported="no">
 		<description>INSUA NorthStar DOS 2.1.1 QuadDensity for Vector/3P+S</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -424,7 +424,7 @@
 		</part>
 	</software>
 
-	<software name="xitancpm">
+	<software name="xitancpm" supported="no">
 		<description>Xitan CP/M 2.26 - 48k</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -436,7 +436,7 @@
 		</part>
 	</software>
 
-	<software name="aca">
+	<software name="aca" supported="no">
 		<description>Active Circuit Analysis</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -448,7 +448,7 @@
 		</part>
 	</software>
 
-	<software name="adven">
+	<software name="adven" supported="no">
 		<description>Original Adventure</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -466,7 +466,7 @@
 		</part>
 	</software>
 
-	<software name="alps">
+	<software name="alps" supported="no">
 		<description>Assembly Language Programming System</description>
 		<year>1979</year>
 		<publisher>Dave Dunfield</publisher>
@@ -490,7 +490,7 @@
 		</part>
 	</software>
 
-	<software name="apcbasic">
+	<software name="apcbasic" supported="no">
 		<description>APCBASIC 2.4.2</description>
 		<year>1982</year>
 		<publisher>Chris Cochran</publisher>
@@ -502,7 +502,7 @@
 		</part>
 	</software>
 
-	<software name="aztec">
+	<software name="aztec" supported="no">
 		<description>AZTEC 'C' compiler</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -514,7 +514,7 @@
 		</part>
 	</software>
 
-	<software name="basex">
+	<software name="basex" supported="no">
 		<description>BaseX</description>
 		<year>1978</year>
 		<publisher>Interactive Microware</publisher>
@@ -534,7 +534,7 @@
 		</part>
 	</software>
 
-	<software name="bazic">
+	<software name="bazic" supported="no">
 		<description>BAZIC</description>
 		<year>198?</year>
 		<publisher>Micro Mike's</publisher>
@@ -546,7 +546,7 @@
 		</part>
 	</software>
 
-	<software name="beamdef">
+	<software name="beamdef" supported="no">
 		<description>Beam Deflection</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -564,7 +564,7 @@
 		</part>
 	</software>
 
-	<software name="bridge">
+	<software name="bridge" supported="no">
 		<description>Bridge 2.0</description>
 		<year>198?</year>
 		<publisher>DynaComp</publisher>
@@ -576,7 +576,7 @@
 		</part>
 	</software>
 
-	<software name="bssv2ch4">
+	<software name="bssv2ch4" supported="no">
 		<description>Basic Scientific Subroutines V2 CH4</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -588,7 +588,7 @@
 		</part>
 	</software>
 
-	<software name="butler">
+	<software name="butler" supported="no">
 		<description>Butler Adventure</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -600,7 +600,7 @@
 		</part>
 	</software>
 
-	<software name="chess">
+	<software name="chess" supported="no">
 		<description>Chess Master</description>
 		<year>198?</year>
 		<publisher>DynaComp</publisher>
@@ -612,7 +612,7 @@
 		</part>
 	</software>
 
-	<software name="compare">
+	<software name="compare" supported="no">
 		<description>File comparison package</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -624,7 +624,7 @@
 		</part>
 	</software>
 
-	<software name="compress">
+	<software name="compress" supported="no">
 		<description>File compression package</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -636,7 +636,7 @@
 		</part>
 	</software>
 
-	<software name="copyall">
+	<software name="copyall" supported="no">
 		<description>COPYALL</description>
 		<year>198?</year>
 		<publisher>Micro Mike's</publisher>
@@ -648,7 +648,7 @@
 		</part>
 	</software>
 
-	<software name="cpmgames">
+	<software name="cpmgames" supported="no">
 		<description>CP/M Games disk</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -660,7 +660,7 @@
 		</part>
 	</software>
 
-	<software name="cpmug23">
+	<software name="cpmug23" supported="no">
 		<description>NorthStar CP/M Users Group Diskette #23</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -672,7 +672,7 @@
 		</part>
 	</software>
 
-	<software name="cpmug24">
+	<software name="cpmug24" supported="no">
 		<description>NorthStar CP/M Users Group Diskette #24</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -684,7 +684,7 @@
 		</part>
 	</software>
 
-	<software name="cpmug25">
+	<software name="cpmug25" supported="no">
 		<description>NorthStar CP/M Users Group Diskette #25</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -702,7 +702,7 @@
 		</part>
 	</software>
 
-	<software name="cpmug29">
+	<software name="cpmug29" supported="no">
 		<description>NorthStar CP/M Users Group Diskette #29</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -720,7 +720,7 @@
 		</part>
 	</software>
 
-	<software name="cpmug30">
+	<software name="cpmug30" supported="no">
 		<description>NorthStar CP/M Users Group Diskette #30</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -738,7 +738,7 @@
 		</part>
 	</software>
 
-	<software name="cpmug31">
+	<software name="cpmug31" supported="no">
 		<description>NorthStar CP/M Users Group Diskette #31</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -756,7 +756,7 @@
 		</part>
 	</software>
 
-	<software name="cpmug32">
+	<software name="cpmug32" supported="no">
 		<description>NorthStar CP/M Users Group Diskette #32</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -768,7 +768,7 @@
 		</part>
 	</software>
 
-	<software name="cpmug34">
+	<software name="cpmug34" supported="no">
 		<description>NorthStar CP/M Users Group Diskette #34</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -780,7 +780,7 @@
 		</part>
 	</software>
 
-	<software name="cpmug36">
+	<software name="cpmug36" supported="no">
 		<description>NorthStar CP/M Users Group Diskette #36</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -798,7 +798,7 @@
 		</part>
 	</software>
 
-	<software name="cpmug40">
+	<software name="cpmug40" supported="no">
 		<description>NorthStar CP/M Users Group Diskette #40</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -810,7 +810,7 @@
 		</part>
 	</software>
 
-	<software name="crans">
+	<software name="crans" supported="no">
 		<description>Cranston Manor Adventure</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -822,7 +822,7 @@
 		</part>
 	</software>
 
-	<software name="datasmth">
+	<software name="datasmth" supported="no">
 		<description>Data Smoother</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -834,7 +834,7 @@
 		</part>
 	</software>
 
-	<software name="datastar">
+	<software name="datastar" supported="no">
 		<description>DATASTAR</description>
 		<year>198?</year>
 		<publisher>Micropro</publisher>
@@ -846,7 +846,7 @@
 		</part>
 	</software>
 
-	<software name="dmmutil">
+	<software name="dmmutil" supported="no">
 		<description>DMM Utilities</description>
 		<year>198?</year>
 		<publisher>Elliam Associates</publisher>
@@ -858,7 +858,7 @@
 		</part>
 	</software>
 
-	<software name="dynabase">
+	<software name="dynabase" supported="no">
 		<description>Dynabase Database</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -870,7 +870,7 @@
 		</part>
 	</software>
 
-	<software name="f80">
+	<software name="f80" supported="no">
 		<description>Fortran-80 (v3.44)</description>
 		<year>1980</year>
 		<publisher>Microsoft</publisher>
@@ -882,7 +882,7 @@
 		</part>
 	</software>
 
-	<software name="f80_331" cloneof="f80">
+	<software name="f80_331" cloneof="f80" supported="no">
 		<description>Fortran-80 (v3.31)</description>
 		<year>1980</year>
 		<publisher>Microsoft</publisher>
@@ -894,7 +894,7 @@
 		</part>
 	</software>
 
-	<software name="fastgam">
+	<software name="fastgam" supported="no">
 		<description>FastGammon</description>
 		<year>198?</year>
 		<publisher>Quality Software</publisher>
@@ -906,7 +906,7 @@
 		</part>
 	</software>
 
-	<software name="finmgtsy">
+	<software name="finmgtsy" supported="no">
 		<description>Financial Management System</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -918,7 +918,7 @@
 		</part>
 	</software>
 
-	<software name="gamepak2">
+	<software name="gamepak2" supported="no">
 		<description>Game Pak 2</description>
 		<year>198?</year>
 		<publisher>DynaComp</publisher>
@@ -930,7 +930,7 @@
 		</part>
 	</software>
 
-	<software name="games">
+	<software name="games" supported="no">
 		<description>Games</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -942,7 +942,7 @@
 		</part>
 	</software>
 
-	<software name="games1">
+	<software name="games1" supported="no">
 		<description>Games 1</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -954,7 +954,7 @@
 		</part>
 	</software>
 
-	<software name="games10">
+	<software name="games10" supported="no">
 		<description>Games 10</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -966,7 +966,7 @@
 		</part>
 	</software>
 
-	<software name="games11">
+	<software name="games11" supported="no">
 		<description>Games 11</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -978,7 +978,7 @@
 		</part>
 	</software>
 
-	<software name="games2">
+	<software name="games2" supported="no">
 		<description>Games 2</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -990,7 +990,7 @@
 		</part>
 	</software>
 
-	<software name="games3">
+	<software name="games3" supported="no">
 		<description>Games 3</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -1002,7 +1002,7 @@
 		</part>
 	</software>
 
-	<software name="games4">
+	<software name="games4" supported="no">
 		<description>Games 4</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -1014,7 +1014,7 @@
 		</part>
 	</software>
 
-	<software name="games5">
+	<software name="games5" supported="no">
 		<description>Games 5</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -1026,7 +1026,7 @@
 		</part>
 	</software>
 
-	<software name="games6">
+	<software name="games6" supported="no">
 		<description>Games 6</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -1038,7 +1038,7 @@
 		</part>
 	</software>
 
-	<software name="games7">
+	<software name="games7" supported="no">
 		<description>Games 7</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -1050,7 +1050,7 @@
 		</part>
 	</software>
 
-	<software name="games8">
+	<software name="games8" supported="no">
 		<description>Games 8</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -1062,7 +1062,7 @@
 		</part>
 	</software>
 
-	<software name="games9">
+	<software name="games9" supported="no">
 		<description>Games 9</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -1074,7 +1074,7 @@
 		</part>
 	</software>
 
-	<software name="generate">
+	<software name="generate" supported="no">
 		<description>Basic Disassembler</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -1086,7 +1086,7 @@
 		</part>
 	</software>
 
-	<software name="hancapii">
+	<software name="hancapii" supported="no">
 		<description>Handicapper II (Horse Race Handicapper)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -1098,7 +1098,7 @@
 		</part>
 	</software>
 
-	<software name="handicap">
+	<software name="handicap" supported="no">
 		<description>Horse Race Handicapper</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -1110,7 +1110,7 @@
 		</part>
 	</software>
 
-	<software name="hearts">
+	<software name="hearts" supported="no">
 		<description>Hearts 1.5</description>
 		<year>198?</year>
 		<publisher>DynaComp</publisher>
@@ -1122,7 +1122,7 @@
 		</part>
 	</software>
 
-	<software name="icatutil">
+	<software name="icatutil" supported="no">
 		<description>INSUA Catalog Utilities</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -1134,7 +1134,7 @@
 		</part>
 	</software>
 
-	<software name="inutil">
+	<software name="inutil" supported="no">
 		<description>INSUA DOS Utilities #1</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -1146,7 +1146,7 @@
 		</part>
 	</software>
 
-	<software name="keeptrak">
+	<software name="keeptrak" supported="no">
 		<description>Keep Track Of It</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -1158,7 +1158,7 @@
 		</part>
 	</software>
 
-	<software name="keno">
+	<software name="keno" supported="no">
 		<description>KENO Casino game</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -1170,7 +1170,7 @@
 		</part>
 	</software>
 
-	<software name="maillist">
+	<software name="maillist" supported="no">
 		<description>DynaComp MailList 2.2</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -1182,7 +1182,7 @@
 		</part>
 	</software>
 
-	<software name="michart">
+	<software name="michart" supported="no">
 		<description>Micro Chart Program</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -1194,7 +1194,7 @@
 		</part>
 	</software>
 
-	<software name="monarch">
+	<software name="monarch" supported="no">
 		<description>Monarch</description>
 		<year>198?</year>
 		<publisher>DynaComp</publisher>
@@ -1206,7 +1206,7 @@
 		</part>
 	</software>
 
-	<software name="mstuf">
+	<software name="mstuf" supported="no">
 		<description>The MicroStuf Co. RCONS 2.1 and MESS 2.2</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -1218,7 +1218,7 @@
 		</part>
 	</software>
 
-	<software name="multlinr">
+	<software name="multlinr" supported="no">
 		<description>Multilinear Regression</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -1230,7 +1230,7 @@
 		</part>
 	</software>
 
-	<software name="nsse1">
+	<software name="nsse1" supported="no">
 		<description>NorthStar Software Exchange #1</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -1242,7 +1242,7 @@
 		</part>
 	</software>
 
-	<software name="nsse16">
+	<software name="nsse16" supported="no">
 		<description>NorthStar Software Exchange #16</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -1254,7 +1254,7 @@
 		</part>
 	</software>
 
-	<software name="nsse17">
+	<software name="nsse17" supported="no">
 		<description>NorthStar Software Exchange #17</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -1266,7 +1266,7 @@
 		</part>
 	</software>
 
-	<software name="nsse18">
+	<software name="nsse18" supported="no">
 		<description>NorthStar Software Exchange #18</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -1278,7 +1278,7 @@
 		</part>
 	</software>
 
-	<software name="nsse2">
+	<software name="nsse2" supported="no">
 		<description>NorthStar Software Exchange #2</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -1290,7 +1290,7 @@
 		</part>
 	</software>
 
-	<software name="nsse20">
+	<software name="nsse20" supported="no">
 		<description>NorthStar Software Exchange #20</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -1302,7 +1302,7 @@
 		</part>
 	</software>
 
-	<software name="nsse21">
+	<software name="nsse21" supported="no">
 		<description>NorthStar Software Exchange #21</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -1314,7 +1314,7 @@
 		</part>
 	</software>
 
-	<software name="nsse22">
+	<software name="nsse22" supported="no">
 		<description>NorthStar Software Exchange #22</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -1326,7 +1326,7 @@
 		</part>
 	</software>
 
-	<software name="nsse7">
+	<software name="nsse7" supported="no">
 		<description>NorthStar Software Exchange #7</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -1338,7 +1338,7 @@
 		</part>
 	</software>
 
-	<software name="nsse8">
+	<software name="nsse8" supported="no">
 		<description>NorthStar Software Exchange #8</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -1350,7 +1350,7 @@
 		</part>
 	</software>
 
-	<software name="nsse9">
+	<software name="nsse9" supported="no">
 		<description>NorthStar Software Exchange #9</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -1362,7 +1362,7 @@
 		</part>
 	</software>
 
-	<software name="nsseg1r3">
+	<software name="nsseg1r3" supported="no">
 		<description>NorthStar Software Exchange Games-1 Release-3</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -1374,7 +1374,7 @@
 		</part>
 	</software>
 
-	<software name="pds">
+	<software name="pds" supported="no">
 		<description>Program Development System</description>
 		<year>1978</year>
 		<publisher>Allen Ashley</publisher>
@@ -1392,7 +1392,7 @@
 		</part>
 	</software>
 
-	<software name="pfm">
+	<software name="pfm" supported="no">
 		<description>Personal Finance Manager</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -1404,7 +1404,7 @@
 		</part>
 	</software>
 
-	<software name="power">
+	<software name="power" supported="no">
 		<description>POWER! Special Version for INSUA Members</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -1416,7 +1416,7 @@
 		</part>
 	</software>
 
-	<software name="protext">
+	<software name="protext" supported="no">
 		<description>Protext and MultiEd</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -1428,7 +1428,7 @@
 		</part>
 	</software>
 
-	<software name="quickref">
+	<software name="quickref" supported="no">
 		<description>Quickref</description>
 		<year>1979</year>
 		<publisher>A. H. Bazell</publisher>
@@ -1440,7 +1440,7 @@
 		</part>
 	</software>
 
-	<software name="rmf">
+	<software name="rmf" supported="no">
 		<description>Remote Micro Facility</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -1452,7 +1452,7 @@
 		</part>
 	</software>
 
-	<software name="roots">
+	<software name="roots" supported="no">
 		<description>Find roots of polynomial</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -1464,7 +1464,7 @@
 		</part>
 	</software>
 
-	<software name="skpilot">
+	<software name="skpilot" supported="no">
 		<description>Starkweather Pilot (v4.3)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -1476,7 +1476,7 @@
 		</part>
 	</software>
 
-	<software name="smlinreg">
+	<software name="smlinreg" supported="no">
 		<description>Stepwise Multilinear Regression</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -1488,7 +1488,7 @@
 		</part>
 	</software>
 
-	<software name="smms">
+	<software name="smms" supported="no">
 		<description>Music Synth</description>
 		<year>1979</year>
 		<publisher>Jon Bokelman</publisher>
@@ -1500,7 +1500,7 @@
 		</part>
 	</software>
 
-	<software name="spacelns">
+	<software name="spacelns" supported="no">
 		<description>Space Lanes</description>
 		<year>198?</year>
 		<publisher>DynaComp</publisher>
@@ -1512,7 +1512,7 @@
 		</part>
 	</software>
 
-	<software name="spilot41">
+	<software name="spilot41" supported="no">
 		<description>Super-Pilot 4.1 (Pilot Plus)</description>
 		<year>1979</year>
 		<publisher>A. Banks</publisher>
@@ -1524,7 +1524,7 @@
 		</part>
 	</software>
 
-	<software name="statevar">
+	<software name="statevar" supported="no">
 		<description>State Variables</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -1536,7 +1536,7 @@
 		</part>
 	</software>
 
-	<software name="stock">
+	<software name="stock" supported="no">
 		<description>Microcomputer Stock Program</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -1548,7 +1548,7 @@
 		</part>
 	</software>
 
-	<software name="strace">
+	<software name="strace" supported="no">
 		<description>Super-Trace</description>
 		<year>1989</year>
 		<publisher>Pavel Breder</publisher>
@@ -1560,7 +1560,7 @@
 		</part>
 	</software>
 
-	<software name="taxopt">
+	<software name="taxopt" supported="no">
 		<description>Tax Optimizer</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -1572,7 +1572,7 @@
 		</part>
 	</software>
 
-	<software name="tpascal">
+	<software name="tpascal" supported="no">
 		<description>Turbo-Pascal</description>
 		<year>198?</year>
 		<publisher>Borland</publisher>
@@ -1584,7 +1584,7 @@
 		</part>
 	</software>
 
-	<software name="trafunan">
+	<software name="trafunan" supported="no">
 		<description>Traffic Function Analyzer</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -1596,7 +1596,7 @@
 		</part>
 	</software>
 
-	<software name="uncharry">
+	<software name="uncharry" supported="no">
 		<description>Uncle Harrys Will</description>
 		<year>198?</year>
 		<publisher>DynaComp</publisher>
@@ -1608,7 +1608,7 @@
 		</part>
 	</software>
 
-	<software name="valdez">
+	<software name="valdez" supported="no">
 		<description>Valdez (Supertanker simulation)</description>
 		<year>198?</year>
 		<publisher>DynaComp</publisher>
@@ -1620,7 +1620,7 @@
 		</part>
 	</software>
 
-	<software name="vedit">
+	<software name="vedit" supported="no">
 		<description>VEDIT editor</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -1632,7 +1632,7 @@
 		</part>
 	</software>
 
-	<software name="windmere">
+	<software name="windmere" supported="no">
 		<description>Windmere Estates</description>
 		<year>198?</year>
 		<publisher>DynaComp</publisher>
@@ -1644,7 +1644,7 @@
 		</part>
 	</software>
 
-	<software name="ws30">
+	<software name="ws30" supported="no">
 		<description>WordStar 3.0</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -1656,7 +1656,7 @@
 		</part>
 	</software>
 
-	<software name="xek">
+	<software name="xek" supported="no">
 		<description>XEK Assembler/Disassembler</description>
 		<year>198?</year>
 		<publisher>ByteShop of Westminster</publisher>
@@ -1668,7 +1668,7 @@
 		</part>
 	</software>
 
-	<software name="z80asm">
+	<software name="z80asm" supported="no">
 		<description>Z80 Assembler (with LifeBoat CP/M 2.20 - 56k)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -1680,7 +1680,7 @@
 		</part>
 	</software>
 
-	<software name="010disk">
+	<software name="010disk" supported="no">
 		<description>AUTOLOAD DOS &amp; BASIC, DOC - WORD PROCESSOR NORTHSTAR IN 5/20/85</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -1692,7 +1692,7 @@
 		</part>
 	</software>
 
-	<software name="011disk">
+	<software name="011disk" supported="no">
 		<description>ARTICLE, SYNC BUSTER PRIME DISK 3/19/87</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -1704,7 +1704,7 @@
 		</part>
 	</software>
 
-	<software name="012disk">
+	<software name="012disk" supported="no">
 		<description>WORD PROCESSOR FILES, ARTICLE - RBG MONITOR, NORTHSTAR IN 8/20/85</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -1716,7 +1716,7 @@
 		</part>
 	</software>
 
-	<software name="013disk">
+	<software name="013disk" supported="no">
 		<description>AUTOLOAD DOS &amp; BASIC, REPORT, PEMBROOK, NORTHSTAR IN 3/26/84</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -1728,7 +1728,7 @@
 		</part>
 	</software>
 
-	<software name="014disk">
+	<software name="014disk" supported="no">
 		<description>START 6/18/85, REPORT FILES #34</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -1740,7 +1740,7 @@
 		</part>
 	</software>
 
-	<software name="015disk">
+	<software name="015disk" supported="no">
 		<description>WORD PROCESSOR FILES, ARTICLES - RBG MONITOR, NORTHSTAR IN 5/20/85</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -1752,7 +1752,7 @@
 		</part>
 	</software>
 
-	<software name="016disk">
+	<software name="016disk" supported="no">
 		<description>DOS &amp; BASIC AUTOLOAD &amp; UTILITIES, STORE, PRINT, PRINT1, PRINT2, NORTHSTAR, IN 4/25/85, USE 3/12/85. USE 5/17/85</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -1764,7 +1764,7 @@
 		</part>
 	</software>
 
-	<software name="017disk">
+	<software name="017disk" supported="no">
 		<description>VIDEO GAMES FILES, VIRGINIA, FUN-PUTT, IN 4/29/84, USE 5/17/85</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -1776,7 +1776,7 @@
 		</part>
 	</software>
 
-	<software name="018disk">
+	<software name="018disk" supported="no">
 		<description>DOS &amp; BASIC AUTOLOAD &amp; UTILITIES, STORE, PRINT, PRINT1, PRINT2, NORTHSTAR, IN 3/27/84</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -1788,7 +1788,7 @@
 		</part>
 	</software>
 
-	<software name="019disk">
+	<software name="019disk" supported="no">
 		<description>VIDEO GAME FILES - 3/12/85, IN 4/24/84</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -1800,7 +1800,7 @@
 		</part>
 	</software>
 
-	<software name="020disk">
+	<software name="020disk" supported="no">
 		<description>BAUDOT RTTY, IN 4/24/84</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -1812,7 +1812,7 @@
 		</part>
 	</software>
 
-	<software name="021disk">
+	<software name="021disk" supported="no">
 		<description>DOS &amp; BASIC AUTOLOAD W/CF, INVOICE &amp; BID, IN 3/26/84</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -1824,7 +1824,7 @@
 		</part>
 	</software>
 
-	<software name="022disk">
+	<software name="022disk" supported="no">
 		<description>VIDEO GAMES - FILE 6/1/84, NORTHSTAR, IN 4/24/84</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -1836,7 +1836,7 @@
 		</part>
 	</software>
 
-	<software name="023disk">
+	<software name="023disk" supported="no">
 		<description>VIDEO GAME FILES INCLUDING MASTER, NORTHSTAR, IN 3/27/84</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -1848,7 +1848,7 @@
 		</part>
 	</software>
 
-	<software name="024disk">
+	<software name="024disk" supported="no">
 		<description>AUTOLOAD DOS &amp; BASIC, BILLING SERVICE, NORTHSTAR, IN 6/23/84</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -1860,7 +1860,7 @@
 		</part>
 	</software>
 
-	<software name="025disk">
+	<software name="025disk" supported="no">
 		<description>CHART OF ACCOUNTS - GENERAL LEDGER WITH DOS, BASIC, CF   DD, IN 4/24/84</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -1872,7 +1872,7 @@
 		</part>
 	</software>
 
-	<software name="026disk">
+	<software name="026disk" supported="no">
 		<description>AUTOLOAD DOS &amp; MODEM 3/30/84, NONWORKING DOS - SD?, NORTHSTAR, IN 3/26/84</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -1884,7 +1884,7 @@
 		</part>
 	</software>
 
-	<software name="027disk">
+	<software name="027disk" supported="no">
 		<description>WORD PROCESSING, MIKE, BACKUP 6/23/84</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -1896,7 +1896,7 @@
 		</part>
 	</software>
 
-	<software name="028disk">
+	<software name="028disk" supported="no">
 		<description>AUTOLOAD DOS &amp; BASIC, LOAD MENU   NORTHSTAR, PRIME BACK-UP, 3/24/84</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -1908,7 +1908,7 @@
 		</part>
 	</software>
 
-	<software name="029disk">
+	<software name="029disk" supported="no">
 		<description>FULL 6/18/85, START18, REPORT FILES</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -1920,7 +1920,7 @@
 		</part>
 	</software>
 
-	<software name="030disk">
+	<software name="030disk" supported="no">
 		<description>PRIME MASTER BACKUP, IN 3/28/84</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -1932,7 +1932,7 @@
 		</part>
 	</software>
 
-	<software name="031disk">
+	<software name="031disk" supported="no">
 		<description>AUTOLOAD DOS &amp; MODEM, CF, M2D00, MODEM 0100, NORTHSTAR, IN 6/23/84</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -1944,7 +1944,7 @@
 		</part>
 	</software>
 
-	<software name="032disk">
+	<software name="032disk" supported="no">
 		<description>MRP DEMO, JOBS DRIVE #1, SINGLE DENSITY</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -1956,7 +1956,7 @@
 		</part>
 	</software>
 
-	<software name="033disk">
+	<software name="033disk" supported="no">
 		<description>MRP DEMO, FILES DRIVE #2, SINGLE DENSE</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -1968,7 +1968,7 @@
 		</part>
 	</software>
 
-	<software name="034disk">
+	<software name="034disk" supported="no">
 		<description>WP FILE, JOHN LETTER, MDEM1, 6/20/85</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -1980,7 +1980,7 @@
 		</part>
 	</software>
 
-	<software name="035disk">
+	<software name="035disk" supported="no">
 		<description>AUTOLOAD DOS &amp; BASIC, DOC - WORD PROCESSOR, NORTHSTAR, 6/25/84</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -1992,7 +1992,7 @@
 		</part>
 	</software>
 
-	<software name="036disk">
+	<software name="036disk" supported="no">
 		<description>MRP DEMO - FILES   DRIVE #2, IN 8/30/84</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -2004,7 +2004,7 @@
 		</part>
 	</software>
 
-	<software name="037disk">
+	<software name="037disk" supported="no">
 		<description>REPORT FILES, DRIVE #2, FULL, IN 3/27/84</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -2016,7 +2016,7 @@
 		</part>
 	</software>
 
-	<software name="038disk">
+	<software name="038disk" supported="no">
 		<description>DOS &amp; BASIC &amp; CF, MRP DEMO - JOBS   DRIVE #1, IN 8/30/84</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -2028,7 +2028,7 @@
 		</part>
 	</software>
 
-	<software name="039disk">
+	<software name="039disk" supported="no">
 		<description>FILES FOR BILLING SERVICE, NORTHSTAR, 3/24/84</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -2040,7 +2040,7 @@
 		</part>
 	</software>
 
-	<software name="040disk">
+	<software name="040disk" supported="no">
 		<description>PRIME MASTER, BACK UP, SYSTEM START UP, DD</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -2052,7 +2052,7 @@
 		</part>
 	</software>
 
-	<software name="041disk">
+	<software name="041disk" supported="no">
 		<description>AUTOLOAD DOS &amp; BASIC, LOAD 'CHECK', NORTHSTAR, IN 4/29/84</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -2064,7 +2064,7 @@
 		</part>
 	</software>
 
-	<software name="042disk">
+	<software name="042disk" supported="no">
 		<description>AUTOLOAD DOS &amp; BASIC &amp; CF, 'LOAD CHECK', NORTHSTAR, IN 4/29/84</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -2076,7 +2076,7 @@
 		</part>
 	</software>
 
-	<software name="043disk">
+	<software name="043disk" supported="no">
 		<description>LIBRARY - CLIPPER DD 4/27/84, IN 3/27/84</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -2088,7 +2088,7 @@
 		</part>
 	</software>
 
-	<software name="044disk">
+	<software name="044disk" supported="no">
 		<description>AUTOLOAD DOS &amp; BASIC PRINTER, 'FILL 8206, 128', 'FILL 8206, 176', LOAD MENU, BILLING SERVICE NORTHSTAR, IN 3/21/84</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -2100,7 +2100,7 @@
 		</part>
 	</software>
 
-	<software name="045disk">
+	<software name="045disk" supported="no">
 		<description>DOC, WORD PROCESSOR, MASTER, SER #998, DD</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -2112,7 +2112,7 @@
 		</part>
 	</software>
 
-	<software name="046disk">
+	<software name="046disk" supported="no">
 		<description>ASSEMBLER - PLAY, IN 3/26/84</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -2124,7 +2124,7 @@
 		</part>
 	</software>
 
-	<software name="047disk">
+	<software name="047disk" supported="no">
 		<description>ASSEMBLER, HOMEBREW, MASTER MIKES DOS, BASIC, MONITOR - M2A00</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -2136,7 +2136,7 @@
 		</part>
 	</software>
 
-	<software name="048disk">
+	<software name="048disk" supported="no">
 		<description>DOS, BASIC, DAZZ D800, TIC TAC, 11/4/83</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -2148,7 +2148,7 @@
 		</part>
 	</software>
 
-	<software name="049disk">
+	<software name="049disk" supported="no">
 		<description>SYNCBUSTER   COPY 1, IN 4/12/87</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -2160,7 +2160,7 @@
 		</part>
 	</software>
 
-	<software name="050disk">
+	<software name="050disk" supported="no">
 		<description>NSUG #7, GAME PACK, N*TREK, MEMSET 40959</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -2172,7 +2172,7 @@
 		</part>
 	</software>
 
-	<software name="051disk">
+	<software name="051disk" supported="no">
 		<description>NSUG #10, GAME PACK, ED, SCH2222, ENTER 0 IF NO CHANGE</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -2184,7 +2184,7 @@
 		</part>
 	</software>
 
-	<software name="052disk">
+	<software name="052disk" supported="no">
 		<description>NSUG #11</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -2196,7 +2196,7 @@
 		</part>
 	</software>
 
-	<software name="053disk">
+	<software name="053disk" supported="no">
 		<description>NSUG #12</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -2208,7 +2208,7 @@
 		</part>
 	</software>
 
-	<software name="054disk">
+	<software name="054disk" supported="no">
 		<description>NSUG #13, BANNER 2, COPY-DOC, (SINGLE DRIVE)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -2220,7 +2220,7 @@
 		</part>
 	</software>
 
-	<software name="055disk">
+	<software name="055disk" supported="no">
 		<description>NSUG #14, GAME PACK, (MEMSET  40959)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -2232,7 +2232,7 @@
 		</part>
 	</software>
 
-	<software name="056disk">
+	<software name="056disk" supported="no">
 		<description>NSUG #15</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -2244,7 +2244,7 @@
 		</part>
 	</software>
 
-	<software name="057disk">
+	<software name="057disk" supported="no">
 		<description>NSUG #16, STORM</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -2256,7 +2256,7 @@
 		</part>
 	</software>
 
-	<software name="058disk">
+	<software name="058disk" supported="no">
 		<description>NSUG #17</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -2268,7 +2268,7 @@
 		</part>
 	</software>
 
-	<software name="059disk">
+	<software name="059disk" supported="no">
 		<description>NSUG #18, GAME PACK</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -2280,7 +2280,7 @@
 		</part>
 	</software>
 
-	<software name="060disk">
+	<software name="060disk" supported="no">
 		<description>NSSE #1, GAME PACK, STARTREK MEMSET 40959, HOMEBREW NORTHSTAR 57343</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -2292,7 +2292,7 @@
 		</part>
 	</software>
 
-	<software name="061disk">
+	<software name="061disk" supported="no">
 		<description>NSSE #2</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -2304,7 +2304,7 @@
 		</part>
 	</software>
 
-	<software name="062disk">
+	<software name="062disk" supported="no">
 		<description>NSSE #3, GUESS, GAME PACK</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -2316,7 +2316,7 @@
 		</part>
 	</software>
 
-	<software name="063disk">
+	<software name="063disk" supported="no">
 		<description>NSSE #4</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -2328,7 +2328,7 @@
 		</part>
 	</software>
 
-	<software name="064disk">
+	<software name="064disk" supported="no">
 		<description>NSSE #5, GAUSS, LF PILOT 2A00</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -2340,7 +2340,7 @@
 		</part>
 	</software>
 
-	<software name="065disk">
+	<software name="065disk" supported="no">
 		<description>NSSE #6</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -2352,7 +2352,7 @@
 		</part>
 	</software>
 
-	<software name="066disk">
+	<software name="066disk" supported="no">
 		<description>NSSE #7, GAME PACK</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -2364,7 +2364,7 @@
 		</part>
 	</software>
 
-	<software name="067disk">
+	<software name="067disk" supported="no">
 		<description>NSSE #8, GAME PACK</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -2376,7 +2376,7 @@
 		</part>
 	</software>
 
-	<software name="068disk">
+	<software name="068disk" supported="no">
 		<description>NSSE #9, GOOD DISASSEMBLER, DASM</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -2388,7 +2388,7 @@
 		</part>
 	</software>
 
-	<software name="069disk">
+	<software name="069disk" supported="no">
 		<description>NSSE #10, FINANCIAL</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -2400,7 +2400,7 @@
 		</part>
 	</software>
 
-	<software name="070disk">
+	<software name="070disk" supported="no">
 		<description>NSSE #11, GAME PACK</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -2412,7 +2412,7 @@
 		</part>
 	</software>
 
-	<software name="071disk">
+	<software name="071disk" supported="no">
 		<description>NSSE #12</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -2424,7 +2424,7 @@
 		</part>
 	</software>
 
-	<software name="072disk">
+	<software name="072disk" supported="no">
 		<description>NSSE #13, GAME PACK</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -2436,7 +2436,7 @@
 		</part>
 	</software>
 
-	<software name="073disk">
+	<software name="073disk" supported="no">
 		<description>GENERAL LEDGER, SINGLE DENSITY</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -2448,7 +2448,7 @@
 		</part>
 	</software>
 
-	<software name="074disk">
+	<software name="074disk" supported="no">
 		<description>AUTOLOAD DOS &amp; BASIC, GENERAL LEDGER - CHART OF ACCOUNTS, HOMEBREW, IN 4/29/84</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -2460,7 +2460,7 @@
 		</part>
 	</software>
 
-	<software name="075disk">
+	<software name="075disk" supported="no">
 		<description>PHONE BOOK (A) 7/22/83</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -2472,7 +2472,7 @@
 		</part>
 	</software>
 
-	<software name="076disk">
+	<software name="076disk" supported="no">
 		<description>DICK'S INVOICE, XMAS LETTER, FUN &amp; PIZZA (GYRUSS) (A), CHARLIE'S ESTIMATES (LOAD 'JOB')</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -2484,7 +2484,7 @@
 		</part>
 	</software>
 
-	<software name="077disk">
+	<software name="077disk" supported="no">
 		<description>SYSTEM MASTER DISK, SYSTEM START UP, *SPARE*</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -2496,7 +2496,7 @@
 		</part>
 	</software>
 
-	<software name="078disk">
+	<software name="078disk" supported="no">
 		<description>HORIZON, SYSTEM DISK, VERSION 5.1DQ, 2034</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -2508,7 +2508,7 @@
 		</part>
 	</software>
 
-	<software name="079disk">
+	<software name="079disk" supported="no">
 		<description>CP/M 2.011, 48K SYSTEM</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -2520,7 +2520,7 @@
 		</part>
 	</software>
 
-	<software name="080disk">
+	<software name="080disk" supported="no">
 		<description>NORTHSTAR DOS &amp; BASIC, SERIAL IN FLASHWRITER I</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -2532,7 +2532,7 @@
 		</part>
 	</software>
 
-	<software name="101disk">
+	<software name="101disk" supported="no">
 		<description>WORKING DOS BACKUP</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -2544,7 +2544,7 @@
 		</part>
 	</software>
 
-	<software name="102disk">
+	<software name="102disk" supported="no">
 		<description>COPY OF ORIGINAL CPM 2.011 (UNCONF)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -2556,7 +2556,7 @@
 		</part>
 	</software>
 
-	<software name="103disk">
+	<software name="103disk" supported="no">
 		<description>GRAPHICS BACKUP</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -2568,7 +2568,7 @@
 		</part>
 	</software>
 
-	<software name="104disk">
+	<software name="104disk" supported="no">
 		<description>BIOS BACKUP</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -2580,7 +2580,7 @@
 		</part>
 	</software>
 
-	<software name="105disk">
+	<software name="105disk" supported="no">
 		<description>WORDSTAR + DOCUMENT FILES, BOOT</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -2592,7 +2592,7 @@
 		</part>
 	</software>
 
-	<software name="106disk">
+	<software name="106disk" supported="no">
 		<description>FORTRAN, CBASIC-2, MBASIC, MAC, NO BOOT</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -2604,7 +2604,7 @@
 		</part>
 	</software>
 
-	<software name="107disk">
+	<software name="107disk" supported="no">
 		<description>CONFIGURED CPM 2.2 BACKUP</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -2616,7 +2616,7 @@
 		</part>
 	</software>
 
-	<software name="108disk">
+	<software name="108disk" supported="no">
 		<description>PICTURES (N-DOS)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -2628,7 +2628,7 @@
 		</part>
 	</software>
 
-	<software name="109disk">
+	<software name="109disk" supported="no">
 		<description>BDS 'C' COMPILER, VERSION 1.42 (COPY) S/N 0425 - VOL 2/2</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -2640,7 +2640,7 @@
 		</part>
 	</software>
 
-	<software name="110disk">
+	<software name="110disk" supported="no">
 		<description>BDS 'C' COMPILER, VERSION 1.42 (COPY) S/N 0425 - VOL 1/2</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -2652,7 +2652,7 @@
 		</part>
 	</software>
 
-	<software name="111disk">
+	<software name="111disk" supported="no">
 		<description>BDS C COMPILER, VOL 2/2</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -2664,7 +2664,7 @@
 		</part>
 	</software>
 
-	<software name="112disk">
+	<software name="112disk" supported="no">
 		<description>BDS C COMPILER, VOL 1/2</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -2676,7 +2676,7 @@
 		</part>
 	</software>
 
-	<software name="113disk">
+	<software name="113disk" supported="no">
 		<description>PASCAL/Z FOR CP/M, VOL 1/4</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -2688,7 +2688,7 @@
 		</part>
 	</software>
 
-	<software name="114disk">
+	<software name="114disk" supported="no">
 		<description>PASCAL/Z FOR CP/M, VOL 2/4</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -2700,7 +2700,7 @@
 		</part>
 	</software>
 
-	<software name="115disk">
+	<software name="115disk" supported="no">
 		<description>PASCAL/Z FOR CP/M, VOL 3/4</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -2712,7 +2712,7 @@
 		</part>
 	</software>
 
-	<software name="116disk">
+	<software name="116disk" supported="no">
 		<description>PASCAL/Z FOR CP/M, VOL 4/4</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -2724,7 +2724,7 @@
 		</part>
 	</software>
 
-	<software name="117disk">
+	<software name="117disk" supported="no">
 		<description>FORTRAN, CBASIC-2, MBASIC, MAC, NO BOOT (Alt)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -2736,7 +2736,7 @@
 		</part>
 	</software>
 
-	<software name="118disk">
+	<software name="118disk" supported="no">
 		<description>ADA COMPILER, ORIGINAL, QUAD</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -2748,7 +2748,7 @@
 		</part>
 	</software>
 
-	<software name="119disk">
+	<software name="119disk" supported="no">
 		<description>AZTEC C COMPILER</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -2760,7 +2760,7 @@
 		</part>
 	</software>
 
-	<software name="120disk">
+	<software name="120disk" supported="no">
 		<description>ADA COMPILER, WORKING DISK, QUAD</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -2772,7 +2772,7 @@
 		</part>
 	</software>
 
-	<software name="d01b01">
+	<software name="d01b01" supported="no">
 		<description>CP/M RELEASE 2.2 1.2.0 DQH 013658</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -2784,7 +2784,7 @@
 		</part>
 	</software>
 
-	<software name="d01b02">
+	<software name="d01b02" supported="no">
 		<description>DOS/BASIC 2.1.1 QG SYSTEM DISK (SUPERCEDES DOS 5.2)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -2796,7 +2796,7 @@
 		</part>
 	</software>
 
-	<software name="d01b03">
+	<software name="d01b03" supported="no">
 		<description>MIKE BERNSONS SMALL 'C'</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -2808,7 +2808,7 @@
 		</part>
 	</software>
 
-	<software name="d02b01">
+	<software name="d02b01" supported="no">
 		<description>CP/M RELEASE 2.2 1.2.0 DQH 014254 FOR 15MB WIN</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -2820,7 +2820,7 @@
 		</part>
 	</software>
 
-	<software name="d02b03">
+	<software name="d02b03" supported="no">
 		<description>WORDSTAR (INSTALLED)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -2832,7 +2832,7 @@
 		</part>
 	</software>
 
-	<software name="d03b01">
+	<software name="d03b01" supported="no">
 		<description>CP/M RELEASE 2.2 1.2.0 DQH 013860</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -2844,7 +2844,7 @@
 		</part>
 	</software>
 
-	<software name="d03b03">
+	<software name="d03b03" supported="no">
 		<description>MBASIC V5.2</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -2856,7 +2856,7 @@
 		</part>
 	</software>
 
-	<software name="d04b01">
+	<software name="d04b01" supported="no">
 		<description>HDOS 2.2.0 H SYSTEM DISK</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -2868,7 +2868,7 @@
 		</part>
 	</software>
 
-	<software name="d04b02">
+	<software name="d04b02" supported="no">
 		<description>NORTH STAR REL 5 DOUBLE DENSITY BITSTREAMER II SYSTEM DISKETTE</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -2880,7 +2880,7 @@
 		</part>
 	</software>
 
-	<software name="d04b03">
+	<software name="d04b03" supported="no">
 		<description>DOS/BASIC 2.1.1 DQ</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -2892,7 +2892,7 @@
 		</part>
 	</software>
 
-	<software name="d05b01">
+	<software name="d05b01" supported="no">
 		<description>HDOS 2.0.0 H SYSTEM DISK</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -2904,7 +2904,7 @@
 		</part>
 	</software>
 
-	<software name="d05b02">
+	<software name="d05b02" supported="no">
 		<description>FORTRAN-80 1.0.0.*DQH</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -2916,7 +2916,7 @@
 		</part>
 	</software>
 
-	<software name="d05b03">
+	<software name="d05b03" supported="no">
 		<description>BACKUP MICROMOTION FORTH 79 FLOATING POINT PACKAGE NORTHSTAR CPM</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -2928,7 +2928,7 @@
 		</part>
 	</software>
 
-	<software name="d06b01">
+	<software name="d06b01" supported="no">
 		<description>HDOS 2.1.0 H SYSTEM DISK</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -2940,7 +2940,7 @@
 		</part>
 	</software>
 
-	<software name="d06b02">
+	<software name="d06b02" supported="no">
 		<description>APPLICATION SOFTWARE UTILITIES 1.1.0 DQ TRANSFER UTILITIES HORIZON VERSION</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -2952,7 +2952,7 @@
 		</part>
 	</software>
 
-	<software name="d06b03">
+	<software name="d06b03" supported="no">
 		<description>MICROMOTION FORTH 79 NORTHSTAR - CPM</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -2964,7 +2964,7 @@
 		</part>
 	</software>
 
-	<software name="d07b01">
+	<software name="d07b01" supported="no">
 		<description>HDOS 2.2.1 H INITIAL RECOVERY DISK</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -2976,7 +2976,7 @@
 		</part>
 	</software>
 
-	<software name="d07b02">
+	<software name="d07b02" supported="no">
 		<description>MICRO 80, MACRO 80, SER 39138 VER 3.44, FORMAT NS</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -2988,7 +2988,7 @@
 		</part>
 	</software>
 
-	<software name="d07b03">
+	<software name="d07b03" supported="no">
 		<description>MICROMOTION FORTH 79 FLOATING POINT PACKAGE</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -3000,7 +3000,7 @@
 		</part>
 	</software>
 
-	<software name="d08b01">
+	<software name="d08b01" supported="no">
 		<description>HDOS 2.0.0 H INITIAL RECOVERY DISK</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -3012,7 +3012,7 @@
 		</part>
 	</software>
 
-	<software name="d08b02">
+	<software name="d08b02" supported="no">
 		<description>DBASE II 2.35 1.0.0 *QH</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -3024,7 +3024,7 @@
 		</part>
 	</software>
 
-	<software name="d08b03">
+	<software name="d08b03" supported="no">
 		<description>MICROMOTION FORTH 79</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -3036,7 +3036,7 @@
 		</part>
 	</software>
 
-	<software name="d09b01">
+	<software name="d09b01" supported="no">
 		<description>HDOS 2.1.0 H INITIAL RECOVERY DISK</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -3048,7 +3048,7 @@
 		</part>
 	</software>
 
-	<software name="d09b02">
+	<software name="d09b02" supported="no">
 		<description>MICROPLAN 1.1.0 *QH 001934</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -3060,7 +3060,7 @@
 		</part>
 	</software>
 
-	<software name="d09b03">
+	<software name="d09b03" supported="no">
 		<description>PASCAL Z</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -3072,7 +3072,7 @@
 		</part>
 	</software>
 
-	<software name="d10b01">
+	<software name="d10b01" supported="no">
 		<description>TSS/C INSTALLATION DISK 1.1.0 H 301792</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -3084,7 +3084,7 @@
 		</part>
 	</software>
 
-	<software name="d10b02">
+	<software name="d10b02" supported="no">
 		<description>MICROPRO WORDSTAR 3.0 1.0.0 *DQH WORDSTAR 3.0 XG7995TZ</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -3096,7 +3096,7 @@
 		</part>
 	</software>
 
-	<software name="d10b03">
+	<software name="d10b03" supported="no">
 		<description>SAVE DISK - SUPERCALC</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -3108,7 +3108,7 @@
 		</part>
 	</software>
 
-	<software name="d11b01">
+	<software name="d11b01" supported="no">
 		<description>TSS/C CP/M UTILITIES DISK 1.1.0 H</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -3120,7 +3120,7 @@
 		</part>
 	</software>
 
-	<software name="d11b02">
+	<software name="d11b02" supported="no">
 		<description>MICROPRO WORDSTAR 3.0 WH6454S1</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -3132,7 +3132,7 @@
 		</part>
 	</software>
 
-	<software name="d11b03">
+	<software name="d11b03" supported="no">
 		<description>DISK FROM CRAY CMOS 1.1 UTILITIES</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -3144,7 +3144,7 @@
 		</part>
 	</software>
 
-	<software name="d12b01">
+	<software name="d12b01" supported="no">
 		<description>TSS/A START-UP DISK 2.1.1 H</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -3156,7 +3156,7 @@
 		</part>
 	</software>
 
-	<software name="d12b02">
+	<software name="d12b02" supported="no">
 		<description>MICROPRO SPELLSTAR 1.2 1.0.0 *DQH SPELLSTAR 1.21 S26396BE</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -3168,7 +3168,7 @@
 		</part>
 	</software>
 
-	<software name="d13b01">
+	<software name="d13b01" supported="no">
 		<description>TSS/A UPDATE DISK 2.1.1 H</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -3180,7 +3180,7 @@
 		</part>
 	</software>
 
-	<software name="d14b01">
+	<software name="d14b01" supported="no">
 		<description>TSS/A UTILITIES DISK 1 OF 2 2.1.1 H</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -3192,7 +3192,7 @@
 		</part>
 	</software>
 
-	<software name="d15b01">
+	<software name="d15b01" supported="no">
 		<description>TSS/A UTILITIES DISK 2 OF 2 2.1.1 H</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -3204,7 +3204,7 @@
 		</part>
 	</software>
 
-	<software name="d16b01">
+	<software name="d16b01" supported="no">
 		<description>TSS/A PASSWORD DISK 2.1.1 H</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -3216,7 +3216,7 @@
 		</part>
 	</software>
 
-	<software name="r0">
+	<software name="r0" supported="no">
 		<description>TINY</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -3228,7 +3228,7 @@
 		</part>
 	</software>
 
-	<software name="r1">
+	<software name="r1" supported="no">
 		<description>CP/M PDS</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -3240,7 +3240,7 @@
 		</part>
 	</software>
 
-	<software name="r2">
+	<software name="r2" supported="no">
 		<description>COMSTAR</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -3252,7 +3252,7 @@
 		</part>
 	</software>
 
-	<software name="r3">
+	<software name="r3" supported="no">
 		<description>ALL GAMES BACKUP 1</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -3264,7 +3264,7 @@
 		</part>
 	</software>
 
-	<software name="r4">
+	<software name="r4" supported="no">
 		<description>ALL GAMES BACKUP 2</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -3276,7 +3276,7 @@
 		</part>
 	</software>
 
-	<software name="r5">
+	<software name="r5" supported="no">
 		<description>FORMATMW CM5619 [ON JACKET]</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -3288,7 +3288,7 @@
 		</part>
 	</software>
 
-	<software name="r6">
+	<software name="r6" supported="no">
 		<description>WORKING CP/M C</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -3300,7 +3300,7 @@
 		</part>
 	</software>
 
-	<software name="r7">
+	<software name="r7" supported="no">
 		<description>DEFENDER EPROMS</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -3312,7 +3312,7 @@
 		</part>
 	</software>
 
-	<software name="r8">
+	<software name="r8" supported="no">
 		<description>PDS CP/M</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
