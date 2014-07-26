@@ -159,14 +159,14 @@ WRITE8_MEMBER( prestige_state::bankswitch_w )
 		break;
 
 	case 1:
-		if (m_bank[5] & 0x02)
+		if (!(m_bank[5] & 0x01) && (m_bank[5] & 0x02))
 			m_bank2->set_entry(0x40 + (data & 0x1f));
 		else
 			m_bank2->set_entry(data & 0x3f);
 		break;
 
 	case 2:
-		if (m_bank[5] & 0x04)
+		if (!(m_bank[5] & 0x01) && (m_bank[5] & 0x04))
 			m_bank3->set_entry(0x40 + (data & 0x1f));
 		else
 			m_bank3->set_entry(data & 0x3f);
@@ -575,6 +575,20 @@ INPUT_PORTS_START( glcolor )
 
 INPUT_PORTS_END
 
+INPUT_PORTS_START( glmcolor )
+	PORT_INCLUDE(glcolor)
+
+	PORT_MODIFY("KEY.14")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(MOUSECODE_BUTTON1) PORT_NAME("Mouse Button 1")
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(MOUSECODE_BUTTON2) PORT_NAME("Mouse Button 2")
+
+	PORT_START("MOUSEX")
+	PORT_BIT( 0xff, 0x00, IPT_MOUSE_X ) PORT_SENSITIVITY(30) PORT_KEYDELTA(2)
+
+	PORT_START("MOUSEY")
+	PORT_BIT( 0xff, 0x00, IPT_MOUSE_Y ) PORT_SENSITIVITY(30) PORT_KEYDELTA(2)
+INPUT_PORTS_END
+
 
 IRQ_CALLBACK_MEMBER(prestige_state::prestige_int_ack)
 {
@@ -735,6 +749,11 @@ static MACHINE_CONFIG_DERIVED( glcolor, prestige_base )
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "glcolor")
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( glmcolor, glcolor )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_IO_MAP(prestige_io)
+MACHINE_CONFIG_END
+
 static MACHINE_CONFIG_DERIVED( prestige, prestige_base )
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("gl6000sl_cart", "gl6000sl")
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("misterx_cart", "misterx")
@@ -786,10 +805,28 @@ ROM_START( glcolor )
 	ROM_CART_LOAD( "cart", 0, 0x80000, 0 )
 ROM_END
 
+ROM_START( glmcolor )
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD( "27-5673-00.u6", 0x00000, 0x100000, CRC(c4245392) SHA1(bb651aaf11b75f4155c0a0106de9394018110cc7) )
+
+	ROM_REGION( 0x80000, "cart", ROMREGION_ERASEFF )
+	ROM_CART_LOAD( "cart", 0, 0x80000, 0 )
+ROM_END
+
+ROM_START( gjrstar3 )
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD( "54-06056-000-000.u3", 0x000000, 0x040000, CRC(72522179) SHA1(ede9491713ad018012cf925a519bcafe126f1ad3))
+
+	ROM_REGION( 0x80000, "cart", ROMREGION_ERASEFF )
+	ROM_CART_LOAD( "cart", 0, 0x80000, 0 )
+ROM_END
+
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
 COMP( 1994, glcolor,   0,       0,  glcolor,    glcolor,  driver_device,     0,  "VTech",   "Genius Leader Color (Germany)",    GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1996, glmcolor,  0,       0,  glmcolor,   glmcolor, driver_device,     0,  "VTech",   "Genius Leader Magic Color (Germany)",    GAME_NOT_WORKING | GAME_NO_SOUND)
 COMP( 1997, gl6000sl,  0,       0,  gl6000sl,   prestige, driver_device,     0,  "VTech",   "Genius Leader 6000SL (Germany)",   GAME_NOT_WORKING | GAME_NO_SOUND)
 COMP( 1998, gl7007sl,  0,       0,  gl7007sl,   prestige, driver_device,     0,  "VTech",   "Genius Leader 7007SL (Germany)",   GAME_NOT_WORKING | GAME_NO_SOUND)
 COMP( 1998, prestige,  0,       0,  prestige,   prestige, driver_device,     0,  "VTech",   "PreComputer Prestige Elite",       GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1998, gjrstar3,  0,       0,  prestige,   prestige, driver_device,     0,  "VTech",   "Genius Junior Redstar 3 (Germany)", GAME_IS_SKELETON)
