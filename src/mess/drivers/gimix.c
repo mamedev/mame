@@ -13,6 +13,12 @@
     Information Link:  http://www.backglass.org/duncan/gimix/
 
     TODO:  Everything
+
+    Usage:
+    System boots into GMXBUG-09
+    To boot Flex, insert the Flex system disk (3.3 or later, must support the DMA disk controller), type U and press enter.
+    To boot OS-9, insert the OS-9 system disk, type O, and press Enter.
+    Note that booting OS-9 doesn't currently work without a timer hack.
 */
 
 #include "emu.h"
@@ -86,7 +92,6 @@ public:
 		, m_bank16(*this, "bank16")
 		, m_rombank1(*this, "rombank1")
 		, m_rombank2(*this, "rombank2")
-		, m_rombank3(*this, "rombank3")
 		, m_fixedrombank(*this, "fixedrombank")
 	{}
 
@@ -106,6 +111,7 @@ public:
 	DECLARE_WRITE8_MEMBER(pia_pa_w);
 	DECLARE_READ8_MEMBER(pia_pb_r);
 	DECLARE_WRITE8_MEMBER(pia_pb_w);
+	TIMER_DEVICE_CALLBACK_MEMBER(test_timer_w);
 
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 
@@ -160,7 +166,6 @@ private:
 	required_device<address_map_bank_device> m_bank16;
 	required_memory_bank m_rombank1;
 	required_memory_bank m_rombank2;
-	required_memory_bank m_rombank3;
 	required_memory_bank m_fixedrombank;
 
 };
@@ -179,8 +184,8 @@ static ADDRESS_MAP_START( gimix_banked_mem, AS_PROGRAM, 8, gimix_state)
 	AM_RANGE(0x0e240, 0x0e3af) AM_RAM
 	AM_RANGE(0x0e3b0, 0x0e3b3) AM_READWRITE(dma_r, dma_w)  // DMA controller (custom?)
 	AM_RANGE(0x0e3b4, 0x0e3b7) AM_READWRITE(fdc_r, fdc_w)  // FD1797 FDC
-	AM_RANGE(0x0e400, 0x0e7ff) AM_RAM
-	AM_RANGE(0x0e800, 0x0efff) AM_ROMBANK("rombank3")
+	AM_RANGE(0x0e400, 0x0e7ff) AM_RAM  // scratchpad RAM
+	AM_RANGE(0x0e800, 0x0efff) AM_RAM
 	AM_RANGE(0x0f000, 0x0f7ff) AM_ROMBANK("rombank2")
 	AM_RANGE(0x0f800, 0x0ffff) AM_ROMBANK("rombank1")
 	//AM_RANGE(0x10000, 0x1ffff) AM_RAM
@@ -249,7 +254,6 @@ WRITE8_MEMBER( gimix_state::system_w )
 		{
 			m_rombank1->set_entry(2);
 			m_rombank2->set_entry(3);
-			m_rombank3->set_entry(1);
 			m_fixedrombank->set_entry(2);
 			logerror("SYS: FPLA software latch set\n");
 		}
@@ -257,7 +261,6 @@ WRITE8_MEMBER( gimix_state::system_w )
 		{
 			m_rombank1->set_entry(0);
 			m_rombank2->set_entry(1);
-			m_rombank3->set_entry(2);
 			m_fixedrombank->set_entry(0);
 			logerror("SYS: FPLA software latch reset\n");
 		}
@@ -453,7 +456,6 @@ void gimix_state::machine_reset()
 	m_term_data = 0;
 	m_rombank1->set_entry(0);  // RAM banks are undefined on startup
 	m_rombank2->set_entry(1);
-	m_rombank3->set_entry(2);
 	m_fixedrombank->set_entry(0);
 	m_dma_status = 0x00;
 	m_dma_ctrl = 0x00;
@@ -470,11 +472,9 @@ void gimix_state::machine_start()
 	UINT8* ROM = m_rom->base();
 	m_rombank1->configure_entries(0,4,ROM,0x800);
 	m_rombank2->configure_entries(0,4,ROM,0x800);
-	m_rombank3->configure_entries(0,4,ROM,0x800);
 	m_fixedrombank->configure_entries(0,4,ROM+0x700,0x800);
 	m_rombank1->set_entry(0);  // RAM banks are undefined on startup
 	m_rombank2->set_entry(1);
-	m_rombank3->set_entry(2);
 	m_fixedrombank->set_entry(0);
 	// install any extra RAM
 	if(m_ram->size() > 65536)
@@ -512,12 +512,27 @@ WRITE_LINE_MEMBER(gimix_state::write_acia_clock)
 	m_acia2->write_rxc(state);
 }
 
+TIMER_DEVICE_CALLBACK_MEMBER(gimix_state::test_timer_w)
+{
+	static bool prev;
+	if(!prev)
+	{
+		m_maincpu->set_input_line(M6809_IRQ_LINE,ASSERT_LINE);
+		prev = true;
+	}
+	else
+	{
+		m_maincpu->set_input_line(M6809_IRQ_LINE,CLEAR_LINE);
+		prev = false;
+	}
+}
+
 FLOPPY_FORMATS_MEMBER( gimix_state::floppy_formats )
 	FLOPPY_FLEX_FORMAT
 FLOPPY_FORMATS_END
 
 static SLOT_INTERFACE_START( gimix_floppies )
-	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
+	SLOT_INTERFACE( "525hd", FLOPPY_525_HD )
 SLOT_INTERFACE_END
 
 #define MCFG_ADDRESS_BANK(tag) \
@@ -546,8 +561,8 @@ static MACHINE_CONFIG_START( gimix, gimix_state )
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(gimix_state,fdc_irq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(gimix_state,fdc_drq_w))
 	MCFG_WD_FDC_FORCE_READY
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", gimix_floppies, "525dd", gimix_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", gimix_floppies, "525dd", gimix_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", gimix_floppies, "525hd", gimix_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:1", gimix_floppies, "525hd", gimix_state::floppy_formats)
 
 	/* parallel ports */
 	MCFG_DEVICE_ADD("pia1",PIA6821,XTAL_2MHz)
@@ -561,12 +576,15 @@ static MACHINE_CONFIG_START( gimix, gimix_state )
 	MCFG_DEVICE_ADD("acia1",ACIA6850,XTAL_2MHz)
 	MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE("serial1",rs232_port_device,write_txd))
 	MCFG_ACIA6850_RTS_HANDLER(DEVWRITELINE("serial1",rs232_port_device,write_rts))
+
 	MCFG_DEVICE_ADD("acia2",ACIA6850,XTAL_2MHz)
 	MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE("serial2",rs232_port_device,write_txd))
 	MCFG_ACIA6850_RTS_HANDLER(DEVWRITELINE("serial2",rs232_port_device,write_rts))
+
 	MCFG_DEVICE_ADD("acia3",ACIA6850,XTAL_2MHz)
 	MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE("serial3",rs232_port_device,write_txd))
 	MCFG_ACIA6850_RTS_HANDLER(DEVWRITELINE("serial3",rs232_port_device,write_rts))
+
 	MCFG_DEVICE_ADD("acia4",ACIA6850,XTAL_2MHz)
 	MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE("serial4",rs232_port_device,write_txd))
 	MCFG_ACIA6850_RTS_HANDLER(DEVWRITELINE("serial4",rs232_port_device,write_rts))
@@ -613,12 +631,14 @@ static MACHINE_CONFIG_START( gimix, gimix_state )
 	MCFG_RAM_DEFAULT_SIZE("128K")
 	MCFG_RAM_EXTRA_OPTIONS("56K,256K,512K")
 
+	// uncomment this timer to use a hack that generates a regular IRQ, this will get OS-9 to boot
+	// for some unknown reason, OS-9 does not touch the 6840, and only clears/disables IRQs on the RTC
+	//MCFG_TIMER_DRIVER_ADD_PERIODIC("test_timer",gimix_state,test_timer_w,attotime::from_msec(100))
 MACHINE_CONFIG_END
 
 ROM_START( gimix )
 	ROM_REGION( 0x10000, "roms", 0)
-
-	/* CPU board U4: gimixf8.bin  - checksum 68DB - 2716 - GMXBUG09 V2.1 | (c)1981 GIMIX | $F800 I2716 */
+/* CPU board U4: gimixf8.bin  - checksum 68DB - 2716 - GMXBUG09 V2.1 | (c)1981 GIMIX | $F800 I2716 */
 		ROM_LOAD( "gimixf8.u4",  0x000000, 0x000800, CRC(7d60f838) SHA1(eb7546e8bbf50d33e181f3e86c3e4c5c9032cab2) )
 /* CPU board U5: gimixv14.bin - checksum 97E2 - 2716 - GIMIX 6809 | AUTOBOOT | V1.4 I2716 */
 		ROM_LOAD( "gimixv14.u5", 0x000800, 0x000800, CRC(f795b8b9) SHA1(eda2de51cc298d94b36605437d900ce971b3b276) )
