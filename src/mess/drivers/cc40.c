@@ -57,8 +57,8 @@
 
 
   TODO:
-  - other RAM configurations (6KB(default), 18KB, external)
-  - understand bus_control_r/w
+  - external RAM cartridge (bus_control_w cartridge memory addressing)
+  - auto clock divider on slow memory access
   - Hexbus interface and peripherals
     * HX-1000: color plotter
     * HX-1010: thermal printer
@@ -85,20 +85,36 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_dac(*this, "dac")
-	{ }
+	{
+		m_sysram[0] = NULL;
+		m_sysram[1] = NULL;
+	}
 
 	required_device<tms70c20_device> m_maincpu;
 	required_device<dac_device> m_dac;
 
+	nvram_device *m_nvram[2];
 	ioport_port *m_key_matrix[8];
 
+	UINT8 m_bus_control;
 	UINT8 m_power;
 	UINT8 m_banks;
 	UINT8 m_clock_control;
+	UINT8 m_clock_divider;
 	UINT8 m_key_select;
+	
+	UINT8 *m_sysram[2];
+	UINT16 m_sysram_size[2];
+	UINT16 m_sysram_end[2];
+	UINT16 m_sysram_mask[2];
 
+	void postload();
+	void init_sysram(int chip, UINT16 size);
 	void update_lcd_indicator(UINT8 y, UINT8 x, int state);
+	void update_clock_divider();
 
+	DECLARE_READ8_MEMBER(sysram_r);
+	DECLARE_WRITE8_MEMBER(sysram_w);
 	DECLARE_READ8_MEMBER(bus_control_r);
 	DECLARE_WRITE8_MEMBER(bus_control_w);
 	DECLARE_WRITE8_MEMBER(power_w);
@@ -106,14 +122,15 @@ public:
 	DECLARE_READ8_MEMBER(battery_r);
 	DECLARE_READ8_MEMBER(bankswitch_r);
 	DECLARE_WRITE8_MEMBER(bankswitch_w);
-	DECLARE_READ8_MEMBER(clock_r);
-	DECLARE_WRITE8_MEMBER(clock_w);
+	DECLARE_READ8_MEMBER(clock_control_r);
+	DECLARE_WRITE8_MEMBER(clock_control_w);
 	DECLARE_READ8_MEMBER(keyboard_r);
 	DECLARE_WRITE8_MEMBER(keyboard_w);
 
 	virtual void machine_reset();
 	virtual void machine_start();
 	DECLARE_PALETTE_INIT(cc40);
+	DECLARE_INPUT_CHANGED_MEMBER(sysram_size_changed);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cc40_cartridge);
 };
 
@@ -210,17 +227,57 @@ static HD44780_PIXEL_UPDATE(cc40_pixel_update)
 
 ***************************************************************************/
 
+READ8_MEMBER(cc40_state::sysram_r)
+{
+	// read system ram, based on addressing configured in bus_control_w
+	if (offset < m_sysram_end[0] && m_sysram_size[0] != 0)
+		return m_sysram[0][offset & (m_sysram_size[0] - 1)];
+	else if (offset < m_sysram_end[1] && m_sysram_size[1] != 0)
+		return m_sysram[1][(offset - m_sysram_end[0]) & (m_sysram_size[1] - 1)];
+	else
+		return 0xff;
+}
+
+WRITE8_MEMBER(cc40_state::sysram_w)
+{
+	// write system ram, based on addressing configured in bus_control_w
+	if (offset < m_sysram_end[0] && m_sysram_size[0] != 0)
+		m_sysram[0][offset & (m_sysram_size[0] - 1)] = data;
+	else if (offset < m_sysram_end[1] && m_sysram_size[1] != 0)
+		m_sysram[1][(offset - m_sysram_end[0]) & (m_sysram_size[1] - 1)] = data;
+}
+
 READ8_MEMBER(cc40_state::bus_control_r)
 {
-	// According to TI's official documentation, this register is set with predefined values
-	// describing system hardware configuration, but there doesn't seem to be any indication
-	// that it's used at all.
-	return 0x4c;
+	return m_bus_control;
 }
 
 WRITE8_MEMBER(cc40_state::bus_control_w)
 {
-	;
+	// d0,d1: auto enable clock divider on cartridge memory access (d0: area 1, d1: area 2)
+
+	// d2,d3: system ram addressing
+	// 00: 8K, 8K @ $1000-$2fff, $3000-$4fff
+	// 01: 8K, 2K @ $1000-$2fff, $3000-$37ff
+	// 10: 2K, 8K @ $1000-$17ff, $1800-$37ff
+	// 11: 2K, 2K @ $1000-$17ff, $1800-$1fff
+	int d2 = (data & 4) ? 0x0800 : 0x2000;
+	int d3 = (data & 8) ? 0x0800 : 0x2000;
+	m_sysram_end[0] = d3;
+	m_sysram_mask[0] = d3 - 1;
+	m_sysram_end[1] = d3 + d2;
+	m_sysram_mask[1] = d2 - 1;
+	
+	// d4,d5: cartridge memory addressing
+	// 00: 2K @ $5000-$57ff & $5800-$5fff
+	// 01: 8K @ $5000-$6fff & $7000-$8fff
+	// 10:16K @ $5000-$8fff & $9000-$cfff
+	// 11: 8K @ $1000-$2fff & $3000-$4fff - system ram is disabled
+
+	// d6: auto enable clock divider on system rom access
+
+	// d7: unused?
+	m_bus_control = data;
 }
 
 WRITE8_MEMBER(cc40_state::power_w)
@@ -255,36 +312,34 @@ WRITE8_MEMBER(cc40_state::bankswitch_w)
 	// d0-d1: system rom bankswitch
 	membank("sysbank")->set_entry(data & 3);
 
-	// d2-d3: cartridge rom bankswitch
+	// d2-d3: cartridge 32KB page bankswitch
 	membank("cartbank")->set_entry(data >> 2 & 3);
 
 	m_banks = data & 0x0f;
 }
 
-READ8_MEMBER(cc40_state::clock_r)
+READ8_MEMBER(cc40_state::clock_control_r)
 {
 	return m_clock_control;
 }
 
-WRITE8_MEMBER(cc40_state::clock_w)
+void cc40_state::update_clock_divider()
 {
-	// d3: enable clock divider
-	if (data & 8)
-	{
-		if (m_clock_control != (data & 0x0f))
-		{
-			// d0-d2: clock divider (2.5MHz /3 to /17 in steps of 2)
-			double div = (~data & 7) * 2 + 1;
-			m_maincpu->set_clock_scale(1 / div);
-		}
-	}
-	else if (m_clock_control & 8)
-	{
-		// high to low
-		m_maincpu->set_clock_scale(1);
-	}
+	// 2.5MHz /3 to /17 in steps of 2
+	m_clock_divider = (~m_clock_control & 7) * 2 + 1;
+	m_maincpu->set_clock_scale((m_clock_control & 8) ? (1.0 / (double)m_clock_divider) : 1);
+}
 
-	m_clock_control = data & 0x0f;
+WRITE8_MEMBER(cc40_state::clock_control_w)
+{
+	// d0-d2: clock divider
+	// d3: enable clock divider always
+	// other bits: unused?
+	if (m_clock_control != (data & 0x0f))
+	{
+		m_clock_control = data;
+		update_clock_divider();
+	}
 }
 
 READ8_MEMBER(cc40_state::keyboard_r)
@@ -307,25 +362,22 @@ WRITE8_MEMBER(cc40_state::keyboard_w)
 	m_key_select = data;
 }
 
-
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, cc40_state )
 	ADDRESS_MAP_UNMAP_HIGH
 
 	AM_RANGE(0x0110, 0x0110) AM_READWRITE(bus_control_r, bus_control_w)
 	AM_RANGE(0x0111, 0x0111) AM_WRITE(power_w)
-	AM_RANGE(0x0112, 0x0112) AM_NOP // hexbus data
-	AM_RANGE(0x0113, 0x0113) AM_NOP // hexbus available
-	AM_RANGE(0x0114, 0x0114) AM_NOP // hexbus handshake
+	AM_RANGE(0x0112, 0x0112) AM_NOP // d0-d3: Hexbus data
+	AM_RANGE(0x0113, 0x0113) AM_NOP // d0: Hexbus available
+	AM_RANGE(0x0114, 0x0114) AM_NOP // d0,d1: Hexbus handshake
 	AM_RANGE(0x0115, 0x0115) AM_WRITE(sound_w)
 	AM_RANGE(0x0116, 0x0116) AM_READ(battery_r)
 	AM_RANGE(0x0119, 0x0119) AM_READWRITE(bankswitch_r, bankswitch_w)
-	AM_RANGE(0x011a, 0x011a) AM_READWRITE(clock_r, clock_w)
+	AM_RANGE(0x011a, 0x011a) AM_READWRITE(clock_control_r, clock_control_w)
 	AM_RANGE(0x011e, 0x011f) AM_DEVREADWRITE("hd44780", hd44780_device, read, write)
 
-	AM_RANGE(0x0800, 0x0fff) AM_RAM AM_SHARE("nvram1")
-	AM_RANGE(0x1000, 0x17ff) AM_RAM AM_SHARE("nvram2")
-	AM_RANGE(0x3000, 0x37ff) AM_RAM AM_SHARE("nvram3")
-
+	AM_RANGE(0x0800, 0x0fff) AM_RAM AM_SHARE("sysram.0")
+	AM_RANGE(0x1000, 0x4fff) AM_READWRITE(sysram_r, sysram_w)
 	AM_RANGE(0x5000, 0xcfff) AM_ROMBANK("cartbank")
 	AM_RANGE(0xd000, 0xefff) AM_ROMBANK("sysbank")
 ADDRESS_MAP_END
@@ -343,7 +395,22 @@ ADDRESS_MAP_END
 
 ***************************************************************************/
 
+INPUT_CHANGED_MEMBER(cc40_state::sysram_size_changed)
+{
+	init_sysram((int)(FPTR)param, newval << 11);
+}
+
 static INPUT_PORTS_START( cc40 )
+	PORT_START("RAMSIZE")
+	PORT_CONFNAME( 0x07, 0x01, "RAM Chip 1") PORT_CHANGED_MEMBER(DEVICE_SELF, cc40_state, sysram_size_changed, (void *)0)
+	PORT_CONFSETTING(    0x00, "None" )
+	PORT_CONFSETTING(    0x01, "2KB" )
+	PORT_CONFSETTING(    0x04, "8KB" )
+	PORT_CONFNAME( 0x70, 0x10, "RAM Chip 2") PORT_CHANGED_MEMBER(DEVICE_SELF, cc40_state, sysram_size_changed, (void *)1)
+	PORT_CONFSETTING(    0x00, "None" )
+	PORT_CONFSETTING(    0x10, "2KB" )
+	PORT_CONFSETTING(    0x40, "8KB" )
+
 	// 8x8 keyboard matrix, RESET and ON buttons are not on it. Unused entries are not connected, but some might have a purpose for factory testing(?)
 	// The numpad number keys are shared with the ones on the main keyboard, also on the real machine.
 	// PORT_NAME lists functions under [SHIFT] as secondaries.
@@ -440,12 +507,40 @@ void cc40_state::machine_reset()
 {
 	m_power = 1;
 
+	update_clock_divider();
+
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	bankswitch_w(space, 0, 0);
 }
 
+void cc40_state::init_sysram(int chip, UINT16 size)
+{
+	if (m_sysram[chip] == NULL)
+	{
+		// init to largest possible
+		m_sysram[chip] = auto_alloc_array(machine(), UINT8, 0x2000);
+		save_pointer(NAME(m_sysram[chip]), 0x2000, chip);
+		
+		save_item(NAME(m_sysram_size[chip]), chip);
+		save_item(NAME(m_sysram_end[chip]), chip);
+		save_item(NAME(m_sysram_mask[chip]), chip);
+	}
+	
+	m_nvram[chip]->set_base(m_sysram[chip], size);
+	m_sysram_size[chip] = size;
+}
+
+void cc40_state::postload()
+{
+	init_sysram(0, m_sysram_size[0]);
+	init_sysram(1, m_sysram_size[1]);
+
+	update_clock_divider();
+}
+
 void cc40_state::machine_start()
 {
+	// init
 	static const char *const tags[] = { "IN0", "IN1", "IN2", "IN3", "IN4", "IN5", "IN6", "IN7" };
 	for (int i = 0; i < 8; i++)
 		m_key_matrix[i] = ioport(tags[i]);
@@ -453,17 +548,29 @@ void cc40_state::machine_start()
 	membank("sysbank")->configure_entries(0, 4, memregion("system")->base(), 0x2000);
 	membank("cartbank")->configure_entries(0, 4, memregion("user1")->base(), 0x8000);
 
-	// zerofill
+	m_nvram[0] = machine().device<nvram_device>("sysram.1");
+	m_nvram[1] = machine().device<nvram_device>("sysram.2");
+	init_sysram(0, 0x800);
+	init_sysram(1, 0x800);
+
+	address_space &space = m_maincpu->space(AS_PROGRAM);
+	bus_control_w(space, 0, 0);
+	bankswitch_w(space, 0, 0);
+
+	// zerofill other
 	m_power = 0;
-	m_banks = 0;
 	m_clock_control = 0;
 	m_key_select = 0;
 
 	// register for savestates
+	save_item(NAME(m_bus_control));
 	save_item(NAME(m_power));
 	save_item(NAME(m_banks));
 	save_item(NAME(m_clock_control));
+	save_item(NAME(m_clock_divider));
 	save_item(NAME(m_key_select));
+
+	machine().save().register_postload(save_prepost_delegate(FUNC(cc40_state::postload), this));
 }
 
 static MACHINE_CONFIG_START( cc40, cc40_state )
@@ -473,9 +580,9 @@ static MACHINE_CONFIG_START( cc40, cc40_state )
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(main_io_map)
 
-	MCFG_NVRAM_ADD_0FILL("nvram1")
-	MCFG_NVRAM_ADD_0FILL("nvram2")
-	MCFG_NVRAM_ADD_0FILL("nvram3")
+	MCFG_NVRAM_ADD_0FILL("sysram.0")
+	MCFG_NVRAM_ADD_0FILL("sysram.1")
+	MCFG_NVRAM_ADD_0FILL("sysram.2")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", LCD)
