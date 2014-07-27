@@ -337,15 +337,18 @@ TIMER_CALLBACK_MEMBER( amiga_state::scanline_callback )
 		m_cia_0->tod_w(0);
 	}
 
-	// pot counters (start counting at 7 (ntsc) or 8 (pal))
-	if (BIT(CUSTOM_REG(REG_POTGO), 0) && (scanline /2 ) > 7)
+	if (m_potgo_port)
 	{
-		m_pot0x += !(m_potgo_port->read() & 0x0100);
-		m_pot0y += !(m_potgo_port->read() & 0x0400);
-		m_pot1x += !(m_potgo_port->read() & 0x1000);
-		m_pot1y += !(m_potgo_port->read() & 0x4000);
+		// pot counters (start counting at 7 (ntsc) or 8 (pal))
+		if (BIT(CUSTOM_REG(REG_POTGO), 0) && (scanline /2 ) > 7)
+		{
+			m_pot0x += !(m_potgo_port->read() & 0x0100);
+			m_pot0y += !(m_potgo_port->read() & 0x0400);
+			m_pot1x += !(m_potgo_port->read() & 0x1000);
+			m_pot1y += !(m_potgo_port->read() & 0x4000);
+		}
 	}
-
+	
 	// render up to this scanline
 	if (!m_screen->update_partial(scanline))
 	{
@@ -1240,10 +1243,12 @@ READ16_MEMBER( amiga_state::custom_chip_r )
 			return CUSTOM_REG(REG_SERDATR);
 
 		case REG_JOY0DAT:
-			return joy0dat_r();
+			if (state->m_joy0dat_port)
+				return joy0dat_r();
 
 		case REG_JOY1DAT:
-			return joy1dat_r();
+			if (state->m_joy1dat_port)
+				return joy1dat_r();
 
 		case REG_POTGOR:
 			if (state->m_potgo_port)
