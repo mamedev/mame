@@ -20,7 +20,7 @@
  *
  *  TODO:
  *  - dump CROM and emulate cpu at microinstruction level
- *  - memory modes with IOCNT0, currently always running in full expansion mode
+ *  - memory modes with IOCNT0, currently always running in faked full expansion mode
  *  - timer event counter mode (timer control register, bit 6)
  *  - TMS70x1/2 serial port and timer 3
  *  - TMS70C46 DOCK-BUS comms with external pins
@@ -55,8 +55,8 @@ const device_type TMS7041 = &device_creator<tms7041_device>;
 const device_type TMS7002 = &device_creator<tms7002_device>;
 const device_type TMS7042 = &device_creator<tms7042_device>;
 
-// TMS70C46 is a TMS70C40, plus support for external memory bus, clock divider
-// on slow memory, and wake-up on keypress.
+// TMS70C46 is literally a shell around a TMS70C40, with support for external
+// memory bus, auto external clock divider on slow memory, and wake-up on keypress.
 const device_type TMS70C46 = &device_creator<tms70c46_device>;
 
 // TMS70Cx2 is an update to TMS70x2 with some extra features. Due to some changes
@@ -333,10 +333,10 @@ void tms7000_device::device_reset()
 	if (chip_is_family_70x2())
 		write_p(0x10, 0x00); // IOCNT1
 
-	write_mem16(0, m_pc); // previous PC
-	m_sp = 0x01;
-	m_pc = read_mem16(0xfffe);
-	m_icount -= 17;
+	m_sp = 0xff;
+	m_op = 0xff;
+	execute_one(m_op);
+	m_icount -= 3; // 17 total
 }
 
 
@@ -449,7 +449,7 @@ void tms7000_device::timer_run(int tmr)
 	// run automatic timer if source is internal
 	if ((m_timer_control[tmr] & 0xe0) == 0x80)
 	{
-		attotime period = attotime::from_hz(clock()) * 16 * (m_timer_prescaler[tmr] + 1); // fOSC/16
+		attotime period = attotime::from_hz(clock()) * 8 * (m_timer_prescaler[tmr] + 1); // fOSC/16 - fOSC is freq _before_ internal clockdivider
 		m_timer_handle[tmr]->adjust(period, tmr);
 	}
 }
