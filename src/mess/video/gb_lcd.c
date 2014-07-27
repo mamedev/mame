@@ -1186,14 +1186,17 @@ void cgb_lcd_device::update_sprites()
 			case 0x00:                 /* priority is not set (overlaps bgnd & wnd, don't flip x) */
 				for (bit = 0; bit < 8; bit++, xindex++)
 				{
-					register int colour = ((data & 0x8000) ? 2 : 0) | ((data & 0x0080) ? 1 : 0);
-					if ((m_bg_zbuf[xindex] & 0x80) && (m_bg_zbuf[xindex] & 0x7f) && (LCDCONT & 0x1))
-						colour = 0;
-					if (colour && xindex >= 0 && xindex < 160)
+					if (xindex >= 0 && xindex < 160)
 					{
-						if (!m_gbc_mode)
-							colour = pal ? m_gb_spal1[colour] : m_gb_spal0[colour];
-						plot_pixel(bitmap, xindex, yindex, m_cgb_spal[pal + colour]);
+						register int colour = ((data & 0x8000) ? 2 : 0) | ((data & 0x0080) ? 1 : 0);
+						if ((m_bg_zbuf[xindex] & 0x80) && (m_bg_zbuf[xindex] & 0x7f) && (LCDCONT & 0x1))
+							colour = 0;
+						if (colour)
+						{
+							if (!m_gbc_mode)
+								colour = pal ? m_gb_spal1[colour] : m_gb_spal0[colour];
+							plot_pixel(bitmap, xindex, yindex, m_cgb_spal[pal + colour]);
+						}
 					}
 					data <<= 1;
 				}
