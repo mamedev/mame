@@ -49,7 +49,11 @@
 
   CC-40 is powered by 4 AA batteries. These will also save internal RAM,
   provided that the machine is turned off properly. If a program is running,
-  you may have to press [BREAK] before turning the CC-40 off.
+  you may have to press [BREAK] before turning the CC-40 off. If RAM contents
+  ends up dodgy somehow, just delete the nvram files.
+  
+  Officially, minimum total RAM size is 6KB. The system will still boot with less,
+  but don't expect all software to work properly.
 
   To run a cartridge, usually the command RUN "DIR" shows which program(s)
   can be loaded. Load a program by pressing the [RUN] key while viewing the list,
@@ -407,7 +411,7 @@ static INPUT_PORTS_START( cc40 )
 	PORT_CONFSETTING(    0x01, "2KB" )
 	PORT_CONFSETTING(    0x04, "8KB" )
 	PORT_CONFNAME( 0x70, 0x10, "RAM Chip 2") PORT_CHANGED_MEMBER(DEVICE_SELF, cc40_state, sysram_size_changed, (void *)1)
-	PORT_CONFSETTING(    0x00, "None" )
+	PORT_CONFSETTING(    0x00, "None" ) // note: invalid configuration, unless Chip 1 is also 0x00
 	PORT_CONFSETTING(    0x10, "2KB" )
 	PORT_CONFSETTING(    0x40, "8KB" )
 
@@ -550,8 +554,8 @@ void cc40_state::machine_start()
 
 	m_nvram[0] = machine().device<nvram_device>("sysram.1");
 	m_nvram[1] = machine().device<nvram_device>("sysram.2");
-	init_sysram(0, 0x800);
-	init_sysram(1, 0x800);
+	init_sysram(0, 0x800); // default to 6KB
+	init_sysram(1, 0x800); // "
 
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	bus_control_w(space, 0, 0);
