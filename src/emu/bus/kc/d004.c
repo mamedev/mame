@@ -54,7 +54,7 @@ FLOPPY_FORMATS_MEMBER( kc_d004_device::floppy_formats )
 FLOPPY_FORMATS_END
 
 static SLOT_INTERFACE_START( kc_d004_floppies )
-	SLOT_INTERFACE( "525hd", FLOPPY_525_HD )
+	SLOT_INTERFACE( "525qd", FLOPPY_525_QD )
 SLOT_INTERFACE_END
 
 static const z80_daisy_config kc_d004_daisy_chain[] =
@@ -77,11 +77,10 @@ static MACHINE_CONFIG_FRAGMENT(kc_d004)
 
 	MCFG_UPD765A_ADD(UPD765_TAG, false, false)
 	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(kc_d004_device, fdc_irq))
-	MCFG_UPD765_DRQ_CALLBACK(WRITELINE(kc_d004_device, fdc_drq))
-	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":0", kc_d004_floppies, "525hd", kc_d004_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":1", kc_d004_floppies, "525hd", kc_d004_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":2", kc_d004_floppies, "525hd", kc_d004_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":3", kc_d004_floppies, "525hd", kc_d004_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":0", kc_d004_floppies, "525qd", kc_d004_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":1", kc_d004_floppies, "525qd", kc_d004_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":2", kc_d004_floppies, "525qd", kc_d004_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":3", kc_d004_floppies, "525qd", kc_d004_device::floppy_formats)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_FRAGMENT(kc_d004_gide)
@@ -134,6 +133,10 @@ kc_d004_device::kc_d004_device(const machine_config &mconfig, const char *tag, d
 		device_kcexp_interface( mconfig, *this ),
 		m_cpu(*this, Z80_TAG),
 		m_fdc(*this, UPD765_TAG),
+		m_floppy0(*this, UPD765_TAG ":0"),
+		m_floppy1(*this, UPD765_TAG ":1"),
+		m_floppy2(*this, UPD765_TAG ":2"),
+		m_floppy3(*this, UPD765_TAG ":3"),
 		m_koppel_ram(*this, "koppelram")
 {
 }
@@ -143,6 +146,10 @@ kc_d004_device::kc_d004_device(const machine_config &mconfig, device_type type, 
 		device_kcexp_interface( mconfig, *this ),
 		m_cpu(*this, Z80_TAG),
 		m_fdc(*this, UPD765_TAG),
+		m_floppy0(*this, UPD765_TAG ":0"),
+		m_floppy1(*this, UPD765_TAG ":1"),
+		m_floppy2(*this, UPD765_TAG ":2"),
+		m_floppy3(*this, UPD765_TAG ":3"),
 		m_koppel_ram(*this, "koppelram")
 {
 }
@@ -156,7 +163,6 @@ void kc_d004_device::device_start()
 	m_rom  = memregion(Z80_TAG)->base();
 
 	m_reset_timer = timer_alloc(TIMER_RESET);
-	m_tc_clear_timer = timer_alloc(TIMER_TC_CLEAR);
 }
 
 //-------------------------------------------------
@@ -167,7 +173,7 @@ void kc_d004_device::device_reset()
 {
 	m_rom_base = 0xc000;
 	m_enabled = m_connected = 0;
-	m_floppy = subdevice<floppy_connector>(UPD765_TAG ":0")->get_device();
+	m_floppy = m_floppy0->get_device();
 
 	// hold cpu at reset
 	m_reset_timer->adjust(attotime::zero);
@@ -201,9 +207,6 @@ void kc_d004_device::device_timer(emu_timer &timer, device_timer_id id, int para
 	{
 		case TIMER_RESET:
 			m_cpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-			break;
-		case TIMER_TC_CLEAR:
-			m_fdc->tc_w(false);
 			break;
 	}
 }
@@ -316,63 +319,57 @@ void kc_d004_device::io_write(offs_t offset, UINT8 data)
 READ8_MEMBER(kc_d004_device::hw_input_gate_r)
 {
 	/*
-
 	    bit 7: DMA Request (DRQ from FDC)
 	    bit 6: Interrupt (INT from FDC)
 	    bit 5: Drive Ready
 	    bit 4: Index pulse from disc
-
 	*/
 
-	if (m_floppy->ready_r())
-		m_hw_input_gate |= 0x20;
-	else
-		m_hw_input_gate &= ~0x20;
+	UINT8 hw_input_gate = 0x0f;
 
-	if (m_floppy->idx_r())
-		m_hw_input_gate &= ~0x10;
-	else
-		m_hw_input_gate |= 0x10;
+	if (m_floppy && !m_floppy->idx_r())
+		hw_input_gate |= 0x10;
 
-	return m_hw_input_gate | 0x0f;
+	if (m_floppy && !m_floppy->ready_r())
+		hw_input_gate |= 0x20;
+
+	if (!m_fdc->get_irq())
+		hw_input_gate |= 0x40;
+
+	if (!m_fdc->get_drq())
+		hw_input_gate |= 0x80;
+
+	return hw_input_gate;
 }
 
 WRITE8_MEMBER(kc_d004_device::fdd_select_w)
 {
 	if (data & 0x01)
-		m_floppy = subdevice<floppy_connector>(UPD765_TAG ":0")->get_device();
+		m_floppy = m_floppy0->get_device();
 	else if (data & 0x02)
-		m_floppy = subdevice<floppy_connector>(UPD765_TAG ":1")->get_device();
+		m_floppy = m_floppy1->get_device();
 	else if (data & 0x04)
-		m_floppy = subdevice<floppy_connector>(UPD765_TAG ":2")->get_device();
+		m_floppy = m_floppy2->get_device();
 	else if (data & 0x08)
-		m_floppy = subdevice<floppy_connector>(UPD765_TAG ":3")->get_device();
+		m_floppy = m_floppy3->get_device();
 	else
 		m_floppy = NULL;
+
+	if (m_floppy)
+		m_floppy->mon_w(0);
+
 	m_fdc->set_floppy(m_floppy);
 }
 
 WRITE8_MEMBER(kc_d004_device::hw_terminal_count_w)
 {
 	m_fdc->tc_w(true);
-
-	m_tc_clear_timer->adjust(attotime::from_nsec(200));
 }
 
 WRITE_LINE_MEMBER(kc_d004_device::fdc_irq)
 {
 	if (state)
-		m_hw_input_gate &= ~0x40;
-	else
-		m_hw_input_gate |= 0x40;
-}
-
-WRITE_LINE_MEMBER(kc_d004_device::fdc_drq)
-{
-	if (state)
-		m_hw_input_gate &= ~0x80;
-	else
-		m_hw_input_gate |= 0x80;
+		m_fdc->tc_w(false);
 }
 
 
