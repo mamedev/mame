@@ -131,7 +131,7 @@ protected:
 	int              m_draw_time;
 	UINT8            m_line_counter;
 	UINT8            m_hcounter;
-	memory_region    *m_CRAM;                    /* Pointer to CRAM */
+	UINT8            m_CRAM[SEGA315_5378_CRAM_SIZE];  /* CRAM */
 	const UINT8      *m_frame_timing;
 	bitmap_rgb32     m_tmpbitmap;
 	bitmap_ind8      m_y1_bitmap;
