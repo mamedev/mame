@@ -332,6 +332,10 @@ machine_config_constructor generic_terminal_device::device_mconfig_additions() c
 void generic_terminal_device::device_start()
 {
 	m_keyboard_cb.resolve_safe();
+	save_item(NAME(m_buffer));
+	save_item(NAME(m_x_pos));
+	save_item(NAME(m_framecnt));
+	save_item(NAME(m_y_pos));
 }
 
 void generic_terminal_device::device_reset()
