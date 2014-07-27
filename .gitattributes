@@ -6455,6 +6455,7 @@ src/mame/layout/buckrog.lay svneol=native#text/xml
 src/mame/layout/buggybjr.lay svneol=native#text/xml
 src/mame/layout/buggyboy.lay svneol=native#text/xml
 src/mame/layout/buggychl.lay svneol=native#text/xml
+src/mame/layout/by17.lay svneol=native#text/plain
 src/mame/layout/bzone.lay svneol=native#text/xml
 src/mame/layout/cardline.lay svneol=native#text/xml
 src/mame/layout/cbombers.lay svneol=native#text/xml
