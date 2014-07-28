@@ -6046,6 +6046,7 @@ int saturn_state::get_vcounter( void )
 		return (vcount & ~1) | (machine().first_screen()->frame_number() & 1);
 
 	/* docs says << 1, but according to HW tests it's a typo. */
+	assert((vcount & 0x1ff) < ARRAY_LENGTH(true_vcount));
 	return (true_vcount[vcount & 0x1ff][STV_VDP2_VRES]); // Non-interlace
 }
 
