@@ -31,6 +31,7 @@ ioport_constructor serial_terminal_device::device_input_ports() const
 
 void serial_terminal_device::device_start()
 {
+	generic_terminal_device::device_start();
 }
 
 WRITE_LINE_MEMBER(serial_terminal_device::update_serial)
