@@ -151,5 +151,5 @@ ROM_START( fun4a )
 ROM_END
 
 
-GAME( 1976, fun4,  0,    bailey, 0, driver_device,  0, ROT0, "Bailey International", "Fun Four (Set 1) [TTL]", GAME_IS_SKELETON )
-GAME( 1976, fun4a, fun4, bailey, 0, driver_device,  0, ROT0, "Bailey International", "Fun Four (Set 2) [TTL]", GAME_IS_SKELETON )
+GAME( 1976, fun4,  0,    bailey, 0, driver_device,  0, ROT0, "Bailey International", "Fun Four (set 1) [TTL]", GAME_IS_SKELETON )
+GAME( 1976, fun4a, fun4, bailey, 0, driver_device,  0, ROT0, "Bailey International", "Fun Four (set 2) [TTL]", GAME_IS_SKELETON )
