@@ -75,6 +75,7 @@ WRITE8_MEMBER(tecnbras_state::print_column_w)
 {
 	int x = m_xcoord + offset;
 	for (int i=0; i<7; i++){
+		assert((x/5) < ARRAY_LENGTH(m_digit));
 		m_digit[x/5][i] &= ~(1 << (x%5));
 		m_digit[x/5][i] |= BIT(data, 7-i) ? (1 << (x%5)) : 0;
 		output_set_indexed_value("dmd_", (x/5)*7 + i, 0x1F & m_digit[x/5][i]);
