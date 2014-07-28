@@ -184,10 +184,13 @@ READ8_MEMBER( xor100_state::fdc_wait_r )
 
 	*/
 
-	if (!m_fdc_irq && !m_fdc_drq)
+	if (!space.debugger_access())
 	{
-		fatalerror("Z80 WAIT not supported by MAME core\n");
-		m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, ASSERT_LINE);
+		if (!m_fdc_irq && !m_fdc_drq)
+		{
+			fatalerror("Z80 WAIT not supported by MAME core\n");
+			m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, ASSERT_LINE);
+		}
 	}
 
 	return !m_fdc_irq << 7;
