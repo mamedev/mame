@@ -341,7 +341,7 @@ READ8_MEMBER( ncr539x_device::read )
 								fifo_fill_size = m_xfer_count;
 							}
 							assert(m_buffer_offset < m_buffer_size);
-							assert((m_buffer_offset + fifo_fill_size) < m_buffer_size);
+							assert((m_buffer_offset + fifo_fill_size) <= m_buffer_size);
 							memcpy(m_fifo, &m_buffer[m_buffer_offset], fifo_fill_size);
 							m_buffer_offset += fifo_fill_size;
 							m_buffer_remaining -= fifo_fill_size;
