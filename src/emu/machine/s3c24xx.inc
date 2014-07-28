@@ -1945,6 +1945,7 @@ void S3C24_CLASS_NAME::s3c24xx_memcon_reset()
 
 READ32_MEMBER( S3C24_CLASS_NAME::s3c24xx_memcon_r )
 {
+	assert(offset < ARRAY_LENGTH(m_memcon.regs.data));
 	UINT32 data = m_memcon.regs.data[offset];
 	verboselog( machine(), 9, "(MEMCON) %08X -> %08X\n", S3C24XX_BASE_MEMCON + (offset << 2), data);
 	return data;
