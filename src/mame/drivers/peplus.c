@@ -7797,7 +7797,7 @@ ROM_START( pekoc766 ) /* Superboard : Standard Draw Poker (PP0766) English / Spa
 PayTable   Js+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
 ----------------------------------------------------------
   ????      1    2    3    4    5   8  25  50 300    400
-  % Range: 92.6-94.6%  Optimum: 96.4%  Hit Frequency: ??.?%
+  % Range: 92.6-94.6%  Optimum: 96.4%  Hit Frequency: 45.6%
      Programs Available: PP0766 A5W-A6F
 
 Same as US paytable QJ
@@ -7871,6 +7871,16 @@ Same as US paytable GA
 ROM_END
 
 ROM_START( pekoc803 ) /* Superboard : Joker Poker (PP0830) English / Spanish - Key On Credit */
+/*
+                                            w/J     w/oJ
+PayTable   Ks+  2P  3K  STR  FL  FH  4K  SF  RF  5K  RF  (Bonus)
+----------------------------------------------------------------
+  ????      1    1   2   3    4   5  20  40 100 200 500    800
+  % Range: 91.5-93.5%  Optimum: 95.5%  Hit Frequency: 44.7%
+     Programs Available: PP0803 A5W-A6F, PP0803 A50-A6N
+
+Same as US paytable P17A
+*/
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "pp0803_a5w-a6f.u67",   0x00000, 0x10000, CRC(26ec73b3) SHA1(0f592d21e83b73f37943b80ded6e83ee7b9c3edf) )
 
@@ -7888,6 +7898,16 @@ ROM_START( pekoc803 ) /* Superboard : Joker Poker (PP0830) English / Spanish - K
 ROM_END
 
 ROM_START( pekoc803a ) /* Superboard : Joker Poker (PP0803) English / Spanish - Key On Credit */
+/*
+                                            w/J     w/oJ
+PayTable   Ks+  2P  3K  STR  FL  FH  4K  SF  RF  5K  RF  (Bonus)
+----------------------------------------------------------------
+  ????      1    1   2   3    4   5  20  40 100 200 500    800
+  % Range: 91.5-93.5%  Optimum: 95.5%  Hit Frequency: 44.7%
+     Programs Available: PP0803 A5W-A6F, PP0803 A50-A6N
+
+Same as US paytable P17A
+*/
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "pp0803_a50-a6n.u67",   0x00000, 0x10000, CRC(40c18868) SHA1(d0e899fd09c1b49e2b93671770e4981c0a3a3501) )
 
@@ -7957,6 +7977,14 @@ Same as US paytable GB
 ROM_END
 
 ROM_START( pekoc818 ) /* Superboard : Joker Poker (Aces or Better) - Key On Credit */
+/*
+                                            w/J     w/oJ
+PayTable   As   2P  3K  STR  FL  FH  4K  SF  RF  5K  RF  (Bonus)
+----------------------------------------------------------------
+  ????      1    1   2   3    4   6  15  50  80 200 500    800
+  % Range: 83.6-85.6%  Optimum: 87.6%  Hit Frequency: ??.?%
+     Programs Available: PP0818 A5W-A6F
+*/
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "pp0818_a5w-a6f.u67",   0x00000, 0x10000, CRC(38b1f3ca) SHA1(d869fbacdd918b146072ca820530cc041aa54568) )
 
@@ -8002,7 +8030,7 @@ ROM_START( pekoc825 ) /* Superboard : White Hot Aces - Key On Credit */
                                       5-K 2-4
 PayTable   Js+  2PR  3K  STR  FL  FH  4K  4K  4A  SF  RF  (Bonus)
 -----------------------------------------------------------------
-  ????      1    1    3   4    5  10  50 120 240  80 250    800
+  ????      1    1    2   4    7  10  50 120 240  50 250    800
   % Range: 91.4-93.4%  Optimum: 95.4%  Hit Frequency: 44.7%
      Programs Available: PP0825 A59-A7C
 */
@@ -8022,12 +8050,12 @@ PayTable   Js+  2PR  3K  STR  FL  FH  4K  4K  4A  SF  RF  (Bonus)
 	ROM_LOAD( "capx733.u43", 0x0000, 0x0200, CRC(867efa71) SHA1(f9e303dfaa43d5e44dbd1671b3269c1a658dea89) )
 ROM_END
 
-ROM_START( pex0838s ) /* Superboard : Five Times Pay Slots (X000835S+XS000002) - 2 Coins Max / 1 Pay Line */
+ROM_START( pex0838s ) /* Superboard : Five Times Pay Slots (X000835S+XS000002) - Payout 90.01% */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "xs000002.u67",   0x00000, 0x10000, CRC(f25725e8) SHA1(a7a0022162f6aa3303f072b6fab3713bdc6b57ad) )
 
 	ROM_REGION( 0x10000, "user1", 0 )
-	ROM_LOAD( "x000838s.u66",   0x00000, 0x10000, CRC(913d17ac) SHA1(37162ac4384954165d9cfe04811ff5fa2cdde71e) ) /* Five Times Pay Slots - 2CM1L */
+	ROM_LOAD( "x000838s.u66",   0x00000, 0x10000, CRC(913d17ac) SHA1(37162ac4384954165d9cfe04811ff5fa2cdde71e) ) /* Five Times Pay Slots - 2 Coins Max / 1 Pay Line */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
 	ROM_LOAD( "mro-cg2351.u77",  0x00000, 0x8000, CRC(d861f650) SHA1(7b483c5241e6704e8a2c70edb5a315ed6b1ae85d) )
@@ -8039,12 +8067,12 @@ ROM_START( pex0838s ) /* Superboard : Five Times Pay Slots (X000835S+XS000002) -
 	ROM_LOAD( "capx2351.u43", 0x0000, 0x0200, CRC(34c59e88) SHA1(bf4d7a54c964b1b723ec65a4ede40ad900dd0f08) )
 ROM_END
 
-ROM_START( pex0841s ) /* Superboard : Five Times Pay Slots (X000841S+XS000002) - 3 Coins Max / 1 Pay Line */
+ROM_START( pex0841s ) /* Superboard : Five Times Pay Slots (X000841S+XS000002) - Payout 92.51% */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "xs000002.u67",   0x00000, 0x10000, CRC(f25725e8) SHA1(a7a0022162f6aa3303f072b6fab3713bdc6b57ad) )
 
 	ROM_REGION( 0x10000, "user1", 0 )
-	ROM_LOAD( "x000841s.u66",   0x00000, 0x10000, CRC(430cc466) SHA1(3cd4a942274930db260567344008880027d5538c) ) /* Five Times Pay Slots - 3CM1L */
+	ROM_LOAD( "x000841s.u66",   0x00000, 0x10000, CRC(430cc466) SHA1(3cd4a942274930db260567344008880027d5538c) ) /* Five Times Pay Slots - 3 Coins Max / 1 Pay Line */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
 	ROM_LOAD( "mro-cg2351.u77",  0x00000, 0x8000, CRC(d861f650) SHA1(7b483c5241e6704e8a2c70edb5a315ed6b1ae85d) )
@@ -8056,12 +8084,12 @@ ROM_START( pex0841s ) /* Superboard : Five Times Pay Slots (X000841S+XS000002) -
 	ROM_LOAD( "capx2351.u43", 0x0000, 0x0200, CRC(34c59e88) SHA1(bf4d7a54c964b1b723ec65a4ede40ad900dd0f08) )
 ROM_END
 
-ROM_START( pex0998s ) /* Superboard : Triple Triple Diamond Slots (X000998S+XS000006) - 2 Coins Max / 1 Pay Line */
+ROM_START( pex0998s ) /* Superboard : Triple Triple Diamond Slots (X000998S+XS000006) - Payout 92.47% */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "xs000006.u67",   0x00000, 0x10000, CRC(4b11ca18) SHA1(f64a1fbd089c01bc35a5484e60b8834a2db4a79f) )
 
 	ROM_REGION( 0x10000, "user1", 0 )
-	ROM_LOAD( "x000998s.u66",   0x00000, 0x10000, CRC(e29d4346) SHA1(93901ff65c8973e34ac1f0dd68bb4c4973da5621) ) /* Triple Triple Diamonds Slots - 2CM1L */
+	ROM_LOAD( "x000998s.u66",   0x00000, 0x10000, CRC(e29d4346) SHA1(93901ff65c8973e34ac1f0dd68bb4c4973da5621) ) /* Triple Triple Diamonds Slots - 2 Coins Max / 1 Pay Line */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
 	ROM_LOAD( "mro-cg2361.u77",  0x00000, 0x8000, CRC(c0eba866) SHA1(8f217aeb3e8028a5633d95e5612f1b55e601650f) )
@@ -8073,12 +8101,12 @@ ROM_START( pex0998s ) /* Superboard : Triple Triple Diamond Slots (X000998S+XS00
 	ROM_LOAD( "capx2361.u43", 0x0000, 0x0200, CRC(93057296) SHA1(534bbf8ee80a22822d577f6685501f4c929987ef) )
 ROM_END
 
-ROM_START( pex1087s ) /* Superboard : Double Double Diamond Slots (X001087S+XS000006) - 3 Coins Max / 1 Pay Line */
+ROM_START( pex1087s ) /* Superboard : Double Double Diamond Slots (X001087S+XS000006) - Payout 94.95% */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "xs000006.u67",   0x00000, 0x10000, CRC(4b11ca18) SHA1(f64a1fbd089c01bc35a5484e60b8834a2db4a79f) )
 
 	ROM_REGION( 0x10000, "user1", 0 )
-	ROM_LOAD( "x001087s.u66",   0x00000, 0x10000, CRC(f811cff6) SHA1(3bdb77774387602ba4d699e009afa8591559c33e) ) /* Double Double Diamonds Slots - 3CM1L */
+	ROM_LOAD( "x001087s.u66",   0x00000, 0x10000, CRC(f811cff6) SHA1(3bdb77774387602ba4d699e009afa8591559c33e) ) /* Double Double Diamonds Slots - 3 Coins Max / 1 Pay Line */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
 	ROM_LOAD( "mro-cg2415.u77",  0x00000, 0x8000, CRC(f135a9c1) SHA1(366f93ce14da86c237da62f0b252bd26d662c8b1) )
@@ -8092,13 +8120,23 @@ ROM_START( pex1087s ) /* Superboard : Double Double Diamond Slots (X001087S+XS00
 ROM_END
 
 ROM_START( pexm001p ) /* Superboard : Multi-Poker (XM00001P) - Bonus Poker, Bonus Poker Dlx, Deuces Wild Poker, Jacks or Better & Dbl Bonus Poker */
+/*
+Combined average payout percent: 99.64%
+
+Game Type           PayTable   Payout
+-------------------------------------
+Bonus Poker          P77A      99.20%
+Bonus Poker Deluxe   P200A     98.50%
+Deuces Wild Poker    P34A     100.80%
+Jacks or Better      CA        99.50%
+Double Bonus Poker   P324A    100.20%
+*/
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "xmp00003.u67",   0x00000, 0x10000, CRC(41e33b3e) SHA1(cd5debfb59c4f0cc5d700a1c592a0dc203abcb66) ) /* Linkable Progressive, No Double Up */
 	/* Known to be found with XMP00003, XMP00006 or XMP00024 programs */
 
 	ROM_REGION( 0x10000, "user1", 0 )
-	ROM_LOAD( "xm00001p.u66",   0x00000, 0x10000, CRC(b1569f05) SHA1(c94409ad74c4585288780cc2f96957592554a250) )
-	/* XM00001P, XM00002P, XM00003P & XM00006P provide the same games, just different payout percentages per game */
+	ROM_LOAD( "xm00001p.u66",   0x00000, 0x10000, CRC(b1569f05) SHA1(c94409ad74c4585288780cc2f96957592554a250) ) /*  07/18/95   @IGT  L95-1613  */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
 	ROM_LOAD( "mro-cg2174.u77",  0x00000, 0x8000, CRC(bb666733) SHA1(dcaa1980b051a554cb0f443b1183a680edc9ad3f) ) /*  07/26/95   @ IGT  L95-1616  */
@@ -8111,13 +8149,23 @@ ROM_START( pexm001p ) /* Superboard : Multi-Poker (XM00001P) - Bonus Poker, Bonu
 ROM_END
 
 ROM_START( pexm002p ) /* Superboard : Multi-Poker (XM00002P) - Bonus Poker, Bonus Poker Dlx, Deuces Wild Poker, Jacks or Better & Dbl Bonus Poker */
+/*
+Combined average payout percent: 98.14%
+
+Game Type           PayTable   Payout
+-------------------------------------
+Bonus Poker          P90A      98.00%
+Bonus Poker Deluxe   P251A     97.40%
+Deuces Wild Poker    P62A      98.90%
+Jacks or Better      BA        97.30%
+Double Bonus Poker   P323A     99.10%
+*/
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "xmp00006.u67",   0x00000, 0x10000, CRC(d61f1677) SHA1(2eca1315d6aa310a54de2dfa369e443a07495b76) ) /*  07/25/96   @IGT L96-2041  - Linkable Progressive */
 	/* Known to be found with XMP00003, XMP00006 or XMP00024 programs */
 
 	ROM_REGION( 0x10000, "user1", 0 )
-	ROM_LOAD( "xm00002p.u66",   0x00000, 0x10000, CRC(96cf471c) SHA1(9597bf6a80c392ee22dc4606db610fdaf032377f) )
-	/* XM00001P, XM00002P, XM00003P & XM00006P provide the same games, just different payout percentages per game */
+	ROM_LOAD( "xm00002p.u66",   0x00000, 0x10000, CRC(96cf471c) SHA1(9597bf6a80c392ee22dc4606db610fdaf032377f) ) /*  07/18/95   @IGT  L95-1614  */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
 	ROM_LOAD( "mro-cg2174.u77",  0x00000, 0x8000, CRC(bb666733) SHA1(dcaa1980b051a554cb0f443b1183a680edc9ad3f) ) /*  07/26/95   @ IGT  L95-1616  */
@@ -8130,13 +8178,23 @@ ROM_START( pexm002p ) /* Superboard : Multi-Poker (XM00002P) - Bonus Poker, Bonu
 ROM_END
 
 ROM_START( pexm003p ) /* Superboard : Multi-Poker (XM00003P) - Bonus Poker, Bonus Poker Dlx, Deuces Wild Poker, Jacks or Better & Dbl Bonus Poker */
+/*
+Combined average payout percent: 96.78%
+
+Game Type           PayTable   Payout
+-------------------------------------
+Bonus Poker          P101A     96.90%
+Bonus Poker Deluxe   P253A     96.30%
+Deuces Wild Poker    P47A      96.80%
+Jacks or Better      P11A      96.10%
+Double Bonus Poker   P325A     97.80%
+*/
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "xmp00024.u67",   0x00000, 0x10000, CRC(f2df8870) SHA1(bc7fa1d79da07093cf3d3508e226a9c490990e04) ) /* Standalone Progressive */
 	/* Known to be found with XMP00003, XMP00006 or XMP00024 programs */
 
 	ROM_REGION( 0x10000, "user1", 0 )
 	ROM_LOAD( "xm00003p.u66",   0x00000, 0x10000, CRC(55b44732) SHA1(8e0bbad3aaa7deca85ae641c444be3a513bdce50) ) /*  07/18/95   @IGT  L95-1615  */
-	/* XM00001P, XM00002P, XM00003P & XM00006P provide the same games, just different payout percentages per game */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
 	ROM_LOAD( "mro-cg2174.u77",  0x00000, 0x8000, CRC(bb666733) SHA1(dcaa1980b051a554cb0f443b1183a680edc9ad3f) ) /*  07/26/95   @ IGT  L95-1616  */
@@ -8149,6 +8207,17 @@ ROM_START( pexm003p ) /* Superboard : Multi-Poker (XM00003P) - Bonus Poker, Bonu
 ROM_END
 
 ROM_START( pexm004p ) /* Superboard : Multi-Poker (XM00004P) - Dbl Dbl Bonus Poker, Nevada Bonus Poker, Joker Poker, Dbl Bonus Poker & Dbl Deuces Poker */
+/*
+Combined average payout percent: 99.22%
+
+Game Type           PayTable   Payout
+-------------------------------------
+Double Double Bonus  P505A     97.80%
+Nevada Bonus Poker   P503A     98.80%
+Joker Poker          ZA       100.20%
+Double Bonus Poker   P324A    100.20%
+Double Deuce Poker   P236A     99.60%
+*/
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "xmp00002.u67",   0x00000, 0x10000, CRC(d5624ac8) SHA1(6b778b0e7ddb81123c6038920b3447e05a0556b2) ) /* Linkable Progressive */
 
@@ -8166,6 +8235,17 @@ ROM_START( pexm004p ) /* Superboard : Multi-Poker (XM00004P) - Dbl Dbl Bonus Pok
 ROM_END
 
 ROM_START( pexm005p ) /* Superboard : Multi-Poker (XM00005P) - Bonus Poker, Dbl Dbl Bonus Poker, Joker Poker, Dbl Joker Poker & Dbl Bonus Poker */
+/*
+Combined average payout percent: 97.06%
+
+Game Type           PayTable   Payout
+-------------------------------------
+Bonus Poker          P101A     96.90%
+Double Double Bonus  P506A     96.70%
+Joker Poker          NA        97.20%
+Double Joker Poker   ?????     98.10%
+Double Bonus Poker   P434A     96.40%
+*/
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "xmp00004.u67",   0x00000, 0x10000, CRC(83184999) SHA1(b8483917b338be4fd3641b3990eea37072d36885) ) /* Linkable Progressive */
 	/* Also known to be found with XMP00024 programs */
@@ -8184,13 +8264,23 @@ ROM_START( pexm005p ) /* Superboard : Multi-Poker (XM00005P) - Bonus Poker, Dbl 
 ROM_END
 
 ROM_START( pexm006p ) /* Superboard : Multi-Poker (XM00006P) - Bonus Poker, Bonus Poker Dlx, Deuces Wild Poker, Jacks or Better & Dbl Bonus Poker */
+/*
+Combined average payout percent: 99.04%
+
+Game Type           PayTable   Payout
+-------------------------------------
+Bonus Poker          P77A      99.20%
+Bonus Poker Deluxe   P200A     98.50%
+Deuces Wild Poker    P62A      98.90%
+Jacks or Better      CA        99.50%
+Double Bonus Poker   P323A     99.10%
+*/
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "xmp00006.u67",   0x00000, 0x10000, CRC(d61f1677) SHA1(2eca1315d6aa310a54de2dfa369e443a07495b76) ) /*  07/25/96   @IGT L96-2041  - Linkable Progressive */
 	/* Known to be found with XMP00003, XMP00006 or XMP00024 programs */
 
 	ROM_REGION( 0x10000, "user1", 0 )
-	ROM_LOAD( "xm00006p.u66",   0x00000, 0x10000, CRC(b464ee79) SHA1(8768e52c66881c8f327055124ff31bcad79fd027) )
-	/* XM00001P, XM00002P, XM00003P & XM00006P provide the same games, just different payout percentages per game */
+	ROM_LOAD( "xm00006p.u66",   0x00000, 0x10000, CRC(b464ee79) SHA1(8768e52c66881c8f327055124ff31bcad79fd027) ) /*  03/08/96   @IGT  NV  */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
 	ROM_LOAD( "mro-cg2174.u77",  0x00000, 0x8000, CRC(bb666733) SHA1(dcaa1980b051a554cb0f443b1183a680edc9ad3f) ) /*  07/26/95   @ IGT  L95-1616  */
@@ -8203,6 +8293,17 @@ ROM_START( pexm006p ) /* Superboard : Multi-Poker (XM00006P) - Bonus Poker, Bonu
 ROM_END
 
 ROM_START( pexm007p ) /* Superboard : Multi-Poker (XM00007P) - Bonus Poker, Dbl Dbl Bonus Poker, Deuces Wild Poker, Dbl Bonus Poker & Jacks or Better */
+/*
+Combined average payout percent: 97.38%
+
+Game Type           PayTable   Payout
+-------------------------------------
+Bonus Poker          P90A      98.00%
+Double Double Bonus  P506A     96.70%
+Deuces Wild Poker    P59A      97.10%
+Jacks or Better      BA        97.30%
+Double Bonus Poker   P325A     97.80%
+*/
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "xmp00006.u67",   0x00000, 0x10000, CRC(d61f1677) SHA1(2eca1315d6aa310a54de2dfa369e443a07495b76) ) /*  07/25/96   @IGT L96-2041  - Linkable Progressive */
 
@@ -8220,6 +8321,17 @@ ROM_START( pexm007p ) /* Superboard : Multi-Poker (XM00007P) - Bonus Poker, Dbl 
 ROM_END
 
 ROM_START( pexm008p ) /* Superboard : Multi-Poker (XM00008P) - Bonus Poker, Bonus Poker Dlx, Deuces Wild Poker, Jacks or Better & Dbl Bonus Poker */
+/*
+Combined average payout percent: 99.30%
+
+Game Type           PayTable   Payout
+-------------------------------------
+Bonus Poker          P77A      99.20%
+Bonus Poker Deluxe   P200A     98.50%
+Deuces Wild Poker    P34A     100.80%
+Double Bonus Poker   P324A    100.20%
+Double Double Bonus  P505A     97.80%
+*/
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "xmp00006.u67",   0x00000, 0x10000, CRC(d61f1677) SHA1(2eca1315d6aa310a54de2dfa369e443a07495b76) ) /*  07/25/96   @IGT L96-2041  - Linkable Progressive */
 
@@ -8241,6 +8353,17 @@ ROM_START( pexm008p ) /* Superboard : Multi-Poker (XM00008P) - Bonus Poker, Bonu
 ROM_END
 
 ROM_START( pexm009p ) /* Superboard : Multi-Poker (XM00009P) - Aces & Faces, Bonus Poker Dlx, Deuces Wild Poker, Jacks or Better & Dbl Aces & Faces Poker */
+/*
+Combined average payout percent: 98.47%
+
+Game Type           PayTable   Payout
+-------------------------------------
+Aces & Faces         ?????     99.20%
+Bonus Poker Deluxe   P200A     98.50%
+Deuces Wild Poker    P62A      98.90%
+Jacks or Better      BB        97.80%
+Double Aces & Faces  ?????     99.30%
+*/
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "xmp00002.u67",   0x00000, 0x10000, CRC(d5624ac8) SHA1(6b778b0e7ddb81123c6038920b3447e05a0556b2) ) /* Linkable Progressive */
 
@@ -8262,6 +8385,17 @@ ROM_START( pexm009p ) /* Superboard : Multi-Poker (XM00009P) - Aces & Faces, Bon
 ROM_END
 
 ROM_START( pexm013p ) /* Superboard : Multi-Poker (XM00013P) - Bonus Poker, Dbl Dbl Bonus Poker, Deuces Wild Poker, Jacks or Better & Joker Poker  */
+/*
+Combined average payout percent: 95.80%
+
+Game Type           PayTable   Payout
+-------------------------------------
+Bonus Poker          P596A     95.80%
+Double Double Bonus  P507A     95.60%
+Deuces Wild Poker    P57A      96.00%
+Jacks or Better      P11A      96.10%
+Joker Poker          P17A      95.50%
+*/
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "xmp00025.u67",   0x00000, 0x10000, CRC(5d39ff71) SHA1(0a5f67e61ae0e8a08cc551ab4271ffc97c343ae3) )
 
