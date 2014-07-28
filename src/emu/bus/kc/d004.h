@@ -71,7 +71,7 @@ private:
 	emu_timer *         m_reset_timer;
 
 	UINT8 *             m_rom;
-	UINT8               m_hw_input_gate;
+	//UINT8               m_hw_input_gate;
 	UINT16              m_rom_base;
 	UINT8               m_enabled;
 	UINT8               m_connected;
