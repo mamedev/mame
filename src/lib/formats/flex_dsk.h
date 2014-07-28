@@ -2,7 +2,6 @@
  * flex_dsk.h
  *
  *  Created on: 24/06/2014
- *      Author: bsr
  */
 
 #ifndef FLEX_DSK_H_

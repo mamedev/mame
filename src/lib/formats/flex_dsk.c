@@ -42,7 +42,7 @@ bool flex_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 {
 	int spt = info.last_sec;
 	int bps = 256;
-	int cell_count = 50000;
+	int cell_count = (form_factor == floppy_image::FF_525) ? 50000 : 100000;
 	int offset = 0;
 	int head_num = 1;
 	int total_tracks = info.last_trk+1;

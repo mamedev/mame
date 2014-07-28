@@ -93,6 +93,7 @@ public:
 		, m_rombank1(*this, "rombank1")
 		, m_rombank2(*this, "rombank2")
 		, m_fixedrombank(*this, "fixedrombank")
+		, m_dma_dip(*this, "dma_s2")
 	{}
 
 	DECLARE_WRITE8_MEMBER(kbd_put);
@@ -168,6 +169,7 @@ private:
 	required_memory_bank m_rombank2;
 	required_memory_bank m_fixedrombank;
 
+	required_ioport m_dma_dip;
 };
 
 static ADDRESS_MAP_START( gimix_banked_mem, AS_PROGRAM, 8, gimix_state)
@@ -215,6 +217,11 @@ static ADDRESS_MAP_START( gimix_io, AS_IO, 8, gimix_state )
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( gimix )
+	PORT_START("dma_s2")
+	PORT_DIPNAME(0x00000100,0x00000000,"5.25\" / 8\" floppy drive 0") PORT_DIPLOCATION("S2:9")
+	PORT_DIPSETTING(0x00000000,"5.25\"")
+	PORT_DIPSETTING(0x00000100,"8\"")
+
 INPUT_PORTS_END
 
 READ8_MEMBER( gimix_state::keyin_r )
@@ -284,6 +291,10 @@ READ8_MEMBER(gimix_state::dma_r)
 	switch(offset)
 	{
 	case 0:
+		if(m_dma_dip->read() & 0x00000100)
+			m_dma_status |= 0x01;   // 8"
+		else
+			m_dma_status &= ~0x01;  // 5.25"
 		return m_dma_status;
 	case 1:
 		return m_dma_ctrl;
@@ -465,6 +476,12 @@ void gimix_state::machine_reset()
 	m_floppy1_ready = false;
 	membank("lower_ram")->set_base(m_ram->pointer());
 	membank("upper_ram")->set_base(m_ram->pointer()+0x10000);
+
+	// set FDC clock based on DIP Switch S2-9 (5.25"/8" drive select)
+	if(m_dma_dip->read() & 0x00000100)
+		m_fdc->set_unscaled_clock(XTAL_8MHz / 4); // 8 inch (2MHz)
+	else
+		m_fdc->set_unscaled_clock(XTAL_8MHz / 8); // 5.25 inch (1MHz)
 }
 
 void gimix_state::machine_start()
@@ -533,6 +550,7 @@ FLOPPY_FORMATS_END
 
 static SLOT_INTERFACE_START( gimix_floppies )
 	SLOT_INTERFACE( "525hd", FLOPPY_525_HD )
+	SLOT_INTERFACE( "8dd", FLOPPY_8_DSDD )
 SLOT_INTERFACE_END
 
 #define MCFG_ADDRESS_BANK(tag) \
@@ -557,7 +575,7 @@ static MACHINE_CONFIG_START( gimix, gimix_state )
 	MCFG_PTM6840_IRQ_CB(WRITELINE(gimix_state,irq_w))  // PCB pictures show both the RTC and timer set to generate IRQs (are jumper configurable)
 
 	/* floppy disks */
-	MCFG_FD1797x_ADD("fdc",XTAL_8MHz / 8)
+	MCFG_FD1797x_ADD("fdc",XTAL_8MHz / 4)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(gimix_state,fdc_irq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(gimix_state,fdc_drq_w))
 	MCFG_WD_FDC_FORCE_READY
@@ -630,6 +648,8 @@ static MACHINE_CONFIG_START( gimix, gimix_state )
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("128K")
 	MCFG_RAM_EXTRA_OPTIONS("56K,256K,512K")
+
+	MCFG_SOFTWARE_LIST_ADD("flop_list","gimix")
 
 	// uncomment this timer to use a hack that generates a regular IRQ, this will get OS-9 to boot
 	// for some unknown reason, OS-9 does not touch the 6840, and only clears/disables IRQs on the RTC
