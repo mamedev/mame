@@ -76,6 +76,7 @@ mc68681_device::mc68681_device(const machine_config &mconfig, const char *tag, d
 	ip5clk(0),
 	ip6clk(0),
 	ACR(0),
+	m_read_vector(false),
 	IP_last_state(0)
 {
 }
