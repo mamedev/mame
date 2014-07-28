@@ -332,7 +332,37 @@ void mos7360_device::device_start()
 	}
 
 	// register for state saving
-	//save_item(NAME());
+	save_item(NAME(m_reg));
+	save_item(NAME(m_last_data));
+	save_item(NAME(m_rom));
+	save_item(NAME(m_frame_count));
+	save_item(NAME(m_lines));
+	save_item(NAME(m_timer1_active));
+	save_item(NAME(m_timer2_active));
+	save_item(NAME(m_timer3_active));
+	save_item(NAME(m_cursor1));
+	save_item(NAME(m_chargenaddr));
+	save_item(NAME(m_bitmapaddr));
+	save_item(NAME(m_x_begin));
+	save_item(NAME(m_x_end));
+	save_item(NAME(m_y_begin));
+	save_item(NAME(m_y_end));
+	save_item(NAME(m_c16_bitmap));
+	save_item(NAME(m_bitmapmulti));
+	save_item(NAME(m_mono));
+	save_item(NAME(m_monoinversed));
+	save_item(NAME(m_multi));
+	save_item(NAME(m_ecmcolor));
+	save_item(NAME(m_colors));
+	save_item(NAME(m_rasterline));
+	save_item(NAME(m_lastline));
+	save_item(NAME(m_rastertime));
+	save_item(NAME(m_tone1pos));
+	save_item(NAME(m_tone2pos));
+	save_item(NAME(m_tone1samples));
+	save_item(NAME(m_tone2samples));
+	save_item(NAME(m_noisepos));
+	save_item(NAME(m_noisesamples));
 }
 
 
