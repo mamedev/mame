@@ -160,7 +160,14 @@ void upd765_family_device::device_start()
 
 		flopi[i].main_state = IDLE;
 		flopi[i].sub_state = IDLE;
+		flopi[i].dir = 0;
+		flopi[i].counter = 0;
+		flopi[i].pcn = 0;
+		flopi[i].st0 = 0;
+		flopi[i].st0_filled = false;
 		flopi[i].live = false;
+		flopi[i].index = false;
+		flopi[i].ready = false;
 	}
 	cur_rate = 250000;
 	tc = false;
