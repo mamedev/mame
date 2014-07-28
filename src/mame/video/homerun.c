@@ -13,7 +13,7 @@
 CUSTOM_INPUT_MEMBER(homerun_state::homerun_sprite0_r)
 {
 	// sprite-0 vs background collision status, similar to NES
-	return (m_screen->vpos() > (m_spriteram[0] - 15)) ? 1 : 0;
+	return (m_screen->vpos() > (m_spriteram[0] - 16 + 1)) ? 1 : 0;
 }
 
 WRITE8_MEMBER(homerun_state::homerun_scrollhi_w)
@@ -115,25 +115,23 @@ void homerun_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprec
 
 	for (offs = m_spriteram.bytes() - 4; offs >= 0; offs -= 4)
 	{
+		if (spriteram[offs + 0] == 0)
+			continue;
+
+		int sy = spriteram[offs + 0] - 16 + 1;
 		int sx = spriteram[offs + 3];
-		int sy = spriteram[offs + 0] - 15;
 		int code = (spriteram[offs + 1]) | ((spriteram[offs + 2] & 0x8) << 5) | ((m_gfx_ctrl & 3) << 9);
 		int color = (spriteram[offs + 2] & 0x07) | 8;
 		int flipx = (spriteram[offs + 2] & 0x40) >> 6;
 		int flipy = (spriteram[offs + 2] & 0x80) >> 7;
 
-		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
-				code,
-				color,
-				flipx,flipy,
-				sx,sy,0);
+		if (sy >= 0)
+		{
+			m_gfxdecode->gfx(1)->transpen(bitmap, cliprect, code, color, flipx, flipy, sx, sy, 0);
 
-		// wraparound
-		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
-				code,
-				color,
-				flipx,flipy,
-				sx-256,sy,0);
+			// wraparound x
+			m_gfxdecode->gfx(1)->transpen(bitmap, cliprect, code, color, flipx, flipy, sx - 256 , sy, 0);
+		}
 	}
 }
 
