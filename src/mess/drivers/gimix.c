@@ -113,6 +113,7 @@ public:
 	DECLARE_READ8_MEMBER(pia_pb_r);
 	DECLARE_WRITE8_MEMBER(pia_pb_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(test_timer_w);
+	DECLARE_INPUT_CHANGED_MEMBER(drive_size_cb);
 
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 
@@ -218,7 +219,7 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( gimix )
 	PORT_START("dma_s2")
-	PORT_DIPNAME(0x00000100,0x00000000,"5.25\" / 8\" floppy drive 0") PORT_DIPLOCATION("S2:9")
+	PORT_DIPNAME(0x00000100,0x00000000,"5.25\" / 8\" floppy drive 0") PORT_DIPLOCATION("S2:9") PORT_CHANGED_MEMBER(DEVICE_SELF,gimix_state,drive_size_cb,NULL)
 	PORT_DIPSETTING(0x00000000,"5.25\"")
 	PORT_DIPSETTING(0x00000100,"8\"")
 
@@ -462,6 +463,15 @@ WRITE_LINE_MEMBER(gimix_state::fdc_drq_w)
 		m_dma_status &= ~0x80;
 }
 
+INPUT_CHANGED_MEMBER(gimix_state::drive_size_cb)
+{
+	// set FDC clock based on DIP Switch S2-9 (5.25"/8" drive select)
+	if(m_dma_dip->read() & 0x00000100)
+		m_fdc->set_unscaled_clock(XTAL_8MHz / 4); // 8 inch (2MHz)
+	else
+		m_fdc->set_unscaled_clock(XTAL_8MHz / 8); // 5.25 inch (1MHz)
+}
+
 void gimix_state::machine_reset()
 {
 	m_term_data = 0;
@@ -477,7 +487,7 @@ void gimix_state::machine_reset()
 	membank("lower_ram")->set_base(m_ram->pointer());
 	membank("upper_ram")->set_base(m_ram->pointer()+0x10000);
 
-	// set FDC clock based on DIP Switch S2-9 (5.25"/8" drive select)
+	// initialise FDC clock based on DIP Switch S2-9 (5.25"/8" drive select)
 	if(m_dma_dip->read() & 0x00000100)
 		m_fdc->set_unscaled_clock(XTAL_8MHz / 4); // 8 inch (2MHz)
 	else
