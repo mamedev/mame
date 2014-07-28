@@ -793,7 +793,8 @@ void sgb_lcd_device::update_sprites()
 			data = (vram[adr + 1] << 8) | vram[adr];
 
 			/* Find the palette to use */
-			pal = m_sgb_pal_map[(xindex >> 3)][((yindex - SGB_YOFFSET) >> 3)] << 2;
+			// If sprite started before the start of the line we may need to pick a different pal_map entry?
+			pal = m_sgb_pal_map[(xindex < 0) ? 0 : (xindex >> 3)][((yindex - SGB_YOFFSET) >> 3)] << 2;
 
 			/* Offset to center of screen */
 			xindex += SGB_XOFFSET;
