@@ -169,7 +169,7 @@ ROM_START( antiairc )
 ROM_END
 
 
-ROM_START( crshnscr )
+ROM_START( crashnsc )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
 
 	ROM_REGION( 0x0400, "gfx", ROMREGION_ERASE00 )
@@ -288,7 +288,7 @@ ROM_START( steeplec )
 ROM_END
 
 
-ROM_START( stntcycl )
+ROM_START( stuntcyc )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
 
 	ROM_REGION( 0x0200, "gfx", ROMREGION_ERASE00 )
