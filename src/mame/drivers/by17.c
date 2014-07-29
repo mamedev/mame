@@ -71,7 +71,6 @@ private:
 	bool m_u11_timer;
 	UINT8 m_digit;
 	UINT8 m_segment;
-	UINT8 m_disp_info[3];
 	virtual void machine_reset();
 	required_device<m6800_cpu_device> m_maincpu;
 	required_device<pia6821_device> m_pia_u10;
@@ -267,14 +266,6 @@ INPUT_CHANGED_MEMBER( by17_state::self_test )
 
 WRITE_LINE_MEMBER( by17_state::u10_ca2_w )
 {
-	if (m_u10 == 15)
-	{
-		m_disp_info[0] = 1;
-		m_disp_info[1] = m_digit;
-		m_disp_info[2] = m_segment;
-	}
-	else
-		m_disp_info[0] = 0;
 }
 		
 WRITE_LINE_MEMBER( by17_state::u10_cb2_w )
@@ -297,15 +288,29 @@ READ8_MEMBER( by17_state::u10_a_r )
 
 WRITE8_MEMBER( by17_state::u10_a_w )
 {
+	static const UINT8 patterns[16] = { 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7d,0x07,0x7f,0x6f,0,0,0,0,0,0 }; // MC14543
 	m_segment = data >> 4;
 	m_u10_a = data;
 	m_u10 = (data & 15) | (BIT(m_u11_a, 0) << 4);
-//if (m_disp_info[0]) if (m_disp_info[2] < 15) printf("%X:%X:%X:%X ",m_u10,m_disp_info[0],m_disp_info[1],m_disp_info[2]);
-
-	if ((m_disp_info[0]) && (BIT(m_u10, 4)))
+	switch (m_u10)
 	{
-		static const UINT8 patterns[16] = { 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7d,0x07,0x7f,0x6f,0,0,0,0,0,0 }; // MC14543
-		output_set_digit_value(m_disp_info[1]+(m_u10&15)*8, patterns[m_disp_info[2]]);
+		case 0x10: // wrong
+			output_set_digit_value(m_digit, patterns[m_segment]);
+			break;
+		case 0x1d:
+			output_set_digit_value(8+m_digit, patterns[m_segment]);
+			break;
+		case 0x1b:
+			output_set_digit_value(16+m_digit, patterns[m_segment]);
+			break;
+		case 0x07:
+			output_set_digit_value(24+m_digit, patterns[m_segment]);
+			break;
+		case 0x0f:
+			output_set_digit_value(32+m_digit, patterns[m_segment]);
+			break;
+		default:
+			break;
 	}
 }
 
@@ -359,22 +364,22 @@ WRITE8_MEMBER( by17_state::u11_a_w )
 
 	m_digit = 0xff;
 	if BIT(data, 2)
-		m_digit = 5;
-	else
-	if BIT(data, 3)
 		m_digit = 4;
 	else
-	if BIT(data, 4)
+	if BIT(data, 3)
 		m_digit = 3;
 	else
-	if BIT(data, 5)
+	if BIT(data, 4)
 		m_digit = 2;
 	else
-	if BIT(data, 6)
+	if BIT(data, 5)
 		m_digit = 1;
 	else
-	if BIT(data, 7)
+	if BIT(data, 6)
 		m_digit = 0;
+	else
+	if BIT(data, 7)
+		m_digit = 5;
 }
 
 WRITE8_MEMBER( by17_state::u11_b_w )

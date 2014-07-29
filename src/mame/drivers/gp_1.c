@@ -352,7 +352,7 @@ WRITE8_MEMBER( gp_1_state::porta_w )
 
 WRITE8_MEMBER( gp_1_state::portc_w )
 {
-	output_set_value("led0", BIT(data, 3));
+	output_set_value("led0", !BIT(data, 3));
 	m_digit = data & 7;
 }
 
