@@ -80,6 +80,7 @@ public:
 	void fdc_drq_w(bool state);
 
 	void bankswitch();
+	void post_load();
 
 	// memory state
 	int m_mode;

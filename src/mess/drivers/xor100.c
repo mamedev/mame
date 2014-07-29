@@ -485,6 +485,8 @@ void xor100_state::machine_start()
 	membank("bank3")->configure_entry(0, rom);
 	membank("bank3")->configure_entries(1, banks, ram + 0xf800, 0x10000);
 
+	machine().save().register_postload(save_prepost_delegate(FUNC(xor100_state::post_load), this));
+
 	/* register for state saving */
 	save_item(NAME(m_mode));
 	save_item(NAME(m_bank));
@@ -492,12 +494,18 @@ void xor100_state::machine_start()
 	save_item(NAME(m_fdc_drq));
 	save_item(NAME(m_fdc_dden));
 	save_item(NAME(m_centronics_busy));
+	save_item(NAME(m_centronics_select));
 }
 
 void xor100_state::machine_reset()
 {
 	m_mode = EPROM_0000;
 
+	bankswitch();
+}
+
+void xor100_state::post_load()
+{
 	bankswitch();
 }
 
