@@ -952,7 +952,7 @@ void k053247_device::zdrawgfxzoom32GP(
 const device_type K055673 = &device_creator<k055673_device>;
 
 k055673_device::k055673_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: k053247_device(mconfig, K055673, "K055673 Sprite Generator", tag, owner, clock, "k055673", __FILE__)
+	: k053247_device(mconfig, K055673, "K053246 & K055673 Sprite Generator", tag, owner, clock, "k055673", __FILE__)
 {
 }
 
@@ -1093,7 +1093,7 @@ void k055673_device::device_start()
 const device_type K053246 = &device_creator<k053247_device>;
 
 k053247_device::k053247_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, K053246, "K053246 & 053247 Sprite Generator", tag, owner, clock, "k053247", __FILE__),
+	: device_t(mconfig, K053246, "K053246 & K053247 Sprite Generator", tag, owner, clock, "k053247", __FILE__),
 		device_video_interface(mconfig, *this),
 		m_gfxdecode(*this),
 		m_palette(*this)
@@ -1153,16 +1153,6 @@ void k053247_device::device_start()
 				8*64, 9*64, 10*64, 11*64, 12*64, 13*64, 14*64, 15*64 },
 		128*8
 	};
-	static const gfx_layout tasman_16x16_layout =
-	{
-		16,16,
-		RGN_FRAC(1,2),
-		8,
-		{ 0,8,16,24, RGN_FRAC(1,2)+0,RGN_FRAC(1,2)+8,RGN_FRAC(1,2)+16,RGN_FRAC(1,2)+24 },
-		{ 0,1,2,3,4,5,6,7, 32,33,34,35,36,37,38,39 },
-		{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64, 8*64, 9*64, 10*64, 11*64, 12*64, 13*64, 14*64, 15*64 },
-		16*64
-	};
 
 	/* decode the graphics */
 	switch (m_plane_order)
@@ -1170,11 +1160,6 @@ void k053247_device::device_start()
 	case NORMAL_PLANE_ORDER:
 		total = machine().root_device().memregion(m_memory_region)->bytes() / 128;
 		konami_decode_gfx(machine(), m_gfxdecode, m_palette, m_gfx_num, machine().root_device().memregion(m_memory_region)->base(), total, &spritelayout, 4);
-		break;
-
-	case TASMAN_PLANE_ORDER:
-		total = machine().root_device().memregion(m_memory_region)->bytes() / 128;
-		konami_decode_gfx(machine(), m_gfxdecode, m_palette, m_gfx_num, machine().root_device().memregion(m_memory_region)->base(), total, &tasman_16x16_layout, 4);
 		break;
 
 	default:

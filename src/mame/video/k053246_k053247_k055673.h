@@ -7,7 +7,6 @@
 #define __K05324x_H__
 
 #define NORMAL_PLANE_ORDER 0x0123
-#define TASMAN_PLANE_ORDER 0x1616
 
 typedef device_delegate<void (int *code, int *color, int *priority_mask)> k053247_cb_delegate;
 #define K053246_CB_MEMBER(_name)   void _name(int *code, int *color, int *priority_mask)
