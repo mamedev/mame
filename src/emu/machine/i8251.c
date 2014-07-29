@@ -59,6 +59,25 @@ void i8251_device::device_start()
 	m_rxrdy_handler.resolve_safe();
 	m_txrdy_handler.resolve_safe();
 	m_txempty_handler.resolve_safe();
+	save_item(NAME(m_flags));
+	save_item(NAME(m_sync_byte_offset));
+	save_item(NAME(m_sync_byte_count));
+	save_item(NAME(m_sync_bytes));
+	save_item(NAME(m_status));
+	save_item(NAME(m_command));
+	save_item(NAME(m_mode_byte));
+	save_item(NAME(m_cts));
+	save_item(NAME(m_dsr));
+	save_item(NAME(m_rxd));
+	save_item(NAME(m_rxc));
+	save_item(NAME(m_txc));
+	save_item(NAME(m_rxc_count));
+	save_item(NAME(m_txc_count));
+	save_item(NAME(m_br_factor));
+	save_item(NAME(m_data));
+	save_item(NAME(m_tx_busy));
+	save_item(NAME(m_disable_tx_pending));
+	device_serial_interface::register_save_state(machine().save(), name(), tag());
 }
 
 

@@ -43,8 +43,10 @@ ioport_constructor serial_keyboard_device::device_input_ports() const
 
 void serial_keyboard_device::device_start()
 {
-	/// HACK: the base class resolves a handler in device_start()
-	m_timer = timer_alloc();
+	generic_keyboard_device::device_start();
+	device_serial_interface::register_save_state(machine().save(), name(), tag());
+	save_item(NAME(m_curr_key));
+	save_item(NAME(m_key_valid));
 }
 
 WRITE_LINE_MEMBER(serial_keyboard_device::update_serial)

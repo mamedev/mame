@@ -235,6 +235,8 @@ void generic_keyboard_device::device_start()
 {
 	m_keyboard_cb.resolve_safe();
 	m_timer = timer_alloc();
+	save_item(NAME(m_last_code));
+	save_item(NAME(m_scan_line));
 }
 
 void generic_keyboard_device::device_reset()

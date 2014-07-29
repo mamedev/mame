@@ -130,6 +130,8 @@ protected:
 	const char *parity_tostring(parity_t stop_bits);
 	const char *stop_bits_tostring(stop_bits_t stop_bits);
 
+	void register_save_state(save_manager &save, const char *module, const char *tag);
+
 private:
 	enum { TRA_TIMER_ID = 10000, RCV_TIMER_ID };
 
