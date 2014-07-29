@@ -88,7 +88,8 @@ public:
 	cc40_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_dac(*this, "dac")
+		m_dac(*this, "dac"),
+		m_battery_inp(*this, "BATTERY")
 	{
 		m_sysram[0] = NULL;
 		m_sysram[1] = NULL;
@@ -96,6 +97,7 @@ public:
 
 	required_device<tms70c20_device> m_maincpu;
 	required_device<dac_device> m_dac;
+	required_ioport m_battery_inp;
 
 	nvram_device *m_nvram[2];
 	ioport_port *m_key_matrix[8];
@@ -303,7 +305,7 @@ WRITE8_MEMBER(cc40_state::sound_w)
 READ8_MEMBER(cc40_state::battery_r)
 {
 	// d0: low battery sense line (0 = low power)
-	return 1;
+	return m_battery_inp->read();
 }
 
 READ8_MEMBER(cc40_state::bankswitch_r)
@@ -414,6 +416,11 @@ static INPUT_PORTS_START( cc40 )
 	PORT_CONFSETTING(    0x00, "None" ) // note: invalid configuration, unless Chip 1 is also 0x00
 	PORT_CONFSETTING(    0x10, "2KB" )
 	PORT_CONFSETTING(    0x40, "8KB" )
+
+	PORT_START("BATTERY")
+	PORT_CONFNAME( 0x01, 0x01, "Battery Status" )
+	PORT_CONFSETTING(    0x00, "Low" )
+	PORT_CONFSETTING(    0x01, DEF_STR( Normal ) )
 
 	// 8x8 keyboard matrix, RESET and ON buttons are not on it. Unused entries are not connected, but some might have a purpose for factory testing(?)
 	// The numpad number keys are shared with the ones on the main keyboard, also on the real machine.

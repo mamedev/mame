@@ -62,7 +62,6 @@
   TODO:
   - it runs too fast due to missing clock divider emulation in TMS70C46
   - external ram cartridge
-  - battery low/ok status.. setting INT1 on reset seems to clear it
   - DOCK-BUS interface and peripherals, compatible with both TI-74 and TI-95
     * CI-7 cassette interface
     * PC-324 thermal printer
@@ -85,10 +84,12 @@ class ti74_state : public driver_device
 public:
 	ti74_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu")
+		m_maincpu(*this, "maincpu"),
+		m_battery_inp(*this, "BATTERY")
 	{ }
 
 	required_device<tms70c46_device> m_maincpu;
+	required_ioport m_battery_inp;
 
 	ioport_port *m_key_matrix[8];
 
@@ -96,6 +97,7 @@ public:
 	UINT8 m_power;
 
 	void update_lcd_indicator(UINT8 y, UINT8 x, int state);
+	void update_battery_status(int state);
 
 	DECLARE_READ8_MEMBER(keyboard_r);
 	DECLARE_WRITE8_MEMBER(keyboard_w);
@@ -104,6 +106,7 @@ public:
 	virtual void machine_reset();
 	virtual void machine_start();
 	DECLARE_PALETTE_INIT(ti74);
+	DECLARE_INPUT_CHANGED_MEMBER(battery_status_changed);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(ti74_cartridge);
 };
 
@@ -272,7 +275,7 @@ WRITE8_MEMBER(ti74_state::bankswitch_w)
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, ti74_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x1000, 0x1001) AM_DEVREADWRITE("hd44780", hd44780_device, read, write)
-	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_SHARE("6264.ic3")
+	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_SHARE("sysram.ic3")
 	AM_RANGE(0x4000, 0xbfff) AM_ROM AM_REGION("user1", 0)
 	AM_RANGE(0xc000, 0xdfff) AM_ROMBANK("sysbank")
 ADDRESS_MAP_END
@@ -291,7 +294,18 @@ ADDRESS_MAP_END
 
 ***************************************************************************/
 
+INPUT_CHANGED_MEMBER(ti74_state::battery_status_changed)
+{
+	if (machine().phase() == MACHINE_PHASE_RUNNING)
+		update_battery_status(newval);
+}
+
 static INPUT_PORTS_START( ti74 )
+	PORT_START("BATTERY")
+	PORT_CONFNAME( 0x01, 0x01, "Battery Status" ) PORT_CHANGED_MEMBER(DEVICE_SELF, ti74_state, battery_status_changed, 0)
+	PORT_CONFSETTING(    0x00, "Low" )
+	PORT_CONFSETTING(    0x01, DEF_STR( Normal ) )
+
 	// 8x8 keyboard matrix, RESET and ON buttons are not on it. Unused entries are not connected, but some have a purpose for factory testing.
 	// For convenience, number keys are mapped to number row too.
 	// PORT_NAME lists functions under [SHIFT] and [MODE] or [STAT] as secondaries.
@@ -377,6 +391,11 @@ static INPUT_PORTS_START( ti74 )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( ti95 )
+	PORT_START("BATTERY")
+	PORT_CONFNAME( 0x01, 0x01, "Battery Status" ) PORT_CHANGED_MEMBER(DEVICE_SELF, ti74_state, battery_status_changed, 0)
+	PORT_CONFSETTING(    0x00, "Low" )
+	PORT_CONFSETTING(    0x01, DEF_STR( Normal ) )
+
 	// 8x8 keyboard matrix, RESET and ON buttons are not on it.
 	// For convenience, number keys are mapped to number row too.
 	// PORT_NAME lists functions under [ALPHA] and [2nd] as secondaries.
@@ -469,9 +488,17 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
+void ti74_state::update_battery_status(int state)
+{
+	// battery ok/low status is on int1 line!
+	m_maincpu->set_input_line(TMS7000_INT1_LINE, state ? ASSERT_LINE : CLEAR_LINE);
+}
+
 void ti74_state::machine_reset()
 {
 	m_power = 1;
+	
+	update_battery_status(m_battery_inp->read());
 }
 
 void ti74_state::machine_start()
@@ -485,7 +512,7 @@ void ti74_state::machine_start()
 
 	// zerofill
 	m_key_select = 0;
-	m_power = 1;
+	m_power = 0;
 
 	// register for savestates
 	save_item(NAME(m_key_select));
@@ -499,7 +526,7 @@ static MACHINE_CONFIG_START( ti74, ti74_state )
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(main_io_map)
 
-	MCFG_NVRAM_ADD_0FILL("6264.ic3")
+	MCFG_NVRAM_ADD_0FILL("sysram.ic3")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", LCD)
@@ -534,7 +561,7 @@ static MACHINE_CONFIG_START( ti95, ti74_state )
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(main_io_map)
 
-	MCFG_NVRAM_ADD_0FILL("6264.ic3")
+	MCFG_NVRAM_ADD_0FILL("sysram.ic3")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", LCD)
