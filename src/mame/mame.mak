@@ -2532,6 +2532,7 @@ $(DRIVERS)/blockade.o:  $(LAYOUT)/blockade.lh
 $(DRIVERS)/buggychl.o:  $(LAYOUT)/buggychl.lh
 
 $(DRIVERS)/by17.o:      $(LAYOUT)/by17.lh
+$(DRIVERS)/by35.o:      $(LAYOUT)/by35.lh
 
 $(DRIVERS)/bzone.o:     $(LAYOUT)/bzone.lh \
 			$(LAYOUT)/redbaron.lh
