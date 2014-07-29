@@ -1956,7 +1956,7 @@ void ioport_field::frame_update(ioport_value &result, bool mouse_down)
 		curstate = false;
 
 	// additional logic to restrict digital joysticks
-	if (curstate && !mouse_down && m_live->joystick != NULL && m_way != 16 && !machine().options().joystick_contradictory())
+	if (curstate && !m_digital_value && !mouse_down && m_live->joystick != NULL && m_way != 16 && !machine().options().joystick_contradictory())
 	{
 		UINT8 mask = (m_way == 4) ? m_live->joystick->current4way() : m_live->joystick->current();
 		if (!(mask & (1 << m_live->joydir)))
