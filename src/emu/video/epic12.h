@@ -51,7 +51,10 @@ class epic12_device : public device_t,
 public:
 	epic12_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	void set_rambase(UINT16* rambase) { epic12_device_ram16 = rambase; }
+	void set_rambase(UINT16* rambase) { m_ram16 = rambase; }
+	void set_delay_scale(int delay_scale) { m_delay_scale = delay_scale; }
+	void set_is_unsafe(int is_unsafe) { m_is_unsafe = is_unsafe; }
+	void set_cpu_device(cpu_device* maincpu) { m_maincpu = maincpu; }
 
 	inline UINT16 READ_NEXT_WORD(offs_t *addr);
 
@@ -62,64 +65,56 @@ public:
 		dev.m_main_rammask = ramsize-1;
 	}
 
-
 	static void *blit_request_callback(void *param, int threadid);
 
-	DECLARE_READ64_MEMBER( epic12_device_fpga_r );
-	DECLARE_WRITE64_MEMBER( epic12_device_fpga_w );
+	DECLARE_READ64_MEMBER( fpga_r );
+	DECLARE_WRITE64_MEMBER( fpga_w );
 
 	void draw_screen(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	UINT16* epic12_device_ram16;
-	UINT32 epic12_device_gfx_addr;
-	UINT32 epic12_device_gfx_scroll_0_x, epic12_device_gfx_scroll_0_y;
-	UINT32 epic12_device_gfx_scroll_1_x, epic12_device_gfx_scroll_1_y;
+	UINT16* m_ram16;
+	UINT32 m_gfx_addr;
+	UINT32 m_gfx_scroll_0_x, m_gfx_scroll_0_y;
+	UINT32 m_gfx_scroll_1_x, m_gfx_scroll_1_y;
 
+	int m_gfx_size;
+	bitmap_rgb32 *m_bitmaps;
+	rectangle m_clip;
 
-	int epic12_device_gfx_size;
-	bitmap_rgb32 *epic12_device_bitmaps;
-	rectangle epic12_device_clip;
-
-
-	UINT16* use_ram;
+	UINT16* m_use_ram;
 	int m_main_ramsize; // type D has double the main ram
 	int m_main_rammask;
-
-	// thread safe mode, with no delays & shadow ram copy
-	DECLARE_READ32_MEMBER(epic12_device_blitter_r);
-	DECLARE_WRITE32_MEMBER(epic12_device_blitter_w);
-	UINT32 epic12_device_gfx_addr_shadowcopy;
-	UINT32 epic12_device_gfx_scroll_0_x_shadowcopy, epic12_device_gfx_scroll_0_y_shadowcopy;
-	UINT32 epic12_device_gfx_scroll_1_x_shadowcopy, epic12_device_gfx_scroll_1_y_shadowcopy;
-	UINT16* epic12_device_ram16_copy;
-	inline void epic12_device_gfx_upload_shadow_copy(address_space &space, offs_t *addr);
-	inline void epic12_device_gfx_create_shadow_copy(address_space &space);
-	inline UINT16 COPY_NEXT_WORD(address_space &space, offs_t *addr);
-	inline void epic12_device_gfx_draw_shadow_copy(address_space &space, offs_t *addr);
-	inline void epic12_device_gfx_upload(offs_t *addr);
-	inline void epic12_device_gfx_draw(offs_t *addr);
-	void epic12_device_gfx_exec(void);
-	DECLARE_READ32_MEMBER( epic12_device_gfx_ready_r );
-	DECLARE_WRITE32_MEMBER( epic12_device_gfx_exec_w );
-
-
-	// for thread unsafe mode with blitter delays, no shadow copy of RAM
-	DECLARE_READ32_MEMBER(epic12_device_blitter_r_unsafe);
-	DECLARE_WRITE32_MEMBER(epic12_device_blitter_w_unsafe);
-	READ32_MEMBER( epic12_device_gfx_ready_r_unsafe );
-	WRITE32_MEMBER( epic12_device_gfx_exec_w_unsafe );
-	void epic12_device_gfx_exec_unsafe(void);
-	static void *blit_request_callback_unsafe(void *param, int threadid);
 
 	int m_is_unsafe;
 	int m_delay_scale;
 	cpu_device* m_maincpu;
 
-	void set_delay_scale(int delay_scale) { m_delay_scale = delay_scale; }
-	void set_is_unsafe(int is_unsafe) { m_is_unsafe = is_unsafe; }
-	void set_cpu_device(cpu_device* maincpu) { m_maincpu = maincpu; }
-
 	void install_handlers(int addr1, int addr2);
+
+	// thread safe mode, with no delays & shadow ram copy
+	DECLARE_READ32_MEMBER(blitter_r);
+	DECLARE_WRITE32_MEMBER(blitter_w);
+	UINT32 m_gfx_addr_shadowcopy;
+	UINT32 m_gfx_scroll_0_x_shadowcopy, m_gfx_scroll_0_y_shadowcopy;
+	UINT32 m_gfx_scroll_1_x_shadowcopy, m_gfx_scroll_1_y_shadowcopy;
+	UINT16* m_ram16_copy;
+	inline void gfx_upload_shadow_copy(address_space &space, offs_t *addr);
+	inline void gfx_create_shadow_copy(address_space &space);
+	inline UINT16 COPY_NEXT_WORD(address_space &space, offs_t *addr);
+	inline void gfx_draw_shadow_copy(address_space &space, offs_t *addr);
+	inline void gfx_upload(offs_t *addr);
+	inline void gfx_draw(offs_t *addr);
+	void gfx_exec(void);
+	DECLARE_READ32_MEMBER( gfx_ready_r );
+	DECLARE_WRITE32_MEMBER( gfx_exec_w );
+
+	// for thread unsafe mode with blitter delays, no shadow copy of RAM
+	DECLARE_READ32_MEMBER(blitter_r_unsafe);
+	DECLARE_WRITE32_MEMBER(blitter_w_unsafe);
+	READ32_MEMBER( gfx_ready_r_unsafe );
+	WRITE32_MEMBER( gfx_exec_w_unsafe );
+	void gfx_exec_unsafe(void);
+	static void *blit_request_callback_unsafe(void *param, int threadid);
 
 #define BLIT_FUNCTION static const void
 #define BLIT_PARAMS bitmap_rgb32 *bitmap, const rectangle *clip, UINT32 *gfx, int src_x, int src_y, const int dst_x_start, const int dst_y_start, int dimx, int dimy, const int flipy, const UINT8 s_alpha, const UINT8 d_alpha, const clr_t *tint_clr
@@ -832,14 +827,14 @@ protected:
 	virtual void device_start();
 	virtual void device_reset();
 
-	osd_work_queue *    queue;                  /* work queue */
-	osd_work_item * blitter_request;
+	osd_work_queue *m_work_queue;
+	osd_work_item *m_blitter_request;
 
 	// blit timing
-	emu_timer *epic12_device_blitter_delay_timer;
-	int blitter_busy;
+	emu_timer *m_blitter_delay_timer;
+	int m_blitter_busy;
 
-	TIMER_CALLBACK_MEMBER( epic12_device_blitter_delay_callback );
+	TIMER_CALLBACK_MEMBER( blitter_delay_callback );
 };
 
 

@@ -349,7 +349,7 @@ static ADDRESS_MAP_START( cv1k_port, AS_IO, 64, cv1k_state )
 	AM_RANGE(SH3_PORT_E, SH3_PORT_E+7) AM_READ( cv1k_flash_port_e_r )
 	AM_RANGE(SH3_PORT_F, SH3_PORT_F+7) AM_READ_PORT("PORT_F")
 	AM_RANGE(SH3_PORT_L, SH3_PORT_L+7) AM_READ_PORT("PORT_L")
-	AM_RANGE(SH3_PORT_J, SH3_PORT_J+7) AM_DEVREADWRITE( "blitter", epic12_device, epic12_device_fpga_r, epic12_device_fpga_w )
+	AM_RANGE(SH3_PORT_J, SH3_PORT_J+7) AM_DEVREADWRITE( "blitter", epic12_device, fpga_r, fpga_w )
 ADDRESS_MAP_END
 
 

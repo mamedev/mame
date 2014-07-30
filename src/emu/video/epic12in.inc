@@ -1,5 +1,4 @@
-
-
+/* blitter function */
 
 const void epic12_device::FUNCNAME(BLIT_PARAMS)
 {
