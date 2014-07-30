@@ -1072,13 +1072,13 @@ int render_target::configured_view(const char *viewname, int targetindex, int nu
 			for (view = view_by_index(viewindex = 0); view != NULL; view = view_by_index(++viewindex))
 			{
 				const render_screen_list &viewscreens = view->screens();
-				if (viewscreens.count() == 1 && viewscreens.contains(*screen))
-					break;
 				if (viewscreens.count() == 0)
 				{
 					view = NULL;
 					break;
 				}
+				else if (viewscreens.count() == viewscreens.contains(*screen))
+					break;
 			}
 		}
 

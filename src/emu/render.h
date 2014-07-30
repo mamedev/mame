@@ -253,11 +253,12 @@ public:
 	void reset() { m_list.reset(); }
 
 	// query
-	bool contains(screen_device &screen) const
+	int contains(screen_device &screen) const
 	{
+		int count = 0;
 		for (item *curitem = m_list.first(); curitem != NULL; curitem = curitem->m_next)
-			if (&curitem->m_screen == &screen) return true;
-		return false;
+			if (&curitem->m_screen == &screen) count++;
+		return count;
 	}
 
 private:
