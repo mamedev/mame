@@ -618,7 +618,7 @@ void epic12_device::epic12_device_gfx_exec(void)
 void epic12_device::epic12_device_gfx_exec_unsafe(void)
 {
 	offs_t addr = epic12_device_gfx_addr & 0x1fffffff;
-	epic12_device_clip.set(epic12_device_gfx_scroll_1_x_shadowcopy, epic12_device_clip.min_x + 320-1, epic12_device_gfx_scroll_1_y_shadowcopy, epic12_device_clip.min_y + 240-1);
+	epic12_device_clip.set(epic12_device_gfx_scroll_1_x, epic12_device_clip.min_x + 320-1, epic12_device_gfx_scroll_1_y, epic12_device_clip.min_y + 240-1);
 
 //  logerror("GFX EXEC: %08X\n", addr);
 
@@ -634,7 +634,7 @@ void epic12_device::epic12_device_gfx_exec_unsafe(void)
 
 			case 0xc000:
 				if (READ_NEXT_WORD(&addr)) // cliptype
-					epic12_device_clip.set(epic12_device_gfx_scroll_1_x_shadowcopy, epic12_device_clip.min_x + 320-1, epic12_device_gfx_scroll_1_y_shadowcopy, epic12_device_clip.min_y + 240-1);
+					epic12_device_clip.set(epic12_device_gfx_scroll_1_x, epic12_device_clip.min_x + 320-1, epic12_device_gfx_scroll_1_y, epic12_device_clip.min_y + 240-1);
 				else
 					epic12_device_clip.set(0, 0x2000-1, 0, 0x1000-1);
 				break;
