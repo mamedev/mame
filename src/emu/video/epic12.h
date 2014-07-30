@@ -1,3 +1,4 @@
+/* emulation of Altera Cyclone EPIC12 FPGA programmed as a blitter */
 
 #define MCFG_EPIC12_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, EPIC12, 0)
@@ -50,7 +51,7 @@ class epic12_device : public device_t,
 public:
 	epic12_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	static void set_rambase(device_t &device, UINT16* rambase);
+	void set_rambase(UINT16* rambase) { epic12_device_ram16 = rambase; }
 
 	inline UINT16 READ_NEXT_WORD(offs_t *addr);
 
@@ -67,7 +68,7 @@ public:
 	DECLARE_READ64_MEMBER( epic12_device_fpga_r );
 	DECLARE_WRITE64_MEMBER( epic12_device_fpga_w );
 
-	void draw_screen(bitmap_rgb32 &bitmap, const rectangle &cliprect );
+	void draw_screen(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	UINT16* epic12_device_ram16;
 	UINT32 epic12_device_gfx_addr;
@@ -94,7 +95,7 @@ public:
 	inline void epic12_device_gfx_upload_shadow_copy(address_space &space, offs_t *addr);
 	inline void epic12_device_gfx_create_shadow_copy(address_space &space);
 	inline UINT16 COPY_NEXT_WORD(address_space &space, offs_t *addr);
-	inline void epic12_device_gfx_draw_shadow_copy(address_space &space, offs_t *addr, int cliptype);
+	inline void epic12_device_gfx_draw_shadow_copy(address_space &space, offs_t *addr);
 	inline void epic12_device_gfx_upload(offs_t *addr);
 	inline void epic12_device_gfx_draw(offs_t *addr);
 	void epic12_device_gfx_exec(void);
@@ -114,9 +115,9 @@ public:
 	int m_delay_scale;
 	cpu_device* m_maincpu;
 
-	static void set_delay_scale(device_t &device, int delay_scale);
-	static void set_is_unsafe(device_t &device, int is_unsafe);
-	static void set_cpu_device(device_t &device, cpu_device* maincpu);
+	void set_delay_scale(int delay_scale) { m_delay_scale = delay_scale; }
+	void set_is_unsafe(int is_unsafe) { m_is_unsafe = is_unsafe; }
+	void set_cpu_device(cpu_device* maincpu) { m_maincpu = maincpu; }
 
 	void install_handlers(int addr1, int addr2);
 
@@ -831,8 +832,6 @@ protected:
 	virtual void device_start();
 	virtual void device_reset();
 
-
-
 	osd_work_queue *    queue;                  /* work queue */
 	osd_work_item * blitter_request;
 
@@ -841,13 +840,7 @@ protected:
 	int blitter_busy;
 
 	TIMER_CALLBACK_MEMBER( epic12_device_blitter_delay_callback );
-
-
-private:
 };
-
-
-
 
 
 

@@ -162,7 +162,7 @@ Speedups
  - Need SH3 recompiler?
 
 Blitter Timing
- - Correct slowdown emulation and flags (depends on blit mode, and speed of RAM) - could do with the recompiler or alt idle skips on the busy flag wait looops
+ - Correct slowdown emulation and flags (depends on blit mode, and speed of RAM) - could do with the recompiler or alt idle skips on the busy flag wait loops
  - End of Blit IRQ? (one game has a valid irq routine that looks like it was used for profiling, but nothing depends on it)
 
 */
@@ -187,7 +187,7 @@ public:
 		m_blitter(*this, "blitter"),
 		m_serflash(*this, "game"),
 		m_eeprom(*this, "eeprom"),
-		cv1k_ram(*this, "mainram"),
+		m_ram(*this, "mainram"),
 		m_blitrate(*this, "BLITRATE"),
 		m_eepromout(*this, "EEPROMOUT") { }
 
@@ -196,7 +196,7 @@ public:
 	required_device<serflash_device> m_serflash;
 	required_device<rtc9701_device> m_eeprom;
 
-	required_shared_ptr<UINT64> cv1k_ram;
+	required_shared_ptr<UINT64> m_ram;
 
 	DECLARE_READ8_MEMBER(cv1k_flash_io_r);
 	DECLARE_WRITE8_MEMBER(cv1k_flash_io_w);
@@ -204,10 +204,9 @@ public:
 	DECLARE_WRITE8_MEMBER(serial_rtc_eeprom_w);
 	DECLARE_READ64_MEMBER(cv1k_flash_port_e_r);
 
-	INTERRUPT_GEN_MEMBER(cv1k_interrupt);
 	UINT32 screen_update_cv1k(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	DECLARE_MACHINE_RESET( cv1k );
+	virtual void machine_reset();
 
 	/* game specific */
 	DECLARE_READ64_MEMBER(mushisam_speedup_r);
@@ -231,7 +230,7 @@ public:
 
 UINT32 cv1k_state::screen_update_cv1k(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	epic12_device::set_delay_scale(m_blitter, m_blitrate->read());
+	m_blitter->set_delay_scale(m_blitrate->read());
 
 	m_blitter->draw_screen(bitmap,cliprect);
 	return 0;
@@ -242,7 +241,7 @@ UINT32 cv1k_state::screen_update_cv1k(screen_device &screen, bitmap_rgb32 &bitma
 
 READ64_MEMBER( cv1k_state::cv1k_flash_port_e_r )
 {
-	return  ((m_serflash->flash_ready_r(space, offset) ? 0x20 : 0x00)) | 0xdf;
+	return ((m_serflash->flash_ready_r(space, offset) ? 0x20 : 0x00)) | 0xdf;
 }
 
 
@@ -298,7 +297,7 @@ READ8_MEMBER( cv1k_state::serial_rtc_eeprom_r )
 {
 	switch (offset)
 	{
-		case 1:
+		case 0x01:
 			return 0xfe | m_eeprom->read_bit();
 
 		default:
@@ -315,10 +314,11 @@ WRITE8_MEMBER( cv1k_state::serial_rtc_eeprom_w )
 			break;
 		case 0x03:
 			m_serflash->flash_enab_w(space,offset,data);
-			return;
+			break;
+
 		default:
-			logerror("unknown serial_rtc_eeprom_w access offset %02x data %02x\n",offset, data);
-		break;
+			logerror("unknown serial_rtc_eeprom_w access offset %02x data %02x\n", offset, data);
+			break;
 	}
 }
 
@@ -409,21 +409,17 @@ static INPUT_PORTS_START( cv1k )
 INPUT_PORTS_END
 
 
-INTERRUPT_GEN_MEMBER(cv1k_state::cv1k_interrupt)
+void cv1k_state::machine_reset()
 {
-	m_maincpu->set_input_line(2, HOLD_LINE);
-}
-
-MACHINE_RESET_MEMBER( cv1k_state, cv1k )
-{
-	epic12_device::set_rambase (m_blitter, reinterpret_cast<UINT16 *>(cv1k_ram.target()));
-	epic12_device::set_cpu_device (m_blitter, m_maincpu );
-	epic12_device::set_is_unsafe(m_blitter, machine().root_device().ioport(":BLITCFG")->read());
+	m_blitter->set_rambase (reinterpret_cast<UINT16 *>(m_ram.target()));
+	m_blitter->set_cpu_device (m_maincpu);
+	m_blitter->set_is_unsafe(machine().root_device().ioport(":BLITCFG")->read());
 	m_blitter->install_handlers( 0x18000000, 0x18000057 );
 	m_blitter->reset();
 }
 
 static MACHINE_CONFIG_START( cv1k, cv1k_state )
+
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SH3BE, CPU_CLOCK)
 	MCFG_SH4_MD0(0)  // none of this is verified
@@ -438,7 +434,7 @@ static MACHINE_CONFIG_START( cv1k, cv1k_state )
 	MCFG_SH4_CLOCK(CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(cv1k_map)
 	MCFG_CPU_IO_MAP(cv1k_port)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cv1k_state, cv1k_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", cv1k_state, irq2_line_hold)
 
 	MCFG_RTC9701_ADD("eeprom")
 	MCFG_SERFLASH_ADD("game")
@@ -451,10 +447,7 @@ static MACHINE_CONFIG_START( cv1k, cv1k_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 0x140-1, 0, 0xf0-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cv1k_state, screen_update_cv1k)
 
-
 	MCFG_PALETTE_ADD("palette", 0x10000)
-
-	MCFG_MACHINE_RESET_OVERRIDE(cv1k_state, cv1k)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MCFG_YMZ770_ADD("ymz770", XTAL_16_384MHz)
@@ -466,6 +459,8 @@ static MACHINE_CONFIG_START( cv1k, cv1k_state )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( cv1k_d, cv1k )
+
+	/* basic machine hardware */
 	MCFG_DEVICE_REMOVE("maincpu")
 
 	MCFG_CPU_ADD("maincpu", SH3BE, CPU_CLOCK)
@@ -481,7 +476,7 @@ static MACHINE_CONFIG_DERIVED( cv1k_d, cv1k )
 	MCFG_SH4_CLOCK(CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(cv1k_d_map)
 	MCFG_CPU_IO_MAP(cv1k_port)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cv1k_state, cv1k_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", cv1k_state, irq2_line_hold)
 
 	MCFG_DEVICE_MODIFY("blitter")
 	MCFG_EPIC12_SET_MAINRAMSIZE(0x1000000)
@@ -804,7 +799,7 @@ READ64_MEMBER( cv1k_state::mushisam_speedup_r )
 	if ( pc == 0xc04a0aa ) m_maincpu->spin_until_time( attotime::from_usec(10)); // mushisam
 	else if (pc == 0xc04a0da)  m_maincpu->spin_until_time( attotime::from_usec(10)); // mushitam
 //  else printf("read %08x\n", m_maincpu->pc());
-	return cv1k_ram[0x0022f0/8];
+	return m_ram[0x0022f0/8];
 }
 
 DRIVER_INIT_MEMBER(cv1k_state,mushisam)
@@ -816,7 +811,7 @@ READ64_MEMBER( cv1k_state::mushisama_speedup_r )
 {
 	if (m_maincpu->pc()== 0xc04a2aa ) m_maincpu->spin_until_time( attotime::from_usec(10)); // mushisam
 //  else printf("read %08x\n", m_maincpu->pc());
-	return cv1k_ram[0x00024d8/8];
+	return m_ram[0x00024d8/8];
 }
 
 DRIVER_INIT_MEMBER(cv1k_state,mushisama)
@@ -833,7 +828,7 @@ READ64_MEMBER( cv1k_state::espgal2_speedup_r )
 	if ( pc == 0xc0519a2 ) m_maincpu->spin_until_time( attotime::from_usec(10)); // deathsml
 	if ( pc == 0xc1d1346 ) m_maincpu->spin_until_time( attotime::from_usec(10)); // dpddfk / dsmbl
 //  else printf("read %08x\n", m_maincpu->pc());
-	return cv1k_ram[0x002310/8];
+	return m_ram[0x002310/8];
 }
 
 DRIVER_INIT_MEMBER(cv1k_state,espgal2)

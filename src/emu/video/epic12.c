@@ -33,39 +33,11 @@ epic12_device::epic12_device(const machine_config &mconfig, const char *tag, dev
 	epic12_device_gfx_scroll_1_y_shadowcopy = 0;
 	epic12_device_ram16_copy = 0;
 	epic12_device_blit_delay = 0;
-
 }
 
 TIMER_CALLBACK_MEMBER( epic12_device::epic12_device_blitter_delay_callback )
 {
 	blitter_busy = 0;
-}
-
-// static
-	void epic12_device::set_rambase(device_t &device, UINT16* rambase)
-{
-	epic12_device &dev = downcast<epic12_device &>(device);
-	dev.epic12_device_ram16 = rambase;
-}
-
-
-void epic12_device::set_delay_scale(device_t &device, int delay_scale)
-{
-	epic12_device &dev = downcast<epic12_device &>(device);
-	dev.m_delay_scale = delay_scale;
-}
-
-void epic12_device::set_is_unsafe(device_t &device, int is_unsafe)
-{
-	epic12_device &dev = downcast<epic12_device &>(device);
-	dev.m_is_unsafe = is_unsafe;
-
-}
-
-void epic12_device::set_cpu_device(device_t &device, cpu_device* maincpu)
-{
-	epic12_device &dev = downcast<epic12_device &>(device);
-	dev.m_maincpu = maincpu;
 }
 
 
@@ -74,15 +46,12 @@ void epic12_device::device_start()
 	epic12_device_gfx_size = 0x2000 * 0x1000;
 	epic12_device_bitmaps = auto_bitmap_rgb32_alloc(machine(), 0x2000, 0x1000);
 	epic12_device_clip = epic12_device_bitmaps->cliprect();
-
+	epic12_device_clip.set(0, 0x2000-1, 0, 0x1000-1);
+	
 	epic12_device_ram16_copy = auto_alloc_array(machine(), UINT16, m_main_ramsize/2);
-
-
 
 	epic12_device_blitter_delay_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(epic12_device::epic12_device_blitter_delay_callback),this));
 	epic12_device_blitter_delay_timer->adjust(attotime::never);
-
-
 }
 
 void epic12_device::device_reset()
@@ -326,7 +295,7 @@ epic12_device_blitfunction epic12_device_f1_ti0_tr0_blit_funcs[] =
 
 
 
-inline void epic12_device::epic12_device_gfx_draw_shadow_copy(address_space &space, offs_t *addr, int cliptype)
+inline void epic12_device::epic12_device_gfx_draw_shadow_copy(address_space &space, offs_t *addr)
 {
 	COPY_NEXT_WORD(space, addr);
 	COPY_NEXT_WORD(space, addr);
@@ -567,12 +536,7 @@ inline void epic12_device::epic12_device_gfx_draw(offs_t *addr)
 void epic12_device::epic12_device_gfx_create_shadow_copy(address_space &space)
 {
 	offs_t addr = epic12_device_gfx_addr & 0x1fffffff;
-	UINT16 cliptype = 0;
-
-	epic12_device_clip.min_x = epic12_device_gfx_scroll_1_x_shadowcopy;
-	epic12_device_clip.min_y = epic12_device_gfx_scroll_1_y_shadowcopy;
-	epic12_device_clip.max_x = epic12_device_clip.min_x + 320-1;
-	epic12_device_clip.max_y = epic12_device_clip.min_y + 240-1;
+	epic12_device_clip.set(epic12_device_gfx_scroll_1_x_shadowcopy, epic12_device_clip.min_x + 320-1, epic12_device_gfx_scroll_1_y_shadowcopy, epic12_device_clip.min_y + 240-1);
 
 	while (1)
 	{
@@ -585,25 +549,10 @@ void epic12_device::epic12_device_gfx_create_shadow_copy(address_space &space)
 				return;
 
 			case 0xc000:
-				data = COPY_NEXT_WORD(space, &addr);
-
-				cliptype = data ? 1 : 0;
-
-				if (cliptype)
-				{
-					epic12_device_clip.min_x = epic12_device_gfx_scroll_1_x_shadowcopy;
-					epic12_device_clip.min_y = epic12_device_gfx_scroll_1_y_shadowcopy;
-					epic12_device_clip.max_x = epic12_device_clip.min_x + 320-1;
-					epic12_device_clip.max_y = epic12_device_clip.min_y + 240-1;
-				}
+				if (COPY_NEXT_WORD(space, &addr)) // cliptype
+					epic12_device_clip.set(epic12_device_gfx_scroll_1_x_shadowcopy, epic12_device_clip.min_x + 320-1, epic12_device_gfx_scroll_1_y_shadowcopy, epic12_device_clip.min_y + 240-1);
 				else
-				{
-					epic12_device_clip.min_x = 0;
-					epic12_device_clip.min_y = 0;
-					epic12_device_clip.max_x = 0x2000-1;
-					epic12_device_clip.max_y = 0x1000-1;
-				}
-
+					epic12_device_clip.set(0, 0x2000-1, 0, 0x1000-1);
 				break;
 
 			case 0x2000:
@@ -613,7 +562,7 @@ void epic12_device::epic12_device_gfx_create_shadow_copy(address_space &space)
 
 			case 0x1000:
 				addr -= 2;
-				epic12_device_gfx_draw_shadow_copy(space, &addr, cliptype);
+				epic12_device_gfx_draw_shadow_copy(space, &addr);
 				break;
 
 			default:
@@ -626,16 +575,10 @@ void epic12_device::epic12_device_gfx_create_shadow_copy(address_space &space)
 
 void epic12_device::epic12_device_gfx_exec(void)
 {
-	UINT16 cliptype = 0;
-
 	offs_t addr = epic12_device_gfx_addr_shadowcopy & 0x1fffffff;
+	epic12_device_clip.set(epic12_device_gfx_scroll_1_x_shadowcopy, epic12_device_clip.min_x + 320-1, epic12_device_gfx_scroll_1_y_shadowcopy, epic12_device_clip.min_y + 240-1);
 
 //  logerror("GFX EXEC: %08X\n", addr);
-
-	epic12_device_clip.min_x = epic12_device_gfx_scroll_1_x_shadowcopy;
-	epic12_device_clip.min_y = epic12_device_gfx_scroll_1_y_shadowcopy;
-	epic12_device_clip.max_x = epic12_device_clip.min_x + 320-1;
-	epic12_device_clip.max_y = epic12_device_clip.min_y + 240-1;
 
 	while (1)
 	{
@@ -648,23 +591,10 @@ void epic12_device::epic12_device_gfx_exec(void)
 				return;
 
 			case 0xc000:
-				data = READ_NEXT_WORD(&addr);
-				cliptype = data ? 1 : 0;
-
-				if (cliptype)
-				{
-					epic12_device_clip.min_x = epic12_device_gfx_scroll_1_x_shadowcopy;
-					epic12_device_clip.min_y = epic12_device_gfx_scroll_1_y_shadowcopy;
-					epic12_device_clip.max_x = epic12_device_clip.min_x + 320-1;
-					epic12_device_clip.max_y = epic12_device_clip.min_y + 240-1;
-				}
+				if (READ_NEXT_WORD(&addr)) // cliptype
+					epic12_device_clip.set(epic12_device_gfx_scroll_1_x_shadowcopy, epic12_device_clip.min_x + 320-1, epic12_device_gfx_scroll_1_y_shadowcopy, epic12_device_clip.min_y + 240-1);
 				else
-				{
-					epic12_device_clip.min_x = 0;
-					epic12_device_clip.min_y = 0;
-					epic12_device_clip.max_x = 0x2000-1;
-					epic12_device_clip.max_y = 0x1000-1;
-				}
+					epic12_device_clip.set(0, 0x2000-1, 0, 0x1000-1);
 				break;
 
 			case 0x2000:
@@ -687,16 +617,10 @@ void epic12_device::epic12_device_gfx_exec(void)
 
 void epic12_device::epic12_device_gfx_exec_unsafe(void)
 {
-	UINT16 cliptype = 0;
-
 	offs_t addr = epic12_device_gfx_addr & 0x1fffffff;
+	epic12_device_clip.set(epic12_device_gfx_scroll_1_x_shadowcopy, epic12_device_clip.min_x + 320-1, epic12_device_gfx_scroll_1_y_shadowcopy, epic12_device_clip.min_y + 240-1);
 
 //  logerror("GFX EXEC: %08X\n", addr);
-
-	epic12_device_clip.min_x = epic12_device_gfx_scroll_1_x;
-	epic12_device_clip.min_y = epic12_device_gfx_scroll_1_y;
-	epic12_device_clip.max_x = epic12_device_clip.min_x + 320-1;
-	epic12_device_clip.max_y = epic12_device_clip.min_y + 240-1;
 
 	while (1)
 	{
@@ -709,23 +633,10 @@ void epic12_device::epic12_device_gfx_exec_unsafe(void)
 				return;
 
 			case 0xc000:
-				data = READ_NEXT_WORD(&addr);
-				cliptype = data ? 1 : 0;
-
-				if (cliptype)
-				{
-					epic12_device_clip.min_x = epic12_device_gfx_scroll_1_x;
-					epic12_device_clip.min_y = epic12_device_gfx_scroll_1_y;
-					epic12_device_clip.max_x = epic12_device_clip.min_x  + 320-1;
-					epic12_device_clip.max_y = epic12_device_clip.min_y + 240-1;
-				}
+				if (READ_NEXT_WORD(&addr)) // cliptype
+					epic12_device_clip.set(epic12_device_gfx_scroll_1_x_shadowcopy, epic12_device_clip.min_x + 320-1, epic12_device_gfx_scroll_1_y_shadowcopy, epic12_device_clip.min_y + 240-1);
 				else
-				{
-					epic12_device_clip.min_x = 0;
-					epic12_device_clip.min_y = 0;
-					epic12_device_clip.max_x = 0x2000-1;
-					epic12_device_clip.max_y = 0x1000-1;
-				}
+					epic12_device_clip.set(0, 0x2000-1, 0, 0x1000-1);
 				break;
 
 			case 0x2000:
@@ -1025,9 +936,6 @@ void epic12_device::install_handlers(int addr1, int addr2)
 	}
 
 	space.install_readwrite_handler(addr1, addr2, read , write, U64(0xffffffffffffffff));
-
-
-
 }
 
 READ64_MEMBER( epic12_device::epic12_device_fpga_r )
