@@ -4,8 +4,6 @@
 #ifndef __KONAMI_HELPER_H__
 #define __KONAMI_HELPER_H__
 
-#define NORMAL_PLANE_ORDER 0x0123
-
 void konami_decode_gfx(running_machine &machine, gfxdecode_device * gfxdecode, palette_device &palette, int gfx_index, UINT8 *data, UINT32 total, const gfx_layout *layout, int bpp);
 
 /* helper function to sort three tile layers by priority order */

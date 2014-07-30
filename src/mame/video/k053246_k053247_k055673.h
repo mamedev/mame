@@ -6,7 +6,7 @@
 #ifndef __K05324x_H__
 #define __K05324x_H__
 
-#define NORMAL_PLANE_ORDER 0x0123
+#define NORMAL_PLANE_ORDER 4
 
 typedef device_delegate<void (int *code, int *color, int *priority_mask)> k053247_cb_delegate;
 #define K053246_CB_MEMBER(_name)   void _name(int *code, int *color, int *priority_mask)
@@ -26,10 +26,10 @@ typedef device_delegate<void (int *code, int *color, int *priority_mask)> k05324
 
 
 /**  Konami 053246 / 053247 / 055673  **/
-#define K055673_LAYOUT_GX  0
-#define K055673_LAYOUT_RNG 1
-#define K055673_LAYOUT_LE2 2
-#define K055673_LAYOUT_GX6 3
+#define K055673_LAYOUT_GX  5
+#define K055673_LAYOUT_RNG 4
+#define K055673_LAYOUT_LE2 8
+#define K055673_LAYOUT_GX6 6
 
 
 /*
@@ -68,12 +68,12 @@ public:
 	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
 	static void static_set_palette_tag(device_t &device, const char *tag);
 	static void set_k053247_callback(device_t &device, k053247_cb_delegate callback) { downcast<k053247_device &>(device).m_k053247_cb = callback; }
-	static void set_config(device_t &device, const char *gfx_reg, int gfx_num, int order, int dx, int dy)
+	static void set_config(device_t &device, const char *gfx_reg, int gfx_num, int bpp, int dx, int dy)
 	{
 		k053247_device &dev = downcast<k053247_device &>(device);
 		dev.m_memory_region = gfx_reg;
 		dev.m_gfx_num = gfx_num;
-		dev.m_plane_order = order;
+		dev.m_bpp = bpp;
 		dev.m_dx = dx;
 		dev.m_dy = dy;
 	}
@@ -81,16 +81,13 @@ public:
 	void clear_all();
 
 	DECLARE_READ16_MEMBER( k055673_rom_word_r );
-	DECLARE_READ16_MEMBER( k055673_GX6bpp_rom_word_r );
+	DECLARE_READ16_MEMBER( k055673_5bpp_rom_word_r );
 
 	DECLARE_READ8_MEMBER( k053247_r );
 	DECLARE_WRITE8_MEMBER( k053247_w );
 	DECLARE_READ16_MEMBER( k053247_word_r );
 	DECLARE_WRITE16_MEMBER( k053247_word_w );
-	DECLARE_READ32_MEMBER( k053247_long_r );
-	DECLARE_WRITE32_MEMBER( k053247_long_w );
-	DECLARE_WRITE16_MEMBER( k053247_reg_word_w ); // "OBJSET2" registers
-	DECLARE_WRITE32_MEMBER( k053247_reg_long_w );
+	DECLARE_WRITE16_MEMBER( k055673_reg_word_w ); // "OBJSET2" registers
 
 	void k053247_sprites_draw( bitmap_ind16 &bitmap,const rectangle &cliprect);
 	void k053247_sprites_draw( bitmap_rgb32 &bitmap,const rectangle &cliprect);
@@ -104,16 +101,12 @@ public:
 	DECLARE_WRITE8_MEMBER( k053246_w );
 	DECLARE_READ16_MEMBER( k053246_word_r );
 	DECLARE_WRITE16_MEMBER( k053246_word_w );
-	DECLARE_READ32_MEMBER( k053246_long_r );
-	DECLARE_WRITE32_MEMBER( k053246_long_w );
 
 	void k053246_set_objcha_line( int state);
 	int k053246_is_irq_enabled(void);
 	int k053246_read_register( int regnum);
 
 	DECLARE_READ16_MEMBER( k053246_reg_word_r );    // OBJSET1
-	DECLARE_READ16_MEMBER( k053247_reg_word_r );    // OBJSET2
-	DECLARE_READ32_MEMBER( k053247_reg_long_r );    // OBJSET2
 
 	UINT16    *m_ram;
 
@@ -130,7 +123,7 @@ public:
 	//FIXME: device should be updated to use device_gfx_interface to get rid of most of these!
 	const char *m_memory_region;
 	int m_gfx_num;
-	int m_plane_order;
+	int m_bpp;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 

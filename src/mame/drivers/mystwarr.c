@@ -1,5 +1,3 @@
-#define MW_DEBUG     0
-
 /**************************************************************************
  * Mystic Warrior (c) 1993 Konami
  * Metamorphic Force (c) 1993 Konami
@@ -298,7 +296,7 @@ static ADDRESS_MAP_START( mystwarr_map, AS_PROGRAM, 16, mystwarr_state )
 	AM_RANGE(0x400000, 0x40ffff) AM_READWRITE(k053247_scattered_word_r,k053247_scattered_word_w) AM_SHARE("spriteram")
 	AM_RANGE(0x480000, 0x4800ff) AM_DEVWRITE("k055555", k055555_device, K055555_word_w)
 	AM_RANGE(0x482000, 0x48200f) AM_DEVREAD("k055673", k055673_device, k055673_rom_word_r)
-	AM_RANGE(0x482010, 0x48201f) AM_DEVWRITE("k055673", k055673_device,k053247_reg_word_w)
+	AM_RANGE(0x482010, 0x48201f) AM_DEVWRITE("k055673", k055673_device,k055673_reg_word_w)
 	AM_RANGE(0x484000, 0x484007) AM_DEVWRITE("k055673", k055673_device, k053246_word_w)
 	AM_RANGE(0x48a000, 0x48a01f) AM_DEVWRITE("k054338", k054338_device, word_w)
 	AM_RANGE(0x48c000, 0x48c03f) AM_DEVWRITE("k056832", k056832_device,word_w)
@@ -319,12 +317,6 @@ static ADDRESS_MAP_START( mystwarr_map, AS_PROGRAM, 16, mystwarr_state )
 	AM_RANGE(0x602000, 0x603fff) AM_DEVREADWRITE("k056832", k056832_device,ram_word_r,ram_word_w) // tilemap RAM mirror read(essential)
 	AM_RANGE(0x680000, 0x683fff) AM_DEVREAD("k056832", k056832_device, mw_rom_word_r)
 	AM_RANGE(0x700000, 0x701fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-#if MW_DEBUG
-	AM_RANGE(0x482010, 0x48201f) AM_DEVREAD("k055673", k055673_device, k053247_reg_word_r)
-	AM_RANGE(0x484000, 0x484007) AM_DEVREAD("k055673", k055673_device, k053246_reg_word_r)
-	AM_RANGE(0x48a000, 0x48a01f) AM_DEVREAD("k054338", k054338_device, word_r)
-	AM_RANGE(0x48c000, 0x48c03f) AM_DEVREAD("k056832", k056832_device, word_r)
-#endif
 ADDRESS_MAP_END
 
 /* Metamorphic Force */
@@ -335,7 +327,7 @@ static ADDRESS_MAP_START( metamrph_map, AS_PROGRAM, 16, mystwarr_state )
 	AM_RANGE(0x211000, 0x21ffff) AM_RAM
 	AM_RANGE(0x240000, 0x240007) AM_DEVWRITE("k055673", k055673_device, k053246_word_w)
 	AM_RANGE(0x244000, 0x24400f) AM_DEVREAD("k055673", k055673_device, k055673_rom_word_r)
-	AM_RANGE(0x244010, 0x24401f) AM_DEVWRITE("k055673", k055673_device,k053247_reg_word_w)
+	AM_RANGE(0x244010, 0x24401f) AM_DEVWRITE("k055673", k055673_device,k055673_reg_word_w)
 	AM_RANGE(0x24c000, 0x24ffff) AM_DEVREADWRITE("k053250_1", k053250_device, ram_r, ram_w)
 	AM_RANGE(0x250000, 0x25000f) AM_DEVREADWRITE("k053250_1", k053250_device, reg_r, reg_w)
 	AM_RANGE(0x254000, 0x25401f) AM_DEVWRITE("k054338", k054338_device, word_w)
@@ -359,13 +351,6 @@ static ADDRESS_MAP_START( metamrph_map, AS_PROGRAM, 16, mystwarr_state )
 	AM_RANGE(0x310000, 0x311fff) AM_DEVREAD("k056832", k056832_device, mw_rom_word_r)
 	AM_RANGE(0x320000, 0x321fff) AM_DEVREAD("k053250_1", k053250_device, rom_r)
 	AM_RANGE(0x330000, 0x331fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-#if MW_DEBUG
-	AM_RANGE(0x240000, 0x240007) AM_DEVREAD("k055673", k055673_device, k053246_reg_word_r)
-	AM_RANGE(0x244010, 0x24401f) AM_DEVREAD("k055673", k055673_device, k053247_reg_word_r)
-	AM_RANGE(0x254000, 0x25401f) AM_DEVREAD("k054338", k054338_device, word_r)
-	AM_RANGE(0x26C000, 0x26C007) AM_DEVREAD("k056832", k056832_device, b_word_r)
-	AM_RANGE(0x270000, 0x27003f) AM_DEVREAD("k056832", k056832_device, word_r)
-#endif
 ADDRESS_MAP_END
 
 /* Violent Storm */
@@ -376,7 +361,7 @@ static ADDRESS_MAP_START( viostorm_map, AS_PROGRAM, 16, mystwarr_state )
 	AM_RANGE(0x211000, 0x21ffff) AM_RAM
 	AM_RANGE(0x240000, 0x240007) AM_DEVWRITE("k055673", k055673_device, k053246_word_w)
 	AM_RANGE(0x244000, 0x24400f) AM_DEVREAD("k055673", k055673_device, k055673_rom_word_r)
-	AM_RANGE(0x244010, 0x24401f) AM_DEVWRITE("k055673", k055673_device,k053247_reg_word_w)
+	AM_RANGE(0x244010, 0x24401f) AM_DEVWRITE("k055673", k055673_device,k055673_reg_word_w)
 	AM_RANGE(0x24c000, 0x24ffff) AM_RAM     // K053250 ram
 	AM_RANGE(0x250000, 0x25000f) AM_RAM     // K053250 reg
 	AM_RANGE(0x254000, 0x25401f) AM_DEVWRITE("k054338", k054338_device, word_w)
@@ -401,13 +386,6 @@ static ADDRESS_MAP_START( viostorm_map, AS_PROGRAM, 16, mystwarr_state )
 	AM_RANGE(0x304000, 0x3041ff) AM_RAM
 	AM_RANGE(0x310000, 0x311fff) AM_DEVREAD("k056832", k056832_device, mw_rom_word_r)
 	AM_RANGE(0x330000, 0x331fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-#if MW_DEBUG
-	AM_RANGE(0x240000, 0x240007) AM_DEVREAD("k055673", k055673_device, k053246_reg_word_r)
-	AM_RANGE(0x244010, 0x24401f) AM_DEVREAD("k055673", k055673_device, k053247_reg_word_r)
-	AM_RANGE(0x254000, 0x25401f) AM_DEVREAD("k054338", k054338_device, word_r)
-	AM_RANGE(0x26C000, 0x26C007) AM_DEVREAD("k056832", k056832_device, b_word_r)
-	AM_RANGE(0x270000, 0x27003f) AM_DEVREAD("k056832", k056832_device, word_r)
-#endif
 ADDRESS_MAP_END
 
 // Martial Champion specific interfaces
@@ -467,7 +445,7 @@ static ADDRESS_MAP_START( martchmp_map, AS_PROGRAM, 16, mystwarr_state )
 	AM_RANGE(0x300000, 0x3fffff) AM_ROM                                 // data ROM
 	AM_RANGE(0x400000, 0x4000ff) AM_DEVWRITE("k055555", k055555_device, K055555_word_w)                // PCU2
 	AM_RANGE(0x402000, 0x40200f) AM_DEVREAD("k055673", k055673_device, k055673_rom_word_r)         // sprite ROM readback
-	AM_RANGE(0x402010, 0x40201f) AM_DEVWRITE("k055673", k055673_device,k053247_reg_word_w)            // OBJSET2
+	AM_RANGE(0x402010, 0x40201f) AM_DEVWRITE("k055673", k055673_device,k055673_reg_word_w)            // OBJSET2
 	AM_RANGE(0x404000, 0x404007) AM_DEVWRITE("k055673", k055673_device, k053246_word_w)                // OBJSET1
 	AM_RANGE(0x40a000, 0x40a01f) AM_DEVWRITE("k054338", k054338_device, word_w)                // CLTC
 	AM_RANGE(0x40c000, 0x40c03f) AM_DEVWRITE("k056832", k056832_device,word_w)                // VACSET
@@ -490,13 +468,6 @@ static ADDRESS_MAP_START( martchmp_map, AS_PROGRAM, 16, mystwarr_state )
 	AM_RANGE(0x680000, 0x681fff) AM_DEVREADWRITE("k056832", k056832_device,ram_word_r,ram_word_w) // tilemap RAM
 	AM_RANGE(0x682000, 0x683fff) AM_DEVREADWRITE("k056832", k056832_device,ram_word_r,ram_word_w) // tilemap RAM mirror read/write (essential)
 	AM_RANGE(0x700000, 0x703fff) AM_DEVREAD("k056832", k056832_device, mw_rom_word_r)          // tile ROM readback
-#if MW_DEBUG
-	AM_RANGE(0x402010, 0x40201f) AM_DEVREAD("k055673", k055673_device, k053247_reg_word_r)
-	AM_RANGE(0x404000, 0x404007) AM_DEVREAD("k055673", k055673_device, k053246_reg_word_r)
-	AM_RANGE(0x40a000, 0x40a01f) AM_DEVREAD("k054338", k054338_device, word_r)
-	AM_RANGE(0x40c000, 0x40c03f) AM_DEVREAD("k056832", k056832_device, word_r)
-	AM_RANGE(0x41e000, 0x41e007) AM_DEVREAD("k056832", k056832_device, b_word_r)
-#endif
 ADDRESS_MAP_END
 
 /* Ultimate Battler Dadandarn */
@@ -509,7 +480,7 @@ static ADDRESS_MAP_START( dadandrn_map, AS_PROGRAM, 16, mystwarr_state )
 	AM_RANGE(0x430000, 0x430007) AM_DEVWRITE("k055673", k055673_device, k053246_word_w)
 	AM_RANGE(0x440000, 0x443fff) AM_DEVREAD("k056832", k056832_device, mw_rom_word_r)
 	AM_RANGE(0x450000, 0x45000f) AM_DEVREAD("k055673", k055673_device, k055673_rom_word_r)
-	AM_RANGE(0x450010, 0x45001f) AM_DEVWRITE("k055673", k055673_device,k053247_reg_word_w)
+	AM_RANGE(0x450010, 0x45001f) AM_DEVWRITE("k055673", k055673_device,k055673_reg_word_w)
 	AM_RANGE(0x460000, 0x46001f) AM_WRITEONLY AM_SHARE("k053936_0_ct16")
 	AM_RANGE(0x470000, 0x470fff) AM_RAM AM_SHARE("k053936_0_li16")
 	AM_RANGE(0x480000, 0x48003f) AM_DEVWRITE("k056832", k056832_device,word_w)        // VACSET
@@ -533,13 +504,6 @@ static ADDRESS_MAP_START( dadandrn_map, AS_PROGRAM, 16, mystwarr_state )
 	AM_RANGE(0xa00000, 0xa7ffff) AM_READ(ddd_053936_tilerom_1_r) // 128k tilemap readback
 	AM_RANGE(0xc00000, 0xdfffff) AM_READ(ddd_053936_tilerom_2_r)    // tile character readback
 	AM_RANGE(0xe00000, 0xe00001) AM_WRITENOP    // watchdog
-#if MW_DEBUG
-	AM_RANGE(0x430000, 0x430007) AM_DEVREAD("k055673", k055673_device, k053246_reg_word_r)
-	AM_RANGE(0x450010, 0x45001f) AM_DEVREAD("k055673", k055673_device, k053247_reg_word_r)
-	AM_RANGE(0x480000, 0x48003f) AM_DEVREAD("k056832", k056832_device, word_r)
-	AM_RANGE(0x482000, 0x482007) AM_DEVREAD("k056832", k056832_device, b_word_r)
-	AM_RANGE(0x48c000, 0x48c01f) AM_DEVREAD("k054338", k054338_device, word_r)
-#endif
 ADDRESS_MAP_END
 
 /* Gaiapolis */
@@ -555,7 +519,7 @@ static ADDRESS_MAP_START( gaiapols_map, AS_PROGRAM, 16, mystwarr_state )
 	AM_RANGE(0x430000, 0x430007) AM_DEVWRITE("k055673", k055673_device, k053246_word_w)
 	AM_RANGE(0x440000, 0x441fff) AM_DEVREAD("k056832", k056832_device, mw_rom_word_r)
 	AM_RANGE(0x450000, 0x45000f) AM_DEVREAD("k055673", k055673_device, k055673_rom_word_r)
-	AM_RANGE(0x450010, 0x45001f) AM_DEVWRITE("k055673", k055673_device,k053247_reg_word_w)
+	AM_RANGE(0x450010, 0x45001f) AM_DEVWRITE("k055673", k055673_device,k055673_reg_word_w)
 	AM_RANGE(0x460000, 0x46001f) AM_WRITEONLY AM_SHARE("k053936_0_ct16")
 	AM_RANGE(0x470000, 0x470fff) AM_RAM AM_SHARE("k053936_0_li16")
 	AM_RANGE(0x480000, 0x48003f) AM_DEVWRITE("k056832", k056832_device,word_w)            // VACSET
@@ -579,13 +543,6 @@ static ADDRESS_MAP_START( gaiapols_map, AS_PROGRAM, 16, mystwarr_state )
 	AM_RANGE(0xa00000, 0xa7ffff) AM_READ(ddd_053936_tilerom_1_r)    // 128k tilemap readback
 	AM_RANGE(0xc00000, 0xdfffff) AM_READ(gai_053936_tilerom_2_r)    // tile character readback
 	AM_RANGE(0xe00000, 0xe00001) AM_WRITENOP    // watchdog
-#if MW_DEBUG
-	AM_RANGE(0x430000, 0x430007) AM_DEVREAD("k055673", k055673_device, k053246_reg_word_r)
-	AM_RANGE(0x450010, 0x45001f) AM_DEVREAD("k055673", k055673_device, k053247_reg_word_r)
-	AM_RANGE(0x480000, 0x48003f) AM_DEVREAD("k056832", k056832_device, word_r)
-	AM_RANGE(0x482000, 0x482007) AM_DEVREAD("k056832", k056832_device, b_word_r)
-	AM_RANGE(0x48c000, 0x48c01f) AM_DEVREAD("k054338", k054338_device, word_r)
-#endif
 ADDRESS_MAP_END
 
 /**********************************************************************************/
@@ -1013,7 +970,7 @@ static MACHINE_CONFIG_START( mystwarr, mystwarr_state )
 
 	MCFG_DEVICE_ADD("k055673", K055673, 0)
 	MCFG_K055673_CB(mystwarr_state, mystwarr_sprite_callback)
-	MCFG_K055673_CONFIG("gfx2", 0, 0, -48, -24)
+	MCFG_K055673_CONFIG("gfx2", 0, K055673_LAYOUT_GX, -48, -24)
 	MCFG_K055673_GFXDECODE("gfxdecode")
 	MCFG_K055673_PALETTE("palette")
 
@@ -1066,7 +1023,7 @@ static MACHINE_CONFIG_DERIVED( viostorm, mystwarr )
 
 	MCFG_DEVICE_MODIFY("k055673")
 	MCFG_K055673_CB(mystwarr_state, metamrph_sprite_callback)
-	MCFG_K055673_CONFIG("gfx2", 0, 1, -62, -23)
+	MCFG_K055673_CONFIG("gfx2", 0, K055673_LAYOUT_RNG, -62, -23)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( metamrph, mystwarr )
@@ -1099,7 +1056,7 @@ static MACHINE_CONFIG_DERIVED( metamrph, mystwarr )
 
 	MCFG_DEVICE_MODIFY("k055673")
 	MCFG_K055673_CB(mystwarr_state, metamrph_sprite_callback)
-	MCFG_K055673_CONFIG("gfx2", 0, 1, -51, -24)
+	MCFG_K055673_CONFIG("gfx2", 0, K055673_LAYOUT_RNG, -51, -24)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( dadandrn, mystwarr )
@@ -1132,7 +1089,7 @@ static MACHINE_CONFIG_DERIVED( dadandrn, mystwarr )
 
 	MCFG_DEVICE_MODIFY("k055673")
 	MCFG_K055673_CB(mystwarr_state, gaiapols_sprite_callback)
-	MCFG_K055673_CONFIG("gfx2", 0, 0, -42, -22)
+	MCFG_K055673_CONFIG("gfx2", 0, K055673_LAYOUT_GX, -42, -22)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( gaiapols, mystwarr )
@@ -1168,7 +1125,7 @@ static MACHINE_CONFIG_DERIVED( gaiapols, mystwarr )
 
 	MCFG_DEVICE_MODIFY("k055673")
 	MCFG_K055673_CB(mystwarr_state, gaiapols_sprite_callback)
-	MCFG_K055673_CONFIG("gfx2", 0, 1, -61, -22) // stage2 brick walls
+	MCFG_K055673_CONFIG("gfx2", 0, K055673_LAYOUT_RNG, -61, -22) // stage2 brick walls
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( martchmp, mystwarr )
@@ -1203,7 +1160,7 @@ static MACHINE_CONFIG_DERIVED( martchmp, mystwarr )
 
 	MCFG_DEVICE_MODIFY("k055673")
 	MCFG_K055673_CB(mystwarr_state, martchmp_sprite_callback)
-	MCFG_K055673_CONFIG("gfx2", 0, 0, -58, -23)
+	MCFG_K055673_CONFIG("gfx2", 0, K055673_LAYOUT_GX, -58, -23)
 MACHINE_CONFIG_END
 
 /**********************************************************************************/

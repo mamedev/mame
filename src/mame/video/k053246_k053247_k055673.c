@@ -88,17 +88,8 @@ int k053247_device::k053247_read_register( int regnum )
 }
 
 
-WRITE16_MEMBER( k053247_device::k053247_reg_word_w ) // write-only OBJSET2 registers (see p.43 table 6.1)
+WRITE16_MEMBER( k053247_device::k055673_reg_word_w ) // write-only OBJSET2 registers (see p.43 table 6.1)
 {
-	COMBINE_DATA(m_kx47_regs + offset);
-}
-
-WRITE32_MEMBER( k053247_device::k053247_reg_long_w )
-{
-	offset <<= 1;
-	COMBINE_DATA(m_kx47_regs + offset + 1);
-	mem_mask >>= 16;
-	data >>= 16;
 	COMBINE_DATA(m_kx47_regs + offset);
 }
 
@@ -109,20 +100,6 @@ READ16_MEMBER( k053247_device::k053247_word_r )
 
 WRITE16_MEMBER( k053247_device::k053247_word_w )
 {
-	COMBINE_DATA(m_ram + offset);
-}
-
-READ32_MEMBER( k053247_device::k053247_long_r )
-{
-	return m_ram[offset * 2 + 1] | (m_ram[offset * 2] << 16);
-}
-
-WRITE32_MEMBER( k053247_device::k053247_long_w )
-{
-	offset <<= 1;
-	COMBINE_DATA(m_ram + offset + 1);
-	mem_mask >>= 16;
-	data >>= 16;
 	COMBINE_DATA(m_ram + offset);
 }
 
@@ -146,11 +123,13 @@ WRITE8_MEMBER( k053247_device::k053247_w )
 		m_ram[offs] = (m_ram[offs] & 0x00ff) | (data << 8);
 }
 
-// Mystic Warriors hardware games support a non-objcha based ROM readback
+// The K055673 supports a non-objcha based ROM readback
 // write the address to the 246 as usual, but there's a completely separate ROM
 // window that works without needing an objcha line.
 // in this window, +0 = 32 bits from one set of ROMs, and +8 = 32 bits from another set
-READ16_MEMBER( k053247_device::k055673_rom_word_r ) // 5bpp
+
+// FIXME: rearrange ROM loading so this can be merged with the 4/6/8bpp version
+READ16_MEMBER( k053247_device::k055673_5bpp_rom_word_r ) // 5bpp
 {
 	UINT8 *ROM8 = (UINT8 *)space.machine().root_device().memregion(m_memory_region)->base();
 	UINT16 *ROM = (UINT16 *)space.machine().root_device().memregion(m_memory_region)->base();
@@ -188,38 +167,21 @@ READ16_MEMBER( k053247_device::k055673_rom_word_r ) // 5bpp
 	return 0;
 }
 
-READ16_MEMBER( k053247_device::k055673_GX6bpp_rom_word_r )
+READ16_MEMBER( k053247_device::k055673_rom_word_r )
 {
+	if (m_bpp == 5)
+		return k055673_5bpp_rom_word_r(space, offset, mem_mask);
+
 	UINT16 *ROM = (UINT16 *)space.machine().root_device().memregion(m_memory_region)->base();
 	int romofs;
 
 	romofs = m_kx46_regs[6] << 16 | m_kx46_regs[7] << 8 | m_kx46_regs[4];
 
-	romofs /= 4;    // romofs increments 4 at a time
-	romofs *= 12 / 2;   // each increment of romofs = 12 new bytes (6 new words)
+	romofs = (romofs >> 2) * m_bpp;
 
-	switch (offset)
-	{
-		case 0:
-			return ROM[romofs + 3];
-		case 1:
-			return ROM[romofs + 4];
-		case 2:
-		case 3:
-			return ROM[romofs + 5];
-		case 4:
-			return ROM[romofs];
-		case 5:
-			return ROM[romofs + 1];
-		case 6:
-		case 7:
-			return ROM[romofs + 2];
-		default:
-//          LOG(("55673_rom_word_r: Unknown read offset %x (PC=%x)\n", offset, space.device().safe_pc()));
-			break;
-	}
+	if ((offset & 0x4) == 0) romofs += m_bpp >> 1;
 
-	return 0;
+	return ROM[romofs + (offset & 0x3)];
 }
 
 READ8_MEMBER( k053247_device::k053246_r )
@@ -258,19 +220,6 @@ WRITE16_MEMBER( k053247_device::k053246_word_w )
 		k053246_w( space, offset << 1,(data >> 8) & 0xff);
 	if (ACCESSING_BITS_0_7)
 		k053246_w( space, (offset << 1) + 1,data & 0xff);
-}
-
-READ32_MEMBER( k053247_device::k053246_long_r )
-{
-	offset <<= 1;
-	return (k053246_word_r( space, offset + 1, 0xffff) | k053246_word_r( space, offset, 0xffff) << 16);
-}
-
-WRITE32_MEMBER( k053247_device::k053246_long_w )
-{
-	offset <<= 1;
-	k053246_word_w( space, offset, data >> 16, mem_mask >> 16);
-	k053246_word_w( space, offset + 1, data, mem_mask);
 }
 
 void k053247_device::k053246_set_objcha_line( int state )
@@ -992,11 +941,11 @@ void k055673_device::device_start()
 		16,16,
 		0,
 		8,
-		{ 8*1,8*0,8*3,8*2,8*5,8*4,8*7,8*6 },
+		{ 56, 48, 40, 32, 24, 16, 8, 0 },
 		{  0,1,2,3,4,5,6,7,64+0,64+1,64+2,64+3,64+4,64+5,64+6,64+7 },
 		{ 128*0, 128*1, 128*2,  128*3,  128*4,  128*5,  128*6,  128*7,
 			128*8, 128*9, 128*10, 128*11, 128*12, 128*13, 128*14, 128*15 },
-		128*16
+		16*16*8
 	};
 	static const gfx_layout spritelayout4 = /* System GX 6bpp sprite layout */
 	{
@@ -1023,7 +972,7 @@ void k055673_device::device_start()
 	alt_k055673_rom = (UINT16 *)machine().root_device().memregion(m_memory_region)->base();
 
 	/* decode the graphics */
-	switch (m_plane_order)
+	switch (m_bpp)
 	{
 		case K055673_LAYOUT_GX:
 			size4 = (machine().root_device().memregion(m_memory_region)->bytes()/(1024*1024))/5;
@@ -1155,7 +1104,7 @@ void k053247_device::device_start()
 	};
 
 	/* decode the graphics */
-	switch (m_plane_order)
+	switch (m_bpp)
 	{
 	case NORMAL_PLANE_ORDER:
 		total = machine().root_device().memregion(m_memory_region)->bytes() / 128;
@@ -1232,14 +1181,3 @@ READ16_MEMBER( k053247_device::k053246_reg_word_r )
 {
 	return(m_kx46_regs[offset * 2] << 8 | m_kx46_regs[offset * 2 + 1]);
 }   // OBJSET1
-
-READ16_MEMBER( k053247_device::k053247_reg_word_r )
-{
-	return(m_kx47_regs[offset]);
-}   // OBJSET2
-
-READ32_MEMBER( k053247_device::k053247_reg_long_r )
-{
-	offset <<= 1;
-	return (k053247_reg_word_r( space, offset + 1, 0xffff) | k053247_reg_word_r( space, offset, 0xffff) << 16);
-}

@@ -104,8 +104,6 @@
 #include "includes/konamigx.h"
 #include "rendlay.h"
 
-#define GX_DEBUG     0
-
 
 
 
@@ -745,16 +743,6 @@ READ32_MEMBER(konamigx_state::le2_gun_V_r)
 /**********************************************************************************/
 /* system or game dependent handlers */
 
-READ32_MEMBER(konamigx_state::gx5bppspr_r)
-{
-	return (m_k055673->k055673_rom_word_r(space, offset*2+1, 0xffff) | m_k055673->k055673_rom_word_r(space, offset*2, 0xffff)<<16);
-}
-
-READ32_MEMBER(konamigx_state::gx6bppspr_r)
-{
-	return (m_k055673->k055673_GX6bpp_rom_word_r(space, offset*2+1, 0xffff) | m_k055673->k055673_GX6bpp_rom_word_r(space, offset*2, 0xffff)<<16);
-}
-
 READ32_MEMBER(konamigx_state::type1_roz_r1)
 {
 	UINT32 *ROM = (UINT32 *)memregion("gfx3")->base();
@@ -993,12 +981,13 @@ static ADDRESS_MAP_START( gx_base_memmap, AS_PROGRAM, 32, konamigx_state )
 	AM_RANGE(0x400000, 0x7fffff) AM_ROM // data ROM
 	AM_RANGE(0xc00000, 0xc1ffff) AM_RAM AM_SHARE("workram")
 	AM_RANGE(0xd00000, 0xd01fff) AM_DEVREAD("k056832", k056832_device, k_5bpp_rom_long_r)
-	AM_RANGE(0xd20000, 0xd20fff) AM_DEVREADWRITE("k055673", k055673_device, k053247_long_r, k053247_long_w)
+	AM_RANGE(0xd20000, 0xd20fff) AM_DEVREADWRITE16("k055673", k055673_device, k053247_word_r, k053247_word_w, 0xffffffff)
 	AM_RANGE(0xd21000, 0xd23fff) AM_RAM
 	AM_RANGE(0xd40000, 0xd4003f) AM_DEVWRITE("k056832", k056832_device, long_w)
 	AM_RANGE(0xd44000, 0xd4400f) AM_WRITE(konamigx_tilebank_w)
-	AM_RANGE(0xd48000, 0xd48007) AM_DEVWRITE("k055673", k055673_device, k053246_long_w)
-	AM_RANGE(0xd4a010, 0xd4a01f) AM_DEVWRITE("k055673", k055673_device, k053247_reg_long_w)
+	AM_RANGE(0xd48000, 0xd48007) AM_DEVWRITE16("k055673", k055673_device, k053246_word_w, 0xffffffff)
+	AM_RANGE(0xd4a000, 0xd4a00f) AM_DEVREAD16("k055673", k055673_device, k055673_rom_word_r, 0xffffffff)
+	AM_RANGE(0xd4a010, 0xd4a01f) AM_DEVWRITE16("k055673", k055673_device, k055673_reg_word_w, 0xffffffff)
 	AM_RANGE(0xd4c000, 0xd4c01f) AM_READWRITE(ccu_r, ccu_w)
 	AM_RANGE(0xd4e000, 0xd4e01f) AM_WRITENOP
 	AM_RANGE(0xd50000, 0xd500ff) AM_DEVWRITE("k055555", k055555_device, K055555_long_w)
@@ -1011,14 +1000,9 @@ static ADDRESS_MAP_START( gx_base_memmap, AS_PROGRAM, 32, konamigx_state )
 	AM_RANGE(0xd80000, 0xd8001f) AM_DEVWRITE("k054338", k054338_device, long_w)
 	AM_RANGE(0xda0000, 0xda1fff) AM_DEVREADWRITE("k056832", k056832_device, ram_long_r, ram_long_w)
 	AM_RANGE(0xda2000, 0xda3fff) AM_DEVREADWRITE("k056832", k056832_device, ram_long_r, ram_long_w)
-#if GX_DEBUG
-	AM_RANGE(0xd40000, 0xd4003f) AM_DEVREAD("k056832", k056832_device, long_r)
-	AM_RANGE(0xd4a010, 0xd4a01f) AM_DEVREAD("k055673", k055673_device, k053247_reg_long_r)
-#endif
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( gx_type1_map, AS_PROGRAM, 32, konamigx_state )
-	AM_RANGE(0xd4a000, 0xd4a01f) AM_READ(gx6bppspr_r)   // sprite ROM readback
 	AM_RANGE(0xd90000, 0xd97fff) AM_RAM_WRITE(konamigx_palette_w) AM_SHARE("paletteram")
 	AM_RANGE(0xdc0000, 0xdc1fff) AM_RAM         // LAN RAM? (Racin' Force has, Open Golf doesn't)
 	AM_RANGE(0xdd0000, 0xdd00ff) AM_READNOP AM_WRITENOP // LAN board
@@ -2443,10 +2427,10 @@ ROM_START( winspike )
 
 	/* sprites */
 	ROM_REGION( 0x1000000, "gfx2", ROMREGION_ERASE00 )
-	ROM_LOAD64_WORD( "705a10.33g",   0x000000, 0x400000, CRC(fc4dc78b) SHA1(520cdcf9ca20ec1c84be734e06e183e7a871090b) )
-	ROM_LOAD64_WORD( "705a11.30g",   0x000002, 0x400000, CRC(68542ce9) SHA1(a4294da1d1026e3a9d070575e5855935389a705f) )
-	ROM_LOAD64_WORD( "705a13.28g",   0x000004, 0x400000, CRC(3b62584b) SHA1(69718f47ff1e8d65a11972af1ed5068db175f625) )
-	ROM_LOAD64_WORD( "705a17.25g",   0x000006, 0x400000, CRC(971d2812) SHA1(ee0819faf6f6c8420d5d3742cb39dfb76b9ce7a4) )
+	ROM_LOAD64_WORD( "705a17.25g",   0x000000, 0x400000, CRC(971d2812) SHA1(ee0819faf6f6c8420d5d3742cb39dfb76b9ce7a4) )
+	ROM_LOAD64_WORD( "705a13.28g",   0x000002, 0x400000, CRC(3b62584b) SHA1(69718f47ff1e8d65a11972af1ed5068db175f625) )
+	ROM_LOAD64_WORD( "705a11.30g",   0x000004, 0x400000, CRC(68542ce9) SHA1(a4294da1d1026e3a9d070575e5855935389a705f) )
+	ROM_LOAD64_WORD( "705a10.33g",   0x000006, 0x400000, CRC(fc4dc78b) SHA1(520cdcf9ca20ec1c84be734e06e183e7a871090b) )
 
 	/* sound data */
 	ROM_REGION( 0x400000, "shared", 0 )
@@ -2502,10 +2486,10 @@ ROM_START( winspikej )
 
 	/* sprites */
 	ROM_REGION( 0x1000000, "gfx2", ROMREGION_ERASE00 )
-	ROM_LOAD64_WORD( "705a10.33g",   0x000000, 0x400000, CRC(fc4dc78b) SHA1(520cdcf9ca20ec1c84be734e06e183e7a871090b) )
-	ROM_LOAD64_WORD( "705a11.30g",   0x000002, 0x400000, CRC(68542ce9) SHA1(a4294da1d1026e3a9d070575e5855935389a705f) )
-	ROM_LOAD64_WORD( "705a13.28g",   0x000004, 0x400000, CRC(3b62584b) SHA1(69718f47ff1e8d65a11972af1ed5068db175f625) )
-	ROM_LOAD64_WORD( "705a17.25g",   0x000006, 0x400000, CRC(971d2812) SHA1(ee0819faf6f6c8420d5d3742cb39dfb76b9ce7a4) )
+	ROM_LOAD64_WORD( "705a17.25g",   0x000000, 0x400000, CRC(971d2812) SHA1(ee0819faf6f6c8420d5d3742cb39dfb76b9ce7a4) )
+	ROM_LOAD64_WORD( "705a13.28g",   0x000002, 0x400000, CRC(3b62584b) SHA1(69718f47ff1e8d65a11972af1ed5068db175f625) )
+	ROM_LOAD64_WORD( "705a11.30g",   0x000004, 0x400000, CRC(68542ce9) SHA1(a4294da1d1026e3a9d070575e5855935389a705f) )
+	ROM_LOAD64_WORD( "705a10.33g",   0x000006, 0x400000, CRC(fc4dc78b) SHA1(520cdcf9ca20ec1c84be734e06e183e7a871090b) )
 
 	/* sound data */
 	ROM_REGION( 0x400000, "shared", 0 )
@@ -3200,10 +3184,10 @@ ROM_START( le2 )
 
 	/* sprites */
 	ROM_REGION( 0x800000, "gfx2", ROMREGION_ERASE00 )
-	ROM_LOAD64_WORD( "312a08.33g", 0x000000, 2*1024*1024, CRC(29015d56) SHA1(7273270804ecefd8f59469c2c2a8a89fb045a12b) )
-	ROM_LOAD64_WORD( "312a09.30g", 0x000002, 2*1024*1024, CRC(b2c5d6d5) SHA1(8248612275ca862c6688de5c6f24f37aeb3f9fe5) )
-	ROM_LOAD64_WORD( "312a10.28g", 0x000004, 2*1024*1024, CRC(3c570d04) SHA1(ebbf7d28726e98c8895c9bf901f8b2dd38018c77) )
-	ROM_LOAD64_WORD( "312a11.25g", 0x000006, 2*1024*1024, CRC(5f474357) SHA1(1f6d99f1ea69e07a65731ea4eae5917452cfcab6) )
+	ROM_LOAD64_WORD( "312a11.25g", 0x000000, 2*1024*1024, CRC(5f474357) SHA1(1f6d99f1ea69e07a65731ea4eae5917452cfcab6) )
+	ROM_LOAD64_WORD( "312a10.28g", 0x000002, 2*1024*1024, CRC(3c570d04) SHA1(ebbf7d28726e98c8895c9bf901f8b2dd38018c77) )
+	ROM_LOAD64_WORD( "312a09.30g", 0x000004, 2*1024*1024, CRC(b2c5d6d5) SHA1(8248612275ca862c6688de5c6f24f37aeb3f9fe5) )
+	ROM_LOAD64_WORD( "312a08.33g", 0x000006, 2*1024*1024, CRC(29015d56) SHA1(7273270804ecefd8f59469c2c2a8a89fb045a12b) )
 
 	/* sound data */
 	ROM_REGION( 0x400000, "shared", 0 )
@@ -3238,10 +3222,10 @@ ROM_START( le2u )
 
 	/* sprites */
 	ROM_REGION( 0x800000, "gfx2", ROMREGION_ERASE00 )
-	ROM_LOAD64_WORD( "312a08.33g", 0x000000, 2*1024*1024, CRC(29015d56) SHA1(7273270804ecefd8f59469c2c2a8a89fb045a12b) )
-	ROM_LOAD64_WORD( "312a09.30g", 0x000002, 2*1024*1024, CRC(b2c5d6d5) SHA1(8248612275ca862c6688de5c6f24f37aeb3f9fe5) )
-	ROM_LOAD64_WORD( "312a10.28g", 0x000004, 2*1024*1024, CRC(3c570d04) SHA1(ebbf7d28726e98c8895c9bf901f8b2dd38018c77) )
-	ROM_LOAD64_WORD( "312a11.25g", 0x000006, 2*1024*1024, CRC(5f474357) SHA1(1f6d99f1ea69e07a65731ea4eae5917452cfcab6) )
+	ROM_LOAD64_WORD( "312a11.25g", 0x000000, 2*1024*1024, CRC(5f474357) SHA1(1f6d99f1ea69e07a65731ea4eae5917452cfcab6) )
+	ROM_LOAD64_WORD( "312a10.28g", 0x000002, 2*1024*1024, CRC(3c570d04) SHA1(ebbf7d28726e98c8895c9bf901f8b2dd38018c77) )
+	ROM_LOAD64_WORD( "312a09.30g", 0x000004, 2*1024*1024, CRC(b2c5d6d5) SHA1(8248612275ca862c6688de5c6f24f37aeb3f9fe5) )
+	ROM_LOAD64_WORD( "312a08.33g", 0x000006, 2*1024*1024, CRC(29015d56) SHA1(7273270804ecefd8f59469c2c2a8a89fb045a12b) )
 
 	/* sound data */
 	ROM_REGION( 0x400000, "shared", 0 )
@@ -3277,10 +3261,10 @@ ROM_START( le2j )
 
 	/* sprites */
 	ROM_REGION( 0x800000, "gfx2", ROMREGION_ERASE00 )
-	ROM_LOAD64_WORD( "312a08.33g", 0x000000, 2*1024*1024, CRC(29015d56) SHA1(7273270804ecefd8f59469c2c2a8a89fb045a12b) )
-	ROM_LOAD64_WORD( "312a09.30g", 0x000002, 2*1024*1024, CRC(b2c5d6d5) SHA1(8248612275ca862c6688de5c6f24f37aeb3f9fe5) )
-	ROM_LOAD64_WORD( "312a10.28g", 0x000004, 2*1024*1024, CRC(3c570d04) SHA1(ebbf7d28726e98c8895c9bf901f8b2dd38018c77) )
-	ROM_LOAD64_WORD( "312a11.25g", 0x000006, 2*1024*1024, CRC(5f474357) SHA1(1f6d99f1ea69e07a65731ea4eae5917452cfcab6) )
+	ROM_LOAD64_WORD( "312a11.25g", 0x000000, 2*1024*1024, CRC(5f474357) SHA1(1f6d99f1ea69e07a65731ea4eae5917452cfcab6) )
+	ROM_LOAD64_WORD( "312a10.28g", 0x000002, 2*1024*1024, CRC(3c570d04) SHA1(ebbf7d28726e98c8895c9bf901f8b2dd38018c77) )
+	ROM_LOAD64_WORD( "312a09.30g", 0x000004, 2*1024*1024, CRC(b2c5d6d5) SHA1(8248612275ca862c6688de5c6f24f37aeb3f9fe5) )
+	ROM_LOAD64_WORD( "312a08.33g", 0x000006, 2*1024*1024, CRC(29015d56) SHA1(7273270804ecefd8f59469c2c2a8a89fb045a12b) )
 
 	/* sound data */
 	ROM_REGION( 0x400000, "shared", 0 )
@@ -3798,20 +3782,9 @@ DRIVER_INIT_MEMBER(konamigx_state,konamigx)
 		i++;
 	}
 
-	switch (readback)
-	{
-		case BPP5:
-			m_maincpu->space(AS_PROGRAM).install_read_handler(0xd4a000, 0xd4a00f, read32_delegate(FUNC(konamigx_state::gx5bppspr_r),this));
-		break;
+	if (readback == BPP66)
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0xd00000, 0xd01fff, read32_delegate(FUNC(konamigx_state::k_6bpp_rom_long_r), this));
 
-		case BPP66:
-			m_maincpu->space(AS_PROGRAM).install_read_handler(0xd00000, 0xd01fff, read32_delegate(FUNC(konamigx_state::k_6bpp_rom_long_r), this));
-		// fall through
-
-		case BPP6:
-			m_maincpu->space(AS_PROGRAM).install_read_handler(0xd4a000, 0xd4a00f, read32_delegate(FUNC(konamigx_state::gx6bppspr_r),this));
-		break;
-	}
 
 #undef BPP5
 #undef BPP6
