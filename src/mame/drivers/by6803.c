@@ -1,55 +1,409 @@
-/*
+/********************************************************************************************
+
+    PINBALL
     Bally MPU A084-91786-AH06 (6803)
-*/
+
+There are no dispswitches; everything is done with a numeric keypad located just inside the
+door. The system responds with messages on the display.
+
+ToDo:
+- Everything
+- Fails PIA test
+- Artwork
+- Operator keypad
+- Various sound boards
+- Inputs, Solenoids vary per game
+- Mechanical
+
+*********************************************************************************************/
 
 
-#include "emu.h"
+#include "machine/genpin.h"
 #include "cpu/m6800/m6800.h"
-#include "cpu/m6809/m6809.h"
+//#include "cpu/m6809/m6809.h"
+#include "machine/6821pia.h"
+#include "machine/nvram.h"
+//#include "audio/midway.h"
+//#include "by6803.lh"
 
-class by6803_state : public driver_device
+
+class by6803_state : public genpin_class
 {
 public:
 	by6803_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu")
+		: genpin_class(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_pia0(*this, "pia0")
+		, m_pia1(*this, "pia1")
+		, m_io_test(*this, "TEST")
+		, m_io_x0(*this, "X0")
+		, m_io_x1(*this, "X1")
+		, m_io_x2(*this, "X2")
+		, m_io_x3(*this, "X3")
+		, m_io_x4(*this, "X4")
 	{ }
 
-protected:
-
-	// devices
-	required_device<cpu_device> m_maincpu;
-
-	// driver_device overrides
-	virtual void machine_reset();
-public:
 	DECLARE_DRIVER_INIT(by6803);
+	DECLARE_READ8_MEMBER(port1_r);
+	DECLARE_WRITE8_MEMBER(port1_w);
+	DECLARE_READ8_MEMBER(port2_r);
+	DECLARE_WRITE8_MEMBER(port2_w);
+	DECLARE_READ8_MEMBER(pia0_a_r);
+	DECLARE_WRITE8_MEMBER(pia0_a_w);
+	DECLARE_READ8_MEMBER(pia0_b_r);
+	DECLARE_WRITE8_MEMBER(pia0_b_w);
+	DECLARE_READ8_MEMBER(pia1_a_r);
+	DECLARE_WRITE8_MEMBER(pia1_a_w);
+	DECLARE_WRITE8_MEMBER(pia1_b_w);
+	DECLARE_WRITE_LINE_MEMBER(pia0_ca2_w);
+	DECLARE_WRITE_LINE_MEMBER(pia0_cb2_w);
+	DECLARE_WRITE_LINE_MEMBER(pia1_cb2_w);
+	DECLARE_INPUT_CHANGED_MEMBER(activity_test);
+	DECLARE_INPUT_CHANGED_MEMBER(self_test);
+	TIMER_DEVICE_CALLBACK_MEMBER(pia0_timer);
+private:
+	UINT8 m_pia0_a;
+	UINT8 m_pia0_b;
+	UINT8 m_pia1_a;
+	UINT8 m_pia1_b;
+	bool m_pia0_cb2;
+	bool m_pia0_timer;
+	UINT8 m_port1, m_port2;
+	UINT8 m_digit;
+	UINT8 m_segment;
+	virtual void machine_reset();
+	required_device<m6803_cpu_device> m_maincpu;
+	required_device<pia6821_device> m_pia0;
+	required_device<pia6821_device> m_pia1;
+	required_ioport m_io_test;
+	required_ioport m_io_x0;
+	required_ioport m_io_x1;
+	required_ioport m_io_x2;
+	required_ioport m_io_x3;
+	required_ioport m_io_x4;
 };
 
 
 static ADDRESS_MAP_START( by6803_map, AS_PROGRAM, 8, by6803_state )
-	AM_RANGE(0x0000, 0xffff) AM_NOP
-	AM_RANGE(0x0000, 0x00ff) AM_RAM
-	AM_RANGE(0x1000, 0x17ff) AM_RAM
+	AM_RANGE(0x0020, 0x0023) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
+	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
+	AM_RANGE(0x1000, 0x17ff) AM_RAM AM_SHARE("nvram") // 6116 ram
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( by6803_io, AS_IO, 8, by6803_state )
+	AM_RANGE(M6801_PORT1, M6801_PORT1) AM_READWRITE(port1_r, port1_w) // P10-P17
+	AM_RANGE(M6801_PORT2, M6801_PORT2) AM_READWRITE(port2_r, port2_w) // P20-P24
+ADDRESS_MAP_END
+
 static INPUT_PORTS_START( by6803 )
+	PORT_START("TEST")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Self Test") PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, by6803_state, self_test, 0)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Activity") PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, by6803_state, activity_test, 0)
+
+	PORT_START("X0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER )
+	PORT_BIT( 0x0a, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START2 )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_START1 )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_TILT )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Outhole") PORT_CODE(KEYCODE_X)
+
+	PORT_START("X1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN2 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN1 )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN3 )
+	PORT_BIT( 0x38, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_TILT1 ) PORT_NAME("Slam Tilt")
+
+	// from here, vary per game
+	PORT_START("X2")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_A)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_S)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_D)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_F)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_G)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_H)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_J)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_K)
+
+	PORT_START("X3")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_Q)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_W)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_E)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_R)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_Y)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_U)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_I)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_O)
+
+	PORT_START("X4")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_Z)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_C)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_V)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_B)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_N)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_M)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_COMMA)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_STOP)
 INPUT_PORTS_END
+
+INPUT_CHANGED_MEMBER( by6803_state::activity_test )
+{
+	if(newval)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+}
+
+INPUT_CHANGED_MEMBER( by6803_state::self_test )
+{
+	m_pia0->ca1_w(newval);
+}
+
+READ8_MEMBER( by6803_state::port1_r )
+{
+	return m_port1;
+}
+
+// P10-17 - goes to peripheral bus
+WRITE8_MEMBER( by6803_state::port1_w )
+{
+	m_port1 = data; // sound data = P10,11,12,13,24; P14-17 unknown
+}
+
+READ8_MEMBER( by6803_state::port2_r )
+{
+	return m_port2;
+}
+
+// P20 - input from a phase
+// P21 - output to phase circuit
+// P22 - LED, connects to reset circuit, could be a watchdog
+// P23 - high
+// P24 - sound strobe
+WRITE8_MEMBER( by6803_state::port2_w )
+{
+	m_port2 = data;
+	output_set_value("led0", BIT(data, 2)); // P22 drives LED
+}
+
+// display latch strobes; display blanking
+WRITE_LINE_MEMBER( by6803_state::pia0_ca2_w )
+{
+}
+
+// lamp strobe 1 when high
+WRITE_LINE_MEMBER( by6803_state::pia0_cb2_w )
+{
+}
+
+// sol bank select (0 to enable sol selection)
+WRITE_LINE_MEMBER( by6803_state::pia1_cb2_w )
+{
+}
+
+READ8_MEMBER( by6803_state::pia0_a_r )
+{
+	return m_pia0_a;
+}
+
+// d0=p1,2   d1=p3,4   d2=?   d3=?  (active low, also pia0:ca2 must be low)
+// d4-7 do digit select; d0-4 switch matrix
+// d0-3 lamp rows & d5=0 & pia0:cb2=1 (1st lamp bank)
+// d0-3 lamp rows & d6=0 & pia0:cb2=1 (2nd lamp bank)
+// d0-3 lamp rows & d7=0 & pia0:cb2=1 (3rd lamp bank)
+WRITE8_MEMBER( by6803_state::pia0_a_w )
+{
+	m_pia0_a = data;
+#if 0
+// This is all wrong
+	switch (m_pia0_a)
+	{
+		case 0x10: // wrong
+			output_set_digit_value(m_digit, m_segment);
+			break;
+		case 0x1d:
+			output_set_digit_value(8+m_digit, m_segment);
+			break;
+		case 0x1b:
+			output_set_digit_value(16+m_digit, m_segment);
+			break;
+		case 0x07:
+			output_set_digit_value(24+m_digit, m_segment);
+			break;
+		case 0x0f:
+			output_set_digit_value(32+m_digit, m_segment);
+			break;
+		default:
+			break;
+	}
+#endif
+}
+
+// switch returns
+READ8_MEMBER( by6803_state::pia0_b_r )
+{
+	UINT8 data = 0;
+
+	if (BIT(m_pia0_a, 0))
+		data |= m_io_x0->read();
+
+	if (BIT(m_pia0_a, 1))
+		data |= m_io_x1->read();
+
+	if (BIT(m_pia0_a, 2))
+		data |= m_io_x2->read();
+
+	if (BIT(m_pia0_a, 3))
+		data |= m_io_x3->read();
+
+	if (BIT(m_pia0_a, 4))
+		data |= m_io_x4->read();
+
+	return data;
+}
+
+WRITE8_MEMBER( by6803_state::pia0_b_w )
+{
+	m_pia0_b = data;
+}
+
+READ8_MEMBER( by6803_state::pia1_a_r )
+{
+	return m_pia1_a;
+}
+
+// segment data; d0 & pia0:ca2 = comma; passed to digits when PA0? is high (assume they mean pia0:pa0)
+WRITE8_MEMBER( by6803_state::pia1_a_w )
+{
+	m_pia1_a = data;
+	m_segment = data >> 1;
+}
+
+// solenoids, activated when pia1:cb2 is low
+WRITE8_MEMBER( by6803_state::pia1_b_w )
+{
+	m_pia1_b = data;
+	switch (data & 15)
+	{
+		case 0x0: //
+			//m_samples->start(0, 3);
+			break;
+		case 0x1: // chime 10
+			//m_samples->start(1, 1);
+			break;
+		case 0x2: // chime 100
+			//m_samples->start(2, 2);
+			break;
+		case 0x3: // chime 1000
+			//m_samples->start(3, 3);
+			break;
+		case 0x4: // chime 10000
+			//m_samples->start(0, 4);
+			break;
+		case 0x5: // knocker
+			//m_samples->start(0, 6);
+			break;
+		case 0x6: // outhole
+			//m_samples->start(0, 5);
+			break;
+		// from here, vary per game
+		case 0x7:
+		case 0x8:
+		case 0x9:
+			//m_samples->start(0, 5);
+			break;
+		case 0xa:
+			//m_samples->start(0, 5);
+			break;
+		case 0xb:
+			//m_samples->start(0, 0);
+			break;
+		case 0xc:
+			//m_samples->start(0, 5);
+			break;
+		case 0xd:
+			//m_samples->start(0, 0);
+			break;
+		case 0xe:
+			//m_samples->start(0, 5);
+			break;
+		case 0xf: // not used
+			break;
+	}
+}
 
 void by6803_state::machine_reset()
 {
+	m_pia0_a = 0;
+	m_pia0_b = 0;
+	m_pia0_cb2 = 0;
+	m_pia1_a = 0;
+	m_pia1_b = 0;
+	m_port2 = 2+8;
 }
 
 DRIVER_INIT_MEMBER(by6803_state,by6803)
 {
 }
 
+// zero-cross detection
+TIMER_DEVICE_CALLBACK_MEMBER( by6803_state::pia0_timer )
+{
+	// Phase A
+	if ((m_pia0_timer) && (!BIT(m_port2, 1)))
+		m_port2 |= 1; // set P20 high
+	else
+		m_port2 &= ~1;
+
+	// Is this the correct thing to do? No other driver uses this line.
+	// What polarity is it? I'm assuming that irq asserted = 1.
+	m_maincpu->set_input_line(M6801_TIN_LINE, BIT(m_port2, 0));
+
+	m_pia0_timer ^= 1;
+
+	// Phase B
+	m_pia0->cb1_w(m_pia0_timer);
+}
+
 static MACHINE_CONFIG_START( by6803, by6803_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6803, 1000000)
+	MCFG_CPU_ADD("maincpu", M6803, XTAL_3_579545MHz)
 	MCFG_CPU_PROGRAM_MAP(by6803_map)
+	MCFG_CPU_IO_MAP(by6803_io)
+
+	MCFG_NVRAM_ADD_0FILL("nvram")
+
+	/* Video */
+	//MCFG_DEFAULT_LAYOUT(layout_by6803)
+
+	/* Sound */
+	MCFG_FRAGMENT_ADD( genpin_audio )
+
+	/* Devices */
+	MCFG_DEVICE_ADD("pia0", PIA6821, 0)
+	MCFG_PIA_READPA_HANDLER(READ8(by6803_state, pia0_a_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(by6803_state, pia0_a_w))
+	MCFG_PIA_READPB_HANDLER(READ8(by6803_state, pia0_b_r))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(by6803_state, pia0_b_w))
+	MCFG_PIA_CA2_HANDLER(WRITELINE(by6803_state, pia0_ca2_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(by6803_state, pia0_cb2_w))
+	MCFG_PIA_IRQA_HANDLER(DEVWRITELINE("maincpu", m6803_cpu_device, irq_line))
+	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE("maincpu", m6803_cpu_device, irq_line))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_z", by6803_state, pia0_timer, attotime::from_hz(120)) // mains freq*2
+
+	MCFG_DEVICE_ADD("pia1", PIA6821, 0)
+	MCFG_PIA_READPA_HANDLER(READ8(by6803_state, pia1_a_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(by6803_state, pia1_a_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(by6803_state, pia1_b_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(by6803_state, pia1_cb2_w))
+
+	//MCFG_SPEAKER_STANDARD_MONO("mono")
+	//MCFG_MIDWAY_TURBO_CHIP_SQUEAK_ADD("tcs") // Cheap Squeak Turbo
+	//MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
+
 
 /*-----------------------------------------------------------
 / Atlantis
