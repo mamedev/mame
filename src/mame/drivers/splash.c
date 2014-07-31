@@ -502,7 +502,6 @@ static MACHINE_CONFIG_START( splash, splash_state )
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
-
 	MCFG_MACHINE_RESET_OVERRIDE(splash_state, splash )
 
 	/* sound hardware */
@@ -594,6 +593,7 @@ WRITE_LINE_MEMBER(splash_state::adpcm_int2)
 }
 
 static MACHINE_CONFIG_START( funystrp, splash_state )
+
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)       /* 12 MHz (24/2) */
 	MCFG_CPU_PROGRAM_MAP(funystrp_map)
@@ -615,7 +615,6 @@ static MACHINE_CONFIG_START( funystrp, splash_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", splash)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
-
 
 	MCFG_MACHINE_RESET_OVERRIDE(splash_state, funystrp )
 
@@ -1061,15 +1060,14 @@ DRIVER_INIT_MEMBER(splash_state,funystrp)
 	ROM = (UINT16 *)memregion("audiocpu")->base();
 
 	membank("sound_bank")->configure_entries(0, 16, &ROM[0x00000], 0x8000);
-
 }
 
-GAME( 1992, splash,   0,        splash,   splash, splash_state,   splash,   ROT0, "Gaelco",    "Splash! (Ver. 1.2 World)", 0 )
-GAME( 1992, splash10, splash,   splash,   splash, splash_state,   splash10, ROT0, "Gaelco",    "Splash! (Ver. 1.0 World)", 0 )
-GAME( 1992, paintlad, splash,   splash,   splash, splash_state,   splash,   ROT0, "Gaelco",    "Painted Lady (Splash) (Ver. 1.3 US)", 0 )
+GAME( 1992, splash,   0,        splash,   splash, splash_state,   splash,   ROT0, "Gaelco / OMK Software", "Splash! (Ver. 1.2 World)", 0 )
+GAME( 1992, splash10, splash,   splash,   splash, splash_state,   splash10, ROT0, "Gaelco / OMK Software", "Splash! (Ver. 1.0 World)", 0 )
+GAME( 1992, paintlad, splash,   splash,   splash, splash_state,   splash,   ROT0, "Gaelco / OMK Software", "Painted Lady (Splash) (Ver. 1.3 US)", 0 )
 
 GAME( 1993, roldfrog, 0,        roldfrog, splash, splash_state,   roldfrog, ROT0, "Microhard", "The Return of Lady Frog (set 1)", 0)
 GAME( 1993, roldfroga,roldfrog, roldfrog, splash, splash_state,   roldfrog, ROT0, "Microhard", "The Return of Lady Frog (set 2)", 0 )
-GAME( 1995, rebus,    0,        roldfrog, splash, splash_state,   rebus,    ROT0, "Microhard", "Rebus", GAME_NOT_WORKING|GAME_UNEMULATED_PROTECTION|GAME_NO_SOUND )
-GAME( 199?, funystrp, 0,        funystrp, funystrp, splash_state, funystrp, ROT0, "Microhard / MagicGames", "Funny Strip", GAME_NOT_WORKING|GAME_UNEMULATED_PROTECTION )
-GAME( 199?, puckpepl, funystrp, funystrp, funystrp, splash_state, funystrp, ROT0, "Microhard", "Puck People", GAME_NOT_WORKING|GAME_UNEMULATED_PROTECTION )
+GAME( 1995, rebus,    0,        roldfrog, splash, splash_state,   rebus,    ROT0, "Microhard", "Rebus", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_NO_SOUND )
+GAME( 199?, funystrp, 0,        funystrp, funystrp, splash_state, funystrp, ROT0, "Microhard / MagicGames", "Funny Strip", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION )
+GAME( 199?, puckpepl, funystrp, funystrp, funystrp, splash_state, funystrp, ROT0, "Microhard", "Puck People", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION )
