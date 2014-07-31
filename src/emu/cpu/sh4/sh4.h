@@ -362,17 +362,9 @@ protected:
 	UINT64 m_debugger_temp;
 
 
-	typedef void (sh34_base_device::*sh4ophandler)(const UINT16);
-
-	static sh4ophandler s_master_ophandler_table[0x10000];
-	static const sh4ophandler s_op1111_0x13_handlers[16];
-	static const sh4ophandler s_op1000_handler[16];
-	static const sh4ophandler s_op1100_handler[16];
-	static const sh4ophandler s_op0000_handlers[256];
-	static const sh4ophandler s_op0100_handlers[256];
-	static const sh4ophandler s_upper4bits[256];
-
-
+	void execute_one_0000(const UINT16 opcode);
+	void execute_one_4000(const UINT16 opcode);
+	void execute_one(const UINT16 opcode);
 	inline void sh4_check_pending_irq(const char *message) // look for highest priority active exception and handle it
 	{
 		int a,irq,z;
@@ -627,7 +619,6 @@ protected:
 	void sh4_dmac_nmi();
 	void sh4_handler_ipra_w(UINT32 data, UINT32 mem_mask);
 	UINT32 sh4_getsqremap(UINT32 address);
-	void sh4_build_optable();
 	void sh4_parse_configuration();
 	void sh4_timer_recompute(int which);
 	UINT32 sh4_handle_tcnt0_addr_r(UINT32 mem_mask);

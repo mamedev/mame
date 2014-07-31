@@ -289,7 +289,7 @@ inline void sh34_base_device::WL(offs_t A, UINT32 V)
  *  0011 nnnn mmmm 1100  1       -
  *  ADD     Rm,Rn
  */
-void sh34_base_device::ADD(const UINT16 opcode)
+inline void sh34_base_device::ADD(const UINT16 opcode)
 {
 	m_r[Rn] += m_r[Rm];
 }
@@ -298,7 +298,7 @@ void sh34_base_device::ADD(const UINT16 opcode)
  *  0111 nnnn iiii iiii  1       -
  *  ADD     #imm,Rn
  */
-void sh34_base_device::ADDI(const UINT16 opcode)
+inline void sh34_base_device::ADDI(const UINT16 opcode)
 {
 	m_r[Rn] += (INT32)(INT16)(INT8)(opcode&0xff);
 }
@@ -307,7 +307,7 @@ void sh34_base_device::ADDI(const UINT16 opcode)
  *  0011 nnnn mmmm 1110  1       carry
  *  ADDC    Rm,Rn
  */
-void sh34_base_device::ADDC(const UINT16 opcode)
+inline void sh34_base_device::ADDC(const UINT16 opcode)
 {
 	UINT32 m = Rm; UINT32 n = Rn;
 	UINT32 tmp0, tmp1;
@@ -327,7 +327,7 @@ void sh34_base_device::ADDC(const UINT16 opcode)
  *  0011 nnnn mmmm 1111  1       overflow
  *  ADDV    Rm,Rn
  */
-void sh34_base_device::ADDV(const UINT16 opcode)
+inline void sh34_base_device::ADDV(const UINT16 opcode)
 {
 	UINT32 m = Rm; UINT32 n = Rn;
 	INT32 dest, src, ans;
@@ -362,7 +362,7 @@ void sh34_base_device::ADDV(const UINT16 opcode)
  *  0010 nnnn mmmm 1001  1       -
  *  AND     Rm,Rn
  */
-void sh34_base_device::AND(const UINT16 opcode)
+inline void sh34_base_device::AND(const UINT16 opcode)
 {
 	m_r[Rn] &= m_r[Rm];
 }
@@ -372,7 +372,7 @@ void sh34_base_device::AND(const UINT16 opcode)
  *  1100 1001 iiii iiii  1       -
  *  AND     #imm,R0
  */
-void sh34_base_device::ANDI(const UINT16 opcode)
+inline void sh34_base_device::ANDI(const UINT16 opcode)
 {
 	m_r[0] &= (opcode&0xff);
 }
@@ -381,7 +381,7 @@ void sh34_base_device::ANDI(const UINT16 opcode)
  *  1100 1101 iiii iiii  1       -
  *  AND.B   #imm,@(R0,GBR)
  */
-void sh34_base_device::ANDM(const UINT16 opcode)
+inline void sh34_base_device::ANDM(const UINT16 opcode)
 {
 	UINT32 temp;
 
@@ -395,7 +395,7 @@ void sh34_base_device::ANDM(const UINT16 opcode)
  *  1000 1011 dddd dddd  3/1     -
  *  BF      disp8
  */
-void sh34_base_device::BF(const UINT16 opcode)
+inline void sh34_base_device::BF(const UINT16 opcode)
 {
 	if ((m_sr & T) == 0)
 	{
@@ -409,7 +409,7 @@ void sh34_base_device::BF(const UINT16 opcode)
  *  1000 1111 dddd dddd  3/1     -
  *  BFS     disp8
  */
-void sh34_base_device::BFS(const UINT16 opcode)
+inline void sh34_base_device::BFS(const UINT16 opcode)
 {
 	if ((m_sr & T) == 0)
 	{
@@ -424,7 +424,7 @@ void sh34_base_device::BFS(const UINT16 opcode)
  *  1010 dddd dddd dddd  2       -
  *  BRA     disp12
  */
-void sh34_base_device::BRA(const UINT16 opcode)
+inline void sh34_base_device::BRA(const UINT16 opcode)
 {
 	INT32 disp = ((INT32)(opcode&0xfff) << 20) >> 20;
 
@@ -448,7 +448,7 @@ void sh34_base_device::BRA(const UINT16 opcode)
  *  0000 mmmm 0010 0011  2       -
  *  BRAF    Rm
  */
-void sh34_base_device::BRAF(const UINT16 opcode)
+inline void sh34_base_device::BRAF(const UINT16 opcode)
 {
 	m_delay = m_pc;
 	m_pc += m_r[Rn] + 2;
@@ -459,7 +459,7 @@ void sh34_base_device::BRAF(const UINT16 opcode)
  *  1011 dddd dddd dddd  2       -
  *  BSR     disp12
  */
-void sh34_base_device::BSR(const UINT16 opcode)
+inline void sh34_base_device::BSR(const UINT16 opcode)
 {
 	INT32 disp = ((INT32)(opcode&0xfff) << 20) >> 20;
 
@@ -473,7 +473,7 @@ void sh34_base_device::BSR(const UINT16 opcode)
  *  0000 mmmm 0000 0011  2       -
  *  BSRF    Rm
  */
-void sh34_base_device::BSRF(const UINT16 opcode)
+inline void sh34_base_device::BSRF(const UINT16 opcode)
 {
 	m_pr = m_pc + 2;
 	m_delay = m_pc;
@@ -485,7 +485,7 @@ void sh34_base_device::BSRF(const UINT16 opcode)
  *  1000 1001 dddd dddd  3/1     -
  *  BT      disp8
  */
-void sh34_base_device::BT(const UINT16 opcode)
+inline void sh34_base_device::BT(const UINT16 opcode)
 {
 	if ((m_sr & T) != 0)
 	{
@@ -499,7 +499,7 @@ void sh34_base_device::BT(const UINT16 opcode)
  *  1000 1101 dddd dddd  2/1     -
  *  BTS     disp8
  */
-void sh34_base_device::BTS(const UINT16 opcode)
+inline void sh34_base_device::BTS(const UINT16 opcode)
 {
 	if ((m_sr & T) != 0)
 	{
@@ -514,7 +514,7 @@ void sh34_base_device::BTS(const UINT16 opcode)
  *  0000 0000 0010 1000  1       -
  *  CLRMAC
  */
-void sh34_base_device::CLRMAC(const UINT16 opcode)
+inline void sh34_base_device::CLRMAC(const UINT16 opcode)
 {
 	m_mach = 0;
 	m_macl = 0;
@@ -524,7 +524,7 @@ void sh34_base_device::CLRMAC(const UINT16 opcode)
  *  0000 0000 0000 1000  1       -
  *  CLRT
  */
-void sh34_base_device::CLRT(const UINT16 opcode)
+inline void sh34_base_device::CLRT(const UINT16 opcode)
 {
 	m_sr &= ~T;
 }
@@ -533,7 +533,7 @@ void sh34_base_device::CLRT(const UINT16 opcode)
  *  0011 nnnn mmmm 0000  1       comparison result
  *  CMP_EQ  Rm,Rn
  */
-void sh34_base_device::CMPEQ(const UINT16 opcode)
+inline void sh34_base_device::CMPEQ(const UINT16 opcode)
 {
 	if (m_r[Rn] == m_r[Rm])
 		m_sr |= T;
@@ -545,7 +545,7 @@ void sh34_base_device::CMPEQ(const UINT16 opcode)
  *  0011 nnnn mmmm 0011  1       comparison result
  *  CMP_GE  Rm,Rn
  */
-void sh34_base_device::CMPGE(const UINT16 opcode)
+inline void sh34_base_device::CMPGE(const UINT16 opcode)
 {
 	if ((INT32) m_r[Rn] >= (INT32) m_r[Rm])
 		m_sr |= T;
@@ -557,7 +557,7 @@ void sh34_base_device::CMPGE(const UINT16 opcode)
  *  0011 nnnn mmmm 0111  1       comparison result
  *  CMP_GT  Rm,Rn
  */
-void sh34_base_device::CMPGT(const UINT16 opcode)
+inline void sh34_base_device::CMPGT(const UINT16 opcode)
 {
 	if ((INT32) m_r[Rn] > (INT32) m_r[Rm])
 		m_sr |= T;
@@ -569,7 +569,7 @@ void sh34_base_device::CMPGT(const UINT16 opcode)
  *  0011 nnnn mmmm 0110  1       comparison result
  *  CMP_HI  Rm,Rn
  */
-void sh34_base_device::CMPHI(const UINT16 opcode)
+inline void sh34_base_device::CMPHI(const UINT16 opcode)
 {
 	if ((UINT32) m_r[Rn] > (UINT32) m_r[Rm])
 		m_sr |= T;
@@ -581,7 +581,7 @@ void sh34_base_device::CMPHI(const UINT16 opcode)
  *  0011 nnnn mmmm 0010  1       comparison result
  *  CMP_HS  Rm,Rn
  */
-void sh34_base_device::CMPHS(const UINT16 opcode)
+inline void sh34_base_device::CMPHS(const UINT16 opcode)
 {
 	if ((UINT32) m_r[Rn] >= (UINT32) m_r[Rm])
 		m_sr |= T;
@@ -594,7 +594,7 @@ void sh34_base_device::CMPHS(const UINT16 opcode)
  *  0100 nnnn 0001 0101  1       comparison result
  *  CMP_PL  Rn
  */
-void sh34_base_device::CMPPL(const UINT16 opcode)
+inline void sh34_base_device::CMPPL(const UINT16 opcode)
 {
 	if ((INT32) m_r[Rn] > 0)
 		m_sr |= T;
@@ -606,7 +606,7 @@ void sh34_base_device::CMPPL(const UINT16 opcode)
  *  0100 nnnn 0001 0001  1       comparison result
  *  CMP_PZ  Rn
  */
-void sh34_base_device::CMPPZ(const UINT16 opcode)
+inline void sh34_base_device::CMPPZ(const UINT16 opcode)
 {
 	if ((INT32) m_r[Rn] >= 0)
 		m_sr |= T;
@@ -618,7 +618,7 @@ void sh34_base_device::CMPPZ(const UINT16 opcode)
  *  0010 nnnn mmmm 1100  1       comparison result
  * CMP_STR  Rm,Rn
  */
-void sh34_base_device::CMPSTR(const UINT16 opcode)
+inline void sh34_base_device::CMPSTR(const UINT16 opcode)
 {
 	UINT32 temp;
 	INT32 HH, HL, LH, LL;
@@ -638,7 +638,7 @@ void sh34_base_device::CMPSTR(const UINT16 opcode)
  *  1000 1000 iiii iiii  1       comparison result
  *  CMP/EQ #imm,R0
  */
-void sh34_base_device::CMPIM(const UINT16 opcode)
+inline void sh34_base_device::CMPIM(const UINT16 opcode)
 {
 	UINT32 imm = (UINT32)(INT32)(INT16)(INT8)(opcode&0xff);
 
@@ -652,7 +652,7 @@ void sh34_base_device::CMPIM(const UINT16 opcode)
  *  0010 nnnn mmmm 0111  1       calculation result
  *  DIV0S   Rm,Rn
  */
-void sh34_base_device::DIV0S(const UINT16 opcode)
+inline void sh34_base_device::DIV0S(const UINT16 opcode)
 {
 	UINT32 m = Rm; UINT32 n = Rn;
 
@@ -674,7 +674,7 @@ void sh34_base_device::DIV0S(const UINT16 opcode)
  *  0000 0000 0001 1001  1       0
  *  DIV0U
  */
-void sh34_base_device::DIV0U(const UINT16 opcode)
+inline void sh34_base_device::DIV0U(const UINT16 opcode)
 {
 	m_sr &= ~(M | Q | T);
 }
@@ -683,7 +683,7 @@ void sh34_base_device::DIV0U(const UINT16 opcode)
  *  0011 nnnn mmmm 0100  1       calculation result
  *  DIV1 Rm,Rn
  */
-void sh34_base_device::DIV1(const UINT16 opcode)
+inline void sh34_base_device::DIV1(const UINT16 opcode)
 {
 	UINT32 m = Rm; UINT32 n = Rn;
 
@@ -777,7 +777,7 @@ void sh34_base_device::DIV1(const UINT16 opcode)
 }
 
 /*  DMULS.L Rm,Rn */
-void sh34_base_device::DMULS(const UINT16 opcode)
+inline void sh34_base_device::DMULS(const UINT16 opcode)
 {
 	UINT32 m = Rm; UINT32 n = Rn;
 
@@ -828,7 +828,7 @@ void sh34_base_device::DMULS(const UINT16 opcode)
 }
 
 /*  DMULU.L Rm,Rn */
-void sh34_base_device::DMULU(const UINT16 opcode)
+inline void sh34_base_device::DMULU(const UINT16 opcode)
 {
 	UINT32 m = Rm; UINT32 n = Rn;
 
@@ -858,7 +858,7 @@ void sh34_base_device::DMULU(const UINT16 opcode)
 }
 
 /*  DT      Rn */
-void sh34_base_device::DT(const UINT16 opcode)
+inline void sh34_base_device::DT(const UINT16 opcode)
 {
 	UINT32 n = Rn;
 
@@ -886,38 +886,38 @@ void sh34_base_device::DT(const UINT16 opcode)
 }
 
 /*  EXTS.B  Rm,Rn */
-void sh34_base_device::EXTSB(const UINT16 opcode)
+inline void sh34_base_device::EXTSB(const UINT16 opcode)
 {
 	m_r[Rn] = ((INT32)m_r[Rm] << 24) >> 24;
 }
 
 /*  EXTS.W  Rm,Rn */
-void sh34_base_device::EXTSW(const UINT16 opcode)
+inline void sh34_base_device::EXTSW(const UINT16 opcode)
 {
 	m_r[Rn] = ((INT32)m_r[Rm] << 16) >> 16;
 }
 
 /*  EXTU.B  Rm,Rn */
-void sh34_base_device::EXTUB(const UINT16 opcode)
+inline void sh34_base_device::EXTUB(const UINT16 opcode)
 {
 	m_r[Rn] = m_r[Rm] & 0x000000ff;
 }
 
 /*  EXTU.W  Rm,Rn */
-void sh34_base_device::EXTUW(const UINT16 opcode)
+inline void sh34_base_device::EXTUW(const UINT16 opcode)
 {
 	m_r[Rn] = m_r[Rm] & 0x0000ffff;
 }
 
 /*  JMP     @Rm */
-void sh34_base_device::JMP(const UINT16 opcode)
+inline void sh34_base_device::JMP(const UINT16 opcode)
 {
 	m_delay = m_pc;
 	m_pc = m_ea = m_r[Rn];
 }
 
 /*  JSR     @Rm */
-void sh34_base_device::JSR(const UINT16 opcode)
+inline void sh34_base_device::JSR(const UINT16 opcode)
 {
 	m_delay = m_pc;
 	m_pr = m_pc + 2;
@@ -927,7 +927,7 @@ void sh34_base_device::JSR(const UINT16 opcode)
 
 
 /*  LDC     Rm,SR */
-void sh34_base_device::LDCSR(const UINT16 opcode)
+inline void sh34_base_device::LDCSR(const UINT16 opcode)
 {
 	UINT32 reg;
 
@@ -941,19 +941,19 @@ void sh34_base_device::LDCSR(const UINT16 opcode)
 }
 
 /*  LDC     Rm,GBR */
-void sh34_base_device::LDCGBR(const UINT16 opcode)
+inline void sh34_base_device::LDCGBR(const UINT16 opcode)
 {
 	m_gbr = m_r[Rn];
 }
 
 /*  LDC     Rm,VBR */
-void sh34_base_device::LDCVBR(const UINT16 opcode)
+inline void sh34_base_device::LDCVBR(const UINT16 opcode)
 {
 	m_vbr = m_r[Rn];
 }
 
 /*  LDC.L   @Rm+,SR */
-void sh34_base_device::LDCMSR(const UINT16 opcode)
+inline void sh34_base_device::LDCMSR(const UINT16 opcode)
 {
 	UINT32 old;
 
@@ -970,7 +970,7 @@ void sh34_base_device::LDCMSR(const UINT16 opcode)
 }
 
 /*  LDC.L   @Rm+,GBR */
-void sh34_base_device::LDCMGBR(const UINT16 opcode)
+inline void sh34_base_device::LDCMGBR(const UINT16 opcode)
 {
 	m_ea = m_r[Rn];
 	m_gbr = RL(m_ea );
@@ -979,7 +979,7 @@ void sh34_base_device::LDCMGBR(const UINT16 opcode)
 }
 
 /*  LDC.L   @Rm+,VBR */
-void sh34_base_device::LDCMVBR(const UINT16 opcode)
+inline void sh34_base_device::LDCMVBR(const UINT16 opcode)
 {
 	m_ea = m_r[Rn];
 	m_vbr = RL(m_ea );
@@ -988,25 +988,25 @@ void sh34_base_device::LDCMVBR(const UINT16 opcode)
 }
 
 /*  LDS     Rm,MACH */
-void sh34_base_device::LDSMACH(const UINT16 opcode)
+inline void sh34_base_device::LDSMACH(const UINT16 opcode)
 {
 	m_mach = m_r[Rn];
 }
 
 /*  LDS     Rm,MACL */
-void sh34_base_device::LDSMACL(const UINT16 opcode)
+inline void sh34_base_device::LDSMACL(const UINT16 opcode)
 {
 	m_macl = m_r[Rn];
 }
 
 /*  LDS     Rm,PR */
-void sh34_base_device::LDSPR(const UINT16 opcode)
+inline void sh34_base_device::LDSPR(const UINT16 opcode)
 {
 	m_pr = m_r[Rn];
 }
 
 /*  LDS.L   @Rm+,MACH */
-void sh34_base_device::LDSMMACH(const UINT16 opcode)
+inline void sh34_base_device::LDSMMACH(const UINT16 opcode)
 {
 	m_ea = m_r[Rn];
 	m_mach = RL(m_ea );
@@ -1014,7 +1014,7 @@ void sh34_base_device::LDSMMACH(const UINT16 opcode)
 }
 
 /*  LDS.L   @Rm+,MACL */
-void sh34_base_device::LDSMMACL(const UINT16 opcode)
+inline void sh34_base_device::LDSMMACL(const UINT16 opcode)
 {
 	m_ea = m_r[Rn];
 	m_macl = RL(m_ea );
@@ -1022,7 +1022,7 @@ void sh34_base_device::LDSMMACL(const UINT16 opcode)
 }
 
 /*  LDS.L   @Rm+,PR */
-void sh34_base_device::LDSMPR(const UINT16 opcode)
+inline void sh34_base_device::LDSMPR(const UINT16 opcode)
 {
 	m_ea = m_r[Rn];
 	m_pr = RL(m_ea );
@@ -1030,7 +1030,7 @@ void sh34_base_device::LDSMPR(const UINT16 opcode)
 }
 
 /*  MAC.L   @Rm+,@Rn+ */
-void sh34_base_device::MAC_L(const UINT16 opcode)
+inline void sh34_base_device::MAC_L(const UINT16 opcode)
 {
 	UINT32 m = Rm; UINT32 n = Rn;
 
@@ -1109,7 +1109,7 @@ void sh34_base_device::MAC_L(const UINT16 opcode)
 }
 
 /*  MAC.W   @Rm+,@Rn+ */
-void sh34_base_device::MAC_W(const UINT16 opcode)
+inline void sh34_base_device::MAC_W(const UINT16 opcode)
 {
 	UINT32 m = Rm; UINT32 n = Rn;
 
@@ -1163,55 +1163,55 @@ void sh34_base_device::MAC_W(const UINT16 opcode)
 }
 
 /*  MOV     Rm,Rn */
-void sh34_base_device::MOV(const UINT16 opcode)
+inline void sh34_base_device::MOV(const UINT16 opcode)
 {
 	m_r[Rn] = m_r[Rm];
 }
 
 /*  MOV.B   Rm,@Rn */
-void sh34_base_device::MOVBS(const UINT16 opcode)
+inline void sh34_base_device::MOVBS(const UINT16 opcode)
 {
 	m_ea = m_r[Rn];
 	WB(m_ea, m_r[Rm] & 0x000000ff);
 }
 
 /*  MOV.W   Rm,@Rn */
-void sh34_base_device::MOVWS(const UINT16 opcode)
+inline void sh34_base_device::MOVWS(const UINT16 opcode)
 {
 	m_ea = m_r[Rn];
 	WW(m_ea, m_r[Rm] & 0x0000ffff);
 }
 
 /*  MOV.L   Rm,@Rn */
-void sh34_base_device::MOVLS(const UINT16 opcode)
+inline void sh34_base_device::MOVLS(const UINT16 opcode)
 {
 	m_ea = m_r[Rn];
 	WL(m_ea, m_r[Rm] );
 }
 
 /*  MOV.B   @Rm,Rn */
-void sh34_base_device::MOVBL(const UINT16 opcode)
+inline void sh34_base_device::MOVBL(const UINT16 opcode)
 {
 	m_ea = m_r[Rm];
 	m_r[Rn] = (UINT32)(INT32)(INT16)(INT8) RB( m_ea );
 }
 
 /*  MOV.W   @Rm,Rn */
-void sh34_base_device::MOVWL(const UINT16 opcode)
+inline void sh34_base_device::MOVWL(const UINT16 opcode)
 {
 	m_ea = m_r[Rm];
 	m_r[Rn] = (UINT32)(INT32)(INT16) RW(m_ea );
 }
 
 /*  MOV.L   @Rm,Rn */
-void sh34_base_device::MOVLL(const UINT16 opcode)
+inline void sh34_base_device::MOVLL(const UINT16 opcode)
 {
 	m_ea = m_r[Rm];
 	m_r[Rn] = RL(m_ea );
 }
 
 /*  MOV.B   Rm,@-Rn */
-void sh34_base_device::MOVBM(const UINT16 opcode)
+inline void sh34_base_device::MOVBM(const UINT16 opcode)
 {
 	UINT32 data = m_r[Rm] & 0x000000ff;
 
@@ -1220,7 +1220,7 @@ void sh34_base_device::MOVBM(const UINT16 opcode)
 }
 
 /*  MOV.W   Rm,@-Rn */
-void sh34_base_device::MOVWM(const UINT16 opcode)
+inline void sh34_base_device::MOVWM(const UINT16 opcode)
 {
 	UINT32 data = m_r[Rm] & 0x0000ffff;
 
@@ -1229,7 +1229,7 @@ void sh34_base_device::MOVWM(const UINT16 opcode)
 }
 
 /*  MOV.L   Rm,@-Rn */
-void sh34_base_device::MOVLM(const UINT16 opcode)
+inline void sh34_base_device::MOVLM(const UINT16 opcode)
 {
 	UINT32 data = m_r[Rm];
 
@@ -1238,7 +1238,7 @@ void sh34_base_device::MOVLM(const UINT16 opcode)
 }
 
 /*  MOV.B   @Rm+,Rn */
-void sh34_base_device::MOVBP(const UINT16 opcode)
+inline void sh34_base_device::MOVBP(const UINT16 opcode)
 {
 	UINT32 m = Rm; UINT32 n = Rn;
 
@@ -1248,7 +1248,7 @@ void sh34_base_device::MOVBP(const UINT16 opcode)
 }
 
 /*  MOV.W   @Rm+,Rn */
-void sh34_base_device::MOVWP(const UINT16 opcode)
+inline void sh34_base_device::MOVWP(const UINT16 opcode)
 {
 	UINT32 m = Rm; UINT32 n = Rn;
 
@@ -1258,7 +1258,7 @@ void sh34_base_device::MOVWP(const UINT16 opcode)
 }
 
 /*  MOV.L   @Rm+,Rn */
-void sh34_base_device::MOVLP(const UINT16 opcode)
+inline void sh34_base_device::MOVLP(const UINT16 opcode)
 {
 	UINT32 m = Rm; UINT32 n = Rn;
 
@@ -1268,55 +1268,55 @@ void sh34_base_device::MOVLP(const UINT16 opcode)
 }
 
 /*  MOV.B   Rm,@(R0,Rn) */
-void sh34_base_device::MOVBS0(const UINT16 opcode)
+inline void sh34_base_device::MOVBS0(const UINT16 opcode)
 {
 	m_ea = m_r[Rn] + m_r[0];
 	WB(m_ea, m_r[Rm] & 0x000000ff );
 }
 
 /*  MOV.W   Rm,@(R0,Rn) */
-void sh34_base_device::MOVWS0(const UINT16 opcode)
+inline void sh34_base_device::MOVWS0(const UINT16 opcode)
 {
 	m_ea = m_r[Rn] + m_r[0];
 	WW(m_ea, m_r[Rm] & 0x0000ffff );
 }
 
 /*  MOV.L   Rm,@(R0,Rn) */
-void sh34_base_device::MOVLS0(const UINT16 opcode)
+inline void sh34_base_device::MOVLS0(const UINT16 opcode)
 {
 	m_ea = m_r[Rn] + m_r[0];
 	WL(m_ea, m_r[Rm] );
 }
 
 /*  MOV.B   @(R0,Rm),Rn */
-void sh34_base_device::MOVBL0(const UINT16 opcode)
+inline void sh34_base_device::MOVBL0(const UINT16 opcode)
 {
 	m_ea = m_r[Rm] + m_r[0];
 	m_r[Rn] = (UINT32)(INT32)(INT16)(INT8) RB( m_ea );
 }
 
 /*  MOV.W   @(R0,Rm),Rn */
-void sh34_base_device::MOVWL0(const UINT16 opcode)
+inline void sh34_base_device::MOVWL0(const UINT16 opcode)
 {
 	m_ea = m_r[Rm] + m_r[0];
 	m_r[Rn] = (UINT32)(INT32)(INT16) RW(m_ea );
 }
 
 /*  MOV.L   @(R0,Rm),Rn */
-void sh34_base_device::MOVLL0(const UINT16 opcode)
+inline void sh34_base_device::MOVLL0(const UINT16 opcode)
 {
 	m_ea = m_r[Rm] + m_r[0];
 	m_r[Rn] = RL(m_ea );
 }
 
 /*  MOV     #imm,Rn */
-void sh34_base_device::MOVI(const UINT16 opcode)
+inline void sh34_base_device::MOVI(const UINT16 opcode)
 {
 	m_r[Rn] = (UINT32)(INT32)(INT16)(INT8)(opcode&0xff);
 }
 
 /*  MOV.W   @(disp8,PC),Rn */
-void sh34_base_device::MOVWI(const UINT16 opcode)
+inline void sh34_base_device::MOVWI(const UINT16 opcode)
 {
 	UINT32 disp = opcode & 0xff;
 	m_ea = m_pc + disp * 2 + 2;
@@ -1324,7 +1324,7 @@ void sh34_base_device::MOVWI(const UINT16 opcode)
 }
 
 /*  MOV.L   @(disp8,PC),Rn */
-void sh34_base_device::MOVLI(const UINT16 opcode)
+inline void sh34_base_device::MOVLI(const UINT16 opcode)
 {
 	UINT32 disp = opcode & 0xff;
 	m_ea = ((m_pc + 2) & ~3) + disp * 4;
@@ -1332,7 +1332,7 @@ void sh34_base_device::MOVLI(const UINT16 opcode)
 }
 
 /*  MOV.B   @(disp8,GBR),R0 */
-void sh34_base_device::MOVBLG(const UINT16 opcode)
+inline void sh34_base_device::MOVBLG(const UINT16 opcode)
 {
 	UINT32 disp = opcode & 0xff;
 	m_ea = m_gbr + disp;
@@ -1340,7 +1340,7 @@ void sh34_base_device::MOVBLG(const UINT16 opcode)
 }
 
 /*  MOV.W   @(disp8,GBR),R0 */
-void sh34_base_device::MOVWLG(const UINT16 opcode)
+inline void sh34_base_device::MOVWLG(const UINT16 opcode)
 {
 	UINT32 disp = opcode & 0xff;
 	m_ea = m_gbr + disp * 2;
@@ -1348,7 +1348,7 @@ void sh34_base_device::MOVWLG(const UINT16 opcode)
 }
 
 /*  MOV.L   @(disp8,GBR),R0 */
-void sh34_base_device::MOVLLG(const UINT16 opcode)
+inline void sh34_base_device::MOVLLG(const UINT16 opcode)
 {
 	UINT32 disp = opcode & 0xff;
 	m_ea = m_gbr + disp * 4;
@@ -1356,7 +1356,7 @@ void sh34_base_device::MOVLLG(const UINT16 opcode)
 }
 
 /*  MOV.B   R0,@(disp8,GBR) */
-void sh34_base_device::MOVBSG(const UINT16 opcode)
+inline void sh34_base_device::MOVBSG(const UINT16 opcode)
 {
 	UINT32 disp = opcode & 0xff;
 	m_ea = m_gbr + disp;
@@ -1364,7 +1364,7 @@ void sh34_base_device::MOVBSG(const UINT16 opcode)
 }
 
 /*  MOV.W   R0,@(disp8,GBR) */
-void sh34_base_device::MOVWSG(const UINT16 opcode)
+inline void sh34_base_device::MOVWSG(const UINT16 opcode)
 {
 	UINT32 disp = opcode & 0xff;
 	m_ea = m_gbr + disp * 2;
@@ -1372,7 +1372,7 @@ void sh34_base_device::MOVWSG(const UINT16 opcode)
 }
 
 /*  MOV.L   R0,@(disp8,GBR) */
-void sh34_base_device::MOVLSG(const UINT16 opcode)
+inline void sh34_base_device::MOVLSG(const UINT16 opcode)
 {
 	UINT32 disp = opcode & 0xff;
 	m_ea = m_gbr + disp * 4;
@@ -1380,7 +1380,7 @@ void sh34_base_device::MOVLSG(const UINT16 opcode)
 }
 
 /*  MOV.B   R0,@(disp4,Rm) */
-void sh34_base_device::MOVBS4(const UINT16 opcode)
+inline void sh34_base_device::MOVBS4(const UINT16 opcode)
 {
 	UINT32 disp = opcode & 0x0f;
 	m_ea = m_r[Rm] + disp;
@@ -1388,7 +1388,7 @@ void sh34_base_device::MOVBS4(const UINT16 opcode)
 }
 
 /*  MOV.W   R0,@(disp4,Rm) */
-void sh34_base_device::MOVWS4(const UINT16 opcode)
+inline void sh34_base_device::MOVWS4(const UINT16 opcode)
 {
 	UINT32 disp = opcode & 0x0f;
 	m_ea = m_r[Rm] + disp * 2;
@@ -1396,7 +1396,7 @@ void sh34_base_device::MOVWS4(const UINT16 opcode)
 }
 
 /* MOV.L Rm,@(disp4,Rn) */
-void sh34_base_device::MOVLS4(const UINT16 opcode)
+inline void sh34_base_device::MOVLS4(const UINT16 opcode)
 {
 	UINT32 disp = opcode & 0x0f;
 	m_ea = m_r[Rn] + disp * 4;
@@ -1404,7 +1404,7 @@ void sh34_base_device::MOVLS4(const UINT16 opcode)
 }
 
 /*  MOV.B   @(disp4,Rm),R0 */
-void sh34_base_device::MOVBL4(const UINT16 opcode)
+inline void sh34_base_device::MOVBL4(const UINT16 opcode)
 {
 	UINT32 disp = opcode & 0x0f;
 	m_ea = m_r[Rm] + disp;
@@ -1412,7 +1412,7 @@ void sh34_base_device::MOVBL4(const UINT16 opcode)
 }
 
 /*  MOV.W   @(disp4,Rm),R0 */
-void sh34_base_device::MOVWL4(const UINT16 opcode)
+inline void sh34_base_device::MOVWL4(const UINT16 opcode)
 {
 	UINT32 disp = opcode & 0x0f;
 	m_ea = m_r[Rm] + disp * 2;
@@ -1420,7 +1420,7 @@ void sh34_base_device::MOVWL4(const UINT16 opcode)
 }
 
 /*  MOV.L   @(disp4,Rm),Rn */
-void sh34_base_device::MOVLL4(const UINT16 opcode)
+inline void sh34_base_device::MOVLL4(const UINT16 opcode)
 {
 	UINT32 disp = opcode & 0x0f;
 	m_ea = m_r[Rm] + disp * 4;
@@ -1428,7 +1428,7 @@ void sh34_base_device::MOVLL4(const UINT16 opcode)
 }
 
 /*  MOVA    @(disp8,PC),R0 */
-void sh34_base_device::MOVA(const UINT16 opcode)
+inline void sh34_base_device::MOVA(const UINT16 opcode)
 {
 	UINT32 disp = opcode & 0xff;
 	m_ea = ((m_pc + 2) & ~3) + disp * 4;
@@ -1442,32 +1442,32 @@ void sh34_base_device::MOVT(const UINT16 opcode)
 }
 
 /*  MUL.L   Rm,Rn */
-void sh34_base_device::MULL(const UINT16 opcode)
+inline void sh34_base_device::MULL(const UINT16 opcode)
 {
 	m_macl = m_r[Rn] * m_r[Rm];
 	m_sh4_icount--;
 }
 
 /*  MULS    Rm,Rn */
-void sh34_base_device::MULS(const UINT16 opcode)
+inline void sh34_base_device::MULS(const UINT16 opcode)
 {
 	m_macl = (INT16) m_r[Rn] * (INT16) m_r[Rm];
 }
 
 /*  MULU    Rm,Rn */
-void sh34_base_device::MULU(const UINT16 opcode)
+inline void sh34_base_device::MULU(const UINT16 opcode)
 {
 	m_macl = (UINT16) m_r[Rn] * (UINT16) m_r[Rm];
 }
 
 /*  NEG     Rm,Rn */
-void sh34_base_device::NEG(const UINT16 opcode)
+inline void sh34_base_device::NEG(const UINT16 opcode)
 {
 	m_r[Rn] = 0 - m_r[Rm];
 }
 
 /*  NEGC    Rm,Rn */
-void sh34_base_device::NEGC(const UINT16 opcode)
+inline void sh34_base_device::NEGC(const UINT16 opcode)
 {
 	UINT32 temp;
 
@@ -1480,31 +1480,31 @@ void sh34_base_device::NEGC(const UINT16 opcode)
 }
 
 /*  NOP */
-void sh34_base_device::NOP(const UINT16 opcode)
+inline void sh34_base_device::NOP(const UINT16 opcode)
 {
 }
 
 /*  NOT     Rm,Rn */
-void sh34_base_device::NOT(const UINT16 opcode)
+inline void sh34_base_device::NOT(const UINT16 opcode)
 {
 	m_r[Rn] = ~m_r[Rm];
 }
 
 /*  OR      Rm,Rn */
-void sh34_base_device::OR(const UINT16 opcode)
+inline void sh34_base_device::OR(const UINT16 opcode)
 {
 	m_r[Rn] |= m_r[Rm];
 }
 
 /*  OR      #imm,R0 */
-void sh34_base_device::ORI(const UINT16 opcode)
+inline void sh34_base_device::ORI(const UINT16 opcode)
 {
 	m_r[0] |= (opcode&0xff);
 	m_sh4_icount -= 2;
 }
 
 /*  OR.B    #imm,@(R0,GBR) */
-void sh34_base_device::ORM(const UINT16 opcode)
+inline void sh34_base_device::ORM(const UINT16 opcode)
 {
 	UINT32 temp;
 
@@ -1515,7 +1515,7 @@ void sh34_base_device::ORM(const UINT16 opcode)
 }
 
 /*  ROTCL   Rn */
-void sh34_base_device::ROTCL(const UINT16 opcode)
+inline void sh34_base_device::ROTCL(const UINT16 opcode)
 {
 	UINT32 n = Rn;
 
@@ -1527,7 +1527,7 @@ void sh34_base_device::ROTCL(const UINT16 opcode)
 }
 
 /*  ROTCR   Rn */
-void sh34_base_device::ROTCR(const UINT16 opcode)
+inline void sh34_base_device::ROTCR(const UINT16 opcode)
 {
 	UINT32 n = Rn;
 
@@ -1541,7 +1541,7 @@ void sh34_base_device::ROTCR(const UINT16 opcode)
 }
 
 /*  ROTL    Rn */
-void sh34_base_device::ROTL(const UINT16 opcode)
+inline void sh34_base_device::ROTL(const UINT16 opcode)
 {
 	UINT32 n = Rn;
 
@@ -1550,7 +1550,7 @@ void sh34_base_device::ROTL(const UINT16 opcode)
 }
 
 /*  ROTR    Rn */
-void sh34_base_device::ROTR(const UINT16 opcode)
+inline void sh34_base_device::ROTR(const UINT16 opcode)
 {
 	UINT32 n = Rn;
 
@@ -1559,7 +1559,7 @@ void sh34_base_device::ROTR(const UINT16 opcode)
 }
 
 /*  RTE */
-void sh34_base_device::RTE(const UINT16 opcode)
+inline void sh34_base_device::RTE(const UINT16 opcode)
 {
 	m_delay = m_pc;
 	m_pc = m_ea = m_spc;
@@ -1573,7 +1573,7 @@ void sh34_base_device::RTE(const UINT16 opcode)
 }
 
 /*  RTS */
-void sh34_base_device::RTS(const UINT16 opcode)
+inline void sh34_base_device::RTS(const UINT16 opcode)
 {
 	m_delay = m_pc;
 	m_pc = m_ea = m_pr;
@@ -1581,13 +1581,13 @@ void sh34_base_device::RTS(const UINT16 opcode)
 }
 
 /*  SETT */
-void sh34_base_device::SETT(const UINT16 opcode)
+inline void sh34_base_device::SETT(const UINT16 opcode)
 {
 	m_sr |= T;
 }
 
 /*  SHAL    Rn      (same as SHLL) */
-void sh34_base_device::SHAL(const UINT16 opcode)
+inline void sh34_base_device::SHAL(const UINT16 opcode)
 {
 	UINT32 n = Rn;
 
@@ -1596,7 +1596,7 @@ void sh34_base_device::SHAL(const UINT16 opcode)
 }
 
 /*  SHAR    Rn */
-void sh34_base_device::SHAR(const UINT16 opcode)
+inline void sh34_base_device::SHAR(const UINT16 opcode)
 {
 	UINT32 n = Rn;
 
@@ -1605,7 +1605,7 @@ void sh34_base_device::SHAR(const UINT16 opcode)
 }
 
 /*  SHLL    Rn      (same as SHAL) */
-void sh34_base_device::SHLL(const UINT16 opcode)
+inline void sh34_base_device::SHLL(const UINT16 opcode)
 {
 	UINT32 n = Rn;
 
@@ -1614,25 +1614,25 @@ void sh34_base_device::SHLL(const UINT16 opcode)
 }
 
 /*  SHLL2   Rn */
-void sh34_base_device::SHLL2(const UINT16 opcode)
+inline void sh34_base_device::SHLL2(const UINT16 opcode)
 {
 	m_r[Rn] <<= 2;
 }
 
 /*  SHLL8   Rn */
-void sh34_base_device::SHLL8(const UINT16 opcode)
+inline void sh34_base_device::SHLL8(const UINT16 opcode)
 {
 	m_r[Rn] <<= 8;
 }
 
 /*  SHLL16  Rn */
-void sh34_base_device::SHLL16(const UINT16 opcode)
+inline void sh34_base_device::SHLL16(const UINT16 opcode)
 {
 	m_r[Rn] <<= 16;
 }
 
 /*  SHLR    Rn */
-void sh34_base_device::SHLR(const UINT16 opcode)
+inline void sh34_base_device::SHLR(const UINT16 opcode)
 {
 	UINT32 n = Rn;
 
@@ -1641,25 +1641,25 @@ void sh34_base_device::SHLR(const UINT16 opcode)
 }
 
 /*  SHLR2   Rn */
-void sh34_base_device::SHLR2(const UINT16 opcode)
+inline void sh34_base_device::SHLR2(const UINT16 opcode)
 {
 	m_r[Rn] >>= 2;
 }
 
 /*  SHLR8   Rn */
-void sh34_base_device::SHLR8(const UINT16 opcode)
+inline void sh34_base_device::SHLR8(const UINT16 opcode)
 {
 	m_r[Rn] >>= 8;
 }
 
 /*  SHLR16  Rn */
-void sh34_base_device::SHLR16(const UINT16 opcode)
+inline void sh34_base_device::SHLR16(const UINT16 opcode)
 {
 	m_r[Rn] >>= 16;
 }
 
 /*  SLEEP */
-void sh34_base_device::SLEEP(const UINT16 opcode)
+inline void sh34_base_device::SLEEP(const UINT16 opcode)
 {
 	/* 0 = normal mode */
 	/* 1 = enters into power-down mode */
@@ -1675,25 +1675,25 @@ void sh34_base_device::SLEEP(const UINT16 opcode)
 }
 
 /*  STC     SR,Rn */
-void sh34_base_device::STCSR(const UINT16 opcode)
+inline void sh34_base_device::STCSR(const UINT16 opcode)
 {
 	m_r[Rn] = m_sr;
 }
 
 /*  STC     GBR,Rn */
-void sh34_base_device::STCGBR(const UINT16 opcode)
+inline void sh34_base_device::STCGBR(const UINT16 opcode)
 {
 	m_r[Rn] = m_gbr;
 }
 
 /*  STC     VBR,Rn */
-void sh34_base_device::STCVBR(const UINT16 opcode)
+inline void sh34_base_device::STCVBR(const UINT16 opcode)
 {
 	m_r[Rn] = m_vbr;
 }
 
 /*  STC.L   SR,@-Rn */
-void sh34_base_device::STCMSR(const UINT16 opcode)
+inline void sh34_base_device::STCMSR(const UINT16 opcode)
 {
 	UINT32 n = Rn;
 
@@ -1704,7 +1704,7 @@ void sh34_base_device::STCMSR(const UINT16 opcode)
 }
 
 /*  STC.L   GBR,@-Rn */
-void sh34_base_device::STCMGBR(const UINT16 opcode)
+inline void sh34_base_device::STCMGBR(const UINT16 opcode)
 {
 	UINT32 n = Rn;
 
@@ -1715,7 +1715,7 @@ void sh34_base_device::STCMGBR(const UINT16 opcode)
 }
 
 /*  STC.L   VBR,@-Rn */
-void sh34_base_device::STCMVBR(const UINT16 opcode)
+inline void sh34_base_device::STCMVBR(const UINT16 opcode)
 {
 	UINT32 n = Rn;
 
@@ -1726,25 +1726,25 @@ void sh34_base_device::STCMVBR(const UINT16 opcode)
 }
 
 /*  STS     MACH,Rn */
-void sh34_base_device::STSMACH(const UINT16 opcode)
+inline void sh34_base_device::STSMACH(const UINT16 opcode)
 {
 	m_r[Rn] = m_mach;
 }
 
 /*  STS     MACL,Rn */
-void sh34_base_device::STSMACL(const UINT16 opcode)
+inline void sh34_base_device::STSMACL(const UINT16 opcode)
 {
 	m_r[Rn] = m_macl;
 }
 
 /*  STS     PR,Rn */
-void sh34_base_device::STSPR(const UINT16 opcode)
+inline void sh34_base_device::STSPR(const UINT16 opcode)
 {
 	m_r[Rn] = m_pr;
 }
 
 /*  STS.L   MACH,@-Rn */
-void sh34_base_device::STSMMACH(const UINT16 opcode)
+inline void sh34_base_device::STSMMACH(const UINT16 opcode)
 {
 	UINT32 n = Rn;
 
@@ -1754,7 +1754,7 @@ void sh34_base_device::STSMMACH(const UINT16 opcode)
 }
 
 /*  STS.L   MACL,@-Rn */
-void sh34_base_device::STSMMACL(const UINT16 opcode)
+inline void sh34_base_device::STSMMACL(const UINT16 opcode)
 {
 	UINT32 n = Rn;
 
@@ -1764,7 +1764,7 @@ void sh34_base_device::STSMMACL(const UINT16 opcode)
 }
 
 /*  STS.L   PR,@-Rn */
-void sh34_base_device::STSMPR(const UINT16 opcode)
+inline void sh34_base_device::STSMPR(const UINT16 opcode)
 {
 	UINT32 n = Rn;
 
@@ -1774,13 +1774,13 @@ void sh34_base_device::STSMPR(const UINT16 opcode)
 }
 
 /*  SUB     Rm,Rn */
-void sh34_base_device::SUB(const UINT16 opcode)
+inline void sh34_base_device::SUB(const UINT16 opcode)
 {
 	m_r[Rn] -= m_r[Rm];
 }
 
 /*  SUBC    Rm,Rn */
-void sh34_base_device::SUBC(const UINT16 opcode)
+inline void sh34_base_device::SUBC(const UINT16 opcode)
 {
 	UINT32 m = Rm; UINT32 n = Rn;
 
@@ -1798,7 +1798,7 @@ void sh34_base_device::SUBC(const UINT16 opcode)
 }
 
 /*  SUBV    Rm,Rn */
-void sh34_base_device::SUBV(const UINT16 opcode)
+inline void sh34_base_device::SUBV(const UINT16 opcode)
 {
 	UINT32 m = Rm; UINT32 n = Rn;
 
@@ -1831,7 +1831,7 @@ void sh34_base_device::SUBV(const UINT16 opcode)
 }
 
 /*  SWAP.B  Rm,Rn */
-void sh34_base_device::SWAPB(const UINT16 opcode)
+inline void sh34_base_device::SWAPB(const UINT16 opcode)
 {
 	UINT32 m = Rm; UINT32 n = Rn;
 
@@ -1844,7 +1844,7 @@ void sh34_base_device::SWAPB(const UINT16 opcode)
 }
 
 /*  SWAP.W  Rm,Rn */
-void sh34_base_device::SWAPW(const UINT16 opcode)
+inline void sh34_base_device::SWAPW(const UINT16 opcode)
 {
 	UINT32 m = Rm; UINT32 n = Rn;
 
@@ -1855,7 +1855,7 @@ void sh34_base_device::SWAPW(const UINT16 opcode)
 }
 
 /*  TAS.B   @Rn */
-void sh34_base_device::TAS(const UINT16 opcode)
+inline void sh34_base_device::TAS(const UINT16 opcode)
 {
 	UINT32 n = Rn;
 
@@ -1874,7 +1874,7 @@ void sh34_base_device::TAS(const UINT16 opcode)
 }
 
 /*  TRAPA   #imm */
-void sh34_base_device::TRAPA(const UINT16 opcode)
+inline void sh34_base_device::TRAPA(const UINT16 opcode)
 {
 	UINT32 imm = opcode & 0xff;
 
@@ -1916,7 +1916,7 @@ void sh34_base_device::TRAPA(const UINT16 opcode)
 }
 
 /*  TST     Rm,Rn */
-void sh34_base_device::TST(const UINT16 opcode)
+inline void sh34_base_device::TST(const UINT16 opcode)
 {
 	if ((m_r[Rn] & m_r[Rm]) == 0)
 		m_sr |= T;
@@ -1925,7 +1925,7 @@ void sh34_base_device::TST(const UINT16 opcode)
 }
 
 /*  TST     #imm,R0 */
-void sh34_base_device::TSTI(const UINT16 opcode)
+inline void sh34_base_device::TSTI(const UINT16 opcode)
 {
 	UINT32 imm = opcode & 0xff;
 
@@ -1936,7 +1936,7 @@ void sh34_base_device::TSTI(const UINT16 opcode)
 }
 
 /*  TST.B   #imm,@(R0,GBR) */
-void sh34_base_device::TSTM(const UINT16 opcode)
+inline void sh34_base_device::TSTM(const UINT16 opcode)
 {
 	UINT32 imm = opcode & 0xff;
 
@@ -1949,20 +1949,20 @@ void sh34_base_device::TSTM(const UINT16 opcode)
 }
 
 /*  XOR     Rm,Rn */
-void sh34_base_device::XOR(const UINT16 opcode)
+inline void sh34_base_device::XOR(const UINT16 opcode)
 {
 	m_r[Rn] ^= m_r[Rm];
 }
 
 /*  XOR     #imm,R0 */
-void sh34_base_device::XORI(const UINT16 opcode)
+inline void sh34_base_device::XORI(const UINT16 opcode)
 {
 	UINT32 imm = opcode & 0xff;
 	m_r[0] ^= imm;
 }
 
 /*  XOR.B   #imm,@(R0,GBR) */
-void sh34_base_device::XORM(const UINT16 opcode)
+inline void sh34_base_device::XORM(const UINT16 opcode)
 {
 	UINT32 imm = opcode & 0xff;
 	UINT32 temp;
@@ -1975,7 +1975,7 @@ void sh34_base_device::XORM(const UINT16 opcode)
 }
 
 /*  XTRCT   Rm,Rn */
-void sh34_base_device::XTRCT(const UINT16 opcode)
+inline void sh34_base_device::XTRCT(const UINT16 opcode)
 {
 	UINT32 m = Rm; UINT32 n = Rn;
 
@@ -1987,43 +1987,43 @@ void sh34_base_device::XTRCT(const UINT16 opcode)
 }
 
 /*  STC     SSR,Rn */
-void sh34_base_device::STCSSR(const UINT16 opcode)
+inline void sh34_base_device::STCSSR(const UINT16 opcode)
 {
 	m_r[Rn] = m_ssr;
 }
 
 /*  STC     SPC,Rn */
-void sh34_base_device::STCSPC(const UINT16 opcode)
+inline void sh34_base_device::STCSPC(const UINT16 opcode)
 {
 	m_r[Rn] = m_spc;
 }
 
 /*  STC     SGR,Rn */
-void sh34_base_device::STCSGR(const UINT16 opcode)
+inline void sh34_base_device::STCSGR(const UINT16 opcode)
 {
 	m_r[Rn] = m_sgr;
 }
 
 /*  STS     FPUL,Rn */
-void sh34_base_device::STSFPUL(const UINT16 opcode)
+inline void sh34_base_device::STSFPUL(const UINT16 opcode)
 {
 	m_r[Rn] = m_fpul;
 }
 
 /*  STS     FPSCR,Rn */
-void sh34_base_device::STSFPSCR(const UINT16 opcode)
+inline void sh34_base_device::STSFPSCR(const UINT16 opcode)
 {
 	m_r[Rn] = m_fpscr & 0x003FFFFF;
 }
 
 /*  STC     DBR,Rn */
-void sh34_base_device::STCDBR(const UINT16 opcode)
+inline void sh34_base_device::STCDBR(const UINT16 opcode)
 {
 	m_r[Rn] = m_dbr;
 }
 
 /*  STCRBANK   Rm_BANK,Rn */
-void sh34_base_device::STCRBANK(const UINT16 opcode)
+inline void sh34_base_device::STCRBANK(const UINT16 opcode)
 {
 	UINT32 m = Rm;
 
@@ -2031,7 +2031,7 @@ void sh34_base_device::STCRBANK(const UINT16 opcode)
 }
 
 /*  STCMRBANK   Rm_BANK,@-Rn */
-void sh34_base_device::STCMRBANK(const UINT16 opcode)
+inline void sh34_base_device::STCMRBANK(const UINT16 opcode)
 {
 	UINT32 m = Rm; UINT32 n = Rn;
 
@@ -2042,24 +2042,24 @@ void sh34_base_device::STCMRBANK(const UINT16 opcode)
 }
 
 /*  MOVCA.L     R0,@Rn */
-void sh34_base_device::MOVCAL(const UINT16 opcode)
+inline void sh34_base_device::MOVCAL(const UINT16 opcode)
 {
 	m_ea = m_r[Rn];
 	WL(m_ea, m_r[0] );
 }
 
-void sh34_base_device::CLRS(const UINT16 opcode)
+inline void sh34_base_device::CLRS(const UINT16 opcode)
 {
 	m_sr &= ~S;
 }
 
-void sh34_base_device::SETS(const UINT16 opcode)
+inline void sh34_base_device::SETS(const UINT16 opcode)
 {
 	m_sr |= S;
 }
 
 /*  STS.L   SGR,@-Rn */
-void sh34_base_device::STCMSGR(const UINT16 opcode)
+inline void sh34_base_device::STCMSGR(const UINT16 opcode)
 {
 	UINT32 n = Rn;
 
@@ -2069,7 +2069,7 @@ void sh34_base_device::STCMSGR(const UINT16 opcode)
 }
 
 /*  STS.L   FPUL,@-Rn */
-void sh34_base_device::STSMFPUL(const UINT16 opcode)
+inline void sh34_base_device::STSMFPUL(const UINT16 opcode)
 {
 	UINT32 n = Rn;
 
@@ -2079,7 +2079,7 @@ void sh34_base_device::STSMFPUL(const UINT16 opcode)
 }
 
 /*  STS.L   FPSCR,@-Rn */
-void sh34_base_device::STSMFPSCR(const UINT16 opcode)
+inline void sh34_base_device::STSMFPSCR(const UINT16 opcode)
 {
 	UINT32 n = Rn;
 
@@ -2089,7 +2089,7 @@ void sh34_base_device::STSMFPSCR(const UINT16 opcode)
 }
 
 /*  STC.L   DBR,@-Rn */
-void sh34_base_device::STCMDBR(const UINT16 opcode)
+inline void sh34_base_device::STCMDBR(const UINT16 opcode)
 {
 	UINT32 n = Rn;
 
@@ -2099,7 +2099,7 @@ void sh34_base_device::STCMDBR(const UINT16 opcode)
 }
 
 /*  STC.L   SSR,@-Rn */
-void sh34_base_device::STCMSSR(const UINT16 opcode)
+inline void sh34_base_device::STCMSSR(const UINT16 opcode)
 {
 	UINT32 n = Rn;
 
@@ -2109,7 +2109,7 @@ void sh34_base_device::STCMSSR(const UINT16 opcode)
 }
 
 /*  STC.L   SPC,@-Rn */
-void sh34_base_device::STCMSPC(const UINT16 opcode)
+inline void sh34_base_device::STCMSPC(const UINT16 opcode)
 {
 	UINT32 n = Rn;
 
@@ -2119,7 +2119,7 @@ void sh34_base_device::STCMSPC(const UINT16 opcode)
 }
 
 /*  LDS.L   @Rm+,FPUL */
-void sh34_base_device::LDSMFPUL(const UINT16 opcode)
+inline void sh34_base_device::LDSMFPUL(const UINT16 opcode)
 {
 	m_ea = m_r[Rn];
 	m_fpul = RL(m_ea );
@@ -2127,7 +2127,7 @@ void sh34_base_device::LDSMFPUL(const UINT16 opcode)
 }
 
 /*  LDS.L   @Rm+,FPSCR */
-void sh34_base_device::LDSMFPSCR(const UINT16 opcode)
+inline void sh34_base_device::LDSMFPSCR(const UINT16 opcode)
 {
 	UINT32 s;
 
@@ -2147,7 +2147,7 @@ void sh34_base_device::LDSMFPSCR(const UINT16 opcode)
 }
 
 /*  LDC.L   @Rm+,DBR */
-void sh34_base_device::LDCMDBR(const UINT16 opcode)
+inline void sh34_base_device::LDCMDBR(const UINT16 opcode)
 {
 	m_ea = m_r[Rn];
 	m_dbr = RL(m_ea );
@@ -2155,7 +2155,7 @@ void sh34_base_device::LDCMDBR(const UINT16 opcode)
 }
 
 /*  LDC.L   @Rn+,Rm_BANK */
-void sh34_base_device::LDCMRBANK(const UINT16 opcode)
+inline void sh34_base_device::LDCMRBANK(const UINT16 opcode)
 {
 	UINT32 m = Rm; UINT32 n = Rn;
 
@@ -2165,7 +2165,7 @@ void sh34_base_device::LDCMRBANK(const UINT16 opcode)
 }
 
 /*  LDC.L   @Rm+,SSR */
-void sh34_base_device::LDCMSSR(const UINT16 opcode)
+inline void sh34_base_device::LDCMSSR(const UINT16 opcode)
 {
 	m_ea = m_r[Rn];
 	m_ssr = RL(m_ea );
@@ -2173,7 +2173,7 @@ void sh34_base_device::LDCMSSR(const UINT16 opcode)
 }
 
 /*  LDC.L   @Rm+,SPC */
-void sh34_base_device::LDCMSPC(const UINT16 opcode)
+inline void sh34_base_device::LDCMSPC(const UINT16 opcode)
 {
 	m_ea = m_r[Rn];
 	m_spc = RL(m_ea );
@@ -2181,13 +2181,13 @@ void sh34_base_device::LDCMSPC(const UINT16 opcode)
 }
 
 /*  LDS     Rm,FPUL */
-void sh34_base_device::LDSFPUL(const UINT16 opcode)
+inline void sh34_base_device::LDSFPUL(const UINT16 opcode)
 {
 	m_fpul = m_r[Rn];
 }
 
 /*  LDS     Rm,FPSCR */
-void sh34_base_device::LDSFPSCR(const UINT16 opcode)
+inline void sh34_base_device::LDSFPSCR(const UINT16 opcode)
 {
 	UINT32 s;
 
@@ -2204,13 +2204,13 @@ void sh34_base_device::LDSFPSCR(const UINT16 opcode)
 }
 
 /*  LDC     Rm,DBR */
-void sh34_base_device::LDCDBR(const UINT16 opcode)
+inline void sh34_base_device::LDCDBR(const UINT16 opcode)
 {
 	m_dbr = m_r[Rn];
 }
 
 /*  SHAD    Rm,Rn */
-void sh34_base_device::SHAD(const UINT16 opcode)
+inline void sh34_base_device::SHAD(const UINT16 opcode)
 {
 	UINT32 m = Rm; UINT32 n = Rn;
 
@@ -2226,7 +2226,7 @@ void sh34_base_device::SHAD(const UINT16 opcode)
 }
 
 /*  SHLD    Rm,Rn */
-void sh34_base_device::SHLD(const UINT16 opcode)
+inline void sh34_base_device::SHLD(const UINT16 opcode)
 {
 	UINT32 m = Rm; UINT32 n = Rn;
 
@@ -2239,7 +2239,7 @@ void sh34_base_device::SHLD(const UINT16 opcode)
 }
 
 /*  LDCRBANK   Rn,Rm_BANK */
-void sh34_base_device::LDCRBANK(const UINT16 opcode)
+inline void sh34_base_device::LDCRBANK(const UINT16 opcode)
 {
 	UINT32 m = Rm;
 
@@ -2247,19 +2247,19 @@ void sh34_base_device::LDCRBANK(const UINT16 opcode)
 }
 
 /*  LDC     Rm,SSR */
-void sh34_base_device::LDCSSR(const UINT16 opcode)
+inline void sh34_base_device::LDCSSR(const UINT16 opcode)
 {
 	m_ssr = m_r[Rn];
 }
 
 /*  LDC     Rm,SPC */
-void sh34_base_device::LDCSPC(const UINT16 opcode)
+inline void sh34_base_device::LDCSPC(const UINT16 opcode)
 {
 	m_spc = m_r[Rn];
 }
 
 /*  PREF     @Rn */
-void sh34_base_device::PREFM(const UINT16 opcode)
+inline void sh34_base_device::PREFM(const UINT16 opcode)
 {
 	int a;
 	UINT32 addr,dest,sq;
@@ -2337,7 +2337,7 @@ void sh34_base_device::PREFM(const UINT16 opcode)
 /*  FMOV    @Rm+,DRn PR=0 SZ=1 1111nnn0mmmm1001 */
 /*  FMOV    @Rm+,XDn PR=0 SZ=1 1111nnn1mmmm1001 */
 /*  FMOV    @Rm+,XDn PR=1      1111nnn1mmmm1001 */
-void sh34_base_device::FMOVMRIFR(const UINT16 opcode)
+inline void sh34_base_device::FMOVMRIFR(const UINT16 opcode)
 {
 	UINT32 m = Rm; UINT32 n = Rn;
 
@@ -2375,7 +2375,7 @@ void sh34_base_device::FMOVMRIFR(const UINT16 opcode)
 /*  FMOV    DRm,@Rn PR=0 SZ=1 1111nnnnmmm01010 */
 /*  FMOV    XDm,@Rn PR=0 SZ=1 1111nnnnmmm11010 */
 /*  FMOV    XDm,@Rn PR=1      1111nnnnmmm11010 */
-void sh34_base_device::FMOVFRMR(const UINT16 opcode)
+inline void sh34_base_device::FMOVFRMR(const UINT16 opcode)
 {
 	UINT32 m = Rm; UINT32 n = Rn;
 
@@ -2407,7 +2407,7 @@ void sh34_base_device::FMOVFRMR(const UINT16 opcode)
 /*  FMOV    DRm,@-Rn PR=0 SZ=1 1111nnnnmmm01011 */
 /*  FMOV    XDm,@-Rn PR=0 SZ=1 1111nnnnmmm11011 */
 /*  FMOV    XDm,@-Rn PR=1      1111nnnnmmm11011 */
-void sh34_base_device::FMOVFRMDR(const UINT16 opcode)
+inline void sh34_base_device::FMOVFRMDR(const UINT16 opcode)
 {
 	UINT32 m = Rm; UINT32 n = Rn;
 
@@ -2443,7 +2443,7 @@ void sh34_base_device::FMOVFRMDR(const UINT16 opcode)
 /*  FMOV    DRm,@(R0,Rn) PR=0 SZ=1 1111nnnnmmm00111 */
 /*  FMOV    XDm,@(R0,Rn) PR=0 SZ=1 1111nnnnmmm10111 */
 /*  FMOV    XDm,@(R0,Rn) PR=1      1111nnnnmmm10111 */
-void sh34_base_device::FMOVFRS0(const UINT16 opcode)
+inline void sh34_base_device::FMOVFRS0(const UINT16 opcode)
 {
 	UINT32 m = Rm; UINT32 n = Rn;
 
@@ -2475,7 +2475,7 @@ void sh34_base_device::FMOVFRS0(const UINT16 opcode)
 /*  FMOV    @(R0,Rm),DRn PR=0 SZ=1 1111nnn0mmmm0110 */
 /*  FMOV    @(R0,Rm),XDn PR=0 SZ=1 1111nnn1mmmm0110 */
 /*  FMOV    @(R0,Rm),XDn PR=1      1111nnn1mmmm0110 */
-void sh34_base_device::FMOVS0FR(const UINT16 opcode)
+inline void sh34_base_device::FMOVS0FR(const UINT16 opcode)
 {
 	UINT32 m = Rm; UINT32 n = Rn;
 
@@ -2508,7 +2508,7 @@ void sh34_base_device::FMOVS0FR(const UINT16 opcode)
 /*  FMOV    @Rm,XDn PR=0 SZ=1 1111nnn1mmmm1000 */
 /*  FMOV    @Rm,XDn PR=1      1111nnn1mmmm1000 */
 /*  FMOV    @Rm,DRn PR=1      1111nnn0mmmm1000 */
-void sh34_base_device::FMOVMRFR(const UINT16 opcode)
+inline void sh34_base_device::FMOVMRFR(const UINT16 opcode)
 {
 	UINT32 m = Rm; UINT32 n = Rn;
 
@@ -2549,7 +2549,7 @@ void sh34_base_device::FMOVMRFR(const UINT16 opcode)
 /*  FMOV    XDm,DRn PR=1      XDm -> DRn 1111nnn0mmm11100 */
 /*  FMOV    DRm,XDn PR=1      DRm -> XDn 1111nnn1mmm01100 */
 /*  FMOV    XDm,XDn PR=1      XDm -> XDn 1111nnn1mmm11100 */
-void sh34_base_device::FMOVFR(const UINT16 opcode)
+inline void sh34_base_device::FMOVFR(const UINT16 opcode)
 {
 	UINT32 m = Rm; UINT32 n = Rn;
 
@@ -2577,25 +2577,25 @@ void sh34_base_device::FMOVFR(const UINT16 opcode)
 }
 
 /*  FLDI1  FRn 1111nnnn10011101 */
-void sh34_base_device::FLDI1(const UINT16 opcode)
+inline void sh34_base_device::FLDI1(const UINT16 opcode)
 {
 	m_fr[Rn] = 0x3F800000;
 }
 
 /*  FLDI0  FRn 1111nnnn10001101 */
-void sh34_base_device::FLDI0(const UINT16 opcode)
+inline void sh34_base_device::FLDI0(const UINT16 opcode)
 {
 	m_fr[Rn] = 0;
 }
 
 /*  FLDS FRm,FPUL 1111mmmm00011101 */
-void sh34_base_device:: FLDS(const UINT16 opcode)
+inline void sh34_base_device:: FLDS(const UINT16 opcode)
 {
 	m_fpul = m_fr[Rn];
 }
 
 /*  FSTS FPUL,FRn 1111nnnn00001101 */
-void sh34_base_device:: FSTS(const UINT16 opcode)
+inline void sh34_base_device:: FSTS(const UINT16 opcode)
 {
 	m_fr[Rn] = m_fpul;
 }
@@ -2616,7 +2616,7 @@ void sh34_base_device::FSCHG()
 
 /* FTRC FRm,FPUL PR=0 1111mmmm00111101 */
 /* FTRC DRm,FPUL PR=1 1111mmm000111101 */
-void sh34_base_device::FTRC(const UINT16 opcode)
+inline void sh34_base_device::FTRC(const UINT16 opcode)
 {
 	UINT32 n = Rn;
 
@@ -2634,7 +2634,7 @@ void sh34_base_device::FTRC(const UINT16 opcode)
 
 /* FLOAT FPUL,FRn PR=0 1111nnnn00101101 */
 /* FLOAT FPUL,DRn PR=1 1111nnn000101101 */
-void sh34_base_device::FLOAT(const UINT16 opcode)
+inline void sh34_base_device::FLOAT(const UINT16 opcode)
 {
 	UINT32 n = Rn;
 
@@ -2651,7 +2651,7 @@ void sh34_base_device::FLOAT(const UINT16 opcode)
 
 /* FNEG FRn PR=0 1111nnnn01001101 */
 /* FNEG DRn PR=1 1111nnn001001101 */
-void sh34_base_device::FNEG(const UINT16 opcode)
+inline void sh34_base_device::FNEG(const UINT16 opcode)
 {
 	UINT32 n = Rn;
 
@@ -2664,7 +2664,7 @@ void sh34_base_device::FNEG(const UINT16 opcode)
 
 /* FABS FRn PR=0 1111nnnn01011101 */
 /* FABS DRn PR=1 1111nnn001011101 */
-void sh34_base_device::FABS(const UINT16 opcode)
+inline void sh34_base_device::FABS(const UINT16 opcode)
 {
 	UINT32 n = Rn;
 
@@ -2683,7 +2683,7 @@ void sh34_base_device::FABS(const UINT16 opcode)
 
 /* FCMP/EQ FRm,FRn PR=0 1111nnnnmmmm0100 */
 /* FCMP/EQ DRm,DRn PR=1 1111nnn0mmm00100 */
-void sh34_base_device::FCMP_EQ(const UINT16 opcode)
+inline void sh34_base_device::FCMP_EQ(const UINT16 opcode)
 {
 	UINT32 m = Rm; UINT32 n = Rn;
 
@@ -2704,7 +2704,7 @@ void sh34_base_device::FCMP_EQ(const UINT16 opcode)
 
 /* FCMP/GT FRm,FRn PR=0 1111nnnnmmmm0101 */
 /* FCMP/GT DRm,DRn PR=1 1111nnn0mmm00101 */
-void sh34_base_device::FCMP_GT(const UINT16 opcode)
+inline void sh34_base_device::FCMP_GT(const UINT16 opcode)
 {
 	UINT32 m = Rm; UINT32 n = Rn;
 
@@ -2724,7 +2724,7 @@ void sh34_base_device::FCMP_GT(const UINT16 opcode)
 }
 
 /* FCNVDS DRm,FPUL PR=1 1111mmm010111101 */
-void sh34_base_device::FCNVDS(const UINT16 opcode)
+inline void sh34_base_device::FCNVDS(const UINT16 opcode)
 {
 	UINT32 n = Rn;
 
@@ -2737,7 +2737,7 @@ void sh34_base_device::FCNVDS(const UINT16 opcode)
 }
 
 /* FCNVSD FPUL, DRn PR=1 1111nnn010101101 */
-void sh34_base_device::FCNVSD(const UINT16 opcode)
+inline void sh34_base_device::FCNVSD(const UINT16 opcode)
 {
 	UINT32 n = Rn;
 
@@ -2749,7 +2749,7 @@ void sh34_base_device::FCNVSD(const UINT16 opcode)
 
 /* FADD FRm,FRn PR=0 1111nnnnmmmm0000 */
 /* FADD DRm,DRn PR=1 1111nnn0mmm00000 */
-void sh34_base_device::FADD(const UINT16 opcode)
+inline void sh34_base_device::FADD(const UINT16 opcode)
 {
 	UINT32 m = Rm; UINT32 n = Rn;
 
@@ -2764,7 +2764,7 @@ void sh34_base_device::FADD(const UINT16 opcode)
 
 /* FSUB FRm,FRn PR=0 1111nnnnmmmm0001 */
 /* FSUB DRm,DRn PR=1 1111nnn0mmm00001 */
-void sh34_base_device::FSUB(const UINT16 opcode)
+inline void sh34_base_device::FSUB(const UINT16 opcode)
 {
 	UINT32 m = Rm; UINT32 n = Rn;
 
@@ -2780,7 +2780,7 @@ void sh34_base_device::FSUB(const UINT16 opcode)
 
 /* FMUL FRm,FRn PR=0 1111nnnnmmmm0010 */
 /* FMUL DRm,DRn PR=1 1111nnn0mmm00010 */
-void sh34_base_device::FMUL(const UINT16 opcode)
+inline void sh34_base_device::FMUL(const UINT16 opcode)
 {
 	UINT32 m = Rm; UINT32 n = Rn;
 
@@ -2795,7 +2795,7 @@ void sh34_base_device::FMUL(const UINT16 opcode)
 
 /* FDIV FRm,FRn PR=0 1111nnnnmmmm0011 */
 /* FDIV DRm,DRn PR=1 1111nnn0mmm00011 */
-void sh34_base_device::FDIV(const UINT16 opcode)
+inline void sh34_base_device::FDIV(const UINT16 opcode)
 {
 	UINT32 m = Rm; UINT32 n = Rn;
 
@@ -2813,7 +2813,7 @@ void sh34_base_device::FDIV(const UINT16 opcode)
 }
 
 /* FMAC FR0,FRm,FRn PR=0 1111nnnnmmmm1110 */
-void sh34_base_device::FMAC(const UINT16 opcode)
+inline void sh34_base_device::FMAC(const UINT16 opcode)
 {
 	UINT32 m = Rm; UINT32 n = Rn;
 
@@ -2824,7 +2824,7 @@ void sh34_base_device::FMAC(const UINT16 opcode)
 
 /* FSQRT FRn PR=0 1111nnnn01101101 */
 /* FSQRT DRn PR=1 1111nnnn01101101 */
-void sh34_base_device::FSQRT(const UINT16 opcode)
+inline void sh34_base_device::FSQRT(const UINT16 opcode)
 {
 	UINT32 n = Rn;
 
@@ -2841,7 +2841,7 @@ void sh34_base_device::FSQRT(const UINT16 opcode)
 }
 
 /* FSRRA FRn PR=0 1111nnnn01111101 */
-void sh34_base_device::FSRRA(const UINT16 opcode)
+inline void sh34_base_device::FSRRA(const UINT16 opcode)
 {
 	UINT32 n = Rn;
 
@@ -2863,7 +2863,7 @@ float angle;
 }
 
 /* FIPR FVm,FVn PR=0 1111nnmm11101101 */
-void sh34_base_device::FIPR(const UINT16 opcode)
+inline void sh34_base_device::FIPR(const UINT16 opcode)
 {
 	UINT32 n = Rn;
 
@@ -2896,7 +2896,7 @@ float sum[4];
 		FP_RFS(n + i) = sum[i];
 }
 
-void sh34_base_device::op1111_0xf13(const UINT16 opcode)
+inline void sh34_base_device::op1111_0xf13(const UINT16 opcode)
 {
 	if (opcode & 0x100) {
 			if (opcode & 0x200) {
@@ -2926,19 +2926,27 @@ void sh34_base_device::dbreak(const UINT16 opcode)
 }
 
 
-sh34_base_device::sh4ophandler sh34_base_device::s_master_ophandler_table[0x10000];
-
-const sh34_base_device::sh4ophandler sh34_base_device::s_op1111_0x13_handlers[16] =
+inline void sh34_base_device::op1111_0x13(UINT16 opcode)
 {
-	&sh34_base_device::FSTS,       &sh34_base_device::FLDS,       &sh34_base_device::FLOAT,      &sh34_base_device::FTRC,
-	&sh34_base_device::FNEG,       &sh34_base_device::FABS,       &sh34_base_device::FSQRT,      &sh34_base_device::FSRRA,
-	&sh34_base_device::FLDI0,      &sh34_base_device::FLDI1,      &sh34_base_device::FCNVSD,     &sh34_base_device::FCNVDS,
-	&sh34_base_device::dbreak,     &sh34_base_device::dbreak,     &sh34_base_device::FIPR,       &sh34_base_device::op1111_0xf13
-};
-
-void sh34_base_device::op1111_0x13(UINT16 opcode)
-{
-	(this->*s_op1111_0x13_handlers[(opcode&0xf0)>>4])(opcode);
+	switch((opcode >> 4) & 0x0f)
+	{
+		case 0x00:  FSTS(opcode); break;
+		case 0x01:  FLDS(opcode); break;
+		case 0x02:  FLOAT(opcode); break;
+		case 0x03:  FTRC(opcode); break;
+		case 0x04:  FNEG(opcode); break;
+		case 0x05:  FABS(opcode); break;
+		case 0x06:  FSQRT(opcode); break;
+		case 0x07:  FSRRA(opcode); break;
+		case 0x08:  FLDI0(opcode); break;
+		case 0x09:  FLDI1(opcode); break;
+		case 0x0a:  FCNVSD(opcode); break;
+		case 0x0b:  FCNVDS(opcode); break;
+		case 0x0c:  dbreak(opcode); break;
+		case 0x0d:  dbreak(opcode); break;
+		case 0x0e:  FIPR(opcode); break;
+		case 0x0f:  op1111_0xf13(opcode); break;
+	}
 }
 
 
@@ -3039,8 +3047,6 @@ void sh34_base_device::device_reset()
 	m_sleep_mode = 0;
 
 	m_sh4_mmu_enabled = 0;
-
-	sh4_build_optable();
 }
 
 /*-------------------------------------------------
@@ -3072,228 +3078,741 @@ void sh4_base_device::device_reset()
 	m_SH4_TCNT2 = 0xffffffff;
 }
 
-/* These tables are combined into our main opcode jump table, master_ophandler_table in the RESET function */
-
-#define SH4OP(x)  &sh34_base_device::x
-
-const sh34_base_device::sh4ophandler sh34_base_device::s_op1000_handler[16] =
+inline void sh34_base_device::execute_one_0000(const UINT16 opcode)
 {
-	SH4OP(MOVBS4),     SH4OP(MOVWS4),     SH4OP(NOP),        SH4OP(NOP),        SH4OP(MOVBL4),     SH4OP(MOVWL4),     SH4OP(NOP),        SH4OP(NOP),
-	SH4OP(CMPIM),      SH4OP(BT),         SH4OP(NOP),        SH4OP(BF),         SH4OP(NOP),        SH4OP(BTS),        SH4OP(NOP),        SH4OP(BFS)
+    switch(opcode & 0xff)
+    {
+		// 0x00
+		case 0x00:  NOP(opcode); break;
+		case 0x10:  NOP(opcode); break;
+		case 0x20:  NOP(opcode); break;
+		case 0x30:  NOP(opcode); break;
+		case 0x40:  NOP(opcode); break;
+		case 0x50:  NOP(opcode); break;
+		case 0x60:  NOP(opcode); break;
+		case 0x70:  NOP(opcode); break;
+		case 0x80:  NOP(opcode); break;
+		case 0x90:  NOP(opcode); break;
+		case 0xa0:  NOP(opcode); break;
+		case 0xb0:  NOP(opcode); break;
+		case 0xc0:  NOP(opcode); break;
+		case 0xd0:  NOP(opcode); break;
+		case 0xe0:  NOP(opcode); break;
+		case 0xf0:  NOP(opcode); break;
+		// 0x10
+		case 0x01:  NOP(opcode); break;
+		case 0x11:  NOP(opcode); break;
+		case 0x21:  NOP(opcode); break;
+		case 0x31:  NOP(opcode); break;
+		case 0x41:  NOP(opcode); break;
+		case 0x51:  NOP(opcode); break;
+		case 0x61:  NOP(opcode); break;
+		case 0x71:  NOP(opcode); break;
+		case 0x81:  NOP(opcode); break;
+		case 0x91:  NOP(opcode); break;
+		case 0xa1:  NOP(opcode); break;
+		case 0xb1:  NOP(opcode); break;
+		case 0xc1:  NOP(opcode); break;
+		case 0xd1:  NOP(opcode); break;
+		case 0xe1:  NOP(opcode); break;
+		case 0xf1:  NOP(opcode); break;
+		// 0x20
+		case 0x02:  STCSR(opcode); break;
+		case 0x12:  STCGBR(opcode); break;
+		case 0x22:  STCVBR(opcode); break;
+		case 0x32:  STCSSR(opcode); break;
+		case 0x42:  STCSPC(opcode); break;
+		case 0x52:  NOP(opcode); break;
+		case 0x62:  NOP(opcode); break;
+		case 0x72:  NOP(opcode); break;
+		case 0x82:  STCRBANK(opcode); break;
+		case 0x92:  STCRBANK(opcode); break;
+		case 0xa2:  STCRBANK(opcode); break;
+		case 0xb2:  STCRBANK(opcode); break;
+		case 0xc2:  STCRBANK(opcode); break;
+		case 0xd2:  STCRBANK(opcode); break;
+		case 0xe2:  STCRBANK(opcode); break;
+		case 0xf2:  STCRBANK(opcode); break;
+		// 0x30
+		case 0x03:  BSRF(opcode); break;
+		case 0x13:  NOP(opcode); break;
+		case 0x23:  BRAF(opcode); break;
+		case 0x33:  NOP(opcode); break;
+		case 0x43:  NOP(opcode); break;
+		case 0x53:  NOP(opcode); break;
+		case 0x63:  NOP(opcode); break;
+		case 0x73:  NOP(opcode); break;
+		case 0x83:  PREFM(opcode); break;
+		case 0x93:  TODO(opcode); break;
+		case 0xa3:  TODO(opcode); break;
+		case 0xb3:  TODO(opcode); break;
+		case 0xc3:  MOVCAL(opcode); break;
+		case 0xd3:  NOP(opcode); break;
+		case 0xe3:  NOP(opcode); break;
+		case 0xf3:  NOP(opcode); break;
+		// 0x40
+		case 0x04:  MOVBS0(opcode); break;
+		case 0x14:  MOVBS0(opcode); break;
+		case 0x24:  MOVBS0(opcode); break;
+		case 0x34:  MOVBS0(opcode); break;
+		case 0x44:  MOVBS0(opcode); break;
+		case 0x54:  MOVBS0(opcode); break;
+		case 0x64:  MOVBS0(opcode); break;
+		case 0x74:  MOVBS0(opcode); break;
+		case 0x84:  MOVBS0(opcode); break;
+		case 0x94:  MOVBS0(opcode); break;
+		case 0xa4:  MOVBS0(opcode); break;
+		case 0xb4:  MOVBS0(opcode); break;
+		case 0xc4:  MOVBS0(opcode); break;
+		case 0xd4:  MOVBS0(opcode); break;
+		case 0xe4:  MOVBS0(opcode); break;
+		case 0xf4:  MOVBS0(opcode); break;
+		// 0x50
+		case 0x05:  MOVWS0(opcode); break;
+		case 0x15:  MOVWS0(opcode); break;
+		case 0x25:  MOVWS0(opcode); break;
+		case 0x35:  MOVWS0(opcode); break;
+		case 0x45:  MOVWS0(opcode); break;
+		case 0x55:  MOVWS0(opcode); break;
+		case 0x65:  MOVWS0(opcode); break;
+		case 0x75:  MOVWS0(opcode); break;
+		case 0x85:  MOVWS0(opcode); break;
+		case 0x95:  MOVWS0(opcode); break;
+		case 0xa5:  MOVWS0(opcode); break;
+		case 0xb5:  MOVWS0(opcode); break;
+		case 0xc5:  MOVWS0(opcode); break;
+		case 0xd5:  MOVWS0(opcode); break;
+		case 0xe5:  MOVWS0(opcode); break;
+		case 0xf5:  MOVWS0(opcode); break;
+		// 0x60
+		case 0x06:  MOVLS0(opcode); break;
+		case 0x16:  MOVLS0(opcode); break;
+		case 0x26:  MOVLS0(opcode); break;
+		case 0x36:  MOVLS0(opcode); break;
+		case 0x46:  MOVLS0(opcode); break;
+		case 0x56:  MOVLS0(opcode); break;
+		case 0x66:  MOVLS0(opcode); break;
+		case 0x76:  MOVLS0(opcode); break;
+		case 0x86:  MOVLS0(opcode); break;
+		case 0x96:  MOVLS0(opcode); break;
+		case 0xa6:  MOVLS0(opcode); break;
+		case 0xb6:  MOVLS0(opcode); break;
+		case 0xc6:  MOVLS0(opcode); break;
+		case 0xd6:  MOVLS0(opcode); break;
+		case 0xe6:  MOVLS0(opcode); break;
+		case 0xf6:  MOVLS0(opcode); break;
+		// 0x70
+		case 0x07:  MULL(opcode); break;
+		case 0x17:  MULL(opcode); break;
+		case 0x27:  MULL(opcode); break;
+		case 0x37:  MULL(opcode); break;
+		case 0x47:  MULL(opcode); break;
+		case 0x57:  MULL(opcode); break;
+		case 0x67:  MULL(opcode); break;
+		case 0x77:  MULL(opcode); break;
+		case 0x87:  MULL(opcode); break;
+		case 0x97:  MULL(opcode); break;
+		case 0xa7:  MULL(opcode); break;
+		case 0xb7:  MULL(opcode); break;
+		case 0xc7:  MULL(opcode); break;
+		case 0xd7:  MULL(opcode); break;
+		case 0xe7:  MULL(opcode); break;
+		case 0xf7:  MULL(opcode); break;
+		// 0x80
+		case 0x08:  CLRT(opcode); break;
+		case 0x18:  SETT(opcode); break;
+		case 0x28:  CLRMAC(opcode); break;
+		case 0x38:  TODO(opcode); break;
+		case 0x48:  CLRS(opcode); break;
+		case 0x58:  SETS(opcode); break;
+		case 0x68:  NOP(opcode); break;
+		case 0x78:  NOP(opcode); break;
+		case 0x88:  CLRT(opcode); break;
+		case 0x98:  SETT(opcode); break;
+		case 0xa8:  CLRMAC(opcode); break;
+		case 0xb8:  TODO(opcode); break;
+		case 0xc8:  CLRS(opcode); break;
+		case 0xd8:  SETS(opcode); break;
+		case 0xe8:  NOP(opcode); break;
+		case 0xf8:  NOP(opcode); break;
+		// 0x90
+		case 0x09:  NOP(opcode); break;
+		case 0x19:  DIV0U(opcode); break;
+		case 0x29:  MOVT(opcode); break;
+		case 0x39:  NOP(opcode); break;
+		case 0x49:  NOP(opcode); break;
+		case 0x59:  DIV0U(opcode); break;
+		case 0x69:  MOVT(opcode); break;
+		case 0x79:  NOP(opcode); break;
+		case 0x89:  NOP(opcode); break;
+		case 0x99:  DIV0U(opcode); break;
+		case 0xa9:  MOVT(opcode); break;
+		case 0xb9:  NOP(opcode); break;
+		case 0xc9:  NOP(opcode); break;
+		case 0xd9:  DIV0U(opcode); break;
+		case 0xe9:  MOVT(opcode); break;
+		case 0xf9:  NOP(opcode); break;
+		// 0xa0
+		case 0x0a:  STSMACH(opcode); break;
+		case 0x1a:  STSMACL(opcode); break;
+		case 0x2a:  STSPR(opcode); break;
+		case 0x3a:  STCSGR(opcode); break;
+		case 0x4a:  NOP(opcode); break;
+		case 0x5a:  STSFPUL(opcode); break;
+		case 0x6a:  STSFPSCR(opcode); break;
+		case 0x7a:  STCDBR(opcode); break;
+		case 0x8a:  STSMACH(opcode); break;
+		case 0x9a:  STSMACL(opcode); break;
+		case 0xaa:  STSPR(opcode); break;
+		case 0xba:  STCSGR(opcode); break;
+		case 0xca:  NOP(opcode); break;
+		case 0xda:  STSFPUL(opcode); break;
+		case 0xea:  STSFPSCR(opcode); break;
+		case 0xfa:  STCDBR(opcode); break;
+		// 0xb0
+		case 0x0b:  RTS(opcode); break;
+		case 0x1b:  SLEEP(opcode); break;
+		case 0x2b:  RTE(opcode); break;
+		case 0x3b:  NOP(opcode); break;
+		case 0x4b:  RTS(opcode); break;
+		case 0x5b:  SLEEP(opcode); break;
+		case 0x6b:  RTE(opcode); break;
+		case 0x7b:  NOP(opcode); break;
+		case 0x8b:  RTS(opcode); break;
+		case 0x9b:  SLEEP(opcode); break;
+		case 0xab:  RTE(opcode); break;
+		case 0xbb:  NOP(opcode); break;
+		case 0xcb:  RTS(opcode); break;
+		case 0xdb:  SLEEP(opcode); break;
+		case 0xeb:  RTE(opcode); break;
+		case 0xfb:  NOP(opcode); break;
+		// 0xc0
+		case 0x0c:  MOVBL0(opcode); break;
+		case 0x1c:  MOVBL0(opcode); break;
+		case 0x2c:  MOVBL0(opcode); break;
+		case 0x3c:  MOVBL0(opcode); break;
+		case 0x4c:  MOVBL0(opcode); break;
+		case 0x5c:  MOVBL0(opcode); break;
+		case 0x6c:  MOVBL0(opcode); break;
+		case 0x7c:  MOVBL0(opcode); break;
+		case 0x8c:  MOVBL0(opcode); break;
+		case 0x9c:  MOVBL0(opcode); break;
+		case 0xac:  MOVBL0(opcode); break;
+		case 0xbc:  MOVBL0(opcode); break;
+		case 0xcc:  MOVBL0(opcode); break;
+		case 0xdc:  MOVBL0(opcode); break;
+		case 0xec:  MOVBL0(opcode); break;
+		case 0xfc:  MOVBL0(opcode); break;
+		// 0xd0
+		case 0x0d:  MOVWL0(opcode); break;
+		case 0x1d:  MOVWL0(opcode); break;
+		case 0x2d:  MOVWL0(opcode); break;
+		case 0x3d:  MOVWL0(opcode); break;
+		case 0x4d:  MOVWL0(opcode); break;
+		case 0x5d:  MOVWL0(opcode); break;
+		case 0x6d:  MOVWL0(opcode); break;
+		case 0x7d:  MOVWL0(opcode); break;
+		case 0x8d:  MOVWL0(opcode); break;
+		case 0x9d:  MOVWL0(opcode); break;
+		case 0xad:  MOVWL0(opcode); break;
+		case 0xbd:  MOVWL0(opcode); break;
+		case 0xcd:  MOVWL0(opcode); break;
+		case 0xdd:  MOVWL0(opcode); break;
+		case 0xed:  MOVWL0(opcode); break;
+		case 0xfd:  MOVWL0(opcode); break;
+		// 0xe0
+		case 0x0e:  MOVLL0(opcode); break;
+		case 0x1e:  MOVLL0(opcode); break;
+		case 0x2e:  MOVLL0(opcode); break;
+		case 0x3e:  MOVLL0(opcode); break;
+		case 0x4e:  MOVLL0(opcode); break;
+		case 0x5e:  MOVLL0(opcode); break;
+		case 0x6e:  MOVLL0(opcode); break;
+		case 0x7e:  MOVLL0(opcode); break;
+		case 0x8e:  MOVLL0(opcode); break;
+		case 0x9e:  MOVLL0(opcode); break;
+		case 0xae:  MOVLL0(opcode); break;
+		case 0xbe:  MOVLL0(opcode); break;
+		case 0xce:  MOVLL0(opcode); break;
+		case 0xde:  MOVLL0(opcode); break;
+		case 0xee:  MOVLL0(opcode); break;
+		case 0xfe:  MOVLL0(opcode); break;
+		// 0xf0
+		case 0x0f:  MAC_L(opcode); break;
+		case 0x1f:  MAC_L(opcode); break;
+		case 0x2f:  MAC_L(opcode); break;
+		case 0x3f:  MAC_L(opcode); break;
+		case 0x4f:  MAC_L(opcode); break;
+		case 0x5f:  MAC_L(opcode); break;
+		case 0x6f:  MAC_L(opcode); break;
+		case 0x7f:  MAC_L(opcode); break;
+		case 0x8f:  MAC_L(opcode); break;
+		case 0x9f:  MAC_L(opcode); break;
+		case 0xaf:  MAC_L(opcode); break;
+		case 0xbf:  MAC_L(opcode); break;
+		case 0xcf:  MAC_L(opcode); break;
+		case 0xdf:  MAC_L(opcode); break;
+		case 0xef:  MAC_L(opcode); break;
+		case 0xff:  MAC_L(opcode); break;
+	}
 };
 
-const sh34_base_device::sh4ophandler sh34_base_device::s_op1100_handler[16] =
+inline void sh34_base_device::execute_one_4000(const UINT16 opcode)
 {
-	SH4OP(MOVBSG),     SH4OP(MOVWSG),     SH4OP(MOVLSG),     SH4OP(TRAPA),      SH4OP(MOVBLG),     SH4OP(MOVWLG),     SH4OP(MOVLLG),     SH4OP(MOVA),
-	SH4OP(TSTI),       SH4OP(ANDI),       SH4OP(XORI),       SH4OP(ORI),        SH4OP(TSTM),       SH4OP(ANDM),       SH4OP(XORM),       SH4OP(ORM)
-};
+	switch(opcode & 0xff)
+	{
+		// 0x00
+		case 0x00:  SHLL(opcode); break;
+		case 0x10:  DT(opcode); break;
+		case 0x20:  SHAL(opcode); break;
+		case 0x30:  NOP(opcode); break;
+		case 0x40:  SHLL(opcode); break;
+		case 0x50:  DT(opcode); break;
+		case 0x60:  SHAL(opcode); break;
+		case 0x70:  NOP(opcode); break;
+		case 0x80:  SHLL(opcode); break;
+		case 0x90:  DT(opcode); break;
+		case 0xa0:  SHAL(opcode); break;
+		case 0xb0:  NOP(opcode); break;
+		case 0xc0:  SHLL(opcode); break;
+		case 0xd0:  DT(opcode); break;
+		case 0xe0:  SHAL(opcode); break;
+		case 0xf0:  NOP(opcode); break;
+		// 0x10
+		case 0x01:  SHLR(opcode); break;
+		case 0x11:  CMPPZ(opcode); break;
+		case 0x21:  SHAR(opcode); break;
+		case 0x31:  NOP(opcode); break;
+		case 0x41:  SHLR(opcode); break;
+		case 0x51:  CMPPZ(opcode); break;
+		case 0x61:  SHAR(opcode); break;
+		case 0x71:  NOP(opcode); break;
+		case 0x81:  SHLR(opcode); break;
+		case 0x91:  CMPPZ(opcode); break;
+		case 0xa1:  SHAR(opcode); break;
+		case 0xb1:  NOP(opcode); break;
+		case 0xc1:  SHLR(opcode); break;
+		case 0xd1:  CMPPZ(opcode); break;
+		case 0xe1:  SHAR(opcode); break;
+		case 0xf1:  NOP(opcode); break;
+		// 0x20
+		case 0x02:  STSMMACH(opcode); break;
+		case 0x12:  STSMMACL(opcode); break;
+		case 0x22:  STSMPR(opcode); break;
+		case 0x32:  STCMSGR(opcode); break;
+		case 0x42:  NOP(opcode); break;
+		case 0x52:  STSMFPUL(opcode); break;
+		case 0x62:  STSMFPSCR(opcode); break;
+		case 0x72:  NOP(opcode); break;
+		case 0x82:  NOP(opcode); break;
+		case 0x92:  NOP(opcode); break;
+		case 0xa2:  NOP(opcode); break;
+		case 0xb2:  NOP(opcode); break;
+		case 0xc2:  NOP(opcode); break;
+		case 0xd2:  NOP(opcode); break;
+		case 0xe2:  NOP(opcode); break;
+		case 0xf2:  STCMDBR(opcode); break;
+		// 0x30
+		case 0x03:  STCMSR(opcode); break;
+		case 0x13:  STCMGBR(opcode); break;
+		case 0x23:  STCMVBR(opcode); break;
+		case 0x33:  STCMSSR(opcode); break;
+		case 0x43:  STCMSPC(opcode); break;
+		case 0x53:  NOP(opcode); break;
+		case 0x63:  NOP(opcode); break;
+		case 0x73:  NOP(opcode); break;
+		case 0x83:  STCMRBANK(opcode); break;
+		case 0x93:  STCMRBANK(opcode); break;
+		case 0xa3:  STCMRBANK(opcode); break;
+		case 0xb3:  STCMRBANK(opcode); break;
+		case 0xc3:  STCMRBANK(opcode); break;
+		case 0xd3:  STCMRBANK(opcode); break;
+		case 0xe3:  STCMRBANK(opcode); break;
+		case 0xf3:  STCMRBANK(opcode); break;
+		// 0x40
+		case 0x04:  ROTL(opcode); break;
+		case 0x14:  NOP(opcode); break;
+		case 0x24:  ROTCL(opcode); break;
+		case 0x34:  NOP(opcode); break;
+		case 0x44:  ROTL(opcode); break;
+		case 0x54:  NOP(opcode); break;
+		case 0x64:  ROTCL(opcode); break;
+		case 0x74:  NOP(opcode); break;
+		case 0x84:  ROTL(opcode); break;
+		case 0x94:  NOP(opcode); break;
+		case 0xa4:  ROTCL(opcode); break;
+		case 0xb4:  NOP(opcode); break;
+		case 0xc4:  ROTL(opcode); break;
+		case 0xd4:  NOP(opcode); break;
+		case 0xe4:  ROTCL(opcode); break;
+		case 0xf4:  NOP(opcode); break;
+		// 0x50
+		case 0x05:  ROTR(opcode); break;
+		case 0x15:  CMPPL(opcode); break;
+		case 0x25:  ROTCR(opcode); break;
+		case 0x35:  NOP(opcode); break;
+		case 0x45:  ROTR(opcode); break;
+		case 0x55:  CMPPL(opcode); break;
+		case 0x65:  ROTCR(opcode); break;
+		case 0x75:  NOP(opcode); break;
+		case 0x85:  ROTR(opcode); break;
+		case 0x95:  CMPPL(opcode); break;
+		case 0xa5:  ROTCR(opcode); break;
+		case 0xb5:  NOP(opcode); break;
+		case 0xc5:  ROTR(opcode); break;
+		case 0xd5:  CMPPL(opcode); break;
+		case 0xe5:  ROTCR(opcode); break;
+		case 0xf5:  NOP(opcode); break;
+		// 0x60
+		case 0x06:  LDSMMACH(opcode); break;
+		case 0x16:  LDSMMACL(opcode); break;
+		case 0x26:  LDSMPR(opcode); break;
+		case 0x36:  NOP(opcode); break;
+		case 0x46:  NOP(opcode); break;
+		case 0x56:  LDSMFPUL(opcode); break;
+		case 0x66:  LDSMFPSCR(opcode); break;
+		case 0x76:  NOP(opcode); break;
+		case 0x86:  NOP(opcode); break;
+		case 0x96:  NOP(opcode); break;
+		case 0xa6:  NOP(opcode); break;
+		case 0xb6:  NOP(opcode); break;
+		case 0xc6:  NOP(opcode); break;
+		case 0xd6:  NOP(opcode); break;
+		case 0xe6:  NOP(opcode); break;
+		case 0xf6:  LDCMDBR(opcode); break;
+		// 0x70
+		case 0x07:  LDCMSR(opcode); break;
+		case 0x17:  LDCMGBR(opcode); break;
+		case 0x27:  LDCMVBR(opcode); break;
+		case 0x37:  LDCMSSR(opcode); break;
+		case 0x47:  LDCMSPC(opcode); break;
+		case 0x57:  NOP(opcode); break;
+		case 0x67:  NOP(opcode); break;
+		case 0x77:  NOP(opcode); break;
+		case 0x87:  LDCMRBANK(opcode); break;
+		case 0x97:  LDCMRBANK(opcode); break;
+		case 0xa7:  LDCMRBANK(opcode); break;
+		case 0xb7:  LDCMRBANK(opcode); break;
+		case 0xc7:  LDCMRBANK(opcode); break;
+		case 0xd7:  LDCMRBANK(opcode); break;
+		case 0xe7:  LDCMRBANK(opcode); break;
+		case 0xf7:  LDCMRBANK(opcode); break;
+		// 0x80
+		case 0x08:  SHLL2(opcode); break;
+		case 0x18:  SHLL8(opcode); break;
+		case 0x28:  SHLL16(opcode); break;
+		case 0x38:  NOP(opcode); break;
+		case 0x48:  SHLL2(opcode); break;
+		case 0x58:  SHLL8(opcode); break;
+		case 0x68:  SHLL16(opcode); break;
+		case 0x78:  NOP(opcode); break;
+		case 0x88:  SHLL2(opcode); break;
+		case 0x98:  SHLL8(opcode); break;
+		case 0xa8:  SHLL16(opcode); break;
+		case 0xb8:  NOP(opcode); break;
+		case 0xc8:  SHLL2(opcode); break;
+		case 0xd8:  SHLL8(opcode); break;
+		case 0xe8:  SHLL16(opcode); break;
+		case 0xf8:  NOP(opcode); break;
+		// 0x90
+		case 0x09:  SHLR2(opcode); break;
+		case 0x19:  SHLR8(opcode); break;
+		case 0x29:  SHLR16(opcode); break;
+		case 0x39:  NOP(opcode); break;
+		case 0x49:  SHLR2(opcode); break;
+		case 0x59:  SHLR8(opcode); break;
+		case 0x69:  SHLR16(opcode); break;
+		case 0x79:  NOP(opcode); break;
+		case 0x89:  SHLR2(opcode); break;
+		case 0x99:  SHLR8(opcode); break;
+		case 0xa9:  SHLR16(opcode); break;
+		case 0xb9:  NOP(opcode); break;
+		case 0xc9:  SHLR2(opcode); break;
+		case 0xd9:  SHLR8(opcode); break;
+		case 0xe9:  SHLR16(opcode); break;
+		case 0xf9:  NOP(opcode); break;
+		// 0xa0
+		case 0x0a:  LDSMACH(opcode); break;
+		case 0x1a:  LDSMACL(opcode); break;
+		case 0x2a:  LDSPR(opcode); break;
+		case 0x3a:  NOP(opcode); break;
+		case 0x4a:  NOP(opcode); break;
+		case 0x5a:  LDSFPUL(opcode); break;
+		case 0x6a:  LDSFPSCR(opcode); break;
+		case 0x7a:  NOP(opcode); break;
+		case 0x8a:  NOP(opcode); break;
+		case 0x9a:  NOP(opcode); break;
+		case 0xaa:  NOP(opcode); break;
+		case 0xba:  NOP(opcode); break;
+		case 0xca:  NOP(opcode); break;
+		case 0xda:  NOP(opcode); break;
+		case 0xea:  NOP(opcode); break;
+		case 0xfa:  LDCDBR(opcode); break;
+		// 0xb0
+		case 0x0b:  JSR(opcode); break;
+		case 0x1b:  TAS(opcode); break;
+		case 0x2b:  JMP(opcode); break;
+		case 0x3b:  NOP(opcode); break;
+		case 0x4b:  JSR(opcode); break;
+		case 0x5b:  TAS(opcode); break;
+		case 0x6b:  JMP(opcode); break;
+		case 0x7b:  NOP(opcode); break;
+		case 0x8b:  JSR(opcode); break;
+		case 0x9b:  TAS(opcode); break;
+		case 0xab:  JMP(opcode); break;
+		case 0xbb:  NOP(opcode); break;
+		case 0xcb:  JSR(opcode); break;
+		case 0xdb:  TAS(opcode); break;
+		case 0xeb:  JMP(opcode); break;
+		case 0xfb:  NOP(opcode); break;
+		// 0xc0
+		case 0x0c:  SHAD(opcode); break;
+		case 0x1c:  SHAD(opcode); break;
+		case 0x2c:  SHAD(opcode); break;
+		case 0x3c:  SHAD(opcode); break;
+		case 0x4c:  SHAD(opcode); break;
+		case 0x5c:  SHAD(opcode); break;
+		case 0x6c:  SHAD(opcode); break;
+		case 0x7c:  SHAD(opcode); break;
+		case 0x8c:  SHAD(opcode); break;
+		case 0x9c:  SHAD(opcode); break;
+		case 0xac:  SHAD(opcode); break;
+		case 0xbc:  SHAD(opcode); break;
+		case 0xcc:  SHAD(opcode); break;
+		case 0xdc:  SHAD(opcode); break;
+		case 0xec:  SHAD(opcode); break;
+		case 0xfc:  SHAD(opcode); break;
+		// 0xd0
+		case 0x0d:  SHLD(opcode); break;
+		case 0x1d:  SHLD(opcode); break;
+		case 0x2d:  SHLD(opcode); break;
+		case 0x3d:  SHLD(opcode); break;
+		case 0x4d:  SHLD(opcode); break;
+		case 0x5d:  SHLD(opcode); break;
+		case 0x6d:  SHLD(opcode); break;
+		case 0x7d:  SHLD(opcode); break;
+		case 0x8d:  SHLD(opcode); break;
+		case 0x9d:  SHLD(opcode); break;
+		case 0xad:  SHLD(opcode); break;
+		case 0xbd:  SHLD(opcode); break;
+		case 0xcd:  SHLD(opcode); break;
+		case 0xdd:  SHLD(opcode); break;
+		case 0xed:  SHLD(opcode); break;
+		case 0xfd:  SHLD(opcode); break;
+		// 0xe0
+		case 0x0e:  LDCSR(opcode); break;
+		case 0x1e:  LDCGBR(opcode); break;
+		case 0x2e:  LDCVBR(opcode); break;
+		case 0x3e:  LDCSSR(opcode); break;
+		case 0x4e:  LDCSPC(opcode); break;
+		case 0x5e:  NOP(opcode); break;
+		case 0x6e:  NOP(opcode); break;
+		case 0x7e:  NOP(opcode); break;
+		case 0x8e:  LDCRBANK(opcode); break;
+		case 0x9e:  LDCRBANK(opcode); break;
+		case 0xae:  LDCRBANK(opcode); break;
+		case 0xbe:  LDCRBANK(opcode); break;
+		case 0xce:  LDCRBANK(opcode); break;
+		case 0xde:  LDCRBANK(opcode); break;
+		case 0xee:  LDCRBANK(opcode); break;
+		case 0xfe:  LDCRBANK(opcode); break;
+		// 0xf0
+		case 0x0f:  MAC_W(opcode); break;
+		case 0x1f:  MAC_W(opcode); break;
+		case 0x2f:  MAC_W(opcode); break;
+		case 0x3f:  MAC_W(opcode); break;
+		case 0x4f:  MAC_W(opcode); break;
+		case 0x5f:  MAC_W(opcode); break;
+		case 0x6f:  MAC_W(opcode); break;
+		case 0x7f:  MAC_W(opcode); break;
+		case 0x8f:  MAC_W(opcode); break;
+		case 0x9f:  MAC_W(opcode); break;
+		case 0xaf:  MAC_W(opcode); break;
+		case 0xbf:  MAC_W(opcode); break;
+		case 0xcf:  MAC_W(opcode); break;
+		case 0xdf:  MAC_W(opcode); break;
+		case 0xef:  MAC_W(opcode); break;
+		case 0xff:  MAC_W(opcode); break;
+	}
+}
 
-const sh34_base_device::sh4ophandler sh34_base_device::s_op0000_handlers[256] =
+
+inline void sh34_base_device::execute_one(const UINT16 opcode)
 {
-	SH4OP(NOP),        SH4OP(NOP),        SH4OP(NOP),        SH4OP(NOP),        SH4OP(NOP),        SH4OP(NOP),        SH4OP(NOP),        SH4OP(NOP),
-	SH4OP(NOP),        SH4OP(NOP),        SH4OP(NOP),        SH4OP(NOP),        SH4OP(NOP),        SH4OP(NOP),        SH4OP(NOP),        SH4OP(NOP),
-	SH4OP(NOP),        SH4OP(NOP),        SH4OP(NOP),        SH4OP(NOP),        SH4OP(NOP),        SH4OP(NOP),        SH4OP(NOP),        SH4OP(NOP),
-	SH4OP(NOP),        SH4OP(NOP),        SH4OP(NOP),        SH4OP(NOP),        SH4OP(NOP),        SH4OP(NOP),        SH4OP(NOP),        SH4OP(NOP),
-	SH4OP(STCSR),      SH4OP(STCGBR),     SH4OP(STCVBR),     SH4OP(STCSSR),     SH4OP(STCSPC),     SH4OP(NOP),        SH4OP(NOP),        SH4OP(NOP),
-	SH4OP(STCRBANK),   SH4OP(STCRBANK),   SH4OP(STCRBANK),   SH4OP(STCRBANK),   SH4OP(STCRBANK),   SH4OP(STCRBANK),   SH4OP(STCRBANK),   SH4OP(STCRBANK),
-	SH4OP(BSRF),       SH4OP(NOP),        SH4OP(BRAF),       SH4OP(NOP),        SH4OP(NOP),        SH4OP(NOP),        SH4OP(NOP),        SH4OP(NOP),
-	SH4OP(PREFM),      SH4OP(TODO),       SH4OP(TODO),       SH4OP(TODO),       SH4OP(MOVCAL),     SH4OP(NOP),        SH4OP(NOP),        SH4OP(NOP),
-	SH4OP(MOVBS0),     SH4OP(MOVBS0),     SH4OP(MOVBS0),     SH4OP(MOVBS0),     SH4OP(MOVBS0),     SH4OP(MOVBS0),     SH4OP(MOVBS0),     SH4OP(MOVBS0),
-	SH4OP(MOVBS0),     SH4OP(MOVBS0),     SH4OP(MOVBS0),     SH4OP(MOVBS0),     SH4OP(MOVBS0),     SH4OP(MOVBS0),     SH4OP(MOVBS0),     SH4OP(MOVBS0),
-	SH4OP(MOVWS0),     SH4OP(MOVWS0),     SH4OP(MOVWS0),     SH4OP(MOVWS0),     SH4OP(MOVWS0),     SH4OP(MOVWS0),     SH4OP(MOVWS0),     SH4OP(MOVWS0),
-	SH4OP(MOVWS0),     SH4OP(MOVWS0),     SH4OP(MOVWS0),     SH4OP(MOVWS0),     SH4OP(MOVWS0),     SH4OP(MOVWS0),     SH4OP(MOVWS0),     SH4OP(MOVWS0),
-	SH4OP(MOVLS0),     SH4OP(MOVLS0),     SH4OP(MOVLS0),     SH4OP(MOVLS0),     SH4OP(MOVLS0),     SH4OP(MOVLS0),     SH4OP(MOVLS0),     SH4OP(MOVLS0),
-	SH4OP(MOVLS0),     SH4OP(MOVLS0),     SH4OP(MOVLS0),     SH4OP(MOVLS0),     SH4OP(MOVLS0),     SH4OP(MOVLS0),     SH4OP(MOVLS0),     SH4OP(MOVLS0),
-	SH4OP(MULL),       SH4OP(MULL),       SH4OP(MULL),       SH4OP(MULL),       SH4OP(MULL),       SH4OP(MULL),       SH4OP(MULL),       SH4OP(MULL),
-	SH4OP(MULL),       SH4OP(MULL),       SH4OP(MULL),       SH4OP(MULL),       SH4OP(MULL),       SH4OP(MULL),       SH4OP(MULL),       SH4OP(MULL),
-	SH4OP(CLRT),       SH4OP(SETT),       SH4OP(CLRMAC),     SH4OP(TODO),       SH4OP(CLRS),       SH4OP(SETS),       SH4OP(NOP),        SH4OP(NOP),
-	SH4OP(CLRT),       SH4OP(SETT),       SH4OP(CLRMAC),     SH4OP(TODO),       SH4OP(CLRS),       SH4OP(SETS),       SH4OP(NOP),        SH4OP(NOP),
-	SH4OP(NOP),        SH4OP(DIV0U),      SH4OP(MOVT),       SH4OP(NOP),        SH4OP(NOP),        SH4OP(DIV0U),      SH4OP(MOVT),       SH4OP(NOP),
-	SH4OP(NOP),        SH4OP(DIV0U),      SH4OP(MOVT),       SH4OP(NOP),        SH4OP(NOP),        SH4OP(DIV0U),      SH4OP(MOVT),       SH4OP(NOP),
-	SH4OP(STSMACH),    SH4OP(STSMACL),    SH4OP(STSPR),      SH4OP(STCSGR),     SH4OP(NOP),        SH4OP(STSFPUL),    SH4OP(STSFPSCR),   SH4OP(STCDBR),
-	SH4OP(STSMACH),    SH4OP(STSMACL),    SH4OP(STSPR),      SH4OP(STCSGR),     SH4OP(NOP),        SH4OP(STSFPUL),    SH4OP(STSFPSCR),   SH4OP(STCDBR),
-	SH4OP(RTS),        SH4OP(SLEEP),      SH4OP(RTE),        SH4OP(NOP),        SH4OP(RTS),        SH4OP(SLEEP),      SH4OP(RTE),        SH4OP(NOP),
-	SH4OP(RTS),        SH4OP(SLEEP),      SH4OP(RTE),        SH4OP(NOP),        SH4OP(RTS),        SH4OP(SLEEP),      SH4OP(RTE),        SH4OP(NOP),
-	SH4OP(MOVBL0),     SH4OP(MOVBL0),     SH4OP(MOVBL0),     SH4OP(MOVBL0),     SH4OP(MOVBL0),     SH4OP(MOVBL0),     SH4OP(MOVBL0),     SH4OP(MOVBL0),
-	SH4OP(MOVBL0),     SH4OP(MOVBL0),     SH4OP(MOVBL0),     SH4OP(MOVBL0),     SH4OP(MOVBL0),     SH4OP(MOVBL0),     SH4OP(MOVBL0),     SH4OP(MOVBL0),
-	SH4OP(MOVWL0),     SH4OP(MOVWL0),     SH4OP(MOVWL0),     SH4OP(MOVWL0),     SH4OP(MOVWL0),     SH4OP(MOVWL0),     SH4OP(MOVWL0),     SH4OP(MOVWL0),
-	SH4OP(MOVWL0),     SH4OP(MOVWL0),     SH4OP(MOVWL0),     SH4OP(MOVWL0),     SH4OP(MOVWL0),     SH4OP(MOVWL0),     SH4OP(MOVWL0),     SH4OP(MOVWL0),
-	SH4OP(MOVLL0),     SH4OP(MOVLL0),     SH4OP(MOVLL0),     SH4OP(MOVLL0),     SH4OP(MOVLL0),     SH4OP(MOVLL0),     SH4OP(MOVLL0),     SH4OP(MOVLL0),
-	SH4OP(MOVLL0),     SH4OP(MOVLL0),     SH4OP(MOVLL0),     SH4OP(MOVLL0),     SH4OP(MOVLL0),     SH4OP(MOVLL0),     SH4OP(MOVLL0),     SH4OP(MOVLL0),
-	SH4OP(MAC_L),      SH4OP(MAC_L),      SH4OP(MAC_L),      SH4OP(MAC_L),      SH4OP(MAC_L),      SH4OP(MAC_L),      SH4OP(MAC_L),      SH4OP(MAC_L),
-	SH4OP(MAC_L),      SH4OP(MAC_L),      SH4OP(MAC_L),      SH4OP(MAC_L),      SH4OP(MAC_L),      SH4OP(MAC_L),      SH4OP(MAC_L),      SH4OP(MAC_L)
-};
-
-const sh34_base_device::sh4ophandler sh34_base_device::s_op0100_handlers[256] =
-{
-	SH4OP(SHLL),       SH4OP(DT),         SH4OP(SHAL),       SH4OP(NOP),        SH4OP(SHLL),       SH4OP(DT),         SH4OP(SHAL),       SH4OP(NOP),
-	SH4OP(SHLL),       SH4OP(DT),         SH4OP(SHAL),       SH4OP(NOP),        SH4OP(SHLL),       SH4OP(DT),         SH4OP(SHAL),       SH4OP(NOP),
-	SH4OP(SHLR),       SH4OP(CMPPZ),      SH4OP(SHAR),       SH4OP(NOP),        SH4OP(SHLR),       SH4OP(CMPPZ),      SH4OP(SHAR),       SH4OP(NOP),
-	SH4OP(SHLR),       SH4OP(CMPPZ),      SH4OP(SHAR),       SH4OP(NOP),        SH4OP(SHLR),       SH4OP(CMPPZ),      SH4OP(SHAR),       SH4OP(NOP),
-	SH4OP(STSMMACH),   SH4OP(STSMMACL),   SH4OP(STSMPR),     SH4OP(STCMSGR),    SH4OP(NOP),        SH4OP(STSMFPUL),   SH4OP(STSMFPSCR),  SH4OP(NOP),
-	SH4OP(NOP),        SH4OP(NOP),        SH4OP(NOP),        SH4OP(NOP),        SH4OP(NOP),        SH4OP(NOP),        SH4OP(NOP),        SH4OP(STCMDBR),
-	SH4OP(STCMSR),     SH4OP(STCMGBR),    SH4OP(STCMVBR),    SH4OP(STCMSSR),    SH4OP(STCMSPC),    SH4OP(NOP),        SH4OP(NOP),        SH4OP(NOP),
-	SH4OP(STCMRBANK),  SH4OP(STCMRBANK),  SH4OP(STCMRBANK),  SH4OP(STCMRBANK),  SH4OP(STCMRBANK),  SH4OP(STCMRBANK),  SH4OP(STCMRBANK),  SH4OP(STCMRBANK),
-	SH4OP(ROTL),       SH4OP(NOP),        SH4OP(ROTCL),      SH4OP(NOP),        SH4OP(ROTL),       SH4OP(NOP),        SH4OP(ROTCL),      SH4OP(NOP),
-	SH4OP(ROTL),       SH4OP(NOP),        SH4OP(ROTCL),      SH4OP(NOP),        SH4OP(ROTL),       SH4OP(NOP),        SH4OP(ROTCL),      SH4OP(NOP),
-	SH4OP(ROTR),       SH4OP(CMPPL),      SH4OP(ROTCR),      SH4OP(NOP),        SH4OP(ROTR),       SH4OP(CMPPL),      SH4OP(ROTCR),      SH4OP(NOP),
-	SH4OP(ROTR),       SH4OP(CMPPL),      SH4OP(ROTCR),      SH4OP(NOP),        SH4OP(ROTR),       SH4OP(CMPPL),      SH4OP(ROTCR),      SH4OP(NOP),
-	SH4OP(LDSMMACH),   SH4OP(LDSMMACL),   SH4OP(LDSMPR),     SH4OP(NOP),        SH4OP(NOP),        SH4OP(LDSMFPUL),   SH4OP(LDSMFPSCR),  SH4OP(NOP),
-	SH4OP(NOP),        SH4OP(NOP),        SH4OP(NOP),        SH4OP(NOP),        SH4OP(NOP),        SH4OP(NOP),        SH4OP(NOP),        SH4OP(LDCMDBR),
-	SH4OP(LDCMSR),     SH4OP(LDCMGBR),    SH4OP(LDCMVBR),    SH4OP(LDCMSSR),    SH4OP(LDCMSPC),    SH4OP(NOP),        SH4OP(NOP),        SH4OP(NOP),
-	SH4OP(LDCMRBANK),  SH4OP(LDCMRBANK),  SH4OP(LDCMRBANK),  SH4OP(LDCMRBANK),  SH4OP(LDCMRBANK),  SH4OP(LDCMRBANK),  SH4OP(LDCMRBANK),  SH4OP(LDCMRBANK),
-	SH4OP(SHLL2),      SH4OP(SHLL8),      SH4OP(SHLL16),     SH4OP(NOP),        SH4OP(SHLL2),      SH4OP(SHLL8),      SH4OP(SHLL16),     SH4OP(NOP),
-	SH4OP(SHLL2),      SH4OP(SHLL8),      SH4OP(SHLL16),     SH4OP(NOP),        SH4OP(SHLL2),      SH4OP(SHLL8),      SH4OP(SHLL16),     SH4OP(NOP),
-	SH4OP(SHLR2),      SH4OP(SHLR8),      SH4OP(SHLR16),     SH4OP(NOP),        SH4OP(SHLR2),      SH4OP(SHLR8),      SH4OP(SHLR16),     SH4OP(NOP),
-	SH4OP(SHLR2),      SH4OP(SHLR8),      SH4OP(SHLR16),     SH4OP(NOP),        SH4OP(SHLR2),      SH4OP(SHLR8),      SH4OP(SHLR16),     SH4OP(NOP),
-	SH4OP(LDSMACH),    SH4OP(LDSMACL),    SH4OP(LDSPR),      SH4OP(NOP),        SH4OP(NOP),        SH4OP(LDSFPUL),    SH4OP(LDSFPSCR),   SH4OP(NOP),
-	SH4OP(NOP),        SH4OP(NOP),        SH4OP(NOP),        SH4OP(NOP),        SH4OP(NOP),        SH4OP(NOP),        SH4OP(NOP),        SH4OP(LDCDBR),
-	SH4OP(JSR),        SH4OP(TAS),        SH4OP(JMP),        SH4OP(NOP),        SH4OP(JSR),        SH4OP(TAS),        SH4OP(JMP),        SH4OP(NOP),
-	SH4OP(JSR),        SH4OP(TAS),        SH4OP(JMP),        SH4OP(NOP),        SH4OP(JSR),        SH4OP(TAS),        SH4OP(JMP),        SH4OP(NOP),
-	SH4OP(SHAD),       SH4OP(SHAD),       SH4OP(SHAD),       SH4OP(SHAD),       SH4OP(SHAD),       SH4OP(SHAD),       SH4OP(SHAD),       SH4OP(SHAD),
-	SH4OP(SHAD),       SH4OP(SHAD),       SH4OP(SHAD),       SH4OP(SHAD),       SH4OP(SHAD),       SH4OP(SHAD),       SH4OP(SHAD),       SH4OP(SHAD),
-	SH4OP(SHLD),       SH4OP(SHLD),       SH4OP(SHLD),       SH4OP(SHLD),       SH4OP(SHLD),       SH4OP(SHLD),       SH4OP(SHLD),       SH4OP(SHLD),
-	SH4OP(SHLD),       SH4OP(SHLD),       SH4OP(SHLD),       SH4OP(SHLD),       SH4OP(SHLD),       SH4OP(SHLD),       SH4OP(SHLD),       SH4OP(SHLD),
-	SH4OP(LDCSR),      SH4OP(LDCGBR),     SH4OP(LDCVBR),     SH4OP(LDCSSR),     SH4OP(LDCSPC),     SH4OP(NOP),        SH4OP(NOP),        SH4OP(NOP),
-	SH4OP(LDCRBANK),   SH4OP(LDCRBANK),   SH4OP(LDCRBANK),   SH4OP(LDCRBANK),   SH4OP(LDCRBANK),   SH4OP(LDCRBANK),   SH4OP(LDCRBANK),   SH4OP(LDCRBANK),
-	SH4OP(MAC_W),      SH4OP(MAC_W),      SH4OP(MAC_W),      SH4OP(MAC_W),      SH4OP(MAC_W),      SH4OP(MAC_W),      SH4OP(MAC_W),      SH4OP(MAC_W),
-	SH4OP(MAC_W),      SH4OP(MAC_W),      SH4OP(MAC_W),      SH4OP(MAC_W),      SH4OP(MAC_W),      SH4OP(MAC_W),      SH4OP(MAC_W),      SH4OP(MAC_W)
-};
-
-
-const sh34_base_device::sh4ophandler sh34_base_device::s_upper4bits[256] =
-{
-	/* j = 0x0000 - uses op0000_handlers*/
-	NULL,          NULL,          NULL,          NULL,          NULL,          NULL,          NULL,          NULL,
-	NULL,          NULL,          NULL,          NULL,          NULL,          NULL,          NULL,          NULL,
-	/* j = 0x1000 */
-	SH4OP(MOVLS4),     SH4OP(MOVLS4),     SH4OP(MOVLS4),     SH4OP(MOVLS4),     SH4OP(MOVLS4),     SH4OP(MOVLS4),     SH4OP(MOVLS4),     SH4OP(MOVLS4),
-	SH4OP(MOVLS4),     SH4OP(MOVLS4),     SH4OP(MOVLS4),     SH4OP(MOVLS4),     SH4OP(MOVLS4),     SH4OP(MOVLS4),     SH4OP(MOVLS4),     SH4OP(MOVLS4),
-	/* j = 0x2000 */
-	SH4OP(MOVBS),      SH4OP(MOVWS),      SH4OP(MOVLS),      SH4OP(NOP),        SH4OP(MOVBM),      SH4OP(MOVWM),      SH4OP(MOVLM),      SH4OP(DIV0S),
-	SH4OP(TST),        SH4OP(AND),        SH4OP(XOR),        SH4OP(OR),         SH4OP(CMPSTR),     SH4OP(XTRCT),      SH4OP(MULU),       SH4OP(MULS),
-	/* j = 0x3000 */
-	SH4OP(CMPEQ),      SH4OP(NOP),        SH4OP(CMPHS),      SH4OP(CMPGE),      SH4OP(DIV1),       SH4OP(DMULU),      SH4OP(CMPHI),      SH4OP(CMPGT),
-	SH4OP(SUB),        SH4OP(NOP),        SH4OP(SUBC),       SH4OP(SUBV),       SH4OP(ADD),        SH4OP(DMULS),      SH4OP(ADDC),       SH4OP(ADDV),
-	/* j = 0x4000 - uses op0100_handlers*/
-	NULL,          NULL,          NULL,          NULL,          NULL,          NULL,          NULL,          NULL,
-	NULL,          NULL,          NULL,          NULL,          NULL,          NULL,          NULL,          NULL,
-	/* j = 0x5000 */
-	SH4OP(MOVLL4),     SH4OP(MOVLL4),     SH4OP(MOVLL4),     SH4OP(MOVLL4),     SH4OP(MOVLL4),     SH4OP(MOVLL4),     SH4OP(MOVLL4),     SH4OP(MOVLL4),
-	SH4OP(MOVLL4),     SH4OP(MOVLL4),     SH4OP(MOVLL4),     SH4OP(MOVLL4),     SH4OP(MOVLL4),     SH4OP(MOVLL4),     SH4OP(MOVLL4),     SH4OP(MOVLL4),
-	/* j = 0x6000 */
-	SH4OP(MOVBL),      SH4OP(MOVWL),      SH4OP(MOVLL),      SH4OP(MOV),        SH4OP(MOVBP),      SH4OP(MOVWP),      SH4OP(MOVLP),      SH4OP(NOT),
-	SH4OP(SWAPB),      SH4OP(SWAPW),      SH4OP(NEGC),       SH4OP(NEG),        SH4OP(EXTUB),      SH4OP(EXTUW),      SH4OP(EXTSB),      SH4OP(EXTSW),
-	/* j = 0x7000 */
-	SH4OP(ADDI),       SH4OP(ADDI),       SH4OP(ADDI),       SH4OP(ADDI),       SH4OP(ADDI),       SH4OP(ADDI),       SH4OP(ADDI),       SH4OP(ADDI),
-	SH4OP(ADDI),       SH4OP(ADDI),       SH4OP(ADDI),       SH4OP(ADDI),       SH4OP(ADDI),       SH4OP(ADDI),       SH4OP(ADDI),       SH4OP(ADDI),
-	/* j = 0x8000 - uses op1000_handlers */
-	NULL,          NULL,          NULL,          NULL,          NULL,          NULL,          NULL,          NULL,
-	NULL,          NULL,          NULL,          NULL,          NULL,          NULL,          NULL,          NULL,
-	/* j = 0x9000 */
-	SH4OP(MOVWI),      SH4OP(MOVWI),      SH4OP(MOVWI),      SH4OP(MOVWI),      SH4OP(MOVWI),      SH4OP(MOVWI),      SH4OP(MOVWI),      SH4OP(MOVWI),
-	SH4OP(MOVWI),      SH4OP(MOVWI),      SH4OP(MOVWI),      SH4OP(MOVWI),      SH4OP(MOVWI),      SH4OP(MOVWI),      SH4OP(MOVWI),      SH4OP(MOVWI),
-		/* j = 0xa000 */
-	SH4OP(BRA),        SH4OP(BRA),        SH4OP(BRA),        SH4OP(BRA),        SH4OP(BRA),        SH4OP(BRA),        SH4OP(BRA),        SH4OP(BRA),
-	SH4OP(BRA),        SH4OP(BRA),        SH4OP(BRA),        SH4OP(BRA),        SH4OP(BRA),        SH4OP(BRA),        SH4OP(BRA),        SH4OP(BRA),
-	/* j = 0xb000 */
-	SH4OP(BSR),        SH4OP(BSR),        SH4OP(BSR),        SH4OP(BSR),        SH4OP(BSR),        SH4OP(BSR),        SH4OP(BSR),        SH4OP(BSR),
-	SH4OP(BSR),        SH4OP(BSR),        SH4OP(BSR),        SH4OP(BSR),        SH4OP(BSR),        SH4OP(BSR),        SH4OP(BSR),        SH4OP(BSR),
-	/* j = 0xc000 - uses op1100_handlers */
-	NULL,          NULL,          NULL,          NULL,          NULL,          NULL,          NULL,          NULL,
-	NULL,          NULL,          NULL,          NULL,          NULL,          NULL,          NULL,          NULL,
-	/* j = 0xd000 */
-	SH4OP(MOVLI),      SH4OP(MOVLI),      SH4OP(MOVLI),      SH4OP(MOVLI),      SH4OP(MOVLI),      SH4OP(MOVLI),      SH4OP(MOVLI),      SH4OP(MOVLI),
-	SH4OP(MOVLI),      SH4OP(MOVLI),      SH4OP(MOVLI),      SH4OP(MOVLI),      SH4OP(MOVLI),      SH4OP(MOVLI),      SH4OP(MOVLI),      SH4OP(MOVLI),
-	/* j = 0xe000 */
-	SH4OP(MOVI),       SH4OP(MOVI),       SH4OP(MOVI),       SH4OP(MOVI),       SH4OP(MOVI),       SH4OP(MOVI),       SH4OP(MOVI),       SH4OP(MOVI),
-	SH4OP(MOVI),       SH4OP(MOVI),       SH4OP(MOVI),       SH4OP(MOVI),       SH4OP(MOVI),       SH4OP(MOVI),       SH4OP(MOVI),       SH4OP(MOVI),
-	/* j = 0xf000 */
-	SH4OP(FADD),       SH4OP(FSUB),       SH4OP(FMUL),       SH4OP(FDIV),       SH4OP(FCMP_EQ),    SH4OP(FCMP_GT),    SH4OP(FMOVS0FR),   SH4OP(FMOVFRS0),
-	SH4OP(FMOVMRFR),   SH4OP(FMOVMRIFR),  SH4OP(FMOVFRMR),   SH4OP(FMOVFRMDR),  SH4OP(FMOVFR),     SH4OP(op1111_0x13),SH4OP(FMAC),       SH4OP(dbreak)
-};
-
-void sh34_base_device::sh4_build_optable()
-{
-	int j,y,x,z;
-
-	// combine our opcode handler tables into one larger table thus reducing level of indirection on all opcode handlers
-	for (j = 0; j<0x10000;j+=0x1000)
+	switch(opcode & 0xf000)
 	{
-		for (y = 0; y<0x1000;y+=0x100)
-		{
-			for (x=0; x<0x100;x+=0x10)
+		case 0x0000:
+			execute_one_0000(opcode);
+			break;
+
+		case 0x1000:
+			MOVLS4(opcode);
+			break;
+
+		case 0x2000:
+			switch(opcode & 0x0f)
 			{
-				for (z=0;z<0x10;z++)
-				{
-					s_master_ophandler_table[j+y+x+z] = s_upper4bits[(((j+z)&0xf000)>>8) + (z & 0xf)];
-				}
+				case 0x00:  MOVBS(opcode); break;
+				case 0x01:  MOVWS(opcode); break;
+				case 0x02:  MOVLS(opcode); break;
+				case 0x03:  NOP(opcode); break;
+				case 0x04:  MOVBM(opcode); break;
+				case 0x05:  MOVWM(opcode); break;
+				case 0x06:  MOVLM(opcode); break;
+				case 0x07:  DIV0S(opcode); break;
+				case 0x08:  TST(opcode); break;
+				case 0x09:  AND(opcode); break;
+				case 0x0a:  XOR(opcode); break;
+				case 0x0b:  OR(opcode); break;
+				case 0x0c:  CMPSTR(opcode); break;
+				case 0x0d:  XTRCT(opcode); break;
+				case 0x0e:  MULU(opcode); break;
+				case 0x0f:  MULS(opcode); break;
 			}
-		}
-	}
+			break;
 
-	j = 0x0000;
-	//for (j = 0; j<0x10000;j+=0x1000)
-	{
-		for (y = 0; y<0x1000;y+=0x100)
-		{
-			for (x=0; x<0x100;x+=0x10)
+		case 0x3000:
+			switch(opcode & 0x0f)
 			{
-				for (z=0;z<0x10;z++)
-				{
-					s_master_ophandler_table[j+y+x+z] = s_op0000_handlers[((((j+y+x+z)&0xf0)>>4)) | ((((j+y+x+z)&0xf)<<4))];
-				}
+				case 0x00:  CMPEQ(opcode); break;
+				case 0x01:  NOP(opcode); break;
+				case 0x02:  CMPHS(opcode); break;
+				case 0x03:  CMPGE(opcode); break;
+				case 0x04:  DIV1(opcode); break;
+				case 0x05:  DMULU(opcode); break;
+				case 0x06:  CMPHI(opcode); break;
+				case 0x07:  CMPGT(opcode); break;
+				case 0x08:  SUB(opcode); break;
+				case 0x09:  NOP(opcode); break;
+				case 0x0a:  SUBC(opcode); break;
+				case 0x0b:  SUBV(opcode); break;
+				case 0x0c:  ADD(opcode); break;
+				case 0x0d:  DMULS(opcode); break;
+				case 0x0e:  ADDC(opcode); break;
+				case 0x0f:  ADDV(opcode); break;
 			}
-		}
-	}
+			break;
 
-	j = 0x4000;
-	//for (j = 0; j<0x10000;j+=0x1000)
-	{
-		for (y = 0; y<0x1000;y+=0x100)
-		{
-			for (x=0; x<0x100;x+=0x10)
+		case 0x4000:
+			execute_one_4000(opcode);
+			break;
+
+		case 0x5000:
+			MOVLL4(opcode);
+			break;
+
+		case 0x6000:
+			switch(opcode & 0x0f)
 			{
-				for (z=0;z<0x10;z++)
-				{
-					s_master_ophandler_table[j+y+x+z] = s_op0100_handlers[((((j+y+x+z)&0xf0)>>4)) | ((((j+y+x+z)&0xf)<<4))];
-				}
+				case 0x00:  MOVBL(opcode); break;
+				case 0x01:  MOVWL(opcode); break;
+				case 0x02:  MOVLL(opcode); break;
+				case 0x03:  MOV(opcode); break;
+				case 0x04:  MOVBP(opcode); break;
+				case 0x05:  MOVWP(opcode); break;
+				case 0x06:  MOVLP(opcode); break;
+				case 0x07:  NOT(opcode); break;
+				case 0x08:  SWAPB(opcode); break;
+				case 0x09:  SWAPW(opcode); break;
+				case 0x0a:  NEGC(opcode); break;
+				case 0x0b:  NEG(opcode); break;
+				case 0x0c:  EXTUB(opcode); break;
+				case 0x0d:  EXTUW(opcode); break;
+				case 0x0e:  EXTSB(opcode); break;
+				case 0x0f:  EXTSW(opcode); break;
 			}
-		}
-	}
+			break;
 
+		case 0x7000:
+			ADDI(opcode);
+			break;
 
-	j = 0x8000;
-	//for (j = 0; j<0x10000;j+=0x1000)
-	{
-		for (y = 0; y<0x1000;y+=0x100)
-		{
-			for (x=0; x<0x100;x+=0x10)
+		case 0x8000:
+			switch((opcode >> 8) & 0x0f)
 			{
-				for (z=0;z<0x10;z++)
-				{
-					s_master_ophandler_table[j+y+x+z] = s_op1000_handler[((((j+y+x+z)&0xf00)>>8))];
-				}
+				case 0x00:  MOVBS4(opcode); break;
+				case 0x01:  MOVWS4(opcode); break;
+				case 0x02:  NOP(opcode); break;
+				case 0x03:  NOP(opcode); break;
+				case 0x04:  MOVBL4(opcode); break;
+				case 0x05:  MOVWL4(opcode); break;
+				case 0x06:  NOP(opcode); break;
+				case 0x07:  NOP(opcode); break;
+				case 0x08:  CMPIM(opcode); break;
+				case 0x09:  BT(opcode); break;
+				case 0x0a:  NOP(opcode); break;
+				case 0x0b:  BF(opcode); break;
+				case 0x0c:  NOP(opcode); break;
+				case 0x0d:  BTS(opcode); break;
+				case 0x0e:  NOP(opcode); break;
+				case 0x0f:  BFS(opcode); break;
 			}
-		}
-	}
+			break;
 
-	j = 0xc000;
-	//for (j = 0; j<0x10000;j+=0x1000)
-	{
-		for (y = 0; y<0x1000;y+=0x100)
-		{
-			for (x=0; x<0x100;x+=0x10)
+		case 0x9000:
+			MOVWI(opcode);
+			break;
+
+		case 0xa000:
+			BRA(opcode);
+			break;
+
+		case 0xb000:
+			BSR(opcode);
+			break;
+
+		case 0xc000:
+			switch((opcode >> 8) & 0x0f)
 			{
-				for (z=0;z<0x10;z++)
-				{
-					s_master_ophandler_table[j+y+x+z] = s_op1100_handler[((((j+y+x+z)&0xf00)>>8))];
-				}
+				case 0x00:  MOVBSG(opcode); break;
+				case 0x01:  MOVWSG(opcode); break;
+				case 0x02:  MOVLSG(opcode); break;
+				case 0x03:  TRAPA(opcode); break;
+				case 0x04:  MOVBLG(opcode); break;
+				case 0x05:  MOVWLG(opcode); break;
+				case 0x06:  MOVLLG(opcode); break;
+				case 0x07:  MOVA(opcode); break;
+				case 0x08:  TSTI(opcode); break;
+				case 0x09:  ANDI(opcode); break;
+				case 0x0a:  XORI(opcode); break;
+				case 0x0b:  ORI(opcode); break;
+				case 0x0c:  TSTM(opcode); break;
+				case 0x0d:  ANDM(opcode); break;
+				case 0x0e:  XORM(opcode); break;
+				case 0x0f:  ORM(opcode); break;
 			}
-		}
+			break;
+
+		case 0xd000:
+			MOVLI(opcode);
+			break;
+
+		case 0xe000:
+			MOVI(opcode);
+			break;
+
+		case 0xf000:
+			switch(opcode & 0x0f)
+			{
+				case 0x00:  FADD(opcode); break;
+				case 0x01:  FSUB(opcode); break;
+				case 0x02:  FMUL(opcode); break;
+				case 0x03:  FDIV(opcode); break;
+				case 0x04:  FCMP_EQ(opcode); break;
+				case 0x05:  FCMP_GT(opcode); break;
+				case 0x06:  FMOVS0FR(opcode); break;
+				case 0x07:  FMOVFRS0(opcode); break;
+				case 0x08:  FMOVMRFR(opcode); break;
+				case 0x09:  FMOVMRIFR(opcode); break;
+				case 0x0a:  FMOVFRMR(opcode); break;
+				case 0x0b:  FMOVFRMDR(opcode); break;
+				case 0x0c:  FMOVFR(opcode); break;
+				case 0x0d:  op1111_0x13(opcode); break;
+				case 0x0e:  FMAC(opcode); break;
+				case 0x0f:  dbreak(opcode); break;
+			}
+			break;
 	}
-
-
 }
 
 
@@ -3317,7 +3836,7 @@ void sh34_base_device::execute_run()
 			m_delay = 0;
 			m_ppc = m_pc;
 
-			(this->*s_master_ophandler_table[opcode])(opcode);
+			execute_one(opcode);
 
 			if (m_test_irq && !m_delay)
 			{
@@ -3326,14 +3845,14 @@ void sh34_base_device::execute_run()
 		}
 		else
 		{
-			const UINT16  opcode = m_direct->read_decrypted_word((UINT32)(m_pc & AM), WORD2_XOR_LE(0));
+			const UINT16 opcode = m_direct->read_decrypted_word((UINT32)(m_pc & AM), WORD2_XOR_LE(0));
 
 			debugger_instruction_hook(this, m_pc & AM);
 
 			m_pc += 2;
 			m_ppc = m_pc;
 
-			(this->*s_master_ophandler_table[opcode])(opcode);
+			execute_one(opcode);
 
 			if (m_test_irq && !m_delay)
 			{
@@ -3364,7 +3883,7 @@ void sh3be_device::execute_run()
 			m_delay = 0;
 			m_ppc = m_pc;
 
-			(this->*s_master_ophandler_table[opcode])(opcode);
+			execute_one(opcode);
 
 
 			if (m_test_irq && !m_delay)
@@ -3383,7 +3902,7 @@ void sh3be_device::execute_run()
 			m_pc += 2;
 			m_ppc = m_pc;
 
-			(this->*s_master_ophandler_table[opcode])(opcode);
+			execute_one(opcode);
 
 			if (m_test_irq && !m_delay)
 			{
@@ -3414,7 +3933,7 @@ void sh4be_device::execute_run()
 			m_delay = 0;
 			m_ppc = m_pc;
 
-			(this->*s_master_ophandler_table[opcode])(opcode);
+			execute_one(opcode);
 
 
 			if (m_test_irq && !m_delay)
@@ -3433,7 +3952,7 @@ void sh4be_device::execute_run()
 			m_pc += 2;
 			m_ppc = m_pc;
 
-			(this->*s_master_ophandler_table[opcode])(opcode);
+			execute_one(opcode);
 
 			if (m_test_irq && !m_delay)
 			{
