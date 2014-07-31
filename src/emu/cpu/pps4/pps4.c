@@ -5,6 +5,26 @@
  *   pps4.c
  *
  *   Rockwell PPS-4 CPU
+ *   Introduced in 1972, it ran at 256kHz. An improved version was released
+ *   in 1975, but could only manage 200kHz. The chipset continued to be
+ *   produced through the 1980s, but never found much acceptance. Chip
+ *   numbers are 10660 (original), 11660, 12660.
+ *
+ *   List of support / peripheral chips:
+ *   10706   Clock generator
+ *   10738   Bus interface
+ *   11049   Interval timer
+ *   10686   General purpose I/O
+ *   10696   General purpose I/O
+ *   10731   Telecommunications data interface
+ *   10736   dot matrix printer controller
+ *   10788   keyboard/display controller
+ *   10789   printer controller
+ *   10815   keyboard/printer controller
+ *   10930   Serial data controller
+ *   15380   dot matrix printer controller
+ *
+ *   Note: External clock should be divided by 18 (not implemented).
  *
  *****************************************************************************/
 #include "emu.h"
