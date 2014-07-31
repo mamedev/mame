@@ -17,7 +17,7 @@
  - Sega Demo Unit II (kiosk expansion device)
  - SMS Disk System (floppy disk drive expansion device) - unreleased
  - Sega Graphic Board (black version) - unreleased
- - Rapid button of japanese Master System
+ - Rapid button of Japanese Master System
  - Keyboard support for Sega Mark III (sg1000m3 driver)
  - Link between two Mark III's through keyboard, supported by F-16 Fighting Falcon
  - Mark III expansion slot, used by keyboard and FM module
@@ -985,7 +985,7 @@ ROM_END
      - built-in Alex Kidd in Miracle World - 1994 ?
      - built-in World Cup Italia '90 (Super Futebol II) - 1994
    - Tec Toy Master System Girl (no driver)
-     - built-in Monica no Castelo do Dragao - 199?
+     - built-in Monica no Castelo do Dragao - 1994
      - built-in Sonic the Hedgehog (T. Monica em O Resgate pack) - 199?
   Notes about BR:
    - PAL-M has same frequency and line count of NTSC

@@ -129,6 +129,7 @@ public:
 	UINT8 m_store_cart_selection_data;
 	sega8_cart_slot_device *m_slots[16];
 	sega8_card_slot_device *m_cards[16];
+	void store_post_load();
 	void store_select_cart(UINT8 data);
 
 	/* Cartridge slot info */

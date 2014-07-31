@@ -86,7 +86,7 @@ void sms_state::sms_get_inputs( address_space &space )
 	m_port_dd_reg &= ~0x08 | (data2 >> 4); // TR (Button 2)
 
 	// Sega Mark III does not have TH line connected.
-	// Also, the japanese Master System does not set port $dd with TH input.
+	// Also, the Japanese Master System does not set port $dd with TH input.
 	if (!m_is_mark_iii && !m_is_smsj)
 	{
 		m_port_dd_reg &= ~0x40 | data1; // TH ctrl1
@@ -278,7 +278,7 @@ READ8_MEMBER(sms_state::sms_input_port_dd_r)
 
 	if (m_is_smsj)
 	{
-		// For japanese Master System, set upper 4 bits with TH/TR
+		// For Japanese Master System, set upper 4 bits with TH/TR
 		// direction bits of IO control register, according to Enri's
 		// docs (http://www43.tok2.com/home/cmpslv/Sms/EnrSms.htm).
 		// This makes the console incapable of using the Light Phaser.
@@ -814,6 +814,8 @@ MACHINE_START_MEMBER(sms_state,sms)
 
 	if (m_is_sdisp)
 	{
+		machine().save().register_postload(save_prepost_delegate(FUNC(sms_state::store_post_load), this));
+
 		save_item(NAME(m_store_control));
 		save_item(NAME(m_store_cart_selection_data));
 
@@ -828,7 +830,6 @@ MACHINE_START_MEMBER(sms_state,sms)
 			sprintf(str,"slot%i",i + 16 + 1);
 			m_cards[i] = machine().device<sega8_card_slot_device>(str);
 		}
-		store_select_cart(m_store_cart_selection_data);
 	}
 }
 
@@ -881,6 +882,12 @@ WRITE8_MEMBER(smssdisp_state::sms_store_cart_select_w)
 	store_select_cart(data);
 	m_store_cart_selection_data = data;
 	setup_media_slots();
+}
+
+
+void sms_state::store_post_load()
+{
+	store_select_cart(m_store_cart_selection_data);
 }
 
 

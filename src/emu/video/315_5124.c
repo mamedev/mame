@@ -633,10 +633,7 @@ WRITE8_MEMBER( sega315_5124_device::vram_write )
 
 WRITE8_MEMBER( sega315_5124_device::register_write )
 {
-	int reg_num;
-	int hpos = m_screen->hpos();
-
-	check_pending_flags();
+	int reg_num, hpos;
 
 	if (m_pending_reg_write == 0)
 	{
@@ -670,11 +667,15 @@ WRITE8_MEMBER( sega315_5124_device::register_write )
 			if (reg_num == 0 || reg_num == 1)
 				set_display_settings();
 
+			hpos = m_screen->hpos();
+
 			if (reg_num == 1 && hpos <= DISPLAY_DISABLED_HPOS)
 				m_display_disabled = !(m_reg[0x01] & 0x40);
 
 			if (reg_num == 8 && hpos <= X_SCROLL_HPOS)
 				m_reg8copy = m_reg[0x08];
+
+			check_pending_flags();
 
 			if ( ( reg_num == 0 && (m_status & STATUS_HINT) ) ||
 					( reg_num == 1 && (m_status & STATUS_VINT) ) )
