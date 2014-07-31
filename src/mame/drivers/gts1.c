@@ -66,7 +66,6 @@ ToDo:
 
 #include "machine/genpin.h"
 #include "cpu/pps4/pps4.h"
-//#include "machine/nvram.h"
 //#include "gts1.lh"
 
 class gts1_state : public genpin_class
