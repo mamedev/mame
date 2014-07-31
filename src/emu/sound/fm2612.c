@@ -24,6 +24,10 @@
 **
 **  CHANGELOG:
 **
+** 07-30-2014 dink (FB Alpha project):
+**  - fixed missing dac channel on savestate load
+**
+** xx-xx-xxxx
 **  - fixed LFO implementation:
 **      .added support for CH3 special mode: fixes various sound effects (birds in Warlock, bug sound in Aladdin...)
 **      .inverted LFO AM waveform: fixes Spider-Man & Venom : Separation Anxiety (intro), California Games (surfing event)
@@ -2323,7 +2327,7 @@ void ym2612_postload(void *chip)
 
 		/* DAC data & port */
 		F2612->dacout = ((int)F2612->REGS[0x2a] - 0x80) << 6;   /* level unknown */
-		F2612->dacen  = F2612->REGS[0x2d] & 0x80;
+		F2612->dacen  = F2612->REGS[0x2b] & 0x80;
 		/* OPN registers */
 		/* DT / MULTI , TL , KS / AR , AMON / DR , SR , SL / RR , SSG-EG */
 		for(r=0x30;r<0x9e;r++)
