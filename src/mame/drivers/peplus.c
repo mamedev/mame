@@ -1735,6 +1735,7 @@ ROM_END
 ROM_START( pepp0046b ) /* Normal board : 10's or Better (PP0043) */
 /*
 PayTable  10s+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
+----------------------------------------------------------
   P8B      1     1    3    4    5   8  25  50 300   1000
   % Range: 85.2-87.2%  Optimum: 89.2%  Hit Frequency: 49.0%
      Programs Available: PP0046, X000046P
