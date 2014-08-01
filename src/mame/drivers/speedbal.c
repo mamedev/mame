@@ -5,10 +5,6 @@
  this was available in a number of cabinet types including 'Super Pin-Ball'
  which mimicked a Pinball table in design, complete with 7-seg scoreboard.
 
- TODO:
- - decrypt Music Ball
-
-
 driver by Joseba Epalza
 
 - 4MHz XTAL, 20MHz XTAL
@@ -314,8 +310,6 @@ ROM_START( speedbal )
 	ROM_LOAD( "sb6.bin",  0x08000, 0x08000, CRC(0e2506eb) SHA1(56f779266b977819063c475b84ca246fc6d8d6a7) )
 ROM_END
 
-//#define USE_DECRYPTION_HELPER
-
 ROM_START( musicbal )
 	ROM_REGION( 0x10000, "maincpu", 0 )     /* 64K for code: main - encrypted */
 	ROM_LOAD( "01.bin",  0x0000,  0x8000, CRC(412298a2) SHA1(3c3247b466880cd78dd7f7f73911f475352c15df) )
@@ -336,157 +330,35 @@ ROM_START( musicbal )
 	ROM_REGION( 0x10000, "sprites", ROMREGION_INVERT ) // still contain Speed Ball logos!
 	ROM_LOAD( "07.bin",  0x00000, 0x08000, CRC(310e1e23) SHA1(290f3e1c7b907165fe60a4ebe7a8b04b2451b3b1) )   /* sprites */
 	ROM_LOAD( "06.bin",  0x08000, 0x08000, CRC(2e7772f8) SHA1(caded1a72356501282e627e23718c30cb8f09370) )
-#ifdef USE_DECRYPTION_HELPER
-/* speed ball code for decryption comparison help */
-
-	ROM_REGION( 0x10000, "helper", 0 )
-	ROM_LOAD( "sb1.bin",  0x0000,  0x8000, CRC(1c242e34) SHA1(8b2e8983e0834c99761ce2b5ea765dba56e77964) )
-	ROM_LOAD( "sb3.bin",  0x8000,  0x8000, CRC(7682326a) SHA1(15a72bf088a9adfaa50c11202b4970e07c309a21) )
-#endif
-
 ROM_END
 
-
-
-
-
-
-
-#define MUSICBALL_XOR05  { rom[i] = rom[i] ^ 0x05; }
-#define MUSICBALL_XOR84  { rom[i] = rom[i] ^ 0x84; }
-#define MUSICBALL_SWAP1  { rom[i] = BITSWAP8(rom[i],2,6,5,4,3,7,0,1); }
-#define MUSICBALL_SWAP2  { rom[i] = BITSWAP8(rom[i],7,6,5,4,3,0,2,1); }
-// are bits 6,5,4,3 affected, or does this work on only the 4 bits?
 
 DRIVER_INIT_MEMBER(speedbal_state,musicbal)
 {
 	UINT8* rom = memregion("maincpu")->base();
-
-	// significant blocks of text etc. should be the same as speedbal
-
+    
+    const UINT8 xorTable[8] = {0x05, 0x06, 0x84, 0x84, 0x00, 0x87, 0x84, 0x84};     // XORs affecting bits #0, #1, #2 & #7
+    const int swapTable[4][4] = {                                                   // 4 possible swaps affecting bits #0, #1, #2 & #7
+        {1,0,7,2},
+        {2,7,0,1},
+        {7,2,1,0},
+        {0,2,1,7}
+    };
+    
 	for (int i=0;i<0x8000;i++)
 	{
-		// some bits are ^ 0x05
-		/*if ((i&0x30) == 0x00)
-		{
-		    if ((( i & 0x0f ) > 0x08)  &&  (( i & 0x0f ) < 0x0f)) MUSICBALL_XOR05
-		}
-		*/
+        int addIdx = BIT(i,3)^(BIT(i,5)<<1)^(BIT(i,9)<<2);  // 3 bits of address...
+        int xorMask = xorTable[addIdx];                     // ... control the xor...
+        int bswIdx = xorMask & 3;                           // ... and the bitswap
 
-		if (!(i&0x0800))
-		{
-			if (i&0x0020) { MUSICBALL_XOR84 }
-			else
-			{
-				if (i&0x08) { MUSICBALL_XOR84 }
-			}
-		}
-		else
-		{
-			MUSICBALL_XOR84
-		}
-
-/*
-6608:  00, 00, 00, 00, 00, 00, 00, 00, // wrong
-6618:  00, 05, 05, 00, 00, 00, 05, 05,
-
-6648:  00, 05, 05, 05, 05, 05, 05, 00,
-6658:  05, 05, 00, 05, 00, 00, 00, 00,
-
-6688:  05, 05, 05, 05, 05, 05, 05, 00,
-6698:  00, 00, 00, 00, 05, 00, 00, 05,
-
-66c8:  05, 00, 05, 00, 05, 00, 00, 05,
-66d8:  05, 05, 05, 05, 00, 05, 05, 05,
-
-6708:  00, 05, 00, 05, 05, 00, 05, 00,
-6718:  00, 05, 00, 05, 05, 00, 05, 00,
-
-6748:  05, 05, 05, 05, 05, 05, 05, 00,
-6758:  05, 00, 00, 05, 00, 05, 00, 05,
-
-6788:  05, 00, 00, 05, 05, 00, 05, 00,
-6798:  05, 00, 05, 00, 05, 05, 05, 05,
-
-67c8:  00, 00, 05, 00, 05, 05, 05, 05,
-67d8:  00, 00, 05, 00, 05, 05, 05, 05,
-*/
-
-
-
-
-		if (!(i&0x0800))
-		{
-			if (i&0x0020) { MUSICBALL_SWAP1 }
-			else
-			{
-				if (i&0x08) { MUSICBALL_SWAP2 }
-				else { MUSICBALL_SWAP1 }
-			}
-		}
-		else
-		{
-			MUSICBALL_SWAP1
-		}
-
-	}
-
-#ifdef USE_DECRYPTION_HELPER
-	UINT8* helper = memregion("helper")->base();
-
-	int speedball_position = 0x590c; // a block of text that should mostly match here (terminators seem to be changed 1F 60 <-> DD 52 tho)
-	int musicball_position = 0x6610; // it's mostly the pattern of where xor 0x05 gets applied we're interested in
-	int blocklength = 0x2e0; // there is a clear change in pattern  > 6800
-
-
-	if (helper)
-	{
-		int bytecount = 0;
-
-		for (int i=0;i<blocklength;i++)
-		{
-			UINT8 music = rom[musicball_position+i];
-			UINT8 speed = helper[speedball_position+i];
-
-			if (bytecount==0) printf("%04x:  ", musicball_position+i);
-
-			UINT8 display = music ^ speed;
-
-			// filter out the terminators
-			if (display == 0xc2) display = 0x00;
-			if (display == 0x32) display = 0x00;
-
-			if (display == 0xc7) display = 0x05;
-			if (display == 0x37) display = 0x05;
-
-			//printf("%02x-%02x, ", music, speed);
-			printf("%02x, ", display);
-
-			bytecount++;
-			if (bytecount==16) { bytecount = 0; printf("\n"); }
-
-		}
-
-	}
-
-	{
-		FILE *fp;
-		char filename[256];
-		sprintf(filename,"decrypted_%s", machine().system().name);
-		fp=fopen(filename, "w+b");
-		if (fp)
-		{
-			fwrite(rom, 0x8000, 1, fp);
-			fclose(fp);
-		}
-	}
-#endif
+        // only bits #0, #1, #2 & #7 are affected
+        rom[i] = BITSWAP8(rom[i], swapTable[bswIdx][3], 6,5,4,3, swapTable[bswIdx][2], swapTable[bswIdx][1], swapTable[bswIdx][0]) ^ xorTable[addIdx];
+    }
 
 	DRIVER_INIT_CALL(speedbal);
-
 }
 
 
 
 GAMEL( 1987, speedbal, 0,        speedbal, speedbal, speedbal_state, speedbal, ROT270, "Tecfri / Desystem S.A.", "Speed Ball", 0, layout_speedbal )
-GAMEL( 1988, musicbal, 0,        speedbal, speedbal, speedbal_state, musicbal, ROT270, "Tecfri / Desystem S.A.", "Music Ball", GAME_NOT_WORKING, layout_speedbal )
+GAMEL( 1988, musicbal, 0,        speedbal, speedbal, speedbal_state, musicbal, ROT270, "Tecfri / Desystem S.A.", "Music Ball", 0, layout_speedbal )
