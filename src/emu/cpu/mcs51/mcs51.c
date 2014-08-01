@@ -2137,6 +2137,12 @@ void mcs51_cpu_device::device_start()
 	save_item(NAME(m_ds5002fp.previous_ta) );
 	save_item(NAME(m_ds5002fp.ta_window) );
 	save_item(NAME(m_ds5002fp.range) );
+	save_item(NAME(m_uart.data_out));
+	save_item(NAME(m_uart.bits_to_send));
+	save_item(NAME(m_uart.smod_div));
+	save_item(NAME(m_uart.rx_clk));
+	save_item(NAME(m_uart.tx_clk));
+	save_item(NAME(m_uart.delay_cycles));
 
 	state_add( MCS51_PC,  "PC", m_pc).formatstr("%04X");
 	state_add( MCS51_SP,  "SP", SP).formatstr("%02X");
@@ -2309,10 +2315,12 @@ void mcs51_cpu_device::device_reset()
 		m_ds5002fp.range = (GET_RG1 << 1) | GET_RG0;
 	}
 
+	m_uart.data_out = 0;
 	m_uart.rx_clk = 0;
 	m_uart.tx_clk = 0;
 	m_uart.bits_to_send = 0;
 	m_uart.delay_cycles = 0;
+	m_uart.smod_div = 0;
 
 	m_recalc_parity = 0;
 }
