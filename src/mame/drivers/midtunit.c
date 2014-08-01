@@ -614,7 +614,8 @@ static MACHINE_CONFIG_START( tunit_core, midtunit_state )
 	MCFG_PALETTE_ADD("palette", 32768)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK * 2, 505, 0, 399, 289, 0, 253)
+	// from TMS340 registers
+	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK * 2, 506, 100, 500, 289, 20, 274)
 	MCFG_SCREEN_UPDATE_DEVICE("maincpu", tms34010_device, tms340x0_ind16)
 	MCFG_SCREEN_PALETTE("palette")
 

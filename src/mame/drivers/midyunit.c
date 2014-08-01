@@ -1115,7 +1115,8 @@ static MACHINE_CONFIG_START( zunit, midyunit_state )
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
-	MCFG_SCREEN_RAW_PARAMS(MEDRES_PIXEL_CLOCK*2, 673, 0, 511, 433, 0, 399)
+	// from TMS340 registers
+	MCFG_SCREEN_RAW_PARAMS(MEDRES_PIXEL_CLOCK*2, 674, 122, 634, 433, 27, 427)
 	MCFG_SCREEN_UPDATE_DEVICE("maincpu", tms34010_device, tms340x0_ind16)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -1151,7 +1152,9 @@ static MACHINE_CONFIG_START( yunit_core, midyunit_state )
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
-	MCFG_SCREEN_RAW_PARAMS(STDRES_PIXEL_CLOCK*2, 505, 0, 399, 289, 0, 253)
+	// from TMS340 registers - visible area varies slightly between games
+	// we use the largest visarea (smashtv's) here so that aviwrite will work nicely
+	MCFG_SCREEN_RAW_PARAMS(STDRES_PIXEL_CLOCK*2, 506, 90, 500, 289, 20, 276)
 	MCFG_SCREEN_UPDATE_DEVICE("maincpu", tms34010_device, tms340x0_ind16)
 	MCFG_SCREEN_PALETTE("palette")
 
