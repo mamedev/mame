@@ -68,7 +68,7 @@ private:
 	bool m_pia0_cb2;
 	bool m_pia0_timer;
 	UINT8 m_port1, m_port2;
-	UINT8 m_digit;
+	//UINT8 m_digit;
 	UINT8 m_segment;
 	virtual void machine_reset();
 	required_device<m6803_cpu_device> m_maincpu;
