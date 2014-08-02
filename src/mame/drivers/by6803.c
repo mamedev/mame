@@ -3,7 +3,7 @@
     PINBALL
     Bally MPU A084-91786-AH06 (6803)
 
-There are no dispswitches; everything is done with a numeric keypad located just inside the
+There are no dipswitches; everything is done with a numeric keypad located just inside the
 door. The system responds with messages on the display.
 
 ToDo:

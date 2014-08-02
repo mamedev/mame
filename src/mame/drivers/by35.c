@@ -62,6 +62,7 @@ private:
 	UINT8 m_u10_b;
 	UINT8 m_u11_a;
 	UINT8 m_u11_b;
+	bool m_u10_ca2;
 	bool m_u10_cb2;
 	bool m_u10_timer;
 	bool m_u11_timer;
@@ -262,6 +263,7 @@ INPUT_CHANGED_MEMBER( by35_state::self_test )
 
 WRITE_LINE_MEMBER( by35_state::u10_ca2_w )
 {
+	m_u10_ca2 = state;
 }
 		
 WRITE_LINE_MEMBER( by35_state::u10_cb2_w )
@@ -288,9 +290,11 @@ WRITE8_MEMBER( by35_state::u10_a_w )
 	m_segment = data >> 4;
 	m_u10_a = data;
 	m_u10 = (data & 15) | (BIT(m_u11_a, 0) << 4);
-	switch (m_u10)
+	if (!m_u10_ca2)
 	{
-		case 0x10: // wrong
+		switch (m_u10)
+		{
+		case 0x10:
 			output_set_digit_value(m_digit, patterns[m_segment]);
 			break;
 		case 0x1d:
@@ -299,14 +303,15 @@ WRITE8_MEMBER( by35_state::u10_a_w )
 		case 0x1b:
 			output_set_digit_value(16+m_digit, patterns[m_segment]);
 			break;
-		case 0x07:
+		case 0x17:
 			output_set_digit_value(24+m_digit, patterns[m_segment]);
 			break;
-		case 0x0f:
+		case 0x1f:
 			output_set_digit_value(32+m_digit, patterns[m_segment]);
 			break;
-		default:
+		default://printf("%X ",m_u10);
 			break;
+		}
 	}
 }
 
