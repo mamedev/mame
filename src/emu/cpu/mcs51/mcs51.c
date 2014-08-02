@@ -307,6 +307,7 @@ i8751_device::i8751_device(const machine_config &mconfig, const char *tag, devic
 i8052_device::i8052_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, int program_width, int data_width, UINT8 features)
 	: mcs51_cpu_device(mconfig, type, name, tag, owner, clock, shortname, program_width, data_width, features | FEATURE_I8052)
 {
+	m_num_interrupts = 6;
 }
 
 i8052_device::i8052_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
