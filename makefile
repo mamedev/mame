@@ -684,7 +684,7 @@ OBJDIRS = $(OBJ) $(OBJ)/$(TARGET)/$(SUBTARGET)
 
 
 #-------------------------------------------------
-# define standard libarires for CPU and sounds
+# define standard libraries for CPU and sounds
 #-------------------------------------------------
 
 LIBEMU = $(OBJ)/libemu.a
