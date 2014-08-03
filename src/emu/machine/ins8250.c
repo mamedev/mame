@@ -526,6 +526,20 @@ void ins8250_uart_device::device_start()
 	set_tra_rate(0);
 	set_rcv_rate(0);
 	memset(&m_regs, 0x00, sizeof(m_regs));
+
+	device_serial_interface::register_save_state(machine().save(), name(), tag());
+	save_item(NAME(m_regs.thr));
+	save_item(NAME(m_regs.rbr));
+	save_item(NAME(m_regs.ier));
+	save_item(NAME(m_regs.dl));
+	save_item(NAME(m_regs.iir));
+	save_item(NAME(m_regs.fcr));
+	save_item(NAME(m_regs.lcr));
+	save_item(NAME(m_regs.mcr));
+	save_item(NAME(m_regs.lsr));
+	save_item(NAME(m_regs.msr));
+	save_item(NAME(m_regs.scr));
+	save_item(NAME(m_int_pending));
 }
 
 void ins8250_uart_device::device_reset()
@@ -555,6 +569,14 @@ void ns16550_device::device_start()
 {
 	m_timeout = timer_alloc();
 	ins8250_uart_device::device_start();
+	save_item(NAME(m_rintlvl));
+	save_item(NAME(m_rfifo));
+	save_item(NAME(m_tfifo));
+	save_item(NAME(m_rhead));
+	save_item(NAME(m_rtail));
+	save_item(NAME(m_rnum));
+	save_item(NAME(m_thead));
+	save_item(NAME(m_ttail));
 }
 
 void ns16550_device::device_reset()
