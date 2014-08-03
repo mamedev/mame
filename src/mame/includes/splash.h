@@ -17,7 +17,12 @@ public:
 		m_msm1(*this, "msm1"),
 		m_msm2(*this, "msm2"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")  { }
+		m_palette(*this, "palette"),
+		
+		funystrp_val(0),
+		funystrp_ff3cc7_val(0),
+		funystrp_ff3cc8_val(0)
+		{ }
 
 	required_shared_ptr<UINT16> m_pixelram;
 	required_shared_ptr<UINT16> m_videoram;
@@ -54,7 +59,6 @@ public:
 	DECLARE_READ8_MEMBER(roldfrog_unk_r);
 	DECLARE_READ16_MEMBER(spr_read);
 	DECLARE_WRITE16_MEMBER(spr_write);
-	DECLARE_WRITE16_MEMBER(funystrp_sh_irqtrigger_w);
 	DECLARE_READ8_MEMBER(int_source_r);
 	DECLARE_WRITE8_MEMBER(msm1_data_w);
 	DECLARE_WRITE8_MEMBER(msm1_interrupt_w);
@@ -63,20 +67,16 @@ public:
 	DECLARE_WRITE16_MEMBER(splash_vram_w);
 	DECLARE_DRIVER_INIT(splash10);
 	DECLARE_DRIVER_INIT(roldfrog);
-	DECLARE_DRIVER_INIT(funystrp);
 	DECLARE_DRIVER_INIT(splash);
 	DECLARE_DRIVER_INIT(rebus);
 	TILE_GET_INFO_MEMBER(get_tile_info_splash_tilemap0);
 	TILE_GET_INFO_MEMBER(get_tile_info_splash_tilemap1);
 	virtual void video_start();
 	DECLARE_MACHINE_RESET(splash);
-	DECLARE_MACHINE_RESET(funystrp);
 	UINT32 screen_update_splash(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_funystrp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(roldfrog_interrupt);
 	void draw_bitmap(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void splash_draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
-	void funystrp_draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
 	void roldfrog_update_irq(  );
 	DECLARE_WRITE_LINE_MEMBER(splash_msm5205_int);
 	DECLARE_WRITE_LINE_MEMBER(ym_irq);
@@ -89,4 +89,17 @@ public:
 	optional_device<msm5205_device> m_msm2;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+
+	// Funny Strip
+	DECLARE_MACHINE_RESET(funystrp);
+	DECLARE_WRITE16_MEMBER(funystrp_protection_w);
+	DECLARE_READ16_MEMBER(funystrp_protection_r);
+	DECLARE_WRITE16_MEMBER(funystrp_sh_irqtrigger_w);
+	DECLARE_DRIVER_INIT(funystrp);
+	UINT32 screen_update_funystrp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void funystrp_draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
+	UINT8 funystrp_val;
+	UINT8 funystrp_ff3cc7_val;
+	UINT8 funystrp_ff3cc8_val;
+
 };

@@ -438,7 +438,7 @@ static INPUT_PORTS_START( funystrp )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
 
 	PORT_START("SYSTEM")
-	PORT_DIPNAME( 0xffff, 0xffff, "Clear EEPROM" )
+	PORT_DIPNAME( 0xffff, 0x0000, "Clear EEPROM" )
 	PORT_DIPSETTING(    0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0xffff, DEF_STR( On ) )
 
@@ -1016,50 +1016,329 @@ DRIVER_INIT_MEMBER(splash_state,rebus)
 
 
 
+
+READ16_MEMBER(splash_state::funystrp_protection_r)
+{
+	int pc = space.device().safe_pc();
+
+	int ofst = offset+(0x100000/2);
+
+//	logerror ("PROTR: %5.5x, pc: %5.5x\n", ofst*2, pc);
+
+	// don't interfere with ram check.
+	if (pc == 0x04770) return 0x00;
+	if (pc == 0x04788) return 0x55;
+
+	switch (ofst)
+	{
+		//-----------------------------------------------------------------
+		// sub $7ACC, $C7EE, subtractions, original value from 68k
+
+		case ((0x107001 / 2) + 0x0030): // $7ACE
+			funystrp_val = funystrp_ff3cc7_val & 0x7f;
+			return 0;
+
+		case ((0x107001 / 2) + 0x013e): // $7AFC
+			return (funystrp_val + 0x13) & 0xff;
+
+		case ((0x107001 / 2) + 0x0279): // $7B38
+			return (funystrp_val + 0x22) & 0xff;
+
+		case ((0x107001 / 2) + 0x0357): // $7B6E
+			return (funystrp_val + 0x44) & 0xff;
+
+		case ((0x107001 / 2) + 0x03b1): // $7BA4
+			return (funystrp_val + 0x6a) & 0xff;
+
+		//-----------------------------------------------------------------
+		// sub $7E76, subtractions, original value from protection device
+
+		case ((0x110001 / 2) + 0x0013): // $7E80
+			funystrp_val = 0;
+			return 0;
+
+		case ((0x110001 / 2) + 0x0125): // $7E96
+			return (funystrp_val + 0x03) & 0xff;
+
+		case ((0x110001 / 2) + 0x0261): // $7ECE
+			return (funystrp_val + 0x08) & 0xff;
+
+		case ((0x110001 / 2) + 0x0322): // $7F00
+			return (funystrp_val + 0x12) & 0xff;
+
+		case ((0x110001 / 2) + 0x039b): // $7F36
+			return (funystrp_val + 0x70) & 0xff;
+
+		//-----------------------------------------------------------------
+		// sub $7F70, $8038, $116E2, no subtractions, straight compare!, original value from 68k
+		// increase ff3cc8 value in sub $116e2 
+	
+		case ((0x100001 / 2) + 0x0010): // $7F72
+			funystrp_val = funystrp_ff3cc8_val;
+			return 0;
+
+		case ((0x100001 / 2) + 0x0123): // $7F9A
+			return (funystrp_val + 0x00) & 0xff;
+
+		case ((0x100001 / 2) + 0x0257): // $7FC4
+			return (funystrp_val + 0x00) & 0xff;
+
+		case ((0x100001 / 2) + 0x0312): // $7FEA
+			return (funystrp_val + 0x00) & 0xff;
+
+		case ((0x100001 / 2) + 0x0395): // $8010
+			// increment $ff3cc8 in $117A8
+			return (funystrp_val + 0x00) & 0xff;
+
+		//-----------------------------------------------------------------
+		// sub $8522, subtractions, original value from protection device, weird cases
+
+		case ((0x104801 / 2) + 0x013A): // $8524
+			funystrp_val = 0;
+			return 0;
+
+		// this and above usually swapped... fooling the lazy bootlegger?
+		case ((0x104801 / 2) + 0x0017): // $8542
+			return (funystrp_val + 0x12) & 0xff;
+
+		// first case... weird?
+	//	case ((0x104801 / 2) + 0x013A): // $857E
+	//		return (funystrp_val + 0x00) & 0xff;
+
+		case ((0x104801 / 2) + 0x0277): // $85A4
+			return (funystrp_val + 0x04) & 0xff;
+
+		case ((0x104801 / 2) + 0x034b): // $85D6
+			return (funystrp_val + 0x37) & 0xff;
+
+		case ((0x104801 / 2) + 0x03ac): // $860E
+			return (funystrp_val + 0x77) & 0xff;
+
+		//-----------------------------------------------------------------
+		// sub $88F8, subtractions, original value from protection device
+		// verified as working!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+		case ((0x127001 / 2) + 0x0045): // $88FA
+			funystrp_val = 0;
+			return 0;
+
+		case ((0x127001 / 2) + 0x0145): // $8918
+			return (funystrp_val + 0x01) & 0xff;
+
+		case ((0x127001 / 2) + 0x028B): // $894A
+			return (funystrp_val + 0x02) & 0xff;
+
+		case ((0x127001 / 2) + 0x0363): // $8982
+			return (funystrp_val + 0x03) & 0xff;
+
+		case ((0x127001 / 2) + 0x03BA): // $89B4
+			return (funystrp_val + 0x00) & 0xff;
+
+		//-----------------------------------------------------------------
+		// sub $9DD2, subtractions, original value from protection device
+	
+		case ((0x170001 / 2) + 0x006B): // $9DD4
+			funystrp_val = 0;
+			return 0;
+
+		case ((0x170001 / 2) + 0x0162): // $9DF2
+			return (funystrp_val + 0x00) & 0xff;
+
+		case ((0x170001 / 2) + 0x02A7): // $9E1E
+			return (funystrp_val + 0x7c) & 0xff;
+
+		case ((0x170001 / 2) + 0x0381): // $9E54
+			return (funystrp_val + 0x30) & 0xff;
+
+		case ((0x170001 / 2) + 0x03C7): // $9E8A
+			return (funystrp_val + 0x28) & 0xff;
+
+		//-----------------------------------------------------------------
+		// sub $A944, subtractions, original value from protection device
+		// verified as working!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+		case ((0x177001 / 2) + 0x0079): // $A946
+			funystrp_val = 0;
+			return 0;
+
+		case ((0x177001 / 2) + 0x01A0): // $A964
+			return (funystrp_val + 0x02) & 0xff;
+
+		case ((0x177001 / 2) + 0x02B2): // $A99C
+			return (funystrp_val + 0x04) & 0xff;
+
+		case ((0x177001 / 2) + 0x039A): // $A9CE
+			return (funystrp_val + 0x25) & 0xff;
+
+		case ((0x177001 / 2) + 0x03D3): // $AA04
+			return (funystrp_val + 0x16) & 0xff;
+
+		//-----------------------------------------------------------------
+		// sub $C5E4, subtractions, original value from 68k
+
+	//	these cases are already in sub $7ACC, last one is new!!
+	//	case ((0x107001 / 2) + 0x0030): // $7ACE
+	//		funystrp_val = funystrp_ff3cc7_val & 0x7f;
+	//		return 0;
+
+	//	case ((0x107001 / 2) + 0x013e): // $7AFC
+	//		return (funystrp_val + 0x13) & 0xff;
+
+	//	case ((0x107001 / 2) + 0x0279): // $7B38
+	//		return (funystrp_val + 0x22) & 0xff;
+
+	//	case ((0x107001 / 2) + 0x0357): // $7B6E
+	//		return (funystrp_val + 0x44) & 0xff;
+
+		case ((0x107001 / 2) + 0x0381): // $7BA4
+			return (funystrp_val + 0x6a) & 0xff;
+
+		//-----------------------------------------------------------------
+		// sub $DBCE, subtractions, original value from protection device
+
+		case ((0x140001 / 2) + 0x0052): // $DBD0
+			funystrp_val = 0;
+			return 0;
+
+		case ((0x140001 / 2) + 0x015C): // $DBEE
+			return (funystrp_val + 0x15) & 0xff;
+
+		case ((0x140001 / 2) + 0x0293): // $DC2A
+			return (funystrp_val + 0x03) & 0xff;
+
+		case ((0x140001 / 2) + 0x0374): // $DC5C
+			return (funystrp_val + 0x55) & 0xff;
+
+		case ((0x140001 / 2) + 0x03C0): // $DC92
+			return (funystrp_val + 0x44) & 0xff;
+
+		//-----------------------------------------------------------------
+		// sub $F72C, subtractions, original value from protection device,
+		// routine verified working!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	
+		case ((0x100001 / 2) + 0x0017): // $F72E
+			funystrp_val = 0;
+			return 0;
+
+		case ((0x100001 / 2) + 0x0127): // $F74C
+			return (funystrp_val + 0x17) & 0xff;
+
+		case ((0x110001 / 2) + 0x0263): // $F788
+			return (funystrp_val + 0x0f) & 0xff;
+
+		case ((0x110001 / 2) + 0x0324): // $F7BE
+			return (funystrp_val + 0x12) & 0xff;
+
+		case ((0x110001 / 2) + 0x0399): // $F7F4
+			return (funystrp_val + 0x70) & 0xff;
+
+		//-----------------------------------------------------------------
+		// sub $F82E, subtractions, original value from protection device, 
+	
+		case ((0x100001 / 2) + 0x0013): // $F830
+			funystrp_val = 0;
+			return 0;
+
+		case ((0x100001 / 2) + 0x0125): // $F84E
+			return (funystrp_val + 0x17) & 0xff;
+
+	//	used in sub $7E76
+	//	case ((0x110001 / 2) + 0x0261): // $F88A
+	//		return (funystrp_val + 0x0f) & 0xff;
+
+	//	case ((0x110001 / 2) + 0x0322): // $F8C0
+	//		return (funystrp_val + 0x12) & 0xff;
+
+	//	case ((0x110001 / 2) + 0x039B): // $F8F6
+	//		return (funystrp_val + 0x70) & 0xff;
+
+		//-----------------------------------------------------------------
+		// sub $10FE2, subtractions, original value from protection device
+		// routine is different from rest, unoptimized or just poorly coded?
+		// examine later to verify this is right
+	
+		case ((0x105001 / 2) + 0x0021): // $10FF6
+			funystrp_val = 0;
+			return 0;
+
+		case ((0x105001 / 2) + 0x0131): // $1100C
+			return (funystrp_val + 0x51) & 0xff;
+
+		case ((0x105001 / 2) + 0x026a): // $11038
+			return (funystrp_val + 0x22) & 0xff;
+
+		case ((0x105001 / 2) + 0x0331): // $11060
+			return (funystrp_val + 0x00) & 0xff;
+
+		case ((0x105001 / 2) + 0x03ab): // $11078
+			return (funystrp_val + 0x03) & 0xff;
+
+		//-----------------------------------------------------------------
+		// sub $11F2C, subtractions, original value from protection device, 
+		// routine is different from rest, unoptimized or just poorly coded?
+		// examine later to verify this is right
+	
+		case ((0x183001 / 2) + 0x0088): // $11F3C
+			funystrp_val = 0;
+			return 0;
+
+		case ((0x183001 / 2) + 0x01A7): // $11F5A
+			return (funystrp_val + 0x09) & 0xff;
+
+		case ((0x183001 / 2) + 0x02C4): // $11F86
+			return (funystrp_val + 0x01) & 0xff;
+
+		case ((0x183001 / 2) + 0x03B3): // $11FAA
+			return (funystrp_val + 0x63) & 0xff;
+
+		case ((0x183001 / 2) + 0x03E9): // $11FD2
+			return (funystrp_val + 0x65) & 0xff;
+	}
+
+	return 0;
+}
+
+WRITE16_MEMBER(splash_state::funystrp_protection_w)
+{
+	int ofst = (0x100000/2)+offset;
+
+//	logerror ("PROTW: %5.5x, %4.4x, PC: %5.5x m: %4.4x\n", ofst*2, data, space.device().safe_pc(), mem_mask);
+
+//	if (ACCESSING_BITS_0_7) // ??
+	{
+		switch (ofst)
+		{
+			case (0x100000/2):
+				// on boot?
+			return;
+
+			case (0x1007e1/2):
+			case (0x1007e3/2):
+			// counters written here... ??
+			return;
+
+			case (0x1007e5/2):
+				funystrp_ff3cc8_val = data;
+			return;
+	
+			case (0x1007e7/2):
+				funystrp_ff3cc7_val = data;
+			return;
+		}
+	}
+}
+
 DRIVER_INIT_MEMBER(splash_state,funystrp)
 {
-	UINT16 *ROM = (UINT16 *)memregion("maincpu")->base();
-
 	m_bitmap_type = 0;
 	m_sprite_attr2_shift = 0;
 
-	// initial protection checks, just after boot
-
-	ROM[0x04770/2] = 0x4e71;
-	ROM[0x04772/2] = 0x4e71;
-
-	// temporary solution - work in progress - will be turned into proper r/w handlers
-	// protection write -> read -> compare tests
-	// not all of them should always pass ( especially the ones that compares data read with ram variable )
-	// side effect of the above is broken (sometimes) sound
-	// there's stil problem with  (broken) gameplay = sometimes one (or more) dot is moved
-	// out of playfield (and placed on right part of screen ) and there's no way to complete the level
-	// game reads sprite coords directly from sprite ram and checks distance between player and each(!) dot or
-	// game object every frame
-	// most of the patched protection checks are very similar. when test fails, dot counter is altered.
-	// sometimes it's increased = level is impossible to complete, sometimes - cleared (and level ends
-	// immediately).
-
-	ROM[0x07b30/2] = 0x7001;
-	ROM[0x07ec6/2] = 0x7001;
-	ROM[0x07fbe/2] = 0x7001;
-	ROM[0x08060/2] = 0x7001;
-	ROM[0x08576/2] = 0x7001;
-	ROM[0x08948/2] = 0x7001;
-	ROM[0x09e16/2] = 0x7001;
-	ROM[0x0a994/2] = 0x7001;
-	ROM[0x0c648/2] = 0x7001;
-	ROM[0x0c852/2] = 0x7001;
-	ROM[0x0dc22/2] = 0x7001;
-	ROM[0x0f780/2] = 0x7001;
-	ROM[0x0f882/2] = 0x7001;
-	ROM[0x11032/2] = 0x7001;
-	ROM[0x11730/2] = 0x7001;
-	ROM[0x11f80/2] = 0x7001;
-
-	ROM = (UINT16 *)memregion("audiocpu")->base();
+	UINT16 *ROM = (UINT16 *)memregion("audiocpu")->base();
 
 	membank("sound_bank")->configure_entries(0, 16, &ROM[0x00000], 0x8000);
+
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x100000, 0x1fffff, write16_delegate(FUNC(splash_state::funystrp_protection_w), this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x100000, 0x1fffff, read16_delegate(FUNC(splash_state::funystrp_protection_r),this));
 }
 
 GAME( 1992, splash,   0,        splash,   splash, splash_state,   splash,   ROT0, "Gaelco / OMK Software", "Splash! (Ver. 1.2 World)", 0 )
