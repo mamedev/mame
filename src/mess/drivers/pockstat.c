@@ -905,6 +905,8 @@ void pockstat_state::machine_start()
 
 	save_item(NAME(m_ps_flash_write_enable_count));
 	save_item(NAME(m_ps_flash_write_count));
+
+	save_item(NAME(m_lcd_control));
 }
 
 void pockstat_state::machine_reset()
