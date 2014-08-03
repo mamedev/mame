@@ -17,7 +17,6 @@ Published by Sega/Sega Toys (HPC-6*** serial codes)
 * それいけ! アンパンマン えいごとなかよし ようちえんでABC - Soreike! Anpanman - Eigo to Nakayoshi Youchiende ABC (Sega - 1994 - HPC-6012)
 * 魔法騎士 レイアース マジックナイトたんじょう - Magic Knight Rayearth: Magic Knight Tanjou (Sega - 1995xxxx - HPC-6022)
 * NHKおかあさんといっしょ げんきなこあつまれ! - NHK Okaasan to Issho Genki na Koatsumare! (Sega - 19951125 - HPC-6025)
-* ぺたぺたちょっきん あそべるずかん <どうぶつ> - Petapeta Chokkinna Soberuzukan ~Doubutsu~ (Sega - 199511xx - HPC-6028)
 * バーバパパのうちゅうりょこう - Barbapapa no Uchuu Ryokou (Sega - 1996xxxx - HPC-6036)
 * 超光戦士 シャンゼリオン  - Chou Hikari Senshi Shanzerion (Sega - 1996xxxx - HPC-6038)
 * パケット2 ゆかいな仲間とゲームで数遊び  - Paketto 2 Yukai na Nakama to Game de Kazu Asobi (Sega - ???? - HPC-6048)
@@ -33,7 +32,6 @@ Published by Sega/Sega Toys (HPC-6*** serial codes)
 * クッキングピコ セット - Cooking Pico Set (Sega Toys - 1999xxxx - HPC-6076)
 * スージーちゃんとマービー おてつだい だ～いすき! - Susie-chan to Mabi - Otetsudai Daisuki! (Sega Toys - 200010xx - HPC-6089)
 * それいけ!アンパンマン アンパンマンとすうじあそび - Soreike! Anpanman - Anpanman to Suuji Asobi (Sega Toys - ???? - HPC-6091)
-* コンビニでおかいもの! - Conveni de Okaimono! (Sega Toys - ???? - HPC-6094)
 * パソコン接続キット ピコタウンにでかけよう! - Pasokon Setsuzoku Kit PicoTown ni Dekakeyou! (Sega Toys - 20010601 - HPC-6097)
 * アンパンマンのはじめてマウスピコ アンパンマンとパソコンれんしゅう! <同梱> - Anpanman no Hajimete Mouse Pico with Anpanman to Pasokon renshuu! (Sega Toys - 20020124 - HPC-6102)
 * ECCジュニアの はじめてえいご Vol.3 - Happy Birthday, Patty! パティちゃんのお誕生日 - ECC Junior no Hajimete Eigo Vol. 3 - Happy Birthday, Patty! - Patty-chan no Otanjoubi (Sega Toys - 20020307 - HPC-6105)
@@ -71,11 +69,9 @@ Published by Others (T-yyy*** serial codes, for yyy depending on the publisher)
 * 忍者戦隊カクレンジャー - Ninja Sentai Kakuranger (Bandai - ???? - T-133???)
 * 楽しく遊んで能力アップ!!たのしい幼稚園 - Tanoshi ku Asonde Nouryoku Appu!! Tanoshii Youchien (Bandai - 1994xxxx - T-133050)
 * クレヨンしんちゃんの おえかきノート - Crayon Shin-chan Oekaki Note (Bandai - ???? - T-133080)
-* 美少女戦士セーラームーンスーパーズ - Bishoujo Senshi Sailor Moon SuperS (Bandai - 19951019 - T-133130)
 * 忍たま乱太郎 - Nintama Rantarou (Bandai - ???? - T-133150)
 * 電磁戦隊メガレンジャー - Denji Sentai Megaranger (Bandai - 1997xxxx - T-133220)
 * それいけ!アンパンマンのみんなできょうそうアンパンマン! - Soreike! Anpanman no Minna de Kyousou Anpanman! (Bandai - 1996xxxx - T-133250)
-* 夢のクレヨン王国 - Yume no Crayon Oukoku (Bandai - 1998xxxx - T-133270)
 * 新ウルトラヒーロー - Shin Ultrahero (Bandai - 1998xxxx - T-133280)
 * うんてんトーマス デラックスセット - Unten Thomas Track Set (Bandai - 200004xx - T-133???)
 * ウルトラマンピコ ウルトラファイティングベース - Ultraman Pico Ultraman Fighting Best (Bandai - 200009xx - T-133???)
@@ -568,6 +564,22 @@ Published by Others (T-yyy*** serial codes, for yyy depending on the publisher)
 		</part>
 	</software>
 
+	<software name="sailorss">
+		<description>Bishoujo Senshi Sailor Moon SuperS (Jpn)</description>
+		<year>1995</year>
+		<publisher>Bandai</publisher>
+		<info name="serial" value="T-133130"/>
+		<info name="release" value="19951019"/>
+		<info name="alt_title" value="美少女戦士セーラームーンスーパーズ"/>
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-6882A" />
+			<feature name="ic1" value="MPR-18311-T" />
+			<dataarea name="rom" size="524288">
+				<rom name="mpr-18311-t.ic1" size="524288" crc="a616e7b3" sha1="773ca5ef704a17227f25318d6e5113c0a72bf5e8" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="chibim">
 		<description>Chibi Maruko-chan - Issho ni Asobou yo (Jpn)</description>
 		<year>1995</year>
@@ -580,6 +592,21 @@ Published by Others (T-yyy*** serial codes, for yyy depending on the publisher)
 			<feature name="ic1" value="MPR-18117-H" />
 			<dataarea name="rom" size="524288">
 				<rom name="mpr-18117-h.ic1" size="524288" crc="c81acb46" sha1="d4a51f8894157dc8ef845931366d2ab482d43839" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="conveni">
+		<description>Conveni de Okaimono! (Jpn)</description>
+		<year>2001</year>
+		<publisher>Sega Toys</publisher>
+		<info name="serial" value="HPC-6094"/>
+		<info name="alt_title" value="コンビニでおかいもの!"/>
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-7090A" />
+			<feature name="ic1" value="9K0-0032-RV" />
+			<dataarea name="rom" size="2097152">
+				<rom name="9k0-0032-rv.ic1" size="2097152" crc="c95a4ef3" sha1="24d03589c4192e139f0eb33ce6e4b4a87c949a9b" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -1321,8 +1348,8 @@ Published by Others (T-yyy*** serial codes, for yyy depending on the publisher)
 		<part name="cart" interface="pico_cart">
 			<feature name="pcb" value="171-7090A" />
 			<feature name="ic1" value="MPR-18585-16MX" />
-			<dataarea name="rom" size="2097152">
-				<rom name="mpr-18585-16mx.ic1" size="2097152" crc="dd4f5471" sha1="0eb13ae5f4b4649b107f4e105c3ae63475b75ee8" offset="0" loadflag="load16_word_swap" />
+			<dataarea name="rom" size="1048576">
+				<rom name="mpr-18585-16mx.ic1" size="1048576" crc="1c828987" sha1="c12f22a7d2a99c01cd0fb70154eee07b41420d30" offset="0" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -1440,8 +1467,10 @@ Published by Others (T-yyy*** serial codes, for yyy depending on the publisher)
 		<info name="release" value="19950725"/>
 		<info name="alt_title" value="ゴジラ どきどき怪獣島"/>
 		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-6883A" />
+			<feature name="ic1" value="MPR-18194 J16" />
 			<dataarea name="rom" size="1048576">
-				<rom name="gojira dokidoki kaijuu shima (japan).bin" size="1048576" crc="fd8a2715" sha1="47c8357c16d76dd067063c4fe61e579c8bc0e13c" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-18194 j16.ic1" size="1048576" crc="fd8a2715" sha1="47c8357c16d76dd067063c4fe61e579c8bc0e13c" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -2821,6 +2850,22 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 		</part>
 	</software>
 
+	<software name="petapeta">
+		<description>Petapeta Chokkin Asoberu Zukan ~Doubutsu~ (Jpn)</description>
+		<year>1995</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="HPC-6028"/>
+		<info name="release" value="199511xx"/>
+		<info name="alt_title" value="ぺたぺたちょっきん あそべるずかん &lt;どうぶつ&gt;"/>
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-6882A" />
+			<feature name="ic1" value="MPR-18300-T" />
+			<dataarea name="rom" size="524288">
+				<rom name="mpr-18300-t.ic1" size="524288" crc="4f0edce3" sha1="9782459dca47ac06890789f5299bcc0bf7466bc8" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="peterpan">
 		<description>Peter Pan - Neverland e Ikou! (Jpn)</description>
 		<year>1997</year>
@@ -3364,6 +3409,22 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 	</software>
 
 	<software name="sonigamj" cloneof="sonicgam">
+		<description>Sonic the Hedgehog's Gameworld (Jpn, Rev. 1)</description>
+		<year>1994</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="HPC-6010"/>
+		<info name="release" value="199408xx"/>
+		<info name="alt_title" value="ソニック☆ザ☆ヘッジホッグ ゲームワールド"/>
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-6882A" />
+			<feature name="ic1" value="MPR-17004A-U" />
+			<dataarea name="rom" size="524288">
+				<rom name="mpr-17004a-u.ic1" size="524288" crc="b8f507fa" sha1="a2f920ea5737eb24591274f84b28da97db72a151" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sonigamja" cloneof="sonicgam">
 		<description>Sonic the Hedgehog's Gameworld (Jpn)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -3882,6 +3943,21 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 			<feature name="ic2" value="315-5865" />
 			<dataarea name="rom" size="1048576">
 				<rom name="mpr-18804 j41.ic1" size="1048576" crc="d130d765" sha1="97c99f623285af22a1f3201b7b1a2665c7bbb649" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="yumecray">
+		<description>Yume no Crayon Oukoku (Jpn)</description>
+		<year>1998</year>
+		<publisher>Bandai</publisher>
+		<info name="serial" value="T-133270"/>
+		<info name="alt_title" value="夢のクレヨン王国"/>
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-6882A" />
+			<feature name="ic1" value="MPR-20816-T" />
+			<dataarea name="rom" size="524288">
+				<rom name="mpr-20816-t.ic1" size="524288" crc="0518d160" sha1="85f7569c2ea7956998c677e5b6947ca22d3da5eb" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
