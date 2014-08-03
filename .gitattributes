@@ -6665,6 +6665,7 @@ src/mame/layout/splus.lay svneol=native#text/xml
 src/mame/layout/spyhunt.lay svneol=native#text/xml
 src/mame/layout/sspeedr.lay svneol=native#text/xml
 src/mame/layout/sstrangr.lay svneol=native#text/xml
+src/mame/layout/st_mp100.lay svneol=native#text/plain
 src/mame/layout/stactics.lay svneol=native#text/xml
 src/mame/layout/starcas.lay svneol=native#text/xml
 src/mame/layout/stepstag.lay svneol=native#text/xml
