@@ -1181,6 +1181,7 @@ void pc1640_state::machine_start()
 	save_item(NAME(m_printer_data));
 	save_item(NAME(m_printer_control));
 	save_item(NAME(m_speaker_drive));
+	save_item(NAME(m_opt));
 }
 
 
