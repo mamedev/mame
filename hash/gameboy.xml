@@ -6886,6 +6886,78 @@
 		</part>
 	</software>
 
+	<software name="gbsjous">
+		<description>Goukaku Boy GOLD - Shikakui Atama o Maruku Suru - Joushiki no Sho (Jpn)</description>
+		<year>2000</year>
+		<publisher>Imagineer</publisher>
+		<info name="serial" value="DMG-BS4J-JPN"/>
+		<info name="release" value="20000317"/>
+		<info name="alt_title" value="ゴールド シカクいアタマをマルくする。 合格ボーイGOLD ■いアタマを●くする。 国語 算数 理科 社会 常識の書"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc5" />
+			<!-- cartridge ram -->
+			<dataarea name="rom" size="1048576">
+				<rom name="goukaku boy series - shikakui atama o marukusuru - joushiki no sho (japan).bin" size="1048576" crc="5d43a385" sha1="d367f2dab5eacb10e785a13a2550ca7cc3e54177" offset="000000" />
+			</dataarea>
+			<dataarea name="nvram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gbskjtat">
+		<description>Goukaku Boy GOLD - Shikakui Atama o Maruku Suru - Kanji no Tatsujin (Jpn)</description>
+		<year>2001</year>
+		<publisher>Imagineer</publisher>
+		<info name="serial" value="DMG-BK4J-JPN"/>
+		<info name="release" value="20010330"/>
+		<info name="alt_title" value="ゴールド シカクいアタマをマルくする。 合格ボーイGOLD ■いアタマを●くする。 読み 書き 筆順 熟語 漢字の達人"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc5" />
+			<!-- cartridge ram -->
+			<dataarea name="rom" size="1048576">
+				<rom name="goukaku boy series - shikakui atama o marukusuru - kanji no tatsujin (japan).bin" size="1048576" crc="62b00f69" sha1="1d3e5ad888b8339e35c46455d84017d8a0d69c6d" offset="000000" />
+			</dataarea>
+			<dataarea name="nvram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gbskstat">
+		<description>Goukaku Boy GOLD - Shikakui Atama o Maruku Suru - Keisan no Tatsujin (Jpn)</description>
+		<year>2001</year>
+		<publisher>Imagineer</publisher>
+		<info name="serial" value="DMG-BC4J-JPN"/>
+		<info name="release" value="20010330"/>
+		<info name="alt_title" value="ゴールド シカクいアタマをマルくする。 合格ボーイGOLD ■いアタマを●くする。 整数 小数 分数 単位 計算の達人"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc5" />
+			<!-- cartridge ram -->
+			<dataarea name="rom" size="1048576">
+				<rom name="goukaku boy series - shikakui atama o marukusuru - keisan no tatsujin (japan).bin" size="1048576" crc="71acbb67" sha1="e2ac91493248869aba6b7d26a36e5ff6bd6d6f5a" offset="000000" />
+			</dataarea>
+			<dataarea name="nvram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gbsnanm">
+		<description>Goukaku Boy GOLD - Shikakui Atama o Maruku Suru - Nanmon no Sho (Jpn)</description>
+		<year>2000</year>
+		<publisher>Imagineer</publisher>
+		<info name="serial" value="DMG-BD4J-JPN"/>
+		<info name="release" value="20000317"/>
+		<info name="alt_title" value="ゴールド シカクいアタマをマルくする。 合格ボーイGOLD ■いアタマを●くする。 国語 算数 理科 社会 難問の書"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc5" />
+			<!-- cartridge ram -->
+			<dataarea name="rom" size="1048576">
+				<rom name="goukaku boy series - shikakui atama o marukusuru - nanmon no sho (japan).bin" size="1048576" crc="3c907f2c" sha1="fa7a40acd835676fbcae9507a8aaaf1191f9b1cd" offset="000000" />
+			</dataarea>
+			<dataarea name="nvram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="gbs99nen">
 		<description>Goukaku Boy Series - 99 Nendo Ban Eitango Center 1500 (Jpn)</description>
 		<year>1998</year>
@@ -7111,62 +7183,8 @@
 		</part>
 	</software>
 
-	<software name="gbsjous">
-		<description>Goukaku Boy Series - Shikakui Atama o Marukusuru - Joushiki no Sho (Jpn)</description>
-		<year>2000</year>
-		<publisher>Imagineer</publisher>
-		<info name="serial" value="DMG-BS4J-JPN"/>
-		<info name="release" value="20000317"/>
-		<info name="alt_title" value="ゴールド シカクいアタマをマルくする。 合格ボーイGOLD ■いアタマを●くする。 国語 算数 理科 社会 常識の書"/>
-		<part name="cart" interface="gameboy_cart">
-			<feature name="slot" value="rom_mbc5" />
-			<!-- cartridge ram -->
-			<dataarea name="rom" size="1048576">
-				<rom name="goukaku boy series - shikakui atama o marukusuru - joushiki no sho (japan).bin" size="1048576" crc="5d43a385" sha1="d367f2dab5eacb10e785a13a2550ca7cc3e54177" offset="000000" />
-			</dataarea>
-			<dataarea name="nvram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="gbskjtat">
-		<description>Goukaku Boy Series - Shikakui Atama o Marukusuru - Kanji no Tatsujin (Jpn)</description>
-		<year>2001</year>
-		<publisher>Imagineer</publisher>
-		<info name="serial" value="DMG-BK4J-JPN"/>
-		<info name="release" value="20010330"/>
-		<info name="alt_title" value="ゴールド シカクいアタマをマルくする。 合格ボーイGOLD ■いアタマを●くする。 読み 書き 筆順 熟語 漢字の達人"/>
-		<part name="cart" interface="gameboy_cart">
-			<feature name="slot" value="rom_mbc5" />
-			<!-- cartridge ram -->
-			<dataarea name="rom" size="1048576">
-				<rom name="goukaku boy series - shikakui atama o marukusuru - kanji no tatsujin (japan).bin" size="1048576" crc="62b00f69" sha1="1d3e5ad888b8339e35c46455d84017d8a0d69c6d" offset="000000" />
-			</dataarea>
-			<dataarea name="nvram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="gbskstat">
-		<description>Goukaku Boy Series - Shikakui Atama o Marukusuru - Keisan no Tatsujin (Jpn)</description>
-		<year>2001</year>
-		<publisher>Imagineer</publisher>
-		<info name="serial" value="DMG-BC4J-JPN"/>
-		<info name="release" value="20010330"/>
-		<info name="alt_title" value="ゴールド シカクいアタマをマルくする。 合格ボーイGOLD ■いアタマを●くする。 整数 小数 分数 単位 計算の達人"/>
-		<part name="cart" interface="gameboy_cart">
-			<feature name="slot" value="rom_mbc5" />
-			<!-- cartridge ram -->
-			<dataarea name="rom" size="1048576">
-				<rom name="goukaku boy series - shikakui atama o marukusuru - keisan no tatsujin (japan).bin" size="1048576" crc="71acbb67" sha1="e2ac91493248869aba6b7d26a36e5ff6bd6d6f5a" offset="000000" />
-			</dataarea>
-			<dataarea name="nvram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="gbskokug">
-		<description>Goukaku Boy Series - Shikakui Atama o Marukusuru - Kokugo Battle Hen (Jpn)</description>
+		<description>Goukaku Boy Series - Shikakui Atama o Maruku Suru - Kokugo Battle Hen (Jpn)</description>
 		<year>1999</year>
 		<publisher>Imagineer</publisher>
 		<info name="serial" value="DMG-AJ6J-JPN"/>
@@ -7180,26 +7198,23 @@
 		</part>
 	</software>
 
-	<software name="gbsnanm">
-		<description>Goukaku Boy Series - Shikakui Atama o Marukusuru - Nanmon no Sho (Jpn)</description>
-		<year>2000</year>
+	<software name="gbskokugse" cloneof="gbskokug">
+		<description>Goukaku Boy Series - Shikakui Atama o Maruku Suru - Kokugo Battle Hen (Jpn, Special Edition)</description>
+		<year>1999</year>
 		<publisher>Imagineer</publisher>
-		<info name="serial" value="DMG-BD4J-JPN"/>
-		<info name="release" value="20000317"/>
-		<info name="alt_title" value="ゴールド シカクいアタマをマルくする。 合格ボーイGOLD ■いアタマを●くする。 国語 算数 理科 社会 難問の書"/>
+		<info name="serial" value="DMG-BF3J-JPN"/>
+		<info name="release" value="19990924"/>
+		<info name="alt_title" value="シカクいアタマをマルくする。 合格ボーイシリーズ ■いアタマを●くする。 国語バトル編 スペシャルエディション"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="slot" value="rom_mbc5" />
-			<!-- cartridge ram -->
-			<dataarea name="rom" size="1048576">
-				<rom name="goukaku boy series - shikakui atama o marukusuru - nanmon no sho (japan).bin" size="1048576" crc="3c907f2c" sha1="fa7a40acd835676fbcae9507a8aaaf1191f9b1cd" offset="000000" />
-			</dataarea>
-			<dataarea name="nvram" size="8192">
+			<feature name="slot" value="rom_mbc1" />
+			<dataarea name="rom" size="262144">
+				<rom name="goukaku boy series - shikakui atama o marukusuru - kokugo battle hen (japan) (special edition).bin" size="262144" crc="7e6e16d5" sha1="3fc9c1bc1d3b8e7ee90c14d4ae4938726f61a2db" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="gbsrikbt">
-		<description>Goukaku Boy Series - Shikakui Atama o Marukusuru - Rika Battle Hen (Jpn)</description>
+		<description>Goukaku Boy Series - Shikakui Atama o Maruku Suru - Rika Battle Hen (Jpn)</description>
 		<year>1999</year>
 		<publisher>Imagineer</publisher>
 		<info name="serial" value="DMG-AE8J-JPN"/>
@@ -7214,7 +7229,7 @@
 	</software>
 
 	<software name="gbssanbt">
-		<description>Goukaku Boy Series - Shikakui Atama o Marukusuru - Sansuu Battle Hen (Jpn)</description>
+		<description>Goukaku Boy Series - Shikakui Atama o Maruku Suru - Sansuu Battle Hen (Jpn)</description>
 		<year>1999</year>
 		<publisher>Imagineer</publisher>
 		<info name="serial" value="DMG-AF3J-JPN"/>
@@ -7229,7 +7244,7 @@
 	</software>
 
 	<software name="gbsshkbt">
-		<description>Goukaku Boy Series - Shikakui Atama o Marukusuru - Shakai Battle Hen (Jpn)</description>
+		<description>Goukaku Boy Series - Shikakui Atama o Maruku Suru - Shakai Battle Hen (Jpn)</description>
 		<year>1999</year>
 		<publisher>Imagineer</publisher>
 		<info name="serial" value="DMG-AK8J-JPN"/>
@@ -7244,7 +7259,7 @@
 	</software>
 
 	<software name="gbsasob">
-		<description>Goukaku Boy Series - Shikakui Atama o Marukusuru - Suuji de Asobou Sansuu Hen (Jpn, Rev. A)</description>
+		<description>Goukaku Boy Series - Shikakui Atama o Maruku Suru - Suuji de Asobou Sansuu Hen (Jpn, Rev. A)</description>
 		<year>1998</year>
 		<publisher>Imagineer</publisher>
 		<info name="serial" value="DMG-AM5J-JPN"/>
@@ -7259,7 +7274,7 @@
 	</software>
 
 	<software name="gbsasoba" cloneof="gbsasob">
-		<description>Goukaku Boy Series - Shikakui Atama o Marukusuru - Suuji de Asobou Sansuu Hen (Jpn)</description>
+		<description>Goukaku Boy Series - Shikakui Atama o Maruku Suru - Suuji de Asobou Sansuu Hen (Jpn)</description>
 		<year>1998</year>
 		<publisher>Imagineer</publisher>
 		<info name="serial" value="DMG-AM5J-JPN"/>
@@ -7274,7 +7289,7 @@
 	</software>
 
 	<software name="gbsshika">
-		<description>Goukaku Boy Series - Shikakui Atama o Marukusuru - Zukei no Tatsujin (Jpn)</description>
+		<description>Goukaku Boy GOLD - Shikakui Atama o Maruku Suru - Zukei no Tatsujin (Jpn)</description>
 		<year>2000</year>
 		<publisher>Imagineer</publisher>
 		<info name="serial" value="DMG-BZ4J-JPN"/>
@@ -9680,7 +9695,7 @@
 	</software>
 
 	<software name="kizuchid">
-		<description>Kizuchida Quiz da Gen-san da! (Jpn)</description>
+		<description>Kizuchi da Quiz da Gen-san da! (Jpn)</description>
 		<year>1992</year>
 		<publisher>Irem</publisher>
 		<info name="serial" value="DMG-QGJ (IG-09)"/>
@@ -11543,7 +11558,7 @@
 	</software>
 
 	<software name="mickeymw">
-		<description>Mickey Mouse - Magic Wand (Euro, USA)</description>
+		<description>Mickey Mouse - Magic Wands (Euro, USA)</description>
 		<year>1998</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-I5-USA, DMG-I5-NOE"/>
@@ -12232,7 +12247,7 @@
 			<feature name="slot" value="rom_mbc1" />
 			<!-- cartridge ram -->
 			<dataarea name="rom" size="524288">
-				<rom name="monster race (japan).bin" size="524288" crc="ad529057" sha1="a30e68a691d92d8899d140e5786a185805b8db65" offset="000000" />
+				<rom name="monster race (japan).bin" size="524288" crc="c191bd66" sha1="bb305ec61ec272a7a2fada1c03ba6784c5168f86" offset="000000" />
 			</dataarea>
 			<dataarea name="nvram" size="32768">
 			</dataarea>
@@ -16618,7 +16633,7 @@
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
-				<rom name="radar mission (japan).bin" size="131072" crc="7c7e6d1c" sha1="a69585cf74e66fd94cdea090e515c7e4a0e044b8" offset="000000" />
+				<rom name="radar mission (japan).bin" size="131072" crc="892fc0af" sha1="64a808f582afcbed6a3ce0263f1dae6fde57f30b" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -20365,7 +20380,7 @@
 	</software>
 
 	<software name="tasmaniaj" cloneof="tasmania">
-		<description>Tasmania Story (Jpn)</description>
+		<description>Tasmania Monogatari (Jpn)</description>
 		<year>1990</year>
 		<publisher>Pony Canyon</publisher>
 		<info name="serial" value="DMG-TAJ (R30G10001)"/>
@@ -21974,7 +21989,7 @@
 	</software>
 
 	<software name="uruseiya">
-		<description>Urusei Yatsura - Miss Tomobiki o Saguse! (Jpn)</description>
+		<description>Urusei Yatsura - Miss Tomobiki o Sagase! (Jpn)</description>
 		<year>1992</year>
 		<publisher>Yanoman</publisher>
 		<info name="serial" value="DMG-UYJ"/>
@@ -23075,7 +23090,7 @@
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
-				<rom name="yuu yuu hakusho dai-3-dan - makai no tobira (japan).bin" size="262144" crc="a67cd2cc" sha1="eb72f6956e8c8aa05bee69a0f174f58724008abd" offset="000000" />
+				<rom name="yuu yuu hakusho dai-3-dan - makai no tobira (japan).bin" size="262144" crc="25c618f6" sha1="ffaff18cc2028ca7f823ed1c2a025ed5a61d1b9d" offset="000000" />
 			</dataarea>
 		</part>
 	</software>

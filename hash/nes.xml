@@ -44675,6 +44675,23 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
+	<software name="colordinp" cloneof="colordin">
+		<description>Color A Dinosaur (USA, Prototype)</description>
+		<year>1993</year>
+		<publisher>Virgin Interactive</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="uxrom" />
+			<feature name="pcb" value="NES-UNROM" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="prg" size="131072">
+				<rom name="color a dinosaur proto.prg" size="131072" crc="cb17d41e" sha1="c9f15fcb8389ef25cb16af0b277ec6885dc4b6d7" offset="00000" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="columbus">
 		<description>Columbus - Ougon no Yoake (Jpn)</description>
 		<year>1992</year>
@@ -47563,6 +47580,23 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
+	<software name="monstparj" cloneof="monstpar">
+		<description>Parody World - Monster Party (Jpn, Prototype)</description>
+		<year>1989</year>
+		<publisher>Shinsei</publisher>
+		<info name="alt_title" value="パーロディワールドモンスターパーティー"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="sxrom" />
+			<feature name="pcb" value="NES-SLROM" />
+			<dataarea name="chr" size="131072">
+				<rom name="monster party famicom proto.chr" size="131072" crc="e3ed6a37" sha1="58f48b3e08f2316149a59032779ef397b15f9ad1" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="131072">
+				<rom name="monster party famicom proto.prg" size="131072" crc="37ac913e" sha1="ceb86975623f88abd2a17897a436d1b86e19ae4a" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mooncrys">
 		<description>Moon Crystal (Jpn)</description>
 		<year>1992</year>
@@ -48320,6 +48354,22 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
+	<software name="rbyrnepc">
+		<description>Robert Byrne's Pool Challenge (USA, Prototype)</description>
+		<year>1992</year>
+		<publisher>American Video Entertainment</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="nina006" />
+			<feature name="pcb" value="AVE-NINA-06" />
+			<dataarea name="chr" size="32768">
+				<rom name="robert byrnes pool challenge (usa) (proto) (unl).chr" size="32768" crc="01005a00" sha1="e47a5a225990eca7aa6dc3853ca2c243f7d29136" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="65536">
+				<rom name="robert byrnes pool challenge (usa) (proto) (unl).prg" size="65536" crc="02aea60e" sha1="5e2c1160e29a701a0086378b16fe0337db7981b7" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="roboccow">
 		<description>Robocco Wars (Jpn)</description>
 		<year>1991</year>
@@ -48389,22 +48439,6 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			</dataarea>
 			<!-- 8k WRAM on cartridge -->
 			<dataarea name="wram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="yonoidp" cloneof="yonoid">
-		<description>Yo! Noid (USA, Prototype)</description>
-		<year>1990</year>
-		<publisher>Capcom</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="sxrom" />
-			<feature name="pcb" value="NES-SLROM" />
-			<dataarea name="chr" size="131072">
-				<rom name="yo! noid (u) (prototype).chr" size="131072" crc="868f7343" sha1="acb6f6eb9e8beb0636c59a999c8f5920ef7786a3" offset="00000" />
-			</dataarea>
-			<dataarea name="prg" size="131072">
-				<rom name="yo! noid (u) (prototype).prg" size="131072" crc="217916d3" sha1="cc18e533a2a9f73c492ef1fb9aa7d0502d6c15d8" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -50066,6 +50100,22 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
+	<software name="yonoidp" cloneof="yonoid">
+		<description>Yo! Noid (USA, Prototype)</description>
+		<year>1990</year>
+		<publisher>Capcom</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="sxrom" />
+			<feature name="pcb" value="NES-SLROM" />
+			<dataarea name="chr" size="131072">
+				<rom name="yo! noid (u) (prototype).chr" size="131072" crc="868f7343" sha1="acb6f6eb9e8beb0636c59a999c8f5920ef7786a3" offset="00000" />
+			</dataarea>
+			<dataarea name="prg" size="131072">
+				<rom name="yo! noid (u) (prototype).prg" size="131072" crc="217916d3" sha1="cc18e533a2a9f73c492ef1fb9aa7d0502d6c15d8" offset="00000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="yumepeng">
 		<description>Yume Penguin Monogatari (Jpn)</description>
 		<year>1991</year>
@@ -50117,23 +50167,6 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			</dataarea>
 			<dataarea name="prg" size="32768">
 				<rom name="zunou senkan galg (japan) (beta).prg" size="32768" crc="b9fdd901" sha1="9e4aca30d102c196ecebde2c83e98ce47dc534bc" offset="00000" status="baddump" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="colordinp" cloneof="colordin">
-		<description>Color A Dinosaur (USA, Prototype)</description>
-		<year>1993</year>
-		<publisher>Virgin Interactive</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="uxrom" />
-			<feature name="pcb" value="NES-UNROM" />
-			<feature name="mirroring" value="vertical" />
-			<dataarea name="prg" size="131072">
-				<rom name="color a dinosaur proto.prg" size="131072" crc="cb17d41e" sha1="c9f15fcb8389ef25cb16af0b277ec6885dc4b6d7" offset="00000" status="baddump" />
-			</dataarea>
-			<!-- 8k VRAM on cartridge -->
-			<dataarea name="vram" size="8192">
 			</dataarea>
 		</part>
 	</software>

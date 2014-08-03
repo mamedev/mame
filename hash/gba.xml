@@ -8490,6 +8490,17 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 		</part>
 	</software>
 
+	<software name="harlock">
+		<description>Captain Harlock (Euro, Prototype Demo)</description>
+		<year>2003</year>
+		<publisher>Otaboo</publisher>
+		<part name="cart" interface="gba_cart">
+			<dataarea name="rom" size="596520">
+				<rom name="captain harlock albator gba.bin" size="596520" crc="176da49f" sha1="8e1c979b8afc1b17d5e5663cd1c99ef53e24b41f" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="carbatlj">
 		<description>Car Battler Joe (USA)</description>
 		<year>2002</year>
@@ -23671,10 +23682,10 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 	</software>
 
 	<software name="mnaswt16">
-		<description>Mary-Kate and Ashley Sweet 16 - Licensed to Drive (USA)</description>
+		<description>Mary-Kate and Ashley Sweet 16 - Licensed to Drive (Euro, USA)</description>
 		<year>2002</year>
 		<publisher>Acclaim</publisher>
-		<info name="serial" value="AGB-AAYE-USA"/>
+		<info name="serial" value="AGB-AAYP-EUR, AGB-AAYE-USA"/>
 		<part name="cart" interface="gba_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="mary-kate and ashley sweet 16 - licensed to drive (usa).bin" size="4194304" crc="5fe092c6" sha1="284059f03f0dda9ce511d3c57bf0607706b9fca3" offset="000000" />
