@@ -47584,7 +47584,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<description>Parody World - Monster Party (Jpn, Prototype)</description>
 		<year>1989</year>
 		<publisher>Shinsei</publisher>
-		<info name="alt_title" value="パーロディワールドモンスターパーティー"/>
+		<info name="alt_title" value="パロディワールドモンスターパーティー"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="NES-SLROM" />
