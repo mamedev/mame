@@ -68,7 +68,7 @@ void nes_state::state_register()
 	save_pointer(NAME(m_ciram), 0x800);
 
 	if (m_disk_expansion)
-		save_pointer(NAME(m_vram), 0x800);
+		save_pointer(NAME(m_vram), 0x2000);
 
 	save_item(NAME(m_pad_latch));
 	save_item(NAME(m_zapper_latch));
@@ -80,6 +80,10 @@ void nes_state::state_register()
 	save_item(NAME(m_mic_obstruct));
 	save_item(NAME(m_powerpad_latch));
 	save_item(NAME(m_ftrainer_scan));
+	save_item(NAME(m_IRQ_enable));
+	save_item(NAME(m_IRQ_enable_latch));
+	save_item(NAME(m_IRQ_count));
+	save_item(NAME(m_IRQ_count_latch));
 }
 
 
