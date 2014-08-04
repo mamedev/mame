@@ -805,9 +805,41 @@ ROM_START( glcolor )
 	ROM_CART_LOAD( "cart", 0, 0x80000, 0 )
 ROM_END
 
+ROM_START( glscolor )
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD( "27-5488-00.u5", 0x00000, 0x080000, CRC(e6cf7702) SHA1(ce40418a7777b331bf8c4c881d51732aeb384582) )    // identical to 'Genius Leader Color'
+
+	ROM_REGION( 0x80000, "cart", ROMREGION_ERASEFF )
+	ROM_CART_LOAD( "cart", 0, 0x80000, 0 )
+ROM_END
+
 ROM_START( glmcolor )
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD( "27-5673-00.u6", 0x00000, 0x100000, CRC(c4245392) SHA1(bb651aaf11b75f4155c0a0106de9394018110cc7) )
+
+	ROM_REGION( 0x80000, "cart", ROMREGION_ERASEFF )
+	ROM_CART_LOAD( "cart", 0, 0x80000, 0 )
+ROM_END
+
+ROM_START( gj4000 )
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD( "27-05886-000-000.u4", 0x000000, 0x40000, CRC(5f6db95b) SHA1(fe683154e33a82ea38696096616d11e850e0c7a3))
+
+	ROM_REGION( 0x80000, "cart", ROMREGION_ERASEFF )
+	ROM_CART_LOAD( "cart", 0, 0x80000, 0 )
+ROM_END
+
+ROM_START( gj5000 )
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD( "27-6019-01.u2", 0x000000, 0x80000, CRC(946e5b7d) SHA1(80963d6ad80d49e54c8996bfc77ac135c4935be5))
+
+	ROM_REGION( 0x80000, "cart", ROMREGION_ERASEFF )
+	ROM_CART_LOAD( "cart", 0, 0x80000, 0 )
+ROM_END
+
+ROM_START( gjrstar )
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD( "27-5740-00.u1", 0x000000, 0x40000, CRC(ff3dc3bb) SHA1(bc16dfc1e12b0008456c700c431c8df6263b671f))
 
 	ROM_REGION( 0x80000, "cart", ROMREGION_ERASEFF )
 	ROM_CART_LOAD( "cart", 0, 0x80000, 0 )
@@ -825,8 +857,15 @@ ROM_END
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
 COMP( 1994, glcolor,   0,       0,  glcolor,    glcolor,  driver_device,     0,  "VTech",   "Genius Leader Color (Germany)",    GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1994, glscolor,  glcolor, 0,  glcolor,    glcolor,  driver_device,     0,  "VTech",   "Genius Leader Super Color (Germany)",    GAME_NOT_WORKING | GAME_NO_SOUND)
 COMP( 1996, glmcolor,  0,       0,  glmcolor,   glmcolor, driver_device,     0,  "VTech",   "Genius Leader Magic Color (Germany)",    GAME_NOT_WORKING | GAME_NO_SOUND)
 COMP( 1997, gl6000sl,  0,       0,  gl6000sl,   prestige, driver_device,     0,  "VTech",   "Genius Leader 6000SL (Germany)",   GAME_NOT_WORKING | GAME_NO_SOUND)
 COMP( 1998, gl7007sl,  0,       0,  gl7007sl,   prestige, driver_device,     0,  "VTech",   "Genius Leader 7007SL (Germany)",   GAME_NOT_WORKING | GAME_NO_SOUND)
 COMP( 1998, prestige,  0,       0,  prestige,   prestige, driver_device,     0,  "VTech",   "PreComputer Prestige Elite",       GAME_NOT_WORKING | GAME_NO_SOUND)
+
+
+// these systems need to be moved into a separate driver
+COMP( 1996, gj4000,    0,       0,  prestige,   prestige, driver_device,     0,  "VTech",   "Genius Junior 4000 (Germany)", GAME_IS_SKELETON)
+COMP( 1996, gjrstar,   0,       0,  prestige,   prestige, driver_device,     0,  "VTech",   "Genius Junior Redstar(Germany)", GAME_IS_SKELETON)
 COMP( 1998, gjrstar3,  0,       0,  prestige,   prestige, driver_device,     0,  "VTech",   "Genius Junior Redstar 3 (Germany)", GAME_IS_SKELETON)
+COMP( 1998, gj5000,    0,       0,  prestige,   prestige, driver_device,     0,  "VTech",   "Genius Junior 5000 (Germany)", GAME_IS_SKELETON)
