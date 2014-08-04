@@ -49039,6 +49039,23 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
+	<software name="striderj" cloneof="strider">
+		<description>Strider Hiryu (Jpn, Prototype)</description>
+		<year>1988</year>
+		<publisher>Capcom</publisher>
+		<info name="alt_title" value="ストライダー飛竜"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="sxrom" />
+			<feature name="pcb" value="NES-SLROM" />
+			<dataarea name="prg" size="262144">
+				<rom name="strider hiryu.prg" size="262144" crc="367566ce" sha1="57d305495fa7f0d107299e6600edfcad53559360" offset="00000" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- This would need tape emulation and real tapes dumped -->
 	<software name="studybox">
 		<description>Study Box (Jpn)</description>
