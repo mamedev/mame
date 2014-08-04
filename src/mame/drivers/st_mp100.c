@@ -90,7 +90,7 @@ static ADDRESS_MAP_START( st_mp100_map, AS_PROGRAM, 8, st_mp100_state )
 	AM_RANGE(0x0000, 0x007f) AM_RAM // internal to the cpu
 	AM_RANGE(0x0088, 0x008b) AM_DEVREADWRITE("pia_u10", pia6821_device, read, write)
 	AM_RANGE(0x0090, 0x0093) AM_DEVREADWRITE("pia_u11", pia6821_device, read, write)
-	AM_RANGE(0x00a0, 0x00bf) // to sound board
+	AM_RANGE(0x00a0, 0x00bf) AM_WRITENOP // to sound board
 	AM_RANGE(0x00c0, 0x00df) // to sound board
 	AM_RANGE(0x0200, 0x02ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x1000, 0x1fff) AM_ROM AM_REGION("roms", 0 )
