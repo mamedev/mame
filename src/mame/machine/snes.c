@@ -1084,6 +1084,7 @@ void snes_state::machine_start()
 		save_item(NAME(m_dma_channel[i].trans_size), i);
 		save_item(NAME(m_dma_channel[i].ibank), i);
 		save_item(NAME(m_dma_channel[i].hdma_addr), i);
+		save_item(NAME(m_dma_channel[i].hdma_iaddr), i);
 		save_item(NAME(m_dma_channel[i].hdma_line_counter), i);
 		save_item(NAME(m_dma_channel[i].unk), i);
 		save_item(NAME(m_dma_channel[i].do_transfer), i);
@@ -1101,9 +1102,15 @@ void snes_state::machine_start()
 	save_item(NAME(m_dma_regs));
 	save_item(NAME(m_cpu_regs));
 	save_item(NAME(m_oldjoy1_latch));
+	save_item(NAME(m_input_disabled));
+	save_item(NAME(m_game_over_flag));
+	save_item(NAME(m_joy_flag));
 
 	m_is_nss = 0;
 	m_is_sfcbox = 0;
+	m_input_disabled = 0;
+	m_game_over_flag = 0;
+	m_joy_flag = 1;
 }
 
 void snes_state::machine_reset()

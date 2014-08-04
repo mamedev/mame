@@ -327,6 +327,29 @@ void snes_ppu_device::device_start()
 	save_item(NAME(m_mode7.ver_offset));
 	save_item(NAME(m_mode7.extbg));
 
+	for (int i = 0; i < ARRAY_LENGTH(m_oam_spritelist); i++)
+	{
+		save_item(NAME(m_oam_spritelist[i].tile), i);
+		save_item(NAME(m_oam_spritelist[i].x), i);
+		save_item(NAME(m_oam_spritelist[i].y), i);
+		save_item(NAME(m_oam_spritelist[i].size), i);
+		save_item(NAME(m_oam_spritelist[i].vflip), i);
+		save_item(NAME(m_oam_spritelist[i].hflip), i);
+		save_item(NAME(m_oam_spritelist[i].priority_bits), i);
+		save_item(NAME(m_oam_spritelist[i].pal), i);
+		save_item(NAME(m_oam_spritelist[i].height), i);
+		save_item(NAME(m_oam_spritelist[i].width), i);
+	}
+
+	for (int i = 0; i < ARRAY_LENGTH(m_oam_tilelist); i++)
+	{
+		save_item(NAME(m_oam_tilelist[i].x), i);
+		save_item(NAME(m_oam_tilelist[i].priority), i);
+		save_item(NAME(m_oam_tilelist[i].pal), i);
+		save_item(NAME(m_oam_tilelist[i].tileaddr), i);
+		save_item(NAME(m_oam_tilelist[i].hflip), i);
+	}
+
 	save_item(NAME(m_mosaic_size));
 	save_item(NAME(m_clip_to_black));
 	save_item(NAME(m_prevent_color_math));
