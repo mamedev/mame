@@ -1459,6 +1459,19 @@ ROM_START(tk2000)
 	ROM_LOAD( "342-0132-c.e12", 0x000, 0x800, BAD_DUMP CRC(e47045f4) SHA1(12a2e718f5f4acd69b6c33a45a4a940b1440a481) ) // probably not this machine's actual ROM
 ROM_END
 
+// unlike the very unique TK2000, the TK3000 is a stock enhanced IIe clone
+ROM_START(tk3000)
+	ROM_REGION(0x2000,"gfx1",0)
+	ROM_LOAD ( "341-0265-a.chr", 0x0000, 0x1000,CRC(2651014d) SHA1(b2b5d87f52693817fc747df087a4aa1ddcdb1f10))
+	ROM_LOAD ( "341-0265-a.chr", 0x1000, 0x1000,CRC(2651014d) SHA1(b2b5d87f52693817fc747df087a4aa1ddcdb1f10))
+
+	ROM_REGION(0x4000,"maincpu",0)
+	ROM_LOAD( "tk3000e.rom",  0x000000, 0x004000, CRC(5b1e8ab2) SHA1(f163e5753c18ff0e812a448e8da406f102600edf) )
+
+	ROM_REGION( 0x800, "keyboard", ROMREGION_ERASE00 )
+	ROM_LOAD( "342-0132-c.e12", 0x000, 0x800, BAD_DUMP CRC(e47045f4) SHA1(12a2e718f5f4acd69b6c33a45a4a940b1440a481) ) // probably not this machine's actual ROM
+ROM_END
+
 ROM_START(prav8c)
 	ROM_REGION(0x2000,"gfx1",0)
 	ROM_LOAD ( "charrom.d20", 0x0000, 0x2000,CRC(935212cc) SHA1(934603a441c631bd841ea0d2ff39525474461e47))
@@ -1648,6 +1661,7 @@ COMP( 1985, apple2eeuk,apple2e, 0,        apple2ee,    apple2euk, driver_device,
 COMP( 1987, apple2ep, apple2e,  0,        apple2ep,    apple2ep, driver_device, 0,        "Apple Computer",    "Apple //e (Platinum)", GAME_SUPPORTS_SAVE )
 COMP( 1984, apple2c,  0,        apple2,   apple2c,     apple2e, driver_device,  0,        "Apple Computer",    "Apple //c" , GAME_SUPPORTS_SAVE )
 COMP( 1984, tk2000,   apple2c,  0,        tk2000,      apple2e, driver_device,  0,        "Microdigital",      "TK2000" , GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+COMP( 1986, tk3000,   apple2c,  0,        apple2ee,    apple2e, driver_device,  0,        "Microdigital",      "TK3000//e" , GAME_SUPPORTS_SAVE )
 COMP( 1989, prav8c,   apple2c,  0,        apple2c,     apple2e, driver_device,  0,        "Pravetz",           "Pravetz 8C", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
 COMP( 1983, las3000,  apple2,   0,        apple2p,     apple2p, driver_device,  0,        "Video Technology",  "Laser 3000",    GAME_NOT_WORKING )
 COMP( 1987, laser128, apple2c,  0,        laser128,    apple2e, driver_device,  0,        "Video Technology",  "Laser 128 (version 4.2)", GAME_NOT_WORKING )
