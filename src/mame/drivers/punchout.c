@@ -14,6 +14,7 @@ the bottom screen.
 driver by Nicola Salmoria
 
 TODO:
+- add useless driver config to choose between pink and white color proms
 - Finish emulation of RP5C01 and RP5H01 for spnchout. The RP5C01 features don't
   seem to be used at all except for very basic protection e.g. relying on the
   masking done by the internal registers.
@@ -100,6 +101,13 @@ write:
 4011      DAC crowd noise
 4015      ?? 00 or 0f
 4017      ?? always c0
+
+proms:
+If you take a look at the Super Punch-Out Manual, you will notice that it
+references different color prom labels. So both boards could use white labels
+or pink labels and this is because Nintendo populated the boards with different
+parts ie 6J and 6K on the BAK board could be populated with 74ls157 or 74ls158
+regardless of PCB revision which would change proms 6E, 6F, and 7F.
 
 ***************************************************************************
 
@@ -999,26 +1007,117 @@ MACHINE_CONFIG_END
 ***************************************************************************/
 
 ROM_START( punchout )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "chp1-c.8l",    0x0000, 0x2000, CRC(a4003adc) SHA1(a8026eb39aa883993a0c9cb4400bf1a7e5898a2b) )
-	ROM_LOAD( "chp1-c.8k",    0x2000, 0x2000, CRC(745ecf40) SHA1(430f80b688a515953fab177a3ec2eb31c886df22) )
-	ROM_LOAD( "chp1-c.8j",    0x4000, 0x2000, CRC(7a7f870e) SHA1(76bb9f3ef0a2fd514db63fb77f35bde12c15c29c) )
-	ROM_LOAD( "chp1-c.8h",    0x6000, 0x2000, CRC(5d8123d7) SHA1(04ddfcde969db93ff31e9c8a2af4dde285b82e2e) )
-	ROM_LOAD( "chp1-c.8f",    0x8000, 0x4000, CRC(c8a55ddb) SHA1(f91fb368542c50969a086f01a2e70ecce7f2697b) )
+	ROM_REGION( 0x10000, "maincpu", 0 )     /* 64k for code */
+	ROM_LOAD( "chp1-c.8l",    0x0000, 0x2000, CRC(a4003adc) SHA1(a8026eb39aa883993a0c9cb4400bf1a7e5898a2b) )    /* Revision e-1 */
+	ROM_LOAD( "chp1-c.8k",    0x2000, 0x2000, CRC(745ecf40) SHA1(430f80b688a515953fab177a3ec2eb31c886df22) )    /* Revision e-1 */
+	ROM_LOAD( "chp1-c.8j",    0x4000, 0x2000, CRC(7a7f870e) SHA1(76bb9f3ef0a2fd514db63fb77f35bde12c15c29c) )    /* Revision e */
+	ROM_LOAD( "chp1-c.8h",    0x6000, 0x2000, CRC(5d8123d7) SHA1(04ddfcde969db93ff31e9c8a2af4dde285b82e2e) )    /* Revision e */
+	ROM_LOAD( "chp1-c.8f",    0x8000, 0x4000, CRC(c8a55ddb) SHA1(f91fb368542c50969a086f01a2e70ecce7f2697b) )    /* Revision e-1 */
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for the sound CPU */
+	ROM_LOAD( "chp1-c.4k",    0xe000, 0x2000, CRC(cb6ef376) SHA1(503dbcc1b18a497311bf129689d5650860bf96c7) )
+
+	ROM_REGION( 0x04000, "gfx1", ROMREGION_ERASEFF )
+	ROM_LOAD( "chp1-b.4c",    0x00000, 0x0800, CRC(49b763bc) SHA1(064739bf4f5eb18567fd4df9c37280dc84101715) )   /* chars #1 */ /* Revision B */
+	ROM_CONTINUE(             0x01000, 0x0800 )
+	ROM_CONTINUE(             0x00800, 0x0800 )
+	ROM_CONTINUE(             0x01800, 0x0800 )
+	ROM_LOAD( "chp1-b.4d",    0x02000, 0x0800, CRC(08bc6d67) SHA1(d229a7c9152bb43fe12c313c8d3b681226b847e0) )   /* Revision B */
+	ROM_CONTINUE(             0x03000, 0x0800 )
+	ROM_CONTINUE(             0x02800, 0x0800 )
+	ROM_CONTINUE(             0x03800, 0x0800 )
+
+	ROM_REGION( 0x04000, "gfx2", ROMREGION_ERASEFF )
+	ROM_LOAD( "chp1-b.4a",    0x00000, 0x0800, CRC(c075f831) SHA1(f22d9e415637599420c443ce08e7e70d1eb1c6f5) )   /* chars #2 */ /* Revision B */
+	ROM_CONTINUE(             0x01000, 0x0800 )
+	ROM_CONTINUE(             0x00800, 0x0800 )
+	ROM_CONTINUE(             0x01800, 0x0800 )
+	ROM_LOAD( "chp1-b.4b",    0x02000, 0x0800, CRC(c4cc2b5a) SHA1(7b9d4dcecc67271980c3c44561fc25a6f6c93ee3) )   /* Revision B */
+	ROM_CONTINUE(             0x03000, 0x0800 )
+	ROM_CONTINUE(             0x02800, 0x0800 )
+	ROM_CONTINUE(             0x03800, 0x0800 )
+
+	ROM_REGION( 0x30000, "gfx3", ROMREGION_ERASEFF )
+	ROM_LOAD( "chp1-v.2r",    0x00000, 0x4000, CRC(bd1d4b2e) SHA1(492ae301a9890c2603d564c9048b1b67895052dd) )	/* chars #3 */ /* Labeled Rev B, but same as Rev A */
+	ROM_LOAD( "chp1-v.2t",    0x04000, 0x4000, CRC(dd9a688a) SHA1(fbb98eebfbaab445928da939846a2d07a8046afb) )
+	ROM_LOAD( "chp1-v.2u",    0x08000, 0x2000, CRC(da6a3c4b) SHA1(e03469fb6f552f41a9b7f4b3e51c15a52b61cf84) )
+	/* 0a000-0bfff empty (space for 16k ROM) */
+	ROM_LOAD( "chp1-v.2v",    0x0c000, 0x2000, CRC(8c734a67) SHA1(d59b5a2517e4890e7ca7da52ca2813a6abc484a3) )
+	/* 0e000-0ffff empty (space for 16k ROM) */
+	ROM_LOAD( "chp1-v.3r",    0x10000, 0x4000, CRC(2e74ad1d) SHA1(538b3f9273699106a50887c927f0251537bf0f42) )
+	ROM_LOAD( "chp1-v.3t",    0x14000, 0x4000, CRC(630ba9fb) SHA1(36cec8658597239385cada3bc947b940ab66954b) )
+	ROM_LOAD( "chp1-v.3u",    0x18000, 0x2000, CRC(6440321d) SHA1(c8c084ad408cb6bf65959ed4db03c4b4cf9b1c1a) )
+	/* 1a000-1bfff empty (space for 16k ROM) */
+	ROM_LOAD( "chp1-v.3v",    0x1c000, 0x2000, CRC(bb7b7198) SHA1(64572668d30e008daf4ccaa5689518ecc41f1091) )
+	/* 1e000-1ffff empty (space for 16k ROM) */
+	ROM_LOAD( "chp1-v.4r",    0x20000, 0x4000, CRC(4e5b0fe9) SHA1(c5c4fb735cc232b43c49442e62af0ebe99eaab0c) )
+	ROM_LOAD( "chp1-v.4t",    0x24000, 0x4000, CRC(37ffc940) SHA1(d555807a6a1025c81637c5db0184b48306aa01ac) )
+	ROM_LOAD( "chp1-v.4u",    0x28000, 0x2000, CRC(1a7521d4) SHA1(4e8a8298f2ff8257d2058e5133ad295f92c7deb8) )
+	/* 2a000-2bfff empty (space for 16k ROM) */
+	/* 2c000-2ffff empty (4v doesn't exist, it is seen as a 0xff fill) */
+
+	ROM_REGION( 0x10000, "gfx4", ROMREGION_ERASEFF )
+	ROM_LOAD( "chp1-v.6p",    0x00000, 0x0800, CRC(75be7aae) SHA1(396bc1d301b99e064de4dad699882618b1b9c958) )	/* chars #4 */ /* Revision B */
+	ROM_CONTINUE(             0x01000, 0x0800 )
+	ROM_CONTINUE(             0x00800, 0x0800 )
+	ROM_CONTINUE(             0x01800, 0x0800 )
+	ROM_LOAD( "chp1-v.6n",    0x02000, 0x0800, CRC(daf74de0) SHA1(9373d4527b675b3128a5a830f42e1dc5dcb85307) )	/* Revision B */
+	ROM_CONTINUE(             0x03000, 0x0800 )
+	ROM_CONTINUE(             0x02800, 0x0800 )
+	ROM_CONTINUE(             0x03800, 0x0800 )
+	/* 04000-07fff empty (space for 6l and 6k) */
+	ROM_LOAD( "chp1-v.8p",    0x08000, 0x0800, CRC(4cb7ea82) SHA1(213b7c1431f4c92e5519a8771035bda28b3bab8a) )	/* Revision B */
+	ROM_CONTINUE(             0x09000, 0x0800 )
+	ROM_CONTINUE(             0x08800, 0x0800 )
+	ROM_CONTINUE(             0x09800, 0x0800 )
+	ROM_LOAD( "chp1-v.8n",    0x0a000, 0x0800, CRC(1c0d09aa) SHA1(3276bae7400453f3612f53d7b47fb199cbe53e6d) )	/* Revision B */
+	ROM_CONTINUE(             0x0b000, 0x0800 )
+	ROM_CONTINUE(             0x0a800, 0x0800 )
+	ROM_CONTINUE(             0x0b800, 0x0800 )
+	/* 0c000-0ffff empty (space for 8l and 8k) */
+
+	ROM_REGION( 0x2100, "proms", ROMREGION_ERASEFF ) // see driver notes
+	// pink labeled color proms
+	ROM_LOAD( "chp1-b-6e_pink.6e",  0x0000, 0x0200, CRC(e9ca3ac6) SHA1(68d9739d8a0dadc6fe3b3767437526096ca5db98) )  /* R (top monitor) */
+	ROM_LOAD( "chp1-b-6f_pink.6f",  0x0200, 0x0200, CRC(02be56ab) SHA1(a88f332cb26928350ed20ab5f4c04d5324bb516a) )  /* G */
+	ROM_LOAD( "chp1-b-7f_pink.7f",  0x0400, 0x0200, CRC(11de55f1) SHA1(269b82f4bc73fac197e0bb6d9a90a220e77ce478) )  /* B */
+	ROM_LOAD( "chp1-b-7e_pink.7e",  0x0600, 0x0200, CRC(fddaa777) SHA1(ee6bff5ffeefc82374868a268f885d0bc3a76da2) )  /* R (bottom monitor) */
+	ROM_LOAD( "chp1-b-8e_pink.8e",  0x0800, 0x0200, CRC(c3d5d71f) SHA1(2b02479614a801f539fead17860b84e9a180e761) )  /* G */
+	ROM_LOAD( "chp1-b-8f_pink.8f",  0x0a00, 0x0200, CRC(a3037155) SHA1(8b6c0c80278ca859a08a1a2429190d51be4f9401) )  /* B */
+	// white labeled color proms (indices are reversed)
+	ROM_LOAD( "chp1-b-6e_white.6e", 0x1000, 0x0200, CRC(ddac5f0e) SHA1(25dabe415757ccea057609a3f3f79a56b613032a) )  /* R (top monitor) */
+	ROM_LOAD( "chp1-b-6f_white.6f", 0x1200, 0x0200, CRC(846c6261) SHA1(f012a02bbdf0166b9bfd3dc9749db18759a22421) )  /* G */
+	ROM_LOAD( "chp1-b-7f_white.7f", 0x1400, 0x0200, CRC(1682dd30) SHA1(84b92d1b292210bda0c25537c8ee3e274aaac75c) )  /* B */
+	ROM_LOAD( "chp1-b-7e_white.7e", 0x1600, 0x0200, CRC(47adf7a2) SHA1(1d37d5207cd37a9c122251c60cc8f43dd680f484) )  /* R (bottom monitor) */
+	ROM_LOAD( "chp1-b-8e_white.8e", 0x1800, 0x0200, CRC(b0fc15a8) SHA1(a1af09cfea81231240bd94f3b98de1be8235ebe7) )  /* G */
+	ROM_LOAD( "chp1-b-8f_white.8f", 0x1a00, 0x0200, CRC(1ffd894a) SHA1(9e8c1c28b4c12acf42f814bc109d353729a25652) )  /* B */
+	ROM_LOAD( "chp1-v-2d.2d",       0x2000, 0x0100, CRC(71dc0d48) SHA1(dd6609f547d74887f520d7e71a1a00317ff181d0) )  /* timing - not used */
+
+	ROM_REGION( 0x4000, "vlm", 0 )	/* 16k for the VLM5030 data */
+	ROM_LOAD( "chp1-c.6p",    0x0000, 0x4000, CRC(ea0bbb31) SHA1(b1da024cb688341d39791a78d1144fe09acb00cf) )
+ROM_END
+
+ROM_START( punchouta )
+	ROM_REGION( 0x10000, "maincpu", 0 )     /* 64k for code */
+	ROM_LOAD( "chp1-c.8l",    0x0000, 0x2000, CRC(a4003adc) SHA1(a8026eb39aa883993a0c9cb4400bf1a7e5898a2b) )   /* Revision e-1 */
+	ROM_LOAD( "chp1-c.8k",    0x2000, 0x2000, CRC(745ecf40) SHA1(430f80b688a515953fab177a3ec2eb31c886df22) )   /* Revision e-1 */
+	ROM_LOAD( "chp1-c.8j",    0x4000, 0x2000, CRC(7a7f870e) SHA1(76bb9f3ef0a2fd514db63fb77f35bde12c15c29c) )   /* Revision e */
+	ROM_LOAD( "chp1-c.8h",    0x6000, 0x2000, CRC(5d8123d7) SHA1(04ddfcde969db93ff31e9c8a2af4dde285b82e2e) )   /* Revision e */
+	ROM_LOAD( "chp1-c.8f",    0x8000, 0x4000, CRC(c8a55ddb) SHA1(f91fb368542c50969a086f01a2e70ecce7f2697b) )   /* Revision e-1 */
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for the sound CPU */
 	ROM_LOAD( "chp1-c.4k",    0xe000, 0x2000, CRC(cb6ef376) SHA1(503dbcc1b18a497311bf129689d5650860bf96c7) )
 
 	ROM_REGION( 0x04000, "gfx1", ROMREGION_ERASEFF | ROMREGION_INVERT )
-	ROM_LOAD( "chp1-b.4c",    0x00000, 0x2000, CRC(e26dc8b3) SHA1(a704d39ef6f5cbad64a478e5c109b18aae427cbc) )   /* chars #1 */
+	ROM_LOAD( "chp1-b.4c",    0x00000, 0x2000, CRC(e26dc8b3) SHA1(a704d39ef6f5cbad64a478e5c109b18aae427cbc) )   /* chars #1 */ /* Revision A */
 	ROM_LOAD( "chp1-b.4d",    0x02000, 0x2000, CRC(dd1310ca) SHA1(918d2eda000244b692f1da7ac57d7a0edaef95fb) )
 
 	ROM_REGION( 0x04000, "gfx2", ROMREGION_ERASEFF | ROMREGION_INVERT )
-	ROM_LOAD( "chp1-b.4a",    0x00000, 0x2000, CRC(20fb4829) SHA1(9f0ce9379eb31c19bfacdc514ac6a28aa4217cbb) )   /* chars #2 */
+	ROM_LOAD( "chp1-b.4a",    0x00000, 0x2000, CRC(20fb4829) SHA1(9f0ce9379eb31c19bfacdc514ac6a28aa4217cbb) )   /* chars #2 */ /* Revision A */
 	ROM_LOAD( "chp1-b.4b",    0x02000, 0x2000, CRC(edc34594) SHA1(fbb4a8b979d60b183dc23bdbb7425100b9325287) )
 
 	ROM_REGION( 0x30000, "gfx3", ROMREGION_ERASEFF )
-	ROM_LOAD( "chp1-v.2r",    0x00000, 0x4000, CRC(bd1d4b2e) SHA1(492ae301a9890c2603d564c9048b1b67895052dd) )   /* chars #3 */
+	ROM_LOAD( "chp1-v.2r",    0x00000, 0x4000, CRC(bd1d4b2e) SHA1(492ae301a9890c2603d564c9048b1b67895052dd) )   /* chars #3 */ /* Same as Rev B */
 	ROM_LOAD( "chp1-v.2t",    0x04000, 0x4000, CRC(dd9a688a) SHA1(fbb98eebfbaab445928da939846a2d07a8046afb) )
 	ROM_LOAD( "chp1-v.2u",    0x08000, 0x2000, CRC(da6a3c4b) SHA1(e03469fb6f552f41a9b7f4b3e51c15a52b61cf84) )
 	/* 0a000-0bfff empty (space for 16k ROM) */
@@ -1037,28 +1136,36 @@ ROM_START( punchout )
 	/* 2c000-2ffff empty (4v doesn't exist, it is seen as a 0xff fill) */
 
 	ROM_REGION( 0x10000, "gfx4", ROMREGION_ERASEFF | ROMREGION_INVERT )
-	ROM_LOAD( "chp1-v.6p",    0x00000, 0x2000, CRC(16588f7a) SHA1(1aeaaa5cc2477c3aa4bf80df7d9474cc9ded9f15) )   /* chars #4 */
+	ROM_LOAD( "chp1-v.6p",    0x00000, 0x2000, CRC(16588f7a) SHA1(1aeaaa5cc2477c3aa4bf80df7d9474cc9ded9f15) )   /* chars #4 */ /* Revision A */
 	ROM_LOAD( "chp1-v.6n",    0x02000, 0x2000, CRC(dc743674) SHA1(660582c76ee68a7267d5686a2f8ea0fd6c2b25fc) )
 	/* 04000-07fff empty (space for 6l and 6k) */
 	ROM_LOAD( "chp1-v.8p",    0x08000, 0x2000, CRC(c2db5b4e) SHA1(39d009af597fa28d34af31aec111aa6fe09fea39) )
 	ROM_LOAD( "chp1-v.8n",    0x0a000, 0x2000, CRC(e6af390e) SHA1(73984cbdc8fbf667126ada63ab9500609eb25c61) )
 	/* 0c000-0ffff empty (space for 8l and 8k) */
 
-	ROM_REGION( 0x0d00, "proms", 0 )
-	ROM_LOAD( "chp1-b.6e",    0x0000, 0x0200, CRC(e9ca3ac6) SHA1(68d9739d8a0dadc6fe3b3767437526096ca5db98) )    /* R (top monitor) */
-	ROM_LOAD( "chp1-b.6f",    0x0200, 0x0200, CRC(02be56ab) SHA1(a88f332cb26928350ed20ab5f4c04d5324bb516a) )    /* G */
-	ROM_LOAD( "chp1-b.7f",    0x0400, 0x0200, CRC(11de55f1) SHA1(269b82f4bc73fac197e0bb6d9a90a220e77ce478) )    /* B */
-	ROM_LOAD( "chp1-b.7e",    0x0600, 0x0200, CRC(47adf7a2) SHA1(1d37d5207cd37a9c122251c60cc8f43dd680f484) )    /* R (bottom monitor) */
-	ROM_LOAD( "chp1-b.8e",    0x0800, 0x0200, CRC(b0fc15a8) SHA1(a1af09cfea81231240bd94f3b98de1be8235ebe7) )    /* G */
-	ROM_LOAD( "chp1-b.8f",    0x0a00, 0x0200, CRC(1ffd894a) SHA1(9e8c1c28b4c12acf42f814bc109d353729a25652) )    /* B */
-	ROM_LOAD( "chp1-v.2d",    0x0c00, 0x0100, CRC(71dc0d48) SHA1(dd6609f547d74887f520d7e71a1a00317ff181d0) )    /* timing - not used */
+	ROM_REGION( 0x2100, "proms", ROMREGION_ERASEFF ) // see driver notes
+	// pink labeled color proms
+	ROM_LOAD( "chp1-b-6e_pink.6e",  0x0000, 0x0200, CRC(e9ca3ac6) SHA1(68d9739d8a0dadc6fe3b3767437526096ca5db98) )  /* R (top monitor) */
+	ROM_LOAD( "chp1-b-6f_pink.6f",  0x0200, 0x0200, CRC(02be56ab) SHA1(a88f332cb26928350ed20ab5f4c04d5324bb516a) )  /* G */
+	ROM_LOAD( "chp1-b-7f_pink.7f",  0x0400, 0x0200, CRC(11de55f1) SHA1(269b82f4bc73fac197e0bb6d9a90a220e77ce478) )  /* B */
+	ROM_LOAD( "chp1-b-7e_pink.7e",  0x0600, 0x0200, CRC(fddaa777) SHA1(ee6bff5ffeefc82374868a268f885d0bc3a76da2) )  /* R (bottom monitor) */
+	ROM_LOAD( "chp1-b-8e_pink.8e",  0x0800, 0x0200, CRC(c3d5d71f) SHA1(2b02479614a801f539fead17860b84e9a180e761) )  /* G */
+	ROM_LOAD( "chp1-b-8f_pink.8f",  0x0a00, 0x0200, CRC(a3037155) SHA1(8b6c0c80278ca859a08a1a2429190d51be4f9401) )  /* B */
+	// white labeled color proms (indices are reversed)
+	ROM_LOAD( "chp1-b-6e_white.6e", 0x1000, 0x0200, CRC(ddac5f0e) SHA1(25dabe415757ccea057609a3f3f79a56b613032a) )  /* R (top monitor) */
+	ROM_LOAD( "chp1-b-6f_white.6f", 0x1200, 0x0200, CRC(846c6261) SHA1(f012a02bbdf0166b9bfd3dc9749db18759a22421) )  /* G */
+	ROM_LOAD( "chp1-b-7f_white.7f", 0x1400, 0x0200, CRC(1682dd30) SHA1(84b92d1b292210bda0c25537c8ee3e274aaac75c) )  /* B */
+	ROM_LOAD( "chp1-b-7e_white.7e", 0x1600, 0x0200, CRC(47adf7a2) SHA1(1d37d5207cd37a9c122251c60cc8f43dd680f484) )  /* R (bottom monitor) */
+	ROM_LOAD( "chp1-b-8e_white.8e", 0x1800, 0x0200, CRC(b0fc15a8) SHA1(a1af09cfea81231240bd94f3b98de1be8235ebe7) )  /* G */
+	ROM_LOAD( "chp1-b-8f_white.8f", 0x1a00, 0x0200, CRC(1ffd894a) SHA1(9e8c1c28b4c12acf42f814bc109d353729a25652) )  /* B */
+	ROM_LOAD( "chp1-v-2d.2d",       0x2000, 0x0100, CRC(71dc0d48) SHA1(dd6609f547d74887f520d7e71a1a00317ff181d0) )  /* timing - not used */
 
 	ROM_REGION( 0x4000, "vlm", 0 )  /* 16k for the VLM5030 data */
 	ROM_LOAD( "chp1-c.6p",    0x0000, 0x4000, CRC(ea0bbb31) SHA1(b1da024cb688341d39791a78d1144fe09acb00cf) )
 ROM_END
 
 ROM_START( punchoutj )
-	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )     /* 64k for code */
 	ROM_LOAD( "chp1-c_8l_a.8l", 0x0000, 0x2000, CRC(9735eb5a) SHA1(0c68e91568845ae3cda5eb6f62c2e271f66c79b4) )
 	ROM_LOAD( "chp1-c_8k_a.8k", 0x2000, 0x2000, CRC(98baba41) SHA1(87d6ab86cf593e0098edbee62727b253489bdb47) )
 	ROM_LOAD( "chp1-c_8j_a.8j", 0x4000, 0x2000, CRC(7a7f870e) SHA1(76bb9f3ef0a2fd514db63fb77f35bde12c15c29c) )
@@ -1103,17 +1210,25 @@ ROM_START( punchoutj )
 	ROM_LOAD( "chp1-v_8n_a.8n", 0x0a000, 0x2000, CRC(e6af390e) SHA1(73984cbdc8fbf667126ada63ab9500609eb25c61) )
 	/* 0c000-0ffff empty (space for 8l and 8k) */
 
-	ROM_REGION( 0x0d00, "proms", 0 )
-	ROM_LOAD( "chp1-b-6e.6e", 0x0000, 0x0200, CRC(e9ca3ac6) SHA1(68d9739d8a0dadc6fe3b3767437526096ca5db98) )    /* R (top monitor) */
-	ROM_LOAD( "chp1-b-6f.6f", 0x0200, 0x0200, CRC(02be56ab) SHA1(a88f332cb26928350ed20ab5f4c04d5324bb516a) )    /* G */
-	ROM_LOAD( "chp1-b-7f.7f", 0x0400, 0x0200, CRC(11de55f1) SHA1(269b82f4bc73fac197e0bb6d9a90a220e77ce478) )    /* B */
-	ROM_LOAD( "chp1-b-7e.7e", 0x0600, 0x0200, CRC(47adf7a2) SHA1(1d37d5207cd37a9c122251c60cc8f43dd680f484) )    /* R (bottom monitor) */
-	ROM_LOAD( "chp1-b-8e.8e", 0x0800, 0x0200, CRC(b0fc15a8) SHA1(a1af09cfea81231240bd94f3b98de1be8235ebe7) )    /* G */
-	ROM_LOAD( "chp1-b-8f.8f", 0x0a00, 0x0200, CRC(1ffd894a) SHA1(9e8c1c28b4c12acf42f814bc109d353729a25652) )    /* B */
-	ROM_LOAD( "chp1-v-2d.2d", 0x0c00, 0x0100, CRC(71dc0d48) SHA1(dd6609f547d74887f520d7e71a1a00317ff181d0) )    /* timing - not used */
+	ROM_REGION( 0x2100, "proms", ROMREGION_ERASEFF ) // see driver notes
+	// pink labeled color proms
+	ROM_LOAD( "chp1-b-6e_pink.6e",  0x0000, 0x0200, CRC(e9ca3ac6) SHA1(68d9739d8a0dadc6fe3b3767437526096ca5db98) )  /* R (top monitor) */
+	ROM_LOAD( "chp1-b-6f_pink.6f",  0x0200, 0x0200, CRC(02be56ab) SHA1(a88f332cb26928350ed20ab5f4c04d5324bb516a) )  /* G */
+	ROM_LOAD( "chp1-b-7f_pink.7f",  0x0400, 0x0200, CRC(11de55f1) SHA1(269b82f4bc73fac197e0bb6d9a90a220e77ce478) )  /* B */
+	ROM_LOAD( "chp1-b-7e_pink.7e",  0x0600, 0x0200, CRC(fddaa777) SHA1(ee6bff5ffeefc82374868a268f885d0bc3a76da2) )  /* R (bottom monitor) */
+	ROM_LOAD( "chp1-b-8e_pink.8e",  0x0800, 0x0200, CRC(c3d5d71f) SHA1(2b02479614a801f539fead17860b84e9a180e761) )  /* G */
+	ROM_LOAD( "chp1-b-8f_pink.8f",  0x0a00, 0x0200, CRC(a3037155) SHA1(8b6c0c80278ca859a08a1a2429190d51be4f9401) )  /* B */
+	// white labeled color proms (indices are reversed)
+	ROM_LOAD( "chp1-b-6e_white.6e", 0x1000, 0x0200, CRC(ddac5f0e) SHA1(25dabe415757ccea057609a3f3f79a56b613032a) )  /* R (top monitor) */
+	ROM_LOAD( "chp1-b-6f_white.6f", 0x1200, 0x0200, CRC(846c6261) SHA1(f012a02bbdf0166b9bfd3dc9749db18759a22421) )  /* G */
+	ROM_LOAD( "chp1-b-7f_white.7f", 0x1400, 0x0200, CRC(1682dd30) SHA1(84b92d1b292210bda0c25537c8ee3e274aaac75c) )  /* B */
+	ROM_LOAD( "chp1-b-7e_white.7e", 0x1600, 0x0200, CRC(47adf7a2) SHA1(1d37d5207cd37a9c122251c60cc8f43dd680f484) )  /* R (bottom monitor) */
+	ROM_LOAD( "chp1-b-8e_white.8e", 0x1800, 0x0200, CRC(b0fc15a8) SHA1(a1af09cfea81231240bd94f3b98de1be8235ebe7) )  /* G */
+	ROM_LOAD( "chp1-b-8f_white.8f", 0x1a00, 0x0200, CRC(1ffd894a) SHA1(9e8c1c28b4c12acf42f814bc109d353729a25652) )  /* B */
+	ROM_LOAD( "chp1-v-2d.2d",       0x2000, 0x0100, CRC(71dc0d48) SHA1(dd6609f547d74887f520d7e71a1a00317ff181d0) )  /* timing - not used */
 
 	ROM_REGION( 0x4000, "vlm", 0 )  /* 16k for the VLM5030 data */
-	ROM_LOAD( "chp1-c_6p_a.6p",    0x0000, 0x4000, CRC(597955ca) SHA1(e03b1ff1b506d38515d74710ced741d4e50e04b2) )
+	ROM_LOAD( "chp1-c_6p_a.6p",  0x0000, 0x4000, CRC(597955ca) SHA1(e03b1ff1b506d38515d74710ced741d4e50e04b2) )
 ROM_END
 
 /* Italian bootleg set from an original board found in Italy,
@@ -1123,7 +1238,7 @@ ROM_END
 
 ROM_START( punchita )
 	/* Unique to this set */
-	ROM_REGION( 0x10000, "maincpu", 0 ) /* 64k for code */
+	ROM_REGION( 0x10000, "maincpu", 0 )     /* 64k for code */
 	ROM_LOAD( "chp1-c(__ita).8l",    0x0000, 0x2000, CRC(1d595ce2) SHA1(affd43bef96c68f953e66cfa14ad4e9c304dc022) )
 	ROM_LOAD( "chp1-c(__ita).8k",    0x2000, 0x2000, CRC(c062fa5c) SHA1(8ebd6fd76f1fd1b85216a4e21d8a13be8317b9e2) )
 	ROM_LOAD( "chp1-c(__ita).8j",    0x4000, 0x2000, CRC(48d453ef) SHA1(145f3ace8bec87e83b64c6472e2b71f1ebea13ea) )
@@ -1195,21 +1310,29 @@ ROM_START( punchita )
 	ROM_CONTINUE(             0x0b800, 0x0800 )
 	/* 0c000-0ffff empty (space for 8l and 8k) */
 
-	ROM_REGION( 0x0d00, "proms", 0 )
-	ROM_LOAD( "chp1-b.6e",    0x0000, 0x0200, CRC(e9ca3ac6) SHA1(68d9739d8a0dadc6fe3b3767437526096ca5db98) )    /* R (top monitor) */
-	ROM_LOAD( "chp1-b.6f",    0x0200, 0x0200, CRC(02be56ab) SHA1(a88f332cb26928350ed20ab5f4c04d5324bb516a) )    /* G */
-	ROM_LOAD( "chp1-b.7f",    0x0400, 0x0200, CRC(11de55f1) SHA1(269b82f4bc73fac197e0bb6d9a90a220e77ce478) )    /* B */
-	ROM_LOAD( "chp1-b.7e",    0x0600, 0x0200, CRC(47adf7a2) SHA1(1d37d5207cd37a9c122251c60cc8f43dd680f484) )    /* R (bottom monitor) */
-	ROM_LOAD( "chp1-b.8e",    0x0800, 0x0200, CRC(b0fc15a8) SHA1(a1af09cfea81231240bd94f3b98de1be8235ebe7) )    /* G */
-	ROM_LOAD( "chp1-b.8f",    0x0a00, 0x0200, CRC(1ffd894a) SHA1(9e8c1c28b4c12acf42f814bc109d353729a25652) )    /* B */
-	ROM_LOAD( "chp1-v.2d",    0x0c00, 0x0100, CRC(71dc0d48) SHA1(dd6609f547d74887f520d7e71a1a00317ff181d0) )    /* timing - not used */
+	ROM_REGION( 0x2100, "proms", ROMREGION_ERASEFF ) // see driver notes
+	// pink labeled color proms
+	ROM_LOAD( "chp1-b-6e_pink.6e",  0x0000, 0x0200, CRC(e9ca3ac6) SHA1(68d9739d8a0dadc6fe3b3767437526096ca5db98) )  /* R (top monitor) */
+	ROM_LOAD( "chp1-b-6f_pink.6f",  0x0200, 0x0200, CRC(02be56ab) SHA1(a88f332cb26928350ed20ab5f4c04d5324bb516a) )  /* G */
+	ROM_LOAD( "chp1-b-7f_pink.7f",  0x0400, 0x0200, CRC(11de55f1) SHA1(269b82f4bc73fac197e0bb6d9a90a220e77ce478) )  /* B */
+	ROM_LOAD( "chp1-b-7e_pink.7e",  0x0600, 0x0200, CRC(fddaa777) SHA1(ee6bff5ffeefc82374868a268f885d0bc3a76da2) )  /* R (bottom monitor) */
+	ROM_LOAD( "chp1-b-8e_pink.8e",  0x0800, 0x0200, CRC(c3d5d71f) SHA1(2b02479614a801f539fead17860b84e9a180e761) )  /* G */
+	ROM_LOAD( "chp1-b-8f_pink.8f",  0x0a00, 0x0200, CRC(a3037155) SHA1(8b6c0c80278ca859a08a1a2429190d51be4f9401) )  /* B */
+	// white labeled color proms (indices are reversed)
+	ROM_LOAD( "chp1-b-6e_white.6e", 0x1000, 0x0200, CRC(ddac5f0e) SHA1(25dabe415757ccea057609a3f3f79a56b613032a) )  /* R (top monitor) */
+	ROM_LOAD( "chp1-b-6f_white.6f", 0x1200, 0x0200, CRC(846c6261) SHA1(f012a02bbdf0166b9bfd3dc9749db18759a22421) )  /* G */
+	ROM_LOAD( "chp1-b-7f_white.7f", 0x1400, 0x0200, CRC(1682dd30) SHA1(84b92d1b292210bda0c25537c8ee3e274aaac75c) )  /* B */
+	ROM_LOAD( "chp1-b-7e_white.7e", 0x1600, 0x0200, CRC(47adf7a2) SHA1(1d37d5207cd37a9c122251c60cc8f43dd680f484) )  /* R (bottom monitor) */
+	ROM_LOAD( "chp1-b-8e_white.8e", 0x1800, 0x0200, CRC(b0fc15a8) SHA1(a1af09cfea81231240bd94f3b98de1be8235ebe7) )  /* G */
+	ROM_LOAD( "chp1-b-8f_white.8f", 0x1a00, 0x0200, CRC(1ffd894a) SHA1(9e8c1c28b4c12acf42f814bc109d353729a25652) )  /* B */
+	ROM_LOAD( "chp1-v-2d.2d",       0x2000, 0x0100, CRC(71dc0d48) SHA1(dd6609f547d74887f520d7e71a1a00317ff181d0) )  /* timing - not used */
 
 	ROM_REGION( 0x4000, "vlm", 0 )  /* 16k for the VLM5030 data */
 	ROM_LOAD( "chp1-c.6p",    0x0000, 0x4000, CRC(ea0bbb31) SHA1(b1da024cb688341d39791a78d1144fe09acb00cf) )
 ROM_END
 
 ROM_START( spnchout )
-	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )     /* 64k for code */
 	ROM_LOAD( "chs1-c.8l",    0x0000, 0x2000, CRC(703b9780) SHA1(93b2fd8392ef094413330cd2474ac406c3db426e) )
 	ROM_LOAD( "chs1-c.8k",    0x2000, 0x2000, CRC(e13719f6) SHA1(d0f08a0999801dd5d55f2f4ae3e76f25b765b8d6) )
 	ROM_LOAD( "chs1-c.8j",    0x4000, 0x2000, CRC(1fa629e8) SHA1(e0c37883e65c77e9f25e323fb4dc05f7dcdc6347) )
@@ -1275,21 +1398,93 @@ ROM_START( spnchout )
 	ROM_CONTINUE(             0x0b800, 0x0800 )
 	/* 0c000-0ffff empty (space for 8l and 8k) */
 
-	ROM_REGION( 0x0d00, "proms", 0 )
-	ROM_LOAD( "chs1-b.6e",    0x0000, 0x0200, CRC(0ad4d727) SHA1(5fa4247d58d10b4644f0a7492efb22b7a9ce7b62) )    /* R (top monitor) */
-	ROM_LOAD( "chs1-b.6f",    0x0200, 0x0200, CRC(86f5cfdb) SHA1(a2a3a4e9ca15826fe8c86650d50c8ce203d57eae) )    /* G */
-	ROM_LOAD( "chs1-b.7f",    0x0400, 0x0200, CRC(8bd406f8) SHA1(eaf0b62eccf1f47452bf983b3ffc6cacc25d4585) )    /* B */
-	ROM_LOAD( "chs1-b.7e",    0x0600, 0x0200, CRC(9e170f64) SHA1(9548bfec2f5b7d222e91562b5459aef8c107b3ec) )    /* R (bottom monitor) */
-	ROM_LOAD( "chs1-b.8e",    0x0800, 0x0200, CRC(3a2e333b) SHA1(5cf0324cc07ac4af63598c5c6acc61d24215b233) )    /* G */
-	ROM_LOAD( "chs1-b.8f",    0x0a00, 0x0200, CRC(1663eed7) SHA1(90ff876a6b885f8a80c17531cde8b91864f1a6a5) )    /* B */
-	ROM_LOAD( "chs1-v.2d",    0x0c00, 0x0100, CRC(71dc0d48) SHA1(dd6609f547d74887f520d7e71a1a00317ff181d0) )    /* timing - not used */
+	ROM_REGION( 0x2100, "proms", ROMREGION_ERASEFF ) // see driver notes
+	// pink labeled color proms
+	ROM_LOAD( "chs1-b-6e_pink.6e",  0x0000, 0x0200, CRC(0ad4d727) SHA1(5fa4247d58d10b4644f0a7492efb22b7a9ce7b62) )  /* R (top monitor) */
+	ROM_LOAD( "chs1-b-6f_pink.6f",  0x0200, 0x0200, CRC(86f5cfdb) SHA1(a2a3a4e9ca15826fe8c86650d50c8ce203d57eae) )  /* G */
+	ROM_LOAD( "chs1-b-7f_pink.7f",  0x0400, 0x0200, CRC(8bd406f8) SHA1(eaf0b62eccf1f47452bf983b3ffc6cacc25d4585) )  /* B */
+	ROM_LOAD( "chs1-b-7e_pink.7e",  0x0600, 0x0200, CRC(4c7e3a67) SHA1(a6b3436673ba31e04a7614b71bc4039ad4ce56f1) )  /* R (bottom monitor) */
+	ROM_LOAD( "chs1-b-8e_pink.8e",  0x0800, 0x0200, CRC(ec659313) SHA1(a1209650187fce92ef63d77b3ef190e49fdb2e2b) )  /* G */
+	ROM_LOAD( "chs1-b-8f_pink.8f",  0x0a00, 0x0200, CRC(8b493c09) SHA1(607d4237ebf41009db567009949d685bceee1f23) )  /* B */
+	// white labeled color proms (indices are reversed)
+	ROM_LOAD( "chs1-b-6e_white.6e", 0x1000, 0x0200, CRC(8efd867f) SHA1(d5f2bfe750bb5d472922bdb7e915ee28a3eec9bd) )  /* R (top monitor) */
+	ROM_LOAD( "chs1-b-6f_white.6f", 0x1200, 0x0200, CRC(279d6cbc) SHA1(aea56970801908b4d51be0c15043c7b315d2637f) )  /* G */
+	ROM_LOAD( "chs1-b-7f_white.7f", 0x1400, 0x0200, CRC(cad6b7ad) SHA1(62b61d5fa47ca6e2dd15295674dff62e4e69471a) )  /* B */
+	ROM_LOAD( "chs1-b-7e_white.7e", 0x1600, 0x0200, CRC(9e170f64) SHA1(9548bfec2f5b7d222e91562b5459aef8c107b3ec) )  /* R (bottom monitor) */
+	ROM_LOAD( "chs1-b-8e_white.8e", 0x1800, 0x0200, CRC(3a2e333b) SHA1(5cf0324cc07ac4af63598c5c6acc61d24215b233) )  /* G */
+	ROM_LOAD( "chs1-b-8f_white.8f", 0x1a00, 0x0200, CRC(1663eed7) SHA1(90ff876a6b885f8a80c17531cde8b91864f1a6a5) )  /* B */
+	ROM_LOAD( "chs1-v.2d",          0x2000, 0x0100, CRC(71dc0d48) SHA1(dd6609f547d74887f520d7e71a1a00317ff181d0) )  /* timing - not used */
 
 	ROM_REGION( 0x10000, "vlm", 0 ) /* 64k for the VLM5030 data */
 	ROM_LOAD( "chs1-c.6p",    0x0000, 0x4000, CRC(ad8b64b8) SHA1(0f1232a10faf71b782f9f6653cca8570243c17e0) )
 ROM_END
 
+ROM_START( spnchouta )
+	ROM_REGION( 0x10000, "maincpu", 0 )     /* 64k for code */
+	ROM_LOAD( "chs1-c.8l",    0x0000, 0x2000, CRC(703b9780) SHA1(93b2fd8392ef094413330cd2474ac406c3db426e) )    /* Revision e-1 */
+	ROM_LOAD( "chs1-c.8k",    0x2000, 0x2000, CRC(e13719f6) SHA1(d0f08a0999801dd5d55f2f4ae3e76f25b765b8d6) )    /* Revision e-1 */
+	ROM_LOAD( "chs1-c.8j",    0x4000, 0x2000, CRC(1fa629e8) SHA1(e0c37883e65c77e9f25e323fb4dc05f7dcdc6347) )    /* Revision e */
+	ROM_LOAD( "chs1-c.8h",    0x6000, 0x2000, CRC(15a6c068) SHA1(3f42697a6d79c6fd4b638feb366c80e98a7f02e2) )    /* Revision e */
+	ROM_LOAD( "chs1-c.8f",    0x8000, 0x4000, CRC(4ff3cdd9) SHA1(282edf9a3fa085bc82523249a519f2a3fe04e87e) )    /* Revision e-1 */
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for the sound CPU */
+	ROM_LOAD( "chp1-c.4k",    0xe000, 0x2000, CRC(cb6ef376) SHA1(503dbcc1b18a497311bf129689d5650860bf96c7) )
+
+	ROM_REGION( 0x04000, "gfx1", ROMREGION_ERASEFF | ROMREGION_INVERT )
+	ROM_LOAD( "chs1-b.4c",    0x00000, 0x2000, CRC(b017e1e9) SHA1(39e98f48bff762a674a2506efa39b3619337a1e0) )   /* chars #1 */ /* Revision A */
+	ROM_LOAD( "chs1-b.4d",    0x02000, 0x2000, CRC(e3de9d18) SHA1(f55b6f522e127e6239197dd7eb1564e6f275df74) )   /* Revision A */
+
+	ROM_REGION( 0x04000, "gfx2", ROMREGION_ERASEFF | ROMREGION_INVERT )
+	ROM_LOAD( "chp1-b.4a",    0x00000, 0x2000, CRC(20fb4829) SHA1(9f0ce9379eb31c19bfacdc514ac6a28aa4217cbb) )   /* chars #2 */ /* Revision A */
+	ROM_LOAD( "chp1-b.4b",    0x02000, 0x2000, CRC(edc34594) SHA1(fbb4a8b979d60b183dc23bdbb7425100b9325287) )   /* Revision A */
+
+	ROM_REGION( 0x30000, "gfx3", ROMREGION_ERASEFF )
+	ROM_LOAD( "chs1-v.2r",    0x00000, 0x4000, CRC(ff33405d) SHA1(31b892d184d24a0ec05fd6facec61a532ce8535b) )   /* chars #3 */
+	ROM_LOAD( "chs1-v.2t",    0x04000, 0x4000, CRC(f507818b) SHA1(fb99c5c88e829d7e81c53ead21554a614b6fdcf9) )
+	ROM_LOAD( "chs1-v.2u",    0x08000, 0x4000, CRC(0995fc95) SHA1(d056fc61ad2409525622b4db69796668c3145460) )
+	ROM_LOAD( "chs1-v.2v",    0x0c000, 0x2000, CRC(f44d9878) SHA1(327a8bbc8f1a33fcf95ebc75db97406feb6435d9) )
+	/* 0e000-0ffff empty (space for 16k ROM) */
+	ROM_LOAD( "chs1-v.3r",    0x10000, 0x4000, CRC(09570945) SHA1(c3e2a8f76eebacc9042d087db2dfdc8ea267d46a) )
+	ROM_LOAD( "chs1-v.3t",    0x14000, 0x4000, CRC(42c6861c) SHA1(2b160cde3cc3ee7adb276fe719f7919c9295ba38) )
+	ROM_LOAD( "chs1-v.3u",    0x18000, 0x4000, CRC(bf5d02dd) SHA1(f1f4932fc258c087783450e7c964902fa45c4568) )
+	ROM_LOAD( "chs1-v.3v",    0x1c000, 0x2000, CRC(5673f4fc) SHA1(682a81b60494b2c77d1da312c97bc807021eac67) )
+	/* 1e000-1ffff empty (space for 16k ROM) */
+	ROM_LOAD( "chs1-v.4r",    0x20000, 0x4000, CRC(8e155758) SHA1(d21ce2d81b2d47e5ff091e48cf46d41d01ea6314) )
+	ROM_LOAD( "chs1-v.4t",    0x24000, 0x4000, CRC(b4e43448) SHA1(1ed6bf913c15851cf86554713c122b55c18c5d67) )
+	ROM_LOAD( "chs1-v.4u",    0x28000, 0x4000, CRC(74e0d956) SHA1(b172cdcc5d26f3be06a7f0f9e19879957e87f992) )
+	/* 2c000-2ffff empty (4v doesn't exist, it is seen as a 0xff fill) */
+
+	ROM_REGION( 0x10000, "gfx4", ROMREGION_ERASEFF | ROMREGION_INVERT )
+	ROM_LOAD( "chp1-v.6p",    0x00000, 0x2000, CRC(16588f7a) SHA1(1aeaaa5cc2477c3aa4bf80df7d9474cc9ded9f15) )   /* chars #4 */ /* Revision A */
+	ROM_LOAD( "chp1-v.6n",    0x02000, 0x2000, CRC(dc743674) SHA1(660582c76ee68a7267d5686a2f8ea0fd6c2b25fc) )   /* Revision A */
+	/* 04000-07fff empty (space for 6l and 6k) */
+	ROM_LOAD( "chp1-v.8p",    0x08000, 0x2000, CRC(c2db5b4e) SHA1(39d009af597fa28d34af31aec111aa6fe09fea39) )   /* Revision A */
+	ROM_LOAD( "chp1-v.8n",    0x0a000, 0x2000, CRC(e6af390e) SHA1(73984cbdc8fbf667126ada63ab9500609eb25c61) )   /* Revision A */
+	/* 0c000-0ffff empty (space for 8l and 8k) */
+
+	ROM_REGION( 0x2100, "proms", ROMREGION_ERASEFF ) // see driver notes
+	// pink labeled color proms
+	ROM_LOAD( "chs1-b-6e_pink.6e",  0x0000, 0x0200, CRC(0ad4d727) SHA1(5fa4247d58d10b4644f0a7492efb22b7a9ce7b62) )  /* R (top monitor) */
+	ROM_LOAD( "chs1-b-6f_pink.6f",  0x0200, 0x0200, CRC(86f5cfdb) SHA1(a2a3a4e9ca15826fe8c86650d50c8ce203d57eae) )  /* G */
+	ROM_LOAD( "chs1-b-7f_pink.7f",  0x0400, 0x0200, CRC(8bd406f8) SHA1(eaf0b62eccf1f47452bf983b3ffc6cacc25d4585) )  /* B */
+	ROM_LOAD( "chs1-b-7e_pink.7e",  0x0600, 0x0200, CRC(4c7e3a67) SHA1(a6b3436673ba31e04a7614b71bc4039ad4ce56f1) )  /* R (bottom monitor) */
+	ROM_LOAD( "chs1-b-8e_pink.8e",  0x0800, 0x0200, CRC(ec659313) SHA1(a1209650187fce92ef63d77b3ef190e49fdb2e2b) )  /* G */
+	ROM_LOAD( "chs1-b-8f_pink.8f",  0x0a00, 0x0200, CRC(8b493c09) SHA1(607d4237ebf41009db567009949d685bceee1f23) )  /* B */
+	// white labeled color proms (indices are reversed)
+	ROM_LOAD( "chs1-b-6e_white.6e", 0x1000, 0x0200, CRC(8efd867f) SHA1(d5f2bfe750bb5d472922bdb7e915ee28a3eec9bd) )  /* R (top monitor) */
+	ROM_LOAD( "chs1-b-6f_white.6f", 0x1200, 0x0200, CRC(279d6cbc) SHA1(aea56970801908b4d51be0c15043c7b315d2637f) )  /* G */
+	ROM_LOAD( "chs1-b-7f_white.7f", 0x1400, 0x0200, CRC(cad6b7ad) SHA1(62b61d5fa47ca6e2dd15295674dff62e4e69471a) )  /* B */
+	ROM_LOAD( "chs1-b-7e_white.7e", 0x1600, 0x0200, CRC(9e170f64) SHA1(9548bfec2f5b7d222e91562b5459aef8c107b3ec) )  /* R (bottom monitor) */
+	ROM_LOAD( "chs1-b-8e_white.8e", 0x1800, 0x0200, CRC(3a2e333b) SHA1(5cf0324cc07ac4af63598c5c6acc61d24215b233) )  /* G */
+	ROM_LOAD( "chs1-b-8f_white.8f", 0x1a00, 0x0200, CRC(1663eed7) SHA1(90ff876a6b885f8a80c17531cde8b91864f1a6a5) )  /* B */
+	ROM_LOAD( "chs1-v.2d",          0x2000, 0x0100, CRC(71dc0d48) SHA1(dd6609f547d74887f520d7e71a1a00317ff181d0) )  /* timing - not used */
+
+	ROM_REGION( 0x4000, "vlm", 0 )	/* 16k for the VLM5030 data */
+	ROM_LOAD( "chs1-c.6p",    0x0000, 0x4000, CRC(ad8b64b8) SHA1(0f1232a10faf71b782f9f6653cca8570243c17e0) )
+ROM_END
+
 ROM_START( spnchoutj )
-	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )     /* 64k for code */
 	ROM_LOAD( "chs1c8la.bin", 0x0000, 0x2000, CRC(dc2a592b) SHA1(a8a7fc5c836e2723ba6abcb1137f4c4f79e21c87) )
 	ROM_LOAD( "chs1c8ka.bin", 0x2000, 0x2000, CRC(ce687182) SHA1(f07d930d90eda199b089f9023b51fd4456c87bdf) )
 	ROM_LOAD( "chs1-c.8j",    0x4000, 0x2000, CRC(1fa629e8) SHA1(e0c37883e65c77e9f25e323fb4dc05f7dcdc6347) )
@@ -1349,21 +1544,29 @@ ROM_START( spnchoutj )
 	ROM_CONTINUE(             0x0b800, 0x0800 )
 	/* 0c000-0ffff empty (space for 8l and 8k) */
 
-	ROM_REGION( 0x0d00, "proms", 0 )
-	ROM_LOAD( "chs1b_6e.bpr", 0x0000, 0x0200, CRC(8efd867f) SHA1(d5f2bfe750bb5d472922bdb7e915ee28a3eec9bd) )    /* R (top monitor) */
-	ROM_LOAD( "chs1b_6f.bpr", 0x0200, 0x0200, CRC(279d6cbc) SHA1(aea56970801908b4d51be0c15043c7b315d2637f) )    /* G */
-	ROM_LOAD( "chs1b_7f.bpr", 0x0400, 0x0200, CRC(cad6b7ad) SHA1(62b61d5fa47ca6e2dd15295674dff62e4e69471a) )    /* B */
-	ROM_LOAD( "chs1-b.7e",    0x0600, 0x0200, CRC(9e170f64) SHA1(9548bfec2f5b7d222e91562b5459aef8c107b3ec) )    /* R (bottom monitor) */
-	ROM_LOAD( "chs1-b.8e",    0x0800, 0x0200, CRC(3a2e333b) SHA1(5cf0324cc07ac4af63598c5c6acc61d24215b233) )    /* G */
-	ROM_LOAD( "chs1-b.8f",    0x0a00, 0x0200, CRC(1663eed7) SHA1(90ff876a6b885f8a80c17531cde8b91864f1a6a5) )    /* B */
-	ROM_LOAD( "chs1-v.2d",    0x0c00, 0x0100, CRC(71dc0d48) SHA1(dd6609f547d74887f520d7e71a1a00317ff181d0) )    /* timing - not used */
+	ROM_REGION( 0x2100, "proms", ROMREGION_ERASEFF ) // see driver notes
+	// pink labeled color proms
+	ROM_LOAD( "chs1-b-6e_pink.6e",  0x0000, 0x0200, CRC(0ad4d727) SHA1(5fa4247d58d10b4644f0a7492efb22b7a9ce7b62) )  /* R (top monitor) */
+	ROM_LOAD( "chs1-b-6f_pink.6f",  0x0200, 0x0200, CRC(86f5cfdb) SHA1(a2a3a4e9ca15826fe8c86650d50c8ce203d57eae) )  /* G */
+	ROM_LOAD( "chs1-b-7f_pink.7f",  0x0400, 0x0200, CRC(8bd406f8) SHA1(eaf0b62eccf1f47452bf983b3ffc6cacc25d4585) )  /* B */
+	ROM_LOAD( "chs1-b-7e_pink.7e",  0x0600, 0x0200, CRC(4c7e3a67) SHA1(a6b3436673ba31e04a7614b71bc4039ad4ce56f1) )  /* R (bottom monitor) */
+	ROM_LOAD( "chs1-b-8e_pink.8e",  0x0800, 0x0200, CRC(ec659313) SHA1(a1209650187fce92ef63d77b3ef190e49fdb2e2b) )  /* G */
+	ROM_LOAD( "chs1-b-8f_pink.8f",  0x0a00, 0x0200, CRC(8b493c09) SHA1(607d4237ebf41009db567009949d685bceee1f23) )  /* B */
+	// white labeled color proms (indices are reversed)
+	ROM_LOAD( "chs1-b-6e_white.6e", 0x1000, 0x0200, CRC(8efd867f) SHA1(d5f2bfe750bb5d472922bdb7e915ee28a3eec9bd) )  /* R (top monitor) */
+	ROM_LOAD( "chs1-b-6f_white.6f", 0x1200, 0x0200, CRC(279d6cbc) SHA1(aea56970801908b4d51be0c15043c7b315d2637f) )  /* G */
+	ROM_LOAD( "chs1-b-7f_white.7f", 0x1400, 0x0200, CRC(cad6b7ad) SHA1(62b61d5fa47ca6e2dd15295674dff62e4e69471a) )  /* B */
+	ROM_LOAD( "chs1-b-7e_white.7e", 0x1600, 0x0200, CRC(9e170f64) SHA1(9548bfec2f5b7d222e91562b5459aef8c107b3ec) )  /* R (bottom monitor) */
+	ROM_LOAD( "chs1-b-8e_white.8e", 0x1800, 0x0200, CRC(3a2e333b) SHA1(5cf0324cc07ac4af63598c5c6acc61d24215b233) )  /* G */
+	ROM_LOAD( "chs1-b-8f_white.8f", 0x1a00, 0x0200, CRC(1663eed7) SHA1(90ff876a6b885f8a80c17531cde8b91864f1a6a5) )  /* B */
+	ROM_LOAD( "chs1-v.2d",          0x2000, 0x0100, CRC(71dc0d48) SHA1(dd6609f547d74887f520d7e71a1a00317ff181d0) )  /* timing - not used */
 
 	ROM_REGION( 0x10000, "vlm", 0 ) /* 64k for the VLM5030 data */
 	ROM_LOAD( "chs1c6pa.bin", 0x0000, 0x4000, CRC(d05fb730) SHA1(9f4c4c7e5113739312558eff4d3d3e42d513aa31) )
 ROM_END
 
 ROM_START( armwrest )
-	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )     /* 64k for code */
 	ROM_LOAD( "chv1-c.8l",    0x0000, 0x2000, CRC(b09764c1) SHA1(2f32acd689ef70ec81fe958c7a604855ae39cf5e) )
 	ROM_LOAD( "chv1-c.8k",    0x2000, 0x2000, CRC(0e147ff7) SHA1(7ea8b7b5562d9432c6cace2ee13377f91543975d) )
 	ROM_LOAD( "chv1-c.8j",    0x4000, 0x2000, CRC(e7365289) SHA1(9d4ed5ce73b93c3917b1411ed902974e2a4f3d35) )
@@ -1420,9 +1623,11 @@ ROM_END
 
 
 
-GAME( 1984, punchout,  0,        punchout, punchout, punchout_state, punchout, ROT0, "Nintendo", "Punch-Out!!", 0 )
-GAME( 1984, punchoutj, punchout, punchout, punchout, punchout_state, punchout, ROT0, "Nintendo", "Punch-Out!! (Japan)", 0 )
-GAME( 1984, punchita,  punchout, punchout, punchout, punchout_state, spnchout, ROT0, "bootleg",  "Punch-Out!! (Italian bootleg)", 0 )
-GAME( 1984, spnchout,  0,        punchout, spnchout, punchout_state, spnchout, ROT0, "Nintendo", "Super Punch-Out!!", 0 )
-GAME( 1984, spnchoutj, spnchout, punchout, spnchout, punchout_state, spnchotj, ROT0, "Nintendo", "Super Punch-Out!! (Japan)", 0 )
-GAME( 1985, armwrest,  0,        armwrest, armwrest, punchout_state, armwrest, ROT0, "Nintendo", "Arm Wrestling", 0 )
+GAME( 1984, punchout,  0,        punchout, punchout, driver_device, 0, ROT0, "Nintendo", "Punch-Out!! (Rev B)", 0 ) /* CHP1-02 boards */
+GAME( 1984, punchouta, punchout, punchout, punchout, driver_device, 0, ROT0, "Nintendo", "Punch-Out!! (Rev A)", 0 ) /* CHP1-01 boards */
+GAME( 1984, punchoutj, punchout, punchout, punchout, driver_device, 0, ROT0, "Nintendo", "Punch-Out!! (Japan)", 0 )
+GAME( 1984, punchita,  punchout, punchout, punchout, driver_device, 0, ROT0, "bootleg",  "Punch-Out!! (Italian bootleg)", 0 )
+GAME( 1984, spnchout,  0,        punchout, spnchout, driver_device, 0, ROT0, "Nintendo", "Super Punch-Out!! (Rev B)", 0 ) /* CHP1-02 boards */
+GAME( 1984, spnchouta, spnchout, punchout, spnchout, driver_device, 0, ROT0, "Nintendo", "Super Punch-Out!! (Rev A)", 0 ) /* CHP1-01 boards */
+GAME( 1984, spnchoutj, spnchout, punchout, spnchout, driver_device, 0, ROT0, "Nintendo", "Super Punch-Out!! (Japan)", 0 )
+GAME( 1985, armwrest,  0,        armwrest, armwrest, driver_device, 0, ROT0, "Nintendo", "Arm Wrestling", 0 )

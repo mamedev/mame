@@ -10,33 +10,6 @@
 #include "includes/punchout.h"
 
 
-DRIVER_INIT_MEMBER(punchout_state,punchout)
-{
-	m_palette_reverse_top = 0x00;
-	m_palette_reverse_bot = 0xff;
-}
-
-DRIVER_INIT_MEMBER(punchout_state,spnchout)
-{
-	m_palette_reverse_top = 0x00;
-	m_palette_reverse_bot = 0xff;
-}
-
-DRIVER_INIT_MEMBER(punchout_state,spnchotj)
-{
-	m_palette_reverse_top = 0xff;
-	m_palette_reverse_bot = 0xff;
-}
-
-DRIVER_INIT_MEMBER(punchout_state,armwrest)
-{
-	m_palette_reverse_top = 0x00;
-	m_palette_reverse_bot = 0x00;
-}
-
-
-
-
 /***************************************************************************
 
   Start the video hardware emulation.
@@ -140,7 +113,7 @@ VIDEO_START_MEMBER(punchout_state,armwrest)
 	m_bg_top_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(punchout_state::armwrest_top_get_info),this), TILEMAP_SCAN_ROWS,  8,8, 32,32);
 	m_bg_bot_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(punchout_state::armwrest_bot_get_info),this), TILEMAP_SCAN_ROWS,  8,8, 32,32);
 
-	m_spr1_tilemap =       &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(punchout_state::bs1_get_info),this), tilemap_mapper_delegate(FUNC(punchout_state::armwrest_bs1_scan),this),  8,8, 32,16);
+	m_spr1_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(punchout_state::bs1_get_info),this), tilemap_mapper_delegate(FUNC(punchout_state::armwrest_bs1_scan),this),  8,8, 32,16);
 	m_spr1_tilemap_flipx = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(punchout_state::bs1_get_info),this), tilemap_mapper_delegate(FUNC(punchout_state::armwrest_bs1_scan_flipx),this),  8,8, 32,16);
 	m_spr2_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(punchout_state::bs2_get_info),this), TILEMAP_SCAN_ROWS,  8,8, 16,32);
 	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(punchout_state::armwrest_fg_get_info),this), TILEMAP_SCAN_ROWS,  8,8, 32,32);
@@ -322,7 +295,8 @@ void punchout_state::punchout_copy_top_palette(int bank)
 		g = 255 - pal4bit(color_prom[i + 0x200 + base]);
 		b = 255 - pal4bit(color_prom[i + 0x400 + base]);
 
-		m_palette->set_pen_color(i ^ m_palette_reverse_top, rgb_t(r, g, b));
+		m_palette->set_pen_color(i, rgb_t(r, g, b)); // pink labeled color proms
+		//m_palette->set_pen_color(i ^ 0xff, rgb_t(r, g, b)); // in case of white labeled color proms
 	}
 }
 
@@ -341,7 +315,8 @@ void punchout_state::punchout_copy_bot_palette(int bank)
 		g = 255 - pal4bit(color_prom[i + 0x200 + base]);
 		b = 255 - pal4bit(color_prom[i + 0x400 + base]);
 
-		m_palette->set_pen_color((i ^ m_palette_reverse_bot) + 0x100, rgb_t(r, g, b));
+		m_palette->set_pen_color(i + 0x100, rgb_t(r, g, b)); // pink labeled color proms
+		//m_palette->set_pen_color((i ^ 0xff) + 0x100, rgb_t(r, g, b)); // in case of white labeled color proms
 	}
 }
 

@@ -17,7 +17,8 @@ public:
 		m_audiocpu(*this, "audiocpu"),
 		m_vlm(*this, "vlm"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette")
+	{ }
 
 	int m_rp5c01_mode_sel;
 	int m_rp5c01_mem[16*4];
@@ -42,8 +43,6 @@ public:
 	tilemap_t *m_spr1_tilemap;
 	tilemap_t *m_spr1_tilemap_flipx;
 	tilemap_t *m_spr2_tilemap;
-	int m_palette_reverse_top;
-	int m_palette_reverse_bot;
 
 	UINT8 m_nmi_mask;
 	DECLARE_WRITE8_MEMBER(punchout_2a03_reset_w);
@@ -61,10 +60,6 @@ public:
 	DECLARE_WRITE8_MEMBER(punchout_speech_reset_w);
 	DECLARE_WRITE8_MEMBER(punchout_speech_st_w);
 	DECLARE_WRITE8_MEMBER(punchout_speech_vcu_w);
-	DECLARE_DRIVER_INIT(armwrest);
-	DECLARE_DRIVER_INIT(spnchotj);
-	DECLARE_DRIVER_INIT(punchout);
-	DECLARE_DRIVER_INIT(spnchout);
 	TILE_GET_INFO_MEMBER(top_get_info);
 	TILE_GET_INFO_MEMBER(armwrest_top_get_info);
 	TILE_GET_INFO_MEMBER(bot_get_info);
