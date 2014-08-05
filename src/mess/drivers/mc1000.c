@@ -311,7 +311,10 @@ READ8_MEMBER( mc1000_state::keydata_r )
 
 	data = (m_modifiers->read() & 0xc0) | (data & 0x3f);
 
-	if (m_cassette->input() < +0.0) data &= 0x7f;
+	if ((m_cassette->get_state() & CASSETTE_MASK_UISTATE) == CASSETTE_PLAY)
+	{
+		if (m_cassette->input() >= +0.0) data &= 0x7f;
+	}
 
 	return data;
 }
