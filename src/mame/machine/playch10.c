@@ -26,11 +26,10 @@ void playch10_state::machine_reset()
 	m_MMC2_bank_latch[0] = m_MMC2_bank_latch[1] = 0xfe;
 
 	/* reset the security chip */
-	address_space &space = generic_space();
-	m_rp5h01->enable_w(space, 0, 0);
-	m_rp5h01->reset_w(space, 0, 0);
-	m_rp5h01->reset_w(space, 0, 1);
-	m_rp5h01->enable_w(space, 0, 1);
+	m_rp5h01->enable_w(1);
+	m_rp5h01->enable_w(0);
+	m_rp5h01->reset_w(0);
+	m_rp5h01->reset_w(1);
 
 	pc10_set_mirroring(m_mirroring);
 }
@@ -160,10 +159,8 @@ READ8_MEMBER(playch10_state::pc10_prot_r)
 	/* we only support a single cart connected at slot 0 */
 	if (m_cart_sel == 0)
 	{
-		m_rp5h01->enable_w(space, 0, 0);
-		data |= ((~m_rp5h01->counter_r(space, 0)) << 4) & 0x10;    /* D4 */
-		data |= ((m_rp5h01->data_r(space, 0)) << 3) & 0x08;        /* D3 */
-		m_rp5h01->enable_w(space, 0, 1);
+		data |= ((~m_rp5h01->counter_r()) << 4) & 0x10;  /* D4 */
+		data |= (m_rp5h01->data_r() << 3) & 0x08;        /* D3 */
 	}
 	return data;
 }
@@ -173,11 +170,9 @@ WRITE8_MEMBER(playch10_state::pc10_prot_w)
 	/* we only support a single cart connected at slot 0 */
 	if (m_cart_sel == 0)
 	{
-		m_rp5h01->enable_w(space, 0, 0);
-		m_rp5h01->test_w(space, 0, data & 0x10);       /* D4 */
-		m_rp5h01->clock_w(space, 0, data & 0x08);      /* D3 */
-		m_rp5h01->reset_w(space, 0, ~data & 0x01); /* D0 */
-		m_rp5h01->enable_w(space, 0, 1);
+		m_rp5h01->test_w(data & 0x10);       /* D4 */
+		m_rp5h01->clock_w(data & 0x08);      /* D3 */
+		m_rp5h01->reset_w(~data & 0x01);     /* D0 */
 	}
 }
 

@@ -304,7 +304,7 @@ public:
 		m_rp5h01(*this,"rp5h01"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette")
-		{ }
+	{ }
 
 	required_device<m50458_device> m_m50458;
 	required_device<s3520cf_device> m_s3520cf;
@@ -470,13 +470,9 @@ READ8_MEMBER(nss_state::nss_prot_r)
 
 	if (m_cart_sel == 0)
 	{
-		m_rp5h01->enable_w(space, 0, 0);
-		data |= ((~m_rp5h01->counter_r(space, 0)) << 4) & 0x10;  /* D4 */
-		data |= ((m_rp5h01->data_r(space, 0)) << 3) & 0x08;      /* D3 */
-		m_rp5h01->enable_w(space, 0, 1);
+		data |= ((~m_rp5h01->counter_r()) << 4) & 0x10;  /* D4 */
+		data |= (m_rp5h01->data_r() << 3) & 0x08;        /* D3 */
 	}
-	else
-		m_rp5h01->enable_w(space, 0, 1);
 
 	return data;
 }
@@ -485,14 +481,10 @@ WRITE8_MEMBER(nss_state::nss_prot_w)
 {
 	if (m_cart_sel == 0)
 	{
-		m_rp5h01->enable_w(space, 0, 0);
-		m_rp5h01->test_w(space, 0, data & 0x10);     /* D4 */
-		m_rp5h01->clock_w(space, 0, data & 0x08);        /* D3 */
-		m_rp5h01->cs_w(space, 0, ~data & 0x01);
-		m_rp5h01->enable_w(space, 0, 1);
+		m_rp5h01->test_w(data & 0x10);     /* D4 */
+		m_rp5h01->clock_w(data & 0x08);    /* D3 */
+		m_rp5h01->cs_w(~data & 0x01);
 	}
-	else
-		m_rp5h01->enable_w(space, 0, 1);
 
 	ioport("EEPROMOUT")->write(data, 0xff);
 }
@@ -802,6 +794,12 @@ void nss_state::machine_reset()
 	/* start with both CPUs disabled */
 	m_maincpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	m_soundcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+
+	/* reset the security chip */
+	m_rp5h01->enable_w(1);
+	m_rp5h01->enable_w(0);
+	m_rp5h01->reset_w(0);
+	m_rp5h01->reset_w(1);
 
 	m_game_over_flag = 1;
 	m_joy_flag = 1;

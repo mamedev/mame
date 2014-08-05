@@ -1,7 +1,16 @@
 /***************************************************************************
 
-    RP5H01
+    RP5H01 - Ricoh 64x1bit PROM with 6/7-bit counter
 
+****************************************************************************
+                      ___________
+            DATA   1 |*          | 8  COUNTER OUT
+                     |           |        
+         _CE/Vpp   2 |   RP5H01  | 7  RESET
+                     |   RF5H01  |        
+             Vcc   3 |           | 6  DATA CLOCK
+                     |           |        
+             GND   4 |___________| 5  TEST
 
 ***************************************************************************/
 
@@ -28,13 +37,13 @@ class rp5h01_device : public device_t
 public:
 	rp5h01_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	DECLARE_WRITE8_MEMBER( enable_w );   /* /CE */
-	DECLARE_WRITE8_MEMBER( reset_w );    /* RESET */
-	DECLARE_WRITE8_MEMBER( cs_w );   /* CS */
-	DECLARE_WRITE8_MEMBER( clock_w );    /* DATA CLOCK (active low) */
-	DECLARE_WRITE8_MEMBER( test_w );     /* TEST */
-	DECLARE_READ8_MEMBER( counter_r );   /* COUNTER OUT */
-	DECLARE_READ8_MEMBER( data_r );      /* DATA */
+	DECLARE_WRITE_LINE_MEMBER( enable_w );   /* /CE */
+	DECLARE_WRITE_LINE_MEMBER( reset_w );    /* RESET */
+	DECLARE_WRITE_LINE_MEMBER( cs_w );       /* CS */
+	DECLARE_WRITE_LINE_MEMBER( clock_w );    /* DATA CLOCK (active low) */
+	DECLARE_WRITE_LINE_MEMBER( test_w );     /* TEST */
+	DECLARE_READ_LINE_MEMBER( counter_r );   /* COUNTER OUT */
+	DECLARE_READ_LINE_MEMBER( data_r );      /* DATA */
 
 protected:
 	// device-level overrides
