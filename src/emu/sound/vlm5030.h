@@ -14,19 +14,19 @@
 	void set_rom(void *speech_rom);
 
 	/* get BSY pin level */
-	int bsy();
+	DECLARE_READ_LINE_MEMBER( bsy );
 
 	/* latch contoll data */
 	DECLARE_WRITE8_MEMBER( data_w );
 
 	/* set RST pin level : reset / set table address A8-A15 */
-	void rst (int pin );
+	DECLARE_WRITE_LINE_MEMBER( rst );
 
 	/* set VCU pin level : ?? unknown */
-	void vcu( int pin );
+	DECLARE_WRITE_LINE_MEMBER( vcu );
 
 	/* set ST pin level  : set table address A0-A7 / start speech */
-	void st( int pin );
+	DECLARE_WRITE_LINE_MEMBER( st );
 
 protected:
 	// device-level overrides
