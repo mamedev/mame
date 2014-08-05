@@ -178,13 +178,6 @@ WRITE8_MEMBER(playch10_state::pc10_prot_w)
 		m_rp5h01->clock_w(space, 0, data & 0x08);      /* D3 */
 		m_rp5h01->reset_w(space, 0, ~data & 0x01); /* D0 */
 		m_rp5h01->enable_w(space, 0, 1);
-
-		/* this thing gets dense at some point                      */
-		/* it wants to jump and execute an opcode at $ffff, wich    */
-		/* is the actual protection memory area                     */
-		/* setting the whole 0x2000 region every time is a waste    */
-		/* so we just set $ffff with the current value              */
-		memregion("maincpu")->base()[0xffff] = pc10_prot_r(space, 0);
 	}
 }
 
