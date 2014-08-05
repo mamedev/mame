@@ -2075,19 +2075,21 @@ The exception is the case where none of b7-b0 are reset (i.e. port &FBFF), which
 
 				switch (b8b0)
 				{
-				case 0x00: {
-					/* FDC Motor Control - Bit 0 defines the state of the FDD motor:
-					 * "1" the FDD motor will be active.
-					 * "0" the FDD motor will be in-active.*/
-					floppy_image_device *floppy;
-					floppy = machine().device<floppy_connector>(":upd765:0")->get_device();
-					if(floppy)
-						floppy->mon_w(!BIT(data, 0));
-					floppy = machine().device<floppy_connector>(":upd765:1")->get_device();
-					if(floppy)
-						floppy->mon_w(!BIT(data, 0));
-					break;
-				}
+				case 0x00:
+				case 0x01:
+					{
+						/* FDC Motor Control - Bit 0 defines the state of the FDD motor:
+						 * "1" the FDD motor will be active.
+						 * "0" the FDD motor will be in-active.*/
+						floppy_image_device *floppy;
+						floppy = machine().device<floppy_connector>(":upd765:0")->get_device();
+						if(floppy)
+							floppy->mon_w(!BIT(data, 0));
+						floppy = machine().device<floppy_connector>(":upd765:1")->get_device();
+						if(floppy)
+							floppy->mon_w(!BIT(data, 0));
+						break;
+					}
 
 				case 0x03: /* Write Data register of FDC */
 					m_fdc->fifo_w(space, 0,data);
