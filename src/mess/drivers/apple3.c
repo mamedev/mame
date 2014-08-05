@@ -22,6 +22,7 @@
 
 #include "bus/a2bus/a2cffa.h"
 #include "bus/a2bus/a2applicard.h"
+#include "bus/a2bus/a2thunderclock.h"
 
 static ADDRESS_MAP_START( apple3_map, AS_PROGRAM, 8, apple3_state )
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(apple3_memory_r, apple3_memory_w)
@@ -30,6 +31,7 @@ ADDRESS_MAP_END
 static SLOT_INTERFACE_START(apple3_cards)
 	SLOT_INTERFACE("cffa2", A2BUS_CFFA2_6502)  /* CFFA2000 Compact Flash for Apple II (www.dreher.net), 6502 firmware */
 	SLOT_INTERFACE("applicard", A2BUS_APPLICARD)    /* PCPI Applicard */
+	SLOT_INTERFACE("thclock", A2BUS_THUNDERCLOCK)    /* ThunderWare ThunderClock Plus - driver assumes slot 2 by default */
 SLOT_INTERFACE_END
 
 static SLOT_INTERFACE_START( a3_floppies )
