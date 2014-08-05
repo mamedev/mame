@@ -1,10 +1,12 @@
 /***************************************************************************
 
-    RP5H01 - Ricoh 64x1bit PROM with 6/7-bit counter
+    RP5H01 - Ricoh 64x1bit(+8bit) PROM with 6/7-bit counter
 
-    TODO:
-    - follow the datasheet better (all dumps presumably needs to be redone
-      from scratch?)
+    In reality, PROM data is 72bits (64 + 8bit 'dummy'). In 7-bit counter mode,
+    from 64 to 127 (%1000000 to %1111111), the dummy bits are read repeatedly,
+    with a mask of %1010111. For example if the 8 dummy bits are $7c,
+    bits 64 to 127 are read as $7c $7c $00 $00 $7c $7c $00 $00.
+    To simplify this, our emulation expects 'overdumps', 128bits total.
 
 ***************************************************************************/
 
@@ -39,6 +41,7 @@ void rp5h01_device::device_config_complete()
 
 void rp5h01_device::device_start()
 {
+	assert(region()->bytes() == 0x10);
 	m_data = *region();
 
 	/* register for state saving */
@@ -58,7 +61,7 @@ void rp5h01_device::device_reset()
 	m_counter = 0;
 	m_counter_mode = COUNTER_MODE_6_BITS;
 	m_enabled = 0;
-	m_old_reset = -1;
+	m_old_reset = 0;
 	m_old_clock = 0;
 }
 
