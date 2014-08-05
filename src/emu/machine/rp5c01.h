@@ -56,7 +56,8 @@ public:
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
-	DECLARE_WRITE_LINE_MEMBER( adj_w );
+	DECLARE_READ_LINE_MEMBER( alarm_r ) { return m_alarm; }
+	DECLARE_WRITE_LINE_MEMBER( adj_w ) { if (state) adjust_seconds(); }
 
 protected:
 	// device-level overrides
