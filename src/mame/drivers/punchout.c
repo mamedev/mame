@@ -7,17 +7,13 @@ The most significant changes are that Punchout has a larger bottom tilemap,
 with scrolling, while Arm Wrestling has an additional FG tilemap displayed on
 the bottom screen.
 
-- money bag placement might not be 100% correct in Arm Wrestling, however
-  the more serious part of armwrest35b9yel (unplayable bonus round after rounds
-  5 and 9) is now fixed.
-
 driver by Nicola Salmoria
 
 TODO:
 - add useless driver config to choose between pink and white color proms
-- Finish emulation of RP5C01 and RP5H01 for spnchout. The RP5C01 features don't
-  seem to be used at all except for very basic protection e.g. relying on the
-  masking done by the internal registers.
+- video raw params - pixel clock is derived from 20.16mhz xtal
+- finish spnchout protection emulation
+- money bag placement might not be 100% correct in Arm Wrestling
 
 
 main CPU:
@@ -126,11 +122,13 @@ DIP locations verified for:
 #include "includes/punchout.h"
 
 
-CUSTOM_INPUT_MEMBER(punchout_state::punchout_vlm5030_busy_r)
-{
-	/* bit 4 of DSW1 is busy pin level */
-	return (m_vlm->bsy()) ? 0x00 : 0x01;
-}
+/***************************************************************************
+
+  I/O, Memory Maps
+
+***************************************************************************/
+
+// Z80 (main)
 
 WRITE8_MEMBER(punchout_state::punchout_speech_reset_w)
 {
@@ -155,168 +153,10 @@ WRITE8_MEMBER(punchout_state::punchout_2a03_reset_w)
 		m_audiocpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 }
 
-
-READ8_MEMBER(punchout_state::spunchout_rp5c01_r)
+WRITE8_MEMBER(punchout_state::nmi_mask_w)
 {
-	logerror("%04x: prot_r %x\n", space.device().safe_pcbase(), offset);
-
-	if (offset <= 0x0c)
-	{
-		switch (m_rp5c01_mode_sel & 3)
-		{
-			case 0: // time
-				switch ( offset )
-				{
-					case 0x00:  // 1-second counter
-						return m_rp5c01_mem[0x00];
-
-					case 0x01:  // 10-second counter
-						return m_rp5c01_mem[0x01] & 0x7;
-
-					case 0x02:  // 1-minute counter
-						return m_rp5c01_mem[0x02];
-
-					case 0x03:  // 10-minute counter
-						return m_rp5c01_mem[0x03] & 0x07;
-
-					case 0x04:  // 1-hour counter
-						return m_rp5c01_mem[0x04];
-
-					case 0x05:  // 10-hour counter
-						return m_rp5c01_mem[0x05] & 0x03;
-
-					case 0x06:  // day-of-the-week counter
-						return m_rp5c01_mem[0x06] & 0x07;
-
-					case 0x07:  // 1-day counter
-						return m_rp5c01_mem[0x07];
-
-					case 0x08:  // 10-day counter
-						return m_rp5c01_mem[0x08] & 0x03;
-
-					case 0x09:  // 1-month counter
-						return m_rp5c01_mem[0x09];
-
-					case 0x0a:  // 10-month counter
-						return m_rp5c01_mem[0x0a] & 0x01;
-
-					case 0x0b:  // 1-year counter
-						return m_rp5c01_mem[0x0b];
-
-					case 0x0c:  // 10-year counter
-						return m_rp5c01_mem[0x0c];
-				}
-				break;
-
-			case 1: // alarm
-				switch ( offset )
-				{
-					case 0x00:  // n/a
-						return 0x00;
-
-					case 0x01:  // n/a
-						return 0x00;
-
-					case 0x02:  // 1-minute alarm register
-						return m_rp5c01_mem[0x12];
-
-					case 0x03:  // 10-minute alarm register
-						return m_rp5c01_mem[0x13] & 0x07;
-
-					case 0x04:  // 1-hour alarm register
-						return m_rp5c01_mem[0x14];
-
-					case 0x05:  // 10-hour alarm register
-						return m_rp5c01_mem[0x15] & 0x03;
-
-					case 0x06:  // day-of-the-week alarm register
-						return m_rp5c01_mem[0x16] & 0x07;
-
-					case 0x07:  // 1-day alarm register
-						return m_rp5c01_mem[0x17];
-
-					case 0x08:  // 10-day alarm register
-						return m_rp5c01_mem[0x18] & 0x03;
-
-					case 0x09:  // n/a
-						return 0x00;
-
-					case 0x0a:  // /12/24 select register
-						return m_rp5c01_mem[0x1a] & 0x01;
-
-					case 0x0b:  // leap year count
-						return m_rp5c01_mem[0x1b] & 0x03;
-
-					case 0x0c:  // n/a
-						return 0x00;
-				}
-				break;
-
-			case 2: // RAM BLOCK 10
-			case 3: // RAM BLOCK 11
-				return m_rp5c01_mem[0x10 * (m_rp5c01_mode_sel & 3) + offset];
-		}
-	}
-	else if (offset == 0x0d)
-	{
-		return m_rp5c01_mode_sel;
-	}
-
-	logerror("Read from unknown protection? port %02x ( selector = %02x )\n", offset, m_rp5c01_mode_sel );
-	return 0;
+	m_nmi_mask = data & 1;
 }
-
-WRITE8_MEMBER(punchout_state::spunchout_rp5c01_w)
-{
-	data &= 0x0f;
-
-	logerror("%04x: prot_w %x = %02x\n",space.device().safe_pcbase(),offset,data);
-
-	if (offset <= 0x0c)
-	{
-		m_rp5c01_mem[0x10 * (m_rp5c01_mode_sel & 3) + offset] = data;
-	}
-	else if (offset == 0x0d)
-	{
-		m_rp5c01_mode_sel = data;
-		logerror("MODE: Timer EN = %d  Alarm EN = %d  MODE %d\n",BIT(data,3),BIT(data,2),data&3);
-	}
-	else if (offset == 0x0e)
-	{
-		logerror("TEST = %d",data);
-	}
-	else if (offset == 0x0f)
-	{
-		logerror("RESET: /1Hz = %d  /16Hz = %d  Timer = %d  Timer = %d\n",BIT(data,3),BIT(data,2),BIT(data,1),BIT(data,0));
-	}
-}
-
-READ8_MEMBER(punchout_state::spunchout_exp_r)
-{
-	// bit 7 = DATA OUT from RP5H01
-	// bit 6 = COUNTER OUT from RP5H01
-	// bit 5 = /ALARM from RP5C01
-	// bit 4 = n.c.
-	// bits 3-0 = D3-D0 from RP5C01
-
-	UINT8 ret = spunchout_rp5c01_r( space, offset >> 4 );
-
-	// FIXME hack
-	/* PC = 0x0313 */
-	/* (ret or 0x10) -> (D7DF),(D7A0) - (D7DF),(D7A0) = 0d0h(ret nc) */
-
-	if (space.device().safe_pcbase() == 0x0313)
-		ret |= 0xc0;
-
-	return ret;
-}
-
-WRITE8_MEMBER(punchout_state::spunchout_exp_w)
-{
-	spunchout_rp5c01_w( space, offset >> 4, data );
-}
-
-
 
 static ADDRESS_MAP_START( punchout_map, AS_PROGRAM, 8, punchout_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
@@ -346,10 +186,6 @@ static ADDRESS_MAP_START( armwrest_map, AS_PROGRAM, 8, punchout_state )
 	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(punchout_bg_top_videoram_w) AM_SHARE("bg_top_videoram")
 ADDRESS_MAP_END
 
-WRITE8_MEMBER(punchout_state::nmi_mask_w)
-{
-	m_nmi_mask = data & 1;
-}
 
 static ADDRESS_MAP_START( punchout_io_map, AS_IO, 8, punchout_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
@@ -369,10 +205,55 @@ static ADDRESS_MAP_START( punchout_io_map, AS_IO, 8, punchout_state )
 	AM_RANGE(0x0d, 0x0d) AM_WRITE(punchout_speech_st_w) /* VLM5030 */
 	AM_RANGE(0x0e, 0x0e) AM_WRITE(punchout_speech_vcu_w)    /* VLM5030 */
 	AM_RANGE(0x0f, 0x0f) AM_WRITENOP    /* enable NVRAM ? */
-
-	/* protection ports - Super Punchout only (move to install handler?) */
-	AM_RANGE(0x07, 0x07) AM_MIRROR(0xf0) AM_MASK(0xf0) AM_READWRITE(spunchout_exp_r, spunchout_exp_w)
 ADDRESS_MAP_END
+
+
+// Super Punch-Out!! comes with an extra security PCB that plugs into the Z80 socket
+// CHS1-01-EXP, has Z80 CPU, RP5C01, RP5H01
+
+// The RP5C01 features don't seem to be used at all except for very basic protection
+// e.g. relying on the masking done by the internal registers.
+
+READ8_MEMBER(punchout_state::spunchout_exp_r)
+{
+	// d0-d3: D0-D3 from RP5C01
+	// d4: N/C
+	// d5: /ALARM from RP5C01
+	// d6: COUNTER OUT from RP5H01
+	// d7: DATA OUT from RP5H01
+
+	UINT8 ret = m_rtc->read(space, offset >> 4 & 0xf) & 0xf;
+	ret |= 0x10;
+	ret |= m_rtc->alarm_r() ? 0x00 : 0x20;
+	ret |= m_rp5h01->counter_r() ? 0x40 : 0x00;
+	ret |= m_rp5h01->data_r() ? 0x80 : 0x00;
+
+	// FIXME - hack d6/d7 state until we have a dump of RP5H01 and know the connections for spunchout_exp_w
+	/* PC = 0x0313 */
+	/* (ret or 0x10) -> (D7DF),(D7A0) - (D7DF),(D7A0) = 0d0h(ret nc) */
+	ret &= 0x3f;
+	if (space.device().safe_pcbase() == 0x0313)
+	{
+		ret |= 0xc0;
+	}
+
+	return ret;
+}
+
+WRITE8_MEMBER(punchout_state::spunchout_exp_w)
+{
+	// d0-d3: D0-D3 to RP5C01
+	// d4-d7: ? to RP5H01?
+	
+	m_rtc->write(space, offset >> 4 & 0xf, data & 0xf);
+}
+
+static ADDRESS_MAP_START( spnchout_io_map, AS_IO, 8, punchout_state )
+	AM_RANGE(0x07, 0x07) AM_MIRROR(0xf0) AM_MASK(0xf0) AM_READWRITE(spunchout_exp_r, spunchout_exp_w) /* protection ports */
+	AM_IMPORT_FROM( punchout_io_map )
+ADDRESS_MAP_END
+
+// 2A03 (sound)
 
 static ADDRESS_MAP_START( punchout_sound_map, AS_PROGRAM, 8, punchout_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
@@ -383,6 +264,18 @@ static ADDRESS_MAP_START( punchout_sound_map, AS_PROGRAM, 8, punchout_state )
 ADDRESS_MAP_END
 
 
+
+/***************************************************************************
+
+  Inputs
+
+***************************************************************************/
+
+CUSTOM_INPUT_MEMBER(punchout_state::punchout_vlm5030_busy_r)
+{
+	/* bit 4 of DSW1 is vlm busy pin level */
+	return (m_vlm->bsy()) ? 0x00 : 0x01;
+}
 
 static INPUT_PORTS_START( punchout )
 	PORT_START("IN0")
@@ -432,12 +325,12 @@ static INPUT_PORTS_START( punchout )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
-//  PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )        /* Not documented */
+	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )        /* dupe, Not documented */
 	PORT_DIPSETTING(    0x08, "1 Coin/2 Credits (2 Credits/1 Play)" ) /* Not documented */
 	PORT_DIPSETTING(    0x0d, "1 Coin/3 Credits (2 Credits/1 Play)" ) /* Not documented */
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
-//  PORT_DIPSETTING(    0x04, DEF_STR( 1C_2C ) )        /* Not documented */
-//  PORT_DIPSETTING(    0x09, DEF_STR( 1C_2C ) )        /* Not documented */
+	PORT_DIPSETTING(    0x04, DEF_STR( 1C_2C ) )        /* dupe, Not documented */
+	PORT_DIPSETTING(    0x09, DEF_STR( 1C_2C ) )        /* dupe, Not documented */
 	PORT_DIPSETTING(    0x05, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x06, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(    0x0a, DEF_STR( 1C_5C ) )
@@ -463,11 +356,11 @@ static INPUT_PORTS_START( spnchout )
 	PORT_DIPSETTING(    0x08, DEF_STR( 6C_1C ) )        /* Not documented */
 	PORT_DIPSETTING(    0x04, DEF_STR( 5C_1C ) )        /* Not documented */
 	PORT_DIPSETTING(    0x03, DEF_STR( 4C_1C ) )        /* Not documented */
-//  PORT_DIPSETTING(    0x09, DEF_STR( 4C_1C ) )        /* Not documented */
+	PORT_DIPSETTING(    0x09, DEF_STR( 4C_1C ) )        /* dupe, Not documented */
 	PORT_DIPSETTING(    0x0c, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
-//  PORT_DIPSETTING(    0x0e, DEF_STR( 1C_1C ) )        /* Not documented */
+	PORT_DIPSETTING(    0x0e, DEF_STR( 1C_1C ) )        /* dupe, Not documented */
 	PORT_DIPSETTING(    0x0d, "1 Coin/3 Credits (2 Credits/1 Play)" ) /* Not documented */
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x0b, "1 Coin/2 Credits (3 Credits/1 Play)" ) /* Not documented */
@@ -882,6 +775,13 @@ bit 3210 5432  L  R  C
 INPUT_PORTS_END
 
 
+
+/***************************************************************************
+
+  Machine Configs
+
+***************************************************************************/
+
 static const gfx_layout charlayout_2bpp =
 {
 	8,8,
@@ -919,31 +819,34 @@ static GFXDECODE_START( armwrest )
 GFXDECODE_END
 
 
-void punchout_state::machine_reset()
-{
-	m_rp5c01_mode_sel = 0;
-	memset(m_rp5c01_mem, 0, sizeof(m_rp5c01_mem));
-}
-
 INTERRUPT_GEN_MEMBER(punchout_state::vblank_irq)
 {
-	if(m_nmi_mask)
+	if (m_nmi_mask)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
+
+MACHINE_RESET_MEMBER(punchout_state, spnchout)
+{
+	/* reset the security chip */
+	m_rp5h01->enable_w(1);
+	m_rp5h01->enable_w(0);
+	m_rp5h01->reset_w(0);
+	m_rp5h01->reset_w(1);
+}
 
 
 static MACHINE_CONFIG_START( punchout, punchout_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 8000000/2) /* 4 MHz */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_8MHz/2)
 	MCFG_CPU_PROGRAM_MAP(punchout_map)
 	MCFG_CPU_IO_MAP(punchout_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("top", punchout_state,  vblank_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("top", punchout_state, vblank_irq)
 
-	MCFG_CPU_ADD("audiocpu", N2A03, N2A03_DEFAULTCLOCK)
+	MCFG_CPU_ADD("audiocpu", N2A03, XTAL_21_4772MHz/12)
 	MCFG_CPU_PROGRAM_MAP(punchout_sound_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("top", punchout_state,  nmi_line_pulse)
+	MCFG_CPU_VBLANK_INT_DRIVER("top", punchout_state, nmi_line_pulse)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -968,30 +871,41 @@ static MACHINE_CONFIG_START( punchout, punchout_state )
 	MCFG_SCREEN_UPDATE_DRIVER(punchout_state, screen_update_punchout_bottom)
 	MCFG_SCREEN_PALETTE("palette")
 
-
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("nesapu", NES_APU, N2A03_DEFAULTCLOCK)
+	MCFG_SOUND_ADD("nesapu", NES_APU, XTAL_21_4772MHz/12)
 	MCFG_NES_APU_CPU("audiocpu")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("vlm", VLM5030, 3580000)
+	MCFG_SOUND_ADD("vlm", VLM5030, XTAL_21_4772MHz/6)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+MACHINE_CONFIG_END
+
+
+static MACHINE_CONFIG_DERIVED( spnchout, punchout )
+
+	/* basic machine hardware */
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_IO_MAP(spnchout_io_map)
+
+	MCFG_DEVICE_ADD("rtc", RP5C01, XTAL_32_768kHz) // frequency guessed
+	MCFG_RP5H01_ADD("rp5h01")
+	
+	MCFG_MACHINE_RESET_OVERRIDE(punchout_state, spnchout)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( armwrest, punchout )
 
 	/* basic machine hardware */
-
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(armwrest_map)
 
 	/* video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", armwrest)
 
-	MCFG_VIDEO_START_OVERRIDE(punchout_state,armwrest)
+	MCFG_VIDEO_START_OVERRIDE(punchout_state, armwrest)
 	MCFG_SCREEN_MODIFY("top")
 	MCFG_SCREEN_UPDATE_DRIVER(punchout_state, screen_update_armwrest_top)
 	MCFG_SCREEN_MODIFY("bottom")
@@ -1002,7 +916,7 @@ MACHINE_CONFIG_END
 
 /***************************************************************************
 
-  Game driver(s)
+  Game drivers
 
 ***************************************************************************/
 
@@ -1417,6 +1331,9 @@ ROM_START( spnchout )
 
 	ROM_REGION( 0x10000, "vlm", 0 ) /* 64k for the VLM5030 data */
 	ROM_LOAD( "chs1-c.6p",    0x0000, 0x4000, CRC(ad8b64b8) SHA1(0f1232a10faf71b782f9f6653cca8570243c17e0) )
+
+	ROM_REGION( 0x10, "rp5h01", ROMREGION_ERASE00 ) // security prom on daughterboard
+	ROM_LOAD( "rp5h01.exp", 0x00, 0x10, NO_DUMP )
 ROM_END
 
 ROM_START( spnchouta )
@@ -1481,6 +1398,9 @@ ROM_START( spnchouta )
 
 	ROM_REGION( 0x4000, "vlm", 0 )	/* 16k for the VLM5030 data */
 	ROM_LOAD( "chs1-c.6p",    0x0000, 0x4000, CRC(ad8b64b8) SHA1(0f1232a10faf71b782f9f6653cca8570243c17e0) )
+
+	ROM_REGION( 0x10, "rp5h01", ROMREGION_ERASE00 ) // security prom on daughterboard
+	ROM_LOAD( "rp5h01.exp", 0x00, 0x10, NO_DUMP )
 ROM_END
 
 ROM_START( spnchoutj )
@@ -1563,6 +1483,9 @@ ROM_START( spnchoutj )
 
 	ROM_REGION( 0x10000, "vlm", 0 ) /* 64k for the VLM5030 data */
 	ROM_LOAD( "chs1c6pa.bin", 0x0000, 0x4000, CRC(d05fb730) SHA1(9f4c4c7e5113739312558eff4d3d3e42d513aa31) )
+
+	ROM_REGION( 0x10, "rp5h01", ROMREGION_ERASE00 ) // security prom on daughterboard
+	ROM_LOAD( "rp5h01.exp", 0x00, 0x10, NO_DUMP )
 ROM_END
 
 ROM_START( armwrest )
@@ -1627,7 +1550,7 @@ GAME( 1984, punchout,  0,        punchout, punchout, driver_device, 0, ROT0, "Ni
 GAME( 1984, punchouta, punchout, punchout, punchout, driver_device, 0, ROT0, "Nintendo", "Punch-Out!! (Rev A)", 0 ) /* CHP1-01 boards */
 GAME( 1984, punchoutj, punchout, punchout, punchout, driver_device, 0, ROT0, "Nintendo", "Punch-Out!! (Japan)", 0 )
 GAME( 1984, punchita,  punchout, punchout, punchout, driver_device, 0, ROT0, "bootleg",  "Punch-Out!! (Italian bootleg)", 0 )
-GAME( 1984, spnchout,  0,        punchout, spnchout, driver_device, 0, ROT0, "Nintendo", "Super Punch-Out!! (Rev B)", 0 ) /* CHP1-02 boards */
-GAME( 1984, spnchouta, spnchout, punchout, spnchout, driver_device, 0, ROT0, "Nintendo", "Super Punch-Out!! (Rev A)", 0 ) /* CHP1-01 boards */
-GAME( 1984, spnchoutj, spnchout, punchout, spnchout, driver_device, 0, ROT0, "Nintendo", "Super Punch-Out!! (Japan)", 0 )
+GAME( 1984, spnchout,  0,        spnchout, spnchout, driver_device, 0, ROT0, "Nintendo", "Super Punch-Out!! (Rev B)", 0 ) /* CHP1-02 boards */
+GAME( 1984, spnchouta, spnchout, spnchout, spnchout, driver_device, 0, ROT0, "Nintendo", "Super Punch-Out!! (Rev A)", 0 ) /* CHP1-01 boards */
+GAME( 1984, spnchoutj, spnchout, spnchout, spnchout, driver_device, 0, ROT0, "Nintendo", "Super Punch-Out!! (Japan)", 0 )
 GAME( 1985, armwrest,  0,        armwrest, armwrest, driver_device, 0, ROT0, "Nintendo", "Arm Wrestling", 0 )
