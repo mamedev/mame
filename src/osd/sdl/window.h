@@ -119,9 +119,6 @@ extern sdl_window_info *sdl_window_list;
 //  PROTOTYPES
 //============================================================
 
-// core initialization
-int sdlwindow_init(running_machine &machine);
-
 // creation/deletion of windows
 int sdlwindow_video_window_create(running_machine &machine, int index, sdl_monitor_info *monitor, const sdl_window_config *config);
 void sdlwindow_video_window_update(running_machine &machine, sdl_window_info *window);

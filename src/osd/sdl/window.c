@@ -114,7 +114,6 @@ struct worker_param {
 //  PROTOTYPES
 //============================================================
 
-static void sdlwindow_exit(running_machine &machine);
 static void sdlwindow_video_window_destroy(running_machine &machine, sdl_window_info *window);
 static OSDWORK_CALLBACK( draw_video_contents_wt );
 static OSDWORK_CALLBACK( sdlwindow_video_window_destroy_wt );
@@ -202,21 +201,18 @@ static OSDWORK_CALLBACK(sdlwindow_thread_id)
 
 
 //============================================================
-//  win_init_window
+//  window_init
 //  (main thread)
 //============================================================
 
-int sdlwindow_init(running_machine &machine)
+bool sdl_osd_interface::window_init()
 {
 	osd_printf_verbose("Enter sdlwindow_init\n");
 	// determine if we are using multithreading or not
-	multithreading_enabled = downcast<sdl_options &>(machine.options()).multithreading();
+	multithreading_enabled = downcast<sdl_options &>(machine().options()).multithreading();
 
 	// get the main thread ID before anything else
 	main_threadid = SDL_ThreadID();
-
-	// ensure we get called on the way out
-	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(sdlwindow_exit), &machine));
 
 	// if multithreading, create a thread to run the windows
 	if (multithreading_enabled)
@@ -224,7 +220,7 @@ int sdlwindow_init(running_machine &machine)
 		// create a thread to run the windows from
 		work_queue = osd_work_queue_alloc(WORK_QUEUE_FLAG_IO);
 		if (work_queue == NULL)
-			return 1;
+			return false;
 		osd_work_item_queue(work_queue, &sdlwindow_thread_id, NULL, WORK_ITEM_FLAG_AUTO_RELEASE);
 	}
 	else
@@ -238,27 +234,27 @@ int sdlwindow_init(running_machine &machine)
 #if USE_OPENGL
 	if (video_config.mode == VIDEO_MODE_OPENGL)
 	{
-		if (drawogl_init(machine, &draw))
+		if (drawogl_init(machine(), &draw))
 			video_config.mode = VIDEO_MODE_SOFT;
 	}
 #endif
 #if SDLMAME_SDL2
 	if (video_config.mode == VIDEO_MODE_SDL13)
 	{
-		if (draw13_init(machine, &draw))
+		if (draw13_init(machine(), &draw))
 			video_config.mode = VIDEO_MODE_SOFT;
 	}
 #endif
 	if (video_config.mode == VIDEO_MODE_SOFT)
 	{
 		if (drawsdl_init(&draw))
-			return 1;
+			return false;
 	}
 
 	// set up the window list
 	last_window_ptr = &sdl_window_list;
 	osd_printf_verbose("Leave sdlwindow_init\n");
-	return 0;
+	return true;
 }
 
 
@@ -296,7 +292,7 @@ static OSDWORK_CALLBACK( sdlwindow_exit_wt )
 }
 
 
-static void sdlwindow_exit(running_machine &machine)
+void sdl_osd_interface::window_exit()
 {
 	ASSERT_MAIN_THREAD();
 
@@ -307,7 +303,7 @@ static void sdlwindow_exit(running_machine &machine)
 	{
 		sdl_window_info *temp = sdl_window_list;
 		sdl_window_list = temp->next;
-		sdlwindow_video_window_destroy(machine, temp);
+		sdlwindow_video_window_destroy(machine(), temp);
 	}
 
 	// if we're multithreaded, clean up the window thread

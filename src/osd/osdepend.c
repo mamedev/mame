@@ -417,6 +417,11 @@ bool osd_interface::video_init()
 	return true;
 }
 
+bool osd_interface::window_init()
+{
+	return true;
+}
+
 bool osd_interface::sound_init()
 {
 	osd_sound_type sound = m_sound_options.find(machine().options().sound());
@@ -492,6 +497,10 @@ void osd_interface::exit_subsystems()
 }
 
 void osd_interface::video_exit()
+{
+}
+
+void osd_interface::window_exit()
 {
 }
 

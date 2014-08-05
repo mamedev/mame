@@ -109,7 +109,7 @@ bool sdl_osd_interface::video_init()
 	video_config.beamwidth = machine().options().beam();
 
 	// initialize the window system so we can make windows
-	if (sdlwindow_init(machine()))
+	if (!window_init())
 		return false;
 
 	// create the windows
@@ -133,6 +133,8 @@ bool sdl_osd_interface::video_init()
 
 void sdl_osd_interface::video_exit()
 {
+	window_exit();
+	
 	// free all of our monitor information
 	while (sdl_monitor_list != NULL)
 	{

@@ -77,7 +77,7 @@ bool windows_osd_interface::video_init()
 	init_monitors();
 
 	// initialize the window system so we can make windows
-	winwindow_init(machine());
+	window_init();
 
 	// create the windows
 	windows_options &options = downcast<windows_options &>(machine().options());
@@ -96,6 +96,8 @@ bool windows_osd_interface::video_init()
 
 void windows_osd_interface::video_exit()
 {
+	window_exit();
+	
 	// free all of our monitor information
 	while (win_monitor_list != NULL)
 	{

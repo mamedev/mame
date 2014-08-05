@@ -171,6 +171,7 @@ public:
 
 	virtual bool video_init();
 	virtual void video_register();
+	virtual bool window_init();
 
 	bool sound_init();
 	virtual void sound_register();
@@ -185,6 +186,7 @@ public:
 
 	void exit_subsystems();
 	virtual void video_exit();
+	virtual void window_exit();
 	void sound_exit();
 	virtual void input_exit();
 	virtual void output_exit();

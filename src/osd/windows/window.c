@@ -117,7 +117,6 @@ static HANDLE window_thread_ready_event;
 //  PROTOTYPES
 //============================================================
 
-static void winwindow_exit(running_machine &machine);
 static void winwindow_video_window_destroy(win_window_info *window);
 static void draw_video_contents(win_window_info *window, HDC dc, int update);
 
@@ -181,22 +180,19 @@ static void mtlog_dump(void) { }
 
 
 //============================================================
-//  winwindow_init
+//  window_init
 //  (main thread)
 //============================================================
 
-void winwindow_init(running_machine &machine)
+bool windows_osd_interface::window_init()
 {
 	size_t temp;
 
 	// determine if we are using multithreading or not
-	multithreading_enabled = downcast<windows_options &>(machine.options()).multithreading();
+	multithreading_enabled = downcast<windows_options &>(machine().options()).multithreading();
 
 	// get the main thread ID before anything else
 	main_threadid = GetCurrentThreadId();
-
-	// ensure we get called on the way out
-	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(winwindow_exit), &machine));
 
 	// set up window class and register it
 	create_window_class();
@@ -234,21 +230,23 @@ void winwindow_init(running_machine &machine)
 	// initialize the drawers
 	if (video_config.mode == VIDEO_MODE_D3D)
 	{
-		if (drawd3d_init(machine, &draw))
+		if (drawd3d_init(machine(), &draw))
 			video_config.mode = VIDEO_MODE_GDI;
 	}
 	if (video_config.mode == VIDEO_MODE_DDRAW)
 	{
-		if (drawdd_init(machine, &draw))
+		if (drawdd_init(machine(), &draw))
 			video_config.mode = VIDEO_MODE_GDI;
 	}
 	if (video_config.mode == VIDEO_MODE_GDI)
-		drawgdi_init(machine, &draw);
+		drawgdi_init(machine(), &draw);
 	if (video_config.mode == VIDEO_MODE_NONE)
-		drawnone_init(machine, &draw);
+		drawnone_init(machine(), &draw);
 
 	// set up the window list
 	last_window_ptr = &win_window_list;
+	
+	return true;
 }
 
 
@@ -258,7 +256,7 @@ void winwindow_init(running_machine &machine)
 //  (main thread)
 //============================================================
 
-static void winwindow_exit(running_machine &machine)
+void windows_osd_interface::window_exit()
 {
 	assert(GetCurrentThreadId() == main_threadid);
 

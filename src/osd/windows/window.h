@@ -110,9 +110,6 @@ extern win_window_info *win_window_list;
 //  PROTOTYPES
 //============================================================
 
-// core initialization
-void winwindow_init(running_machine &machine);
-
 // creation/deletion of windows
 void winwindow_video_window_create(running_machine &machine, int index, win_monitor_info *monitor, const win_window_config *config);
 

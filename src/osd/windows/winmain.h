@@ -261,6 +261,7 @@ public:
 	virtual void debugger_register();
 
 	virtual bool video_init();
+	virtual bool window_init();
 	virtual bool input_init();
 	virtual void input_pause();
 	virtual void input_resume();
@@ -270,6 +271,7 @@ public:
 	#endif
 
 	virtual void video_exit();
+	virtual void window_exit();
 	virtual void input_exit();
 	virtual void output_exit();
 	#ifdef USE_NETWORK
