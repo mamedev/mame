@@ -20,7 +20,33 @@
 	</led14segsc>
 	</element>
 
-	<view name="VFD and Lamp Matrix">
+	<element name="Steppers" defstate="0">
+		<simplecounter maxstate="999" digits="3">
+		<color red="1.0" green="1.0" blue="1.0" />
+		<bounds x="0" y="0" width="1" height="1" />
+		</simplecounter>
+	</element>
+
+	<view name="VFD, Reels and Lamp Matrix">
+		<backdrop name="reel1" element="Steppers" state="0">
+			<bounds x="10" y="320" width="50" height="50"/>
+		</backdrop>
+		<backdrop name="reel2" element="Steppers" state="0">
+			<bounds x="60" y="320" width="50" height="50"/>
+		</backdrop>
+		<backdrop name="reel3" element="Steppers" state="0">
+			<bounds x="110" y="320" width="50" height="50"/>
+		</backdrop>
+		<backdrop name="reel4" element="Steppers" state="0">
+			<bounds x="160" y="320" width="50" height="50"/>
+		</backdrop>
+		<backdrop name="reel5" element="Steppers" state="0">
+			<bounds x="220" y="320" width="50" height="50"/>
+		</backdrop>
+		<backdrop name="reel6" element="Steppers" state="0">
+			<bounds x="280" y="320" width="50" height="50"/>
+		</backdrop>
+
 		<backdrop name="lamp0" element="matrixlamp" state="0">
 			<bounds x="0" y="0" width="7" height="7"/>
 		</backdrop>

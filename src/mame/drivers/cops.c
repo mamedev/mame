@@ -1,16 +1,29 @@
 /***************************************************************************
 
-    Atari Games Cops
+    Nova 'LaserMax'/Atari Games Cops
     (hardware developed by Nova Productions Limited)
+    Preliminary driver by Mariusz Wojcieszek, James Wallace
 
-    Preliminary driver by Mariusz Wojcieszek
+	Cops uses a Sony CD-ROM in addition to the regular setup, purely to play
+	Bad Boys by Inner Circle, so there is muscial accompaniment to areas 
+	where the laserdisc audio is muted.
 
+    TODO: There are probably more ROMs for Revelations, the disc contains
+    full data for a picture based memory game called 'Vision Quest'.	
+	
+	LaserMax memory map needs sorting out, Cops uses a subset of what's
+	actually available
+
+    The UK version COPS appears to want to communicate with the LDP in a
+	different way.
 ***************************************************************************/
 
 
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
 #include "machine/6522via.h"
+#include "sound/sn76496.h"
+
 //#include "machine/mos6551.h"
 
 #include "cops.lh"
@@ -26,11 +39,13 @@ public:
 	cops_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
+			m_sn(*this, "snsnd"),
 			m_irq(0)
 	{ }
 
 	// devices
 	required_device<cpu_device> m_maincpu;
+	required_device<sn76489_device> m_sn;
 
 	// screen updates
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -52,10 +67,12 @@ public:
 	void dacia_receive(UINT8 data);
 	DECLARE_WRITE8_MEMBER(dacia_w);
 	DECLARE_READ8_MEMBER(dacia_r);
+	DECLARE_WRITE8_MEMBER(via1_b_w);
+	DECLARE_WRITE8_MEMBER(via1_cb1_w);
 	DECLARE_WRITE8_MEMBER(cdrom_data_w);
 	DECLARE_WRITE8_MEMBER(cdrom_ctrl_w);
 	DECLARE_READ8_MEMBER(cdrom_data_r);
-
+	DECLARE_DRIVER_INIT(cops);
 	int m_irq;
 
 	UINT8 m_lcd_addr_l, m_lcd_addr_h;
@@ -66,6 +83,9 @@ public:
 
 	UINT8 m_cdrom_ctrl;
 	UINT8 m_cdrom_data;
+
+	UINT8 m_sn_data;
+	UINT8 m_sn_cb1;
 
 	// LDP-1450
 	UINT8 m_ld_command_to_send[5];
@@ -97,13 +117,6 @@ void cops_state::video_start()
 
 UINT32 cops_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	char ledtext[16 + 1];
-	for ( int i = 0; i < 16; i++ )
-	{
-		ledtext[i] = m_maincpu->space(AS_PROGRAM).read_byte(0x64 + i);
-	}
-	ledtext[16] = 0;
-	popmessage("%s",ledtext);
 	return 0;
 }
 
@@ -386,7 +399,7 @@ WRITE8_MEMBER(cops_state::io1_w)
 				{
 					sprintf(output_name, "digit%d", i);
 					display_data = m_lcd_data_l | (m_lcd_data_h << 8);
-					display_data = BITSWAP16(display_data, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0); // todo:
+					display_data = BITSWAP16(display_data, 4, 5, 12, 1, 0, 11, 10, 6, 7, 2, 9, 3, 15, 8, 14, 13);
 					output_set_value(output_name, display_data);
 				}
 			}
@@ -494,6 +507,20 @@ WRITE_LINE_MEMBER(cops_state::via1_irq)
 	m_maincpu->set_input_line(M6502_IRQ_LINE, m_irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
+WRITE8_MEMBER(cops_state::via1_b_w)
+{
+	m_sn_data = BITSWAP8(data,0,1,2,3,4,5,6,7);
+	if (m_sn_cb1)
+	{
+		m_sn->write(space,0,m_sn_data);
+	}
+}
+
+WRITE8_MEMBER(cops_state::via1_cb1_w)
+{
+	m_sn_cb1 = data;
+}
+
 /*************************************
  *
  *  VIA 2 (U27)
@@ -534,9 +561,8 @@ static ADDRESS_MAP_START( cops_map, AS_PROGRAM, 8, cops_state )
 //  AM_RANGE(0xd004, 0xd007) AM_DEVREADWRITE("acia6551_2", mos6551_device, read, write )
 	AM_RANGE(0xd000, 0xd007) AM_READWRITE(dacia_r, dacia_w)
 	AM_RANGE(0xd800, 0xd80f) AM_DEVREADWRITE("via6522_3", via6522_device, read, write)  /* VIA 3 */
-	AM_RANGE(0xe000, 0xffff) AM_ROM AM_REGION("system", 0)
+	AM_RANGE(0xe000, 0xffff) AM_ROMBANK("sysbank1")
 ADDRESS_MAP_END
-
 
 static INPUT_PORTS_START( cops )
 	PORT_START("SW0")
@@ -587,6 +613,15 @@ PALETTE_INIT_MEMBER( cops_state,cops )
 {
 }
 
+DRIVER_INIT_MEMBER(cops_state,cops)
+{
+	//The hardware is designed and programmed to use multiple system ROM banks, but for some reason it's hardwired to bank 2.
+	//For documentation's sake, here's the init
+	UINT8 *rom = memregion("system")->base();
+	membank("sysbank1")->configure_entries(0, 4, &rom[0x0000], 0x2000);
+	membank("sysbank1")->set_entry(2);
+}
+
 static MACHINE_CONFIG_START( cops, cops_state )
 
 	/* basic machine hardware */
@@ -608,6 +643,8 @@ static MACHINE_CONFIG_START( cops, cops_state )
 	/* via */
 	MCFG_DEVICE_ADD("via6522_1", VIA6522, 0)
 	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(cops_state, via1_irq))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(cops_state, via1_b_w))
+	MCFG_VIA6522_CB1_HANDLER(WRITE8(cops_state, via1_cb1_w))
 
 	MCFG_DEVICE_ADD("via6522_2", VIA6522, 0)
 	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(cops_state, via2_irq))
@@ -623,6 +660,11 @@ static MACHINE_CONFIG_START( cops, cops_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+	
+		/* TODO: Verify clock */
+	MCFG_SOUND_ADD("snsnd", SN76489, MAIN_CLOCK/2)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+
 MACHINE_CONFIG_END
 
 
@@ -640,4 +682,23 @@ ROM_START( cops )
 	ROM_LOAD( "cops_sys.dat", 0x0000, 0x8000, CRC(0060e5d0) SHA1(b8c9f6fde6a315e33fa7946e5d3bb4ea2fbe76a8) )
 ROM_END
 
-GAMEL( 1994, cops,  0,   cops,  cops,  driver_device, 0,       ROT0, "Atari Games",      "Cops", GAME_NOT_WORKING | GAME_NO_SOUND, layout_cops )
+ROM_START( copsuk )
+	ROM_REGION( 0x8000, "program", 0 )
+	ROM_LOAD( "cops1b_uk.bin", 0x0000, 0x8000, CRC(f095ee95) SHA1(86bb517331d81ae3a8f3b87df67c321013c6aae4) )
+
+	ROM_REGION( 0x8000, "system", 0 )
+	ROM_LOAD( "cops_sys.dat", 0x0000, 0x8000, CRC(0060e5d0) SHA1(b8c9f6fde6a315e33fa7946e5d3bb4ea2fbe76a8) )
+ROM_END
+
+ROM_START( revlatns )
+	ROM_REGION( 0x8000, "program", 0 )
+	ROM_LOAD( "revelations_prog.bin", 0x0000, 0x8000, CRC(5ab41ac3) SHA1(0f7027551da17011576cf077e2f199729bb10482) )
+
+	ROM_REGION( 0x8000, "system", 0 )
+	ROM_LOAD( "revelations_sys.bin", 0x0000, 0x8000, CRC(43e5e3ec) SHA1(fa44b102b5aa7ad2421c575abdc67f1c29f23bc1) )
+ROM_END
+
+
+GAMEL( 1994, cops,  	0,   cops,  cops,  cops_state, cops,       ROT0, "Atari Games",      				"Cops (USA)",	GAME_NOT_WORKING | GAME_NO_SOUND, layout_cops )
+GAMEL( 1994, copsuk,  	cops,cops,  cops,  cops_state, cops,       ROT0, "Nova Productions / Deith Leisure","Cops (UK)",	GAME_NOT_WORKING | GAME_NO_SOUND, layout_cops )
+GAMEL( 1994, revlatns,  0,   cops,  cops,  cops_state, cops,       ROT0, "Nova Productions",      			"Revelations", 	GAME_NOT_WORKING | GAME_NO_SOUND, layout_cops )

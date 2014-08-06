@@ -214,7 +214,6 @@ int bfm_sc1_state::Scorpion1_GetSwitchState(int strobe, int data)
 
 WRITE8_MEMBER(bfm_sc1_state::bankswitch_w)
 {
-//  printf("bankswitch %02x\n", data);
 	membank("bank1")->set_entry(data & 0x03);
 }
 
@@ -355,28 +354,6 @@ READ8_MEMBER(bfm_sc1_state::nec_r)
 
 WRITE8_MEMBER(bfm_sc1_state::vfd_w)
 {
-/*  int changed = m_vfd_latch ^ data;
-
-    m_vfd_latch = data;
-
-    if ( changed )
-    {
-        if ( changed & VFD_RESET )
-        { // vfd reset line changed
-            if ( !(data & VFD_RESET) )
-            { // reset the vfd
-            m_vfd0->reset();
-            }
-        }
-        if ( changed & VFD_CLOCK1 )
-        { // clock line changed
-            if ( !(data & VFD_CLOCK1) && (data & VFD_RESET) )
-            { // new data clocked into vfd
-                m_vfd0->shift_data(data & VFD_DATA );
-            }
-        }
-    }
-*/
 	m_vfd0->por(data & VFD_RESET);
 	m_vfd0->data(data & VFD_DATA);
 	m_vfd0->sclk(data & VFD_CLOCK1);
@@ -1077,6 +1054,7 @@ static MACHINE_CONFIG_START( scorpion1, bfm_sc1_state )
 	MCFG_CPU_PERIODIC_INT_DRIVER(bfm_sc1_state, timer_irq,  1000)               // generate 1000 IRQ's per second
 	MCFG_WATCHDOG_TIME_INIT(PERIOD_OF_555_MONOSTABLE(120000,100e-9))
 
+	
 	MCFG_BFMBD1_ADD("vfd0",0)
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("aysnd",AY8912, MASTER_CLOCK/4)
