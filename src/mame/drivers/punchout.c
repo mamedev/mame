@@ -12,6 +12,7 @@ driver by Nicola Salmoria
 TODO:
 - add useless driver config to choose between pink and white color proms
 - video raw params - pixel clock is derived from 20.16mhz xtal
+- spnchout rtc doesn't have a battery
 - money bag placement might not be 100% correct in Arm Wrestling
 
 
@@ -662,14 +663,14 @@ static MACHINE_CONFIG_START( punchout, punchout_state )
 	MCFG_SCREEN_PALETTE("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_SOUND_ADD("nesapu", NES_APU, XTAL_21_4772MHz/12)
 	MCFG_NES_APU_CPU("audiocpu")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 
 	MCFG_SOUND_ADD("vlm", VLM5030, XTAL_21_4772MHz/6)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 MACHINE_CONFIG_END
 
 
@@ -679,7 +680,7 @@ static MACHINE_CONFIG_DERIVED( spnchout, punchout )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(spnchout_io_map)
 
-	MCFG_DEVICE_ADD("rtc", RP5C01, XTAL_32_768kHz) // frequency guessed
+	MCFG_DEVICE_ADD("rtc", RP5C01, 0) // OSCIN -> Vcc
 	MCFG_RP5H01_ADD("rp5h01")
 	
 	MCFG_MACHINE_RESET_OVERRIDE(punchout_state, spnchout)

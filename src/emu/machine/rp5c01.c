@@ -198,11 +198,14 @@ void rp5c01_device::device_start()
 	m_out_alarm_cb.resolve_safe();
 
 	// allocate timers
-	m_clock_timer = timer_alloc(TIMER_CLOCK);
-	m_clock_timer->adjust(attotime::from_hz(clock() / 16384), 0, attotime::from_hz(clock() / 16384));
+	if (clock() > 0)
+	{
+		m_clock_timer = timer_alloc(TIMER_CLOCK);
+		m_clock_timer->adjust(attotime::from_hz(clock() / 16384), 0, attotime::from_hz(clock() / 16384));
 
-	m_16hz_timer = timer_alloc(TIMER_16HZ);
-	m_16hz_timer->adjust(attotime::from_hz(clock() / 1024), 0, attotime::from_hz(clock() / 1024));
+		m_16hz_timer = timer_alloc(TIMER_16HZ);
+		m_16hz_timer->adjust(attotime::from_hz(clock() / 1024), 0, attotime::from_hz(clock() / 1024));
+	}
 
 	// state saving
 	save_item(NAME(m_reg[MODE00]));
@@ -228,7 +231,8 @@ void rp5c01_device::device_reset()
 	// 24 hour mode
 	m_reg[MODE01][REGISTER_12_24_SELECT] = 1;
 
-	set_current_time(machine());
+	if (clock() > 0)
+		set_current_time(machine());
 }
 
 
