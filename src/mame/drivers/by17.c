@@ -9,7 +9,6 @@
 
 
 ToDo:
-- Display to fix
 - Bow & Arrow fails the PIA test and doesn't boot
 - Dips, Inputs, Solenoids vary per game
 - Mechanical
@@ -103,125 +102,167 @@ static INPUT_PORTS_START( by17 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Activity") PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, by17_state, activity_test, 0)
 
 	PORT_START("DSW0")
-	PORT_DIPNAME( 0x01, 0x00, "S01") // S1-5: 32 combinations of coins/credits of a coin slot. S9-13 other slot.
+	PORT_DIPNAME( 0x1f, 0x02, "Coin Slot 1")
+	PORT_DIPSETTING(    0x00, DEF_STR( 2C_3C )) // same as 01
+	PORT_DIPSETTING(    0x02, DEF_STR( 1C_1C ))
+	PORT_DIPSETTING(    0x03, DEF_STR( 2C_1C ))
+	PORT_DIPSETTING(    0x04, DEF_STR( 1C_2C ))
+	PORT_DIPSETTING(    0x05, DEF_STR( 2C_2C ))
+	PORT_DIPSETTING(    0x06, DEF_STR( 1C_3C ))
+	PORT_DIPSETTING(    0x07, DEF_STR( 2C_3C ))
+	PORT_DIPSETTING(    0x08, DEF_STR( 1C_4C ))
+	PORT_DIPSETTING(    0x09, DEF_STR( 2C_4C ))
+	PORT_DIPSETTING(    0x0a, DEF_STR( 1C_5C ))
+	PORT_DIPSETTING(    0x0b, DEF_STR( 2C_5C ))
+	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_6C ))
+	PORT_DIPSETTING(    0x0d, DEF_STR( 2C_6C ))
+	PORT_DIPSETTING(    0x0e, DEF_STR( 1C_7C ))
+	PORT_DIPSETTING(    0x0f, DEF_STR( 2C_7C ))
+	PORT_DIPSETTING(    0x10, DEF_STR( 1C_8C ))
+	PORT_DIPSETTING(    0x11, DEF_STR( 2C_8C ))
+	PORT_DIPSETTING(    0x12, DEF_STR( 1C_9C ))
+	PORT_DIPSETTING(    0x13, "2 coins 9 credits")
+	PORT_DIPSETTING(    0x14, "1 coin 10 credits")
+	PORT_DIPSETTING(    0x15, "2 coins 10 credits")
+	PORT_DIPSETTING(    0x16, "1 coin 11 credits")
+	PORT_DIPSETTING(    0x17, "2 coins 11 credits")
+	PORT_DIPSETTING(    0x18, "1 coin 12 credits")
+	PORT_DIPSETTING(    0x19, "2 coins 12 credits")
+	PORT_DIPSETTING(    0x1a, "1 coin 13 credits")
+	PORT_DIPSETTING(    0x1b, "2 coins 13 credits")
+	PORT_DIPSETTING(    0x1c, "1 coin 14 credits")
+	PORT_DIPSETTING(    0x1d, "2 coins 14 credits")
+	PORT_DIPSETTING(    0x1e, "1 coin 15 credits")
+	PORT_DIPSETTING(    0x1f, "2 coins 15 credits")
+	PORT_DIPNAME( 0x20, 0x20, "Award")
+	PORT_DIPSETTING(    0x00, "Extra Ball")
+	PORT_DIPSETTING(    0x20, "Free Game")
+	PORT_DIPNAME( 0x40, 0x00, "S07")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
-	PORT_DIPSETTING(    0x01, DEF_STR( On ))
-	PORT_DIPNAME( 0x02, 0x00, "S02")
+	PORT_DIPSETTING(    0x40, DEF_STR( On ))
+	PORT_DIPNAME( 0x80, 0x00, "Play melody always")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
-	PORT_DIPSETTING(    0x02, DEF_STR( On ))
-	PORT_DIPNAME( 0x04, 0x00, "S03")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
-	PORT_DIPSETTING(    0x04, DEF_STR( On ))
-	PORT_DIPNAME( 0x08, 0x00, "S04")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
-	PORT_DIPSETTING(    0x08, DEF_STR( On ))
-	PORT_DIPNAME( 0x10, 0x00, "S05")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
-	PORT_DIPSETTING(    0x10, DEF_STR( On ))
-	PORT_DIPNAME( 0x20, 0x20, "S06")
-	PORT_DIPSETTING(    0x00, DEF_STR( No ))
-	PORT_DIPSETTING(    0x20, DEF_STR( Yes ))
-	PORT_DIPNAME( 0x40, 0x40, "S07")
-	PORT_DIPSETTING(    0x00, DEF_STR( No ))
-	PORT_DIPSETTING(    0x40, DEF_STR( Yes ))
-	PORT_DIPNAME( 0x80, 0x80, "S08")
-	PORT_DIPSETTING(    0x00, DEF_STR( No ))
-	PORT_DIPSETTING(    0x80, DEF_STR( Yes ))
+	PORT_DIPSETTING(    0x80, DEF_STR( On ))
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x01, 0x00, "S09")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
-	PORT_DIPSETTING(    0x01, DEF_STR( On ))
-	PORT_DIPNAME( 0x02, 0x00, "S10")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
-	PORT_DIPSETTING(    0x02, DEF_STR( On ))
-	PORT_DIPNAME( 0x04, 0x00, "S11")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
-	PORT_DIPSETTING(    0x04, DEF_STR( On ))
-	PORT_DIPNAME( 0x08, 0x00, "S12")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
-	PORT_DIPSETTING(    0x08, DEF_STR( On ))
-	PORT_DIPNAME( 0x10, 0x00, "S13")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
-	PORT_DIPSETTING(    0x10, DEF_STR( On ))
+	PORT_DIPNAME( 0x1f, 0x02, "Coin Slot 3")
+	PORT_DIPSETTING(    0x00, DEF_STR( 2C_3C )) // same as 01
+	PORT_DIPSETTING(    0x02, DEF_STR( 1C_1C ))
+	PORT_DIPSETTING(    0x03, DEF_STR( 2C_1C ))
+	PORT_DIPSETTING(    0x04, DEF_STR( 1C_2C ))
+	PORT_DIPSETTING(    0x05, DEF_STR( 2C_2C ))
+	PORT_DIPSETTING(    0x06, DEF_STR( 1C_3C ))
+	PORT_DIPSETTING(    0x07, DEF_STR( 2C_3C ))
+	PORT_DIPSETTING(    0x08, DEF_STR( 1C_4C ))
+	PORT_DIPSETTING(    0x09, DEF_STR( 2C_4C ))
+	PORT_DIPSETTING(    0x0a, DEF_STR( 1C_5C ))
+	PORT_DIPSETTING(    0x0b, DEF_STR( 2C_5C ))
+	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_6C ))
+	PORT_DIPSETTING(    0x0d, DEF_STR( 2C_6C ))
+	PORT_DIPSETTING(    0x0e, DEF_STR( 1C_7C ))
+	PORT_DIPSETTING(    0x0f, DEF_STR( 2C_7C ))
+	PORT_DIPSETTING(    0x10, DEF_STR( 1C_8C ))
+	PORT_DIPSETTING(    0x11, DEF_STR( 2C_8C ))
+	PORT_DIPSETTING(    0x12, DEF_STR( 1C_9C ))
+	PORT_DIPSETTING(    0x13, "2 coins 9 credits")
+	PORT_DIPSETTING(    0x14, "1 coin 10 credits")
+	PORT_DIPSETTING(    0x15, "2 coins 10 credits")
+	PORT_DIPSETTING(    0x16, "1 coin 11 credits")
+	PORT_DIPSETTING(    0x17, "2 coins 11 credits")
+	PORT_DIPSETTING(    0x18, "1 coin 12 credits")
+	PORT_DIPSETTING(    0x19, "2 coins 12 credits")
+	PORT_DIPSETTING(    0x1a, "1 coin 13 credits")
+	PORT_DIPSETTING(    0x1b, "2 coins 13 credits")
+	PORT_DIPSETTING(    0x1c, "1 coin 14 credits")
+	PORT_DIPSETTING(    0x1d, "2 coins 14 credits")
+	PORT_DIPSETTING(    0x1e, "1 coin 15 credits")
+	PORT_DIPSETTING(    0x1f, "2 coins 15 credits")
 	PORT_DIPNAME( 0x20, 0x00, "S14")
-	PORT_DIPSETTING(    0x00, DEF_STR( Yes ))
-	PORT_DIPSETTING(    0x20, DEF_STR( No ))
-	PORT_DIPNAME( 0x40, 0x40, "S15")
-	PORT_DIPSETTING(    0x00, DEF_STR( No ))
-	PORT_DIPSETTING(    0x40, DEF_STR( Yes ))
-	PORT_DIPNAME( 0x80, 0x00, "S16")
-	PORT_DIPSETTING(    0x00, DEF_STR( No ))
-	PORT_DIPSETTING(    0x80, DEF_STR( Yes ))
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
+	PORT_DIPSETTING(    0x20, DEF_STR( On ))
+	PORT_DIPNAME( 0x40, 0x00, "Award for beating high score")
+	PORT_DIPSETTING(    0x00, "Novelty")
+	PORT_DIPSETTING(    0x40, "3 Free Games")
+	PORT_DIPNAME( 0x80, 0x00, "Balls")
+	PORT_DIPSETTING(    0x00, "3")
+	PORT_DIPSETTING(    0x80, "5")
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x01, 0x00, "S17")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
-	PORT_DIPSETTING(    0x01, DEF_STR( On ))
-	PORT_DIPNAME( 0x02, 0x00, "S18")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
-	PORT_DIPSETTING(    0x02, DEF_STR( On ))
-	PORT_DIPNAME( 0x04, 0x00, "S19")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
-	PORT_DIPSETTING(    0x04, DEF_STR( On ))
-	PORT_DIPNAME( 0x08, 0x00, "S20")
+	PORT_DIPNAME( 0x07, 0x02, "Maximum Credits")
+	PORT_DIPSETTING(    0x00, "5")
+	PORT_DIPSETTING(    0x01, "10")
+	PORT_DIPSETTING(    0x02, "15")
+	PORT_DIPSETTING(    0x00, "20")
+	PORT_DIPSETTING(    0x00, "25")
+	PORT_DIPSETTING(    0x00, "30")
+	PORT_DIPSETTING(    0x00, "35")
+	PORT_DIPSETTING(    0x00, "40")
+	PORT_DIPNAME( 0x08, 0x08, "Credits displayed")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
 	PORT_DIPSETTING(    0x08, DEF_STR( On ))
-	PORT_DIPNAME( 0x10, 0x00, "S21")
+	PORT_DIPNAME( 0x10, 0x10, "Match")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
 	PORT_DIPSETTING(    0x10, DEF_STR( On ))
+	// from here, game-specific options
 	PORT_DIPNAME( 0x20, 0x00, "S22")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
 	PORT_DIPSETTING(    0x20, DEF_STR( On ))
 	PORT_DIPNAME( 0x40, 0x00, "S23")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
 	PORT_DIPSETTING(    0x40, DEF_STR( On ))
-	PORT_DIPNAME( 0x80, 0x00, "S24")
+	PORT_DIPNAME( 0x80, 0x00, "No free balls or games") // night rider
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
 	PORT_DIPSETTING(    0x80, DEF_STR( On ))
 
 	PORT_START("DSW3")
-	PORT_DIPNAME( 0x03, 0x03, "Maximum Credits")
-	PORT_DIPSETTING(    0x00, "10")
-	PORT_DIPSETTING(    0x01, "15")
-	PORT_DIPSETTING(    0x02, "25")
-	PORT_DIPSETTING(    0x03, "40")
-	PORT_DIPNAME( 0x04, 0x04, "Credits displayed")
+	PORT_DIPNAME( 0x01, 0x00, "S25")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
+	PORT_DIPSETTING(    0x01, DEF_STR( On ))
+	PORT_DIPNAME( 0x02, 0x00, "S26")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
+	PORT_DIPSETTING(    0x02, DEF_STR( On ))
+	PORT_DIPNAME( 0x04, 0x00, "S27")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
 	PORT_DIPSETTING(    0x04, DEF_STR( On ))
-	PORT_DIPNAME( 0x08, 0x08, "Match")
+	PORT_DIPNAME( 0x08, 0x00, "S28")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
 	PORT_DIPSETTING(    0x08, DEF_STR( On ))
-	PORT_DIPNAME( 0x10, 0x00, "Keep all replays")
+	PORT_DIPNAME( 0x10, 0x00, "S29")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
 	PORT_DIPSETTING(    0x10, DEF_STR( On ))
-	PORT_DIPNAME( 0x20, 0x00, "Voice" )
+	PORT_DIPNAME( 0x20, 0x00, "S30")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
 	PORT_DIPSETTING(    0x20, DEF_STR( On ))
-	PORT_DIPNAME( 0xC0, 0x40, "Balls")
-	PORT_DIPSETTING(    0xC0, "2")
-	PORT_DIPSETTING(    0x00, "3")
-	PORT_DIPSETTING(    0x80, "4")
-	PORT_DIPSETTING(    0x40, "5")
+	PORT_DIPNAME( 0x40, 0x00, "Awards") // night rider
+	PORT_DIPSETTING(    0x00, "Conservative")
+	PORT_DIPSETTING(    0x40, "Liberal")
+	PORT_DIPNAME( 0x80, 0x00, "Lane Adjustment") // night rider
+	PORT_DIPSETTING(    0x00, "Conservative")
+	PORT_DIPSETTING(    0x80, "Liberal")
 
 	PORT_START("X0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER )
-	PORT_BIT( 0x0a, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START2 )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER )
+	// custom
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_SLASH)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_COLON)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_QUOTE)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_BACKSLASH)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_BACKSPACE)
+	// standard
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_TILT )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Outhole") PORT_CODE(KEYCODE_X)
 
 	PORT_START("X1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN2 )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN3 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN1 )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN3 )
-	PORT_BIT( 0x38, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN2 )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_L)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_OPENBRACE)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_CLOSEBRACE)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_ENTER)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_TILT1 ) PORT_NAME("Slam Tilt")
 
-	// from here, vary per game
+	// custom
 	PORT_START("X2")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_A)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_S)
@@ -296,26 +337,20 @@ WRITE8_MEMBER( by17_state::u10_a_w )
 
 	if (!m_u10_ca2)
 	{
-		switch (m_u10)
-		{
-		case 0x10:
+		if (!BIT(m_u10, 0))
 			output_set_digit_value(m_digit, patterns[m_segment]);
-			break;
-		case 0x1d:
+		else
+		if (m_u10==0x1d)
 			output_set_digit_value(8+m_digit, patterns[m_segment]);
-			break;
-		case 0x1b:
+		else
+		if (m_u10==0x1b)
 			output_set_digit_value(16+m_digit, patterns[m_segment]);
-			break;
-		case 0x07:
+		else
+		if (m_u10==0x07)
 			output_set_digit_value(24+m_digit, patterns[m_segment]);
-			break;
-		case 0x0f:
+		else
+		if (!BIT(m_u10, 4))
 			output_set_digit_value(32+m_digit, patterns[m_segment]);
-			break;
-		default:
-			break;
-		}
 	}
 }
 
@@ -392,20 +427,19 @@ WRITE8_MEMBER( by17_state::u11_b_w )
 	m_u11_b = data;
 	switch (data & 15)
 	{
-		case 0x0: //
-			//m_samples->start(0, 3);
-			break;
-		case 0x1: // chime 10
+		case 0x0: // chime 10
 			m_samples->start(1, 1);
 			break;
-		case 0x2: // chime 100
+		case 0x1: // chime 100
 			m_samples->start(2, 2);
 			break;
-		case 0x3: // chime 1000
+		case 0x2: // chime 1000
 			m_samples->start(3, 3);
 			break;
-		case 0x4: // chime 10000
+		case 0x3: // chime 10000
 			m_samples->start(0, 4);
+			break;
+		case 0x4:
 			break;
 		case 0x5: // knocker
 			m_samples->start(0, 6);
@@ -417,24 +451,15 @@ WRITE8_MEMBER( by17_state::u11_b_w )
 		case 0x7:
 		case 0x8:
 		case 0x9:
-			//m_samples->start(0, 5);
 			break;
 		case 0xa:
-			//m_samples->start(0, 5);
-			break;
 		case 0xb:
-			//m_samples->start(0, 0);
-			break;
-		case 0xc:
-			//m_samples->start(0, 5);
+		case 0xc: // bumpers
+			m_samples->start(0, 0);
 			break;
 		case 0xd:
-			//m_samples->start(0, 0);
-			break;
 		case 0xe:
-			//m_samples->start(0, 5);
-			break;
-		case 0xf: // not used
+		case 0xf:
 			break;
 	}
 }
@@ -446,9 +471,11 @@ void by17_state::machine_reset()
 	m_u10_cb2 = 0;
 	m_u11_a = 0;
 	m_u11_b = 0;
+	m_u10_timer = 0;
+	m_u11_timer = 0;
 }
 
-DRIVER_INIT_MEMBER(by17_state,by17)
+DRIVER_INIT_MEMBER( by17_state, by17 )
 {
 }
 
@@ -502,18 +529,10 @@ static MACHINE_CONFIG_START( by17, by17_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_d", by17_state, u11_timer, attotime::from_hz(634)) // 555 timer*2
 MACHINE_CONFIG_END
 
-/*--------------------------------
-/ Black Jack
-/-------------------------------*/
-ROM_START(blackjck)
-	ROM_REGION(0x1000, "roms", 0)
-	ROM_LOAD( "728-32_2.716", 0x0000, 0x0800, CRC(1333c9d1) SHA1(1fbb60d84db47ffaf7f291575b2705783a110678))
-	ROM_LOAD( "720-20_6.716", 0x0800, 0x0800, CRC(0c17aa4d) SHA1(729e61a29691857112579efcdb96a35e8e5b1279))
-ROM_END
-
-/*--------------------------------
-/ Bow and Arrow
-/-------------------------------*/
+/*------------------------------------------------------------------
+/ Bow and Arrow #1033 (prototype only, slightly different hardware)
+/ not sure yet if it belongs in this driver
+/-------------------------------------------------------------------*/
 ROM_START(bowarrow)
 	ROM_REGION(0x1000, "roms", 0)
 	ROM_LOAD("b14.bin", 0x0400, 0x0200, CRC(d4d0f92a) SHA1(b996cbe9762fafd64115dc78e24626cf08f8abf7))
@@ -525,25 +544,7 @@ ROM_START(bowarrow)
 ROM_END
 
 /*--------------------------------
-/ Eight Ball
-/-------------------------------*/
-ROM_START(eightbll)
-	ROM_REGION(0x1000, "roms", 0)
-	ROM_LOAD( "723-20_2.716", 0x0000, 0x0800, CRC(33559e7b) SHA1(49008db95c8f012e7e3b613e6eee811512207fa9))
-	ROM_LOAD( "720-20_6.716", 0x0800, 0x0800, CRC(0c17aa4d) SHA1(729e61a29691857112579efcdb96a35e8e5b1279))
-ROM_END
-
-/*--------------------------------
-/ Evel Knievel
-/-------------------------------*/
-ROM_START(evelknie)
-	ROM_REGION(0x1000, "roms", 0)
-	ROM_LOAD( "722-17_2.716", 0x0000, 0x0800, CRC(b6d9a3fa) SHA1(1939e13f73a324e3d2fd269a54446f48cf530f50))
-	ROM_LOAD( "720-20_6.716", 0x0800, 0x0800, CRC(0c17aa4d) SHA1(729e61a29691857112579efcdb96a35e8e5b1279))
-ROM_END
-
-/*--------------------------------
-/ Freedom
+/ Freedom #1066
 /-------------------------------*/
 ROM_START(freedom)
 	ROM_REGION(0x1000, "roms", 0)
@@ -553,16 +554,7 @@ ROM_START(freedom)
 ROM_END
 
 /*--------------------------------
-/ Mata Hari
-/-------------------------------*/
-ROM_START(matahari)
-	ROM_REGION(0x1000, "roms", 0)
-	ROM_LOAD( "725-21_2.716", 0x0000, 0x0800, CRC(63acd9b0) SHA1(2347342f1281c097ea39c79236d85b00a1dfc7b2))
-	ROM_LOAD( "720-20_6.716", 0x0800, 0x0800, CRC(0c17aa4d) SHA1(729e61a29691857112579efcdb96a35e8e5b1279))
-ROM_END
-
-/*--------------------------------
-/ Night Rider
+/ Night Rider #1074
 /-------------------------------*/
 ROM_START(nightrdr)
 	ROM_REGION(0x1000, "roms", 0)
@@ -577,7 +569,43 @@ ROM_START(nightr20)
 ROM_END
 
 /*--------------------------------
-/ Power Play
+/ Black Jack #1092
+/-------------------------------*/
+ROM_START(blackjck)
+	ROM_REGION(0x1000, "roms", 0)
+	ROM_LOAD( "728-32_2.716", 0x0000, 0x0800, CRC(1333c9d1) SHA1(1fbb60d84db47ffaf7f291575b2705783a110678))
+	ROM_LOAD( "720-20_6.716", 0x0800, 0x0800, CRC(0c17aa4d) SHA1(729e61a29691857112579efcdb96a35e8e5b1279))
+ROM_END
+
+/*--------------------------------
+/ Evel Knievel #1094
+/-------------------------------*/
+ROM_START(evelknie)
+	ROM_REGION(0x1000, "roms", 0)
+	ROM_LOAD( "722-17_2.716", 0x0000, 0x0800, CRC(b6d9a3fa) SHA1(1939e13f73a324e3d2fd269a54446f48cf530f50))
+	ROM_LOAD( "720-20_6.716", 0x0800, 0x0800, CRC(0c17aa4d) SHA1(729e61a29691857112579efcdb96a35e8e5b1279))
+ROM_END
+
+/*--------------------------------
+/ Mata Hari #1104
+/-------------------------------*/
+ROM_START(matahari)
+	ROM_REGION(0x1000, "roms", 0)
+	ROM_LOAD( "725-21_2.716", 0x0000, 0x0800, CRC(63acd9b0) SHA1(2347342f1281c097ea39c79236d85b00a1dfc7b2))
+	ROM_LOAD( "720-20_6.716", 0x0800, 0x0800, CRC(0c17aa4d) SHA1(729e61a29691857112579efcdb96a35e8e5b1279))
+ROM_END
+
+/*--------------------------------
+/ Eight Ball #1118
+/-------------------------------*/
+ROM_START(eightbll)
+	ROM_REGION(0x1000, "roms", 0)
+	ROM_LOAD( "723-20_2.716", 0x0000, 0x0800, CRC(33559e7b) SHA1(49008db95c8f012e7e3b613e6eee811512207fa9))
+	ROM_LOAD( "720-20_6.716", 0x0800, 0x0800, CRC(0c17aa4d) SHA1(729e61a29691857112579efcdb96a35e8e5b1279))
+ROM_END
+
+/*--------------------------------
+/ Power Play #1120
 /-------------------------------*/
 ROM_START(pwerplay)
 	ROM_REGION(0x1000, "roms", 0)
@@ -586,11 +614,7 @@ ROM_START(pwerplay)
 ROM_END
 
 /*--------------------------------
-/ Stellar Airship / Geiger-Automatenbau GMBH, of Germany (1981)
-/-------------------------------*/
-
-/*--------------------------------
-/ Strikes and Spares
+/ Strikes and Spares #1135
 /-------------------------------*/
 ROM_START(stk_sprs)
 	ROM_REGION(0x1000, "roms", 0)
@@ -598,14 +622,18 @@ ROM_START(stk_sprs)
 	ROM_LOAD( "720-20_6.716", 0x0800, 0x0800, CRC(0c17aa4d) SHA1(729e61a29691857112579efcdb96a35e8e5b1279))
 ROM_END
 
+/*--------------------------------------------------------------
+/ Stellar Airship / Geiger-Automatenbau GMBH, of Germany (1981)
+/---------------------------------------------------------------*/
 
-GAME( 1978, blackjck, 0,        by17, by17, by17_state, by17, ROT0, "Bally","Black Jack (Pinball)", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1976, bowarrow, 0,        by17, by17, by17_state, by17, ROT0, "Bally","Bow & Arrow (Prototype)", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1977, eightbll, 0,        by17, by17, by17_state, by17, ROT0, "Bally","Eight Ball", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1977, evelknie, 0,        by17, by17, by17_state, by17, ROT0, "Bally","Evel Knievel", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1977, freedom,  0,        by17, by17, by17_state, by17, ROT0, "Bally","Freedom", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1978, matahari, 0,        by17, by17, by17_state, by17, ROT0, "Bally","Mata Hari", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1977, nightrdr, 0,        by17, by17, by17_state, by17, ROT0, "Bally","Night Rider (rev. 21)", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1977, nightr20, nightrdr, by17, by17, by17_state, by17, ROT0, "Bally","Night Rider (rev. 20)", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1978, pwerplay, 0,        by17, by17, by17_state, by17, ROT0, "Bally","Power Play (Pinball)", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1978, stk_sprs, 0,        by17, by17, by17_state, by17, ROT0, "Bally","Strikes and Spares", GAME_IS_SKELETON_MECHANICAL)
+
+GAME( 1976, bowarrow, 0,        by17, by17, by17_state, by17, ROT0, "Bally", "Bow & Arrow (Prototype)", GAME_IS_SKELETON_MECHANICAL)
+GAME( 1977, freedom,  0,        by17, by17, by17_state, by17, ROT0, "Bally", "Freedom", GAME_MECHANICAL)
+GAME( 1977, nightrdr, 0,        by17, by17, by17_state, by17, ROT0, "Bally", "Night Rider (rev. 21)", GAME_MECHANICAL)
+GAME( 1977, nightr20, nightrdr, by17, by17, by17_state, by17, ROT0, "Bally", "Night Rider (rev. 20)", GAME_MECHANICAL)
+GAME( 1978, blackjck, 0,        by17, by17, by17_state, by17, ROT0, "Bally", "Black Jack (Pinball)", GAME_MECHANICAL)
+GAME( 1977, evelknie, 0,        by17, by17, by17_state, by17, ROT0, "Bally", "Evel Knievel", GAME_MECHANICAL)
+GAME( 1978, matahari, 0,        by17, by17, by17_state, by17, ROT0, "Bally", "Mata Hari", GAME_MECHANICAL)
+GAME( 1977, eightbll, 0,        by17, by17, by17_state, by17, ROT0, "Bally", "Eight Ball", GAME_MECHANICAL)
+GAME( 1978, pwerplay, 0,        by17, by17, by17_state, by17, ROT0, "Bally", "Power Play (Pinball)", GAME_MECHANICAL)
+GAME( 1978, stk_sprs, 0,        by17, by17, by17_state, by17, ROT0, "Bally", "Strikes and Spares", GAME_MECHANICAL)
