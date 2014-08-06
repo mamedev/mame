@@ -2914,7 +2914,7 @@ ROM_END
      GAME BD NO. 833-8389-01 EXHAUST NOTE (USA)
                  833-8389-02 EXHAUST NOTE (World)
                  833-8389-03 EXHAUST NOTE (Japan)
-         ROM BD. 834-8439-01 (USA)
+         ROM BD. 834-8439-01 (USA) 834-8439-04 according to dump notes
                  834-8439-02 (World)
                  834-8439-03 (Japan)
         MAIN BD. 837-7428 (SYSTEM 32 COM)
@@ -2949,7 +2949,7 @@ ROM_START( f1en )
 	ROMX_LOAD( "mpr-14363", 0x000007, 0x080000, CRC(f3427a56) SHA1(6a99d7432dfff35470ddcca5cfde36689a77e706) , ROM_SKIP(7) )
 ROM_END
 
-ROM_START( f1ena ) // ROM PCB number is 834-8439-04
+ROM_START( f1enu ) // ROM PCB number is 834-8439-04
 	ROM_REGION( 0x200000, "maincpu", 0 ) /* v60 code + data */
 	ROM_LOAD_x8( "epr-14451a.ic6",       0x000000, 0x020000, CRC(e17259c9) SHA1(be789b7630b7265e19ea2c80f603caff9cec37f8) )
 	ROM_LOAD16_BYTE_x2( "epr-14445.014", 0x100000, 0x040000, CRC(d06261ab) SHA1(6e1c4ce4e49a142fd5b1ecac98145960d7afd567) )
@@ -4592,6 +4592,8 @@ DRIVER_INIT_MEMBER(segas32_state,f1en)
 	segas32_common_init(read16_delegate(FUNC(segas32_state::analog_custom_io_r),this), write16_delegate(FUNC(segas32_state::analog_custom_io_w),this));
 
 	m_dual_pcb_comms = auto_alloc_array(machine(), UINT16, 0x1000/2);
+	memset(m_dual_pcb_comms, 0xff, 0x1000 / 2);
+
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x810000, 0x810fff, read16_delegate(FUNC(segas32_state::dual_pcb_comms_r),this), write16_delegate(FUNC(segas32_state::dual_pcb_comms_w),this));
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x818000, 0x818003, read16_delegate(FUNC(segas32_state::dual_pcb_masterslave),this));
 
@@ -4756,8 +4758,8 @@ GAME( 1992, brivalj,   brival,   system32,     brival,   segas32_state, brival, 
 GAME( 1992, darkedge,  0,        system32,     darkedge, segas32_state, darkedge, ROT0, "Sega",   "Dark Edge (World)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1992, darkedgej, darkedge, system32,     darkedge, segas32_state, darkedge, ROT0, "Sega",   "Dark Edge (Japan)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1994, dbzvrvs,   0,        system32,     dbzvrvs,  segas32_state, dbzvrvs,  ROT0, "Sega / Banpresto", "Dragon Ball Z V.R.V.S. (Japan)", GAME_IMPERFECT_GRAPHICS)
-GAME( 1991, f1en,      0,        system32,     f1en,     segas32_state, f1en,     ROT0, "Sega",   "F1 Exhaust Note (set 1)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1991, f1ena,     f1en,     system32,     f1en,     segas32_state, f1en,     ROT0, "Sega",   "F1 Exhaust Note (set 2)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1991, f1en,      0,        system32,     f1en,     segas32_state, f1en,     ROT0, "Sega",   "F1 Exhaust Note (World)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1991, f1enu,     f1en,     system32,     f1en,     segas32_state, f1en,     ROT0, "Sega",   "F1 Exhaust Note (US)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1993, f1lap,     0,        system32,     f1lap,    segas32_state, f1lap,    ROT0, "Sega",   "F1 Super Lap (World)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1993, f1lapj,    f1lap,    system32,     f1lap,    segas32_state, f1lap,    ROT0, "Sega",   "F1 Super Lap (Japan)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1992, ga2,       0,        system32_v25, ga2,      segas32_state, ga2,      ROT0, "Sega",   "Golden Axe: The Revenge of Death Adder (World)", GAME_IMPERFECT_GRAPHICS )
