@@ -1270,20 +1270,34 @@ void amstrad_state::AmstradCPC_GA_SetRamConfiguration()
 	int ConfigurationIndex = m_GateArray_RamConfiguration & 0x07;
 	int BankIndex,i;
 	unsigned char *BankAddr;
+	UINT8 banknum = (m_GateArray_RamConfiguration & 0x38) >> 3;
 
 /* if b5 = 0 */
-	if(((m_GateArray_RamConfiguration) & (1<<5)) == 0)
+	if(m_ram->size() > 65536)
 	{
 		for (i=0;i<4;i++)
 		{
 			BankIndex = RamConfigurations[(ConfigurationIndex << 2) + i];
-			BankAddr = m_ram->pointer() + (BankIndex << 14);
+			if(BankIndex > 3)
+			{
+				UINT8 maxbank = ((m_ram->size()-65536) / 65536);
+				BankAddr = m_ram->pointer() + (BankIndex << 14) + ((banknum%maxbank)*0x10000);
+			}
+			else
+				BankAddr = m_ram->pointer() + (BankIndex << 14);
 			m_Aleste_RamBanks[i] = BankAddr;
 			m_AmstradCPC_RamBanks[i] = BankAddr;
 		}
 	}
 	else
-	{/* Need to add the ram expansion configuration here ! */
+	{
+		// set normal 64k RAM mapping
+		for (i=0;i<4;i++)
+		{
+			BankAddr = m_ram->pointer() + (i << 14);
+			m_Aleste_RamBanks[i] = BankAddr;
+			m_AmstradCPC_RamBanks[i] = BankAddr;
+		}
 	}
 	amstrad_rethinkMemory();
 }

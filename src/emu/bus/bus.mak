@@ -1063,6 +1063,7 @@ BUSOBJS += $(BUSOBJ)/cpc/cpc_rom.o
 BUSOBJS += $(BUSOBJ)/cpc/cpc_pds.o
 BUSOBJS += $(BUSOBJ)/cpc/cpc_rs232.o
 BUSOBJS += $(BUSOBJ)/cpc/mface2.o
+BUSOBJS += $(BUSOBJ)/cpc/symbfac2.o
 endif
 
 #-------------------------------------------------
