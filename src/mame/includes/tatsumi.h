@@ -76,8 +76,6 @@ public:
 	UINT8 m_roundupt_crt_reg[64];
 	UINT8* m_shadow_pen_array;
 	required_shared_ptr<UINT16> m_spriteram;
-	DECLARE_READ16_MEMBER(cyclwarr_cpu_bb_r);
-	DECLARE_WRITE16_MEMBER(cyclwarr_cpu_bb_w);
 	DECLARE_READ16_MEMBER(cyclwarr_sprite_r);
 	DECLARE_WRITE16_MEMBER(cyclwarr_sprite_w);
 	DECLARE_WRITE16_MEMBER(bigfight_a20000_w);

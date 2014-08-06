@@ -155,16 +155,6 @@
 
 /***************************************************************************/
 
-READ16_MEMBER(tatsumi_state::cyclwarr_cpu_bb_r)
-{
-	return m_cyclwarr_cpub_ram[offset];
-}
-
-WRITE16_MEMBER(tatsumi_state::cyclwarr_cpu_bb_w)
-{
-	COMBINE_DATA(&m_cyclwarr_cpub_ram[offset]);
-}
-
 READ16_MEMBER(tatsumi_state::cyclwarr_sprite_r)
 {
 	return m_spriteram[offset];
@@ -298,7 +288,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( cyclwarr_68000a_map, AS_PROGRAM, 16, tatsumi_state )
 	AM_RANGE(0x000000, 0x00ffff) AM_RAM AM_SHARE("cw_cpua_ram")
 	AM_RANGE(0x03e000, 0x03efff) AM_RAM
-	AM_RANGE(0x040000, 0x043fff) AM_READWRITE(cyclwarr_cpu_bb_r, cyclwarr_cpu_bb_w)
+	AM_RANGE(0x040000, 0x04ffff) AM_RAM AM_SHARE("cw_cpub_ram")
 	AM_RANGE(0x080000, 0x08ffff) AM_READWRITE(cyclwarr_videoram1_r, cyclwarr_videoram1_w) AM_SHARE("cw_videoram1")
 	AM_RANGE(0x090000, 0x09ffff) AM_READWRITE(cyclwarr_videoram0_r, cyclwarr_videoram0_w) AM_SHARE("cw_videoram0")
 
@@ -353,7 +343,7 @@ static ADDRESS_MAP_START( bigfight_68000a_map, AS_PROGRAM, 16, tatsumi_state )
 	AM_RANGE(0x000000, 0x00ffff) AM_RAM AM_SHARE("cw_cpua_ram")
 
 	AM_RANGE(0x03e000, 0x03efff) AM_RAM
-	AM_RANGE(0x040000, 0x04ffff) AM_READWRITE(cyclwarr_cpu_bb_r, cyclwarr_cpu_bb_w)
+	AM_RANGE(0x040000, 0x04ffff) AM_RAM AM_SHARE("cw_cpub_ram")
 
 	AM_RANGE(0x080000, 0x08ffff) AM_READWRITE(cyclwarr_videoram1_r, cyclwarr_videoram1_w) AM_SHARE("cw_videoram1")
 	AM_RANGE(0x090000, 0x09ffff) AM_READWRITE(cyclwarr_videoram0_r, cyclwarr_videoram0_w) AM_SHARE("cw_videoram0")
@@ -1345,9 +1335,9 @@ DRIVER_INIT_MEMBER(tatsumi_state,apache3)
 	UINT8 *dst = memregion("gfx1")->base();
 	UINT8 *src1 = memregion("gfx2")->base();
 	UINT8 *src2 = memregion("gfx3")->base();
-	int i;
 
-	for (i=0; i<0x100000; i+=32) {
+	for (int i=0; i<0x100000; i+=32)
+	{
 		memcpy(dst,src1,32);
 		src1+=32;
 		dst+=32;
@@ -1372,9 +1362,9 @@ DRIVER_INIT_MEMBER(tatsumi_state,roundup5)
 	UINT8 *dst = memregion("gfx1")->base();
 	UINT8 *src1 = memregion("gfx2")->base();
 	UINT8 *src2 = memregion("gfx3")->base();
-	int i;
 
-	for (i=0; i<0xc0000; i+=32) {
+	for (int i=0; i<0xc0000; i+=32)
+	{
 		memcpy(dst,src1,32);
 		src1+=32;
 		dst+=32;
@@ -1399,8 +1389,9 @@ DRIVER_INIT_MEMBER(tatsumi_state,cyclwarr)
 	int len1 = memregion("gfx2")->bytes();
 	UINT8 *src2 = memregion("gfx3")->base();
 	int len2 = memregion("gfx3")->bytes();
-	int i;
-	for (i=0; i<len1; i+=32) {
+	
+	for (int i=0; i<len1; i+=32)
+	{
 		memcpy(dst,src1,32);
 		src1+=32;
 		dst+=32;
@@ -1430,10 +1421,10 @@ DRIVER_INIT_MEMBER(tatsumi_state,cyclwarr)
 
 /* http://www.tatsu-mi.co.jp/game/trace/index.html */
 
-/* 1987 Gray Out */
+/* ** 1987  grayout    - Gray Out (not dumped yet) */
 GAME( 1988, apache3,   0,        apache3,   apache3,  tatsumi_state, apache3,  ROT0, "Tatsumi", "Apache 3", GAME_IMPERFECT_GRAPHICS )
 GAME( 1988, apache3a,  apache3,  apache3,   apache3,  tatsumi_state, apache3,  ROT0, "Tatsumi (Kana Corporation license)", "Apache 3 (Kana Corporation license)", GAME_IMPERFECT_GRAPHICS )
 GAMEL(1989, roundup5,  0,        roundup5,  roundup5, tatsumi_state, roundup5, ROT0, "Tatsumi", "Round Up 5 - Super Delta Force", GAME_IMPERFECT_GRAPHICS, layout_roundup5 )
-GAME( 1991, cyclwarr,  0,        cyclwarr,  cyclwarr, tatsumi_state, cyclwarr, ROT0, "Tatsumi", "Cycle Warriors (set 1)", GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING)
-GAME( 1991, cyclwarra, cyclwarr, cyclwarr,  cyclwarr, tatsumi_state, cyclwarr, ROT0, "Tatsumi", "Cycle Warriors (set 2)", GAME_IMPERFECT_GRAPHICS)
-GAME( 1992, bigfight,  0,        bigfight,  bigfight, tatsumi_state, cyclwarr, ROT0, "Tatsumi", "Big Fight - Big Trouble In The Atlantic Ocean", GAME_IMPERFECT_GRAPHICS)
+GAME( 1991, cyclwarr,  0,        cyclwarr,  cyclwarr, tatsumi_state, cyclwarr, ROT0, "Tatsumi", "Cycle Warriors (set 1)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1991, cyclwarra, cyclwarr, cyclwarr,  cyclwarr, tatsumi_state, cyclwarr, ROT0, "Tatsumi", "Cycle Warriors (set 2)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1992, bigfight,  0,        bigfight,  bigfight, tatsumi_state, cyclwarr, ROT0, "Tatsumi", "Big Fight - Big Trouble In The Atlantic Ocean", GAME_IMPERFECT_GRAPHICS )
