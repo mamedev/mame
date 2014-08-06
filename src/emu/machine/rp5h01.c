@@ -7,12 +7,22 @@
     with a mask of %1010111. For example if the 8 dummy bits are $7c,
     bits 64 to 127 are read as $7c $7c $00 $00 $7c $7c $00 $00.
     To simplify this, our emulation expects 'overdumps', 128bits total.
+    
+    TODO:
+    - not sure if the polarity of our PROM dumps (playch10) is correct,
+      same goes for the bit order (note: does not require new dumps)
 
 ***************************************************************************/
 
 #include "emu.h"
 #include "machine/rp5h01.h"
 
+// this is the contents of an unprogrammed PROM
+static const UINT8 initial_data[0x10] =
+{
+	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+	0xff, 0xff, 0x00, 0x00, 0xff, 0xff, 0x00, 0x00
+};
 
 //-------------------------------------------------
 //  rp5h01_device - constructor
@@ -41,8 +51,11 @@ void rp5h01_device::device_config_complete()
 
 void rp5h01_device::device_start()
 {
-	assert(region()->bytes() == 0x10);
 	m_data = *region();
+	if (m_data == NULL)
+		m_data = initial_data;
+	else
+		assert(region()->bytes() == 0x10);
 
 	/* register for state saving */
 	save_item(NAME(m_counter));
@@ -86,8 +99,6 @@ WRITE_LINE_MEMBER( rp5h01_device::enable_w )
 
 WRITE_LINE_MEMBER( rp5h01_device::reset_w )
 {
-	state = !state;
-
 	/* if it's not enabled, ignore */
 	if (!m_enabled)
 		return;

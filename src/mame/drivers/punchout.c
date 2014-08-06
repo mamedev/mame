@@ -12,7 +12,6 @@ driver by Nicola Salmoria
 TODO:
 - add useless driver config to choose between pink and white color proms
 - video raw params - pixel clock is derived from 20.16mhz xtal
-- finish spnchout protection emulation
 - money bag placement might not be 100% correct in Arm Wrestling
 
 
@@ -213,29 +212,20 @@ ADDRESS_MAP_END
 
 // The RP5C01 features don't seem to be used at all except for very basic protection
 // e.g. relying on the masking done by the internal registers.
+// The RP5H01 one-time PROM (OTP) is assumed to be unprogrammed.
 
 READ8_MEMBER(punchout_state::spunchout_exp_r)
 {
 	// d0-d3: D0-D3 from RP5C01
 	// d4: N/C
-	// d5: /ALARM from RP5C01
+	// d5: _ALARM from RP5C01
 	// d6: COUNTER OUT from RP5H01
-	// d7: DATA OUT from RP5H01
-
+	// d7: DATA OUT from RP5H01 - always 0?
 	UINT8 ret = m_rtc->read(space, offset >> 4 & 0xf) & 0xf;
 	ret |= 0x10;
 	ret |= m_rtc->alarm_r() ? 0x00 : 0x20;
-	ret |= m_rp5h01->counter_r() ? 0x40 : 0x00;
-	ret |= m_rp5h01->data_r() ? 0x80 : 0x00;
-
-	// FIXME - hack d6/d7 state until we have a dump of RP5H01 and know the connections for spunchout_exp_w
-	/* PC = 0x0313 */
-	/* (ret or 0x10) -> (D7DF),(D7A0) - (D7DF),(D7A0) = 0d0h(ret nc) */
-	ret &= 0x3f;
-	if (space.device().safe_pcbase() == 0x0313)
-	{
-		ret |= 0xc0;
-	}
+	ret |= m_rp5h01->counter_r() ? 0x00 : 0x40;
+	ret |= m_rp5h01->data_r() ? 0x00 : 0x80;
 
 	return ret;
 }
@@ -243,9 +233,19 @@ READ8_MEMBER(punchout_state::spunchout_exp_r)
 WRITE8_MEMBER(punchout_state::spunchout_exp_w)
 {
 	// d0-d3: D0-D3 to RP5C01
-	// d4-d7: ? to RP5H01?
-	
 	m_rtc->write(space, offset >> 4 & 0xf, data & 0xf);
+	
+	// d0: 74LS74 1D + 74LS74 2D
+	// 74LS74 1Q -> RP5H01 DATA CLOCK + TEST
+	// 74LS74 2Q -> RP5H01 RESET
+	// 74LS74 _2Q -> 74LS74 _1 RESET
+	m_rp5h01->clock_w(data & 1);
+	m_rp5h01->test_w(data & 1);
+	m_rp5h01->reset_w(data & 1);
+	m_rp5h01->clock_w(0);
+	m_rp5h01->test_w(0);
+
+	// d4-d7: unused?
 }
 
 static ADDRESS_MAP_START( spnchout_io_map, AS_IO, 8, punchout_state )
@@ -622,11 +622,7 @@ INTERRUPT_GEN_MEMBER(punchout_state::vblank_irq)
 
 MACHINE_RESET_MEMBER(punchout_state, spnchout)
 {
-	/* reset the security chip */
-	m_rp5h01->enable_w(1);
-	m_rp5h01->enable_w(0);
-	m_rp5h01->reset_w(0);
-	m_rp5h01->reset_w(1);
+	m_rp5h01->enable_w(0); // _CE -> GND
 }
 
 
@@ -821,7 +817,7 @@ ROM_START( punchouta )
 	ROM_LOAD( "chp1-b.4d",    0x02000, 0x2000, CRC(dd1310ca) SHA1(918d2eda000244b692f1da7ac57d7a0edaef95fb) )
 
 	ROM_REGION( 0x04000, "gfx2", ROMREGION_ERASEFF | ROMREGION_INVERT )
-	ROM_LOAD( "chp1-b(__a).4a",    0x00000, 0x2000, CRC(20fb4829) SHA1(9f0ce9379eb31c19bfacdc514ac6a28aa4217cbb) )   /* chars #2 */ /* Revision A */
+	ROM_LOAD( "chp1-b.4a",    0x00000, 0x2000, CRC(20fb4829) SHA1(9f0ce9379eb31c19bfacdc514ac6a28aa4217cbb) )   /* chars #2 */ /* Revision A */
 	ROM_LOAD( "chp1-b.4b",    0x02000, 0x2000, CRC(edc34594) SHA1(fbb4a8b979d60b183dc23bdbb7425100b9325287) )
 
 	ROM_REGION( 0x30000, "gfx3", ROMREGION_ERASEFF )
@@ -1125,9 +1121,6 @@ ROM_START( spnchout )
 
 	ROM_REGION( 0x10000, "vlm", 0 ) /* 64k for the VLM5030 data */
 	ROM_LOAD( "chs1-c.6p",    0x0000, 0x4000, CRC(ad8b64b8) SHA1(0f1232a10faf71b782f9f6653cca8570243c17e0) )
-
-	ROM_REGION( 0x10, "rp5h01", ROMREGION_ERASE00 ) // security prom on daughterboard
-	ROM_LOAD( "rp5h01.exp", 0x00, 0x10, NO_DUMP )
 ROM_END
 
 ROM_START( spnchouta )
@@ -1146,7 +1139,7 @@ ROM_START( spnchouta )
 	ROM_LOAD( "chs1-b.4d",    0x02000, 0x2000, CRC(e3de9d18) SHA1(f55b6f522e127e6239197dd7eb1564e6f275df74) )   /* Revision A */
 
 	ROM_REGION( 0x04000, "gfx2", ROMREGION_ERASEFF | ROMREGION_INVERT )
-	ROM_LOAD( "chp1-b(__a).4a",    0x00000, 0x2000, CRC(20fb4829) SHA1(9f0ce9379eb31c19bfacdc514ac6a28aa4217cbb) )   /* chars #2 */ /* Revision A */
+	ROM_LOAD( "chp1-b.4a",    0x00000, 0x2000, CRC(20fb4829) SHA1(9f0ce9379eb31c19bfacdc514ac6a28aa4217cbb) )   /* chars #2 */ /* Revision A */
 	ROM_LOAD( "chp1-b.4b",    0x02000, 0x2000, CRC(edc34594) SHA1(fbb4a8b979d60b183dc23bdbb7425100b9325287) )   /* Revision A */
 
 	ROM_REGION( 0x30000, "gfx3", ROMREGION_ERASEFF )
@@ -1192,9 +1185,6 @@ ROM_START( spnchouta )
 
 	ROM_REGION( 0x4000, "vlm", 0 )	/* 16k for the VLM5030 data */
 	ROM_LOAD( "chs1-c.6p",    0x0000, 0x4000, CRC(ad8b64b8) SHA1(0f1232a10faf71b782f9f6653cca8570243c17e0) )
-
-	ROM_REGION( 0x10, "rp5h01", ROMREGION_ERASE00 ) // security prom on daughterboard
-	ROM_LOAD( "rp5h01.exp", 0x00, 0x10, NO_DUMP )
 ROM_END
 
 ROM_START( spnchoutj )
@@ -1277,9 +1267,6 @@ ROM_START( spnchoutj )
 
 	ROM_REGION( 0x10000, "vlm", 0 ) /* 64k for the VLM5030 data */
 	ROM_LOAD( "chs1c6pa.bin", 0x0000, 0x4000, CRC(d05fb730) SHA1(9f4c4c7e5113739312558eff4d3d3e42d513aa31) )
-
-	ROM_REGION( 0x10, "rp5h01", ROMREGION_ERASE00 ) // security prom on daughterboard
-	ROM_LOAD( "rp5h01.exp", 0x00, 0x10, NO_DUMP )
 ROM_END
 
 ROM_START( armwrest )

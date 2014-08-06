@@ -57,7 +57,7 @@ private:
 	int m_enabled;        /* chip enable */
 	int m_old_reset;      /* reset pin state (level-triggered) */
 	int m_old_clock;      /* clock pin state (level-triggered) */
-	UINT8 *m_data;
+	const UINT8 *m_data;
 };
 
 extern const device_type RP5H01;
