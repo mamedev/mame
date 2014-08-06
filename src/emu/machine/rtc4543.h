@@ -64,9 +64,10 @@ private:
 	int m_clk;
 	int m_wr;
 	int m_data;
+	int m_shiftreg;
 	int m_regs[7];
 	int m_curreg;
-	int m_bit;
+	int m_curbit;
 
 	// timers
 	emu_timer *m_clock_timer;
