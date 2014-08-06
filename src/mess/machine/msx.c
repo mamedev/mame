@@ -196,6 +196,32 @@ DRIVER_INIT_MEMBER(msx_state,msx)
 	msx_memory_init();
 
 	m_maincpu->z80_set_cycle_tables( cc_op, cc_cb, cc_ed, cc_xy, cc_xycb, cc_ex );
+
+	save_item(NAME(m_psg_b));
+	save_item(NAME(m_mouse));
+	save_item(NAME(m_mouse_stat));
+	save_item(NAME(m_rtc_latch));
+	save_item(NAME(m_kanji_latch));
+	save_item(NAME(m_slot_expanded));
+	save_item(NAME(m_primary_slot));
+	save_item(NAME(m_secondary_slot));
+	save_item(NAME(m_port_c_old));
+	save_item(NAME(m_keylatch));
+	save_item(NAME(m_current_switched_device));
+	save_item(NAME(m_irq_state));
+
+	machine().save().register_postload(save_prepost_delegate(FUNC(msx_state::post_load), this));
+}
+
+void msx_state::post_load()
+{
+	for (int page = 0; page < 4; page++)
+	{
+		int slot_primary = (m_primary_slot >> (page * 2)) & 3;
+		int slot_secondary = (m_secondary_slot[slot_primary] >> (page * 2)) & 3;
+
+		m_current_page[page] = m_all_slots[slot_primary][slot_secondary][page];
+	}
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(msx_state::msx2_interrupt)

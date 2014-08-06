@@ -113,13 +113,6 @@ class msx_state : public driver_device
 public:
 	msx_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
-		, m_psg_b(0)
-		, m_rtc_latch(0)
-		, m_kanji_latch(0)
-		, m_primary_slot(0)
-		, m_port_c_old(0)
-		, m_keylatch(0)
-		, m_current_switched_device(0)
 		, m_maincpu(*this, "maincpu")
 		, m_v9938(*this, "v9938")
 		, m_v9958(*this, "v9958")
@@ -141,6 +134,13 @@ public:
 		, m_io_key3(*this, "KEY3")
 		, m_io_key4(*this, "KEY4")
 		, m_io_key5(*this, "KEY5")
+		, m_psg_b(0)
+		, m_rtc_latch(0)
+		, m_kanji_latch(0)
+		, m_primary_slot(0)
+		, m_port_c_old(0)
+		, m_keylatch(0)
+		, m_current_switched_device(0)
 	{
 		for (int prim = 0; prim < 4; prim++ )
 		{
@@ -182,6 +182,60 @@ public:
 	DECLARE_WRITE8_MEMBER(msx_switched_w);
 	DECLARE_WRITE_LINE_MEMBER(turbo_w);
 
+	void msx_memory_map_all();
+	void msx_memory_map_page(UINT8 page);
+	void msx_ch_reset_core();
+	void msx_memory_reset();
+
+	DECLARE_FLOPPY_FORMATS(floppy_formats);
+
+	DECLARE_READ8_MEMBER(msx_psg_port_a_r);
+	DECLARE_READ8_MEMBER(msx_psg_port_b_r);
+	DECLARE_WRITE8_MEMBER(msx_psg_port_a_w);
+	DECLARE_WRITE8_MEMBER(msx_psg_port_b_w);
+	DECLARE_DRIVER_INIT(msx);
+	DECLARE_MACHINE_START(msx);
+	DECLARE_MACHINE_RESET(msx);
+	DECLARE_MACHINE_START(msx2);
+	DECLARE_MACHINE_RESET(msx2);
+	INTERRUPT_GEN_MEMBER(msx_interrupt);
+	TIMER_DEVICE_CALLBACK_MEMBER(msx2_interrupt);
+	TIMER_DEVICE_CALLBACK_MEMBER(msx2p_interrupt);
+	DECLARE_WRITE8_MEMBER(msx_ay8910_w);
+	void msx_memory_init();
+	void post_load();
+
+	DECLARE_WRITE_LINE_MEMBER(msx_irq_source0) { msx_irq_source(0, state); }  // usually tms9918/v9938/v9958
+	DECLARE_WRITE_LINE_MEMBER(msx_irq_source1) { msx_irq_source(1, state); }  // usually first cartridge slot
+	DECLARE_WRITE_LINE_MEMBER(msx_irq_source2) { msx_irq_source(2, state); }  // usually second cartridge slot
+	DECLARE_WRITE_LINE_MEMBER(msx_irq_source3) { msx_irq_source(3, state); }  // sometimes expansion slot
+
+protected:
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const { return (spacenum == 0) ? &m_switched_device_as_config : NULL; }
+
+private:
+	required_device<z80_device> m_maincpu;
+	optional_device<v9938_device> m_v9938;
+	optional_device<v9958_device> m_v9958;
+	required_device<cassette_image_device> m_cassette;
+	required_device<ay8910_device> m_ay8910;
+	required_device<dac_device> m_dac;
+	optional_device<rp5c01_device> m_rtc;
+	address_space_config m_switched_device_as_config;
+	required_memory_region m_region_maincpu;
+	optional_memory_region m_region_kanji;
+	required_ioport m_io_joy0;
+	required_ioport m_io_joy1;
+	required_ioport m_io_dsw;
+	required_ioport m_io_mouse0;
+	required_ioport m_io_mouse1;
+	required_ioport m_io_key0;
+	required_ioport m_io_key1;
+	required_ioport m_io_key2;
+	required_ioport m_io_key3;
+	required_ioport m_io_key4;
+	required_ioport m_io_key5;
+
 	/* PSG */
 	int m_psg_b;
 	/* mouse */
@@ -201,59 +255,7 @@ public:
 	int m_port_c_old;
 	int m_keylatch;
 	UINT8 m_current_switched_device;
-	void msx_memory_map_all ();
-	void msx_memory_map_page (UINT8 page);
-	void msx_ch_reset_core ();
-	void msx_memory_reset ();
 
-	required_device<z80_device> m_maincpu;
-	optional_device<v9938_device> m_v9938;
-	optional_device<v9958_device> m_v9958;
-	required_device<cassette_image_device> m_cassette;
-	required_device<ay8910_device> m_ay8910;
-	required_device<dac_device> m_dac;
-	optional_device<rp5c01_device> m_rtc;
-	DECLARE_FLOPPY_FORMATS(floppy_formats);
-
-	DECLARE_READ8_MEMBER(msx_psg_port_a_r);
-	DECLARE_READ8_MEMBER(msx_psg_port_b_r);
-	DECLARE_WRITE8_MEMBER(msx_psg_port_a_w);
-	DECLARE_WRITE8_MEMBER(msx_psg_port_b_w);
-	DECLARE_DRIVER_INIT(msx);
-	DECLARE_MACHINE_START(msx);
-	DECLARE_MACHINE_RESET(msx);
-	DECLARE_MACHINE_START(msx2);
-	DECLARE_MACHINE_RESET(msx2);
-	INTERRUPT_GEN_MEMBER(msx_interrupt);
-	TIMER_DEVICE_CALLBACK_MEMBER(msx2_interrupt);
-	TIMER_DEVICE_CALLBACK_MEMBER(msx2p_interrupt);
-	DECLARE_WRITE8_MEMBER(msx_ay8910_w);
-	void msx_memory_init();
-
-	DECLARE_WRITE_LINE_MEMBER(msx_irq_source0) { msx_irq_source(0, state); }  // usually tms9918/v9938/v9958
-	DECLARE_WRITE_LINE_MEMBER(msx_irq_source1) { msx_irq_source(1, state); }  // usually first cartridge slot
-	DECLARE_WRITE_LINE_MEMBER(msx_irq_source2) { msx_irq_source(2, state); }  // usually second cartridge slot
-	DECLARE_WRITE_LINE_MEMBER(msx_irq_source3) { msx_irq_source(3, state); }  // sometimes expansion slot
-
-protected:
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const { return (spacenum == 0) ? &m_switched_device_as_config : NULL; }
-
-	address_space_config m_switched_device_as_config;
-	required_memory_region m_region_maincpu;
-	optional_memory_region m_region_kanji;
-	required_ioport m_io_joy0;
-	required_ioport m_io_joy1;
-	required_ioport m_io_dsw;
-	required_ioport m_io_mouse0;
-	required_ioport m_io_mouse1;
-	required_ioport m_io_key0;
-	required_ioport m_io_key1;
-	required_ioport m_io_key2;
-	required_ioport m_io_key3;
-	required_ioport m_io_key4;
-	required_ioport m_io_key5;
-
-private:
 	int m_irq_state[4];
 
 	void msx_irq_source(int source, int level);
