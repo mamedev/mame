@@ -66,10 +66,6 @@ static const int register_write_mask[2][16] =
 };
 
 
-// days per month
-//static const int DAYS_PER_MONTH[12] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
-
-
 // modes
 enum
 {
@@ -179,6 +175,7 @@ rp5c01_device::rp5c01_device(const machine_config &mconfig, const char *tag, dev
 		device_rtc_interface(mconfig, *this),
 		device_nvram_interface(mconfig, *this),
 		m_out_alarm_cb(*this),
+		m_battery_backed(true),
 		m_mode(0),
 		m_reset(0),
 		m_alarm(1),
@@ -231,7 +228,7 @@ void rp5c01_device::device_reset()
 	// 24 hour mode
 	m_reg[MODE01][REGISTER_12_24_SELECT] = 1;
 
-	if (clock() > 0)
+	if (m_battery_backed && clock() > 0)
 		set_current_time(machine());
 }
 
@@ -299,7 +296,8 @@ void rp5c01_device::nvram_default()
 
 void rp5c01_device::nvram_read(emu_file &file)
 {
-	file.read(m_ram, RAM_SIZE);
+	if (m_battery_backed)
+		file.read(m_ram, RAM_SIZE);
 }
 
 
@@ -310,7 +308,8 @@ void rp5c01_device::nvram_read(emu_file &file)
 
 void rp5c01_device::nvram_write(emu_file &file)
 {
-	file.write(m_ram, RAM_SIZE);
+	if (m_battery_backed)
+		file.write(m_ram, RAM_SIZE);
 }
 
 

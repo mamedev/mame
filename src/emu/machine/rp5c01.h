@@ -37,6 +37,10 @@
 #define MCFG_RP5C01_OUT_ALARM_CB(_devcb) \
 	devcb = &rp5c01_device::set_out_alarm_callback(*device, DEVCB_##_devcb);
 
+// include this macro if the chip is not battery backed
+#define MCFG_RP5C01_REMOVE_BATTERY() \
+	rp5c01_device::remove_battery(*device);
+
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -53,6 +57,7 @@ public:
 	rp5c01_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	template<class _Object> static devcb_base &set_out_alarm_callback(device_t &device, _Object object) { return downcast<rp5c01_device &>(device).m_out_alarm_cb.set_callback(object); }
+	static void remove_battery(device_t &device) { downcast<rp5c01_device &>(device).m_battery_backed = false; }
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
@@ -83,7 +88,8 @@ private:
 	static const device_timer_id TIMER_CLOCK = 0;
 	static const device_timer_id TIMER_16HZ = 1;
 
-	devcb_write_line        m_out_alarm_cb;
+	devcb_write_line m_out_alarm_cb;
+	bool m_battery_backed;
 
 	UINT8 m_reg[2][13];         // clock registers
 	UINT8 m_ram[13];            // RAM
