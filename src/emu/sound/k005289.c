@@ -214,13 +214,13 @@ WRITE8_MEMBER( k005289_device::k005289_control_B_w )
 
 WRITE8_MEMBER( k005289_device::ld1_w )
 {
-	m_freq_latch[0] = 0x1000 - offset;
+	m_freq_latch[0] = 0xfff - offset;
 }
 
 
 WRITE8_MEMBER( k005289_device::ld2_w )
 {
-	m_freq_latch[1] = 0x1000 - offset;
+	m_freq_latch[1] = 0xfff - offset;
 }
 
 
