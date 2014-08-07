@@ -215,29 +215,36 @@ void atari_motion_objects_device::draw(bitmap_ind16 &bitmap, const rectangle &cl
 		// if this matches the last link, we don't need to re-process the list
 		build_active_list(link);
 
+		// initialize the parameters
+		m_next_xpos = 123456;
+
+		// safety check
+		if (m_activelist == m_activelast)
+			continue;
+
 		// set the start and end points
 		UINT16 *first, *last;
 		int step;
 		if (m_reverse)
 		{
 			first = m_activelast - 4;
-			// TODO: this sets last to index m_activelist[-4]
-			last = m_activelist - 4;
+			last = m_activelist;
 			step = -4;
 		}
 		else
 		{
 			first = m_activelist;
-			last = m_activelast;
+			last = m_activelast - 4;
 			step = 4;
 		}
 
-		// initialize the parameters
-		m_next_xpos = 123456;
-
 		// render the mos
-		for (UINT16 *current = first; current != last; current += step)
+		for (UINT16 *current = first; ; current += step)
+		{
 			render_object(bitmap, bandclip, current);
+			if (current == last)
+				break;
+		}
 	}
 }
 
