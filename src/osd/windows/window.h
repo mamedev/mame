@@ -32,50 +32,52 @@
 //  TYPE DEFINITIONS
 //============================================================
 
-struct win_window_info
+class win_window_info
 {
 public:
-	win_window_info(running_machine &machine)
-		: m_machine(machine) { }
+	win_window_info(running_machine &machine);
+	virtual ~win_window_info();		
 
 	running_machine &machine() const { return m_machine; }
 
-	win_window_info *   next;
-	volatile int        init_state;
+	void update();
+	
+	win_window_info *   m_next;
+	volatile int        m_init_state;
 
 	// window handle and info
-	HWND                hwnd;
-	HWND                focus_hwnd;
-	char                title[256];
-	RECT                non_fullscreen_bounds;
-	int                 startmaximized;
-	int                 isminimized;
-	int                 ismaximized;
-	int                 resize_state;
+	HWND                m_hwnd;
+	HWND                m_focus_hwnd;
+	char                m_title[256];
+	RECT                m_non_fullscreen_bounds;
+	int                 m_startmaximized;
+	int                 m_isminimized;
+	int                 m_ismaximized;
+	int                 m_resize_state;
 
 	// monitor info
-	win_monitor_info *  monitor;
-	int                 fullscreen;
-	int                 fullscreen_safe;
-	int                 maxwidth, maxheight;
-	int                 refresh;
-	float               aspect;
+	win_monitor_info *  m_monitor;
+	int                 m_fullscreen;
+	int                 m_fullscreen_safe;
+	int                 m_maxwidth, m_maxheight;
+	int                 m_refresh;
+	float               m_aspect;
 
 	// rendering info
-	osd_lock *          render_lock;
-	render_target *     target;
-	int                 targetview;
-	int                 targetorient;
-	render_layer_config targetlayerconfig;
-	render_primitive_list *primlist;
+	osd_lock *          m_render_lock;
+	render_target *     m_target;
+	int                 m_targetview;
+	int                 m_targetorient;
+	render_layer_config m_targetlayerconfig;
+	render_primitive_list *m_primlist;
 
 	// input info
-	DWORD               lastclicktime;
-	int                 lastclickx;
-	int                 lastclicky;
+	DWORD               m_lastclicktime;
+	int                 m_lastclickx;
+	int                 m_lastclicky;
 
 	// drawing data
-	void *              drawdata;
+	void *              m_drawdata;
 
 private:
 	running_machine &   m_machine;
@@ -115,7 +117,6 @@ void winwindow_video_window_create(running_machine &machine, int index, win_moni
 
 BOOL winwindow_has_focus(void);
 void winwindow_update_cursor_state(running_machine &machine);
-void winwindow_video_window_update(win_window_info *window);
 win_monitor_info *winwindow_video_window_monitor(win_window_info *window, const RECT *proposed);
 
 LRESULT CALLBACK winwindow_video_window_proc(HWND wnd, UINT message, WPARAM wparam, LPARAM lparam);
@@ -146,7 +147,7 @@ extern int win_create_menu(running_machine &machine, HMENU *menus);
 
 INLINE BOOL win_has_menu(win_window_info *window)
 {
-	return GetMenu(window->hwnd) ? TRUE : FALSE;
+	return GetMenu(window->m_hwnd) ? TRUE : FALSE;
 }
 
 

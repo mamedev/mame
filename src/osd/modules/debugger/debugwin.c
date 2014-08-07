@@ -512,7 +512,7 @@ static debugwin_info *debugwin_window_create(running_machine &machine, LPCSTR ti
 	// create the window
 	info->handler = handler;
 	info->wnd = win_create_window_ex_utf8(DEBUG_WINDOW_STYLE_EX, "MAMEDebugWindow", title, DEBUG_WINDOW_STYLE,
-			0, 0, 100, 100, win_window_list->hwnd, create_standard_menubar(), GetModuleHandle(NULL), info);
+			0, 0, 100, 100, win_window_list->m_hwnd, create_standard_menubar(), GetModuleHandle(NULL), info);
 	if (info->wnd == NULL)
 		goto cleanup;
 
@@ -3074,7 +3074,7 @@ static void smart_show_all(BOOL show)
 {
 	debugwin_info *info;
 	if (!show)
-		SetForegroundWindow(win_window_list->hwnd);
+		SetForegroundWindow(win_window_list->m_hwnd);
 	for (info = window_list; info != NULL; info = info->next)
 		smart_show_window(info->wnd, show);
 }

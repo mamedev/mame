@@ -494,7 +494,7 @@ static void winui_output_error(delegate_late_bind *param, const char *format, va
 		winwindow_toggle_full_screen();
 
 	vsnprintf(buffer, ARRAY_LENGTH(buffer), format, argptr);
-	win_message_box_utf8(win_window_list ? win_window_list->hwnd : NULL, buffer, emulator_info::get_appname(), MB_OK);
+	win_message_box_utf8(win_window_list ? win_window_list->m_hwnd : NULL, buffer, emulator_info::get_appname(), MB_OK);
 }
 
 
@@ -625,11 +625,11 @@ void windows_osd_interface::init(running_machine &machine)
 
 	// notify listeners of screen configuration
 	astring tempstring;
-	for (win_window_info *info = win_window_list; info != NULL; info = info->next)
+	for (win_window_info *info = win_window_list; info != NULL; info = info->m_next)
 	{
-		char *tmp = utf8_from_tstring(info->monitor->info.szDevice);
+		char *tmp = utf8_from_tstring(info->m_monitor->info.szDevice);
 		tempstring.printf("Orientation(%s)", tmp);
-		output_set_value(tempstring, info->targetorient);
+		output_set_value(tempstring, info->m_targetorient);
 		osd_free(tmp);
 	}
 

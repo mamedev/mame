@@ -84,7 +84,7 @@ bool windows_osd_interface::video_init()
 	for (index = 0; index < video_config.numscreens; index++)
 		winwindow_video_window_create(machine(), index, pick_monitor(options, index), &video_config.window[index]);
 	if (video_config.mode != VIDEO_MODE_NONE)
-		SetForegroundWindow(win_window_list->hwnd);
+		SetForegroundWindow(win_window_list->m_hwnd);
 
 	return true;
 }
@@ -187,8 +187,8 @@ void windows_osd_interface::update(bool skip_redraw)
 
 	// if we're not skipping this redraw, update all windows
 	if (!skip_redraw)
-		for (win_window_info *window = win_window_list; window != NULL; window = window->next)
-			winwindow_video_window_update(window);
+		for (win_window_info *window = win_window_list; window != NULL; window = window->m_next)
+			window->update();
 
 	// poll the joystick values here
 	winwindow_process_events(machine(), TRUE, FALSE);
