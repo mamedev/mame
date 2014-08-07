@@ -212,7 +212,10 @@ WRITE16_MEMBER(tecmosys_state::tecmosys_prot_data_w)
 				m_device_value = 0;
 			}
 			else
+			{
+				assert(m_device_read_ptr >= 0 && m_device_read_ptr < ARRAY_LENGTH(m_device_data->checksums));
 				m_device_value = data == m_device_data->checksums[m_device_read_ptr] ? m_device_data->checksums[m_device_read_ptr++] : 0xff;
+			}
 			break;
 
 		case DS_DONE:
