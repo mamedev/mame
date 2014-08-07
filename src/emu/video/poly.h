@@ -41,7 +41,7 @@
 //**************************************************************************
 
 // keep statistics
-#define KEEP_STATISTICS                 0
+#define KEEP_POLY_STATISTICS            0
 
 // turn this on to log the reasons for any long waits
 #define LOG_WAITS                       0
@@ -268,7 +268,7 @@ private:
 	UINT32              m_triangles;                // number of triangles queued
 	UINT32              m_quads;                    // number of quads queued
 	UINT64              m_pixels;                   // number of pixels rendered
-#if KEEP_STATISTICS
+#if KEEP_POLY_STATISTICS
 	UINT32              m_conflicts[WORK_MAX_THREADS]; // number of conflicts found, per thread
 	UINT32              m_resolved[WORK_MAX_THREADS];   // number of conflicts resolved, per thread
 #endif
@@ -292,7 +292,7 @@ poly_manager<_BaseType, _ObjectData, _MaxParams, _MaxPolys>::poly_manager(runnin
 		m_quads(0),
 		m_pixels(0)
 {
-#if KEEP_STATISTICS
+#if KEEP_POLY_STATISTICS
 	memset(m_conflicts, 0, sizeof(m_conflicts));
 	memset(m_resolved, 0, sizeof(m_resolved));
 #endif
@@ -319,7 +319,7 @@ poly_manager<_BaseType, _ObjectData, _MaxParams, _MaxPolys>::poly_manager(screen
 		m_quads(0),
 		m_pixels(0)
 {
-#if KEEP_STATISTICS
+#if KEEP_POLY_STATISTICS
 	memset(m_conflicts, 0, sizeof(m_conflicts));
 	memset(m_resolved, 0, sizeof(m_resolved));
 #endif
@@ -340,7 +340,7 @@ poly_manager<_BaseType, _ObjectData, _MaxParams, _MaxPolys>::poly_manager(screen
 template<typename _BaseType, class _ObjectData, int _MaxParams, int _MaxPolys>
 poly_manager<_BaseType, _ObjectData, _MaxParams, _MaxPolys>::~poly_manager()
 {
-#if KEEP_STATISTICS
+#if KEEP_POLY_STATISTICS
 {
 	// accumulate stats over the entire collection
 	int conflicts = 0, resolved = 0;
@@ -401,7 +401,7 @@ void *poly_manager<_BaseType, _ObjectData, _MaxParams, _MaxPolys>::work_item_cal
 					new_count_next = orig_count_next | (unitnum << 16);
 				} while (compare_exchange32((volatile INT32 *)&prevunit.count_next, orig_count_next, new_count_next) != orig_count_next);
 
-#if KEEP_STATISTICS
+#if KEEP_POLY_STATISTICS
 				// track resolved conflicts
 				polygon.m_owner->m_conflicts[threadid]++;
 				if (orig_count_next != 0)
