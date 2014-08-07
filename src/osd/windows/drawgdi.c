@@ -129,7 +129,7 @@ static render_primitive_list *drawgdi_window_get_primitives(win_window_info *win
 {
 	RECT client;
 	GetClientRect(window->hwnd, &client);
-	window->target->set_bounds(rect_width(&client), rect_height(&client), winvideo_monitor_get_aspect(window->monitor));
+	window->target->set_bounds(rect_width(&client), rect_height(&client), window->monitor->get_aspect());
 	return &window->target->get_primitives();
 }
 

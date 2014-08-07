@@ -109,17 +109,30 @@ void windows_osd_interface::video_exit()
 
 
 
+win_monitor_info::win_monitor_info()
+	: next(NULL),
+	  handle(NULL),
+	  aspect(0.0f),
+	  reqwidth(0),
+	  reqheight(0)
+{
+}
+
+win_monitor_info::~win_monitor_info()
+{
+}
+
 //============================================================
 //  winvideo_monitor_refresh
 //============================================================
 
-void winvideo_monitor_refresh(win_monitor_info *monitor)
+void win_monitor_info::refresh()
 {
 	BOOL result;
 
 	// fetch the latest info about the monitor
-	monitor->info.cbSize = sizeof(monitor->info);
-	result = GetMonitorInfo(monitor->handle, (LPMONITORINFO)&monitor->info);
+	info.cbSize = sizeof(info);
+	result = GetMonitorInfo(handle, (LPMONITORINFO)&info);
 	assert(result);
 	(void)result; // to silence gcc 4.6
 }
@@ -130,16 +143,16 @@ void winvideo_monitor_refresh(win_monitor_info *monitor)
 //  winvideo_monitor_get_aspect
 //============================================================
 
-float winvideo_monitor_get_aspect(win_monitor_info *monitor)
+float win_monitor_info::get_aspect()
 {
 	// refresh the monitor information and compute the aspect
 	if (video_config.keepaspect)
 	{
 		int width, height;
-		winvideo_monitor_refresh(monitor);
-		width = rect_width(&monitor->info.rcMonitor);
-		height = rect_height(&monitor->info.rcMonitor);
-		return monitor->aspect / ((float)width / (float)height);
+		refresh();
+		width = rect_width(&info.rcMonitor);
+		height = rect_height(&info.rcMonitor);
+		return aspect / ((float)width / (float)height);
 	}
 	return 0.0f;
 }
@@ -236,14 +249,14 @@ static BOOL CALLBACK monitor_enum_callback(HMONITOR handle, HDC dc, LPRECT rect,
 	(void)result; // to silence gcc 4.6
 
 	// allocate a new monitor info
-	monitor = global_alloc_clear(win_monitor_info);
+	monitor = global_alloc(win_monitor_info);
 
 	// copy in the data
 	monitor->handle = handle;
 	monitor->info = info;
 
 	// guess the aspect ratio assuming square pixels
-	monitor->aspect = (float)(info.rcMonitor.right - info.rcMonitor.left) / (float)(info.rcMonitor.bottom - info.rcMonitor.top);
+	monitor->set_aspect((float)(info.rcMonitor.right - info.rcMonitor.left) / (float)(info.rcMonitor.bottom - info.rcMonitor.top));
 
 	// save the primary monitor handle
 	if (monitor->info.dwFlags & MONITORINFOF_PRIMARY)
@@ -311,7 +324,7 @@ static win_monitor_info *pick_monitor(windows_options &options, int index)
 
 finishit:
 	if (aspect != 0)
-		monitor->aspect = aspect;
+		monitor->set_aspect(aspect);
 	return monitor;
 }
 

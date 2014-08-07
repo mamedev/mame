@@ -272,7 +272,7 @@ static render_primitive_list *drawd3d_window_get_primitives(win_window_info *win
 	GetClientRectExceptMenu(window->hwnd, &client, window->fullscreen);
 	if (rect_width(&client) > 0 && rect_height(&client) > 0)
 	{
-		window->target->set_bounds(rect_width(&client), rect_height(&client), winvideo_monitor_get_aspect(window->monitor));
+		window->target->set_bounds(rect_width(&client), rect_height(&client), window->monitor->get_aspect());
 		window->target->set_max_update_rate((d3d->get_refresh() == 0) ? d3d->get_origmode().RefreshRate : d3d->get_refresh());
 	}
 	return &window->target->get_primitives();

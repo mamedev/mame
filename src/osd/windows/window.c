@@ -835,7 +835,7 @@ win_monitor_info *winwindow_video_window_monitor(win_window_info *window, const 
 		monitor = window->monitor;
 
 	// make sure we're up-to-date
-	winvideo_monitor_refresh(monitor);
+	monitor->refresh();
 	return monitor;
 }
 
@@ -1493,7 +1493,7 @@ static void constrain_to_aspect_ratio(win_window_info *window, RECT *rect, int a
 	assert(GetCurrentThreadId() == window_threadid);
 
 	// get the pixel aspect ratio for the target monitor
-	pixel_aspect = winvideo_monitor_get_aspect(monitor);
+	pixel_aspect = monitor->get_aspect();
 
 	// determine the proposed width/height
 	propwidth = rect_width(rect) - extrawidth;
@@ -1665,7 +1665,7 @@ static void get_max_bounds(win_window_info *window, RECT *bounds, int constrain)
 	assert(GetCurrentThreadId() == window_threadid);
 
 	// compute the maximum client area
-	winvideo_monitor_refresh(window->monitor);
+	window->monitor->refresh();
 	maximum = window->monitor->info.rcWork;
 
 	// clamp to the window's max
