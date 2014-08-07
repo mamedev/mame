@@ -40,6 +40,9 @@ void ds2401_device::device_start()
 	t_pdh  = attotime::from_usec( 30);
 	t_pdl  = attotime::from_usec(120);
 
+	m_rx = true;
+	m_tx = true;
+
 	save_item(NAME(m_state));
 	save_item(NAME(m_bit));
 	save_item(NAME(m_byte));
