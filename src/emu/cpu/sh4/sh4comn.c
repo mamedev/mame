@@ -395,7 +395,7 @@ void sh34_base_device::sh4_exception(const char *message, int exception) // hand
 			m_m[INTEVT] = exception_codes[exception];
 			vector = 0x600;
 			if ((exception >= SH4_INTC_IRL0) && (exception <= SH4_INTC_IRL3))
-				standard_irq_callback(SH4_INTC_IRL0-exception+SH4_IRL0);
+				standard_irq_callback((exception-SH4_INTC_IRL0)+SH4_IRL0);
 			else
 				standard_irq_callback(SH4_IRL3+1);
 			LOG(("SH-4 '%s' interrupt exception #%d after [%s]\n", tag(), exception, message));
@@ -422,7 +422,7 @@ void sh34_base_device::sh4_exception(const char *message, int exception) // hand
 			vector = 0x600;
 
 			if ((exception >= SH4_INTC_IRL0) && (exception <= SH4_INTC_IRL3))
-				standard_irq_callback(SH4_INTC_IRL0-exception+SH4_IRL0);
+				standard_irq_callback((exception-SH4_INTC_IRL0)+SH4_IRL0);
 			else
 				standard_irq_callback(SH4_IRL3+1);
 
