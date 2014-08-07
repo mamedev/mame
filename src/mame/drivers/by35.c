@@ -9,7 +9,7 @@ There are many sound boards used, however there are only a few major types.
 * A084-91495-A371 same as above
 * AS-3107 (Squawk & Talk) has a 6802/6808/6810 + 2xPIA + AY-3-8912 + AD558 + TMS5200 + TMS6100 + 4x1kROM.
 * Cheap Squeak has 6803 + ZN429 + 2x2kROM
-* Xenon (#1196) has a speech board (similar to AS-3022) and a vocalizer board, with 32k of roms.
+* Xenon (#1196) has a sound board (similar to AS-3022) and a vocalizer board, with 32k of roms.
 
 
 Sound Board     Machine
@@ -49,7 +49,7 @@ Cheap Squeak    1390,1391,0A17,0A40,0A44,0B42
 
 
 ToDo:
-- Nuova Bell games don't boot
+- Many games don't boot
 - Display to fix
 - Sound
 - Dips, Inputs, Solenoids vary per game
@@ -1771,7 +1771,7 @@ ROM_START(suprbowl)
 	ROM_RELOAD(0xe000, 0x2000)
 ROM_END
 
-
+// AS-2888 sound
 GAME( 1979, sst,        0,        by35, by35, by35_state, by35, ROT0, "Bally","Supersonic", GAME_IS_SKELETON_MECHANICAL)
 GAME( 1978, playboy,    0,        by35, by35, by35_state, by35, ROT0, "Bally","Playboy", GAME_IS_SKELETON_MECHANICAL)
 GAME( 1978, lostwrlp,   0,        by35, by35, by35_state, by35, ROT0, "Bally","Lost World", GAME_IS_SKELETON_MECHANICAL)
@@ -1779,11 +1779,13 @@ GAME( 1978, smman,      0,        by35, by35, by35_state, by35, ROT0, "Bally","S
 GAME( 1978, voltan,     0,        by35, by35, by35_state, by35, ROT0, "Bally","Voltan Escapes Cosmic Doom", GAME_IS_SKELETON_MECHANICAL)
 GAME( 1979, startrep,   0,        by35, by35, by35_state, by35, ROT0, "Bally","Star Trek (Pinball)", GAME_IS_SKELETON_MECHANICAL)
 GAME( 1979, kiss,       0,        by35, by35, by35_state, by35, ROT0, "Bally","Kiss", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1980, ngndshkr,   0,        by35, by35, by35_state, by35, ROT0, "Bally","Nitro Ground Shaker", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1980, slbmania,   0,        by35, by35, by35_state, by35, ROT0, "Bally","Silverball Mania", GAME_IS_SKELETON_MECHANICAL)
 GAME( 1979, hglbtrtr,   0,        by35, by35, by35_state, by35, ROT0, "Bally","Harlem Globetrotters On Tour", GAME_IS_SKELETON_MECHANICAL)
 GAME( 1979, dollyptn,   0,        by35, by35, by35_state, by35, ROT0, "Bally","Dolly Parton", GAME_IS_SKELETON_MECHANICAL)
 GAME( 1979, paragon,    0,        by35, by35, by35_state, by35, ROT0, "Bally","Paragon", GAME_IS_SKELETON_MECHANICAL)
+
+// AS-3022 sound
+GAME( 1980, ngndshkr,   0,        by35, by35, by35_state, by35, ROT0, "Bally","Nitro Ground Shaker", GAME_IS_SKELETON_MECHANICAL)
+GAME( 1980, slbmania,   0,        by35, by35, by35_state, by35, ROT0, "Bally","Silverball Mania", GAME_IS_SKELETON_MECHANICAL)
 GAME( 1979, futurspa,   0,        by35, by35, by35_state, by35, ROT0, "Bally","Future Spa", GAME_IS_SKELETON_MECHANICAL)
 GAME( 1980, spaceinv,   0,        by35, by35, by35_state, by35, ROT0, "Bally","Space Invaders", GAME_IS_SKELETON_MECHANICAL)
 GAME( 1980, rollston,   0,        by35, by35, by35_state, by35, ROT0, "Bally","Rolling Stones", GAME_IS_SKELETON_MECHANICAL)
@@ -1793,10 +1795,19 @@ GAME( 1980, xenonf,     xenon,    by35, by35, by35_state, by35, ROT0, "Bally","X
 GAME( 1980, viking,     0,        by35, by35, by35_state, by35, ROT0, "Bally","Viking", GAME_IS_SKELETON_MECHANICAL)
 GAME( 1980, hotdoggn,   0,        by35, by35, by35_state, by35, ROT0, "Bally","Hotdoggin'", GAME_IS_SKELETON_MECHANICAL)
 GAME( 1980, skatebll,   0,        by35, by35, by35_state, by35, ROT0, "Bally","Skateball", GAME_IS_SKELETON_MECHANICAL)
+GAME( 1980, frontier,   0,        by35, by35, by35_state, by35, ROT0, "Bally","Frontier", GAME_IS_SKELETON_MECHANICAL)
+GAME( 1982, speakesy,   0,        by35, by35, by35_state, by35, ROT0, "Bally","Speakeasy", GAME_IS_SKELETON_MECHANICAL)
+GAME( 1982, speakesy4p, speakesy, by35, by35, by35_state, by35, ROT0, "Bally","Speakeasy 4 Player", GAME_IS_SKELETON_MECHANICAL)
+GAME( 1983, bmx,        0,        by35, by35, by35_state, by35, ROT0, "Bally","BMX", GAME_IS_SKELETON_MECHANICAL)
+GAME( 1983, granslam,   0,        by35, by35, by35_state, by35, ROT0, "Bally","Grand Slam", GAME_IS_SKELETON_MECHANICAL)
+GAME( 1983, granslam4,  granslam, by35, by35, by35_state, by35, ROT0, "Bally","Grand Slam (4 Players)", GAME_IS_SKELETON_MECHANICAL)
+GAME( 1983, goldball,   0,        by35, by35, by35_state, by35, ROT0, "Bally","Gold Ball (set 1)", GAME_IS_SKELETON_MECHANICAL)
+GAME( 1983, goldballn,  goldball, by35, by35, by35_state, by35, ROT0, "Bally / Oliver","Gold Ball (set 2)", GAME_IS_SKELETON_MECHANICAL)
+
+// Squawk & Talk sound
 GAME( 1981, flashgdn,   0,        by35, by35, by35_state, by35, ROT0, "Bally","Flash Gordon", GAME_IS_SKELETON_MECHANICAL)
 GAME( 1981, flashgdnf,  flashgdn, by35, by35, by35_state, by35, ROT0, "Bally","Flash Gordon (French)", GAME_IS_SKELETON_MECHANICAL)
 GAME( 1981, flashgdnv,  flashgdn, by35, by35, by35_state, by35, ROT0, "Bally","Flash Gordon (Vocalizer sound)", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1980, frontier,   0,        by35, by35, by35_state, by35, ROT0, "Bally","Frontier", GAME_IS_SKELETON_MECHANICAL)
 GAME( 1981, fball_ii,   0,        by35, by35, by35_state, by35, ROT0, "Bally","Fireball II", GAME_IS_SKELETON_MECHANICAL)
 GAME( 1981, eballdlx,   0,        by35, by35, by35_state, by35, ROT0, "Bally","Eight Ball Deluxe (rev. 15)", GAME_IS_SKELETON_MECHANICAL)
 GAME( 1981, eballd14,   eballdlx, by35, by35, by35_state, by35, ROT0, "Bally","Eight Ball Deluxe (rev. 14)", GAME_IS_SKELETON_MECHANICAL)
@@ -1808,15 +1819,10 @@ GAME( 1982, vector,     0,        by35, by35, by35_state, by35, ROT0, "Bally","V
 GAME( 1981, elektra,    0,        by35, by35, by35_state, by35, ROT0, "Bally","Elektra", GAME_IS_SKELETON_MECHANICAL)
 GAME( 1982, spectrm,    0,        by35, by35, by35_state, by35, ROT0, "Bally","Spectrum", GAME_IS_SKELETON_MECHANICAL)
 GAME( 1982, spectrm4,   spectrm,  by35, by35, by35_state, by35, ROT0, "Bally","Spectrum (ver 4)", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1982, speakesy,   0,        by35, by35, by35_state, by35, ROT0, "Bally","Speakeasy", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1982, speakesy4p, speakesy, by35, by35, by35_state, by35, ROT0, "Bally","Speakeasy 4 Player", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1983, bmx,        0,        by35, by35, by35_state, by35, ROT0, "Bally","BMX", GAME_IS_SKELETON_MECHANICAL)
 GAME( 1982, rapidfip,   0,        by35, by35, by35_state, by35, ROT0, "Bally","Rapid Fire", GAME_IS_SKELETON_MECHANICAL)
 GAME( 1982, m_mpac,     0,        by35, by35, by35_state, by35, ROT0, "Bally","Mr. and Mrs. PacMan", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1983, granslam,   0,        by35, by35, by35_state, by35, ROT0, "Bally","Grand Slam", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1983, granslam4,  granslam, by35, by35, by35_state, by35, ROT0, "Bally","Grand Slam (4 Players)", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1983, goldball,   0,        by35, by35, by35_state, by35, ROT0, "Bally","Gold Ball (set 1)", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1983, goldballn,  goldball, by35, by35, by35_state, by35, ROT0, "Bally / Oliver","Gold Ball (set 2)", GAME_IS_SKELETON_MECHANICAL)
+
+// Cheap Squeak sound
 GAME( 1984, kosteel,    0,        by35, by35, by35_state, by35, ROT0, "Bally","Kings of Steel", GAME_IS_SKELETON_MECHANICAL)
 GAME( 1983, xsandos,    0,        by35, by35, by35_state, by35, ROT0, "Bally","X's & O's", GAME_IS_SKELETON_MECHANICAL)
 GAME( 1984, spyhuntr,   0,        by35, by35, by35_state, by35, ROT0, "Bally","Spy Hunter (Pinball)", GAME_IS_SKELETON_MECHANICAL)
@@ -1824,8 +1830,7 @@ GAME( 1984, fbclass,    0,        by35, by35, by35_state, by35, ROT0, "Bally","F
 GAME( 1984, blakpyra,   0,        by35, by35, by35_state, by35, ROT0, "Bally","Black Pyramid", GAME_IS_SKELETON_MECHANICAL)
 GAME( 1985, cybrnaut,   0,        by35, by35, by35_state, by35, ROT0, "Bally","Cybernaut", GAME_IS_SKELETON_MECHANICAL)
 
-GAME( 1986, bullseye,   0,        by35, by35, by35_state, by35, ROT0, "Grand Products","301/Bullseye", GAME_IS_SKELETON_MECHANICAL)
-
+// Other manufacturers
 GAME( 1984, suprbowl,   xsandos,  by35, by35, by35_state, by35, ROT0, "Bell Games","Super Bowl", GAME_IS_SKELETON_MECHANICAL)
 GAME( 1984, tigerrag,   kosteel,  by35, by35, by35_state, by35, ROT0, "Bell Games","Tiger Rag", GAME_IS_SKELETON_MECHANICAL)
 GAME( 1985, cosflash,   flashgdn, by35, by35, by35_state, by35, ROT0, "Bell Games","Cosmic Flash", GAME_IS_SKELETON_MECHANICAL)
@@ -1840,7 +1845,7 @@ GAME( 1987, futrquen,   0,        by35, by35, by35_state, by35, ROT0, "Nuova Bel
 GAME( 1987, f1gpp,      0,        by35, by35, by35_state, by35, ROT0, "Nuova Bell Games","F1 Grand Prix", GAME_IS_SKELETON_MECHANICAL)
 GAME( 1988, toppin,     0,        by35, by35, by35_state, by35, ROT0, "Nuova Bell Games","Top Pin", GAME_IS_SKELETON_MECHANICAL)
 GAME( 1988, uboat65,    0,        by35, by35, by35_state, by35, ROT0, "Nuova Bell Games","U-boat 65", GAME_IS_SKELETON_MECHANICAL)
-
+GAME( 1986, bullseye,   0,        by35, by35, by35_state, by35, ROT0, "Grand Products","301/Bullseye", GAME_IS_SKELETON_MECHANICAL)
 GAME( 1988, bbbowlin,   0,        by35, by35, by35_state, by35, ROT0, "United","Big Ball Bowling (Bowler)", GAME_IS_SKELETON_MECHANICAL)
 GAME( 1988, monrobwl,   0,        by35, by35, by35_state, by35, ROT0, "Monroe Bowling Co.","Stars & Strikes (Bowler)", GAME_IS_SKELETON_MECHANICAL)
 GAME( 1984, mdntmrdr,   0,        by35, by35, by35_state, by35, ROT0, "Bally Midway","Midnight Marauders (Gun game)", GAME_IS_SKELETON_MECHANICAL)
