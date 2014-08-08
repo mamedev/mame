@@ -125,7 +125,7 @@ UINT32 gameplan_state::screen_update_leprechn(screen_device &screen, bitmap_rgb3
 		UINT8 y = offs >> 8;
 		UINT8 x = offs & 0xff;
 
-		bitmap.pix32(y, x) = pens[m_videoram[offs]];
+		bitmap.pix32(y, x) = pens[m_videoram[offs] & (LEPRECHN_NUM_PENS-1)];
 	}
 
 	return 0;
