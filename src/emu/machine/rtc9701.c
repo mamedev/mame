@@ -105,6 +105,10 @@ void rtc9701_device::device_start()
 	m_rtc.hour = ((systime.local_time.hour / 10)<<4) | ((systime.local_time.hour % 10) & 0xf);
 	m_rtc.min = ((systime.local_time.minute / 10)<<4) | ((systime.local_time.minute % 10) & 0xf);
 	m_rtc.sec = ((systime.local_time.second / 10)<<4) | ((systime.local_time.second % 10) & 0xf);
+
+	rtc_state = RTC9701_CMD_WAIT;
+	cmd_stream_pos = 0;
+	current_cmd = 0;
 }
 
 
