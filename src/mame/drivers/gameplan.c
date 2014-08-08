@@ -1014,6 +1014,7 @@ static MACHINE_CONFIG_DERIVED( leprechn, gameplan )
 
 	/* via */
 	MCFG_DEVICE_MODIFY("via6522_0")
+	MCFG_VIA6522_READPB_HANDLER(READ8(gameplan_state, leprechn_videoram_r))
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(gameplan_state, leprechn_video_command_w))
 MACHINE_CONFIG_END
 

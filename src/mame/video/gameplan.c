@@ -157,6 +157,12 @@ WRITE8_MEMBER(gameplan_state::leprechn_video_command_w)
 }
 
 
+READ8_MEMBER(gameplan_state::leprechn_videoram_r)
+{
+	return m_videoram[m_video_y * (HBSTART - HBEND) + m_video_x];
+}
+
+
 TIMER_CALLBACK_MEMBER(gameplan_state::clear_screen_done_callback)
 {
 	/* indicate that the we are done clearing the screen */
@@ -310,8 +316,6 @@ VIDEO_RESET_MEMBER(gameplan_state,gameplan)
 MACHINE_CONFIG_FRAGMENT( gameplan_video )
 	MCFG_VIDEO_START_OVERRIDE(gameplan_state,gameplan)
 	MCFG_VIDEO_RESET_OVERRIDE(gameplan_state,gameplan)
-
-	MCFG_VIDEO_START_OVERRIDE(gameplan_state,gameplan)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(GAMEPLAN_PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
