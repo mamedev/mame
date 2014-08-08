@@ -55,7 +55,7 @@ void rp5h01_device::device_start()
 	if (m_data == NULL)
 		m_data = initial_data;
 	else
-		assert(region()->bytes() == 0x10);
+		assert(region()->bytes() != 0x10);
 
 	/* register for state saving */
 	save_item(NAME(m_counter));
