@@ -1521,6 +1521,40 @@ ROM_START( pacmania )
 	ROM_LOAD( "pnx_obj1.bin",       0x20000, 0x20000, CRC(4c08affe) SHA1(f8f60fdc31779e2abe496e36ba0e4f27546cbc54) )
 ROM_END
 
+// all other roms are MASK roms matching the world set, possible prototype sound roms (handwritten / dated labels)
+ROM_START( pacmaniao )
+	ROM_REGION( 0x2c000, "audiocpu", 0 )       /* 176k for the sound cpu */
+	ROM_LOAD( "pac-mania_111187.sound0",         0x0c000, 0x10000, CRC(845d6a2e) SHA1(bd541a5df0cbc0fe7f24fedcecb5b9f52a78d102) ) // different
+	ROM_LOAD( "pac-mania_111187.sound1",         0x1c000, 0x10000, CRC(411bc134) SHA1(89960596def3580d19d9121d1efffbba2d1bdd94) ) // identical to japanese version
+
+	ROM_REGION( 0x400000, "user1", 0 ) /* 4M for ROMs */
+	/* 000000-07ffff empty */
+	/* 080000-0fffff empty */
+	/* 100000-17ffff empty */
+	/* 180000-1fffff empty */
+	/* 200000-27ffff empty */
+	/* 280000-2fffff empty */
+	ROM_LOAD_1024( "pn_prg-6.bin",    0x300000, CRC(fe94900c) SHA1(5ce726baafc5ed24ea4cae33232c97637afb486b) )
+	ROM_LOAD_512 ( "pn2_p7.bin",      0x380000, CRC(462fa4fd) SHA1(b27bee1ac64ac204c85703c3822de7dbda11b75e) )
+
+	ROM_REGION( 0xd0000, "mcu", 0 )       /* the MCU & voice */
+	ROM_LOAD( "cus64-64a1.mcu",     0x0f000, 0x01000, CRC(ffb5c0bd) SHA1(7a38c0cc2553c627f4ec507fb6e807cf7d537c02) ) /* internal 63701 MCU code */
+	ROM_LOAD_HS( "pac-mania_111187.voice0",      0x10000, 0x10000, CRC(1ad5788f) SHA1(f6b1ccdcc3db11c0ab83e3ff24e772cd2b491468) ) // identical to world version
+
+	ROM_REGION( 0x20000, "gfx1", 0 )  /* character mask */
+	ROM_LOAD( "pn1_c8.bin",         0x00000, 0x10000, CRC(f3afd65d) SHA1(51daefd8685b49c464130b9e7d93e31cfdda724e) ) // same as the Japanese version
+
+	ROM_REGION( 0x100000, "gfx2", 0 ) /* characters */
+	ROM_LOAD( "pn_chr-0.bin",       0x00000, 0x20000, CRC(7c57644c) SHA1(77d9cc9ffbed47a941e4c5e5645d7d1126f6c302) )
+	ROM_LOAD( "pn_chr-1.bin",       0x20000, 0x20000, CRC(7eaa67ed) SHA1(4ad6cfa31d781fa7169663bbc319fc79d8965290) )
+	ROM_LOAD( "pn_chr-2.bin",       0x40000, 0x20000, CRC(27e739ac) SHA1(be9dbd22d988b76f7044328e2056c3f26b703401) )
+	ROM_LOAD( "pn_chr-3.bin",       0x60000, 0x20000, CRC(1dfda293) SHA1(fa01b0b8a820c1d24ff0f84b857d2784f0dac1cf) )
+
+	ROM_REGION( 0x100000, "gfx3", 0 ) /* sprites */
+	ROM_LOAD( "pn_obj-0.bin",       0x00000, 0x20000, CRC(fda57e8b) SHA1(16a72585268159d24f881dbb1aa6ae82bcc4bde7) )
+	ROM_LOAD( "pnx_obj1.bin",       0x20000, 0x20000, CRC(4c08affe) SHA1(f8f60fdc31779e2abe496e36ba0e4f27546cbc54) )
+ROM_END
+
 /* Pac-Mania (Japan) diff o1,s0,s1,p7,v0 */
 ROM_START( pacmaniaj )
 	ROM_REGION( 0x2c000, "audiocpu", 0 )       /* 176k for the sound cpu */
@@ -2710,6 +2744,7 @@ GAME( 1987, blazer,    0,        ns1,     ns1,      namcos1_state, blazer,   ROT
 GAME( 1987, quester,   0,        ns1,     quester,  namcos1_state, quester,  ROT90,  "Namco", "Quester (Japan)", 0 )
 GAME( 1987, questers,  quester,  ns1,     quester,  namcos1_state, quester,  ROT90,  "Namco", "Quester Special Edition (Japan)", 0 )
 GAME( 1987, pacmania,  0,        ns1,     pacmania, namcos1_state, pacmania, ROT270, "Namco", "Pac-Mania", 0 )
+GAME( 1987, pacmaniao, pacmania, ns1,     pacmania, namcos1_state, pacmania, ROT270, "Namco", "Pac-Mania (111187 sound program)", 0 )
 GAME( 1987, pacmaniaj, pacmania, ns1,     pacmania, namcos1_state, pacmania, ROT90,  "Namco", "Pac-Mania (Japan)", 0 )
 GAME( 1987, galaga88,  0,        ns1,     galaga88, namcos1_state, galaga88, ROT270, "Namco", "Galaga '88", 0 )
 GAME( 1987, galaga88a, galaga88, ns1,     galaga88, namcos1_state, galaga88, ROT90,  "Namco", "Galaga '88 (02-03-88)", 0 )
