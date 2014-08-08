@@ -495,8 +495,8 @@ static ADDRESS_MAP_START( newmcard_io, AS_IO, 16, highvdeo_state )
 	AM_RANGE(0x000c, 0x000d) AM_READ(newmcard_vblank_r )
 	AM_RANGE(0x000e, 0x000f) AM_READ(read2_r )
 	AM_RANGE(0x0010, 0x0011) AM_DEVWRITE8("ramdac", ramdac_device, index_w, 0x00ff)
-	AM_RANGE(0x0012, 0x0013) AM_DEVWRITE8("ramdac", ramdac_device, pal_w, 0x00ff)
-	AM_RANGE(0x0014, 0x0015) AM_DEVWRITE8("ramdac", ramdac_device, mask_w, 0x00ff)
+	AM_RANGE(0x0012, 0x0013) AM_DEVWRITE8("ramdac", ramdac_device, mask_w, 0x00ff)
+	AM_RANGE(0x0014, 0x0015) AM_DEVWRITE8("ramdac", ramdac_device, pal_w, 0x00ff)
 ADDRESS_MAP_END
 
 /****************************
