@@ -3326,6 +3326,22 @@ do                                                                              
 	/* handle alpha mask */                                                     \
 	APPLY_ALPHAMASK(VV, STATS, FBZMODE, c_other.rgb.a);                         \
 																				\
+	/* compute c_local */                                                       \
+	if (FBZCP_CC_LOCALSELECT_OVERRIDE(FBZCOLORPATH) == 0)                       \
+	{                                                                           \
+		if (FBZCP_CC_LOCALSELECT(FBZCOLORPATH) == 0)    /* iterated RGB */      \
+			c_local.u = ITERARGB.u;                                             \
+		else                                            /* color0 RGB */        \
+			c_local.u = (VV)->reg[color0].u;                                    \
+	}                                                                           \
+	else                                                                        \
+	{                                                                           \
+		if (!(TEXELARGB.rgb.a & 0x80))                  /* iterated RGB */      \
+			c_local.u = ITERARGB.u;                                             \
+		else                                            /* color0 RGB */        \
+			c_local.u = (VV)->reg[color0].u;                                    \
+	}                                                                           \
+																				\
 	/* compute a_local */                                                       \
 	switch (FBZCP_CCA_LOCALSELECT(FBZCOLORPATH))                                \
 	{                                                                           \
@@ -3411,22 +3427,6 @@ do                                                                              
 	/* handle alpha test */                                                     \
 	APPLY_ALPHATEST(VV, STATS, ALPHAMODE, a);                                   \
 																				\
-																				\
-	/* compute c_local */                                                       \
-	if (FBZCP_CC_LOCALSELECT_OVERRIDE(FBZCOLORPATH) == 0)                       \
-	{                                                                           \
-		if (FBZCP_CC_LOCALSELECT(FBZCOLORPATH) == 0)    /* iterated RGB */      \
-			c_local.u = ITERARGB.u;                                             \
-		else                                            /* color0 RGB */        \
-			c_local.u = (VV)->reg[color0].u;                                    \
-	}                                                                           \
-	else                                                                        \
-	{                                                                           \
-		if (!(TEXELARGB.rgb.a & 0x80))                  /* iterated RGB */      \
-			c_local.u = ITERARGB.u;                                             \
-		else                                            /* color0 RGB */        \
-			c_local.u = (VV)->reg[color0].u;                                    \
-	}                                                                           \
 																				\
 	/* select zero or c_other */                                                \
 	if (FBZCP_CC_ZERO_OTHER(FBZCOLORPATH) == 0)                                 \
