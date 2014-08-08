@@ -625,13 +625,19 @@ void i80186_cpu_device::device_reset()
 	m_intr.poll_status       = 0x0000;
 	m_intr.ext_state         = 0x00;
 	m_reloc = 0x20ff;
-	m_dma[0].drq_state = false;
-	m_dma[1].drq_state = false;
+	
+	for(int i = 0; i < ARRAY_LENGTH(m_dma); ++i)
+	{
+		m_dma[i].drq_state = false;
+		m_dma[i].control = 0;
+	}
+
 	for(int i = 0; i < ARRAY_LENGTH(m_timer); ++i)
 	{
 		m_timer[i].control = 0;
 		m_timer[i].maxA = 0;
 		m_timer[i].maxB = 0;
+		m_timer[i].active_count = false;
 		m_timer[i].count = 0;
 	}
 }
