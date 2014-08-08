@@ -5,6 +5,7 @@
 #include "ascii.h"
 #include "bm_012.h"
 #include "crossblaim.h"
+#include "disk.h"
 #include "dooly.h"
 #include "fmpac.h"
 #include "halnote.h"
@@ -54,6 +55,7 @@ SLOT_INTERFACE_START(msx_cart)
 	SLOT_INTERFACE_INTERNAL("dooly", MSX_CART_DOOLY)
 	SLOT_INTERFACE_INTERNAL("halnote", MSX_CART_HALNOTE)
 	SLOT_INTERFACE_INTERNAL("arc", MSX_CART_ARC)
+	SLOT_INTERFACE_INTERNAL("disk_vy0010", MSX_CART_VY0010)
 	SLOT_INTERFACE("bm_012", MSX_CART_BM_012)
 SLOT_INTERFACE_END
 

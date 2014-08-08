@@ -17109,6 +17109,25 @@ legacy FM implementations cannot find it.
 		</part>
 	</software>
 
+	<software name="vy0010">
+		<description>Philips VY-0010 (Floppy controller + 3.5" SS floppy drive)</description>
+		<year>198?</year>
+		<publisher>Philips</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="disk_vy0010" />
+			<dataarea name="rom" size="0x4000">
+				<!-- Dump contains contents of the memory mapped FDC registers -->
+				<!-- ROM label taken from schematic, possibly incorrect -->
+				<rom name="27128q25-8.ic2" size="0x4000" crc="164f5a6d" sha1="8924e3e11eb1c8c1edcb7efa63c26d2bdc142473" status="baddump" offset="0" />
+			</dataarea>
+		</part>
+		<!-- The package came with a copy of msx-dos -->
+<!--
+		<part name="flop1" interface="35_disk">
+		</part>
+-->
+	</software>
+
 	<!-- SORT -->
 
 	<software name="dooly">
