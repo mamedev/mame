@@ -759,8 +759,8 @@ ROM_START( pc_smb )     /* Super Mario Bros. */
 	ROM_REGION( 0x02000, "gfx2", 0 )    /* cart gfx */
 	ROM_LOAD( "u2sm",    0x00000, 0x2000, CRC(867b51ad) SHA1(394badaf0b0bdd0ea279a1bca89a9d9ddc00b1b5) )
 
-	ROM_REGION( 0x0100,  "rp5h01", 0 )  /* rp5h01 data */
-	ROM_LOAD( "security.prm", 0x00000, 0x10, CRC(bd82d775) SHA1(e15c369d638156eeb0cd141aeeec877c62810b64) )
+	ROM_REGION( 0x10, "rp5h01", 0 ) /* rp5h01 data */
+	ROM_LOAD( "security.prm", 0x00, 0x10, CRC(bd82d775) SHA1(e15c369d638156eeb0cd141aeeec877c62810b64) )
 ROM_END
 
 ROM_START( pc_ebike )   /* Excite Bike */
@@ -774,8 +774,8 @@ ROM_START( pc_ebike )   /* Excite Bike */
 	ROM_REGION( 0x02000, "gfx2", 0 )    /* cart gfx */
 	ROM_LOAD( "u2eb",    0x00000, 0x2000, CRC(e5f72401) SHA1(a8bf028e1a62677e48e88cf421bb2a8051eb800c) )
 
-	ROM_REGION( 0x0100,  "rp5h01", 0 )  /* rp5h01 data */
-	ROM_LOAD( "security.prm", 0x00000, 0x10, CRC(a0263750) SHA1(2ab6e43c2bc4c07fc7887defc4fc81502167ef60) )
+	ROM_REGION( 0x10, "rp5h01", 0 ) /* rp5h01 data */
+	ROM_LOAD( "security.prm", 0x00, 0x10, CRC(a0263750) SHA1(2ab6e43c2bc4c07fc7887defc4fc81502167ef60) )
 ROM_END
 
 ROM_START( pc_1942 )    /* 1942 */
@@ -789,8 +789,8 @@ ROM_START( pc_1942 )    /* 1942 */
 	ROM_REGION( 0x02000, "gfx2", 0 )    /* cart gfx */
 	ROM_LOAD( "u2",      0x00000, 0x2000, CRC(03379b76) SHA1(d2a6ca1cdd8935525f59f1d38806b2296cb12a12) )
 
-	ROM_REGION( 0x0100,  "rp5h01", 0 )  /* rp5h01 data */
-	ROM_LOAD( "security.prm", 0x00000, 0x10, CRC(29893c7f) SHA1(58478b7de2177c8dc1d6885bd34eeeeb5e46d7a3) )
+	ROM_REGION( 0x10, "rp5h01", 0 ) /* rp5h01 data */
+	ROM_LOAD( "security.prm", 0x00, 0x10, CRC(29893c7f) SHA1(58478b7de2177c8dc1d6885bd34eeeeb5e46d7a3) )
 ROM_END
 
 ROM_START( pc_bfght )   /* Balloon Fight */
@@ -804,8 +804,8 @@ ROM_START( pc_bfght )   /* Balloon Fight */
 	ROM_REGION( 0x02000, "gfx2", 0 )    /* cart gfx */
 	ROM_LOAD( "bf-u2",   0x00000, 0x2000, CRC(c642a1df) SHA1(e73cd3d4c0bad8e6f7a1aa6a580f3817a83756a9) )
 
-	ROM_REGION( 0x0100,  "rp5h01", 0 )  /* rp5h01 data */
-	ROM_LOAD( "security.prm", 0x00000, 0x10, CRC(be3c42fb) SHA1(da40c57bda36d1dbacdf246e0d2579b6be616480) )
+	ROM_REGION( 0x10, "rp5h01", 0 ) /* rp5h01 data */
+	ROM_LOAD( "security.prm", 0x00, 0x10, CRC(be3c42fb) SHA1(da40c57bda36d1dbacdf246e0d2579b6be616480) )
 ROM_END
 
 ROM_START( pc_bball )   /* Baseball */
@@ -819,8 +819,8 @@ ROM_START( pc_bball )   /* Baseball */
 	ROM_REGION( 0x02000, "gfx2", 0 )    /* cart gfx */
 	ROM_LOAD( "ba-u2",   0x00000, 0x2000, CRC(cde71b82) SHA1(296ccef8a1fd9209f414ce0c788ab0dc95058242) )
 
-	ROM_REGION( 0x0100,  "rp5h01", 0 )  /* rp5h01 data */
-	ROM_LOAD( "security.prm", 0x00000, 0x10, CRC(7940cfc4) SHA1(9e36ceb5aac023472f48f2f06cf171bffa49a664) )
+	ROM_REGION( 0x10, "rp5h01", 0 ) /* rp5h01 data */
+	ROM_LOAD( "security.prm", 0x00, 0x10, CRC(7940cfc4) SHA1(9e36ceb5aac023472f48f2f06cf171bffa49a664) )
 ROM_END
 
 ROM_START( pc_golf )    /* Golf */
@@ -834,8 +834,8 @@ ROM_START( pc_golf )    /* Golf */
 	ROM_REGION( 0x02000, "gfx2", 0 )    /* cart gfx */
 	ROM_LOAD( "gf-u2",   0x00000, 0x2000, CRC(ff6fc790) SHA1(40177839b61f375f2ad03b203328683264845b5b) )
 
-	ROM_REGION( 0x0100,  "rp5h01", 0 )  /* rp5h01 data */
-	ROM_LOAD( "security.prm", 0x00000, 0x10, CRC(2cd98ef6) SHA1(bd5142c6a29df674ab835c8beafff7e93712d88f) )
+	ROM_REGION( 0x10, "rp5h01", 0 ) /* rp5h01 data */
+	ROM_LOAD( "security.prm", 0x00, 0x10, CRC(2cd98ef6) SHA1(bd5142c6a29df674ab835c8beafff7e93712d88f) )
 ROM_END
 
 ROM_START( pc_kngfu )   /* Kung Fu */
@@ -849,8 +849,8 @@ ROM_START( pc_kngfu )   /* Kung Fu */
 	ROM_REGION( 0x02000, "gfx2", 0 )    /* cart gfx */
 	ROM_LOAD( "sx-u2",   0x00000, 0x2000, CRC(430b49a4) SHA1(7e618dbff521c3d5ee0f3d8bb01d2e770395a6bc) )
 
-	ROM_REGION( 0x0100,  "rp5h01", 0 )  /* rp5h01 data */
-	ROM_LOAD( "security.prm", 0x00000, 0x10, CRC(a1687f01) SHA1(ff4c3e925ece14acfa6f51c87af310ebbe3af638) )
+	ROM_REGION( 0x10, "rp5h01", 0 ) /* rp5h01 data */
+	ROM_LOAD( "security.prm", 0x00, 0x10, CRC(a1687f01) SHA1(ff4c3e925ece14acfa6f51c87af310ebbe3af638) )
 ROM_END
 
 ROM_START( pc_tenis )   /* Tennis */
@@ -864,8 +864,8 @@ ROM_START( pc_tenis )   /* Tennis */
 	ROM_REGION( 0x02000, "gfx2", 0 )    /* cart gfx */
 	ROM_LOAD( "te-u2",   0x00000, 0x2000, CRC(3a34c45b) SHA1(2cc26a01c38ead50503dccb3ee929ba7a2b6772c) )
 
-	ROM_REGION( 0x0100,  "rp5h01", 0 )  /* rp5h01 data */
-	ROM_LOAD( "security.prm", 0x00000, 0x10, CRC(bcc9a48e) SHA1(a293898f17b627cdf8e7a1074ef30ad8c2392977) )
+	ROM_REGION( 0x10, "rp5h01", 0 ) /* rp5h01 data */
+	ROM_LOAD( "security.prm", 0x00, 0x10, CRC(bcc9a48e) SHA1(a293898f17b627cdf8e7a1074ef30ad8c2392977) )
 ROM_END
 
 ROM_START( pc_vball )   /* Volley Ball */
@@ -879,8 +879,8 @@ ROM_START( pc_vball )   /* Volley Ball */
 	ROM_REGION( 0x02000, "gfx2", 0 )    /* cart gfx */
 	ROM_LOAD( "vb-u2",   0x00000, 0x2000, CRC(2415dce2) SHA1(fd89b4a542989a89c2d0467257dca57518bfa96b) )
 
-	ROM_REGION( 0x0100,  "rp5h01", 0 )  /* rp5h01 data */
-	ROM_LOAD( "security.prm", 0x00000, 0x10, CRC(f701863f) SHA1(78614e6b8a78384d9aeab439eb8d53a3691dd0a1) )
+	ROM_REGION( 0x10, "rp5h01", 0 ) /* rp5h01 data */
+	ROM_LOAD( "security.prm", 0x00, 0x10, CRC(f701863f) SHA1(78614e6b8a78384d9aeab439eb8d53a3691dd0a1) )
 ROM_END
 
 ROM_START( pc_mario )   /* Mario Bros. */
@@ -894,8 +894,8 @@ ROM_START( pc_mario )   /* Mario Bros. */
 	ROM_REGION( 0x02000, "gfx2", 0 )    /* cart gfx */
 	ROM_LOAD( "ma-u2",   0x00000, 0x2000, CRC(10f77435) SHA1(a646c3443832ada84d31a3a8a4b34aebc17cecd5) )
 
-	ROM_REGION( 0x0100,  "rp5h01", 0 )  /* rp5h01 data */
-	ROM_LOAD( "security.prm", 0x00000, 0x10, CRC(79006635) SHA1(10dcb24fb7717b993110512115ab04310dc637d0) )
+	ROM_REGION( 0x10, "rp5h01", 0 ) /* rp5h01 data */
+	ROM_LOAD( "security.prm", 0x00, 0x10, CRC(79006635) SHA1(10dcb24fb7717b993110512115ab04310dc637d0) )
 ROM_END
 
 /* Gun Games */
@@ -910,8 +910,8 @@ ROM_START( pc_duckh )   /* Duck Hunt */
 	ROM_REGION( 0x04000, "gfx2", 0 )    /* cart gfx */
 	ROM_LOAD( "u2",      0x00000, 0x2000, CRC(4e049e03) SHA1(ffad32a3bab2fb3826bc554b1b9838e837513576) )
 
-	ROM_REGION( 0x0100,  "rp5h01", 0 )  /* rp5h01 data */
-	ROM_LOAD( "security.prm", 0x00000, 0x10, CRC(8cd6aad6) SHA1(4543cdb55c3521e1b5d61f82d4800c414658fd6d) )
+	ROM_REGION( 0x10, "rp5h01", 0 ) /* rp5h01 data */
+	ROM_LOAD( "security.prm", 0x00, 0x10, CRC(8cd6aad6) SHA1(4543cdb55c3521e1b5d61f82d4800c414658fd6d) )
 ROM_END
 
 ROM_START( pc_hgaly )   /* Hogan's Alley */
@@ -925,8 +925,8 @@ ROM_START( pc_hgaly )   /* Hogan's Alley */
 	ROM_REGION( 0x04000, "gfx2", 0 )    /* cart gfx */
 	ROM_LOAD( "ha-u2",   0x00000, 0x2000, CRC(5df42fc4) SHA1(4fcf23151d9f11c1ef1b1007dd8058f5d5fe9ab8) )
 
-	ROM_REGION( 0x0100,  "rp5h01", 0 )  /* rp5h01 data */
-	ROM_LOAD( "security.prm", 0x00000, 0x10, CRC(5ac61521) SHA1(75d2ad958336061e70049272ce4c88bff182f96d) )
+	ROM_REGION( 0x10, "rp5h01", 0 ) /* rp5h01 data */
+	ROM_LOAD( "security.prm", 0x00, 0x10, CRC(5ac61521) SHA1(75d2ad958336061e70049272ce4c88bff182f96d) )
 ROM_END
 
 ROM_START( pc_wgnmn )   /* Wild Gunman */
@@ -940,8 +940,8 @@ ROM_START( pc_wgnmn )   /* Wild Gunman */
 	ROM_REGION( 0x04000, "gfx2", 0 )    /* cart gfx */
 	ROM_LOAD( "wg-u2",   0x00000, 0x2000, CRC(a5e04856) SHA1(9194d89a34f687742216889cbb3e717a9ae81c92) )
 
-	ROM_REGION( 0x0100,  "rp5h01", 0 )  /* rp5h01 data */
-	ROM_LOAD( "security.prm", 0x00000, 0x10, CRC(def015a3) SHA1(b542828a74744d87331821635777d7715e22a15b) )
+	ROM_REGION( 0x10, "rp5h01", 0 ) /* rp5h01 data */
+	ROM_LOAD( "security.prm", 0x00, 0x10, CRC(def015a3) SHA1(b542828a74744d87331821635777d7715e22a15b) )
 ROM_END
 
 /* A-Board Games */
@@ -956,8 +956,8 @@ ROM_START( pc_tkfld )   /* Track & Field */
 	ROM_REGION( 0x08000, "gfx2", 0 )    /* cart gfx */
 	ROM_LOAD( "u3tr",    0x00000, 0x8000, CRC(03bfbc4b) SHA1(ffc4e0e1d858fb4472423ae1c1fdc1e8197c30f0) )
 
-	ROM_REGION( 0x0100,  "rp5h01", 0 )  /* rp5h01 data */
-	ROM_LOAD( "security.prm", 0x00000, 0x10, CRC(1e2e7f1e) SHA1(4b65f5b217586653a1d0da96539cc9bc50d989e2) )
+	ROM_REGION( 0x10, "rp5h01", 0 ) /* rp5h01 data */
+	ROM_LOAD( "security.prm", 0x00, 0x10, CRC(1e2e7f1e) SHA1(4b65f5b217586653a1d0da96539cc9bc50d989e2) )
 ROM_END
 
 ROM_START( pc_grdus )   /* Gradius */
@@ -971,8 +971,8 @@ ROM_START( pc_grdus )   /* Gradius */
 	ROM_REGION( 0x08000, "gfx2", 0 )    /* cart gfx */
 	ROM_LOAD( "gr-u3",   0x00000, 0x8000, CRC(de963bec) SHA1(ecb76b5897658ebac31a07516bb2a5820279474f) )
 
-	ROM_REGION( 0x0100,  "rp5h01", 0 )  /* rp5h01 data */
-	ROM_LOAD( "security.prm", 0x00000, 0x10, CRC(b8d5bf8a) SHA1(1c208fa5409b6e21aa576e1b9e086e830dc26a1a) )
+	ROM_REGION( 0x10, "rp5h01", 0 ) /* rp5h01 data */
+	ROM_LOAD( "security.prm", 0x00, 0x10, CRC(b8d5bf8a) SHA1(1c208fa5409b6e21aa576e1b9e086e830dc26a1a) )
 ROM_END
 
 ROM_START( pc_grdue )   /* Gradius (Early version) */
@@ -986,8 +986,8 @@ ROM_START( pc_grdue )   /* Gradius (Early version) */
 	ROM_REGION( 0x08000, "gfx2", 0 )    /* cart gfx */
 	ROM_LOAD( "gr-u3",   0x00000, 0x8000, CRC(de963bec) SHA1(ecb76b5897658ebac31a07516bb2a5820279474f) )
 
-	ROM_REGION( 0x0100,  "rp5h01", 0 )  /* rp5h01 data */
-	ROM_LOAD( "security.prm", 0x00000, 0x10, CRC(b8d5bf8a) SHA1(1c208fa5409b6e21aa576e1b9e086e830dc26a1a) )
+	ROM_REGION( 0x10, "rp5h01", 0 ) /* rp5h01 data */
+	ROM_LOAD( "security.prm", 0x00, 0x10, CRC(b8d5bf8a) SHA1(1c208fa5409b6e21aa576e1b9e086e830dc26a1a) )
 ROM_END
 
 
@@ -1003,8 +1003,8 @@ ROM_START( pc_rnatk )   /* Rush N' Attack */
 
 	/* No cart gfx - uses vram */
 
-	ROM_REGION( 0x0100,  "rp5h01", 0 )  /* rp5h01 data */
-	ROM_LOAD( "security.prm", 0x00000, 0x10, CRC(1f6596b2) SHA1(e50780241ae3a16811bd92eb366f642a4b5eadf3) )
+	ROM_REGION( 0x10, "rp5h01", 0 ) /* rp5h01 data */
+	ROM_LOAD( "security.prm", 0x00, 0x10, CRC(1f6596b2) SHA1(e50780241ae3a16811bd92eb366f642a4b5eadf3) )
 ROM_END
 
 ROM_START( pc_cntra )   /* Contra */
@@ -1018,8 +1018,8 @@ ROM_START( pc_cntra )   /* Contra */
 
 	/* No cart gfx - uses vram */
 
-	ROM_REGION( 0x0100,  "rp5h01", 0 )  /* rp5h01 data */
-	ROM_LOAD( "security.prm", 0x00000, 0x10, CRC(8ab3977a) SHA1(61d3a7981fbe8a76ab7eee032059d42b50892e97) )
+	ROM_REGION( 0x10, "rp5h01", 0 ) /* rp5h01 data */
+	ROM_LOAD( "security.prm", 0x00, 0x10, CRC(8ab3977a) SHA1(61d3a7981fbe8a76ab7eee032059d42b50892e97) )
 ROM_END
 
 ROM_START( pc_pwrst )   /* Pro Wrestling */
@@ -1034,8 +1034,8 @@ ROM_START( pc_pwrst )   /* Pro Wrestling */
 
 	/* No cart gfx - uses vram */
 
-	ROM_REGION( 0x0100,  "rp5h01", 0 )  /* rp5h01 data */
-	ROM_LOAD( "security.prm", 0x00000, 0x10, CRC(4c6b7983) SHA1(377bd6267ae1d3ab13389a8adf894e116b3c9daa) )
+	ROM_REGION( 0x10, "rp5h01", 0 ) /* rp5h01 data */
+	ROM_LOAD( "security.prm", 0x00, 0x10, CRC(4c6b7983) SHA1(377bd6267ae1d3ab13389a8adf894e116b3c9daa) )
 ROM_END
 
 ROM_START( pc_cvnia )   /* Castlevania */
@@ -1049,8 +1049,8 @@ ROM_START( pc_cvnia )   /* Castlevania */
 
 	/* No cart gfx - uses vram */
 
-	ROM_REGION( 0x0100,  "rp5h01", 0 )  /* rp5h01 data */
-	ROM_LOAD( "security.prm", 0x00000, 0x10, CRC(7da2f045) SHA1(e6048a1f94103c2896eeb33dd7f6bc639831dd7d) )
+	ROM_REGION( 0x10, "rp5h01", 0 ) /* rp5h01 data */
+	ROM_LOAD( "security.prm", 0x00, 0x10, CRC(7da2f045) SHA1(e6048a1f94103c2896eeb33dd7f6bc639831dd7d) )
 ROM_END
 
 ROM_START( pc_dbldr )   /* Double Dribble */
@@ -1064,8 +1064,8 @@ ROM_START( pc_dbldr )   /* Double Dribble */
 
 	/* No cart gfx - uses vram */
 
-	ROM_REGION( 0x0100,  "rp5h01", 0 )  /* rp5h01 data */
-	ROM_LOAD( "security.prm", 0x00000, 0x10, CRC(9b5f4bd2) SHA1(998d2766763eb66f4052f9f16fbfb93d5b41a582) )
+	ROM_REGION( 0x10, "rp5h01", 0 ) /* rp5h01 data */
+	ROM_LOAD( "security.prm", 0x00, 0x10, CRC(9b5f4bd2) SHA1(998d2766763eb66f4052f9f16fbfb93d5b41a582) )
 ROM_END
 
 ROM_START( pc_rygar )   /* Rygar */
@@ -1079,8 +1079,8 @@ ROM_START( pc_rygar )   /* Rygar */
 
 	/* No cart gfx - uses vram */
 
-	ROM_REGION( 0x0100,  "rp5h01", 0 )  /* rp5h01 data */
-	ROM_LOAD( "security.prm", 0x00000, 0x10, CRC(b69309ab) SHA1(a11ae46ed4c6ae5c22bab36593a53535a257fd4f) )
+	ROM_REGION( 0x10, "rp5h01", 0 ) /* rp5h01 data */
+	ROM_LOAD( "security.prm", 0x00, 0x10, CRC(b69309ab) SHA1(a11ae46ed4c6ae5c22bab36593a53535a257fd4f) )
 ROM_END
 
 ROM_START( pc_trjan )   /* Trojan */
@@ -1094,8 +1094,8 @@ ROM_START( pc_trjan )   /* Trojan */
 
 	/* No cart gfx - uses vram */
 
-	ROM_REGION( 0x0100,  "rp5h01", 0 )  /* rp5h01 data */
-	ROM_LOAD( "security.prm", 0x00000, 0x10, CRC(14df772f) SHA1(bb1c58d53ee8c059b3a06d43ee4faf849d4f005f) )
+	ROM_REGION( 0x10, "rp5h01", 0 ) /* rp5h01 data */
+	ROM_LOAD( "security.prm", 0x00, 0x10, CRC(14df772f) SHA1(bb1c58d53ee8c059b3a06d43ee4faf849d4f005f) )
 ROM_END
 
 /* C-Board Games */
@@ -1110,8 +1110,8 @@ ROM_START( pc_goons )   /* The Goonies */
 	ROM_REGION( 0x04000, "gfx2", 0 )    /* cart gfx */
 	ROM_LOAD( "gn-u2",   0x00000, 0x4000, CRC(0f9c7f49) SHA1(f2fcf55d22a38a01df45393c90c73ff14b3b647c) )
 
-	ROM_REGION( 0x0100,  "rp5h01", 0 )  /* rp5h01 data */
-	ROM_LOAD( "security.prm", 0x00000, 0x10, CRC(cdd62d08) SHA1(e2752127ac0b1217f0216854b68a5e5957a565b3) )
+	ROM_REGION( 0x10, "rp5h01", 0 ) /* rp5h01 data */
+	ROM_LOAD( "security.prm", 0x00, 0x10, CRC(cdd62d08) SHA1(e2752127ac0b1217f0216854b68a5e5957a565b3) )
 ROM_END
 
 /* D-Board Games */
@@ -1126,8 +1126,8 @@ ROM_START( pc_radrc )   /* Rad Racer */
 
 	/* No cart gfx - uses vram */
 
-	ROM_REGION( 0x0100,  "rp5h01", 0 )  /* rp5h01 data */
-	ROM_LOAD( "security.prm", 0x00000, 0x10, CRC(17c880f9) SHA1(41be451fcc46a746d5d31dba09f524c0af0cd214) )
+	ROM_REGION( 0x10, "rp5h01", 0 ) /* rp5h01 data */
+	ROM_LOAD( "security.prm", 0x00, 0x10, CRC(17c880f9) SHA1(41be451fcc46a746d5d31dba09f524c0af0cd214) )
 ROM_END
 
 ROM_START( pc_mtoid )   /* Metroid */
@@ -1141,8 +1141,8 @@ ROM_START( pc_mtoid )   /* Metroid */
 
 	/* No cart gfx - uses vram */
 
-	ROM_REGION( 0x0100,  "rp5h01", 0 )  /* rp5h01 data */
-	ROM_LOAD( "security.prm", 0x00000, 0x10, CRC(efab54c9) SHA1(1d0122b7c90a364d54bf6eaa37ce439d706a4357) )
+	ROM_REGION( 0x10, "rp5h01", 0 ) /* rp5h01 data */
+	ROM_LOAD( "security.prm", 0x00, 0x10, CRC(efab54c9) SHA1(1d0122b7c90a364d54bf6eaa37ce439d706a4357) )
 ROM_END
 
 /* E-Board Games */
@@ -1157,8 +1157,8 @@ ROM_START( pc_miket )   /* Mike Tyson's Punchout */
 	ROM_REGION( 0x20000, "gfx2", 0 )    /* cart gfx */
 	ROM_LOAD( "u3pt",    0x00000, 0x20000, CRC(570b48ea) SHA1(33de517b16b61625909d2eb5307c08b337b542c4) )
 
-	ROM_REGION( 0x0100,  "rp5h01", 0 )  /* rp5h01 data */
-	ROM_LOAD( "security.prm", 0x00000, 0x10, CRC(60f7ea1d) SHA1(fcc04cbd8ed233bb1358fc55800f9bb6c75b195b) )
+	ROM_REGION( 0x10, "rp5h01", 0 ) /* rp5h01 data */
+	ROM_LOAD( "security.prm", 0x00, 0x10, CRC(60f7ea1d) SHA1(fcc04cbd8ed233bb1358fc55800f9bb6c75b195b) )
 ROM_END
 
 /* F-Board Games */
@@ -1173,8 +1173,8 @@ ROM_START( pc_ngaid )   /* Ninja Gaiden */
 	ROM_REGION( 0x020000, "gfx2", 0 )   /* cart gfx */
 	ROM_LOAD( "u1ng",   0x00000, 0x20000, CRC(eccd2dcb) SHA1(2a319086f7c22b8fe7ca8ab72436a7c8d07b915e) )    /* banked */
 
-	ROM_REGION( 0x0100,  "rp5h01", 0 )  /* rp5h01 data */
-	ROM_LOAD( "security.prm", 0x00000, 0x10, CRC(ec5641d6) SHA1(05f546aec5a9db167688a9abbac922f5ced7f7c5) )
+	ROM_REGION( 0x10, "rp5h01", 0 ) /* rp5h01 data */
+	ROM_LOAD( "security.prm", 0x00, 0x10, CRC(ec5641d6) SHA1(05f546aec5a9db167688a9abbac922f5ced7f7c5) )
 ROM_END
 
 ROM_START( pc_ddrgn )   /* Double Dragon */
@@ -1188,8 +1188,8 @@ ROM_START( pc_ddrgn )   /* Double Dragon */
 	ROM_REGION( 0x020000, "gfx2", 0 )   /* cart gfx */
 	ROM_LOAD( "wd-u1",  0x00000, 0x20000, CRC(5ebe0fd0) SHA1(4a948c9784433e051f1015a6b6e985a98b81b80d) )
 
-	ROM_REGION( 0x0100,  "rp5h01", 0 )  /* rp5h01 data */
-	ROM_LOAD( "security.prm", 0x00000, 0x10, CRC(f9739d62) SHA1(c9574ed8f24ffb7ab5a6bb1b79805fb6dc6e991a) )
+	ROM_REGION( 0x10, "rp5h01", 0 ) /* rp5h01 data */
+	ROM_LOAD( "security.prm", 0x00, 0x10, CRC(f9739d62) SHA1(c9574ed8f24ffb7ab5a6bb1b79805fb6dc6e991a) )
 ROM_END
 
 ROM_START( pc_drmro )   /* Dr Mario */
@@ -1209,8 +1209,8 @@ ROM_START( pc_drmro )   /* Dr Mario */
 	ROM_RELOAD(         0x10000, 0x08000 )
 	ROM_RELOAD(         0x18000, 0x08000 )
 
-	ROM_REGION( 0x0100,  "rp5h01", 0 )  /* rp5h01 data */
-	ROM_LOAD( "security.prm", 0x00000, 0x10, CRC(1b26e58c) SHA1(bd2d81d3cc54966ef154b3487d43ecbc316d6d22) )
+	ROM_REGION( 0x10, "rp5h01", 0 ) /* rp5h01 data */
+	ROM_LOAD( "security.prm", 0x00, 0x10, CRC(1b26e58c) SHA1(bd2d81d3cc54966ef154b3487d43ecbc316d6d22) )
 ROM_END
 
 ROM_START( pc_virus )   /* Virus (from location test board) */
@@ -1230,8 +1230,8 @@ ROM_START( pc_virus )   /* Virus (from location test board) */
 	ROM_RELOAD(         0x10000, 0x08000 )
 	ROM_RELOAD(         0x18000, 0x08000 )
 
-	ROM_REGION( 0x0100,  "rp5h01", 0 )  /* rp5h01 data */
-	ROM_LOAD( "security.u6", 0x00000, 0x10, CRC(5b4f6930) SHA1(bd152d6907fe55f80125b34360fdb44cfc348906) )
+	ROM_REGION( 0x10, "rp5h01", 0 ) /* rp5h01 data */
+	ROM_LOAD( "security.u6", 0x00, 0x10, CRC(5b4f6930) SHA1(bd152d6907fe55f80125b34360fdb44cfc348906) )
 ROM_END
 
 ROM_START( pc_bload )   /* Bases Loaded (from location test board) */
@@ -1246,8 +1246,8 @@ ROM_START( pc_bload )   /* Bases Loaded (from location test board) */
 	ROM_REGION( 0x020000, "gfx2", 0 )   /* cart gfx */
 	ROM_LOAD( "u1",  0x00000, 0x20000, CRC(02ff6ae9) SHA1(ba15b91f917c9e722d1d8b24b5783bd5eac6a4e7) )
 
-	ROM_REGION( 0x0100,  "rp5h01", 0 )  /* rp5h01 data */
-	ROM_LOAD( "security.u6", 0x00000, 0x10, CRC(5b4f6930) SHA1(bd152d6907fe55f80125b34360fdb44cfc348906) )
+	ROM_REGION( 0x10, "rp5h01", 0 ) /* rp5h01 data */
+	ROM_LOAD( "security.u6", 0x00, 0x10, CRC(5b4f6930) SHA1(bd152d6907fe55f80125b34360fdb44cfc348906) )
 ROM_END
 
 ROM_START( pc_ftqst )   /* Fester's Quest */
@@ -1261,8 +1261,8 @@ ROM_START( pc_ftqst )   /* Fester's Quest */
 	ROM_REGION( 0x020000, "gfx2", 0 )   /* cart gfx */
 	ROM_LOAD( "eq-u1",  0x00000, 0x20000, CRC(0ca17ab5) SHA1(a8765d6245f64b2d94c454662a24f8d8e277aa5a) )
 
-	ROM_REGION( 0x0100,  "rp5h01", 0 )  /* rp5h01 data */
-	ROM_LOAD( "security.prm", 0x00000, 0x10, CRC(1c601cd7) SHA1(bc13067475aac4a7b8bf5f0df96bdd5ba33f1cd7) )
+	ROM_REGION( 0x10, "rp5h01", 0 ) /* rp5h01 data */
+	ROM_LOAD( "security.prm", 0x00, 0x10, CRC(1c601cd7) SHA1(bc13067475aac4a7b8bf5f0df96bdd5ba33f1cd7) )
 ROM_END
 
 ROM_START( pc_rcpam )   /* RC Pro Am */
@@ -1282,8 +1282,8 @@ ROM_START( pc_rcpam )   /* RC Pro Am */
 	ROM_RELOAD(         0x10000, 0x08000 )
 	ROM_RELOAD(         0x18000, 0x08000 )
 
-	ROM_REGION( 0x0100,  "rp5h01", 0 )  /* rp5h01 data */
-	ROM_LOAD( "security.prm", 0x00000, 0x10, CRC(d71d8085) SHA1(67e30ff0c31c6600890408c4dc4d0d2f19856363) )
+	ROM_REGION( 0x10, "rp5h01", 0 ) /* rp5h01 data */
+	ROM_LOAD( "security.prm", 0x00, 0x10, CRC(d71d8085) SHA1(67e30ff0c31c6600890408c4dc4d0d2f19856363) )
 ROM_END
 
 ROM_START( pc_rrngr )   /* Rescue Rangers */
@@ -1297,8 +1297,8 @@ ROM_START( pc_rrngr )   /* Rescue Rangers */
 	ROM_REGION( 0x020000, "gfx2", 0 )   /* cart gfx */
 	ROM_LOAD( "ru-u1",  0x00000, 0x20000, CRC(218d4224) SHA1(37a729021173bec08a8497ad03fd58379b0fce39) )
 
-	ROM_REGION( 0x0100,  "rp5h01", 0 )  /* rp5h01 data */
-	ROM_LOAD( "security.prm", 0x00000, 0x10, CRC(1c2e1865) SHA1(ab2aa76d74c9e76c7ee3f9a211b1aefe5708a23f) )
+	ROM_REGION( 0x10, "rp5h01", 0 ) /* rp5h01 data */
+	ROM_LOAD( "security.prm", 0x00, 0x10, CRC(1c2e1865) SHA1(ab2aa76d74c9e76c7ee3f9a211b1aefe5708a23f) )
 ROM_END
 
 ROM_START( pc_ynoid )   /* Yo! Noid */
@@ -1312,8 +1312,8 @@ ROM_START( pc_ynoid )   /* Yo! Noid */
 	ROM_REGION( 0x020000, "gfx2", 0 )   /* cart gfx */
 	ROM_LOAD( "yc-u1",  0x00000, 0x20000, CRC(868f7343) SHA1(acb6f6eb9e8beb0636c59a999c8f5920ef7786a3) )
 
-	ROM_REGION( 0x0100,  "rp5h01", 0 )  /* rp5h01 data */
-	ROM_LOAD( "security.prm", 0x00000, 0x10, CRC(8c376465) SHA1(39b06fd2ecd5f06b90b2fe06406c9155f5601bd8) )
+	ROM_REGION( 0x10, "rp5h01", 0 ) /* rp5h01 data */
+	ROM_LOAD( "security.prm", 0x00, 0x10, CRC(8c376465) SHA1(39b06fd2ecd5f06b90b2fe06406c9155f5601bd8) )
 ROM_END
 
 ROM_START( pc_tmnt )    /* Teenage Mutant Ninja Turtles */
@@ -1327,8 +1327,8 @@ ROM_START( pc_tmnt )    /* Teenage Mutant Ninja Turtles */
 	ROM_REGION( 0x020000, "gfx2", 0 )   /* cart gfx */
 	ROM_LOAD( "u1u2",   0x00000, 0x20000, CRC(91f01f53) SHA1(171ed0792f3ca3f195145000d96b91aa57898773) )
 
-	ROM_REGION( 0x0100,  "rp5h01", 0 )  /* rp5h01 data */
-	ROM_LOAD( "security.prm", 0x00000, 0x10, CRC(f5a38e98) SHA1(26ef27294fc14d84920132023fbcf406d89ce2ee) )
+	ROM_REGION( 0x10, "rp5h01", 0 ) /* rp5h01 data */
+	ROM_LOAD( "security.prm", 0x00, 0x10, CRC(f5a38e98) SHA1(26ef27294fc14d84920132023fbcf406d89ce2ee) )
 ROM_END
 
 ROM_START( pc_bstar )   /* Baseball Stars */
@@ -1342,8 +1342,8 @@ ROM_START( pc_bstar )   /* Baseball Stars */
 	ROM_REGION( 0x020000, "gfx2", 0 )   /* cart gfx */
 	ROM_LOAD( "b9-u1",   0x00000, 0x20000, CRC(ce149864) SHA1(00c88525756a360f42b27f0e2afaa0a19c2645a6) )
 
-	ROM_REGION( 0x0100,  "rp5h01", 0 )  /* rp5h01 data */
-	ROM_LOAD( "security.prm", 0x00000, 0x10, CRC(3e871350) SHA1(b338f9ef4e18d14843c6a1e8ecb974bca1df73d4) )
+	ROM_REGION( 0x10, "rp5h01", 0 ) /* rp5h01 data */
+	ROM_LOAD( "security.prm", 0x00, 0x10, CRC(3e871350) SHA1(b338f9ef4e18d14843c6a1e8ecb974bca1df73d4) )
 ROM_END
 
 ROM_START( pc_tbowl )   /* Tecmo Bowl */
@@ -1357,8 +1357,8 @@ ROM_START( pc_tbowl )   /* Tecmo Bowl */
 	ROM_REGION( 0x020000, "gfx2", 0 )   /* cart gfx */
 	ROM_LOAD( "tw-u1",   0x00000, 0x20000, CRC(44b078ef) SHA1(ae0c24f4ddd822b19c60e31257279b33b5f3fcad) )
 
-	ROM_REGION( 0x0100,  "rp5h01", 0 )  /* rp5h01 data */
-	ROM_LOAD( "security.prm", 0x00000, 0x10, CRC(18b2d1d3) SHA1(f4d023531b3d69cad4c9c511878e5aa6afb0ac59) )
+	ROM_REGION( 0x10, "rp5h01", 0 ) /* rp5h01 data */
+	ROM_LOAD( "security.prm", 0x00, 0x10, CRC(18b2d1d3) SHA1(f4d023531b3d69cad4c9c511878e5aa6afb0ac59) )
 ROM_END
 
 /* G-Board Games */
@@ -1374,8 +1374,8 @@ ROM_START( pc_smb3 )    /* Super Mario Bros 3 */
 	ROM_REGION( 0x020000, "gfx2", 0 )   /* cart gfx */
 	ROM_LOAD( "u1um",    0x00000, 0x20000, CRC(c2928c49) SHA1(2697d1f21b72a6d8e7d2a2d2c51c9c5550f68b56) )
 
-	ROM_REGION( 0x0100,  "rp5h01", 0 )  /* rp5h01 data */
-	ROM_LOAD( "security.prm", 0x00000, 0x10, CRC(e48f4945) SHA1(66fe537cfe540317d6194847321ce4a9bdf0bba4) )
+	ROM_REGION( 0x10, "rp5h01", 0 ) /* rp5h01 data */
+	ROM_LOAD( "security.prm", 0x00, 0x10, CRC(e48f4945) SHA1(66fe537cfe540317d6194847321ce4a9bdf0bba4) )
 ROM_END
 
 ROM_START( pc_gntlt )   /* Gauntlet */
@@ -1390,8 +1390,8 @@ ROM_START( pc_gntlt )   /* Gauntlet */
 	ROM_REGION( 0x010000, "gfx2", 0 )   /* cart gfx */
 	ROM_LOAD( "gl-0.chr", 0x00000, 0x10000, CRC(22af8849) SHA1(01054943c1d069f5f535e93f969a5b6bfb958e0b) )
 
-	ROM_REGION( 0x0100,  "rp5h01", 0 )  /* rp5h01 data */
-	ROM_LOAD( "security.prm", 0x00000, 0x10, CRC(ba7f2e13) SHA1(8b9ee3b18bcb4b258a46d1c900b18a9cb2594046) )
+	ROM_REGION( 0x10, "rp5h01", 0 ) /* rp5h01 data */
+	ROM_LOAD( "security.prm", 0x00, 0x10, CRC(ba7f2e13) SHA1(8b9ee3b18bcb4b258a46d1c900b18a9cb2594046) )
 ROM_END
 
 ROM_START( pc_pwbld )   /* Power Blade */
@@ -1406,8 +1406,8 @@ ROM_START( pc_pwbld )   /* Power Blade */
 	ROM_REGION( 0x020000, "gfx2", 0 )   /* cart gfx */
 	ROM_LOAD( "7t-u1",    0x00000, 0x20000, CRC(344be4a6) SHA1(2894292544f4315df44cda1bdc96047453da03e8) )
 
-	ROM_REGION( 0x0100,  "rp5h01", 0 )  /* rp5h01 data */
-	ROM_LOAD( "security.prm", 0x00000, 0x10, CRC(31a05a48) SHA1(8b340600feae03bb5cdab852a9879ecffcc8a2b9) )
+	ROM_REGION( 0x10, "rp5h01", 0 ) /* rp5h01 data */
+	ROM_LOAD( "security.prm", 0x00, 0x10, CRC(31a05a48) SHA1(8b340600feae03bb5cdab852a9879ecffcc8a2b9) )
 ROM_END
 
 ROM_START( pc_ngai3 )   /* Ninja Gaiden 3 */
@@ -1422,8 +1422,8 @@ ROM_START( pc_ngai3 )   /* Ninja Gaiden 3 */
 	ROM_REGION( 0x020000, "gfx2", 0 )   /* cart gfx */
 	ROM_LOAD( "u13n",    0x00000, 0x20000, CRC(584bcf5d) SHA1(f4582e2a382c8424f839e848e95e88a7f46307dc) )
 
-	ROM_REGION( 0x0100,  "rp5h01", 0 )  /* rp5h01 data */
-	ROM_LOAD( "security.prm", 0x00000, 0x10, CRC(13755943) SHA1(b7d809b0f60ef489777ccb35868f5c1e777356e0) )
+	ROM_REGION( 0x10, "rp5h01", 0 ) /* rp5h01 data */
+	ROM_LOAD( "security.prm", 0x00, 0x10, CRC(13755943) SHA1(b7d809b0f60ef489777ccb35868f5c1e777356e0) )
 ROM_END
 
 ROM_START( pc_radr2 )   /* Rad Racer II */
@@ -1440,8 +1440,8 @@ ROM_START( pc_radr2 )   /* Rad Racer II */
 	ROM_REGION( 0x010000, "gfx2", 0 )   /* cart gfx */
 	ROM_LOAD( "qr-u1",    0x00000, 0x10000, CRC(07df55d8) SHA1(dd0fa0a79d30eb04917d7309a62adfb037ef9ca5) )
 
-	ROM_REGION( 0x0100,  "rp5h01", 0 )  /* rp5h01 data */
-	ROM_LOAD( "security.prm", 0x00000, 0x10, CRC(40c4f294) SHA1(3fcac63fe6f147b662d59d25f905f797a1f5d0db) )
+	ROM_REGION( 0x10, "rp5h01", 0 ) /* rp5h01 data */
+	ROM_LOAD( "security.prm", 0x00, 0x10, CRC(40c4f294) SHA1(3fcac63fe6f147b662d59d25f905f797a1f5d0db) )
 ROM_END
 
 ROM_START( pc_rkats )   /* Rockin' Kats */
@@ -1456,8 +1456,8 @@ ROM_START( pc_rkats )   /* Rockin' Kats */
 	ROM_REGION( 0x020000, "gfx2", 0 )   /* cart gfx */
 	ROM_LOAD( "7a-u1",    0x00000, 0x20000, CRC(487aa440) SHA1(ee7ebbcf89c81ba59beda1bd27289dae21bb8071) )
 
-	ROM_REGION( 0x0100,  "rp5h01", 0 )  /* rp5h01 data */
-	ROM_LOAD( "security.prm", 0x00000, 0x10, CRC(56ab5bf9) SHA1(9546f6e20fdb13146c5db5353a1cb2a95931d909) )
+	ROM_REGION( 0x10, "rp5h01", 0 ) /* rp5h01 data */
+	ROM_LOAD( "security.prm", 0x00, 0x10, CRC(56ab5bf9) SHA1(9546f6e20fdb13146c5db5353a1cb2a95931d909) )
 ROM_END
 
 ROM_START( pc_suprc )   /* Super C */
@@ -1472,8 +1472,8 @@ ROM_START( pc_suprc )   /* Super C */
 	ROM_REGION( 0x020000, "gfx2", 0 )   /* cart gfx */
 	ROM_LOAD( "ue-u1",    0x00000, 0x20000, CRC(153295c1) SHA1(4ff1caaedca52fb9bb0ca6c8fac24edda77308d7) )
 
-	ROM_REGION( 0x0100,  "rp5h01", 0 )  /* rp5h01 data */
-	ROM_LOAD( "security.prm", 0x00000, 0x10, CRC(d477095e) SHA1(a179dffe529889f8e17e9f04958fea28611df0d3) )
+	ROM_REGION( 0x10, "rp5h01", 0 ) /* rp5h01 data */
+	ROM_LOAD( "security.prm", 0x00, 0x10, CRC(d477095e) SHA1(a179dffe529889f8e17e9f04958fea28611df0d3) )
 ROM_END
 
 ROM_START( pc_tmnt2 )   /* Teenage Mutant Ninja Turtles II */
@@ -1487,8 +1487,8 @@ ROM_START( pc_tmnt2 )   /* Teenage Mutant Ninja Turtles II */
 	ROM_REGION( 0x040000, "gfx2", 0 )   /* cart gfx */
 	ROM_LOAD( "2n-u1",    0x00000, 0x40000, CRC(0dbc575f) SHA1(8094278cf3267757953ab761dbccf38589142376) )
 
-	ROM_REGION( 0x0100,  "rp5h01", 0 )  /* rp5h01 data */
-	ROM_LOAD( "security.prm", 0x00000, 0x10, CRC(237e8519) SHA1(81b368d0784e4172c5cf9f4f4b92e29e05d34ae7) )
+	ROM_REGION( 0x10, "rp5h01", 0 ) /* rp5h01 data */
+	ROM_LOAD( "security.prm", 0x00, 0x10, CRC(237e8519) SHA1(81b368d0784e4172c5cf9f4f4b92e29e05d34ae7) )
 ROM_END
 
 ROM_START( pc_wcup )    /* Nintendo World Cup */
@@ -1503,8 +1503,8 @@ ROM_START( pc_wcup )    /* Nintendo World Cup */
 	ROM_REGION( 0x020000, "gfx2", 0 )   /* cart gfx */
 	ROM_LOAD( "xz-u1",    0x00000, 0x20000, CRC(92477d53) SHA1(33225bd5ee72f92761fdce931c93dd54e6885bd4) )
 
-	ROM_REGION( 0x0100,  "rp5h01", 0 )  /* rp5h01 data */
-	ROM_LOAD( "security.prm", 0x00000, 0x10, CRC(e17e1d76) SHA1(3e4e1ddcc8524bf451cb568b1357ec1f0a8be44c) )
+	ROM_REGION( 0x10, "rp5h01", 0 ) /* rp5h01 data */
+	ROM_LOAD( "security.prm", 0x00, 0x10, CRC(e17e1d76) SHA1(3e4e1ddcc8524bf451cb568b1357ec1f0a8be44c) )
 ROM_END
 
 ROM_START( pc_mman3 )   /* Mega Man 3 */
@@ -1519,8 +1519,8 @@ ROM_START( pc_mman3 )   /* Mega Man 3 */
 	ROM_REGION( 0x020000, "gfx2", 0 )   /* cart gfx */
 	ROM_LOAD( "xu-u1",    0x00000, 0x20000, CRC(4028916e) SHA1(f986f72ba5284129620d31c0779ac6d50638e6f1) )
 
-	ROM_REGION( 0x0100,  "rp5h01", 0 )  /* rp5h01 data */
-	ROM_LOAD( "security.prm", 0x00000, 0x10, CRC(0fe6e900) SHA1(544d8af1aa9186bf76d0a35e78b20e94d3afbcb5) )
+	ROM_REGION( 0x10, "rp5h01", 0 ) /* rp5h01 data */
+	ROM_LOAD( "security.prm", 0x00, 0x10, CRC(0fe6e900) SHA1(544d8af1aa9186bf76d0a35e78b20e94d3afbcb5) )
 ROM_END
 
 ROM_START( pc_smb2 )    /* Super Mario Bros 2 */
@@ -1535,8 +1535,8 @@ ROM_START( pc_smb2 )    /* Super Mario Bros 2 */
 	ROM_REGION( 0x020000, "gfx2", 0 )   /* cart gfx */
 	ROM_LOAD( "mw-u1",    0x00000, 0x20000, CRC(f2ba1170) SHA1(d9976b677ad222b76fbdaf31713374e2f283d44e) )
 
-	ROM_REGION( 0x0100,  "rp5h01", 0 )  /* rp5h01 data */
-	ROM_LOAD( "security.prm", 0x00000, 0x10, CRC(372f4e84) SHA1(cdf221d49f3b454997d696f213d60b5dce0ce9fb) )
+	ROM_REGION( 0x10, "rp5h01", 0 ) /* rp5h01 data */
+	ROM_LOAD( "security.prm", 0x00, 0x10, CRC(372f4e84) SHA1(cdf221d49f3b454997d696f213d60b5dce0ce9fb) )
 ROM_END
 
 ROM_START( pc_ngai2 )   /* Ninja Gaiden 2 */
@@ -1551,8 +1551,8 @@ ROM_START( pc_ngai2 )   /* Ninja Gaiden 2 */
 	ROM_REGION( 0x020000, "gfx2", 0 )   /* cart gfx */
 	ROM_LOAD( "nw-u1",    0x00000, 0x20000, CRC(8e0c8bb0) SHA1(6afe24b8e57f5a2174000a706b66209d7e310ed6) )
 
-	ROM_REGION( 0x0100,  "rp5h01", 0 )  /* rp5h01 data */
-	ROM_LOAD( "security.prm", 0x00000, 0x10, CRC(682dffd1) SHA1(87ea54b3d725a552b397ccb2af0ccf8bd6452a7c) )
+	ROM_REGION( 0x10, "rp5h01", 0 ) /* rp5h01 data */
+	ROM_LOAD( "security.prm", 0x00, 0x10, CRC(682dffd1) SHA1(87ea54b3d725a552b397ccb2af0ccf8bd6452a7c) )
 ROM_END
 
 /* H-Board Games */
@@ -1568,8 +1568,8 @@ ROM_START( pc_pinbt )   /* PinBot */
 	ROM_REGION( 0x010000, "gfx2", 0 )   /* cart gfx */
 	ROM_LOAD( "io-u1",    0x00000, 0x10000, CRC(9089fc24) SHA1(0bc92a0853c5ebc47c3adbc4e919ea41a55297d0) )
 
-	ROM_REGION( 0x0100,  "rp5h01", 0 )  /* rp5h01 data */
-	ROM_LOAD( "security.prm", 0x00000, 0x10, CRC(ac75f323) SHA1(4bffff024132d6f71d6aa55e24af400d2915aca4) )
+	ROM_REGION( 0x10, "rp5h01", 0 ) /* rp5h01 data */
+	ROM_LOAD( "security.prm", 0x00, 0x10, CRC(ac75f323) SHA1(4bffff024132d6f71d6aa55e24af400d2915aca4) )
 ROM_END
 
 /* i-Board Games */
@@ -1584,8 +1584,8 @@ ROM_START( pc_cshwk )   /* Captain Sky Hawk */
 
 	/* No cart gfx - uses vram */
 
-	ROM_REGION( 0x0100,  "rp5h01", 0 )  /* rp5h01 data */
-	ROM_LOAD( "security.prm", 0x00000, 0x10, CRC(eb1c794f) SHA1(d32f841fd4306389d716229da9bffea909186689) )
+	ROM_REGION( 0x10, "rp5h01", 0 ) /* rp5h01 data */
+	ROM_LOAD( "security.prm", 0x00, 0x10, CRC(eb1c794f) SHA1(d32f841fd4306389d716229da9bffea909186689) )
 ROM_END
 
 ROM_START( pc_sjetm )   /* Solar Jetman */
@@ -1598,8 +1598,8 @@ ROM_START( pc_sjetm )   /* Solar Jetman */
 
 	/* No cart gfx - uses vram */
 
-	ROM_REGION( 0x0100,  "rp5h01", 0 )  /* rp5h01 data */
-	ROM_LOAD( "security.prm", 0x00000, 0x10, CRC(f3ae712a) SHA1(51f443c65e64f1a9eb565ce017b50ec9bd4a5520) )
+	ROM_REGION( 0x10, "rp5h01", 0 ) /* rp5h01 data */
+	ROM_LOAD( "security.prm", 0x00, 0x10, CRC(f3ae712a) SHA1(51f443c65e64f1a9eb565ce017b50ec9bd4a5520) )
 ROM_END
 
 
@@ -1614,8 +1614,8 @@ ROM_START( pc_moglf )   /* Mario Open Golf */
 
 	/* No cart gfx - uses vram */
 
-	ROM_REGION( 0x0100,  "rp5h01", 0 )  /* rp5h01 data */
-	ROM_LOAD( "security.prm", 0x00000, 0x10, CRC(633766d5) SHA1(3a2564f3a2daf3a789e4c4056822f12243c89619) )
+	ROM_REGION( 0x10, "rp5h01", 0 ) /* rp5h01 data */
+	ROM_LOAD( "security.prm", 0x00, 0x10, CRC(633766d5) SHA1(3a2564f3a2daf3a789e4c4056822f12243c89619) )
 ROM_END
 
 /***************************************************************************
@@ -1628,7 +1628,6 @@ ROM_START( playch10 )
 	BIOS_CPU
 	BIOS_GFX
 	ROM_REGION( 0x50000, "cart", ROMREGION_ERASE00 )
-	ROM_REGION( 0x100, "rp5h01", ROMREGION_ERASE00 )
 ROM_END
 
 /******************************************************************************/
