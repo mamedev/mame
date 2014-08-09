@@ -964,11 +964,11 @@ void floppy_image::get_maximal_geometry(int &_tracks, int &_heads)
 
 void floppy_image::get_actual_geometry(int &_tracks, int &_heads)
 {
-	int maxt = tracks*4, maxh = heads-1;
+	int maxt = (tracks-1)*4, maxh = heads-1;
 
 	while(maxt >= 0) {
 		for(int i=0; i<=maxh; i++)
-			if(get_track_size(maxt, i))
+			if(track_array[maxt][i].track_size)
 				goto track_done;
 		maxt--;
 	}
@@ -976,7 +976,7 @@ void floppy_image::get_actual_geometry(int &_tracks, int &_heads)
 	if(maxt >= 0)
 		while(maxh >= 0) {
 			for(int i=0; i<=maxt; i++)
-				if(get_track_size(i, maxh))
+				if(track_array[i][maxh].track_size)
 					goto head_done;
 			maxh--;
 		}
@@ -988,7 +988,7 @@ void floppy_image::get_actual_geometry(int &_tracks, int &_heads)
 int floppy_image::get_resolution() const
 {
 	int mask = 0;
-	for(int i=0; i<tracks*4+1; i++)
+	for(int i=0; i<=(tracks-1)*4; i++)
 		for(int j=0; j<heads; j++)
 			if(track_array[i][j].track_size)
 				mask |= 1 << (i & 3);
