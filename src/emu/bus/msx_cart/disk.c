@@ -5,6 +5,43 @@
  * Currently supported:
  * - Philips VY-0010 (Interface cartridge + 1 3.5" SS floppy drive)
  *
+ * Not supported yet/to be investigated:
+ * - AVT DPF-500 - 5.25" Floppy drive plus interface
+ * - Canon VF-100
+ * - Daewoo CPF-350C
+ * - Fenner FD-300 - DSDD 3.5" Floppy drive
+ * - Fenner FD-400 - Floppy interface for FD-300
+ * - JVC HC-F303 - Floppy drive
+ * - Mitsubishi ML-30FD - DSDD 3.5" Floppy drive
+ * - Mitsubishi ML-30DC - Floppy interface
+ * - National FS-FD35 - MB8877A (interface/drive?)
+ * - Panasonic FS-FD1 - TC8566AF (interface/drive?)
+ * - Panasonic FS-FD1A - TC8566F - DSDD 3.5" Floppy drive with builtin interface
+ *                     - Rom label reads: "FDC BIOS V1.0 / COPYRIGHT MEI / 1987 DASFD1AA1"
+ * - Philips NMS-1200 - Floppy interface
+ * - Sakir AFD-01 - SSDD 3.5" Floppy drive
+ * - Sanyo MFD-001/MFD-002 - 360KB 5.25" Floppy drive
+ * - Sanyo MFD-25FD - DSDD 3.5" Floppy drive
+ * - Sharp Epcom HB-3600 - WD2793 - Floppy interface Intended to be used with HB-6000 (5.25" SS? drive), Brazil
+ *                       - Sold as part of HB-3600 + HB-6000 bundle according to wikipedia
+ * - Sharp Epcom HB-6000 - 360KB 5.25" drive
+ * - Sony HBD-20W - DSDD 3.5" Floppy drive
+ * - Sony HBD-30X/30W - DSDD 3.5" drive
+ * - Sony HBD-50 - SSDD 3.5" drive (drive only?)
+ * - Sony HBD-F1 (interface only?) - WD2793 - 3.5" DSDD drive??
+ * - Sony HBX-30 (interface only, meant for 30W) - WD2793
+ * - Sony WS2793-02 - WD2793? - Interface for HBD-50
+ * - Spectravideo SVI-213 - MB8877A - Floppy interface for SVI-707
+ * - Spectravideo SVI-707 - MB8877A - 5.25" SSDD? drive (320KB) - There seem to be 2 ROMs on the PCB, apparently one is for MSX and one is for CP/M operation?
+ *                        - See https://plus.google.com/photos/115644813183575095400/albums/5223347091895442113?banner=pwa
+ * - Talent DPF-550/5 - DS 5.25" Floppy drive plus interface
+ * - Talent DPF-560 - DS 5.25" Floppy drive
+ * - Toshiba HX-F101 - SSDD 3.5" Floppy drive
+ * - Yamaha FD-01 - SS 3.5" Floppy drive
+ * - Yamaha FD-03 - SS 3.5" Floppy drive
+ * - Yamaha FD-05 - SS 3.5" Floppy drive
+ * - Other models?
+ *
  ****************************************************************************/
 
 #include "emu.h"

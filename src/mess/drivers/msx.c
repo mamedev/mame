@@ -362,22 +362,6 @@ Yeno MX64 - MSX1 - mx64
 PCB Layouts missing
 
 
-===================================================
-
-External floppy drives:
-Philips VY-0010 - WD2793
-Sharp Epcom HB-3600 - WD2793
-Sony HBD-20W (drive+interface?) - xxxxxx - 1 3.5" DSDD drive
-Sony HBD-30X/30W (drive only?) (- xxxxxx) - 1 3.5" DSDD drive
-Sony HBD-50 (drive only?) (- WD2793) - 1 3.5" SSDD drive
-Sony HBD-F1 (interface only?) - WD2793 (- 1 3.5" DSDD)
-Sony HBK-30 (interface only, meant for 30W) - WD2793
-National FS-FD35 - MB8877A
-Panasonic FS-FD1 - TC8566AF
-Panasonic FS-FD1A - TC8566AF
-Spectravideo SVI-707 - MB8877A - 1 5.25" SSDD drive (320KB) - There seem to be 2 ROMs on the PCB, apparently one is for MSX and one is for CP/M operation?
-                     - See https://plus.google.com/photos/115644813183575095400/albums/5223347091895442113?banner=pwa
-
 */
 
 
