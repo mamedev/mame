@@ -808,7 +808,7 @@ READ16_MEMBER(midway_ioasic_device::fifo_status_r)
 	/* kludge alert: if we're reading this from the DCS CPU itself, and we recently cleared */
 	/* the FIFO, and we're within 16 instructions of the read that cleared the FIFO, make */
 	/* sure the FIFO clear bit is set */
-	if (m_fifo_force_buffer_empty_pc && m_has_dcs)// && device == m_dcs_cpu)
+	if (m_fifo_force_buffer_empty_pc && &space.device() == m_dcs_cpu)
 	{
 		offs_t currpc = m_dcs_cpu->safe_pc();
 		if (currpc >= m_fifo_force_buffer_empty_pc && currpc < m_fifo_force_buffer_empty_pc + 0x10)
