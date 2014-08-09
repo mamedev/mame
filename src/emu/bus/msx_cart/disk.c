@@ -5,26 +5,45 @@
  * Currently supported:
  * - Philips VY-0010 (Interface cartridge + 1 3.5" SS floppy drive)
  *
- * Not supported yet/to be investigated:
- * - AVT DPF-500 - 5.25" Floppy drive plus interface
- * - Canon VF-100
- * - Daewoo CPF-350C
+ * Not supported yet:
+ * - Canon VF-100 - DSDD 3.5" Floppy drive + interface + 1 floppy disk containing MSX-DOS
+ * - Panasonic FS-FD1 - TC8566AF? - DSDD 3.5" Floppy drive + interface
+ * - Panasonic FS-FD1A - TC8566F - DSDD 3.5" Floppy drive with builtin interface
+ *                     - Rom label reads: "FDC BIOS V1.0 / COPYRIGHT MEI / 1987 DASFD1AA1"
+ * - Talent DPF-550/5 - WD1772 - DSDD 5.25" Floppy drive (360KB) plus interface (manufactured by Daewoo)
+ *                    - Rom label markings: MSX DISK / DPF 555D
+ *
+ * Drive only:
+ * - Philps VY-0011 - 3.5" SSDD Floppy drive
+ * - Talent DPF-560 - DSDD 5.25" Floppy drive
+ *
+ * To be investigated:
+ * - AVT DPF-500 - WD1772? - DD 5.25" Floppy drive + interface + 1 floppy disk containing MSX-DOS
+ * - Daewoo CPF-350C - DD 3.5" Floppy drive
+ * - Daewoo CPF-360C - DD 3.5" Floppy drive
+ * - Daewoo MPF-550 - DSDD 5.25" Floppy drive + interface
+ * = Daewoo MPF-560 - DSDD 5.25" Floppy drive
+ * - DMX Interface para drive - Interface + 1 floppy disk containg MSX-DOS 1.0
  * - Fenner FD-300 - DSDD 3.5" Floppy drive
  * - Fenner FD-400 - Floppy interface for FD-300
+ * - Hitachi MPF-310CH - DSDD Floppy drive
+ * - hitachi MPC-310CH - Interface for MPF-310CH
  * - JVC HC-F303 - Floppy drive
  * - Mitsubishi ML-30FD - DSDD 3.5" Floppy drive
  * - Mitsubishi ML-30DC - Floppy interface
- * - National FS-FD35 - MB8877A (interface/drive?)
- * - Panasonic FS-FD1 - TC8566AF (interface/drive?)
- * - Panasonic FS-FD1A - TC8566F - DSDD 3.5" Floppy drive with builtin interface
- *                     - Rom label reads: "FDC BIOS V1.0 / COPYRIGHT MEI / 1987 DASFD1AA1"
+ * - National FS-FD351 - MB8877A - 3.5" Floppy drive + interface?
  * - Philips NMS-1200 - Floppy interface
+ * - Philips NMS-9111 - 3.5" Floppy drive
+ * - Philips NMS-9113 - 3.5" Floppy drive
  * - Sakir AFD-01 - SSDD 3.5" Floppy drive
- * - Sanyo MFD-001/MFD-002 - 360KB 5.25" Floppy drive
+ * - Sanyo MFD-001 - 360KB 5.25" Floppy drive + interface?
+ * - Sanyo MFD-002 - 360KB 5.25" Floppy drive (2nd drive for MFD-001?)
  * - Sanyo MFD-25FD - DSDD 3.5" Floppy drive
+ * - Sanyo MFD-35 - SSDD 3.5" Floppy drive + interface
  * - Sharp Epcom HB-3600 - WD2793 - Floppy interface Intended to be used with HB-6000 (5.25" SS? drive), Brazil
  *                       - Sold as part of HB-3600 + HB-6000 bundle according to wikipedia
  * - Sharp Epcom HB-6000 - 360KB 5.25" drive
+ * - Sony HBD-100 - SSDD 3.5" Floppy drivbe
  * - Sony HBD-20W - DSDD 3.5" Floppy drive
  * - Sony HBD-30X/30W - DSDD 3.5" drive
  * - Sony HBD-50 - SSDD 3.5" drive (drive only?)
@@ -34,13 +53,48 @@
  * - Spectravideo SVI-213 - MB8877A - Floppy interface for SVI-707
  * - Spectravideo SVI-707 - MB8877A - 5.25" SSDD? drive (320KB) - There seem to be 2 ROMs on the PCB, apparently one is for MSX and one is for CP/M operation?
  *                        - See https://plus.google.com/photos/115644813183575095400/albums/5223347091895442113?banner=pwa
- * - Talent DPF-550/5 - DS 5.25" Floppy drive plus interface
- * - Talent DPF-560 - DS 5.25" Floppy drive
- * - Toshiba HX-F101 - SSDD 3.5" Floppy drive
- * - Yamaha FD-01 - SS 3.5" Floppy drive
- * - Yamaha FD-03 - SS 3.5" Floppy drive
- * - Yamaha FD-05 - SS 3.5" Floppy drive
- * - Other models?
+ * - Spectravideo SVI-717 - Interface for 2 drives?
+ * - Spectravideo SVI-787 - SSDD 3.5" Floppy drive
+ * - Spectravideo SVI-801 - Interface
+ * - Toshiba HX-F100 - Floppy drive
+ * - Toshiba HX-F101 - SSDD 3.5" Floppy drive + interface
+ * - Yamaha FD-01 - SSDD 3.5" Floppy drive
+ * - Yamaha FD-03 - DSDD 3.5" Floppy drive
+ * - Yamaha FD-05 - DSDD 3.5" Floppy drive
+ * - Other models:
+ *   - ACVS 3.5" Floppy drive interface
+ *   - Tradeco floppy interface
+ *   - Angeisa 3.5" Floppy drive
+ *   - Angeisa 5.25" 360KB Floppy drive
+ *   - Angeisa 5.25" 720KB Floppy drive
+ *   - Angeisa floppy drive interface
+ *   - Datagame floppy drive interface
+ *   - Digital Design DSDD 3.5" Floppy drive
+ *   - Digital Design 5.25" 360KB Floppy drive
+ *   - Digital Design 5.25" 720KB Floppy drive
+ *   - Digital Design floppy drive interface
+ *   - DMX 3.5" Floppy drive
+ *   - DMX floppy drive interface
+ *   - Liftron 3.5" Floppy drive
+ *   - Liftron floppy drive interface
+ *   - Microsol DRX-180 5.25" Floppy drive FS
+ *   - Microsol DRX-360 5.25" Floppy drive FD
+ *   - Microsol DRX-720 5.25" Floppy drive 80 track (720KB)
+ *   - Microsol CDX-1 floppy interface
+ *   - Microsol CDX-2 floppy interface
+ *   - Racidata 3.5" Floppy drive
+ *   - Racidata 5.25" Floppy drive
+ *   - Racidata floppy interface
+ *   - Sileman Triton-s 3.5" FS Floppy drive
+ *   - Sileman Triton-d 3.5" FD Floppy drive
+ *   - Talent TPF-723 5.25" Floppy drive
+ *   - Talent TPF-725 5.25" Flpppy drive
+ *   - Technohead Leopard 3.5" Floppy drive
+ *   - Technohead Leopard 5.25" Floppy drive
+ *   - Technohead floppy interface
+ * - More??
+ *
+ * Several model references found in Vitropedia (ISBN 9781409212774)
  *
  ****************************************************************************/
 
