@@ -13,8 +13,7 @@ games at the start of ball 1.
 
 
 ToDo:
-- Family Fun / Star Trip / Vegas, the chimes have been replaced by a SN76477,
-  not yet emulated.
+- Mechanical
 
 ********************************************************************************/
 
@@ -23,6 +22,7 @@ ToDo:
 #include "cpu/z80/z80daisy.h"
 #include "machine/i8255.h"
 #include "machine/z80ctc.h"
+#include "sound/sn76477.h"
 #include "gp_1.lh"
 
 class gp_1_state : public genpin_class
@@ -32,6 +32,7 @@ public:
 		: genpin_class(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_ctc(*this, "ctc")
+		, m_sn(*this, "snsnd")
 		, m_io_dsw0(*this, "DSW0")
 		, m_io_dsw1(*this, "DSW1")
 		, m_io_dsw2(*this, "DSW2")
@@ -45,6 +46,7 @@ public:
 
 	DECLARE_DRIVER_INIT(gp_1);
 	DECLARE_WRITE8_MEMBER(porta_w);
+	DECLARE_WRITE8_MEMBER(portas_w);
 	DECLARE_WRITE8_MEMBER(portc_w);
 	DECLARE_READ8_MEMBER(portb_r);
 	TIMER_DEVICE_CALLBACK_MEMBER(zero_timer);
@@ -55,6 +57,7 @@ private:
 	virtual void machine_reset();
 	required_device<cpu_device> m_maincpu;
 	required_device<z80ctc_device> m_ctc;
+	optional_device<sn76477_device> m_sn;
 	required_ioport m_io_dsw0;
 	required_ioport m_io_dsw1;
 	required_ioport m_io_dsw2;
@@ -197,7 +200,7 @@ static INPUT_PORTS_START( gp_1 )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ))
 
 	PORT_START("DSW3")
-	PORT_DIPNAME( 0x07, 0x07, "Max number of credits")
+	PORT_DIPNAME( 0x07, 0x02, "Max number of credits")
 	PORT_DIPSETTING(    0x00, "5" )
 	PORT_DIPSETTING(    0x01, "10")
 	PORT_DIPSETTING(    0x02, "15")
@@ -206,7 +209,7 @@ static INPUT_PORTS_START( gp_1 )
 	PORT_DIPSETTING(    0x05, "30")
 	PORT_DIPSETTING(    0x06, "35")
 	PORT_DIPSETTING(    0x07, "40")
-	PORT_DIPNAME( 0x08, 0x08, "Balls")
+	PORT_DIPNAME( 0x08, 0x00, "Balls")
 	PORT_DIPSETTING(    0x00, "3")
 	PORT_DIPSETTING(    0x08, "5")
 	PORT_DIPNAME( 0x10, 0x10, "Award")
@@ -294,10 +297,10 @@ WRITE8_MEMBER( gp_1_state::porta_w )
 		switch (data)
 		{
 			case 0x10: // chime c
-				m_samples->start(0, 3);
+				m_samples->start(3, 3);
 				break;
 			case 0x11: // chime b
-				m_samples->start(0, 2);
+				m_samples->start(2, 2);
 				break;
 			case 0x12: // knocker
 				m_samples->start(0, 6);
@@ -306,7 +309,7 @@ WRITE8_MEMBER( gp_1_state::porta_w )
 			case 0x14: // not used
 				break;
 			case 0x15: // chime a
-				m_samples->start(0, 1);
+				m_samples->start(1, 1);
 				break;
 			case 0x16: // chime d
 				m_samples->start(0, 4);
@@ -347,6 +350,38 @@ WRITE8_MEMBER( gp_1_state::porta_w )
 		output_set_digit_value(m_digit+16, patterns[m_segment[10]]);
 		output_set_digit_value(m_digit+24, patterns[m_segment[11]]);
 	}
+}
+
+WRITE8_MEMBER( gp_1_state::portas_w )
+{
+	m_u14 = data >> 4;
+	if (m_u14 == 1) switch (data)
+	{
+		case 0x10: // chime c
+			m_sn->vco_voltage_w(0.45);
+			m_sn->enable_w(0);
+			data = 0x1f;
+			break;
+		case 0x11: // chime b
+			m_sn->vco_voltage_w(0.131);
+			m_sn->enable_w(0);
+			data = 0x1f;
+			break;
+		case 0x15: // chime a
+			m_sn->vco_voltage_w(0.07);
+			m_sn->enable_w(0);
+			data = 0x1f;
+			break;
+		case 0x16: // chime d
+			m_sn->vco_voltage_w(2.25);
+			m_sn->enable_w(0);
+			data = 0x1f;
+			break;
+		default:
+			m_sn->enable_w(1);
+	}
+
+	porta_w(space, offset, data);
 }
 
 WRITE8_MEMBER( gp_1_state::portc_w )
@@ -398,6 +433,46 @@ static MACHINE_CONFIG_START( gp_1, gp_1_state )
 	MCFG_DEVICE_ADD("ctc", Z80CTC, 2457600 )
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0)) // Todo: absence of ints will cause a watchdog reset
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("gp1", gp_1_state, zero_timer, attotime::from_hz(120)) // mains freq*2
+MACHINE_CONFIG_END
+
+static const sn76477_interface sn76477_intf =
+{
+	0,          /*  4 noise_res (N/C)        */
+	0,          /*  5 filter_res (N/C)       */
+	0,          /*  6 filter_cap (N/C)       */
+	0,          /*  7 decay_res (N/C)        */
+	0,          /*  8 attack_decay_cap (N/C) */
+	0,          /* 10 attack_res (nc)        */
+	RES_K(220), /* 11 amplitude_res          */
+	RES_K(47),  /* 12 feedback_res           */
+	0,          /* 16 vco_voltage (N/C)      */
+	CAP_U(0.1), /* 17 vco_cap                */
+	RES_K(56),  /* 18 vco_res                */
+	5.0,        /* 19 pitch_voltage          */
+	RES_K(220), /* 20 slf_res                */
+	CAP_U(1.0), /* 21 slf_cap                */
+	0,          /* 23 oneshot_cap (N/C)      */
+	0,          /* 24 oneshot_res (N/C)      */
+	0,          /* 22 vco (nc)               */
+	0,          /* 26 mixer A (nc)           */
+	0,          /* 25 mixer B (nc)           */
+	0,          /* 27 mixer C (nc)           */
+	0,          /* 1  envelope 1 (nc)        */
+	1,          /* 28 envelope 2             */
+	1           /* 9  enable (variable) 1=off */
+};
+
+static MACHINE_CONFIG_DERIVED( gp_1s, gp_1 )
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("snsnd", SN76477, 0)
+	MCFG_SOUND_CONFIG(sn76477_intf)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+
+	MCFG_DEVICE_REMOVE("ppi")
+	MCFG_DEVICE_ADD("ppi", I8255A, 0 )
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(gp_1_state, portas_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(gp_1_state, portb_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(gp_1_state, portc_w))
 MACHINE_CONFIG_END
 
 
@@ -468,6 +543,6 @@ GAME(1978, foxylady, gp_110,   gp_1,     gp_1,     driver_device, 0,   ROT0, "Ga
 GAME(1978, real,     gp_110,   gp_1,     gp_1,     driver_device, 0,   ROT0, "Game Plan", "Real",         GAME_MECHANICAL)
 GAME(1978, rio,      gp_110,   gp_1,     gp_1,     driver_device, 0,   ROT0, "Game Plan", "Rio",          GAME_MECHANICAL)
 GAME(1978, chucklck, gp_110,   gp_1,     gp_1,     driver_device, 0,   ROT0, "Game Plan", "Chuck-A-Luck", GAME_MECHANICAL)
-GAME(1979, famlyfun, 0,        gp_1,     gp_1,     driver_device, 0,   ROT0, "Game Plan", "Family Fun!",  GAME_MECHANICAL | GAME_IMPERFECT_SOUND )
-GAME(1979, startrip, 0,        gp_1,     gp_1,     driver_device, 0,   ROT0, "Game Plan", "Star Trip",    GAME_MECHANICAL | GAME_IMPERFECT_SOUND )
-GAME(1979, vegasgp,  0,        gp_1,     gp_1,     driver_device, 0,   ROT0, "Game Plan", "Vegas (Game Plan)", GAME_MECHANICAL | GAME_IMPERFECT_SOUND )
+GAME(1979, famlyfun, 0,        gp_1s,    gp_1,     driver_device, 0,   ROT0, "Game Plan", "Family Fun!",  GAME_MECHANICAL)
+GAME(1979, startrip, 0,        gp_1s,    gp_1,     driver_device, 0,   ROT0, "Game Plan", "Star Trip",    GAME_MECHANICAL)
+GAME(1979, vegasgp,  0,        gp_1s,    gp_1,     driver_device, 0,   ROT0, "Game Plan", "Vegas (Game Plan)", GAME_MECHANICAL)
