@@ -947,19 +947,13 @@ floppy_image::floppy_image(int _tracks, int _heads, UINT32 _form_factor)
 	form_factor = _form_factor;
 	variant = 0;
 
-	memset(cell_data, 0, sizeof(cell_data));
-	memset(track_size, 0, sizeof(track_size));
-	memset(track_alloc_size, 0, sizeof(track_alloc_size));
-	memset(write_splice, 0, sizeof(write_splice));
+	track_array.resize(tracks*4+1);
+	for(int i=0; i<tracks*4+1; i++)
+		track_array[i].resize(heads);
 }
 
 floppy_image::~floppy_image()
 {
-	for (int i=0;i<MAX_FLOPPY_TRACKS;i++) {
-		for (int j=0;j<MAX_FLOPPY_HEADS;j++) {
-			global_free_array(cell_data[i][j]);
-		}
-	}
 }
 
 void floppy_image::get_maximal_geometry(int &_tracks, int &_heads)
@@ -970,7 +964,7 @@ void floppy_image::get_maximal_geometry(int &_tracks, int &_heads)
 
 void floppy_image::get_actual_geometry(int &_tracks, int &_heads)
 {
-	int maxt = tracks-1, maxh = heads-1;
+	int maxt = tracks*4, maxh = heads-1;
 
 	while(maxt >= 0) {
 		for(int i=0; i<=maxh; i++)
@@ -987,22 +981,29 @@ void floppy_image::get_actual_geometry(int &_tracks, int &_heads)
 			maxh--;
 		}
 	head_done:
-	_tracks = maxt+1;
+	_tracks = (maxt+4)/4;
 	_heads = maxh+1;
+}
+
+int floppy_image::get_resolution() const
+{
+	int mask = 0;
+	for(int i=0; i<tracks*4+1; i++)
+		for(int j=0; j<heads; j++)
+			if(track_array[i][j].track_size)
+				mask |= 1 << (i & 3);
+	if(mask & 0xa)
+		return 2;
+	if(mask & 0x4)
+		return 1;
+	return 0;
 }
 
 void floppy_image::ensure_alloc(int track, int head)
 {
-	if(track_size[track][head] > track_alloc_size[track][head]) {
-		UINT32 new_size = track_size[track][head]*11/10;
-		UINT32 *new_array = global_alloc_array(UINT32, new_size);
-		if(track_alloc_size[track][head]) {
-			memcpy(new_array, cell_data[track][head], track_alloc_size[track][head]*4);
-			global_free_array(cell_data[track][head]);
-		}
-		cell_data[track][head] = new_array;
-		track_alloc_size[track][head] = new_size;
-	}
+	track_info &tr = track_array[track][head];
+	if(tr.track_size > tr.cell_data.count())
+		tr.cell_data.resize_keep_and_clear_new(tr.track_size);
 }
 
 const char *floppy_image::get_variant_name(UINT32 form_factor, UINT32 variant)

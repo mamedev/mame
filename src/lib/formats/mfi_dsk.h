@@ -26,7 +26,10 @@ private:
 		MG_A      = (0 << MG_SHIFT),
 		MG_B      = (1 << MG_SHIFT),
 		MG_N      = (2 << MG_SHIFT),
-		MG_D      = (3 << MG_SHIFT)
+		MG_D      = (3 << MG_SHIFT),
+
+		RESOLUTION_SHIFT = 30,
+		CYLINDER_MASK = 0x3fffffff
 	};
 
 	static const char sign[16];

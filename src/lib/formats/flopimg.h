@@ -12,6 +12,7 @@
 #include "osdcore.h"
 #include "ioprocs.h"
 #include "opresolv.h"
+#include "coretmpl.h"
 
 #ifndef LOG_FORMATS
 #define LOG_FORMATS if (0) printf
@@ -637,7 +638,13 @@ floppy_image_format_t *floppy_image_format_creator()
 //! form factor can be physically inserted in a reader that handles
 //! it.  The second half indicates the variants which are usually
 //! detectable by the reader, such as density and number of sides.
-
+//!
+//! Resolution is quarter-track.  The optional subtrack parameter is
+//! 0-3:
+//! - 0 = Track itself
+//! - 1 = 1st quarter track
+//! - 2 = Half track
+//! - 3 = 2nd quarter track
 
 class floppy_image
 {
@@ -682,7 +689,7 @@ public:
 		M2FM = 0x4D32464D, //!< "M2FM", modified modified frequency modulation
 	};
 
-// construction/destruction
+	// construction/destruction
 
 
 	//! floppy_image constructor
@@ -703,21 +710,25 @@ public:
 
 	/*!
 	  @param track
+	  @param subtrack
 	  @param head
 	  @param size size of this track
 	*/
-	void set_track_size(int track, int head, UINT32 size) { track_size[track][head] = size; ensure_alloc(track, head); }
+	void set_track_size(int track, int head, UINT32 size, int subtrack = 0) { track_array[track*4+subtrack][head].track_size = size; ensure_alloc(track*4+subtrack, head); }
 
 	/*!
-	  @param track track number
+	  @param track
+	  @param subtrack
 	  @param head head number
 	  @return a pointer to the data buffer for this track and head
 	*/
-	UINT32 *get_buffer(int track, int head) { return cell_data[track][head]; }
+	UINT32 *get_buffer(int track, int head, int subtrack = 0) { return track_array[track*4+subtrack][head].cell_data; }
+
 	//! @return the track size
 	//! @param track
+	//! @param subtrack
 	//! @param head
-	UINT32 get_track_size(int track, int head) { return track_size[track][head]; }
+	UINT32 get_track_size(int track, int head, int subtrack = 0) { return track_array[track*4+subtrack][head].track_size; }
 
 	//! Sets the write splice position.
 	//! The "track splice" information indicates where to start writing
@@ -727,17 +738,21 @@ public:
 	//! representation is the angular position relative to the index.
 
 	/*! @param track
+	    @param subtrack
 	    @param head
 	    @param pos the position
 	*/
-	void set_write_splice_position(int track, int head, UINT32 pos) { write_splice[track][head] = pos; }
+	void set_write_splice_position(int track, int head, UINT32 pos, int subtrack = 0) { track_array[track*4+subtrack][head].write_splice = pos; }
 	//! @return the current write splice position.
-	UINT32 get_write_splice_position(int track, int head) const { return write_splice[track][head]; }
+	UINT32 get_write_splice_position(int track, int head, int subtrack = 0) const { return track_array[track*4+subtrack][head].write_splice; }
 	//! @return the maximal geometry supported by this format.
 	void get_maximal_geometry(int &tracks, int &heads);
 
 	//! @return the current geometry of the loaded image.
 	void get_actual_geometry(int &tracks, int &heads);
+
+	//! @return the track resolution (0=full track, 1 = half-track, 2 = quarter track)
+	int get_resolution() const;
 
 	//! Returns the variant name for the particular disk form factor/variant
 	//! @param form_factor
@@ -746,20 +761,21 @@ public:
 	static const char *get_variant_name(UINT32 form_factor, UINT32 variant);
 
 private:
-
-	enum {
-		MAX_FLOPPY_HEADS = 2,
-		MAX_FLOPPY_TRACKS = 84
-	};
-
 	int tracks, heads;
 
 	UINT32 form_factor, variant;
 
-	UINT32 *cell_data[MAX_FLOPPY_TRACKS][MAX_FLOPPY_HEADS];
-	UINT32 track_size[MAX_FLOPPY_TRACKS][MAX_FLOPPY_HEADS];
-	UINT32 track_alloc_size[MAX_FLOPPY_TRACKS][MAX_FLOPPY_HEADS];
-	UINT32 write_splice[MAX_FLOPPY_TRACKS][MAX_FLOPPY_HEADS];
+	struct track_info {
+		dynamic_array<UINT32> cell_data;
+		UINT32 track_size;
+		UINT32 write_splice;
+
+		track_info() { track_size = write_splice = 0; }
+	};
+
+	// track number multiplied by 4 then head
+	// last array size may be bigger than actual track size
+	dynamic_array<dynamic_array<track_info> > track_array;
 
 	void ensure_alloc(int track, int head);
 };

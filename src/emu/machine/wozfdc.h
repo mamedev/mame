@@ -60,7 +60,7 @@ private:
 	};
 
 	const UINT8 *m_rom_p6;
-	UINT8 current_cyl, last_6502_write;
+	UINT8 last_6502_write;
 	bool mode_write, mode_load;
 	int active;
 	UINT8 phases;

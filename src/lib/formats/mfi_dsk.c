@@ -8,10 +8,12 @@
   Mess floppy image structure:
 
   - header with signature, number of cylinders, number of heads.  Min
-    track and min head are considered to always be 0.
+    track and min head are considered to always be 0.  The two top bits
+    of the cylinder count is the resolution: 0=tracks, 1=half tracks,
+    2=quarter tracks.
 
-  - vector of track descriptions, looping on cylinders and sub-lopping
-    on heads, each description composed of:
+  - vector of track descriptions, looping on cylinders with the given
+    resolution and sub-lopping on heads, each description composed of:
     - offset of the track data in bytes from the start of the file
     - size of the compressed track data in bytes (0 for unformatted)
     - size of the uncompressed track data in bytes (0 for unformatted)
@@ -97,7 +99,8 @@ int mfi_format::identify(io_generic *io, UINT32 form_factor)
 
 	io_generic_read(io, &h, 0, sizeof(header));
 	if(memcmp( h.sign, sign, 16 ) == 0 &&
-		h.cyl_count <= 160 &&
+	   (h.cyl_count & CYLINDER_MASK) <= 84 &&
+	   (h.cyl_count >> RESOLUTION_SHIFT) < 3 &&
 		h.head_count <= 2 &&
 		(!form_factor || !h.form_factor || h.form_factor == form_factor))
 		return 100;
@@ -107,22 +110,24 @@ int mfi_format::identify(io_generic *io, UINT32 form_factor)
 bool mfi_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 {
 	header h;
-	entry entries[84*2];
+	entry entries[84*2*4];
 	io_generic_read(io, &h, 0, sizeof(header));
-	io_generic_read(io, &entries, sizeof(header), h.cyl_count*h.head_count*sizeof(entry));
+	int resolution = h.cyl_count >> RESOLUTION_SHIFT;
+	h.cyl_count &= CYLINDER_MASK;
+	io_generic_read(io, &entries, sizeof(header), (h.cyl_count << resolution)*h.head_count*sizeof(entry));
 
 	image->set_variant(h.variant);
 
 	dynamic_buffer compressed;
 
 	entry *ent = entries;
-	for(unsigned int cyl=0; cyl != h.cyl_count; cyl++)
+	for(unsigned int cyl=0; cyl <= (h.cyl_count - 1) << 2; cyl += 4 >> resolution)
 		for(unsigned int head=0; head != h.head_count; head++) {
-			image->set_write_splice_position(cyl, head, ent->write_splice);
+			image->set_write_splice_position(cyl >> 2, head, ent->write_splice, cyl & 3);
 
 			if(ent->uncompressed_size == 0) {
 				// Unformatted track
-				image->set_track_size(cyl, head, 0);
+				image->set_track_size(cyl >> 2, head, 0, cyl & 3);
 				ent++;
 				continue;
 			}
@@ -132,8 +137,8 @@ bool mfi_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 			io_generic_read(io, compressed, ent->offset, ent->compressed_size);
 
 			unsigned int cell_count = ent->uncompressed_size/4;
-			image->set_track_size(cyl, head, cell_count);
-			UINT32 *trackbuf = image->get_buffer(cyl, head);
+			image->set_track_size(cyl >> 2, head, cell_count, cyl & 3);
+			UINT32 *trackbuf = image->get_buffer(cyl >> 2, head, cyl & 3);
 
 			uLongf size = ent->uncompressed_size;
 			if(uncompress((Bytef *)trackbuf, &size, compressed, ent->compressed_size) != Z_OK)
@@ -158,18 +163,19 @@ bool mfi_format::save(io_generic *io, floppy_image *image)
 {
 	int tracks, heads;
 	image->get_actual_geometry(tracks, heads);
+	int resolution = image->get_resolution();
 	int max_track_size = 0;
-	for(int track=0; track<tracks; track++)
+	for(int track=0; track <= (tracks-1) << 2; track += 4 >> resolution)
 		for(int head=0; head<heads; head++) {
-			int tsize = image->get_track_size(track, head);
+			int tsize = image->get_track_size(track >> 2, head, track & 3);
 			if(tsize > max_track_size)
 					max_track_size = tsize;
 		}
 
 	header h;
-	entry entries[84*2];
+	entry entries[84*2*4];
 	memcpy(h.sign, sign, 16);
-	h.cyl_count = tracks;
+	h.cyl_count = tracks | (resolution << RESOLUTION_SHIFT);
 	h.head_count = heads;
 	h.form_factor = image->get_form_factor();
 	h.variant = image->get_variant();
@@ -178,20 +184,20 @@ bool mfi_format::save(io_generic *io, floppy_image *image)
 
 	memset(entries, 0, sizeof(entries));
 
-	int pos = sizeof(header) + tracks*heads*sizeof(entry);
+	int pos = sizeof(header) + (tracks << resolution)*heads*sizeof(entry);
 	int epos = 0;
 	UINT32 *precomp = global_alloc_array(UINT32, max_track_size);
 	UINT8 *postcomp = global_alloc_array(UINT8, max_track_size*4 + 1000);
 
-	for(int track=0; track<tracks; track++)
+	for(int track=0; track <= (tracks-1) << 2; track += 4 >> resolution)
 		for(int head=0; head<heads; head++) {
-			int tsize = image->get_track_size(track, head);
+			int tsize = image->get_track_size(track >> 2, head, track & 3);
 			if(!tsize) {
 				epos++;
 				continue;
 			}
 
-			memcpy(precomp, image->get_buffer(track, head), tsize*4);
+			memcpy(precomp, image->get_buffer(track >> 2, head, track & 3), tsize*4);
 			for(int j=0; j<tsize-1; j++)
 				precomp[j] = (precomp[j] & floppy_image::MG_MASK) |
 					((precomp[j+1] & floppy_image::TIME_MASK) -
@@ -206,14 +212,14 @@ bool mfi_format::save(io_generic *io, floppy_image *image)
 			entries[epos].offset = pos;
 			entries[epos].uncompressed_size = tsize*4;
 			entries[epos].compressed_size = csize;
-			entries[epos].write_splice = image->get_write_splice_position(track, head);
+			entries[epos].write_splice = image->get_write_splice_position(track >> 2, head, track & 3);
 			epos++;
 
 			io_generic_write(io, postcomp, pos, csize);
 			pos += csize;
 		}
 
-	io_generic_write(io, entries, sizeof(header), tracks*heads*sizeof(entry));
+	io_generic_write(io, entries, sizeof(header), (tracks << resolution)*heads*sizeof(entry));
 	return true;
 }
 

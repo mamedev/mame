@@ -105,6 +105,7 @@ public:
 	bool ss_r() { return ss; }
 	bool twosid_r();
 
+	void seek_phase_w(int phases);
 	void stp_w(int state);
 	void dir_w(int state) { dir = state; }
 	void ss_w(int state) { ss = state; }
@@ -164,7 +165,7 @@ protected:
 
 	attotime revolution_start_time, rev_time;
 	UINT32 revolution_count;
-	int cyl;
+	int cyl, subcyl;
 
 	bool image_dirty;
 	int ready_counter;

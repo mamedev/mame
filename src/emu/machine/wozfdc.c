@@ -72,7 +72,6 @@ void wozfdc_device::device_start()
 
 void wozfdc_device::device_reset()
 {
-	current_cyl = 0;
 	floppy = NULL;
 	active = MODE_IDLE;
 	phases = 0x00;
@@ -199,22 +198,8 @@ void wozfdc_device::phase(int ph, bool on)
 	else
 		phases &= ~(1 << ph);
 
-	if(floppy && active) {
-		int cph = current_cyl & 3;
-		int pcyl = current_cyl;
-		if(!(phases & (1 << cph))) {
-			if(current_cyl < 70 && (phases & (1 << ((cph+1) & 3))))
-				current_cyl++;
-			if(current_cyl && (phases & (1 << ((cph+3) & 3))))
-				current_cyl--;
-			if(current_cyl != pcyl && !(current_cyl & 1)) {
-				floppy->dir_w(current_cyl < pcyl);
-				floppy->stp_w(true);
-				floppy->stp_w(false);
-				floppy->stp_w(true);
-			}
-		}
-	}
+	if(floppy && active)
+		floppy->seek_phase_w(phases);
 }
 
 void wozfdc_device::control(int offset)
@@ -238,10 +223,8 @@ void wozfdc_device::control(int offset)
 		case 0x9:
 			switch(active) {
 			case MODE_IDLE:
-				if(floppy) {
+				if(floppy)
 					floppy->mon_w(false);
-					current_cyl = floppy->get_cyl() << 1;
-				}
 				active = MODE_ACTIVE;
 				if(floppy)
 					lss_start();

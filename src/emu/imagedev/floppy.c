@@ -273,6 +273,7 @@ void floppy_image_device::device_start()
 	mon = 1;
 
 	cyl = 0;
+	subcyl = 0;
 	ss  = 0;
 	stp = 1;
 	wpt = 0;
@@ -535,7 +536,49 @@ void floppy_image_device::stp_w(int state)
 				if (dskchg==0) dskchg = 1;
 			}
 		}
+		subcyl = 0;
 	}
+}
+
+void floppy_image_device::seek_phase_w(int phases)
+{
+	int cur_pos = (cyl << 2) | subcyl;
+	int req_pos;
+	switch(phases) {
+	case 0x1: req_pos = 0; break;
+	case 0x3: req_pos = 1; break;
+	case 0x2: req_pos = 2; break;
+	case 0x6: req_pos = 3; break;
+	case 0x4: req_pos = 4; break;
+	case 0xc: req_pos = 5; break;
+	case 0x8: req_pos = 6; break;
+	case 0x9: req_pos = 7; break;
+	default: return;
+	}
+
+	// Opposite phase, don't move
+	if(((cur_pos ^ req_pos) & 7) == 4)
+		return;
+
+	int next_pos = (cur_pos & ~7) | req_pos;
+	if(next_pos < cur_pos-4)
+		next_pos += 8;
+	else if(next_pos > cur_pos+4)
+		next_pos -= 8;
+	if(next_pos < 0)
+		next_pos = 0;
+	else if(next_pos > (tracks-1)*4)
+		next_pos = (tracks-1)*4;
+	cyl = next_pos >> 2;
+	subcyl = next_pos & 3;
+
+	if(TRACE_STEP && (next_pos != cur_pos))
+		logerror("%s: track %d.%d\n", tag(), cyl, subcyl);
+
+	/* Update disk detection if applicable */
+	if (exists())
+		if (dskchg==0)
+			dskchg = 1;
 }
 
 int floppy_image_device::find_index(UINT32 position, const UINT32 *buf, int buf_size)
