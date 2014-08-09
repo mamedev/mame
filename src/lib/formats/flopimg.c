@@ -77,7 +77,7 @@ static floppy_image_legacy *floppy_init(void *fp, const struct io_procs *procs, 
 {
 	floppy_image_legacy *floppy;
 
-	floppy = (floppy_image_legacy *)malloc(sizeof(floppy_image));
+	floppy = (floppy_image_legacy *)malloc(sizeof(floppy_image_legacy));
 	if (!floppy)
 		return NULL;
 
