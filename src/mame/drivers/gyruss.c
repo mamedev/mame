@@ -123,10 +123,8 @@ WRITE8_MEMBER(gyruss_state::gyruss_irq_clear_w)
 
 void gyruss_state::filter_w(address_space &space, int chip, int data )
 {
-	int i;
-
 	//printf("chip %d - %02x\n", chip, data);
-	for (i = 0; i < 3; i++)
+	for (int i = 0; i < 3; i++)
 	{
 		/* low bit: 47000pF = 0.047uF */
 		/* high bit: 220000pF = 0.22uF */
@@ -160,11 +158,15 @@ WRITE8_MEMBER(gyruss_state::gyruss_i8039_irq_w)
 WRITE8_MEMBER(gyruss_state::master_nmi_mask_w)
 {
 	m_master_nmi_mask = data & 1;
+	if (!m_master_nmi_mask)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 WRITE8_MEMBER(gyruss_state::slave_irq_mask_w)
 {
 	m_slave_irq_mask = data & 1;
+	if (!m_slave_irq_mask)
+		m_subcpu->set_input_line(0, CLEAR_LINE);
 }
 
 static ADDRESS_MAP_START( main_cpu1_map, AS_PROGRAM, 8, gyruss_state )
@@ -446,13 +448,13 @@ void gyruss_state::machine_start()
 INTERRUPT_GEN_MEMBER(gyruss_state::master_vblank_irq)
 {
 	if (m_master_nmi_mask)
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		device.execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 INTERRUPT_GEN_MEMBER(gyruss_state::slave_vblank_irq)
 {
 	if (m_slave_irq_mask)
-		device.execute().set_input_line(0, HOLD_LINE);
+		device.execute().set_input_line(0, ASSERT_LINE);
 }
 
 static MACHINE_CONFIG_START( gyruss, gyruss_state )
@@ -475,7 +477,6 @@ static MACHINE_CONFIG_START( gyruss, gyruss_state )
 	MCFG_CPU_IO_MAP(audio_cpu2_io_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
-
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
