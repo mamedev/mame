@@ -6644,6 +6644,7 @@ src/mame/layout/seabattl.lay svneol=native#text/xml
 src/mame/layout/seawolf.lay svneol=native#text/xml
 src/mame/layout/seawolf2.lay svneol=native#text/xml
 src/mame/layout/segajw.lay svneol=native#text/xml
+src/mame/layout/sfiii2.lay svneol=native#text/xml
 src/mame/layout/sgsafari.lay svneol=native#text/xml
 src/mame/layout/sharkpy.lay svneol=native#text/xml
 src/mame/layout/sharkpye.lay svneol=native#text/xml

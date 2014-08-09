@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<mamelayout version="2">
+
+<!-- Screen mode is configured in Test Menu -> Configuration -> Game -> Screen Mode -->
+
+	<view name="Normal (4:3)">
+		<screen index="0">
+			<bounds left="0" top="0" right="4" bottom="3" />
+		</screen>
+	</view>
+	<view name="Wide (16:9)">
+		<screen index="0">
+			<bounds left="0" top="0" right="16" bottom="9" />
+		</screen>
+	</view>
+</mamelayout>

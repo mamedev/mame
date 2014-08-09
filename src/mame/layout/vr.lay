@@ -1,5 +1,8 @@
 <?xml version="1.0"?>
 <mamelayout version="2">
+
+<!-- Screen mode is configured in Test Mode -> Game System -> Monitor -->
+
 	<view name="Wide (16:9)">
 		<screen index="0">
 			<bounds left="0" top="0" right="16" bottom="9" />

@@ -2571,6 +2571,8 @@ $(DRIVERS)/copsnrob.o:  $(LAYOUT)/copsnrob.lh
 $(DRIVERS)/corona.o:    $(LAYOUT)/re800.lh \
 			$(LAYOUT)/luckyrlt.lh
 
+$(DRIVERS)/cps3.o:      $(LAYOUT)/sfiii2.lh
+
 $(DRIVERS)/darius.o:    $(LAYOUT)/darius.lh
 
 $(DRIVERS)/dblcrown.o:  $(LAYOUT)/dblcrown.lh
