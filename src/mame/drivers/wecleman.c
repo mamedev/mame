@@ -1222,8 +1222,8 @@ ROM_END
 ROM_START( wecleman2 )
 	ROM_REGION( 0x40000, "maincpu", 0 ) /* Main CPU Code */
 	// I doubt these labels are correct, or one set of roms is bad.
-	ROM_LOAD16_BYTE( "602f08(__wecleman2).17h", 0x00000, 0x10000, CRC(43241265) SHA1(3da1ed0d15b03845c07f07ec6838ce160d81633d) ) // only 17h and 23h differ slightly from parent
-	ROM_LOAD16_BYTE( "602f11(__wecleman2).23h", 0x00001, 0x10000, CRC(3ea7dae0) SHA1(d33d67f4cc65a7680e5f43407136b75512a10230) ) // "
+	ROM_LOAD16_BYTE( "602f08.17h", 0x00000, 0x10000, CRC(43241265) SHA1(3da1ed0d15b03845c07f07ec6838ce160d81633d) ) // only 17h and 23h differ slightly from parent
+	ROM_LOAD16_BYTE( "602f11.23h", 0x00001, 0x10000, CRC(3ea7dae0) SHA1(d33d67f4cc65a7680e5f43407136b75512a10230) ) // "
 	ROM_LOAD16_BYTE( "602a09.18h", 0x20000, 0x10000, CRC(8a9d756f) SHA1(12605e86ce29e6300b5400720baac7b0293d9e66) )
 	ROM_LOAD16_BYTE( "602a10.22h", 0x20001, 0x10000, CRC(569f5001) SHA1(ec2dd331a279083cf847fbbe71c017038a1d562a) )
 

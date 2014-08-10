@@ -1190,8 +1190,8 @@ ROM_END
 
 ROM_START( deluxe5a ) /* Deluxe 5 */
 	ROM_REGION( 0x080000, "maincpu", 0 )        /* 68000 Code */
-	ROM_LOAD16_BYTE( "(__deluxe5a)esd2.cu02", 0x000000, 0x040000,  CRC(c67bf757) SHA1(c90d486088d4aedbc9dd307cf1a8d5febf6fdba0) )
-	ROM_LOAD16_BYTE( "(__deluxe5a)esd1.cu03", 0x000001, 0x040000,  CRC(24f4d7b9) SHA1(bb0eabdd72a475149d6df768d9d29b545f061e54) )
+	ROM_LOAD16_BYTE( "esd2.cu02", 0x000000, 0x040000,  CRC(c67bf757) SHA1(c90d486088d4aedbc9dd307cf1a8d5febf6fdba0) ) // sldh
+	ROM_LOAD16_BYTE( "esd1.cu03", 0x000001, 0x040000,  CRC(24f4d7b9) SHA1(bb0eabdd72a475149d6df768d9d29b545f061e54) ) // sldh
 
 	ROM_REGION( 0x40000, "audiocpu", 0 )        /* Z80 Code */
 	ROM_LOAD( "esd3.su06", 0x00000, 0x40000, CRC(31de379a) SHA1(a0c9a9cec7207cc4ba33abb68bef62d7eb8e75e9) ) /* AM27C020 mask rom */
@@ -1213,8 +1213,8 @@ ROM_END
 
 ROM_START( deluxe5b ) /* Deluxe 5 */
 	ROM_REGION( 0x080000, "maincpu", 0 )        /* 68000 Code */
-	ROM_LOAD16_BYTE( "(__deluxe5b)esd2.cu02", 0x000000, 0x040000,  CRC(72a67495) SHA1(4fd5871621a6d1d4ea7a23c84f5796ee99caf857) )
-	ROM_LOAD16_BYTE( "(__deluxe5b)esd1.cu03", 0x000001, 0x040000,  CRC(7cc119c8) SHA1(4d2d37e815ab3211ff88c2e6584b4eaee1cd202d) )
+	ROM_LOAD16_BYTE( "esd2.cu02", 0x000000, 0x040000,  CRC(72a67495) SHA1(4fd5871621a6d1d4ea7a23c84f5796ee99caf857) ) // sldh
+	ROM_LOAD16_BYTE( "esd1.cu03", 0x000001, 0x040000,  CRC(7cc119c8) SHA1(4d2d37e815ab3211ff88c2e6584b4eaee1cd202d) ) // sldh
 
 	ROM_REGION( 0x40000, "audiocpu", 0 )        /* Z80 Code */
 	ROM_LOAD( "esd3.su06", 0x00000, 0x40000, CRC(31de379a) SHA1(a0c9a9cec7207cc4ba33abb68bef62d7eb8e75e9) ) /* AM27C020 mask rom */

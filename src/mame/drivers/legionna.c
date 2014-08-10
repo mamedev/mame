@@ -2327,8 +2327,8 @@ ROM_END
 
 ROM_START( cupsocsb3 )
 	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 Code */
-	ROM_LOAD16_BYTE( "4(__cupsocsb3).bin", 0x00001, 0x80000, CRC(f615058f) SHA1(f7c0eb6b9f8dcdc8b13f8e5b03f46252a87a6c0f) )
-	ROM_LOAD16_BYTE( "5(__cupsocsb3).bin", 0x00000, 0x80000, CRC(6500edf2) SHA1(1a617b18b4997c24af53601c98e9a0efbe637a4b) )
+	ROM_LOAD16_BYTE( "4.bin", 0x00001, 0x80000, CRC(f615058f) SHA1(f7c0eb6b9f8dcdc8b13f8e5b03f46252a87a6c0f) ) // sldh
+	ROM_LOAD16_BYTE( "5.bin", 0x00000, 0x80000, CRC(6500edf2) SHA1(1a617b18b4997c24af53601c98e9a0efbe637a4b) ) // sldh
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* Z80 code */
 	ROM_LOAD( "sc_01.bin",    0x000000, 0x08000, CRC(cea39d6d) SHA1(f0b79c03ffafdd1e57673d6d4836becbe415110b) )

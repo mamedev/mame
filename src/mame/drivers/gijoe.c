@@ -410,7 +410,7 @@ ROM_START( gijoea )
 	ROM_LOAD( "069a04.1e", 0x000000, 0x200000, CRC(11d6dcd6) SHA1(04cbff9f61cd8641db538db809ddf20da29fd5ac) )
 
 	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom
-	ROM_LOAD( "er5911(__gijoea).7d", 0x0000, 0x080, CRC(64f5c87b) SHA1(af81abc54eb59ef7d2250b5ab6cc9642fbd9bfb2) ) // No actual label so create a unique one for this set
+	ROM_LOAD( "er5911.7d", 0x0000, 0x080, CRC(64f5c87b) SHA1(af81abc54eb59ef7d2250b5ab6cc9642fbd9bfb2) ) // sldh - No actual label so create a unique one for this set
 ROM_END
 
 ROM_START( gijoeu )
@@ -437,7 +437,7 @@ ROM_START( gijoeu )
 	ROM_LOAD( "069a04.1e", 0x000000, 0x200000, CRC(11d6dcd6) SHA1(04cbff9f61cd8641db538db809ddf20da29fd5ac) )
 
 	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting upside down with error
-	ROM_LOAD( "er5911(__gijoeu).7d", 0x0000, 0x080, CRC(ca966023) SHA1(6f07ece0f95213bc12387192986f468d23dfdfc8) ) // No actual label so create a unique one for this set
+	ROM_LOAD( "er5911.7d", 0x0000, 0x080, CRC(ca966023) SHA1(6f07ece0f95213bc12387192986f468d23dfdfc8) ) // sldh - No actual label so create a unique one for this set
 ROM_END
 
 ROM_START( gijoej )
@@ -464,7 +464,7 @@ ROM_START( gijoej )
 	ROM_LOAD( "069a04.1e", 0x000000, 0x200000, CRC(11d6dcd6) SHA1(04cbff9f61cd8641db538db809ddf20da29fd5ac) )
 
 	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting upside down with error
-	ROM_LOAD( "er5911(__gijoej).7d", 0x0000, 0x080, CRC(c914fcf2) SHA1(b4f0a0b5d6d4075b004b061336d162336ce1a754) ) // No actual label so create a unique one for this set
+	ROM_LOAD( "er5911.7d", 0x0000, 0x080, CRC(c914fcf2) SHA1(b4f0a0b5d6d4075b004b061336d162336ce1a754) ) // sldh - No actual label so create a unique one for this set
 ROM_END
 
 

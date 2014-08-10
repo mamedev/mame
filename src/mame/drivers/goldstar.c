@@ -10225,18 +10225,18 @@ Seems to be related to timing since once patched the game is very fast.
 ROM_START( lucky8a )
 	ROM_REGION( 0x8000, "maincpu", 0 )
 	// we have to patch this, it might be bad
-	ROM_LOAD( "1(__baddump)",  0x0000, 0x8000, BAD_DUMP CRC(554cddff) SHA1(8a0678993c7010f70adc9e9443b51cf5929bf110) )
+	ROM_LOAD( "1",  0x0000, 0x8000, BAD_DUMP CRC(554cddff) SHA1(8a0678993c7010f70adc9e9443b51cf5929bf110) ) // sldh
 
 	ROM_REGION( 0x18000, "gfx1", 0 )
-	ROM_LOAD( "6(__lucky8a)",  0x00000, 0x8000, CRC(59026af3) SHA1(3d7f7e78968ca26275635aeaa0e994468a3da575) )
-	ROM_LOAD( "7(__lucky8a)",  0x08000, 0x8000, CRC(67a073c1) SHA1(36194d57d0dc0601fa1fdf2e6806f11b2ea6da36) )
-	ROM_LOAD( "8(__lucky8a)",  0x10000, 0x8000, CRC(80b35f06) SHA1(561d257d7bc8976cfa08f36d84961f1263509b5b) )
+	ROM_LOAD( "6",  0x00000, 0x8000, CRC(59026af3) SHA1(3d7f7e78968ca26275635aeaa0e994468a3da575) ) // sldh
+	ROM_LOAD( "7",  0x08000, 0x8000, CRC(67a073c1) SHA1(36194d57d0dc0601fa1fdf2e6806f11b2ea6da36) ) // sldh
+	ROM_LOAD( "8",  0x10000, 0x8000, CRC(80b35f06) SHA1(561d257d7bc8976cfa08f36d84961f1263509b5b) ) // sldh
 
 	ROM_REGION( 0x8000, "gfx2", 0 )
-	ROM_LOAD( "2(__lucky8a)",  0x0000, 0x2000, CRC(29d6f197) SHA1(1542ca457594f6b7fe8f28f7d78023edd7021bc8) )
-	ROM_LOAD( "3(__lucky8a)",  0x2000, 0x2000, CRC(5f812e65) SHA1(70d9ea82f9337936bf21f82b6961768d436f3a6f) )
-	ROM_LOAD( "4(__lucky8a)",  0x4000, 0x2000, CRC(898b9ed5) SHA1(11b7d1cfcf425d00d086c74e0dbcb72068dda9fe) )
-	ROM_LOAD( "5(__lucky8a)",  0x6000, 0x2000, CRC(4f7cfb35) SHA1(0617cf4419be00d9bacc78724089cb8af4104d68) )
+	ROM_LOAD( "2",  0x0000, 0x2000, CRC(29d6f197) SHA1(1542ca457594f6b7fe8f28f7d78023edd7021bc8) ) // sldh
+	ROM_LOAD( "3",  0x2000, 0x2000, CRC(5f812e65) SHA1(70d9ea82f9337936bf21f82b6961768d436f3a6f) ) // sldh
+	ROM_LOAD( "4",  0x4000, 0x2000, CRC(898b9ed5) SHA1(11b7d1cfcf425d00d086c74e0dbcb72068dda9fe) ) // sldh
+	ROM_LOAD( "5",  0x6000, 0x2000, CRC(4f7cfb35) SHA1(0617cf4419be00d9bacc78724089cb8af4104d68) ) // sldh
 
 	ROM_REGION( 0x200, "proms", 0 )
 	ROM_LOAD( "prom3", 0x0000, 0x0100, CRC(23e81049) SHA1(78071dae70fad870e972d944642fb3a2374be5e4) )
@@ -10263,7 +10263,7 @@ ROM_END
 */
 ROM_START( lucky8b )
 	ROM_REGION( 0x8000, "maincpu", 0 )
-	ROM_LOAD( "8(__lucky8b).bin",  0x0000, 0x8000, CRC(ab7c58f2) SHA1(74782772bcc91178fa381074ddca99e0515f7693) )
+	ROM_LOAD( "8.bin",  0x0000, 0x8000, CRC(ab7c58f2) SHA1(74782772bcc91178fa381074ddca99e0515f7693) ) // sldh
 
 	ROM_REGION( 0x18000, "gfx1", 0 )
 	ROM_LOAD( "5.bin",  0x00000, 0x8000, CRC(9bbe5437) SHA1(ef3789cf34d83827bd6ad4755fd443c3d9bdf661) )
@@ -10293,7 +10293,7 @@ ROM_END
 
 ROM_START( lucky8c )
 	ROM_REGION( 0x8000, "maincpu", 0 )
-	ROM_LOAD( "8(__lucky8c).bin",   0x0000, 0x8000, CRC(6890f8d8) SHA1(7e9d974acf199c78972299bfa3e275a30a3f6eaa) )
+	ROM_LOAD( "8.bin",   0x0000, 0x8000, CRC(6890f8d8) SHA1(7e9d974acf199c78972299bfa3e275a30a3f6eaa) ) // sldh
 
 	ROM_REGION( 0x18000, "gfx1", 0 )
 	ROM_LOAD( "5",  0x00000, 0x8000, CRC(59026af3) SHA1(3d7f7e78968ca26275635aeaa0e994468a3da575) )
@@ -10368,26 +10368,26 @@ ay-38910A
 27128.1             NO MATCH
 27128.7             NO MATCH
 27256.5             = 5                     lucky8     New Lucky 8 Lines (set 1, W-4)
-                    = 6(__lucky8a)          lucky8a    New Lucky 8 Lines (set 2, W-4)
+                    = 6                     lucky8a    New Lucky 8 Lines (set 2, W-4)
                     = 5                     lucky8c    New Lucky 8 Lines (set 4, W-4)
                     = 5                     lucky8d    New Lucky 8 Lines (set 5, W-4)
 27256.6             = 6                     lucky8     New Lucky 8 Lines (set 1, W-4)
-                    = 7(__lucky8a)          lucky8a    New Lucky 8 Lines (set 2, W-4)
+                    = 7                     lucky8a    New Lucky 8 Lines (set 2, W-4)
                     = 6                     lucky8c    New Lucky 8 Lines (set 4, W-4)
                     = 6                     lucky8d    New Lucky 8 Lines (set 5, W-4)
 2764.2              = 2.bin                 ladylinr   Lady Liner
                     = 2                     lucky8     New Lucky 8 Lines (set 1, W-4)
-                    = 3(__lucky8a)          lucky8a    New Lucky 8 Lines (set 2, W-4)
+                    = 3                     lucky8a    New Lucky 8 Lines (set 2, W-4)
                     = 2                     lucky8c    New Lucky 8 Lines (set 4, W-4)
                     = 2                     lucky8d    New Lucky 8 Lines (set 5, W-4)
 2764.3              = 3.bin                 ladylinr   Lady Liner
                     = 3                     lucky8     New Lucky 8 Lines (set 1, W-4)
-                    = 4(__lucky8a)          lucky8a    New Lucky 8 Lines (set 2, W-4)
+                    = 4                     lucky8a    New Lucky 8 Lines (set 2, W-4)
                     = 3                     lucky8c    New Lucky 8 Lines (set 4, W-4)
                     = 3                     lucky8d    New Lucky 8 Lines (set 5, W-4)
 2764.4              = 4.bin                 ladylinr   Lady Liner
                     = 4                     lucky8     New Lucky 8 Lines (set 1, W-4)
-                    = 5(__lucky8a)          lucky8a    New Lucky 8 Lines (set 2, W-4)
+                    = 5                     lucky8a    New Lucky 8 Lines (set 2, W-4)
                     = 4                     lucky8c    New Lucky 8 Lines (set 4, W-4)
                     = 4                     lucky8d    New Lucky 8 Lines (set 5, W-4)
 

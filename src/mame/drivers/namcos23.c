@@ -4751,7 +4751,7 @@ ROM_END
 
 ROM_START( crszonev3b2 )
 	ROM_REGION32_BE( 0x800000, "user1", 0 ) /* 4 megs for main R4650 code */
-	ROM_LOAD16_WORD_SWAP( "cszo3verb(__crszonev3b2).ic4", 0x400000, 0x400000, CRC(3755b402) SHA1(e169fded9d136af7ce6997868629eed5196b8cdd) )  // cszo3verb.ic4
+	ROM_LOAD16_WORD_SWAP( "cszo3verb.ic4", 0x400000, 0x400000, CRC(3755b402) SHA1(e169fded9d136af7ce6997868629eed5196b8cdd) ) // sldh
 	ROM_CONTINUE( 0x000000, 0x400000 )
 
 	ROM_REGION( 0x80000, "subcpu", 0 )  /* Hitachi H8/3002 MCU code */

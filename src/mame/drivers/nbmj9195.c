@@ -3500,10 +3500,10 @@ ROM_END
 
 ROM_START( yosimotm )
 	ROM_REGION( 0x10000, "maincpu", 0 ) /* main program */
-	ROM_LOAD( "1(__yosimotm).7c",  0x00000,  0x10000, CRC(d156b07d) SHA1(8dcf2d8ac60920dc7ea286d4b91399ed2db05a3b) )
+	ROM_LOAD( "1.7c",  0x00000,  0x10000, CRC(d156b07d) SHA1(8dcf2d8ac60920dc7ea286d4b91399ed2db05a3b) ) // sldh
 
 	ROM_REGION( 0x20000, "audiocpu", 0 ) /* sound program */
-	ROM_LOAD( "2(__yosimotm).12e", 0x00000,  0x20000, CRC(e2d84085) SHA1(890b4d4a02030253837b67e8232293dce30d7ca2) )
+	ROM_LOAD( "2.12e", 0x00000,  0x20000, CRC(e2d84085) SHA1(890b4d4a02030253837b67e8232293dce30d7ca2) ) // sldh
 
 	ROM_REGION( 0x300000, "gfx1", 0 ) /* gfx */
 	ROM_LOAD( "3.3h",  0x000000, 0x80000, CRC(f421c6c8) SHA1(f9d68f542cbf379a7c41b47704b19e1aec69f237) )

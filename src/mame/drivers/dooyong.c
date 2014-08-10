@@ -1314,7 +1314,7 @@ ROM_END
 
 ROM_START( gulfstrmb )
 	ROM_REGION( 0x30000, "maincpu", 0 ) /* 64k for code + 128k for banks */
-	ROM_LOAD( "(__gulfstrmb)1.l4",       0x00000, 0x20000, CRC(aabd95a5) SHA1(f1d3ade952e96b288e2cd4b172931862b16b4af9) )
+	ROM_LOAD( "1.l4",        0x00000, 0x20000, CRC(aabd95a5) SHA1(f1d3ade952e96b288e2cd4b172931862b16b4af9) ) // sldh
 	ROM_RELOAD(              0x10000, 0x20000 )             /* banked at 0x8000-0xbfff */
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* sound */

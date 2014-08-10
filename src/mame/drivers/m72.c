@@ -2758,7 +2758,7 @@ ROM_START( nspirit )
 	ROM_RELOAD(                     0xe0000, 0x10000 )
 
 	ROM_REGION( 0x10000, "mcu", 0 )
-	ROM_LOAD( "nin_c-pr(__nodump).1c", 0x00000, 0x01000, NO_DUMP ) // read protected
+	ROM_LOAD( "nin_c-pr.1c", 0x00000, 0x01000, NO_DUMP ) // sldh - read protected
 
 	ROM_REGION( 0x080000, "gfx1", 0 )
 	ROM_LOAD( "nin-r00.7m",  0x00000, 0x20000, CRC(5f61d30b) SHA1(7754697e43f6117fa604f50885b76014b1dc5760) )  /* sprites */

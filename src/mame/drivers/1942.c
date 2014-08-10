@@ -883,31 +883,31 @@ ROM_END
 
 ROM_START( 1942p )
 	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASEFF ) /* 64k for code + 3*16k for the banked ROMs images */
-	ROM_LOAD( "(__1942p)1.bin", 0x00000, 0x8000, CRC(d8506aee) SHA1(aebdce3203e7743d70a8465a5e5766f9f47cb33f) )//
-	ROM_LOAD( "(__1942p)2.bin", 0x10000, 0x4000, CRC(793a8fbc) SHA1(57f27a2b59cbc7e82e41683ddfd58055350f80bc) )//
-	ROM_CONTINUE(0x18000,0x4000)
-	ROM_LOAD( "(__1942p)3.bin", 0x14000, 0x4000, CRC(108fda63) SHA1(6ffdf57a04bcfae9fdb2343f30cff50926188cbf) )//
+	ROM_LOAD( "1.bin",    0x00000, 0x8000, CRC(d8506aee) SHA1(aebdce3203e7743d70a8465a5e5766f9f47cb33f) ) // sldh
+	ROM_LOAD( "2.bin",    0x10000, 0x4000, CRC(793a8fbc) SHA1(57f27a2b59cbc7e82e41683ddfd58055350f80bc) ) // sldh
+	ROM_CONTINUE(         0x18000, 0x4000)
+	ROM_LOAD( "3.bin",    0x14000, 0x4000, CRC(108fda63) SHA1(6ffdf57a04bcfae9fdb2343f30cff50926188cbf) ) // sldh
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "(__1942p)snd.bin", 0x0000, 0x4000, BAD_DUMP CRC(43d6df9f) SHA1(c34579c73faa7e9552a6721ef8050b33ca158588) ) // looks bad, window was smashed, likely dead.
+	ROM_LOAD( "snd.bin",   0x0000, 0x4000, BAD_DUMP CRC(43d6df9f) SHA1(c34579c73faa7e9552a6721ef8050b33ca158588) ) // sldh - looks bad, window was smashed, likely dead.
 	ROM_LOAD( "sr-01.c11", 0x0000, 0x4000, CRC(bd87f06b) SHA1(821f85cf157f81117eeaba0c3cf0337eac357e58) ) // works but we can't be 100% sure it was the same.
 
 	ROM_REGION( 0x2000, "gfx1", ROMREGION_INVERT )
-	ROM_LOAD( "(__1942p)8.bin", 0x0000, 0x2000, CRC(6ebca191) SHA1(0dbddadde54a0ab66994c4a8726be05c6ca88a0e) )   /* characters */ //
+	ROM_LOAD( "8.bin",    0x0000, 0x2000, CRC(6ebca191) SHA1(0dbddadde54a0ab66994c4a8726be05c6ca88a0e) ) /* characters */ // sldh
 
 	ROM_REGION( 0xc000, "gfx2", ROMREGION_INVERT )
-	ROM_LOAD( "(__1942p)5.bin", 0x0000, 0x4000, CRC(1081b88c) SHA1(f3026e72206c96573fd6ba28d15e865b51735004) )  /* tiles */
-	ROM_LOAD( "(__1942p)6.bin", 0x4000, 0x4000, CRC(2d6acd8c) SHA1(914bb971c8f1364d0c44bd11f5f7e8da1f4953bb) )
-	ROM_LOAD( "(__1942p)7.bin", 0x8000, 0x4000, CRC(30f13e78) SHA1(51b9c0dfc53db705b75dd7ce643cec807533af5a) )
+	ROM_LOAD( "5.bin",    0x0000, 0x4000, CRC(1081b88c) SHA1(f3026e72206c96573fd6ba28d15e865b51735004) ) /* tiles */ // sldh
+	ROM_LOAD( "6.bin",    0x4000, 0x4000, CRC(2d6acd8c) SHA1(914bb971c8f1364d0c44bd11f5f7e8da1f4953bb) ) // sldh
+	ROM_LOAD( "7.bin",    0x8000, 0x4000, CRC(30f13e78) SHA1(51b9c0dfc53db705b75dd7ce643cec807533af5a) ) // sldh
 
 	ROM_REGION( 0x10000, "gfx3", ROMREGION_INVERT )
-	ROM_LOAD( "(__1942p)9.bin", 0x0000, 0x4000, CRC(755a4762) SHA1(b8747e02854a2dd8fa1251e206dbf0a0fc017b38) )  /* tiles */
-	ROM_LOAD( "(__1942p)10.bin", 0x4000, 0x4000, CRC(4a5a9084) SHA1(dcf9834e58324f9c94206728a055083e335bc862) )
-	ROM_LOAD( "(__1942p)11.bin", 0x8000, 0x4000, CRC(d2ce3eb6) SHA1(ebe71bd413b169ff2cea6973faf48527a8283eef) )
-	ROM_LOAD( "(__1942p)12.bin", 0xc000, 0x4000, CRC(aaa86493) SHA1(b0f6c59b5369b565bf863544a26cde2105aa35be) )
+	ROM_LOAD( "9.bin",    0x0000, 0x4000, CRC(755a4762) SHA1(b8747e02854a2dd8fa1251e206dbf0a0fc017b38) ) /* tiles */ // sldh
+	ROM_LOAD( "10.bin",   0x4000, 0x4000, CRC(4a5a9084) SHA1(dcf9834e58324f9c94206728a055083e335bc862) ) // sldh
+	ROM_LOAD( "11.bin",   0x8000, 0x4000, CRC(d2ce3eb6) SHA1(ebe71bd413b169ff2cea6973faf48527a8283eef) ) // sldh
+	ROM_LOAD( "12.bin",   0xc000, 0x4000, CRC(aaa86493) SHA1(b0f6c59b5369b565bf863544a26cde2105aa35be) ) // sldh
 
 	ROM_REGION( 0x0100, "proms", 0 ) // only one prom was in the dump - uses paletteram instead of proms
-	ROM_LOAD( "(__1942p)ic22.bin",  0x0000, 0x0100, CRC(f6fad943) SHA1(b0a24ea7805272e8ebf72a99b08907bc00d5f82f) )    /* sprite lookup table */ //
+	ROM_LOAD( "ic22.bin", 0x0000, 0x0100, CRC(f6fad943) SHA1(b0a24ea7805272e8ebf72a99b08907bc00d5f82f) ) /* sprite lookup table */ // sldh
 ROM_END
 
 

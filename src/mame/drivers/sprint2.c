@@ -626,7 +626,7 @@ ROM_START( sprint2h )
 	ROM_RELOAD(             0xe800, 0x0800 )
 	ROM_LOAD( "6404.d1",    0x3000, 0x0800, CRC(d2878ff6) SHA1(b742a8896c1bf1cfacf48d06908920d88a2c9ea8) )
 	ROM_RELOAD(             0xf000, 0x0800 )
-	ROM_LOAD( "6405-02(__sprint2h).e1", 0x3800, 0x0800, CRC(6de291f1) SHA1(00c2826011d80ac0784649a7bc156a97c26565fd) )
+	ROM_LOAD( "6405-02.e1", 0x3800, 0x0800, CRC(6de291f1) SHA1(00c2826011d80ac0784649a7bc156a97c26565fd) ) // sldh
 	ROM_RELOAD(             0xf800, 0x0800 )
 
 	ROM_REGION( 0x0200, "gfx1", 0 ) /* tiles */

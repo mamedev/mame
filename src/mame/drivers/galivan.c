@@ -975,8 +975,8 @@ PR.8E        [ffb4b287] = YNCP-8E.BIN  from Youma Ninpou Chou (Nichibutsu, Ninja
 
 ROM_START( youmab2 )
 	ROM_REGION( 0x18000, "maincpu", 0 ) /* main cpu code */
-	ROM_LOAD( "1(__bootleg).1d",     0x00000, 0x8000, CRC(692ae497) SHA1(572e5a1eae9b0bb48f65dce5de2df5c5ae95a3bd) )
-	ROM_LOAD( "3(__bootleg).4d",     0x10000, 0x8000, CRC(ebf61afc) SHA1(30235a90e8316f5033d44d31f02cca97c64f2d5e) )
+	ROM_LOAD( "1.1d",     0x00000, 0x8000, CRC(692ae497) SHA1(572e5a1eae9b0bb48f65dce5de2df5c5ae95a3bd) ) // sldh
+	ROM_LOAD( "3.4d",     0x10000, 0x8000, CRC(ebf61afc) SHA1(30235a90e8316f5033d44d31f02cca97c64f2d5e) ) // sldh
 
 	ROM_REGION( 0x10000, "user2", 0 )   /* main cpu code */
 	/* This rom is double the size of the original one, appears to have extra (banked) code for 0x8000 */
@@ -987,7 +987,7 @@ ROM_START( youmab2 )
 	ROM_LOAD( "12.15b",  0x4000, 0x8000, CRC(ac3a0b81) SHA1(39f2c305706e313d5256c357a3c8b57bbe45d3d7) )
 
 	ROM_REGION( 0x08000, "gfx1", 0 )
-	ROM_LOAD( "4(__bootleg).7d",     0x00000, 0x8000, CRC(a1954f44) SHA1(b10a22b51bd1a02c0d7b116b4d7390003c41decf) )    /* chars */
+	ROM_LOAD( "4.7d",     0x00000, 0x8000, CRC(a1954f44) SHA1(b10a22b51bd1a02c0d7b116b4d7390003c41decf) ) /* chars */ // sldh
 
 	ROM_REGION( 0x20000, "gfx2", 0 )
 	ROM_LOAD( "7.13f",   0x00000, 0x8000, CRC(655f0a58) SHA1(8ffe73cec68d52c7b09651b546289613d6d4dde4) ) /* tiles */

@@ -758,7 +758,7 @@ scr*   - gfx
 // fantasy 95 - derived from new fantasia?
 ROM_START( fantsy95 )
 	ROM_REGION( 0x500000, "maincpu", 0 )    /* 68000 code */
-	ROM_LOAD16_BYTE( "prog2(__fantsy95).12",  0x000000, 0x80000, CRC(1e684da7) SHA1(2104a6fb5f019011009f4faa769afcada90cff97) ) // prog2.12
+	ROM_LOAD16_BYTE( "prog2.12",  0x000000, 0x80000, CRC(1e684da7) SHA1(2104a6fb5f019011009f4faa769afcada90cff97) ) // sldh
 	ROM_LOAD16_BYTE( "prog1.7",   0x000001, 0x80000, CRC(dc4e4f6b) SHA1(9934121692a6d32164bef03c72c25dc727438e54) )
 	ROM_LOAD16_BYTE( "i-scr2.10", 0x100000, 0x80000, CRC(ab8756ff) SHA1(0a7aa977151962e67b15a7e0f819b1412ff8dbdc) )
 	ROM_LOAD16_BYTE( "i-scr1.5",  0x100001, 0x80000, CRC(d8e2ef77) SHA1(ec2c1dcc13e281288b5df43fa7a0b3cdf7357459) )
@@ -770,7 +770,7 @@ ROM_START( fantsy95 )
 	ROM_LOAD16_BYTE( "i-scr7.6",  0x400001, 0x80000, CRC(8662dd01) SHA1(a349c1cd965d3d51c20178fcce2f61ae76f4006a) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )    /* sprites */
-	ROM_LOAD( "(__1994)obj1.13",  0x00000, 0x80000, CRC(832cd451) SHA1(29dfab1d4b7a15f3fe9fbedef41d405a40235a77) )
+	ROM_LOAD( "obj1.13",  0x00000, 0x80000, CRC(832cd451) SHA1(29dfab1d4b7a15f3fe9fbedef41d405a40235a77) ) // sldh
 
 	ROM_REGION( 0x140000, "oki", 0 )    /* OKIM6295 samples */
 	/* 00000-2ffff is fixed, 30000-3ffff is bank switched from all the ROMs */
@@ -793,7 +793,7 @@ ROM_START( newfant )
 	ROM_LOAD16_BYTE( "iscr7.06", 0x400001, 0x80000, CRC(2dee0c31) SHA1(1097006e6e5d16b24fb71615b6c0754fe0ecbe33) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )    /* sprites */
-	ROM_LOAD( "(__1995)nf95obj1.13",  0x00000, 0x80000, CRC(e6d1bc71) SHA1(df0b6c1742c01991196659bab2691230323e7b8d) )
+	ROM_LOAD( "nf95obj1.13",  0x00000, 0x80000, CRC(e6d1bc71) SHA1(df0b6c1742c01991196659bab2691230323e7b8d) ) // sldh
 
 	ROM_REGION( 0x140000, "oki", 0 )    /* OKIM6295 samples */
 	/* 00000-2ffff is fixed, 30000-3ffff is bank switched from all the ROMs */
@@ -816,7 +816,7 @@ ROM_START( newfanta )
 	ROM_LOAD16_BYTE( "iscr7.06", 0x400001, 0x80000, CRC(2dee0c31) SHA1(1097006e6e5d16b24fb71615b6c0754fe0ecbe33) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )    /* sprites */
-	ROM_LOAD( "(__1994)obj1.13",  0x00000, 0x80000, CRC(832cd451) SHA1(29dfab1d4b7a15f3fe9fbedef41d405a40235a77) )
+	ROM_LOAD( "obj1.13",  0x00000, 0x80000, CRC(832cd451) SHA1(29dfab1d4b7a15f3fe9fbedef41d405a40235a77) ) // sldh
 
 	ROM_REGION( 0x140000, "oki", 0 )    /* OKIM6295 samples */
 	/* 00000-2ffff is fixed, 30000-3ffff is bank switched from all the ROMs */
@@ -1086,7 +1086,7 @@ ROM_START( supmodel )
 	ROM_LOAD16_BYTE( "i-scr7.6",  0x400001, 0x80000, CRC(19c73268) SHA1(aa6dc8c817a2e9707ea74e219ab34cf826223741) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )    /* sprites */
-	ROM_LOAD( "(__1994)obj1.13",  0x00000, 0x80000, CRC(832cd451) SHA1(29dfab1d4b7a15f3fe9fbedef41d405a40235a77) )
+	ROM_LOAD( "obj1.13",  0x00000, 0x80000, CRC(832cd451) SHA1(29dfab1d4b7a15f3fe9fbedef41d405a40235a77) ) // sldh
 
 	ROM_REGION( 0x140000, "oki", 0 )    /* OKIM6295 samples */
 	/* 00000-2ffff is fixed, 30000-3ffff is bank switched from all the ROMs */

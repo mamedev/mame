@@ -6642,7 +6642,7 @@ ROM_START( tenkaie )
 	ROM_REGION( 0x50000, "maincpu", 0 )
 	ROM_LOAD( "epr-a01.rom",      0x00000, 0x40000, CRC(a35e54db) SHA1(247c856e19989fb834e8ed135393927bbd9c0277) )
 	ROM_RELOAD(                   0x10000, 0x40000 )
-	ROM_LOAD( "tmp91p640n-10(__baddump).5b", 0x00000, 0x04000, BAD_DUMP CRC(509f1c97) SHA1(08557bea2e924053fd5bc9de5e306f3ecf8e98e6) ) // not dumped, rom taken from tenkai
+	ROM_LOAD( "tmp91p640n-10.5b", 0x00000, 0x04000, BAD_DUMP CRC(509f1c97) SHA1(08557bea2e924053fd5bc9de5e306f3ecf8e98e6) ) // sldh - not dumped, rom taken from tenkai
 
 	ROM_REGION( 0x100000, "gfx1", 0 )   // blitter data
 	ROM_LOAD( "lzc-01.rom", 0x000000, 0x100000, CRC(786698e3) SHA1(9ddf4e31f454fb3c7969b1433771e95a976de741) )

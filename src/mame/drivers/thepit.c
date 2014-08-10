@@ -892,30 +892,30 @@ ROM_END
 
 ROM_START( fitterbl )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "ic38(__bootleg).bin",  0x0000, 0x1000, CRC(805c6974) SHA1(b1a41df746a347df6f47578fc59a7393e5195ada) )
-	ROM_LOAD( "roundup.u39",          0x1000, 0x1000, CRC(37bf554b) SHA1(773279fb21c56221d5f29fd31c2149e68dcf3909) )
-	ROM_LOAD( "ic40(__bootleg).bin",  0x2000, 0x1000, CRC(c5f7156e) SHA1(3702a0eb4c395217a8f761133dba7871a96b7f38) )
-	ROM_LOAD( "ic41(__bootleg).bin",  0x3000, 0x1000, CRC(a67d5bda) SHA1(86d1628d4f0bcd3c3099f99ab92b3ac758ffec71) )
-	ROM_LOAD( "ic33(__bootleg).bin",  0x4000, 0x1000, CRC(1f3c78ee) SHA1(961b6ba8d08ddcbeda52b98a2f181f37beed5fb1) )
+	ROM_LOAD( "ic38.bin",     0x0000, 0x1000, CRC(805c6974) SHA1(b1a41df746a347df6f47578fc59a7393e5195ada) ) // sldh
+	ROM_LOAD( "roundup.u39",  0x1000, 0x1000, CRC(37bf554b) SHA1(773279fb21c56221d5f29fd31c2149e68dcf3909) )
+	ROM_LOAD( "ic40.bin",     0x2000, 0x1000, CRC(c5f7156e) SHA1(3702a0eb4c395217a8f761133dba7871a96b7f38) ) // sldh
+	ROM_LOAD( "ic41.bin",     0x3000, 0x1000, CRC(a67d5bda) SHA1(86d1628d4f0bcd3c3099f99ab92b3ac758ffec71) ) // sldh
+	ROM_LOAD( "ic33.bin",     0x4000, 0x1000, CRC(1f3c78ee) SHA1(961b6ba8d08ddcbeda52b98a2f181f37beed5fb1) ) // sldh
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "ic30(__bootleg).bin",  0x0000, 0x0800, CRC(1b18faee) SHA1(b4002e2fdaa6bb966da4faa46ac56751a3841f5f) )
-	ROM_LOAD( "ic31(__bootleg).bin",  0x0800, 0x0800, CRC(76cf4394) SHA1(5dc13bd5fc92ce4ce12bab60576292a6028891c3) )
+	ROM_LOAD( "ic30.bin",     0x0000, 0x0800, CRC(1b18faee) SHA1(b4002e2fdaa6bb966da4faa46ac56751a3841f5f) ) // sldh
+	ROM_LOAD( "ic31.bin",     0x0800, 0x0800, CRC(76cf4394) SHA1(5dc13bd5fc92ce4ce12bab60576292a6028891c3) ) // sldh
 
 	ROM_REGION( 0x1800, "gfx1", 0 ) /* chars and sprites */
-	ROM_LOAD( "ic9(__bootleg).bin",   0x0000, 0x0800, CRC(394676a2) SHA1(5bd26d717e25b7c192af8173db9ae18371dbcfbe) )
+	ROM_LOAD( "ic9.bin",      0x0000, 0x0800, CRC(394676a2) SHA1(5bd26d717e25b7c192af8173db9ae18371dbcfbe) )
 	ROM_LOAD( "ic10.bin",     0x1000, 0x0800, CRC(a38d708d) SHA1(6632392cece34332a2a4427ec14d95f201319c67) )
 
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "roundup.clr",  0x0000, 0x0020, CRC(a758b567) SHA1(d188c90dba10fe3abaae92488786b555b35218c5) )
 ROM_END
 
-ROM_START( ttfitter ) /* originally dumped with "roundup.uxx" labels - changed to "ttfitter.uxx" to lessen confusion between parent */
+ROM_START( ttfitter )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ttfitter.u38", 0x0000, 0x1000, CRC(2ccd60d4) SHA1(2eb4f72e371578a0eda54a75074c0a0c3ccfefea) )
-	ROM_LOAD( "roundup.u39",  0x1000, 0x1000, CRC(37bf554b) SHA1(773279fb21c56221d5f29fd31c2149e68dcf3909) ) // ttfitter.u39
+	ROM_LOAD( "ttfitter.u39", 0x1000, 0x1000, CRC(37bf554b) SHA1(773279fb21c56221d5f29fd31c2149e68dcf3909) ) // dlsh
 	ROM_LOAD( "ttfitter.u40", 0x2000, 0x1000, CRC(572e2157) SHA1(030ad888d7fc9b61df6749592934d55de449de8c) )
-	ROM_LOAD( "roundup.u41",  0x3000, 0x1000, CRC(1c5ed660) SHA1(6729ecb8072b1ea0bd8557fd0b484d086b94c4b1) ) // ttfitter.u41
+	ROM_LOAD( "ttfitter.u41", 0x3000, 0x1000, CRC(1c5ed660) SHA1(6729ecb8072b1ea0bd8557fd0b484d086b94c4b1) ) // dlsh
 	ROM_LOAD( "ttfitter.u33", 0x4000, 0x1000, CRC(d6fc9d0c) SHA1(558cad013b4adee226eb1ddf4ee5860a381197b1) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
@@ -927,7 +927,7 @@ ROM_START( ttfitter ) /* originally dumped with "roundup.uxx" labels - changed t
 	ROM_LOAD( "ttfitter.u8",  0x1000, 0x0800, CRC(a8256dfe) SHA1(b3dfb915ba4367c8c73a8cc6fb02d98ec148f5a1) )
 
 	ROM_REGION( 0x0020, "proms", 0 )
-	ROM_LOAD( "roundup.clr",  0x0000, 0x0020, CRC(a758b567) SHA1(d188c90dba10fe3abaae92488786b555b35218c5) ) // ttfitter.clr
+	ROM_LOAD( "ttfitter.clr", 0x0000, 0x0020, CRC(a758b567) SHA1(d188c90dba10fe3abaae92488786b555b35218c5) ) // dlsh
 
 ROM_END
 

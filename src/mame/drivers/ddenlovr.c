@@ -11479,22 +11479,22 @@ the second halves of 7408.13b, 7409.4b, 7410.3b and 7411.2b are identical
 
 ROM_START( funkyfig )
 	ROM_REGION( 0x90000 + 0x1000*8, "maincpu", 0 )  /* Z80 Code + space for banked RAM */
-	ROM_LOAD( "(__funkyfig)7403.3c",      0x00000, 0x80000, CRC(ad0f5e14) SHA1(82de58d7ba35266f2d96503d72487796a9693996) )
+	ROM_LOAD( "7403.3c",      0x00000, 0x80000, CRC(ad0f5e14) SHA1(82de58d7ba35266f2d96503d72487796a9693996) ) // sldh
 	ROM_RELOAD(               0x10000, 0x80000 )
 
 	ROM_REGION( 0x20000, "soundcpu", 0 )    /* Z80 Code */
 	ROM_LOAD( "7401.1h",      0x00000, 0x20000, CRC(0f47d785) SHA1(d57733db6dcfb4c2cdaad04b5d3f0f569a0e7461) )  // 1xxxxxxxxxxxxxxxx = 0xFF
 
 	ROM_REGION( 0x500000, "blitter", ROMREGION_ERASE00 )    /* blitter data */
-	// the rom naming / sizes in this set are strange and don't match up with test mode properly!
-	ROM_LOAD( "(__funkyfig)7404.8b",      0x000000, 0x080000, CRC(aa4ddf32) SHA1(864890795a238ab34a85ca55a387d7e5efafccee) )            // \             \-- tested as 7404
-	ROM_LOAD( "(__funkyfig)7405.9b",      0x080000, 0x080000, CRC(fc125bd8) SHA1(150578f67d89be59eeeb811c159a789e5e9c993e) )            // /             /
-	ROM_LOAD( "(__funkyfig)7406.10b",     0x100000, 0x080000, CRC(04a214b1) SHA1(af3e652377f5652377c7dedfad7c2677695eaf46) )            // \             \-- tested as 7405
-	ROM_LOAD( "(__funkyfig)7407.11b",     0x180000, 0x080000, CRC(7c794189) SHA1(641bc5b51e53315d730a56feccaf75b75a8020dd) )            // /             /
-	ROM_LOAD( "(__funkyfig)7409.4b",      0x200000, 0x100000, CRC(064082c3) SHA1(26b0eec56b06365740b213b34e33a4b94ebc1d25) )            // \             \-- tested as 7406
-	ROM_LOAD( "(__funkyfig)7410.3b",      0x280000, 0x100000, CRC(0ba67874) SHA1(3d984c77a843501e1075cadcc27820a35410ea3b) )            // /             /
-	ROM_LOAD( "(__funkyfig)7408.13b",     0x300000, 0x100000, CRC(9efe4c60) SHA1(6462dca2af38517639bd2f182e68b7b1fc98a312) )            //                --- tested as 7407
-	ROM_LOAD( "(__funkyfig)7411.2b",      0x400000, 0x100000, CRC(1e9c73dc) SHA1(ba64de6168dc626dc89d38b3f9d8991163f5e63e) )            //                --- tested as 7408 (first half only)
+	// sldh - the rom naming / sizes in this set are strange and don't match up with test mode properly!
+	ROM_LOAD( "7404.8b",      0x000000, 0x080000, CRC(aa4ddf32) SHA1(864890795a238ab34a85ca55a387d7e5efafccee) ) // \             \-- tested as 7404
+	ROM_LOAD( "7405.9b",      0x080000, 0x080000, CRC(fc125bd8) SHA1(150578f67d89be59eeeb811c159a789e5e9c993e) ) // /             /
+	ROM_LOAD( "7406.10b",     0x100000, 0x080000, CRC(04a214b1) SHA1(af3e652377f5652377c7dedfad7c2677695eaf46) ) // \             \-- tested as 7405
+	ROM_LOAD( "7407.11b",     0x180000, 0x080000, CRC(7c794189) SHA1(641bc5b51e53315d730a56feccaf75b75a8020dd) ) // /             /
+	ROM_LOAD( "7409.4b",      0x200000, 0x100000, CRC(064082c3) SHA1(26b0eec56b06365740b213b34e33a4b94ebc1d25) ) // \             \-- tested as 7406
+	ROM_LOAD( "7410.3b",      0x280000, 0x100000, CRC(0ba67874) SHA1(3d984c77a843501e1075cadcc27820a35410ea3b) ) // /             /
+	ROM_LOAD( "7408.13b",     0x300000, 0x100000, CRC(9efe4c60) SHA1(6462dca2af38517639bd2f182e68b7b1fc98a312) ) //                --- tested as 7407
+	ROM_LOAD( "7411.2b",      0x400000, 0x100000, CRC(1e9c73dc) SHA1(ba64de6168dc626dc89d38b3f9d8991163f5e63e) ) //                --- tested as 7408 (first half only)
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* Samples */
 	ROM_LOAD( "7402.1e",      0x000000, 0x040000, CRC(5038cc34) SHA1(65618b232a6592ad36f4abbaa40625c208a015fd) )

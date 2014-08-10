@@ -1848,7 +1848,7 @@ ROM_START( nstocker2 )
 	ROM_LOAD( "cd01.u4a",  0x20000, 0x4000, CRC(75e9b51a) SHA1(dbe575d37836245746ea85ffe85e8e6665ec37ea) )
 	ROM_LOAD( "cd23.u3a",  0x24000, 0x4000, CRC(0a32e0a5) SHA1(dedbe08aed483bae27e1a607334e24cdfcb2f851) )
 	ROM_LOAD( "cd45.u2a",  0x28000, 0x4000, CRC(9bb292fe) SHA1(6fc7abcc110c2cf7399d11a478cfdadb3439b6ab) )
-	ROM_LOAD( "cd6ef(__nstocker2).u1a", 0x2c000, 0x4000, CRC(c77d2302) SHA1(2b0956a7d6bdff5e4f77084149a9528fb07154dc) )
+	ROM_LOAD( "cd6ef.u1a", 0x2c000, 0x4000, CRC(c77d2302) SHA1(2b0956a7d6bdff5e4f77084149a9528fb07154dc) ) // sldh
 
 	SOUNDBOARD_ROMS
 
@@ -1915,16 +1915,16 @@ ROM_END
 
 ROM_START( spiker2 ) /* Spiker U.R. 5/5/86 */
 	ROM_REGION( 0x40000, "maincpu", 0 )     /* 64k for code for the first CPU, plus 128k of banked ROMs */
-	ROM_LOAD( "ab01(__050586).u8a",  0x10000, 0x4000, CRC(59025e39) SHA1(f0e3e45bb32cc6664831c4ef6b0cfabf3fc71f58) )
-	ROM_LOAD( "ab23(__050586).u7a",  0x14000, 0x4000, CRC(ffb23288) SHA1(3458e486794f6c936d15e837be0f419027b01311) )
-	ROM_LOAD( "cd6ef(__050586).u1a", 0x2c000, 0x4000, CRC(7f04774d) SHA1(c49ac3aa86425cdbab9877fc253999329bb99a49) )
+	ROM_LOAD( "ab01.u8a",  0x10000, 0x4000, CRC(59025e39) SHA1(f0e3e45bb32cc6664831c4ef6b0cfabf3fc71f58) ) // sldh
+	ROM_LOAD( "ab23.u7a",  0x14000, 0x4000, CRC(ffb23288) SHA1(3458e486794f6c936d15e837be0f419027b01311) ) // sldh
+	ROM_LOAD( "cd6ef.u1a", 0x2c000, 0x4000, CRC(7f04774d) SHA1(c49ac3aa86425cdbab9877fc253999329bb99a49) ) // sldh
 
 	SOUNDBOARD_ROMS
 
 	ROM_REGION( 0x10000, "gfx1", 0 )        /* up to 64k of sprites */
-	ROM_LOAD( "gr01(__050586).u4c", 0x00000, 0x4000, CRC(1228b7a3) SHA1(70a207714ba7bc4f4dbc492768480afa424b31c0) )
-	ROM_LOAD( "gr23.u3c",           0x04000, 0x4000, CRC(970c81f6) SHA1(f22189e172a795d115597feb48ccbc04be3859b9) )
-	ROM_LOAD( "gr45(__050586).u2c", 0x08000, 0x4000, CRC(bf2b413d) SHA1(f0f797853ac1b6e45ff606d7aa5c9350765efd48) )
+	ROM_LOAD( "gr01.u4c", 0x00000, 0x4000, CRC(1228b7a3) SHA1(70a207714ba7bc4f4dbc492768480afa424b31c0) ) // sldh
+	ROM_LOAD( "gr23.u3c", 0x04000, 0x4000, CRC(970c81f6) SHA1(f22189e172a795d115597feb48ccbc04be3859b9) )
+	ROM_LOAD( "gr45.u2c", 0x08000, 0x4000, CRC(bf2b413d) SHA1(f0f797853ac1b6e45ff606d7aa5c9350765efd48) ) // sldh
 
 	ROM_REGION( 0x00001, "cart_pals", 0) /* PAL's located on the cartridge */
 	ROM_LOAD( "pal16r8.u7c", 0x0000, 0x0001, NO_DUMP ) /* PAL16R8ANC */
@@ -1937,7 +1937,7 @@ ROM_START( spiker3 ) /* Spiker U.R. 6/9/86 */
 	ROM_REGION( 0x40000, "maincpu", 0 )     /* 64k for code for the first CPU, plus 128k of banked ROMs */
 	ROM_LOAD( "ab01.u8a",  0x10000, 0x4000, CRC(2d53d023) SHA1(01c1d2cd7d8be60c40527e9c1571b84388a39bd8) )
 	ROM_LOAD( "ab23.u7a",  0x14000, 0x4000, CRC(3be87edf) SHA1(0d4f1ff501d5d865abc3906f6b232ec04586d3dc) )
-	ROM_LOAD( "cd6ef(__060686).u1a", 0x2c000, 0x4000, CRC(5b5a6d86) SHA1(a173637991601adc87f0fc8fd1ee9102f5fb2b81) )
+	ROM_LOAD( "cd6ef.u1a", 0x2c000, 0x4000, CRC(5b5a6d86) SHA1(a173637991601adc87f0fc8fd1ee9102f5fb2b81) ) // sldh
 
 	SOUNDBOARD_ROMS
 

@@ -1585,44 +1585,44 @@ ROM_START( ppspeed )
 
 	/* Z8002 #1 memory/ROM data */
 	ROM_REGION( 0x10000, "sub", 0 )
-	ROM_LOAD16_BYTE( "tr1b.bin",    0x0001, 0x2000, CRC(127f0750) SHA1(97ae6c6f8086187c7cdb8bff5fec94914791890b) )
-	ROM_LOAD16_BYTE( "tr2b.bin",    0x0000, 0x2000, CRC(6bd4ff6b) SHA1(cf992de39a8cf7804961a8e6773fc4f7feb1878b) )
+	ROM_LOAD16_BYTE( "tr1b.bin",  0x0001, 0x2000, CRC(127f0750) SHA1(97ae6c6f8086187c7cdb8bff5fec94914791890b) )
+	ROM_LOAD16_BYTE( "tr2b.bin",  0x0000, 0x2000, CRC(6bd4ff6b) SHA1(cf992de39a8cf7804961a8e6773fc4f7feb1878b) )
 
 	/* Z8002 #2 memory/ROM data */
 	ROM_REGION( 0x10000, "sub2", 0 )
-	ROM_LOAD16_BYTE( "tr5b.bin",     0x0001, 0x2000, CRC(4e5f7b9c) SHA1(d26b1f24dd9ef00388987890bc5b95d4db403815) )
-	ROM_LOAD16_BYTE( "tr6b(__ppspeed).bin",  0x0000, 0x2000, CRC(b3641d0c) SHA1(38ce172b2e38895749cbd3cc1c0e2c0fe8be744a) )
+	ROM_LOAD16_BYTE( "tr5b.bin",  0x0001, 0x2000, CRC(4e5f7b9c) SHA1(d26b1f24dd9ef00388987890bc5b95d4db403815) )
+	ROM_LOAD16_BYTE( "tr6b.bin",  0x0000, 0x2000, CRC(b3641d0c) SHA1(38ce172b2e38895749cbd3cc1c0e2c0fe8be744a) ) // sldh
 
 	/* graphics data */
 	ROM_REGION( 0x01000, "gfx1", 0 )    /* 2bpp alpha layer */
-	ROM_LOAD( "tr28(__ppspeed).bin",   0x0000, 0x1000, CRC(cd80b4c3) SHA1(5f237c1e7eb94ecb2680270afdf31c8e111164c5) )
+	ROM_LOAD( "tr28.bin",     0x0000, 0x1000, CRC(cd80b4c3) SHA1(5f237c1e7eb94ecb2680270afdf31c8e111164c5) ) // sldh
 
 	ROM_REGION( 0x01000, "gfx2", 0 )    /* 2bpp view layer */
-	ROM_LOAD( "tr29.bin",      0x0000, 0x1000, CRC(c6e15c21) SHA1(e2a70b3f7ce51a003068eb75d9fe82548f0206d7) )
+	ROM_LOAD( "tr29.bin",     0x0000, 0x1000, CRC(c6e15c21) SHA1(e2a70b3f7ce51a003068eb75d9fe82548f0206d7) )
 
 	ROM_REGION( 0x04000, "gfx3", 0 )    /* 4bpp 16x16 sprites */
-	ROM_LOAD( "tr25.bin",      0x0000, 0x2000, CRC(f44d33c1) SHA1(e09bcc127e61b351e99c54bf0e3cbab8583949ec) )    /* 4bpp sm sprites, planes 0+1 */
-	ROM_LOAD( "tr26.bin",      0x2000, 0x2000, CRC(87e8482d) SHA1(3f1c7f0f9b27e8b61e62db55dd4332c75dc31558) )    /* 4bpp sm sprites, planes 2+3 */
+	ROM_LOAD( "tr25.bin",     0x0000, 0x2000, CRC(f44d33c1) SHA1(e09bcc127e61b351e99c54bf0e3cbab8583949ec) ) /* 4bpp sm sprites, planes 0+1 */
+	ROM_LOAD( "tr26.bin",     0x2000, 0x2000, CRC(87e8482d) SHA1(3f1c7f0f9b27e8b61e62db55dd4332c75dc31558) ) /* 4bpp sm sprites, planes 2+3 */
 
 	ROM_REGION( 0x10000, "gfx4", 0 )    /* 4bpp 32x32 sprites */
-	ROM_LOAD( "tr17.bin",      0x0000, 0x2000, CRC(613ab0df) SHA1(88aa4500275aae010fc9783c1d8d843feab89afa) )    /* 4bpp lg sprites, planes 0+1 */
-	ROM_LOAD( "tr19(__ppspeed).bin",   0x2000, 0x2000, CRC(1ea04ccd) SHA1(1cec1e4d0f47365245d92489f78d3edd4f23481f) )
-	ROM_LOAD( "tr21(__ppspeed).bin",   0x4000, 0x2000, CRC(bd7b4a62) SHA1(66175a9382f627053097f0bc9a3fd49a26f8ac8f) )
-	ROM_LOAD( "tr18.bin",      0x8000, 0x2000, CRC(5fd933e3) SHA1(5b27a8519234c935308f943cd58abc1efc463726) )    /* 4bpp lg sprites, planes 2+3 */
-	ROM_LOAD( "tr20(__ppspeed).bin",   0xa000, 0x2000, CRC(c572c6ed) SHA1(c2398a82a57be92a0bdc58330504e821878492ea) )
-	ROM_LOAD( "tr22(__ppspeed).bin",   0xc000, 0x2000, CRC(db1bcdd8) SHA1(ffd4edd8c02914a0a85cd7e39153c27d79526457) )
+	ROM_LOAD( "tr17.bin",     0x0000, 0x2000, CRC(613ab0df) SHA1(88aa4500275aae010fc9783c1d8d843feab89afa) ) /* 4bpp lg sprites, planes 0+1 */
+	ROM_LOAD( "tr19.bin",     0x2000, 0x2000, CRC(1ea04ccd) SHA1(1cec1e4d0f47365245d92489f78d3edd4f23481f) ) // sldh
+	ROM_LOAD( "tr21.bin",     0x4000, 0x2000, CRC(bd7b4a62) SHA1(66175a9382f627053097f0bc9a3fd49a26f8ac8f) ) // sldh
+	ROM_LOAD( "tr18.bin",     0x8000, 0x2000, CRC(5fd933e3) SHA1(5b27a8519234c935308f943cd58abc1efc463726) ) /* 4bpp lg sprites, planes 2+3 */
+	ROM_LOAD( "tr20.bin",     0xa000, 0x2000, CRC(c572c6ed) SHA1(c2398a82a57be92a0bdc58330504e821878492ea) ) // sldh
+	ROM_LOAD( "tr22.bin",     0xc000, 0x2000, CRC(db1bcdd8) SHA1(ffd4edd8c02914a0a85cd7e39153c27d79526457) ) // sldh
 
 	ROM_REGION( 0x5000, "gfx5", 0 )     /* road generation ROMs needed at runtime */
-	ROM_LOAD( "tr30.bin",     0x0000, 0x2000, CRC(ee6b3315) SHA1(9cc26c6d3604c0f60d716f86e67e9d9c0487f87d) )    /* road control */
-	ROM_LOAD( "tr31.bin",     0x2000, 0x2000, CRC(6d1e7042) SHA1(90113ff0c93ed86d95067290088705bb5e6608d1) )    /* road bits 1 */
-	ROM_LOAD( "tr32.bin",     0x4000, 0x1000, CRC(4e97f101) SHA1(f377d053821c74aee93ebcd30a4d43e6156f3cfe) )    /* road bits 2 */
+	ROM_LOAD( "tr30.bin",     0x0000, 0x2000, CRC(ee6b3315) SHA1(9cc26c6d3604c0f60d716f86e67e9d9c0487f87d) ) /* road control */
+	ROM_LOAD( "tr31.bin",     0x2000, 0x2000, CRC(6d1e7042) SHA1(90113ff0c93ed86d95067290088705bb5e6608d1) ) /* road bits 1 */
+	ROM_LOAD( "tr32.bin",     0x4000, 0x1000, CRC(4e97f101) SHA1(f377d053821c74aee93ebcd30a4d43e6156f3cfe) ) /* road bits 2 */
 
 	ROM_REGION( 0x1000, "gfx6", 0 )     /* sprite scaling */
-	ROM_LOAD( "tr27.bin",      0x0000, 0x1000, CRC(a61bff15) SHA1(f7a59970831cdaaa7bf59c2221a38e4746c54244) )    /* vertical scaling */
+	ROM_LOAD( "tr27.bin",     0x0000, 0x1000, CRC(a61bff15) SHA1(f7a59970831cdaaa7bf59c2221a38e4746c54244) ) /* vertical scaling */
 
 	ROM_REGION( 0x4000, "engine", 0 )
-	ROM_LOAD( "tr15.bin",      0x0000, 0x2000, CRC(b5ad4d5f) SHA1(c07e77a050200d6fe9952031f971ca35f4d15ff8) )    /* engine sound */
-	ROM_LOAD( "tr16.bin",      0x2000, 0x2000, CRC(8fdd2f6f) SHA1(3818dc94c60cd78c4212ab7a4367cf3d98166ee6) )    /* engine sound */
+	ROM_LOAD( "tr15.bin",     0x0000, 0x2000, CRC(b5ad4d5f) SHA1(c07e77a050200d6fe9952031f971ca35f4d15ff8) ) /* engine sound */
+	ROM_LOAD( "tr16.bin",     0x2000, 0x2000, CRC(8fdd2f6f) SHA1(3818dc94c60cd78c4212ab7a4367cf3d98166ee6) ) /* engine sound */
 
 
 	// nothing below was verified on this boardset, assumed to be the same
