@@ -120,7 +120,7 @@ private:
 	}
 
 #ifdef __GNUC__
-	void clear_internal(UINT32 start, UINT32 count, UINT8 data) { assert(__is_pod(_ElementType)); memset(&m_array[start], data, count * sizeof(*m_array)); }
+	void clear_internal(UINT32 start, UINT32 count, UINT8 data) { assert(__is_pod(_ElementType)); memset((void *)&m_array[start], data, count * sizeof(*m_array)); }
 #else
 	void clear_internal(UINT32 start, UINT32 count, UINT8 data) { memset(&m_array[start], data, count * sizeof(*m_array)); }
 #endif
