@@ -205,10 +205,10 @@ static void init_tmu_shared(tmu_shared_state *s);
 static void init_tmu(voodoo_state *v, tmu_state *t, voodoo_reg *reg, void *memory, int tmem);
 static void soft_reset(voodoo_state *v);
 static void recompute_video_memory(voodoo_state *v);
-static void check_stalled_cpu(voodoo_state *v, const attotime &current_time);
-static void flush_fifos(voodoo_state *v, const attotime &current_time);
+static void check_stalled_cpu(voodoo_state *v, attotime current_time);
+static void flush_fifos(voodoo_state *v, attotime current_time);
 static TIMER_CALLBACK( stall_cpu_callback );
-static void stall_cpu(voodoo_state *v, int state, const attotime &current_time);
+static void stall_cpu(voodoo_state *v, int state, attotime current_time);
 static TIMER_CALLBACK( vblank_callback );
 static INT32 register_w(voodoo_state *v, offs_t offset, UINT32 data);
 static INT32 lfb_w(voodoo_state *v, offs_t offset, UINT32 data, UINT32 mem_mask, int forcefront);
@@ -2108,7 +2108,7 @@ static TIMER_CALLBACK( stall_cpu_callback )
 }
 
 
-static void check_stalled_cpu(voodoo_state *v, const attotime &current_time)
+static void check_stalled_cpu(voodoo_state *v, attotime current_time)
 {
 	int resume = FALSE;
 
@@ -2162,7 +2162,7 @@ static void check_stalled_cpu(voodoo_state *v, const attotime &current_time)
 }
 
 
-static void stall_cpu(voodoo_state *v, int state, const attotime &current_time)
+static void stall_cpu(voodoo_state *v, int state, attotime current_time)
 {
 	/* sanity check */
 	if (!v->pci.op_pending) fatalerror("FIFOs not empty, no op pending!\n");
@@ -3421,7 +3421,7 @@ static INT32 texture_w(voodoo_state *v, offs_t offset, UINT32 data)
  *
  *************************************/
 
-static void flush_fifos(voodoo_state *v, const attotime &current_time)
+static void flush_fifos(voodoo_state *v, attotime current_time)
 {
 	static UINT8 in_flush;
 
