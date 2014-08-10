@@ -17,13 +17,14 @@ static const char *const genpin_sample_names[] =
 	"chime4",
 	"hole",
 	"knocker",
+	"sling",
 	"coinin",
 	0   /* end of array */
 };
 
 static const samples_interface genpin_samples_intf =
 {
-	4, // channels
+	6, // channels
 	genpin_sample_names
 };
 

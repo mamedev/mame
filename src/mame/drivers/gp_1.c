@@ -312,27 +312,29 @@ WRITE8_MEMBER( gp_1_state::porta_w )
 				m_samples->start(1, 1);
 				break;
 			case 0x16: // chime d
-				m_samples->start(0, 4);
+				m_samples->start(4, 4);
 				break;
 			case 0x17: // outhole
+				m_samples->start(5, 5);
+				break;
 			case 0x18: // r sling
 			case 0x19: // l sling
-				m_samples->start(0, 5);
+				m_samples->start(0, 7);
 				break;
-			case 0x1a: // c kickout
-				m_samples->start(0, 5);
+			case 0x1a: // C kickout
+				m_samples->start(5, 5);
 				break;
 			case 0x1b: // r bumper
 				m_samples->start(0, 0);
 				break;
-			case 0x1c: // a kickout
-				m_samples->start(0, 5);
+			case 0x1c: // B kickout
+				m_samples->start(5, 5);
 				break;
 			case 0x1d: // l bumper
 				m_samples->start(0, 0);
 				break;
-			case 0x1e: // a kickout
-				m_samples->start(0, 5);
+			case 0x1e: // A kickout
+				m_samples->start(5, 5);
 				break;
 			case 0x1f: // not used
 				break;
@@ -355,30 +357,33 @@ WRITE8_MEMBER( gp_1_state::porta_w )
 WRITE8_MEMBER( gp_1_state::portas_w )
 {
 	m_u14 = data >> 4;
-	if (m_u14 == 1) switch (data)
+	if (m_u14 == 1)
 	{
-		case 0x10: // chime c
-			m_sn->vco_voltage_w(0.45);
-			m_sn->enable_w(0);
-			data = 0x1f;
-			break;
-		case 0x11: // chime b
-			m_sn->vco_voltage_w(0.131);
-			m_sn->enable_w(0);
-			data = 0x1f;
-			break;
-		case 0x15: // chime a
-			m_sn->vco_voltage_w(0.07);
-			m_sn->enable_w(0);
-			data = 0x1f;
-			break;
-		case 0x16: // chime d
-			m_sn->vco_voltage_w(2.25);
-			m_sn->enable_w(0);
-			data = 0x1f;
-			break;
-		default:
-			m_sn->enable_w(1);
+		switch (data)
+		{
+			case 0x10: // chime c
+				m_sn->vco_voltage_w(0.45);
+				m_sn->enable_w(0);
+				data = 0x1f;
+				break;
+			case 0x11: // chime b
+				m_sn->vco_voltage_w(0.131);
+				m_sn->enable_w(0);
+				data = 0x1f;
+				break;
+			case 0x15: // chime a
+				m_sn->vco_voltage_w(0.07);
+				m_sn->enable_w(0);
+				data = 0x1f;
+				break;
+			case 0x16: // chime d
+				m_sn->vco_voltage_w(2.25);
+				m_sn->enable_w(0);
+				data = 0x1f;
+				break;
+			default:
+				m_sn->enable_w(1);
+		}
 	}
 
 	porta_w(space, offset, data);
