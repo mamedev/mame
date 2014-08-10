@@ -4,12 +4,13 @@
  *
  * Currently supported:
  * - Philips VY-0010 (Interface cartridge + 1 3.5" SS floppy drive)
+ * - Panasonic FS-FD1 - WD2793? - DSDD 3.5" Floppy drive + interface
+ * - Panasonic FS-FD1A - TC8566F - DSDD 3.5" Floppy drive with builtin interface
+ *                     - Rom label reads: "FDC BIOS V1.0 / COPYRIGHT MEI / 1987 DASFD1AA1"
  *
  * Not supported yet:
  * - Canon VF-100 - DSDD 3.5" Floppy drive + interface + 1 floppy disk containing MSX-DOS
- * - Panasonic FS-FD1 - TC8566AF? - DSDD 3.5" Floppy drive + interface
- * - Panasonic FS-FD1A - TC8566F - DSDD 3.5" Floppy drive with builtin interface
- *                     - Rom label reads: "FDC BIOS V1.0 / COPYRIGHT MEI / 1987 DASFD1AA1"
+ * - National FS-FD351 - MB8877A - DSDD 3.5" Floppy drive + interface
  * - Talent DPF-550/5 - WD1772 - DSDD 5.25" Floppy drive (360KB) plus interface (manufactured by Daewoo)
  *                    - Rom label markings: MSX DISK / DPF 555D
  *
@@ -31,7 +32,6 @@
  * - JVC HC-F303 - Floppy drive
  * - Mitsubishi ML-30FD - DSDD 3.5" Floppy drive
  * - Mitsubishi ML-30DC - Floppy interface
- * - National FS-FD351 - MB8877A - 3.5" Floppy drive + interface?
  * - Philips NMS-1200 - Floppy interface
  * - Philips NMS-9111 - 3.5" Floppy drive
  * - Philips NMS-9113 - 3.5" Floppy drive
@@ -104,9 +104,11 @@
 
 
 const device_type MSX_CART_VY0010 = &device_creator<msx_cart_vy0010>;
+const device_type MSX_CART_FSFD1 = &device_creator<msx_cart_fsfd1>;
+const device_type MSX_CART_FSFD1A = &device_creator<msx_cart_fsfd1a>;
 
 
-FLOPPY_FORMATS_MEMBER( msx_cart_vy0010::floppy_formats )
+FLOPPY_FORMATS_MEMBER( msx_cart_disk::floppy_formats )
 	FLOPPY_MSX_FORMAT
 FLOPPY_FORMATS_END
 
@@ -117,15 +119,60 @@ static SLOT_INTERFACE_START( msx_floppies )
 SLOT_INTERFACE_END
 
 
-msx_cart_vy0010::msx_cart_vy0010(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, MSX_CART_VY0010, "MSX Cartridge - VY0010", tag, owner, clock, "msx_cart_vy0010", __FILE__)
+msx_cart_disk::msx_cart_disk(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname)
+	: device_t(mconfig, type, name, tag, owner, clock, shortname, __FILE__)
 	, msx_cart_interface(mconfig, *this)
-	, m_fdc(*this, "fdc")
 	, m_floppy0(*this, "fdc:0")
 	, m_floppy1(*this, "fdc:1")
 	, m_floppy(NULL)
+{
+}
+
+
+msx_cart_disk_wd::msx_cart_disk_wd(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname)
+	: msx_cart_disk(mconfig, type, name, tag, owner, clock, shortname)
+	, m_fdc(*this, "fdc")
+{
+}
+
+
+msx_cart_disk_type1::msx_cart_disk_type1(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname)
+	: msx_cart_disk_wd(mconfig, type, name, tag, owner, clock, shortname)
 	, m_control(0)
 {
+}
+
+msx_cart_vy0010::msx_cart_vy0010(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: msx_cart_disk_type1(mconfig, MSX_CART_VY0010, "MSX Cartridge - VY0010", tag, owner, clock, "msx_cart_vy0010")
+{
+}
+
+
+msx_cart_fsfd1::msx_cart_fsfd1(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: msx_cart_disk_type1(mconfig, MSX_CART_FSFD1, "MSX Cartridge - FS-FD1", tag, owner, clock, "msx_cart_fsfd1")
+{
+}
+
+
+msx_cart_disk_tc8566::msx_cart_disk_tc8566(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname)
+	: msx_cart_disk(mconfig, type, name, tag, owner, clock, shortname)
+	, m_fdc(*this, "fdc")
+{
+}
+
+
+msx_cart_fsfd1a::msx_cart_fsfd1a(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: msx_cart_disk_tc8566(mconfig, MSX_CART_FSFD1A, "MSX Cartridge - FS-FD1A", tag, owner, clock, "msx_cart_fsfd1a")
+{
+}
+
+
+void msx_cart_disk::initialize_cartridge()
+{
+	if ( get_rom_size() != 0x4000 )
+	{
+		fatalerror("msx_cart_disk: Invalid ROM size\n");
+	}
 }
 
 
@@ -138,7 +185,7 @@ static MACHINE_CONFIG_FRAGMENT( vy0010 )
 	MCFG_WD_FDC_FORCE_READY
 
 	// Single sided 3.5" floppy drive
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", msx_floppies, "35ssdd", msx_cart_vy0010::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", msx_floppies, "35ssdd", msx_cart_disk::floppy_formats)
 
 	// Attach software lists
 	// We do not know in what kind of machine the user has inserted the floppy interface
@@ -155,16 +202,58 @@ machine_config_constructor msx_cart_vy0010::device_mconfig_additions() const
 }
 
 
-void msx_cart_vy0010::device_start()
+static MACHINE_CONFIG_FRAGMENT( fsfd1 )
+	MCFG_WD2793x_ADD("fdc", XTAL_4MHz / 4)
+
+	// Double sided 3.5" floppy drive
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", msx_floppies, "35dd", msx_cart_disk::floppy_formats)
+
+	// Attach software lists
+	// We do not know in what kind of machine the user has inserted the floppy interface
+	// so we list all msx floppy software lists.
+	//
+	MCFG_SOFTWARE_LIST_ADD("flop_list","msx2_flop")
+	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("msx1_flop_list","msx1_flop")
+MACHINE_CONFIG_END
+
+
+machine_config_constructor msx_cart_fsfd1::device_mconfig_additions() const
+{
+	return MACHINE_CONFIG_NAME( fsfd1 );
+}
+
+
+static MACHINE_CONFIG_FRAGMENT( fsfd1a )
+	MCFG_TC8566AF_ADD("fdc")
+
+	// Double sided 3.5" floppy drive
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", msx_floppies, "35dd", msx_cart_disk::floppy_formats)
+
+	// Attach software lists
+	// We do not know in what kind of machine the user has inserted the floppy interface
+	// so we list all msx floppy software lists.
+	//
+	MCFG_SOFTWARE_LIST_ADD("flop_list","msx2_flop")
+	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("msx1_flop_list","msx1_flop")
+MACHINE_CONFIG_END
+
+
+machine_config_constructor msx_cart_fsfd1a::device_mconfig_additions() const
+{
+	return MACHINE_CONFIG_NAME( fsfd1a );
+}
+
+
+void msx_cart_disk_type1::device_start()
 {
 	save_item(NAME(m_side_control));
 	save_item(NAME(m_control));
 
-	machine().save().register_postload(save_prepost_delegate(FUNC(msx_cart_vy0010::post_load), this));
+	machine().save().register_postload(save_prepost_delegate(FUNC(msx_cart_disk_type1::post_load), this));
 }
 
 
-void msx_cart_vy0010::post_load()
+void msx_cart_disk_type1::post_load()
 {
 	UINT8 data = m_control;
 
@@ -175,7 +264,7 @@ void msx_cart_vy0010::post_load()
 }
 
 
-void msx_cart_vy0010::set_control(UINT8 data)
+void msx_cart_disk_type1::set_control(UINT8 data)
 {
 	UINT8 old_m_control = m_control;
 
@@ -212,7 +301,7 @@ void msx_cart_vy0010::set_control(UINT8 data)
 }
 
 
-void msx_cart_vy0010::set_side_control(UINT8 data)
+void msx_cart_disk_type1::set_side_control(UINT8 data)
 {
 	m_side_control = data;
 
@@ -223,22 +312,13 @@ void msx_cart_vy0010::set_side_control(UINT8 data)
 }
 
 
-void msx_cart_vy0010::device_reset()
+void msx_cart_disk_type1::device_reset()
 {
 	m_fdc->dden_w(false);
 }
 
 
-void msx_cart_vy0010::initialize_cartridge()
-{
-	if ( get_rom_size() != 0x4000 )
-	{
-		fatalerror("vy0010: Invalid ROM size\n");
-	}
-}
-
-
-READ8_MEMBER(msx_cart_vy0010::read_cart)
+READ8_MEMBER(msx_cart_disk_type1::read_cart)
 {
 	switch (offset)
 	{
@@ -279,7 +359,7 @@ READ8_MEMBER(msx_cart_vy0010::read_cart)
 }
 
 
-WRITE8_MEMBER(msx_cart_vy0010::write_cart)
+WRITE8_MEMBER(msx_cart_disk_type1::write_cart)
 {
 	switch (offset)
 	{
@@ -314,9 +394,65 @@ WRITE8_MEMBER(msx_cart_vy0010::write_cart)
 			break;
 
 		default:
-			logerror("msx_cart_vy0010::write_cart: Unmapped write writing %02x to %04x\n", data, offset);
+			logerror("msx_cart_disk_type1::write_cart: Unmapped write writing %02x to %04x\n", data, offset);
 			break;
 	}
 }
 
+
+void msx_cart_fsfd1a::device_start()
+{
+}
+
+
+void msx_cart_fsfd1a::device_reset()
+{
+}
+
+
+READ8_MEMBER(msx_cart_fsfd1a::read_cart)
+{
+	switch (offset)
+	{
+		case 0x7ffa:
+		case 0xbffa:
+			return m_fdc->msr_r(space, 4);
+
+		case 0x7ffb:
+		case 0xbffb:
+			return m_fdc->fifo_r(space, 5);
+	}
+
+	if (offset >= 0x4000 && offset < 0x8000)
+	{
+		return get_rom_base()[offset & 0x3fff];
+	}
+	return 0xff;
+}
+
+
+WRITE8_MEMBER(msx_cart_fsfd1a::write_cart)
+{
+	switch (offset)
+	{
+		case 0x7ff8:
+		case 0xbff8:
+			m_fdc->dor_w(space, 2, data);
+			break;
+
+		case 0x7ff9:
+		case 0xbff9:
+			m_fdc->cr1_w(space, 3, data);
+			break;
+
+		case 0x7ffb:
+		case 0xbffb:
+			m_fdc->fifo_w(space, 5, data);
+			break;
+
+		default:
+			logerror("msx_cart_fsfd1a::write_cart: Unmapped write writing %02x to %04x\n", data, offset);
+			break;
+	}
+}
 

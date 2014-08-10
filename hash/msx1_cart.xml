@@ -17110,7 +17110,7 @@ legacy FM implementations cannot find it.
 	</software>
 
 	<software name="vy0010">
-		<description>Philips VY-0010 (Floppy controller + 3.5" SS floppy drive)</description>
+		<description>VY-0010 (Floppy controller + 3.5" SSDD floppy drive)</description>
 		<year>198?</year>
 		<publisher>Philips</publisher>
 		<part name="cart" interface="msx_cart">
@@ -17121,10 +17121,46 @@ legacy FM implementations cannot find it.
 				<rom name="27128q25-8.ic2" size="0x4000" crc="164f5a6d" sha1="8924e3e11eb1c8c1edcb7efa63c26d2bdc142473" status="baddump" offset="0" />
 			</dataarea>
 		</part>
-		<!-- The package came with a copy of msx-dos -->
+		<!-- The package came with a copy of MSX-DOS -->
 <!--
-		<part name="flop1" interface="35_disk">
+		<part name="flop1" interface="floppy_3_5">
 		</part>
+-->
+	</software>
+
+	<software name="fsfd1">
+		<description>FS-FD1 (Floppy controller + 3.5" DSDD floppy drive)</description>
+		<year>198?</year>
+		<publisher>Panasonic</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="disk_fsfd1" />
+			<dataarea name="rom" size="0x4000">
+				<!-- hashes not verified -->
+				<rom name="fs_fd1.rom" size="0x4000" crc="4c9b8214" sha1="8e3f6f08309f082a82be8298a66c9b90f2d34ad4" offset="0" />
+			</dataarea>
+		</part>
+<!--
+		The floppy drive was most likely bundled with a copy of MSX-DOS, but we are not 100% sure yet
+		<part name="flop1" interface="floppy_3_5">
+		</part>
+-->
+	</software>
+
+	<software name="fsfd1a">
+		<description>FS-FD1A (3.5" DSDD floppy drive with integrated controller)</description>
+		<year>198?</year>
+		<publisher>Panasonic</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="disk_fsfd1a" />
+			<dataarea name="rom" size="0x4000">
+				<!-- hashes not verified -->
+				<rom name="fs_fd1a.rom" size="0x4000" crc="4b673b29" sha1="74ead27eec8d876144c2a015c0260d6db2117d72" offset="0" />
+			</dataarea>
+		</part>
+<!--
+        The floppy drive was most likely bundled with a copy of MSX-DOS, but we are not 10% sure yet
+        <part name="flop1" interface="floppy_3_5">
+        </part>
 -->
 	</software>
 
