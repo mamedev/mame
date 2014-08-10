@@ -20,32 +20,21 @@
 #include "sound/msm5205.h"
 #include "includes/sf.h"
 
-READ16_MEMBER(sf_state::dummy_r)
+
+WRITE8_MEMBER(sf_state::sf_coin_w)
 {
-	return 0xffff;
+	coin_counter_w(machine(), 0,  data & 0x01);
+	coin_counter_w(machine(), 1,  data & 0x02);
+	coin_lockout_w(machine(), 0, ~data & 0x10);
+	coin_lockout_w(machine(), 1, ~data & 0x20);
+	coin_lockout_w(machine(), 2, ~data & 0x40); /* is there a third coin input? */
 }
 
 
-WRITE16_MEMBER(sf_state::sf_coin_w)
+WRITE8_MEMBER(sf_state::soundcmd_w)
 {
-	if (ACCESSING_BITS_0_7)
-	{
-		coin_counter_w(machine(), 0, data & 0x01);
-		coin_counter_w(machine(), 1,  data & 0x02);
-		coin_lockout_w(machine(), 0, ~data & 0x10);
-		coin_lockout_w(machine(), 1, ~data & 0x20);
-		coin_lockout_w(machine(), 2, ~data & 0x40); /* is there a third coin input? */
-	}
-}
-
-
-WRITE16_MEMBER(sf_state::soundcmd_w)
-{
-	if (ACCESSING_BITS_0_7)
-	{
-		soundlatch_byte_w(space, offset, data & 0xff);
-		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-	}
+	soundlatch_byte_w(space, offset, data & 0xff);
+	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
@@ -196,6 +185,7 @@ WRITE8_MEMBER(sf_state::msm2_5205_w)
 
 
 static ADDRESS_MAP_START( sf_map, AS_PROGRAM, 16, sf_state )
+	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x04ffff) AM_ROM
 	AM_RANGE(0x800000, 0x800fff) AM_RAM_WRITE(sf_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0xb00000, 0xb007ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
@@ -206,56 +196,58 @@ static ADDRESS_MAP_START( sf_map, AS_PROGRAM, 16, sf_state )
 	AM_RANGE(0xc00008, 0xc00009) AM_READ_PORT("DSW1")
 	AM_RANGE(0xc0000a, 0xc0000b) AM_READ_PORT("DSW2")
 	AM_RANGE(0xc0000c, 0xc0000d) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xc0000e, 0xc0000f) AM_READ(dummy_r)
-	AM_RANGE(0xc00010, 0xc00011) AM_WRITE(sf_coin_w)
+	AM_RANGE(0xc0000e, 0xc0000f) AM_READNOP
+	AM_RANGE(0xc00010, 0xc00011) AM_WRITE8(sf_coin_w, 0x00ff)
 	AM_RANGE(0xc00014, 0xc00015) AM_WRITE(sf_fg_scroll_w)
 	AM_RANGE(0xc00018, 0xc00019) AM_WRITE(sf_bg_scroll_w)
 	AM_RANGE(0xc0001a, 0xc0001b) AM_WRITE(sf_gfxctrl_w)
-	AM_RANGE(0xc0001c, 0xc0001d) AM_WRITE(soundcmd_w)
+	AM_RANGE(0xc0001c, 0xc0001d) AM_WRITE8(soundcmd_w, 0x00ff)
 //  AM_RANGE(0xc0001e, 0xc0001f) AM_WRITE(protection_w)
 	AM_RANGE(0xff8000, 0xffdfff) AM_RAM
 	AM_RANGE(0xffe000, 0xffffff) AM_RAM AM_SHARE("objectram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sfus_map, AS_PROGRAM, 16, sf_state )
+	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x04ffff) AM_ROM
 	AM_RANGE(0x800000, 0x800fff) AM_RAM_WRITE(sf_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0xb00000, 0xb007ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0xc00000, 0xc00001) AM_READ_PORT("IN0")
 	AM_RANGE(0xc00002, 0xc00003) AM_READ_PORT("IN1")
-	AM_RANGE(0xc00004, 0xc00005) AM_READ(dummy_r)
-	AM_RANGE(0xc00006, 0xc00007) AM_READ(dummy_r)
+	AM_RANGE(0xc00004, 0xc00005) AM_READNOP
+	AM_RANGE(0xc00006, 0xc00007) AM_READNOP
 	AM_RANGE(0xc00008, 0xc00009) AM_READ_PORT("DSW1")
 	AM_RANGE(0xc0000a, 0xc0000b) AM_READ_PORT("DSW2")
 	AM_RANGE(0xc0000c, 0xc0000d) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xc0000e, 0xc0000f) AM_READ(dummy_r)
-	AM_RANGE(0xc00010, 0xc00011) AM_WRITE(sf_coin_w)
+	AM_RANGE(0xc0000e, 0xc0000f) AM_READNOP
+	AM_RANGE(0xc00010, 0xc00011) AM_WRITE8(sf_coin_w, 0x00ff)
 	AM_RANGE(0xc00014, 0xc00015) AM_WRITE(sf_fg_scroll_w)
 	AM_RANGE(0xc00018, 0xc00019) AM_WRITE(sf_bg_scroll_w)
 	AM_RANGE(0xc0001a, 0xc0001b) AM_WRITE(sf_gfxctrl_w)
-	AM_RANGE(0xc0001c, 0xc0001d) AM_WRITE(soundcmd_w)
+	AM_RANGE(0xc0001c, 0xc0001d) AM_WRITE8(soundcmd_w, 0x00ff)
 //  AM_RANGE(0xc0001e, 0xc0001f) AM_WRITE(protection_w)
 	AM_RANGE(0xff8000, 0xffdfff) AM_RAM
 	AM_RANGE(0xffe000, 0xffffff) AM_RAM AM_SHARE("objectram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sfjp_map, AS_PROGRAM, 16, sf_state )
+	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x04ffff) AM_ROM
 	AM_RANGE(0x800000, 0x800fff) AM_RAM_WRITE(sf_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0xb00000, 0xb007ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0xc00000, 0xc00001) AM_READ_PORT("COINS")
 	AM_RANGE(0xc00002, 0xc00003) AM_READ_PORT("P1")
 	AM_RANGE(0xc00004, 0xc00005) AM_READ_PORT("P2")
-	AM_RANGE(0xc00006, 0xc00007) AM_READ(dummy_r)
+	AM_RANGE(0xc00006, 0xc00007) AM_READNOP
 	AM_RANGE(0xc00008, 0xc00009) AM_READ_PORT("DSW1")
 	AM_RANGE(0xc0000a, 0xc0000b) AM_READ_PORT("DSW2")
 	AM_RANGE(0xc0000c, 0xc0000d) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xc0000e, 0xc0000f) AM_READ(dummy_r)
-	AM_RANGE(0xc00010, 0xc00011) AM_WRITE(sf_coin_w)
+	AM_RANGE(0xc0000e, 0xc0000f) AM_READNOP
+	AM_RANGE(0xc00010, 0xc00011) AM_WRITE8(sf_coin_w, 0x00ff)
 	AM_RANGE(0xc00014, 0xc00015) AM_WRITE(sf_fg_scroll_w)
 	AM_RANGE(0xc00018, 0xc00019) AM_WRITE(sf_bg_scroll_w)
 	AM_RANGE(0xc0001a, 0xc0001b) AM_WRITE(sf_gfxctrl_w)
-	AM_RANGE(0xc0001c, 0xc0001d) AM_WRITE(soundcmd_w)
+	AM_RANGE(0xc0001c, 0xc0001d) AM_WRITE8(soundcmd_w, 0x00ff)
 	AM_RANGE(0xc0001e, 0xc0001f) AM_WRITE(protection_w)
 	AM_RANGE(0xff8000, 0xffdfff) AM_RAM
 	AM_RANGE(0xffe000, 0xffffff) AM_RAM AM_SHARE("objectram")
@@ -794,8 +786,6 @@ GFXDECODE_END
 
 void sf_state::machine_start()
 {
-	/* devices */
-
 	save_item(NAME(m_sf_active));
 	save_item(NAME(m_bgscroll));
 	save_item(NAME(m_fgscroll));
@@ -811,19 +801,17 @@ void sf_state::machine_reset()
 static MACHINE_CONFIG_START( sf, sf_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 8000000)    /* 8 MHz ? (xtal is 16MHz) */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_8MHz)
 	MCFG_CPU_PROGRAM_MAP(sf_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", sf_state,  irq1_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", sf_state, irq1_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 3579545)  /* ? xtal is 3.579545MHz */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz)  /* ? xtal is 3.579545MHz */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
-								/* NMIs are caused by the main CPU */
 
-
-	MCFG_CPU_ADD("audio2", Z80, 3579545)    /* ? xtal is 3.579545MHz */
+	MCFG_CPU_ADD("audio2", Z80, XTAL_3_579545MHz)    /* ? xtal is 3.579545MHz */
 	MCFG_CPU_PROGRAM_MAP(sound2_map)
 	MCFG_CPU_IO_MAP(sound2_io_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(sf_state, irq0_line_hold, 8000)
+	MCFG_CPU_PERIODIC_INT_DRIVER(sf_state, irq0_line_hold, 8000) // ?
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -842,7 +830,7 @@ static MACHINE_CONFIG_START( sf, sf_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_YM2151_ADD("ymsnd", 3579545)
+	MCFG_YM2151_ADD("ymsnd", XTAL_3_579545MHz)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.60)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.60)
@@ -879,7 +867,7 @@ static MACHINE_CONFIG_DERIVED( sfp, sf )
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", sf_state,  irq6_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", sf_state, irq6_line_hold)
 MACHINE_CONFIG_END
 
 
@@ -906,7 +894,7 @@ ROM_START( sf )
 	ROM_LOAD( "sf-40.bin", 0x060000, 0x020000, CRC(c70b30de) SHA1(26112ee1720b6ad0e2e29e2d25ee2ec76fca0e3a) )
 
 	ROM_REGION( 0x100000, "gfx2", 0 )
-	ROM_LOAD( "sf-25.bin", 0x000000, 0x020000, CRC(7f23042e) SHA1(a355fd7047fb1a71ab5cd08e1afd82c2558494c1) )   /* Background m planes 0-1 */
+	ROM_LOAD( "sf-25.bin", 0x000000, 0x020000, CRC(7f23042e) SHA1(a355fd7047fb1a71ab5cd08e1afd82c2558494c1) ) /* Background m planes 0-1 */
 	ROM_LOAD( "sf-28.bin", 0x020000, 0x020000, CRC(92f8b91c) SHA1(6d958bc45131810d7b0af02be939ce37a39c35e8) )
 	ROM_LOAD( "sf-30.bin", 0x040000, 0x020000, CRC(b1399856) SHA1(7c956d49b2e73291182ea1ec4cebd3411d1322a1) )
 	ROM_LOAD( "sf-34.bin", 0x060000, 0x020000, CRC(96b6ae2e) SHA1(700e050463b7a29a1eb08007a2add045afdcd8a0) )
@@ -943,10 +931,10 @@ ROM_START( sf )
 	ROM_LOAD( "sf-33.bin", 0x030000, 0x010000, CRC(3e99d3d5) SHA1(9168a977e80f8c23c6126b9e64eb176290cf941a) )
 
 	ROM_REGION( 0x0320, "proms", 0 )
-	ROM_LOAD( "sfb05(__sf).mb7114h.12k",  0x0000, 0x0100, CRC(75af3553) SHA1(14da009592877a6097b34ea844fa897ceda7465e) )    /* MB7114H */
-	ROM_LOAD( "sfb10(__sf).mb7114h.11h",  0x0100, 0x0100, CRC(c0e56586) SHA1(2abf93aef48af34f869b30f63c130513a97f86a3) )    /* MB7114H */
-	ROM_LOAD( "sfb04(__sf).mb7114h.12j",  0x0200, 0x0100, CRC(4c734b64) SHA1(7a122b643bad3e3586821980efff023a63e5a029) )    /* MB7114H */
-	ROM_LOAD( "sfb00(__sf).mb7051.13h", 0x0300, 0x0020, CRC(06bcda53) SHA1(fa69b77697bb12aa6012d82ef5b504d3a1d20232) )    /* MMI-7603 or MB7051 (equiv to 82s123 32x8 TS) */
+	ROM_LOAD( "sfb05.mb7114h.12k", 0x0000, 0x0100, CRC(75af3553) SHA1(14da009592877a6097b34ea844fa897ceda7465e) ) /* MB7114H */
+	ROM_LOAD( "sfb10.mb7114h.11h", 0x0100, 0x0100, CRC(c0e56586) SHA1(2abf93aef48af34f869b30f63c130513a97f86a3) ) /* MB7114H */
+	ROM_LOAD( "sfb04.mb7114h.12j", 0x0200, 0x0100, CRC(4c734b64) SHA1(7a122b643bad3e3586821980efff023a63e5a029) ) /* MB7114H */
+	ROM_LOAD( "sfb00.mb7051.13h",  0x0300, 0x0020, CRC(06bcda53) SHA1(fa69b77697bb12aa6012d82ef5b504d3a1d20232) ) /* MMI-7603 or MB7051 (equiv to 82s123 32x8 TS) */
 ROM_END
 
 ROM_START( sfu )
@@ -972,7 +960,7 @@ ROM_START( sfu )
 	ROM_LOAD( "sf-40.bin", 0x060000, 0x020000, CRC(c70b30de) SHA1(26112ee1720b6ad0e2e29e2d25ee2ec76fca0e3a) )
 
 	ROM_REGION( 0x100000, "gfx2", 0 )
-	ROM_LOAD( "sf-25.bin", 0x000000, 0x020000, CRC(7f23042e) SHA1(a355fd7047fb1a71ab5cd08e1afd82c2558494c1) )   /* Background m planes 0-1 */
+	ROM_LOAD( "sf-25.bin", 0x000000, 0x020000, CRC(7f23042e) SHA1(a355fd7047fb1a71ab5cd08e1afd82c2558494c1) ) /* Background m planes 0-1 */
 	ROM_LOAD( "sf-28.bin", 0x020000, 0x020000, CRC(92f8b91c) SHA1(6d958bc45131810d7b0af02be939ce37a39c35e8) )
 	ROM_LOAD( "sf-30.bin", 0x040000, 0x020000, CRC(b1399856) SHA1(7c956d49b2e73291182ea1ec4cebd3411d1322a1) )
 	ROM_LOAD( "sf-34.bin", 0x060000, 0x020000, CRC(96b6ae2e) SHA1(700e050463b7a29a1eb08007a2add045afdcd8a0) )
@@ -1009,10 +997,10 @@ ROM_START( sfu )
 	ROM_LOAD( "sf-33.bin", 0x030000, 0x010000, CRC(3e99d3d5) SHA1(9168a977e80f8c23c6126b9e64eb176290cf941a) )
 
 	ROM_REGION( 0x0320, "proms", 0 )
-	ROM_LOAD( "mb7114h.12k",  0x0000, 0x0100, CRC(75af3553) SHA1(14da009592877a6097b34ea844fa897ceda7465e) )    /* unknown */
-	ROM_LOAD( "mb7114h.11h",  0x0100, 0x0100, CRC(c0e56586) SHA1(2abf93aef48af34f869b30f63c130513a97f86a3) )    /* unknown */
-	ROM_LOAD( "mb7114h.12j",  0x0200, 0x0100, CRC(4c734b64) SHA1(7a122b643bad3e3586821980efff023a63e5a029) )    /* unknown */
-	ROM_LOAD( "mmi-7603.13h", 0x0300, 0x0020, CRC(06bcda53) SHA1(fa69b77697bb12aa6012d82ef5b504d3a1d20232) )    /* unknown */
+	ROM_LOAD( "mb7114h.12k",  0x0000, 0x0100, CRC(75af3553) SHA1(14da009592877a6097b34ea844fa897ceda7465e) ) /* unknown */
+	ROM_LOAD( "mb7114h.11h",  0x0100, 0x0100, CRC(c0e56586) SHA1(2abf93aef48af34f869b30f63c130513a97f86a3) ) /* unknown */
+	ROM_LOAD( "mb7114h.12j",  0x0200, 0x0100, CRC(4c734b64) SHA1(7a122b643bad3e3586821980efff023a63e5a029) ) /* unknown */
+	ROM_LOAD( "mmi-7603.13h", 0x0300, 0x0020, CRC(06bcda53) SHA1(fa69b77697bb12aa6012d82ef5b504d3a1d20232) ) /* unknown */
 ROM_END
 
 
@@ -1042,7 +1030,7 @@ ROM_START( sfua )
 	ROM_LOAD( "sf-40.bin", 0x060000, 0x020000, CRC(c70b30de) SHA1(26112ee1720b6ad0e2e29e2d25ee2ec76fca0e3a) )
 
 	ROM_REGION( 0x100000, "gfx2", 0 )
-	ROM_LOAD( "sf-25.bin", 0x000000, 0x020000, CRC(7f23042e) SHA1(a355fd7047fb1a71ab5cd08e1afd82c2558494c1) )   /* Background m planes 0-1 */
+	ROM_LOAD( "sf-25.bin", 0x000000, 0x020000, CRC(7f23042e) SHA1(a355fd7047fb1a71ab5cd08e1afd82c2558494c1) ) /* Background m planes 0-1 */
 	ROM_LOAD( "sf-28.bin", 0x020000, 0x020000, CRC(92f8b91c) SHA1(6d958bc45131810d7b0af02be939ce37a39c35e8) )
 	ROM_LOAD( "sf-30.bin", 0x040000, 0x020000, CRC(b1399856) SHA1(7c956d49b2e73291182ea1ec4cebd3411d1322a1) )
 	ROM_LOAD( "sf-34.bin", 0x060000, 0x020000, CRC(96b6ae2e) SHA1(700e050463b7a29a1eb08007a2add045afdcd8a0) )
@@ -1079,10 +1067,10 @@ ROM_START( sfua )
 	ROM_LOAD( "sf-33.bin", 0x030000, 0x010000, CRC(3e99d3d5) SHA1(9168a977e80f8c23c6126b9e64eb176290cf941a) )
 
 	ROM_REGION( 0x0320, "proms", 0 )
-	ROM_LOAD( "sfb05.bin",    0x0000, 0x0100, CRC(864199ad) SHA1(b777df20b19fa7b7536120191df1875101e9d7af) )    /* unknown */
-	ROM_LOAD( "sfb00.bin",    0x0100, 0x0100, CRC(bd3f8c5d) SHA1(c31ee9f466f05a21612f5ea29fb8c7c25dc9e011) )    /* unknown */
-	ROM_LOAD( "mb7114h.12j",  0x0200, 0x0100, CRC(4c734b64) SHA1(7a122b643bad3e3586821980efff023a63e5a029) )    /* unknown */
-	ROM_LOAD( "mmi-7603.13h", 0x0300, 0x0020, CRC(06bcda53) SHA1(fa69b77697bb12aa6012d82ef5b504d3a1d20232) )    /* unknown */
+	ROM_LOAD( "sfb05.bin",    0x0000, 0x0100, CRC(864199ad) SHA1(b777df20b19fa7b7536120191df1875101e9d7af) ) /* unknown */
+	ROM_LOAD( "sfb00.bin",    0x0100, 0x0100, CRC(bd3f8c5d) SHA1(c31ee9f466f05a21612f5ea29fb8c7c25dc9e011) ) /* unknown */
+	ROM_LOAD( "mb7114h.12j",  0x0200, 0x0100, CRC(4c734b64) SHA1(7a122b643bad3e3586821980efff023a63e5a029) ) /* unknown */
+	ROM_LOAD( "mmi-7603.13h", 0x0300, 0x0020, CRC(06bcda53) SHA1(fa69b77697bb12aa6012d82ef5b504d3a1d20232) ) /* unknown */
 ROM_END
 
 
@@ -1112,7 +1100,7 @@ ROM_START( sfj )
 	ROM_LOAD( "sf-40.bin", 0x060000, 0x020000, CRC(c70b30de) SHA1(26112ee1720b6ad0e2e29e2d25ee2ec76fca0e3a) )
 
 	ROM_REGION( 0x100000, "gfx2", 0 )
-	ROM_LOAD( "sf-25.bin", 0x000000, 0x020000, CRC(7f23042e) SHA1(a355fd7047fb1a71ab5cd08e1afd82c2558494c1) )   /* Background m planes 0-1 */
+	ROM_LOAD( "sf-25.bin", 0x000000, 0x020000, CRC(7f23042e) SHA1(a355fd7047fb1a71ab5cd08e1afd82c2558494c1) ) /* Background m planes 0-1 */
 	ROM_LOAD( "sf-28.bin", 0x020000, 0x020000, CRC(92f8b91c) SHA1(6d958bc45131810d7b0af02be939ce37a39c35e8) )
 	ROM_LOAD( "sf-30.bin", 0x040000, 0x020000, CRC(b1399856) SHA1(7c956d49b2e73291182ea1ec4cebd3411d1322a1) )
 	ROM_LOAD( "sf-34.bin", 0x060000, 0x020000, CRC(96b6ae2e) SHA1(700e050463b7a29a1eb08007a2add045afdcd8a0) )
@@ -1149,10 +1137,10 @@ ROM_START( sfj )
 	ROM_LOAD( "sf-33.bin", 0x030000, 0x010000, CRC(3e99d3d5) SHA1(9168a977e80f8c23c6126b9e64eb176290cf941a) )
 
 	ROM_REGION( 0x0320, "proms", 0 )
-	ROM_LOAD( "sfb05.bin",    0x0000, 0x0100, CRC(864199ad) SHA1(b777df20b19fa7b7536120191df1875101e9d7af) )    /* unknown */
-	ROM_LOAD( "sfb00.bin",    0x0100, 0x0100, CRC(bd3f8c5d) SHA1(c31ee9f466f05a21612f5ea29fb8c7c25dc9e011) )    /* unknown */
-	ROM_LOAD( "mb7114h.12j",  0x0200, 0x0100, CRC(4c734b64) SHA1(7a122b643bad3e3586821980efff023a63e5a029) )    /* unknown */
-	ROM_LOAD( "mmi-7603.13h", 0x0300, 0x0020, CRC(06bcda53) SHA1(fa69b77697bb12aa6012d82ef5b504d3a1d20232) )    /* unknown */
+	ROM_LOAD( "sfb05.bin",    0x0000, 0x0100, CRC(864199ad) SHA1(b777df20b19fa7b7536120191df1875101e9d7af) ) /* unknown */
+	ROM_LOAD( "sfb00.bin",    0x0100, 0x0100, CRC(bd3f8c5d) SHA1(c31ee9f466f05a21612f5ea29fb8c7c25dc9e011) ) /* unknown */
+	ROM_LOAD( "mb7114h.12j",  0x0200, 0x0100, CRC(4c734b64) SHA1(7a122b643bad3e3586821980efff023a63e5a029) ) /* unknown */
+	ROM_LOAD( "mmi-7603.13h", 0x0300, 0x0020, CRC(06bcda53) SHA1(fa69b77697bb12aa6012d82ef5b504d3a1d20232) ) /* unknown */
 ROM_END
 
 
@@ -1214,16 +1202,16 @@ ROM_START( sfp )
 	ROM_LOAD( "ms1j18.5g",  0x030000, 0x010000, CRC(89e35dc1) SHA1(368d0cce3bc39b3762d79df0c023242018fbbcb8) )
 
 	ROM_REGION( 0x0320, "proms", 0 )
-	ROM_LOAD( "sfb05.bin",    0x0000, 0x0100, CRC(864199ad) SHA1(b777df20b19fa7b7536120191df1875101e9d7af) )    /* unknown */
-	ROM_LOAD( "sfb00.bin",    0x0100, 0x0100, CRC(bd3f8c5d) SHA1(c31ee9f466f05a21612f5ea29fb8c7c25dc9e011) )    /* unknown */
-	ROM_LOAD( "mb7114h.12j",  0x0200, 0x0100, CRC(4c734b64) SHA1(7a122b643bad3e3586821980efff023a63e5a029) )    /* unknown */
-	ROM_LOAD( "mmi-7603.13h", 0x0300, 0x0020, CRC(06bcda53) SHA1(fa69b77697bb12aa6012d82ef5b504d3a1d20232) )    /* unknown */
+	ROM_LOAD( "sfb05.bin",    0x0000, 0x0100, CRC(864199ad) SHA1(b777df20b19fa7b7536120191df1875101e9d7af) ) /* unknown */
+	ROM_LOAD( "sfb00.bin",    0x0100, 0x0100, CRC(bd3f8c5d) SHA1(c31ee9f466f05a21612f5ea29fb8c7c25dc9e011) ) /* unknown */
+	ROM_LOAD( "mb7114h.12j",  0x0200, 0x0100, CRC(4c734b64) SHA1(7a122b643bad3e3586821980efff023a63e5a029) ) /* unknown */
+	ROM_LOAD( "mmi-7603.13h", 0x0300, 0x0020, CRC(06bcda53) SHA1(fa69b77697bb12aa6012d82ef5b504d3a1d20232) ) /* unknown */
 ROM_END
 
 
 
-GAME( 1987, sf,   0,  sf,   sf, driver_device,   0, ROT0, "Capcom", "Street Fighter (World, Analog buttons)", GAME_SUPPORTS_SAVE )
+GAME( 1987, sf,   0,  sf,   sf,   driver_device, 0, ROT0, "Capcom", "Street Fighter (World, Analog buttons)", GAME_SUPPORTS_SAVE )
 GAME( 1987, sfu,  sf, sfus, sfus, driver_device, 0, ROT0, "Capcom", "Street Fighter (US, set 1)", GAME_SUPPORTS_SAVE ) // Shows Capcom copyright
 GAME( 1987, sfua, sf, sfjp, sfjp, driver_device, 0, ROT0, "Capcom", "Street Fighter (US, set 2) (protected)", GAME_SUPPORTS_SAVE ) // Shows Capcom USA copyright
 GAME( 1987, sfj,  sf, sfjp, sfjp, driver_device, 0, ROT0, "Capcom", "Street Fighter (Japan) (protected)", GAME_SUPPORTS_SAVE )
-GAME( 1987, sfp,  sf, sfp,  sf, driver_device,   0, ROT0, "Capcom", "Street Fighter (prototype)", GAME_SUPPORTS_SAVE )
+GAME( 1987, sfp,  sf, sfp,  sf,   driver_device, 0, ROT0, "Capcom", "Street Fighter (prototype)", GAME_SUPPORTS_SAVE )

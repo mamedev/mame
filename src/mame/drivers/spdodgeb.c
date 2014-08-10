@@ -1,6 +1,6 @@
 /***************************************************************************
 
-Super Dodgeball / Nekketsu Koukou Dodgeball Bu
+Super Dodge Ball / Nekketsu Koukou Dodgeball Bu
 
 briver by Paul Hampson and Nicola Salmoria
 
@@ -238,22 +238,12 @@ WRITE8_MEMBER(spdodgeb_state::mcu63701_w)
 }
 
 
-READ8_MEMBER(spdodgeb_state::port_0_r)
-{
-	int port = ioport("IN0")->read();
-
-	m_toggle^=0x02; /* mcu63701_busy flag */
-
-	return (port | m_toggle);
-}
-
-
 
 static ADDRESS_MAP_START( spdodgeb_map, AS_PROGRAM, 8, spdodgeb_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
 	AM_RANGE(0x1000, 0x10ff) AM_WRITEONLY AM_SHARE("spriteram")
 	AM_RANGE(0x2000, 0x2fff) AM_RAM_WRITE(spdodgeb_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x3000, 0x3000) AM_READ(port_0_r) //AM_WRITENOP
+	AM_RANGE(0x3000, 0x3000) AM_READ_PORT("IN0") //AM_WRITENOP
 	AM_RANGE(0x3001, 0x3001) AM_READ_PORT("DSW") //AM_WRITENOP
 	AM_RANGE(0x3002, 0x3002) AM_WRITE(sound_command_w)
 //  AM_RANGE(0x3003, 0x3003) AM_WRITENOP
@@ -275,10 +265,16 @@ static ADDRESS_MAP_START( spdodgeb_sound_map, AS_PROGRAM, 8, spdodgeb_state )
 ADDRESS_MAP_END
 
 
+CUSTOM_INPUT_MEMBER(spdodgeb_state::mcu63705_busy_r)
+{
+	m_toggle ^= 0x01;
+	return m_toggle;
+}
+
 static INPUT_PORTS_START( spdodgeb )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SPECIAL )   /* mcu63701_busy flag */
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, spdodgeb_state, mcu63705_busy_r, NULL) /* mcu63701_busy flag */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -404,16 +400,16 @@ void spdodgeb_state::machine_reset()
 static MACHINE_CONFIG_START( spdodgeb, spdodgeb_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502,12000000/6)   /* 2MHz ? */
+	MCFG_CPU_ADD("maincpu", M6502, XTAL_12MHz/6)   /* 2MHz ? */
 	MCFG_CPU_PROGRAM_MAP(spdodgeb_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", spdodgeb_state, spdodgeb_interrupt, "screen", 0, 1) /* 1 IRQ every 8 visible scanlines, plus NMI for vblank */
 
-	MCFG_CPU_ADD("audiocpu", M6809,12000000/6)  /* 2MHz ? */
+	MCFG_CPU_ADD("audiocpu", M6809, XTAL_12MHz/6)  /* 2MHz ? */
 	MCFG_CPU_PROGRAM_MAP(spdodgeb_sound_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(12000000/2, 384, 0, 256, 272, 0, 240)
+	MCFG_SCREEN_RAW_PARAMS(XTAL_12MHz/2, 384, 0, 256, 272, 0, 240)
 	MCFG_SCREEN_UPDATE_DRIVER(spdodgeb_state, screen_update_spdodgeb)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -421,11 +417,10 @@ static MACHINE_CONFIG_START( spdodgeb, spdodgeb_state )
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_INIT_OWNER(spdodgeb_state, spdodgeb)
 
-
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, 3000000)
+	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_12MHz/4)
 	MCFG_YM3812_IRQ_HANDLER(WRITELINE(spdodgeb_state, irqhandler))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)

@@ -1,3 +1,9 @@
+/*************************************************************************
+
+    Super Dodge Ball hardware
+
+*************************************************************************/
+
 #include "sound/msm5205.h"
 
 class spdodgeb_state : public driver_device
@@ -45,7 +51,6 @@ public:
 	DECLARE_WRITE8_MEMBER(spd_adpcm_w);
 	DECLARE_READ8_MEMBER(mcu63701_r);
 	DECLARE_WRITE8_MEMBER(mcu63701_w);
-	DECLARE_READ8_MEMBER(port_0_r);
 	DECLARE_WRITE8_MEMBER(spdodgeb_scrollx_lo_w);
 	DECLARE_WRITE8_MEMBER(spdodgeb_ctrl_w);
 	DECLARE_WRITE8_MEMBER(spdodgeb_videoram_w);
@@ -58,6 +63,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(spdodgeb_interrupt);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void mcu63705_update_inputs();
+	DECLARE_CUSTOM_INPUT_MEMBER(mcu63705_busy_r);
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 	void spd_adpcm_int(msm5205_device *device, int chip);
 	DECLARE_WRITE_LINE_MEMBER(spd_adpcm_int_1);
