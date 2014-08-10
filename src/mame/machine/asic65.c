@@ -239,7 +239,6 @@ WRITE16_MEMBER( asic65_device::data_w )
 
 READ16_MEMBER( asic65_device::read )
 {
-	int command = (m_command < MAX_COMMANDS) ? command_map[m_asic65_type][m_command] : OP_UNKNOWN;
 	INT64 element, result64 = 0;
 	UINT16 result = 0;
 
@@ -251,6 +250,8 @@ READ16_MEMBER( asic65_device::read )
 		return m_68data;
 	}
 
+	int command = (m_command < MAX_COMMANDS) ? command_map[m_asic65_type][m_command] : OP_UNKNOWN;
+	
 	/* update results */
 	switch (command)
 	{
