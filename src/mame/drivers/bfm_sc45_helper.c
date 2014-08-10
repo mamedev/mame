@@ -216,6 +216,7 @@ int find_input_strings(running_machine &machine)
 
 					//if (pos <= 5)
 					{
+						assert(pos >= 0 && pos < ARRAY_LENGTH(sc4inputs[port]));
 						if (sc4inputs[port][pos].used == false)
 						{
 							sc4inputs[port][pos].used = true;
@@ -383,7 +384,7 @@ struct lampinfo
 
 lampinfo lamps[16][16];
 
-void set_clickable_temp(running_machine &machine, astring teststring, int clickport, int clickmask)
+void set_clickable_temp(running_machine &machine, const astring &teststring, int clickport, int clickmask)
 {
 	for (int y = 0; y < 16; y++)
 	{
