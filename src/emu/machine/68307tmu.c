@@ -155,6 +155,7 @@ UINT16 m68307_timer::read_tcn(UINT16 mem_mask, int which)
 
 void m68307_timer::write_ter(UINT16 data, UINT16 mem_mask, int which)
 {
+	assert(which >= 0 && which < ARRAY_LENGTH(singletimer));
 	m68307_single_timer* tptr = &singletimer[which];
 	if (data & 0x2) tptr->regs[m68307TIMER_TMR] &= ~0x2;
 }
@@ -212,6 +213,7 @@ void m68307_timer::write_tmr(UINT16 data, UINT16 mem_mask, int which)
 
 void m68307_timer::write_trr(UINT16 data, UINT16 mem_mask, int which)
 {
+	assert(which >= 0 && which < ARRAY_LENGTH(singletimer));
 	m68307_single_timer* tptr = &singletimer[which];
 
 	COMBINE_DATA(&tptr->regs[m68307TIMER_TRR]);
