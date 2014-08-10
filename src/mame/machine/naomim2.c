@@ -5,7 +5,7 @@
 const device_type NAOMI_M2_BOARD = &device_creator<naomi_m2_board>;
 
 naomi_m2_board::naomi_m2_board(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: naomi_board(mconfig, NAOMI_M2_BOARD, "NAOMI-M2-BOARD", tag, owner, clock, "naomi_m2_board", __FILE__)
+	: naomi_board(mconfig, NAOMI_M2_BOARD, "Sega NAOMI M2 BOARD", tag, owner, clock, "naomi_m2_board", __FILE__)
 {
 	key_tag = 0;
 }

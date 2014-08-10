@@ -632,7 +632,7 @@ void sega_sys16a_sprite_device::draw(bitmap_ind16 &bitmap, const rectangle &clip
 //-------------------------------------------------
 
 bootleg_sys16a_sprite_device::bootleg_sys16a_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: sega_16bit_sprite_device(mconfig, BOOTLEG_SYS16A_SPRITES, "Bootleg System 16A Sprites", tag, owner, "bootleg_sys16a_sprite", __FILE__)
+	: sega_16bit_sprite_device(mconfig, BOOTLEG_SYS16A_SPRITES, "Sega System 16A Sprites (Bootleg)", tag, owner, "bootleg_sys16a_sprite", __FILE__)
 {
 	m_addrmap[0] = 0;
 	m_addrmap[1] = 1;

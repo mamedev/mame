@@ -9,7 +9,7 @@
 
 /*
 neosprite_base_device::neosprite_base_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : device_t(mconfig, NEOGEO_SPRITE_BASE, "Neogeo Sprites", tag, owner, clock, "neospritebase", __FILE__),
+    : device_t(mconfig, NEOGEO_SPRITE_BASE, "NeoGeo Sprites", tag, owner, clock, "neospritebase", __FILE__),
     m_bppshift(4)
 {
 

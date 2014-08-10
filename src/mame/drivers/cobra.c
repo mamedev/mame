@@ -499,7 +499,7 @@ protected:
 const device_type COBRA_JVS = &device_creator<cobra_jvs>;
 
 cobra_jvs::cobra_jvs(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: jvs_device(mconfig, COBRA_JVS, "COBRA_JVS", tag, owner, clock, "cobra_jvs", __FILE__)
+	: jvs_device(mconfig, COBRA_JVS, "JVS (COBRA)", tag, owner, clock, "cobra_jvs", __FILE__)
 {
 }
 
@@ -557,7 +557,7 @@ private:
 const device_type COBRA_JVS_HOST = &device_creator<cobra_jvs_host>;
 
 cobra_jvs_host::cobra_jvs_host(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: jvs_host(mconfig, COBRA_JVS_HOST, "COBRA_JVS_HOST", tag, owner, clock, "cobra_jvs_host", __FILE__)
+	: jvs_host(mconfig, COBRA_JVS_HOST, "JVS-HOST (COBRA)", tag, owner, clock, "cobra_jvs_host", __FILE__)
 {
 	m_send_ptr = 0;
 }

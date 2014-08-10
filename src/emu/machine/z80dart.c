@@ -120,7 +120,7 @@ z80dart_device::z80dart_device(const machine_config &mconfig, device_type type, 
 }
 
 z80dart_device::z80dart_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, Z80DART, "Z80-DART", tag, owner, clock, "z80dart", __FILE__),
+	: device_t(mconfig, Z80DART, "Z80 DART", tag, owner, clock, "z80dart", __FILE__),
 		device_z80daisy_interface(mconfig, *this),
 		m_chanA(*this, CHANA_TAG),
 		m_chanB(*this, CHANB_TAG),
@@ -150,27 +150,27 @@ z80dart_device::z80dart_device(const machine_config &mconfig, const char *tag, d
 }
 
 z80sio0_device::z80sio0_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: z80dart_device(mconfig, Z80SIO0, "Z80-SIO/0", tag, owner, clock, TYPE_SIO0, "z80sio0", __FILE__)
+	: z80dart_device(mconfig, Z80SIO0, "Z80 SIO/0", tag, owner, clock, TYPE_SIO0, "z80sio0", __FILE__)
 {
 }
 
 z80sio1_device::z80sio1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: z80dart_device(mconfig, Z80SIO1, "Z80-SIO/1", tag, owner, clock, TYPE_SIO1, "z80sio1", __FILE__)
+	: z80dart_device(mconfig, Z80SIO1, "Z80 SIO/1", tag, owner, clock, TYPE_SIO1, "z80sio1", __FILE__)
 {
 }
 
 z80sio2_device::z80sio2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: z80dart_device(mconfig, Z80SIO2, "Z80-SIO/2", tag, owner, clock, TYPE_SIO2, "z80sio2", __FILE__)
+	: z80dart_device(mconfig, Z80SIO2, "Z80 SIO/2", tag, owner, clock, TYPE_SIO2, "z80sio2", __FILE__)
 {
 }
 
 z80sio3_device::z80sio3_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: z80dart_device(mconfig, Z80SIO3, "Z80-SIO/3", tag, owner, clock, TYPE_SIO3, "z80sio3", __FILE__)
+	: z80dart_device(mconfig, Z80SIO3, "Z80 SIO/3", tag, owner, clock, TYPE_SIO3, "z80sio3", __FILE__)
 {
 }
 
 z80sio4_device::z80sio4_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: z80dart_device(mconfig, Z80SIO4, "Z80-SIO/4", tag, owner, clock, TYPE_SIO4, "z80sio4", __FILE__)
+	: z80dart_device(mconfig, Z80SIO4, "Z80 SIO/4", tag, owner, clock, TYPE_SIO4, "z80sio4", __FILE__)
 {
 }
 
@@ -503,7 +503,7 @@ WRITE8_MEMBER( z80dart_device::ba_cd_w )
 //-------------------------------------------------
 
 z80dart_channel::z80dart_channel(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, Z80DART_CHANNEL, "Z80-DART channel", tag, owner, clock, "z80dart_channel", __FILE__),
+	: device_t(mconfig, Z80DART_CHANNEL, "Z80 DART channel", tag, owner, clock, "z80dart_channel", __FILE__),
 		device_serial_interface(mconfig, *this),
 		m_rx_error(0),
 		m_rx_fifo(-1),
