@@ -26,15 +26,15 @@
     3) Press F to format.  Accept all the default options from now on;
        there is no "format switch" to worry about with the current emulation.
     4) Quit MESS.  Restart with the corvus in slot 6 and a diskii(ng) in slot 7
-       with the "Corvus Hard Drive - Utilities 1.dsk" mounted.
-    5) When you get the BASIC prompt, "LOAD BSYSGEN"
-    7) Type "15100 Z(II) = PEEK(20480 + II)" to fix a bug in the program
-       and press Enter.
-    8) Type RUN and press Enter
-    9) Choose drive 1 and press Y at "OK TO BSYSGEN?"
-    10) When the format completes, type "RUN APPLESOFT BOOT PREP" and press Enter.
-    11) Once it finishes, quit MESS.  Remove the diskii(ng) from slot 7 and
-       the system should boot from the Corvus HD.
+       with the "Corvus Hard Drive - Utilities Disk 1.dsk" mounted.
+    5) When you get the BASIC prompt, "RUN BSYSGEN"
+    6) Choose drive 1 and press Y at "OK TO BSYSGEN?"
+    7) When the format completes, type "RUN APPLESOFT BOOT PREP" and press Enter.
+    8) Once it finishes, quit MESS.  Remove the diskii(ng) from slot 7 and
+       the system will boot into DOS 3.3 from the Corvus HD.
+ 
+    TODO: but there are no Corvus drivers present after that, only
+    Disk II?
 
 *********************************************************************/
 
