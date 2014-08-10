@@ -49,7 +49,7 @@ Usage:
 
 #include "emu.h"
 #include "machine/mos6530.h"
-#include "cpu/m6502/m6502.h"
+#include "cpu/m6502/m6504.h"
 #include "sound/speaker.h"
 #include "mk2.lh"
 
@@ -79,7 +79,6 @@ public:
 
 // only lower 12 address bits on bus!
 static ADDRESS_MAP_START(mk2_mem , AS_PROGRAM, 8, mk2_state)
-	ADDRESS_MAP_GLOBAL_MASK(0x1FFF) // m6504
 	AM_RANGE( 0x0000, 0x01ff) AM_RAM // 2 2111, should be mirrored
 	AM_RANGE( 0x0b00, 0x0b0f) AM_DEVREADWRITE("miot", mos6530_device, read, write)
 	AM_RANGE( 0x0b80, 0x0bbf) AM_RAM // rriot ram
@@ -184,7 +183,7 @@ WRITE8_MEMBER( mk2_state::mk2_write_b )
 
 static MACHINE_CONFIG_START( mk2, mk2_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, 1000000)        /* 6504 */
+	MCFG_CPU_ADD("maincpu", M6504, 1000000)
 	MCFG_CPU_PROGRAM_MAP(mk2_mem)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
@@ -219,6 +218,6 @@ ROM_END
 ***************************************************************************/
 
 
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    COMPANY               FULLNAME */
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT  CLASS            INIT    COMPANY               FULLNAME */
 CONS( 1979, ccmk2,    0,      0,      mk2,    mk2, driver_device,    0, "Quelle International", "Chess Champion MK II", 0)
 // second design sold (same computer/program?)
