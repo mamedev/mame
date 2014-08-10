@@ -853,6 +853,14 @@ ROM_START( gjrstar3 )
 	ROM_CART_LOAD( "cart", 0, 0x80000, 0 )
 ROM_END
 
+ROM_START( gl6600cx )
+	ROM_REGION( 0x200000, "maincpu", 0 )
+	ROM_LOAD( "54-06400-00.u1", 0x000000, 0x200000, CRC(b05cd075) SHA1(b1d9eb02ca56350eb9e89518db89c0a2a845ebd8))
+
+	ROM_REGION( 0x80000, "cart", ROMREGION_ERASEFF )
+	ROM_CART_LOAD( "cart", 0, 0x80000, 0 )
+ROM_END
+
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
@@ -869,3 +877,4 @@ COMP( 1996, gj4000,    0,       0,  prestige,   prestige, driver_device,     0, 
 COMP( 1996, gjrstar,   0,       0,  prestige,   prestige, driver_device,     0,  "VTech",   "Genius Junior Redstar(Germany)", GAME_IS_SKELETON)
 COMP( 1998, gjrstar3,  0,       0,  prestige,   prestige, driver_device,     0,  "VTech",   "Genius Junior Redstar 3 (Germany)", GAME_IS_SKELETON)
 COMP( 1998, gj5000,    0,       0,  prestige,   prestige, driver_device,     0,  "VTech",   "Genius Junior 5000 (Germany)", GAME_IS_SKELETON)
+COMP( 1999, gl6600cx,  0,       0,  prestige,   prestige, driver_device,     0,  "VTech",   "Genius Leader 6600CX (Germany)", GAME_IS_SKELETON)
