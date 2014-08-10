@@ -80,6 +80,7 @@ enum machine_type_t
 	APPLE_IIC,          // Apple IIc
 	APPLE_IICPLUS,      // Apple IIc+
 	TK2000,             // Microdigital TK2000
+	TK3000,				// Microdigital TK3000
 	LASER128,           // Laser 128/128EX/128EX2
 	SPACE84,            // "Space 84" with flipped text mode
 	LABA2P              // lab equipment (?) II Plus with flipped text mode
@@ -135,6 +136,7 @@ public:
 		m_kbspecial(*this, "keyb_special"),
 		m_kbrepeat(*this, "keyb_repeat"),
 		m_resetdip(*this, "reset_dip"),
+		m_sysconfig(*this, "a2_config"),
 		m_cassette(*this, "cassette"),
 		m_acia1(*this, IIC_ACIA1_TAG),
 		m_acia2(*this, IIC_ACIA2_TAG)
@@ -151,6 +153,7 @@ public:
 	required_ioport m_kbspecial;
 	optional_ioport m_kbrepeat;
 	optional_ioport m_resetdip;
+	optional_ioport m_sysconfig;
 	optional_device<cassette_image_device> m_cassette;
 
 	optional_device<mos6551_device> m_acia1, m_acia2;
@@ -313,6 +316,7 @@ public:
 	DECLARE_MACHINE_START(apple2c);
 	DECLARE_MACHINE_START(apple2cp);
 	DECLARE_MACHINE_START(tk2000);
+	DECLARE_MACHINE_START(tk3000);
 	DECLARE_MACHINE_START(laser128);
 	DECLARE_MACHINE_START(space84);
 	DECLARE_MACHINE_START(laba2p);

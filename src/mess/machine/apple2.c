@@ -1313,7 +1313,7 @@ READ8_MEMBER ( apple2_state::apple2_auxram0000_r )
 	{
 		return m_auxslotdevice->read_auxram(offset);
 	}
-	else if (m_machinetype == APPLE_IIE)
+	else if (m_machinetype == APPLE_IIE || m_machinetype == TK3000)
 	{
 		return 0xff;
 	}
@@ -1328,7 +1328,7 @@ READ8_MEMBER ( apple2_state::apple2_auxram0200_r )
 	{
 		return m_auxslotdevice->read_auxram(offset+0x200);
 	}
-	else if (m_machinetype == APPLE_IIE)
+	else if (m_machinetype == APPLE_IIE || m_machinetype == TK3000)
 	{
 		return 0xff;
 	}
@@ -1343,7 +1343,7 @@ READ8_MEMBER ( apple2_state::apple2_auxram0400_r )
 	{
 		return m_auxslotdevice->read_auxram(offset+0x400);
 	}
-	else if (m_machinetype == APPLE_IIE)
+	else if (m_machinetype == APPLE_IIE || m_machinetype == TK3000)
 	{
 		return 0xff;
 	}
@@ -1358,7 +1358,7 @@ READ8_MEMBER ( apple2_state::apple2_auxram0800_r )
 	{
 		return m_auxslotdevice->read_auxram(offset+0x800);
 	}
-	else if (m_machinetype == APPLE_IIE)
+	else if (m_machinetype == APPLE_IIE || m_machinetype == TK3000)
 	{
 		return 0xff;
 	}
@@ -1373,7 +1373,7 @@ READ8_MEMBER ( apple2_state::apple2_auxram2000_r )
 	{
 		return m_auxslotdevice->read_auxram(offset+0x2000);
 	}
-	else if (m_machinetype == APPLE_IIE)
+	else if (m_machinetype == APPLE_IIE || m_machinetype == TK3000)
 	{
 		return 0xff;
 	}
@@ -1388,7 +1388,7 @@ READ8_MEMBER ( apple2_state::apple2_auxram4000_r )
 	{
 		return m_auxslotdevice->read_auxram(offset+0x4000);
 	}
-	else if (m_machinetype == APPLE_IIE)
+	else if (m_machinetype == APPLE_IIE || m_machinetype == TK3000)
 	{
 		return 0xff;
 	}
@@ -1403,7 +1403,7 @@ READ8_MEMBER ( apple2_state::apple2_auxramc000_r )
 	{
 		return m_auxslotdevice->read_auxram(offset+0xc000);
 	}
-	else if (m_machinetype == APPLE_IIE)
+	else if (m_machinetype == APPLE_IIE || m_machinetype == TK3000)
 	{
 		return 0xff;
 	}
@@ -1418,7 +1418,7 @@ READ8_MEMBER ( apple2_state::apple2_auxramd000_r )
 	{
 		return m_auxslotdevice->read_auxram(offset+0xd000);
 	}
-	else if (m_machinetype == APPLE_IIE)
+	else if (m_machinetype == APPLE_IIE || m_machinetype == TK3000)
 	{
 		return 0xff;
 	}
@@ -1433,7 +1433,7 @@ READ8_MEMBER ( apple2_state::apple2_auxrame000_r )
 	{
 		return m_auxslotdevice->read_auxram(offset+0xe000);
 	}
-	else if (m_machinetype == APPLE_IIE)
+	else if (m_machinetype == APPLE_IIE || m_machinetype == TK3000)
 	{
 		return 0xff;
 	}
@@ -1503,7 +1503,7 @@ WRITE8_MEMBER ( apple2_state::apple2_auxram0000_w )
 		m_auxslotdevice->write_auxram(offset, data);
 		return;
 	}
-	else if (m_machinetype == APPLE_IIE)
+	else if (m_machinetype == APPLE_IIE || m_machinetype == TK3000)
 	{
 		return;
 	}
@@ -1519,7 +1519,7 @@ WRITE8_MEMBER ( apple2_state::apple2_auxram0200_w )
 		m_auxslotdevice->write_auxram(offset+0x200, data);
 		return;
 	}
-	else if (m_machinetype == APPLE_IIE)
+	else if (m_machinetype == APPLE_IIE || m_machinetype == TK3000)
 	{
 		return;
 	}
@@ -1535,7 +1535,7 @@ WRITE8_MEMBER ( apple2_state::apple2_auxram0400_w )
 		m_auxslotdevice->write_auxram(offset+0x400, data);
 		return;
 	}
-	else if (m_machinetype == APPLE_IIE)
+	else if (m_machinetype == APPLE_IIE || m_machinetype == TK3000)
 	{
 		return;
 	}
@@ -1551,7 +1551,7 @@ WRITE8_MEMBER ( apple2_state::apple2_auxram0800_w )
 		m_auxslotdevice->write_auxram(offset+0x800, data);
 		return;
 	}
-	else if (m_machinetype == APPLE_IIE)
+	else if (m_machinetype == APPLE_IIE || m_machinetype == TK3000)
 	{
 		return;
 	}
@@ -1567,7 +1567,7 @@ WRITE8_MEMBER ( apple2_state::apple2_auxram2000_w )
 		m_auxslotdevice->write_auxram(offset+0x2000, data);
 		return;
 	}
-	else if (m_machinetype == APPLE_IIE)
+	else if (m_machinetype == APPLE_IIE || m_machinetype == TK3000)
 	{
 		return;
 	}
@@ -1583,7 +1583,7 @@ WRITE8_MEMBER ( apple2_state::apple2_auxram4000_w )
 		m_auxslotdevice->write_auxram(offset+0x4000, data);
 		return;
 	}
-	else if (m_machinetype == APPLE_IIE)
+	else if (m_machinetype == APPLE_IIE || m_machinetype == TK3000)
 	{
 		return;
 	}
@@ -1599,7 +1599,7 @@ WRITE8_MEMBER ( apple2_state::apple2_auxramc000_w )
 		m_auxslotdevice->write_auxram(offset+0xc000, data);
 		return;
 	}
-	else if (m_machinetype == APPLE_IIE)
+	else if (m_machinetype == APPLE_IIE || m_machinetype == TK3000)
 	{
 		return;
 	}
@@ -1615,7 +1615,7 @@ WRITE8_MEMBER ( apple2_state::apple2_auxramd000_w )
 		m_auxslotdevice->write_auxram(offset+0xd000, data);
 		return;
 	}
-	else if (m_machinetype == APPLE_IIE)
+	else if (m_machinetype == APPLE_IIE || m_machinetype == TK3000)
 	{
 		return;
 	}
@@ -1631,7 +1631,7 @@ WRITE8_MEMBER ( apple2_state::apple2_auxrame000_w )
 		m_auxslotdevice->write_auxram(offset+0xe000, data);
 		return;
 	}
-	else if (m_machinetype == APPLE_IIE)
+	else if (m_machinetype == APPLE_IIE || m_machinetype == TK3000)
 	{
 		return;
 	}
@@ -2143,7 +2143,7 @@ void apple2_state::apple2_init_common()
 	m_slot_ram = (m_slot_length > 0) ? &m_rom[m_rom_length] : NULL;
 
 	m_auxslotdevice = NULL;
-	if (m_machinetype == APPLE_IIE)
+	if (m_machinetype == APPLE_IIE || m_machinetype == TK3000)
 	{
 		m_auxslotdevice = m_a2eauxslot->get_a2eauxslot_card();
 	}
@@ -2187,6 +2187,13 @@ void apple2_state::apple2eplus_init_common(void *apple2cp_ce00_ram)
 MACHINE_START_MEMBER(apple2_state,apple2c)
 {
 	m_machinetype = APPLE_IIC;
+
+	apple2eplus_init_common((void *)NULL);
+}
+
+MACHINE_START_MEMBER(apple2_state,tk3000)
+{
+	m_machinetype = TK3000;	// enhanced IIe clone with Z80 keyboard scanner subcpu
 
 	apple2eplus_init_common((void *)NULL);
 }

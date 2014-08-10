@@ -97,6 +97,49 @@ inline void apple2_state::apple2_plot_text_character(bitmap_ind16 &bitmap, int x
 	const UINT8 *chardata;
 	UINT16 color;
 
+	if (m_sysconfig != NULL)
+	{
+		switch (m_sysconfig->read() & 0x03)
+		{
+			case 0:
+				break;	// leave alone
+
+			case 1:
+				if ((m_machinetype == APPLE_II) || (m_machinetype == LABA2P) || (m_machinetype == SPACE84))
+				{
+					bg = WHITE;
+				}
+				else
+				{
+					fg = WHITE;
+				}
+				break;
+
+			case 2:
+				if ((m_machinetype == APPLE_II) || (m_machinetype == LABA2P) || (m_machinetype == SPACE84))
+				{
+					bg = GREEN;
+				}
+				else
+				{
+					fg = GREEN;
+				}
+				break;
+
+			case 3:
+				if ((m_machinetype == APPLE_II) || (m_machinetype == LABA2P) || (m_machinetype == SPACE84))
+				{
+					bg = ORANGE;
+				}
+				else
+				{
+					fg = ORANGE;
+				}
+				break;
+		}
+	}
+
+
 	if (my_a2 & VAR_ALTCHARSET)
 	{
 		/* we're using an alternate charset */
@@ -139,7 +182,7 @@ inline void apple2_state::apple2_plot_text_character(bitmap_ind16 &bitmap, int x
 
 				for (i = 0; i < xscale; i++)
 				{
-					bitmap.pix16(ypos + y, xpos + (x * xscale) + i) = color;
+					bitmap.pix16(ypos + y, xpos + (x * xscale) + i) = color; 
 				}
 			}
 		}
@@ -242,6 +285,12 @@ void apple2_state::apple2_hires_draw(bitmap_ind16 &bitmap, const rectangle &clip
 	UINT16 *p;
 	UINT32 w;
 	UINT16 *artifact_map_ptr;
+	int mon_type = 0;
+
+	if (m_sysconfig != NULL)
+	{
+		mon_type = m_sysconfig->read() & 0x03;
+	}
 
 	/* sanity checks */
 	if (beginrow < cliprect.min_y)
@@ -300,12 +349,53 @@ void apple2_state::apple2_hires_draw(bitmap_ind16 &bitmap, const rectangle &clip
 			switch(columns)
 			{
 				case 40:
-					artifact_map_ptr = &m_hires_artifact_map[((vram_row[col+1] & 0x80) >> 7) * 16];
-					for (b = 0; b < 7; b++)
+					switch (mon_type)
 					{
-						v = artifact_map_ptr[((w >> (b + 7-1)) & 0x07) | (((b ^ col) & 0x01) << 3)];
-						*(p++) = v;
-						*(p++) = v;
+						case 0:
+							artifact_map_ptr = &m_hires_artifact_map[((vram_row[col+1] & 0x80) >> 7) * 16];
+							for (b = 0; b < 7; b++) 
+							{
+								v = artifact_map_ptr[((w >> (b + 7-1)) & 0x07) | (((b ^ col) & 0x01) << 3)];
+
+								if ((col == 0) && (row == 0))
+								{
+									printf("R0C0 %x\n", v);
+								}	
+
+								*(p++) = v;
+								*(p++) = v;
+							}
+							break;
+
+						case 1:
+							for (b = 0; b < 7; b++) 
+							{
+								v = (w & 1);
+								w >>= 1;
+								*(p++) = v ? WHITE : BLACK;
+								*(p++) = v ? WHITE : BLACK;
+							}
+							break;
+
+						case 2:
+							for (b = 0; b < 7; b++) 
+							{
+								v = (w & 1);
+								w >>= 1;
+								*(p++) = v ? GREEN : BLACK;
+								*(p++) = v ? GREEN : BLACK;
+							}
+							break;
+
+						case 3:
+							for (b = 0; b < 7; b++) 
+							{
+								v = (w & 1);
+								w >>= 1;
+								*(p++) = v ? ORANGE : BLACK;
+								*(p++) = v ? ORANGE : BLACK;
+							}
+							break;
 					}
 					break;
 
@@ -321,10 +411,42 @@ void apple2_state::apple2_hires_draw(bitmap_ind16 &bitmap, const rectangle &clip
 					}
 					else
 					{
-						for (b = 0; b < 7; b++)
+						switch (mon_type)
 						{
-							v = m_dhires_artifact_map[((((w >> (b + 7-1)) & 0x0F) * 0x11) >> (((2-(col*7+b))) & 0x03)) & 0x0F];
-							*(p++) = v;
+							case 0:
+								for (b = 0; b < 7; b++) 
+								{
+									v = m_dhires_artifact_map[((((w >> (b + 7-1)) & 0x0F) * 0x11) >> (((2-(col*7+b))) & 0x03)) & 0x0F];
+									*(p++) = v;
+								}
+								break;
+
+							case 1:
+								for (b = 0; b < 7; b++)
+								{
+									v = (w & 1);
+									w >>= 1;
+									*(p++) = v ? WHITE : BLACK;
+								}
+								break;
+
+							case 2:
+								for (b = 0; b < 7; b++)
+								{
+									v = (w & 1);
+									w >>= 1;
+									*(p++) = v ? GREEN : BLACK;
+								}
+								break;
+
+							case 3:
+								for (b = 0; b < 7; b++)
+								{
+									v = (w & 1);
+									w >>= 1;
+									*(p++) = v ? ORANGE : BLACK;
+								}
+								break;
 						}
 					}
 					break;

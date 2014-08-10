@@ -130,6 +130,7 @@ CPUS += SCUDSP
 CPUS += IE15
 CPUS += 8X300
 CPUS += ALTO2
+#CPUS += W65816
 
 #-------------------------------------------------
 # specify available sound cores; some of these are
@@ -2022,6 +2023,7 @@ $(MESSOBJ)/vtech.a:             \
 	$(MESS_DRIVERS)/prestige.o  \
 	$(MESS_DRIVERS)/pitagjr.o  \
 	$(MESS_DRIVERS)/geniusiq.o  \
+	$(MESS_DRIVERS)/laser3k.o	\
 
 $(MESSOBJ)/wang.a:              \
 	$(MESS_DRIVERS)/wangpc.o    \

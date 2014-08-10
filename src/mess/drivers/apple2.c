@@ -177,7 +177,14 @@ UniDisk 3.5 drive!)
 The external drive port supports not only 5.25 drives but also UniDisk and
 Apple 3.5 drives, allowing via daisy-chaining any combination of UniDisk,
 Apple 3.5 and Apple 5.25 drives - up to three devices
-
+ 
+---------------------------------- 
+ 
+TK3000 keyboard matrix 
+ 
+Data bus D0-D7 is X0-X7 
+Address bus A0-A11 is Y0-Y11 
+ 
 ***************************************************************************/
 
 
@@ -186,6 +193,7 @@ Apple 3.5 and Apple 5.25 drives - up to three devices
 #include "imagedev/cassette.h"
 #include "formats/ap2_dsk.h"
 #include "includes/apple2.h"
+#include "cpu/z80/z80.h"
 
 #include "bus/a2bus/a2bus.h"
 #include "bus/a2bus/a2lang.h"
@@ -253,6 +261,24 @@ static ADDRESS_MAP_START( apple2_map, AS_PROGRAM, 8, apple2_state )
 	/* nothing in the address map - everything is added dynamically */
 ADDRESS_MAP_END
 
+/*
+ 
+    LS259 at H12
+ 
+    A8  = D
+    A9  = A
+    A10 = B
+    A11 = C
+ 
+	374/259 outputs to 65C02 c000/c010 selected by Z80 WR OR Z80 IORQ? (schematic is not super legible)
+ 
+*/
+
+// RAM and ROM alternate in 8K blocks: ROM at 0/4/8/c, RAM at 2/6/a/e (RAM is only 1k and further mirrors inside those locations)
+static ADDRESS_MAP_START( tk3000_kbd_map, AS_PROGRAM, 8, apple2_state )
+	AM_RANGE(0x0000, 0x1fff) AM_ROM AM_MIRROR(0xc000) AM_REGION("kbdcpu", 0)
+	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_MIRROR(0xcc00) AM_MASK(0x3ff)
+ADDRESS_MAP_END
 
 
 /***************************************************************************
@@ -339,6 +365,15 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( apple2_gameport )
 	PORT_INCLUDE( apple2_joystick )
 	//PORT_INCLUDE( apple2_paddle )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( apple2_sysconfig )
+	PORT_START("a2_config")
+	PORT_CONFNAME(0x03, 0x00, "Composite monitor type")
+	PORT_CONFSETTING(0x00, "Color")
+	PORT_CONFSETTING(0x01, "B&W")
+	PORT_CONFSETTING(0x02, "Green")
+	PORT_CONFSETTING(0x03, "Amber")
 INPUT_PORTS_END
 
 	/*
@@ -534,6 +569,8 @@ static INPUT_PORTS_START( apple2 )
 
 	/* other devices */
 	PORT_INCLUDE( apple2_gameport )
+
+	PORT_INCLUDE(apple2_sysconfig)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( apple2p )
@@ -662,6 +699,8 @@ static INPUT_PORTS_START( apple2e_common )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Open Apple")   PORT_CODE(KEYCODE_LALT)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Solid Apple")  PORT_CODE(KEYCODE_RALT)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("RESET")        PORT_CODE(KEYCODE_F12)
+
+	PORT_INCLUDE(apple2_sysconfig)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( apple2e )
@@ -788,6 +827,7 @@ static INPUT_PORTS_START( apple2euk )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("RESET")        PORT_CODE(KEYCODE_F12)
 
 	PORT_INCLUDE( apple2_gameport )
+	PORT_INCLUDE(apple2_sysconfig)
 INPUT_PORTS_END
 
 INPUT_PORTS_START( apple2ep )
@@ -909,6 +949,7 @@ INPUT_PORTS_START( apple2ep )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("RESET")        PORT_CODE(KEYCODE_F12)
 
 	PORT_INCLUDE( apple2_gameport )
+	PORT_INCLUDE(apple2_sysconfig)
 INPUT_PORTS_END
 
 /* according to Steve Nickolas (author of Dapple), our original palette would
@@ -1145,6 +1186,13 @@ static MACHINE_CONFIG_DERIVED( apple2ee, apple2e )
 	MCFG_CPU_REPLACE("maincpu", M65C02, 1021800)        /* close to actual CPU frequency of 1.020484 MHz */
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( tk3000, apple2e )
+	MCFG_CPU_REPLACE("maincpu", M65C02, 1021800)        /* close to actual CPU frequency of 1.020484 MHz */
+
+	MCFG_CPU_ADD("subcpu", Z80, 1021800)	// schematics are illegible on where the clock comes from, but it *seems* to be the same as the 65C02 clock
+	MCFG_CPU_PROGRAM_MAP(tk3000_kbd_map)
+MACHINE_CONFIG_END
+
 static MACHINE_CONFIG_DERIVED( apple2ep, apple2e )
 	MCFG_CPU_REPLACE("maincpu", M65C02, 1021800)        /* close to actual CPU frequency of 1.020484 MHz */
 MACHINE_CONFIG_END
@@ -1194,6 +1242,9 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( apple2cp, apple2c )
 	MCFG_MACHINE_START_OVERRIDE(apple2_state,apple2cp)
+
+	MCFG_A2BUS_SLOT_REMOVE("sl6")
+	MCFG_A2BUS_ONBOARD_ADD("a2bus", "sl6", A2BUS_IWM_FDC, NULL)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( apple2c_iwm, apple2c )
@@ -1212,7 +1263,7 @@ static MACHINE_CONFIG_DERIVED( laser128, apple2c )
 	MCFG_A2BUS_ONBOARD_ADD("a2bus", "sl3", A2BUS_LASER128, NULL)
 	MCFG_A2BUS_ONBOARD_ADD("a2bus", "sl4", A2BUS_LASER128, NULL)
 	MCFG_A2BUS_ONBOARD_ADD("a2bus", "sl5", A2BUS_LASER128, NULL)
-	MCFG_A2BUS_ONBOARD_ADD("a2bus", "sl6", A2BUS_IWM_FDC, NULL)     // slots 6 and 7 are hacks for now
+	MCFG_A2BUS_ONBOARD_ADD("a2bus", "sl6", A2BUS_LASER128, NULL)
 //    MCFG_A2BUS_ONBOARD_ADD("a2bus", "sl7", A2BUS_LASER128, NULL)
 MACHINE_CONFIG_END
 
@@ -1459,16 +1510,18 @@ ROM_START(tk2000)
 	ROM_LOAD( "342-0132-c.e12", 0x000, 0x800, BAD_DUMP CRC(e47045f4) SHA1(12a2e718f5f4acd69b6c33a45a4a940b1440a481) ) // probably not this machine's actual ROM
 ROM_END
 
-// unlike the very unique TK2000, the TK3000 is a stock enhanced IIe clone
+// unlike the very unique TK2000, the TK3000 is a mostly stock enhanced IIe clone
 ROM_START(tk3000)
 	ROM_REGION(0x2000,"gfx1",0)
-	ROM_LOAD ( "341-0265-a.chr", 0x0000, 0x1000,CRC(2651014d) SHA1(b2b5d87f52693817fc747df087a4aa1ddcdb1f10))
-	ROM_LOAD ( "341-0265-a.chr", 0x1000, 0x1000,CRC(2651014d) SHA1(b2b5d87f52693817fc747df087a4aa1ddcdb1f10))
+	ROM_LOAD( "tk3000.f7",    0x000000, 0x002000, CRC(70157693) SHA1(a7922e2137f95271011042441d80466fba7bb828) )
 
 	ROM_REGION(0x4000,"maincpu",0)
-	ROM_LOAD( "tk3000e.rom",  0x000000, 0x004000, CRC(5b1e8ab2) SHA1(f163e5753c18ff0e812a448e8da406f102600edf) )
+	ROM_LOAD( "tk3000.f4f6",  0x000000, 0x004000, CRC(5b1e8ab2) SHA1(f163e5753c18ff0e812a448e8da406f102600edf) )
 
-	ROM_REGION( 0x800, "keyboard", ROMREGION_ERASE00 )
+	ROM_REGION(0x2000, "kbdcpu", 0)
+	ROM_LOAD( "tk3000.e13",   0x000000, 0x002000, CRC(f9b860d3) SHA1(6a127f1458f43a00199d3dde94569b8928f05a53) )
+
+	ROM_REGION(0x800, "keyboard", ROMREGION_ERASE00)
 	ROM_LOAD( "342-0132-c.e12", 0x000, 0x800, BAD_DUMP CRC(e47045f4) SHA1(12a2e718f5f4acd69b6c33a45a4a940b1440a481) ) // probably not this machine's actual ROM
 ROM_END
 
@@ -1521,16 +1574,6 @@ ROM_START(apple2c4)
 
 	ROM_REGION( 0x800, "keyboard", ROMREGION_ERASE00 )
 	ROM_LOAD( "342-0132-c.e12", 0x000, 0x800, CRC(e47045f4) SHA1(12a2e718f5f4acd69b6c33a45a4a940b1440a481) ) // 1983 US-Dvorak
-ROM_END
-
-ROM_START(las3000)
-	ROM_REGION(0x0800,"gfx1",0)
-	ROM_LOAD ( "341-0036.chr", 0x0000, 0x0800, CRC(64f415c6) SHA1(f9d312f128c9557d9d6ac03bfad6c3ddf83e5659))
-
-	ROM_REGION(0x8700,"maincpu",0)
-	ROM_LOAD ( "las3000.rom", 0x4000, 0x4000, CRC(9C7AEB09) SHA1(3302ADF41E258CF50210C19736948C8FA65E91DE))
-	ROM_CONTINUE(0x0000, 0x4000)
-	ROM_LOAD ( "l3kdisk.rom", 0x8500, 0x0100, CRC(2D4B1584) SHA1(989780B77E100598124DF7B72663E5A31A3339C0))
 ROM_END
 
 ROM_START(laser128)
@@ -1661,9 +1704,8 @@ COMP( 1985, apple2eeuk,apple2e, 0,        apple2ee,    apple2euk, driver_device,
 COMP( 1987, apple2ep, apple2e,  0,        apple2ep,    apple2ep, driver_device, 0,        "Apple Computer",    "Apple //e (Platinum)", GAME_SUPPORTS_SAVE )
 COMP( 1984, apple2c,  0,        apple2,   apple2c,     apple2e, driver_device,  0,        "Apple Computer",    "Apple //c" , GAME_SUPPORTS_SAVE )
 COMP( 1984, tk2000,   apple2c,  0,        tk2000,      apple2e, driver_device,  0,        "Microdigital",      "TK2000" , GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
-COMP( 1986, tk3000,   apple2c,  0,        apple2ee,    apple2e, driver_device,  0,        "Microdigital",      "TK3000//e" , GAME_SUPPORTS_SAVE )
+COMP( 1986, tk3000,   apple2c,  0,        tk3000,      apple2e, driver_device,  0,        "Microdigital",      "TK3000//e" , GAME_SUPPORTS_SAVE )
 COMP( 1989, prav8c,   apple2c,  0,        apple2c,     apple2e, driver_device,  0,        "Pravetz",           "Pravetz 8C", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
-COMP( 1983, las3000,  apple2,   0,        apple2p,     apple2p, driver_device,  0,        "Video Technology",  "Laser 3000",    GAME_NOT_WORKING )
 COMP( 1987, laser128, apple2c,  0,        laser128,    apple2e, driver_device,  0,        "Video Technology",  "Laser 128 (version 4.2)", GAME_NOT_WORKING )
 COMP( 1988, las128ex, apple2c,  0,        laser128,    apple2e, driver_device,  0,        "Video Technology",  "Laser 128ex (version 4.5)", GAME_NOT_WORKING )
 // TODO: add laser128ex2

@@ -8127,6 +8127,7 @@ src/mess/drivers/konin.c svneol=native#text/plain
 src/mess/drivers/korgm1.c svneol=native#text/plain
 src/mess/drivers/kramermc.c svneol=native#text/plain
 src/mess/drivers/kyocera.c svneol=native#text/plain
+src/mess/drivers/laser3k.c svneol=native#text/plain
 src/mess/drivers/lc80.c svneol=native#text/plain
 src/mess/drivers/lcmate2.c svneol=native#text/plain
 src/mess/drivers/lft.c svneol=native#text/plain
