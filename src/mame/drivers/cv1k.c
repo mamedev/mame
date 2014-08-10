@@ -824,9 +824,9 @@ READ64_MEMBER( cv1k_state::espgal2_speedup_r )
 	int pc = m_maincpu->pc();
 
 	if ( pc == 0xc05177a ) m_maincpu->spin_until_time( attotime::from_usec(10)); // espgal2
-	if ( pc == 0xc05176a ) m_maincpu->spin_until_time( attotime::from_usec(10)); // futari15 / futari15a / futari10 / futariblk / ibarablk / ibarablka / mmpork / mmmbanc
-	if ( pc == 0xc0519a2 ) m_maincpu->spin_until_time( attotime::from_usec(10)); // deathsml
-	if ( pc == 0xc1d1346 ) m_maincpu->spin_until_time( attotime::from_usec(10)); // dpddfk / dsmbl
+	else if ( pc == 0xc05176a ) m_maincpu->spin_until_time( attotime::from_usec(10)); // futari15 / futari15a / futari10 / futariblk / ibarablk / ibarablka / mmpork / mmmbanc
+	else if ( pc == 0xc0519a2 ) m_maincpu->spin_until_time( attotime::from_usec(10)); // deathsml
+	else if ( pc == 0xc1d1346 ) m_maincpu->spin_until_time( attotime::from_usec(10)); // dpddfk / dsmbl
 //  else printf("read %08x\n", m_maincpu->pc());
 	return m_ram[0x002310/8];
 }
