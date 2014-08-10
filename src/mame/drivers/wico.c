@@ -37,10 +37,10 @@ class wico_state : public genpin_class
 {
 public:
 	wico_state(const machine_config &mconfig, device_type type, const char *tag)
-		: genpin_class(mconfig, type, tag),
-	m_ccpu(*this, "ccpu"),
-	m_hcpu(*this, "hcpu"),
-	m_shared_ram(*this, "sharedram")
+		: genpin_class(mconfig, type, tag)
+		, m_ccpu(*this, "ccpu")
+		, m_hcpu(*this, "hcpu")
+		, m_shared_ram(*this, "sharedram")
 	{ }
 
 	DECLARE_READ8_MEMBER(lampst_r);
@@ -54,21 +54,16 @@ public:
 	DECLARE_READ8_MEMBER(gentmrcl_r);
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_housekeeping);
 	TIMER_DEVICE_CALLBACK_MEMBER(firq_housekeeping);
-protected:
-
-	// devices
-	required_device<cpu_device> m_ccpu;
-	required_device<cpu_device> m_hcpu;
-	required_shared_ptr<UINT8> m_shared_ram;
-
-	// driver_device overrides
-	virtual void machine_reset();
 private:
 	bool m_zcen;
 	bool m_gten;
 	bool m_disp_on;
 	bool m_diag_on;
 	UINT8 m_firqtimer;
+	virtual void machine_reset();
+	required_device<cpu_device> m_ccpu;
+	required_device<cpu_device> m_hcpu;
+	required_shared_ptr<UINT8> m_shared_ram;
 };
 
 // housekeeping cpu

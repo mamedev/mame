@@ -1,6 +1,6 @@
 /***********************************************************************************
 
-    Pinball
+    PINBALL
     Williams System 3
 
     Typical of Williams hardware: Motorola 8-bit CPUs, and lots of PIAs.
@@ -16,7 +16,7 @@
     the real board.
 
 ToDo:
-- Add 10k chime when added to samples.
+- Mechanical
 
 
 ************************************************************************************/
@@ -33,15 +33,15 @@ class s3_state : public genpin_class
 {
 public:
 	s3_state(const machine_config &mconfig, device_type type, const char *tag)
-		: genpin_class(mconfig, type, tag),
-	m_maincpu(*this, "maincpu"),
-	m_audiocpu(*this, "audiocpu"),
-	m_dac(*this, "dac"),
-	m_pia22(*this, "pia22"),
-	m_pia24(*this, "pia24"),
-	m_pia28(*this, "pia28"),
-	m_pia30(*this, "pia30"),
-	m_pias(*this, "pias")
+		: genpin_class(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_audiocpu(*this, "audiocpu")
+		, m_dac(*this, "dac")
+		, m_pia22(*this, "pia22")
+		, m_pia24(*this, "pia24")
+		, m_pia28(*this, "pia28")
+		, m_pia30(*this, "pia30")
+		, m_pias(*this, "pias")
 	{ }
 
 	DECLARE_READ8_MEMBER(dac_r);
@@ -71,17 +71,6 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(audio_nmi);
 	DECLARE_MACHINE_RESET(s3);
 	DECLARE_MACHINE_RESET(s3a);
-protected:
-
-	// devices
-	required_device<cpu_device> m_maincpu;
-	optional_device<cpu_device> m_audiocpu;
-	optional_device<dac_device> m_dac;
-	required_device<pia6821_device> m_pia22;
-	required_device<pia6821_device> m_pia24;
-	required_device<pia6821_device> m_pia28;
-	required_device<pia6821_device> m_pia30;
-	optional_device<pia6821_device> m_pias;
 private:
 	UINT8 m_t_c;
 	UINT8 m_sound_data;
@@ -90,6 +79,14 @@ private:
 	bool m_cb1;
 	bool m_data_ok;
 	bool m_chimes;
+	required_device<cpu_device> m_maincpu;
+	optional_device<cpu_device> m_audiocpu;
+	optional_device<dac_device> m_dac;
+	required_device<pia6821_device> m_pia22;
+	required_device<pia6821_device> m_pia24;
+	required_device<pia6821_device> m_pia28;
+	required_device<pia6821_device> m_pia30;
+	optional_device<pia6821_device> m_pias;
 };
 
 static ADDRESS_MAP_START( s3_main_map, AS_PROGRAM, 8, s3_state )
@@ -273,7 +270,7 @@ INPUT_CHANGED_MEMBER( s3_state::audio_nmi )
 WRITE8_MEMBER( s3_state::sol0_w )
 {
 	if (BIT(data, 4))
-		m_samples->start(2, 5); // outhole
+		m_samples->start(5, 5); // outhole
 }
 
 WRITE8_MEMBER( s3_state::sol1_w )
@@ -289,9 +286,8 @@ WRITE8_MEMBER( s3_state::sol1_w )
 		if (BIT(data, 2))
 			m_samples->start(3, 3); // 1000 chime
 
-		// we don't have a 10k chime in samples yet
-		//if (BIT(data, 3))
-			//m_samples->start(1, x); // 10k chime
+		if (BIT(data, 3))
+			m_samples->start(4, 4); // 10k chime
 	}
 	else
 	{

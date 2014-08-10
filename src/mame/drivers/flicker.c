@@ -1,8 +1,8 @@
 /***********************************************************************************
 
-  Flicker Pinball
-
-  Prototype create by Nutting Associates for Bally.
+  PINBALL
+  Flicker was originally an EM machine, and Bally asked Nutting Associates
+  to create a solid-state prototype.
 
   Seems to be the first ever microprocessor-controlled pinball machine.
 
@@ -25,22 +25,17 @@ class flicker_state : public genpin_class
 {
 public:
 	flicker_state(const machine_config &mconfig, device_type type, const char *tag)
-		: genpin_class(mconfig, type, tag),
-	m_maincpu(*this, "maincpu")
+		: genpin_class(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
 	{ }
 
 	DECLARE_WRITE8_MEMBER(port00_w);
 	DECLARE_WRITE8_MEMBER(port01_w);
 	DECLARE_WRITE8_MEMBER(port10_w);
 	DECLARE_READ8_MEMBER(port02_r);
-
-protected:
-
-	// devices
-	required_device<i4004_cpu_device> m_maincpu;
-
 private:
 	UINT8 m_out_data;
+	required_device<i4004_cpu_device> m_maincpu;
 };
 
 
@@ -192,7 +187,7 @@ sound to produce. We need to change this to just one pulse per actual sound. */
 						break;
 					case 0x07:
 					case 0x08:
-						m_samples->start(0, 5);
+						m_samples->start(5, 5);
 						break;
 					case 0x09:
 						m_samples->start(0, 6);

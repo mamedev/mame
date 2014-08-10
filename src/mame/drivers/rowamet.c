@@ -1,6 +1,6 @@
 /************************************************************************************
 
-    Pinball
+    PINBALL
     Rowamet : Heavy Metal
 
     PinMAME used as reference (couldn't find a manual)
@@ -10,6 +10,7 @@ ToDO:
 - Outputs
 - Fix display
 - Doesn't boot properly
+- Bad sound rom
 
 *************************************************************************************/
 
@@ -22,10 +23,10 @@ class rowamet_state : public driver_device
 {
 public:
 	rowamet_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-	m_maincpu(*this, "maincpu"),
-	m_cpu2(*this, "cpu2"),
-	m_p_ram(*this, "ram")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_cpu2(*this, "cpu2")
+		, m_p_ram(*this, "ram")
 	{ }
 
 	DECLARE_READ8_MEMBER(sound_r);
@@ -34,25 +35,19 @@ public:
 	DECLARE_READ8_MEMBER(io_r);
 	DECLARE_WRITE8_MEMBER(io_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(rowamet_timer);
-
-protected:
-
-	// devices
-	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_cpu2;
-	required_shared_ptr<UINT8> m_p_ram;
-
-	// driver_device overrides
-	virtual void machine_reset();
 private:
 	UINT8 m_out_offs;
 	UINT8 m_sndcmd;
 	UINT8 m_io[16];
+	virtual void machine_reset();
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_cpu2;
+	required_shared_ptr<UINT8> m_p_ram;
 };
 
 
 static ADDRESS_MAP_START( rowamet_map, AS_PROGRAM, 8, rowamet_state )
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
+	AM_RANGE(0x0000, 0x1fff) AM_ROM AM_REGION("roms", 0)
 	AM_RANGE(0x2800, 0x2808) AM_READ(switch_r)
 	AM_RANGE(0x4000, 0x407f) AM_RAM
 	AM_RANGE(0x4080, 0x408f) AM_RAM AM_SHARE("ram")
@@ -61,7 +56,7 @@ static ADDRESS_MAP_START( rowamet_map, AS_PROGRAM, 8, rowamet_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( rowamet_sub_map, AS_PROGRAM, 8, rowamet_state )
-	AM_RANGE(0x0000, 0x0fff) AM_ROM
+	AM_RANGE(0x0000, 0x0fff) AM_ROM AM_REGION("roms", 0x2000)
 	AM_RANGE(0x1000, 0x17ff) AM_RAM
 ADDRESS_MAP_END
 
@@ -82,7 +77,10 @@ READ8_MEMBER( rowamet_state::sound_r )
 
 READ8_MEMBER( rowamet_state::switch_r )
 {
-	return 0;
+	if (offset==6)
+		return 0x3f; // gets stuck in a loop without this
+	else
+		return 0;
 }
 
 WRITE8_MEMBER( rowamet_state::mute_w )
@@ -112,6 +110,11 @@ WRITE8_MEMBER( rowamet_state::io_w )
 
 void rowamet_state::machine_reset()
 {
+	UINT8 i;
+	m_out_offs = 0;
+	m_sndcmd = 0;
+	for (i = 0; i < 16; i++)
+		m_io[i] = 0;
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(rowamet_state::rowamet_timer)
@@ -150,13 +153,12 @@ MACHINE_CONFIG_END
 / Heavy Metal (????)
 /-------------------------------------------------------------------*/
 ROM_START(heavymtl)
-	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_REGION(0x3000, "roms", 0)
 	ROM_LOAD("hvymtl_c.bin", 0x0000, 0x1000, CRC(8f36d3da) SHA1(beec79c5d794ede96d95105bad7466b67762606d))
 	ROM_LOAD("hvymtl_b.bin", 0x1000, 0x1000, CRC(357f1252) SHA1(ddc55ded0dc1c8632c31d809bfadfb45ae248cfd))
-
-	ROM_REGION(0x10000, "cpu2", 0)
-	ROM_LOAD("hvymtl_s.bin", 0x0000, 0x1000, CRC(c525e6cb) SHA1(144e06fbbdd1f3e45ccca8bace6b04f876b1312c))
-	ROM_FILL(0, 1, 0) // remove erronous FF
+	ROM_LOAD("hvymtl_s.bin", 0x2000, 0x1000, BAD_DUMP CRC(c525e6cb) SHA1(144e06fbbdd1f3e45ccca8bace6b04f876b1312c))
+	ROM_FILL(0x2000, 1, 0xaf) // bad byte
+	ROM_FILL(0x2551, 1, 0xdd) // another bad byte
 ROM_END
 
 /*-------------------------------------------------------------------

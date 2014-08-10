@@ -26,21 +26,17 @@ class zac_proto_state : public driver_device
 {
 public:
 	zac_proto_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
 	{ }
 
 	DECLARE_WRITE8_MEMBER(out0_w);
 	DECLARE_WRITE8_MEMBER(out1_w);
 	DECLARE_WRITE8_MEMBER(digit_w);
 	DECLARE_WRITE8_MEMBER(sound_w);
-protected:
-
-	// devices
-	required_device<cpu_device> m_maincpu;
-
-	// driver_device overrides
+private:
 	virtual void machine_reset();
+	required_device<cpu_device> m_maincpu;
 };
 
 

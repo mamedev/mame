@@ -1,11 +1,12 @@
 /**********************************************************************************
 
-    Pinball
+    PINBALL
     Technoplay "2-2C 8008 LS" (68000 CPU)
     Schematic and PinMAME used as references
 
 ToDo:
-- Once game starts, nothing responds
+- Once you press the credit button, nothing responds (game requires 4 balls)
+- Sliding display is too fast to read (much better if cpu xtal changed to 4MHz)
 - No sound due to missing roms
 
 ***********************************************************************************/
@@ -15,14 +16,13 @@ ToDo:
 #include "cpu/m68000/m68000.h"
 #include "techno.lh"
 
-#define TECHNO_MAINCLK 8e6
 
 class techno_state : public driver_device
 {
 public:
 	techno_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-	m_maincpu(*this, "maincpu")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
 	{ }
 
 	DECLARE_READ16_MEMBER(key_r);
@@ -36,20 +36,14 @@ public:
 	DECLARE_WRITE16_MEMBER(sol1_w);
 	DECLARE_WRITE16_MEMBER(sol2_w);
 	DECLARE_WRITE16_MEMBER(sound_w);
-	UINT16 m_digit;
-	UINT8 m_vector;
-protected:
-
-	// devices
-	required_device<cpu_device> m_maincpu;
-
-	// driver_device overrides
-	virtual void machine_reset();
+	INTERRUPT_GEN_MEMBER(techno_intgen);
 private:
 	bool m_digwait;
 	UINT8 m_keyrow;
-public:
-	INTERRUPT_GEN_MEMBER(techno_intgen);
+	UINT16 m_digit;
+	UINT8 m_vector;
+	virtual void machine_reset();
+	required_device<cpu_device> m_maincpu;
 };
 
 
@@ -249,11 +243,11 @@ void techno_state::machine_reset()
 
 static MACHINE_CONFIG_START( techno, techno_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, TECHNO_MAINCLK)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_8MHz)
 	MCFG_CPU_PROGRAM_MAP(techno_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(techno_state, techno_intgen,  TECHNO_MAINCLK/256) // 31250Hz
+	MCFG_CPU_PERIODIC_INT_DRIVER(techno_state, techno_intgen,  XTAL_8MHz/256) // 31250Hz
 	MCFG_NVRAM_ADD_0FILL("nvram")
-	//MCFG_CPU_ADD("cpu2", TMS7000, 4000000)
+	//MCFG_CPU_ADD("cpu2", TMS7000, XTAL_4MHz)
 	//MCFG_CPU_PROGRAM_MAP(techno_sub_map)
 
 	/* Video */
@@ -261,12 +255,12 @@ static MACHINE_CONFIG_START( techno, techno_state )
 MACHINE_CONFIG_END
 
 ROM_START(xforce)
-	ROM_REGION(0x1000000, "maincpu", 0)
-	ROM_LOAD16_BYTE("ic15", 0x000001, 0x8000, CRC(fb8d2853) SHA1(0b0004abfe32edfd3ac15d66f90695d264c97eba))
-	ROM_LOAD16_BYTE("ic17", 0x000000, 0x8000, CRC(122ef649) SHA1(0b425f81869bc359841377a91c39f44395502bff))
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD16_BYTE("ic15", 0x0001, 0x8000, CRC(fb8d2853) SHA1(0b0004abfe32edfd3ac15d66f90695d264c97eba))
+	ROM_LOAD16_BYTE("ic17", 0x0000, 0x8000, CRC(122ef649) SHA1(0b425f81869bc359841377a91c39f44395502bff))
 
 	//ROM_REGION(0x20000), "cpu2", 0)
 	// 5 x 27256 roms are undumped
 ROM_END
 
-GAME(1987,  xforce,  0,  techno,  techno, driver_device,  0,  ROT0,  "Tecnoplay", "X Force", GAME_MECHANICAL | GAME_NO_SOUND | GAME_IMPERFECT_KEYBOARD)
+GAME(1987,  xforce,  0,  techno,  techno, driver_device,  0,  ROT0,  "Tecnoplay", "X Force", GAME_IS_SKELETON_MECHANICAL)

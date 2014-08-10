@@ -13,11 +13,19 @@ games at the start of ball 1.
 All the Z80 "maincpu" code is copied from gp_1.c
 Any bug fixes need to be applied both here and there.
 
+Sound boards: (each game has its own custom sounds)
+-------------------------------------------------------------------------------
+Old Coney Island            3x SN76477
+Sharpshooter                3x SN76477
+Super Nova                  4x SN76477
+Andromeda/Cyclopes          6808/6802/6810 + 6821 + 1 rom + ZN428
+Lady Sharpshooter           6808/6802/6810 + 2x6821 + 2xROM + 6840 + discrete
+(no schematics for the others)
 
 ToDo:
-- The earlier sets have a sound board with 3x SN76477 and lots of discrete circuitry (not emulated)
-- The later sets (with sound roms) have a sound board with a MC6808 and 6821PIA (not emulated)
-- Each machine has its own set of inputs (not emulated)
+- Sound
+- Inputs vary per machine
+- Mechanical
 
 
 ******************************************************************************************/
@@ -202,7 +210,7 @@ static INPUT_PORTS_START( gp_1 )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ))
 
 	PORT_START("DSW3")
-	PORT_DIPNAME( 0x07, 0x07, "Max number of credits")
+	PORT_DIPNAME( 0x07, 0x02, "Max number of credits")
 	PORT_DIPSETTING(    0x00, "5" )
 	PORT_DIPSETTING(    0x01, "10")
 	PORT_DIPSETTING(    0x02, "15")
@@ -211,7 +219,7 @@ static INPUT_PORTS_START( gp_1 )
 	PORT_DIPSETTING(    0x05, "30")
 	PORT_DIPSETTING(    0x06, "35")
 	PORT_DIPSETTING(    0x07, "40")
-	PORT_DIPNAME( 0x08, 0x08, "Balls")
+	PORT_DIPNAME( 0x08, 0x00, "Balls")
 	PORT_DIPSETTING(    0x00, "3")
 	PORT_DIPSETTING(    0x08, "5")
 	PORT_DIPNAME( 0x10, 0x10, "Award")
