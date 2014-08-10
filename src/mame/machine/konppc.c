@@ -17,7 +17,8 @@ const device_type KONPPC = &device_creator<konppc_device>;
 konppc_device::konppc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, KONPPC, "KONPPC", tag, owner, clock, "konppc", __FILE__),
 	cgboard_type(0),
-	num_cgboards(0)
+	num_cgboards(0)/*,
+	cgboard_id(MAX_CG_BOARDS)*/
 {
 }
 
@@ -134,6 +135,7 @@ WRITE32_MEMBER( konppc_device::cgboard_dsp_comm_w_ppc )
 		{
 			if (ACCESSING_BITS_24_31)
 			{
+				assert(cgboard_id >= 0);
 				dsp_shared_ram_bank[cgboard_id] = (data >> 24) & 0x1;
 
 				if (data & 0x80000000)
