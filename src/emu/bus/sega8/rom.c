@@ -792,6 +792,14 @@ WRITE8_MEMBER(sega8_codemasters_device::write_cart)
  -------------------------------------------------*/
 
 
+READ8_MEMBER(sega8_4pak_device::read_cart)
+{
+	int bank = offset / 0x4000;
+
+    return m_rom[m_rom_bank_base[bank] * 0x4000 + (offset & 0x3fff)];
+}
+
+
 WRITE8_MEMBER(sega8_4pak_device::write_cart)
 {
 	switch (offset)
