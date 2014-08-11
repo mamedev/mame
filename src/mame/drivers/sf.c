@@ -399,6 +399,10 @@ static INPUT_PORTS_START( sfan )
 	// 4 pneumatic buttons. When their pressure starts decreasing, the game will latch
 	// the highest measured value and respond with a low/mid/strong attack: approx.
 	// 0x40 for low, 0xe0 for mid, 0xfe for strong.
+	// NOTE: Timing is a matter of tenth-seconds. Tapping the button too lightly/quickly,
+	// will not trigger an attack, same as on the original cab. Similarly, holding the
+	// button for too long won't register either, analogous to the original cab by pushing
+	// the button down slowly instead of hammering it.
 	PORT_START("PUNCH")
 	PORT_BIT( 0x00ff, 0x0000, IPT_PEDAL1 ) PORT_PLAYER(1) PORT_SENSITIVITY(100) PORT_KEYDELTA(25) PORT_NAME("P1 Punch")
 	PORT_BIT( 0xff00, 0x0000, IPT_PEDAL1 ) PORT_PLAYER(2) PORT_SENSITIVITY(100) PORT_KEYDELTA(25) PORT_NAME("P2 Punch")
