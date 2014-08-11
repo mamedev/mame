@@ -3,14 +3,14 @@
  * MSX Floopy drive interface add-on cartridges
  *
  * Currently supported:
- * - Philips VY-0010 (Interface cartridge + 1 3.5" SS floppy drive)
+ * - National FS-CF351 + FS-FD351 - MB8877A - DSDD 3.5" Floppy drive + interface
  * - Panasonic FS-FD1 - WD2793? - DSDD 3.5" Floppy drive + interface
  * - Panasonic FS-FD1A - TC8566F - DSDD 3.5" Floppy drive with builtin interface
  *                     - Rom label reads: "FDC BIOS V1.0 / COPYRIGHT MEI / 1987 DASFD1AA1"
+ * - Philips VY-0010 (Interface cartridge + 1 3.5" SS floppy drive)
  *
  * Not supported yet:
  * - Canon VF-100 - DSDD 3.5" Floppy drive + interface + 1 floppy disk containing MSX-DOS
- * - National FS-FD351 - MB8877A - DSDD 3.5" Floppy drive + interface
  * - Talent DPF-550/5 - WD1772 - DSDD 5.25" Floppy drive (360KB) plus interface (manufactured by Daewoo)
  *                    - Rom label markings: MSX DISK / DPF 555D
  *
@@ -106,6 +106,7 @@
 const device_type MSX_CART_VY0010 = &device_creator<msx_cart_vy0010>;
 const device_type MSX_CART_FSFD1 = &device_creator<msx_cart_fsfd1>;
 const device_type MSX_CART_FSFD1A = &device_creator<msx_cart_fsfd1a>;
+const device_type MSX_CART_FSCF351 = &device_creator<msx_cart_fscf351>;
 
 
 FLOPPY_FORMATS_MEMBER( msx_cart_disk::floppy_formats )
@@ -142,6 +143,14 @@ msx_cart_disk_type1::msx_cart_disk_type1(const machine_config &mconfig, device_t
 {
 }
 
+
+msx_cart_disk_type2::msx_cart_disk_type2(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname)
+	: msx_cart_disk_wd(mconfig, type, name, tag, owner, clock, shortname)
+	, m_control(0)
+{
+}
+
+
 msx_cart_vy0010::msx_cart_vy0010(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: msx_cart_disk_type1(mconfig, MSX_CART_VY0010, "MSX Cartridge - VY0010", tag, owner, clock, "msx_cart_vy0010")
 {
@@ -150,6 +159,12 @@ msx_cart_vy0010::msx_cart_vy0010(const machine_config &mconfig, const char *tag,
 
 msx_cart_fsfd1::msx_cart_fsfd1(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: msx_cart_disk_type1(mconfig, MSX_CART_FSFD1, "MSX Cartridge - FS-FD1", tag, owner, clock, "msx_cart_fsfd1")
+{
+}
+
+
+msx_cart_fscf351::msx_cart_fscf351(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+    : msx_cart_disk_type2(mconfig, MSX_CART_FSCF351, "MSX Cartridge - FS-CF351", tag, owner, clock, "msx_cart_fscf351")
 {
 }
 
@@ -241,6 +256,28 @@ MACHINE_CONFIG_END
 machine_config_constructor msx_cart_fsfd1a::device_mconfig_additions() const
 {
 	return MACHINE_CONFIG_NAME( fsfd1a );
+}
+
+
+static MACHINE_CONFIG_FRAGMENT( fscf351 )
+	MCFG_MB8877x_ADD("fdc", XTAL_4MHz / 4)
+	MCFG_WD_FDC_FORCE_READY
+
+	// Double sided 3.5" floppy drive
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", msx_floppies, "35dd", msx_cart_disk::floppy_formats)
+
+	// Attach software lists
+	// We do not know in what kind of machine the user has inserted the floppy interface
+	// so we list all msx floppy software lists.
+	//
+	MCFG_SOFTWARE_LIST_ADD("flop_list","msx2_flop")
+	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("msx1_flop_list","msx1_flop")
+MACHINE_CONFIG_END
+
+
+machine_config_constructor msx_cart_fscf351::device_mconfig_additions() const
+{
+	return MACHINE_CONFIG_NAME( fscf351 );
 }
 
 
@@ -398,6 +435,138 @@ WRITE8_MEMBER(msx_cart_disk_type1::write_cart)
 			break;
 	}
 }
+
+
+void msx_cart_disk_type2::device_start()
+{
+	save_item(NAME(m_control));
+
+	machine().save().register_postload(save_prepost_delegate(FUNC(msx_cart_disk_type2::post_load), this));
+}
+
+
+void msx_cart_disk_type2::device_reset()
+{
+	m_fdc->dden_w(false);
+}
+
+
+void msx_cart_disk_type2::post_load()
+{
+	UINT8 data = m_control;
+
+	// To make sure the FDD busy led status gets set correctly
+	m_control ^= 0x40;
+
+	set_control(data);
+}
+
+
+void msx_cart_disk_type2::set_control(UINT8 data)
+{
+	UINT8 old_m_control = m_control;
+
+	m_control = data;
+
+	switch (m_control & 3)
+	{
+		case 1:
+			m_floppy = m_floppy0 ? m_floppy0->get_device() : NULL;
+			break;
+
+		case 2:
+			m_floppy = m_floppy1 ? m_floppy1->get_device() : NULL;
+			break;
+
+		default:
+			m_floppy = NULL;
+			break;
+	}
+
+	if (m_floppy)
+	{
+		m_floppy->mon_w((m_control & 0x08) ? 0 : 1);
+		m_floppy->ss_w((m_control & 0x04) ? 1 : 0);
+	}
+
+	m_fdc->set_floppy(m_floppy);
+
+	if ((old_m_control ^ m_control) & 0x40)
+	{
+		set_led_status(machine(), 0, !(m_control & 0x40));
+	}
+}
+
+
+READ8_MEMBER(msx_cart_disk_type2::read_cart)
+{
+	switch (offset)
+	{
+		case 0x7fb8:
+		case 0xbfb8:
+			return m_fdc->status_r();
+
+		case 0x7fb9:
+		case 0xbfb9:
+			return m_fdc->track_r();
+
+		case 0x7fba:
+		case 0xbfba:
+			return m_fdc->sector_r();
+
+		case 0x7fbb:
+		case 0xbfbb:
+			return m_fdc->data_r();
+
+		case 0x7fbc:
+		case 0xbfbc:
+			return 0x3f | (m_fdc->drq_r() ? 0 : 0x40) | (m_fdc->intrq_r() ? 0x80 : 0);
+	}
+
+	if (offset >= 0x4000 && offset < 0x8000)
+	{
+		return get_rom_base()[offset & 0x3fff];
+	}
+	return 0xff;
+}
+
+
+WRITE8_MEMBER(msx_cart_disk_type2::write_cart)
+{
+	switch (offset)
+	{
+		case 0x7fb8:
+		case 0xbfb8:
+			m_fdc->cmd_w(data);
+			break;
+
+		case 0x7fb9:
+		case 0xbfb9:
+			m_fdc->track_w(data);
+			break;
+
+		case 0x7fba:
+		case 0xbfba:
+			m_fdc->sector_w(data);
+			break;
+
+		case 0x7fbb:
+		case 0xbfbb:
+			m_fdc->data_w(data);
+			break;
+
+		case 0x7fbc:
+		case 0xbfbc:
+			set_control(data);
+			break;
+
+		default:
+			logerror("msx_cart_disk_type2::write_cart: Unmapped write writing %02x to %04x\n", data, offset);
+			break;
+	}
+}
+
+
 
 
 void msx_cart_fsfd1a::device_start()

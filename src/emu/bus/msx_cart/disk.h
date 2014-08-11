@@ -11,6 +11,7 @@
 extern const device_type MSX_CART_VY0010;
 extern const device_type MSX_CART_FSFD1;
 extern const device_type MSX_CART_FSFD1A;
+extern const device_type MSX_CART_FSCF351;
 
 
 class msx_cart_disk : public device_t
@@ -63,6 +64,27 @@ protected:
 };
 
 
+class msx_cart_disk_type2 : public msx_cart_disk_wd
+{
+public:
+	msx_cart_disk_type2(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname);
+
+	// device-level overrides
+	virtual void device_start();
+	virtual void device_reset();
+
+	virtual DECLARE_READ8_MEMBER(read_cart);
+	virtual DECLARE_WRITE8_MEMBER(write_cart);
+
+	void post_load();
+
+protected:
+	UINT8 m_control;
+
+	void set_control(UINT8 data);
+};
+
+
 class msx_cart_vy0010 : public msx_cart_disk_type1
 {
 public:
@@ -76,6 +98,15 @@ class msx_cart_fsfd1 : public msx_cart_disk_type1
 {
 public:
 	msx_cart_fsfd1(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	virtual machine_config_constructor device_mconfig_additions() const;
+};
+
+
+class msx_cart_fscf351 : public msx_cart_disk_type2
+{
+public:
+	msx_cart_fscf351(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	virtual machine_config_constructor device_mconfig_additions() const;
 };
