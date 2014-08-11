@@ -17095,20 +17095,6 @@ legacy FM implementations cannot find it.
 
 	<!-- Devices -->
 
-	<!-- mounting this should add the floppy drive, rather than it always being there? -->
-	<software name="diskbas" supported="no">
-		<description>Disk BASIC v1.0 for FS-FD1 (Japan)</description>
-		<year>1987</year>
-		<publisher>Matsushita</publisher>
-		<part name="cart" interface="msx_cart">
-			<feature name="slot" value="disk_rom" />
-			<feature name="mapper" value="DISK_ROM" />
-			<dataarea name="rom" size="0x4000">
-				<rom name="disk basic v1.0 for fs-fd1 (1987)(matsushita electric industrial)(jp).rom" size="0x4000" crc="4c9b8214" sha1="8e3f6f08309f082a82be8298a66c9b90f2d34ad4" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="vy0010">
 		<description>VY-0010 (Floppy controller + 3.5" SSDD floppy drive)</description>
 		<year>198?</year>
