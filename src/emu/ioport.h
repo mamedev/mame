@@ -399,6 +399,11 @@ enum ioport_type
 	IPT_COUNT
 };
 DECLARE_ENUM_OPERATORS(ioport_type)
+// aliases for some types
+#define IPT_PADDLE_H        IPT_PADDLE
+#define IPT_PEDAL1          IPT_PEDAL
+#define IPT_POSITIONAL_H    IPT_POSITIONAL
+#define IPT_DIAL_H          IPT_DIAL
 
 
 // input type classes
