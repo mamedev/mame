@@ -979,10 +979,10 @@ ROM_END
      - built-in Alex Kidd in Miracle World - 1992
      - built-in Sonic the Hedgehog - 1993
      - built-in World Cup Italia '90 (Super Futebol II) - 1994
-     - built-in Hang On/Safari Hunt v2.4 (blue L.Phaser pack) - 199?
+     - built-in Hang On/Safari Hunt v2.4 (blue L.Phaser pack) - 1995
    - Tec Toy Master System Super Compact (no driver)
+     - built-in Alex Kidd in Miracle World - 1993
      - built-in Sonic the Hedgehog - 1993
-     - built-in Alex Kidd in Miracle World - 1994 ?
      - built-in World Cup Italia '90 (Super Futebol II) - 1994
    - Tec Toy Master System Girl (no driver)
      - built-in Monica no Castelo do Dragao - 1994
