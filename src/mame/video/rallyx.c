@@ -439,7 +439,7 @@ void rallyx_state::draw_stars( bitmap_ind16 &bitmap, const rectangle &cliprect )
 }
 
 
-void rallyx_state::rallyx_draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int displacement )
+void rallyx_state::rallyx_draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	UINT8 *spriteram = m_spriteram;
 	UINT8 *spriteram_2 = m_spriteram2;
@@ -447,13 +447,11 @@ void rallyx_state::rallyx_draw_sprites( screen_device &screen, bitmap_ind16 &bit
 
 	for (offs = 0x20 - 2; offs >= m_spriteram_base; offs -= 2)
 	{
-		int sx = spriteram[offs + 1] + ((spriteram_2[offs + 1] & 0x80) << 1) - displacement;
-		int sy = 241 - spriteram_2[offs] - displacement;
+		int sx = spriteram[offs + 1] + ((spriteram_2[offs + 1] & 0x80) << 1);
+		int sy = 241 - spriteram_2[offs];
 		int color = spriteram_2[offs + 1] & 0x3f;
 		int flipx = spriteram[offs] & 1;
 		int flipy = spriteram[offs] & 2;
-		if (flip_screen())
-			sx -= 2 * displacement;
 
 		m_gfxdecode->gfx(1)->prio_transmask(bitmap,cliprect,
 				(spriteram[offs] & 0xfc) >> 2,
@@ -465,7 +463,7 @@ void rallyx_state::rallyx_draw_sprites( screen_device &screen, bitmap_ind16 &bit
 	}
 }
 
-void rallyx_state::locomotn_draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int displacement )
+void rallyx_state::locomotn_draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	UINT8 *spriteram = m_spriteram;
 	UINT8 *spriteram_2 = m_spriteram2;
@@ -474,7 +472,7 @@ void rallyx_state::locomotn_draw_sprites( screen_device &screen, bitmap_ind16 &b
 	for (offs = 0x20 - 2; offs >= m_spriteram_base; offs -= 2)
 	{
 		int sx = spriteram[offs + 1] + ((spriteram_2[offs + 1] & 0x80) << 1);
-		int sy = 241 - spriteram_2[offs] - displacement;
+		int sy = 241 - spriteram_2[offs];
 		int color = spriteram_2[offs + 1] & 0x3f;
 		int flip = spriteram[offs] & 2;
 
@@ -609,7 +607,7 @@ UINT32 rallyx_state::screen_update_rallyx(screen_device &screen, bitmap_ind16 &b
 	m_fg_tilemap->draw(screen, bitmap, fg_clip, 1, 1);
 
 	rallyx_draw_bullets(bitmap, cliprect, TRUE);
-	rallyx_draw_sprites(screen, bitmap, cliprect, 1);
+	rallyx_draw_sprites(screen, bitmap, cliprect);
 	rallyx_draw_bullets(bitmap, cliprect, FALSE);
 
 	return 0;
@@ -643,7 +641,7 @@ UINT32 rallyx_state::screen_update_jungler(screen_device &screen, bitmap_ind16 &
 	m_fg_tilemap->draw(screen, bitmap, fg_clip, 1, 0);
 
 	jungler_draw_bullets(bitmap, cliprect, TRUE);
-	rallyx_draw_sprites(screen, bitmap, cliprect, 0);
+	rallyx_draw_sprites(screen, bitmap, cliprect);
 	jungler_draw_bullets(bitmap, cliprect, FALSE);
 
 	if (m_stars_enable)
@@ -688,7 +686,7 @@ UINT32 rallyx_state::screen_update_locomotn(screen_device &screen, bitmap_ind16 
 	m_fg_tilemap->draw(screen, bitmap, fg_clip, 1, 1);
 
 	locomotn_draw_bullets(bitmap, cliprect, TRUE);
-	locomotn_draw_sprites(screen, bitmap, cliprect, 0);
+	locomotn_draw_sprites(screen, bitmap, cliprect);
 	locomotn_draw_bullets(bitmap, cliprect, FALSE);
 
 	if (m_stars_enable)

@@ -832,13 +832,13 @@ MACHINE_RESET_MEMBER(rallyx_state,rallyx)
 
 INTERRUPT_GEN_MEMBER(rallyx_state::rallyx_vblank_irq)
 {
-	if(m_main_irq_mask)
+	if (m_main_irq_mask)
 		device.execute().set_input_line(0, ASSERT_LINE);
 }
 
 INTERRUPT_GEN_MEMBER(rallyx_state::jungler_vblank_irq)
 {
-	if(m_main_irq_mask)
+	if (m_main_irq_mask)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
@@ -848,7 +848,7 @@ static MACHINE_CONFIG_START( rallyx, rallyx_state )
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/6)    /* 3.072 MHz */
 	MCFG_CPU_PROGRAM_MAP(rallyx_map)
 	MCFG_CPU_IO_MAP(io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", rallyx_state,  rallyx_vblank_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", rallyx_state, rallyx_vblank_irq)
 
 	MCFG_MACHINE_START_OVERRIDE(rallyx_state,rallyx)
 	MCFG_MACHINE_RESET_OVERRIDE(rallyx_state,rallyx)
@@ -887,7 +887,7 @@ static MACHINE_CONFIG_START( jungler, rallyx_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/6)    /* 3.072 MHz */
 	MCFG_CPU_PROGRAM_MAP(jungler_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", rallyx_state,  jungler_vblank_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", rallyx_state, jungler_vblank_irq)
 
 	MCFG_MACHINE_START_OVERRIDE(rallyx_state,rallyx)
 	MCFG_MACHINE_RESET_OVERRIDE(rallyx_state,rallyx)
