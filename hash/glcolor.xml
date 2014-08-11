@@ -57,4 +57,16 @@
 			</dataarea>
 		</part>
 	</software>
+
+<!-- According to the boxart, this is compatible with: Leader Color/Super Color -->
+	<software name="spiellern">
+		<description>Spiel-und Lernspaß</description>
+		<year>199?</year>
+		<publisher>Video Technology</publisher>
+		<part name="rom" interface="genius_cart">
+			<dataarea name="rom" size="1">
+				<!-- cartridge contains only a jumper wire -->
+			</dataarea>
+		</part>
+	</software>
 </softwarelist>

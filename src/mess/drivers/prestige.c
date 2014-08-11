@@ -91,6 +91,7 @@ public:
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
 			m_ram(*this, RAM_TAG),
+			m_cart(*this, "cart"),
 			m_keyboard(*this, "KEY"),
 			m_bank1(*this, "bank1"),
 			m_bank2(*this, "bank2"),
@@ -101,6 +102,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
+	required_device<cartslot_image_device> m_cart;
 	required_ioport_array<16> m_keyboard;
 	required_memory_bank m_bank1;
 	required_memory_bank m_bank2;
@@ -159,14 +161,14 @@ WRITE8_MEMBER( prestige_state::bankswitch_w )
 		break;
 
 	case 1:
-		if (!(m_bank[5] & 0x01) && (m_bank[5] & 0x02))
+		if (!(m_bank[5] & 0x01) && (m_bank[5] & 0x02) && m_cart->exists())
 			m_bank2->set_entry(0x40 + (data & 0x1f));
 		else
 			m_bank2->set_entry(data & 0x3f);
 		break;
 
 	case 2:
-		if (!(m_bank[5] & 0x01) && (m_bank[5] & 0x04))
+		if (!(m_bank[5] & 0x01) && (m_bank[5] & 0x04) && m_cart->exists())
 			m_bank3->set_entry(0x40 + (data & 0x1f));
 		else
 			m_bank3->set_entry(data & 0x3f);
