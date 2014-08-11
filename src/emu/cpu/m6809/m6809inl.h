@@ -302,43 +302,12 @@ inline bool m6809_base_device::is_register_addressing_mode()
 
 inline UINT16 m6809_base_device::get_pending_interrupt()
 {
-	UINT16 result;
 	if (m_nmi_asserted)
-		result = VECTOR_NMI;
+		return VECTOR_NMI;
 	else if (!(m_cc & CC_F) && m_firq_line)
-		result = VECTOR_FIRQ;
+		return VECTOR_FIRQ;
 	else if (!(m_cc & CC_I) && m_irq_line)
-		result = VECTOR_IRQ;
+		return VECTOR_IRQ;
 	else
-		result = 0;
-	return result;
-}
-
-
-
-//-------------------------------------------------
-//  check_pending_interrupt
-//-------------------------------------------------
-
-inline UINT16 m6809_base_device::check_pending_interrupt()
-{
-	UINT16 result = get_pending_interrupt();
-
-	// check_pending_interrupt() will also invoke the IRQ
-	// callback for FIRQ and IRQ interrupts
-	//
-	// I'm not sure why this is necessary; neither the 6809, 6309
-	// nor (presumably) Konami had any interrupt acknowledge lines so
-	// it isn't clear what this is reflecting
-	switch(result)
-	{
-		case VECTOR_FIRQ:
-			standard_irq_callback(M6809_FIRQ_LINE);
-			break;
-		case VECTOR_IRQ:
-			standard_irq_callback(M6809_IRQ_LINE);
-			break;
-	}
-
-	return result;
+		return 0;
 }

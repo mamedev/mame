@@ -238,7 +238,6 @@ protected:
 	bool is_register_addressing_mode();
 	bool is_ea_addressing_mode() { return m_addressing_mode == ADDRESSING_MODE_EA; }
 	UINT16 get_pending_interrupt();
-	UINT16 check_pending_interrupt();
 	void log_illegal();
 
 private:

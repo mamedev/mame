@@ -73,7 +73,7 @@ private:
 	void execute_one();
 };
 
-#define KONAMI_IRQ_LINE 0   /* IRQ line number */
-#define KONAMI_FIRQ_LINE 1   /* FIRQ line number */
+#define KONAMI_IRQ_LINE  M6809_IRQ_LINE   /* 0 - IRQ line number */
+#define KONAMI_FIRQ_LINE M6809_FIRQ_LINE  /* 1 - FIRQ line number */
 
 #endif /* __KONAMI_CPU_H__ */

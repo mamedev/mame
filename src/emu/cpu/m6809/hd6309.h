@@ -140,7 +140,7 @@ enum
 	HD6309_ZERO_WORD
 };
 
-#define HD6309_IRQ_LINE  0   /* IRQ line number */
-#define HD6309_FIRQ_LINE 1   /* FIRQ line number */
+#define HD6309_IRQ_LINE  M6809_IRQ_LINE   /* 0 - IRQ line number */
+#define HD6309_FIRQ_LINE M6809_FIRQ_LINE  /* 1 - FIRQ line number */
 
 #endif // __HD6309_H__

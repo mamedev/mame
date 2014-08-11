@@ -7,6 +7,7 @@ NMI:
 	m_cc |= CC_I | CC_F;
 	set_ea(VECTOR_NMI);
 	eat(1);
+	standard_irq_callback(INPUT_LINE_NMI);
 	goto INTERRUPT_VECTOR;
 
 FIRQ:
@@ -25,6 +26,7 @@ FIRQ:
 	m_cc |= CC_I | CC_F;
 	set_ea(VECTOR_FIRQ);
 	eat(1);
+	standard_irq_callback(M6809_FIRQ_LINE);
 	goto INTERRUPT_VECTOR;
 
 IRQ:
@@ -35,6 +37,7 @@ IRQ:
 	m_cc |= CC_I;
 	set_ea(VECTOR_IRQ);
 	eat(1);
+	standard_irq_callback(M6809_IRQ_LINE);
 	goto INTERRUPT_VECTOR;
 
 INTERRUPT_VECTOR:
@@ -447,6 +450,16 @@ CWAI:
 
 	set_ea(m_ea.w);	// need to do this to set the addressing mode
 	m_cc |= CC_I | (m_ea.w != VECTOR_IRQ ? CC_F : 0);
+
+	// invoke standard interrupt callback for MAME core
+	switch (m_ea.w)
+	{
+		case VECTOR_NMI:	standard_irq_callback(INPUT_LINE_NMI); break;
+		case VECTOR_FIRQ:	standard_irq_callback(M6809_FIRQ_LINE); break;
+		case VECTOR_IRQ:	standard_irq_callback(M6809_IRQ_LINE); break;
+		default:			break;
+	}
+
 	goto INTERRUPT_VECTOR;
 
 LEA_xy:

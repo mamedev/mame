@@ -1,6 +1,6 @@
 MAIN:
 	// check interrupt lines
-	switch(check_pending_interrupt())
+	switch(get_pending_interrupt())
 	{
 		case VECTOR_NMI:	goto NMI;
 		case VECTOR_FIRQ:	goto FIRQ;
