@@ -21,23 +21,6 @@
 #include "includes/sf.h"
 
 
-WRITE8_MEMBER(sf_state::sf_coin_w)
-{
-	coin_counter_w(machine(), 0,  data & 0x01);
-	coin_counter_w(machine(), 1,  data & 0x02);
-	coin_lockout_w(machine(), 0, ~data & 0x10);
-	coin_lockout_w(machine(), 1, ~data & 0x20);
-	coin_lockout_w(machine(), 2, ~data & 0x40); /* is there a third coin input? */
-}
-
-
-WRITE8_MEMBER(sf_state::soundcmd_w)
-{
-	soundlatch_byte_w(space, offset, data & 0xff);
-	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-}
-
-
 /* The protection of the Japanese (and alt US) version */
 /* I'd love to see someone dump the 68705 / i8751 roms */
 
@@ -55,9 +38,7 @@ WRITE16_MEMBER(sf_state::protection_w)
 		{ 3, 2, 1, 0, 6, 7, 4, 5, 8, 9 },
 		{ 6, 7, 4, 5, 3, 2, 1, 0, 8, 9 }
 	};
-	int map;
-
-	map = maplist
+	int map = maplist
 		[space.read_byte(0xffc006)]
 		[(space.read_byte(0xffc003) << 1) + (space.read_word(0xffc004) >> 8)];
 
@@ -142,28 +123,25 @@ WRITE16_MEMBER(sf_state::protection_w)
 }
 
 
-/* The world version has analog buttons */
-/* We simulate them with 3 buttons the same way the other versions
-   internally do */
-
-static const int scale[8] = { 0x00, 0x40, 0xe0, 0xfe, 0xfe, 0xfe, 0xfe, 0xfe };
-
-READ16_MEMBER(sf_state::button1_r)
+WRITE8_MEMBER(sf_state::sf_coin_w)
 {
-	return (scale[ioport("AN3")->read()] << 8) | scale[ioport("AN1")->read()];
+	coin_counter_w(machine(), 0,  data & 0x01);
+	coin_counter_w(machine(), 1,  data & 0x02);
+	coin_lockout_w(machine(), 0, ~data & 0x10);
+	coin_lockout_w(machine(), 1, ~data & 0x20);
+	coin_lockout_w(machine(), 2, ~data & 0x40); /* is there a third coin input? */
 }
 
-READ16_MEMBER(sf_state::button2_r)
+WRITE8_MEMBER(sf_state::soundcmd_w)
 {
-	return (scale[ioport("AN4")->read()] << 8) | scale[ioport("AN2")->read()];
+	soundlatch_byte_w(space, offset, data & 0xff);
+	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
-
 
 WRITE8_MEMBER(sf_state::sound2_bank_w)
 {
 	membank("bank1")->set_base(memregion("audio2")->base() + 0x8000 * (data + 1));
 }
-
 
 WRITE8_MEMBER(sf_state::msm1_5205_w)
 {
@@ -183,7 +161,6 @@ WRITE8_MEMBER(sf_state::msm2_5205_w)
 	m_msm2->vclk_w(0);
 }
 
-
 static ADDRESS_MAP_START( sf_map, AS_PROGRAM, 16, sf_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x04ffff) AM_ROM
@@ -191,8 +168,8 @@ static ADDRESS_MAP_START( sf_map, AS_PROGRAM, 16, sf_state )
 	AM_RANGE(0xb00000, 0xb007ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0xc00000, 0xc00001) AM_READ_PORT("IN0")
 	AM_RANGE(0xc00002, 0xc00003) AM_READ_PORT("IN1")
-	AM_RANGE(0xc00004, 0xc00005) AM_READ(button1_r)
-	AM_RANGE(0xc00006, 0xc00007) AM_READ(button2_r)
+	AM_RANGE(0xc00004, 0xc00005) AM_READ_PORT("PUNCH")
+	AM_RANGE(0xc00006, 0xc00007) AM_READ_PORT("KICK")
 	AM_RANGE(0xc00008, 0xc00009) AM_READ_PORT("DSW1")
 	AM_RANGE(0xc0000a, 0xc0000b) AM_READ_PORT("DSW2")
 	AM_RANGE(0xc0000c, 0xc0000d) AM_READ_PORT("SYSTEM")
@@ -276,6 +253,12 @@ static ADDRESS_MAP_START( sound2_io_map, AS_IO, 8, sf_state )
 ADDRESS_MAP_END
 
 
+
+/***************************************************************************
+
+  Inputs
+
+***************************************************************************/
 
 static INPUT_PORTS_START( common )
 	PORT_START("DSW1")
@@ -413,45 +396,16 @@ static INPUT_PORTS_START( sfan )
 	PORT_MODIFY("DSW1")
 	PORT_DIPUNUSED_DIPLOC( 0x0100, 0x0100, "DSW2.13E:1" ) // Flip Screen not available
 
-	PORT_START("AN1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(1)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	// 4 pneumatic buttons. When their pressure starts decreasing, the game will latch
+	// the highest measured value and respond with a low/mid/strong attack: approx.
+	// 0x40 for low, 0xe0 for mid, 0xfe for strong.
+	PORT_START("PUNCH")
+	PORT_BIT( 0x00ff, 0x0000, IPT_PEDAL1 ) PORT_PLAYER(1) PORT_SENSITIVITY(100) PORT_KEYDELTA(25) PORT_NAME("P1 Punch")
+	PORT_BIT( 0xff00, 0x0000, IPT_PEDAL1 ) PORT_PLAYER(2) PORT_SENSITIVITY(100) PORT_KEYDELTA(25) PORT_NAME("P2 Punch")
 
-	PORT_START("AN2")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_PLAYER(1)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_PLAYER(1)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_PLAYER(1)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-
-	PORT_START("AN3")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(2)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-
-	PORT_START("AN4")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_PLAYER(2)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_PLAYER(2)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_PLAYER(2)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_START("KICK")
+	PORT_BIT( 0x00ff, 0x0000, IPT_PEDAL2 ) PORT_PLAYER(1) PORT_SENSITIVITY(100) PORT_KEYDELTA(25) PORT_NAME("P1 Kick")
+	PORT_BIT( 0xff00, 0x0000, IPT_PEDAL2 ) PORT_PLAYER(2) PORT_SENSITIVITY(100) PORT_KEYDELTA(25) PORT_NAME("P2 Kick")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( sfus )
@@ -515,6 +469,12 @@ static INPUT_PORTS_START( sfjp )
 INPUT_PORTS_END
 
 
+
+/***************************************************************************
+
+  Machine Configs
+
+***************************************************************************/
 
 static const gfx_layout char_layout =
 {
@@ -635,6 +595,13 @@ static MACHINE_CONFIG_DERIVED( sfp, sf )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", sf_state, irq6_line_hold)
 MACHINE_CONFIG_END
 
+
+
+/***************************************************************************
+
+  Game drivers
+
+***************************************************************************/
 
 ROM_START( sf )
 	ROM_REGION( 0x60000, "maincpu", 0 )
