@@ -1997,6 +1997,7 @@ fightrol        // (c) 1983 Taito
 rollace         // (c) 1983 Williams
 rollace2        // (c) 1983 Williams
 lgp             // (c) 1983 Taito
+lgpalt          // (c) 1983 Taito
 vsgongf         // (c) 1984 Kaneko
 ringfgt         // (c) 1984 Taito
 ringfgt2        // (c) 1984 Taito
@@ -4213,6 +4214,7 @@ dlair2_314      // (c) 1991 Leland
 dlair2_312      // (c) 1991 Leland
 dlair2_300      // (c) 1991 Leland
 dlair2_211      // (c) 1991 Leland
+dlair2_200      // (c) 1991 Leland
 spacea91        // (c) 1991 Leland
 spacea91_13e        // (c) 1991 Leland
 
@@ -7808,6 +7810,7 @@ greatgun        // (c) 1983
 // Other Stern
 cliffhgr        // (c) 1983
 cliffhgra       // (c) 1983
+cliffhgra2      // (c) 1983
 goaltogo        // (c) 1983
 
 // GamePlan games
@@ -9974,18 +9977,27 @@ odeontw2        // (c) 1999
 alg_bios
 maddoga         // (c) 1990
 wsjr            // (c) 1991
-wsjr15          // (c) 1991
+wsjr_15         // (c) 1991
 maddog          // (c) 1990
+maddog_202      // (c) 1990
 maddog2         // (c) 1992
-maddog22        // (c) 1992
-maddog21        // (c) 1992
+maddog2_202     // (c) 1992
+maddog2_110     // (c) 1992
+maddog2_100     // (c) 1992
 spacepir        // (c) 1992
+spacepir_14     // (c) 1992
 gallgall        // (c) 1992
+gallgall_21     // (c) 1992
 crimepat        // (c) 1993
-crimep211       // (c) 1993
+crimepat_14     // (c) 1993
+crimepat_12     // (c) 1993
 crimep2         // (c) 1993
+crimep2_11      // (c) 1993
 lastbh          // (c) 1994
+lastbh_006      // (c) 1994
 fastdraw        // (c) 1995
+fastdraw_130    // (c) 1995
+
 aplatoon        // (c) 199? Nova?
 zortonbr        // (c) 1993 Web Picmatic
 
@@ -10052,6 +10064,7 @@ dlairc          // (c) 1983 Cinematronics
 dlairb          // (c) 1983 Cinematronics
 dlaira          // (c) 1983 Cinematronics
 dleuro          // (c) 1983 Atari
+dleuroalt       // (c) 1983 Atari
 dlital          // (c) 1983 Sidam
 spaceace        // (c) 1983 Cinematronics
 spaceacea2      // (c) 1983 Cinematronics

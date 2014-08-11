@@ -757,6 +757,30 @@ ROM_START( dlair )      /* revision F2 */
 	DISK_IMAGE_READONLY( "dlair", 0, NO_DUMP )
 ROM_END
 
+ROM_START( dlair_1 )     /* Serial #001, courtesy Jason Finn */
+	ROM_REGION( 0xa000, "maincpu", 0 )
+	ROM_LOAD( "dl_n1_u1.bin", 0x0000, 0x2000,  CRC(a1856eac) SHA1(f5c1daeec3d4a3c14399f181dc4dfafdc43acc51) )
+	ROM_LOAD( "dl_n1_u2.bin", 0x2000, 0x2000,  CRC(1b34406f) SHA1(f78b2e7558e28fa81fdea4d72d68348fc11d224c) )
+	ROM_LOAD( "dl_n1_u3.bin", 0x4000, 0x2000,  CRC(cf3f4d3c) SHA1(af263d914902c74d4090dc213be5b9edbde9e1ae) )
+	ROM_LOAD( "dl_n1_u4.bin", 0x6000, 0x2000,  CRC(a98880c5) SHA1(48eec445f6f40db18b0f66c777bff475cf33571a) )
+	ROM_LOAD( "dl_n1_u5.bin", 0x8000, 0x2000,  CRC(17b7336b) SHA1(f5b7fc6b2f100a7cf7c6e7e31492bf08a82199f1) )
+
+	DISK_REGION( "ld_pr7820" )
+	DISK_IMAGE_READONLY( "dlair", 0, NO_DUMP )
+ROM_END
+
+ROM_START( dlair_2 )     
+	ROM_REGION( 0xa000, "maincpu", 0 )
+	ROM_LOAD( "dlu1.bin", 0x0000, 0x2000,  CRC(ea6d5498) SHA1(1d854c04e0074e693e791e22a4c9cc21d5175d95) )
+	ROM_LOAD( "dlu2.bin", 0x2000, 0x2000,  CRC(ffe84a95) SHA1(675ce2e68e43beb1f389bc6ab1a55bee862a1440) )
+	ROM_LOAD( "dlu3.bin", 0x4000, 0x2000,  CRC(6363fd84) SHA1(d865495337ed77952b60ca267ce52e1e9e01224b) )
+	ROM_LOAD( "dlu4.bin", 0x6000, 0x2000,  CRC(84cabb86) SHA1(eac6ba4c5989ba67d914c9c84f91cf7a1e86accf) )
+	ROM_LOAD( "dlu5.bin", 0x8000, 0x2000,  CRC(8cc8f073) SHA1(78bbd7992224f4f273672d2fc1d64661f9200a77) )
+
+	DISK_REGION( "ld_pr7820" )
+	DISK_IMAGE_READONLY( "dlair", 0, NO_DUMP )
+ROM_END
+
 ROM_START( dlaira )     /* revision A */
 	ROM_REGION( 0xa000, "maincpu", 0 )
 	ROM_LOAD( "dl_a_u1.bin", 0x0000, 0x2000,  CRC(d76e83ec) SHA1(fc7ff5d883de9b38a9e0532c35990f4b319ba1d3) )
@@ -833,6 +857,20 @@ ROM_START( dleuro )     /* European Atari version */
 	ROM_LOAD( "elu46.bin", 0x2000, 0x2000, CRC(8479612b) SHA1(b5543a06928274bde0e1bdda0747d936feaff177) )
 	ROM_LOAD( "elu47.bin", 0x4000, 0x2000, CRC(6a66f6b4) SHA1(2bee981870e61977565439c34568952043656cfa) )
 	ROM_LOAD( "elu48.bin", 0x6000, 0x2000, CRC(36575106) SHA1(178e26e7d5c7f879bc55c2fb170f3bb47a709610) )
+
+	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_LOAD( "elu33.bin", 0x0000, 0x2000, CRC(e7506d96) SHA1(610ae25bd8db13b18b9e681e855ffa978043255b) )
+
+	DISK_REGION( "ld_22vp932" )
+	DISK_IMAGE_READONLY( "dleuro", 0, NO_DUMP )
+ROM_END
+
+ROM_START( dleuroalt )     /* European Atari version */
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "elu45_d2.bin",0x0000, 0x2000, CRC(329b354a) SHA1(54bbc5aa647d3c20166a57f9d3aa5569e7289af8) )
+	ROM_LOAD( "elu46.bin",   0x2000, 0x2000, CRC(8479612b) SHA1(b5543a06928274bde0e1bdda0747d936feaff177) )
+	ROM_LOAD( "elu47.bin",   0x4000, 0x2000, CRC(6a66f6b4) SHA1(2bee981870e61977565439c34568952043656cfa) )
+	ROM_LOAD( "elu48.bin",   0x6000, 0x2000, CRC(36575106) SHA1(178e26e7d5c7f879bc55c2fb170f3bb47a709610) )
 
 	ROM_REGION( 0x2000, "gfx1", 0 )
 	ROM_LOAD( "elu33.bin", 0x0000, 0x2000, CRC(e7506d96) SHA1(610ae25bd8db13b18b9e681e855ffa978043255b) )
@@ -942,7 +980,11 @@ GAMEL( 1983, dlaird,   dlair,    dlair_ldv1000, dlair, dlair_state,  fixed,    R
 GAMEL( 1983, dlairc,   dlair,    dlair_pr7820,  dlair, dlair_state,  fixed,    ROT0, "Cinematronics", "Dragon's Lair (US Rev. C, Pioneer PR-7820)",  GAME_NOT_WORKING, layout_dlair )
 GAMEL( 1983, dlairb,   dlair,    dlair_pr7820,  dlair, dlair_state,  fixed,    ROT0, "Cinematronics", "Dragon's Lair (US Rev. B, Pioneer PR-7820)",  GAME_NOT_WORKING, layout_dlair )
 GAMEL( 1983, dlaira,   dlair,    dlair_pr7820,  dlair, dlair_state,  fixed,    ROT0, "Cinematronics", "Dragon's Lair (US Rev. A, Pioneer PR-7820)",  GAME_NOT_WORKING, layout_dlair )
+GAMEL( 1983, dlair_2,  dlair,    dlair_pr7820,  dlair, dlair_state,  fixed,    ROT0, "Cinematronics", "Dragon's Lair (US Beta 2?, Pioneer PR-7820)",  GAME_NOT_WORKING, layout_dlair )
+GAMEL( 1983, dlair_1,  dlair,    dlair_pr7820,  dlair, dlair_state,  fixed,    ROT0, "Cinematronics", "Dragon's Lair (US Beta 1, Pioneer PR-7820)",  GAME_NOT_WORKING, layout_dlair )
+
 GAMEL( 1983, dleuro,   dlair,    dleuro,        dleuro, dlair_state, fixed,    ROT0, "Cinematronics (Atari license)", "Dragon's Lair (European)",  GAME_NOT_WORKING, layout_dlair )
+GAMEL( 1983, dleuroalt,dlair,    dleuro,        dleuro, dlair_state, fixed,    ROT0, "Cinematronics (Atari license)", "Dragon's Lair (European, alternate)",  GAME_NOT_WORKING, layout_dlair )
 GAMEL( 1983, dlital,   dlair,    dleuro,        dleuro, dlair_state, fixed,    ROT0, "Cinematronics (Sidam license?)","Dragon's Lair (Italian)",  GAME_NOT_WORKING, layout_dlair )
 
 GAMEL( 1983, spaceace,     0,        dlair_ldv1000, dlaire, dlair_state, variable, ROT0, "Cinematronics", "Space Ace (US Rev. A3)", GAME_NOT_WORKING, layout_dlair )

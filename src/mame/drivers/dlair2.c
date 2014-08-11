@@ -14,6 +14,8 @@ http://www.dragons-lair-project.com/tech/pages/dl2.asp
   (located inside coin door) - Release both buttons
 
 * Rom version determines LD Image to use:
+  ROM revision 2.00 works only with a Dragon's Lair II/Space Ace '91 proto disc,
+  and an AMOA prototype board with DL2 BIOS ROM.
   ROM revision 2.xx works only with a Dragon's Lair II disc, serial number
   C-910-00001-00.  This is the original pressing of the laser disc.
   ROM revision 3.xx works with a Dragon's Lair II disc, serial number
@@ -260,6 +262,15 @@ ROM_START( dlair2_211 )
 	ROM_LOAD( "dl2_211.bin",     0x00000, 0x10000, CRC(9f2660a3) SHA1(bf35356aab0138f86e6ea18c7bcf4f3f3c428d98) )
 ROM_END
 
+ROM_START( dlair2_200 )
+	ROM_REGION( 0x10000, "ipl", 0 )
+	ROM_LOAD( "dl2_amoa_proto_9-8_2e7f.bin",      0x00000, 0x10000,CRC(b41bad8d) SHA1(c9d594f94c349d83f07c1f4730bfde371834263d) )
+
+	ROM_REGION( 0x2000, "bios", 0 ) /* BIOS for proto board */
+	ROM_LOAD( "dl2_amoa_proto_bios_mod_56ee.bin",0x00000, 0x2000, CRC(1fc21576) SHA1(dc5443f6a8d80ec8148314244f05ac0290e380ea) )
+	
+ROM_END
+
 ROM_START( spacea91 )
 	ROM_REGION( 0x10000, "ipl", 0 )
 	ROM_LOAD( "ace.dat",         0x00000, 0x10000, CRC(de93a213) SHA1(1c95d5f45292f08149d749e1f7b5d9409d3a266e) )
@@ -280,8 +291,9 @@ GAME( 1991, dlair2_316e,  dlair2,   dlair2,  dlair2, driver_device,  0,       RO
 GAME( 1991, dlair2_315,   dlair2,   dlair2,  dlair2, driver_device,  0,       ROT0, "Leland",      "Dragon's Lair 2: Time Warp (US v3.15)", GAME_IS_SKELETON )
 GAME( 1991, dlair2_315s,  dlair2,   dlair2,  dlair2, driver_device,  0,       ROT0, "Leland",      "Dragon's Lair 2: Time Warp (Spanish v3.15)", GAME_IS_SKELETON )
 GAME( 1991, dlair2_314,   dlair2,   dlair2,  dlair2, driver_device,  0,       ROT0, "Leland",      "Dragon's Lair 2: Time Warp (US v3.14)", GAME_IS_SKELETON )
-GAME( 1991, dlair2_312,   dlair2,   dlair2,  dlair2, driver_device,  0,       ROT0, "Leland",      "Dragon's Lair 2: Time Warp (US v3.12)", GAME_IS_SKELETON )
+GAME( 1991, dlair2_312,   dlair2,   dlair2,  dlair2, driver_device,  0,       ROT0, "Leland",      "Dragon's Lair 2: Time Warp (Euro v3.12)", GAME_IS_SKELETON )
 GAME( 1991, dlair2_300,   dlair2,   dlair2,  dlair2, driver_device,  0,       ROT0, "Leland",      "Dragon's Lair 2: Time Warp (US v3.00)", GAME_IS_SKELETON )
 GAME( 1991, dlair2_211,   dlair2,   dlair2,  dlair2, driver_device,  0,       ROT0, "Leland",      "Dragon's Lair 2: Time Warp (US v2.11)", GAME_IS_SKELETON )
+GAME( 1991, dlair2_200,   dlair2,   dlair2,  dlair2, driver_device,  0,       ROT0, "Leland",      "Dragon's Lair 2: Time Warp (US v2.00, AMOA prototype)", GAME_IS_SKELETON )
 GAME( 1991, spacea91,     0,        dlair2,  dlair2, driver_device,  0,       ROT0, "Leland",      "Space Ace (DL2 Conversion) (US v1.3)", GAME_IS_SKELETON )
 GAME( 1991, spacea91_13e, spacea91, dlair2,  dlair2, driver_device,  0,       ROT0, "Leland",      "Space Ace (DL2 Conversion) (Euro v1.3)", GAME_IS_SKELETON )
