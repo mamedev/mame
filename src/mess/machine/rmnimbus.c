@@ -44,10 +44,16 @@ to create a blank hard disk which can then be formatted with the RM tools.
 The important thing when doing this is to make sure that if using the Native
 SCSI tools, that the disk has the  same number of blocks as specified above,
 even if you have to use unusual geometry to do so !
+Currently, only the ST225N and ST125N can be formatted as the other native
+drives and Xebec board expect the WRITE BUFFER (0x3B) and READ BUFFER (0x3C)
+with mode 0 commands to be implemented and the Adaptec board uses unknown
+command 0xE4.
+
 
 for example:
 
-chdman createhd -o ST125N.chd -chs 407,4,26 -ss 512
+chdman createhd -o ST125N.chd -chs 41921,1,1 -ss 512
+(the actual geometry can't be used because the block count won't match)
 
 */
 
@@ -1075,7 +1081,7 @@ READ8_MEMBER(rmnimbus_state::scsi_r)
 			result |= m_scsi_cd << 6;
 			result |= m_scsi_io << 5;
 			result |= m_scsi_bsy << 4;
-			result |= m_scsi_msg << 3;
+			result |= !m_scsi_msg << 3;
 			if(floppy)
 			{
 				result |= FDC_MOTOR() << 2;
