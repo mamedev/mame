@@ -117,7 +117,10 @@ WRITE8_MEMBER(leland_state::leland_scroll_w)
 
 WRITE8_MEMBER(leland_state::leland_gfx_port_w)
 {
-	m_screen->update_partial(m_screen->vpos());
+	int scanline = m_screen->vpos();
+	if (scanline > 0)
+		m_screen->update_partial(scanline - 1);
+
 	m_gfxbank = data;
 }
 
