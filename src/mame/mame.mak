@@ -2460,6 +2460,8 @@ $(DRIVERS)/aces1.o:     $(LAYOUT)/aces1.lh
 
 $(DRIVERS)/acefruit.o:  $(LAYOUT)/sidewndr.lh
 
+$(DRIVERS)/allied.o:    $(LAYOUT)/allied.lh
+
 $(DRIVERS)/amaticmg.o:  $(LAYOUT)/suprstar.lh
 
 $(DRIVERS)/ampoker2.o:  $(LAYOUT)/ampoker2.lh \

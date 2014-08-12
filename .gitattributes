@@ -6431,6 +6431,7 @@ src/mame/layout/3bagflvt.lay svneol=native#text/xml
 src/mame/layout/abaseb.lay svneol=native#text/xml
 src/mame/layout/ace.lay svneol=native#text/xml
 src/mame/layout/aces1.lay svneol=native#text/xml
+src/mame/layout/allied.lay svneol=native#text/plain
 src/mame/layout/ampoker2.lay svneol=native#text/xml
 src/mame/layout/arcwins.lay svneol=native#text/xml
 src/mame/layout/arimk4nz.lay svneol=native#text/xml
