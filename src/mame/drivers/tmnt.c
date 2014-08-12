@@ -1966,6 +1966,7 @@ MACHINE_START_MEMBER(tmnt_state,common)
 	save_item(NAME(m_layer_colorbase));
 	save_item(NAME(m_layerpri));
 	save_item(NAME(m_sorted_layer));
+	save_item(NAME(m_irq5_mask));
 }
 
 MACHINE_RESET_MEMBER(tmnt_state,common)
@@ -1973,6 +1974,7 @@ MACHINE_RESET_MEMBER(tmnt_state,common)
 	m_toggle = 0;
 	m_last = 0;
 	m_tmnt_soundlatch = 0;
+	m_irq5_mask = 0;
 }
 
 
