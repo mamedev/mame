@@ -102,6 +102,19 @@ and why some of the dumps below have weird size?
 		</part>
 	</software>
 
+	<software name="bosco">
+		<description>Star Destroyer Bosconian</description>
+		<year>1981</year>
+		<publisher>Namco</publisher>
+		<info name="serial" value="3" />
+		<info name="alt_title" value="ボスコニアン" />
+		<part name="cart" interface="m5_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="bosconian.bin" size="8192" crc="8b299b7f" sha1="b26b1289fc96778d3b3f50eee5ca3963a1948dff" offset="00000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="galax">
 		<description>Galax</description>
 		<year>1981</year>
