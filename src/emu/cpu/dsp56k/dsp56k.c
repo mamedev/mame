@@ -227,6 +227,9 @@ static CPU_INIT( dsp56k )
 	device->save_item(NAME(cpustate->HI.trxh));
 	device->save_item(NAME(cpustate->HI.trxl));
 	device->save_item(NAME(cpustate->HI.bootstrap_offset));
+	
+	device->save_item(NAME(cpustate->peripheral_ram));
+	device->save_item(NAME(cpustate->program_ram));
 
 	//cpustate->config = device->static_config();
 	//cpustate->irq_callback = irqcallback;
