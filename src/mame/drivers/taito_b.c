@@ -2734,7 +2734,7 @@ static MACHINE_CONFIG_START( selfeena, taitob_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", XTAL_16MHz/2)  /* 8 MHz */
+	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL_16MHz/2)  /* 8 MHz */
 	MCFG_YM2610_IRQ_HANDLER(WRITELINE(taitob_state, irqhandler))
 	MCFG_SOUND_ROUTE(0, "mono", 0.25)
 	MCFG_SOUND_ROUTE(1, "mono", 1.0)
