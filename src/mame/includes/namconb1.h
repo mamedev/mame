@@ -43,18 +43,19 @@ public:
 	required_shared_ptr<UINT16> m_namconb_shareram;
 	required_shared_ptr<UINT32> m_generic_paletteram_32;
 
-	UINT8 m_namconb_cpureg[32];
-	int m_vblank_irq_active;
-	int m_pos_irq_active;
+	UINT8 m_vbl_irq_level;
+	UINT8 m_pos_irq_level;
+	UINT8 m_unk_irq_level;
 	UINT16 m_count;
 	UINT8 m_nbx_port6;
 	UINT32 m_tilemap_tile_bank[4];
 
 	DECLARE_READ32_MEMBER(randgen_r);
 	DECLARE_WRITE32_MEMBER(srand_w);
-	DECLARE_WRITE32_MEMBER(namconb1_cpureg_w);
-	DECLARE_WRITE32_MEMBER(namconb2_cpureg_w);
-	DECLARE_READ32_MEMBER(namconb_cpureg_r);
+	DECLARE_WRITE8_MEMBER(namconb1_cpureg_w);
+	DECLARE_WRITE8_MEMBER(namconb2_cpureg_w);
+	DECLARE_READ8_MEMBER(namconb1_cpureg_r);
+	DECLARE_READ8_MEMBER(namconb2_cpureg_r);
 	DECLARE_READ32_MEMBER(custom_key_r);
 	DECLARE_READ32_MEMBER(gunbulet_gun_r);
 	DECLARE_READ32_MEMBER(namconb_share_r);
@@ -71,6 +72,7 @@ public:
 	DECLARE_READ8_MEMBER(dac2_r);
 	DECLARE_READ8_MEMBER(dac1_r);
 	DECLARE_READ8_MEMBER(dac0_r);
+
 	DECLARE_DRIVER_INIT(sws95);
 	DECLARE_DRIVER_INIT(machbrkr);
 	DECLARE_DRIVER_INIT(sws97);
@@ -81,14 +83,11 @@ public:
 	DECLARE_DRIVER_INIT(gslgr94j);
 	DECLARE_DRIVER_INIT(outfxies);
 	DECLARE_DRIVER_INIT(gslgr94u);
-	DECLARE_MACHINE_START(namconb);
+	DECLARE_MACHINE_RESET(namconb);
 	DECLARE_VIDEO_START(namconb1);
 	DECLARE_VIDEO_START(namconb2);
 	UINT32 screen_update_namconb1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_namconb2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(namconb1_interrupt);
-	INTERRUPT_GEN_MEMBER(namconb2_interrupt);
-	TIMER_CALLBACK_MEMBER(namconb1_TriggerPOSIRQ);
-	TIMER_CALLBACK_MEMBER(namconb2_TriggerPOSIRQ);
-	TIMER_DEVICE_CALLBACK_MEMBER(mcu_interrupt);
+
+	TIMER_DEVICE_CALLBACK_MEMBER(namconb_scantimer);
 };

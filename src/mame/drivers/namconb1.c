@@ -281,11 +281,29 @@ GFX:                Custom 145     ( 80 pin PQFP)
 
 /****************************************************************************/
 
-TIMER_DEVICE_CALLBACK_MEMBER(namconb1_state::mcu_interrupt)
+TIMER_DEVICE_CALLBACK_MEMBER(namconb1_state::namconb_scantimer)
 {
 	int scanline = param;
 
-	/* TODO: real sources of these */
+	// Handle VBLANK
+	if (scanline == NAMCONB1_VBSTART)
+	{
+		if (m_vbl_irq_level != 0)
+			m_maincpu->set_input_line(m_vbl_irq_level, ASSERT_LINE);
+	}
+
+	// Handle POSIRQ
+	UINT32 posirq_scanline = (m_generic_paletteram_32[0x1808/4] & 0xffff) - 32;
+
+	if (scanline == posirq_scanline)
+	{
+		m_screen->update_partial(posirq_scanline);
+
+		if (m_pos_irq_level != 0)
+			m_maincpu->set_input_line(m_pos_irq_level, ASSERT_LINE);
+	}
+
+	// TODO: Real sources of these
 	if (scanline == 224)
 		m_mcu->set_input_line(M37710_LINE_IRQ0, HOLD_LINE);
 	else if (scanline == 0)
@@ -295,262 +313,199 @@ TIMER_DEVICE_CALLBACK_MEMBER(namconb1_state::mcu_interrupt)
 }
 
 
-TIMER_CALLBACK_MEMBER(namconb1_state::namconb1_TriggerPOSIRQ)
-{
-	if(m_pos_irq_active || !(m_namconb_cpureg[0x02] & 0xf0))
-		return;
-
-	m_screen->update_partial(param);
-	m_pos_irq_active = 1;
-	m_maincpu->set_input_line(m_namconb_cpureg[0x02] & 0xf, ASSERT_LINE);
-}
-
-INTERRUPT_GEN_MEMBER(namconb1_state::namconb1_interrupt)
-{
-	/**
-	 * 400000 0x00
-	 * 400001 0x00
-	 * 400002 0x00
-	 * 400003 0x00
-	 * 400004 0x35 // irq levels
-	 * 400005 0x00
-	 * 400006 0x00
-	 * 400007 0x00
-	 * 400008 0x00
-	 * 400009 0x00 VBLANK ack
-	 * 40000a 0x00
-	 * 40000b 0x03
-	 * 40000c 0x07
-	 * 40000d 0x01
-	 * 40000e 0x10
-	 * 40000f 0x03
-	 * 400010 0x00
-	 * 400011 0x07
-	 * 400012 0x10
-	 * 400013 0x10
-	 * 400014 0x00
-	 * 400015 0x01
-	 * 400016 (watchdog)
-	 * 400017 0x00
-	 * 400018 0x01
-	 * 400019 0x00
-	 * 40001a 0x00
-	 * 40001b 0x00
-	 * 40001c 0x00
-	 * 40001d 0x00
-	 * 40001e 0x00
-	 * 40001f 0x00
-	 */
-	int scanline = (m_generic_paletteram_32[0x1808/4]&0xffff)-32;
-
-	if((!m_vblank_irq_active) && (m_namconb_cpureg[0x04] & 0xf0)) {
-		device.execute().set_input_line(m_namconb_cpureg[0x04] & 0xf, ASSERT_LINE);
-		m_vblank_irq_active = 1;
-	}
-
-	if( scanline<0 )
-	{
-		scanline = 0;
-	}
-	if( scanline < NAMCONB1_VBSTART )
-	{
-		machine().scheduler().timer_set( m_screen->time_until_pos(scanline), timer_expired_delegate(FUNC(namconb1_state::namconb1_TriggerPOSIRQ),this), scanline);
-	}
-} /* namconb1_interrupt */
-
-
-TIMER_CALLBACK_MEMBER(namconb1_state::namconb2_TriggerPOSIRQ)
-{
-	m_screen->update_partial(param);
-	m_pos_irq_active = 1;
-	m_maincpu->set_input_line(m_namconb_cpureg[0x02], ASSERT_LINE);
-}
-
-INTERRUPT_GEN_MEMBER(namconb1_state::namconb2_interrupt)
-{
-	/**
-	 * f00000 0x01 // VBLANK irq level
-	 * f00001 0x00
-	 * f00002 0x05 // POSIRQ level
-	 * f00003 0x00
-	 *
-	 * f00004 VBLANK ack
-	 * f00005
-	 * f00006 POSIRQ ack
-	 * f00007
-	 *
-	 * f00008
-	 *
-	 * f00009 0x62
-	 * f0000a 0x0f
-	 * f0000b 0x41
-	 * f0000c 0x70
-	 * f0000d 0x70
-	 * f0000e 0x23
-	 * f0000f 0x50
-	 * f00010 0x00
-	 * f00011 0x64
-	 * f00012 0x18
-	 * f00013 0xe7
-	 * f00014 (watchdog)
-	 * f00016 0x00
-	 * f0001e 0x00
-	 * f0001f 0x01
-	 */
-	int scanline = (m_generic_paletteram_32[0x1808/4]&0xffff)-32;
-
-	if((!m_vblank_irq_active) && m_namconb_cpureg[0x00]) {
-		device.execute().set_input_line(m_namconb_cpureg[0x00], ASSERT_LINE);
-		m_vblank_irq_active = 1;
-	}
-
-	if( scanline<0 )
-		scanline = 0;
-
-	if( scanline < NAMCONB1_VBSTART )
-		machine().scheduler().timer_set( m_screen->time_until_pos(scanline), timer_expired_delegate(FUNC(namconb1_state::namconb2_TriggerPOSIRQ),this), scanline);
-} /* namconb2_interrupt */
 
 /****************************************************************************/
 
-static void namconb1_cpureg8_w(running_machine &machine, int reg, UINT8 data)
+WRITE8_MEMBER(namconb1_state::namconb1_cpureg_w)
 {
-	namconb1_state *state = machine.driver_data<namconb1_state>();
-	UINT8 prev = state->m_namconb_cpureg[reg];
-	state->m_namconb_cpureg[reg] = data;
-	switch(reg) {
-	case 0x02: // POS IRQ level/enable
-		if(state->m_pos_irq_active && (((prev & 0xf) != (data & 0xf)) || !(data & 0xf0))) {
-			state->m_maincpu->set_input_line(prev & 0xf, CLEAR_LINE);
-			if(data & 0xf0)
-				state->m_maincpu->set_input_line(data & 0xf, ASSERT_LINE);
+	/**
+	 * 400000 0x00
+	 * 400001 POS IRQ enable/level
+	 * 400002 ??? IRQ enable/level
+	 * 400003 0x00
+	 * 400004 VBL IRQ enable/level
+	 * 400005 0x00
+	 * 400006 POS IRQ ack
+	 * 400007 ??? IRQ ack
+	 * 400008 0x00
+	 * 400009 VBL IRQ ack
+	 * 40000a ??? (0x00)
+	 * 40000b ??? (0x03)
+	 * 40000c ??? (0x07)
+	 * 40000d ??? (0x01)
+	 * 40000e ??? (0x10)
+	 * 40000f ??? (0x03)
+	 * 400010 ??? (0x00)
+	 * 400011 ??? (0x07)
+	 * 400012 ??? (0x10)
+	 * 400013 ??? (0x10)
+	 * 400014 ??? (0x00)
+	 * 400015 ??? (0x01)
+	 * 400016 Watchdog
+	 * 400017 ??? (0x00)
+	 * 400018 C75 Control
+	 * 400019 ??? (0x00)
+	 * 40001a ??? (0x00)
+	 * 40001b ??? (0x00)
+	 * 40001c ??? (0x00)
+	 * 40001d ??? (0x00)
+	 * 40001e ??? (0x00)
+	 * 40001f ??? (0x00)
+	 */
+	switch (offset)
+	{
+		case 0x01:
+			// Bits 5-4 unknown
+			m_maincpu->set_input_line(m_pos_irq_level, CLEAR_LINE);
+			m_pos_irq_level = data & 0x0f;
+			break;
+
+		case 0x02:
+			m_maincpu->set_input_line(m_unk_irq_level, CLEAR_LINE);
+			m_unk_irq_level = data & 0x0f;
+			break;
+
+		case 0x04:
+			m_maincpu->set_input_line(m_vbl_irq_level, CLEAR_LINE);
+			m_vbl_irq_level = data & 0x0f;
+			break;
+
+		case 0x06:
+			m_maincpu->set_input_line(m_pos_irq_level, CLEAR_LINE);
+			break;
+
+		case 0x07:
+			m_maincpu->set_input_line(m_unk_irq_level, CLEAR_LINE);
+			break;
+
+		case 0x09:
+			m_maincpu->set_input_line(m_vbl_irq_level, CLEAR_LINE);
+			break;
+
+		case 0x16:
+			break;
+
+		case 0x18:
+			if (data & 1)
+			{
+				m_mcu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
+				m_mcu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+				m_mcu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+			}
 			else
-				state->m_pos_irq_active = 0;
-		}
-		break;
+				m_mcu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+			break;
 
-	case 0x04: // VBLANK IRQ level/enable
-		if(state->m_vblank_irq_active && (((prev & 0xf) != (data & 0xf)) || !(data & 0xf0))) {
-			state->m_maincpu->set_input_line(prev & 0xf, CLEAR_LINE);
-			if(data & 0xf0)
-				state->m_maincpu->set_input_line(data & 0xf, ASSERT_LINE);
-			else
-				state->m_vblank_irq_active = 0;
-		}
-		break;
-
-	case 0x07: // POS ack
-		if(state->m_pos_irq_active) {
-			state->m_maincpu->set_input_line(state->m_namconb_cpureg[0x02] & 0xf, CLEAR_LINE);
-			state->m_pos_irq_active = 0;
-		}
-		break;
-
-	case 0x09: // VBLANK ack
-		if(state->m_vblank_irq_active) {
-			state->m_maincpu->set_input_line(state->m_namconb_cpureg[0x04] & 0xf, CLEAR_LINE);
-			state->m_vblank_irq_active = 0;
-		}
-		break;
-
-	case 0x16: // Watchdog
-		break;
-
-	case 0x18: // C75 Control
-		if(data & 1) {
-			state->m_mcu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
-			state->m_mcu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-			state->m_mcu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
-		} else
-			state->m_mcu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
-		break;
+		default:
+			logerror("Unhandled CPU reg write to [0x%.2x] with 0x%.2x (PC=0x%x)\n", offset, data, space.device().safe_pc());
 	}
 }
 
-WRITE32_MEMBER(namconb1_state::namconb1_cpureg_w)
+
+WRITE8_MEMBER(namconb1_state::namconb2_cpureg_w)
 {
-	if(mem_mask & 0xff000000)
-		namconb1_cpureg8_w(machine(), offset*4, data >> 24);
-	if(mem_mask & 0x00ff0000)
-		namconb1_cpureg8_w(machine(), offset*4+1, data >> 16);
-	if(mem_mask & 0x0000ff00)
-		namconb1_cpureg8_w(machine(), offset*4+2, data >> 8);
-	if(mem_mask & 0x000000ff)
-		namconb1_cpureg8_w(machine(), offset*4+3, data);
-}
+	/**
+	 * f00000 VBL IRQ enable/level
+	 * f00001 ??? IRQ enable/level
+	 * f00002 POS IRQ enable/level
+	 * f00003 ??? (0x00)
+	 * f00004 VBL IRQ ack
+	 * f00005 ??? IRQ ack
+	 * f00006 POS IRQ ack
+	 * f00007
+	 * f00008
+	 * f00009 ??? (0x62)
+	 * f0000a ??? (0x0f)
+	 * f0000b ??? (0x41)
+	 * f0000c ??? (0x70)
+	 * f0000d ??? (0x70)
+	 * f0000e ??? (0x23)
+	 * f0000f ??? (0x50)
+	 * f00010 ??? (0x00)
+	 * f00011 ??? (0x64)
+	 * f00012 ??? (0x18)
+	 * f00013 ??? (0xe7)
+	 * f00014 Watchdog
+	 * f00015
+	 * f00016 C75 Control
+	 * f00017
+	 * f00018
+	 * f00019
+	 * f0001a
+	 * f0001b
+	 * f0001c
+	 * f0001d
+	 * f0001e ??? (0x00)
+	 * f0001f ??? (0x01)
+	 */
+	switch (offset)
+	{
+		case 0x00:
+			m_maincpu->set_input_line(m_vbl_irq_level, CLEAR_LINE);
+			m_vbl_irq_level = data & 0x0f;
+			break;
 
+		case 0x01:
+			m_maincpu->set_input_line(m_unk_irq_level, CLEAR_LINE);
+			m_unk_irq_level = data & 0x0f;
+			break;
 
-static void namconb2_cpureg8_w(running_machine &machine, int reg, UINT8 data)
-{
-	namconb1_state *state = machine.driver_data<namconb1_state>();
-	UINT8 prev = state->m_namconb_cpureg[reg];
-	state->m_namconb_cpureg[reg] = data;
-	switch(reg) {
-	case 0x00: // VBLANK IRQ level
-		if(state->m_vblank_irq_active && (prev != data)) {
-			state->m_maincpu->set_input_line(prev, CLEAR_LINE);
-			if(data)
-				state->m_maincpu->set_input_line(data, ASSERT_LINE);
+		case 0x02:
+			m_maincpu->set_input_line(m_pos_irq_level, CLEAR_LINE);
+			m_pos_irq_level = data & 0x0f;
+			break;
+
+		case 0x04:
+			m_maincpu->set_input_line(m_vbl_irq_level, CLEAR_LINE);
+			break;
+
+		case 0x05:
+			m_maincpu->set_input_line(m_unk_irq_level, CLEAR_LINE);
+			break;
+
+		case 0x06:
+			m_maincpu->set_input_line(m_pos_irq_level, CLEAR_LINE);
+			break;
+
+		case 0x14:
+			break;
+
+		case 0x16:
+			if (data & 1)
+			{
+				m_mcu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
+				m_mcu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+				m_mcu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+			}
 			else
-				state->m_vblank_irq_active = 0;
-		}
-		break;
+			{
+				m_mcu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+			}
+			break;
 
-	case 0x02: // POS IRQ level
-		if(state->m_pos_irq_active && (prev != data)) {
-			state->m_maincpu->set_input_line(prev, CLEAR_LINE);
-			if(data)
-				state->m_maincpu->set_input_line(data, ASSERT_LINE);
-			else
-				state->m_pos_irq_active = 0;
-		}
-		break;
-
-	case 0x04: // VBLANK ack
-		if(state->m_vblank_irq_active) {
-			state->m_maincpu->set_input_line(state->m_namconb_cpureg[0x00], CLEAR_LINE);
-			state->m_vblank_irq_active = 0;
-		}
-		break;
-
-	case 0x06: // POS ack
-		if(state->m_pos_irq_active) {
-			state->m_maincpu->set_input_line(state->m_namconb_cpureg[0x02], CLEAR_LINE);
-			state->m_pos_irq_active = 0;
-		}
-		break;
-
-	case 0x14: // Watchdog
-		break;
-
-	case 0x16: // C75 Control
-		if(data & 1) {
-			state->m_mcu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
-			state->m_mcu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-			state->m_mcu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
-		} else {
-			state->m_mcu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
-		}
-		break;
+		default:
+			logerror("Unhandled CPU reg write to [0x%.2x] with 0x%.2x (PC=0x%x)\n", offset, data, space.device().safe_pc());
 	}
 }
 
-WRITE32_MEMBER(namconb1_state::namconb2_cpureg_w)
+
+READ8_MEMBER(namconb1_state::namconb1_cpureg_r)
 {
-	if(mem_mask & 0xff000000)
-		namconb2_cpureg8_w(machine(), offset*4, data >> 24);
-	if(mem_mask & 0x00ff0000)
-		namconb2_cpureg8_w(machine(), offset*4+1, data >> 16);
-	if(mem_mask & 0x0000ff00)
-		namconb2_cpureg8_w(machine(), offset*4+2, data >> 8);
-	if(mem_mask & 0x000000ff)
-		namconb2_cpureg8_w(machine(), offset*4+3, data);
+	// 16: Watchdog
+	if (offset != 0x16)
+		logerror("Unhandled CPU reg read from [0x%.2x] (PC=0x%x)\n", offset, space.device().safe_pc());
+
+	return 0xff;
 }
 
-READ32_MEMBER(namconb1_state::namconb_cpureg_r)
+
+READ8_MEMBER(namconb1_state::namconb2_cpureg_r)
 {
-	return (m_namconb_cpureg[offset*4] << 24) | (m_namconb_cpureg[offset*4+1] << 16)
-		| (m_namconb_cpureg[offset*4+2] << 8) | m_namconb_cpureg[offset*4+3];
+	// 14: Watchdog
+	if (offset != 0x14)
+		logerror("Unhandled CPU reg read from [0x%.2x] (PC=0x%x)\n", offset, space.device().safe_pc());
+
+	return 0xff;
 }
 
 
@@ -565,7 +520,7 @@ READ32_MEMBER(namconb1_state::custom_key_r)
 		m_count = machine().rand();
 	} while( m_count==old_count );
 
-	switch( m_gametype )
+	switch (m_gametype)
 	{
 	/*
 	    Gunbullet/Point Blank keycus notes (thanks Guru):
@@ -583,39 +538,39 @@ READ32_MEMBER(namconb1_state::custom_key_r)
 		return 0;
 
 	case NAMCONB1_SWS95:
-		switch( offset )
+		switch (offset)
 		{
-		case 0: return 0x0189;
-		case 1: return  m_count<<16;
+			case 0: return 0x0189;
+			case 1: return  m_count<<16;
 		}
 		break;
 
 	case NAMCONB1_SWS96:
-		switch( offset )
+		switch (offset)
 		{
-		case 0: return 0x01aa<<16;
-		case 4: return m_count<<16;
+			case 0: return 0x01aa<<16;
+			case 4: return m_count<<16;
 		}
 		break;
 
 	case NAMCONB1_SWS97:
-		switch( offset )
+		switch (offset)
 		{
-		case 2: return 0x1b2<<16;
-		case 5: return m_count<<16;
+			case 2: return 0x1b2<<16;
+			case 5: return m_count<<16;
 		}
 		break;
 
 	case NAMCONB1_GSLGR94U:
-		switch( offset )
+		switch (offset)
 		{
-		case 0: return 0x0167;
-		case 1: return m_count<<16;
+			case 0: return 0x0167;
+			case 1: return m_count<<16;
 		}
 		break;
 
 	case NAMCONB1_GSLGR94J:
-		switch( offset )
+		switch (offset)
 		{
 		case 1: return 0;
 		case 3: return (0x0171<<16) | m_count;
@@ -623,26 +578,26 @@ READ32_MEMBER(namconb1_state::custom_key_r)
 		break;
 
 	case NAMCONB1_NEBULRAY:
-		switch( offset )
+		switch (offset)
 		{
-		case 1: return 0x016e;
-		case 3: return m_count;
+			case 1: return 0x016e;
+			case 3: return m_count;
 		}
 		break;
 
 	case NAMCONB1_VSHOOT:
-		switch( offset )
+		switch (offset)
 		{
-		case 2: return m_count<<16;
-		case 3: return 0x0170<<16;
+			case 2: return m_count<<16;
+			case 3: return 0x0170<<16;
 		}
 		break;
 
 	case NAMCONB2_OUTFOXIES:
-		switch( offset )
+		switch (offset)
 		{
-		case 0: return 0x0186;
-		case 1: return m_count<<16;
+			case 0: return 0x0186;
+			case 1: return m_count<<16;
 		}
 		break;
 
@@ -661,12 +616,12 @@ READ32_MEMBER(namconb1_state::gunbulet_gun_r)
 {
 	int result = 0;
 
-	switch( offset )
+	switch (offset)
 	{
-	case 0: case 1: result = (UINT8)(0x0f + ioport("LIGHT1_Y")->read() * 224/255); break; /* Y (p2) */
-	case 2: case 3: result = (UINT8)(0x26 + ioport("LIGHT1_X")->read() * 288/314); break; /* X (p2) */
-	case 4: case 5: result = (UINT8)(0x0f + ioport("LIGHT0_Y")->read() * 224/255); break; /* Y (p1) */
-	case 6: case 7: result = (UINT8)(0x26 + ioport("LIGHT0_X")->read() * 288/314); break; /* X (p1) */
+		case 0: case 1: result = (UINT8)(0x0f + ioport("LIGHT1_Y")->read() * 224/255); break; /* Y (p2) */
+		case 2: case 3: result = (UINT8)(0x26 + ioport("LIGHT1_X")->read() * 288/314); break; /* X (p2) */
+		case 4: case 5: result = (UINT8)(0x0f + ioport("LIGHT0_Y")->read() * 224/255); break; /* Y (p1) */
+		case 6: case 7: result = (UINT8)(0x26 + ioport("LIGHT0_X")->read() * 288/314); break; /* X (p1) */
 	}
 	return result<<24;
 } /* gunbulet_gun_r */
@@ -704,7 +659,7 @@ static ADDRESS_MAP_START( namconb1_am, AS_PROGRAM, 32, namconb1_state )
 	AM_RANGE(0x1e4000, 0x1e4003) AM_READWRITE(randgen_r,srand_w)
 	AM_RANGE(0x200000, 0x207fff) AM_READWRITE(namconb_share_r, namconb_share_w)
 	AM_RANGE(0x208000, 0x2fffff) AM_RAM
-	AM_RANGE(0x400000, 0x40001f) AM_READWRITE(namconb_cpureg_r, namconb1_cpureg_w)
+	AM_RANGE(0x400000, 0x40001f) AM_READWRITE8(namconb1_cpureg_r, namconb1_cpureg_w, 0xffffffff)
 	AM_RANGE(0x580000, 0x5807ff) AM_DEVREADWRITE8("eeprom", eeprom_parallel_28xx_device, read, write, 0xffffffff)
 	AM_RANGE(0x600000, 0x61ffff) AM_READWRITE16(c355_obj_ram_r,c355_obj_ram_w,0xffffffff) AM_SHARE("objram")
 	AM_RANGE(0x620000, 0x620007) AM_READWRITE16(c355_obj_position_r,c355_obj_position_w,0xffffffff)
@@ -735,7 +690,7 @@ static ADDRESS_MAP_START( namconb2_am, AS_PROGRAM, 32, namconb1_state )
 	AM_RANGE(0x980000, 0x98000f) AM_READWRITE16(c169_roz_bank_r,c169_roz_bank_w,0xffffffff)
 	AM_RANGE(0xa00000, 0xa007ff) AM_DEVREADWRITE8("eeprom", eeprom_parallel_28xx_device, read, write, 0xffffffff)
 	AM_RANGE(0xc00000, 0xc0001f) AM_READ(custom_key_r) AM_WRITENOP
-	AM_RANGE(0xf00000, 0xf0001f) AM_READWRITE(namconb_cpureg_r, namconb2_cpureg_w)
+	AM_RANGE(0xf00000, 0xf0001f) AM_READWRITE8(namconb1_cpureg_r, namconb2_cpureg_w, 0xffffffff)
 ADDRESS_MAP_END
 
 WRITE16_MEMBER(namconb1_state::nbmcu_shared_w)
@@ -1122,38 +1077,40 @@ static const gfx_layout roz_layout =
 
 static GFXDECODE_START( namconb1 )
 	GFXDECODE_ENTRY( NAMCONB1_TILEGFXREGION,    0, tile_layout, 0x1000, 0x10 )
-	GFXDECODE_ENTRY( NAMCONB1_SPRITEGFXREGION,  0, obj_layout,      0x0000, 0x10 )
+	GFXDECODE_ENTRY( NAMCONB1_SPRITEGFXREGION,  0, obj_layout,  0x0000, 0x10 )
 GFXDECODE_END /* gfxdecodeinfo */
 
 static GFXDECODE_START( 2 )
 	GFXDECODE_ENTRY( NAMCONB1_TILEGFXREGION,    0, tile_layout, 0x1000, 0x08 )
-	GFXDECODE_ENTRY( NAMCONB1_SPRITEGFXREGION,  0, obj_layout,      0x0000, 0x10 )
+	GFXDECODE_ENTRY( NAMCONB1_SPRITEGFXREGION,  0, obj_layout,  0x0000, 0x10 )
 	GFXDECODE_ENTRY( NAMCONB1_ROTGFXREGION, 0, roz_layout,      0x1800, 0x08 )
 GFXDECODE_END /* gfxdecodeinfo2 */
 
+
 /***************************************************************/
 
-MACHINE_START_MEMBER(namconb1_state,namconb)
+MACHINE_RESET_MEMBER(namconb1_state, namconb)
 {
-	m_vblank_irq_active = 0;
-	m_pos_irq_active = 0;
-	memset(m_namconb_cpureg, 0, sizeof(m_namconb_cpureg));
+	m_pos_irq_level = 0;
+	m_unk_irq_level = 0;
+	m_vbl_irq_level = 0;
 }
+
 
 /***************************************************************/
 
 static MACHINE_CONFIG_START( namconb1, namconb1_state )
 	MCFG_CPU_ADD("maincpu", M68EC020, MASTER_CLOCK/2)
 	MCFG_CPU_PROGRAM_MAP(namconb1_am)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", namconb1_state,  namconb1_interrupt)
 
 	MCFG_CPU_ADD("mcu", M37702, MASTER_CLOCK/3)
 	MCFG_CPU_PROGRAM_MAP(namcoc75_am)
 	MCFG_CPU_IO_MAP(namcoc75_io)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("mcu_st", namconb1_state, mcu_interrupt, "screen", 0, 1)
 
 	MCFG_EEPROM_2816_ADD("eeprom")
-	MCFG_MACHINE_START_OVERRIDE(namconb1_state,namconb)
+	MCFG_MACHINE_RESET_OVERRIDE(namconb1_state, namconb)
+
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", namconb1_state, namconb_scantimer, "screen", 0, 1)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(59.7)
@@ -1180,15 +1137,15 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( namconb2, namconb1_state )
 	MCFG_CPU_ADD("maincpu", M68EC020, MASTER_CLOCK/2)
 	MCFG_CPU_PROGRAM_MAP(namconb2_am)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", namconb1_state,  namconb2_interrupt)
 
 	MCFG_CPU_ADD("mcu", M37702, MASTER_CLOCK/3)
 	MCFG_CPU_PROGRAM_MAP(namcoc75_am)
 	MCFG_CPU_IO_MAP(namcoc75_io)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("mcu_st", namconb1_state, mcu_interrupt, "screen", 0, 1)
 
 	MCFG_EEPROM_2816_ADD("eeprom")
-	MCFG_MACHINE_START_OVERRIDE(namconb1_state,namconb)
+	MCFG_MACHINE_RESET_OVERRIDE(namconb1_state, namconb)
+
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", namconb1_state, namconb_scantimer, "screen", 0, 1)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(59.7)
