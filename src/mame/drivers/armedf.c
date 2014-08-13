@@ -702,12 +702,12 @@ ADDRESS_MAP_END
 
 READ8_MEMBER(armedf_state::blitter_txram_r)
 {
-	return m_text_videoram[offset] & 0xff;
+	return m_text_videoram[offset];
 }
 
 WRITE8_MEMBER(armedf_state::blitter_txram_w)
 {
-	m_text_videoram[offset] = (data & 0xff) | (m_text_videoram[offset] & 0xff00);
+	m_text_videoram[offset] = data;
 	m_tx_tilemap->mark_tile_dirty(offset);
 }
 
