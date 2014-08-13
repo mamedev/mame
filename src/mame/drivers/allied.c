@@ -25,8 +25,9 @@
   For some reason the 'rol $46' instruction outputs the original data
   followed by the new result, so I've had to employ a horrible hack.
 
-  When playing, you must hit Z at the start of each ball, or you'll get
-  no points. When the ball indicator goes out, your game is over.
+  At the start of each ball, the display will be flashing. You need to
+  hit Z, and then you can get a score. When the ball indicator goes out,
+  your game is over.
 
   Game doesn't have any backup battery, so all info is lost at poweroff.
   If required, a fake nvram could be used at 00-3F (like PinMAME does).
@@ -417,6 +418,15 @@ WRITE8_MEMBER( allied_state::ic4_b_w )
 			segment = (m_player_score[i] >> 16) & 15;
 			output_set_digit_value(i*10+5, patterns[segment]);
 		}
+		else
+		{
+			output_set_digit_value(i*10, 0);
+			output_set_digit_value(i*10+1, 0);
+			output_set_digit_value(i*10+2, 0);
+			output_set_digit_value(i*10+3, 0);
+			output_set_digit_value(i*10+4, 0);
+			output_set_digit_value(i*10+5, 0);
+		}
 	}
 
 	// doesn't seem to be a strobe for the credits display
@@ -583,7 +593,16 @@ TIMER_DEVICE_CALLBACK_MEMBER( allied_state::timer_a )
 
 void allied_state::machine_reset()
 {
-	output_set_value("led0", 1);  //1=off (diagnostic led still to be hooked up)
+	m_display = 0;
+	m_bit_counter = 0;
+	m_disp_data = 0;
+	m_ic5a = 0;
+	m_ic6a0 = 0;
+	m_ic6a1 = 0;
+	m_ic6a2 = 0;
+	m_ic6b4 = 0;
+	m_ic6b7 = 0;
+	output_set_value("led0", 1);  //1=off
 }
 
 static MACHINE_CONFIG_START( allied, allied_state )
