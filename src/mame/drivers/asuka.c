@@ -1303,6 +1303,44 @@ ROM_START( jigkmgri )
 	ROM_LOAD( "b41-04.48",  0x00000, 0x80000, CRC(c668638f) SHA1(07238a6cb4d93ffaf6351657163b5d80f0dbf688) )
 ROM_END
 
+
+ROM_START( bonzeadvp )
+	ROM_REGION( 0x100000, "maincpu", 0 )     /* 68000 code */
+	ROM_LOAD16_BYTE( "0l.ic17", 0x00000, 0x10000, CRC(9e046e6f) SHA1(a05ed46930bcfa8f59fda6f1d370b841ad261258) )
+	ROM_LOAD16_BYTE( "0h.ic26", 0x00001, 0x10000, CRC(3e2b2628) SHA1(66ee0e5d2c38c467edc3f22b83b73643764ae8f0) )
+	ROM_LOAD16_BYTE( "1h.ic16", 0x20000, 0x10000, CRC(52f31b98) SHA1(8a20a79350073438522361d3f598afa42f0f62ed) )
+	ROM_LOAD16_BYTE( "1l.ic25", 0x20001, 0x10000, CRC(c7e79b98) SHA1(1d92861c6337362cdd9d31a2da944d8eb3171170) )
+	/* 0x040000 - 0x7ffff is intentionally empty */
+	ROM_LOAD16_BYTE( "fd65.ic20",      0x80001, 0x20000, CRC(c32f3bd5) SHA1(d9db14ec26cac5504a61058e87da4e404647ca94) ) // these 4 == b41-01.15 but split
+	ROM_LOAD16_BYTE( "49eb.ic26",      0x80000, 0x20000, CRC(c747650b) SHA1(ef03931d233ec1f9e61d45d02abb23e69edd8c15) ) // ^
+	ROM_LOAD16_BYTE( "a418.ic23",      0xc0001, 0x20000, CRC(51b02be6) SHA1(20e3423aea359f3ca92dd24f4f87351d93c279b6) ) // ^
+	ROM_LOAD16_BYTE( "no label.ic28",  0xc0000, 0x20000, CRC(dc1f9fd0) SHA1(88addfa2c3bb854efd88a3556d23a7607b6ec848) ) // ^
+
+	ROM_REGION( 0x80000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "abbe.ic9",   0x00000, 0x20000, CRC(50e6581c) SHA1(230724d65c9b1ea5d72117dca077464dd599ad68) ) // first 2 == first half b41-03.1 but split
+	ROM_LOAD16_BYTE( "0ac8.ic15",  0x00001, 0x20000, CRC(29002fc4) SHA1(5ddbefc0d173865802362990e99a3b542c096412) ) // ^
+	ROM_LOAD16_BYTE( "5ebf.ic5",   0x40000, 0x20000, CRC(dac6f11f) SHA1(8c79d05ca539ebfbec35c7426c207937745c1949) ) // these 2 have differences
+	ROM_LOAD16_BYTE( "77c8.ic12",  0x40001, 0x20000, CRC(d8aaae12) SHA1(240dda7d7e74ffc6a084c39ca19903fd35ad0157) ) // ^
+
+	ROM_REGION( 0x80000, "gfx2", 0 )
+	ROM_LOAD16_BYTE( "9369.ic19",  0x00000, 0x20000, CRC(a9dd7f90) SHA1(c3acf2dcd9325b9a74967d4b9cfff59bdb4045c6) ) // these 4 == b41-02.7 but split
+	ROM_LOAD16_BYTE( "e3ed.ic25",  0x00001, 0x20000, CRC(7cc66ee2) SHA1(145d3bd0e3ef765874fc679e709391d516e74ef0) ) // ^
+	ROM_LOAD16_BYTE( "03eb.ic16",  0x40000, 0x20000, CRC(39f32715) SHA1(5c555fde1ae0bb1e796e0122157bc694392122f3) ) // ^
+	ROM_LOAD16_BYTE( "b8e1.ic22",  0x40001, 0x20000, CRC(15b836cf) SHA1(0f7e5cb6a57c336125909e28af664fe7387947d4) ) // ^
+
+	ROM_REGION( 0x1c000, "audiocpu", 0 )     /* sound cpu */
+	ROM_LOAD( "b41-13.20",  0x00000, 0x04000, CRC(9e464254) SHA1(b6f6126b54c15320ecaa652d0eeabaa4cd94bd26) ) // missing from dump
+	ROM_CONTINUE(        0x10000, 0x0c000 )   /* banked stuff */
+
+	/* is the C-Chip the same as the final? */
+
+	ROM_REGION( 0x80000, "ymsnd", 0 )     /* ADPCM samples */
+	ROM_LOAD( "6089.ic17",  0x00000, 0x20000, CRC(b092783c) SHA1(e13f765e2884b6194926bf982595de18376ffef9) ) // these 4 == b41-04.48 but split
+	ROM_LOAD( "2e1f.ic14",  0x20000, 0x20000, CRC(df1f87c0) SHA1(ad3df38c22f1bb7bdc449922bd3c2a5c78aa87f8) ) // ^
+	ROM_LOAD( "f66e.ic11",  0x40000, 0x20000, CRC(c6df1b3e) SHA1(84d6ad3e3af565060aa4324c6e3e91e4dc5089b6) ) // ^
+	ROM_LOAD( "49a7.ic7",   0x60000, 0x20000, CRC(5584c02c) SHA1(00402df66debb257c97a609a37de0f8eeeb6e9f0) ) // ^
+ROM_END
+
 ROM_START( asuka )
 	ROM_REGION( 0x100000, "maincpu", 0 )     /* 1024k for 68000 code */
 	ROM_LOAD16_BYTE( "b68-13.bin",  0x00000, 0x20000, CRC(855efb3e) SHA1(644e02e207adeaec7839c824688d88ab8d046418) )
@@ -1614,6 +1652,7 @@ GAME( 1988, bonzeadv,  0,        bonzeadv, bonzeadv, driver_device, 0, ROT0,   "
 GAME( 1988, bonzeadvo, bonzeadv, bonzeadv, bonzeadv, driver_device, 0, ROT0,   "Taito Corporation Japan",   "Bonze Adventure (World, Older)", GAME_SUPPORTS_SAVE )
 GAME( 1988, bonzeadvu, bonzeadv, bonzeadv, jigkmgri, driver_device, 0, ROT0,   "Taito America Corporation", "Bonze Adventure (US)", GAME_SUPPORTS_SAVE )
 GAME( 1988, jigkmgri,  bonzeadv, bonzeadv, jigkmgri, driver_device, 0, ROT0,   "Taito Corporation",         "Jigoku Meguri (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1988, bonzeadvp, bonzeadv, bonzeadv, jigkmgri, driver_device, 0, ROT0,   "Taito Corporation Japan",   "Bonze Adventure (World, prototype)", GAME_SUPPORTS_SAVE )
 GAME( 1988, asuka,     0,        asuka,    asuka, driver_device,    0, ROT270, "Taito Corporation",         "Asuka & Asuka (World)", GAME_SUPPORTS_SAVE )
 GAME( 1988, asukaj,    asuka,    asuka,    asuka, driver_device,    0, ROT270, "Taito Corporation",         "Asuka & Asuka (Japan)", GAME_SUPPORTS_SAVE )
 GAME( 1989, mofflott,  0,        mofflott, mofflott, driver_device, 0, ROT270, "Taito Corporation",         "Maze of Flott (Japan)", GAME_SUPPORTS_SAVE )
