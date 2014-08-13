@@ -1195,11 +1195,9 @@ void apple2_state::machine_reset()
 		|| !strncmp(machine().system().name, "apple2g", 7);
 	apple2_setvar(need_intcxrom ? VAR_INTCXROM : 0, ~0);
 
-	// ROM 0 cannot boot unless language card bank 2 is write-enabled (but read ROM) on startup
-	if (!strncmp(machine().system().name, "apple2g", 7))
-	{
-		apple2_setvar(VAR_LCWRITE|VAR_LCRAM2, VAR_LCWRITE | VAR_LCRAM | VAR_LCRAM2);
-	}
+	// IIgs ROM 0 cannot boot unless language card bank 2 is write-enabled (but read ROM) on startup
+	// Peter Ferrie reports this is also the default on the IIe/IIc at least
+	apple2_setvar(VAR_LCWRITE|VAR_LCRAM2, VAR_LCWRITE | VAR_LCRAM | VAR_LCRAM2);
 
 	m_a2_speaker_state = 0;
 
