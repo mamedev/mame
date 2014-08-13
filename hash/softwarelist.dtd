@@ -24,8 +24,8 @@
 			<!ELEMENT dataarea (rom*)>
 				<!ATTLIST dataarea name CDATA #REQUIRED>
 				<!ATTLIST dataarea size CDATA #REQUIRED>
-				<!ATTLIST dataarea databits (8|16|32|64) "8">
-				<!ATTLIST dataarea endian (big|little) "little">
+				<!ATTLIST dataarea width (8|16|32|64) "8">
+				<!ATTLIST dataarea endianness (big|little) "little">
 				<!ELEMENT rom EMPTY>
 					<!ATTLIST rom name CDATA #IMPLIED>
 					<!ATTLIST rom size CDATA #IMPLIED>
