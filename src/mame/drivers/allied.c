@@ -34,8 +34,7 @@
 
 
 ToDo:
-- Insert coins doesn't register (if you use debug to enter the number of
-  credits into $1A, then the game is playable).
+- Coin slot 3 not working. Pressing it a lot kills all the coin slots.
 
 
 ***************************************************************************/
@@ -58,6 +57,7 @@ public:
 		, m_ic5(*this, "ic5")
 		, m_ic6(*this, "ic6")
 		, m_ic7(*this, "ic7")
+		, m_ic8(*this, "ic8")
 	{ }
 
 	DECLARE_WRITE8_MEMBER(ic1_b_w);
@@ -78,6 +78,8 @@ public:
 	DECLARE_READ8_MEMBER(ic6_a_r);
 	DECLARE_READ8_MEMBER(ic6_b_r);
 	DECLARE_READ8_MEMBER(ic7_a_r);
+	DECLARE_WRITE_LINE_MEMBER(ic8_cb2_w);
+	TIMER_DEVICE_CALLBACK_MEMBER(timer_a);
 private:
 	UINT32 m_player_score[6];
 	UINT8 m_display;
@@ -88,6 +90,7 @@ private:
 	UINT8 m_ic6a1;
 	UINT8 m_ic6a2;
 	UINT8 m_ic6b4;
+	UINT8 m_ic6b7;
 	virtual void machine_reset();
 	required_device<m6504_device> m_maincpu;
 	required_device<pia6821_device> m_ic1;
@@ -96,6 +99,7 @@ private:
 	required_device<mos6530_device> m_ic5;
 	required_device<mos6530_device> m_ic6;
 	required_device<pia6821_device> m_ic7;
+	required_device<pia6821_device> m_ic8;
 };
 
 
@@ -464,7 +468,7 @@ READ8_MEMBER( allied_state::ic6_a_r )
 // 1 adjustment, test switch
 READ8_MEMBER( allied_state::ic6_b_r )
 {
-	return m_ic6b4 | ioport("TEST")->read() | 0xcf;
+	return m_ic6b4 | ioport("TEST")->read() | m_ic6b7 | 0x4f;
 }
 
 WRITE8_MEMBER( allied_state::ic6_b_w )
@@ -561,6 +565,22 @@ WRITE8_MEMBER( allied_state::ic8_b_w )
 	output_set_value("led6", !BIT(data, 5));
 }
 
+// this line not emulated in PinMAME, maybe it isn't needed
+WRITE_LINE_MEMBER( allied_state::ic8_cb2_w )
+{
+	m_ic6b7 = state ? 128 : 0; // i think it's pb7, hard to tell
+	m_ic7->cb1_w(state);
+}
+
+TIMER_DEVICE_CALLBACK_MEMBER( allied_state::timer_a )
+{
+	UINT8 data = ioport("X6A")->read();
+
+	m_ic8->ca1_w(BIT(data, 4));
+	m_ic8->cb1_w(BIT(data, 5));
+	m_ic8->ca2_w(BIT(data, 6));
+}
+
 void allied_state::machine_reset()
 {
 	output_set_value("led0", 1);  //1=off (diagnostic led still to be hooked up)
@@ -624,7 +644,7 @@ static MACHINE_CONFIG_START( allied, allied_state )
 	//MCFG_PIA_READPB_HANDLER(READ8(allied_state, ic8_b_r))
 	MCFG_PIA_WRITEPB_HANDLER(WRITE8(allied_state, ic8_b_w))
 	//MCFG_PIA_CA2_HANDLER(WRITELINE(allied_state, ic8_ca2_w))
-	//MCFG_PIA_CB2_HANDLER(WRITELINE(allied_state, ic8_cb2_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(allied_state, ic8_cb2_w))
 	MCFG_PIA_IRQA_HANDLER(DEVWRITELINE("maincpu", m6504_device, irq_line))
 	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE("maincpu", m6504_device, irq_line))
 
@@ -642,6 +662,8 @@ static MACHINE_CONFIG_START( allied, allied_state )
 	//MCFG_MOS6530_OUT_PA_CB(WRITE8(allied_state, ic6_a_w))
 	MCFG_MOS6530_IN_PB_CB(READ8(allied_state, ic6_b_r))
 	MCFG_MOS6530_OUT_PB_CB(WRITE8(allied_state, ic6_b_w))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_a", allied_state, timer_a, attotime::from_hz(50))
 MACHINE_CONFIG_END
 
 
@@ -666,14 +688,14 @@ ROM_END
 
 
 GAME(1977,  allied,     0,          allied, allied, driver_device, 0, ROT0, "Allied Leisure", "Allied System", GAME_IS_BIOS_ROOT)
-GAME(1977,  suprpick,   allied,     allied, allied, driver_device, 0, ROT0, "Allied Leisure", "Super Picker", GAME_IS_SKELETON_MECHANICAL)
-GAME(1977,  royclark,   allied,     allied, allied, driver_device, 0, ROT0, "Fascination Int.", "Roy Clark - The Entertainer", GAME_IS_SKELETON_MECHANICAL)
-GAME(1977,  thndbolt,   allied,     allied, allied, driver_device, 0, ROT0, "Allied Leisure", "Thunderbolt", GAME_IS_SKELETON_MECHANICAL)
-GAME(1978,  hoedown,    allied,     allied, allied, driver_device, 0, ROT0, "Allied Leisure", "Hoe Down", GAME_IS_SKELETON_MECHANICAL)
-GAME(1978,  takefive,   allied,     allied, allied, driver_device, 0, ROT0, "Allied Leisure", "Take Five", GAME_IS_SKELETON_MECHANICAL)
-GAME(1978,  heartspd,   allied,     allied, allied, driver_device, 0, ROT0, "Allied Leisure", "Hearts & Spades", GAME_IS_SKELETON_MECHANICAL)
-GAME(1978,  foathens,   allied,     allied, allied, driver_device, 0, ROT0, "Allied Leisure", "Flame of Athens", GAME_IS_SKELETON_MECHANICAL)
-GAME(1979,  disco79,    allied,     allied, allied, driver_device, 0, ROT0, "Allied Leisure", "Disco '79", GAME_IS_SKELETON_MECHANICAL)
-GAME(1979,  erosone,    allied,     allied, allied, driver_device, 0, ROT0, "Fascination Int.", "Eros One", GAME_IS_SKELETON_MECHANICAL)
-GAME(1979,  circa33,    allied,     allied, allied, driver_device, 0, ROT0, "Fascination Int.", "Circa 1933", GAME_IS_SKELETON_MECHANICAL)
-GAME(1979,  starshot,   allied,     allied, allied, driver_device, 0, ROT0, "Allied Leisure", "Star Shooter", GAME_IS_SKELETON_MECHANICAL)
+GAME(1977,  suprpick,   allied,     allied, allied, driver_device, 0, ROT0, "Allied Leisure", "Super Picker", GAME_MECHANICAL)
+GAME(1977,  royclark,   allied,     allied, allied, driver_device, 0, ROT0, "Fascination Int.", "Roy Clark - The Entertainer", GAME_MECHANICAL)
+GAME(1977,  thndbolt,   allied,     allied, allied, driver_device, 0, ROT0, "Allied Leisure", "Thunderbolt", GAME_MECHANICAL)
+GAME(1978,  hoedown,    allied,     allied, allied, driver_device, 0, ROT0, "Allied Leisure", "Hoe Down", GAME_MECHANICAL)
+GAME(1978,  takefive,   allied,     allied, allied, driver_device, 0, ROT0, "Allied Leisure", "Take Five", GAME_MECHANICAL)
+GAME(1978,  heartspd,   allied,     allied, allied, driver_device, 0, ROT0, "Allied Leisure", "Hearts & Spades", GAME_MECHANICAL)
+GAME(1978,  foathens,   allied,     allied, allied, driver_device, 0, ROT0, "Allied Leisure", "Flame of Athens", GAME_MECHANICAL)
+GAME(1979,  disco79,    allied,     allied, allied, driver_device, 0, ROT0, "Allied Leisure", "Disco '79", GAME_MECHANICAL)
+GAME(1979,  erosone,    allied,     allied, allied, driver_device, 0, ROT0, "Fascination Int.", "Eros One", GAME_MECHANICAL)
+GAME(1979,  circa33,    allied,     allied, allied, driver_device, 0, ROT0, "Fascination Int.", "Circa 1933", GAME_MECHANICAL)
+GAME(1979,  starshot,   allied,     allied, allied, driver_device, 0, ROT0, "Allied Leisure", "Star Shooter", GAME_MECHANICAL)
