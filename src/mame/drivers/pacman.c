@@ -6262,6 +6262,8 @@ DRIVER_INIT_MEMBER(pacman_state,rocktrv2)
 
 	ROM[0x7ffe] = 0xa7;
 	ROM[0x7fee] = 0x6d;
+	
+	save_item(NAME(m_rocktrv2_question_bank));
 }
 
 /* The encrpytion is provided by a 74298 sitting on top of the rom at 6f.
