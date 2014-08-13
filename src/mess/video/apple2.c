@@ -356,12 +356,6 @@ void apple2_state::apple2_hires_draw(bitmap_ind16 &bitmap, const rectangle &clip
 							for (b = 0; b < 7; b++) 
 							{
 								v = artifact_map_ptr[((w >> (b + 7-1)) & 0x07) | (((b ^ col) & 0x01) << 3)];
-
-								if ((col == 0) && (row == 0))
-								{
-									printf("R0C0 %x\n", v);
-								}	
-
 								*(p++) = v;
 								*(p++) = v;
 							}
