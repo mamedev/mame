@@ -582,20 +582,23 @@ int sega8_cart_slot_device::get_cart_type(UINT8 *ROM, UINT32 len)
 	}
 
 	// Terebi Oekaki (TV Draw)
-	if (!strncmp((const char *)&ROM[0x13b3], "annakmn", 7))
+	if (len >= 0x13b3 + 7 && !strncmp((const char *)&ROM[0x13b3], "annakmn", 7))
 		type = SEGA8_TEREBIOEKAKI;
 
 	// The Castle (ROM+RAM)
-	if (!strncmp((const char *)&ROM[0x1cc3], "ASCII 1986", 10))
+	if (len >= 0x1cc3 + 10 && !strncmp((const char *)&ROM[0x1cc3], "ASCII 1986", 10))
 		type = SEGA8_CASTLE;
 
 	// BASIC Level 3
-	if (!strncmp((const char *)&ROM[0x6a20], "SC-3000 BASIC Level 3 ver 1.0", 29))
+	if (len >= 0x6a20 + 29 && !strncmp((const char *)&ROM[0x6a20], "SC-3000 BASIC Level 3 ver 1.0", 29))
 		type = SEGA8_BASIC_L3;
 
 	// Music Editor
-	if (!strncmp((const char *)&ROM[0x0841], "PIANO", 5) || !strncmp((const char *)&ROM[0x0841], "music", 5))
-		type = SEGA8_MUSIC_EDITOR;
+	if (len >= 0x0841 + 5)
+	{
+		if (!strncmp((const char *)&ROM[0x0841], "PIANO", 5) || !strncmp((const char *)&ROM[0x0841], "music", 5))
+			type = SEGA8_MUSIC_EDITOR;
+	}
 
 
 	return type;
