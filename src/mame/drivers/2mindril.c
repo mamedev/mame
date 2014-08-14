@@ -53,7 +53,7 @@ public:
 	/* input-related */
 	UINT16        m_defender_sensor;
 	UINT16        m_shutter_sensor;
-	UINT16        irq_reg;
+	UINT16        m_irq_reg;
 
 	/* devices */
 	DECLARE_READ16_MEMBER(drill_io_r);
@@ -187,7 +187,7 @@ WRITE16_MEMBER(_2mindril_state::sensors_w)
 
 READ16_MEMBER(_2mindril_state::drill_irq_r)
 {
-	return irq_reg;
+	return m_irq_reg;
 }
 
 WRITE16_MEMBER(_2mindril_state::drill_irq_w)
@@ -198,16 +198,16 @@ WRITE16_MEMBER(_2mindril_state::drill_irq_w)
 	---- ---- ---- x--- irq lv 4 ack, 0->1 latch
 	---- ---- -??- -??? connected to the other levels?
 	*/
-	if(((irq_reg & 8) == 0) && data & 8)
+	if(((m_irq_reg & 8) == 0) && data & 8)
 		m_maincpu->set_input_line(4, CLEAR_LINE);
 
-	if(((irq_reg & 0x10) == 0) && data & 0x10)
+	if(((m_irq_reg & 0x10) == 0) && data & 0x10)
 		m_maincpu->set_input_line(5, CLEAR_LINE);
 
 	if(data & 0xffe7)
 		printf("%04x\n",data);
 
-	COMBINE_DATA(&irq_reg);
+	COMBINE_DATA(&m_irq_reg);
 }
 
 static ADDRESS_MAP_START( drill_map, AS_PROGRAM, 16, _2mindril_state )
@@ -433,13 +433,14 @@ MACHINE_START_MEMBER(_2mindril_state,drill)
 {
 	save_item(NAME(m_defender_sensor));
 	save_item(NAME(m_shutter_sensor));
+	save_item(NAME(m_irq_reg));
 }
 
 MACHINE_RESET_MEMBER(_2mindril_state,drill)
 {
 	m_defender_sensor = 0;
 	m_shutter_sensor = 0;
-	irq_reg = 0;
+	m_irq_reg = 0;
 }
 
 static MACHINE_CONFIG_START( drill, _2mindril_state )
@@ -560,4 +561,4 @@ DRIVER_INIT_MEMBER(_2mindril_state,drill)
 	tile_decode();
 }
 
-GAME( 1993, 2mindril,    0,        drill,    drill, _2mindril_state,    drill, ROT0,  "Taito", "Two Minute Drill", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE | GAME_MECHANICAL)
+GAME( 1993, 2mindril,    0,        drill,    drill, _2mindril_state,    drill, ROT0,  "Taito", "Two Minute Drill", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_MECHANICAL)
