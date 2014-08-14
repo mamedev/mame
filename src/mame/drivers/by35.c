@@ -309,7 +309,7 @@ WRITE_LINE_MEMBER( by35_state::u10_ca2_w )
 {
 	m_u10_ca2 = state;
 }
-		
+
 WRITE_LINE_MEMBER( by35_state::u10_cb2_w )
 {
 }

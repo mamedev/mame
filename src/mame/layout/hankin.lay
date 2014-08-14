@@ -117,16 +117,16 @@
 		</bezel>
 
 		<!-- Credits and Balls -->
-		<bezel name="digit44" element="digit">
+		<bezel name="digit40" element="digit">
 			<bounds left="39" top="345" right="73" bottom="384" />
 		</bezel>
-		<bezel name="digit43" element="digit">
+		<bezel name="digit42" element="digit">
 			<bounds left="110" top="345" right="144" bottom="384" />
 		</bezel>
-		<bezel name="digit42" element="digit">
+		<bezel name="digit44" element="digit">
 			<bounds left="171" top="345" right="205" bottom="384" />
 		</bezel>
-		<bezel name="digit41" element="digit">
+		<bezel name="digit43" element="digit">
 			<bounds left="210" top="345" right="244" bottom="384" />
 		</bezel>
 		<bezel element="P2"><bounds left="100" right="158" top="330" bottom="342" /></bezel>

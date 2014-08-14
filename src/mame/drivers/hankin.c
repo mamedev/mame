@@ -4,6 +4,14 @@
   Hankin
   Based on Bally BY35
 
+
+ToDo:
+- High score isn't saved or remembered
+- Sound
+- Inputs
+- Outputs
+- Mechanical
+
 ***********************************************************************************/
 
 #include "machine/genpin.h"
@@ -21,16 +29,48 @@ public:
 		, m_ic10(*this, "ic10")
 		, m_ic11(*this, "ic11")
 		, m_ic2(*this, "ic2")
+		, m_io_test(*this, "TEST")
+		, m_io_dsw0(*this, "DSW0")
+		, m_io_dsw1(*this, "DSW1")
+		, m_io_dsw2(*this, "DSW2")
+		, m_io_x0(*this, "X0")
+		, m_io_x1(*this, "X1")
+		, m_io_x2(*this, "X2")
+		, m_io_x3(*this, "X3")
+		, m_io_x4(*this, "X4")
 	{ }
 
 	DECLARE_DRIVER_INIT(hankin);
+	DECLARE_WRITE_LINE_MEMBER(ic10_ca2_w);
+	DECLARE_WRITE_LINE_MEMBER(ic11_ca2_w);
+	DECLARE_WRITE8_MEMBER(ic10_a_w);
+	DECLARE_WRITE8_MEMBER(ic11_a_w);
+	DECLARE_READ8_MEMBER(ic11_b_r);
+	DECLARE_INPUT_CHANGED_MEMBER(self_test);
+	TIMER_DEVICE_CALLBACK_MEMBER(timer_x);
 private:
+	bool m_timer_x;
+	bool m_ic11_ca2;
+	UINT8 m_counter;
+	UINT8 m_digit;
+	UINT8 m_segment;
+	UINT8 m_ic10a;
+	UINT8 m_ic11a;
 	virtual void machine_reset();
 	required_device<m6802_cpu_device> m_maincpu;
 	required_device<m6802_cpu_device> m_audiocpu;
 	required_device<pia6821_device> m_ic10;
 	required_device<pia6821_device> m_ic11;
 	required_device<pia6821_device> m_ic2;
+	required_ioport m_io_test;
+	required_ioport m_io_dsw0;
+	required_ioport m_io_dsw1;
+	required_ioport m_io_dsw2;
+	required_ioport m_io_x0;
+	required_ioport m_io_x1;
+	required_ioport m_io_x2;
+	required_ioport m_io_x3;
+	required_ioport m_io_x4;
 };
 
 
@@ -51,7 +91,270 @@ static ADDRESS_MAP_START( hankin_sub_map, AS_PROGRAM, 8, hankin_state )
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( hankin )
+	PORT_START("TEST")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Self Test") PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, hankin_state, self_test, 0)
+
+	PORT_START("DSW0")
+	PORT_DIPNAME( 0x01, 0x00, "S01") // S1-5: 32 combinations of coins/credits of a coin slot. S9-13 other slot.
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
+	PORT_DIPSETTING(    0x01, DEF_STR( On ))
+	PORT_DIPNAME( 0x02, 0x00, "S02")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
+	PORT_DIPSETTING(    0x02, DEF_STR( On ))
+	PORT_DIPNAME( 0x04, 0x00, "S03")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
+	PORT_DIPSETTING(    0x04, DEF_STR( On ))
+	PORT_DIPNAME( 0x08, 0x00, "S04")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
+	PORT_DIPSETTING(    0x08, DEF_STR( On ))
+	PORT_DIPNAME( 0x10, 0x00, "S05")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
+	PORT_DIPSETTING(    0x10, DEF_STR( On ))
+	PORT_DIPNAME( 0x20, 0x20, "S06")
+	PORT_DIPSETTING(    0x00, DEF_STR( No ))
+	PORT_DIPSETTING(    0x20, DEF_STR( Yes ))
+	PORT_DIPNAME( 0x40, 0x40, "S07")
+	PORT_DIPSETTING(    0x00, DEF_STR( No ))
+	PORT_DIPSETTING(    0x40, DEF_STR( Yes ))
+	PORT_DIPNAME( 0x80, 0x80, "S08")
+	PORT_DIPSETTING(    0x00, DEF_STR( No ))
+	PORT_DIPSETTING(    0x80, DEF_STR( Yes ))
+
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x01, 0x00, "S09")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
+	PORT_DIPSETTING(    0x01, DEF_STR( On ))
+	PORT_DIPNAME( 0x02, 0x00, "S10")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
+	PORT_DIPSETTING(    0x02, DEF_STR( On ))
+	PORT_DIPNAME( 0x04, 0x00, "S11")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
+	PORT_DIPSETTING(    0x04, DEF_STR( On ))
+	PORT_DIPNAME( 0x08, 0x00, "S12")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
+	PORT_DIPSETTING(    0x08, DEF_STR( On ))
+	PORT_DIPNAME( 0x10, 0x00, "S13")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
+	PORT_DIPSETTING(    0x10, DEF_STR( On ))
+	PORT_DIPNAME( 0x20, 0x00, "S14")
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ))
+	PORT_DIPSETTING(    0x20, DEF_STR( No ))
+	PORT_DIPNAME( 0x40, 0x40, "S15")
+	PORT_DIPSETTING(    0x00, DEF_STR( No ))
+	PORT_DIPSETTING(    0x40, DEF_STR( Yes ))
+	PORT_DIPNAME( 0x80, 0x00, "S16")
+	PORT_DIPSETTING(    0x00, DEF_STR( No ))
+	PORT_DIPSETTING(    0x80, DEF_STR( Yes ))
+
+	PORT_START("DSW2")
+	PORT_DIPNAME( 0x01, 0x00, "S17")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
+	PORT_DIPSETTING(    0x01, DEF_STR( On ))
+	PORT_DIPNAME( 0x02, 0x00, "S18")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
+	PORT_DIPSETTING(    0x02, DEF_STR( On ))
+	PORT_DIPNAME( 0x04, 0x00, "S19")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
+	PORT_DIPSETTING(    0x04, DEF_STR( On ))
+	PORT_DIPNAME( 0x08, 0x00, "S20")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
+	PORT_DIPSETTING(    0x08, DEF_STR( On ))
+	PORT_DIPNAME( 0x10, 0x00, "S21")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
+	PORT_DIPSETTING(    0x10, DEF_STR( On ))
+	PORT_DIPNAME( 0x20, 0x00, "S22")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
+	PORT_DIPSETTING(    0x20, DEF_STR( On ))
+	PORT_DIPNAME( 0x40, 0x00, "S23")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
+	PORT_DIPSETTING(    0x40, DEF_STR( On ))
+	PORT_DIPNAME( 0x80, 0x00, "S24")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
+	PORT_DIPSETTING(    0x80, DEF_STR( On ))
+
+	PORT_START("DSW3")
+	PORT_DIPNAME( 0x03, 0x03, "Maximum Credits")
+	PORT_DIPSETTING(    0x00, "10")
+	PORT_DIPSETTING(    0x01, "15")
+	PORT_DIPSETTING(    0x02, "25")
+	PORT_DIPSETTING(    0x03, "40")
+	PORT_DIPNAME( 0x04, 0x04, "Credits displayed")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
+	PORT_DIPSETTING(    0x04, DEF_STR( On ))
+	PORT_DIPNAME( 0x08, 0x08, "Match")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
+	PORT_DIPSETTING(    0x08, DEF_STR( On ))
+	PORT_DIPNAME( 0x10, 0x00, "Keep all replays")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
+	PORT_DIPSETTING(    0x10, DEF_STR( On ))
+	PORT_DIPNAME( 0x20, 0x00, "Voice" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
+	PORT_DIPSETTING(    0x20, DEF_STR( On ))
+	PORT_DIPNAME( 0xC0, 0x40, "Balls")
+	PORT_DIPSETTING(    0xC0, "2")
+	PORT_DIPSETTING(    0x00, "3")
+	PORT_DIPSETTING(    0x80, "4")
+	PORT_DIPSETTING(    0x40, "5")
+
+	PORT_START("X0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER )
+	PORT_BIT( 0x0a, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START2 )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_START1 )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_TILT )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Outhole") PORT_CODE(KEYCODE_X)
+
+	PORT_START("X1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN2 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN1 )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN3 )
+	PORT_BIT( 0x38, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_TILT1 ) PORT_NAME("Slam Tilt")
+
+	// from here, vary per game
+	PORT_START("X2")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_A)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_S)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_D)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_F)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_G)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_H)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_J)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_K)
+
+	PORT_START("X3")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_Q)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_W)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_E)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_R)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_Y)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_U)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_I)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_O)
+
+	PORT_START("X4")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_Z)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_C)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_V)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_B)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_N)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_M)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_COMMA)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_STOP)
 INPUT_PORTS_END
+
+INPUT_CHANGED_MEMBER( hankin_state::self_test )
+{
+	m_ic11->ca1_w(newval);
+}
+
+WRITE8_MEMBER( hankin_state::ic10_a_w )
+{
+	m_ic10a = data;
+	//m_digit = 0xff;
+
+	if (!m_ic11_ca2)
+	{
+		if BIT(data, 2)
+			m_digit = 5;
+		else
+		if BIT(data, 3)
+			m_digit = 4;
+		else
+		if BIT(data, 4)
+			m_digit = 3;
+		else
+		if BIT(data, 5)
+			m_digit = 2;
+		else
+		if BIT(data, 6)
+			m_digit = 1;
+		else
+		if BIT(data, 7)
+			m_digit = 0;
+
+		m_counter++;
+	}
+}
+
+WRITE_LINE_MEMBER( hankin_state::ic10_ca2_w )
+{
+	output_set_value("led0", !state);
+}
+
+WRITE8_MEMBER( hankin_state::ic11_a_w )
+{
+	static const UINT8 patterns[16] = { 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7d,0x07,0x7f,0x6f,0,0,0,0,0,0 }; // MC14543
+	m_ic11a = data;
+
+	if (!m_ic11_ca2)
+	{
+		if (m_counter==3)
+			output_set_digit_value(m_digit, patterns[m_segment]);
+
+		m_counter++;
+		m_segment = data >> 4;
+
+		if (m_counter==4)
+			output_set_digit_value(10+m_digit, patterns[m_segment]);
+		else
+		if (m_counter==6)
+			output_set_digit_value(20+m_digit, patterns[m_segment]);
+		else
+		if (m_counter==8)
+			output_set_digit_value(30+m_digit, patterns[m_segment]);
+		else
+		if (m_counter==10)
+			output_set_digit_value(40+m_digit, patterns[m_segment]);
+	}
+}
+
+READ8_MEMBER( hankin_state::ic11_b_r )
+{
+	UINT8 data = 0;
+
+	if (BIT(m_ic11a, 0))
+		data |= m_io_x0->read();
+
+	if (BIT(m_ic11a, 1))
+		data |= m_io_x1->read();
+
+	if (BIT(m_ic11a, 2))
+		data |= m_io_x2->read();
+
+	if (BIT(m_ic11a, 3))
+		data |= m_io_x3->read();
+
+	if (BIT(m_ic11a, 4))
+		data |= m_io_x4->read();
+
+	if (BIT(m_ic11a, 5))
+		data |= m_io_dsw0->read();
+
+	if (BIT(m_ic11a, 6))
+		data |= m_io_dsw1->read();
+
+	if (BIT(m_ic11a, 7))
+		data |= m_io_dsw2->read();
+
+	return data;
+}
+
+WRITE_LINE_MEMBER( hankin_state::ic11_ca2_w )
+{
+	m_ic11_ca2 = state;
+	if (!state)
+		m_counter = 0;
+}
+		
+// zero-cross detection
+TIMER_DEVICE_CALLBACK_MEMBER( hankin_state::timer_x )
+{
+	m_timer_x ^= 1;
+	m_ic11->cb1_w(m_timer_x);
+}
 
 void hankin_state::machine_reset()
 {
@@ -80,20 +383,20 @@ static MACHINE_CONFIG_START( hankin, hankin_state )
 	/* Devices */
 	MCFG_DEVICE_ADD("ic10", PIA6821, 0)
 	//MCFG_PIA_READPA_HANDLER(READ8(hankin_state, ic10_a_r))
-	//MCFG_PIA_WRITEPA_HANDLER(WRITE8(hankin_state, ic10_a_w))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(hankin_state, ic10_a_w))
 	//MCFG_PIA_READPB_HANDLER(READ8(hankin_state, ic10_b_r))
 	//MCFG_PIA_WRITEPB_HANDLER(WRITE8(hankin_state, ic10_b_w))
-	//MCFG_PIA_CA2_HANDLER(WRITELINE(hankin_state, ic10_ca2_w))
+	MCFG_PIA_CA2_HANDLER(WRITELINE(hankin_state, ic10_ca2_w))
 	//MCFG_PIA_CB2_HANDLER(WRITELINE(hankin_state, ic10_cb2_w))
 	MCFG_PIA_IRQA_HANDLER(DEVWRITELINE("maincpu", m6802_cpu_device, irq_line))
 	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE("maincpu", m6802_cpu_device, irq_line))
 
 	MCFG_DEVICE_ADD("ic11", PIA6821, 0)
 	//MCFG_PIA_READPA_HANDLER(READ8(hankin_state, ic11_a_r))
-	//MCFG_PIA_WRITEPA_HANDLER(WRITE8(hankin_state, ic11_a_w))
-	//MCFG_PIA_READPB_HANDLER(READ8(hankin_state, ic11_b_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(hankin_state, ic11_a_w))
+	MCFG_PIA_READPB_HANDLER(READ8(hankin_state, ic11_b_r))
 	//MCFG_PIA_WRITEPB_HANDLER(WRITE8(hankin_state, ic11_b_w))
-	//MCFG_PIA_CA2_HANDLER(WRITELINE(hankin_state, ic11_ca2_w))
+	MCFG_PIA_CA2_HANDLER(WRITELINE(hankin_state, ic11_ca2_w))
 	//MCFG_PIA_CB2_HANDLER(WRITELINE(hankin_state, ic11_cb2_w))
 	MCFG_PIA_IRQA_HANDLER(DEVWRITELINE("maincpu", m6802_cpu_device, irq_line))
 	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE("maincpu", m6802_cpu_device, irq_line))
@@ -107,6 +410,8 @@ static MACHINE_CONFIG_START( hankin, hankin_state )
 	//MCFG_PIA_CB2_HANDLER(WRITELINE(hankin_state, ic2_cb2_w))
 	MCFG_PIA_IRQA_HANDLER(DEVWRITELINE("audiocpu", m6802_cpu_device, irq_line))
 	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE("audiocpu", m6802_cpu_device, irq_line))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_x", hankin_state, timer_x, attotime::from_hz(120)) // mains freq*2
 MACHINE_CONFIG_END
 
 /*--------------------------------
