@@ -259,7 +259,8 @@ protected:
 private:
 	void command_lo_sync(void *ptr, int param);
 	void delayed_response_r(void *ptr, int param);
-	void set_clock_line(int which, bool state) { m_clock_active = state ? (m_clock_active | (1<<which)) : (m_clock_active & ~(1<<which)); }
+	void set_clock_line(int which, int state) { m_clock_active = state ? (m_clock_active | (1<<which)) : (m_clock_active & ~(1<<which)); }
+
 	// internal state
 	i80186_cpu_device *m_audiocpu;
 	UINT16 m_peripheral;

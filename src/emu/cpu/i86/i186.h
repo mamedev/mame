@@ -57,7 +57,7 @@ private:
 	void handle_eoi(int data);
 	void external_int(UINT16 intno, int state);
 	void internal_timer_sync(int which);
-	void internal_timer_update(int which,int new_count,int new_maxA,int new_maxB,int new_control);
+	void internal_timer_update(int which, int new_count, int new_maxA, int new_maxB, int new_control);
 	void update_dma_control(int which, int new_control);
 	void drq_callback(int which);
 	void inc_timer(int which);
@@ -90,32 +90,32 @@ private:
 		UINT32      dest;
 		UINT16      count;
 		UINT16      control;
-		emu_timer   *finish_timer;
 	};
 
 	struct intr_state
 	{
-		UINT8   pending;
-		UINT16  ack_mask;
-		UINT16  priority_mask;
-		UINT16  in_service;
-		UINT16  request;
-		UINT16  status;
-		UINT16  poll_status;
-		UINT16  timer;
-		UINT16  dma[2];
-		UINT16  ext[4];
-		UINT8   ext_state;
+		UINT8       pending;
+		UINT16      ack_mask;
+		UINT16      priority_mask;
+		UINT16      in_service;
+		UINT16      request;
+		UINT16      status;
+		UINT16      poll_status;
+		UINT16      timer;
+		UINT16      dma[2];
+		UINT16      ext[4];
+		UINT8       ext_state;
 	};
+
+	timer_state     m_timer[3];
+	dma_state       m_dma[2];
+	intr_state      m_intr;
+	mem_state       m_mem;
 
 	static const device_timer_id TIMER_INT0 = 0;
 	static const device_timer_id TIMER_INT1 = 1;
 	static const device_timer_id TIMER_INT2 = 2;
 
-	struct timer_state  m_timer[3];
-	struct dma_state    m_dma[2];
-	struct intr_state   m_intr;
-	struct mem_state    m_mem;
 	UINT16 m_reloc;
 
 	address_space_config m_program_config;

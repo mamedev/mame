@@ -100,7 +100,6 @@ void pit8253_device::device_start()
 	m_out1_handler.resolve_safe();
 	m_out2_handler.resolve_safe();
 
-	/* register for state saving */
 	for (int timerno = 0; timerno < PIT8253_MAX_TIMER; timerno++)
 	{
 		pit8253_timer *timer = get_timer(timerno);

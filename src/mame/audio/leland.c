@@ -245,6 +245,33 @@ machine_config_constructor wsf_80186_sound_device::device_mconfig_additions() co
 
 void leland_80186_sound_device::device_start()
 {
+	// register for savestates
+	save_item(NAME(m_peripheral));
+	save_item(NAME(m_last_control));
+	save_item(NAME(m_clock_active));
+	save_item(NAME(m_clock_tick));
+	save_item(NAME(m_sound_command));
+	save_item(NAME(m_sound_response));
+	save_item(NAME(m_ext_start));
+	save_item(NAME(m_ext_stop));
+	save_item(NAME(m_ext_active));
+	save_item(NAME(m_dac_sample));
+	save_item(NAME(m_dac_volume));
+	
+	// zerofill
+	m_peripheral = 0;
+	m_last_control = 0;
+	m_clock_active = 0;
+	m_clock_tick = 0;
+	m_sound_command = 0;
+	m_sound_response = 0;
+	m_ext_start = 0;
+	m_ext_stop = 0;
+	m_ext_active = 0;
+	m_ext_base = NULL;
+	memset(m_dac_sample, 0, sizeof(m_dac_sample));
+	memset(m_dac_volume, 0x80, sizeof(m_dac_volume));
+
 	m_audiocpu = downcast<i80186_cpu_device *>(machine().device("audiocpu"));
 
 	/* determine which sound hardware is installed */
@@ -273,6 +300,7 @@ void leland_80186_sound_device::device_reset()
 	m_ext_active = 0;
 	memset(m_dac_sample, 0, sizeof(m_dac_sample));
 	memset(m_dac_volume, 0x80, sizeof(m_dac_volume));
+
 	m_dac_timer->adjust(attotime::from_hz(48000), 0, attotime::from_hz(48000));
 }
 
@@ -361,7 +389,7 @@ WRITE8_MEMBER( leland_80186_sound_device::leland_80186_control_w )
 {
 	/* see if anything changed */
 	int diff = (m_last_control ^ data) & 0xf8;
-	if (!diff)
+	if (diff == 0)
 		return;
 	m_last_control = data;
 
@@ -377,15 +405,15 @@ WRITE8_MEMBER( leland_80186_sound_device::leland_80186_control_w )
 	}
 
 	/* /RESET */
-	m_audiocpu->device_t::execute().set_input_line(INPUT_LINE_RESET, data & 0x80  ? CLEAR_LINE : ASSERT_LINE);
-	m_audiocpu->device_t::execute().set_input_line(INPUT_LINE_TEST, data & 0x10  ? CLEAR_LINE : ASSERT_LINE);
+	m_audiocpu->device_t::execute().set_input_line(INPUT_LINE_RESET, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
+	m_audiocpu->device_t::execute().set_input_line(INPUT_LINE_TEST, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
 
 	/* /NMI */
 /*  If the master CPU doesn't get a response by the time it's ready to send
     the next command, it uses an NMI to force the issue; unfortunately, this
     seems to really screw up the sound system. It turns out it's better to
     just wait for the original interrupt to occur naturally */
-/*  space.machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_NMI, data & 0x40  ? CLEAR_LINE : ASSERT_LINE);*/
+/*  space.machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_NMI, (data & 0x40) ? CLEAR_LINE : ASSERT_LINE);*/
 
 	/* INT0 */
 	m_audiocpu->int0_w(data & 0x20);
