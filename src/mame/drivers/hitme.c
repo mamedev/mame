@@ -299,6 +299,7 @@ GFXDECODE_END
 
 void hitme_state::machine_start()
 {
+	save_item(NAME(m_timeout_time));
 }
 
 void hitme_state::machine_reset()
