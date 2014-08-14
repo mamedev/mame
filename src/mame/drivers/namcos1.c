@@ -415,7 +415,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( virtual_map, AS_PROGRAM, 8, namcos1_state )
 	AM_RANGE(0x2c0000, 0x2c1fff) AM_WRITE(namcos1_3dcs_w)
-	AM_RANGE(0x2e0000, 0x2e7fff) AM_RAM_WRITE(namcos1_paletteram_w) AM_SHARE("paletteram")
+	AM_RANGE(0x2e0000, 0x2e7fff) AM_DEVREADWRITE("c116", namco_c116_device, read, write)
 	AM_RANGE(0x2f0000, 0x2f7fff) AM_RAM_WRITE(namcos1_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x2f8000, 0x2f9fff) AM_READWRITE(no_key_r, no_key_w)
 	AM_RANGE(0x2fc000, 0x2fcfff) AM_RAM_WRITE(namcos1_spriteram_w) AM_SHARE("spriteram")
@@ -1069,6 +1069,9 @@ static MACHINE_CONFIG_START( ns1, namcos1_state )
 
 	MCFG_PALETTE_ADD("palette", 0x2000)
 	MCFG_PALETTE_ENABLE_SHADOWS()
+
+	MCFG_DEVICE_ADD("c116", NAMCO_C116, 0)
+	MCFG_GFX_PALETTE("palette")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

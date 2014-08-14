@@ -71,42 +71,11 @@ NB2TilemapCB(running_machine &machine, UINT16 code, int *tile, int *mask )
 	}
 } /* NB2TilemapCB */
 
-static void namconb1_install_palette(running_machine &machine)
-{
-	namconb1_state *state = machine.driver_data<namconb1_state>();
-	int pen, page, dword_offset, byte_offset;
-	UINT32 r,g,b;
-	UINT32 *pSource;
-
-	/**
-	 * This is unnecessarily expensive.  Better would be to mark palette entries dirty as
-	 * they are modified, and only process those that have changed.
-	 */
-	pen = 0;
-	for( page=0; page<4; page++ )
-	{
-		pSource = &state->m_generic_paletteram_32[page*0x2000/4];
-		for( dword_offset=0; dword_offset<0x800/4; dword_offset++ )
-		{
-			r = pSource[dword_offset+0x0000/4];
-			g = pSource[dword_offset+0x0800/4];
-			b = pSource[dword_offset+0x1000/4];
-
-			for( byte_offset=0; byte_offset<4; byte_offset++ )
-			{
-				state->m_palette->set_pen_color(pen++, r>>24, g>>24, b>>24 );
-				r<<=8; g<<=8; b<<=8;
-			}
-		}
-	}
-} /* namconb1_install_palette */
-
 static void
 video_update_common(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int bROZ )
 {
 	namconb1_state *state = screen.machine().driver_data<namconb1_state>();
 	int pri;
-	namconb1_install_palette(screen.machine());
 
 	if( bROZ )
 	{
@@ -137,12 +106,10 @@ UINT32 namconb1_state::screen_update_namconb1(screen_device &screen, bitmap_ind1
 	/* compute window for custom screen blanking */
 	rectangle clip;
 	//004a 016a 0021 0101 0144 0020 (nebulas ray)
-	UINT32 xclip = m_generic_paletteram_32[0x1800/4];
-	UINT32 yclip = m_generic_paletteram_32[0x1804/4];
-	clip.min_x = (xclip>>16)    - 0x4a;
-	clip.max_x = (xclip&0xffff) - 0x4a - 1;
-	clip.min_y = (yclip>>16)    - 0x21;
-	clip.max_y = (yclip&0xffff) - 0x21 - 1;
+	clip.min_x = m_c116->get_reg(0) - 0x4a;
+	clip.max_x = m_c116->get_reg(1) - 0x4a - 1;
+	clip.min_y = m_c116->get_reg(2) - 0x21;
+	clip.max_y = m_c116->get_reg(3) - 0x21 - 1;
 	/* intersect with master clip rectangle */
 	clip &= cliprect;
 
@@ -174,12 +141,10 @@ UINT32 namconb1_state::screen_update_namconb2(screen_device &screen, bitmap_ind1
 	/* compute window for custom screen blanking */
 	rectangle clip;
 	//004a016a 00210101 01440020
-	UINT32 xclip = m_generic_paletteram_32[0x1800/4];
-	UINT32 yclip = m_generic_paletteram_32[0x1804/4];
-	clip.min_x = (xclip>>16)    - 0x4b;
-	clip.max_x = (xclip&0xffff) - 0x4b - 1;
-	clip.min_y = (yclip>>16)    - 0x21;
-	clip.max_y = (yclip&0xffff) - 0x21 - 1;
+	clip.min_x = m_c116->get_reg(0) - 0x4b;
+	clip.max_x = m_c116->get_reg(1) - 0x4b - 1;
+	clip.min_y = m_c116->get_reg(2) - 0x21;
+	clip.max_y = m_c116->get_reg(3) - 0x21 - 1;
 	/* intersect with master clip rectangle */
 	clip &= cliprect;
 

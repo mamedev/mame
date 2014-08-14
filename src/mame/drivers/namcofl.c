@@ -197,13 +197,14 @@ WRITE32_MEMBER(namcofl_state::namcofl_sysreg_w)
 	}
 }
 
-WRITE32_MEMBER(namcofl_state::namcofl_paletteram_w)
+// FIXME: remove this trampoline once the IRQ is moved into the actual device
+WRITE8_MEMBER(namcofl_state::namcofl_c116_w)
 {
-	COMBINE_DATA(&m_generic_paletteram_32[offset]);
+	m_c116->write(space, offset, data);
 
-	if ((offset == 0x1808/4) && ACCESSING_BITS_16_31)
+	if ((offset & 0x180e) == 0x180a)
 	{
-		UINT16 v = m_generic_paletteram_32[offset] >> 16;
+		UINT16 v = m_c116->get_reg(5);
 		UINT16 triggerscanline=(((v>>8)&0xff)|((v&0xff)<<8))-(32+1);
 
 		m_raster_interrupt_timer->adjust(m_screen->time_until_pos(triggerscanline));
@@ -232,7 +233,7 @@ static ADDRESS_MAP_START( namcofl_mem, AS_PROGRAM, 32, namcofl_state )
 	AM_RANGE(0x30284000, 0x3028bfff) AM_READWRITE(namcofl_share_r, namcofl_share_w)
 	AM_RANGE(0x30300000, 0x30303fff) AM_RAM /* COMRAM */
 	AM_RANGE(0x30380000, 0x303800ff) AM_READ(fl_network_r ) /* network registers */
-	AM_RANGE(0x30400000, 0x3040ffff) AM_RAM_WRITE(namcofl_paletteram_w) AM_SHARE("paletteram")
+	AM_RANGE(0x30400000, 0x30407fff) AM_DEVREAD8("c116", namco_c116_device,read,0xffffffff) AM_WRITE8(namcofl_c116_w,0xffffffff)
 	AM_RANGE(0x30800000, 0x3080ffff) AM_READWRITE16(c123_tilemap_videoram_r,c123_tilemap_videoram_w,0xffffffff)
 	AM_RANGE(0x30a00000, 0x30a0003f) AM_READWRITE16(c123_tilemap_control_r,c123_tilemap_control_w,0xffffffff)
 	AM_RANGE(0x30c00000, 0x30c1ffff) AM_READWRITE16(c169_roz_videoram_r,c169_roz_videoram_w,0xffffffff) AM_SHARE("rozvideoram")
@@ -603,6 +604,9 @@ static MACHINE_CONFIG_START( namcofl, namcofl_state )
 	MCFG_PALETTE_ADD("palette", 8192)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", 2)
+
+	MCFG_DEVICE_ADD("c116", NAMCO_C116, 0)
+	MCFG_GFX_PALETTE("palette")
 
 	MCFG_VIDEO_START_OVERRIDE(namcofl_state,namcofl)
 

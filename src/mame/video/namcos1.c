@@ -125,19 +125,10 @@ void namcos1_state::video_start()
 	m_bg_tilemap[4]->set_scrolldy(16, 16);
 	m_bg_tilemap[5]->set_scrolldy(16, 16);
 
-	/* register videoram to the save state system (post-allocation) */
-	save_item(NAME(m_cus116));
-
 	/* set table for sprite color == 0x7f */
 	for (i = 0;i < 15;i++)
 		m_drawmode_table[i] = DRAWMODE_SHADOW;
 	m_drawmode_table[15] = DRAWMODE_NONE;
-
-	/* clear paletteram */
-	memset(m_paletteram, 0, 0x8000);
-	memset(m_cus116, 0, 0x10);
-	for (i = 0; i < 0x2000; i++)
-		m_palette->set_pen_color(i, rgb_t(0, 0, 0));
 
 	/* all palette entries are not affected by shadow sprites... */
 	for (i = 0;i < 0x2000;i++)
@@ -175,42 +166,6 @@ WRITE8_MEMBER( namcos1_state::namcos1_videoram_w )
 			m_bg_tilemap[layer]->mark_tile_dirty(num);
 	}
 }
-
-
-WRITE8_MEMBER( namcos1_state::namcos1_paletteram_w )
-{
-	if (m_paletteram[offset] == data)
-		return;
-
-	if ((offset & 0x1800) != 0x1800)
-	{
-		int r,g,b;
-		int color = ((offset & 0x6000) >> 2) | (offset & 0x7ff);
-
-		m_paletteram[offset] = data;
-
-		offset &= ~0x1800;
-		r = m_paletteram[offset];
-		g = m_paletteram[offset + 0x0800];
-		b = m_paletteram[offset + 0x1000];
-		m_palette->set_pen_color(color,rgb_t(r,g,b));
-	}
-	else
-	{
-		int i, j;
-
-		m_cus116[offset & 0x0f] = data;
-
-		for (i = 0x1800; i < 0x8000; i += 0x2000)
-		{
-			offset = (offset & 0x0f) | i;
-
-			for (j = 0; j < 0x80; j++, offset += 0x10)
-				m_paletteram[offset] = data;
-		}
-	}
-}
-
 
 
 WRITE8_MEMBER( namcos1_state::namcos1_spriteram_w )
@@ -335,13 +290,13 @@ UINT32 namcos1_state::screen_update_namcos1(screen_device &screen, bitmap_ind16 
 	bitmap.fill(m_palette->black_pen(), cliprect);
 
 	/* berabohm uses asymmetrical visibility windows to iris on the character */
-	i = ((m_cus116[0] << 8) | m_cus116[1]) - 1;         // min x
+	i = m_c116->get_reg(0) - 1;                         // min x
 	if (new_clip.min_x < i) new_clip.min_x = i;
-	i = ((m_cus116[2] << 8) | m_cus116[3]) - 1 - 1;     // max x
+	i = m_c116->get_reg(1) - 1 - 1;                     // max x
 	if (new_clip.max_x > i) new_clip.max_x = i;
-	i = ((m_cus116[4] << 8) | m_cus116[5]) - 0x11;      // min y
+	i = m_c116->get_reg(2) - 0x11;                      // min y
 	if (new_clip.min_y < i) new_clip.min_y = i;
-	i = ((m_cus116[6] << 8) | m_cus116[7]) - 0x11 - 1;  // max y
+	i = m_c116->get_reg(3) - 0x11 - 1;                  // max y
 	if (new_clip.max_y > i) new_clip.max_y = i;
 
 	if (new_clip.empty())

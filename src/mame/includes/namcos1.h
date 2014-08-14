@@ -1,6 +1,7 @@
 #include "machine/c117.h"
 #include "sound/dac.h"
 #include "sound/namco.h"
+#include "video/c116.h"
 
 class namcos1_state : public driver_device
 {
@@ -11,11 +12,11 @@ public:
 		m_subcpu(*this, "subcpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_mcu(*this, "mcu"),
+		m_c116(*this, "c116"),
 		m_c117(*this, "c117"),
 		m_dac(*this, "dac"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
-		m_paletteram(*this, "paletteram"),
 		m_videoram(*this, "videoram"),
 		m_spriteram(*this, "spriteram"),
 		m_playfield_control(*this, "pfcontrol"),
@@ -26,12 +27,12 @@ public:
 	required_device<cpu_device> m_subcpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<cpu_device> m_mcu;
+	required_device<namco_c116_device> m_c116;
 	required_device<namco_c117_device> m_c117;
 	required_device<dac_device> m_dac;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	required_shared_ptr<UINT8> m_paletteram;
 	required_shared_ptr<UINT8> m_videoram;
 	required_shared_ptr<UINT8> m_spriteram;
 	required_shared_ptr<UINT8> m_playfield_control;
@@ -60,7 +61,6 @@ public:
 	int m_strobe;
 	int m_strobe_count;
 	int m_stored_input[2];
-	UINT8 m_cus116[0x10];
 	tilemap_t *m_bg_tilemap[6];
 	UINT8 *m_tilemap_maskdata;
 	int m_copy_sprites;
@@ -117,7 +117,6 @@ public:
 	void namcos1_update_DACs();
 	void namcos1_init_DACs();
 	DECLARE_WRITE8_MEMBER( namcos1_videoram_w );
-	DECLARE_WRITE8_MEMBER( namcos1_paletteram_w );
 	DECLARE_WRITE8_MEMBER( namcos1_spriteram_w );
 	WRITE8_MEMBER( namcos1_3dcs_w );
 	READ8_MEMBER( no_key_r );

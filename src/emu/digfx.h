@@ -212,6 +212,9 @@ protected:
 	virtual void interface_pre_start();
 	virtual void interface_post_start();
 
+	palette_device *            m_palette;                  // pointer to the palette device
+	auto_pointer<gfx_element>   m_gfx[MAX_GFX_ELEMENTS];    // array of pointers to graphic sets
+
 private:
 	// configuration
 	const gfx_decode_entry *    m_gfxdecodeinfo;        // pointer to array of gfx decode information
@@ -220,8 +223,6 @@ private:
 
 	// internal state
 	bool                        m_decoded;                  // have we processed our decode info yet?
-	palette_device *            m_palette;                  // pointer to the palette device
-	auto_pointer<gfx_element>   m_gfx[MAX_GFX_ELEMENTS];    // array of pointers to graphic sets
 };
 
 // iterator

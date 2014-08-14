@@ -293,7 +293,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(namconb1_state::namconb_scantimer)
 	}
 
 	// Handle POSIRQ
-	UINT32 posirq_scanline = (m_generic_paletteram_32[0x1808/4] & 0xffff) - 32;
+	UINT32 posirq_scanline = m_c116->get_reg(5) - 32;
 
 	if (scanline == posirq_scanline)
 	{
@@ -667,7 +667,7 @@ static ADDRESS_MAP_START( namconb1_am, AS_PROGRAM, 32, namconb1_state )
 	AM_RANGE(0x660000, 0x66003f) AM_READWRITE16(c123_tilemap_control_r,c123_tilemap_control_w,0xffffffff)
 	AM_RANGE(0x680000, 0x68000f) AM_RAM AM_SHARE("spritebank32")
 	AM_RANGE(0x6e0000, 0x6e001f) AM_READ(custom_key_r) AM_WRITENOP
-	AM_RANGE(0x700000, 0x707fff) AM_RAM AM_SHARE("paletteram")
+	AM_RANGE(0x700000, 0x707fff) AM_DEVREADWRITE8("c116", namco_c116_device, read, write, 0xffffffff)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( namconb2_am, AS_PROGRAM, 32, namconb1_state )
@@ -684,7 +684,7 @@ static ADDRESS_MAP_START( namconb2_am, AS_PROGRAM, 32, namconb1_state )
 	AM_RANGE(0x6c0000, 0x6c003f) AM_READWRITE16(c123_tilemap_control_r,c123_tilemap_control_w,0xffffffff)
 	AM_RANGE(0x700000, 0x71ffff) AM_READWRITE16(c169_roz_videoram_r,c169_roz_videoram_w,0xffffffff) AM_SHARE("rozvideoram")
 	AM_RANGE(0x740000, 0x74001f) AM_READWRITE16(c169_roz_control_r,c169_roz_control_w,0xffffffff)
-	AM_RANGE(0x800000, 0x807fff) AM_RAM AM_SHARE("paletteram")
+	AM_RANGE(0x800000, 0x807fff) AM_DEVREADWRITE8("c116", namco_c116_device, read, write, 0xffffffff)
 	AM_RANGE(0x900008, 0x90000f) AM_RAM AM_SHARE("spritebank32")
 	AM_RANGE(0x940000, 0x94000f) AM_RAM AM_SHARE("tilebank32")
 	AM_RANGE(0x980000, 0x98000f) AM_READWRITE16(c169_roz_bank_r,c169_roz_bank_w,0xffffffff)
@@ -1116,9 +1116,11 @@ static MACHINE_CONFIG_START( namconb1, namconb1_state )
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", namconb1)
-
 	MCFG_PALETTE_ADD("palette", 0x2000)
 	MCFG_PALETTE_ENABLE_SHADOWS()
+
+	MCFG_DEVICE_ADD("c116", NAMCO_C116, 0)
+	MCFG_GFX_PALETTE("palette")
 
 	MCFG_VIDEO_START_OVERRIDE(namconb1_state,namconb1)
 
@@ -1153,6 +1155,9 @@ static MACHINE_CONFIG_START( namconb2, namconb1_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", 2)
 	MCFG_PALETTE_ADD("palette", 0x2000)
 	MCFG_PALETTE_ENABLE_SHADOWS()
+
+	MCFG_DEVICE_ADD("c116", NAMCO_C116, 0)
+	MCFG_GFX_PALETTE("palette")
 
 	MCFG_VIDEO_START_OVERRIDE(namconb1_state,namconb2)
 

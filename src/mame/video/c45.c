@@ -131,7 +131,7 @@ WRITE16_MEMBER( namco_c45_road_device::tilemap_w )
 WRITE16_MEMBER( namco_c45_road_device::tileram_w )
 {
 	COMBINE_DATA(&m_tileram[offset]);
-	gfx(0)->mark_dirty(offset / WORDS_PER_ROAD_TILE);
+	m_gfx[0]->mark_dirty(offset / WORDS_PER_ROAD_TILE);
 }
 
 
@@ -198,7 +198,7 @@ void namco_c45_road_device::draw(bitmap_ind16 &bitmap, const rectangle &cliprect
 			while (numpixels-- > 0)
 			{
 				int pen = source_gfx[sourcex >> 16];
-				if (palette()->pen_indirect(pen) != m_transparent_color)
+				if (m_palette->pen_indirect(pen) != m_transparent_color)
 				{
 					if (m_clut != NULL)
 						pen = (pen & ~0xff) | m_clut[pen & 0xff];
