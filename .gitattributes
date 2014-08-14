@@ -6534,6 +6534,7 @@ src/mame/layout/gunchamps.lay svneol=native#text/xml
 src/mame/layout/gunfight.lay svneol=native#text/xml
 src/mame/layout/gunnrose.lay svneol=native#text/xml
 src/mame/layout/gypsyjug.lay svneol=native#text/xml
+src/mame/layout/hankin.lay svneol=native#text/plain
 src/mame/layout/icecold.lay svneol=native#text/xml
 src/mame/layout/igspoker.lay svneol=native#text/xml
 src/mame/layout/imolagp.lay svneol=native#text/xml

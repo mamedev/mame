@@ -2636,6 +2636,8 @@ $(DRIVERS)/grchamp.o:   $(LAYOUT)/grchamp.lh
 
 $(DRIVERS)/highvdeo.o:  $(LAYOUT)/fashion.lh
 
+$(DRIVERS)/hankin.o:    $(LAYOUT)/hankin.lh
+
 $(DRIVERS)/hitme.o:     $(LAYOUT)/barricad.lh
 
 $(DRIVERS)/icecold.o:   $(LAYOUT)/icecold.lh
