@@ -975,10 +975,6 @@ INPUT_PORTS_END
 
 DRIVER_INIT_MEMBER(namconb1_state,nebulray)
 {
-	UINT8 *pMem = (UINT8 *)memregion(NAMCONB1_TILEMASKREGION)->base();
-	size_t numBytes = (0xfe7-0xe6f)*8;
-	memset( &pMem[0xe6f*8], 0, numBytes );
-
 	m_gametype = NAMCONB1_NEBULRAY;
 } /* nebulray */
 
