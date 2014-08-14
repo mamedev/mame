@@ -1032,6 +1032,7 @@ void i80186_cpu_device::device_timer(emu_timer &timer, device_timer_id id, int p
 				t->int_timer->adjust(attotime::never, which);
 			break;
 		}
+
 		default:
 			break;
 	}
@@ -1052,12 +1053,12 @@ void i80186_cpu_device::inc_timer(int which)
 	struct timer_state *t = &m_timer[which];
 
 	t->count++;
-	if(t->control & 2)
+	if (t->control & 2)
 	{
-		if(t->count == (t->active_count ? t->maxB : t->maxA))
+		if (t->count == (t->active_count ? t->maxB : t->maxA))
 			device_timer(*t->int_timer, which, which, NULL);
 	}
-	else if(t->count == t->maxA)
+	else if (t->count == t->maxA)
 		device_timer(*t->int_timer, which, which, NULL);
 }
 
@@ -1088,10 +1089,12 @@ void i80186_cpu_device::internal_timer_update(int which,int new_count,int new_ma
 			internal_timer_sync(which);
 			update_int_timer = 1;
 		}
+
 		t->maxA = new_maxA;
+
 		if (new_maxA == 0)
 		{
-				new_maxA = 0x10000;
+			new_maxA = 0x10000;
 		}
 	}
 
@@ -1108,10 +1111,9 @@ void i80186_cpu_device::internal_timer_update(int which,int new_count,int new_ma
 
 		if (new_maxB == 0)
 		{
-				new_maxB = 0x10000;
+			new_maxB = 0x10000;
 		}
 	}
-
 
 	/* handle control changes */
 	if (new_control != -1)
@@ -1367,7 +1369,7 @@ READ16_MEMBER(i80186_cpu_device::internal_port_r)
 		case 0x30:
 			if (LOG_PORTS) logerror("%05X:read 80186 Timer %d count\n", pc(), (offset - 0x28) / 4);
 			which = (offset - 0x28) / 4;
-			if (!(offset & 1))
+			if (ACCESSING_BITS_0_7)
 				internal_timer_sync(which);
 			return m_timer[which].count;
 
@@ -1466,7 +1468,7 @@ READ16_MEMBER(i80186_cpu_device::internal_port_r)
 WRITE16_MEMBER(i80186_cpu_device::internal_port_w)
 {
 	int which;
-
+	
 	switch (offset)
 	{
 		case 0x11:
@@ -1670,9 +1672,9 @@ WRITE16_MEMBER(i80186_cpu_device::internal_port_w)
 			{
 				UINT32 newmap = (data & 0xfff) << 8;
 				UINT32 oldmap = (m_reloc & 0xfff) << 8;
-				if(!(data & 0x1000) || ((data & 0x1000) && (m_reloc & 0x1000)))
+				if (!(data & 0x1000) || ((data & 0x1000) && (m_reloc & 0x1000)))
 					m_program->unmap_readwrite(oldmap, oldmap + 0xff);
-				if(data & 0x1000)  // TODO: make work with 80188 if needed
+				if (data & 0x1000) // TODO: make work with 80188 if needed
 					m_program->install_readwrite_handler(newmap, newmap + 0xff, read16_delegate(FUNC(i80186_cpu_device::internal_port_r), this), write16_delegate(FUNC(i80186_cpu_device::internal_port_w), this));
 			}
 			m_reloc = data;

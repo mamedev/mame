@@ -62,17 +62,15 @@ struct pit8253_timer
 	UINT8 control;                  /* 6-bit control byte */
 	UINT8 status;                   /* status byte - 8254 only */
 	UINT8 lowcount;                 /* LSB of new counter value for 16-bit writes */
-	INT32 rmsb;                     /* 1 = Next read is MSB of 16-bit value */
-	INT32 wmsb;                     /* 1 = Next write is MSB of 16-bit value */
-	INT32 output;                       /* 0 = low, 1 = high */
+	int rmsb;                       /* 1 = Next read is MSB of 16-bit value */
+	int wmsb;                       /* 1 = Next write is MSB of 16-bit value */
+	int output;                     /* 0 = low, 1 = high */
 
-	INT32 gate;                     /* gate input (0 = low, 1 = high) */
-	INT32 latched_count;                /* number of bytes of count latched */
-	INT32 latched_status;               /* 1 = status latched (8254 only) */
-	INT32 null_count;                   /* 1 = mode control or count written, 0 = count loaded */
-	INT32 phase;                        /* see phase definition tables in simulate2(), below */
-
-	UINT32 cycles_to_output;        /* cycles until output callback called */
+	int gate;                       /* gate input (0 = low, 1 = high) */
+	int latched_count;              /* number of bytes of count latched */
+	int latched_status;             /* 1 = status latched (8254 only) */
+	int null_count;                 /* 1 = mode control or count written, 0 = count loaded */
+	int phase;                      /* see phase definition tables in simulate2(), below */
 };
 
 class pit8253_device : public device_t
@@ -125,7 +123,7 @@ protected:
 
 private:
 	int pit8253_gate(pit8253_timer *timer);
-	void decrease_counter_value(pit8253_timer *timer, UINT64 cycles);
+	void decrease_counter_value(pit8253_timer *timer, INT64 cycles);
 	void load_counter_value(pit8253_timer *timer);
 	void set_output(pit8253_timer *timer, int output);
 	void simulate2(pit8253_timer *timer, INT64 elapsed_cycles);
