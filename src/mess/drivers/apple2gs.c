@@ -564,6 +564,27 @@ ROM_START(apple2gsr0p)  // 6/19/1986 Cortland prototype
 	ROM_LOAD( "341-0132-d.e12", 0x000, 0x800, CRC(c506efb9) SHA1(8e14e85c645187504ec9d162b3ea614a0c421d32) )
 ROM_END
 
+ROM_START(apple2gsr0p2)  // 3/10/1986 Cortland prototype, boots as "Apple //'ing - Alpha 2.0"
+	ROM_REGION(0xc00,"m50740",0)
+	ROM_LOAD( "341s0345.bin", 0x000000, 0x000c00, CRC(48cd5779) SHA1(97e421f5247c00a0ca34cd08b6209df573101480) )
+
+	ROM_REGION(0x400, "kmcu", 0)
+	ROM_LOAD( "341-0232a.bin", 0x000000, 0x000400, CRC(6a158b9f) SHA1(e8744180075182849d431fd8023a52a062a6da76) )
+	ROM_LOAD( "341-0124a.bin", 0x000000, 0x000400, CRC(2a3576bf) SHA1(58fbf770d3801a02d0944039829f9241b5279013) )
+
+	ROM_REGION(0x1000,"gfx1",0)
+	ROM_LOAD ( "apple2gs.chr", 0x0000, 0x1000, CRC(91e53cd8) SHA1(34e2443e2ef960a36c047a09ed5a93f471797f89))
+
+	ROM_REGION(0x20000,"maincpu",0)
+	ROM_LOAD( "apple iigs alpha rom 2.0 19860310.bin", 0x000000, 0x020000, CRC(a47d275f) SHA1(c5836adcfc8be69c7351b84afa94c814e8d92b81) ) 
+
+	ROM_REGION(0x20000, "es5503", ROMREGION_ERASE00)
+
+	// temporary: use IIe enhanced keyboard decode ROM
+	ROM_REGION( 0x800, "keyboard", 0 )
+	ROM_LOAD( "341-0132-d.e12", 0x000, 0x800, CRC(c506efb9) SHA1(8e14e85c645187504ec9d162b3ea614a0c421d32) )
+ROM_END
+
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT       INIT      COMPANY            FULLNAME */
 COMP( 1989, apple2gs, 0,        apple2, apple2gs,   apple2gs, driver_device, 0, "Apple Computer", "Apple IIgs (ROM03)", GAME_SUPPORTS_SAVE )
 COMP( 198?, apple2gsr3p, apple2gs, 0,   apple2gs,   apple2gs, driver_device, 0, "Apple Computer", "Apple IIgs (ROM03 prototype)", GAME_NOT_WORKING )
@@ -571,3 +592,4 @@ COMP( 1989, apple2gsr3lp, apple2gs, 0,  apple2gs,   apple2gs, driver_device, 0, 
 COMP( 1987, apple2gsr1, apple2gs, 0,    apple2gsr1, apple2gs, driver_device, 0, "Apple Computer", "Apple IIgs (ROM01)", GAME_SUPPORTS_SAVE )
 COMP( 1986, apple2gsr0, apple2gs, 0,    apple2gsr1, apple2gs, driver_device, 0, "Apple Computer", "Apple IIgs (ROM00)", GAME_SUPPORTS_SAVE )
 COMP( 1986, apple2gsr0p,apple2gs, 0,    apple2gsr1, apple2gs, driver_device, 0, "Apple Computer", "Apple IIgs (ROM00 prototype 6/19/1986)", GAME_SUPPORTS_SAVE )
+COMP( 1986, apple2gsr0p2,apple2gs,0,    apple2gsr1, apple2gs, driver_device, 0, "Apple Computer", "Apple IIgs (ROM00 prototype 3/10/1986)", GAME_SUPPORTS_SAVE )
