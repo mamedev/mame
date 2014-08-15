@@ -7,9 +7,8 @@
 
 ToDo:
 - High score isn't saved or remembered
+- Display should be flouro blue 9-segment
 - Sound
-- Inputs
-- Outputs
 - Mechanical
 
 ***********************************************************************************/
@@ -42,8 +41,11 @@ public:
 
 	DECLARE_DRIVER_INIT(hankin);
 	DECLARE_WRITE_LINE_MEMBER(ic10_ca2_w);
+	DECLARE_WRITE_LINE_MEMBER(ic10_cb2_w);
 	DECLARE_WRITE_LINE_MEMBER(ic11_ca2_w);
+	DECLARE_WRITE_LINE_MEMBER(ic11_cb2_w);
 	DECLARE_WRITE8_MEMBER(ic10_a_w);
+	DECLARE_WRITE8_MEMBER(ic10_b_w);
 	DECLARE_WRITE8_MEMBER(ic11_a_w);
 	DECLARE_READ8_MEMBER(ic11_b_r);
 	DECLARE_INPUT_CHANGED_MEMBER(self_test);
@@ -51,6 +53,7 @@ public:
 private:
 	bool m_timer_x;
 	bool m_ic11_ca2;
+	bool m_ic10_cb2;
 	UINT8 m_counter;
 	UINT8 m_digit;
 	UINT8 m_segment;
@@ -95,125 +98,102 @@ static INPUT_PORTS_START( hankin )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Self Test") PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, hankin_state, self_test, 0)
 
 	PORT_START("DSW0")
-	PORT_DIPNAME( 0x01, 0x00, "S01") // S1-5: 32 combinations of coins/credits of a coin slot. S9-13 other slot.
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
-	PORT_DIPSETTING(    0x01, DEF_STR( On ))
-	PORT_DIPNAME( 0x02, 0x00, "S02")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
-	PORT_DIPSETTING(    0x02, DEF_STR( On ))
-	PORT_DIPNAME( 0x04, 0x00, "S03")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
-	PORT_DIPSETTING(    0x04, DEF_STR( On ))
-	PORT_DIPNAME( 0x08, 0x00, "S04")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
-	PORT_DIPSETTING(    0x08, DEF_STR( On ))
-	PORT_DIPNAME( 0x10, 0x00, "S05")
+	PORT_DIPNAME( 0x07, 0x00, DEF_STR(Coinage))
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ))
+	PORT_DIPSETTING(    0x01, DEF_STR( 2C_1C ))
+	PORT_DIPSETTING(    0x02, DEF_STR( 3C_1C ))
+	PORT_DIPSETTING(    0x03, DEF_STR( 4C_1C ))
+	PORT_DIPSETTING(    0x04, DEF_STR( 2C_3C ))
+	PORT_DIPSETTING(    0x05, DEF_STR( 3C_2C ))
+	PORT_DIPSETTING(    0x06, "5 coins 4 credits")
+	PORT_DIPSETTING(    0x07, "5 coins 2 credits")
+	PORT_DIPNAME( 0x08, 0x08, "Award")
+	PORT_DIPSETTING(    0x00, "Extra Ball")
+	PORT_DIPSETTING(    0x08, "Free Game")
+	PORT_DIPNAME( 0x10, 0x10, "Match")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
 	PORT_DIPSETTING(    0x10, DEF_STR( On ))
-	PORT_DIPNAME( 0x20, 0x20, "S06")
-	PORT_DIPSETTING(    0x00, DEF_STR( No ))
-	PORT_DIPSETTING(    0x20, DEF_STR( Yes ))
-	PORT_DIPNAME( 0x40, 0x40, "S07")
-	PORT_DIPSETTING(    0x00, DEF_STR( No ))
-	PORT_DIPSETTING(    0x40, DEF_STR( Yes ))
-	PORT_DIPNAME( 0x80, 0x80, "S08")
-	PORT_DIPSETTING(    0x00, DEF_STR( No ))
-	PORT_DIPSETTING(    0x80, DEF_STR( Yes ))
+	PORT_DIPNAME( 0x60, 0x40, "Credits for exceeding high score")
+	PORT_DIPSETTING(    0x00, "0")
+	PORT_DIPSETTING(    0x20, "1")
+	PORT_DIPSETTING(    0x40, "2")
+	PORT_DIPSETTING(    0x60, "3")
+	PORT_DIPNAME( 0x80, 0x00, "Game Over Tune")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
+	PORT_DIPSETTING(    0x80, DEF_STR( On ))
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x01, 0x00, "S09")
+	PORT_DIPNAME( 0x01, 0x00, "Coin Alarm")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
 	PORT_DIPSETTING(    0x01, DEF_STR( On ))
-	PORT_DIPNAME( 0x02, 0x00, "S10")
+	PORT_DIPNAME( 0x02, 0x00, "S10 (game specific)")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
 	PORT_DIPSETTING(    0x02, DEF_STR( On ))
-	PORT_DIPNAME( 0x04, 0x00, "S11")
+	PORT_DIPNAME( 0x04, 0x04, "Background Sound")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
 	PORT_DIPSETTING(    0x04, DEF_STR( On ))
-	PORT_DIPNAME( 0x08, 0x00, "S12")
+	PORT_DIPNAME( 0x08, 0x00, "S12 (game Specific)")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
 	PORT_DIPSETTING(    0x08, DEF_STR( On ))
-	PORT_DIPNAME( 0x10, 0x00, "S13")
+	PORT_DIPNAME( 0x10, 0x00, "S13 (game specific)")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
 	PORT_DIPSETTING(    0x10, DEF_STR( On ))
-	PORT_DIPNAME( 0x20, 0x00, "S14")
-	PORT_DIPSETTING(    0x00, DEF_STR( Yes ))
-	PORT_DIPSETTING(    0x20, DEF_STR( No ))
-	PORT_DIPNAME( 0x40, 0x40, "S15")
-	PORT_DIPSETTING(    0x00, DEF_STR( No ))
-	PORT_DIPSETTING(    0x40, DEF_STR( Yes ))
-	PORT_DIPNAME( 0x80, 0x00, "S16")
-	PORT_DIPSETTING(    0x00, DEF_STR( No ))
-	PORT_DIPSETTING(    0x80, DEF_STR( Yes ))
+	PORT_DIPNAME( 0x20, 0x00, "S14 (game specific)")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
+	PORT_DIPSETTING(    0x20, DEF_STR( On ))
+	PORT_DIPNAME( 0x40, 0x00, "S15 (game specific)")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
+	PORT_DIPSETTING(    0x40, DEF_STR( On ))
+	PORT_DIPNAME( 0x80, 0x00, "Balls")
+	PORT_DIPSETTING(    0x00, "3")
+	PORT_DIPSETTING(    0x80, "5")
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x01, 0x00, "S17")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
-	PORT_DIPSETTING(    0x01, DEF_STR( On ))
-	PORT_DIPNAME( 0x02, 0x00, "S18")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
-	PORT_DIPSETTING(    0x02, DEF_STR( On ))
+	PORT_DIPNAME( 0x03, 0x02, "Maximum Credits")
+	PORT_DIPSETTING(    0x00, "5")
+	PORT_DIPSETTING(    0x01, "10")
+	PORT_DIPSETTING(    0x02, "15")
+	PORT_DIPSETTING(    0x03, "20")
 	PORT_DIPNAME( 0x04, 0x00, "S19")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
 	PORT_DIPSETTING(    0x04, DEF_STR( On ))
 	PORT_DIPNAME( 0x08, 0x00, "S20")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
 	PORT_DIPSETTING(    0x08, DEF_STR( On ))
-	PORT_DIPNAME( 0x10, 0x00, "S21")
+	PORT_DIPNAME( 0x10, 0x00, "Remember Bonus Multiplier")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
 	PORT_DIPSETTING(    0x10, DEF_STR( On ))
-	PORT_DIPNAME( 0x20, 0x00, "S22")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
-	PORT_DIPSETTING(    0x20, DEF_STR( On ))
-	PORT_DIPNAME( 0x40, 0x00, "S23")
+	PORT_DIPNAME( 0x20, 0x20, "Free Game Sound")
+	PORT_DIPSETTING(    0x00, "Special Tune")
+	PORT_DIPSETTING(    0x20, "Knocker")
+	PORT_DIPNAME( 0x40, 0x00, "Coin Counter reset") // see manual
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
 	PORT_DIPSETTING(    0x40, DEF_STR( On ))
-	PORT_DIPNAME( 0x80, 0x00, "S24")
+	PORT_DIPNAME( 0x80, 0x00, "Time out in test mode")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
 	PORT_DIPSETTING(    0x80, DEF_STR( On ))
 
-	PORT_START("DSW3")
-	PORT_DIPNAME( 0x03, 0x03, "Maximum Credits")
-	PORT_DIPSETTING(    0x00, "10")
-	PORT_DIPSETTING(    0x01, "15")
-	PORT_DIPSETTING(    0x02, "25")
-	PORT_DIPSETTING(    0x03, "40")
-	PORT_DIPNAME( 0x04, 0x04, "Credits displayed")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
-	PORT_DIPSETTING(    0x04, DEF_STR( On ))
-	PORT_DIPNAME( 0x08, 0x08, "Match")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
-	PORT_DIPSETTING(    0x08, DEF_STR( On ))
-	PORT_DIPNAME( 0x10, 0x00, "Keep all replays")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
-	PORT_DIPSETTING(    0x10, DEF_STR( On ))
-	PORT_DIPNAME( 0x20, 0x00, "Voice" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
-	PORT_DIPSETTING(    0x20, DEF_STR( On ))
-	PORT_DIPNAME( 0xC0, 0x40, "Balls")
-	PORT_DIPSETTING(    0xC0, "2")
-	PORT_DIPSETTING(    0x00, "3")
-	PORT_DIPSETTING(    0x80, "4")
-	PORT_DIPSETTING(    0x40, "5")
-
+	// Switches are numbered 8-1,16-9,24-17
 	PORT_START("X0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER )
-	PORT_BIT( 0x0a, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START2 )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_SLASH)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_COLON)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_QUOTE)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_BACKSLASH)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_BACKSPACE)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_TILT )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Outhole") PORT_CODE(KEYCODE_X)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_Z)
 
 	PORT_START("X1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN2 )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN1 )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN3 )
-	PORT_BIT( 0x38, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_MINUS)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_EQUALS)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_L)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_OPENBRACE)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_CLOSEBRACE)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_NAME("Coin Door")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_TILT1 ) PORT_NAME("Slam Tilt")
 
-	// from here, vary per game
 	PORT_START("X2")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_A)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_S)
@@ -235,7 +215,7 @@ static INPUT_PORTS_START( hankin )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_O)
 
 	PORT_START("X4")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_Z)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Outhole") PORT_CODE(KEYCODE_X)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_C)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_V)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_B)
@@ -253,7 +233,6 @@ INPUT_CHANGED_MEMBER( hankin_state::self_test )
 WRITE8_MEMBER( hankin_state::ic10_a_w )
 {
 	m_ic10a = data;
-	//m_digit = 0xff;
 
 	if (!m_ic11_ca2)
 	{
@@ -279,9 +258,42 @@ WRITE8_MEMBER( hankin_state::ic10_a_w )
 	}
 }
 
+WRITE8_MEMBER( hankin_state::ic10_b_w )
+{
+	if (!m_ic10_cb2)
+	{
+		switch (data & 15)
+		{
+			case 0x0: // knocker
+				m_samples->start(0, 6);
+				break;
+			case 0x6: // outhole
+				m_samples->start(0, 5);
+				break;
+			case 0x8:
+			case 0x9:
+			case 0xa: // bumpers
+				m_samples->start(0, 0);
+				break;
+			case 0xb:
+			case 0xd: // slings
+				m_samples->start(0, 7);
+				break;
+		}
+	}
+	// also sound data
+}
+
 WRITE_LINE_MEMBER( hankin_state::ic10_ca2_w )
 {
 	output_set_value("led0", !state);
+	// also sound strobe
+}
+
+WRITE_LINE_MEMBER( hankin_state::ic10_cb2_w )
+{
+	// solenoid strobe
+	m_ic10_cb2 = state;
 }
 
 WRITE8_MEMBER( hankin_state::ic11_a_w )
@@ -348,7 +360,12 @@ WRITE_LINE_MEMBER( hankin_state::ic11_ca2_w )
 	if (!state)
 		m_counter = 0;
 }
-		
+
+// lamp strobe
+WRITE_LINE_MEMBER( hankin_state::ic11_cb2_w )
+{
+}
+
 // zero-cross detection
 TIMER_DEVICE_CALLBACK_MEMBER( hankin_state::timer_x )
 {
@@ -385,9 +402,9 @@ static MACHINE_CONFIG_START( hankin, hankin_state )
 	//MCFG_PIA_READPA_HANDLER(READ8(hankin_state, ic10_a_r))
 	MCFG_PIA_WRITEPA_HANDLER(WRITE8(hankin_state, ic10_a_w))
 	//MCFG_PIA_READPB_HANDLER(READ8(hankin_state, ic10_b_r))
-	//MCFG_PIA_WRITEPB_HANDLER(WRITE8(hankin_state, ic10_b_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(hankin_state, ic10_b_w))
 	MCFG_PIA_CA2_HANDLER(WRITELINE(hankin_state, ic10_ca2_w))
-	//MCFG_PIA_CB2_HANDLER(WRITELINE(hankin_state, ic10_cb2_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(hankin_state, ic10_cb2_w))
 	MCFG_PIA_IRQA_HANDLER(DEVWRITELINE("maincpu", m6802_cpu_device, irq_line))
 	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE("maincpu", m6802_cpu_device, irq_line))
 
@@ -397,7 +414,7 @@ static MACHINE_CONFIG_START( hankin, hankin_state )
 	MCFG_PIA_READPB_HANDLER(READ8(hankin_state, ic11_b_r))
 	//MCFG_PIA_WRITEPB_HANDLER(WRITE8(hankin_state, ic11_b_w))
 	MCFG_PIA_CA2_HANDLER(WRITELINE(hankin_state, ic11_ca2_w))
-	//MCFG_PIA_CB2_HANDLER(WRITELINE(hankin_state, ic11_cb2_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(hankin_state, ic11_cb2_w))
 	MCFG_PIA_IRQA_HANDLER(DEVWRITELINE("maincpu", m6802_cpu_device, irq_line))
 	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE("maincpu", m6802_cpu_device, irq_line))
 
