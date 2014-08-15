@@ -233,6 +233,21 @@ endif
 
 #-------------------------------------------------
 #
+#@src/emu/bus/dmv/dmv.h,BUSES += DMV
+#-------------------------------------------------
+
+ifneq ($(filter DMV,$(BUSES)),)
+OBJDIRS += $(BUSOBJ)/dmv
+BUSOBJS += $(BUSOBJ)/dmv/dmvbus.o
+BUSOBJS += $(BUSOBJ)/dmv/k220.o
+BUSOBJS += $(BUSOBJ)/dmv/k230.o
+BUSOBJS += $(BUSOBJ)/dmv/k806.o
+BUSOBJS += $(BUSOBJ)/dmv/ram.o
+endif
+
+
+#-------------------------------------------------
+#
 #@src/emu/bus/ecbbus/ecbbus.h,BUSES += ECBBUS
 #-------------------------------------------------
 

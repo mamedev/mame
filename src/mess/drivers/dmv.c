@@ -18,6 +18,16 @@
 #include "machine/dmv_keyb.h"
 #include "sound/speaker.h"
 #include "video/upd7220.h"
+#include "formats/dmv_dsk.h"
+
+// expansion slots
+#include "bus/dmv/dmvbus.h"
+#include "bus/dmv/k220.h"
+#include "bus/dmv/k230.h"
+#include "bus/dmv/k806.h"
+#include "bus/dmv/ram.h"
+
+
 #include "dmv.lh"
 
 class dmv_state : public driver_device
@@ -35,7 +45,19 @@ public:
 			m_keyboard(*this, "keyboard"),
 			m_speaker(*this, "speaker"),
 			m_video_ram(*this, "video_ram"),
-			m_palette(*this, "palette")
+			m_palette(*this, "palette"),
+			m_ram(*this, "ram"),
+			m_bootrom(*this, "boot"),
+			m_chargen(*this, "chargen"),
+			m_slot1(*this, "slot1"),
+			m_slot2(*this, "slot2"),
+			m_slot2a(*this, "slot2a"),
+			m_slot3(*this, "slot3"),
+			m_slot4(*this, "slot4"),
+			m_slot5(*this, "slot5"),
+			m_slot6(*this, "slot6"),
+			m_slot7(*this, "slot7"),
+			m_slot7a(*this, "slot7a")
 		{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -47,10 +69,25 @@ public:
 	required_device<floppy_connector> m_floppy1;
 	required_device<dmv_keyboard_device> m_keyboard;
 	required_device<speaker_sound_device> m_speaker;
+	required_shared_ptr<UINT8> m_video_ram;
+	required_device<palette_device> m_palette;
+	required_memory_region m_ram;
+	required_memory_region m_bootrom;
+	required_memory_region m_chargen;
 
-	virtual void video_start();
+	required_device<dmvcart_slot_device> m_slot1;
+	required_device<dmvcart_slot_device> m_slot2;
+	required_device<dmvcart_slot_device> m_slot2a;
+	required_device<dmvcart_slot_device> m_slot3;
+	required_device<dmvcart_slot_device> m_slot4;
+	required_device<dmvcart_slot_device> m_slot5;
+	required_device<dmvcart_slot_device> m_slot6;
+	required_device<dmvcart_slot_device> m_slot7;
+	required_device<dmvcart_slot_device> m_slot7a;
+
 	virtual void machine_start();
 	virtual void machine_reset();
+	void update_halt_line();
 
 	DECLARE_WRITE8_MEMBER(leds_w);
 	DECLARE_WRITE_LINE_MEMBER(dma_hrq_changed);
@@ -58,33 +95,57 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(dmac_dack3);
 	DECLARE_WRITE_LINE_MEMBER(fdc_irq);
 	DECLARE_WRITE_LINE_MEMBER(pit_out0);
+	DECLARE_WRITE_LINE_MEMBER(timint_w);
 	DECLARE_WRITE8_MEMBER(fdd_motor_w);
 	DECLARE_READ8_MEMBER(sys_status_r);
 	DECLARE_WRITE8_MEMBER(tc_set_w);
-	DECLARE_READ8_MEMBER(memory_read_byte);
-	DECLARE_WRITE8_MEMBER(memory_write_byte);
+	DECLARE_WRITE8_MEMBER(switch16_w);
 	DECLARE_WRITE8_MEMBER(ramsel_w);
 	DECLARE_WRITE8_MEMBER(romsel_w);
 	DECLARE_READ8_MEMBER(kb_mcu_port1_r);
 	DECLARE_WRITE8_MEMBER(kb_mcu_port1_w);
 	DECLARE_WRITE8_MEMBER(kb_mcu_port2_w);
+	DECLARE_WRITE8_MEMBER(rambank_w);
+	DECLARE_READ8_MEMBER(program_r);
+	DECLARE_WRITE8_MEMBER(program_w);
+	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
-	required_shared_ptr<UINT8> m_video_ram;
-	required_device<palette_device> m_palette;
+	void ifsel_r(address_space &space, int ifsel, offs_t offset, UINT8 &data);
+	void ifsel_w(address_space &space, int ifsel, offs_t offset, UINT8 data);
+	DECLARE_READ8_MEMBER(ifsel0_r)  { UINT8 data = 0xff;   ifsel_r(space, 0, offset, data);   return data; }
+	DECLARE_READ8_MEMBER(ifsel1_r)  { UINT8 data = 0xff;   ifsel_r(space, 1, offset, data);   return data; }
+	DECLARE_READ8_MEMBER(ifsel2_r)  { UINT8 data = 0xff;   ifsel_r(space, 2, offset, data);   return data; }
+	DECLARE_READ8_MEMBER(ifsel3_r)  { UINT8 data = 0xff;   ifsel_r(space, 3, offset, data);   return data; }
+	DECLARE_READ8_MEMBER(ifsel4_r)  { UINT8 data = 0xff;   ifsel_r(space, 4, offset, data);   return data; }
+	DECLARE_WRITE8_MEMBER(ifsel0_w) { ifsel_w(space, 0, offset, data); }
+	DECLARE_WRITE8_MEMBER(ifsel1_w) { ifsel_w(space, 1, offset, data); }
+	DECLARE_WRITE8_MEMBER(ifsel2_w) { ifsel_w(space, 2, offset, data); }
+	DECLARE_WRITE8_MEMBER(ifsel3_w) { ifsel_w(space, 3, offset, data); }
+	DECLARE_WRITE8_MEMBER(ifsel4_w) { ifsel_w(space, 4, offset, data); }
 
 	UPD7220_DISPLAY_PIXELS_MEMBER( hgdc_display_pixels );
 	UPD7220_DRAW_TEXT_LINE_MEMBER( hgdc_draw_text );
 
+	bool        m_ramoutdis;
+	int         m_switch16;
+	int         m_dma_hrq;
+	int         m_ram_bank;
+	bool        m_color_mode;
 	int         m_eop_line;
 	int         m_dack3_line;
 	int         m_sd_poll_state;
 	int         m_floppy_motor;
-	UINT8       m_ram[0x2000];
 };
 
 WRITE8_MEMBER(dmv_state::tc_set_w)
 {
 	m_fdc->tc_w(true);
+}
+
+WRITE8_MEMBER(dmv_state::switch16_w)
+{
+	m_switch16 = !m_switch16;
+	update_halt_line();
 }
 
 WRITE8_MEMBER(dmv_state::leds_w)
@@ -109,12 +170,17 @@ WRITE8_MEMBER(dmv_state::leds_w)
 
 WRITE8_MEMBER(dmv_state::ramsel_w)
 {
-	m_maincpu->space(AS_PROGRAM).install_ram(0x0000, 0x1fff, m_ram);
+	m_ramoutdis = false;
 }
 
 WRITE8_MEMBER(dmv_state::romsel_w)
 {
-	m_maincpu->space(AS_PROGRAM).install_rom(0x0000, 0x1fff, memregion("maincpu")->base());
+	m_ramoutdis = true;
+}
+
+WRITE8_MEMBER(dmv_state::rambank_w)
+{
+	m_ram_bank = offset;
 }
 
 WRITE8_MEMBER(dmv_state::fdd_motor_w)
@@ -145,8 +211,9 @@ READ8_MEMBER(dmv_state::sys_status_r)
 	if (m_floppy_motor)
 		data |= 0x01;
 
-	// 16-bit CPU not available
-	data |= 0x02;
+	// 16-bit CPU
+	if (!(m_slot7->av16bit() || m_slot7a->av16bit()))
+		data |= 0x02;
 
 	if (!m_floppy0->get_device()->ready_r())
 		data |= 0x04;
@@ -159,21 +226,61 @@ READ8_MEMBER(dmv_state::sys_status_r)
 
 UPD7220_DISPLAY_PIXELS_MEMBER( dmv_state::hgdc_display_pixels )
 {
-	//TODO
+	if (m_color_mode)
+	{
+		// 96KB videoram (32KB green + 32KB red + 32KB blue)
+		UINT8 green = m_video_ram[0x00000 + (address & 0x7fff)];
+		UINT8 red   = m_video_ram[0x08000 + (address & 0x7fff)];
+		UINT8 blue  = m_video_ram[0x10000 + (address & 0x7fff)];
+
+		for(int xi=0; xi<8; xi++)
+		{
+			int r = ((red   >> (7-xi)) & 1) ? 255 : 0;
+			int g = ((green >> (7-xi)) & 1) ? 255 : 0;
+			int b = ((blue  >> (7-xi)) & 1) ? 255 : 0;
+
+			if (bitmap.cliprect().contains(x + xi, y))
+				bitmap.pix32(y, x + xi) = rgb_t(r, g, b);
+		}
+	}
+	else
+	{
+		const rgb_t *palette = m_palette->palette()->entry_list_raw();
+
+		// 32KB videoram
+		UINT8 gfx = m_video_ram[address & 0x7fff];
+
+		for(int xi=0;xi<8;xi++)
+		{
+			if (bitmap.cliprect().contains(x + xi, y))
+				bitmap.pix32(y, x + xi) = ((gfx >> (7-xi)) & 1) ? palette[1] : palette[0];
+		}
+	}
 }
 
 UPD7220_DRAW_TEXT_LINE_MEMBER( dmv_state::hgdc_draw_text )
 {
-	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	UINT8 * chargen = memregion("maincpu")->base() + 0x1000;
-
 	for( int x = 0; x < pitch; x++ )
 	{
 		UINT8 tile = m_video_ram[((addr+x)*2) & 0x1ffff] & 0xff;
+		UINT8 attr = m_video_ram[((addr+x)*2 + 1) & 0x1ffff] & 0xff;
+
+		rgb_t bg, fg;
+		if (m_color_mode)
+		{
+			bg = rgb_t(attr & 0x20 ? 0 : 255, attr & 0x40 ? 0 : 255, attr & 0x80 ? 0 : 255);
+			fg = rgb_t(attr & 0x04 ? 255 : 0, attr & 0x08 ? 255 : 0, attr & 0x10 ? 255 : 0);
+		}
+		else
+		{
+			const rgb_t *palette = m_palette->palette()->entry_list_raw();
+			bg = palette[(attr & 1) ? 1 : 0];
+			fg = palette[(attr & 1) ? 0 : 1];
+		}
 
 		for( int yi = 0; yi < lr; yi++)
 		{
-			UINT8 tile_data = chargen[(tile*16+yi) & 0x7ff];
+			UINT8 tile_data = m_chargen->base()[(tile*16+yi) & 0x7ff];
 
 			if(cursor_on && cursor_addr == addr+x) //TODO
 				tile_data^=0xff;
@@ -191,7 +298,7 @@ UPD7220_DRAW_TEXT_LINE_MEMBER( dmv_state::hgdc_draw_text )
 
 				if(yi >= 16) { pen = 0; }
 
-				bitmap.pix32(res_y, res_x) = palette[pen];
+				bitmap.pix32(res_y, res_x) = pen ? fg : bg;
 			}
 		}
 	}
@@ -201,10 +308,70 @@ static SLOT_INTERFACE_START( dmv_floppies )
 		SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
 SLOT_INTERFACE_END
 
+
+void dmv_state::ifsel_r(address_space &space, int ifsel, offs_t offset, UINT8 &data)
+{
+	dmvcart_slot_device *slots[] = { m_slot2, m_slot2a, m_slot3, m_slot4, m_slot5, m_slot6, m_slot7, m_slot7a };
+	for(int i=0; i<8; i++)
+		slots[i]->io_read(space, ifsel, offset, data);
+}
+
+void dmv_state::ifsel_w(address_space &space, int ifsel, offs_t offset, UINT8 data)
+{
+	dmvcart_slot_device *slots[] = { m_slot2, m_slot2a, m_slot3, m_slot4, m_slot5, m_slot6, m_slot7, m_slot7a };
+	for(int i=0; i<8; i++)
+		slots[i]->io_write(space, ifsel, offset, data);
+}
+
+WRITE8_MEMBER(dmv_state::program_w)
+{
+	bool tramd = false;
+	dmvcart_slot_device *slots[] = { m_slot2, m_slot2a, m_slot3, m_slot4, m_slot5, m_slot6, m_slot7, m_slot7a };
+	for(int i=0; i<8 && !tramd; i++)
+		tramd = slots[i]->write(offset, data);
+
+	if (!tramd)
+	{
+		int cas = (m_switch16 ? offset >> 16 : m_ram_bank) & 0x07;
+
+		if (cas == 0)
+			m_ram->base()[offset & 0xffff] = data;
+		else
+			m_slot1->ram_write(cas, offset & 0xffff, data);
+	}
+}
+
+READ8_MEMBER(dmv_state::program_r)
+{
+	UINT8 data = 0xff;
+	if (m_ramoutdis && offset < 0x2000)
+	{
+		data = m_bootrom->base()[offset];
+	}
+	else
+	{
+		bool tramd = false;
+		dmvcart_slot_device *slots[] = { m_slot2, m_slot2a, m_slot3, m_slot4, m_slot5, m_slot6, m_slot7, m_slot7a };
+		for(int i=0; i<8 && !tramd; i++)
+			tramd = slots[i]->read(offset, data);
+
+		if (!tramd)
+		{
+			int cas = (m_switch16 ? offset >> 16 : m_ram_bank) & 0x07;
+
+			if (cas == 0)
+				data = m_ram->base()[offset & 0xffff];
+			else
+				m_slot1->ram_read(cas, offset & 0xffff, data);
+		}
+	}
+
+	return data;
+}
+
 static ADDRESS_MAP_START(dmv_mem, AS_PROGRAM, 8, dmv_state)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x0000, 0x1fff ) AM_ROM
-	AM_RANGE( 0x2000, 0xffff ) AM_RAM
+	AM_RANGE( 0x0000, 0xffff ) AM_READWRITE(program_r, program_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dmv_io , AS_IO, 8, dmv_state)
@@ -221,8 +388,14 @@ static ADDRESS_MAP_START( dmv_io , AS_IO, 8, dmv_state)
 	AM_RANGE(0x50, 0x51) AM_DEVICE("i8272", i8272a_device, map)
 	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE("pit8253", pit8253_device, read, write)
 	AM_RANGE(0xa0, 0xa1) AM_DEVREADWRITE("upd7220", upd7220_device, read, write)
+	AM_RANGE(0xd0, 0xd7) AM_WRITE(switch16_w)
+	AM_RANGE(0xe0, 0xe7) AM_WRITE(rambank_w)
 
-	//AM_RANGE(0xe0, 0xe7) RAM bankswitch
+	AM_RANGE(0x60, 0x6f) AM_READWRITE(ifsel0_r, ifsel0_w)
+	AM_RANGE(0x70, 0x7f) AM_READWRITE(ifsel1_r, ifsel1_w)
+	AM_RANGE(0x30, 0x3f) AM_READWRITE(ifsel2_r, ifsel2_w)
+	AM_RANGE(0xb0, 0xbf) AM_READWRITE(ifsel3_r, ifsel3_w)
+	AM_RANGE(0xc0, 0xcf) AM_READWRITE(ifsel4_r, ifsel4_w)
 ADDRESS_MAP_END
 
 READ8_MEMBER(dmv_state::kb_mcu_port1_r)
@@ -239,6 +412,8 @@ WRITE8_MEMBER(dmv_state::kb_mcu_port1_w)
 WRITE8_MEMBER(dmv_state::kb_mcu_port2_w)
 {
 	m_speaker->level_w(BIT(data, 0));
+	m_slot7a->irq1_w(BIT(data, 4));
+	m_slot7->irq1_w(BIT(data, 4));
 }
 
 static ADDRESS_MAP_START( dmv_kb_ctrl_io, AS_IO, 8, dmv_state )
@@ -253,6 +428,10 @@ ADDRESS_MAP_END
 
 /* Input ports */
 INPUT_PORTS_START( dmv )
+	PORT_START("CONFIG")
+	PORT_CONFNAME( 0x01, 0x00, "Video Board" )
+	PORT_CONFSETTING( 0x00, "Monochrome" )
+	PORT_CONFSETTING( 0x01, "Color" )
 INPUT_PORTS_END
 
 void dmv_state::machine_start()
@@ -261,15 +440,25 @@ void dmv_state::machine_start()
 
 void dmv_state::machine_reset()
 {
+	m_color_mode = ioport("CONFIG")->read() & 0x01;
+
+	m_ramoutdis = true;
+	m_ram_bank = 0;
 	m_eop_line = 0;
 	m_dack3_line = 0;
 	m_sd_poll_state = 0;
 	m_floppy_motor = 1;
-	m_maincpu->space(AS_PROGRAM).install_rom(0x0000, 0x1fff, memregion("maincpu")->base());
+	m_switch16 = 0;
+	m_dma_hrq = 0;
+
+	update_halt_line();
 }
 
-void dmv_state::video_start()
+void dmv_state::update_halt_line()
 {
+	m_slot7->hold_w(!m_switch16 || m_dma_hrq ? ASSERT_LINE : CLEAR_LINE);
+	m_slot7a->hold_w(!m_switch16 || m_dma_hrq ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_HALT, m_switch16 || m_dma_hrq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 /* F4 Character Displayer */
@@ -287,7 +476,7 @@ static const gfx_layout dmv_charlayout =
 };
 
 static GFXDECODE_START( dmv )
-	GFXDECODE_ENTRY("maincpu", 0x1000, dmv_charlayout, 0, 1)
+	GFXDECODE_ENTRY("chargen", 0x0000, dmv_charlayout, 0, 1)
 GFXDECODE_END
 
 
@@ -297,7 +486,8 @@ GFXDECODE_END
 
 WRITE_LINE_MEMBER( dmv_state::dma_hrq_changed )
 {
-	m_maincpu->set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
+	m_dma_hrq = state;
+	update_halt_line();
 
 	// Assert HLDA
 	m_dmac->hack_w(state);
@@ -329,24 +519,51 @@ WRITE_LINE_MEMBER( dmv_state::pit_out0 )
 	}
 }
 
+WRITE_LINE_MEMBER( dmv_state::timint_w )
+{
+	m_slot7a->irq0_w(state);
+	m_slot7->irq0_w(state);
+}
+
 WRITE_LINE_MEMBER( dmv_state::fdc_irq )
 {
+	m_slot7a->irq6_w(state);
+	m_slot7->irq6_w(state);
+
 	if (state)
 		m_fdc->tc_w(false);
 }
 
-READ8_MEMBER(dmv_state::memory_read_byte)
-{
-	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
-	return prog_space.read_byte(offset);
-}
 
-WRITE8_MEMBER(dmv_state::memory_write_byte)
-{
-	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
-	prog_space.write_byte(offset, data);
-}
+FLOPPY_FORMATS_MEMBER( dmv_state::floppy_formats )
+	FLOPPY_DMV_FORMAT
+FLOPPY_FORMATS_END
 
+
+static SLOT_INTERFACE_START(dmv_slot1)
+	SLOT_INTERFACE("k200", DMV_K200)            // K200 64K RAM expansion
+	SLOT_INTERFACE("k202", DMV_K202)            // K202 192K RAM expansion
+	SLOT_INTERFACE("k208", DMV_K208)            // K208 448K RAM expansion
+SLOT_INTERFACE_END
+
+static SLOT_INTERFACE_START(dmv_slot2_6)
+	SLOT_INTERFACE("k806", DMV_K806)            // K806 Mouse module
+SLOT_INTERFACE_END
+
+static SLOT_INTERFACE_START(dmv_slot7)
+	SLOT_INTERFACE("k220", DMV_K220)            // K220 Diagnostic Module
+	SLOT_INTERFACE("k231", DMV_K231)            // K231 External 8088 module without interrupt controller
+SLOT_INTERFACE_END
+
+
+static SLOT_INTERFACE_START(dmv_slot2a)
+
+SLOT_INTERFACE_END
+
+static SLOT_INTERFACE_START(dmv_slot7a)
+	SLOT_INTERFACE("k230", DMV_K230)            // K230 Internal 8088 module without interrupt controller
+	SLOT_INTERFACE("k235", DMV_K235)            // K235 Internal 8088 module with interrupt controller
+SLOT_INTERFACE_END
 
 static MACHINE_CONFIG_START( dmv, dmv_state )
 	/* basic machine hardware */
@@ -366,11 +583,11 @@ static MACHINE_CONFIG_START( dmv, dmv_state )
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_UPDATE_DEVICE("upd7220", upd7220_device, screen_update)
-	MCFG_SCREEN_SIZE(640, 480)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
+	MCFG_SCREEN_SIZE(640, 400)
+	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 400-1)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dmv)
-	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
+	MCFG_PALETTE_ADD_MONOCHROME_GREEN("palette")
 	MCFG_DEFAULT_LAYOUT(layout_dmv)
 
 	// devices
@@ -382,8 +599,14 @@ static MACHINE_CONFIG_START( dmv, dmv_state )
 	MCFG_DEVICE_ADD( "dma8237", AM9517A, XTAL_4MHz )
 	MCFG_I8237_OUT_HREQ_CB(WRITELINE(dmv_state, dma_hrq_changed))
 	MCFG_I8237_OUT_EOP_CB(WRITELINE(dmv_state, dmac_eop))
-	MCFG_I8237_IN_MEMR_CB(READ8(dmv_state, memory_read_byte))
-	MCFG_I8237_OUT_MEMW_CB(WRITE8(dmv_state, memory_write_byte))
+	MCFG_I8237_IN_MEMR_CB(READ8(dmv_state, program_r))
+	MCFG_I8237_OUT_MEMW_CB(WRITE8(dmv_state, program_w))
+	MCFG_I8237_IN_IOR_0_CB(LOGGER("DMA CH1", 0))
+	MCFG_I8237_OUT_IOW_0_CB(LOGGER("DMA CH1", 0))
+	MCFG_I8237_IN_IOR_1_CB(LOGGER("DMA CH2", 0))
+	MCFG_I8237_OUT_IOW_1_CB(LOGGER("DMA CH2", 0))
+	MCFG_I8237_IN_IOR_2_CB(DEVREAD8("upd7220", upd7220_device, dack_r))
+	MCFG_I8237_OUT_IOW_2_CB(DEVWRITE8("upd7220", upd7220_device, dack_w))
 	MCFG_I8237_IN_IOR_3_CB(DEVREAD8("i8272", i8272a_device, mdma_r))
 	MCFG_I8237_OUT_IOW_3_CB(DEVWRITE8("i8272", i8272a_device, mdma_w))
 	MCFG_I8237_OUT_DACK_3_CB(WRITELINE(dmv_state, dmac_dack3))
@@ -391,28 +614,67 @@ static MACHINE_CONFIG_START( dmv, dmv_state )
 	MCFG_I8272A_ADD( "i8272", true )
 	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(dmv_state, fdc_irq))
 	MCFG_UPD765_DRQ_CALLBACK(DEVWRITELINE("dma8237", am9517a_device, dreq3_w))
-	MCFG_FLOPPY_DRIVE_ADD("i8272:0", dmv_floppies, "525dd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("i8272:1", dmv_floppies, "525dd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("i8272:0", dmv_floppies, "525dd", dmv_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("i8272:1", dmv_floppies, "525dd", dmv_state::floppy_formats)
 
 	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
 	MCFG_PIT8253_CLK0(50)
 	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(dmv_state, pit_out0))
-	//MCFG_PIT8253_CLK2(XTAL_24MHz / 3 / 16)
-	//MCFG_PIT8253_OUT2_HANDLER(WRITELINE(dmv_state, timint_w))
+	MCFG_PIT8253_CLK2(XTAL_24MHz / 3 / 16)
+	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(dmv_state, timint_w))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO( "mono" )
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+
+	MCFG_DEVICE_ADD("slot1", DMVCART_SLOT, 0)
+	MCFG_DEVICE_SLOT_INTERFACE(dmv_slot1, NULL, false)
+	MCFG_DEVICE_ADD("slot2", DMVCART_SLOT, 0)
+	MCFG_DEVICE_SLOT_INTERFACE(dmv_slot2_6, NULL, false)
+	MCFG_DEVICE_ADD("slot2a", DMVCART_SLOT, 0)
+	MCFG_DEVICE_SLOT_INTERFACE(dmv_slot2a, NULL, false)
+	MCFG_DEVICE_ADD("slot3", DMVCART_SLOT, 0)
+	MCFG_DEVICE_SLOT_INTERFACE(dmv_slot2_6, NULL, false)
+	MCFG_DEVICE_ADD("slot4", DMVCART_SLOT, 0)
+	MCFG_DEVICE_SLOT_INTERFACE(dmv_slot2_6, NULL, false)
+	MCFG_DEVICE_ADD("slot5", DMVCART_SLOT, 0)
+	MCFG_DEVICE_SLOT_INTERFACE(dmv_slot2_6, NULL, false)
+	MCFG_DEVICE_ADD("slot6", DMVCART_SLOT, 0)
+	MCFG_DEVICE_SLOT_INTERFACE(dmv_slot2_6, NULL, false)
+
+	MCFG_DEVICE_ADD("slot7", DMVCART_SLOT, 0)
+	MCFG_DEVICE_SLOT_INTERFACE(dmv_slot7, NULL, false)
+	MCFG_DMVCART_SLOT_PROGRAM_READWRITE_CB(READ8(dmv_state, program_r), WRITE8(dmv_state, program_w))
+	MCFG_DEVICE_ADD("slot7a", DMVCART_SLOT, 0)
+	MCFG_DEVICE_SLOT_INTERFACE(dmv_slot7a, "k230", false)
+	MCFG_DMVCART_SLOT_PROGRAM_READWRITE_CB(READ8(dmv_state, program_r), WRITE8(dmv_state, program_w))
+
 MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( dmv )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "dmv_norm.bin", 0x0000, 0x2000, CRC(bf25f3f0) SHA1(0c7dd37704db4799e340cc836f887cd543e5c964))
+	ROM_REGION( 0x2000, "boot", 0 )
+	ROM_SYSTEM_BIOS(0, "c07", "C.07.00")    // ROM bears the handwritten note "Color 7.0", this is from the machine that originally had Color, 68K and internal 8088
+	ROM_SYSTEM_BIOS(1, "m07", "M.07.00")    // Mono machine with internal 8088 and internal HD
+	ROM_SYSTEM_BIOS(2, "m06", "M.06.00")    // Mono machine
+	ROM_SYSTEM_BIOS(3, "m05", "M.05.00")    // Mono machine, marked "updated"
+
+	ROMX_LOAD( "dmv_mb_rom_33610.bin", 0x00000,    0x02000,    CRC(bf25f3f0) SHA1(0c7dd37704db4799e340cc836f887cd543e5c964), ROM_BIOS(1) )
+	ROMX_LOAD( "dmv_mb_rom_33609.bin", 0x00000,    0x02000,    CRC(120951b6) SHA1(57bef9cc6379dea5730bc1477e8896508e00a349), ROM_BIOS(2) )
+	ROMX_LOAD( "dmv_mb_rom_32676.bin", 0x00000,    0x02000,    CRC(7796519e) SHA1(8d5dd9c1e66c96fcca271b6f673d6a0e784acb33), ROM_BIOS(3) )
+	ROMX_LOAD( "dmv_mb_rom_32664.bin", 0x00000,    0x02000,    CRC(6624610e) SHA1(e9226be897d2c5f875784ab77dad8807f14c7714), ROM_BIOS(4) )
 
 	ROM_REGION(0x400, "kb_ctrl_mcu", 0)
-	ROM_LOAD( "dmv_kb_ctrl_mcu.bin", 0x0000, 0x0400, CRC(a03af298) SHA1(144cba41294c46f5ca79b7ad8ced0e4408168775))
+	ROMX_LOAD( "dmv_mb_8741_32678.bin",    0x00000,    0x00400,    CRC(50d1dc4c) SHA1(2c8251d6c8df9f507e11bf920869657f4d074db1), ROM_BIOS(1) )
+	ROMX_LOAD( "dmv_mb_8741_32678.bin",    0x00000,    0x00400,    CRC(50d1dc4c) SHA1(2c8251d6c8df9f507e11bf920869657f4d074db1), ROM_BIOS(2) )
+	ROMX_LOAD( "dmv_mb_8741_32678.bin",    0x00000,    0x00400,    CRC(50d1dc4c) SHA1(2c8251d6c8df9f507e11bf920869657f4d074db1), ROM_BIOS(3) )
+	ROMX_LOAD( "dmv_mb_8741_32121.bin",    0x00000,    0x00400,    CRC(a03af298) SHA1(144cba41294c46f5ca79b7ad8ced0e4408168775), ROM_BIOS(4) )
+
+	ROM_REGION(0x800, "chargen", 0)
+	ROM_LOAD( "76161.bin",    0x00000,    0x00800,  CRC(6e4df4f9) SHA1(20ff4fc48e55eaf5131f6573fff93e7f97d2f45d)) // same for both color and monochrome board
+
+	ROM_REGION(0x10000, "ram", ROMREGION_ERASE) // 64K RAM on mainboard
 ROM_END
 
 /* Driver */

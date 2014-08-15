@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
 <mamelayout version="2">
 	<element name="led" defstate="0">
 		<disk state="0">
@@ -47,6 +48,11 @@
 		<text string="8">
 			<color red="1.0" green="1.0" blue="1.0" />
 		</text>
+	</element>
+	<element name="digit" defstate="0">
+		<led7seg>
+			<color red="0.75" green="0.0" blue="0.0" />
+		</led7seg>
 	</element>
 
 
@@ -103,6 +109,69 @@
 		</bezel>
 		<bezel name="label8" element="l8">
 			<bounds x="0" y="170" width="15" height="16" />
+		</bezel>
+	</view>
+
+	<view name="Diagnostic module">
+		<screen index="0">
+			<bounds x="30" y="0" width="640" height="480" />
+		</screen>
+
+		<bezel name="led1" element="led">
+			<bounds x="15" y="33" width="10" height="10" />
+		</bezel>
+		<bezel name="led2" element="led">
+			<bounds x="15" y="53" width="10" height="10" />
+		</bezel>
+		<bezel name="led3" element="led">
+			<bounds x="15" y="73" width="10" height="10" />
+		</bezel>
+		<bezel name="led4" element="led">
+			<bounds x="15" y="93" width="10" height="10" />
+		</bezel>
+		<bezel name="led5" element="led">
+			<bounds x="15" y="113" width="10" height="10" />
+		</bezel>
+		<bezel name="led6" element="led">
+			<bounds x="15" y="133" width="10" height="10" />
+		</bezel>
+		<bezel name="led7" element="led">
+			<bounds x="15" y="153" width="10" height="10" />
+		</bezel>
+		<bezel name="led8" element="led">
+			<bounds x="15" y="173" width="10" height="10" />
+		</bezel>
+
+		<bezel name="label1" element="l1">
+			<bounds x="0" y="30" width="15" height="16" />
+		</bezel>
+		<bezel name="label2" element="l2">
+			<bounds x="0" y="50" width="15" height="16" />
+		</bezel>
+		<bezel name="label3" element="l3">
+			<bounds x="0" y="70" width="15" height="16" />
+		</bezel>
+		<bezel name="label4" element="l4">
+			<bounds x="0" y="90" width="15" height="16" />
+		</bezel>
+		<bezel name="label5" element="l5">
+			<bounds x="0" y="110" width="15" height="16" />
+		</bezel>
+		<bezel name="label6" element="l6">
+			<bounds x="0" y="130" width="15" height="16" />
+		</bezel>
+		<bezel name="label7" element="l7">
+			<bounds x="0" y="150" width="15" height="16" />
+		</bezel>
+		<bezel name="label8" element="l8">
+			<bounds x="0" y="170" width="15" height="16" />
+		</bezel>
+
+		<bezel name="digit0" element="digit">
+			<bounds x="5" y="200" width="20" height="30" />
+		</bezel>
+		<bezel name="digit1" element="digit">
+			<bounds x="5" y="240" width="20" height="30" />
 		</bezel>
 	</view>
 

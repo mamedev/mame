@@ -139,6 +139,7 @@ FORMATSOBJS = \
 	$(LIBOBJ)/formats/d88_dsk.o     \
 	$(LIBOBJ)/formats/dfi_dsk.o     \
 	$(LIBOBJ)/formats/dim_dsk.o     \
+	$(LIBOBJ)/formats/dmv_dsk.o     \
 	$(LIBOBJ)/formats/dsk_dsk.o     \
 	$(LIBOBJ)/formats/ep64_dsk.o    \
 	$(LIBOBJ)/formats/esq8_dsk.o    \
