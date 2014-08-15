@@ -228,6 +228,9 @@ BUILD_FLAC = 1
 # uncomment next line to build jpeglib as part of MAME build
 BUILD_JPEGLIB = 1
 
+# uncomment next line to build libsqlite3 as part of MAME/MESS build
+BUILD_SQLITE3 = 1
+
 # uncomment next line to build PortMidi as part of MAME/MESS build
 BUILD_MIDILIB = 1
 
@@ -254,7 +257,7 @@ BUILD_MIDILIB = 1
 # DEPRECATED = 1
 
 # specify the sanitizer to use or leave empty to use none
-# SANITIZE = 
+# SANITIZE =
 
 # uncomment next line to enable LTO (link-time optimizations)
 # LTO = 1
@@ -760,7 +763,12 @@ LUA_LIB = $(OBJ)/liblua.a
 WEB_LIB = $(OBJ)/libweb.a
 
 # add SQLite3 library
+ifeq ($(BUILD_SQLITE3),1)
 SQLITE3_LIB = $(OBJ)/libsqlite3.a
+else
+LIBS += -lsqlite3
+SQLITE3_LIB =
+endif
 
 # add PortMidi MIDI library
 ifeq ($(BUILD_MIDILIB),1)
