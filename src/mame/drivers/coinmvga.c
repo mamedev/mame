@@ -1,17 +1,16 @@
 /******************************************************************************
 
-    COINMASTER-GAMING - VGA BOARD
-    -----------------------------
+  COINMASTER-GAMING - VGA BOARD
+  -----------------------------
 
-    Preliminary driver by Roberto Fresca & Angelo Salese.
+  Preliminary driver by Roberto Fresca & Angelo Salese.
 
 
-    Games running on this hardware:
+  Games running on this hardware:
 
-    * Colorama (standalone),   199x-2001,  Coinmaster-Gaming, Ltd.
-    * Roulette (bet station).  199x-2001,  Coinmaster-Gaming, Ltd.
-    * Keno, (bet station).     2000-2001,  Coinmaster-Gaming, Ltd.
-
+  * Colorama (standalone),   199x-2001,  Coinmaster-Gaming, Ltd.
+  * Roulette (bet station).  199x-2001,  Coinmaster-Gaming, Ltd.
+  * Keno, (bet station).     2000-2001,  Coinmaster-Gaming, Ltd.
 
 
 *******************************************************************************
@@ -20,7 +19,7 @@
   Hardware Notes:
   ---------------
 
-  This board is used in each bet station of Coinmaster's Roulette and Keno game.
+  This board is used in each bet station of Coinmaster's Roulette and Keno games.
   Both systems have a phisical electromechanical unit with their own controller
   plus sound. The central units (wheel controller) are routed to the bet stations
   (10 for default) through 2 different kind of networks, depending the wheel system.
@@ -170,40 +169,47 @@
 
 *******************************************************************************
 
-    --------------------
-    ***  Memory Map  ***
-    --------------------
+  --------------------
+  ***  Memory Map  ***
+  --------------------
 
-    0x000000 - 0x09FFFF    ; ROM space.
-    0x210000 - 0x21FFFF    ; NVRAM?.
+  0x000000 - 0x09FFFF    ; ROM space.
+  0x210000 - 0x21FFFF    ; NVRAM?.
 
 
 *******************************************************************************
 
 
-    DRIVER UPDATES:
+  DRIVER UPDATES:
 
 
-    [2009-08-18]
+  [2014-08-15]
 
-    - Renamed Roulette V75 to Coinmaster Roulette V75.
-    - Added Roulette controller program & sound ROMs.
-    - Added 2 complete spanish Keno sets.
-    - Added technical notes.
-
-
-    [2009-08-17]
-
-    - Initial release.
-    - Added technical notes.
+  - Added Colorama (P521 V13, Spanish).
+  - Changed the Colorama parent set description to Colorama (P521, English).
+  - Added technical notes.       	
 
 
-    TODO:
+  [2009-08-18]
 
-    - Interrupts generation is unknown.
-    - Touch screen hook-up.
-    - Fully understand why it trigger some RTEs that should be RTS at POST.
-    - Rewrite palette system, use two RAMDAC devices
+  - Renamed Roulette V75 to Coinmaster Roulette V75.
+  - Added Roulette controller program & sound ROMs.
+  - Added 2 complete spanish Keno sets.
+  - Added technical notes.
+
+
+  [2009-08-17]
+
+  - Initial release.
+  - Added technical notes.
+
+
+  TODO:
+
+  - Interrupts generation is unknown.
+  - Touch screen hook-up.
+  - Fully understand why it trigger some RTEs that should be RTS at POST.
+  - Rewrite palette system, use two RAMDAC devices
 
 
 *******************************************************************************/
@@ -263,16 +269,16 @@ UINT32 coinmvga_state::screen_update_coinmvga(screen_device &screen, bitmap_ind1
 	gfx_element *gfx = m_gfxdecode->gfx(0);
 	int count = 0x04000/2;
 
-	int y,x;
+	int y, x;
 
 
-	for (y=0;y<64;y++)
+	for (y = 0; y < 64; y++)
 	{
-		for (x=0;x<128;x++)
+		for (x = 0; x < 128; x++)
 		{
 			int tile = m_vram[count];
 			//int colour = tile>>12;
-			gfx->opaque(bitmap,cliprect,tile,0,0,0,x*8,y*8);
+			gfx->opaque(bitmap, cliprect, tile, 0, 0, 0, x*8, y*8);
 
 			count++;
 		}
@@ -562,7 +568,7 @@ static const gfx_layout tiles8x8_layout =
 	8, 8,
 	RGN_FRAC(1,1),
 	4,
-	{ 3,2,1,0 },
+	{ 3, 2, 1, 0 },
 	{ 12, 8, 4, 0, 28, 24, 20, 16  },
 	{ 0*8, 4*8, 8*8, 12*8, 16*8, 20*8, 24*8, 28*8 },
 	32*8
@@ -571,10 +577,10 @@ static const gfx_layout tiles8x8_layout =
 /* FIX ME */
 static const gfx_layout tiles16x16_layout =
 {
-	8,8,
+	8, 8,
 	RGN_FRAC(1,2),
 	8,
-	{ RGN_FRAC(1,2)+3,3,RGN_FRAC(1,2)+2,2,RGN_FRAC(1,2)+1,1,RGN_FRAC(1,2)+0,0 },
+	{ RGN_FRAC(1,2)+3, 3, RGN_FRAC(1,2)+2, 2, RGN_FRAC(1,2)+1, 1, RGN_FRAC(1,2)+0, 0 },
 	{ 12, 4, 28, 20, 12+32*8, 4+32*8, 28+32*8, 20+32*8  },
 	{ 0*8, 4*8, 8*8, 12*8, 16*8, 20*8, 24*8, 28*8 },
 	32*8*2
@@ -660,7 +666,9 @@ MACHINE_CONFIG_END
 *************************/
 
 /*
-   Colorama (english)
+   Colorama.
+   p521 (unknown version), English.
+
    Standalone. Phisical arm on marquee + bet station.
 */
 
@@ -688,9 +696,42 @@ ROM_START( colorama )
 ROM_END
 
 
+ROM_START( coloramas )
+
+/*
+   Colorama.
+   p521 v13, Spanish.
+
+   Standalone. Phisical arm on marquee + bet station.
+*/
+
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "p521_v13_rwof_prog_1_(401)_14-2-00_spanish.bin",  0x00001, 0x80000, CRC(69c26df0) SHA1(a83232e835a24e4da46a613abfa34ca2440727ac) )
+	ROM_LOAD16_BYTE( "p521_v13_rwof_prog_2_(401)_14-2-00_spanish.bin",  0x00000, 0x80000, CRC(42294c43) SHA1(f8a94d0387eb2f58643570017499c70baaa393cc) )
+
+	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "p521_v12_rwof_fore_1_(401)_20-7-99_spanish.bin",  0x00001, 0x80000, CRC(c5187559) SHA1(a32cee8948eb08fa9662622164f7ba9042d297d8) )
+	ROM_LOAD16_BYTE( "p521_v12_rwof_fore_2_(401)_20-7-99_spanish.bin",  0x00000, 0x80000, CRC(fdf71c26) SHA1(4e2e5cc3f847a173283401969e21ccde941f0f20) )
+
+	ROM_REGION( 0x400000, "gfx2", 0 )
+	ROM_LOAD16_BYTE( "p521_v12_rwof_back_1_(801)_20-7-99_spanish.bin",  0x200001, 0x100000, CRC(0cbaf152) SHA1(2d6dfc7a4a8ccb6891dd8859594711ddf8a1055e) )
+	ROM_LOAD16_BYTE( "p521_v12_rwof_back_2_(801)_20-7-99_spanish.bin",  0x200000, 0x100000, CRC(7e840b74) SHA1(3825533a824a9a47e4bd44adcebbdc56a01a6f1e) )
+	ROM_LOAD16_BYTE( "p521_v12_rwof_back_3_(801)_20-7-99_spanish.bin",  0x000001, 0x100000, CRC(3163f25d) SHA1(ea2336f2381de1680046c70f217c398d1229f11f) )
+	ROM_LOAD16_BYTE( "p521_v12_rwof_back_4_(801)_20-7-99_spanish.bin",  0x000000, 0x100000, CRC(e741a046) SHA1(8b65205c1d55dfca953e3626d151cb28ba1b2dfc) )
+
+	ROM_REGION( 0x100000, "ymz", 0 )
+	ROM_LOAD( "p521_v12_rwof_bet_sound_(801)_20-7-99_spanish.bin",  0x00000, 0x100000, CRC(a9bda811) SHA1(c5a9aa83bba4bed00f4b23f17b82100c94e2889c) )
+
+	ROM_REGION( 0x0200, "plds", 0 )
+	ROM_LOAD( "palce22v10h25.u11",  0x0000, 0x0200, NO_DUMP )
+
+ROM_END
+
+
+
 /*
    Coinmaster Roulette V75 (y2k, spanish)
-   Phisical Unit + 10/15 bet stations.
+   Phisical Unit + 10-15 bet stations.
 */
 
 ROM_START( cmrltv75 )
@@ -839,8 +880,9 @@ DRIVER_INIT_MEMBER(coinmvga_state,cmrltv75)
 *      Game Drivers      *
 *************************/
 
-/*    YEAR  NAME       PARENT    MACHINE   INPUT     INIT      ROT     COMPANY                    FULLNAME                                     FLAGS */
-GAME( 2001, colorama,  0,        coinmvga, coinmvga, coinmvga_state, colorama, ROT0,  "Coinmaster-Gaming, Ltd.", "Colorama (English)",                         GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND | GAME_NOT_WORKING )
-GAME( 2001, cmrltv75,  0,        coinmvga, coinmvga, coinmvga_state, cmrltv75, ROT90, "Coinmaster-Gaming, Ltd.", "Coinmaster Roulette V75 (Y2K, Spanish)",     GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND | GAME_NOT_WORKING )
-GAME( 2000, cmkenosp,  0,        coinmvga, coinmvga, driver_device, 0,        ROT90, "Coinmaster-Gaming, Ltd.", "Coinmaster Keno (Y2K, Spanish, 2000-12-14)", GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND | GAME_NOT_WORKING )
-GAME( 2000, cmkenospa, cmkenosp, coinmvga, coinmvga, driver_device, 0,        ROT90, "Coinmaster-Gaming, Ltd.", "Coinmaster Keno (Y2K, Spanish, 2000-12-02)", GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND | GAME_NOT_WORKING )
+/*    YEAR  NAME       PARENT    MACHINE   INPUT     STATE           INIT      ROT     COMPANY                    FULLNAME                                      FLAGS */
+GAME( 2000, colorama,  0,        coinmvga, coinmvga, coinmvga_state, colorama, ROT0,  "Coinmaster-Gaming, Ltd.", "Colorama (P521, English)",                          GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND | GAME_NOT_WORKING )
+GAME( 2000, coloramas, colorama, coinmvga, coinmvga, coinmvga_state, colorama, ROT0,  "Coinmaster-Gaming, Ltd.", "Colorama (P521 V13, Spanish)",                GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND | GAME_NOT_WORKING )
+GAME( 2001, cmrltv75,  0,        coinmvga, coinmvga, coinmvga_state, cmrltv75, ROT90, "Coinmaster-Gaming, Ltd.", "Coinmaster Roulette P497 V75 (Y2K, Spanish)", GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND | GAME_NOT_WORKING )
+GAME( 2000, cmkenosp,  0,        coinmvga, coinmvga, driver_device,  0,        ROT90, "Coinmaster-Gaming, Ltd.", "Coinmaster Keno (Y2K, Spanish, 2000-12-14)",  GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND | GAME_NOT_WORKING )
+GAME( 2000, cmkenospa, cmkenosp, coinmvga, coinmvga, driver_device,  0,        ROT90, "Coinmaster-Gaming, Ltd.", "Coinmaster Keno (Y2K, Spanish, 2000-12-02)",  GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND | GAME_NOT_WORKING )
