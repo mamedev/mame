@@ -10,6 +10,7 @@
 #include "emu.h"
 #include "machine/ataintf.h"
 #include "machine/ds128x.h"
+#include "machine/nvram.h"
 #include "cpcexp.h"
 
 class cpc_symbiface2_device  : public device_t,
@@ -30,6 +31,8 @@ public:
 	DECLARE_READ8_MEMBER(rtc_r);
 	DECLARE_WRITE8_MEMBER(rtc_w);
 	DECLARE_READ8_MEMBER(mouse_r);
+	DECLARE_READ8_MEMBER(rom_rewrite_r);
+	DECLARE_WRITE8_MEMBER(rom_rewrite_w);
 	DECLARE_INPUT_CHANGED_MEMBER(mouse_change_x);
 	DECLARE_INPUT_CHANGED_MEMBER(mouse_change_y);
 	DECLARE_INPUT_CHANGED_MEMBER(mouse_change_buttons);
@@ -48,13 +51,16 @@ protected:
 	virtual void device_reset();
 
 private:
-	//cpc_expansion_slot_device *m_slot;
+	cpc_expansion_slot_device *m_slot;
 	required_device<ata_interface_device> m_ide;
 	required_device<ds12885_device> m_rtc;
+	required_device<nvram_device> m_nvram;
 
 	required_ioport m_mouse_x;
 	required_ioport m_mouse_y;
 	required_ioport m_mouse_buttons;
+
+	dynamic_buffer m_rom_space;
 
 	bool m_iohigh;
 	UINT16 m_ide_data;
@@ -62,6 +68,12 @@ private:
 	UINT8 m_mouse_state;
 	UINT8 m_input_x;
 	UINT8 m_input_y;
+
+	// stores backup pointers so that mapping can be restored
+	UINT8* m_4xxx_ptr_r;
+	UINT8* m_4xxx_ptr_w;
+	UINT8* m_6xxx_ptr_r;
+	UINT8* m_6xxx_ptr_w;
 };
 
 // device type definition

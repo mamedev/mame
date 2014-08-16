@@ -41,7 +41,6 @@ static MACHINE_CONFIG_FRAGMENT( cpc_rs232 )
 	MCFG_CPC_EXPANSION_SLOT_OUT_IRQ_CB(DEVWRITELINE("^", cpc_expansion_slot_device, irq_w))
 	MCFG_CPC_EXPANSION_SLOT_OUT_NMI_CB(DEVWRITELINE("^", cpc_expansion_slot_device, nmi_w))
 	MCFG_CPC_EXPANSION_SLOT_OUT_ROMDIS_CB(DEVWRITELINE("^", cpc_expansion_slot_device, romdis_w))  // ROMDIS
-	MCFG_CPC_EXPANSION_SLOT_OUT_ROMEN_CB(DEVWRITELINE("^", cpc_expansion_slot_device, romen_w))  // /ROMEN
 
 MACHINE_CONFIG_END
 

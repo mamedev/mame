@@ -62,9 +62,6 @@
 #define MCFG_CPC_EXPANSION_SLOT_OUT_ROMDIS_CB(_devcb) \
 	devcb = &cpc_expansion_slot_device::set_out_romdis_callback(*device, DEVCB_##_devcb);
 
-#define MCFG_CPC_EXPANSION_SLOT_OUT_ROMEN_CB(_devcb) \
-	devcb = &cpc_expansion_slot_device::set_out_romen_callback(*device, DEVCB_##_devcb);
-
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -81,6 +78,12 @@ public:
 
 	// reset
 	virtual void cpc_reset_w() { };
+
+	void set_rom_bank(UINT8 sel) { m_rom_sel = sel; }  // tell device the currently selected ROM
+	UINT8 get_rom_bank() { return m_rom_sel; }
+
+private:
+	UINT8 m_rom_sel;  // currently selected ROM
 };
 
 
@@ -98,13 +101,13 @@ public:
 	template<class _Object> static devcb_base &set_out_nmi_callback(device_t &device, _Object object) { return downcast<cpc_expansion_slot_device &>(device).m_out_nmi_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_out_reset_callback(device_t &device, _Object object) { return downcast<cpc_expansion_slot_device &>(device).m_out_reset_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_out_romdis_callback(device_t &device, _Object object) { return downcast<cpc_expansion_slot_device &>(device).m_out_romdis_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_romen_callback(device_t &device, _Object object) { return downcast<cpc_expansion_slot_device &>(device).m_out_romen_cb.set_callback(object); }
 
 	DECLARE_WRITE_LINE_MEMBER( irq_w );
 	DECLARE_WRITE_LINE_MEMBER( nmi_w );
 	DECLARE_WRITE_LINE_MEMBER( reset_w );
 	DECLARE_WRITE_LINE_MEMBER( romdis_w );
-	DECLARE_WRITE_LINE_MEMBER( romen_w );
+
+	void set_rom_bank(UINT8 sel) { if(m_card) m_card->set_rom_bank(sel); }  // tell device the currently selected ROM
 
 protected:
 	// device-level overrides
@@ -115,9 +118,9 @@ protected:
 	devcb_write_line    m_out_nmi_cb;
 	devcb_write_line    m_out_reset_cb;
 	devcb_write_line    m_out_romdis_cb;
-	devcb_write_line    m_out_romen_cb;
 
 	device_cpc_expansion_card_interface *m_card;
+
 };
 
 

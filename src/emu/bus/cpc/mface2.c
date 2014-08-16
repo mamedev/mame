@@ -22,7 +22,6 @@ static MACHINE_CONFIG_FRAGMENT( cpc_mface2 )
 	MCFG_CPC_EXPANSION_SLOT_OUT_IRQ_CB(DEVWRITELINE("^", cpc_expansion_slot_device, irq_w))
 	MCFG_CPC_EXPANSION_SLOT_OUT_NMI_CB(DEVWRITELINE("^", cpc_expansion_slot_device, nmi_w))
 	MCFG_CPC_EXPANSION_SLOT_OUT_ROMDIS_CB(DEVWRITELINE("^", cpc_expansion_slot_device, romdis_w))  // ROMDIS
-	MCFG_CPC_EXPANSION_SLOT_OUT_ROMEN_CB(DEVWRITELINE("^", cpc_expansion_slot_device, romen_w))  // /ROMEN
 MACHINE_CONFIG_END
 
 DIRECT_UPDATE_MEMBER( cpc_multiface2_device::amstrad_default )
@@ -63,7 +62,6 @@ DIRECT_UPDATE_MEMBER( cpc_multiface2_device::amstrad_multiface_directoverride )
 			m_multiface_flags &= ~(MULTIFACE_VISIBLE|MULTIFACE_STOP_BUTTON_PRESSED);
 
 			m_romdis=0;
-			m_slot->romen_w(0);
 
 			/* clear op base override */
 			machine().device("maincpu")->memory().space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(FUNC(cpc_multiface2_device::amstrad_default),this));
@@ -149,7 +147,6 @@ void cpc_multiface2_device::multiface_stop()
 		m_multiface_flags |= MULTIFACE_STOP_BUTTON_PRESSED;
 
 		m_romdis = 1;
-		m_slot->romen_w(1);
 
 		/* page rom into memory */
 		multiface_rethink_memory();

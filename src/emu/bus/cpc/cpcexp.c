@@ -45,8 +45,7 @@ cpc_expansion_slot_device::cpc_expansion_slot_device(const machine_config &mconf
 		m_out_irq_cb(*this),
 		m_out_nmi_cb(*this),
 		m_out_reset_cb(*this),
-		m_out_romdis_cb(*this),
-		m_out_romen_cb(*this)
+		m_out_romdis_cb(*this)
 {
 }
 
@@ -67,7 +66,6 @@ void cpc_expansion_slot_device::device_start()
 	m_out_nmi_cb.resolve_safe();
 	m_out_reset_cb.resolve_safe();
 	m_out_romdis_cb.resolve_safe();
-	m_out_romen_cb.resolve_safe();
 }
 
 
@@ -84,4 +82,3 @@ WRITE_LINE_MEMBER( cpc_expansion_slot_device::irq_w ) { m_out_irq_cb(state); }
 WRITE_LINE_MEMBER( cpc_expansion_slot_device::nmi_w ) { m_out_nmi_cb(state); }
 WRITE_LINE_MEMBER( cpc_expansion_slot_device::reset_w ) { m_out_reset_cb(state); }
 WRITE_LINE_MEMBER( cpc_expansion_slot_device::romdis_w ) { m_out_romdis_cb(state); }
-WRITE_LINE_MEMBER( cpc_expansion_slot_device::romen_w ) { m_out_romen_cb(state); }

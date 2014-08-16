@@ -10,7 +10,7 @@
  *  Created on: 2/08/2014
  *
  *  TODO:
- *    - expansion RAM
+ *    - expansion RAM (for now handled by -ramsize)
  *    - rewritable ROM
  *    - mouse controls still need some work
  */
@@ -28,6 +28,7 @@ const device_type CPC_SYMBIFACE2 = &device_creator<cpc_symbiface2_device>;
 static MACHINE_CONFIG_FRAGMENT( cpc_symbiface2 )
 	MCFG_ATA_INTERFACE_ADD("ide",ata_devices,"hdd",NULL,false)
 	MCFG_DS12885_ADD("rtc")
+	MCFG_NVRAM_ADD_1FILL("nvram")
 	// no pass-through
 MACHINE_CONFIG_END
 
@@ -73,6 +74,7 @@ cpc_symbiface2_device::cpc_symbiface2_device(const machine_config &mconfig, cons
 	device_cpc_expansion_card_interface(mconfig, *this),
 	m_ide(*this,"ide"),
 	m_rtc(*this,"rtc"),
+	m_nvram(*this,"nvram"),
 	m_mouse_x(*this,"sf2_mouse_x"),
 	m_mouse_y(*this,"sf2_mouse_y"),
 	m_mouse_buttons(*this,"sf2_mouse_buttons")
@@ -88,10 +90,21 @@ void cpc_symbiface2_device::device_start()
 	device_t* cpu = machine().device("maincpu");
 	address_space& space = cpu->memory().space(AS_IO);
 
+	m_slot = dynamic_cast<cpc_expansion_slot_device *>(owner());
+
 	space.install_readwrite_handler(0xfd00,0xfd07,0,0,read8_delegate(FUNC(cpc_symbiface2_device::ide_cs1_r),this),write8_delegate(FUNC(cpc_symbiface2_device::ide_cs1_w),this));
 	space.install_readwrite_handler(0xfd08,0xfd0f,0,0,read8_delegate(FUNC(cpc_symbiface2_device::ide_cs0_r),this),write8_delegate(FUNC(cpc_symbiface2_device::ide_cs0_w),this));
 	space.install_read_handler(0xfd10,0xfd10,0,0,read8_delegate(FUNC(cpc_symbiface2_device::mouse_r),this));
 	space.install_readwrite_handler(0xfd14,0xfd15,0,0,read8_delegate(FUNC(cpc_symbiface2_device::rtc_r),this),write8_delegate(FUNC(cpc_symbiface2_device::rtc_w),this));
+	space.install_readwrite_handler(0xfd17,0xfd17,0,0,read8_delegate(FUNC(cpc_symbiface2_device::rom_rewrite_r),this),write8_delegate(FUNC(cpc_symbiface2_device::rom_rewrite_w),this));
+
+	// set up ROM space (these can be writable, when mapped to &4000, or completely disabled, allowing the built-in ROMs to be visible)
+	// 32 banks of 16kB (512kB)
+	m_rom_space.resize(32*16384);
+
+	m_nvram->set_base(m_rom_space,m_rom_space.bytes());
+	save_item(NAME(m_rom_space));
+
 }
 
 //-------------------------------------------------
@@ -107,8 +120,8 @@ void cpc_symbiface2_device::device_reset()
 }
 
 // IDE controller (custom)
-// #FD00 - CS1
-// #FD08 - CS0
+// #FD00-07 - CS1
+// #FD08-0F - CS0
 READ8_MEMBER(cpc_symbiface2_device::ide_cs0_r)
 {
 	// data is returned in words, so it must be buffered
@@ -250,3 +263,31 @@ INPUT_CHANGED_MEMBER(cpc_symbiface2_device::mouse_change_buttons)
 	m_mouse_state = PS2_MOUSE_BUTTONS;
 }
 
+// #FD17 (read) - map currently selected ROM to 0x4000 for read/write
+READ8_MEMBER(cpc_symbiface2_device::rom_rewrite_r)
+{
+	UINT8 bank = get_rom_bank();
+
+	if(bank >= 32)
+		return 0xff;
+
+	m_4xxx_ptr_r = (UINT8*)machine().root_device().membank("bank3")->base();
+	m_4xxx_ptr_w = (UINT8*)machine().root_device().membank("bank11")->base();
+	m_6xxx_ptr_r = (UINT8*)machine().root_device().membank("bank4")->base();
+	m_6xxx_ptr_w = (UINT8*)machine().root_device().membank("bank12")->base();
+	machine().root_device().membank("bank3")->set_base((UINT8*)m_rom_space+(bank*16384));
+	machine().root_device().membank("bank4")->set_base((UINT8*)m_rom_space+(bank*16384+8192));
+	machine().root_device().membank("bank11")->set_base((UINT8*)m_rom_space+(bank*16384));
+	machine().root_device().membank("bank12")->set_base((UINT8*)m_rom_space+(bank*16384+8192));
+
+	return 0xff;
+}
+
+// #FD17 (write) - unmap selected ROM at 0x4000
+WRITE8_MEMBER(cpc_symbiface2_device::rom_rewrite_w)
+{
+	machine().root_device().membank("bank3")->set_base(m_4xxx_ptr_r);
+	machine().root_device().membank("bank4")->set_base(m_6xxx_ptr_r);
+	machine().root_device().membank("bank11")->set_base(m_4xxx_ptr_w);
+	machine().root_device().membank("bank12")->set_base(m_4xxx_ptr_w);
+}

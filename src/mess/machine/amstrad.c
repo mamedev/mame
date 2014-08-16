@@ -1111,15 +1111,6 @@ WRITE_LINE_MEMBER(amstrad_state::cpc_romdis)
 	amstrad_rethinkMemory();
 }
 
-WRITE_LINE_MEMBER(amstrad_state::cpc_romen)
-{
-	if(state != 0)
-		m_gate_array.mrer &= ~0x04;
-	else
-		m_gate_array.mrer |= 0x04;
-	amstrad_rethinkMemory();
-}
-
 
 /*--------------------------
   - Ram and Rom management -
@@ -2027,6 +2018,23 @@ WRITE8_MEMBER(amstrad_state::amstrad_cpc_io_w)
 	if ((offset & (1<<13)) == 0)
 	{
 		m_gate_array.upper_bank = data;
+		// expansion devices know the selected ROM by monitoring I/O writes to DFxx
+		// there are no signals related to which ROM is selected
+		cpc_expansion_slot_device* exp_port = m_exp;
+		while(exp_port != NULL)
+		{
+			device_cpc_expansion_card_interface* temp;
+			device_t* temp_dev;
+
+			temp = dynamic_cast<device_cpc_expansion_card_interface*>(exp_port->get_card_device());
+			temp_dev = dynamic_cast<device_t*>(exp_port->get_card_device());
+			if(temp != NULL)
+			{
+				temp->set_rom_bank(data);
+			}
+			exp_port = temp_dev->subdevice<cpc_expansion_slot_device>("exp");
+		}
+
 		amstrad_setUpperRom();
 	}
 
