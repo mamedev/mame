@@ -450,7 +450,7 @@ READ8_MEMBER(apple2_state::apple2_c1xx_r )
 
 	if (slotdevice != NULL)
 	{
-		if (slotdevice->take_c800())
+		if ((slotdevice->take_c800()) && (!space.debugger_access()))
 		{
 //          printf("c1xx_r: taking cnxx_slot to %d\n", slotnum);
 			m_a2_cnxx_slot = slotnum;
@@ -499,7 +499,7 @@ READ8_MEMBER(apple2_state::apple2_c3xx_r )
 	// is a card installed in this slot?
 	if (slotdevice != NULL)
 	{
-		if (slotdevice->take_c800())
+		if ((slotdevice->take_c800()) && (!space.debugger_access()))
 		{
 //          printf("c3xx_r: taking cnxx_slot to %d\n", slotnum);
 			m_a2_cnxx_slot = slotnum;
@@ -526,7 +526,7 @@ WRITE8_MEMBER(apple2_state::apple2_c3xx_w )
 
 	if (slotdevice != NULL)
 	{
-		if (slotdevice->take_c800())
+		if ((slotdevice->take_c800()) && (!space.debugger_access()))
 		{
 //          printf("c3xx_w: taking cnxx_slot to %d\n", slotnum);
 			m_a2_cnxx_slot = slotnum;
@@ -552,7 +552,7 @@ READ8_MEMBER(apple2_state::apple2_c4xx_r )
 	// is a card installed in this slot?
 	if (slotdevice != NULL)
 	{
-		if (slotdevice->take_c800() && (m_a2_cnxx_slot != slotnum))
+		if (slotdevice->take_c800() && (m_a2_cnxx_slot != slotnum) && (!space.debugger_access()))
 		{
 			m_a2_cnxx_slot = slotnum;
 			apple2_update_memory();
@@ -578,7 +578,7 @@ WRITE8_MEMBER ( apple2_state::apple2_c4xx_w )
 
 	if (slotdevice != NULL)
 	{
-		if (slotdevice->take_c800())
+		if ((slotdevice->take_c800()) && (!space.debugger_access()))
 		{
 //          printf("c4xx_w: taking cnxx_slot to %d\n", slotnum);
 			m_a2_cnxx_slot = slotnum;
