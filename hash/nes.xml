@@ -47827,6 +47827,22 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
+	<software name="ngaidenp" cloneof="shadwarr">
+		<description>Ninja Gaiden (USA, Prototype)</description>
+		<year>1989</year>
+		<publisher>Tecmo</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="sxrom" />
+			<feature name="pcb" value="NES-SLROM" />
+			<dataarea name="chr" size="131072">
+				<rom name="nes nin chr" size="131072" crc="eccd2dcb" sha1="2a319086f7c22b8fe7ca8ab72436a7c8d07b915e" offset="00000" />
+			</dataarea>
+			<dataarea name="prg" size="131072">
+				<rom name="nes nin prg" size="131072" crc="2fa94066" sha1="711e7ea580a5ffe5542d9a7d3de2871423119c3c" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="ngaiden2p" cloneof="shadwar2" supported="partial">
 		<description>Ninja Gaiden II - The Dark Sword of Chaos (USA, Sample 36)</description>
 		<year>1990</year>
