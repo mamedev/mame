@@ -42,7 +42,8 @@ protected:
 
 private:
 	UINT8 *m_rom;
-	int m_slot7_bank;
+	UINT8 m_slot7_ram[0x800];
+	int m_slot7_bank, m_slot7_ram_bank;
 };
 
 // device type definition

@@ -27,6 +27,8 @@
 #define IIC_ACIA1_TAG "acia1"
 #define IIC_ACIA2_TAG "acia2"
 
+#define LASER128_UDC_TAG "l128udc"
+
 #define PRINTER_PORT_TAG "printer"
 #define MODEM_PORT_TAG "modem"
 
@@ -139,7 +141,8 @@ public:
 		m_sysconfig(*this, "a2_config"),
 		m_cassette(*this, "cassette"),
 		m_acia1(*this, IIC_ACIA1_TAG),
-		m_acia2(*this, IIC_ACIA2_TAG)
+		m_acia2(*this, IIC_ACIA2_TAG),
+		m_laserudc(*this, LASER128_UDC_TAG)
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -157,6 +160,7 @@ public:
 	optional_device<cassette_image_device> m_cassette;
 
 	optional_device<mos6551_device> m_acia1, m_acia2;
+	optional_device<applefdc_base_device> m_laserudc;
 
 	UINT32 m_flags, m_flags_mask;
 	INT32 m_a2_cnxx_slot;

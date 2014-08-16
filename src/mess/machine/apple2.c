@@ -366,6 +366,11 @@ READ8_MEMBER(apple2_state::apple2_c080_r)
 				}
 			}
 		}
+		else if ((m_machinetype == LASER128) && (slot == 6))
+		{
+			offset &= 0xf;
+			return m_laserudc->read(offset);
+		}
 
 		/* now identify the device */
 		slotdevice = m_a2bus->get_a2bus_card(slot);
@@ -409,6 +414,12 @@ WRITE8_MEMBER(apple2_state::apple2_c080_w)
 				return;
 			}
 		}
+	}
+	else if ((m_machinetype == LASER128) && (slot == 6))
+	{
+		offset &= 0xf;
+		m_laserudc->write(space, offset, data);
+		return;
 	}
 
 	/* now identify the device */
