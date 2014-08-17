@@ -194,7 +194,7 @@ UINT8 a2bus_timemasterho_device::read_cnxx(address_space &space, UINT8 offset)
 {
 	if (m_started)
 	{
-		if (m_dsw1->read() & 2)	// TimeMaster native
+		if (!(m_dsw1->read() & 2))	// TimeMaster native
 		{
 			return m_rom[offset+0xc00];
 		}
@@ -226,7 +226,7 @@ WRITE8_MEMBER(a2bus_timemasterho_device::pia_out_b)
 
 	if (m_started)
 	{
-		if (!(m_dsw1->read() & 1))
+		if (m_dsw1->read() & 1)
 		{
 			m_msm5832->write_w((data >> 6) & 1 ? ASSERT_LINE : CLEAR_LINE); 
 		}
