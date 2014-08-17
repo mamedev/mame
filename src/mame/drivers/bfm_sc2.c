@@ -180,29 +180,31 @@ class bfm_sc2_state : public driver_device
 public:
 	bfm_sc2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
+			m_maincpu(*this, "maincpu"),
+			m_upd7759(*this, "upd"),
 			m_vfd0(*this, "vfd0"),
 			m_vfd1(*this, "vfd1"),
-			m_dm01(*this, "dm01"),
-			m_maincpu(*this, "maincpu"),
-			m_upd7759(*this, "upd") { }
-
+			m_dm01(*this, "dm01") { }
+	
+	required_device<cpu_device> m_maincpu;
+	required_device<upd7759_device> m_upd7759;
 	optional_device<bfm_bd1_t> m_vfd0;
 	optional_device<bfm_bd1_t> m_vfd1;
 	optional_device<bfmdm01_device> m_dm01;
 
-	int m_sc2gui_update_mmtr;
+	int m_sc2gui_update_mmtr; //not used?
 	UINT8 *m_nvram;
 	UINT8 m_key[8];
 	UINT8 m_e2ram[1024];
 	int m_mmtr_latch;
-	int m_triac_latch;
+	int m_triac_latch; //initialized but not used?
 	int m_irq_status;
 	int m_optic_pattern;
 	int m_uart1_data;
 	int m_uart2_data;
 	int m_data_to_uart1;
 	int m_data_to_uart2;
-	int m_locked;
+	int m_locked; //initialized but not used?
 	int m_is_timer_enabled;
 	int m_reel_changed;
 	int m_coin_inhibits;
@@ -317,8 +319,7 @@ public:
 	void adder2_common_init();
 	void sc2awp_common_init(int reels, int decrypt);
 	void sc2awpdmd_common_init(int reels, int decrypt);
-	required_device<cpu_device> m_maincpu;
-	required_device<upd7759_device> m_upd7759;
+	void save_state();
 };
 
 
@@ -1390,7 +1391,50 @@ READ8_MEMBER(bfm_sc2_state::direct_input_r)
 	return 0;
 }
 
-
+void bfm_sc2_state::save_state()
+{
+	/* TODO: Split between the different machine types */
+	
+	save_item(NAME(m_key));
+	save_item(NAME(m_mmtr_latch));
+	//save_item(NAME(m_triac_latch)); // uncomment when variable is used
+	save_item(NAME(m_irq_status));
+	save_item(NAME(m_optic_pattern));
+	save_item(NAME(m_uart1_data));
+	save_item(NAME(m_uart2_data));
+	save_item(NAME(m_data_to_uart1));
+	save_item(NAME(m_data_to_uart2));
+	//save_item(NAME(m_locked)); // uncomment when variable is used
+	save_item(NAME(m_is_timer_enabled));
+	save_item(NAME(m_reel_changed));
+	save_item(NAME(m_coin_inhibits));
+	save_item(NAME(m_irq_timer_stat));
+	save_item(NAME(m_expansion_latch));
+	save_item(NAME(m_global_volume));
+	save_item(NAME(m_volume_override));
+	save_item(NAME(m_reel12_latch));
+	save_item(NAME(m_reel34_latch));
+	save_item(NAME(m_reel56_latch));
+	save_item(NAME(m_pay_latch));
+	save_item(NAME(m_slide_states));
+	save_item(NAME(m_slide_pay_sensor));
+	save_item(NAME(m_triac_select));
+	save_item(NAME(m_hopper_running));
+	save_item(NAME(m_hopper_coin_sense));
+	save_item(NAME(m_timercnt));
+	save_item(NAME(m_sc2_Inputs));
+	save_item(NAME(m_input_override));
+	save_item(NAME(m_e2reg));
+	save_item(NAME(m_e2state));
+	save_item(NAME(m_e2cnt));
+	save_item(NAME(m_e2data));
+	save_item(NAME(m_e2address));
+	save_item(NAME(m_e2rw));
+	save_item(NAME(m_e2data_pin));
+	save_item(NAME(m_e2dummywrite));
+	save_item(NAME(m_e2data_to_read));
+	save_item(NAME(m_codec_data));
+}
 
 
 static ADDRESS_MAP_START( sc2_basemap, AS_PROGRAM, 8, bfm_sc2_state )
@@ -2110,6 +2154,8 @@ MACHINE_START_MEMBER(bfm_sc2_state,bfm_sc2)
 	nvram_device *e2ram = subdevice<nvram_device>("e2ram");
 	if (e2ram != NULL)
 		e2ram->set_base(m_e2ram, sizeof(m_e2ram));
+	
+	save_state();
 }
 
 static MACHINE_CONFIG_START( scorpion2_vid, bfm_sc2_state )
