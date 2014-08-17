@@ -510,6 +510,7 @@ BUSOBJS += $(BUSOBJ)/pet/superpet.o
 BUSOBJS += $(BUSOBJ)/pet/user.o
 BUSOBJS += $(BUSOBJ)/pet/diag.o
 BUSOBJS += $(BUSOBJ)/pet/petuja.o
+BUSOBJS += $(BUSOBJ)/pet/cb2snd.o
 endif
 
 

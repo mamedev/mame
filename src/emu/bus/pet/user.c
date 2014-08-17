@@ -124,8 +124,10 @@ device_pet_user_port_interface::~device_pet_user_port_interface()
 
 #include "diag.h"
 #include "petuja.h"
+#include "cb2snd.h"
 
 SLOT_INTERFACE_START( pet_user_port_cards )
 	SLOT_INTERFACE("diag", PET_USERPORT_DIAGNOSTIC_CONNECTOR)
 	SLOT_INTERFACE("petuja", PET_USERPORT_JOYSTICK_ADAPTER)
+	SLOT_INTERFACE("cb2snd", PET_USERPORT_CB2_SOUND_DEVICE)
 SLOT_INTERFACE_END
