@@ -314,7 +314,7 @@ void pit8253_device::simulate2(pit8253_timer *timer, INT64 elapsed_cycles)
 	int bcd = CTRL_BCD(timer->control);
 	int mode = CTRL_MODE(timer->control);
 	static const UINT32 CYCLES_NEVER = (0xffffffff);
-	UINT32 cycles_to_output = CYCLES_NEVER;
+	UINT32 cycles_to_output = 0;
 
 	LOG2(("pit8253: simulate2(): simulating %d cycles for %d in mode %d, bcd = %d, phase = %d, gate = %d, output %d, value = 0x%04x\n",
 			(int)elapsed_cycles, timer->index, mode, bcd, timer->phase, timer->gate, timer->output, timer->value));
