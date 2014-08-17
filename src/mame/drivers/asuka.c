@@ -1303,18 +1303,17 @@ ROM_START( jigkmgri )
 	ROM_LOAD( "b41-04.48",  0x00000, 0x80000, CRC(c668638f) SHA1(07238a6cb4d93ffaf6351657163b5d80f0dbf688) )
 ROM_END
 
-
-ROM_START( bonzeadvp )
+ROM_START( bonzeadvp ) /* Labels consists of hand written checksum values of the ROMs */
 	ROM_REGION( 0x100000, "maincpu", 0 )     /* 68000 code */
 	ROM_LOAD16_BYTE( "0l.ic17", 0x00000, 0x10000, CRC(9e046e6f) SHA1(a05ed46930bcfa8f59fda6f1d370b841ad261258) )
 	ROM_LOAD16_BYTE( "0h.ic26", 0x00001, 0x10000, CRC(3e2b2628) SHA1(66ee0e5d2c38c467edc3f22b83b73643764ae8f0) )
 	ROM_LOAD16_BYTE( "1h.ic16", 0x20000, 0x10000, CRC(52f31b98) SHA1(8a20a79350073438522361d3f598afa42f0f62ed) )
 	ROM_LOAD16_BYTE( "1l.ic25", 0x20001, 0x10000, CRC(c7e79b98) SHA1(1d92861c6337362cdd9d31a2da944d8eb3171170) )
 	/* 0x040000 - 0x7ffff is intentionally empty */
-	ROM_LOAD16_BYTE( "fd65.ic20",      0x80001, 0x20000, CRC(c32f3bd5) SHA1(d9db14ec26cac5504a61058e87da4e404647ca94) ) // these 4 == b41-01.15 but split
-	ROM_LOAD16_BYTE( "49eb.ic26",      0x80000, 0x20000, CRC(c747650b) SHA1(ef03931d233ec1f9e61d45d02abb23e69edd8c15) ) // ^
-	ROM_LOAD16_BYTE( "a418.ic23",      0xc0001, 0x20000, CRC(51b02be6) SHA1(20e3423aea359f3ca92dd24f4f87351d93c279b6) ) // ^
-	ROM_LOAD16_BYTE( "no label.ic28",  0xc0000, 0x20000, CRC(dc1f9fd0) SHA1(88addfa2c3bb854efd88a3556d23a7607b6ec848) ) // ^
+	ROM_LOAD16_BYTE( "fd65.ic20",  0x80001, 0x20000, CRC(c32f3bd5) SHA1(d9db14ec26cac5504a61058e87da4e404647ca94) ) // these 4 == b41-01.15 but split
+	ROM_LOAD16_BYTE( "49eb.ic26",  0x80000, 0x20000, CRC(c747650b) SHA1(ef03931d233ec1f9e61d45d02abb23e69edd8c15) ) // ^
+	ROM_LOAD16_BYTE( "a418.ic23",  0xc0001, 0x20000, CRC(51b02be6) SHA1(20e3423aea359f3ca92dd24f4f87351d93c279b6) ) // ^
+	ROM_LOAD16_BYTE( "0e7e.ic28",  0xc0000, 0x20000, CRC(dc1f9fd0) SHA1(88addfa2c3bb854efd88a3556d23a7607b6ec848) ) // ^
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
 	ROM_LOAD16_BYTE( "abbe.ic9",   0x00000, 0x20000, CRC(50e6581c) SHA1(230724d65c9b1ea5d72117dca077464dd599ad68) ) // first 2 == first half b41-03.1 but split
@@ -1330,7 +1329,7 @@ ROM_START( bonzeadvp )
 
 	ROM_REGION( 0x1c000, "audiocpu", 0 )     /* sound cpu */
 	ROM_LOAD( "b41-13.20",  0x00000, 0x04000, CRC(9e464254) SHA1(b6f6126b54c15320ecaa652d0eeabaa4cd94bd26) ) // missing from dump
-	ROM_CONTINUE(        0x10000, 0x0c000 )   /* banked stuff */
+	ROM_CONTINUE(           0x10000, 0x0c000)   /* banked stuff */
 
 	/* is the C-Chip the same as the final? */
 
@@ -1338,7 +1337,7 @@ ROM_START( bonzeadvp )
 	ROM_LOAD( "6089.ic17",  0x00000, 0x20000, CRC(b092783c) SHA1(e13f765e2884b6194926bf982595de18376ffef9) ) // these 4 == b41-04.48 but split
 	ROM_LOAD( "2e1f.ic14",  0x20000, 0x20000, CRC(df1f87c0) SHA1(ad3df38c22f1bb7bdc449922bd3c2a5c78aa87f8) ) // ^
 	ROM_LOAD( "f66e.ic11",  0x40000, 0x20000, CRC(c6df1b3e) SHA1(84d6ad3e3af565060aa4324c6e3e91e4dc5089b6) ) // ^
-	ROM_LOAD( "49a7.ic7",   0x60000, 0x20000, CRC(5584c02c) SHA1(00402df66debb257c97a609a37de0f8eeeb6e9f0) ) // ^
+	ROM_LOAD( "49d7.ic7",   0x60000, 0x20000, CRC(5584c02c) SHA1(00402df66debb257c97a609a37de0f8eeeb6e9f0) ) // ^
 ROM_END
 
 ROM_START( asuka )
@@ -1362,6 +1361,10 @@ ROM_START( asuka )
 
 	ROM_REGION( 0x10000, "ymsnd", 0 )   /* ADPCM samples */
 	ROM_LOAD( "b68-10.bin", 0x00000, 0x10000, CRC(387aaf40) SHA1(47c583564ef1d49ece15f97221b2e073e8fb0544) )
+
+	ROM_REGION( 0x144, "pals", 0 )
+	ROM_LOAD( "b68-04.bin", 0x00000, 0x144, CRC(9be618d1) SHA1(61ee33c3db448a05ff8f455e77fe17d51106baec) )
+	ROM_LOAD( "b68-05.bin", 0x00000, 0x104, CRC(d6524ccc) SHA1(f3b56253692aebb63278d47832fc27b8b212b59c) )
 ROM_END
 
 ROM_START( asukaj )
@@ -1385,6 +1388,10 @@ ROM_START( asukaj )
 
 	ROM_REGION( 0x10000, "ymsnd", 0 )   /* ADPCM samples */
 	ROM_LOAD( "b68-10.bin", 0x00000, 0x10000, CRC(387aaf40) SHA1(47c583564ef1d49ece15f97221b2e073e8fb0544) )
+
+	ROM_REGION( 0x144, "pals", 0 )
+	ROM_LOAD( "b68-04.bin", 0x00000, 0x144, CRC(9be618d1) SHA1(61ee33c3db448a05ff8f455e77fe17d51106baec) )
+	ROM_LOAD( "b68-05.bin", 0x00000, 0x104, CRC(d6524ccc) SHA1(f3b56253692aebb63278d47832fc27b8b212b59c) )
 ROM_END
 
 ROM_START( mofflott )
@@ -1560,6 +1567,10 @@ ROM_START( galmedes )
 	ROM_REGION( 0x1c000, "audiocpu", 0 )    /* sound cpu */
 	ROM_LOAD( "gm-snd.bin", 0x00000, 0x04000, CRC(d6f56c21) SHA1(ff9743448ac8ce57a2f8c33a26145e7b92cbe3c3) )
 	ROM_CONTINUE(           0x10000, 0x0c000 )  /* banked stuff */
+
+	ROM_REGION( 0x144, "pals", 0 )
+	ROM_LOAD( "b68-04.bin", 0x00000, 0x144, CRC(9be618d1) SHA1(61ee33c3db448a05ff8f455e77fe17d51106baec) )
+	ROM_LOAD( "b68-05.bin", 0x00000, 0x104, CRC(d6524ccc) SHA1(f3b56253692aebb63278d47832fc27b8b212b59c) )
 ROM_END
 
 ROM_START( earthjkr )
@@ -1580,6 +1591,10 @@ ROM_START( earthjkr )
 	ROM_REGION( 0x1c000, "audiocpu", 0 )    /* sound cpu */
 	ROM_LOAD( "ej_2.rom", 0x00000, 0x04000, CRC(42ba2566) SHA1(c437388684b565c7504d6bad6accd73aa000faca) )
 	ROM_CONTINUE(         0x10000, 0x0c000 )    /* banked stuff */
+
+	ROM_REGION( 0x144, "pals", 0 )
+	ROM_LOAD( "b68-04.bin", 0x00000, 0x144, CRC(9be618d1) SHA1(61ee33c3db448a05ff8f455e77fe17d51106baec) )
+	ROM_LOAD( "b68-05.bin", 0x00000, 0x104, CRC(d6524ccc) SHA1(f3b56253692aebb63278d47832fc27b8b212b59c) )
 ROM_END
 
 ROM_START( earthjkrp ) // was production PCB complete with MASK rom, could just be an early revision, not proto
@@ -1600,7 +1615,6 @@ ROM_START( earthjkrp ) // was production PCB complete with MASK rom, could just 
 	ROM_REGION( 0x1c000, "audiocpu", 0 )    /* sound cpu */
 	ROM_LOAD( "ej_2.rom", 0x00000, 0x04000, CRC(42ba2566) SHA1(c437388684b565c7504d6bad6accd73aa000faca) )
 	ROM_CONTINUE(         0x10000, 0x0c000 )    /* banked stuff */
-
 
 	ROM_REGION( 0x144, "pals", 0 )
 	ROM_LOAD( "b68-04.bin", 0x00000, 0x144, CRC(9be618d1) SHA1(61ee33c3db448a05ff8f455e77fe17d51106baec) )
