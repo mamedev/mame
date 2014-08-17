@@ -161,7 +161,7 @@ void msm5832_device::rtc_clock_updated(int year, int month, int day, int day_of_
 	write_counter(REGISTER_Y1, year);
 	write_counter(REGISTER_MO1, month);
 	write_counter(REGISTER_D1, day);
-	m_reg[REGISTER_W] = day_of_week;
+	m_reg[REGISTER_W] = day_of_week-1;
 	write_counter(REGISTER_H1, hour);
 	write_counter(REGISTER_MI1, minute);
 	write_counter(REGISTER_S1, second);
