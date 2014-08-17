@@ -223,7 +223,6 @@ Address bus A0-A11 is Y0-Y11
 #include "bus/a2bus/a2corvus.h"
 #include "bus/a2bus/a2mcms.h"
 #include "bus/a2bus/a2dx1.h"
-#include "bus/a2bus/timemasterho.h"
 #include "bus/a2bus/a2estd80col.h"
 #include "bus/a2bus/a2eext80col.h"
 #include "bus/a2bus/a2eramworks3.h"
@@ -1025,7 +1024,6 @@ static SLOT_INTERFACE_START(apple2_cards)
 	SLOT_INTERFACE("mcms1", A2BUS_MCMS1)  /* Mountain Computer Music System, card 1 of 2 */
 	SLOT_INTERFACE("mcms2", A2BUS_MCMS2)  /* Mountain Computer Music System, card 2 of 2.  must be in card 1's slot + 1! */
 	SLOT_INTERFACE("dx1", A2BUS_DX1)    /* Decillonix DX-1 sampler card */
-	SLOT_INTERFACE("tm2ho", A2BUS_TIMEMASTERHO)	/* Applied Engineering TimeMaster II H.O. */
 SLOT_INTERFACE_END
 
 static SLOT_INTERFACE_START(apple2eaux_cards)
