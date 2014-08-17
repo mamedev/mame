@@ -49,8 +49,8 @@ Cheap Squeak    1390,1391,0A17,0A40,0A44,0B42
 
 
 ToDo:
-- Many games don't boot
-- Display to fix
+- The Nuova Bell games don't boot
+- The Bell games have major problems
 - Sound
 - Dips, Inputs, Solenoids vary per game
 - Mechanical
@@ -84,7 +84,8 @@ public:
 		, m_io_x4(*this, "X4")
 	{ }
 
-	DECLARE_DRIVER_INIT(by35);
+	DECLARE_DRIVER_INIT(by35_6);
+	DECLARE_DRIVER_INIT(by35_7);
 	DECLARE_READ8_MEMBER(u10_a_r);
 	DECLARE_WRITE8_MEMBER(u10_a_w);
 	DECLARE_READ8_MEMBER(u10_b_r);
@@ -98,20 +99,22 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(u11_cb2_w);
 	DECLARE_INPUT_CHANGED_MEMBER(activity_test);
 	DECLARE_INPUT_CHANGED_MEMBER(self_test);
-	TIMER_DEVICE_CALLBACK_MEMBER(u10_timer);
+	TIMER_DEVICE_CALLBACK_MEMBER(timer_x);
 	TIMER_DEVICE_CALLBACK_MEMBER(u11_timer);
 private:
-	UINT8 m_u10;
-	UINT8 m_u10_a;
-	UINT8 m_u10_b;
-	UINT8 m_u11_a;
-	UINT8 m_u11_b;
+	UINT8 m_u10a;
+	UINT8 m_u10b;
+	UINT8 m_u11a;
+	UINT8 m_u11b;
 	bool m_u10_ca2;
 	bool m_u10_cb2;
-	bool m_u10_timer;
+	bool m_u11_cb2;
+	bool m_timer_x;
 	bool m_u11_timer;
+	bool m_6d;
 	UINT8 m_digit;
-	UINT8 m_segment;
+	UINT8 m_counter;
+	UINT8 m_segment[5];
 	virtual void machine_reset();
 	required_device<m6800_cpu_device> m_maincpu;
 	required_device<pia6821_device> m_pia_u10;
@@ -144,125 +147,165 @@ static INPUT_PORTS_START( by35 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Activity") PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, by35_state, activity_test, 0)
 
 	PORT_START("DSW0")
-	PORT_DIPNAME( 0x01, 0x00, "S01") // S1-5: 32 combinations of coins/credits of a coin slot. S9-13 other slot.
+	PORT_DIPNAME( 0x1f, 0x02, "Coin Slot 1")
+	PORT_DIPSETTING(    0x00, DEF_STR( 2C_3C )) // same as 01
+	PORT_DIPSETTING(    0x02, DEF_STR( 1C_1C ))
+	PORT_DIPSETTING(    0x03, DEF_STR( 2C_1C ))
+	PORT_DIPSETTING(    0x04, DEF_STR( 1C_2C ))
+	PORT_DIPSETTING(    0x05, DEF_STR( 2C_2C ))
+	PORT_DIPSETTING(    0x06, DEF_STR( 1C_3C ))
+	PORT_DIPSETTING(    0x07, DEF_STR( 2C_3C ))
+	PORT_DIPSETTING(    0x08, DEF_STR( 1C_4C ))
+	PORT_DIPSETTING(    0x09, DEF_STR( 2C_4C ))
+	PORT_DIPSETTING(    0x0a, DEF_STR( 1C_5C ))
+	PORT_DIPSETTING(    0x0b, DEF_STR( 2C_5C ))
+	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_6C ))
+	PORT_DIPSETTING(    0x0d, DEF_STR( 2C_6C ))
+	PORT_DIPSETTING(    0x0e, DEF_STR( 1C_7C ))
+	PORT_DIPSETTING(    0x0f, DEF_STR( 2C_7C ))
+	PORT_DIPSETTING(    0x10, DEF_STR( 1C_8C ))
+	PORT_DIPSETTING(    0x11, DEF_STR( 2C_8C ))
+	PORT_DIPSETTING(    0x12, DEF_STR( 1C_9C ))
+	PORT_DIPSETTING(    0x13, "2 coins 9 credits")
+	PORT_DIPSETTING(    0x14, "1 coin 10 credits")
+	PORT_DIPSETTING(    0x15, "2 coins 10 credits")
+	PORT_DIPSETTING(    0x16, "1 coin 11 credits")
+	PORT_DIPSETTING(    0x17, "2 coins 11 credits")
+	PORT_DIPSETTING(    0x18, "1 coin 12 credits")
+	PORT_DIPSETTING(    0x19, "2 coins 12 credits")
+	PORT_DIPSETTING(    0x1a, "1 coin 13 credits")
+	PORT_DIPSETTING(    0x1b, "2 coins 13 credits")
+	PORT_DIPSETTING(    0x1c, "1 coin 14 credits")
+	PORT_DIPSETTING(    0x1d, "2 coins 14 credits")
+	PORT_DIPSETTING(    0x1e, "1 coin 15 credits")
+	PORT_DIPSETTING(    0x1f, "2 coins 15 credits")
+	PORT_DIPNAME( 0x60, 0x40, "Award for beating high score")
+	PORT_DIPSETTING(    0x00, "Nothing")
+	PORT_DIPSETTING(    0x20, "1 free game")
+	PORT_DIPSETTING(    0x40, "2 free games")
+	PORT_DIPSETTING(    0x60, "3 free games")
+	PORT_DIPNAME( 0x80, 0x00, "Melody option 1")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
-	PORT_DIPSETTING(    0x01, DEF_STR( On ))
-	PORT_DIPNAME( 0x02, 0x00, "S02")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
-	PORT_DIPSETTING(    0x02, DEF_STR( On ))
-	PORT_DIPNAME( 0x04, 0x00, "S03")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
-	PORT_DIPSETTING(    0x04, DEF_STR( On ))
-	PORT_DIPNAME( 0x08, 0x00, "S04")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
-	PORT_DIPSETTING(    0x08, DEF_STR( On ))
-	PORT_DIPNAME( 0x10, 0x00, "S05")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
-	PORT_DIPSETTING(    0x10, DEF_STR( On ))
-	PORT_DIPNAME( 0x20, 0x20, "S06")
-	PORT_DIPSETTING(    0x00, DEF_STR( No ))
-	PORT_DIPSETTING(    0x20, DEF_STR( Yes ))
-	PORT_DIPNAME( 0x40, 0x40, "S07")
-	PORT_DIPSETTING(    0x00, DEF_STR( No ))
-	PORT_DIPSETTING(    0x40, DEF_STR( Yes ))
-	PORT_DIPNAME( 0x80, 0x80, "S08")
-	PORT_DIPSETTING(    0x00, DEF_STR( No ))
-	PORT_DIPSETTING(    0x80, DEF_STR( Yes ))
+	PORT_DIPSETTING(    0x80, DEF_STR( On ))
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x01, 0x00, "S09")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
-	PORT_DIPSETTING(    0x01, DEF_STR( On ))
-	PORT_DIPNAME( 0x02, 0x00, "S10")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
-	PORT_DIPSETTING(    0x02, DEF_STR( On ))
-	PORT_DIPNAME( 0x04, 0x00, "S11")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
-	PORT_DIPSETTING(    0x04, DEF_STR( On ))
-	PORT_DIPNAME( 0x08, 0x00, "S12")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
-	PORT_DIPSETTING(    0x08, DEF_STR( On ))
-	PORT_DIPNAME( 0x10, 0x00, "S13")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
-	PORT_DIPSETTING(    0x10, DEF_STR( On ))
-	PORT_DIPNAME( 0x20, 0x00, "S14")
-	PORT_DIPSETTING(    0x00, DEF_STR( Yes ))
-	PORT_DIPSETTING(    0x20, DEF_STR( No ))
-	PORT_DIPNAME( 0x40, 0x40, "S15")
-	PORT_DIPSETTING(    0x00, DEF_STR( No ))
-	PORT_DIPSETTING(    0x40, DEF_STR( Yes ))
-	PORT_DIPNAME( 0x80, 0x00, "S16")
-	PORT_DIPSETTING(    0x00, DEF_STR( No ))
-	PORT_DIPSETTING(    0x80, DEF_STR( Yes ))
+	PORT_DIPNAME( 0x1f, 0x02, "Coin Slot 3")
+	PORT_DIPSETTING(    0x00, DEF_STR( 2C_3C )) // same as 01
+	PORT_DIPSETTING(    0x02, DEF_STR( 1C_1C ))
+	PORT_DIPSETTING(    0x03, DEF_STR( 2C_1C ))
+	PORT_DIPSETTING(    0x04, DEF_STR( 1C_2C ))
+	PORT_DIPSETTING(    0x05, DEF_STR( 2C_2C ))
+	PORT_DIPSETTING(    0x06, DEF_STR( 1C_3C ))
+	PORT_DIPSETTING(    0x07, DEF_STR( 2C_3C ))
+	PORT_DIPSETTING(    0x08, DEF_STR( 1C_4C ))
+	PORT_DIPSETTING(    0x09, DEF_STR( 2C_4C ))
+	PORT_DIPSETTING(    0x0a, DEF_STR( 1C_5C ))
+	PORT_DIPSETTING(    0x0b, DEF_STR( 2C_5C ))
+	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_6C ))
+	PORT_DIPSETTING(    0x0d, DEF_STR( 2C_6C ))
+	PORT_DIPSETTING(    0x0e, DEF_STR( 1C_7C ))
+	PORT_DIPSETTING(    0x0f, DEF_STR( 2C_7C ))
+	PORT_DIPSETTING(    0x10, DEF_STR( 1C_8C ))
+	PORT_DIPSETTING(    0x11, DEF_STR( 2C_8C ))
+	PORT_DIPSETTING(    0x12, DEF_STR( 1C_9C ))
+	PORT_DIPSETTING(    0x13, "2 coins 9 credits")
+	PORT_DIPSETTING(    0x14, "1 coin 10 credits")
+	PORT_DIPSETTING(    0x15, "2 coins 10 credits")
+	PORT_DIPSETTING(    0x16, "1 coin 11 credits")
+	PORT_DIPSETTING(    0x17, "2 coins 11 credits")
+	PORT_DIPSETTING(    0x18, "1 coin 12 credits")
+	PORT_DIPSETTING(    0x19, "2 coins 12 credits")
+	PORT_DIPSETTING(    0x1a, "1 coin 13 credits")
+	PORT_DIPSETTING(    0x1b, "2 coins 13 credits")
+	PORT_DIPSETTING(    0x1c, "1 coin 14 credits")
+	PORT_DIPSETTING(    0x1d, "2 coins 14 credits")
+	PORT_DIPSETTING(    0x1e, "1 coin 15 credits")
+	PORT_DIPSETTING(    0x1f, "2 coins 15 credits")
+	PORT_DIPNAME( 0x60, 0x60, "Award")
+	PORT_DIPSETTING(    0x00, "Nothing")
+	PORT_DIPSETTING(    0x40, "Extra Ball")
+	PORT_DIPSETTING(    0x60, "Free Game")
+	PORT_DIPNAME( 0x80, 0x00, "Balls")
+	PORT_DIPSETTING(    0x00, "3")
+	PORT_DIPSETTING(    0x80, "5")
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x01, 0x00, "S17")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
-	PORT_DIPSETTING(    0x01, DEF_STR( On ))
-	PORT_DIPNAME( 0x02, 0x00, "S18")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
-	PORT_DIPSETTING(    0x02, DEF_STR( On ))
-	PORT_DIPNAME( 0x04, 0x00, "S19")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
-	PORT_DIPSETTING(    0x04, DEF_STR( On ))
-	PORT_DIPNAME( 0x08, 0x00, "S20")
+	PORT_DIPNAME( 0x07, 0x02, "Maximum Credits")
+	PORT_DIPSETTING(    0x00, "5")
+	PORT_DIPSETTING(    0x01, "10")
+	PORT_DIPSETTING(    0x02, "15")
+	PORT_DIPSETTING(    0x03, "20")
+	PORT_DIPSETTING(    0x04, "25")
+	PORT_DIPSETTING(    0x05, "30")
+	PORT_DIPSETTING(    0x06, "35")
+	PORT_DIPSETTING(    0x07, "40")
+	PORT_DIPNAME( 0x08, 0x08, "Credits displayed")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
 	PORT_DIPSETTING(    0x08, DEF_STR( On ))
-	PORT_DIPNAME( 0x10, 0x00, "S21")
+	PORT_DIPNAME( 0x10, 0x10, "Match")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
 	PORT_DIPSETTING(    0x10, DEF_STR( On ))
-	PORT_DIPNAME( 0x20, 0x00, "S22")
+	PORT_DIPNAME( 0x20, 0x00, "S22 (game specific)")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
 	PORT_DIPSETTING(    0x20, DEF_STR( On ))
-	PORT_DIPNAME( 0x40, 0x00, "S23")
+	PORT_DIPNAME( 0x40, 0x00, "S23 (game specific)")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
 	PORT_DIPSETTING(    0x40, DEF_STR( On ))
-	PORT_DIPNAME( 0x80, 0x00, "S24")
+	PORT_DIPNAME( 0x80, 0x00, "S24 (game specific)")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
 	PORT_DIPSETTING(    0x80, DEF_STR( On ))
 
 	PORT_START("DSW3")
-	PORT_DIPNAME( 0x03, 0x03, "Maximum Credits")
-	PORT_DIPSETTING(    0x00, "10")
-	PORT_DIPSETTING(    0x01, "15")
-	PORT_DIPSETTING(    0x02, "25")
-	PORT_DIPSETTING(    0x03, "40")
-	PORT_DIPNAME( 0x04, 0x04, "Credits displayed")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
-	PORT_DIPSETTING(    0x04, DEF_STR( On ))
-	PORT_DIPNAME( 0x08, 0x08, "Match")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
-	PORT_DIPSETTING(    0x08, DEF_STR( On ))
-	PORT_DIPNAME( 0x10, 0x00, "Keep all replays")
+	PORT_DIPNAME( 0x0f, 0x00, "Coin Slot 2")
+	PORT_DIPSETTING(    0x00, "Same as slot 1")
+	PORT_DIPSETTING(    0x01, DEF_STR( 1C_1C ))
+	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ))
+	PORT_DIPSETTING(    0x03, DEF_STR( 1C_3C ))
+	PORT_DIPSETTING(    0x04, DEF_STR( 1C_4C ))
+	PORT_DIPSETTING(    0x05, DEF_STR( 1C_5C ))
+	PORT_DIPSETTING(    0x06, DEF_STR( 1C_6C ))
+	PORT_DIPSETTING(    0x07, DEF_STR( 1C_7C ))
+	PORT_DIPSETTING(    0x08, DEF_STR( 1C_8C ))
+	PORT_DIPSETTING(    0x09, DEF_STR( 1C_9C ))
+	PORT_DIPSETTING(    0x0a, "1 coin 10 credits")
+	PORT_DIPSETTING(    0x0b, "1 coin 11 credits")
+	PORT_DIPSETTING(    0x0c, "1 coin 12 credits")
+	PORT_DIPSETTING(    0x0d, "1 coin 13 credits")
+	PORT_DIPSETTING(    0x0e, "1 coin 14 credits")
+	PORT_DIPSETTING(    0x0f, "1 coin 15 credits")
+	PORT_DIPNAME( 0x10, 0x00, "S29")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
 	PORT_DIPSETTING(    0x10, DEF_STR( On ))
-	PORT_DIPNAME( 0x20, 0x00, "Voice" )
+	PORT_DIPNAME( 0x20, 0x00, "S30")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
 	PORT_DIPSETTING(    0x20, DEF_STR( On ))
-	PORT_DIPNAME( 0xC0, 0x40, "Balls")
-	PORT_DIPSETTING(    0xC0, "2")
-	PORT_DIPSETTING(    0x00, "3")
-	PORT_DIPSETTING(    0x80, "4")
-	PORT_DIPSETTING(    0x40, "5")
+	PORT_DIPNAME( 0x40, 0x00, "S31 (game specific)")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
+	PORT_DIPSETTING(    0x40, DEF_STR( On ))
+	PORT_DIPNAME( 0x80, 0x00, "Melody option 2")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
+	PORT_DIPSETTING(    0x80, DEF_STR( On ))
 
 	PORT_START("X0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER )
-	PORT_BIT( 0x0a, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START2 )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_SLASH)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_COLON)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_QUOTE)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_BACKSLASH)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_BACKSPACE)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_TILT )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Outhole") PORT_CODE(KEYCODE_X)
 
 	PORT_START("X1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN2 )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN3 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN1 )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN3 )
-	PORT_BIT( 0x38, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN2 )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_L)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_OPENBRACE)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_CLOSEBRACE)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_ENTER)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_TILT1 ) PORT_NAME("Slam Tilt")
 
-	// from here, vary per game
 	PORT_START("X2")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_A)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_S)
@@ -308,6 +351,8 @@ INPUT_CHANGED_MEMBER( by35_state::self_test )
 WRITE_LINE_MEMBER( by35_state::u10_ca2_w )
 {
 	m_u10_ca2 = state;
+	if (!state)
+		m_counter = 0;
 }
 
 WRITE_LINE_MEMBER( by35_state::u10_cb2_w )
@@ -321,36 +366,36 @@ WRITE_LINE_MEMBER( by35_state::u11_ca2_w )
 
 WRITE_LINE_MEMBER( by35_state::u11_cb2_w )
 {
+	m_u11_cb2 = state;
 }
 
 READ8_MEMBER( by35_state::u10_a_r )
 {
-	return m_u10_a;
+	return m_u10a;
 }
 
 WRITE8_MEMBER( by35_state::u10_a_w )
 {
-	static const UINT8 patterns[16] = { 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7d,0x07,0x7f,0x6f,0,0,0,0,0,0 }; // MC14543
-	m_segment = data >> 4;
-	m_u10_a = data;
-	m_u10 = (data & 15) | (BIT(m_u11_a, 0) << 4);
+	m_u10a = data;
 
 	if (!m_u10_ca2)
 	{
-		if (!BIT(m_u10, 0))
-			output_set_digit_value(m_digit, patterns[m_segment]);
+		m_counter++;
+
+		if (m_counter==1)
+			m_segment[0] = data>>4;
 		else
-		if (m_u10==0x1d)
-			output_set_digit_value(8+m_digit, patterns[m_segment]);
+		if (m_counter==3)
+			m_segment[1] = data>>4;
 		else
-		if (m_u10==0x1b)
-			output_set_digit_value(16+m_digit, patterns[m_segment]);
+		if (m_counter==5)
+			m_segment[2] = data>>4;
 		else
-		if (m_u10==0x17)
-			output_set_digit_value(24+m_digit, patterns[m_segment]);
+		if (m_counter==7)
+			m_segment[3] = data>>4;
 		else
-		if (m_u10==0x1f)
-			output_set_digit_value(32+m_digit, patterns[m_segment]);
+		if (m_counter==9)
+			m_segment[4] = data>>4;
 	}
 }
 
@@ -358,28 +403,28 @@ READ8_MEMBER( by35_state::u10_b_r )
 {
 	UINT8 data = 0;
 
-	if (BIT(m_u10_a, 0))
+	if (BIT(m_u10a, 0))
 		data |= m_io_x0->read();
 
-	if (BIT(m_u10_a, 1))
+	if (BIT(m_u10a, 1))
 		data |= m_io_x1->read();
 
-	if (BIT(m_u10_a, 2))
+	if (BIT(m_u10a, 2))
 		data |= m_io_x2->read();
 
-	if (BIT(m_u10_a, 3))
+	if (BIT(m_u10a, 3))
 		data |= m_io_x3->read();
 
-	if (BIT(m_u10_a, 4))
+	if (BIT(m_u10a, 4))
 		data |= m_io_x4->read();
 
-	if (BIT(m_u10_a, 5))
+	if (BIT(m_u10a, 5))
 		data |= m_io_dsw0->read();
 
-	if (BIT(m_u10_a, 6))
+	if (BIT(m_u10a, 6))
 		data |= m_io_dsw1->read();
 
-	if (BIT(m_u10_a, 7))
+	if (BIT(m_u10a, 7))
 		data |= m_io_dsw2->read();
 
 	if (m_u10_cb2)
@@ -390,108 +435,134 @@ READ8_MEMBER( by35_state::u10_b_r )
 
 WRITE8_MEMBER( by35_state::u10_b_w )
 {
-	m_u10_b = data;
+	m_u10b = data;
 }
 
 READ8_MEMBER( by35_state::u11_a_r )
 {
-	return m_u11_a;
+	return m_u11a;
 }
 
 WRITE8_MEMBER( by35_state::u11_a_w )
 {
-	m_u11_a = data;
+	m_u11a = data;
 
-	m_digit = 0xff;
-	if BIT(data, 2)
-		m_digit = 4;
-	else
-	if BIT(data, 3)
-		m_digit = 3;
-	else
-	if BIT(data, 4)
-		m_digit = 2;
-	else
-	if BIT(data, 5)
-		m_digit = 1;
-	else
-	if BIT(data, 6)
-		m_digit = 0;
-	else
-	if BIT(data, 7)
-		m_digit = 5;
+	if (!m_u10_ca2)
+	{
+		if (!m_6d & BIT(data, 1))
+			m_digit = 6;
+		else
+		if BIT(data, 2)
+			m_digit = 5;
+		else
+		if BIT(data, 3)
+			m_digit = 4;
+		else
+		if BIT(data, 4)
+			m_digit = 3;
+		else
+		if BIT(data, 5)
+			m_digit = 2;
+		else
+		if BIT(data, 6)
+			m_digit = 1;
+		else
+		if BIT(data, 7)
+			m_digit = 0;
+
+		if (BIT(data, 0) && (m_counter > 8))
+		{
+			static const UINT8 patterns[16] = { 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7d,0x07,0x7f,0x6f,0,0,0,0,0,0 }; // MC14543
+			output_set_digit_value(m_digit, patterns[m_segment[0]]);
+			output_set_digit_value(10+m_digit, patterns[m_segment[1]]);
+			output_set_digit_value(20+m_digit, patterns[m_segment[2]]);
+			output_set_digit_value(30+m_digit, patterns[m_segment[3]]);
+			output_set_digit_value(40+m_digit, patterns[m_segment[4]]);
+		}
+	}
 }
 
 WRITE8_MEMBER( by35_state::u11_b_w )
 {
-	m_u11_b = data;
-	switch (data & 15)
+	m_u11b = data;
+	if (!m_u11_cb2)
 	{
-		case 0x0: //
-			//m_samples->start(0, 3);
-			break;
-		case 0x1: // chime 10
-			m_samples->start(1, 1);
-			break;
-		case 0x2: // chime 100
-			m_samples->start(2, 2);
-			break;
-		case 0x3: // chime 1000
-			m_samples->start(3, 3);
-			break;
-		case 0x4: // chime 10000
-			m_samples->start(0, 4);
-			break;
-		case 0x5: // knocker
-			m_samples->start(0, 6);
-			break;
-		case 0x6: // outhole
-			m_samples->start(0, 5);
-			break;
-		// from here, vary per game
-		case 0x7:
-		case 0x8:
-		case 0x9:
-			//m_samples->start(0, 5);
-			break;
-		case 0xa:
-			//m_samples->start(0, 5);
-			break;
-		case 0xb:
-			//m_samples->start(0, 0);
-			break;
-		case 0xc:
-			//m_samples->start(0, 5);
-			break;
-		case 0xd:
-			//m_samples->start(0, 0);
-			break;
-		case 0xe:
-			//m_samples->start(0, 5);
-			break;
-		case 0xf: // not used
-			break;
+		switch (data & 15)
+		{
+			// these vary per game
+			case 0x0: //
+				//m_samples->start(0, 3);
+				break;
+			case 0x1: // chime 10
+				//m_samples->start(1, 1);
+				break;
+			case 0x2: // chime 100
+				//m_samples->start(2, 2);
+				break;
+			case 0x3: // chime 1000
+				//m_samples->start(3, 3);
+				break;
+			case 0x4: // chime 10000
+				//m_samples->start(0, 4);
+				break;
+			// these 2 are standard
+			case 0x5: // knocker
+				m_samples->start(0, 6);
+				break;
+			case 0x6: // outhole
+				m_samples->start(0, 5);
+				break;
+			// these vary per game
+			case 0x7:
+			case 0x8:
+			case 0x9:
+				//m_samples->start(0, 5);
+				break;
+			case 0xa:
+				//m_samples->start(0, 5);
+				break;
+			case 0xb:
+				//m_samples->start(0, 0);
+				break;
+			case 0xc:
+				//m_samples->start(0, 5);
+				break;
+			case 0xd:
+				//m_samples->start(0, 0);
+				break;
+			case 0xe:
+				//m_samples->start(0, 5);
+				break;
+			case 0xf: // not used
+				break;
+		}
 	}
 }
 
 void by35_state::machine_reset()
 {
-	m_u10_a = 0;
-	m_u10_b = 0;
+	m_u10a = 0;
+	m_u10b = 0;
 	m_u10_cb2 = 0;
-	m_u11_a = 0;
-	m_u11_b = 0;
+	m_u11a = 0;
+	m_u11b = 0;
 }
 
-DRIVER_INIT_MEMBER(by35_state,by35)
+DRIVER_INIT_MEMBER( by35_state, by35_6 )
 {
+	m_6d = 1;
+}
+
+DRIVER_INIT_MEMBER( by35_state, by35_7 )
+{
+	m_6d = 0;
 }
 
 // zero-cross detection
-TIMER_DEVICE_CALLBACK_MEMBER( by35_state::u10_timer )
+TIMER_DEVICE_CALLBACK_MEMBER( by35_state::timer_x )
 {
-	m_u10_timer ^= 1;
-	m_pia_u10->cb1_w(m_u10_timer);
+	m_timer_x ^= 1;
+	m_pia_u10->cb1_w(m_timer_x);
 }
 
 // 555 timer for display refresh
@@ -524,7 +595,7 @@ static MACHINE_CONFIG_START( by35, by35_state )
 	MCFG_PIA_CB2_HANDLER(WRITELINE(by35_state, u10_cb2_w))
 	MCFG_PIA_IRQA_HANDLER(DEVWRITELINE("maincpu", m6800_cpu_device, irq_line))
 	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE("maincpu", m6800_cpu_device, irq_line))
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_z", by35_state, u10_timer, attotime::from_hz(120)) // mains freq*2
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_x", by35_state, timer_x, attotime::from_hz(120)) // mains freq*2
 
 	MCFG_DEVICE_ADD("pia_u11", PIA6821, 0)
 	MCFG_PIA_READPA_HANDLER(READ8(by35_state, u11_a_r))
@@ -1772,82 +1843,82 @@ ROM_START(suprbowl)
 ROM_END
 
 // AS-2888 sound
-GAME( 1979, sst,        0,        by35, by35, by35_state, by35, ROT0, "Bally","Supersonic", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1978, playboy,    0,        by35, by35, by35_state, by35, ROT0, "Bally","Playboy", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1978, lostwrlp,   0,        by35, by35, by35_state, by35, ROT0, "Bally","Lost World", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1978, smman,      0,        by35, by35, by35_state, by35, ROT0, "Bally","Six Million Dollar Man", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1978, voltan,     0,        by35, by35, by35_state, by35, ROT0, "Bally","Voltan Escapes Cosmic Doom", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1979, startrep,   0,        by35, by35, by35_state, by35, ROT0, "Bally","Star Trek (Pinball)", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1979, kiss,       0,        by35, by35, by35_state, by35, ROT0, "Bally","Kiss", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1979, hglbtrtr,   0,        by35, by35, by35_state, by35, ROT0, "Bally","Harlem Globetrotters On Tour", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1979, dollyptn,   0,        by35, by35, by35_state, by35, ROT0, "Bally","Dolly Parton", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1979, paragon,    0,        by35, by35, by35_state, by35, ROT0, "Bally","Paragon", GAME_IS_SKELETON_MECHANICAL)
+GAME( 1979, sst,        0,        by35, by35, by35_state, by35_6, ROT0, "Bally", "Supersonic", GAME_IS_SKELETON_MECHANICAL)
+GAME( 1978, playboy,    0,        by35, by35, by35_state, by35_6, ROT0, "Bally", "Playboy", GAME_IS_SKELETON_MECHANICAL)
+GAME( 1978, lostwrlp,   0,        by35, by35, by35_state, by35_6, ROT0, "Bally", "Lost World", GAME_IS_SKELETON_MECHANICAL)
+GAME( 1978, smman,      0,        by35, by35, by35_state, by35_6, ROT0, "Bally", "Six Million Dollar Man", GAME_IS_SKELETON_MECHANICAL)
+GAME( 1978, voltan,     0,        by35, by35, by35_state, by35_6, ROT0, "Bally", "Voltan Escapes Cosmic Doom", GAME_IS_SKELETON_MECHANICAL)
+GAME( 1979, startrep,   0,        by35, by35, by35_state, by35_6, ROT0, "Bally", "Star Trek (Pinball)", GAME_IS_SKELETON_MECHANICAL)
+GAME( 1979, kiss,       0,        by35, by35, by35_state, by35_6, ROT0, "Bally", "Kiss", GAME_IS_SKELETON_MECHANICAL)
+GAME( 1979, hglbtrtr,   0,        by35, by35, by35_state, by35_6, ROT0, "Bally", "Harlem Globetrotters On Tour", GAME_IS_SKELETON_MECHANICAL)
+GAME( 1979, dollyptn,   0,        by35, by35, by35_state, by35_6, ROT0, "Bally", "Dolly Parton", GAME_IS_SKELETON_MECHANICAL)
+GAME( 1979, paragon,    0,        by35, by35, by35_state, by35_6, ROT0, "Bally", "Paragon", GAME_IS_SKELETON_MECHANICAL)
 
 // AS-3022 sound
-GAME( 1980, ngndshkr,   0,        by35, by35, by35_state, by35, ROT0, "Bally","Nitro Ground Shaker", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1980, slbmania,   0,        by35, by35, by35_state, by35, ROT0, "Bally","Silverball Mania", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1979, futurspa,   0,        by35, by35, by35_state, by35, ROT0, "Bally","Future Spa", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1980, spaceinv,   0,        by35, by35, by35_state, by35, ROT0, "Bally","Space Invaders", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1980, rollston,   0,        by35, by35, by35_state, by35, ROT0, "Bally","Rolling Stones", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1980, mystic,     0,        by35, by35, by35_state, by35, ROT0, "Bally","Mystic", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1980, xenon,      0,        by35, by35, by35_state, by35, ROT0, "Bally","Xenon", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1980, xenonf,     xenon,    by35, by35, by35_state, by35, ROT0, "Bally","Xenon (French)", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1980, viking,     0,        by35, by35, by35_state, by35, ROT0, "Bally","Viking", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1980, hotdoggn,   0,        by35, by35, by35_state, by35, ROT0, "Bally","Hotdoggin'", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1980, skatebll,   0,        by35, by35, by35_state, by35, ROT0, "Bally","Skateball", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1980, frontier,   0,        by35, by35, by35_state, by35, ROT0, "Bally","Frontier", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1982, speakesy,   0,        by35, by35, by35_state, by35, ROT0, "Bally","Speakeasy", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1982, speakesy4p, speakesy, by35, by35, by35_state, by35, ROT0, "Bally","Speakeasy 4 Player", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1983, bmx,        0,        by35, by35, by35_state, by35, ROT0, "Bally","BMX", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1983, granslam,   0,        by35, by35, by35_state, by35, ROT0, "Bally","Grand Slam", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1983, granslam4,  granslam, by35, by35, by35_state, by35, ROT0, "Bally","Grand Slam (4 Players)", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1983, goldball,   0,        by35, by35, by35_state, by35, ROT0, "Bally","Gold Ball (set 1)", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1983, goldballn,  goldball, by35, by35, by35_state, by35, ROT0, "Bally / Oliver","Gold Ball (set 2)", GAME_IS_SKELETON_MECHANICAL)
+GAME( 1980, ngndshkr,   0,        by35, by35, by35_state, by35_6, ROT0, "Bally", "Nitro Ground Shaker", GAME_IS_SKELETON_MECHANICAL)
+GAME( 1980, slbmania,   0,        by35, by35, by35_state, by35_6, ROT0, "Bally", "Silverball Mania", GAME_IS_SKELETON_MECHANICAL)
+GAME( 1979, futurspa,   0,        by35, by35, by35_state, by35_6, ROT0, "Bally", "Future Spa", GAME_IS_SKELETON_MECHANICAL)
+GAME( 1980, spaceinv,   0,        by35, by35, by35_state, by35_6, ROT0, "Bally", "Space Invaders", GAME_IS_SKELETON_MECHANICAL)
+GAME( 1980, rollston,   0,        by35, by35, by35_state, by35_6, ROT0, "Bally", "Rolling Stones", GAME_IS_SKELETON_MECHANICAL)
+GAME( 1980, mystic,     0,        by35, by35, by35_state, by35_6, ROT0, "Bally", "Mystic", GAME_IS_SKELETON_MECHANICAL)
+GAME( 1980, xenon,      0,        by35, by35, by35_state, by35_6, ROT0, "Bally", "Xenon", GAME_IS_SKELETON_MECHANICAL)
+GAME( 1980, xenonf,     xenon,    by35, by35, by35_state, by35_6, ROT0, "Bally", "Xenon (French)", GAME_IS_SKELETON_MECHANICAL)
+GAME( 1980, viking,     0,        by35, by35, by35_state, by35_6, ROT0, "Bally", "Viking", GAME_IS_SKELETON_MECHANICAL)
+GAME( 1980, hotdoggn,   0,        by35, by35, by35_state, by35_6, ROT0, "Bally", "Hotdoggin'", GAME_IS_SKELETON_MECHANICAL)
+GAME( 1980, skatebll,   0,        by35, by35, by35_state, by35_7, ROT0, "Bally", "Skateball", GAME_IS_SKELETON_MECHANICAL)
+GAME( 1980, frontier,   0,        by35, by35, by35_state, by35_7, ROT0, "Bally", "Frontier", GAME_IS_SKELETON_MECHANICAL)
+GAME( 1982, speakesy,   0,        by35, by35, by35_state, by35_7, ROT0, "Bally", "Speakeasy", GAME_IS_SKELETON_MECHANICAL)
+GAME( 1982, speakesy4p, speakesy, by35, by35, by35_state, by35_7, ROT0, "Bally", "Speakeasy 4 Player", GAME_IS_SKELETON_MECHANICAL)
+GAME( 1983, bmx,        0,        by35, by35, by35_state, by35_7, ROT0, "Bally", "BMX", GAME_IS_SKELETON_MECHANICAL)
+GAME( 1983, granslam,   0,        by35, by35, by35_state, by35_7, ROT0, "Bally", "Grand Slam", GAME_IS_SKELETON_MECHANICAL)
+GAME( 1983, granslam4,  granslam, by35, by35, by35_state, by35_7, ROT0, "Bally", "Grand Slam (4 Players)", GAME_IS_SKELETON_MECHANICAL)
+GAME( 1983, goldball,   0,        by35, by35, by35_state, by35_7, ROT0, "Bally", "Gold Ball (set 1)", GAME_IS_SKELETON_MECHANICAL)
+GAME( 1983, goldballn,  goldball, by35, by35, by35_state, by35_7, ROT0, "Bally / Oliver", "Gold Ball (set 2)", GAME_IS_SKELETON_MECHANICAL)
 
 // Squawk & Talk sound
-GAME( 1981, flashgdn,   0,        by35, by35, by35_state, by35, ROT0, "Bally","Flash Gordon", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1981, flashgdnf,  flashgdn, by35, by35, by35_state, by35, ROT0, "Bally","Flash Gordon (French)", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1981, flashgdnv,  flashgdn, by35, by35, by35_state, by35, ROT0, "Bally","Flash Gordon (Vocalizer sound)", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1981, fball_ii,   0,        by35, by35, by35_state, by35, ROT0, "Bally","Fireball II", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1981, eballdlx,   0,        by35, by35, by35_state, by35, ROT0, "Bally","Eight Ball Deluxe (rev. 15)", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1981, eballd14,   eballdlx, by35, by35, by35_state, by35, ROT0, "Bally","Eight Ball Deluxe (rev. 14)", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1981, embryon,    0,        by35, by35, by35_state, by35, ROT0, "Bally","Embryon", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1981, fathom,     0,        by35, by35, by35_state, by35, ROT0, "Bally","Fathom", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1981, centaur,    0,        by35, by35, by35_state, by35, ROT0, "Bally","Centaur", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1981, medusa,     0,        by35, by35, by35_state, by35, ROT0, "Bally","Medusa", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1982, vector,     0,        by35, by35, by35_state, by35, ROT0, "Bally","Vector", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1981, elektra,    0,        by35, by35, by35_state, by35, ROT0, "Bally","Elektra", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1982, spectrm,    0,        by35, by35, by35_state, by35, ROT0, "Bally","Spectrum", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1982, spectrm4,   spectrm,  by35, by35, by35_state, by35, ROT0, "Bally","Spectrum (ver 4)", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1982, rapidfip,   0,        by35, by35, by35_state, by35, ROT0, "Bally","Rapid Fire", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1982, m_mpac,     0,        by35, by35, by35_state, by35, ROT0, "Bally","Mr. and Mrs. PacMan", GAME_IS_SKELETON_MECHANICAL)
+GAME( 1981, flashgdn,   0,        by35, by35, by35_state, by35_7, ROT0, "Bally", "Flash Gordon", GAME_IS_SKELETON_MECHANICAL)
+GAME( 1981, flashgdnf,  flashgdn, by35, by35, by35_state, by35_7, ROT0, "Bally", "Flash Gordon (French)", GAME_IS_SKELETON_MECHANICAL)
+GAME( 1981, flashgdnv,  flashgdn, by35, by35, by35_state, by35_7, ROT0, "Bally", "Flash Gordon (Vocalizer sound)", GAME_IS_SKELETON_MECHANICAL)
+GAME( 1981, fball_ii,   0,        by35, by35, by35_state, by35_7, ROT0, "Bally", "Fireball II", GAME_IS_SKELETON_MECHANICAL)
+GAME( 1981, eballdlx,   0,        by35, by35, by35_state, by35_7, ROT0, "Bally", "Eight Ball Deluxe (rev. 15)", GAME_IS_SKELETON_MECHANICAL)
+GAME( 1981, eballd14,   eballdlx, by35, by35, by35_state, by35_7, ROT0, "Bally", "Eight Ball Deluxe (rev. 14)", GAME_IS_SKELETON_MECHANICAL)
+GAME( 1981, embryon,    0,        by35, by35, by35_state, by35_7, ROT0, "Bally", "Embryon", GAME_IS_SKELETON_MECHANICAL)
+GAME( 1981, fathom,     0,        by35, by35, by35_state, by35_7, ROT0, "Bally", "Fathom", GAME_IS_SKELETON_MECHANICAL)
+GAME( 1981, centaur,    0,        by35, by35, by35_state, by35_7, ROT0, "Bally", "Centaur", GAME_IS_SKELETON_MECHANICAL)
+GAME( 1981, medusa,     0,        by35, by35, by35_state, by35_7, ROT0, "Bally", "Medusa", GAME_IS_SKELETON_MECHANICAL)
+GAME( 1982, vector,     0,        by35, by35, by35_state, by35_7, ROT0, "Bally", "Vector", GAME_IS_SKELETON_MECHANICAL)
+GAME( 1981, elektra,    0,        by35, by35, by35_state, by35_7, ROT0, "Bally", "Elektra", GAME_IS_SKELETON_MECHANICAL)
+GAME( 1982, spectrm,    0,        by35, by35, by35_state, by35_7, ROT0, "Bally", "Spectrum", GAME_IS_SKELETON_MECHANICAL)
+GAME( 1982, spectrm4,   spectrm,  by35, by35, by35_state, by35_7, ROT0, "Bally", "Spectrum (ver 4)", GAME_IS_SKELETON_MECHANICAL)
+GAME( 1982, rapidfip,   0,        by35, by35, by35_state, by35_7, ROT0, "Bally", "Rapid Fire", GAME_IS_SKELETON_MECHANICAL)
+GAME( 1982, m_mpac,     0,        by35, by35, by35_state, by35_7, ROT0, "Bally", "Mr. and Mrs. PacMan", GAME_IS_SKELETON_MECHANICAL)
 
 // Cheap Squeak sound
-GAME( 1984, kosteel,    0,        by35, by35, by35_state, by35, ROT0, "Bally","Kings of Steel", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1983, xsandos,    0,        by35, by35, by35_state, by35, ROT0, "Bally","X's & O's", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1984, spyhuntr,   0,        by35, by35, by35_state, by35, ROT0, "Bally","Spy Hunter (Pinball)", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1984, fbclass,    0,        by35, by35, by35_state, by35, ROT0, "Bally","Fireball Classic", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1984, blakpyra,   0,        by35, by35, by35_state, by35, ROT0, "Bally","Black Pyramid", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1985, cybrnaut,   0,        by35, by35, by35_state, by35, ROT0, "Bally","Cybernaut", GAME_IS_SKELETON_MECHANICAL)
+GAME( 1984, kosteel,    0,        by35, by35, by35_state, by35_7, ROT0, "Bally", "Kings of Steel", GAME_IS_SKELETON_MECHANICAL)
+GAME( 1983, xsandos,    0,        by35, by35, by35_state, by35_7, ROT0, "Bally", "X's & O's", GAME_IS_SKELETON_MECHANICAL)
+GAME( 1984, spyhuntr,   0,        by35, by35, by35_state, by35_7, ROT0, "Bally", "Spy Hunter (Pinball)", GAME_IS_SKELETON_MECHANICAL)
+GAME( 1984, fbclass,    0,        by35, by35, by35_state, by35_7, ROT0, "Bally", "Fireball Classic", GAME_IS_SKELETON_MECHANICAL)
+GAME( 1984, blakpyra,   0,        by35, by35, by35_state, by35_7, ROT0, "Bally", "Black Pyramid", GAME_IS_SKELETON_MECHANICAL)
+GAME( 1985, cybrnaut,   0,        by35, by35, by35_state, by35_7, ROT0, "Bally", "Cybernaut", GAME_IS_SKELETON_MECHANICAL)
 
 // Other manufacturers
-GAME( 1984, suprbowl,   xsandos,  by35, by35, by35_state, by35, ROT0, "Bell Games","Super Bowl", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1984, tigerrag,   kosteel,  by35, by35, by35_state, by35, ROT0, "Bell Games","Tiger Rag", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1985, cosflash,   flashgdn, by35, by35, by35_state, by35, ROT0, "Bell Games","Cosmic Flash", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1985, newwave,    blakpyra, by35, by35, by35_state, by35, ROT0, "Bell Games","New Wave", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1985, saturn2,    spyhuntr, by35, by35, by35_state, by35, ROT0, "Bell Games","Saturn 2", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1985, worlddef,   0,        by35, by35, by35_state, by35, ROT0, "Bell Games","World Defender", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1986, spacehaw,   cybrnaut, by35, by35, by35_state, by35, ROT0, "Nuova Bell Games","Space Hawks", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1986, darkshad,   0,        by35, by35, by35_state, by35, ROT0, "Nuova Bell Games","Dark Shadow", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1986, skflight,   0,        by35, by35, by35_state, by35, ROT0, "Nuova Bell Games","Skill Flight", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1987, cobrap,     0,        by35, by35, by35_state, by35, ROT0, "Nuova Bell Games","Cobra", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1987, futrquen,   0,        by35, by35, by35_state, by35, ROT0, "Nuova Bell Games","Future Queen", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1987, f1gpp,      0,        by35, by35, by35_state, by35, ROT0, "Nuova Bell Games","F1 Grand Prix", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1988, toppin,     0,        by35, by35, by35_state, by35, ROT0, "Nuova Bell Games","Top Pin", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1988, uboat65,    0,        by35, by35, by35_state, by35, ROT0, "Nuova Bell Games","U-boat 65", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1986, bullseye,   0,        by35, by35, by35_state, by35, ROT0, "Grand Products","301/Bullseye", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1988, bbbowlin,   0,        by35, by35, by35_state, by35, ROT0, "United","Big Ball Bowling (Bowler)", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1988, monrobwl,   0,        by35, by35, by35_state, by35, ROT0, "Monroe Bowling Co.","Stars & Strikes (Bowler)", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1984, mdntmrdr,   0,        by35, by35, by35_state, by35, ROT0, "Bally Midway","Midnight Marauders (Gun game)", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1988, blbeauty,   0,        by35, by35, by35_state, by35, ROT0, "Stern","Black Beauty (Shuffle)", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1984, myststar,   0,        by35, by35, by35_state, by35, ROT0, "Zaccaria","Mystic Star", GAME_IS_SKELETON_MECHANICAL)
+GAME( 1984, suprbowl,   xsandos,  by35, by35, by35_state, by35_7, ROT0, "Bell Games", "Super Bowl", GAME_IS_SKELETON_MECHANICAL)
+GAME( 1984, tigerrag,   kosteel,  by35, by35, by35_state, by35_7, ROT0, "Bell Games", "Tiger Rag", GAME_IS_SKELETON_MECHANICAL)
+GAME( 1985, cosflash,   flashgdn, by35, by35, by35_state, by35_7, ROT0, "Bell Games", "Cosmic Flash", GAME_IS_SKELETON_MECHANICAL)
+GAME( 1985, newwave,    blakpyra, by35, by35, by35_state, by35_7, ROT0, "Bell Games", "New Wave", GAME_IS_SKELETON_MECHANICAL)
+GAME( 1985, saturn2,    spyhuntr, by35, by35, by35_state, by35_7, ROT0, "Bell Games", "Saturn 2", GAME_IS_SKELETON_MECHANICAL)
+GAME( 1985, worlddef,   0,        by35, by35, by35_state, by35_7, ROT0, "Bell Games", "World Defender", GAME_IS_SKELETON_MECHANICAL)
+GAME( 1986, spacehaw,   cybrnaut, by35, by35, by35_state, by35_7, ROT0, "Nuova Bell Games", "Space Hawks", GAME_IS_SKELETON_MECHANICAL)
+GAME( 1986, darkshad,   0,        by35, by35, by35_state, by35_7, ROT0, "Nuova Bell Games", "Dark Shadow", GAME_IS_SKELETON_MECHANICAL)
+GAME( 1986, skflight,   0,        by35, by35, by35_state, by35_7, ROT0, "Nuova Bell Games", "Skill Flight", GAME_IS_SKELETON_MECHANICAL)
+GAME( 1987, cobrap,     0,        by35, by35, by35_state, by35_7, ROT0, "Nuova Bell Games", "Cobra", GAME_IS_SKELETON_MECHANICAL)
+GAME( 1987, futrquen,   0,        by35, by35, by35_state, by35_7, ROT0, "Nuova Bell Games", "Future Queen", GAME_IS_SKELETON_MECHANICAL)
+GAME( 1987, f1gpp,      0,        by35, by35, by35_state, by35_7, ROT0, "Nuova Bell Games", "F1 Grand Prix", GAME_IS_SKELETON_MECHANICAL)
+GAME( 1988, toppin,     0,        by35, by35, by35_state, by35_7, ROT0, "Nuova Bell Games", "Top Pin", GAME_IS_SKELETON_MECHANICAL)
+GAME( 1988, uboat65,    0,        by35, by35, by35_state, by35_7, ROT0, "Nuova Bell Games", "U-boat 65", GAME_IS_SKELETON_MECHANICAL)
+GAME( 1986, bullseye,   0,        by35, by35, by35_state, by35_7, ROT0, "Grand Products", "301/Bullseye", GAME_IS_SKELETON_MECHANICAL)
+GAME( 1988, bbbowlin,   0,        by35, by35, by35_state, by35_7, ROT0, "United", "Big Ball Bowling (Bowler)", GAME_IS_SKELETON_MECHANICAL)
+GAME( 1988, monrobwl,   0,        by35, by35, by35_state, by35_7, ROT0, "Monroe Bowling Co.", "Stars & Strikes (Bowler)", GAME_IS_SKELETON_MECHANICAL)
+GAME( 1984, mdntmrdr,   0,        by35, by35, by35_state, by35_6, ROT0, "Bally Midway", "Midnight Marauders (Gun game)", GAME_IS_SKELETON_MECHANICAL)
+GAME( 1988, blbeauty,   0,        by35, by35, by35_state, by35_7, ROT0, "Stern", "Black Beauty (Shuffle)", GAME_IS_SKELETON_MECHANICAL)
+GAME( 1984, myststar,   0,        by35, by35, by35_state, by35_6, ROT0, "Zaccaria", "Mystic Star", GAME_IS_SKELETON_MECHANICAL)
