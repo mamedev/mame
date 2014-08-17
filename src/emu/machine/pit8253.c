@@ -703,22 +703,7 @@ void pit8253_device::simulate2(pit8253_timer *timer, INT64 elapsed_cycles)
 
 
 /* This emulates timer "timer" for "elapsed_cycles" cycles, broken down into
-   sections punctuated by callbacks.
-
-   The loop technically should never execute even once. It's here to eliminate
-   the following potential bug:
-
-   1) The mame timer isn't perfectly accurate.
-   2) The output callback is executed too late, after an update which
-      brings the timer's local time past the callback time.
-   3) A short pulse is skipped.
-   4) That short pulse would have triggered an interrupt. The interrupt is
-      skipped.
-
-   This is a loop instead of an "if" statement in case the mame timer is
-   inaccurate by more than one cycle, and the output changed multiple
-   times during the discrepancy. In practice updates should still be O(1).
-*/
+   sections punctuated by callbacks. */
 void pit8253_device::simulate(pit8253_timer *timer, INT64 elapsed_cycles)
 {
 	if (elapsed_cycles > 0)
@@ -1061,12 +1046,11 @@ WRITE8_MEMBER( pit8253_device::write )
 void pit8253_device::gate_w(int gate, int state)
 {
 	pit8253_timer *timer = get_timer(gate);
-	assert(timer != 0);
-
-	LOG2(("pit8253 : gate_w(): gate=%d state=%d\n", gate, state));
 
 	if (timer == NULL)
 		return;
+
+	LOG2(("pit8253 : gate_w(): gate=%d state=%d\n", gate, state));
 
 	if (state != timer->gate)
 	{
@@ -1103,7 +1087,7 @@ WRITE_LINE_MEMBER( pit8253_device::write_gate2 )
 void pit8253_device::set_clockin(int timerno, double new_clockin)
 {
 	pit8253_timer *timer = get_timer(timerno);
-	assert(timer != 0);
+	assert(timer != NULL);
 
 	LOG2(("pit8253_set_clockin(): PIT timer=%d, clockin = %lf\n", timerno, new_clockin));
 
@@ -1116,7 +1100,7 @@ void pit8253_device::set_clockin(int timerno, double new_clockin)
 void pit8253_device::set_clock_signal(int timerno, int state)
 {
 	pit8253_timer *timer = get_timer(timerno);
-	assert(timer != 0);
+	assert(timer != NULL);
 
 	LOG2(("pit8253_set_clock_signal(): PIT timer=%d, state = %d\n", timerno, state));
 
