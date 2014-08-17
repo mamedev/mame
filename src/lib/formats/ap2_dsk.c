@@ -611,6 +611,7 @@ bool a2_16sect_format::load(io_generic *io, UINT32 form_factor, floppy_image *im
 		UINT8 sector_data[256*16];
 		int offset = 0;
 		static const unsigned char pascal_block1[4] = { 0x08, 0xa5, 0x0f, 0x29 };
+		static const unsigned char pascal2_block1[4] = { 0xff, 0xa2, 0x00, 0x8e };
 		static const unsigned char dos33_block1[4] = { 0xa2, 0x02, 0x8e, 0x52 };
 		static const unsigned char sos_block1[4] = { 0xc9, 0x20, 0xf0, 0x3e };
 		static const unsigned char a3a2emul_block1[6] = { 0x8d, 0xd0, 0x03, 0x4c, 0xc7, 0xa4 };
@@ -648,6 +649,10 @@ bool a2_16sect_format::load(io_generic *io, UINT32 form_factor, floppy_image *im
 				}
 			}   // check for DOS 3.3 disks in ProDOS order
 			else if (!memcmp(dos33_block1, &sector_data[0x100], 4))
+			{
+				m_prodos_order = true;
+			}	// check for a later version of the Pascal boot block
+			else if (!memcmp(pascal2_block1, &sector_data[0x100], 4))
 			{
 				m_prodos_order = true;
 			}
