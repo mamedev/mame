@@ -21,6 +21,7 @@
 #include "ui/mainmenu.h"
 #include "ui/miscmenu.h"
 #include "ui/viewgfx.h"
+#include "imagedev/cassette.h"
 #include <ctype.h>
 
 
@@ -1550,7 +1551,27 @@ UINT32 ui_manager::handler_ingame(running_machine &machine, render_container *co
 			machine.pause();
 		return machine.ui().set_handler(ui_gfx_ui_handler, is_paused);
 	}
-
+	
+	// handle a tape control key
+	if (ui_input_pressed(machine, IPT_UI_TAPE_START))
+	{
+		cassette_device_iterator cassiter(machine.root_device());
+		for (cassette_image_device *cass = cassiter.first(); cass != NULL; cass = cassiter.next())
+		{
+			cass->change_state(CASSETTE_PLAY, CASSETTE_MASK_UISTATE);
+			return 0;
+		}
+	}
+	if (ui_input_pressed(machine, IPT_UI_TAPE_STOP))
+	{
+		cassette_device_iterator cassiter(machine.root_device());
+		for (cassette_image_device *cass = cassiter.first(); cass != NULL; cass = cassiter.next())
+		{
+			cass->change_state(CASSETTE_STOPPED, CASSETTE_MASK_UISTATE);
+			return 0;
+		}
+	}
+	
 	// handle a save state request
 	if (ui_input_pressed(machine, IPT_UI_SAVE_STATE))
 	{

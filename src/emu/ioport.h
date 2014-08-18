@@ -367,6 +367,8 @@ enum ioport_type
 		IPT_UI_PASTE,
 		IPT_UI_SAVE_STATE,
 		IPT_UI_LOAD_STATE,
+		IPT_UI_TAPE_START,
+		IPT_UI_TAPE_STOP,
 
 		// additional OSD-specified UI port types (up to 16)
 		IPT_OSD_1,
