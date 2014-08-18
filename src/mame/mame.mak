@@ -2666,6 +2666,8 @@ $(DRIVERS)/kungfur.o:   $(LAYOUT)/kungfur.lh
 $(DRIVERS)/lazercmd.o:  $(LAYOUT)/lazercmd.lh \
 			$(LAYOUT)/medlanes.lh
 
+$(DRIVERS)/ltd.o:       $(LAYOUT)/ltd.lh
+
 $(DRIVERS)/luckgrln.o:  $(LAYOUT)/luckgrln.lh
 
 $(DRIVERS)/lucky74.o:   $(LAYOUT)/lucky74.lh
