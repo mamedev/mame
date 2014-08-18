@@ -63,7 +63,6 @@ public:
 	optional_shared_ptr<UINT16> m_vram_2;
 	required_shared_ptr<UINT16> m_spriteram;
 	optional_shared_ptr<UINT16> m_tiletable;
-	UINT16 *    m_tiletable_old;
 	optional_shared_ptr<UINT16> m_blitter_regs;
 	optional_shared_ptr<UINT16> m_scroll;
 	optional_shared_ptr<UINT16> m_window;
@@ -213,7 +212,3 @@ public:
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };
-
-
-/*----------- defined in video/metro.c -----------*/
-void metro_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect);
