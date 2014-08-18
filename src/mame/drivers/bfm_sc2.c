@@ -1629,7 +1629,7 @@ static INPUT_PORTS_START( pyramid )
 	PORT_START("STROBE11")
 	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x00, "DIL:!12" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x00, "DIL:!13" )
-	PORT_DIPNAME( 0x04, 0x00, "Attract mode" ) PORT_DIPLOCATION("DIL:!14")
+	PORT_DIPNAME( 0x04, 0x04, "Attract mode" ) PORT_DIPLOCATION("DIL:!14")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( On  ) )
 	PORT_DIPNAME( 0x18, 0x00, "Stake" ) PORT_DIPLOCATION("DIL:!15,!16")
@@ -1769,7 +1769,7 @@ static INPUT_PORTS_START( qntoond )
 	PORT_DIPNAME( 0x02, 0x00, "Clear credits on reset" )PORT_DIPLOCATION("DIL:!13")
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( Yes  ) )
-	PORT_DIPNAME( 0x04, 0x00, "Attract mode" )PORT_DIPLOCATION("DIL:!14")
+	PORT_DIPNAME( 0x04, 0x04, "Attract mode" )PORT_DIPLOCATION("DIL:!14")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( On  ) )
 	PORT_DIPNAME( 0x08, 0x00, "Attract mode language" )PORT_DIPLOCATION("DIL:!15")
@@ -1876,7 +1876,7 @@ static INPUT_PORTS_START( slotsnl )
 	PORT_MODIFY("STROBE11")
 	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x00, "DIL:!12" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x00, "DIL:!13" )
-	PORT_DIPNAME( 0x04, 0x00, "Attract mode" )PORT_DIPLOCATION("DIL:!14")
+	PORT_DIPNAME( 0x04, 0x04, "Attract mode" )PORT_DIPLOCATION("DIL:!14")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( On  ) )
 	PORT_DIPNAME( 0x18, 0x00, "Timebar speed" )PORT_DIPLOCATION("DIL:!15,!16")
@@ -1952,7 +1952,7 @@ static INPUT_PORTS_START( sltblgtk )
 	PORT_DIPNAME( 0x02, 0x00, "Clear credits" )PORT_DIPLOCATION("DIL:!13")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, "Attract mode" )PORT_DIPLOCATION("DIL:!14")
+	PORT_DIPNAME( 0x04, 0x04, "Attract mode" )PORT_DIPLOCATION("DIL:!14")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off  ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( On   ) )
 	PORT_DIPNAME( 0x08, 0x00, "Show hints" )PORT_DIPLOCATION("DIL:!15")
@@ -2075,7 +2075,7 @@ static INPUT_PORTS_START( paradice )
 	PORT_DIPSETTING(    0x02, "7" )
 	PORT_DIPSETTING(    0x01, "8" )
 	PORT_DIPSETTING(    0x03, "9" )
-	PORT_DIPNAME( 0x04, 0x00, "Attract mode" )PORT_DIPLOCATION("DIL:!14")
+	PORT_DIPNAME( 0x04, 0x04, "Attract mode" )PORT_DIPLOCATION("DIL:!14")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( On  ) )
 	PORT_DIPNAME( 0x18, 0x00, "Timebar speed" )PORT_DIPLOCATION("DIL:!15,!16")
@@ -2127,7 +2127,7 @@ static INPUT_PORTS_START( pokio )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( On  ) )
 	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x00, "DIL:!13" )
-	PORT_DIPNAME( 0x04, 0x00, "Attract mode" )PORT_DIPLOCATION("DIL:!14")
+	PORT_DIPNAME( 0x04, 0x04, "Attract mode" )PORT_DIPLOCATION("DIL:!14")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( On  ) )
 	PORT_DIPNAME( 0x18, 0x00, "Timebar speed" )PORT_DIPLOCATION("DIL:!15,!16")
@@ -7470,19 +7470,26 @@ ROM_END
 
 #define GAME_FLAGS GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL
 
-GAMEL( 1993, qntoondo, qntoond,   scorpion2_vid, qntoond, bfm_sc2_state,   adder_dutch,0,       "BFM/ELAM", "Quintoon (Dutch, Game Card 95-750-136)",       GAME_SUPPORTS_SAVE,layout_quintoon )
 GAMEL( 1993, quintoon, 0,         scorpion2_vid, quintoon, bfm_sc2_state,  quintoon,   0,       "BFM",      "Quintoon (UK, Game Card 95-750-206)",          GAME_SUPPORTS_SAVE|GAME_IMPERFECT_SOUND,layout_quintoon ) //Current samples need verification
 GAMEL( 1993, quintond, quintoon,  scorpion2_vid, quintoon, bfm_sc2_state,  quintoon,   0,       "BFM",      "Quintoon (UK, Game Card 95-751-206, Datapak)",GAME_SUPPORTS_SAVE|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING,layout_quintoon ) //Current samples need verification
 GAMEL( 1993, quintono, quintoon,  scorpion2_vid, quintoon, bfm_sc2_state,  quintoon,   0,       "BFM",      "Quintoon (UK, Game Card 95-750-203)",          GAME_SUPPORTS_SAVE|GAME_IMPERFECT_SOUND,layout_quintoon ) //Current samples need verification
+
 GAMEL( 1993, qntoond,  0,         scorpion2_vid, qntoond, bfm_sc2_state,   adder_dutch,0,       "BFM/ELAM", "Quintoon (Dutch, Game Card 95-750-243)",       GAME_SUPPORTS_SAVE,layout_quintoon )
+GAMEL( 1993, qntoondo, qntoond,   scorpion2_vid, qntoond, bfm_sc2_state,   adder_dutch,0,       "BFM/ELAM", "Quintoon (Dutch, Game Card 95-750-136)",       GAME_SUPPORTS_SAVE,layout_quintoon )
+
 GAMEL( 1994, pokio,    0,         scorpion2_vid, pokio, bfm_sc2_state,     adder_dutch,0,       "BFM/ELAM", "Pokio (Dutch, Game Card 95-750-278)",          GAME_SUPPORTS_SAVE,layout_pokio )
-GAMEL( 1995, slotsnl,  0,         scorpion2_vid, slotsnl, bfm_sc2_state,   adder_dutch,0,       "BFM/ELAM", "Slots (Dutch, Game Card 95-750-368)",          GAME_SUPPORTS_SAVE,layout_slots )
+
 GAMEL( 1995, paradice, 0,         scorpion2_vid, paradice, bfm_sc2_state,  adder_dutch,0,       "BFM/ELAM", "Paradice (Dutch, Game Card 95-750-615)",       GAME_SUPPORTS_SAVE,layout_paradice )
-GAMEL( 1996, pyramid,  0,         scorpion2_vid, pyramid, bfm_sc2_state,   pyramid, 0,       "BFM/ELAM", "Pyramid (Dutch, Game Card 95-750-898)",       GAME_SUPPORTS_SAVE,layout_pyramid )
+
+GAMEL( 1996, pyramid,  0,         scorpion2_vid, pyramid, bfm_sc2_state,   pyramid, 0,          "BFM/ELAM", "Pyramid (Dutch, Game Card 95-750-898)",       GAME_SUPPORTS_SAVE,layout_pyramid )
+
+GAMEL( 1995, slotsnl,  0,         scorpion2_vid, slotsnl, bfm_sc2_state,   adder_dutch,0,       "BFM/ELAM", "Slots (Dutch, Game Card 95-750-368)",          GAME_SUPPORTS_SAVE,layout_slots )
 
 GAMEL( 1996, sltblgtk, 0,         scorpion2_vid, sltblgtk, bfm_sc2_state,  sltsbelg,   0,       "BFM/ELAM", "Slots (Belgian Token, Game Card 95-750-943)",  GAME_SUPPORTS_SAVE,layout_sltblgtk )
+
 GAMEL( 1996, sltblgpo, 0,         scorpion2_vid, sltblgpo, bfm_sc2_state,  sltsbelg,   0,       "BFM/ELAM", "Slots (Belgian Cash, Game Card 95-750-938)",   GAME_SUPPORTS_SAVE,layout_sltblgpo )
 GAMEL( 1996, sltblgp1, sltblgpo,  scorpion2_vid, sltblgpo, bfm_sc2_state,  sltsbelg,   0,       "BFM/ELAM", "Slots (Belgian Cash, Game Card 95-752-008)",   GAME_SUPPORTS_SAVE,layout_sltblgpo )
+
 GAMEL( 1997, gldncrwn, 0,         scorpion2_vid, gldncrwn, bfm_sc2_state,  gldncrwn,   0,       "BFM/ELAM", "Golden Crown (Dutch, Game Card 95-752-011)",   GAME_SUPPORTS_SAVE,layout_gldncrwn )
 
 /* Non-Video */
