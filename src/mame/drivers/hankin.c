@@ -7,7 +7,6 @@
 
 ToDo:
 - High score isn't saved or remembered
-- Display should be flouro blue 12-segment
 - Sound
 - Mechanical
 
@@ -254,14 +253,18 @@ WRITE8_MEMBER( hankin_state::ic10_a_w )
 		if BIT(data, 7)
 			m_digit = 0;
 
+		// This machine has a 10-segment display, however the only
+		// use is to place the '1' digit in the centre segments.
 		if (BIT(data, 0) && (m_counter > 8))
 		{
-			static const UINT8 patterns[16] = { 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7d,0x07,0x7f,0x6f,0,0,0,0,0,0 }; // MC14543
-			output_set_digit_value(m_digit, patterns[m_segment[0]]);
-			output_set_digit_value(10+m_digit, patterns[m_segment[1]]);
-			output_set_digit_value(20+m_digit, patterns[m_segment[2]]);
-			output_set_digit_value(30+m_digit, patterns[m_segment[3]]);
-			output_set_digit_value(40+m_digit, patterns[m_segment[4]]);
+			static const UINT8 patterns[16] = { 0x3f,0x80,0x5b,0x4f,0x66,0x6d,0x7d,0x07,0x7f,0x6f,0,0,0,0,0,0 }; // MC14543 with '1' adjusted
+			UINT16 i, seg1, seg2;
+			for (i = 0; i < 5; i++)
+			{
+				seg1 = patterns[m_segment[i]];
+				seg2 = BITSWAP16(seg1, 8, 8, 8, 8, 8, 8, 7, 7, 6, 6, 5, 4, 3, 2, 1, 0);
+				output_set_digit_value(i*10+m_digit, seg2);
+			}
 		}
 	}
 }
@@ -383,10 +386,6 @@ void hankin_state::machine_reset()
 {
 }
 
-DRIVER_INIT_MEMBER(hankin_state,hankin)
-{
-}
-
 static MACHINE_CONFIG_START( hankin, hankin_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6802, 3276800)
@@ -493,8 +492,8 @@ ROM_START(empsback)
 ROM_END
 
 
-GAME(1978,  fjholden,  0,  hankin,  hankin, hankin_state,  hankin,  ROT0,  "Hankin", "FJ Holden", GAME_IS_SKELETON_MECHANICAL)
-GAME(1980,  howzat,    0,  hankin,  hankin, hankin_state,  hankin,  ROT0,  "Hankin", "Howzat!", GAME_IS_SKELETON_MECHANICAL)
-GAME(1978,  orbit1,    0,  hankin,  hankin, hankin_state,  hankin,  ROT0,  "Hankin", "Orbit 1", GAME_IS_SKELETON_MECHANICAL)
-GAME(1980,  shark,     0,  hankin,  hankin, hankin_state,  hankin,  ROT0,  "Hankin", "Shark", GAME_IS_SKELETON_MECHANICAL)
-GAME(1981,  empsback,  0,  hankin,  hankin, hankin_state,  hankin,  ROT0,  "Hankin", "The Empire Strike Back", GAME_IS_SKELETON_MECHANICAL)
+GAME(1978,  fjholden,  0,  hankin,  hankin, driver_device, 0,  ROT0,  "Hankin", "FJ Holden", GAME_MECHANICAL | GAME_NO_SOUND )
+GAME(1978,  orbit1,    0,  hankin,  hankin, driver_device, 0,  ROT0,  "Hankin", "Orbit 1", GAME_MECHANICAL | GAME_NO_SOUND )
+GAME(1980,  shark,     0,  hankin,  hankin, driver_device, 0,  ROT0,  "Hankin", "Shark", GAME_MECHANICAL | GAME_NO_SOUND )
+GAME(1980,  howzat,    0,  hankin,  hankin, driver_device, 0,  ROT0,  "Hankin", "Howzat!", GAME_MECHANICAL | GAME_NO_SOUND )
+GAME(1981,  empsback,  0,  hankin,  hankin, driver_device, 0,  ROT0,  "Hankin", "The Empire Strike Back", GAME_MECHANICAL | GAME_NO_SOUND )
