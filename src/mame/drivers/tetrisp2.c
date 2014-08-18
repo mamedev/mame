@@ -1271,6 +1271,8 @@ void tetrisp2_state::init_rockn_timer()
 	save_item(NAME(m_rockn_protectdata));
 	save_item(NAME(m_rockn_adpcmbank));
 	save_item(NAME(m_rockn_soundvolume));
+	save_item(NAME(m_rocknms_main2sub));
+	save_item(NAME(m_rocknms_sub2main));
 }
 
 DRIVER_INIT_MEMBER(tetrisp2_state,rockn)
