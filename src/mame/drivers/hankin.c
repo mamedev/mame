@@ -7,7 +7,7 @@
 
 ToDo:
 - High score isn't saved or remembered
-- Sound
+- Sound needs to be verified with original
 - Mechanical
 
 ***********************************************************************************/
@@ -15,6 +15,7 @@ ToDo:
 #include "machine/genpin.h"
 #include "cpu/m6800/m6800.h"
 #include "machine/6821pia.h"
+#include "sound/dac.h"
 #include "hankin.lh"
 
 class hankin_state : public genpin_class
@@ -27,6 +28,7 @@ public:
 		, m_ic10(*this, "ic10")
 		, m_ic11(*this, "ic11")
 		, m_ic2(*this, "ic2")
+		, m_dac(*this, "dac")
 		, m_io_test(*this, "TEST")
 		, m_io_dsw0(*this, "DSW0")
 		, m_io_dsw1(*this, "DSW1")
@@ -38,32 +40,47 @@ public:
 		, m_io_x4(*this, "X4")
 	{ }
 
-	DECLARE_DRIVER_INIT(hankin);
 	DECLARE_WRITE_LINE_MEMBER(ic10_ca2_w);
 	DECLARE_WRITE_LINE_MEMBER(ic10_cb2_w);
 	DECLARE_WRITE_LINE_MEMBER(ic11_ca2_w);
 	DECLARE_WRITE_LINE_MEMBER(ic11_cb2_w);
+	DECLARE_WRITE_LINE_MEMBER(ic2_ca2_w);
+	DECLARE_WRITE_LINE_MEMBER(ic2_cb2_w);
 	DECLARE_WRITE8_MEMBER(ic10_a_w);
 	DECLARE_WRITE8_MEMBER(ic10_b_w);
 	DECLARE_WRITE8_MEMBER(ic11_a_w);
+	DECLARE_WRITE8_MEMBER(ic2_b_w);
+	DECLARE_WRITE8_MEMBER(ic2_a_w);
 	DECLARE_READ8_MEMBER(ic11_b_r);
+	DECLARE_READ8_MEMBER(ic2_a_r);
 	DECLARE_INPUT_CHANGED_MEMBER(self_test);
+	TIMER_DEVICE_CALLBACK_MEMBER(timer_s);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_x);
 private:
 	bool m_timer_x;
+	bool m_timer_sb;
+	UINT8 m_timer_s[3];
+	UINT8 m_vol;
+	UINT8 m_ic2a;
+	UINT8 m_ic2b;
 	UINT8 m_ic10a;
+	UINT8 m_ic10b;
 	UINT8 m_ic11a;
 	bool m_ic11_ca2;
 	bool m_ic10_cb2;
+	bool m_ic2_ca2;
+	bool m_ic2_cb2;
 	UINT8 m_counter;
 	UINT8 m_digit;
 	UINT8 m_segment[5];
+	UINT8 *m_p_prom;
 	virtual void machine_reset();
 	required_device<m6802_cpu_device> m_maincpu;
 	required_device<m6802_cpu_device> m_audiocpu;
 	required_device<pia6821_device> m_ic10;
 	required_device<pia6821_device> m_ic11;
 	required_device<pia6821_device> m_ic2;
+	required_device<dac_device> m_dac;
 	required_ioport m_io_test;
 	required_ioport m_io_dsw0;
 	required_ioport m_io_dsw1;
@@ -117,7 +134,7 @@ static INPUT_PORTS_START( hankin )
 	PORT_DIPSETTING(    0x20, "1")
 	PORT_DIPSETTING(    0x40, "2")
 	PORT_DIPSETTING(    0x60, "3")
-	PORT_DIPNAME( 0x80, 0x00, "Game Over Tune")
+	PORT_DIPNAME( 0x80, 0x80, "Game Over Tune")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
 	PORT_DIPSETTING(    0x80, DEF_STR( On ))
 
@@ -271,6 +288,8 @@ WRITE8_MEMBER( hankin_state::ic10_a_w )
 
 WRITE8_MEMBER( hankin_state::ic10_b_w )
 {
+	m_ic10b = data;
+
 	if (!m_ic10_cb2)
 	{
 		switch (data & 15)
@@ -299,6 +318,7 @@ WRITE_LINE_MEMBER( hankin_state::ic10_ca2_w )
 {
 	output_set_value("led0", !state);
 	// also sound strobe
+	m_ic2->ca1_w(state);
 }
 
 WRITE_LINE_MEMBER( hankin_state::ic10_cb2_w )
@@ -382,8 +402,79 @@ TIMER_DEVICE_CALLBACK_MEMBER( hankin_state::timer_x )
 	m_ic11->cb1_w(m_timer_x);
 }
 
+// Sound
+// 555 osc at 47kHz
+// Then optional divide by 2 controlled by CA2
+// Then presettable 74LS161 binary divider controlled by PB0-3
+// Then a pair of 7493 to generate 5 address lines, enabled by CB2
+// The address lines are merged with PA4-7 to form a lookup on the prom
+// Output of prom goes to a 4-bit DAC
+// Volume is controlled by PB4-7
+// Variables:
+// m_timer_s[0] inc each timer cycle, bit 0 = 47k, bit 1 = 23.5k
+// m_timer_s[1] count in 74LS161
+// m_timer_s[2] count in 7493s
+// m_timer_sb   wanted output of m_timer_s[0]
+TIMER_DEVICE_CALLBACK_MEMBER( hankin_state::timer_s )
+{
+	m_timer_s[0]++;
+	bool cs = (m_ic2_ca2) ? BIT(m_timer_s[0], 0) : BIT(m_timer_s[0], 1); // divide by 2 stage
+	if (cs != m_timer_sb)
+	{
+		m_timer_sb = cs;
+		m_timer_s[1]++;
+		if (m_timer_s[1] > 15)
+		{
+			m_timer_s[1] = m_ic2b & 15; // set to preset value
+			if (!m_ic2_cb2)
+			{
+				m_timer_s[2]++;
+				offs_t offs = (m_timer_s[2] & 31) | (m_ic2a << 5);
+				m_dac->write_unsigned8(m_p_prom[offs]<< m_vol);
+			}
+			else
+				m_timer_s[2] = 0;
+		}
+	}
+}
+
 void hankin_state::machine_reset()
 {
+	m_p_prom = memregion("roms")->base() + 0x1800;
+}
+
+// PA0-3 = sound data from main cpu
+READ8_MEMBER( hankin_state::ic2_a_r )
+{
+	return m_ic10b;
+}
+
+// PA4-7 = sound data to prom
+WRITE8_MEMBER( hankin_state::ic2_a_w )
+{
+	m_ic2a = data >> 4;
+	offs_t offs = (m_timer_s[2] & 31) | (m_ic2a << 5);
+	m_dac->write_unsigned8(m_p_prom[offs]<< m_vol);
+}
+
+// PB0-3 = preset on 74LS161
+// PB4-7 = volume
+WRITE8_MEMBER( hankin_state::ic2_b_w )
+{
+	m_ic2b = data;
+	m_vol = (m_ic2b & 0xf0) / 50; // 0 to 4
+}
+
+// low to divide 555 by 2
+WRITE_LINE_MEMBER( hankin_state::ic2_ca2_w )
+{
+	m_ic2_ca2 = state;
+}
+
+// low to enable 7493 dividers
+WRITE_LINE_MEMBER( hankin_state::ic2_cb2_w )
+{
+	m_ic2_cb2 = state;
 }
 
 static MACHINE_CONFIG_START( hankin, hankin_state )
@@ -401,6 +492,10 @@ static MACHINE_CONFIG_START( hankin, hankin_state )
 
 	/* Sound */
 	MCFG_FRAGMENT_ADD( genpin_audio )
+
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* Devices */
 	MCFG_DEVICE_ADD("ic10", PIA6821, 0)
@@ -424,16 +519,17 @@ static MACHINE_CONFIG_START( hankin, hankin_state )
 	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE("maincpu", m6802_cpu_device, irq_line))
 
 	MCFG_DEVICE_ADD("ic2", PIA6821, 0)
-	//MCFG_PIA_READPA_HANDLER(READ8(hankin_state, ic2_a_r))
-	//MCFG_PIA_WRITEPA_HANDLER(WRITE8(hankin_state, ic2_a_w))
+	MCFG_PIA_READPA_HANDLER(READ8(hankin_state, ic2_a_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(hankin_state, ic2_a_w))
 	//MCFG_PIA_READPB_HANDLER(READ8(hankin_state, ic2_b_r))
-	//MCFG_PIA_WRITEPB_HANDLER(WRITE8(hankin_state, ic2_b_w))
-	//MCFG_PIA_CA2_HANDLER(WRITELINE(hankin_state, ic2_ca2_w))
-	//MCFG_PIA_CB2_HANDLER(WRITELINE(hankin_state, ic2_cb2_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(hankin_state, ic2_b_w))
+	MCFG_PIA_CA2_HANDLER(WRITELINE(hankin_state, ic2_ca2_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(hankin_state, ic2_cb2_w))
 	MCFG_PIA_IRQA_HANDLER(DEVWRITELINE("audiocpu", m6802_cpu_device, irq_line))
 	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE("audiocpu", m6802_cpu_device, irq_line))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_x", hankin_state, timer_x, attotime::from_hz(120)) // mains freq*2
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_s", hankin_state, timer_s, attotime::from_hz(94000)) // 555 on sound board*2
 MACHINE_CONFIG_END
 
 /*--------------------------------
@@ -492,8 +588,8 @@ ROM_START(empsback)
 ROM_END
 
 
-GAME(1978,  fjholden,  0,  hankin,  hankin, driver_device, 0,  ROT0,  "Hankin", "FJ Holden", GAME_MECHANICAL | GAME_NO_SOUND )
-GAME(1978,  orbit1,    0,  hankin,  hankin, driver_device, 0,  ROT0,  "Hankin", "Orbit 1", GAME_MECHANICAL | GAME_NO_SOUND )
-GAME(1980,  shark,     0,  hankin,  hankin, driver_device, 0,  ROT0,  "Hankin", "Shark", GAME_MECHANICAL | GAME_NO_SOUND )
-GAME(1980,  howzat,    0,  hankin,  hankin, driver_device, 0,  ROT0,  "Hankin", "Howzat!", GAME_MECHANICAL | GAME_NO_SOUND )
-GAME(1981,  empsback,  0,  hankin,  hankin, driver_device, 0,  ROT0,  "Hankin", "The Empire Strike Back", GAME_MECHANICAL | GAME_NO_SOUND )
+GAME(1978,  fjholden,  0,  hankin,  hankin, driver_device, 0,  ROT0,  "Hankin", "FJ Holden", GAME_MECHANICAL )
+GAME(1978,  orbit1,    0,  hankin,  hankin, driver_device, 0,  ROT0,  "Hankin", "Orbit 1", GAME_MECHANICAL )
+GAME(1980,  shark,     0,  hankin,  hankin, driver_device, 0,  ROT0,  "Hankin", "Shark", GAME_MECHANICAL )
+GAME(1980,  howzat,    0,  hankin,  hankin, driver_device, 0,  ROT0,  "Hankin", "Howzat!", GAME_MECHANICAL )
+GAME(1981,  empsback,  0,  hankin,  hankin, driver_device, 0,  ROT0,  "Hankin", "The Empire Strike Back", GAME_MECHANICAL )
