@@ -72,9 +72,10 @@ private:
 	bool m_timer_x;
 	bool m_u11_timer;
 	bool m_su; // speech unit fitted yes/no
-	bool m_6d; // 6-digit display yes/no
+	bool m_7d; // 7-digit display yes/no
 	UINT8 m_digit;
 	UINT8 m_counter;
+	UINT8 m_segment[5];
 	virtual void machine_reset();
 	required_device<m6800_cpu_device> m_maincpu;
 	optional_device<s14001a_device> m_s14001a;
@@ -362,31 +363,26 @@ READ8_MEMBER( st_mp200_state::u10_a_r )
 
 WRITE8_MEMBER( st_mp200_state::u10_a_w )
 {
-	static const UINT8 patterns[16] = { 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7d,0x07,0x7f,0x6f,0,0,0,0,0,0 }; // MC14543
 	m_u10a = data;
 
 	if (!m_u10_ca2)
 	{
 		m_counter++;
-		UINT8 segment = data >> 4;
-
-		if (m_6d && !m_digit && (m_counter < 6))
-			m_digit = 6; // handle 6-digit display
 
 		if (m_counter==1)
-			output_set_digit_value(m_digit, patterns[segment]);
+			m_segment[0] = data>>4;
 		else
 		if (m_counter==3)
-			output_set_digit_value(10+m_digit, patterns[segment]);
+			m_segment[1] = data>>4;
 		else
 		if (m_counter==5)
-			output_set_digit_value(20+m_digit, patterns[segment]);
+			m_segment[2] = data>>4;
 		else
-		if (m_counter==8)
-			output_set_digit_value(30+m_digit, patterns[segment]);
+		if (m_counter==7)
+			m_segment[3] = data>>4;
 		else
-		if (m_counter==10)
-			output_set_digit_value(40+m_digit, patterns[segment]);
+		if (m_counter==9)
+			m_segment[4] = data>>4;
 	}
 }
 
@@ -440,7 +436,7 @@ WRITE8_MEMBER( st_mp200_state::u11_a_w )
 
 	if (!m_u10_ca2)
 	{
-		if BIT(data, 1)
+		if (m_7d & BIT(data, 1))
 			m_digit = 6;
 		else
 		if BIT(data, 2)
@@ -461,7 +457,15 @@ WRITE8_MEMBER( st_mp200_state::u11_a_w )
 		if BIT(data, 7)
 			m_digit = 0;
 
-		m_counter++;
+		if (BIT(data, 0) && (m_counter > 8))
+		{
+			static const UINT8 patterns[16] = { 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7d,0x07,0x7f,0x6f,0,0,0,0,0,0 }; // MC14543
+			output_set_digit_value(m_digit, patterns[m_segment[0]]);
+			output_set_digit_value(10+m_digit, patterns[m_segment[1]]);
+			output_set_digit_value(20+m_digit, patterns[m_segment[2]]);
+			output_set_digit_value(30+m_digit, patterns[m_segment[3]]);
+			output_set_digit_value(40+m_digit, patterns[m_segment[4]]);
+		}
 	}
 }
 
@@ -531,19 +535,19 @@ void st_mp200_state::machine_reset()
 
 DRIVER_INIT_MEMBER( st_mp200_state, st_mp200 )
 {
-	m_6d = 0;
+	m_7d = 1;
 	m_su = 0;
 }
 
 DRIVER_INIT_MEMBER( st_mp200_state, st_mp201 )
 {
-	m_6d = 0;
+	m_7d = 1;
 	m_su = 1;
 }
 
 DRIVER_INIT_MEMBER( st_mp200_state, st_mp202 )
 {
-	m_6d = 1;
+	m_7d = 0;
 	m_su = 0;
 }
 

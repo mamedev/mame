@@ -42,7 +42,6 @@ public:
 		, m_io_x4(*this, "X4")
 	{ }
 
-	DECLARE_DRIVER_INIT(by17);
 	DECLARE_READ8_MEMBER(u10_a_r);
 	DECLARE_WRITE8_MEMBER(u10_a_w);
 	DECLARE_READ8_MEMBER(u10_b_r);
@@ -56,20 +55,21 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(u11_cb2_w);
 	DECLARE_INPUT_CHANGED_MEMBER(activity_test);
 	DECLARE_INPUT_CHANGED_MEMBER(self_test);
-	TIMER_DEVICE_CALLBACK_MEMBER(u10_timer);
+	TIMER_DEVICE_CALLBACK_MEMBER(timer_x);
 	TIMER_DEVICE_CALLBACK_MEMBER(u11_timer);
 private:
-	UINT8 m_u10;
-	UINT8 m_u10_a;
-	UINT8 m_u10_b;
-	UINT8 m_u11_a;
-	UINT8 m_u11_b;
+	UINT8 m_u10a;
+	UINT8 m_u10b;
+	UINT8 m_u11a;
+	UINT8 m_u11b;
 	bool m_u10_ca2;
 	bool m_u10_cb2;
-	bool m_u10_timer;
+	bool m_u11_cb2;
+	bool m_timer_x;
 	bool m_u11_timer;
 	UINT8 m_digit;
-	UINT8 m_segment;
+	UINT8 m_counter;
+	UINT8 m_segment[5];
 	virtual void machine_reset();
 	required_device<m6800_cpu_device> m_maincpu;
 	required_device<pia6821_device> m_pia_u10;
@@ -308,8 +308,10 @@ INPUT_CHANGED_MEMBER( by17_state::self_test )
 WRITE_LINE_MEMBER( by17_state::u10_ca2_w )
 {
 	m_u10_ca2 = state;
+	if (!state)
+		m_counter = 0;
 }
-		
+
 WRITE_LINE_MEMBER( by17_state::u10_cb2_w )
 {
 }
@@ -321,36 +323,36 @@ WRITE_LINE_MEMBER( by17_state::u11_ca2_w )
 
 WRITE_LINE_MEMBER( by17_state::u11_cb2_w )
 {
+	m_u11_cb2 = state;
 }
 
 READ8_MEMBER( by17_state::u10_a_r )
 {
-	return m_u10_a;
+	return m_u10a;
 }
 
 WRITE8_MEMBER( by17_state::u10_a_w )
 {
-	static const UINT8 patterns[16] = { 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7d,0x07,0x7f,0x6f,0,0,0,0,0,0 }; // MC14543
-	m_segment = data >> 4;
-	m_u10_a = data;
-	m_u10 = (data & 15) | (BIT(m_u11_a, 0) << 4);
+	m_u10a = data;
 
 	if (!m_u10_ca2)
 	{
-		if (!BIT(m_u10, 0))
-			output_set_digit_value(m_digit, patterns[m_segment]);
+		m_counter++;
+
+		if (m_counter==1)
+			m_segment[0] = data>>4;
 		else
-		if (m_u10==0x1d)
-			output_set_digit_value(8+m_digit, patterns[m_segment]);
+		if (m_counter==3)
+			m_segment[1] = data>>4;
 		else
-		if (m_u10==0x1b)
-			output_set_digit_value(16+m_digit, patterns[m_segment]);
+		if (m_counter==5)
+			m_segment[2] = data>>4;
 		else
-		if (m_u10==0x07)
-			output_set_digit_value(24+m_digit, patterns[m_segment]);
+		if (m_counter==7)
+			m_segment[3] = data>>4;
 		else
-		if (!BIT(m_u10, 4))
-			output_set_digit_value(32+m_digit, patterns[m_segment]);
+		if (m_counter==9)
+			m_segment[4] = data>>4;
 	}
 }
 
@@ -358,28 +360,28 @@ READ8_MEMBER( by17_state::u10_b_r )
 {
 	UINT8 data = 0;
 
-	if (BIT(m_u10_a, 0))
+	if (BIT(m_u10a, 0))
 		data |= m_io_x0->read();
 
-	if (BIT(m_u10_a, 1))
+	if (BIT(m_u10a, 1))
 		data |= m_io_x1->read();
 
-	if (BIT(m_u10_a, 2))
+	if (BIT(m_u10a, 2))
 		data |= m_io_x2->read();
 
-	if (BIT(m_u10_a, 3))
+	if (BIT(m_u10a, 3))
 		data |= m_io_x3->read();
 
-	if (BIT(m_u10_a, 4))
+	if (BIT(m_u10a, 4))
 		data |= m_io_x4->read();
 
-	if (BIT(m_u10_a, 5))
+	if (BIT(m_u10a, 5))
 		data |= m_io_dsw0->read();
 
-	if (BIT(m_u10_a, 6))
+	if (BIT(m_u10a, 6))
 		data |= m_io_dsw1->read();
 
-	if (BIT(m_u10_a, 7))
+	if (BIT(m_u10a, 7))
 		data |= m_io_dsw2->read();
 
 	if (m_u10_cb2)
@@ -390,100 +392,111 @@ READ8_MEMBER( by17_state::u10_b_r )
 
 WRITE8_MEMBER( by17_state::u10_b_w )
 {
-	m_u10_b = data;
+	m_u10b = data;
 }
 
 READ8_MEMBER( by17_state::u11_a_r )
 {
-	return m_u11_a;
+	return m_u11a;
 }
 
 WRITE8_MEMBER( by17_state::u11_a_w )
 {
-	m_u11_a = data;
+	m_u11a = data;
 
-	m_digit = 0xff;
-	if BIT(data, 2)
-		m_digit = 4;
-	else
-	if BIT(data, 3)
-		m_digit = 3;
-	else
-	if BIT(data, 4)
-		m_digit = 2;
-	else
-	if BIT(data, 5)
-		m_digit = 1;
-	else
-	if BIT(data, 6)
-		m_digit = 0;
-	else
-	if BIT(data, 7)
-		m_digit = 5;
+	if (!m_u10_ca2)
+	{
+		if BIT(data, 2)
+			m_digit = 5;
+		else
+		if BIT(data, 3)
+			m_digit = 4;
+		else
+		if BIT(data, 4)
+			m_digit = 3;
+		else
+		if BIT(data, 5)
+			m_digit = 2;
+		else
+		if BIT(data, 6)
+			m_digit = 1;
+		else
+		if BIT(data, 7)
+			m_digit = 0;
+
+		if (BIT(data, 0) && (m_counter > 8))
+		{
+			static const UINT8 patterns[16] = { 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7d,0x07,0x7f,0x6f,0,0,0,0,0,0 }; // MC14543
+			output_set_digit_value(m_digit, patterns[m_segment[0]]);
+			output_set_digit_value(10+m_digit, patterns[m_segment[1]]);
+			output_set_digit_value(20+m_digit, patterns[m_segment[2]]);
+			output_set_digit_value(30+m_digit, patterns[m_segment[3]]);
+			output_set_digit_value(40+m_digit, patterns[m_segment[4]]);
+		}
+	}
 }
 
 WRITE8_MEMBER( by17_state::u11_b_w )
 {
-	m_u11_b = data;
-	switch (data & 15)
+	m_u11b = data;
+	if (!m_u11_cb2)
 	{
-		case 0x0: // chime 10
-			m_samples->start(1, 1);
-			break;
-		case 0x1: // chime 100
-			m_samples->start(2, 2);
-			break;
-		case 0x2: // chime 1000
-			m_samples->start(3, 3);
-			break;
-		case 0x3: // chime 10000
-			m_samples->start(0, 4);
-			break;
-		case 0x4:
-			break;
-		case 0x5: // knocker
-			m_samples->start(0, 6);
-			break;
-		case 0x6: // outhole
-			m_samples->start(0, 5);
-			break;
-		// from here, vary per game
-		case 0x7:
-		case 0x8:
-		case 0x9:
-			break;
-		case 0xa:
-		case 0xb:
-		case 0xc: // bumpers
-			m_samples->start(0, 0);
-			break;
-		case 0xd:
-		case 0xe:
-		case 0xf:
-			break;
+		switch (data & 15)
+		{
+			case 0x0: // chime 10
+				m_samples->start(1, 1);
+				break;
+			case 0x1: // chime 100
+				m_samples->start(2, 2);
+				break;
+			case 0x2: // chime 1000
+				m_samples->start(3, 3);
+				break;
+			case 0x3: // chime 10000
+				m_samples->start(0, 4);
+				break;
+			case 0x4:
+				break;
+			case 0x5: // knocker
+				m_samples->start(0, 6);
+				break;
+			case 0x6: // outhole
+				m_samples->start(0, 5);
+				break;
+			// from here, vary per game
+			case 0x7:
+			case 0x8:
+			case 0x9:
+				break;
+			case 0xa:
+			case 0xb:
+			case 0xc: // bumpers
+				m_samples->start(0, 0);
+				break;
+			case 0xd:
+			case 0xe:
+			case 0xf:
+				break;
+		}
 	}
 }
 
 void by17_state::machine_reset()
 {
-	m_u10_a = 0;
-	m_u10_b = 0;
+	m_u10a = 0;
+	m_u10b = 0;
 	m_u10_cb2 = 0;
-	m_u11_a = 0;
-	m_u11_b = 0;
-	m_u10_timer = 0;
+	m_u11a = 0;
+	m_u11b = 0;
+	m_timer_x = 0;
 	m_u11_timer = 0;
 }
 
-DRIVER_INIT_MEMBER( by17_state, by17 )
-{
-}
-
 // zero-cross detection
-TIMER_DEVICE_CALLBACK_MEMBER( by17_state::u10_timer )
+TIMER_DEVICE_CALLBACK_MEMBER( by17_state::timer_x )
 {
-	m_u10_timer ^= 1;
-	m_pia_u10->cb1_w(m_u10_timer);
+	m_timer_x ^= 1;
+	m_pia_u10->cb1_w(m_timer_x);
 }
 
 // 555 timer for display refresh
@@ -516,7 +529,7 @@ static MACHINE_CONFIG_START( by17, by17_state )
 	MCFG_PIA_CB2_HANDLER(WRITELINE(by17_state, u10_cb2_w))
 	MCFG_PIA_IRQA_HANDLER(DEVWRITELINE("maincpu", m6800_cpu_device, irq_line))
 	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE("maincpu", m6800_cpu_device, irq_line))
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_z", by17_state, u10_timer, attotime::from_hz(120)) // mains freq*2
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_x", by17_state, timer_x, attotime::from_hz(120)) // mains freq*2
 
 	MCFG_DEVICE_ADD("pia_u11", PIA6821, 0)
 	MCFG_PIA_READPA_HANDLER(READ8(by17_state, u11_a_r))
@@ -627,13 +640,13 @@ ROM_END
 /---------------------------------------------------------------*/
 
 
-GAME( 1976, bowarrow, 0,        by17, by17, by17_state, by17, ROT0, "Bally", "Bow & Arrow (Prototype)", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1977, freedom,  0,        by17, by17, by17_state, by17, ROT0, "Bally", "Freedom", GAME_MECHANICAL)
-GAME( 1977, nightrdr, 0,        by17, by17, by17_state, by17, ROT0, "Bally", "Night Rider (rev. 21)", GAME_MECHANICAL)
-GAME( 1977, nightr20, nightrdr, by17, by17, by17_state, by17, ROT0, "Bally", "Night Rider (rev. 20)", GAME_MECHANICAL)
-GAME( 1978, blackjck, 0,        by17, by17, by17_state, by17, ROT0, "Bally", "Black Jack (Pinball)", GAME_MECHANICAL)
-GAME( 1977, evelknie, 0,        by17, by17, by17_state, by17, ROT0, "Bally", "Evel Knievel", GAME_MECHANICAL)
-GAME( 1978, matahari, 0,        by17, by17, by17_state, by17, ROT0, "Bally", "Mata Hari", GAME_MECHANICAL)
-GAME( 1977, eightbll, 0,        by17, by17, by17_state, by17, ROT0, "Bally", "Eight Ball", GAME_MECHANICAL)
-GAME( 1978, pwerplay, 0,        by17, by17, by17_state, by17, ROT0, "Bally", "Power Play (Pinball)", GAME_MECHANICAL)
-GAME( 1978, stk_sprs, 0,        by17, by17, by17_state, by17, ROT0, "Bally", "Strikes and Spares", GAME_MECHANICAL)
+GAME( 1976, bowarrow, 0,        by17, by17, driver_device, 0, ROT0, "Bally", "Bow & Arrow (Prototype)", GAME_IS_SKELETON_MECHANICAL)
+GAME( 1977, freedom,  0,        by17, by17, driver_device, 0, ROT0, "Bally", "Freedom", GAME_MECHANICAL)
+GAME( 1977, nightrdr, 0,        by17, by17, driver_device, 0, ROT0, "Bally", "Night Rider (rev. 21)", GAME_MECHANICAL)
+GAME( 1977, nightr20, nightrdr, by17, by17, driver_device, 0, ROT0, "Bally", "Night Rider (rev. 20)", GAME_MECHANICAL)
+GAME( 1978, blackjck, 0,        by17, by17, driver_device, 0, ROT0, "Bally", "Black Jack (Pinball)", GAME_MECHANICAL)
+GAME( 1977, evelknie, 0,        by17, by17, driver_device, 0, ROT0, "Bally", "Evel Knievel", GAME_MECHANICAL)
+GAME( 1978, matahari, 0,        by17, by17, driver_device, 0, ROT0, "Bally", "Mata Hari", GAME_MECHANICAL)
+GAME( 1977, eightbll, 0,        by17, by17, driver_device, 0, ROT0, "Bally", "Eight Ball", GAME_MECHANICAL)
+GAME( 1978, pwerplay, 0,        by17, by17, driver_device, 0, ROT0, "Bally", "Power Play (Pinball)", GAME_MECHANICAL)
+GAME( 1978, stk_sprs, 0,        by17, by17, driver_device, 0, ROT0, "Bally", "Strikes and Spares", GAME_MECHANICAL)

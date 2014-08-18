@@ -7,7 +7,7 @@
 
 ToDo:
 - High score isn't saved or remembered
-- Display should be flouro blue 9-segment
+- Display should be flouro blue 12-segment
 - Sound
 - Mechanical
 
@@ -52,13 +52,13 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_x);
 private:
 	bool m_timer_x;
+	UINT8 m_ic10a;
+	UINT8 m_ic11a;
 	bool m_ic11_ca2;
 	bool m_ic10_cb2;
 	UINT8 m_counter;
 	UINT8 m_digit;
-	UINT8 m_segment;
-	UINT8 m_ic10a;
-	UINT8 m_ic11a;
+	UINT8 m_segment[5];
 	virtual void machine_reset();
 	required_device<m6802_cpu_device> m_maincpu;
 	required_device<m6802_cpu_device> m_audiocpu;
@@ -254,7 +254,15 @@ WRITE8_MEMBER( hankin_state::ic10_a_w )
 		if BIT(data, 7)
 			m_digit = 0;
 
-		m_counter++;
+		if (BIT(data, 0) && (m_counter > 8))
+		{
+			static const UINT8 patterns[16] = { 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7d,0x07,0x7f,0x6f,0,0,0,0,0,0 }; // MC14543
+			output_set_digit_value(m_digit, patterns[m_segment[0]]);
+			output_set_digit_value(10+m_digit, patterns[m_segment[1]]);
+			output_set_digit_value(20+m_digit, patterns[m_segment[2]]);
+			output_set_digit_value(30+m_digit, patterns[m_segment[3]]);
+			output_set_digit_value(40+m_digit, patterns[m_segment[4]]);
+		}
 	}
 }
 
@@ -298,28 +306,26 @@ WRITE_LINE_MEMBER( hankin_state::ic10_cb2_w )
 
 WRITE8_MEMBER( hankin_state::ic11_a_w )
 {
-	static const UINT8 patterns[16] = { 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7d,0x07,0x7f,0x6f,0,0,0,0,0,0 }; // MC14543
 	m_ic11a = data;
 
 	if (!m_ic11_ca2)
 	{
-		if (m_counter==3)
-			output_set_digit_value(m_digit, patterns[m_segment]);
-
 		m_counter++;
-		m_segment = data >> 4;
 
-		if (m_counter==4)
-			output_set_digit_value(10+m_digit, patterns[m_segment]);
+		if (m_counter==1)
+			m_segment[0] = data>>4;
 		else
-		if (m_counter==6)
-			output_set_digit_value(20+m_digit, patterns[m_segment]);
+		if (m_counter==3)
+			m_segment[1] = data>>4;
 		else
-		if (m_counter==8)
-			output_set_digit_value(30+m_digit, patterns[m_segment]);
+		if (m_counter==5)
+			m_segment[2] = data>>4;
 		else
-		if (m_counter==10)
-			output_set_digit_value(40+m_digit, patterns[m_segment]);
+		if (m_counter==7)
+			m_segment[3] = data>>4;
+		else
+		if (m_counter==9)
+			m_segment[4] = data>>4;
 	}
 }
 

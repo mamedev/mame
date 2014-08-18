@@ -111,7 +111,7 @@ private:
 	bool m_u11_cb2;
 	bool m_timer_x;
 	bool m_u11_timer;
-	bool m_6d;
+	bool m_7d;
 	UINT8 m_digit;
 	UINT8 m_counter;
 	UINT8 m_segment[5];
@@ -449,7 +449,7 @@ WRITE8_MEMBER( by35_state::u11_a_w )
 
 	if (!m_u10_ca2)
 	{
-		if (!m_6d & BIT(data, 1))
+		if (m_7d & BIT(data, 1))
 			m_digit = 6;
 		else
 		if BIT(data, 2)
@@ -550,12 +550,12 @@ void by35_state::machine_reset()
 
 DRIVER_INIT_MEMBER( by35_state, by35_6 )
 {
-	m_6d = 1;
+	m_7d = 0;
 }
 
 DRIVER_INIT_MEMBER( by35_state, by35_7 )
 {
-	m_6d = 0;
+	m_7d = 1;
 }
 
 // zero-cross detection
