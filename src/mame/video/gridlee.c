@@ -68,6 +68,7 @@ void gridlee_state::video_start()
 	/* reset the palette */
 	m_palettebank_vis = 0;
 
+	save_pointer(NAME(m_local_videoram), 256 * 256);
 	save_item(NAME(m_cocktail_flip));
 	save_item(NAME(m_palettebank_vis));
 	machine().save().register_postload(save_prepost_delegate(FUNC(gridlee_state::expand_pixels), this));
