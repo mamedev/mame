@@ -61,7 +61,7 @@ void ui_menu_mess_tape_control::populate()
 	cassette_state state;
 	UINT32 flags = 0;
 
-	if (count() > 0)
+	if (count() > 1)
 	{
 		int index = current_index();
 
@@ -121,8 +121,11 @@ void ui_menu_mess_tape_control::populate()
 	}
 	else
 	{
-		// no tape loaded
-		item_append("No Tape Image loaded", NULL, flags, NULL);
+		// no tape loaded in this cassette device (but there could be more than one!)
+		if (count() > 1)
+			item_append("No Tape Image loaded", "", flags, TAPECMD_SELECT);
+		else
+			item_append("No Tape Image loaded", NULL, 0, NULL);
 	}
 }
 
