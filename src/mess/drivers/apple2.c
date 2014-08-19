@@ -1204,6 +1204,9 @@ static MACHINE_CONFIG_DERIVED( apple2c, apple2ee )
 	MCFG_MACHINE_START_OVERRIDE(apple2_state,apple2c)
 	MCFG_VIDEO_START_OVERRIDE(apple2_state,apple2c)
 
+	// IIc and friends have no cassette port
+	MCFG_DEVICE_REMOVE("cassette")
+
 	MCFG_A2BUS_SLOT_REMOVE("sl1")   // IIc has no slots, of course :)
 	MCFG_A2BUS_SLOT_REMOVE("sl2")
 	MCFG_A2BUS_SLOT_REMOVE("sl3")

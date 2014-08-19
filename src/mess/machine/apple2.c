@@ -347,7 +347,7 @@ READ8_MEMBER(apple2_state::apple2_c080_r)
 		offset &= 0x7F;
 		slot = offset / 0x10;
 
-		if ((m_machinetype == APPLE_IIC) || (m_machinetype == APPLE_IICPLUS))
+		if ((m_machinetype == APPLE_IIC) || (m_machinetype == APPLE_IICPLUS) || (m_machinetype == LASER128))
 		{
 			if (slot == 1)
 			{
@@ -366,7 +366,8 @@ READ8_MEMBER(apple2_state::apple2_c080_r)
 				}
 			}
 		}
-		else if ((m_machinetype == LASER128) && (slot == 6))
+
+		if ((m_machinetype == LASER128) && (slot == 6))
 		{
 			offset &= 0xf;
 			return m_laserudc->read(offset);
@@ -394,7 +395,7 @@ WRITE8_MEMBER(apple2_state::apple2_c080_w)
 	offset &= 0x7F;
 	slot = offset / 0x10;
 
-	if ((m_machinetype == APPLE_IIC) || (m_machinetype == APPLE_IICPLUS))
+	if ((m_machinetype == APPLE_IIC) || (m_machinetype == APPLE_IICPLUS) || (m_machinetype == LASER128))
 	{
 		if (slot == 1)
 		{
@@ -415,7 +416,8 @@ WRITE8_MEMBER(apple2_state::apple2_c080_w)
 			}
 		}
 	}
-	else if ((m_machinetype == LASER128) && (slot == 6))
+
+	if ((m_machinetype == LASER128) && (slot == 6))
 	{
 		offset &= 0xf;
 		m_laserudc->write(space, offset, data);
