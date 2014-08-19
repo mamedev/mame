@@ -250,8 +250,8 @@ usb_sound_device::usb_sound_device(const machine_config &mconfig, device_type ty
 		m_in_latch(0),
 		m_out_latch(0),
 		m_last_p2_value(0),
-		m_program_ram(NULL),
-		m_work_ram(NULL),
+		m_program_ram(*this, "pgmram"),
+		m_work_ram(*this, "workram"),
 		m_work_ram_bank(0),
 		m_t1_clock(0),
 		m_t1_clock_mask(0),
@@ -264,17 +264,9 @@ usb_sound_device::usb_sound_device(const machine_config &mconfig, device_type ty
 usb_sound_device::usb_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, SEGAUSB, "Sega Universal Sound Board", tag, owner, clock, "segausb", __FILE__),
 		device_sound_interface(mconfig, *this),
-		m_ourcpu(*this, "ourcpu")
-{
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void usb_sound_device::device_config_complete()
+		m_ourcpu(*this, "ourcpu"),
+		m_program_ram(*this, "pgmram"),
+		m_work_ram(*this, "workram")
 {
 }
 
@@ -290,10 +282,6 @@ void usb_sound_device::device_start()
 	/* find the CPU we are associated with */
 	m_maincpu = machine().device("maincpu");
 	assert(m_maincpu != NULL);
-
-	/* allocate RAM */
-	m_program_ram = (UINT8 *)memshare("pgmram")->ptr();
-	m_work_ram = auto_alloc_array(machine(), UINT8, 0x400);
 
 	/* create a sound stream */
 	m_stream = machine().sound().stream_alloc(*this, 0, 1, SAMPLE_RATE);
@@ -866,7 +854,7 @@ static ADDRESS_MAP_START( usb_map, AS_PROGRAM, 8, usb_sound_device )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( usb_portmap, AS_IO, 8, usb_sound_device )
-	AM_RANGE(0x00, 0xff) AM_READWRITE(workram_r, workram_w)
+	AM_RANGE(0x00, 0xff) AM_READWRITE(workram_r, workram_w) AM_SHARE("workram")
 	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_READWRITE(p1_r, p1_w)
 	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_WRITE(p2_w)
 	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_READ(t1_r)

@@ -138,7 +138,6 @@ public:
 protected:
 	// device-level overrides
 	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
 
@@ -152,8 +151,8 @@ private:
 	UINT8               m_in_latch;             /* input latch */
 	UINT8               m_out_latch;            /* output latch */
 	UINT8               m_last_p2_value;        /* current P2 output value */
-	UINT8 *             m_program_ram;          /* pointer to program RAM */
-	UINT8 *             m_work_ram;             /* pointer to work RAM */
+	optional_shared_ptr<UINT8> m_program_ram;          /* pointer to program RAM */
+	required_shared_ptr<UINT8> m_work_ram;             /* pointer to work RAM */
 	UINT8               m_work_ram_bank;        /* currently selected work RAM bank */
 	UINT8               m_t1_clock;             /* T1 clock value */
 	UINT8               m_t1_clock_mask;        /* T1 clock mask (configured via jumpers) */
