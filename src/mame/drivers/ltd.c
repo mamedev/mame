@@ -3,17 +3,39 @@
   PINBALL
   LTD (Brazil)
 
-  Not much info available for these machines.
+  Not much info available for these machines. System 3 has a homebrew partial
+  schematic available (with some obvious mistakes). There's also a manual
+  (looks like Portuguese?), but no schematic. No info on system 4 has been found.
+
   Used PinMAME as a reference.
 
-ToDo:
-- Everything
+  System 3: NMI is connected "FICHA" (coin slot). RST is connected to "TILT".
 
+  The manual mentions these machines:
+  Arizona, Atlantis, Galaxia, Hustler, Martian Queen.
+
+  PinMAME has a large list of games, these are:
+  1977: O Gaucho, Samba
+  1978: Grand Prix
+  1981: Al Capone, Amazon, Arizona, Atlantis, Black Hole, Carnaval no Rio,
+        Cowboy Eight Ball, Disco Dancing, Force, Galaxia, Haunted Hotel,
+        Hustler, King Kong, Kung Fu, Mr. & Mrs. Pec-Men, Martian Queen,
+        Space Poker, Time Machine, Zephy
+  1982: Alien Warrior, Columbia, Cowboy 2, Trick Shooter
+  (unknown year): Viking King
+
+ToDo:
+- System 4, everything
+- System 3, sound
+- Zephy, no playfield inputs
+- Outputs
+- Mechanical
 
 ********************************************************************************/
 
 #include "machine/genpin.h"
 #include "cpu/m6800/m6800.h"
+#include "sound/ay8910.h"
 #include "ltd.lh"
 
 class ltd_state : public genpin_class
@@ -25,11 +47,17 @@ public:
 		, m_p_ram(*this, "nvram")
 	{ }
 
+	DECLARE_DRIVER_INIT(atla_ltd);
+	DECLARE_DRIVER_INIT(bhol_ltd);
+	DECLARE_DRIVER_INIT(zephy);
 	DECLARE_DRIVER_INIT(ltd);
 	DECLARE_READ8_MEMBER(io_r);
 	DECLARE_WRITE8_MEMBER(io_w);
+	DECLARE_INPUT_CHANGED_MEMBER(ficha);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_r);
 private:
+	bool m_timer_r;
+	UINT8 m_game;
 	UINT8 m_out_offs;
 	virtual void machine_reset();
 	required_device<cpu_device> m_maincpu;
@@ -39,21 +67,23 @@ private:
 
 static ADDRESS_MAP_START( ltd3_map, AS_PROGRAM, 8, ltd_state )
 	AM_RANGE(0x0000, 0x007f) AM_RAM AM_SHARE("nvram") // internal to the cpu
-	AM_RANGE(0x0080, 0x00ff) AM_READ(io_r)
+	AM_RANGE(0x0080, 0x0087) AM_MIRROR(0x78) AM_READ(io_r)
 	AM_RANGE(0x0800, 0x2fff) AM_WRITE(io_w)
 	AM_RANGE(0xc000, 0xcfff) AM_ROM AM_MIRROR(0x3000) AM_REGION("roms", 0)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ltd4_map, AS_PROGRAM, 8, ltd_state )
-	AM_RANGE(0x0000, 0x01ff) AM_RAM
+	AM_RANGE(0x0000, 0x001f) AM_RAM // internal to the cpu
+	AM_RANGE(0x0080, 0x00ff) AM_RAM
+	AM_RANGE(0x0100, 0x01ff) AM_RAM AM_SHARE("nvram")
 	//AM_RANGE(0x0800, 0x0800) AM_WRITE(cycle_reset_w)
-	//AM_RANGE(0x0c00, 0x0c00) AM_WRITE(ay8910_1_reset)
-	//AM_RANGE(0x1000, 0x1000) AM_WRITE(ay8910_0_ctrl_w)
-	//AM_RANGE(0x1400, 0x1400) AM_WRITE(ay8910_0_reset)
-	//AM_RANGE(0x1800, 0x1800) AM_WRITE(ay8910_1_ctrl_w)
+	AM_RANGE(0x0c00, 0x0c00) AM_DEVWRITE("aysnd_1", ay8910_device, reset_w)
+	AM_RANGE(0x1000, 0x1000) AM_DEVWRITE("aysnd_0", ay8910_device, address_w)
+	AM_RANGE(0x1400, 0x1400) AM_DEVWRITE("aysnd_0", ay8910_device, reset_w)
+	AM_RANGE(0x1800, 0x1800) AM_DEVWRITE("aysnd_1", ay8910_device, address_w)
 	//AM_RANGE(0x2800, 0x2800) AM_WRITE(auxlamps_w)
-	//AM_RANGE(0x3000, 0x3000) AM_WRITE(ay8910_0_data_w)
-	//AM_RANGE(0x3800, 0x3800) AM_WRITE(ay8910_1_data_w)
+	AM_RANGE(0x3000, 0x3000) AM_DEVWRITE("aysnd_0", ay8910_device, data_w)
+	AM_RANGE(0x3800, 0x3800) AM_DEVWRITE("aysnd_1", ay8910_device, data_w)
 	AM_RANGE(0xc000, 0xdfff) AM_ROM AM_MIRROR(0x2000) AM_REGION("roms", 0)
 ADDRESS_MAP_END
 
@@ -62,16 +92,104 @@ static ADDRESS_MAP_START( ltd4_io, AS_IO, 8, ltd_state )
 	//AM_RANGE(0x0101, 0x0101) AM_WRITE(
 ADDRESS_MAP_END
 
-static INPUT_PORTS_START( ltd )
+static INPUT_PORTS_START( ltd3 )
+	PORT_START("FICHA")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, ltd_state, ficha, 0)
+
+	PORT_START("X0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_0_PAD) //tilt
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_1_PAD) //1,2
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_2_PAD) //1,2
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_3_PAD) //1,2
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_4_PAD) //1,2
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_5_PAD) //1,2
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("X1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_SLASH) //2
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_COLON) //1,2
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_QUOTE) //1,2
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_BACKSLASH) //1,2
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_BACKSPACE) //1,2
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_OPENBRACE) //1
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("X2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_A) //1,2
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_S) //1,2
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_D) //1,2
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_F) //1,2
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_G) //2
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_H) //2
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("X3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Q) //2
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_W) //2
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_E) //2
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_R)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Y)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START )
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("X4")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Z)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_C)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_V)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_B)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_N)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_M)
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("X5")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_CLOSEBRACE)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_ENTER)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_J)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_K)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_I)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_O)
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("X6")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_COMMA)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_STOP)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_6_PAD)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_7_PAD)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_8_PAD)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_9_PAD)
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("X7")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_X) PORT_NAME("Outhole") // 1,2
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_ASTERISK)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_SLASH_PAD)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_MINUS_PAD)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_PLUS_PAD)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_ENTER_PAD)
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
+
+static INPUT_PORTS_START( ltd4 )
+INPUT_PORTS_END
+
+INPUT_CHANGED_MEMBER( ltd_state::ficha )
+{
+	if(newval)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+}
 
 // switches
 READ8_MEMBER( ltd_state::io_r )
 {
-	return 0;
+	if (offset==0) return ioport("X0")->read();
+	if (offset==1) return ioport("X1")->read();
+	if (offset==2) return ioport("X2")->read();
+	if (offset==3) return ioport("X3")->read();
+	if (offset==7) return ioport("X7")->read();
+	return 0xff;
 }
 
-// Lamps
+// Lamps only used by Zephy
 WRITE8_MEMBER( ltd_state::io_w )
 {
 	offset >>= 10; // reduces offsets to 1 per bank
@@ -80,35 +198,167 @@ WRITE8_MEMBER( ltd_state::io_w )
 void ltd_state::machine_reset()
 {
 	m_out_offs = 0;
+	m_timer_r = 0;
 }
 
 DRIVER_INIT_MEMBER( ltd_state, ltd )
 {
+	m_game = 0;
+}
+
+DRIVER_INIT_MEMBER( ltd_state, atla_ltd )
+{
+	m_game = 1;
+	output_set_digit_value(0, 0x3f);
+	output_set_digit_value(10, 0x3f);
+}
+
+DRIVER_INIT_MEMBER( ltd_state, bhol_ltd )
+{
+	m_game = 2;
+}
+
+DRIVER_INIT_MEMBER( ltd_state, zephy )
+{
+	m_game = 3;
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER( ltd_state::timer_r )
 {
+	m_timer_r ^= 1;
+	m_maincpu->set_input_line(M6800_IRQ_LINE, (m_timer_r) ? CLEAR_LINE : ASSERT_LINE);	
 	static const UINT8 patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0x58, 0x4c, 0x62, 0x69, 0x78, 0 }; // 7447
 	m_out_offs++;
+	if (m_out_offs > 0x7f) m_out_offs = 0x60;
 
-	if (m_out_offs < 0x40)
+	if ((m_out_offs > 0x5f) && (m_out_offs < 0x6a))
 	{
-		UINT8 display = (m_out_offs >> 3) & 7;
-		UINT8 digit = m_out_offs & 7;
-		output_set_digit_value(display * 10 + digit, patterns[m_p_ram[m_out_offs]&15]);
+		switch(m_game)
+		{
+			case 1: // atlantis (2-player, 5-digit)
+			{
+				switch(m_out_offs-0x60)
+				{
+					case 0:
+						output_set_digit_value(1, patterns[m_p_ram[m_out_offs]&15]);
+						output_set_digit_value(2, patterns[m_p_ram[m_out_offs]>>4]);
+						break;
+					case 1:
+						output_set_digit_value(11, patterns[m_p_ram[m_out_offs]&15]);
+						output_set_digit_value(12, patterns[m_p_ram[m_out_offs]>>4]);
+						break;
+					case 2:
+						output_set_digit_value(3, patterns[m_p_ram[m_out_offs]&15]);
+						output_set_digit_value(4, patterns[m_p_ram[m_out_offs]>>4]);
+						break;
+					case 3:
+						output_set_digit_value(13, patterns[m_p_ram[m_out_offs]&15]);
+						output_set_digit_value(14, patterns[m_p_ram[m_out_offs]>>4]);
+						break;
+					case 8:
+						output_set_digit_value(41, patterns[m_p_ram[m_out_offs]&15]);
+						output_set_digit_value(40, patterns[m_p_ram[m_out_offs]>>4]);
+						break;
+				}
+				break;
+			}
+			case 2: // black hole (2-player, 6-digit)
+			{
+				switch(m_out_offs-0x60)
+				{
+					case 0:
+						output_set_digit_value(0, patterns[m_p_ram[m_out_offs]&15]);
+						output_set_digit_value(1, patterns[m_p_ram[m_out_offs]>>4]);
+						break;
+					case 1:
+						output_set_digit_value(10, patterns[m_p_ram[m_out_offs]&15]);
+						output_set_digit_value(11, patterns[m_p_ram[m_out_offs]>>4]);
+						break;
+					case 2:
+						output_set_digit_value(2, patterns[m_p_ram[m_out_offs]&15]);
+						output_set_digit_value(3, patterns[m_p_ram[m_out_offs]>>4]);
+						break;
+					case 3:
+						output_set_digit_value(12, patterns[m_p_ram[m_out_offs]&15]);
+						output_set_digit_value(13, patterns[m_p_ram[m_out_offs]>>4]);
+						break;
+					case 4:
+						output_set_digit_value(4, patterns[m_p_ram[m_out_offs]&15]);
+						output_set_digit_value(5, patterns[m_p_ram[m_out_offs]>>4]);
+						break;
+					case 5:
+						output_set_digit_value(14, patterns[m_p_ram[m_out_offs]&15]);
+						output_set_digit_value(15, patterns[m_p_ram[m_out_offs]>>4]);
+						break;
+					case 8:
+						output_set_digit_value(41, patterns[m_p_ram[m_out_offs]&15]);
+						output_set_digit_value(40, patterns[m_p_ram[m_out_offs]>>4]);
+						break;
+				}
+				break;
+			}
+			case 3: // zephy (3-player, 6-digit)
+			{
+				switch(m_out_offs-0x60)
+				{
+					case 0:
+						output_set_digit_value(0, patterns[m_p_ram[m_out_offs]&15]);
+						output_set_digit_value(1, patterns[m_p_ram[m_out_offs]>>4]);
+						break;
+					case 1:
+						output_set_digit_value(2, patterns[m_p_ram[m_out_offs]&15]);
+						output_set_digit_value(3, patterns[m_p_ram[m_out_offs]>>4]);
+						break;
+					case 2:
+						output_set_digit_value(4, patterns[m_p_ram[m_out_offs]&15]);
+						output_set_digit_value(5, patterns[m_p_ram[m_out_offs]>>4]);
+						break;
+					case 3:
+						output_set_digit_value(10, patterns[m_p_ram[m_out_offs]&15]);
+						output_set_digit_value(11, patterns[m_p_ram[m_out_offs]>>4]);
+						break;
+					case 4:
+						output_set_digit_value(12, patterns[m_p_ram[m_out_offs]&15]);
+						output_set_digit_value(13, patterns[m_p_ram[m_out_offs]>>4]);
+						break;
+					case 5:
+						output_set_digit_value(14, patterns[m_p_ram[m_out_offs]&15]);
+						output_set_digit_value(15, patterns[m_p_ram[m_out_offs]>>4]);
+						break;
+					case 6:
+						output_set_digit_value(20, patterns[m_p_ram[m_out_offs]&15]);
+						output_set_digit_value(21, patterns[m_p_ram[m_out_offs]>>4]);
+						break;
+					case 7:
+						output_set_digit_value(22, patterns[m_p_ram[m_out_offs]&15]);
+						output_set_digit_value(23, patterns[m_p_ram[m_out_offs]>>4]);
+						break;
+					case 8:
+						output_set_digit_value(24, patterns[m_p_ram[m_out_offs]&15]);
+						output_set_digit_value(25, patterns[m_p_ram[m_out_offs]>>4]);
+						break;
+					case 9:
+						output_set_digit_value(40, patterns[m_p_ram[m_out_offs]&15]);
+						output_set_digit_value(41, patterns[m_p_ram[m_out_offs]>>4]);
+						break;
+				}
+				break;
+			}
+
+		}
 	}
-	else
-	if (m_out_offs == 0x4a) // outhole
-	{
-		if (BIT(m_p_ram[m_out_offs], 0))
-			m_samples->start(0, 5);
-	}
-	else
-	if (m_out_offs == 0x4b) // knocker (not strapids)
-	{
-		if (BIT(m_p_ram[m_out_offs], 0))
-			m_samples->start(0, 6);
-	}
+//	else
+//	if (m_out_offs == 0x4a) // outhole
+//	{
+//		if (BIT(m_p_ram[m_out_offs], 0))
+//			m_samples->start(0, 5);
+//	}
+//	else
+//	if (m_out_offs == 0x4b) // knocker
+//	{
+//		if (BIT(m_p_ram[m_out_offs], 0))
+//			m_samples->start(0, 6);
+//	}
 }
 
 static MACHINE_CONFIG_START( ltd3, ltd_state )
@@ -133,11 +383,19 @@ static MACHINE_CONFIG_START( ltd4, ltd_state )
 	MCFG_CPU_PROGRAM_MAP(ltd4_map)
 	MCFG_CPU_IO_MAP(ltd4_io)
 
+	MCFG_NVRAM_ADD_0FILL("nvram")
+
 	/* Video */
 	MCFG_DEFAULT_LAYOUT(layout_ltd)
 
 	/* Sound */
 	MCFG_FRAGMENT_ADD( genpin_audio )
+
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("aysnd_0", AY8910, XTAL_3_579545MHz/2) /* guess */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.3)
+	MCFG_SOUND_ADD("aysnd_1", AY8910, XTAL_3_579545MHz/2) /* guess */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.3)
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------------------------
@@ -203,12 +461,12 @@ ROM_START(columbia)
 ROM_END
 
 // system 3
-GAME(1981, atla_ltd, 0,  ltd3,  ltd,  ltd_state, ltd, ROT0, "LTD", "Atlantis (LTD)",     GAME_IS_SKELETON_MECHANICAL)
-GAME(1981, bhol_ltd, 0,  ltd3,  ltd,  ltd_state, ltd, ROT0, "LTD", "Black Hole (LTD)",   GAME_IS_SKELETON_MECHANICAL)
-GAME(1981, zephy,    0,  ltd3,  ltd,  ltd_state, ltd, ROT0, "LTD", "Zephy",              GAME_IS_SKELETON_MECHANICAL)
+GAME(1981, atla_ltd, 0,  ltd3,  ltd3, ltd_state, atla_ltd, ROT0, "LTD", "Atlantis (LTD)",     GAME_MECHANICAL | GAME_NO_SOUND )
+GAME(1981, bhol_ltd, 0,  ltd3,  ltd3, ltd_state, bhol_ltd, ROT0, "LTD", "Black Hole (LTD)",   GAME_MECHANICAL | GAME_NO_SOUND )
+GAME(1981, zephy,    0,  ltd3,  ltd3, ltd_state, zephy,    ROT0, "LTD", "Zephy",              GAME_IS_SKELETON_MECHANICAL)
 
 // system 4
-GAME(1981, cowboy,   0,  ltd4,  ltd,  ltd_state, ltd, ROT0, "LTD", "Cowboy Eight Ball",  GAME_IS_SKELETON_MECHANICAL)
-GAME(1981, pecmen,   0,  ltd4,  ltd,  ltd_state, ltd, ROT0, "LTD", "Mr. & Mrs. Pec-Men", GAME_IS_SKELETON_MECHANICAL)
-GAME(1981, alcapone, 0,  ltd4,  ltd,  ltd_state, ltd, ROT0, "LTD", "Al Capone",          GAME_IS_SKELETON_MECHANICAL)
-GAME(1982, columbia, 0,  ltd4,  ltd,  ltd_state, ltd, ROT0, "LTD", "Columbia",           GAME_IS_SKELETON_MECHANICAL)
+GAME(1981, cowboy,   0,  ltd4,  ltd4, ltd_state, ltd,      ROT0, "LTD", "Cowboy Eight Ball",  GAME_IS_SKELETON_MECHANICAL)
+GAME(1981, pecmen,   0,  ltd4,  ltd4, ltd_state, ltd,      ROT0, "LTD", "Mr. & Mrs. Pec-Men", GAME_IS_SKELETON_MECHANICAL)
+GAME(1981, alcapone, 0,  ltd4,  ltd4, ltd_state, ltd,      ROT0, "LTD", "Al Capone",          GAME_IS_SKELETON_MECHANICAL)
+GAME(1982, columbia, 0,  ltd4,  ltd4, ltd_state, ltd,      ROT0, "LTD", "Columbia",           GAME_IS_SKELETON_MECHANICAL)
