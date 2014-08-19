@@ -61,12 +61,16 @@ void a2bus_laser128_device::device_start()
 {
 	// set_a2bus_device makes m_slot valid
 	set_a2bus_device();
+
+	save_item(NAME(m_slot7_bank));
+	save_item(NAME(m_slot7_ram_bank));
 }
 
 void a2bus_laser128_device::device_reset()
 {
 	m_rom = device().machine().root_device().memregion("maincpu")->base();
 	m_slot7_bank = 0;
+	m_slot7_ram_bank = 0;
 }
 
 UINT8 a2bus_laser128_device::read_c0nx(address_space &space, UINT8 offset)
@@ -120,12 +124,12 @@ void a2bus_laser128_device::write_c800(address_space &space, UINT16 offset, UINT
 	// UDCREG
 	if ((m_slot == 7) && (offset == 0x7f8))
 	{
-		printf("%02x to UDCREG\n", data);
+//		printf("%02x to UDCREG\n", data);
 
 		m_slot7_ram_bank = (data & 0x8) ? 0x400 : 0;
 		m_slot7_bank = (((data >> 4) & 0x7) * 0x400);
 
-		printf("\tRAM bank %x, ROM bank %x\n", m_slot7_ram_bank, m_slot7_bank);
+//		printf("\tRAM bank %x, ROM bank %x\n", m_slot7_ram_bank, m_slot7_bank);
 	}
 }
 
