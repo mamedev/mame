@@ -4,13 +4,9 @@ Phoenix hardware games
 
 driver by Richard Davies
 
-Note:
-    The discrete sound part of Phoenix requires a sample rate of at least 44100.
-    This is because the frequencies are so high, that some sounds will be
-    missed at a lower sample rate.
-
-    pleiads is using another sound driver, audio\pleiads.c
- Andrew Scott (ascott@utkux.utcc.utk.edu)
+Notes:
+- Discrete sound emulation is in audio/phoenix.c,
+  pleiads is using another sound driver, audio/pleiads.c
 
 
 To Do:
@@ -1260,8 +1256,8 @@ GAME( 1980, phoenixa, phoenix,  phoenix,  phoenixa, driver_device, 0,        ROT
 GAME( 1980, phoenixb, phoenix,  phoenix,  phoenixa, driver_device, 0,        ROT90, "Amstar (Centuri license)", "Phoenix (Centuri, set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1980, phoenixt, phoenix,  phoenix,  phoenixt, driver_device, 0,        ROT90, "Amstar (Taito license)", "Phoenix (Taito)", GAME_SUPPORTS_SAVE )
 GAME( 1980, phoenixj, phoenix,  phoenix,  phoenixt, driver_device, 0,        ROT90, "Amstar (Taito Japan license)", "Phoenix (Taito Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1980, phoenix3, phoenix,  phoenix,  phoenix3, driver_device, 0,        ROT90, "bootleg (T.P.N.)",   "Phoenix (T.P.N.)", GAME_SUPPORTS_SAVE )
-GAME( 1980, phoenixdal,phoenix, phoenix,  phoenixt, driver_device, 0,        ROT90, "bootleg", "Phoenix (D&L bootleg)", GAME_SUPPORTS_SAVE )
+GAME( 1980, phoenix3, phoenix,  phoenix,  phoenix3, driver_device, 0,        ROT90, "bootleg (T.P.N.)", "Phoenix (T.P.N. bootleg)", GAME_SUPPORTS_SAVE )
+GAME( 1980, phoenixdal,phoenix, phoenix,  phoenixt, driver_device, 0,        ROT90, "bootleg (D&L)", "Phoenix (D&L bootleg)", GAME_SUPPORTS_SAVE )
 GAME( 1981, phoenixc, phoenix,  phoenix,  phoenixt, driver_device, 0,        ROT90, "bootleg? (Irecsa / G.G.I Corp)", "Phoenix (Irecsa / G.G.I Corp, set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1981, phoenixc2,phoenix,  phoenix,  phoenixt, driver_device, 0,        ROT90, "bootleg? (Irecsa / G.G.I Corp)", "Phoenix (Irecsa / G.G.I Corp, set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1981, phoenixc3,phoenix,  phoenix,  phoenixt, driver_device, 0,        ROT90, "bootleg? (Irecsa / G.G.I Corp)", "Phoenix (Irecsa / G.G.I Corp, set 3)", GAME_SUPPORTS_SAVE )
