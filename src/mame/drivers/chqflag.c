@@ -33,6 +33,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(chqflag_state::chqflag_scanline)
 
 WRITE8_MEMBER(chqflag_state::chqflag_bankswitch_w)
 {
+	m_bank = data; //needed to restore the bankswitch post load
+	
 	int bankaddress;
 	UINT8 *RAM = memregion("maincpu")->base();
 
@@ -59,6 +61,11 @@ WRITE8_MEMBER(chqflag_state::chqflag_bankswitch_w)
 	}
 
 	/* other bits unknown/unused */
+}
+
+void chqflag_state::bankswitch_restore()
+{
+	chqflag_bankswitch_w(m_maincpu->space(AS_PROGRAM), 0, m_bank);
 }
 
 WRITE8_MEMBER(chqflag_state::chqflag_vreg_w)
@@ -281,6 +288,8 @@ void chqflag_state::machine_start()
 	save_item(NAME(m_analog_ctrl));
 	save_item(NAME(m_accel));
 	save_item(NAME(m_wheel));
+	save_item(NAME(m_bank));
+	machine().save().register_postload(save_prepost_delegate(FUNC(chqflag_state::bankswitch_restore), this));
 }
 
 void chqflag_state::machine_reset()
@@ -290,6 +299,7 @@ void chqflag_state::machine_reset()
 	m_analog_ctrl = 0;
 	m_accel = 0;
 	m_wheel = 0;
+	m_bank = 0;
 }
 
 static MACHINE_CONFIG_START( chqflag, chqflag_state )

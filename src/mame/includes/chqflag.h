@@ -37,6 +37,7 @@ public:
 	int        m_analog_ctrl;
 	int        m_accel;
 	int        m_wheel;
+	int		   m_bank;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -65,4 +66,5 @@ public:
 	K051316_CB_MEMBER(zoom_callback_1);
 	K051316_CB_MEMBER(zoom_callback_2);
 	K051960_CB_MEMBER(sprite_callback);
+	void bankswitch_restore();
 };
