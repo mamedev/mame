@@ -5533,7 +5533,7 @@ ROM_START( newpuc2 )
 
 	ROM_REGION( 0x0200, "namco", 0 ) /* sound PROMs */
 	ROM_LOAD( "82s126.1m", 0x0000, 0x0100, CRC(a9cc86bf) SHA1(bbcec0570aeceb582ff8238a4bc8546a23430081) )
-	ROM_LOAD( "82s126.3m", 0x0100, 0x0100, CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) )   /*timing - not used */
+	ROM_LOAD( "82s126.3m", 0x0100, 0x0100, CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) )   /* timing - not used */
 ROM_END
 
 
@@ -5560,7 +5560,7 @@ ROM_START( newpuc2b )
 
 	ROM_REGION( 0x0200, "namco", 0 ) /* sound PROMs */
 	ROM_LOAD( "82s126.1m", 0x0000, 0x0100, CRC(a9cc86bf) SHA1(bbcec0570aeceb582ff8238a4bc8546a23430081) )
-	ROM_LOAD( "82s126.3m", 0x0100, 0x0100, CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) )   /*timing - not used */
+	ROM_LOAD( "82s126.3m", 0x0100, 0x0100, CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) )   /* timing - not used */
 ROM_END
 
 ROM_START( pacuman )
@@ -5586,7 +5586,7 @@ ROM_START( pacuman )
 
 	ROM_REGION( 0x0200, "namco", 0 ) /* sound PROMs */
 	ROM_LOAD( "82s126.1m", 0x0000, 0x0100, CRC(a9cc86bf) SHA1(bbcec0570aeceb582ff8238a4bc8546a23430081) )
-	ROM_LOAD( "82s126.3m", 0x0100, 0x0100, CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) )   /*timing - not used */
+	ROM_LOAD( "82s126.3m", 0x0100, 0x0100, CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) )   /* timing - not used */
 ROM_END
 
 
@@ -5613,7 +5613,7 @@ ROM_START( nmouse )
 
 	ROM_REGION( 0x0200, "namco", 0 )    /* sound PROMs */
 	ROM_LOAD( "82s126.1m", 0x0000, 0x0100, CRC(a9cc86bf) SHA1(bbcec0570aeceb582ff8238a4bc8546a23430081) )
-	ROM_LOAD( "82s126.3m", 0x0100, 0x0100, CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) )   /*timing - not used */
+	ROM_LOAD( "82s126.3m", 0x0100, 0x0100, CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) )   /* timing - not used */
 ROM_END
 
 ROM_START( nmouseb )
@@ -5639,7 +5639,7 @@ ROM_START( nmouseb )
 
 	ROM_REGION( 0x0200, "namco", 0 )    /* sound PROMs */
 	ROM_LOAD( "82s126.1m", 0x0000, 0x0100, CRC(a9cc86bf) SHA1(bbcec0570aeceb582ff8238a4bc8546a23430081) )
-	ROM_LOAD( "82s126.3m", 0x0100, 0x0100, CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) )   /*timing - not used */
+	ROM_LOAD( "82s126.3m", 0x0100, 0x0100, CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) )   /* timing - not used */
 ROM_END
 
 
@@ -5734,7 +5734,7 @@ ROM_START( woodpeck )
 
 	ROM_REGION( 0x0200, "namco", 0 )    /* sound PROMs */
 	ROM_LOAD( "pr.1k", 0x0000, 0x0100, CRC(a9cc86bf) SHA1(bbcec0570aeceb582ff8238a4bc8546a23430081) )
-	ROM_LOAD( "pr.3k", 0x0100, 0x0100, CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) )   /*timing - not used */
+	ROM_LOAD( "pr.3k", 0x0100, 0x0100, CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) )   /* timing - not used */
 ROM_END
 
 ROM_START( woodpeca )
@@ -5756,8 +5756,39 @@ ROM_START( woodpeca )
 
 	ROM_REGION( 0x0200, "namco", 0 )    /* sound PROMs */
 	ROM_LOAD( "pr.1k", 0x0000, 0x0100, CRC(a9cc86bf) SHA1(bbcec0570aeceb582ff8238a4bc8546a23430081) )
-	ROM_LOAD( "pr.3k", 0x0100, 0x0100, CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) )   /*timing - not used */
+	ROM_LOAD( "pr.3k", 0x0100, 0x0100, CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) )   /* timing - not used */
 ROM_END
+
+
+ROM_START( numcrash )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "nc-1.6e",      0x0000, 0x0800, CRC(c85a79ba) SHA1(938b6b2920b14a4f0fbcd09fe25873bfd8ddc245) ) // ok
+	ROM_LOAD( "nc-2.6f",      0x0800, 0x0800, CRC(954a4630) SHA1(09bc3d8d1d4e79a805c5fb436739bc618faf7825) ) // ok
+	ROM_RELOAD(               0x1000, 0x0800 )
+	ROM_RELOAD(               0x8000, 0x0800 )
+	ROM_RELOAD(               0x8800, 0x0800 )
+	ROM_LOAD( "nc-6.6m",      0x1800, 0x0800, CRC(7b8de692) SHA1(7d5fe625ee9acf3cced2d98df99f5dee6c8122b1) ) // ok
+	ROM_LOAD( "nc-3.6h",      0x2000, 0x0800, CRC(e47f7cf3) SHA1(47e513cf4fe80617547093210ca6582646a9b256) ) // ok
+	ROM_LOAD( "nc-7.6n",      0x2800, 0x0800, CRC(c6f5bd41) SHA1(854002c6c45f6993ada98b42ed6b814afac0c1f7) ) // ?
+	ROM_LOAD( "nc-5.6k",      0x3000, 0x0800, CRC(20e6c64d) SHA1(ff61ede279a46ea2bec534dd82ec89e41a3ec77b) ) // ?
+	ROM_LOAD( "nc-4.6j",      0x3800, 0x0800, CRC(ca211190) SHA1(57d02d520ab42be14b780748a1d0d0d180e124ac) ) // ?
+	ROM_LOAD( "nc-8.6p",      0x9000, 0x1000, CRC(7dabb3e5) SHA1(29dd5f6b7acc3abd292c903be6fef9fc4a135287) ) // ok
+
+	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_LOAD( "nc-9.5e",      0x0000, 0x0800, CRC(6a30b507) SHA1(e5760844cd051504e61774c57549c2697d473591) )
+	ROM_LOAD( "nc-10.5f",     0x0800, 0x0800, CRC(bdd352db) SHA1(c4dd0bd009098a82dd5603046fa929f7395dd903) )
+	ROM_LOAD( "nc-11.5h",     0x1000, 0x0800, CRC(5f54d8e6) SHA1(3a20df62f484846e5610b88c04db56f9b5b3029c) )
+	ROM_LOAD( "nc-12.5j",     0x1800, 0x0800, CRC(b104a8a9) SHA1(ac7f9b0041a9be1d0ffa58d2f65a0d294e986357) )
+
+	ROM_REGION( 0x0120, "proms", 0 )
+	ROM_LOAD( "7051p1.7f",    0x0000, 0x0020, CRC(2fc650bd) SHA1(8d0268dee78e47c712202b0ec4f1f51109b1f2a5) )
+	ROM_LOAD( "7052.4a",      0x0020, 0x0100, CRC(2bc5d339) SHA1(446e234df94d9ef34c3191877bb33dd775acfdf5) )
+
+	ROM_REGION( 0x0200, "namco", 0 )    /* sound PROMs */
+	ROM_LOAD( "7611p3.1m",    0x0000, 0x0100, CRC(a9cc86bf) SHA1(bbcec0570aeceb582ff8238a4bc8546a23430081) )
+	ROM_LOAD( "7611p2.3m",    0x0100, 0x0100, CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) )    /* timing - not used */
+ROM_END
+
 
 ROM_START( bigbucks )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -6487,7 +6518,9 @@ GAME( 1986, rocktrv2, 0,        rocktrv2, rocktrv2, pacman_state,  rocktrv2, ROT
 
 GAME( 1986, bigbucks, 0,        bigbucks, bigbucks, driver_device, 0,        ROT90,  "Dynasoft Inc.", "Big Bucks", GAME_SUPPORTS_SAVE )
 
-GAME( 198?, cannonbp, 0,        pacman,   cannonbp, pacman_state,  cannonbp, ROT90,  "Novomatic", "Cannon Ball (Pac-Man Hardware)", GAME_WRONG_COLORS|GAME_SUPPORTS_SAVE )
+GAME( 1983, numcrash, 0,        woodpek,  woodpek,  driver_device, 0,        ROT90,  "Hanshin Goraku", "Number Crash", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+
+GAME( 198?, cannonbp, 0,        pacman,   cannonbp, pacman_state,  cannonbp, ROT90,  "Novomatic", "Cannon Ball (Pac-Man Hardware)", GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
 
 GAME( 1999, superabc, 0,        superabc, superabc, pacman_state,  superabc, ROT90,  "hack (Two-Bit Score)", "Super ABC (Pac-Man multigame kit, Sep. 03 1999)", GAME_SUPPORTS_SAVE )
 GAME( 1999, superabco,superabc, superabc, superabc, pacman_state,  superabc, ROT90,  "hack (Two-Bit Score)", "Super ABC (Pac-Man multigame kit, Mar. 08 1999)", GAME_SUPPORTS_SAVE )
