@@ -224,7 +224,9 @@ inline void dooyong_state::lastday_get_tile_info(tile_data &tileinfo, int tile_i
 		flags = ((attr & 0x02) ? TILE_FLIPX : 0) | ((attr & 0x04) ? TILE_FLIPY : 0);
 	}
 	else
-	{   /* primella/popbingo */
+	{   
+
+		/* primella */
 		/* Tiles take two bytes in ROM:
 		                 MSB   LSB
 		   [offs + 0x00] YXCC CCcc    (Y flip, X flip, bits 3-0 of color code, bits 9-8 of gfx code)
@@ -233,8 +235,17 @@ inline void dooyong_state::lastday_get_tile_info(tile_data &tileinfo, int tile_i
 		   C = color code
 		   X = x flip
 		   Y = y flip */
-		code = tilerom[offs + 1] | ((attr & 0x03) << 8);
-		color = (attr & 0x3c) >> 2;
+		int codemask = 0x03;
+		int palmask  = 0x3c;
+		
+		if (m_gfxdecode->gfx(1)->depth() == 256) // pop bingo has an 8bpp layer and uses what would be the low palette bit to address more tiles (girls 4,5,6 in bonus game)
+		{
+			codemask = 0x07;
+			palmask = 0x00;
+		}
+
+		code = tilerom[offs + 1] | ((attr & codemask) << 8);
+		color = (attr & palmask) >> 2;
 		flags = ((attr & 0x40) ? TILE_FLIPX : 0) | ((attr & 0x80) ? TILE_FLIPY : 0);
 	}
 
