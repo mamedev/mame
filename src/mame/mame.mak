@@ -2649,6 +2649,8 @@ $(DRIVERS)/imolagp.o:   $(LAYOUT)/imolagp.lh
 
 $(DRIVERS)/jankenmn.o:  $(LAYOUT)/jankenmn.lh
 
+$(DRIVERS)/jeutel.o:    $(LAYOUT)/jeutel.lh
+
 $(DRIVERS)/jpmimpct.o:  $(LAYOUT)/jpmimpct.lh
 
 $(DRIVERS)/jpmmps.o:    $(LAYOUT)/jpmmps.lh

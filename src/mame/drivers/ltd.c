@@ -26,6 +26,7 @@
 
 ToDo:
 - No mechanical sounds
+- Although nvram is fitted, everything is lost at powerup
 - System 3, no sound
 - System 3, slam tilt to connect to reset line
 - Zephy, no playfield inputs

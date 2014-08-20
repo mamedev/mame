@@ -1,47 +1,55 @@
 /*******************************************************************************
 
-Pinball
-Jeutel
+  PINBALL
+  Jeutel
+
+  There are at least 7 machines from this manufacturer. Unable to find anything
+  technical at all... so will be using PinMAME as the reference.
+
+ToDo:
+- Everything!
+- Each machine has 4 players, 7-digit, 12-segment florescent display  
 
 ********************************************************************************/
 
-#include "emu.h"
+#include "machine/genpin.h"
 #include "cpu/z80/z80.h"
+#include "machine/i8255.h"
+#include "sound/ay8910.h"
+#include "sound/tms5110.h"
+#include "jeutel.lh"
 
-class jeutel_state : public driver_device
+class jeutel_state : public genpin_class
 {
 public:
 	jeutel_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-	m_maincpu(*this, "maincpu")
+		: genpin_class(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
 	{ }
 
-protected:
-
-	// devices
-	required_device<cpu_device> m_maincpu;
-
-	// driver_device overrides
-	virtual void machine_reset();
-public:
 	DECLARE_DRIVER_INIT(jeutel);
+private:
+	virtual void machine_reset();
+	required_device<cpu_device> m_maincpu;
 };
 
 
 static ADDRESS_MAP_START( jeutel_map, AS_PROGRAM, 8, jeutel_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	//AM_RANGE(0xe000, 0xe003) AM_READWRITE ppi8255_2
+	AM_RANGE(0xc000, 0xc3ff) AM_RAM AM_SHARE("shared")
+	AM_RANGE(0xc400, 0xc7ff) AM_RAM
+	AM_RANGE(0xe000, 0xe003) AM_DEVREADWRITE("ppi8255_2", i8255_device, read, write)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( jeutel_cpu2, AS_PROGRAM, 8, jeutel_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
-	//AM_RANGE(0x2000, 0x2003) AM_WRITE ppi8255_0
-	//AM_RANGE(0x3000, 0x3003) AM_WRITE ppi8255_1
-	//AM_RANGE(0x4000, 0x4000) AM_WRITENOP
+	AM_RANGE(0x2000, 0x2003) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
+	AM_RANGE(0x3000, 0x3003) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
+	AM_RANGE(0x4000, 0x4000) AM_WRITENOP
 	AM_RANGE(0x8000, 0x83ff) AM_RAM
+	AM_RANGE(0xc000, 0xc3ff) AM_RAM AM_SHARE("shared")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( jeutel_cpu3, AS_PROGRAM, 8, jeutel_state )
@@ -52,9 +60,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( jeutel_cpu3_io, AS_IO, 8, jeutel_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	//AM_RANGE(0x00, 0x00) AM_WRITE AY8910_control_port_0_w
-	//AM_RANGE(0x01, 0x01) AM_WRITE AY8910_write_port_0_w
-	//AM_RANGE(0x04, 0x04) AM_READ(AY8910_read_port_0_r)
+	AM_RANGE(0x00, 0x00) AM_DEVWRITE("aysnd", ay8910_device, address_w)
+	AM_RANGE(0x01, 0x01) AM_DEVWRITE("aysnd", ay8910_device, data_w)
+	AM_RANGE(0x04, 0x04) AM_DEVREAD("aysnd", ay8910_device, data_r)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( jeutel )
@@ -64,7 +72,7 @@ void jeutel_state::machine_reset()
 {
 }
 
-DRIVER_INIT_MEMBER(jeutel_state,jeutel)
+DRIVER_INIT_MEMBER( jeutel_state, jeutel )
 {
 }
 
@@ -77,6 +85,51 @@ static MACHINE_CONFIG_START( jeutel, jeutel_state )
 	MCFG_CPU_ADD("cpu3", Z80, 3300000)
 	MCFG_CPU_PROGRAM_MAP(jeutel_cpu3)
 	MCFG_CPU_IO_MAP(jeutel_cpu3_io)
+
+	/* Video */
+	MCFG_DEFAULT_LAYOUT(layout_jeutel)
+
+	/* Sound */
+	MCFG_FRAGMENT_ADD( genpin_audio )
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_SOUND_ADD("aysnd", AY8910, 639450)
+	//MCFG_AY8910_PORT_A_READ_CB(IOPORT("P1"))
+	//MCFG_AY8910_PORT_B_READ_CB(IOPORT("P2"))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+
+	MCFG_SOUND_ADD("tms", TMS5110A, 640000)
+	//MCFG_TMS5110_M0_CB(DEVWRITELINE("tmsprom", tmsprom_device, m0_w))
+	//MCFG_TMS5110_DATA_CB(DEVREADLINE("tmsprom", tmsprom_device, data_r))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+
+	/* Devices */
+	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
+	//MCFG_I8255_IN_PORTA_CB(IOPORT("P1"))
+	//MCFG_I8255_OUT_PORTA_CB(WRITE8(jeutel_state, port_C_w))
+	//MCFG_I8255_IN_PORTB_CB(IOPORT("P2"))
+	//MCFG_I8255_OUT_PORTB_CB(WRITE8(jeutel_state, port_C_w))
+	//MCFG_I8255_IN_PORTC_CB(IOPORT("EXTRA"))
+	//MCFG_I8255_OUT_PORTC_CB(WRITE8(jeutel_state, port_C_w))
+
+	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
+	//MCFG_I8255_IN_PORTA_CB(IOPORT("P1"))
+	//MCFG_I8255_OUT_PORTA_CB(WRITE8(jeutel_state, port_C_w))
+	//MCFG_I8255_IN_PORTB_CB(IOPORT("P2"))
+	//MCFG_I8255_OUT_PORTB_CB(WRITE8(jeutel_state, port_C_w))
+	//MCFG_I8255_IN_PORTC_CB(IOPORT("EXTRA"))
+	//MCFG_I8255_OUT_PORTC_CB(WRITE8(jeutel_state, port_C_w))
+
+	MCFG_DEVICE_ADD("ppi8255_2", I8255A, 0)
+	//MCFG_I8255_IN_PORTA_CB(IOPORT("P1"))
+	//MCFG_I8255_OUT_PORTA_CB(WRITE8(jeutel_state, port_C_w))
+	//MCFG_I8255_IN_PORTB_CB(IOPORT("P2"))
+	//MCFG_I8255_OUT_PORTB_CB(WRITE8(jeutel_state, port_C_w))
+	//MCFG_I8255_IN_PORTC_CB(IOPORT("EXTRA"))
+	//MCFG_I8255_OUT_PORTC_CB(WRITE8(jeutel_state, port_C_w))
+
 MACHINE_CONFIG_END
 
 /*--------------------------------
