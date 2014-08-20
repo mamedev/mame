@@ -1721,7 +1721,24 @@
 		</part>
 	</software>
 
-<!-- 24 Kb cartridges (30 : 22 main sets + 8 clones) -->
+<!-- 20 Kb cartridges -->
+
+	<software name="secalpha">
+		<description>Sector Alpha</description>
+		<year>1983</year>
+		<publisher>Spectravideo</publisher>
+		<info name="serial" value="SE220" />
+		<part name="cart" interface="coleco_cart">
+			<dataarea name="rom" size="20480">
+				<rom name="secalpha.1" size="8192" crc="9299539b" sha1="880beb9a4df332948052b40eef09b6c877de5f9e" offset="0x0000" />
+				<rom name="secalpha.2" size="8192" crc="c8d6e83d" sha1="366877e0b68cdf2e4bfde38d9ce72eed97946f89" offset="0x2000" />
+				<rom name="secalpha.3" size="4096" crc="354a3b2f" sha1="ff8966cec010248af60d2e2abee8a949c154ea25" offset="0x4000" />
+			</dataarea>
+		</part>
+	</software>
+
+
+<!-- 24 Kb cartridges (28 : 21 main sets + 7 clones) -->
 
 	<software name="1on1">
 		<!-- One on One (1984)(Micro Lab).bin -->
@@ -2085,37 +2102,6 @@
 				<rom name="rocky.1" size="8192" crc="a51498f5" sha1="91f764f4b3a236cda9e99284fba7f03ddf781974" offset="0x0000" />
 				<rom name="rocky.2" size="8192" crc="5a8f2336" sha1="c2347eb8b94a926c51e330efbe618b99ad7e56f9" offset="0x2000" />
 				<rom name="rocky.3" size="8192" crc="56fc8d0a" sha1="29f1733141ee98b0bd069d000fe531d95e1fc31b" offset="0x4000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="secalpha">
-		<!-- Sector Alpha (1983)(Spectravideo).bin -->
-		<description>Sector Alpha</description>
-		<year>1983</year>
-		<publisher>Spectravideo</publisher>
-		<info name="serial" value="SE220" />
-		<part name="cart" interface="coleco_cart">
-			<dataarea name="rom" size="24576">
-				<rom name="secalpha.1" size="8192" crc="9299539b" sha1="880beb9a4df332948052b40eef09b6c877de5f9e" offset="0x0000" />
-				<rom name="secalpha.2" size="8192" crc="c8d6e83d" sha1="366877e0b68cdf2e4bfde38d9ce72eed97946f89" offset="0x2000" />
-				<rom name="secalpha.3" size="8192" crc="381b8234" sha1="158557e2fc1b5fca85f3580d0072096a39a9360e" offset="0x4000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="secalphaa" cloneof="secalpha">
-		<!-- Sector Alpha (1983)(Spectravideo)[a].bin -->
-		<!-- 0x5000-0x5fff : filled with 0xff in this set -->
-		<description>Sector Alpha (Alt)</description>
-		<year>1983</year>
-		<publisher>Spectravideo</publisher>
-		<info name="serial" value="SE220" />
-		<part name="cart" interface="coleco_cart">
-			<dataarea name="rom" size="24576">
-				<rom name="secalpha.1"  size="8192" crc="9299539b" sha1="880beb9a4df332948052b40eef09b6c877de5f9e" offset="0x0000" />
-				<rom name="secalpha.2"  size="8192" crc="c8d6e83d" sha1="366877e0b68cdf2e4bfde38d9ce72eed97946f89" offset="0x2000" />
-				<rom name="secalphaa.3" size="8192" crc="ec61013a" sha1="b1698b804738e7bc822f4115f841c7d55d91d1e6" offset="0x4000" />
 			</dataarea>
 		</part>
 	</software>
