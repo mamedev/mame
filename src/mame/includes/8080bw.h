@@ -52,6 +52,8 @@ public:
 	UINT8 m_schaser_background_disable;
 	UINT8 m_schaser_background_select;
 	UINT16 m_claybust_gun_pos;
+	
+	int m_invmulti_bank;
 
 
 	DECLARE_CUSTOM_INPUT_MEMBER(sflush_80_r);
@@ -152,6 +154,7 @@ public:
 	inline void set_pixel( bitmap_rgb32 &bitmap, UINT8 y, UINT8 x, const pen_t *pens, UINT8 color );
 	inline void set_8_pixels( bitmap_rgb32 &bitmap, UINT8 y, UINT8 x, UINT8 data, const pen_t *pens, UINT8 fore_color, UINT8 back_color );
 	void clear_extra_columns( bitmap_rgb32 &bitmap, const pen_t *pens, UINT8 color );
+	void invmulti_bankswitch_restore();
 };
 
 
