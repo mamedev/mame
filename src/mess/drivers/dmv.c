@@ -108,7 +108,12 @@ public:
 	DECLARE_WRITE8_MEMBER(rambank_w);
 	DECLARE_READ8_MEMBER(program_r);
 	DECLARE_WRITE8_MEMBER(program_w);
+	DECLARE_READ8_MEMBER(exp_program_r);
+	DECLARE_WRITE8_MEMBER(exp_program_w);
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
+
+	UINT8 program_read(address_space &space, int cas, offs_t offset);
+	void program_write(address_space &space, int cas, offs_t offset, UINT8 data);
 
 	void ifsel_r(address_space &space, int ifsel, offs_t offset, UINT8 &data);
 	void ifsel_w(address_space &space, int ifsel, offs_t offset, UINT8 data);
@@ -323,7 +328,27 @@ void dmv_state::ifsel_w(address_space &space, int ifsel, offs_t offset, UINT8 da
 		slots[i]->io_write(space, ifsel, offset, data);
 }
 
+WRITE8_MEMBER(dmv_state::exp_program_w)
+{
+	program_write(space, (offset >> 16) & 0x07, offset, data);
+}
+
+READ8_MEMBER(dmv_state::exp_program_r)
+{
+	return program_read(space, (offset >> 16) & 0x07, offset);
+}
+
 WRITE8_MEMBER(dmv_state::program_w)
+{
+	program_write(space, m_ram_bank, offset, data);
+}
+
+READ8_MEMBER(dmv_state::program_r)
+{
+	return program_read(space, m_ram_bank, offset);
+}
+
+void dmv_state::program_write(address_space &space, int cas, offs_t offset, UINT8 data)
 {
 	bool tramd = false;
 	dmvcart_slot_device *slots[] = { m_slot2, m_slot2a, m_slot3, m_slot4, m_slot5, m_slot6, m_slot7, m_slot7a };
@@ -332,8 +357,6 @@ WRITE8_MEMBER(dmv_state::program_w)
 
 	if (!tramd)
 	{
-		int cas = (m_switch16 ? offset >> 16 : m_ram_bank) & 0x07;
-
 		if (cas == 0)
 			m_ram->base()[offset & 0xffff] = data;
 		else
@@ -341,7 +364,7 @@ WRITE8_MEMBER(dmv_state::program_w)
 	}
 }
 
-READ8_MEMBER(dmv_state::program_r)
+UINT8 dmv_state::program_read(address_space &space, int cas, offs_t offset)
 {
 	UINT8 data = 0xff;
 	if (m_ramoutdis && offset < 0x2000)
@@ -357,8 +380,6 @@ READ8_MEMBER(dmv_state::program_r)
 
 		if (!tramd)
 		{
-			int cas = (m_switch16 ? offset >> 16 : m_ram_bank) & 0x07;
-
 			if (cas == 0)
 				data = m_ram->base()[offset & 0xffff];
 			else
@@ -645,10 +666,10 @@ static MACHINE_CONFIG_START( dmv, dmv_state )
 
 	MCFG_DEVICE_ADD("slot7", DMVCART_SLOT, 0)
 	MCFG_DEVICE_SLOT_INTERFACE(dmv_slot7, NULL, false)
-	MCFG_DMVCART_SLOT_PROGRAM_READWRITE_CB(READ8(dmv_state, program_r), WRITE8(dmv_state, program_w))
+	MCFG_DMVCART_SLOT_PROGRAM_READWRITE_CB(READ8(dmv_state, exp_program_r), WRITE8(dmv_state, exp_program_w))
 	MCFG_DEVICE_ADD("slot7a", DMVCART_SLOT, 0)
 	MCFG_DEVICE_SLOT_INTERFACE(dmv_slot7a, "k230", false)
-	MCFG_DMVCART_SLOT_PROGRAM_READWRITE_CB(READ8(dmv_state, program_r), WRITE8(dmv_state, program_w))
+	MCFG_DMVCART_SLOT_PROGRAM_READWRITE_CB(READ8(dmv_state, exp_program_r), WRITE8(dmv_state, exp_program_w))
 
 MACHINE_CONFIG_END
 
