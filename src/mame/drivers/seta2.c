@@ -3432,7 +3432,7 @@ ROM_END
 
 
 GAME( 1994, gundamex, 0,        gundamex, gundamex, driver_device, 0,        ROT0, "Banpresto",             "Mobile Suit Gundam EX Revue",                  0 )
-GAME( 1995, grdians,  0,        grdians,  grdians,  driver_device, 0,        ROT0, "Banpresto",             "Guardians / Denjin Makai II",                  GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )    // Displays (c) Winky Soft at game's end.
+GAME( 1995, grdians,  0,        grdians,  grdians,  driver_device, 0,        ROT0, "Winkysoft (Banpresto license)", "Guardians / Denjin Makai II",          GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )
 GAME( 1996, mj4simai, 0,        mj4simai, mj4simai, driver_device, 0,        ROT0, "Maboroshi Ware",        "Wakakusamonogatari Mahjong Yonshimai (Japan)", GAME_NO_COCKTAIL )
 GAME( 1996, myangel,  0,        myangel,  myangel,  driver_device, 0,        ROT0, "MOSS / Namco",          "Kosodate Quiz My Angel (Japan)",               GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )
 GAME( 1997, myangel2, 0,        myangel2, myangel2, driver_device, 0,        ROT0, "MOSS / Namco",          "Kosodate Quiz My Angel 2 (Japan)",             GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )
