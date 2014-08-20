@@ -9,7 +9,7 @@
 
   Used PinMAME as a reference.
 
-  System 3: NMI is connected "FICHA" (coin slot). RST is connected to "TILT".
+  System 3: NMI is connected to "FICHA" (coin slot). RST is connected to "TILT".
 
   The manual mentions these machines:
   Arizona, Atlantis, Galaxia, Hustler, Martian Queen.
@@ -25,9 +25,13 @@
   (unknown year): Viking King
 
 ToDo:
-- System 4, everything
-- System 3, sound
+- No mechanical sounds
+- System 3, no sound
+- System 3, slam tilt to connect to reset line
 - Zephy, no playfield inputs
+- System 4, no playfield inputs
+- System 4, can randomly freeze MAME for no reason
+- Alcapone, display needs fixing
 - Outputs
 - Mechanical
 
@@ -53,12 +57,21 @@ public:
 	DECLARE_DRIVER_INIT(ltd);
 	DECLARE_READ8_MEMBER(io_r);
 	DECLARE_WRITE8_MEMBER(io_w);
+	DECLARE_READ8_MEMBER(port1_r);
+	DECLARE_WRITE8_MEMBER(port1_w);
+	DECLARE_READ8_MEMBER(port2_r);
+	DECLARE_WRITE8_MEMBER(port2_w);
+	DECLARE_WRITE8_MEMBER(count_reset_w);
 	DECLARE_INPUT_CHANGED_MEMBER(ficha);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_r);
 private:
 	bool m_timer_r;
+	bool m_clear;
+	UINT8 m_counter;
+	UINT8 m_digit;
 	UINT8 m_game;
 	UINT8 m_out_offs;
+	UINT8 m_port2;
 	virtual void machine_reset();
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<UINT8> m_p_ram;
@@ -76,7 +89,7 @@ static ADDRESS_MAP_START( ltd4_map, AS_PROGRAM, 8, ltd_state )
 	AM_RANGE(0x0000, 0x001f) AM_RAM // internal to the cpu
 	AM_RANGE(0x0080, 0x00ff) AM_RAM
 	AM_RANGE(0x0100, 0x01ff) AM_RAM AM_SHARE("nvram")
-	//AM_RANGE(0x0800, 0x0800) AM_WRITE(cycle_reset_w)
+	AM_RANGE(0x0800, 0x0800) AM_WRITE(count_reset_w)
 	AM_RANGE(0x0c00, 0x0c00) AM_DEVWRITE("aysnd_1", ay8910_device, reset_w)
 	AM_RANGE(0x1000, 0x1000) AM_DEVWRITE("aysnd_0", ay8910_device, address_w)
 	AM_RANGE(0x1400, 0x1400) AM_DEVWRITE("aysnd_0", ay8910_device, reset_w)
@@ -88,10 +101,12 @@ static ADDRESS_MAP_START( ltd4_map, AS_PROGRAM, 8, ltd_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ltd4_io, AS_IO, 8, ltd_state )
-	//AM_RANGE(0x0100, 0x0100) AM_READWRITE
-	//AM_RANGE(0x0101, 0x0101) AM_WRITE(
+	AM_RANGE(0x0100, 0x0100) AM_READWRITE(port1_r,port1_w)
+	AM_RANGE(0x0101, 0x0101) AM_READWRITE(port2_r,port2_w)
 ADDRESS_MAP_END
 
+// bits 6,7 not connected to data bus
+// 1=does something in Atlantis; 2=does something in Black Hole; note that sometimes pressing G or H will reboot the machine.
 static INPUT_PORTS_START( ltd3 )
 	PORT_START("FICHA")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, ltd_state, ficha, 0)
@@ -127,9 +142,51 @@ static INPUT_PORTS_START( ltd3 )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Q) //2
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_W) //2
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_E) //2
+	PORT_BIT( 0x18, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START )
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("X7")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_X) PORT_NAME("Outhole") // 1,2
+	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNUSED )
+INPUT_PORTS_END
+
+// this needs to be redone once inputs start to work
+static INPUT_PORTS_START( ltd4 )
+	PORT_START("X0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_0_PAD)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_1_PAD)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_2_PAD)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_3_PAD)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_4_PAD)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_TILT ) // tilt all
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("X1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_SLASH)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_COLON)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_QUOTE) // start pecmen
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_BACKSLASH)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 ) //coin all
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 ) //coin cowboy,alcapone; start pecmen
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("X2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 ) //start cowboy,alcapone
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_S)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_D)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_F)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_G)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_H)
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("X3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Q)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_W)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_E)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_R)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Y)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_BACKSPACE)
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("X4")
@@ -160,16 +217,13 @@ static INPUT_PORTS_START( ltd3 )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("X7")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_X) PORT_NAME("Outhole") // 1,2
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_X)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_ASTERISK)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_SLASH_PAD)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_MINUS_PAD)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_MINUS_PAD) // credit pecmen
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_PLUS_PAD)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_ENTER_PAD)
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( ltd4 )
 INPUT_PORTS_END
 
 INPUT_CHANGED_MEMBER( ltd_state::ficha )
@@ -181,11 +235,21 @@ INPUT_CHANGED_MEMBER( ltd_state::ficha )
 // switches
 READ8_MEMBER( ltd_state::io_r )
 {
-	if (offset==0) return ioport("X0")->read();
-	if (offset==1) return ioport("X1")->read();
-	if (offset==2) return ioport("X2")->read();
-	if (offset==3) return ioport("X3")->read();
-	if (offset==7) return ioport("X7")->read();
+	if (offset==0)
+		return ioport("X0")->read();
+	else
+	if (offset==1)
+		return ioport("X1")->read();
+	else
+	if (offset==2)
+		return ioport("X2")->read();
+	else
+	if (offset==3)
+		return ioport("X3")->read();
+	else
+	if (offset==7)
+		return ioport("X7")->read();
+
 	return 0xff;
 }
 
@@ -195,8 +259,102 @@ WRITE8_MEMBER( ltd_state::io_w )
 	offset >>= 10; // reduces offsets to 1 per bank
 }
 
+READ8_MEMBER( ltd_state:: port1_r )
+{
+	if (~m_port2 & 0x10)
+	{
+		UINT8 row = m_digit >> 4;
+
+		if (row==0)
+			return ioport("X0")->read();
+		else
+		if (row==1)
+			return ioport("X1")->read();
+		else
+		if (row==2)
+			return ioport("X2")->read();
+		else
+		if (row==3)
+			return ioport("X3")->read();
+		else
+		if (row==4)
+			return ioport("X4")->read();
+		else
+		if (row==5)
+			return ioport("X5")->read();
+		else
+		if (row==6)
+			return ioport("X6")->read();
+		else
+		//if (row==7)
+			return ioport("X7")->read();
+	}
+	return 0xff;
+}
+
+WRITE8_MEMBER( ltd_state::port1_w )
+{
+	if (m_port2 & 0x10)
+	{
+		UINT8 row = m_digit & 15;
+		UINT8 segment = BITSWAP8(data, 7, 0, 1, 2, 3, 4, 5, 6);
+
+		switch (m_counter)
+		{
+			case 0:
+				m_clear = (data < 0xff);
+				break;
+			case 6:
+				if (m_clear)
+					m_digit = data;
+				break;
+			case 7:
+				if (m_clear)
+				{
+					if (row>7)
+						output_set_digit_value(row+2, segment); // P2
+					else
+						output_set_digit_value(row, segment); // P1
+				}
+				break;
+			case 8:
+				if (m_clear)
+				{
+					if (row>13)
+						output_set_digit_value(row+26, segment); // credits / ball
+					else
+					if (row>7)
+						output_set_digit_value(row+22, segment); // P4
+					else
+						output_set_digit_value(row+20, segment); // P3
+				}
+				break;
+		}
+	}
+}
+
+READ8_MEMBER( ltd_state:: port2_r )
+{
+	return m_port2;
+}
+
+WRITE8_MEMBER( ltd_state::port2_w )
+{
+	if (~m_port2 & data & 0x10)
+		m_counter++;
+
+	m_port2 = data;
+}
+
+WRITE8_MEMBER( ltd_state::count_reset_w )
+{
+	m_counter = 0;
+}
+
 void ltd_state::machine_reset()
 {
+	m_clear = 0;
+	m_counter = 0;
 	m_out_offs = 0;
 	m_timer_r = 0;
 }
@@ -347,18 +505,6 @@ TIMER_DEVICE_CALLBACK_MEMBER( ltd_state::timer_r )
 
 		}
 	}
-//	else
-//	if (m_out_offs == 0x4a) // outhole
-//	{
-//		if (BIT(m_p_ram[m_out_offs], 0))
-//			m_samples->start(0, 5);
-//	}
-//	else
-//	if (m_out_offs == 0x4b) // knocker
-//	{
-//		if (BIT(m_p_ram[m_out_offs], 0))
-//			m_samples->start(0, 6);
-//	}
 }
 
 static MACHINE_CONFIG_START( ltd3, ltd_state )
@@ -379,7 +525,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( ltd4, ltd_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6803, XTAL_3_579545MHz)
+	MCFG_CPU_ADD("maincpu", M6803, XTAL_3_579545MHz) // guess, no details available
 	MCFG_CPU_PROGRAM_MAP(ltd4_map)
 	MCFG_CPU_IO_MAP(ltd4_io)
 
@@ -466,7 +612,7 @@ GAME(1981, bhol_ltd, 0,  ltd3,  ltd3, ltd_state, bhol_ltd, ROT0, "LTD", "Black H
 GAME(1981, zephy,    0,  ltd3,  ltd3, ltd_state, zephy,    ROT0, "LTD", "Zephy",              GAME_IS_SKELETON_MECHANICAL)
 
 // system 4
-GAME(1981, cowboy,   0,  ltd4,  ltd4, ltd_state, ltd,      ROT0, "LTD", "Cowboy Eight Ball",  GAME_IS_SKELETON_MECHANICAL)
+GAME(1981, cowboy,   0,  ltd4,  ltd4, ltd_state, ltd,      ROT0, "LTD", "Cowboy Eight Ball 2", GAME_IS_SKELETON_MECHANICAL)
 GAME(1981, pecmen,   0,  ltd4,  ltd4, ltd_state, ltd,      ROT0, "LTD", "Mr. & Mrs. Pec-Men", GAME_IS_SKELETON_MECHANICAL)
 GAME(1981, alcapone, 0,  ltd4,  ltd4, ltd_state, ltd,      ROT0, "LTD", "Al Capone",          GAME_IS_SKELETON_MECHANICAL)
 GAME(1982, columbia, 0,  ltd4,  ltd4, ltd_state, ltd,      ROT0, "LTD", "Columbia",           GAME_IS_SKELETON_MECHANICAL)
