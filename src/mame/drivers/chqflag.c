@@ -31,41 +31,34 @@ TIMER_DEVICE_CALLBACK_MEMBER(chqflag_state::chqflag_scanline)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-WRITE8_MEMBER(chqflag_state::chqflag_bankswitch_w)
+/* these trampolines are less confusing than nested address_map_bank_devices */
+READ8_MEMBER(chqflag_state::k051316_1_ramrom_r)
 {
-	m_bank = data; //needed to restore the bankswitch post load
-	
-	int bankaddress;
-	UINT8 *RAM = memregion("maincpu")->base();
-
-	/* bits 0-4 = ROM bank # (0x00-0x11) */
-	bankaddress = 0x10000 + (data & 0x1f) * 0x4000;
-	membank("bank4")->set_base(&RAM[bankaddress]);
-
-	/* bit 5 = memory bank select */
-	if (data & 0x20)
-	{
-		space.install_read_bank(0x1800, 0x1fff, "bank5");
-		space.install_write_handler(0x1800, 0x1fff, write8_delegate(FUNC(palette_device::write),m_palette.target()));
-		membank("bank5")->set_base(m_paletteram);
-
-		if (m_k051316_readroms)
-			space.install_readwrite_handler(0x1000, 0x17ff, read8_delegate(FUNC(k051316_device::rom_r), (k051316_device*)m_k051316_1), write8_delegate(FUNC(k051316_device::write), (k051316_device*)m_k051316_1)); /* 051316 #1 (ROM test) */
-		else
-			space.install_readwrite_handler(0x1000, 0x17ff, read8_delegate(FUNC(k051316_device::read), (k051316_device*)m_k051316_1), write8_delegate(FUNC(k051316_device::write), (k051316_device*)m_k051316_1));     /* 051316 #1 */
-	}
+	if (m_k051316_readroms)
+		return m_k051316_1->rom_r(space, offset);
 	else
-	{
-		space.install_readwrite_bank(0x1000, 0x17ff, "bank1");              /* RAM */
-		space.install_readwrite_bank(0x1800, 0x1fff, "bank2");              /* RAM */
-	}
-
-	/* other bits unknown/unused */
+		return m_k051316_1->read(space, offset);
 }
 
-void chqflag_state::bankswitch_restore()
+READ8_MEMBER(chqflag_state::k051316_2_ramrom_r)
 {
-	chqflag_bankswitch_w(m_maincpu->space(AS_PROGRAM), 0, m_bank);
+	if (m_k051316_readroms)
+		return m_k051316_2->rom_r(space, offset);
+	else
+		return m_k051316_2->read(space, offset);
+}
+
+WRITE8_MEMBER(chqflag_state::chqflag_bankswitch_w)
+{
+	/* bits 0-4 = ROM bank # (0x00-0x11) */
+	int bankaddress = data & 0x1f;
+	if (bankaddress < (0x50000 / 0x4000))
+		m_rombank->set_entry(bankaddress);
+
+	/* bit 5 = select work RAM or k051316 + palette */
+	m_bank1000->set_bank((data & 0x20) >> 5);
+
+	/* other bits unknown/unused */
 }
 
 WRITE8_MEMBER(chqflag_state::chqflag_vreg_w)
@@ -76,11 +69,6 @@ WRITE8_MEMBER(chqflag_state::chqflag_vreg_w)
 
 	/* bit 4 = enable rom reading through K051316 #1 & #2 */
 	m_k051316_readroms = (data & 0x10);
-
-	if (m_k051316_readroms)
-		space.install_read_handler(0x2800, 0x2fff, read8_delegate(FUNC(k051316_device::rom_r), (k051316_device*)m_k051316_2));   /* 051316 (ROM test) */
-	else
-		space.install_read_handler(0x2800, 0x2fff, read8_delegate(FUNC(k051316_device::read), (k051316_device*)m_k051316_2));       /* 051316 */
 
 	/* Bits 3-7 probably control palette dimming in a similar way to TMNT2/Sunset Riders, */
 	/* however I don't have enough evidence to determine the exact behaviour. */
@@ -139,13 +127,12 @@ WRITE8_MEMBER(chqflag_state::chqflag_sh_irqtrigger_w)
 /****************************************************************************/
 
 static ADDRESS_MAP_START( chqflag_map, AS_PROGRAM, 8, chqflag_state )
-	AM_RANGE(0x0000, 0x0fff) AM_RAM                                             /* RAM */
-	AM_RANGE(0x1000, 0x17ff) AM_RAMBANK("bank1")                                /* banked RAM (RAM/051316 (chip 1)) */
-	AM_RANGE(0x1800, 0x1fff) AM_RAMBANK("bank2")                                /* palette + RAM */
-	AM_RANGE(0x2000, 0x2007) AM_DEVREADWRITE("k051960", k051960_device, k051937_r, k051937_w)                    /* Sprite control registers */
-	AM_RANGE(0x2400, 0x27ff) AM_DEVREADWRITE("k051960", k051960_device, k051960_r, k051960_w)                    /* Sprite RAM */
-	AM_RANGE(0x2800, 0x2fff) AM_READ_BANK("bank3") AM_DEVWRITE("k051316_2", k051316_device, write)       /* 051316 zoom/rotation (chip 2) */
-	AM_RANGE(0x3000, 0x3000) AM_WRITE(soundlatch_byte_w)                                /* sound code # */
+	AM_RANGE(0x0000, 0x0fff) AM_RAM
+	AM_RANGE(0x1000, 0x1fff) AM_DEVICE("bank1000", address_map_bank_device, amap8)
+	AM_RANGE(0x2000, 0x2007) AM_DEVREADWRITE("k051960", k051960_device, k051937_r, k051937_w)            /* Sprite control registers */
+	AM_RANGE(0x2400, 0x27ff) AM_DEVREADWRITE("k051960", k051960_device, k051960_r, k051960_w)            /* Sprite RAM */
+	AM_RANGE(0x2800, 0x2fff) AM_READ(k051316_2_ramrom_r) AM_DEVWRITE("k051316_2", k051316_device, write) /* 051316 zoom/rotation (chip 2) */
+	AM_RANGE(0x3000, 0x3000) AM_WRITE(soundlatch_byte_w)                        /* sound code # */
 	AM_RANGE(0x3001, 0x3001) AM_WRITE(chqflag_sh_irqtrigger_w)                  /* cause interrupt on audio CPU */
 	AM_RANGE(0x3002, 0x3002) AM_WRITE(chqflag_bankswitch_w)                     /* bankswitch control */
 	AM_RANGE(0x3003, 0x3003) AM_WRITE(chqflag_vreg_w)                           /* enable K051316 ROM reading */
@@ -160,9 +147,16 @@ static ADDRESS_MAP_START( chqflag_map, AS_PROGRAM, 8, chqflag_state )
 	AM_RANGE(0x3700, 0x3700) AM_WRITE(select_analog_ctrl_w)                     /* select accelerator/wheel */
 	AM_RANGE(0x3701, 0x3701) AM_READ_PORT("IN2")                                /* Brake + Shift + ? */
 	AM_RANGE(0x3702, 0x3702) AM_READWRITE(analog_read_r, select_analog_ctrl_w)  /* accelerator/wheel */
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank4")                                        /* banked ROM */
-	AM_RANGE(0x8000, 0xffff) AM_ROM                                             /* ROM */
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("rombank")                              /* banked ROM */
+	AM_RANGE(0x8000, 0xffff) AM_ROM AM_REGION("maincpu", 0x48000)               /* ROM */
 ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( bank1000_map, AS_PROGRAM, 8, chqflag_state )
+	AM_RANGE(0x0000, 0x0fff) AM_RAM
+	AM_RANGE(0x1000, 0x17ff) AM_READ(k051316_1_ramrom_r) AM_DEVWRITE("k051316_1", k051316_device, write)
+	AM_RANGE(0x1800, 0x1fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+ADDRESS_MAP_END
+
 
 WRITE8_MEMBER(chqflag_state::k007232_bankswitch_w)
 {
@@ -275,21 +269,13 @@ WRITE8_MEMBER(chqflag_state::volume_callback1)
 
 void chqflag_state::machine_start()
 {
-	UINT8 *ROM = memregion("maincpu")->base();
+	m_rombank->configure_entries(0, 0x50000 / 0x4000, memregion("maincpu")->base(), 0x4000);
 
-	membank("bank1")->configure_entries(0, 4, &ROM[0x10000], 0x2000);
-
-	m_paletteram.resize(m_palette->entries() * 2);
-	m_palette->basemem().set(m_paletteram, ENDIANNESS_BIG, 2);
-
-	save_item(NAME(m_paletteram));
 	save_item(NAME(m_k051316_readroms));
 	save_item(NAME(m_last_vreg));
 	save_item(NAME(m_analog_ctrl));
 	save_item(NAME(m_accel));
 	save_item(NAME(m_wheel));
-	save_item(NAME(m_bank));
-	machine().save().register_postload(save_prepost_delegate(FUNC(chqflag_state::bankswitch_restore), this));
 }
 
 void chqflag_state::machine_reset()
@@ -299,7 +285,6 @@ void chqflag_state::machine_reset()
 	m_analog_ctrl = 0;
 	m_accel = 0;
 	m_wheel = 0;
-	m_bank = 0;
 }
 
 static MACHINE_CONFIG_START( chqflag, chqflag_state )
@@ -311,6 +296,13 @@ static MACHINE_CONFIG_START( chqflag, chqflag_state )
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(chqflag_sound_map)
+
+	MCFG_DEVICE_ADD("bank1000", ADDRESS_MAP_BANK, 0)
+	MCFG_DEVICE_PROGRAM_MAP(bank1000_map)
+	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
+	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_ADDRBUS_WIDTH(13)
+	MCFG_ADDRESS_MAP_BANK_STRIDE(0x1000)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
@@ -368,13 +360,11 @@ static MACHINE_CONFIG_START( chqflag, chqflag_state )
 MACHINE_CONFIG_END
 
 ROM_START( chqflag )
-	ROM_REGION( 0x58000, "maincpu", 0 ) /* 052001 code */
-	ROM_LOAD( "717h02",     0x050000, 0x008000, CRC(f5bd4e78) SHA1(7bab02152d055a6c3a322c88e7ee0b85a39d8ef2) )  /* banked ROM */
-	ROM_CONTINUE(           0x008000, 0x008000 )                /* fixed ROM */
-	ROM_LOAD( "717e10",     0x010000, 0x040000, CRC(72fc56f6) SHA1(433ea9a33f0230e046c731c70060f6a38db14ac7) )  /* banked ROM */
-	/* extra memory for banked RAM */
+	ROM_REGION( 0x50000, "maincpu", 0 ) /* 052001 code */
+	ROM_LOAD( "717e10",     0x00000, 0x40000, CRC(72fc56f6) SHA1(433ea9a33f0230e046c731c70060f6a38db14ac7) )
+	ROM_LOAD( "717h02",     0x40000, 0x10000, CRC(f5bd4e78) SHA1(7bab02152d055a6c3a322c88e7ee0b85a39d8ef2) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for the SOUND CPU */
+	ROM_REGION( 0x08000, "audiocpu", 0 )    /* Z80 code */
 	ROM_LOAD( "717e01",     0x000000, 0x008000, CRC(966b8ba8) SHA1(ab7448cb61fa5922b1d8ae5f0d0f42d734ed4f93) )
 
 	ROM_REGION( 0x100000, "k051960", 0 )    /* sprites */
@@ -398,13 +388,11 @@ ROM_START( chqflag )
 ROM_END
 
 ROM_START( chqflagj )
-	ROM_REGION( 0x58000, "maincpu", 0 ) /* 052001 code */
-	ROM_LOAD( "717j02.bin", 0x050000, 0x008000, CRC(05355daa) SHA1(130ddbc289c077565e44f33c63a63963e6417e19) )  /* banked ROM */
-	ROM_CONTINUE(           0x008000, 0x008000 )                /* fixed ROM */
-	ROM_LOAD( "717e10",     0x010000, 0x040000, CRC(72fc56f6) SHA1(433ea9a33f0230e046c731c70060f6a38db14ac7) )  /* banked ROM */
-	/* extra memory for banked RAM */
+	ROM_REGION( 0x50000, "maincpu", 0 ) /* 052001 code */
+	ROM_LOAD( "717e10",     0x00000, 0x40000, CRC(72fc56f6) SHA1(433ea9a33f0230e046c731c70060f6a38db14ac7) )
+	ROM_LOAD( "717j02.bin", 0x40000, 0x10000, CRC(05355daa) SHA1(130ddbc289c077565e44f33c63a63963e6417e19) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for the SOUND CPU */
+	ROM_REGION( 0x08000, "audiocpu", 0 )    /* Z80 code */
 	ROM_LOAD( "717e01",     0x000000, 0x008000, CRC(966b8ba8) SHA1(ab7448cb61fa5922b1d8ae5f0d0f42d734ed4f93) )
 
 	ROM_REGION( 0x100000, "k051960", 0 )    /* sprites */

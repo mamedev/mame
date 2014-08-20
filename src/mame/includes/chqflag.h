@@ -3,6 +3,7 @@
     Chequered Flag
 
 *************************************************************************/
+#include "machine/bankdev.h"
 #include "sound/k007232.h"
 #include "video/k051960.h"
 #include "video/k051316.h"
@@ -16,16 +17,14 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
+		m_bank1000(*this, "bank1000"),
 		m_k007232_1(*this, "k007232_1"),
 		m_k007232_2(*this, "k007232_2"),
 		m_k051960(*this, "k051960"),
 		m_k051316_1(*this, "k051316_1"),
 		m_k051316_2(*this, "k051316_2"),
-		m_palette(*this, "palette") { }
-
-	/* memory pointers */
-	UINT8 *    m_ram;
-	dynamic_array<UINT8> m_paletteram;
+		m_palette(*this, "palette"),
+		m_rombank(*this, "rombank") { }
 
 	/* video-related */
 	int        m_zoom_colorbase[2];
@@ -37,11 +36,11 @@ public:
 	int        m_analog_ctrl;
 	int        m_accel;
 	int        m_wheel;
-	int		   m_bank;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
+	required_device<address_map_bank_device> m_bank1000;
 	required_device<k007232_device> m_k007232_1;
 	required_device<k007232_device> m_k007232_2;
 	required_device<k051960_device> m_k051960;
@@ -49,6 +48,11 @@ public:
 	required_device<k051316_device> m_k051316_2;
 	required_device<palette_device> m_palette;
 
+	/* memory pointers */
+	required_memory_bank m_rombank;
+
+	DECLARE_READ8_MEMBER(k051316_1_ramrom_r);
+	DECLARE_READ8_MEMBER(k051316_2_ramrom_r);
 	DECLARE_WRITE8_MEMBER(chqflag_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(chqflag_vreg_w);
 	DECLARE_WRITE8_MEMBER(select_analog_ctrl_w);
@@ -66,5 +70,4 @@ public:
 	K051316_CB_MEMBER(zoom_callback_1);
 	K051316_CB_MEMBER(zoom_callback_2);
 	K051960_CB_MEMBER(sprite_callback);
-	void bankswitch_restore();
 };
