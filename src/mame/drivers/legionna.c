@@ -720,14 +720,14 @@ static INPUT_PORTS_START( denjinmk )
 	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Flip_Screen ) )
 	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0020, DEF_STR( On ) )
 	PORT_SERVICE( 0x0040, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Language ) ) //it actually skips the story entirely, so just remain JP as default
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Language ) ) // it actually skips the story entirely, so just remain JP as default
 	PORT_DIPSETTING(      0x0080, DEF_STR( Japanese ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( English ) )
 	PORT_DIPNAME( 0x0f00, 0x0f00, DEF_STR( Coin_A ) )
@@ -2426,7 +2426,7 @@ GAME( 1992, heatbrle, heatbrl,  heatbrl,  heatbrl, driver_device,  0,         RO
 
 GAME( 1993, godzilla, 0,        godzilla, godzilla, driver_device, 0,         ROT0, "Banpresto", "Godzilla (Japan)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
 GAME( 1993, grainbow, 0,        grainbow, grainbow, driver_device, 0,         ROT0, "Banpresto", "SD Gundam Sangokushi Rainbow Tairiku Senki", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
-GAME( 1993, denjinmk, 0,        denjinmk, denjinmk, legionna_state, denjinmk,  ROT0, "Banpresto", "Denjin Makai", GAME_IMPERFECT_GRAPHICS )
+GAME( 1993, denjinmk, 0,        denjinmk, denjinmk, legionna_state,denjinmk,  ROT0, "Banpresto", "Denjin Makai", GAME_IMPERFECT_GRAPHICS )
 
 GAME( 1992, cupsoc,   0,        cupsoc,   cupsoc, driver_device,   0,         ROT0, "Seibu Kaihatsu", "Seibu Cup Soccer (set 1)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
 GAME( 1992, cupsoca,  cupsoc,   cupsoc,   cupsoc, driver_device,   0,         ROT0, "Seibu Kaihatsu", "Seibu Cup Soccer (set 2)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
