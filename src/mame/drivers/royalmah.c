@@ -35,6 +35,7 @@ Year + Game               Board(s)               CPU      Company            Not
 96  Janputer '96          NS503X0727             Z80      Dynax              Larger palette, RTC
 97  Janputer Special      CS166P008 + NS5110207  Z80      Dynax              Larger palette, RTC
 99  Mahjong Cafe Break    NS528-9812             TLCS-90  Nakanihon / Dynax  Undumped internal rom
+99  Mahjong Cafe Paradise ? + Techno Top Limited TLCS-90  Techno-Top?        Undumped internal rom
 -----------------------------------------------------------------------------------------------------------------------
 
 TODO:
@@ -4176,6 +4177,35 @@ ROM_END
 
 /***************************************************************************
 
+Mahjong Cafe Paradise
+1999 Techno-Top
+
+Royal Mahjong board. No roms on the base board.
+
+Top board looks like typical Dynax with scratched SDIP64.
+It is marked 'Techno Top Limited' and has just 2 eproms and 2 PROMs.
+Everything else is scratched but there's a 32.768kHz OSC, RTC and connected battery.
+Also, 4 DIP sw each with 10 switches and an 8MHz OSC next to the SDIP64 chip,
+and a PLCC68 chip (likely FPGA)
+
+***************************************************************************/
+
+ROM_START( cafepara )
+	ROM_REGION( 0x290000, "maincpu", 0 )
+	ROM_LOAD( "cafepara.tmp91640", 0x000000, 0x004000, NO_DUMP )
+	// VIDEO & AM MICRO COMPUTER SYSTEMS 1999 TECHNO-TOP,LIMITED NAGOYA JAPAN MAHJONG CAFE PARADISE TSS001 VER. 1.00
+	ROM_LOAD( "00101.1h", 0x000000, 0x080000, CRC(f5917280) SHA1(e6180e36643075ab9fa5bc27baef2a464a23f581) )
+	/* bank switched ROMs follow */
+	ROM_RELOAD(           0x010000, 0x080000 )
+	ROM_LOAD( "00102.1d", 0x090000, 0x200000, CRC(ed3b5447) SHA1(ac24e9c00c94c35d2b2ec35f0c4262ceeda5408f) )
+
+	ROM_REGION( 0x400, "proms", 0 )
+	ROM_LOAD( "ts001b.4h", 0x000, 0x200, CRC(b0019654) SHA1(78ba9b35744849c430f99137ea0da3d5564cc72a) )
+	ROM_LOAD( "ts001a.4j", 0x200, 0x200, CRC(e89d4db0) SHA1(ff191a76fe1144e72a1cf3769f0156adf2d0507f) )
+ROM_END
+
+/***************************************************************************
+
 Mahjong Vegas
 Dynax, 199?
 
@@ -4426,6 +4456,7 @@ Notes:
       Y      - 32.768kHz OSC for RTC
 
 ***************************************************************************/
+
 ROM_START( cafebrk )
 	ROM_REGION( 0x280000, "maincpu", 0 )
 	ROM_LOAD( "528.tmp91640", 0x000000, 0x004000, NO_DUMP )
@@ -4767,39 +4798,40 @@ DRIVER_INIT_MEMBER(royalmah_state,janptr96)
 	machine().device<nvram_device>("nvram")->set_base(m_janptr96_nvram, 0x1000 * 9);
 }
 
-GAME( 1981,  royalmj,  0,        royalmah, royalmah, driver_device, 0,        ROT0,   "Nichibutsu",                 "Royal Mahjong (Japan, v1.13)",          0 )
-GAME( 1981?, openmj,   royalmj,  royalmah, royalmah, driver_device, 0,        ROT0,   "Sapporo Mechanic",           "Open Mahjong [BET] (Japan)",            0 )
-GAME( 1982,  royalmah, royalmj,  royalmah, royalmah, driver_device, 0,        ROT0,   "bootleg",                    "Royal Mahjong (Falcon bootleg, v1.01)", 0 )
-GAME( 1983,  janyoup2, royalmj,  ippatsu,  janyoup2, driver_device, 0,        ROT0,   "Cosmo Denshi",               "Janyou Part II (ver 7.03, July 1 1983)",0 )
-GAME( 1981,  janputer, 0,        royalmah, royalmah, driver_device, 0,        ROT0,   "bootleg (Public Software Ltd. / Mes)", "New Double Bet Mahjong (bootleg of Janputer)", 0 ) // the original Janputer (Sanritsu) is not yet dumped
-GAME( 1984,  janoh,    0,        royalmah, royalmah, driver_device, 0,        ROT0,   "Toaplan",                    "Jan Oh (set 1)",                        GAME_NOT_WORKING )
-GAME( 1984,  janoha,   janoh,    janoh,    royalmah, driver_device, 0,        ROT0,   "Toaplan",                    "Jan Oh (set 2)",                        GAME_NOT_WORKING ) // this one is complete?
-GAME( 1985,  jansou,   0,        jansou,   jansou, driver_device,   0,        ROT0,   "Dyna",                       "Jansou (set 1)",                        GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 1985,  jansoua,  jansou,   jansou,   jansou, driver_device,   0,        ROT0,   "Dyna",                       "Jansou (set 2)",                        0 )
-GAME( 1986,  dondenmj, 0,        dondenmj, majs101b, driver_device, 0,        ROT0,   "Dyna Electronics",           "Don Den Mahjong [BET] (Japan)",         0 )
-GAME( 1986,  ippatsu,  0,        ippatsu,  ippatsu, royalmah_state, ippatsu,  ROT0,   "Public Software / Paradais", "Ippatsu Gyakuten [BET] (Japan)",        0 )
-GAME( 1986,  suzume,   0,        suzume,   suzume, driver_device,   0,        ROT0,   "Dyna Electronics",           "Watashiha Suzumechan (Japan)",          0 )
-GAME( 1986,  mjsiyoub, 0,        royalmah, royalmah, driver_device, 0,        ROT0,   "Visco",                      "Mahjong Shiyou (Japan)",                GAME_NOT_WORKING )
-GAME( 1986,  mjsenka,  0,        royalmah, royalmah, driver_device, 0,        ROT0,   "Visco",                      "Mahjong Senka (Japan)",                 GAME_NOT_WORKING )
-GAME( 1986,  mjyarou,  0,        royalmah, royalmah, driver_device, 0,        ROT0,   "Visco / Video System",       "Mahjong Yarou [BET] (Japan)",           GAME_NOT_WORKING )
-GAME( 1986?, mjclub,   0,        mjclub,   mjclub, driver_device,   0,        ROT0,   "Xex",                        "Mahjong Club [BET] (Japan)",            0 )
-GAME( 1987,  mjdiplob, 0,        mjdiplob, mjdiplob, driver_device, 0,        ROT0,   "Dynax",                      "Mahjong Diplomat [BET] (Japan)",        0 )
-GAME( 1987,  tontonb,  0,        tontonb,  tontonb, driver_device,  0,        ROT0,   "Dynax",                      "Tonton [BET] (Japan set 1)",            0 )
-GAME( 1987,  makaijan, 0,        makaijan, makaijan, driver_device, 0,        ROT0,   "Dynax",                      "Makaijan [BET] (Japan)",                0 )
-GAME( 1988,  majs101b, 0,        majs101b, majs101b, driver_device, 0,        ROT0,   "Dynax",                      "Mahjong Studio 101 [BET] (Japan)",      0 )
-GAME( 1988,  mjapinky, 0,        mjapinky, mjapinky, driver_device, 0,        ROT0,   "Dynax",                      "Almond Pinky [BET] (Japan)",            0 )
-GAME( 1989,  mjdejavu, 0,        mjdejavu, mjdejavu, driver_device, 0,        ROT0,   "Dynax",                      "Mahjong Shinkirou Deja Vu (Japan)",     0 )
-GAME( 1989,  mjdejav2, mjdejavu, mjdejavu, mjdejavu, driver_device, 0,        ROT0,   "Dynax",                      "Mahjong Shinkirou Deja Vu 2 (Japan)",   0 )
-GAME( 1989,  mjderngr, 0,        mjderngr, mjderngr, driver_device, 0,        ROT0,   "Dynax",                      "Mahjong Derringer (Japan)",             0 )
-GAME( 1989,  daisyari, 0,        daisyari, daisyari, driver_device, 0,        ROT0,   "Best System",                "Daisyarin [BET] (Japan)",               0 )
-GAME( 1990,  mjifb,    0,        mjifb,    mjifb, driver_device,    0,        ROT0,   "Dynax",                      "Mahjong If...? [BET]",                  0 )
-GAME( 1990,  mjifb2,   mjifb,    mjifb,    mjifb, driver_device,    0,        ROT0,   "Dynax",                      "Mahjong If...? [BET](2921)",            0 )
-GAME( 1990,  mjifb3,   mjifb,    mjifb,    mjifb, driver_device,    0,        ROT0,   "Dynax",                      "Mahjong If...? [BET](2931)",            0 )
-GAME( 1991,  mjvegasa, 0,        mjvegasa, mjvegasa, driver_device, 0,        ROT0,   "Dynax",                      "Mahjong Vegas (Japan, unprotected)",    0 )
-GAME( 1991,  mjvegas,  mjvegasa, mjvegasa, mjvegasa, driver_device, 0,        ROT0,   "Dynax",                      "Mahjong Vegas (Japan)",                 GAME_NOT_WORKING )
-GAME( 1992,  cafetime, 0,        cafetime, cafetime, driver_device, 0,        ROT0,   "Dynax",                      "Mahjong Cafe Time",                     0 )
-GAME( 1993,  cafedoll, 0,        mjifb,    mjifb, driver_device,    0,        ROT0,   "Dynax",                      "Mahjong Cafe Doll (Japan)",             GAME_NOT_WORKING )
-GAME( 1995,  mjtensin, 0,        mjtensin, mjtensin, driver_device, 0,        ROT0,   "Dynax",                      "Mahjong Tensinhai (Japan)",             GAME_NOT_WORKING )
+GAME( 1981,  royalmj,  0,        royalmah, royalmah, driver_device, 0,         ROT0,   "Nichibutsu",                 "Royal Mahjong (Japan, v1.13)",          0 )
+GAME( 1981?, openmj,   royalmj,  royalmah, royalmah, driver_device, 0,         ROT0,   "Sapporo Mechanic",           "Open Mahjong [BET] (Japan)",            0 )
+GAME( 1982,  royalmah, royalmj,  royalmah, royalmah, driver_device, 0,         ROT0,   "bootleg",                    "Royal Mahjong (Falcon bootleg, v1.01)", 0 )
+GAME( 1983,  janyoup2, royalmj,  ippatsu,  janyoup2, driver_device, 0,         ROT0,   "Cosmo Denshi",               "Janyou Part II (ver 7.03, July 1 1983)",0 )
+GAME( 1981,  janputer, 0,        royalmah, royalmah, driver_device, 0,         ROT0,   "bootleg (Public Software Ltd. / Mes)", "New Double Bet Mahjong (bootleg of Janputer)", 0 ) // the original Janputer (Sanritsu) is not yet dumped
+GAME( 1984,  janoh,    0,        royalmah, royalmah, driver_device, 0,         ROT0,   "Toaplan",                    "Jan Oh (set 1)",                        GAME_NOT_WORKING )
+GAME( 1984,  janoha,   janoh,    janoh,    royalmah, driver_device, 0,         ROT0,   "Toaplan",                    "Jan Oh (set 2)",                        GAME_NOT_WORKING ) // this one is complete?
+GAME( 1985,  jansou,   0,        jansou,   jansou, driver_device,   0,         ROT0,   "Dyna",                       "Jansou (set 1)",                        GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 1985,  jansoua,  jansou,   jansou,   jansou, driver_device,   0,         ROT0,   "Dyna",                       "Jansou (set 2)",                        0 )
+GAME( 1986,  dondenmj, 0,        dondenmj, majs101b, driver_device, 0,         ROT0,   "Dyna Electronics",           "Don Den Mahjong [BET] (Japan)",         0 )
+GAME( 1986,  ippatsu,  0,        ippatsu,  ippatsu, royalmah_state, ippatsu,   ROT0,   "Public Software / Paradais", "Ippatsu Gyakuten [BET] (Japan)",        0 )
+GAME( 1986,  suzume,   0,        suzume,   suzume, driver_device,   0,         ROT0,   "Dyna Electronics",           "Watashiha Suzumechan (Japan)",          0 )
+GAME( 1986,  mjsiyoub, 0,        royalmah, royalmah, driver_device, 0,         ROT0,   "Visco",                      "Mahjong Shiyou (Japan)",                GAME_NOT_WORKING )
+GAME( 1986,  mjsenka,  0,        royalmah, royalmah, driver_device, 0,         ROT0,   "Visco",                      "Mahjong Senka (Japan)",                 GAME_NOT_WORKING )
+GAME( 1986,  mjyarou,  0,        royalmah, royalmah, driver_device, 0,         ROT0,   "Visco / Video System",       "Mahjong Yarou [BET] (Japan)",           GAME_NOT_WORKING )
+GAME( 1986?, mjclub,   0,        mjclub,   mjclub, driver_device,   0,         ROT0,   "Xex",                        "Mahjong Club [BET] (Japan)",            0 )
+GAME( 1987,  mjdiplob, 0,        mjdiplob, mjdiplob, driver_device, 0,         ROT0,   "Dynax",                      "Mahjong Diplomat [BET] (Japan)",        0 )
+GAME( 1987,  tontonb,  0,        tontonb,  tontonb, driver_device,  0,         ROT0,   "Dynax",                      "Tonton [BET] (Japan set 1)",            0 )
+GAME( 1987,  makaijan, 0,        makaijan, makaijan, driver_device, 0,         ROT0,   "Dynax",                      "Makaijan [BET] (Japan)",                0 )
+GAME( 1988,  majs101b, 0,        majs101b, majs101b, driver_device, 0,         ROT0,   "Dynax",                      "Mahjong Studio 101 [BET] (Japan)",      0 )
+GAME( 1988,  mjapinky, 0,        mjapinky, mjapinky, driver_device, 0,         ROT0,   "Dynax",                      "Almond Pinky [BET] (Japan)",            0 )
+GAME( 1989,  mjdejavu, 0,        mjdejavu, mjdejavu, driver_device, 0,         ROT0,   "Dynax",                      "Mahjong Shinkirou Deja Vu (Japan)",     0 )
+GAME( 1989,  mjdejav2, mjdejavu, mjdejavu, mjdejavu, driver_device, 0,         ROT0,   "Dynax",                      "Mahjong Shinkirou Deja Vu 2 (Japan)",   0 )
+GAME( 1989,  mjderngr, 0,        mjderngr, mjderngr, driver_device, 0,         ROT0,   "Dynax",                      "Mahjong Derringer (Japan)",             0 )
+GAME( 1989,  daisyari, 0,        daisyari, daisyari, driver_device, 0,         ROT0,   "Best System",                "Daisyarin [BET] (Japan)",               0 )
+GAME( 1990,  mjifb,    0,        mjifb,    mjifb, driver_device,    0,         ROT0,   "Dynax",                      "Mahjong If...? [BET]",                  0 )
+GAME( 1990,  mjifb2,   mjifb,    mjifb,    mjifb, driver_device,    0,         ROT0,   "Dynax",                      "Mahjong If...? [BET](2921)",            0 )
+GAME( 1990,  mjifb3,   mjifb,    mjifb,    mjifb, driver_device,    0,         ROT0,   "Dynax",                      "Mahjong If...? [BET](2931)",            0 )
+GAME( 1991,  mjvegasa, 0,        mjvegasa, mjvegasa, driver_device, 0,         ROT0,   "Dynax",                      "Mahjong Vegas (Japan, unprotected)",    0 )
+GAME( 1991,  mjvegas,  mjvegasa, mjvegasa, mjvegasa, driver_device, 0,         ROT0,   "Dynax",                      "Mahjong Vegas (Japan)",                 GAME_NOT_WORKING )
+GAME( 1992,  cafetime, 0,        cafetime, cafetime, driver_device, 0,         ROT0,   "Dynax",                      "Mahjong Cafe Time",                     0 )
+GAME( 1993,  cafedoll, 0,        mjifb,    mjifb, driver_device,    0,         ROT0,   "Dynax",                      "Mahjong Cafe Doll (Japan)",             GAME_NOT_WORKING )
+GAME( 1995,  mjtensin, 0,        mjtensin, mjtensin, driver_device, 0,         ROT0,   "Dynax",                      "Mahjong Tensinhai (Japan)",             GAME_NOT_WORKING )
 GAME( 1996,  janptr96, 0,        janptr96, janptr96, royalmah_state, janptr96, ROT0,   "Dynax",                      "Janputer '96 (Japan)",                  0 )
 GAME( 1997,  janptrsp, 0,        janptr96, janptr96, royalmah_state, janptr96, ROT0,   "Dynax",                      "Janputer Special (Japan)",              0 )
-GAME( 1999,  cafebrk,  0,        mjifb,    mjifb, driver_device,    0,        ROT0,   "Nakanihon / Dynax",          "Mahjong Cafe Break",                    GAME_NOT_WORKING )
+GAME( 1999,  cafebrk,  0,        mjifb,    mjifb, driver_device,    0,         ROT0,   "Nakanihon / Dynax",          "Mahjong Cafe Break",                    GAME_NOT_WORKING )
+GAME( 1999,  cafepara, 0,        mjifb,    mjifb, driver_device,    0,         ROT0,   "Techno-Top",                 "Mahjong Cafe Paradise",                 GAME_NOT_WORKING )
