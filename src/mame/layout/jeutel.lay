@@ -146,7 +146,5 @@
 		<bezel name="text2" element="P4"><bounds left="100" right="180" top="90" bottom="102" /></bezel>
 		<bezel name="text1" element="P5"><bounds left="100" right="180" top="150" bottom="162" /></bezel>
 		<bezel name="text0" element="P6"><bounds left="100" right="180" top="210" bottom="222" /></bezel>
-		<bezel name="led0" element="red_led">
-			<bounds left="10" right="25" top="360" bottom="375" /></bezel>
 	</view>
 </mamelayout>
