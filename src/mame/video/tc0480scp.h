@@ -69,7 +69,7 @@ private:
 	// internal state
 	UINT16           m_ctrl[0x18];
 
-	UINT16 *         m_ram;
+	dynamic_array<UINT16> m_ram;
 	UINT16 *         m_bg_ram[4];
 	UINT16 *         m_tx_ram;
 	UINT16 *         m_char_ram;

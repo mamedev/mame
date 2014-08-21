@@ -139,16 +139,8 @@ const device_type TC0480SCP = &device_creator<tc0480scp_device>;
 
 tc0480scp_device::tc0480scp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, TC0480SCP, "Taito TC0480SCP", tag, owner, clock, "tc0480scp", __FILE__),
-	// m_ctrl[0x18](0),
-	m_ram(NULL),
-	//m_bg_ram[4](NULL),
 	m_tx_ram(NULL),
 	m_char_ram(NULL),
-	//m_bgscroll_ram[4](NULL),
-	//m_rowzoom_ram[4](NULL),
-	//m_bgcolumn_ram[4](NULL),
-	//m_bgscrollx[4](NULL),
-	//m_bgscrolly[4](NULL),
 	m_pri_reg(0),
 	m_dblwidth(0),
 	m_gfxnum(0),
@@ -163,6 +155,17 @@ tc0480scp_device::tc0480scp_device(const machine_config &mconfig, const char *ta
 	m_gfxdecode(*this),
 	m_palette(*this)
 {
+	memset(m_ctrl, 0, sizeof(m_ctrl));
+	
+	for (int i = 0; i < 4; i++)
+	{
+		m_bg_ram[i] = NULL;
+		m_bgscroll_ram[i] = NULL;
+		m_rowzoom_ram[i] = NULL;
+		m_bgcolumn_ram[i] = NULL;
+		m_bgscrollx[i] = NULL;
+		m_bgscrolly[i] = NULL;
+	}
 }
 
 //-------------------------------------------------
@@ -275,15 +278,17 @@ void tc0480scp_device::device_start()
 		m_tilemap[3][i]->set_scroll_rows(512);
 	}
 
-	m_ram = auto_alloc_array_clear(machine(), UINT16, TC0480SCP_RAM_SIZE / 2);
-
+	m_ram.resize_and_clear(TC0480SCP_RAM_SIZE / 2);
 	set_layer_ptrs();
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
 	m_gfxdecode->set_gfx(m_txnum, global_alloc(gfx_element(m_palette, tc0480scp_charlayout, (UINT8 *)m_char_ram, NATIVE_ENDIAN_VALUE_LE_BE(8,0), 64, 0)));
 
-	save_pointer(NAME(m_ram), TC0480SCP_RAM_SIZE / 2);
+	save_item(NAME(m_ram));
 	save_item(NAME(m_ctrl));
+	save_item(NAME(m_bgscrollx));
+	save_item(NAME(m_bgscrolly));
+	save_item(NAME(m_pri_reg));
 	save_item(NAME(m_dblwidth));
 	machine().save().register_postload(save_prepost_delegate(FUNC(tc0480scp_device::postload), this));
 }
