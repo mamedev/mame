@@ -366,6 +366,29 @@ READ8_MEMBER(apple2_state::apple2_c080_r)
 				}
 			}
 		}
+		
+		if ((m_machinetype == APPLE_IICPLUS) && (slot == 6))
+		{
+			offset &= 0xf;
+			return m_iicpiwm->read(offset);
+		}
+
+		if ((m_machinetype == LASER128) && (slot == 5))
+		{
+			offset &= 0xf;
+			UINT8 retval = m_exp_regs[offset];
+							 
+			if (offset == 3)
+			{
+				retval = m_exp_ram[m_exp_liveptr&m_exp_addrmask];
+				m_exp_liveptr++;
+				m_exp_regs[0] = m_exp_liveptr & 0xff;
+				m_exp_regs[1] = (m_exp_liveptr>>8) & 0xff;
+				m_exp_regs[2] = ((m_exp_liveptr>>16) & 0xff) | m_exp_bankhior;
+			}
+
+			return retval;
+		}
 
 		if ((m_machinetype == LASER128) && (slot == 6))
 		{
@@ -414,6 +437,59 @@ WRITE8_MEMBER(apple2_state::apple2_c080_w)
 				m_acia2->write(space, offset-8, data);
 				return;
 			}
+		}
+	}
+
+	if ((m_machinetype == APPLE_IICPLUS) && (slot == 6))
+	{
+		offset &= 0xf;
+		m_iicpiwm->write(offset, data);
+		return;
+	}
+
+	if ((m_machinetype == LASER128) && (slot == 5))
+	{
+		switch (offset & 0xf)
+		{
+			case 0:
+				m_exp_wptr &= ~0xff;
+				m_exp_wptr |= data;
+				m_exp_regs[0] = m_exp_wptr & 0xff;
+				m_exp_regs[1] = (m_exp_wptr>>8) & 0xff;
+				m_exp_regs[2] = ((m_exp_wptr>>16) & 0xff) | m_exp_bankhior;
+				m_exp_liveptr = m_exp_wptr;
+				break;
+
+			case 1:
+				m_exp_wptr &= ~0xff00;
+				m_exp_wptr |= (data<<8);
+				m_exp_regs[0] = m_exp_wptr & 0xff;
+				m_exp_regs[1] = (m_exp_wptr>>8) & 0xff;
+				m_exp_regs[2] = ((m_exp_wptr>>16) & 0xff) | m_exp_bankhior;
+				m_exp_liveptr = m_exp_wptr;
+				break;
+
+			case 2:
+				m_exp_wptr &= ~0xff0000;
+				m_exp_wptr |= (data<<16);
+				m_exp_regs[0] = m_exp_wptr & 0xff;
+				m_exp_regs[1] = (m_exp_wptr>>8) & 0xff;
+				m_exp_regs[2] = ((m_exp_wptr>>16) & 0xff) | m_exp_bankhior;
+				m_exp_liveptr = m_exp_wptr;
+				break;
+
+			case 3:
+	//            printf("Write %02x to RAM[%x]\n", data, m_liveptr);
+				m_exp_ram[(m_exp_liveptr&m_exp_addrmask)] = data;
+				m_exp_liveptr++;
+				m_exp_regs[0] = m_exp_liveptr & 0xff;
+				m_exp_regs[1] = (m_exp_liveptr>>8) & 0xff;
+				m_exp_regs[2] = ((m_exp_liveptr>>16) & 0xff) | m_exp_bankhior;
+				break;
+
+			default:
+				m_exp_regs[offset] = data;
+				break;
 		}
 	}
 
@@ -1218,6 +1294,10 @@ void apple2_state::machine_reset()
 
 	m_joystick_x1_time = m_joystick_y1_time = 0;
 	m_joystick_x2_time = m_joystick_y2_time = 0;
+
+	memset(m_exp_regs, 0, sizeof(UINT8) * 0x10);
+	m_exp_wptr = m_exp_liveptr = 0;
+
 }
 
 int apple2_state::a2_no_ctrl_reset()
@@ -2250,6 +2330,20 @@ MACHINE_START_MEMBER(apple2_state,laser128)
 	m_machinetype = LASER128;
 
 	apple2_init_common();
+
+	// 1 MB of expansion RAM in slot 5
+	m_exp_ram = auto_alloc_array(machine(), UINT8, 1024*1024); 
+	memset(m_exp_ram, 0xff, 1024*1024);
+
+	m_exp_bankhior = 0xf0;
+	m_exp_addrmask = 0xfffff;
+
+	// save memory expansion vars
+	save_item(NAME(m_exp_regs));
+	save_item(NAME(m_exp_wptr));
+	save_item(NAME(m_exp_liveptr));
+	save_item(NAME(m_exp_bankhior));
+	save_item(NAME(m_exp_addrmask));
 
 	/* setup memory */
 	memset(&mem_cfg, 0, sizeof(mem_cfg));

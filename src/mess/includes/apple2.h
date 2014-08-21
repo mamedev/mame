@@ -26,6 +26,7 @@
 
 #define IIC_ACIA1_TAG "acia1"
 #define IIC_ACIA2_TAG "acia2"
+#define IICP_IWM_TAG	"iwm"
 
 #define LASER128_UDC_TAG "l128udc"
 
@@ -142,7 +143,8 @@ public:
 		m_cassette(*this, "cassette"),
 		m_acia1(*this, IIC_ACIA1_TAG),
 		m_acia2(*this, IIC_ACIA2_TAG),
-		m_laserudc(*this, LASER128_UDC_TAG)
+		m_laserudc(*this, LASER128_UDC_TAG),
+		m_iicpiwm(*this, IICP_IWM_TAG)
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -161,6 +163,7 @@ public:
 
 	optional_device<mos6551_device> m_acia1, m_acia2;
 	optional_device<applefdc_base_device> m_laserudc;
+	optional_device<iwm_device> m_iicpiwm;
 
 	UINT32 m_flags, m_flags_mask;
 	INT32 m_a2_cnxx_slot;
@@ -360,6 +363,14 @@ public:
 	void apple2eplus_init_common(void *apple2cp_ce00_ram);
 	INT8 apple2_slotram_r(address_space &space, int slotnum, int offset);
 	int a2_no_ctrl_reset();
+
+private:
+	// Laser 128EX2 slot 5 Apple Memory Expansion emulation vars
+	UINT8 m_exp_bankhior;
+	int m_exp_addrmask;
+	UINT8 m_exp_regs[0x10];
+	UINT8 *m_exp_ram;
+	int m_exp_wptr, m_exp_liveptr;
 };
 /*----------- defined in drivers/apple2.c -----------*/
 INPUT_PORTS_EXTERN( apple2ep );
