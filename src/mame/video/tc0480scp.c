@@ -163,8 +163,8 @@ tc0480scp_device::tc0480scp_device(const machine_config &mconfig, const char *ta
 		m_bgscroll_ram[i] = NULL;
 		m_rowzoom_ram[i] = NULL;
 		m_bgcolumn_ram[i] = NULL;
-		m_bgscrollx[i] = NULL;
-		m_bgscrolly[i] = NULL;
+		m_bgscrollx[i] = 0;
+		m_bgscrolly[i] = 0;
 	}
 }
 
