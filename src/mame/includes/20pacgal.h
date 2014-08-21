@@ -68,7 +68,7 @@ public:
 	void draw_stars(bitmap_rgb32 &bitmap, const rectangle &cliprect );
 	void draw_sprite(bitmap_rgb32 &bitmap, int y, int x,
 						UINT8 code, UINT8 color, int flip_y, int flip_x);
-
+	void common_save_state();
 };
 
 
@@ -80,7 +80,7 @@ public:
 	{ }
 
 	DECLARE_READ8_MEMBER( _25pacman_io_87_r );
-
+	virtual void machine_start();
 };
 
 /*----------- defined in video/20pacgal.c -----------*/

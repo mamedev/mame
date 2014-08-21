@@ -354,7 +354,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-void _20pacgal_state::machine_start()
+void _20pacgal_state::common_save_state()
 {
 	save_item(NAME(m_game_selected));
 	save_item(NAME(m_ram_48000));
@@ -362,8 +362,17 @@ void _20pacgal_state::machine_start()
 	save_item(NAME(m_sprite_gfx_ram));
 	save_item(NAME(m_sprite_ram));
 	save_item(NAME(m_sprite_color_lookup));
+}
+ 
+void _20pacgal_state::machine_start()
+{
+	common_save_state();
+	machine().save().register_postload(save_prepost_delegate(FUNC(_20pacgal_state::set_bankptr), this)); //currently not used by 25pacman
+}
 
-	machine().save().register_postload(save_prepost_delegate(FUNC(_20pacgal_state::set_bankptr), this));
+void _25pacman_state::machine_start()
+{
+	common_save_state();
 }
 
 void _20pacgal_state::machine_reset()
