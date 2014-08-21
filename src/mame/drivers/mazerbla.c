@@ -231,6 +231,7 @@ public:
 	TIMER_CALLBACK_MEMBER(deferred_ls670_1_w);
 	TIMER_CALLBACK_MEMBER(delayed_sound_w);
 	IRQ_CALLBACK_MEMBER(irq_callback);
+	void rom_bank_select();
 };
 
 
@@ -348,7 +349,11 @@ WRITE8_MEMBER(mazerbla_state::cfb_vbank_w)
 WRITE8_MEMBER(mazerbla_state::cfb_rom_bank_sel_w)
 {
 	m_gfx_rom_bank = data;
+	rom_bank_select();
+}
 
+void mazerbla_state::rom_bank_select()
+{
 	membank("bank1")->set_base(memregion("sub2")->base() + (m_gfx_rom_bank * 0x2000) + 0x10000);
 }
 
@@ -1406,6 +1411,8 @@ void mazerbla_state::machine_start()
 
 	save_item(NAME(m_vsb_ls273));
 	save_item(NAME(m_soundlatch));
+	
+	machine().save().register_postload(save_prepost_delegate(FUNC(mazerbla_state::rom_bank_select), this));
 }
 
 void mazerbla_state::machine_reset()
