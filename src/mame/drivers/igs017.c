@@ -30,7 +30,7 @@ To Do:
 - Protection emulation, instead of patching the roms.
 - NVRAM.
 - iqblockf: protection.
-- mgcs: implement joystick inputs. Sound banking and DSW go through protection.
+- mgcs: implement joystick inputs. Finish IGS029 protection simulation.
 
 Notes:
 
@@ -50,6 +50,7 @@ Notes:
 #include "sound/okim6295.h"
 #include "machine/igs025.h"
 #include "machine/igs022.h"
+#include "machine/ticket.h"
 
 class igs017_state : public driver_device
 {
@@ -62,6 +63,7 @@ public:
 		m_fg_videoram(*this, "fg_videoram", 0),
 		m_bg_videoram(*this, "bg_videoram", 0),
 		m_oki(*this, "oki"),
+		m_hopperdev(*this, "hopper"),
 		m_igs025(*this,"igs025"),
 		m_igs022(*this,"igs022"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -77,6 +79,7 @@ public:
 	optional_shared_ptr<UINT8> m_fg_videoram;
 	optional_shared_ptr<UINT8> m_bg_videoram;
 	required_device<okim6295_device> m_oki;
+	optional_device<ticket_dispenser_device> m_hopperdev;
 	optional_device<igs025_device> m_igs025; // Mj Shuang Long Qiang Zhu 2
 	optional_device<igs022_device> m_igs022; // Mj Shuang Long Qiang Zhu 2
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -102,10 +105,18 @@ public:
 	UINT16 m_igs_magic[2];
 	UINT8 m_scramble_data;
 	int m_irq1_enable;
+	UINT8 m_dsw_select;
 
 	// lhzb2a protection:
 	UINT16 m_prot_regs[2], m_prot_val, m_prot_word, m_prot_m3, m_prot_mf;
 	UINT8 m_prot2;
+
+	// IGS029 protection (communication)
+	UINT8 m_igs029_send_data, m_igs029_recv_data;
+	UINT8 m_igs029_send_buf[256], m_igs029_recv_buf[256];
+	int m_igs029_send_len, m_igs029_recv_len;
+	// IGS029 protection (mgcs)
+	UINT32 m_igs029_mgcs_long;
 
 	int m_irq2_enable;
 	DECLARE_WRITE8_MEMBER(video_disable_w);
@@ -174,7 +185,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void video_start();
-	virtual void video_reset();
+	virtual void machine_reset();
 	DECLARE_MACHINE_RESET(iqblocka);
 	DECLARE_MACHINE_RESET(mgcs);
 	DECLARE_MACHINE_RESET(lhzb2a);
@@ -193,6 +204,7 @@ public:
 	void mgcs_decrypt_tiles();
 	void mgcs_flip_sprites();
 	void mgcs_patch_rom();
+	void mgcs_igs029_run();
 	void starzan_decrypt(UINT8 *ROM, int size, bool isOpcode);
 	void lhzb2_patch_rom();
 	void lhzb2_decrypt_tiles();
@@ -202,7 +214,11 @@ public:
 	void spkrform_decrypt_sprites();
 };
 
-
+void igs017_state::machine_reset()
+{
+	m_video_disable = 0;
+	m_igs029_send_len = m_igs029_recv_len = 0;
+}
 
 /***************************************************************************
                                 Video Hardware
@@ -219,11 +235,6 @@ WRITE16_MEMBER(igs017_state::video_disable_lsb_w)
 {
 	if (ACCESSING_BITS_0_7)
 		video_disable_w(space,offset,data);
-}
-
-void igs017_state::video_reset()
-{
-	m_video_disable = 0;
 }
 
 
@@ -709,15 +720,14 @@ void igs017_state::mgcs_flip_sprites()
 
 void igs017_state::mgcs_patch_rom()
 {
-	UINT16 *rom = (UINT16 *)memregion("maincpu")->base();
+//	UINT16 *rom = (UINT16 *)memregion("maincpu")->base();
 
-	rom[0x4e036/2] = 0x6006;
+//	rom[0x20666/2] = 0x601e;    // 020666: 671E    beq $20686 (rom check)
 
-	// IGS029 reads the dips?
-	rom[0x4e00e/2] = 0x4e75;
-
-	rom[0x4dfce/2] = 0x6010;    // 04DFCE: 6610    bne $4dfe0
-	rom[0x20666/2] = 0x601e;    // 020666: 671E    beq $20686 (rom check)
+	// IGS029 send command
+//	rom[0x4dfce/2] = 0x6010;    // 04DFCE: 6610    bne $4dfe0
+//	rom[0x4e00e/2] = 0x4e75;
+//	rom[0x4e036/2] = 0x6006;	// 04E036: 6306    bls     $4e03e
 }
 
 DRIVER_INIT_MEMBER(igs017_state,mgcs)
@@ -1425,6 +1435,129 @@ ADDRESS_MAP_END
 
 // mgcs
 
+// IGS029 appears to be an MCU that receives commands (write port with value, read port, etc.)
+// Sound banking and DSW are accessed through it. It also performs some game specific calculations.
+void igs017_state::mgcs_igs029_run()
+{
+	logerror("%s: running igs029 command ", machine().describe_context());
+	for (int i = 0; i < m_igs029_send_len; i++)
+		logerror("%02x ", m_igs029_send_buf[i]);
+
+	if (m_igs029_send_buf[0] == 0x05 && m_igs029_send_buf[1] == 0x5a)
+	{
+		UINT8 data = m_igs029_send_buf[2];
+		UINT8 port = m_igs029_send_buf[3];
+
+		logerror("PORT %02x = %02x\n", port, data);
+
+		switch (port)
+		{
+			case 0x01:
+				m_oki->set_bank_base((data & 0x10) ? 0x40000 : 0);
+				coin_counter_w(machine(), 0, (~data) & 0x20);   // coin in
+				coin_counter_w(machine(), 1, (~data) & 0x40);   // coin out
+
+//				popmessage("PORT1 %02X", data);
+
+				if ( data & ~0x70 )
+					logerror("%s: warning, unknown bits written in port %02x = %02x\n", machine().describe_context(), port, data);
+
+				break;
+
+			case 0x03:
+				m_dsw_select = data;
+
+//				popmessage("PORT3 %02X", data);
+
+				if ( data & ~0x03 )
+					logerror("%s: warning, unknown bits written in port %02x = %02x\n", machine().describe_context(), port, data);
+
+				break;
+
+			default:
+				logerror("%s: warning, unknown port %02x written with %02x\n", machine().describe_context(), port, data);
+		}
+
+		m_igs029_recv_len = 0;
+		m_igs029_recv_buf[m_igs029_recv_len++] = 0x01;
+	}
+	else if (m_igs029_send_buf[0] == 0x03 && m_igs029_send_buf[1] == 0x55)
+	{
+		logerror("MIN BET?\n");
+
+		// No inputs. Returns 1 long
+
+		UINT8 min_bets[4] = {1, 2, 3, 5};
+
+		m_igs029_recv_len = 0;
+		m_igs029_recv_buf[m_igs029_recv_len++] = 0x00;
+		m_igs029_recv_buf[m_igs029_recv_len++] = 0x00;
+		m_igs029_recv_buf[m_igs029_recv_len++] = 0x00;
+		m_igs029_recv_buf[m_igs029_recv_len++] = min_bets[ (~ioport("DSW2")->read()) & 3 ];
+		m_igs029_recv_buf[m_igs029_recv_len++] = 0x05;
+	}
+	else if (m_igs029_send_buf[0] == 0x03 && m_igs029_send_buf[1] == 0x39)
+	{
+		logerror("READ DSW\n");
+
+		UINT8 ret;
+		if      (~m_dsw_select & 0x01)	ret = ioport("DSW1")->read();
+		else if (~m_dsw_select & 0x02)	ret = ioport("DSW2")->read();
+		else
+		{
+			logerror("%s: warning, reading dsw with dsw_select = %02x\n", machine().describe_context(), m_dsw_select);
+			ret = 0xff;
+		}
+
+		m_igs029_recv_len = 0;
+		m_igs029_recv_buf[m_igs029_recv_len++] = ret;
+		m_igs029_recv_buf[m_igs029_recv_len++] = 0x02;
+	}
+	else if (m_igs029_send_buf[0] == 0x07 && m_igs029_send_buf[1] == 0x2c)
+	{
+		logerror("?? (2C)\n");	// ??
+
+		// 4 inputs. Returns 1 long
+
+		// called when pressing start without betting.
+		// Returning high values produces an overflow causing a division by 0, and then the game hangs.
+		m_igs029_recv_len = 0;
+		m_igs029_recv_buf[m_igs029_recv_len++] = 0x00;
+		m_igs029_recv_buf[m_igs029_recv_len++] = 0x00;
+		m_igs029_recv_buf[m_igs029_recv_len++] = 0x00;
+		m_igs029_recv_buf[m_igs029_recv_len++] = 0x01;	// ??
+		m_igs029_recv_buf[m_igs029_recv_len++] = 0x05;
+	}
+	else if (m_igs029_send_buf[0] == 0x07 && m_igs029_send_buf[1] == 0x15)
+	{
+		logerror("SET LONG\n");
+
+		m_igs029_mgcs_long = (m_igs029_send_buf[2] << 24) | (m_igs029_send_buf[3] << 16) | (m_igs029_send_buf[4] << 8) | m_igs029_send_buf[5];
+
+		m_igs029_recv_len = 0;
+		m_igs029_recv_buf[m_igs029_recv_len++] = 0x01;
+	}
+	else if (m_igs029_send_buf[0] == 0x03 && m_igs029_send_buf[1] == 0x04)
+	{
+		logerror("GET LONG\n");
+
+		m_igs029_recv_len = 0;
+		m_igs029_recv_buf[m_igs029_recv_len++] = (m_igs029_mgcs_long >>  0) & 0xff;
+		m_igs029_recv_buf[m_igs029_recv_len++] = (m_igs029_mgcs_long >>  8) & 0xff;
+		m_igs029_recv_buf[m_igs029_recv_len++] = (m_igs029_mgcs_long >> 16) & 0xff;
+		m_igs029_recv_buf[m_igs029_recv_len++] = (m_igs029_mgcs_long >> 24) & 0xff;
+		m_igs029_recv_buf[m_igs029_recv_len++] = 0x05;
+	}
+	else
+	{
+		logerror("UNKNOWN\n");
+
+		m_igs029_recv_len = 0;
+		m_igs029_recv_buf[m_igs029_recv_len++] = 0x01;
+	}
+
+	m_igs029_send_len = 0;
+}
 
 WRITE16_MEMBER(igs017_state::mgcs_magic_w)
 {
@@ -1438,22 +1571,71 @@ WRITE16_MEMBER(igs017_state::mgcs_magic_w)
 		case 0x00:
 			if (ACCESSING_BITS_0_7)
 			{
+				bool igs029_irq = !(m_input_select & 0x04) &&  (data & 0x04);	// 0->1
+
+				// 7654 3--- Keys
+				// ---- -2-- IRQ on IGS029
+				// ---- --1-
+				// ---- ---0 Hopper Motor
 				m_input_select = data & 0xff;
+
+				m_hopperdev->write(space, 0, (data & 0x0001) ? 0x80 : 0x00);
+
+				if (igs029_irq)
+				{
+					if (!m_igs029_recv_len)
+					{
+						// SEND
+						if (m_igs029_send_len < sizeof(m_igs029_send_buf))
+							m_igs029_send_buf[m_igs029_send_len++] = m_igs029_send_data;
+
+						logerror("%s: igs029 send ", machine().describe_context());
+						for (int i = 0; i < m_igs029_send_len; i++)
+							logerror("%02x ", m_igs029_send_buf[i]);
+						logerror("\n");
+
+						if (m_igs029_send_buf[0] == m_igs029_send_len)
+							mgcs_igs029_run();
+					}
+
+					if (m_igs029_recv_len)
+					{
+						// RECV
+						logerror("%s: igs029 recv ", machine().describe_context());
+						for (int i = 0; i < m_igs029_recv_len; i++)
+							logerror("%02x ", m_igs029_recv_buf[i]);
+						logerror("\n");
+
+						if (m_igs029_recv_len)
+							--m_igs029_recv_len;
+
+						m_igs029_recv_data = m_igs029_recv_buf[m_igs029_recv_len];
+					}
+				}
 			}
 
-			if ( m_input_select & ~0xf8 )
+			if ( m_input_select & ~0xfd )
 				logerror("%s: warning, unknown bits written in input_select = %02x\n", machine().describe_context(), m_input_select);
+
 			break;
 
 		case 0x01:
 			if (ACCESSING_BITS_0_7)
 			{
 				m_scramble_data = data & 0xff;
+//				logerror("%s: writing %02x to igs_magic = %02x\n", machine().describe_context(), data & 0xff, m_igs_magic[0]);
 			}
 			break;
 
 		// case 0x02: ?
-		// case 0x03: ?
+
+		case 0x03:
+			if (ACCESSING_BITS_0_7)
+			{
+				m_igs029_send_data = data & 0xff;
+//				logerror("%s: writing %02x to igs_magic = %02x\n", machine().describe_context(), data & 0xff, m_igs_magic[0]);
+			}
+			break;
 
 		default:
 			logerror("%s: warning, writing to igs_magic %02x = %02x\n", machine().describe_context(), m_igs_magic[0], data);
@@ -1462,10 +1644,29 @@ WRITE16_MEMBER(igs017_state::mgcs_magic_w)
 
 READ16_MEMBER(igs017_state::mgcs_magic_r)
 {
+	if (offset == 0)
+		return m_igs_magic[0];
+
 	switch(m_igs_magic[0])
 	{
+		case 0x00:
+			return m_input_select | 0x02;
+
 		case 0x01:
-			return BITSWAP8(m_scramble_data, 4,5,6,7, 0,1,2,3);
+		{
+			UINT16 ret = BITSWAP8( (BITSWAP8(m_scramble_data, 0,1,2,3,4,5,6,7) + 1) & 3, 4,5,6,7, 0,1,2,3);
+			logerror("%s: reading %02x from igs_magic = %02x\n", machine().describe_context(), ret, m_igs_magic[0]);
+			return ret;
+		}
+
+		case 0x02:
+		{
+			UINT8 ret = m_igs029_recv_data;
+			logerror("%s: reading %02x from igs_magic = %02x\n", machine().describe_context(), ret, m_igs_magic[0]);
+			return ret;
+		}
+
+//		case 0x05: ???
 
 		default:
 			logerror("%s: warning, reading with igs_magic = %02x\n", machine().describe_context(), m_igs_magic[0]);
@@ -1520,14 +1721,13 @@ WRITE16_MEMBER(igs017_state::mgcs_paletteram_w)
 static ADDRESS_MAP_START( mgcs, AS_PROGRAM, 16, igs017_state )
 	AM_RANGE( 0x000000, 0x07ffff ) AM_ROM
 	AM_RANGE( 0x300000, 0x303fff ) AM_RAM
-	AM_RANGE( 0x49c000, 0x49c003 ) AM_WRITE(mgcs_magic_w )
-	AM_RANGE( 0x49c002, 0x49c003 ) AM_READ(mgcs_magic_r )
+	AM_RANGE( 0x49c000, 0x49c003 ) AM_WRITE(mgcs_magic_w ) AM_READ(mgcs_magic_r )
 	AM_RANGE( 0xa02000, 0xa02fff ) AM_READWRITE(spriteram_lsb_r, spriteram_lsb_w ) AM_SHARE("spriteram")
 	AM_RANGE( 0xa03000, 0xa037ff ) AM_RAM_WRITE(mgcs_paletteram_w ) AM_SHARE("paletteram")
 	AM_RANGE( 0xa04020, 0xa04027 ) AM_DEVREAD8("ppi8255", i8255_device, read, 0x00ff)
 	AM_RANGE( 0xa04024, 0xa04025 ) AM_WRITE(video_disable_lsb_w )
-	AM_RANGE( 0xa04028, 0xa04029 ) AM_WRITE(irq2_enable_w )
-	AM_RANGE( 0xa0402a, 0xa0402b ) AM_WRITE(irq1_enable_w )
+	AM_RANGE( 0xa04028, 0xa04029 ) AM_RAM_WRITE(irq2_enable_w )
+	AM_RANGE( 0xa0402a, 0xa0402b ) AM_RAM_WRITE(irq1_enable_w )
 	AM_RANGE( 0xa08000, 0xa0bfff ) AM_READWRITE(fg_lsb_r, fg_lsb_w ) AM_SHARE("fg_videoram")
 	AM_RANGE( 0xa0c000, 0xa0ffff ) AM_READWRITE(bg_lsb_r, bg_lsb_w ) AM_SHARE("bg_videoram")
 	AM_RANGE( 0xa12000, 0xa12001 ) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff )
@@ -2747,14 +2947,14 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( mgcs )
 
-	// DSWs don't work: they are read through a protection device (IGS029? see code at 1CF16)
+	// DSWs are read through a protection device (IGS029). See code at 1CF16
 
-	PORT_START("DSW1")
+	PORT_START("DSW1")	// $3009e2
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_5C ) )
 	PORT_DIPNAME( 0x0c, 0x0c, "Credits Per Note" )
 	PORT_DIPSETTING(    0x0c, "10" )
 	PORT_DIPSETTING(    0x08, "20" )
@@ -2773,7 +2973,7 @@ static INPUT_PORTS_START( mgcs )
 	PORT_DIPSETTING(    0x80, "1000" )
 	PORT_DIPSETTING(    0x00, "2000" )
 
-	PORT_START("DSW2")
+	PORT_START("DSW2")	// $3009e3
 	PORT_DIPNAME( 0x03, 0x03, "Min Bet" )
 	PORT_DIPSETTING(    0x03, "1" )
 	PORT_DIPSETTING(    0x02, "2" )
@@ -2782,15 +2982,15 @@ static INPUT_PORTS_START( mgcs )
 	PORT_DIPNAME( 0x04, 0x04, "Double Up" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "Double Up Type" )
-	PORT_DIPSETTING(    0x10, "Double" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Single ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Controls ) )
-	PORT_DIPSETTING(    0x20, "Keyboard" )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Controls ) )
+	PORT_DIPSETTING(    0x10, "Keyboard" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Joystick ) )
-	PORT_DIPNAME( 0x40, 0x40, "Number Type" )
-	PORT_DIPSETTING(    0x40, "Number" )
+	PORT_DIPNAME( 0x20, 0x20, "Number Type" )
+	PORT_DIPSETTING(    0x20, "Number" )
 	PORT_DIPSETTING(    0x00, "Tile" )
+	PORT_DIPNAME( 0x40, 0x40, "Double Up Type" )
+	PORT_DIPSETTING(    0x40, "Double" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Single ) )
 	PORT_DIPNAME( 0x80, 0x80, "Bet Number" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
@@ -2798,7 +2998,7 @@ static INPUT_PORTS_START( mgcs )
 	// the top 2 bits of COINS (port A) and KEYx (port B) are read and combined with the bottom 4 bits read from port C (see code at 1C83A)
 
 	PORT_START("COINS")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_SERVICE2 ) // hopper switch (unimplemented)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL  ) PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r) // hopper switch
 	PORT_SERVICE_NO_TOGGLE( 0x02,   IP_ACTIVE_LOW ) // service mode (keep pressed during boot too)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_SERVICE1 ) PORT_NAME("Statistics")  // press with the above for sound test
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_COIN1    ) PORT_IMPULSE(5)
@@ -3006,7 +3206,7 @@ static INPUT_PORTS_START( mgdh )
 	PORT_DIPNAME( 0x20, 0x20, "Pay Out Type" )
 	PORT_DIPSETTING(    0x20, "Coins" )
 	PORT_DIPSETTING(    0x00, "Notes" )
-	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0xc0, 0xc0, "Min Bet" )
 	PORT_DIPSETTING(    0xc0, "1" )
 	PORT_DIPSETTING(    0x80, "2" )
 	PORT_DIPSETTING(    0x40, "3" )
@@ -3540,6 +3740,8 @@ static MACHINE_CONFIG_START( mgcs, igs017_state )
 	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
 	MCFG_I8255_IN_PORTA_CB(IOPORT("COINS"))
 	MCFG_I8255_IN_PORTB_CB(READ8(igs017_state, mgcs_keys_r))
+
+	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(50), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
