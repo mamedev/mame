@@ -5762,17 +5762,16 @@ ROM_END
 
 ROM_START( numcrash )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "nc-1.6e",      0x0000, 0x0800, CRC(c85a79ba) SHA1(938b6b2920b14a4f0fbcd09fe25873bfd8ddc245) ) // ok
-	ROM_LOAD( "nc-2.6f",      0x0800, 0x0800, CRC(954a4630) SHA1(09bc3d8d1d4e79a805c5fb436739bc618faf7825) ) // ok
-	ROM_RELOAD(               0x1000, 0x0800 )
+	ROM_LOAD( "nc-1.6e",      0x0000, 0x0800, CRC(c85a79ba) SHA1(938b6b2920b14a4f0fbcd09fe25873bfd8ddc245) )
+	ROM_LOAD( "nc-5.6k",      0x0800, 0x0800, CRC(20e6c64d) SHA1(ff61ede279a46ea2bec534dd82ec89e41a3ec77b) )
+	ROM_LOAD( "nc-2.6f",      0x1000, 0x0800, CRC(954a4630) SHA1(09bc3d8d1d4e79a805c5fb436739bc618faf7825) )
 	ROM_RELOAD(               0x8000, 0x0800 )
+	ROM_LOAD( "nc-6.6m",      0x1800, 0x0800, CRC(7b8de692) SHA1(7d5fe625ee9acf3cced2d98df99f5dee6c8122b1) )
+	ROM_LOAD( "nc-3.6h",      0x2000, 0x0800, CRC(e47f7cf3) SHA1(47e513cf4fe80617547093210ca6582646a9b256) )
 	ROM_RELOAD(               0x8800, 0x0800 )
-	ROM_LOAD( "nc-6.6m",      0x1800, 0x0800, CRC(7b8de692) SHA1(7d5fe625ee9acf3cced2d98df99f5dee6c8122b1) ) // ok
-	ROM_LOAD( "nc-3.6h",      0x2000, 0x0800, CRC(e47f7cf3) SHA1(47e513cf4fe80617547093210ca6582646a9b256) ) // ok
-	ROM_LOAD( "nc-7.6n",      0x2800, 0x0800, CRC(c6f5bd41) SHA1(854002c6c45f6993ada98b42ed6b814afac0c1f7) ) // ?
-	ROM_LOAD( "nc-5.6k",      0x3000, 0x0800, CRC(20e6c64d) SHA1(ff61ede279a46ea2bec534dd82ec89e41a3ec77b) ) // ?
-	ROM_LOAD( "nc-4.6j",      0x3800, 0x0800, CRC(ca211190) SHA1(57d02d520ab42be14b780748a1d0d0d180e124ac) ) // ?
-	ROM_LOAD( "nc-8.6p",      0x9000, 0x1000, CRC(7dabb3e5) SHA1(29dd5f6b7acc3abd292c903be6fef9fc4a135287) ) // ok
+	ROM_LOAD( "nc-7.6n",      0x2800, 0x0800, CRC(c6f5bd41) SHA1(854002c6c45f6993ada98b42ed6b814afac0c1f7) )
+	ROM_LOAD( "nc-4.6j",      0x3000, 0x0800, CRC(c67450d2) SHA1(b940093c979795d0de4b203200c3f824d5d9ac7f) )
+	ROM_LOAD( "nc-8.6p",      0x9000, 0x1000, CRC(7dabb3e5) SHA1(29dd5f6b7acc3abd292c903be6fef9fc4a135287) )
 
 	ROM_REGION( 0x2000, "gfx1", 0 )
 	ROM_LOAD( "nc-9.5e",      0x0000, 0x0800, CRC(6a30b507) SHA1(e5760844cd051504e61774c57549c2697d473591) )
