@@ -677,9 +677,8 @@ void gp9001vdp_device::draw_sprites( running_machine &machine, bitmap_ind16 &bit
 
 	if (sp.use_sprite_buffer) source = sp.vram16_buffer;
 	else source = m_spriteram;
-	gfx_element *spritegfx = gfx(1);
-	int total_elements = spritegfx->elements();
-	int total_colors = spritegfx->colors();
+	int total_elements = m_gfx[1]->elements();
+	int total_colors = m_gfx[1]->colors();
 
 	int old_x = (-(sp.scrollx)) & 0x1ff;
 	int old_y = (-(sp.scrolly)) & 0x1ff;
@@ -780,10 +779,10 @@ void gp9001vdp_device::draw_sprites( running_machine &machine, bitmap_ind16 &bit
 					*/
 					sprite %= total_elements;
 					color %= total_colors;
-					const pen_t *paldata = &palette()->pen(color * 16);
+					const pen_t *paldata = &m_palette->pen(color * 16);
 					{
 						int yy, xx;
-						const UINT8* srcdata = spritegfx->get_data(sprite);
+						const UINT8* srcdata = m_gfx[1]->get_data(sprite);
 						int count = 0;
 						int ystart, yend, yinc;
 						int xstart, xend, xinc;

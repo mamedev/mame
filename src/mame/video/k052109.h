@@ -26,19 +26,7 @@ public:
 	static void set_k052109_callback(device_t &device, k052109_cb_delegate callback) { downcast<k052109_device &>(device).m_k052109_cb = callback; }
 	static void set_ram(device_t &device, bool ram);
 
-	// static configuration
-	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
-	static void static_set_palette_tag(device_t &device, const char *tag);
-
 	/*
-	You don't have to decode the graphics: the vh_start() routines will do that
-	for you, using the plane order passed.
-	Of course the ROM data must be in the correct order. This is a way to ensure
-	that the ROM test will pass.
-	The konami_rom_deinterleave() function in konami_helper.h will do the reorganization for
-	you in most cases (but see tmnt.c for additional bit rotations or byte
-	permutations which may be required).
-
 	The callback is passed:
 	- layer number (0 = FIX, 1 = A, 2 = B)
 	- bank (range 0-3, output of the pins CAB1 and CAB2)

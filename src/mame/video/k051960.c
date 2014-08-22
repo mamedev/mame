@@ -2,7 +2,7 @@
 Konami 051960/051937
 -------------
 Sprite generators. Designed to work in pair. The 051960 manages the sprite
-list and produces and address that is fed to the gfx ROMs. The data from the
+list and produces an address that is fed to the gfx ROMs. The data from the
 ROMs is sent to the 051937, along with color code and other stuff from the
 051960. The 051937 outputs up to 12 bits of palette index, plus "shadow" and
 transparency information.
@@ -16,7 +16,7 @@ bus to the ROMs). However, the addressing space can be increased by using one
 or more of the "color attribute" bits of the sprites as bank selectors.
 Moreover a few games store the gfx data in the ROMs in a format different from
 the one expected by the 051960, and use external logic to reorder the address
-lines.
+and/or data lines.
 The 051960 can also genenrate IRQ, FIRQ and NMI signals.
 
 memory map:
@@ -75,6 +75,9 @@ const gfx_layout k051960_device::spritelayout =
 	128*8
 };
 
+// cuebrick, mia and tmnt connect the lower four output lines from the K051937
+// (i.e. the ones outputting ROM data rather than attribute data) to the mixer
+// in reverse order.
 const gfx_layout k051960_device::spritelayout_reverse =
 {
 	16,16,
@@ -88,6 +91,11 @@ const gfx_layout k051960_device::spritelayout_reverse =
 	128*8
 };
 
+// In gradius3, the gfx ROMs are directly connected to one of the 68K CPUs
+// rather than being read the usual way; moreover, the ROM data lines are
+// connected in different ways to the 68K and to the K051937.
+// Rather than copy the ROM region and bitswap one copy, we (currently)
+// just use an alternate gfx layout for this game.
 const gfx_layout k051960_device::spritelayout_gradius3 =
 {
 	16,16,
@@ -160,9 +168,9 @@ void k051960_device::device_start()
 	m_sprite_size = region()->bytes();
 
 	decode_gfx();
-	gfx(0)->set_colors(palette()->entries() / gfx(0)->depth());
+	m_gfx[0]->set_colors(m_palette->entries() / m_gfx[0]->depth());
 
-	if (VERBOSE && !(palette()->shadows_enabled()))
+	if (VERBOSE && !(m_palette->shadows_enabled()))
 		popmessage("driver should use VIDEO_HAS_SHADOWS");
 
 	m_ram = auto_alloc_array_clear(machine(), UINT8, 0x400);
@@ -455,7 +463,7 @@ void k051960_device::k051960_sprites_draw( bitmap_ind16 &bitmap, const rectangle
 			flipy = !flipy;
 		}
 
-		drawmode_table[gfx(0)->granularity() - 1] = shadow ? DRAWMODE_SHADOW : DRAWMODE_SOURCE;
+		drawmode_table[m_gfx[0]->granularity() - 1] = shadow ? DRAWMODE_SHADOW : DRAWMODE_SOURCE;
 
 		if (zoomx == 0x10000 && zoomy == 0x10000)
 		{
@@ -481,14 +489,14 @@ void k051960_device::k051960_sprites_draw( bitmap_ind16 &bitmap, const rectangle
 						c += yoffset[y];
 
 					if (max_priority == -1)
-						gfx(0)->prio_transtable(bitmap,cliprect,
+						m_gfx[0]->prio_transtable(bitmap,cliprect,
 								c,color,
 								flipx,flipy,
 								sx & 0x1ff,sy,
 								priority_bitmap,pri,
 								drawmode_table);
 					else
-						gfx(0)->transtable(bitmap,cliprect,
+						m_gfx[0]->transtable(bitmap,cliprect,
 								c,color,
 								flipx,flipy,
 								sx & 0x1ff,sy,
@@ -522,7 +530,7 @@ void k051960_device::k051960_sprites_draw( bitmap_ind16 &bitmap, const rectangle
 						c += yoffset[y];
 
 					if (max_priority == -1)
-						gfx(0)->prio_zoom_transtable(bitmap,cliprect,
+						m_gfx[0]->prio_zoom_transtable(bitmap,cliprect,
 								c,color,
 								flipx,flipy,
 								sx & 0x1ff,sy,
@@ -530,7 +538,7 @@ void k051960_device::k051960_sprites_draw( bitmap_ind16 &bitmap, const rectangle
 								priority_bitmap,pri,
 								drawmode_table);
 					else
-						gfx(0)->zoom_transtable(bitmap,cliprect,
+						m_gfx[0]->zoom_transtable(bitmap,cliprect,
 								c,color,
 								flipx,flipy,
 								sx & 0x1ff,sy,

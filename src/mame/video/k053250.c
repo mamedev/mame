@@ -3,7 +3,7 @@
 const device_type K053250 = &device_creator<k053250_device>;
 
 k053250_device::k053250_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, K053250, "K053250 Road Generator", tag, owner, clock, "k053250", __FILE__),
+	: device_t(mconfig, K053250, "K053250 LVC", tag, owner, clock, "k053250", __FILE__),
 		device_gfx_interface(mconfig, *this),
 		device_video_interface(mconfig, *this)
 {
@@ -351,7 +351,7 @@ void k053250_device::draw( bitmap_rgb32 &bitmap, const rectangle &cliprect, int 
 	linedata_offs += line_start * linedata_adv;     // pre-advance line info offset for the clipped region
 
 	// load physical palette base
-	pal_base = palette()->pens() + (colorbase << 4) % palette()->entries();
+	pal_base = m_palette->pens() + (colorbase << 4) % m_palette->entries();
 
 	// walk the target bitmap within the visible area vertically or horizontally, one line at a time
 	for (line_pos=line_start; line_pos <= line_end; linedata_offs += linedata_adv, line_pos++)
