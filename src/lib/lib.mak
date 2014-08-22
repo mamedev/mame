@@ -29,6 +29,11 @@ OBJDIRS += \
 	$(LIBOBJ)/web/json \
 	$(LIBOBJ)/sqlite3 \
 	$(LIBOBJ)/bgfx \
+	$(LIBOBJ)/bgfx/common \
+	$(LIBOBJ)/bgfx/common/entry \
+	$(LIBOBJ)/bgfx/common/font \
+	$(LIBOBJ)/bgfx/common/imgui \
+	$(LIBOBJ)/bgfx/common/nanovg \
 
 #-------------------------------------------------
 # utility library objects
@@ -575,6 +580,28 @@ BGFXOBJS = \
 	$(LIBOBJ)/bgfx/renderer_gl.o \
 	$(LIBOBJ)/bgfx/renderer_null.o \
 	$(LIBOBJ)/bgfx/vertexdecl.o \
+	$(LIBOBJ)/bgfx/common/bgfx_utils.o \
+	$(LIBOBJ)/bgfx/common/bounds.o \
+	$(LIBOBJ)/bgfx/common/camera.o \
+	$(LIBOBJ)/bgfx/common/cube_atlas.o \
+	$(LIBOBJ)/bgfx/common/font/font_manager.o \
+	$(LIBOBJ)/bgfx/common/font/text_buffer_manager.o \
+	$(LIBOBJ)/bgfx/common/font/text_metrics.o \
+	$(LIBOBJ)/bgfx/common/font/utf8.o \
+	$(LIBOBJ)/bgfx/common/imgui/imgui.o \
+	$(LIBOBJ)/bgfx/common/nanovg/nanovg.o \
+	$(LIBOBJ)/bgfx/common/nanovg/nanovg_bgfx.o \
+#	$(LIBOBJ)/bgfx/common/entry/cmd.o \
+#	$(LIBOBJ)/bgfx/common/entry/dbg.o \
+#	$(LIBOBJ)/bgfx/common/entry/entry.o \
+#	$(LIBOBJ)/bgfx/common/entry/entry_android.o \
+#	$(LIBOBJ)/bgfx/common/entry/entry_asmjs.o \
+#	$(LIBOBJ)/bgfx/common/entry/entry_linux.o \
+#	$(LIBOBJ)/bgfx/common/entry/entry_nacl.o \
+#	$(LIBOBJ)/bgfx/common/entry/entry_qnx.o \
+#	$(LIBOBJ)/bgfx/common/entry/entry_sdl.o \
+#	$(LIBOBJ)/bgfx/common/entry/entry_windows.o \
+#	$(LIBOBJ)/bgfx/common/entry/input.o \
 
 $(OBJ)/libbgfx.a: $(BGFXOBJS)
 
