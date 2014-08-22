@@ -3043,8 +3043,7 @@ static MACHINE_CONFIG_START( contcirc, taitoz_state )
 	MCFG_TC0100SCN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("tc0150rod", TC0150ROD, 0)
-	MCFG_TC0150ROD_GFXTAG("gfx3")
-
+	
 	MCFG_TC0110PCR_ADD("tc0110pcr")
 	MCFG_TC0110PCR_PALETTE("palette")
 
@@ -3122,8 +3121,7 @@ static MACHINE_CONFIG_START( chasehq, taitoz_state )
 	MCFG_TC0100SCN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("tc0150rod", TC0150ROD, 0)
-	MCFG_TC0150ROD_GFXTAG("gfx3")
-
+	
 	MCFG_TC0110PCR_ADD("tc0110pcr")
 	MCFG_TC0110PCR_PALETTE("palette")
 
@@ -3203,8 +3201,7 @@ static MACHINE_CONFIG_START( enforce, taitoz_state )
 	MCFG_TC0100SCN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("tc0150rod", TC0150ROD, 0)
-	MCFG_TC0150ROD_GFXTAG("gfx3")
-
+	
 	MCFG_TC0110PCR_ADD("tc0110pcr")
 	MCFG_TC0110PCR_PALETTE("palette")
 
@@ -3280,8 +3277,7 @@ static MACHINE_CONFIG_START( bshark, taitoz_state )
 	MCFG_TC0100SCN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("tc0150rod", TC0150ROD, 0)
-	MCFG_TC0150ROD_GFXTAG("gfx3")
-
+	
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
@@ -3362,8 +3358,7 @@ static MACHINE_CONFIG_START( sci, taitoz_state )
 	MCFG_TC0100SCN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("tc0150rod", TC0150ROD, 0)
-	MCFG_TC0150ROD_GFXTAG("gfx3")
-
+	
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
@@ -3439,8 +3434,7 @@ static MACHINE_CONFIG_START( nightstr, taitoz_state )
 	MCFG_TC0100SCN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("tc0150rod", TC0150ROD, 0)
-	MCFG_TC0150ROD_GFXTAG("gfx3")
-
+	
 	MCFG_TC0110PCR_ADD("tc0110pcr")
 	MCFG_TC0110PCR_PALETTE("palette")
 
@@ -3520,8 +3514,7 @@ static MACHINE_CONFIG_START( aquajack, taitoz_state )
 	MCFG_TC0100SCN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("tc0150rod", TC0150ROD, 0)
-	MCFG_TC0150ROD_GFXTAG("gfx3")
-
+	
 	MCFG_TC0110PCR_ADD("tc0110pcr")
 	MCFG_TC0110PCR_PALETTE("palette")
 
@@ -3671,8 +3664,7 @@ static MACHINE_CONFIG_START( dblaxle, taitoz_state )
 	MCFG_TC0480SCP_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("tc0150rod", TC0150ROD, 0)
-	MCFG_TC0150ROD_GFXTAG("gfx3")
-
+	
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
@@ -3748,8 +3740,7 @@ static MACHINE_CONFIG_START( racingb, taitoz_state )
 	MCFG_TC0480SCP_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("tc0150rod", TC0150ROD, 0)
-	MCFG_TC0150ROD_GFXTAG("gfx3")
-
+	
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
@@ -3805,7 +3796,7 @@ ROM_START( contcirc ) /* 3D Effects controlled via dipswitch, when on can toggle
 	ROM_LOAD32_BYTE( "b33-04", 0x000002, 0x080000, CRC(8df866a2) SHA1(6b87d8e683fe7d31070b16620ebfee4edf7711b8) )
 	ROM_LOAD32_BYTE( "b33-03", 0x000003, 0x080000, CRC(4f6c36d9) SHA1(18b15a991c3daf22b7f3f144edf3bd2abb3917eb) )
 
-	ROM_REGION( 0x80000, "gfx3", 0 )    /* don't dispose */
+	ROM_REGION( 0x80000, "tc0150rod", 0 )    /* don't dispose */
 	ROM_LOAD( "b33-01.3", 0x00000, 0x80000, CRC(f11f2be8) SHA1(72ae08dc5bf5f6901fbb52d3b1dabcba90929b38) )  /* ROD, road lines */
 
 	ROM_REGION16_LE( 0x80000, "user1", 0 )
@@ -3847,7 +3838,7 @@ ROM_START( contcircu ) /* 3D Effects controlled via dipswitch, when on can toggl
 	ROM_LOAD32_BYTE( "b33-04", 0x000002, 0x080000, CRC(8df866a2) SHA1(6b87d8e683fe7d31070b16620ebfee4edf7711b8) )
 	ROM_LOAD32_BYTE( "b33-03", 0x000003, 0x080000, CRC(4f6c36d9) SHA1(18b15a991c3daf22b7f3f144edf3bd2abb3917eb) )
 
-	ROM_REGION( 0x80000, "gfx3", 0 )    /* don't dispose */
+	ROM_REGION( 0x80000, "tc0150rod", 0 )    /* don't dispose */
 	ROM_LOAD( "b33-01.3", 0x00000, 0x80000, CRC(f11f2be8) SHA1(72ae08dc5bf5f6901fbb52d3b1dabcba90929b38) )  /* ROD, road lines */
 
 	ROM_REGION16_LE( 0x80000, "user1", 0 )
@@ -3889,7 +3880,7 @@ ROM_START( contcircua )
 	ROM_LOAD32_BYTE( "b33-04", 0x000002, 0x080000, CRC(8df866a2) SHA1(6b87d8e683fe7d31070b16620ebfee4edf7711b8) )
 	ROM_LOAD32_BYTE( "b33-03", 0x000003, 0x080000, CRC(4f6c36d9) SHA1(18b15a991c3daf22b7f3f144edf3bd2abb3917eb) )
 
-	ROM_REGION( 0x80000, "gfx3", 0 )    /* don't dispose */
+	ROM_REGION( 0x80000, "tc0150rod", 0 )    /* don't dispose */
 	ROM_LOAD( "b33-01.3", 0x00000, 0x80000, CRC(f11f2be8) SHA1(72ae08dc5bf5f6901fbb52d3b1dabcba90929b38) )  /* ROD, road lines */
 
 	ROM_REGION16_LE( 0x80000, "user1", 0 )
@@ -3931,7 +3922,7 @@ ROM_START( contcircj )
 	ROM_LOAD32_BYTE( "b33-04", 0x000002, 0x080000, CRC(8df866a2) SHA1(6b87d8e683fe7d31070b16620ebfee4edf7711b8) )
 	ROM_LOAD32_BYTE( "b33-03", 0x000003, 0x080000, CRC(4f6c36d9) SHA1(18b15a991c3daf22b7f3f144edf3bd2abb3917eb) )
 
-	ROM_REGION( 0x80000, "gfx3", 0 )    /* don't dispose */
+	ROM_REGION( 0x80000, "tc0150rod", 0 )    /* don't dispose */
 	ROM_LOAD( "b33-01.3", 0x00000, 0x80000, CRC(f11f2be8) SHA1(72ae08dc5bf5f6901fbb52d3b1dabcba90929b38) )  /* ROD, road lines */
 
 	ROM_REGION16_LE( 0x80000, "user1", 0 )
@@ -3975,7 +3966,7 @@ ROM_START( chasehq )
 	ROM_LOAD32_BYTE( "b52-36.9",  0x000002, 0x080000, CRC(61e89e91) SHA1(f655b3caa37a8835c2eb11f4d72e985636ac5379) )
 	ROM_LOAD32_BYTE( "b52-37.11", 0x000003, 0x080000, CRC(f02e47b9) SHA1(093864bd18bd58dafa57990e999f394ca3124452) )
 
-	ROM_REGION( 0x80000, "gfx3", 0 )    /* don't dispose */
+	ROM_REGION( 0x80000, "tc0150rod", 0 )    /* don't dispose */
 	ROM_LOAD( "b52-28.4", 0x00000, 0x80000, CRC(963bc82b) SHA1(e3558aecd1b82ddbf10ab2b71843a3664705f1f1) )  /* ROD, road lines */
 
 	ROM_REGION( 0x200000, "gfx4", 0 )
@@ -4055,7 +4046,7 @@ ROM_START( chasehqj )
 	ROM_LOAD32_BYTE( "b52-36.9",  0x000002, 0x080000, CRC(61e89e91) SHA1(f655b3caa37a8835c2eb11f4d72e985636ac5379) )
 	ROM_LOAD32_BYTE( "b52-37.11", 0x000003, 0x080000, CRC(f02e47b9) SHA1(093864bd18bd58dafa57990e999f394ca3124452) )
 
-	ROM_REGION( 0x80000, "gfx3", 0 )    /* don't dispose */
+	ROM_REGION( 0x80000, "tc0150rod", 0 )    /* don't dispose */
 	ROM_LOAD( "b52-28.4", 0x00000, 0x80000, CRC(963bc82b) SHA1(e3558aecd1b82ddbf10ab2b71843a3664705f1f1) )  /* ROD, road lines */
 
 	ROM_REGION( 0x200000, "gfx4", 0 )
@@ -4137,7 +4128,7 @@ ROM_START( chasehqju )
 	ROM_LOAD32_BYTE( "b52-36.9",  0x000002, 0x080000, CRC(61e89e91) SHA1(f655b3caa37a8835c2eb11f4d72e985636ac5379) )
 	ROM_LOAD32_BYTE( "b52-37.11", 0x000003, 0x080000, CRC(f02e47b9) SHA1(093864bd18bd58dafa57990e999f394ca3124452) )
 
-	ROM_REGION( 0x80000, "gfx3", 0 )    /* don't dispose */
+	ROM_REGION( 0x80000, "tc0150rod", 0 )    /* don't dispose */
 	ROM_LOAD( "b52-28.4", 0x00000, 0x80000, CRC(963bc82b) SHA1(e3558aecd1b82ddbf10ab2b71843a3664705f1f1) )  /* ROD, road lines */
 
 	ROM_REGION( 0x200000, "gfx4", 0 )
@@ -4217,7 +4208,7 @@ ROM_START( chasehqu )
 	ROM_LOAD32_BYTE( "b52-36.9",  0x000002, 0x080000, CRC(61e89e91) SHA1(f655b3caa37a8835c2eb11f4d72e985636ac5379) )
 	ROM_LOAD32_BYTE( "b52-37.11", 0x000003, 0x080000, CRC(f02e47b9) SHA1(093864bd18bd58dafa57990e999f394ca3124452) )
 
-	ROM_REGION( 0x80000, "gfx3", 0 )    /* don't dispose */
+	ROM_REGION( 0x80000, "tc0150rod", 0 )    /* don't dispose */
 	ROM_LOAD( "b52-28.4", 0x00000, 0x80000, CRC(963bc82b) SHA1(e3558aecd1b82ddbf10ab2b71843a3664705f1f1) )  /* ROD, road lines */
 
 	ROM_REGION( 0x200000, "gfx4", 0 )
@@ -4295,7 +4286,7 @@ ROM_START( enforce )
 	ROM_LOAD32_BYTE( "b58-02.2",  0x000002, 0x080000, CRC(6a6e307c) SHA1(fc4a68220e0dd0e64d75ba7c7af0c1ac97dc7fd9) )
 	ROM_LOAD32_BYTE( "b58-01.1",  0x000003, 0x080000, CRC(01e9f0a8) SHA1(0d3a4dc81702e3c57c790eb8a45caca36cb47d4c) )
 
-	ROM_REGION( 0x80000, "gfx3", 0 )    /* don't dispose */
+	ROM_REGION( 0x80000, "tc0150rod", 0 )    /* don't dispose */
 	ROM_LOAD( "b58-06.116", 0x00000, 0x80000, CRC(b3495d70) SHA1(ead4c2fd20b8f103a849201c7344cded013eb8bb) )    /* ROD, road lines */
 
 	ROM_REGION16_LE( 0x80000, "user1", 0 )
@@ -4339,7 +4330,7 @@ ROM_START( enforcej )
 	ROM_LOAD32_BYTE( "b58-02.2",  0x000002, 0x080000, CRC(6a6e307c) SHA1(fc4a68220e0dd0e64d75ba7c7af0c1ac97dc7fd9) )
 	ROM_LOAD32_BYTE( "b58-01.1",  0x000003, 0x080000, CRC(01e9f0a8) SHA1(0d3a4dc81702e3c57c790eb8a45caca36cb47d4c) )
 
-	ROM_REGION( 0x80000, "gfx3", 0 )    /* don't dispose */
+	ROM_REGION( 0x80000, "tc0150rod", 0 )    /* don't dispose */
 	ROM_LOAD( "b58-06.116", 0x00000, 0x80000, CRC(b3495d70) SHA1(ead4c2fd20b8f103a849201c7344cded013eb8bb) )    /* ROD, road lines */
 
 	ROM_REGION16_LE( 0x80000, "user1", 0 )
@@ -4383,7 +4374,7 @@ ROM_START( enforceja )
 	ROM_LOAD32_BYTE( "b58-02.2",  0x000002, 0x080000, CRC(6a6e307c) SHA1(fc4a68220e0dd0e64d75ba7c7af0c1ac97dc7fd9) )
 	ROM_LOAD32_BYTE( "b58-01.1",  0x000003, 0x080000, CRC(01e9f0a8) SHA1(0d3a4dc81702e3c57c790eb8a45caca36cb47d4c) )
 
-	ROM_REGION( 0x80000, "gfx3", 0 )    /* don't dispose */
+	ROM_REGION( 0x80000, "tc0150rod", 0 )    /* don't dispose */
 	ROM_LOAD( "b58-06.116", 0x00000, 0x80000, CRC(b3495d70) SHA1(ead4c2fd20b8f103a849201c7344cded013eb8bb) )    /* ROD, road lines */
 
 	ROM_REGION16_LE( 0x80000, "user1", 0 )
@@ -4427,7 +4418,7 @@ ROM_START( bshark )
 	ROM_LOAD32_BYTE( "c34_02.15", 0x000002, 0x080000, CRC(8488ba10) SHA1(60f8f0dc9d4bc6bc452527250221c9915e9dfe6e) )
 	ROM_LOAD32_BYTE( "c34_01.14", 0x000003, 0x080000, CRC(3ebe8c63) SHA1(fa7403bf895c041cb64234209c944683ae372e57) )
 
-	ROM_REGION( 0x80000, "gfx3", 0 )    /* don't dispose */
+	ROM_REGION( 0x80000, "tc0150rod", 0 )    /* don't dispose */
 	ROM_LOAD( "c34_07.42", 0x00000, 0x80000, CRC(edb07808) SHA1(f32b4b93e9125536376d96fbca76c2b2f5f78656) ) /* ROD, road lines */
 
 	ROM_REGION16_LE( 0x80000, "user1", 0 )
@@ -4469,7 +4460,7 @@ ROM_START( bsharku )
 	ROM_LOAD32_BYTE( "c34_02.15", 0x000002, 0x080000, CRC(8488ba10) SHA1(60f8f0dc9d4bc6bc452527250221c9915e9dfe6e) )
 	ROM_LOAD32_BYTE( "c34_01.14", 0x000003, 0x080000, CRC(3ebe8c63) SHA1(fa7403bf895c041cb64234209c944683ae372e57) )
 
-	ROM_REGION( 0x80000, "gfx3", 0 )    /* don't dispose */
+	ROM_REGION( 0x80000, "tc0150rod", 0 )    /* don't dispose */
 	ROM_LOAD( "c34_07.42", 0x00000, 0x80000, CRC(edb07808) SHA1(f32b4b93e9125536376d96fbca76c2b2f5f78656) ) /* ROD, road lines */
 
 	ROM_REGION16_LE( 0x80000, "user1", 0 )
@@ -4511,7 +4502,7 @@ ROM_START( bsharkj )
 	ROM_LOAD32_BYTE( "c34_02.15", 0x000002, 0x080000, CRC(8488ba10) SHA1(60f8f0dc9d4bc6bc452527250221c9915e9dfe6e) )
 	ROM_LOAD32_BYTE( "c34_01.14", 0x000003, 0x080000, CRC(3ebe8c63) SHA1(fa7403bf895c041cb64234209c944683ae372e57) )
 
-	ROM_REGION( 0x80000, "gfx3", 0 )    /* don't dispose */
+	ROM_REGION( 0x80000, "tc0150rod", 0 )    /* don't dispose */
 	ROM_LOAD( "c34_07.42", 0x00000, 0x80000, CRC(edb07808) SHA1(f32b4b93e9125536376d96fbca76c2b2f5f78656) ) /* ROD, road lines */
 
 	ROM_REGION16_LE( 0x80000, "user1", 0 )
@@ -4553,7 +4544,7 @@ ROM_START( bsharkjjs )
 	ROM_LOAD32_BYTE( "c34_02.15", 0x000002, 0x080000, CRC(8488ba10) SHA1(60f8f0dc9d4bc6bc452527250221c9915e9dfe6e) )
 	ROM_LOAD32_BYTE( "c34_01.14", 0x000003, 0x080000, CRC(3ebe8c63) SHA1(fa7403bf895c041cb64234209c944683ae372e57) )
 
-	ROM_REGION( 0x80000, "gfx3", 0 )    /* don't dispose */
+	ROM_REGION( 0x80000, "tc0150rod", 0 )    /* don't dispose */
 	ROM_LOAD( "c34_07.42", 0x00000, 0x80000, CRC(edb07808) SHA1(f32b4b93e9125536376d96fbca76c2b2f5f78656) ) /* ROD, road lines */
 
 	ROM_REGION16_LE( 0x80000, "user1", 0 )
@@ -4597,7 +4588,7 @@ ROM_START( sci )
 	ROM_LOAD32_BYTE( "c09-03.54", 0x000002, 0x080000, CRC(a31d0e80) SHA1(dfeff1b89dd7b3f19b26e77f2d66f6448cb00553) )
 	ROM_LOAD32_BYTE( "c09-01.55", 0x000003, 0x080000, CRC(64bfea10) SHA1(15ea43092027b1717d0f24fbe6ac2cdf11a7ddc6) )
 
-	ROM_REGION( 0x80000, "gfx3", 0 )    /* don't dispose */
+	ROM_REGION( 0x80000, "tc0150rod", 0 )    /* don't dispose */
 	ROM_LOAD( "c09-07.15", 0x00000, 0x80000, CRC(963bc82b) SHA1(e3558aecd1b82ddbf10ab2b71843a3664705f1f1) ) /* ROD, road lines */
 
 	ROM_REGION16_LE( 0x80000, "user1", 0 )
@@ -4646,7 +4637,7 @@ ROM_START( scia )
 	ROM_LOAD32_BYTE( "c09-03.54", 0x000002, 0x080000, CRC(a31d0e80) SHA1(dfeff1b89dd7b3f19b26e77f2d66f6448cb00553) )
 	ROM_LOAD32_BYTE( "c09-01.55", 0x000003, 0x080000, CRC(64bfea10) SHA1(15ea43092027b1717d0f24fbe6ac2cdf11a7ddc6) )
 
-	ROM_REGION( 0x80000, "gfx3", 0 )    /* don't dispose */
+	ROM_REGION( 0x80000, "tc0150rod", 0 )    /* don't dispose */
 	ROM_LOAD( "c09-07.15", 0x00000, 0x80000, CRC(963bc82b) SHA1(e3558aecd1b82ddbf10ab2b71843a3664705f1f1) ) /* ROD, road lines */
 
 	ROM_REGION16_LE( 0x80000, "user1", 0 )
@@ -4690,7 +4681,7 @@ ROM_START( scij )
 	ROM_LOAD32_BYTE( "c09-03.54", 0x000002, 0x080000, CRC(a31d0e80) SHA1(dfeff1b89dd7b3f19b26e77f2d66f6448cb00553) )
 	ROM_LOAD32_BYTE( "c09-01.55", 0x000003, 0x080000, CRC(64bfea10) SHA1(15ea43092027b1717d0f24fbe6ac2cdf11a7ddc6) )
 
-	ROM_REGION( 0x80000, "gfx3", 0 )    /* don't dispose */
+	ROM_REGION( 0x80000, "tc0150rod", 0 )    /* don't dispose */
 	ROM_LOAD( "c09-07.15", 0x00000, 0x80000, CRC(963bc82b) SHA1(e3558aecd1b82ddbf10ab2b71843a3664705f1f1) ) /* ROD, road lines */
 
 	ROM_REGION16_LE( 0x80000, "user1", 0 )
@@ -4734,7 +4725,7 @@ ROM_START( sciu )
 	ROM_LOAD32_BYTE( "c09-03.54", 0x000002, 0x080000, CRC(a31d0e80) SHA1(dfeff1b89dd7b3f19b26e77f2d66f6448cb00553) )
 	ROM_LOAD32_BYTE( "c09-01.55", 0x000003, 0x080000, CRC(64bfea10) SHA1(15ea43092027b1717d0f24fbe6ac2cdf11a7ddc6) )
 
-	ROM_REGION( 0x80000, "gfx3", 0 )    /* don't dispose */
+	ROM_REGION( 0x80000, "tc0150rod", 0 )    /* don't dispose */
 	ROM_LOAD( "c09-07.15", 0x00000, 0x80000, CRC(963bc82b) SHA1(e3558aecd1b82ddbf10ab2b71843a3664705f1f1) ) /* ROD, road lines */
 
 	ROM_REGION16_LE( 0x80000, "user1", 0 )
@@ -4778,7 +4769,7 @@ ROM_START( scin )
 	ROM_LOAD32_BYTE( "c09-03.54", 0x000002, 0x080000, CRC(a31d0e80) SHA1(dfeff1b89dd7b3f19b26e77f2d66f6448cb00553) )
 	ROM_LOAD32_BYTE( "c09-01.55", 0x000003, 0x080000, CRC(64bfea10) SHA1(15ea43092027b1717d0f24fbe6ac2cdf11a7ddc6) )
 
-	ROM_REGION( 0x80000, "gfx3", 0 )    /* don't dispose */
+	ROM_REGION( 0x80000, "tc0150rod", 0 )    /* don't dispose */
 	ROM_LOAD( "c09-07.15", 0x00000, 0x80000, CRC(963bc82b) SHA1(e3558aecd1b82ddbf10ab2b71843a3664705f1f1) ) /* ROD, road lines */
 
 	ROM_REGION16_LE( 0x80000, "user1", 0 )
@@ -4823,7 +4814,7 @@ ROM_START( nightstr )
 	ROM_LOAD32_BYTE( "b91-02.bin", 0x000002, 0x080000, CRC(457c64b8) SHA1(443f13d56d53ca6a7750ec974da675bad3f34a38) )
 	ROM_LOAD32_BYTE( "b91-01.bin", 0x000003, 0x080000, CRC(3731d94f) SHA1(2978d3eb1f44595681e84f3aa8dc03d34a191455) )
 
-	ROM_REGION( 0x80000, "gfx3", 0 )    /* don't dispose */
+	ROM_REGION( 0x80000, "tc0150rod", 0 )    /* don't dispose */
 	ROM_LOAD( "b91-10.bin", 0x00000, 0x80000, CRC(1d8f05b4) SHA1(04caa6a0887b90860c426a973dc3c3270e996818) )    /* ROD, road lines */
 
 	ROM_REGION( 0x200000, "gfx4", 0 )
@@ -4877,7 +4868,7 @@ ROM_START( nightstru )
 	ROM_LOAD32_BYTE( "b91-02.bin", 0x000002, 0x080000, CRC(457c64b8) SHA1(443f13d56d53ca6a7750ec974da675bad3f34a38) )
 	ROM_LOAD32_BYTE( "b91-01.bin", 0x000003, 0x080000, CRC(3731d94f) SHA1(2978d3eb1f44595681e84f3aa8dc03d34a191455) )
 
-	ROM_REGION( 0x80000, "gfx3", 0 )    /* don't dispose */
+	ROM_REGION( 0x80000, "tc0150rod", 0 )    /* don't dispose */
 	ROM_LOAD( "b91-10.bin", 0x00000, 0x80000, CRC(1d8f05b4) SHA1(04caa6a0887b90860c426a973dc3c3270e996818) )    /* ROD, road lines */
 
 	ROM_REGION( 0x200000, "gfx4", 0 )
@@ -4931,7 +4922,7 @@ ROM_START( nightstrj )
 	ROM_LOAD32_BYTE( "b91-02.bin", 0x000002, 0x080000, CRC(457c64b8) SHA1(443f13d56d53ca6a7750ec974da675bad3f34a38) )
 	ROM_LOAD32_BYTE( "b91-01.bin", 0x000003, 0x080000, CRC(3731d94f) SHA1(2978d3eb1f44595681e84f3aa8dc03d34a191455) )
 
-	ROM_REGION( 0x80000, "gfx3", 0 )    /* don't dispose */
+	ROM_REGION( 0x80000, "tc0150rod", 0 )    /* don't dispose */
 	ROM_LOAD( "b91-10.bin", 0x00000, 0x80000, CRC(1d8f05b4) SHA1(04caa6a0887b90860c426a973dc3c3270e996818) )    /* ROD, road lines */
 
 	ROM_REGION( 0x200000, "gfx4", 0 )
@@ -4983,7 +4974,7 @@ ROM_START( aquajack )
 	ROM_LOAD32_BYTE( "b77-02.ic14", 0x000002, 0x80000, CRC(daea0d2e) SHA1(10640651824234a589838e8f017964b79de79cb4) )
 	ROM_LOAD32_BYTE( "b77-01.ic13", 0x000003, 0x80000, CRC(cdab000d) SHA1(d83ee7f1dc17ab113bac38d0d062bb1519ff69f7) )
 
-	ROM_REGION( 0x80000, "gfx3", 0 )    /* don't dispose */
+	ROM_REGION( 0x80000, "tc0150rod", 0 )    /* don't dispose */
 	ROM_LOAD( "b77-07.ic33", 0x000000, 0x80000, CRC(7db1fc5e) SHA1(fbc88c2179b881d34d3a33d0a901d8da3445f9a8) )  /* ROD, road lines */
 
 	ROM_REGION16_LE( 0x80000, "user1", 0 )
@@ -5024,7 +5015,7 @@ ROM_START( aquajacku )
 	ROM_LOAD32_BYTE( "b77-02.ic14", 0x000002, 0x80000, CRC(daea0d2e) SHA1(10640651824234a589838e8f017964b79de79cb4) )
 	ROM_LOAD32_BYTE( "b77-01.ic13", 0x000003, 0x80000, CRC(cdab000d) SHA1(d83ee7f1dc17ab113bac38d0d062bb1519ff69f7) )
 
-	ROM_REGION( 0x80000, "gfx3", 0 )    /* don't dispose */
+	ROM_REGION( 0x80000, "tc0150rod", 0 )    /* don't dispose */
 	ROM_LOAD( "b77-07.ic33", 0x000000, 0x80000, CRC(7db1fc5e) SHA1(fbc88c2179b881d34d3a33d0a901d8da3445f9a8) )  /* ROD, road lines */
 
 	ROM_REGION16_LE( 0x80000, "user1", 0 )
@@ -5065,7 +5056,7 @@ ROM_START( aquajackj )
 	ROM_LOAD32_BYTE( "b77-02.ic14", 0x000002, 0x80000, CRC(daea0d2e) SHA1(10640651824234a589838e8f017964b79de79cb4) )
 	ROM_LOAD32_BYTE( "b77-01.ic13", 0x000003, 0x80000, CRC(cdab000d) SHA1(d83ee7f1dc17ab113bac38d0d062bb1519ff69f7) )
 
-	ROM_REGION( 0x80000, "gfx3", 0 )    /* don't dispose */
+	ROM_REGION( 0x80000, "tc0150rod", 0 )    /* don't dispose */
 	ROM_LOAD( "b77-07.ic33", 0x000000, 0x80000, CRC(7db1fc5e) SHA1(fbc88c2179b881d34d3a33d0a901d8da3445f9a8) )  /* ROD, road lines */
 
 	ROM_REGION16_LE( 0x80000, "user1", 0 )
@@ -5225,7 +5216,7 @@ ROM_START( dblaxle )
 //  ROMX_LOAD      ( "c78-05l.1", 0x000003, 0x080000, CRC(f24bf972) , ROM_SKIP(7) )
 //  ROMX_LOAD      ( "c78-05h.2", 0x000007, 0x080000, CRC(c01039b5) , ROM_SKIP(7) )
 
-	ROM_REGION( 0x80000, "gfx3", 0 )    /* don't dispose */
+	ROM_REGION( 0x80000, "tc0150rod", 0 )    /* don't dispose */
 	ROM_LOAD( "c78-09.12", 0x000000, 0x80000, CRC(0dbde6f5) SHA1(4049271e3738b54e0c56d191889b1aea5664d49f) )    /* ROD, road lines */
 
 	ROM_REGION16_LE( 0x80000, "user1", 0 )
@@ -5273,7 +5264,7 @@ ROM_START( dblaxleu )
 //  ROMX_LOAD      ( "c78-05l.1", 0x000003, 0x080000, CRC(f24bf972) , ROM_SKIP(7) )
 //  ROMX_LOAD      ( "c78-05h.2", 0x000007, 0x080000, CRC(c01039b5) , ROM_SKIP(7) )
 
-	ROM_REGION( 0x80000, "gfx3", 0 )    /* don't dispose */
+	ROM_REGION( 0x80000, "tc0150rod", 0 )    /* don't dispose */
 	ROM_LOAD( "c78-09.12", 0x000000, 0x80000, CRC(0dbde6f5) SHA1(4049271e3738b54e0c56d191889b1aea5664d49f) )    /* ROD, road lines */
 
 	ROM_REGION16_LE( 0x80000, "user1", 0 )
@@ -5319,7 +5310,7 @@ ROM_START( pwheelsj )
 	ROM_LOAD32_BYTE( "c78-06.23", 0x000002, 0x100000, CRC(8309e91b) SHA1(3f27557bc82bf42cc77e3c7e363b51a0b119144d) )
 	ROM_LOAD32_BYTE( "c78-05.31", 0x000003, 0x100000, CRC(90001f68) SHA1(5c08dfe6a2e12e6ca84035815563f38fc2c2c029) )
 
-	ROM_REGION( 0x80000, "gfx3", 0 )    /* don't dispose */
+	ROM_REGION( 0x80000, "tc0150rod", 0 )    /* don't dispose */
 	ROM_LOAD( "c78-09.12", 0x000000, 0x80000, CRC(0dbde6f5) SHA1(4049271e3738b54e0c56d191889b1aea5664d49f) )    /* ROD, road lines */
 
 	ROM_REGION16_LE( 0x80000, "user1", 0 )
@@ -5365,7 +5356,7 @@ ROM_START( racingb )
 	ROM_LOAD32_BYTE( "c84-91.23", 0x000002, 0x100000, CRC(b1b0146c) SHA1(d01f08085d644b17445d904a4684c00f133f7bae) )
 	ROM_LOAD32_BYTE( "c84-93.31", 0x000003, 0x100000, CRC(8837bb4e) SHA1(c41fff198a3c87c6e1672174ede589434374c1b3) )
 
-	ROM_REGION( 0x80000, "gfx3", 0 )    /* don't dispose */
+	ROM_REGION( 0x80000, "tc0150rod", 0 )    /* don't dispose */
 	ROM_LOAD( "c84-84.12", 0x000000, 0x80000, CRC(34dc486b) SHA1(2f503be67adbc5293f2d1218c838416fd931796c) )    /* ROD, road lines */
 
 	ROM_REGION16_LE( 0x80000, "user1", 0 )
@@ -5411,7 +5402,7 @@ ROM_START( racingbj )
 	ROM_LOAD32_BYTE( "c84-91.23", 0x000002, 0x100000, CRC(b1b0146c) SHA1(d01f08085d644b17445d904a4684c00f133f7bae) )
 	ROM_LOAD32_BYTE( "c84-93.31", 0x000003, 0x100000, CRC(8837bb4e) SHA1(c41fff198a3c87c6e1672174ede589434374c1b3) )
 
-	ROM_REGION( 0x80000, "gfx3", 0 )    /* don't dispose */
+	ROM_REGION( 0x80000, "tc0150rod", 0 )    /* don't dispose */
 	ROM_LOAD( "c84-84.12", 0x000000, 0x80000, CRC(34dc486b) SHA1(2f503be67adbc5293f2d1218c838416fd931796c) )    /* ROD, road lines */
 
 	ROM_REGION16_LE( 0x80000, "user1", 0 )
