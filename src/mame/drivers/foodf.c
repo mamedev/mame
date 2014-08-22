@@ -437,6 +437,29 @@ ROM_START( foodf2 )
 ROM_END
 
 
+ROM_START( foodf1 )
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* 64k for 68000 code */
+	ROM_LOAD16_BYTE( "136020-101.8c",   0x000001, 0x002000, CRC(06d0ede0) SHA1(2bc6bef433abcaba8181b76dfa90e45a35b04ada) )
+	ROM_LOAD16_BYTE( "136020-102.9c",   0x000000, 0x002000, CRC(ca6390a4) SHA1(b5a355f7900e96eaeb6946de6d10bfc842ce23d1) )
+	ROM_LOAD16_BYTE( "136020-103.8d",   0x004001, 0x002000, CRC(36e89e89) SHA1(2a71650d71ca8b8e16fdff158e6c8265b9bf8625) )
+	ROM_LOAD16_BYTE( "136020-104.9d",   0x004000, 0x002000, CRC(f667374c) SHA1(d7be70b56500e2071b7f8c810f7a3e2a6743c6bd) )
+	ROM_LOAD16_BYTE( "136020-105.8e",   0x008001, 0x002000, CRC(a8c22e50) SHA1(7c18f58c0b4769fd8b91e134b812d0df0e4b5c13) )
+	ROM_LOAD16_BYTE( "136020-106.9e",   0x008000, 0x002000, CRC(13e013c4) SHA1(2c35261a129c0cd29dcf396067cc3239af71411e) )
+	ROM_LOAD16_BYTE( "136020-107.8f",   0x00c001, 0x002000, CRC(8a3f7ca4) SHA1(7196ebe15a35511276c32111fc69a207bbc7837f) )
+	ROM_LOAD16_BYTE( "136020-108.9f",   0x00c000, 0x002000, CRC(d4244e12) SHA1(f8963c1e170471f5c132005b96fed80bc26f2574) )
+
+	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_LOAD( "136020-109.6lm",  0x000000, 0x002000, CRC(c13c90eb) SHA1(ebd2bbbdd7e184851d1ab4b5648481d966c78cc2) )
+
+	ROM_REGION( 0x4000, "gfx2", 0 )
+	ROM_LOAD( "136020-110.4e",   0x000000, 0x002000, CRC(8870e3d6) SHA1(702007d3d543f872b5bf5d00b49f6e05b46d6600) )
+	ROM_LOAD( "136020-111.4d",   0x002000, 0x002000, CRC(84372edf) SHA1(9beef3ff3b28405c45d691adfbc233921073be47) )
+
+	ROM_REGION( 0x100, "proms", 0 )
+	ROM_LOAD( "136020-112.2p",   0x000000, 0x000100, CRC(0aa962d6) SHA1(efb51e4c95efb1b85206c416c1d6d35c6f4ff35c) )
+ROM_END
+
+
 ROM_START( foodfc )
 	ROM_REGION( 0x10000, "maincpu", 0 ) /* 64k for 68000 code */
 	ROM_LOAD16_BYTE( "136020-113.8c",   0x000001, 0x002000, CRC(193a299f) SHA1(58bbf714eff22d8a47b174e4b121f14a8dcb4ef9) )
@@ -469,4 +492,5 @@ ROM_END
 
 GAME( 1982, foodf,  0,     foodf, foodf, driver_device, 0, ROT0, "General Computer Corporation (Atari license)", "Food Fight (rev 3)", GAME_SUPPORTS_SAVE )
 GAME( 1982, foodf2, foodf, foodf, foodf, driver_device, 0, ROT0, "General Computer Corporation (Atari license)", "Food Fight (rev 2)", GAME_SUPPORTS_SAVE )
+GAME( 1982, foodf1, foodf, foodf, foodf, driver_device, 0, ROT0, "General Computer Corporation (Atari license)", "Food Fight (rev 1)", GAME_SUPPORTS_SAVE )
 GAME( 1982, foodfc, foodf, foodf, foodf, driver_device, 0, ROT0, "General Computer Corporation (Atari license)", "Food Fight (cocktail)", GAME_SUPPORTS_SAVE )
