@@ -578,7 +578,22 @@ BGFXOBJS = \
 
 $(OBJ)/libbgfx.a: $(BGFXOBJS)
 
+BGFXINC = -I$(LIBSRC) -I$(LIBSRC)/bgfx/include -I$(LIBSRC)/khronos 
+ifdef MSVC_BUILD
+	BGFXINC += -I$(LIBSRC)/compat/msvc
+else
+	ifeq ($(TARGETOS),win32)
+		BGFXINC += -I$(LIBSRC)/compat/mingw
+	endif
+	ifeq ($(TARGETOS),freebsd)
+		BGFXINC += -I$(LIBSRC)/compat/freebsd
+	endif
+	ifeq ($(TARGETOS),macosx)
+		BGFXINC += -I$(LIBSRC)/compat/osx
+	endif
+endif
+
 $(LIBOBJ)/bgfx/%.o: $(LIBSRC)/bgfx/%.cpp | $(OSPREBUILD)
 	@echo Compiling $<...
-	$(CC) $(CDEFS) $(CCOMFLAGS) -I$(LIBSRC) -I$(LIBSRC)/bgfx/include -I$(LIBSRC)/compat/mingw -I$(LIBSRC)/khronos -D__STDC_LIMIT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_CONSTANT_MACROS -c $< -o $@
+	$(CC) $(CDEFS) $(CCOMFLAGS) $(BGFXINC) -D__STDC_LIMIT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_CONSTANT_MACROS -c $< -o $@
 
