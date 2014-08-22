@@ -6551,6 +6551,8 @@ DRIVER_INIT_MEMBER(galaxian_state,scorpion)
 //  space.nop_write(0x6803, 0x6803);
 
 	m_audiocpu->space(AS_PROGRAM).install_read_handler(0x3000, 0x3000, read8_delegate(FUNC(galaxian_state::scorpion_digitalker_intr_r),this));
+	
+	save_item(NAME(m_protection_state));
 /*
 {
     const UINT8 *rom = memregion("speech")->base();
