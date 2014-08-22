@@ -28,6 +28,7 @@ OBJDIRS += \
 	$(LIBOBJ)/web \
 	$(LIBOBJ)/web/json \
 	$(LIBOBJ)/sqlite3 \
+	$(LIBOBJ)/bgfx \
 
 #-------------------------------------------------
 # utility library objects
@@ -557,3 +558,27 @@ endif
 $(LIBOBJ)/sqlite3/sqlite3.o: $(LIBSRC)/sqlite3/sqlite3.c | $(OSPREBUILD)
 	@echo Compiling $<...
 	$(CC) $(CDEFS) $(CONLYFLAGS) -Wno-bad-function-cast -I$(LIBSRC)/sqlite3 -c $< -o $@
+
+#-------------------------------------------------
+# BGFX library objects
+#-------------------------------------------------
+
+BGFXOBJS = \
+	$(LIBOBJ)/bgfx/bgfx.o \
+	$(LIBOBJ)/bgfx/glcontext_egl.o \
+	$(LIBOBJ)/bgfx/glcontext_glx.o \
+	$(LIBOBJ)/bgfx/glcontext_ppapi.o \
+	$(LIBOBJ)/bgfx/glcontext_wgl.o \
+	$(LIBOBJ)/bgfx/image.o \
+	$(LIBOBJ)/bgfx/renderer_d3d11.o \
+	$(LIBOBJ)/bgfx/renderer_d3d9.o \
+	$(LIBOBJ)/bgfx/renderer_gl.o \
+	$(LIBOBJ)/bgfx/renderer_null.o \
+	$(LIBOBJ)/bgfx/vertexdecl.o \
+
+$(OBJ)/libbgfx.a: $(BGFXOBJS)
+
+$(LIBOBJ)/bgfx/%.o: $(LIBSRC)/bgfx/%.cpp | $(OSPREBUILD)
+	@echo Compiling $<...
+	$(CC) $(CDEFS) $(CCOMFLAGS) -I$(LIBSRC) -I$(LIBSRC)/bgfx/include -I$(LIBSRC)/compat/mingw -I$(LIBSRC)/khronos -D__STDC_LIMIT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_CONSTANT_MACROS -c $< -o $@
+
