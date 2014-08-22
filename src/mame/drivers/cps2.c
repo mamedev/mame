@@ -1422,11 +1422,11 @@ ROM_END
 
 ROM_START( 19xxa )
 	ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code */
-	ROM_LOAD16_WORD_SWAP( "19xx_09xa_03b.3", 0x000000, 0x80000, CRC(2e994897) SHA1(8dee5d84fd01f416fa6dfef76be0dfff90f45595) ) /* Yes it's actually 09xa, that's not a typo */
-	ROM_LOAD16_WORD_SWAP( "19xx_09xa_04b.4", 0x080000, 0x80000, CRC(6364d001) SHA1(a6f3f0015c9a3c27bc2109d557b88d0773a83465) ) /* Yes it's actually 09xa, that's not a typo */
-	ROM_LOAD16_WORD_SWAP( "19xx_09xa_05b.5", 0x100000, 0x80000, CRC(00c1949b) SHA1(4120a57d06638c637b74442b200e46d9b13fa431) ) /* Yes it's actually 09xa, that's not a typo */
-	ROM_LOAD16_WORD_SWAP( "19xx_09xa_06b.6", 0x180000, 0x80000, CRC(363c1f6e) SHA1(2e358e345f1d5963836b0ac8c6a1b455638bd19d) ) /* Yes it's actually 09xa, that's not a typo */
-	ROM_LOAD16_WORD_SWAP( "19xx_19xa_07.7",  0x200000, 0x80000, CRC(61c0296c) SHA1(9e225beccffd14bb53a32f8c0f2aef7f331dae30) ) /* This one was different, it actually was 19xa */
+	ROM_LOAD16_WORD_SWAP( "09xa.03b", 0x000000, 0x80000, CRC(2e994897) SHA1(8dee5d84fd01f416fa6dfef76be0dfff90f45595) ) /* Yes it's actually 09xa, that's not a typo */
+	ROM_LOAD16_WORD_SWAP( "09xa.04b", 0x080000, 0x80000, CRC(6364d001) SHA1(a6f3f0015c9a3c27bc2109d557b88d0773a83465) ) /* Yes it's actually 09xa, that's not a typo */
+	ROM_LOAD16_WORD_SWAP( "09xa.05b", 0x100000, 0x80000, CRC(00c1949b) SHA1(4120a57d06638c637b74442b200e46d9b13fa431) ) /* Yes it's actually 09xa, that's not a typo */
+	ROM_LOAD16_WORD_SWAP( "09xa.06b", 0x180000, 0x80000, CRC(363c1f6e) SHA1(2e358e345f1d5963836b0ac8c6a1b455638bd19d) ) /* Yes it's actually 09xa, that's not a typo */
+	ROM_LOAD16_WORD_SWAP( "19xa.07",  0x200000, 0x80000, CRC(61c0296c) SHA1(9e225beccffd14bb53a32f8c0f2aef7f331dae30) ) /* This one was different, it actually was 19xa */
 
 	ROM_REGION( 0x1000000, "gfx", 0 )
 	ROMX_LOAD( "19x.13m",   0x0000000, 0x080000, CRC(427aeb18) SHA1(901029b5423e4bda85f592735036c06b7d426680) , ROM_GROUPWORD | ROM_SKIP(6) )
