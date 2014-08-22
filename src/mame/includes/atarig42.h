@@ -65,6 +65,7 @@ public:
 	void guardians_sloop_tweak(int offset);
 	DECLARE_DIRECT_UPDATE_MEMBER(atarig42_sloop_direct_handler);
 	DECLARE_DRIVER_INIT(roadriot);
+	DECLARE_DRIVER_INIT(dangerex);
 	DECLARE_DRIVER_INIT(guardian);
 	TILE_GET_INFO_MEMBER(get_alpha_tile_info);
 	TILE_GET_INFO_MEMBER(get_playfield_tile_info);
