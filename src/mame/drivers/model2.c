@@ -5992,7 +5992,7 @@ GAME( 1993, daytonata, daytona, model2o, daytona, driver_device, 0,       ROT0, 
 GAME( 1993, daytonam,  daytona, model2o, daytona, model2_state,  daytonam,ROT0, "Sega",   "Daytona USA (Japan, To The MAXX)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
 GAME( 1994, desert,          0, model2o, desert,  driver_device, 0,       ROT0, "Sega / Martin Marietta", "Desert Tank", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
 GAME( 1994, vcop,            0, model2o, vcop,    driver_device, 0,       ROT0, "Sega",   "Virtua Cop (Revision B)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
-GAME( 1994, vcopa,           0, model2o, vcop,    driver_device, 0,       ROT0, "Sega",   "Virtua Cop (Revision A)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
+GAME( 1994, vcopa,        vcop, model2o, vcop,    driver_device, 0,       ROT0, "Sega",   "Virtua Cop (Revision A)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
 
 // Model 2A-CRX (TGPs, SCSP sound board)
 GAME( 1995, manxtt,          0, manxttdx,manxtt,  driver_device, 0, ROT0, "Sega", "Manx TT Superbike - DX (Revision D)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
