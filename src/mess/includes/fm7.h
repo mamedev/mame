@@ -4,6 +4,7 @@
 #include "sound/beep.h"
 #include "sound/2203intf.h"
 #include "machine/wd17xx.h"
+#include "machine/bankdev.h"
 
 /*
  *
@@ -141,7 +142,23 @@ public:
 		m_joy1(*this, "joy1"),
 		m_joy2(*this, "joy2"),
 		m_dsw(*this, "DSW"),
-		m_palette(*this, "palette")
+		m_palette(*this, "palette"),
+		m_avbank1(*this, "av_bank1"),
+		m_avbank2(*this, "av_bank2"),
+		m_avbank3(*this, "av_bank3"),
+		m_avbank4(*this, "av_bank4"),
+		m_avbank5(*this, "av_bank5"),
+		m_avbank6(*this, "av_bank6"),
+		m_avbank7(*this, "av_bank7"),
+		m_avbank8(*this, "av_bank8"),
+		m_avbank9(*this, "av_bank9"),
+		m_avbank10(*this, "av_bank10"),
+		m_avbank11(*this, "av_bank11"),
+		m_avbank12(*this, "av_bank12"),
+		m_avbank13(*this, "av_bank13"),
+		m_avbank14(*this, "av_bank14"),
+		m_avbank15(*this, "av_bank15"),
+		m_avbank16(*this, "av_bank16")
 	{
 	}
 
@@ -341,6 +358,23 @@ public:
 	required_ioport m_joy2;
 	required_ioport m_dsw;
 	required_device<palette_device> m_palette;
+
+	optional_device<address_map_bank_device> m_avbank1;
+	optional_device<address_map_bank_device> m_avbank2;
+	optional_device<address_map_bank_device> m_avbank3;
+	optional_device<address_map_bank_device> m_avbank4;
+	optional_device<address_map_bank_device> m_avbank5;
+	optional_device<address_map_bank_device> m_avbank6;
+	optional_device<address_map_bank_device> m_avbank7;
+	optional_device<address_map_bank_device> m_avbank8;
+	optional_device<address_map_bank_device> m_avbank9;
+	optional_device<address_map_bank_device> m_avbank10;
+	optional_device<address_map_bank_device> m_avbank11;
+	optional_device<address_map_bank_device> m_avbank12;
+	optional_device<address_map_bank_device> m_avbank13;
+	optional_device<address_map_bank_device> m_avbank14;
+	optional_device<address_map_bank_device> m_avbank15;
+	optional_device<address_map_bank_device> m_avbank16;
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);

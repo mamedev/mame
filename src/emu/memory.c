@@ -204,7 +204,7 @@ enum
 {
 	STATIC_INVALID = 0,                                 // invalid - should never be used
 	STATIC_BANK1 = 1,                                   // first memory bank
-	STATIC_BANKMAX = 124,                               // last memory bank
+	STATIC_BANKMAX = 252,                               // last memory bank
 	STATIC_NOP,                                         // NOP - reads = unmapped value; writes = no-op
 	STATIC_UNMAP,                                       // unmapped - same as NOP except we log errors
 	STATIC_WATCHPOINT,                                  // watchpoint - used internally
