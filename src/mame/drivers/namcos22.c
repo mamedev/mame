@@ -3097,17 +3097,17 @@ static INPUT_PORTS_START( ridgera )
 	    2 4 6   Standard (default) setup uses a racing shifter like in Ace Driver. */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP   ) PORT_NAME("Shift Down")
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_NAME("Shift Up")
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_NAME("Shift Left")    // not used in Standard
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_NAME("Shift Right")   // not used in Standard
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Clutch Pedal")        // not used in Standard
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_NAME("Shift Left")    // not used in Standard Cabinet
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_NAME("Shift Right")   // not used in Standard Cabinet
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Clutch Pedal")        // not used in Standard Cabinet
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_DIPNAME( 0x0100, 0x0000, DEF_STR( Cabinet ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( Standard ) )
-	PORT_DIPSETTING(      0x0100, "Deluxe" )
+	PORT_CONFNAME( 0x0100, 0x0000, DEF_STR( Cabinet ) ) // @ JAMMA pins
+	PORT_CONFSETTING(      0x0000, DEF_STR( Standard ) )
+	PORT_CONFSETTING(      0x0100, "Deluxe" )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN ) // also service mode?
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_SERVICE3 ) // also service mode?
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -3166,11 +3166,11 @@ static INPUT_PORTS_START( ridgera2 )
 	PORT_INCLUDE( ridgera )
 
 	PORT_MODIFY("INPUTS")
-	PORT_DIPNAME( 0x2100, 0x2000, DEF_STR( Cabinet ) )
-	PORT_DIPSETTING(      0x0000, "50 Inch" )
-	PORT_DIPSETTING(      0x0100, "Twin" )
-	PORT_DIPSETTING(      0x2000, DEF_STR( Standard ) )
-	PORT_DIPSETTING(      0x2100, "Deluxe" )
+	PORT_CONFNAME( 0x2100, 0x2000, DEF_STR( Cabinet ) ) // @ JAMMA pins
+	PORT_CONFSETTING(      0x0000, "50 Inch" )
+	PORT_CONFSETTING(      0x0100, "Twin" )
+	PORT_CONFSETTING(      0x2000, DEF_STR( Standard ) )
+	PORT_CONFSETTING(      0x2100, "Deluxe" )
 
 	/* Some dipswitches seem to be for debug purposes, for example:
 	    2-4 : background drawing related
@@ -3192,11 +3192,11 @@ static INPUT_PORTS_START( raveracw )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("View Change")
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNKNOWN ) // no coin2
 
-	PORT_DIPNAME( 0x2100, 0x2000, DEF_STR( Cabinet ) )
-	PORT_DIPSETTING(      0x0000, "50 Inch" )
-	PORT_DIPSETTING(      0x0100, "Twin" )
-	PORT_DIPSETTING(      0x2000, DEF_STR( Standard ) )
-	PORT_DIPSETTING(      0x2100, "Deluxe" )
+	PORT_CONFNAME( 0x2100, 0x2000, DEF_STR( Cabinet ) ) // @ JAMMA pins
+	PORT_CONFSETTING(      0x0000, "50 Inch" )
+	PORT_CONFSETTING(      0x0100, "Twin" )
+	PORT_CONFSETTING(      0x2000, DEF_STR( Standard ) )
+	PORT_CONFSETTING(      0x2100, "Deluxe" )
 INPUT_PORTS_END
 
 
