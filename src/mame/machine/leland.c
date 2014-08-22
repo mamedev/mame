@@ -469,7 +469,8 @@ WRITE8_MEMBER(leland_state::leland_master_alt_bankswitch_w)
 	(this->*m_update_master_bank)();
 
 	/* sound control is in the rest */
-	m_sound->leland_80186_control_w(space, offset, data);
+	if (m_sound)
+		m_sound->leland_80186_control_w(space, offset, data);
 }
 
 

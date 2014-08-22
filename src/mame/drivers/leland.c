@@ -75,6 +75,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( master_map_io, AS_IO, 8, leland_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0xf0, 0xf0) AM_WRITE(leland_master_alt_bankswitch_w)
 	AM_RANGE(0xfd, 0xff) AM_READWRITE(leland_master_analog_key_r, leland_master_analog_key_w)
 ADDRESS_MAP_END
 
