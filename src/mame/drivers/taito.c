@@ -3,8 +3,6 @@
   PINBALL
   Taito of Brasil
 
-  Like most pinballs from that country, they are copies of American machines.
-
   Unable to locate any schematics that are actually useful.
 
   Used PinMAME and the Rowamet driver as references.
