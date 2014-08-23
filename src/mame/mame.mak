@@ -2852,6 +2852,8 @@ $(DRIVERS)/superchs.o:  $(LAYOUT)/superchs.lh
 
 $(DRIVERS)/sfbonus.o:   $(LAYOUT)/pirpok2.lh
 
+$(DRIVERS)/taito.o:     $(LAYOUT)/taito.lh
+
 $(DRIVERS)/taito_z.o:   $(LAYOUT)/contcirc.lh \
 			$(LAYOUT)/dblaxle.lh
 
