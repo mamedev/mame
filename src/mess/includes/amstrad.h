@@ -25,6 +25,12 @@
 #include "machine/ram.h"
 #include "imagedev/cassette.h"
 #include "bus/centronics/ctronics.h"
+#include "bus/centronics/comxpl80.h"
+#include "bus/centronics/epson_ex800.h"
+#include "bus/centronics/epson_lx800.h"
+#include "bus/centronics/printer.h"
+#include "bus/centronics/digiblst.h"
+
 
 /****************************
  * Gate Array data (CPC) -
