@@ -21,6 +21,7 @@
 #include "bus/cpc/cpc_pds.h"
 #include "bus/cpc/cpc_rs232.h"
 #include "bus/cpc/symbfac2.h"
+#include "bus/cpc/amdrum.h"
 #include "machine/ram.h"
 #include "imagedev/cassette.h"
 #include "bus/centronics/ctronics.h"
