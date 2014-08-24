@@ -1112,43 +1112,37 @@ ROM_END
  *
  *************************************/
 
-static void decrypt_ultennis(running_machine &machine)
+void artmagic_state::decrypt_ultennis()
 {
-	artmagic_state *state = machine.driver_data<artmagic_state>();
-	int i;
-
 	/* set up the parameters for the blitter data decryption which will happen at runtime */
-	for (i = 0;i < 16;i++)
+	for (int i = 0; i < 16; i++)
 	{
-		state->m_xor[i] = 0x0462;
-		if (i & 1) state->m_xor[i] ^= 0x0011;
-		if (i & 2) state->m_xor[i] ^= 0x2200;
-		if (i & 4) state->m_xor[i] ^= 0x4004;
-		if (i & 8) state->m_xor[i] ^= 0x0880;
+		m_xor[i] = 0x0462;
+		if (i & 1) m_xor[i] ^= 0x0011;
+		if (i & 2) m_xor[i] ^= 0x2200;
+		if (i & 4) m_xor[i] ^= 0x4004;
+		if (i & 8) m_xor[i] ^= 0x0880;
 	}
 }
 
 
-static void decrypt_cheesech(running_machine &machine)
+void artmagic_state::decrypt_cheesech()
 {
-	artmagic_state *state = machine.driver_data<artmagic_state>();
-	int i;
-
 	/* set up the parameters for the blitter data decryption which will happen at runtime */
-	for (i = 0;i < 16;i++)
+	for (int i = 0; i < 16; i++)
 	{
-		state->m_xor[i] = 0x0891;
-		if (i & 1) state->m_xor[i] ^= 0x1100;
-		if (i & 2) state->m_xor[i] ^= 0x0022;
-		if (i & 4) state->m_xor[i] ^= 0x0440;
-		if (i & 8) state->m_xor[i] ^= 0x8008;
+		m_xor[i] = 0x0891;
+		if (i & 1) m_xor[i] ^= 0x1100;
+		if (i & 2) m_xor[i] ^= 0x0022;
+		if (i & 4) m_xor[i] ^= 0x0440;
+		if (i & 8) m_xor[i] ^= 0x8008;
 	}
 }
 
 
 DRIVER_INIT_MEMBER(artmagic_state,ultennis)
 {
-	decrypt_ultennis(machine());
+	decrypt_ultennis();
 	m_is_stoneball = 0;
 	m_protection_handler = ultennis_protection;
 
@@ -1159,7 +1153,7 @@ DRIVER_INIT_MEMBER(artmagic_state,ultennis)
 
 DRIVER_INIT_MEMBER(artmagic_state,cheesech)
 {
-	decrypt_cheesech(machine());
+	decrypt_cheesech();
 	m_is_stoneball = 0;
 	m_protection_handler = cheesech_protection;
 }
@@ -1167,7 +1161,7 @@ DRIVER_INIT_MEMBER(artmagic_state,cheesech)
 
 DRIVER_INIT_MEMBER(artmagic_state,stonebal)
 {
-	decrypt_ultennis(machine());
+	decrypt_ultennis();
 	m_is_stoneball = 1; /* blits 1 line high are NOT encrypted, also different first pixel decrypt */
 	m_protection_handler = stonebal_protection;
 }
@@ -1175,7 +1169,7 @@ DRIVER_INIT_MEMBER(artmagic_state,stonebal)
 DRIVER_INIT_MEMBER(artmagic_state,shtstar)
 {
 	/* wrong */
-	decrypt_ultennis(machine());
+	decrypt_ultennis();
 	m_is_stoneball =0;
 	m_protection_handler = stonebal_protection;
 }
