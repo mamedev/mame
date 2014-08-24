@@ -312,9 +312,10 @@ READ8_MEMBER(fm7_state::vector_r)
 {
 	UINT8* RAM = memregion("maincpu")->base();
 	UINT8* ROM = memregion("init")->base();
+	UINT32 init_size = memregion("init")->bytes();
 
 	if(m_init_rom_en)
-		return ROM[0x1ff0+offset];
+		return ROM[(init_size-0x10)+offset];
 	else
 	{
 		if(m_type == SYS_FM7)
