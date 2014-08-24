@@ -10,7 +10,7 @@
 #include "bus/c64/exp.h"
 #include "bus/vic20/user.h"
 #include "bus/pet/cass.h"
-#include "bus/vcs/ctrl.h"
+#include "bus/vcs_ctrl/ctrl.h"
 #include "imagedev/snapquik.h"
 #include "cpu/m6502/m8502.h"
 #include "machine/mos6526.h"

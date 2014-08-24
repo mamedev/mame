@@ -10,7 +10,7 @@
 #include "bus/pet/cass.h"
 #include "bus/plus4/exp.h"
 #include "bus/plus4/user.h"
-#include "bus/vcs/ctrl.h"
+#include "bus/vcs_ctrl/ctrl.h"
 #include "cpu/m6502/m7501.h"
 #include "imagedev/snapquik.h"
 #include "machine/mos6529.h"

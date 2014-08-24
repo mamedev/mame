@@ -8,7 +8,7 @@
 #include "emu.h"
 #include "bus/pet/cass.h"
 #include "bus/vic10/exp.h"
-#include "bus/vcs/ctrl.h"
+#include "bus/vcs_ctrl/ctrl.h"
 #include "cpu/m6502/m6510.h"
 #include "machine/mos6526.h"
 #include "machine/ram.h"

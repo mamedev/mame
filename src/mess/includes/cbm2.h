@@ -10,7 +10,7 @@
 #include "bus/cbm2/user.h"
 #include "bus/ieee488/ieee488.h"
 #include "bus/pet/cass.h"
-#include "bus/vcs/ctrl.h"
+#include "bus/vcs_ctrl/ctrl.h"
 #include "cpu/m6502/m6509.h"
 #include "cpu/i86/i86.h"
 #include "machine/cbm_snqk.h"
