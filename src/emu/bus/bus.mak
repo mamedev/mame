@@ -562,18 +562,33 @@ endif
 
 #-------------------------------------------------
 #
-#@src/emu/bus/vcs/ctrl.h,BUSES += VCS
+#@src/emu/bus/vcs/vcs_slot.h,BUSES += VCS
 #-------------------------------------------------
 
 ifneq ($(filter VCS,$(BUSES)),)
 OBJDIRS += $(BUSOBJ)/vcs
-BUSOBJS += $(BUSOBJ)/vcs/ctrl.o
-BUSOBJS += $(BUSOBJ)/vcs/joystick.o
-BUSOBJS += $(BUSOBJ)/vcs/joybooster.o
-BUSOBJS += $(BUSOBJ)/vcs/keypad.o
-BUSOBJS += $(BUSOBJ)/vcs/lightpen.o
-BUSOBJS += $(BUSOBJ)/vcs/paddles.o
-BUSOBJS += $(BUSOBJ)/vcs/wheel.o
+BUSOBJS += $(BUSOBJ)/vcs/vcs_slot.o
+BUSOBJS += $(BUSOBJ)/vcs/rom.o
+BUSOBJS += $(BUSOBJ)/vcs/compumat.o
+BUSOBJS += $(BUSOBJ)/vcs/dpc.o
+BUSOBJS += $(BUSOBJ)/vcs/scharger.o
+endif
+
+
+#-------------------------------------------------
+#
+#@src/emu/bus/vcs/ctrl.h,BUSES += VCS_CTRL
+#-------------------------------------------------
+
+ifneq ($(filter VCS_CTRL,$(BUSES)),)
+OBJDIRS += $(BUSOBJ)/vcs_ctrl
+BUSOBJS += $(BUSOBJ)/vcs_ctrl/ctrl.o
+BUSOBJS += $(BUSOBJ)/vcs_ctrl/joystick.o
+BUSOBJS += $(BUSOBJ)/vcs_ctrl/joybooster.o
+BUSOBJS += $(BUSOBJ)/vcs_ctrl/keypad.o
+BUSOBJS += $(BUSOBJ)/vcs_ctrl/lightpen.o
+BUSOBJS += $(BUSOBJ)/vcs_ctrl/paddles.o
+BUSOBJS += $(BUSOBJ)/vcs_ctrl/wheel.o
 endif
 
 

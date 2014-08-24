@@ -11,38 +11,17 @@ TODO:
 #include "emu.h"
 #include "machine/6532riot.h"
 #include "cpu/m6502/m6502.h"
-#include "sound/wave.h"
 #include "sound/tiaintf.h"
-#include "imagedev/cartslot.h"
-#include "imagedev/cassette.h"
-#include "formats/a26_cas.h"
 #include "video/tia.h"
-#include "bus/vcs/ctrl.h"
-#include "hashfile.h"
+#include "bus/vcs/vcs_slot.h"
+#include "bus/vcs/rom.h"
+#include "bus/vcs/dpc.h"
+#include "bus/vcs/scharger.h"
+#include "bus/vcs/compumat.h"
+#include "bus/vcs_ctrl/ctrl.h"
 
 #define CONTROL1_TAG    "joyport1"
 #define CONTROL2_TAG    "joyport2"
-
-struct df_t {
-	UINT8   top;
-	UINT8   bottom;
-	UINT8   low;
-	UINT8   high;
-	UINT8   flag;
-	UINT8   music_mode;     /* Only used by data fetchers 5,6, and 7 */
-	UINT8   osc_clk;        /* Only used by data fetchers 5,6, and 7 */
-};
-
-struct dpc_t
-{
-	df_t df[8];
-	UINT8   movamt;
-	UINT8   latch_62;
-	UINT8   latch_64;
-	UINT8   dlc;
-	UINT8   shift_reg;
-	emu_timer   *oscillator;
-};
 
 
 class a2600_state : public driver_device
@@ -51,1224 +30,54 @@ public:
 	a2600_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_riot_ram(*this, "riot_ram"),
-		m_banking_mode(0xff),
 		m_joy1(*this, CONTROL1_TAG),
 		m_joy2(*this, CONTROL2_TAG) ,
+		m_cartslot(*this, "cartslot"),
 		m_maincpu(*this, "maincpu"),
-		m_cassette(*this, "cassette"),
-		m_modeFE_trigger_on_next_access(false),
 		m_screen(*this, "screen") { }
 
-	dpc_t m_dpc;
-	memory_region* m_extra_RAM;
-	UINT8* m_bank_base[5];
-	UINT8* m_ram_base;
 	required_shared_ptr<UINT8> m_riot_ram;
-	UINT8 m_banking_mode;
-	unsigned m_cart_size;
-	unsigned m_number_banks;
-	unsigned m_current_bank;
-	unsigned m_current_reset_bank_counter;
-	unsigned m_mode3E_ram_enabled;
-	UINT8 m_modeSS_byte;
-	UINT32 m_modeSS_byte_started;
-	unsigned m_modeSS_write_delay;
-	unsigned m_modeSS_write_enabled;
-	unsigned m_modeSS_high_ram_enabled;
-	unsigned m_modeSS_diff_adjust;
-	UINT16 m_modeSS_last_address;
-	unsigned m_FVlocked;
 	UINT16 m_current_screen_height;
 
-	DECLARE_DIRECT_UPDATE_MEMBER(modeF6_opbase);
-	DECLARE_DIRECT_UPDATE_MEMBER(modeDPC_opbase_handler);
-	DECLARE_READ8_MEMBER(modeF8_switch_r);
-	DECLARE_READ8_MEMBER(modeFA_switch_r);
-	DECLARE_READ8_MEMBER(modeF6_switch_r);
-	DECLARE_READ8_MEMBER(modeF4_switch_r);
-	DECLARE_READ8_MEMBER(modeE0_switch_r);
-	DECLARE_READ8_MEMBER(modeE7_switch_r);
-	DECLARE_READ8_MEMBER(modeE7_RAM_switch_r);
-	DECLARE_READ8_MEMBER(modeUA_switch_r);
-	DECLARE_READ8_MEMBER(modeDC_switch_r);
-	DECLARE_READ8_MEMBER(modeFV_switch_r);
-	DECLARE_READ8_MEMBER(modeJVP_switch_r);
-	DECLARE_WRITE8_MEMBER(modeF8_switch_w);
-	DECLARE_WRITE8_MEMBER(modeFA_switch_w);
-	DECLARE_WRITE8_MEMBER(modeF6_switch_w);
-	DECLARE_WRITE8_MEMBER(modeF4_switch_w);
-	DECLARE_WRITE8_MEMBER(modeE0_switch_w);
-	DECLARE_WRITE8_MEMBER(modeE7_switch_w);
-	DECLARE_WRITE8_MEMBER(modeE7_RAM_switch_w);
-	DECLARE_WRITE8_MEMBER(mode3F_switch_w);
-	DECLARE_WRITE8_MEMBER(modeUA_switch_w);
-	DECLARE_WRITE8_MEMBER(modeDC_switch_w);
-	DECLARE_WRITE8_MEMBER(mode3E_switch_w);
-	DECLARE_WRITE8_MEMBER(mode3E_RAM_switch_w);
-	DECLARE_WRITE8_MEMBER(mode3E_RAM_w);
-	DECLARE_WRITE8_MEMBER(modeFV_switch_w);
-	DECLARE_WRITE8_MEMBER(modeJVP_switch_w);
-	DECLARE_READ8_MEMBER(modeSS_r);
-	DECLARE_READ8_MEMBER(modeDPC_r);
-	DECLARE_WRITE8_MEMBER(modeDPC_w);
-	DECLARE_READ8_MEMBER(modeFE_switch_r);
-	DECLARE_WRITE8_MEMBER(modeFE_switch_w);
-	DECLARE_READ8_MEMBER(modeFE_rom_r);
-	DECLARE_READ8_MEMBER(current_bank_r);
-	DECLARE_READ16_MEMBER(a2600_read_input_port);
-	DECLARE_READ8_MEMBER(a2600_get_databus_contents);
-	DECLARE_WRITE16_MEMBER(a2600_tia_vsync_callback);
-	DECLARE_WRITE16_MEMBER(a2600_tia_vsync_callback_pal);
-	void modeDPC_check_flag(UINT8 data_fetcher);
-	void modeDPC_decrement_counter(UINT8 data_fetcher);
-	virtual void machine_reset();
 	DECLARE_MACHINE_START(a2600);
-	TIMER_CALLBACK_MEMBER(modeDPC_timer_callback);
 	DECLARE_WRITE8_MEMBER(switch_A_w);
 	DECLARE_READ8_MEMBER(switch_A_r);
 	DECLARE_WRITE8_MEMBER(switch_B_w);
 	DECLARE_WRITE_LINE_MEMBER(irq_callback);
 	DECLARE_READ8_MEMBER(riot_input_port_8_r);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( a2600_cart );
+	DECLARE_READ16_MEMBER(a2600_read_input_port);
+	DECLARE_READ8_MEMBER(a2600_get_databus_contents);
+	DECLARE_WRITE16_MEMBER(a2600_tia_vsync_callback);
+	DECLARE_WRITE16_MEMBER(a2600_tia_vsync_callback_pal);
+	// investigate how the carts mapped here (Mapper JVP) interact with the RIOT device
+	DECLARE_READ8_MEMBER(cart_over_riot_r);
+	DECLARE_WRITE8_MEMBER(cart_over_riot_w);
 
 protected:
 	required_device<vcs_control_port_device> m_joy1;
 	required_device<vcs_control_port_device> m_joy2;
-	int next_bank();
-	void modeF8_switch(UINT16 offset, UINT8 data);
-	void modeFA_switch(UINT16 offset, UINT8 data);
-	void modeF6_switch(UINT16 offset, UINT8 data);
-	void modeF4_switch(UINT16 offset, UINT8 data);
-	void mode3F_switch(UINT16 offset, UINT8 data);
-	void modeUA_switch(UINT16 offset, UINT8 data);
-	void modeE0_switch(UINT16 offset, UINT8 data);
-	void modeE7_switch(UINT16 offset, UINT8 data);
-	void modeE7_RAM_switch(UINT16 offset, UINT8 data);
-	void modeDC_switch(UINT16 offset, UINT8 data);
-	void mode3E_switch(UINT16 offset, UINT8 data);
-	void mode3E_RAM_switch(UINT16 offset, UINT8 data);
-	void modeFV_switch(UINT16 offset, UINT8 data);
-	void modeJVP_switch(UINT16 offset, UINT8 data);
-	void install_banks(int count, unsigned init);
+	required_device<vcs_cart_slot_device> m_cartslot;
 
-	UINT8   *m_cart;
-	int detect_modeDC();
-	int detect_modef6();
-	int detect_mode3E();
-	int detect_modeSS();
-	int detect_modeFE();
-	int detect_modeE0();
-	int detect_modeCV();
-	int detect_modeFV();
-	int detect_modeJVP();
-	int detect_modeE7();
-	int detect_modeUA();
-	int detect_8K_mode3F();
-	int detect_32K_mode3F();
-	int detect_super_chip();
 	unsigned long detect_2600controllers();
 	required_device<m6502_device> m_maincpu;
-	required_device<cassette_image_device> m_cassette;
-	bool m_modeFE_trigger_on_next_access;
 	required_device<screen_device> m_screen;
 };
 
 
 
-#define CART machine().root_device().memregion("user1")->base()
-
 #define MASTER_CLOCK_NTSC   3579545
 #define MASTER_CLOCK_PAL    3546894
 #define CATEGORY_SELECT     16
 
-enum
-{
-	mode2K,
-	mode4K,
-	modeF8,
-	modeFA,
-	modeF6,
-	modeF4,
-	modeFE,
-	modeE0,
-	mode3F,
-	modeUA,
-	modeE7,
-	modeDC,
-	modeCV,
-	mode3E,
-	modeSS,
-	modeFV,
-	modeDPC,
-	mode32in1,
-	modeJVP,
-	mode8in1,
-	mode4in1
-};
-
 static const UINT16 supported_screen_heights[4] = { 262, 312, 328, 342 };
 
-int a2600_state::detect_modeDC()
-{
-	int i,numfound = 0;
-	// signature is also in 'video reflex'.. maybe figure out that controller port someday...
-	static const unsigned char signature[3] = { 0x8d, 0xf0, 0xff };
-	if (m_cart_size == 0x10000)
-	{
-		UINT8 *cart = CART;
-		for (i = 0; i < m_cart_size - sizeof signature; i++)
-		{
-			if (!memcmp(&cart[i], signature,sizeof signature))
-			{
-				numfound = 1;
-			}
-		}
-	}
-	if (numfound) return 1;
-	return 0;
-}
-
-int a2600_state::detect_modef6()
-{
-	int i, numfound = 0;
-	static const unsigned char signature[3] = { 0x8d, 0xf6, 0xff };
-	if (m_cart_size == 0x4000)
-	{
-		UINT8 *cart = CART;
-		for (i = 0; i < m_cart_size - sizeof signature; i++)
-		{
-			if (!memcmp(&cart[i], signature, sizeof signature))
-			{
-				numfound = 1;
-			}
-		}
-	}
-	if (numfound) return 1;
-	return 0;
-}
-
-int a2600_state::detect_mode3E()
-{
-	// this one is a little hacky.. looks for STY $3e, which is unique to
-	// 'not boulderdash', but is the only example i have (cow)
-	// Would have used STA $3e, but 'Alien' and 'Star Raiders' do that for unknown reasons
-
-	int i,numfound = 0;
-	static const unsigned char signature[3] = { 0x84, 0x3e, 0x9d };
-	if (m_cart_size == 0x0800 || m_cart_size == 0x1000)
-	{
-		UINT8 *cart = CART;
-		for (i = 0; i < m_cart_size - sizeof signature; i++)
-		{
-			if (!memcmp(&cart[i], signature,sizeof signature))
-			{
-				numfound = 1;
-			}
-		}
-	}
-	if (numfound) return 1;
-	return 0;
-}
-
-int a2600_state::detect_modeSS()
-{
-	int i,numfound = 0;
-	static const unsigned char signature[5] = { 0xbd, 0xe5, 0xff, 0x95, 0x81 };
-	if (m_cart_size == 0x0800 || m_cart_size == 0x1000)
-	{
-		UINT8 *cart = CART;
-		for (i = 0; i < m_cart_size - sizeof signature; i++)
-		{
-			if (!memcmp(&cart[i], signature,sizeof signature))
-			{
-				numfound = 1;
-			}
-		}
-	}
-	if (numfound) return 1;
-	return 0;
-}
-
-int a2600_state::detect_modeFE()
-{
-	int i,j,numfound = 0;
-	static const unsigned char signatures[][5] =  {
-									{ 0x20, 0x00, 0xd0, 0xc6, 0xc5 },
-									{ 0x20, 0xc3, 0xf8, 0xa5, 0x82 },
-									{ 0xd0, 0xfb, 0x20, 0x73, 0xfe },
-									{ 0x20, 0x00, 0xf0, 0x84, 0xd6 }
-	};
-	if (m_cart_size == 0x2000)
-	{
-		UINT8 *cart = CART;
-		for (i = 0; i < m_cart_size - (sizeof signatures/sizeof signatures[0]); i++)
-		{
-			for (j = 0; j < (sizeof signatures/sizeof signatures[0]) && !numfound; j++)
-			{
-				if (!memcmp(&cart[i], &signatures[j],sizeof signatures[0]))
-				{
-					numfound = 1;
-				}
-			}
-		}
-	}
-	if (numfound) return 1;
-	return 0;
-}
-
-int a2600_state::detect_modeE0()
-{
-	int i,j,numfound = 0;
-	static const unsigned char signatures[][3] =  {
-									{ 0x8d, 0xe0, 0x1f },
-									{ 0x8d, 0xe0, 0x5f },
-									{ 0x8d, 0xe9, 0xff },
-									{ 0xad, 0xe9, 0xff },
-									{ 0xad, 0xed, 0xff },
-									{ 0xad, 0xf3, 0xbf }
-	};
-	if (m_cart_size == 0x2000)
-	{
-		UINT8 *cart = CART;
-		for (i = 0; i < m_cart_size - (sizeof signatures/sizeof signatures[0]); i++)
-		{
-			for (j = 0; j < (sizeof signatures/sizeof signatures[0]) && !numfound; j++)
-			{
-				if (!memcmp(&cart[i], &signatures[j],sizeof signatures[0]))
-				{
-					numfound = 1;
-				}
-			}
-		}
-	}
-	if (numfound) return 1;
-	return 0;
-}
-
-int a2600_state::detect_modeCV()
-{
-	int i,j,numfound = 0;
-	static const unsigned char signatures[][3] = {
-									{ 0x9d, 0xff, 0xf3 },
-									{ 0x99, 0x00, 0xf4 }
-	};
-	if (m_cart_size == 0x0800 || m_cart_size == 0x1000)
-	{
-		UINT8 *cart = CART;
-		for (i = 0; i < m_cart_size - (sizeof signatures/sizeof signatures[0]); i++)
-		{
-			for (j = 0; j < (sizeof signatures/sizeof signatures[0]) && !numfound; j++)
-			{
-				if (!memcmp(&cart[i], &signatures[j],sizeof signatures[0]))
-				{
-					numfound = 1;
-				}
-			}
-		}
-	}
-	if (numfound) return 1;
-	return 0;
-}
-
-int a2600_state::detect_modeFV()
-{
-	int i,j,numfound = 0;
-	static const unsigned char signatures[][3] = {
-									{ 0x2c, 0xd0, 0xff }
-	};
-	if (m_cart_size == 0x2000)
-	{
-		UINT8 *cart = CART;
-		for (i = 0; i < m_cart_size - (sizeof signatures/sizeof signatures[0]); i++)
-		{
-			for (j = 0; j < (sizeof signatures/sizeof signatures[0]) && !numfound; j++)
-			{
-				if (!memcmp(&cart[i], &signatures[j],sizeof signatures[0]))
-				{
-					numfound = 1;
-				}
-			}
-		}
-		m_FVlocked = 0;
-	}
-	if (numfound) return 1;
-	return 0;
-}
-
-int a2600_state::detect_modeJVP()
-{
-	int i,j,numfound = 0;
-	static const unsigned char signatures[][4] = {
-									{ 0x2c, 0xc0, 0xef, 0x60 },
-									{ 0x8d, 0xa0, 0x0f, 0xf0 }
-	};
-	if (m_cart_size == 0x4000 || m_cart_size == 0x2000)
-	{
-		UINT8 *cart = CART;
-		for (i = 0; i < m_cart_size - (sizeof signatures/sizeof signatures[0]); i++)
-		{
-			for (j = 0; j < (sizeof signatures/sizeof signatures[0]) && !numfound; j++)
-			{
-				if (!memcmp(&cart[i], &signatures[j],sizeof signatures[0]))
-				{
-					numfound = 1;
-				}
-			}
-		}
-	}
-	if (numfound) return 1;
-	return 0;
-}
-
-int a2600_state::detect_modeE7()
-{
-	int i,j,numfound = 0;
-	static const unsigned char signatures[][3] = {
-									{ 0xad, 0xe5, 0xff },
-									{ 0x8d, 0xe7, 0xff }
-	};
-	if (m_cart_size == 0x2000 || m_cart_size == 0x4000)
-	{
-		UINT8 *cart = CART;
-		for (i = 0; i < m_cart_size - (sizeof signatures/sizeof signatures[0]); i++)
-		{
-			for (j = 0; j < (sizeof signatures/sizeof signatures[0]) && !numfound; j++)
-			{
-				if (!memcmp(&cart[i], &signatures[j],sizeof signatures[0]))
-				{
-					numfound = 1;
-				}
-			}
-		}
-	}
-	if (numfound) return 1;
-	return 0;
-}
-
-int a2600_state::detect_modeUA()
-{
-	int i,numfound = 0;
-	static const unsigned char signature[3] = { 0x8d, 0x40, 0x02 };
-	if (m_cart_size == 0x2000)
-	{
-		UINT8 *cart = CART;
-		for (i = 0; i < m_cart_size - sizeof signature; i++)
-		{
-			if (!memcmp(&cart[i], signature,sizeof signature))
-			{
-				numfound = 1;
-			}
-		}
-	}
-	if (numfound) return 1;
-	return 0;
-}
-
-int a2600_state::detect_8K_mode3F()
-{
-	int i,numfound = 0;
-	static const unsigned char signature1[4] = { 0xa9, 0x01, 0x85, 0x3f };
-	static const unsigned char signature2[4] = { 0xa9, 0x02, 0x85, 0x3f };
-	// have to look for two signatures because 'not boulderdash' gives false positive otherwise
-	if (m_cart_size == 0x2000)
-	{
-		UINT8 *cart = CART;
-		for (i = 0; i < m_cart_size - sizeof signature1; i++)
-		{
-			if (!memcmp(&cart[i], signature1,sizeof signature1))
-			{
-				numfound |= 0x01;
-			}
-			if (!memcmp(&cart[i], signature2,sizeof signature2))
-			{
-				numfound |= 0x02;
-			}
-		}
-	}
-	if (numfound == 0x03) return 1;
-	return 0;
-}
-
-int a2600_state::detect_32K_mode3F()
-{
-	int i,numfound = 0;
-	static const unsigned char signature[4] = { 0xa9, 0x0e, 0x85, 0x3f };
-	if (m_cart_size >= 0x8000)
-	{
-		UINT8 *cart = CART;
-		for (i = 0; i < m_cart_size - sizeof signature; i++)
-		{
-			if (!memcmp(&cart[i], signature,sizeof signature))
-			{
-				numfound++;
-			}
-		}
-	}
-	if (numfound > 1) return 1;
-	return 0;
-}
-
-int a2600_state::detect_super_chip()
-{
-	int i,j;
-	UINT8 *cart = CART;
-	static const unsigned char signatures[][5] = {
-									{ 0xa2, 0x7f, 0x9d, 0x00, 0xf0 }, // dig dug
-									{ 0xae, 0xf6, 0xff, 0x4c, 0x00 } // off the wall
-	};
-
-	if (m_cart_size == 0x4000)
-	{
-		for (i = 0; i < m_cart_size - (sizeof signatures/sizeof signatures[0]); i++)
-		{
-			for (j = 0; j < (sizeof signatures/sizeof signatures[0]); j++)
-			{
-				if (!memcmp(&cart[i], &signatures[j],sizeof signatures[0]))
-				{
-					return 1;
-				}
-			}
-		}
-	}
-	for (i = 0x1000; i < m_cart_size; i += 0x1000)
-	{
-		if (memcmp(cart, cart + i, 0x100))
-		{
-			return 0;
-		}
-	}
-	/* Check the reset vector does not point into the super chip RAM area */
-	i = ( cart[0x0FFD] << 8 ) | cart[0x0FFC];
-	if ( ( i & 0x0FFF ) < 0x0100 )
-	{
-		return 0;
-	}
-	return 1;
-}
-
-
-DEVICE_IMAGE_LOAD_MEMBER( a2600_state, a2600_cart )
-{
-	UINT8 *cart = memregion("user1")->base();
-
-	if (image.software_entry() == NULL)
-		m_cart_size = image.length();
-	else
-		m_cart_size = image.get_software_region_length("rom");
-
-	switch (m_cart_size)
-	{
-	case 0x00800:
-	case 0x01000:
-	case 0x02000:
-	case 0x028ff:
-	case 0x02900:
-	case 0x03000:
-	case 0x04000:
-	case 0x08000:
-	case 0x10000:
-	case 0x80000:
-		break;
-
-	default:
-		image.seterror(IMAGE_ERROR_UNSUPPORTED, "Invalid rom file size" );
-		return 1; /* unsupported image format */
-	}
-
-	m_current_bank = 0;
-
-	if (image.software_entry() == NULL)
-	{
-		image.fread(cart, m_cart_size);
-	}
-	else
-	{
-		memcpy(cart, image.get_software_region("rom"), m_cart_size);
-
-		const char *mapper = image.get_feature("mapper");
-
-		if ( mapper != NULL )
-		{
-			static const struct { const char *mapper_name; int mapper_type; } mapper_types[] =
-			{
-				{ "F8",    modeF8 },
-				{ "FA",    modeFA },
-				{ "F6",    modeF6 },
-				{ "F4",    modeF4 },
-				{ "FE",    modeFE },
-				{ "E0",    modeE0 },
-				{ "3F",    mode3F },
-				{ "UA",    modeUA },
-				{ "E7",    modeE7 },
-				{ "DC",    modeDC },
-				{ "CV",    modeCV },
-				{ "3E",    mode3E },
-				{ "SS",    modeSS },
-				{ "FV",    modeFV },
-				{ "DPC",   modeDPC },
-				{ "32in1", mode32in1 },
-				{ "JVP",   modeJVP },
-				{ "4in1",  mode4in1 },
-				{ "8in1",  mode8in1 },
-			};
-
-			for (int i = 0; i < ARRAY_LENGTH(mapper_types) && m_banking_mode == 0xff; i++)
-			{
-				if (!core_stricmp(mapper, mapper_types[i].mapper_name))
-				{
-					m_banking_mode = mapper_types[i].mapper_type;
-				}
-			}
-		}
-	}
-
-	if (!(m_cart_size == 0x4000 && detect_modef6()))
-	{
-		while (m_cart_size > 0x00800)
-		{
-			if (!memcmp(cart, &cart[m_cart_size/2],m_cart_size/2)) m_cart_size /= 2;
-			else break;
-		}
-	}
-
-	return 0;
-}
-
-
-int a2600_state::next_bank()
-{
-	return m_current_bank = (m_current_bank + 1) % 16;
-}
-
-
-void a2600_state::modeF8_switch(UINT16 offset, UINT8 data)
-{
-	m_bank_base[1] = m_cart + 0x2000 * m_current_reset_bank_counter + 0x1000 * offset;
-	membank("bank1")->set_base(m_bank_base[1]);
-}
-
-void a2600_state::modeFA_switch(UINT16 offset, UINT8 data)
-{
-	m_bank_base[1] = m_cart + 0x1000 * offset;
-	membank("bank1")->set_base(m_bank_base[1]);
-}
-
-void a2600_state::modeF6_switch(UINT16 offset, UINT8 data)
-{
-	m_bank_base[1] = m_cart + 0x1000 * offset;
-	membank("bank1")->set_base(m_bank_base[1]);
-}
-
-void a2600_state::modeF4_switch(UINT16 offset, UINT8 data)
-{
-	m_bank_base[1] = m_cart + 0x1000 * offset;
-	membank("bank1")->set_base(m_bank_base[1]);
-}
-
-void a2600_state::mode3F_switch(UINT16 offset, UINT8 data)
-{
-	m_bank_base[1] = m_cart + 0x800 * (data & (m_number_banks - 1));
-	membank("bank1")->set_base(m_bank_base[1]);
-}
-
-void a2600_state::modeUA_switch(UINT16 offset, UINT8 data)
-{
-	m_bank_base[1] = m_cart + (offset >> 6) * 0x1000;
-	membank("bank1")->set_base(m_bank_base[1]);
-}
-
-void a2600_state::modeE0_switch(UINT16 offset, UINT8 data)
-{
-	int bank = 1 + (offset >> 3);
-	char bank_name[10];
-	sprintf(bank_name,"bank%d",bank);
-	m_bank_base[bank] = m_cart + 0x400 * (offset & 7);
-	membank(bank_name)->set_base(m_bank_base[bank]);
-}
-
-void a2600_state::modeE7_switch(UINT16 offset, UINT8 data)
-{
-	m_bank_base[1] = m_cart + 0x800 * offset;
-	membank("bank1")->set_base(m_bank_base[1]);
-}
-
-void a2600_state::modeE7_RAM_switch(UINT16 offset, UINT8 data)
-{
-	membank("bank9")->set_base(m_extra_RAM->base() + (4 + offset) * 256 );
-}
-
-void a2600_state::modeDC_switch(UINT16 offset, UINT8 data)
-{
-	m_bank_base[1] = m_cart + 0x1000 * next_bank();
-	membank("bank1")->set_base(m_bank_base[1]);
-}
-
-void a2600_state::mode3E_switch(UINT16 offset, UINT8 data)
-{
-	m_bank_base[1] = m_cart + 0x800 * (data & (m_number_banks - 1));
-	membank("bank1")->set_base(m_bank_base[1]);
-	m_mode3E_ram_enabled = 0;
-}
-
-void a2600_state::mode3E_RAM_switch(UINT16 offset, UINT8 data)
-{
-	m_ram_base = m_extra_RAM->base() + 0x200 * ( data & 0x3F );
-	membank("bank1")->set_base(m_ram_base);
-	m_mode3E_ram_enabled = 1;
-}
-
-void a2600_state::modeFV_switch(UINT16 offset, UINT8 data)
-{
-	if (!m_FVlocked && ( m_maincpu->pc() & 0x1F00 ) == 0x1F00 )
-	{
-		m_FVlocked = 1;
-		m_current_bank = m_current_bank ^ 0x01;
-		m_bank_base[1] = m_cart + 0x1000 * m_current_bank;
-		membank("bank1")->set_base(m_bank_base[1]);
-	}
-}
-
-void a2600_state::modeJVP_switch(UINT16 offset, UINT8 data)
-{
-	switch( offset )
-	{
-	case 0x00:
-	case 0x20:
-		m_current_bank ^= 1;
-		break;
-	default:
-		printf("%04X: write to unknown mapper address %02X\n", m_maincpu->pc(), 0xfa0 + offset );
-		break;
-	}
-	m_bank_base[1] = m_cart + 0x1000 * m_current_bank;
-	membank("bank1")->set_base(m_bank_base[1] );
-}
-
-
-/* These read handlers will return the byte from the new bank */
-READ8_MEMBER(a2600_state::modeF8_switch_r)
-{
-	if ( !space.debugger_access() )
-	{
-		modeF8_switch(offset, 0);
-	}
-	return m_bank_base[1][0xff8 + offset];
-}
-
-READ8_MEMBER(a2600_state::modeFA_switch_r)
-{
-	if ( !space.debugger_access() )
-	{
-		modeFA_switch(offset, 0);
-	}
-	return m_bank_base[1][0xff8 + offset];
-}
-
-READ8_MEMBER(a2600_state::modeF6_switch_r)
-{
-	if ( ! space.debugger_access() )
-	{
-		modeF6_switch(offset, 0);
-	}
-	return m_bank_base[1][0xff6 + offset];
-}
-
-READ8_MEMBER(a2600_state::modeF4_switch_r)
-{
-	if ( ! space.debugger_access() )
-	{
-		modeF4_switch(offset, 0);
-	}
-	return m_bank_base[1][0xff4 + offset];
-}
-
-READ8_MEMBER(a2600_state::modeE0_switch_r)
-{
-	if ( ! space.debugger_access() )
-	{
-		modeE0_switch(offset, 0);
-	}
-	return m_bank_base[4][0x3e0 + offset];
-}
-
-READ8_MEMBER(a2600_state::modeE7_switch_r)
-{
-	if ( ! space.debugger_access() )
-	{
-		modeE7_switch(offset, 0);
-	}
-	return m_bank_base[1][0xfe0 + offset];
-}
-
-READ8_MEMBER(a2600_state::modeE7_RAM_switch_r)
-{
-	if ( ! space.debugger_access() )
-	{
-		modeE7_RAM_switch(offset, 0);
-	}
-	return 0;
-}
-
-READ8_MEMBER(a2600_state::modeUA_switch_r)
-{
-	if ( ! space.debugger_access() )
-	{
-		modeUA_switch(offset, 0);
-	}
-	return 0;
-}
-
-READ8_MEMBER(a2600_state::modeDC_switch_r)
-{
-	if ( ! space.debugger_access() )
-	{
-		modeDC_switch(offset, 0);
-	}
-	return m_bank_base[1][0xff0 + offset];
-}
-
-READ8_MEMBER(a2600_state::modeFV_switch_r)
-{
-	if ( ! space.debugger_access() )
-	{
-		modeFV_switch(offset, 0);
-	}
-	return m_bank_base[1][0xfd0 + offset];
-}
-
-READ8_MEMBER(a2600_state::modeJVP_switch_r)
-{
-	if ( ! space.debugger_access() )
-	{
-		modeJVP_switch(offset, 0);
-	}
-	return m_riot_ram[ 0x20 + offset ];
-}
-
-
-WRITE8_MEMBER(a2600_state::modeF8_switch_w){ modeF8_switch(offset, data); }
-WRITE8_MEMBER(a2600_state::modeFA_switch_w){ modeFA_switch(offset, data); }
-WRITE8_MEMBER(a2600_state::modeF6_switch_w){ modeF6_switch(offset, data); }
-WRITE8_MEMBER(a2600_state::modeF4_switch_w){ modeF4_switch(offset, data); }
-WRITE8_MEMBER(a2600_state::modeE0_switch_w){ modeE0_switch(offset, data); }
-WRITE8_MEMBER(a2600_state::modeE7_switch_w){ modeE7_switch(offset, data); }
-WRITE8_MEMBER(a2600_state::modeE7_RAM_switch_w){ modeE7_RAM_switch(offset, data); }
-WRITE8_MEMBER(a2600_state::mode3F_switch_w){ mode3F_switch(offset, data); }
-WRITE8_MEMBER(a2600_state::modeUA_switch_w){ modeUA_switch(offset, data); }
-WRITE8_MEMBER(a2600_state::modeDC_switch_w){ modeDC_switch(offset, data); }
-WRITE8_MEMBER(a2600_state::mode3E_switch_w){ mode3E_switch(offset, data); }
-WRITE8_MEMBER(a2600_state::mode3E_RAM_switch_w){ mode3E_RAM_switch(offset, data); }
-WRITE8_MEMBER(a2600_state::mode3E_RAM_w)
-{
-	if ( m_mode3E_ram_enabled )
-	{
-		m_ram_base[offset] = data;
-	}
-}
-WRITE8_MEMBER(a2600_state::modeFV_switch_w){ modeFV_switch(offset, data); }
-WRITE8_MEMBER(a2600_state::modeJVP_switch_w)
-{
-	modeJVP_switch(offset, data); m_riot_ram[ 0x20 + offset ] = data;
-}
-
-
-DIRECT_UPDATE_MEMBER(a2600_state::modeF6_opbase)
-{
-	if ( ( address & 0x1FFF ) >= 0x1FF6 && ( address & 0x1FFF ) <= 0x1FF9 )
-	{
-		if ( ! direct.space().debugger_access() )
-		{
-			modeF6_switch_w(m_maincpu->space(AS_PROGRAM), ( address & 0x1FFF ) - 0x1FF6, 0 );
-		}
-	}
-	return address;
-}
-
-
-READ8_MEMBER(a2600_state::modeSS_r)
-{
-	UINT8 data = ( offset & 0x800 ) ? m_bank_base[2][offset & 0x7FF] : m_bank_base[1][offset];
-
-	if ( space.debugger_access() )
-	{
-		return data;
-	}
-
-	//logerror("%04X: read from modeSS area offset = %04X\n", m_maincpu->pc(), offset);
-	/* Check for control register "write" */
-	if ( offset == 0xFF8 )
-	{
-		//logerror("%04X: write to modeSS control register data = %02X\n", m_maincpu->pc(), m_modeSS_byte);
-		m_modeSS_write_enabled = m_modeSS_byte & 0x02;
-		m_modeSS_write_delay = m_modeSS_byte >> 5;
-		switch ( m_modeSS_byte & 0x1C )
-		{
-		case 0x00:
-			m_bank_base[1] = m_extra_RAM->base() + 2 * 0x800;
-			m_bank_base[2] = ( m_modeSS_byte & 0x01 ) ? memregion("maincpu")->base() + 0x1800 : memregion("user1")->base();
-			m_modeSS_high_ram_enabled = 0;
-			break;
-		case 0x04:
-			m_bank_base[1] = m_extra_RAM->base();
-			m_bank_base[2] = ( m_modeSS_byte & 0x01 ) ? memregion("maincpu")->base() + 0x1800 : memregion("user1")->base();
-			m_modeSS_high_ram_enabled = 0;
-			break;
-		case 0x08:
-			m_bank_base[1] = m_extra_RAM->base() + 2 * 0x800;
-			m_bank_base[2] = m_extra_RAM->base();
-			m_modeSS_high_ram_enabled = 1;
-			break;
-		case 0x0C:
-			m_bank_base[1] = m_extra_RAM->base();
-			m_bank_base[2] = m_extra_RAM->base() + 2 * 0x800;
-			m_modeSS_high_ram_enabled = 1;
-			break;
-		case 0x10:
-			m_bank_base[1] = m_extra_RAM->base() + 2 * 0x800;
-			m_bank_base[2] = ( m_modeSS_byte & 0x01 ) ? memregion("maincpu")->base() + 0x1800 : memregion("user1")->base();
-			m_modeSS_high_ram_enabled = 0;
-			break;
-		case 0x14:
-			m_bank_base[1] = m_extra_RAM->base() + 0x800;
-			m_bank_base[2] = ( m_modeSS_byte & 0x01 ) ? memregion("maincpu")->base() + 0x1800 : memregion("user1")->base();
-			m_modeSS_high_ram_enabled = 0;
-			break;
-		case 0x18:
-			m_bank_base[1] = m_extra_RAM->base() + 2 * 0x800;
-			m_bank_base[2] = m_extra_RAM->base() + 0x800;
-			m_modeSS_high_ram_enabled = 1;
-			break;
-		case 0x1C:
-			m_bank_base[1] = m_extra_RAM->base() + 0x800;
-			m_bank_base[2] = m_extra_RAM->base() + 2 * 0x800;
-			m_modeSS_high_ram_enabled = 1;
-			break;
-		}
-		membank("bank1")->set_base(m_bank_base[1] );
-		membank("bank2")->set_base(m_bank_base[2] );
-		// Make sure we do not trigger a spurious RAM write
-		m_modeSS_byte_started -= 5;
-	}
-	else if ( offset == 0xFF9 )
-	{
-		/* Cassette port read */
-		double tap_val = m_cassette->input();
-		//logerror("%04X: Cassette port read, tap_val = %f\n", m_maincpu->pc(), tap_val);
-		if ( tap_val < 0 )
-		{
-			data = 0x00;
-		}
-		else
-		{
-			data = 0x01;
-		}
-		// Make sure we do not trigger a spurious RAM write
-		m_modeSS_byte_started -= 5;
-	}
-	else
-	{
-		/* Possible RAM write */
-		if ( m_modeSS_write_enabled )
-		{
-			/* Check for dummy read from same address */
-			if ( m_modeSS_last_address == offset )
-			{
-				m_modeSS_diff_adjust += 1;
-			}
-
-			int diff = m_maincpu->total_cycles() - m_modeSS_byte_started;
-			//logerror("%04X: offset = %04X, %d\n", m_maincpu->pc(), offset, diff);
-			if ( diff - m_modeSS_diff_adjust == 5 )
-			{
-				//logerror("%04X: RAM write offset = %04X, data = %02X\n", m_maincpu->pc(), offset, m_modeSS_byte );
-				if ( offset & 0x800 )
-				{
-					if ( m_modeSS_high_ram_enabled )
-					{
-						m_bank_base[2][offset & 0x7FF] = m_modeSS_byte;
-						data = m_modeSS_byte;
-					}
-				}
-				else
-				{
-					m_bank_base[1][offset] = m_modeSS_byte;
-					data = m_modeSS_byte;
-				}
-			}
-			else if ( offset < 0x0100 )
-			{
-				m_modeSS_byte = offset;
-				m_modeSS_byte_started = m_maincpu->total_cycles();
-				m_modeSS_diff_adjust = 0;
-			}
-			m_modeSS_last_address = offset;
-		}
-		else if ( offset < 0x0100 )
-		{
-			m_modeSS_byte = offset;
-			m_modeSS_byte_started = m_maincpu->total_cycles();
-			m_modeSS_last_address = offset;
-			m_modeSS_diff_adjust = 0;
-		}
-	}
-	return data;
-}
-
-void a2600_state::modeDPC_check_flag(UINT8 data_fetcher)
-{
-	/* Set flag when low counter equals top */
-	if ( m_dpc.df[data_fetcher].low == m_dpc.df[data_fetcher].top )
-	{
-		m_dpc.df[data_fetcher].flag = 1;
-	}
-	/* Reset flag when low counter equals bottom */
-	if ( m_dpc.df[data_fetcher].low == m_dpc.df[data_fetcher].bottom )
-	{
-		m_dpc.df[data_fetcher].flag = 0;
-	}
-}
-
-void a2600_state::modeDPC_decrement_counter(UINT8 data_fetcher)
-{
-	m_dpc.df[data_fetcher].low -= 1;
-	if ( m_dpc.df[data_fetcher].low == 0xFF )
-	{
-		m_dpc.df[data_fetcher].high -= 1;
-		if ( data_fetcher > 4 && m_dpc.df[data_fetcher].music_mode )
-		{
-			m_dpc.df[data_fetcher].low = m_dpc.df[data_fetcher].top;
-		}
-	}
-
-	modeDPC_check_flag(data_fetcher );
-}
-
-TIMER_CALLBACK_MEMBER(a2600_state::modeDPC_timer_callback)
-{
-	int data_fetcher;
-	for( data_fetcher = 5; data_fetcher < 8; data_fetcher++ )
-	{
-		if ( m_dpc.df[data_fetcher].osc_clk )
-		{
-			modeDPC_decrement_counter(data_fetcher );
-		}
-	}
-}
-
-DIRECT_UPDATE_MEMBER(a2600_state::modeDPC_opbase_handler)
-{
-	if ( ! direct.space().debugger_access() )
-	{
-		UINT8   new_bit;
-		new_bit = ( m_dpc.shift_reg & 0x80 ) ^ ( ( m_dpc.shift_reg & 0x20 ) << 2 );
-		new_bit = new_bit ^ ( ( ( m_dpc.shift_reg & 0x10 ) << 3 ) ^ ( ( m_dpc.shift_reg & 0x08 ) << 4 ) );
-		new_bit = new_bit ^ 0x80;
-		m_dpc.shift_reg = new_bit | ( m_dpc.shift_reg >> 1 );
-	}
-	return address;
-}
-
-READ8_MEMBER(a2600_state::modeDPC_r)
-{
-	static const UINT8 dpc_amplitude[8] = { 0x00, 0x04, 0x05, 0x09, 0x06, 0x0A, 0x0B, 0x0F };
-	UINT8   data_fetcher = offset & 0x07;
-	UINT8   data = 0xFF;
-
-	logerror("%04X: Read from DPC offset $%02X\n", m_maincpu->pc(), offset);
-	if ( offset < 0x08 )
-	{
-		switch( offset & 0x06 )
-		{
-		case 0x00:      /* Random number generator */
-		case 0x02:
-			return m_dpc.shift_reg;
-		case 0x04:      /* Sound value, MOVAMT value AND'd with Draw Line Carry; with Draw Line Add */
-			m_dpc.latch_62 = m_dpc.latch_64;
-		case 0x06:      /* Sound value, MOVAMT value AND'd with Draw Line Carry; without Draw Line Add */
-			m_dpc.latch_64 = m_dpc.latch_62 + m_dpc.df[4].top;
-			m_dpc.dlc = ( m_dpc.latch_62 + m_dpc.df[4].top > 0xFF ) ? 1 : 0;
-			data = 0;
-			if ( m_dpc.df[5].music_mode && m_dpc.df[5].flag )
-			{
-				data |= 0x01;
-			}
-			if ( m_dpc.df[6].music_mode && m_dpc.df[6].flag )
-			{
-				data |= 0x02;
-			}
-			if ( m_dpc.df[7].music_mode && m_dpc.df[7].flag )
-			{
-				data |= 0x04;
-			}
-			return ( m_dpc.dlc ? m_dpc.movamt & 0xF0 : 0 ) | dpc_amplitude[data];
-		}
-	}
-	else
-	{
-		UINT8   display_data = memregion("user1")->base()[0x2000 + ( ~ ( ( m_dpc.df[data_fetcher].low | ( m_dpc.df[data_fetcher].high << 8 ) ) ) & 0x7FF ) ];
-
-		switch( offset & 0x38 )
-		{
-		case 0x08:          /* display data */
-			data = display_data;
-			break;
-		case 0x10:          /* display data AND'd w/flag */
-			data = m_dpc.df[data_fetcher].flag ? display_data : 0x00;
-			break;
-		case 0x18:          /* display data AND'd w/flag, nibbles swapped */
-			data = m_dpc.df[data_fetcher].flag ? BITSWAP8(display_data,3,2,1,0,7,6,5,4) : 0x00;
-			break;
-		case 0x20:          /* display data AND'd w/flag, byte reversed */
-			data = m_dpc.df[data_fetcher].flag ? BITSWAP8(display_data,0,1,2,3,4,5,6,7) : 0x00;
-			break;
-		case 0x28:          /* display data AND'd w/flag, rotated right */
-			data = m_dpc.df[data_fetcher].flag ? ( display_data >> 1 ) : 0x00;
-			break;
-		case 0x30:          /* display data AND'd w/flag, rotated left */
-			data = m_dpc.df[data_fetcher].flag ? ( display_data << 1 ) : 0x00;
-			break;
-		case 0x38:          /* flag */
-			data = m_dpc.df[data_fetcher].flag ? 0xFF : 0x00;
-			break;
-		}
-
-		if ( data_fetcher < 5 || ! m_dpc.df[data_fetcher].osc_clk )
-		{
-			modeDPC_decrement_counter(data_fetcher );
-		}
-	}
-	return data;
-}
-
-WRITE8_MEMBER(a2600_state::modeDPC_w)
-{
-	UINT8   data_fetcher = offset & 0x07;
-
-	switch( offset & 0x38 )
-	{
-	case 0x00:          /* Top count */
-		m_dpc.df[data_fetcher].top = data;
-		m_dpc.df[data_fetcher].flag = 0;
-		modeDPC_check_flag(data_fetcher );
-		break;
-	case 0x08:          /* Bottom count */
-		m_dpc.df[data_fetcher].bottom = data;
-		modeDPC_check_flag(data_fetcher );
-		break;
-	case 0x10:          /* Counter low */
-		m_dpc.df[data_fetcher].low = data;
-		if ( data_fetcher == 4 )
-		{
-			m_dpc.latch_64 = data;
-		}
-		if ( data_fetcher > 4 && m_dpc.df[data_fetcher].music_mode )
-		{
-			m_dpc.df[data_fetcher].low = m_dpc.df[data_fetcher].top;
-		}
-		modeDPC_check_flag(data_fetcher );
-		break;
-	case 0x18:          /* Counter high */
-		m_dpc.df[data_fetcher].high = data;
-		m_dpc.df[data_fetcher].music_mode = data & 0x10;
-		m_dpc.df[data_fetcher].osc_clk = data & 0x20;
-		if ( data_fetcher > 4 && m_dpc.df[data_fetcher].music_mode && m_dpc.df[data_fetcher].low == 0xFF )
-		{
-			m_dpc.df[data_fetcher].low = m_dpc.df[data_fetcher].top;
-			modeDPC_check_flag(data_fetcher );
-		}
-		break;
-	case 0x20:          /* Draw line movement value / MOVAMT */
-		m_dpc.movamt = data;
-		break;
-	case 0x28:          /* Not used */
-		logerror("%04X: Write to unused DPC register $%02X, data $%02X\n", m_maincpu->pc(), offset, data);
-		break;
-	case 0x30:          /* Random number generator reset */
-		m_dpc.shift_reg = 0;
-		break;
-	case 0x38:          /* Not used */
-		logerror("%04X: Write to unused DPC register $%02X, data $%02X\n", m_maincpu->pc(), offset, data);
-		break;
-	}
-}
-
-/*
-
-There seems to be a kind of lag between the writing to address 0x1FE and the
-Activision switcher springing into action. It waits for the next byte to arrive
-on the data bus, which is the new PCH in the case of a JSR, and the PCH of the
-stored PC on the stack in the case of an RTS.
-
-depending on last byte & 0x20 -> 0x00 -> switch to bank #1
-                              -> 0x20 -> switch to bank #0
-
- */
-
-
-READ8_MEMBER(a2600_state::modeFE_switch_r)
-{
-	UINT8 data = space.read_byte(0xFE + offset );
-
-	if ( ! space.debugger_access() )
-	{
-		switch ( offset & 1 )
-		{
-			case 0:
-				/* The next byte on the data bus determines which bank to switch to */
-				m_modeFE_trigger_on_next_access = true;
-				break;
-
-			case 1:
-				if ( m_modeFE_trigger_on_next_access ) {
-					m_bank_base[1] = m_cart + 0x1000 * ( ( data & 0x20 ) ? 0 : 1 );
-					m_modeFE_trigger_on_next_access = false;
-				}
-				break;
-		}
-	}
-	return data;
-}
-
-
-WRITE8_MEMBER(a2600_state::modeFE_switch_w)
-{
-	space.write_byte(0xFE, data );
-	if ( ! space.debugger_access() )
-	{
-		/* The next byte on the data bus determines which bank to switch to */
-		m_modeFE_trigger_on_next_access = true;
-	}
-}
-
-
-READ8_MEMBER(a2600_state::modeFE_rom_r)
-{
-	UINT8 data = m_bank_base[1][offset];;
-
-	if ( ! space.debugger_access() )
-	{
-		if ( m_modeFE_trigger_on_next_access )
-		{
-			m_bank_base[1] = m_cart + 0x1000 * ( ( data & 0x20 ) ? 0 : 1 );
-			m_modeFE_trigger_on_next_access = false;
-		}
-	}
-
-	return data;
-}
-
-
-READ8_MEMBER(a2600_state::current_bank_r)
-{
-	return m_current_bank;
-}
 
 static ADDRESS_MAP_START(a2600_mem, AS_PROGRAM, 8, a2600_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
-	AM_RANGE(0x0000, 0x007F) AM_MIRROR(0x0F00) AM_DEVREADWRITE("tia_video", tia_video_device, read, write)
-	AM_RANGE(0x0080, 0x00FF) AM_MIRROR(0x0D00) AM_RAM AM_SHARE("riot_ram")
-	AM_RANGE(0x0280, 0x029F) AM_MIRROR(0x0D00) AM_DEVREADWRITE("riot", riot6532_device, read, write)
-	AM_RANGE(0x1000, 0x1FFF)                   AM_ROMBANK("bank1")
+	AM_RANGE(0x0000, 0x007f) AM_MIRROR(0x0f00) AM_DEVREADWRITE("tia_video", tia_video_device, read, write)
+	AM_RANGE(0x0080, 0x00ff) AM_MIRROR(0x0d00) AM_RAM AM_SHARE("riot_ram")
+	AM_RANGE(0x0280, 0x029f) AM_MIRROR(0x0d00) AM_DEVREADWRITE("riot", riot6532_device, read, write)
+	// AM_RANGE(0x1000, 0x1fff) is cart data and it is configured at reset time, depending on the mounted cart!
 ADDRESS_MAP_END
 
 WRITE8_MEMBER(a2600_state::switch_A_w)
@@ -1313,28 +122,6 @@ READ8_MEMBER(a2600_state::riot_input_port_8_r)
 	return ioport("SWB")->read();
 }
 
-void a2600_state::install_banks(int count, unsigned init)
-{
-	int i;
-
-	for (i = 0; i < count; i++)
-	{
-		static const char *const handler[] =
-		{
-			"bank1",
-			"bank2",
-			"bank3",
-			"bank4",
-		};
-
-		m_maincpu->space(AS_PROGRAM).install_read_bank(
-			0x1000 + (i + 0) * 0x1000 / count - 0,
-			0x1000 + (i + 1) * 0x1000 / count - 1, handler[i]);
-
-		m_bank_base[i + 1] = m_cart + init;
-		membank(handler[i])->set_base(m_bank_base[i + 1]);
-	}
-}
 
 READ16_MEMBER(a2600_state::a2600_read_input_port)
 {
@@ -1442,16 +229,85 @@ WRITE16_MEMBER(a2600_state::a2600_tia_vsync_callback_pal)
 	}
 }
 
+// TODO: is this the correct behavior for the real hardware?!?
+READ8_MEMBER(a2600_state::cart_over_riot_r)
+{
+	if (!space.debugger_access())
+		if (m_cartslot)
+			m_cartslot->write_bank(space, offset, 0);
+	return m_riot_ram[0x20 + offset];
+}
+
+WRITE8_MEMBER(a2600_state::cart_over_riot_w)
+{
+	if (m_cartslot)
+		m_cartslot->write_bank(space, offset, 0);
+	m_riot_ram[0x20 + offset] = data;
+	
+}
 
 MACHINE_START_MEMBER(a2600_state,a2600)
 {
 	m_current_screen_height = m_screen->height();
-	m_extra_RAM = machine().memory().region_alloc("user2", 0x8600, 1, ENDIANNESS_LITTLE);
-	memset( m_riot_ram, 0x00, 0x80 );
-	m_current_reset_bank_counter = 0xFF;
-	m_dpc.oscillator = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(a2600_state::modeDPC_timer_callback),this));
-	m_cart = CART;
-	m_modeSS_last_address = 0;
+	memset(m_riot_ram, 0x00, 0x80);
+
+	switch (m_cartslot->get_cart_type())
+	{
+		case A26_2K:
+		case A26_4K:
+		case A26_F4:
+		case A26_F8:
+		case A26_F8SW:
+		case A26_FA:
+		case A26_E0:
+		case A26_E7:
+		case A26_CV:
+		case A26_DC:
+		case A26_FV:
+		case A26_8IN1:
+			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x1000, 0x1fff, read8_delegate(FUNC(vcs_cart_slot_device::read_rom),(vcs_cart_slot_device*)m_cartslot), write8_delegate(FUNC(vcs_cart_slot_device::write_bank),(vcs_cart_slot_device*)m_cartslot));
+			break;
+		case A26_F6:
+		case A26_DPC:
+			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x1000, 0x1fff, read8_delegate(FUNC(vcs_cart_slot_device::read_rom),(vcs_cart_slot_device*)m_cartslot), write8_delegate(FUNC(vcs_cart_slot_device::write_bank),(vcs_cart_slot_device*)m_cartslot));
+			m_maincpu->space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(FUNC(vcs_cart_slot_device::cart_opbase),(vcs_cart_slot_device*)m_cartslot));
+			break;
+		case A26_FE:
+			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x1000, 0x1fff, read8_delegate(FUNC(vcs_cart_slot_device::read_rom),(vcs_cart_slot_device*)m_cartslot), write8_delegate(FUNC(vcs_cart_slot_device::write_ram),(vcs_cart_slot_device*)m_cartslot));
+			m_maincpu->space(AS_PROGRAM).install_read_handler(0x01fe, 0x01ff, read8_delegate(FUNC(vcs_cart_slot_device::read_bank),(vcs_cart_slot_device*)m_cartslot));
+			m_maincpu->space(AS_PROGRAM).install_write_handler(0x01fe, 0x01fe, write8_delegate(FUNC(vcs_cart_slot_device::write_bank),(vcs_cart_slot_device*)m_cartslot));
+			break;
+		case A26_3E:
+			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x1000, 0x1fff, read8_delegate(FUNC(vcs_cart_slot_device::read_rom),(vcs_cart_slot_device*)m_cartslot), write8_delegate(FUNC(vcs_cart_slot_device::write_ram),(vcs_cart_slot_device*)m_cartslot));
+			m_maincpu->space(AS_PROGRAM).install_write_handler(0x3e, 0x3f, write8_delegate(FUNC(vcs_cart_slot_device::write_bank),(vcs_cart_slot_device*)m_cartslot));
+			break;
+		case A26_3F:
+			m_maincpu->space(AS_PROGRAM).install_read_handler(0x1000, 0x1fff, read8_delegate(FUNC(vcs_cart_slot_device::read_rom),(vcs_cart_slot_device*)m_cartslot));
+			m_maincpu->space(AS_PROGRAM).install_write_handler(0x00, 0x3f, write8_delegate(FUNC(vcs_cart_slot_device::write_bank),(vcs_cart_slot_device*)m_cartslot));
+			break;
+		case A26_UA:
+			m_maincpu->space(AS_PROGRAM).install_read_handler(0x1000, 0x1fff, read8_delegate(FUNC(vcs_cart_slot_device::read_rom),(vcs_cart_slot_device*)m_cartslot));
+			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x200, 0x27f, read8_delegate(FUNC(vcs_cart_slot_device::read_bank),(vcs_cart_slot_device*)m_cartslot), write8_delegate(FUNC(vcs_cart_slot_device::write_bank),(vcs_cart_slot_device*)m_cartslot));
+			break;
+		case A26_JVP:
+			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x1000, 0x1fff, read8_delegate(FUNC(vcs_cart_slot_device::read_rom),(vcs_cart_slot_device*)m_cartslot), write8_delegate(FUNC(vcs_cart_slot_device::write_bank),(vcs_cart_slot_device*)m_cartslot));
+			// to verify the actual behavior...
+			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xfa0, 0xfc0, read8_delegate(FUNC(a2600_state::cart_over_riot_r), this), write8_delegate(FUNC(a2600_state::cart_over_riot_w), this));
+			break;
+		case A26_4IN1:
+		case A26_32IN1:
+			m_maincpu->space(AS_PROGRAM).install_read_handler(0x1000, 0x1fff, read8_delegate(FUNC(vcs_cart_slot_device::read_rom),(vcs_cart_slot_device*)m_cartslot));
+			break;
+		case A26_SS:
+			m_maincpu->space(AS_PROGRAM).install_read_handler(0x1000, 0x1fff, read8_delegate(FUNC(vcs_cart_slot_device::read_rom),(vcs_cart_slot_device*)m_cartslot));
+			break;
+		case A26_CM:
+			m_maincpu->space(AS_PROGRAM).install_read_handler(0x1000, 0x1fff, read8_delegate(FUNC(vcs_cart_slot_device::read_rom),(vcs_cart_slot_device*)m_cartslot));
+			break;
+	}
+	
+	/* Banks may have changed, reset the cpu so it uses the correct reset vector */
+	m_maincpu->reset();
 }
 
 
@@ -1535,349 +391,9 @@ unsigned a2600_state::long detect_2600controllers()
 }
 #endif
 
-void a2600_state::machine_reset()
-{
-	address_space& space = m_maincpu->space(AS_PROGRAM);
-	int chip = 0xFF;
-	static const unsigned char snowwhite[] = { 0x10, 0xd0, 0xff, 0xff }; // Snow White Proto
-
-	m_current_reset_bank_counter++;
-
-	/* auto-detect bank mode */
-	if (m_banking_mode == 0xff) if (detect_modeDC()) m_banking_mode = modeDC;
-	if (m_banking_mode == 0xff) if (detect_mode3E()) m_banking_mode = mode3E;
-	if (m_banking_mode == 0xff) if (detect_modeFE()) m_banking_mode = modeFE;
-	if (m_banking_mode == 0xff) if (detect_modeSS()) m_banking_mode = modeSS;
-	if (m_banking_mode == 0xff) if (detect_modeE0()) m_banking_mode = modeE0;
-	if (m_banking_mode == 0xff) if (detect_modeCV()) m_banking_mode = modeCV;
-	if (m_banking_mode == 0xff) if (detect_modeFV()) m_banking_mode = modeFV;
-	if (m_banking_mode == 0xff) if (detect_modeJVP()) m_banking_mode = modeJVP;
-	if (m_banking_mode == 0xff) if (detect_modeUA()) m_banking_mode = modeUA;
-	if (m_banking_mode == 0xff) if (detect_8K_mode3F()) m_banking_mode = mode3F;
-	if (m_banking_mode == 0xff) if (detect_32K_mode3F()) m_banking_mode = mode3F;
-	if (m_banking_mode == 0xff) if (detect_modeE7()) m_banking_mode = modeE7;
-
-	if (m_banking_mode == 0xff)
-	{
-		switch (m_cart_size)
-		{
-		case 0x800:
-			m_banking_mode = mode2K;
-			break;
-		case 0x1000:
-			m_banking_mode = mode4K;
-			break;
-		case 0x2000:
-			m_banking_mode = modeF8;
-			break;
-		case 0x28FF:
-		case 0x2900:
-			m_banking_mode = modeDPC;
-			break;
-		case 0x3000:
-			m_banking_mode = modeFA;
-			break;
-		case 0x4000:
-			m_banking_mode = modeF6;
-			break;
-		case 0x8000:
-			m_banking_mode = modeF4;
-			break;
-		case 0x10000:
-			m_banking_mode = mode32in1;
-			break;
-		case 0x80000:
-			m_banking_mode = mode3F;
-			break;
-		}
-	}
-
-	/* auto-detect super chip */
-
-	chip = 0;
-
-	if (m_cart_size == 0x2000 || m_cart_size == 0x4000 || m_cart_size == 0x8000)
-	{
-		chip = detect_super_chip();
-	}
-
-	/* Super chip games:
-	   dig dig, crystal castles, millipede, stargate, defender ii, jr. Pac Man,
-	   desert falcon, dark chambers, super football, sprintmaster, fatal run,
-	   off the wall, shooting arcade, secret quest, radar lock, save mary, klax
-	*/
-
-	/* set up ROM banks */
-
-	switch (m_banking_mode)
-	{
-	case mode2K:
-		install_banks(2, 0x0000);
-		break;
-
-	case mode4K:
-		install_banks(1, 0x0000);
-		break;
-
-	case mode4in1:
-		m_current_reset_bank_counter = m_current_reset_bank_counter & 0x03;
-		install_banks(1, m_current_reset_bank_counter * 0x1000);
-		break;
-
-	case mode8in1:
-		m_current_reset_bank_counter = m_current_reset_bank_counter & 0x07;
-		if ( m_current_reset_bank_counter == 7 )
-		{
-			/* Special case for Yar's Revenge */
-			install_banks(1, 0x2000 * m_current_reset_bank_counter + 0x0000);
-		}
-		else
-		{
-			install_banks(1, 0x2000 * m_current_reset_bank_counter + 0x1000);
-		}
-		break;
-
-	case modeF8:
-		m_current_reset_bank_counter = 0;
-		if (!memcmp(&CART[0x1ffc],snowwhite,sizeof(snowwhite)))
-		{
-			install_banks(1, 0x0000);
-		}
-		else
-		{
-			install_banks(1, 0x1000);
-		}
-		break;
-
-	case modeFA:
-		install_banks(1, 0x2000);
-		break;
-
-	case modeF6:
-		install_banks(1, 0x0000);
-		break;
-
-	case modeF4:
-		install_banks(1, 0x7000);
-		break;
-
-	case modeFE:
-		install_banks(1, 0x0000);
-		break;
-
-	case modeE0:
-		install_banks(4, 0x1c00);
-		break;
-
-	case mode3F:
-		install_banks(2, m_cart_size - 0x800);
-		m_number_banks = m_cart_size / 0x800;
-		break;
-
-	case modeUA:
-		install_banks(1, 0x1000);
-		break;
-
-	case modeE7:
-		install_banks(2, 0x3800);
-		break;
-
-	case modeDC:
-		install_banks(1, 0x1000 * m_current_bank);
-		break;
-
-	case modeCV:
-		install_banks(2, 0x0000);
-		break;
-
-	case mode3E:
-		install_banks(2, m_cart_size - 0x800);
-		m_number_banks = m_cart_size / 0x800;
-		m_mode3E_ram_enabled = 0;
-		break;
-
-	case modeSS:
-		install_banks(2, 0x0000);
-		break;
-
-	case modeFV:
-		install_banks(1, 0x0000);
-		m_current_bank = 0;
-		break;
-
-	case modeDPC:
-		m_current_reset_bank_counter = 0;
-		install_banks(1, 0x0000);
-		break;
-
-	case mode32in1:
-		install_banks(2, 0x0000);
-		m_current_reset_bank_counter = m_current_reset_bank_counter & 0x1F;
-		break;
-
-	case modeJVP:
-		m_current_reset_bank_counter = m_current_reset_bank_counter & 1;
-		if ( m_cart_size == 0x2000 )
-			m_current_reset_bank_counter = 0;
-		m_current_bank = m_current_reset_bank_counter * 2;
-		install_banks(1, 0x1000 * m_current_bank);
-		break;
-	}
-
-	/* set up bank counter */
-
-	if (m_banking_mode == modeDC)
-	{
-		space.install_read_handler(0x1fec, 0x1fec, read8_delegate(FUNC(a2600_state::current_bank_r),this));
-	}
-
-	/* set up bank switch registers */
-
-	switch (m_banking_mode)
-	{
-	case modeF8:
-	case mode8in1:
-		space.install_write_handler(0x1ff8, 0x1ff9, write8_delegate(FUNC(a2600_state::modeF8_switch_w),this));
-		space.install_read_handler(0x1ff8, 0x1ff9, read8_delegate(FUNC(a2600_state::modeF8_switch_r),this));
-		break;
-
-	case modeFA:
-		space.install_write_handler(0x1ff8, 0x1ffa, write8_delegate(FUNC(a2600_state::modeFA_switch_w),this));
-		space.install_read_handler(0x1ff8, 0x1ffa, read8_delegate(FUNC(a2600_state::modeFA_switch_r),this));
-		break;
-
-	case modeF6:
-		space.install_write_handler(0x1ff6, 0x1ff9, write8_delegate(FUNC(a2600_state::modeF6_switch_w),this));
-		space.install_read_handler(0x1ff6, 0x1ff9, read8_delegate(FUNC(a2600_state::modeF6_switch_r),this));
-		space.set_direct_update_handler(direct_update_delegate(FUNC(a2600_state::modeF6_opbase), this));
-		break;
-
-	case modeF4:
-		space.install_write_handler(0x1ff4, 0x1ffb, write8_delegate(FUNC(a2600_state::modeF4_switch_w),this));
-		space.install_read_handler(0x1ff4, 0x1ffb, read8_delegate(FUNC(a2600_state::modeF4_switch_r),this));
-		break;
-
-	case modeE0:
-		space.install_write_handler(0x1fe0, 0x1ff8, write8_delegate(FUNC(a2600_state::modeE0_switch_w),this));
-		space.install_read_handler(0x1fe0, 0x1ff8, read8_delegate(FUNC(a2600_state::modeE0_switch_r),this));
-		break;
-
-	case mode3F:
-		space.install_write_handler(0x00, 0x3f, write8_delegate(FUNC(a2600_state::mode3F_switch_w),this));
-		break;
-
-	case modeUA:
-		space.install_write_handler(0x200, 0x27f, write8_delegate(FUNC(a2600_state::modeUA_switch_w),this));
-		space.install_read_handler(0x200, 0x27f, read8_delegate(FUNC(a2600_state::modeUA_switch_r),this));
-		break;
-
-	case modeE7:
-		space.install_write_handler(0x1fe0, 0x1fe7, write8_delegate(FUNC(a2600_state::modeE7_switch_w),this));
-		space.install_read_handler(0x1fe0, 0x1fe7, read8_delegate(FUNC(a2600_state::modeE7_switch_r),this));
-		space.install_write_handler(0x1fe8, 0x1feb, write8_delegate(FUNC(a2600_state::modeE7_RAM_switch_w),this));
-		space.install_read_handler(0x1fe8, 0x1feb, read8_delegate(FUNC(a2600_state::modeE7_RAM_switch_r),this));
-		space.install_write_bank(0x1800, 0x18ff, "bank9");
-		space.install_read_bank(0x1900, 0x19ff, "bank9");
-		membank("bank9")->set_base(m_extra_RAM->base() + 4 * 256 );
-		break;
-
-	case modeDC:
-		space.install_write_handler(0x1ff0, 0x1ff0, write8_delegate(FUNC(a2600_state::modeDC_switch_w),this));
-		space.install_read_handler(0x1ff0, 0x1ff0, read8_delegate(FUNC(a2600_state::modeDC_switch_r),this));
-		break;
-
-	case modeFE:
-		space.install_write_handler(0x01fe, 0x01fe, write8_delegate(FUNC(a2600_state::modeFE_switch_w),this));
-		space.install_read_handler(0x01fe, 0x01ff, read8_delegate(FUNC(a2600_state::modeFE_switch_r),this));
-		space.install_read_handler(0x1000, 0x1fff, read8_delegate(FUNC(a2600_state::modeFE_rom_r),this));
-		m_modeFE_trigger_on_next_access = false;
-		break;
-
-	case mode3E:
-		space.install_write_handler(0x3e, 0x3e, write8_delegate(FUNC(a2600_state::mode3E_RAM_switch_w),this));
-		space.install_write_handler(0x3f, 0x3f, write8_delegate(FUNC(a2600_state::mode3E_switch_w),this));
-		space.install_write_handler(0x1400, 0x15ff, write8_delegate(FUNC(a2600_state::mode3E_RAM_w),this));
-		break;
-
-	case modeSS:
-		space.install_read_handler(0x1000, 0x1fff, read8_delegate(FUNC(a2600_state::modeSS_r),this));
-		m_bank_base[1] = m_extra_RAM->base() + 2 * 0x800;
-		m_bank_base[2] = CART;
-		membank("bank1")->set_base(m_bank_base[1] );
-		membank("bank2")->set_base(m_bank_base[2] );
-		m_modeSS_write_enabled = 0;
-		m_modeSS_byte_started = 0;
-		/* The Supercharger has no motor control so just enable it */
-		m_cassette->change_state(CASSETTE_MOTOR_ENABLED, CASSETTE_MOTOR_DISABLED );
-		break;
-
-	case modeFV:
-		space.install_write_handler(0x1fd0, 0x1fd0, write8_delegate(FUNC(a2600_state::modeFV_switch_w),this));
-		space.install_read_handler(0x1fd0, 0x1fd0, read8_delegate(FUNC(a2600_state::modeFV_switch_r),this));
-		break;
-
-	case modeDPC:
-		space.install_read_handler(0x1000, 0x103f, read8_delegate(FUNC(a2600_state::modeDPC_r),this));
-		space.install_write_handler(0x1040, 0x107f, write8_delegate(FUNC(a2600_state::modeDPC_w),this));
-		space.install_write_handler(0x1ff8, 0x1ff9, write8_delegate(FUNC(a2600_state::modeF8_switch_w),this));
-		space.install_read_handler(0x1ff8, 0x1ff9, read8_delegate(FUNC(a2600_state::modeF8_switch_r),this));
-		space.set_direct_update_handler(direct_update_delegate(FUNC(a2600_state::modeDPC_opbase_handler), this));
-		{
-			int data_fetcher;
-			for( data_fetcher = 0; data_fetcher < 8; data_fetcher++ )
-			{
-				m_dpc.df[data_fetcher].osc_clk = 0;
-				m_dpc.df[data_fetcher].flag = 0;
-				m_dpc.df[data_fetcher].music_mode = 0;
-			}
-		}
-		m_dpc.oscillator->adjust(attotime::from_hz(18400), 0, attotime::from_hz(18400));
-		break;
-
-	case mode32in1:
-		membank("bank1")->set_base(CART + m_current_reset_bank_counter * 0x800 );
-		membank("bank2")->set_base(CART + m_current_reset_bank_counter * 0x800 );
-		break;
-
-	case modeJVP:
-		space.install_read_handler(0x0FA0, 0x0FC0, read8_delegate(FUNC(a2600_state::modeJVP_switch_r),this));
-		space.install_write_handler(0x0FA0, 0x0FC0, write8_delegate(FUNC(a2600_state::modeJVP_switch_w),this));
-		break;
-	}
-
-	/* set up extra RAM */
-
-	if (m_banking_mode == modeFA)
-	{
-		space.install_write_bank(0x1000, 0x10ff, "bank9");
-		space.install_read_bank(0x1100, 0x11ff, "bank9");
-
-		membank("bank9")->set_base(m_extra_RAM->base());
-	}
-
-	if (m_banking_mode == modeCV)
-	{
-		space.install_write_bank(0x1400, 0x17ff, "bank9");
-		space.install_read_bank(0x1000, 0x13ff, "bank9");
-
-		membank("bank9")->set_base(m_extra_RAM->base());
-	}
-
-	if (chip)
-	{
-		space.install_write_bank(0x1000, 0x107f, "bank9");
-		space.install_read_bank(0x1080, 0x10ff, "bank9");
-
-		membank("bank9")->set_base(m_extra_RAM->base());
-	}
-
-	/* Banks may have changed, reset the cpu so it uses the correct reset vector */
-	m_maincpu->reset();
-}
-
 
 static INPUT_PORTS_START( a2600 )
-	PORT_START("SWB") /* SWCHB */
+	PORT_START("SWB")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Reset Game") PORT_CODE(KEYCODE_2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Select Game") PORT_CODE(KEYCODE_1)
 	PORT_BIT ( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -1895,12 +411,34 @@ static INPUT_PORTS_START( a2600 )
 INPUT_PORTS_END
 
 
+static SLOT_INTERFACE_START(a2600_cart)
+	SLOT_INTERFACE_INTERNAL("a26_2k",    A26_ROM_2K)
+	SLOT_INTERFACE_INTERNAL("a26_4k",    A26_ROM_4K)
+	SLOT_INTERFACE_INTERNAL("a26_f4",    A26_ROM_F4)
+	SLOT_INTERFACE_INTERNAL("a26_f6",    A26_ROM_F6)
+	SLOT_INTERFACE_INTERNAL("a26_f8",    A26_ROM_F8)
+	SLOT_INTERFACE_INTERNAL("a26_f8sw",  A26_ROM_F8_SW)
+	SLOT_INTERFACE_INTERNAL("a26_fa",    A26_ROM_FA)
+	SLOT_INTERFACE_INTERNAL("a26_fe",    A26_ROM_FE)
+	SLOT_INTERFACE_INTERNAL("a26_3e",    A26_ROM_3E)
+	SLOT_INTERFACE_INTERNAL("a26_3f",    A26_ROM_3F)
+	SLOT_INTERFACE_INTERNAL("a26_e0",    A26_ROM_E0)
+	SLOT_INTERFACE_INTERNAL("a26_e7",    A26_ROM_E7)
+	SLOT_INTERFACE_INTERNAL("a26_ua",    A26_ROM_UA)
+	SLOT_INTERFACE_INTERNAL("a26_cv",    A26_ROM_CV)
+	SLOT_INTERFACE_INTERNAL("a26_dc",    A26_ROM_DC)
+	SLOT_INTERFACE_INTERNAL("a26_fv",    A26_ROM_FV)
+	SLOT_INTERFACE_INTERNAL("a26_jvp",   A26_ROM_JVP)
+	SLOT_INTERFACE_INTERNAL("a26_cm",    A26_ROM_COMPUMATE)
+	SLOT_INTERFACE_INTERNAL("a26_ss",    A26_ROM_SUPERCHARGER)
+	SLOT_INTERFACE_INTERNAL("a26_dpc",   A26_ROM_DPC)
+	SLOT_INTERFACE_INTERNAL("a26_4in1",  A26_ROM_4IN1)
+	SLOT_INTERFACE_INTERNAL("a26_8in1",  A26_ROM_8IN1)
+	SLOT_INTERFACE_INTERNAL("a26_32in1", A26_ROM_32IN1)
+SLOT_INTERFACE_END
+
 static MACHINE_CONFIG_FRAGMENT(a2600_cartslot)
-	MCFG_CARTSLOT_ADD("cart")
-	MCFG_CARTSLOT_EXTENSION_LIST("bin,a26")
-	MCFG_CARTSLOT_MANDATORY
-	MCFG_CARTSLOT_LOAD(a2600_state,a2600_cart)
-	MCFG_CARTSLOT_INTERFACE("a2600_cart")
+	MCFG_VCS_CARTRIDGE_ADD("cartslot", a2600_cart, NULL)
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("cart_list","a2600")
@@ -1930,8 +468,6 @@ static MACHINE_CONFIG_START( a2600, a2600_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_TIA_ADD("tia", MASTER_CLOCK_NTSC/114)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* devices */
 	MCFG_DEVICE_ADD("riot", RIOT6532, MASTER_CLOCK_NTSC / 3)
@@ -1946,10 +482,6 @@ static MACHINE_CONFIG_START( a2600, a2600_state )
 
 	MCFG_FRAGMENT_ADD(a2600_cartslot)
 	MCFG_SOFTWARE_LIST_FILTER("cart_list", "NTSC")
-	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_CASSETTE_FORMATS(a26_cassette_formats)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
-	MCFG_CASSETTE_INTERFACE("a2600_cass")
 MACHINE_CONFIG_END
 
 
@@ -1977,8 +509,6 @@ static MACHINE_CONFIG_START( a2600p, a2600_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_TIA_ADD("tia", MASTER_CLOCK_PAL/114)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* devices */
 	MCFG_DEVICE_ADD("riot", RIOT6532, MASTER_CLOCK_PAL / 3)
@@ -1993,18 +523,11 @@ static MACHINE_CONFIG_START( a2600p, a2600_state )
 
 	MCFG_FRAGMENT_ADD(a2600_cartslot)
 	MCFG_SOFTWARE_LIST_FILTER("cart_list", "PAL")
-	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_CASSETTE_FORMATS(a26_cassette_formats)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
-	MCFG_CASSETTE_INTERFACE("a2600_cass")
 MACHINE_CONFIG_END
 
 
 ROM_START( a2600 )
-	ROM_REGION( 0x2000, "maincpu", 0 )
-	ROM_FILL( 0x0000, 0x2000, 0xFF )
-	ROM_REGION( 0x80000, "user1", 0 )
-	ROM_FILL( 0x00000, 0x80000, 0xFF )
+	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASEFF )
 ROM_END
 
 #define rom_a2600p rom_a2600
