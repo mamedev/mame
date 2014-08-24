@@ -1147,7 +1147,8 @@ void fm7_state::fm7_mmr_refresh(address_space& space)
 	if(m_basic_rom_en)
 	{
 		UINT8* ROM = memregion("fbasic")->base();
-		membank("fbasic_bank_r")->set_base(ROM);
+		if(ROM != NULL)
+			membank("fbasic_bank_r")->set_base(ROM);
 	}
 	else
 	{
@@ -1494,22 +1495,22 @@ static ADDRESS_MAP_START( fm7_sub_mem, AS_PROGRAM, 8, fm7_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( fm11_mem, AS_PROGRAM, 8, fm7_state )
-	AM_RANGE(0x0000,0x0fff) AM_RAMBANK("bank1")
-	AM_RANGE(0x1000,0x1fff) AM_RAMBANK("bank2")
-	AM_RANGE(0x2000,0x2fff) AM_RAMBANK("bank3")
-	AM_RANGE(0x3000,0x3fff) AM_RAMBANK("bank4")
-	AM_RANGE(0x4000,0x4fff) AM_RAMBANK("bank5")
-	AM_RANGE(0x5000,0x5fff) AM_RAMBANK("bank6")
-	AM_RANGE(0x6000,0x6fff) AM_RAMBANK("bank7")
-	AM_RANGE(0x7000,0x7fff) AM_RAMBANK("bank8")
-	AM_RANGE(0x8000,0x8fff) AM_RAMBANK("bank9")
-	AM_RANGE(0x9000,0x9fff) AM_RAMBANK("bank10")
-	AM_RANGE(0xa000,0xafff) AM_RAMBANK("bank11")
-	AM_RANGE(0xb000,0xbfff) AM_RAMBANK("bank12")
-	AM_RANGE(0xc000,0xcfff) AM_RAMBANK("bank13")
-	AM_RANGE(0xd000,0xdfff) AM_RAMBANK("bank14")
-	AM_RANGE(0xe000,0xefff) AM_RAMBANK("bank15")
-	AM_RANGE(0xf000,0xfbff) AM_RAMBANK("bank16")
+	AM_RANGE(0x0000,0x0fff) AM_DEVREADWRITE("av_bank1", address_map_bank_device, read8, write8)
+	AM_RANGE(0x1000,0x1fff) AM_DEVREADWRITE("av_bank2", address_map_bank_device, read8, write8)
+	AM_RANGE(0x2000,0x2fff) AM_DEVREADWRITE("av_bank3", address_map_bank_device, read8, write8)
+	AM_RANGE(0x3000,0x3fff) AM_DEVREADWRITE("av_bank4", address_map_bank_device, read8, write8)
+	AM_RANGE(0x4000,0x4fff) AM_DEVREADWRITE("av_bank5", address_map_bank_device, read8, write8)
+	AM_RANGE(0x5000,0x5fff) AM_DEVREADWRITE("av_bank6", address_map_bank_device, read8, write8)
+	AM_RANGE(0x6000,0x6fff) AM_DEVREADWRITE("av_bank7", address_map_bank_device, read8, write8)
+	AM_RANGE(0x7000,0x7fff) AM_DEVREADWRITE("av_bank8", address_map_bank_device, read8, write8)
+	AM_RANGE(0x8000,0x8fff) AM_DEVREADWRITE("av_bank9", address_map_bank_device, read8, write8)
+	AM_RANGE(0x9000,0x9fff) AM_DEVREADWRITE("av_bank10", address_map_bank_device, read8, write8)
+	AM_RANGE(0xa000,0xafff) AM_DEVREADWRITE("av_bank11", address_map_bank_device, read8, write8)
+	AM_RANGE(0xb000,0xbfff) AM_DEVREADWRITE("av_bank12", address_map_bank_device, read8, write8)
+	AM_RANGE(0xc000,0xcfff) AM_DEVREADWRITE("av_bank13", address_map_bank_device, read8, write8)
+	AM_RANGE(0xd000,0xdfff) AM_DEVREADWRITE("av_bank14", address_map_bank_device, read8, write8)
+	AM_RANGE(0xe000,0xefff) AM_DEVREADWRITE("av_bank15", address_map_bank_device, read8, write8)
+	AM_RANGE(0xf000,0xfbff) AM_DEVREADWRITE("av_bank16", address_map_bank_device, read8, write8)
 	AM_RANGE(0xfc00,0xfc7f) AM_RAM
 	AM_RANGE(0xfc80,0xfcff) AM_READWRITE(fm7_main_shared_r,fm7_main_shared_w)
 	// I/O space (FD00-FDFF)
@@ -2257,6 +2258,23 @@ static MACHINE_CONFIG_START( fm11, fm7_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.25)
 
 	MCFG_MACHINE_START_OVERRIDE(fm7_state,fm11)
+
+	MCFG_ADDRESS_BANK("av_bank1")
+	MCFG_ADDRESS_BANK("av_bank2")
+	MCFG_ADDRESS_BANK("av_bank3")
+	MCFG_ADDRESS_BANK("av_bank4")
+	MCFG_ADDRESS_BANK("av_bank5")
+	MCFG_ADDRESS_BANK("av_bank6")
+	MCFG_ADDRESS_BANK("av_bank7")
+	MCFG_ADDRESS_BANK("av_bank8")
+	MCFG_ADDRESS_BANK("av_bank9")
+	MCFG_ADDRESS_BANK("av_bank10")
+	MCFG_ADDRESS_BANK("av_bank11")
+	MCFG_ADDRESS_BANK("av_bank12")
+	MCFG_ADDRESS_BANK("av_bank13")
+	MCFG_ADDRESS_BANK("av_bank14")
+	MCFG_ADDRESS_BANK("av_bank15")
+	MCFG_ADDRESS_BANK("av_bank16")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
