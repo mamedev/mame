@@ -3,7 +3,8 @@
 /************************************************************************************
 
 California Chase (c) 1999 The Game Room
-
+Host Invaders (c) 1998 The Game Room
+ 
 driver by Angelo Salese & Grull Osgo
 
 TODO:
@@ -49,7 +50,8 @@ SMC FD37C669QF (QFP100)
 connectors for COM1, COM2, LPT1, IDE0, IDE1, floppy etc
 uses standard AT PSU
 
-Video card is Trident TGUI9680 with 512k on-board VRAM
+Video card is Trident TGUI9680 with 512k on-board VRAM 
+Card is branded "Union UTD73" - these are all over eBay, for instance
 RAM is AS4C256K16EO-50JC (x2)
 Trident BIOS V5.5 (DIP28). Actual size unknown, dumped as 64k, 128k, 256k and 512k (can only be one of these sizes)
 6.5536MHz xtal
@@ -76,7 +78,11 @@ HDD is WD Caviar 2170. C/H/S = 1010/6/55. Capacity = 170.6MB
 The HDD is DOS-readable and in fact the OS is just Windows 98 DOS and can
 be easily copied. Tested with another HDD.... formatted with DOS, copied
 all files across to new HDD, boots up fine.
-
+ 
+ 
+Host Invaders is the same motherboard and video card as above, but instead of an HDD, 
+there is a CD-ROM drive. 
+ 
 ************************************************************************************/
 /*
 Grull Osgo - Improvements
@@ -151,6 +157,7 @@ public:
 	DECLARE_WRITE16_MEMBER(calchase_dac_l_w);
 	DECLARE_WRITE16_MEMBER(calchase_dac_r_w);
 	DECLARE_DRIVER_INIT(calchase);
+	DECLARE_DRIVER_INIT(hostinv);
 	virtual void machine_start();
 	virtual void machine_reset();
 	void intel82439tx_init();
@@ -663,6 +670,32 @@ static MACHINE_CONFIG_START( calchase, calchase_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.5)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_START( hostinv, calchase_state )
+	MCFG_CPU_ADD("maincpu", PENTIUM, 133000000) // Cyrix 686MX-PR200 CPU
+	MCFG_CPU_PROGRAM_MAP(calchase_map)
+	MCFG_CPU_IO_MAP(calchase_io)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259_1", pic8259_device, inta_cb)
+
+	MCFG_FRAGMENT_ADD( pcat_common )
+
+	MCFG_IDE_CONTROLLER_32_ADD("ide", ata_devices, "cdrom", NULL, true)
+	MCFG_ATA_INTERFACE_IRQ_HANDLER(DEVWRITELINE("pic8259_2", pic8259_device, ir6_w))
+
+	MCFG_PCI_BUS_LEGACY_ADD("pcibus", 0)
+	MCFG_PCI_BUS_LEGACY_DEVICE(0, NULL, intel82439tx_pci_r, intel82439tx_pci_w)
+	MCFG_PCI_BUS_LEGACY_DEVICE(7, NULL, intel82371ab_pci_r, intel82371ab_pci_w)
+
+	/* video hardware */
+	MCFG_FRAGMENT_ADD( pcvideo_trident_vga )
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker","rspeaker")
+	MCFG_DAC_ADD("dac_l")
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.5)
+	MCFG_DAC_ADD("dac_r")
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.5)
+MACHINE_CONFIG_END
+
 
 READ32_MEMBER(calchase_state::calchase_idle_skip_r)
 {
@@ -686,6 +719,13 @@ DRIVER_INIT_MEMBER(calchase_state,calchase)
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x3f0b160, 0x3f0b163, read32_delegate(FUNC(calchase_state::calchase_idle_skip_r),this), write32_delegate(FUNC(calchase_state::calchase_idle_skip_w),this));
 }
 
+DRIVER_INIT_MEMBER(calchase_state, hostinv)
+{
+	m_bios_ram = auto_alloc_array(machine(), UINT32, 0x20000/4);
+
+	intel82439tx_init();
+}
+
 ROM_START( calchase )
 	ROM_REGION( 0x40000, "bios", 0 )
 	ROM_LOAD( "mb_bios.bin", 0x00000, 0x20000, CRC(dea7a51b) SHA1(e2028c00bfa6d12959fc88866baca8b06a1eab68) )
@@ -701,4 +741,20 @@ ROM_START( calchase )
 	DISK_IMAGE_READONLY( "calchase", 0,BAD_DUMP SHA1(6ae51a9b3f31cf4166322328a98c0235b0874eb3) )
 ROM_END
 
+ROM_START( hostinv )
+	ROM_REGION( 0x40000, "bios", 0 )
+	ROM_LOAD( "hostinv_bios.bin", 0x000000, 0x020000, CRC(5111e4b8) SHA1(20ab93150b61fd068f269368450734bba5dcb284) ) 
+
+	ROM_REGION( 0x8000, "video_bios", 0 )
+	ROM_LOAD16_BYTE( "trident_tgui9680_bios.bin", 0x0000, 0x4000, CRC(1eebde64) SHA1(67896a854d43a575037613b3506aea6dae5d6a19) )
+	ROM_CONTINUE(                                 0x0001, 0x4000 )
+
+	ROM_REGION( 0x800, "nvram", ROMREGION_ERASEFF )
+	ROM_LOAD( "ds1220y_hostinv.bin", 0x000, 0x800, NO_DUMP )
+
+	DISK_REGION( "ide:0:cdrom:image" )
+	DISK_IMAGE_READONLY( "hostinv", 0, SHA1(3cb86c62e80be98a717172b717f7276a0e5f6830) )
+ROM_END
+
+GAME( 1998, hostinv,   0,    hostinv,  calchase, calchase_state,  hostinv,  ROT0, "The Game Room", "Host Invaders", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
 GAME( 1999, calchase,  0,    calchase, calchase, calchase_state,  calchase, ROT0, "The Game Room", "California Chase", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
