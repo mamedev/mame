@@ -49,11 +49,11 @@ public:
 	void ram_alloc(UINT32 size);
 	void nvram_alloc(UINT32 size);
 	UINT8* get_rom_base() { return m_rom; }
-	UINT8*  get_ram_base() { return m_ram; }
-	UINT8*  get_nvram_base() { return m_nvram; }
-	UINT32  get_rom_size() { return m_rom.bytes(); }
-	UINT32  get_ram_size() { return m_ram.bytes(); }
-	UINT32  get_nvram_size() { return m_nvram.bytes(); }
+	UINT8* get_ram_base() { return m_ram; }
+	UINT8* get_nvram_base() { return m_nvram; }
+	UINT32 get_rom_size() { return m_rom.bytes(); }
+	UINT32 get_ram_size() { return m_ram.bytes(); }
+	UINT32 get_nvram_size() { return m_nvram.bytes(); }
 
 protected:
 	// internal state
@@ -123,6 +123,7 @@ private:
 	int m_stick_type;
 
 	int verify_header(char *header);
+	void internal_header_logging(UINT8 *header, UINT32 len);
 };
 
 

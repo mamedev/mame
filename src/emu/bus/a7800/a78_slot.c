@@ -39,7 +39,9 @@ const device_type A78_CART_SLOT = &device_creator<a78_cart_slot_device>;
 //-------------------------------------------------
 
 device_a78_cart_interface::device_a78_cart_interface (const machine_config &mconfig, device_t &device)
-	: device_slot_card_interface(mconfig, device)
+	: device_slot_card_interface(mconfig, device),
+		m_base_rom(0x8000),
+		m_bank_mask(0)
 {
 }
 
@@ -60,15 +62,14 @@ void device_a78_cart_interface::rom_alloc(UINT32 size)
 {
 	if (m_rom == NULL)
 	{
-		// allocate rom
 		m_rom.resize(size);
-
+		
 		// setup other helpers
 		if ((size / 0x4000) & 1) // compensate for SuperGame carts with 9 x 16K banks (to my knowledge no other cart has m_bank_mask != power of 2)
 			m_bank_mask = (size / 0x4000) - 2;
 		else
 			m_bank_mask = (size / 0x4000) - 1;
-
+		
 		// the rom is mapped to the top of the memory area
 		// so we store the starting point of data to simplify 
 		// the access handling
@@ -207,96 +208,97 @@ static const char *a78_get_slot(int type)
 
 bool a78_cart_slot_device::call_load()
 {
-	UINT8 *ROM;
-	UINT32 len;
-
-	if (software_entry() != NULL)
+	if (m_cart)
 	{
-		const char *pcb_name;
-		len = get_software_region_length("rom");
-
-		m_cart->rom_alloc(len);
-		ROM = m_cart->get_rom_base();
-		memcpy(ROM, get_software_region("rom"), len);
-
-		if ((pcb_name = get_feature("slot")) != NULL)
-			m_type = a78_get_pcb_id(pcb_name);
-		else
-			m_type = A78_TYPE0;
-	}
-	else
-	{
-		// Load and check the header
-		char head[128];		
-		fread(head, 128);
+		UINT8 *ROM;
+		UINT32 len;
 		
-		if (verify_header((char *)head) == IMAGE_VERIFY_FAIL)
-			return IMAGE_INIT_FAIL;
-
-		len = (head[49] << 24) |(head[50] << 16) |(head[51] << 8) | head[52];
-		if (len + 128 > length())
+		if (software_entry() != NULL)
 		{
-			logerror("Invalid length in the header. The game might be corrupted.\n");
-			len = length() - 128;
-		}
-
-		switch ((head[53] << 8) | head[54])
-		{
-			case 0x0000:
+			const char *pcb_name;
+			len = get_software_region_length("rom");
+			
+			m_cart->rom_alloc(len);
+			ROM = m_cart->get_rom_base();
+			memcpy(ROM, get_software_region("rom"), len);
+			
+			if ((pcb_name = get_feature("slot")) != NULL)
+				m_type = a78_get_pcb_id(pcb_name);
+			else
 				m_type = A78_TYPE0;
-				break;
-			case 0x0001:
-				m_type = A78_TYPE1;
-				break;
-			case 0x0002:
-				m_type = A78_TYPE2;
-				break;
-			case 0x0003:
-				m_type = A78_TYPE3;
-				break;
-			case 0x0006:
-				m_type = A78_TYPE6;
-				break;
-			case 0x000a:
-				m_type = A78_TYPEA;
-				break;
-			case 0x000b:
-				m_type = A78_TYPEB;
-				break;
-			case 0x0020:
-				m_type = A78_BANKRAM;
-				break;
-			case 0x0100:
-				m_type = A78_ABSOLUTE;
-				break;
-			case 0x0200:
-				m_type = A78_ACTIVISION;
-				break;
 		}
-		logerror("Cart type: %x\n", m_type);
+		else
+		{
+			// Load and check the header
+			char head[128];		
+			fread(head, 128);
+			
+			if (verify_header((char *)head) == IMAGE_VERIFY_FAIL)
+				return IMAGE_INIT_FAIL;
+			
+			len = (head[49] << 24) | (head[50] << 16) | (head[51] << 8) | head[52];
+			if (len + 128 > length())
+			{
+				logerror("Invalid length in the header. The game might be corrupted.\n");
+				len = length() - 128;
+			}
+			
+			switch ((head[53] << 8) | head[54])
+			{
+				case 0x0000:
+					m_type = A78_TYPE0;
+					break;
+				case 0x0001:
+					m_type = A78_TYPE1;
+					break;
+				case 0x0002:
+					m_type = A78_TYPE2;
+					break;
+				case 0x0003:
+					m_type = A78_TYPE3;
+					break;
+				case 0x0006:
+					m_type = A78_TYPE6;
+					break;
+				case 0x000a:
+					m_type = A78_TYPEA;
+					break;
+				case 0x000b:
+					m_type = A78_TYPEB;
+					break;
+				case 0x0020:
+					m_type = A78_BANKRAM;
+					break;
+				case 0x0100:
+					m_type = A78_ABSOLUTE;
+					break;
+				case 0x0200:
+					m_type = A78_ACTIVISION;
+					break;
+			}
+			logerror("Cart type: %x\n", m_type);
+			
+			internal_header_logging((UINT8 *)head, length());
+			
+			m_cart->rom_alloc(len);
+			ROM = m_cart->get_rom_base();
+			fread(ROM, len);
+		}
 		
-		// This field is currently only used for logging
-		m_stick_type = head[55];
+		//printf("Type: %s\n", a78_get_slot(m_type));
 		
-		m_cart->rom_alloc(len);
-		ROM = m_cart->get_rom_base();
-		fread(ROM, len);
+		if (m_type == A78_TYPE6)
+			m_cart->ram_alloc(0x4000);
+		if (m_type == A78_BANKRAM)
+			m_cart->ram_alloc(0x8000);
+		if (m_type == A78_XB_BOARD || m_type == A78_XM_BOARD)
+			m_cart->ram_alloc(0x20000);
+		if (m_type == A78_HSC || m_type == A78_XM_BOARD)
+		{
+			m_cart->nvram_alloc(0x800);
+			battery_load(m_cart->get_nvram_base(), 0x800, 0xff);
+		}
 	}
-
-	//printf("Type: %s\n", a78_get_slot(m_type));
-
-	if (m_type == A78_TYPE6)
-		m_cart->ram_alloc(0x4000);
-	if (m_type == A78_BANKRAM)
-		m_cart->ram_alloc(0x8000);
-	if (m_type == A78_XB_BOARD || m_type == A78_XM_BOARD)
-		m_cart->ram_alloc(0x20000);
-	if (m_type == A78_HSC || m_type == A78_XM_BOARD)
-	{
-		m_cart->nvram_alloc(0x800);
-		battery_load(m_cart->get_nvram_base(), 0x800, 0xff);
-	}
-
 	return IMAGE_INIT_PASS;
 }
 
@@ -380,7 +382,7 @@ void a78_cart_slot_device::get_default_card_software(astring &result)
 			case 0x0003:
 				type = A78_TYPE3;
 				break;
-			case 0x0004:
+			case 0x0006:
 				type = A78_TYPE6;
 				break;
 			case 0x000a:
@@ -477,38 +479,113 @@ WRITE8_MEMBER(a78_cart_slot_device::write_40xx)
 }
 
 
-/*  Header format
- 0     Header version     - 1 byte
- 1..16  "ATARI7800     "  - 16 bytes
- 17..48 Cart title        - 32 bytes
- 49..52 data length      - 4 bytes
- 53..54 cart type          - 2 bytes
- bit 0 0x01 - pokey cart
- bit 1 0x02 - supercart bank switched
- bit 2 0x04 - supercart RAM at $4000
- bit 3 0x08 - additional ROM at $4000
- bit 4 0x10 - bank 6 at $4000
- bit 5 0x20 - supercart banked RAM
- 
- bit 8-15 - Special
- 0 = Normal cart
- 1 = Absolute (F18 Hornet)
- 2 = Activision
- 
- 55   controller 1 type  - 1 byte
- 56   controller 2 type  - 1 byte
- 0 = None
- 1 = Joystick
- 2 = Light Gun
- 57  0 = NTSC/1 = PAL
- 
- 100..127 "ACTUAL CART DATA STARTS HERE" - 28 bytes
- 
- Versions:
- Version 0: Initial release
- Version 1: Added PAL/NTSC bit. Added Special cart byte.
- Changed 53 bit 2, added bit 3
- 
- */
+/*-------------------------------------------------
+ A78 header logging
+ -------------------------------------------------*/
 
-// TODO: log all properties from the header
+void a78_cart_slot_device::internal_header_logging(UINT8 *header, UINT32 len)
+{
+	char head_title[35];
+	UINT32 head_length = (header[49] << 24) | (header[50] << 16) | (header[51] << 8) | header[52];
+	UINT16 head_mapper = (header[53] << 8) | header[54];
+	UINT8 head_ctrl1 = header[55];
+	UINT8 head_ctrl2 = header[56];
+	UINT8 head_ispal = header[57];
+	astring cart_mapper, ctrl1, ctrl2;
+	memcpy(head_title, header + 0x11, 0x20);
+
+	switch (head_mapper)
+	{
+		case 0x0000:
+			cart_mapper.cpy("No Bankswitch");
+			break;
+		case 0x0001:
+			cart_mapper.cpy("No Bankswitch + POKEY");
+			break;
+		case 0x0002:
+			cart_mapper.cpy("SuperCart Bankswitch");
+			break;
+		case 0x0003:
+			cart_mapper.cpy("SuperCart Bankswitch + POKEY");
+			break;
+		case 0x0006:
+			cart_mapper.cpy("SuperCart Bankswitch + RAM");
+			break;
+		case 0x000a:
+			cart_mapper.cpy("SuperCart 9Banks");
+			break;
+		case 0x000b:
+			cart_mapper.cpy("SuperCart XM Compatible");
+			break;
+		case 0x0020:
+			cart_mapper.cpy("SuperCart Bankswitch + 32K RAM");
+			break;
+		case 0x0100:
+			cart_mapper.cpy("Absolute Bankswitch");
+			break;
+		case 0x0200:
+			cart_mapper.cpy("Activision Bankswitch");
+			break;
+		default:
+			cart_mapper.cpy("Unknown mapper");
+			break;
+	}
+
+	switch (head_ctrl1)
+	{
+		case 0x00:
+			ctrl1.cpy("None");
+			break;
+		case 0x01:
+			ctrl1.cpy("Joystick");
+			break;
+		case 0x02:
+			ctrl1.cpy("Light Gun");
+			break;
+		default:
+			ctrl1.cpy("Unknown controller");
+			break;
+	}
+	
+	switch (head_ctrl2)
+	{
+		case 0x00:
+			ctrl2.cpy("None");
+			break;
+		case 0x01:
+			ctrl2.cpy("Joystick");
+			break;
+		case 0x02:
+			ctrl2.cpy("Light Gun");
+			break;
+		default:
+			ctrl2.cpy("Unknown controller");
+			break;
+	}
+	
+	logerror( "ROM DETAILS\n" );
+	logerror( "===========\n\n" );
+	logerror( "\tTotal length (with header):  0x%x (%dK + 128b header)\n\nn", len, len/0x400);	
+	logerror( "HEADER DETAILS\n" );
+	logerror( "==============\n\n" );
+	logerror( "\tTitle:           %.32s\n", head_title);
+	logerror( "\tLength:          0x%X [real 0x%X]\n", head_length, len);
+	logerror( "\tMapper:          %s\n", cart_mapper.cstr());
+	logerror( "\t\tPOKEY:           %s\n", BIT(head_mapper, 0) ? "Yes" : "No");
+	logerror( "\t\tSC Bankswitch:   %s\n", BIT(head_mapper, 1) ? "Yes" : "No");
+	logerror( "\t\tRAM at $4000:    %s\n", BIT(head_mapper, 2) ? "Yes" : "No");
+	logerror( "\t\tbank0 at $4000:  %s\n", BIT(head_mapper, 3) ? "Yes" : "No");
+	logerror( "\t\tbank6 at $4000:  %s\n", BIT(head_mapper, 4) ? "Yes" : "No");
+	logerror( "\t\tbanked RAM:      %s\n", BIT(head_mapper, 5) ? "Yes" : "No");
+	logerror( "\t\tSpecial:         %s ", (head_mapper & 0xff00) ? "Yes" : "No");
+	if (head_mapper & 0xff00)
+	{
+		logerror( "[%s]\n", (head_mapper & 0xff00) == 0x100 ? "Absolute" :
+								(head_mapper & 0xff00) == 0x200 ? "Activision" : "Unknown" );
+	}
+	else
+		logerror( "\n");
+	logerror( "\tController 1:    0x%.2X [%s]\n", head_ctrl1, ctrl1.cstr());
+	logerror( "\tController 2:    0x%.2X [%s]\n", head_ctrl2, ctrl2.cstr());
+	logerror( "\tVideo:           %s\n", (head_ispal) ? "PAL" : "NTSC");	
+}

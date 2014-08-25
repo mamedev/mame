@@ -37,7 +37,8 @@
  
  TODO:
   - verify what happens when 2 POKEYs are present
-  - verify whether high score works fine with XM
+  - understand why high score in XM is not written to NVRAM
+  - add Yamaha YM2151 when more clear specs are available
 
 ***********************************************************************************************************/
 
