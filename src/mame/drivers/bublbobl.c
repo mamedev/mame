@@ -571,6 +571,15 @@ static INPUT_PORTS_START( sboblbob )
 	PORT_DIPSETTING(    0x20, "100 (Cheat)")
 INPUT_PORTS_END
 
+static INPUT_PORTS_START (boblbobl2)
+	PORT_INCLUDE (sboblbob)
+	
+	PORT_MODIFY ("IN0")
+	PORT_BIT (0x04, IP_ACTIVE_LOW,  IPT_COIN2) PORT_IMPULSE (1)
+	PORT_BIT (0x08, IP_ACTIVE_LOW,  IPT_COIN1) PORT_IMPULSE (1)
+	PORT_BIT (0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN) // Must be low or the game freezes!
+INPUT_PORTS_END
+
 // default to 'Dream Land' not 'Super Dream Land'
 static INPUT_PORTS_START( dland )
 	PORT_INCLUDE( boblbobl )
@@ -1362,17 +1371,17 @@ ROM_START( boblbobl2 )
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for the third CPU */
 	ROM_LOAD( "a78-07.46",    0x0000, 0x08000, CRC(4f9a26e8) SHA1(3105b34b88a7134493c2b3f584729f8b0407a011) )
 
-	ROM_REGION( 0x80000, "gfx1", ROMREGION_INVERT )
-	ROM_LOAD( "gfx7.bin",     0x00000, 0x10000, CRC(702f61c0) SHA1(2f294ab2b0286736a64ea2bfc95d855aa5b41ada) )
-	ROM_LOAD( "gfx8.bin",     0x10000, 0x10000, CRC(677840e8) SHA1(995b2125ca18910d7d4b96078f4ecb17465c4151) )
-	ROM_LOAD( "a78-13.16",    0x20000, 0x08000, CRC(d0af35c5) SHA1(c5a89f4d73acc0db86654540b3abfd77b3757db5) )
-	ROM_LOAD( "a78-14.17",    0x28000, 0x08000, CRC(7b5369a8) SHA1(1307b26d80e6f36ebe6c442bebec41d20066eaf9) )  // match
-	/* 0x30000-0x3ffff empty */
-	ROM_LOAD( "gfx10.bin",    0x40000, 0x10000, CRC(d370f499) SHA1(94ce157ff1a53fabf08abe5467531b94a56666a5) )
-	ROM_LOAD( "gfx11.bin",    0x50000, 0x10000, CRC(76f2b367) SHA1(3e357a5642c8747df77a995057cecdf96f3130ab) )
-	ROM_LOAD( "a78-19.34",    0x60000, 0x08000, CRC(66e9438c) SHA1(b94e62b6fbe7f4e08086d0365afc5cff6e0ccafd) )
-	ROM_LOAD( "a78-20.35",    0x68000, 0x08000, CRC(9ef863ad) SHA1(29f91b5a3765e4d6e6c3382db1d8d8297b6e56c8) )  // match
-	/* 0x70000-0x7ffff empty */
+	ROM_REGION (0x80000, "gfx1", ROMREGION_INVERT)
+	ROM_LOAD ("gfx11.bin", 0x00000, 0x10000, CRC (76f2b367) SHA1 (3e357a5642c8747df77a995057cecdf96f3130ab))
+	ROM_LOAD ("gfx10.bin", 0x10000, 0x10000, CRC (d370f499) SHA1 (94ce157ff1a53fabf08abe5467531b94a56666a5))
+	ROM_LOAD ("a78-13.16", 0x20000, 0x08000, CRC (d0af35c5) SHA1 (c5a89f4d73acc0db86654540b3abfd77b3757db5)) // Match
+	ROM_LOAD ("a78-14.17", 0x28000, 0x08000, CRC (7b5369a8) SHA1 (1307b26d80e6f36ebe6c442bebec41d20066eaf9)) // Match
+	// 0x30000 - 0x3FFFF empty
+	ROM_LOAD ("gfx8.bin",  0x40000, 0x10000, CRC (677840e8) SHA1 (995b2125ca18910d7d4b96078f4ecb17465c4151))
+	ROM_LOAD ("gfx7.bin",  0x50000, 0x10000, CRC (702f61c0) SHA1 (2f294ab2b0286736a64ea2bfc95d855aa5b41ada))
+	ROM_LOAD ("a78-19.34", 0x60000, 0x08000, CRC (66e9438c) SHA1 (b94e62b6fbe7f4e08086d0365afc5cff6e0ccafd)) // Match
+	ROM_LOAD ("a78-20.35", 0x68000, 0x08000, CRC (9ef863ad) SHA1 (29f91b5a3765e4d6e6c3382db1d8d8297b6e56c8)) // Match
+	// 0x70000 - 0x7FFFF empty
 
 	ROM_REGION( 0x0100, "proms", 0 )
 	ROM_LOAD( "a71-25.41",    0x0000, 0x0100, CRC(2d0f8545) SHA1(089c31e2f614145ef2743164f7b52ae35bc06808) )    /* video timing */
@@ -1584,7 +1593,7 @@ GAME( 1986, bublboblr,  bublbobl, bublbobl, bublbobl, bublbobl_state, bublbobl, 
 GAME( 1986, bublboblr1, bublbobl, bublbobl, bublbobl, bublbobl_state, bublbobl, ROT0,  "Taito America Corporation (Romstar license)", "Bubble Bobble (US, Ver 1.0)", GAME_SUPPORTS_SAVE )
 
 GAME( 1986, boblbobl,   bublbobl, boblbobl, boblbobl, bublbobl_state, bublbobl, ROT0,  "bootleg", "Bobble Bobble (set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1986, boblbobl2,  bublbobl, boblbobl, boblbobl, bublbobl_state, bublbobl, ROT0,  "bootleg", "Bobble Bobble (set 2)", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
+GAME( 1986, boblbobl2,  bublbobl, boblbobl, boblbobl2,bublbobl_state, bublbobl, ROT0,  "bootleg", "Super Bobble Bobble (Datsu bootleg)", GAME_SUPPORTS_SAVE )
 GAME( 1986, sboblboa,   bublbobl, boblbobl, boblbobl, bublbobl_state, bublbobl, ROT0,  "bootleg", "Super Bobble Bobble (set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1986, sboblbob,   bublbobl, boblbobl, sboblbob, bublbobl_state, bublbobl, ROT0,  "bootleg", "Super Bobble Bobble (set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1986, bub68705,   bublbobl, bub68705, bublbobl, bublbobl_state, bublbobl, ROT0,  "bootleg", "Bubble Bobble (bootleg with 68705)", GAME_SUPPORTS_SAVE )
