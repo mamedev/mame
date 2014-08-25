@@ -149,6 +149,7 @@ private:
 	void draw_char(int x, int y);
 	int translate_command(UINT8 data);
 	void process_fifo();
+	void continue_command();
 	void update_text(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void draw_graphics_line(bitmap_rgb32 &bitmap, UINT32 addr, int y, int wd);
 	void update_graphics(bitmap_rgb32 &bitmap, const rectangle &cliprect, int force_bitmap);

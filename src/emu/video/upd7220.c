@@ -506,7 +506,7 @@ inline void upd7220_device::read_vram(UINT8 type, UINT8 mod)
 	if (mod)
 		LOG (("uPD7220 RDAT used with mod = %02x?\n",mod));
 
-	for (int i = 0; i < m_figs.m_dc; i++)
+	while (m_figs.m_dc && m_fifo_ptr < (type ? 15 : 14))
 	{
 		switch(type)
 		{
@@ -522,8 +522,12 @@ inline void upd7220_device::read_vram(UINT8 type, UINT8 mod)
 				break;
 		}
 
+		m_figs.m_dc--;
 		advance_ead();
 	}
+
+	if (m_figs.m_dc == 0)
+		reset_figs_param();
 }
 
 
@@ -1371,7 +1375,6 @@ void upd7220_device::process_fifo()
 		fifo_set_direction(FIFO_READ);
 
 		read_vram((m_cr & 0x18) >> 3,m_cr & 3);
-		reset_figs_param();
 
 		m_sr |= UPD7220_SR_DATA_READY;
 		break;
@@ -1411,6 +1414,21 @@ void upd7220_device::process_fifo()
 
 
 //-------------------------------------------------
+//  continue command
+//-------------------------------------------------
+
+void upd7220_device::continue_command()
+{
+	// continue RDAT command when data to read are larger than the FIFO (a5105 and dmv text scrolling)
+	if (m_figs.m_dc && translate_command(m_cr) == COMMAND_RDAT)
+	{
+		read_vram((m_cr & 0x18) >> 3, m_cr & 3);
+		m_sr |= UPD7220_SR_DATA_READY;
+	}
+}
+
+
+//-------------------------------------------------
 //  read -
 //-------------------------------------------------
 
@@ -1424,6 +1442,8 @@ READ8_MEMBER( upd7220_device::read )
 		int flag;
 		fifo_set_direction(FIFO_READ);
 		dequeue(&data, &flag);
+
+		continue_command();
 	}
 	else
 	{
