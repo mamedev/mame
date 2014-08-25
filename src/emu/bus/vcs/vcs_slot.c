@@ -58,7 +58,10 @@ void device_vcs_cart_interface::rom_alloc(UINT32 size)
 void device_vcs_cart_interface::ram_alloc(UINT32 size)
 {
 	if (m_ram == NULL)
+	{
 		m_ram.resize(size);
+		device().save_item(NAME(m_ram));
+	}
 }
 
 
