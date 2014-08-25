@@ -560,6 +560,7 @@ MACHINES += DIABLO_HD
 
 BUSES += A1BUS
 BUSES += A2BUS
+BUSES += A7800
 BUSES += ABCBUS
 BUSES += ABCKB
 BUSES += ADAM
@@ -1023,7 +1024,6 @@ $(MESSOBJ)/at.a:                \
 $(MESSOBJ)/atari.a:             \
 	$(MESS_MACHINE)/atarifdc.o  \
 	$(MESS_DRIVERS)/atari400.o  \
-	$(MESS_MACHINE)/a7800.o     \
 	$(MESS_DRIVERS)/a7800.o     \
 	$(MESS_VIDEO)/a7800.o       \
 	$(MESS_DRIVERS)/a2600.o     \

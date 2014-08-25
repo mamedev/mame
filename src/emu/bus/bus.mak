@@ -16,6 +16,20 @@ BUSOBJ = $(EMUOBJ)/bus
 
 #-------------------------------------------------
 #
+#@src/emu/bus/a7800/a78_slot.h,BUSES += A7800
+#-------------------------------------------------
+
+ifneq ($(filter A7800,$(BUSES)),)
+OBJDIRS += $(BUSOBJ)/a7800
+BUSOBJS += $(BUSOBJ)/a7800/a78_slot.o
+BUSOBJS += $(BUSOBJ)/a7800/rom.o
+BUSOBJS += $(BUSOBJ)/a7800/hiscore.o
+BUSOBJS += $(BUSOBJ)/a7800/xboard.o
+endif
+
+
+#-------------------------------------------------
+#
 #@src/emu/bus/abcbus/abcbus.h,BUSES += ABCBUS
 #-------------------------------------------------
 

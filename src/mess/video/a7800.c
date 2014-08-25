@@ -28,7 +28,6 @@
 
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
-
 #include "includes/a7800.h"
 
 
@@ -345,7 +344,7 @@ UINT32 a7800_state::screen_update_a7800(screen_device &screen, bitmap_ind16 &bit
 
 /****** MARIA ***************************************/
 
-READ8_MEMBER(a7800_state::a7800_MARIA_r)
+READ8_MEMBER(a7800_state::maria_r)
 {
 	switch (offset)
 	{
@@ -358,7 +357,7 @@ READ8_MEMBER(a7800_state::a7800_MARIA_r)
 	}
 }
 
-WRITE8_MEMBER(a7800_state::a7800_MARIA_w)
+WRITE8_MEMBER(a7800_state::maria_w)
 {
 	int i;
 

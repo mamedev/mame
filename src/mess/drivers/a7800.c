@@ -7,8 +7,9 @@
   Dan Boris
 
     2002/05/13 kubecj   added more banks for bankswitching
-                            added PAL machine description
-                            changed clock to be precise
+                        added PAL machine description
+                        changed clock to be precise
+						improved cart emulation (in machine/)
 
     2012/10/25 Robert Tuccitto  NTSC Color Generator utilized for
                 color palette with hue shift/start
@@ -83,15 +84,20 @@
 
     2014/03/25 Mike Saarna  Fixed Riot Timer
 
+    2014/04/04 Mike Saarna  Fix to controller button RIOT behavior
+
     2014/05/06 Mike Saarna/Robert Tuccitto Brought initial Maria cycle counts
-+           inline from measurements taken with logic analyzer and tests.
+               inline from measurements taken with logic analyzer and tests.
+ 
+    2014/08/25 Fabio Priuli Converted carts to be slot devices and cleaned
+               up the driver (removed the pokey, cleaned up rom regions, etc.)
+ 
 ***************************************************************************/
 
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
-#include "sound/pokey.h"
 #include "sound/tiaintf.h"
-#include "imagedev/cartslot.h"
+#include "bus/a7800/a78_carts.h"
 #include "machine/6532riot.h"
 #include "includes/a7800.h"
 
@@ -101,31 +107,121 @@
 
 
 /***************************************************************************
+ MEMORY HANDLERS
+ ***************************************************************************/
+
+// RIOT
+READ8_MEMBER(a7800_state::riot_joystick_r)
+{
+	return m_io_joysticks->read();
+}
+
+READ8_MEMBER(a7800_state::riot_console_button_r)
+{
+	return m_io_console_buttons->read();
+}
+
+WRITE8_MEMBER(a7800_state::riot_button_pullup_w)
+{
+	if(m_maincpu->space(AS_PROGRAM).read_byte(0x283) & 0x04)
+		m_p1_one_button = data & 0x04; // pin 6 of the controller port is held high by the riot chip when reading two-button controllers (from schematic)
+	if(m_maincpu->space(AS_PROGRAM).read_byte(0x283) & 0x10)
+		m_p2_one_button = data & 0x10;
+}
+
+READ8_MEMBER(a7800_state::tia_r)
+{
+	switch (offset & 0x0f)
+	{
+		case 0x00:
+		case 0x01:
+		case 0x02:
+		case 0x03:
+		case 0x04:
+		case 0x05:
+		case 0x06:
+		case 0x07:
+			/* Even though the 7800 doesn't use the TIA graphics the collision registers should
+			 still return a reasonable value */
+			return 0x00;
+		case 0x08:
+			return ((m_io_buttons->read() & 0x02) << 6);
+		case 0x09:
+			return ((m_io_buttons->read() & 0x08) << 4);
+		case 0x0a:
+			return ((m_io_buttons->read() & 0x01) << 7);
+		case 0x0b:
+			return ((m_io_buttons->read() & 0x04) << 5);
+		case 0x0c:
+			if (((m_io_buttons->read() & 0x08) ||(m_io_buttons->read() & 0x02)) && m_p1_one_button)
+				return 0x00;
+			else
+				return 0x80;
+		case 0x0d:
+			if (((m_io_buttons->read() & 0x01) ||(m_io_buttons->read() & 0x04)) && m_p2_one_button)
+				return 0x00;
+			else
+				return 0x80;
+		default:
+			logerror("undefined TIA read %x\n",offset);
+			
+	}
+	return 0xff;
+}
+
+// TIA
+WRITE8_MEMBER(a7800_state::tia_w)
+{
+	if (offset < 0x20) 
+	{ //INPTCTRL covers TIA registers 0x00-0x1F until locked
+		if (data & 0x01)
+		{
+			if (m_ctrl_lock && offset == 0x01)
+				m_maria_flag = 1;
+			else if (!m_ctrl_lock)
+				m_maria_flag = 1;
+		}
+		if (!m_ctrl_lock)
+		{
+			m_ctrl_lock = data & 0x01;
+			m_ctrl_reg = data;
+		}
+	}
+	m_tia->tia_sound_w(space, offset, data);
+}
+
+
+// ROM
+READ8_MEMBER(a7800_state::bios_or_cart_r)
+{
+	if (!(m_ctrl_reg & 0x04))
+		return m_bios[offset];
+	else
+		return m_cartslot->read_40xx(space, offset + 0x8000);
+}
+
+/***************************************************************************
     ADDRESS MAPS
 ***************************************************************************/
 
 static ADDRESS_MAP_START( a7800_mem, AS_PROGRAM, 8, a7800_state )
-	AM_RANGE(0x0000, 0x001f) AM_MIRROR(0x300) AM_READWRITE(a7800_TIA_r, a7800_TIA_w)
-	AM_RANGE(0x0020, 0x003f) AM_MIRROR(0x300) AM_READWRITE(a7800_MARIA_r, a7800_MARIA_w)
-	AM_RANGE(0x0040, 0x00ff) AM_READ_BANK("bank5") AM_WRITE(a7800_RAM0_w)   /* RAM (6116 block 0) */
-	AM_RANGE(0x0140, 0x01ff) AM_RAMBANK("bank6")    /* RAM (6116 block 1) */
+	AM_RANGE(0x0000, 0x001f) AM_MIRROR(0x300) AM_READWRITE(tia_r, tia_w)
+	AM_RANGE(0x0020, 0x003f) AM_MIRROR(0x300) AM_READWRITE(maria_r, maria_w)
+	AM_RANGE(0x0040, 0x00ff) AM_RAMBANK("ram0")     // RAM (6116 block 0)
+	AM_RANGE(0x0140, 0x01ff) AM_RAMBANK("ram1")     // RAM (6116 block 1)
 	AM_RANGE(0x0280, 0x02ff) AM_DEVREADWRITE("riot", riot6532_device, read, write)
-	AM_RANGE(0x0450, 0x045f) /* XBOARD POKEY1 */
-	AM_RANGE(0x0460, 0x046f) /* XBOARD POKEY2 */
-	AM_RANGE(0x0470, 0x047f) /* XBOARD CTRL */
-	AM_RANGE(0x0480, 0x04ff) AM_MIRROR(0x100) AM_RAM    /* RIOT RAM */
-	AM_RANGE(0x1000, 0x17ff) AM_RAM /* hs SRAM */
-	AM_RANGE(0x1800, 0x27ff) AM_RAM
-	AM_RANGE(0x2800, 0x2fff) AM_RAMBANK("bank7")    /* MAINRAM */
-	AM_RANGE(0x3000, 0x37ff) AM_RAMBANK("bank7")    /* MAINRAM */
-	AM_RANGE(0x3800, 0x3fff) AM_RAMBANK("bank7")    /* MAINRAM */
-	AM_RANGE(0x3000, 0x3fff) AM_ROM  /* hs ROM space */
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")                        /* f18 hornet */
-	AM_RANGE(0x4000, 0xffff) AM_WRITE(a7800_cart_w) /* XBOARD SRAM */
-	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank2")                        /* sc */
-	AM_RANGE(0xa000, 0xbfff) AM_ROMBANK("bank3")                        /* sc + ac */
-	AM_RANGE(0xc000, 0xdfff) AM_ROMBANK("bank4")                        /* ac */
-	AM_RANGE(0xe000, 0xffff) AM_ROM
+	AM_RANGE(0x0480, 0x04ff) AM_MIRROR(0x100) AM_RAMBANK("riot_ram")
+	AM_RANGE(0x1800, 0x27ff) AM_RAMBANK("main_ram")
+
+	AM_RANGE(0x2040, 0x20ff) AM_RAMBANK("ram0")     // mirror (6116 block 0)
+	AM_RANGE(0x2140, 0x21ff) AM_RAMBANK("ram1")     // mirror (6116 block 1)
+
+	AM_RANGE(0x2800, 0x2fff) AM_RAMBANK("mirror")	// these should mirror "main_ram" (according to docs)
+	AM_RANGE(0x3000, 0x37ff) AM_RAMBANK("mirror")   // but system have issues in such case...
+	AM_RANGE(0x3800, 0x3fff) AM_RAMBANK("mirror")
+	AM_RANGE(0x4000, 0xffff) AM_DEVWRITE("cartslot", a78_cart_slot_device, write_40xx)
+	AM_RANGE(0x4000, 0xbfff) AM_DEVREAD("cartslot", a78_cart_slot_device, read_40xx)
+	AM_RANGE(0xc000, 0xffff) AM_READ(bios_or_cart_r)	// here also the BIOS can be accessed
 ADDRESS_MAP_END
 
 
@@ -134,7 +230,7 @@ ADDRESS_MAP_END
 ***************************************************************************/
 
 static INPUT_PORTS_START( a7800 )
-	PORT_START("joysticks")            /* IN0 */
+	PORT_START("joysticks")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP)    PORT_PLAYER(2) PORT_8WAY
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN)  PORT_PLAYER(2) PORT_8WAY
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT)  PORT_PLAYER(2) PORT_8WAY
@@ -144,18 +240,18 @@ static INPUT_PORTS_START( a7800 )
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT)  PORT_PLAYER(1) PORT_8WAY
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_PLAYER(1) PORT_8WAY
 
-	PORT_START("buttons")              /* IN1 */
+	PORT_START("buttons")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_BUTTON2)       PORT_PLAYER(2)
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_BUTTON2)       PORT_PLAYER(1)
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_BUTTON1)       PORT_PLAYER(2)
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_BUTTON1)       PORT_PLAYER(1)
 	PORT_BIT(0xF0, IP_ACTIVE_LOW, IPT_UNUSED)
 
-	PORT_START("vblank")               /* IN2 */
+	PORT_START("vblank")
 	PORT_BIT(0x7F, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_VBLANK("screen")
 
-	PORT_START("console_buttons")      /* IN3 */
+	PORT_START("console_buttons")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER)  PORT_NAME("Reset")         PORT_CODE(KEYCODE_R)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER)  PORT_NAME("Select")        PORT_CODE(KEYCODE_S)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNUSED)
@@ -1133,12 +1229,50 @@ PALETTE_INIT_MEMBER(a7800_state,a7800p)
     MACHINE DRIVERS
 ***************************************************************************/
 
+void a7800_state::machine_start()
+{
+	m_bios = machine().root_device().memregion("maincpu")->base() + 0xc000;
+	save_item(NAME(m_p1_one_button));
+	save_item(NAME(m_p2_one_button));
+	save_item(NAME(m_bios_enabled));
+	save_item(NAME(m_ctrl_lock));
+	save_item(NAME(m_ctrl_reg));
+	save_item(NAME(m_maria_flag));
+	
+	// install additional POKEY handlers
+	switch (m_cartslot->get_cart_type())
+	{
+		case A78_TYPE1:
+		case A78_TYPE3:
+		case A78_TYPEB:
+		case A78_XB_BOARD:
+			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x0400, 0x047f, read8_delegate(FUNC(a78_cart_slot_device::read_04xx),(a78_cart_slot_device*)m_cartslot), write8_delegate(FUNC(a78_cart_slot_device::write_04xx),(a78_cart_slot_device*)m_cartslot));
+			break;
+		case A78_HSC:
+			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x1000, 0x17ff, read8_delegate(FUNC(a78_cart_slot_device::read_10xx),(a78_cart_slot_device*)m_cartslot), write8_delegate(FUNC(a78_cart_slot_device::write_10xx),(a78_cart_slot_device*)m_cartslot));
+			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x3000, 0x3fff, read8_delegate(FUNC(a78_cart_slot_device::read_30xx),(a78_cart_slot_device*)m_cartslot), write8_delegate(FUNC(a78_cart_slot_device::write_30xx),(a78_cart_slot_device*)m_cartslot));
+			break;
+		case A78_XM_BOARD:
+			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x0400, 0x047f, read8_delegate(FUNC(a78_cart_slot_device::read_04xx),(a78_cart_slot_device*)m_cartslot), write8_delegate(FUNC(a78_cart_slot_device::write_04xx),(a78_cart_slot_device*)m_cartslot));
+			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x1000, 0x17ff, read8_delegate(FUNC(a78_cart_slot_device::read_10xx),(a78_cart_slot_device*)m_cartslot), write8_delegate(FUNC(a78_cart_slot_device::write_10xx),(a78_cart_slot_device*)m_cartslot));
+			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x3000, 0x3fff, read8_delegate(FUNC(a78_cart_slot_device::read_30xx),(a78_cart_slot_device*)m_cartslot), write8_delegate(FUNC(a78_cart_slot_device::write_30xx),(a78_cart_slot_device*)m_cartslot));
+			break;
+	}
+}
+
+void a7800_state::machine_reset()
+{
+	m_ctrl_lock = 0;
+	m_ctrl_reg = 0;
+	m_maria_flag = 0;
+	m_bios_enabled = 0;
+}
+
 static MACHINE_CONFIG_START( a7800_ntsc, a7800_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, A7800_NTSC_Y1/8) /* 1.79 MHz (switches to 1.19 MHz on TIA or RIOT access) */
 	MCFG_CPU_PROGRAM_MAP(a7800_mem)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", a7800_state, a7800_interrupt, "screen", 0, 1)
-
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1149,12 +1283,9 @@ static MACHINE_CONFIG_START( a7800_ntsc, a7800_state )
 	MCFG_PALETTE_ADD("palette", ARRAY_LENGTH(a7800_palette) / 3)
 	MCFG_PALETTE_INIT_OWNER(a7800_state, a7800)
 
-
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_TIA_ADD("tia", 31400)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-	MCFG_SOUND_ADD("pokey", POKEY, A7800_NTSC_Y1/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* devices */
@@ -1163,12 +1294,7 @@ static MACHINE_CONFIG_START( a7800_ntsc, a7800_state )
 	MCFG_RIOT6532_IN_PB_CB(READ8(a7800_state, riot_console_button_r))
 	MCFG_RIOT6532_OUT_PB_CB(WRITE8(a7800_state, riot_button_pullup_w))
 
-	MCFG_CARTSLOT_ADD("cart")
-	MCFG_CARTSLOT_EXTENSION_LIST("bin,a78")
-	MCFG_CARTSLOT_NOT_MANDATORY
-	MCFG_CARTSLOT_LOAD(a7800_state,a7800_cart)
-	MCFG_CARTSLOT_PARTIALHASH(a7800_partialhash)
-	MCFG_CARTSLOT_INTERFACE("a7800_cart")
+	MCFG_A78_CARTRIDGE_ADD("cartslot", a7800_cart, NULL)
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("cart_list","a7800")
@@ -1177,7 +1303,6 @@ MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( a7800_pal, a7800_ntsc )
-
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK(CLK_PAL)
@@ -1188,11 +1313,6 @@ static MACHINE_CONFIG_DERIVED( a7800_pal, a7800_ntsc )
 
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_INIT_OWNER(a7800_state, a7800p )
-
-	/* sound hardware */
-	MCFG_SOUND_MODIFY("pokey")
-	MCFG_SOUND_CLOCK(CLK_PAL)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* devices */
 	MCFG_DEVICE_REMOVE("riot")
@@ -1213,8 +1333,7 @@ MACHINE_CONFIG_END
 ***************************************************************************/
 
 ROM_START( a7800 )
-	ROM_REGION(0x100000, "maincpu", 0)
-	ROM_FILL(0x0000, 0x100000, 0xff)
+	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
 	ROM_SYSTEM_BIOS( 0, "a7800", "Atari 7800" )
 	ROMX_LOAD("7800.u7", 0xf000, 0x1000, CRC(5d13730c) SHA1(d9d134bb6b36907c615a594cc7688f7bfcef5b43), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS( 1, "a7800pr", "Atari 7800 (prototype with Asteroids)" )
@@ -1222,10 +1341,31 @@ ROM_START( a7800 )
 ROM_END
 
 ROM_START( a7800p )
-	ROM_REGION(0x100000, "maincpu", 0)
-	ROM_FILL(0x0000, 0x100000, 0xff)
+	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD("7800pal.rom", 0xc000, 0x4000, CRC(d5b61170) SHA1(5a140136a16d1d83e4ff32a19409ca376a8df874))
 ROM_END
+
+
+/***************************************************************************
+ DRIVER INIT
+ ***************************************************************************/
+
+DRIVER_INIT_MEMBER(a7800_state,a7800_ntsc)
+{
+	m_ispal = FALSE;
+	m_lines = 263;
+	m_p1_one_button = 1;
+	m_p2_one_button = 1;
+}
+
+
+DRIVER_INIT_MEMBER(a7800_state,a7800_pal)
+{
+	m_ispal = TRUE;
+	m_lines = 313;
+	m_p1_one_button = 1;
+	m_p2_one_button = 1;
+}
 
 
 /***************************************************************************
