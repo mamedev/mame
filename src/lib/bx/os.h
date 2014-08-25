@@ -16,7 +16,8 @@
 	|| BX_PLATFORM_IOS \
 	|| BX_PLATFORM_LINUX \
 	|| BX_PLATFORM_NACL \
-	|| BX_PLATFORM_OSX
+	|| BX_PLATFORM_OSX \
+	|| BX_PLATFORM_RPI
 
 #	include <sched.h> // sched_yield
 #	if BX_PLATFORM_FREEBSD || BX_PLATFORM_IOS || BX_PLATFORM_NACL || BX_PLATFORM_OSX
@@ -30,10 +31,10 @@
 #		include <dlfcn.h> // dlopen, dlclose, dlsym
 #	endif // BX_PLATFORM_NACL
 
-#	if BX_PLATFORM_LINUX
+#	if BX_PLATFORM_LINUX || BX_PLATFORM_RPI
 #		include <unistd.h> // syscall
 #		include <sys/syscall.h>
-#	endif // BX_PLATFORM_LINUX
+#	endif // BX_PLATFORM_LINUX || BX_PLATFORM_RPI
 
 #	if BX_PLATFORM_ANDROID
 #		include "debug.h" // getTid is not implemented...
@@ -79,7 +80,7 @@ namespace bx
 	{
 #if BX_PLATFORM_WINDOWS
 		return ::GetCurrentThreadId();
-#elif BX_PLATFORM_LINUX
+#elif BX_PLATFORM_LINUX || BX_PLATFORM_RPI
 		return (pid_t)::syscall(SYS_gettid);
 #elif BX_PLATFORM_IOS || BX_PLATFORM_OSX
 		return (mach_port_t)::pthread_mach_thread_np(pthread_self() );

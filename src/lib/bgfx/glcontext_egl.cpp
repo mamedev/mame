@@ -5,10 +5,14 @@
 
 #include "bgfx_p.h"
 
-#if (BGFX_CONFIG_RENDERER_OPENGLES|BGFX_CONFIG_RENDERER_OPENGL)
+#if (BGFX_CONFIG_RENDERER_OPENGLES || BGFX_CONFIG_RENDERER_OPENGL)
 #	include "renderer_gl.h"
 
 #	if BGFX_USE_EGL
+
+#		if BX_PLATFORM_RPI
+#			include <bcm_host.h>
+#		endif // BX_PLATFORM_RPI
 
 #ifndef EGL_CONTEXT_MAJOR_VERSION_KHR
 #	define EGL_CONTEXT_MAJOR_VERSION_KHR EGL_CONTEXT_CLIENT_VERSION
@@ -94,8 +98,22 @@ EGL_IMPORT
 #	define GL_IMPORT(_optional, _proto, _func, _import) _proto _func = NULL
 #	include "glimports.h"
 
+#	if BX_PLATFORM_RPI
+	static EGL_DISPMANX_WINDOW_T s_dispmanWindow;
+
+	void x11SetDisplayWindow(::Display* _display, ::Window _window)
+	{
+		// Noop for now...
+		BX_UNUSED(_display, _window);
+	}
+#	endif // BX_PLATFORM_RPI
+
 	void GlContext::create(uint32_t _width, uint32_t _height)
 	{
+#	if BX_PLATFORM_RPI
+		bcm_host_init();
+#	endif // BX_PLATFORM_RPI
+
 		m_eglLibrary = eglOpen();
 
 		BX_UNUSED(_width, _height);
@@ -137,6 +155,31 @@ EGL_IMPORT
 		eglGetConfigAttrib(m_display, config, EGL_NATIVE_VISUAL_ID, &format);
 		ANativeWindow_setBuffersGeometry(g_bgfxAndroidWindow, _width, _height, format);
 		nwt = g_bgfxAndroidWindow;
+#	elif BX_PLATFORM_RPI
+		DISPMANX_DISPLAY_HANDLE_T dispmanDisplay = vc_dispmanx_display_open(0);
+		DISPMANX_UPDATE_HANDLE_T  dispmanUpdate  = vc_dispmanx_update_start(0);
+
+		VC_RECT_T dstRect = { 0, 0, _width,        _height       };
+		VC_RECT_T srcRect = { 0, 0, _width  << 16, _height << 16 };
+
+		DISPMANX_ELEMENT_HANDLE_T dispmanElement = vc_dispmanx_element_add(dispmanUpdate
+			, dispmanDisplay
+			, 0
+			, &dstRect
+			, 0
+			, &srcRect
+			, DISPMANX_PROTECTION_NONE
+			, NULL
+			, NULL
+			, DISPMANX_NO_ROTATE
+			);
+
+		s_dispmanWindow.element = dispmanElement;
+		s_dispmanWindow.width   = _width;
+		s_dispmanWindow.height  = _height;
+		nwt = &s_dispmanWindow;
+
+		vc_dispmanx_update_submit_sync(dispmanUpdate);
 #	endif // BX_PLATFORM_ANDROID
 
 		m_surface = eglCreateWindowSurface(m_display, config, nwt, NULL);
@@ -183,6 +226,10 @@ EGL_IMPORT
 		m_context = NULL;
 
 		eglClose(m_eglLibrary);
+
+#	if BX_PLATFORM_RPI
+		bcm_host_deinit();
+#	endif // BX_PLATFORM_RPI
 	}
 
 	void GlContext::resize(uint32_t /*_width*/, uint32_t /*_height*/, bool _vsync)
@@ -227,4 +274,4 @@ EGL_IMPORT
 } // namespace bgfx
 
 #	endif // BGFX_USE_EGL
-#endif // (BGFX_CONFIG_RENDERER_OPENGLES|BGFX_CONFIG_RENDERER_OPENGL)
+#endif // (BGFX_CONFIG_RENDERER_OPENGLES || BGFX_CONFIG_RENDERER_OPENGL)

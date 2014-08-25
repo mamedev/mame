@@ -2,7 +2,7 @@
  * Copyright 2010-2013 Branimir Karadzic. All rights reserved.
  * License: http://www.opensource.org/licenses/BSD-2-Clause
  */
- 
+
 #ifndef BX_READERWRITER_H_HEADER_GUARD
 #define BX_READERWRITER_H_HEADER_GUARD
 

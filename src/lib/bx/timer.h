@@ -12,10 +12,10 @@
 #	include <time.h> // clock, clock_gettime
 #elif BX_PLATFORM_EMSCRIPTEN
 #	include <emscripten.h>
-#elif  BX_PLATFORM_FREEBSD || BX_PLATFORM_LINUX || BX_PLATFORM_NACL || BX_PLATFORM_OSX || BX_PLATFORM_IOS || BX_PLATFORM_QNX
-#	include <sys/time.h> // gettimeofday
 #elif BX_PLATFORM_WINDOWS || BX_PLATFORM_WINRT
 #	include <windows.h>
+#else
+#	include <sys/time.h> // gettimeofday
 #endif // BX_PLATFORM_
 
 namespace bx

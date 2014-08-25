@@ -18,7 +18,14 @@
 #elif 0 // BX_COMPILER_CLANG
 #	include "float4_langext.h"
 #else
-//#	pragma message("************************************\nUsing SIMD reference implementation!\n************************************")
+#	ifndef BX_FLOAT4_WARN_REFERENCE_IMPL
+#		define BX_FLOAT4_WARN_REFERENCE_IMPL 0
+#	endif // BX_FLOAT4_WARN_REFERENCE_IMPL
+
+#	if BX_FLOAT4_WARN_REFERENCE_IMPL
+#		pragma message("************************************\nUsing SIMD reference implementation!\n************************************")
+#	endif // BX_FLOAT4_WARN_REFERENCE_IMPL
+
 #	include "float4_ref.h"
 #endif //
 

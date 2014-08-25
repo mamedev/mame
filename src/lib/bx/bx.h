@@ -9,7 +9,7 @@
 #include <stdint.h> // uint32_t
 #include <stdlib.h> // size_t
 
-#include "platform.h"
+#include "config.h"
 #include "macros.h"
 
 namespace bx
