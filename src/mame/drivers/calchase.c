@@ -756,5 +756,22 @@ ROM_START( hostinv )
 	DISK_IMAGE_READONLY( "hostinv", 0, SHA1(3cb86c62e80be98a717172b717f7276a0e5f6830) )
 ROM_END
 
+ROM_START( eggsplc )
+	ROM_REGION( 0x40000, "bios", 0 )
+	ROM_LOAD( "hostinv_bios.bin", 0x000000, 0x020000, CRC(5111e4b8) SHA1(20ab93150b61fd068f269368450734bba5dcb284) ) 
+
+	ROM_REGION( 0x8000, "video_bios", 0 )
+	ROM_LOAD16_BYTE( "trident_tgui9680_bios.bin", 0x0000, 0x4000, CRC(1eebde64) SHA1(67896a854d43a575037613b3506aea6dae5d6a19) )
+	ROM_CONTINUE(                                 0x0001, 0x4000 )
+
+	ROM_REGION( 0x800, "nvram", ROMREGION_ERASEFF )
+	ROM_LOAD( "ds1220y_eggsplc.bin", 0x000, 0x800, NO_DUMP )
+
+	DISK_REGION( "ide:0:hdd:image" )
+	DISK_IMAGE_READONLY( "eggsplc", 0, SHA1(fa38dd6b0d25cde644f68cf639768f137c607eb5) )
+ROM_END
+
 GAME( 1998, hostinv,   0,    hostinv,  calchase, calchase_state,  hostinv,  ROT0, "The Game Room", "Host Invaders", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
 GAME( 1999, calchase,  0,    calchase, calchase, calchase_state,  calchase, ROT0, "The Game Room", "California Chase", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
+GAME( 2002, eggsplc,   0,    calchase, calchase, calchase_state,  hostinv,  ROT0, "The Game Room", "Eggs Playing Chicken", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
+
