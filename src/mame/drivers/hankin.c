@@ -430,7 +430,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( hankin_state::timer_s )
 			{
 				m_timer_s[2]++;
 				offs_t offs = (m_timer_s[2] & 31) | (m_ic2a << 5);
-				m_dac->write_unsigned8(m_p_prom[offs]<< m_vol);
+				m_dac->write_unsigned8(m_p_prom[offs]<< 4);
 			}
 			else
 				m_timer_s[2] = 0;
@@ -441,6 +441,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( hankin_state::timer_s )
 void hankin_state::machine_reset()
 {
 	m_p_prom = memregion("roms")->base() + 0x1800;
+	m_vol = 0;
 }
 
 // PA0-3 = sound data from main cpu
@@ -454,7 +455,7 @@ WRITE8_MEMBER( hankin_state::ic2_a_w )
 {
 	m_ic2a = data >> 4;
 	offs_t offs = (m_timer_s[2] & 31) | (m_ic2a << 5);
-	m_dac->write_unsigned8(m_p_prom[offs]<< m_vol);
+	m_dac->write_unsigned8(m_p_prom[offs]<< 4);
 }
 
 // PB0-3 = preset on 74LS161
@@ -462,7 +463,16 @@ WRITE8_MEMBER( hankin_state::ic2_a_w )
 WRITE8_MEMBER( hankin_state::ic2_b_w )
 {
 	m_ic2b = data;
-	m_vol = (m_ic2b & 0xf0) / 50; // 0 to 4
+
+	data >>= 4;
+
+	if (data != m_vol)
+	{
+		m_vol = data;
+		float vol = m_vol/16.666+0.1;
+		m_dac->set_output_gain(0, vol);
+	}
+
 }
 
 // low to divide 555 by 2
