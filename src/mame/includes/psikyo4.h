@@ -28,7 +28,8 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "lpalette"),
 		m_palette2(*this, "rpalette"),
-		m_screen(*this, "screen")
+		m_lscreen(*this, "lscreen"),
+		m_rscreen(*this, "rscreen")
 	{ }
 
 	/* memory pointers */
@@ -48,6 +49,10 @@ public:
 	required_device<sh2_device> m_maincpu;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+	required_device<palette_device> m_palette2;
+	required_device<screen_device> m_lscreen;
+	required_device<screen_device> m_rscreen;
 
 	DECLARE_WRITE32_MEMBER(ps4_paletteram32_RRRRRRRRGGGGGGGGBBBBBBBBxxxxxxxx_dword_w);
 	DECLARE_WRITE32_MEMBER(ps4_bgpen_1_dword_w);
@@ -72,8 +77,4 @@ public:
 	void set_hotgmck_pcm_bank( int n );
 	void install_hotgmck_pcm_bank();
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
-
-	required_device<palette_device> m_palette;
-	required_device<palette_device> m_palette2;
-	optional_device<screen_device> m_screen;
 };
