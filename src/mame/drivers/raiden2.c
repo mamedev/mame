@@ -24,6 +24,9 @@ raiden 2 board test note 17/04/08 (based on test by dox)
   value of 0x80 puts 0x00000-0x1ffff at 0x20000 - 0x3ffff
   value of 0x00 puts 0x20000-0x3ffff at 0x20000 - 0x3ffff
 
+===
+
+raiden2 first bullet work RAM is at 0x5290, has a sprite offset of 0x1c9c and a sprite color of 4.
 
 ===========================================================================================================
 
