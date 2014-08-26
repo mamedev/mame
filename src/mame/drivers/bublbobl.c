@@ -554,7 +554,7 @@ static INPUT_PORTS_START( boblbobl )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( sboblbob )
+static INPUT_PORTS_START( sboblboblb )
 	PORT_INCLUDE( boblbobl )
 
 	PORT_MODIFY( "DSW0" )
@@ -571,13 +571,13 @@ static INPUT_PORTS_START( sboblbob )
 	PORT_DIPSETTING(    0x20, "100 (Cheat)")
 INPUT_PORTS_END
 
-static INPUT_PORTS_START (boblbobl2)
-	PORT_INCLUDE (sboblbob)
+static INPUT_PORTS_START( sboblbobl )
+	PORT_INCLUDE( sboblboblb )
 	
-	PORT_MODIFY ("IN0")
-	PORT_BIT (0x04, IP_ACTIVE_LOW,  IPT_COIN2) PORT_IMPULSE (1)
-	PORT_BIT (0x08, IP_ACTIVE_LOW,  IPT_COIN1) PORT_IMPULSE (1)
-	PORT_BIT (0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN) // Must be low or the game freezes!
+	PORT_MODIFY( "IN0" )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(1)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(1)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // Must be low or the game freezes!
 INPUT_PORTS_END
 
 // default to 'Dream Land' not 'Super Dream Land'
@@ -1357,7 +1357,7 @@ ROM_START( boblbobl )
 	ROM_LOAD( "pal16l8.u4",  0x0400, 0x0104, CRC(077d20a8) SHA1(8e568ffd6f66c3dd61708dd0f3be9c2ed488ae4b) )
 ROM_END
 
-ROM_START( boblbobl2 )
+ROM_START( sboblbobl )
 	ROM_REGION( 0x30000, "maincpu", 0 )
 	ROM_LOAD( "cpu2-3.bin",   0x00000, 0x08000, CRC(2d9107b6) SHA1(ab1a4a20f4b533cd06cc458668f407a8a14c9d70) )
 	/* ROMs banked at 8000-bfff */
@@ -1387,7 +1387,7 @@ ROM_START( boblbobl2 )
 	ROM_LOAD( "a71-25.41",    0x0000, 0x0100, CRC(2d0f8545) SHA1(089c31e2f614145ef2743164f7b52ae35bc06808) )    /* video timing */
 ROM_END
 
-ROM_START( sboblboa )
+ROM_START( sboblbobla )
 	ROM_REGION( 0x30000, "maincpu", 0 )
 	ROM_LOAD( "1c.bin",    0x00000, 0x08000, CRC(f304152a) SHA1(103d9beddccef289ed739d28ebda69bbad3d42f9) )
 	/* ROMs banked at 8000-bfff */
@@ -1421,7 +1421,7 @@ ROM_START( sboblboa )
 	ROM_LOAD( "a71-25.41",    0x0000, 0x0100, CRC(2d0f8545) SHA1(089c31e2f614145ef2743164f7b52ae35bc06808) )    /* video timing */
 ROM_END
 
-ROM_START( sboblbob )
+ROM_START( sboblboblb )
 	ROM_REGION( 0x30000, "maincpu", 0 )
 	ROM_LOAD( "bbb-3.rom",    0x00000, 0x08000, CRC(f304152a) SHA1(103d9beddccef289ed739d28ebda69bbad3d42f9) )
 	/* ROMs banked at 8000-bfff */
@@ -1582,20 +1582,20 @@ DRIVER_INIT_MEMBER(bublbobl_state,dland)
  *
  *************************************/
 
-GAME( 1986, tokio,      0,        tokio,    tokio, bublbobl_state,    tokio,    ROT90, "Taito Corporation", "Tokio / Scramble Formation (newer)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE )
-GAME( 1986, tokioo,     tokio,    tokio,    tokio, bublbobl_state,    tokio,    ROT90, "Taito Corporation", "Tokio / Scramble Formation (older)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE )
-GAME( 1986, tokiou,     tokio,    tokio,    tokio, bublbobl_state,    tokio,    ROT90, "Taito America Corporation (Romstar license)", "Tokio / Scramble Formation (US)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE )
-GAME( 1986, tokiob,     tokio,    tokio,    tokio, bublbobl_state,    tokiob,   ROT90, "bootleg", "Tokio / Scramble Formation (bootleg)", GAME_SUPPORTS_SAVE )
+GAME( 1986, tokio,      0,        tokio,    tokio,      bublbobl_state, tokio,    ROT90, "Taito Corporation", "Tokio / Scramble Formation (newer)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE )
+GAME( 1986, tokioo,     tokio,    tokio,    tokio,      bublbobl_state, tokio,    ROT90, "Taito Corporation", "Tokio / Scramble Formation (older)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE )
+GAME( 1986, tokiou,     tokio,    tokio,    tokio,      bublbobl_state, tokio,    ROT90, "Taito America Corporation (Romstar license)", "Tokio / Scramble Formation (US)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE )
+GAME( 1986, tokiob,     tokio,    tokio,    tokio,      bublbobl_state, tokiob,   ROT90, "bootleg", "Tokio / Scramble Formation (bootleg)", GAME_SUPPORTS_SAVE )
 
-GAME( 1986, bublbobl,   0,        bublbobl, bublbobl, bublbobl_state, bublbobl, ROT0,  "Taito Corporation", "Bubble Bobble (Japan, Ver 0.1)", GAME_SUPPORTS_SAVE )
-GAME( 1986, bublbobl1,  bublbobl, bublbobl, bublbobl, bublbobl_state, bublbobl, ROT0,  "Taito Corporation", "Bubble Bobble (Japan, Ver 0.0)", GAME_SUPPORTS_SAVE )
-GAME( 1986, bublboblr,  bublbobl, bublbobl, bublbobl, bublbobl_state, bublbobl, ROT0,  "Taito America Corporation (Romstar license)", "Bubble Bobble (US, Ver 5.1)", GAME_SUPPORTS_SAVE ) // newest release, with mode select
-GAME( 1986, bublboblr1, bublbobl, bublbobl, bublbobl, bublbobl_state, bublbobl, ROT0,  "Taito America Corporation (Romstar license)", "Bubble Bobble (US, Ver 1.0)", GAME_SUPPORTS_SAVE )
+GAME( 1986, bublbobl,   0,        bublbobl, bublbobl,   bublbobl_state, bublbobl, ROT0,  "Taito Corporation", "Bubble Bobble (Japan, Ver 0.1)", GAME_SUPPORTS_SAVE )
+GAME( 1986, bublbobl1,  bublbobl, bublbobl, bublbobl,   bublbobl_state, bublbobl, ROT0,  "Taito Corporation", "Bubble Bobble (Japan, Ver 0.0)", GAME_SUPPORTS_SAVE )
+GAME( 1986, bublboblr,  bublbobl, bublbobl, bublbobl,   bublbobl_state, bublbobl, ROT0,  "Taito America Corporation (Romstar license)", "Bubble Bobble (US, Ver 5.1)", GAME_SUPPORTS_SAVE ) // newest release, with mode select
+GAME( 1986, bublboblr1, bublbobl, bublbobl, bublbobl,   bublbobl_state, bublbobl, ROT0,  "Taito America Corporation (Romstar license)", "Bubble Bobble (US, Ver 1.0)", GAME_SUPPORTS_SAVE )
 
-GAME( 1986, boblbobl,   bublbobl, boblbobl, boblbobl, bublbobl_state, bublbobl, ROT0,  "bootleg", "Bobble Bobble (set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1986, boblbobl2,  bublbobl, boblbobl, boblbobl2,bublbobl_state, bublbobl, ROT0,  "bootleg", "Super Bobble Bobble (Datsu bootleg)", GAME_SUPPORTS_SAVE )
-GAME( 1986, sboblboa,   bublbobl, boblbobl, boblbobl, bublbobl_state, bublbobl, ROT0,  "bootleg", "Super Bobble Bobble (set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1986, sboblbob,   bublbobl, boblbobl, sboblbob, bublbobl_state, bublbobl, ROT0,  "bootleg", "Super Bobble Bobble (set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1986, bub68705,   bublbobl, bub68705, bublbobl, bublbobl_state, bublbobl, ROT0,  "bootleg", "Bubble Bobble (bootleg with 68705)", GAME_SUPPORTS_SAVE )
+GAME( 1986, boblbobl,   bublbobl, boblbobl, boblbobl,   bublbobl_state, bublbobl, ROT0,  "bootleg", "Bobble Bobble (bootleg of Bubble Bobble)", GAME_SUPPORTS_SAVE )
+GAME( 1986, sboblbobl,  bublbobl, boblbobl, sboblbobl,  bublbobl_state, bublbobl, ROT0,  "bootleg (Datsu)", "Super Bobble Bobble (bootleg, set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1986, sboblbobla, bublbobl, boblbobl, boblbobl,   bublbobl_state, bublbobl, ROT0,  "bootleg", "Super Bobble Bobble (bootleg, set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1986, sboblboblb, bublbobl, boblbobl, sboblboblb, bublbobl_state, bublbobl, ROT0,  "bootleg", "Super Bobble Bobble (bootleg, set 3)", GAME_SUPPORTS_SAVE )
+GAME( 1986, bub68705,   bublbobl, bub68705, bublbobl,   bublbobl_state, bublbobl, ROT0,  "bootleg", "Bubble Bobble (bootleg with 68705)", GAME_SUPPORTS_SAVE )
 
-GAME( 1987, dland,      bublbobl, boblbobl, dland, bublbobl_state,    dland,    ROT0,  "bootleg", "Dream Land / Super Dream Land (bootleg of Bubble Bobble)", GAME_SUPPORTS_SAVE )
+GAME( 1987, dland,      bublbobl, boblbobl, dland,      bublbobl_state, dland,    ROT0,  "bootleg", "Dream Land / Super Dream Land (bootleg of Bubble Bobble)", GAME_SUPPORTS_SAVE )
