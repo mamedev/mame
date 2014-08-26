@@ -37,8 +37,6 @@
  
  TODO:
   - verify what happens when 2 POKEYs are present
-  - understand why high score in XM is not written to NVRAM
-  - add Yamaha YM2151 when more clear specs are available
 
 ***********************************************************************************************************/
 
@@ -73,7 +71,8 @@ a78_xboard_device::a78_xboard_device(const machine_config &mconfig, const char *
 
 
 a78_xm_device::a78_xm_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-					: a78_xboard_device(mconfig, A78_XM, "Atari 7800 XM expansion module", tag, owner, clock, "a78_xm", __FILE__)
+					: a78_xboard_device(mconfig, A78_XM, "Atari 7800 XM expansion module", tag, owner, clock, "a78_xm", __FILE__),
+						m_ym(*this, "xm_ym2151")
 {
 }
 
@@ -90,6 +89,20 @@ void a78_xboard_device::device_reset()
 	m_ram_bank = 0;
 }
 
+void a78_xm_device::device_start()
+{
+	save_item(NAME(m_reg));
+	save_item(NAME(m_ram_bank));
+	save_item(NAME(m_ym_enabled));
+}
+
+void a78_xm_device::device_reset()
+{
+	m_reg = 0;
+	m_ram_bank = 0;
+	m_ym_enabled = 0;
+}
+
 
 static MACHINE_CONFIG_FRAGMENT( a78_xb )
 	MCFG_A78_CARTRIDGE_ADD("xb_slot", a7800_cart, NULL)
@@ -100,11 +113,27 @@ static MACHINE_CONFIG_FRAGMENT( a78_xb )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "xb_speaker", 1.00)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_FRAGMENT( a78_xm )
+	MCFG_A78_CARTRIDGE_ADD("xb_slot", a7800_cart, NULL)
+
+	MCFG_SPEAKER_STANDARD_MONO("xb_speaker")
+
+	MCFG_SOUND_ADD("xb_pokey", POKEY, XTAL_14_31818MHz/8)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "xb_speaker", 1.00)
+
+	MCFG_SOUND_ADD("xm_ym2151", YM2151, XTAL_14_31818MHz/8)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "xb_speaker", 1.00)
+MACHINE_CONFIG_END
+
 machine_config_constructor a78_xboard_device::device_mconfig_additions() const
 {
 	return MACHINE_CONFIG_NAME( a78_xb );
 }
 
+machine_config_constructor a78_xm_device::device_mconfig_additions() const
+{
+	return MACHINE_CONFIG_NAME( a78_xm );
+}
 
 /*-------------------------------------------------
  mapper specific handlers
@@ -175,5 +204,34 @@ WRITE8_MEMBER(a78_xm_device::write_10xx)
 READ8_MEMBER(a78_xm_device::read_30xx)
 {
 	return m_rom[offset];
+}
+
+READ8_MEMBER(a78_xm_device::read_04xx)
+{
+	if (BIT(m_reg, 4) && offset >= 0x50 && offset < 0x60)
+		return m_pokey->read(space, offset & 0x0f);
+	else if (m_ym_enabled && offset >= 0x60 && offset <= 0x61)
+		return m_ym->read(space, offset & 1);
+	else if (BIT(m_reg, 4) && offset >= 0x60 && offset < 0x70)
+		return m_xbslot->read_04xx(space, offset - 0x10);	// access second POKEY
+	else
+		return 0xff;
+}
+
+WRITE8_MEMBER(a78_xm_device::write_04xx)
+{
+	if (BIT(m_reg, 4) && offset >= 0x50 && offset < 0x60)
+		m_pokey->write(space, offset & 0x0f, data);
+	else if (m_ym_enabled && offset >= 0x60 && offset <= 0x61)
+		m_ym->write(space, offset & 1, data);
+	else if (BIT(m_reg, 4) && offset >= 0x60 && offset < 0x70)
+		m_xbslot->write_04xx(space, offset - 0x10, data);	// access second POKEY
+	else if (offset >= 0x70 && offset < 0x80)
+	{
+		if (data == 0x84)
+			m_ym_enabled = 1;
+		m_reg = data;
+		m_ram_bank = m_reg & 7;
+	}
 }
 
