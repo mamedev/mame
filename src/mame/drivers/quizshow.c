@@ -11,7 +11,6 @@
 TODO:
 - preserve tape and hook it up, the game is not playable without it
 - is timing accurate?
-- correct dump for gfx roms
 
 ***************************************************************************/
 
@@ -423,7 +422,7 @@ ROM_START( quizshow )
 	ROM_REGION( 0x0800, "gfx1", ROMREGION_ERASEFF )
 
 	ROM_REGION( 0x0200, "user1", 0 ) // gfx1
-	ROM_LOAD_NIB_HIGH( "005466-01.m2", 0x0000, 0x0200, BAD_DUMP CRC(b2aa7578) SHA1(5c3eb80066420002bc3dcc7ca4ab6efad7ed4ae5) ) // missing rom, zerofilled
+	ROM_LOAD_NIB_HIGH( "005466-01.m2", 0x0000, 0x0200, BAD_DUMP CRC(03017820) SHA1(fd118aa706bdc6976e527ed63388fad01e66270e) ) // from Atari's source archive, may have some bad bits
 	ROM_LOAD_NIB_LOW ( "005466-02.n2", 0x0000, 0x0200, CRC(cd554367) SHA1(04da83eb6e2f86f88a3495072b98fbdaca485ae8) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
