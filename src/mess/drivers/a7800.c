@@ -97,13 +97,72 @@
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
 #include "sound/tiaintf.h"
-#include "bus/a7800/a78_carts.h"
+#include "sound/tiasound.h"
 #include "machine/6532riot.h"
-#include "includes/a7800.h"
+#include "video/maria.h"
+#include "bus/a7800/a78_carts.h"
 
 
 #define A7800_NTSC_Y1   XTAL_14_31818MHz
 #define CLK_PAL 1773447
+
+
+class a7800_state : public driver_device
+{
+public:
+	a7800_state(const machine_config &mconfig, device_type type, const char *tag)
+	: driver_device(mconfig, type, tag),
+	m_maincpu(*this, "maincpu"),
+	m_tia(*this, "tia"),
+	m_maria(*this, "maria"),
+	m_io_joysticks(*this, "joysticks"),
+	m_io_buttons(*this, "buttons"),
+	m_io_vblank(*this, "vblank"),
+	m_io_console_buttons(*this, "console_buttons"),
+	m_cartslot(*this, "cartslot"),
+	m_screen(*this, "screen") { }
+	
+	int m_lines;
+	int m_ispal;
+	
+	int m_ctrl_lock;
+	int m_ctrl_reg;
+	int m_maria_flag;
+	int m_p1_one_button;
+	int m_p2_one_button;
+	int m_bios_enabled;
+	
+	UINT8 *m_bios;
+	
+	DECLARE_READ8_MEMBER(bios_or_cart_r);
+	DECLARE_WRITE8_MEMBER(ram0_w);
+	DECLARE_READ8_MEMBER(tia_r);
+	DECLARE_WRITE8_MEMBER(tia_w);
+	DECLARE_READ8_MEMBER(maria_r);
+	DECLARE_WRITE8_MEMBER(maria_w);
+	DECLARE_DRIVER_INIT(a7800_pal);
+	DECLARE_DRIVER_INIT(a7800_ntsc);
+	virtual void machine_start();
+	virtual void machine_reset();
+	DECLARE_PALETTE_INIT(a7800);
+	DECLARE_PALETTE_INIT(a7800p);
+	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
+	TIMER_CALLBACK_MEMBER(maria_startdma);
+	DECLARE_READ8_MEMBER(riot_joystick_r);
+	DECLARE_READ8_MEMBER(riot_console_button_r);
+	DECLARE_WRITE8_MEMBER(riot_button_pullup_w);
+	
+protected:
+	required_device<cpu_device> m_maincpu;
+	required_device<tia_device> m_tia;
+	required_device<atari_maria_device> m_maria;
+	required_ioport m_io_joysticks;
+	required_ioport m_io_buttons;
+	required_ioport m_io_vblank;
+	required_ioport m_io_console_buttons;
+	required_device<a78_cart_slot_device> m_cartslot;
+	required_device<screen_device> m_screen;
+};
 
 
 /***************************************************************************
@@ -191,6 +250,22 @@ WRITE8_MEMBER(a7800_state::tia_w)
 }
 
 
+// TIMERS
+
+TIMER_DEVICE_CALLBACK_MEMBER(a7800_state::interrupt)
+{
+	// DMA Begins 7 cycles after hblank
+	machine().scheduler().timer_set(m_maincpu->cycles_to_attotime(7), timer_expired_delegate(FUNC(a7800_state::maria_startdma),this));
+	m_maria->interrupt(m_lines);
+}
+
+TIMER_CALLBACK_MEMBER(a7800_state::maria_startdma)
+{
+	m_maria->startdma(m_lines);
+}
+
+
+
 // ROM
 READ8_MEMBER(a7800_state::bios_or_cart_r)
 {
@@ -206,7 +281,7 @@ READ8_MEMBER(a7800_state::bios_or_cart_r)
 
 static ADDRESS_MAP_START( a7800_mem, AS_PROGRAM, 8, a7800_state )
 	AM_RANGE(0x0000, 0x001f) AM_MIRROR(0x300) AM_READWRITE(tia_r, tia_w)
-	AM_RANGE(0x0020, 0x003f) AM_MIRROR(0x300) AM_READWRITE(maria_r, maria_w)
+	AM_RANGE(0x0020, 0x003f) AM_MIRROR(0x300) AM_DEVREADWRITE("maria", atari_maria_device, read, write)
 	AM_RANGE(0x0040, 0x00ff) AM_RAMBANK("ram0")     // RAM (6116 block 0)
 	AM_RANGE(0x0140, 0x01ff) AM_RAMBANK("ram1")     // RAM (6116 block 1)
 	AM_RANGE(0x0280, 0x02ff) AM_DEVREADWRITE("riot", riot6532_device, read, write)
@@ -1272,16 +1347,19 @@ static MACHINE_CONFIG_START( a7800_ntsc, a7800_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, A7800_NTSC_Y1/8) /* 1.79 MHz (switches to 1.19 MHz on TIA or RIOT access) */
 	MCFG_CPU_PROGRAM_MAP(a7800_mem)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", a7800_state, a7800_interrupt, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", a7800_state, interrupt, "screen", 0, 1)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS( 7159090, 454, 0, 320, 263, 27, 27 + 192 + 32 )
-	MCFG_SCREEN_UPDATE_DRIVER(a7800_state, screen_update_a7800)
+	MCFG_SCREEN_UPDATE_DEVICE("maria", atari_maria_device, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", ARRAY_LENGTH(a7800_palette) / 3)
 	MCFG_PALETTE_INIT_OWNER(a7800_state, a7800)
+
+	MCFG_DEVICE_ADD("maria", ATARI_MARIA, 0)
+	MCFG_MARIA_DMACPU("maincpu")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

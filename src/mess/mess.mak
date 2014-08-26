@@ -1025,7 +1025,7 @@ $(MESSOBJ)/atari.a:             \
 	$(MESS_MACHINE)/atarifdc.o  \
 	$(MESS_DRIVERS)/atari400.o  \
 	$(MESS_DRIVERS)/a7800.o     \
-	$(MESS_VIDEO)/a7800.o       \
+	$(MESS_VIDEO)/maria.o       \
 	$(MESS_DRIVERS)/a2600.o     \
 	$(MESS_DRIVERS)/atarist.o   \
 	$(MESS_VIDEO)/atarist.o     \
