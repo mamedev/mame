@@ -48,6 +48,9 @@ public:
 	DECLARE_READ16_MEMBER( io_chip_r );
 	DECLARE_WRITE16_MEMBER( io_chip_w );
 	DECLARE_WRITE16_MEMBER( sound_data_w );
+	DECLARE_READ16_MEMBER(link_r);
+	DECLARE_READ16_MEMBER(link2_r);
+	DECLARE_WRITE16_MEMBER(link2_w);
 
 	// sound Z80 CPU read/write handlers
 	DECLARE_READ8_MEMBER( sound_data_r );
