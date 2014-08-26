@@ -1617,6 +1617,8 @@ int mips3_device::generate_opcode(drcuml_block *block, compiler_state *compiler,
 			return TRUE;
 
 		case 0x31:  /* LWC1 - MIPS I */
+			UML_TEST(block, CPR032(COP0_Status), SR_COP1);                          // test    [Status],SR_COP1
+			UML_EXHc(block, COND_Z, *m_exception[EXCEPTION_BADCOP], 1);				// exh     cop,1,Z
 			UML_ADD(block, I0, R32(RSREG), SIMMVAL);                        // add     i0,<rsreg>,SIMMVAL
 			UML_CALLH(block, *m_read32[m_core->mode >> 1]); // callh   read32
 			UML_MOV(block, FPR32(RTREG), I0);                                   // mov     <cpr1_rt>,i0
@@ -1625,6 +1627,8 @@ int mips3_device::generate_opcode(drcuml_block *block, compiler_state *compiler,
 			return TRUE;
 
 		case 0x35:  /* LDC1 - MIPS III */
+			UML_TEST(block, CPR032(COP0_Status), SR_COP1);                          // test    [Status],SR_COP1
+			UML_EXHc(block, COND_Z, *m_exception[EXCEPTION_BADCOP], 1);				// exh     cop,1,Z
 			UML_ADD(block, I0, R32(RSREG), SIMMVAL);                        // add     i0,<rsreg>,SIMMVAL
 			UML_CALLH(block, *m_read64[m_core->mode >> 1]); // callh   read64
 			UML_DMOV(block, FPR64(RTREG), I0);                                  // dmov    <cpr1_rt>,i0
@@ -1768,6 +1772,8 @@ int mips3_device::generate_opcode(drcuml_block *block, compiler_state *compiler,
 			return TRUE;
 
 		case 0x39:  /* SWC1 - MIPS I */
+			UML_TEST(block, CPR032(COP0_Status), SR_COP1);                          // test    [Status],SR_COP1
+			UML_EXHc(block, COND_Z, *m_exception[EXCEPTION_BADCOP], 1);				// exh     cop,1,Z
 			UML_ADD(block, I0, R32(RSREG), SIMMVAL);                        // add     i0,<rsreg>,SIMMVAL
 			UML_MOV(block, I1, FPR32(RTREG));                                   // mov     i1,<cpr1_rt>
 			UML_CALLH(block, *m_write32[m_core->mode >> 1]);    // callh   write32
@@ -1776,6 +1782,8 @@ int mips3_device::generate_opcode(drcuml_block *block, compiler_state *compiler,
 			return TRUE;
 
 		case 0x3d:  /* SDC1 - MIPS III */
+			UML_TEST(block, CPR032(COP0_Status), SR_COP1);                          // test    [Status],SR_COP1
+			UML_EXHc(block, COND_Z, *m_exception[EXCEPTION_BADCOP], 1);				// exh     cop,1,Z
 			UML_ADD(block, I0, R32(RSREG), SIMMVAL);                        // add     i0,<rsreg>,SIMMVAL
 			UML_DMOV(block, I1, FPR64(RTREG));                                  // dmov    i1,<cpr1_rt>
 			UML_CALLH(block, *m_write64[m_core->mode >> 1]);    // callh   write64
