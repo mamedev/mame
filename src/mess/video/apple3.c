@@ -154,7 +154,8 @@ void apple3_state::apple3_video_text40(bitmap_ind16 &bitmap)
 			offset = ram_size - 0x8000 + text_map[y] + x + (m_flags & VAR_VM2 ? 0x0400 : 0x0000);
 			ch = ram[offset];
 
-			if (m_flags & VAR_VM0)
+			// no color text in emulation mode
+			if ((m_flags & VAR_VM0) && (m_via_1_a & 0x40))
 			{
 				/* color text */
 				offset = ram_size - 0x8000 + text_map[y] + x + (m_flags & VAR_VM2 ? 0x0000 : 0x0400);
@@ -411,7 +412,7 @@ void apple3_state::apple3_video_graphics_chires(bitmap_ind16 &bitmap)
 
 UINT32 apple3_state::screen_update_apple3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-//  printf("gfx mode %x\n", m_flags & (VAR_VM3|VAR_VM1|VAR_VM0));
+//	printf("gfx mode %x\n", m_flags & (VAR_VM3|VAR_VM1|VAR_VM0));
 
 	switch(m_flags & (VAR_VM3|VAR_VM1|VAR_VM0))
 	{
