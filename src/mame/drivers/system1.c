@@ -4908,8 +4908,8 @@ GAME( 1986, gardia,     0,        sys1pio,  gardia, system1_state,    gardia,   
 GAME( 1986, brain,      0,        sys1pio,  brain, system1_state,     bank44,   ROT0,   "Coreland / Sega", "Brain", GAME_SUPPORTS_SAVE )
 
 /* System 2 */
-GAME( 1985, choplift,   0,        sys2rowm, choplift, system1_state,  choplift, ROT0,   "Sega",            "Choplifter (8751 315-5151)", GAME_SUPPORTS_SAVE )
-GAME( 1985, chopliftu,  choplift, sys2row,  choplift, system1_state,  bank0c,   ROT0,   "Sega",            "Choplifter (unprotected)", GAME_SUPPORTS_SAVE )
+GAME( 1985, choplift,   0,        sys2rowm, choplift, system1_state,  choplift, ROT0,   "Sega (licensed from Dan Gorlin)", "Choplifter (8751 315-5151)", GAME_SUPPORTS_SAVE )
+GAME( 1985, chopliftu,  choplift, sys2row,  choplift, system1_state,  bank0c,   ROT0,   "Sega (licensed from Dan Gorlin)", "Choplifter (unprotected)", GAME_SUPPORTS_SAVE )
 GAME( 1985, chopliftbl, choplift, sys2row,  choplift, system1_state,  bank0c,   ROT0,   "bootleg",         "Choplifter (bootleg)", GAME_SUPPORTS_SAVE )
 GAME( 1985, shtngmst,   0,        sys2m,    shtngmst, system1_state,  shtngmst, ROT0,   "Sega",            "Shooting Master (8751 315-5159)", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
 GAME( 1985, shtngmste,  shtngmst, sys2m,    shtngmst, system1_state,  shtngmst, ROT0,   "Sega / EVG",      "Shooting Master (EVG, 8751 315-5159a)", GAME_SUPPORTS_SAVE )
