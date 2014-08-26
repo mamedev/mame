@@ -405,12 +405,12 @@ MACHINE_CONFIG_END
 
 
 /*-----------------------------------------------------------
-/ Atlantis
+/ Atlantis #2006
 /-----------------------------------------------------------*/
 ROM_START(atlantip)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD( "u26_cpu.rom", 0x8000, 0x4000, CRC(b98491e1) SHA1(b867e2b24e93c4ee19169fe93c0ebfe0c1e2fc25))
-	ROM_LOAD( "u27_cpu.rom", 0xc000, 0x4000, CRC(8ea2b4db) SHA1(df55a9fb70d1cabad51dc2b089af7904a823e1d8) )
+	ROM_LOAD( "u27_cpu.rom", 0xc000, 0x4000, CRC(8ea2b4db) SHA1(df55a9fb70d1cabad51dc2b089af7904a823e1d8))
 	ROM_REGION(0x10000, "cpu2", ROMREGION_ERASEFF)
 	ROM_REGION(0x30000, "sound1", 0)
 	ROM_LOAD("u4_snd.rom", 0x00000, 0x8000, CRC(6a48b588) SHA1(c58dbfd920c279d7b9d2de8558d73c687b29ce9c))
@@ -422,11 +422,11 @@ ROM_START(atlantip)
 ROM_END
 
 /*------------------------------------
-/ Beat the Clock
+/ Beat the Clock #OC70
 /------------------------------------*/
 ROM_START(beatclck)
 	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD( "btc_u3.cpu", 0xc000, 0x4000, CRC(9ba822ab) SHA1(f28d38411df3978bcaf24177fa1b47037a586cbb) )
+	ROM_LOAD( "btc_u3.cpu", 0xc000, 0x4000, CRC(9ba822ab) SHA1(f28d38411df3978bcaf24177fa1b47037a586cbb))
 	ROM_REGION(0x10000, "cpu2", 0)
 	ROM_LOAD("btc_u2.snd", 0xc000, 0x1000, CRC(fd22fd2a) SHA1(efad3b94e91d07930ada5366d389f35377dfbd99))
 	ROM_LOAD("btc_u3.snd", 0xd000, 0x1000, CRC(22311a4a) SHA1(2c22ba9228e44e68b9308b3bf8803edcd70fa5b9))
@@ -439,12 +439,12 @@ ROM_END
 /------------------------------------*/
 
 /*------------------------------------
-/ Black Belt
+/ Black Belt #OE52
 /------------------------------------*/
 ROM_START(blackblt)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD( "u2.cpu", 0x8000, 0x4000, CRC(7c771910) SHA1(1df8ae478c3626a5200215bfca557ca42e064d2b))
-	ROM_LOAD( "u3.cpu", 0xc000, 0x4000, CRC(bad0f4c3) SHA1(5e5240fda9f7f7f15f1953f12b132ba1c4fc886e) )
+	ROM_LOAD( "u3.cpu", 0xc000, 0x4000, CRC(bad0f4c3) SHA1(5e5240fda9f7f7f15f1953f12b132ba1c4fc886e))
 	ROM_REGION(0x10000, "cpu2", 0)
 	ROM_LOAD("blck_u7.snd", 0x8000, 0x8000, CRC(db8bce07) SHA1(6327cfbb2761f4d190e2852f3321cdd0cc1e46a8))
 ROM_END
@@ -452,7 +452,7 @@ ROM_END
 ROM_START(blackblt2)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD( "cpu_u2.cpu", 0x8000, 0x4000, CRC(b86d16ec) SHA1(2e4601e725261aca67e4d706f310b14eb7578d8b))
-	ROM_LOAD( "cpu_u3.cpu", 0xc000, 0x4000, CRC(c63e3e6f) SHA1(cd3f66c3796eaf64c36cabba9d74cc8c690d9d8b) )
+	ROM_LOAD( "cpu_u3.cpu", 0xc000, 0x4000, CRC(c63e3e6f) SHA1(cd3f66c3796eaf64c36cabba9d74cc8c690d9d8b))
 	ROM_REGION(0x10000, "cpu2", 0)
 	ROM_LOAD("blb_u2.snd", 0xc000, 0x1000, NO_DUMP)
 	ROM_LOAD("blb_u3.snd", 0xd000, 0x1000, NO_DUMP)
@@ -461,7 +461,7 @@ ROM_START(blackblt2)
 ROM_END
 
 /*------------------------------------
-/ Blackwater 100
+/ Blackwater 100 #OH07
 /------------------------------------*/
 ROM_START(black100)
 	ROM_REGION(0x10000, "maincpu", 0)
@@ -486,23 +486,23 @@ ROM_START(black100s)
 ROM_END
 
 /*------------------------------------
-/ City Slicker
+/ City Slicker #OE79
 /------------------------------------*/
 ROM_START(cityslck)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD( "u2.128", 0x8000, 0x4000, CRC(94bcf162) SHA1(1d83592ad2441fc5e4c6fd3ab2373614dfe78b34))
-	ROM_LOAD( "u3.128", 0xc000, 0x4000, CRC(97cb2bca) SHA1(0cbd49bbce2ce26c720d8a52bd4d1256f0ac61b3) )
+	ROM_LOAD( "u3.128", 0xc000, 0x4000, CRC(97cb2bca) SHA1(0cbd49bbce2ce26c720d8a52bd4d1256f0ac61b3))
 	ROM_REGION(0x10000, "cpu2", 0)
 	ROM_LOAD("u7_snd.512", 0x0000, 0x10000, CRC(6941d68a) SHA1(28de4327f328d16ec4cab59642c185777535efb2))
 ROM_END
 
 /*------------------------------------
-/ Dungeons & Dragons
+/ Dungeons & Dragons #OH06
 /------------------------------------*/
 ROM_START(dungdrag)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD( "cpu_u2.128", 0x8000, 0x4000, CRC(cefd4330) SHA1(0bffb2b73229e9908a018e06daeceb736896e5f0))
-	ROM_LOAD( "cpu_u3.128", 0xc000, 0x4000, CRC(4bacc7f5) SHA1(71dd898924e0e968c4f3ba8a261e6b382d8ae0f1) )
+	ROM_LOAD( "cpu_u3.128", 0xc000, 0x4000, CRC(4bacc7f5) SHA1(71dd898924e0e968c4f3ba8a261e6b382d8ae0f1))
 	ROM_REGION(0x01000000, "cpu2", 0)
 	ROM_LOAD16_BYTE("snd_u12.512", 0x00001, 0x10000, CRC(dd95f851) SHA1(6fa46b512bced0d1862b2621e195ef0dfd24f928))
 	ROM_LOAD16_BYTE("snd_u11.512", 0x00000, 0x10000, CRC(dcd461b3) SHA1(834000cfb6c6acf5c296db58971251819971f4de))
@@ -511,11 +511,11 @@ ROM_START(dungdrag)
 ROM_END
 
 /*------------------------------------
-/ Eight Ball Champ
+/ Eight Ball Champ #OB38
 /------------------------------------*/
 ROM_START(eballchp)
 	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD( "u3_cpu.128", 0xc000, 0x4000, CRC(025f3008) SHA1(25d310f169b92ce6b348330816ddc3b5710e57da) )
+	ROM_LOAD( "u3_cpu.128", 0xc000, 0x4000, CRC(025f3008) SHA1(25d310f169b92ce6b348330816ddc3b5710e57da))
 	ROM_REGION(0x10000, "cpu2", 0)
 	ROM_LOAD("u3_snd.532", 0xd000, 0x1000, CRC(4836d70d) SHA1(a4acc64609d91a84ba4c8101186d07397b496600))
 	ROM_LOAD("u4_snd.532", 0xe000, 0x1000, CRC(4b49d94d) SHA1(52d5f4b7604601cd86f0e80ed7c4fe09d14f5976))
@@ -525,7 +525,7 @@ ROM_END
 #ifdef MISSING_GAME // same as above but with CPU2 roms as NO_DUMP
 ROM_START(eballch2)
 	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD( "u3_cpu.128", 0xc000, 0x4000, CRC(025f3008) SHA1(25d310f169b92ce6b348330816ddc3b5710e57da) )
+	ROM_LOAD( "u3_cpu.128", 0xc000, 0x4000, CRC(025f3008) SHA1(25d310f169b92ce6b348330816ddc3b5710e57da))
 	ROM_REGION(0x10000, "cpu2", 0)
 	ROM_LOAD("ebcu4.snd", 0x8000, 0x2000, NO_DUMP)
 	ROM_RELOAD(0xa000, 0x2000)
@@ -535,7 +535,7 @@ ROM_END
 #endif
 
 /*------------------------------------------------
-/ Escape from the Lost World
+/ Escape from the Lost World #OH05
 /-----------------------------------------------*/
 ROM_START(esclwrld)
 	ROM_REGION(0x10000, "maincpu", 0)
@@ -559,7 +559,7 @@ ROM_START(esclwrldg)
 	ROM_LOAD16_BYTE("u13.512", 0x20000, 0x10000, CRC(b056842e) SHA1(7c67e5d69235a784b9c38cb31302d206278a3814))
 ROM_END
 /*------------------------------------
-/ Hardbody
+/ Hardbody #OE94
 /------------------------------------*/
 ROM_START(hardbody)
 	ROM_REGION(0x10000, "maincpu", 0)
@@ -578,23 +578,23 @@ ROM_START(hardbodyg)
 ROM_END
 
 /*-----------------------------------------
-/ Heavy Metal Meltdown
+/ Heavy Metal Meltdown #OH03
 /-----------------------------------------*/
 ROM_START(hvymetap)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD( "u2.rom", 0x8000, 0x4000, CRC(53466e4e) SHA1(af6d0e15821ff707f24bb99b8d9dfb9f929906db))
-	ROM_LOAD( "u3.rom", 0xc000, 0x4000, CRC(0a08ae7e) SHA1(04f295fbe3a7bd7b929556338914c0ed94a77d62) )
+	ROM_LOAD( "u3.rom", 0xc000, 0x4000, CRC(0a08ae7e) SHA1(04f295fbe3a7bd7b929556338914c0ed94a77d62))
 	ROM_REGION(0x01000000, "cpu2", 0)
 	ROM_LOAD16_BYTE("u12.rom", 0x00001, 0x10000, CRC(77933258) SHA1(42a01e97440dbb7d3da92dbfbad2516f4b553a5f))
 	ROM_LOAD16_BYTE("u11.rom", 0x00000, 0x10000, CRC(b7e4de7d) SHA1(bcc89e10c368cdbc5137d8f585e109c0be25522d))
 ROM_END
 
 /*------------------------------------
-/ Lady Luck
+/ Lady Luck #OE34
 /------------------------------------*/
 ROM_START(ladyluck)
 	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD( "u3.cpu", 0xc000, 0x4000, CRC(129f41f5) SHA1(0351419814d3f4e98a4572fdec9d53e12fe6b6be) )
+	ROM_LOAD( "u3.cpu", 0xc000, 0x4000, CRC(129f41f5) SHA1(0351419814d3f4e98a4572fdec9d53e12fe6b6be))
 	ROM_REGION(0x10000, "cpu2", 0)
 	ROM_LOAD("u4_snd.532", 0x8000, 0x2000, CRC(e9ef01e6) SHA1(79191e776b6683b259cd1a80e9fb3183268bde56))
 	ROM_RELOAD(0xa000, 0x2000)
@@ -603,23 +603,23 @@ ROM_START(ladyluck)
 ROM_END
 
 /*--------------------------------
-/ MotorDome
+/ MotorDome #OE14
 /-------------------------------*/
 ROM_START(motrdome)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD( "modm_u2.dat", 0x8000, 0x4000, CRC(820ca073) SHA1(0b50712f7d65f629af934deccc52d588f390a05b))
-	ROM_LOAD( "modm_u3.dat", 0xc000, 0x4000, CRC(aae7c418) SHA1(9d3ea83ffff0b9696f5113043475c6e9b9a464ae) )
+	ROM_LOAD( "modm_u3.dat", 0xc000, 0x4000, CRC(aae7c418) SHA1(9d3ea83ffff0b9696f5113043475c6e9b9a464ae))
 	ROM_REGION(0x10000, "cpu2", 0)
 	ROM_LOAD("modm_u7.snd", 0x8000, 0x8000, CRC(29ce4679) SHA1(f17998198b542dd99a34abd678db7e031bde074b))
 ROM_END
 
 /*--------------------------------
-/ Party Animal
+/ Party Animal #OH01
 /-------------------------------*/
 ROM_START(prtyanim)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD( "cpu_u2.128", 0x8000, 0x4000, CRC(abdc0b2d) SHA1(b93c7248ea83461101383023bd4e4a50292d8570))
-	ROM_LOAD( "cpu_u3.128", 0xc000, 0x4000, CRC(e48b2d63) SHA1(190fc5a805bda9617c08a29c0bde4d94a77279e9) )
+	ROM_LOAD( "cpu_u3.128", 0xc000, 0x4000, CRC(e48b2d63) SHA1(190fc5a805bda9617c08a29c0bde4d94a77279e9))
 	ROM_REGION(0x01000000, "cpu2", 0)
 	ROM_LOAD16_BYTE("snd_u12.512", 0x00001, 0x10000, CRC(265a9494) SHA1(3b631f2b1c8c685aef32fb6c5289cd792711ff7e))
 	ROM_LOAD16_BYTE("snd_u11.512", 0x00000, 0x10000, CRC(20be998f) SHA1(7f98073d0f559e081b2d6dc8c1f3462e3fe9a713))
@@ -630,7 +630,7 @@ ROM_END
 ROM_START(prtyanimg)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD( "cpu_u2g.128", 0x8000, 0x4000, CRC(8abf40a2) SHA1(04ac296c99bc176faf21f1277ff59228a2031715))
-	ROM_LOAD( "cpu_u3g.128", 0xc000, 0x4000, CRC(e781dd4b) SHA1(3395ddd2d774c83cac98b6d67415d3c8cd0b04fe) )
+	ROM_LOAD( "cpu_u3g.128", 0xc000, 0x4000, CRC(e781dd4b) SHA1(3395ddd2d774c83cac98b6d67415d3c8cd0b04fe))
 	ROM_REGION(0x01000000, "cpu2", 0)
 	ROM_LOAD16_BYTE("snd_u12.512", 0x00001, 0x10000, CRC(265a9494) SHA1(3b631f2b1c8c685aef32fb6c5289cd792711ff7e))
 	ROM_LOAD16_BYTE("snd_u11.512", 0x00000, 0x10000, CRC(20be998f) SHA1(7f98073d0f559e081b2d6dc8c1f3462e3fe9a713))
@@ -639,12 +639,12 @@ ROM_START(prtyanimg)
 ROM_END
 
 /*------------------------------------
-/ Special Force - 1st Game to use Sounds Deluxe Sound Hardware
+/ Special Force #OE47 - 1st Game to use Sounds Deluxe Sound Hardware
 /------------------------------------*/
 ROM_START(specforc)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD( "u2_revc.128", 0x8000, 0x4000, CRC(d042af04) SHA1(0a73ee6d3ce603899fd89de70f90e9efc58b8b42))
-	ROM_LOAD( "u3_revc.128", 0xc000, 0x4000, CRC(d48a5eaf) SHA1(90a5d5e928abfec699bae9d0087e90316339058f) )
+	ROM_LOAD( "u3_revc.128", 0xc000, 0x4000, CRC(d48a5eaf) SHA1(90a5d5e928abfec699bae9d0087e90316339058f))
 	ROM_REGION(0x01000000, "cpu2", 0)
 	ROM_LOAD16_BYTE("u12_snd.512", 0x00001, 0x10000, CRC(4f48a490) SHA1(6c9a594ecc68adf3b1eda315c4704e1d025a3442))
 	ROM_LOAD16_BYTE("u11_snd.512", 0x00000, 0x10000, CRC(b16eb713) SHA1(461e5ed82891d17849984137536bc6d1ab2907c2))
@@ -653,12 +653,12 @@ ROM_START(specforc)
 ROM_END
 
 /*------------------------------------
-/ Strange Science
+/ Strange Science #OE35
 /------------------------------------*/
 ROM_START(strngsci)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD( "cpu_u2.128", 0x8000, 0x4000, CRC(2ffcf284) SHA1(27d66806708c983092bab4ed6965c2e91e69acdc))
-	ROM_LOAD( "cpu_u3.128", 0xc000, 0x4000, CRC(35257931) SHA1(d3d6b84e50677a4c5f9d5c13c9522ad6d3a1358d) )
+	ROM_LOAD( "cpu_u3.128", 0xc000, 0x4000, CRC(35257931) SHA1(d3d6b84e50677a4c5f9d5c13c9522ad6d3a1358d))
 	ROM_REGION(0x10000, "cpu2", 0)
 	ROM_LOAD("sound_u7.256", 0x8000, 0x8000, CRC(bc33901e) SHA1(5231d8f01a107742acee2d13580a461063018a11))
 ROM_END
@@ -666,13 +666,13 @@ ROM_END
 ROM_START(strngscg)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD( "cpub_u2.128", 0x8000, 0x4000, CRC(48ef1052) SHA1(afcb0520ab834c0d6ef4a73f615c48653ccedc24))
-	ROM_LOAD( "cpub_u3.128", 0xc000, 0x4000, CRC(da5b4b3b) SHA1(ff9babf2efc6622803db9ba8712dd8b76c8412b8) )
+	ROM_LOAD( "cpub_u3.128", 0xc000, 0x4000, CRC(da5b4b3b) SHA1(ff9babf2efc6622803db9ba8712dd8b76c8412b8))
 	ROM_REGION(0x10000, "cpu2", 0)
 	ROM_LOAD("sound_u7.256", 0x8000, 0x8000, CRC(bc33901e) SHA1(5231d8f01a107742acee2d13580a461063018a11))
 ROM_END
 
 /*-------------------------------------------------------------
-/ Truck Stop
+/ Truck Stop #2001
 /-------------------------------------------------------------*/
 ROM_START(trucksp3)
 	ROM_REGION(0x10000, "maincpu", 0)
@@ -703,26 +703,26 @@ ROM_START(trucksp2)
 ROM_END
 
 
-GAME( 1989, atlantip, 0,        by6803, by6803, by6803_state, by6803, ROT0, "Bally","Atlantis", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1985, beatclck, 0,        by6803, by6803, by6803_state, by6803, ROT0, "Bally","Beat the Clock", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1986, blackblt, 0,        by6803, by6803, by6803_state, by6803, ROT0, "Bally","Black Belt", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1986, blackblt2,blackblt, by6803, by6803, by6803_state, by6803, ROT0, "Bally","Black Belt (Squawk and Talk)", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1988, black100, 0,        by6803, by6803, by6803_state, by6803, ROT0, "Bally","Blackwater 100", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1988, black100s, black100,    by6803, by6803, by6803_state, by6803, ROT0, "Bally","Blackwater 100 (Single Ball Play)", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1987, cityslck, 0,        by6803, by6803, by6803_state, by6803, ROT0, "Bally","City Slicker", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1987, dungdrag, 0,        by6803, by6803, by6803_state, by6803, ROT0, "Bally","Dungeons & Dragons", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1985, eballchp, 0,        by6803, by6803, by6803_state, by6803, ROT0, "Bally","Eight Ball Champ", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1987, esclwrld, 0,        by6803, by6803, by6803_state, by6803, ROT0, "Bally","Escape from the Lost World", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1987, esclwrldg, esclwrld,    by6803, by6803, by6803_state, by6803, ROT0, "Bally","Escape from the Lost World (German)", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1987, hardbody, 0,        by6803, by6803, by6803_state, by6803, ROT0, "Bally","Hardbody", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1987, hardbodyg, hardbody,    by6803, by6803, by6803_state, by6803, ROT0, "Bally","Hardbody (German)", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1987, hvymetap, 0,        by6803, by6803, by6803_state, by6803, ROT0, "Bally","Heavy Metal Meltdown", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1986, ladyluck, 0,        by6803, by6803, by6803_state, by6803, ROT0, "Bally","Lady Luck", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1986, motrdome, 0,        by6803, by6803, by6803_state, by6803, ROT0, "Bally","MotorDome", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1987, prtyanim, 0,        by6803, by6803, by6803_state, by6803, ROT0, "Bally","Party Animal", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1987, prtyanimg,prtyanim, by6803, by6803, by6803_state, by6803, ROT0, "Bally","Party Animal (German)", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1986, specforc, 0,        by6803, by6803, by6803_state, by6803, ROT0, "Bally","Special Force", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1986, strngsci, 0,        by6803, by6803, by6803_state, by6803, ROT0, "Bally","Strange Science", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1986, strngscg, strngsci, by6803, by6803, by6803_state, by6803, ROT0, "Bally","Strange Science (German)", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1988, trucksp3, 0,        by6803, by6803, by6803_state, by6803, ROT0, "Bally","Truck Stop (P-3)", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1988, trucksp2, trucksp3, by6803, by6803, by6803_state, by6803, ROT0, "Bally","Truck Stop (P-2)", GAME_IS_SKELETON_MECHANICAL)
+GAME( 1985, eballchp,  0,        by6803, by6803, by6803_state, by6803, ROT0, "Bally","Eight Ball Champ", GAME_IS_SKELETON_MECHANICAL)
+GAME( 1985, beatclck,  0,        by6803, by6803, by6803_state, by6803, ROT0, "Bally","Beat the Clock", GAME_IS_SKELETON_MECHANICAL)
+GAME( 1986, motrdome,  0,        by6803, by6803, by6803_state, by6803, ROT0, "Bally","MotorDome", GAME_IS_SKELETON_MECHANICAL)
+GAME( 1986, ladyluck,  0,        by6803, by6803, by6803_state, by6803, ROT0, "Bally","Lady Luck", GAME_IS_SKELETON_MECHANICAL)
+GAME( 1986, strngsci,  0,        by6803, by6803, by6803_state, by6803, ROT0, "Bally","Strange Science", GAME_IS_SKELETON_MECHANICAL)
+GAME( 1986, strngscg,  strngsci, by6803, by6803, by6803_state, by6803, ROT0, "Bally","Strange Science (German)", GAME_IS_SKELETON_MECHANICAL)
+GAME( 1986, specforc,  0,        by6803, by6803, by6803_state, by6803, ROT0, "Bally","Special Force", GAME_IS_SKELETON_MECHANICAL)
+GAME( 1986, blackblt,  0,        by6803, by6803, by6803_state, by6803, ROT0, "Bally","Black Belt", GAME_IS_SKELETON_MECHANICAL)
+GAME( 1986, blackblt2, blackblt, by6803, by6803, by6803_state, by6803, ROT0, "Bally","Black Belt (Squawk and Talk)", GAME_IS_SKELETON_MECHANICAL)
+GAME( 1987, cityslck,  0,        by6803, by6803, by6803_state, by6803, ROT0, "Bally","City Slicker", GAME_IS_SKELETON_MECHANICAL)
+GAME( 1987, hardbody,  0,        by6803, by6803, by6803_state, by6803, ROT0, "Bally","Hardbody", GAME_IS_SKELETON_MECHANICAL)
+GAME( 1987, hardbodyg, hardbody, by6803, by6803, by6803_state, by6803, ROT0, "Bally","Hardbody (German)", GAME_IS_SKELETON_MECHANICAL)
+GAME( 1987, prtyanim,  0,        by6803, by6803, by6803_state, by6803, ROT0, "Bally","Party Animal", GAME_IS_SKELETON_MECHANICAL)
+GAME( 1987, prtyanimg, prtyanim, by6803, by6803, by6803_state, by6803, ROT0, "Bally","Party Animal (German)", GAME_IS_SKELETON_MECHANICAL)
+GAME( 1987, hvymetap,  0,        by6803, by6803, by6803_state, by6803, ROT0, "Bally","Heavy Metal Meltdown", GAME_IS_SKELETON_MECHANICAL)
+GAME( 1987, esclwrld,  0,        by6803, by6803, by6803_state, by6803, ROT0, "Bally","Escape from the Lost World", GAME_IS_SKELETON_MECHANICAL)
+GAME( 1987, esclwrldg, esclwrld, by6803, by6803, by6803_state, by6803, ROT0, "Bally","Escape from the Lost World (German)", GAME_IS_SKELETON_MECHANICAL)
+GAME( 1987, dungdrag,  0,        by6803, by6803, by6803_state, by6803, ROT0, "Bally","Dungeons & Dragons", GAME_IS_SKELETON_MECHANICAL)
+GAME( 1988, black100,  0,        by6803, by6803, by6803_state, by6803, ROT0, "Bally","Blackwater 100", GAME_IS_SKELETON_MECHANICAL)
+GAME( 1988, black100s, black100, by6803, by6803, by6803_state, by6803, ROT0, "Bally","Blackwater 100 (Single Ball Play)", GAME_IS_SKELETON_MECHANICAL)
+GAME( 1988, trucksp3,  0,        by6803, by6803, by6803_state, by6803, ROT0, "Bally","Truck Stop (P-3)", GAME_IS_SKELETON_MECHANICAL)
+GAME( 1988, trucksp2,  trucksp3, by6803, by6803, by6803_state, by6803, ROT0, "Bally","Truck Stop (P-2)", GAME_IS_SKELETON_MECHANICAL)
+GAME( 1989, atlantip,  0,        by6803, by6803, by6803_state, by6803, ROT0, "Bally","Atlantis", GAME_IS_SKELETON_MECHANICAL)

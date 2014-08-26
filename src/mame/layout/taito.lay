@@ -120,6 +120,9 @@
 		<bezel name="digit27" element="digit">
 			<bounds left="54" top="345" right="88" bottom="384" />
 		</bezel>
+		<bezel name="digit31" element="digit">
+			<bounds left="122" top="345" right="156" bottom="384" />
+		</bezel>
 		<bezel name="digit24" element="digit">
 			<bounds left="186" top="345" right="220" bottom="384" />
 		</bezel>

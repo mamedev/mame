@@ -819,6 +819,15 @@ ROM_START(trident)
 	ROM_LOAD( "cpu_u6.716", 0x0800, 0x0800, CRC(540bce56) SHA1(0b21385501b83e448403e0216371487ed54026b7))
 ROM_END
 
+/*-------------------------------------
+/ Cosmic Princess #111 - same ROMs as Magic
+/-------------------------------------*/
+ROM_START(princess)
+	ROM_REGION(0x1000, "roms", 0)
+	ROM_LOAD( "cpu_u2.716", 0x0000, 0x0800, CRC(8838091f) SHA1(d2702b5e15076793b4560c77b78eed6c1da571b6))
+	ROM_LOAD( "cpu_u6.716", 0x0800, 0x0800, CRC(fb955a6f) SHA1(387080d5af318463475797fecff026d6db776a0c))
+ROM_END
+
 /*--------------------------------
 / Hot Hand #112
 /-------------------------------*/
@@ -832,15 +841,6 @@ ROM_END
 / Magic #115 - 2nd rom same as hothand
 /-------------------------------------*/
 ROM_START(magic)
-	ROM_REGION(0x1000, "roms", 0)
-	ROM_LOAD( "cpu_u2.716", 0x0000, 0x0800, CRC(8838091f) SHA1(d2702b5e15076793b4560c77b78eed6c1da571b6))
-	ROM_LOAD( "cpu_u6.716", 0x0800, 0x0800, CRC(fb955a6f) SHA1(387080d5af318463475797fecff026d6db776a0c))
-ROM_END
-
-/*-------------------------------------
-/ Cosmic Princess - same ROMs as Magic
-/-------------------------------------*/
-ROM_START(princess)
 	ROM_REGION(0x1000, "roms", 0)
 	ROM_LOAD( "cpu_u2.716", 0x0000, 0x0800, CRC(8838091f) SHA1(d2702b5e15076793b4560c77b78eed6c1da571b6))
 	ROM_LOAD( "cpu_u6.716", 0x0800, 0x0800, CRC(fb955a6f) SHA1(387080d5af318463475797fecff026d6db776a0c))
@@ -861,5 +861,5 @@ GAME(1979,  dracula,    0,      st_mp100,   mp100, driver_device, 0,   ROT0,   "
 // different inputs
 GAME(1979,  trident,    0,      st_mp100,   mp200, driver_device, 0,   ROT0,   "Stern", "Trident", GAME_MECHANICAL | GAME_NO_SOUND )
 GAME(1979,  hothand,    0,      st_mp100,   mp200, driver_device, 0,   ROT0,   "Stern", "Hot Hand", GAME_MECHANICAL | GAME_NO_SOUND )
-GAME(1979,  magic,      0,      st_mp100,   mp200, driver_device, 0,   ROT0,   "Stern", "Magic", GAME_MECHANICAL | GAME_NO_SOUND )
 GAME(1979,  princess,   0,      st_mp100,   mp200, driver_device, 0,   ROT0,   "Stern", "Cosmic Princess", GAME_MECHANICAL | GAME_NO_SOUND )
+GAME(1979,  magic,      0,      st_mp100,   mp200, driver_device, 0,   ROT0,   "Stern", "Magic", GAME_MECHANICAL | GAME_NO_SOUND )
