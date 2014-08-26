@@ -15,7 +15,7 @@ Other       :   Mitsubishi M60067-0901FP 452100 (208pin PQFP, GA1)
 ---------------------------------------------------------------------------
 Year + Game
 ---------------------------------------------------------------------------
-95  Go Go! Mile Smile
+95  Susume! Mile Smile / Go Go! Mile Smile
 96  Gyakuten!! Puzzle Bancho
 ---------------------------------------------------------------------------
 
@@ -24,7 +24,7 @@ Do NOT trust the Service Mode for dipswitch settings for Go Go! Mile Smile:
   setting of Coin B and only uses the settings for Coin A, except for Coin B "Free Play"
   The game says Press 1 or 2, and will start the game, but jumps right to the Game Over
   and "Continue" countdown.
-The Service Mode is WAY off on effects of dipswitches for the Japanese set!!! It reports
+The Service Mode is WAY off on effects of dipswitches for the ealier set!!! It reports
   the effects of MAME's SW1:3-8 have been moved to SW1:2-7 and Demo Sound has moved to
   SW2:7. What MAME shows as settings are according to actual game effect and reflect what
   the manual states.
@@ -197,7 +197,7 @@ static INPUT_PORTS_START( gogomile )
 	PORT_DIPSETTING(      0x000c, DEF_STR( Normal ) )
 	PORT_DIPSETTING(      0x0008, DEF_STR( Hard ) )
 	PORT_DIPSETTING(      0x0004, DEF_STR( Very_Hard ) )
-	PORT_DIPNAME( 0x0030, 0x0020, DEF_STR( Language ) ) PORT_DIPLOCATION("SW1:5,6") /* Default Language: English */
+	PORT_DIPNAME( 0x0030, 0x0030, DEF_STR( Language ) ) PORT_DIPLOCATION("SW1:5,6")
 	PORT_DIPSETTING(      0x0010, DEF_STR( Chinese ) )
 	PORT_DIPSETTING(      0x0030, DEF_STR( Japanese ) ) /* Only setting to give a "For use only in...." Copyright Notice */
 	PORT_DIPSETTING(      0x0000, DEF_STR( Korean ) )
@@ -237,17 +237,11 @@ static INPUT_PORTS_START( gogomile )
 */
 INPUT_PORTS_END
 
-/* Same as gogomile, but the default country is different and the coinage settings too. */
-static INPUT_PORTS_START( gogomilej )
+
+static INPUT_PORTS_START( gogomileo )	/* The ealier version has different coinage settings. */
 	PORT_INCLUDE( gogomile )
 
 	PORT_MODIFY("DSW")      // $880000.w
-	PORT_DIPNAME( 0x0030, 0x0030, DEF_STR( Language ) )     PORT_DIPLOCATION("SW1:5,6") /* Default Language: Japanese */
-	PORT_DIPSETTING(      0x0010, DEF_STR( Chinese ) )
-	PORT_DIPSETTING(      0x0030, DEF_STR( Japanese ) ) /* Only setting to give a "For use only in...." Copyright Notice */
-	PORT_DIPSETTING(      0x0000, DEF_STR( Korean ) )
-	PORT_DIPSETTING(      0x0020, DEF_STR( English ) )
-
 	PORT_DIPNAME( 0x1c00, 0x1c00, DEF_STR( Coin_A ) )   PORT_DIPLOCATION("SW2:3,4,5")
 	PORT_DIPSETTING(      0x1800, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(      0x1400, DEF_STR( 3C_1C ) )
@@ -450,10 +444,10 @@ void fuuki16_state::machine_reset()
 static MACHINE_CONFIG_START( fuuki16, fuuki16_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz / 2)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz / 2) /* 16 MHz */
 	MCFG_CPU_PROGRAM_MAP(fuuki16_map)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_12MHz / 2)
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_12MHz / 2) /* 6 MHz */
 	MCFG_CPU_PROGRAM_MAP(fuuki16_sound_map)
 	MCFG_CPU_IO_MAP(fuuki16_sound_io_map)
 
@@ -474,16 +468,16 @@ static MACHINE_CONFIG_START( fuuki16, fuuki16_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("ym1", YM2203, XTAL_12MHz / 3)
+	MCFG_SOUND_ADD("ym1", YM2203, XTAL_28_64MHz / 8) /* 3.58 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.15)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.15)
 
-	MCFG_SOUND_ADD("ym2", YM3812, XTAL_12MHz / 3)
+	MCFG_SOUND_ADD("ym2", YM3812, XTAL_28_64MHz / 8) /* 3.58 MHz */
 	MCFG_YM3812_IRQ_HANDLER(WRITELINE(fuuki16_state, soundirq))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.30)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.30)
 
-	MCFG_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", XTAL_32MHz / 32, OKIM6295_PIN7_HIGH) /* 1 Mhz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.85)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.85)
 MACHINE_CONFIG_END
@@ -509,20 +503,20 @@ Sound: Z80 YM2203C YM3812 M6295 Y3014Bx2
 OSC  : 32.00000MHz(OSC1) 28.64000MHz(OSC2) 12.000MHz(Xtal1)
 
 ROMs:
-fp2.2 - Main programs (27c4000)
-fp1.1 /
+fp2.rom2 - Main programs (27c4000)
+fp1.rom1 /
 
-lh538n1d.25 - Samples (Sharp mask, read as 27c8001)
-fs1.24 - Sound program (27c010)
+lh538n1d.rom25 - Samples (Sharp mask, read as 27c8001)
+fs1.rom24 - Sound program (27c010)
 
-lh5370h8.11 - Sprites? (Sharp Mask, read as 27c160)
-lh5370ha.12 |
-lh5370h7.15 |
-lh5370h9.16 /
+lh5370h8.rom11 - Sprites? (Sharp Mask, read as 27c160)
+lh5370ha.rom12 |
+lh5370h7.rom15 |
+lh5370h9.rom16 /
 
-lh537k2r.20 - Tiles? (Sharp Mask, read as 27c160)
-lh5370hb.19 |
-lh5370h6.3  /
+lh537k2r.rom20 - Tiles? (Sharp Mask, read as 27c160)
+lh5370hb.rom19 |
+lh5370h6.rom3  /
 
 Custom chips:
 FI-002K (208pin PQFP, GA2)
@@ -531,66 +525,74 @@ FI-003K (208pin PQFP, GA3)
 
 Others:
 Mitsubishi M60067-0901FP 452100 (208pin PQFP, GA1)
-4 GALs (16V8B, not dumped)
+5 GALs (GAL16V8B, not dumped)
+
+Measured clocks:
+
+    68k - 16mhz, OSC1 / 2
+    Z80 - 6mhz, Xtal1 / 2
+  M6295 - 1mhz,  OSC1 / 32
+YM2203C - 3.58mhz, OSC2 / 8
+ YM3812 - 3.58mhz, OSC2 / 8
 
 ***************************************************************************/
 
 ROM_START( gogomile )
 	ROM_REGION( 0x100000, "maincpu", 0 )        /* 68000 Code */
-	ROM_LOAD16_BYTE( "fp2n", 0x000000, 0x080000, CRC(e73583a0) SHA1(05c6ee5cb2c151b32c462e8b920f9a57fb6cce5b) )
-	ROM_LOAD16_BYTE( "fp1n", 0x000001, 0x080000, CRC(7b110824) SHA1(980e326d3b9e113ed522be3076663a249da4e739) )
+	ROM_LOAD16_BYTE( "fp2n.rom2", 0x000000, 0x080000, CRC(e73583a0) SHA1(05c6ee5cb2c151b32c462e8b920f9a57fb6cce5b) )
+	ROM_LOAD16_BYTE( "fp1n.rom1", 0x000001, 0x080000, CRC(7b110824) SHA1(980e326d3b9e113ed522be3076663a249da4e739) )
 
 	ROM_REGION( 0x28000, "audiocpu", 0 )        /* Z80 Code */
-	ROM_LOAD( "fs1.24", 0x00000, 0x08000, CRC(4e4bd371) SHA1(429e776135ce8960e147762763d952d16ed3f9d4) )    // same as japanese version
-	ROM_CONTINUE(       0x10000, 0x18000             )
+	ROM_LOAD( "fs1.rom24", 0x00000, 0x08000, CRC(4e4bd371) SHA1(429e776135ce8960e147762763d952d16ed3f9d4) )
+	ROM_CONTINUE(          0x10000, 0x18000)
 
 	ROM_REGION( 0x200000, "gfx1", 0 )   /* 16x16x4 Sprites */
-	ROM_LOAD( "lh537k2r.20", 0x000000, 0x200000, CRC(525dbf51) SHA1(f21876676cc60ed65bc86884da894b24830826bb) )
+	ROM_LOAD( "lh537k2r.rom20", 0x000000, 0x200000, CRC(525dbf51) SHA1(f21876676cc60ed65bc86884da894b24830826bb) )
 
 	ROM_REGION( 0x200000, "gfx2", 0 )   /* 16x16x4 Tiles */
-	ROM_LOAD( "lh5370h6.3", 0x000000, 0x200000, CRC(e2ca7107) SHA1(7174c2e1e2106275ad41b53af22651dca492367a) )  // x11xxxxxxxxxxxxxxxxxx = 0xFF
+	ROM_LOAD( "lh5370h6.rom3", 0x000000, 0x200000, CRC(e2ca7107) SHA1(7174c2e1e2106275ad41b53af22651dca492367a) )  // x11xxxxxxxxxxxxxxxxxx = 0xFF
 
 	ROM_REGION( 0x800000, "gfx3", 0 )   /* 16x16x8 Tiles */
-	ROM_LOAD( "lh5370h8.11", 0x000000, 0x200000, CRC(9961c925) SHA1(c47b4f19f090527b3e0c04dd046aa9cd51ca0e16) )
-	ROM_LOAD( "lh5370ha.12", 0x200000, 0x200000, CRC(5f2a87de) SHA1(d7ed8f01b40aaf58126aaeee10ec7d948a144080) )
-	ROM_LOAD( "lh5370h7.15", 0x400000, 0x200000, CRC(34921680) SHA1(d9862f106caa14ea6ad925174e6bf2d542511593) )
-	ROM_LOAD( "lh5370h9.16", 0x600000, 0x200000, CRC(e0118483) SHA1(36f9068e6c81c171b4426c3794277742bbc926f5) )
+	ROM_LOAD( "lh5370h8.rom11", 0x000000, 0x200000, CRC(9961c925) SHA1(c47b4f19f090527b3e0c04dd046aa9cd51ca0e16) )
+	ROM_LOAD( "lh5370ha.rom12", 0x200000, 0x200000, CRC(5f2a87de) SHA1(d7ed8f01b40aaf58126aaeee10ec7d948a144080) )
+	ROM_LOAD( "lh5370h7.rom15", 0x400000, 0x200000, CRC(34921680) SHA1(d9862f106caa14ea6ad925174e6bf2d542511593) )
+	ROM_LOAD( "lh5370h9.rom16", 0x600000, 0x200000, CRC(e0118483) SHA1(36f9068e6c81c171b4426c3794277742bbc926f5) )
 
 	ROM_REGION( 0x200000, "gfx4", 0 )   /* 16x16x4 Tiles */
-	ROM_LOAD( "lh5370hb.19", 0x000000, 0x200000, CRC(bd1e896f) SHA1(075f7600cbced1d285cf32fc196844720eb12671) ) // FIRST AND SECOND HALF IDENTICAL
+	ROM_LOAD( "lh5370hb.rom19", 0x000000, 0x200000, CRC(bd1e896f) SHA1(075f7600cbced1d285cf32fc196844720eb12671) ) // FIRST AND SECOND HALF IDENTICAL
 
-	/* 0x40000 * 4: sounds+speech (japanese),sounds+speech (english) */
+	/* 0x40000 * 4: sounds+speech (japanese), sounds+speech (english) */
 	ROM_REGION( 0x100000, "oki", 0 )    /* Samples */
-	ROM_LOAD( "lh538n1d.25", 0x000000, 0x100000, CRC(01622a95) SHA1(8d414bfc6dcfab1cf9cfe5738eb5c2ff31b77df6) ) // 0x40000 * 4
+	ROM_LOAD( "lh538n1d.rom25", 0x000000, 0x100000, CRC(01622a95) SHA1(8d414bfc6dcfab1cf9cfe5738eb5c2ff31b77df6) ) // 0x40000 * 4
 ROM_END
 
-ROM_START( gogomilej )
+ROM_START( gogomileo )
 	ROM_REGION( 0x100000, "maincpu", 0 )        /* 68000 Code */
-	ROM_LOAD16_BYTE( "fp2.2", 0x000000, 0x080000, CRC(28fd3e4e) SHA1(3303e5759c0781035c74354587e1916719695754) )    // 1xxxxxxxxxxxxxxxxxx = 0xFF
-	ROM_LOAD16_BYTE( "fp1.1", 0x000001, 0x080000, CRC(35a5fc45) SHA1(307207791cee7f40e88feffc5805ac25008a8566) )    // 1xxxxxxxxxxxxxxxxxx = 0xFF
+	ROM_LOAD16_BYTE( "fp2.rom2", 0x000000, 0x080000, CRC(28fd3e4e) SHA1(3303e5759c0781035c74354587e1916719695754) )    // 1xxxxxxxxxxxxxxxxxx = 0xFF
+	ROM_LOAD16_BYTE( "fp1.rom1", 0x000001, 0x080000, CRC(35a5fc45) SHA1(307207791cee7f40e88feffc5805ac25008a8566) )    // 1xxxxxxxxxxxxxxxxxx = 0xFF
 
 	ROM_REGION( 0x28000, "audiocpu", 0 )        /* Z80 Code */
-	ROM_LOAD( "fs1.24", 0x00000, 0x08000, CRC(4e4bd371) SHA1(429e776135ce8960e147762763d952d16ed3f9d4) )
-	ROM_CONTINUE(       0x10000, 0x18000             )
+	ROM_LOAD( "fs1.rom24", 0x00000, 0x08000, CRC(4e4bd371) SHA1(429e776135ce8960e147762763d952d16ed3f9d4) )
+	ROM_CONTINUE(          0x10000, 0x18000)
 
 	ROM_REGION( 0x200000, "gfx1", 0 )   /* 16x16x4 Sprites */
-	ROM_LOAD( "lh537k2r.20", 0x000000, 0x200000, CRC(525dbf51) SHA1(f21876676cc60ed65bc86884da894b24830826bb) )
+	ROM_LOAD( "lh537k2r.rom20", 0x000000, 0x200000, CRC(525dbf51) SHA1(f21876676cc60ed65bc86884da894b24830826bb) )
 
 	ROM_REGION( 0x200000, "gfx2", 0 )   /* 16x16x4 Tiles */
-	ROM_LOAD( "lh5370h6.3", 0x000000, 0x200000, CRC(e2ca7107) SHA1(7174c2e1e2106275ad41b53af22651dca492367a) )  // x11xxxxxxxxxxxxxxxxxx = 0xFF
+	ROM_LOAD( "lh5370h6.rom3", 0x000000, 0x200000, CRC(e2ca7107) SHA1(7174c2e1e2106275ad41b53af22651dca492367a) )  // x11xxxxxxxxxxxxxxxxxx = 0xFF
 
 	ROM_REGION( 0x800000, "gfx3", 0 )   /* 16x16x8 Tiles */
-	ROM_LOAD( "lh5370h8.11", 0x000000, 0x200000, CRC(9961c925) SHA1(c47b4f19f090527b3e0c04dd046aa9cd51ca0e16) )
-	ROM_LOAD( "lh5370ha.12", 0x200000, 0x200000, CRC(5f2a87de) SHA1(d7ed8f01b40aaf58126aaeee10ec7d948a144080) )
-	ROM_LOAD( "lh5370h7.15", 0x400000, 0x200000, CRC(34921680) SHA1(d9862f106caa14ea6ad925174e6bf2d542511593) )
-	ROM_LOAD( "lh5370h9.16", 0x600000, 0x200000, CRC(e0118483) SHA1(36f9068e6c81c171b4426c3794277742bbc926f5) )
+	ROM_LOAD( "lh5370h8.rom11", 0x000000, 0x200000, CRC(9961c925) SHA1(c47b4f19f090527b3e0c04dd046aa9cd51ca0e16) )
+	ROM_LOAD( "lh5370ha.rom12", 0x200000, 0x200000, CRC(5f2a87de) SHA1(d7ed8f01b40aaf58126aaeee10ec7d948a144080) )
+	ROM_LOAD( "lh5370h7.rom15", 0x400000, 0x200000, CRC(34921680) SHA1(d9862f106caa14ea6ad925174e6bf2d542511593) )
+	ROM_LOAD( "lh5370h9.rom16", 0x600000, 0x200000, CRC(e0118483) SHA1(36f9068e6c81c171b4426c3794277742bbc926f5) )
 
 	ROM_REGION( 0x200000, "gfx4", 0 )   /* 16x16x4 Tiles */
-	ROM_LOAD( "lh5370hb.19", 0x000000, 0x200000, CRC(bd1e896f) SHA1(075f7600cbced1d285cf32fc196844720eb12671) ) // FIRST AND SECOND HALF IDENTICAL
+	ROM_LOAD( "lh5370hb.rom19", 0x000000, 0x200000, CRC(bd1e896f) SHA1(075f7600cbced1d285cf32fc196844720eb12671) ) // FIRST AND SECOND HALF IDENTICAL
 
-	/* 0x40000 * 4: sounds+speech (japanese),sounds+speech (english) */
+	/* 0x40000 * 4: sounds+speech (japanese), sounds+speech (english) */
 	ROM_REGION( 0x100000, "oki", 0 )    /* Samples */
-	ROM_LOAD( "lh538n1d.25", 0x000000, 0x100000, CRC(01622a95) SHA1(8d414bfc6dcfab1cf9cfe5738eb5c2ff31b77df6) ) // 0x40000 * 4
+	ROM_LOAD( "lh538n1d.rom25", 0x000000, 0x100000, CRC(01622a95) SHA1(8d414bfc6dcfab1cf9cfe5738eb5c2ff31b77df6) ) // 0x40000 * 4
 ROM_END
 
 
@@ -607,16 +609,16 @@ Sound: Z80 YM2203 YM3812 M6295
 OSC  : 32.00000MHz(OSC1) 28.64000MHz(OSC2) 12.000MHz(Xtal1)
 
 ROMs:
-rom2.no1 - Main program (even)(27c4000)
-rom1.no2 - Main program (odd) (27c4000)
+no1.rom2 - Main program (even)(27c4000)
+no2.rom1 - Main program (odd) (27c4000)
 
-rom25.no3 - Samples (27c2001)
-rom24.no4 - Sound program (27c010)
+no3.rom25 - Samples (27c2001)
+no4.rom24 - Sound program (27c010)
 
-rom11.61 - Graphics (Mask, read as 27c160)
-rom15.59 |
-rom20.58 |
-rom3.60  /
+61.rom11 - Graphics (Mask, read as 27c160)
+59.rom15 |
+58.rom20 |
+60.rom3  /
 
 Custom chips:
 FI-002K (208pin PQFP, GA2)
@@ -629,28 +631,28 @@ Mitsubishi M60067-0901FP 452100 (208pin PQFP, GA1)
 
 ROM_START( pbancho )
 	ROM_REGION( 0x100000, "maincpu", 0 )        /* 68000 Code */
-	ROM_LOAD16_BYTE( "rom2.no1", 0x000000, 0x080000, CRC(1b4fd178) SHA1(02cf3d2554b29cd253470d68ea959738f3b98dbe) ) // 1xxxxxxxxxxxxxxxxxx = 0xFF
-	ROM_LOAD16_BYTE( "rom1.no2", 0x000001, 0x080000, CRC(9cf510a5) SHA1(08e79b5bbd1c011c32f82dd15fba42d7898861be) ) // 1xxxxxxxxxxxxxxxxxx = 0xFF
+	ROM_LOAD16_BYTE( "no1.rom2", 0x000000, 0x080000, CRC(1b4fd178) SHA1(02cf3d2554b29cd253470d68ea959738f3b98dbe) ) // 1xxxxxxxxxxxxxxxxxx = 0xFF
+	ROM_LOAD16_BYTE( "no2,rom1", 0x000001, 0x080000, CRC(9cf510a5) SHA1(08e79b5bbd1c011c32f82dd15fba42d7898861be) ) // 1xxxxxxxxxxxxxxxxxx = 0xFF
 
 	ROM_REGION( 0x28000, "audiocpu", 0 )        /* Z80 Code */
-	ROM_LOAD( "rom24.no4", 0x00000, 0x08000, CRC(dfbfdb81) SHA1(84b0cbe843a9bbae43975afdbd029a9b76fd488b) )
-	ROM_CONTINUE(          0x10000, 0x18000             )
+	ROM_LOAD( "no4.rom23", 0x00000, 0x08000, CRC(dfbfdb81) SHA1(84b0cbe843a9bbae43975afdbd029a9b76fd488b) )
+	ROM_CONTINUE(          0x10000, 0x18000)
 
 	ROM_REGION( 0x200000, "gfx1", 0 )   /* 16x16x4 Sprites */
-	ROM_LOAD( "rom20.58", 0x000000, 0x200000, CRC(4dad0a2e) SHA1(a4f70557503110a5457b9096a79a5f249095fa55) )
+	ROM_LOAD( "58.rom20", 0x000000, 0x200000, CRC(4dad0a2e) SHA1(a4f70557503110a5457b9096a79a5f249095fa55) )
 
 	ROM_REGION( 0x200000, "gfx2", 0 )   /* 16x16x4 Tiles */
-	ROM_LOAD( "rom3.60",  0x000000, 0x200000, CRC(a50a3c1b) SHA1(a2b30f9f83f5dc2e069d7559aefbda9929fc640c) )
+	ROM_LOAD( "60.rom3",  0x000000, 0x200000, CRC(a50a3c1b) SHA1(a2b30f9f83f5dc2e069d7559aefbda9929fc640c) )
 
 	ROM_REGION( 0x400000, "gfx3", 0 )   /* 16x16x8 Tiles */
-	ROM_LOAD( "rom11.61", 0x000000, 0x200000, CRC(7f1213b9) SHA1(f8d6432b270c4d0954602e430ddd26841eb05656) )
-	ROM_LOAD( "rom15.59", 0x200000, 0x200000, CRC(b83dcb70) SHA1(b0b9df451535d85612fa095b4f694cf2e7930bca) )
+	ROM_LOAD( "61.rom11", 0x000000, 0x200000, CRC(7f1213b9) SHA1(f8d6432b270c4d0954602e430ddd26841eb05656) )
+	ROM_LOAD( "59.rom15", 0x200000, 0x200000, CRC(b83dcb70) SHA1(b0b9df451535d85612fa095b4f694cf2e7930bca) )
 
 	ROM_REGION( 0x200000, "gfx4", 0 )   /* 16x16x4 Tiles */
-	ROM_LOAD( "rom3.60",  0x000000, 0x200000, CRC(a50a3c1b) SHA1(a2b30f9f83f5dc2e069d7559aefbda9929fc640c) )    // ?maybe?
+	ROM_LOAD( "60.rom3",  0x000000, 0x200000, CRC(a50a3c1b) SHA1(a2b30f9f83f5dc2e069d7559aefbda9929fc640c) )    // ?maybe?
 
 	ROM_REGION( 0x040000, "oki", 0 )    /* Samples */
-	ROM_LOAD( "rom25.no3", 0x000000, 0x040000, CRC(a7bfb5ea) SHA1(61937eae4f8855bc09c494aff52d76d41dc3b76a) )
+	ROM_LOAD( "n03.rom25", 0x000000, 0x040000, CRC(a7bfb5ea) SHA1(61937eae4f8855bc09c494aff52d76d41dc3b76a) )
 ROM_END
 
 
@@ -662,6 +664,6 @@ ROM_END
 
 ***************************************************************************/
 
-GAME( 1995, gogomile, 0,        fuuki16, gogomile, driver_device, 0, ROT0, "Fuuki", "Go Go! Mile Smile", 0 )
-GAME( 1995, gogomilej,gogomile, fuuki16, gogomilej, driver_device,0, ROT0, "Fuuki", "Susume! Mile Smile (Japan)", 0 )
-GAME( 1996, pbancho,  0,        fuuki16, pbancho, driver_device,  0, ROT0, "Fuuki", "Gyakuten!! Puzzle Bancho (Japan)", 0)
+GAME( 1995, gogomile,  0,        fuuki16, gogomile,  driver_device, 0, ROT0, "Fuuki", "Susume! Mile Smile / Go Go! Mile Smile (newer)", 0 )
+GAME( 1995, gogomileo, gogomile, fuuki16, gogomileo, driver_device, 0, ROT0, "Fuuki", "Susume! Mile Smile / Go Go! Mile Smile (older)", 0 )
+GAME( 1996, pbancho,   0,        fuuki16, pbancho,   driver_device, 0, ROT0, "Fuuki", "Gyakuten!! Puzzle Bancho (Japan)", 0)

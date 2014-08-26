@@ -177,6 +177,7 @@ enum
 	XTAL_28_37516MHz    = 28375160,     /* Amiga PAL systems */
 	XTAL_28_48MHz       = 28480000,     /* Chromatics CGC-7900 */
 	XTAL_28_63636MHz    = 28636363,     /* Later Leland games and Atari GT, Amiga NTSC, Raiden2 h/w (8x NTSC subcarrier)*/
+	XTAL_28_64MHz       = 28640000,     /* Fukki FG-1c AI AM-2 PCB */
 	XTAL_28_7MHz        = 28700000,
 	XTAL_29_4912MHz     = 29491200,     /* Xerox Alto-II system clock (tagged 29.4MHz in the schematics) */
 	XTAL_30MHz          = 30000000,     /* Impera Magic Card */
