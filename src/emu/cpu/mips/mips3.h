@@ -544,20 +544,28 @@ private:
 	void static_generate_tlb_mismatch();
 	void static_generate_exception(UINT8 exception, int recover, const char *name);
 	void static_generate_memory_accessor(int mode, int size, int iswrite, int ismasked, const char *name, uml::code_handle **handleptr);
+
 	void generate_update_mode(drcuml_block *block);
 	void generate_update_cycles(drcuml_block *block, compiler_state *compiler, uml::parameter param, int allow_exception);
 	void generate_checksum_block(drcuml_block *block, compiler_state *compiler, const opcode_desc *seqhead, const opcode_desc *seqlast);
 	void generate_sequence_instruction(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
 	void generate_delay_slot_and_branch(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, UINT8 linkreg);
+
 	int generate_opcode(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
 	int generate_special(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
 	int generate_regimm(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
 	int generate_idt(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
+
 	int generate_set_cop0_reg(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, UINT8 reg);
 	int generate_get_cop0_reg(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, UINT8 reg);
 	int generate_cop0(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
 	int generate_cop1(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
 	int generate_cop1x(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
+
+	void check_cop0_access(drcuml_block *block);
+	void check_cop1_access(drcuml_block *block);
+	void generate_badcop(drcuml_block *block, const int cop);
+
 	void log_add_disasm_comment(drcuml_block *block, UINT32 pc, UINT32 op);
 	const char *log_desc_flags_to_string(UINT32 flags);
 	void log_register_list(drcuml_state *drcuml, const char *string, const UINT32 *reglist, const UINT32 *regnostarlist);
@@ -743,12 +751,13 @@ private:
 
 /* fix me -- how do we make this work?? */
 #define MIPS3DRC_STRICT_VERIFY      0x0001          /* verify all instructions */
-#define MIPS3DRC_STRICT_COP1        0x0002          /* validate all COP1 instructions */
-#define MIPS3DRC_STRICT_COP2        0x0004          /* validate all COP2 instructions */
-#define MIPS3DRC_FLUSH_PC           0x0008          /* flush the PC value before each memory access */
-#define MIPS3DRC_CHECK_OVERFLOWS    0x0010          /* actually check overflows on add/sub instructions */
+#define MIPS3DRC_STRICT_COP0        0x0002          /* validate all COP0 instructions */
+#define MIPS3DRC_STRICT_COP1        0x0004          /* validate all COP1 instructions */
+#define MIPS3DRC_STRICT_COP2        0x0008          /* validate all COP2 instructions */
+#define MIPS3DRC_FLUSH_PC           0x0010          /* flush the PC value before each memory access */
+#define MIPS3DRC_CHECK_OVERFLOWS    0x0020          /* actually check overflows on add/sub instructions */
 
-#define MIPS3DRC_COMPATIBLE_OPTIONS (MIPS3DRC_STRICT_VERIFY | MIPS3DRC_STRICT_COP1 | MIPS3DRC_STRICT_COP2 | MIPS3DRC_FLUSH_PC)
+#define MIPS3DRC_COMPATIBLE_OPTIONS (MIPS3DRC_STRICT_VERIFY | MIPS3DRC_STRICT_COP1 | MIPS3DRC_STRICT_COP0 | MIPS3DRC_STRICT_COP2 | MIPS3DRC_FLUSH_PC)
 #define MIPS3DRC_FASTEST_OPTIONS    (0)
 
 

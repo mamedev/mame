@@ -1617,8 +1617,7 @@ int mips3_device::generate_opcode(drcuml_block *block, compiler_state *compiler,
 			return TRUE;
 
 		case 0x31:  /* LWC1 - MIPS I */
-			UML_TEST(block, CPR032(COP0_Status), SR_COP1);                          // test    [Status],SR_COP1
-			UML_EXHc(block, COND_Z, *m_exception[EXCEPTION_BADCOP], 1);				// exh     cop,1,Z
+			check_cop1_access(block);
 			UML_ADD(block, I0, R32(RSREG), SIMMVAL);                        // add     i0,<rsreg>,SIMMVAL
 			UML_CALLH(block, *m_read32[m_core->mode >> 1]); // callh   read32
 			UML_MOV(block, FPR32(RTREG), I0);                                   // mov     <cpr1_rt>,i0
@@ -1627,8 +1626,7 @@ int mips3_device::generate_opcode(drcuml_block *block, compiler_state *compiler,
 			return TRUE;
 
 		case 0x35:  /* LDC1 - MIPS III */
-			UML_TEST(block, CPR032(COP0_Status), SR_COP1);                          // test    [Status],SR_COP1
-			UML_EXHc(block, COND_Z, *m_exception[EXCEPTION_BADCOP], 1);				// exh     cop,1,Z
+			check_cop1_access(block);
 			UML_ADD(block, I0, R32(RSREG), SIMMVAL);                        // add     i0,<rsreg>,SIMMVAL
 			UML_CALLH(block, *m_read64[m_core->mode >> 1]); // callh   read64
 			UML_DMOV(block, FPR64(RTREG), I0);                                  // dmov    <cpr1_rt>,i0
@@ -1772,8 +1770,7 @@ int mips3_device::generate_opcode(drcuml_block *block, compiler_state *compiler,
 			return TRUE;
 
 		case 0x39:  /* SWC1 - MIPS I */
-			UML_TEST(block, CPR032(COP0_Status), SR_COP1);                          // test    [Status],SR_COP1
-			UML_EXHc(block, COND_Z, *m_exception[EXCEPTION_BADCOP], 1);				// exh     cop,1,Z
+			check_cop1_access(block);
 			UML_ADD(block, I0, R32(RSREG), SIMMVAL);                        // add     i0,<rsreg>,SIMMVAL
 			UML_MOV(block, I1, FPR32(RTREG));                                   // mov     i1,<cpr1_rt>
 			UML_CALLH(block, *m_write32[m_core->mode >> 1]);    // callh   write32
@@ -1782,8 +1779,7 @@ int mips3_device::generate_opcode(drcuml_block *block, compiler_state *compiler,
 			return TRUE;
 
 		case 0x3d:  /* SDC1 - MIPS III */
-			UML_TEST(block, CPR032(COP0_Status), SR_COP1);                          // test    [Status],SR_COP1
-			UML_EXHc(block, COND_Z, *m_exception[EXCEPTION_BADCOP], 1);				// exh     cop,1,Z
+			check_cop1_access(block);
 			UML_ADD(block, I0, R32(RSREG), SIMMVAL);                        // add     i0,<rsreg>,SIMMVAL
 			UML_DMOV(block, I1, FPR64(RTREG));                                  // dmov    i1,<cpr1_rt>
 			UML_CALLH(block, *m_write64[m_core->mode >> 1]);    // callh   write64
@@ -2480,6 +2476,28 @@ int mips3_device::generate_get_cop0_reg(drcuml_block *block, compiler_state *com
 }
 
 
+/*-------------------------------------------------------------------------
+    generate_badcop - raise a BADCOP exception
+-------------------------------------------------------------------------*/
+
+void mips3_device::generate_badcop(drcuml_block *block, const int cop)
+{
+	UML_TEST(block, CPR032(COP0_Status), SR_COP0 << cop);               // test    [Status], SR_COP0 << cop
+	UML_EXHc(block, COND_Z, *m_exception[EXCEPTION_BADCOP], cop);		// exh     badcop,cop,Z
+}
+
+/*-------------------------------------------------------------------------
+    check_cop0_access - raise a BADCOP exception if we're not in kernel mode
+-------------------------------------------------------------------------*/
+
+void mips3_device::check_cop0_access(drcuml_block *block)
+{
+	if ((m_core->mode >> 1) != MODE_KERNEL)
+	{
+		generate_badcop(block, 0);
+	}
+}
+
 /*-------------------------------------------------
     generate_cop0 - compile COP0 opcodes
 -------------------------------------------------*/
@@ -2606,6 +2624,18 @@ int mips3_device::generate_cop0(drcuml_block *block, compiler_state *compiler, c
     COP1 RECOMPILATION
 ***************************************************************************/
 
+/*-------------------------------------------------------------------------
+    check_cop1_access - raise a BADCOP exception if COP1 is not enabled
+-------------------------------------------------------------------------*/
+
+void mips3_device::check_cop1_access(drcuml_block *block)
+{
+	if (m_drcoptions & MIPS3DRC_STRICT_COP1)
+	{
+		generate_badcop(block, 1);
+	}
+}
+
 /*-------------------------------------------------
     generate_cop1 - compile COP1 opcodes
 -------------------------------------------------*/
@@ -2616,39 +2646,34 @@ int mips3_device::generate_cop1(drcuml_block *block, compiler_state *compiler, c
 	code_label skip;
 	condition_t condition;
 
-	/* generate an exception if COP1 is disabled */
-	if (m_drcoptions & MIPS3DRC_STRICT_COP1)
-	{
-		UML_TEST(block, CPR032(COP0_Status), SR_COP1);                          // test    [Status],SR_COP1
-		UML_EXHc(block, COND_Z, *m_exception[EXCEPTION_BADCOP], 1);// exh     cop,1,Z
-	}
+	check_cop1_access(block);
 
 	switch (RSREG)
 	{
-		case 0x00:  /* MFCz - MIPS I */
+		case 0x00:  /* MFC1 - MIPS I */
 			if (RTREG != 0)
 				UML_DSEXT(block, R64(RTREG), FPR32(RDREG), SIZE_DWORD);                 // dsext   <rtreg>,fpr[rdreg],dword
 			return TRUE;
 
-		case 0x01:  /* DMFCz - MIPS III */
+		case 0x01:  /* DMFC1 - MIPS III */
 			if (RTREG != 0)
 				UML_DMOV(block, R64(RTREG), FPR64(RDREG));                          // dmov    <rtreg>,fpr[rdreg]
 			return TRUE;
 
-		case 0x02:  /* CFCz - MIPS I */
+		case 0x02:  /* CFC1 - MIPS I */
 			if (RTREG != 0)
 				UML_DSEXT(block, R64(RTREG), CCR132(RDREG), SIZE_DWORD);                    // dsext   <rtreg>,ccr132[rdreg],dword
 			return TRUE;
 
-		case 0x04:  /* MTCz - MIPS I */
+		case 0x04:  /* MTC1 - MIPS I */
 			UML_MOV(block, FPR32(RDREG), R32(RTREG));                               // mov     fpr[rdreg],<rtreg>
 			return TRUE;
 
-		case 0x05:  /* DMTCz - MIPS III */
+		case 0x05:  /* DMTC1 - MIPS III */
 			UML_DMOV(block, FPR64(RDREG), R64(RTREG));                              // dmov    fpr[rdreg],<rtreg>
 			return TRUE;
 
-		case 0x06:  /* CTCz - MIPS I */
+		case 0x06:  /* CTC1 - MIPS I */
 			if (RDREG != 31)
 				UML_DSEXT(block, CCR164(RDREG), R32(RTREG), SIZE_DWORD);                    // dsext   ccr1[rdreg],<rtreg>,dword
 			else
@@ -2991,11 +3016,7 @@ int mips3_device::generate_cop1x(drcuml_block *block, compiler_state *compiler, 
 	int in_delay_slot = ((desc->flags & OPFLAG_IN_DELAY_SLOT) != 0);
 	UINT32 op = desc->opptr.l[0];
 
-	if (m_drcoptions & MIPS3DRC_STRICT_COP1)
-	{
-		UML_TEST(block, CPR032(COP0_Status), SR_COP1);                          // test    [Status],SR_COP1
-		UML_EXHc(block, COND_Z, *m_exception[EXCEPTION_BADCOP], 1);// exh     cop,1,Z
-	}
+	check_cop1_access(block);
 
 	switch (op & 0x3f)
 	{
