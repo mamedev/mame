@@ -220,10 +220,17 @@ int machine_manager::execute()
 		if (m_new_driver_pending)
 		{
 			astring old_system_name(m_options.system_name());
-			m_options.set_system_name(m_new_driver_pending->name);
-			astring error_string;
-			if (old_system_name != m_options.system_name()) {
+			bool new_system = (old_system_name != m_new_driver_pending->name);
+			// first: if we scheduled a new system, remove device options of the old system
+			// notice that, if we relaunch the same system, there is no effect on the emulation
+			if (new_system)
 				m_options.remove_device_options();
+			// second: set up new system name (and the related device options)
+			m_options.set_system_name(m_new_driver_pending->name);
+			// third: if we scheduled a new system, take also care of ramsize options
+			if (new_system)
+			{
+				astring error_string;
 				m_options.set_value(OPTION_RAMSIZE, "", OPTION_PRIORITY_CMDLINE, error_string);
 			}
 			firstrun = true;
