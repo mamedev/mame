@@ -11,7 +11,8 @@
 ToDo:
 - 4x4 not emulated yet, appears to be a different cpu and hardware.
 - sounds to be verified against a real machine
-- noise generator not done yet
+- noise generator sounds like a loud barrrr instead of noise, fortunately it
+  doesn't seem to be used.
 - inputs, outputs, dips vary per machine
 - High score isn't saved or remembered
 
@@ -31,6 +32,7 @@ public:
 		: genpin_class(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_dac(*this, "dac")
+		, m_dac1(*this, "dac1")
 	{ }
 
 	DECLARE_WRITE8_MEMBER(sound0_w);
@@ -45,7 +47,8 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_s);
 private:
 	bool m_timer_sb;
-	UINT8 m_timer_s[3];
+	bool m_ab1;
+	UINT8 m_timer_s[5];
 	UINT8 m_sound0;
 	UINT8 m_sound1;
 	UINT8 m_vol;
@@ -55,6 +58,7 @@ private:
 	virtual void machine_reset();
 	required_device<cpu_device> m_maincpu;
 	required_device<dac_device> m_dac;
+	required_device<dac_device> m_dac1;
 };
 
 
@@ -356,10 +360,13 @@ READ8_MEMBER( atari_s2_state::switch_r )
 // The address lines are merged with m_sound0:d0-3 to form a lookup on the prom
 // Output of prom goes to a 4-bit DAC
 // Volume is controlled by m_sound1:d0-3
+// Noise is a pair of 74LS164 shift registers, connected to form a pseudo-random pattern
 // Variables:
 // m_timer_s[0] inc each timer cycle, bit 0 = 500k, bit 1 = 250k, bit 2 = 125k, bit 3 = 62.5k
 // m_timer_s[1] count in 74LS161
 // m_timer_s[2] count in 74LS393
+// m_timer_s[3] shift register of 74LS164 P4
+// m_timer_s[4] shift register of 74LS164 N4
 // m_timer_sb   wanted output of m_timer_s[0]
 TIMER_DEVICE_CALLBACK_MEMBER( atari_s2_state::timer_s )
 {
@@ -371,11 +378,20 @@ TIMER_DEVICE_CALLBACK_MEMBER( atari_s2_state::timer_s )
 		m_timer_s[1]++;
 		if (m_timer_s[1] > 15)
 		{
+			// wave
 			m_timer_s[1] = m_sound1; // set to preset value
 			m_timer_s[2]++;
 			offs_t offs = (m_timer_s[2] & 31) | ((m_sound0 & 15) << 5);
 			if BIT(m_sound0, 6)
 				m_dac->write_unsigned8(m_p_prom[offs]<< 4);
+			// noise
+			if BIT(m_sound0, 7)
+			{
+				m_timer_s[3] = (m_timer_s[3] << 1) | m_ab1;
+				m_timer_s[4] = (m_timer_s[4] << 1) | !BIT(m_timer_s[3], 1);
+				m_ab1 = BIT(m_timer_s[3], 0) ^ BIT(m_timer_s[4], 6);
+				m_dac1->write_unsigned8((m_timer_s[4] & 7)<< 5);
+			}
 		}
 	}
 }
@@ -405,6 +421,7 @@ WRITE8_MEMBER( atari_s2_state::sound1_w )
 		m_vol = data;
 		float vol = m_vol/16.666+0.1;
 		m_dac->set_output_gain(0, vol);
+		m_dac1->set_output_gain(0, vol);
 	}
 }
 
@@ -435,6 +452,8 @@ static MACHINE_CONFIG_START( atari_s2, atari_s2_state )
 	MCFG_FRAGMENT_ADD( genpin_audio )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	MCFG_SOUND_ADD("dac1", DAC, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* Video */
