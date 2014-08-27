@@ -16,8 +16,8 @@
 
 class ui_menu_software_parts : public ui_menu {
 public:
-	enum { T_ENTRY, T_FMGR };
-	ui_menu_software_parts(running_machine &machine, render_container *container, const software_info *info, const char *interface, const software_part **part, bool opt_fmgr, int *result);
+	enum { T_EMPTY, T_FMGR, T_SWLIST, T_ENTRY, };
+	ui_menu_software_parts(running_machine &machine, render_container *container, const software_info *info, const char *interface, const software_part **part, bool other_opt, int *result);
 	virtual ~ui_menu_software_parts();
 	virtual void populate();
 	virtual void handle();
@@ -32,7 +32,7 @@ private:
 	const software_info *   m_info;
 	const char *            m_interface;
 	const software_part **  m_selected_part;
-	bool                    m_opt_fmgr;
+	bool                    m_other_opt;
 	int *                   m_result;
 };
 

@@ -237,16 +237,25 @@ void ui_menu_control_device_image::handle()
 
 	case SELECT_OTHER_PART:
 		switch(submenu_result) {
-		case ui_menu_software_parts::T_ENTRY: {
+		case ui_menu_software_parts::T_ENTRY:
 			load_software_part();
 			break;
-		}
 
 		case ui_menu_software_parts::T_FMGR:
 			state = START_FILE;
 			handle();
 			break;
 
+		case ui_menu_software_parts::T_EMPTY:
+			image->unload();
+			ui_menu::stack_pop(machine());
+			break;
+
+		case ui_menu_software_parts::T_SWLIST:
+			state = START_SOFTLIST;
+			handle();
+			break;
+				
 		case -1: // return to system
 			ui_menu::stack_pop(machine());
 			break;

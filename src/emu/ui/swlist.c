@@ -30,13 +30,13 @@
 //  ctor
 //-------------------------------------------------
 
-ui_menu_software_parts::ui_menu_software_parts(running_machine &machine, render_container *container, const software_info *info, const char *interface, const software_part **part, bool opt_fmgr, int *result)
+ui_menu_software_parts::ui_menu_software_parts(running_machine &machine, render_container *container, const software_info *info, const char *interface, const software_part **part, bool other_opt, int *result)
 	: ui_menu(machine, container)
 {
 	m_info = info;
 	m_interface = interface;
 	m_selected_part = part;
-	m_opt_fmgr = opt_fmgr;
+	m_other_opt = other_opt;
 	m_result = result;
 }
 
@@ -56,6 +56,25 @@ ui_menu_software_parts::~ui_menu_software_parts()
 
 void ui_menu_software_parts::populate()
 {
+	if (m_other_opt)
+	{
+		software_part_menu_entry *entry1 = (software_part_menu_entry *) m_pool_alloc(sizeof(*entry1));
+		entry1->type = T_EMPTY;
+		entry1->part = 0;
+		item_append("[empty slot]", 0, 0, entry1);
+
+		software_part_menu_entry *entry2 = (software_part_menu_entry *) m_pool_alloc(sizeof(*entry2));
+		entry2->type = T_FMGR;
+		entry2->part = 0;
+		item_append("[file manager]", 0, 0, entry2);
+
+		
+		software_part_menu_entry *entry3 = (software_part_menu_entry *) m_pool_alloc(sizeof(*entry3));
+		entry3->type = T_SWLIST;
+		entry3->part = 0;
+		item_append("[software list]", 0, 0, entry3);
+	}
+
 	for (const software_part *swpart = m_info->first_part(); swpart != NULL; swpart = swpart->next())
 	{
 		if (swpart->matches_interface(m_interface))
@@ -70,14 +89,6 @@ void ui_menu_software_parts::populate()
 			entry->part = swpart;
 			item_append(m_info->shortname(), menu_part_name.cstr(), 0, entry);
 		}
-	}
-
-	if (m_opt_fmgr)
-	{
-		software_part_menu_entry *entry = (software_part_menu_entry *) m_pool_alloc(sizeof(*entry));
-		entry->type = T_FMGR;
-		entry->part = 0;
-		item_append("[file manager]", 0, 0, entry);
 	}
 }
 
