@@ -8,11 +8,19 @@
 
     The only difference seems to be an extra bank of inputs (or something) at 2008-200B.
 
+ToDo:
+- 4x4 not emulated yet, appears to be a different cpu and hardware.
+- sounds to be verified against a real machine
+- noise generator not done yet
+- inputs, outputs, dips vary per machine
+- High score isn't saved or remembered
+
 
 *****************************************************************************************/
 
 #include "machine/genpin.h"
 #include "cpu/m6800/m6800.h"
+#include "sound/dac.h"
 #include "atari_s2.lh"
 
 
@@ -20,30 +28,33 @@ class atari_s2_state : public genpin_class
 {
 public:
 	atari_s2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: genpin_class(mconfig, type, tag),
-	m_maincpu(*this, "maincpu")
+		: genpin_class(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_dac(*this, "dac")
 	{ }
 
-	DECLARE_WRITE8_MEMBER(sound0_w) { };
-	DECLARE_WRITE8_MEMBER(sound1_w) { };
+	DECLARE_WRITE8_MEMBER(sound0_w);
+	DECLARE_WRITE8_MEMBER(sound1_w);
 	DECLARE_WRITE8_MEMBER(lamp_w) { };
 	DECLARE_WRITE8_MEMBER(sol0_w);
 	DECLARE_WRITE8_MEMBER(sol1_w) { };
 	DECLARE_WRITE8_MEMBER(intack_w);
 	DECLARE_WRITE8_MEMBER(display_w);
 	DECLARE_READ8_MEMBER(switch_r);
-
 	TIMER_DEVICE_CALLBACK_MEMBER(irq);
-protected:
-
-	// devices
-	required_device<cpu_device> m_maincpu;
-
-	// driver_device overrides
-	virtual void machine_reset();
+	TIMER_DEVICE_CALLBACK_MEMBER(timer_s);
 private:
+	bool m_timer_sb;
+	UINT8 m_timer_s[3];
+	UINT8 m_sound0;
+	UINT8 m_sound1;
+	UINT8 m_vol;
 	UINT8 m_t_c;
 	UINT8 m_segment[7];
+	UINT8 *m_p_prom;
+	virtual void machine_reset();
+	required_device<cpu_device> m_maincpu;
+	required_device<dac_device> m_dac;
 };
 
 
@@ -337,6 +348,66 @@ READ8_MEMBER( atari_s2_state::switch_r )
 	return ioport(kbdrow)->read();
 }
 
+// Sound
+// 4 frequencies (500k,250k,125k,62.5k) come from main clock circuits
+// We choose one of these with SEL A,B
+// Then presettable 74LS161 binary divider controlled by m_sound0:d4-7
+// Then a 74LS393 to generate 5 address lines
+// The address lines are merged with m_sound0:d0-3 to form a lookup on the prom
+// Output of prom goes to a 4-bit DAC
+// Volume is controlled by m_sound1:d0-3
+// Variables:
+// m_timer_s[0] inc each timer cycle, bit 0 = 500k, bit 1 = 250k, bit 2 = 125k, bit 3 = 62.5k
+// m_timer_s[1] count in 74LS161
+// m_timer_s[2] count in 74LS393
+// m_timer_sb   wanted output of m_timer_s[0]
+TIMER_DEVICE_CALLBACK_MEMBER( atari_s2_state::timer_s )
+{
+	m_timer_s[0]++;
+	bool cs = BIT(m_timer_s[0], (m_sound0 & 0x30) >> 4); // select which frequency to work with by using SEL A,B
+	if (cs != m_timer_sb)
+	{
+		m_timer_sb = cs;
+		m_timer_s[1]++;
+		if (m_timer_s[1] > 15)
+		{
+			m_timer_s[1] = m_sound1; // set to preset value
+			m_timer_s[2]++;
+			offs_t offs = (m_timer_s[2] & 31) | ((m_sound0 & 15) << 5);
+			if BIT(m_sound0, 6)
+				m_dac->write_unsigned8(m_p_prom[offs]<< 4);
+		}
+	}
+}
+
+// d0-3 = sound data to prom
+// d4-5 = select initial clock frequency
+// d6 h = enable wave
+// d7 h = enable noise
+WRITE8_MEMBER( atari_s2_state::sound0_w )
+{
+	m_sound0 = data;
+	offs_t offs = (m_timer_s[2] & 31) | ((m_sound0 & 15) << 5);
+	if BIT(m_sound0, 6)
+		m_dac->write_unsigned8(m_p_prom[offs]<< 4);
+}
+
+// d0-3 = volume
+// d4-7 = preset on 74LS161
+WRITE8_MEMBER( atari_s2_state::sound1_w )
+{
+	m_sound1 = data >> 4;
+
+	data &= 15;
+
+	if (data != m_vol)
+	{
+		m_vol = data;
+		float vol = m_vol/16.666+0.1;
+		m_dac->set_output_gain(0, vol);
+	}
+}
+
 TIMER_DEVICE_CALLBACK_MEMBER( atari_s2_state::irq )
 {
 	if (m_t_c > 0x40)
@@ -347,20 +418,30 @@ TIMER_DEVICE_CALLBACK_MEMBER( atari_s2_state::irq )
 
 void atari_s2_state::machine_reset()
 {
+	m_p_prom = memregion("proms")->base();
+	m_vol = 0;
+	m_sound0 = 0;
+	m_sound1 = 0;
 }
+
 
 static MACHINE_CONFIG_START( atari_s2, atari_s2_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6800, XTAL_4MHz / 4)
 	MCFG_CPU_PROGRAM_MAP(atari_s2_map)
 	MCFG_NVRAM_ADD_0FILL("nvram")
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq", atari_s2_state, irq, attotime::from_hz(XTAL_4MHz / 8192))
 
 	/* Sound */
 	MCFG_FRAGMENT_ADD( genpin_audio )
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* Video */
 	MCFG_DEFAULT_LAYOUT(layout_atari_s2)
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq", atari_s2_state, irq, attotime::from_hz(XTAL_4MHz / 8192))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_s", atari_s2_state, timer_s, attotime::from_hz(150000))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( atari_s3, atari_s2 )
@@ -378,7 +459,7 @@ ROM_START(supermap)
 	ROM_LOAD("atari_m.rom", 0x3000, 0x0800, CRC(1bb6b72c) SHA1(dd24ed54de275aadf8dc0810a6af3ac97aea4026))
 	ROM_LOAD("atari_j.rom", 0x3800, 0x0800, CRC(26521779) SHA1(2cf1c66441aee99b9d01859d495c12025b5ef094))
 
-	ROM_REGION(0x1000, "sound1", 0)
+	ROM_REGION(0x0200, "proms", 0)
 	ROM_LOAD("82s130.bin", 0x0000, 0x0200, CRC(da1f77b4) SHA1(b21fdc1c6f196c320ec5404013d672c35f95890b))
 ROM_END
 
@@ -391,7 +472,7 @@ ROM_START(hercules)
 	ROM_LOAD("atari_m.rom", 0x3000, 0x0800, CRC(1bb6b72c) SHA1(dd24ed54de275aadf8dc0810a6af3ac97aea4026))
 	ROM_LOAD("atari_j.rom", 0x3800, 0x0800, CRC(26521779) SHA1(2cf1c66441aee99b9d01859d495c12025b5ef094))
 
-	ROM_REGION(0x1000, "sound1", 0)
+	ROM_REGION(0x0200, "proms", 0)
 	ROM_LOAD("82s130.bin", 0x0000, 0x0200, CRC(da1f77b4) SHA1(b21fdc1c6f196c320ec5404013d672c35f95890b))
 ROM_END
 
@@ -404,7 +485,7 @@ ROM_START(roadrunr)
 	ROM_LOAD("3000.716", 0x3000, 0x0800, CRC(2fc01359) SHA1(d3df20c764bb68a5316367bb18d34a03293e7fa6))
 	ROM_LOAD("3800.716", 0x3800, 0x0800, CRC(77262408) SHA1(3045a732c39c96002f495f64ed752279f7d43ee7))
 
-	ROM_REGION(0x1000, "sound1", 0)
+	ROM_REGION(0x0200, "proms", 0)
 	ROM_LOAD("82s130.bin", 0x0000, 0x0200, CRC(da1f77b4) SHA1(b21fdc1c6f196c320ec5404013d672c35f95890b))
 ROM_END
 
@@ -418,11 +499,11 @@ ROM_START(fourx4)
 	ROM_LOAD("c000a70c.bin", 0xc000, 0x2000, CRC(c31ca8d3) SHA1(53f20eff0084771dc61d19db7ddae52e4423e75e)) \
 	ROM_RELOAD(0xe000, 0x2000)
 
-	ROM_REGION(0x1000, "sound1", 0)
+	ROM_REGION(0x0200, "proms", 0)
 	ROM_LOAD("82s130.bin", 0x0000, 0x0200, CRC(da1f77b4) SHA1(b21fdc1c6f196c320ec5404013d672c35f95890b))
 ROM_END
 
-GAME( 1979, supermap,  0,  atari_s2,  atari_s2, driver_device, 0,  ROT0, "Atari", "Superman (Pinball)", GAME_MECHANICAL | GAME_NO_SOUND)
-GAME( 1979, hercules,  0,  atari_s2,  atari_s2, driver_device, 0,  ROT0, "Atari", "Hercules", GAME_MECHANICAL | GAME_NO_SOUND)
-GAME( 1979, roadrunr,  0,  atari_s3,  atari_s2, driver_device, 0,  ROT0, "Atari", "Road Runner", GAME_MECHANICAL | GAME_NO_SOUND)
-GAME( 1982, fourx4,    0,  atari_s2,  atari_s2, driver_device, 0,  ROT0, "Atari", "4x4", GAME_IS_SKELETON_MECHANICAL)
+GAME( 1979, supermap,  0,  atari_s2,  atari_s2, driver_device, 0,  ROT0, "Atari", "Superman (Pinball)", GAME_MECHANICAL | GAME_IMPERFECT_SOUND)
+GAME( 1979, hercules,  0,  atari_s2,  atari_s2, driver_device, 0,  ROT0, "Atari", "Hercules", GAME_MECHANICAL | GAME_IMPERFECT_SOUND)
+GAME( 1979, roadrunr,  0,  atari_s3,  atari_s2, driver_device, 0,  ROT0, "Atari", "Road Runner", GAME_MECHANICAL | GAME_IMPERFECT_SOUND)
+GAME( 1982, fourx4,    0,  atari_s3,  atari_s2, driver_device, 0,  ROT0, "Atari", "4x4", GAME_IS_SKELETON_MECHANICAL)

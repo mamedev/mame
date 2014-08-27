@@ -472,7 +472,6 @@ WRITE8_MEMBER( hankin_state::ic2_b_w )
 		float vol = m_vol/16.666+0.1;
 		m_dac->set_output_gain(0, vol);
 	}
-
 }
 
 // low to divide 555 by 2
