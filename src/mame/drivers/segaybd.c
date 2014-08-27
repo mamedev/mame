@@ -760,9 +760,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( link_map, AS_PROGRAM, 8, segaybd_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
-	AM_RANGE(0x2000, 0x2fff) AM_RAM
-	AM_RANGE(0x3000, 0x3fff) AM_RAM
-	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_SHARE("linkram")
+	AM_RANGE(0x2000, 0x3fff) AM_RAM
+	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_SHARE("linkram") // MB8421
 ADDRESS_MAP_END
 
 READ8_MEMBER(segaybd_state::link_portc0_r)
@@ -1338,12 +1337,12 @@ static MACHINE_CONFIG_START( yboard, segaybd_state )
 MACHINE_CONFIG_END
 
 // LINK PCB is 834-6740
-// has 1x 8 switch dip bank, z80B CPU, ribbon connector? (to main board?), RX/TX ports, 16Mhz OSC
+// has 1x 8 switch dip bank, z80E CPU, ribbon connector? (to main board?), RX/TX ports, 16Mhz OSC
 static MACHINE_CONFIG_DERIVED( yboard_link, yboard )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(main_map_link)
 
-	MCFG_CPU_ADD("linkcpu", Z80, LINK_CLOCK/4 ) // ?? mhz
+	MCFG_CPU_ADD("linkcpu", Z80, LINK_CLOCK/2 ) // 8 mhz?
 	MCFG_CPU_PROGRAM_MAP(link_map)
 	MCFG_CPU_IO_MAP(link_portmap)
 	// valid code at 0x28 and 0x38 
