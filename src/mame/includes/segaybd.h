@@ -124,5 +124,7 @@ public:
 	DECLARE_READ8_MEMBER(linkram_r);
 	DECLARE_WRITE8_MEMBER(linkram_w);
 
+	DECLARE_READ8_MEMBER(link_portc0_r);
+
 	optional_shared_ptr<UINT8> m_linkram;
 };

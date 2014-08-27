@@ -765,9 +765,18 @@ static ADDRESS_MAP_START( link_map, AS_PROGRAM, 8, segaybd_state )
 	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_SHARE("linkram")
 ADDRESS_MAP_END
 
+READ8_MEMBER(segaybd_state::link_portc0_r)
+{
+	return 0xf8;
+}
+
 static ADDRESS_MAP_START( link_portmap, AS_IO, 8, segaybd_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
+
+//	AM_RANGE(0x40, 0x40) AM_READ_PORT("LinkDSW") 
+	AM_RANGE(0xc0, 0xc0) AM_READ(link_portc0_r)
+	
 ADDRESS_MAP_END
 
 //**************************************************************************
