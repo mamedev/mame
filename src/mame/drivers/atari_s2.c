@@ -47,7 +47,6 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_s);
 private:
 	bool m_timer_sb;
-	bool m_ab1;
 	UINT8 m_timer_s[5];
 	UINT8 m_sound0;
 	UINT8 m_sound1;
@@ -387,10 +386,16 @@ TIMER_DEVICE_CALLBACK_MEMBER( atari_s2_state::timer_s )
 			// noise
 			if BIT(m_sound0, 7)
 			{
-				m_timer_s[3] = (m_timer_s[3] << 1) | m_ab1;
-				m_timer_s[4] = (m_timer_s[4] << 1) | !BIT(m_timer_s[3], 1);
-				m_ab1 = BIT(m_timer_s[3], 0) ^ BIT(m_timer_s[4], 6);
+				bool ab0 = BIT(m_timer_s[3], 0) ^ BIT(m_timer_s[4], 6);
+				bool ab1 = !BIT(m_timer_s[3], 1);
+				m_timer_s[3] = (m_timer_s[3] << 1) | ab0;
+				m_timer_s[4] = (m_timer_s[4] << 1) | ab1;
 				m_dac1->write_unsigned8((m_timer_s[4] & 7)<< 5);
+			}
+			else
+			{
+				m_timer_s[3] = 0;
+				m_timer_s[4] = 0;
 			}
 		}
 	}
@@ -452,9 +457,9 @@ static MACHINE_CONFIG_START( atari_s2, atari_s2_state )
 	MCFG_FRAGMENT_ADD( genpin_audio )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("dac", DAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 	MCFG_SOUND_ADD("dac1", DAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 
 	/* Video */
 	MCFG_DEFAULT_LAYOUT(layout_atari_s2)
