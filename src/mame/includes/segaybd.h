@@ -33,7 +33,8 @@ public:
 			m_irq2_scanline(0),
 			m_timer_irq_state(0),
 			m_vblank_irq_state(0),
-			m_tmp_bitmap(512, 512)
+			m_tmp_bitmap(512, 512),
+			m_linkram(*this, "linkram")
 	{
 		memset(m_analog_data, 0, sizeof(m_analog_data));
 		memset(m_misc_io_data, 0, sizeof(m_misc_io_data));
@@ -48,9 +49,6 @@ public:
 	DECLARE_READ16_MEMBER( io_chip_r );
 	DECLARE_WRITE16_MEMBER( io_chip_w );
 	DECLARE_WRITE16_MEMBER( sound_data_w );
-	DECLARE_READ16_MEMBER(link_r);
-	DECLARE_READ16_MEMBER(link2_r);
-	DECLARE_WRITE16_MEMBER(link2_w);
 
 	// sound Z80 CPU read/write handlers
 	DECLARE_READ8_MEMBER( sound_data_r );
@@ -116,4 +114,15 @@ protected:
 	UINT8           m_vblank_irq_state;
 	UINT8           m_misc_io_data[0x10];
 	bitmap_ind16    m_tmp_bitmap;
+
+public:
+	// linkpcb support
+	DECLARE_READ16_MEMBER(link_r);
+	DECLARE_READ16_MEMBER(link2_r);
+	DECLARE_WRITE16_MEMBER(link2_w);
+
+	DECLARE_READ8_MEMBER(linkram_r);
+	DECLARE_WRITE8_MEMBER(linkram_w);
+
+	optional_shared_ptr<UINT8> m_linkram;
 };

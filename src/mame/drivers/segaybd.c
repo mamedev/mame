@@ -667,6 +667,16 @@ WRITE16_MEMBER(segaybd_state::link2_w)
 	logerror("link2_w %04x\n", data);
 }
 
+READ8_MEMBER(segaybd_state::linkram_r)
+{
+	return m_linkram[offset];
+}
+
+WRITE8_MEMBER(segaybd_state::linkram_w)
+{
+	m_linkram[offset] = data;
+}
+
 //**************************************************************************
 //  MAIN CPU ADDRESS MAPS
 //**************************************************************************
@@ -686,7 +696,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, segaybd_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( main_map_link, AS_PROGRAM, 16, segaybd_state )
-	AM_RANGE(0x190000, 0x190fff) AM_RAM // ram to share with link CPU?
+	AM_RANGE(0x190000, 0x190fff) AM_READWRITE8(linkram_r, linkram_w, 0x00ff) // ram to share with link CPU?
 	AM_RANGE(0x191000, 0x191001) AM_READ(link_r)
 	AM_RANGE(0x192000, 0x192001) AM_READWRITE(link2_r, link2_w)
 
@@ -752,7 +762,7 @@ static ADDRESS_MAP_START( link_map, AS_PROGRAM, 8, segaybd_state )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x2000, 0x2fff) AM_RAM
 	AM_RANGE(0x3000, 0x3fff) AM_RAM
-	AM_RANGE(0x4000, 0x47ff) AM_RAM
+	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_SHARE("linkram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( link_portmap, AS_IO, 8, segaybd_state )
@@ -1128,6 +1138,32 @@ static INPUT_PORTS_START( pdriftl )
 	PORT_DIPSETTING(    0xc0, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(    0xb0, DEF_STR( 6C_1C ) )
 	PORT_DIPSETTING(    0x00, "Free Play (if Coin A too) or 1/1" )
+
+	PORT_START("LinkDSW")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
 
@@ -1301,6 +1337,7 @@ static MACHINE_CONFIG_DERIVED( yboard_link, yboard )
 	MCFG_CPU_ADD("linkcpu", Z80, LINK_CLOCK/4 ) // ?? mhz
 	MCFG_CPU_PROGRAM_MAP(link_map)
 	MCFG_CPU_IO_MAP(link_portmap)
+	// valid code at 0x28 and 0x38 
 MACHINE_CONFIG_END
 
 //**************************************************************************
