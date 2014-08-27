@@ -203,12 +203,17 @@ void ui_menu_control_device_image::handle()
 
 	case SELECT_PARTLIST:
 		swi = sld->find(software_info_name);
-		if(swi->has_multiple_parts(image->image_interface())) {
+		if (!swi)
+			state = START_SOFTLIST;	
+		else if(swi->has_multiple_parts(image->image_interface())) 
+		{
 			submenu_result = -1;
 			swp = 0;
 			ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_software_parts(machine(), container, swi, image->image_interface(), &swp, false, &submenu_result)));
 			state = SELECT_ONE_PART;
-		} else {
+		} 
+		else 
+		{
 			swp = swi->first_part();
 			load_software_part();
 			ui_menu::stack_pop(machine());
