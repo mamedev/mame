@@ -14,7 +14,7 @@
  Basketball (1974)                                       UNKNOWN
  Cisco/Fisco 400 (1977)                                  UNKNOWN
  Crashing Race (1976)                                    UNKNOWN
- Crossfire (1977)                                        UNKNOWN - AKA Bazooka
+ Cross Fire (1977)                                       UNKNOWN - AKA Bazooka
  Davis Cup (1973)                                        UNKNOWN
  Elepong (1973)                                          UNKNOWN
  Flying Fortress/Flying Fortress II (1977)               UNKNOWN
@@ -175,6 +175,17 @@ ROM_START( gunman )
 ROM_END
 
 
+ROM_START( bazooka )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
+
+	ROM_REGION( 0x0800, "roms", ROMREGION_ERASE00 )
+	ROM_LOAD( "1",  0x0000, 0x0200, CRC(edc34cb0) SHA1(f76a81833b015784e55b33189e9058cd24922f9b) )
+	ROM_LOAD( "2",  0x0200, 0x0200, CRC(3e78e4c2) SHA1(814509eb773bfa87f1df933214f079e7dd2a8fa2) )
+	ROM_LOAD( "3",  0x0400, 0x0200, CRC(4fc10886) SHA1(b1c6f890994ba2182a4e7fc17582d6797dbd6ce9) )
+	ROM_LOAD( "4",  0x0600, 0x0200, CRC(00179936) SHA1(e5417b8d3814dafe1278179b307a1b563a378cbe) )
+ROM_END
+
+
 ROM_START( ttblock )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
 
@@ -194,5 +205,6 @@ ROM_END
 
 
 GAME( 1977, gunman,   0, taitottl, 0, driver_device,  0, ROT0, "Taito", "Gunman [TTL]", GAME_IS_SKELETON )
-GAME( 1977, ttblock,  0, taitottl, 0, driver_device,  0, ROT0, "Taito", "T. T. Block [TTL]", GAME_IS_SKELETON )
+GAME( 1977, bazooka,  0, taitottl, 0, driver_device,  0, ROT0, "Taito do Brasil", "Bazooka (Brazil) [TTL]", GAME_IS_SKELETON ) // clone of Cross Fire
+GAME( 1977, ttblock,  0, taitottl, 0, driver_device,  0, ROT0, "Taito", "T.T. Block [TTL]", GAME_IS_SKELETON )
 GAME( 1979, zzblock,  0, taitottl, 0, driver_device,  0, ROT0, "Taito", "Zun Zun Block [TTL]", GAME_IS_SKELETON )
