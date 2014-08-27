@@ -16531,6 +16531,18 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 	</software>
 
 	<software name="garfldspa" cloneof="garfldsp">
+		<description>Garfield - The Search for Pooky (Euro, Rev. 1)</description>
+		<year>2004</year>
+		<publisher>The Game Factory</publisher>
+		<info name="serial" value="AGB-BGOP-EUR"/>
+		<part name="cart" interface="gba_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="garfieldtsfp.rev1.bin" size="8388608" crc="387eb638" sha1="5ead81908f576e37837bab60d5c580ca684a8fc5" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="garfldspb" cloneof="garfldsp">
 		<description>Garfield - The Search for Pooky (Euro)</description>
 		<year>2004</year>
 		<publisher>The Game Factory</publisher>

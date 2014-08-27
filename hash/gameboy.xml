@@ -6890,9 +6890,27 @@
 		<description>Goukaku Boy GOLD - Shikakui Atama o Maruku Suru - Joushiki no Sho (Jpn)</description>
 		<year>2000</year>
 		<publisher>Imagineer</publisher>
-		<info name="serial" value="DMG-BS4J-JPN"/>
+		<info name="serial" value="DMG-BJ3J-JPN"/>
 		<info name="release" value="20000317"/>
 		<info name="alt_title" value="ゴールド シカクいアタマをマルくする。 合格ボーイGOLD ■いアタマを●くする。 国語 算数 理科 社会 常識の書"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc5" />
+			<!-- cartridge ram -->
+			<dataarea name="rom" size="1048576">
+				<rom name="sikakujosikbj3j1.bin" size="1048576" crc="26772e04" sha1="a6ab7420a2d69d62338bc03dc4e0e46b0dc8429b" offset="000000" />
+			</dataarea>
+			<dataarea name="nvram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gbsjousse" cloneof="gbsjous">
+		<description>Goukaku Boy GOLD - Shikakui Atama o Maruku Suru - Joushiki no Sho (Jpn, Special Edition)</description>
+		<year>2000</year>
+		<publisher>Imagineer</publisher>
+		<info name="serial" value="DMG-BS4J-JPN"/>
+		<info name="release" value="20000317"/>
+		<info name="alt_title" value="ゴールド シカクいアタマをマルくする。 合格ボーイGOLD ■いアタマを●くする。 国語 算数 理科 社会 常識の書 スペシャルエディション"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<!-- cartridge ram -->
@@ -6905,7 +6923,7 @@
 	</software>
 
 	<software name="gbskjtat">
-		<description>Goukaku Boy GOLD - Shikakui Atama o Maruku Suru - Kanji no Tatsujin (Jpn)</description>
+		<description>Goukaku Boy GOLD - Shikakui Atama o Maruku Suru - Kanji no Tatsujin (Jpn, Special Edition)</description>
 		<year>2001</year>
 		<publisher>Imagineer</publisher>
 		<info name="serial" value="DMG-BK4J-JPN"/>
