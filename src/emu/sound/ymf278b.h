@@ -11,7 +11,8 @@
 	devcb = &ymf278b_device::set_irq_handler(*device, DEVCB_##_devcb);
 
 class ymf278b_device : public device_t,
-									public device_sound_interface
+						public device_sound_interface,
+						public device_memory_interface
 {
 public:
 	ymf278b_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
@@ -29,6 +30,9 @@ protected:
 	virtual void device_reset();
 
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+
+	// device_memory_interface overrides
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const { return (spacenum == AS_0) ? &m_space_config : NULL; }
 
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
@@ -75,8 +79,6 @@ private:
 		int num;        /* slot number (for debug only) */
 	};
 
-	void write_memory(UINT32 offset, UINT8 data);
-	UINT8 read_memory(UINT32 offset);
 	int compute_rate(YMF278BSlot *slot, int val);
 	UINT32 compute_decay_env_vol_step(YMF278BSlot *slot, int val);
 	void compute_freq_step(YMF278BSlot *slot);
@@ -120,12 +122,12 @@ private:
 	INT32 m_mix_level[8];
 
 	emu_timer *m_timer_a, *m_timer_b;
-	const UINT8 *m_rom;
-	UINT32 m_romsize;
 	int m_clock;
 
 	sound_stream * m_stream;
 	INT32 *m_mix_buffer;
+	direct_read_data * m_direct;
+	const address_space_config m_space_config;
 	devcb_write_line m_irq_handler;
 };
 

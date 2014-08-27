@@ -729,6 +729,14 @@ static ADDRESS_MAP_START( daitorid_sound_io_map, AS_IO, 8, metro_state )
 	AM_RANGE(UPD7810_PORTC, UPD7810_PORTC) AM_WRITE(daitorid_sound_rombank_w)
 ADDRESS_MAP_END
 
+/*****************/
+
+
+static ADDRESS_MAP_START( ymf278_map, AS_IO, 8, metro_state )
+	AM_RANGE(0x000000, 0x27ffff) AM_ROM
+ADDRESS_MAP_END
+
+
 /***************************************************************************
                                     Bal Cube
 ***************************************************************************/
@@ -3651,6 +3659,7 @@ static MACHINE_CONFIG_START( msgogo, metro_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_SOUND_ADD("ymf", YMF278B, YMF278B_STD_CLOCK)
+	MCFG_DEVICE_ADDRESS_MAP(AS_0, ymf278_map)
 	MCFG_YMF278B_IRQ_HANDLER(WRITELINE(metro_state, ymf278b_interrupt))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)

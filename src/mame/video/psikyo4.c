@@ -55,23 +55,18 @@ void psikyo4_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprec
 	UINT32 *source = m_spriteram;
 	UINT16 *list = (UINT16 *)m_spriteram.target() + 0x2c00/2 + 0x04/2; /* 0x2c00/0x2c02 what are these for, pointers? one for each screen */
 	UINT16 listlen = (0xc00/2 - 0x04/2), listcntr = 0;
-	int flipscreen1, flipscreen2;
-
-	flipscreen1 = (((m_vidregs[1] >> 30) & 2) == 2) ? 1 : 0;
-	flipscreen2 = (((m_vidregs[1] >> 22) & 2) == 2) ? 1 : 0;
+	bool flipscreen = BIT(m_vidregs[1], (scr == 0 ? 31 : 23));
+	int screen_height = (scr == 0 ? m_lscreen : m_rscreen)->visible_area().max_y + 1;
 
 	while (listcntr < listlen)
 	{
-		UINT16 listdat, sprnum, thisscreen;
+		UINT16 listdat, sprnum;
 
 		listdat = list[BYTE_XOR_BE(listcntr)];
 		sprnum = (listdat & 0x03ff) * 2;
 
-		thisscreen = 0;
-		if ((listdat & 0x2000) == scr) thisscreen = 1;
-
 		/* start drawing */
-		if (!(listdat & 0x8000) && thisscreen) /* draw only selected screen */
+		if ((listdat & 0x8000) == 0 && (listdat & 0x2000) == scr) /* draw only selected screen */
 		{
 			int loopnum = 0, i, j;
 			UINT32 xpos, ypos, tnum, wide, high, colr, flipx, flipy;
@@ -93,10 +88,10 @@ void psikyo4_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprec
 			if (ypos & 0x200) ypos -= 0x400;
 			if (xpos & 0x200) xpos -= 0x400;
 
-			if ((!scr && flipscreen1) || (scr && flipscreen2))
+			if (flipscreen)
 			{
 				/* Screen Height depends on game */
-				(!scr && flipscreen1) ? ypos = m_lscreen->visible_area().max_y + 1 - ypos - high * 16 : ypos = m_rscreen->visible_area().max_y + 1 - ypos - high * 16;
+				ypos = screen_height - ypos - high * 16;
 				xpos = 40 * 8 - xpos - wide * 16;
 				flipx = !flipx;
 				flipy = !flipy;

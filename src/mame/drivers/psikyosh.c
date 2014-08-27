@@ -355,7 +355,7 @@ WRITE32_MEMBER(psikyosh_state::psikyosh_vidregs_w)
 	if (offset == 4) /* Configure bank for gfx test */
 	{
 		if (ACCESSING_BITS_0_15)    // Bank
-			membank("bank2")->set_entry(m_vidregs[offset] & 0xfff);
+			membank("gfxbank")->set_entry(m_vidregs[offset] & 0xfff);
 	}
 }
 
@@ -486,7 +486,7 @@ P1KEY11  29|30  P2KEY11
 static ADDRESS_MAP_START( ps3v1_map, AS_PROGRAM, 32, psikyosh_state )
 // rom mapping
 	AM_RANGE(0x00000000, 0x000fffff) AM_ROM // program ROM (1 meg)
-	AM_RANGE(0x02000000, 0x021fffff) AM_ROMBANK("bank1") // data ROM
+	AM_RANGE(0x02000000, 0x020fffff) AM_ROM AM_REGION("maincpu", 0x100000) // data ROM
 // video chip
 	AM_RANGE(0x03000000, 0x03003fff) AM_RAM AM_SHARE("spriteram") // video banks0-7 (sprites and sprite list)
 	AM_RANGE(0x03004000, 0x0300ffff) AM_RAM AM_SHARE("bgram") // video banks 7-0x1f (backgrounds and other effects)
@@ -494,9 +494,9 @@ static ADDRESS_MAP_START( ps3v1_map, AS_PROGRAM, 32, psikyosh_state )
 	AM_RANGE(0x03050000, 0x030501ff) AM_RAM AM_SHARE("zoomram") // sprite zoom lookup table
 	AM_RANGE(0x0305ffdc, 0x0305ffdf) AM_READNOP AM_WRITE(psikyosh_irqctrl_w) // also writes to this address - might be vblank reads?
 	AM_RANGE(0x0305ffe0, 0x0305ffff) AM_RAM_WRITE(psikyosh_vidregs_w) AM_SHARE("vidregs") //  video registers
-	AM_RANGE(0x03060000, 0x0307ffff) AM_ROMBANK("bank2") // data for rom tests (gfx), data is controlled by vidreg
+	AM_RANGE(0x03060000, 0x0307ffff) AM_ROMBANK("gfxbank") // data for rom tests (gfx), data is controlled by vidreg
 // rom mapping
-	AM_RANGE(0x04060000, 0x0407ffff) AM_ROMBANK("bank2") // data for rom tests (gfx) (Mirrored?)
+	AM_RANGE(0x04060000, 0x0407ffff) AM_ROMBANK("gfxbank") // data for rom tests (gfx) (Mirrored?)
 // sound chip
 	AM_RANGE(0x05000000, 0x05000007) AM_DEVREADWRITE8("ymf", ymf278b_device, read, write, 0xffffffff)
 // inputs/eeprom
@@ -522,9 +522,9 @@ static ADDRESS_MAP_START( ps5_map, AS_PROGRAM, 32, psikyosh_state )
 	AM_RANGE(0x04050000, 0x040501ff) AM_RAM AM_SHARE("zoomram") // sprite zoom lookup table
 	AM_RANGE(0x0405ffdc, 0x0405ffdf) AM_READNOP AM_WRITE(psikyosh_irqctrl_w) // also writes to this address - might be vblank reads?
 	AM_RANGE(0x0405ffe0, 0x0405ffff) AM_RAM_WRITE(psikyosh_vidregs_w) AM_SHARE("vidregs") // video registers
-	AM_RANGE(0x04060000, 0x0407ffff) AM_ROMBANK("bank2") // data for rom tests (gfx), data is controlled by vidreg
+	AM_RANGE(0x04060000, 0x0407ffff) AM_ROMBANK("gfxbank") // data for rom tests (gfx), data is controlled by vidreg
 // rom mapping
-	AM_RANGE(0x05000000, 0x0507ffff) AM_ROMBANK("bank1") // data ROM
+	AM_RANGE(0x05000000, 0x0507ffff) AM_ROM AM_REGION("maincpu", 0x100000) // data ROM
 // ram
 	AM_RANGE(0x06000000, 0x060fffff) AM_RAM AM_SHARE("ram")
 ADDRESS_MAP_END
@@ -764,7 +764,7 @@ WRITE_LINE_MEMBER(psikyosh_state::irqhandler)
 
 void psikyosh_state::machine_start()
 {
-	membank("bank2")->configure_entries(0, 0x1000, memregion("gfx1")->base(), 0x20000);
+	membank("gfxbank")->configure_entries(0, 0x1000, memregion("gfx1")->base(), 0x20000);
 }
 
 
@@ -828,7 +828,7 @@ MACHINE_CONFIG_END
 /* PS3 */
 
 ROM_START( soldivid )
-	ROM_REGION( 0x100000, "maincpu", 0)
+	ROM_REGION( 0x200000, "maincpu", 0)
 	ROM_LOAD32_WORD_SWAP( "2-prog_l.u18", 0x000002, 0x080000, CRC(cf179b04) SHA1(343f00a81cffd44334a4db81b6b828b7cf73c1e8) )
 	ROM_LOAD32_WORD_SWAP( "1-prog_h.u17", 0x000000, 0x080000, CRC(f467d1c4) SHA1(a011e6f310a54f09efa0bf4597783cd78c05ad6f) )
 
@@ -846,7 +846,7 @@ ROM_START( soldivid )
 ROM_END
 
 ROM_START( s1945ii )
-	ROM_REGION( 0x100000, "maincpu", 0) /* Code */
+	ROM_REGION( 0x200000, "maincpu", 0) /* Code */
 	ROM_LOAD32_WORD_SWAP( "2_prog_l.u18", 0x000002, 0x080000, CRC(20a911b8) SHA1(82ba7b93bd621fc45a4dc2722752077b59a0a233) )
 	ROM_LOAD32_WORD_SWAP( "1_prog_h.u17", 0x000000, 0x080000, CRC(4c0fe85e) SHA1(74f810a1c3e9d629c8b190f68d73ce07b11f77b7) )
 
@@ -898,7 +898,7 @@ ROM_START( daraku )
 ROM_END
 
 ROM_START( sbomber ) /* Version B - Only shows "Version B" when set to Japan region */
-	ROM_REGION( 0x100000, "maincpu", 0)
+	ROM_REGION( 0x200000, "maincpu", 0)
 	ROM_LOAD32_WORD_SWAP( "1-b_pr_l.u18", 0x000002, 0x080000, CRC(52d12225) SHA1(0a31a5d557414e7bf51dc6f7fbdd417a20b78df1) )
 	ROM_LOAD32_WORD_SWAP( "1-b_pr_h.u17", 0x000000, 0x080000, CRC(1bbd0345) SHA1(c6ccb7c97cc9e9ea298c1883d1dd5563907a7255) )
 
@@ -922,7 +922,7 @@ ROM_START( sbomber ) /* Version B - Only shows "Version B" when set to Japan reg
 ROM_END
 
 ROM_START( sbombera ) /* Original version */
-	ROM_REGION( 0x100000, "maincpu", 0)
+	ROM_REGION( 0x200000, "maincpu", 0)
 	ROM_LOAD32_WORD_SWAP( "2.u18", 0x000002, 0x080000, CRC(57819a26) SHA1(d7a6fc957e39adf97762ab0a35b91aa17ec026e0) )
 	ROM_LOAD32_WORD_SWAP( "1.u17", 0x000000, 0x080000, CRC(c388e847) SHA1(cbf4f2e191894160bdf0290d72cf20c222aaf7a7) )
 
@@ -996,7 +996,7 @@ ROM_END
 /* PS5v2 */
 
 ROM_START( dragnblz )
-	ROM_REGION( 0x100000, "maincpu", 0)
+	ROM_REGION( 0x180000, "maincpu", 0)
 	ROM_LOAD32_WORD_SWAP( "2prog_h.u21",   0x000000, 0x080000, CRC(fc5eade8) SHA1(e5d05543641e4a3900b0d42e0d5f75734683d635) )
 	ROM_LOAD32_WORD_SWAP( "1prog_l.u22",   0x000002, 0x080000, CRC(95d6fd02) SHA1(2b2830e7fa66cbd13666191762bfddc40571caec) )
 
@@ -1022,7 +1022,7 @@ ROM_START( dragnblz )
 	ROM_LOAD32_WORD( "10l.u58",0x2800000, 0x200000, CRC(a3f5c7f8) SHA1(d17478ca3e7ef46270f350ffa35d43acb05b1185) )
 	ROM_LOAD32_WORD( "10h.u59",0x2800002, 0x200000, CRC(30e304c4) SHA1(1d866276bfe7f7524306a880d225aaf11ac2e5dd) )
 
-	ROM_REGION( 0x200000, "ymf", 0 ) /* Samples */
+	ROM_REGION( 0x400000, "ymf", 0 ) /* Samples */
 	ROM_LOAD( "snd0.u52", 0x000000, 0x200000, CRC(7fd1b225) SHA1(6aa61021ada51393bbb34fd1aea00b8feccc8197) )
 
 	ROM_REGION( 0x100, "eeprom", 0 )
@@ -1038,7 +1038,7 @@ Starting with Gunbarich and including Mahjong G-Taste, Psikyo started to "recycl
 */
 
 ROM_START( gnbarich )
-	ROM_REGION( 0x100000, "maincpu", 0)
+	ROM_REGION( 0x180000, "maincpu", 0)
 	ROM_LOAD32_WORD_SWAP( "2-prog_l.u21",   0x000000, 0x080000, CRC(c136cd9c) SHA1(ab66c4f5196a66a97dbb5832336a203421cf40fa) )
 	ROM_LOAD32_WORD_SWAP( "1-prog_h.u22",   0x000002, 0x080000, CRC(6588fc96) SHA1(3db29fcf17e8b2aee465319b557bd3e45bc966b2) )
 
@@ -1064,7 +1064,7 @@ ROM_START( gnbarich )
 //  ROM_LOAD32_WORD( "10l.u58",0x2800000, 0x200000, CRC(a3f5c7f8) SHA1(d17478ca3e7ef46270f350ffa35d43acb05b1185) ) /* From Dragon Blaze */
 //  ROM_LOAD32_WORD( "10h.u59",0x2800002, 0x200000, CRC(30e304c4) SHA1(1d866276bfe7f7524306a880d225aaf11ac2e5dd) ) /* From Dragon Blaze */
 
-	ROM_REGION( 0x200000, "ymf", 0 ) /* Samples */
+	ROM_REGION( 0x400000, "ymf", 0 ) /* Samples */
 	ROM_LOAD( "snd0.u52", 0x000000, 0x200000, CRC(7b10436b) SHA1(c731fcce024e286a677ca10a91761c1ee06094a5) )
 
 	ROM_REGION( 0x100, "eeprom", 0 )
@@ -1072,7 +1072,7 @@ ROM_START( gnbarich )
 ROM_END
 
 ROM_START( mjgtaste )
-	ROM_REGION( 0x100000, "maincpu", 0)
+	ROM_REGION( 0x180000, "maincpu", 0)
 	ROM_LOAD32_WORD_SWAP( "2.u21",   0x000000, 0x080000, CRC(5f2041dc) SHA1(f3862ffdb8df0cf921ce1cb0236935731e7729a7) )
 	ROM_LOAD32_WORD_SWAP( "1.u22",   0x000002, 0x080000, CRC(f5ff7876) SHA1(4c909db9c97f29fd79df6dacd29762688701b973) )
 
@@ -1098,7 +1098,7 @@ ROM_START( mjgtaste )
 //  ROM_LOAD32_WORD( "10l.u58",0x2800000, 0x200000, CRC(a3f5c7f8) SHA1(d17478ca3e7ef46270f350ffa35d43acb05b1185) ) /* From Dragon Blaze */
 //  ROM_LOAD32_WORD( "10h.u59",0x2800002, 0x200000, CRC(30e304c4) SHA1(1d866276bfe7f7524306a880d225aaf11ac2e5dd) ) /* From Dragon Blaze */
 
-	ROM_REGION( 0x800000, "ymf", 0 ) /* Samples */
+	ROM_REGION( 0x400000, "ymf", 0 ) /* Samples */
 	ROM_LOAD( "snd0.u52", 0x000000, 0x400000, CRC(0179f018) SHA1(16ae63e021230356777342ed902e02407a1a1b82) )
 
 	ROM_REGION( 0x100, "eeprom", 0 )
@@ -1106,7 +1106,7 @@ ROM_START( mjgtaste )
 ROM_END
 
 ROM_START( tgm2 )
-	ROM_REGION( 0x100000, "maincpu", 0)
+	ROM_REGION( 0x180000, "maincpu", 0)
 	ROM_LOAD32_WORD_SWAP( "2.u21",   0x000000, 0x080000, CRC(b19f6c31) SHA1(c58346c575db71262aebc3993743cb031c41e4af) )
 	ROM_LOAD32_WORD_SWAP( "1.u22",   0x000002, 0x080000, CRC(c521bf24) SHA1(0ee5b9f74b6b8bcc01b2270c53f30d99e877ed64) )
 
@@ -1129,7 +1129,7 @@ ROM_START( tgm2 )
 	ROM_LOAD32_WORD( "95ts_10l.u58", 0x2800000, 0x200000, CRC(303a5240) SHA1(5816d1922e85bc27a2a13cdd183d9e67c7ddb2e1) )
 	ROM_LOAD32_WORD( "96ts_10h.u59", 0x2800002, 0x200000, CRC(2240ebf6) SHA1(b61f93a18dd9d94fb57d95745d4df2e41a0371ff) )
 
-	ROM_REGION( 0x800000, "ymf", 0 ) /* Samples */
+	ROM_REGION( 0x400000, "ymf", 0 ) /* Samples */
 	ROM_LOAD( "97ts_snd.u52", 0x000000, 0x400000, CRC(9155eca6) SHA1(f0b4f68462d8a465c39815d3b7fd9818788132ae) )
 
 	ROM_REGION( 0x100, "eeprom", 0 ) /* Default Eeprom (contains scores etc.) */
@@ -1138,7 +1138,7 @@ ROM_START( tgm2 )
 ROM_END
 
 ROM_START( tgm2p )
-	ROM_REGION( 0x100000, "maincpu", 0)
+	ROM_REGION( 0x180000, "maincpu", 0)
 	ROM_LOAD32_WORD_SWAP( "2b.u21",   0x000000, 0x080000, CRC(38bc626c) SHA1(783e8413b11f1fa08d331b09ef4ed63f62b87ead) )
 	ROM_LOAD32_WORD_SWAP( "1b.u22",   0x000002, 0x080000, CRC(7599fb19) SHA1(3f7e81756470c173cc17a7e7dee91437571fd0c3) )
 
@@ -1161,7 +1161,7 @@ ROM_START( tgm2p )
 	ROM_LOAD32_WORD( "95ts_10l.u58", 0x2800000, 0x200000, CRC(303a5240) SHA1(5816d1922e85bc27a2a13cdd183d9e67c7ddb2e1) )
 	ROM_LOAD32_WORD( "96ts_10h.u59", 0x2800002, 0x200000, CRC(2240ebf6) SHA1(b61f93a18dd9d94fb57d95745d4df2e41a0371ff) )
 
-	ROM_REGION( 0x800000, "ymf", 0 ) /* Samples */
+	ROM_REGION( 0x400000, "ymf", 0 ) /* Samples */
 	ROM_LOAD( "97ts_snd.u52", 0x000000, 0x400000, CRC(9155eca6) SHA1(f0b4f68462d8a465c39815d3b7fd9818788132ae) )
 
 	ROM_REGION( 0x100, "eeprom", 0 ) /* Default Eeprom (contains scores etc.) */
@@ -1169,105 +1169,46 @@ ROM_START( tgm2p )
 	ROM_LOAD( "tgm2p.default.nv", 0x000, 0x100, CRC(b2328b40) SHA1(e6cda4d6f4e91b9f78d2ca84a5eee6c3bd03fe02) )
 ROM_END
 
-void psikyosh_state::ps3_init()
+DRIVER_INIT_MEMBER(psikyosh_state,ps3)
 {
+	m_maincpu->sh2drc_set_options(SH2DRC_FASTEST_OPTIONS);
 	m_maincpu->sh2drc_add_fastram(0x03004000, 0x0300ffff, 0, &m_bgram[0]);
 	m_maincpu->sh2drc_add_fastram(0x03050000, 0x030501ff, 0, &m_zoomram[0]);
 	m_maincpu->sh2drc_add_fastram(0x06000000, 0x060fffff, 0, &m_ram[0]);
 }
 
-void psikyosh_state::ps5_init()
+DRIVER_INIT_MEMBER(psikyosh_state,ps5)
 {
+	m_maincpu->sh2drc_set_options(SH2DRC_FASTEST_OPTIONS);
 	m_maincpu->sh2drc_add_fastram(0x04004000, 0x0400ffff, 0, &m_bgram[0]);
 	m_maincpu->sh2drc_add_fastram(0x04050000, 0x040501ff, 0, &m_zoomram[0]);
 	m_maincpu->sh2drc_add_fastram(0x06000000, 0x060fffff, 0, &m_ram[0]);
 }
 
-DRIVER_INIT_MEMBER(psikyosh_state,soldivid)
-{
-	m_maincpu->sh2drc_set_options(SH2DRC_FASTEST_OPTIONS);
-	ps3_init();
-}
-
-DRIVER_INIT_MEMBER(psikyosh_state,s1945ii)
-{
-	m_maincpu->sh2drc_set_options(SH2DRC_FASTEST_OPTIONS);
-	ps3_init();
-}
-
-DRIVER_INIT_MEMBER(psikyosh_state,daraku)
-{
-	UINT8 *RAM = memregion("maincpu")->base();
-	membank("bank1")->set_base(&RAM[0x100000]);
-	m_maincpu->sh2drc_set_options(SH2DRC_FASTEST_OPTIONS);
-	ps3_init();
-}
-
-DRIVER_INIT_MEMBER(psikyosh_state,sbomberb)
-{
-	m_maincpu->sh2drc_set_options(SH2DRC_FASTEST_OPTIONS);
-	ps3_init();
-}
-
-DRIVER_INIT_MEMBER(psikyosh_state,gunbird2)
-{
-	UINT8 *RAM = memregion("maincpu")->base();
-	membank("bank1")->set_base(&RAM[0x100000]);
-	m_maincpu->sh2drc_set_options(SH2DRC_FASTEST_OPTIONS);
-	ps5_init();
-}
-
-DRIVER_INIT_MEMBER(psikyosh_state,s1945iii)
-{
-	UINT8 *RAM = memregion("maincpu")->base();
-	membank("bank1")->set_base(&RAM[0x100000]);
-	m_maincpu->sh2drc_set_options(SH2DRC_FASTEST_OPTIONS);
-	ps5_init();
-}
-
-DRIVER_INIT_MEMBER(psikyosh_state,dragnblz)
-{
-	m_maincpu->sh2drc_set_options(SH2DRC_FASTEST_OPTIONS);
-	ps5_init();
-}
-
-DRIVER_INIT_MEMBER(psikyosh_state,gnbarich)
-{
-	m_maincpu->sh2drc_set_options(SH2DRC_FASTEST_OPTIONS);
-	ps5_init();
-}
-
-DRIVER_INIT_MEMBER(psikyosh_state,tgm2)
-{
-	m_maincpu->sh2drc_set_options(SH2DRC_FASTEST_OPTIONS);
-	ps5_init();
-}
-
 DRIVER_INIT_MEMBER(psikyosh_state,mjgtaste)
 {
-	m_maincpu->sh2drc_set_options(SH2DRC_FASTEST_OPTIONS);
 	/* needs to install mahjong controls too (can select joystick in test mode tho) */
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x03000000, 0x03000003, read32_delegate(FUNC(psikyosh_state::mjgtaste_input_r),this));
-	ps5_init();
+	DRIVER_INIT_CALL(ps5);
 }
 
 
 /*     YEAR  NAME      PARENT    MACHINE    INPUT     INIT      MONITOR COMPANY   FULLNAME FLAGS */
 
 /* ps3-v1 */
-GAME( 1997, soldivid, 0,        psikyo3v1,   soldivid, psikyosh_state, soldivid, ROT0,   "Psikyo", "Sol Divide - The Sword Of Darkness", GAME_SUPPORTS_SAVE )
-GAME( 1997, s1945ii,  0,        psikyo3v1,   s1945ii, psikyosh_state,  s1945ii,  ROT270, "Psikyo", "Strikers 1945 II", GAME_SUPPORTS_SAVE )
-GAME( 1998, daraku,   0,        psikyo3v1,   daraku, psikyosh_state,   daraku,   ROT0,   "Psikyo", "Daraku Tenshi - The Fallen Angels", GAME_SUPPORTS_SAVE )
-GAME( 1998, sbomber,  0,        psikyo3v1,   sbomberb, psikyosh_state, sbomberb, ROT270, "Psikyo", "Space Bomber (ver. B)", GAME_SUPPORTS_SAVE )
-GAME( 1998, sbombera, sbomber,  psikyo3v1,   sbomberb, psikyosh_state, sbomberb, ROT270, "Psikyo", "Space Bomber", GAME_SUPPORTS_SAVE )
+GAME( 1997, soldivid, 0,        psikyo3v1,   soldivid, psikyosh_state, ps3, ROT0,   "Psikyo", "Sol Divide - The Sword Of Darkness", GAME_SUPPORTS_SAVE )
+GAME( 1997, s1945ii,  0,        psikyo3v1,   s1945ii,  psikyosh_state, ps3, ROT270, "Psikyo", "Strikers 1945 II", GAME_SUPPORTS_SAVE )
+GAME( 1998, daraku,   0,        psikyo3v1,   daraku,   psikyosh_state, ps3, ROT0,   "Psikyo", "Daraku Tenshi - The Fallen Angels", GAME_SUPPORTS_SAVE )
+GAME( 1998, sbomber,  0,        psikyo3v1,   sbomberb, psikyosh_state, ps3, ROT270, "Psikyo", "Space Bomber (ver. B)", GAME_SUPPORTS_SAVE )
+GAME( 1998, sbombera, sbomber,  psikyo3v1,   sbomberb, psikyosh_state, ps3, ROT270, "Psikyo", "Space Bomber", GAME_SUPPORTS_SAVE )
 
 /* ps5 */
-GAME( 1998, gunbird2, 0,        psikyo5,     gunbird2, psikyosh_state, gunbird2, ROT270, "Psikyo", "Gunbird 2", GAME_SUPPORTS_SAVE )
-GAME( 1999, s1945iii, 0,        psikyo5,     s1945iii, psikyosh_state, s1945iii, ROT270, "Psikyo", "Strikers 1945 III (World) / Strikers 1999 (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1998, gunbird2, 0,        psikyo5,     gunbird2, psikyosh_state, ps5, ROT270, "Psikyo", "Gunbird 2", GAME_SUPPORTS_SAVE )
+GAME( 1999, s1945iii, 0,        psikyo5,     s1945iii, psikyosh_state, ps5, ROT270, "Psikyo", "Strikers 1945 III (World) / Strikers 1999 (Japan)", GAME_SUPPORTS_SAVE )
 
 /* ps5v2 */
-GAME( 2000, dragnblz, 0,        psikyo5,     dragnblz, psikyosh_state, dragnblz, ROT270, "Psikyo", "Dragon Blaze", GAME_SUPPORTS_SAVE )
-GAME( 2000, tgm2,     0,        psikyo5_240, tgm2, psikyosh_state,     tgm2,     ROT0,   "Arika",  "Tetris the Absolute The Grand Master 2", GAME_SUPPORTS_SAVE )
-GAME( 2000, tgm2p,    tgm2,     psikyo5_240, tgm2, psikyosh_state,     tgm2,     ROT0,   "Arika",  "Tetris the Absolute The Grand Master 2 Plus", GAME_SUPPORTS_SAVE )
-GAME( 2001, gnbarich, 0,        psikyo5,     gnbarich, psikyosh_state, gnbarich, ROT270, "Psikyo", "Gunbarich", GAME_SUPPORTS_SAVE )
+GAME( 2000, dragnblz, 0,        psikyo5,     dragnblz, psikyosh_state, ps5,      ROT270, "Psikyo", "Dragon Blaze", GAME_SUPPORTS_SAVE )
+GAME( 2000, tgm2,     0,        psikyo5_240, tgm2,     psikyosh_state, ps5,      ROT0,   "Arika",  "Tetris the Absolute The Grand Master 2", GAME_SUPPORTS_SAVE )
+GAME( 2000, tgm2p,    tgm2,     psikyo5_240, tgm2,     psikyosh_state, ps5,      ROT0,   "Arika",  "Tetris the Absolute The Grand Master 2 Plus", GAME_SUPPORTS_SAVE )
+GAME( 2001, gnbarich, 0,        psikyo5,     gnbarich, psikyosh_state, ps5,      ROT270, "Psikyo", "Gunbarich", GAME_SUPPORTS_SAVE )
 GAME( 2002, mjgtaste, 0,        psikyo5,     mjgtaste, psikyosh_state, mjgtaste, ROT0,   "Psikyo", "Mahjong G-Taste", GAME_SUPPORTS_SAVE )

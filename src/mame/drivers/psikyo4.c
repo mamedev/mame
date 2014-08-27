@@ -31,8 +31,7 @@ YMF278B-F (80 pin PQFP) & YAC513 (16 pin SOIC)
 To Do:
 
   Sprite List format not 100% understood.
-  The sound rom banking is wrong, at least for the ROM tests (see hotgm4ev), all the roms
-  are good, but it tests sound rom 0 twice due to the banking issues.
+  Lode Runner still fails the sound ROM test for some reason (different banking from the other games?)
 
 *-----------------------------------*
 |         Tips and Tricks           |
@@ -40,8 +39,10 @@ To Do:
 
 Hold Button during booting to test roms (Checksum 16-bit) for:
 
-Lode Runner - The Dig Fight:   PL1 Start (passes gfx, sample result:05A5, expects:0BB0 [both sets]) (banking?)
-Quiz de Idol! Hot Debut:       PL1 Start (passes)
+Hot Gimmick 4 Ever:            PL1 Start+PL2 Start (passes)
+Hot Gimmick Integral:          PL1 Start+PL2 Start (passes)
+Lode Runner - The Dig Fight:   PL1 Start (debug DSW must be set; passes gfx, sample result:05A5, expects:0BB0 [both sets])
+Quiz de Idol! Hot Debut:       PL1 Start (debug DSW must be set; passes)
 
 --- Lode Runner: The Dig Fight ---
 
@@ -120,7 +121,7 @@ ROMs -
 
        The remaining ROMs are surface mounted TSOP48 Type II MASKROMs,
        either OKI MSM27C3252 (32MBit) or OKI MSM27C1652 (16MBit).
-       These MASKROMs are non-standard are require a custom adapter
+       These MASKROMs are non-standard and require a custom adapter
        to read them. Not all positions are populated for each game. See
        the source below for specifics.
 
@@ -129,20 +130,10 @@ ROMs -
 #include "includes/psikyo4.h"
 #include "rendlay.h"
 
-
-static const gfx_layout layout_16x16x8 =
-{
-	16,16,
-	RGN_FRAC(1,1),
-	8,
-	{STEP8(0,1)},
-	{STEP16(0,8)},
-	{STEP16(0,16*8)},
-	16*16*8
-};
+static GFXLAYOUT_RAW( layout_16x16x8, 16, 16, 16*8, 16*16*8 )
 
 static GFXDECODE_START( ps4 )
-	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x8, 0x000, 0x80 ) // 8bpp tiles
+	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x8, 0x000, 0x40 ) // 8bpp tiles
 GFXDECODE_END
 
 WRITE32_MEMBER(psikyo4_state::ps4_eeprom_w)
@@ -176,21 +167,15 @@ INTERRUPT_GEN_MEMBER(psikyo4_state::psikyosh_interrupt)
 	device.execute().set_input_line(4, HOLD_LINE);
 }
 
-CUSTOM_INPUT_MEMBER(psikyo4_state::system_port_r)
-{
-	return ioport("SYSTEM")->read();
-}
-
 CUSTOM_INPUT_MEMBER(psikyo4_state::mahjong_ctrl_r)/* used by hotgmck/hgkairak */
 {
 	int player = (FPTR)param;
-	int sel = (m_io_select[0] & 0x0000ff00) >> 8;
 	int ret = 0xff;
 
-	if (sel & 1) ret &= ioport(player ? "KEY4" : "KEY0" )->read();
-	if (sel & 2) ret &= ioport(player ? "KEY5" : "KEY1" )->read();
-	if (sel & 4) ret &= ioport(player ? "KEY6" : "KEY2" )->read();
-	if (sel & 8) ret &= ioport(player ? "KEY7" : "KEY3" )->read();
+	if (m_io_select & 1) ret &= m_keys[player+0]->read();
+	if (m_io_select & 2) ret &= m_keys[player+1]->read();
+	if (m_io_select & 4) ret &= m_keys[player+2]->read();
+	if (m_io_select & 8) ret &= m_keys[player+3]->read();
 
 	return ret;
 }
@@ -298,41 +283,41 @@ WRITE32_MEMBER(psikyo4_state::ps4_vidregs_w)
 	if (offset == 2) /* Configure bank for gfx test */
 	{
 		if (ACCESSING_BITS_0_15)    // Bank
-			membank("bank2")->set_base(memregion("gfx1")->base() + 0x2000 * (m_vidregs[offset] & 0x1fff)); /* Bank comes from vidregs */
+			membank("gfxbank")->set_base(memregion("gfx1")->base() + 0x2000 * (m_vidregs[offset] & 0x1fff)); /* Bank comes from vidregs */
 	}
 }
 
-#define PCM_BANK_NO_LEGACY(n)   ((m_io_select[0] >> (n * 4 + 24)) & 0x07)
-
-void psikyo4_state::set_hotgmck_pcm_bank( int n )
+WRITE32_MEMBER(psikyo4_state::io_select_w)
 {
-	UINT8 *ymf_pcmbank = memregion("ymf")->base() + 0x200000;
-	UINT8 *pcm_rom = memregion("ymfsource")->base();
+	// YMF banking
+	if (ACCESSING_BITS_16_31)
+	{
+		UINT32 bankdata = data >> 16;
+		UINT32 bankmask = mem_mask >> 16;
+		for (int i = 0; i < 4; i++)
+		{
+			if (bankmask & 0x0f)
+			{
+				int banknum = bankdata & 0x0f;
+				if (banknum < m_ymf_max_bank)
+					m_ymf_bank[i]->set_entry(banknum);
+			}
+			bankdata >>= 4;
+			bankmask >>= 4;
+		}
+	}
 
-	memcpy(ymf_pcmbank + n * 0x100000, pcm_rom + PCM_BANK_NO_LEGACY(n) * 0x100000, 0x100000);
-}
-#define PCM_BANK_NO(n)  ((m_io_select[0] >> (n * 4 + 24)) & 0x07)
-WRITE32_MEMBER(psikyo4_state::hotgmck_pcm_bank_w)
-{
-	int old_bank0 = PCM_BANK_NO(0);
-	int old_bank1 = PCM_BANK_NO(1);
-	int new_bank0, new_bank1;
+	// mahjong input multiplexing
+	if (ACCESSING_BITS_8_15)
+		m_io_select = data >> 8;
 
-	COMBINE_DATA(&m_io_select[0]);
-
-	new_bank0 = PCM_BANK_NO(0);
-	new_bank1 = PCM_BANK_NO(1);
-
-	if (old_bank0 != new_bank0)
-		set_hotgmck_pcm_bank(0);
-
-	if (old_bank1 != new_bank1)
-		set_hotgmck_pcm_bank(1);
+	if (ACCESSING_BITS_0_7)
+		logerror("Unk ioselect write %x mask %x\n", data, mem_mask);
 }
 
 static ADDRESS_MAP_START( ps4_map, AS_PROGRAM, 32, psikyo4_state )
 	AM_RANGE(0x00000000, 0x000fffff) AM_ROM     // program ROM (1 meg)
-	AM_RANGE(0x02000000, 0x021fffff) AM_ROMBANK("bank1") // data ROM
+	AM_RANGE(0x02000000, 0x021fffff) AM_ROM AM_REGION("maincpu", 0x100000) // data ROM
 	AM_RANGE(0x03000000, 0x030037ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x03003fe0, 0x03003fe3) AM_READWRITE(ps4_eeprom_r,ps4_eeprom_w)
 	AM_RANGE(0x03003fe4, 0x03003fe7) AM_READNOP // also writes to this address - might be vblank?
@@ -343,27 +328,33 @@ static ADDRESS_MAP_START( ps4_map, AS_PROGRAM, 32, psikyo4_state )
 	AM_RANGE(0x03003ff8, 0x03003ffb) AM_WRITE(ps4_screen2_brt_w) // screen 2 brightness
 	AM_RANGE(0x03003ffc, 0x03003fff) AM_WRITE(ps4_bgpen_2_dword_w) AM_SHARE("bgpen_2") // screen 2 clear colour
 	AM_RANGE(0x03004000, 0x03005fff) AM_RAM_WRITE(ps4_paletteram32_RRRRRRRRGGGGGGGGBBBBBBBBxxxxxxxx_dword_w) AM_SHARE("paletteram") // palette
-	AM_RANGE(0x03006000, 0x03007fff) AM_ROMBANK("bank2") // data for rom tests (gfx), data is controlled by vidreg
+	AM_RANGE(0x03006000, 0x03007fff) AM_ROMBANK("gfxbank") // data for rom tests (gfx), data is controlled by vidreg
 	AM_RANGE(0x05000000, 0x05000007) AM_DEVREADWRITE8("ymf", ymf278b_device, read, write, 0xffffffff)
 	AM_RANGE(0x05800000, 0x05800003) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x05800004, 0x05800007) AM_READ_PORT("P3_P4")
-	AM_RANGE(0x05800008, 0x0580000b) AM_WRITEONLY AM_SHARE("io_select") // Used by Mahjong games to choose input (also maps normal loderndf inputs to offsets)
+	AM_RANGE(0x05800008, 0x0580000b) AM_WRITE(io_select_w) // Used by Mahjong games to choose input (also maps normal loderndf inputs to offsets)
 
 	AM_RANGE(0x06000000, 0x060fffff) AM_RAM AM_SHARE("ram") // main RAM (1 meg)
+ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( ps4_ymf_map, AS_0, 8, psikyo4_state )
+	AM_RANGE(0x000000, 0x0fffff) AM_ROMBANK("ymfbank0")
+	AM_RANGE(0x100000, 0x1fffff) AM_ROMBANK("ymfbank1")
+	AM_RANGE(0x200000, 0x2fffff) AM_ROMBANK("ymfbank2")
+	AM_RANGE(0x300000, 0x3fffff) AM_ROMBANK("ymfbank3")
 ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( hotgmck )
 	PORT_START("P1_P2")
-	PORT_BIT( 0x000000ff, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_CUSTOM_MEMBER(DEVICE_SELF, psikyo4_state,system_port_r, NULL)
+	PORT_BIT( 0x000000ff, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "SYSTEM")
 	PORT_BIT( 0x00ffff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0xff000000, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_CUSTOM_MEMBER(DEVICE_SELF, psikyo4_state,mahjong_ctrl_r, (void *)0)
 
 	PORT_START("P3_P4")
-	PORT_BIT( 0x000000ff, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_CUSTOM_MEMBER(DEVICE_SELF, psikyo4_state,system_port_r, NULL)
+	PORT_BIT( 0x000000ff, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "SYSTEM")
 	PORT_BIT( 0x00ffff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0xff000000, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_CUSTOM_MEMBER(DEVICE_SELF, psikyo4_state,mahjong_ctrl_r, (void *)1)
+	PORT_BIT( 0xff000000, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_CUSTOM_MEMBER(DEVICE_SELF, psikyo4_state,mahjong_ctrl_r, (void *)4)
 
 	PORT_START("JP4")/* jumper pads 'JP4' on the PCB */
 	/* EEPROM is read here */
@@ -381,7 +372,7 @@ static INPUT_PORTS_START( hotgmck )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE2 )   // Screen 2
 
-	PORT_START("KEY0")  /* fake player 1 controls 1st bank */
+	PORT_START("KEY.0")  /* fake player 1 controls 1st bank */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_A )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_E )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_I )
@@ -391,7 +382,7 @@ static INPUT_PORTS_START( hotgmck )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("KEY1")  /* fake player 1 controls 2nd bank */
+	PORT_START("KEY.1")  /* fake player 1 controls 2nd bank */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_B )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_F )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_J )
@@ -401,7 +392,7 @@ static INPUT_PORTS_START( hotgmck )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("KEY2")  /* fake player 1 controls 3rd bank */
+	PORT_START("KEY.2")  /* fake player 1 controls 3rd bank */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_C )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_G )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_K )
@@ -411,7 +402,7 @@ static INPUT_PORTS_START( hotgmck )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("KEY3")  /* fake player 1 controls 4th bank */
+	PORT_START("KEY.3")  /* fake player 1 controls 4th bank */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_D )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_H )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_L )
@@ -421,7 +412,7 @@ static INPUT_PORTS_START( hotgmck )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("KEY4")  /* fake player 2 controls 1st bank */
+	PORT_START("KEY.4")  /* fake player 2 controls 1st bank */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_A ) PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_E ) PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_I ) PORT_PLAYER(2)
@@ -431,7 +422,7 @@ static INPUT_PORTS_START( hotgmck )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("KEY5")  /* fake player 2 controls 2nd bank */
+	PORT_START("KEY.5")  /* fake player 2 controls 2nd bank */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_B ) PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_F ) PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_J ) PORT_PLAYER(2)
@@ -441,7 +432,7 @@ static INPUT_PORTS_START( hotgmck )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("KEY6")  /* fake player 2 controls 3rd bank */
+	PORT_START("KEY.6")  /* fake player 2 controls 3rd bank */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_C ) PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_G ) PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_K ) PORT_PLAYER(2)
@@ -451,7 +442,7 @@ static INPUT_PORTS_START( hotgmck )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("KEY7")  /* fake player 2 controls 4th bank */
+	PORT_START("KEY.7")  /* fake player 2 controls 4th bank */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_D ) PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_H ) PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_L ) PORT_PLAYER(2)
@@ -470,7 +461,7 @@ static INPUT_PORTS_START( loderndf )
 	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_COIN4 )    // Screen 2 - 2nd slot
 	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_SERVICE1 ) // Screen 1
 	PORT_SERVICE_NO_TOGGLE( 0x00000020, IP_ACTIVE_LOW)
-	PORT_DIPNAME( 0x00000040, 0x00000040, "Debug" ) /* Must be high for rom test, unknown other side-effects */
+	PORT_DIPNAME( 0x00000040, 0x00000040, "Debug" ) /* Must be on for rom test, unknown other side-effects */
 	PORT_DIPSETTING(          0x00000040, DEF_STR( Off ) )
 	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
 	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_SERVICE2 ) // Screen 2
@@ -633,6 +624,24 @@ WRITE_LINE_MEMBER(psikyo4_state::irqhandler)
 
 void psikyo4_state::machine_start()
 {
+	// configure YMF ROM banks
+	memory_region *YMFROM = memregion("ymf");
+	m_ymf_max_bank = YMFROM->bytes() / 0x100000;
+	for (int i = 0; i < 4; i++)
+	{
+		char banktag[16];
+		sprintf(banktag, "ymfbank%d", i);
+		m_ymf_bank[i] = membank(banktag);
+		m_ymf_bank[i]->configure_entries(0, m_ymf_max_bank, YMFROM->base(), 0x100000);
+		m_ymf_bank[i]->set_entry(i);
+	}
+
+	// configure SH2 DRC
+	m_maincpu->sh2drc_add_fastram(0x00000000, 0x000fffff, 1, memregion("maincpu")->base());
+	m_maincpu->sh2drc_add_fastram(0x03000000, 0x030037ff, 0, memshare("spriteram")->ptr());
+	m_maincpu->sh2drc_add_fastram(0x06000000, 0x060fffff, 0, memshare("ram")->ptr());
+
+	save_item(NAME(m_io_select));
 	save_item(NAME(m_oldbrt1));
 	save_item(NAME(m_oldbrt2));
 }
@@ -683,6 +692,7 @@ static MACHINE_CONFIG_START( ps4big, psikyo4_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_SOUND_ADD("ymf", YMF278B, MASTER_CLOCK/2)
+	MCFG_DEVICE_ADDRESS_MAP(AS_0, ps4_ymf_map)
 	MCFG_YMF278B_IRQ_HANDLER(WRITELINE(psikyo4_state, irqhandler))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
@@ -718,9 +728,7 @@ ROM_START( hotgmck )
 	ROM_LOAD32_WORD( "3l.bin", 0x1800000, 0x400000, CRC(a8a646f7) SHA1(be96626f3a4c8eb81f0bb7d8ac1c4e6619be50c8) )
 	ROM_LOAD32_WORD( "3h.bin", 0x1800002, 0x400000, CRC(8c32becd) SHA1(9a8ddda4c6c007bb5cd4abb11859a4b7f1b1d578) )
 
-	ROM_REGION( 0x400000, "ymf", ROMREGION_ERASE00 )
-
-	ROM_REGION( 0x800000, "ymfsource", 0 )
+	ROM_REGION( 0x800000, "ymf", 0 )
 	ROM_LOAD( "snd0.bin", 0x000000, 0x400000, CRC(c090d51a) SHA1(d229753b536209fe0da1985ca694fd1a73bc0f39) )
 	ROM_LOAD( "snd1.bin", 0x400000, 0x400000, CRC(c24243b5) SHA1(2100d5d7d2e4b9ed90bde38cb61a5da09f00ce21) )
 ROM_END
@@ -745,9 +753,7 @@ ROM_START( hgkairak )
 	ROM_LOAD32_WORD( "5l.u7",  0x2800000, 0x400000, CRC(4639ef36) SHA1(324ffcfa1b1b9def00c15f628c59cea1d09b031d) )
 	ROM_LOAD32_WORD( "5h.u16", 0x2800002, 0x400000, CRC(549e9e9e) SHA1(90c1695c89c059852f8b4f714b3dfee006839b44) )
 
-	ROM_REGION( 0x400000, "ymf", ROMREGION_ERASE00 )
-
-	ROM_REGION( 0x800000, "ymfsource", 0 )
+	ROM_REGION( 0x800000, "ymf", 0 )
 	ROM_LOAD( "snd0.u10", 0x000000, 0x400000, CRC(0e8e5fdf) SHA1(041e3118f7a838dcc9fb99a1028fb48a452ba1d9) )
 	ROM_LOAD( "snd1.u19", 0x400000, 0x400000, CRC(d8057d2f) SHA1(51d96cc4e9da81cbd1e815c652707407e6c7c3ae) )
 ROM_END
@@ -777,9 +783,7 @@ ROM_START( hotgmck3 )
 	ROM_LOAD32_WORD( "7l.u9",  0x3800000, 0x400000, CRC(2ec78fb2) SHA1(194e9833ab7057c2f83c581e722b41631d99fccc) )
 	ROM_LOAD32_WORD( "7h.u18", 0x3800002, 0x400000, CRC(c1735612) SHA1(84e32d3249d57cdc8ea91780801eaa196c439895) )
 
-	ROM_REGION( 0x400000, "ymf", ROMREGION_ERASE00 )
-
-	ROM_REGION( 0x800000, "ymfsource", 0 )
+	ROM_REGION( 0x800000, "ymf", 0 )
 	ROM_LOAD( "snd0.u10", 0x000000, 0x400000, CRC(d62a0dba) SHA1(d81e2e1251b62eca8cd4d8eec2515b2cf7d7ff0a) )
 	ROM_LOAD( "snd1.u19", 0x400000, 0x400000, CRC(1df91fb4) SHA1(f0f2d2d717fbd16a67da9f0e21f288ceedef839f) )
 ROM_END
@@ -789,7 +793,7 @@ ROM_START( hotgm4ev )
 	ROM_REGION( 0x500000, "maincpu", 0)
 	ROM_LOAD32_WORD_SWAP( "2.u22",   0x000000, 0x080000, CRC(3334c21e) SHA1(8d825448e40bc50d670ab8587a40df6b27ac918e) )
 	ROM_LOAD32_WORD_SWAP( "1.u23",   0x000002, 0x080000, CRC(b1a1c643) SHA1(1912a2d231e97ffbe9b668ca7f25cf406664f3ba) )
-	ROM_LOAD16_WORD_SWAP( "prog.u1", 0x100000, 0x400000, CRC(ad556d8e) SHA1(d3dc3c5cbe939b6fc28f861e4132c5485ba89f50) ) // no test
+	ROM_LOAD16_WORD_SWAP( "prog.u1", 0x100000, 0x400000, CRC(ad556d8e) SHA1(d3dc3c5cbe939b6fc28f861e4132c5485ba89f50) ) // no test; second half empty
 
 	ROM_REGION( 0x8000000, "gfx1", 0 )  /* Sprites */
 	ROM_LOAD32_WORD( "0l.u2",  0x0000000, 0x400000, CRC(f65986f7) SHA1(3824a7ea7f14ef3f319b07bd1224847131f6cac0) ) // ok
@@ -809,19 +813,16 @@ ROM_START( hotgm4ev )
 	ROM_LOAD32_WORD( "7l.u9",  0x3800000, 0x400000, CRC(022a8a31) SHA1(a21dbf36f56e144f9817c7255866546367dda2f6) ) // ok
 	ROM_LOAD32_WORD( "7h.u18", 0x3800002, 0x400000, CRC(77e47409) SHA1(0e1deb01dd1250c90fc3eed776becd51899f0b5f) ) // ok
 
-	ROM_REGION( 0x400000, "ymf", ROMREGION_ERASE00 )
-
-	ROM_REGION( 0x800000, "ymfsource", 0 )
+	ROM_REGION( 0x800000, "ymf", 0 )
 	ROM_LOAD( "snd0.u10", 0x000000, 0x400000, CRC(051e2fed) SHA1(ee8073332801982549b3c142fba114e27733a756) ) // ok
-	ROM_LOAD( "snd1.u19", 0x400000, 0x400000, CRC(0de0232d) SHA1(c600fe1d3c6c05e451ae7ef249bb92e8fc9cec3a) ) // ok (but fails rom test due to banking error in emulation)
+	ROM_LOAD( "snd1.u19", 0x400000, 0x400000, CRC(0de0232d) SHA1(c600fe1d3c6c05e451ae7ef249bb92e8fc9cec3a) ) // ok
 ROM_END
 
 ROM_START( hotgmcki )
-	ROM_REGION( 0x500000, "maincpu", 0)
+	ROM_REGION( 0x300000, "maincpu", 0)
 	ROM_LOAD32_WORD_SWAP( "2.u22",   0x000000, 0x080000, CRC(abc192dd) SHA1(674c2b8814319605c1b6221bbe18588a98dda093) )
 	ROM_LOAD32_WORD_SWAP( "1.u23",   0x000002, 0x080000, CRC(8be896d0) SHA1(5d677dede4ec18cbfc54acae95fe0f10bfc4d566) )
 	ROM_LOAD16_WORD_SWAP( "prog.u1", 0x100000, 0x200000, CRC(9017ae8e) SHA1(0879198606095a2d209df059538ce1c73460b30e) ) // no test
-	ROM_RELOAD(0x300000,0x200000)
 
 	/* Roms have to be mirrored with ROM_RELOAD for rom tests to pass */
 	ROM_REGION( 0x4000000, "gfx1", ROMREGION_ERASEFF | 0 )  /* Sprites */
@@ -858,16 +859,14 @@ ROM_START( hotgmcki )
 	ROM_LOAD32_WORD( "7h.u18", 0x3800002, 0x200000, CRC(a3fd4ae5) SHA1(31056e5f645984b85e9bc3767016a856ac0175f9) ) // ok
 	ROM_RELOAD(                0x3c00002, 0x200000 )
 
-	ROM_REGION( 0x400000, "ymf", ROMREGION_ERASE00 )
-
-	ROM_REGION( 0x800000, "ymfsource", 0 )
+	ROM_REGION( 0x800000, "ymf", 0 )
 	ROM_LOAD( "snd0.u10", 0x000000, 0x400000, CRC(5f275f35) SHA1(c5952a16e9f0cee6fc990c234ccaa7ca577741bd) ) // ok
-	ROM_LOAD( "snd1.u19", 0x400000, 0x400000, CRC(98608779) SHA1(a73c21f0f66c2af903e44a0a6a9f821b00615e7b) ) // ok (but fails rom test due to bad banking in service mode)
+	ROM_LOAD( "snd1.u19", 0x400000, 0x400000, CRC(98608779) SHA1(a73c21f0f66c2af903e44a0a6a9f821b00615e7b) ) // ok
 ROM_END
 
 
 ROM_START( loderndf )
-	ROM_REGION( 0x100000, "maincpu", 0)
+	ROM_REGION( 0x300000, "maincpu", 0)
 	ROM_LOAD32_WORD_SWAP( "1b.u23", 0x000002, 0x080000, CRC(fae92286) SHA1(c3d3a50514fb9c0bbd3ffb5c4bfcc853dc1893d2) )
 	ROM_LOAD32_WORD_SWAP( "2b.u22", 0x000000, 0x080000, CRC(fe2424c0) SHA1(48a329cfdf98da1a8701b430c159d470c0f5eca1) )
 
@@ -882,7 +881,7 @@ ROM_START( loderndf )
 ROM_END
 
 ROM_START( loderndfa )
-	ROM_REGION( 0x100000, "maincpu", 0)
+	ROM_REGION( 0x300000, "maincpu", 0)
 	ROM_LOAD32_WORD_SWAP( "12.u23", 0x000002, 0x080000, CRC(661d372e) SHA1(c509c3ad9ca01e0f58bfc319b2738ecc36865ffd) )
 	ROM_LOAD32_WORD_SWAP( "3.u22", 0x000000, 0x080000, CRC(0a63529f) SHA1(05dd7877041b69d46e41c5bddb877c083620294b) )
 
@@ -897,7 +896,7 @@ ROM_START( loderndfa )
 ROM_END
 
 ROM_START( hotdebut )
-	ROM_REGION( 0x100000, "maincpu", 0)
+	ROM_REGION( 0x300000, "maincpu", 0)
 	ROM_LOAD32_WORD_SWAP( "1.u23",   0x000002, 0x080000, CRC(0b0d0027) SHA1(f62c487a725439af035d2904d453d3c2f7a5649b) )
 	ROM_LOAD32_WORD_SWAP( "2.u22",   0x000000, 0x080000, CRC(c3b5180b) SHA1(615cc1fd99a1e4634b04bb92a3c41f914644e903) )
 
@@ -914,46 +913,12 @@ ROM_START( hotdebut )
 ROM_END
 
 
-void psikyo4_state::hotgmck_pcm_bank_postload()
-{
-	set_hotgmck_pcm_bank(0);
-	set_hotgmck_pcm_bank(1);
-}
-
-void psikyo4_state::install_hotgmck_pcm_bank()
-{
-	UINT8 *ymf_pcm = memregion("ymf")->base();
-	UINT8 *pcm_rom = memregion("ymfsource")->base();
-
-	memcpy(ymf_pcm, pcm_rom, 0x200000);
-
-	m_io_select[0] = (m_io_select[0] & 0x00ffffff) | 0x32000000;
-	set_hotgmck_pcm_bank(0);
-	set_hotgmck_pcm_bank(1);
-
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x5800008, 0x580000b, write32_delegate(FUNC(psikyo4_state::hotgmck_pcm_bank_w),this));
-	machine().save().register_postload(save_prepost_delegate(FUNC(psikyo4_state::hotgmck_pcm_bank_postload), this));
-}
-
-DRIVER_INIT_MEMBER(psikyo4_state,hotgmck)
-{
-	UINT8 *RAM = memregion("maincpu")->base();
-	membank("bank1")->set_base(&RAM[0x100000]);
-	install_hotgmck_pcm_bank();    // Banked PCM ROM
-
-	UINT32 *rom = (UINT32 *)memregion("maincpu")->base();
-	m_maincpu->sh2drc_add_fastram(0x00000000, 0x000fffff, 1, rom);
-	m_maincpu->sh2drc_add_fastram(0x03000000, 0x030037ff, 0, &m_spriteram[0]);
-	m_maincpu->sh2drc_add_fastram(0x06000000, 0x060fffff, 0, &m_ram[0]);
-}
-
-
-/*    YEAR  NAME      PARENT    MACHINE    INPUT     INIT                     MONITOR COMPANY   FULLNAME     FLAGS */
-GAME( 1997, hotgmck,  0,        ps4big,    hotgmck,  psikyo4_state, hotgmck,  ROT0,   "Psikyo", "Taisen Hot Gimmick (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1998, hgkairak, 0,        ps4big,    hotgmck,  psikyo4_state, hotgmck,  ROT0,   "Psikyo", "Taisen Hot Gimmick Kairakuten (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1999, hotgmck3, 0,        ps4big,    hotgmck,  psikyo4_state, hotgmck,  ROT0,   "Psikyo", "Taisen Hot Gimmick 3 Digital Surfing (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 2000, hotgm4ev, 0,        ps4big,    hotgmck,  psikyo4_state, hotgmck,  ROT0,   "Psikyo", "Taisen Hot Gimmick 4 Ever (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 2001, hotgmcki, 0,        ps4big,    hotgmck,  psikyo4_state, hotgmck,  ROT0,   "Psikyo", "Mahjong Hot Gimmick Integral (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 2000, loderndf, 0,        ps4small,  loderndf, driver_device, 0,        ROT0,   "Psikyo", "Lode Runner - The Dig Fight (ver. B)", GAME_SUPPORTS_SAVE )
-GAME( 2000, loderndfa,loderndf, ps4small,  loderndf, driver_device, 0,        ROT0,   "Psikyo", "Lode Runner - The Dig Fight (ver. A)", GAME_SUPPORTS_SAVE )
-GAME( 2000, hotdebut, 0,        ps4small,  hotdebut, driver_device, 0,        ROT0,   "MOSS / Psikyo", "Quiz de Idol! Hot Debut (Japan)", GAME_SUPPORTS_SAVE )
+/*    YEAR  NAME      PARENT    MACHINE    INPUT     INIT              MONITOR COMPANY   FULLNAME     FLAGS */
+GAME( 1997, hotgmck,  0,        ps4big,    hotgmck,  driver_device, 0, ROT0,   "Psikyo", "Taisen Hot Gimmick (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1998, hgkairak, 0,        ps4big,    hotgmck,  driver_device, 0, ROT0,   "Psikyo", "Taisen Hot Gimmick Kairakuten (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1999, hotgmck3, 0,        ps4big,    hotgmck,  driver_device, 0, ROT0,   "Psikyo", "Taisen Hot Gimmick 3 Digital Surfing (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 2000, hotgm4ev, 0,        ps4big,    hotgmck,  driver_device, 0, ROT0,   "Psikyo", "Taisen Hot Gimmick 4 Ever (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 2001, hotgmcki, 0,        ps4big,    hotgmck,  driver_device, 0, ROT0,   "Psikyo", "Mahjong Hot Gimmick Integral (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 2000, loderndf, 0,        ps4small,  loderndf, driver_device, 0, ROT0,   "Psikyo", "Lode Runner - The Dig Fight (ver. B)", GAME_SUPPORTS_SAVE )
+GAME( 2000, loderndfa,loderndf, ps4small,  loderndf, driver_device, 0, ROT0,   "Psikyo", "Lode Runner - The Dig Fight (ver. A)", GAME_SUPPORTS_SAVE )
+GAME( 2000, hotdebut, 0,        ps4small,  hotdebut, driver_device, 0, ROT0,   "MOSS / Psikyo", "Quiz de Idol! Hot Debut (Japan)", GAME_SUPPORTS_SAVE )

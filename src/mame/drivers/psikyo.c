@@ -1590,7 +1590,7 @@ ROM_START( s1945 )
 	ROM_REGION( 0x200000, "gfx2", 0 )   /* Layer 0 + 1 */
 	ROM_LOAD( "u34.bin",  0x000000, 0x200000, CRC(aaf83e23) SHA1(1c75d09ff42c0c215f8c66c699ca75688c95a05e) )
 
-	ROM_REGION( 0x200000, "ymf", 0 )    /* Samples */
+	ROM_REGION( 0x400000, "ymf", 0 )    /* Samples */
 	ROM_LOAD( "u61.bin",  0x000000, 0x200000, CRC(a839cf47) SHA1(e179eb505c80d5bb3ccd9e228f2cf428c62b72ee) )    // 8 bit signed pcm (16KHz)
 
 	ROM_REGION( 0x040000, "spritelut", 0 )  /* */
@@ -1620,7 +1620,7 @@ ROM_START( s1945a )
 	ROM_REGION( 0x200000, "gfx2", 0 )   /* Layer 0 + 1 */
 	ROM_LOAD( "u34.bin",  0x000000, 0x200000, CRC(aaf83e23) SHA1(1c75d09ff42c0c215f8c66c699ca75688c95a05e) )
 
-	ROM_REGION( 0x200000, "ymf", 0 )    /* Samples */
+	ROM_REGION( 0x400000, "ymf", 0 )    /* Samples */
 	ROM_LOAD( "u61.bin",  0x000000, 0x200000, CRC(a839cf47) SHA1(e179eb505c80d5bb3ccd9e228f2cf428c62b72ee) )    // 8 bit signed pcm (16KHz)
 
 	ROM_REGION( 0x040000, "spritelut", 0 )  /* */
@@ -1650,7 +1650,7 @@ ROM_START( s1945j )
 	ROM_REGION( 0x200000, "gfx2", 0 )   /* Layer 0 + 1 */
 	ROM_LOAD( "u34.bin",  0x000000, 0x200000, CRC(aaf83e23) SHA1(1c75d09ff42c0c215f8c66c699ca75688c95a05e) )
 
-	ROM_REGION( 0x200000, "ymf", 0 )    /* Samples */
+	ROM_REGION( 0x400000, "ymf", 0 )    /* Samples */
 	ROM_LOAD( "u61.bin",  0x000000, 0x200000, CRC(a839cf47) SHA1(e179eb505c80d5bb3ccd9e228f2cf428c62b72ee) )    // 8 bit signed pcm (16KHz)
 
 	ROM_REGION( 0x040000, "spritelut", 0 )  /* */
@@ -1680,7 +1680,7 @@ ROM_START( s1945k ) /* Same MCU as the current parent set, region dip has no eff
 	ROM_REGION( 0x200000, "gfx2", 0 )   /* Layer 0 + 1 */
 	ROM_LOAD( "u34.bin",  0x000000, 0x200000, CRC(aaf83e23) SHA1(1c75d09ff42c0c215f8c66c699ca75688c95a05e) )
 
-	ROM_REGION( 0x200000, "ymf", 0 )    /* Samples */
+	ROM_REGION( 0x400000, "ymf", 0 )    /* Samples */
 	ROM_LOAD( "u61.bin",  0x000000, 0x200000, CRC(a839cf47) SHA1(e179eb505c80d5bb3ccd9e228f2cf428c62b72ee) )    // 8 bit signed pcm (16KHz)
 
 	ROM_REGION( 0x040000, "spritelut", 0 )  /* */
