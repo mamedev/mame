@@ -1058,6 +1058,62 @@ static INPUT_PORTS_START( pdriftj )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( pdriftl )
+	PORT_INCLUDE( pdrift )
+
+	PORT_MODIFY("DSW")
+	PORT_DIPUNUSED_DIPLOC( 0x08, IP_ACTIVE_LOW, "SWB:4" )
+	PORT_DIPNAME( 0x10, 0x00, "Ground Level Tilts" ) PORT_DIPLOCATION("SWB:5")
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0xe0, 0x80, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SWB:6,7,8")
+	PORT_DIPSETTING(    0xe0, "0 - Easiest" )
+	PORT_DIPSETTING(    0xa0, "1" )
+	PORT_DIPSETTING(    0xc0, "2" )
+	PORT_DIPSETTING(    0x80, "3" )
+	PORT_DIPSETTING(    0x60, "4" )
+	PORT_DIPSETTING(    0x40, "5" )
+	PORT_DIPSETTING(    0x20, "6" )
+	PORT_DIPSETTING(    0x00, "7 - Hardest" )
+
+	PORT_MODIFY("COINAGE")
+	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SWA:1,2,3,4")
+	PORT_DIPSETTING(    0x0a, DEF_STR( 1C_6C ) )
+	PORT_DIPSETTING(    0x0d, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x0e, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x06, DEF_STR( 2C_3C ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( 2C_3C ) )
+	PORT_DIPSETTING(    0x02, "4 Coins/5 Credits" )
+	PORT_DIPSETTING(    0x03, "5 Coins/6 Credits" )
+	PORT_DIPSETTING(    0x0f, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 4C_3C ) )
+	PORT_DIPSETTING(    0x05, "6 Coins/4 Credits" )
+	PORT_DIPSETTING(    0x09, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x07, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x0c, DEF_STR( 5C_1C ) )
+	PORT_DIPSETTING(    0x0b, DEF_STR( 6C_1C ) )
+	PORT_DIPSETTING(    0x00, "Free Play (if Coin B too) or 1/1" )
+	PORT_DIPNAME( 0xf0, 0xf0, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("SWA:5,6,7,8")
+	PORT_DIPSETTING(    0xa0, DEF_STR( 1C_6C ) )
+	PORT_DIPSETTING(    0xd0, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0xe0, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x60, DEF_STR( 2C_3C ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( 2C_3C ) )
+	PORT_DIPSETTING(    0x20, "4 Coins/5 Credits" )
+	PORT_DIPSETTING(    0x30, "5 Coins/6 Credits" )
+	PORT_DIPSETTING(    0xf0, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( 4C_3C ) )
+	PORT_DIPSETTING(    0x50, "6 Coins/4 Credits" )
+	PORT_DIPSETTING(    0x90, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x70, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0xc0, DEF_STR( 5C_1C ) )
+	PORT_DIPSETTING(    0xb0, DEF_STR( 6C_1C ) )
+	PORT_DIPSETTING(    0x00, "Free Play (if Coin A too) or 1/1" )
+INPUT_PORTS_END
+
+
 static INPUT_PORTS_START( rchase )
 	PORT_INCLUDE( yboard_generic )
 
@@ -2384,7 +2440,7 @@ DRIVER_INIT_MEMBER(segaybd_state,rchase)
 //  GAME DRIVERS
 //**************************************************************************
 
-//    YEAR, NAME,      PARENT,  MACHINE,INPUT,    INIT,                   MONITOR,COMPANY,FULLNAME,FLAGS,                                     LAYOUT
+//    YEAR, NAME,      PARENT,  MACHINE, INPUT,    INIT,                   MONITOR,COMPANY,FULLNAME,FLAGS,                                     LAYOUT
 GAME( 1988, gforce2,   0,        yboard, gforce2,  segaybd_state, gforce2, ROT0,   "Sega", "Galaxy Force 2", GAME_SUPPORTS_SAVE )
 GAME( 1988, gforce2j,  gforce2,  yboard, gforce2,  segaybd_state, gforce2, ROT0,   "Sega", "Galaxy Force 2 (Japan)", GAME_SUPPORTS_SAVE )
 GAME( 1988, gforce2ja, gforce2,  yboard, gforce2,  segaybd_state, gforce2, ROT0,   "Sega", "Galaxy Force 2 (Japan, Rev A)", GAME_SUPPORTS_SAVE )
@@ -2394,7 +2450,7 @@ GAMEL(1988, pdrift,    0,        yboard, pdrift,   segaybd_state, pdrift,  ROT0,
 GAMEL(1988, pdrifta,   pdrift,   yboard, pdrift,   segaybd_state, pdrift,  ROT0,   "Sega", "Power Drift (World)", GAME_SUPPORTS_SAVE,          layout_pdrift )
 GAMEL(1988, pdrifte,   pdrift,   yboard, pdrifte,  segaybd_state, pdrift,  ROT0,   "Sega", "Power Drift (World, Earlier)", GAME_SUPPORTS_SAVE, layout_pdrift )
 GAMEL(1988, pdriftj,   pdrift,   yboard, pdriftj,  segaybd_state, pdrift,  ROT0,   "Sega", "Power Drift (Japan)", GAME_SUPPORTS_SAVE,          layout_pdrift )
-GAMEL(1988, pdriftl,   pdrift,   yboard, pdriftj,  segaybd_state, pdrift,  ROT0,   "Sega", "Power Drift (Japan, Link Version)", GAME_SUPPORTS_SAVE|GAME_NOT_WORKING, layout_pdrift)
+GAMEL(1988, pdriftl,   pdrift,   yboard, pdriftl,  segaybd_state, pdrift,  ROT0,   "Sega", "Power Drift (Japan, Link Version)", GAME_SUPPORTS_SAVE|GAME_NOT_WORKING, layout_pdrift)
 
 GAME( 1991, rchase,    0,        yboard, rchase,   segaybd_state, rchase,  ROT0,   "Sega", "Rail Chase (World)", GAME_SUPPORTS_SAVE )
 GAME( 1991, rchasej,   rchase,   yboard, rchase,   segaybd_state, rchase,  ROT0,   "Sega", "Rail Chase (Japan)", GAME_SUPPORTS_SAVE )
