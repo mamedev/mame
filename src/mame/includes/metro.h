@@ -158,7 +158,7 @@ public:
 	DECLARE_READ16_MEMBER(dokyusp_eeprom_r);
 	DECLARE_WRITE16_MEMBER(dokyusp_eeprom_bit_w);
 	DECLARE_WRITE16_MEMBER(dokyusp_eeprom_reset_w);
-	DECLARE_WRITE16_MEMBER(mouja_sound_rombank_w);
+	DECLARE_WRITE8_MEMBER(mouja_sound_rombank_w);
 	void gakusai_oki_bank_set();
 
 	// vmetal
@@ -177,8 +177,6 @@ public:
 	TILE_GET_INFO_MEMBER(metro_k053936_get_tile_info);
 	TILE_GET_INFO_MEMBER(metro_k053936_gstrik2_get_tile_info);
 	TILEMAP_MAPPER_MEMBER(tilemap_scan_gstrik2);
-	DECLARE_MACHINE_START(metro);
-	DECLARE_MACHINE_RESET(metro);
 	void expand_gfx1();
 	DECLARE_VIDEO_START(metro_i4100);
 	DECLARE_VIDEO_START(metro_i4220);
@@ -210,5 +208,6 @@ public:
 	DECLARE_READ_LINE_MEMBER(metro_rxd_r);
 
 protected:
+	virtual void machine_start();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };

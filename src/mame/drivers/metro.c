@@ -19,40 +19,44 @@ Sound Chips  :  OKIM6295 + YM2413  or
 Other        :  Memory Blitter
 
 ------------------------------------------------------------------------------------------------
-Year + Game                     PCB           Video   Issues / Notes
+Year + Game                     PCB           Video  Sub CPU  Sound         Issues / Notes
 ------------------------------------------------------------------------------------------------
-92  Last Fortress - Toride      VG420         I4100
-92  Last Fortress - Toride (Ger)VG460-(A)     I4100
-92  Pang Pom's                  VG420         I4100
-92  Sky Alert                   VG420         I4100
-92  The Karate Tournament       VG460-B       I4100
-93? Lady Killer / Moeyo Gonta!! VG460-B       I4100
-93  Poitto!                     MTR5260-A     I4100
+92  Last Fortress - Toride      VG420         I4100  uPD7810  YM2413+M6295
+92  Last Fortress - Toride (Ger)VG460-(A)     I4100  uPD7810  YM2413+M6295
+92  Pang Pom's                  VG420         I4100  uPD7810  YM2413+M6295
+92  Sky Alert                   VG420         I4100  uPD7810  YM2413+M6295
+92  The Karate Tournament       VG460-B       I4100  uPD7810  YM2413+M6295
+93? Lady Killer / Moeyo Gonta!! VG460-B       I4100  uPD7810  YM2413+M6295
+93  Poitto!                     MTR5260-A     I4100  uPD7810  YM2413+M6295
 
-94  Blazing Tornado             HUM-002-A-(B) I4220    Also has Konami 053936 gfx chip
-94  Dharma Doujou               MTR5260-A     I4220
-94  Dharma Doujou (Korea)       MTR527        I4220
-94  Gun Master                  MTR5260-A     I4220
-94  Toride II Adauchi Gaiden    MTR5260-A     I4220
-94  Toride II Adauchi Gaiden(Kr)MTR5260-A     I4220    No YM2151
-95  Daitoride                   MTR5260-A     I4220
-95  Mouse Shooter GoGo          -             I4220    No sound CPU
-95  Pururun                     MTR5260-A     I4220
-95  Puzzli                      MTR5260-A     I4220
-95  Varia Metal                 ES-9309B-B    I4220    No sound CPU but ES-8712 + M6295 + M6585
-96  Bal Cube                    -             I4220    No sound CPU
-96  Bang Bang Ball              -             I4220    No sound CPU
-96  Daitoride (YMF278B)         -             I4220    No sound CPU
-96  Grand Striker 2             HUM-003(A)    I4220    Also has Konami 053936 gfx chip
-96  Sankokushi                  MTR5260-A     I4220
-99  Battle Bubble v2.00         LM2D-Y        I4220    No sound CPU
+94  Dharma Doujou               MTR5260-A     I4220  uPD7810  YM2413+M6295
+94  Dharma Doujou (Korea)       MTR527        I4220  uPD7810  YM2413+M6295
+94  Toride II Adauchi Gaiden    MTR5260-A     I4220  uPD7810  YM2413+M6295
+94  Toride II Adauchi Gaiden(Kr)MTR5260-A     I4220  uPD7810  YM2413+M6295
+94  Gun Master                  MTR5260-A     I4220  uPD7810  YM2151+M6295
+95  Daitoride                   MTR5260-A     I4220  uPD7810  YM2151+M6295
+95  Pururun                     MTR5260-A     I4220  uPD7810  YM2151+M6295
+95  Puzzli                      MTR5260-A     I4220  uPD7810  YM2151+M6295
+96  Sankokushi                  MTR5260-A     I4220  uPD7810  YM2413+M6295
 
-95  Mahjong Doukyuusei          VG330-B       I4300    No sound CPU
-95  Mahjong Doukyuusei Special  VG340-A       I4300    No sound CPU
-96  Mouja                       VG410-B       I4300    No sound CPU
-97  Mahjong Gakuensai           VG340-A       I4300    No sound CPU
-98  Mahjong Gakuensai 2         VG340-A       I4300    No sound CPU
-00  Puzzlet                     VG2200-(B)    I4300    Z86E02 Zilog Z8 8-bit MCU
+95  Mouse Shooter GoGo          -             I4220   -       YMF278B       GFX ROM data lines swapped
+96  Bal Cube                    -             I4220   -       YMF278B       GFX ROM data lines swapped
+96  Daitoride (YMF278B)         -             I4220   -       YMF278B       GFX ROM data lines swapped
+96  Bang Bang Ball              -             I4220   -       YMF278B       GFX ROM data lines swapped
+99  Battle Bubble v2.00         LM2D-Y        I4220   -       YMF278B       GFX ROM data lines swapped
+
+94  Blazing Tornado             HUM-002-A-(B) I4220  Z80      YM2610        Konami 053936 PSAC2
+96  Grand Striker 2             HUM-003(A)    I4220  Z80      YM2610        Konami 053936 PSAC2
+
+95  Varia Metal                 ES-9309B-B    I4220   -       ES8712+M6295+M6585
+
+95  Mahjong Doukyuusei          VG330-B       I4300   -       YM2413+M6295
+95  Mahjong Doukyuusei Special  VG340-A       I4300   -       YM2413+M6295
+96  Mouja                       VG410-B       I4300   -       YM2413+M6295
+97  Mahjong Gakuensai           VG340-A       I4300   -       YM2413+M6295
+98  Mahjong Gakuensai 2         VG340-A       I4300   -       YM2413+M6295
+
+00  Puzzlet                     VG2200-(B)    I4300  Z86E02   YM2413+M6295  H8/3007 CPU
 ------------------------------------------------------------------------------------------------
 
 Mouse Shooter GoGo, Bal Cube, Bang Bang Ball & Daitoride (YMF278B) PCBs have
@@ -82,7 +86,7 @@ To Do:
 
 Notes:
 
--   To enter service mode in ladykill, 3kokishi: toggle the dip switch and reset
+-   To enter service mode in ladykill, 3kokushi: toggle the dip switch and reset
     keeping start 2 pressed.
 -   Sprite zoom in Mouja at the end of a match looks wrong, but it's been verified
     to be the same on the original board
@@ -987,11 +991,11 @@ static ADDRESS_MAP_START( dharma_map, AS_PROGRAM, 16, metro_state )
 	AM_RANGE(0x878870, 0x87887b) AM_WRITEONLY AM_SHARE("scroll")                    // Scroll Regs
 	AM_RANGE(0x878880, 0x878881) AM_WRITENOP                                        // ? CRT
 	AM_RANGE(0x878890, 0x878891) AM_WRITENOP                                        // ? CRT
+	AM_RANGE(0x8788a2, 0x8788a3) AM_READWRITE(metro_irq_cause_r, metro_irq_cause_w) // IRQ Cause / IRQ Acknowledge
 	AM_RANGE(0x8788a4, 0x8788a5) AM_WRITEONLY AM_SHARE("irq_enable")                // IRQ Enable
 	AM_RANGE(0x8788a8, 0x8788a9) AM_WRITE(metro_soundlatch_w)                       // To Sound CPU
 	AM_RANGE(0x8788aa, 0x8788ab) AM_WRITEONLY AM_SHARE("rombank")                   // Rom Bank
 	AM_RANGE(0x8788ac, 0x8788ad) AM_WRITEONLY AM_SHARE("screenctrl")                // Screen Control
-	AM_RANGE(0x8788a2, 0x8788a3) AM_READWRITE(metro_irq_cause_r, metro_irq_cause_w) // IRQ Cause / IRQ Acknowledge
 	AM_RANGE(0x879700, 0x879713) AM_WRITEONLY AM_SHARE("videoregs")                 // Video Registers
 	AM_RANGE(0xc00000, 0xc00001) AM_READ_PORT("IN0") AM_WRITE(metro_soundstatus_w)  // To Sound CPU
 	AM_RANGE(0xc00002, 0xc00003) AM_READ_PORT("IN1")                                //
@@ -1233,13 +1237,13 @@ static ADDRESS_MAP_START( gakusai_map, AS_PROGRAM, 16, metro_state )
 	AM_RANGE(0x278820, 0x27882f) AM_WRITEONLY AM_SHARE("irq_vectors")               // IRQ Vectors
 	AM_RANGE(0x278830, 0x278831) AM_WRITEONLY AM_SHARE("irq_enable")                // IRQ Enable
 	AM_RANGE(0x278832, 0x278833) AM_READWRITE(metro_irq_cause_r, metro_irq_cause_w) // IRQ Cause / IRQ Acknowledge
-	AM_RANGE(0x278880, 0x278881) AM_READ(gakusai_input_r)                           // Inputs
-	AM_RANGE(0x278882, 0x278883) AM_READ_PORT("IN0")                                //
 	AM_RANGE(0x278836, 0x278837) AM_WRITE(watchdog_reset16_w)                       // Watchdog
 	AM_RANGE(0x278840, 0x27884d) AM_WRITE(metro_blitter_w) AM_SHARE("blitter_regs") // Tiles Blitter
-	AM_RANGE(0x278860, 0x27886b) AM_WRITE(metro_window_w) AM_SHARE("window")        // Tilemap Window
 	AM_RANGE(0x278850, 0x27885b) AM_WRITEONLY AM_SHARE("scroll")                    // Scroll Regs
+	AM_RANGE(0x278860, 0x27886b) AM_WRITE(metro_window_w) AM_SHARE("window")        // Tilemap Window
 	AM_RANGE(0x278870, 0x278871) AM_WRITEONLY AM_SHARE("rombank")                   // Rom Bank
+	AM_RANGE(0x278880, 0x278881) AM_READ(gakusai_input_r)                           // Inputs
+	AM_RANGE(0x278882, 0x278883) AM_READ_PORT("IN0")                                //
 	AM_RANGE(0x278888, 0x278889) AM_WRITEONLY AM_SHARE("input_sel")                 // Inputs
 	AM_RANGE(0x279700, 0x279713) AM_WRITEONLY AM_SHARE("videoregs")                 // Video Registers
 	AM_RANGE(0x400000, 0x400001) AM_WRITENOP                                        // ? 5
@@ -1274,11 +1278,11 @@ static ADDRESS_MAP_START( gakusai2_map, AS_PROGRAM, 16, metro_state )
 	AM_RANGE(0x678832, 0x678833) AM_READWRITE(metro_irq_cause_r,metro_irq_cause_w)  // IRQ Cause / IRQ Acknowledge
 	AM_RANGE(0x678836, 0x678837) AM_WRITE(watchdog_reset16_w)                       // Watchdog
 	AM_RANGE(0x678840, 0x67884d) AM_WRITE(metro_blitter_w) AM_SHARE("blitter_regs") // Tiles Blitter
+	AM_RANGE(0x678850, 0x67885b) AM_WRITEONLY AM_SHARE("scroll")                    // Scroll Regs
 	AM_RANGE(0x678860, 0x67886b) AM_WRITE(metro_window_w) AM_SHARE("window")        // Tilemap Window
+	AM_RANGE(0x678870, 0x678871) AM_WRITEONLY AM_SHARE("rombank")                   // Rom Bank
 	AM_RANGE(0x678880, 0x678881) AM_READ(gakusai_input_r)                           // Inputs
 	AM_RANGE(0x678882, 0x678883) AM_READ_PORT("IN0")                                //
-	AM_RANGE(0x678850, 0x67885b) AM_WRITEONLY AM_SHARE("scroll")                    // Scroll Regs
-	AM_RANGE(0x678870, 0x678871) AM_WRITEONLY AM_SHARE("rombank")                   // Rom Bank
 	AM_RANGE(0x678888, 0x678889) AM_WRITEONLY AM_SHARE("input_sel")                 // Inputs
 	AM_RANGE(0x679700, 0x679713) AM_WRITEONLY AM_SHARE("videoregs")                 // Video Registers
 	AM_RANGE(0x800000, 0x800001) AM_WRITENOP                                        // ? 5
@@ -1336,19 +1340,19 @@ static ADDRESS_MAP_START( dokyusp_map, AS_PROGRAM, 16, metro_state )
 	AM_RANGE(0x272000, 0x273fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")    // Palette
 	AM_RANGE(0x274000, 0x274fff) AM_RAM AM_SHARE("spriteram")                       // Sprites
 	AM_RANGE(0x278000, 0x2787ff) AM_RAM AM_SHARE("tiletable")                       // Tiles Set
+	AM_RANGE(0x27880e, 0x27880f) AM_RAM AM_SHARE("screenctrl")                      // Screen Control
 	AM_RANGE(0x278810, 0x27881f) AM_WRITEONLY AM_SHARE("irq_levels")                // IRQ Levels
 	AM_RANGE(0x278820, 0x27882f) AM_WRITEONLY AM_SHARE("irq_vectors")               // IRQ Vectors
 	AM_RANGE(0x278830, 0x278831) AM_WRITEONLY AM_SHARE("irq_enable")                // IRQ Enable
 	AM_RANGE(0x278832, 0x278833) AM_READWRITE(metro_irq_cause_r,metro_irq_cause_w)  // IRQ Cause / IRQ Acknowledge
 	AM_RANGE(0x278836, 0x278837) AM_WRITE(watchdog_reset16_w)                       // Watchdog
 	AM_RANGE(0x278840, 0x27884d) AM_WRITE(metro_blitter_w) AM_SHARE("blitter_regs") // Tiles Blitter
-	AM_RANGE(0x278860, 0x27886b) AM_WRITE(metro_window_w) AM_SHARE("window")        // Tilemap Window
 	AM_RANGE(0x278850, 0x27885b) AM_WRITEONLY AM_SHARE("scroll")                    // Scroll Regs
+	AM_RANGE(0x278860, 0x27886b) AM_WRITE(metro_window_w) AM_SHARE("window")        // Tilemap Window
 	AM_RANGE(0x278870, 0x278871) AM_WRITEONLY AM_SHARE("rombank")                   // Rom Bank
 	AM_RANGE(0x278880, 0x278881) AM_READ(gakusai_input_r)                           // Inputs
 	AM_RANGE(0x278882, 0x278883) AM_READ_PORT("IN0")                                //
 	AM_RANGE(0x278888, 0x278889) AM_WRITEONLY AM_SHARE("input_sel")                 //
-	AM_RANGE(0x27880e, 0x27880f) AM_RAM AM_SHARE("screenctrl")                      // Screen Control
 	AM_RANGE(0x279700, 0x279713) AM_WRITEONLY AM_SHARE("videoregs")                 // Video Registers
 	AM_RANGE(0x400000, 0x400001) AM_WRITENOP                                        // ? 5
 	AM_RANGE(0x500000, 0x500001) AM_WRITE(gakusai_oki_bank_lo_w)                    // Sound
@@ -1386,12 +1390,12 @@ static ADDRESS_MAP_START( dokyusei_map, AS_PROGRAM, 16, metro_state )
 	AM_RANGE(0x478850, 0x47885b) AM_WRITEONLY AM_SHARE("scroll")                    // Scroll Regs
 	AM_RANGE(0x478860, 0x47886b) AM_WRITE(metro_window_w) AM_SHARE("window")        // Tilemap Window
 	AM_RANGE(0x478870, 0x478871) AM_WRITEONLY AM_SHARE("rombank")                   // Rom Bank
-	AM_RANGE(0x479700, 0x479713) AM_WRITEONLY AM_SHARE("videoregs")                 // Video Registers
-	AM_RANGE(0x478888, 0x478889) AM_WRITEONLY AM_SHARE("input_sel")                 // Inputs
 	AM_RANGE(0x478880, 0x478881) AM_READ(gakusai_input_r)                           // Inputs
 	AM_RANGE(0x478882, 0x478883) AM_READ_PORT("IN0")                                //
 	AM_RANGE(0x478884, 0x478885) AM_READ_PORT("DSW0")                               // 2 x DSW
 	AM_RANGE(0x478886, 0x478887) AM_READ_PORT("DSW1")                               //
+	AM_RANGE(0x478888, 0x478889) AM_WRITEONLY AM_SHARE("input_sel")                 // Inputs
+	AM_RANGE(0x479700, 0x479713) AM_WRITEONLY AM_SHARE("videoregs")                 // Video Registers
 	AM_RANGE(0x800000, 0x800001) AM_WRITE(gakusai_oki_bank_hi_w)                    // Samples Bank?
 	AM_RANGE(0x900000, 0x900001) AM_WRITENOP                                        // ? 4
 	AM_RANGE(0xa00000, 0xa00001) AM_WRITE(gakusai_oki_bank_lo_w)                    // Samples Bank
@@ -1652,10 +1656,9 @@ ADDRESS_MAP_END
                                     Mouja
 ***************************************************************************/
 
-WRITE16_MEMBER(metro_state::mouja_sound_rombank_w)
+WRITE8_MEMBER(metro_state::mouja_sound_rombank_w)
 {
-	if (ACCESSING_BITS_0_7)
-		m_oki->set_bank_base(((data >> 3) & 0x07) * 0x40000);
+	membank("okibank")->set_entry((data >> 3) & 0x07);
 }
 
 static ADDRESS_MAP_START( mouja_map, AS_PROGRAM, 16, metro_state )
@@ -1682,7 +1685,7 @@ static ADDRESS_MAP_START( mouja_map, AS_PROGRAM, 16, metro_state )
 	AM_RANGE(0x478886, 0x478887) AM_READ_PORT("IN2")                                //
 	AM_RANGE(0x478888, 0x478889) AM_WRITENOP                                        // ??
 	AM_RANGE(0x479700, 0x479713) AM_WRITEONLY AM_SHARE("videoregs")                 // Video Registers
-	AM_RANGE(0x800000, 0x800001) AM_WRITE(mouja_sound_rombank_w)
+	AM_RANGE(0x800000, 0x800001) AM_WRITE8(mouja_sound_rombank_w, 0x00ff)
 	AM_RANGE(0xc00000, 0xc00003) AM_DEVWRITE8("ymsnd", ym2413_device, write, 0x00ff)
 	AM_RANGE(0xd00000, 0xd00001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0xffff)
 	AM_RANGE(0xf00000, 0xf0ffff) AM_RAM AM_MIRROR(0x0f0000)                         // RAM (mirrored)
@@ -1692,6 +1695,11 @@ static ADDRESS_MAP_START( mouja_map, AS_PROGRAM, 16, metro_state )
 	AM_RANGE(0x47883a, 0x47883b) AM_WRITEONLY AM_SHARE("rombank")                   // Rom Bank
 	AM_RANGE(0x800002, 0x800009) AM_WRITE(metro_coin_lockout_4words_w)              // Coin Lockout
 #endif
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( mouja_okimap, AS_0, 8, metro_state )
+	AM_RANGE(0x00000, 0x1ffff) AM_ROM
+	AM_RANGE(0x20000, 0x3ffff) AM_ROMBANK("okibank")
 ADDRESS_MAP_END
 
 
@@ -1825,18 +1833,13 @@ static ADDRESS_MAP_START( puzzlet_map, AS_PROGRAM, 16, metro_state )
 	AM_RANGE(0x700000, 0x71ffff) AM_RAM_WRITE(metro_vram_0_w) AM_SHARE("vram_0")    // Layer 0
 	AM_RANGE(0x720000, 0x73ffff) AM_RAM_WRITE(metro_vram_1_w) AM_SHARE("vram_1")    // Layer 1
 	AM_RANGE(0x740000, 0x75ffff) AM_RAM_WRITE(metro_vram_2_w) AM_SHARE("vram_2")    // Layer 2
-	AM_RANGE(0x774000, 0x774fff) AM_RAM AM_SHARE("spriteram")
-
 	AM_RANGE(0x760000, 0x76ffff) AM_READ(metro_bankedrom_r)                         // Banked ROM
-
 	AM_RANGE(0x770000, 0x771fff) AM_RAM                                             // ???
-//  AM_RANGE(0x772000, 0x773fff) AM_RAM
 	AM_RANGE(0x772000, 0x773fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")    // Palette
-
+	AM_RANGE(0x774000, 0x774fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x775000, 0x775fff) AM_RAM_WRITE(vram_0_clr_w)
 	AM_RANGE(0x776000, 0x776fff) AM_RAM_WRITE(vram_1_clr_w)
 	AM_RANGE(0x777000, 0x777fff) AM_RAM_WRITE(vram_2_clr_w)
-
 	AM_RANGE(0x778000, 0x7787ff) AM_RAM AM_SHARE("tiletable")                       // Tiles Set
 	AM_RANGE(0x778800, 0x778813) AM_WRITEONLY AM_SHARE("videoregs")                 // Video Registers
 	AM_RANGE(0x778840, 0x77884f) AM_WRITE(metro_blitter_w) AM_SHARE("blitter_regs") // Tiles Blitter
@@ -1845,7 +1848,6 @@ static ADDRESS_MAP_START( puzzlet_map, AS_PROGRAM, 16, metro_state )
 	AM_RANGE(0x778890, 0x778891) AM_WRITENOP                                        // ? CRT
 	AM_RANGE(0x7788a2, 0x7788a3) AM_WRITE(metro_irq_cause_w)                            // IRQ Cause
 	AM_RANGE(0x7788a4, 0x7788a5) AM_WRITE(puzzlet_irq_enable_w) AM_SHARE("irq_enable")  // IRQ Enable
-
 	AM_RANGE(0x7788aa, 0x7788ab) AM_WRITEONLY AM_SHARE("rombank")                   // Rom Bank
 	AM_RANGE(0x7788ac, 0x7788ad) AM_WRITEONLY AM_SHARE("screenctrl")                // Screen Control
 
@@ -3606,7 +3608,7 @@ GFXDECODE_END
 
 ***************************************************************************/
 
-MACHINE_START_MEMBER(metro_state,metro)
+void metro_state::machine_start()
 {
 	save_item(NAME(m_blitter_bit));
 	save_item(NAME(m_irq_line));
@@ -3621,79 +3623,6 @@ MACHINE_START_MEMBER(metro_state,metro)
 	save_item(NAME(m_sprite_yoffs));
 }
 
-MACHINE_RESET_MEMBER(metro_state,metro)
-{
-}
-
-
-static MACHINE_CONFIG_START( balcube, metro_state )
-
-	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
-	MCFG_CPU_PROGRAM_MAP(balcube_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", metro_state,  metro_vblank_interrupt)
-	MCFG_CPU_PERIODIC_INT_DRIVER(metro_state, metro_periodic_interrupt,  8*60) // ?
-
-	MCFG_MACHINE_START_OVERRIDE(metro_state,metro)
-	MCFG_MACHINE_RESET_OVERRIDE(metro_state,metro)
-
-	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(320, 224)
-	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 224-1)
-	MCFG_SCREEN_UPDATE_DRIVER(metro_state, screen_update_metro)
-	MCFG_SCREEN_PALETTE("palette")
-
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", i4220)
-	MCFG_VIDEO_START_OVERRIDE(metro_state,metro_i4220_dx_tmap)
-	MCFG_PALETTE_ADD("palette", 0x1000)
-	MCFG_PALETTE_FORMAT(GGGGGRRRRRBBBBBx)
-
-	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-
-	MCFG_SOUND_ADD("ymf", YMF278B, YMF278B_STD_CLOCK)
-	MCFG_YMF278B_IRQ_HANDLER(WRITELINE(metro_state, ymf278b_interrupt))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_CONFIG_END
-
-
-static MACHINE_CONFIG_START( daitoa, metro_state )
-
-	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
-	MCFG_CPU_PROGRAM_MAP(daitoa_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", metro_state,  metro_vblank_interrupt)
-	MCFG_CPU_PERIODIC_INT_DRIVER(metro_state, metro_periodic_interrupt,  8*60) // ?
-
-	MCFG_MACHINE_START_OVERRIDE(metro_state,metro)
-	MCFG_MACHINE_RESET_OVERRIDE(metro_state,metro)
-
-	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(320, 224)
-	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 224-1)
-	MCFG_SCREEN_UPDATE_DRIVER(metro_state, screen_update_metro)
-	MCFG_SCREEN_PALETTE("palette")
-
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", i4220)
-	MCFG_VIDEO_START_OVERRIDE(metro_state,metro_i4220_dx_tmap)
-	MCFG_PALETTE_ADD("palette", 0x1000)
-	MCFG_PALETTE_FORMAT(GGGGGRRRRRBBBBBx)
-
-	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-
-	MCFG_SOUND_ADD("ymf", YMF278B, YMF278B_STD_CLOCK)
-	MCFG_YMF278B_IRQ_HANDLER(WRITELINE(metro_state, ymf278b_interrupt))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_START( msgogo, metro_state )
@@ -3704,9 +3633,6 @@ static MACHINE_CONFIG_START( msgogo, metro_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", metro_state,  metro_vblank_interrupt) // timing is off, shaking sprites in intro
 	MCFG_CPU_PERIODIC_INT_DRIVER(metro_state, metro_periodic_interrupt,  60) // ?
 
-	MCFG_MACHINE_START_OVERRIDE(metro_state,metro)
-	MCFG_MACHINE_RESET_OVERRIDE(metro_state,metro)
-
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -3730,75 +3656,34 @@ static MACHINE_CONFIG_START( msgogo, metro_state )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( balcube, msgogo )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(balcube_map)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", metro_state,  metro_vblank_interrupt)
+	MCFG_CPU_PERIODIC_INT_DRIVER(metro_state, metro_periodic_interrupt,  8*60) // ?
+MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( bangball, metro_state )
+static MACHINE_CONFIG_DERIVED( daitoa, msgogo )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(daitoa_map)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", metro_state,  metro_vblank_interrupt)
+	MCFG_CPU_PERIODIC_INT_DRIVER(metro_state, metro_periodic_interrupt,  8*60) // ?
+MACHINE_CONFIG_END
 
-	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
+static MACHINE_CONFIG_DERIVED( bangball, msgogo )
+	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(bangball_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", metro_state,  metro_vblank_interrupt)
 	MCFG_CPU_PERIODIC_INT_DRIVER(metro_state, metro_periodic_interrupt,  60) // ?
-
-	MCFG_MACHINE_START_OVERRIDE(metro_state,metro)
-	MCFG_MACHINE_RESET_OVERRIDE(metro_state,metro)
-
-	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(320, 224)
-	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 224-1)
-	MCFG_SCREEN_UPDATE_DRIVER(metro_state, screen_update_metro)
-	MCFG_SCREEN_PALETTE("palette")
-
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", i4220)
-	MCFG_VIDEO_START_OVERRIDE(metro_state,metro_i4220_dx_tmap)
-	MCFG_PALETTE_ADD("palette", 0x1000)
-	MCFG_PALETTE_FORMAT(GGGGGRRRRRBBBBBx)
-
-	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-
-	MCFG_SOUND_ADD("ymf", YMF278B, YMF278B_STD_CLOCK)
-	MCFG_YMF278B_IRQ_HANDLER(WRITELINE(metro_state, ymf278b_interrupt))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-
-static MACHINE_CONFIG_START( batlbubl, metro_state )
-
-	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
+static MACHINE_CONFIG_DERIVED( batlbubl, msgogo )
+	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(batlbubl_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", metro_state,  metro_vblank_interrupt)
 	MCFG_CPU_PERIODIC_INT_DRIVER(metro_state, metro_periodic_interrupt,  60) // ?
-
-	MCFG_MACHINE_START_OVERRIDE(metro_state,metro)
-	MCFG_MACHINE_RESET_OVERRIDE(metro_state,metro)
-
-	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(320, 224)
-	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 224-1)
-	MCFG_SCREEN_UPDATE_DRIVER(metro_state, screen_update_metro)
-	MCFG_SCREEN_PALETTE("palette")
-
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", i4220)
-	MCFG_VIDEO_START_OVERRIDE(metro_state,metro_i4220_dx_tmap)
-	MCFG_PALETTE_ADD("palette", 0x1000)
-	MCFG_PALETTE_FORMAT(GGGGGRRRRRBBBBBx)
-
-	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-
-	MCFG_SOUND_ADD("ymf", YMF278B, YMF278B_STD_CLOCK)
-	MCFG_YMF278B_IRQ_HANDLER(WRITELINE(metro_state, ymf278b_interrupt))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
+
 
 static MACHINE_CONFIG_START( daitorid, metro_state )
 
@@ -3812,9 +3697,6 @@ static MACHINE_CONFIG_START( daitorid, metro_state )
 	MCFG_UPD7810_RXD(READLINE(metro_state,metro_rxd_r))
 	MCFG_CPU_PROGRAM_MAP(metro_sound_map)
 	MCFG_CPU_IO_MAP(daitorid_sound_io_map)
-
-	MCFG_MACHINE_START_OVERRIDE(metro_state,metro)
-	MCFG_MACHINE_RESET_OVERRIDE(metro_state,metro)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -3857,9 +3739,6 @@ static MACHINE_CONFIG_START( dharma, metro_state )
 	MCFG_CPU_PROGRAM_MAP(metro_sound_map)
 	MCFG_CPU_IO_MAP(metro_sound_io_map)
 
-	MCFG_MACHINE_START_OVERRIDE(metro_state,metro)
-	MCFG_MACHINE_RESET_OVERRIDE(metro_state,metro)
-
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -3899,9 +3778,6 @@ static MACHINE_CONFIG_START( karatour, metro_state )
 	MCFG_UPD7810_RXD(READLINE(metro_state,metro_rxd_r))
 	MCFG_CPU_PROGRAM_MAP(metro_sound_map)
 	MCFG_CPU_IO_MAP(metro_sound_io_map)
-
-	MCFG_MACHINE_START_OVERRIDE(metro_state,metro)
-	MCFG_MACHINE_RESET_OVERRIDE(metro_state,metro)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -3943,9 +3819,6 @@ static MACHINE_CONFIG_START( 3kokushi, metro_state )
 	MCFG_CPU_PROGRAM_MAP(metro_sound_map)
 	MCFG_CPU_IO_MAP(metro_sound_io_map)
 
-	MCFG_MACHINE_START_OVERRIDE(metro_state,metro)
-	MCFG_MACHINE_RESET_OVERRIDE(metro_state,metro)
-
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -3986,9 +3859,6 @@ static MACHINE_CONFIG_START( lastfort, metro_state )
 	MCFG_CPU_PROGRAM_MAP(metro_sound_map)
 	MCFG_CPU_IO_MAP(metro_sound_io_map)
 
-	MCFG_MACHINE_START_OVERRIDE(metro_state,metro)
-	MCFG_MACHINE_RESET_OVERRIDE(metro_state,metro)
-
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(58)
@@ -4028,9 +3898,6 @@ static MACHINE_CONFIG_START( lastforg, metro_state )
 	MCFG_CPU_PROGRAM_MAP(metro_sound_map)
 	MCFG_CPU_IO_MAP(metro_sound_io_map)
 
-	MCFG_MACHINE_START_OVERRIDE(metro_state,metro)
-	MCFG_MACHINE_RESET_OVERRIDE(metro_state,metro)
-
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(58)
@@ -4064,9 +3931,6 @@ static MACHINE_CONFIG_START( dokyusei, metro_state )
 	MCFG_CPU_PROGRAM_MAP(dokyusei_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", metro_state,  metro_vblank_interrupt)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(metro_state,metro_irq_callback)
-
-	MCFG_MACHINE_START_OVERRIDE(metro_state,metro)
-	MCFG_MACHINE_RESET_OVERRIDE(metro_state,metro)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -4102,8 +3966,6 @@ static MACHINE_CONFIG_START( dokyusp, metro_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", metro_state,  metro_vblank_interrupt)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(metro_state,metro_irq_callback)
 
-	MCFG_MACHINE_START_OVERRIDE(metro_state,metro)
-	MCFG_MACHINE_RESET_OVERRIDE(metro_state,metro)
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
 	/* video hardware */
@@ -4141,8 +4003,6 @@ static MACHINE_CONFIG_START( gakusai, metro_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", metro_state,  metro_vblank_interrupt)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(metro_state,metro_irq_callback)
 
-	MCFG_MACHINE_START_OVERRIDE(metro_state,metro)
-	MCFG_MACHINE_RESET_OVERRIDE(metro_state,metro)
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
 	/* video hardware */
@@ -4180,8 +4040,6 @@ static MACHINE_CONFIG_START( gakusai2, metro_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", metro_state,  metro_vblank_interrupt)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(metro_state,metro_irq_callback)
 
-	MCFG_MACHINE_START_OVERRIDE(metro_state,metro)
-	MCFG_MACHINE_RESET_OVERRIDE(metro_state,metro)
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
 	/* video hardware */
@@ -4224,9 +4082,6 @@ static MACHINE_CONFIG_START( pangpoms, metro_state )
 	MCFG_CPU_PROGRAM_MAP(metro_sound_map)
 	MCFG_CPU_IO_MAP(metro_sound_io_map)
 
-	MCFG_MACHINE_START_OVERRIDE(metro_state,metro)
-	MCFG_MACHINE_RESET_OVERRIDE(metro_state,metro)
-
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -4267,9 +4122,6 @@ static MACHINE_CONFIG_START( poitto, metro_state )
 	MCFG_CPU_PROGRAM_MAP(metro_sound_map)
 	MCFG_CPU_IO_MAP(metro_sound_io_map)
 
-	MCFG_MACHINE_START_OVERRIDE(metro_state,metro)
-	MCFG_MACHINE_RESET_OVERRIDE(metro_state,metro)
-
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -4309,9 +4161,6 @@ static MACHINE_CONFIG_START( pururun, metro_state )
 	MCFG_UPD7810_RXD(READLINE(metro_state,metro_rxd_r))
 	MCFG_CPU_PROGRAM_MAP(metro_sound_map)
 	MCFG_CPU_IO_MAP(daitorid_sound_io_map)
-
-	MCFG_MACHINE_START_OVERRIDE(metro_state,metro)
-	MCFG_MACHINE_RESET_OVERRIDE(metro_state,metro)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -4354,9 +4203,6 @@ static MACHINE_CONFIG_START( skyalert, metro_state )
 	MCFG_CPU_PROGRAM_MAP(metro_sound_map)
 	MCFG_CPU_IO_MAP(metro_sound_io_map)
 
-	MCFG_MACHINE_START_OVERRIDE(metro_state,metro)
-	MCFG_MACHINE_RESET_OVERRIDE(metro_state,metro)
-
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -4397,9 +4243,6 @@ static MACHINE_CONFIG_START( toride2g, metro_state )
 	MCFG_CPU_PROGRAM_MAP(metro_sound_map)
 	MCFG_CPU_IO_MAP(metro_sound_io_map)
 
-	MCFG_MACHINE_START_OVERRIDE(metro_state,metro)
-	MCFG_MACHINE_RESET_OVERRIDE(metro_state,metro)
-
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -4435,9 +4278,6 @@ static MACHINE_CONFIG_START( mouja, metro_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", metro_state,  metro_vblank_interrupt)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(metro_state,metro_irq_callback)
 
-	MCFG_MACHINE_START_OVERRIDE(metro_state,metro)
-	MCFG_MACHINE_RESET_OVERRIDE(metro_state,metro)
-
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(58)
@@ -4455,6 +4295,7 @@ static MACHINE_CONFIG_START( mouja, metro_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MCFG_OKIM6295_ADD("oki", XTAL_16MHz/1024*132, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADDRESS_MAP(AS_0, mouja_okimap)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.25)
 
@@ -4471,9 +4312,6 @@ static MACHINE_CONFIG_START( vmetal, metro_state )
 	MCFG_CPU_PROGRAM_MAP(vmetal_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", metro_state,  metro_vblank_interrupt)
 	MCFG_CPU_PERIODIC_INT_DRIVER(metro_state, metro_periodic_interrupt,  8*60) // ?
-
-	MCFG_MACHINE_START_OVERRIDE(metro_state,metro)
-	MCFG_MACHINE_RESET_OVERRIDE(metro_state,metro)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -4516,9 +4354,6 @@ static MACHINE_CONFIG_START( blzntrnd, metro_state )
 	MCFG_CPU_PROGRAM_MAP(blzntrnd_sound_map)
 	MCFG_CPU_IO_MAP(blzntrnd_sound_io_map)
 
-	MCFG_MACHINE_START_OVERRIDE(metro_state,metro)
-	MCFG_MACHINE_RESET_OVERRIDE(metro_state,metro)
-
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(58)
@@ -4547,49 +4382,12 @@ static MACHINE_CONFIG_START( blzntrnd, metro_state )
 	MCFG_SOUND_ROUTE(2, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-/* like blzntrnd but new vidstart / gfxdecode for the different bg tilemap */
-
-static MACHINE_CONFIG_START( gstrik2, metro_state )
-
-	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
-	MCFG_CPU_PROGRAM_MAP(blzntrnd_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", metro_state,  karatour_interrupt)
-	MCFG_CPU_PERIODIC_INT_DRIVER(metro_state, metro_periodic_interrupt,  8*60) // ?
-
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_16MHz/2)
-	MCFG_CPU_PROGRAM_MAP(blzntrnd_sound_map)
-	MCFG_CPU_IO_MAP(blzntrnd_sound_io_map)
-
-	MCFG_MACHINE_START_OVERRIDE(metro_state,metro)
-	MCFG_MACHINE_RESET_OVERRIDE(metro_state,metro)
-
-	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(58)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(320, 224)
-	MCFG_SCREEN_VISIBLE_AREA(8, 320-8-1, 0, 224-1)
-	MCFG_SCREEN_UPDATE_DRIVER(metro_state, screen_update_metro)
-	MCFG_SCREEN_PALETTE("palette")
-
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", gstrik2)
+static MACHINE_CONFIG_DERIVED( gstrik2, blzntrnd )
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gstrik2)
 	MCFG_VIDEO_START_OVERRIDE(metro_state,gstrik2)
-	MCFG_PALETTE_ADD("palette", 0x1000)
-	MCFG_PALETTE_FORMAT(GGGGGRRRRRBBBBBx)
 
-	MCFG_DEVICE_ADD("k053936", K053936, 0)
+	MCFG_DEVICE_MODIFY("k053936")
 	MCFG_K053936_OFFSETS(-69, -19)
-
-	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-
-	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL_16MHz/2)
-	MCFG_YM2610_IRQ_HANDLER(WRITELINE(metro_state, blzntrnd_irqhandler))
-	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
-	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
-	MCFG_SOUND_ROUTE(1, "lspeaker",  1.0)
-	MCFG_SOUND_ROUTE(2, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -4600,9 +4398,6 @@ static MACHINE_CONFIG_START( puzzlet, metro_state )
 	MCFG_CPU_PROGRAM_MAP(puzzlet_map)
 	MCFG_CPU_IO_MAP(puzzlet_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", metro_state,  puzzlet_interrupt)
-
-	MCFG_MACHINE_START_OVERRIDE(metro_state,metro)
-	MCFG_MACHINE_RESET_OVERRIDE(metro_state,metro)
 
 	/* Coins/service */
 	MCFG_PUZZLET_IO_ADD("coins")
@@ -4795,7 +4590,7 @@ Blazing Tornado
 
 CPU:    68000-16
 Sound:  Z80-8
-    YMF286K
+    YMF286K (YM2610 compatible)
 OSC:    16.0000MHz
     26.666MHz
 Chips:  Imagetek I4220 071
@@ -5685,28 +5480,8 @@ ROM_START( mouja )
 	ROMX_LOAD( "lh53882b.u4", 0x000004, 0x100000, CRC(5dd7a7b2) SHA1(b0347e8951b29356a7d945b906d93c40b9abc19c) , ROM_GROUPWORD | ROM_SKIP(6)) /* Silkscreened U4 and 31 */
 	ROMX_LOAD( "lh53882d.u1", 0x000006, 0x100000, CRC(430c3925) SHA1(41e5bd02a665eee87ef8f4ae9f4bee374c25e00b) , ROM_GROUPWORD | ROM_SKIP(6)) /* Silkscreened U1 and 75 */
 
-	ROM_REGION( 0x100000, "user1", 0 )  /* Samples */
+	ROM_REGION( 0x100000, "oki", 0 )  /* Samples */
 	ROM_LOAD( "lh538711.u53",     0x000000, 0x100000, CRC(fe3df432) SHA1(4fb7ad997ca6e91468d7516e5c4a94cde6e07104) ) /* Silkscreened U53 and 11 */
-
-	/* $00000-$20000 stays the same in all sound banks, */
-	/* the second half of the bank is what gets switched */
-	ROM_REGION( 0x200000, "oki", 0 ) /* Samples */
-	ROM_COPY( "user1", 0x000000, 0x000000, 0x020000)
-	ROM_COPY( "user1", 0x020000, 0x020000, 0x020000)
-	ROM_COPY( "user1", 0x000000, 0x040000, 0x020000)
-	ROM_COPY( "user1", 0x020000, 0x060000, 0x020000)
-	ROM_COPY( "user1", 0x000000, 0x080000, 0x020000)
-	ROM_COPY( "user1", 0x040000, 0x0a0000, 0x020000)
-	ROM_COPY( "user1", 0x000000, 0x0c0000, 0x020000)
-	ROM_COPY( "user1", 0x060000, 0x0e0000, 0x020000)
-	ROM_COPY( "user1", 0x000000, 0x100000, 0x020000)
-	ROM_COPY( "user1", 0x080000, 0x120000, 0x020000)
-	ROM_COPY( "user1", 0x000000, 0x140000, 0x020000)
-	ROM_COPY( "user1", 0x0a0000, 0x160000, 0x020000)
-	ROM_COPY( "user1", 0x000000, 0x180000, 0x020000)
-	ROM_COPY( "user1", 0x0c0000, 0x1a0000, 0x020000)
-	ROM_COPY( "user1", 0x000000, 0x1c0000, 0x020000)
-	ROM_COPY( "user1", 0x0e0000, 0x1e0000, 0x020000)
 ROM_END
 
 
@@ -6417,18 +6192,12 @@ DRIVER_INIT_MEMBER(metro_state,daitorid)
 /* Unscramble the GFX ROMs */
 DRIVER_INIT_MEMBER(metro_state,balcube)
 {
-	const size_t len = memregion("gfx1")->bytes();
-	UINT8 *src       = memregion("gfx1")->base();
-	UINT8 *end       = src + len;
+	UINT8 *ROM         = memregion("gfx1")->base();
+	const unsigned len = memregion("gfx1")->bytes();
 
-	while (src < end)
+	for (unsigned i = 0; i < len; i+=2)
 	{
-		static const UINT8 scramble[16] = { 0x0,0x8,0x4,0xc,0x2,0xa,0x6,0xe,0x1,0x9,0x5,0xd,0x3,0xb,0x7,0xf };
-		UINT8 data;
-
-		data  = *src;
-		*src  = (scramble[data & 0x0f] << 4) | scramble[data >> 4];
-		src   +=  2;
+		ROM[i]  = BITSWAP8(ROM[i],0,1,2,3,4,5,6,7);
 	}
 
 	metro_common();
@@ -6468,6 +6237,7 @@ DRIVER_INIT_MEMBER(metro_state,mouja)
 	m_irq_line = -1;    /* split interrupt handlers */
 	m_vblank_bit = 1;
 	m_mouja_irq_timer = timer_alloc(TIMER_MOUJA_IRQ);
+	membank("okibank")->configure_entries(0, 8, memregion("oki")->base(), 0x20000);
 }
 
 DRIVER_INIT_MEMBER(metro_state,gakusai)
@@ -6527,7 +6297,7 @@ GAME( 1996, bangball,  0,        bangball, bangball, metro_state, balcube,  ROT0
 GAME( 1996, gstrik2,   0,        gstrik2,  gstrik2,  metro_state, blzntrnd, ROT0,   "Human Amusement",                                 "Grand Striker 2 (Europe and Oceania)",   GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
 GAME( 1996, gstrik2j,  gstrik2,  gstrik2,  gstrik2,  metro_state, blzntrnd, ROT0,   "Human Amusement",                                 "Grand Striker 2 (Japan)",                GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE ) // priority between rounds
 GAME( 1999, batlbubl,  bangball, batlbubl, batlbubl, metro_state, balcube,  ROT0,   "Banpresto (Limenko license?)",                    "Battle Bubble (v2.00)",                  GAME_SUPPORTS_SAVE ) // or bootleg?
-GAME( 1996, mouja,     0,        mouja,    mouja,    metro_state, mouja,    ROT0,   "Etona",                                           "Mouja (Japan)",                          GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1996, mouja,     0,        mouja,    mouja,    metro_state, mouja,    ROT0,   "Etona",                                           "Mouja (Japan)",                          GAME_SUPPORTS_SAVE )
 GAME( 1997, gakusai,   0,        gakusai,  gakusai,  metro_state, gakusai,  ROT0,   "MakeSoft",                                        "Mahjong Gakuensai (Japan)",              GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
 GAME( 1998, gakusai2,  0,        gakusai2, gakusai,  metro_state, gakusai,  ROT0,   "MakeSoft",                                        "Mahjong Gakuensai 2 (Japan)",            GAME_SUPPORTS_SAVE )
 GAME( 2000, puzzlet,   0,        puzzlet,  puzzlet,  metro_state, puzzlet,  ROT0,   "Unies Corporation",                               "Puzzlet (Japan)",                        GAME_NOT_WORKING | GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
