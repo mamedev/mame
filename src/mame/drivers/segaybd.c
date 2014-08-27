@@ -45,6 +45,7 @@
 
 const UINT32 MASTER_CLOCK = 50000000;
 const UINT32 SOUND_CLOCK = 32215900;
+const UINT32 LINK_CLOCK = XTAL_16MHz;
 
 // use this to fiddle with the IRQ2 timing
 #define TWEAK_IRQ2_SCANLINE     (0)
@@ -681,15 +682,16 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, segaybd_state )
 	AM_RANGE(0x0c0000, 0x0cffff) AM_RAM AM_SHARE("shareram")
 	AM_RANGE(0x100000, 0x10001f) AM_READWRITE(io_chip_r, io_chip_w)
 	AM_RANGE(0x100040, 0x100047) AM_READWRITE(analog_r, analog_w)
+	AM_RANGE(0x1f0000, 0x1fffff) AM_RAM
+ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( main_map_link, AS_PROGRAM, 16, segaybd_state )
 	AM_RANGE(0x190000, 0x190fff) AM_RAM // ram to share with link CPU?
 	AM_RANGE(0x191000, 0x191001) AM_READ(link_r)
 	AM_RANGE(0x192000, 0x192001) AM_READWRITE(link2_r, link2_w)
 
-	AM_RANGE(0x1f0000, 0x1fffff) AM_RAM
+	AM_IMPORT_FROM(main_map)
 ADDRESS_MAP_END
-
-
 
 //**************************************************************************
 //  SUB CPU ADDRESS MAPS
@@ -741,7 +743,22 @@ static ADDRESS_MAP_START( sound_portmap, AS_IO, 8, segaybd_state )
 	AM_RANGE(0x40, 0x40) AM_MIRROR(0x3f) AM_READ(sound_data_r)
 ADDRESS_MAP_END
 
+//**************************************************************************
+//  Z80 LINK BOARD CPU ADDRESS MAPS
+//**************************************************************************
 
+static ADDRESS_MAP_START( link_map, AS_PROGRAM, 8, segaybd_state )
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x0000, 0x0fff) AM_ROM
+	AM_RANGE(0x2000, 0x2fff) AM_RAM
+	AM_RANGE(0x3000, 0x3fff) AM_RAM
+	AM_RANGE(0x4000, 0x47ff) AM_RAM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( link_portmap, AS_IO, 8, segaybd_state )
+	ADDRESS_MAP_UNMAP_HIGH
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+ADDRESS_MAP_END
 
 //**************************************************************************
 //  GENERIC PORT DEFINITIONS
@@ -1275,7 +1292,16 @@ static MACHINE_CONFIG_START( yboard, segaybd_state )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
+// LINK PCB is 834-6740
+// has 1x 8 switch dip bank, z80B CPU, ribbon connector? (to main board?), RX/TX ports, 16Mhz OSC
+static MACHINE_CONFIG_DERIVED( yboard_link, yboard )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(main_map_link)
 
+	MCFG_CPU_ADD("linkcpu", Z80, LINK_CLOCK/4 ) // ?? mhz
+	MCFG_CPU_PROGRAM_MAP(link_map)
+	MCFG_CPU_IO_MAP(link_portmap)
+MACHINE_CONFIG_END
 
 //**************************************************************************
 //  ROM DEFINITIONS
@@ -1697,7 +1723,7 @@ ROM_START( pdrift )
 	ROM_LOAD16_BYTE( "epr-11791.14",  0x000001, 0x20000, CRC(36b2910a) SHA1(9948b91837f944a7a606542fa685525e74bbe398) )
 	ROM_LOAD16_BYTE( "epr-11790.17",  0x040000, 0x20000, CRC(2a564e66) SHA1(5f30fc15bfd017d75cfffe1e9e62ed0bcf32a98e) )
 	ROM_LOAD16_BYTE( "epr-11792.15",  0x040001, 0x20000, CRC(c85caf6e) SHA1(2411ea99ec7f6e2b0b4f219e86ff2172539ad2c4) )
-
+	
 	ROM_REGION64_BE( 0x400000, "ysprites", 0)
 	ROMX_LOAD( "epr-11757.67",  0x000000, 0x20000, CRC(e46dc478) SHA1(baf79e230aef3d63fb50373b2b1626f7c56ee94f), ROM_SKIP(7) )
 	ROMX_LOAD( "epr-11758.75",  0x000001, 0x20000, CRC(5b435c87) SHA1(6b42b08e73957c36cd8faa896ca14461d00afd29), ROM_SKIP(7) )
@@ -2087,7 +2113,7 @@ ROM_START(pdriftl)
 	ROM_LOAD("epr-11897.ic3", 0x000000, 0x20000, CRC(4463cb95) SHA1(e86fd4611cf83fe72d59950a60fc8c3a7381a1c7))
 	ROM_LOAD("epr-11898.ic4", 0x000000, 0x20000, CRC(5d19d767) SHA1(d335cd3ef57c75e388df04b04fc3e2881a3902cf))
 
-	ROM_REGION(0x10000, "linkcpu", 0)        // Z80 sound CPU
+	ROM_REGION(0x10000, "linkcpu", 0)        // Z80 link board CPU
 	ROM_LOAD("epr-12028", 0x000000, 0x08000, CRC(bb682a92) SHA1(0445bdbca0db9edecd826da37cd2d3afc57c5cf6) )
 ROM_END
 
@@ -2441,18 +2467,21 @@ DRIVER_INIT_MEMBER(segaybd_state,rchase)
 //**************************************************************************
 
 //    YEAR, NAME,      PARENT,  MACHINE, INPUT,    INIT,                   MONITOR,COMPANY,FULLNAME,FLAGS,                                     LAYOUT
-GAME( 1988, gforce2,   0,        yboard, gforce2,  segaybd_state, gforce2, ROT0,   "Sega", "Galaxy Force 2", GAME_SUPPORTS_SAVE )
-GAME( 1988, gforce2j,  gforce2,  yboard, gforce2,  segaybd_state, gforce2, ROT0,   "Sega", "Galaxy Force 2 (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1988, gforce2ja, gforce2,  yboard, gforce2,  segaybd_state, gforce2, ROT0,   "Sega", "Galaxy Force 2 (Japan, Rev A)", GAME_SUPPORTS_SAVE )
-GAME( 1990, gloc,      0,        yboard, gloc,     segaybd_state, gloc,    ROT0,   "Sega", "G-LOC Air Battle (US)", GAME_SUPPORTS_SAVE )
-GAME( 1990, glocr360,  gloc,     yboard, glocr360, segaybd_state, r360,    ROT0,   "Sega", "G-LOC R360", GAME_SUPPORTS_SAVE )
-GAMEL(1988, pdrift,    0,        yboard, pdrift,   segaybd_state, pdrift,  ROT0,   "Sega", "Power Drift (World, Rev A)", GAME_SUPPORTS_SAVE,   layout_pdrift )
-GAMEL(1988, pdrifta,   pdrift,   yboard, pdrift,   segaybd_state, pdrift,  ROT0,   "Sega", "Power Drift (World)", GAME_SUPPORTS_SAVE,          layout_pdrift )
-GAMEL(1988, pdrifte,   pdrift,   yboard, pdrifte,  segaybd_state, pdrift,  ROT0,   "Sega", "Power Drift (World, Earlier)", GAME_SUPPORTS_SAVE, layout_pdrift )
-GAMEL(1988, pdriftj,   pdrift,   yboard, pdriftj,  segaybd_state, pdrift,  ROT0,   "Sega", "Power Drift (Japan)", GAME_SUPPORTS_SAVE,          layout_pdrift )
-GAMEL(1988, pdriftl,   pdrift,   yboard, pdriftl,  segaybd_state, pdrift,  ROT0,   "Sega", "Power Drift (Japan, Link Version)", GAME_SUPPORTS_SAVE|GAME_NOT_WORKING, layout_pdrift)
+GAME( 1988, gforce2,   0,        yboard,      gforce2,  segaybd_state, gforce2, ROT0,   "Sega", "Galaxy Force 2", GAME_SUPPORTS_SAVE )
+GAME( 1988, gforce2j,  gforce2,  yboard,      gforce2,  segaybd_state, gforce2, ROT0,   "Sega", "Galaxy Force 2 (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1988, gforce2ja, gforce2,  yboard,      gforce2,  segaybd_state, gforce2, ROT0,   "Sega", "Galaxy Force 2 (Japan, Rev A)", GAME_SUPPORTS_SAVE )
 
-GAME( 1991, rchase,    0,        yboard, rchase,   segaybd_state, rchase,  ROT0,   "Sega", "Rail Chase (World)", GAME_SUPPORTS_SAVE )
-GAME( 1991, rchasej,   rchase,   yboard, rchase,   segaybd_state, rchase,  ROT0,   "Sega", "Rail Chase (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1991, strkfgtr,  0,        yboard, strkfgtr, segaybd_state, gloc,    ROT0,   "Sega", "Strike Fighter (World)", GAME_SUPPORTS_SAVE )
-GAME( 1991, strkfgtrj, strkfgtr, yboard, strkfgtr, segaybd_state, gloc,    ROT0,   "Sega", "Strike Fighter (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1990, gloc,      0,        yboard,      gloc,     segaybd_state, gloc,    ROT0,   "Sega", "G-LOC Air Battle (US)", GAME_SUPPORTS_SAVE )
+GAME( 1990, glocr360,  gloc,     yboard,      glocr360, segaybd_state, r360,    ROT0,   "Sega", "G-LOC R360", GAME_SUPPORTS_SAVE )
+
+GAMEL(1988, pdrift,    0,        yboard,      pdrift,   segaybd_state, pdrift,  ROT0,   "Sega", "Power Drift (World, Rev A)", GAME_SUPPORTS_SAVE,   layout_pdrift )
+GAMEL(1988, pdrifta,   pdrift,   yboard,      pdrift,   segaybd_state, pdrift,  ROT0,   "Sega", "Power Drift (World)", GAME_SUPPORTS_SAVE,          layout_pdrift )
+GAMEL(1988, pdrifte,   pdrift,   yboard,      pdrifte,  segaybd_state, pdrift,  ROT0,   "Sega", "Power Drift (World, Earlier)", GAME_SUPPORTS_SAVE, layout_pdrift )
+GAMEL(1988, pdriftj,   pdrift,   yboard,      pdriftj,  segaybd_state, pdrift,  ROT0,   "Sega", "Power Drift (Japan)", GAME_SUPPORTS_SAVE,          layout_pdrift )
+GAMEL(1988, pdriftl,   pdrift,   yboard_link, pdriftl,  segaybd_state, pdrift,  ROT0,   "Sega", "Power Drift (Japan, Link Version)", GAME_SUPPORTS_SAVE|GAME_NOT_WORKING, layout_pdrift)
+
+GAME( 1991, rchase,    0,        yboard,      rchase,   segaybd_state, rchase,  ROT0,   "Sega", "Rail Chase (World)", GAME_SUPPORTS_SAVE )
+GAME( 1991, rchasej,   rchase,   yboard,      rchase,   segaybd_state, rchase,  ROT0,   "Sega", "Rail Chase (Japan)", GAME_SUPPORTS_SAVE )
+
+GAME( 1991, strkfgtr,  0,        yboard,      strkfgtr, segaybd_state, gloc,    ROT0,   "Sega", "Strike Fighter (World)", GAME_SUPPORTS_SAVE )
+GAME( 1991, strkfgtrj, strkfgtr, yboard,      strkfgtr, segaybd_state, gloc,    ROT0,   "Sega", "Strike Fighter (Japan)", GAME_SUPPORTS_SAVE )
