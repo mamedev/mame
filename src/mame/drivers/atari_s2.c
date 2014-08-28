@@ -1,6 +1,6 @@
 /****************************************************************************************
 
-    Pinball
+    PINBALL
     Atari Generation/System 2 and 3
 
     System 2 : Manuals and PinMAME used as references (couldn't find full schematics).
