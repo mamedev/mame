@@ -76,7 +76,6 @@ struct blitter_t
 			depth,
 			pen,
 			flags;
-
 };
 
 class igs011_state : public driver_device
@@ -85,16 +84,24 @@ public:
 	igs011_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_priority_ram(*this, "priority_ram"),
-		m_vbowl_trackball(*this, "vbowl_trackball"),
 		m_oki(*this, "oki"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
+		m_priority_ram(*this, "priority_ram"),
+		m_vbowl_trackball(*this, "vbowl_trackball"),
 		m_generic_paletteram_16(*this, "paletteram") { }
 
+	/* devices */
 	required_device<cpu_device> m_maincpu;
+	optional_device<okim6295_device> m_oki;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
+	
+	/* memory pointers */
 	required_shared_ptr<UINT16> m_priority_ram;
 	optional_shared_ptr<UINT16> m_vbowl_trackball;
+	required_shared_ptr<UINT16> m_generic_paletteram_16;
+		
 	UINT8 *m_layer[8];
 	UINT16 m_priority;
 	UINT8 m_lhb2_pen_hi;
@@ -209,6 +216,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(lev5_timer_irq_cb);
 	TIMER_DEVICE_CALLBACK_MEMBER(lhb_timer_irq_cb);
 	TIMER_DEVICE_CALLBACK_MEMBER(lev3_timer_irq_cb);
+	virtual void machine_start();
 	virtual void video_start();
 	UINT32 screen_update_igs011(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_vbowl(screen_device &screen, bool state);
@@ -225,10 +233,6 @@ public:
 	void ryukobou_decrypt();
 	void lhb2_decrypt_gfx();
 	void drgnwrld_gfx_decrypt();
-	optional_device<okim6295_device> m_oki;
-	required_device<screen_device> m_screen;
-	required_device<palette_device> m_palette;
-	required_shared_ptr<UINT16> m_generic_paletteram_16;
 };
 
 
@@ -266,14 +270,25 @@ WRITE16_MEMBER(igs011_state::igs011_priority_w)
 
 void igs011_state::video_start()
 {
-	int i;
-
-	for (i = 0; i < 8; i++)
+	for (int i = 0; i < 8; i++)
 	{
 		m_layer[i] = auto_alloc_array(machine(), UINT8, 512 * 256);
+		save_pointer(NAME(m_layer[i]), 512 * 256, i);
 	}
 
 	m_lhb2_pen_hi = 0;
+	
+	save_item(NAME(m_priority));
+	save_item(NAME(m_lhb2_pen_hi));
+	save_item(NAME(m_blitter.x));
+	save_item(NAME(m_blitter.y));
+	save_item(NAME(m_blitter.w));
+	save_item(NAME(m_blitter.h));
+	save_item(NAME(m_blitter.gfx_lo));
+	save_item(NAME(m_blitter.gfx_hi));
+	save_item(NAME(m_blitter.depth));
+	save_item(NAME(m_blitter.pen));
+	save_item(NAME(m_blitter.flags));
 }
 
 UINT32 igs011_state::screen_update_igs011(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -571,6 +586,28 @@ WRITE16_MEMBER(igs011_state::igs011_blit_flags_w)
     Common functions
 
 ***************************************************************************/
+
+void igs011_state::machine_start()
+{
+	save_item(NAME(m_igs_dips_sel));
+	save_item(NAME(m_igs_input_sel));
+	save_item(NAME(m_igs_hopper));
+	save_item(NAME(m_prot1));
+	save_item(NAME(m_prot1_swap));
+	save_item(NAME(m_prot1_addr));
+	save_item(NAME(m_prot2));
+	save_item(NAME(m_igs012_prot));
+	save_item(NAME(m_igs012_prot_swap));
+	save_item(NAME(m_igs012_prot_mode));
+	save_item(NAME(m_igs003_reg));
+	save_item(NAME(m_lhb_irq_enable));
+	save_item(NAME(m_igs003_prot_hold));
+	save_item(NAME(m_igs003_prot_x));
+	save_item(NAME(m_igs003_prot_y));
+	save_item(NAME(m_igs003_prot_z));
+	save_item(NAME(m_igs003_prot_h1));
+	save_item(NAME(m_igs003_prot_h2));
+}
 
 // Inputs
 
@@ -4747,20 +4784,20 @@ ROM_END
 
 ***************************************************************************/
 
-GAME( 1997, drgnwrld,     0,        drgnwrld,        drgnwrld, igs011_state,  drgnwrld,     ROT0, "IGS",        "Dragon World (World, V040O)",          0 )
-GAME( 1995, drgnwrldv30,  drgnwrld, drgnwrld,        drgnwrld, igs011_state,  drgnwrldv30,  ROT0, "IGS",        "Dragon World (World, V030O)",          0 )
-GAME( 1995, drgnwrldv21,  drgnwrld, drgnwrld_igs012, drgnwrld, igs011_state,  drgnwrldv21,  ROT0, "IGS",        "Dragon World (World, V021O)",          0 )
-GAME( 1995, drgnwrldv21j, drgnwrld, drgnwrld_igs012, drgnwrldj, igs011_state, drgnwrldv21j, ROT0, "IGS / Alta", "Zhong Guo Long (Japan, V021J)",        0 )
-GAME( 1995, drgnwrldv20j, drgnwrld, drgnwrld_igs012, drgnwrldj, igs011_state, drgnwrldv20j, ROT0, "IGS / Alta", "Zhong Guo Long (Japan, V020J)",        0 )
-GAME( 1995, drgnwrldv10c, drgnwrld, drgnwrld,        drgnwrldc, igs011_state, drgnwrldv10c, ROT0, "IGS",        "Zhong Guo Long (China, V010C)",        0 )
-GAME( 1995, drgnwrldv11h, drgnwrld, drgnwrld,        drgnwrldc, igs011_state, drgnwrldv11h, ROT0, "IGS",        "Dong Fang Zhi Zhu (Hong Kong, V011H)", 0 )
-GAME( 1995, lhb,          0,        lhb,             lhb, igs011_state,       lhb,          ROT0, "IGS",        "Long Hu Bang (China, V035C)",          0 )
-GAME( 1995, lhbv33c,      lhb,      lhb,             lhb, igs011_state,       lhbv33c,      ROT0, "IGS",        "Long Hu Bang (China, V033C)",          0 )
-GAME( 1995, dbc,          lhb,      lhb,             lhb, igs011_state,       dbc,          ROT0, "IGS",        "Da Ban Cheng (Hong Kong, V027H)",      0 )
-GAME( 1995, ryukobou,     lhb,      lhb,             lhb, igs011_state,       ryukobou,     ROT0, "IGS / Alta", "Mahjong Ryukobou (Japan, V030J)",      0 )
-GAME( 1996, lhb2,         0,        lhb2,            lhb2, igs011_state,      lhb2,         ROT0, "IGS",        "Long Hu Bang II (Hong Kong, V185H)",   0 )
-GAME( 1996, xymg,         0,        xymg,            xymg, igs011_state,      xymg,         ROT0, "IGS",        "Xing Yun Man Guan (China, V651C)",     0 )
-GAME( 1996, wlcc,         xymg,     wlcc,            wlcc, igs011_state,      wlcc,         ROT0, "IGS",        "Wan Li Chang Cheng (China, V638C)",    0 )
-GAME( 1996, vbowl,        0,        vbowl,           vbowl, igs011_state,     vbowl,        ROT0, "IGS",        "Virtua Bowling (World, V101XCM)",      GAME_IMPERFECT_SOUND )
-GAME( 1996, vbowlj,       vbowl,    vbowl,           vbowlj, igs011_state,    vbowlj,       ROT0, "IGS / Alta", "Virtua Bowling (Japan, V100JCM)",      GAME_IMPERFECT_SOUND )
-GAME( 1998, nkishusp,     lhb2,     nkishusp,        nkishusp, igs011_state,  nkishusp,     ROT0, "IGS / Alta", "Mahjong Nenrikishu SP (Japan, V250J)", 0 )
+GAME( 1997, drgnwrld,     0,        drgnwrld,        drgnwrld, igs011_state,  drgnwrld,     ROT0, "IGS",        "Dragon World (World, V040O)",          GAME_SUPPORTS_SAVE )
+GAME( 1995, drgnwrldv30,  drgnwrld, drgnwrld,        drgnwrld, igs011_state,  drgnwrldv30,  ROT0, "IGS",        "Dragon World (World, V030O)",          GAME_SUPPORTS_SAVE )
+GAME( 1995, drgnwrldv21,  drgnwrld, drgnwrld_igs012, drgnwrld, igs011_state,  drgnwrldv21,  ROT0, "IGS",        "Dragon World (World, V021O)",          GAME_SUPPORTS_SAVE )
+GAME( 1995, drgnwrldv21j, drgnwrld, drgnwrld_igs012, drgnwrldj, igs011_state, drgnwrldv21j, ROT0, "IGS / Alta", "Zhong Guo Long (Japan, V021J)",        GAME_SUPPORTS_SAVE )
+GAME( 1995, drgnwrldv20j, drgnwrld, drgnwrld_igs012, drgnwrldj, igs011_state, drgnwrldv20j, ROT0, "IGS / Alta", "Zhong Guo Long (Japan, V020J)",        GAME_SUPPORTS_SAVE )
+GAME( 1995, drgnwrldv10c, drgnwrld, drgnwrld,        drgnwrldc, igs011_state, drgnwrldv10c, ROT0, "IGS",        "Zhong Guo Long (China, V010C)",        GAME_SUPPORTS_SAVE )
+GAME( 1995, drgnwrldv11h, drgnwrld, drgnwrld,        drgnwrldc, igs011_state, drgnwrldv11h, ROT0, "IGS",        "Dong Fang Zhi Zhu (Hong Kong, V011H)", GAME_SUPPORTS_SAVE )
+GAME( 1995, lhb,          0,        lhb,             lhb, igs011_state,       lhb,          ROT0, "IGS",        "Long Hu Bang (China, V035C)",          GAME_SUPPORTS_SAVE )
+GAME( 1995, lhbv33c,      lhb,      lhb,             lhb, igs011_state,       lhbv33c,      ROT0, "IGS",        "Long Hu Bang (China, V033C)",          GAME_SUPPORTS_SAVE )
+GAME( 1995, dbc,          lhb,      lhb,             lhb, igs011_state,       dbc,          ROT0, "IGS",        "Da Ban Cheng (Hong Kong, V027H)",      GAME_SUPPORTS_SAVE )
+GAME( 1995, ryukobou,     lhb,      lhb,             lhb, igs011_state,       ryukobou,     ROT0, "IGS / Alta", "Mahjong Ryukobou (Japan, V030J)",      GAME_SUPPORTS_SAVE )
+GAME( 1996, lhb2,         0,        lhb2,            lhb2, igs011_state,      lhb2,         ROT0, "IGS",        "Long Hu Bang II (Hong Kong, V185H)",   GAME_SUPPORTS_SAVE )
+GAME( 1996, xymg,         0,        xymg,            xymg, igs011_state,      xymg,         ROT0, "IGS",        "Xing Yun Man Guan (China, V651C)",     GAME_SUPPORTS_SAVE )
+GAME( 1996, wlcc,         xymg,     wlcc,            wlcc, igs011_state,      wlcc,         ROT0, "IGS",        "Wan Li Chang Cheng (China, V638C)",    GAME_SUPPORTS_SAVE )
+GAME( 1996, vbowl,        0,        vbowl,           vbowl, igs011_state,     vbowl,        ROT0, "IGS",        "Virtua Bowling (World, V101XCM)",      GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE)
+GAME( 1996, vbowlj,       vbowl,    vbowl,           vbowlj, igs011_state,    vbowlj,       ROT0, "IGS / Alta", "Virtua Bowling (Japan, V100JCM)",      GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE)
+GAME( 1998, nkishusp,     lhb2,     nkishusp,        nkishusp, igs011_state,  nkishusp,     ROT0, "IGS / Alta", "Mahjong Nenrikishu SP (Japan, V250J)", GAME_SUPPORTS_SAVE )
