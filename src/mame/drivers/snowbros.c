@@ -2359,6 +2359,8 @@ ROM_START( sohosung )
 	ROM_LOAD16_BYTE( "su_ho_sung.uh12",  0x00001, 0x20000, CRC(6bd8bd08) SHA1(668398c9c77cc4cc52858daefd3cb13fbaf29a37) )
 	ROM_LOAD16_BYTE( "su_ho_sung.ui12",  0x00000, 0x20000, CRC(79a4806e) SHA1(a4080ea70fa588ada384ffa9877f5cf965fb68df) )
 
+	ROM_LOAD( "fakecode",     0x3fe00, 0x200, CRC(2849b78a) SHA1(a1aec7510de9476c23b3f65ffc465a32dfa70718) ) // temphack: this is extracted from puzzle break ram at runtime
+
 	ROM_REGION( 0x10000, "soundcpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "su_ho_sung.u1", 0x00000, 0x10000 ,  CRC(509ce74e) SHA1(a93add5ab674671078b55128281dcf9b0db46617) )
 
@@ -2813,6 +2815,19 @@ DRIVER_INIT_MEMBER(snowbros_state,pzlbreak)
 	m_pandora->set_bg_pen(0xc0);
 }
 
+DRIVER_INIT_MEMBER(snowbros_state,sohosung)
+{
+	UINT16 *HCROM = (UINT16*)memregion("maincpu")->base();
+
+	// replace jump to ram with jump to fake code we load in rom region
+	HCROM[0x580/2] = 0x0003;
+	HCROM[0x582/2] = 0xfe04;
+
+	// disable checksum check fail
+	HCROM[0x41e/2] = 0x4e71;
+	HCROM[0x420/2] = 0x4e71;
+}
+
 GAME( 1990, snowbros,  0,        snowbros, snowbros, driver_device, 0, ROT0, "Toaplan", "Snow Bros. - Nick & Tom (set 1)", 0 )
 GAME( 1990, snowbrosa, snowbros, snowbros, snowbros, driver_device, 0, ROT0, "Toaplan", "Snow Bros. - Nick & Tom (set 2)", 0 )
 GAME( 1990, snowbrosb, snowbros, snowbros, snowbros, driver_device, 0, ROT0, "Toaplan", "Snow Bros. - Nick & Tom (set 3)", 0 )
@@ -2838,7 +2853,7 @@ GAME( 1997, pzlbreak, 0,        semiprot, pzlbreak, snowbros_state, pzlbreak, RO
 GAME( 1999, moremore, 0,        semiprot, moremore, snowbros_state, moremorp, ROT0, "SemiCom / Exit", "More More", 0 )
 GAME( 1999, moremorp, 0,        semiprot, moremore, snowbros_state, moremorp, ROT0, "SemiCom / Exit", "More More Plus", 0 )
 GAME( 2002, 4in1boot, 0,        _4in1,    4in1boot, snowbros_state, 4in1boot, ROT0, "K1 Soft", "Puzzle King (includes bootleg of Snow Bros.)" , 0)
-GAME( 1997, sohosung, 0,        semiprot, cookbib3, snowbros_state, cookbib3, ROT0, "SemiCom", "So Ho Sung", GAME_NOT_WORKING )
+GAME( 1997, sohosung, 0,        semiprot, cookbib3, snowbros_state, sohosung, ROT0, "SemiCom", "So Ho Sung", GAME_NOT_WORKING )
 
 // The Korean games database shows an earlier version of this called Ball Boy with a different title screen to the version of Ball Boy we have
 // http://mamedev.emulab.it/undumped/images/Ballboy.jpg
