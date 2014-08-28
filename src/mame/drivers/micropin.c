@@ -1,8 +1,10 @@
+// license:MAME
+// copyright-holders:Robbbert
 /*************************************************************************************
 
-Pinball
-Micropin : Pentacup
-First version used a 6800, but a later revision used a 8085A.
+  PINBALL
+  Micropin : Pentacup
+  First version used a 6800, but a later revision used a 8085A.
 
 **************************************************************************************/
 

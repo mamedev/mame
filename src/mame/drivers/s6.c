@@ -1,6 +1,8 @@
+// license:MAME
+// copyright-holders:Robbbert
 /***********************************************************************************
 
-    Pinball
+    PINBALL
     Williams System 6
 
     After starting a game, nothing much works.

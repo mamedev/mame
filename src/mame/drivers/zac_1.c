@@ -1,6 +1,8 @@
+// license:MAME
+// copyright-holders:Robbbert
 /*************************************************************************************
 
-    Pinball
+    PINBALL
     Zaccaria Generation 1
 
     Made working in Sept 2012 [Robbbert]

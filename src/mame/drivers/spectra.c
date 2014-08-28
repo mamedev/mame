@@ -1,5 +1,8 @@
+// license:MAME
+// copyright-holders:Robbbert
 /******************************************************************************************
-    Pinball
+
+    PINBALL
     Valley Spectra IV
 
     Rotating game, like Midway's "Rotation VIII".

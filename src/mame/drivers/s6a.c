@@ -1,6 +1,8 @@
+// license:MAME
+// copyright-holders:Robbbert
 /***********************************************************************************
 
-    Pinball
+    PINBALL
     Williams System 6a
 
     Sound is working fully via the sound test (F1) key.

@@ -1,6 +1,8 @@
+// license:MAME
+// copyright-holders:Robbbert
 /***********************************************************************************
 
-    Pinball
+    PINBALL
     Williams System 4
 
     No schematics have been located as yet.

@@ -1,8 +1,11 @@
+// license:MAME
+// copyright-holders:Robbbert
 /**********************************************************************************
 
   PINBALL
   Hankin
   Based on Bally BY35
+  Sound based on Atari System 1
 
 
 ToDo:

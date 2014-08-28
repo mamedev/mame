@@ -1,6 +1,8 @@
+// license:MAME
+// copyright-holders:Robbbert
 /********************************************************************************
 
-    Pinball
+    PINBALL
     NSM (Lowen) : Hot Fire Birds
 
     Schematic and PinMAME used as references

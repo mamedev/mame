@@ -1,6 +1,8 @@
+// license:MAME
+// copyright-holders:Robbbert
 /**************************************************************************
 
-    Pinball
+    PINBALL
     Wico's only game : Af-tor
 
     Schematic and PinMAME used as references.

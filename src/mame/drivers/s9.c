@@ -1,6 +1,8 @@
+// license:MAME
+// copyright-holders:Robbbert
 /****************************************************************************************
 
-    Pinball
+    PINBALL
     Williams System 9
 
     Status of games:

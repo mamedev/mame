@@ -1,6 +1,8 @@
+// license:MAME
+// copyright-holders:Robbbert
 /**************************************************************************************
 
-    Pinball
+    PINBALL
     Videodens
 
     PinMAME used as reference (unable to find any info at all on the net).

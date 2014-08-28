@@ -1,6 +1,8 @@
+// license:MAME
+// copyright-holders:Robbbert
 /***********************************************************************************
 
-    Pinball
+    PINBALL
     Williams System 8
 
     Only 2 games used this system.

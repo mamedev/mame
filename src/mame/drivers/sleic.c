@@ -1,6 +1,8 @@
+// license:MAME
+// copyright-holders:Robbbert
 /**************************************************************************************
 
-    Pinball
+    PINBALL
     Sleic made a number of pinball machines (Pinball, Bike Race, Dona Elvira 2,
     Super Pang, Io Moon) but seems only Pinball is dumped. The only manual I could
     find is in Spanish and has no schematics.

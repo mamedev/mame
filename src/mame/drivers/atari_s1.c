@@ -1,3 +1,5 @@
+// license:MAME
+// copyright-holders:Robbbert
 /***********************************************************************************
 
     PINBALL
@@ -22,6 +24,8 @@
     SW2 Toggle 6 = 2006
     SW2 Toggle 7 = 2005
     SW2 Toggle 8 = 2004
+
+No NVRAM; coin counters are mechanical.
 
 Until game-specific switches are set up, here is the outhole for each game:
 - spcrider: O
@@ -121,7 +125,6 @@ static ADDRESS_MAP_START( atarians_map, AS_PROGRAM, 8, atari_s1_state ) // more 
 	AM_RANGE(0x2000, 0x204f) AM_MIRROR(0x0F80) AM_READ(switch_r)
 	AM_RANGE(0x3000, 0x3fff) AM_WRITE(audioen_w) // audio enable
 	AM_RANGE(0x4000, 0x4fff) AM_WRITE(watchdog_reset_w)
-	AM_RANGE(0x5080, 0x508c) AM_MIRROR(3) AM_WRITE(meter_w) // time2000 only
 	AM_RANGE(0x6000, 0x6fff) AM_WRITE(audiores_w) // audio reset
 	AM_RANGE(0x7000, 0x7fff) AM_ROM
 ADDRESS_MAP_END

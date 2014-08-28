@@ -1,6 +1,8 @@
+// license:MAME
+// copyright-holders:Robbbert
 /*********************************************************************
 
-    Pinball
+    PINBALL
     Zaccaria Prototype
 
     These use the INS8060 (SC/MP) processor, and are Zaccaria's first

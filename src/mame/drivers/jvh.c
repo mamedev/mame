@@ -1,7 +1,9 @@
+// license:MAME
+// copyright-holders:Robbbert
 /*******************************************************************************
 
-Pinball
-JVH : Escape, and Movie Masters
+  PINBALL
+  JVH : Escape, and Movie Masters
 
 ********************************************************************************/
 #include "emu.h"
