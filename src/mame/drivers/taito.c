@@ -13,19 +13,35 @@
 
   Need schematics to do this properly.
 
+Status of each game:
+- shock, obaoba, drakor, meteort, sureshop, cosmic, vortexp, stest, rally:
+    Works, with various quality of sounds
+- sharkt, snake:
+    As above, but outhole can randomly stop working
+- lunelle:
+    Works, but play can be interrupted by a large flashing '14'
+- ladylukt, vegast, titan, gork:
+    Works, no sound
+- gemini2k, zarza, cavnegro, hawkman, mrblack, sshuttle, fireactd:
+    Can insert a coin but cannot start a game
+- fireact:
+    Cannot insert a coin
+- mrblkz80:
+    Different hardware, not emulated
+
 
 ToDO:
 - Inputs
 - Outputs
 - Sound (need a schematic)
 - Display flickers ingame
-- Votrax makes continual rattling noise
+- Votrax makes continual rattling noise and nothing else
 - Some games produce sound, but silence or random sounds often occur, or it just
   cuts out for a while.
 
 *****************************************************************************************/
 
-#include "emu.h"
+#include "machine/genpin.h"
 #include "cpu/i8085/i8085.h"
 #include "cpu/m6800/m6800.h"
 #include "machine/6821pia.h"
@@ -34,11 +50,11 @@ ToDO:
 #include "sound/dac.h"
 #include "taito.lh"
 
-class taito_state : public driver_device
+class taito_state : public genpin_class
 {
 public:
 	taito_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
+		: genpin_class(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_cpu2(*this, "audiocpu")
 		, m_pia(*this, "pia")
@@ -108,11 +124,19 @@ static ADDRESS_MAP_START( taito_sub_map2, AS_PROGRAM, 8, taito_state )
 	AM_RANGE(0x2000, 0x3fff) AM_ROM AM_REGION("cpu2", 0x2000)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( taito_sub_map3, AS_PROGRAM, 8, taito_state )
+static ADDRESS_MAP_START( taito_sub_map5, AS_PROGRAM, 8, taito_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x007f) AM_RAM // internal to the cpu
 	AM_RANGE(0x0400, 0x0403) AM_DEVREADWRITE("pia", pia6821_device, read, write)
-	AM_RANGE(0x5000, 0x7fff) AM_ROM AM_REGION("cpu2", 0x5000)
+	AM_RANGE(0x1000, 0x1000) AM_DEVWRITE("aysnd_0", ay8910_device, address_w)
+	AM_RANGE(0x1003, 0x1003) AM_DEVWRITE("aysnd_0", ay8910_device, address_w)
+	AM_RANGE(0x1007, 0x1007) AM_DEVREAD("aysnd_0", ay8910_device, data_r)
+	AM_RANGE(0x100c, 0x100c) AM_DEVWRITE("aysnd_1", ay8910_device, address_w)
+	AM_RANGE(0x100a, 0x100a) AM_DEVWRITE("aysnd_0", ay8910_device, data_w)
+	AM_RANGE(0x100b, 0x100b) AM_DEVWRITE("aysnd_0", ay8910_device, data_w)
+	AM_RANGE(0x100d, 0x100d) AM_DEVREAD("aysnd_1", ay8910_device, data_r)
+	AM_RANGE(0x100e, 0x100e) AM_DEVWRITE("aysnd_1", ay8910_device, data_w)
+	AM_RANGE(0x2000, 0x7fff) AM_ROM AM_REGION("cpu2", 0x2000)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( shock_map, AS_PROGRAM, 8, taito_state )
@@ -306,9 +330,11 @@ static MACHINE_CONFIG_START( taito, taito_state )
 	MCFG_DEFAULT_LAYOUT(layout_taito)
 
 	/* Sound */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_FRAGMENT_ADD( genpin_audio )
+
+	MCFG_SPEAKER_STANDARD_MONO("dacsnd")
 	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.95)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "dacsnd", 0.95)
 
 	MCFG_DEVICE_ADD("pia", PIA6821, 0)
 	//MCFG_PIA_READPA_HANDLER(READ8(taito_state, pia_pa_r))
@@ -323,16 +349,6 @@ static MACHINE_CONFIG_START( taito, taito_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_a", taito_state, timer_a, attotime::from_hz(200))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( taito2, taito )
-	MCFG_CPU_MODIFY( "audiocpu" )
-	MCFG_CPU_PROGRAM_MAP(taito_sub_map2)
-MACHINE_CONFIG_END
-
-static MACHINE_CONFIG_DERIVED( taito3, taito )
-	MCFG_CPU_MODIFY( "audiocpu" )
-	MCFG_CPU_PROGRAM_MAP(taito_sub_map3)
-MACHINE_CONFIG_END
-
 static MACHINE_CONFIG_DERIVED( shock, taito )
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(shock_map)
@@ -340,11 +356,17 @@ static MACHINE_CONFIG_DERIVED( shock, taito )
 	MCFG_CPU_PROGRAM_MAP(shock_sub_map)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( taito2, taito )
+	MCFG_CPU_MODIFY( "audiocpu" )
+	MCFG_CPU_PROGRAM_MAP(taito_sub_map2)
+MACHINE_CONFIG_END
+
 // add vox
 static MACHINE_CONFIG_DERIVED( taito4, taito )
+	MCFG_SPEAKER_STANDARD_MONO("voxsnd")
 	MCFG_DEVICE_ADD("votrax", VOTRAX_SC01, 720000) // guess
 	MCFG_VOTRAX_SC01_REQUEST_CB(WRITELINE(taito_state, votrax_request))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15) // todo: fix - it makes noise continuously
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "voxsnd", 0.15) // todo: fix - it makes noise continuously
 
 	MCFG_DEVICE_REMOVE("pia")
 	MCFG_DEVICE_ADD("pia", PIA6821, 0)
@@ -358,6 +380,26 @@ static MACHINE_CONFIG_DERIVED( taito4, taito )
 	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE("audiocpu", m6802_cpu_device, irq_line))
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_FRAGMENT( taito_ay_audio )
+	MCFG_CPU_MODIFY( "audiocpu" )
+	MCFG_CPU_PROGRAM_MAP(taito_sub_map5)
+
+	MCFG_SPEAKER_STANDARD_MONO("aysnd")
+	MCFG_SOUND_ADD("aysnd_0", AY8910, XTAL_3_579545MHz/2) /* guess */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "aysnd", 0.8)
+	MCFG_SOUND_ADD("aysnd_1", AY8910, XTAL_3_579545MHz/2) /* guess */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "aysnd", 0.8)
+MACHINE_CONFIG_END
+
+// add ay
+static MACHINE_CONFIG_DERIVED( taito5, taito )
+	MCFG_FRAGMENT_ADD( taito_ay_audio )
+MACHINE_CONFIG_END
+
+// add vox and ay
+static MACHINE_CONFIG_DERIVED( taito6, taito4 )
+	MCFG_FRAGMENT_ADD( taito_ay_audio )
+MACHINE_CONFIG_END
 
 
 
@@ -510,9 +552,10 @@ ROM_START(gork)
 	ROM_LOAD( "gork3.bin", 0x1000, 0x0800, CRC(0ea1a2dc) SHA1(3ab58bc25a4512aae5c16f497bddf713413c02fe))
 	ROM_LOAD( "gork4.bin", 0x1800, 0x0800, CRC(0e6260fb) SHA1(b2f7190991d63701210a25a3970293b8f4c34022))
 
-	ROM_REGION(0x4000, "cpu2", 0)
+	ROM_REGION(0x8000, "cpu2", 0)
 	ROM_LOAD("gork_s1.bin", 0x2000, 0x1000, CRC(6611a4cb) SHA1(3ab840b162f9bfe2aebe1d3afeb1fddaf849d9c5))
 	ROM_LOAD("gork_s2.bin", 0x3000, 0x1000, CRC(440739cb) SHA1(6172bf000f854ccf5c24c7700a0ad208596d24f8))
+	ROM_RELOAD( 0x7000, 0x1000)
 ROM_END
 
 /*--------------------------------
@@ -719,9 +762,10 @@ ROM_START(snake)
 	ROM_LOAD( "snake3.bin", 0x1000, 0x0800, CRC(6f054bc0) SHA1(08ab82131888756e8178b2fe2bbc24fc4f494ef2))
 	ROM_LOAD( "snake4.bin", 0x1800, 0x0800, CRC(ed231064) SHA1(42410dbbef36dea9d0163c65406bc86b35bb0bd7))
 
-	ROM_REGION(0x4000, "cpu2", 0)
+	ROM_REGION(0x8000, "cpu2", 0)
 	ROM_LOAD("snake_s1.bin", 0x2000, 0x1000, CRC(f7c1623c) SHA1(77e79ccc4b074b715008de37332baf76791d471e))
 	ROM_LOAD("snake_s2.bin", 0x3000, 0x1000, CRC(18316d73) SHA1(422a093ff245f0c8f710aeba91acd59666e2398b))
+	ROM_RELOAD( 0x7000, 0x1000)
 ROM_END
 
 /*--------------------------------
@@ -845,9 +889,10 @@ ROM_START(voleybal)
 	ROM_LOAD( "voley3.bin", 0x1000, 0x0800, NO_DUMP)
 	ROM_LOAD( "voley4.bin", 0x1800, 0x0800, NO_DUMP)
 
-	ROM_REGION(0x4000, "cpu2", 0)
+	ROM_REGION(0x8000, "cpu2", 0)
 	ROM_LOAD("voley_s1.bin", 0x2000, 0x1000, CRC(9c825666) SHA1(330ecd9caccb8a1555c5e7302095ae25558c020e))
 	ROM_LOAD("voley_s2.bin", 0x3000, 0x1000, CRC(79a8228c) SHA1(e71d9347a8fc230c70703164ae0e4d44423bbb5d))
+	ROM_RELOAD( 0x7000, 0x1000)
 ROM_END
 
 /*--------------------------------
@@ -921,7 +966,7 @@ ROM_START(mrblkz80)
 ROM_END
 
 // no sound
-GAME(198?,  taitest,    0,          taito,  taito, taito_state, taito,  ROT0,   "Taito do Brasil",  "Taito Test Fixture", GAME_MECHANICAL | GAME_NO_SOUND_HW )
+GAME(198?,  taitest,    0,          taito,  taito, taito_state, taito,  ROT0,   "Taito do Brasil",  "Taito Test Fixture", GAME_MECHANICAL )
 
 // dac (sintetizador)
 GAME(1979,  shock,      0,          shock,  taito, taito_state, taito,  ROT0,   "Taito do Brasil",  "Shock", GAME_MECHANICAL | GAME_IMPERFECT_SOUND )
@@ -954,17 +999,17 @@ GAME(1982,  hawkman,    0,          taito4, taito, taito_state, taito,  ROT0,   
 GAME(1982,  hawkman1,   hawkman,    taito4, taito, taito_state, taito,  ROT0,   "Taito do Brasil",  "Hawkman (set 2)", GAME_IS_SKELETON_MECHANICAL)
 
 // dac and ay
-GAME(1982,  snake,      0,          taito2, taito, taito_state, taito,  ROT0,   "Taito do Brasil",  "Snake Machine", GAME_MECHANICAL | GAME_IMPERFECT_SOUND )
-GAME(198?,  voleybal,   0,          taito2, taito, taito_state, taito,  ROT0,   "Taito do Brasil",  "Voley Ball",  GAME_IS_SKELETON_MECHANICAL)
-GAME(1984,  mrblack,    0,          taito3, taito, taito_state, taito,  ROT0,   "Taito do Brasil",  "Mr. Black (set 1)", GAME_IS_SKELETON_MECHANICAL)
-GAME(1985,  mrblack1,   mrblack,    taito3, taito, taito_state, taito,  ROT0,   "Taito do Brasil",  "Mr. Black (set 2)", GAME_IS_SKELETON_MECHANICAL)
-GAME(1985,  sshuttle,   0,          taito3, taito, taito_state, taito,  ROT0,   "Taito do Brasil",  "Space Shuttle (Taito) (set 1)", GAME_IS_SKELETON_MECHANICAL)
-GAME(1985,  sshuttle1,  sshuttle,   taito3, taito, taito_state, taito,  ROT0,   "Taito do Brasil",  "Space Shuttle (Taito) (set 2)", GAME_IS_SKELETON_MECHANICAL)
-GAME(198?,  polar,      0,          taito3, taito, taito_state, taito,  ROT0,   "Taito do Brasil",  "Polar Explorer", GAME_IS_SKELETON_MECHANICAL)
+GAME(1982,  snake,      0,          taito5, taito, taito_state, taito,  ROT0,   "Taito do Brasil",  "Snake Machine", GAME_MECHANICAL | GAME_IMPERFECT_SOUND )
+GAME(198?,  voleybal,   0,          taito5, taito, taito_state, taito,  ROT0,   "Taito do Brasil",  "Voley Ball",  GAME_IS_SKELETON_MECHANICAL)
+GAME(1984,  mrblack,    0,          taito5, taito, taito_state, taito,  ROT0,   "Taito do Brasil",  "Mr. Black (set 1)", GAME_IS_SKELETON_MECHANICAL)
+GAME(1985,  mrblack1,   mrblack,    taito5, taito, taito_state, taito,  ROT0,   "Taito do Brasil",  "Mr. Black (set 2)", GAME_IS_SKELETON_MECHANICAL)
+GAME(1985,  sshuttle,   0,          taito5, taito, taito_state, taito,  ROT0,   "Taito do Brasil",  "Space Shuttle (Taito) (set 1)", GAME_IS_SKELETON_MECHANICAL)
+GAME(1985,  sshuttle1,  sshuttle,   taito5, taito, taito_state, taito,  ROT0,   "Taito do Brasil",  "Space Shuttle (Taito) (set 2)", GAME_IS_SKELETON_MECHANICAL)
+GAME(198?,  polar,      0,          taito5, taito, taito_state, taito,  ROT0,   "Taito do Brasil",  "Polar Explorer", GAME_IS_SKELETON_MECHANICAL)
 
 // dac, vox and ay
-GAME(1982,  gork,       0,          taito2, taito, taito_state, taito,  ROT0,   "Taito do Brasil",  "Gork", GAME_MECHANICAL | GAME_NO_SOUND )
-GAME(198?,  fireactd,   0,          taito3, taito, taito_state, taito,  ROT0,   "Taito do Brasil",  "Fire Action Deluxe", GAME_IS_SKELETON_MECHANICAL)
+GAME(1982,  gork,       0,          taito6, taito, taito_state, taito,  ROT0,   "Taito do Brasil",  "Gork", GAME_MECHANICAL | GAME_NO_SOUND )
+GAME(198?,  fireactd,   0,          taito6, taito, taito_state, taito,  ROT0,   "Taito do Brasil",  "Fire Action Deluxe", GAME_IS_SKELETON_MECHANICAL)
 
 // different hardware
 GAME(198?,  mrblkz80,   mrblack,    taito,  taito, taito_state, taito,  ROT0,   "Taito do Brasil",  "Mr. Black (Z-80 CPU)", GAME_IS_SKELETON_MECHANICAL)
