@@ -7,6 +7,7 @@
 *************************************************************************/
 
 #include "sound/ay8910.h"
+#include "sound/samples.h"
 #include "video/vector.h"
 
 class cinemat_state : public driver_device
@@ -16,18 +17,22 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_ay1(*this, "ay1"),
+		m_samples(*this, "samples"),
 		m_vector(*this, "vector"),
-		m_rambase(*this, "rambase"),
-		m_screen(*this, "screen") { }
+		m_screen(*this, "screen"),
+		m_rambase(*this, "rambase") { }
 
 	required_device<ccpu_cpu_device> m_maincpu;
 	optional_device<ay8910_device> m_ay1;
+	optional_device<samples_device> m_samples;
 	required_device<vector_device> m_vector;
-	optional_shared_ptr<UINT16> m_rambase;
 	required_device<screen_device> m_screen;
+	optional_shared_ptr<UINT16> m_rambase;
 
-	UINT8 m_sound_control;
-	void (*m_sound_handler)(running_machine &,UINT8 sound_val, UINT8 bits_changed);
+	typedef void (cinemat_state::*sound_func)(UINT8 sound_val, UINT8 bits_changed);
+	
+	sound_func m_sound_handler;
+	UINT8 m_sound_control;	
 	UINT32 m_current_shift;
 	UINT32 m_last_shift;
 	UINT32 m_last_shift2;
@@ -100,7 +105,23 @@ public:
 	DECLARE_READ8_MEMBER(sound_portb_r);
 	DECLARE_WRITE8_MEMBER(sound_portb_w);
 	DECLARE_WRITE8_MEMBER(sound_output_w);
+	TIMER_CALLBACK_MEMBER(synced_sound_w);
+	void generic_init(sound_func sound_handler);
 	void cinemat_vector_callback(INT16 sx, INT16 sy, INT16 ex, INT16 ey, UINT8 shift);
+	void spacewar_sound_w(UINT8 sound_val, UINT8 bits_changed);
+	void barrier_sound_w(UINT8 sound_val, UINT8 bits_changed);
+	void speedfrk_sound_w(UINT8 sound_val, UINT8 bits_changed);
+	void starhawk_sound_w(UINT8 sound_val, UINT8 bits_changed);
+	void sundance_sound_w(UINT8 sound_val, UINT8 bits_changed);
+	void tailg_sound_w(UINT8 sound_val, UINT8 bits_changed);
+	void warrior_sound_w(UINT8 sound_val, UINT8 bits_changed);
+	void armora_sound_w(UINT8 sound_val, UINT8 bits_changed);
+	void ripoff_sound_w(UINT8 sound_val, UINT8 bits_changed);
+	void starcas_sound_w(UINT8 sound_val, UINT8 bits_changed);
+	void solarq_sound_w(UINT8 sound_val, UINT8 bits_changed);
+	void boxingb_sound_w(UINT8 sound_val, UINT8 bits_changed);
+	void wotw_sound_w(UINT8 sound_val, UINT8 bits_changed);
+	void demon_sound_w(UINT8 sound_val, UINT8 bits_changed);
 };
 
 /*----------- defined in audio/cinemat.c -----------*/
