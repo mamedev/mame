@@ -206,8 +206,11 @@ bool mfi_format::save(io_generic *io, floppy_image *image)
 				(200000000 - (precomp[tsize-1] & floppy_image::TIME_MASK));
 
 			uLongf csize = max_track_size*4 + 1000;
-			if(compress(postcomp, &csize, (const Bytef *)precomp, tsize*4) != Z_OK)
+			if(compress(postcomp, &csize, (const Bytef *)precomp, tsize*4) != Z_OK) {
+				global_free_array(precomp);
+				global_free_array(postcomp);
 				return false;
+			}
 
 			entries[epos].offset = pos;
 			entries[epos].uncompressed_size = tsize*4;
@@ -220,6 +223,8 @@ bool mfi_format::save(io_generic *io, floppy_image *image)
 		}
 
 	io_generic_write(io, entries, sizeof(header), (tracks << resolution)*heads*sizeof(entry));
+	global_free_array(precomp);
+	global_free_array(postcomp);
 	return true;
 }
 
