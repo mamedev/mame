@@ -4176,6 +4176,9 @@ ROM_END
 /**************************************************************************************************************************
     The JLeague '94
     protected via FD1149 317-0222
+
+    Sega Game ID codes:
+     Game: 833-10851 J. LEAGUE 1994
 */
 ROM_START( jleague )
 	ROM_REGION( 0x200000, "maincpu", 0 ) /* v60 code + data */
