@@ -34,18 +34,17 @@ kaneko_calc3_device::kaneko_calc3_device(const machine_config &mconfig, const ch
 }
 
 
-static TIMER_CALLBACK( kaneko_calc3_run_callback )
+TIMER_CALLBACK_MEMBER( kaneko_calc3_device::run_callback )
 {
-	kaneko_calc3_device* dev = (kaneko_calc3_device*)ptr;
-	dev->calc3_mcu_run(machine);
-	dev->reset_run_timer();
+	calc3_mcu_run(machine());
+	reset_run_timer();
 }
 
 void kaneko_calc3_device::device_start()
 {
 	m_calc3_mcuram = (UINT16*)auto_alloc_array_clear(this->machine(), UINT16, 0x10000/2);
 	initial_scan_tables(this->machine());
-	m_runtimer = machine().scheduler().timer_alloc(FUNC(kaneko_calc3_run_callback), (void*)this);
+	m_runtimer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(kaneko_calc3_device::run_callback), this));
 
 
 	save_item(NAME(m_calc3.mcu_status));

@@ -73,18 +73,16 @@ WRITE8_MEMBER(jedi_state::jedi_audio_reset_w)
 }
 
 
-static TIMER_CALLBACK( delayed_audio_latch_w )
+TIMER_CALLBACK_MEMBER(jedi_state::delayed_audio_latch_w)
 {
-	jedi_state *state = machine.driver_data<jedi_state>();
-
-	state->m_audio_latch = param;
-	*state->m_audio_comm_stat |= 0x80;
+	m_audio_latch = param;
+	*m_audio_comm_stat |= 0x80;
 }
 
 
 WRITE8_MEMBER(jedi_state::jedi_audio_latch_w)
 {
-	machine().scheduler().synchronize(FUNC(delayed_audio_latch_w), data);
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(jedi_state::delayed_audio_latch_w), this), data);
 }
 
 

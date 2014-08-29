@@ -1297,10 +1297,9 @@ WRITE_LINE_MEMBER(harddriv_state::hdds3xdsp_timer_enable_callback)
 /*
     TODO: The following does not work correctly
 */
-static TIMER_CALLBACK( xsdp_sport1_irq_off_callback )
+TIMER_CALLBACK_MEMBER(harddriv_state::xsdp_sport1_irq_off_callback)
 {
-	harddriv_state *state = machine.driver_data<harddriv_state>();
-	state->m_ds3xdsp->set_input_line(ADSP2105_SPORT1_RX, CLEAR_LINE);
+	m_ds3xdsp->set_input_line(ADSP2105_SPORT1_RX, CLEAR_LINE);
 }
 
 
@@ -1312,7 +1311,7 @@ WRITE32_MEMBER(harddriv_state::hdds3sdsp_serial_tx_callback)
 	m_ds3sdsp_sdata = data;
 
 	m_ds3xdsp->set_input_line(ADSP2105_SPORT1_RX, ASSERT_LINE);
-	machine().scheduler().timer_set(attotime::from_nsec(200), FUNC(xsdp_sport1_irq_off_callback));
+	machine().scheduler().timer_set(attotime::from_nsec(200), timer_expired_delegate(FUNC(harddriv_state::xsdp_sport1_irq_off_callback), this));
 }
 
 

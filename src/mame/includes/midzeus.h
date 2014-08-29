@@ -97,6 +97,7 @@ public:
 	DECLARE_READ32_MEMBER( zeus2_r );
 	DECLARE_WRITE32_MEMBER( zeus2_w );
 private:
+	TIMER_CALLBACK_MEMBER(int_timer_callback);
 	void exit_handler2();
 	void zeus2_register32_w(offs_t offset, UINT32 data, int logit);
 	void zeus2_register_update(offs_t offset, UINT32 oldval, int logit);

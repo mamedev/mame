@@ -53,6 +53,7 @@ private:
 	UINT16* m_calc3_mcuram;
 	void calc3_mcu_init(running_machine &machine);
 	void initial_scan_tables(running_machine& machine);
+	TIMER_CALLBACK_MEMBER(run_callback);
 
 	calc3_t m_calc3;
 	void calc3_mcu_com_w(offs_t offset, UINT16 data, UINT16 mem_mask, int _n_);

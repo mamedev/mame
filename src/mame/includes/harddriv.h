@@ -382,6 +382,8 @@ public:
 
 	void hdds3sdsp_reset_timer();
 	void hdds3xdsp_reset_timer();
+	
+	TIMER_CALLBACK_MEMBER( xsdp_sport1_irq_off_callback );
 
 	/* DSK board */
 	DECLARE_WRITE16_MEMBER( hd68k_dsk_control_w );

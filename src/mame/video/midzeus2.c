@@ -245,9 +245,9 @@ INLINE UINT8 get_texel_4bit(const void *base, int y, int x, int width)
  *
  *************************************/
 
-static TIMER_CALLBACK( int_timer_callback )
+TIMER_CALLBACK_MEMBER(midzeus2_state::int_timer_callback)
 {
-	machine.device("maincpu")->execute().set_input_line(2, ASSERT_LINE);
+	m_maincpu->set_input_line(2, ASSERT_LINE);
 }
 
 
@@ -268,7 +268,7 @@ VIDEO_START_MEMBER(midzeus2_state,midzeus2)
 	texel_width = 256;
 	zeus_renderbase = waveram[1];
 
-	int_timer = machine().scheduler().timer_alloc(FUNC(int_timer_callback));
+	int_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(midzeus2_state::int_timer_callback), this));
 
 	/* save states */
 	save_pointer(NAME(waveram[0]), WAVERAM0_WIDTH * WAVERAM0_HEIGHT * 8 / sizeof(waveram[0][0]));
