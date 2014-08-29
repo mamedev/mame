@@ -232,7 +232,7 @@ Notes:
       Z80 clock: 8.000MHz [16/2]
       6264     : 8k x8 SRAM
       MB8421   : Fujitsu 2k x8 Dual-Port SRAM (SDIP52)
-      MB89372  : ?, Manufactured by Fujitsu, SDIP64
+      MB89372  : Fujitsu Multi-Protocol Controller (SDIP64)
       epr-12587: 27C256 EPROM
 
 

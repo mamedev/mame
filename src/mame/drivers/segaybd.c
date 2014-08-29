@@ -24,6 +24,36 @@
     Known bugs:
         * still seems to be some glitchiness in the games in general
 
+****************************************************************************
+
+Network Board (used for Power Drift)
+-------------
+
+Board: 834-6740
+|-------------| |-| |--------|---|-|
+| _ 315-5336  RX  TX          CNC  |
+||C|                               |
+||N| MB8421 EPR-12028  MB89372P-SH |
+||A|          5563                 |
+||_|                      315-5337 |
+|    SW1     LED   16MHz     Z80E  |
+|----------------------------------|
+
+Notes:
+      PALs      : 315-5337, 315-5336, both PAL16L8
+      Z80 clock : 8.000MHz [16/2]
+      5563      : Toshiba TC5563APL-12L 8k x 8 SRAM
+      MB8421    : Fujitsu 2k x 8 Dual-Port SRAM (SDIP52)
+      MB89372   : Fujitsu Multi-Protocol Controller
+      EPR-12028 : 27C256 EPROM
+      CNA       : 50 Pin connector to main board
+      CNC       : 10 pin connector
+      SW1       : Dipswitch block, 8 switches
+
+MB89372 - Uses 3 serial data transfer protocols: ASYNC, COP & BOP. Has a built
+          in DMA controller and Interrupt controller to handle interrupts
+          from the serial interface unit (SIU) & DMA controller (DMAC)
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -1341,17 +1371,15 @@ static MACHINE_CONFIG_START( yboard, segaybd_state )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-// LINK PCB is 834-6740, similar to the one for Super Monaco GP
-// has 1x 8 switch dip bank, Z80E CPU, ribbon connector? (to main board?), RX/TX ports, 16Mhz OSC,
-// MB8421 DPSRAM, MB89372 (UART?)
-// irq at 0x28 is from mb8421, and irq at 0x38 probably from uart?
+
+// irq at 0x28 is from MB8421, and irq at 0x38 probably from MB89372?
 static MACHINE_CONFIG_DERIVED( yboard_link, yboard )
 
 	// basic machine hardware
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(main_map_link)
 
-	MCFG_CPU_ADD("linkcpu", Z80, XTAL_16MHz/2 ) // 8 mhz?
+	MCFG_CPU_ADD("linkcpu", Z80, XTAL_16MHz/2 ) // 8 Mhz
 	MCFG_CPU_PROGRAM_MAP(link_map)
 	MCFG_CPU_IO_MAP(link_portmap)
 
@@ -2091,7 +2119,12 @@ ROM_START( pdriftj )
 	ROM_LOAD( "epr-11898.ic4", 0x000000, 0x20000, CRC(5d19d767) SHA1(d335cd3ef57c75e388df04b04fc3e2881a3902cf) )
 ROM_END
 
-// this was just 6 loose program roms + 4 sprite roms + the link PCBs, other roms could be incorrect
+//*************************************************************************************************************************
+//  Power Drift, Sega Y-board Link version
+//  Sega Game ID:  833-6697
+//
+//  This was just 6 loose program roms + 4 sprite roms + the link PCBs, other roms could be incorrect
+//
 ROM_START(pdriftl)
 	ROM_REGION(0x080000, "maincpu", 0) // M
 	ROM_LOAD16_BYTE("epr-12107a.25", 0x000000, 0x20000, CRC(0acaed3c) SHA1(0a3d86346b7a75a53b07311c095a879a22048590))
