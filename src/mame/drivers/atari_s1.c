@@ -82,7 +82,6 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(nmi);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_s);
 private:
-	bool m_timer_sb;
 	bool m_audiores;
 	UINT8 m_timer_s[3];
 	UINT8 m_vol;
