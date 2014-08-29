@@ -30,6 +30,7 @@
 #include "cpu/z80/z80.h"
 #include "includes/segaybd.h"
 #include "cpu/m68000/m68000.h"
+#include "machine/mb8421.h"
 #include "machine/segaic16.h"
 #include "machine/nvram.h"
 #include "sound/2151intf.h"
@@ -45,7 +46,6 @@
 
 const UINT32 MASTER_CLOCK = 50000000;
 const UINT32 SOUND_CLOCK = 32215900;
-const UINT32 LINK_CLOCK = XTAL_16MHz;
 
 // use this to fiddle with the IRQ2 timing
 #define TWEAK_IRQ2_SCANLINE     (0)
@@ -651,32 +651,6 @@ void segaybd_state::update_irqs()
 }
 
 
-READ16_MEMBER(segaybd_state::link_r)
-{
-	return rand();
-}
-
-READ16_MEMBER(segaybd_state::link2_r)
-{
-	return 0x0000;
-}
-
-WRITE16_MEMBER(segaybd_state::link2_w)
-{
-	data &= mem_mask;
-	logerror("link2_w %04x\n", data);
-}
-
-READ8_MEMBER(segaybd_state::linkram_r)
-{
-	return m_linkram[offset];
-}
-
-WRITE8_MEMBER(segaybd_state::linkram_w)
-{
-	m_linkram[offset] = data;
-}
-
 //**************************************************************************
 //  MAIN CPU ADDRESS MAPS
 //**************************************************************************
@@ -695,13 +669,6 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, segaybd_state )
 	AM_RANGE(0x1f0000, 0x1fffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( main_map_link, AS_PROGRAM, 16, segaybd_state )
-	AM_RANGE(0x190000, 0x190fff) AM_READWRITE8(linkram_r, linkram_w, 0x00ff) // ram to share with link CPU?
-	AM_RANGE(0x191000, 0x191001) AM_READ(link_r)
-	AM_RANGE(0x192000, 0x192001) AM_READWRITE(link2_r, link2_w)
-
-	AM_IMPORT_FROM(main_map)
-ADDRESS_MAP_END
 
 //**************************************************************************
 //  SUB CPU ADDRESS MAPS
@@ -734,7 +701,6 @@ static ADDRESS_MAP_START( suby_map, AS_PROGRAM, 16, segaybd_state )
 ADDRESS_MAP_END
 
 
-
 //**************************************************************************
 //  Z80 SOUND CPU ADDRESS MAPS
 //**************************************************************************
@@ -753,15 +719,54 @@ static ADDRESS_MAP_START( sound_portmap, AS_IO, 8, segaybd_state )
 	AM_RANGE(0x40, 0x40) AM_MIRROR(0x3f) AM_READ(sound_data_r)
 ADDRESS_MAP_END
 
+
 //**************************************************************************
-//  Z80 LINK BOARD CPU ADDRESS MAPS
+//  LINK BOARD
 //**************************************************************************
+
+WRITE_LINE_MEMBER(segaybd_state::mb8421_intl)
+{
+	// shared ram interrupt request from linkcpu side
+	// unused?
+}
+
+WRITE_LINE_MEMBER(segaybd_state::mb8421_intr)
+{
+	// shared ram interrupt request from maincpu side
+	m_linkcpu->set_input_line_and_vector(0, state ? ASSERT_LINE : CLEAR_LINE, 0xef); // RST $28
+}
+
+
+READ16_MEMBER(segaybd_state::link_r)
+{
+	return rand();
+}
+
+READ16_MEMBER(segaybd_state::link2_r)
+{
+	return 0x0000;
+}
+
+WRITE16_MEMBER(segaybd_state::link2_w)
+{
+	data &= mem_mask;
+	logerror("link2_w %04x\n", data);
+}
+
+static ADDRESS_MAP_START( main_map_link, AS_PROGRAM, 16, segaybd_state )
+	AM_RANGE(0x190000, 0x190fff) AM_DEVREADWRITE8("mb8421", mb8421_device, left_r, left_w, 0x00ff)
+	AM_RANGE(0x191000, 0x191001) AM_READ(link_r)
+	AM_RANGE(0x192000, 0x192001) AM_READWRITE(link2_r, link2_w)
+
+	AM_IMPORT_FROM(main_map)
+ADDRESS_MAP_END
+
 
 static ADDRESS_MAP_START( link_map, AS_PROGRAM, 8, segaybd_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x2000, 0x3fff) AM_RAM
-	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_SHARE("linkram") // MB8421
+	AM_RANGE(0x4000, 0x47ff) AM_DEVREADWRITE("mb8421", mb8421_device, right_r, right_w)
 ADDRESS_MAP_END
 
 READ8_MEMBER(segaybd_state::link_portc0_r)
@@ -773,10 +778,10 @@ static ADDRESS_MAP_START( link_portmap, AS_IO, 8, segaybd_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 
-//	AM_RANGE(0x40, 0x40) AM_READ_PORT("LinkDSW") 
+//	AM_RANGE(0x40, 0x40) AM_READ_PORT("LinkDSW")
 	AM_RANGE(0xc0, 0xc0) AM_READ(link_portc0_r)
-	
 ADDRESS_MAP_END
+
 
 //**************************************************************************
 //  GENERIC PORT DEFINITIONS
@@ -1336,16 +1341,23 @@ static MACHINE_CONFIG_START( yboard, segaybd_state )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-// LINK PCB is 834-6740
-// has 1x 8 switch dip bank, z80E CPU, ribbon connector? (to main board?), RX/TX ports, 16Mhz OSC
+// LINK PCB is 834-6740, similar to the one for Super Monaco GP
+// has 1x 8 switch dip bank, Z80E CPU, ribbon connector? (to main board?), RX/TX ports, 16Mhz OSC,
+// MB8421 DPSRAM, MB89372 (UART?)
+// irq at 0x28 is from mb8421, and irq at 0x38 probably from uart?
 static MACHINE_CONFIG_DERIVED( yboard_link, yboard )
+
+	// basic machine hardware
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(main_map_link)
 
-	MCFG_CPU_ADD("linkcpu", Z80, LINK_CLOCK/2 ) // 8 mhz?
+	MCFG_CPU_ADD("linkcpu", Z80, XTAL_16MHz/2 ) // 8 mhz?
 	MCFG_CPU_PROGRAM_MAP(link_map)
 	MCFG_CPU_IO_MAP(link_portmap)
-	// valid code at 0x28 and 0x38 
+
+	MCFG_DEVICE_ADD("mb8421", MB8421, 0)
+	MCFG_MB8421_INTL_HANDLER(WRITELINE(segaybd_state, mb8421_intl))
+	MCFG_MB8421_INTR_HANDLER(WRITELINE(segaybd_state, mb8421_intr))
 MACHINE_CONFIG_END
 
 //**************************************************************************

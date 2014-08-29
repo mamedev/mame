@@ -457,11 +457,13 @@ static const int dendego_pressure_table[0x100] =
 
 WRITE_LINE_MEMBER(taitojc_state::mb8421_intl)
 {
+	// shared ram interrupt request from dsp side
 	m_maincpu->set_input_line(6, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 WRITE_LINE_MEMBER(taitojc_state::mb8421_intr)
 {
+	// shared ram interrupt request from maincpu side
 	// this is hacky, acquiring the internal dsp romdump should allow it to be cleaned up
 	if (state)
 	{
