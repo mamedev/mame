@@ -616,7 +616,7 @@ void rsp_device::state_string_export(const device_state_entry &entry, astring &s
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			string.printf("");
+			string.printf("%s","");
 			break;
 
 #if USE_SIMD
