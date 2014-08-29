@@ -36,7 +36,7 @@ class rsp_frontend : public drc_frontend
 {
 public:
 	// construction/destruction
-	rsp_frontend(rsp_state &state, UINT32 window_start, UINT32 window_end, UINT32 max_sequence);
+	rsp_frontend(rsp_device &rsp, UINT32 window_start, UINT32 window_end, UINT32 max_sequence);
 
 protected:
 	// required overrides
@@ -50,7 +50,7 @@ private:
 	bool describe_cop2(UINT32 op, opcode_desc &desc);
 
 	// internal state
-	rsp_state &m_context;
+	rsp_device &m_rsp;
 };
 
 

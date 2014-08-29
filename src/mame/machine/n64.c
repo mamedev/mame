@@ -2417,10 +2417,11 @@ void n64_state::machine_start()
 	/* configure fast RAM regions for DRC */
 	dynamic_cast<mips3_device *>(machine().device("maincpu"))->mips3drc_add_fastram(0x00000000, 0x007fffff, FALSE, rdram);
 
-	rspdrc_set_options(machine().device("rsp"), RSPDRC_STRICT_VERIFY);
-	rspdrc_flush_drc_cache(machine().device("rsp"));
-	rspdrc_add_dmem(machine().device("rsp"), rsp_dmem);
-	rspdrc_add_imem(machine().device("rsp"), rsp_imem);
+	rsp_device *rsp = machine().device<rsp_device>("rsp");
+	rsp->rspdrc_set_options(RSPDRC_STRICT_VERIFY);
+	rsp->rspdrc_flush_drc_cache();
+	rsp->rspdrc_add_dmem(rsp_dmem);
+	rsp->rspdrc_add_imem(rsp_imem);
 
 	/* add a hook for battery save */
 	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(n64_state::n64_machine_stop),this));

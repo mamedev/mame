@@ -8,8 +8,11 @@
 #include "debugger.h"
 #include "rsp.h"
 #include "rspdiv.h"
+#include "rspfe.h"
 
-CPU_DISASSEMBLE( rsp );
+
+const device_type RSP = &device_creator<rsp_device>;
+
 
 #define LOG_INSTRUCTION_EXECUTION       0
 #define SAVE_DISASM                     0
@@ -28,43 +31,37 @@ CPU_DISASSEMBLE( rsp );
 
 extern offs_t rsp_dasm_one(char *buffer, offs_t pc, UINT32 op);
 
-INLINE rsp_state *get_safe_token(device_t *device)
-{
-	assert(device != NULL);
-	assert(device->type() == RSP_INT);
-	return (rsp_state *)downcast<legacy_cpu_device *>(device)->token();
-}
 
 #define SIMM16      ((INT32)(INT16)(op))
 #define UIMM16      ((UINT16)(op))
 #define UIMM26      (op & 0x03ffffff)
 
-#define JUMP_ABS(addr)          { rsp->nextpc = 0x04001000 | (((addr) << 2) & 0xfff); }
-#define JUMP_ABS_L(addr,l)      { rsp->nextpc = 0x04001000 | (((addr) << 2) & 0xfff); rsp->r[l] = rsp->pc + 4; }
-#define JUMP_REL(offset)        { rsp->nextpc = 0x04001000 | ((rsp->pc + ((offset) << 2)) & 0xfff); }
-#define JUMP_REL_L(offset,l)    { rsp->nextpc = 0x04001000 | ((rsp->pc + ((offset) << 2)) & 0xfff); rsp->r[l] = rsp->pc + 4; }
-#define JUMP_PC(addr)           { rsp->nextpc = 0x04001000 | ((addr) & 0xfff); }
-#define JUMP_PC_L(addr,l)       { rsp->nextpc = 0x04001000 | ((addr) & 0xfff); rsp->r[l] = rsp->pc + 4; }
-#define LINK(l)                 { rsp->r[l] = rsp->pc + 4; }
+#define JUMP_ABS(addr)          { m_nextpc = 0x04001000 | (((addr) << 2) & 0xfff); }
+#define JUMP_ABS_L(addr,l)      { m_nextpc = 0x04001000 | (((addr) << 2) & 0xfff); m_rsp_state->r[l] = m_rsp_state->pc + 4; }
+#define JUMP_REL(offset)        { m_nextpc = 0x04001000 | ((m_rsp_state->pc + ((offset) << 2)) & 0xfff); }
+#define JUMP_REL_L(offset,l)    { m_nextpc = 0x04001000 | ((m_rsp_state->pc + ((offset) << 2)) & 0xfff); m_rsp_state->r[l] = m_rsp_state->pc + 4; }
+#define JUMP_PC(addr)           { m_nextpc = 0x04001000 | ((addr) & 0xfff); }
+#define JUMP_PC_L(addr,l)       { m_nextpc = 0x04001000 | ((addr) & 0xfff); m_rsp_state->r[l] = m_rsp_state->pc + 4; }
+#define LINK(l)                 { m_rsp_state->r[l] = m_rsp_state->pc + 4; }
 
-#define VREG_B(reg, offset)     rsp->v[(reg)].b[(offset)^1]
-#define VREG_S(reg, offset)     rsp->v[(reg)].s[(offset)]
-#define VREG_L(reg, offset)     rsp->v[(reg)].l[(offset)]
+#define VREG_B(reg, offset)     m_v[(reg)].b[(offset)^1]
+#define VREG_S(reg, offset)     m_v[(reg)].s[(offset)]
+#define VREG_L(reg, offset)     m_v[(reg)].l[(offset)]
 
-#define R_VREG_B(reg, offset)       rsp->v[(reg)].b[(offset)^1]
-#define R_VREG_S(reg, offset)       (INT16)rsp->v[(reg)].s[(offset)]
-#define R_VREG_L(reg, offset)       rsp->v[(reg)].l[(offset)]
+#define R_VREG_B(reg, offset)       m_v[(reg)].b[(offset)^1]
+#define R_VREG_S(reg, offset)       (INT16)m_v[(reg)].s[(offset)]
+#define R_VREG_L(reg, offset)       m_v[(reg)].l[(offset)]
 
-#define W_VREG_B(reg, offset, val)  (rsp->v[(reg)].b[(offset)^1] = val)
-#define W_VREG_S(reg, offset, val)  (rsp->v[(reg)].s[(offset)] = val)
-#define W_VREG_L(reg, offset, val)  (rsp->v[(reg)].l[(offset)] = val)
+#define W_VREG_B(reg, offset, val)  (m_v[(reg)].b[(offset)^1] = val)
+#define W_VREG_S(reg, offset, val)  (m_v[(reg)].s[(offset)] = val)
+#define W_VREG_L(reg, offset, val)  (m_v[(reg)].l[(offset)] = val)
 
 #define VEC_EL_2(x,z)           (vector_elements[(x)][(z)])
 
-#define ACCUM(x)        rsp->accum[((x))].q
-#define ACCUM_H(x)      rsp->accum[((x))].w[3]
-#define ACCUM_M(x)      rsp->accum[((x))].w[2]
-#define ACCUM_L(x)      rsp->accum[((x))].w[1]
+#define ACCUM(x)        m_accum[((x))].q
+#define ACCUM_H(x)      m_accum[((x))].w[3]
+#define ACCUM_M(x)      m_accum[((x))].w[2]
+#define ACCUM_L(x)      m_accum[((x))].w[1]
 
 #define CARRY       0
 #define COMPARE     1
@@ -72,53 +69,158 @@ INLINE rsp_state *get_safe_token(device_t *device)
 #define ZERO        3
 #define CLIP2       4
 
-#define CARRY_FLAG(x)           (rsp->vflag[CARRY][x & 7] != 0 ? 0xffff : 0)
-#define COMPARE_FLAG(x)         (rsp->vflag[COMPARE][x & 7] != 0 ? 0xffff : 0)
-#define CLIP1_FLAG(x)           (rsp->vflag[CLIP1][x & 7] != 0 ? 0xffff : 0)
-#define ZERO_FLAG(x)            (rsp->vflag[ZERO][x & 7] != 0 ? 0xffff : 0)
-#define CLIP2_FLAG(x)           (rsp->vflag[CLIP2][x & 7] != 0 ? 0xffff : 0)
+#define CARRY_FLAG(x)           (m_vflag[CARRY][x & 7] != 0 ? 0xffff : 0)
+#define COMPARE_FLAG(x)         (m_vflag[COMPARE][x & 7] != 0 ? 0xffff : 0)
+#define CLIP1_FLAG(x)           (m_vflag[CLIP1][x & 7] != 0 ? 0xffff : 0)
+#define ZERO_FLAG(x)            (m_vflag[ZERO][x & 7] != 0 ? 0xffff : 0)
+#define CLIP2_FLAG(x)           (m_vflag[CLIP2][x & 7] != 0 ? 0xffff : 0)
 
-#define CLEAR_CARRY_FLAGS()     { memset(rsp->vflag[0], 0, 16); }
-#define CLEAR_COMPARE_FLAGS()   { memset(rsp->vflag[1], 0, 16); }
-#define CLEAR_CLIP1_FLAGS()     { memset(rsp->vflag[2], 0, 16); }
-#define CLEAR_ZERO_FLAGS()      { memset(rsp->vflag[3], 0, 16); }
-#define CLEAR_CLIP2_FLAGS()     { memset(rsp->vflag[4], 0, 16); }
+#define CLEAR_CARRY_FLAGS()     { memset(m_vflag[0], 0, 16); }
+#define CLEAR_COMPARE_FLAGS()   { memset(m_vflag[1], 0, 16); }
+#define CLEAR_CLIP1_FLAGS()     { memset(m_vflag[2], 0, 16); }
+#define CLEAR_ZERO_FLAGS()      { memset(m_vflag[3], 0, 16); }
+#define CLEAR_CLIP2_FLAGS()     { memset(m_vflag[4], 0, 16); }
 
-#define SET_CARRY_FLAG(x)       { rsp->vflag[0][x & 7] = 0xffff; }
-#define SET_COMPARE_FLAG(x)     { rsp->vflag[1][x & 7] = 0xffff; }
-#define SET_CLIP1_FLAG(x)       { rsp->vflag[2][x & 7] = 0xffff; }
-#define SET_ZERO_FLAG(x)        { rsp->vflag[3][x & 7] = 0xffff; }
-#define SET_CLIP2_FLAG(x)       { rsp->vflag[4][x & 7] = 0xffff; }
+#define SET_CARRY_FLAG(x)       { m_vflag[0][x & 7] = 0xffff; }
+#define SET_COMPARE_FLAG(x)     { m_vflag[1][x & 7] = 0xffff; }
+#define SET_CLIP1_FLAG(x)       { m_vflag[2][x & 7] = 0xffff; }
+#define SET_ZERO_FLAG(x)        { m_vflag[3][x & 7] = 0xffff; }
+#define SET_CLIP2_FLAG(x)       { m_vflag[4][x & 7] = 0xffff; }
 
-#define CLEAR_CARRY_FLAG(x)     { rsp->vflag[0][x & 7] = 0; }
-#define CLEAR_COMPARE_FLAG(x)   { rsp->vflag[1][x & 7] = 0; }
-#define CLEAR_CLIP1_FLAG(x)     { rsp->vflag[2][x & 7] = 0; }
-#define CLEAR_ZERO_FLAG(x)      { rsp->vflag[3][x & 7] = 0; }
-#define CLEAR_CLIP2_FLAG(x)     { rsp->vflag[4][x & 7] = 0; }
+#define CLEAR_CARRY_FLAG(x)     { m_vflag[0][x & 7] = 0; }
+#define CLEAR_COMPARE_FLAG(x)   { m_vflag[1][x & 7] = 0; }
+#define CLEAR_CLIP1_FLAG(x)     { m_vflag[2][x & 7] = 0; }
+#define CLEAR_ZERO_FLAG(x)      { m_vflag[3][x & 7] = 0; }
+#define CLEAR_CLIP2_FLAG(x)     { m_vflag[4][x & 7] = 0; }
 
-#define ROPCODE(pc)     rsp->program->read_dword(pc)
+#define ROPCODE(pc)     m_program->read_dword(pc)
 
-INLINE UINT8 READ8(rsp_state *rsp, UINT32 address)
+
+/***************************************************************************
+    DEBUGGING
+***************************************************************************/
+
+#define SINGLE_INSTRUCTION_MODE         (0)
+
+/***************************************************************************
+    CONSTANTS
+***************************************************************************/
+
+/* compilation boundaries -- how far back/forward does the analysis extend? */
+#define COMPILE_BACKWARDS_BYTES         128
+#define COMPILE_FORWARDS_BYTES          512
+#define COMPILE_MAX_INSTRUCTIONS        ((COMPILE_BACKWARDS_BYTES/4) + (COMPILE_FORWARDS_BYTES/4))
+#define COMPILE_MAX_SEQUENCE            64
+
+/* size of the execution code cache */
+#define CACHE_SIZE                      (32 * 1024 * 1024)
+
+
+rsp_device::rsp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: cpu_device(mconfig, RSP, "RSP", tag, owner, clock, "rsp", __FILE__)
+	, m_program_config("program", ENDIANNESS_BIG, 32, 32)
+	, m_cache(CACHE_SIZE + sizeof(internal_rsp_state))
+	, m_drcuml(NULL)
+//  , m_drcuml(*this, m_cache, ( RSP_LOG_UML ? DRCUML_OPTION_LOG_UML : 0 ) | ( RSP_LOG_NATIVE ? DRCUML_OPTION_LOG_NATIVE : 0 ), 8, 32, 2)
+	, m_drcfe(NULL)
+	, m_drcoptions(0)
+	, m_cache_dirty(TRUE)
+	, m_numcycles(0)
+	, m_format(NULL)
+	, m_arg2(0)
+	, m_arg3(0)
+	, m_entry(NULL)
+	, m_nocode(NULL)
+	, m_out_of_cycles(NULL)
+	, m_read8(NULL)
+	, m_write8(NULL)
+	, m_read16(NULL)
+	, m_write16(NULL)
+	, m_read32(NULL)
+	, m_write32(NULL)
+	, m_rsp_state(NULL)
+	, m_exec_output(NULL)
+#if SIMUL_SIMD
+	, m_old_reciprocal_res(0)
+	, m_old_reciprocal_high(0)
+	, m_old_dp_allowed(0)
+	, m_scalar_reciprocal_res(0)
+	, m_scalar_reciprocal_high(0)
+	, m_scalar_dp_allowed(0)
+	, m_simd_reciprocal_res(0)
+	, m_simd_reciprocal_high(0)
+	, m_simd_dp_allowed(0)
+#endif
+	, m_sr(0)
+	, m_step_count(0)
+#if USE_SIMD
+	, m_accum_h(0)
+	, m_accum_m(0)
+	, m_accum_l(0)
+	, m_accum_ll(0)
+#endif
+	, m_reciprocal_res(0)
+	, m_reciprocal_high(0)
+	, m_dp_allowed(0)
+	, m_ppc(0)
+	, m_nextpc(0)
+	, m_dmem32(NULL)
+	, m_dmem16(NULL)
+	, m_dmem8(NULL)
+	, m_imem32(NULL)
+	, m_imem16(NULL)
+	, m_imem8(NULL)
+	, m_debugger_temp(0)
+	, m_dp_reg_r_func(*this)
+	, m_dp_reg_w_func(*this)
+	, m_sp_reg_r_func(*this)
+	, m_sp_reg_w_func(*this)
+	, m_sp_set_status_func(*this)
+{
+	m_isdrc = mconfig.options().drc() ? true : false;
+	memset(m_vres, 0, sizeof(m_vres));
+	memset(m_v, 0, sizeof(m_v));
+	memset(m_vflag, 0, sizeof(m_vflag));
+#if SIMUL_SIMD
+	memset(m_old_r, 0, sizeof(m_old_r));
+	memset(m_old_dmem, 0, sizeof(m_old_dmem));
+	memset(m_scalar_r, 0, sizeof(m_scalar_r));
+	memset(m_scalar_dmem, 0, sizeof(m_scalar_dmem));
+#endif
+#if USE_SIMD
+	memset(m_xv, 0, sizeof(m_xv));
+	memset(m_xvflag, 0, sizeof(m_xvflag));
+#endif
+	memset(m_accum, 0, sizeof(m_accum));
+}
+
+offs_t rsp_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
+{
+	extern CPU_DISASSEMBLE( rsp );
+	return CPU_DISASSEMBLE_NAME( rsp )(this, buffer, pc, oprom, opram, options);
+}
+
+inline UINT8 rsp_device::READ8(UINT32 address)
 {
 	UINT8 ret;
 	address = 0x04000000 | (address & 0xfff);
-	ret = rsp->program->read_byte(address);
+	ret = m_program->read_byte(address);
 	//printf("%04xr%02x\n", address & 0x0000ffff, ret);
 	return ret;
 }
 
-INLINE UINT16 READ16(rsp_state *rsp, UINT32 address)
+inline UINT16 rsp_device::READ16(UINT32 address)
 {
 	UINT16 ret;
 	address = 0x04000000 | (address & 0xfff);
 
 	if(address & 1)
 	{
-		ret = ((rsp->program->read_byte(address + 0) & 0xff) << 8) | (rsp->program->read_byte(address + 1) & 0xff);
+		ret = ((m_program->read_byte(address + 0) & 0xff) << 8) | (m_program->read_byte(address + 1) & 0xff);
 	}
 	else
 	{
-		ret = rsp->program->read_word(address);
+		ret = m_program->read_word(address);
 	}
 
 	//printf("%04xr%04x\n", address & 0x0000ffff, ret);
@@ -126,103 +228,103 @@ INLINE UINT16 READ16(rsp_state *rsp, UINT32 address)
 	return ret;
 }
 
-INLINE UINT32 READ32(rsp_state *rsp, UINT32 address)
+inline UINT32 rsp_device::READ32(UINT32 address)
 {
 	UINT32 ret;
 	address = 0x04000000 | (address & 0xfff);
 
 	if(address & 3)
 	{
-		ret =  ((rsp->program->read_byte(address + 0) & 0xff) << 24) |
-				((rsp->program->read_byte(address + 1) & 0xff) << 16) |
-				((rsp->program->read_byte(address + 2) & 0xff) << 8) |
-				((rsp->program->read_byte(address + 3) & 0xff) << 0);
+		ret =  ((m_program->read_byte(address + 0) & 0xff) << 24) |
+				((m_program->read_byte(address + 1) & 0xff) << 16) |
+				((m_program->read_byte(address + 2) & 0xff) << 8) |
+				((m_program->read_byte(address + 3) & 0xff) << 0);
 	}
 	else
 	{
-		ret = rsp->program->read_dword(address);
+		ret = m_program->read_dword(address);
 	}
 
 	//printf("%04xr%08x\n", address & 0x0000ffff, ret);
 	return ret;
 }
 
-INLINE void WRITE8(rsp_state *rsp, UINT32 address, UINT8 data)
+void rsp_device::WRITE8(UINT32 address, UINT8 data)
 {
 	address = 0x04000000 | (address & 0xfff);
 	//printf("%04x:%02x\n", address & 0x0000ffff, data);
-	rsp->program->write_byte(address, data);
+	m_program->write_byte(address, data);
 }
 
-INLINE void WRITE16(rsp_state *rsp, UINT32 address, UINT16 data)
+void rsp_device::WRITE16(UINT32 address, UINT16 data)
 {
 	address = 0x04000000 | (address & 0xfff);
 	//printf("%04x:%04x\n", address & 0x0000ffff, data);
 
 	if(address & 1)
 	{
-		rsp->program->write_byte(address + 0, (data >> 8) & 0xff);
-		rsp->program->write_byte(address + 1, (data >> 0) & 0xff);
+		m_program->write_byte(address + 0, (data >> 8) & 0xff);
+		m_program->write_byte(address + 1, (data >> 0) & 0xff);
 		return;
 	}
 
-	rsp->program->write_word(address, data);
+	m_program->write_word(address, data);
 }
 
-INLINE void WRITE32(rsp_state *rsp, UINT32 address, UINT32 data)
+void rsp_device::WRITE32(UINT32 address, UINT32 data)
 {
 	address = 0x04000000 | (address & 0xfff);
 	//printf("%04x:%08x\n", address & 0x0000ffff, data);
 
 	if(address & 3)
 	{
-		rsp->program->write_byte(address + 0, (data >> 24) & 0xff);
-		rsp->program->write_byte(address + 1, (data >> 16) & 0xff);
-		rsp->program->write_byte(address + 2, (data >> 8) & 0xff);
-		rsp->program->write_byte(address + 3, (data >> 0) & 0xff);
+		m_program->write_byte(address + 0, (data >> 24) & 0xff);
+		m_program->write_byte(address + 1, (data >> 16) & 0xff);
+		m_program->write_byte(address + 2, (data >> 8) & 0xff);
+		m_program->write_byte(address + 3, (data >> 0) & 0xff);
 		return;
 	}
 
-	rsp->program->write_dword(address, data);
+	m_program->write_dword(address, data);
 }
 
 /*****************************************************************************/
 
-static UINT32 get_cop0_reg(rsp_state *rsp, int reg)
+UINT32 rsp_device::get_cop0_reg(int reg)
 {
 	reg &= 0xf;
 	if (reg < 8)
 	{
-		return (rsp->device->sp_reg_r_func)(reg, 0xffffffff);
+		return m_sp_reg_r_func(reg, 0xffffffff);
 	}
 	else if (reg >= 8 && reg < 16)
 	{
-		return (rsp->device->dp_reg_r_func)(reg - 8, 0xffffffff);
+		return m_dp_reg_r_func(reg - 8, 0xffffffff);
 	}
 
 	return 0;
 }
 
-static void set_cop0_reg(rsp_state *rsp, int reg, UINT32 data)
+void rsp_device::set_cop0_reg(int reg, UINT32 data)
 {
 	reg &= 0xf;
 	if (reg < 8)
 	{
-		(rsp->device->sp_reg_w_func)(reg, data, 0xffffffff);
+		m_sp_reg_w_func(reg, data, 0xffffffff);
 	}
 	else if (reg >= 8 && reg < 16)
 	{
-		(rsp->device->dp_reg_w_func)(reg - 8, data, 0xffffffff);
+		m_dp_reg_w_func(reg - 8, data, 0xffffffff);
 	}
 }
 
-static void unimplemented_opcode(rsp_state *rsp, UINT32 op)
+void rsp_device::unimplemented_opcode(UINT32 op)
 {
-	if ((rsp->device->machine().debug_flags & DEBUG_FLAG_ENABLED) != 0)
+	if ((machine().debug_flags & DEBUG_FLAG_ENABLED) != 0)
 	{
 		char string[200];
-		rsp_dasm_one(string, rsp->ppc, op);
-		osd_printf_debug("%08X: %s\n", rsp->ppc, string);
+		rsp_dasm_one(string, m_ppc, op);
+		osd_printf_debug("%08X: %s\n", m_ppc, string);
 	}
 
 #if SAVE_DISASM
@@ -255,7 +357,7 @@ static void unimplemented_opcode(rsp_state *rsp, UINT32 op)
 	}
 #endif
 
-	fatalerror("RSP: unknown opcode %02X (%08X) at %08X\n", op >> 26, op, rsp->ppc);
+	fatalerror("RSP: unknown opcode %02X (%08X) at %08X\n", op >> 26, op, m_ppc);
 }
 
 /*****************************************************************************/
@@ -280,65 +382,444 @@ static const int vector_elements[16][8] =
 	{ 7, 7, 7, 7, 7, 7, 7, 7 },     // 7
 };
 
-void rsp_cpu_device::resolve_cb()
+void rsp_device::resolve_cb()
 {
-	dp_reg_r_func.resolve();
-	dp_reg_w_func.resolve();
-	sp_reg_r_func.resolve();
-	sp_reg_w_func.resolve();
-	sp_set_status_func.resolve();
+	m_dp_reg_r_func.resolve();
+	m_dp_reg_w_func.resolve();
+	m_sp_reg_r_func.resolve();
+	m_sp_reg_w_func.resolve();
+	m_sp_set_status_func.resolve();
 }
 
-static CPU_INIT( rsp )
+void rsp_device::device_start()
 {
-	rsp_state *rsp = get_safe_token(device);
-	int regIdx;
-	int accumIdx;
+	m_rsp_state = (internal_rsp_state *)m_cache.alloc_near(sizeof(internal_rsp_state));
 
 	if (LOG_INSTRUCTION_EXECUTION)
-		rsp->exec_output = fopen("rsp_execute.txt", "wt");
+		m_exec_output = fopen("rsp_execute.txt", "wt");
 
-	rsp->irq_callback = irqcallback;
-	rsp->device = downcast<rsp_cpu_device *>(device);
-	rsp->program = &device->space(AS_PROGRAM);
-	rsp->direct = &rsp->program->direct();
-	rsp->device->resolve_cb();
+	m_program = &space(AS_PROGRAM);
+	m_direct = &m_program->direct();
+	resolve_cb();
 
-#if 1
 	// Inaccurate.  RSP registers power on to a random state...
-	for(regIdx = 0; regIdx < 32; regIdx++ )
+	for(int regIdx = 0; regIdx < 32; regIdx++ )
 	{
-		rsp->r[regIdx] = 0;
-		rsp->v[regIdx].d[0] = 0;
-		rsp->v[regIdx].d[1] = 0;
+		m_rsp_state->r[regIdx] = 0;
+		m_v[regIdx].d[0] = 0;
+		m_v[regIdx].d[1] = 0;
 	}
 	CLEAR_CARRY_FLAGS();
 	CLEAR_COMPARE_FLAGS();
 	CLEAR_CLIP1_FLAGS();
 	CLEAR_ZERO_FLAGS();
 	CLEAR_CLIP2_FLAGS();
-	//rsp->square_root_res = 0;
-	//rsp->square_root_high = 0;
-	rsp->reciprocal_res = 0;
-	rsp->reciprocal_high = 0;
-#endif
+	//m_square_root_res = 0;
+	//m_square_root_high = 0;
+	m_reciprocal_res = 0;
+	m_reciprocal_high = 0;
 
 	// ...except for the accumulators.
 	// We're not calling machine.rand() because initializing something with machine.rand()
 	//   makes me retch uncontrollably.
-	for(accumIdx = 0; accumIdx < 8; accumIdx++ )
+	for(int accumIdx = 0; accumIdx < 8; accumIdx++ )
 	{
-		rsp->accum[accumIdx].q = 0;
+		m_accum[accumIdx].q = 0;
 	}
 
-	rsp->sr = RSP_STATUS_HALT;
-	rsp->step_count = 0;
+	m_sr = RSP_STATUS_HALT;
+	m_step_count = 0;
+
+	/* initialize the UML generator */
+	UINT32 drc_flags = 0;
+	if (RSP_LOG_UML)
+	{
+		drc_flags |= DRCUML_OPTION_LOG_UML;
+	}
+	if (RSP_LOG_NATIVE)
+	{
+		drc_flags |= DRCUML_OPTION_LOG_NATIVE;
+	}
+	m_drcuml = auto_alloc(machine(), drcuml_state(*this, m_cache, drc_flags, 8, 32, 2));
+
+	/* add symbols for our stuff */
+	m_drcuml->symbol_add(&m_rsp_state->pc, sizeof(m_rsp_state->pc), "pc");
+	m_drcuml->symbol_add(&m_rsp_state->icount, sizeof(m_rsp_state->icount), "icount");
+	for (int regnum = 0; regnum < 32; regnum++)
+	{
+		char buf[10];
+		sprintf(buf, "r%d", regnum);
+		m_drcuml->symbol_add(&m_rsp_state->r[regnum], sizeof(m_rsp_state->r[regnum]), buf);
+	}
+	m_drcuml->symbol_add(&m_rsp_state->arg0, sizeof(m_rsp_state->arg0), "arg0");
+	m_drcuml->symbol_add(&m_rsp_state->arg1, sizeof(m_rsp_state->arg1), "arg1");
+	m_drcuml->symbol_add(&m_arg2, sizeof(m_arg2), "arg2");
+	m_drcuml->symbol_add(&m_arg3, sizeof(m_arg3), "arg3");
+	m_drcuml->symbol_add(&m_numcycles, sizeof(m_numcycles), "numcycles");
+
+	/* initialize the front-end helper */
+	m_drcfe = auto_alloc(machine(), rsp_frontend(*this, COMPILE_BACKWARDS_BYTES, COMPILE_FORWARDS_BYTES, SINGLE_INSTRUCTION_MODE ? 1 : COMPILE_MAX_SEQUENCE));
+
+	/* compute the register parameters */
+	for (int regnum = 0; regnum < 32; regnum++)
+	{
+		m_regmap[regnum] = (regnum == 0) ? uml::parameter(0) : uml::parameter::make_memory(&m_rsp_state->r[regnum]);
+	}
+
+    /*
+    drcbe_info beinfo;
+    m_drcuml->get_backend_info(beinfo);
+    if (beinfo.direct_iregs > 2)
+    {
+        m_regmap[30] = I2;
+    }
+    if (beinfo.direct_iregs > 3)
+    {
+        m_regmap[31] = I3;
+    }
+    if (beinfo.direct_iregs > 4)
+    {
+        m_regmap[2] = I4;
+    }
+    if (beinfo.direct_iregs > 5)
+    {
+        m_regmap[3] = I5;
+    }
+    if (beinfo.direct_iregs > 6)
+    {
+        m_regmap[4] = I6;
+    }
+    */
+
+	/* mark the cache dirty so it is updated on next execute */
+	m_cache_dirty = TRUE;
+
+	state_add( RSP_PC,      "PC", m_debugger_temp).callimport().callexport().formatstr("%08X");
+	state_add( RSP_R0,      "R0", m_rsp_state->r[0]).formatstr("%08X");
+	state_add( RSP_R1,      "R1", m_rsp_state->r[1]).formatstr("%08X");
+	state_add( RSP_R2,      "R2", m_rsp_state->r[2]).formatstr("%08X");
+	state_add( RSP_R3,      "R3", m_rsp_state->r[3]).formatstr("%08X");
+	state_add( RSP_R4,      "R4", m_rsp_state->r[4]).formatstr("%08X");
+	state_add( RSP_R5,      "R5", m_rsp_state->r[5]).formatstr("%08X");
+	state_add( RSP_R6,      "R6", m_rsp_state->r[6]).formatstr("%08X");
+	state_add( RSP_R7,      "R7", m_rsp_state->r[7]).formatstr("%08X");
+	state_add( RSP_R8,      "R8", m_rsp_state->r[8]).formatstr("%08X");
+	state_add( RSP_R9,      "R9", m_rsp_state->r[9]).formatstr("%08X");
+	state_add( RSP_R10,     "R10", m_rsp_state->r[10]).formatstr("%08X");
+	state_add( RSP_R11,     "R11", m_rsp_state->r[11]).formatstr("%08X");
+	state_add( RSP_R12,     "R12", m_rsp_state->r[12]).formatstr("%08X");
+	state_add( RSP_R13,     "R13", m_rsp_state->r[13]).formatstr("%08X");
+	state_add( RSP_R14,     "R14", m_rsp_state->r[14]).formatstr("%08X");
+	state_add( RSP_R15,     "R15", m_rsp_state->r[15]).formatstr("%08X");
+	state_add( RSP_R16,     "R16", m_rsp_state->r[16]).formatstr("%08X");
+	state_add( RSP_R17,     "R17", m_rsp_state->r[17]).formatstr("%08X");
+	state_add( RSP_R18,     "R18", m_rsp_state->r[18]).formatstr("%08X");
+	state_add( RSP_R19,     "R19", m_rsp_state->r[19]).formatstr("%08X");
+	state_add( RSP_R20,     "R20", m_rsp_state->r[20]).formatstr("%08X");
+	state_add( RSP_R21,     "R21", m_rsp_state->r[21]).formatstr("%08X");
+	state_add( RSP_R22,     "R22", m_rsp_state->r[22]).formatstr("%08X");
+	state_add( RSP_R23,     "R23", m_rsp_state->r[23]).formatstr("%08X");
+	state_add( RSP_R24,     "R24", m_rsp_state->r[24]).formatstr("%08X");
+	state_add( RSP_R25,     "R25", m_rsp_state->r[25]).formatstr("%08X");
+	state_add( RSP_R26,     "R26", m_rsp_state->r[26]).formatstr("%08X");
+	state_add( RSP_R27,     "R27", m_rsp_state->r[27]).formatstr("%08X");
+	state_add( RSP_R28,     "R28", m_rsp_state->r[28]).formatstr("%08X");
+	state_add( RSP_R29,     "R29", m_rsp_state->r[29]).formatstr("%08X");
+	state_add( RSP_R30,     "R30", m_rsp_state->r[30]).formatstr("%08X");
+	state_add( RSP_R31,     "R31", m_rsp_state->r[31]).formatstr("%08X");
+	state_add( RSP_SR,      "SR",  m_sr).formatstr("%08X");
+	state_add( RSP_NEXTPC,  "NPC", m_debugger_temp).callimport().callexport().formatstr("%08X");
+	state_add( RSP_STEPCNT, "STEP",  m_step_count).formatstr("%08X");
+
+	state_add( RSP_V0,      "V0",  m_debugger_temp).formatstr("%39s");
+	state_add( RSP_V1,      "V1",  m_debugger_temp).formatstr("%39s");
+	state_add( RSP_V2,      "V2",  m_debugger_temp).formatstr("%39s");
+	state_add( RSP_V3,      "V3",  m_debugger_temp).formatstr("%39s");
+	state_add( RSP_V4,      "V4",  m_debugger_temp).formatstr("%39s");
+	state_add( RSP_V5,      "V5",  m_debugger_temp).formatstr("%39s");
+	state_add( RSP_V6,      "V6",  m_debugger_temp).formatstr("%39s");
+	state_add( RSP_V7,      "V7",  m_debugger_temp).formatstr("%39s");
+	state_add( RSP_V8,      "V8",  m_debugger_temp).formatstr("%39s");
+	state_add( RSP_V9,      "V9",  m_debugger_temp).formatstr("%39s");
+	state_add( RSP_V10,     "V10", m_debugger_temp).formatstr("%39s");
+	state_add( RSP_V11,     "V11", m_debugger_temp).formatstr("%39s");
+	state_add( RSP_V12,     "V12", m_debugger_temp).formatstr("%39s");
+	state_add( RSP_V13,     "V13", m_debugger_temp).formatstr("%39s");
+	state_add( RSP_V14,     "V14", m_debugger_temp).formatstr("%39s");
+	state_add( RSP_V15,     "V15", m_debugger_temp).formatstr("%39s");
+	state_add( RSP_V16,     "V16", m_debugger_temp).formatstr("%39s");
+	state_add( RSP_V17,     "V17", m_debugger_temp).formatstr("%39s");
+	state_add( RSP_V18,     "V18", m_debugger_temp).formatstr("%39s");
+	state_add( RSP_V19,     "V19", m_debugger_temp).formatstr("%39s");
+	state_add( RSP_V20,     "V20", m_debugger_temp).formatstr("%39s");
+	state_add( RSP_V21,     "V21", m_debugger_temp).formatstr("%39s");
+	state_add( RSP_V22,     "V22", m_debugger_temp).formatstr("%39s");
+	state_add( RSP_V23,     "V23", m_debugger_temp).formatstr("%39s");
+	state_add( RSP_V24,     "V24", m_debugger_temp).formatstr("%39s");
+	state_add( RSP_V25,     "V25", m_debugger_temp).formatstr("%39s");
+	state_add( RSP_V26,     "V26", m_debugger_temp).formatstr("%39s");
+	state_add( RSP_V27,     "V27", m_debugger_temp).formatstr("%39s");
+	state_add( RSP_V28,     "V28", m_debugger_temp).formatstr("%39s");
+	state_add( RSP_V29,     "V29", m_debugger_temp).formatstr("%39s");
+	state_add( RSP_V30,     "V30", m_debugger_temp).formatstr("%39s");
+	state_add( RSP_V31,     "V31", m_debugger_temp).formatstr("%39s");
+
+	state_add( STATE_GENPC, "GENPC", m_debugger_temp).callimport().callexport().noshow();
+	state_add( STATE_GENFLAGS, "GENFLAGS", m_debugger_temp).formatstr("%1s").noshow();
+	state_add( STATE_GENSP, "GENSP", m_rsp_state->r[31]).noshow();
+	state_add( STATE_GENPCBASE, "GENPCBASE", m_debugger_temp).callimport().callexport().noshow();
+
+	m_icountptr = &m_rsp_state->icount;
 }
 
-static CPU_EXIT( rsp )
+void rsp_device::state_import(const device_state_entry &entry)
 {
-	rsp_state *rsp = get_safe_token(device);
+	switch (entry.index())
+	{
+		case STATE_GENPC:
+		case RSP_PC:
+			m_rsp_state->pc = m_debugger_temp;
+			break;
 
+		case STATE_GENPCBASE:
+			m_ppc = m_debugger_temp;
+			break;
+
+		case RSP_NEXTPC:
+			m_nextpc = m_debugger_temp;
+			break;
+	}
+}
+
+
+void rsp_device::state_export(const device_state_entry &entry)
+{
+	switch (entry.index())
+	{
+		case STATE_GENPC:
+		case RSP_PC:
+			m_debugger_temp = m_rsp_state->pc | 0x04000000;
+			break;
+
+		case STATE_GENPCBASE:
+			m_debugger_temp = m_ppc | 0x04000000;
+			break;
+
+		case RSP_NEXTPC:
+			m_debugger_temp = m_nextpc | 0x04000000;
+			break;
+	}
+}
+
+void rsp_device::state_string_export(const device_state_entry &entry, astring &string)
+{
+	switch (entry.index())
+	{
+		case STATE_GENFLAGS:
+			string.printf("");
+			break;
+
+#if USE_SIMD
+		case RSP_V0:
+			string.printf("%04X|%04X|%04X|%04X|%04X|%04X|%04X|%04X", (UINT16)_mm_extract_epi16(m_xv[ 0], 7), (UINT16)_mm_extract_epi16(m_xv[ 0], 6), (UINT16)_mm_extract_epi16(m_xv[ 0], 5), (UINT16)_mm_extract_epi16(m_xv[ 0], 4), (UINT16)_mm_extract_epi16(m_xv[ 0], 3), (UINT16)_mm_extract_epi16(m_xv[ 0], 2), (UINT16)_mm_extract_epi16(m_xv[ 0], 1), (UINT16)_mm_extract_epi16(m_xv[ 0], 0));
+			break;
+		case RSP_V1:
+			string.printf("%04X|%04X|%04X|%04X|%04X|%04X|%04X|%04X", (UINT16)_mm_extract_epi16(m_xv[ 1], 7), (UINT16)_mm_extract_epi16(m_xv[ 1], 6), (UINT16)_mm_extract_epi16(m_xv[ 1], 5), (UINT16)_mm_extract_epi16(m_xv[ 1], 4), (UINT16)_mm_extract_epi16(m_xv[ 1], 3), (UINT16)_mm_extract_epi16(m_xv[ 1], 2), (UINT16)_mm_extract_epi16(m_xv[ 1], 1), (UINT16)_mm_extract_epi16(m_xv[ 1], 0));
+			break;
+		case RSP_V2:
+			string.printf("%04X|%04X|%04X|%04X|%04X|%04X|%04X|%04X", (UINT16)_mm_extract_epi16(m_xv[ 2], 7), (UINT16)_mm_extract_epi16(m_xv[ 2], 6), (UINT16)_mm_extract_epi16(m_xv[ 2], 5), (UINT16)_mm_extract_epi16(m_xv[ 2], 4), (UINT16)_mm_extract_epi16(m_xv[ 2], 3), (UINT16)_mm_extract_epi16(m_xv[ 2], 2), (UINT16)_mm_extract_epi16(m_xv[ 2], 1), (UINT16)_mm_extract_epi16(m_xv[ 2], 0));
+			break;
+		case RSP_V3:
+			string.printf("%04X|%04X|%04X|%04X|%04X|%04X|%04X|%04X", (UINT16)_mm_extract_epi16(m_xv[ 3], 7), (UINT16)_mm_extract_epi16(m_xv[ 3], 6), (UINT16)_mm_extract_epi16(m_xv[ 3], 5), (UINT16)_mm_extract_epi16(m_xv[ 3], 4), (UINT16)_mm_extract_epi16(m_xv[ 3], 3), (UINT16)_mm_extract_epi16(m_xv[ 3], 2), (UINT16)_mm_extract_epi16(m_xv[ 3], 1), (UINT16)_mm_extract_epi16(m_xv[ 3], 0));
+			break;
+		case RSP_V4:
+			string.printf("%04X|%04X|%04X|%04X|%04X|%04X|%04X|%04X", (UINT16)_mm_extract_epi16(m_xv[ 4], 7), (UINT16)_mm_extract_epi16(m_xv[ 4], 6), (UINT16)_mm_extract_epi16(m_xv[ 4], 5), (UINT16)_mm_extract_epi16(m_xv[ 4], 4), (UINT16)_mm_extract_epi16(m_xv[ 4], 3), (UINT16)_mm_extract_epi16(m_xv[ 4], 2), (UINT16)_mm_extract_epi16(m_xv[ 4], 1), (UINT16)_mm_extract_epi16(m_xv[ 4], 0));
+			break;
+		case RSP_V5:
+			string.printf("%04X|%04X|%04X|%04X|%04X|%04X|%04X|%04X", (UINT16)_mm_extract_epi16(m_xv[ 5], 7), (UINT16)_mm_extract_epi16(m_xv[ 5], 6), (UINT16)_mm_extract_epi16(m_xv[ 5], 5), (UINT16)_mm_extract_epi16(m_xv[ 5], 4), (UINT16)_mm_extract_epi16(m_xv[ 5], 3), (UINT16)_mm_extract_epi16(m_xv[ 5], 2), (UINT16)_mm_extract_epi16(m_xv[ 5], 1), (UINT16)_mm_extract_epi16(m_xv[ 5], 0));
+			break;
+		case RSP_V6:
+			string.printf("%04X|%04X|%04X|%04X|%04X|%04X|%04X|%04X", (UINT16)_mm_extract_epi16(m_xv[ 6], 7), (UINT16)_mm_extract_epi16(m_xv[ 6], 6), (UINT16)_mm_extract_epi16(m_xv[ 6], 5), (UINT16)_mm_extract_epi16(m_xv[ 6], 4), (UINT16)_mm_extract_epi16(m_xv[ 6], 3), (UINT16)_mm_extract_epi16(m_xv[ 6], 2), (UINT16)_mm_extract_epi16(m_xv[ 6], 1), (UINT16)_mm_extract_epi16(m_xv[ 6], 0));
+			break;
+		case RSP_V7:
+			string.printf("%04X|%04X|%04X|%04X|%04X|%04X|%04X|%04X", (UINT16)_mm_extract_epi16(m_xv[ 7], 7), (UINT16)_mm_extract_epi16(m_xv[ 7], 6), (UINT16)_mm_extract_epi16(m_xv[ 7], 5), (UINT16)_mm_extract_epi16(m_xv[ 7], 4), (UINT16)_mm_extract_epi16(m_xv[ 7], 3), (UINT16)_mm_extract_epi16(m_xv[ 7], 2), (UINT16)_mm_extract_epi16(m_xv[ 7], 1), (UINT16)_mm_extract_epi16(m_xv[ 7], 0));
+			break;
+		case RSP_V8:
+			string.printf("%04X|%04X|%04X|%04X|%04X|%04X|%04X|%04X", (UINT16)_mm_extract_epi16(m_xv[ 8], 7), (UINT16)_mm_extract_epi16(m_xv[ 8], 6), (UINT16)_mm_extract_epi16(m_xv[ 8], 5), (UINT16)_mm_extract_epi16(m_xv[ 8], 4), (UINT16)_mm_extract_epi16(m_xv[ 8], 3), (UINT16)_mm_extract_epi16(m_xv[ 8], 2), (UINT16)_mm_extract_epi16(m_xv[ 8], 1), (UINT16)_mm_extract_epi16(m_xv[ 8], 0));
+			break;
+		case RSP_V9:
+			string.printf("%04X|%04X|%04X|%04X|%04X|%04X|%04X|%04X", (UINT16)_mm_extract_epi16(m_xv[ 9], 7), (UINT16)_mm_extract_epi16(m_xv[ 9], 6), (UINT16)_mm_extract_epi16(m_xv[ 9], 5), (UINT16)_mm_extract_epi16(m_xv[ 9], 4), (UINT16)_mm_extract_epi16(m_xv[ 9], 3), (UINT16)_mm_extract_epi16(m_xv[ 9], 2), (UINT16)_mm_extract_epi16(m_xv[ 9], 1), (UINT16)_mm_extract_epi16(m_xv[ 9], 0));
+			break;
+		case RSP_V10:
+			string.printf("%04X|%04X|%04X|%04X|%04X|%04X|%04X|%04X", (UINT16)_mm_extract_epi16(m_xv[10], 7), (UINT16)_mm_extract_epi16(m_xv[10], 6), (UINT16)_mm_extract_epi16(m_xv[10], 5), (UINT16)_mm_extract_epi16(m_xv[10], 4), (UINT16)_mm_extract_epi16(m_xv[10], 3), (UINT16)_mm_extract_epi16(m_xv[10], 2), (UINT16)_mm_extract_epi16(m_xv[10], 1), (UINT16)_mm_extract_epi16(m_xv[10], 0));
+			break;
+		case RSP_V11:
+			string.printf("%04X|%04X|%04X|%04X|%04X|%04X|%04X|%04X", (UINT16)_mm_extract_epi16(m_xv[11], 7), (UINT16)_mm_extract_epi16(m_xv[11], 6), (UINT16)_mm_extract_epi16(m_xv[11], 5), (UINT16)_mm_extract_epi16(m_xv[11], 4), (UINT16)_mm_extract_epi16(m_xv[11], 3), (UINT16)_mm_extract_epi16(m_xv[11], 2), (UINT16)_mm_extract_epi16(m_xv[11], 1), (UINT16)_mm_extract_epi16(m_xv[11], 0));
+			break;
+		case RSP_V12:
+			string.printf("%04X|%04X|%04X|%04X|%04X|%04X|%04X|%04X", (UINT16)_mm_extract_epi16(m_xv[12], 7), (UINT16)_mm_extract_epi16(m_xv[12], 6), (UINT16)_mm_extract_epi16(m_xv[12], 5), (UINT16)_mm_extract_epi16(m_xv[12], 4), (UINT16)_mm_extract_epi16(m_xv[12], 3), (UINT16)_mm_extract_epi16(m_xv[12], 2), (UINT16)_mm_extract_epi16(m_xv[12], 1), (UINT16)_mm_extract_epi16(m_xv[12], 0));
+			break;
+		case RSP_V13:
+			string.printf("%04X|%04X|%04X|%04X|%04X|%04X|%04X|%04X", (UINT16)_mm_extract_epi16(m_xv[13], 7), (UINT16)_mm_extract_epi16(m_xv[13], 6), (UINT16)_mm_extract_epi16(m_xv[13], 5), (UINT16)_mm_extract_epi16(m_xv[13], 4), (UINT16)_mm_extract_epi16(m_xv[13], 3), (UINT16)_mm_extract_epi16(m_xv[13], 2), (UINT16)_mm_extract_epi16(m_xv[13], 1), (UINT16)_mm_extract_epi16(m_xv[13], 0));
+			break;
+		case RSP_V14:
+			string.printf("%04X|%04X|%04X|%04X|%04X|%04X|%04X|%04X", (UINT16)_mm_extract_epi16(m_xv[14], 7), (UINT16)_mm_extract_epi16(m_xv[14], 6), (UINT16)_mm_extract_epi16(m_xv[14], 5), (UINT16)_mm_extract_epi16(m_xv[14], 4), (UINT16)_mm_extract_epi16(m_xv[14], 3), (UINT16)_mm_extract_epi16(m_xv[14], 2), (UINT16)_mm_extract_epi16(m_xv[14], 1), (UINT16)_mm_extract_epi16(m_xv[14], 0));
+			break;
+		case RSP_V15:
+			string.printf("%04X|%04X|%04X|%04X|%04X|%04X|%04X|%04X", (UINT16)_mm_extract_epi16(m_xv[15], 7), (UINT16)_mm_extract_epi16(m_xv[15], 6), (UINT16)_mm_extract_epi16(m_xv[15], 5), (UINT16)_mm_extract_epi16(m_xv[15], 4), (UINT16)_mm_extract_epi16(m_xv[15], 3), (UINT16)_mm_extract_epi16(m_xv[15], 2), (UINT16)_mm_extract_epi16(m_xv[15], 1), (UINT16)_mm_extract_epi16(m_xv[15], 0));
+			break;
+		case RSP_V16:
+			string.printf("%04X|%04X|%04X|%04X|%04X|%04X|%04X|%04X", (UINT16)_mm_extract_epi16(m_xv[16], 7), (UINT16)_mm_extract_epi16(m_xv[16], 6), (UINT16)_mm_extract_epi16(m_xv[16], 5), (UINT16)_mm_extract_epi16(m_xv[16], 4), (UINT16)_mm_extract_epi16(m_xv[16], 3), (UINT16)_mm_extract_epi16(m_xv[16], 2), (UINT16)_mm_extract_epi16(m_xv[16], 1), (UINT16)_mm_extract_epi16(m_xv[16], 0));
+			break;
+		case RSP_V17:
+			string.printf("%04X|%04X|%04X|%04X|%04X|%04X|%04X|%04X", (UINT16)_mm_extract_epi16(m_xv[17], 7), (UINT16)_mm_extract_epi16(m_xv[17], 6), (UINT16)_mm_extract_epi16(m_xv[17], 5), (UINT16)_mm_extract_epi16(m_xv[17], 4), (UINT16)_mm_extract_epi16(m_xv[17], 3), (UINT16)_mm_extract_epi16(m_xv[17], 2), (UINT16)_mm_extract_epi16(m_xv[17], 1), (UINT16)_mm_extract_epi16(m_xv[17], 0));
+			break;
+		case RSP_V18:
+			string.printf("%04X|%04X|%04X|%04X|%04X|%04X|%04X|%04X", (UINT16)_mm_extract_epi16(m_xv[18], 7), (UINT16)_mm_extract_epi16(m_xv[18], 6), (UINT16)_mm_extract_epi16(m_xv[18], 5), (UINT16)_mm_extract_epi16(m_xv[18], 4), (UINT16)_mm_extract_epi16(m_xv[18], 3), (UINT16)_mm_extract_epi16(m_xv[18], 2), (UINT16)_mm_extract_epi16(m_xv[18], 1), (UINT16)_mm_extract_epi16(m_xv[18], 0));
+			break;
+		case RSP_V19:
+			string.printf("%04X|%04X|%04X|%04X|%04X|%04X|%04X|%04X", (UINT16)_mm_extract_epi16(m_xv[19], 7), (UINT16)_mm_extract_epi16(m_xv[19], 6), (UINT16)_mm_extract_epi16(m_xv[19], 5), (UINT16)_mm_extract_epi16(m_xv[19], 4), (UINT16)_mm_extract_epi16(m_xv[19], 3), (UINT16)_mm_extract_epi16(m_xv[19], 2), (UINT16)_mm_extract_epi16(m_xv[19], 1), (UINT16)_mm_extract_epi16(m_xv[19], 0));
+			break;
+		case RSP_V20:
+			string.printf("%04X|%04X|%04X|%04X|%04X|%04X|%04X|%04X", (UINT16)_mm_extract_epi16(m_xv[20], 7), (UINT16)_mm_extract_epi16(m_xv[20], 6), (UINT16)_mm_extract_epi16(m_xv[20], 5), (UINT16)_mm_extract_epi16(m_xv[20], 4), (UINT16)_mm_extract_epi16(m_xv[20], 3), (UINT16)_mm_extract_epi16(m_xv[20], 2), (UINT16)_mm_extract_epi16(m_xv[20], 1), (UINT16)_mm_extract_epi16(m_xv[20], 0));
+			break;
+		case RSP_V21:
+			string.printf("%04X|%04X|%04X|%04X|%04X|%04X|%04X|%04X", (UINT16)_mm_extract_epi16(m_xv[21], 7), (UINT16)_mm_extract_epi16(m_xv[21], 6), (UINT16)_mm_extract_epi16(m_xv[21], 5), (UINT16)_mm_extract_epi16(m_xv[21], 4), (UINT16)_mm_extract_epi16(m_xv[21], 3), (UINT16)_mm_extract_epi16(m_xv[21], 2), (UINT16)_mm_extract_epi16(m_xv[21], 1), (UINT16)_mm_extract_epi16(m_xv[21], 0));
+			break;
+		case RSP_V22:
+			string.printf("%04X|%04X|%04X|%04X|%04X|%04X|%04X|%04X", (UINT16)_mm_extract_epi16(m_xv[22], 7), (UINT16)_mm_extract_epi16(m_xv[22], 6), (UINT16)_mm_extract_epi16(m_xv[22], 5), (UINT16)_mm_extract_epi16(m_xv[22], 4), (UINT16)_mm_extract_epi16(m_xv[22], 3), (UINT16)_mm_extract_epi16(m_xv[22], 2), (UINT16)_mm_extract_epi16(m_xv[22], 1), (UINT16)_mm_extract_epi16(m_xv[22], 0));
+			break;
+		case RSP_V23:
+			string.printf("%04X|%04X|%04X|%04X|%04X|%04X|%04X|%04X", (UINT16)_mm_extract_epi16(m_xv[23], 7), (UINT16)_mm_extract_epi16(m_xv[23], 6), (UINT16)_mm_extract_epi16(m_xv[23], 5), (UINT16)_mm_extract_epi16(m_xv[23], 4), (UINT16)_mm_extract_epi16(m_xv[23], 3), (UINT16)_mm_extract_epi16(m_xv[23], 2), (UINT16)_mm_extract_epi16(m_xv[23], 1), (UINT16)_mm_extract_epi16(m_xv[23], 0));
+			break;
+		case RSP_V24:
+			string.printf("%04X|%04X|%04X|%04X|%04X|%04X|%04X|%04X", (UINT16)_mm_extract_epi16(m_xv[24], 7), (UINT16)_mm_extract_epi16(m_xv[24], 6), (UINT16)_mm_extract_epi16(m_xv[24], 5), (UINT16)_mm_extract_epi16(m_xv[24], 4), (UINT16)_mm_extract_epi16(m_xv[24], 3), (UINT16)_mm_extract_epi16(m_xv[24], 2), (UINT16)_mm_extract_epi16(m_xv[24], 1), (UINT16)_mm_extract_epi16(m_xv[24], 0));
+			break;
+		case RSP_V25:
+			string.printf("%04X|%04X|%04X|%04X|%04X|%04X|%04X|%04X", (UINT16)_mm_extract_epi16(m_xv[25], 7), (UINT16)_mm_extract_epi16(m_xv[25], 6), (UINT16)_mm_extract_epi16(m_xv[25], 5), (UINT16)_mm_extract_epi16(m_xv[25], 4), (UINT16)_mm_extract_epi16(m_xv[25], 3), (UINT16)_mm_extract_epi16(m_xv[25], 2), (UINT16)_mm_extract_epi16(m_xv[25], 1), (UINT16)_mm_extract_epi16(m_xv[25], 0));
+			break;
+		case RSP_V26:
+			string.printf("%04X|%04X|%04X|%04X|%04X|%04X|%04X|%04X", (UINT16)_mm_extract_epi16(m_xv[26], 7), (UINT16)_mm_extract_epi16(m_xv[26], 6), (UINT16)_mm_extract_epi16(m_xv[26], 5), (UINT16)_mm_extract_epi16(m_xv[26], 4), (UINT16)_mm_extract_epi16(m_xv[26], 3), (UINT16)_mm_extract_epi16(m_xv[26], 2), (UINT16)_mm_extract_epi16(m_xv[26], 1), (UINT16)_mm_extract_epi16(m_xv[26], 0));
+			break;
+		case RSP_V27:
+			string.printf("%04X|%04X|%04X|%04X|%04X|%04X|%04X|%04X", (UINT16)_mm_extract_epi16(m_xv[27], 7), (UINT16)_mm_extract_epi16(m_xv[27], 6), (UINT16)_mm_extract_epi16(m_xv[27], 5), (UINT16)_mm_extract_epi16(m_xv[27], 4), (UINT16)_mm_extract_epi16(m_xv[27], 3), (UINT16)_mm_extract_epi16(m_xv[27], 2), (UINT16)_mm_extract_epi16(m_xv[27], 1), (UINT16)_mm_extract_epi16(m_xv[27], 0));
+			break;
+		case RSP_V28:
+			string.printf("%04X|%04X|%04X|%04X|%04X|%04X|%04X|%04X", (UINT16)_mm_extract_epi16(m_xv[28], 7), (UINT16)_mm_extract_epi16(m_xv[28], 6), (UINT16)_mm_extract_epi16(m_xv[28], 5), (UINT16)_mm_extract_epi16(m_xv[28], 4), (UINT16)_mm_extract_epi16(m_xv[28], 3), (UINT16)_mm_extract_epi16(m_xv[28], 2), (UINT16)_mm_extract_epi16(m_xv[28], 1), (UINT16)_mm_extract_epi16(m_xv[28], 0));
+			break;
+		case RSP_V29:
+			string.printf("%04X|%04X|%04X|%04X|%04X|%04X|%04X|%04X", (UINT16)_mm_extract_epi16(m_xv[29], 7), (UINT16)_mm_extract_epi16(m_xv[29], 6), (UINT16)_mm_extract_epi16(m_xv[29], 5), (UINT16)_mm_extract_epi16(m_xv[29], 4), (UINT16)_mm_extract_epi16(m_xv[29], 3), (UINT16)_mm_extract_epi16(m_xv[29], 2), (UINT16)_mm_extract_epi16(m_xv[29], 1), (UINT16)_mm_extract_epi16(m_xv[29], 0));
+			break;
+		case RSP_V30:
+			string.printf("%04X|%04X|%04X|%04X|%04X|%04X|%04X|%04X", (UINT16)_mm_extract_epi16(m_xv[30], 7), (UINT16)_mm_extract_epi16(m_xv[30], 6), (UINT16)_mm_extract_epi16(m_xv[30], 5), (UINT16)_mm_extract_epi16(m_xv[30], 4), (UINT16)_mm_extract_epi16(m_xv[30], 3), (UINT16)_mm_extract_epi16(m_xv[30], 2), (UINT16)_mm_extract_epi16(m_xv[30], 1), (UINT16)_mm_extract_epi16(m_xv[30], 0));
+			break;
+		case RSP_V31:
+			string.printf("%04X|%04X|%04X|%04X|%04X|%04X|%04X|%04X", (UINT16)_mm_extract_epi16(m_xv[31], 7), (UINT16)_mm_extract_epi16(m_xv[31], 6), (UINT16)_mm_extract_epi16(m_xv[31], 5), (UINT16)_mm_extract_epi16(m_xv[31], 4), (UINT16)_mm_extract_epi16(m_xv[31], 3), (UINT16)_mm_extract_epi16(m_xv[31], 2), (UINT16)_mm_extract_epi16(m_xv[31], 1), (UINT16)_mm_extract_epi16(m_xv[31], 0));
+			break;
+#else
+		case RSP_V0:
+			string.printf("%04X|%04X|%04X|%04X|%04X|%04X|%04X|%04X", (UINT16)VREG_S( 0, 0), (UINT16)VREG_S( 0, 1), (UINT16)VREG_S( 0, 2), (UINT16)VREG_S( 0, 3), (UINT16)VREG_S( 0, 4), (UINT16)VREG_S( 0, 5), (UINT16)VREG_S( 0, 6), (UINT16)VREG_S( 0, 7));
+			break;
+		case RSP_V1:
+			string.printf("%04X|%04X|%04X|%04X|%04X|%04X|%04X|%04X", (UINT16)VREG_S( 1, 0), (UINT16)VREG_S( 1, 1), (UINT16)VREG_S( 1, 2), (UINT16)VREG_S( 1, 3), (UINT16)VREG_S( 1, 4), (UINT16)VREG_S( 1, 5), (UINT16)VREG_S( 1, 6), (UINT16)VREG_S( 1, 7));
+			break;
+		case RSP_V2:
+			string.printf("%04X|%04X|%04X|%04X|%04X|%04X|%04X|%04X", (UINT16)VREG_S( 2, 0), (UINT16)VREG_S( 2, 1), (UINT16)VREG_S( 2, 2), (UINT16)VREG_S( 2, 3), (UINT16)VREG_S( 2, 4), (UINT16)VREG_S( 2, 5), (UINT16)VREG_S( 2, 6), (UINT16)VREG_S( 2, 7));
+			break;
+		case RSP_V3:
+			string.printf("%04X|%04X|%04X|%04X|%04X|%04X|%04X|%04X", (UINT16)VREG_S( 3, 0), (UINT16)VREG_S( 3, 1), (UINT16)VREG_S( 3, 2), (UINT16)VREG_S( 3, 3), (UINT16)VREG_S( 3, 4), (UINT16)VREG_S( 3, 5), (UINT16)VREG_S( 3, 6), (UINT16)VREG_S( 3, 7));
+			break;
+		case RSP_V4:
+			string.printf("%04X|%04X|%04X|%04X|%04X|%04X|%04X|%04X", (UINT16)VREG_S( 4, 0), (UINT16)VREG_S( 4, 1), (UINT16)VREG_S( 4, 2), (UINT16)VREG_S( 4, 3), (UINT16)VREG_S( 4, 4), (UINT16)VREG_S( 4, 5), (UINT16)VREG_S( 4, 6), (UINT16)VREG_S( 4, 7));
+			break;
+		case RSP_V5:
+			string.printf("%04X|%04X|%04X|%04X|%04X|%04X|%04X|%04X", (UINT16)VREG_S( 5, 0), (UINT16)VREG_S( 5, 1), (UINT16)VREG_S( 5, 2), (UINT16)VREG_S( 5, 3), (UINT16)VREG_S( 5, 4), (UINT16)VREG_S( 5, 5), (UINT16)VREG_S( 5, 6), (UINT16)VREG_S( 5, 7));
+			break;
+		case RSP_V6:
+			string.printf("%04X|%04X|%04X|%04X|%04X|%04X|%04X|%04X", (UINT16)VREG_S( 6, 0), (UINT16)VREG_S( 6, 1), (UINT16)VREG_S( 6, 2), (UINT16)VREG_S( 6, 3), (UINT16)VREG_S( 6, 4), (UINT16)VREG_S( 6, 5), (UINT16)VREG_S( 6, 6), (UINT16)VREG_S( 6, 7));
+			break;
+		case RSP_V7:
+			string.printf("%04X|%04X|%04X|%04X|%04X|%04X|%04X|%04X", (UINT16)VREG_S( 7, 0), (UINT16)VREG_S( 7, 1), (UINT16)VREG_S( 7, 2), (UINT16)VREG_S( 7, 3), (UINT16)VREG_S( 7, 4), (UINT16)VREG_S( 7, 5), (UINT16)VREG_S( 7, 6), (UINT16)VREG_S( 7, 7));
+			break;
+		case RSP_V8:
+			string.printf("%04X|%04X|%04X|%04X|%04X|%04X|%04X|%04X", (UINT16)VREG_S( 8, 0), (UINT16)VREG_S( 8, 1), (UINT16)VREG_S( 8, 2), (UINT16)VREG_S( 8, 3), (UINT16)VREG_S( 8, 4), (UINT16)VREG_S( 8, 5), (UINT16)VREG_S( 8, 6), (UINT16)VREG_S( 8, 7));
+			break;
+		case RSP_V9:
+			string.printf("%04X|%04X|%04X|%04X|%04X|%04X|%04X|%04X", (UINT16)VREG_S( 9, 0), (UINT16)VREG_S( 9, 1), (UINT16)VREG_S( 9, 2), (UINT16)VREG_S( 9, 3), (UINT16)VREG_S( 9, 4), (UINT16)VREG_S( 9, 5), (UINT16)VREG_S( 9, 6), (UINT16)VREG_S( 9, 7));
+			break;
+		case RSP_V10:
+			string.printf("%04X|%04X|%04X|%04X|%04X|%04X|%04X|%04X", (UINT16)VREG_S(10, 0), (UINT16)VREG_S(10, 1), (UINT16)VREG_S(10, 2), (UINT16)VREG_S(10, 3), (UINT16)VREG_S(10, 4), (UINT16)VREG_S(10, 5), (UINT16)VREG_S(10, 6), (UINT16)VREG_S(10, 7));
+			break;
+		case RSP_V11:
+			string.printf("%04X|%04X|%04X|%04X|%04X|%04X|%04X|%04X", (UINT16)VREG_S(11, 0), (UINT16)VREG_S(11, 1), (UINT16)VREG_S(11, 2), (UINT16)VREG_S(11, 3), (UINT16)VREG_S(11, 4), (UINT16)VREG_S(11, 5), (UINT16)VREG_S(11, 6), (UINT16)VREG_S(11, 7));
+			break;
+		case RSP_V12:
+			string.printf("%04X|%04X|%04X|%04X|%04X|%04X|%04X|%04X", (UINT16)VREG_S(12, 0), (UINT16)VREG_S(12, 1), (UINT16)VREG_S(12, 2), (UINT16)VREG_S(12, 3), (UINT16)VREG_S(12, 4), (UINT16)VREG_S(12, 5), (UINT16)VREG_S(12, 6), (UINT16)VREG_S(12, 7));
+			break;
+		case RSP_V13:
+			string.printf("%04X|%04X|%04X|%04X|%04X|%04X|%04X|%04X", (UINT16)VREG_S(13, 0), (UINT16)VREG_S(13, 1), (UINT16)VREG_S(13, 2), (UINT16)VREG_S(13, 3), (UINT16)VREG_S(13, 4), (UINT16)VREG_S(13, 5), (UINT16)VREG_S(13, 6), (UINT16)VREG_S(13, 7));
+			break;
+		case RSP_V14:
+			string.printf("%04X|%04X|%04X|%04X|%04X|%04X|%04X|%04X", (UINT16)VREG_S(14, 0), (UINT16)VREG_S(14, 1), (UINT16)VREG_S(14, 2), (UINT16)VREG_S(14, 3), (UINT16)VREG_S(14, 4), (UINT16)VREG_S(14, 5), (UINT16)VREG_S(14, 6), (UINT16)VREG_S(14, 7));
+			break;
+		case RSP_V15:
+			string.printf("%04X|%04X|%04X|%04X|%04X|%04X|%04X|%04X", (UINT16)VREG_S(15, 0), (UINT16)VREG_S(15, 1), (UINT16)VREG_S(15, 2), (UINT16)VREG_S(15, 3), (UINT16)VREG_S(15, 4), (UINT16)VREG_S(15, 5), (UINT16)VREG_S(15, 6), (UINT16)VREG_S(15, 7));
+			break;
+		case RSP_V16:
+			string.printf("%04X|%04X|%04X|%04X|%04X|%04X|%04X|%04X", (UINT16)VREG_S(16, 0), (UINT16)VREG_S(16, 1), (UINT16)VREG_S(16, 2), (UINT16)VREG_S(16, 3), (UINT16)VREG_S(16, 4), (UINT16)VREG_S(16, 5), (UINT16)VREG_S(16, 6), (UINT16)VREG_S(16, 7));
+			break;
+		case RSP_V17:
+			string.printf("%04X|%04X|%04X|%04X|%04X|%04X|%04X|%04X", (UINT16)VREG_S(17, 0), (UINT16)VREG_S(17, 1), (UINT16)VREG_S(17, 2), (UINT16)VREG_S(17, 3), (UINT16)VREG_S(17, 4), (UINT16)VREG_S(17, 5), (UINT16)VREG_S(17, 6), (UINT16)VREG_S(17, 7));
+			break;
+		case RSP_V18:
+			string.printf("%04X|%04X|%04X|%04X|%04X|%04X|%04X|%04X", (UINT16)VREG_S(18, 0), (UINT16)VREG_S(18, 1), (UINT16)VREG_S(18, 2), (UINT16)VREG_S(18, 3), (UINT16)VREG_S(18, 4), (UINT16)VREG_S(18, 5), (UINT16)VREG_S(18, 6), (UINT16)VREG_S(18, 7));
+			break;
+		case RSP_V19:
+			string.printf("%04X|%04X|%04X|%04X|%04X|%04X|%04X|%04X", (UINT16)VREG_S(19, 0), (UINT16)VREG_S(19, 1), (UINT16)VREG_S(19, 2), (UINT16)VREG_S(19, 3), (UINT16)VREG_S(19, 4), (UINT16)VREG_S(19, 5), (UINT16)VREG_S(19, 6), (UINT16)VREG_S(19, 7));
+			break;
+		case RSP_V20:
+			string.printf("%04X|%04X|%04X|%04X|%04X|%04X|%04X|%04X", (UINT16)VREG_S(20, 0), (UINT16)VREG_S(20, 1), (UINT16)VREG_S(20, 2), (UINT16)VREG_S(20, 3), (UINT16)VREG_S(20, 4), (UINT16)VREG_S(20, 5), (UINT16)VREG_S(20, 6), (UINT16)VREG_S(20, 7));
+			break;
+		case RSP_V21:
+			string.printf("%04X|%04X|%04X|%04X|%04X|%04X|%04X|%04X", (UINT16)VREG_S(21, 0), (UINT16)VREG_S(21, 1), (UINT16)VREG_S(21, 2), (UINT16)VREG_S(21, 3), (UINT16)VREG_S(21, 4), (UINT16)VREG_S(21, 5), (UINT16)VREG_S(21, 6), (UINT16)VREG_S(21, 7));
+			break;
+		case RSP_V22:
+			string.printf("%04X|%04X|%04X|%04X|%04X|%04X|%04X|%04X", (UINT16)VREG_S(22, 0), (UINT16)VREG_S(22, 1), (UINT16)VREG_S(22, 2), (UINT16)VREG_S(22, 3), (UINT16)VREG_S(22, 4), (UINT16)VREG_S(22, 5), (UINT16)VREG_S(22, 6), (UINT16)VREG_S(22, 7));
+			break;
+		case RSP_V23:
+			string.printf("%04X|%04X|%04X|%04X|%04X|%04X|%04X|%04X", (UINT16)VREG_S(23, 0), (UINT16)VREG_S(23, 1), (UINT16)VREG_S(23, 2), (UINT16)VREG_S(23, 3), (UINT16)VREG_S(23, 4), (UINT16)VREG_S(23, 5), (UINT16)VREG_S(23, 6), (UINT16)VREG_S(23, 7));
+			break;
+		case RSP_V24:
+			string.printf("%04X|%04X|%04X|%04X|%04X|%04X|%04X|%04X", (UINT16)VREG_S(24, 0), (UINT16)VREG_S(24, 1), (UINT16)VREG_S(24, 2), (UINT16)VREG_S(24, 3), (UINT16)VREG_S(24, 4), (UINT16)VREG_S(24, 5), (UINT16)VREG_S(24, 6), (UINT16)VREG_S(24, 7));
+			break;
+		case RSP_V25:
+			string.printf("%04X|%04X|%04X|%04X|%04X|%04X|%04X|%04X", (UINT16)VREG_S(25, 0), (UINT16)VREG_S(25, 1), (UINT16)VREG_S(25, 2), (UINT16)VREG_S(25, 3), (UINT16)VREG_S(25, 4), (UINT16)VREG_S(25, 5), (UINT16)VREG_S(25, 6), (UINT16)VREG_S(25, 7));
+			break;
+		case RSP_V26:
+			string.printf("%04X|%04X|%04X|%04X|%04X|%04X|%04X|%04X", (UINT16)VREG_S(26, 0), (UINT16)VREG_S(26, 1), (UINT16)VREG_S(26, 2), (UINT16)VREG_S(26, 3), (UINT16)VREG_S(26, 4), (UINT16)VREG_S(26, 5), (UINT16)VREG_S(26, 6), (UINT16)VREG_S(26, 7));
+			break;
+		case RSP_V27:
+			string.printf("%04X|%04X|%04X|%04X|%04X|%04X|%04X|%04X", (UINT16)VREG_S(27, 0), (UINT16)VREG_S(27, 1), (UINT16)VREG_S(27, 2), (UINT16)VREG_S(27, 3), (UINT16)VREG_S(27, 4), (UINT16)VREG_S(27, 5), (UINT16)VREG_S(27, 6), (UINT16)VREG_S(27, 7));
+			break;
+		case RSP_V28:
+			string.printf("%04X|%04X|%04X|%04X|%04X|%04X|%04X|%04X", (UINT16)VREG_S(28, 0), (UINT16)VREG_S(28, 1), (UINT16)VREG_S(28, 2), (UINT16)VREG_S(28, 3), (UINT16)VREG_S(28, 4), (UINT16)VREG_S(28, 5), (UINT16)VREG_S(28, 6), (UINT16)VREG_S(28, 7));
+			break;
+		case RSP_V29:
+			string.printf("%04X|%04X|%04X|%04X|%04X|%04X|%04X|%04X", (UINT16)VREG_S(29, 0), (UINT16)VREG_S(29, 1), (UINT16)VREG_S(29, 2), (UINT16)VREG_S(29, 3), (UINT16)VREG_S(29, 4), (UINT16)VREG_S(29, 5), (UINT16)VREG_S(29, 6), (UINT16)VREG_S(29, 7));
+			break;
+		case RSP_V30:
+			string.printf("%04X|%04X|%04X|%04X|%04X|%04X|%04X|%04X", (UINT16)VREG_S(30, 0), (UINT16)VREG_S(30, 1), (UINT16)VREG_S(30, 2), (UINT16)VREG_S(30, 3), (UINT16)VREG_S(30, 4), (UINT16)VREG_S(30, 5), (UINT16)VREG_S(30, 6), (UINT16)VREG_S(30, 7));
+			break;
+		case RSP_V31:
+			string.printf("%04X|%04X|%04X|%04X|%04X|%04X|%04X|%04X", (UINT16)VREG_S(31, 0), (UINT16)VREG_S(31, 1), (UINT16)VREG_S(31, 2), (UINT16)VREG_S(31, 3), (UINT16)VREG_S(31, 4), (UINT16)VREG_S(31, 5), (UINT16)VREG_S(31, 6), (UINT16)VREG_S(31, 7));
+			break;
+#endif
+
+	}
+}
+
+void rsp_device::device_stop()
+{
 #if SAVE_DISASM
 	{
 		char string[200];
@@ -364,7 +845,7 @@ static CPU_EXIT( rsp )
 
 		for (i=0; i < 0x1000; i+=4)
 		{
-			fprintf(dmem, "%08X: %08X\n", 0x04000000 + i, READ32(rsp, 0x04000000 + i));
+			fprintf(dmem, "%08X: %08X\n", 0x04000000 + i, READ32(0x04000000 + i));
 		}
 		fclose(dmem);
 #endif
@@ -372,24 +853,33 @@ static CPU_EXIT( rsp )
 
 		for (i=0; i < 0x1000; i++)
 		{
-			fputc(READ8(rsp, 0x04000000 + i), dmem);
+			fputc(READ8(0x04000000 + i), dmem);
 		}
 		fclose(dmem);
 	}
 #endif
 
-	if (rsp->exec_output)
-		fclose(rsp->exec_output);
-	rsp->exec_output = NULL;
+	if (m_exec_output)
+		fclose(m_exec_output);
+	m_exec_output = NULL;
+
+	/* clean up the DRC */
+	if ( m_drcuml )
+	{
+		auto_free(machine(), m_drcuml);
+	}
+	if (m_drcfe )
+	{
+  	  auto_free(machine(), m_drcfe);
+	}
 }
 
-static CPU_RESET( rsp )
+void rsp_device::device_reset()
 {
-	rsp_state *rsp = get_safe_token(device);
-	rsp->nextpc = ~0;
+	m_nextpc = ~0;
 }
 
-static void handle_lwc2(rsp_state *rsp, UINT32 op)
+void rsp_device::handle_lwc2(UINT32 op)
 {
 	int i, end;
 	UINT32 ea;
@@ -411,8 +901,8 @@ static void handle_lwc2(rsp_state *rsp, UINT32 op)
 			//
 			// Load 1 byte to vector byte index
 
-			ea = (base) ? rsp->r[base] + offset : offset;
-			VREG_B(dest, index) = READ8(rsp, ea);
+			ea = (base) ? m_rsp_state->r[base] + offset : offset;
+			VREG_B(dest, index) = READ8(ea);
 			break;
 		}
 		case 0x01:      /* LSV */
@@ -424,13 +914,13 @@ static void handle_lwc2(rsp_state *rsp, UINT32 op)
 			//
 			// Loads 2 bytes starting from vector byte index
 
-			ea = (base) ? rsp->r[base] + (offset * 2) : (offset * 2);
+			ea = (base) ? m_rsp_state->r[base] + (offset * 2) : (offset * 2);
 
 			end = index + 2;
 
 			for (i=index; i < end; i++)
 			{
-				VREG_B(dest, i) = READ8(rsp, ea);
+				VREG_B(dest, i) = READ8(ea);
 				ea++;
 			}
 			break;
@@ -444,13 +934,13 @@ static void handle_lwc2(rsp_state *rsp, UINT32 op)
 			//
 			// Loads 4 bytes starting from vector byte index
 
-			ea = (base) ? rsp->r[base] + (offset * 4) : (offset * 4);
+			ea = (base) ? m_rsp_state->r[base] + (offset * 4) : (offset * 4);
 
 			end = index + 4;
 
 			for (i=index; i < end; i++)
 			{
-				VREG_B(dest, i) = READ8(rsp, ea);
+				VREG_B(dest, i) = READ8(ea);
 				ea++;
 			}
 			break;
@@ -464,13 +954,13 @@ static void handle_lwc2(rsp_state *rsp, UINT32 op)
 			//
 			// Loads 8 bytes starting from vector byte index
 
-			ea = (base) ? rsp->r[base] + (offset * 8) : (offset * 8);
+			ea = (base) ? m_rsp_state->r[base] + (offset * 8) : (offset * 8);
 
 			end = index + 8;
 
 			for (i=index; i < end; i++)
 			{
-				VREG_B(dest, i) = READ8(rsp, ea);
+				VREG_B(dest, i) = READ8(ea);
 				ea++;
 			}
 			break;
@@ -484,14 +974,14 @@ static void handle_lwc2(rsp_state *rsp, UINT32 op)
 			//
 			// Loads up to 16 bytes starting from vector byte index
 
-			ea = (base) ? rsp->r[base] + (offset * 16) : (offset * 16);
+			ea = (base) ? m_rsp_state->r[base] + (offset * 16) : (offset * 16);
 
 			end = index + (16 - (ea & 0xf));
 			if (end > 16) end = 16;
 
 			for (i=index; i < end; i++)
 			{
-				VREG_B(dest, i) = READ8(rsp, ea);
+				VREG_B(dest, i) = READ8(ea);
 				ea++;
 			}
 			break;
@@ -505,7 +995,7 @@ static void handle_lwc2(rsp_state *rsp, UINT32 op)
 			//
 			// Stores up to 16 bytes starting from right side until 16-byte boundary
 
-			ea = (base) ? rsp->r[base] + (offset * 16) : (offset * 16);
+			ea = (base) ? m_rsp_state->r[base] + (offset * 16) : (offset * 16);
 
 			index = 16 - ((ea & 0xf) - index);
 			end = 16;
@@ -513,7 +1003,7 @@ static void handle_lwc2(rsp_state *rsp, UINT32 op)
 
 			for (i=index; i < end; i++)
 			{
-				VREG_B(dest, i) = READ8(rsp, ea);
+				VREG_B(dest, i) = READ8(ea);
 				ea++;
 			}
 			break;
@@ -527,11 +1017,11 @@ static void handle_lwc2(rsp_state *rsp, UINT32 op)
 			//
 			// Loads a byte as the upper 8 bits of each element
 
-			ea = (base) ? rsp->r[base] + (offset * 8) : (offset * 8);
+			ea = (base) ? m_rsp_state->r[base] + (offset * 8) : (offset * 8);
 
 			for (i=0; i < 8; i++)
 			{
-				VREG_S(dest, i) = READ8(rsp, ea + (((16-index) + i) & 0xf)) << 8;
+				VREG_S(dest, i) = READ8(ea + (((16-index) + i) & 0xf)) << 8;
 			}
 			break;
 		}
@@ -544,11 +1034,11 @@ static void handle_lwc2(rsp_state *rsp, UINT32 op)
 			//
 			// Loads a byte as the bits 14-7 of each element
 
-			ea = (base) ? rsp->r[base] + (offset * 8) : (offset * 8);
+			ea = (base) ? m_rsp_state->r[base] + (offset * 8) : (offset * 8);
 
 			for (i=0; i < 8; i++)
 			{
-				VREG_S(dest, i) = READ8(rsp, ea + (((16-index) + i) & 0xf)) << 7;
+				VREG_S(dest, i) = READ8(ea + (((16-index) + i) & 0xf)) << 7;
 			}
 			break;
 		}
@@ -561,11 +1051,11 @@ static void handle_lwc2(rsp_state *rsp, UINT32 op)
 			//
 			// Loads a byte as the bits 14-7 of each element, with 2-byte stride
 
-			ea = (base) ? rsp->r[base] + (offset * 16) : (offset * 16);
+			ea = (base) ? m_rsp_state->r[base] + (offset * 16) : (offset * 16);
 
 			for (i=0; i < 8; i++)
 			{
-				VREG_S(dest, i) = READ8(rsp, ea + (((16-index) + (i<<1)) & 0xf)) << 7;
+				VREG_S(dest, i) = READ8(ea + (((16-index) + (i<<1)) & 0xf)) << 7;
 			}
 			break;
 		}
@@ -578,7 +1068,7 @@ static void handle_lwc2(rsp_state *rsp, UINT32 op)
 			//
 			// Loads a byte as the bits 14-7 of upper or lower quad, with 4-byte stride
 
-			ea = (base) ? rsp->r[base] + (offset * 16) : (offset * 16);
+			ea = (base) ? m_rsp_state->r[base] + (offset * 16) : (offset * 16);
 
 			// not sure what happens if 16-byte boundary is crossed...
 
@@ -586,7 +1076,7 @@ static void handle_lwc2(rsp_state *rsp, UINT32 op)
 
 			for (i=index >> 1; i < end; i++)
 			{
-				VREG_S(dest, i) = READ8(rsp, ea) << 7;
+				VREG_S(dest, i) = READ8(ea) << 7;
 				ea += 4;
 			}
 			break;
@@ -601,16 +1091,16 @@ static void handle_lwc2(rsp_state *rsp, UINT32 op)
 			// Loads the full 128-bit vector starting from vector byte index and wrapping to index 0
 			// after byte index 15
 
-			ea = (base) ? rsp->r[base] + (offset * 16) : (offset * 16);
+			ea = (base) ? m_rsp_state->r[base] + (offset * 16) : (offset * 16);
 
 			// not sure what happens if 16-byte boundary is crossed...
-			if ((ea & 0xf) > 0) fatalerror("RSP: LWV: 16-byte boundary crossing at %08X, recheck this!\n", rsp->ppc);
+			if ((ea & 0xf) > 0) fatalerror("RSP: LWV: 16-byte boundary crossing at %08X, recheck this!\n", m_ppc);
 
 			end = (16 - index) + 16;
 
 			for (i=(16 - index); i < end; i++)
 			{
-				VREG_B(dest, i & 0xf) = READ8(rsp, ea);
+				VREG_B(dest, i & 0xf) = READ8(ea);
 				ea += 4;
 			}
 			break;
@@ -636,14 +1126,14 @@ static void handle_lwc2(rsp_state *rsp, UINT32 op)
 
 			if (index & 1)  fatalerror("RSP: LTV: index = %d\n", index);
 
-			ea = (base) ? rsp->r[base] + (offset * 16) : (offset * 16);
+			ea = (base) ? m_rsp_state->r[base] + (offset * 16) : (offset * 16);
 
 			ea = ((ea + 8) & ~0xf) + (index & 1);
 			for (i=vs; i < ve; i++)
 			{
 				element = ((8 - (index >> 1) + (i-vs)) << 1);
-				VREG_B(i, (element & 0xf)) = READ8(rsp, ea);
-				VREG_B(i, ((element + 1) & 0xf)) = READ8(rsp, ea + 1);
+				VREG_B(i, (element & 0xf)) = READ8(ea);
+				VREG_B(i, ((element + 1) & 0xf)) = READ8(ea + 1);
 
 				ea += 2;
 			}
@@ -652,13 +1142,13 @@ static void handle_lwc2(rsp_state *rsp, UINT32 op)
 
 		default:
 		{
-			unimplemented_opcode(rsp, op);
+			unimplemented_opcode(op);
 			break;
 		}
 	}
 }
 
-static void handle_swc2(rsp_state *rsp, UINT32 op)
+void rsp_device::handle_swc2(UINT32 op)
 {
 	int i, end;
 	int eaoffset;
@@ -681,8 +1171,8 @@ static void handle_swc2(rsp_state *rsp, UINT32 op)
 			//
 			// Stores 1 byte from vector byte index
 
-			ea = (base) ? rsp->r[base] + offset : offset;
-			WRITE8(rsp, ea, VREG_B(dest, index));
+			ea = (base) ? m_rsp_state->r[base] + offset : offset;
+			WRITE8(ea, VREG_B(dest, index));
 			break;
 		}
 		case 0x01:      /* SSV */
@@ -694,13 +1184,13 @@ static void handle_swc2(rsp_state *rsp, UINT32 op)
 			//
 			// Stores 2 bytes starting from vector byte index
 
-			ea = (base) ? rsp->r[base] + (offset * 2) : (offset * 2);
+			ea = (base) ? m_rsp_state->r[base] + (offset * 2) : (offset * 2);
 
 			end = index + 2;
 
 			for (i=index; i < end; i++)
 			{
-				WRITE8(rsp, ea, VREG_B(dest, i));
+				WRITE8(ea, VREG_B(dest, i));
 				ea++;
 			}
 			break;
@@ -714,13 +1204,13 @@ static void handle_swc2(rsp_state *rsp, UINT32 op)
 			//
 			// Stores 4 bytes starting from vector byte index
 
-			ea = (base) ? rsp->r[base] + (offset * 4) : (offset * 4);
+			ea = (base) ? m_rsp_state->r[base] + (offset * 4) : (offset * 4);
 
 			end = index + 4;
 
 			for (i=index; i < end; i++)
 			{
-				WRITE8(rsp, ea, VREG_B(dest, i));
+				WRITE8(ea, VREG_B(dest, i));
 				ea++;
 			}
 			break;
@@ -734,13 +1224,13 @@ static void handle_swc2(rsp_state *rsp, UINT32 op)
 			//
 			// Stores 8 bytes starting from vector byte index
 
-			ea = (base) ? rsp->r[base] + (offset * 8) : (offset * 8);
+			ea = (base) ? m_rsp_state->r[base] + (offset * 8) : (offset * 8);
 
 			end = index + 8;
 
 			for (i=index; i < end; i++)
 			{
-				WRITE8(rsp, ea, VREG_B(dest, i));
+				WRITE8(ea, VREG_B(dest, i));
 				ea++;
 			}
 			break;
@@ -754,13 +1244,13 @@ static void handle_swc2(rsp_state *rsp, UINT32 op)
 			//
 			// Stores up to 16 bytes starting from vector byte index until 16-byte boundary
 
-			ea = (base) ? rsp->r[base] + (offset * 16) : (offset * 16);
+			ea = (base) ? m_rsp_state->r[base] + (offset * 16) : (offset * 16);
 
 			end = index + (16 - (ea & 0xf));
 
 			for (i=index; i < end; i++)
 			{
-				WRITE8(rsp, ea, VREG_B(dest, i & 0xf));
+				WRITE8(ea, VREG_B(dest, i & 0xf));
 				ea++;
 			}
 			break;
@@ -775,7 +1265,7 @@ static void handle_swc2(rsp_state *rsp, UINT32 op)
 			// Stores up to 16 bytes starting from right side until 16-byte boundary
 
 			int o;
-			ea = (base) ? rsp->r[base] + (offset * 16) : (offset * 16);
+			ea = (base) ? m_rsp_state->r[base] + (offset * 16) : (offset * 16);
 
 			end = index + (ea & 0xf);
 			o = (16 - (ea & 0xf)) & 0xf;
@@ -783,7 +1273,7 @@ static void handle_swc2(rsp_state *rsp, UINT32 op)
 
 			for (i=index; i < end; i++)
 			{
-				WRITE8(rsp, ea, VREG_B(dest, ((i + o) & 0xf)));
+				WRITE8(ea, VREG_B(dest, ((i + o) & 0xf)));
 				ea++;
 			}
 			break;
@@ -797,18 +1287,18 @@ static void handle_swc2(rsp_state *rsp, UINT32 op)
 			//
 			// Stores upper 8 bits of each element
 
-			ea = (base) ? rsp->r[base] + (offset * 8) : (offset * 8);
+			ea = (base) ? m_rsp_state->r[base] + (offset * 8) : (offset * 8);
 			end = index + 8;
 
 			for (i=index; i < end; i++)
 			{
 				if ((i & 0xf) < 8)
 				{
-					WRITE8(rsp, ea, VREG_B(dest, ((i & 0xf) << 1)));
+					WRITE8(ea, VREG_B(dest, ((i & 0xf) << 1)));
 				}
 				else
 				{
-					WRITE8(rsp, ea, VREG_S(dest, (i & 0x7)) >> 7);
+					WRITE8(ea, VREG_S(dest, (i & 0x7)) >> 7);
 				}
 				ea++;
 			}
@@ -823,18 +1313,18 @@ static void handle_swc2(rsp_state *rsp, UINT32 op)
 			//
 			// Stores bits 14-7 of each element
 
-			ea = (base) ? rsp->r[base] + (offset * 8) : (offset * 8);
+			ea = (base) ? m_rsp_state->r[base] + (offset * 8) : (offset * 8);
 			end = index + 8;
 
 			for (i=index; i < end; i++)
 			{
 				if ((i & 0xf) < 8)
 				{
-					WRITE8(rsp, ea, VREG_S(dest, (i & 0x7)) >> 7);
+					WRITE8(ea, VREG_S(dest, (i & 0x7)) >> 7);
 				}
 				else
 				{
-					WRITE8(rsp, ea, VREG_B(dest, ((i & 0x7) << 1)));
+					WRITE8(ea, VREG_B(dest, ((i & 0x7) << 1)));
 				}
 				ea++;
 			}
@@ -849,14 +1339,14 @@ static void handle_swc2(rsp_state *rsp, UINT32 op)
 			//
 			// Stores bits 14-7 of each element, with 2-byte stride
 
-			ea = (base) ? rsp->r[base] + (offset * 16) : (offset * 16);
+			ea = (base) ? m_rsp_state->r[base] + (offset * 16) : (offset * 16);
 
 			for (i=0; i < 8; i++)
 			{
 				UINT8 d = ((VREG_B(dest, ((index + (i << 1) + 0) & 0xf))) << 1) |
 							((VREG_B(dest, ((index + (i << 1) + 1) & 0xf))) >> 7);
 
-				WRITE8(rsp, ea, d);
+				WRITE8(ea, d);
 				ea += 2;
 			}
 			break;
@@ -872,9 +1362,9 @@ static void handle_swc2(rsp_state *rsp, UINT32 op)
 
 			// FIXME: only works for index 0 and index 8
 
-			if (index & 0x7)    osd_printf_debug("RSP: SFV: index = %d at %08X\n", index, rsp->ppc);
+			if (index & 0x7)    osd_printf_debug("RSP: SFV: index = %d at %08X\n", index, m_ppc);
 
-			ea = (base) ? rsp->r[base] + (offset * 16) : (offset * 16);
+			ea = (base) ? m_rsp_state->r[base] + (offset * 16) : (offset * 16);
 
 			eaoffset = ea & 0xf;
 			ea &= ~0xf;
@@ -883,7 +1373,7 @@ static void handle_swc2(rsp_state *rsp, UINT32 op)
 
 			for (i=index >> 1; i < end; i++)
 			{
-				WRITE8(rsp, ea + (eaoffset & 0xf), VREG_S(dest, i) >> 7);
+				WRITE8(ea + (eaoffset & 0xf), VREG_S(dest, i) >> 7);
 				eaoffset += 4;
 			}
 			break;
@@ -898,7 +1388,7 @@ static void handle_swc2(rsp_state *rsp, UINT32 op)
 			// Stores the full 128-bit vector starting from vector byte index and wrapping to index 0
 			// after byte index 15
 
-			ea = (base) ? rsp->r[base] + (offset * 16) : (offset * 16);
+			ea = (base) ? m_rsp_state->r[base] + (offset * 16) : (offset * 16);
 
 			eaoffset = ea & 0xf;
 			ea &= ~0xf;
@@ -907,7 +1397,7 @@ static void handle_swc2(rsp_state *rsp, UINT32 op)
 
 			for (i=index; i < end; i++)
 			{
-				WRITE8(rsp, ea + (eaoffset & 0xf), VREG_B(dest, i & 0xf));
+				WRITE8(ea + (eaoffset & 0xf), VREG_B(dest, i & 0xf));
 				eaoffset++;
 			}
 			break;
@@ -929,14 +1419,14 @@ static void handle_swc2(rsp_state *rsp, UINT32 op)
 
 			element = 8 - (index >> 1);
 
-			ea = (base) ? rsp->r[base] + (offset * 16) : (offset * 16);
+			ea = (base) ? m_rsp_state->r[base] + (offset * 16) : (offset * 16);
 
 			eaoffset = (ea & 0xf) + (element * 2);
 			ea &= ~0xf;
 
 			for (i=vs; i < ve; i++)
 			{
-				WRITE16(rsp, ea + (eaoffset & 0xf), VREG_S(i, element & 0x7));
+				WRITE16(ea + (eaoffset & 0xf), VREG_S(i, element & 0x7));
 				eaoffset += 2;
 				element++;
 			}
@@ -945,13 +1435,13 @@ static void handle_swc2(rsp_state *rsp, UINT32 op)
 
 		default:
 		{
-			unimplemented_opcode(rsp, op);
+			unimplemented_opcode(op);
 			break;
 		}
 	}
 }
 
-INLINE UINT16 SATURATE_ACCUM(rsp_state *rsp, int accum, int slice, UINT16 negative, UINT16 positive)
+inline UINT16 rsp_device::SATURATE_ACCUM(int accum, int slice, UINT16 negative, UINT16 positive)
 {
 	if ((INT16)ACCUM_H(accum) < 0)
 	{
@@ -1007,7 +1497,7 @@ INLINE UINT16 SATURATE_ACCUM(rsp_state *rsp, int accum, int slice, UINT16 negati
 	return 0;
 }
 
-INLINE UINT16 SATURATE_ACCUM1(rsp_state *rsp, int accum, UINT16 negative, UINT16 positive)
+inline UINT16 rsp_device::SATURATE_ACCUM1(int accum, UINT16 negative, UINT16 positive)
 {
 	if ((INT16)ACCUM_H(accum) < 0)
 	{
@@ -1049,7 +1539,7 @@ INLINE UINT16 SATURATE_ACCUM1(rsp_state *rsp, int accum, UINT16 negative, UINT16
 	return 0;
 }
 
-#define WRITEBACK_RESULT() {memcpy(&rsp->v[VDREG].s[0], &vres[0], 16);}
+#define WRITEBACK_RESULT() {memcpy(&m_v[VDREG].s[0], &vres[0], 16);}
 
 #if 0
 static float float_round(float input)
@@ -1069,7 +1559,7 @@ static float float_round(float input)
 }
 #endif
 
-static void handle_vector_ops(rsp_state *rsp, UINT32 op)
+void rsp_device::handle_vector_ops(UINT32 op)
 {
 	int i;
 	UINT32 VS1REG = (op >> 11) & 0x1f;
@@ -1315,7 +1805,7 @@ static void handle_vector_ops(rsp_state *rsp, UINT32 op)
 				r = s1 * s2;
 
 				ACCUM(i) += (INT64)(r) << 17;
-				res = SATURATE_ACCUM(rsp, i, 1, 0x8000, 0x7fff);
+				res = SATURATE_ACCUM(i, 1, 0x8000, 0x7fff);
 
 				vres[i] = res;
 			}
@@ -1406,7 +1896,7 @@ static void handle_vector_ops(rsp_state *rsp, UINT32 op)
 				ACCUM_M(i) = (UINT16)(r3);
 				ACCUM_H(i) += (INT16)(r3 >> 16);
 
-				res = SATURATE_ACCUM(rsp, i, 0, 0x0000, 0xffff);
+				res = SATURATE_ACCUM(i, 0, 0x0000, 0xffff);
 
 				vres[i] = res;
 			}
@@ -1444,7 +1934,7 @@ static void handle_vector_ops(rsp_state *rsp, UINT32 op)
 				if ((INT32)(r1) < 0)
 					ACCUM_H(i) -= 1;
 
-				res = SATURATE_ACCUM(rsp, i, 1, 0x8000, 0x7fff);
+				res = SATURATE_ACCUM(i, 1, 0x8000, 0x7fff);
 
 				vres[i] = res;
 			}
@@ -1474,7 +1964,7 @@ static void handle_vector_ops(rsp_state *rsp, UINT32 op)
 
 				ACCUM(i) += (INT64)(s1*s2)<<16;
 
-				res = SATURATE_ACCUM(rsp, i, 0, 0x0000, 0xffff);
+				res = SATURATE_ACCUM(i, 0, 0x0000, 0xffff);
 				vres[i] = res;
 			}
 			WRITEBACK_RESULT();
@@ -1502,9 +1992,9 @@ static void handle_vector_ops(rsp_state *rsp, UINT32 op)
 				s1 = (INT32)(INT16)VREG_S(VS1REG, i);
 				s2 = (INT32)(INT16)VREG_S(VS2REG, sel);
 
-				rsp->accum[i].l[1] += s1*s2;
+				m_accum[i].l[1] += s1*s2;
 
-				res = SATURATE_ACCUM1(rsp, i, 0x8000, 0x7fff);
+				res = SATURATE_ACCUM1(i, 0x8000, 0x7fff);
 
 				vres[i] = res;
 			}
@@ -2351,8 +2841,8 @@ static void handle_vector_ops(rsp_state *rsp, UINT32 op)
 			}
 			rec = temp;
 
-			rsp->reciprocal_res = rec;
-			rsp->dp_allowed = 0;
+			m_reciprocal_res = rec;
+			m_dp_allowed = 0;
 
 			VREG_S(VDREG, del) = (UINT16)(rec & 0xffff);
 
@@ -2379,13 +2869,13 @@ static void handle_vector_ops(rsp_state *rsp, UINT32 op)
 			int sel = EL & 7;
 			INT32 shifter = 0;
 
-			INT32 rec = ((UINT16)(VREG_S(VS2REG, sel)) | ((UINT32)(rsp->reciprocal_high) & 0xffff0000));
+			INT32 rec = ((UINT16)(VREG_S(VS2REG, sel)) | ((UINT32)(m_reciprocal_high) & 0xffff0000));
 
 			INT32 datainput = rec;
 
 			if (rec < 0)
 			{
-				if (rsp->dp_allowed)
+				if (m_dp_allowed)
 				{
 					if (rec < -32768)
 					{
@@ -2416,7 +2906,7 @@ static void handle_vector_ops(rsp_state *rsp, UINT32 op)
 			}
 			else
 			{
-				if (rsp->dp_allowed)
+				if (m_dp_allowed)
 				{
 					shifter = 0;
 				}
@@ -2443,8 +2933,8 @@ static void handle_vector_ops(rsp_state *rsp, UINT32 op)
 			}
 			rec = temp;
 
-			rsp->reciprocal_res = rec;
-			rsp->dp_allowed = 0;
+			m_reciprocal_res = rec;
+			m_dp_allowed = 0;
 
 			VREG_S(VDREG, del) = (UINT16)(rec & 0xffff);
 
@@ -2469,8 +2959,8 @@ static void handle_vector_ops(rsp_state *rsp, UINT32 op)
 			int del = VS1REG & 7;
 			int sel = EL & 7;
 
-			rsp->reciprocal_high = (VREG_S(VS2REG, sel)) << 16;
-			rsp->dp_allowed = 1;
+			m_reciprocal_high = (VREG_S(VS2REG, sel)) << 16;
+			m_dp_allowed = 1;
 
 			for (i = 0; i < 8; i++)
 			{
@@ -2478,7 +2968,7 @@ static void handle_vector_ops(rsp_state *rsp, UINT32 op)
 				ACCUM_L(i) = VREG_S(VS2REG, sel);
 			}
 
-			VREG_S(VDREG, del) = (INT16)(rsp->reciprocal_res >> 16);
+			VREG_S(VDREG, del) = (INT16)(m_reciprocal_res >> 16);
 
 			break;
 		}
@@ -2554,8 +3044,8 @@ static void handle_vector_ops(rsp_state *rsp, UINT32 op)
 			}
 			rec = temp;
 
-			rsp->reciprocal_res = rec;
-			rsp->dp_allowed = 0;
+			m_reciprocal_res = rec;
+			m_dp_allowed = 0;
 
 			VREG_S(VDREG, del) = (UINT16)(rec & 0xffff);
 
@@ -2581,13 +3071,13 @@ static void handle_vector_ops(rsp_state *rsp, UINT32 op)
 			int sel = EL & 7;
 			INT32 shifter = 0;
 
-			INT32 rec = ((UINT16)(VREG_S(VS2REG, sel)) | ((UINT32)(rsp->reciprocal_high) & 0xffff0000));
+			INT32 rec = ((UINT16)(VREG_S(VS2REG, sel)) | ((UINT32)(m_reciprocal_high) & 0xffff0000));
 
 			INT32 datainput = rec;
 
 			if (rec < 0)
 			{
-				if (rsp->dp_allowed)
+				if (m_dp_allowed)
 				{
 					if (rec < -32768)//VDIV.C,208
 					{
@@ -2617,7 +3107,7 @@ static void handle_vector_ops(rsp_state *rsp, UINT32 op)
 			}
 			else
 			{
-				if (rsp->dp_allowed)
+				if (m_dp_allowed)
 				{
 					shifter = 0;
 				}
@@ -2646,8 +3136,8 @@ static void handle_vector_ops(rsp_state *rsp, UINT32 op)
 			}
 			rec = temp;
 
-			rsp->reciprocal_res = rec;
-			rsp->dp_allowed = 0;
+			m_reciprocal_res = rec;
+			m_dp_allowed = 0;
 
 			VREG_S(VDREG, del) = (UINT16)(rec & 0xffff);
 
@@ -2672,8 +3162,8 @@ static void handle_vector_ops(rsp_state *rsp, UINT32 op)
 			int del = VS1REG & 7;
 			int sel = EL & 7;
 
-			rsp->reciprocal_high = (VREG_S(VS2REG, sel)) << 16;
-			rsp->dp_allowed = 1;
+			m_reciprocal_high = (VREG_S(VS2REG, sel)) << 16;
+			m_dp_allowed = 1;
 
 			for (i=0; i < 8; i++)
 			{
@@ -2681,7 +3171,7 @@ static void handle_vector_ops(rsp_state *rsp, UINT32 op)
 				ACCUM_L(i) = VREG_S(VS2REG, sel);
 			}
 
-			VREG_S(VDREG, del) = (INT16)(rsp->reciprocal_res >> 16);    // store high part
+			VREG_S(VDREG, del) = (INT16)(m_reciprocal_res >> 16);    // store high part
 			break;
 		}
 
@@ -2697,36 +3187,39 @@ static void handle_vector_ops(rsp_state *rsp, UINT32 op)
 			break;
 		}
 
-		default:    unimplemented_opcode(rsp, op); break;
+		default:    unimplemented_opcode(op); break;
 	}
 }
 
-static CPU_EXECUTE( rsp )
+void rsp_device::execute_run()
 {
-	rsp_state *rsp = get_safe_token(device);
-	UINT32 op;
-
-	rsp->pc = 0x4001000 | (rsp->pc & 0xfff);
-
-	if( rsp->sr & ( RSP_STATUS_HALT | RSP_STATUS_BROKE ) )
+	if (m_isdrc)
 	{
-		rsp->icount = MIN(rsp->icount, 0);
+		execute_run_drc();
+		return;
 	}
 
-	while (rsp->icount > 0)
-	{
-		rsp->ppc = rsp->pc;
-		debugger_instruction_hook(device, rsp->pc);
+	m_rsp_state->pc = 0x4001000 | (m_rsp_state->pc & 0xfff);
 
-		op = ROPCODE(rsp->pc);
-		if (rsp->nextpc != ~0)
+	if( m_sr & ( RSP_STATUS_HALT | RSP_STATUS_BROKE ) )
+	{
+		m_rsp_state->icount = MIN(m_rsp_state->icount, 0);
+	}
+
+	while (m_rsp_state->icount > 0)
+	{
+		m_ppc = m_rsp_state->pc;
+		debugger_instruction_hook(this, m_rsp_state->pc);
+
+		UINT32 op = ROPCODE(m_rsp_state->pc);
+		if (m_nextpc != ~0)
 		{
-			rsp->pc = rsp->nextpc;
-			rsp->nextpc = ~0;
+			m_rsp_state->pc = m_nextpc;
+			m_nextpc = ~0;
 		}
 		else
 		{
-			rsp->pc += 4;
+			m_rsp_state->pc += 4;
 		}
 
 		switch (op >> 26)
@@ -2745,10 +3238,10 @@ static CPU_EXECUTE( rsp )
 					case 0x09:  /* JALR */      JUMP_PC_L(RSVAL, RDREG); break;
 					case 0x0d:  /* BREAK */
 					{
-						(rsp->device->sp_set_status_func)(0, 0x3, 0xffffffff);
-						rsp->icount = MIN(rsp->icount, 1);
+						m_sp_set_status_func(0, 0x3, 0xffffffff);
+						m_rsp_state->icount = MIN(m_rsp_state->icount, 1);
 
-						if (LOG_INSTRUCTION_EXECUTION) fprintf(rsp->exec_output, "\n---------- break ----------\n\n");
+						if (LOG_INSTRUCTION_EXECUTION) fprintf(m_exec_output, "\n---------- break ----------\n\n");
 
 						break;
 					}
@@ -2762,7 +3255,7 @@ static CPU_EXECUTE( rsp )
 					case 0x27:  /* NOR */       if (RDREG) RDVAL = ~(RSVAL | RTVAL); break;
 					case 0x2a:  /* SLT */       if (RDREG) RDVAL = (INT32)RSVAL < (INT32)RTVAL; break;
 					case 0x2b:  /* SLTU */      if (RDREG) RDVAL = (UINT32)RSVAL < (UINT32)RTVAL; break;
-					default:    unimplemented_opcode(rsp, op); break;
+					default:    unimplemented_opcode(op); break;
 				}
 				break;
 			}
@@ -2775,7 +3268,7 @@ static CPU_EXECUTE( rsp )
 					case 0x01:  /* BGEZ */      if ((INT32)(RSVAL) >= 0) JUMP_REL(SIMM16); break;
 					case 0x10:  /* BLTZAL */    if ((INT32)(RSVAL) < 0) JUMP_REL_L(SIMM16, 31); break;
 					case 0x11:  /* BGEZAL */    if ((INT32)(RSVAL) >= 0) JUMP_REL_L(SIMM16, 31); break;
-					default:    unimplemented_opcode(rsp, op); break;
+					default:    unimplemented_opcode(op); break;
 				}
 				break;
 			}
@@ -2799,9 +3292,9 @@ static CPU_EXECUTE( rsp )
 			{
 				switch ((op >> 21) & 0x1f)
 				{
-					case 0x00:  /* MFC0 */      if (RTREG) RTVAL = get_cop0_reg(rsp, RDREG); break;
-					case 0x04:  /* MTC0 */      set_cop0_reg(rsp, RDREG, RTVAL); break;
-					default:    unimplemented_opcode(rsp, op); break;
+					case 0x00:  /* MFC0 */      if (RTREG) RTVAL = get_cop0_reg(RDREG); break;
+					case 0x04:  /* MTC0 */      set_cop0_reg(RDREG, RTVAL); break;
+					default:    unimplemented_opcode(op); break;
 				}
 				break;
 			}
@@ -2978,29 +3471,29 @@ static CPU_EXECUTE( rsp )
 					case 0x10: case 0x11: case 0x12: case 0x13: case 0x14: case 0x15: case 0x16: case 0x17:
 					case 0x18: case 0x19: case 0x1a: case 0x1b: case 0x1c: case 0x1d: case 0x1e: case 0x1f:
 					{
-						handle_vector_ops(rsp, op);
+						handle_vector_ops(op);
 						break;
 					}
 
-					default:    unimplemented_opcode(rsp, op); break;
+					default:    unimplemented_opcode(op); break;
 				}
 				break;
 			}
 
-			case 0x20:  /* LB */        if (RTREG) RTVAL = (INT32)(INT8)READ8(rsp, RSVAL + SIMM16); break;
-			case 0x21:  /* LH */        if (RTREG) RTVAL = (INT32)(INT16)READ16(rsp, RSVAL + SIMM16); break;
-			case 0x23:  /* LW */        if (RTREG) RTVAL = READ32(rsp, RSVAL + SIMM16); break;
-			case 0x24:  /* LBU */       if (RTREG) RTVAL = (UINT8)READ8(rsp, RSVAL + SIMM16); break;
-			case 0x25:  /* LHU */       if (RTREG) RTVAL = (UINT16)READ16(rsp, RSVAL + SIMM16); break;
-			case 0x28:  /* SB */        WRITE8(rsp, RSVAL + SIMM16, RTVAL); break;
-			case 0x29:  /* SH */        WRITE16(rsp, RSVAL + SIMM16, RTVAL); break;
-			case 0x2b:  /* SW */        WRITE32(rsp, RSVAL + SIMM16, RTVAL); break;
-			case 0x32:  /* LWC2 */      handle_lwc2(rsp, op); break;
-			case 0x3a:  /* SWC2 */      handle_swc2(rsp, op); break;
+			case 0x20:  /* LB */        if (RTREG) RTVAL = (INT32)(INT8)READ8(RSVAL + SIMM16); break;
+			case 0x21:  /* LH */        if (RTREG) RTVAL = (INT32)(INT16)READ16(RSVAL + SIMM16); break;
+			case 0x23:  /* LW */        if (RTREG) RTVAL = READ32(RSVAL + SIMM16); break;
+			case 0x24:  /* LBU */       if (RTREG) RTVAL = (UINT8)READ8(RSVAL + SIMM16); break;
+			case 0x25:  /* LHU */       if (RTREG) RTVAL = (UINT16)READ16(RSVAL + SIMM16); break;
+			case 0x28:  /* SB */        WRITE8(RSVAL + SIMM16, RTVAL); break;
+			case 0x29:  /* SH */        WRITE16(RSVAL + SIMM16, RTVAL); break;
+			case 0x2b:  /* SW */        WRITE32(RSVAL + SIMM16, RTVAL); break;
+			case 0x32:  /* LWC2 */      handle_lwc2(op); break;
+			case 0x3a:  /* SWC2 */      handle_swc2(op); break;
 
 			default:
 			{
-				unimplemented_opcode(rsp, op);
+				unimplemented_opcode(op);
 				break;
 			}
 		}
@@ -3011,267 +3504,65 @@ static CPU_EXECUTE( rsp )
 			static UINT32 prev_regs[32];
 			static VECTOR_REG prev_vecs[32];
 			char string[200];
-			rsp_dasm_one(string, rsp->ppc, op);
+			rsp_dasm_one(string, m_ppc, op);
 
-			fprintf(rsp->exec_output, "%08X: %s", rsp->ppc, string);
+			fprintf(m_exec_output, "%08X: %s", m_ppc, string);
 
 			l = strlen(string);
 			if (l < 36)
 			{
 				for (i=l; i < 36; i++)
 				{
-					fprintf(rsp->exec_output, " ");
+					fprintf(m_exec_output, " ");
 				}
 			}
 
-			fprintf(rsp->exec_output, "| ");
+			fprintf(m_exec_output, "| ");
 
 			for (i=0; i < 32; i++)
 			{
-				if (rsp->r[i] != prev_regs[i])
+				if (m_rsp_state->r[i] != prev_regs[i])
 				{
-					fprintf(rsp->exec_output, "R%d: %08X ", i, rsp->r[i]);
+					fprintf(m_exec_output, "R%d: %08X ", i, m_rsp_state->r[i]);
 				}
-				prev_regs[i] = rsp->r[i];
+				prev_regs[i] = m_rsp_state->r[i];
 			}
 
 			for (i=0; i < 32; i++)
 			{
-				if (rsp->v[i].d[0] != prev_vecs[i].d[0] || rsp->v[i].d[1] != prev_vecs[i].d[1])
+				if (m_v[i].d[0] != prev_vecs[i].d[0] || m_v[i].d[1] != prev_vecs[i].d[1])
 				{
-					fprintf(rsp->exec_output, "V%d: %04X|%04X|%04X|%04X|%04X|%04X|%04X|%04X ", i,
+					fprintf(m_exec_output, "V%d: %04X|%04X|%04X|%04X|%04X|%04X|%04X|%04X ", i,
 					(UINT16)VREG_S(i,0), (UINT16)VREG_S(i,1), (UINT16)VREG_S(i,2), (UINT16)VREG_S(i,3), (UINT16)VREG_S(i,4), (UINT16)VREG_S(i,5), (UINT16)VREG_S(i,6), (UINT16)VREG_S(i,7));
 				}
-				prev_vecs[i].d[0] = rsp->v[i].d[0];
-				prev_vecs[i].d[1] = rsp->v[i].d[1];
+				prev_vecs[i].d[0] = m_v[i].d[0];
+				prev_vecs[i].d[1] = m_v[i].d[1];
 			}
 
-			fprintf(rsp->exec_output, "\n");
+			fprintf(m_exec_output, "\n");
 
 		}
 
-		--rsp->icount;
+		--m_rsp_state->icount;
 
-		if( rsp->sr & RSP_STATUS_SSTEP )
+		if( m_sr & RSP_STATUS_SSTEP )
 		{
-			if( rsp->step_count )
+			if( m_step_count )
 			{
-				rsp->step_count--;
+				m_step_count--;
 			}
 			else
 			{
-				rsp->sr |= RSP_STATUS_BROKE;
+				m_sr |= RSP_STATUS_BROKE;
 			}
 		}
 
-		if( rsp->sr & ( RSP_STATUS_HALT | RSP_STATUS_BROKE ) )
+		if( m_sr & ( RSP_STATUS_HALT | RSP_STATUS_BROKE ) )
 		{
-			rsp->icount = MIN(rsp->icount, 0);
+			m_rsp_state->icount = MIN(m_rsp_state->icount, 0);
 		}
 
 	}
 }
 
 
-
-
-/*****************************************************************************/
-
-static CPU_SET_INFO( rsp )
-{
-	rsp_state *rsp = get_safe_token(device);
-
-	switch (state)
-	{
-		/* --- the following bits of info are set as 64-bit signed integers --- */
-		case CPUINFO_INT_PC:
-		case CPUINFO_INT_REGISTER + RSP_PC:             rsp->pc = info->i;        break;
-		case CPUINFO_INT_REGISTER + RSP_R0:             rsp->r[0] = info->i;        break;
-		case CPUINFO_INT_REGISTER + RSP_R1:             rsp->r[1] = info->i;        break;
-		case CPUINFO_INT_REGISTER + RSP_R2:             rsp->r[2] = info->i;        break;
-		case CPUINFO_INT_REGISTER + RSP_R3:             rsp->r[3] = info->i;        break;
-		case CPUINFO_INT_REGISTER + RSP_R4:             rsp->r[4] = info->i;        break;
-		case CPUINFO_INT_REGISTER + RSP_R5:             rsp->r[5] = info->i;        break;
-		case CPUINFO_INT_REGISTER + RSP_R6:             rsp->r[6] = info->i;        break;
-		case CPUINFO_INT_REGISTER + RSP_R7:             rsp->r[7] = info->i;        break;
-		case CPUINFO_INT_REGISTER + RSP_R8:             rsp->r[8] = info->i;        break;
-		case CPUINFO_INT_REGISTER + RSP_R9:             rsp->r[9] = info->i;        break;
-		case CPUINFO_INT_REGISTER + RSP_R10:            rsp->r[10] = info->i;        break;
-		case CPUINFO_INT_REGISTER + RSP_R11:            rsp->r[11] = info->i;        break;
-		case CPUINFO_INT_REGISTER + RSP_R12:            rsp->r[12] = info->i;        break;
-		case CPUINFO_INT_REGISTER + RSP_R13:            rsp->r[13] = info->i;        break;
-		case CPUINFO_INT_REGISTER + RSP_R14:            rsp->r[14] = info->i;        break;
-		case CPUINFO_INT_REGISTER + RSP_R15:            rsp->r[15] = info->i;        break;
-		case CPUINFO_INT_REGISTER + RSP_R16:            rsp->r[16] = info->i;        break;
-		case CPUINFO_INT_REGISTER + RSP_R17:            rsp->r[17] = info->i;        break;
-		case CPUINFO_INT_REGISTER + RSP_R18:            rsp->r[18] = info->i;        break;
-		case CPUINFO_INT_REGISTER + RSP_R19:            rsp->r[19] = info->i;        break;
-		case CPUINFO_INT_REGISTER + RSP_R20:            rsp->r[20] = info->i;        break;
-		case CPUINFO_INT_REGISTER + RSP_R21:            rsp->r[21] = info->i;        break;
-		case CPUINFO_INT_REGISTER + RSP_R22:            rsp->r[22] = info->i;        break;
-		case CPUINFO_INT_REGISTER + RSP_R23:            rsp->r[23] = info->i;        break;
-		case CPUINFO_INT_REGISTER + RSP_R24:            rsp->r[24] = info->i;        break;
-		case CPUINFO_INT_REGISTER + RSP_R25:            rsp->r[25] = info->i;        break;
-		case CPUINFO_INT_REGISTER + RSP_R26:            rsp->r[26] = info->i;        break;
-		case CPUINFO_INT_REGISTER + RSP_R27:            rsp->r[27] = info->i;        break;
-		case CPUINFO_INT_REGISTER + RSP_R28:            rsp->r[28] = info->i;        break;
-		case CPUINFO_INT_REGISTER + RSP_R29:            rsp->r[29] = info->i;        break;
-		case CPUINFO_INT_REGISTER + RSP_R30:            rsp->r[30] = info->i;        break;
-		case CPUINFO_INT_SP:
-		case CPUINFO_INT_REGISTER + RSP_R31:            rsp->r[31] = info->i;        break;
-		case CPUINFO_INT_REGISTER + RSP_SR:             rsp->sr = info->i;           break;
-		case CPUINFO_INT_REGISTER + RSP_NEXTPC:         rsp->nextpc = info->i;       break;
-		case CPUINFO_INT_REGISTER + RSP_STEPCNT:        rsp->step_count = info->i;   break;
-	}
-}
-
-CPU_GET_INFO( rsp_int )
-{
-	rsp_state *rsp = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
-
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_CONTEXT_SIZE:                  info->i = sizeof(rsp_state);            break;
-		case CPUINFO_INT_INPUT_LINES:                   info->i = 1;                            break;
-		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:            info->i = 0;                            break;
-		case CPUINFO_INT_ENDIANNESS:                    info->i = ENDIANNESS_BIG;               break;
-		case CPUINFO_INT_CLOCK_MULTIPLIER:              info->i = 1;                            break;
-		case CPUINFO_INT_CLOCK_DIVIDER:                 info->i = 1;                            break;
-		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:         info->i = 4;                            break;
-		case CPUINFO_INT_MAX_INSTRUCTION_BYTES:         info->i = 4;                            break;
-		case CPUINFO_INT_MIN_CYCLES:                    info->i = 1;                            break;
-		case CPUINFO_INT_MAX_CYCLES:                    info->i = 1;                            break;
-
-		case CPUINFO_INT_DATABUS_WIDTH + AS_PROGRAM:    info->i = 32;                   break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM: info->i = 32;                  break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + AS_PROGRAM: info->i = 0;                   break;
-		case CPUINFO_INT_DATABUS_WIDTH + AS_DATA:   info->i = 0;                    break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + AS_DATA:   info->i = 0;                    break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + AS_DATA:   info->i = 0;                    break;
-		case CPUINFO_INT_DATABUS_WIDTH + AS_IO:     info->i = 0;                    break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + AS_IO:     info->i = 0;                    break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + AS_IO:     info->i = 0;                    break;
-
-		case CPUINFO_INT_INPUT_STATE:                   info->i = CLEAR_LINE;                   break;
-
-		case CPUINFO_INT_PREVIOUSPC:                    info->i = rsp->ppc;                     break;
-
-		case CPUINFO_INT_PC:    /* intentional fallthrough */
-		case CPUINFO_INT_REGISTER + RSP_PC:             info->i = rsp->pc;                      break;
-
-		case CPUINFO_INT_REGISTER + RSP_R0:             info->i = rsp->r[0];                        break;
-		case CPUINFO_INT_REGISTER + RSP_R1:             info->i = rsp->r[1];                        break;
-		case CPUINFO_INT_REGISTER + RSP_R2:             info->i = rsp->r[2];                        break;
-		case CPUINFO_INT_REGISTER + RSP_R3:             info->i = rsp->r[3];                        break;
-		case CPUINFO_INT_REGISTER + RSP_R4:             info->i = rsp->r[4];                        break;
-		case CPUINFO_INT_REGISTER + RSP_R5:             info->i = rsp->r[5];                        break;
-		case CPUINFO_INT_REGISTER + RSP_R6:             info->i = rsp->r[6];                        break;
-		case CPUINFO_INT_REGISTER + RSP_R7:             info->i = rsp->r[7];                        break;
-		case CPUINFO_INT_REGISTER + RSP_R8:             info->i = rsp->r[8];                        break;
-		case CPUINFO_INT_REGISTER + RSP_R9:             info->i = rsp->r[9];                        break;
-		case CPUINFO_INT_REGISTER + RSP_R10:            info->i = rsp->r[10];                   break;
-		case CPUINFO_INT_REGISTER + RSP_R11:            info->i = rsp->r[11];                   break;
-		case CPUINFO_INT_REGISTER + RSP_R12:            info->i = rsp->r[12];                   break;
-		case CPUINFO_INT_REGISTER + RSP_R13:            info->i = rsp->r[13];                   break;
-		case CPUINFO_INT_REGISTER + RSP_R14:            info->i = rsp->r[14];                   break;
-		case CPUINFO_INT_REGISTER + RSP_R15:            info->i = rsp->r[15];                   break;
-		case CPUINFO_INT_REGISTER + RSP_R16:            info->i = rsp->r[16];                   break;
-		case CPUINFO_INT_REGISTER + RSP_R17:            info->i = rsp->r[17];                   break;
-		case CPUINFO_INT_REGISTER + RSP_R18:            info->i = rsp->r[18];                   break;
-		case CPUINFO_INT_REGISTER + RSP_R19:            info->i = rsp->r[19];                   break;
-		case CPUINFO_INT_REGISTER + RSP_R20:            info->i = rsp->r[20];                   break;
-		case CPUINFO_INT_REGISTER + RSP_R21:            info->i = rsp->r[21];                   break;
-		case CPUINFO_INT_REGISTER + RSP_R22:            info->i = rsp->r[22];                   break;
-		case CPUINFO_INT_REGISTER + RSP_R23:            info->i = rsp->r[23];                   break;
-		case CPUINFO_INT_REGISTER + RSP_R24:            info->i = rsp->r[24];                   break;
-		case CPUINFO_INT_REGISTER + RSP_R25:            info->i = rsp->r[25];                   break;
-		case CPUINFO_INT_REGISTER + RSP_R26:            info->i = rsp->r[26];                   break;
-		case CPUINFO_INT_REGISTER + RSP_R27:            info->i = rsp->r[27];                   break;
-		case CPUINFO_INT_REGISTER + RSP_R28:            info->i = rsp->r[28];                   break;
-		case CPUINFO_INT_REGISTER + RSP_R29:            info->i = rsp->r[29];                   break;
-		case CPUINFO_INT_REGISTER + RSP_R30:            info->i = rsp->r[30];                   break;
-		case CPUINFO_INT_SP:
-		case CPUINFO_INT_REGISTER + RSP_R31:            info->i = rsp->r[31];                   break;
-		case CPUINFO_INT_REGISTER + RSP_SR:             info->i = rsp->sr;                       break;
-		case CPUINFO_INT_REGISTER + RSP_NEXTPC:         info->i = rsp->nextpc;                   break;
-		case CPUINFO_INT_REGISTER + RSP_STEPCNT:        info->i = rsp->step_count;               break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_FCT_SET_INFO:                      info->setinfo = CPU_SET_INFO_NAME(rsp);         break;
-		case CPUINFO_FCT_INIT:                          info->init = CPU_INIT_NAME(rsp);                    break;
-		case CPUINFO_FCT_RESET:                         info->reset = CPU_RESET_NAME(rsp);              break;
-		case CPUINFO_FCT_EXIT:                          info->exit = CPU_EXIT_NAME(rsp);                    break;
-		case CPUINFO_FCT_EXECUTE:                       info->execute = CPU_EXECUTE_NAME(rsp);          break;
-		case CPUINFO_FCT_BURN:                          info->burn = NULL;                      break;
-		case CPUINFO_FCT_DISASSEMBLE:                   info->disassemble = CPU_DISASSEMBLE_NAME(rsp);          break;
-		case CPUINFO_PTR_INSTRUCTION_COUNTER:           info->icount = &rsp->icount;                break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:                          strcpy(info->s, "RSP");                 break;
-		case CPUINFO_STR_SHORTNAME:                     strcpy(info->s, "rsp");                 break;
-		case CPUINFO_STR_FAMILY:                    strcpy(info->s, "RSP");                 break;
-		case CPUINFO_STR_VERSION:                   strcpy(info->s, "1.0");                 break;
-		case CPUINFO_STR_SOURCE_FILE:                       strcpy(info->s, __FILE__);              break;
-		case CPUINFO_STR_CREDITS:                   strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
-
-		case CPUINFO_STR_FLAGS:                         strcpy(info->s, " ");                   break;
-
-		case CPUINFO_STR_REGISTER + RSP_PC:             sprintf(info->s, "PC: %08X", rsp->pc);  break;
-
-		case CPUINFO_STR_REGISTER + RSP_R0:             sprintf(info->s, "R0: %08X", rsp->r[0]); break;
-		case CPUINFO_STR_REGISTER + RSP_R1:             sprintf(info->s, "R1: %08X", rsp->r[1]); break;
-		case CPUINFO_STR_REGISTER + RSP_R2:             sprintf(info->s, "R2: %08X", rsp->r[2]); break;
-		case CPUINFO_STR_REGISTER + RSP_R3:             sprintf(info->s, "R3: %08X", rsp->r[3]); break;
-		case CPUINFO_STR_REGISTER + RSP_R4:             sprintf(info->s, "R4: %08X", rsp->r[4]); break;
-		case CPUINFO_STR_REGISTER + RSP_R5:             sprintf(info->s, "R5: %08X", rsp->r[5]); break;
-		case CPUINFO_STR_REGISTER + RSP_R6:             sprintf(info->s, "R6: %08X", rsp->r[6]); break;
-		case CPUINFO_STR_REGISTER + RSP_R7:             sprintf(info->s, "R7: %08X", rsp->r[7]); break;
-		case CPUINFO_STR_REGISTER + RSP_R8:             sprintf(info->s, "R8: %08X", rsp->r[8]); break;
-		case CPUINFO_STR_REGISTER + RSP_R9:             sprintf(info->s, "R9: %08X", rsp->r[9]); break;
-		case CPUINFO_STR_REGISTER + RSP_R10:            sprintf(info->s, "R10: %08X", rsp->r[10]); break;
-		case CPUINFO_STR_REGISTER + RSP_R11:            sprintf(info->s, "R11: %08X", rsp->r[11]); break;
-		case CPUINFO_STR_REGISTER + RSP_R12:            sprintf(info->s, "R12: %08X", rsp->r[12]); break;
-		case CPUINFO_STR_REGISTER + RSP_R13:            sprintf(info->s, "R13: %08X", rsp->r[13]); break;
-		case CPUINFO_STR_REGISTER + RSP_R14:            sprintf(info->s, "R14: %08X", rsp->r[14]); break;
-		case CPUINFO_STR_REGISTER + RSP_R15:            sprintf(info->s, "R15: %08X", rsp->r[15]); break;
-		case CPUINFO_STR_REGISTER + RSP_R16:            sprintf(info->s, "R16: %08X", rsp->r[16]); break;
-		case CPUINFO_STR_REGISTER + RSP_R17:            sprintf(info->s, "R17: %08X", rsp->r[17]); break;
-		case CPUINFO_STR_REGISTER + RSP_R18:            sprintf(info->s, "R18: %08X", rsp->r[18]); break;
-		case CPUINFO_STR_REGISTER + RSP_R19:            sprintf(info->s, "R19: %08X", rsp->r[19]); break;
-		case CPUINFO_STR_REGISTER + RSP_R20:            sprintf(info->s, "R20: %08X", rsp->r[20]); break;
-		case CPUINFO_STR_REGISTER + RSP_R21:            sprintf(info->s, "R21: %08X", rsp->r[21]); break;
-		case CPUINFO_STR_REGISTER + RSP_R22:            sprintf(info->s, "R22: %08X", rsp->r[22]); break;
-		case CPUINFO_STR_REGISTER + RSP_R23:            sprintf(info->s, "R23: %08X", rsp->r[23]); break;
-		case CPUINFO_STR_REGISTER + RSP_R24:            sprintf(info->s, "R24: %08X", rsp->r[24]); break;
-		case CPUINFO_STR_REGISTER + RSP_R25:            sprintf(info->s, "R25: %08X", rsp->r[25]); break;
-		case CPUINFO_STR_REGISTER + RSP_R26:            sprintf(info->s, "R26: %08X", rsp->r[26]); break;
-		case CPUINFO_STR_REGISTER + RSP_R27:            sprintf(info->s, "R27: %08X", rsp->r[27]); break;
-		case CPUINFO_STR_REGISTER + RSP_R28:            sprintf(info->s, "R28: %08X", rsp->r[28]); break;
-		case CPUINFO_STR_REGISTER + RSP_R29:            sprintf(info->s, "R29: %08X", rsp->r[29]); break;
-		case CPUINFO_STR_REGISTER + RSP_R30:            sprintf(info->s, "R30: %08X", rsp->r[30]); break;
-		case CPUINFO_STR_REGISTER + RSP_R31:            sprintf(info->s, "R31: %08X", rsp->r[31]); break;
-		case CPUINFO_STR_REGISTER + RSP_SR:             sprintf(info->s, "SR: %08X",  rsp->sr);    break;
-		case CPUINFO_STR_REGISTER + RSP_NEXTPC:         sprintf(info->s, "NPC: %08X", rsp->nextpc);break;
-		case CPUINFO_STR_REGISTER + RSP_STEPCNT:        sprintf(info->s, "STEP: %d",  rsp->step_count);  break;
-	}
-}
-
-rsp_cpu_device::rsp_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, UINT32 clock, cpu_get_info_func get_info)
-	: legacy_cpu_device(mconfig, type, tag, owner, clock, get_info),
-		dp_reg_r_func(*this),
-		dp_reg_w_func(*this),
-		sp_reg_r_func(*this),
-		sp_reg_w_func(*this),
-		sp_set_status_func(*this)
-{
-}
-
-rsp_int_device::rsp_int_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, UINT32 clock)
-	: rsp_cpu_device(mconfig, type, tag, owner, clock, CPU_GET_INFO_NAME(rsp_int))
-{
-}
-
-const device_type RSP_INT = &legacy_device_creator<rsp_drc_device>;
-
-const device_type RSP = &legacy_device_creator_drc<rsp_int_device, rsp_drc_device>;
