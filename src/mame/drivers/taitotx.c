@@ -281,6 +281,7 @@ ROM_START( trbwtchs )
 	DISK_IMAGE( "troublewitches_ac_v1.00j", 0, SHA1(733ecbae040dd32447230d3fc81e6f8614715ee5) )
 ROM_END
 
+
 GAME( 2004, chaosbrk,  0,    taito_type_x, taito_type_x, driver_device,  0, ROT0, "Taito Corporation", "Chaos Breaker (v2.02J)",  GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 2004, gwinggen,  0,    taito_type_x, taito_type_x, driver_device,  0, ROT0, "Takumi Corporation", "Giga Wing Generations (v2.02J)",  GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 2005, homura,    0,    taito_type_x, taito_type_x, driver_device,  0, ROT0, "SKonec Entertainment", "Homura (v2.04J)",  GAME_NOT_WORKING | GAME_NO_SOUND )
@@ -293,6 +294,28 @@ GAME( 2007, raiden4,   0,    taito_type_x, taito_type_x, driver_device,  0, ROT0
 GAME( 2008, kof98um,   0,    taito_type_x, taito_type_x, driver_device,  0, ROT0, "SNK", "The King of Fighters '98: Ultimate Match (v1.00)",  GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 2008, trbwtchs,  0,    taito_type_x, taito_type_x, driver_device,  0, ROT0, "Adventure Planning Service/Studio SiestA", "Trouble Witches AC (v1.00J)",  GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 2009, goketsuj,  0,    taito_type_x, taito_type_x, driver_device,  0, ROT0, "Atlus", "Goketsuji Ichizoku: Matsuri Senzo Kuyou (v200906230)",  GAME_NOT_WORKING | GAME_NO_SOUND )
+
+
+// Type X+
+
+// stickers: CPU P4 2.8 GHz  MEM 512 MB  GRA 9600XT
+//           TAITO Type X+  Model 012A  No 470GM1941  AC100V  50/60Hz 3.5A
+//           Windows(R) XP Embedded    00039-209-795-804    X11-15305
+//
+//           ****   M9006981A  VER.1.00   40.0GB  WD  WD400BB-22JHCO
+ROM_START( wontmuch )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD("taito_type_x2_bios.bin", 0x00, 0x10000, NO_DUMP ) // size unknown.
+	/* bios, video bios etc. not dumped */
+
+	DISK_REGION( "ide:0:hdd:image" ) // Single 40GB drive
+	// 5BC6813ADBE1525BAFED792FC12C27AB
+	DISK_IMAGE( "wontmuch_v1.00", 0, SHA1(fcc9719aa68234e3df5e8cb9cd7bcb1b0dcb66b1) )
+ROM_END
+
+
+GAME( 2006, wontmuch,   0,    taito_type_x, taito_type_x, driver_device,  0, ROT0, "Capcom", "Won!Tertainment Music Channel (v1.00)",  GAME_NOT_WORKING | GAME_NO_SOUND )
+
 
 // Type X2
 
