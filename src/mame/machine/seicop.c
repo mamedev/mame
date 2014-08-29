@@ -2787,6 +2787,12 @@ WRITE16_MEMBER( seibu_cop_legacy_device::generic_cop_w )
 				/* 8 + [4] */
 				/* 4 + [6] */
 
+				// these two are obvious ...
+				// 0xf x 16 = 240
+				// 0x14 x 16 = 320
+				// what are these two instead? scale factor? offsets?
+				// 0xfc69 ?
+				// 0x7f4 ?
 				//printf("%08x %08x %08x %08x %08x %08x %08x\n",m_cop_register[0],m_cop_register[1],m_cop_register[2],m_cop_register[3],m_cop_register[4],m_cop_register[5],m_cop_register[6]);
 
 				offs = (offset & 3) * 4;

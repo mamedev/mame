@@ -28,8 +28,8 @@ preliminary memory map:
 (screen 1 -> Foreground)
 (screen 2 -> Midground)
 (screen 3 -> Text layer)
-[0x00]: Single cell H size +1?
-[0x02]: Total number of visible cells +1?
+[0x00]: Total number of visible cells?
+[0x02]: Single cell H size +1?
 [0x1a]: Layer Dynamic Paging?
 [0x1c]: Layer Enable
 ---x ---- sprite enable
