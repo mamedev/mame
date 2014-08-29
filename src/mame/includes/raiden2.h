@@ -27,6 +27,8 @@ public:
 	DECLARE_WRITE16_MEMBER( cop_dma_v1_w );
 	DECLARE_WRITE16_MEMBER( cop_dma_v2_w );
 	DECLARE_WRITE16_MEMBER( cop_scale_w );
+	DECLARE_WRITE16_MEMBER( cop_angle_target_w );
+	DECLARE_WRITE16_MEMBER( cop_angle_step_w );
 	DECLARE_WRITE16_MEMBER( cop_dma_adr_rel_w );
 	DECLARE_WRITE16_MEMBER( cop_dma_src_w );
 	DECLARE_WRITE16_MEMBER( cop_dma_size_w );
@@ -108,8 +110,8 @@ public:
 	UINT16 cop_func_mask[0x100/8];          /* function mask (?) */
 	UINT16 cop_program[0x100];              /* program "code" */
 	UINT16 cop_latch_addr, cop_latch_trigger, cop_latch_value, cop_latch_mask;
-	INT8 cop_angle_compare;
-	UINT8 cop_angle_mod_val;
+	UINT16 cop_angle_target;
+	UINT16 cop_angle_step;
 
 	DECLARE_WRITE16_MEMBER( sprite_prot_x_w );
 	DECLARE_WRITE16_MEMBER( sprite_prot_y_w );

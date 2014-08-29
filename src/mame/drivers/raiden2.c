@@ -480,6 +480,16 @@ WRITE16_MEMBER(raiden2_state::cop_scale_w)
 	cop_scale &= 3;
 }
 
+WRITE16_MEMBER(raiden2_state::cop_angle_target_w)
+{
+	COMBINE_DATA(&cop_angle_target);
+}
+
+WRITE16_MEMBER(raiden2_state::cop_angle_step_w)
+{
+	COMBINE_DATA(&cop_angle_step);
+}
+
 READ16_MEMBER(raiden2_state::cop_reg_high_r)
 {
 	return cop_regs[offset] >> 16;
@@ -622,6 +632,35 @@ WRITE16_MEMBER(raiden2_state::cop_cmd_w)
 		cop_status = 7;
 
 		space.write_word(cop_regs[0]+(0x38), res);
+		break;
+	}
+
+	case 0x6200: {
+		UINT8 angle = space.read_byte(cop_regs[0]+0x34);
+		UINT16 flags = space.read_word(cop_regs[0]);
+		cop_angle_target &= 0xff;
+		cop_angle_step &= 0xff;
+		flags &= ~0x0004;
+		int delta = angle - cop_angle_target;
+		if(delta >= 128)
+			delta -= 256;
+		else if(delta < -128)
+			delta += 256;
+		if(delta < 0) {
+			if(delta >= -cop_angle_step) {
+				angle = cop_angle_target;
+				flags |= 0x0004;
+			} else
+				angle += cop_angle_step;
+		} else {
+			if(delta <= cop_angle_step) {
+				angle = cop_angle_target;
+				flags |= 0x0004;
+			} else
+				angle -= cop_angle_step;
+		}
+		space.write_word(cop_regs[0], flags);
+		space.write_byte(cop_regs[0]+0x34, angle);
 		break;
 	}
 
@@ -1396,8 +1435,8 @@ WRITE16_MEMBER(raiden2_state::cop_sort_dma_trig_w)
 
 /* MEMORY MAPS */
 static ADDRESS_MAP_START( raiden2_cop_mem, AS_PROGRAM, 16, raiden2_state )
-//  AM_RANGE(0x0041c, 0x0041d) AM_WRITENOP // angle compare (for 0x6200 COP macro)
-//  AM_RANGE(0x0041e, 0x0041f) AM_WRITENOP // angle mod value (for 0x6200 COP macro)
+	AM_RANGE(0x0041c, 0x0041d) AM_WRITE(cop_angle_target_w) // angle target (for 0x6200 COP macro)
+	AM_RANGE(0x0041e, 0x0041f) AM_WRITE(cop_angle_step_w)   // angle step   (for 0x6200 COP macro)
 	AM_RANGE(0x00420, 0x00421) AM_WRITE(cop_itoa_low_w)
 	AM_RANGE(0x00422, 0x00423) AM_WRITE(cop_itoa_high_w)
 	AM_RANGE(0x00424, 0x00425) AM_WRITE(cop_itoa_digit_count_w)
