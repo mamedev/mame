@@ -732,7 +732,7 @@ ADDRESS_MAP_END
 /*****************/
 
 
-static ADDRESS_MAP_START( ymf278_map, AS_IO, 8, metro_state )
+static ADDRESS_MAP_START( ymf278_map, AS_0, 8, metro_state )
 	AM_RANGE(0x000000, 0x27ffff) AM_ROM
 ADDRESS_MAP_END
 
