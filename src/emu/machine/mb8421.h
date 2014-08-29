@@ -48,6 +48,7 @@ public:
 	template<class _Object> static devcb_base &set_intr_handler(device_t &device, _Object object) { return downcast<mb8421_device &>(device).m_intr_handler.set_callback(object); }
 
 	DECLARE_READ_LINE_MEMBER( busy_r ) { return 0; } // _BUSY pin - not emulated
+	UINT8 peek(offs_t offset) { return m_ram[offset & 0x7ff]; }
 
 	DECLARE_WRITE8_MEMBER( left_w );
 	DECLARE_READ8_MEMBER( left_r );

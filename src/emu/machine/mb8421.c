@@ -5,10 +5,6 @@
     Fujitsu MB8421/22/31/32-90/-90L/-90LL/-12/-12L/-12LL
     CMOS 16K-bit (2KB) dual-port SRAM
 
-    TODO:
-    - retransmit (RT pin)
-    - cascaded width expansion mode (when needed)
-
 **********************************************************************/
 
 #include "machine/mb8421.h"
@@ -58,18 +54,17 @@ void mb8421_device::device_reset()
 WRITE8_MEMBER(mb8421_device::left_w)
 {
 	offset &= 0x7ff;
+	m_ram[offset] = data;
 
 	if (offset == 0x7ff)
 		m_intr_handler(1);
-
-	m_ram[offset] = data;
 }
 
 READ8_MEMBER(mb8421_device::left_r)
 {
 	offset &= 0x7ff;
 
-	if (offset == 0x7fe)
+	if (offset == 0x7fe && !space.debugger_access())
 		m_intl_handler(0);
 	
 	return m_ram[offset];
@@ -78,18 +73,17 @@ READ8_MEMBER(mb8421_device::left_r)
 WRITE8_MEMBER(mb8421_device::right_w)
 {
 	offset &= 0x7ff;
+	m_ram[offset] = data;
 
 	if (offset == 0x7fe)
 		m_intl_handler(1);
-
-	m_ram[offset] = data;
 }
 
 READ8_MEMBER(mb8421_device::right_r)
 {
 	offset &= 0x7ff;
 
-	if (offset == 0x7ff)
+	if (offset == 0x7ff && !space.debugger_access())
 		m_intr_handler(0);
 	
 	return m_ram[offset];

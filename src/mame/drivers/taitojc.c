@@ -311,7 +311,7 @@ Notes:
       D482445 - 256k x16 Video DRAM. Compatible with Toshiba TC524165/TC52V4165 (also used on Namco System 11 CPU boards)
       LC321664- 64k x16 DRAM
       TC51832 - 32k x8 SRAM
-      MB8422  - 16k-bit (2kbytes) Dual Port SRAM
+      MB8421  - 16k-bit (2kbytes) Dual Port SRAM
 
       Measurements:
                    HSync  - 24.639kHz / 24.690kHz (alternates between the two frequencies slowly every ~2 seconds)
@@ -380,6 +380,8 @@ Notes:
 #include "cpu/mc68hc11/mc68hc11.h"
 #include "sound/es5506.h"
 #include "sound/okim6295.h"
+#include "machine/mb8421.h"
+#include "machine/taitoio.h"
 #include "machine/eepromser.h"
 #include "audio/taito_en.h"
 #include "includes/taitojc.h"
@@ -444,176 +446,33 @@ static const int dendego_pressure_table[0x100] =
 #define VBSTART             (400)
 
 
+#define DSP_IDLESKIP        1 /* dsp idle skipping speedup hack */
+
+
 /***************************************************************************
 
-  maincpu I/O
+  Interrupts
 
 ***************************************************************************/
 
-#define DEBUG_DSP               0
-#define DEBUG_BLOCK_MOVES       0
-
-READ32_MEMBER(taitojc_state::dsp_shared_r)
+WRITE_LINE_MEMBER(taitojc_state::mb8421_intl)
 {
-	return m_dsp_shared_ram[offset] << 16;
+	m_maincpu->set_input_line(6, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-#if DEBUG_DSP
-
-void taitojc_state::debug_dsp_command()
+WRITE_LINE_MEMBER(taitojc_state::mb8421_intr)
 {
-	UINT16 *cmd = &m_dsp_shared_ram[0x1fc0/2];
-
-	switch (cmd[0])
+	// this is hacky, acquiring the internal dsp romdump should allow it to be cleaned up
+	if (state)
 	{
-		case 0x00:
+		if (m_mb8421->peek(0x7ff) & 0x08)
 		{
-			printf("DSP: NOP\n");
-			break;
+			m_dsp->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 		}
-		case 0x01:
-		{
-			printf("DSP: Move to Shared RAM: %04X\n", cmd[1]);
-			break;
-		}
-		case 0x02:
-		{
-			printf("DSP: Move from Shared RAM: %04X\n", cmd[1]);
-			break;
-		}
-		case 0x03:
-		{
-			printf("DSP: Block move DM to DM: %04X, %04X, %04X\n", cmd[1], cmd[2], cmd[3]+1);
-			if (cmd[2] >= 0x7800 && cmd[2] < 0x8000)
-			{
-				int i, j;
-				int saddr = cmd[2] - 0x7800;
-				int daddr = cmd[1];
-				int length = cmd[3]+1;
-
-				for (j=0; j < length; j+=16)
-				{
-					int ll = (length - j);
-					if (ll > 16) ll = 16;
-
-#if DEBUG_BLOCK_MOVES
-					printf("   %04X: ", daddr);
-#endif
-					for (i=0; i < ll; i++)
-					{
-						UINT16 d = m_dsp_shared_ram[saddr++];
-						if (daddr >= 0x8000 && daddr < 0x10000)
-						{
-							m_debug_dsp_ram[daddr-0x8000] = d;
-						}
-						daddr++;
-
-#if DEBUG_BLOCK_MOVES
-						printf("%04X ", d);
-#endif
-					}
-#if DEBUG_BLOCK_MOVES
-					printf("\n");
-#endif
-				}
-			}
-			break;
-		}
-		case 0x04:
-		{
-			printf("DSP: Block move PM to DM: %04X, %04X, %04X\n", cmd[1], cmd[2], cmd[3]+1);
-			break;
-		}
-		case 0x05:
-		{
-			printf("DSP: Block move DM to PM: %04X, %04X, %04X\n", cmd[1], cmd[2], cmd[3]+1);
-			break;
-		}
-		case 0x08:
-		{
-			printf("DSP: Jump to address: %04X, %04X, %04X\n", cmd[1], cmd[3], cmd[4]);
-			break;
-		}
-		case 0x09:
-		{
-			printf("DSP: Call Sub operation: %04X\n", cmd[1]);
-			if (cmd[1] == 0x8000)
-			{
-				int addr = 0;
-				int end = 0;
-				while (!end)
-				{
-					int i;
-					UINT16 cmd = m_debug_dsp_ram[addr++];
-					int length = cmd & 0xff;
-
-					if ((cmd >> 11) == 6)
-						end = 1;
-
-					printf("   %04X (%02X): ", cmd, cmd >> 11);
-					for (i=0; i < length; i++)
-					{
-						printf("%04X ", m_debug_dsp_ram[addr+i]);
-					}
-					printf("\n");
-
-					addr += length;
-				};
-			}
-			break;
-		}
-		case 0x0d:
-		{
-			printf("DSP: Calculate ROM checksum\n");
-			break;
-		}
-		case 0x10:
-		{
-			printf("DSP: Test RAM\n");
-			break;
-		}
-		case 0x11:
-		{
-			printf("DSP: Test Program Checksum: %04X, %04X\n", cmd[1], cmd[2]+1);
-			break;
-		}
-		default:
-		{
-			printf("DSP: Unknown command %04X\n", cmd[0]);
-			break;
-		}
-	}
-
-	printf("\n");
-}
-#endif // DEBUG_DSP
-
-WRITE32_MEMBER(taitojc_state::dsp_shared_w)
-{
-	//osd_printf_debug("dsp_shared: %08X, %04X at %08X\n", offset, data >> 16, space.device().safe_pc());
-	if (ACCESSING_BITS_24_31)
-	{
-		m_dsp_shared_ram[offset] &= 0x00ff;
-		m_dsp_shared_ram[offset] |= (data >> 16) & 0xff00;
-	}
-	if (ACCESSING_BITS_16_23)
-	{
-		m_dsp_shared_ram[offset] &= 0xff00;
-		m_dsp_shared_ram[offset] |= (data >> 16) & 0x00ff;
-	}
-
-#if DEBUG_DSP
-	if (offset == 0x1fc0/4)
-	{
-		debug_dsp_command(machine());
-	}
-#endif
-
-	if (offset == 0x1ffc/4)
-	{
-		if ((data & 0x80000) == 0)
+		else
 		{
 			/*
+			regarding m_has_dsp_hack:
 			All games minus Dangerous Curves tests if the DSP is alive with this code snippet:
 
 			0008C370: 4A79 1000 1FC0                                      tst.w   $10001fc0.l
@@ -629,13 +488,36 @@ WRITE32_MEMBER(taitojc_state::dsp_shared_w)
 			}
 			m_first_dsp_reset = 0;
 		}
-		else
-		{
-			m_dsp->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-		}
 	}
 }
 
+INTERRUPT_GEN_MEMBER(taitojc_state::taitojc_vblank)
+{
+	device.execute().set_input_line_and_vector(2, HOLD_LINE, 0x82); // where does it come from?
+}
+
+WRITE8_MEMBER(taitojc_state::jc_irq_unk_w)
+{
+	// gets written to at the end of irq6 routine
+	// writes $02 or $06, depending on a value in DSP RAM, what does it mean?
+}
+
+
+/***************************************************************************
+
+  maincpu I/O
+
+***************************************************************************/
+
+READ8_MEMBER(taitojc_state::dsp_shared_r)
+{
+	return m_dsp_shared_ram_hi[offset];
+}
+
+WRITE8_MEMBER(taitojc_state::dsp_shared_w)
+{
+	m_dsp_shared_ram_hi[offset] = data;
+}
 
 
 READ8_MEMBER(taitojc_state::mcu_comm_r)
@@ -714,14 +596,6 @@ READ8_MEMBER(taitojc_state::jc_pcbid_r)
 }
 
 
-WRITE8_MEMBER(taitojc_state::jc_irq_ack_w)
-{
-	// gets written to at the end of irq6 routine
-	// writes $02 or $06, depending on a value in DSP RAM, what does it mean?
-	m_maincpu->set_input_line(6, CLEAR_LINE);
-}
-
-
 /*
 
 Some games (Dangerous Curves, Side by Side, Side by Side 2) were released as Twin cabinets,
@@ -753,11 +627,12 @@ static ADDRESS_MAP_START( taitojc_map, AS_PROGRAM, 32, taitojc_state )
 	AM_RANGE(0x06400000, 0x0641ffff) AM_READWRITE(taitojc_palette_r, taitojc_palette_w) AM_SHARE("palette_ram")
 	AM_RANGE(0x06600000, 0x0660001f) AM_DEVREADWRITE8("tc0640fio", tc0640fio_device, read, write, 0xff000000)
 	AM_RANGE(0x0660004c, 0x0660004f) AM_WRITE_PORT("EEPROMOUT")
-	AM_RANGE(0x06800000, 0x06800003) AM_WRITE8(jc_irq_ack_w, 0x00ff0000)
+	AM_RANGE(0x06800000, 0x06800003) AM_WRITE8(jc_irq_unk_w, 0x00ff0000)
 	AM_RANGE(0x06a00000, 0x06a01fff) AM_READWRITE(snd_share_r, snd_share_w) AM_SHARE("snd_shared")
 	AM_RANGE(0x06c00000, 0x06c0001f) AM_READWRITE8(jc_lan_r, jc_lan_w, 0x00ff0000)
 	AM_RANGE(0x08000000, 0x080fffff) AM_RAM AM_SHARE("main_ram")
-	AM_RANGE(0x10000000, 0x10001fff) AM_READWRITE(dsp_shared_r, dsp_shared_w)
+	AM_RANGE(0x10000000, 0x10001fff) AM_DEVREADWRITE8("mb8421", mb8421_device, left_r, left_w, 0x00ff0000)
+	AM_RANGE(0x10000000, 0x10001fff) AM_READWRITE8(dsp_shared_r, dsp_shared_w, 0xff000000) // which chip is this?
 ADDRESS_MAP_END
 
 
@@ -973,7 +848,6 @@ WRITE16_MEMBER(taitojc_state::dsp_texture_w)
 {
 	int index;
 	int x, y;
-	//osd_printf_debug("texture write %08X, %04X\n", dsp_addr1, data);
 
 	x = (m_dsp_tex_offset >> 0 & 0x1f) | (m_dsp_tex_offset >> 5 & 0x20);
 	y = (m_dsp_tex_offset >> 5 & 0x1f) | (m_dsp_tex_offset >> 6 & 0x20);
@@ -992,7 +866,6 @@ READ16_MEMBER(taitojc_state::dsp_texaddr_r)
 WRITE16_MEMBER(taitojc_state::dsp_texaddr_w)
 {
 	m_dsp_tex_address = data;
-//  osd_printf_debug("texaddr = %08X at %08X\n", data, space.device().safe_pc());
 
 	m_texture_x = (((data >> 0) & 0x1f) << 1) | ((data >> 12) & 0x1);
 	m_texture_y = (((data >> 5) & 0x1f) << 1) | ((data >> 13) & 0x1);
@@ -1017,19 +890,6 @@ WRITE16_MEMBER(taitojc_state::dsp_unk2_w)
 	}
 }
 
-READ16_MEMBER(taitojc_state::dsp_to_main_r)
-{
-	return m_dsp_shared_ram[0x7fe];
-}
-
-WRITE16_MEMBER(taitojc_state::dsp_to_main_w)
-{
-	m_maincpu->set_input_line(6, ASSERT_LINE); // probably not correct to do it here
-
-	COMBINE_DATA(&m_dsp_shared_ram[0x7fe]);
-}
-
-
 static ADDRESS_MAP_START( tms_program_map, AS_PROGRAM, 16, taitojc_state )
 	AM_RANGE(0x4000, 0x7fff) AM_RAM
 ADDRESS_MAP_END
@@ -1048,8 +908,8 @@ static ADDRESS_MAP_START( tms_data_map, AS_DATA, 16, taitojc_state )
 	AM_RANGE(0x701d, 0x701d) AM_READ(dsp_math_projection_y_r)
 	AM_RANGE(0x701f, 0x701f) AM_READ(dsp_math_projection_x_r)
 	AM_RANGE(0x7022, 0x7022) AM_READ(dsp_math_unk_r)
-	AM_RANGE(0x7ffe, 0x7ffe) AM_READWRITE(dsp_to_main_r, dsp_to_main_w)
-	AM_RANGE(0x7800, 0x7fff) AM_RAM AM_SHARE("dsp_shared")
+	AM_RANGE(0x7800, 0x7fff) AM_DEVREADWRITE8("mb8421", mb8421_device, right_r, right_w, 0x00ff)
+	AM_RANGE(0x7800, 0x7fff) AM_READWRITE8(dsp_shared_r, dsp_shared_w, 0xff00) // which chip is this?
 	AM_RANGE(0x8000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -1120,7 +980,7 @@ static INPUT_PORTS_START( common )
 	PORT_START("EEPROMOUT")
 	PORT_BIT( 0x04000000, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, di_write)
 	PORT_BIT( 0x08000000, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, clk_write)
-	PORT_BIT( 0x10000000, IP_ACTIVE_HIGH,  IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, cs_write)
+	PORT_BIT( 0x10000000, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, cs_write)
 INPUT_PORTS_END
 
 // Mascon must always be in a defined state, Densha de Go 2 in particular returns black screen if the Mascon input is undefined
@@ -1229,6 +1089,7 @@ void taitojc_state::machine_reset()
 	m_dsp_tex_offset = 0;
 	m_polygon_fifo_ptr = 0;
 
+	memset(m_dsp_shared_ram_hi, 0, sizeof(m_dsp_shared_ram_hi));
 	memset(m_viewport_data, 0, sizeof(m_viewport_data));
 	memset(m_projection_data, 0, sizeof(m_projection_data));
 	memset(m_intersection_data, 0, sizeof(m_intersection_data));
@@ -1237,9 +1098,30 @@ void taitojc_state::machine_reset()
 	m_dsp->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
-INTERRUPT_GEN_MEMBER(taitojc_state::taitojc_vblank)
+void taitojc_state::machine_start()
 {
-	device.execute().set_input_line_and_vector(2, HOLD_LINE, 0x82); // where does it come from?
+	// register for savestates
+	save_item(NAME(m_texture_x));
+	save_item(NAME(m_texture_y));
+	save_item(NAME(m_dsp_rom_pos));
+	save_item(NAME(m_dsp_tex_address));
+	save_item(NAME(m_dsp_tex_offset));
+	save_item(NAME(m_first_dsp_reset));
+	save_item(NAME(m_dsp_shared_ram_hi));
+	save_item(NAME(m_viewport_data));
+	save_item(NAME(m_projection_data));
+	save_item(NAME(m_intersection_data));
+	save_item(NAME(m_gfx_index));
+	save_item(NAME(m_polygon_fifo_ptr));
+
+	save_item(NAME(m_mcu_comm_main));
+	save_item(NAME(m_mcu_comm_hc11));
+	save_item(NAME(m_mcu_data_main));
+	save_item(NAME(m_mcu_data_hc11));
+	save_item(NAME(m_mcu_output));
+
+	save_item(NAME(m_speed_meter));
+	save_item(NAME(m_brake_meter));
 }
 
 
@@ -1262,6 +1144,10 @@ static MACHINE_CONFIG_START( taitojc, taitojc_state )
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+
+	MCFG_DEVICE_ADD("mb8421", MB8421, 0)
+	MCFG_MB8421_INTL_HANDLER(WRITELINE(taitojc_state, mb8421_intl))
+	MCFG_MB8421_INTR_HANDLER(WRITELINE(taitojc_state, mb8421_intr))
 
 	MCFG_DEVICE_ADD("tc0640fio", TC0640FIO, 0)
 	MCFG_TC0640FIO_READ_0_CB(IOPORT("SERVICE"))
@@ -1311,23 +1197,18 @@ MACHINE_CONFIG_END
 
 READ16_MEMBER(taitojc_state::taitojc_dsp_idle_skip_r)
 {
-	if(space.device().safe_pc()==0x404c)
+	if (space.device().safe_pc() == 0x404c)
 		space.device().execute().spin_until_time(attotime::from_usec(500));
 
-	return m_dsp_shared_ram[0x7f0];
+	return m_dsp_shared_ram_hi[0x7f0] << 8 | m_mb8421->peek(0x7f0);
 }
 
 READ16_MEMBER(taitojc_state::dendego2_dsp_idle_skip_r)
 {
-	if(space.device().safe_pc()==0x402e)
+	if (space.device().safe_pc() == 0x402e)
 		space.device().execute().spin_until_time(attotime::from_usec(500));
 
-	return m_dsp_shared_ram[0x7f0];
-}
-
-WRITE16_MEMBER(taitojc_state::dsp_idle_skip_w)
-{
-	COMBINE_DATA(&m_dsp_shared_ram[0x7f0]);
+	return m_dsp_shared_ram_hi[0x7f0] << 8 | m_mb8421->peek(0x7f0);
 }
 
 
@@ -1337,14 +1218,16 @@ DRIVER_INIT_MEMBER(taitojc_state,taitojc)
 
 	m_has_dsp_hack = 1;
 
-	m_dsp->space(AS_DATA).install_readwrite_handler(0x7ff0, 0x7ff0, read16_delegate(FUNC(taitojc_state::taitojc_dsp_idle_skip_r),this), write16_delegate(FUNC(taitojc_state::dsp_idle_skip_w),this));
+	if (DSP_IDLESKIP)
+		m_dsp->space(AS_DATA).install_read_handler(0x7ff0, 0x7ff0, read16_delegate(FUNC(taitojc_state::taitojc_dsp_idle_skip_r),this));
 }
 
 DRIVER_INIT_MEMBER(taitojc_state,dendego2)
 {
 	DRIVER_INIT_CALL(taitojc);
 
-	m_dsp->space(AS_DATA).install_readwrite_handler(0x7ff0, 0x7ff0, read16_delegate(FUNC(taitojc_state::dendego2_dsp_idle_skip_r),this), write16_delegate(FUNC(taitojc_state::dsp_idle_skip_w),this));
+	if (DSP_IDLESKIP)
+		m_dsp->space(AS_DATA).install_read_handler(0x7ff0, 0x7ff0, read16_delegate(FUNC(taitojc_state::dendego2_dsp_idle_skip_r),this));
 }
 
 DRIVER_INIT_MEMBER(taitojc_state,dangcurv)
@@ -2041,11 +1924,11 @@ GAME( 1995, landgear,  0,        taitojc, landgear, taitojc_state, taitojc,  ROT
 GAME( 1995, landgearj, landgear, taitojc, landgear, taitojc_state, taitojc,  ROT0, "Taito", "Landing Gear (Ver 4.2 J)",                             GAME_IMPERFECT_GRAPHICS )                 // LANDING GEAR           VER 4.2 J   Feb  8 1996  09:46:22
 GAME( 1995, landgeara, landgear, taitojc, landgear, taitojc_state, taitojc,  ROT0, "Taito", "Landing Gear (Ver 3.1 O)",                             GAME_IMPERFECT_GRAPHICS )                 // LANDING GEAR           VER 3.1 O   Feb  8 1996  09:46:22
 GAME( 1995, landgearja,landgear, taitojc, landgear, taitojc_state, taitojc,  ROT0, "Taito", "Landing Gear (Ver 3.0 J)",                             GAME_IMPERFECT_GRAPHICS )                 // LANDING GEAR           VER 3.0 J   Feb  8 1996  09:46:22
-GAME( 1996, sidebs,    0,        taitojc, sidebs, taitojc_state,   taitojc,  ROT0, "Taito", "Side by Side (Ver 2.7 J)",                             GAME_IMPERFECT_GRAPHICS )                 // SIDE BY SIDE           VER 2.7 J   1996/10/11   14:54:10
-GAME( 1996, sidebsja,  sidebs,   taitojc, sidebs, taitojc_state,   taitojc,  ROT0, "Taito", "Side by Side (Ver 2.5 J)",                             GAME_IMPERFECT_GRAPHICS )                 // SIDE BY SIDE           VER 2.5 J   1996/ 6/20   18:13:14
-GAMEL(1996, dendego,   0,        dendego, dendego, taitojc_state,  taitojc,  ROT0, "Taito", "Densha de GO! (Ver 2.2 J)",                            GAME_IMPERFECT_GRAPHICS, layout_dendego ) // DENSYA DE GO           VER 2.2 J   1997/ 2/ 4   12:00:28
-GAMEL(1996, dendegox,  dendego,  dendego, dendego, taitojc_state,  taitojc,  ROT0, "Taito", "Densha de GO! EX (Ver 2.4 J)",                         GAME_IMPERFECT_GRAPHICS, layout_dendego ) // DENSYA DE GO           VER 2.4 J   1997/ 4/18   13:38:34
-GAME( 1997, sidebs2,   0,        taitojc, sidebs, taitojc_state,   taitojc,  ROT0, "Taito", "Side by Side 2 (Ver 2.6 A)",                           GAME_IMPERFECT_GRAPHICS )                 // SIDE BY SIDE2          VER 2.6 A   1997/ 6/19   09:39:22
-GAME( 1997, sidebs2j,  sidebs2,  taitojc, sidebs, taitojc_state,   taitojc,  ROT0, "Taito", "Side by Side 2 Evoluzione (Ver 2.4 J)",                GAME_IMPERFECT_GRAPHICS )                 // SIDE BY SIDE2          VER 2.4 J   1997/ 5/26   13:06:37
-GAMEL(1998, dendego2,  0,        dendego, dendego, taitojc_state,  dendego2, ROT0, "Taito", "Densha de GO! 2 Kousoku-hen (Ver 2.5 J)",              GAME_IMPERFECT_GRAPHICS, layout_dendego ) // DENSYA DE GO2          VER 2.5 J   1998/ 3/ 2   15:30:55
-GAMEL(1998, dendego23k,dendego2, dendego, dendego, taitojc_state,  dendego2, ROT0, "Taito", "Densha de GO! 2 Kousoku-hen 3000-bandai (Ver 2.20 J)", GAME_IMPERFECT_GRAPHICS, layout_dendego ) // DENSYA DE GO! 2 3000   VER 2.20 J  1998/ 7/15   17:42:38
+GAME( 1996, sidebs,    0,        taitojc, sidebs,   taitojc_state, taitojc,  ROT0, "Taito", "Side by Side (Ver 2.7 J)",                             GAME_IMPERFECT_GRAPHICS )                 // SIDE BY SIDE           VER 2.7 J   1996/10/11   14:54:10
+GAME( 1996, sidebsja,  sidebs,   taitojc, sidebs,   taitojc_state, taitojc,  ROT0, "Taito", "Side by Side (Ver 2.5 J)",                             GAME_IMPERFECT_GRAPHICS )                 // SIDE BY SIDE           VER 2.5 J   1996/ 6/20   18:13:14
+GAMEL(1996, dendego,   0,        dendego, dendego,  taitojc_state, taitojc,  ROT0, "Taito", "Densha de GO! (Ver 2.2 J)",                            GAME_IMPERFECT_GRAPHICS, layout_dendego ) // DENSYA DE GO           VER 2.2 J   1997/ 2/ 4   12:00:28
+GAMEL(1996, dendegox,  dendego,  dendego, dendego,  taitojc_state, taitojc,  ROT0, "Taito", "Densha de GO! EX (Ver 2.4 J)",                         GAME_IMPERFECT_GRAPHICS, layout_dendego ) // DENSYA DE GO           VER 2.4 J   1997/ 4/18   13:38:34
+GAME( 1997, sidebs2,   0,        taitojc, sidebs,   taitojc_state, taitojc,  ROT0, "Taito", "Side by Side 2 (Ver 2.6 A)",                           GAME_IMPERFECT_GRAPHICS )                 // SIDE BY SIDE2          VER 2.6 A   1997/ 6/19   09:39:22
+GAME( 1997, sidebs2j,  sidebs2,  taitojc, sidebs,   taitojc_state, taitojc,  ROT0, "Taito", "Side by Side 2 Evoluzione (Ver 2.4 J)",                GAME_IMPERFECT_GRAPHICS )                 // SIDE BY SIDE2          VER 2.4 J   1997/ 5/26   13:06:37
+GAMEL(1998, dendego2,  0,        dendego, dendego,  taitojc_state, dendego2, ROT0, "Taito", "Densha de GO! 2 Kousoku-hen (Ver 2.5 J)",              GAME_IMPERFECT_GRAPHICS, layout_dendego ) // DENSYA DE GO2          VER 2.5 J   1998/ 3/ 2   15:30:55
+GAMEL(1998, dendego23k,dendego2, dendego, dendego,  taitojc_state, dendego2, ROT0, "Taito", "Densha de GO! 2 Kousoku-hen 3000-bandai (Ver 2.20 J)", GAME_IMPERFECT_GRAPHICS, layout_dendego ) // DENSYA DE GO! 2 3000   VER 2.20 J  1998/ 7/15   17:42:38
