@@ -743,6 +743,47 @@ ROM_START( gaplusd ) /* Alternate hardware */
 	ROM_LOAD( "pal10l8.8n", 0x0000, 0x002c, CRC(08e5b2fe) SHA1(1aa7fa1a61795703af84ae427d0d8588ef8c4c3f) )
 ROM_END
 
+ROM_START( gaplust ) /* Tecfri PCB */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* 64k for the MAIN CPU */
+	ROM_LOAD( "tecgap_gp2_4.4", 0xa000, 0x2000, CRC(d891a70d) SHA1(ec906d623f936335e194d3bf9484ca4e82691272) ) // galaga3m - m1.9e                   99.865723%
+	ROM_LOAD( "tecgap_gp2_3.3", 0xc000, 0x2000, CRC(1df6e319) SHA1(beb7bd22ff8bcb1c39f676e8bbb607e06e4f20d6) ) // galaga3m - m2.9d                   6.762695%
+	ROM_LOAD( "tecgap_gp2_2.2", 0xe000, 0x2000, CRC(fc764728) SHA1(5a8bd3e83fbea2bb6cc06748c85b56e24a706f37) ) // galaga3m - m3.9c                   81.530762%
+
+	ROM_REGION( 0x10000, "sub", 0 ) /* 64k for the SUB CPU */ // a mix of galaga3 and gaplus
+	ROM_LOAD( "tecgap_gp2_8.8", 0xa000, 0x2000, CRC(9ec3dce5) SHA1(196a975aff59be19f55041a44b201aafef083ba7) )
+	ROM_LOAD( "tecgap_gp2_7.7", 0xc000, 0x2000, CRC(0621f7df) SHA1(b86020f819fefb134cb57e203f7c90b1b29581c8) )
+	ROM_LOAD( "tecgap_gp2_6.6", 0xe000, 0x2000, CRC(6a2942c5) SHA1(6fb2c4dcb2ad393220917b81f1a42e571d209d76) )
+
+	ROM_REGION( 0x10000, "sub2", 0 ) /* 64k for the SOUND CPU */
+	ROM_LOAD( "tecgap_gp2_1.1", 0xe000, 0x2000, CRC(ed8aa206) SHA1(4e0a31d84cb7aca497485dbe0240009d58275765) )
+
+	ROM_REGION( 0x4000, "gfx1", 0 )
+	ROM_LOAD( "tecgap_gp2_5.5", 0x0000, 0x2000, CRC(f3d19987) SHA1(a0107fa4659597ac42c875ab1c0deb845534268b) )    /* characters */
+	/* 0x2000-0x3fff  will be unpacked from 0x0000-0x1fff */
+
+	ROM_REGION( 0xc000, "gfx2", 0 )
+	ROM_LOAD( "tecgap_gp2_11.11", 0x0000, 0x2000, CRC(57740ff9) SHA1(16873e0ac5f975768d596d7d32af7571f4817f2b) )    /* objects */
+	ROM_LOAD( "tecgap_gp2_10.10", 0x2000, 0x2000, CRC(61519645) SHA1(22b70ec534f9201b5a2552ae4eedabc9d55ed515) )    /* objects */ // different (bad?)  99.279785%
+	ROM_LOAD( "tecgap_gp2_12.12", 0x4000, 0x2000, CRC(7316a1f1) SHA1(368e4541a5151e906a189712bc05192c2ceec8ae) )    /* objects */
+	ROM_LOAD( "tecgap_gp2_9.9",   0x6000, 0x2000, CRC(e6a9ae67) SHA1(99c1e67c3b216aa1b63f199e21c73cdedde80e1b) )    /* objects */
+	/* 0x8000-0x9fff  will be unpacked from 0x6000-0x7fff */
+	ROM_FILL(               0xa000, 0x2000, 0x00 )    // optional ROM, not used
+
+	ROM_REGION( 0x0800, "proms", 0 )
+	ROM_LOAD( "gp2-3.1p", 0x0000, 0x0100, CRC(a5091352) SHA1(dcd6dfbfbd5281ba0c7b7c189d6fde23617ed3e3) )    /* red palette ROM (4 bits) */
+	ROM_LOAD( "gp2-1.1n", 0x0100, 0x0100, CRC(8bc8022a) SHA1(c76f9d9b066e268621d41a703c5280261234709a) )    /* green palette ROM (4 bits) */
+	ROM_LOAD( "gp2-2.2n", 0x0200, 0x0100, CRC(8dabc20b) SHA1(64d7b333f529d3ba66aeefd380fd1cbf9ddf460d) )    /* blue palette ROM (4 bits) */
+	ROM_LOAD( "gp2-7.6s", 0x0300, 0x0100, CRC(2faa3e09) SHA1(781ffe9088476798409cb922350eff881590cf35) )    /* char color ROM */
+	ROM_LOAD( "gp2-6.6p", 0x0400, 0x0200, CRC(6f99c2da) SHA1(955dcef363870ee8e91edc73b9ea3ce489738aad) )    /* sprite color ROM (lower 4 bits) */ // not verified, but Gaplus logo looks uncorrect with Galaga3 ones
+	ROM_LOAD( "gp2-5.6n", 0x0600, 0x0200, CRC(c7d31657) SHA1(a93a5bc448dc127e1389d10a9cb06acadfe940cf) )    /* sprite color ROM (upper 4 bits) */
+
+	ROM_REGION( 0x0100, "namco", 0 ) /* sound prom */
+	ROM_LOAD( "gp2-4.3f", 0x0000, 0x0100, CRC(2d9fbdd8) SHA1(e6a23cd5ce3d3e76de3b70c8ab5a3c45b1147af4) )
+
+	ROM_REGION( 0x0100, "plds", 0 )
+	ROM_LOAD( "pal10l8.8n", 0x0000, 0x002c, CRC(08e5b2fe) SHA1(1aa7fa1a61795703af84ae427d0d8588ef8c4c3f) )
+ROM_END
+
 ROM_START( galaga3 ) /* Version 2 or 3 PCB */
 	ROM_REGION( 0x10000, "maincpu", 0 ) /* 64k for the MAIN CPU */
 	ROM_LOAD( "gp3-4c.8d", 0xa000, 0x2000, CRC(10d7f64c) SHA1(e39f77af16016d28170e4ac1c2a784b0a7ec5454) )
@@ -982,7 +1023,9 @@ GAME( 1984, galaga3,  gaplus,   gaplus,   gaplus,   gaplus_state, galaga3, ROT90
 GAME( 1984, galaga3a, gaplus,   gaplus,   gaplus,   gaplus_state, galaga3, ROT90, "Namco", "Galaga 3 (GP3 rev. C)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 GAME( 1984, galaga3b, gaplus,   gaplus,   gaplus,   gaplus_state, galaga3, ROT90, "Namco", "Galaga 3 (GP3)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 
-
 /* These sets are on older revision (AKA Midway) 1 PCBs */
 GAME( 1984, galaga3c, gaplus,   gaplus,   galaga3a, gaplus_state, galaga3, ROT90, "Namco", "Galaga 3 (set 4)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 GAME( 1984, galaga3m, gaplus,   gaplus,   galaga3m, gaplus_state, galaga3, ROT90, "Namco", "Galaga 3 (set 5)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+
+/* This is an odd mix of Galaga3 and Gaplus, main code seems closest to galaga3m but still has significant changes, copyright is modified to 1992, has Galaga 3 style high scores, PARSEF spelling error on high score table */
+GAME( 1992, gaplust,  gaplus,   gaplus,  gapluso,  gaplus_state, galaga3, ROT90, "bootleg (Tecfri)", "Gaplus (Tecfri PCB)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
