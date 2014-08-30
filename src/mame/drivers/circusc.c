@@ -32,17 +32,17 @@ To enter service mode, keep 1&2 pressed on reset
     CB3C: AC 03            ANDA  #$03
     CB3E: 09 03            CMPA  #$03
     CB40: 07 02            BCS   $CB44
-    CB42: 04 03            LDA   #$04
+    CB42: 04 04            LDA   #$04
     CB44: A9 03            ADDA  #$03
 
   Ingame lives are correct though (same code for 'circusc' and 'circusc3') :
 
-    6B93: 96 0D            LDA   $2F
-    6B95: 84 81            ANDA  #$03
-    6B97: 8B 2B            ADDA  #$03
-    6B99: 81 8E            CMPA  #$06
-    6B9B: 25 2A            BCS   $6B9F
-    6B9D: 86 8F            LDA   #$07
+    6B93: 14 2F            LDA   $2F
+    6B95: A6 03            ANDA  #$03
+    6B97: 09 03            ADDA  #$03
+    6B99: A9 06            CMPA  #$06
+    6B9B: AD 02            BCS   $6B9F
+    6B9D: AE 07            LDA   #$07
 
 This bug is due to 380_r02.6h, it differs from 380_q02.6h by 2 bytes, at
  offset 0x0b43 is 0x05 and 0x0b45 is 0x02 which is the code listed above.
