@@ -2354,7 +2354,7 @@ ROM_END
 
 
 
-ROM_START( sohosung )
+ROM_START( suhosong )
 	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD16_BYTE( "su_ho_sung.uh12",  0x00001, 0x20000, CRC(6bd8bd08) SHA1(668398c9c77cc4cc52858daefd3cb13fbaf29a37) )
 	ROM_LOAD16_BYTE( "su_ho_sung.ui12",  0x00000, 0x20000, CRC(79a4806e) SHA1(a4080ea70fa588ada384ffa9877f5cf965fb68df) )
@@ -2815,7 +2815,7 @@ DRIVER_INIT_MEMBER(snowbros_state,pzlbreak)
 	m_pandora->set_bg_pen(0xc0);
 }
 
-DRIVER_INIT_MEMBER(snowbros_state,sohosung)
+DRIVER_INIT_MEMBER(snowbros_state,suhosong)
 {
 	UINT16 *HCROM = (UINT16*)memregion("maincpu")->base();
 
@@ -2853,7 +2853,7 @@ GAME( 1997, pzlbreak, 0,        semiprot, pzlbreak, snowbros_state, pzlbreak, RO
 GAME( 1999, moremore, 0,        semiprot, moremore, snowbros_state, moremorp, ROT0, "SemiCom / Exit", "More More", 0 )
 GAME( 1999, moremorp, 0,        semiprot, moremore, snowbros_state, moremorp, ROT0, "SemiCom / Exit", "More More Plus", 0 )
 GAME( 2002, 4in1boot, 0,        _4in1,    4in1boot, snowbros_state, 4in1boot, ROT0, "K1 Soft", "Puzzle King (includes bootleg of Snow Bros.)" , 0)
-GAME( 1997, sohosung, 0,        semiprot, cookbib3, snowbros_state, sohosung, ROT0, "SemiCom", "So Ho Sung", GAME_NOT_WORKING )
+GAME( 1997, suhosong, 0,        semiprot, cookbib3, snowbros_state, suhosong, ROT0, "SemiCom", "Su Ho Seong", GAME_NOT_WORKING )
 
 // The Korean games database shows an earlier version of this called Ball Boy with a different title screen to the version of Ball Boy we have
 // http://mamedev.emulab.it/undumped/images/Ballboy.jpg
