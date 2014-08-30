@@ -1392,6 +1392,13 @@ ROM_START( arkanoidjo )
 	ROM_LOAD( "a75-09.ic23",    0x0400, 0x0200, CRC(a7c6c277) SHA1(adaa003dcd981576ea1cc5f697d709b2d6b2ea29) )  /* blue component */
 ROM_END
 
+/* There is known to exist an undumped Arkanoid set that sits between the arkanoidj & arkatour sets rom number wise:
+
+   A75-24.IC17 - Program roms
+   A75-25.IC16 /
+   A75-26.IC14 - MCU
+*/
+
 ROM_START( arkatour )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "a75-27.ic17",   0x0000, 0x8000, CRC(e3b8faf5) SHA1(4c09478fa41881fa89ee6afb676aeb780f17ac2e) )
