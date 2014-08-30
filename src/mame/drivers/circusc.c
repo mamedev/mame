@@ -426,7 +426,7 @@ ROM_START( circusc2 ) /* This set verified to come with Q revision roms for 01 t
 
 	ROM_REGION( 0x04000, "gfx1", 0 )
 	ROM_LOAD( "380_j12.4a",   0x0000, 0x2000, CRC(56e5b408) SHA1(73b9e3d46dfe9e39b390c634df153648a0906876) )
-	ROM_LOAD( "380_j13.5a",   0x2000, 0x2000, CRC(5aca0193) SHA1(4d0b0a773c385b7f1dcf024760d0437f47e78fbe) )
+	ROM_LOAD( "380_k13.5a",   0x2000, 0x2000, CRC(5aca0193) SHA1(4d0b0a773c385b7f1dcf024760d0437f47e78fbe) ) // == 380_j13.5a
 
 	ROM_REGION( 0x0c000, "gfx2", 0 )
 	ROM_LOAD( "380_j06.11e",  0x0000, 0x2000, CRC(df0405c6) SHA1(70a50dcc86dfbdaa9c2af613105aae7f90747804) )
