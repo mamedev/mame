@@ -2825,16 +2825,16 @@ WRITE16_MEMBER( seibu_cop_legacy_device::generic_cop_w )
 
 				m_cop_angle_compare &= 0xff;
 				m_cop_angle_mod_val &= 0xff;
-				flags &= 0x04;				
+				flags &= ~0x0004;
 				
 				int delta = cur_angle - m_cop_angle_compare;
 				if(delta >= 128)
 					delta -= 256;
 				else if(delta < -128)
 					delta += 256;
-				if(delta < 0) 
+				if(delta < 0)
 				{
-					if(delta >= -m_cop_angle_mod_val) 
+					if(delta >= -m_cop_angle_mod_val)
 					{
 						cur_angle = m_cop_angle_compare;
 						flags |= 0x0004;
@@ -2842,9 +2842,9 @@ WRITE16_MEMBER( seibu_cop_legacy_device::generic_cop_w )
 					else
 						cur_angle += m_cop_angle_mod_val;
 				} 
-				else 
+				else
 				{
-					if(delta <= m_cop_angle_mod_val) 
+					if(delta <= m_cop_angle_mod_val)
 					{
 						cur_angle = m_cop_angle_compare;
 						flags |= 0x0004;
@@ -2872,16 +2872,16 @@ WRITE16_MEMBER( seibu_cop_legacy_device::generic_cop_w )
 
 				m_cop_angle_compare &= 0xff;
 				m_cop_angle_mod_val &= 0xff;
-				flags &= 0x04;				
+				flags &= ~0x0004;
 				
 				int delta = cur_angle - m_cop_angle_compare;
 				if(delta >= 128)
 					delta -= 256;
 				else if(delta < -128)
 					delta += 256;
-				if(delta < 0) 
+				if(delta < 0)
 				{
-					if(delta >= -m_cop_angle_mod_val) 
+					if(delta >= -m_cop_angle_mod_val)
 					{
 						cur_angle = m_cop_angle_compare;
 						flags |= 0x0004;
@@ -2889,9 +2889,9 @@ WRITE16_MEMBER( seibu_cop_legacy_device::generic_cop_w )
 					else
 						cur_angle += m_cop_angle_mod_val;
 				} 
-				else 
+				else
 				{
-					if(delta <= m_cop_angle_mod_val) 
+					if(delta <= m_cop_angle_mod_val)
 					{
 						cur_angle = m_cop_angle_compare;
 						flags |= 0x0004;
