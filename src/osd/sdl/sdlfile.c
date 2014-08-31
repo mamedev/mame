@@ -264,8 +264,6 @@ file_error osd_open(const char *path, UINT32 openflags, osd_file **file, UINT64 
 
 	*filesize = (UINT64)st.st_size;
 
-	fprintf(stderr, "SDL: opened file %s, size %I64d\n", tmpstr, *filesize);
-
 error:
 	// cleanup
 	if (filerr != FILERR_NONE && *file != NULL)
