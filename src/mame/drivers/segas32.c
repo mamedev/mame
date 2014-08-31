@@ -2512,12 +2512,14 @@ MACHINE_CONFIG_END
                 834-8526-02 (Export)
                 834-8526-03 (Japan)
    Link PCB No: 837-8223-01
+     A/D BD No: 837-7536 (one for each mainboard)
+     DSP BD No: 837-8341
 
     requires 2 linked system32 pcbs
     requires additional math DSP to be emulated
 
 	The link PCB attaches 2 System 32 mainboards together, then ROM boards for each mainboard attaches to the link PCB.
-	This provides a direct connection between the PCBS (NOT a network link) so they effectively operate as a single boardset
+	This provides a direct connection between the PCBs (NOT a network link) so they effectively operate as a single boardset
 	sharing RAM (we should emulate it as such)
 
 	Link PCB is a single sparsely populated romless PCB but contains
@@ -2535,7 +2537,7 @@ MACHINE_CONFIG_END
 
 	(todo, full layout)
 
-	The left PCB (master?) contains a sub-board on the ROM board with the math DSP, the right PCB does not have this.
+	The left Rom PCB (master?) contains a sub-board on the ROM board with the math DSP, the right Rom PCB does not have this.
 
 */
 ROM_START( arescue )
@@ -2578,6 +2580,8 @@ ROM_END
        Game BD: 833-8508-03 AIR RESCUE
     Rom PCB No: 834-8526-03
    Link PCB No: 837-8223-01
+     A/D BD No: 837-7536 (one for each mainboard)
+     DSP BD No: 837-8341
 
     requires 2 linked system32 pcbs
     requires additional math DSP to be emulated
