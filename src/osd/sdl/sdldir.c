@@ -2,12 +2,16 @@
 //
 //  sdldir.c - SDL core directory access functions
 //
-//  Copyright (c) 1996-2010, Nicola Salmoria and the MAME Team.
+//  Copyright (c) 1996-2014, Nicola Salmoria and the MAME Team.
 //  Visit http://mamedev.org for licensing and usage restrictions.
 //
 //  SDLMAME by Olivier Galibert and R. Belmont
 //
 //============================================================
+
+#ifdef SDLMAME_WIN32
+#include "../windows/windir.c"
+#else
 
 #ifndef _LARGEFILE64_SOURCE
 #define _LARGEFILE64_SOURCE
@@ -230,3 +234,5 @@ void osd_closedir(osd_directory *dir)
 	osd_free(dir->path);
 	osd_free(dir);
 }
+
+#endif
