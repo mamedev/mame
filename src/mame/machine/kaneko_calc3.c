@@ -29,6 +29,7 @@ const device_type KANEKO_CALC3 = &device_creator<kaneko_calc3_device>;
 
 kaneko_calc3_device::kaneko_calc3_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, KANEKO_CALC3, "Kaneko CALC3 MCU", tag, owner, clock, "kaneko_calc3", __FILE__),
+		m_mcuram(*this, ":mcuram"),
 		m_mcu_status(0),
 		m_mcu_command_offset(0),
 		m_mcu_crc(0),
@@ -45,8 +46,7 @@ kaneko_calc3_device::kaneko_calc3_device(const machine_config &mconfig, const ch
 		m_dsw_addr(0),
 		m_eeprom_addr(0),
 		m_poll_addr(0),
-		m_checksumaddress(0),
-		m_mcuram(NULL)
+		m_checksumaddress(0)
 {
 	m_data_header[0] = m_data_header[1] = 0;
 }
@@ -54,10 +54,8 @@ kaneko_calc3_device::kaneko_calc3_device(const machine_config &mconfig, const ch
 
 void kaneko_calc3_device::device_start()
 {
-	m_mcuram = (UINT16*)auto_alloc_array_clear(machine(), UINT16, 0x10000/2);
 	initial_scan_tables();
 	m_runtimer = timer_alloc(MCU_RUN_TIMER);
-
 
 	save_item(NAME(m_mcu_status));
 	save_item(NAME(m_mcu_command_offset));
@@ -77,7 +75,6 @@ void kaneko_calc3_device::device_start()
 	save_item(NAME(m_eeprom_addr));
 	save_item(NAME(m_poll_addr));
 	save_item(NAME(m_checksumaddress));
-	save_pointer(NAME(m_mcuram), 0x10000/2);
 }
 
 void kaneko_calc3_device::device_reset()
@@ -128,16 +125,6 @@ void kaneko_calc3_device::mcu_init()
 {
 	m_mcu_status = 0;
 	m_mcu_command_offset = 0;
-}
-
-READ16_MEMBER(kaneko_calc3_device::mcu_ram_r)
-{
-	return m_mcuram[offset];
-}
-
-WRITE16_MEMBER(kaneko_calc3_device::mcu_ram_w)
-{
-	COMBINE_DATA(&m_mcuram[offset]);
 }
 
 void kaneko_calc3_device::mcu_com_w(offs_t offset, UINT16 data, UINT16 mem_mask, int _n_)

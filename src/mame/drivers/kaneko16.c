@@ -717,7 +717,7 @@ WRITE16_MEMBER(kaneko16_shogwarr_state::brapboys_oki_bank_w)
 static ADDRESS_MAP_START( shogwarr, AS_PROGRAM, 16, kaneko16_shogwarr_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM     // ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM AM_SHARE("mainram")     // Work RAM
-	AM_RANGE(0x200000, 0x20ffff) AM_DEVREADWRITE("calc3_prot", kaneko_calc3_device, mcu_ram_r,mcu_ram_w) // Shared With MCU
+	AM_RANGE(0x200000, 0x20ffff) AM_RAM AM_SHARE("mcuram")
 	AM_RANGE(0x280000, 0x280001) AM_DEVWRITE("calc3_prot", kaneko_calc3_device, mcu_com0_w)
 	AM_RANGE(0x290000, 0x290001) AM_DEVWRITE("calc3_prot", kaneko_calc3_device, mcu_com1_w)
 	AM_RANGE(0x2b0000, 0x2b0001) AM_DEVWRITE("calc3_prot", kaneko_calc3_device, mcu_com2_w)

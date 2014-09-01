@@ -9,16 +9,12 @@ class kaneko_calc3_device : public device_t
 public:
 	kaneko_calc3_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	DECLARE_READ16_MEMBER(mcu_ram_r);
-	DECLARE_WRITE16_MEMBER(mcu_ram_w);
-
 	DECLARE_WRITE16_MEMBER(mcu_com0_w);
 	DECLARE_WRITE16_MEMBER(mcu_com1_w);
 	DECLARE_WRITE16_MEMBER(mcu_com2_w);
 	DECLARE_WRITE16_MEMBER(mcu_com3_w);
 
 	void reset_run_timer();
-
 	void mcu_run();
 	
 protected:
@@ -27,6 +23,7 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
 private:
+	required_shared_ptr<UINT16> m_mcuram;
 	int m_mcu_status;
 	int m_mcu_command_offset;
 	UINT16 m_mcu_crc;
@@ -45,7 +42,6 @@ private:
 	UINT16 m_eeprom_addr;
 	UINT16 m_poll_addr;
 	UINT16 m_checksumaddress;
-	UINT16* m_mcuram;
 	emu_timer* m_runtimer;
 	
 	enum
