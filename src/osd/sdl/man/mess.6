@@ -16,7 +16,7 @@
 .\" http://www.mess.org/
 .\"
 .\"
-.TH MESS 6 2013-09-23 0.150 "The Multiple Emulator Super System (MESS)"
+.TH MESS 6 2014-07-31 0.154 "The Multiple Emulator Super System (MESS)"
 .\"
 .\"
 .\" NAME chapter
@@ -27,8 +27,9 @@ MESS \- The Multiple Emulator Super System
 .\" SYNOPSIS chapter
 .SH SYNOPSIS
 .B mess
-.RI [ options ]
 .I system
+.RI [ "media software" ]
+.RI [ options ]
 .\"
 .\"
 .\" DESCRIPTION chapter
@@ -37,6 +38,25 @@ MESS documents the hardware for a wide variety of (mostly vintage) computers,
 video game consoles, and calculators through software emulation. As a nice
 side effect, MESS allows software and games for these hardware platforms
 to run on modern PCs.
+.\"
+.\"
+.\" SOFTWARE chapter
+.SH SOFTWARE
+A \fIsoftware\fR entry may be specified to attach an image file to the
+emulated system. In such a case, the appropriate \fImedia\fR switch
+is also required:
+.TP
+.B \-cart, \-cart1
+Cartrigde, used mainly by game consoles
+.TP
+.B \-cass
+Cassette (tape), widely used by old home computers
+.TP
+.B \-flop, -flop1
+Floppy disk
+.TP
+.B \-cdrom
+CD-Rom
 .\"
 .\"
 .\" OPTIONS chapter
@@ -282,15 +302,6 @@ which used this type of hardware. This data is read at startup and
 written when MESS exits. The default is 'nvram' (that is, a
 directory 'nvram' in the same directory as the MESS executable). If this
 directory does not exist, it will be automatically created.
-.TP
-.B \-memcard_directory \fIpathname
-Specifies a single directory where memory card files are stored. Memory
-card files store the contents of removable memory cards for systems which
-used this type of hardware. This data is read and written under control
-of the user via the 'Memory Card' menu in the user interface. The
-default is 'memcard' (that is, a directory 'memcard' in the same
-directory as the MESS executable). If this directory does not exist,
-it will be automatically created.
 .TP
 .B \-input_directory \fIpathname
 Specifies a single directory where input recording files are stored.
@@ -1017,9 +1028,6 @@ immediately at startup. The default is OFF (\-nodebug).
 .B \-debugscript \fIfilename
 Specifies a file that contains a list of debugger commands to execute
 immediately upon startup. The default is NULL (no commands).
-.TP
-.B \-debug_internal, \-di
-Use the internal debugger for debugging.
 .\" +++++++++++++++++++++++++++++++++++++++++++++++++++++++
 .\" SDL specific
 .\" +++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -1091,6 +1099,9 @@ Internal webserver listener port.
 .B \-http_path \fIpath
 Path to web files. Default is /usr/share/games/mess/web.
 .TP
+.B \-console
+Enable emulator LUA console.
+.TP
 .B \-newui, \-nu
 Use the new MESS UI.
 .TP
@@ -1101,7 +1112,7 @@ if it detects that the emulation has locked up.
 .\"
 .\" SEE ALSO chapter
 .SH SEE ALSO
-castool(1), chdman(1), imgtool(1), testkeys(1)
+castool(1), chdman(1), floptool(1), imgtool(1), testkeys(1)
 .\"
 .\"
 .\" LEGAL NOTICE chapter

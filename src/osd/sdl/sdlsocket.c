@@ -2,25 +2,27 @@
 //
 //  sdlsocket.c - SDL socket (inet) access functions
 //
-//  Copyright (c) 1996-2013, Nicola Salmoria and the MAME Team.
+//  Copyright (c) 1996-2014, Nicola Salmoria and the MAME Team.
 //  Visit http://mamedev.org for licensing and usage restrictions.
 //
 //  SDLMAME by Olivier Galibert and R. Belmont
 //
 //============================================================
 
+#ifdef SDLMAME_WIN32
+#include "../windows/winsocket.c"
+#else
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <fcntl.h>
-#ifndef SDLMAME_WIN32
 #include <sys/select.h>
 #include <netinet/in.h>
 #include <netinet/tcp.h>
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <netdb.h>
-#endif
 #include <errno.h>
 
 #define NO_MEM_TRACKING
@@ -36,17 +38,14 @@ const char *sdlfile_socket_identifier  = "socket.";
 */
 bool sdl_check_socket_path(const char *path)
 {
-#ifndef SDLMAME_WIN32
 	if (strlen(sdlfile_socket_identifier) > 0 &&
 		strncmp(path, sdlfile_socket_identifier, strlen(sdlfile_socket_identifier)) == 0 &&
 		strchr(path, ':') != NULL) return true;
-#endif
 	return false;
 }
 
 file_error sdl_open_socket(const char *path, UINT32 openflags, osd_file **file, UINT64 *filesize)
 {
-#ifndef SDLMAME_WIN32
 	char hostname[256];
 	struct hostent *localhost;
 	struct sockaddr_in sai;
@@ -103,13 +102,12 @@ file_error sdl_open_socket(const char *path, UINT32 openflags, osd_file **file, 
 
 	*filesize = 0;
 	(*file)->handle = -1;
-#endif
 	return FILERR_NONE;
 }
 
 file_error sdl_read_socket(osd_file *file, void *buffer, UINT64 offset, UINT32 count, UINT32 *actual)
 {
-#if (!defined(SDLMAME_WIN32)) && (!defined(SDLMAME_EMSCRIPTEN))
+#if (!defined(SDLMAME_EMSCRIPTEN))
 	ssize_t result;
 	char line[80];
 	struct timeval timeout;
@@ -172,7 +170,6 @@ file_error sdl_read_socket(osd_file *file, void *buffer, UINT64 offset, UINT32 c
 
 file_error sdl_write_socket(osd_file *file, const void *buffer, UINT64 offset, UINT32 count, UINT32 *actual)
 {
-#ifndef SDLMAME_WIN32
 	ssize_t result;
 
 	result = write(file->socket, buffer, count);
@@ -186,15 +183,13 @@ file_error sdl_write_socket(osd_file *file, const void *buffer, UINT64 offset, U
 	{
 		*actual = result;
 	}
-#endif
 	return FILERR_NONE;
 }
 
 file_error sdl_close_socket(osd_file *file)
 {
-#ifndef SDLMAME_WIN32
 	close(file->socket);
 	osd_free(file);
-#endif
 	return FILERR_NONE;
 }
+#endif

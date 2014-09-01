@@ -107,7 +107,8 @@ osd_ticks_t osd_ticks_per_second(void)
 {
 	if (ticks_per_second == 0)
 	{
-		return 1;   // this isn't correct, but it prevents the crash
+		// if we haven't computed the value yet, there's no time like the present
+		init_cycle_counter();
 	}
 	return ticks_per_second;
 }

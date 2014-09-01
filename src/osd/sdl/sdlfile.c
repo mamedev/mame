@@ -1,13 +1,18 @@
 //============================================================
 //
-//  fileio.c - SDL file access functions
+//  sdlfile.c - SDL file access functions
 //
-//  Copyright (c) 1996-2010, Nicola Salmoria and the MAME Team.
+//  Copyright (c) 1996-2014, Nicola Salmoria and the MAME Team.
 //  Visit http://mamedev.org for licensing and usage restrictions.
 //
 //  SDLMAME by Olivier Galibert and R. Belmont
 //
 //============================================================
+
+#ifdef SDLMAME_WIN32
+#include "../windows/winfile.c"
+#include "../windows/winutil.c"
+#else
 
 #ifndef _LARGEFILE64_SOURCE
 #define _LARGEFILE64_SOURCE
@@ -16,6 +21,11 @@
 #ifdef SDLMAME_LINUX
 #define __USE_LARGEFILE64
 #endif
+
+#ifdef SDLMAME_WIN32
+#define _FILE_OFFSET_BITS 64
+#endif
+
 #ifndef SDLMAME_BSD
 #ifdef _XOPEN_SOURCE
 #undef _XOPEN_SOURCE
@@ -253,7 +263,6 @@ file_error osd_open(const char *path, UINT32 openflags, osd_file **file, UINT64 
 	#endif
 
 	*filesize = (UINT64)st.st_size;
-
 
 error:
 	// cleanup
@@ -500,3 +509,4 @@ int osd_is_absolute_path(const char *path)
 
 	return result;
 }
+#endif
