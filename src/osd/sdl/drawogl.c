@@ -187,9 +187,6 @@ struct texture_info
 	UINT32              mpass_texture_scrn[2];  // Multipass OpenGL texture "name"/ID for the shader
 	UINT32              mpass_fbo_scrn[2];      // framebuffer object for this texture, multipass
 
-	int                 lut_table_width;        // LUT table width
-	int                 lut_table_height;       // LUT table height
-
 	UINT32              pbo;                    // pixel buffer object for this texture (DYNAMIC only!)
 	UINT32              *data;                  // pixels for the texture
 	int                 data_own;               // do we own / allocated it ?
@@ -1895,56 +1892,11 @@ static int texture_shader_create(sdl_window_info *window,
 {
 	sdl_info *sdl = (sdl_info *) window->dxdata;
 	int uniform_location;
-	int lut_table_width_pow2=0;
-	int lut_table_height_pow2=0;
 	int i;
 	int surf_w_pow2  = get_valid_pow2_value (window->blitwidth, texture->texpow2);
 	int surf_h_pow2  = get_valid_pow2_value (window->blitheight, texture->texpow2);
 
 	assert ( texture->type==TEXTURE_TYPE_SHADER );
-
-	texture->lut_table_height = 1; // default ..
-
-	switch(texture->format)
-	{
-		case SDL_TEXFORMAT_RGB32_PALETTED:
-		case SDL_TEXFORMAT_RGB32:
-			texture->lut_table_width  = 1 << 8; // 8 bits per component
-			texture->lut_table_width *= 3;      // BGR ..
-			break;
-
-		case SDL_TEXFORMAT_RGB15_PALETTED:
-		case SDL_TEXFORMAT_RGB15:
-			texture->lut_table_width  = 1 << 5; // 5 bits per component
-			texture->lut_table_width *= 3;      // BGR ..
-			break;
-
-		case SDL_TEXFORMAT_PALETTE16:
-			texture->lut_table_width  = (1 << 8) * 3;
-			break;
-
-		default:
-			// should never happen
-			assert(0);
-			exit(1);
-	}
-
-	texture->lut_table_height = 1;
-
-	/**
-	 * always use pow2 for LUT, to minimize the chance for floating point arithmetic errors
-	 * (->buggy GLSL engine)
-	 */
-	lut_table_height_pow2 = get_valid_pow2_value (texture->lut_table_height, 1 /* texture->texpow2 */);
-	lut_table_width_pow2  = get_valid_pow2_value (texture->lut_table_width,  1 /* texture->texpow2 */);
-
-	if ( lut_table_width_pow2 > sdl->texture_max_width || lut_table_height_pow2 > sdl->texture_max_height )
-	{
-		osd_printf_error("Need lut size %dx%d, but max text size is %dx%d, bail out\n",
-			lut_table_width_pow2, lut_table_height_pow2,
-			sdl->texture_max_width, sdl->texture_max_height);
-		return -1;
-	}
 
 	GL_CHECK_ERROR_QUIET();
 
