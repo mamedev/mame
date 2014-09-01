@@ -1290,13 +1290,13 @@ READ16_MEMBER(raiden2_state::cop_collision_status_r)
 WRITE16_MEMBER(raiden2_state::sprite_prot_x_w)
 {
 	sprite_prot_x = data;
-	popmessage("%04x %04x",sprite_prot_x,sprite_prot_y);
+	//popmessage("%04x %04x",sprite_prot_x,sprite_prot_y);
 }
 
 WRITE16_MEMBER(raiden2_state::sprite_prot_y_w)
 {
 	sprite_prot_y = data;
-	popmessage("%04x %04x",sprite_prot_x,sprite_prot_y);
+	//popmessage("%04x %04x",sprite_prot_x,sprite_prot_y);
 }
 
 WRITE16_MEMBER(raiden2_state::sprite_prot_src_seg_w)
@@ -1309,15 +1309,20 @@ WRITE16_MEMBER(raiden2_state::sprite_prot_src_w)
 	int dx;
 	int dy;
 	UINT32 src;
-
+		
 	sprite_prot_src_addr[1] = data;
 	src = (sprite_prot_src_addr[0]<<4)+sprite_prot_src_addr[1];
 
 	dx = ((space.read_dword(src+0x08) >> 16) - (sprite_prot_x)) & 0xffff;
 	dy = ((space.read_dword(src+0x04) >> 16) - (sprite_prot_y)) & 0xffff;
 
-	space.write_word(src,(dx < 0x140 && dy < 256) ? 0x0001 : 0x0000);
+	space.write_word(src,(dx < 0x140 && dy < 256) ? (0x0001) : 0x0000);
+	space.write_word(dst1, space.read_word(src+0x60));
+	space.write_word(dst1+2,space.read_word(src+0x62));
+	space.write_word(dst1+4,dx-8);
+	space.write_word(dst1+6,dy-8);
 
+	dst1+=8;
 	//printf("[%08x] %08x %08x %04x %04x\n",src,dx,dy,dst1,dst2);
 }
 
@@ -1919,7 +1924,7 @@ static MACHINE_CONFIG_START( raiden2, raiden2_state )
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
 	MCFG_SCREEN_REFRESH_RATE(55.47)    /* verified on pcb */
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate *//2)
-	MCFG_SCREEN_SIZE(64*8, 64*8)
+	MCFG_SCREEN_SIZE(44*8, 34*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(raiden2_state, screen_update_raiden2)
 	MCFG_SCREEN_PALETTE("palette")
