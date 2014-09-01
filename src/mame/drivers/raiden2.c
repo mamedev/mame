@@ -549,6 +549,12 @@ UINT8 raiden2_state::cop_calculate_collsion_detection()
 	return res;
 }
 
+/* 
+TODO:
+2a05: first boss 
+2208/2288: first enemies when they crash on the ground (collision direction?)
+39b0: purple laser when it's fired up (variation of 3bb0?)
+*/
 WRITE16_MEMBER(raiden2_state::cop_cmd_w)
 {
 	cop_status &= 0x7fff;
@@ -591,13 +597,15 @@ WRITE16_MEMBER(raiden2_state::cop_cmd_w)
 	case 0x3b30:
 	case 0x3bb0: { // 3bb0 0004 007f 0038 - 0f9c 0b9c 0b9c 0b9c 0b9c 0b9c 0b9c 099c
 		/* TODO: these are actually internally loaded via 0x130e command */
-		int dx = space.read_dword(cop_regs[1]+4) - space.read_dword(cop_regs[0]+4);
-		int dy = space.read_dword(cop_regs[1]+8) - space.read_dword(cop_regs[0]+8);
+		int dx,dy;
 
+		dx = space.read_dword(cop_regs[1]+4) - space.read_dword(cop_regs[0]+4);
+		dy = space.read_dword(cop_regs[1]+8) - space.read_dword(cop_regs[0]+8);
+		
 		dx = dx >> 16;
 		dy = dy >> 16;
 		cop_dist = sqrt((double)(dx*dx+dy*dy));
-
+		
 		if(data & 0x0080)
 			space.write_word(cop_regs[0]+0x38, cop_dist);
 		break;
@@ -1309,20 +1317,25 @@ WRITE16_MEMBER(raiden2_state::sprite_prot_src_w)
 	int dx;
 	int dy;
 	UINT32 src;
-		
+	UINT8 flag;
 	sprite_prot_src_addr[1] = data;
 	src = (sprite_prot_src_addr[0]<<4)+sprite_prot_src_addr[1];
 
 	dx = ((space.read_dword(src+0x08) >> 16) - (sprite_prot_x)) & 0xffff;
 	dy = ((space.read_dword(src+0x04) >> 16) - (sprite_prot_y)) & 0xffff;
 
-	space.write_word(src,(dx < 0x140 && dy < 256) ? (0x0001) : 0x0000);
+	flag = dx < 0x140 && dy < 256 ? 1 : 0;
+	
+	space.write_word(src,flag);
+	if(flag == 1)
+	{
 	space.write_word(dst1, space.read_word(src+0x60));
 	space.write_word(dst1+2,space.read_word(src+0x62));
 	space.write_word(dst1+4,dx-8);
 	space.write_word(dst1+6,dy-8);
 
 	dst1+=8;
+	}
 	//printf("[%08x] %08x %08x %04x %04x\n",src,dx,dy,dst1,dst2);
 }
 
