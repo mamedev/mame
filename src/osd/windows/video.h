@@ -29,11 +29,20 @@
 //  TYPE DEFINITIONS
 //============================================================
 
-struct win_monitor_info
+class win_monitor_info
 {
+public:
+	win_monitor_info();
+	virtual ~win_monitor_info();
+
+	void refresh();
+	float get_aspect();
+	void set_aspect(float a) { aspect = a; }
+	
 	win_monitor_info  * next;                   // pointer to next monitor in list
 	HMONITOR            handle;                 // handle to the monitor
-	MONITORINFOEX       info;                   // most recently retrieved info
+	MONITORINFOEX       info;                   // most recently retrieved info	
+private:	
 	float               aspect;                 // computed/configured aspect ratio of the physical device
 	int                 reqwidth;               // requested width for this monitor
 	int                 reqheight;              // requested height for this monitor
@@ -81,7 +90,6 @@ struct win_video_config
 //  GLOBAL VARIABLES
 //============================================================
 
-extern win_monitor_info *win_monitor_list;
 extern win_video_config video_config;
 
 
@@ -89,8 +97,6 @@ extern win_video_config video_config;
 //  PROTOTYPES
 //============================================================
 
-void winvideo_monitor_refresh(win_monitor_info *monitor);
-float winvideo_monitor_get_aspect(win_monitor_info *monitor);
 win_monitor_info *winvideo_monitor_from_handle(HMONITOR monitor);
 
 #endif

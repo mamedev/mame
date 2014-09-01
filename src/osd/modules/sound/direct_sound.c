@@ -234,7 +234,7 @@ HRESULT sound_direct_sound::dsound_init()
 	}
 
 	// set the cooperative level
-	result = IDirectSound_SetCooperativeLevel(dsound, win_window_list->hwnd, DSSCL_PRIORITY);
+	result = IDirectSound_SetCooperativeLevel(dsound, win_window_list->m_hwnd, DSSCL_PRIORITY);
 	if (result != DS_OK)
 	{
 		osd_printf_error("Error setting DirectSound cooperative level: %08x\n", (UINT32)result);

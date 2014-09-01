@@ -87,9 +87,9 @@ static void drawnone_window_destroy(win_window_info *window)
 static render_primitive_list *drawnone_window_get_primitives(win_window_info *window)
 {
 	RECT client;
-	GetClientRect(window->hwnd, &client);
-	window->target->set_bounds(rect_width(&client), rect_height(&client), winvideo_monitor_get_aspect(window->monitor));
-	return &window->target->get_primitives();
+	GetClientRect(window->m_hwnd, &client);
+	window->m_target->set_bounds(rect_width(&client), rect_height(&client), window->m_monitor->get_aspect());
+	return &window->m_target->get_primitives();
 }
 
 

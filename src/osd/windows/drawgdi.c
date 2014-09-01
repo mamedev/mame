@@ -82,7 +82,7 @@ static int drawgdi_window_init(win_window_info *window)
 {
 	// allocate memory for our structures
 	gdi_info *gdi = global_alloc_clear(gdi_info);
-	window->drawdata = gdi;
+	window->m_drawdata = gdi;
 
 	// fill in the bitmap info header
 	gdi->bminfo.bmiHeader.biSize            = sizeof(gdi->bminfo.bmiHeader);
@@ -106,7 +106,7 @@ static int drawgdi_window_init(win_window_info *window)
 
 static void drawgdi_window_destroy(win_window_info *window)
 {
-	gdi_info *gdi = (gdi_info *)window->drawdata;
+	gdi_info *gdi = (gdi_info *)window->m_drawdata;
 
 	// skip if nothing
 	if (gdi == NULL)
@@ -116,7 +116,7 @@ static void drawgdi_window_destroy(win_window_info *window)
 	if (gdi->bmdata != NULL)
 		global_free_array(gdi->bmdata);
 	global_free(gdi);
-	window->drawdata = NULL;
+	window->m_drawdata = NULL;
 }
 
 
@@ -128,9 +128,9 @@ static void drawgdi_window_destroy(win_window_info *window)
 static render_primitive_list *drawgdi_window_get_primitives(win_window_info *window)
 {
 	RECT client;
-	GetClientRect(window->hwnd, &client);
-	window->target->set_bounds(rect_width(&client), rect_height(&client), winvideo_monitor_get_aspect(window->monitor));
-	return &window->target->get_primitives();
+	GetClientRect(window->m_hwnd, &client);
+	window->m_target->set_bounds(rect_width(&client), rect_height(&client), window->m_monitor->get_aspect());
+	return &window->m_target->get_primitives();
 }
 
 
@@ -141,16 +141,16 @@ static render_primitive_list *drawgdi_window_get_primitives(win_window_info *win
 
 static int drawgdi_window_draw(win_window_info *window, HDC dc, int update)
 {
-	gdi_info *gdi = (gdi_info *)window->drawdata;
+	gdi_info *gdi = (gdi_info *)window->m_drawdata;
 	int width, height, pitch;
 	RECT bounds;
 
 	// we don't have any special resize behaviors
-	if (window->resize_state == RESIZE_STATE_PENDING)
-		window->resize_state = RESIZE_STATE_NORMAL;
+	if (window->m_resize_state == RESIZE_STATE_PENDING)
+		window->m_resize_state = RESIZE_STATE_NORMAL;
 
 	// get the target bounds
-	GetClientRect(window->hwnd, &bounds);
+	GetClientRect(window->m_hwnd, &bounds);
 
 	// compute width/height/pitch of target
 	width = rect_width(&bounds);
@@ -166,9 +166,9 @@ static int drawgdi_window_draw(win_window_info *window, HDC dc, int update)
 	}
 
 	// draw the primitives to the bitmap
-	window->primlist->acquire_lock();
-	software_renderer<UINT32, 0,0,0, 16,8,0>::draw_primitives(*window->primlist, gdi->bmdata, width, height, pitch);
-	window->primlist->release_lock();
+	window->m_primlist->acquire_lock();
+	software_renderer<UINT32, 0,0,0, 16,8,0>::draw_primitives(*window->m_primlist, gdi->bmdata, width, height, pitch);
+	window->m_primlist->release_lock();
 
 	// fill in bitmap-specific info
 	gdi->bminfo.bmiHeader.biWidth = pitch;
