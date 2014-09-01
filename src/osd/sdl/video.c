@@ -2,7 +2,7 @@
 //
 //  video.c - SDL video handling
 //
-//  Copyright (c) 1996-2010, Nicola Salmoria and the MAME Team.
+//  Copyright (c) 1996-2014, Nicola Salmoria and the MAME Team.
 //  Visit http://mamedev.org for licensing and usage restrictions.
 //
 //  SDLMAME by Olivier Galibert and R. Belmont
@@ -645,15 +645,9 @@ static void extract_video_config(running_machine &machine)
 	}
 	else if (USE_OPENGL && (strcmp(stemp, SDLOPTVAL_OPENGL) == 0))
 		video_config.mode = VIDEO_MODE_OPENGL;
-	else if (USE_OPENGL && (strcmp(stemp, SDLOPTVAL_OPENGL16) == 0))
+	else if (SDLMAME_SDL2 && (strcmp(stemp, SDLOPTVAL_SDL2ACCEL) == 0))
 	{
-		video_config.mode = VIDEO_MODE_OPENGL;
-		video_config.prefer16bpp_tex = 1;
-	}
-	else if (SDLMAME_SDL2 && (strcmp(stemp, SDLOPTVAL_SDL13) == 0))
-	{
-		video_config.mode = VIDEO_MODE_SDL13;
-		video_config.prefer16bpp_tex = 1;
+		video_config.mode = VIDEO_MODE_SDL2ACCEL;
 	}
 	else
 	{
@@ -684,7 +678,6 @@ static void extract_video_config(running_machine &machine)
 			video_config.prescale = 1;
 		}
 		// default to working video please
-		video_config.prefer16bpp_tex = 0;
 		video_config.forcepow2texture = options.gl_force_pow2_texture();
 		video_config.allowtexturerect = !(options.gl_no_texture_rect());
 		video_config.vbo         = options.gl_vbo();

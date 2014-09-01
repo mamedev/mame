@@ -2,7 +2,7 @@
 //
 //  window.h - SDL window handling
 //
-//  Copyright (c) 1996-2006, Nicola Salmoria and the MAME Team.
+//  Copyright (c) 1996-2014, Nicola Salmoria and the MAME Team.
 //  Visit http://mamedev.org for licensing and usage restrictions.
 //
 //  SDLMAME by Olivier Galibert and R. Belmont
@@ -147,6 +147,6 @@ int drawogl_init(running_machine &machine, sdl_draw_info *callbacks);
 // PROTOTYPES - draw13.c
 //============================================================
 
-int draw13_init(running_machine &machine, sdl_draw_info *callbacks);
+int drawsdl2_init(running_machine &machine, sdl_draw_info *callbacks);
 
 #endif /* __SDLWINDOW__ */
