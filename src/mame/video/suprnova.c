@@ -343,8 +343,6 @@ WRITE32_MEMBER(skns_state::skns_v3_regs_w)
 
 void skns_state::video_start()
 {
-	m_spritegen = machine().device<sknsspr_device>("spritegen");
-
 	m_tilemap_A = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(skns_state::get_tilemap_A_tile_info),this),TILEMAP_SCAN_ROWS,16,16,64, 64);
 		m_tilemap_A->set_transparent_pen(0);
 

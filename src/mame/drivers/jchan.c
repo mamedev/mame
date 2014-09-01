@@ -181,26 +181,27 @@ class jchan_state : public driver_device
 public:
 	jchan_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
+		m_maincpu(*this,"maincpu"),
+		m_subcpu(*this,"sub"),
+		m_palette(*this, "palette"),
+		m_spritegen1(*this, "spritegen1"),
+		m_spritegen2(*this, "spritegen2"),
 		m_view2_0(*this, "view2_0"),
 		m_spriteram_1(*this, "spriteram_1"),
 		m_sprregs_1(*this, "sprregs_1"),
 		m_spriteram_2(*this, "spriteram_2"),
 		m_sprregs_2(*this, "sprregs_2"),
 		m_mainsub_shared_ram(*this, "mainsub_shared"),
-		m_ctrl(*this, "ctrl"),
-		m_maincpu(*this,"maincpu"),
-		m_subcpu(*this,"sub"),
-		m_palette(*this, "palette")
+		m_ctrl(*this, "ctrl")
 		{ }
 
-	optional_device<kaneko_view2_tilemap_device> m_view2_0;
-	bitmap_ind16 *m_sprite_bitmap_1;
-	bitmap_ind16 *m_sprite_bitmap_2;
-	UINT32* m_sprite_ram32_1;
-	UINT32* m_sprite_ram32_2;
-	UINT32* m_sprite_regs32_1;
-	UINT32* m_sprite_regs32_2;
-	int m_irq_sub_enable;
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_subcpu;
+	required_device<palette_device> m_palette;
+	required_device<sknsspr_device> m_spritegen1;
+	required_device<sknsspr_device> m_spritegen2;
+	required_device<kaneko_view2_tilemap_device> m_view2_0;
+	
 	required_shared_ptr<UINT16> m_spriteram_1;
 	required_shared_ptr<UINT16> m_sprregs_1;
 	required_shared_ptr<UINT16> m_spriteram_2;
@@ -208,12 +209,13 @@ public:
 	required_shared_ptr<UINT16> m_mainsub_shared_ram;
 	required_shared_ptr<UINT16> m_ctrl;
 
-	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_subcpu;
-	required_device<palette_device> m_palette;
-	sknsspr_device* m_spritegen1;
-	sknsspr_device* m_spritegen2;
-
+	bitmap_ind16 *m_sprite_bitmap_1;
+	bitmap_ind16 *m_sprite_bitmap_2;
+	UINT32* m_sprite_ram32_1;
+	UINT32* m_sprite_ram32_2;
+	UINT32* m_sprite_regs32_1;
+	UINT32* m_sprite_regs32_2;
+	int m_irq_sub_enable;
 
 	DECLARE_WRITE16_MEMBER(jchan_ctrl_w);
 	DECLARE_READ16_MEMBER(jchan_ctrl_r);
@@ -283,10 +285,6 @@ void jchan_state::video_start()
 
 	m_sprite_bitmap_1 = auto_bitmap_ind16_alloc(machine(),1024,1024);
 	m_sprite_bitmap_2 = auto_bitmap_ind16_alloc(machine(),1024,1024);
-
-	m_spritegen1 = machine().device<sknsspr_device>("spritegen1");
-	m_spritegen2 = machine().device<sknsspr_device>("spritegen2");
-
 
 	m_spritegen1->skns_sprite_kludge(0,0);
 	m_spritegen2->skns_sprite_kludge(0,0);
@@ -435,12 +433,12 @@ static ADDRESS_MAP_START( jchan_main, AS_PROGRAM, 16, jchan_state )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM // Work RAM - [A] grid tested, cleared ($9d6-$a54)
 
-	AM_RANGE(0x300000, 0x30ffff) AM_DEVREADWRITE( "toybox", kaneko_toybox_device, toybox_mcu_ram_r, toybox_mcu_ram_w )//    [G] MCU share
-	AM_RANGE(0x330000, 0x330001) AM_DEVWRITE( "toybox", kaneko_toybox_device, toybox_mcu_com0_w)
-	AM_RANGE(0x340000, 0x340001) AM_DEVWRITE( "toybox", kaneko_toybox_device, toybox_mcu_com1_w)
-	AM_RANGE(0x350000, 0x350001) AM_DEVWRITE( "toybox", kaneko_toybox_device, toybox_mcu_com2_w)
-	AM_RANGE(0x360000, 0x360001) AM_DEVWRITE( "toybox", kaneko_toybox_device, toybox_mcu_com3_w)
-	AM_RANGE(0x370000, 0x370001) AM_DEVREAD( "toybox", kaneko_toybox_device, toybox_mcu_status_r)
+	AM_RANGE(0x300000, 0x30ffff) AM_RAM AM_SHARE("mcuram") //    [G] MCU share
+	AM_RANGE(0x330000, 0x330001) AM_DEVWRITE( "toybox", kaneko_toybox_device, mcu_com0_w)
+	AM_RANGE(0x340000, 0x340001) AM_DEVWRITE( "toybox", kaneko_toybox_device, mcu_com1_w)
+	AM_RANGE(0x350000, 0x350001) AM_DEVWRITE( "toybox", kaneko_toybox_device, mcu_com2_w)
+	AM_RANGE(0x360000, 0x360001) AM_DEVWRITE( "toybox", kaneko_toybox_device, mcu_com3_w)
+	AM_RANGE(0x370000, 0x370001) AM_DEVREAD( "toybox", kaneko_toybox_device, mcu_status_r)
 
 	AM_RANGE(0x400000, 0x403fff) AM_RAM AM_SHARE("mainsub_shared")
 

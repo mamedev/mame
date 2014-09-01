@@ -290,7 +290,7 @@ static const UINT16 bonkadv_mcu_4_33[] = {
 };
 
 /* decryption table */
-static const UINT8 toybox_mcu_decryption_table[0x100] = {
+static const UINT8 decryption_table[0x100] = {
 0x7b,0x82,0xf0,0xbc,0x7f,0x1d,0xa2,0xc5,0x2a,0xfa,0x55,0xee,0x1a,0xd0,0x59,0x76,
 0x5e,0x75,0x79,0x16,0xa5,0xf6,0x84,0xed,0x0f,0x2e,0xf2,0x36,0x61,0xac,0xcd,0xab,
 0x01,0x3b,0x01,0x87,0x73,0xab,0xce,0x5d,0xd4,0x1d,0x68,0x2a,0x35,0xea,0x13,0x27,
@@ -310,7 +310,7 @@ static const UINT8 toybox_mcu_decryption_table[0x100] = {
 };
 
 /* alt decryption table (gtmr2) */
-static const UINT8 toybox_mcu_decryption_table_alt[0x100] = {
+static const UINT8 decryption_table_alt[0x100] = {
 0x26,0x17,0xb9,0xcf,0x1a,0xf5,0x14,0x1e,0x0c,0x35,0xb3,0x66,0xa0,0x17,0xe9,0xe4,
 0x90,0xf6,0xd5,0x35,0xac,0x95,0x49,0x43,0x64,0x0c,0x03,0x75,0x4d,0xda,0xb6,0xdf,
 0x06,0xcf,0x83,0x9e,0x35,0x2c,0x71,0x2a,0xab,0xcc,0x65,0xd4,0x1f,0xb0,0x88,0x3c,
@@ -335,37 +335,37 @@ class kaneko_toybox_device : public device_t
 public:
 	kaneko_toybox_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	static void set_toybox_table(device_t &device, int tabletype);
-	static void set_toybox_gametype(device_t &device, int gametype);
+	static void set_table(device_t &device, int tabletype);
+	static void set_game_type(device_t &device, int gametype);
 
-	DECLARE_READ16_MEMBER(toybox_mcu_ram_r);
-	DECLARE_WRITE16_MEMBER(toybox_mcu_ram_w);
-
-	DECLARE_WRITE16_MEMBER(toybox_mcu_com0_w);
-	DECLARE_WRITE16_MEMBER(toybox_mcu_com1_w);
-	DECLARE_WRITE16_MEMBER(toybox_mcu_com2_w);
-	DECLARE_WRITE16_MEMBER(toybox_mcu_com3_w);
-	DECLARE_READ16_MEMBER(toybox_mcu_status_r);
-
-	void toybox_mcu_com_w(offs_t offset, UINT16 data, UINT16 mem_mask, int _n_);
-
-	void toxboy_decrypt_rom(running_machine& machine);
-	void toxboy_handle_04_subcommand(running_machine& machine,UINT8 mcu_subcmd, UINT16*mcu_ram);
-	void toybox_mcu_init(running_machine &machine);
-	void toybox_mcu_run(running_machine &machine);
-
-	UINT16 m_toybox_mcu_com[4];
-
-	int m_gametype;
-	int m_tabletype;
+	DECLARE_WRITE16_MEMBER(mcu_com0_w);
+	DECLARE_WRITE16_MEMBER(mcu_com1_w);
+	DECLARE_WRITE16_MEMBER(mcu_com2_w);
+	DECLARE_WRITE16_MEMBER(mcu_com3_w);
+	DECLARE_READ16_MEMBER(mcu_status_r);
 
 protected:
 	virtual void device_start();
 	virtual void device_reset();
 
 private:
-	UINT16* m_toybox_mcuram;
+	required_shared_ptr<UINT16> m_mcuram;
+	UINT16 m_mcu_com[4];
+	int m_gametype;
+	int m_tabletype;
+	
+	void mcu_com_w(offs_t offset, UINT16 data, UINT16 mem_mask, int _n_);
+	void decrypt_rom();
+	void handle_04_subcommand(UINT8 mcu_subcmd, UINT16 *mcu_ram);
+	void mcu_init();
+	void mcu_run();
 };
 
 
 extern const device_type KANEKO_TOYBOX;
+
+#define MCFG_TOYBOX_TABLE_TYPE(_type) \
+	kaneko_toybox_device::set_table(*device, _type);
+	
+#define MCFG_TOYBOX_GAME_TYPE(_type) \
+	kaneko_toybox_device::set_game_type(*device, _type);

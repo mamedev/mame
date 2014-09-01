@@ -421,11 +421,11 @@ WRITE16_MEMBER(kaneko16_gtmr_state::bloodwar_coin_lockout_w)
 static ADDRESS_MAP_START( bloodwar, AS_PROGRAM, 16, kaneko16_gtmr_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM     // ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM     // Work RAM
-	AM_RANGE(0x200000, 0x20ffff) AM_DEVREADWRITE( "toybox", kaneko_toybox_device, toybox_mcu_ram_r, toybox_mcu_ram_w )
-	AM_RANGE(0x2a0000, 0x2a0001) AM_DEVWRITE( "toybox", kaneko_toybox_device, toybox_mcu_com0_w)    // To MCU ?
-	AM_RANGE(0x2b0000, 0x2b0001) AM_DEVWRITE( "toybox", kaneko_toybox_device, toybox_mcu_com1_w)
-	AM_RANGE(0x2c0000, 0x2c0001) AM_DEVWRITE( "toybox", kaneko_toybox_device, toybox_mcu_com2_w)
-	AM_RANGE(0x2d0000, 0x2d0001) AM_DEVWRITE( "toybox", kaneko_toybox_device, toybox_mcu_com3_w)
+	AM_RANGE(0x200000, 0x20ffff) AM_RAM AM_SHARE("mcuram")
+	AM_RANGE(0x2a0000, 0x2a0001) AM_DEVWRITE( "toybox", kaneko_toybox_device, mcu_com0_w)    // To MCU ?
+	AM_RANGE(0x2b0000, 0x2b0001) AM_DEVWRITE( "toybox", kaneko_toybox_device, mcu_com1_w)
+	AM_RANGE(0x2c0000, 0x2c0001) AM_DEVWRITE( "toybox", kaneko_toybox_device, mcu_com2_w)
+	AM_RANGE(0x2d0000, 0x2d0001) AM_DEVWRITE( "toybox", kaneko_toybox_device, mcu_com3_w)
 	AM_RANGE(0x300000, 0x30ffff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")    // Palette
 	AM_RANGE(0x400000, 0x401fff) AM_RAM AM_SHARE("spriteram")                   // Sprites
 	AM_RANGE(0x500000, 0x503fff) AM_DEVREADWRITE("view2_0", kaneko_view2_tilemap_device,  kaneko_tmap_vram_r, kaneko_tmap_vram_w )
@@ -443,7 +443,7 @@ static ADDRESS_MAP_START( bloodwar, AS_PROGRAM, 16, kaneko16_gtmr_state )
 	AM_RANGE(0xb00006, 0xb00007) AM_READ_PORT("EXTRA")
 	AM_RANGE(0xb80000, 0xb80001) AM_WRITE(bloodwar_coin_lockout_w)  // Coin Lockout
 	AM_RANGE(0xc00000, 0xc00001) AM_WRITE(kaneko16_display_enable)
-	AM_RANGE(0xd00000, 0xd00001) AM_DEVREAD( "toybox", kaneko_toybox_device, toybox_mcu_status_r)
+	AM_RANGE(0xd00000, 0xd00001) AM_DEVREAD( "toybox", kaneko_toybox_device, mcu_status_r)
 	AM_RANGE(0xe00000, 0xe00001) AM_WRITE(bloodwar_oki_0_bank_w)
 	AM_RANGE(0xe80000, 0xe80001) AM_WRITE(bloodwar_oki_1_bank_w)
 ADDRESS_MAP_END
@@ -475,11 +475,11 @@ WRITE16_MEMBER(kaneko16_gtmr_state::bonkadv_oki_1_bank_w)
 static ADDRESS_MAP_START( bonkadv, AS_PROGRAM, 16, kaneko16_gtmr_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM     // ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM     // Work RAM
-	AM_RANGE(0x200000, 0x20ffff) AM_DEVREADWRITE( "toybox", kaneko_toybox_device, toybox_mcu_ram_r, toybox_mcu_ram_w )      // Shared With MCU
-	AM_RANGE(0x2a0000, 0x2a0001) AM_DEVWRITE( "toybox", kaneko_toybox_device, toybox_mcu_com0_w)    // To MCU ?
-	AM_RANGE(0x2b0000, 0x2b0001) AM_DEVWRITE( "toybox", kaneko_toybox_device, toybox_mcu_com1_w)
-	AM_RANGE(0x2c0000, 0x2c0001) AM_DEVWRITE( "toybox", kaneko_toybox_device, toybox_mcu_com2_w)
-	AM_RANGE(0x2d0000, 0x2d0001) AM_DEVWRITE( "toybox", kaneko_toybox_device, toybox_mcu_com3_w)
+	AM_RANGE(0x200000, 0x20ffff) AM_RAM AM_SHARE("mcuram")      // Shared With MCU
+	AM_RANGE(0x2a0000, 0x2a0001) AM_DEVWRITE( "toybox", kaneko_toybox_device, mcu_com0_w)    // To MCU ?
+	AM_RANGE(0x2b0000, 0x2b0001) AM_DEVWRITE( "toybox", kaneko_toybox_device, mcu_com1_w)
+	AM_RANGE(0x2c0000, 0x2c0001) AM_DEVWRITE( "toybox", kaneko_toybox_device, mcu_com2_w)
+	AM_RANGE(0x2d0000, 0x2d0001) AM_DEVWRITE( "toybox", kaneko_toybox_device, mcu_com3_w)
 	AM_RANGE(0x300000, 0x30ffff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")    // Palette
 	AM_RANGE(0x400000, 0x401fff) AM_RAM AM_SHARE("spriteram")                   // Sprites
 	AM_RANGE(0x500000, 0x503fff) AM_DEVREADWRITE("view2_0", kaneko_view2_tilemap_device,  kaneko_tmap_vram_r, kaneko_tmap_vram_w )
@@ -497,7 +497,7 @@ static ADDRESS_MAP_START( bonkadv, AS_PROGRAM, 16, kaneko16_gtmr_state )
 	AM_RANGE(0xb00006, 0xb00007) AM_READ_PORT("UNK")
 	AM_RANGE(0xb80000, 0xb80001) AM_WRITE(bloodwar_coin_lockout_w)  // Coin Lockout
 	AM_RANGE(0xc00000, 0xc00001) AM_WRITE(kaneko16_display_enable)
-	AM_RANGE(0xd00000, 0xd00001) AM_DEVREAD( "toybox", kaneko_toybox_device, toybox_mcu_status_r)
+	AM_RANGE(0xd00000, 0xd00001) AM_DEVREAD( "toybox", kaneko_toybox_device, mcu_status_r)
 	AM_RANGE(0xe00000, 0xe00001) AM_WRITE(bonkadv_oki_0_bank_w)
 	AM_RANGE(0xe80000, 0xe80001) AM_WRITE(bonkadv_oki_1_bank_w)
 ADDRESS_MAP_END
@@ -545,12 +545,12 @@ static ADDRESS_MAP_START( gtmr_map, AS_PROGRAM, 16, kaneko16_gtmr_state )
 	AM_RANGE(0x0ffffe, 0x0fffff) AM_READ(gtmr_wheel_r)                                                      // Wheel Value
 
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM                                                                     // Work RAM
-	AM_RANGE(0x200000, 0x20ffff) AM_DEVREADWRITE( "toybox", kaneko_toybox_device, toybox_mcu_ram_r, toybox_mcu_ram_w )                                          // Shared With MCU
+	AM_RANGE(0x200000, 0x20ffff) AM_RAM AM_SHARE("mcuram")                                          // Shared With MCU
 
-	AM_RANGE(0x2a0000, 0x2a0001) AM_DEVWRITE( "toybox", kaneko_toybox_device, toybox_mcu_com0_w)                                                // To MCU ?
-	AM_RANGE(0x2b0000, 0x2b0001) AM_DEVWRITE( "toybox", kaneko_toybox_device, toybox_mcu_com1_w)
-	AM_RANGE(0x2c0000, 0x2c0001) AM_DEVWRITE( "toybox", kaneko_toybox_device, toybox_mcu_com2_w)
-	AM_RANGE(0x2d0000, 0x2d0001) AM_DEVWRITE( "toybox", kaneko_toybox_device, toybox_mcu_com3_w)
+	AM_RANGE(0x2a0000, 0x2a0001) AM_DEVWRITE( "toybox", kaneko_toybox_device, mcu_com0_w)                                                // To MCU ?
+	AM_RANGE(0x2b0000, 0x2b0001) AM_DEVWRITE( "toybox", kaneko_toybox_device, mcu_com1_w)
+	AM_RANGE(0x2c0000, 0x2c0001) AM_DEVWRITE( "toybox", kaneko_toybox_device, mcu_com2_w)
+	AM_RANGE(0x2d0000, 0x2d0001) AM_DEVWRITE( "toybox", kaneko_toybox_device, mcu_com3_w)
 
 	AM_RANGE(0x300000, 0x30ffff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")    // Palette
 	AM_RANGE(0x310000, 0x327fff) AM_RAM                                                                     //
@@ -577,7 +577,7 @@ static ADDRESS_MAP_START( gtmr_map, AS_PROGRAM, 16, kaneko16_gtmr_state )
 	AM_RANGE(0xb80000, 0xb80001) AM_WRITE(kaneko16_coin_lockout_w)                                          // Coin Lockout
 	AM_RANGE(0xc00000, 0xc00001) AM_WRITE(kaneko16_display_enable)                                          // might do more than that
 
-	AM_RANGE(0xd00000, 0xd00001) AM_DEVREAD( "toybox", kaneko_toybox_device, toybox_mcu_status_r)
+	AM_RANGE(0xd00000, 0xd00001) AM_DEVREAD( "toybox", kaneko_toybox_device, mcu_status_r)
 
 	AM_RANGE(0xe00000, 0xe00001) AM_WRITE(gtmr_oki_0_bank_w)                                        // Samples Bankswitching
 	AM_RANGE(0xe80000, 0xe80001) AM_WRITE(gtmr_oki_1_bank_w)
@@ -614,12 +614,12 @@ static ADDRESS_MAP_START( gtmr2_map, AS_PROGRAM, 16, kaneko16_gtmr_state )
 	AM_RANGE(0x0ffffe, 0x0fffff) AM_READ(gtmr2_wheel_r) // Wheel Value
 
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM // Work RAM
-	AM_RANGE(0x200000, 0x20ffff) AM_DEVREADWRITE( "toybox", kaneko_toybox_device, toybox_mcu_ram_r, toybox_mcu_ram_w ) // Shared With MCU
+	AM_RANGE(0x200000, 0x20ffff) AM_RAM AM_SHARE("mcuram") // Shared With MCU
 
-	AM_RANGE(0x2a0000, 0x2a0001) AM_DEVWRITE( "toybox", kaneko_toybox_device, toybox_mcu_com0_w)    // To MCU ?
-	AM_RANGE(0x2b0000, 0x2b0001) AM_DEVWRITE( "toybox", kaneko_toybox_device, toybox_mcu_com1_w)
-	AM_RANGE(0x2c0000, 0x2c0001) AM_DEVWRITE( "toybox", kaneko_toybox_device, toybox_mcu_com2_w)
-	AM_RANGE(0x2d0000, 0x2d0001) AM_DEVWRITE( "toybox", kaneko_toybox_device, toybox_mcu_com3_w)
+	AM_RANGE(0x2a0000, 0x2a0001) AM_DEVWRITE( "toybox", kaneko_toybox_device, mcu_com0_w)    // To MCU ?
+	AM_RANGE(0x2b0000, 0x2b0001) AM_DEVWRITE( "toybox", kaneko_toybox_device, mcu_com1_w)
+	AM_RANGE(0x2c0000, 0x2c0001) AM_DEVWRITE( "toybox", kaneko_toybox_device, mcu_com2_w)
+	AM_RANGE(0x2d0000, 0x2d0001) AM_DEVWRITE( "toybox", kaneko_toybox_device, mcu_com3_w)
 
 	AM_RANGE(0x300000, 0x30ffff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")    // Palette
 	AM_RANGE(0x310000, 0x327fff) AM_RAM //
@@ -645,7 +645,7 @@ static ADDRESS_MAP_START( gtmr2_map, AS_PROGRAM, 16, kaneko16_gtmr_state )
 	AM_RANGE(0xb80000, 0xb80001) AM_WRITE(kaneko16_coin_lockout_w)  // Coin Lockout
 	AM_RANGE(0xc00000, 0xc00001) AM_WRITE(kaneko16_display_enable)  // might do more than that
 
-	AM_RANGE(0xd00000, 0xd00001) AM_DEVREAD( "toybox", kaneko_toybox_device, toybox_mcu_status_r)
+	AM_RANGE(0xd00000, 0xd00001) AM_DEVREAD( "toybox", kaneko_toybox_device, mcu_status_r)
 
 	AM_RANGE(0xe00000, 0xe00001) AM_WRITE(gtmr_oki_0_bank_w)    // Samples Bankswitching
 	AM_RANGE(0xe80000, 0xe80001) AM_WRITE(gtmr_oki_1_bank_w)
@@ -1907,8 +1907,6 @@ static MACHINE_CONFIG_START( gtmr, kaneko16_gtmr_state )
 	MCFG_KANEKO16_SPRITE_GFXDECODE("gfxdecode")
 
 	MCFG_DEVICE_ADD("toybox", KANEKO_TOYBOX, 0)
-	kaneko_toybox_device::set_toybox_table(*device, TABLE_NORMAL);
-	kaneko_toybox_device::set_toybox_gametype(*device, GAME_NORMAL);
 	/* part of the toybox? */
 	MCFG_DEVICE_ADD("kan_hit", KANEKO_HIT, 0)
 	kaneko_hit_device::set_type(*device, 1);
@@ -1928,7 +1926,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( gtmre, gtmr )
 	MCFG_DEVICE_MODIFY("toybox")
-	kaneko_toybox_device::set_toybox_table(*device, TABLE_ALT);
+	MCFG_TOYBOX_TABLE_TYPE(TABLE_ALT)
 MACHINE_CONFIG_END
 
 /***************************************************************************
@@ -1980,7 +1978,7 @@ static MACHINE_CONFIG_DERIVED( bonkadv, gtmr )
 
 
 	MCFG_DEVICE_MODIFY("toybox")
-	kaneko_toybox_device::set_toybox_gametype(*device, GAME_BONK);
+	MCFG_TOYBOX_GAME_TYPE(GAME_BONK)
 	MCFG_DEVICE_MODIFY("kan_hit")
 	kaneko_hit_device::set_type(*device, 0);
 

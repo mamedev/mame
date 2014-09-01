@@ -52,85 +52,63 @@ mcu_subcmd  = kaneko16_mcu_ram[0x0014/2];    // sub-command parameter, happens o
 const device_type KANEKO_TOYBOX = &device_creator<kaneko_toybox_device>;
 
 kaneko_toybox_device::kaneko_toybox_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, KANEKO_TOYBOX, "Kaneko Toybox MCU", tag, owner, clock, "kaneko_toybox", __FILE__)
+	: device_t(mconfig, KANEKO_TOYBOX, "Kaneko Toybox MCU", tag, owner, clock, "kaneko_toybox", __FILE__),
+		m_mcuram(*this, ":mcuram"),
+		m_gametype(GAME_NORMAL),
+		m_tabletype(TABLE_NORMAL)
 {
-	m_tabletype = TABLE_NORMAL;
-	m_gametype = GAME_NORMAL;
+	m_mcu_com[0] = m_mcu_com[1] = m_mcu_com[2] = m_mcu_com[3] = 0;
 }
 
-void kaneko_toybox_device::set_toybox_table(device_t &device, int tabletype)
+void kaneko_toybox_device::set_table(device_t &device, int tabletype)
 {
 	kaneko_toybox_device &dev = downcast<kaneko_toybox_device &>(device);
 	dev.m_tabletype = tabletype;
 }
 
-void kaneko_toybox_device::set_toybox_gametype(device_t &device, int gametype)
+void kaneko_toybox_device::set_game_type(device_t &device, int gametype)
 {
 	kaneko_toybox_device &dev = downcast<kaneko_toybox_device &>(device);
 	dev.m_gametype = gametype;
 }
 
-
 void kaneko_toybox_device::device_start()
 {
-	m_toybox_mcuram = (UINT16*)auto_alloc_array_clear(this->machine(), UINT16, 0x10000/2);
-	memset(m_toybox_mcu_com, 0, 4 * sizeof( UINT16) );
-	toxboy_decrypt_rom(this->machine());
+	memset(m_mcu_com, 0, 4 * sizeof( UINT16) );
+	decrypt_rom();
 
-
-	save_pointer(NAME(m_toybox_mcuram), 0x10000/2);
-	save_item(NAME(m_toybox_mcu_com[0]));
-	save_item(NAME(m_toybox_mcu_com[1]));
-	save_item(NAME(m_toybox_mcu_com[2]));
-	save_item(NAME(m_toybox_mcu_com[3]));
-
+	save_item(NAME(m_mcu_com));
 }
 
 void kaneko_toybox_device::device_reset()
 {
-	toybox_mcu_init(this->machine());
+	mcu_init();
 }
 
 
-READ16_MEMBER(kaneko_toybox_device::toybox_mcu_ram_r)
-{
-	return m_toybox_mcuram[offset];
-}
-
-
-WRITE16_MEMBER(kaneko_toybox_device::toybox_mcu_ram_w)
-{
-	COMBINE_DATA(&m_toybox_mcuram[offset]);
-}
-
-
-
-#define MCU_RESPONSE(d) memcpy(&m_toybox_mcuram[mcu_offset], d, sizeof(d))
-
+#define MCU_RESPONSE(d) memcpy(&m_mcuram[mcu_offset], d, sizeof(d))
 
 
 // I use a byteswapped MCU data rom to make the transfers to the 68k side easier
 //  not sure if it's all 100% endian safe
-void kaneko_toybox_device::toxboy_decrypt_rom(running_machine& machine)
+void kaneko_toybox_device::decrypt_rom()
 {
-	UINT8 *src = (UINT8 *)machine.root_device().memregion(":mcudata" )->base();
+	UINT8 *src = (UINT8 *)machine().root_device().memregion(":mcudata")->base();
 
 	int i;
 
 	for (i=0;i<0x020000;i++)
 	{
-		if (m_tabletype == TABLE_NORMAL) src[i] = src[i] + toybox_mcu_decryption_table[(i^1)&0xff];
-		else src[i] = src[i] + toybox_mcu_decryption_table_alt[(i^1)&0xff];
+		if (m_tabletype == TABLE_NORMAL) src[i] = src[i] + decryption_table[(i^1)&0xff];
+		else src[i] = src[i] + decryption_table_alt[(i^1)&0xff];
 	}
-
-
 }
 
 
 
-void kaneko_toybox_device::toxboy_handle_04_subcommand(running_machine& machine,UINT8 mcu_subcmd, UINT16*mcu_ram)
+void kaneko_toybox_device::handle_04_subcommand(UINT8 mcu_subcmd, UINT16 *mcu_ram)
 {
-	UINT8 *src = (UINT8 *)machine.root_device().memregion(":mcudata")->base()+0x10000;
+	UINT8 *src = (UINT8 *)machine().root_device().memregion(":mcudata")->base()+0x10000;
 	UINT8* dst = (UINT8 *)mcu_ram;
 
 	int offs = (mcu_subcmd&0x3f)*8;
@@ -151,32 +129,32 @@ void kaneko_toybox_device::toxboy_handle_04_subcommand(running_machine& machine,
 }
 
 
-void kaneko_toybox_device::toybox_mcu_init(running_machine &machine)
+void kaneko_toybox_device::mcu_init()
 {
-	memset(m_toybox_mcu_com, 0, 4 * sizeof( UINT16) );
+	memset(m_mcu_com, 0, 4 * sizeof( UINT16) );
 }
 
-void kaneko_toybox_device::toybox_mcu_com_w(offs_t offset, UINT16 data, UINT16 mem_mask, int _n_)
+void kaneko_toybox_device::mcu_com_w(offs_t offset, UINT16 data, UINT16 mem_mask, int _n_)
 {
-	COMBINE_DATA(&m_toybox_mcu_com[_n_]);
-	if (m_toybox_mcu_com[0] != 0xFFFF)  return;
-	if (m_toybox_mcu_com[1] != 0xFFFF)  return;
-	if (m_toybox_mcu_com[2] != 0xFFFF)  return;
-	if (m_toybox_mcu_com[3] != 0xFFFF)  return;
+	COMBINE_DATA(&m_mcu_com[_n_]);
+	if (m_mcu_com[0] != 0xFFFF)  return;
+	if (m_mcu_com[1] != 0xFFFF)  return;
+	if (m_mcu_com[2] != 0xFFFF)  return;
+	if (m_mcu_com[3] != 0xFFFF)  return;
 
-	memset(m_toybox_mcu_com, 0, 4 * sizeof( UINT16 ) );
-	toybox_mcu_run(machine());
+	memset(m_mcu_com, 0, 4 * sizeof( UINT16 ) );
+	mcu_run();
 }
 
-WRITE16_MEMBER(kaneko_toybox_device::toybox_mcu_com0_w){ toybox_mcu_com_w(offset, data, mem_mask, 0); }
-WRITE16_MEMBER(kaneko_toybox_device::toybox_mcu_com1_w){ toybox_mcu_com_w(offset, data, mem_mask, 1); }
-WRITE16_MEMBER(kaneko_toybox_device::toybox_mcu_com2_w){ toybox_mcu_com_w(offset, data, mem_mask, 2); }
-WRITE16_MEMBER(kaneko_toybox_device::toybox_mcu_com3_w){ toybox_mcu_com_w(offset, data, mem_mask, 3); }
+WRITE16_MEMBER(kaneko_toybox_device::mcu_com0_w){ mcu_com_w(offset, data, mem_mask, 0); }
+WRITE16_MEMBER(kaneko_toybox_device::mcu_com1_w){ mcu_com_w(offset, data, mem_mask, 1); }
+WRITE16_MEMBER(kaneko_toybox_device::mcu_com2_w){ mcu_com_w(offset, data, mem_mask, 2); }
+WRITE16_MEMBER(kaneko_toybox_device::mcu_com3_w){ mcu_com_w(offset, data, mem_mask, 3); }
 
 /*
     bonkadv and bloodwar test bit 0
 */
-READ16_MEMBER(kaneko_toybox_device::toybox_mcu_status_r)
+READ16_MEMBER(kaneko_toybox_device::mcu_status_r)
 {
 	logerror("CPU %s (PC=%06X) : read MCU status\n", space.device().tag(), space.device().safe_pcbase());
 	return 0; // most games test bit 0 for failure
@@ -184,12 +162,11 @@ READ16_MEMBER(kaneko_toybox_device::toybox_mcu_status_r)
 
 
 
-void kaneko_toybox_device::toybox_mcu_run(running_machine &machine)
+void kaneko_toybox_device::mcu_run()
 {
-	UINT16 *kaneko16_mcu_ram = m_toybox_mcuram;
-	UINT16 mcu_command  =   kaneko16_mcu_ram[0x0010/2];
-	UINT16 mcu_offset   =   kaneko16_mcu_ram[0x0012/2] / 2;
-	UINT16 mcu_data     =   kaneko16_mcu_ram[0x0014/2];
+	UINT16 mcu_command  =   m_mcuram[0x0010/2];
+	UINT16 mcu_offset   =   m_mcuram[0x0012/2] / 2;
+	UINT16 mcu_data     =   m_mcuram[0x0014/2];
 
 	//printf("command %04x\n",mcu_command);
 
@@ -197,30 +174,30 @@ void kaneko_toybox_device::toybox_mcu_run(running_machine &machine)
 	{
 		case 0x02:  // Read from NVRAM
 		{
-			UINT8* nvdat = (UINT8*)&kaneko16_mcu_ram[mcu_offset];
+			UINT8* nvdat = (UINT8*)&m_mcuram[mcu_offset];
 
-			address_space &eeprom_space = machine.device<eeprom_serial_93cxx_device>(":eeprom")->space();
+			address_space &eeprom_space = machine().device<eeprom_serial_93cxx_device>(":eeprom")->space();
 
 			for (int i=0;i<0x80;i++)
 			{
 				nvdat[i] = eeprom_space.read_byte(i);
 			}
 
-			logerror("%s : MCU executed command: %04X %04X (load NVRAM settings)\n", machine.describe_context(), mcu_command, mcu_offset*2);
+			logerror("%s : MCU executed command: %04X %04X (load NVRAM settings)\n", machine().describe_context(), mcu_command, mcu_offset*2);
 
 		}
 		break;
 
 		case 0x42:  // Write to NVRAM
 		{
-			address_space &eeprom_space = machine.device<eeprom_serial_93cxx_device>(":eeprom")->space();
-			UINT8* nvdat = (UINT8*)&kaneko16_mcu_ram[mcu_offset];
+			address_space &eeprom_space = machine().device<eeprom_serial_93cxx_device>(":eeprom")->space();
+			UINT8* nvdat = (UINT8*)&m_mcuram[mcu_offset];
 			for (int i=0;i<0x80;i++)
 			{
 				eeprom_space.write_byte(i, nvdat[i]);
 			}
 
-			logerror("%s : MCU executed command: %04X %04X (save NVRAM settings)\n", machine.describe_context(), mcu_command, mcu_offset*2);
+			logerror("%s : MCU executed command: %04X %04X (save NVRAM settings)\n", machine().describe_context(), mcu_command, mcu_offset*2);
 		}
 		break;
 
@@ -232,27 +209,27 @@ void kaneko_toybox_device::toybox_mcu_run(running_machine &machine)
 				//memcpy(m_nvram_save, bonkadv_mcu_43, sizeof(bonkadv_mcu_43));
 
 
-				address_space &eeprom_space = machine.device<eeprom_serial_93cxx_device>(":eeprom")->space();
+				address_space &eeprom_space = machine().device<eeprom_serial_93cxx_device>(":eeprom")->space();
 				UINT8* nvdat = (UINT8*)&bonkadv_mcu_43[0];
 				for (int i=0;i<0x80;i++)
 				{
 					eeprom_space.write_byte(i, nvdat[i]);
 				}
-				logerror("%s : MCU executed command: %04X %04X (restore default NVRAM settings)\n", machine.describe_context(), mcu_command, mcu_offset*2);
+				logerror("%s : MCU executed command: %04X %04X (restore default NVRAM settings)\n", machine().describe_context(), mcu_command, mcu_offset*2);
 			}
 		}
 		break;
 
 		case 0x03:  // DSW
 		{
-			kaneko16_mcu_ram[mcu_offset] = machine.root_device().ioport(":DSW1")->read();
-			logerror("%s : MCU executed command: %04X %04X (read DSW)\n", machine.describe_context(), mcu_command, mcu_offset*2);
+			m_mcuram[mcu_offset] = machine().root_device().ioport(":DSW1")->read();
+			logerror("%s : MCU executed command: %04X %04X (read DSW)\n", machine().describe_context(), mcu_command, mcu_offset*2);
 		}
 		break;
 
 		case 0x04:  // Protection
 		{
-			logerror("%s : MCU executed command: %04X %04X %04X\n", machine.describe_context(), mcu_command, mcu_offset*2, mcu_data);
+			logerror("%s : MCU executed command: %04X %04X %04X\n", machine().describe_context(), mcu_command, mcu_offset*2, mcu_data);
 
 			if (m_gametype == GAME_BONK)
 			{
@@ -268,21 +245,21 @@ void kaneko_toybox_device::toybox_mcu_run(running_machine &machine)
 
 					// dynamic, per-level (29), in level order
 					default:
-						toxboy_handle_04_subcommand(machine, mcu_data, kaneko16_mcu_ram);
+						handle_04_subcommand(mcu_data, m_mcuram);
 						break;
 
 				}
 			}
 			else
 			{
-				toxboy_handle_04_subcommand(machine, mcu_data, kaneko16_mcu_ram);
+				handle_04_subcommand(mcu_data, m_mcuram);
 			}
 
 		}
 		break;
 
 		default:
-			logerror("%s : MCU executed command: %04X %04X %04X (UNKNOWN COMMAND)\n", machine.describe_context(), mcu_command, mcu_offset*2, mcu_data);
+			logerror("%s : MCU executed command: %04X %04X %04X (UNKNOWN COMMAND)\n", machine().describe_context(), mcu_command, mcu_offset*2, mcu_data);
 		break;
 	}
 }
