@@ -1,30 +1,6 @@
 /* CALC 3 */
 
-#define CALC3_VERBOSE_OUTPUT 0
-
-
-struct calc3_t
-{
-	int mcu_status;
-	int mcu_command_offset;
-	UINT16 mcu_crc;
-	UINT8 decryption_key_byte;
-	UINT8 alternateswaps;
-	UINT8 shift;
-	UINT8 subtracttype;
-	UINT8 mode;
-	UINT8 blocksize_offset;
-	UINT16 dataend;
-	UINT16 database;
-	int data_header[2];
-	UINT32 writeaddress;
-	UINT32 writeaddress_current;
-	UINT16 dsw_addr;
-	UINT16 eeprom_addr;
-	UINT16 poll_addr;
-	UINT16 checksumaddress;
-};
-
+#define VERBOSE_OUTPUT 0
 
 
 
@@ -33,35 +9,55 @@ class kaneko_calc3_device : public device_t
 public:
 	kaneko_calc3_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	DECLARE_READ16_MEMBER(calc3_mcu_ram_r);
-	DECLARE_WRITE16_MEMBER(calc3_mcu_ram_w);
+	DECLARE_READ16_MEMBER(mcu_ram_r);
+	DECLARE_WRITE16_MEMBER(mcu_ram_w);
 
-	DECLARE_WRITE16_MEMBER(calc3_mcu_com0_w);
-	DECLARE_WRITE16_MEMBER(calc3_mcu_com1_w);
-	DECLARE_WRITE16_MEMBER(calc3_mcu_com2_w);
-	DECLARE_WRITE16_MEMBER(calc3_mcu_com3_w);
+	DECLARE_WRITE16_MEMBER(mcu_com0_w);
+	DECLARE_WRITE16_MEMBER(mcu_com1_w);
+	DECLARE_WRITE16_MEMBER(mcu_com2_w);
+	DECLARE_WRITE16_MEMBER(mcu_com3_w);
 
 	void reset_run_timer();
 
-	void calc3_mcu_run(running_machine &machine);
-
+	void mcu_run();
+	
 protected:
 	virtual void device_start();
 	virtual void device_reset();
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
 private:
-	UINT16* m_calc3_mcuram;
-	void calc3_mcu_init(running_machine &machine);
-	void initial_scan_tables(running_machine& machine);
-	TIMER_CALLBACK_MEMBER(run_callback);
-
-	calc3_t m_calc3;
-	void calc3_mcu_com_w(offs_t offset, UINT16 data, UINT16 mem_mask, int _n_);
-	UINT8 shift_bits(UINT8 dat, int bits);
-	int calc3_decompress_table(running_machine& machine, int tabnum, UINT8* dstram, int dstoffset);
-
+	int m_mcu_status;
+	int m_mcu_command_offset;
+	UINT16 m_mcu_crc;
+	UINT8 m_decryption_key_byte;
+	UINT8 m_alternateswaps;
+	UINT8 m_shift;
+	UINT8 m_subtracttype;
+	UINT8 m_mode;
+	UINT8 m_blocksize_offset;
+	UINT16 m_dataend;
+	UINT16 m_database;
+	int m_data_header[2];
+	UINT32 m_writeaddress;
+	UINT32 m_writeaddress_current;
+	UINT16 m_dsw_addr;
+	UINT16 m_eeprom_addr;
+	UINT16 m_poll_addr;
+	UINT16 m_checksumaddress;
+	UINT16* m_mcuram;
 	emu_timer* m_runtimer;
-
+	
+	enum
+	{
+		MCU_RUN_TIMER
+	};
+	
+	void mcu_init();
+	void initial_scan_tables();
+	void mcu_com_w(offs_t offset, UINT16 data, UINT16 mem_mask, int _n_);
+	UINT8 shift_bits(UINT8 dat, int bits);
+	int decompress_table(int tabnum, UINT8* dstram, int dstoffset);
 };
 
 

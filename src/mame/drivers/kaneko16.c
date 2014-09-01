@@ -717,12 +717,12 @@ WRITE16_MEMBER(kaneko16_shogwarr_state::brapboys_oki_bank_w)
 static ADDRESS_MAP_START( shogwarr, AS_PROGRAM, 16, kaneko16_shogwarr_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM     // ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM AM_SHARE("mainram")     // Work RAM
-	AM_RANGE(0x200000, 0x20ffff) AM_DEVREADWRITE("calc3_prot", kaneko_calc3_device, calc3_mcu_ram_r, calc3_mcu_ram_w) // Shared With MCU
-	AM_RANGE(0x280000, 0x280001) AM_DEVWRITE("calc3_prot", kaneko_calc3_device, calc3_mcu_com0_w)
-	AM_RANGE(0x290000, 0x290001) AM_DEVWRITE("calc3_prot", kaneko_calc3_device, calc3_mcu_com1_w)
-	AM_RANGE(0x2b0000, 0x2b0001) AM_DEVWRITE("calc3_prot", kaneko_calc3_device, calc3_mcu_com2_w)
+	AM_RANGE(0x200000, 0x20ffff) AM_DEVREADWRITE("calc3_prot", kaneko_calc3_device, mcu_ram_r,mcu_ram_w) // Shared With MCU
+	AM_RANGE(0x280000, 0x280001) AM_DEVWRITE("calc3_prot", kaneko_calc3_device, mcu_com0_w)
+	AM_RANGE(0x290000, 0x290001) AM_DEVWRITE("calc3_prot", kaneko_calc3_device, mcu_com1_w)
+	AM_RANGE(0x2b0000, 0x2b0001) AM_DEVWRITE("calc3_prot", kaneko_calc3_device, mcu_com2_w)
 	//AM_RANGE(0x2c0000, 0x2c0001) // run calc 3? or irq ack?
-	AM_RANGE(0x2d0000, 0x2d0001) AM_DEVWRITE("calc3_prot", kaneko_calc3_device, calc3_mcu_com3_w)
+	AM_RANGE(0x2d0000, 0x2d0001) AM_DEVWRITE("calc3_prot", kaneko_calc3_device, mcu_com3_w)
 	AM_RANGE(0x380000, 0x380fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")    // Palette
 	AM_RANGE(0x400000, 0x400001) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0x00ff) // Samples
 	AM_RANGE(0x480000, 0x480001) AM_DEVREADWRITE8("oki2", okim6295_device, read, write, 0x00ff)
