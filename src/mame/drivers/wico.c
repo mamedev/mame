@@ -20,11 +20,18 @@
         d d
 
 
+    Press 9 to enter service/selftest. Press 1 to step through the tests.
+    When you reach the audit stages, press 6 to advance and 5 to clear.
+    In the switch test, it will report any closed dip as a failure. You can
+    ignore these.
+    The game has 2 balls, for multiball feature, so the outhole doesn't
+    work because it thinks the 2nd ball is in play somewhere.
+
+
 ToDo:
-- Outhole doesn't work
-- Add mechanical sounds
-- Fix failures in test mode
-- Find and add Clear and Advance buttons (behind front door)
+- Add outhole/saucer sound
+
+
 
 
 ***************************************************************************/
@@ -49,6 +56,8 @@ public:
 	DECLARE_READ8_MEMBER(switch_r);
 	DECLARE_WRITE8_MEMBER(muxen_w);
 	DECLARE_WRITE8_MEMBER(muxld_w);
+	DECLARE_WRITE8_MEMBER(csols_w);
+	DECLARE_WRITE8_MEMBER(msols_w);
 	DECLARE_WRITE8_MEMBER(dled0_w);
 	DECLARE_WRITE8_MEMBER(dled1_w);
 	DECLARE_WRITE8_MEMBER(zcres_w);
@@ -62,6 +71,7 @@ private:
 	bool m_disp_on;
 	bool m_diag_on;
 	UINT8 m_firqtimer;
+	UINT8 m_diag_segments;
 	virtual void machine_reset();
 	required_device<cpu_device> m_ccpu;
 	required_device<cpu_device> m_hcpu;
@@ -75,7 +85,7 @@ static ADDRESS_MAP_START( hcpu_map, AS_PROGRAM, 8, wico_state )
 	//AM_RANGE(0x1fe1, 0x1fe1) AM_WRITE(store_w)
 	AM_RANGE(0x1fe2, 0x1fe2) AM_WRITE(muxen_w)
 	//AM_RANGE(0x1fe3, 0x1fe3) AM_WRITE(csols_w)
-	AM_RANGE(0x1fe4, 0x1fe4) AM_READNOP //AM_WRITE(msols_w)
+	AM_RANGE(0x1fe4, 0x1fe4) AM_NOP
 	AM_RANGE(0x1fe5, 0x1fe5) AM_DEVWRITE("sn76494", sn76494_device, write)
 	AM_RANGE(0x1fe6, 0x1fe6) AM_WRITE(wdogcl_w)
 	AM_RANGE(0x1fe7, 0x1fe7) AM_WRITE(zcres_w)
@@ -93,22 +103,22 @@ ADDRESS_MAP_END
 // command cpu
 static ADDRESS_MAP_START( ccpu_map, AS_PROGRAM, 8, wico_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("sharedram") // 2128  2k RAM
-	AM_RANGE(0x1fe0, 0x1fe0) AM_WRITE(muxld_w) // to display module
+	//AM_RANGE(0x1fe0, 0x1fe0) AM_WRITE(muxld_w) // to display module
 	//AM_RANGE(0x1fe1, 0x1fe1) AM_WRITE(store_w) // enable save to nvram
 	AM_RANGE(0x1fe2, 0x1fe2) AM_WRITE(muxen_w) // digit to display on diagnostic LED; d0=L will disable main displays
-	//AM_RANGE(0x1fe3, 0x1fe3) AM_WRITE(csols_w) // solenoid column
-	//AM_RANGE(0x1fe4, 0x1fe4) AM_READNOP AM_WRITE(msols_w) // solenoid row
+	AM_RANGE(0x1fe3, 0x1fe3) AM_WRITE(csols_w) // solenoid column
+	AM_RANGE(0x1fe4, 0x1fe4) AM_WRITE(msols_w) // solenoid row
 	AM_RANGE(0x1fe5, 0x1fe5) AM_DEVWRITE("sn76494", sn76494_device, write)
 	AM_RANGE(0x1fe6, 0x1fe6) AM_WRITE(wdogcl_w) // watchdog clear
 	AM_RANGE(0x1fe7, 0x1fe7) AM_WRITE(zcres_w) // enable IRQ on hcpu
 	AM_RANGE(0x1fe8, 0x1fe8) AM_WRITE(dled0_w) // turn off diagnostic LED
 	AM_RANGE(0x1fe9, 0x1fe9) AM_WRITE(dled1_w) // turn on diagnostic LED
 	AM_RANGE(0x1fea, 0x1fea) AM_READ(gentmrcl_r) // enable IRQ on ccpu
-	AM_RANGE(0x1feb, 0x1feb) AM_READ(lampst_r) // lamps?
+	//AM_RANGE(0x1feb, 0x1feb) AM_READ(lampst_r) // lamps?
 	//AM_RANGE(0x1fec, 0x1fec) AM_READ(sast_r) // a pwron pulse to d0 L->H
 	//AM_RANGE(0x1fed, 0x1fed) AM_READ(solst1_r) // switches
 	//AM_RANGE(0x1fee, 0x1fee) AM_READ(solst0_r) // switches
-	AM_RANGE(0x1fef, 0x1fef) AM_READ(switch_r) // switches
+	//AM_RANGE(0x1fef, 0x1fef) AM_READ(switch_r) // switches
 	AM_RANGE(0x4000, 0x40ff) AM_RAM AM_SHARE("nvram") // X2212 4bit x 256 NVRAM, stores only when store_w is active
 	AM_RANGE(0x8000, 0x9fff) AM_ROM
 	AM_RANGE(0xe000, 0xffff) AM_ROM
@@ -116,8 +126,8 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( wico )
 	PORT_START("X0")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_COIN1)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_COIN2)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_COIN1) // Clear button
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_COIN2) // Advance button
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_START1)
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Top Lane 4") PORT_CODE(KEYCODE_Q)
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Top Lane 3") PORT_CODE(KEYCODE_W)
@@ -143,7 +153,6 @@ static INPUT_PORTS_START( wico )
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("R Rollunder") PORT_CODE(KEYCODE_N)
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("R Spinner") PORT_CODE(KEYCODE_M)
 	PORT_START("X5")
-	PORT_START("X6")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("L SLingshot") PORT_CODE(KEYCODE_COMMA)
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("R Slingshot") PORT_CODE(KEYCODE_STOP)
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("R Drop Bank E") PORT_CODE(KEYCODE_A)
@@ -152,15 +161,16 @@ static INPUT_PORTS_START( wico )
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("L Drop Bank C") PORT_CODE(KEYCODE_F)
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("L Drop Bank S") PORT_CODE(KEYCODE_G)
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("L Drop Bank E") PORT_CODE(KEYCODE_H)
+	PORT_START("X6")
 	PORT_START("X7")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("R Target Zone E")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("R Target Zone D")
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("R Target Zone I")
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("R Target Zone")
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("L Target Zone T")
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("L Target Zone S")
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("L Target Zone A")
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("L Target Zone F")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("R Target Zone E") PORT_CODE(KEYCODE_0_PAD)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("R Target Zone D") PORT_CODE(KEYCODE_1_PAD)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("R Target Zone I") PORT_CODE(KEYCODE_2_PAD)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("R Target Zone R") PORT_CODE(KEYCODE_3_PAD)
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("L Target Zone T") PORT_CODE(KEYCODE_4_PAD)
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("L Target Zone S") PORT_CODE(KEYCODE_5_PAD)
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("L Target Zone A") PORT_CODE(KEYCODE_6_PAD)
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("L Target Zone F") PORT_CODE(KEYCODE_7_PAD)
 	PORT_START("X8")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("R Outlane Target") PORT_CODE(KEYCODE_MINUS)
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("L Outlane Target") PORT_CODE(KEYCODE_EQUALS)
@@ -172,12 +182,12 @@ static INPUT_PORTS_START( wico )
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("L Rollover L Outlane") PORT_CODE(KEYCODE_SLASH)
 	PORT_START("X9")
 	PORT_START("XA")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Door Slam")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_TILT1) PORT_NAME("Door Slam")
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_TILT) PORT_NAME("Playfield Tilt")
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Pendulum Tilt")
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("R Flipper Lane Change")
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Ball Feed Middle")
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Ball Feed Lower")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_TILT) PORT_NAME("Pendulum Tilt")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("R Flipper Lane Change") PORT_CODE(KEYCODE_RSHIFT)
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Ball Feed Middle") PORT_CODE(KEYCODE_8_PAD)
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Ball Feed Lower") PORT_CODE(KEYCODE_9_PAD)
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("10 points") PORT_CODE(KEYCODE_COLON)
 	PORT_START("XB")
 	PORT_START("XC")
@@ -283,41 +293,44 @@ static INPUT_PORTS_START( wico )
 	PORT_DIPNAME( 0x40, 0x00, "Disable Match display" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, "Self Test" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+	// This is a dip and a pushbutton in parallel.
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_NAME("Self Test")
 INPUT_PORTS_END
-
-void wico_state::machine_reset()
-{
-	m_hcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-	m_zcen = 0;
-	m_gten = 0;
-	m_firqtimer = 0;
-	m_disp_on = 0;
-	m_diag_on = 0;
-}
 
 // diagnostic display off
 WRITE8_MEMBER( wico_state::dled0_w )
 {
 	m_diag_on = 0;
+	output_set_digit_value(9, 0);
 }
 
 // diagnostic display on
 WRITE8_MEMBER( wico_state::dled1_w )
 {
 	m_diag_on = 1;
+	output_set_digit_value(9, m_diag_segments);
+}
+
+WRITE8_MEMBER( wico_state::csols_w )
+{
+}
+
+WRITE8_MEMBER( wico_state::msols_w )
+{
 }
 
 // write to diagnostic display
 WRITE8_MEMBER( wico_state::muxen_w )
 {
 	static const UINT8 patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x6f, 0x77, 0x7c, 0x39, 0x5e, 0x79, 0x71 }; // MC14495
-	UINT8 segments = 0;
+
+	m_diag_segments = patterns[data>>4];
+
 	if (m_diag_on)
-		segments = patterns[data>>4];
-	output_set_digit_value(9, segments);
+		output_set_digit_value(9, m_diag_segments);
+	else
+		output_set_digit_value(9, 0);
+
 	m_disp_on = BIT(data, 0);
 }
 
@@ -343,8 +356,18 @@ READ8_MEMBER( wico_state::gentmrcl_r )
 READ8_MEMBER( wico_state::switch_r )
 {
 	char kbdrow[8];
-	sprintf(kbdrow,"X%X",m_shared_ram[0x95]);
-	return ioport(kbdrow)->read();
+	offset = m_shared_ram[0x95];
+	sprintf(kbdrow,"X%X",offset);
+	UINT8 data = ioport(kbdrow)->read();
+
+	// Reflex solenoids - operated directly by the switches without needing the cpu
+	if ((offset==2) && (data & 15))
+		m_samples->start(0, 0); // bumpers
+	else
+	if ((offset==5) && (data & 3))
+		m_samples->start(1, 7); // slings
+
+	return data;
 }
 
 // write digits in main display
@@ -387,6 +410,16 @@ TIMER_DEVICE_CALLBACK_MEMBER( wico_state::firq_housekeeping )
 		m_ccpu->set_input_line(M6809_IRQ_LINE, HOLD_LINE);
 		m_firqtimer = 0;
 	}
+}
+
+void wico_state::machine_reset()
+{
+	m_hcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	m_zcen = 0;
+	m_gten = 0;
+	m_firqtimer = 0;
+	m_disp_on = 0;
+	m_diag_on = 0;
 }
 
 

@@ -15,6 +15,23 @@
     There is a bug - if you score 1000 and had less than 100, the hundreds digit will
     be blank. It will of course fix itself during the course of the game.
 
+    Setting up - if you do not set up the game, each player will get 255 balls.
+    Turn test switch to Setup. Press 1 to advance to next set. Press 5 to adjust the
+    set. Use the manual for a description of each set. After setting up set 16, do not
+    press 1, instead turn the dipswitch to Play. Exit (to save nvram), and restart.
+    Now the game is ready. Very quick guide to a reasonable setup:
+    06 - 30000 (1st award score)
+    07 - 50000 (2nd award score)
+    08 - 70000 (3rd award score)
+    09 - 90000 (high score)
+    11 - 1 (1 coin 1 credit)
+    13 - 3 (3 balls)
+    15 - 1 (award is a free game)
+    16 - 1 (match enabled)
+
+ToDo:
+- Get good dump of u4 rom.
+
 
 *******************************************************************************************/
 
@@ -72,9 +89,9 @@ static INPUT_PORTS_START( spectra )
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("R Bumper") PORT_CODE(KEYCODE_Y)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("C Bumper") PORT_CODE(KEYCODE_U)
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("L Bumper") PORT_CODE(KEYCODE_I)
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("R Triangle") PORT_CODE(KEYCODE_O)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("R Sling") PORT_CODE(KEYCODE_O)
 	PORT_START("X1")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("L Triangle") PORT_CODE(KEYCODE_A)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("L Sling") PORT_CODE(KEYCODE_A)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("R Outlane") PORT_CODE(KEYCODE_S)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("R Rollover") PORT_CODE(KEYCODE_D)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("L Rollover") PORT_CODE(KEYCODE_F)
@@ -112,14 +129,13 @@ void spectra_state::machine_reset()
 READ8_MEMBER( spectra_state::porta_r )
 {
 	char kbdrow[6];
-	UINT8 key=0, old=0, ret=0;
+	UINT8 key=0, ret=0;
 	sprintf(kbdrow,"X%X",(m_porta & 0x18) >> 3);
 	key = ioport(kbdrow)->read();
 	ret = ((BIT(key, m_porta & 7)) ? 0x40 : 0) | (m_porta & 0xbf);
 
-	if (ret == 0x1b && old != ret && m_p_ram[0x7b] < 0x1E)
-		m_samples->start(2, 4); // coin
-	old = ret;
+	if (ret == 0x1b && m_p_ram[0x7b] < 0x1E)
+		m_samples->start(3, 8); // coin
 
 	return ret;
 }
@@ -193,6 +209,12 @@ TIMER_DEVICE_CALLBACK_MEMBER( spectra_state::outtimer)
 			m_samples->start(1, 0); // bumpers
 	}
 	else
+	if (m_out_offs < 0x79)
+	{
+		if (m_p_ram[m_out_offs])
+			m_samples->start(2, 7); // slings
+	}
+	else
 		m_out_offs = 0xff;
 }
 
@@ -226,7 +248,7 @@ static const sn76477_interface sn76477_intf =
 
 static MACHINE_CONFIG_START( spectra, spectra_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, 3579545/4)  // actually a 6503
+	MCFG_CPU_ADD("maincpu", M6502, 3579545/4)  // actually a M6503
 	MCFG_CPU_PROGRAM_MAP(spectra_map)
 
 	MCFG_DEVICE_ADD("riot", RIOT6532, 3579545/4)
@@ -249,7 +271,7 @@ static MACHINE_CONFIG_START( spectra, spectra_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("snsnd", SN76477, 0)
 	MCFG_SOUND_CONFIG(sn76477_intf)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 
 /*--------------------------------
@@ -263,4 +285,4 @@ ROM_START(spectra)
 ROM_END
 
 
-GAME(1979,  spectra,  0,  spectra,  spectra, driver_device, 0,  ROT0,  "Valley", "Spectra IV", GAME_MECHANICAL)
+GAME(1979,  spectra,  0,  spectra,  spectra, driver_device, 0,  ROT0,  "Valley", "Spectra IV", GAME_MECHANICAL )
