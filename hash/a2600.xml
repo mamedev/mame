@@ -214,6 +214,8 @@ Info from Atariage and Atarimania
 		<info name="programmers" value="Jerry Lawson, Dan Mcelroy" />
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a2600_cart">
+			<feature name="mapper" value="F8" />
+			<feature name="slot" value="a26_f8" />
 			<dataarea name="rom" size="8192">
 				<rom name="3-d genesis (1983) (amiga, jerry lawson, dan mcelroy) (prototype).bin" size="8192" crc="931a0bdc" sha1="0e146e5eb1a68cba4f8fa55ec6f125438efcfcb4" offset="0" />
 			</dataarea>
@@ -227,6 +229,8 @@ Info from Atariage and Atarimania
 		<info name="programmer" value="michael k. glass, jerry lawson" />
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a2600_cart">
+			<feature name="mapper" value="F6" />
+			<feature name="slot" value="a26_f6" />
 			<dataarea name="rom" size="16384">
 				<rom name="3-d ghost attack (1983) (amiga, michael k. glass, jerry lawson) (prototype).bin" size="16384" crc="11396d94" sha1="29e431c27ddb8649ec3f15966011505822907139" offset="0" />
 			</dataarea>
@@ -2047,6 +2051,8 @@ Info from Atariage and Atarimania
 		<publisher>Video Soft</publisher>
 		<sharedfeat name="compatibility" value="NTSC" />
 		<part name="cart" interface="a2600_cart">
+			<feature name="mapper" value="F8" />
+			<feature name="slot" value="a26_f8" />
 			<dataarea name="rom" size="8192">
 				<rom name="atom smasher (1984) (video soft) (prototype) ~.bin" size="8192" crc="1712423a" sha1="ff2a4cec8005a1b04c20671f9d06aefebbb0fda1" offset="0" />
 			</dataarea>
@@ -3223,6 +3229,8 @@ Info from Atariage and Atarimania
 		<year>1982</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a2600_cart">
+			<feature name="mapper" value="F8" />
+			<feature name="slot" value="a26_f8" />
 			<dataarea name="rom" size="8192">
 				<rom name="centipede (1982) (atari - gcc) (cx2676) (prototype) (pal).bin" size="8192" crc="aae78b7f" sha1="c5ff64d7593f0d0103d6bb50a150e8a87d222ef3" offset="0" />
 			</dataarea>
@@ -3824,6 +3832,8 @@ Info from Atariage and Atarimania
 		<year>1983</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="a2600_cart">
+			<feature name="mapper" value="F8" />
+			<feature name="slot" value="a26_f8" />
 			<dataarea name="rom" size="8192">
 				<rom name="congo bongo (1983) (sega, steve beck, phat ho - beck-tech - teldec) (006-01 - 3.60105 vg) (pal).bin" size="8192" crc="015c0e40" sha1="5fec580e99c99380889c058ef49318e4518e6f7f" offset="0" />
 			</dataarea>
@@ -5505,6 +5515,8 @@ Info from Atariage and Atarimania
 		<year>19??</year>
 		<publisher>CCE</publisher>
 		<part name="cart" interface="a2600_cart">
+			<feature name="mapper" value="F8" />
+			<feature name="slot" value="a26_f8" />
 			<dataarea name="rom" size="8192">
 				<rom name="e.t. - the extra-terrestrial (cce).bin" size="8192" crc="508767ff" sha1="6d17f13a289dcc936a919a1dbd7d415e843c30eb" offset="0" />
 			</dataarea>
@@ -9322,6 +9334,8 @@ Info from Atariage and Atarimania
 		<publisher>Darrell Spice Jr.</publisher>
 		<sharedfeat name="compatibility" value="NTSC" />
 		<part name="cart" interface="a2600_cart">
+			<feature name="mapper" value="F4" />
+			<feature name="slot" value="a26_f4" />
 			<dataarea name="rom" size="32768">
 				<rom name="mm20071129ntsc.bin" size="32768" crc="98d3aeb9" sha1="3cfffe08164cbebac1bc99599aaffd0bea6299a6" offset="0" />
 			</dataarea>
@@ -9334,6 +9348,8 @@ Info from Atariage and Atarimania
 		<publisher>Darrell Spice Jr.</publisher>
 		<sharedfeat name="compatibility" value="PAL" />
 		<part name="cart" interface="a2600_cart">
+			<feature name="mapper" value="F4" />
+			<feature name="slot" value="a26_f4" />
 			<dataarea name="rom" size="32768">
 				<rom name="mm20071129pal.bin" size="32768" crc="9cbc1023" sha1="d86ccdb2a21b2ca3d65509e9eb6c299083396589" offset="0" />
 			</dataarea>
@@ -10054,6 +10070,8 @@ Info from Atariage and Atarimania
 		<publisher>Atari</publisher>
 		<sharedfeat name="compatibility" value="PAL" />
 		<part name="cart" interface="a2600_cart">
+			<feature name="mapper" value="F6" />
+			<feature name="slot" value="a26_f6" />
 			<dataarea name="rom" size="16384">
 				<rom name="motorodeo (motor olympics, motor rodeo) (1990) (atari - axlon, steve defrisco) (cx26171) (pal).bin" size="16384" crc="9260f839" sha1="ece97bda734faffcf847a8bcdfa474789c377d8d" offset="0" />
 			</dataarea>
