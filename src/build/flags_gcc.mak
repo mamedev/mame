@@ -13,6 +13,7 @@ endif
 
 ifeq ($(findstring 4.9.,$(TEST_GCC)),4.9.)
 	CCOMFLAGS += -Wno-narrowing -Wno-attributes -Wno-unused-local-typedefs
+	CCOMFLAGS += -Wno-array-bounds -Wno-strict-overflow
 endif
 
 ifeq ($(findstring arm,$(UNAME)),arm)
