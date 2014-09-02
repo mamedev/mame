@@ -1803,7 +1803,7 @@ Info from Atariage and Atarimania
 		<info name="serial" value="2658" />
 		<part name="cart" interface="a2600_cart">
 			<feature name="mapper" value="F8" />
-			<feature name="slot" value="a26_f8" />
+			<feature name="slot" value="a26_f8sw" />
 			<dataarea name="rom" size="8192">
 				<rom name="berenstain bears.bin" size="8192" crc="29d28baf" sha1="c3afd7909b72b49ca7d4485465b622d5e55f8913" offset="0" />
 			</dataarea>
@@ -3807,7 +3807,7 @@ Info from Atariage and Atarimania
 		<publisher>Sega</publisher>
 		<part name="cart" interface="a2600_cart">
 			<feature name="mapper" value="F8" />
-			<feature name="slot" value="a26_f8" />
+			<feature name="slot" value="a26_f8sw" />
 			<dataarea name="rom" size="8192">
 				<rom name="congo bongo (1983) (sega, steve beck, phat ho - beck-tech) (006-01).bin" size="8192" crc="3f6e7e0c" sha1="3a77db43b6583e8689435f0f14aa04b9e57bdded" offset="0" />
 			</dataarea>
@@ -9472,7 +9472,7 @@ Info from Atariage and Atarimania
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a2600_cart">
 			<feature name="mapper" value="F8" />
-			<feature name="slot" value="a26_f8" />
+			<feature name="slot" value="a26_f8sw" />
 			<dataarea name="rom" size="8192">
 				<rom name="mind maze (mind race) (mindlink controller) (10-10-1984) (atari, peter c. niday, howard scott warshaw) (prototype).bin" size="8192" crc="7cc6c991" sha1="3844b79dbec5ffc99eaa2c9f5fa4f0a26c08c06d" offset="0" />
 			</dataarea>
@@ -9956,7 +9956,7 @@ Info from Atariage and Atarimania
 		<publisher>Imagic</publisher>
 		<part name="cart" interface="a2600_cart">
 			<feature name="mapper" value="F8" />
-			<feature name="slot" value="a26_f8" />
+			<feature name="slot" value="a26_f8sw" />
 			<dataarea name="rom" size="8192">
 				<rom name="moonsweeper (1983) (imagic, bob smith) (720114-1a, 03207, iz-001-04).bin" size="8192" crc="450b5c57" sha1="05ab04dc30eae31b98ebf6f43fec6793a53e0a23" offset="0" />
 			</dataarea>
@@ -9969,7 +9969,7 @@ Info from Atariage and Atarimania
 		<publisher>Activision</publisher>
 		<part name="cart" interface="a2600_cart">
 			<feature name="mapper" value="F8" />
-			<feature name="slot" value="a26_f8" />
+			<feature name="slot" value="a26_f8sw" />
 			<dataarea name="rom" size="8192">
 				<rom name="moonsweeper (1988) (activision) (aiz-001).bin" size="8192" crc="bb513282" sha1="2bb48d52aa43b10cdd29a1ceb2bd0c83aefbf96a" offset="0" />
 			</dataarea>
@@ -12691,7 +12691,7 @@ Info from Atariage and Atarimania
 		<publisher>CCE</publisher>
 		<part name="cart" interface="a2600_cart">
 			<feature name="mapper" value="F8" />
-			<feature name="slot" value="a26_f8" />
+			<feature name="slot" value="a26_f8sw" />
 			<dataarea name="rom" size="8192">
 				<rom name="resgate espacial (aka moonsweeper) (cce).bin" size="8192" crc="0c139bb8" sha1="c29a06c2950c79ede34905de5dea27b12ef1f8bf" offset="0" />
 			</dataarea>
@@ -13988,7 +13988,7 @@ Info from Atariage and Atarimania
 		<publisher>Imagic</publisher>
 		<part name="cart" interface="a2600_cart">
 			<feature name="mapper" value="F8" />
-			<feature name="slot" value="a26_f8" />
+			<feature name="slot" value="a26_f8sw" />
 			<dataarea name="rom" size="8192">
 				<rom name="sky patrol (aerial ace) (1982) (imagic, brad stewart) (720106-1a, ia3409) (prototype).bin" size="8192" crc="a1ecdf0e" sha1="fc5f1e30db3b2469c9701dadfa95f3268fd1e4cb" offset="0" />
 			</dataarea>
