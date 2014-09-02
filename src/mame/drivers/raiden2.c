@@ -553,7 +553,7 @@ UINT8 raiden2_state::cop_calculate_collsion_detection()
 TODO:
 2a05: first boss 
 2208/2288: first enemies when they crash on the ground (collision direction?)
-39b0: purple laser when it's fired up (variation of 3bb0?)
+39b0: purple laser when it's fired up (variation of 3bb0?) - 0205: if you comment out the line that also makes zeroteam crash, triggering purple laser doesn't crash anymore, but laser isn't visible
 */
 WRITE16_MEMBER(raiden2_state::cop_cmd_w)
 {
