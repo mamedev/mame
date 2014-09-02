@@ -22,7 +22,8 @@ enum
 	A78_BANKRAM,		// SuperGame + 32K RAM banked (untested)
 	A78_XB_BOARD,		// A7800 Expansion Board (it shall more or less apply to the Expansion Module too, but this is not officially released yet)
 	A78_XM_BOARD,		// A7800 XM Expansion Module (theoretical specs only, since this is not officially released yet)
-	A78_TYPEB			// Cart exploiting the XB board, but possibly also compatible with non-expanded A7800
+	A78_TYPEB,			// Cart exploiting the XB board, but possibly also compatible with non-expanded A7800
+	A78_NOCART
 };
 
 

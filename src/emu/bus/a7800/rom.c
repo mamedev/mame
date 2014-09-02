@@ -179,7 +179,7 @@ MACHINE_CONFIG_END
 
  Carts with no bankswitch (8K to 48K)
 
- GAMES:
+ GAMES: Asteroids, Centipede, Dig Dug and many more
 
  -------------------------------------------------*/
 
@@ -197,7 +197,7 @@ READ8_MEMBER(a78_rom_device::read_40xx)
  The Pokey chips is accessed at 0x0450-0x045f or
  by writing at 0x4000-0x7fff in some games.
  
- GAMES:
+ GAMES: Ballblazer, Beef Drop (homebrew)
  
  -------------------------------------------------*/
 
@@ -240,7 +240,7 @@ machine_config_constructor a78_rom_pokey_device::device_mconfig_additions() cons
  Note that the code is written so that also
  homebrew games with larger ROMs work!
  
- GAMES:
+ GAMES: Crack'd, Fatal Run, Ikari Warriors...
  
  -------------------------------------------------*/
 
@@ -266,7 +266,7 @@ WRITE8_MEMBER(a78_rom_sg_device::write_40xx)
  Carts with SuperGame bankswitch + POKEY chip
  As above, the Pokey chips is accessed at
  
- GAMES:
+ GAMES: Commando
  
  -------------------------------------------------*/
 
@@ -305,7 +305,7 @@ machine_config_constructor a78_rom_sg_pokey_device::device_mconfig_additions() c
  for the moment we treat all as 16K of RAM even if
  from softlist we shall differentiate between them.
  
- GAMES:
+ GAMES: Impossible Mission, Jinks and some protos
  
  -------------------------------------------------*/
 
@@ -366,7 +366,7 @@ WRITE8_MEMBER(a78_rom_bankram_device::write_40xx)
  9 x 16K banks mappable in 0x8000-0xbfff
  bank 7 is always mapped in 0xc000-0xffff
  
- GAMES:
+ GAMES: Alien Brigade & Crossbow
  
  -------------------------------------------------*/
 

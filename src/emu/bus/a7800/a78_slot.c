@@ -118,6 +118,7 @@ a78_cart_slot_device::a78_cart_slot_device(const machine_config &mconfig, const 
 						device_image_interface(mconfig, *this),
 						device_slot_interface(mconfig, *this)
 {
+	m_type = A78_NOCART;
 }
 
 
@@ -182,6 +183,7 @@ static const a78_slot slot_list[] =
 	{ A78_BANKRAM,  "a78_bankram" },
 	{ A78_XB_BOARD, "a78_xboard" },
 	{ A78_XM_BOARD, "a78_xm" },
+	{ A78_NOCART,   "empty" },
 };
 
 static int a78_get_pcb_id(const char *slot)
@@ -335,8 +337,8 @@ bool a78_cart_slot_device::call_softlist_load(software_list_device &swlist, cons
 }
 
 /*-------------------------------------------------
- identify_cart_type - code to detect cart type from
- fullpath
+ verify_header - check the image (from fullpath)
+ has an admissible header
  -------------------------------------------------*/
 
 int a78_cart_slot_device::verify_header(char *header)
