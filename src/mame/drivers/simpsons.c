@@ -507,6 +507,35 @@ ROM_START( simpsons2p2 ) /* World 2 Player, alt */
 	ROM_LOAD( "simpsons2p2.12c.nv", 0x0000, 0x080, CRC(fbac4e30) SHA1(d3ff3a392550d9b06400b9292a44bdac7ba5c801) )
 ROM_END
 
+ROM_START( simpsons2p3 ) // no rom labels
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* code + banked roms */
+	ROM_LOAD( "072-g02.16c", 0x00000, 0x20000, CRC(580ce1d6) SHA1(5b07fb8e8041e1663980aa35d853fdc13b22dac5) )
+	ROM_LOAD( "072-p01.17c", 0x20000, 0x20000, CRC(07ceeaea) SHA1(c18255ae1d578c2d53de80d6323cdf41cbe47b57) )
+	ROM_LOAD( "4.13c", 0x40000, 0x20000, CRC(c3040e4f) SHA1(f6b5cbee5d7c6642a11d115bb6d93a7f2821cd8f) ) /* Unknown revision/region code */
+	ROM_LOAD( "3.15c", 0x60000, 0x20000, CRC(eb4f5781) SHA1(58a556e9b4b9e4bd0e76ac86ab8e062c3f1e2d31) ) /* Unknown revision/region code */
+
+	ROM_REGION( 0x28000, "audiocpu", 0 ) /* Z80 code + banks */
+	ROM_LOAD( "072-g03.6g", 0x00000, 0x08000, CRC(76c1850c) SHA1(9047c6b26c4e33c74eb7400a807d3d9f206f7bbe) )
+	ROM_CONTINUE(       0x10000, 0x18000 )
+
+	ROM_REGION( 0x100000, "k052109", 0 )
+	ROM_LOAD32_WORD( "072-b07.18h", 0x000000, 0x080000, CRC(ba1ec910) SHA1(0805ccb641271dea43185dc0365732260db1763d) )
+	ROM_LOAD32_WORD( "072-b06.16h", 0x000002, 0x080000, CRC(cf2bbcab) SHA1(47afea47f9bc8cb5eb1c7b7fbafe954b3e749aeb) )
+
+	ROM_REGION( 0x400000, "gfx2", 0 ) /* graphics */
+	ROM_LOAD64_WORD( "072-b08.3n",  0x000000, 0x100000, CRC(7de500ad) SHA1(61b76b8f402e3bde1509679aaaa28ef08cafb0ab) ) /* sprites */
+	ROM_LOAD64_WORD( "072-b09.8n",  0x000002, 0x100000, CRC(aa085093) SHA1(925239d79bf607021d371263352618876f59c1f8) )
+	ROM_LOAD64_WORD( "072-b10.12n", 0x000004, 0x100000, CRC(577dbd53) SHA1(e603e03e3dcba766074561faa92afafa5761953d) )
+	ROM_LOAD64_WORD( "072-b11.16l", 0x000006, 0x100000, CRC(55fab05d) SHA1(54db8559d71ed257de9a29c8808654eaea0df9e2) )
+
+	ROM_REGION( 0x140000, "k053260", 0 ) /* samples for the 053260 */
+	ROM_LOAD( "072-d05.1f", 0x000000, 0x100000, CRC(1397a73b) SHA1(369422c84cca5472967af54b8351e29fcd69f621) )
+	ROM_LOAD( "072-d04.1d", 0x100000, 0x040000, CRC(78778013) SHA1(edbd6d83b0d1a20df39bb160b92395586fa3c32d) )
+
+	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting upside down with error
+	ROM_LOAD( "simpsons2p.12c.nv", 0x0000, 0x080, CRC(fbac4e30) SHA1(d3ff3a392550d9b06400b9292a44bdac7ba5c801) )
+ROM_END
+
 ROM_START( simpsons2pa ) /* Asia 2 Player */
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* code + banked roms */
 	ROM_LOAD( "072-g02.16c", 0x00000, 0x20000, CRC(580ce1d6) SHA1(5b07fb8e8041e1663980aa35d853fdc13b22dac5) ) /* Same as both world 2p sets */
@@ -565,6 +594,8 @@ ROM_START( simpsons2pj ) /* Japan 2 Player */
 	ROM_LOAD( "simpsons2pj.12c.nv", 0x0000, 0x080, CRC(3550a54e) SHA1(370cd40a12c471b3b6690ecbdde9c7979bc2a652) )
 ROM_END
 
+
+
 /***************************************************************************
 
   Game driver(s)
@@ -576,5 +607,6 @@ GAME( 1991, simpsons,    0,        simpsons, simpsons, driver_device, 0, ROT0, "
 GAME( 1991, simpsons4pa, simpsons, simpsons, simpsons, driver_device, 0, ROT0, "Konami", "The Simpsons (4 Players World, set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1991, simpsons2p,  simpsons, simpsons, simpsn2p, driver_device, 0, ROT0, "Konami", "The Simpsons (2 Players World, set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1991, simpsons2p2, simpsons, simpsons, simpsons, driver_device, 0, ROT0, "Konami", "The Simpsons (2 Players World, set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1991, simpsons2p3, simpsons, simpsons, simpsn2p, driver_device, 0, ROT0, "Konami", "The Simpsons (2 Players World, set 3)", GAME_SUPPORTS_SAVE )
 GAME( 1991, simpsons2pa, simpsons, simpsons, simpsn2p, driver_device, 0, ROT0, "Konami", "The Simpsons (2 Players Asia)", GAME_SUPPORTS_SAVE )
 GAME( 1991, simpsons2pj, simpsons, simpsons, simpsn2p, driver_device, 0, ROT0, "Konami", "The Simpsons (2 Players Japan)", GAME_SUPPORTS_SAVE )
