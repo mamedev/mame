@@ -1,8 +1,8 @@
 //============================================================
 //
-//  draw13.c - SDL 1.3 drawing implementation
+//  draw13.c - SDL 2.0 drawing implementation
 //
-//  Copyright (c) 1996-2010, Nicola Salmoria and the MAME Team.
+//  Copyright (c) 1996-2014, Nicola Salmoria and the MAME Team.
 //  Visit http://mamedev.org for licensing and usage restrictions.
 //
 //  SDLMAME by Olivier Galibert and R. Belmont
@@ -145,17 +145,17 @@ struct sdl_info
 
 // core functions
 
-static void draw13_exit(void);
-static void draw13_attach(sdl_draw_info *info, sdl_window_info *window);
-static int draw13_window_create(sdl_window_info *window, int width, int height);
-static void draw13_window_resize(sdl_window_info *window, int width, int height);
-static void draw13_window_destroy(sdl_window_info *window);
-static int draw13_window_draw(sdl_window_info *window, UINT32 dc, int update);
-static render_primitive_list &draw13_window_get_primitives(sdl_window_info *window);
-static void draw13_destroy_all_textures(sdl_window_info *window);
-static void draw13_window_clear(sdl_window_info *window);
-static int draw13_xy_to_render_target(sdl_window_info *window, int x, int y, int *xt, int *yt);
-static void draw13_destroy_texture(sdl_info *sdl, texture_info *texture);
+static void drawsdl2_exit(void);
+static void drawsdl2_attach(sdl_draw_info *info, sdl_window_info *window);
+static int drawsdl2_window_create(sdl_window_info *window, int width, int height);
+static void drawsdl2_window_resize(sdl_window_info *window, int width, int height);
+static void drawsdl2_window_destroy(sdl_window_info *window);
+static int drawsdl2_window_draw(sdl_window_info *window, UINT32 dc, int update);
+static render_primitive_list &drawsdl2_window_get_primitives(sdl_window_info *window);
+static void drawsdl2_destroy_all_textures(sdl_window_info *window);
+static void drawsdl2_window_clear(sdl_window_info *window);
+static int drawsdl2_xy_to_render_target(sdl_window_info *window, int x, int y, int *xt, int *yt);
+static void drawsdl2_destroy_texture(sdl_info *sdl, texture_info *texture);
 
 //============================================================
 //  Textures
@@ -206,7 +206,7 @@ static copy_info blit_info_default[] =
 	ENTRY(YUY16,            YUY2,       2, 0, yuv16_yuy2),
 	ENTRY(YUY16,            YVYU,       2, 0, yuv16_yvyu),
 	ENTRY(YUY16,            ARGB8888,   4, 0, yuv16_argb32),
-	ENTRY(YUY16,            RGB888,     4, 0, yuv16pal_argb32),
+	ENTRY(YUY16,            RGB888,     4, 0, yuv16_argb32),
 
 	ENTRY(YUY16_PALETTED,   UYVY,       2, 0, yuv16pal_uyvy),
 	ENTRY(YUY16_PALETTED,   YUY2,       2, 0, yuv16pal_yuy2),
@@ -261,25 +261,6 @@ static copy_info blit_info_default[] =
 
 	ENTRY(PALETTE16A,       ARGB8888,   4, 1, rot_pal16a_argb32),
 	ENTRY(PALETTE16A,       RGB888,     4, 1, rot_pal16a_rgb32),
-
-{ -1 },
-};
-
-static copy_info blit_info_16bpp[] =
-{
-	/* no rotation */
-	ENTRY(PALETTE16,        RGB555,     2, 0, pal16_argb1555),
-	ENTRY(PALETTE16,        ARGB1555,   2, 0, pal16_argb1555),
-
-	ENTRY(RGB15_PALETTED,   RGB555,     2, 0, rgb15pal_argb1555),
-	ENTRY(RGB15_PALETTED,   ARGB1555,   2, 0, rgb15pal_argb1555),
-
-	/* rotation */
-	ENTRY(PALETTE16,        RGB555,     2, 1, rot_pal16_argb1555),
-	ENTRY(PALETTE16,        ARGB1555,   2, 1, rot_pal16_argb1555),
-
-	ENTRY(RGB15_PALETTED,   RGB555,     2, 1, rot_rgb15pal_argb1555),
-	ENTRY(RGB15_PALETTED,   ARGB1555,   2, 1, rot_rgb15pal_argb1555),
 
 { -1 },
 };
@@ -455,7 +436,7 @@ static int RendererSupportsFormat(SDL_Renderer *renderer, Uint32 format, Uint32 
 #endif
 
 //============================================================
-//  draw13_init
+//  drawsdl2_init
 //============================================================
 
 static void add_list(copy_info **head, copy_info *element, Uint32 bm)
@@ -486,23 +467,19 @@ static void expand_copy_info(copy_info *list)
 	}
 }
 
-int draw13_init(running_machine &machine, sdl_draw_info *callbacks)
+int drawsdl2_init(running_machine &machine, sdl_draw_info *callbacks)
 {
 	const char *stemp;
 
 	// fill in the callbacks
-	callbacks->exit = draw13_exit;
-	callbacks->attach = draw13_attach;
+	callbacks->exit = drawsdl2_exit;
+	callbacks->attach = drawsdl2_attach;
 
 	osd_printf_verbose("Using SDL native texturing driver (SDL 2.0+)\n");
 
 	expand_copy_info(blit_info_default);
-	//FIXME: -opengl16 should be -opengl -prefer16bpp
-	//if (video_config.prefer16bpp_tex)
-	expand_copy_info(blit_info_16bpp);
 
 	// Load the GL library now - else MT will fail
-
 	stemp = downcast<sdl_options &>(machine.options()).gl_lib();
 	if (stemp != NULL && strcmp(stemp, SDLOPTVAL_AUTO) == 0)
 		stemp = NULL;
@@ -518,10 +495,10 @@ int draw13_init(running_machine &machine, sdl_draw_info *callbacks)
 
 
 //============================================================
-//  draw13_exit
+//  drawsdl2_exit
 //============================================================
 
-static void draw13_exit(void)
+static void drawsdl2_exit(void)
 {
 	int i;
 	copy_info *bi, *freeme;
@@ -539,32 +516,32 @@ static void draw13_exit(void)
 }
 
 //============================================================
-//  draw13_attach
+//  drawsdl2_attach
 //============================================================
 
-static void draw13_attach(sdl_draw_info *info, sdl_window_info *window)
+static void drawsdl2_attach(sdl_draw_info *info, sdl_window_info *window)
 {
 	// fill in the callbacks
-	window->create = draw13_window_create;
-	window->resize = draw13_window_resize;
-	window->get_primitives = draw13_window_get_primitives;
-	window->draw = draw13_window_draw;
-	window->destroy = draw13_window_destroy;
-	window->destroy_all_textures = draw13_destroy_all_textures;
-	window->clear = draw13_window_clear;
-	window->xy_to_render_target = draw13_xy_to_render_target;
+	window->create = drawsdl2_window_create;
+	window->resize = drawsdl2_window_resize;
+	window->get_primitives = drawsdl2_window_get_primitives;
+	window->draw = drawsdl2_window_draw;
+	window->destroy = drawsdl2_window_destroy;
+	window->destroy_all_textures = drawsdl2_destroy_all_textures;
+	window->clear = drawsdl2_window_clear;
+	window->xy_to_render_target = drawsdl2_xy_to_render_target;
 }
 
 //============================================================
-//  draw13_window_create
+//  drawsdl2_window_create
 //============================================================
 
-static int draw13_window_create(sdl_window_info *window, int width, int height)
+static int drawsdl2_window_create(sdl_window_info *window, int width, int height)
 {
 	// allocate memory for our structures
 	sdl_info *sdl = (sdl_info *) osd_malloc(sizeof(*sdl));
 
-	osd_printf_verbose("Enter draw13_window_create\n");
+	osd_printf_verbose("Enter drawsdl2_window_create\n");
 
 	memset(sdl, 0, sizeof(*sdl));
 
@@ -638,15 +615,15 @@ static int draw13_window_create(sdl_window_info *window, int width, int height)
 	sdl->texture_max_height = 64;
 
 	SDL_RenderPresent(sdl->sdl_renderer);
-	osd_printf_verbose("Leave draw13_window_create\n");
+	osd_printf_verbose("Leave drawsdl2_window_create\n");
 	return 0;
 }
 
 //============================================================
-//  draw13_window_resize
+//  drawsdl2_window_resize
 //============================================================
 
-static void draw13_window_resize(sdl_window_info *window, int width, int height)
+static void drawsdl2_window_resize(sdl_window_info *window, int width, int height)
 {
 	sdl_info *sdl = (sdl_info *) window->dxdata;
 
@@ -665,7 +642,7 @@ static void draw13_window_resize(sdl_window_info *window, int width, int height)
 //  drawsdl_xy_to_render_target
 //============================================================
 
-static int draw13_xy_to_render_target(sdl_window_info *window, int x, int y, int *xt, int *yt)
+static int drawsdl2_xy_to_render_target(sdl_window_info *window, int x, int y, int *xt, int *yt)
 {
 	sdl_info *sdl = (sdl_info *) window->dxdata;
 
@@ -679,10 +656,10 @@ static int draw13_xy_to_render_target(sdl_window_info *window, int x, int y, int
 }
 
 //============================================================
-//  draw13_window_get_primitives
+//  drawsdl2_window_get_primitives
 //============================================================
 
-static render_primitive_list &draw13_window_get_primitives(sdl_window_info *window)
+static render_primitive_list &drawsdl2_window_get_primitives(sdl_window_info *window)
 {
 	if ((!window->fullscreen) || (video_config.switchres))
 	{
@@ -697,10 +674,10 @@ static render_primitive_list &draw13_window_get_primitives(sdl_window_info *wind
 }
 
 //============================================================
-//  draw13_window_draw
+//  drawsdl2_window_draw
 //============================================================
 
-static int draw13_window_draw(sdl_window_info *window, UINT32 dc, int update)
+static int drawsdl2_window_draw(sdl_window_info *window, UINT32 dc, int update)
 {
 	sdl_info *sdl = (sdl_info *) window->dxdata;
 	render_primitive *prim;
@@ -809,10 +786,10 @@ static int draw13_window_draw(sdl_window_info *window, UINT32 dc, int update)
 
 
 //============================================================
-//  draw13_window_clear
+//  drawsdl2_window_clear
 //============================================================
 
-static void draw13_window_clear(sdl_window_info *window)
+static void drawsdl2_window_clear(sdl_window_info *window)
 {
 	sdl_info *sdl = (sdl_info *) window->dxdata;
 
@@ -821,10 +798,10 @@ static void draw13_window_clear(sdl_window_info *window)
 
 
 //============================================================
-//  draw13_window_destroy
+//  drawsdl2_window_destroy
 //============================================================
 
-static void draw13_window_destroy(sdl_window_info *window)
+static void drawsdl2_window_destroy(sdl_window_info *window)
 {
 	sdl_info *sdl = (sdl_info *) window->dxdata;
 
@@ -834,7 +811,7 @@ static void draw13_window_destroy(sdl_window_info *window)
 
 	// free the memory in the window
 
-	draw13_destroy_all_textures(window);
+	drawsdl2_destroy_all_textures(window);
 
 	SDL_DestroyWindow(window->sdl_window);
 
@@ -1107,7 +1084,7 @@ static texture_info *texture_find(sdl_info *sdl, const render_primitive *prim, q
 			texture_info *expire = texture;
 			texture = texture->next;
 			if (now - expire->last_access > osd_ticks_per_second())
-				draw13_destroy_texture(sdl, expire);
+				drawsdl2_destroy_texture(sdl, expire);
 		}
 
 	// nothing found
@@ -1147,7 +1124,7 @@ static texture_info * texture_update(sdl_window_info *window, const render_primi
 	return texture;
 }
 
-static void draw13_destroy_texture(sdl_info *sdl, texture_info *texture)
+static void drawsdl2_destroy_texture(sdl_info *sdl, texture_info *texture)
 {
 	texture_info *p;
 
@@ -1169,7 +1146,7 @@ static void draw13_destroy_texture(sdl_info *sdl, texture_info *texture)
 	osd_free(texture);
 }
 
-static void draw13_destroy_all_textures(sdl_window_info *window)
+static void drawsdl2_destroy_all_textures(sdl_window_info *window)
 {
 	sdl_info *sdl = (sdl_info *) window->dxdata;
 	texture_info *next_texture=NULL, *texture = NULL;
@@ -1189,7 +1166,7 @@ static void draw13_destroy_all_textures(sdl_window_info *window)
 	while (texture)
 	{
 		next_texture = texture->next;
-		draw13_destroy_texture(sdl, texture);
+		drawsdl2_destroy_texture(sdl, texture);
 		texture = next_texture;
 	}
 

@@ -2,7 +2,7 @@
 //
 //  window.c - SDL window handling
 //
-//  Copyright (c) 1996-2010, Nicola Salmoria and the MAME Team.
+//  Copyright (c) 1996-2014, Nicola Salmoria and the MAME Team.
 //  Visit http://mamedev.org for licensing and usage restrictions.
 //
 //  SDLMAME by Olivier Galibert and R. Belmont
@@ -239,9 +239,9 @@ bool sdl_osd_interface::window_init()
 	}
 #endif
 #if SDLMAME_SDL2
-	if (video_config.mode == VIDEO_MODE_SDL13)
+	if (video_config.mode == VIDEO_MODE_SDL2ACCEL)
 	{
-		if (draw13_init(machine(), &draw))
+		if (drawsdl2_init(machine(), &draw))
 			video_config.mode = VIDEO_MODE_SOFT;
 	}
 #endif
@@ -974,6 +974,7 @@ void sdlwindow_video_window_update(running_machine &machine, sdl_window_info *wi
 		{
 			window->minwidth = tempwidth;
 			window->minheight = tempheight;
+
 			if (!window->fullscreen)
 			{
 				sdlwindow_blit_surface_size(window, window->width, window->height);

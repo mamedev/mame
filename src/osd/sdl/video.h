@@ -2,7 +2,7 @@
 //
 //  video.h - SDL implementation of MAME video routines
 //
-//  Copyright (c) 1996-2006, Nicola Salmoria and the MAME Team.
+//  Copyright (c) 1996-2014, Nicola Salmoria and the MAME Team.
 //  Visit http://mamedev.org for licensing and usage restrictions.
 //
 //  SDLMAME by Olivier Galibert and R. Belmont
@@ -21,7 +21,7 @@
 enum {
 	VIDEO_MODE_SOFT = 0,
 	VIDEO_MODE_OPENGL,
-	VIDEO_MODE_SDL13
+	VIDEO_MODE_SDL2ACCEL
 };
 
 #define VIDEO_SCALE_MODE_NONE       (0)
@@ -109,7 +109,6 @@ struct sdl_video_config
 
 	// OpenGL options
 	int                 filter;         // enable filtering, disabled if glsl_filter>0
-	int                 prefer16bpp_tex;
 	int                 glsl;
 	int                 glsl_filter;        // glsl filtering, >0 disables filter
 	char *              glsl_shader_mamebm[GLSL_SHADER_MAX]; // custom glsl shader set, mame bitmap

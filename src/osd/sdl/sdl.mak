@@ -59,7 +59,7 @@ USE_DISPATCH_GL = 1
 # active development on sdlmame or SDL.
 
 # uncomment the next line to compile and link against SDL2.0
-# SDL_LIBVER = sdl2
+#SDL_LIBVER = sdl2
 
 # uncomment the next line to use couriersud's multi-keyboard patch for SDL 2.1? (this API was removed prior to the 2.0 release)
 # SDL2_MULTIAPI = 1
@@ -622,7 +622,11 @@ ifndef NO_USE_QTDEBUG
 MOC = @moc
 endif
 
-LIBS += -lSDL.dll
+ifeq ($(SDL_LIBVER),sdl2)
+LIBS += -lSDL2 -lImm32 -lversion -lole32 -loleaut32 -static
+else
+LIBS += -lSDL -static
+endif
 LIBS += -luser32 -lgdi32 -lddraw -ldsound -ldxguid -lwinmm -ladvapi32 -lcomctl32 -lshlwapi
 
 endif   # Win32
