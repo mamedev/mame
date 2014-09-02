@@ -1766,7 +1766,7 @@ WRITE8_MEMBER(a400_state::disable_cart)
 			m_cartslot->write_d5xx(space, offset, data);
 			break;			
 		case A800_OSSM091:
-			if (offset & 0x9 == 0x08)
+			if ((offset & 0x9) == 0x08)
 				setup_ram(2, m_ram->size());
 			else
 			{
