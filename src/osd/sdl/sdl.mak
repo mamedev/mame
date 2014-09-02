@@ -622,7 +622,7 @@ ifndef NO_USE_QTDEBUG
 MOC = @moc
 endif
 
-LIBS += -lSDL.dll
+LIBS += -lSDL -static
 LIBS += -luser32 -lgdi32 -lddraw -ldsound -ldxguid -lwinmm -ladvapi32 -lcomctl32 -lshlwapi
 
 endif   # Win32
