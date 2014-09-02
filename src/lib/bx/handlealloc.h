@@ -68,6 +68,7 @@ namespace bx
 
 		void free(uint16_t _handle)
 		{
+			BX_CHECK(0 < m_numHandles, "Freeing invalid handle %d.", _handle);
 			uint16_t* sparse = &m_handles[MaxHandlesT];
 			uint16_t index = sparse[_handle];
 			--m_numHandles;

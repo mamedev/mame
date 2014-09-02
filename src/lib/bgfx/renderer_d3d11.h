@@ -14,7 +14,15 @@
 #endif // !USE_D3D11_DYNAMIC_LIB
 
 #define D3D11_NO_HELPERS
-#include <d3d11.h>
+#if BX_COMPILER_MSVC
+#	pragma warning(push)
+//  winerror.h and dxgitypes.h both define DXGI_ERRORs.
+#	pragma warning(disable:4005) // warning C4005: '' : macro redefinition
+#	include <d3d11.h>
+#	pragma warning(pop)
+#else
+#	include <d3d11.h>
+#endif // BX_COMPILER_MSVC
 #include "renderer_d3d.h"
 
 #define D3DCOLOR_ARGB(_a, _r, _g, _b) ( (DWORD)( ( ( (_a)&0xff)<<24)|( ( (_r)&0xff)<<16)|( ( (_g)&0xff)<<8)|( (_b)&0xff) ) )
@@ -105,7 +113,7 @@ namespace bgfx
 		}
 
 		void create(uint32_t _size, void* _data, VertexDeclHandle _declHandle);
-		void update(uint32_t _offset, uint32_t _size, void* _data);
+		void update(uint32_t _offset, uint32_t _size, void* _data, bool _discard = false);
 
 		void destroy()
 		{
@@ -272,7 +280,7 @@ namespace bgfx
 		void create(uint8_t _num, const TextureHandle* _handles);
 		void destroy();
 		void resolve();
-		void clear(const Clear& _clear);
+		void clear(const Clear& _clear, const float _palette[][4]);
 
 		ID3D11RenderTargetView* m_rtv[BGFX_CONFIG_MAX_FRAME_BUFFER_ATTACHMENTS-1];
 		ID3D11ShaderResourceView* m_srv[BGFX_CONFIG_MAX_FRAME_BUFFER_ATTACHMENTS-1];

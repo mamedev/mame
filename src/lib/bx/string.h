@@ -311,6 +311,22 @@ namespace bx
 		return _filePath;
 	}
 
+	/// Convert size in bytes to human readable string.
+	inline void prettify(char* _out, size_t _count, uint64_t _size)
+	{
+		uint8_t idx = 0;
+		double size = double(_size);
+		while (_size != (_size&0x7ff)
+		&&     idx < 9)
+		{
+			_size >>= 10;
+			size *= 1.0/1024.0;
+			++idx;
+		}
+
+		snprintf(_out, _count, "%0.2f %c%c", size, "BkMGTPEZY"[idx], idx > 0 ? 'B' : '\0');
+	}
+
 	/*
 	 * Copyright (c) 1998 Todd C. Miller <Todd.Miller@courtesan.com>
 	 *

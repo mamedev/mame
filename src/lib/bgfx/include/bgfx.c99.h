@@ -112,6 +112,7 @@ typedef enum bgfx_texture_format
     BGFX_TEXTURE_FORMAT_RGBA4,
     BGFX_TEXTURE_FORMAT_RGB5A1,
     BGFX_TEXTURE_FORMAT_RGB10A2,
+    BGFX_TEXTURE_FORMAT_R11G11B10F,
 
     BGFX_TEXTURE_FORMAT_UNKNOWN_DEPTH,
 
@@ -1019,6 +1020,14 @@ BGFX_C_API bgfx_uniform_handle_t bgfx_create_uniform(const char* _name, bgfx_uni
 BGFX_C_API void bgfx_destroy_uniform(bgfx_uniform_handle_t _handle);
 
 /**
+ *  Set clear color palette value.
+ *
+ *  @param _index Index into palette.
+ *  @param _rgba RGBA floating point value.
+ */
+BGFX_C_API void bgfx_set_clear_color(uint8_t _index, const float _rgba[4]);
+
+/**
  *  Set view name.
  *
  *  @param _id View id.
@@ -1086,6 +1095,19 @@ BGFX_C_API void bgfx_set_view_scissor_mask(uint32_t _viewMask, uint16_t _x, uint
  *  @param _stencil Stencil clear value.
  */
 BGFX_C_API void bgfx_set_view_clear(uint8_t _id, uint8_t _flags, uint32_t _rgba, float _depth, uint8_t _stencil);
+
+/**
+ *  Set view clear flags with different clear color for each
+ *  frame buffer texture. Must use setClearColor to setup clear color
+ *  palette.
+
+ *  @param _id View id.
+ *  @param _flags Clear flags. Use BGFX_CLEAR_NONE to remove any clear
+ *  operation. See: BGFX_CLEAR_*.
+ *  @param _depth Depth clear value.
+ *  @param _stencil Stencil clear value.
+ */
+BGFX_C_API void bgfx_set_view_clear_mrt7(uint8_t _id, uint8_t _flags, float _depth, uint8_t _stencil, uint8_t _0, uint8_t _1, uint8_t _2, uint8_t _3, uint8_t _4, uint8_t _5, uint8_t _6, uint8_t _7);
 
 /**
  *  Set view clear flags for multiple views.

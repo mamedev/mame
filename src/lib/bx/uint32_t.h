@@ -321,13 +321,13 @@ namespace bx
 	/// Count number of bits set.
 	inline uint32_t uint32_cntbits(uint32_t _val)
 	{
-#if BX_COMPILER_GCC
+#if BX_COMPILER_GCC || BX_COMPILER_CLANG
 		return __builtin_popcount(_val);
 #elif BX_COMPILER_MSVC && BX_PLATFORM_WINDOWS
 		return __popcnt(_val);
 #else
 		return uint32_cntbits_ref(_val);
-#endif // BX_COMPILER_GCC
+#endif // BX_COMPILER_
 	}
 
 	inline uint32_t uint32_cntlz_ref(uint32_t _val)
@@ -351,7 +351,7 @@ namespace bx
 	/// Count number of leading zeros.
 	inline uint32_t uint32_cntlz(uint32_t _val)
 	{
-#if BX_COMPILER_GCC
+#if BX_COMPILER_GCC || BX_COMPILER_CLANG
 		return __builtin_clz(_val);
 #elif BX_COMPILER_MSVC && BX_PLATFORM_WINDOWS
 		unsigned long index;
@@ -374,7 +374,7 @@ namespace bx
 
 	inline uint32_t uint32_cnttz(uint32_t _val)
 	{
-#if BX_COMPILER_GCC
+#if BX_COMPILER_GCC || BX_COMPILER_CLANG
 		return __builtin_ctz(_val);
 #elif BX_COMPILER_MSVC && BX_PLATFORM_WINDOWS
 		unsigned long index;
@@ -624,7 +624,7 @@ namespace bx
 	/// Count number of leading zeros.
 	inline uint64_t uint64_cntlz(uint64_t _val)
 	{
-#if BX_COMPILER_GCC
+#if BX_COMPILER_GCC || BX_COMPILER_CLANG
 		return __builtin_clz(_val);
 #elif BX_COMPILER_MSVC && BX_PLATFORM_WINDOWS && BX_ARCH_64BIT
 		unsigned long index;
@@ -645,7 +645,7 @@ namespace bx
 
 	inline uint64_t uint64_cnttz(uint64_t _val)
 	{
-#if BX_COMPILER_GCC
+#if BX_COMPILER_GCC || BX_COMPILER_CLANG
 		return __builtin_ctz(_val);
 #elif BX_COMPILER_MSVC && BX_PLATFORM_WINDOWS && BX_ARCH_64BIT
 		unsigned long index;
