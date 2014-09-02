@@ -206,7 +206,7 @@ static copy_info blit_info_default[] =
 	ENTRY(YUY16,            YUY2,       2, 0, yuv16_yuy2),
 	ENTRY(YUY16,            YVYU,       2, 0, yuv16_yvyu),
 	ENTRY(YUY16,            ARGB8888,   4, 0, yuv16_argb32),
-	ENTRY(YUY16,            RGB888,     4, 0, yuv16pal_argb32),
+	ENTRY(YUY16,            RGB888,     4, 0, yuv16_argb32),
 
 	ENTRY(YUY16_PALETTED,   UYVY,       2, 0, yuv16pal_uyvy),
 	ENTRY(YUY16_PALETTED,   YUY2,       2, 0, yuv16pal_yuy2),
@@ -261,25 +261,6 @@ static copy_info blit_info_default[] =
 
 	ENTRY(PALETTE16A,       ARGB8888,   4, 1, rot_pal16a_argb32),
 	ENTRY(PALETTE16A,       RGB888,     4, 1, rot_pal16a_rgb32),
-
-{ -1 },
-};
-
-static copy_info blit_info_16bpp[] =
-{
-	/* no rotation */
-	ENTRY(PALETTE16,        RGB555,     2, 0, pal16_argb1555),
-	ENTRY(PALETTE16,        ARGB1555,   2, 0, pal16_argb1555),
-
-	ENTRY(RGB15_PALETTED,   RGB555,     2, 0, rgb15pal_argb1555),
-	ENTRY(RGB15_PALETTED,   ARGB1555,   2, 0, rgb15pal_argb1555),
-
-	/* rotation */
-	ENTRY(PALETTE16,        RGB555,     2, 1, rot_pal16_argb1555),
-	ENTRY(PALETTE16,        ARGB1555,   2, 1, rot_pal16_argb1555),
-
-	ENTRY(RGB15_PALETTED,   RGB555,     2, 1, rot_rgb15pal_argb1555),
-	ENTRY(RGB15_PALETTED,   ARGB1555,   2, 1, rot_rgb15pal_argb1555),
 
 { -1 },
 };
@@ -497,12 +478,8 @@ int drawsdl2_init(running_machine &machine, sdl_draw_info *callbacks)
 	osd_printf_verbose("Using SDL native texturing driver (SDL 2.0+)\n");
 
 	expand_copy_info(blit_info_default);
-	//FIXME: -opengl16 should be -opengl -prefer16bpp
-	//if (video_config.prefer16bpp_tex)
-	expand_copy_info(blit_info_16bpp);
 
 	// Load the GL library now - else MT will fail
-
 	stemp = downcast<sdl_options &>(machine.options()).gl_lib();
 	if (stemp != NULL && strcmp(stemp, SDLOPTVAL_AUTO) == 0)
 		stemp = NULL;
