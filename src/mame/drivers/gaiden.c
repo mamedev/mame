@@ -1159,7 +1159,8 @@ Dumped from an original Tecmo board. Board No. 6215-A. Serial A-59488.
 
 ROM_START( ryukendna )
 	ROM_REGION( 0x40000, "maincpu", 0 ) /* 2*128k for 68000 code */
-	ROM_LOAD16_BYTE( "1.3s",  0x00000, 0x20000, CRC(0ed5464c) SHA1(2eab6650ad1c38cd560ec3d084f47156756c97a4) )
+	ROM_LOAD16_BYTE( "1.3s",  0x00000, 0x20000, CRC(5532e302) SHA1(8ce48963ba737890d1a46c42a113d9419a3c174c) ) // found on 2 pcbs
+//	ROM_LOAD16_BYTE( "1.3s",  0x00000, 0x20000, CRC(0ed5464c) SHA1(2eab6650ad1c38cd560ec3d084f47156756c97a4) ) 2 bytes different ( 022a : 50 instead of 51, 12f9 : 6b instead of 6a) - possible bad rom
 	ROM_LOAD16_BYTE( "2.4s",  0x00001, 0x20000, CRC(a93a8256) SHA1(6bf6c189f82cb9341d3427a822de83cbaed27bc0) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
