@@ -30,6 +30,20 @@ endif
 
 #-------------------------------------------------
 #
+#@src/emu/bus/a800/a800_slot.h,BUSES += A800
+#-------------------------------------------------
+
+ifneq ($(filter A800,$(BUSES)),)
+OBJDIRS += $(BUSOBJ)/a800
+BUSOBJS += $(BUSOBJ)/a800/a800_slot.o
+BUSOBJS += $(BUSOBJ)/a800/rom.o
+BUSOBJS += $(BUSOBJ)/a800/oss.o
+BUSOBJS += $(BUSOBJ)/a800/sparta.o
+endif
+
+
+#-------------------------------------------------
+#
 #@src/emu/bus/abcbus/abcbus.h,BUSES += ABCBUS
 #-------------------------------------------------
 

@@ -103,7 +103,8 @@ Possible Undumped protos: -
 		<description>5200 Menu (Prototype)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
-		<part name="cart" interface="a5200_cart">
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a5200" />
 			<dataarea name="rom" size="8192">
 				<rom name="5200menu.bin" size="8192" crc="0de2db48" sha1="e64fb1a353c72b87c5483bb88cb3523ea5d37b59" offset="0" />
 			</dataarea>
@@ -114,7 +115,8 @@ Possible Undumped protos: -
 		<description>A.E. (Prototype)</description>
 		<year>1982</year>
 		<publisher>Brøderbund Software Inc</publisher>
-		<part name="cart" interface="a5200_cart">
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a5200" />
 			<dataarea name="rom" size="16384">
 				<rom name="aep.bin" size="16384" crc="35484751" sha1="e18a603b18b85e24f9c938b33b6077a767c1fa9c" offset="0" />
 			</dataarea>
@@ -126,7 +128,8 @@ Possible Undumped protos: -
 		<year>1983</year>
 		<publisher>Activision</publisher>
 		<info name="serial" value="FC-008" />
-		<part name="cart" interface="a5200_cart">
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a5200" />
 			<dataarea name="rom" size="16384">
 				<rom name="decathln.bin" size="16384" crc="f43e7cd0" sha1="db203973df13b071da46d52fdb078a76f4db428d" offset="0" />
 			</dataarea>
@@ -138,7 +141,8 @@ Possible Undumped protos: -
 		<year>1982</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX5201" />
-		<part name="cart" interface="a5200_cart">
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a5200" />
 			<dataarea name="rom" size="8192">
 				<rom name="asteroid.bin" size="8192" crc="38480891" sha1="18697dd8e640fa1578b3b4ae09af484c14fb8410" offset="0" />
 			</dataarea>
@@ -150,8 +154,8 @@ Possible Undumped protos: -
 		<year>1984</year>
 		<publisher>Parker Brothers</publisher>
 		<info name="serial" value="9560" />
-		<part name="cart" interface="a5200_cart">
-			<feature name="cart_type" value="A13MIRRORING" />
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a5200_2chips" />
 			<dataarea name="rom" size="16384">
 				<rom name="astrchse.bin" size="16384" crc="4019ecec" sha1="67e405c37e55dec4071018e8166ab4faf9f21df5" offset="0" />
 			</dataarea>
@@ -163,7 +167,8 @@ Possible Undumped protos: -
 		<year>1986</year>
 		<publisher>Atari / Lucasfilm</publisher>
 		<info name="serial" value="CX5255" />
-		<part name="cart" interface="a5200_cart">
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a5200" />
 			<dataarea name="rom" size="32768">
 				<rom name="ballblze.bin" size="32768" crc="94d97d14" sha1="ed92ffd21abd50339f5be0cbff9bdcc8fafbc67f" offset="0" />
 			</dataarea>
@@ -174,7 +179,8 @@ Possible Undumped protos: -
 		<description>Barroom Baseball (Prototype)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
-		<part name="cart" interface="a5200_cart">
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a5200" />
 			<dataarea name="rom" size="32768">
 				<rom name="barbball.bin" size="32768" crc="21d19c8f" sha1="510ccb20df2ecdbe7f8373de6a9fc11493e8c3f2" offset="0" />
 			</dataarea>
@@ -186,8 +192,8 @@ Possible Undumped protos: -
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX5239" />
-		<part name="cart" interface="a5200_cart">
-			<feature name="cart_type" value="A13MIRRORING" />
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a5200_2chips" />
 			<dataarea name="rom" size="16384">
 				<rom name="bzone.bin" size="16384" crc="b3b8e314" sha1="a339cddfc28477c21c58783d2d3b0cf0f4626ddf" offset="0" />
 			</dataarea>
@@ -199,7 +205,8 @@ Possible Undumped protos: -
 		<year>1983</year>
 		<publisher>Activision</publisher>
 		<info name="serial" value="FZ-009" />
-		<part name="cart" interface="a5200_cart">
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a5200" />
 			<dataarea name="rom" size="16384">
 				<rom name="beamrid.bin" size="16384" crc="9bae58dc" sha1="b75d555d059ad61992f9f5a234129ecbf9504c35" offset="0" />
 			</dataarea>
@@ -211,7 +218,8 @@ Possible Undumped protos: -
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX5221" />
-		<part name="cart" interface="a5200_cart">
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a5200" />
 			<dataarea name="rom" size="16384">
 				<rom name="berzerk.bin" size="16384" crc="be3cd348" sha1="e56ccc6bf427a832ce00540b02d065a2688260dc" offset="0" />
 			</dataarea>
@@ -223,7 +231,8 @@ Possible Undumped protos: -
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX5231" />
-		<part name="cart" interface="a5200_cart">
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a5200" />
 			<dataarea name="rom" size="32768">
 				<rom name="blckbelt.bin" size="32768" crc="ed47b0d8" sha1="9b7ecd444b6239442ef1f54cd8e14c294c064da2" offset="0" />
 			</dataarea>
@@ -234,7 +243,8 @@ Possible Undumped protos: -
 		<description>Blaster (Prototype)</description>
 		<year>1984</year>
 		<publisher>Atari</publisher>
-		<part name="cart" interface="a5200_cart">
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a5200" />
 			<dataarea name="rom" size="16384">
 				<rom name="blaster.bin" size="16384" crc="c8f9c094" sha1="ab3130256d16af09cac8b11749dfaff6aaaa3ea3" offset="0" />
 			</dataarea>
@@ -246,7 +256,8 @@ Possible Undumped protos: -
 		<year>1982</year>
 		<publisher>CBS Electronics / Bally Midway MFG. Co.</publisher>
 		<info name="serial" value="80033" />
-		<part name="cart" interface="a5200_cart">
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a5200" />
 			<dataarea name="rom" size="16384">
 				<rom name="blueprnt.bin" size="16384" crc="0624e6e7" sha1="1e1a20c104bf4d55eca0ca1e72dc5dc64fa6b1b5" offset="0" />
 			</dataarea>
@@ -257,7 +268,8 @@ Possible Undumped protos: -
 		<description>Bounty Bob Strikes Back!</description>
 		<year>1984</year>
 		<publisher>Big Five Software</publisher>
-		<part name="cart" interface="a5200_cart">
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a5200_bbsb" />
 			<dataarea name="rom" size="40960">
 				<rom name="bbstrksb.bin" size="40960" crc="7873c6dd" sha1="cfdd2f8dabb03d8784f336bb0c804270dc3a8a6c" offset="0" />
 			</dataarea>
@@ -269,8 +281,8 @@ Possible Undumped protos: -
 		<year>1983</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="005-02" />
-		<part name="cart" interface="a5200_cart">
-			<feature name="cart_type" value="A13MIRRORING" />
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a5200_2chips" />
 			<dataarea name="rom" size="16384">
 				<rom name="buckrog.bin" size="16384" crc="04807705" sha1="bc7c81f758dd3e224e42ac8a16c1a12d69aed722" offset="0" />
 			</dataarea>
@@ -282,8 +294,8 @@ Possible Undumped protos: -
 		<year>1982</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX5212" />
-		<part name="cart" interface="a5200_cart">
-			<feature name="cart_type" value="A13MIRRORING" />
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a5200_2chips" />
 			<feature name="peripheral" value="trackball" /> <!-- Works with Trackball controller -->
 			<dataarea name="rom" size="16384">
 				<rom name="centiped.bin" size="16384" crc="536a70fe" sha1="eb343b90d3de696e69b1f039d4fb2c6afb0d80c0" offset="0" />
@@ -296,7 +308,8 @@ Possible Undumped protos: -
 		<year>1984</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX5253" />
-		<part name="cart" interface="a5200_cart">
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a5200" />
 			<dataarea name="rom" size="16384">
 				<rom name="choplift.bin" size="16384" crc="9ad53bbc" sha1="9f1ee191319ef0261cc7074a81c0e6d6b7464cd2" offset="0" />
 			</dataarea>
@@ -308,8 +321,8 @@ Possible Undumped protos: -
 		<year>1983</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="006-02" />
-		<part name="cart" interface="a5200_cart">
-			<feature name="cart_type" value="A13MIRRORING" />
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a5200_2chips" />
 			<dataarea name="rom" size="16384">
 				<rom name="congo.bin" size="16384" crc="f1f42bbd" sha1="e0203c2124127eba2d679be548fa257ecc5b2607" offset="0" />
 			</dataarea>
@@ -322,8 +335,8 @@ Possible Undumped protos: -
 		<year>1982</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX5210" />
-		<part name="cart" interface="a5200_cart">
-			<feature name="cart_type" value="A13MIRRORING" />
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a5200_2chips" />
 			<dataarea name="rom" size="16384">
 				<rom name="cntrmsre.bin" size="16384" crc="fd541c80" sha1="fa6d77e6e9afd0ea42fc9f9807932bf9e8fb170e" offset="0" />
 			</dataarea>
@@ -335,7 +348,8 @@ Possible Undumped protos: -
 		<year>1983</year>
 		<publisher>Activision</publisher>
 		<info name="serial" value="FZ-011" />
-		<part name="cart" interface="a5200_cart">
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a5200" />
 			<dataarea name="rom" size="16384">
 				<rom name="pitfall2.bin" size="16384" crc="4b910461" sha1="b051f0fb2e816787ab6eed0cb008b9f8cc9963dc" offset="0" />
 			</dataarea>
@@ -347,8 +361,8 @@ Possible Undumped protos: -
 		<year>1982</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX5218" />
-		<part name="cart" interface="a5200_cart">
-			<feature name="cart_type" value="A13MIRRORING" />
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a5200_2chips" />
 			<dataarea name="rom" size="16384">
 				<rom name="defender.bin" size="16384" crc="bd52623b" sha1="44f6dbf5013a70e646d5c5232981d517069fc449" offset="0" />
 			</dataarea>
@@ -360,8 +374,8 @@ Possible Undumped protos: -
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX5211" />
-		<part name="cart" interface="a5200_cart">
-			<feature name="cart_type" value="A13MIRRORING" />
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a5200_2chips" />
 			<dataarea name="rom" size="16384">
 				<rom name="digdug.bin" size="16384" crc="6a687f9c" sha1="387a76ba5912251e2285b7722004ad75e9ede523" offset="0" />
 			</dataarea>
@@ -373,7 +387,8 @@ Possible Undumped protos: -
 		<year>1983</year>
 		<publisher>Activision</publisher>
 		<info name="serial" value="FZ-005" />
-		<part name="cart" interface="a5200_cart">
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a5200" />
 			<dataarea name="rom" size="8192">
 				<rom name="dredfctr.bin" size="8192" crc="460def2d" sha1="ea7b40ce1106378e1d409cab6634fb2e483ff238" offset="0" />
 			</dataarea>
@@ -385,7 +400,8 @@ Possible Undumped protos: -
 		<year>1984</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX5256" />
-		<part name="cart" interface="a5200_cart">
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a5200" />
 			<dataarea name="rom" size="16384">
 				<rom name="finalleg.bin" size="16384" crc="d3bd3221" sha1="48625af4f3e9fe538dab2a0b463887fc8c6b138d" offset="0" />
 			</dataarea>
@@ -396,8 +412,8 @@ Possible Undumped protos: -
 		<description>Frisky Tom (Prototype)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
-		<part name="cart" interface="a5200_cart">
-			<feature name="cart_type" value="A13MIRRORING" />
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a5200_2chips" />
 			<dataarea name="rom" size="16384">
 				<rom name="friskyt.bin" size="16384" crc="04b299a4" sha1="69dcc8f59ca449f13dc896b4b29b534762d97064" offset="0" />
 			</dataarea>
@@ -409,7 +425,8 @@ Possible Undumped protos: -
 		<year>1983</year>
 		<publisher>Parker Brothers</publisher>
 		<info name="serial" value="9530" />
-		<part name="cart" interface="a5200_cart">
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a5200" />
 			<dataarea name="rom" size="8192">
 				<rom name="frogger.bin" size="8192" crc="ae7e3444" sha1="d9a695757f0494aee92a50ab8a49558745e0cedf" offset="0" />
 			</dataarea>
@@ -421,8 +438,8 @@ Possible Undumped protos: -
 		<year>1983</year>
 		<publisher>Parker Brothers</publisher>
 		<info name="serial" value="9090" />
-		<part name="cart" interface="a5200_cart">
-			<feature name="cart_type" value="A13MIRRORING" />
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a5200_2chips" />
 			<dataarea name="rom" size="16384">
 				<rom name="frogger2.bin" size="16384" crc="0af19345" sha1="3d815594cf674694b04bb0ff90bf635d7d402fc2" offset="0" />
 			</dataarea>
@@ -434,7 +451,8 @@ Possible Undumped protos: -
 		<year>1982</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX5206" />
-		<part name="cart" interface="a5200_cart">
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a5200" />
 			<feature name="peripheral" value="trackball" /> <!-- Works with Trackball controller -->
 			<dataarea name="rom" size="8192">
 				<rom name="galaxian.bin" size="8192" crc="3ef4a23f" sha1="0df0d7f11d89e2c5b59cc9f98d67d98e203831aa" offset="0" />
@@ -447,7 +465,8 @@ Possible Undumped protos: -
 		<year>1982</year>
 		<publisher>CBS Electronics / Bally Midway MFG. Co.</publisher>
 		<info name="serial" value="80013" />
-		<part name="cart" interface="a5200_cart">
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a5200" />
 			<dataarea name="rom" size="8192">
 				<rom name="gorf.bin" size="8192" crc="e955db74" sha1="80926bb270ea66cb5cacc379de1fc16d8a3d814b" offset="0" />
 			</dataarea>
@@ -459,7 +478,8 @@ Possible Undumped protos: -
 		<year>1984</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX5257" />
-		<part name="cart" interface="a5200_cart">
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a5200" />
 			<dataarea name="rom" size="32768">
 				<rom name="gremlins.bin" size="32768" crc="063ec2c4" sha1="f3c32b39580d589799dcead98bb206fbf3df0504" offset="0" />
 			</dataarea>
@@ -471,8 +491,8 @@ Possible Undumped protos: -
 		<year>1984</year>
 		<publisher>Parker Brothers</publisher>
 		<info name="serial" value="9080" />
-		<part name="cart" interface="a5200_cart">
-			<feature name="cart_type" value="A13MIRRORING" />
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a5200_2chips" />
 			<dataarea name="rom" size="16384">
 				<rom name="gyruss.bin" size="16384" crc="cfd4a7f9" sha1="d0d8650eb07d1679004d491360c2c041e37c61cd" offset="0" />
 			</dataarea>
@@ -484,7 +504,8 @@ Possible Undumped protos: -
 		<year>1984</year>
 		<publisher>Activision</publisher>
 		<info name="serial" value="FZ-007" />
-		<part name="cart" interface="a5200_cart">
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a5200" />
 			<dataarea name="rom" size="16384">
 				<rom name="hero.bin" size="16384" crc="18a73af3" sha1="d286ecb6793a0dda9c9c68f6355dbe3ade6922f9" offset="0" />
 			</dataarea>
@@ -496,8 +517,8 @@ Possible Undumped protos: -
 		<year>1984</year>
 		<publisher>Parker Brothers</publisher>
 		<info name="serial" value="9100" />
-		<part name="cart" interface="a5200_cart">
-			<feature name="cart_type" value="A13MIRRORING" />
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a5200_2chips" />
 			<dataarea name="rom" size="16384">
 				<rom name="jamesbnd.bin" size="16384" crc="d9ae4518" sha1="ae765943ae8d909b6ca6ff1560ba027adeeaa515" offset="0" />
 			</dataarea>
@@ -509,8 +530,8 @@ Possible Undumped protos: -
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX5240" />
-		<part name="cart" interface="a5200_cart">
-			<feature name="cart_type" value="A13MIRRORING" />
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a5200_2chips" />
 			<dataarea name="rom" size="16384">
 				<rom name="joust.bin" size="16384" crc="bfd30c01" sha1="0f74125edac90ffd1274a128df2970c239348fb5" offset="0" />
 			</dataarea>
@@ -522,8 +543,8 @@ Possible Undumped protos: -
 		<year>1984</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX5251" />
-		<part name="cart" interface="a5200_cart">
-			<feature name="cart_type" value="A13MIRRORING" />
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a5200_2chips" />
 			<dataarea name="rom" size="16384">
 				<rom name="jrpacman.bin" size="16384" crc="59983c40" sha1="a3e760d09e4dc6053286967576b5b7d42ee2fd38" offset="0" />
 			</dataarea>
@@ -535,8 +556,8 @@ Possible Undumped protos: -
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX5222" />
-		<part name="cart" interface="a5200_cart">
-			<feature name="cart_type" value="A13MIRRORING" />
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a5200_2chips" />
 			<dataarea name="rom" size="16384">
 				<rom name="jungleh.bin" size="16384" crc="2c676662" sha1="fa02ee04cfad90c6ccf9d9b984e3b7b3327fec12" offset="0" />
 			</dataarea>
@@ -548,7 +569,8 @@ Possible Undumped protos: -
 		<year>1982</year>
 		<publisher>CBS Electronics / Kay Enterprizes Co.</publisher>
 		<info name="serial" value="80503" />
-		<part name="cart" interface="a5200_cart">
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a5200" />
 			<dataarea name="rom" size="8192">
 				<rom name="krazysht.bin" size="8192" crc="ee702214" sha1="c7eb2b4a46a197adfedf33c2ccc17d8424d681c4" offset="0" />
 			</dataarea>
@@ -560,7 +582,8 @@ Possible Undumped protos: -
 		<year>1983</year>
 		<publisher>Activision</publisher>
 		<info name="serial" value="FZ-001" />
-		<part name="cart" interface="a5200_cart">
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a5200" />
 			<feature name="peripheral" value="trackball" /> <!-- Works with Trackball controller -->
 			<dataarea name="rom" size="4096">
 				<rom name="kaboom.bin" size="4096" crc="420f5d0b" sha1="a80f876a89a8ceacc71da5d9c02b546970b17730" offset="0" />
@@ -573,8 +596,8 @@ Possible Undumped protos: -
 		<year>1982</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX5229" />
-		<part name="cart" interface="a5200_cart">
-			<feature name="cart_type" value="A13MIRRORING" />
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a5200_2chips" />
 			<dataarea name="rom" size="16384">
 				<rom name="kangaroo.bin" size="16384" crc="ecfa624f" sha1="c3dbeed7adc0e282bf76332ab5a3209550e26d02" offset="0" />
 			</dataarea>
@@ -586,7 +609,8 @@ Possible Undumped protos: -
 		<year>1983</year>
 		<publisher>Activision</publisher>
 		<info name="serial" value="FZ-006" />
-		<part name="cart" interface="a5200_cart">
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a5200" />
 			<dataarea name="rom" size="8192">
 				<rom name="keystone.bin" size="8192" crc="8fe3bb2c" sha1="9f31c85a13e919135438590601e33bef11a8df8a" offset="0" />
 			</dataarea>
@@ -598,7 +622,8 @@ Possible Undumped protos: -
 		<year>1984</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX5260" />
-		<part name="cart" interface="a5200_cart">
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a5200" />
 			<dataarea name="rom" size="16384">
 				<rom name="laststar.bin" size="16384" crc="83517703" sha1="4046f60602254a7d86d2a6efd1a330455eaec119" offset="0" />
 			</dataarea>
@@ -609,8 +634,8 @@ Possible Undumped protos: -
 		<description>Looney Tunes Hotel (Prototype)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
-		<part name="cart" interface="a5200_cart">
-			<feature name="cart_type" value="A13MIRRORING" />
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a5200_2chips" />
 			<dataarea name="rom" size="16384">
 				<rom name="loontoon.bin" size="16384" crc="84df4925" sha1="bc4a536616ac45689b3ad790f6b1394ebbd8cc7e" offset="0" />
 			</dataarea>
@@ -622,7 +647,8 @@ Possible Undumped protos: -
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX5247" />
-		<part name="cart" interface="a5200_cart">
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a5200" />
 			<dataarea name="rom" size="32768">
 				<rom name="mario.bin" size="32768" crc="873742f1" sha1="a293b6b06050e11029d97137f2b1b36059567273" offset="0" />
 			</dataarea>
@@ -633,7 +659,8 @@ Possible Undumped protos: -
 		<description>Meebzork (Prototype)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
-		<part name="cart" interface="a5200_cart">
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a5200" />
 			<dataarea name="rom" size="32768">
 				<rom name="meebzork.bin" size="32768" crc="9fb13411" sha1="ff0f1d9ed0ae45e3c81b252f3d0a335e03b0aa4b" offset="0" />
 			</dataarea>
@@ -645,7 +672,8 @@ Possible Undumped protos: -
 		<year>1984</year>
 		<publisher>Activision</publisher>
 		<info name="serial" value="FZ-003" />
-		<part name="cart" interface="a5200_cart">
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a5200" />
 			<dataarea name="rom" size="8192">
 				<rom name="megamnia.bin" size="8192" crc="240a1e1a" sha1="f5512460c6b6d3a1baa0b23adf6a3a37fe308eb3" offset="0" />
 			</dataarea>
@@ -656,7 +684,8 @@ Possible Undumped protos: -
 		<description>Meteorites</description>
 		<year>1983</year>
 		<publisher>Electra Concepts</publisher>
-		<part name="cart" interface="a5200_cart">
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a5200" />
 			<dataarea name="rom" size="16384">
 				<rom name="meteorit.bin" size="16384" crc="ab8e035b" sha1="32d86a381feff43149b66336dcc4ba2523273228" offset="0" />
 			</dataarea>
@@ -667,8 +696,8 @@ Possible Undumped protos: -
 		<description>Microgammon SB (Prototype)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
-		<part name="cart" interface="a5200_cart">
-			<feature name="cart_type" value="A13MIRRORING" />
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a5200_2chips" />
 			<dataarea name="rom" size="16384">
 				<rom name="microgam.bin" size="16384" crc="931a454a" sha1="2f152a857a8a58d602b3c717612d9744423ee495" offset="0" />
 			</dataarea>
@@ -680,7 +709,8 @@ Possible Undumped protos: -
 		<year>1984</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX5248" />
-		<part name="cart" interface="a5200_cart">
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a5200" />
 			<feature name="peripheral" value="trackball" /> <!-- Works with Trackball controller -->
 			<dataarea name="rom" size="16384">
 				<rom name="milliped.bin" size="16384" crc="969cfe1a" sha1="1243a8ecfc02a74ae4e1f4fcda38502776f45cb0" offset="0" />
@@ -693,7 +723,8 @@ Possible Undumped protos: -
 		<year>1983</year>
 		<publisher>Big Five Software</publisher>
 		<info name="serial" value="BF1912" />
-		<part name="cart" interface="a5200_cart">
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a5200" />
 			<dataarea name="rom" size="16384">
 				<rom name="mine2049.bin" size="16384" crc="7df1adfb" sha1="0564b1867a0b570d66dfcbc11adc3e51a2c6f28c" offset="0" />
 			</dataarea>
@@ -705,8 +736,8 @@ Possible Undumped protos: -
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX5230" />
-		<part name="cart" interface="a5200_cart">
-			<feature name="cart_type" value="A13MIRRORING" />
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a5200_2chips" />
 			<dataarea name="rom" size="16384">
 				<rom name="minigolf.bin" size="16384" crc="c597c087" sha1="ef4d3ee7b4da2ef79c6f4d0d1833f10c1eb7725e" offset="0" />
 			</dataarea>
@@ -718,7 +749,8 @@ Possible Undumped protos: -
 		<year>1982</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX5202" />
-		<part name="cart" interface="a5200_cart">
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a5200" />
 			<feature name="peripheral" value="trackball" /> <!-- Works with Trackball controller -->
 			<dataarea name="rom" size="8192">
 				<rom name="missile.bin" size="8192" crc="44d3ff6f" sha1="5c8ec22e131810ccac08066ca96e9944ccfa4ecb" offset="0" />
@@ -731,8 +763,8 @@ Possible Undumped protos: -
 		<year>1984</year>
 		<publisher>Parker Brothers</publisher>
 		<info name="serial" value="9460" />
-		<part name="cart" interface="a5200_cart">
-			<feature name="cart_type" value="A13MIRRORING" />
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a5200_2chips" />
 			<dataarea name="rom" size="16384">
 				<rom name="montezum.bin" size="16384" crc="2a640143" sha1="7e2a05625598c7e6615f969aa695e64315cd9846" offset="0" />
 			</dataarea>
@@ -744,7 +776,8 @@ Possible Undumped protos: -
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX5241" />
-		<part name="cart" interface="a5200_cart">
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a5200" />
 			<dataarea name="rom" size="16384">
 				<rom name="mpatrol.bin" size="16384" crc="d0b2f285" sha1="02dd5b9278c06ae8cbb6dacc094e238fbacf08d2" offset="0" />
 			</dataarea>
@@ -756,7 +789,8 @@ Possible Undumped protos: -
 		<year>1983</year>
 		<publisher>CBS Electronics</publisher>
 		<info name="serial" value="80083" />
-		<part name="cart" interface="a5200_cart">
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a5200" />
 			<dataarea name="rom" size="8192">
 				<rom name="mntnking.bin" size="8192" crc="0f24243c" sha1="2e7ae57260624d1f5710d445a0936f0c280a6655" offset="0" />
 			</dataarea>
@@ -768,7 +802,8 @@ Possible Undumped protos: -
 		<year>1984</year>
 		<publisher>Parker Brothers</publisher>
 		<info name="serial" value="9420" />
-		<part name="cart" interface="a5200_cart">
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a5200" />
 			<dataarea name="rom" size="8192">
 				<rom name="docastle.bin" size="8192" crc="aa55f9be" sha1="002e6f8c7533b03f8041e7f1896589c0ab0e17a6" offset="0" />
 			</dataarea>
@@ -780,8 +815,8 @@ Possible Undumped protos: -
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX5243" />
-		<part name="cart" interface="a5200_cart">
-			<feature name="cart_type" value="A13MIRRORING" />
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a5200_2chips" />
 			<dataarea name="rom" size="16384">
 				<rom name="mspacman.bin" size="16384" crc="752f5efd" sha1="f93d72444d76075273e508555423936530875148" offset="0" />
 			</dataarea>
@@ -793,8 +828,8 @@ Possible Undumped protos: -
 		<year>1982</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX5208" />
-		<part name="cart" interface="a5200_cart">
-			<feature name="cart_type" value="A13MIRRORING" />
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a5200_2chips" />
 			<dataarea name="rom" size="16384">
 				<rom name="pacman.bin" size="16384" crc="8873ef51" sha1="ee4b3c6f08aa9fdfab532eec98136306b6923f75" offset="0" />
 			</dataarea>
@@ -806,7 +841,8 @@ Possible Undumped protos: -
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX5236" />
-		<part name="cart" interface="a5200_cart">
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a5200" />
 			<dataarea name="rom" size="32768">
 				<rom name="pengo.bin" size="32768" crc="e4f8ba8c" sha1="19ff7622dbbc2915e3e98d8d966340e7e893ff34" offset="0" />
 			</dataarea>
@@ -818,7 +854,8 @@ Possible Undumped protos: -
 		<year>1984</year>
 		<publisher>Activision</publisher>
 		<info name="serial" value="FZ-004" />
-		<part name="cart" interface="a5200_cart">
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a5200" />
 			<dataarea name="rom" size="8192">
 				<rom name="pitfall.bin" size="8192" crc="b2887833" sha1="d1c7dc3de097a4bfab82235acec69a97e6e05f18" offset="0" />
 			</dataarea>
@@ -830,8 +867,8 @@ Possible Undumped protos: -
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX5217" />
-		<part name="cart" interface="a5200_cart">
-			<feature name="cart_type" value="A13MIRRORING" />
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a5200_2chips" />
 			<feature name="peripheral" value="trackball" /> <!-- Works with Trackball controller -->
 			<dataarea name="rom" size="16384">
 				<rom name="polepos.bin" size="16384" crc="abc2d1e4" sha1="d504764c5894ee99c0b5e2024cbe833ebba3ab17" offset="0" />
@@ -844,8 +881,8 @@ Possible Undumped protos: -
 		<year>1983</year>
 		<publisher>Parker Brothers</publisher>
 		<info name="serial" value="9510" />
-		<part name="cart" interface="a5200_cart">
-			<feature name="cart_type" value="A13MIRRORING" />
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a5200_2chips" />
 			<dataarea name="rom" size="16384">
 				<rom name="popeye.bin" size="16384" crc="a18a9a40" sha1="e615aaa0c1d56ac83b91f6087970fa708d6433bf" offset="0" />
 			</dataarea>
@@ -857,7 +894,8 @@ Possible Undumped protos: -
 		<year>1983</year>
 		<publisher>Parker Brothers</publisher>
 		<info name="serial" value="9500" />
-		<part name="cart" interface="a5200_cart">
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a5200" />
 			<dataarea name="rom" size="8192">
 				<rom name="qbert.bin" size="8192" crc="3fe4a401" sha1="e6966bde5cd4167020c9d21bab613af1648b4d75" offset="0" />
 			</dataarea>
@@ -869,8 +907,8 @@ Possible Undumped protos: -
 		<year>1982</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX5221" />
-		<part name="cart" interface="a5200_cart">
-			<feature name="cart_type" value="A13MIRRORING" />
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a5200_2chips" />
 			<dataarea name="rom" size="16384">
 				<rom name="qix.bin" size="16384" crc="aea6d2c2" sha1="786cdf54d1625e0d3ea8814506fdeeba5e4ece48" offset="0" />
 			</dataarea>
@@ -882,7 +920,8 @@ Possible Undumped protos: -
 		<year>1984</year>
 		<publisher>Sunrise</publisher>
 		<info name="serial" value="1603" />
-		<part name="cart" interface="a5200_cart">
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a5200" />
 			<dataarea name="rom" size="16384">
 				<rom name="questroo.bin" size="16384" crc="b5f3402b" sha1="17a41c5f9a32f8a71939cfaa0e96807b951aedad" offset="0" />
 			</dataarea>
@@ -894,7 +933,8 @@ Possible Undumped protos: -
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX5209" />
-		<part name="cart" interface="a5200_cart">
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a5200" />
 			<feature name="peripheral" value="trackball" /> <!-- Works with Trackball controller -->
 			<dataarea name="rom" size="32768">
 				<rom name="rsbsebll.bin" size="32768" crc="44166592" sha1="a94d06739fa19453fa586a836eaacae11fe93989" offset="0" />
@@ -907,7 +947,8 @@ Possible Undumped protos: -
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX5219" />
-		<part name="cart" interface="a5200_cart">
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a5200" />
 			<dataarea name="rom" size="32768">
 				<rom name="rsbktbll.bin" size="32768" crc="dd217276" sha1="9b21ac7fec8d556585c6970231318ef1f501b2b5" offset="0" />
 			</dataarea>
@@ -919,7 +960,8 @@ Possible Undumped protos: -
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX5219" />
-		<part name="cart" interface="a5200_cart">
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a5200" />
 			<dataarea name="rom" size="32768">
 				<rom name="rsbktbll1.bin" size="32768" crc="c90196fa" sha1="9edb066a37ca7657979952c946ab89be7926f4f8" offset="0" />
 			</dataarea>
@@ -931,7 +973,8 @@ Possible Undumped protos: -
 		<year>1982</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX5219" />
-		<part name="cart" interface="a5200_cart">
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a5200" />
 			<dataarea name="rom" size="16384">
 				<rom name="rsbktbll2.bin" size="16384" crc="0f996184" sha1="2b43f74db4833272d2048de8fa32b857af8e090f" offset="0" />
 			</dataarea>
@@ -944,8 +987,8 @@ Possible Undumped protos: -
 		<year>1982</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX5207" />
-		<part name="cart" interface="a5200_cart">
-			<feature name="cart_type" value="A13MIRRORING" />
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a5200_2chips" />
 			<feature name="peripheral" value="trackball" /> <!-- Works with Trackball controller -->
 			<dataarea name="rom" size="16384">
 				<rom name="rsftball.bin" size="16384" crc="4336c2cc" sha1="a0dbd654ed3ba2583ca175a1356924d9529884df" offset="0" />
@@ -959,8 +1002,8 @@ Possible Undumped protos: -
 		<year>1982</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX5213" />
-		<part name="cart" interface="a5200_cart">
-			<feature name="cart_type" value="A13MIRRORING" />
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a5200_2chips" />
 			<feature name="peripheral" value="trackball" /> <!-- Works with Trackball controller -->
 			<dataarea name="rom" size="16384">
 				<rom name="rssoccer.bin" size="16384" crc="ecbd1853" sha1="c911cc914f3923d5aeb1a897e6dc4a551a9a53da" offset="0" />
@@ -973,8 +1016,8 @@ Possible Undumped protos: -
 		<year>1982</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX5214" />
-		<part name="cart" interface="a5200_cart">
-			<feature name="cart_type" value="A13MIRRORING" />
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a5200_2chips" />
 			<dataarea name="rom" size="16384">
 				<rom name="rstennis.bin" size="16384" crc="10f33c90" sha1="2e6c7472e37926cdfd3d855a4bd37a18fa83d8cf" offset="0" />
 			</dataarea>
@@ -987,7 +1030,8 @@ Possible Undumped protos: -
 		<year>1986</year>
 		<publisher>Atari / Lucasfilm</publisher>
 		<info name="serial" value="CX5254" />
-		<part name="cart" interface="a5200_cart">
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a5200" />
 			<dataarea name="rom" size="32768">
 				<rom name="fractal.bin" size="32768" crc="762c591b" sha1="9253d7286cf87999474b37df242ba23b4358ef4a" offset="0" />
 			</dataarea>
@@ -999,7 +1043,8 @@ Possible Undumped protos: -
 		<year>1983</year>
 		<publisher>Activision</publisher>
 		<info name="serial" value="FZ-002" />
-		<part name="cart" interface="a5200_cart">
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a5200" />
 			<dataarea name="rom" size="8192">
 				<rom name="riveraid.bin" size="8192" crc="09fc7648" sha1="ce9bd3b0847c5e187c3e8f667c8f5ea771c49965" offset="0" />
 			</dataarea>
@@ -1011,8 +1056,8 @@ Possible Undumped protos: -
 		<year>1982</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX5242" />
-		<part name="cart" interface="a5200_cart">
-			<feature name="cart_type" value="A13MIRRORING" />
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a5200_2chips" />
 			<dataarea name="rom" size="16384">
 				<rom name="roadrun.bin" size="16384" crc="a97606ab" sha1="0a7aaef5b0ede927cea13e724906207e1db48068" offset="0" />
 			</dataarea>
@@ -1024,7 +1069,8 @@ Possible Undumped protos: -
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX5225" />
-		<part name="cart" interface="a5200_cart">
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a5200" />
 			<dataarea name="rom" size="16384">
 				<rom name="robotron.bin" size="16384" crc="4252abd9" sha1="9175e6daca58102ac8b9729d7b0336cf09977d12" offset="0" />
 			</dataarea>
@@ -1036,8 +1082,8 @@ Possible Undumped protos: -
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX5232" />
-		<part name="cart" interface="a5200_cart">
-			<feature name="cart_type" value="A13MIRRORING" />
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a5200_2chips" />
 			<dataarea name="rom" size="16384">
 				<rom name="spcedngn.bin" size="16384" crc="b68d61e8" sha1="127ed1c31c3e85d10212eee7b9e6d71aef7dd891" offset="0" />
 			</dataarea>
@@ -1049,7 +1095,8 @@ Possible Undumped protos: -
 		<year>1982</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX5204" />
-		<part name="cart" interface="a5200_cart">
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a5200" />
 			<feature name="peripheral" value="trackball" /> <!-- Works with Trackball controller -->
 			<dataarea name="rom" size="8192">
 				<rom name="spaceinv.bin" size="8192" crc="de5c354a" sha1="cf411db770217b5af5fcfa32725cc587a8b9e710" offset="0" />
@@ -1062,7 +1109,8 @@ Possible Undumped protos: -
 		<year>1983</year>
 		<publisher>Activision</publisher>
 		<info name="serial" value="FZ-012" />
-		<part name="cart" interface="a5200_cart">
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a5200" />
 			<dataarea name="rom" size="16384">
 				<rom name="spceshut.bin" size="16384" crc="387365dc" sha1="5ae20e767d9819fe601f3b1ea6d4506ae2f2ceef" offset="0" />
 			</dataarea>
@@ -1073,7 +1121,8 @@ Possible Undumped protos: -
 		<description>Spitfire (Prototype)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
-		<part name="cart" interface="a5200_cart">
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a5200" />
 			<dataarea name="rom" size="32768">
 				<rom name="spitfire.bin" size="32768" crc="3c311303" sha1="688133761c462d6865bf673ed298b4d828120940" offset="0" />
 			</dataarea>
@@ -1085,8 +1134,8 @@ Possible Undumped protos: -
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX5237" />
-		<part name="cart" interface="a5200_cart">
-			<feature name="cart_type" value="A13MIRRORING" />
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a5200_2chips" />
 			<dataarea name="rom" size="16384">
 				<rom name="sprtgoof.bin" size="16384" crc="73b5b6fb" sha1="5f0354d8792d652313e5a0fa5d395e091c801d97" offset="0" />
 			</dataarea>
@@ -1098,8 +1147,8 @@ Possible Undumped protos: -
 		<year>1982</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX5202" />
-		<part name="cart" interface="a5200_cart">
-			<feature name="cart_type" value="A13MIRRORING" />
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a5200_2chips" />
 			<dataarea name="rom" size="16384">
 				<rom name="starraid.bin" size="16384" crc="7d819a9f" sha1="57dfc22c9805555f957ed51a2dc7bf35ad00c9d9" offset="0" />
 			</dataarea>
@@ -1111,8 +1160,8 @@ Possible Undumped protos: -
 		<year>1982</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="004-02" />
-		<part name="cart" interface="a5200_cart">
-			<feature name="cart_type" value="A13MIRRORING" />
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a5200_2chips" />
 			<dataarea name="rom" size="16384">
 				<rom name="startrek.bin" size="16384" crc="69f23548" sha1="19801454ab86f2a5cf691fcd577a71ad2b8dc7d5" offset="0" />
 			</dataarea>
@@ -1124,7 +1173,8 @@ Possible Undumped protos: -
 		<year>1983</year>
 		<publisher>Parker Brothers</publisher>
 		<info name="serial" value="9060" />
-		<part name="cart" interface="a5200_cart">
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a5200" />
 			<dataarea name="rom" size="8192">
 				<rom name="starwars.bin" size="8192" crc="0675f0a5" sha1="bf77048abc36ba2cba5eeeac812802d6a0eba891" offset="0" />
 			</dataarea>
@@ -1136,8 +1186,8 @@ Possible Undumped protos: -
 		<year>1983</year>
 		<publisher>Parker Brothers</publisher>
 		<info name="serial" value="9040" />
-		<part name="cart" interface="a5200_cart">
-			<feature name="cart_type" value="A13MIRRORING" />
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a5200_2chips" />
 			<dataarea name="rom" size="16384">
 				<rom name="swa.bin" size="16384" crc="75f566df" sha1="ab676ffe054b23bdd43cee2498afefaabbf9355b" offset="0" />
 			</dataarea>
@@ -1149,7 +1199,8 @@ Possible Undumped protos: -
 		<year>1984</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX5252" />
-		<part name="cart" interface="a5200_cart">
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a5200" />
 			<dataarea name="rom" size="16384">
 				<rom name="stargate.bin" size="16384" crc="1d1cee27" sha1="09d192a3598cdadfb61eceb430b3d5892e40962f" offset="0" />
 			</dataarea>
@@ -1161,7 +1212,8 @@ Possible Undumped protos: -
 		<year>1982</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX5203" />
-		<part name="cart" interface="a5200_cart">
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a5200" />
 			<feature name="peripheral" value="trackball" /> <!-- Works with Trackball controller -->
 			<dataarea name="rom" size="4096">
 				<rom name="sprbreak.bin" size="4096" crc="a0642110" sha1="f5f9c7f97bf09e5647e808d892b656f3ee1e19e0" offset="0" />
@@ -1174,7 +1226,8 @@ Possible Undumped protos: -
 		<year>1983</year>
 		<publisher>Parker Brothers</publisher>
 		<info name="serial" value="9550" />
-		<part name="cart" interface="a5200_cart">
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a5200" />
 			<dataarea name="rom" size="8192">
 				<rom name="scobra.bin" size="8192" crc="97debcd2" sha1="8205093f5fb1fdf0ccb71d667ea0a3849fb0a0f2" offset="0" />
 			</dataarea>
@@ -1185,7 +1238,8 @@ Possible Undumped protos: -
 		<description>Super Pac-Man (Prototype)</description>
 		<year>1984</year>
 		<publisher>Atari</publisher>
-		<part name="cart" interface="a5200_cart">
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a5200" />
 			<dataarea name="rom" size="16384">
 				<rom name="spacman.bin" size="16384" crc="0a4ddb1e" sha1="238cb448555d8bb5c96aa0354718411e8777c613" offset="0" />
 			</dataarea>
@@ -1197,7 +1251,8 @@ Possible Undumped protos: -
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX5220" />
-		<part name="cart" interface="a5200_cart">
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a5200" />
 			<dataarea name="rom" size="16384">
 				<rom name="tempest.bin" size="16384" crc="1187342f" sha1="85fcea0a4d4d1f22437801c96229ba96e0f6b711" offset="0" />
 			</dataarea>
@@ -1209,7 +1264,8 @@ Possible Undumped protos: -
 		<year>1984</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX5258" />
-		<part name="cart" interface="a5200_cart">
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a5200" />
 			<dataarea name="rom" size="16384">
 				<rom name="trackfld.bin" size="16384" crc="0ba22ece" sha1="9dfbb5d8b77504c66ce3ac4382daf79820393dd8" offset="0" />
 			</dataarea>
@@ -1221,7 +1277,8 @@ Possible Undumped protos: -
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX5216" />
-		<part name="cart" interface="a5200_cart">
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a5200" />
 			<dataarea name="rom" size="32768">
 				<rom name="vanguard.bin" size="32768" crc="caaea0a4" sha1="6c633de50e6cc0c0c40061cd24e6f78f552a438f" offset="0" />
 			</dataarea>
@@ -1233,7 +1290,8 @@ Possible Undumped protos: -
 		<year>1983</year>
 		<publisher>CBS Electronics</publisher>
 		<info name="serial" value="80003" />
-		<part name="cart" interface="a5200_cart">
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a5200" />
 			<dataarea name="rom" size="16384">
 				<rom name="wow.bin" size="16384" crc="d6f7ddfd" sha1="49debdf3c133fde9905d6d9137da5d8dff8d6283" offset="0" />
 			</dataarea>
@@ -1244,8 +1302,8 @@ Possible Undumped protos: -
 		<description>Xari Arena (Prototype)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
-		<part name="cart" interface="a5200_cart">
-			<feature name="cart_type" value="A13MIRRORING" />
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a5200_2chips" />
 			<dataarea name="rom" size="16384">
 				<rom name="xariarna.bin" size="16384" crc="b8faaec3" sha1="8b5512d3d2a952c99b9377919f0e06481161d81e" offset="0" />
 			</dataarea>
@@ -1257,7 +1315,8 @@ Possible Undumped protos: -
 		<year>1984</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX5246" />
-		<part name="cart" interface="a5200_cart">
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a5200" />
 			<dataarea name="rom" size="32768">
 				<rom name="xevious.bin" size="32768" crc="382634dc" sha1="c3cf33216dfa484309b923f21829d040486bc481" offset="0" />
 			</dataarea>
@@ -1268,7 +1327,8 @@ Possible Undumped protos: -
 		<description>Yellow Sub Demo</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
-		<part name="cart" interface="a5200_cart">
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a5200" />
 			<dataarea name="rom" size="4096">
 				<rom name="yllowsub.bin" size="4096" crc="f47bc091" sha1="e58e1f257923694dbeb586c860f385e74e460f90" offset="0" />
 			</dataarea>
@@ -1280,7 +1340,8 @@ Possible Undumped protos: -
 		<year>1984</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="008-02" />
-		<part name="cart" interface="a5200_cart">
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a5200" />
 			<dataarea name="rom" size="32768">
 				<rom name="zaxxon.bin" size="32768" crc="741746d1" sha1="4a4c4a25c8ed1b0ae79ca22684d7d311a564a7b5" offset="0" />
 			</dataarea>
@@ -1292,7 +1353,8 @@ Possible Undumped protos: -
 		<year>1984</year>
 		<publisher>Activision</publisher>
 		<info name="serial" value="FZ-010" />
-		<part name="cart" interface="a5200_cart">
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a5200" />
 			<dataarea name="rom" size="8192">
 				<rom name="zenji.bin" size="8192" crc="da228530" sha1="55da563b4394508c23d866fb1e543262fb45536d" offset="0" />
 			</dataarea>
@@ -1304,7 +1366,8 @@ Possible Undumped protos: -
 		<year>1984</year>
 		<publisher>Activision</publisher>
 		<info name="serial" value="FZ-101" />
-		<part name="cart" interface="a5200_cart">
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a5200" />
 			<dataarea name="rom" size="16384">
 				<rom name="znerangr.bin" size="16384" crc="2959d827" sha1="18315bec1e62102290feeb77fb290e1266cf5bfc" offset="0" />
 			</dataarea>
@@ -1315,7 +1378,8 @@ Possible Undumped protos: -
 		<description>PAM: Pete's Test (USA)</description>
 		<year>1982</year>
 		<publisher>Atari</publisher>
-		<part name="cart" interface="a5200_cart">
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a5200" />
 			<dataarea name="rom" size="8192">
 				<rom name="petetest.bin" size="8192" crc="28278cd6" sha1="d3ff99e080985c9c8e25389dfa74835e8c9be508" offset="0" />
 			</dataarea>
@@ -1326,8 +1390,8 @@ Possible Undumped protos: -
 		<description>PAM Diag 2.0</description>
 		<year>1982</year>
 		<publisher>Atari</publisher>
-		<part name="cart" interface="a5200_cart">
-			<feature name="cart_type" value="A13MIRRORING" />
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a5200_2chips" />
 			<dataarea name="rom" size="16384">
 				<rom name="pamdiag2.bin" size="16384" crc="e8b130c4" sha1="5cc3b4245faf01c30f77ac20b0b4940f4f8f83d8" offset="0" />
 			</dataarea>
@@ -1338,8 +1402,8 @@ Possible Undumped protos: -
 		<description>Atari PAM Diagnostics (Rev 2.3)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
-		<part name="cart" interface="a5200_cart">
-			<feature name="cart_type" value="A13MIRRORING" />
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a5200_2chips" />
 			<dataarea name="rom" size="16384">
 				<rom name="pamdg23.bin" size="16384" crc="ce07d9ad" sha1="e086e9868aa913e87f94676fd600f003892e73a1" offset="0" />
 			</dataarea>
@@ -1350,7 +1414,8 @@ Possible Undumped protos: -
 		<description>Atari PAM Final System Test (Rev 1.0)</description>
 		<year>1982</year>
 		<publisher>Atari</publisher>
-		<part name="cart" interface="a5200_cart">
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a5200" />
 			<dataarea name="rom" size="8192">
 				<rom name="finaltst.bin" size="8192" crc="7ea86e87" sha1="af81c400f1af0ee13a24da5e8b642442a0fc9479" offset="0" />
 			</dataarea>
@@ -1361,7 +1426,8 @@ Possible Undumped protos: -
 		<description>Boogie (Demo)</description>
 		<year>1982</year>
 		<publisher>Atari</publisher>
-		<part name="cart" interface="a5200_cart">
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a5200" />
 			<dataarea name="rom" size="4096">
 				<rom name="boogie.bin" size="4096" crc="3bd5fdd6" sha1="5236bc13e4b06d2e16d70b0a0c98588e1726da0c" offset="0" />
 			</dataarea>
@@ -1373,7 +1439,8 @@ Possible Undumped protos: -
 		<year>2002</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<info name="developer" value="Ronen Habot" />
-		<part name="cart" interface="a5200_cart">
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a5200" />
 			<dataarea name="rom" size="32768">
 				<rom name="cblast.bin" size="32768" crc="7c988054" sha1="c1a56a1fc51e09b1d8e93af40ddd7596847e6164" offset="0" />
 			</dataarea>
@@ -1385,7 +1452,8 @@ Possible Undumped protos: -
 		<year>2004</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<info name="developer" value="Bryan Edewaard" />
-		<part name="cart" interface="a5200_cart">
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a5200" />
 			<dataarea name="rom" size="32768">
 				<rom name="ccrisis.bin" size="32768" crc="d50e4061" sha1="4e022e101d7346a0a8618018372740e7333b4a36" offset="0" />
 			</dataarea>
@@ -1397,7 +1465,8 @@ Possible Undumped protos: -
 		<year>2002</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<info name="developer" value="Ron Lloyd" />
-		<part name="cart" interface="a5200_cart">
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a5200" />
 			<dataarea name="rom" size="32768">
 				<rom name="koffiyk.bin" size="32768" crc="917be656" sha1="9547c56e2951e1b3a713b0b99d3edb43c9d3cdd8" offset="0" />
 			</dataarea>

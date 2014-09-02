@@ -23,8 +23,6 @@ public:
 		: driver_device(mconfig, type, tag),
 		tv_artifacts(0) { }
 
-	void a600xl_mmu(UINT8 new_mmu);
-
 	/* This is needed in MESS as well for Atari 8bit drivers */
 	void atari_machine_start();
 

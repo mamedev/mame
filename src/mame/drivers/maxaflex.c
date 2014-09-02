@@ -43,6 +43,7 @@ public:
 	UINT8 m_tdr;
 	UINT8 m_tcr;
 	timer_device *m_mcu_timer;
+	void mmu(UINT8 new_mmu);
 	DECLARE_READ8_MEMBER(mcu_portA_r);
 	DECLARE_WRITE8_MEMBER(mcu_portA_w);
 	DECLARE_READ8_MEMBER(mcu_portB_r);
@@ -60,7 +61,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 	DECLARE_READ8_MEMBER(maxaflex_atari_pia_pa_r);
 	DECLARE_READ8_MEMBER(maxaflex_atari_pia_pb_r);
-	WRITE8_MEMBER(a600xl_pia_pb_w) { a600xl_mmu(data); }
+	WRITE8_MEMBER(a600xl_pia_pb_w) { mmu(data); }
 	WRITE_LINE_MEMBER(atari_pia_cb2_w) { }  // This is used by Floppy drive on Atari 8bits Home Computers
 	DECLARE_DRIVER_INIT(a600xl);
 	DECLARE_MACHINE_RESET(supervisor_board);
@@ -72,6 +73,23 @@ public:
 	required_device<speaker_sound_device> m_speaker;
 };
 
+
+void maxaflex_state::mmu(UINT8 new_mmu)
+{
+	/* check if self-test ROM changed */
+	if ( new_mmu & 0x80 )
+	{
+		logerror("%s MMU SELFTEST RAM\n", machine().system().name);
+		machine().device("maincpu")->memory().space(AS_PROGRAM).nop_readwrite(0x5000, 0x57ff);
+	}
+	else
+	{
+		logerror("%s MMU SELFTEST ROM\n", machine().system().name);
+		machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_bank(0x5000, 0x57ff, "bank2");
+		machine().device("maincpu")->memory().space(AS_PROGRAM).unmap_write(0x5000, 0x57ff);
+		machine().root_device().membank("bank2")->set_base(machine().root_device().memregion("maincpu")->base() + 0x5000);
+	}
+}
 
 
 /* Supervisor board emulation */
