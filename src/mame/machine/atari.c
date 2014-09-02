@@ -13,13 +13,10 @@
 #include "includes/atari.h"
 #include "sound/pokey.h"
 #include "sound/dac.h"
-#include "video/gtia.h"
 
 #define VERBOSE_POKEY   1
 #define VERBOSE_SERIAL  1
 #define VERBOSE_TIMERS  1
-
-static void pokey_reset(running_machine &machine);
 
 void atari_interrupt_cb(pokey_device *device, int mask)
 {
@@ -193,64 +190,4 @@ POKEY_KEYBOARD_HANDLER(atari_a5200_keypads)
 		ret |= 0x01;
 
 	return ret;
-}
-
-
-/*************************************
- *
- *  Generic Atari Code
- *
- *************************************/
-
-
-static void pokey_reset(running_machine &machine)
-{
-	pokey_device *pokey = downcast<pokey_device *>(machine.device("pokey"));
-	pokey->write(15,0);
-}
-
-
-static UINT8 console_read(address_space &space)
-{
-	return space.machine().root_device().ioport("console")->read();
-}
-
-
-static void console_write(address_space &space, UINT8 data)
-{
-	dac_device *dac = space.machine().device<dac_device>("dac");
-	if (data & 0x08)
-		dac->write_unsigned8((UINT8)-120);
-	else
-		dac->write_unsigned8(+120);
-}
-
-
-static void _antic_reset(running_machine &machine)
-{
-	antic_reset();
-}
-
-
-void atari_common_state::atari_machine_start()
-{
-	gtia_interface gtia_intf;
-
-	/* GTIA */
-	memset(&gtia_intf, 0, sizeof(gtia_intf));
-	if (machine().root_device().ioport("console") != NULL)
-		gtia_intf.console_read = console_read;
-	if (machine().device<dac_device>("dac") != NULL)
-		gtia_intf.console_write = console_write;
-	gtia_init(machine(), &gtia_intf);
-
-	/* pokey */
-	machine().add_notifier(MACHINE_NOTIFY_RESET, machine_notify_delegate(FUNC(pokey_reset), &machine()));
-
-	/* ANTIC */
-	machine().add_notifier(MACHINE_NOTIFY_RESET, machine_notify_delegate(FUNC(_antic_reset), &machine()));
-
-	/* save states */
-	machine().save().save_pointer(NAME((UINT8 *) &antic.r), sizeof(antic.r));
-	machine().save().save_pointer(NAME((UINT8 *) &antic.w), sizeof(antic.w));
 }

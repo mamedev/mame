@@ -23,9 +23,6 @@ public:
 		: driver_device(mconfig, type, tag),
 		tv_artifacts(0) { }
 
-	/* This is needed in MESS as well for Atari 8bit drivers */
-	void atari_machine_start();
-
 	virtual void video_start();
 	UINT32 screen_update_atari(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -562,6 +559,7 @@ struct ANTIC {
 
 extern ANTIC antic;
 
+void antic_start(running_machine &machine);
 void antic_reset(void);
 
 
@@ -610,5 +608,14 @@ ANTIC_RENDERER( antic_mode_e_48 );
 ANTIC_RENDERER( antic_mode_f_32 );
 ANTIC_RENDERER( antic_mode_f_40 );
 ANTIC_RENDERER( antic_mode_f_48 );
+ANTIC_RENDERER( gtia_mode_1_32 );
+ANTIC_RENDERER( gtia_mode_1_40 );
+ANTIC_RENDERER( gtia_mode_1_48 );
+ANTIC_RENDERER( gtia_mode_2_32 );
+ANTIC_RENDERER( gtia_mode_2_40 );
+ANTIC_RENDERER( gtia_mode_2_48 );
+ANTIC_RENDERER( gtia_mode_3_32 );
+ANTIC_RENDERER( gtia_mode_3_40 );
+ANTIC_RENDERER( gtia_mode_3_48 );
 
 #endif /* ATARI_H */

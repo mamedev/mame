@@ -260,7 +260,9 @@ public:
 	DECLARE_MACHINE_START(a800xl);
 	DECLARE_MACHINE_START(a5200);
 	DECLARE_PALETTE_INIT(a400);
-	
+
+	DECLARE_MACHINE_RESET(a400);
+
 	DECLARE_WRITE8_MEMBER(a600xl_pia_pb_w);
 	DECLARE_WRITE8_MEMBER(a800xl_pia_pb_w);
 	
@@ -299,6 +301,10 @@ protected:
 	
 	void setup_ram(int bank,UINT32 size);
 	void setup_cart(int type);
+
+	// start helper (until GTIA & ANTIC are device-fied)
+	void common_start();
+	void a5200_start();
 };
 
 
@@ -1857,10 +1863,55 @@ void a400_state::setup_cart(int type)
 	}	
 }
 
+static UINT8 console_read(address_space &space)
+{
+	return space.machine().root_device().ioport("console")->read();
+}
+
+static void console_write(address_space &space, UINT8 data)
+{
+	dac_device *dac = space.machine().device<dac_device>("dac");
+	if (data & 0x08)
+		dac->write_unsigned8((UINT8)-120);
+	else
+		dac->write_unsigned8(+120);
+}
+
+
+void a400_state::common_start()
+{	
+	/* GTIA */
+	gtia_interface gtia_intf;
+	gtia_intf.console_read = console_read;
+	gtia_intf.console_write = console_write;
+	gtia_init(machine(), &gtia_intf);
+	
+	/* ANTIC */
+	antic_start(machine());
+}
+
+void a400_state::a5200_start()
+{
+	/* GTIA */
+	gtia_interface gtia_intf;
+	memset(&gtia_intf, 0, sizeof(gtia_intf));
+	gtia_init(machine(), &gtia_intf);	
+	
+	/* ANTIC */
+	antic_start(machine());
+}
+
+MACHINE_RESET_MEMBER( a400_state, a400 )
+{
+	pokey_device *pokey = machine().device<pokey_device>("pokey");
+	pokey->write(15,0);
+	antic_reset();
+}
+
 
 MACHINE_START_MEMBER( a400_state, a400 )
 {
-	atari_machine_start();
+	common_start();
 	setup_ram(0, m_ram->size());
 	setup_ram(1, m_ram->size());
 	setup_ram(2, m_ram->size());
@@ -1873,7 +1924,7 @@ MACHINE_START_MEMBER( a400_state, a400 )
 
 MACHINE_START_MEMBER( a400_state, a800 )
 {
-	atari_machine_start();
+	common_start();
 	setup_ram(0, m_ram->size());
 	setup_ram(1, m_ram->size());
 	setup_ram(2, m_ram->size());
@@ -1888,7 +1939,7 @@ MACHINE_START_MEMBER( a400_state, a800xl )
 {
 	m_mmu = 0xfd;
 	m_ext_bank = 0x03;	// only used by a130xe
-	atari_machine_start();
+	common_start();
 	setup_cart(m_cartslot->get_cart_type());
 
 	save_item(NAME(m_cart_disabled));
@@ -1900,7 +1951,7 @@ MACHINE_START_MEMBER( a400_state, a800xl )
 
 MACHINE_START_MEMBER( a400_state, a5200 )
 {
-	atari_machine_start();
+	a5200_start();
 	setup_cart(m_cartslot->get_cart_type());
 
 	save_item(NAME(m_cart_disabled));
@@ -1946,6 +1997,8 @@ READ8_MEMBER(a400_state::atari_pia_pb_r)
 static MACHINE_CONFIG_START( atari_common_nodac, a400_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, FREQ_17_EXACT)
+
+	MCFG_MACHINE_RESET_OVERRIDE( a400_state, a400 )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

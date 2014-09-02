@@ -68,6 +68,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(mcu_timer_proc);
 	int atari_input_disabled();
 	virtual void machine_start();
+	virtual void machine_reset();
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_mcu;
 	required_device<speaker_sound_device> m_speaker;
@@ -405,8 +406,22 @@ READ8_MEMBER(maxaflex_state::maxaflex_atari_pia_pb_r)
 
 void maxaflex_state::machine_start()
 {
-	atari_machine_start();
+	/* GTIA */
+	gtia_interface gtia_intf;
+	memset(&gtia_intf, 0, sizeof(gtia_intf));
+	gtia_init(machine(), &gtia_intf);	
+	
+	/* ANTIC */
+	antic_start(machine());
 }
+
+void maxaflex_state::machine_reset()
+{
+	pokey_device *pokey = machine().device<pokey_device>("pokey");
+	pokey->write(15,0);
+	antic_reset();
+}
+
 
 static MACHINE_CONFIG_START( a600xl, maxaflex_state )
 	/* basic machine hardware */

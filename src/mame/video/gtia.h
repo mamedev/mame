@@ -135,15 +135,6 @@ extern gtia_struct gtia;
 
 void gtia_init(running_machine &machine, const gtia_interface *intf);
 
-ANTIC_RENDERER( gtia_mode_1_32 );
-ANTIC_RENDERER( gtia_mode_1_40 );
-ANTIC_RENDERER( gtia_mode_1_48 );
-ANTIC_RENDERER( gtia_mode_2_32 );
-ANTIC_RENDERER( gtia_mode_2_40 );
-ANTIC_RENDERER( gtia_mode_2_48 );
-ANTIC_RENDERER( gtia_mode_3_32 );
-ANTIC_RENDERER( gtia_mode_3_40 );
-ANTIC_RENDERER( gtia_mode_3_48 );
 void gtia_render(VIDEO *video);
 
 #endif /* __GTIA_H__ */

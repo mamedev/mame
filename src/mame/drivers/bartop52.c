@@ -30,6 +30,8 @@ public:
 		: atari_common_state(mconfig, type, tag),
 		m_maincpu(*this, "maincpu") { }
 
+	virtual void machine_start();
+	virtual void machine_reset();
 	required_device<cpu_device> m_maincpu;
 };
 
@@ -98,6 +100,25 @@ static INPUT_PORTS_START(bartop52)
 	PORT_BIT(0xff, 0x72, IPT_AD_STICK_Y) PORT_SENSITIVITY(JOYSTICK_SENSITIVITY) PORT_KEYDELTA(JOYSTICK_DELTA) PORT_MINMAX(0x00,0xe4) PORT_PLAYER(2)
 
 INPUT_PORTS_END
+
+
+void bartop52_state::machine_start()
+{
+	/* GTIA */
+	gtia_interface gtia_intf;
+	memset(&gtia_intf, 0, sizeof(gtia_intf));
+	gtia_init(machine(), &gtia_intf);	
+	
+	/* ANTIC */
+	antic_start(machine());
+}
+
+void bartop52_state::machine_reset()
+{
+	pokey_device *pokey = machine().device<pokey_device>("pokey");
+	pokey->write(15,0);
+	antic_reset();
+}
 
 
 static MACHINE_CONFIG_START( a5200, bartop52_state )
