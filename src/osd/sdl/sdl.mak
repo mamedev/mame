@@ -272,8 +272,13 @@ DEBUGOBJS = $(OSDOBJ)/modules/debugger/debugosx.o
 endif
 
 SYNC_IMPLEMENTATION = ntc
+
+# SDLMain_tmpl isn't necessary for SDL2
+ifneq ($(SDL_LIBVER),sdl2)
 SDLMAIN = $(SDLOBJ)/SDLMain_tmpl.o
 SDLUTILMAIN = $(SDLOBJ)/SDLMain_tmpl.o
+endif
+
 SDL_NETWORK = pcap
 MAINLDFLAGS = -Xlinker -all_load
 NO_X11 = 1

@@ -7,7 +7,7 @@
     Feel free to customize this file to suit your needs
 */
 
-#import "SDL/SDL.h"
+#import "sdlinc.h"
 #import "SDLMain_tmpl.h"
 #import <sys/param.h> /* for MAXPATHLEN */
 #import <unistd.h>
