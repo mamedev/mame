@@ -150,6 +150,7 @@ Current Problem(s) - in order of priority
 ********************************************************************************************************/
 
 #include "emu.h"
+#include "debugger.h"
 #include "cpu/nec/nec.h"
 #include "cpu/z80/z80.h"
 #include "machine/eepromser.h"
@@ -560,22 +561,30 @@ WRITE16_MEMBER(raiden2_state::cop_cmd_w)
 	cop_status &= 0x7fff;
 
 	switch(data) {
-	case 0x0205:   // 0205 0006 ffeb 0000 - 0188 0282 0082 0b8e 098e 0000 0000 0000
-		space.write_dword(cop_regs[0] + 4 + offset*4, space.read_dword(cop_regs[0] + 4 + offset*4) + space.read_dword(cop_regs[0] + 0x10 + offset*4));
-		/* TODO: check the following, makes Zero Team to crash as soon as this command is triggered (see above). */
-		space.write_dword(cop_regs[0] + 0x1c + offset*4, space.read_dword(cop_regs[0] + 0x1c + offset*4) + space.read_dword(cop_regs[0] + 0x10 + offset*4));
+	case 0x0205: {  // 0205 0006 ffeb 0000 - 0188 0282 0082 0b8e 098e 0000 0000 0000
+		int ppos = space.read_dword(cop_regs[0] + 4 + offset*4);
+		int npos = ppos + space.read_dword(cop_regs[0] + 0x10 + offset*4);
+		int delta = (npos >> 16) - (ppos >> 16);
+		space.write_dword(cop_regs[0] + 4 + offset*4, npos);
+
+		/* TODO: check the following, makes Zero Team to crash as soon
+		   as this command is triggered (see above) --- or not, since
+		   it was just changed */
+		space.write_word(cop_regs[0] + 0x1e + offset*4, space.read_word(cop_regs[0] + 0x1e + offset*4) + delta);
 		break;
+	}
 
 	case 0x0904: { /* X Se Dae and Zero Team uses this variant */
 		space.write_dword(cop_regs[0] + 16 + offset*4, space.read_dword(cop_regs[0] + 16 + offset*4) - space.read_dword(cop_regs[0] + 0x28 + offset*4));
 		break;
 	}
-	case 0x0905: // 194 288 088
+	case 0x0905: //  0905 0006 fbfb 0008 - 0194 0288 0088 0000 0000 0000 0000 0000
 		space.write_dword(cop_regs[0] + 16 + offset*4, space.read_dword(cop_regs[0] + 16 + offset*4) + space.read_dword(cop_regs[0] + 0x28 + offset*4));
 		break;
 
-	case 0x130e:
-	case 0x138e: { // 130e 0005 bf7f 0010 - 0984 0aa4 0d82 0aa2 039b 0b9a 0b9a 0a9a
+	case 0x130e:   // 130e 0005 bf7f 0010 - 0984 0aa4 0d82 0aa2 039b 0b9a 0b9a 0a9a
+	case 0x138e:
+	case 0x338e: { // 338e 0005 bf7f 0030 - 0984 0aa4 0d82 0aa2 039c 0b9c 0b9c 0a9a
 		int dx = space.read_dword(cop_regs[1]+4) - space.read_dword(cop_regs[0]+4);
 		int dy = space.read_dword(cop_regs[1]+8) - space.read_dword(cop_regs[0]+8);
 
@@ -594,6 +603,34 @@ WRITE16_MEMBER(raiden2_state::cop_cmd_w)
 		break;
 	}
 
+	case 0x2208:
+	case 0x2288: { // 2208 0005 f5df 0020 - 0f8a 0b8a 0388 0b9a 0b9a 0a9a 0000 0000
+		int dx = space.read_word(cop_regs[0]+0x12);
+		int dy = space.read_word(cop_regs[0]+0x16);
+
+		if(!dy) {
+			cop_status |= 0x8000;
+			cop_angle = 0;
+		} else {
+			cop_angle = atan(double(dx)/double(dy)) * 128 / M_PI;
+			if(dy<0)
+				cop_angle += 0x80;
+		}
+
+		if(data & 0x0080) {
+			space.write_byte(cop_regs[0]+0x34, cop_angle);
+		}
+		break;
+	}
+
+	case 0x2a05: { // 2a05 0006 ebeb 0028 - 09af 0a82 0082 0a8f 018e 0000 0000 0000
+		int delta = space.read_word(cop_regs[1] + 0x1e + offset*4);
+		space.write_dword(cop_regs[0] + 4+2  + offset*4, space.read_word(cop_regs[0] + 4+2  + offset*4) + delta);
+		space.write_dword(cop_regs[0] + 0x1e + offset*4, space.read_word(cop_regs[0] + 0x1e + offset*4) + delta);
+		break;
+	}
+
+	case 0x39b0:
 	case 0x3b30:
 	case 0x3bb0: { // 3bb0 0004 007f 0038 - 0f9c 0b9c 0b9c 0b9c 0b9c 0b9c 0b9c 099c
 		/* TODO: these are actually internally loaded via 0x130e command */
@@ -607,39 +644,31 @@ WRITE16_MEMBER(raiden2_state::cop_cmd_w)
 		cop_dist = sqrt((double)(dx*dx+dy*dy));
 		
 		if(data & 0x0080)
-			space.write_word(cop_regs[0]+0x38, cop_dist);
+			space.write_word(cop_regs[0]+(data & 0x200 ? 0x3a : 0x38), cop_dist);
 		break;
 	}
 
 	case 0x42c2: { // 42c2 0005 fcdd 0040 - 0f9a 0b9a 0b9c 0b9c 0b9c 029c 0000 0000
-		/* TODO: these are actually internally loaded via 0x130e command */
-		int dx = space.read_dword(cop_regs[1]+4) - space.read_dword(cop_regs[0]+4);
-		int dy = space.read_dword(cop_regs[1]+8) - space.read_dword(cop_regs[0]+8);
 		int div = space.read_word(cop_regs[0]+(0x36));
-		int res;
-		int cop_dist_raw;
-
 		if(!div)
-		{
-			printf("divide by zero?\n");
 			div = 1;
-		}
-
-		/* TODO: calculation of this one should occur at 0x3b30/0x3bb0 I *think* */
-		/* TODO: recheck if cop_scale still masks at 3 with this command */
-		dx >>= 11 + cop_scale;
-		dy >>= 11 + cop_scale;
-		cop_dist_raw = sqrt((double)(dx*dx+dy*dy));
-
-		res = cop_dist_raw;
-		res /= div;
-
-		cop_dist = (1 << (5 - cop_scale)) / div;
 
 		/* TODO: bits 5-6-15 */
 		cop_status = 7;
 
-		space.write_word(cop_regs[0]+(0x38), res);
+		space.write_word(cop_regs[0]+(0x38), (cop_dist << (5 - cop_scale)) / div);
+		break;
+	}
+
+	case 0x4aa0: { // 4aa0 0005 fcdd 0048 - 0f9a 0b9a 0b9c 0b9c 0b9c 099b 0000 0000
+		int div = space.read_word(cop_regs[0]+(0x38));
+		if(!div)
+			div = 1;
+
+		/* TODO: bits 5-6-15 */
+		cop_status = 7;
+
+		space.write_word(cop_regs[0]+(0x36), (cop_dist << (5 - cop_scale)) / div);
 		break;
 	}
 
@@ -791,7 +820,7 @@ void raiden2_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 	/*00 ???? ????  (colour / priority?)
 	  01 fhhh Fwww   h = height f=flipy w = width F = flipx
 	  02 nnnn nnnn   n = tileno
-	  03 nnnn nnnn   n = tile no
+	  03 nnnn nnnn   n = tileno
 	  04 xxxx xxxx   x = xpos
 	  05 xxxx xxxx   x = xpos
 	  06 yyyy yyyy   y = ypos
@@ -1312,31 +1341,50 @@ WRITE16_MEMBER(raiden2_state::sprite_prot_src_seg_w)
 	sprite_prot_src_addr[0] = data;
 }
 
+READ16_MEMBER(raiden2_state::sprite_prot_src_seg_r)
+{
+	return sprite_prot_src_addr[0];
+}
+
 WRITE16_MEMBER(raiden2_state::sprite_prot_src_w)
 {
-	int dx;
-	int dy;
-	UINT32 src;
-	UINT8 flag;
 	sprite_prot_src_addr[1] = data;
-	src = (sprite_prot_src_addr[0]<<4)+sprite_prot_src_addr[1];
+	UINT32 src = (sprite_prot_src_addr[0]<<4)+sprite_prot_src_addr[1];
 
-	dx = ((space.read_dword(src+0x08) >> 16) - (sprite_prot_x)) & 0xffff;
-	dy = ((space.read_dword(src+0x04) >> 16) - (sprite_prot_y)) & 0xffff;
+	int x = ((space.read_dword(src+0x08) >> 16) - (sprite_prot_x)) & 0xffff;
+	int y = ((space.read_dword(src+0x04) >> 16) - (sprite_prot_y)) & 0xffff;
 
-	flag = dx < 0x140 && dy < 256 ? 1 : 0;
+	UINT16 head1 = space.read_word(src+0x60);
+	UINT16 head2 = space.read_word(src+0x62);
+	UINT16 oxy   = space.read_word(src+0x66);
+
+	int w = (((head1 >> 8 ) & 7) + 1) << 3;
+	int h = (((head1 >> 12) & 7) + 1) << 3;
+
+	int ox = INT8(oxy);
+	int oy = INT8(oxy >> 8);
+
+	UINT16 flag = x-ox > -w && x-ox < cop_spr_maxx+w && y-oy > -h && y-oy < 240+h ? 1 : 0;
 	
-	space.write_word(src,flag);
-	if(flag == 1)
-	{
-	space.write_word(dst1, space.read_word(src+0x60));
-	space.write_word(dst1+2,space.read_word(src+0x62));
-	space.write_word(dst1+4,dx-8);
-	space.write_word(dst1+6,dy-8);
+	flag = (space.read_word(src) & 0xfffe) | flag;
+	space.write_word(src, flag);
 
-	dst1+=8;
+	if(head2 >= 0xc824 && head2 <= 0xc858) {
+		w *= 2;
+		h *= 2;
+	}
+
+	if(flag & 1)
+	{
+		space.write_word(dst1,   head1);
+		space.write_word(dst1+2, head2);
+		space.write_word(dst1+4, x-ox);
+		space.write_word(dst1+6, y-oy);
+
+		dst1 += 8;
 	}
 	//printf("[%08x] %08x %08x %04x %04x\n",src,dx,dy,dst1,dst2);
+	//	debugger_break(machine());
 }
 
 READ16_MEMBER(raiden2_state::sprite_prot_dst1_r)
@@ -1344,9 +1392,14 @@ READ16_MEMBER(raiden2_state::sprite_prot_dst1_r)
 	return dst1;
 }
 
-READ16_MEMBER(raiden2_state::sprite_prot_dst2_r)
+READ16_MEMBER(raiden2_state::sprite_prot_maxx_r)
 {
-	return dst2;
+	return cop_spr_maxx;
+}
+
+READ16_MEMBER(raiden2_state::sprite_prot_unk_r)
+{
+	return cop_spr_unk;
 }
 
 WRITE16_MEMBER(raiden2_state::sprite_prot_dst1_w)
@@ -1354,9 +1407,14 @@ WRITE16_MEMBER(raiden2_state::sprite_prot_dst1_w)
 	dst1 = data;
 }
 
-WRITE16_MEMBER(raiden2_state::sprite_prot_dst2_w)
+WRITE16_MEMBER(raiden2_state::sprite_prot_maxx_w)
 {
-	dst2 = data;
+	cop_spr_maxx = data;
+}
+
+WRITE16_MEMBER(raiden2_state::sprite_prot_unk_w)
+{
+	cop_spr_unk = data;
 }
 
 READ16_MEMBER(raiden2_state::cop_collision_status_y_r)
@@ -1504,14 +1562,15 @@ static ADDRESS_MAP_START( raiden2_cop_mem, AS_PROGRAM, 16, raiden2_state )
 	AM_RANGE(0x006b4, 0x006b7) AM_WRITE(sprcpt_data_2_w)
 	AM_RANGE(0x006b8, 0x006bb) AM_WRITE(sprcpt_val_2_w)
 	AM_RANGE(0x006bc, 0x006bf) AM_WRITE(sprcpt_adr_w)
-	AM_RANGE(0x006c2, 0x006c3) AM_WRITE(sprite_prot_src_seg_w)
+	AM_RANGE(0x006c0, 0x006c1) AM_READWRITE(sprite_prot_unk_r, sprite_prot_unk_w)
+	AM_RANGE(0x006c2, 0x006c3) AM_READWRITE(sprite_prot_src_seg_r, sprite_prot_src_seg_w)
 	AM_RANGE(0x006c6, 0x006c7) AM_WRITE(sprite_prot_dst1_w)
 	AM_RANGE(0x006ca, 0x006cb) AM_WRITE(raiden2_bank_w)
 	AM_RANGE(0x006cc, 0x006cd) AM_WRITE(tile_bank_01_w)
 	AM_RANGE(0x006ce, 0x006cf) AM_WRITE(sprcpt_flags_2_w)
 	AM_RANGE(0x006d8, 0x006d9) AM_WRITE(sprite_prot_x_w)
 	AM_RANGE(0x006da, 0x006db) AM_WRITE(sprite_prot_y_w)
-	AM_RANGE(0x006dc, 0x006dd) AM_READ(sprite_prot_dst2_r) AM_WRITE(sprite_prot_dst2_w)
+	AM_RANGE(0x006dc, 0x006dd) AM_READWRITE(sprite_prot_maxx_r, sprite_prot_maxx_w)
 	AM_RANGE(0x006de, 0x006df) AM_WRITE(sprite_prot_src_w)
 	AM_RANGE(0x006fc, 0x006fd) AM_WRITE(cop_dma_trigger_w)
 	AM_RANGE(0x006fe, 0x006ff) AM_WRITE(cop_sort_dma_trig_w) // sort-DMA trigger

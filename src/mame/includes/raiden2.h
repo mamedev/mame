@@ -117,12 +117,15 @@ public:
 	DECLARE_WRITE16_MEMBER( sprite_prot_y_w );
 	DECLARE_WRITE16_MEMBER( sprite_prot_src_seg_w );
 	DECLARE_WRITE16_MEMBER( sprite_prot_src_w );
+	DECLARE_READ16_MEMBER( sprite_prot_src_seg_r );
 	DECLARE_READ16_MEMBER ( sprite_prot_dst1_r );
-	DECLARE_READ16_MEMBER( sprite_prot_dst2_r );
+	DECLARE_READ16_MEMBER( sprite_prot_maxx_r );
+	DECLARE_READ16_MEMBER( sprite_prot_unk_r );
 	DECLARE_WRITE16_MEMBER( sprite_prot_dst1_w );
-	DECLARE_WRITE16_MEMBER( sprite_prot_dst2_w );
+	DECLARE_WRITE16_MEMBER( sprite_prot_maxx_w );
+	DECLARE_WRITE16_MEMBER( sprite_prot_unk_w );
 
-	UINT16 sprite_prot_x,sprite_prot_y,dst1,dst2;
+	UINT16 sprite_prot_x,sprite_prot_y,dst1,cop_spr_maxx,cop_spr_unk;
 	UINT16 sprite_prot_src_addr[2];
 
 	struct
