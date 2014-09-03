@@ -487,24 +487,31 @@ static void init_monitors(void)
 static sdl_monitor_info *pick_monitor(sdl_options &options, int index)
 {
 	sdl_monitor_info *monitor;
-	const char *scrname;
+	const char *scrname, *scrname2;
 	int moncount = 0;
 	float aspect;
 
 	// get the screen option
-	scrname = options.screen(index);
+	scrname = options.screen();
+	scrname2 = options.screen(index);
+
+	// decide which one we want to use
+	if (strcmp(scrname2, "auto") != 0)
+		scrname = scrname2;
 
 	// get the aspect ratio
 	aspect = get_aspect(options.aspect(), options.aspect(index), TRUE);
 
 	// look for a match in the name first
 	if (scrname != NULL)
+	{
 		for (monitor = sdl_monitor_list; monitor != NULL; monitor = monitor->next)
 		{
 			moncount++;
 			if (strcmp(scrname, monitor->monitor_device) == 0)
 				goto finishit;
 		}
+	}
 
 	// didn't find it; alternate monitors until we hit the jackpot
 	index %= moncount;
