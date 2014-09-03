@@ -185,8 +185,6 @@ pokey_device::pokey_device(const machine_config &mconfig, const char *tag, devic
 		device_sound_interface(mconfig, *this),
 		device_execute_interface(mconfig, *this),
 		device_state_interface(mconfig, *this),
-		m_kbd_r(NULL),
-		m_irq_f(NULL),
 		m_output_type(LEGACY_LINEAR),
 		m_icount(0),
 		m_stream(NULL),
@@ -224,6 +222,10 @@ void pokey_device::device_start()
 	m_channel[CHAN1].m_INTMask = IRQ_TIMR1;
 	m_channel[CHAN2].m_INTMask = IRQ_TIMR2;
 	m_channel[CHAN4].m_INTMask = IRQ_TIMR4;
+
+	// bind callbacks
+	m_keyboard_r.bind_relative_to(*owner());
+	m_irq_f.bind_relative_to(*owner());
 
 	/* calculate the A/D times
 	 * In normal, slow mode (SKCTL bit SK_PADDLE is clear) the conversion
@@ -391,31 +393,29 @@ void pokey_device::device_timer(emu_timer &timer, device_timer_id id, int param,
 	{
 	case 3:
 		/* serout_ready_cb */
-		if( m_IRQEN & IRQ_SEROR )
+		if (m_IRQEN & IRQ_SEROR)
 		{
 			m_IRQST |= IRQ_SEROR;
-			if( m_irq_f )
-				(m_irq_f)(this, IRQ_SEROR);
+			if (!m_irq_f.isnull())
+				m_irq_f(IRQ_SEROR);
 		}
 		break;
 	case 4:
 		/* serout_complete */
-		if( m_IRQEN & IRQ_SEROC )
+		if (m_IRQEN & IRQ_SEROC)
 		{
 			m_IRQST |= IRQ_SEROC;
-			if( m_irq_f )
-				(m_irq_f)(this, IRQ_SEROC);
+			if (!m_irq_f.isnull())
+				m_irq_f(IRQ_SEROC);
 		}
 		break;
 	case 5:
 		/* serin_ready */
-		if( m_IRQEN & IRQ_SERIN )
+		if (m_IRQEN & IRQ_SERIN)
 		{
-			/* set the enabled timer irq status bits */
 			m_IRQST |= IRQ_SERIN;
-			/* call back an application supplied function to handle the interrupt */
-			if( m_irq_f )
-				(m_irq_f)(this, IRQ_SERIN);
+			if (!m_irq_f.isnull())
+				m_irq_f(IRQ_SERIN);
 		}
 		break;
 	case SYNC_WRITE:
@@ -477,26 +477,27 @@ void pokey_device::step_keyboard()
 {
 	if (++m_kbd_cnt > 63)
 		m_kbd_cnt = 0;
-	if (m_kbd_r) {
-		UINT8 ret = m_kbd_r(this, m_kbd_cnt);
+	if (!m_keyboard_r.isnull())
+	{
+		UINT8 ret = m_keyboard_r(m_kbd_cnt);
+
 		switch (m_kbd_cnt)
 		{
 		case POK_KEY_BREAK:
 			if (ret & 2)
 			{
 				/* check if the break IRQ is enabled */
-				if( m_IRQEN & IRQ_BREAK )
+				if (m_IRQEN & IRQ_BREAK)
 				{
-					/* set break IRQ status and call back the interrupt handler */
 					m_IRQST |= IRQ_BREAK;
-					if( m_irq_f )
-						(*m_irq_f)(this, IRQ_BREAK);
+					if (!m_irq_f.isnull())
+						m_irq_f(IRQ_BREAK);
 				}
 			}
 			break;
 		case POK_KEY_SHIFT:
 			m_kbd_latch = (m_kbd_latch & 0xbf) | ((ret & 2) << 5);
-			if( m_kbd_latch & 0x40 )
+			if (m_kbd_latch & 0x40)
 				m_SKSTAT |= SK_SHIFT;
 			else
 				m_SKSTAT &= ~SK_SHIFT;
@@ -522,14 +523,14 @@ void pokey_device::step_keyboard()
 				{
 					m_KBCODE = m_kbd_latch;
 					m_SKSTAT |= SK_KEYBD;
-					if( m_IRQEN & IRQ_KEYBD )
+					if (m_IRQEN & IRQ_KEYBD)
 					{
 						/* last interrupt not acknowledged ? */
-						if( m_IRQST & IRQ_KEYBD )
+						if(m_IRQST & IRQ_KEYBD)
 							m_SKSTAT |= SK_KBERR;
 						m_IRQST |= IRQ_KEYBD;
-						if( m_irq_f )
-							(*m_irq_f)(this, IRQ_KEYBD);
+						if (!m_irq_f.isnull())
+							m_irq_f(IRQ_KEYBD);
 					}
 					m_kbd_state++;
 				}
@@ -646,8 +647,8 @@ UINT32 pokey_device::step_one_clock(void)
 		process_channel(CHAN2);
 
 		/* check if some of the requested timer interrupts are enabled */
-		if ((m_IRQST & IRQ_TIMR2) && m_irq_f )
-			(*m_irq_f)(this, IRQ_TIMR2);
+		if ((m_IRQST & IRQ_TIMR2) && !m_irq_f.isnull())
+				m_irq_f(IRQ_TIMR2);
 	}
 
 	if (m_channel[CHAN1].check_borrow())
@@ -659,8 +660,8 @@ UINT32 pokey_device::step_one_clock(void)
 			m_channel[CHAN1].reset_channel();
 		process_channel(CHAN1);
 		/* check if some of the requested timer interrupts are enabled */
-		if ((m_IRQST & IRQ_TIMR1) && m_irq_f )
-			(*m_irq_f)(this, IRQ_TIMR1);
+		if ((m_IRQST & IRQ_TIMR1) && !m_irq_f.isnull())
+			m_irq_f(IRQ_TIMR1);
 	}
 
 	/* do CHAN4 before CHAN3 because CHAN3 may set borrow! */
@@ -676,8 +677,8 @@ UINT32 pokey_device::step_one_clock(void)
 			m_channel[CHAN2].sample();
 		else
 			m_channel[CHAN2].m_filter_sample = 1;
-		if ((m_IRQST & IRQ_TIMR4) && m_irq_f )
-			(*m_irq_f)(this, IRQ_TIMR4);
+		if ((m_IRQST & IRQ_TIMR4) && !m_irq_f.isnull())
+			m_irq_f(IRQ_TIMR4);
 	}
 
 	if (m_channel[CHAN3].check_borrow())

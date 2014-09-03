@@ -39,6 +39,10 @@ public:
 	DECLARE_READ8_MEMBER ( atari_antic_r );
 	DECLARE_WRITE8_MEMBER ( atari_antic_w );
 
+	POKEY_INTERRUPT_CB_MEMBER(interrupt_cb);
+	POKEY_KEYBOARD_CB_MEMBER(a5200_keypads);
+	POKEY_KEYBOARD_CB_MEMBER(a800_keyboard);
+
 private:
 	UINT32 tv_artifacts ;
 	void prio_init();
@@ -55,12 +59,7 @@ private:
 	inline void LMS(int new_cmd);
 	void antic_scanline_dma(int param);
 	void generic_atari_interrupt(int button_count);
-
 };
-
-void atari_interrupt_cb(pokey_device *device, int mask);
-POKEY_KEYBOARD_HANDLER(atari_a800_keyboard);
-POKEY_KEYBOARD_HANDLER(atari_a5200_keypads);
 
 /* video */
 

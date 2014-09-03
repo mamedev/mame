@@ -58,8 +58,11 @@
 //  CALLBACK HANDLERS
 //**************************************************************************
 
-#define POKEY_KEYBOARD_HANDLER(_name) UINT8 _name(pokey_device *device, UINT8 k543210)
-#define POKEY_INTERRUPT_HANDLER(_name) void _name(pokey_device *device, int mask)
+typedef device_delegate<UINT8 (UINT8 k543210)> pokey_kb_cb_delegate;
+typedef device_delegate<void (int mask)> pokey_int_cb_delegate;
+
+#define POKEY_KEYBOARD_CB_MEMBER(_name) UINT8 _name(UINT8 k543210)
+#define POKEY_INTERRUPT_CB_MEMBER(_name) void _name(int mask)
 
 
 //**************************************************************************
@@ -101,11 +104,12 @@
 
 /* k543210 = k5 ... k0 returns bit0: kr1, bit1: kr2 */
 /* all are, in contrast to actual hardware, ACTIVE_HIGH */
-#define MCFG_POKEY_KEYBOARD_HANDLER(_kbd) \
-	(downcast<pokey_device *>(device))->m_kbd_r = _kbd;
+#define MCFG_POKEY_KEYBOARD_CB(_class, _method) \
+	pokey_device::set_keyboard_callback(*device, pokey_kb_cb_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
 
-#define MCFG_POKEY_INTERRUPT_HANDLER(_irqf) \
-	(downcast<pokey_device *>(device))->m_irq_f = _irqf;
+#define MCFG_POKEY_INTERRUPT_CB(_class, _method) \
+	pokey_device::set_interrupt_callback(*device, pokey_int_cb_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+
 
 #define MCFG_POKEY_OUTPUT_RC(_R, _C, _V) \
 	(downcast<pokey_device *>(device))->m_output_type = pokey_device::RC_LOWPASS; \
@@ -221,6 +225,9 @@ public:
 	template<class _Object> static devcb_base &set_serin_r_callback(device_t &device, _Object object) { return downcast<pokey_device &>(device).m_serin_r_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_serout_w_callback(device_t &device, _Object object) { return downcast<pokey_device &>(device).m_serout_w_cb.set_callback(object); }
 
+	static void set_keyboard_callback(device_t &device, pokey_kb_cb_delegate callback) { downcast<pokey_device &>(device).m_keyboard_r = callback; }
+	static void set_interrupt_callback(device_t &device, pokey_int_cb_delegate callback) { downcast<pokey_device &>(device).m_irq_f = callback; }
+
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
 
@@ -228,11 +235,6 @@ public:
 	void  write(offs_t offset, UINT8 data);
 
 	void serin_ready(int after);
-
-	// internal configuration
-
-	POKEY_KEYBOARD_HANDLER((*m_kbd_r));
-	POKEY_INTERRUPT_HANDLER((*m_irq_f));
 
 	// analog output configuration
 
@@ -345,6 +347,9 @@ private:
 	devcb_read8 m_allpot_r_cb;
 	devcb_read8 m_serin_r_cb;
 	devcb_write8 m_serout_w_cb;
+
+	pokey_kb_cb_delegate m_keyboard_r;
+	pokey_int_cb_delegate m_irq_f;
 
 	UINT8 m_POTx[8];        /* POTx   (R/D200-D207) */
 	UINT8 m_AUDCTL;         /* AUDCTL (W/D208) */

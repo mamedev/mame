@@ -18,7 +18,8 @@
 #define VERBOSE_SERIAL  1
 #define VERBOSE_TIMERS  1
 
-void atari_interrupt_cb(pokey_device *device, int mask)
+
+POKEY_INTERRUPT_CB_MEMBER(atari_common_state::interrupt_cb)
 {
 	if (VERBOSE_POKEY)
 	{
@@ -46,7 +47,7 @@ void atari_interrupt_cb(pokey_device *device, int mask)
 			logerror("atari interrupt_cb TIMR1\n");
 	}
 
-	device->machine().device("maincpu")->execute().set_input_line(0, HOLD_LINE);
+	machine().device("maincpu")->execute().set_input_line(0, HOLD_LINE);
 }
 
 
@@ -87,7 +88,7 @@ void atari_interrupt_cb(pokey_device *device, int mask)
 
  **************************************************************/
 
-POKEY_KEYBOARD_HANDLER(atari_a800_keyboard)
+POKEY_KEYBOARD_CB_MEMBER(atari_common_state::a800_keyboard)
 {
 	int ipt;
 	static const char *const tag[] = {
@@ -101,15 +102,15 @@ POKEY_KEYBOARD_HANDLER(atari_a800_keyboard)
 	{
 	case pokey_device::POK_KEY_BREAK:
 		/* special case ... */
-		ret |= ((device->machine().root_device().ioport(tag[0])->read_safe(0) & 0x08) ? 0x02 : 0x00);
+		ret |= ((machine().root_device().ioport(tag[0])->read_safe(0) & 0x08) ? 0x02 : 0x00);
 		break;
 	case pokey_device::POK_KEY_CTRL:
 		/* CTRL */
-		ret |= ((device->machine().root_device().ioport("fake")->read_safe(0) & 0x02) ? 0x02 : 0x00);
+		ret |= ((machine().root_device().ioport("fake")->read_safe(0) & 0x02) ? 0x02 : 0x00);
 		break;
 	case pokey_device::POK_KEY_SHIFT:
 		/* SHIFT */
-		ret |= ((device->machine().root_device().ioport("fake")->read_safe(0) & 0x01) ? 0x02 : 0x00);
+		ret |= ((machine().root_device().ioport("fake")->read_safe(0) & 0x01) ? 0x02 : 0x00);
 		break;
 	}
 
@@ -118,7 +119,7 @@ POKEY_KEYBOARD_HANDLER(atari_a800_keyboard)
 		return ret;
 
 	/* decode regular key */
-	ipt = device->machine().root_device().ioport(tag[k543210 >> 3])->read_safe(0);
+	ipt = machine().root_device().ioport(tag[k543210 >> 3])->read_safe(0);
 
 	if (ipt & (1 << (k543210 & 0x07)))
 		ret |= 0x01;
@@ -155,7 +156,7 @@ POKEY_KEYBOARD_HANDLER(atari_a800_keyboard)
 
  **************************************************************/
 
-POKEY_KEYBOARD_HANDLER(atari_a5200_keypads)
+POKEY_KEYBOARD_CB_MEMBER(atari_common_state::a5200_keypads)
 {
 	int ipt;
 	static const char *const tag[] = { "keypad_0", "keypad_1", "keypad_2", "keypad_3" };
@@ -166,7 +167,7 @@ POKEY_KEYBOARD_HANDLER(atari_a5200_keypads)
 	{
 	case pokey_device::POK_KEY_BREAK:
 		/* special case ... */
-		ret |= ((device->machine().root_device().ioport(tag[0])->read_safe(0) & 0x01) ? 0x02 : 0x00);
+		ret |= ((machine().root_device().ioport(tag[0])->read_safe(0) & 0x01) ? 0x02 : 0x00);
 		break;
 	case pokey_device::POK_KEY_CTRL:
 	case pokey_device::POK_KEY_SHIFT:
@@ -184,9 +185,9 @@ POKEY_KEYBOARD_HANDLER(atari_a5200_keypads)
 	if (k543210 == 0)
 		return ret;
 
-	ipt = device->machine().root_device().ioport(tag[k543210 >> 2])->read_safe(0);
+	ipt = machine().root_device().ioport(tag[k543210 >> 2])->read_safe(0);
 
-	if (ipt & (1 <<(k543210 & 0x03)))
+	if (ipt & (1 << (k543210 & 0x03)))
 		ret |= 0x01;
 
 	return ret;
