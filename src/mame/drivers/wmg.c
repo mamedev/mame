@@ -182,7 +182,8 @@ WRITE8_MEMBER( wmg_state::wmg_def_rombank_w )
 {
 	address_space &space1 = m_maincpu->space(AS_PROGRAM);
 	data &= 15;
-	if ((m_wmg_def_bank != data) && (m_wmg_bank == 5) && (data))
+
+	if ((m_wmg_def_bank != data) && (m_wmg_bank == 5) && (data != 0))
 	{
 		m_wmg_def_bank = data;
 
@@ -208,8 +209,7 @@ WRITE8_MEMBER( wmg_state::wmg_def_rombank_w )
 				printf("Unknown bank %X selected\n",data);
 		}
 	}
-	else
-	if ((m_wmg_def_bank != data) && (!data))
+	else if ((m_wmg_def_bank != data) && (!data))
 	{
 		/* page 0 is I/O space */
 		m_wmg_def_bank = data;
@@ -243,11 +243,10 @@ WRITE_LINE_MEMBER( wmg_state::wmg_port_select_w )
 
 CUSTOM_INPUT_MEMBER(wmg_state::wmg_mux_r)
 {
-	UINT8 i;
 	const char *tag = (const char *)param;
 
 	if (m_wmg_port_select)
-		for (i = 0; i < m_wmg_port_select; i++)
+		for (int i = 0; i < m_wmg_port_select; i++)
 			tag += strlen(tag) + 1;
 
 	return ioport(tag)->read();
@@ -308,7 +307,7 @@ static INPUT_PORTS_START( wmg )
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, wmg_state, wmg_mux_r, "IN010\0IN010\0IN110\0IN110\0IN210\0IN210\0IN310\0IN310\0IN410\0IN410\0IN510\0IN510\0IN612\0IN611\0IN410\0IN410")
 
 	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Auto Up") PORT_CODE(KEYCODE_F1)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Auto Up / Manual Down") PORT_TOGGLE PORT_CODE(KEYCODE_F1)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Advance") PORT_CODE(KEYCODE_F2)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN3 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("High Score Reset") PORT_CODE(KEYCODE_9)
