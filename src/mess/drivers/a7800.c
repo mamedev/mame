@@ -1314,21 +1314,22 @@ void a7800_state::machine_start()
 	save_item(NAME(m_ctrl_reg));
 	save_item(NAME(m_maria_flag));
 	
-	// install additional POKEY handlers
+	// install additional handlers, if needed
 	switch (m_cartslot->get_cart_type())
 	{
-		case A78_TYPE1:
-		case A78_TYPE3:
-		case A78_TYPEB:
-		case A78_XB_BOARD:
-			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x0400, 0x047f, read8_delegate(FUNC(a78_cart_slot_device::read_04xx),(a78_cart_slot_device*)m_cartslot), write8_delegate(FUNC(a78_cart_slot_device::write_04xx),(a78_cart_slot_device*)m_cartslot));
-			break;
 		case A78_HSC:
+			// ROM+NVRAM accesses for HiScore
 			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x1000, 0x17ff, read8_delegate(FUNC(a78_cart_slot_device::read_10xx),(a78_cart_slot_device*)m_cartslot), write8_delegate(FUNC(a78_cart_slot_device::write_10xx),(a78_cart_slot_device*)m_cartslot));
 			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x3000, 0x3fff, read8_delegate(FUNC(a78_cart_slot_device::read_30xx),(a78_cart_slot_device*)m_cartslot), write8_delegate(FUNC(a78_cart_slot_device::write_30xx),(a78_cart_slot_device*)m_cartslot));
 			break;
-		case A78_XM_BOARD:
+		case A78_XB_BOARD:
+			// POKEY and RAM regs at 0x400-0x47f
 			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x0400, 0x047f, read8_delegate(FUNC(a78_cart_slot_device::read_04xx),(a78_cart_slot_device*)m_cartslot), write8_delegate(FUNC(a78_cart_slot_device::write_04xx),(a78_cart_slot_device*)m_cartslot));
+			break;
+		case A78_XM_BOARD:
+			// POKEY and RAM and YM regs at 0x400-0x47f
+			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x0400, 0x047f, read8_delegate(FUNC(a78_cart_slot_device::read_04xx),(a78_cart_slot_device*)m_cartslot), write8_delegate(FUNC(a78_cart_slot_device::write_04xx),(a78_cart_slot_device*)m_cartslot));
+			// ROM+NVRAM accesses for HiScore
 			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x1000, 0x17ff, read8_delegate(FUNC(a78_cart_slot_device::read_10xx),(a78_cart_slot_device*)m_cartslot), write8_delegate(FUNC(a78_cart_slot_device::write_10xx),(a78_cart_slot_device*)m_cartslot));
 			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x3000, 0x3fff, read8_delegate(FUNC(a78_cart_slot_device::read_30xx),(a78_cart_slot_device*)m_cartslot), write8_delegate(FUNC(a78_cart_slot_device::write_30xx),(a78_cart_slot_device*)m_cartslot));
 			break;

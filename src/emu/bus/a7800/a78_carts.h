@@ -17,7 +17,7 @@ static SLOT_INTERFACE_START(a7800_cart)
 	// not sure which dev cart support banked ram, nor whether there shall be a 9banks or a non-sg version of this...
 	SLOT_INTERFACE_INTERNAL("a78_bankram",  A78_ROM_BANKRAM)	
 	SLOT_INTERFACE_INTERNAL("a78_sg9",      A78_ROM_SG_9BANKS)
-	SLOT_INTERFACE_INTERNAL("a78_xmc",      A78_ROM_XM)	// carts compatible with the expansions below (basically a 9Banks+POKEY)
+	SLOT_INTERFACE_INTERNAL("a78_xmc",      A78_ROM_XM)    // carts compatible with the expansions below (basically a 9Banks+POKEY)
 	SLOT_INTERFACE_INTERNAL("a78_abs",      A78_ROM_ABSOLUTE)
 	SLOT_INTERFACE_INTERNAL("a78_act",      A78_ROM_ACTIVISION)
 	SLOT_INTERFACE_INTERNAL("a78_hsc",      A78_HISCORE)

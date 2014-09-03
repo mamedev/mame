@@ -36,8 +36,6 @@ public:
 	virtual machine_config_constructor device_mconfig_additions() const;
 	
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_04xx);
-	virtual DECLARE_WRITE8_MEMBER(write_04xx);
 	virtual DECLARE_WRITE8_MEMBER(write_40xx);
 	
 protected:
@@ -79,8 +77,6 @@ public:
 	virtual machine_config_constructor device_mconfig_additions() const;
 	
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_04xx);
-	virtual DECLARE_WRITE8_MEMBER(write_04xx);
 	virtual DECLARE_WRITE8_MEMBER(write_40xx);
 	
 protected:
@@ -150,8 +146,6 @@ public:
 	virtual machine_config_constructor device_mconfig_additions() const;
 	
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_04xx);
-	virtual DECLARE_WRITE8_MEMBER(write_04xx);
 	virtual DECLARE_WRITE8_MEMBER(write_40xx);
 	
 protected:

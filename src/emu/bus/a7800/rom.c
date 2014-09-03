@@ -194,8 +194,8 @@ READ8_MEMBER(a78_rom_device::read_40xx)
 /*-------------------------------------------------
 
  Carts with no bankswitch + POKEY chip
- The Pokey chips is accessed at 0x0450-0x045f or
- by writing at 0x4000-0x7fff in some games.
+ The Pokey chips is accessed by writing at 
+ 0x4000-0x7fff.
  
  GAMES: Ballblazer, Beef Drop (homebrew)
  
@@ -204,20 +204,6 @@ READ8_MEMBER(a78_rom_device::read_40xx)
 WRITE8_MEMBER(a78_rom_pokey_device::write_40xx)
 {
 	if (offset < 0x4000)
-		m_pokey->write(space, offset & 0x0f, data);
-}
-
-READ8_MEMBER(a78_rom_pokey_device::read_04xx)
-{
-	if (offset >= 0x50 && offset < 0x60)
-		return m_pokey->read(space, offset & 0x0f);
-	else
-		return 0xff;
-}
-
-WRITE8_MEMBER(a78_rom_pokey_device::write_04xx)
-{
-	if (offset >= 0x50 && offset < 0x60)
 		m_pokey->write(space, offset & 0x0f, data);
 }
 
@@ -264,7 +250,7 @@ WRITE8_MEMBER(a78_rom_sg_device::write_40xx)
 /*-------------------------------------------------
 
  Carts with SuperGame bankswitch + POKEY chip
- As above, the Pokey chips is accessed at
+ As above + Pokey chip access
  
  GAMES: Commando
  
@@ -276,20 +262,6 @@ WRITE8_MEMBER(a78_rom_sg_pokey_device::write_40xx)
 		m_pokey->write(space, offset & 0x0f, data);
 	else if (offset < 0x8000)
 		m_bank = data & m_bank_mask;
-}
-
-READ8_MEMBER(a78_rom_sg_pokey_device::read_04xx)
-{
-	if (offset >= 0x50 && offset < 0x60)
-		return m_pokey->read(space, offset & 0x0f);
-	else
-		return 0xff;
-}
-
-WRITE8_MEMBER(a78_rom_sg_pokey_device::write_04xx)
-{
-	if (offset >= 0x50 && offset < 0x60)
-		m_pokey->write(space, offset & 0x0f, data);
 }
 
 machine_config_constructor a78_rom_sg_pokey_device::device_mconfig_additions() const
@@ -405,25 +377,10 @@ WRITE8_MEMBER(a78_rom_xm_device::write_40xx)
 		m_bank = (data & m_bank_mask) + 1;
 }
 
-READ8_MEMBER(a78_rom_xm_device::read_04xx)
-{
-	if (offset >= 0x50 && offset < 0x60)
-		return m_pokey->read(space, offset & 0x0f);
-	else
-		return 0xff;
-}
-
-WRITE8_MEMBER(a78_rom_xm_device::write_04xx)
-{
-	if (offset >= 0x50 && offset < 0x60)
-		m_pokey->write(space, offset & 0x0f, data);
-}
-
 machine_config_constructor a78_rom_xm_device::device_mconfig_additions() const
 {
 	return MACHINE_CONFIG_NAME( a78_pokey );
 }
-
 
 /*-------------------------------------------------
  

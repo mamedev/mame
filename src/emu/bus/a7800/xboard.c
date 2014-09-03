@@ -23,14 +23,14 @@
  +-------------------------------+
  | 7 | 6 | 5 | 4 | 3 | 2 | 1 | 0 |
  +-------------------------------+
- |   |   |   |   |   |   |   |
- |   |   |   |   |   |   |   +-- Bank select bit 0 \
- |   |   |   |   |   |   +------ Bank select bit 1  | Totally 128 KByte in 16 KByte banks
- |   |   |   |   |   +---------- Bank select bit 2 / 
- |   |   |   |   +-------------- Enable memory bit** (1 = Memory enabled, 0 after power on)
- |   |   |   +------------------ Enable POKEY bit (1 = POKEY enabled, 0 after power on)
- |   |   |
- NA  NA  NA = Not Available or Not Used
+   |   |   |   |   |   |   |   |
+   |   |   |   |   |   |   |   +-- Bank select bit 0 \
+   |   |   |   |   |   |   +------ Bank select bit 1  | Totally 128 KByte in 16 KByte banks
+   |   |   |   |   |   +---------- Bank select bit 2 / 
+   |   |   |   |   +-------------- Enable memory bit (1 = Memory enabled, 0 after power on)
+   |   |   |   +------------------ Enable POKEY bit** (1 = POKEY enabled, 0 after power on)
+   |   |   |
+   NA  NA  NA = Not Available or Not Used
  
  * = Can be mounted piggy back on the first POKEY. Description how to do this will come when i have tried it out.
  ** This bit controls both POKEY chip select signals.
@@ -234,4 +234,3 @@ WRITE8_MEMBER(a78_xm_device::write_04xx)
 		m_ram_bank = m_reg & 7;
 	}
 }
-
