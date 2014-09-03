@@ -2479,19 +2479,22 @@ WRITE16_MEMBER( seibu_cop_legacy_device::generic_cop_w )
 			  Surprisingly atan maths are nowhere to be found from the roms.
 			*/
 
-			/* "automatic" movement */
+			/* "automatic" movement, 0205 */
 			if(COP_CMD(0x188,0x282,0x082,0xb8e,0x98e,0x000,0x000,0x000,6,0xffeb))
 			{
 				UINT8 offs;
 
 				offs = (offset & 3) * 4;
+				int ppos = space.read_dword(m_cop_register[0] + 4 + offs);
+				int npos = ppos + space.read_dword(m_cop_register[0] + 0x10 + offs);
+				int delta = (npos >> 16) - (ppos >> 16);
 
-				space.write_dword(m_cop_register[0] + 0x04 + offs, space.read_dword(m_cop_register[0] + 0x04 + offs) + space.read_dword(m_cop_register[0] + 0x10 + offs));
-				space.write_dword(m_cop_register[0] + 0x1c + offs, space.read_dword(m_cop_register[0] + 0x10 + offs) + space.read_dword(m_cop_register[0] + 0x1c + offs));
+				space.write_dword(m_cop_register[0] + 4 + offs, npos);
+				space.write_word(m_cop_register[0] + 0x1c + offs, space.read_word(m_cop_register[0] + 0x1c + offs) + delta);
 				return;
 			}
 
-			/* "automatic" movement, for arcs in Legionnaire / Zero Team (expression adjustment) */
+			/* "automatic" movement, for arcs in Legionnaire / Zero Team (expression adjustment) 0905 */
 			if(COP_CMD(0x194,0x288,0x088,0x000,0x000,0x000,0x000,0x000,6,0xfbfb))
 			{
 				UINT8 offs;
