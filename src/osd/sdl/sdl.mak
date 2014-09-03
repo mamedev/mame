@@ -59,7 +59,7 @@ USE_DISPATCH_GL = 1
 # active development on sdlmame or SDL.
 
 # uncomment the next line to compile and link against SDL2.0
-#SDL_LIBVER = sdl2
+# SDL_LIBVER = sdl2
 
 # uncomment the next line to use couriersud's multi-keyboard patch for SDL 2.1? (this API was removed prior to the 2.0 release)
 # SDL2_MULTIAPI = 1
@@ -477,7 +477,11 @@ SDLOS_TARGETOS = macosx
 
 ifndef MACOSX_USE_LIBSDL
 # Compile using framework (compile using libSDL is the exception)
+ifeq ($(SDL_LIBVER),sdl2)
+LIBS += -F$(SDL_FRAMEWORK_PATH) -framework SDL2 -framework Cocoa -framework OpenGL -lpthread
+else
 LIBS += -F$(SDL_FRAMEWORK_PATH) -framework SDL -framework Cocoa -framework OpenGL -lpthread
+endif
 INCPATH += -F$(SDL_FRAMEWORK_PATH)
 else
 # Compile using installed libSDL (Fink or MacPorts):
