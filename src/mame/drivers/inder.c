@@ -6,11 +6,21 @@
   All manuals are in Spanish (including the 'English' ones), so some guesswork will be needed.
   The schematics for Brave Team, Canasta are too blurry to read.
 
+  Setting up:
+  - First time run, the displays will all show zero. Take the opportunity to set up the dips. Then
+    exit and restart. The game will be working.
+
+  Status:
+  - Brave Team: working
+  - Others: still to be worked on
+
+
 ********************************************************************************************************/
 
 #include "machine/genpin.h"
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
+#include "sound/sn76496.h"
 #include "inder.lh"
 
 class inder_state : public genpin_class
@@ -19,11 +29,15 @@ public:
 	inder_state(const machine_config &mconfig, device_type type, const char *tag)
 		: genpin_class(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_sn(*this, "sn")
 		, m_switches(*this, "SW")
 	{ }
 
-	DECLARE_READ8_MEMBER(io_r);
-	DECLARE_WRITE8_MEMBER(io_w);
+	DECLARE_READ8_MEMBER(sw_r);
+	DECLARE_WRITE8_MEMBER(sw_w);
+	DECLARE_WRITE8_MEMBER(sol_w);
+	DECLARE_WRITE8_MEMBER(sn_w);
+	DECLARE_WRITE8_MEMBER(lamp_w) { };
 	DECLARE_WRITE8_MEMBER(disp_w);
 	DECLARE_DRIVER_INIT(inder);
 private:
@@ -31,6 +45,7 @@ private:
 	UINT8 m_segment[5];
 	virtual void machine_reset();
 	required_device<cpu_device> m_maincpu;
+	optional_device<sn76489_device> m_sn;
 	required_ioport_array<11> m_switches;
 };
 
@@ -39,187 +54,141 @@ static ADDRESS_MAP_START( inder_map, AS_PROGRAM, 8, inder_state )
 	AM_RANGE(0x2000, 0x20ff) AM_WRITE(disp_w)
 	AM_RANGE(0x4000, 0x43ff) AM_RAM // pair of 2114
 	AM_RANGE(0x4400, 0x44ff) AM_RAM AM_SHARE("nvram") // pair of 5101, battery-backed
-	AM_RANGE(0x4800, 0x480a) AM_READWRITE(io_r,io_w)
+	AM_RANGE(0x4800, 0x480a) AM_READWRITE(sw_r,sw_w)
+	AM_RANGE(0x4900, 0x4900) AM_WRITE(sol_w)
+	AM_RANGE(0x4901, 0x4907) AM_WRITE(lamp_w)
+	AM_RANGE(0x4b00, 0x4b00) AM_WRITE(sn_w)
 	//AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("ppi", i8255_device, read, write)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( inder )
-	PORT_START("TEST")
-	//PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Self Test") PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, inder_state, self_test, 0)
-	//PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Activity") PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, inder_state, activity_test, 0)
-
 	PORT_START("SW.0")
-	PORT_DIPNAME( 0x1f, 0x02, "Coin Slot 1")
-	PORT_DIPSETTING(    0x00, DEF_STR( 2C_3C )) // same as 01
-	PORT_DIPSETTING(    0x02, DEF_STR( 1C_1C ))
-	PORT_DIPSETTING(    0x03, DEF_STR( 2C_1C ))
-	PORT_DIPSETTING(    0x04, DEF_STR( 1C_2C ))
-	PORT_DIPSETTING(    0x05, DEF_STR( 2C_2C ))
-	PORT_DIPSETTING(    0x06, DEF_STR( 1C_3C ))
-	PORT_DIPSETTING(    0x07, DEF_STR( 2C_3C ))
-	PORT_DIPSETTING(    0x08, DEF_STR( 1C_4C ))
-	PORT_DIPSETTING(    0x09, DEF_STR( 2C_4C ))
-	PORT_DIPSETTING(    0x0a, DEF_STR( 1C_5C ))
-	PORT_DIPSETTING(    0x0b, DEF_STR( 2C_5C ))
-	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_6C ))
-	PORT_DIPSETTING(    0x0d, DEF_STR( 2C_6C ))
-	PORT_DIPSETTING(    0x0e, DEF_STR( 1C_7C ))
-	PORT_DIPSETTING(    0x0f, DEF_STR( 2C_7C ))
-	PORT_DIPSETTING(    0x10, DEF_STR( 1C_8C ))
-	PORT_DIPSETTING(    0x11, DEF_STR( 2C_8C ))
-	PORT_DIPSETTING(    0x12, DEF_STR( 1C_9C ))
-	PORT_DIPSETTING(    0x13, "2 coins 9 credits")
-	PORT_DIPSETTING(    0x14, "1 coin 10 credits")
-	PORT_DIPSETTING(    0x15, "2 coins 10 credits")
-	PORT_DIPSETTING(    0x16, "1 coin 11 credits")
-	PORT_DIPSETTING(    0x17, "2 coins 11 credits")
-	PORT_DIPSETTING(    0x18, "1 coin 12 credits")
-	PORT_DIPSETTING(    0x19, "2 coins 12 credits")
-	PORT_DIPSETTING(    0x1a, "1 coin 13 credits")
-	PORT_DIPSETTING(    0x1b, "2 coins 13 credits")
-	PORT_DIPSETTING(    0x1c, "1 coin 14 credits")
-	PORT_DIPSETTING(    0x1d, "2 coins 14 credits")
-	PORT_DIPSETTING(    0x1e, "1 coin 15 credits")
-	PORT_DIPSETTING(    0x1f, "2 coins 15 credits")
-	PORT_DIPNAME( 0x60, 0x40, "Award for beating high score")
-	PORT_DIPSETTING(    0x00, "Nothing")
-	PORT_DIPSETTING(    0x20, "1 free game")
-	PORT_DIPSETTING(    0x40, "2 free games")
-	PORT_DIPSETTING(    0x60, "3 free games")
-	PORT_DIPNAME( 0x80, 0x00, "Melody option 1")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
-	PORT_DIPSETTING(    0x80, DEF_STR( On ))
+	PORT_DIPNAME( 0x03, 0x01, "Coin Slot 1") // sw G,H
+	PORT_DIPSETTING(    0x01, DEF_STR( 1C_1C )) // slot 2: 1 moneda 4 partidas  // selection 00 is same as 01
+	PORT_DIPSETTING(    0x02, DEF_STR( 4C_5C )) // slot 2: 1 moneda 5 partidas
+	PORT_DIPSETTING(    0x03, "4 moneda 6 partidas") // slot 2: 1 moneda 6 partidas
+	PORT_DIPNAME( 0x08, 0x08, "Balls") // sw E
+	PORT_DIPSETTING(    0x08, "3")
+	PORT_DIPSETTING(    0x00, "5")
+	PORT_DIPNAME( 0x30, 0x20, "Points for free game") // sw C,D
+	PORT_DIPSETTING(    0x00, "850000")
+	PORT_DIPSETTING(    0x10, "800000")
+	PORT_DIPSETTING(    0x20, "750000")
+	PORT_DIPSETTING(    0x30, "700000")
+	PORT_BIT( 0xc4, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("SW.1")
-	PORT_DIPNAME( 0x1f, 0x02, "Coin Slot 3")
-	PORT_DIPSETTING(    0x00, DEF_STR( 2C_3C )) // same as 01
-	PORT_DIPSETTING(    0x02, DEF_STR( 1C_1C ))
-	PORT_DIPSETTING(    0x03, DEF_STR( 2C_1C ))
-	PORT_DIPSETTING(    0x04, DEF_STR( 1C_2C ))
-	PORT_DIPSETTING(    0x05, DEF_STR( 2C_2C ))
-	PORT_DIPSETTING(    0x06, DEF_STR( 1C_3C ))
-	PORT_DIPSETTING(    0x07, DEF_STR( 2C_3C ))
-	PORT_DIPSETTING(    0x08, DEF_STR( 1C_4C ))
-	PORT_DIPSETTING(    0x09, DEF_STR( 2C_4C ))
-	PORT_DIPSETTING(    0x0a, DEF_STR( 1C_5C ))
-	PORT_DIPSETTING(    0x0b, DEF_STR( 2C_5C ))
-	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_6C ))
-	PORT_DIPSETTING(    0x0d, DEF_STR( 2C_6C ))
-	PORT_DIPSETTING(    0x0e, DEF_STR( 1C_7C ))
-	PORT_DIPSETTING(    0x0f, DEF_STR( 2C_7C ))
-	PORT_DIPSETTING(    0x10, DEF_STR( 1C_8C ))
-	PORT_DIPSETTING(    0x11, DEF_STR( 2C_8C ))
-	PORT_DIPSETTING(    0x12, DEF_STR( 1C_9C ))
-	PORT_DIPSETTING(    0x13, "2 coins 9 credits")
-	PORT_DIPSETTING(    0x14, "1 coin 10 credits")
-	PORT_DIPSETTING(    0x15, "2 coins 10 credits")
-	PORT_DIPSETTING(    0x16, "1 coin 11 credits")
-	PORT_DIPSETTING(    0x17, "2 coins 11 credits")
-	PORT_DIPSETTING(    0x18, "1 coin 12 credits")
-	PORT_DIPSETTING(    0x19, "2 coins 12 credits")
-	PORT_DIPSETTING(    0x1a, "1 coin 13 credits")
-	PORT_DIPSETTING(    0x1b, "2 coins 13 credits")
-	PORT_DIPSETTING(    0x1c, "1 coin 14 credits")
-	PORT_DIPSETTING(    0x1d, "2 coins 14 credits")
-	PORT_DIPSETTING(    0x1e, "1 coin 15 credits")
-	PORT_DIPSETTING(    0x1f, "2 coins 15 credits")
-	PORT_DIPNAME( 0x60, 0x60, "Award")
-	PORT_DIPSETTING(    0x00, "Nothing")
-	PORT_DIPSETTING(    0x40, "Extra Ball")
-	PORT_DIPSETTING(    0x60, "Free Game")
-	PORT_DIPNAME( 0x80, 0x00, "Balls")
-	PORT_DIPSETTING(    0x00, "3")
-	PORT_DIPSETTING(    0x80, "5")
+	PORT_DIPNAME( 0x03, 0x03, "High Score") //"Handicap"  // sw O,P
+	PORT_DIPSETTING(    0x00, "990000")
+	PORT_DIPSETTING(    0x01, "950000")
+	PORT_DIPSETTING(    0x02, "900000")
+	PORT_DIPSETTING(    0x03, "850000")
+	PORT_DIPNAME( 0x04, 0x00, "Maximum Credits") // sw N
+	PORT_DIPSETTING(    0x04, "10")
+	PORT_DIPSETTING(    0x00, "20")
+	PORT_BIT( 0xf8, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("SW.2")
-	PORT_DIPNAME( 0x07, 0x02, "Maximum Credits")
-	PORT_DIPSETTING(    0x00, "5")
-	PORT_DIPSETTING(    0x01, "10")
-	PORT_DIPSETTING(    0x02, "15")
-	PORT_DIPSETTING(    0x03, "20")
-	PORT_DIPSETTING(    0x04, "25")
-	PORT_DIPSETTING(    0x05, "30")
-	PORT_DIPSETTING(    0x06, "35")
-	PORT_DIPSETTING(    0x07, "40")
-	PORT_DIPNAME( 0x08, 0x08, "Credits displayed")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
-	PORT_DIPSETTING(    0x08, DEF_STR( On ))
-	PORT_DIPNAME( 0x10, 0x10, "Match")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
-	PORT_DIPSETTING(    0x10, DEF_STR( On ))
-	PORT_DIPNAME( 0x20, 0x00, "S22 (game specific)")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
-	PORT_DIPSETTING(    0x20, DEF_STR( On ))
-	PORT_DIPNAME( 0x40, 0x00, "S23 (game specific)")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
-	PORT_DIPSETTING(    0x40, DEF_STR( On ))
-	PORT_DIPNAME( 0x80, 0x00, "S24 (game specific)")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
-	PORT_DIPSETTING(    0x80, DEF_STR( On ))
+	PORT_START("SW.2") // bank of unused dipswitches
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("SW.3")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_SLASH)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_COLON)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_QUOTE)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_BACKSLASH)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_BACKSPACE)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_START1 )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_TILT )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Outhole") PORT_CODE(KEYCODE_X)
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("SW.4")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN3 )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN1 )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN2 )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_L)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_OPENBRACE)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_CLOSEBRACE)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_ENTER)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_TILT1 ) PORT_NAME("Slam Tilt")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("SW.5")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_A)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_S)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_D)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_F)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_G)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_H)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_J)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_K)
+	PORT_START("SW.5") // Contactos 50-57
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) // "Monedero A"
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 ) // "Monedero B"
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_TILT ) // "Falta"
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 ) // "Pulsador Partidas"
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE3 ) PORT_NAME("Reset") // "Puesta a cero"
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Accounting info") // "Test economico"
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Test") // "Test tecnico"
 
-	PORT_START("SW.6")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_Q)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_W)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_E)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_R)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_Y)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_U)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_I)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_O)
+	PORT_START("SW.6") // 60-67
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Q)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_W)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_E)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_R)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Y)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_U)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_I)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_O)
 
-	PORT_START("SW.7")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_Z)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_C)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_V)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_B)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_N)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_M)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_COMMA)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_STOP)
+	PORT_START("SW.7") // 70-77
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_A)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_S)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_D)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_F)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_G)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_H)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_J)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_K)
 
-	PORT_START("SW.8")
-	PORT_START("SW.9")
+	PORT_START("SW.8") // 80-87
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Z)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_C)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_V)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_B)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_N)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_M)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_COMMA)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_STOP)
+
+	PORT_START("SW.9") // 90-97
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_L)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_X) PORT_NAME("Outhole")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_EQUALS)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_BACKSPACE)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_OPENBRACE)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_CLOSEBRACE)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_BACKSLASH)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_COLON)
+
 	PORT_START("SW.10")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
-READ8_MEMBER( inder_state::io_r )
+READ8_MEMBER( inder_state::sw_r )
 {
 	return m_switches[m_row]->read();
 }
 
-WRITE8_MEMBER( inder_state::io_w )
+WRITE8_MEMBER( inder_state::sw_w )
 {
 	m_row = offset;
+}
+
+WRITE8_MEMBER( inder_state::sn_w )
+{
+	m_sn->write(space, 0, BITSWAP8(data, 0, 1, 2, 3, 4, 5, 6, 7));
+}
+
+// "bobinas"
+WRITE8_MEMBER( inder_state::sol_w )
+{
+	if ((data & 0xee) && BIT(data, 4)) // solenoid selected & activated
+	{
+		if BIT(data, 1)
+			m_samples->start(0, 7); // left sling near bumpers
+
+		if BIT(data, 2)
+			m_samples->start(1, 7); // right sling near bumpers
+
+		if BIT(data, 3)
+			m_samples->start(0, 5); // outhole
+
+		if BIT(data, 5)
+			m_samples->start(2, 0); // left bumper
+
+		if BIT(data, 6)
+			m_samples->start(3, 0); // right bumper
+
+		if BIT(data, 7)
+			m_samples->start(4, 0); // middle bumper
+	}
 }
 
 WRITE8_MEMBER( inder_state::disp_w )
@@ -258,6 +227,9 @@ static MACHINE_CONFIG_START( inder, inder_state )
 
 	/* Sound */
 	MCFG_FRAGMENT_ADD( genpin_audio )
+	MCFG_SPEAKER_STANDARD_MONO("snvol")
+	MCFG_SOUND_ADD("sn", SN76489, XTAL_8MHz / 2) // jumper choice of 2 or 4 MHz
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "snvol", 2.0)
 
 	/* Devices */
 	MCFG_DEVICE_ADD("ppi", I8255A, 0 )
@@ -424,7 +396,7 @@ ROM_START(metalman)
 	ROM_LOAD("sound_m3.bin", 0x40000, 0x20000, CRC(4d9f5ed2) SHA1(bc6b7c70369c25eddddac5304497f30cee7675d4))
 ROM_END
 
-GAME(1985,  brvteam,    0,      inder,  inder, inder_state, inder,  ROT0, "Inder", "Brave Team",         GAME_IS_SKELETON_MECHANICAL)
+GAME(1985,  brvteam,    0,      inder,  inder, inder_state, inder,  ROT0, "Inder", "Brave Team",         GAME_MECHANICAL)
 GAME(1986,  canasta,    0,      inder,  inder, inder_state, inder,  ROT0, "Inder", "Canasta '86'",       GAME_IS_SKELETON_MECHANICAL)
 GAME(1986,  lapbylap,   0,      inder,  inder, inder_state, inder,  ROT0, "Inder", "Lap By Lap",         GAME_IS_SKELETON_MECHANICAL)
 GAME(1987,  pinmoonl,   0,      inder,  inder, inder_state, inder,  ROT0, "Inder", "Moon Light (Inder)", GAME_IS_SKELETON_MECHANICAL)

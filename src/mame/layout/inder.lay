@@ -134,10 +134,10 @@
 		<bezel name="digit40" element="digit">
 			<bounds left="69" top="345" right="103" bottom="384" />
 		</bezel>
-		<bezel name="digit42" element="digit">
+		<bezel name="digit45" element="digit">
 			<bounds left="171" top="345" right="205" bottom="384" />
 		</bezel>
-		<bezel name="digit45" element="digit">
+		<bezel name="digit44" element="digit">
 			<bounds left="210" top="345" right="244" bottom="384" />
 		</bezel>
 		<bezel element="P1"><bounds left="200" right="258" top="330" bottom="342" /></bezel>
