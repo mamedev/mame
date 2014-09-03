@@ -217,6 +217,19 @@
 		</part>
 	</software>
 
+	<software name="bcquestc" cloneof="bcquest">
+		<description>BC's Quest for Tires (Can)</description>
+		<year>1983</year>
+		<publisher>Coleco Canada</publisher>
+		<info name="developer" value="Sydney Development Corp." />
+		<part name="cart" interface="coleco_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="bcquest.1"  size="8192" crc="1b866fb5" sha1="fde4d1474f781d8e62fa565a165f22bebca18c88" offset="0x0000" />
+				<rom name="bcquestc.2" size="8192" crc="86ecca35" sha1="eb359799cdaefe6a3962658856003c031f8d51dd" offset="0x2000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="beamridr">
 		<!-- Beamrider (1983)(Activision).bin -->
 		<description>Beamrider</description>
@@ -247,16 +260,28 @@
 	</software>
 
 	<software name="bdash">
-		<!-- Boulder Dash (1984)(Telegames).bin -->
 		<description>Boulder Dash</description>
-		<year>1984</year>
-		<publisher>Telegames / Micro Fun</publisher>
+		<year>1987</year>
+		<publisher>Telegames</publisher>
 		<info name="developer" value="First Star Software" />
 		<info name="serial" value="TC-203" />
 		<part name="cart" interface="coleco_cart">
 			<dataarea name="rom" size="16384">
-				<rom name="bdash.1" size="8192" crc="aee6e532" sha1="fb0d122b46975759d40ccf0ca3e1a2e5dcac7d88" offset="0x0000" />
-				<rom name="bdash.2" size="8192" crc="1092afb5" sha1="ca51147c6179d87cf8ffe5c90ca72c09cd56c0f4" offset="0x2000" />
+				<rom name="bdash.1" size="8192" crc="c4ee48aa" sha1="8fd0a5ea6c34dd7b448a947504e7cafc55b091e4" offset="0x0000" />
+				<rom name="bdash.2" size="8192" crc="ca3e3cf0" sha1="c88ebbf8c8f1c1e6ca44388bc678b4556e91f831" offset="0x2000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bdashp" cloneof="bdash">
+		<description>Boulder Dash (Prototype?)</description>
+		<year>1984</year>
+		<publisher>Micro Fun</publisher>
+		<info name="developer" value="First Star Software" />
+		<part name="cart" interface="coleco_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="bdashp.1" size="8192" crc="aee6e532" sha1="fb0d122b46975759d40ccf0ca3e1a2e5dcac7d88" offset="0x0000" />
+				<rom name="bdashp.2" size="8192" crc="1092afb5" sha1="ca51147c6179d87cf8ffe5c90ca72c09cd56c0f4" offset="0x2000" />
 			</dataarea>
 		</part>
 	</software>
@@ -291,17 +316,32 @@
 		</part>
 	</software>
 
+<!-- This has been verified in multiple US & Euro carts -->
 	<software name="cabbage">
+		<description>Cabbage Patch Kids: Adventure in the Park (OAA)</description>
+		<year>1984</year>
+		<publisher>OAA / Konami</publisher>
+		<info name="developer" value="OAA" />
+		<info name="serial" value="2682" />
+		<part name="cart" interface="coleco_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="cabbage.1" size="8192" crc="e7214974" sha1="f7a5c2e068ba8edba0adea6f876ff17e8ed4ea7d" offset="0x0000" />
+				<rom name="cabbage.2" size="8192" crc="2c110b3b" sha1="4b0f0d339d28dba29cb6f376e7cbb508807923fe" offset="0x2000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cabbagea" cloneof="cabbage">
 		<!-- Cabbage Patch Kids - Adventures in the Park (1984)(Coleco).bin -->
-		<description>Cabbage Patch Kids: Adventure in the Park</description>
+		<description>Cabbage Patch Kids: Adventure in the Park (Coleco)</description>
 		<year>1984</year>
 		<publisher>Coleco / CBS</publisher>
 		<info name="developer" value="OAA" />
 		<info name="serial" value="2682" />
 		<part name="cart" interface="coleco_cart">
 			<dataarea name="rom" size="16384">
-				<rom name="cabbage.1" size="8192" crc="6a8fa43b" sha1="ae5dab9b947e4b37bae6abaecf81afbcb689be04" offset="0x0000" />
-				<rom name="cabbage.2" size="8192" crc="49b92492" sha1="8c883bafb1e01ed59866c1ceabccbb3990ecca6c" offset="0x2000" />
+				<rom name="cabbagea.1" size="8192" crc="6a8fa43b" sha1="ae5dab9b947e4b37bae6abaecf81afbcb689be04" offset="0x0000" />
+				<rom name="cabbagea.2" size="8192" crc="49b92492" sha1="8c883bafb1e01ed59866c1ceabccbb3990ecca6c" offset="0x2000" />
 			</dataarea>
 		</part>
 	</software>
@@ -542,6 +582,34 @@
 		</part>
 	</software>
 
+<!-- This has been verified with real cart -->
+	<software name="evolutioa" cloneof="evolutio">
+		<description>Evolution (Telegames)</description>
+		<year>198?</year>
+		<publisher>Telegames</publisher>
+		<info name="developer" value="Sydney Developmeent Corp." />
+		<part name="cart" interface="coleco_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="evolutioa.1" size="8192" crc="7eb6f929" sha1="e473d34b53b1d4d3dcb7d784692e9ad01ef7096f" offset="0x0000" />
+				<rom name="evolutioa.2" size="8192" crc="fd1644ac" sha1="de90a09aad383eacdf3e16aa76728c140f867d61" offset="0x2000" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- This has been verified with real cart -->
+	<software name="evolutioc" cloneof="evolutio">
+		<description>Evolution (Can)</description>
+		<year>1983</year>
+		<publisher>Coleco / CBS</publisher>
+		<info name="developer" value="Sydney Developmeent Corp." />
+		<part name="cart" interface="coleco_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="evolutioc.1" size="8192" crc="75a9c817" sha1="cfa0de8046eaf7f35fd13400d38a000b3419618f" offset="0x0000" />
+				<rom name="evolutioc.2" size="8192" crc="fd1644ac" sha1="de90a09aad383eacdf3e16aa76728c140f867d61" offset="0x2000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="fathom">
 		<!-- Fathom (1983)(Coleco).bin -->
 		<description>Fathom</description>
@@ -556,8 +624,8 @@
 		</part>
 	</software>
 
+<!-- This has been verified in real carts -->
 	<software name="flipslip">
-		<!-- Flipper Slipper (1983)(Spectravideo).bin -->
 		<description>Flipper Slipper</description>
 		<year>1983</year>
 		<publisher>Spectravideo</publisher>
@@ -565,7 +633,34 @@
 		<part name="cart" interface="coleco_cart">
 			<dataarea name="rom" size="16384">
 				<rom name="flipslip.1" size="8192" crc="e26569f3" sha1="c7be7b82dc66e74dcf15fce148b6ebd85d3b4afa" offset="0x0000" />
-				<rom name="flipslip.2" size="8192" crc="d4ab0e71" sha1="e7adb3c3599d44aa074d1a5a4f06a3c5466159c1" offset="0x2000" />
+				<rom name="flipslip.2" size="8192" crc="80755958" sha1="455ecb6287453d49bbddd497757340761d50c243" offset="0x2000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="flipslipa" cloneof="flipslip">
+		<!-- Flipper Slipper (1983)(Spectravideo).bin -->
+		<description>Flipper Slipper (Bad?)</description>
+		<year>1983</year>
+		<publisher>Spectravideo</publisher>
+		<info name="serial" value="SE291" />
+		<part name="cart" interface="coleco_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="flipslipa.1" size="8192" crc="e26569f3" sha1="c7be7b82dc66e74dcf15fce148b6ebd85d3b4afa" offset="0x0000" />
+				<rom name="flipslipa.2" size="8192" crc="d4ab0e71" sha1="e7adb3c3599d44aa074d1a5a4f06a3c5466159c1" offset="0x2000" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- This has been verified in real carts -->
+	<software name="flipslipb" cloneof="flipslip">
+		<description>Flipper Slipper (Telegames)</description>
+		<year>198?</year>
+		<publisher>Telegames</publisher>
+		<part name="cart" interface="coleco_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="flipslipb.1" size="8192" crc="e26569f3" sha1="c7be7b82dc66e74dcf15fce148b6ebd85d3b4afa" offset="0x0000" />
+				<rom name="flipslipb.2" size="8192" crc="3db410f8" sha1="e884854fe0f3f822ded0b7209b44c3dbac60c16b" offset="0x2000" />
 			</dataarea>
 		</part>
 	</software>
@@ -621,6 +716,7 @@
 		<part name="cart" interface="coleco_cart">
 			<dataarea name="rom" size="16384">
 				<rom name="apshai.1" size="8192" crc="aa3ec181" sha1="7f79628c298ad6e410af82eeb33871869ad23de8" offset="0x0000" />
+                <!-- 2nd 8K chunk containes two copies of the same 4K data -->
 				<rom name="apshai.2" size="8192" crc="0e440f8f" sha1="09ffaeb79cdd8173882b77a8398a4e00ba826de1" offset="0x2000" />
 			</dataarea>
 		</part>
@@ -1135,9 +1231,10 @@
 		</part>
 	</software>
 
+<!-- This was found in multiple carts with Coleco-style shell, both from USA, Euro and Canada -->
 	<software name="pitstop">
-		<!-- Pitstop (1983)(Epyx).bin -->
-		<description>Pitstop</description>
+		<!-- Pitstop (1983)(Epyx)[a].bin -->
+		<description>Pitstop (Euro, USA, Can)</description>
 		<year>1983</year>
 		<publisher>Epyx</publisher>
 		<info name="serial" value="600" />
@@ -1145,23 +1242,24 @@
 		<part name="cart" interface="coleco_cart">
 			<dataarea name="rom" size="16384">
 				<rom name="pitstop.1" size="8192" crc="9480724e" sha1="9eec6c799ff3da0f2f282165cda94ec01d5c53d4" offset="0x0000" />
-				<rom name="pitstop.2" size="8192" crc="ce8e9e7e" sha1="f6872209a6a45f9a0731bf314faa1e1cf520c95a" offset="0x2000" />
+				<rom name="pitstop.2" size="8192" crc="a9172ddb" sha1="b06fb187a6c7d27f18d10fc817df2f26ca8f24cf" offset="0x2000" />
 			</dataarea>
 		</part>
 	</software>
 
+<!-- This was found in multiple carts with Imagic-style shell, USA only -->
 	<software name="pitstopa" cloneof="pitstop">
-		<!-- Pitstop (1983)(Epyx)[a].bin -->
+		<!-- Pitstop (1983)(Epyx).bin -->
 		<!-- 0x26a7 : 0x20 ('pitstop') - 0x10 ('pitstopa') -->
-		<description>Pitstop (Alt)</description>
+		<description>Pitstop (USA, Alt)</description>
 		<year>1983</year>
 		<publisher>Epyx</publisher>
 		<info name="serial" value="600" />
 		<info name="usage" value="Supports driving controller" />
 		<part name="cart" interface="coleco_cart">
 			<dataarea name="rom" size="16384">
-				<rom name="pitstop.1"  size="8192" crc="9480724e" sha1="9eec6c799ff3da0f2f282165cda94ec01d5c53d4" offset="0x0000" />
-				<rom name="pitstopa.2" size="8192" crc="a9172ddb" sha1="b06fb187a6c7d27f18d10fc817df2f26ca8f24cf" offset="0x2000" />
+				<rom name="pitstopa.1" size="8192" crc="9480724e" sha1="9eec6c799ff3da0f2f282165cda94ec01d5c53d4" offset="0x0000" />
+				<rom name="pitstopa.2" size="8192" crc="ce8e9e7e" sha1="f6872209a6a45f9a0731bf314faa1e1cf520c95a" offset="0x2000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1195,16 +1293,30 @@
 		</part>
 	</software>
 
+<!-- This has been verified with a real cart -->
 	<software name="qbertqub">
-		<!-- Q-Bert Qubes (1984)(Parker Brothers).bin -->
 		<description>Q*bert Qubes</description>
 		<year>1984</year>
 		<publisher>Parker Brothers</publisher>
 		<info name="serial" value="9950" />
 		<part name="cart" interface="coleco_cart">
 			<dataarea name="rom" size="16384">
-				<rom name="qbertqub.1" size="8192" crc="f98f9356" sha1="2abff8e0724fce7d68e12b992938f312eab52564" offset="0x0000" />
+				<rom name="qbertqub.1" size="8192" crc="47e28915" sha1="fa9c180b4d6a1599143a9e9184b24a832f804ef7" offset="0x0000" />
 				<rom name="qbertqub.2" size="8192" crc="6c620927" sha1="95810995430977c2164713c422deb7f6161538fd" offset="0x2000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="qbertquba" cloneof="qbertqub">
+		<!-- Q-Bert Qubes (1984)(Parker Brothers).bin -->
+		<description>Q*bert Qubes (Alt?)</description>
+		<year>1984</year>
+		<publisher>Parker Brothers</publisher>
+		<info name="serial" value="9950" />
+		<part name="cart" interface="coleco_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="qbertquba.1" size="8192" crc="f98f9356" sha1="2abff8e0724fce7d68e12b992938f312eab52564" offset="0x0000" />
+				<rom name="qbertquba.2" size="8192" crc="6c620927" sha1="95810995430977c2164713c422deb7f6161538fd" offset="0x2000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1471,22 +1583,6 @@
 			<dataarea name="rom" size="16384">
 				<rom name="sprcross.1" size="8192" crc="e5a53b79" sha1="ca92f9f88a59350b3ad6c5bff1ce09883b817e9f" offset="0x0000" />
 				<rom name="sprcross.2" size="8192" crc="5185bd94" sha1="91d4c54380f2f535d5045437a978e894bd19ff58" offset="0x2000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="sprcrossa" cloneof="sprcross">
-		<!-- Super Cross Force (1983)(Spectravideo)[a].bin -->
-		<!-- 0x2f00-0x2fff : filled with 0xff in this set -->
-		<!-- 0x32cd-0x3dff : filled with 0xff in this set -->
-		<description>Super Cross Force (Alt)</description>
-		<year>1983</year>
-		<publisher>Spectravideo</publisher>
-		<info name="serial" value="SE237" />
-		<part name="cart" interface="coleco_cart">
-			<dataarea name="rom" size="16384">
-				<rom name="sprcross.1"  size="8192" crc="e5a53b79" sha1="ca92f9f88a59350b3ad6c5bff1ce09883b817e9f" offset="0x0000" />
-				<rom name="sprcrossa.2" size="8192" crc="bd58d3e1" sha1="2d9dd5bece51e9aa9aa4b86b78f1127d231511ef" offset="0x2000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1771,8 +1867,8 @@
 		</part>
 	</software>
 
-	<software name="bcquest2ca" cloneof="bcquest2">
-		<!-- BC's Quest for Tires II - Grog's Revenge (1984)(Coleco).bin -->
+<!-- This has been verified with a real cart -->
+	<software name="bcquest2c" cloneof="bcquest2">
 		<description>BC's Quest for Tires II: Grog's Revenge (Can)</description>
 		<year>1984</year>
 		<publisher>Coleco Canada</publisher>
@@ -1780,8 +1876,24 @@
 		<info name="serial" value="2863" />
 		<part name="cart" interface="coleco_cart">
 			<dataarea name="rom" size="24576">
+				<rom name="bcquest2c.1" size="8192" crc="6a6efd7e" sha1="de5bb00f3227819e9cd6e999277b5ef0a24d0980" offset="0x0000" />
+				<rom name="bcquest2c.2" size="8192" crc="c42f20bd" sha1="1f1123a19cf8231d31b85b73cd58c9da65d8f6d0" offset="0x2000" />
+				<rom name="bcquest2c.3" size="8192" crc="0ba739c3" sha1="ee926563a8b3455ce2052e527cb304bb6c5914a8" offset="0x4000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bcquest2ca" cloneof="bcquest2">
+		<!-- BC's Quest for Tires II - Grog's Revenge (1984)(Coleco).bin -->
+		<description>BC's Quest for Tires II: Grog's Revenge (Can, Bad?)</description>
+		<year>1984</year>
+		<publisher>Coleco Canada</publisher>
+		<info name="developer" value="Sydney Development Corp." />
+		<info name="serial" value="2863" />
+		<part name="cart" interface="coleco_cart">
+			<dataarea name="rom" size="24576">
 				<rom name="bcquest2ca.1" size="8192" crc="8898dfc3" sha1="8fb18585c0134932bbf501bd27052ddd51fce458" offset="0x0000" />
-				<rom name="bcquest2ca.2" size="8192" crc="c42f20bd" sha1="1f1123a19cf8231d31b85b73cd58c9da65d8f6d0" offset="0x2000" />
+				<rom name="bcquest2c.2"  size="8192" crc="c42f20bd" sha1="1f1123a19cf8231d31b85b73cd58c9da65d8f6d0" offset="0x2000" />
 				<rom name="bcquest2ca.3" size="8192" crc="117dedbe" sha1="ffb4561403d2e28c74a6c38acd4652fe021a65e2" offset="0x4000" />
 			</dataarea>
 		</part>
@@ -1853,7 +1965,7 @@
 
 	<software name="dkonga" cloneof="dkong">
 		<!-- Donkey Kong (Earlier Version) (1982)(Coleco).bin -->
-		<description>Donkey Kong (Earlier Version)</description>
+		<description>Donkey Kong (Earlier)</description>
 		<!-- This version contained a number of bugs which were fixed and the code size reduced to fit into 16k. -->
 		<year>1982</year>
 		<publisher>Coleco / CBS</publisher>
@@ -1870,6 +1982,7 @@
 
 	<software name="frenzy">
 		<!-- Frenzy (1983)(Coleco).bin -->
+		<!-- 0x5000-0x5fff : Filled with 0xff (except for 0x5ffe) -->
 		<description>Frenzy</description>
 		<year>1983</year>
 		<publisher>Coleco / CBS</publisher>
@@ -1886,7 +1999,8 @@
 
 	<software name="frenzya" cloneof="frenzy">
 		<!-- Frenzy (1983)(Coleco)[a].bin -->
-		<!-- 0x5000-0x5fff : NOT filled with 0xff in this set -->
+		<!-- 0x4000-0x4fff : Same as above -->
+		<!-- 0x5000-0x5fff : Copy of 0x4000-0x4fff -->
 		<description>Frenzy (Alt 1)</description>
 		<year>1983</year>
 		<publisher>Coleco / CBS</publisher>
@@ -1903,7 +2017,8 @@
 
 	<software name="frenzya2" cloneof="frenzy">
 		<!-- Frenzy (1983)(Coleco)[a2].bin -->
-		<!-- 0x5ffe : 0x00 ('frenzy') - 0xff ('frenzya2') -->
+		<!-- 0x4000-0x4fff : Same as above -->
+		<!-- 0x5000-0x5fff : Filled with 0xff -->
 		<description>Frenzy (Alt 2)</description>
 		<year>1983</year>
 		<publisher>Coleco / CBS</publisher>
@@ -1962,33 +2077,48 @@
 		</part>
 	</software>
 
+<!-- This has been verified with real cart -->
 	<software name="heist">
-		<!-- Heist, The (1983)(Micro Fun).bin -->
 		<description>The Heist</description>
 		<year>1983</year>
 		<publisher>Micro Fun</publisher>
 		<info name="serial" value="MCL520" />
 		<part name="cart" interface="coleco_cart">
 			<dataarea name="rom" size="24576">
-				<rom name="heist.1" size="8192" crc="34080665" sha1="380f7b5a85ef1483e15ec589c85b7a91e9167f68" offset="0x0000" />
+				<rom name="heist.1" size="8192" crc="a3696552" sha1="1ca7b8c9c2e046b099c747ed05efb8e175c7e37d" offset="0x0000" />
 				<rom name="heist.2" size="8192" crc="d5c02ce0" sha1="ad3b3dd0d24457f30a4b86b350ac65895b5b9e1b" offset="0x2000" />
-				<rom name="heist.3" size="8192" crc="177a899f" sha1="2534135dea50bc982b197afe569402240f0c907d" offset="0x4000" />
+				<rom name="heist.3" size="8192" crc="b196db89" sha1="c8c3aaeeb8a155f3abaea06198c0c477266c2541" offset="0x4000" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="heista" cloneof="heist">
-		<!-- Heist, The (1983)(Micro Fun)[a].bin -->
-		<!-- 0x5ffe : 0x00 0xff ('heist') - 0x70 0x66 ('heista') -->
-		<description>The Heist (Alt)</description>
+		<!-- Heist, The (1983)(Micro Fun).bin -->
+		<description>The Heist (Trained?)</description>
 		<year>1983</year>
 		<publisher>Micro Fun</publisher>
 		<info name="serial" value="MCL520" />
 		<part name="cart" interface="coleco_cart">
 			<dataarea name="rom" size="24576">
-				<rom name="heist.1"  size="8192" crc="34080665" sha1="380f7b5a85ef1483e15ec589c85b7a91e9167f68" offset="0x0000" />
+				<rom name="heista.1" size="8192" crc="34080665" sha1="380f7b5a85ef1483e15ec589c85b7a91e9167f68" offset="0x0000" />
 				<rom name="heist.2"  size="8192" crc="d5c02ce0" sha1="ad3b3dd0d24457f30a4b86b350ac65895b5b9e1b" offset="0x2000" />
-				<rom name="heista.3" size="8192" crc="b196db89" sha1="c8c3aaeeb8a155f3abaea06198c0c477266c2541" offset="0x4000" />
+				<rom name="heista.3" size="8192" crc="177a899f" sha1="2534135dea50bc982b197afe569402240f0c907d" offset="0x4000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="heistb" cloneof="heist">
+		<!-- Heist, The (1983)(Micro Fun)[a].bin -->
+		<!-- 0x5ffe : 0x00 0xff ('heist') - 0x70 0x66 ('heista') -->
+		<description>The Heist (Trained?, Alt)</description>
+		<year>1983</year>
+		<publisher>Micro Fun</publisher>
+		<info name="serial" value="MCL520" />
+		<part name="cart" interface="coleco_cart">
+			<dataarea name="rom" size="24576">
+				<rom name="heista.1" size="8192" crc="34080665" sha1="380f7b5a85ef1483e15ec589c85b7a91e9167f68" offset="0x0000" />
+				<rom name="heist.2"  size="8192" crc="d5c02ce0" sha1="ad3b3dd0d24457f30a4b86b350ac65895b5b9e1b" offset="0x2000" />
+				<rom name="heistb.3" size="8192" crc="b196db89" sha1="c8c3aaeeb8a155f3abaea06198c0c477266c2541" offset="0x4000" />
 			</dataarea>
 		</part>
 	</software>
@@ -2019,7 +2149,7 @@
 			<dataarea name="rom" size="24576">
 				<rom name="mine2049.1" size="8192" crc="e2814592" sha1="72d481f162983584d38a4a4d68aff51c519d9773" offset="0x0000" />
 				<rom name="mine2049.2" size="8192" crc="3bc36ef5" sha1="5dca9ba3a84b6e4bbdb00688df5a5080d41f102f" offset="0x2000" />
-				<rom name="mine2049.3" size="8192" crc="83722d88" sha1="17b2f7bde759d8d7142f0a9a7aa672f0966d07f2" offset="0x4000" />
+				<rom name="mine2049.3" size="8192" crc="01d96549" sha1="c9a3ed15b584a153488c55a53b88f075e4989f9d" offset="0x4000" />
 			</dataarea>
 		</part>
 	</software>
@@ -2138,8 +2268,8 @@
 		</part>
 	</software>
 
+<!-- This has been verified with real cart (unsure about the upper 4K of the 3rd ROM, though...) -->
 	<software name="subroc">
-		<!-- Subroc (1983)(Coleco).bin -->
 		<description>Subroc</description>
 		<year>1983</year>
 		<publisher>Coleco / CBS</publisher>
@@ -2147,9 +2277,26 @@
 		<info name="serial" value="2614" />
 		<part name="cart" interface="coleco_cart">
 			<dataarea name="rom" size="24576">
-				<rom name="subroc.1" size="8192" crc="85a94623" sha1="9cebe30e43cdd7af9fb611107288588e93542185" offset="0x0000" />
-				<rom name="subroc.2" size="8192" crc="b558def8" sha1="7ca3f7ab8431ca3d45f63b38f3af29ea4977434f" offset="0x2000" />
-				<rom name="subroc.3" size="8192" crc="9dbbb193" sha1="e37a6801e3c3a9fb304974a02aa655e6edda90eb" offset="0x4000" />
+				<rom name="subroc.1" size="8192" crc="ff56b769" sha1="612a0abd13c4c7790890cbcb265a7fd786c7ec5c" offset="0x0000" />
+				<rom name="subroc.2" size="8192" crc="e9e60d4c" sha1="bfc94db65985b7a906099465a47d900f7a9a9106" offset="0x2000" />
+                <!-- 3rd 8K chunk containes two copies of the same 4K data -->
+				<rom name="subroc.3" size="8192" crc="abe18f08" sha1="6ebdc68397c7b20dceba12ff754f88c955d5f98a" offset="0x4000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="subroca" cloneof="subroc">
+		<!-- Subroc (1983)(Coleco).bin -->
+		<description>Subroc (Alt?)</description>
+		<year>1983</year>
+		<publisher>Coleco / CBS</publisher>
+		<info name="developer" value="Sega" />
+		<info name="serial" value="2614" />
+		<part name="cart" interface="coleco_cart">
+			<dataarea name="rom" size="24576">
+				<rom name="subroca.1" size="8192" crc="85a94623" sha1="9cebe30e43cdd7af9fb611107288588e93542185" offset="0x0000" />
+				<rom name="subroca.2" size="8192" crc="b558def8" sha1="7ca3f7ab8431ca3d45f63b38f3af29ea4977434f" offset="0x2000" />
+				<rom name="subroca.3" size="8192" crc="9dbbb193" sha1="e37a6801e3c3a9fb304974a02aa655e6edda90eb" offset="0x4000" />
 			</dataarea>
 		</part>
 	</software>
@@ -2172,17 +2319,36 @@
 
 	<software name="victory">
 		<!-- Victory (1983)(Coleco).bin -->
-		<description>Victory</description>
+		<!-- 0x5000-0x5fff : Filled with 0xff -->
+		<description>Victory (Euro)</description>
 		<year>1983</year>
-		<publisher>Coleco / CBS</publisher>
+		<publisher>CBS</publisher>
 		<info name="developer" value="Exidy" />
 		<info name="serial" value="2446" />
 		<info name="usage" value="Requires roller controller" />
 		<part name="cart" interface="coleco_cart">
 			<dataarea name="rom" size="24576">
 				<rom name="victory.1" size="8192" crc="811389ba" sha1="5fab37b9ffe6d2630c09518e9fbb35d9254962ec" offset="0x0000" />
-				<rom name="victory.2" size="8192" crc="9a0ffe5c" sha1="9801ca851e57e41292734665df32c3f89e53f8e8" offset="0x2000" />
-				<rom name="victory.3" size="8192" crc="0c873fde" sha1="ca926176a5a573cb56f9f1832c82429c9eb8c552" offset="0x4000" />
+				<rom name="victory.2" size="8192" crc="d7ae282c" sha1="0647b80a5e187ce313ae75bb6e3019803249caae" offset="0x2000" />
+				<rom name="victory.3" size="8192" crc="1b355725" sha1="1e04b8d66be18e9ff400787c4b6388891061b659" offset="0x4000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="victoryu" cloneof="victory">
+		<!-- Victory (1983)(Coleco).bin -->
+		<!-- 0x5000-0x5fff : Filled with 0xff -->
+		<description>Victory (USA)</description>
+		<year>1983</year>
+		<publisher>Coleco</publisher>
+		<info name="developer" value="Exidy" />
+		<info name="serial" value="2446" />
+		<info name="usage" value="Requires roller controller" />
+		<part name="cart" interface="coleco_cart">
+			<dataarea name="rom" size="24576">
+				<rom name="victory.1"  size="8192" crc="811389ba" sha1="5fab37b9ffe6d2630c09518e9fbb35d9254962ec" offset="0x0000" />
+				<rom name="victoryu.2" size="8192" crc="9a0ffe5c" sha1="9801ca851e57e41292734665df32c3f89e53f8e8" offset="0x2000" />
+				<rom name="victoryu.3" size="8192" crc="0c873fde" sha1="ca926176a5a573cb56f9f1832c82429c9eb8c552" offset="0x4000" />
 			</dataarea>
 		</part>
 	</software>
@@ -2205,7 +2371,7 @@
 
 	<software name="zaxxon">
 		<!-- Zaxxon (1982)(Coleco).bin -->
-		<description>Zaxxon</description>
+		<description>Zaxxon (Coleco)</description>
 		<year>1982</year>
 		<publisher>Coleco / CBS</publisher>
 		<info name="developer" value="Sega" />
@@ -2215,6 +2381,25 @@
 				<rom name="zaxxon.1" size="8192" crc="91ff7961" sha1="61e3ffc8b89c7bea961d89f445adcfbe1da874e1" offset="0x0000" />
 				<rom name="zaxxon.2" size="8192" crc="36dab466" sha1="e489bc317e09af5c0c5492cfa36f808ca5b4101e" offset="0x2000" />
 				<rom name="zaxxon.3" size="8192" crc="9498a0c9" sha1="4f72bb68d855b8f682896536602869a7ca249497" offset="0x4000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zaxxont" cloneof="zaxxon">
+		<!-- The Taiwan Cooper cart contains a 32K ROM, the last 8K of which was found to 
+             contain 0x4000-0x4fff from Super Action Baseball followed by 0x1000-0x1fff 
+             from Meteoric Shower! -->
+		<description>Zaxxon (Taiwan Cooper)</description>
+		<year>198?</year>
+		<publisher>Taiwan Cooper</publisher>
+		<info name="developer" value="Sega" />
+		<info name="serial" value="2435" />
+		<part name="cart" interface="coleco_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="zaxxont.1" size="8192" crc="45a411fc" sha1="5372b97a0613a97bd3eb4885f68a76a84e13d71a" offset="0x0000" />
+				<rom name="zaxxon.2"  size="8192" crc="36dab466" sha1="e489bc317e09af5c0c5492cfa36f808ca5b4101e" offset="0x2000" />
+				<rom name="zaxxon.3"  size="8192" crc="9498a0c9" sha1="4f72bb68d855b8f682896536602869a7ca249497" offset="0x4000" />
+				<rom name="zaxxont.4" size="8192" crc="c3928bf7" sha1="43deb288bc67c9e32e80980a853f9236ff752794" offset="0x6000" />
 			</dataarea>
 		</part>
 	</software>
@@ -2238,17 +2423,32 @@
 	</software>
 
 	<software name="dambust">
-		<!-- Dam Busters, The (1984)(Coleco).bin -->
 		<description>The Dam Busters</description>
 		<year>1984</year>
 		<publisher>Coleco / CBS</publisher>
 		<info name="serial" value="2686" />
 		<part name="cart" interface="coleco_cart">
 			<dataarea name="rom" size="32768">
-				<rom name="dambust.1" size="8192" crc="9e82b4ab" sha1="d7dee3bfbb285c7cd0c09ebe4465370a1f1b3e05" offset="0x0000" />
-				<rom name="dambust.2" size="8192" crc="56a1b71e" sha1="a63be2652d64647e018c2f1c45586703dc369442" offset="0x2000" />
-				<rom name="dambust.3" size="8192" crc="1b5af735" sha1="a7fa211492aed0db32eb6274bb07c99680b944ee" offset="0x4000" />
-				<rom name="dambust.4" size="8192" crc="72119879" sha1="24f2492bfbc0599531635962fec63b5a4ca20bc7" offset="0x6000" />
+				<rom name="dambust.1" size="8192" crc="58dd9764" sha1="3b84662a1dfaf2cc1a6a2d85f7aff785b9b1d052" offset="0x0000" />
+				<rom name="dambust.2" size="8192" crc="401830a3" sha1="5519bb2dc830509fe934d9fea72de6f26c6e1c91" offset="0x2000" />
+				<rom name="dambust.3" size="8192" crc="ff4cddb5" sha1="9ac9a1dfeb1d94feae87254b1206d8cd096a6d50" offset="0x4000" />
+				<rom name="dambust.4" size="8192" crc="9d0e991a" sha1="8c37fda6a24bbcd939dc0b2330e36be34c755a9a" offset="0x6000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dambustc" cloneof="dambust">
+		<!-- Dam Busters, The (1984)(Coleco).bin -->
+		<description>The Dam Busters (Can)</description>
+		<year>1984</year>
+		<publisher>Coleco / CBS</publisher>
+		<info name="serial" value="2686" />
+		<part name="cart" interface="coleco_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="dambustc.1" size="8192" crc="9e82b4ab" sha1="d7dee3bfbb285c7cd0c09ebe4465370a1f1b3e05" offset="0x0000" />
+				<rom name="dambustc.2" size="8192" crc="56a1b71e" sha1="a63be2652d64647e018c2f1c45586703dc369442" offset="0x2000" />
+				<rom name="dambustc.3" size="8192" crc="1b5af735" sha1="a7fa211492aed0db32eb6274bb07c99680b944ee" offset="0x4000" />
+				<rom name="dambustc.4" size="8192" crc="72119879" sha1="24f2492bfbc0599531635962fec63b5a4ca20bc7" offset="0x6000" />
 			</dataarea>
 		</part>
 	</software>
@@ -2322,55 +2522,38 @@
 		</part>
 	</software>
 
-	<software name="safootb">
+	<software name="safootbu">
 		<!-- Super Action Football (1984)(Coleco).bin -->
-		<description>Super Action Football</description>
+		<description>Super Action Football (USA)</description>
 		<year>1984</year>
 		<publisher>Coleco / CBS</publisher>
 		<info name="serial" value="2422" />
 		<info name="usage" value="Requires Super Action Controllers" />
 		<part name="cart" interface="coleco_cart">
 			<dataarea name="rom" size="32768">
-				<rom name="safootb.1" size="8192" crc="f1fdec05" sha1="d4d0134a5b149517ddc82001e90fd9a8f84b5945" offset="0x0000" />
-				<rom name="safootb.2" size="8192" crc="84104709" sha1="185dc05edc8d36e2720bc4c92629db2864d5dca2" offset="0x2000" />
-				<rom name="safootb.3" size="8192" crc="496d3acb" sha1="2b1ac775a7b6ac7782a075e55e79fc8508b17121" offset="0x4000" />
-				<rom name="safootb.4" size="8192" crc="dcc8042d" sha1="0ef66fbfdca2cf08c6e5da65b34c5f156e336f3e" offset="0x6000" />
+				<rom name="safootbu.1" size="8192" crc="f1fdec05" sha1="d4d0134a5b149517ddc82001e90fd9a8f84b5945" offset="0x0000" />
+				<rom name="safootbu.2" size="8192" crc="84104709" sha1="185dc05edc8d36e2720bc4c92629db2864d5dca2" offset="0x2000" />
+				<rom name="safootbu.3" size="8192" crc="496d3acb" sha1="2b1ac775a7b6ac7782a075e55e79fc8508b17121" offset="0x4000" />
+				<rom name="safootbu.4" size="8192" crc="dcc8042d" sha1="0ef66fbfdca2cf08c6e5da65b34c5f156e336f3e" offset="0x6000" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="saftsocc" cloneof="sasoccer">
+<!-- The Football (=Soccer) game was only released in PAL version and it was titled "Super Action Football" -->
+<!-- The dump with title "Super Action Soccer" is likely hacked -->
+	<software name="safootb">
 		<!-- Super Action Football (1984)(Coleco)[a].bin -->
-		<!-- 0x0024 : " SOCCER " ('sasoccer') - "FOOTBALL" ('saftsocc') -->
-		<!-- 0x7fff : 0x00 ('sasoccer') - 0x1a ('saftsocc') -->
-		<description>Super Action Football (Super Action Soccer clone)</description>
+		<description>Super Action Football (Euro)</description>
 		<year>1984</year>
 		<publisher>Coleco / CBS</publisher>
 		<info name="serial" value="2422" />
 		<info name="usage" value="Requires Super Action Controllers" />
 		<part name="cart" interface="coleco_cart">
 			<dataarea name="rom" size="32768">
-				<rom name="saftsocc.1" size="8192" crc="fb9f52cb" sha1="415a9a29321ea541b4e9a7f6c55789613e047e97" offset="0x0000" />
-				<rom name="sasoccer.2" size="8192" crc="014ecf5f" sha1="5c232a92970368628a41874b65370f4d638ed599" offset="0x2000" />
-				<rom name="sasoccer.3" size="8192" crc="780e3e49" sha1="601620a31148622f5eb4d9ee509be7bc4917d60b" offset="0x4000" />
-				<rom name="saftsocc.4" size="8192" crc="b23e1847" sha1="bb245108b34fa7d5b797fac206db08bb4a727ea0" offset="0x6000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="sasoccer">
-		<!-- Super Action Soccer (1984)(Coleco).bin -->
-		<description>Super Action Soccer</description>
-		<year>1984</year>
-		<publisher>Coleco / CBS</publisher>
-		<info name="serial" value="2422" />
-		<info name="usage" value="Requires Super Action Controllers" />
-		<part name="cart" interface="coleco_cart">
-			<dataarea name="rom" size="32768">
-				<rom name="sasoccer.1" size="8192" crc="17447e87" sha1="0ae929fca4aa372e777d2fcf04d08b2ddc1b7245" offset="0x0000" />
-				<rom name="sasoccer.2" size="8192" crc="014ecf5f" sha1="5c232a92970368628a41874b65370f4d638ed599" offset="0x2000" />
-				<rom name="sasoccer.3" size="8192" crc="780e3e49" sha1="601620a31148622f5eb4d9ee509be7bc4917d60b" offset="0x4000" />
-				<rom name="sasoccer.4" size="8192" crc="4f5ce13d" sha1="262b6bdbdc249d89c87f1b0fbc643c383663103c" offset="0x6000" />
+				<rom name="safootb.1" size="8192" crc="fb9f52cb" sha1="415a9a29321ea541b4e9a7f6c55789613e047e97" offset="0x0000" />
+				<rom name="safootb.2" size="8192" crc="014ecf5f" sha1="5c232a92970368628a41874b65370f4d638ed599" offset="0x2000" />
+				<rom name="safootb.3" size="8192" crc="780e3e49" sha1="601620a31148622f5eb4d9ee509be7bc4917d60b" offset="0x4000" />
+				<rom name="safootb.4" size="8192" crc="4f5ce13d" sha1="262b6bdbdc249d89c87f1b0fbc643c383663103c" offset="0x6000" />
 			</dataarea>
 		</part>
 	</software>
@@ -2454,7 +2637,7 @@
 		<!-- Cabbage Patch Kids - Adventures in the Park (1984)(OAA)(proto).bin -->
 		<description>Cabbage Patch Kids: Adventure in the Park (Prototype)</description>
 		<year>1984</year>
-		<publisher>Coleco / CBS</publisher>
+		<publisher>OAA / Konami</publisher>
 		<info name="developer" value="OAA" />
 		<part name="cart" interface="coleco_cart">
 			<dataarea name="rom" size="16384">
@@ -2895,9 +3078,22 @@
 		</part>
 	</software>
 
+<!-- The lower half has been verified with real cart, but upper 8k should contain some remnants of Boulder Dash... -->
 	<software name="skiing">
-		<!-- Skiing (1986)(Telegames).bin -->
 		<description>Skiing</description>
+		<year>1986</year>
+		<publisher>Telegames</publisher>
+		<part name="cart" interface="coleco_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="skiing.1" size="8192" crc="b37d48bd" sha1="2cfd62a4b403fc2f5344d0e095d1028cc11e4ecc" offset="0x0000" />
+				<rom name="skiing.2" size="8192" crc="b4293435" sha1="5e2b96c19c4f5c63a5afa2de504d29fe64a4c908" offset="0x2000" /> <!-- All FF bytes -->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="skiinga" cloneof="skiing">
+		<!-- Skiing (1986)(Telegames).bin -->
+		<description>Skiing (Bad?)</description>
 		<year>1986</year>
 		<publisher>Telegames</publisher>
 		<part name="cart" interface="coleco_cart">
