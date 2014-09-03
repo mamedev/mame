@@ -1369,11 +1369,6 @@ WRITE16_MEMBER(raiden2_state::sprite_prot_src_w)
 	flag = (space.read_word(src) & 0xfffe) | flag;
 	space.write_word(src, flag);
 
-	if(head2 >= 0xc824 && head2 <= 0xc858) {
-		w *= 2;
-		h *= 2;
-	}
-
 	if(flag & 1)
 	{
 		space.write_word(dst1,   head1);
