@@ -26,6 +26,11 @@ void seibuspi_state::set_layer_offsets()
 		m_midl_layer_offset = 0x2000 / 4 / 2;
 		m_text_layer_offset = 0x3000 / 4 / 2;
 	}
+	
+	m_fore_layer_d13 = m_layer_bank >> 14 & 0x2000;
+	m_back_layer_d14 = m_rf2_layer_bank << 14 & 0x4000;
+	m_midl_layer_d14 = m_rf2_layer_bank << 13 & 0x4000;
+	m_fore_layer_d14 = m_rf2_layer_bank << 12 & 0x4000;
 }
 
 READ32_MEMBER(seibuspi_state::spi_layer_bank_r)
@@ -35,36 +40,40 @@ READ32_MEMBER(seibuspi_state::spi_layer_bank_r)
 
 WRITE32_MEMBER(seibuspi_state::spi_layer_bank_w)
 {
-	// r000f000 0010100x 00000000 00000000
+	// r000f000 0010100a 00000000 00000000
 	// r: rowscroll enable
 	// f: fore layer d13
-	// x: ? (0 in ejanhs, 1 in all other games)
+	// a: global alpha blending enable (0 in ejanhs, 1 in all other games)
 	UINT32 prev = m_layer_bank;
 	COMBINE_DATA(&m_layer_bank);
 
-	if ((prev ^ m_layer_bank) & 0x80000000)
-	{
-		m_rowscroll_enable = m_layer_bank >> 31 & 1;
-		set_layer_offsets();
-	}
+	m_rowscroll_enable = m_layer_bank >> 31 & 1;
+	m_alpha_enable = m_layer_bank >> 16 & 1;
+	set_layer_offsets();
 
 	if ((prev ^ m_layer_bank) & 0x08000000)
 		m_fore_layer->mark_all_dirty();
 }
 
 
-WRITE8_MEMBER(seibuspi_state::spi_set_layer_banks_w)
+WRITE8_MEMBER(seibuspi_state::rf2_layer_bank_w)
 {
-	if ((m_rf2_layer_bank ^ data) & 1)
+	// 00000fmb
+	// f: fore layer d14
+	// m: middle layer d14
+	// b: back layer d14
+	UINT8 prev = m_rf2_layer_bank;
+	m_rf2_layer_bank = data;
+	set_layer_offsets();
+
+	if ((prev ^ m_rf2_layer_bank) & 1)
 		m_back_layer->mark_all_dirty();
 
-	if ((m_rf2_layer_bank ^ data) & 2)
+	if ((prev ^ m_rf2_layer_bank) & 2)
 		m_midl_layer->mark_all_dirty();
 
-	if ((m_rf2_layer_bank ^ data) & 4)
+	if ((prev ^ m_rf2_layer_bank) & 4)
 		m_fore_layer->mark_all_dirty();
-
-	m_rf2_layer_bank = data;
 }
 
 WRITE32_MEMBER(seibuspi_state::spi_layer_enable_w)
@@ -313,8 +322,7 @@ void seibuspi_state::drawgfx_blend(bitmap_rgb32 &bitmap, const rectangle &clipre
 			if (pen != trans_pen)
 			{
 				int global_pen = pen + (color << m_sprite_bpp);
-				UINT8 alpha = m_alpha_table[global_pen];
-				if (alpha)
+				if (m_alpha_enable && m_alpha_table[global_pen])
 				{
 					p[i] = alpha_blend_r32(p[i], pens[global_pen], 0x7f);
 				}
@@ -454,8 +462,7 @@ void seibuspi_state::combine_tilemap(bitmap_rgb32 &bitmap, const rectangle &clip
 			if (opaque || (t[i & xscroll_mask] & (TILEMAP_PIXEL_LAYER0 | TILEMAP_PIXEL_LAYER1)))
 			{
 				UINT16 pen = s[i & xscroll_mask];
-				UINT8 alpha = m_alpha_table[pen];
-				if (alpha)
+				if (m_alpha_enable && m_alpha_table[pen])
 				{
 					*d = alpha_blend_r32(*d, m_palette->pen(pen), 0x7f);
 				}
@@ -555,7 +562,7 @@ TILE_GET_INFO_MEMBER(seibuspi_state::get_back_tile_info)
 	int color = (tile >> 13) & 0x7;
 
 	tile &= 0x1fff;
-	tile |= m_rf2_layer_bank << 14 & 0x4000; // (d0)
+	tile |= m_back_layer_d14;
 
 	SET_TILE_INFO_MEMBER(1, tile, color, 0);
 }
@@ -568,7 +575,7 @@ TILE_GET_INFO_MEMBER(seibuspi_state::get_midl_tile_info)
 
 	tile &= 0x1fff;
 	tile |= 0x2000;
-	tile |= m_rf2_layer_bank << 13 & 0x4000; // (d1)
+	tile |= m_midl_layer_d14;
 
 	SET_TILE_INFO_MEMBER(1, tile, color + 16, 0);
 }
@@ -581,8 +588,8 @@ TILE_GET_INFO_MEMBER(seibuspi_state::get_fore_tile_info)
 
 	tile &= 0x1fff;
 	tile |= m_bg_fore_layer_position;
-	tile |= m_layer_bank >> 14 & 0x2000; // (d27)
-	tile |= m_rf2_layer_bank << 12 & 0x4000; // (d2)
+	tile |= m_fore_layer_d13;
+	tile |= m_fore_layer_d14;
 
 	SET_TILE_INFO_MEMBER(1, tile, color + 8, 0);
 }
@@ -590,13 +597,13 @@ TILE_GET_INFO_MEMBER(seibuspi_state::get_fore_tile_info)
 
 void seibuspi_state::video_start()
 {
-	int i;
-
 	m_video_dma_length = 0;
 	m_video_dma_address = 0;
 	m_layer_enable = 0;
 	m_layer_bank = 0;
 	m_rf2_layer_bank = 0;
+	m_alpha_enable = 0;
+	m_rowscroll_enable = 0;
 	set_layer_offsets();
 
 	UINT32 region_length = memregion("gfx2")->bytes();
@@ -627,26 +634,28 @@ void seibuspi_state::video_start()
 	m_midl_layer->set_transparent_pen(63);
 	m_fore_layer->set_transparent_pen(63);
 
-	memset(m_alpha_table, 0, 8192);
+	// alpha blending (preliminary)
+	memset(m_alpha_table, 0, 0x2000);
 
-	// sprites
-	//for (i = 1792; i < 1808; i++) { m_alpha_table[i] = 1; } // breaks rdft
-	for (i = 1840; i < 1856; i++) { m_alpha_table[i] = 1; }
-	for (i = 1920; i < 1952; i++) { m_alpha_table[i] = 1; }
-	//for (i = 1984; i < 2048; i++) { m_alpha_table[i] = 1; } // breaks batlball
-	//for (i = 3840; i < 3904; i++) { m_alpha_table[i] = 1; } // breaks rdft
-	for (i = 4032; i < 4096; i++) { m_alpha_table[i] = 1; }
+	// sprites(0000-0fff):
+	//memset(m_alpha_table + 0x700, 1, 0x10); // breaks rdft
+	memset(m_alpha_table + 0x730, 1, 0x10);
+	memset(m_alpha_table + 0x780, 1, 0x20);
+	//memset(m_alpha_table + 0x7c0, 1, 0x40); // breaks batlball
+	//memset(m_alpha_table + 0xf00, 1, 0x40); // breaks rdft
+	memset(m_alpha_table + 0xfc0, 1, 0x40);
 
-	// middle layer
-	for (i = 4960; i < 4992; i++) { m_alpha_table[i] = 1; } // breaks ejanhs
-	for (i = 5040; i < 5056; i++) { m_alpha_table[i] = 1; } // breaks ejanhs
-	for (i = 5104; i < 5120; i++) { m_alpha_table[i] = 1; }
-	// fore layer
-	for (i = 5552; i < 5568; i++) { m_alpha_table[i] = 1; } // breaks ejanhs
-	for (i = 5616; i < 5632; i++) { m_alpha_table[i] = 1; } // breaks ejanhs
-	// text layer
-	for (i = 6000; i < 6016; i++) { m_alpha_table[i] = 1; }
-	for (i = 6128; i < 6144; i++) { m_alpha_table[i] = 1; }
+	// back layer(1000-11ff): nope
+	// fore layer(1200-13ff):
+	memset(m_alpha_table + 0x1200 + 0x160, 1, 0x20);
+	memset(m_alpha_table + 0x1200 + 0x1b0, 1, 0x10);
+	memset(m_alpha_table + 0x1200 + 0x1f0, 1, 0x10);
+	// midl layer(1400-15ff)
+	memset(m_alpha_table + 0x1400 + 0x1b0, 1, 0x10);
+	memset(m_alpha_table + 0x1400 + 0x1f0, 1, 0x10);
+	// text layer(1600-17ff)
+	memset(m_alpha_table + 0x1600 + 0x170, 1, 0x10);
+	memset(m_alpha_table + 0x1600 + 0x1f0, 1, 0x10);
 
 	register_video_state();
 }
@@ -658,7 +667,10 @@ VIDEO_START_MEMBER(seibuspi_state,sys386f)
 	m_layer_enable = 0;
 	m_layer_bank = 0;
 	m_rf2_layer_bank = 0;
-
+	m_alpha_enable = 0;
+	m_rowscroll_enable = 0;
+	set_layer_offsets();
+	
 	m_tilemap_ram_size = 0;
 	m_palette_ram_size = 0x4000;
 	m_sprite_ram_size = 0x2000;
@@ -668,7 +680,7 @@ VIDEO_START_MEMBER(seibuspi_state,sys386f)
 	m_palette_ram = auto_alloc_array_clear(machine(), UINT32, m_palette_ram_size/4);
 	m_sprite_ram = auto_alloc_array_clear(machine(), UINT32, m_sprite_ram_size/4);
 
-	memset(m_alpha_table, 0, 8192);
+	memset(m_alpha_table, 0, 0x2000);
 
 	register_video_state();
 }
@@ -680,10 +692,16 @@ void seibuspi_state::register_video_state()
 	save_item(NAME(m_layer_enable));
 	save_item(NAME(m_layer_bank));
 	save_item(NAME(m_rf2_layer_bank));
+	save_item(NAME(m_alpha_enable));
 	save_item(NAME(m_rowscroll_enable));
+
 	save_item(NAME(m_midl_layer_offset));
 	save_item(NAME(m_fore_layer_offset));
 	save_item(NAME(m_text_layer_offset));
+	save_item(NAME(m_fore_layer_d13));
+	save_item(NAME(m_back_layer_d14));
+	save_item(NAME(m_midl_layer_d14));
+	save_item(NAME(m_fore_layer_d14));
 
 	if (m_tilemap_ram != NULL) save_pointer(NAME(m_tilemap_ram), m_tilemap_ram_size/4);
 	save_pointer(NAME(m_palette_ram), m_palette_ram_size/4);

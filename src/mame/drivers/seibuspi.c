@@ -904,7 +904,7 @@ WRITE8_MEMBER(seibuspi_state::eeprom_w)
 WRITE8_MEMBER(seibuspi_state::spi_layerbanks_eeprom_w)
 {
 	// low bits: tile banks
-	spi_set_layer_banks_w(space, 0, data);
+	rf2_layer_bank_w(space, 0, data);
 
 	// high bits: eeprom
 	eeprom_w(space, 0, data);
@@ -942,7 +942,7 @@ READ8_MEMBER(seibuspi_state::sb_coin_r)
 
 READ32_MEMBER(seibuspi_state::ejsakura_keyboard_r)
 {
-	switch(m_ejsakura_input_port)
+	switch (m_ejsakura_input_port)
 	{
 		case 0x01:
 			return ioport("INPUT01")->read();
@@ -1000,7 +1000,7 @@ static ADDRESS_MAP_START( spi_map, AS_PROGRAM, 32, seibuspi_state )
 	AM_RANGE(0x00000684, 0x00000687) AM_READ8(sound_fifo_status_r, 0x000000ff)
 	AM_RANGE(0x00000688, 0x0000068b) AM_WRITE8(z80_prg_transfer_w, 0x000000ff)
 	AM_RANGE(0x0000068c, 0x0000068f) AM_WRITE8(z80_enable_w, 0x000000ff)
-	AM_RANGE(0x0000068c, 0x0000068f) AM_WRITE8(spi_set_layer_banks_w, 0x00ff0000)
+	AM_RANGE(0x0000068c, 0x0000068f) AM_WRITE8(rf2_layer_bank_w, 0x00ff0000)
 	AM_RANGE(0x000006d0, 0x000006d3) AM_DEVWRITE8("ds2404", ds2404_device, ds2404_1w_reset_w, 0x000000ff)
 	AM_RANGE(0x000006d4, 0x000006d7) AM_DEVWRITE8("ds2404", ds2404_device, ds2404_data_w, 0x000000ff)
 	AM_RANGE(0x000006d8, 0x000006db) AM_DEVWRITE8("ds2404", ds2404_device, ds2404_clk_w, 0x000000ff)
@@ -1968,11 +1968,11 @@ DRIVER_INIT_MEMBER(seibuspi_state,sys386f)
 	UINT16 tmp[0x40 / 2], offset;
 
 	// sprite_reorder() only
-	for(i = 0; i < memregion("gfx3")->bytes() / 0x40; i++)
+	for (i = 0; i < memregion("gfx3")->bytes() / 0x40; i++)
 	{
 		memcpy(tmp, src, 0x40);
 
-		for(j = 0; j < 0x40 / 2; j++)
+		for (j = 0; j < 0x40 / 2; j++)
 		{
 			offset = (j >> 1) | (j << 4 & 0x10);
 			*src++ = tmp[offset];
@@ -3758,7 +3758,7 @@ GAME( 1995, viprp1ot,   viprp1,   spi,     spi_3button, seibuspi_state, viprp1, 
 GAME( 1995, viprp1oj,   viprp1,   spi,     spi_3button, seibuspi_state, viprp1o,  ROT270, "Seibu Kaihatsu",                         "Viper Phase 1 (Japan)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1995, viprp1hk,   viprp1,   spi,     spi_3button, seibuspi_state, viprp1,   ROT270, "Seibu Kaihatsu (Metrotainment license)", "Viper Phase 1 (Hong Kong)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND ) /* "=HONG KONG=" seems part of title */
 
-GAME( 1996, ejanhs,     0,        spi,     spi_ejanhs,  seibuspi_state, ejanhs,   ROT0,   "Seibu Kaihatsu",                         "E-Jan High School (Japan)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1996, ejanhs,     0,        spi,     spi_ejanhs,  seibuspi_state, ejanhs,   ROT0,   "Seibu Kaihatsu",                         "E-Jan High School (Japan)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
 
 GAME( 1996, rdft,       0,        spi,     spi_3button, seibuspi_state, rdft,     ROT270, "Seibu Kaihatsu",                         "Raiden Fighters (Japan set 1)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1996, rdftj,      rdft,     spi,     spi_3button, seibuspi_state, rdft,     ROT270, "Seibu Kaihatsu",                         "Raiden Fighters (Japan set 2)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
