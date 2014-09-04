@@ -42,7 +42,10 @@ public:
 	DECLARE_WRITE16_MEMBER(legionna_text_w);
 	DECLARE_WRITE8_MEMBER(okim_rombank_w);
 	DECLARE_DRIVER_INIT(legiongfx);
+	DECLARE_DRIVER_INIT(cupsoc_debug);
 	DECLARE_DRIVER_INIT(cupsoc);
+	DECLARE_DRIVER_INIT(cupsocs);
+	DECLARE_DRIVER_INIT(olysoc92);
 	DECLARE_DRIVER_INIT(denjinmk);
 	TILE_GET_INFO_MEMBER(get_back_tile_info);
 	TILE_GET_INFO_MEMBER(get_mid_tile_info);
