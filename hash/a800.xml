@@ -3528,7 +3528,7 @@ Compiled by K1W1
 	</software>
 
 	<software name="microcal" supported="no">
-		<description>Microcalc XE v2.2 (Mexico)</description>
+		<description>Microcalc XE v2.2 (Mex)</description>
 		<year>19??</year>
 		<publisher>Grupo SITSA</publisher>
 		<part name="cart" interface="a8bit_cart">
@@ -5197,7 +5197,7 @@ Compiled by K1W1
 		<publisher>COVIDEA</publisher>
 		<info name="usage" value="Modem required (and a working Chemical Bank service, obviously inactive for decades)" />
 		<part name="cart" interface="a8bit_cart">
-			<feature name="slot" value="N/A" />
+			<feature name="slot" value="a800_16k" />
 			<dataarea name="rom" size="16384">
 				<rom name="target electronic banking.rom" size="16384" crc="60c2a5ae" sha1="3c4976c118a9aefba8f8895e9b8c818dbc641371" offset="0" />
 			</dataarea>
@@ -5225,7 +5225,7 @@ Compiled by K1W1
 		<info name="serial" value="CXL4016" />
 		<sharedfeat name="compatibility" value="OSb"/>
 		<part name="cart" interface="a8bit_cart">
-			<feature name="slot" value="N/A" />
+			<feature name="slot" value="a800_tlink2" />
 			<dataarea name="rom" size="8192">
 				<rom name="telelink 2.rom" size="8192" crc="f0163f90" sha1="15d1dc9591b7306453087c94746ba1622e46d0ad" offset="0" /> <!-- Verified -->
 			</dataarea>

@@ -20,6 +20,9 @@ const device_type A800_ROM = &device_creator<a800_rom_device>;
 const device_type A800_ROM_BBSB = &device_creator<a800_rom_bbsb_device>;
 const device_type A800_ROM_WILLIAMS = &device_creator<a800_rom_williams_device>;
 const device_type A800_ROM_EXPRESS = &device_creator<a800_rom_express_device>;
+const device_type A800_ROM_TURBO = &device_creator<a800_rom_turbo_device>;
+const device_type A800_ROM_TELELINK2 = &device_creator<a800_rom_telelink2_device>;
+const device_type A800_ROM_MICROCALC = &device_creator<a800_rom_microcalc_device>;
 const device_type XEGS_ROM = &device_creator<xegs_rom_device>;
 const device_type A5200_ROM_2CHIPS = &device_creator<a5200_rom_2chips_device>;
 const device_type A5200_ROM_BBSB = &device_creator<a5200_rom_bbsb_device>;
@@ -59,6 +62,24 @@ a800_rom_williams_device::a800_rom_williams_device(const machine_config &mconfig
 
 a800_rom_express_device::a800_rom_express_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: a800_rom_device(mconfig, A800_ROM_EXPRESS, "Atari 800 64K ROM Carts Express/Diamond", tag, owner, clock, "a800_express", __FILE__)
+{
+}
+
+
+a800_rom_turbo_device::a800_rom_turbo_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+					: a800_rom_device(mconfig, A800_ROM_TURBO, "Atari 800 64K ROM Carts Turbosoft", tag, owner, clock, "a800_turbo", __FILE__)
+{
+}
+
+
+a800_rom_telelink2_device::a800_rom_telelink2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+					: a800_rom_device(mconfig, A800_ROM_TELELINK2, "Atari 800 64K ROM Cart Telelink II", tag, owner, clock, "a800_tlink2", __FILE__)
+{
+}
+
+
+a800_rom_microcalc_device::a800_rom_microcalc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+					: a800_rom_device(mconfig, A800_ROM_MICROCALC, "Atari 800 64K ROM Cart SITSA MicroCalc", tag, owner, clock, "a800_sitsa", __FILE__)
 {
 }
 
@@ -126,6 +147,28 @@ void a800_rom_express_device::device_start()
 }
 
 void a800_rom_express_device::device_reset()
+{
+	m_bank = 0;
+}
+
+
+void a800_rom_turbo_device::device_start()
+{
+	save_item(NAME(m_bank));
+}
+
+void a800_rom_turbo_device::device_reset()
+{
+	m_bank = 0;
+}
+
+
+void a800_rom_microcalc_device::device_start()
+{
+	save_item(NAME(m_bank));
+}
+
+void a800_rom_microcalc_device::device_reset()
 {
 	m_bank = 0;
 }
@@ -263,6 +306,78 @@ WRITE8_MEMBER(a800_rom_express_device::write_d5xx)
 {
 	m_bank = (offset ^ 0x07) & 0x0f;
 }
+
+
+/*-------------------------------------------------
+ 
+ Turbosoft 64K / 128K
+ 
+ 
+ -------------------------------------------------*/
+
+READ8_MEMBER(a800_rom_turbo_device::read_80xx)
+{
+	return m_rom[(offset & 0x1fff) + (m_bank * 0x2000)];
+}
+
+WRITE8_MEMBER(a800_rom_turbo_device::write_d5xx)
+{
+	m_bank = offset & m_bank_mask;
+}
+
+
+/*-------------------------------------------------
+ 
+ Telelink II
+ 
+ 
+ -------------------------------------------------*/
+
+READ8_MEMBER(a800_rom_telelink2_device::read_80xx)
+{
+	if (offset >= 0x2000)
+		return m_rom[offset & 0x1fff];
+	if (offset >= 0x1000 && offset < 0x1100)
+		return m_nvram[offset & 0xff];
+
+	return 0xff;
+}
+
+WRITE8_MEMBER(a800_rom_telelink2_device::write_80xx)
+{
+	m_nvram[offset & 0xff] = data | 0xf0;	// low 4bits only
+}
+
+READ8_MEMBER(a800_rom_telelink2_device::read_d5xx)
+{
+	// this should affect NVRAM enable / save
+	return 0xff;
+}
+
+WRITE8_MEMBER(a800_rom_telelink2_device::write_d5xx)
+{
+	// this should affect NVRAM enable / save
+}
+
+
+
+/*-------------------------------------------------
+ 
+ SITSA Microcalc
+ 
+ 
+ -------------------------------------------------*/
+
+READ8_MEMBER(a800_rom_microcalc_device::read_80xx)
+{
+	return m_rom[(offset & 0x1fff) + (m_bank * 0x2000)];
+}
+
+WRITE8_MEMBER(a800_rom_microcalc_device::write_d5xx)
+{
+	m_bank = data;
+}
+
 
 
 // Atari 5200

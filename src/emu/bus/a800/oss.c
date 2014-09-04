@@ -13,9 +13,16 @@
 //  constructor
 //-------------------------------------------------
 
+const device_type A800_ROM_OSS8K = &device_creator<a800_rom_oss8k_device>;
 const device_type A800_ROM_OSS34 = &device_creator<a800_rom_oss34_device>;
 const device_type A800_ROM_OSS43 = &device_creator<a800_rom_oss43_device>;
 const device_type A800_ROM_OSS91 = &device_creator<a800_rom_oss91_device>;
+
+
+a800_rom_oss8k_device::a800_rom_oss8k_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+					: a800_rom_device(mconfig, A800_ROM_OSS8K, "Atari 800 ROM Carts OSS 8K", tag, owner, clock, "a800_oss8k", __FILE__)
+{
+}
 
 
 a800_rom_oss34_device::a800_rom_oss34_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
@@ -35,6 +42,17 @@ a800_rom_oss91_device::a800_rom_oss91_device(const machine_config &mconfig, cons
 {
 }
 
+
+
+void a800_rom_oss8k_device::device_start()
+{
+	save_item(NAME(m_bank));
+}
+
+void a800_rom_oss8k_device::device_reset()
+{
+	m_bank = 0;
+}
 
 
 void a800_rom_oss34_device::device_start()
@@ -73,6 +91,39 @@ void a800_rom_oss91_device::device_reset()
 /*-------------------------------------------------
  mapper specific handlers
  -------------------------------------------------*/
+
+/*-------------------------------------------------
+ 
+ OSS 8K
+ 
+ This is used by The Writer's Tool only.
+ 
+ -------------------------------------------------*/
+
+READ8_MEMBER(a800_rom_oss8k_device::read_80xx)
+{
+	if (offset >= 0x1000)
+		return m_rom[offset & 0xfff];
+	else
+		return m_rom[(offset & 0xfff) + (m_bank * 0x1000)];
+}
+
+WRITE8_MEMBER(a800_rom_oss8k_device::write_d5xx)
+{
+	switch (offset & 0x09)
+	{
+		case 0:
+		case 1:
+			m_bank = 1;
+			break;
+		case 9:
+			m_bank = 0;
+			break;
+		default:
+			break;
+	}
+}
+
 
 /*-------------------------------------------------
  

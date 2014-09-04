@@ -82,6 +82,77 @@ protected:
 };
 
 
+// ======================> a800_rom_blizzard_device
+
+class a800_rom_blizzard_device : public a800_rom_device
+{
+public:
+	// construction/destruction
+	a800_rom_blizzard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	
+	// device-level overrides
+	virtual void device_start();
+	virtual void device_reset();
+	
+	virtual DECLARE_READ8_MEMBER(read_80xx);
+};
+
+
+// ======================> a800_rom_turbo_device
+
+class a800_rom_turbo_device : public a800_rom_device
+{
+public:
+	// construction/destruction
+	a800_rom_turbo_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	
+	// device-level overrides
+	virtual void device_start();
+	virtual void device_reset();
+	
+	virtual DECLARE_READ8_MEMBER(read_80xx);
+	virtual DECLARE_WRITE8_MEMBER(write_d5xx);
+	
+protected:
+	int m_bank;
+};
+
+
+// ======================> a800_rom_telelink2_device
+
+class a800_rom_telelink2_device : public a800_rom_device
+{
+public:
+	// construction/destruction
+	a800_rom_telelink2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	
+	virtual DECLARE_READ8_MEMBER(read_80xx);
+	virtual DECLARE_WRITE8_MEMBER(write_80xx);
+	virtual DECLARE_READ8_MEMBER(read_d5xx);
+	virtual DECLARE_WRITE8_MEMBER(write_d5xx);
+};
+
+
+// ======================> a800_rom_microcalc_device
+
+class a800_rom_microcalc_device : public a800_rom_device
+{
+public:
+	// construction/destruction
+	a800_rom_microcalc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	
+	// device-level overrides
+	virtual void device_start();
+	virtual void device_reset();
+	
+	virtual DECLARE_READ8_MEMBER(read_80xx);
+	virtual DECLARE_WRITE8_MEMBER(write_d5xx);
+	
+protected:
+	int m_bank;
+};
+
+
 // ======================> xegs_rom_device
 
 class xegs_rom_device : public a800_rom_device
@@ -140,6 +211,9 @@ extern const device_type A800_ROM;
 extern const device_type A800_ROM_BBSB;
 extern const device_type A800_ROM_WILLIAMS;
 extern const device_type A800_ROM_EXPRESS;
+extern const device_type A800_ROM_TURBO;
+extern const device_type A800_ROM_TELELINK2;
+extern const device_type A800_ROM_MICROCALC;
 extern const device_type XEGS_ROM;
 extern const device_type A5200_ROM_2CHIPS;
 extern const device_type A5200_ROM_BBSB;

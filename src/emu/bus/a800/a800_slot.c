@@ -192,6 +192,7 @@ static const a800_slot slot_list[] =
 	{ A800_OSS034M,   "a800_oss034m" },
 	{ A800_OSS043M,   "a800_oss043m" },
 	{ A800_OSSM091,   "a800_ossm091" },
+	{ A800_OSS8K,     "a800_oss8k" },
 	{ A800_PHOENIX,   "a800_phoenix" },
 	{ A800_XEGS,      "xegs" },
 	{ A800_BBSB,      "a800_bbsb" },
@@ -199,6 +200,12 @@ static const a800_slot slot_list[] =
 	{ A800_WILLIAMS,  "a800_williams" },
 	{ A800_EXPRESS,   "a800_express" },
 	{ A800_SPARTADOS, "a800_sparta" },
+	{ A800_TURBO64,   "a800_turbo64" },
+	{ A800_TURBO128,  "a800_turbo128" },
+	{ A800_BLIZZARD,  "a800_blizzard" },
+	{ A800_TELELINK2, "a800_tlink2" },
+	{ A800_MICROCALC, "a800_sitsa" },
+	{ A800_CORINA,    "a800_corina" },
 	{ A800_8K_RIGHT,  "a800_8k_right" },
 	{ A5200_4K,       "a5200" },
 	{ A5200_8K,       "a5200" },
@@ -282,6 +289,9 @@ bool a800_cart_slot_device::call_load()
 			ROM = m_cart->get_rom_base();
 			fread(ROM, len);
 		}
+		if (m_type == A800_TELELINK2)
+			m_cart->nvram_alloc(0x100);
+
 		printf("%s loaded cartridge '%s' size %dK\n", machine().system().name, filename(), len/1024);
 	}
 	return IMAGE_INIT_PASS;
@@ -357,7 +367,22 @@ int a800_cart_slot_device::identify_cart_type(UINT8 *header)
 		case 39:
 			type = A800_PHOENIX;
 			break;
-		// Atari 5200 CART files
+		case 40:
+			type = A800_BLIZZARD;
+			break;
+		case 44:
+			type = A800_OSS8K;
+			break;
+		case 50:
+			type = A800_TURBO64;
+			break;
+		case 51:
+			type = A800_TURBO128;
+			break;
+		case 52:
+			type = A800_MICROCALC;
+			break;
+			// Atari 5200 CART files
 		case 4:
 			type = A5200_32K;
 			break;
