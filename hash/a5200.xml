@@ -974,7 +974,7 @@ Possible Undumped protos: -
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX5219" />
 		<part name="cart" interface="a8bit_cart">
-			<feature name="slot" value="a5200" />
+			<feature name="slot" value="a5200_2chips" />
 			<dataarea name="rom" size="16384">
 				<rom name="rsbktbll2.bin" size="16384" crc="0f996184" sha1="2b43f74db4833272d2048de8fa32b857af8e090f" offset="0" />
 			</dataarea>
@@ -1200,7 +1200,7 @@ Possible Undumped protos: -
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX5252" />
 		<part name="cart" interface="a8bit_cart">
-			<feature name="slot" value="a5200" />
+			<feature name="slot" value="a5200_2chips" />
 			<dataarea name="rom" size="16384">
 				<rom name="stargate.bin" size="16384" crc="1d1cee27" sha1="09d192a3598cdadfb61eceb430b3d5892e40962f" offset="0" />
 			</dataarea>

@@ -366,6 +366,7 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="pcb_type" value="TYPE-3" />
+			<feature name="slot" value="a78_sg_pokey" />
 			<feature name="peripheral" value="lightgun" /> <!-- Works with Lightgun -->
 			<dataarea name="rom" size="131072">
 				<rom name="barnyard.bin" size="131072" crc="ed0a587d" sha1="cbcde3d85c8778dea402394568677884cd781de3" offset="0" />
@@ -1451,6 +1452,7 @@ the buttons not work in emulators.
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="pcb_type" value="TYPE-2" />
+			<feature name="slot" value="a78_sg" />
 			<feature name="peripheral" value="lightgun" /> <!-- Works with Lightgun -->
 			<dataarea name="rom" size="131072">
 				<rom name="meltdown.bin" size="131072" crc="4a8f2171" sha1="e601c45aaa1cc25f01493867664c8b9fefeca70e" offset="0" />
@@ -1466,6 +1468,7 @@ the buttons not work in emulators.
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="pcb_type" value="TYPE-2" />
+			<feature name="slot" value="a78_sg" />
 			<feature name="peripheral" value="lightgun" /> <!-- Works with Lightgun -->
 			<dataarea name="rom" size="131072">
 				<rom name="meltdoeu.bin" size="131072" crc="177fc850" sha1="ac448f369c3c6334415095e4ff344fdd73b473be" offset="0" />
@@ -1473,7 +1476,7 @@ the buttons not work in emulators.
 		</part>
 	</software>
 
-	<software name="mia" supported="no">
+	<software name="mia" supported="partial">
 		<description>Missing In Action (Prototype)</description>
 		<!-- 5 Chips total 4 x 27256, 1 x 27128) -->
 		<year>1989</year>
@@ -1481,7 +1484,7 @@ the buttons not work in emulators.
 		<info name="serial" value="CX7890"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="pcb_type" value="TYPE-2" />
-			<feature name="slot" value="a78_sg" />
+			<feature name="slot" value="a78_sg9" />
 			<dataarea name="rom" size="147456">
 				<rom name="miaproto.bin" size="147456" crc="ff7a4c60" sha1="26b0b187a43bf9a9397cb5e8b0033e8833f48f88" offset="0" />
 			</dataarea>
@@ -1977,6 +1980,7 @@ almost nothing like the prototype.
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="pcb_type" value="TYPE-2" />
+			<feature name="slot" value="a78_sg" />
 			<feature name="peripheral" value="lightgun" /> <!-- Works with Lightgun -->
 			<dataarea name="rom" size="131072">
 				<rom name="sentinel.bin" size="131072" crc="2fddad78" sha1="bd7de03a28b168c992bcaa96539c2310f3bfe30c" offset="0" />
@@ -1992,6 +1996,7 @@ almost nothing like the prototype.
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="pcb_type" value="TYPE-2" />
+			<feature name="slot" value="a78_sg" />
 			<feature name="peripheral" value="lightgun" /> <!-- Works with Lightgun -->
 			<dataarea name="rom" size="131072">
 				<rom name="sentineu.bin" size="131072" crc="47340df9" sha1="6d85a73a56d2f02ff439736eace86691aa613444" offset="0" />
