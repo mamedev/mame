@@ -272,10 +272,10 @@ bool a78_cart_slot_device::call_load()
 					m_type = A78_BANKRAM;
 					break;
 				case 0x0100:
-					m_type = A78_ABSOLUTE;
+					m_type = A78_ACTIVISION;
 					break;
 				case 0x0200:
-					m_type = A78_ACTIVISION;
+					m_type = A78_ABSOLUTE;
 					break;
 			}
 			logerror("Cart type: %x\n", m_type);
@@ -397,10 +397,10 @@ void a78_cart_slot_device::get_default_card_software(astring &result)
 				m_type = A78_BANKRAM;
 				break;
 			case 0x0100:
-				type = A78_ABSOLUTE;
+				type = A78_ACTIVISION;
 				break;
 			case 0x0200:
-				type = A78_ACTIVISION;
+				type = A78_ABSOLUTE;
 				break;
 		}
 		logerror("Cart type: %x\n", type);
@@ -523,10 +523,10 @@ void a78_cart_slot_device::internal_header_logging(UINT8 *header, UINT32 len)
 			cart_mapper.cpy("SuperCart Bankswitch + 32K RAM");
 			break;
 		case 0x0100:
-			cart_mapper.cpy("Absolute Bankswitch");
+			cart_mapper.cpy("Activision Bankswitch");
 			break;
 		case 0x0200:
-			cart_mapper.cpy("Activision Bankswitch");
+			cart_mapper.cpy("Absolute Bankswitch");
 			break;
 		default:
 			cart_mapper.cpy("Unknown mapper");
