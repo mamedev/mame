@@ -1677,8 +1677,9 @@ READ8_MEMBER(vga_device::port_03c0_r)
 			data = vga.attribute.index;
 			break;
 		case 1:
-			if(vga.attribute.index&0x20)
-				data = vga.attribute.index; // TODO: open bus
+			if((vga.attribute.index&0x20)
+			&& ((vga.attribute.index&0x1f)<0x10))
+				data = 0; // palette access is disabled in this mode
 			else if ((vga.attribute.index&0x1f)<sizeof(vga.attribute.data))
 				data=vga.attribute.data[vga.attribute.index&0x1f];
 			break;
