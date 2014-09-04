@@ -549,7 +549,7 @@ READ16_MEMBER(md_rom_cm2in1_device::read)
 READ16_MEMBER(md_rom_mcpirate_device::read)
 {
 	if (offset < 0x400000/2)
-		return m_rom[(((m_bank * 0x10000) + (offset << 1)) & (m_rom.bytes() - 1))/2];
+		return m_rom[(((m_bank * 0x10000) + (offset << 1)) & (m_rom_size - 1))/2];
 	else
 		return read(space, offset - 0x400000/2, 0xffff);
 }
@@ -795,7 +795,7 @@ WRITE16_MEMBER(md_rom_lion2_device::write)
  LION KING 3
  -------------------------------------------------*/
 
-#define MD_LION3_ADDR(a)  (((offset << 1) | (m_bank << 15)) & (m_rom.bytes() - 1))/2
+#define MD_LION3_ADDR(a)  (((offset << 1) | (m_bank << 15)) & (m_rom_size - 1))/2
 
 READ16_MEMBER(md_rom_lion3_device::read)
 {
@@ -926,7 +926,7 @@ READ16_MEMBER(md_rom_soulb_device::read)
  POKEMON STADIUM / KAIJU
  -------------------------------------------------*/
 
-#define MD_POKESTAD_ADDR(a)  (((offset << 1) | (m_bank << 15)) & (m_rom.bytes() - 1))/2
+#define MD_POKESTAD_ADDR(a)  (((offset << 1) | (m_bank << 15)) & (m_rom_size - 1))/2
 
 READ16_MEMBER(md_rom_pokestad_device::read)
 {
@@ -1308,7 +1308,7 @@ WRITE16_MEMBER(md_rom_topf_device::write)
 
 READ16_MEMBER(md_rom_radica_device::read)
 {
-	return m_rom[(((m_bank * 0x10000) + (offset << 1)) & (m_rom.bytes() - 1))/2];
+	return m_rom[(((m_bank * 0x10000) + (offset << 1)) & (m_rom_size - 1))/2];
 }
 
 READ16_MEMBER(md_rom_radica_device::read_a13)

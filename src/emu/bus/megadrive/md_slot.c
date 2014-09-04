@@ -62,7 +62,9 @@ const device_type COPERA_CART_SLOT = &device_creator<copera_cart_slot_device>;
 //-------------------------------------------------
 
 device_md_cart_interface::device_md_cart_interface(const machine_config &mconfig, device_t &device)
-	: device_slot_card_interface(mconfig, device)
+	: device_slot_card_interface(mconfig, device),
+		m_rom(NULL),
+		m_rom_size(0)
 {
 }
 
@@ -79,10 +81,14 @@ device_md_cart_interface::~device_md_cart_interface()
 //  rom_alloc - alloc the space for the cart
 //-------------------------------------------------
 
-void device_md_cart_interface::rom_alloc(size_t size)
+void device_md_cart_interface::rom_alloc(size_t size, const char *tag)
 {
 	if (m_rom == NULL)
-		m_rom.resize(size/sizeof(UINT16));
+	{
+		astring tempstring(tag);
+		m_rom = (UINT16 *)device().machine().memory().region_alloc(tempstring, size, 2, ENDIANNESS_LITTLE)->base();
+		m_rom_size = size;
+	}
 }
 
 
@@ -367,9 +373,11 @@ int base_md_cart_slot_device::load_list()
 	// if cart size is not (2^n * 64K), the system will see anyway that size so we need to alloc a bit more space
 	length = m_cart->get_padded_size(length);
 
-	m_cart->rom_alloc(length);
+	astring cart_string(tag());
+	cart_string.cat(":cart:rom");
+	m_cart->rom_alloc(length, cart_string.cstr());
 	ROM = m_cart->get_rom_base();
-	memcpy(ROM, get_software_region("rom"), get_software_region_length("rom"));
+	memcpy((UINT8 *)ROM, get_software_region("rom"), get_software_region_length("rom"));
 
 	// if we allocated a ROM larger that the file (e.g. due to uneven cart size), set remaining space to 0xff
 	if (length > get_software_region_length("rom"))
@@ -479,7 +487,9 @@ int base_md_cart_slot_device::load_nonlist()
 	// if cart size is not (2^n * 64K), the system will see anyway that size so we need to alloc a bit more space
 	len = m_cart->get_padded_size(tmplen - offset);
 	// this contains an hack for SSF2: its current bankswitch code needs larger rom space to work
-	m_cart->rom_alloc((len == 0x500000) ? 0x900000 : len);
+	astring cart_string(tag());
+	cart_string.cat(":cart:rom");
+	m_cart->rom_alloc((len == 0x500000) ? 0x900000 : len, cart_string.cstr());
 
 
 	// STEP 3: copy the game data in the appropriate way
@@ -602,7 +612,7 @@ void base_md_cart_slot_device::setup_nvram()
 				m_cart->m_nvram_end += 1;
 
 			m_cart->nvram_alloc(m_cart->m_nvram_end - m_cart->m_nvram_start + 1);
-			if (m_cart->m_rom.bytes() <= m_cart->m_nvram_start)
+			if (m_cart->m_rom_size <= m_cart->m_nvram_start)
 				m_cart->m_nvram_active = 1;
 			m_cart->m_nvram_handlers_installed = 1;
 			// don't trust too much header?
@@ -615,7 +625,7 @@ void base_md_cart_slot_device::setup_nvram()
 			logerror("No SRAM detected from header, using fallback SRAM in case this is a broken header\n");
 
 			m_cart->nvram_alloc(m_cart->m_nvram_end - m_cart->m_nvram_start + 1);
-			if (m_cart->m_rom.bytes() <= m_cart->m_nvram_start)
+			if (m_cart->m_rom_size <= m_cart->m_nvram_start)
 				m_cart->m_nvram_active = 1;
 			break;
 
@@ -624,7 +634,7 @@ void base_md_cart_slot_device::setup_nvram()
 			m_cart->m_nvram_start = 0x200000;
 			m_cart->m_nvram_end = m_cart->m_nvram_start + get_software_region_length("sram") - 1;
 			m_cart->nvram_alloc(m_cart->m_nvram_end - m_cart->m_nvram_start + 1);
-			if (m_cart->m_rom.bytes() <= m_cart->m_nvram_start)
+			if (m_cart->m_rom_size <= m_cart->m_nvram_start)
 				m_cart->m_nvram_active = 1;
 			m_cart->m_nvram_handlers_installed = 1;
 			break;
@@ -989,8 +999,8 @@ void base_md_cart_slot_device::file_logging(UINT8 *ROM8, UINT32 rom_len, UINT32 
 	astring ctrl(""), reg("");
 
 	// LOG FILE DETAILS
-	logerror("FILE DETAILS\n" );
-	logerror("============\n" );
+	logerror("FILE DETAILS\n");
+	logerror("============\n");
 	logerror("Name: %s\n", basename());
 	logerror("File Size: 0x%" I64FMT "x\n", (software_entry() == NULL) ? length() : get_software_region_length("rom"));
 	logerror("Detected type: %s\n", md_get_slot(m_type));
@@ -1062,8 +1072,8 @@ void base_md_cart_slot_device::file_logging(UINT8 *ROM8, UINT32 rom_len, UINT32 
 		csum &= 0xffff;
 	}
 
-	logerror("INTERNAL HEADER\n" );
-	logerror("===============\n" );
+	logerror("INTERNAL HEADER\n");
+	logerror("===============\n");
 	logerror("Console: %.16s\n", console);
 	logerror("Copyright String: %.16s\n", copyright);
 	logerror(" - Manufacturer: %.4s\n", copyright + 3); // TODO: convert code to manufacturer name!

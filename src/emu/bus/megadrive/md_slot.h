@@ -107,11 +107,11 @@ public:
 	/* this probably should do more, like make Genesis V2 'die' if the SEGA string is not written promptly */
 	virtual DECLARE_WRITE16_MEMBER(write_tmss_bank) { logerror("Write to TMSS bank: offset %x data %x\n", 0xa14000 + (offset << 1), data); };
 
-	virtual void rom_alloc(size_t size);
+	virtual void rom_alloc(size_t size, const char *tag);
 	virtual void nvram_alloc(size_t size);
 	virtual UINT16* get_rom_base() { return m_rom; };
 	virtual UINT16* get_nvram_base() { return m_nvram; };
-	virtual UINT32 get_rom_size() { return m_rom.bytes(); };
+	virtual UINT32 get_rom_size() { return m_rom_size; };
 	virtual UINT32 get_nvram_size() { return m_nvram.bytes(); };
 	virtual void set_bank_to_rom(const char *banktag, UINT32 offset) {};
 
@@ -127,7 +127,8 @@ public:
 	int m_nvram_handlers_installed;
 
 	// internal state
-	dynamic_array<UINT16> m_rom;
+	UINT16  *m_rom;
+	UINT32  m_rom_size;
 	dynamic_array<UINT16> m_nvram;
 
 	UINT8 rom_bank_map[128];    // 64K chunks of rom
