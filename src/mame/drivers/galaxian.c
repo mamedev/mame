@@ -8575,7 +8575,8 @@ ROM_START( kong )
 	ROM_LOAD( "11",   0x0800, 0x0800, CRC(ad2b2cdd) SHA1(01a5db01c4fa07707823436a28d40cfd2b80be23) )
 	ROM_LOAD( "12",   0x1800, 0x0800, CRC(b74724df) SHA1(d72d0831e3806f49a07ae3333d7a29fccaf6d65e) )
 
-	ROM_REGION( 0x2000, "unk", 0 ) // what is this?
+	ROM_REGION( 0x2000, "unk", 0 )
+	// what is this, speech? the video at https://www.youtube.com/watch?v=HTZEVKoYlGM shows the game apparently talking (2nd game, after The Pit)
 	ROM_LOAD( "13",   0x0000, 0x1000, CRC(7d33ca0a) SHA1(8a65a4b913559e3fd17f6abb381db1ab813fc8f2) )
 
 	ROM_REGION( 0x0020, "proms", 0 )
