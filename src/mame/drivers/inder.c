@@ -31,6 +31,7 @@ public:
 	inder_state(const machine_config &mconfig, device_type type, const char *tag)
 		: genpin_class(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_audiocpu(*this, "audiocpu")
 		, m_sn(*this, "sn")
 		, m_switches(*this, "SW")
 	{ }
@@ -40,14 +41,18 @@ public:
 	DECLARE_WRITE8_MEMBER(sol_brvteam_w);
 	DECLARE_WRITE8_MEMBER(sol_canasta_w);
 	DECLARE_WRITE8_MEMBER(sn_w);
+	DECLARE_READ8_MEMBER(sndcmd_r);
+	DECLARE_WRITE8_MEMBER(sndcmd_w);
 	DECLARE_WRITE8_MEMBER(lamp_w) { };
 	DECLARE_WRITE8_MEMBER(disp_w);
 	DECLARE_DRIVER_INIT(inder);
 private:
 	UINT8 m_row;
 	UINT8 m_segment[5];
+	UINT8 m_sndcmd;
 	virtual void machine_reset();
 	required_device<cpu_device> m_maincpu;
+	optional_device<cpu_device> m_audiocpu;
 	optional_device<sn76489_device> m_sn;
 	required_ioport_array<11> m_switches;
 };
@@ -75,6 +80,28 @@ static ADDRESS_MAP_START( canasta_map, AS_PROGRAM, 8, inder_state )
 	AM_RANGE(0x4b00, 0x4b00) AM_DEVWRITE("ay", ay8910_device, address_w)
 	AM_RANGE(0x4b01, 0x4b01) AM_DEVREAD("ay", ay8910_device, data_r)
 	AM_RANGE(0x4b02, 0x4b02) AM_DEVWRITE("ay", ay8910_device, data_w)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( lapbylap_map, AS_PROGRAM, 8, inder_state )
+	AM_RANGE(0x0000, 0x1fff) AM_ROM
+	AM_RANGE(0x2000, 0x20ff) AM_WRITE(disp_w)
+	AM_RANGE(0x4000, 0x43ff) AM_RAM // pair of 2114
+	AM_RANGE(0x4400, 0x44ff) AM_RAM AM_SHARE("nvram") // pair of 5101, battery-backed
+	AM_RANGE(0x4800, 0x480a) AM_READWRITE(sw_r,sw_w)
+	AM_RANGE(0x4900, 0x4900) AM_WRITE(sol_canasta_w)
+	AM_RANGE(0x4901, 0x4907) AM_WRITE(lamp_w)
+	AM_RANGE(0x4b00, 0x4b00) AM_WRITE(sndcmd_w)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( lapbylap_sub_map, AS_PROGRAM, 8, inder_state )
+	AM_RANGE(0x0000, 0x1fff) AM_ROM
+	AM_RANGE(0x8000, 0x87ff) AM_RAM // 6116
+	AM_RANGE(0x9000, 0x9000) AM_DEVWRITE("ay1", ay8910_device, address_w)
+	AM_RANGE(0x9001, 0x9001) AM_DEVREAD("ay1", ay8910_device, data_r)
+	AM_RANGE(0x9002, 0x9002) AM_DEVWRITE("ay1", ay8910_device, data_w)
+	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE("ay2", ay8910_device, address_w)
+	AM_RANGE(0xa001, 0xa001) AM_DEVREAD("ay2", ay8910_device, data_r)
+	AM_RANGE(0xa002, 0xa002) AM_DEVWRITE("ay2", ay8910_device, data_w)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( inder )
@@ -184,9 +211,9 @@ static INPUT_PORTS_START( canasta )
 	PORT_DIPSETTING(    0x30, "1500000")
 	PORT_DIPNAME( 0xc0, 0xc0, "Points for 2nd free game") // sw A,B
 	PORT_DIPSETTING(    0x00, "NA")
-	PORT_DIPSETTING(    0x10, "2900000")
-	PORT_DIPSETTING(    0x20, "2700000")
-	PORT_DIPSETTING(    0x30, "2500000")
+	PORT_DIPSETTING(    0x40, "2900000")
+	PORT_DIPSETTING(    0x80, "2700000")
+	PORT_DIPSETTING(    0xc0, "2500000")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("SW.1")
@@ -260,6 +287,113 @@ static INPUT_PORTS_START( canasta )
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( lapbylap )
+	PORT_START("SW.0")
+	PORT_DIPNAME( 0x03, 0x03, "Coin Slot 1") // sw G,H
+	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C )) // slot 2: 1 moneda 4 partidas
+	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C )) // and 4c_3c; slot 2: 1 moneda 3 partidas
+	PORT_DIPNAME( 0x08, 0x08, "Balls") // sw E
+	PORT_DIPSETTING(    0x08, "3")
+	PORT_DIPSETTING(    0x00, "5")
+	PORT_DIPNAME( 0x30, 0x20, "Points for free game") // sw C,D
+	PORT_DIPSETTING(    0x00, "2900000")
+	PORT_DIPSETTING(    0x10, "2700000")
+	PORT_DIPSETTING(    0x20, "2500000")
+	PORT_DIPSETTING(    0x30, "2300000")
+	PORT_BIT( 0xc4, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("SW.1")
+	PORT_DIPNAME( 0x03, 0x03, "High Score") //"Handicap"  // sw O,P
+	PORT_DIPSETTING(    0x00, "4600000")
+	PORT_DIPSETTING(    0x01, "4400000")
+	PORT_DIPSETTING(    0x02, "4200000")
+	PORT_DIPSETTING(    0x03, "4000000")
+	PORT_DIPNAME( 0x0c, 0x08, "Extra Ball Award??") //"Comienzo Secuenzia Diana Bola Extra"  // sw M,N
+	PORT_DIPSETTING(    0x04, "50000")
+	PORT_DIPSETTING(    0x08, "25000")
+	PORT_DIPSETTING(    0x0c, "10000")
+	PORT_DIPNAME( 0x10, 0x10, "Extra Ball Derribo??") //"Bola Extra en 1st Derribo Completo"  // sw L
+	PORT_DIPSETTING(    0x00, DEF_STR(No))
+	PORT_DIPSETTING(    0x10, DEF_STR(Yes)) // "Si"
+	PORT_DIPNAME( 0x20, 0x20, "Especiales Laterales??") //need help here guys...  // sw K
+	PORT_DIPSETTING(    0x00, "Derribo Lateral Dianas")
+	PORT_DIPSETTING(    0x20, "Derribo Completo Dianas Laterales")
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("SW.2")
+	PORT_DIPNAME( 0x03, 0x03, "High Score Returns??") //"Handicap de Vueltas"  // sw W,X
+	PORT_DIPSETTING(    0x00, "40")
+	PORT_DIPSETTING(    0x01, "35")
+	PORT_DIPSETTING(    0x02, "30")
+	PORT_DIPSETTING(    0x03, "25")
+	PORT_DIPNAME( 0x40, 0x40, "Bola Extra En Rampa??") //nfi  // sw R
+	PORT_DIPSETTING(    0x00, "Derribo Completo")
+	PORT_DIPSETTING(    0x40, "Derribo Lateral")
+	PORT_DIPNAME( 0x80, 0x80, "Apagado??") //nfi  // sw Q
+	PORT_DIPSETTING(    0x00, DEF_STR(Hard)) // "Facil"
+	PORT_DIPSETTING(    0x80, DEF_STR(Easy)) // "Dificil"
+	PORT_BIT( 0x3c, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("SW.3")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("SW.4")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("SW.5") // Contactos 50-57
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) // "Monedero A"
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 ) // "Monedero B"
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_TILT ) // "Falta"
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 ) // "Pulsador Partidas"
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Accounting info") // "Test economico"
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Test") // "Test tecnico"
+
+	PORT_START("SW.6") // 60-67
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Q)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_W)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_E)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_R)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Y)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_U)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_O)
+
+	PORT_START("SW.7") // 70-77
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_A)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_S)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_D)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_F)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_G)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_H)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_J)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_K)
+
+	PORT_START("SW.8") // 80-87
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Z)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_C)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_V)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_B)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_N)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_M)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_COMMA)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_STOP)
+
+	PORT_START("SW.9") // 90-97
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_L)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_X) PORT_NAME("Outhole")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_EQUALS)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_BACKSPACE)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_OPENBRACE)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_CLOSEBRACE)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_BACKSLASH)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_COLON)
+
+	PORT_START("SW.10")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+INPUT_PORTS_END
+
 READ8_MEMBER( inder_state::sw_r )
 {
 	return m_switches[m_row]->read();
@@ -273,6 +407,17 @@ WRITE8_MEMBER( inder_state::sw_w )
 WRITE8_MEMBER( inder_state::sn_w )
 {
 	m_sn->write(space, 0, BITSWAP8(data, 0, 1, 2, 3, 4, 5, 6, 7));
+}
+
+WRITE8_MEMBER( inder_state::sndcmd_w )
+{
+	m_sndcmd = data;
+	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+}
+
+READ8_MEMBER( inder_state::sndcmd_r )
+{
+	return m_sndcmd;
 }
 
 // "bobinas"
@@ -384,6 +529,30 @@ static MACHINE_CONFIG_START( canasta, inder_state )
 	MCFG_FRAGMENT_ADD( genpin_audio )
 	MCFG_SPEAKER_STANDARD_MONO("ayvol")
 	MCFG_SOUND_ADD("ay", AY8910, XTAL_4MHz / 2)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "ayvol", 1.0)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_START( lapbylap, inder_state )
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_5MHz / 2)
+	MCFG_CPU_PROGRAM_MAP(lapbylap_map)
+	MCFG_CPU_PERIODIC_INT_DRIVER(inder_state, irq0_line_hold, 250) // NE556
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_2MHz)
+	MCFG_CPU_PROGRAM_MAP(lapbylap_sub_map)
+	MCFG_CPU_PERIODIC_INT_DRIVER(inder_state, irq0_line_hold, 250) // NE555
+
+	MCFG_NVRAM_ADD_1FILL("nvram")
+
+	/* Video */
+	MCFG_DEFAULT_LAYOUT(layout_inder)
+
+	/* Sound */
+	MCFG_FRAGMENT_ADD( genpin_audio )
+	MCFG_SPEAKER_STANDARD_MONO("ayvol")
+	MCFG_SOUND_ADD("ay1", AY8910, XTAL_2MHz) // same xtal that drives subcpu
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "ayvol", 1.0)
+	MCFG_SOUND_ADD("ay2", AY8910, XTAL_2MHz) // same xtal that drives subcpu
+	MCFG_AY8910_PORT_A_READ_CB(READ8(inder_state, sndcmd_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "ayvol", 1.0)
 MACHINE_CONFIG_END
 
@@ -548,10 +717,11 @@ ROM_END
 GAME(1985,  brvteam,    0,    inder,    inder,    inder_state, inder,  ROT0, "Inder", "Brave Team",         GAME_MECHANICAL)
 
 // ay8910
-GAME(1986,  canasta,    0,    canasta,  canasta,  inder_state, inder,  ROT0, "Inder", "Canasta '86'",       GAME_MECHANICAL | GAME_NOT_WORKING )
+GAME(1986,  canasta,    0,    canasta,  canasta,  inder_state, inder,  ROT0, "Inder", "Canasta '86'",       GAME_MECHANICAL)
 
 // sound cpu with 2x ay8910
-GAME(1986,  lapbylap,   0,    inder,    inder,    inder_state, inder,  ROT0, "Inder", "Lap By Lap",         GAME_IS_SKELETON_MECHANICAL)
+GAME(1986,  lapbylap,   0,    lapbylap, lapbylap, inder_state, inder,  ROT0, "Inder", "Lap By Lap",         GAME_MECHANICAL)
+
 GAME(1987,  pinmoonl,   0,    inder,    inder,    inder_state, inder,  ROT0, "Inder", "Moon Light (Inder)", GAME_IS_SKELETON_MECHANICAL)
 GAME(1988,  pinclown,   0,    inder,    inder,    inder_state, inder,  ROT0, "Inder", "Clown (Inder)",      GAME_IS_SKELETON_MECHANICAL)
 GAME(1989,  corsario,   0,    inder,    inder,    inder_state, inder,  ROT0, "Inder", "Corsario",           GAME_IS_SKELETON_MECHANICAL)
