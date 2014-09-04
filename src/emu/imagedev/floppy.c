@@ -614,7 +614,7 @@ UINT32 floppy_image_device::find_position(attotime &base, const attotime &when)
 		base -= rev_time;
 	}
 
-	return (delta*floppy_ratio_1 + attotime::from_nsec(500)).as_ticks(1000000000/1000);
+	return (delta*floppy_ratio_1).as_ticks(1000000000/1000);
 }
 
 attotime floppy_image_device::get_next_transition(const attotime &from_when)
