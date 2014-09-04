@@ -8577,6 +8577,7 @@ ROM_START( kong )
 
 	ROM_REGION( 0x2000, "unk", 0 )
 	// what is this, speech? the video at https://www.youtube.com/watch?v=HTZEVKoYlGM shows the game apparently talking (2nd game, after The Pit)
+	// The video however seems to show a game closer to ckongg (a bootleg of Crazy Kong) rather than this version of Kong which is rewritten from scratch
 	ROM_LOAD( "13",   0x0000, 0x1000, CRC(7d33ca0a) SHA1(8a65a4b913559e3fd17f6abb381db1ab813fc8f2) )
 
 	ROM_REGION( 0x0020, "proms", 0 )
