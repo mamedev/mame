@@ -2,7 +2,7 @@
 #include "sound/samples.h"
 #include "includes/circus.h"
 
-static const char *const circus_sample_names[] =
+const char *const circus_sample_names[] =
 {
 	"*circus",
 	"pop",
@@ -11,26 +11,14 @@ static const char *const circus_sample_names[] =
 	0
 };
 
-const samples_interface circus_samples_interface =
-{
-	3,  /* 3 channels */
-	circus_sample_names
-};
-
-static const char *const crash_sample_names[] =
+const char *const crash_sample_names[] =
 {
 	"*crash",
 	"crash",
 	0
 };
 
-const samples_interface crash_samples_interface =
-{
-	1,  /* 1 channel */
-	crash_sample_names
-};
-
-static const char *const ripcord_sample_names[] =
+const char *const ripcord_sample_names[] =
 {
 	"*ripcord",
 	"splash",
@@ -40,13 +28,7 @@ static const char *const ripcord_sample_names[] =
 	0
 };
 
-const samples_interface ripcord_samples_interface =
-{
-	4,  /* 4 channels */
-	ripcord_sample_names
-};
-
-static const char *const robotbwl_sample_names[] =
+const char *const robotbwl_sample_names[] =
 {
 	"*robotbwl",
 	"hit",
@@ -57,11 +39,6 @@ static const char *const robotbwl_sample_names[] =
 	0
 };
 
-const samples_interface robotbwl_samples_interface =
-{
-	5,  /* 5 channels */
-	robotbwl_sample_names
-};
 
 /* Nodes - Inputs */
 #define CIRCUS_MUSIC_BIT    NODE_01

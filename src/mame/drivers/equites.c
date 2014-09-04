@@ -1098,12 +1098,6 @@ static const char *const alphamc07_sample_names[] =
 	0
 };
 
-static const samples_interface alphamc07_samples_interface =
-{
-	3,  /* 3 channels */
-	alphamc07_sample_names
-};
-
 
 #define MSM5232_BASE_VOLUME 1.0
 
@@ -1143,7 +1137,9 @@ static MACHINE_CONFIG_FRAGMENT( common_sound )
 	MCFG_DAC_ADD("dac2")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SAMPLES_ADD("samples", alphamc07_samples_interface)
+	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_SAMPLES_CHANNELS(3)
+	MCFG_SAMPLES_NAMES(alphamc07_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 

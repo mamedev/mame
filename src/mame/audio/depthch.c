@@ -28,15 +28,11 @@ static const char *const depthch_sample_names[] =
 };
 
 
-static const samples_interface depthch_samples_interface =
-{
-	4,
-	depthch_sample_names
-};
-
-
 MACHINE_CONFIG_FRAGMENT( depthch_audio )
-	MCFG_SAMPLES_ADD("samples", depthch_samples_interface)
+
+	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_SAMPLES_CHANNELS(4)
+	MCFG_SAMPLES_NAMES(depthch_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
 

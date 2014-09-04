@@ -72,19 +72,14 @@ static const char *const spacefb_sample_names[] =
 };
 
 
-static const samples_interface spacefb_samples_interface =
-{
-	3,
-	spacefb_sample_names
-};
-
-
 MACHINE_CONFIG_FRAGMENT( spacefb_audio )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_DAC_ADD("dac")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SAMPLES_ADD("samples", spacefb_samples_interface)
+	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_SAMPLES_CHANNELS(3)
+	MCFG_SAMPLES_NAMES(spacefb_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END

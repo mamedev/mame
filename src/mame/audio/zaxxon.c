@@ -90,15 +90,10 @@ static const char *const zaxxon_sample_names[] =
 };
 
 
-static const samples_interface zaxxon_samples_interface =
-{
-	12,
-	zaxxon_sample_names
-};
-
-
 MACHINE_CONFIG_FRAGMENT( zaxxon_samples )
-	MCFG_SAMPLES_ADD("samples", zaxxon_samples_interface)
+	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_SAMPLES_CHANNELS(12)
+	MCFG_SAMPLES_NAMES(zaxxon_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -195,15 +190,10 @@ static const char *const congo_sample_names[] =
 };
 
 
-static const samples_interface congo_samples_interface =
-{
-	5,  /* 5 channels */
-	congo_sample_names
-};
-
-
 MACHINE_CONFIG_FRAGMENT( congo_samples )
-	MCFG_SAMPLES_ADD("samples", congo_samples_interface)
+	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_SAMPLES_CHANNELS(5)
+	MCFG_SAMPLES_NAMES(congo_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 

@@ -181,6 +181,7 @@ public:
 	K052109_CB_MEMBER(tmnt_tile_callback);
 	K052109_CB_MEMBER(ssbl_tile_callback);
 	K052109_CB_MEMBER(blswhstl_tile_callback);
+	SAMPLES_START_CB_MEMBER(tmnt_decode_sample);
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);

@@ -240,7 +240,7 @@ WRITE8_MEMBER(meadows_state::audio_hardware_w)
 	switch (offset & 3)
 	{
 		case 0: /* DAC */
-			meadows_sh_dac_w(machine(), data ^ 0xff);
+			meadows_sh_dac_w(data ^ 0xff);
 			break;
 
 		case 1: /* counter clk 5 MHz / 256 */
@@ -248,7 +248,7 @@ WRITE8_MEMBER(meadows_state::audio_hardware_w)
 				break;
 			logerror("audio_w ctr1 preset $%x amp %d\n", data & 15, data >> 4);
 			m_0c01 = data;
-			meadows_sh_update(machine());
+			meadows_sh_update();
 			break;
 
 		case 2: /* counter clk 5 MHz / 32 (/ 2 or / 4) */
@@ -256,7 +256,7 @@ WRITE8_MEMBER(meadows_state::audio_hardware_w)
 				break;
 			logerror("audio_w ctr2 preset $%02x\n", data);
 			m_0c02 = data;
-			meadows_sh_update(machine());
+			meadows_sh_update();
 			break;
 
 		case 3: /* audio enable */
@@ -264,7 +264,7 @@ WRITE8_MEMBER(meadows_state::audio_hardware_w)
 				break;
 			logerror("audio_w enable ctr2/2:%d ctr2:%d dac:%d ctr1:%d\n", data&1, (data>>1)&1, (data>>2)&1, (data>>3)&1);
 			m_0c03 = data;
-			meadows_sh_update(machine());
+			meadows_sh_update();
 			break;
 	}
 }
@@ -598,23 +598,6 @@ static const char *const bowl3d_sample_names[] =
 	0
 };
 
-
-static const samples_interface meadows_samples_interface =
-{
-	2,
-	NULL,
-	meadows_sh_start
-};
-
-
-static const samples_interface bowl3d_samples_interface =
-{
-	1,
-	bowl3d_sample_names
-};
-
-
-
 /*************************************
  *
  *  Machine drivers
@@ -651,7 +634,9 @@ static MACHINE_CONFIG_START( meadows, meadows_state )
 	MCFG_DAC_ADD("dac")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_SAMPLES_ADD("samples", meadows_samples_interface)
+	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_SAMPLES_CHANNELS(2)
+	MCFG_SAMPLES_START_CB(meadows_state, meadows_sh_start)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -710,10 +695,14 @@ static MACHINE_CONFIG_START( bowl3d, meadows_state )
 	MCFG_DAC_ADD("dac")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_SAMPLES_ADD("samples", meadows_samples_interface)
+	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_SAMPLES_CHANNELS(2)
+	MCFG_SAMPLES_START_CB(meadows_state, meadows_sh_start)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_SAMPLES_ADD("samples2", bowl3d_samples_interface)
+	MCFG_SOUND_ADD("samples2", SAMPLES, 0)
+	MCFG_SAMPLES_CHANNELS(1)
+	MCFG_SAMPLES_NAMES(bowl3d_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

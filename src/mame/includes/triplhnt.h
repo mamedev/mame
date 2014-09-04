@@ -77,4 +77,4 @@ protected:
 
 /*----------- defined in audio/triplhnt.c -----------*/
 DISCRETE_SOUND_EXTERN( triplhnt );
-extern const samples_interface triplhnt_samples_interface;
+extern const char *const triplhnt_sample_names[];

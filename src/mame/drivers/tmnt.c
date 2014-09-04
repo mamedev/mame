@@ -221,15 +221,12 @@ READ8_MEMBER(tmnt_state::tmnt_upd_busy_r)
 	return m_upd7759->busy_r() ? 1 : 0;
 }
 
-
-static SAMPLES_START( tmnt_decode_sample )
+SAMPLES_START_CB_MEMBER(tmnt_state::tmnt_decode_sample)
 {
-	running_machine &machine = device.machine();
-	tmnt_state *state = machine.driver_data<tmnt_state>();
 	int i;
-	UINT8 *source = state->memregion("title")->base();
+	UINT8 *source = memregion("title")->base();
 
-	state->save_item(NAME(state->m_sampledata));
+	save_item(NAME(m_sampledata));
 
 	/*  Sound sample for TMNT.D05 is stored in the following mode (ym3012 format):
 	 *
@@ -249,7 +246,7 @@ static SAMPLES_START( tmnt_decode_sample )
 
 		val <<= (expo - 3);
 
-		state->m_sampledata[i] = val;
+		m_sampledata[i] = val;
 	}
 }
 
@@ -1950,13 +1947,6 @@ WRITE8_MEMBER(tmnt_state::volume_callback)
 	m_k007232->set_volume(1, 0, (data & 0x0f) * 0x11);
 }
 
-static const samples_interface tmnt_samples_interface =
-{
-	1,  /* 1 channel for the title music */
-	NULL,
-	tmnt_decode_sample
-};
-
 MACHINE_START_MEMBER(tmnt_state,common)
 {
 	save_item(NAME(m_toggle));
@@ -2143,7 +2133,9 @@ static MACHINE_CONFIG_START( tmnt, tmnt_state )
 	MCFG_SOUND_ADD("upd", UPD7759, XTAL_640kHz)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 
-	MCFG_SAMPLES_ADD("samples", tmnt_samples_interface)
+	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_SAMPLES_CHANNELS(1) /* 1 channel for the title music */
+	MCFG_SAMPLES_START_CB(tmnt_state, tmnt_decode_sample)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

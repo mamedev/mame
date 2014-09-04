@@ -1206,26 +1206,6 @@ static const char *const seawolf_sample_names[] =
 	0
 };
 
-static const samples_interface seawolf2_samples_interface =
-{
-	10, /* 5*2 channels */
-	seawolf_sample_names
-};
-
-static const samples_interface wow_samples_interface =
-{
-	1,
-	wow_sample_names
-};
-
-static const samples_interface gorf_samples_interface =
-{
-	1,
-	gorf_sample_names
-};
-
-
-
 /*************************************
  *
  *  CPU configurations
@@ -1322,7 +1302,9 @@ static MACHINE_CONFIG_DERIVED( seawolf2, astrocade_base )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SAMPLES_ADD("samples", seawolf2_samples_interface)
+	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_SAMPLES_CHANNELS(10) /* 5*2 channels */
+	MCFG_SAMPLES_NAMES(seawolf_sample_names)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.25)
 	MCFG_SOUND_ROUTE(1, "lspeaker", 0.25)
 	MCFG_SOUND_ROUTE(2, "lspeaker", 0.25)
@@ -1355,14 +1337,6 @@ static MACHINE_CONFIG_DERIVED( spacezap, astrocade_base )
 	MCFG_CPU_IO_MAP(port_map_mono_pattern)
 MACHINE_CONFIG_END
 
-
-#if !USE_FAKE_VOTRAX
-static votrax_sc01_interface votrax_interface =
-{
-	DEVCB_NULL
-};
-#endif
-
 static MACHINE_CONFIG_DERIVED( wow, astrocade_base )
 	MCFG_FRAGMENT_ADD(astrocade_stereo_sound)
 
@@ -1380,9 +1354,11 @@ static MACHINE_CONFIG_DERIVED( wow, astrocade_base )
 	MCFG_SPEAKER_ADD("center", 0.0, 0.0, 1.0)
 
 #if USE_FAKE_VOTRAX
-	MCFG_SAMPLES_ADD("samples", wow_samples_interface)
+	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_SAMPLES_CHANNELS(1)
+	MCFG_SAMPLES_NAMES(wow_sample_names)
 #else
-	MCFG_VOTRAX_SC01_ADD("votrax", 720000, votrax_interface)
+	MCFG_VOTRAX_SC01_ADD("votrax", VOTRAX_SC01, 720000)
 #endif
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "center", 0.85)
 MACHINE_CONFIG_END
@@ -1410,9 +1386,11 @@ static MACHINE_CONFIG_DERIVED( gorf, astrocade_base )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lower", 1.0)
 
 #if USE_FAKE_VOTRAX
-	MCFG_SAMPLES_ADD("samples", gorf_samples_interface)
+	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_SAMPLES_CHANNELS(1)
+	MCFG_SAMPLES_NAMES(gorf_sample_names)
 #else
-	MCFG_VOTRAX_SC01_ADD("votrax", 720000, votrax_interface)
+	MCFG_VOTRAX_SC01_ADD("votrax", VOTRAX_SC01, 720000)
 #endif
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "upper", 0.85)
 MACHINE_CONFIG_END

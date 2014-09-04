@@ -243,36 +243,35 @@ UINT32 safarir_state::screen_update_safarir(screen_device &screen, bitmap_ind16 
 
 WRITE8_MEMBER(safarir_state::safarir_audio_w)
 {
-	samples_device *samples = m_samples;
 	UINT8 rising_bits = data & ~m_port_last;
 
-	if (rising_bits == 0x12) samples->start(CHANNEL_SOUND1, SAMPLE_SOUND1_1);
-	if (rising_bits == 0x02) samples->start(CHANNEL_SOUND1, SAMPLE_SOUND1_2);
-	if (rising_bits == 0x95) samples->start(CHANNEL_SOUND1, SAMPLE_SOUND6);
+	if (rising_bits == 0x12) m_samples->start(CHANNEL_SOUND1, SAMPLE_SOUND1_1);
+	if (rising_bits == 0x02) m_samples->start(CHANNEL_SOUND1, SAMPLE_SOUND1_2);
+	if (rising_bits == 0x95) m_samples->start(CHANNEL_SOUND1, SAMPLE_SOUND6);
 
-	if (rising_bits == 0x04 && (data == 0x15 || data ==0x16)) samples->start(CHANNEL_SOUND2, SAMPLE_SOUND2);
+	if (rising_bits == 0x04 && (data == 0x15 || data ==0x16)) m_samples->start(CHANNEL_SOUND2, SAMPLE_SOUND2);
 
-	if (data == 0x5f && (rising_bits == 0x49 || rising_bits == 0x5f)) samples->start(CHANNEL_SOUND3, SAMPLE_SOUND3, true);
-	if (data == 0x00 || rising_bits == 0x01) samples->stop(CHANNEL_SOUND3);
+	if (data == 0x5f && (rising_bits == 0x49 || rising_bits == 0x5f)) m_samples->start(CHANNEL_SOUND3, SAMPLE_SOUND3, true);
+	if (data == 0x00 || rising_bits == 0x01) m_samples->stop(CHANNEL_SOUND3);
 
 	if (data == 0x13)
 	{
 		if ((rising_bits == 0x13 && m_port_last != 0x04) || (rising_bits == 0x01 && m_port_last == 0x12))
 		{
-			samples->start(CHANNEL_SOUND4, SAMPLE_SOUND7);
+			m_samples->start(CHANNEL_SOUND4, SAMPLE_SOUND7);
 		}
-		else if (rising_bits == 0x03 && m_port_last2 == 0x15 && !samples->playing(CHANNEL_SOUND4))
+		else if (rising_bits == 0x03 && m_port_last2 == 0x15 && !m_samples->playing(CHANNEL_SOUND4))
 		{
-			samples->start(CHANNEL_SOUND4, SAMPLE_SOUND4_1);
+			m_samples->start(CHANNEL_SOUND4, SAMPLE_SOUND4_1);
 		}
 	}
-	if (data == 0x53 && m_port_last == 0x55) samples->start(CHANNEL_SOUND4, SAMPLE_SOUND4_2);
+	if (data == 0x53 && m_port_last == 0x55) m_samples->start(CHANNEL_SOUND4, SAMPLE_SOUND4_2);
 
-	if (data == 0x1f && rising_bits == 0x1f) samples->start(CHANNEL_SOUND5, SAMPLE_SOUND5_1);
-	if (data == 0x14 && (rising_bits == 0x14 || rising_bits == 0x04)) samples->start(CHANNEL_SOUND5, SAMPLE_SOUND5_2);
+	if (data == 0x1f && rising_bits == 0x1f) m_samples->start(CHANNEL_SOUND5, SAMPLE_SOUND5_1);
+	if (data == 0x14 && (rising_bits == 0x14 || rising_bits == 0x04)) m_samples->start(CHANNEL_SOUND5, SAMPLE_SOUND5_2);
 
-	if (data == 0x07 && rising_bits == 0x07 && !samples->playing(CHANNEL_SOUND6))
-		samples->start(CHANNEL_SOUND6, SAMPLE_SOUND8);
+	if (data == 0x07 && rising_bits == 0x07 && !m_samples->playing(CHANNEL_SOUND6))
+		m_samples->start(CHANNEL_SOUND6, SAMPLE_SOUND8);
 
 	m_port_last2 = m_port_last;
 	m_port_last = data;
@@ -297,16 +296,11 @@ static const char *const safarir_sample_names[] =
 };
 
 
-static const samples_interface safarir_samples_interface =
-{
-	6,  /* 6 channels */
-	safarir_sample_names
-};
-
-
 static MACHINE_CONFIG_FRAGMENT( safarir_audio )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SAMPLES_ADD("samples", safarir_samples_interface)
+	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_SAMPLES_CHANNELS(6)
+	MCFG_SAMPLES_NAMES(safarir_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 

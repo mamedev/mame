@@ -286,12 +286,6 @@ static const char *const homerun_sample_names[] =
 	0
 };
 
-static const samples_interface homerun_samples_interface =
-{
-	1,
-	homerun_sample_names
-};
-
 /**************************************************************************/
 
 static const gfx_layout gfxlayout =
@@ -388,7 +382,9 @@ static MACHINE_CONFIG_DERIVED( homerun, dynashot )
 	MCFG_SOUND_ADD("d7756", UPD7756, UPD7759_STANDARD_CLOCK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
-	MCFG_SAMPLES_ADD("samples", homerun_samples_interface)
+	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_SAMPLES_CHANNELS(1)
+	MCFG_SAMPLES_NAMES(homerun_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 

@@ -1738,13 +1738,6 @@ static const char *const journey_sample_names[] =
 	0
 };
 
-static const samples_interface journey_samples_interface =
-{
-	1,
-	journey_sample_names
-};
-
-
 static const char *const twotiger_sample_names[] =
 {
 	"*twotiger",
@@ -1752,14 +1745,6 @@ static const char *const twotiger_sample_names[] =
 	"right",
 	0
 };
-
-static const samples_interface twotiger_samples_interface =
-{
-	2,
-	twotiger_sample_names
-};
-
-
 
 /*************************************
  *
@@ -1838,7 +1823,9 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( mcr_90010_tt, mcr_90010 )
 
 	/* sound hardware */
-	MCFG_SAMPLES_ADD("samples", twotiger_samples_interface)
+	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_SAMPLES_CHANNELS(2)
+	MCFG_SAMPLES_NAMES(twotiger_sample_names)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.25)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.25)
 MACHINE_CONFIG_END
@@ -1853,7 +1840,9 @@ static MACHINE_CONFIG_DERIVED( mcr_91475, mcr_90010 )
 	MCFG_PALETTE_FORMAT(xxxxRRRRBBBBGGGG)
 
 	/* sound hardware */
-	MCFG_SAMPLES_ADD("samples", journey_samples_interface)
+	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_SAMPLES_CHANNELS(1)
+	MCFG_SAMPLES_NAMES(journey_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.25)
 MACHINE_CONFIG_END

@@ -13,20 +13,29 @@ class meadows_state : public driver_device
 public:
 	meadows_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_spriteram(*this, "spriteram"),
-		m_videoram(*this, "videoram"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_dac(*this, "dac"),
 		m_samples(*this, "samples"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette")
+		m_palette(*this, "palette"),
+		m_spriteram(*this, "spriteram"),
+		m_videoram(*this, "videoram")
 	{
 	}
+	
+	required_device<s2650_device> m_maincpu;
+	optional_device<s2650_device> m_audiocpu;
+	optional_device<dac_device> m_dac;
+	optional_device<samples_device> m_samples;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
 
 	optional_shared_ptr<UINT8> m_spriteram;
 	required_shared_ptr<UINT8> m_videoram;
+	
 	UINT8 m_dac_data;
 	int m_dac_enable;
 	int m_channel;
@@ -60,18 +69,7 @@ public:
 	INTERRUPT_GEN_MEMBER(minferno_interrupt);
 	INTERRUPT_GEN_MEMBER(audio_interrupt);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &clip);
-	required_device<s2650_device> m_maincpu;
-	optional_device<s2650_device> m_audiocpu;
-	optional_device<dac_device> m_dac;
-	optional_device<samples_device> m_samples;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<screen_device> m_screen;
-	required_device<palette_device> m_palette;
+	void meadows_sh_dac_w(int data);
+	void meadows_sh_update();
+	SAMPLES_START_CB_MEMBER(meadows_sh_start);
 };
-
-
-/*----------- defined in audio/meadows.c -----------*/
-
-SAMPLES_START( meadows_sh_start );
-void meadows_sh_dac_w(running_machine &machine, int data);
-void meadows_sh_update(running_machine &machine);

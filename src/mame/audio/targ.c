@@ -144,49 +144,30 @@ void exidy_state::common_audio_start(int freq)
 }
 
 
-static SAMPLES_START( spectar_audio_start )
+SAMPLES_START_CB_MEMBER(exidy_state::spectar_audio_start)
 {
-	running_machine &machine = device.machine();
-	exidy_state *state = machine.driver_data<exidy_state>();
-
-	state->common_audio_start(SPECTAR_MAXFREQ);
+	common_audio_start(SPECTAR_MAXFREQ);
 }
 
 
-static SAMPLES_START( targ_audio_start )
+SAMPLES_START_CB_MEMBER(exidy_state::targ_audio_start)
 {
-	running_machine &machine = device.machine();
-	exidy_state *state = machine.driver_data<exidy_state>();
+	common_audio_start(TARG_MAXFREQ);
 
-	state->common_audio_start(TARG_MAXFREQ);
+	m_tone_pointer = 0;
 
-	state->m_tone_pointer = 0;
-
-	state->save_item(NAME(state->m_tone_pointer));
+	save_item(NAME(m_tone_pointer));
 }
-
-
-static const samples_interface spectar_samples_interface =
-{
-	4,  /* number of channel */
-	sample_names,
-	spectar_audio_start
-};
-
-
-static const samples_interface targ_samples_interface =
-{
-	4,  /* number of channel */
-	sample_names,
-	targ_audio_start
-};
 
 
 MACHINE_CONFIG_FRAGMENT( spectar_audio )
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SAMPLES_ADD("samples", spectar_samples_interface)
+	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_SAMPLES_CHANNELS(4)
+	MCFG_SAMPLES_NAMES(sample_names)
+	MCFG_SAMPLES_START_CB(exidy_state, spectar_audio_start)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MCFG_DAC_ADD("dac")
@@ -198,7 +179,10 @@ MACHINE_CONFIG_FRAGMENT( targ_audio )
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SAMPLES_ADD("samples", targ_samples_interface)
+	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_SAMPLES_CHANNELS(4)
+	MCFG_SAMPLES_NAMES(sample_names)
+	MCFG_SAMPLES_START_CB(exidy_state, targ_audio_start)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MCFG_DAC_ADD("dac")

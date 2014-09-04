@@ -8,29 +8,20 @@
 
 #define SND_CLOCK 3072000   /* 3.072 MHz */
 
-static INT16 *samplebuf;    /* buffer to decode samples at run time */
-
-static SAMPLES_START( cclimber_sh_start )
+SAMPLES_START_CB_MEMBER( cclimber_audio_device::sh_start )
 {
-	running_machine &machine = device.machine();
-	samplebuf = 0;
-	if (machine.root_device().memregion("samples")->base())
-		samplebuf = auto_alloc_array(machine, INT16, 2 * machine.root_device().memregion("samples")->bytes());
+	if (machine().root_device().memregion("samples")->base())
+		m_sample_buf = auto_alloc_array(machine(), INT16, 2 * machine().root_device().memregion("samples")->bytes());
 }
-
-const samples_interface cclimber_samples_interface =
-{
-	1,
-	NULL,
-	cclimber_sh_start
-};
 
 MACHINE_CONFIG_FRAGMENT( cclimber_audio )
 	MCFG_SOUND_ADD("aysnd", AY8910, SND_CLOCK/2)
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(cclimber_audio_device, sample_select_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, ":mono", 0.50)
 
-	MCFG_SAMPLES_ADD("samples", cclimber_samples_interface)
+	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_SAMPLES_CHANNELS(1)
+	MCFG_SAMPLES_START_CB(cclimber_audio_device, sh_start)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, ":mono", 0.5)
 MACHINE_CONFIG_END
 
@@ -51,6 +42,7 @@ const device_type CCLIMBER_AUDIO = &device_creator<cclimber_audio_device>;
 
 cclimber_audio_device::cclimber_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, CCLIMBER_AUDIO, "Crazy Climber Sound Board", tag, owner, clock, "cclimber_audio", __FILE__),
+	m_sample_buf(NULL),
 	m_sample_num(0),
 	m_sample_freq(0),
 	m_sample_volume(0),
@@ -116,13 +108,13 @@ void cclimber_audio_device::play_sample(int start,int freq,int volume)
 		int sample;
 
 		sample = (rom[start + len] & 0xf0) >> 4;
-		samplebuf[2*len] = SAMPLE_CONV4(sample) * volume / 31;
+		m_sample_buf[2*len] = SAMPLE_CONV4(sample) * volume / 31;
 
 		sample = rom[start + len] & 0x0f;
-		samplebuf[2*len + 1] = SAMPLE_CONV4(sample) * volume / 31;
+		m_sample_buf[2*len + 1] = SAMPLE_CONV4(sample) * volume / 31;
 
 		len++;
 	}
 
-	m_samples->start_raw(0,samplebuf,2 * len,freq);
+	m_samples->start_raw(0,m_sample_buf,2 * len,freq);
 }

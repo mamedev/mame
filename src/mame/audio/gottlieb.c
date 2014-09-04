@@ -230,25 +230,17 @@ static const char *const qbert_sample_names[] =
 	0   /* end of array */
 };
 
-static const samples_interface reactor_samples_interface =
-{
-	1,  /* one channel */
-	reactor_sample_names
-};
-
-static const samples_interface qbert_samples_interface =
-{
-	1,  /* one channel */
-	qbert_sample_names
-};
-
 MACHINE_CONFIG_FRAGMENT( reactor_samples )
-	MCFG_SAMPLES_ADD("samples", reactor_samples_interface)
+	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_SAMPLES_CHANNELS(1)
+	MCFG_SAMPLES_NAMES(reactor_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_FRAGMENT( qbert_samples )
-	MCFG_SAMPLES_ADD("samples", qbert_samples_interface)
+	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_SAMPLES_CHANNELS(1)
+	MCFG_SAMPLES_NAMES(qbert_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -284,16 +276,12 @@ static const char *const qbert_knocker_names[] =
 	0   /* end of array */
 };
 
-static const samples_interface qbert_knocker_interface =
-{
-	1,  /* one channel */
-	qbert_knocker_names
-};
-
 MACHINE_CONFIG_FRAGMENT( qbert_knocker )
 	MCFG_SPEAKER_ADD("knocker", 0.0, 0.0, 1.0)
 
-	MCFG_SAMPLES_ADD("knocker_sam", qbert_knocker_interface)
+	MCFG_SOUND_ADD("knocker_sam", SAMPLES, 0)
+	MCFG_SAMPLES_CHANNELS(1)
+	MCFG_SAMPLES_NAMES(qbert_knocker_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "knocker", 1.0)
 MACHINE_CONFIG_END
 

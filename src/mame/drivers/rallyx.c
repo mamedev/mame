@@ -804,14 +804,6 @@ static const char *const rallyx_sample_names[] =
 	0   /* end of array */
 };
 
-static const samples_interface rallyx_samples_interface =
-{
-	1,  /* 1 channel */
-	rallyx_sample_names
-};
-
-
-
 /*************************************
  *
  *  Machine driver
@@ -877,7 +869,9 @@ static MACHINE_CONFIG_START( rallyx, rallyx_state )
 	MCFG_NAMCO_AUDIO_VOICES(3)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_SAMPLES_ADD("samples", rallyx_samples_interface)
+	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_SAMPLES_CHANNELS(1)
+	MCFG_SAMPLES_NAMES(rallyx_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 

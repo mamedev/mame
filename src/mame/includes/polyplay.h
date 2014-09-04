@@ -15,6 +15,13 @@ public:
 		m_palette(*this, "palette")  { }
 
 	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<UINT8> m_characterram;
+	
+	required_device<cpu_device> m_maincpu;
+	required_device<samples_device> m_samples;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+	
 	int m_freq1;
 	int m_freq2;
 	int m_channel_playing1;
@@ -28,11 +35,16 @@ public:
 	int m_channel2_const;
 	timer_device* m_timer;
 	int m_last;
-	required_shared_ptr<UINT8> m_characterram;
+	
 	DECLARE_WRITE8_MEMBER(polyplay_sound_channel);
 	DECLARE_WRITE8_MEMBER(polyplay_start_timer2);
 	DECLARE_READ8_MEMBER(polyplay_random_read);
 	DECLARE_WRITE8_MEMBER(polyplay_characterram_w);
+	SAMPLES_START_CB_MEMBER(sh_start);
+	void set_channel1(int active);
+	void set_channel2(int active);
+	void play_channel1(int data);
+	void play_channel2(int data);
 	virtual void machine_reset();
 	virtual void video_start();
 	DECLARE_PALETTE_INIT(polyplay);
@@ -40,17 +52,4 @@ public:
 	INTERRUPT_GEN_MEMBER(periodic_interrupt);
 	INTERRUPT_GEN_MEMBER(coin_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(polyplay_timer_callback);
-	required_device<cpu_device> m_maincpu;
-	required_device<samples_device> m_samples;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
 };
-
-
-/*----------- defined in audio/polyplay.c -----------*/
-
-void polyplay_set_channel1(running_machine &machine, int active);
-void polyplay_set_channel2(running_machine &machine, int active);
-void polyplay_play_channel1(running_machine &machine, int data);
-void polyplay_play_channel2(running_machine &machine, int data);
-SAMPLES_START( polyplay_sh_start );

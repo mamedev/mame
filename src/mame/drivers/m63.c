@@ -181,6 +181,7 @@ public:
 	DECLARE_READ8_MEMBER(irq_r);
 	DECLARE_READ8_MEMBER(snddata_r);
 	DECLARE_WRITE8_MEMBER(fghtbskt_samples_w);
+	SAMPLES_START_CB_MEMBER(fghtbskt_sh_start);
 	DECLARE_WRITE8_MEMBER(nmi_mask_w);
 	DECLARE_DRIVER_INIT(wilytowr);
 	DECLARE_DRIVER_INIT(fghtbskt);
@@ -696,26 +697,17 @@ static GFXDECODE_START( fghtbskt )
 GFXDECODE_END
 
 
-static SAMPLES_START( fghtbskt_sh_start )
+SAMPLES_START_CB_MEMBER(m63_state::fghtbskt_sh_start)
 {
-	running_machine &machine = device.machine();
-	m63_state *state = machine.driver_data<m63_state>();
-	int i, len = state->memregion("samples")->bytes();
-	UINT8 *ROM = state->memregion("samples")->base();
+	int i, len = memregion("samples")->bytes();
+	UINT8 *ROM = memregion("samples")->base();
 
-	state->m_samplebuf = auto_alloc_array(machine, INT16, len);
-	state->save_pointer(NAME(state->m_samplebuf), len);
+	m_samplebuf = auto_alloc_array(machine(), INT16, len);
+	save_pointer(NAME(m_samplebuf), len);
 
 	for(i = 0; i < len; i++)
-		state->m_samplebuf[i] = ((INT8)(ROM[i] ^ 0x80)) * 256;
+		m_samplebuf[i] = ((INT8)(ROM[i] ^ 0x80)) * 256;
 }
-
-static const samples_interface fghtbskt_samples_interface =
-{
-	1,
-	NULL,
-	fghtbskt_sh_start
-};
 
 INTERRUPT_GEN_MEMBER(m63_state::snd_irq)
 {
@@ -831,7 +823,9 @@ static MACHINE_CONFIG_START( fghtbskt, m63_state )
 	MCFG_SOUND_ADD("ay1", AY8910, XTAL_12MHz/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_SAMPLES_ADD("samples", fghtbskt_samples_interface)
+	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_SAMPLES_CHANNELS(1)
+	MCFG_SAMPLES_START_CB(m63_state, fghtbskt_sh_start)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 

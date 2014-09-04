@@ -41,5 +41,5 @@ public:
 
 /*----------- defined in audio/blockade.c -----------*/
 
-extern const samples_interface blockade_samples_interface;
+extern const char *const blockade_sample_names[];
 DISCRETE_SOUND_EXTERN( blockade );

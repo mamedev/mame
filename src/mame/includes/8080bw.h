@@ -159,8 +159,8 @@ public:
 
 
 /*----------- defined in audio/8080bw.c -----------*/
-extern const samples_interface lrescue_samples_interface;
-extern const samples_interface lupin3_samples_interface;
+extern const char *const lrescue_sample_names[];
+extern const char *const lupin3_sample_names[];
 
 DISCRETE_SOUND_EXTERN( ballbomb );
 DISCRETE_SOUND_EXTERN( indianbt );

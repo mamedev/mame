@@ -55,15 +55,9 @@ WRITE8_MEMBER(blockade_state::blockade_env_off_w)
 	return;
 }
 
-static const char *const blockade_sample_names[] =
+const char *const blockade_sample_names[] =
 {
 	"*blockade",
 	"boom",
 	0
-};
-
-const samples_interface blockade_samples_interface =
-{
-	1,  /* 1 channel */
-	blockade_sample_names
 };

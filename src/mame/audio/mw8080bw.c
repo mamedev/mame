@@ -140,19 +140,13 @@ static const char *const seawolf_sample_names[] =
 	0
 };
 
-
-static const samples_interface seawolf_samples_interface =
-{
-	5,  /* 5 channels */
-	seawolf_sample_names
-};
-
-
 MACHINE_CONFIG_FRAGMENT( seawolf_audio )
 	MCFG_SOUND_START_OVERRIDE(mw8080bw_state, samples)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SAMPLES_ADD("samples", seawolf_samples_interface)
+	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_SAMPLES_CHANNELS(5)
+	MCFG_SAMPLES_NAMES(seawolf_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.6)
 MACHINE_CONFIG_END
 
@@ -200,22 +194,19 @@ static const char *const gunfight_sample_names[] =
 };
 
 
-static const samples_interface gunfight_samples_interface =
-{
-	1,  /* 1 channel */
-	gunfight_sample_names
-};
-
-
 MACHINE_CONFIG_FRAGMENT( gunfight_audio )
 	MCFG_SOUND_START_OVERRIDE(mw8080bw_state, samples)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SAMPLES_ADD("samples1", gunfight_samples_interface)
+	MCFG_SOUND_ADD("samples1", SAMPLES, 0)
+	MCFG_SAMPLES_CHANNELS(1)
+	MCFG_SAMPLES_NAMES(gunfight_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 
-	MCFG_SAMPLES_ADD("samples2", gunfight_samples_interface)
+	MCFG_SOUND_ADD("samples2", SAMPLES, 0)
+	MCFG_SAMPLES_CHANNELS(1)
+	MCFG_SAMPLES_NAMES(gunfight_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 MACHINE_CONFIG_END
 
@@ -1552,23 +1543,19 @@ static const char *const gmissile_sample_names[] =
 	0
 };
 
-
-static const samples_interface gmissile_samples_interface =
-{
-	1,  /* 1 channel */
-	gmissile_sample_names
-};
-
-
 MACHINE_CONFIG_FRAGMENT( gmissile_audio )
 	MCFG_SOUND_START_OVERRIDE(mw8080bw_state, samples)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SAMPLES_ADD("samples1", gmissile_samples_interface)
+	MCFG_SOUND_ADD("samples1", SAMPLES, 0)
+	MCFG_SAMPLES_CHANNELS(1)
+	MCFG_SAMPLES_NAMES(gmissile_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.9)
 
-	MCFG_SAMPLES_ADD("samples2", gmissile_samples_interface)
+	MCFG_SOUND_ADD("samples2", SAMPLES, 0)
+	MCFG_SAMPLES_CHANNELS(1)
+	MCFG_SAMPLES_NAMES(gmissile_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.9)
 MACHINE_CONFIG_END
 
@@ -1649,22 +1636,19 @@ static const char *const m4_sample_names[] =
 };
 
 
-static const samples_interface m4_samples_interface =
-{
-	2,  /* 2 channels */
-	m4_sample_names
-};
-
-
 MACHINE_CONFIG_FRAGMENT( m4_audio )
 	MCFG_SOUND_START_OVERRIDE(mw8080bw_state, samples)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SAMPLES_ADD("samples1", m4_samples_interface)
+	MCFG_SOUND_ADD("samples1", SAMPLES, 0)
+	MCFG_SAMPLES_CHANNELS(2)
+	MCFG_SAMPLES_NAMES(m4_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1)
 
-	MCFG_SAMPLES_ADD("samples2", m4_samples_interface)
+	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_SAMPLES_CHANNELS(2)
+	MCFG_SAMPLES_NAMES(m4_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1)
 MACHINE_CONFIG_END
 
@@ -1907,19 +1891,14 @@ static const char *const clowns_sample_names[] =
 	0
 };
 
-static const samples_interface clowns_samples_interface =
-{
-	1,  /* 1 channel */
-	clowns_sample_names
-};
-
-
 MACHINE_CONFIG_FRAGMENT( clowns_audio )
 	MCFG_SOUND_START_OVERRIDE(mw8080bw_state, samples)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SAMPLES_ADD("samples", clowns_samples_interface)
+	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_SAMPLES_CHANNELS(1)
+	MCFG_SAMPLES_NAMES(clowns_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 
 	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
@@ -3301,19 +3280,13 @@ static const char *const phantom2_sample_names[] =
 	0
 };
 
-
-static const samples_interface phantom2_samples_interface =
-{
-	2,  /* 2 channels */
-	phantom2_sample_names
-};
-
-
 MACHINE_CONFIG_FRAGMENT( phantom2_audio )
 	MCFG_SOUND_START_OVERRIDE(mw8080bw_state, samples)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SAMPLES_ADD("samples", phantom2_samples_interface)
+	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_SAMPLES_CHANNELS(2)
+	MCFG_SAMPLES_NAMES(phantom2_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1)
 MACHINE_CONFIG_END
 
@@ -3580,13 +3553,6 @@ static const char *const invaders_sample_names[] =
 };
 
 
-static const samples_interface invaders_samples_interface =
-{
-	6,  /* 6 channels */
-	invaders_sample_names
-};
-
-
 /* left in for all games that hack into invaders samples for audio */
 MACHINE_CONFIG_FRAGMENT( invaders_samples_audio )
 	MCFG_SOUND_START_OVERRIDE(mw8080bw_state, samples)
@@ -3597,7 +3563,9 @@ MACHINE_CONFIG_FRAGMENT( invaders_samples_audio )
 	MCFG_SOUND_CONFIG(invaders_sn76477_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 
-	MCFG_SAMPLES_ADD("samples", invaders_samples_interface)
+	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_SAMPLES_CHANNELS(6)
+	MCFG_SAMPLES_NAMES(invaders_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

@@ -11,21 +11,18 @@
 #define FREQ_HZ 8000
 #define SAMPLEN 0x1000
 
-SAMPLES_START( suna8_sh_start )
+SAMPLES_START_CB_MEMBER(suna8_state::sh_start)
 {
-	suna8_state *state = device.machine().driver_data<suna8_state>();
-	running_machine &machine = device.machine();
+	int i, len = memregion("samples")->bytes() * 2;  // 2 samples per byte
+	UINT8 *ROM = memregion("samples")->base();
 
-	int i, len = state->memregion("samples")->bytes() * 2;  // 2 samples per byte
-	UINT8 *ROM = state->memregion("samples")->base();
-
-	state->m_samplebuf = auto_alloc_array(machine, INT16, len);
+	m_samplebuf = auto_alloc_array(machine(), INT16, len);
 
 	// Convert 4 bit to 16 bit samples
 	for(i = 0; i < len; i++)
-		state->m_samplebuf[i] = (INT8)(((ROM[i/2] << ((i & 1)?0:4)) & 0xf0)  ^ 0x80) * 0x100;
+		m_samplebuf[i] = (INT8)(((ROM[i/2] << ((i & 1)?0:4)) & 0xf0)  ^ 0x80) * 0x100;
 
-	state->m_numsamples = len / SAMPLEN;
+	m_numsamples = len / SAMPLEN;
 }
 
 WRITE8_MEMBER(suna8_state::suna8_samples_number_w)

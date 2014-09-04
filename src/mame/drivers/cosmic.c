@@ -901,13 +901,6 @@ static const char *const cosmica_sample_names[] =
 };
 
 
-static const samples_interface cosmica_samples_interface =
-{
-	13, /* 12 channels */
-	cosmica_sample_names
-};
-
-
 static const char *const panic_sample_names[] =
 {
 	"*panic",
@@ -925,11 +918,6 @@ static const char *const panic_sample_names[] =
 	0
 };
 
-static const samples_interface panic_samples_interface =
-{
-	9,  /* 9 channels */
-	panic_sample_names
-};
 
 static const char *const cosmicg_sample_names[] =
 {
@@ -950,12 +938,6 @@ static const char *const cosmicg_sample_names[] =
 	"cg_gotm",  /* Got Monster */
 	"cg_ext",   /* Coin Extend */
 	0
-};
-
-static const samples_interface cosmicg_samples_interface =
-{
-	9,  /* 9 channels */
-	cosmicg_sample_names
 };
 
 
@@ -1038,7 +1020,9 @@ static MACHINE_CONFIG_DERIVED( panic, cosmic )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SAMPLES_ADD("samples", panic_samples_interface)
+	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_SAMPLES_CHANNELS(9)
+	MCFG_SAMPLES_NAMES(panic_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MCFG_DAC_ADD("dac")
@@ -1064,7 +1048,9 @@ static MACHINE_CONFIG_DERIVED( cosmica, cosmic )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SAMPLES_ADD("samples", cosmica_samples_interface)
+	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_SAMPLES_CHANNELS(13)
+	MCFG_SAMPLES_NAMES(cosmica_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MCFG_DAC_ADD("dac")
@@ -1098,7 +1084,9 @@ static MACHINE_CONFIG_START( cosmicg, cosmic_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SAMPLES_ADD("samples", cosmicg_samples_interface)
+	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_SAMPLES_CHANNELS(9)
+	MCFG_SAMPLES_NAMES(cosmicg_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MCFG_DAC_ADD("dac")

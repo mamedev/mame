@@ -18,48 +18,36 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_SAMPLES_ADD(_tag, _interface) \
-	MCFG_DEVICE_ADD(_tag, SAMPLES, 0) \
-	samples_device::static_set_interface(*device, _interface);
+#define MCFG_SAMPLES_CHANNELS(_channels) \
+	samples_device::static_set_channels(*device, _channels);
 
-#define MCFG_SAMPLES_REPLACE(_tag, _interface) \
-	MCFG_DEVICE_REPLACE(_tag, SAMPLES, 0) \
-	samples_device::static_set_interface(*device, _interface);
+#define MCFG_SAMPLES_NAMES(_names) \
+	samples_device::static_set_samples_names(*device, _names);
+	
+typedef device_delegate<void ()> samples_start_cb_delegate;
 
-
-#define SAMPLES_START(name) void name(samples_device &device)
-
-
+#define SAMPLES_START_CB_MEMBER(_name) void _name()
+	
+#define MCFG_SAMPLES_START_CB(_class, _method) \
+	samples_device::set_samples_start_callback(*device, samples_start_cb_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
 
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-class samples_device;
-
-
-// ======================> samples_interface sample
-
-struct samples_interface
-{
-	UINT8       m_channels;         // number of discrete audio channels needed
-	const char *const *m_names;     // array of sample names
-	void        (*m_start)(samples_device &device); // optional callback
-};
-
-
 // ======================> samples_device
 
 class samples_device :  public device_t,
-						public device_sound_interface,
-						public samples_interface
+						public device_sound_interface
 {
 public:
 	// construction/destruction
 	samples_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// static configuration helpers
-	static void static_set_interface(device_t &device, const samples_interface &interface);
+	static void static_set_channels(device_t &device, UINT8 channels) { downcast<samples_device &>(device).m_channels = channels; }
+	static void static_set_samples_names(device_t &device, const char *const *names) { downcast<samples_device &>(device).m_names = names; }
+	static void set_samples_start_callback(device_t &device, samples_start_cb_delegate callback) { downcast<samples_device &>(device).m_samples_start_cb = callback; }
 
 	// getters
 	bool playing(UINT8 channel) const;
@@ -86,6 +74,11 @@ public:
 		dynamic_array<INT16> data;      // 16-bit signed data
 	};
 	static bool read_sample(emu_file &file, sample_t &sample);
+	
+	// interface
+	UINT8       m_channels;         // number of discrete audio channels needed
+	const char *const *m_names;     // array of sample names
+	samples_start_cb_delegate m_samples_start_cb; // optional callback
 
 protected:
 	// subclasses can do it this way
@@ -140,29 +133,29 @@ class samples_iterator
 {
 public:
 	// construction/destruction
-	samples_iterator(samples_interface &intf)
-		: m_intf(intf),
+	samples_iterator(samples_device &device)
+		: m_samples(device),
 			m_current(-1) { }
 
 	// getters
-	const char *altbasename() const { return (m_intf.m_names != NULL && m_intf.m_names[0] != NULL && m_intf.m_names[0][0] == '*') ? &m_intf.m_names[0][1] : NULL; }
+	const char *altbasename() const { return (m_samples.m_names != NULL && m_samples.m_names[0] != NULL && m_samples.m_names[0][0] == '*') ? &m_samples.m_names[0][1] : NULL; }
 
 	// iteration
 	const char *first()
 	{
-		if (m_intf.m_names == NULL || m_intf.m_names[0] == NULL)
+		if (m_samples.m_names == NULL || m_samples.m_names[0] == NULL)
 			return NULL;
 		m_current = 0;
-		if (m_intf.m_names[0][0] == '*')
+		if (m_samples.m_names[0][0] == '*')
 			m_current++;
-		return m_intf.m_names[m_current++];
+		return m_samples.m_names[m_current++];
 	}
 
 	const char *next()
 	{
-		if (m_current == -1 || m_intf.m_names[m_current] == NULL)
+		if (m_current == -1 || m_samples.m_names[m_current] == NULL)
 			return NULL;
-		return m_intf.m_names[m_current++];
+		return m_samples.m_names[m_current++];
 	}
 
 	// counting
@@ -178,7 +171,7 @@ public:
 
 private:
 	// internal state
-	samples_interface &     m_intf;
+	samples_device &m_samples;
 	int                     m_current;
 };
 

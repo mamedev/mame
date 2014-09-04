@@ -129,12 +129,6 @@ static const char *const spacewar_sample_names[] =
 	0
 };
 
-static const samples_interface spacewar_samples_interface =
-{
-	8,
-	spacewar_sample_names
-};
-
 void cinemat_state::spacewar_sound_w(UINT8 sound_val, UINT8 bits_changed)
 {
 	/* Explosion - rising edge */
@@ -184,7 +178,9 @@ MACHINE_CONFIG_FRAGMENT( spacewar_sound )
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SAMPLES_ADD("samples", spacewar_samples_interface)
+	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_SAMPLES_CHANNELS(8)
+	MCFG_SAMPLES_NAMES(spacewar_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
@@ -203,12 +199,6 @@ static const char *const barrier_sample_names[] =
 	"playmove",
 	"enemmove",
 	0
-};
-
-static const samples_interface barrier_samples_interface =
-{
-	3,
-	barrier_sample_names
 };
 
 void cinemat_state::barrier_sound_w(UINT8 sound_val, UINT8 bits_changed)
@@ -236,7 +226,9 @@ MACHINE_CONFIG_FRAGMENT( barrier_sound )
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SAMPLES_ADD("samples", barrier_samples_interface)
+	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_SAMPLES_CHANNELS(3)
+	MCFG_SAMPLES_NAMES(barrier_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
@@ -253,12 +245,6 @@ static const char *const speedfrk_sample_names[] =
 	"*speedfrk",
 	"offroad",
 	NULL
-};
-
-static const samples_interface speedfrk_samples_interface =
-{
-	1,
-	speedfrk_sample_names
 };
 
 void cinemat_state::speedfrk_sound_w(UINT8 sound_val, UINT8 bits_changed)
@@ -293,7 +279,9 @@ MACHINE_CONFIG_FRAGMENT( speedfrk_sound )
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SAMPLES_ADD("samples", speedfrk_samples_interface)
+	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_SAMPLES_CHANNELS(1)
+	MCFG_SAMPLES_NAMES(speedfrk_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
@@ -315,12 +303,6 @@ static const char *const starhawk_sample_names[] =
 	"master",
 	"kexit",
 	NULL
-};
-
-static const samples_interface starhawk_samples_interface =
-{
-	5,
-	starhawk_sample_names
 };
 
 void cinemat_state::starhawk_sound_w(UINT8 sound_val, UINT8 bits_changed)
@@ -366,7 +348,9 @@ MACHINE_CONFIG_FRAGMENT( starhawk_sound )
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SAMPLES_ADD("samples", starhawk_samples_interface)
+	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_SAMPLES_CHANNELS(5)
+	MCFG_SAMPLES_NAMES(starhawk_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
@@ -388,12 +372,6 @@ static const char *const sundance_sample_names[] =
 	"ping2",
 	"hatch",
 	0
-};
-
-static const samples_interface sundance_samples_interface =
-{
-	6,
-	sundance_sample_names
 };
 
 void cinemat_state::sundance_sound_w(UINT8 sound_val, UINT8 bits_changed)
@@ -433,7 +411,9 @@ MACHINE_CONFIG_FRAGMENT( sundance_sound )
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SAMPLES_ADD("samples", sundance_samples_interface)
+	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_SAMPLES_CHANNELS(6)
+	MCFG_SAMPLES_NAMES(sundance_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
@@ -455,12 +435,6 @@ static const char *const tailg_sample_names[] =
 	"bounce",
 	"hypersp",
 	NULL
-};
-
-static const samples_interface tailg_samples_interface =
-{
-	6,
-	tailg_sample_names
 };
 
 void cinemat_state::tailg_sound_w(UINT8 sound_val, UINT8 bits_changed)
@@ -519,7 +493,9 @@ MACHINE_CONFIG_FRAGMENT( tailg_sound )
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SAMPLES_ADD("samples", tailg_samples_interface)
+	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_SAMPLES_CHANNELS(6)
+	MCFG_SAMPLES_NAMES(tailg_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
@@ -540,12 +516,6 @@ static const char *const warrior_sample_names[] =
 	"fall",
 	"appear",
 	NULL
-};
-
-static const samples_interface warrior_samples_interface =
-{
-	5,
-	warrior_sample_names
 };
 
 void cinemat_state::warrior_sound_w(UINT8 sound_val, UINT8 bits_changed)
@@ -585,7 +555,9 @@ MACHINE_CONFIG_FRAGMENT( warrior_sound )
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SAMPLES_ADD("samples", warrior_samples_interface)
+	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_SAMPLES_CHANNELS(5)
+	MCFG_SAMPLES_NAMES(warrior_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
@@ -608,12 +580,6 @@ static const char *const armora_sample_names[] =
 	"beep",
 	"chopper",
 	NULL
-};
-
-static const samples_interface armora_samples_interface =
-{
-	7,
-	armora_sample_names
 };
 
 void cinemat_state::armora_sound_w(UINT8 sound_val, UINT8 bits_changed)
@@ -677,7 +643,9 @@ MACHINE_CONFIG_FRAGMENT( armora_sound )
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SAMPLES_ADD("samples", armora_samples_interface)
+	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_SAMPLES_CHANNELS(7)
+	MCFG_SAMPLES_NAMES(armora_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
@@ -706,12 +674,6 @@ static const char *const ripoff_sample_names[] =
 	"bg7",
 	"bg8",
 	NULL
-};
-
-static const samples_interface ripoff_samples_interface =
-{
-	6,
-	ripoff_sample_names
 };
 
 void cinemat_state::ripoff_sound_w(UINT8 sound_val, UINT8 bits_changed)
@@ -766,7 +728,9 @@ MACHINE_CONFIG_FRAGMENT( ripoff_sound )
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SAMPLES_ADD("samples", ripoff_samples_interface)
+	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_SAMPLES_CHANNELS(6)
+	MCFG_SAMPLES_NAMES(ripoff_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
@@ -790,12 +754,6 @@ static const char *const starcas_sample_names[] =
 	"sexplode",
 	"pfire",
 	0
-};
-
-static const samples_interface starcas_samples_interface =
-{
-	8,
-	starcas_sample_names
 };
 
 void cinemat_state::starcas_sound_w(UINT8 sound_val, UINT8 bits_changed)
@@ -877,7 +835,9 @@ MACHINE_CONFIG_FRAGMENT( starcas_sound )
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SAMPLES_ADD("samples", starcas_samples_interface)
+	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_SAMPLES_CHANNELS(8)
+	MCFG_SAMPLES_NAMES(starcas_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
 
@@ -901,12 +861,6 @@ static const char *const solarq_sample_names[] =
 	"nuke1",
 	"music",
 	NULL
-};
-
-static const samples_interface solarq_samples_interface =
-{
-	8,
-	solarq_sample_names
 };
 
 void cinemat_state::solarq_sound_w(UINT8 sound_val, UINT8 bits_changed)
@@ -1009,7 +963,9 @@ MACHINE_CONFIG_FRAGMENT( solarq_sound )
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SAMPLES_ADD("samples", solarq_samples_interface)
+	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_SAMPLES_CHANNELS(8)
+	MCFG_SAMPLES_NAMES(solarq_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
 
@@ -1037,12 +993,6 @@ static const char *const boxingb_sample_names[] =
 	"bounce",
 	"bell",
 	NULL
-};
-
-static const samples_interface boxingb_samples_interface =
-{
-	12,
-	boxingb_sample_names
 };
 
 void cinemat_state::boxingb_sound_w(UINT8 sound_val, UINT8 bits_changed)
@@ -1141,7 +1091,9 @@ MACHINE_CONFIG_FRAGMENT( boxingb_sound )
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SAMPLES_ADD("samples", boxingb_samples_interface)
+	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_SAMPLES_CHANNELS(12)
+	MCFG_SAMPLES_NAMES(boxingb_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
@@ -1165,12 +1117,6 @@ static const char *const wotw_sample_names[] =
 	"sexplode",
 	"pfire",
 	0
-};
-
-static const samples_interface wotw_samples_interface =
-{
-	8,
-	wotw_sample_names
 };
 
 void cinemat_state::wotw_sound_w(UINT8 sound_val, UINT8 bits_changed)
@@ -1252,7 +1198,9 @@ MACHINE_CONFIG_FRAGMENT( wotw_sound )
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SAMPLES_ADD("samples", wotw_samples_interface)
+	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_SAMPLES_CHANNELS(8)
+	MCFG_SAMPLES_NAMES(wotw_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 

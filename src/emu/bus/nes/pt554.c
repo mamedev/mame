@@ -83,13 +83,6 @@ static const char *const pt554_sample_names[] =
 	0
 };
 
-static const samples_interface pt554_samples_interface =
-{
-	8,   /* channels */
-	pt554_sample_names
-};
-
-
 //-------------------------------------------------
 //  MACHINE_DRIVER
 //-------------------------------------------------
@@ -99,7 +92,9 @@ static MACHINE_CONFIG_FRAGMENT( pt554 )
 	// additional sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("addon")
 
-	MCFG_SAMPLES_ADD("samples", pt554_samples_interface)
+	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_SAMPLES_CHANNELS(8)
+	MCFG_SAMPLES_NAMES(pt554_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "addon", 0.50)
 MACHINE_CONFIG_END
 

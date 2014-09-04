@@ -51,15 +51,10 @@ static const char *const pulsar_sample_names[] =
 };
 
 
-static const samples_interface pulsar_samples_interface =
-{
-	12,
-	pulsar_sample_names
-};
-
-
 MACHINE_CONFIG_FRAGMENT( pulsar_audio )
-	MCFG_SAMPLES_ADD("samples", pulsar_samples_interface)
+	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_SAMPLES_CHANNELS(12)
+	MCFG_SAMPLES_NAMES(pulsar_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
 

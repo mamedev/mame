@@ -797,13 +797,6 @@ static const char *const m10_sample_names[] =
 	0
 };
 
-
-static const samples_interface m10_samples_interface =
-{
-	6,  /* 6 channels */
-	m10_sample_names
-};
-
 /*************************************
  *
  *  Machine driver
@@ -856,7 +849,9 @@ static MACHINE_CONFIG_START( m10, m10_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SAMPLES_ADD("samples", m10_samples_interface)
+	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_SAMPLES_CHANNELS(6)
+	MCFG_SAMPLES_NAMES(m10_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 MACHINE_CONFIG_END
@@ -897,7 +892,9 @@ static MACHINE_CONFIG_START( m15, m10_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SAMPLES_ADD("samples", m10_samples_interface)
+	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_SAMPLES_CHANNELS(6)
+	MCFG_SAMPLES_NAMES(m10_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 MACHINE_CONFIG_END

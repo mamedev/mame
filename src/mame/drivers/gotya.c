@@ -167,13 +167,6 @@ static const char *const sample_names[] =
 	0
 };
 
-static const samples_interface gotya_samples_interface =
-{
-	4,  /* 4 channels */
-	sample_names
-};
-
-
 void gotya_state::machine_start()
 {
 	save_item(NAME(m_scroll_bit_8));
@@ -211,7 +204,9 @@ static MACHINE_CONFIG_START( gotya, gotya_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SAMPLES_ADD("samples", gotya_samples_interface)
+	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_SAMPLES_CHANNELS(4)
+	MCFG_SAMPLES_NAMES(sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

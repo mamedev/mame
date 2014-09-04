@@ -618,13 +618,6 @@ static const char *const astinvad_sample_names[] =
 	0
 };
 
-static const samples_interface astinvad_samples_interface =
-{
-	6,   /* channels */
-	astinvad_sample_names
-};
-
-
 
 /*************************************
  *
@@ -659,7 +652,9 @@ static MACHINE_CONFIG_START( kamikaze, astinvad_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SAMPLES_ADD("samples", astinvad_samples_interface)
+	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_SAMPLES_CHANNELS(6)
+	MCFG_SAMPLES_NAMES(astinvad_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
@@ -701,7 +696,9 @@ static MACHINE_CONFIG_START( spaceint, astinvad_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SAMPLES_ADD("samples", astinvad_samples_interface)
+	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_SAMPLES_CHANNELS(6)
+	MCFG_SAMPLES_NAMES(astinvad_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 

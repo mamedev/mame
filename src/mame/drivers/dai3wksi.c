@@ -293,12 +293,6 @@ static const char *const dai3wksi_sample_names[] =
 };
 
 
-static const samples_interface dai3wksi_samples_interface =
-{
-	6,  /* 6 channels */
-	dai3wksi_sample_names
-};
-
 #else
 
 WRITE8_MEMBER(dai3wksi_state::dai3wksi_audio_1_w)
@@ -610,7 +604,9 @@ static MACHINE_CONFIG_START( dai3wksi, dai3wksi_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 #if (USE_SAMPLES)
-	MCFG_SAMPLES_ADD("samples", dai3wksi_samples_interface)
+	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_SAMPLES_CHANNELS(6)
+	MCFG_SAMPLES_NAMES(dai3wksi_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 #else
 	MCFG_SOUND_ADD("ic76", SN76477, 0)

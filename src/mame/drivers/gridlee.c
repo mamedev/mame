@@ -400,14 +400,6 @@ static const char *const sample_names[] =
 	0   /* end of array */
 };
 
-static const samples_interface gridlee_samples_interface =
-{
-	8,  /* 8 channels */
-	sample_names
-};
-
-
-
 /*************************************
  *
  *  Machine driver
@@ -437,7 +429,9 @@ static MACHINE_CONFIG_START( gridlee, gridlee_state )
 	MCFG_SOUND_ADD("gridlee", GRIDLEE, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_SAMPLES_ADD("samples", gridlee_samples_interface)
+	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_SAMPLES_CHANNELS(8)
+	MCFG_SAMPLES_NAMES(sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 MACHINE_CONFIG_END
 

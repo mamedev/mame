@@ -86,12 +86,6 @@ static const char *const rotaryf_sample_names[] =
 };
 
 
-static const samples_interface rotaryf_samples_interface =
-{
-	6,  /* 6 channels */
-	rotaryf_sample_names
-};
-
 READ8_MEMBER( rotaryf_state::port29_r )
 {
 	UINT8 data = ioport("INPUTS")->read();
@@ -278,7 +272,9 @@ static MACHINE_CONFIG_START( rotaryf, rotaryf_state )
 	MCFG_SOUND_ADD("snsnd", SN76477, 0)
 	MCFG_SOUND_CONFIG(rotaryf_sn76477_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
-	MCFG_SAMPLES_ADD("samples", rotaryf_samples_interface)
+	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_SAMPLES_CHANNELS(6)
+	MCFG_SAMPLES_NAMES(rotaryf_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

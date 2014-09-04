@@ -151,7 +151,6 @@ TODO:
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/2203intf.h"
-#include "sound/samples.h"
 #include "machine/mc8123.h"
 #include "includes/ninjakd2.h"
 
@@ -169,24 +168,21 @@ TODO:
 #define NE555_FREQUENCY 16300   // measured on PCB
 //#define NE555_FREQUENCY   (1.0f / (0.693 * (560 + 2*51) * 0.1e-6))    // theoretical: this gives 21.8kHz which is too high
 
-static SAMPLES_START( ninjakd2_init_samples )
+SAMPLES_START_CB_MEMBER(ninjakd2_state::ninjakd2_init_samples)
 {
-	ninjakd2_state *state = device.machine().driver_data<ninjakd2_state>();
-	running_machine &machine = device.machine();
-	const UINT8* const rom = state->memregion("pcm")->base();
-	const int length = state->memregion("pcm")->bytes();
-	INT16* sampledata = auto_alloc_array(machine, INT16, length);
+	const UINT8* const rom = memregion("pcm")->base();
+	const int length = memregion("pcm")->bytes();
+	INT16* sampledata = auto_alloc_array(machine(), INT16, length);
 
 	// convert unsigned 8-bit PCM to signed 16-bit
 	for (int i = 0; i < length; ++i)
 		sampledata[i] = rom[i] << 7;
 
-	state->m_sampledata = sampledata;
+	m_sampledata = sampledata;
 }
 
 WRITE8_MEMBER(ninjakd2_state::ninjakd2_pcm_play_w)
 {
-	samples_device *samples = machine().device<samples_device>("pcm");
 	const UINT8* const rom = memregion("pcm")->base();
 
 	// only Ninja Kid II uses this
@@ -201,9 +197,9 @@ WRITE8_MEMBER(ninjakd2_state::ninjakd2_pcm_play_w)
 			++end;
 
 		if (end - start)
-			samples->start_raw(0, &m_sampledata[start], end - start, NE555_FREQUENCY);
+			m_pcm->start_raw(0, &m_sampledata[start], end - start, NE555_FREQUENCY);
 		else
-			samples->stop(0);
+			m_pcm->stop(0);
 	}
 }
 
@@ -870,15 +866,6 @@ WRITE_LINE_MEMBER(ninjakd2_state::irqhandler)
 	m_soundcpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static const samples_interface ninjakd2_samples_interface =
-{
-	1,  /* 1 channel */
-	NULL,
-	ninjakd2_init_samples
-};
-
-
-
 /*************************************
  *
  *  Machine drivers
@@ -961,7 +948,9 @@ static MACHINE_CONFIG_START( ninjakd2, ninjakd2_state )
 	MCFG_SOUND_ROUTE(2, "mono", 0.10)
 	MCFG_SOUND_ROUTE(3, "mono", 0.50)
 
-	MCFG_SAMPLES_ADD("pcm", ninjakd2_samples_interface)
+	MCFG_SOUND_ADD("pcm", SAMPLES, 0)
+	MCFG_SAMPLES_CHANNELS(1)
+	MCFG_SAMPLES_START_CB(ninjakd2_state, ninjakd2_init_samples)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 

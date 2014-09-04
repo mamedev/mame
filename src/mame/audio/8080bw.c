@@ -119,7 +119,7 @@ WRITE8_MEMBER(_8080bw_state::spcewars_sh_port_w)
 /*                                                     */
 /*******************************************************/
 
-static const char *const lrescue_sample_names[] =
+const char *const lrescue_sample_names[] =
 {
 	"*lrescue",
 	"alienexplosion",
@@ -132,12 +132,6 @@ static const char *const lrescue_sample_names[] =
 	"stepl",
 	"steph",
 	0
-};
-
-const samples_interface lrescue_samples_interface =
-{
-	4,  /* 4 channels */
-	lrescue_sample_names
 };
 
 WRITE8_MEMBER(_8080bw_state::lrescue_sh_port_1_w)
@@ -1101,7 +1095,7 @@ const sn76477_interface lupin3_sn76477_interface =
 	1           /* 9  enable (variable)      */
 };
 
-static const char *const lupin3_sample_names[] =
+const char *const lupin3_sample_names[] =
 {
 	"*lupin3",
 	"cap",      /* go to jail */
@@ -1112,13 +1106,6 @@ static const char *const lupin3_sample_names[] =
 	"extend",       /* bonus man */
 	"kick",     /* lands on top of building, wife kicks man */
 	0
-};
-
-
-const samples_interface lupin3_samples_interface =
-{
-	4,  /* 4 channels */
-	lupin3_sample_names
 };
 
 WRITE8_MEMBER( _8080bw_state::lupin3_00_w )

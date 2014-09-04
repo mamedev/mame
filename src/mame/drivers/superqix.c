@@ -108,17 +108,15 @@ DSW2 stored @ $f237
 #include "includes/superqix.h"
 
 
-static SAMPLES_START( pbillian_sh_start )
+SAMPLES_START_CB_MEMBER(superqix_state::pbillian_sh_start)
 {
-	superqix_state *state = device.machine().driver_data<superqix_state>();
-	running_machine &machine = device.machine();
-	UINT8 *src = state->memregion("samples")->base();
-	int i, len = state->memregion("samples")->bytes();
+	UINT8 *src = memregion("samples")->base();
+	int i, len = memregion("samples")->bytes();
 
 	/* convert 8-bit unsigned samples to 8-bit signed */
-	state->m_samplebuf = auto_alloc_array(machine, INT16, len);
+	m_samplebuf = auto_alloc_array(machine(), INT16, len);
 	for (i = 0;i < len;i++)
-		state->m_samplebuf[i] = (INT8)(src[i] ^ 0x80) * 256;
+		m_samplebuf[i] = (INT8)(src[i] ^ 0x80) * 256;
 }
 
 WRITE8_MEMBER(superqix_state::pbillian_sample_trigger_w)
@@ -908,14 +906,6 @@ static GFXDECODE_START( sqix )
 GFXDECODE_END
 
 
-
-static const samples_interface pbillian_samples_interface =
-{
-	1,
-	NULL,
-	pbillian_sh_start
-};
-
 INTERRUPT_GEN_MEMBER(superqix_state::vblank_irq)
 {
 	if(m_nmi_mask)
@@ -960,7 +950,9 @@ static MACHINE_CONFIG_START( pbillian, superqix_state )
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("SYSTEM"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MCFG_SAMPLES_ADD("samples", pbillian_samples_interface)
+	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_SAMPLES_CHANNELS(1)
+	MCFG_SAMPLES_START_CB(superqix_state, pbillian_sh_start)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
@@ -997,7 +989,9 @@ static MACHINE_CONFIG_START( hotsmash, superqix_state )
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("SYSTEM"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MCFG_SAMPLES_ADD("samples", pbillian_samples_interface)
+	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_SAMPLES_CHANNELS(1)
+	MCFG_SAMPLES_START_CB(superqix_state, pbillian_sh_start)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 

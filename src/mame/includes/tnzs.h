@@ -85,9 +85,11 @@ public:
 	DECLARE_WRITE8_MEMBER(kageki_csport_w);
 	DECLARE_WRITE8_MEMBER(kabukiz_sound_bank_w);
 	DECLARE_WRITE8_MEMBER(kabukiz_sample_w);
-
+	
 	DECLARE_READ8_MEMBER(tnzs_ramrom_bank_r);
 	DECLARE_WRITE8_MEMBER(tnzs_ramrom_bank_w);
+	
+	SAMPLES_START_CB_MEMBER(kageki_init_samples);
 
 	DECLARE_DRIVER_INIT(arknoid2);
 	DECLARE_DRIVER_INIT(extrmatn);

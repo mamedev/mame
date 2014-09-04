@@ -629,16 +629,14 @@ Driver by Takahiro Nogi (nogi@kt.rim.or.jp) 1999/11/06
 #include "includes/tnzs.h"
 #include "sound/2151intf.h"
 
-static SAMPLES_START( kageki_init_samples )
+SAMPLES_START_CB_MEMBER(tnzs_state::kageki_init_samples)
 {
-	running_machine &machine = device.machine();
-	tnzs_state *state = machine.driver_data<tnzs_state>();
 	UINT8 *scan, *src;
 	INT16 *dest;
 	int start, size;
 	int i, n;
 
-	src = state->memregion("samples")->base() + 0x0090;
+	src = memregion("samples")->base() + 0x0090;
 	for (i = 0; i < MAX_SAMPLES; i++)
 	{
 		start = (src[(i * 2) + 1] * 256) + src[(i * 2)];
@@ -655,15 +653,15 @@ static SAMPLES_START( kageki_init_samples )
 		}
 
 		/* 2009-11 FP: should these be saved? */
-		state->m_sampledata[i] = auto_alloc_array(machine, INT16, size);
-		state->m_samplesize[i] = size;
+		m_sampledata[i] = auto_alloc_array(machine(), INT16, size);
+		m_samplesize[i] = size;
 
 
 		if (start < 0x100)
 			start = size = 0;
 
 		// signed 8-bit sample to unsigned 8-bit sample convert
-		dest = state->m_sampledata[i];
+		dest = m_sampledata[i];
 		scan = &src[start];
 		for (n = 0; n < size; n++)
 		{
@@ -1533,13 +1531,6 @@ WRITE_LINE_MEMBER(tnzs_state::irqhandler)
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static const samples_interface tnzs_samples_interface =
-{
-	1,
-	NULL,
-	kageki_init_samples
-};
-
 static MACHINE_CONFIG_START( arknoid2, tnzs_state )
 
 	/* basic machine hardware */
@@ -1767,7 +1758,9 @@ static MACHINE_CONFIG_START( kageki, tnzs_state )
 	MCFG_SOUND_ROUTE(2, "mono", 0.15)
 	MCFG_SOUND_ROUTE(3, "mono", 0.35)
 
-	MCFG_SAMPLES_ADD("samples", tnzs_samples_interface)
+	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_SAMPLES_CHANNELS(1)
+	MCFG_SAMPLES_START_CB(tnzs_state, kageki_init_samples)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

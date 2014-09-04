@@ -41,6 +41,8 @@ public:
 	DECLARE_WRITE8_MEMBER( sample_rate_w );
 	DECLARE_WRITE8_MEMBER( sample_volume_w );
 	DECLARE_WRITE8_MEMBER( sample_select_w );
+	
+	SAMPLES_START_CB_MEMBER( sh_start );
 
 protected:
 	// device level overrides
@@ -48,7 +50,9 @@ protected:
 	virtual machine_config_constructor device_mconfig_additions() const;
 
 	void play_sample(int start,int freq,int volume);
+	
 private:
+	INT16 *m_sample_buf;    /* buffer to decode samples at run time */
 	int m_sample_num;
 	int m_sample_freq;
 	int m_sample_volume;

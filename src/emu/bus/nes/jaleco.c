@@ -766,49 +766,6 @@ static const char *const jf33_sample_names[] =
 	0
 };
 
-static const samples_interface jf13_samples_interface =
-{
-	16,   /* channels */
-	jf13_sample_names
-};
-
-static const samples_interface jf17_samples_interface =
-{
-	20,   /* channels */
-	jf17_sample_names
-};
-
-static const samples_interface jf19_samples_interface =
-{
-	20,   /* channels */
-	jf19_sample_names
-};
-
-static const samples_interface jf23_samples_interface =
-{
-	20,   /* channels */
-	jf23_sample_names
-};
-
-static const samples_interface jf24_samples_interface =
-{
-	6,   /* channels */
-	jf24_sample_names
-};
-
-static const samples_interface jf29_samples_interface =
-{
-	20,   /* channels */
-	jf29_sample_names
-};
-
-static const samples_interface jf33_samples_interface =
-{
-	20,   /* channels */
-	jf33_sample_names
-};
-
-
 //-------------------------------------------------
 //  MACHINE_DRIVER
 //-------------------------------------------------
@@ -818,7 +775,9 @@ static MACHINE_CONFIG_FRAGMENT( jf13 )
 	// additional sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("addon")
 
-	MCFG_SAMPLES_ADD("samples", jf13_samples_interface)
+	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_SAMPLES_CHANNELS(16)
+	MCFG_SAMPLES_NAMES(jf13_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "addon", 0.50)
 MACHINE_CONFIG_END
 
@@ -827,7 +786,9 @@ static MACHINE_CONFIG_FRAGMENT( jf17 )
 	// additional sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("addon")
 
-	MCFG_SAMPLES_ADD("samples", jf17_samples_interface)
+	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_SAMPLES_CHANNELS(20)
+	MCFG_SAMPLES_NAMES(jf17_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "addon", 0.50)
 MACHINE_CONFIG_END
 
@@ -836,7 +797,9 @@ static MACHINE_CONFIG_FRAGMENT( jf19 )
 	// additional sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("addon")
 
-	MCFG_SAMPLES_ADD("samples", jf19_samples_interface)
+	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_SAMPLES_CHANNELS(20)
+	MCFG_SAMPLES_NAMES(jf19_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "addon", 0.50)
 MACHINE_CONFIG_END
 
@@ -845,7 +808,9 @@ static MACHINE_CONFIG_FRAGMENT( jf23 )
 	// additional sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("addon")
 
-	MCFG_SAMPLES_ADD("samples", jf23_samples_interface)
+	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_SAMPLES_CHANNELS(20)
+	MCFG_SAMPLES_NAMES(jf23_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "addon", 0.50)
 MACHINE_CONFIG_END
 
@@ -854,7 +819,9 @@ static MACHINE_CONFIG_FRAGMENT( jf24 )
 	// additional sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("addon")
 
-	MCFG_SAMPLES_ADD("samples", jf24_samples_interface)
+	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_SAMPLES_CHANNELS(6)
+	MCFG_SAMPLES_NAMES(jf24_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "addon", 0.50)
 MACHINE_CONFIG_END
 
@@ -863,7 +830,9 @@ static MACHINE_CONFIG_FRAGMENT( jf29 )
 	// additional sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("addon")
 
-	MCFG_SAMPLES_ADD("samples", jf29_samples_interface)
+	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_SAMPLES_CHANNELS(20)
+	MCFG_SAMPLES_NAMES(jf29_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "addon", 0.50)
 MACHINE_CONFIG_END
 
@@ -872,7 +841,9 @@ static MACHINE_CONFIG_FRAGMENT( jf33 )
 	// additional sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("addon")
 
-	MCFG_SAMPLES_ADD("samples", jf33_samples_interface)
+	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_SAMPLES_CHANNELS(20)
+	MCFG_SAMPLES_NAMES(jf33_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "addon", 0.50)
 MACHINE_CONFIG_END
 

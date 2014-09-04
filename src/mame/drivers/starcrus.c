@@ -127,12 +127,6 @@ static const char *const starcrus_sample_names[] =
 	0
 };
 
-static const samples_interface starcrus_samples_interface =
-{
-	4,  /* 4 channels */
-	starcrus_sample_names
-};
-
 
 static MACHINE_CONFIG_START( starcrus, starcrus_state )
 
@@ -158,7 +152,9 @@ static MACHINE_CONFIG_START( starcrus, starcrus_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SAMPLES_ADD("samples", starcrus_samples_interface)
+	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_SAMPLES_CHANNELS(4)
+	MCFG_SAMPLES_NAMES(starcrus_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

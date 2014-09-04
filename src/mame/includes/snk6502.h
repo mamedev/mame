@@ -126,7 +126,7 @@ private:
 	INT32 m_tone_clock;
 	sound_stream * m_tone_stream;
 
-	samples_device *m_samples;
+	optional_device<samples_device> m_samples;
 	UINT8 *m_ROM;
 	int m_Sound0StopOnRollover;
 	UINT8 m_LastPort1;
@@ -146,9 +146,9 @@ private:
 extern const device_type SNK6502;
 
 DISCRETE_SOUND_EXTERN( fantasy );
-extern const samples_interface sasuke_samples_interface;
-extern const samples_interface vanguard_samples_interface;
-extern const samples_interface fantasy_samples_interface;
+extern const char *const sasuke_sample_names[];
+extern const char *const vanguard_sample_names[];
+extern const char *const fantasy_sample_names[];
 extern const sn76477_interface sasuke_sn76477_intf_1;
 extern const sn76477_interface sasuke_sn76477_intf_2;
 extern const sn76477_interface sasuke_sn76477_intf_3;

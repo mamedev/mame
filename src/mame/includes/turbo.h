@@ -168,6 +168,9 @@ public:
 	void buckrog_prepare_sprites(UINT8 y, sprite_info *info);
 	UINT32 buckrog_get_sprite_bits(const UINT8 *sprite_gfxdata, sprite_info *sprinfo, UINT8 *plb);
 	void turbo_rom_decode();
+	void turbo_update_samples();
+	inline void subroc3d_update_volume(int leftchan, UINT8 dis, UINT8 dir);
+	void buckrog_update_samples();
 };
 
 

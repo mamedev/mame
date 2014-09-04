@@ -239,17 +239,12 @@ static const char *const astrob_sample_names[] =
 };
 
 
-static const samples_interface astrob_samples_interface =
-{
-	11,
-	astrob_sample_names
-};
-
-
 MACHINE_CONFIG_FRAGMENT( astrob_sound_board )
 
 	/* sound hardware */
-	MCFG_SAMPLES_ADD("samples", astrob_samples_interface)
+	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_SAMPLES_CHANNELS(11)
+	MCFG_SAMPLES_NAMES(astrob_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -431,13 +426,6 @@ static const char *const sega005_sample_names[] =
 };
 
 
-static const samples_interface sega005_samples_interface =
-{
-	7,
-	sega005_sample_names
-};
-
-
 MACHINE_CONFIG_FRAGMENT( 005_sound_board )
 
 	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
@@ -446,7 +434,9 @@ MACHINE_CONFIG_FRAGMENT( 005_sound_board )
 
 	/* sound hardware */
 
-	MCFG_SAMPLES_ADD("samples", sega005_samples_interface)
+	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_SAMPLES_CHANNELS(7)
+	MCFG_SAMPLES_NAMES(sega005_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MCFG_SOUND_ADD("005", SEGA005, 0)
@@ -598,18 +588,13 @@ static const char *const spaceod_sample_names[] =
 };
 
 
-static const samples_interface spaceod_samples_interface =
-{
-	11,
-	spaceod_sample_names
-};
-
-
 MACHINE_CONFIG_FRAGMENT( spaceod_sound_board )
 
 	/* sound hardware */
 
-	MCFG_SAMPLES_ADD("samples", spaceod_samples_interface)
+	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_SAMPLES_CHANNELS(11)
+	MCFG_SAMPLES_NAMES(spaceod_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -695,13 +680,6 @@ static const char *const monsterb_sample_names[] =
 };
 
 
-static const samples_interface monsterb_samples_interface =
-{
-	2,
-	monsterb_sample_names
-};
-
-
 /*************************************
  *
  *  N7751 memory maps
@@ -740,7 +718,9 @@ MACHINE_CONFIG_FRAGMENT( monsterb_sound_board )
 
 	/* sound hardware */
 
-	MCFG_SAMPLES_ADD("samples", monsterb_samples_interface)
+	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_SAMPLES_CHANNELS(2)
+	MCFG_SAMPLES_NAMES(monsterb_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MCFG_TMS36XX_ADD("music", 247)

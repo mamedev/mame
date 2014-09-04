@@ -110,15 +110,11 @@ static const char *const frogs_sample_names[] =
 	0
 };
 
-static const samples_interface frogs_samples_interface =
-{
-	5,  /* 5 channels */
-	frogs_sample_names
-};
-
 
 MACHINE_CONFIG_FRAGMENT( frogs_audio )
-	MCFG_SAMPLES_ADD("samples", frogs_samples_interface)
+	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_SAMPLES_CHANNELS(5)
+	MCFG_SAMPLES_NAMES(frogs_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)
 
 	MCFG_SOUND_ADD("discrete", DISCRETE, 0)

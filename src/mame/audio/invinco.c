@@ -34,15 +34,11 @@ static const char *const invinco_sample_names[] =
 };
 
 
-static const samples_interface invinco_samples_interface =
-{
-	8,
-	invinco_sample_names
-};
-
 
 MACHINE_CONFIG_FRAGMENT( invinco_audio )
-	MCFG_SAMPLES_ADD("samples", invinco_samples_interface)
+	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_SAMPLES_CHANNELS(8)
+	MCFG_SAMPLES_NAMES(invinco_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
 

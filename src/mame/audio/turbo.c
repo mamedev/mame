@@ -21,19 +21,19 @@
  *
  *************************************/
 
-static void turbo_update_samples(turbo_state *state, samples_device *samples)
+void turbo_state::turbo_update_samples()
 {
 	/* accelerator sounds */
 	/* BSEL == 3 --> off */
 	/* BSEL == 2 --> standard */
 	/* BSEL == 1 --> tunnel */
 	/* BSEL == 0 --> ??? */
-	if (state->m_turbo_bsel == 3 && samples->playing(5))
-		samples->stop(5);
-	else if (state->m_turbo_bsel != 3 && !samples->playing(5))
-		samples->start(5, 7, true);
-	if (samples->playing(5))
-		samples->set_frequency(5, samples->base_frequency(5) * ((state->m_turbo_accel & 0x3f) / 5.25 + 1));
+	if (m_turbo_bsel == 3 && m_samples->playing(5))
+		m_samples->stop(5);
+	else if (m_turbo_bsel != 3 && !m_samples->playing(5))
+		m_samples->start(5, 7, true);
+	if (m_samples->playing(5))
+		m_samples->set_frequency(5, m_samples->base_frequency(5) * ((m_turbo_accel & 0x3f) / 5.25 + 1));
 }
 
 
@@ -107,7 +107,7 @@ WRITE8_MEMBER(turbo_state::turbo_sound_a_w)
 	if ((diff & 0x80) && !(data & 0x80)) m_samples->start(3, 5);
 
 	/* update any samples */
-	turbo_update_samples(this, m_samples);
+	turbo_update_samples();
 
 #else
 
@@ -139,7 +139,7 @@ WRITE8_MEMBER(turbo_state::turbo_sound_b_w)
 	if ((diff & 0x80) && !(data & 0x80)) m_samples->start(2, 6);
 
 	/* update any samples */
-	turbo_update_samples(this, m_samples);
+	turbo_update_samples();
 }
 
 
@@ -155,7 +155,7 @@ WRITE8_MEMBER(turbo_state::turbo_sound_c_w)
 	output_set_value("speed", (data >> 4) & 0x0f);
 
 	/* update any samples */
-	turbo_update_samples(this, m_samples);
+	turbo_update_samples();
 }
 
 
@@ -182,13 +182,6 @@ static const char *const turbo_sample_names[] =
 };
 
 
-static const samples_interface turbo_samples_interface =
-{
-	10,
-	turbo_sample_names
-};
-
-
 MACHINE_CONFIG_FRAGMENT( turbo_samples )
 
 	/* this is the cockpit speaker configuration */
@@ -197,7 +190,9 @@ MACHINE_CONFIG_FRAGMENT( turbo_samples )
 	MCFG_SPEAKER_ADD("lspeaker", -0.2, 0.0, 1.0)    /* left */
 	MCFG_SPEAKER_ADD("rspeaker", 0.2, 0.0, 1.0)     /* right */
 
-	MCFG_SAMPLES_ADD("samples", turbo_samples_interface)
+	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_SAMPLES_CHANNELS(10)
+	MCFG_SAMPLES_NAMES(turbo_sample_names)
 
 	/* channel 0 = CRASH.S -> CRASH.S/SM */
 	MCFG_SOUND_ROUTE(0, "fspeaker", 0.25)
@@ -299,7 +294,7 @@ WRITE8_MEMBER(turbo_state::subroc3d_sound_a_w)
 }
 
 
-INLINE void subroc3d_update_volume(samples_device *samples, int leftchan, UINT8 dis, UINT8 dir)
+inline void turbo_state::subroc3d_update_volume(int leftchan, UINT8 dis, UINT8 dir)
 {
 	float volume = (float)(15 - dis) / 16.0f;
 	float lvol, rvol;
@@ -314,8 +309,8 @@ INLINE void subroc3d_update_volume(samples_device *samples, int leftchan, UINT8 
 		lvol = rvol = 0;
 
 	/* if the sample is playing, adjust it */
-	samples->set_volume(leftchan + 0, lvol);
-	samples->set_volume(leftchan + 1, rvol);
+	m_samples->set_volume(leftchan + 0, lvol);
+	m_samples->set_volume(leftchan + 1, rvol);
 }
 
 
@@ -334,7 +329,7 @@ WRITE8_MEMBER(turbo_state::subroc3d_sound_b_w)
 			m_samples->start(0, 0, true);
 			m_samples->start(1, 0, true);
 		}
-		subroc3d_update_volume(m_samples, 0, m_subroc3d_mdis, m_subroc3d_mdir);
+		subroc3d_update_volume(0, m_subroc3d_mdis, m_subroc3d_mdir);
 	}
 
 	/* bit 1 latches direction/volume for torpedo */
@@ -347,7 +342,7 @@ WRITE8_MEMBER(turbo_state::subroc3d_sound_b_w)
 			m_samples->start(2, 1, true);
 			m_samples->start(3, 1, true);
 		}
-		subroc3d_update_volume(m_samples, 2, m_subroc3d_tdis, m_subroc3d_tdir);
+		subroc3d_update_volume(2, m_subroc3d_tdis, m_subroc3d_tdir);
 	}
 
 	/* bit 2 latches direction/volume for fighter */
@@ -360,7 +355,7 @@ WRITE8_MEMBER(turbo_state::subroc3d_sound_b_w)
 			m_samples->start(4, 2, true);
 			m_samples->start(5, 2, true);
 		}
-		subroc3d_update_volume(m_samples, 4, m_subroc3d_fdis, m_subroc3d_fdir);
+		subroc3d_update_volume(4, m_subroc3d_fdis, m_subroc3d_fdir);
 	}
 
 	/* bit 3 latches direction/volume for hit */
@@ -368,7 +363,7 @@ WRITE8_MEMBER(turbo_state::subroc3d_sound_b_w)
 	{
 		m_subroc3d_hdis = m_sound_state[0] & 0x0f;
 		m_subroc3d_hdir = (m_sound_state[0] >> 4) & 0x07;
-		subroc3d_update_volume(m_samples, 6, m_subroc3d_hdis, m_subroc3d_hdir);
+		subroc3d_update_volume(6, m_subroc3d_hdis, m_subroc3d_hdir);
 	}
 }
 
@@ -433,18 +428,12 @@ static const char *const subroc3d_sample_names[] =
 	0
 };
 
-
-static const samples_interface subroc3d_samples_interface =
-{
-	12,
-	subroc3d_sample_names
-};
-
-
 MACHINE_CONFIG_FRAGMENT( subroc3d_samples )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SAMPLES_ADD("samples", subroc3d_samples_interface)
+	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_SAMPLES_CHANNELS(12)
+	MCFG_SAMPLES_NAMES(subroc3d_sample_names)
 
 	/* MISSILE in channels 0 and 1 */
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
@@ -487,11 +476,11 @@ MACHINE_CONFIG_END
  *
  *************************************/
 
-static void buckrog_update_samples(turbo_state *state, samples_device *samples)
+void turbo_state::buckrog_update_samples()
 {
 	/* accelerator sounds */
-	if (samples->playing(5))
-		samples->set_frequency(5, samples->base_frequency(5) * (state->m_buckrog_myship / 100.25 + 1));
+	if (m_samples->playing(5))
+		m_samples->set_frequency(5, m_samples->base_frequency(5) * (m_buckrog_myship / 100.25 + 1));
 }
 
 
@@ -508,7 +497,7 @@ WRITE8_MEMBER(turbo_state::buckrog_sound_a_w)
 	if ((diff & 0x20) && (data & 0x20))
 	{
 		m_buckrog_myship = data & 0x0f;
-		buckrog_update_samples(this, m_samples);
+		buckrog_update_samples();
 	}
 
 	/* /ALARM0: channel 0 */
@@ -540,7 +529,7 @@ WRITE8_MEMBER(turbo_state::buckrog_sound_b_w)
 	if ((diff & 0x10) && !(data & 0x10))
 	{
 		m_samples->start(3, 7);
-		buckrog_update_samples(this, m_samples);
+		buckrog_update_samples();
 	}
 
 	/* /REBOUND: channel 4 */
@@ -550,7 +539,7 @@ WRITE8_MEMBER(turbo_state::buckrog_sound_b_w)
 	if ((diff & 0x40) &&  (data & 0x40) && !m_samples->playing(5))
 	{
 		m_samples->start(5, 8, true);
-		buckrog_update_samples(this, m_samples);
+		buckrog_update_samples();
 	}
 	if ((diff & 0x40) && !(data & 0x40) &&  m_samples->playing(5)) m_samples->stop(5);
 
@@ -584,16 +573,11 @@ static const char *const buckrog_sample_names[]=
 };
 
 
-static const samples_interface buckrog_samples_interface =
-{
-	6,          /* 6 channels */
-	buckrog_sample_names
-};
-
-
 MACHINE_CONFIG_FRAGMENT( buckrog_samples )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SAMPLES_ADD("samples", buckrog_samples_interface)
+	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_SAMPLES_CHANNELS(6)
+	MCFG_SAMPLES_NAMES(buckrog_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 

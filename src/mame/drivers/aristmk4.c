@@ -677,12 +677,6 @@ static const char *const meter_sample_names[] =
 	0
 };
 
-static const samples_interface meter_samples_interface =
-{
-	5,  /* one for each meter - can pulse simultaneously */
-	meter_sample_names
-};
-
 /******************************************************************************
 
 VERSATILE INTERFACE ADAPTER CONFIGURATION
@@ -1707,7 +1701,9 @@ static MACHINE_CONFIG_START( aristmk4, aristmk4_state )
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(aristmk4_state, pbltlp_out))  // Port B write - goes to lamps on the buttons x4 and light tower x4
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
-	MCFG_SAMPLES_ADD("samples", meter_samples_interface)
+	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_SAMPLES_CHANNELS(5)  /* one for each meter - can pulse simultaneously */
+	MCFG_SAMPLES_NAMES(meter_sample_names)	
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.05)
 
 MACHINE_CONFIG_END

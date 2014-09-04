@@ -270,13 +270,6 @@ static const char *const tankbatt_sample_names[] =
 	0   /* end of array */
 };
 
-static const samples_interface tankbatt_samples_interface =
-{
-	3,  /* 3 channels */
-	tankbatt_sample_names
-};
-
-
 
 static MACHINE_CONFIG_START( tankbatt, tankbatt_state )
 
@@ -302,7 +295,9 @@ static MACHINE_CONFIG_START( tankbatt, tankbatt_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SAMPLES_ADD("samples", tankbatt_samples_interface)
+	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_SAMPLES_CHANNELS(3)
+	MCFG_SAMPLES_NAMES(tankbatt_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 

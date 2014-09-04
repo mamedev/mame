@@ -93,14 +93,6 @@ static const char *const carnival_sample_names[] =
 	0
 };
 
-
-static const samples_interface carnival_samples_interface =
-{
-	10,
-	carnival_sample_names
-};
-
-
 /* sample IDs - must match sample file name table above */
 enum
 {
@@ -296,6 +288,8 @@ MACHINE_CONFIG_FRAGMENT( carnival_audio )
 	MCFG_SOUND_ADD("psg", AY8910, PSG_CLOCK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
-	MCFG_SAMPLES_ADD("samples", carnival_samples_interface)
+	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_SAMPLES_CHANNELS(10)
+	MCFG_SAMPLES_NAMES(carnival_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END

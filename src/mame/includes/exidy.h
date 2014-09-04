@@ -115,7 +115,8 @@ public:
 	DECLARE_WRITE8_MEMBER(spectar_audio_2_w);
 	void adjust_sample(UINT8 freq);
 	void common_audio_start(int freq);
-
+	SAMPLES_START_CB_MEMBER(spectar_audio_start);
+	SAMPLES_START_CB_MEMBER(targ_audio_start);
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);

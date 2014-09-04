@@ -814,13 +814,6 @@ static const char *const elim_sample_names[] =
 	0   /* end of array */
 };
 
-static const samples_interface elim2_samples_interface =
-{
-	8,  /* 8 channels */
-	elim_sample_names
-};
-
-
 
 /*************************************
  *
@@ -845,14 +838,6 @@ static const char *const spacfury_sample_names[] =
 	0   /* end of array */
 };
 
-
-static const samples_interface spacfury_samples_interface =
-{
-	8,  /* 8 channels */
-	spacfury_sample_names
-};
-
-
 /*************************************
  *
  *  Zektor sound interfaces
@@ -875,14 +860,6 @@ static const char *const zektor_sample_names[] =
 	"elim11", /* 10 big explosion */
 	0
 };
-
-
-static const samples_interface zektor_samples_interface =
-{
-	8,
-	zektor_sample_names
-};
-
 
 
 /*************************************
@@ -918,7 +895,9 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( elim2, g80v_base )
 
 	/* custom sound board */
-	MCFG_SAMPLES_ADD("samples", elim2_samples_interface)
+	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_SAMPLES_CHANNELS(8)
+	MCFG_SAMPLES_NAMES(elim_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -926,7 +905,9 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( spacfury, g80v_base )
 
 	/* custom sound board */
-	MCFG_SAMPLES_ADD("samples", spacfury_samples_interface)
+	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_SAMPLES_CHANNELS(8)
+	MCFG_SAMPLES_NAMES(spacfury_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
 	/* speech board */
@@ -937,7 +918,9 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( zektor, g80v_base )
 
 	/* custom sound board */
-	MCFG_SAMPLES_ADD("samples", zektor_samples_interface)
+	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_SAMPLES_CHANNELS(8)
+	MCFG_SAMPLES_NAMES(zektor_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
 	MCFG_SOUND_ADD("aysnd", AY8910, CPU_CLOCK/2/2)

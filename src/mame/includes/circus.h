@@ -62,7 +62,7 @@ public:
 DISCRETE_SOUND_EXTERN( circus );
 DISCRETE_SOUND_EXTERN( robotbwl );
 DISCRETE_SOUND_EXTERN( crash );
-extern const samples_interface circus_samples_interface;
-extern const samples_interface crash_samples_interface;
-extern const samples_interface ripcord_samples_interface;
-extern const samples_interface robotbwl_samples_interface;
+extern const char *const circus_sample_names[];
+extern const char *const crash_sample_names[];
+extern const char *const ripcord_sample_names[];
+extern const char *const robotbwl_sample_names[];

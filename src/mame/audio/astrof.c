@@ -136,18 +136,11 @@ static const char *const astrof_sample_names[] =
 	0
 };
 
-
-static const samples_interface astrof_samples_interface =
-{
-	4,  /* 4 channels */
-	astrof_sample_names
-};
-
-
-
 MACHINE_CONFIG_FRAGMENT( astrof_audio )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SAMPLES_ADD("samples", astrof_samples_interface)
+	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_SAMPLES_CHANNELS(4)
+	MCFG_SAMPLES_NAMES(astrof_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 

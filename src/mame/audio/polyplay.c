@@ -18,58 +18,53 @@
 
 
 
-SAMPLES_START( polyplay_sh_start )
+SAMPLES_START_CB_MEMBER(polyplay_state::sh_start)
 {
-	polyplay_state *state = device.machine().driver_data<polyplay_state>();
 	int i;
 
 	for (i = 0; i < SAMPLE_LENGTH / 2; i++) {
-		state->m_backgroundwave[i] = + SAMPLE_AMPLITUDE;
+		m_backgroundwave[i] = + SAMPLE_AMPLITUDE;
 	}
 	for (i = SAMPLE_LENGTH / 2; i < SAMPLE_LENGTH; i++) {
-		state->m_backgroundwave[i] = - SAMPLE_AMPLITUDE;
+		m_backgroundwave[i] = - SAMPLE_AMPLITUDE;
 	}
-	state->m_freq1 = state->m_freq2 = 110;
-	state->m_channel_playing1 = 0;
-	state->m_channel_playing2 = 0;
+	m_freq1 = m_freq2 = 110;
+	m_channel_playing1 = 0;
+	m_channel_playing2 = 0;
 }
 
-void polyplay_set_channel1(running_machine &machine, int active)
+void polyplay_state::set_channel1(int active)
 {
-	polyplay_state *state = machine.driver_data<polyplay_state>();
-	state->m_channel_playing1 = active;
+	m_channel_playing1 = active;
 }
 
-void polyplay_set_channel2(running_machine &machine, int active)
+void polyplay_state::set_channel2(int active)
 {
-	polyplay_state *state = machine.driver_data<polyplay_state>();
-	state->m_channel_playing2 = active;
+	m_channel_playing2 = active;
 }
 
-void polyplay_play_channel1(running_machine &machine, int data)
+void polyplay_state::play_channel1(int data)
 {
-	polyplay_state *state = machine.driver_data<polyplay_state>();
 	if (data) {
-		state->m_freq1 = 2457600 / 16 / data / 8;
-		state->m_samples->set_volume(0, state->m_channel_playing1 * 1.0);
-		state->m_samples->start_raw(0, state->m_backgroundwave, ARRAY_LENGTH(state->m_backgroundwave), sizeof(state->m_backgroundwave)*state->m_freq1,true);
+		m_freq1 = 2457600 / 16 / data / 8;
+		m_samples->set_volume(0, m_channel_playing1 * 1.0);
+		m_samples->start_raw(0, m_backgroundwave, ARRAY_LENGTH(m_backgroundwave), sizeof(m_backgroundwave)*m_freq1,true);
 	}
 	else {
-		state->m_samples->stop(0);
-		state->m_samples->stop(1);
+		m_samples->stop(0);
+		m_samples->stop(1);
 	}
 }
 
-void polyplay_play_channel2(running_machine &machine, int data)
+void polyplay_state::play_channel2(int data)
 {
-	polyplay_state *state = machine.driver_data<polyplay_state>();
 	if (data) {
-		state->m_freq2 = 2457600 / 16 / data / 8;
-		state->m_samples->set_volume(1, state->m_channel_playing2 * 1.0);
-		state->m_samples->start_raw(1, state->m_backgroundwave, ARRAY_LENGTH(state->m_backgroundwave), sizeof(state->m_backgroundwave)*state->m_freq2,true);
+		m_freq2 = 2457600 / 16 / data / 8;
+		m_samples->set_volume(1, m_channel_playing2 * 1.0);
+		m_samples->start_raw(1, m_backgroundwave, ARRAY_LENGTH(m_backgroundwave), sizeof(m_backgroundwave)*m_freq2,true);
 	}
 	else {
-		state->m_samples->stop(0);
-		state->m_samples->stop(1);
+		m_samples->stop(0);
+		m_samples->stop(1);
 	}
 }

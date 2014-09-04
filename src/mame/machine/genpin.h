@@ -7,7 +7,7 @@
 #include "machine/nvram.h"
 
 
-static const char *const genpin_sample_names[] =
+const char *const genpin_sample_names[] =
 {
 	"*genpin",
 	"bumper",
@@ -21,13 +21,6 @@ static const char *const genpin_sample_names[] =
 	"coinin",
 	0   /* end of array */
 };
-
-static const samples_interface genpin_samples_intf =
-{
-	6, // channels
-	genpin_sample_names
-};
-
 
 MACHINE_CONFIG_EXTERN( genpin_audio );
 

@@ -27,7 +27,7 @@
 #define FRAC_ONE    (1 << FRAC_BITS)
 #define FRAC_MASK   (FRAC_ONE - 1)
 
-static const char *const sasuke_sample_names[] =
+const char *const sasuke_sample_names[] =
 {
 	"*sasuke",
 
@@ -40,13 +40,7 @@ static const char *const sasuke_sample_names[] =
 	0
 };
 
-const samples_interface sasuke_samples_interface =
-{
-	4,  /* 4 channels */
-	sasuke_sample_names
-};
-
-static const char *const vanguard_sample_names[] =
+const char *const vanguard_sample_names[] =
 {
 	"*vanguard",
 
@@ -75,13 +69,8 @@ static const char *const vanguard_sample_names[] =
 	0
 };
 
-const samples_interface vanguard_samples_interface =
-{
-	3,  /* 3 channel */
-	vanguard_sample_names
-};
 
-static const char *const fantasy_sample_names[] =
+const char *const fantasy_sample_names[] =
 {
 	"*fantasy",
 
@@ -100,12 +89,6 @@ static const char *const fantasy_sample_names[] =
 	"ft_voi-b",
 
 	0
-};
-
-const samples_interface fantasy_samples_interface =
-{
-	1,  /* 1 channel */
-	fantasy_sample_names
 };
 
 
@@ -358,6 +341,7 @@ snk6502_sound_device::snk6502_sound_device(const machine_config &mconfig, const 
 		m_tone_clock_expire(0),
 		m_tone_clock(0),
 		m_tone_stream(NULL),
+		m_samples(*this, ":samples"),
 		m_ROM(NULL),
 		m_Sound0StopOnRollover(0),
 		m_LastPort1(0),
@@ -384,7 +368,6 @@ void snk6502_sound_device::device_config_complete()
 
 void snk6502_sound_device::device_start()
 {
-	m_samples = machine().device<samples_device>("samples");
 	m_ROM = machine().root_device().memregion("snk6502")->base();
 
 	// adjusted
