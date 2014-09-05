@@ -47,7 +47,9 @@ const device_type SAMPLES = &device_creator<samples_device>;
 
 samples_device::samples_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, SAMPLES, "Samples", tag, owner, clock, "samples", __FILE__),
-		device_sound_interface(mconfig, *this)
+		device_sound_interface(mconfig, *this),
+		m_channels(0),
+		m_names(NULL)
 {
 }
 
