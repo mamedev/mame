@@ -49,7 +49,7 @@ a800_rom_bbsb_device::a800_rom_bbsb_device(const machine_config &mconfig, const 
 
 
 xegs_rom_device::xegs_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-					: a800_rom_device(mconfig, XEGS_ROM, "Atari XEGS 64K ROM Carts", tag, owner, clock, "xegs", __FILE__)
+					: a800_rom_device(mconfig, XEGS_ROM, "Atari XEGS 64K ROM Carts", tag, owner, clock, "a800_xegs", __FILE__)
 {
 }
 
