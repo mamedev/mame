@@ -6662,7 +6662,7 @@ ROM_START( galaxian )
 ROM_END
 
 /* Suspected of being Space Warp - ASCII shows "COPYRIGHT 1983", "CENTURY ELECTRONICS UK LTD" in swarpt7f.bin */
-/* S2650 CPU, not Z80 */
+/* S2650 CPU, not Z80. gfx is like cosmos(cvs.c) */
 ROM_START( spcwarp )
 	ROM_REGION( 0x4000, "maincpu", 0 )
 	ROM_LOAD( "swarpt7f.bin", 0x0000, 0x1000, CRC(04d744e3) SHA1(db8218510052a05670cb0b722b73d3f10464788c) )
