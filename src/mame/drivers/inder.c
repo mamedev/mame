@@ -31,6 +31,8 @@
 #include "machine/i8255.h"
 #include "sound/sn76496.h"
 #include "sound/ay8910.h"
+#include "sound/msm5205.h"
+#include "machine/7474.h"
 #include "inder.lh"
 
 class inder_state : public genpin_class
@@ -41,9 +43,17 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_audiocpu(*this, "audiocpu")
 		, m_sn(*this, "sn")
+		, m_msm(*this, "msm")
+		, m_7a(*this, "7a")
+		, m_9a(*this, "9a")
+		, m_9b(*this, "9b")
 		, m_switches(*this, "SW")
 	{ }
 
+	DECLARE_READ8_MEMBER(ppic_r);
+	DECLARE_WRITE8_MEMBER(ppia_w);
+	DECLARE_WRITE8_MEMBER(ppib_w);
+	DECLARE_WRITE8_MEMBER(ppic_w);
 	DECLARE_WRITE8_MEMBER(ppi60a_w);
 	DECLARE_WRITE8_MEMBER(ppi60b_w);
 	DECLARE_WRITE8_MEMBER(ppi64c_w);
@@ -53,19 +63,32 @@ public:
 	DECLARE_WRITE8_MEMBER(sol_canasta_w);
 	DECLARE_WRITE8_MEMBER(sn_w);
 	DECLARE_READ8_MEMBER(sndcmd_r);
+	DECLARE_WRITE8_MEMBER(sndbank_w);
 	DECLARE_WRITE8_MEMBER(sndcmd_w);
 	DECLARE_WRITE8_MEMBER(sndcmd_lapbylap_w);
 	DECLARE_WRITE8_MEMBER(lamp_w) { };
 	DECLARE_WRITE8_MEMBER(disp_w);
+	DECLARE_WRITE_LINE_MEMBER(vck_w);
+	DECLARE_WRITE_LINE_MEMBER(qc7a_w);
+	DECLARE_WRITE_LINE_MEMBER(q9a_w);
+	DECLARE_WRITE_LINE_MEMBER(qc9b_w);
 	DECLARE_DRIVER_INIT(inder);
 private:
+	bool m_pc0;
+	UINT8 m_portc;
 	UINT8 m_row;
 	UINT8 m_segment[8];
 	UINT8 m_sndcmd;
+	UINT32 m_sound_addr;
+	UINT8 *m_p_speech;
 	virtual void machine_reset();
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
 	optional_device<sn76489_device> m_sn;
+	optional_device<msm5205_device> m_msm;
+	optional_device<ttl7474_device> m_7a;
+	optional_device<ttl7474_device> m_9a;
+	optional_device<ttl7474_device> m_9b;
 	required_ioport_array<11> m_switches;
 };
 
@@ -130,7 +153,7 @@ static ADDRESS_MAP_START( inder_sub_map, AS_PROGRAM, 8, inder_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x27ff) AM_MIRROR(0x1800) AM_RAM // 6116
 	AM_RANGE(0x4000, 0x4003) AM_MIRROR(0x1ffc) AM_DEVREADWRITE("ppi", i8255_device, read, write)
-	AM_RANGE(0x6000, 0x6000) AM_WRITENOP //(sndctl_w) enable sound data roms
+	AM_RANGE(0x6000, 0x6000) AM_WRITE(sndbank_w)
 	AM_RANGE(0x8000, 0x8000) AM_READ(sndcmd_r)
 ADDRESS_MAP_END
 
@@ -621,7 +644,7 @@ WRITE8_MEMBER( inder_state::disp_w )
 	}
 }
 
-WRITE8_MEMBER(inder_state::ppi60a_w)
+WRITE8_MEMBER( inder_state::ppi60a_w )
 {
 	if (data)
 		for (UINT8 i = 0; i < 8; i++)
@@ -630,7 +653,7 @@ WRITE8_MEMBER(inder_state::ppi60a_w)
 }
 
 // always 0 but we'll support it anyway
-WRITE8_MEMBER(inder_state::ppi60b_w)
+WRITE8_MEMBER( inder_state::ppi60b_w )
 {
 	if (data & 7)
 		for (UINT8 i = 0; i < 3; i++)
@@ -638,7 +661,7 @@ WRITE8_MEMBER(inder_state::ppi60b_w)
 				m_row = i+8;
 }
 
-WRITE8_MEMBER(inder_state::ppi64c_w)
+WRITE8_MEMBER( inder_state::ppi64c_w )
 {
 	UINT8 i;
 	data &= 15;
@@ -650,13 +673,91 @@ WRITE8_MEMBER(inder_state::ppi64c_w)
 	}
 }
 
+WRITE8_MEMBER( inder_state::sndbank_w )
+{
+	UINT8 i;
+	// look for last rom enabled
+	for (i = 0; i < 2; i++)
+		if (!(BIT(data, i)))
+			m_sound_addr = (m_sound_addr & 0x0ffff) | (i << 16);
+}
+
+WRITE_LINE_MEMBER( inder_state::vck_w )
+{
+	m_9a->clock_w(0);
+	m_9b->clock_w(0);
+	m_9a->clock_w(1);
+	m_9b->clock_w(1);
+	if (!m_pc0)
+		m_msm->data_w(m_p_speech[m_sound_addr] & 15);
+	else
+		m_msm->data_w(m_p_speech[m_sound_addr] >> 4);
+}
+
+WRITE_LINE_MEMBER( inder_state::qc7a_w )
+{
+	m_msm->reset_w(state);
+	m_9a->clear_w(!state);
+	m_9b->clear_w(!state);
+}
+
+WRITE_LINE_MEMBER( inder_state::q9a_w )
+{
+	m_pc0 = state;
+}
+
+WRITE_LINE_MEMBER( inder_state::qc9b_w )
+{
+	m_9a->d_w(state);
+	m_9b->d_w(state);
+}
+
+READ8_MEMBER( inder_state::ppic_r )
+{
+	return m_pc0 | m_portc;
+}
+
+WRITE8_MEMBER( inder_state::ppia_w )
+{
+	m_sound_addr = (m_sound_addr & 0x3ff00) | data;
+}
+
+WRITE8_MEMBER( inder_state::ppib_w )
+{
+//	data &= 0x7f;
+//	m_sound_addr = (m_sound_addr & 0x380ff) | (data << 8);
+	m_sound_addr = (m_sound_addr & 0x300ff) | (data << 8);
+}
+
+WRITE8_MEMBER( inder_state::ppic_w )
+{
+	// pc4 - READY line back to cpu board, but not used
+	if (BIT(data, 5) != BIT(m_portc, 5))
+		m_msm->set_prescaler_selector(m_msm, BIT(data, 5) ? MSM5205_S48_4B : MSM5205_S96_4B); // S1 pin
+	m_7a->clock_w(BIT(data, 6));
+	m_7a->preset_w(!BIT(data, 7));
+	m_9a->preset_w(!BIT(data, 7));
+	m_portc = data & 0xfe;
+}
+
+
 void inder_state::machine_reset()
 {
+	m_sound_addr = 0;
 	m_row = 0;
+	if (m_7a)
+		m_7a->clear_w(1);
 }
 
 DRIVER_INIT_MEMBER( inder_state, inder )
 {
+	m_p_speech = memregion("speech")->base();
+	if (m_7a)
+	{
+		m_7a->d_w(0);
+		m_7a->clear_w(0);
+		m_9b->preset_w(1);
+	}
 }
 
 static MACHINE_CONFIG_START( brvteam, inder_state )
@@ -735,6 +836,11 @@ static MACHINE_CONFIG_START( inder, inder_state )
 
 	/* Sound */
 	MCFG_FRAGMENT_ADD( genpin_audio )
+	MCFG_SPEAKER_STANDARD_MONO("msmvol")
+	MCFG_SOUND_ADD("msm", MSM5205, XTAL_384kHz)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(inder_state, vck_w))
+	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)      /* 4KHz 4-bit */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "msmvol", 1.0)
 
 	/* Devices */
 	MCFG_DEVICE_ADD("ppi60", I8255A, 0 )
@@ -771,11 +877,20 @@ static MACHINE_CONFIG_START( inder, inder_state )
 
 	MCFG_DEVICE_ADD("ppi", I8255A, 0 )
 	//MCFG_I8255_IN_PORTA_CB(READ8(inder_state, ppia_r))
-	//MCFG_I8255_OUT_PORTA_CB(WRITE8(inder_state, ppia_w))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(inder_state, ppia_w))
 	//MCFG_I8255_IN_PORTB_CB(READ8(inder_state, ppib_r))
-	//MCFG_I8255_OUT_PORTB_CB(WRITE8(inder_state, ppib_w))
-	//MCFG_I8255_IN_PORTC_CB(READ8(inder_state, ppic_r))
-	//MCFG_I8255_OUT_PORTC_CB(WRITE8(inder_state, ppic_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(inder_state, ppib_w))
+	MCFG_I8255_IN_PORTC_CB(READ8(inder_state, ppic_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(inder_state, ppic_w))
+
+	MCFG_DEVICE_ADD("7a", TTL7474, 0)
+	MCFG_7474_COMP_OUTPUT_CB(WRITELINE(inder_state, qc7a_w))
+
+	MCFG_DEVICE_ADD("9a", TTL7474, 0)
+	MCFG_7474_OUTPUT_CB(WRITELINE(inder_state, q9a_w))
+
+	MCFG_DEVICE_ADD("9b", TTL7474, 0)
+	MCFG_7474_COMP_OUTPUT_CB(WRITELINE(inder_state, qc9b_w))
 MACHINE_CONFIG_END
 
 
@@ -819,7 +934,7 @@ ROM_START(pinmoonl)
 	ROM_REGION(0x2000, "audiocpu", 0)
 	ROM_LOAD("ci-11.bin", 0x0000, 0x2000, CRC(a0732fe4) SHA1(54f62cd81bdb7e1924acb67ddbe43eb3d0a4eab0))
 
-	ROM_REGION(0x40000, "user1", 0)
+	ROM_REGION(0x40000, "speech", 0)
 	ROM_LOAD("ci-24.bin", 0x00000, 0x10000, CRC(6406bd18) SHA1(ae45ed9e8b1fd278a36a68b780352dbbb6ee781e))
 	ROM_LOAD("ci-23.bin", 0x10000, 0x10000, CRC(eac346da) SHA1(7c4c26ae089dda0dcd7300fd1ecabf5a91099c41))
 	ROM_LOAD("ci-22.bin", 0x20000, 0x10000, CRC(379740da) SHA1(83ad13ab7f1f37c78397d8e830bd74c5a7aea758))
@@ -836,7 +951,7 @@ ROM_START(pinclown)
 	ROM_REGION(0x2000, "audiocpu", 0)
 	ROM_LOAD("clown_b.bin", 0x0000, 0x2000, CRC(81a66302) SHA1(3d1243ae878747f20e54cd3322c5a54ded45ce21))
 
-	ROM_REGION(0x40000, "user1", 0)
+	ROM_REGION(0x40000, "speech", 0)
 	ROM_LOAD("clown_c.bin", 0x00000, 0x10000, CRC(dff89319) SHA1(3745a02c3755d11ea7fb552f7a5df2e8bbee2c29))
 	ROM_LOAD("clown_d.bin", 0x10000, 0x10000, CRC(cce4e1dc) SHA1(561c9331d2d110d34cf250cd7b25be16a72a1d79))
 	ROM_LOAD("clown_e.bin", 0x20000, 0x10000, CRC(98263526) SHA1(509764e65847637824ba93f7e6ce926501c431ce))
@@ -853,7 +968,7 @@ ROM_START(corsario)
 	ROM_REGION(0x2000, "audiocpu", 0)
 	ROM_LOAD("a-corsar.bin", 0x0000, 0x2000, CRC(e14b7918) SHA1(5a5fc308b0b70fe041b81071ba4820782b6ff988))
 
-	ROM_REGION(0x40000, "user1", 0)
+	ROM_REGION(0x40000, "speech", 0)
 	ROM_LOAD("b-corsar.bin", 0x00000, 0x10000, CRC(7f155828) SHA1(e459c81b2c2e47d4276344d8d6a08c2c6242f941))
 	ROM_LOAD("c-corsar.bin", 0x10000, 0x10000, CRC(047fd722) SHA1(2385507459f85c68141adc7084cb51dfa02462f6))
 	ROM_LOAD("d-corsar.bin", 0x20000, 0x10000, CRC(10d8b448) SHA1(ed1918e6c55eba07dde31b9755c9403e073cad98))
@@ -870,7 +985,7 @@ ROM_START(mundial)
 	ROM_REGION(0x2000, "audiocpu", 0)
 	ROM_LOAD("snd11.bin", 0x0000, 0x2000, CRC(2cebc1a5) SHA1(e0dae2b1ce31ff436b55ceb1ec71d39fc56694da))
 
-	ROM_REGION(0x40000, "user1", 0)
+	ROM_REGION(0x40000, "speech", 0)
 	ROM_LOAD("snd24.bin", 0x00000, 0x10000, CRC(603bfc3c) SHA1(8badd9731243270ce5b8003373ed09ec7eac6ca6))
 	ROM_LOAD("snd23.bin", 0x10000, 0x10000, CRC(2868ce6f) SHA1(317457763f764be08cbe6a5dd4008ba2257c9d78))
 	ROM_LOAD("snd22.bin", 0x20000, 0x10000, CRC(2559f874) SHA1(cbf57f29e394d5dc320e7dcbd2625f6c96412a06))
@@ -888,7 +1003,7 @@ ROM_START(atleta)
 	ROM_REGION(0x2000, "audiocpu", 0)
 	ROM_LOAD("atletaa.snd", 0x0000, 0x2000, CRC(051c5329) SHA1(339115af4a2e3f1f2c31073cbed1842518d5916e))
 
-	ROM_REGION(0x40000, "user1", 0)
+	ROM_REGION(0x40000, "speech", 0)
 	ROM_LOAD("atletab.snd", 0x00000, 0x10000, CRC(7f155828) SHA1(e459c81b2c2e47d4276344d8d6a08c2c6242f941))
 	ROM_LOAD("atletac.snd", 0x10000, 0x10000, CRC(20456363) SHA1(b226400dac35dedc039a7e03cb525c6033b24ebc))
 	ROM_LOAD("atletad.snd", 0x20000, 0x10000, CRC(6518e3a4) SHA1(6b1d852005dabb76c7c65b87ecc9ee1422f16737))
@@ -905,7 +1020,7 @@ ROM_START(ind250cc)
 	ROM_REGION(0x2000, "audiocpu", 0)
 	ROM_LOAD("a-250cc.bin", 0x0000, 0x2000, CRC(b64bdafb) SHA1(eab6d54d34b44187d454c1999e4bcf455183d5a0))
 
-	ROM_REGION(0x40000, "user1", 0)
+	ROM_REGION(0x40000, "speech", 0)
 	ROM_LOAD("b-250cc.bin", 0x00000, 0x10000, CRC(884c31c8) SHA1(23a838f1f0cb4905fa8552579b5452134f0fc9cc))
 	ROM_LOAD("c-250cc.bin", 0x10000, 0x10000, CRC(5a1dfa1d) SHA1(4957431d87be0bb6d27910b718f7b7edcd405fff))
 	ROM_LOAD("d-250cc.bin", 0x20000, 0x10000, CRC(a0940387) SHA1(0e06483e3e823bf4673d8e0bd120b0a6b802035d))
@@ -923,7 +1038,7 @@ ROM_START(metalman)
 	ROM_REGION(0x2000, "audiocpu", 0)
 	ROM_LOAD("sound_e1.bin", 0x0000, 0x2000, CRC(55e889e8) SHA1(0a240868c1b17762588c0ed9a14f568a6e50f409))
 
-	ROM_REGION(0x80000, "user1", 0)
+	ROM_REGION(0x80000, "speech", 0)
 	ROM_LOAD("sound_e2.bin", 0x00000, 0x20000, CRC(5ac61535) SHA1(75b9a805f8639554251192e3777073c29952c78f))
 
 	ROM_REGION(0x10000, "soundcpu2", 0)
