@@ -5,15 +5,18 @@ class raiden2_state : public driver_device
 public:
 	raiden2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-			back_data(*this, "back_data"),
-			fore_data(*this, "fore_data"),
-			mid_data(*this, "mid_data"),
-			text_data(*this, "text_data"),
-			sprites(*this, "sprites") ,
-		m_maincpu(*this, "maincpu"),
-		m_seibu_sound(*this, "seibu_sound"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") { }
+		  back_data(*this, "back_data"),
+		  fore_data(*this, "fore_data"),
+		  mid_data(*this, "mid_data"),
+		  text_data(*this, "text_data"),
+		  sprites(*this, "sprites") ,
+		  m_maincpu(*this, "maincpu"),
+		  m_seibu_sound(*this, "seibu_sound"),
+		  m_gfxdecode(*this, "gfxdecode"),
+		  m_palette(*this, "palette"),
+		  tile_buffer(320, 256),
+		  sprite_buffer(320, 256)
+	{ }
 
 	required_shared_ptr<UINT16> back_data,fore_data,mid_data, text_data, sprites;
 	required_device<cpu_device> m_maincpu;
@@ -113,6 +116,8 @@ public:
 	UINT16 cop_angle_target;
 	UINT16 cop_angle_step;
 
+	bitmap_ind16 tile_buffer, sprite_buffer;
+
 	DECLARE_WRITE16_MEMBER( sprite_prot_x_w );
 	DECLARE_WRITE16_MEMBER( sprite_prot_y_w );
 	DECLARE_WRITE16_MEMBER( sprite_prot_src_seg_w );
@@ -139,7 +144,7 @@ public:
 	UINT16 cop_hit_status;
 	INT16 cop_hit_val_x,cop_hit_val_y,cop_hit_val_z,cop_hit_val_unk;
 
-	void draw_sprites(bitmap_ind16 &bitmap, bitmap_ind8 &priority, const rectangle &cliprect);
+	void draw_sprites(const rectangle &cliprect);
 	UINT8 cop_calculate_collsion_detection();
 	void cop_take_hit_box_params(UINT8 offs);
 
@@ -166,13 +171,17 @@ public:
 	DECLARE_MACHINE_RESET(zeroteam);
 	DECLARE_MACHINE_RESET(xsedae);
 	DECLARE_MACHINE_RESET(raidendx);
-	UINT32 screen_update_raiden2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_raiden2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(raiden2_interrupt);
 	UINT16 rps();
 	UINT16 rpc();
 	const UINT8 fade_table(int v);
 	void combine32(UINT32 *val, int offset, UINT16 data, UINT16 mem_mask);
 	void sprcpt_init(void);
+
+	void blend_layer(bitmap_rgb32 &bitmap, const rectangle &cliprect, bitmap_ind16 &source, UINT16 layer);
+	void tilemap_draw_and_blend(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, tilemap_t *tilemap);
+
 };
 
 /*----------- defined in machine/r2crypt.c -----------*/
