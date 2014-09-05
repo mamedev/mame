@@ -229,23 +229,15 @@ WRITE16_MEMBER(seibuspi_state::sprite_dma_start_w)
 
 /*****************************************************************************/
 
-void seibuspi_state::drawgfx_blend(bitmap_rgb32 &bitmap, const rectangle &cliprect, gfx_element *gfx, UINT32 code, UINT32 color, int flipx, int flipy, int sx, int sy)
+void seibuspi_state::drawgfx_blend(bitmap_rgb32 &bitmap, const rectangle &cliprect, gfx_element *gfx, UINT32 code, UINT32 color, int flipx, int flipy, int sx, int sy, bitmap_ind8 &primap, int primask)
 {
-	const pen_t *pens = &m_palette->pen(gfx->colorbase());
-	const UINT8 *dp;
-	int i, j;
-	int x1, x2;
-	int y1, y2;
-	int px, py;
-	int xd = 1, yd = 1;
-
 	int width = gfx->width();
 	int height = gfx->height();
 
-	x1 = sx;
-	x2 = sx + width - 1;
-	y1 = sy;
-	y2 = sy + height - 1;
+	int x1 = sx;
+	int x2 = sx + width - 1;
+	int y1 = sy;
+	int y2 = sy + height - 1;
 
 	if (x1 > cliprect.max_x || x2 < cliprect.min_x)
 	{
@@ -256,8 +248,10 @@ void seibuspi_state::drawgfx_blend(bitmap_rgb32 &bitmap, const rectangle &clipre
 		return;
 	}
 
-	px = 0;
-	py = 0;
+	int px = 0;
+	int py = 0;
+	int xd = 1;
+	int yd = 1;
 
 	if (flipx)
 	{
@@ -306,44 +300,37 @@ void seibuspi_state::drawgfx_blend(bitmap_rgb32 &bitmap, const rectangle &clipre
 		y2 = cliprect.max_y;
 	}
 
-	dp = gfx->get_data(code);
+	const pen_t *pens = &m_palette->pen(gfx->colorbase());
+	const UINT8 *src = gfx->get_data(code);
 
 	// draw
-	for (j = y1; j <= y2; j++)
+	for (int y = y1; y <= y2; y++)
 	{
-		UINT32 *p = &bitmap.pix32(j);
+		UINT32 *dest = &bitmap.pix32(y);
+		UINT8 *pri = &primap.pix8(y);
 		UINT8 trans_pen = (1 << m_sprite_bpp) - 1;
-		int dp_i = (py * width) + px;
+		int src_i = (py * width) + px;
 		py += yd;
 
-		for (i = x1; i <= x2; i++)
+		for (int x = x1; x <= x2; x++)
 		{
-			UINT8 pen = dp[dp_i];
-			if (pen != trans_pen)
+			UINT8 pen = src[src_i];
+			if (!(pri[x] & primask) && pen != trans_pen)
 			{
+				pri[x] |= primask;
 				int global_pen = pen + (color << m_sprite_bpp);
 				if (m_alpha_enable && m_alpha_table[global_pen])
-				{
-					p[i] = alpha_blend_r32(p[i], pens[global_pen], 0x7f);
-				}
+					dest[x] = alpha_blend_r32(dest[x], pens[global_pen], 0x7f);
 				else
-				{
-					p[i] = pens[global_pen];
-				}
+					dest[x] = pens[global_pen];
 			}
-			dp_i += xd;
+			src_i += xd;
 		}
 	}
 }
 
-void seibuspi_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect, int pri_mask)
+void seibuspi_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect, bitmap_ind8 &primap, int priority)
 {
-	INT16 xpos, ypos;
-	int tile_num, color;
-	int width, height;
-	int flip_x, flip_y;
-	int priority;
-	int x1, y1;
 	gfx_element *gfx = m_gfxdecode->gfx(2);
 	const int has_tile_high = (gfx->elements() > 0x10000) ? 1 : 0;
 	const int colormask = (m_sprite_bpp == 6) ? 0x3f : 0x1f;
@@ -362,7 +349,7 @@ void seibuspi_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprec
 	if (m_layer_enable & 0x10)
 		return;
 
-	for (int a = m_sprite_ram_size / 4 - 2; a >= 0; a -= 2)
+	for (int a = 0; a < (m_sprite_ram_size / 4); a += 2)
 	{
 		/*
 		    Word 0
@@ -379,31 +366,31 @@ void seibuspi_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprec
 		    -------- -------- ---x---- --------  tile_num high (only on RISE10/11 chip)
 		    -------- -------- ------xx xxxxxxxx  xpos
 		*/
-		tile_num = m_sprite_ram[a + 0] >> 16 & 0xffff;
+		int tile_num = m_sprite_ram[a + 0] >> 16 & 0xffff;
 		if (tile_num == 0)
 			continue;
 
 		if (has_tile_high)
 			tile_num |= m_sprite_ram[a + 1] << 4 & 0x10000;
 
-		priority = m_sprite_ram[a + 0] >> 6 & 0x3;
-		if (pri_mask != priority)
+		if (priority != (m_sprite_ram[a + 0] >> 6 & 0x3))
 			continue;
+		int primask = 1 << priority;
 
-		xpos = m_sprite_ram[a + 1] & 0x3ff;
+		INT16 xpos = m_sprite_ram[a + 1] & 0x3ff;
 		if (xpos & 0x200)
 			xpos |= 0xfc00;
-		ypos = m_sprite_ram[a + 1] >> 16 & 0x1ff;
+		INT16 ypos = m_sprite_ram[a + 1] >> 16 & 0x1ff;
 		if (ypos & 0x100)
 			ypos |= 0xfe00;
-		color = m_sprite_ram[a + 0] & colormask;
+		int color = m_sprite_ram[a + 0] & colormask;
 
-		width = (m_sprite_ram[a + 0] >> 8 & 0x7) + 1;
-		height = (m_sprite_ram[a + 0] >> 12 & 0x7) + 1;
-		flip_x = m_sprite_ram[a + 0] >> 11 & 0x1;
-		flip_y = m_sprite_ram[a + 0] >> 15 & 0x1;
-		x1 = 0;
-		y1 = 0;
+		int width = (m_sprite_ram[a + 0] >> 8 & 0x7) + 1;
+		int height = (m_sprite_ram[a + 0] >> 12 & 0x7) + 1;
+		int flip_x = m_sprite_ram[a + 0] >> 11 & 0x1;
+		int flip_y = m_sprite_ram[a + 0] >> 15 & 0x1;
+		int x1 = 0;
+		int y1 = 0;
 
 		if (flip_x)
 		{
@@ -420,13 +407,11 @@ void seibuspi_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprec
 		{
 			for (int y = y1; y < height; y++)
 			{
-				drawgfx_blend(bitmap, cliprect, gfx, tile_num, color, flip_x, flip_y, xpos + sprite_xtable[flip_x][x], ypos + sprite_ytable[flip_y][y]);
+				drawgfx_blend(bitmap, cliprect, gfx, tile_num, color, flip_x, flip_y, xpos + sprite_xtable[flip_x][x], ypos + sprite_ytable[flip_y][y], primap, primask);
 
 				/* xpos seems to wrap-around to 0 at 512 */
 				if ((xpos + (16 * x) + 16) >= 512)
-				{
-					drawgfx_blend(bitmap, cliprect, gfx, tile_num, color, flip_x, flip_y, xpos - 512 + sprite_xtable[flip_x][x], ypos + sprite_ytable[flip_y][y]);
-				}
+					drawgfx_blend(bitmap, cliprect, gfx, tile_num, color, flip_x, flip_y, xpos - 512 + sprite_xtable[flip_x][x], ypos + sprite_ytable[flip_y][y], primap, primask);
 
 				tile_num++;
 			}
@@ -434,11 +419,11 @@ void seibuspi_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprec
 	}
 }
 
-void seibuspi_state::combine_tilemap(bitmap_rgb32 &bitmap, const rectangle &cliprect, tilemap_t *tile, int x, int y, int opaque, INT16 *rowscroll)
+void seibuspi_state::combine_tilemap(bitmap_rgb32 &bitmap, const rectangle &cliprect, tilemap_t *tile, int sx, int sy, int opaque, INT16 *rowscroll)
 {
-	UINT16 *s;
-	UINT32 *d;
-	UINT8 *t;
+	UINT16 *src;
+	UINT32 *dest;
+	UINT8 *flags;
 	UINT32 xscroll_mask, yscroll_mask;
 
 	bitmap_ind16 &pen_bitmap = tile->pixmap();
@@ -446,32 +431,28 @@ void seibuspi_state::combine_tilemap(bitmap_rgb32 &bitmap, const rectangle &clip
 	xscroll_mask = pen_bitmap.width() - 1;
 	yscroll_mask = pen_bitmap.height() - 1;
 
-	for (int j = cliprect.min_y; j <= cliprect.max_y; j++)
+	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		int rx = x;
+		int rx = sx;
 		if (rowscroll)
 		{
-			rx += rowscroll[(j+y) & yscroll_mask];
+			rx += rowscroll[(y + sy) & yscroll_mask];
 		}
 
-		d = &bitmap.pix32(j);
-		s = &pen_bitmap.pix16((j+y) & yscroll_mask);
-		t = &flags_bitmap.pix8((j+y) & yscroll_mask);
-		for (int i = cliprect.min_x+rx; i <= cliprect.max_x+rx; i++)
+		dest = &bitmap.pix32(y);
+		src = &pen_bitmap.pix16((y + sy) & yscroll_mask);
+		flags = &flags_bitmap.pix8((y + sy) & yscroll_mask);
+		for (int x = cliprect.min_x + rx; x <= cliprect.max_x + rx; x++)
 		{
-			if (opaque || (t[i & xscroll_mask] & (TILEMAP_PIXEL_LAYER0 | TILEMAP_PIXEL_LAYER1)))
+			if (opaque || (flags[x & xscroll_mask] & (TILEMAP_PIXEL_LAYER0 | TILEMAP_PIXEL_LAYER1)))
 			{
-				UINT16 pen = s[i & xscroll_mask];
+				UINT16 pen = src[x & xscroll_mask];
 				if (m_alpha_enable && m_alpha_table[pen])
-				{
-					*d = alpha_blend_r32(*d, m_palette->pen(pen), 0x7f);
-				}
+					*dest = alpha_blend_r32(*dest, m_palette->pen(pen), 0x7f);
 				else
-				{
-					*d = m_palette->pen(pen);
-				}
+					*dest = m_palette->pen(pen);
 			}
-			++d;
+			dest++;
 		}
 	}
 }
@@ -493,13 +474,14 @@ UINT32 seibuspi_state::screen_update_spi(screen_device &screen, bitmap_rgb32 &bi
 		fore_rowscroll = NULL;
 	}
 
+	screen.priority().fill(0, cliprect);
+
 	if (m_layer_enable & 1)
 		bitmap.fill(0, cliprect);
-
-	if (~m_layer_enable & 1)
+	else
 		combine_tilemap(bitmap, cliprect, m_back_layer, m_scrollram[0] & 0xffff, (m_scrollram[0] >> 16) & 0xffff, 1, back_rowscroll);
 
-	draw_sprites(bitmap, cliprect, 0);
+	draw_sprites(bitmap, cliprect, screen.priority(), 0);
 
 	// if fore layer is enabled, draw priority 0 sprites behind back layer
 	if ((m_layer_enable & 0x15) == 0)
@@ -507,21 +489,21 @@ UINT32 seibuspi_state::screen_update_spi(screen_device &screen, bitmap_rgb32 &bi
 
 	// if fore layer is enabled, draw priority 1 sprites behind middle layer
 	if (~m_layer_enable & 4)
-		draw_sprites(bitmap, cliprect, 1);
+		draw_sprites(bitmap, cliprect, screen.priority(), 1);
 
 	if (~m_layer_enable & 2)
 		combine_tilemap(bitmap, cliprect, m_midl_layer, m_scrollram[1] & 0xffff, (m_scrollram[1] >> 16) & 0xffff, 0, midl_rowscroll);
 
 	// if fore layer is disabled, draw priority 1 sprites above middle layer
 	if (m_layer_enable & 4)
-		draw_sprites(bitmap, cliprect, 1);
+		draw_sprites(bitmap, cliprect, screen.priority(), 1);
 
-	draw_sprites(bitmap, cliprect, 2);
+	draw_sprites(bitmap, cliprect, screen.priority(), 2);
 
 	if (~m_layer_enable & 4)
 		combine_tilemap(bitmap, cliprect, m_fore_layer, m_scrollram[2] & 0xffff, (m_scrollram[2] >> 16) & 0xffff, 0, fore_rowscroll);
 
-	draw_sprites(bitmap, cliprect, 3);
+	draw_sprites(bitmap, cliprect, screen.priority(), 3);
 
 	if (~m_layer_enable & 8)
 		combine_tilemap(bitmap, cliprect, m_text_layer, 0, 0, 0, NULL);
@@ -531,12 +513,13 @@ UINT32 seibuspi_state::screen_update_spi(screen_device &screen, bitmap_rgb32 &bi
 
 UINT32 seibuspi_state::screen_update_sys386f(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
+	screen.priority().fill(0, cliprect);
 	bitmap.fill(0, cliprect);
 
-	draw_sprites(bitmap, cliprect, 0);
-	draw_sprites(bitmap, cliprect, 1);
-	draw_sprites(bitmap, cliprect, 2);
-	draw_sprites(bitmap, cliprect, 3);
+	draw_sprites(bitmap, cliprect, screen.priority(), 0);
+	draw_sprites(bitmap, cliprect, screen.priority(), 1);
+	draw_sprites(bitmap, cliprect, screen.priority(), 2);
+	draw_sprites(bitmap, cliprect, screen.priority(), 3);
 
 	return 0;
 }

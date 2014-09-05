@@ -121,11 +121,11 @@ public:
 	INTERRUPT_GEN_MEMBER(spi_interrupt);
 
 	void set_layer_offsets();
-	void drawgfx_blend(bitmap_rgb32 &bitmap, const rectangle &cliprect, gfx_element *gfx, UINT32 code, UINT32 color, int flipx, int flipy, int sx, int sy);
-	void draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect, int pri_mask);
+	void drawgfx_blend(bitmap_rgb32 &bitmap, const rectangle &cliprect, gfx_element *gfx, UINT32 code, UINT32 color, int flipx, int flipy, int sx, int sy, bitmap_ind8 &primap, int primask);
+	void draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect, bitmap_ind8 &primap, int priority);
 	void set_rowscroll(tilemap_t *layer, int scroll, INT16* rows);
 	void set_scroll(tilemap_t *layer, int scroll);
-	void combine_tilemap(bitmap_rgb32 &bitmap, const rectangle &cliprect, tilemap_t *tile, int x, int y, int opaque, INT16 *rowscroll);
+	void combine_tilemap(bitmap_rgb32 &bitmap, const rectangle &cliprect, tilemap_t *tile, int sx, int sy, int opaque, INT16 *rowscroll);
 
 	virtual void machine_start();
 	virtual void video_start();
