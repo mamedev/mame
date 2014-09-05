@@ -744,9 +744,7 @@ WRITE16_MEMBER(raiden2_state::cop_cmd_w)
 
 		// raidendx only
 	case 0x7e05:
-		space.write_dword(0x470, (space.read_dword(cop_regs[4]) & 0x30) << 6);
-		// Actually, wherever the bank selection actually is
-		// And probably 8 bytes too, but they zero all the rest
+		space.write_byte(0x470, space.read_byte(cop_regs[4]));
 		break;
 
 	case 0xa100:
@@ -1010,17 +1008,16 @@ WRITE16_MEMBER(raiden2_state::raidendx_cop_bank_2_w)
 {
 	COMBINE_DATA(&cop_bank);
 
-	if(ACCESSING_BITS_8_15) {
-		int new_bank = 4 | ((cop_bank >> 10) & 3);
-		if(new_bank != fg_bank) {
-			fg_bank = new_bank;
-			foreground_layer->mark_all_dirty();
-		}
-
-		/* probably bit 3 is from 6c9 */
-		/* TODO: this doesn't work! */
-		membank("mainbank")->set_entry(8 | (cop_bank & 0x7000) >> 12);
+	int new_bank = 4 | ((cop_bank >> 4) & 3);
+	if(new_bank != fg_bank) {
+		fg_bank = new_bank;
+		foreground_layer->mark_all_dirty();
 	}
+
+	/* mainbank2 coming from 6c9 ? */
+	int bb = cop_bank >> 12;
+	membank("mainbank1")->set_entry(bb + 16);
+	membank("mainbank2")->set_entry(3);
 }
 
 
@@ -1257,7 +1254,8 @@ MACHINE_RESET_MEMBER(raiden2_state,raiden2)
 	common_reset();
 	sprcpt_init();
 
-	membank("mainbank")->set_entry(1);
+	membank("mainbank1")->set_entry(2);
+	membank("mainbank2")->set_entry(3);
 
 	prg_bank = 0;
 	//cop_init();
@@ -1268,7 +1266,8 @@ MACHINE_RESET_MEMBER(raiden2_state,raidendx)
 	common_reset();
 	sprcpt_init();
 
-	membank("mainbank")->set_entry(8);
+	membank("mainbank1")->set_entry(16);
+	membank("mainbank2")->set_entry(3);
 
 	prg_bank = 0x08;
 
@@ -1282,7 +1281,8 @@ MACHINE_RESET_MEMBER(raiden2_state,zeroteam)
 	mid_bank = 1;
 	sprcpt_init();
 
-	membank("mainbank")->set_entry(1);
+	membank("mainbank1")->set_entry(2);
+	membank("mainbank2")->set_entry(3);
 
 	prg_bank = 0;
 	//cop_init();
@@ -1294,10 +1294,6 @@ MACHINE_RESET_MEMBER(raiden2_state,xsedae)
 	fg_bank = 2;
 	mid_bank = 1;
 	sprcpt_init();
-
-	//membank("mainbank")->set_entry(1);
-
-	//cop_init();
 }
 
 READ16_MEMBER(raiden2_state::raiden2_sound_comms_r)
@@ -1313,8 +1309,10 @@ WRITE16_MEMBER(raiden2_state::raiden2_sound_comms_w)
 WRITE16_MEMBER(raiden2_state::raiden2_bank_w)
 {
 	if(ACCESSING_BITS_8_15) {
+		int bb = (~data >> 15) & 1;
 		logerror("select bank %d %04x\n", (data >> 15) & 1, data);
-		membank("mainbank")->set_entry(!((data >> 15) & 1));
+		membank("mainbank1")->set_entry(bb*2);
+		membank("mainbank2")->set_entry(bb*2+1);
 		prg_bank = ((data >> 15) & 1);
 	}
 }
@@ -1598,7 +1596,8 @@ static ADDRESS_MAP_START( raiden2_mem, AS_PROGRAM, 16, raiden2_state )
 	AM_RANGE(0x10000, 0x1efff) AM_RAM
 	AM_RANGE(0x1f000, 0x1ffff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 
-	AM_RANGE(0x20000, 0x3ffff) AM_ROMBANK("mainbank")
+	AM_RANGE(0x20000, 0x2ffff) AM_ROMBANK("mainbank1")
+	AM_RANGE(0x30000, 0x3ffff) AM_ROMBANK("mainbank2")
 	AM_RANGE(0x40000, 0xfffff) AM_ROM AM_REGION("mainprg", 0x40000)
 ADDRESS_MAP_END
 
@@ -1636,7 +1635,8 @@ static ADDRESS_MAP_START( zeroteam_mem, AS_PROGRAM, 16, raiden2_state )
 	AM_RANGE(0x0f000, 0x0ffff) AM_RAM AM_SHARE("sprites")
 	AM_RANGE(0x10000, 0x1ffff) AM_RAM
 
-	AM_RANGE(0x20000, 0x3ffff) AM_ROMBANK("mainbank")
+	AM_RANGE(0x20000, 0x2ffff) AM_ROMBANK("mainbank1")
+	AM_RANGE(0x30000, 0x3ffff) AM_ROMBANK("mainbank2")
 	AM_RANGE(0x40000, 0xfffff) AM_ROM AM_REGION("mainprg", 0x40000)
 ADDRESS_MAP_END
 
@@ -3306,25 +3306,27 @@ ROM_END
 
 DRIVER_INIT_MEMBER(raiden2_state,raiden2)
 {
-	membank("mainbank")->configure_entries(0, 2, memregion("mainprg")->base(), 0x20000);
+	membank("mainbank1")->configure_entries(0, 4, memregion("mainprg")->base(), 0x10000);
+	membank("mainbank2")->configure_entries(0, 4, memregion("mainprg")->base(), 0x10000);
 	raiden2_decrypt_sprites(machine());
 }
 
 DRIVER_INIT_MEMBER(raiden2_state,raidendx)
 {
-	membank("mainbank")->configure_entries(0, 0x10, memregion("mainprg")->base(), 0x20000);
+	membank("mainbank1")->configure_entries(0, 0x20, memregion("mainprg")->base(), 0x10000);
+	membank("mainbank2")->configure_entries(0, 0x20, memregion("mainprg")->base(), 0x10000);
 	raiden2_decrypt_sprites(machine());
 }
 
 DRIVER_INIT_MEMBER(raiden2_state,xsedae)
 {
 	/* doesn't have banking */
-	//membank("mainbank")->configure_entries(0, 2, memregion("mainprg")->base(), 0x20000);
 }
 
 DRIVER_INIT_MEMBER(raiden2_state,zeroteam)
 {
-	membank("mainbank")->configure_entries(0, 2, memregion("mainprg")->base(), 0x20000);
+	membank("mainbank1")->configure_entries(0, 4, memregion("mainprg")->base(), 0x10000);
+	membank("mainbank2")->configure_entries(0, 4, memregion("mainprg")->base(), 0x10000);
 	zeroteam_decrypt_sprites(machine());
 }
 
