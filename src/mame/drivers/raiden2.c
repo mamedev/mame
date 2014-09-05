@@ -815,7 +815,7 @@ void raiden2_state::draw_sprites(const rectangle &cliprect)
 	  06 yyyy yyyy yyyy yyyy   y = ypos
 	 */
 
-	while( source > sprites ){
+	while( source >= sprites ){
 		int tile_number = source[1];
 		int sx = source[2];
 		int sy = source[3];
@@ -1069,11 +1069,14 @@ VIDEO_START_MEMBER(raiden2_state,raiden2)
 
 /* screen_update_raiden2 (move to video file) */
 
-void raiden2_state::blend_layer(bitmap_rgb32 &bitmap, const rectangle &cliprect, bitmap_ind16 &source, UINT16 layer)
+void raiden2_state::blend_layer(bitmap_rgb32 &bitmap, const rectangle &cliprect, bitmap_ind16 &source, int layer)
 {
+	if(layer == -1)
+		return;
+
 	const UINT8 alpha_active[0x10] = { // MSB first
 		//00    08    10    18    20    28    30    38    40    48    50    58    60    68    70    78
-		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x09, 0x00, 0x0f, 0x00, 0x00
+		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0f, 0x00, 0x0f, 0x00, 0x00
 	};
 
 	const pen_t *pens = &m_palette->pen(0);
@@ -1085,8 +1088,6 @@ void raiden2_state::blend_layer(bitmap_rgb32 &bitmap, const rectangle &cliprect,
 			UINT16 val = *src++;
 			if((val & 0xc000) == layer && (val & 0x000f) != 0x000f) {
 				val &= 0x07ff;
-				// - 04 40 38 50 25 6b
-				// + 3f 5c 68 6f
 				int page = val >> 4;
 				if(((alpha_active[page >> 3] & (0x80 >> (page & 7))) || page == ccol) && (val & 0xf) == 0xe)
 					*dst = alpha_blend_r32(*dst, pens[val], 0x7f);
@@ -1122,25 +1123,28 @@ UINT32 raiden2_state::screen_update_raiden2(screen_device &screen, bitmap_rgb32 
 	bitmap.fill(m_palette->black_pen(), cliprect);
 	draw_sprites(cliprect);
 
-	blend_layer(bitmap, cliprect, sprite_buffer, 0);
+	blend_layer(bitmap, cliprect, sprite_buffer, cur_spri[0]);
 
 	if (!(raiden2_tilemap_enable & 1))
 		tilemap_draw_and_blend(screen, bitmap, cliprect, background_layer);
 
-	blend_layer(bitmap, cliprect, sprite_buffer, 1);
+	blend_layer(bitmap, cliprect, sprite_buffer, cur_spri[1]);
 
 	if (!(raiden2_tilemap_enable & 2))
 		tilemap_draw_and_blend(screen, bitmap, cliprect, midground_layer);
 
-	blend_layer(bitmap, cliprect, sprite_buffer, 2);
+	blend_layer(bitmap, cliprect, sprite_buffer, cur_spri[2]);
 
 	if (!(raiden2_tilemap_enable & 4))
 		tilemap_draw_and_blend(screen, bitmap, cliprect, foreground_layer);
 
-	blend_layer(bitmap, cliprect, sprite_buffer, 3);
+	blend_layer(bitmap, cliprect, sprite_buffer, cur_spri[3]);
 
 	if (!(raiden2_tilemap_enable & 8))
 		tilemap_draw_and_blend(screen, bitmap, cliprect, text_layer);
+
+	blend_layer(bitmap, cliprect, sprite_buffer, cur_spri[4]);
+
 
 	return 0;
 }
@@ -3327,6 +3331,8 @@ ROM_END
 
 DRIVER_INIT_MEMBER(raiden2_state,raiden2)
 {
+	static const int spri[5] = { 0, 1, 2, 3, -1 };
+	cur_spri = spri;
 	membank("mainbank1")->configure_entries(0, 4, memregion("mainprg")->base(), 0x10000);
 	membank("mainbank2")->configure_entries(0, 4, memregion("mainprg")->base(), 0x10000);
 	raiden2_decrypt_sprites(machine());
@@ -3334,6 +3340,8 @@ DRIVER_INIT_MEMBER(raiden2_state,raiden2)
 
 DRIVER_INIT_MEMBER(raiden2_state,raidendx)
 {
+	static const int spri[5] = { 0, 1, 2, 3, -1 };
+	cur_spri = spri;
 	membank("mainbank1")->configure_entries(0, 0x20, memregion("mainprg")->base(), 0x10000);
 	membank("mainbank2")->configure_entries(0, 0x20, memregion("mainprg")->base(), 0x10000);
 	raiden2_decrypt_sprites(machine());
@@ -3341,11 +3349,15 @@ DRIVER_INIT_MEMBER(raiden2_state,raidendx)
 
 DRIVER_INIT_MEMBER(raiden2_state,xsedae)
 {
+	static const int spri[5] = { 0, 1, 2, 3, -1 };
+	cur_spri = spri;
 	/* doesn't have banking */
 }
 
 DRIVER_INIT_MEMBER(raiden2_state,zeroteam)
 {
+	static const int spri[5] = { -1, 0, 1, 2, 3 };
+	cur_spri = spri;
 	membank("mainbank1")->configure_entries(0, 4, memregion("mainprg")->base(), 0x10000);
 	membank("mainbank2")->configure_entries(0, 4, memregion("mainprg")->base(), 0x10000);
 	zeroteam_decrypt_sprites(machine());

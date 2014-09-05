@@ -157,6 +157,7 @@ public:
 
 	UINT32 cop_sort_ram_addr, cop_sort_lookup;
 	UINT16 cop_sort_param;
+	const int *cur_spri;
 
 	DECLARE_DRIVER_INIT(raidendx);
 	DECLARE_DRIVER_INIT(xsedae);
@@ -179,7 +180,7 @@ public:
 	void combine32(UINT32 *val, int offset, UINT16 data, UINT16 mem_mask);
 	void sprcpt_init(void);
 
-	void blend_layer(bitmap_rgb32 &bitmap, const rectangle &cliprect, bitmap_ind16 &source, UINT16 layer);
+	void blend_layer(bitmap_rgb32 &bitmap, const rectangle &cliprect, bitmap_ind16 &source, int layer);
 	void tilemap_draw_and_blend(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, tilemap_t *tilemap);
 
 };
