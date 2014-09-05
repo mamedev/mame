@@ -22,8 +22,8 @@ PCB (c) 2004 SYS_SH2B + SYS_SH2B Rom Board
 
 Very simple PCB contains:
 
-     CPU: Hatachi SH-2 (HD6417604F28)
-   Audio: OKI 6295 (rebaged as AD-65)
+     CPU: Hitachi SH-2 (HD6417604F28)
+   Audio: OKI 6295 (rebadged as AD-65)
 GFX CHIP: RISE11 (custom graphics chip with programmable decryption)
   EEPROM: ST93C56A
      OSC: 28.63636MHz

@@ -26,8 +26,6 @@ raiden 2 board test note 17/04/08 (based on test by dox)
 
 ===
 
-raiden2 first bullet work RAM is at 0x5290, has a sprite offset of 0x1c9c and a sprite color of 4.
-
 ===========================================================================================================
 
 Raiden DX
@@ -130,20 +128,29 @@ Protection Notes:
  to be the actual MCU which is probably internal to one of the Seibu
  customs.
 
- The games in legionna.c use the same protection chips.
+ The games in legionna.c use (almost?) the same protection chips.
 
 Current Problem(s) - in order of priority
 
  High Priority
 
- ROM banking - we don't know where the ROM bank registers are, this causes
- serious problems as it's hard to see which glitches are caused by
- protection, and which are caused by a lack of ROM banking.
+ Protection 
+ - raiden2 doesn't detect hits on stage 2 boss;
+ - zeroteam has bogus collision detection;
+ - raiden2 has a weird movement after that the ship completes animation from the aircraft. Probably 42c2 should be floating point rounded ...
+ - (and probably more)
+ 
+ Unemulated 0-0x3ffff ROM banking for raidendx, but it's unknown if/where it's used (hopefully NOT on getting perfect on Alpha course).
 
- Protection - it isn't emulated, until it is the games will never work.
-
- Video emulation - used to be more complete than it is now, tile banking is
- currently broken.
+ zeroteam - sort-DMA doesn't seem to work too well, sprite-sprite priorities are broken as per now
+ 
+ xsedae - do an "8-liner"-style scroll during attract, doesn't work too well.
+ 
+ sprite chip is the same as seibuspi.c and feversoc.c, needs device-ification and merging.
+ 
+ sprite chip also uses first entry for "something" that isn't sprite, some of them looks clipping 
+ regions (150 - ff in zeroteam, 150 - 0 and 150 - 80 in raiden2). Latter probably do double buffering
+ on odd/even frames, by updating only top or bottom part of screen.
 
  Low Priority
 
