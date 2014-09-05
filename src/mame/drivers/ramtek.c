@@ -176,9 +176,53 @@ ROM_START( wipeormt )
 ROM_END
 
 
+/***************************************************************************
+
+Ramtek Trivia
+
+Board is discrete logic.  Reads questions from 8-track tapes.
+
+Contains the following PROMS:
+
+550549-1.A4  MMI      6301-1 256x4
+550549-2.B4  MMI      6301-1 256x4
+550549-3.C4  MMI      6301-1 256x4
+550549-4.D4  MMI      6301-1 256x4
+550548.E3    Intersil IM5610 32x8
+
+Other components of note:
+
+1 10.7330Mhz crystal
+1 AY-5-1013A UART
+1 Signetics 2513 character generator
+2 2101 Static RAMs (256x4)
+
+My guess is that this is essentially a special purpose terminal.
+Together, 550549-3 and 550549-4 contain character data.
+
+On the PCB:
+    550549-2.B4 has data bits 0 and 1 not connected.
+    550549-4.D4 has data bit 3 not connected
+
+***************************************************************************/
+
+ROM_START( trivia )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
+
+	ROM_REGION( 0x0100, "roms", ROMREGION_ERASE00 )
+	ROM_LOAD( "550549-1.a4",    0x0000, 0x0100, CRC(89a2dcc8) SHA1(688f8d916d6ade0ffeeaf8d2900db45eb27abe8c) )
+	ROM_LOAD( "550549-2.b4",    0x0000, 0x0100, CRC(2405b7a5) SHA1(1e9e658815ae2e31f97cd41861d0fcf415c12963) )
+	ROM_LOAD( "550549-3.c4",    0x0000, 0x0100, CRC(496d5e6a) SHA1(fca17f1710169dff98536d13d80f76060860caf5) )
+	ROM_LOAD( "550549-4.d4",    0x0000, 0x0100, CRC(6dbc83e9) SHA1(8a4f211cb12e5a5244d213c20a4e2df6288abcab) )
+	ROM_LOAD( "550548.e3",      0x0000, 0x0020, CRC(2b7c6a5e) SHA1(943cc3901c651bfe5bf11a40c27801952731b6de) )
+ROM_END
+
+
+
+GAME( 1973, vollyrmt,  0, ramtek, 0, driver_device,  0, ROT0, "Ramtek", "Volly (Ramtek) [TTL]", GAME_IS_SKELETON )
 GAME( 1974, bballrmt,  0, ramtek, 0, driver_device,  0, ROT0, "Ramtek", "Baseball (Ramtek) [TTL]", GAME_IS_SKELETON )
 GAME( 1974, cleanswp,  0, ramtek, 0, driver_device,  0, ROT0, "Ramtek", "Clean Sweep [TTL]", GAME_IS_SKELETON )
-GAME( 1973, vollyrmt,  0, ramtek, 0, driver_device,  0, ROT0, "Ramtek", "Volly (Ramtek) [TTL]", GAME_IS_SKELETON )
 GAME( 1974, wipeormt,  0, ramtek, 0, driver_device,  0, ROT0, "Ramtek", "Wipeout (Ramtek) [TTL]", GAME_IS_SKELETON )
+GAME( 1976, trivia,    0, ramtek, 0, driver_device,  0, ROT0, "Ramtek", "Trivia (Rev B) [TTL]", GAME_IS_SKELETON )
 
 GAME( 197?, ramtek3,   0, ramtek, 0, driver_device,  0, ROT0, "Ramtek", "unknown Ramtek Game (Maybe Hockey?) [TTL]", GAME_IS_SKELETON )
