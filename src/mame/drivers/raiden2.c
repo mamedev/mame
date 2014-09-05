@@ -1379,8 +1379,8 @@ WRITE16_MEMBER(raiden2_state::sprite_prot_src_w)
 	int x = ((space.read_dword(src+0x08) >> 16) - (sprite_prot_x)) & 0xffff;
 	int y = ((space.read_dword(src+0x04) >> 16) - (sprite_prot_y)) & 0xffff;
 
-	UINT16 head1 = space.read_word(src+0x60);
-	UINT16 head2 = space.read_word(src+0x62);
+	UINT16 head1 = space.read_word(src+cop_spr_unk);
+	UINT16 head2 = space.read_word(src+cop_spr_unk+2);
 
 	int w = (((head1 >> 8 ) & 7) + 1) << 3;
 	int h = (((head1 >> 12) & 7) + 1) << 3;
