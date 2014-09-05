@@ -139,7 +139,7 @@ public:
 	UINT16 cop_hit_status;
 	INT16 cop_hit_val_x,cop_hit_val_y,cop_hit_val_z,cop_hit_val_unk;
 
-	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect ,int pri_mask );
+	void draw_sprites(bitmap_ind16 &bitmap, bitmap_ind8 &priority, const rectangle &cliprect);
 	UINT8 cop_calculate_collsion_detection();
 	void cop_take_hit_box_params(UINT8 offs);
 

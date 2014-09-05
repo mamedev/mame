@@ -799,35 +799,20 @@ void raiden2_state::combine32(UINT32 *val, int offset, UINT16 data, UINT16 mem_m
 
 /* SPRITE DRAWING (move to video file) */
 
-void raiden2_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect ,int pri_mask )
+void raiden2_state::draw_sprites(bitmap_ind16 &bitmap, bitmap_ind8 &priority, const rectangle &cliprect)
 {
-	UINT16 *source = sprites + sprites_cur_start/2 - 4;
+	UINT16 *source = sprites;
 
 	gfx_element *gfx = m_gfxdecode->gfx(2);
 
-//  static int ytlim = 1;
-//  static int xtlim = 1;
-
-//  if ( machine.input().code_pressed_once(KEYCODE_Q) ) ytlim--;
-//  if ( machine.input().code_pressed_once(KEYCODE_W) ) ytlim++;
-
-//  if ( machine.input().code_pressed_once(KEYCODE_A) ) xtlim--;
-//  if ( machine.input().code_pressed_once(KEYCODE_S) ) xtlim++;
-
-
-	/*00 ???? ????  (colour / priority?)
-	  01 fhhh Fwww   h = height f=flipy w = width F = flipx
-	  02 nnnn nnnn   n = tileno
-	  03 nnnn nnnn   n = tileno
-	  04 xxxx xxxx   x = xpos
-	  05 xxxx xxxx   x = xpos
-	  06 yyyy yyyy   y = ypos
-	  07 yyyy yyyy   y = ypos
-
+	/*
+	  00 fhhh Fwww ppcc cccc   h = height f=flipy w = width F = flipx p = priority c = color
+	  02 nnnn nnnn nnnn nnnn   n = tileno
+	  04 xxxx xxxx xxxx xxxx   x = xpos
+	  06 yyyy yyyy yyyy yyyy   y = ypos
 	 */
 
-
-	while( source>sprites ){
+	while( source<sprites + sprites_cur_start/2 ){
 		int tile_number = source[1];
 		int sx = source[2];
 		int sy = source[3];
@@ -836,15 +821,19 @@ void raiden2_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 		int ytlim, xtlim;
 		int xflip, yflip;
 		int xstep, ystep;
-
+		int pri, pri_mask;
 
 		ytlim = (source[0] >> 12) & 0x7;
-		xtlim = (source[0] >> 8) & 0x7;
+		xtlim = (source[0] >> 8 ) & 0x7;
 
 		xflip = (source[0] >> 15) & 0x1;
 		yflip = (source[0] >> 11) & 0x1;
 
 		colr = source[0] & 0x3f;
+
+		static const UINT32 pri_masks[5] = { 0xfffe, 0xfffc, 0xfff0, 0xff00 };
+		pri = (source[0] >> 6) & 3;
+		pri_mask = pri_masks[pri];
 
 		ytlim += 1;
 		xtlim += 1;
@@ -875,47 +864,47 @@ void raiden2_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 
 
 
-						gfx->transpen(
+						gfx->prio_transpen(
 						bitmap,
 						cliprect,
 						tile_number,
 						colr,
 						yflip,xflip,
-						(sx+xstep*xtiles)&ZEROTEAM_MASK_X,(sy+ystep*ytiles)&ZEROTEAM_MASK_Y,15);
+						(sx+xstep*xtiles)&ZEROTEAM_MASK_X,(sy+ystep*ytiles)&ZEROTEAM_MASK_Y, priority, pri_mask, 15);
 
 
-						gfx->transpen(
+						gfx->prio_transpen(
 						bitmap,
 						cliprect,
 						tile_number,
 						colr,
 						yflip,xflip,
-						((sx+xstep*xtiles)&ZEROTEAM_MASK_X)-0x200,(sy+ystep*ytiles)&ZEROTEAM_MASK_Y,15);
+						((sx+xstep*xtiles)&ZEROTEAM_MASK_X)-0x200,(sy+ystep*ytiles)&ZEROTEAM_MASK_Y, priority, pri_mask, 15);
 
 
-						gfx->transpen(
+						gfx->prio_transpen(
 						bitmap,
 						cliprect,
 						tile_number,
 						colr,
 						yflip,xflip,
-						(sx+xstep*xtiles)&ZEROTEAM_MASK_X,((sy+ystep*ytiles)&ZEROTEAM_MASK_Y)-0x200,15);
+						(sx+xstep*xtiles)&ZEROTEAM_MASK_X,((sy+ystep*ytiles)&ZEROTEAM_MASK_Y)-0x200, priority, pri_mask, 15);
 
 
-						gfx->transpen(
+						gfx->prio_transpen(
 						bitmap,
 						cliprect,
 						tile_number,
 						colr,
 						yflip,xflip,
-						((sx+xstep*xtiles)&ZEROTEAM_MASK_X)-0x200,((sy+ystep*ytiles)&ZEROTEAM_MASK_Y)-0x200,15);
+						((sx+xstep*xtiles)&ZEROTEAM_MASK_X)-0x200,((sy+ystep*ytiles)&ZEROTEAM_MASK_Y)-0x200, priority, pri_mask, 15);
 
 
 				tile_number++;
 			}
 		}
 
-		source-=4;
+		source += 4;
 	}
 
 }
@@ -1084,36 +1073,22 @@ VIDEO_START_MEMBER(raiden2_state,raiden2)
 UINT32 raiden2_state::screen_update_raiden2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(m_palette->black_pen(), cliprect);
+	screen.priority().fill(0, cliprect);
 
-	//if (!machine().input().code_pressed(KEYCODE_Q))
-	{
-		if (!(raiden2_tilemap_enable & 1))
-			background_layer->draw(screen, bitmap, cliprect, 0, 0);
-	}
+	if (!(raiden2_tilemap_enable & 1))
+		background_layer->draw(screen, bitmap, cliprect, 0, 1);
 
-	//if (!machine().input().code_pressed(KEYCODE_W))
-	{
-		if (!(raiden2_tilemap_enable & 2))
-			midground_layer->draw(screen, bitmap, cliprect, 0, 0);
-	}
+	if (!(raiden2_tilemap_enable & 2))
+		midground_layer->draw(screen, bitmap, cliprect, 0, 2);
 
-	//if (!machine().input().code_pressed(KEYCODE_E))
-	{
-		if (!(raiden2_tilemap_enable & 4))
-			foreground_layer->draw(screen, bitmap, cliprect, 0, 0);
-	}
+	if (!(raiden2_tilemap_enable & 4))
+		foreground_layer->draw(screen, bitmap, cliprect, 0, 4);
 
-	//if (!machine().input().code_pressed(KEYCODE_S))
-	{
-		if (!(raiden2_tilemap_enable & 0x10))
-			draw_sprites(bitmap, cliprect, 0);
-	}
+	if (!(raiden2_tilemap_enable & 8))
+		text_layer->draw(screen, bitmap, cliprect, 0, 8);
 
-	//if (!machine().input().code_pressed(KEYCODE_A))
-	{
-		if (!(raiden2_tilemap_enable & 8))
-			text_layer->draw(screen, bitmap, cliprect, 0, 0);
-	}
+	if (!(raiden2_tilemap_enable & 0x10))
+		draw_sprites(bitmap, screen.priority(), cliprect);
 
 	return 0;
 }
@@ -1354,15 +1329,11 @@ WRITE16_MEMBER(raiden2_state::sprite_prot_src_w)
 
 	UINT16 head1 = space.read_word(src+0x60);
 	UINT16 head2 = space.read_word(src+0x62);
-	UINT16 oxy   = space.read_word(src+0x66);
 
 	int w = (((head1 >> 8 ) & 7) + 1) << 3;
 	int h = (((head1 >> 12) & 7) + 1) << 3;
 
-	int ox = INT8(oxy);
-	int oy = INT8(oxy >> 8);
-
-	UINT16 flag = x-ox > -w && x-ox < cop_spr_maxx+w && y-oy > -h && y-oy < 240+h ? 1 : 0;
+	UINT16 flag = x-w > -w && x-w < cop_spr_maxx+w && y-h > -h && y-h < 240+h ? 1 : 0;
 	
 	flag = (space.read_word(src) & 0xfffe) | flag;
 	space.write_word(src, flag);
@@ -1371,8 +1342,8 @@ WRITE16_MEMBER(raiden2_state::sprite_prot_src_w)
 	{
 		space.write_word(dst1,   head1);
 		space.write_word(dst1+2, head2);
-		space.write_word(dst1+4, x-ox);
-		space.write_word(dst1+6, y-oy);
+		space.write_word(dst1+4, x-w);
+		space.write_word(dst1+6, y-h);
 
 		dst1 += 8;
 	}
