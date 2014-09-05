@@ -13,7 +13,15 @@
 
   Status:
   - Brave Team: working
-  - Others: still to be worked on
+  - Canasta '86: working
+  - Lap by Lap: working
+  - Moon Light: sound and switches to be fixed
+  - Clown: sound and switches to be fixed
+  - Corsario: sound and switches to be fixed
+  - Mundial 90: sound and switches to be fixed
+  - Atleta: sound and switches to be fixed
+  - 250CC: sound and switches to be fixed
+  - Metal Man: not working
 
 
 ********************************************************************************************************/
@@ -36,6 +44,9 @@ public:
 		, m_switches(*this, "SW")
 	{ }
 
+	DECLARE_WRITE8_MEMBER(ppi60a_w);
+	DECLARE_WRITE8_MEMBER(ppi60b_w);
+	DECLARE_WRITE8_MEMBER(ppi64c_w);
 	DECLARE_READ8_MEMBER(sw_r);
 	DECLARE_WRITE8_MEMBER(sw_w);
 	DECLARE_WRITE8_MEMBER(sol_brvteam_w);
@@ -43,12 +54,13 @@ public:
 	DECLARE_WRITE8_MEMBER(sn_w);
 	DECLARE_READ8_MEMBER(sndcmd_r);
 	DECLARE_WRITE8_MEMBER(sndcmd_w);
+	DECLARE_WRITE8_MEMBER(sndcmd_lapbylap_w);
 	DECLARE_WRITE8_MEMBER(lamp_w) { };
 	DECLARE_WRITE8_MEMBER(disp_w);
 	DECLARE_DRIVER_INIT(inder);
 private:
 	UINT8 m_row;
-	UINT8 m_segment[5];
+	UINT8 m_segment[8];
 	UINT8 m_sndcmd;
 	virtual void machine_reset();
 	required_device<cpu_device> m_maincpu;
@@ -66,7 +78,6 @@ static ADDRESS_MAP_START( brvteam_map, AS_PROGRAM, 8, inder_state )
 	AM_RANGE(0x4900, 0x4900) AM_WRITE(sol_brvteam_w)
 	AM_RANGE(0x4901, 0x4907) AM_WRITE(lamp_w)
 	AM_RANGE(0x4b00, 0x4b00) AM_WRITE(sn_w)
-	//AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("ppi", i8255_device, read, write)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( canasta_map, AS_PROGRAM, 8, inder_state )
@@ -90,7 +101,7 @@ static ADDRESS_MAP_START( lapbylap_map, AS_PROGRAM, 8, inder_state )
 	AM_RANGE(0x4800, 0x480a) AM_READWRITE(sw_r,sw_w)
 	AM_RANGE(0x4900, 0x4900) AM_WRITE(sol_canasta_w)
 	AM_RANGE(0x4901, 0x4907) AM_WRITE(lamp_w)
-	AM_RANGE(0x4b00, 0x4b00) AM_WRITE(sndcmd_w)
+	AM_RANGE(0x4b00, 0x4b00) AM_WRITE(sndcmd_lapbylap_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( lapbylap_sub_map, AS_PROGRAM, 8, inder_state )
@@ -104,7 +115,26 @@ static ADDRESS_MAP_START( lapbylap_sub_map, AS_PROGRAM, 8, inder_state )
 	AM_RANGE(0xa002, 0xa002) AM_DEVWRITE("ay2", ay8910_device, data_w)
 ADDRESS_MAP_END
 
-static INPUT_PORTS_START( inder )
+static ADDRESS_MAP_START( inder_map, AS_PROGRAM, 8, inder_state )
+	AM_RANGE(0x0000, 0x3fff) AM_ROM
+	AM_RANGE(0x4000, 0x47ff) AM_MIRROR(0x1800) AM_RAM AM_SHARE("nvram") // 6116, battery-backed
+	AM_RANGE(0x6000, 0x6003) AM_MIRROR(0x13fc) AM_DEVREADWRITE("ppi60", i8255_device, read, write)
+	AM_RANGE(0x6400, 0x6403) AM_MIRROR(0x13fc) AM_DEVREADWRITE("ppi64", i8255_device, read, write)
+	AM_RANGE(0x6800, 0x6803) AM_MIRROR(0x13fc) AM_DEVREADWRITE("ppi68", i8255_device, read, write)
+	AM_RANGE(0x6c00, 0x6c03) AM_MIRROR(0x131c) AM_DEVREADWRITE("ppi6c", i8255_device, read, write)
+	AM_RANGE(0x6c20, 0x6c3f) AM_MIRROR(0x1300) AM_WRITE(sndcmd_w)
+	AM_RANGE(0x6c60, 0x6c7f) AM_MIRROR(0x1300) AM_WRITE(disp_w)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( inder_sub_map, AS_PROGRAM, 8, inder_state )
+	AM_RANGE(0x0000, 0x1fff) AM_ROM
+	AM_RANGE(0x2000, 0x27ff) AM_MIRROR(0x1800) AM_RAM // 6116
+	AM_RANGE(0x4000, 0x4003) AM_MIRROR(0x1ffc) AM_DEVREADWRITE("ppi", i8255_device, read, write)
+	AM_RANGE(0x6000, 0x6000) AM_WRITENOP //(sndctl_w) enable sound data roms
+	AM_RANGE(0x8000, 0x8000) AM_READ(sndcmd_r)
+ADDRESS_MAP_END
+
+static INPUT_PORTS_START( brvteam )
 	PORT_START("SW.0")
 	PORT_DIPNAME( 0x03, 0x01, "Coin Slot 1") // sw G,H
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_1C )) // slot 2: 1 moneda 4 partidas  // selection 00 is same as 01
@@ -394,6 +424,113 @@ static INPUT_PORTS_START( lapbylap )
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( inder )
+	PORT_START("SW.0")
+	PORT_DIPNAME( 0x03, 0x03, "Coin Slot 1") // sw G,H
+	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C )) // slot 2: 1 moneda 4 partidas
+	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C )) // and 4c_3c; slot 2: 1 moneda 3 partidas
+	PORT_DIPNAME( 0x08, 0x08, "Balls") // sw E
+	PORT_DIPSETTING(    0x08, "3")
+	PORT_DIPSETTING(    0x00, "5")
+	PORT_DIPNAME( 0x30, 0x20, "Points for free game") // sw C,D
+	PORT_DIPSETTING(    0x00, "2900000")
+	PORT_DIPSETTING(    0x10, "2700000")
+	PORT_DIPSETTING(    0x20, "2500000")
+	PORT_DIPSETTING(    0x30, "2300000")
+	PORT_BIT( 0xc4, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("SW.1")
+	PORT_DIPNAME( 0x03, 0x03, "High Score") //"Handicap"  // sw O,P
+	PORT_DIPSETTING(    0x00, "4600000")
+	PORT_DIPSETTING(    0x01, "4400000")
+	PORT_DIPSETTING(    0x02, "4200000")
+	PORT_DIPSETTING(    0x03, "4000000")
+	PORT_DIPNAME( 0x0c, 0x08, "Extra Ball Award??") //"Comienzo Secuenzia Diana Bola Extra"  // sw M,N
+	PORT_DIPSETTING(    0x04, "50000")
+	PORT_DIPSETTING(    0x08, "25000")
+	PORT_DIPSETTING(    0x0c, "10000")
+	PORT_DIPNAME( 0x10, 0x10, "Extra Ball Derribo??") //"Bola Extra en 1st Derribo Completo"  // sw L
+	PORT_DIPSETTING(    0x00, DEF_STR(No))
+	PORT_DIPSETTING(    0x10, DEF_STR(Yes)) // "Si"
+	PORT_DIPNAME( 0x20, 0x20, "Especiales Laterales??") //need help here guys...  // sw K
+	PORT_DIPSETTING(    0x00, "Derribo Lateral Dianas")
+	PORT_DIPSETTING(    0x20, "Derribo Completo Dianas Laterales")
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("SW.2")
+	PORT_DIPNAME( 0x03, 0x03, "High Score Returns??") //"Handicap de Vueltas"  // sw W,X
+	PORT_DIPSETTING(    0x00, "40")
+	PORT_DIPSETTING(    0x01, "35")
+	PORT_DIPSETTING(    0x02, "30")
+	PORT_DIPSETTING(    0x03, "25")
+	PORT_DIPNAME( 0x40, 0x40, "Bola Extra En Rampa??") //nfi  // sw R
+	PORT_DIPSETTING(    0x00, "Derribo Completo")
+	PORT_DIPSETTING(    0x40, "Derribo Lateral")
+	PORT_DIPNAME( 0x80, 0x80, "Apagado??") //nfi  // sw Q
+	PORT_DIPSETTING(    0x00, DEF_STR(Hard)) // "Facil"
+	PORT_DIPSETTING(    0x80, DEF_STR(Easy)) // "Dificil"
+	PORT_BIT( 0x3c, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("SW.3")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) // "Monedero A"
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) // "Monedero B"
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_TILT ) // "Falta"
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_START1 ) // "Pulsador Partidas"
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_NAME("Accounting info") // "Test economico"
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_NAME("Test") // "Test tecnico"
+
+	PORT_START("SW.4")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_Q)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_W)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_E)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_R)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_Y)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_U)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_O)
+
+	PORT_START("SW.5")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_A)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_S)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_D)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_F)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_G)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_H)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_J)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_K)
+
+	PORT_START("SW.6")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_Z)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_C)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_V)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_B)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_N)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_M)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_COMMA)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_STOP)
+
+	PORT_START("SW.7")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_L)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_X) PORT_NAME("Outhole")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_EQUALS)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_BACKSPACE)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_OPENBRACE)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_CLOSEBRACE)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_BACKSLASH)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_COLON)
+
+	PORT_START("SW.8")
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("SW.9")
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("SW.10")
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
+INPUT_PORTS_END
+
 READ8_MEMBER( inder_state::sw_r )
 {
 	return m_switches[m_row]->read();
@@ -409,10 +546,15 @@ WRITE8_MEMBER( inder_state::sn_w )
 	m_sn->write(space, 0, BITSWAP8(data, 0, 1, 2, 3, 4, 5, 6, 7));
 }
 
-WRITE8_MEMBER( inder_state::sndcmd_w )
+WRITE8_MEMBER( inder_state::sndcmd_lapbylap_w )
 {
 	m_sndcmd = data;
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+}
+
+WRITE8_MEMBER( inder_state::sndcmd_w )
+{
+	m_sndcmd = data;
 }
 
 READ8_MEMBER( inder_state::sndcmd_r )
@@ -467,9 +609,11 @@ WRITE8_MEMBER( inder_state::sol_canasta_w )
 WRITE8_MEMBER( inder_state::disp_w )
 {
 	UINT8 i;
-	if (offset < 5)
+	if (offset < 8)
 		m_segment[offset] = data;
 	else
+	// From here, only used on old cpu board
+	if (offset > 0x40)
 	{
 		offset = (offset >> 3) & 7;
 		for (i = 0; i < 5; i++)
@@ -477,6 +621,34 @@ WRITE8_MEMBER( inder_state::disp_w )
 	}
 }
 
+WRITE8_MEMBER(inder_state::ppi60a_w)
+{
+	if (data)
+		for (UINT8 i = 0; i < 8; i++)
+			if BIT(data, i)
+				m_row = i;
+}
+
+// always 0 but we'll support it anyway
+WRITE8_MEMBER(inder_state::ppi60b_w)
+{
+	if (data & 7)
+		for (UINT8 i = 0; i < 3; i++)
+			if BIT(data, i)
+				m_row = i+8;
+}
+
+WRITE8_MEMBER(inder_state::ppi64c_w)
+{
+	UINT8 i;
+	data &= 15;
+	if BIT(data, 3) // 8 to 15
+	{
+		data ^= 15; // now 7 to 0
+		for (i = 0; i < 5; i++)
+			output_set_digit_value(i*10+data, m_segment[i]);
+	}
+}
 
 void inder_state::machine_reset()
 {
@@ -487,7 +659,7 @@ DRIVER_INIT_MEMBER( inder_state, inder )
 {
 }
 
-static MACHINE_CONFIG_START( inder, inder_state )
+static MACHINE_CONFIG_START( brvteam, inder_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_5MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(brvteam_map)
@@ -503,15 +675,6 @@ static MACHINE_CONFIG_START( inder, inder_state )
 	MCFG_SPEAKER_STANDARD_MONO("snvol")
 	MCFG_SOUND_ADD("sn", SN76489, XTAL_8MHz / 2) // jumper choice of 2 or 4 MHz
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "snvol", 2.0)
-
-	/* Devices */
-	MCFG_DEVICE_ADD("ppi", I8255A, 0 )
-	//MCFG_I8255_IN_PORTA_CB(READ8(inder_state, porta_r))
-	//MCFG_I8255_OUT_PORTA_CB(WRITE8(inder_state, porta_w))
-	//MCFG_I8255_IN_PORTB_CB(READ8(inder_state, portb_r))
-	//MCFG_I8255_OUT_PORTB_CB(WRITE8(inder_state, portb_w))
-	//MCFG_I8255_IN_PORTC_CB(READ8(inder_state, portc_r))
-	//MCFG_I8255_OUT_PORTC_CB(WRITE8(inder_state, portc_w))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( canasta, inder_state )
@@ -556,6 +719,65 @@ static MACHINE_CONFIG_START( lapbylap, inder_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "ayvol", 1.0)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_START( inder, inder_state )
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_5MHz / 2)
+	MCFG_CPU_PROGRAM_MAP(inder_map)
+	MCFG_CPU_PERIODIC_INT_DRIVER(inder_state, irq0_line_hold, 250) // NE556
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_5MHz / 2)
+	MCFG_CPU_PROGRAM_MAP(inder_sub_map)
+	MCFG_CPU_PERIODIC_INT_DRIVER(inder_state, irq0_line_hold, 250) // NE555
+
+	MCFG_NVRAM_ADD_1FILL("nvram")
+
+	/* Video */
+	MCFG_DEFAULT_LAYOUT(layout_inder)
+
+	/* Sound */
+	MCFG_FRAGMENT_ADD( genpin_audio )
+
+	/* Devices */
+	MCFG_DEVICE_ADD("ppi60", I8255A, 0 )
+	//MCFG_I8255_IN_PORTA_CB(READ8(inder_state, ppi60a_r))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(inder_state, ppi60a_w))
+	//MCFG_I8255_IN_PORTB_CB(READ8(inder_state, ppi60b_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(inder_state, ppi60b_w))
+	MCFG_I8255_IN_PORTC_CB(READ8(inder_state, sw_r))
+	//MCFG_I8255_OUT_PORTC_CB(WRITE8(inder_state, ppi60c_w))
+
+	MCFG_DEVICE_ADD("ppi64", I8255A, 0 )
+	//MCFG_I8255_IN_PORTA_CB(READ8(inder_state, ppi64a_r))
+	//MCFG_I8255_OUT_PORTA_CB(WRITE8(inder_state, ppi64a_w))
+	//MCFG_I8255_IN_PORTB_CB(READ8(inder_state, ppi64b_r))
+	//MCFG_I8255_OUT_PORTB_CB(WRITE8(inder_state, ppi64b_w))
+	//MCFG_I8255_IN_PORTC_CB(READ8(inder_state, ppi64c_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(inder_state, ppi64c_w))
+
+	MCFG_DEVICE_ADD("ppi68", I8255A, 0 )
+	//MCFG_I8255_IN_PORTA_CB(READ8(inder_state, ppi68a_r))
+	//MCFG_I8255_OUT_PORTA_CB(WRITE8(inder_state, ppi68a_w))
+	//MCFG_I8255_IN_PORTB_CB(READ8(inder_state, ppi68b_r))
+	//MCFG_I8255_OUT_PORTB_CB(WRITE8(inder_state, ppi68b_w))
+	//MCFG_I8255_IN_PORTC_CB(READ8(inder_state, ppi68c_r))
+	//MCFG_I8255_OUT_PORTC_CB(WRITE8(inder_state, ppi68c_w))
+
+	MCFG_DEVICE_ADD("ppi6c", I8255A, 0 )
+	//MCFG_I8255_IN_PORTA_CB(READ8(inder_state, ppi6ca_r))
+	//MCFG_I8255_OUT_PORTA_CB(WRITE8(inder_state, ppi6ca_w))
+	//MCFG_I8255_IN_PORTB_CB(READ8(inder_state, ppi6cb_r))
+	//MCFG_I8255_OUT_PORTB_CB(WRITE8(inder_state, ppi6cb_w))
+	//MCFG_I8255_IN_PORTC_CB(READ8(inder_state, ppi6cc_r))
+	//MCFG_I8255_OUT_PORTC_CB(WRITE8(inder_state, ppi6cc_w))
+
+	MCFG_DEVICE_ADD("ppi", I8255A, 0 )
+	//MCFG_I8255_IN_PORTA_CB(READ8(inder_state, ppia_r))
+	//MCFG_I8255_OUT_PORTA_CB(WRITE8(inder_state, ppia_w))
+	//MCFG_I8255_IN_PORTB_CB(READ8(inder_state, ppib_r))
+	//MCFG_I8255_OUT_PORTB_CB(WRITE8(inder_state, ppib_w))
+	//MCFG_I8255_IN_PORTC_CB(READ8(inder_state, ppic_r))
+	//MCFG_I8255_OUT_PORTC_CB(WRITE8(inder_state, ppic_w))
+MACHINE_CONFIG_END
+
 
 /*-------------------------------------------------------------------
 / Brave Team (1985)
@@ -588,46 +810,27 @@ ROM_START(lapbylap)
 ROM_END
 
 /*-------------------------------------------------------------------
-/ 250 CC (1992)
+/ Moon Light (1987)
 /-------------------------------------------------------------------*/
-ROM_START(ind250cc)
-	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD("0-250cc.bin", 0x0000, 0x2000, CRC(753d82ec) SHA1(61950336ba571f9f75f2fc31ccb7beaf4e05dddc))
+ROM_START(pinmoonl)
+	ROM_REGION(0x4000, "maincpu", 0)
+	ROM_LOAD("ci-3.bin", 0x0000, 0x2000, CRC(56b901ae) SHA1(7269d1a100c378b21454f9f80f5bd9fbb736c222))
 
 	ROM_REGION(0x2000, "audiocpu", 0)
-	ROM_LOAD("a-250cc.bin", 0x0000, 0x2000, CRC(b64bdafb) SHA1(eab6d54d34b44187d454c1999e4bcf455183d5a0))
+	ROM_LOAD("ci-11.bin", 0x0000, 0x2000, CRC(a0732fe4) SHA1(54f62cd81bdb7e1924acb67ddbe43eb3d0a4eab0))
 
 	ROM_REGION(0x40000, "user1", 0)
-	ROM_LOAD("b-250cc.bin", 0x00000, 0x10000, CRC(884c31c8) SHA1(23a838f1f0cb4905fa8552579b5452134f0fc9cc))
-	ROM_LOAD("c-250cc.bin", 0x10000, 0x10000, CRC(5a1dfa1d) SHA1(4957431d87be0bb6d27910b718f7b7edcd405fff))
-	ROM_LOAD("d-250cc.bin", 0x20000, 0x10000, CRC(a0940387) SHA1(0e06483e3e823bf4673d8e0bd120b0a6b802035d))
-	ROM_LOAD("e-250cc.bin", 0x30000, 0x10000, CRC(538b3274) SHA1(eb76c41a60199bb94aec4666222e405bbcc33494))
+	ROM_LOAD("ci-24.bin", 0x00000, 0x10000, CRC(6406bd18) SHA1(ae45ed9e8b1fd278a36a68b780352dbbb6ee781e))
+	ROM_LOAD("ci-23.bin", 0x10000, 0x10000, CRC(eac346da) SHA1(7c4c26ae089dda0dcd7300fd1ecabf5a91099c41))
+	ROM_LOAD("ci-22.bin", 0x20000, 0x10000, CRC(379740da) SHA1(83ad13ab7f1f37c78397d8e830bd74c5a7aea758))
+	ROM_LOAD("ci-21.bin", 0x30000, 0x10000, CRC(0febb4a7) SHA1(e6cc1b26ddfe9cd58da29de2a50a83ce50afe323))
 ROM_END
-
-/*-------------------------------------------------------------------
-/ Atleta (1991)
-/-------------------------------------------------------------------*/
-ROM_START(atleta)
-	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD("atleta0.cpu", 0x0000, 0x2000, CRC(5f27240f) SHA1(8b77862fa311d703b3af8a1db17e13b17dca7ec6))
-	ROM_LOAD("atleta1.cpu", 0x2000, 0x2000, CRC(12bef582) SHA1(45e1da318141d9228bc91a4e09fff6bf6f194235))
-
-	ROM_REGION(0x2000, "audiocpu", 0)
-	ROM_LOAD("atletaa.snd", 0x0000, 0x2000, CRC(051c5329) SHA1(339115af4a2e3f1f2c31073cbed1842518d5916e))
-
-	ROM_REGION(0x40000, "user1", 0)
-	ROM_LOAD("atletab.snd", 0x00000, 0x10000, CRC(7f155828) SHA1(e459c81b2c2e47d4276344d8d6a08c2c6242f941))
-	ROM_LOAD("atletac.snd", 0x10000, 0x10000, CRC(20456363) SHA1(b226400dac35dedc039a7e03cb525c6033b24ebc))
-	ROM_LOAD("atletad.snd", 0x20000, 0x10000, CRC(6518e3a4) SHA1(6b1d852005dabb76c7c65b87ecc9ee1422f16737))
-	ROM_LOAD("atletae.snd", 0x30000, 0x10000, CRC(1ef7b099) SHA1(08400db3e238baf1673a2da604c999db6be30ffe))
-ROM_END
-
 
 /*-------------------------------------------------------------------
 / Clown (1988)
 /-------------------------------------------------------------------*/
 ROM_START(pinclown)
-	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_REGION(0x4000, "maincpu", 0)
 	ROM_LOAD("clown_a.bin", 0x0000, 0x2000, CRC(b7c3f9ab) SHA1(89ede10d9e108089da501b28f53cd7849f791a00))
 
 	ROM_REGION(0x2000, "audiocpu", 0)
@@ -644,7 +847,7 @@ ROM_END
 / Corsario (1989)
 /-------------------------------------------------------------------*/
 ROM_START(corsario)
-	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_REGION(0x4000, "maincpu", 0)
 	ROM_LOAD("0-corsar.bin", 0x0000, 0x2000, CRC(800f6895) SHA1(a222e7ea959629202686815646fc917ffc5a646c))
 
 	ROM_REGION(0x2000, "audiocpu", 0)
@@ -661,7 +864,7 @@ ROM_END
 / Mundial 90 (1990)
 /-------------------------------------------------------------------*/
 ROM_START(mundial)
-	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_REGION(0x4000, "maincpu", 0)
 	ROM_LOAD("mundial.cpu", 0x0000, 0x2000, CRC(b615e69b) SHA1(d129eb6f2943af40ddffd0da1e7a711b58f65b3c))
 
 	ROM_REGION(0x2000, "audiocpu", 0)
@@ -675,29 +878,47 @@ ROM_START(mundial)
 ROM_END
 
 /*-------------------------------------------------------------------
-/ Moon Light (1987)
+/ Atleta (1991)
 /-------------------------------------------------------------------*/
-ROM_START(pinmoonl)
-	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD("ci-3.bin", 0x0000, 0x2000, CRC(56b901ae) SHA1(7269d1a100c378b21454f9f80f5bd9fbb736c222))
+ROM_START(atleta)
+	ROM_REGION(0x4000, "maincpu", 0)
+	ROM_LOAD("atleta0.cpu", 0x0000, 0x2000, CRC(5f27240f) SHA1(8b77862fa311d703b3af8a1db17e13b17dca7ec6))
+	ROM_LOAD("atleta1.cpu", 0x2000, 0x2000, CRC(12bef582) SHA1(45e1da318141d9228bc91a4e09fff6bf6f194235))
 
 	ROM_REGION(0x2000, "audiocpu", 0)
-	ROM_LOAD("ci-11.bin", 0x0000, 0x2000, CRC(a0732fe4) SHA1(54f62cd81bdb7e1924acb67ddbe43eb3d0a4eab0))
+	ROM_LOAD("atletaa.snd", 0x0000, 0x2000, CRC(051c5329) SHA1(339115af4a2e3f1f2c31073cbed1842518d5916e))
 
 	ROM_REGION(0x40000, "user1", 0)
-	ROM_LOAD("ci-24.bin", 0x00000, 0x10000, CRC(6406bd18) SHA1(ae45ed9e8b1fd278a36a68b780352dbbb6ee781e))
-	ROM_LOAD("ci-23.bin", 0x10000, 0x10000, CRC(eac346da) SHA1(7c4c26ae089dda0dcd7300fd1ecabf5a91099c41))
-	ROM_LOAD("ci-22.bin", 0x20000, 0x10000, CRC(379740da) SHA1(83ad13ab7f1f37c78397d8e830bd74c5a7aea758))
-	ROM_LOAD("ci-21.bin", 0x30000, 0x10000, CRC(0febb4a7) SHA1(e6cc1b26ddfe9cd58da29de2a50a83ce50afe323))
+	ROM_LOAD("atletab.snd", 0x00000, 0x10000, CRC(7f155828) SHA1(e459c81b2c2e47d4276344d8d6a08c2c6242f941))
+	ROM_LOAD("atletac.snd", 0x10000, 0x10000, CRC(20456363) SHA1(b226400dac35dedc039a7e03cb525c6033b24ebc))
+	ROM_LOAD("atletad.snd", 0x20000, 0x10000, CRC(6518e3a4) SHA1(6b1d852005dabb76c7c65b87ecc9ee1422f16737))
+	ROM_LOAD("atletae.snd", 0x30000, 0x10000, CRC(1ef7b099) SHA1(08400db3e238baf1673a2da604c999db6be30ffe))
+ROM_END
+
+/*-------------------------------------------------------------------
+/ 250 CC (1992)
+/-------------------------------------------------------------------*/
+ROM_START(ind250cc)
+	ROM_REGION(0x4000, "maincpu", 0)
+	ROM_LOAD("0-250cc.bin", 0x0000, 0x2000, CRC(753d82ec) SHA1(61950336ba571f9f75f2fc31ccb7beaf4e05dddc))
+
+	ROM_REGION(0x2000, "audiocpu", 0)
+	ROM_LOAD("a-250cc.bin", 0x0000, 0x2000, CRC(b64bdafb) SHA1(eab6d54d34b44187d454c1999e4bcf455183d5a0))
+
+	ROM_REGION(0x40000, "user1", 0)
+	ROM_LOAD("b-250cc.bin", 0x00000, 0x10000, CRC(884c31c8) SHA1(23a838f1f0cb4905fa8552579b5452134f0fc9cc))
+	ROM_LOAD("c-250cc.bin", 0x10000, 0x10000, CRC(5a1dfa1d) SHA1(4957431d87be0bb6d27910b718f7b7edcd405fff))
+	ROM_LOAD("d-250cc.bin", 0x20000, 0x10000, CRC(a0940387) SHA1(0e06483e3e823bf4673d8e0bd120b0a6b802035d))
+	ROM_LOAD("e-250cc.bin", 0x30000, 0x10000, CRC(538b3274) SHA1(eb76c41a60199bb94aec4666222e405bbcc33494))
 ROM_END
 
 /*-------------------------------------------------------------------
 / Metal Man (1992)
 /-------------------------------------------------------------------*/
 ROM_START(metalman)
-	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD("cpu_0.bin", 0x00000, 0x02000, CRC(7fe4335b) SHA1(52ef2efa29337eebd8c2c9a8aec864356a6829b6))
-	ROM_LOAD("cpu_1.bin", 0x02000, 0x02000, CRC(2cca735e) SHA1(6a76017dfbcac0d57fcec8f07f92d5e04dd3e00b))
+	ROM_REGION(0x4000, "maincpu", 0)
+	ROM_LOAD("cpu_0.bin", 0x0000, 0x2000, CRC(7fe4335b) SHA1(52ef2efa29337eebd8c2c9a8aec864356a6829b6))
+	ROM_LOAD("cpu_1.bin", 0x2000, 0x2000, CRC(2cca735e) SHA1(6a76017dfbcac0d57fcec8f07f92d5e04dd3e00b))
 
 	ROM_REGION(0x2000, "audiocpu", 0)
 	ROM_LOAD("sound_e1.bin", 0x0000, 0x2000, CRC(55e889e8) SHA1(0a240868c1b17762588c0ed9a14f568a6e50f409))
@@ -713,15 +934,17 @@ ROM_START(metalman)
 	ROM_LOAD("sound_m3.bin", 0x40000, 0x20000, CRC(4d9f5ed2) SHA1(bc6b7c70369c25eddddac5304497f30cee7675d4))
 ROM_END
 
-// sn76489
-GAME(1985,  brvteam,    0,    inder,    inder,    inder_state, inder,  ROT0, "Inder", "Brave Team",         GAME_MECHANICAL)
 
-// ay8910
+// old cpu board, 6 digits, sn76489
+GAME(1985,  brvteam,    0,    brvteam,  brvteam,  inder_state, inder,  ROT0, "Inder", "Brave Team",         GAME_MECHANICAL)
+
+// old cpu board, 7 digits, ay8910
 GAME(1986,  canasta,    0,    canasta,  canasta,  inder_state, inder,  ROT0, "Inder", "Canasta '86'",       GAME_MECHANICAL)
 
-// sound cpu with 2x ay8910
+// old cpu board, 7 digits, sound cpu with 2x ay8910
 GAME(1986,  lapbylap,   0,    lapbylap, lapbylap, inder_state, inder,  ROT0, "Inder", "Lap By Lap",         GAME_MECHANICAL)
 
+// new cpu board, sound board with msm5205
 GAME(1987,  pinmoonl,   0,    inder,    inder,    inder_state, inder,  ROT0, "Inder", "Moon Light (Inder)", GAME_IS_SKELETON_MECHANICAL)
 GAME(1988,  pinclown,   0,    inder,    inder,    inder_state, inder,  ROT0, "Inder", "Clown (Inder)",      GAME_IS_SKELETON_MECHANICAL)
 GAME(1989,  corsario,   0,    inder,    inder,    inder_state, inder,  ROT0, "Inder", "Corsario",           GAME_IS_SKELETON_MECHANICAL)
