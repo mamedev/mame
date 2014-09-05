@@ -6662,7 +6662,8 @@ ROM_START( galaxian )
 ROM_END
 
 /* Suspected of being Space Warp - ASCII shows "COPYRIGHT 1983", "CENTURY ELECTRONICS UK LTD" in swarpt7f.bin */
-ROM_START( spcwarpc )
+/* S2650 CPU, not Z80 */
+ROM_START( spcwarp )
 	ROM_REGION( 0x4000, "maincpu", 0 )
 	ROM_LOAD( "swarpt7f.bin", 0x0000, 0x1000, CRC(04d744e3) SHA1(db8218510052a05670cb0b722b73d3f10464788c) )
 	ROM_LOAD( "swarpt7h.bin", 0x1000, 0x1000, CRC(34a36536) SHA1(bc438515618683b2a7c29637871ee00ed95ad7f8) )
@@ -10631,7 +10632,6 @@ GAME( 1980, supergx,  galaxian, galaxian, superg, galaxian_state,   galaxian, RO
 GAME( 19??, tst_galx, galaxian, galaxian, galaxian, galaxian_state, galaxian, ROT90,  "<unknown>", "Galaxian Test ROM", GAME_SUPPORTS_SAVE )
 GAME( 1980, galaxrf,  galaxian, galaxian, galaxrf, galaxian_state,  galaxian, ROT90,  "bootleg (Recreativos Franco S.A.)", "Galaxian (Recreativos Franco S.A. Spanish bootleg)", GAME_SUPPORTS_SAVE )
 GAME( 1980, galaxrfgg,galaxian, galaxian, galaxrf, galaxian_state,  galaxian, ROT90,  "bootleg (Recreativos Franco S.A.)", "Galaxian Growing Galaxip / Galaxian Nave Creciente (Recreativos Franco S.A. Spanish bootleg)", GAME_SUPPORTS_SAVE )
-GAME( 1983, spcwarpc, galaxian, galaxian, galaxian, galaxian_state, galaxian, ROT90,  "Century Electronics CO LTD", "Space Warp (Century Electronics)", GAME_NOT_WORKING | GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
 
 /* other games on basic galaxian hardware */
 GAME( 1981, blkhole,  0,        galaxian, blkhole, galaxian_state,  galaxian, ROT90,  "TDS & MINTS", "Black Hole", GAME_SUPPORTS_SAVE )
@@ -10640,6 +10640,7 @@ GAME( 1980, luctoday, 0,        galaxian, luctoday, galaxian_state, galaxian, RO
 GAME( 19??, chewing,  luctoday, galaxian, luctoday, galaxian_state, galaxian, ROT90,  "<unknown>", "Chewing Gum", GAME_SUPPORTS_SAVE )
 GAME( 1982, catacomb, 0,        galaxian, catacomb, galaxian_state, galaxian, ROT90,  "MTM Games", "Catacomb", GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
 GAME( 19??, omega,    theend,   galaxian, omega, galaxian_state,    galaxian, ROT270, "bootleg?", "Omega", GAME_SUPPORTS_SAVE )
+GAME( 1983, spcwarp,  0,        galaxian, galaxian, galaxian_state, galaxian, ROT90,  "Century Electronics", "Space Warp?", GAME_NOT_WORKING | GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
 
 /* these games require the coin lockout mechanism to be disabled */
 GAME( 1981, warofbug, 0,        galaxian, warofbug, galaxian_state, nolock,   ROT90,  "Armenia / Food and Fun Corp", "War of the Bugs or Monsterous Manouvers in a Mushroom Maze", GAME_SUPPORTS_SAVE )
