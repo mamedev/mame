@@ -23851,6 +23851,19 @@
 	</software>
 
 
+	<software name="188in1" supported="partial">
+		<description>Color GameBoy 188 in 1 (HK)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_188in1" />
+			<dataarea name="rom" size="8388608">
+				<rom name="m29w640ft.u2" size="8388608" crc="e4068d7d" sha1="e61ee50ed39fd5b5cc8bdcb96fe1c3cccdcfc76f" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+
 <!-- Non game cartridges -->
 
 	<software name="ggenie" supported="no">

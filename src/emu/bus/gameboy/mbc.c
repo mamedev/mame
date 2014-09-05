@@ -24,6 +24,7 @@ const device_type GB_ROM_MBC5 = &device_creator<gb_rom_mbc5_device>;
 const device_type GB_ROM_MBC6 = &device_creator<gb_rom_mbc6_device>;
 const device_type GB_ROM_MBC7 = &device_creator<gb_rom_mbc7_device>;
 const device_type GB_ROM_MMM01 = &device_creator<gb_rom_mmm01_device>;
+const device_type GB_ROM_188IN1 = &device_creator<gb_rom_188in1_device>;
 const device_type GB_ROM_SINTAX = &device_creator<gb_rom_sintax_device>;
 const device_type GB_ROM_CHONGWU = &device_creator<gb_rom_chongwu_device>;
 const device_type GB_ROM_LICHENG = &device_creator<gb_rom_licheng_device>;
@@ -35,6 +36,11 @@ const device_type GB_ROM_SM3SP = &device_creator<gb_rom_sm3sp_device>;
 gb_rom_mbc_device::gb_rom_mbc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 					: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 						device_gb_cart_interface( mconfig, *this )
+{
+}
+
+gb_rom_mbc1_device::gb_rom_mbc1_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+					: gb_rom_mbc_device(mconfig, type, name, tag, owner, clock, shortname, source)
 {
 }
 
@@ -80,6 +86,11 @@ gb_rom_mbc7_device::gb_rom_mbc7_device(const machine_config &mconfig, const char
 
 gb_rom_mmm01_device::gb_rom_mmm01_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: gb_rom_mbc_device(mconfig, GB_ROM_MMM01, "GB MMM01 Carts", tag, owner, clock, "gb_rom_mmm01", __FILE__)
+{
+}
+
+gb_rom_188in1_device::gb_rom_188in1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+					: gb_rom_mbc1_device(mconfig, GB_ROM_188IN1, "GB 188in1", tag, owner, clock, "gb_rom_188in1", __FILE__)
 {
 }
 
@@ -261,7 +272,6 @@ WRITE8_MEMBER(gb_rom_mbc_device::write_ram)
 
 
 // MBC1
-
 
 READ8_MEMBER(gb_rom_mbc1_device::read_rom)
 {
@@ -688,6 +698,39 @@ WRITE8_MEMBER(gb_rom_mmm01_device::write_bank)
 		}
 	}
 }
+
+// 188 in 1 pirate (only preliminary)
+
+READ8_MEMBER(gb_rom_188in1_device::read_rom)
+{
+	if (offset < 0x4000)
+		return m_rom[m_game_base + rom_bank_map[m_latch_bank] * 0x4000 + (offset & 0x3fff)];
+	else
+		return m_rom[m_game_base + rom_bank_map[m_latch_bank2] * 0x4000 + (offset & 0x3fff)];
+}
+
+WRITE8_MEMBER(gb_rom_188in1_device::write_bank)
+{
+	if (offset == 0x7b00)
+	{
+		if (data < 0x80)
+			logerror("write to 0x%X data 0x%X\n", offset, data);
+		else
+		{
+			data -= 0x80;
+			m_game_base = 0x400000 + (data * 0x8000);
+			//logerror("offset 0x%X\n", m_game_base);
+		}
+	}
+	else if (offset == 0x7b01 || offset == 0x7b02)
+	{
+		// what do these writes do?
+		printf("write to 0x%X data 0x%X\n", offset, data);
+	}
+	else
+		gb_rom_mbc1_device::write_bank(space, offset, data);
+}
+
 
 // MBC5 variant used by Li Cheng / Niutoude games
 

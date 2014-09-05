@@ -35,6 +35,7 @@ class gb_rom_mbc1_device : public gb_rom_mbc_device
 {
 public:
 	// construction/destruction
+	gb_rom_mbc1_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 	gb_rom_mbc1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
@@ -176,6 +177,25 @@ public:
 	UINT8 m_bank_mask, m_bank, m_reg;
 };
 
+// ======================> gb_rom_188in1_device
+class gb_rom_188in1_device : public gb_rom_mbc1_device
+{
+public:
+	// construction/destruction
+	gb_rom_188in1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	
+	// device-level overrides
+	virtual void device_start() { shared_start(); save_item(NAME(m_game_base)); };
+	virtual void device_reset() { shared_reset(); m_game_base = 0; };
+	
+	// reading and writing
+	virtual DECLARE_READ8_MEMBER(read_rom);
+	virtual DECLARE_WRITE8_MEMBER(write_bank);
+
+private:
+	UINT32 m_game_base;
+};
+
 // ======================> gb_rom_sintax_device
 class gb_rom_sintax_device : public gb_rom_mbc_device
 {
@@ -293,6 +313,7 @@ extern const device_type GB_ROM_MBC5;
 extern const device_type GB_ROM_MBC6;
 extern const device_type GB_ROM_MBC7;
 extern const device_type GB_ROM_MMM01;
+extern const device_type GB_ROM_188IN1;
 extern const device_type GB_ROM_SINTAX;
 extern const device_type GB_ROM_CHONGWU;
 extern const device_type GB_ROM_LICHENG;

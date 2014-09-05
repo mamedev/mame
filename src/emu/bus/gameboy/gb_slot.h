@@ -27,6 +27,7 @@ enum
 	GB_MBC_LASAMA,       /*    ?? ROM,    ?? RAM - Appears in La Sa Ma */
 	GB_MBC_ATVRACIN,
 	GB_MBC_CAMERA,
+	GB_MBC_188IN1,
 	GB_MBC_SINTAX,
 	GB_MBC_CHONGWU,
 	GB_MBC_LICHENG,
