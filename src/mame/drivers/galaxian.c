@@ -6661,6 +6661,24 @@ ROM_START( galaxian )
 	ROM_LOAD( "6l.bpr",       0x0000, 0x0020, CRC(c3ac9467) SHA1(f382ad5a34d282056c78a5ec00c30ec43772bae2) )
 ROM_END
 
+/* Suspected of being Space Warp - ASCII shows "COPYRIGHT 1983", "CENTURY ELECTRONICS UK LTD" in swarpt7f.bin */
+ROM_START( spcwarpc )
+	ROM_REGION( 0x4000, "maincpu", 0 )
+	ROM_LOAD( "swarpt7f.bin", 0x0000, 0x1000, CRC(04d744e3) SHA1(db8218510052a05670cb0b722b73d3f10464788c) )
+	ROM_LOAD( "swarpt7h.bin", 0x1000, 0x1000, CRC(34a36536) SHA1(bc438515618683b2a7c29637871ee00ed95ad7f8) )
+/* ROMCMP reports "BADADDR            xxxxxx-xxxxx".  Observed data sequence repeated every 32 bytes */
+	ROM_LOAD( "swarpt7m.bin", 0x2000, 0x1000, BAD_DUMP CRC(a2dff6c8) SHA1(d1c72848450dc5ff386dc94a26e4bf704ccc7121) )
+/* Stripped "repaired" rom.  Was original rom supposed to be 0x1000 or 0x800? */
+//	ROM_LOAD( "swarpt7m-repair.bin", 0x2000, 0x0800, CRC(109f95cf) SHA1(d99171ffd6639fec28966edaf7cce3a4df5e948d) )
+
+	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_LOAD( "swarpb1h.bin", 0x0000, 0x0800, CRC(6ee3b5f7) SHA1(8150f2ecd59d3a165c0541b550664c56d049edd5) )
+	ROM_LOAD( "swarpb1k.bin", 0x0800, 0x0800, CRC(da4cee6b) SHA1(28b91381658f598fa62049489beee443232825c6) )
+
+	ROM_REGION( 0x0020, "proms", 0 ) /* unknown - using Galaxian's prom for now */
+	ROM_LOAD( "6l.bpr",       0x0000, 0x0020, CRC(c3ac9467) SHA1(f382ad5a34d282056c78a5ec00c30ec43772bae2) )
+ROM_END
+
 ROM_START( galaxiana )
 	ROM_REGION( 0x4000, "maincpu", 0 )
 	ROM_LOAD( "7f.bin",       0x0000, 0x1000, CRC(4335b1de) SHA1(e41e3d90dac738cf71377f3b476ec67b14dee27a) )
@@ -6801,7 +6819,6 @@ ROM_START( moonaln )
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "6l.bpr",       0x0000, 0x0020, CRC(c3ac9467) SHA1(f382ad5a34d282056c78a5ec00c30ec43772bae2) )
 ROM_END
-
 ROM_START( superg )
 	ROM_REGION( 0x4000, "maincpu", 0 )
 	ROM_LOAD( "7f.bin",       0x0000, 0x1000, CRC(4335b1de) SHA1(e41e3d90dac738cf71377f3b476ec67b14dee27a) )
@@ -10614,6 +10631,7 @@ GAME( 1980, supergx,  galaxian, galaxian, superg, galaxian_state,   galaxian, RO
 GAME( 19??, tst_galx, galaxian, galaxian, galaxian, galaxian_state, galaxian, ROT90,  "<unknown>", "Galaxian Test ROM", GAME_SUPPORTS_SAVE )
 GAME( 1980, galaxrf,  galaxian, galaxian, galaxrf, galaxian_state,  galaxian, ROT90,  "bootleg (Recreativos Franco S.A.)", "Galaxian (Recreativos Franco S.A. Spanish bootleg)", GAME_SUPPORTS_SAVE )
 GAME( 1980, galaxrfgg,galaxian, galaxian, galaxrf, galaxian_state,  galaxian, ROT90,  "bootleg (Recreativos Franco S.A.)", "Galaxian Growing Galaxip / Galaxian Nave Creciente (Recreativos Franco S.A. Spanish bootleg)", GAME_SUPPORTS_SAVE )
+GAME( 1983, spcwarpc, galaxian, galaxian, galaxian, galaxian_state, galaxian, ROT90,  "Century Electronics CO LTD", "Space Warp (Century Electronics)", GAME_NOT_WORKING | GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
 
 /* other games on basic galaxian hardware */
 GAME( 1981, blkhole,  0,        galaxian, blkhole, galaxian_state,  galaxian, ROT90,  "TDS & MINTS", "Black Hole", GAME_SUPPORTS_SAVE )
