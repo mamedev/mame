@@ -1379,8 +1379,8 @@ WRITE16_MEMBER(raiden2_state::sprite_prot_src_w)
 	int x = ((space.read_dword(src+0x08) >> 16) - (sprite_prot_x)) & 0xffff;
 	int y = ((space.read_dword(src+0x04) >> 16) - (sprite_prot_y)) & 0xffff;
 
-	UINT16 head1 = space.read_word(src+cop_spr_unk);
-	UINT16 head2 = space.read_word(src+cop_spr_unk+2);
+	UINT16 head1 = space.read_word(src+cop_spr_off);
+	UINT16 head2 = space.read_word(src+cop_spr_off+2);
 
 	int w = (((head1 >> 8 ) & 7) + 1) << 3;
 	int h = (((head1 >> 12) & 7) + 1) << 3;
@@ -1413,9 +1413,9 @@ READ16_MEMBER(raiden2_state::sprite_prot_maxx_r)
 	return cop_spr_maxx;
 }
 
-READ16_MEMBER(raiden2_state::sprite_prot_unk_r)
+READ16_MEMBER(raiden2_state::sprite_prot_off_r)
 {
-	return cop_spr_unk;
+	return cop_spr_off;
 }
 
 WRITE16_MEMBER(raiden2_state::sprite_prot_dst1_w)
@@ -1428,9 +1428,9 @@ WRITE16_MEMBER(raiden2_state::sprite_prot_maxx_w)
 	cop_spr_maxx = data;
 }
 
-WRITE16_MEMBER(raiden2_state::sprite_prot_unk_w)
+WRITE16_MEMBER(raiden2_state::sprite_prot_off_w)
 {
-	cop_spr_unk = data;
+	cop_spr_off = data;
 }
 
 READ16_MEMBER(raiden2_state::cop_collision_status_y_r)
@@ -1578,7 +1578,7 @@ static ADDRESS_MAP_START( raiden2_cop_mem, AS_PROGRAM, 16, raiden2_state )
 	AM_RANGE(0x006b4, 0x006b7) AM_WRITE(sprcpt_data_2_w)
 	AM_RANGE(0x006b8, 0x006bb) AM_WRITE(sprcpt_val_2_w)
 	AM_RANGE(0x006bc, 0x006bf) AM_WRITE(sprcpt_adr_w)
-	AM_RANGE(0x006c0, 0x006c1) AM_READWRITE(sprite_prot_unk_r, sprite_prot_unk_w)
+	AM_RANGE(0x006c0, 0x006c1) AM_READWRITE(sprite_prot_off_r, sprite_prot_off_w)
 	AM_RANGE(0x006c2, 0x006c3) AM_READWRITE(sprite_prot_src_seg_r, sprite_prot_src_seg_w)
 	AM_RANGE(0x006c6, 0x006c7) AM_WRITE(sprite_prot_dst1_w)
 	AM_RANGE(0x006ca, 0x006cb) AM_WRITE(raiden2_bank_w)

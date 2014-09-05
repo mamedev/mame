@@ -125,12 +125,12 @@ public:
 	DECLARE_READ16_MEMBER( sprite_prot_src_seg_r );
 	DECLARE_READ16_MEMBER ( sprite_prot_dst1_r );
 	DECLARE_READ16_MEMBER( sprite_prot_maxx_r );
-	DECLARE_READ16_MEMBER( sprite_prot_unk_r );
+	DECLARE_READ16_MEMBER( sprite_prot_off_r );
 	DECLARE_WRITE16_MEMBER( sprite_prot_dst1_w );
 	DECLARE_WRITE16_MEMBER( sprite_prot_maxx_w );
-	DECLARE_WRITE16_MEMBER( sprite_prot_unk_w );
+	DECLARE_WRITE16_MEMBER( sprite_prot_off_w );
 
-	UINT16 sprite_prot_x,sprite_prot_y,dst1,cop_spr_maxx,cop_spr_unk;
+	UINT16 sprite_prot_x,sprite_prot_y,dst1,cop_spr_maxx,cop_spr_off;
 	UINT16 sprite_prot_src_addr[2];
 
 	struct
