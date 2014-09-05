@@ -386,7 +386,7 @@ static MACHINE_CONFIG_START( pve500, pve500_state )
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("buzzer", BEEP, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.05)
 
 MACHINE_CONFIG_END
 
