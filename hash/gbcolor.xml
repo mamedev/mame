@@ -23652,6 +23652,10 @@ These were produced between 2000 and 2001 by Rocket Games, run by Datel Design
   * CBA078 Shuma Baolong - Diannao Pian 数码暴龙-电脑篇
   * CBA079 Yingxiong Tianxia 英雄天下
   * CBA080 Sanguozhi Wudai 三国志五代
+  * CBA083 Tai Kong Bao Bei 太空宝贝 
+  * CBA085 Shu Ma Bao Bei - Huojian Bingtuan 数码宝贝-火箭兵团
+  * CBA086 Shu Ma Bao Bei - Chao Mengmeng Fanji Zhan 数码宝贝-超梦梦反击战
+  * CBA087 Shu Ma Bao Bei - Hai Zhi Shen 数码宝贝-海之神
 
 -->
 
@@ -23850,6 +23854,74 @@ These were produced between 2000 and 2001 by Rocket Games, run by Datel Design
 				<rom name="sanguozhi wudai (unlicensed, chinese) (cba080) [raw dump].bin" size="2097152" crc="de136996" sha1="8e476e9db9caceb52d048b28163227d987a09a21" offset="0" />
 			</dataarea>
 			<dataarea name="nvram" size="8192"> <!-- Unconfirmed size -->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="taikonglc" cloneof="firmbaby">
+		<description>Tai Kong Bao Bei (Chi, Li Cheng)</description>
+		<year>200?</year>
+		<publisher>Li Cheng</publisher>
+		<info name="serial" value="CBA083"/>
+		<info name="alt_title" value="太空宝贝"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_licheng" />
+			<!-- cartridge ram -->
+			<dataarea name="rom" size="4194304">
+				<rom name="taikong baobei (unlicensed, chinese) (cba083) [raw dump].bin" size="4194304" crc="23f291b3" sha1="278b484fa26f13a98ae5bbe06d19a5c47ccfcd34" offset="0" />
+			</dataarea>
+			<dataarea name="nvram" size="32768"> <!-- Unconfirmed size -->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="smbbhjbt">
+		<description>Shu Ma Bao Bei - Huo Jian Bing Tuan (Chi)</description>
+		<year>200?</year>
+		<publisher>Li Cheng</publisher>
+		<info name="serial" value="CBA085"/>
+		<info name="alt_title" value="数码宝贝-火箭兵团"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_licheng" />
+			<!-- cartridge ram -->
+			<dataarea name="rom" size="524288">
+				<rom name="shuma baobei - huojian bingtuan (unlicensed, chinese) (cba085) [raw dump].bin" size="524288" crc="b0d45b6a" sha1="5e16517d7d4f9ade3c1a65dfc52ab9d6985a821a" offset="0" />
+			</dataarea>
+			<dataarea name="nvram" size="32768"> <!-- Unconfirmed size -->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="smbbcmm">
+		<description>Shu Ma Bao Bei - Chao Meng Meng Fan Ji Zhan (Chi)</description>
+		<year>200?</year>
+		<publisher>Li Cheng</publisher>
+		<info name="serial" value="CBA086"/>
+		<info name="alt_title" value="数码宝贝-超梦梦反击战"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_licheng" />
+			<!-- cartridge ram -->
+			<dataarea name="rom" size="524288">
+				<rom name="shuma baobei - chao mengmeng fanji zhan (unlicensed, chinese) (cba086) [raw dump].bin" size="524288" crc="fc844e0e" sha1="6abec431a861315fb1b284ff964c2abf933444ae" offset="0" />
+			</dataarea>
+			<dataarea name="nvram" size="32768"> <!-- Unconfirmed size -->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="smbbhzs">
+		<description>Shu Ma Bao Bei - Hai Zhi Shen (Chi)</description>
+		<year>200?</year>
+		<publisher>Li Cheng</publisher>
+		<info name="serial" value="CBA087"/>
+		<info name="alt_title" value="数码宝贝-海之神"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_licheng" />
+			<!-- cartridge ram -->
+			<dataarea name="rom" size="524288">
+				<rom name="shuma baobei - hai zhi shen (unlicensed, chinese) (cba087) [raw dump].bin" size="524288" crc="c3cedaed" sha1="4e7b7b361302e5e400047c9e668f23cbc885a9e0" offset="0" />
+			</dataarea>
+			<dataarea name="nvram" size="32768"> <!-- Unconfirmed size -->
 			</dataarea>
 		</part>
 	</software>
@@ -24411,7 +24483,7 @@ These were produced between 2000 and 2001 by Rocket Games, run by Datel Design
 
 	<software name="taikong" cloneof="firmbaby">
 	<!-- 4MB rom with crc 5b49af92 is taizou's cracked version running on base MBC5 -->
-		<description>Tai Kong Bao Bei (Chi)</description>
+		<description>Tai Kong Bao Bei (Chi, Syntax)</description>
 		<year>200?</year>
 		<publisher>Sintax</publisher>
 		<info name="alt_title" value="太空寶貝"/>

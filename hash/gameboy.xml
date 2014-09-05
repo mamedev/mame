@@ -6749,6 +6749,18 @@
 		</part>
 	</software>
 
+	<software name="gogotankjp" cloneof="gogotank">
+		<description>Go! Go! Tank (Jpn, Prototype)</description>
+		<year>1990</year>
+		<publisher>Copya Systems</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc1" />
+			<dataarea name="rom" size="65536">
+				<rom name="go! go! tank (proto).bin" size="65536" crc="6dcf5e7f" sha1="18bbee226858af45a81f7da1186938f53511ef73" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="gogotank">
 		<description>Go! Go! Tank (USA)</description>
 		<year>1991</year>
