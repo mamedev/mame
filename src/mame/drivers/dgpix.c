@@ -77,6 +77,7 @@ public:
 	DECLARE_DRIVER_INIT(fmaniac3);
 	DECLARE_DRIVER_INIT(xfiles);
 	DECLARE_DRIVER_INIT(kdynastg);
+	DECLARE_DRIVER_INIT(jumpjump);
 	virtual void machine_reset();
 	virtual void video_start();
 	UINT32 screen_update_dgpix(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -546,6 +547,20 @@ ROM_START( fmaniac3 )
 	// not present
 ROM_END
 
+
+ROM_START( jumpjump )
+	ROM_REGION32_BE( 0x2000000, "flash", ROMREGION_ERASE00 ) /* Hyperstone CPU Code & Data */
+	/* 0 - 0x17fffff empty space */
+	ROM_LOAD16_WORD_SWAP( "jumpjump.u8", 0x1800000, 0x400000, CRC(210dfd8b) SHA1(a1aee4ec8c01832e77d2e4e334a62c246d7e3635) )
+	ROM_LOAD16_WORD_SWAP( "jumpjump.u9", 0x1c00000, 0x400000, CRC(16d1e352) SHA1(3c43974fb8d90b0c84472dd9f2167eb983142095) )
+
+	ROM_REGION( 0x400000, "cpu1", 0 ) /* sound rom */
+	ROM_LOAD16_WORD_SWAP( "jumpjump.u10", 0x000000, 0x400000, CRC(2152ecce) SHA1(522d389952a07fa0830ca8aaa6de3aacf834e32e) )
+
+	ROM_REGION( 0x1000, "cpu2", ROMREGION_ERASEFF ) /* PIC */
+	// S831D dgPIX-PR1
+ROM_END
+
 DRIVER_INIT_MEMBER(dgpix_state,xfiles)
 {
 	UINT8 *rom = (UINT8 *)memregion("flash")->base() + 0x1c00000;
@@ -588,6 +603,14 @@ DRIVER_INIT_MEMBER(dgpix_state,fmaniac3)
 	m_flash_roms = 2;
 }
 
+DRIVER_INIT_MEMBER(dgpix_state,jumpjump)
+{
+	m_flash_roms = 2;
+
+	// todo: patches
+}
+
 GAME( 1999, xfiles,   0, dgpix, dgpix, dgpix_state, xfiles,   ROT0, "dgPIX Entertainment Inc.", "X-Files",                           GAME_NO_SOUND )
 GAME( 1999, kdynastg, 0, dgpix, dgpix, dgpix_state, kdynastg, ROT0, "EZ Graphics",              "King of Dynast Gear (version 1.8)", GAME_NO_SOUND )
 GAME( 2002, fmaniac3, 0, dgpix, dgpix, dgpix_state, fmaniac3, ROT0, "Saero Entertainment",      "Fishing Maniac 3",                  GAME_NO_SOUND )
+GAME( 1999, jumpjump, 0, dgpix, dgpix, dgpix_state, jumpjump, ROT0, "dgPIX Entertainment Inc.", "Jump Jump",                         GAME_NOT_WORKING | GAME_NO_SOUND )
