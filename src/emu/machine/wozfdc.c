@@ -552,4 +552,9 @@ void appleiii_fdc::control_dx(int offset)
 		default:    // cod8-c0df are not FDC related
 			break;
 	}
+
+	if (offset < 8)
+	{
+		a3_update_drive_sel(); 
+	}
 }
