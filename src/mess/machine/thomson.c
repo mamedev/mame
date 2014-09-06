@@ -2039,9 +2039,15 @@ void thomson_state::to9_set_video_mode( UINT8 data, int style )
 			thom_set_video_mode( THOM_VMODE_TO9 );
 		break;
 
+        // undocumented, but tested on a real TO8D
+        case 0x20: thom_set_video_mode( THOM_VMODE_MO5 );         break;
+
 	case 0x21: thom_set_video_mode( THOM_VMODE_BITMAP4 );     break;
 
 	case 0x41: thom_set_video_mode( THOM_VMODE_BITMAP4_ALT ); break;
+
+        // also undocumented but tested
+	case 0x59: thom_set_video_mode( THOM_VMODE_BITMAP4_ALT_HALF ); break;
 
 	case 0x2a:
 		if ( style==0 )
@@ -2110,7 +2116,6 @@ WRITE8_MEMBER( thomson_state::to9_vreg_w )
 		color = m_to9_palette_data[ 2 * idx + 1 ];
 		color = m_to9_palette_data[ 2 * idx ] | (color << 8);
 		thom_set_palette( idx ^ 8, color & 0x1fff );
-
 		m_to9_palette_idx = ( m_to9_palette_idx + 1 ) & 31;
 	}
 	break;

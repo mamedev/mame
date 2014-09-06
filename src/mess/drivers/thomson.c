@@ -1091,6 +1091,9 @@ static MACHINE_CONFIG_DERIVED( mo5, to7 )
 
 	MCFG_DEVICE_REMOVE( "mc6846" )
 
+       MCFG_PALETTE_MODIFY( "palette" )
+	MCFG_PALETTE_INIT_OWNER(thomson_state, mo5)
+
 	MCFG_DEVICE_MODIFY(THOM_PIA_SYS)
 	MCFG_PIA_READPA_HANDLER(READ8(thomson_state, mo5_sys_porta_in))
 	MCFG_PIA_READPB_HANDLER(READ8(thomson_state, mo5_sys_portb_in))

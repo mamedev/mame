@@ -495,6 +495,29 @@ UPDATE_LOW( bitmap4alt )
 END_UPDATE
 
 
+/* 160x200, 4 colors, no constraint, using only one memory page (undocumented) */
+
+UPDATE_HI( bitmap4althalf )
+{
+	dst[ 0] = dst[ 1] = dst[ 2] = dst[ 3] = pal[ rama >> 6 ];
+	dst[ 4] = dst[ 5] = dst[ 6] = dst[ 7] = pal[ (rama >> 4) & 3 ];
+	dst[ 8] = dst[ 9] = dst[10] = dst[11] = pal[ (rama >> 2) & 3];
+	dst[12] = dst[13] = dst[14] = dst[15] = pal[ rama & 3 ];
+	(void)ramb; // ramb is not used
+}
+END_UPDATE
+
+UPDATE_LOW( bitmap4althalf )
+{
+	dst[0] = dst[1] = pal[ rama >> 6 ];
+	dst[2] = dst[3] = pal[ (rama >> 4) & 3 ];
+	dst[4] = dst[5] = pal[ (rama >> 2) & 3];
+	dst[6] = dst[7] = pal[ rama & 3 ];
+	(void)ramb; // ramb is not used
+}
+END_UPDATE
+
+
 
 /* 160x200, 16-colors, no constraint */
 
@@ -702,6 +725,7 @@ static const thom_scandraw thom_scandraw_funcs[THOM_VMODE_NB][2] =
 	FUN(to770),    FUN(mo5),    FUN(bitmap4), FUN(bitmap4alt),  FUN(mode80),
 	FUN(bitmap16), FUN(page1),  FUN(page2),   FUN(overlay),     FUN(overlay3),
 	FUN(to9), FUN(mode80_to9),
+        FUN(bitmap4althalf),
 };
 
 
@@ -1002,7 +1026,10 @@ void thomson_state::thom_vblank( screen_device &screen, bool state )
 /* -------------- initialization --------------- */
 
 
-
+/* TO7, TO7/70 palette, hardcoded in ROM
+   without further information, we assume that the hardcoded values
+   are the same as those setup by the TO8/TO9+/MO6 when booting up
+ */
 static const UINT16 thom_pal_init[16] =
 {
 	0x1000, /* 0: black */        0x000f, /* 1: red */
@@ -1012,9 +1039,23 @@ static const UINT16 thom_pal_init[16] =
 	0x0777, /* 8: gray */         0x033a, /* 9: pink */
 	0x03a3, /* a: light green */  0x03aa, /* b: light yellow */
 	0x0a33, /* c: light blue */   0x0a3a, /* d: redish pink */
-	0x0ee7, /* e: light cyan */   0x003b, /* f: orange */
+	0x0ee7, /* e: light cyan */   0x007b, /* f: orange */
 };
 
+/* MO5 palette, hardcoded in a ROM
+   values are from "Manuel Technique du MO5", p.19
+ */
+static const UINT16 mo5_pal_init[16] =
+{
+	0x1000, /* 0: black */        0x055f, /* 1: red */
+	0x00f0, /* 2: geen */         0x00ff, /* 3: yellow */
+	0x0f55, /* 4: blue */         0x0f0f, /* 5: purple */
+	0x0ff5, /* 6: cyan */         0x0fff, /* 7: white */
+	0x0aaa, /* 8: gray */         0x0aaf, /* 9: pink */
+	0x0afa, /* a: light green */  0x0aff, /* b: light yellow */
+	0x0fa5, /* c: light blue */   0x0faf, /* d: parama pink */
+	0x0ffa, /* e: light cyan */   0x05af, /* f: orange */
+};
 
 
 VIDEO_START_MEMBER( thomson_state, thom )
@@ -1022,8 +1063,6 @@ VIDEO_START_MEMBER( thomson_state, thom )
 	LOG (( "thom: video start called\n" ));
 
 	/* scan-line state */
-	memcpy( m_thom_last_pal, thom_pal_init, 32 );
-	memcpy( m_thom_pal, thom_pal_init, 32 );
 	memset( m_thom_border_l, 0xff, sizeof( m_thom_border_l ) );
 	memset( m_thom_border_r, 0xff, sizeof( m_thom_border_r ) );
 	memset( m_thom_vbody, 0, sizeof( m_thom_vbody ) );
@@ -1082,15 +1121,13 @@ VIDEO_START_MEMBER( thomson_state, thom )
 }
 
 
-
-PALETTE_INIT_MEMBER(thomson_state, thom)
+/* sets the fixed palette (for MO5,TO7,TO7/70) and gamma correction */
+void thomson_state::thom_configure_palette(double gamma, const UINT16* pal, palette_device& palette)
 {
-	double gamma = 0.6f;
-	unsigned i;
+	memcpy( m_thom_last_pal, pal, 32 );
+	memcpy( m_thom_pal, pal, 32 );
 
-	LOG (( "thom: palette init called\n" ));
-
-	for ( i = 0; i < 4097; i++ )
+	for ( int i = 0; i < 4097; i++ )
 	{
 		UINT8 r = 255. * pow( (i & 15) / 15., gamma );
 		UINT8 g = 255. * pow( ((i>> 4) & 15) / 15., gamma );
@@ -1098,6 +1135,34 @@ PALETTE_INIT_MEMBER(thomson_state, thom)
 		/* UINT8 alpha = i & 0x1000 ? 0 : 255;  TODO: transparency */
 		palette.set_pen_color(i, r, g, b );
 	}
+}
+
+
+PALETTE_INIT_MEMBER(thomson_state, thom)
+{
+	LOG (( "thom: palette init called\n" ));
+
+        /* TO8 and later use an EF9369 color palette chip
+           The spec shows a built-in gamma correction for gamma=2.8
+           i.e., output is out = in ^ (1/2.8)
+
+           For the TO7, the gamma correction is irrelevant.
+           
+           For the TO7/70, we use the same palette and gamma has the TO8,
+           which gives good results (but is not verified).
+         */
+        thom_configure_palette(1.0 / 2.8, thom_pal_init, palette);
+}
+
+PALETTE_INIT_MEMBER(thomson_state, mo5)
+{
+	LOG (( "thom: MO5 palette init called\n" ));
+
+        /* The MO5 has a different fixed palette than the TO7/70.
+           We use a smaller gamma correction which gives intutively better
+           results (but is not verified).
+         */
+        thom_configure_palette(1.0, mo5_pal_init, palette);
 }
 
 
