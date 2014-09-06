@@ -175,7 +175,7 @@ UINT16 raiden2_state::rpc()
 	return m_maincpu->state_int(NEC_IP);
 }
 
-int cnt=0, ccol = 0x6f;
+int cnt=0, ccol = -1;
 
 WRITE16_MEMBER(raiden2_state::cop_pgm_data_w)
 {
@@ -1081,9 +1081,11 @@ void raiden2_state::blend_layer(bitmap_rgb32 &bitmap, const rectangle &cliprect,
 	if(layer == -1)
 		return;
 
-	const UINT8 alpha_active[0x10] = { // MSB first
+	// Tuned for raiden2
+	const UINT8 alpha_active[0x20] = { // MSB first
 		//00    08    10    18    20    28    30    38    40    48    50    58    60    68    70    78
-		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0f, 0x00, 0x0f, 0x00, 0x00
+		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x2f, 0x3f, 0x73, 0xff, 0xfc, 0xf0, 0x04, 0x67,
+		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0f, 0x00, 0x00
 	};
 
 	const pen_t *pens = &m_palette->pen(0);
@@ -1096,7 +1098,16 @@ void raiden2_state::blend_layer(bitmap_rgb32 &bitmap, const rectangle &cliprect,
 			if((val & 0xc000) == layer && (val & 0x000f) != 0x000f) {
 				val &= 0x07ff;
 				int page = val >> 4;
-				if(((alpha_active[page >> 3] & (0x80 >> (page & 7))) || page == ccol) && (val & 0xf) == 0xe)
+				bool active = false;
+				if((val & 0xf) == 0xe && (alpha_active[page >> 3] & (0x80 >> (page & 7))))
+					active = true;
+				if((val & 0x8) == 0x8 && (alpha_active[0x10+(page >> 3)] & (0x80 >> (page & 7))))
+					active = true;
+
+				if(page == ccol)
+					active = !active;
+
+				if(active)
 					*dst = alpha_blend_r32(*dst, pens[val], 0x7f);
 				else
 					*dst = pens[val];
@@ -1123,7 +1134,15 @@ UINT32 raiden2_state::screen_update_raiden2(screen_device &screen, bitmap_rgb32 
 		if (machine().input().code_pressed(KEYCODE_W))
 			ccol++;
 	}
-	ccol &= 0x7f;
+	if(ccol == 0x80)
+		ccol = -1;
+	if(ccol == 0x00)
+		ccol = 0x40;
+	if(ccol == 0x3f)
+		ccol = -1;
+	if(ccol == -2)
+		ccol = 0x7f;
+
 	if(ccol != ocol)
 		popmessage("%02x", ccol);
 
