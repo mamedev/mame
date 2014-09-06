@@ -19,7 +19,7 @@
   - Clown: dips don't always work. No mechanical sounds.
   - Corsario: dips don't always work. No mechanical sounds.
   - Mundial 90: dips don't always work. No mechanical sounds.
-  - Atleta: Switch problem, need the manual. No mechanical sounds.
+  - Atleta: dips don't always work. No mechanical sounds.
   - 250CC: dips don't always work. No mechanical sounds.
   - Metal Man: not working
 
@@ -817,7 +817,6 @@ static INPUT_PORTS_START( mundial )
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-// wrong, no manual available
 static INPUT_PORTS_START( atleta )
 	PORT_START("SW.0")
 	PORT_DIPNAME( 0x80, 0x80, "Balls")
@@ -827,37 +826,32 @@ static INPUT_PORTS_START( atleta )
 	PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C )) // slot 2: 1 moneda 4 partidas
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C )) // and 4c_3c; slot 2: 1 moneda 3 partidas
 	PORT_DIPNAME( 0x0c, 0x0c, "Points for free game")
-	PORT_DIPSETTING(    0x0c, "3000000")
-	PORT_DIPSETTING(    0x08, "3300000")
-	PORT_DIPSETTING(    0x04, "3500000")
-	PORT_DIPSETTING(    0x00, "3800000")
+	PORT_DIPSETTING(    0x0c, "3500000")
+	PORT_DIPSETTING(    0x08, "4000000")
+	PORT_DIPSETTING(    0x04, "4500000")
+	PORT_DIPSETTING(    0x00, "5000000")
 
 	PORT_START("SW.1")
+	PORT_DIPNAME( 0x80, 0x80, "Dianas") // "Dificultad bola extra dianas posterior bancada"
+	PORT_DIPSETTING(    0x80, DEF_STR(Easy)) // "Facil"
+	PORT_DIPSETTING(    0x00, DEF_STR(Hard)) // "Dificil"
 	PORT_DIPNAME( 0x30, 0x30, "High Score") //"Handicap"
-	PORT_DIPSETTING(    0x30, "5000000")
-	PORT_DIPSETTING(    0x20, "5200000")
-	PORT_DIPSETTING(    0x10, "5400000")
-	PORT_DIPSETTING(    0x00, "5600000")
-	PORT_BIT( 0xcf, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_DIPSETTING(    0x30, "5500000")
+	PORT_DIPSETTING(    0x20, "6000000")
+	PORT_DIPSETTING(    0x10, "6500000")
+	PORT_DIPSETTING(    0x00, "7000000")
+	PORT_BIT( 0x4f, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("SW.2")
-	PORT_DIPNAME( 0x30, 0x30, "High Score Returns??") //"Handicap de Vueltas"
-	PORT_DIPSETTING(    0x30, "20")
-	PORT_DIPSETTING(    0x20, "25")
-	PORT_DIPSETTING(    0x10, "30")
-	PORT_DIPSETTING(    0x00, "35")
-	PORT_DIPNAME( 0x01, 0x01, "Apagado de dianas")
-	PORT_DIPSETTING(    0x01, DEF_STR(Easy)) // "Facil"
-	PORT_DIPSETTING(    0x00, DEF_STR(Hard)) // "Dificil"
-	PORT_BIT( 0xce, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("SW.3")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) // "Monedero A"
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) // "Monedero B"
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_QUOTE)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_TILT ) // "Falta"
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_START1 ) // "Pulsador Partidas"
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SERVICE3 ) PORT_NAME("Reset") // "Puesta a cero"
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_NAME("Accounting info") // "Test economico"
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_NAME("Test") // "Test tecnico"
 
@@ -896,7 +890,7 @@ static INPUT_PORTS_START( atleta )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_X) PORT_NAME("Outhole")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_EQUALS)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_BACKSPACE)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_OPENBRACE)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_OPENBRACE)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_CLOSEBRACE)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_BACKSLASH)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_COLON)
@@ -1638,7 +1632,7 @@ GAME(1987,  pinmoonl,   0,    inder,    pinmoonl, inder_state, inder,  ROT0, "In
 GAME(1988,  pinclown,   0,    inder,    pinclown, inder_state, inder1, ROT0, "Inder", "Clown (Inder)",      GAME_MECHANICAL)
 GAME(1989,  corsario,   0,    inder,    corsario, inder_state, inder1, ROT0, "Inder", "Corsario",           GAME_MECHANICAL)
 GAME(1990,  mundial,    0,    inder,    mundial,  inder_state, inder1, ROT0, "Inder", "Mundial 90",         GAME_MECHANICAL)
-GAME(1991,  atleta,     0,    inder,    atleta,   inder_state, inder1, ROT0, "Inder", "Atleta",             GAME_MECHANICAL | GAME_NOT_WORKING )
+GAME(1991,  atleta,     0,    inder,    atleta,   inder_state, inder1, ROT0, "Inder", "Atleta",             GAME_MECHANICAL)
 GAME(1992,  ind250cc,   0,    inder,    ind250cc, inder_state, inder1, ROT0, "Inder", "250 CC",             GAME_MECHANICAL)
 
 // new cpu board, later revision of msm5205 sound board
