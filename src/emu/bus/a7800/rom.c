@@ -347,10 +347,7 @@ WRITE8_MEMBER(a78_rom_sg9_device::write_40xx)
 WRITE8_MEMBER(a78_rom_sg9_pokey_device::write_40xx)
 {
 	if (offset < 0x4000)
-	{
-		printf("write offs 0x%X data 0x%X\n", offset, data);
 		m_pokey->write(space, offset & 0x0f, data);
-	}
 	else if (offset < 0x8000)
 		m_bank = (data & m_bank_mask) + 1;
 }
