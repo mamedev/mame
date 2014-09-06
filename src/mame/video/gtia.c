@@ -818,188 +818,27 @@ static const int    pf_prioindex[256] = {
 /*     */   0x000,0x000,0x000,0x000,0x000,0x000,0x000,0x000,0x000,0x000,0x000,0x000,0x000,0x000,0x000,0x000
 };
 
-#define RENDER_PLAYER(player,color)             \
-static void render_##player##_w1(UINT8 *dst)    \
-{                                               \
-	if( gtia.h.graf##player & 0x80 )            \
-		dst[0] |= color;                        \
-	if( gtia.h.graf##player & 0x40 )            \
-		dst[1] |= color;                        \
-	if( gtia.h.graf##player & 0x20 )            \
-		dst[2] |= color;                        \
-	if( gtia.h.graf##player & 0x10 )            \
-		dst[3] |= color;                        \
-	if( gtia.h.graf##player & 0x08 )            \
-		dst[4] |= color;                        \
-	if( gtia.h.graf##player & 0x04 )            \
-		dst[5] |= color;                        \
-	if( gtia.h.graf##player & 0x02 )            \
-		dst[6] |= color;                        \
-	if( gtia.h.graf##player & 0x01 )            \
-		dst[7] |= color;                        \
-}                                               \
-static void render_##player##_w2(UINT8 *dst)    \
-{                                               \
-	if( gtia.h.graf##player & 0x80 )            \
-	{                                           \
-		dst[ 0] |= color;                       \
-		dst[ 1] |= color;                       \
-	}                                           \
-	if( gtia.h.graf##player & 0x40 )            \
-	{                                           \
-		dst[ 2] |= color;                       \
-		dst[ 3] |= color;                       \
-	}                                           \
-	if( gtia.h.graf##player & 0x20 )            \
-	{                                           \
-		dst[ 4] |= color;                       \
-		dst[ 5] |= color;                       \
-	}                                           \
-	if( gtia.h.graf##player & 0x10 )            \
-	{                                           \
-		dst[ 6] |= color;                       \
-		dst[ 7] |= color;                       \
-	}                                           \
-	if( gtia.h.graf##player & 0x08 )            \
-	{                                           \
-		dst[ 8] |= color;                       \
-		dst[ 9] |= color;                       \
-	}                                           \
-	if( gtia.h.graf##player & 0x04 )            \
-	{                                           \
-		dst[10] |= color;                       \
-		dst[11] |= color;                       \
-	}                                           \
-	if( gtia.h.graf##player & 0x02 )            \
-	{                                           \
-		dst[12] |= color;                       \
-		dst[13] |= color;                       \
-	}                                           \
-	if( gtia.h.graf##player & 0x01 )            \
-	{                                           \
-		dst[14] |= color;                       \
-		dst[15] |= color;                       \
-	}                                           \
-}                                               \
-static void render_##player##_w4(UINT8 *dst)    \
-{                                               \
-	if( gtia.h.graf##player & 0x80 )            \
-	{                                           \
-		dst[ 0] |= color;                       \
-		dst[ 1] |= color;                       \
-		dst[ 2] |= color;                       \
-		dst[ 3] |= color;                       \
-	}                                           \
-	if( gtia.h.graf##player & 0x40 )            \
-	{                                           \
-		dst[ 4] |= color;                       \
-		dst[ 5] |= color;                       \
-		dst[ 6] |= color;                       \
-		dst[ 7] |= color;                       \
-	}                                           \
-	if( gtia.h.graf##player & 0x20 )            \
-	{                                           \
-		dst[ 8] |= color;                       \
-		dst[ 9] |= color;                       \
-		dst[10] |= color;                       \
-		dst[11] |= color;                       \
-	}                                           \
-	if( gtia.h.graf##player & 0x10 )            \
-	{                                           \
-		dst[12] |= color;                       \
-		dst[13] |= color;                       \
-		dst[14] |= color;                       \
-		dst[15] |= color;                       \
-	}                                           \
-	if( gtia.h.graf##player & 0x08 )            \
-	{                                           \
-		dst[16] |= color;                       \
-		dst[17] |= color;                       \
-		dst[18] |= color;                       \
-		dst[19] |= color;                       \
-	}                                           \
-	if( gtia.h.graf##player & 0x04 )            \
-	{                                           \
-		dst[20] |= color;                       \
-		dst[21] |= color;                       \
-		dst[22] |= color;                       \
-		dst[23] |= color;                       \
-	}                                           \
-	if( gtia.h.graf##player & 0x02 )            \
-	{                                           \
-		dst[24] |= color;                       \
-		dst[25] |= color;                       \
-		dst[26] |= color;                       \
-		dst[27] |= color;                       \
-	}                                           \
-	if( gtia.h.graf##player & 0x01 )            \
-	{                                           \
-		dst[28] |= color;                       \
-		dst[29] |= color;                       \
-		dst[30] |= color;                       \
-		dst[31] |= color;                       \
-	}                                           \
-}                                               \
-static void (*const render_##player[4])(UINT8 *dst)={ \
-	render_##player##_w1,                       \
-	render_##player##_w2,                       \
-	render_##player##_w2,                       \
-	render_##player##_w4                        \
+static inline void player_render(UINT8 gfx, int size, UINT8 color, UINT8 *dst)
+{
+	// size is the number of bits in *dst to be filled: 1, 2 or 4
+	if (size == 3)
+		size = 2;
+	for (int i = 0; i < 8; i++)
+		if (BIT(gfx, 7 - i))
+			for (int s = 0; s < size; s++)
+				dst[i * size + s] |= color;
 }
 
-#define RENDER_MISSILE(missile,color)           \
-static void render_##missile##_w1(UINT8 *dst)   \
-{                                               \
-	if( gtia.h.graf##missile & 0x80 )           \
-		dst[0] |= color;                        \
-	if( gtia.h.graf##missile & 0x40 )           \
-		dst[1] |= color;                        \
-}                                               \
-static void render_##missile##_w2(UINT8 *dst)   \
-{                                               \
-	if( gtia.h.graf##missile & 0x80 )           \
-	{                                           \
-		dst[ 0] |= color;                       \
-		dst[ 1] |= color;                       \
-	}                                           \
-	if( gtia.h.graf##missile & 0x40 )           \
-	{                                           \
-		dst[ 2] |= color;                       \
-		dst[ 3] |= color;                       \
-	}                                           \
-}                                               \
-static void render_##missile##_w4(UINT8 *dst)   \
-{                                               \
-	if( gtia.h.graf##missile & 0x80 )           \
-	{                                           \
-		dst[ 0] |= color;                       \
-		dst[ 1] |= color;                       \
-		dst[ 2] |= color;                       \
-		dst[ 3] |= color;                       \
-	}                                           \
-	if( gtia.h.graf##missile & 0x40 )           \
-	{                                           \
-		dst[ 4] |= color;                       \
-		dst[ 5] |= color;                       \
-		dst[ 6] |= color;                       \
-		dst[ 7] |= color;                       \
-	}                                           \
-}                                               \
-static void (*const render_##missile[4])(UINT8 *dst) = { \
-	render_##missile##_w1,                      \
-	render_##missile##_w2,                      \
-	render_##missile##_w2,                      \
-	render_##missile##_w4                       \
+static inline void missile_render(UINT8 gfx, int size, UINT8 color, UINT8 *dst)
+{
+	// size is the number of bits in *dst to be filled: 1, 2 or 4
+	if (size == 3)
+		size = 2;
+	for (int i = 0; i < 2; i++)
+		if (BIT(gfx, 7 - i))
+			for (int s = 0; s < size; s++)
+				dst[i * size + s] |= color;
 }
-
-RENDER_PLAYER(p0,P0);
-RENDER_PLAYER(p1,P1);
-RENDER_PLAYER(p2,P2);
-RENDER_PLAYER(p3,P3);
-RENDER_MISSILE(m0,M0);
-RENDER_MISSILE(m1,M1);
-RENDER_MISSILE(m2,M2);
-RENDER_MISSILE(m3,M3);
 
 
 void gtia_render(VIDEO *video)
@@ -1011,29 +850,23 @@ void gtia_render(VIDEO *video)
 	if( antic.scanline < VBL_END || antic.scanline >= 256 )
 		return;
 
-	if( gtia.h.grafp0 )
-		(*render_p0[gtia.w.sizep0])(&antic.pmbits[gtia.w.hposp0]);
-
-	if( gtia.h.grafp1 )
-		(*render_p1[gtia.w.sizep1])(&antic.pmbits[gtia.w.hposp1]);
-
-	if( gtia.h.grafp2 )
-		(*render_p2[gtia.w.sizep2])(&antic.pmbits[gtia.w.hposp2]);
-
-	if( gtia.h.grafp3 )
-		(*render_p3[gtia.w.sizep3])(&antic.pmbits[gtia.w.hposp3]);
-
-	if( gtia.h.grafm0 )
-		(*render_m0[gtia.w.sizem])(&antic.pmbits[gtia.w.hposm0]);
-
-	if( gtia.h.grafm1 )
-		(*render_m1[gtia.w.sizem])(&antic.pmbits[gtia.w.hposm1]);
-
-	if( gtia.h.grafm2 )
-		(*render_m2[gtia.w.sizem])(&antic.pmbits[gtia.w.hposm2]);
-
-	if( gtia.h.grafm3 )
-		(*render_m3[gtia.w.sizem])(&antic.pmbits[gtia.w.hposm3]);
+	if (gtia.h.grafp0)
+		player_render(gtia.h.grafp0, gtia.w.sizep0 + 1, P0, &antic.pmbits[gtia.w.hposp0]);
+	if (gtia.h.grafp1)
+		player_render(gtia.h.grafp1, gtia.w.sizep1 + 1, P1, &antic.pmbits[gtia.w.hposp1]);
+	if (gtia.h.grafp2)
+		player_render(gtia.h.grafp2, gtia.w.sizep2 + 1, P2, &antic.pmbits[gtia.w.hposp2]);
+	if (gtia.h.grafp3)
+		player_render(gtia.h.grafp3, gtia.w.sizep3 + 1, P3, &antic.pmbits[gtia.w.hposp3]);
+	
+	if (gtia.h.grafm0)
+		missile_render(gtia.h.grafm0, gtia.w.sizem + 1, M0, &antic.pmbits[gtia.w.hposm0]);
+	if (gtia.h.grafm1)
+		missile_render(gtia.h.grafm1, gtia.w.sizem + 1, M1, &antic.pmbits[gtia.w.hposm1]);
+	if (gtia.h.grafm2)
+		missile_render(gtia.h.grafm2, gtia.w.sizem + 1, M2, &antic.pmbits[gtia.w.hposm2]);
+	if (gtia.h.grafm3)
+		missile_render(gtia.h.grafm3, gtia.w.sizem + 1, M3, &antic.pmbits[gtia.w.hposm3]);
 
 	src = antic.pmbits + PMOFFSET;
 	dst = antic.cclock + PMOFFSET - antic.hscrol_old;
