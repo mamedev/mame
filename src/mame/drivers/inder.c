@@ -15,7 +15,7 @@
   - Brave Team: working
   - Canasta '86: working
   - Lap by Lap: working
-  - Moon Light: sound and switches to be fixed
+  - Moon Light: dips don't always work. No mechanical sounds.
   - Clown: sound and switches to be fixed
   - Corsario: sound and switches to be fixed
   - Mundial 90: sound and switches to be fixed
@@ -73,12 +73,15 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(q9a_w);
 	DECLARE_WRITE_LINE_MEMBER(qc9b_w);
 	DECLARE_DRIVER_INIT(inder);
+	DECLARE_DRIVER_INIT(inder1);
 private:
 	bool m_pc0;
+	UINT8 m_game;
 	UINT8 m_portc;
 	UINT8 m_row;
 	UINT8 m_segment[8];
 	UINT8 m_sndcmd;
+	UINT8 m_sndbank;
 	UINT32 m_sound_addr;
 	UINT8 *m_p_speech;
 	virtual void machine_reset();
@@ -147,6 +150,7 @@ static ADDRESS_MAP_START( inder_map, AS_PROGRAM, 8, inder_state )
 	AM_RANGE(0x6c00, 0x6c03) AM_MIRROR(0x131c) AM_DEVREADWRITE("ppi6c", i8255_device, read, write)
 	AM_RANGE(0x6c20, 0x6c3f) AM_MIRROR(0x1300) AM_WRITE(sndcmd_w)
 	AM_RANGE(0x6c60, 0x6c7f) AM_MIRROR(0x1300) AM_WRITE(disp_w)
+	AM_RANGE(0x6ce0, 0x6ce0) AM_WRITENOP
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( inder_sub_map, AS_PROGRAM, 8, inder_state )
@@ -382,9 +386,9 @@ static INPUT_PORTS_START( lapbylap )
 	PORT_DIPNAME( 0x40, 0x40, "Bola Extra En Rampa??") //nfi  // sw R
 	PORT_DIPSETTING(    0x00, "Derribo Completo")
 	PORT_DIPSETTING(    0x40, "Derribo Lateral")
-	PORT_DIPNAME( 0x80, 0x80, "Apagado??") //nfi  // sw Q
-	PORT_DIPSETTING(    0x00, DEF_STR(Hard)) // "Facil"
-	PORT_DIPSETTING(    0x80, DEF_STR(Easy)) // "Dificil"
+	PORT_DIPNAME( 0x80, 0x80, "Apagado de dianas")  // sw Q
+	PORT_DIPSETTING(    0x80, DEF_STR(Easy)) // "Facil"
+	PORT_DIPSETTING(    0x00, DEF_STR(Hard)) // "Dificil"
 	PORT_BIT( 0x3c, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("SW.3")
@@ -449,50 +453,42 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( inder )
 	PORT_START("SW.0")
-	PORT_DIPNAME( 0x03, 0x03, "Coin Slot 1") // sw G,H
-	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C )) // slot 2: 1 moneda 4 partidas
-	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C )) // and 4c_3c; slot 2: 1 moneda 3 partidas
-	PORT_DIPNAME( 0x08, 0x08, "Balls") // sw E
-	PORT_DIPSETTING(    0x08, "3")
+	PORT_DIPNAME( 0x80, 0x80, "Balls")
+	PORT_DIPSETTING(    0x80, "3")
 	PORT_DIPSETTING(    0x00, "5")
-	PORT_DIPNAME( 0x30, 0x20, "Points for free game") // sw C,D
-	PORT_DIPSETTING(    0x00, "2900000")
-	PORT_DIPSETTING(    0x10, "2700000")
-	PORT_DIPSETTING(    0x20, "2500000")
-	PORT_DIPSETTING(    0x30, "2300000")
-	PORT_BIT( 0xc4, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_DIPNAME( 0x30, 0x30, "Coin Slot 1")
+	PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C )) // slot 2: 1 moneda 4 partidas
+	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C )) // and 4c_3c; slot 2: 1 moneda 3 partidas
+	PORT_DIPNAME( 0x0c, 0x0c, "Points for free game")
+	PORT_DIPSETTING(    0x0c, "2600000")
+	PORT_DIPSETTING(    0x08, "3000000")
+	PORT_DIPSETTING(    0x04, "3400000")
+	PORT_DIPSETTING(    0x00, "3800000")
 
 	PORT_START("SW.1")
-	PORT_DIPNAME( 0x03, 0x03, "High Score") //"Handicap"  // sw O,P
-	PORT_DIPSETTING(    0x00, "4600000")
-	PORT_DIPSETTING(    0x01, "4400000")
-	PORT_DIPSETTING(    0x02, "4200000")
-	PORT_DIPSETTING(    0x03, "4000000")
-	PORT_DIPNAME( 0x0c, 0x08, "Extra Ball Award??") //"Comienzo Secuenzia Diana Bola Extra"  // sw M,N
-	PORT_DIPSETTING(    0x04, "50000")
-	PORT_DIPSETTING(    0x08, "25000")
-	PORT_DIPSETTING(    0x0c, "10000")
-	PORT_DIPNAME( 0x10, 0x10, "Extra Ball Derribo??") //"Bola Extra en 1st Derribo Completo"  // sw L
-	PORT_DIPSETTING(    0x00, DEF_STR(No))
-	PORT_DIPSETTING(    0x10, DEF_STR(Yes)) // "Si"
-	PORT_DIPNAME( 0x20, 0x20, "Especiales Laterales??") //need help here guys...  // sw K
-	PORT_DIPSETTING(    0x00, "Derribo Lateral Dianas")
-	PORT_DIPSETTING(    0x20, "Derribo Completo Dianas Laterales")
-	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_DIPNAME( 0x30, 0x30, "High Score") //"Handicap"
+	PORT_DIPSETTING(    0x30, "4800000")
+	PORT_DIPSETTING(    0x20, "5000000")
+	PORT_DIPSETTING(    0x10, "5200000")
+	PORT_DIPSETTING(    0x00, "5400000")
+	PORT_DIPNAME( 0x08, 0x08, "Especial en Picabolas")
+	PORT_DIPSETTING(    0x08, "1st Derribo")
+	PORT_DIPSETTING(    0x00, "2nd Derribo")
+	PORT_DIPNAME( 0x04, 0x04, "Bola Extra En Rampas")
+	PORT_DIPSETTING(    0x04, "4 dianas")
+	PORT_DIPSETTING(    0x00, "2 dianas")
+	PORT_BIT( 0xc3, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("SW.2")
-	PORT_DIPNAME( 0x03, 0x03, "High Score Returns??") //"Handicap de Vueltas"  // sw W,X
-	PORT_DIPSETTING(    0x00, "40")
-	PORT_DIPSETTING(    0x01, "35")
-	PORT_DIPSETTING(    0x02, "30")
-	PORT_DIPSETTING(    0x03, "25")
-	PORT_DIPNAME( 0x40, 0x40, "Bola Extra En Rampa??") //nfi  // sw R
-	PORT_DIPSETTING(    0x00, "Derribo Completo")
-	PORT_DIPSETTING(    0x40, "Derribo Lateral")
-	PORT_DIPNAME( 0x80, 0x80, "Apagado??") //nfi  // sw Q
-	PORT_DIPSETTING(    0x00, DEF_STR(Hard)) // "Facil"
-	PORT_DIPSETTING(    0x80, DEF_STR(Easy)) // "Dificil"
-	PORT_BIT( 0x3c, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_DIPNAME( 0x30, 0x30, "High Score Returns??") //"Handicap de Vueltas"
+	PORT_DIPSETTING(    0x30, "20")
+	PORT_DIPSETTING(    0x20, "25")
+	PORT_DIPSETTING(    0x10, "30")
+	PORT_DIPSETTING(    0x00, "35")
+	PORT_DIPNAME( 0x01, 0x01, "Apagado de dianas")
+	PORT_DIPSETTING(    0x01, DEF_STR(Easy)) // "Facil"
+	PORT_DIPSETTING(    0x00, DEF_STR(Hard)) // "Dificil"
+	PORT_BIT( 0xce, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("SW.3")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) // "Monedero A"
@@ -511,14 +507,14 @@ static INPUT_PORTS_START( inder )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_R)
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_Y)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_U)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_I)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_O)
 
 	PORT_START("SW.5")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_A)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_S)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_D)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_F)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_D)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_F)
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_G)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_H)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_J)
@@ -669,15 +665,20 @@ WRITE8_MEMBER( inder_state::ppi64c_w )
 	{
 		data ^= 15; // now 7 to 0
 		for (i = 0; i < 5; i++)
+		{
+			if ((m_game==1) && (i == 4))  // mundial,clown,250cc,atleta have credit and ball displays swapped
+				data ^= 4;
 			output_set_digit_value(i*10+data, m_segment[i]);
+		}
 	}
 }
 
 WRITE8_MEMBER( inder_state::sndbank_w )
 {
+	m_sndbank = data;
 	UINT8 i;
 	// look for last rom enabled
-	for (i = 0; i < 2; i++)
+	for (i = 0; i < 4; i++)
 		if (!(BIT(data, i)))
 			m_sound_addr = (m_sound_addr & 0x0ffff) | (i << 16);
 }
@@ -688,10 +689,16 @@ WRITE_LINE_MEMBER( inder_state::vck_w )
 	m_9b->clock_w(0);
 	m_9a->clock_w(1);
 	m_9b->clock_w(1);
-	if (!m_pc0)
-		m_msm->data_w(m_p_speech[m_sound_addr] & 15);
+
+	if ((m_sound_addr < 0x40000) && (m_sndbank != 0xff))
+	{
+		if (!m_pc0)
+			m_msm->data_w(m_p_speech[m_sound_addr] & 15);
+		else
+			m_msm->data_w(m_p_speech[m_sound_addr] >> 4);
+	}
 	else
-		m_msm->data_w(m_p_speech[m_sound_addr] >> 4);
+		m_msm->data_w(0);
 }
 
 WRITE_LINE_MEMBER( inder_state::qc7a_w )
@@ -724,8 +731,6 @@ WRITE8_MEMBER( inder_state::ppia_w )
 
 WRITE8_MEMBER( inder_state::ppib_w )
 {
-//	data &= 0x7f;
-//	m_sound_addr = (m_sound_addr & 0x380ff) | (data << 8);
 	m_sound_addr = (m_sound_addr & 0x300ff) | (data << 8);
 }
 
@@ -744,6 +749,7 @@ WRITE8_MEMBER( inder_state::ppic_w )
 void inder_state::machine_reset()
 {
 	m_sound_addr = 0;
+	m_sndbank = 0xff;
 	m_row = 0;
 	if (m_7a)
 		m_7a->clear_w(1);
@@ -758,6 +764,19 @@ DRIVER_INIT_MEMBER( inder_state, inder )
 		m_7a->clear_w(0);
 		m_9b->preset_w(1);
 	}
+	m_game = 0;
+}
+
+DRIVER_INIT_MEMBER( inder_state, inder1 )
+{
+	m_p_speech = memregion("speech")->base();
+	if (m_7a)
+	{
+		m_7a->d_w(0);
+		m_7a->clear_w(0);
+		m_9b->preset_w(1);
+	}
+	m_game = 1;
 }
 
 static MACHINE_CONFIG_START( brvteam, inder_state )
@@ -1051,19 +1070,21 @@ ROM_END
 
 
 // old cpu board, 6 digits, sn76489
-GAME(1985,  brvteam,    0,    brvteam,  brvteam,  inder_state, inder,  ROT0, "Inder", "Brave Team",         GAME_MECHANICAL)
+GAME(1985,  brvteam,    0,    brvteam,  brvteam,  driver_device, 0,    ROT0, "Inder", "Brave Team",         GAME_MECHANICAL)
 
 // old cpu board, 7 digits, ay8910
-GAME(1986,  canasta,    0,    canasta,  canasta,  inder_state, inder,  ROT0, "Inder", "Canasta '86'",       GAME_MECHANICAL)
+GAME(1986,  canasta,    0,    canasta,  canasta,  driver_device, 0,    ROT0, "Inder", "Canasta '86'",       GAME_MECHANICAL)
 
 // old cpu board, 7 digits, sound cpu with 2x ay8910
-GAME(1986,  lapbylap,   0,    lapbylap, lapbylap, inder_state, inder,  ROT0, "Inder", "Lap By Lap",         GAME_MECHANICAL)
+GAME(1986,  lapbylap,   0,    lapbylap, lapbylap, driver_device, 0,    ROT0, "Inder", "Lap By Lap",         GAME_MECHANICAL)
 
 // new cpu board, sound board with msm5205
-GAME(1987,  pinmoonl,   0,    inder,    inder,    inder_state, inder,  ROT0, "Inder", "Moon Light (Inder)", GAME_IS_SKELETON_MECHANICAL)
-GAME(1988,  pinclown,   0,    inder,    inder,    inder_state, inder,  ROT0, "Inder", "Clown (Inder)",      GAME_IS_SKELETON_MECHANICAL)
-GAME(1989,  corsario,   0,    inder,    inder,    inder_state, inder,  ROT0, "Inder", "Corsario",           GAME_IS_SKELETON_MECHANICAL)
-GAME(1990,  mundial,    0,    inder,    inder,    inder_state, inder,  ROT0, "Inder", "Mundial 90",         GAME_IS_SKELETON_MECHANICAL)
-GAME(1991,  atleta,     0,    inder,    inder,    inder_state, inder,  ROT0, "Inder", "Atleta",             GAME_IS_SKELETON_MECHANICAL)
-GAME(1992,  ind250cc,   0,    inder,    inder,    inder_state, inder,  ROT0, "Inder", "250 CC",             GAME_IS_SKELETON_MECHANICAL)
+GAME(1987,  pinmoonl,   0,    inder,    inder,    inder_state, inder,  ROT0, "Inder", "Moon Light (Inder)", GAME_MECHANICAL)
+GAME(1988,  pinclown,   0,    inder,    inder,    inder_state, inder1, ROT0, "Inder", "Clown (Inder)",      GAME_IS_SKELETON_MECHANICAL)
+GAME(1989,  corsario,   0,    inder,    inder,    inder_state, inder1, ROT0, "Inder", "Corsario",           GAME_IS_SKELETON_MECHANICAL)
+GAME(1990,  mundial,    0,    inder,    inder,    inder_state, inder1, ROT0, "Inder", "Mundial 90",         GAME_IS_SKELETON_MECHANICAL)
+GAME(1991,  atleta,     0,    inder,    inder,    inder_state, inder1, ROT0, "Inder", "Atleta",             GAME_IS_SKELETON_MECHANICAL)
+GAME(1992,  ind250cc,   0,    inder,    inder,    inder_state, inder1, ROT0, "Inder", "250 CC",             GAME_IS_SKELETON_MECHANICAL)
+
+// new cpu board, later revision of msm5205 sound board
 GAME(1992,  metalman,   0,    inder,    inder,    inder_state, inder,  ROT0, "Inder", "Metal Man",          GAME_IS_SKELETON_MECHANICAL)
