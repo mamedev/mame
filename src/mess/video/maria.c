@@ -4,6 +4,10 @@
 
  
   - some history:
+    2014-10-03 Mike Saarna, Robert Tuccitto reorganized DMA penalties to 
+				support new rendering timeout code.
+
+    2014-08-29 Mike Saarna Timeout rendering added.
  
     2014-08-26 Fabio Priuli Converted to device
 
@@ -161,17 +165,10 @@ void atari_maria_device::draw_scanline()
 	int d, c, pixel_cell, cells;
 	int maria_cycles;
 
-	if (m_offset == 0)
-	{
-		if (READ_MEM(m_dll + 3) & 0x80)
-			maria_cycles = 40; // DMA + maria interrupt overhead
-		else
-			maria_cycles = 19; // DMA
-		}
-		else
-		{
-			maria_cycles = 16; // DMA
-		}
+	// All lines in a zone have the same initial DMA startup time. We'll adjust
+	// cycles for the special last zone line later, as those penalties happen after
+	// MARIA is done rendering, or after its hit the maximum rendering time.
+	maria_cycles = 16; 
 
 	cells = 0;
 
@@ -179,8 +176,10 @@ void atari_maria_device::draw_scanline()
 	dl = m_dl;
 
 	/* DMA */
-	/* Step through DL's */
-	while ((READ_MEM(dl + 1) & 0x5f) != 0)
+	/* Step through DL's while we're within maximum rendering time.   max render time = ( scanline length - DMA start ) */
+	/*                                                                   426          = (     454         -     28    ) */
+
+	while (((READ_MEM(dl + 1) & 0x5f) != 0) && (maria_cycles<426))
 	{
 		/* Extended header */
 		if (!(READ_MEM(dl + 1) & 0x1f))
@@ -210,6 +209,9 @@ void atari_maria_device::draw_scanline()
 
 		for (int x = 0; x < width; x++)
 		{
+			if (maria_cycles >= 426) // ensure we haven't overrun the maximum render time
+				break;
+
 			/* Do indirect mode */
 			if (ind)
 			{
@@ -217,7 +219,7 @@ void atari_maria_device::draw_scanline()
 				data_addr = (m_charbase | c) + (m_offset << 8);
 				if (is_holey(data_addr))
 					continue;
-
+				
 				maria_cycles += 3;
 				if (m_cwidth) // two data bytes per map byte
 				{
@@ -245,6 +247,15 @@ void atari_maria_device::draw_scanline()
 			}
 		}
 	}
+	
+	// Last Line post-render DMA cycle penalties...
+	if (m_offset == 0) 
+	{
+		maria_cycles += 3; // extra shutdown time
+		if (READ_MEM(m_dll + 3) & 0x80)
+			maria_cycles += 21; // interrupt overhead
+	}
+
 	// Spin the CPU for Maria DMA, if it's not already spinning for WSYNC.
 	// MARIA generates the 6502 clock by dividing its own clock by 4. It needs to HALT and unHALT
 	// the 6502 on ths same clock phase, so MARIA will wait until its clock divides evenly by 4.
