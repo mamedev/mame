@@ -247,7 +247,7 @@ WRITE8_MEMBER(a78_rom_sg_device::write_40xx)
  Carts with SuperGame bankswitch + POKEY chip
  As above + Pokey chip access
  
- GAMES: Commando and Barnyard Blaster
+ GAMES: Commando
  
  -------------------------------------------------*/
 

@@ -365,8 +365,8 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 		<info name="serial" value="CX7859"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
-			<feature name="pcb_type" value="TYPE-3" />
-			<feature name="slot" value="a78_sg_pokey" />
+			<feature name="pcb_type" value="TYPE-2" />
+			<feature name="slot" value="a78_sg" />
 			<feature name="peripheral" value="lightgun" /> <!-- Works with Lightgun -->
 			<dataarea name="rom" size="131072">
 				<rom name="barnyard.bin" size="131072" crc="ed0a587d" sha1="cbcde3d85c8778dea402394568677884cd781de3" offset="0" />
