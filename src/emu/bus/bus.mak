@@ -416,6 +416,7 @@ BUSOBJS += $(BUSOBJ)/isa/xsu_cards.o
 BUSOBJS += $(BUSOBJ)/isa/sc499.o
 BUSOBJS += $(BUSOBJ)/isa/3c505.o
 BUSOBJS += $(BUSOBJ)/isa/aga.o
+BUSOBJS += $(BUSOBJ)/isa/svga_trident.o
 endif
 
 #-------------------------------------------------

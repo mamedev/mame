@@ -24,6 +24,7 @@
 #include "svga_cirrus.h"
 #include "svga_s3.h"
 #include "svga_tseng.h"
+#include "svga_trident.h"
 
 // storage
 #include "fdc.h"
