@@ -25,6 +25,7 @@ BUSOBJS += $(BUSOBJ)/a7800/a78_slot.o
 BUSOBJS += $(BUSOBJ)/a7800/rom.o
 BUSOBJS += $(BUSOBJ)/a7800/hiscore.o
 BUSOBJS += $(BUSOBJ)/a7800/xboard.o
+BUSOBJS += $(BUSOBJ)/a7800/cpuwiz.o
 endif
 
 

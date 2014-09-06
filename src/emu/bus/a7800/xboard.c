@@ -121,7 +121,7 @@ static MACHINE_CONFIG_FRAGMENT( a78_xm )
 	MCFG_SOUND_ADD("xb_pokey", POKEY, XTAL_14_31818MHz/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "xb_speaker", 1.00)
 
-	MCFG_SOUND_ADD("xm_ym2151", YM2151, XTAL_14_31818MHz/8)
+	MCFG_SOUND_ADD("xm_ym2151", YM2151, XTAL_14_31818MHz/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "xb_speaker", 1.00)
 MACHINE_CONFIG_END
 
@@ -228,6 +228,7 @@ WRITE8_MEMBER(a78_xm_device::write_04xx)
 		m_xbslot->write_04xx(space, offset - 0x10, data);	// access second POKEY
 	else if (offset >= 0x70 && offset < 0x80)
 	{
+		//printf("regs 0x%X\n", data);
 		if (data == 0x84)
 			m_ym_enabled = 1;
 		m_reg = data;

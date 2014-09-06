@@ -98,35 +98,14 @@ public:
 };
 
 
-// ======================> a78_rom_bankram_device
+// ======================> a78_rom_sg9_device
 
-class a78_rom_bankram_device : public a78_rom_sg_device
+class a78_rom_sg9_device : public a78_rom_sg_device
 {
 public:
 	// construction/destruction
-	a78_rom_bankram_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
-	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
-	
-	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_40xx);
-	virtual DECLARE_WRITE8_MEMBER(write_40xx);
-
-protected:
-	int m_ram_bank;
-};
-
-
-// ======================> a78_rom_sg_9banks_device
-
-class a78_rom_sg_9banks_device : public a78_rom_sg_device
-{
-public:
-	// construction/destruction
-	a78_rom_sg_9banks_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
-	a78_rom_sg_9banks_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	a78_rom_sg9_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	a78_rom_sg9_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read_40xx);
@@ -134,13 +113,13 @@ public:
 };
 
 
-// ======================> a78_rom_xm_device
+// ======================> a78_rom_sg9_pokey_device
 
-class a78_rom_xm_device : public a78_rom_sg_9banks_device
+class a78_rom_sg9_pokey_device : public a78_rom_sg9_device
 {
 public:
 	// construction/destruction
-	a78_rom_xm_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	a78_rom_sg9_pokey_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	
 	// device-level overrides
 	virtual machine_config_constructor device_mconfig_additions() const;
@@ -201,9 +180,8 @@ extern const device_type A78_ROM_SG;
 extern const device_type A78_ROM_POKEY;
 extern const device_type A78_ROM_SG_POKEY;
 extern const device_type A78_ROM_SG_RAM;
-extern const device_type A78_ROM_BANKRAM;
-extern const device_type A78_ROM_SG_9BANKS;
-extern const device_type A78_ROM_XM;
+extern const device_type A78_ROM_SG9;
+extern const device_type A78_ROM_SG9_POKEY;
 extern const device_type A78_ROM_ABSOLUTE;
 extern const device_type A78_ROM_ACTIVISION;
 

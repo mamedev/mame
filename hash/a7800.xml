@@ -2449,9 +2449,9 @@ almost nothing like the prototype.
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="pcb_type" value="TYPE-XM" />
-			<feature name="slot" value="a78_xmc" />
-			<dataarea name="rom" size="0x24000">
-				<rom name="dkxm_final_demo_pal.a78" size="0x24000" crc="d362712e" sha1="118c462d6698bd23c378785f80062fdd7d65ca00" offset="0" />
+			<feature name="slot" value="a78_sg9" />
+			<dataarea name="rom" size="147456">
+				<rom name="dkxm_final_demo_pal.bin" size="147456" crc="d362712e" sha1="118c462d6698bd23c378785f80062fdd7d65ca00" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2464,9 +2464,9 @@ almost nothing like the prototype.
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="pcb_type" value="TYPE-XM" />
-			<feature name="slot" value="a78_xmc" />
-			<dataarea name="rom" size="0x24000">
-				<rom name="dkxm_final_demo_ntsc.a78" size="0x24000" crc="6e170055" sha1="f4da231312da06ff9e8af5681b5013b14886b455" offset="0" />
+			<feature name="slot" value="a78_sg9" />
+			<dataarea name="rom" size="147456">
+				<rom name="dkxm_final_demo_ntsc.bin" size="147456" crc="6e170055" sha1="f4da231312da06ff9e8af5681b5013b14886b455" offset="0" />
 			</dataarea>
 		</part>
 	</software>

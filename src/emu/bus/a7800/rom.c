@@ -26,9 +26,8 @@ const device_type A78_ROM_SG = &device_creator<a78_rom_sg_device>;
 const device_type A78_ROM_POKEY = &device_creator<a78_rom_pokey_device>;
 const device_type A78_ROM_SG_POKEY = &device_creator<a78_rom_sg_pokey_device>;
 const device_type A78_ROM_SG_RAM = &device_creator<a78_rom_sg_ram_device>;
-const device_type A78_ROM_BANKRAM = &device_creator<a78_rom_bankram_device>;
-const device_type A78_ROM_SG_9BANKS = &device_creator<a78_rom_sg_9banks_device>;
-const device_type A78_ROM_XM = &device_creator<a78_rom_xm_device>;
+const device_type A78_ROM_SG9 = &device_creator<a78_rom_sg9_device>;
+const device_type A78_ROM_SG9_POKEY = &device_creator<a78_rom_sg9_pokey_device>;
 const device_type A78_ROM_ABSOLUTE = &device_creator<a78_rom_abs_device>;
 const device_type A78_ROM_ACTIVISION = &device_creator<a78_rom_act_device>;
 
@@ -75,25 +74,19 @@ a78_rom_sg_ram_device::a78_rom_sg_ram_device(const machine_config &mconfig, cons
 }
 
 
-a78_rom_bankram_device::a78_rom_bankram_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-					: a78_rom_sg_device(mconfig, A78_ROM_BANKRAM, "Atari 7800 ROM Carts w/SuperGame Bankswitch + Banked RAM", tag, owner, clock, "a78_rom_bankram", __FILE__)
-{
-}
-
-
-a78_rom_sg_9banks_device::a78_rom_sg_9banks_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+a78_rom_sg9_device::a78_rom_sg9_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 					: a78_rom_sg_device(mconfig, type, name, tag, owner, clock, shortname, source)
 {
 }
 
-a78_rom_sg_9banks_device::a78_rom_sg_9banks_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-					: a78_rom_sg_device(mconfig, A78_ROM_SG_9BANKS, "Atari 7800 ROM Carts w/SuperGame 9Banks", tag, owner, clock, "a78_rom_sg9", __FILE__)
+a78_rom_sg9_device::a78_rom_sg9_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+					: a78_rom_sg_device(mconfig, A78_ROM_SG9, "Atari 7800 ROM Carts w/SuperGame 9Banks", tag, owner, clock, "a78_rom_sg9", __FILE__)
 {
 }
 
 
-a78_rom_xm_device::a78_rom_xm_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-					: a78_rom_sg_9banks_device(mconfig, A78_ROM_XM, "Atari 7800 ROM Carts w/SuperGame 9Banks + POKEY (XM demo)", tag, owner, clock, "a78_rom_xm", __FILE__),
+a78_rom_sg9_pokey_device::a78_rom_sg9_pokey_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+					: a78_rom_sg9_device(mconfig, A78_ROM_SG9_POKEY, "Atari 7800 ROM Carts w/SuperGame 9Banks + POKEY", tag, owner, clock, "a78_rom_sg9p", __FILE__),
 						m_pokey(*this, "pokey")
 {
 }
@@ -128,18 +121,6 @@ void a78_rom_sg_device::device_start()
 void a78_rom_sg_device::device_reset()
 {
 	m_bank = 0;
-}
-
-void a78_rom_bankram_device::device_start()
-{
-	save_item(NAME(m_bank));
-	save_item(NAME(m_ram_bank));
-}
-
-void a78_rom_bankram_device::device_reset()
-{
-	m_bank = 0;
-	m_ram_bank = 0;
 }
 
 void a78_rom_abs_device::device_start()
@@ -301,38 +282,6 @@ WRITE8_MEMBER(a78_rom_sg_ram_device::write_40xx)
 
 
 /*-------------------------------------------------
- 
- Carts with SuperGame bankswitch + 32K RAM:
- RAM bank is selected by writing with bit5 enabled
- in 0x4000-0x7fff range (bit0-bit4 give the ROM bank)
- 
- GAMES:
- 
- -------------------------------------------------*/
-
-READ8_MEMBER(a78_rom_bankram_device::read_40xx)
-{
-	if (offset < 0x4000)
-		return m_ram[offset + (m_ram_bank * 0x4000)];
-	else if (offset < 0x8000)
-		return m_rom[(offset & 0x3fff) + (m_bank * 0x4000)];
-	else
-		return m_rom[(offset & 0x3fff) + (m_bank_mask * 0x4000)];	// last bank
-}
-
-WRITE8_MEMBER(a78_rom_bankram_device::write_40xx)
-{
-	if (offset < 0x4000)
-		m_ram[offset] = data;
-	else if (offset < 0x8000)
-	{
-		m_bank = data & m_bank_mask;
-		m_ram_bank = BIT(data, 5);
-	}
-}
-
-
-/*-------------------------------------------------
 
  Carts with SuperGame bankswitch 9banks:
  9 x 16K banks mappable in 0x8000-0xbfff
@@ -342,7 +291,7 @@ WRITE8_MEMBER(a78_rom_bankram_device::write_40xx)
  
  -------------------------------------------------*/
 
-READ8_MEMBER(a78_rom_sg_9banks_device::read_40xx)
+READ8_MEMBER(a78_rom_sg9_device::read_40xx)
 {
 	if (offset < 0x4000)
 		return m_rom[(offset & 0x3fff)];
@@ -352,7 +301,7 @@ READ8_MEMBER(a78_rom_sg_9banks_device::read_40xx)
 		return m_rom[(offset & 0x3fff) + ((m_bank_mask + 1) * 0x4000)];	// last bank
 }
 
-WRITE8_MEMBER(a78_rom_sg_9banks_device::write_40xx)
+WRITE8_MEMBER(a78_rom_sg9_device::write_40xx)
 {
 	if (offset >= 0x4000 && offset < 0x8000)
 		m_bank = (data & m_bank_mask) + 1;
@@ -360,24 +309,29 @@ WRITE8_MEMBER(a78_rom_sg_9banks_device::write_40xx)
 
 /*-------------------------------------------------
  
- Carts using XM expansion module or XBoarD expansion
- The only game using this (Donkey Kong XM demo) is
- 144K + POKEY, so that it's like the above with the
- addition of the POKEY.
+ Carts with SuperGame bankswitch 9banks + POKEY:
+ This was not used in any commercial game released 
+ during A7800 lifespan, but it is used by Donkey 
+ Kong XM demo and by Bentley Bear's Crystal Quest
+ for use with XM expansion module or XBoarD expansion
  
- GAMES: Donkey Kong XM demo
+ GAMES: Donkey Kong XM demo, Bentley Bear's Crystal 
+ Quest
  
  -------------------------------------------------*/
 
-WRITE8_MEMBER(a78_rom_xm_device::write_40xx)
+WRITE8_MEMBER(a78_rom_sg9_pokey_device::write_40xx)
 {
 	if (offset < 0x4000)
+	{
+		printf("write offs 0x%X data 0x%X\n", offset, data);
 		m_pokey->write(space, offset & 0x0f, data);
+	}
 	else if (offset < 0x8000)
 		m_bank = (data & m_bank_mask) + 1;
 }
 
-machine_config_constructor a78_rom_xm_device::device_mconfig_additions() const
+machine_config_constructor a78_rom_sg9_pokey_device::device_mconfig_additions() const
 {
 	return MACHINE_CONFIG_NAME( a78_pokey );
 }

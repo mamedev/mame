@@ -170,20 +170,22 @@ struct a78_slot
 // Here, we take the feature attribute from .xml (i.e. the PCB name) and we assign a unique ID to it
 static const a78_slot slot_list[] =
 {
-	{ A78_TYPE0,    "a78_rom" },
-	{ A78_TYPE1,    "a78_pokey" },
-	{ A78_TYPE2,    "a78_sg" },
-	{ A78_TYPE3,    "a78_sg_pokey" },
-	{ A78_TYPE6,    "a78_sg_ram" },
-	{ A78_TYPEA,    "a78_sg9" },
-	{ A78_TYPEB,    "a78_xmc" },
-	{ A78_ABSOLUTE, "a78_abs" },
+	{ A78_TYPE0,      "a78_rom" },
+	{ A78_TYPE1,      "a78_pokey" },
+	{ A78_TYPE2,      "a78_sg" },
+	{ A78_TYPE3,      "a78_sg_pokey" },
+	{ A78_TYPE6,      "a78_sg_ram" },
+	{ A78_TYPEA,      "a78_sg9" },
+	{ A78_TYPEB,      "a78_sg9_pokey" },
+	{ A78_ABSOLUTE,   "a78_abs" },
 	{ A78_ACTIVISION, "a78_act" },
-	{ A78_HSC,      "a78_hsc" },
-	{ A78_BANKRAM,  "a78_bankram" },
-	{ A78_XB_BOARD, "a78_xboard" },
-	{ A78_XM_BOARD, "a78_xm" },
-	{ A78_NOCART,   "empty" },
+	{ A78_HSC,        "a78_hsc" },
+	{ A78_XB_BOARD,   "a78_xboard" },
+	{ A78_XM_BOARD,   "a78_xm" },
+	{ A78_MEGACART,   "a78_megacart" },
+	{ A78_VERSABOARD, "a78_versa" },
+	{ A78_VERSAPOKEY, "a78_versap" },
+	{ A78_NOCART,     "empty" },	// the code should never get here, of course...
 };
 
 static int a78_get_pcb_id(const char *slot)
@@ -269,7 +271,13 @@ bool a78_cart_slot_device::call_load()
 					m_type = A78_TYPEB;
 					break;
 				case 0x0020:
-					m_type = A78_BANKRAM;
+					if (len > 0x40000)
+						m_type = A78_MEGACART;
+					else
+						m_type = A78_VERSABOARD;
+					break;
+				case 0x0021:
+					m_type = A78_VERSAPOKEY;
 					break;
 				case 0x0100:
 					m_type = A78_ACTIVISION;
@@ -291,7 +299,7 @@ bool a78_cart_slot_device::call_load()
 		
 		if (m_type == A78_TYPE6)
 			m_cart->ram_alloc(0x4000);
-		if (m_type == A78_BANKRAM)
+		if (m_type == A78_MEGACART || m_type == A78_VERSABOARD || m_type == A78_VERSAPOKEY)
 			m_cart->ram_alloc(0x8000);
 		if (m_type == A78_XB_BOARD || m_type == A78_XM_BOARD)
 			m_cart->ram_alloc(0x20000);
@@ -394,7 +402,13 @@ void a78_cart_slot_device::get_default_card_software(astring &result)
 				type = A78_TYPEB;
 				break;
 			case 0x0020:
-				m_type = A78_BANKRAM;
+				if (core_fsize(m_file) > 0x40000)
+					type = A78_MEGACART;
+				else
+					type = A78_VERSABOARD;
+				break;
+			case 0x0021:
+				type = A78_VERSAPOKEY;
 				break;
 			case 0x0100:
 				type = A78_ACTIVISION;
