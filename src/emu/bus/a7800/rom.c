@@ -7,8 +7,11 @@
  - pokey or not
  - 9 banks or not
  etc...
- But we might merge many of these if they become too many (e.g. could there be banked 32L RAM also
- in a 9banks cart or in a cart with no bankswitch?)
+ But we might merge many of these if they become too many
+ 
+ TODO:
+ - Are POKEY regs readable somewhere in SG 144K + POKEY homebrew? How do they detect
+   the POKEY otherwise?!?
 
 ***********************************************************************************************************/
 
@@ -182,6 +185,17 @@ READ8_MEMBER(a78_rom_device::read_40xx)
  
  -------------------------------------------------*/
 
+READ8_MEMBER(a78_rom_pokey_device::read_40xx)
+{
+	if (offset < 0x4000)
+		return m_pokey->read(space, offset & 0x0f);
+
+	if (offset + 0x4000 < m_base_rom)
+		return 0xff;
+	else
+		return m_rom[offset + 0x4000 - m_base_rom];
+}
+
 WRITE8_MEMBER(a78_rom_pokey_device::write_40xx)
 {
 	if (offset < 0x4000)
@@ -233,9 +247,19 @@ WRITE8_MEMBER(a78_rom_sg_device::write_40xx)
  Carts with SuperGame bankswitch + POKEY chip
  As above + Pokey chip access
  
- GAMES: Commando
+ GAMES: Commando and Barnyard Blaster
  
  -------------------------------------------------*/
+
+READ8_MEMBER(a78_rom_sg_pokey_device::read_40xx)
+{
+	if (offset < 0x4000)
+		return m_pokey->read(space, offset & 0x0f);
+	else if (offset < 0x8000)
+		return m_rom[(offset & 0x3fff) + (m_bank * 0x4000)];
+	else
+		return m_rom[(offset & 0x3fff) + (m_bank_mask * 0x4000)];	// last bank
+}
 
 WRITE8_MEMBER(a78_rom_sg_pokey_device::write_40xx)
 {
