@@ -127,6 +127,8 @@ struct gtia_struct
 	gtia_readregs   r;          /* read registers */
 	gtia_writeregs  w;          /* write registers */
 	gtia_helpervars h;          /* helper variables */
+
+	UINT16  color_lookup[256];  /* color lookup table */
 };
 
 
@@ -135,6 +137,6 @@ extern gtia_struct gtia;
 
 void gtia_init(running_machine &machine, const gtia_interface *intf);
 
-void gtia_render(VIDEO *video);
+void gtia_render(UINT8 *src, UINT8 *dst, UINT8 *prio, UINT8 *pmbits);
 
 #endif /* __GTIA_H__ */

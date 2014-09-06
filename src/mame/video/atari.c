@@ -739,7 +739,7 @@ void atari_common_state::video_start()
 
 	/* reset the ANTIC color tables */
 	for( i = 0; i < 256; i ++ )
-		antic.color_lookup[i] = (m_palette->pen(0) << 8) + m_palette->pen(0);
+		gtia.color_lookup[i] = (m_palette->pen(0) << 8) + m_palette->pen(0);
 
 	LOG(("atari cclk_init\n"));
 	cclk_init();
@@ -788,6 +788,7 @@ void atari_common_state::artifacts_gfx(UINT8 *src, UINT8 *dst, int width)
 	UINT8 atari_B = ((b+0x70)&0xf0)+c;
 	UINT8 atari_C = b+c;
 	UINT8 atari_D = gtia.w.colbk;
+	UINT16 *color_lookup = gtia.color_lookup;
 
 	for( x = 0; x < width * 4; x++ )
 	{
@@ -807,8 +808,8 @@ void atari_common_state::artifacts_gfx(UINT8 *src, UINT8 *dst, int width)
 			bits |= 3;
 			break;
 		default:
-			*dst++ = antic.color_lookup[n];
-			*dst++ = antic.color_lookup[n];
+			*dst++ = color_lookup[n];
+			*dst++ = color_lookup[n];
 			continue;
 		}
 		switch( (bits >> 1) & 7 )
@@ -862,6 +863,7 @@ void atari_common_state::artifacts_txt(UINT8 * src, UINT8 * dst, int width)
 	UINT8 atari_B = ((b+0x70)&0xf0)+c;
 	UINT8 atari_C = b+c;
 	UINT8 atari_D = gtia.w.colpf2;
+	UINT16 *color_lookup = gtia.color_lookup;
 
 	for( x = 0; x < width * 4; x++ )
 	{
@@ -881,8 +883,8 @@ void atari_common_state::artifacts_txt(UINT8 * src, UINT8 * dst, int width)
 			bits |= 3;
 			break;
 		default:
-			*dst++ = antic.color_lookup[n];
-			*dst++ = antic.color_lookup[n];
+			*dst++ = color_lookup[n];
+			*dst++ = color_lookup[n];
 			continue;
 		}
 		switch( (bits >> 1) & 7 )
@@ -933,6 +935,7 @@ void atari_common_state::antic_linerefresh()
 	UINT8 *src;
 	UINT32 *dst;
 	UINT32 scanline[4 + (HCHARS * 2) + 4];
+	UINT16 *color_lookup = gtia.color_lookup;
 
 	/* increment the scanline */
 	if( ++antic.scanline == machine().first_screen()->height() )
@@ -965,22 +968,22 @@ void atari_common_state::antic_linerefresh()
 			return;
 		}
 	}
-	dst[0] = antic.color_lookup[PBK] | antic.color_lookup[PBK] << 16;
-	dst[1] = antic.color_lookup[PBK] | antic.color_lookup[PBK] << 16;
-	dst[2] = antic.color_lookup[PBK] | antic.color_lookup[PBK] << 16;
+	dst[0] = color_lookup[PBK] | color_lookup[PBK] << 16;
+	dst[1] = color_lookup[PBK] | color_lookup[PBK] << 16;
+	dst[2] = color_lookup[PBK] | color_lookup[PBK] << 16;
 	if ( (antic.cmd & ANTIC_HSCR) == 0  || (antic.pfwidth == 48) || (antic.pfwidth == 32))
 	{
 		/* no hscroll */
-		dst[3] = antic.color_lookup[src[BYTE_XOR_LE(0)]] | antic.color_lookup[src[BYTE_XOR_LE(1)]] << 16;
+		dst[3] = color_lookup[src[BYTE_XOR_LE(0)]] | color_lookup[src[BYTE_XOR_LE(1)]] << 16;
 		src += 2;
 		dst += 4;
 		for( x = 1; x < HCHARS-1; x++ )
 		{
-			*dst++ = antic.color_lookup[src[BYTE_XOR_LE(0)]] | antic.color_lookup[src[BYTE_XOR_LE(1)]] << 16;
-			*dst++ = antic.color_lookup[src[BYTE_XOR_LE(2)]] | antic.color_lookup[src[BYTE_XOR_LE(3)]] << 16;
+			*dst++ = color_lookup[src[BYTE_XOR_LE(0)]] | color_lookup[src[BYTE_XOR_LE(1)]] << 16;
+			*dst++ = color_lookup[src[BYTE_XOR_LE(2)]] | color_lookup[src[BYTE_XOR_LE(3)]] << 16;
 			src += 4;
 		}
-		dst[0] = antic.color_lookup[src[BYTE_XOR_LE(0)]] | antic.color_lookup[src[BYTE_XOR_LE(1)]] << 16;
+		dst[0] = color_lookup[src[BYTE_XOR_LE(0)]] | color_lookup[src[BYTE_XOR_LE(1)]] << 16;
 	}
 	else
 	{
@@ -990,47 +993,47 @@ void atari_common_state::antic_linerefresh()
 		{
 			case 0:
 				{
-					dst[3] = antic.color_lookup[PBK] | antic.color_lookup[PBK] << 16;
+					dst[3] = color_lookup[PBK] | color_lookup[PBK] << 16;
 					dst += 4;
 					for ( x = 1; x < HCHARS-1; x++ )
 					{
-						*dst++ = antic.color_lookup[PBK] | antic.color_lookup[PBK] << 16;
-						*dst++ = antic.color_lookup[PBK] | antic.color_lookup[PBK] << 16;
+						*dst++ = color_lookup[PBK] | color_lookup[PBK] << 16;
+						*dst++ = color_lookup[PBK] | color_lookup[PBK] << 16;
 					}
-					dst[0] = antic.color_lookup[PBK] | antic.color_lookup[PBK] << 16;
+					dst[0] = color_lookup[PBK] | color_lookup[PBK] << 16;
 				}
 				break;
 			/* support for narrow playfield (32) with horizontal scrolling should be added here */
 			case 40:
 				{
-					dst[3] = antic.color_lookup[PBK] | antic.color_lookup[PBK] << 16;
+					dst[3] = color_lookup[PBK] | color_lookup[PBK] << 16;
 					dst += 4;
 					for ( x = 1; x < HCHARS-2; x++ )
 					{
 						if ( x == 1 )
 						{
-							*dst++ = antic.color_lookup[PBK] | antic.color_lookup[PBK] << 16;
+							*dst++ = color_lookup[PBK] | color_lookup[PBK] << 16;
 						}
 						else
 						{
-							*dst++ = antic.color_lookup[src[BYTE_XOR_LE(0)]] | antic.color_lookup[src[BYTE_XOR_LE(1)]] << 16;
+							*dst++ = color_lookup[src[BYTE_XOR_LE(0)]] | color_lookup[src[BYTE_XOR_LE(1)]] << 16;
 						}
-						*dst++ = antic.color_lookup[src[BYTE_XOR_LE(2)]] | antic.color_lookup[src[BYTE_XOR_LE(3)]] << 16;
+						*dst++ = color_lookup[src[BYTE_XOR_LE(2)]] | color_lookup[src[BYTE_XOR_LE(3)]] << 16;
 						src += 4;
 					}
 					for ( ; x < HCHARS-1; x++ )
 					{
-						*dst++ = antic.color_lookup[PBK] | antic.color_lookup[PBK] << 16;
-						*dst++ = antic.color_lookup[PBK] | antic.color_lookup[PBK] << 16;
+						*dst++ = color_lookup[PBK] | color_lookup[PBK] << 16;
+						*dst++ = color_lookup[PBK] | color_lookup[PBK] << 16;
 					}
-					dst[0] = antic.color_lookup[PBK] | antic.color_lookup[PBK] << 16;
+					dst[0] = color_lookup[PBK] | color_lookup[PBK] << 16;
 				}
 				break;
 		}
 	}
-	dst[1] = antic.color_lookup[PBK] | antic.color_lookup[PBK] << 16;
-	dst[2] = antic.color_lookup[PBK] | antic.color_lookup[PBK] << 16;
-	dst[3] = antic.color_lookup[PBK] | antic.color_lookup[PBK] << 16;
+	dst[1] = color_lookup[PBK] | color_lookup[PBK] << 16;
+	dst[2] = color_lookup[PBK] | color_lookup[PBK] << 16;
+	dst[3] = color_lookup[PBK] | color_lookup[PBK] << 16;
 
 	draw_scanline8(*antic.bitmap, 12, y, MIN(antic.bitmap->width() - 12, sizeof(scanline)), (const UINT8 *) scanline, NULL);
 }
@@ -1214,7 +1217,8 @@ TIMER_CALLBACK_MEMBER( atari_common_state::antic_scanline_render )
 		}
 	}
 
-	gtia_render(video);
+	if (antic.scanline >= VBL_END && antic.scanline < 256)
+		gtia_render((UINT8 *)antic.pmbits + PMOFFSET, (UINT8 *)antic.cclock + PMOFFSET - antic.hscrol_old, (UINT8 *)antic.prio_table[gtia.w.prior & 0x3f], (UINT8 *)&antic.pmbits);
 
 	antic.steal_cycles += CYCLES_REFRESH;
 	LOG(("           run CPU for %d cycles\n", CYCLES_HSYNC - CYCLES_HSTART - antic.steal_cycles));

@@ -262,7 +262,6 @@ struct ANTIC {
 	ANTIC_W w;                  /* ANTIC write registers */
 	UINT8   cclock[256+32];     /* color clock buffer filled by ANTIC */
 	UINT8   pmbits[256+32];     /* player missile buffer filled by GTIA */
-	UINT16  color_lookup[256];  /* color lookup table */
 	UINT8   *prio_table[64];    /* player/missile priority tables */
 	VIDEO   *video[312];        /* video buffer */
 	UINT32  *cclk_expand;       /* shared buffer for the following: */

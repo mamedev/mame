@@ -44,19 +44,19 @@ static void gtia_state_postload(running_machine &machine);
  * set both color clocks equal for one color
  **********************************************/
 #define SETCOL_B(o,d) \
-	antic.color_lookup[o] = ((d) << 8) | (d)
+	gtia.color_lookup[o] = ((d) << 8) | (d)
 
 /**********************************************
  * set left color clock for one color
  **********************************************/
 #define SETCOL_L(o,d) \
-	*((UINT8*)&antic.color_lookup[o] + 0) = d
+	*((UINT8*)&gtia.color_lookup[o] + 0) = d
 
 /**********************************************
  * set right color clock for one color
  **********************************************/
 #define SETCOL_R(o,d) \
-	*((UINT8*)&antic.color_lookup[o] + 1) = d
+	*((UINT8*)&gtia.color_lookup[o] + 1) = d
 
 
 
@@ -841,40 +841,30 @@ static inline void missile_render(UINT8 gfx, int size, UINT8 color, UINT8 *dst)
 }
 
 
-void gtia_render(VIDEO *video)
+void gtia_render(UINT8 *src, UINT8 *dst, UINT8 *prio, UINT8 *pmbits)
 {
-	int x;
-	UINT8 *prio = antic.prio_table[gtia.w.prior & 0x3f];
-	UINT8 *src, *dst;
-
-	if( antic.scanline < VBL_END || antic.scanline >= 256 )
-		return;
-
 	if (gtia.h.grafp0)
-		player_render(gtia.h.grafp0, gtia.w.sizep0 + 1, P0, &antic.pmbits[gtia.w.hposp0]);
+		player_render(gtia.h.grafp0, gtia.w.sizep0 + 1, P0, &pmbits[gtia.w.hposp0]);
 	if (gtia.h.grafp1)
-		player_render(gtia.h.grafp1, gtia.w.sizep1 + 1, P1, &antic.pmbits[gtia.w.hposp1]);
+		player_render(gtia.h.grafp1, gtia.w.sizep1 + 1, P1, &pmbits[gtia.w.hposp1]);
 	if (gtia.h.grafp2)
-		player_render(gtia.h.grafp2, gtia.w.sizep2 + 1, P2, &antic.pmbits[gtia.w.hposp2]);
+		player_render(gtia.h.grafp2, gtia.w.sizep2 + 1, P2, &pmbits[gtia.w.hposp2]);
 	if (gtia.h.grafp3)
-		player_render(gtia.h.grafp3, gtia.w.sizep3 + 1, P3, &antic.pmbits[gtia.w.hposp3]);
+		player_render(gtia.h.grafp3, gtia.w.sizep3 + 1, P3, &pmbits[gtia.w.hposp3]);
 	
 	if (gtia.h.grafm0)
-		missile_render(gtia.h.grafm0, gtia.w.sizem + 1, M0, &antic.pmbits[gtia.w.hposm0]);
+		missile_render(gtia.h.grafm0, gtia.w.sizem + 1, M0, &pmbits[gtia.w.hposm0]);
 	if (gtia.h.grafm1)
-		missile_render(gtia.h.grafm1, gtia.w.sizem + 1, M1, &antic.pmbits[gtia.w.hposm1]);
+		missile_render(gtia.h.grafm1, gtia.w.sizem + 1, M1, &pmbits[gtia.w.hposm1]);
 	if (gtia.h.grafm2)
-		missile_render(gtia.h.grafm2, gtia.w.sizem + 1, M2, &antic.pmbits[gtia.w.hposm2]);
+		missile_render(gtia.h.grafm2, gtia.w.sizem + 1, M2, &pmbits[gtia.w.hposm2]);
 	if (gtia.h.grafm3)
-		missile_render(gtia.h.grafm3, gtia.w.sizem + 1, M3, &antic.pmbits[gtia.w.hposm3]);
+		missile_render(gtia.h.grafm3, gtia.w.sizem + 1, M3, &pmbits[gtia.w.hposm3]);
 
-	src = antic.pmbits + PMOFFSET;
-	dst = antic.cclock + PMOFFSET - antic.hscrol_old;
-
-	for( x = 0; x < HWIDTH*4; x++, src++, dst++ )
+	for (int x = 0; x < HWIDTH * 4; x++, src++, dst++)
 	{
 		UINT8 pm, pc, pf;
-		if( !*src )
+		if (!*src)
 			continue;
 		/* get the player/missile combination bits and reset the buffer */
 		pm = *src;
