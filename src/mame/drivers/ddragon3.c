@@ -277,9 +277,9 @@ WRITE16_MEMBER(wwfwfest_state::wwfwfest_paletteram_w)
 /*- Priority Control -*/
 
 
-WRITE16_MEMBER(wwfwfest_state::wwfwfest_1410_write)
+WRITE8_MEMBER(wwfwfest_state::wwfwfest_priority_w)
 {
-	m_pri = data & 0xff;
+	m_pri = data;
 }
 
 
@@ -362,7 +362,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, wwfwfest_state )
 	AM_RANGE(0x10000a, 0x10000b) AM_WRITE(wwfwfest_flipscreen_w)
 	AM_RANGE(0x140000, 0x140003) AM_WRITE(wwfwfest_irq_ack_w)
 	AM_RANGE(0x14000c, 0x14000d) AM_WRITE(wwfwfest_soundwrite)
-	AM_RANGE(0x140010, 0x140011) AM_WRITE(wwfwfest_1410_write)
+	AM_RANGE(0x140010, 0x140011) AM_WRITE8(wwfwfest_priority_w, 0x00ff)
 	AM_RANGE(0x140020, 0x140021) AM_READ_PORT("P1")
 	AM_RANGE(0x140022, 0x140023) AM_READ_PORT("P2")
 	AM_RANGE(0x140024, 0x140025) AM_READ_PORT("P3")

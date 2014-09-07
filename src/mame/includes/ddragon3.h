@@ -49,7 +49,7 @@ public:
 
 	/* misc */
 	UINT16          m_io_reg[8];
-	UINT16 m_pri;
+	UINT8 m_pri;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -100,7 +100,7 @@ public:
 
 
 	//required_device<buffered_spriteram16_device> m_spriteram;
-	DECLARE_WRITE16_MEMBER(wwfwfest_1410_write);
+	DECLARE_WRITE8_MEMBER(wwfwfest_priority_w);
 	DECLARE_WRITE16_MEMBER(wwfwfest_scroll_write);
 	DECLARE_WRITE16_MEMBER(wwfwfest_irq_ack_w);
 	DECLARE_WRITE16_MEMBER(wwfwfest_flipscreen_w);

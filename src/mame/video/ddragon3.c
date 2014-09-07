@@ -110,14 +110,8 @@ TILE_GET_INFO_MEMBER(wwfwfest_state::get_fg0_tile_info)
 
 WRITE16_MEMBER(wwfwfest_state::wwfwfest_fg0_videoram_w)
 {
-	/* Videoram is 8 bit, upper & lower byte writes end up in the same place */
-	if (ACCESSING_BITS_8_15 && ACCESSING_BITS_0_7) {
-		COMBINE_DATA(&m_fg0_videoram[offset]);
-	} else if (ACCESSING_BITS_8_15) {
-		m_fg0_videoram[offset]=(data>>8)&0xff;
-	} else {
-		m_fg0_videoram[offset]=data&0xff;
-	}
+	/* Videoram is 8 bit, upper & lower byte writes end up in the same place due to m68k byte smearing */
+	m_fg0_videoram[offset]=data&0xff;
 
 	m_fg0_tilemap->mark_tile_dirty(offset/2);
 }
@@ -292,7 +286,7 @@ UINT32 ddragon3_state::screen_update_ctribe(screen_device &screen, bitmap_ind16 
 
 UINT32 wwfwfest_state::screen_update_wwfwfest(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	if (m_pri == 0x0078) {
+	if (m_pri == 0x78) {
 		m_fg_tilemap->set_scrolly(0, m_fg_scrolly  );
 		m_fg_tilemap->set_scrollx(0, m_fg_scrollx  + m_bg0_dx);
 		m_bg_tilemap->set_scrolly(0, m_bg_scrolly  );
@@ -306,19 +300,19 @@ UINT32 wwfwfest_state::screen_update_wwfwfest(screen_device &screen, bitmap_ind1
 
 	/* todo : which bits of pri are significant to the order */
 
-	if (m_pri == 0x007b) {
+	if (m_pri == 0x7b) {
 		m_fg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE,0);
 		m_bg_tilemap->draw(screen, bitmap, cliprect, 0,0);
 		draw_sprites(bitmap,cliprect);
 	}
 
-	if (m_pri == 0x007c) {
+	if (m_pri == 0x7c) {
 		m_fg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE,0);
 		draw_sprites(bitmap,cliprect);
 		m_bg_tilemap->draw(screen, bitmap, cliprect, 0,0);
 	}
 
-	if (m_pri == 0x0078) {
+	if (m_pri == 0x78) {
 		m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE,0);
 		m_fg_tilemap->draw(screen, bitmap, cliprect, 0,0);
 		draw_sprites(bitmap,cliprect);
