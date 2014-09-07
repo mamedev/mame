@@ -133,21 +133,20 @@ public:
 	UINT16 sprite_prot_x,sprite_prot_y,dst1,cop_spr_maxx,cop_spr_off;
 	UINT16 sprite_prot_src_addr[2];
 
-	struct
-	{
-		int x,y;
-		int min_x,min_y,max_x,max_y;
-		UINT16 hitbox;
-		UINT16 hitbox_x,hitbox_y;
-	}cop_collision_info[2];
+	struct {
+		int x, y;
+		int min_x, min_y, max_x, max_y;
+	} cop_collision_info[2];
 
-	UINT16 cop_hit_status;
-	INT16 cop_hit_val_x,cop_hit_val_y,cop_hit_val_z,cop_hit_val_unk;
+	UINT16 cop_hit_status, cop_hit_baseadr;
+	INT16 cop_hit_val_x, cop_hit_val_y, cop_hit_val_z, cop_hit_val_unk;
 
 	void draw_sprites(const rectangle &cliprect);
-	UINT8 cop_calculate_collsion_detection();
-	void cop_take_hit_box_params(UINT8 offs);
 
+	void cop_collision_read_xy(address_space &space, int slot, UINT32 spradr);
+	void cop_collision_update_hitbox(address_space &space, int slot, UINT32 hitadr);
+
+	DECLARE_WRITE16_MEMBER(cop_hitbox_baseadr_w);
 	DECLARE_WRITE16_MEMBER(cop_sort_lookup_hi_w);
 	DECLARE_WRITE16_MEMBER(cop_sort_lookup_lo_w);
 	DECLARE_WRITE16_MEMBER(cop_sort_ram_addr_hi_w);

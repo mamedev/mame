@@ -135,7 +135,6 @@ Current Problem(s) - in order of priority
  High Priority
 
  Protection 
- - raiden2 doesn't detect hits on stage 2 boss;
  - zeroteam has bogus collision detection;
  - raiden2 has a weird movement after that the ship completes animation from the aircraft. Probably 42c2 should be floating point rounded ...
  - (and probably more)
@@ -520,51 +519,48 @@ WRITE16_MEMBER(raiden2_state::cop_reg_low_w)
 	cop_regs[offset] = (cop_regs[offset] & ~UINT32(mem_mask)) | (data & mem_mask);
 }
 
-void raiden2_state::cop_take_hit_box_params(UINT8 offs)
+WRITE16_MEMBER(raiden2_state::cop_hitbox_baseadr_w)
 {
-	INT16 start_x,start_y,end_x,end_y;
-
-	start_x = INT8(cop_collision_info[offs].hitbox_x);
-	start_y = INT8(cop_collision_info[offs].hitbox_y);
-
-	end_x = INT8(cop_collision_info[offs].hitbox_x >> 8);
-	end_y = INT8(cop_collision_info[offs].hitbox_y >> 8);
-
-	cop_collision_info[offs].min_x = start_x + (cop_collision_info[offs].x >> 16);
-	cop_collision_info[offs].min_y = start_y + (cop_collision_info[offs].y >> 16);
-	cop_collision_info[offs].max_x = end_x + (cop_collision_info[offs].x >> 16);
-	cop_collision_info[offs].max_y = end_y + (cop_collision_info[offs].y >> 16);
+	COMBINE_DATA(&cop_hit_baseadr);
 }
 
-
-UINT8 raiden2_state::cop_calculate_collsion_detection()
+void raiden2_state::cop_collision_read_xy(address_space &space, int slot, UINT32 spradr)
 {
-	static UINT8 res;
+	cop_collision_info[slot].y = space.read_dword(spradr+4);
+	cop_collision_info[slot].x = space.read_dword(spradr+8);
+}
 
-	res = 3;
+void raiden2_state::cop_collision_update_hitbox(address_space &space, int slot, UINT32 hitadr)
+{
+	UINT32 hitadr2 = space.read_dword(hitadr) + (cop_hit_baseadr << 16);
+	UINT32 hitbox_raw = space.read_dword(hitadr2);
+
+	INT8 hx = hitbox_raw;
+	UINT8 hw = hitbox_raw >> 8;
+	INT8 hy = hitbox_raw >> 16;
+	UINT8 hh = hitbox_raw >> 24;
+
+	cop_collision_info[slot].min_x = (cop_collision_info[slot].x >> 16) + hx;
+	cop_collision_info[slot].min_y = (cop_collision_info[slot].y >> 16) + hy;
+	cop_collision_info[slot].max_x = cop_collision_info[slot].min_x + hw;
+	cop_collision_info[slot].max_y = cop_collision_info[slot].min_y + hh;
+
+	cop_hit_status = 3;
 
 	/* outbound X check */
 	if(cop_collision_info[0].max_x >= cop_collision_info[1].min_x && cop_collision_info[0].min_x <= cop_collision_info[1].max_x)
-		res &= ~2;
+		cop_hit_status &= ~2;
 
 	/* outbound Y check */
 	if(cop_collision_info[0].max_y >= cop_collision_info[1].min_y && cop_collision_info[0].min_y <= cop_collision_info[1].max_y)
-		res &= ~1;
+		cop_hit_status &= ~1;
 
 	cop_hit_val_x = (cop_collision_info[0].x - cop_collision_info[1].x) >> 16;
 	cop_hit_val_y = (cop_collision_info[0].y - cop_collision_info[1].y) >> 16;
 	cop_hit_val_z = 1;
-	cop_hit_val_unk = res; // TODO: there's also bit 2 and 3 triggered in the tests, no known meaning
-
-	return res;
+	cop_hit_val_unk = cop_hit_status; // TODO: there's also bit 2 and 3 triggered in the tests, no known meaning
 }
 
-/* 
-TODO:
-2a05: first boss 
-2208/2288: first enemies when they crash on the ground (collision direction?)
-39b0: purple laser when it's fired up (variation of 3bb0?) - 0205: if you comment out the line that also makes zeroteam crash, triggering purple laser doesn't crash anymore, but laser isn't visible
-*/
 WRITE16_MEMBER(raiden2_state::cop_cmd_w)
 {
 	cop_status &= 0x7fff;
@@ -758,44 +754,26 @@ WRITE16_MEMBER(raiden2_state::cop_cmd_w)
 
 	case 0xa100:
 	case 0xa180:
-		cop_collision_info[0].y = (space.read_dword(cop_regs[0]+4));
-		cop_collision_info[0].x = (space.read_dword(cop_regs[0]+8));
+		cop_collision_read_xy(space, 0, cop_regs[0]);
 		break;
 
 	case 0xa900:
 	case 0xa980:
-		cop_collision_info[1].y = (space.read_dword(cop_regs[1]+4));
-		cop_collision_info[1].x = (space.read_dword(cop_regs[1]+8));
+		cop_collision_read_xy(space, 1, cop_regs[1]);
 		break;
 
 	case 0xb100:
-		cop_collision_info[0].hitbox = space.read_word(cop_regs[2]);
-		cop_collision_info[0].hitbox_y = space.read_word((cop_regs[2]&0xffff0000)|(cop_collision_info[0].hitbox));
-		cop_collision_info[0].hitbox_x = space.read_word(((cop_regs[2]&0xffff0000)|(cop_collision_info[0].hitbox))+2);
-
-		/* do the math */
-		cop_take_hit_box_params(0);
-		cop_hit_status = cop_calculate_collsion_detection();
+		cop_collision_update_hitbox(space, 0, cop_regs[2]);
 		break;
 
 	case 0xb900:
-		cop_collision_info[1].hitbox = space.read_word(cop_regs[3]);
-		cop_collision_info[1].hitbox_y = space.read_word((cop_regs[3]&0xffff0000)|(cop_collision_info[1].hitbox));
-		cop_collision_info[1].hitbox_x = space.read_word(((cop_regs[3]&0xffff0000)|(cop_collision_info[1].hitbox))+2);
-
-		/* do the math */
-		cop_take_hit_box_params(1);
-		cop_hit_status = cop_calculate_collsion_detection();
+		cop_collision_update_hitbox(space, 1, cop_regs[3]);
 		break;
 
 	default:
 		logerror("pcall %04x (%04x:%04x) [%x %x %x %x]\n", data, rps(), rpc(), cop_regs[0], cop_regs[1], cop_regs[2], cop_regs[3]);
 	}
 }
-
-//  case 0x6ca:
-//      logerror("select bank %d %04x\n", (data >> 15) & 1, data);
-//      space.membank("bank1")->set_entry((data >> 15) & 1);
 
 
 void raiden2_state::combine32(UINT32 *val, int offset, UINT16 data, UINT16 mem_mask)
@@ -1559,6 +1537,7 @@ static ADDRESS_MAP_START( raiden2_cop_mem, AS_PROGRAM, 16, raiden2_state )
 	AM_RANGE(0x0042a, 0x0042b) AM_WRITE(cop_dma_v2_w)
 	AM_RANGE(0x00432, 0x00433) AM_WRITE(cop_pgm_data_w)
 	AM_RANGE(0x00434, 0x00435) AM_WRITE(cop_pgm_addr_w)
+	AM_RANGE(0x00436, 0x00437) AM_WRITE(cop_hitbox_baseadr_w)
 	AM_RANGE(0x00438, 0x00439) AM_WRITE(cop_pgm_value_w)
 	AM_RANGE(0x0043a, 0x0043b) AM_WRITE(cop_pgm_mask_w)
 	AM_RANGE(0x0043c, 0x0043d) AM_WRITE(cop_pgm_trigger_w)
