@@ -1,9 +1,10 @@
 /********************************************************************
 
- "dgPIX" games driver
+ dgPIX VRender0 hardware driver
 
  Games Supported:
  ---------------------------------------------------------------------------
+ - Jump Jump                           (c) 1999 dgPIX Entertainment Inc.
  - X-Files                             (c) 1999 dgPIX Entertainment Inc.
  - King of Dynast Gear (version 1.8)   (c) 1999 EZ Graphics [*]
  - Fishing Maniac 3                    (c) 2002 Saero Entertainment
@@ -14,6 +15,7 @@
  Games Needed:
  ---------------------------------------------------------------------------
  - Elfin                               (c) 1999 dgPIX Entertainment Inc.
+ - X-Files (Alternate title screen)    (c) 1999 dgPIX Entertainment Inc.
 
 
  Original bugs:
@@ -46,6 +48,105 @@
    Patch in DRIVER_INIT removes call at RAM adr $8f30 - protection ?
    (without fix, game freezes int one of startup screens - like on real
    board  with  protection PIC removed)
+
+*********************************************************************
+
+PCB Layout
+----------
+
+X-Files
+Fishing Maniac 3
+
+VRenderO Minus Rev4 dgPIX Entertainment Inc. 1999
+|-----------------------------------------------------|
+|TDA1515                C-O-N-N-1                     |
+|   DA1545A                                       C   |
+|                                                 O   |
+|  VOL1    K4E151611                  KS0164      N   |
+|  VOL2    K4E151611                              N   |
+|J                                    169NDK19    3   |
+|A     20MHz                           CONN2          |
+|M  KA4558                                            |
+|M                                                    |
+|A                                          KM6161002 |
+|          E1-32XT                                    |
+|                                           KM6161002 |
+|                                                     |
+|       ST7705C                             KM6161002 |
+| B1             XCS05                                |
+| B2 B3          14.31818MHz  LED           KM6161002 |
+|-----------------------------------------------------|
+Notes:
+      ST7705C      - Reset/Watchdog IC (SOIC8)
+      E1-32XT      - Hyperstone E1-32XT CPU (QFP144)
+      169NDK19     - Xtal, 16.9344MHz
+      CONN1,CONN2, - Connectors for joining main board to small sub-board
+      CONN3
+      XCS05        - Xilinx Spartan XCS05 FPGA (QFP100)
+      B1,B2,B3     - Push Buttons for TEST, SERVICE and RESET
+      KS0164       - Samsung Electronics KS0164 General Midi compliant 32-voice Wavetable Synthesizer Chip
+                     with built-in 16bit CPU and MPU-401 compatibility. (QFP100)
+      K4E151611    - Samsung K4E151611C-JC60 1M x16 CMOS EDO DRAM (SOJ44)
+      KM6161002    - Samsung KM6161002CJ-12 64k x16 High-Speed CMOS SRAM (SOJ44)
+
+
+
+Jump Jump
+King of Dynast Gear
+
+VRenderO Minus Rev5 dgPIX Entertainment Inc. 1999
+|-----------------------------------------------------|
+|TDA1515                C-O-N-N-1                     |
+|   DA1545A                                       C   |
+|                                                 O   |
+|  VOL1    K4E151611                  KS0164      N   |
+|  VOL2    K4E151611                              N   |
+|J                                    169NDK19    3   |
+|A     20MHz                           CONN2          |
+|M  KA4558                                            |
+|M                                                    |
+|A                                          KM6161002 |
+|          E1-32XT                                    |
+|                                           KM6161002 |
+|                                                     |
+|       ST7705C                             KM6161002 |
+| B1             XCS05                                |
+| B2 B3          14.31818MHz  LED           KM6161002 |
+|-----------------------------------------------------|
+Notes:
+      ST7705C      - Reset/Watchdog IC (SOIC8)
+      E1-32XT      - Hyperstone E1-32XT CPU (QFP144)
+      169NDK19     - Xtal, 16.9344MHz
+      CONN1,CONN2, - Connectors for joining main board to small sub-board
+      CONN3
+      XCS05        - Xilinx Spartan XCS05 FPGA (QFP100)
+      B1,B2,B3     - Push Buttons for TEST, SERVICE and RESET
+      KS0164       - Samsung Electronics KS0164 General Midi compliant 32-voice Wavetable Synthesizer Chip
+                     with built-in 16bit CPU and MPU-401 compatibility. (QFP100)
+      K4E151611    - Samsung K4E151611C-JC60 1M x16Bit CMOS EDO DRAM (SOJ44)
+      KM6161002    - Samsung KM6161002CJ-12 64k x16Bit High-Speed CMOS SRAM (SOJ44)
+
+
+
+Sub-Board
+---------
+
+Flash Module Type-A REV2 dgPIX Entertainment Inc. 1999
+|---------------------------------------|
+|            C-O-N-N-1            U100  |
+|C                FLASH.U3      FLASH.U5|
+|O        FLASH.U2       FLASH.U4       |
+|N FLASH.U10                            |
+|N                                      |
+|3                FLASH.U7      FLASH.U9|
+|  CONN2  FLASH.U6       FLASH.U8       |
+|---------------------------------------|
+Notes:
+      FLASH        - Intel DA28F320J5 32M x8 StrataFlash surface-mounted FlashROM (SSOP56)
+      CONN1,CONN2,
+      CONN3        - Connectors for joining small sub-board to main board
+      U100         - A custom programmed PIC (Programmable Interrupt Controller), rebadged as 'dgPIX-PR1' (DIP18)
+
 
 *********************************************************************/
 
@@ -327,10 +428,37 @@ static MACHINE_CONFIG_START( dgpix, dgpix_state )
 	// KS0164 sound chip
 MACHINE_CONFIG_END
 
+
+/*
+Jump Jump
+dgPIX Entertainment Inc. 1999
+
+PCB combo:
+VRenderO Minus Rev5 dgPIX Entertainment Inc. 1999
+Flash Module Type-A REV2 dgPIX Entertainment Inc. 1999
+
+*/
+ROM_START( jumpjump )
+	ROM_REGION32_BE( 0x2000000, "flash", ROMREGION_ERASE00 ) /* Hyperstone CPU Code & Data */
+	/* 0 - 0x17fffff empty space */
+	ROM_LOAD16_WORD_SWAP( "jumpjump.u8", 0x1800000, 0x400000, CRC(210dfd8b) SHA1(a1aee4ec8c01832e77d2e4e334a62c246d7e3635) )
+	ROM_LOAD16_WORD_SWAP( "jumpjump.u9", 0x1c00000, 0x400000, CRC(16d1e352) SHA1(3c43974fb8d90b0c84472dd9f2167eb983142095) )
+
+	ROM_REGION( 0x400000, "cpu1", 0 ) /* sound rom */
+	ROM_LOAD16_WORD_SWAP( "jumpjump.u10", 0x000000, 0x400000, CRC(2152ecce) SHA1(522d389952a07fa0830ca8aaa6de3aacf834e32e) )
+
+	ROM_REGION( 0x1000, "cpu2", ROMREGION_ERASEFF ) /* PIC */
+	ROM_LOAD( "jumpjump_pic",  0x0000, 0x1000, NO_DUMP ) // protected - labeled S831D dgPIX-PR1
+ROM_END
+
 /*
 
 X-Files
 dgPIX Entertainment Inc. 1999
+
+PCB combo:
+VRenderO Minus Rev4 dgPIX Entertainment Inc. 1999
+Flash Module Type-A REV2 dgPIX Entertainment Inc. 1999
 
 Contrary to what you might think on first hearing the title, this game
 is like Match It 2 etc. However, the quality of the graphics
@@ -339,48 +467,9 @@ At the end of the level, you are presented with a babe, where you can use
 the joystick and buttons to scroll up and down and zoom in for erm...
 a closer inspection of the 'merchandise' ;-))
 
-
-PCB Layout
-----------
-
-
-VRenderOMinus Rev4
--------------------------------------------------------
-|                                                     |
-|   DA1545A             C-O-N-N-1                 C   |
-|                                                 O   |
-|  POT1    T2316162               SEC KS0164      N   |
-|  POT2    T2316162                               N   |
-|J                                    169NDK19:   3   |
-|A     20MHz                           CONN2          |
-|M  KA4558                                            |
-|M                                                    |
-|A                                SEC KM6161002CJ-12  |
-|          E1-32XT                                    |
-|                                 SEC KM6161002CJ-12  |
-|                                                     |
-|       ST7705C                   SEC KM6161002CJ-12  |
-| B1             XCS05                                |
-| B2 B3          14.31818MHz      SEC KM6161002CJ-12  |
--------------------------------------------------------
-
-
-Notes
------
-ST7705C          : Reset/Watchdog IC (SOIC8)
-E1-32XT          : Hyperstone E1-32XT CPU
-169NDK19         : Xtal, 16.9MHz
-CONN1,CONN2,CONN3: Connectors for small daughterboard containing
-                   3x DA28F320J5 (32M surface mounted SSOP56 Flash ROM)
-XCS05            : XILINX XCS05 PLD
-B1,B2,B3         : Push Buttons for TEST, SERVICE and RESET
-SEC KS0164       : Samsung Electronics KS0164 General Midi compliant 32-voice Wavetable Synthesizer Chip
-                   with built-in 16bit CPU and MPU-401 compatibility. (QFP100)
-T2316162         : Main program RAM (SOJ44)
-SEC KM6161002    : Graphics RAM (SOJ44)
+Korean text on Mode Select screen and the following screen
 
 */
-
 ROM_START( xfiles )
 	ROM_REGION32_BE( 0x2000000, "flash", ROMREGION_ERASE00 ) /* Hyperstone CPU Code & Data */
 	/* 0 - 0x17fffff empty space */
@@ -398,64 +487,11 @@ ROM_END
 King of Dynast Gear
 EZ Graphics, 1999
 
-This game runs on the same hardware as X-Files.
-
-PCB Layout
-----------
-
+PCB combo:
 VRenderO Minus Rev5 dgPIX Entertainment Inc. 1999
-|-----------------------------------------------------|
-|TDA1515                C-O-N-N-1                     |
-|   DA1545A                                       C   |
-|                                                 O   |
-|  VOL1    K4E151611                  KS0164      N   |
-|  VOL2    K4E151611                              N   |
-|J                                    169NDK19    3   |
-|A     20MHz                           CONN2          |
-|M  KA4558                                            |
-|M                                                    |
-|A                                          KM6161002 |
-|          E1-32XT                                    |
-|                                           KM6161002 |
-|                                                     |
-|       ST7705C                             KM6161002 |
-| B1             XCS05                                |
-| B2 B3          14.31818MHz  LED           KM6161002 |
-|-----------------------------------------------------|
-Notes:
-      ST7705C      - Reset/Watchdog IC (SOIC8)
-      E1-32XT      - Hyperstone E1-32XT CPU (QFP144)
-      169NDK19     - Xtal, 16.9344MHz
-      CONN1,CONN2, - Connectors for joining main board to small sub-board
-      CONN3
-      XCS05        - Xilinx Spartan XCS05 FPGA (QFP100)
-      B1,B2,B3     - Push Buttons for TEST, SERVICE and RESET
-      KS0164       - Samsung Electronics KS0164 General Midi compliant 32-voice Wavetable Synthesizer Chip
-                     with built-in 16bit CPU and MPU-401 compatibility. (QFP100)
-      K4E151611    - Samsung K4E151611C-JC60 1M x16Bit CMOS EDO DRAM (SOJ44)
-      KM6161002    - Samsung KM6161002CJ-12 64k x16Bit High-Speed CMOS SRAM (SOJ44)
-
-Sub-Board
----------
-
 Flash Module Type-A REV2 dgPIX Entertainment Inc. 1999
-|---------------------------------------|
-|            C-O-N-N-1            U100  |
-|C                FLASH.U3      FLASH.U5|
-|O        FLASH.U2       FLASH.U4       |
-|N FLASH.U10                            |
-|N                                      |
-|3                FLASH.U7      FLASH.U9|
-|  CONN2  FLASH.U6       FLASH.U8       |
-|---------------------------------------|
-Notes:
-      FLASH        - Intel DA28F320J5 32M x8 StrataFlash surface-mounted FlashROM (SSOP56)
-      CONN1,CONN2,
-      CONN3        - Connectors for joining small sub-board to main board
-      U100         - A custom programmed PIC (Programmable Interrupt Controller), rebadged as 'dgPIX-PR1' (DIP18)
 
 */
-
 ROM_START( kdynastg )
 	ROM_REGION32_BE( 0x2000000, "flash", ROMREGION_ERASE00 )  /* Hyperstone CPU Code & Data */
 	/* 0 - 0x0ffffff empty space */
@@ -475,65 +511,13 @@ ROM_END
 Fishing Maniac 3
 Saero Entertainment, 2002
 
-This game runs on hardware that is identical to XFiles and King Of Dynast Gear
-but with less ROMs and no PIC.
-
-PCB Layout
-----------
-
+PCB combo:
 VRenderO Minus Rev4 dgPIX Entertainment Inc. 1999
-|-----------------------------------------------------|
-|TDA1515                C-O-N-N-1                     |
-|   DA1545A                                       C   |
-|                                                 O   |
-|  VOL1    K4E151611                  KS0164      N   |
-|  VOL2    K4E151611                              N   |
-|J                                    169NDK19    3   |
-|A     20MHz                           CONN2          |
-|M  KA4558                                            |
-|M                                                    |
-|A                                          KM6161002 |
-|          E1-32XT                                    |
-|                                           KM6161002 |
-|                                                     |
-|       ST7705C                             KM6161002 |
-| B1             XCS05                                |
-| B2 B3          14.31818MHz  LED           KM6161002 |
-|-----------------------------------------------------|
-Notes:
-      ST7705C      - Reset/Watchdog IC (SOIC8)
-      E1-32XT      - Hyperstone E1-32XT CPU (QFP144)
-      169NDK19     - Xtal, 16.9344MHz
-      CONN1,CONN2, - Connectors for joining main board to small sub-board
-      CONN3
-      XCS05        - Xilinx Spartan XCS05 FPGA (QFP100)
-      B1,B2,B3     - Push Buttons for TEST, SERVICE and RESET
-      KS0164       - Samsung Electronics KS0164 General Midi compliant 32-voice Wavetable Synthesizer Chip
-                     with built-in 16bit CPU and MPU-401 compatibility. (QFP100)
-      K4E151611    - Samsung K4E151611C-JC60 1M x16 CMOS EDO DRAM (SOJ44)
-      KM6161002    - Samsung KM6161002CJ-12 64k x16 High-Speed CMOS SRAM (SOJ44)
-
-Sub-Board
----------
-
 Flash Module Type-A REV2 dgPIX Entertainment Inc. 1999
-|---------------------------------------|
-|            C-O-N-N-1            U100  |
-|C                FLASH.U3      FLASH.U5|
-|O        FLASH.U2       FLASH.U4       |
-|N FLASH.U10                            |
-|N                                      |
-|3                FLASH.U7      FLASH.U9|
-|  CONN2  FLASH.U6       FLASH.U8       |
-|---------------------------------------|
-Notes:
-      FLASH        - Intel DA28F320J5 32M x8 StrataFlash surface-mounted FlashROM (SSOP56)
-                     Only U8, U9 & U10 are populated
-      CONN1,CONN2,
-      CONN3        - Connectors for joining small sub-board to main board
-      U100         - Empty 18 pin socket
-*/
 
+ U100 18 pin socket for the PIC chip is unused
+
+*/
 ROM_START( fmaniac3 )
 	ROM_REGION32_BE( 0x2000000, "flash", ROMREGION_ERASE00 ) /* Hyperstone CPU Code & Data */
 	/* 0 - 0x17fffff empty space */
@@ -548,18 +532,20 @@ ROM_START( fmaniac3 )
 ROM_END
 
 
-ROM_START( jumpjump )
-	ROM_REGION32_BE( 0x2000000, "flash", ROMREGION_ERASE00 ) /* Hyperstone CPU Code & Data */
-	/* 0 - 0x17fffff empty space */
-	ROM_LOAD16_WORD_SWAP( "jumpjump.u8", 0x1800000, 0x400000, CRC(210dfd8b) SHA1(a1aee4ec8c01832e77d2e4e334a62c246d7e3635) )
-	ROM_LOAD16_WORD_SWAP( "jumpjump.u9", 0x1c00000, 0x400000, CRC(16d1e352) SHA1(3c43974fb8d90b0c84472dd9f2167eb983142095) )
 
-	ROM_REGION( 0x400000, "cpu1", 0 ) /* sound rom */
-	ROM_LOAD16_WORD_SWAP( "jumpjump.u10", 0x000000, 0x400000, CRC(2152ecce) SHA1(522d389952a07fa0830ca8aaa6de3aacf834e32e) )
+DRIVER_INIT_MEMBER(dgpix_state,jumpjump)
+{
+	UINT8 *rom = (UINT8 *)memregion("flash")->base() + 0x1c00000;
 
-	ROM_REGION( 0x1000, "cpu2", ROMREGION_ERASEFF ) /* PIC */
-	// S831D dgPIX-PR1
-ROM_END
+	rom[BYTE4_XOR_BE(0x3a829a)] = 3;
+	rom[BYTE4_XOR_BE(0x3a829b)] = 0;
+	rom[BYTE4_XOR_BE(0x3a829c)] = 3;
+	rom[BYTE4_XOR_BE(0x3a829d)] = 0;
+	rom[BYTE4_XOR_BE(0x3a829e)] = 3;
+	rom[BYTE4_XOR_BE(0x3a829f)] = 0;
+
+	m_flash_roms = 2;
+}
 
 DRIVER_INIT_MEMBER(dgpix_state,xfiles)
 {
@@ -602,22 +588,7 @@ DRIVER_INIT_MEMBER(dgpix_state,fmaniac3)
 {
 	m_flash_roms = 2;
 }
-
-DRIVER_INIT_MEMBER(dgpix_state,jumpjump)
-{
-	UINT8 *rom = (UINT8 *)memregion("flash")->base() + 0x1c00000;
-
-	rom[BYTE4_XOR_BE(0x3a829a)] = 3;
-	rom[BYTE4_XOR_BE(0x3a829b)] = 0;
-	rom[BYTE4_XOR_BE(0x3a829c)] = 3;
-	rom[BYTE4_XOR_BE(0x3a829d)] = 0;
-	rom[BYTE4_XOR_BE(0x3a829e)] = 3;
-	rom[BYTE4_XOR_BE(0x3a829f)] = 0;
-
-	m_flash_roms = 2;
-}
-
-GAME( 1999, xfiles,   0, dgpix, dgpix, dgpix_state, xfiles,   ROT0, "dgPIX Entertainment Inc.", "X-Files",                           GAME_NO_SOUND )
 GAME( 1999, jumpjump, 0, dgpix, dgpix, dgpix_state, jumpjump, ROT0, "dgPIX Entertainment Inc.", "Jump Jump",                         GAME_NO_SOUND )
+GAME( 1999, xfiles,   0, dgpix, dgpix, dgpix_state, xfiles,   ROT0, "dgPIX Entertainment Inc.", "X-Files",                           GAME_NO_SOUND )
 GAME( 1999, kdynastg, 0, dgpix, dgpix, dgpix_state, kdynastg, ROT0, "EZ Graphics",              "King of Dynast Gear (version 1.8)", GAME_NO_SOUND )
 GAME( 2002, fmaniac3, 0, dgpix, dgpix, dgpix_state, fmaniac3, ROT0, "Saero Entertainment",      "Fishing Maniac 3",                  GAME_NO_SOUND )
