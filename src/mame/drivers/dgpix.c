@@ -605,12 +605,19 @@ DRIVER_INIT_MEMBER(dgpix_state,fmaniac3)
 
 DRIVER_INIT_MEMBER(dgpix_state,jumpjump)
 {
-	m_flash_roms = 2;
+	UINT8 *rom = (UINT8 *)memregion("flash")->base() + 0x1c00000;
 
-	// todo: patches
+	rom[BYTE4_XOR_BE(0x3a829a)] = 3;
+	rom[BYTE4_XOR_BE(0x3a829b)] = 0;
+	rom[BYTE4_XOR_BE(0x3a829c)] = 3;
+	rom[BYTE4_XOR_BE(0x3a829d)] = 0;
+	rom[BYTE4_XOR_BE(0x3a829e)] = 3;
+	rom[BYTE4_XOR_BE(0x3a829f)] = 0;
+
+	m_flash_roms = 2;
 }
 
 GAME( 1999, xfiles,   0, dgpix, dgpix, dgpix_state, xfiles,   ROT0, "dgPIX Entertainment Inc.", "X-Files",                           GAME_NO_SOUND )
+GAME( 1999, jumpjump, 0, dgpix, dgpix, dgpix_state, jumpjump, ROT0, "dgPIX Entertainment Inc.", "Jump Jump",                         GAME_NO_SOUND )
 GAME( 1999, kdynastg, 0, dgpix, dgpix, dgpix_state, kdynastg, ROT0, "EZ Graphics",              "King of Dynast Gear (version 1.8)", GAME_NO_SOUND )
 GAME( 2002, fmaniac3, 0, dgpix, dgpix, dgpix_state, fmaniac3, ROT0, "Saero Entertainment",      "Fishing Maniac 3",                  GAME_NO_SOUND )
-GAME( 1999, jumpjump, 0, dgpix, dgpix, dgpix_state, jumpjump, ROT0, "dgPIX Entertainment Inc.", "Jump Jump",                         GAME_NOT_WORKING | GAME_NO_SOUND )
