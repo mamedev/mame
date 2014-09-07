@@ -947,6 +947,7 @@ OBJDIRS += $(BUSOBJ)/megadrive
 BUSOBJS += $(BUSOBJ)/megadrive/md_slot.o
 BUSOBJS += $(BUSOBJ)/megadrive/md_carts.o
 BUSOBJS += $(BUSOBJ)/megadrive/eeprom.o
+BUSOBJS += $(BUSOBJ)/megadrive/ggenie.o
 BUSOBJS += $(BUSOBJ)/megadrive/jcart.o
 BUSOBJS += $(BUSOBJ)/megadrive/rom.o
 BUSOBJS += $(BUSOBJ)/megadrive/sk.o

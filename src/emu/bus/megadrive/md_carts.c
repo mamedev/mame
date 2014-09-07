@@ -35,6 +35,8 @@ SLOT_INTERFACE_START(md_cart)
 	SLOT_INTERFACE_INTERNAL("rom_stm95",  MD_EEPROM_STM95)
 // CodeMasters 2-in-1 (reset based)
 	SLOT_INTERFACE_INTERNAL("rom_cm2in1",  MD_ROM_CM2IN1)
+// Game Genie
+	SLOT_INTERFACE_INTERNAL("rom_ggenie",  MD_ROM_GAMEGENIE)
 // unique bankswitch
 	SLOT_INTERFACE_INTERNAL("rom_ssf2",  MD_ROM_SSF2)
 	SLOT_INTERFACE_INTERNAL("rom_radica",  MD_ROM_RADICA)

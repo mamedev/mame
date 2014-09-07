@@ -14,6 +14,7 @@
 #include "rom.h"
 #include "svp.h"
 #include "sk.h"
+#include "ggenie.h"
 #include "eeprom.h"
 #include "jcart.h"
 #include "stm95.h"
