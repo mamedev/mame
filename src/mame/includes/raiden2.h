@@ -134,8 +134,8 @@ public:
 	UINT16 sprite_prot_src_addr[2];
 
 	struct {
-		int x, y;
-		int min_x, min_y, max_x, max_y;
+		int x, y, z;
+		int min_x, min_y, min_z, max_x, max_y, max_z;
 	} cop_collision_info[2];
 
 	UINT16 cop_hit_status, cop_hit_baseadr;

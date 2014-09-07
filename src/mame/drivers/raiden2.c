@@ -526,38 +526,46 @@ WRITE16_MEMBER(raiden2_state::cop_hitbox_baseadr_w)
 
 void raiden2_state::cop_collision_read_xy(address_space &space, int slot, UINT32 spradr)
 {
-	cop_collision_info[slot].y = space.read_dword(spradr+4);
-	cop_collision_info[slot].x = space.read_dword(spradr+8);
+	cop_collision_info[slot].x = space.read_dword(spradr+4);
+	cop_collision_info[slot].y = space.read_dword(spradr+8);
+	cop_collision_info[slot].z = space.read_dword(spradr+12);
 }
 
 void raiden2_state::cop_collision_update_hitbox(address_space &space, int slot, UINT32 hitadr)
 {
-	UINT32 hitadr2 = space.read_dword(hitadr) + (cop_hit_baseadr << 16);
-	UINT32 hitbox_raw = space.read_dword(hitadr2);
+	UINT32 hitadr2 = space.read_word(hitadr) | (cop_hit_baseadr << 16);
 
-	INT8 hx = hitbox_raw;
-	UINT8 hw = hitbox_raw >> 8;
-	INT8 hy = hitbox_raw >> 16;
-	UINT8 hh = hitbox_raw >> 24;
+	INT8 hx = space.read_byte(hitadr2++);
+	UINT8 hw = space.read_byte(hitadr2++);
+	INT8 hy = space.read_byte(hitadr2++);
+	UINT8 hh = space.read_byte(hitadr2++);
+	INT8 hz = space.read_byte(hitadr2++);
+	UINT8 hd = space.read_byte(hitadr2++);
 
 	cop_collision_info[slot].min_x = (cop_collision_info[slot].x >> 16) + hx;
 	cop_collision_info[slot].min_y = (cop_collision_info[slot].y >> 16) + hy;
+	cop_collision_info[slot].min_z = (cop_collision_info[slot].z >> 16) + hz;
 	cop_collision_info[slot].max_x = cop_collision_info[slot].min_x + hw;
 	cop_collision_info[slot].max_y = cop_collision_info[slot].min_y + hh;
+	cop_collision_info[slot].max_z = cop_collision_info[slot].min_z + hd;
 
-	cop_hit_status = 3;
+	cop_hit_status = 7;
 
 	/* outbound X check */
 	if(cop_collision_info[0].max_x >= cop_collision_info[1].min_x && cop_collision_info[0].min_x <= cop_collision_info[1].max_x)
-		cop_hit_status &= ~2;
+		cop_hit_status &= ~1;
 
 	/* outbound Y check */
 	if(cop_collision_info[0].max_y >= cop_collision_info[1].min_y && cop_collision_info[0].min_y <= cop_collision_info[1].max_y)
-		cop_hit_status &= ~1;
+		cop_hit_status &= ~2;
+
+	/* outbound Z check */
+	if(cop_collision_info[0].max_z >= cop_collision_info[1].min_z && cop_collision_info[0].min_z <= cop_collision_info[1].max_z)
+		cop_hit_status &= ~4;
 
 	cop_hit_val_x = (cop_collision_info[0].x - cop_collision_info[1].x) >> 16;
 	cop_hit_val_y = (cop_collision_info[0].y - cop_collision_info[1].y) >> 16;
-	cop_hit_val_z = 1;
+	cop_hit_val_z = (cop_collision_info[0].z - cop_collision_info[1].z) >> 16;
 	cop_hit_val_unk = cop_hit_status; // TODO: there's also bit 2 and 3 triggered in the tests, no known meaning
 }
 
