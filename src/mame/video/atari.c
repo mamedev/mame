@@ -703,7 +703,6 @@ void atari_common_state::cclk_init()
 void atari_common_state::video_start()
 {
 	palette_device *m_palette = machine().first_screen()->palette();
-	int i;
 
 	LOG(("atari antic_vh_start\n"));
 	memset(&antic, 0, sizeof(antic));
@@ -737,25 +736,20 @@ void atari_common_state::video_start()
 	antic.uc_g2       = &antic.used_colors[19 * 256];
 	antic.uc_g3       = &antic.used_colors[20 * 256];
 
-	/* reset the ANTIC color tables */
-	for( i = 0; i < 256; i ++ )
-		gtia.color_lookup[i] = (m_palette->pen(0) << 8) + m_palette->pen(0);
+	for (int i = 0; i < 256; i++)
+		m_gtia->set_color_lookup(i, (m_palette->pen(0) << 8) + m_palette->pen(0));
 
 	LOG(("atari cclk_init\n"));
 	cclk_init();
 
-	for( i = 0; i < 64; i++ )
-	{
+	for (int i = 0; i < 64; i++)
 		antic.prio_table[i] = auto_alloc_array(machine(), UINT8, 8*256);
-	}
 
 	LOG(("atari prio_init\n"));
 	prio_init();
 
-	for( i = 0; i < machine().first_screen()->height(); i++ )
-	{
+	for (int i = 0; i < machine().first_screen()->height(); i++)
 		antic.video[i] = auto_alloc_clear(machine(), VIDEO);
-	}
 }
 
 /************************************************************************
@@ -780,17 +774,16 @@ UINT32 atari_common_state::screen_update_atari(screen_device &screen, bitmap_ind
 
 void atari_common_state::artifacts_gfx(UINT8 *src, UINT8 *dst, int width)
 {
-	int x;
 	UINT8 n, bits = 0;
-	UINT8 b = gtia.w.colbk & 0xf0;
-	UINT8 c = gtia.w.colpf1 & 0x0f;
-	UINT8 atari_A = ((b+0x30)&0xf0)+c;
-	UINT8 atari_B = ((b+0x70)&0xf0)+c;
-	UINT8 atari_C = b+c;
-	UINT8 atari_D = gtia.w.colbk;
-	UINT16 *color_lookup = gtia.color_lookup;
+	UINT8 b = m_gtia->get_w_colbk() & 0xf0;
+	UINT8 c = m_gtia->get_w_colpf1() & 0x0f;
+	UINT8 atari_A = ((b + 0x30) & 0xf0) + c;
+	UINT8 atari_B = ((b + 0x70) & 0xf0) + c;
+	UINT8 atari_C = b + c;
+	UINT8 atari_D = m_gtia->get_w_colbk();
+	UINT16 *color_lookup = m_gtia->get_color_lookup();
 
-	for( x = 0; x < width * 4; x++ )
+	for (int x = 0; x < width * 4; x++)
 	{
 		n = *src++;
 		bits <<= 2;
@@ -812,7 +805,7 @@ void atari_common_state::artifacts_gfx(UINT8 *src, UINT8 *dst, int width)
 			*dst++ = color_lookup[n];
 			continue;
 		}
-		switch( (bits >> 1) & 7 )
+		switch ((bits >> 1) & 7)
 		{
 		case 0: /* 0 0 0 */
 		case 1: /* 0 0 1 */
@@ -831,7 +824,7 @@ void atari_common_state::artifacts_gfx(UINT8 *src, UINT8 *dst, int width)
 			*dst++ = atari_A;
 			break;
 		}
-		switch( bits & 7 )
+		switch (bits & 7)
 		{
 		case 0: /* 0 0 0 */
 		case 1: /* 0 0 1 */
@@ -855,17 +848,16 @@ void atari_common_state::artifacts_gfx(UINT8 *src, UINT8 *dst, int width)
 
 void atari_common_state::artifacts_txt(UINT8 * src, UINT8 * dst, int width)
 {
-	int x;
 	UINT8 n, bits = 0;
-	UINT8 b = gtia.w.colpf2 & 0xf0;
-	UINT8 c = gtia.w.colpf1 & 0x0f;
+	UINT8 b = m_gtia->get_w_colpf2() & 0xf0;
+	UINT8 c = m_gtia->get_w_colpf1() & 0x0f;
 	UINT8 atari_A = ((b+0x30)&0xf0)+c;
 	UINT8 atari_B = ((b+0x70)&0xf0)+c;
 	UINT8 atari_C = b+c;
-	UINT8 atari_D = gtia.w.colpf2;
-	UINT16 *color_lookup = gtia.color_lookup;
+	UINT8 atari_D = m_gtia->get_w_colpf2();
+	UINT16 *color_lookup = m_gtia->get_color_lookup();
 
-	for( x = 0; x < width * 4; x++ )
+	for (int x = 0; x < width * 4; x++)
 	{
 		n = *src++;
 		bits <<= 2;
@@ -935,7 +927,7 @@ void atari_common_state::antic_linerefresh()
 	UINT8 *src;
 	UINT32 *dst;
 	UINT32 scanline[4 + (HCHARS * 2) + 4];
-	UINT16 *color_lookup = gtia.color_lookup;
+	UINT16 *color_lookup = m_gtia->get_color_lookup();
 
 	/* increment the scanline */
 	if( ++antic.scanline == machine().first_screen()->height() )
@@ -944,7 +936,7 @@ void atari_common_state::antic_linerefresh()
 		antic.scanline = 0;
 		antic.modelines = 0;
 		/* count frames gone since last write to hitclr */
-		gtia.h.hitclr_frames++;
+		m_gtia->count_hitclr_frames();
 	}
 
 	if( antic.scanline < MIN_Y || antic.scanline > MAX_Y )
@@ -1183,16 +1175,16 @@ TIMER_CALLBACK_MEMBER( atari_common_state::antic_scanline_render )
 			if( antic.w.dmactl & DMA_MISSILE )
 			{
 				antic.steal_cycles += 1;
-				atari_gtia_w(space, 0x11, RDPMGFXD(space, 3*256));
+				m_gtia->write(space, 0x11, RDPMGFXD(space, 3*256));
 			}
 			/* transport player data to GTIA ? */
 			if( antic.w.dmactl & DMA_PLAYER )
 			{
 				antic.steal_cycles += 4;
-				atari_gtia_w(space, 0x0d, RDPMGFXD(space, 4*256));
-				atari_gtia_w(space, 0x0e, RDPMGFXD(space, 5*256));
-				atari_gtia_w(space, 0x0f, RDPMGFXD(space, 6*256));
-				atari_gtia_w(space, 0x10, RDPMGFXD(space, 7*256));
+				m_gtia->write(space, 0x0d, RDPMGFXD(space, 4*256));
+				m_gtia->write(space, 0x0e, RDPMGFXD(space, 5*256));
+				m_gtia->write(space, 0x0f, RDPMGFXD(space, 6*256));
+				m_gtia->write(space, 0x10, RDPMGFXD(space, 7*256));
 			}
 		}
 		else
@@ -1202,23 +1194,23 @@ TIMER_CALLBACK_MEMBER( atari_common_state::antic_scanline_render )
 			{
 				if( (antic.scanline & 1) == 0 )      /* even line ? */
 					antic.steal_cycles += 1;
-				atari_gtia_w(space, 0x11, RDPMGFXS(space, 3*128));
+				m_gtia->write(space, 0x11, RDPMGFXS(space, 3*128));
 			}
 			/* transport player data to GTIA ? */
 			if( antic.w.dmactl & DMA_PLAYER )
 			{
 				if( (antic.scanline & 1) == 0 )      /* even line ? */
 					antic.steal_cycles += 4;
-				atari_gtia_w(space, 0x0d, RDPMGFXS(space, 4*128));
-				atari_gtia_w(space, 0x0e, RDPMGFXS(space, 5*128));
-				atari_gtia_w(space, 0x0f, RDPMGFXS(space, 6*128));
-				atari_gtia_w(space, 0x10, RDPMGFXS(space, 7*128));
+				m_gtia->write(space, 0x0d, RDPMGFXS(space, 4*128));
+				m_gtia->write(space, 0x0e, RDPMGFXS(space, 5*128));
+				m_gtia->write(space, 0x0f, RDPMGFXS(space, 6*128));
+				m_gtia->write(space, 0x10, RDPMGFXS(space, 7*128));
 			}
 		}
 	}
 
 	if (antic.scanline >= VBL_END && antic.scanline < 256)
-		gtia_render((UINT8 *)antic.pmbits + PMOFFSET, (UINT8 *)antic.cclock + PMOFFSET - antic.hscrol_old, (UINT8 *)antic.prio_table[gtia.w.prior & 0x3f], (UINT8 *)&antic.pmbits);
+		m_gtia->render((UINT8 *)antic.pmbits + PMOFFSET, (UINT8 *)antic.cclock + PMOFFSET - antic.hscrol_old, (UINT8 *)antic.prio_table[m_gtia->get_w_prior() & 0x3f], (UINT8 *)&antic.pmbits);
 
 	antic.steal_cycles += CYCLES_REFRESH;
 	LOG(("           run CPU for %d cycles\n", CYCLES_HSYNC - CYCLES_HSTART - antic.steal_cycles));
@@ -1436,7 +1428,7 @@ void atari_common_state::antic_scanline_dma(int param)
 					LMS(new_cmd);
 					/* bits 6+7 of the priority select register determine */
 					/* if newer GTIA or plain graphics modes are used */
-					switch (gtia.w.prior >> 6)
+					switch (m_gtia->get_w_prior() >> 6)
 					{
 						case 0: break;
 						case 1: antic.renderer = renderer[h][16][w];  break;
@@ -1482,8 +1474,6 @@ void atari_common_state::antic_scanline_dma(int param)
 
 void atari_common_state::generic_atari_interrupt(int button_count)
 {
-	int button_port, i;
-
 	LOG(("ANTIC #%3d @cycle #%d scanline interrupt\n", antic.scanline, cycle()));
 
 	if( antic.scanline < VBL_START )
@@ -1494,22 +1484,8 @@ void atari_common_state::generic_atari_interrupt(int button_count)
 
 	if( antic.scanline == VBL_START )
 	{
-		button_port = machine().root_device().ioport("djoy_b")->read_safe(0);
-
 		/* specify buttons relevant to this Atari variant */
-		for (i = 0; i < button_count; i++)
-		{
-			if ((gtia.w.gractl & GTIA_TRIGGER) == 0)
-				gtia.r.but[i] = 1;
-			gtia.r.but[i] &= (button_port >> i) & 1;
-		}
-
-		/* button registers for xl/xe */
-		if (button_count == 2)
-		{
-			gtia.r.but[2] = 1; /* not used on xl/xe */
-			gtia.r.but[3] = 0; /* 1 if external cartridge is inserted */
-		}
+		m_gtia->button_interrupt(button_count, machine().root_device().ioport("djoy_b")->read_safe(0));
 
 		/* do nothing new for the rest of the frame */
 		antic.modelines = machine().first_screen()->height() - VBL_START;

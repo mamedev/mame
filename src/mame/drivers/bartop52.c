@@ -39,7 +39,7 @@ public:
 static ADDRESS_MAP_START(a5200_mem, AS_PROGRAM, 8, bartop52_state )
 	AM_RANGE(0x0000, 0x3fff) AM_RAM
 	AM_RANGE(0x4000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xc0ff) AM_READWRITE(atari_gtia_r, atari_gtia_w)
+	AM_RANGE(0xc000, 0xc0ff) AM_DEVREADWRITE("gtia", gtia_device, read, write)
 	AM_RANGE(0xd400, 0xd5ff) AM_READWRITE(atari_antic_r, atari_antic_w)
 	AM_RANGE(0xe800, 0xe8ff) AM_DEVREADWRITE("pokey", pokey_device, read, write)
 	AM_RANGE(0xf800, 0xffff) AM_ROM
@@ -104,11 +104,6 @@ INPUT_PORTS_END
 
 void bartop52_state::machine_start()
 {
-	/* GTIA */
-	gtia_interface gtia_intf;
-	memset(&gtia_intf, 0, sizeof(gtia_intf));
-	gtia_init(machine(), &gtia_intf);	
-	
 	/* ANTIC */
 	antic_start(machine());
 }
@@ -126,6 +121,8 @@ static MACHINE_CONFIG_START( a5200, bartop52_state )
 	MCFG_CPU_ADD("maincpu", M6502, FREQ_17_EXACT)
 	MCFG_CPU_PROGRAM_MAP(a5200_mem)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", atari_common_state, a5200_interrupt, "screen", 0, 1)
+
+	MCFG_DEVICE_ADD("gtia", ATARI_GTIA, 0)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

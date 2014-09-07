@@ -263,6 +263,8 @@ public:
 
 	DECLARE_MACHINE_RESET(a400);
 
+	DECLARE_WRITE8_MEMBER(gtia_write);
+
 	DECLARE_WRITE8_MEMBER(a600xl_pia_pb_w);
 	DECLARE_WRITE8_MEMBER(a800xl_pia_pb_w);
 	
@@ -529,7 +531,7 @@ WRITE8_MEMBER(a400_state::xegs_low_w)
 static ADDRESS_MAP_START(a400_mem, AS_PROGRAM, 8, a400_state)
 	AM_RANGE(0x0000, 0xbfff) AM_NOP // RAM installed at runtime
 	AM_RANGE(0xc000, 0xcfff) AM_ROM
-	AM_RANGE(0xd000, 0xd0ff) AM_READWRITE(atari_gtia_r, atari_gtia_w)
+	AM_RANGE(0xd000, 0xd0ff) AM_DEVREADWRITE("gtia", gtia_device, read, write)
 	AM_RANGE(0xd100, 0xd1ff) AM_NOP
 	AM_RANGE(0xd200, 0xd2ff) AM_DEVREADWRITE("pokey", pokey_device, read, write)
 	AM_RANGE(0xd300, 0xd3ff) AM_DEVREADWRITE("pia", pia6821_device, read_alt, write_alt)
@@ -544,7 +546,7 @@ static ADDRESS_MAP_START(a600xl_mem, AS_PROGRAM, 8, a400_state)
 	AM_RANGE(0x5000, 0x57ff) AM_READ(a600xl_low_r)    // self test or NOP
 	AM_RANGE(0xa000, 0xbfff) AM_ROM // BASIC
 	AM_RANGE(0xc000, 0xcfff) AM_ROM // OS
-	AM_RANGE(0xd000, 0xd0ff) AM_READWRITE(atari_gtia_r, atari_gtia_w)
+	AM_RANGE(0xd000, 0xd0ff) AM_DEVREADWRITE("gtia", gtia_device, read, write)
 	AM_RANGE(0xd100, 0xd1ff) AM_NOP
 	AM_RANGE(0xd200, 0xd2ff) AM_DEVREADWRITE("pokey", pokey_device, read, write)
 	AM_RANGE(0xd300, 0xd3ff) AM_DEVREADWRITE("pia", pia6821_device, read_alt, write_alt)
@@ -556,7 +558,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(a1200xl_mem, AS_PROGRAM, 8, a400_state)
 	AM_RANGE(0x0000, 0xcfff) AM_READWRITE(a1200xl_low_r, xegs_low_w)
-	AM_RANGE(0xd000, 0xd0ff) AM_READWRITE(atari_gtia_r, atari_gtia_w)
+	AM_RANGE(0xd000, 0xd0ff) AM_DEVREADWRITE("gtia", gtia_device, read, write)
 	AM_RANGE(0xd100, 0xd1ff) AM_NOP
 	AM_RANGE(0xd200, 0xd2ff) AM_DEVREADWRITE("pokey", pokey_device, read, write)
 	AM_RANGE(0xd300, 0xd3ff) AM_DEVREADWRITE("pia", pia6821_device, read_alt, write_alt)
@@ -568,7 +570,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(a800xl_mem, AS_PROGRAM, 8, a400_state)
 	AM_RANGE(0x0000, 0xcfff) AM_READWRITE(a800xl_low_r, a800xl_low_w)
-	AM_RANGE(0xd000, 0xd0ff) AM_READWRITE(atari_gtia_r, atari_gtia_w)
+	AM_RANGE(0xd000, 0xd0ff) AM_DEVREADWRITE("gtia", gtia_device, read, write)
 	AM_RANGE(0xd100, 0xd1ff) AM_NOP
 	AM_RANGE(0xd200, 0xd2ff) AM_DEVREADWRITE("pokey", pokey_device, read, write)
 	AM_RANGE(0xd300, 0xd3ff) AM_DEVREADWRITE("pia", pia6821_device, read_alt, write_alt)
@@ -580,7 +582,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(a130xe_mem, AS_PROGRAM, 8, a400_state)
 	AM_RANGE(0x0000, 0xcfff) AM_READWRITE(a130xe_low_r, a800xl_low_w)
-	AM_RANGE(0xd000, 0xd0ff) AM_READWRITE(atari_gtia_r, atari_gtia_w)
+	AM_RANGE(0xd000, 0xd0ff) AM_DEVREADWRITE("gtia", gtia_device, read, write)
 	AM_RANGE(0xd100, 0xd1ff) AM_NOP
 	AM_RANGE(0xd200, 0xd2ff) AM_DEVREADWRITE("pokey", pokey_device, read, write)
 	AM_RANGE(0xd300, 0xd3ff) AM_DEVREADWRITE("pia", pia6821_device, read_alt, write_alt)
@@ -592,7 +594,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(xegs_mem, AS_PROGRAM, 8, a400_state)
 	AM_RANGE(0x0000, 0xcfff) AM_READWRITE(xegs_low_r, xegs_low_w)
-	AM_RANGE(0xd000, 0xd0ff) AM_READWRITE(atari_gtia_r, atari_gtia_w)
+	AM_RANGE(0xd000, 0xd0ff) AM_DEVREADWRITE("gtia", gtia_device, read, write)
 	AM_RANGE(0xd100, 0xd1ff) AM_NOP
 	AM_RANGE(0xd200, 0xd2ff) AM_DEVREADWRITE("pokey", pokey_device, read, write)
 	AM_RANGE(0xd300, 0xd3ff) AM_DEVREADWRITE("pia", pia6821_device, read_alt, write_alt)
@@ -605,7 +607,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(a5200_mem, AS_PROGRAM, 8, a400_state)
 	AM_RANGE(0x0000, 0x3fff) AM_RAM
 	AM_RANGE(0x4000, 0xbfff) AM_NOP // ROM installed at machine start
-	AM_RANGE(0xc000, 0xcfff) AM_READWRITE(atari_gtia_r, atari_gtia_w)
+	AM_RANGE(0xc000, 0xcfff) AM_DEVREADWRITE("gtia", gtia_device, read, write)
 	AM_RANGE(0xd400, 0xdfff) AM_READWRITE(atari_antic_r, atari_antic_w)
 	// 0xe000-0xe7ff - Expansion?
 	AM_RANGE(0xe800, 0xefff) AM_DEVREADWRITE("pokey", pokey_device, read, write)
@@ -1928,40 +1930,15 @@ void a400_state::setup_cart(int type)
 	}	
 }
 
-static UINT8 console_read(address_space &space)
-{
-	return space.machine().root_device().ioport("console")->read();
-}
-
-static void console_write(address_space &space, UINT8 data)
-{
-	dac_device *dac = space.machine().device<dac_device>("dac");
-	if (data & 0x08)
-		dac->write_unsigned8((UINT8)-120);
-	else
-		dac->write_unsigned8(+120);
-}
-
 
 void a400_state::common_start()
 {	
-	/* GTIA */
-	gtia_interface gtia_intf;
-	gtia_intf.console_read = console_read;
-	gtia_intf.console_write = console_write;
-	gtia_init(machine(), &gtia_intf);
-	
 	/* ANTIC */
 	antic_start(machine());
 }
 
 void a400_state::a5200_start()
 {
-	/* GTIA */
-	gtia_interface gtia_intf;
-	memset(&gtia_intf, 0, sizeof(gtia_intf));
-	gtia_init(machine(), &gtia_intf);	
-	
 	/* ANTIC */
 	antic_start(machine());
 }
@@ -2021,6 +1998,22 @@ MACHINE_START_MEMBER( a400_state, a5200 )
 
 	save_item(NAME(m_cart_disabled));
 	save_item(NAME(m_last_offs));
+}
+
+
+/**************************************************************
+ *
+ * GTIA interface
+ *
+ **************************************************************/
+
+WRITE8_MEMBER(a400_state::gtia_write)
+{
+	dac_device *dac = machine().device<dac_device>("dac");
+	if (data & 0x08)
+		dac->write_unsigned8((UINT8)-120);
+	else
+		dac->write_unsigned8(+120);
 }
 
 /**************************************************************
@@ -2099,7 +2092,6 @@ static MACHINE_CONFIG_START( atari_common_nodac, a400_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 
-
 static MACHINE_CONFIG_DERIVED( atari_common, atari_common_nodac )
 	MCFG_SOUND_ADD("dac", DAC, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
@@ -2107,6 +2099,10 @@ static MACHINE_CONFIG_DERIVED( atari_common, atari_common_nodac )
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("48K")
+
+	MCFG_DEVICE_ADD("gtia", ATARI_GTIA, 0)
+	MCFG_GTIA_READ_CB(IOPORT("console"))
+	MCFG_GTIA_WRITE_CB(WRITE8(a400_state, gtia_write))
 
 	/* devices */
 	MCFG_DEVICE_ADD("fdc", ATARI_FDC, 0)
@@ -2291,6 +2287,8 @@ static MACHINE_CONFIG_DERIVED( a5200, atari_common_nodac )
 	MCFG_POKEY_INTERRUPT_CB(atari_common_state, interrupt_cb)
 
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+
+	MCFG_DEVICE_ADD("gtia", ATARI_GTIA, 0)
 
 	MCFG_DEVICE_MODIFY("pia")
 	MCFG_PIA_READPA_HANDLER(NULL) // FIXME: is there anything connected here

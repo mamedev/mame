@@ -11,15 +11,7 @@
 #ifndef __GTIA_H__
 #define __GTIA_H__
 
-#include "includes/atari.h"
-
-struct gtia_interface
-{
-	UINT8 (*console_read)(address_space &space);
-	void (*console_write)(address_space &space, UINT8 data);
-};
-
-
+#include "emu.h"
 
 
 /* reading registers */
@@ -121,22 +113,76 @@ struct gtia_helpervars
 	UINT8   vdelay_p3;  /* vertical delay for player 3 */
 };
 
-struct gtia_struct
-{
-	gtia_interface intf;
-	gtia_readregs   r;          /* read registers */
-	gtia_writeregs  w;          /* write registers */
-	gtia_helpervars h;          /* helper variables */
+#define MCFG_GTIA_READ_CB(_devcb) \
+	devcb = &gtia_device::set_read_callback(*device, DEVCB_##_devcb);
 
-	UINT16  color_lookup[256];  /* color lookup table */
+#define MCFG_GTIA_WRITE_CB(_devcb) \
+	devcb = &gtia_device::set_write_callback(*device, DEVCB_##_devcb);
+
+
+// ======================> gtia_device
+
+class gtia_device :  public device_t
+{
+public:
+	// construction/destruction
+	gtia_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	
+	template<class _Object> static devcb_base &set_read_callback(device_t &device, _Object object) { return downcast<gtia_device &>(device).m_read_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_write_callback(device_t &device, _Object object) { return downcast<gtia_device &>(device).m_write_cb.set_callback(object); }
+	
+	DECLARE_READ8_MEMBER( read );
+	DECLARE_WRITE8_MEMBER( write );
+
+	UINT16 *get_color_lookup() { return m_color_lookup; }
+	void set_color_lookup(int i, UINT16 data) { m_color_lookup[i] = data; }
+
+	UINT8 get_w_colbk() { return m_w.colbk; }
+	UINT8 get_w_colpf1() { return m_w.colpf1; }
+	UINT8 get_w_colpf2() { return m_w.colpf2; }
+	UINT8 get_w_prior() { return m_w.prior; }
+	void count_hitclr_frames() { m_h.hitclr_frames++; }
+	void button_interrupt(int button_count, UINT8 button_port);
+	
+	void render(UINT8 *src, UINT8 *dst, UINT8 *pmbits, UINT8 *prio);
+	
+protected:
+	// device-level overrides
+	virtual void device_start();
+	virtual void device_reset();
+	
+	void gtia_postload();
+	
+	int is_ntsc();
+	void recalc_p0();
+	void recalc_p1();
+	void recalc_p2();
+	void recalc_p3();
+	void recalc_m0();
+	void recalc_m1();
+	void recalc_m2();
+	void recalc_m3();
+	
+	void player_render(UINT8 gfx, int size, UINT8 color, UINT8 *dst);
+	void missile_render(UINT8 gfx, int size, UINT8 color, UINT8 *dst);
+	
+private:
+	gtia_readregs   m_r;          /* read registers */
+	gtia_writeregs  m_w;          /* write registers */
+	gtia_helpervars m_h;          /* helper variables */
+	
+	UINT8 m_lumpf1;
+	UINT8 m_huepm0, m_huepm1, m_huepm2, m_huepm3, m_huepm4;
+	UINT8 m_huepf2, m_huebk;
+	
+	UINT16 m_color_lookup[256];  /* color lookup table */	// probably better fit to ANTIC, but it remains here for the moment...
+	
+	devcb_read8 m_read_cb;
+	devcb_write8 m_write_cb;
 };
 
 
-
-extern gtia_struct gtia;
-
-void gtia_init(running_machine &machine, const gtia_interface *intf);
-
-void gtia_render(UINT8 *src, UINT8 *dst, UINT8 *prio, UINT8 *pmbits);
+// device type definition
+extern const device_type ATARI_GTIA;
 
 #endif /* __GTIA_H__ */

@@ -14,6 +14,7 @@
 
 #include "machine/6821pia.h"
 #include "sound/pokey.h"
+#include "video/gtia.h"
 
 
 class atari_common_state : public driver_device
@@ -21,6 +22,7 @@ class atari_common_state : public driver_device
 public:
 	atari_common_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
+		m_gtia(*this, "gtia"),
 		tv_artifacts(0) { }
 
 	virtual void video_start();
@@ -33,9 +35,6 @@ public:
 
 	DECLARE_PALETTE_INIT(atari);
 
-	DECLARE_READ8_MEMBER( atari_gtia_r );
-	DECLARE_WRITE8_MEMBER( atari_gtia_w );
-
 	DECLARE_READ8_MEMBER ( atari_antic_r );
 	DECLARE_WRITE8_MEMBER ( atari_antic_w );
 
@@ -44,7 +43,8 @@ public:
 	POKEY_KEYBOARD_CB_MEMBER(a800_keyboard);
 
 private:
-	UINT32 tv_artifacts ;
+	required_device<gtia_device> m_gtia;
+	UINT32 tv_artifacts;
 	void prio_init();
 	void cclk_init();
 	void artifacts_gfx(UINT8 *src, UINT8 *dst, int width);
