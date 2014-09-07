@@ -176,7 +176,7 @@ void seibu_sound_device::decrypt(const char *cpu,int length)
 
 void seibu_sound_device::update_irq_lines(int param)
 {
-	// note: we use 0xff here for inactive irq
+	// note: we use 0xff here for inactive irqline
 
 	switch (param)
 	{

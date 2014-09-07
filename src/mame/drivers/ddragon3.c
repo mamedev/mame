@@ -279,7 +279,7 @@ WRITE16_MEMBER(wwfwfest_state::wwfwfest_paletteram_w)
 
 WRITE16_MEMBER(wwfwfest_state::wwfwfest_1410_write)
 {
-	m_pri = data;
+	m_pri = data & 0xff;
 }
 
 
