@@ -709,7 +709,9 @@ void atari_common_state::video_start()
 
 	antic.bitmap = auto_bitmap_ind16_alloc(machine(), machine().first_screen()->width(), machine().first_screen()->height());
 
-	antic.renderer = antic_mode_0_xx;
+	m_antic_render1 = 0;
+	m_antic_render2 = 0;
+	m_antic_render3 = 0;
 	antic.cclk_expand = auto_alloc_array(machine(), UINT32, 21 * 256);
 
 	antic.pf_21       = &antic.cclk_expand[ 0 * 256];
@@ -1058,54 +1060,6 @@ TIMER_CALLBACK_MEMBER( atari_common_state::antic_issue_dli )
 }
 
 
-static const atari_renderer_func renderer[2][19][5] = {
-	/*   no playfield    narrow          normal          wide         */
-	{
-		{antic_mode_0_xx,antic_mode_0_xx,antic_mode_0_xx,antic_mode_0_xx},
-		{antic_mode_0_xx,antic_mode_0_xx,antic_mode_0_xx,antic_mode_0_xx},
-		{antic_mode_0_xx,antic_mode_2_32,antic_mode_2_40,antic_mode_2_48},
-		{antic_mode_0_xx,antic_mode_3_32,antic_mode_3_40,antic_mode_3_48},
-		{antic_mode_0_xx,antic_mode_4_32,antic_mode_4_40,antic_mode_4_48},
-		{antic_mode_0_xx,antic_mode_5_32,antic_mode_5_40,antic_mode_5_48},
-		{antic_mode_0_xx,antic_mode_6_32,antic_mode_6_40,antic_mode_6_48},
-		{antic_mode_0_xx,antic_mode_7_32,antic_mode_7_40,antic_mode_7_48},
-		{antic_mode_0_xx,antic_mode_8_32,antic_mode_8_40,antic_mode_8_48},
-		{antic_mode_0_xx,antic_mode_9_32,antic_mode_9_40,antic_mode_9_48},
-		{antic_mode_0_xx,antic_mode_a_32,antic_mode_a_40,antic_mode_a_48},
-		{antic_mode_0_xx,antic_mode_b_32,antic_mode_b_40,antic_mode_b_48},
-		{antic_mode_0_xx,antic_mode_c_32,antic_mode_c_40,antic_mode_c_48},
-		{antic_mode_0_xx,antic_mode_d_32,antic_mode_d_40,antic_mode_d_48},
-		{antic_mode_0_xx,antic_mode_e_32,antic_mode_e_40,antic_mode_e_48},
-		{antic_mode_0_xx,antic_mode_f_32,antic_mode_f_40,antic_mode_f_48},
-		{antic_mode_0_xx, gtia_mode_1_32, gtia_mode_1_40, gtia_mode_1_48},
-		{antic_mode_0_xx, gtia_mode_2_32, gtia_mode_2_40, gtia_mode_2_48},
-		{antic_mode_0_xx, gtia_mode_3_32, gtia_mode_3_40, gtia_mode_3_48},
-	},
-	/*   with hscrol enabled playfield width is +32 color clocks      */
-	/*   no playfield    narrow->normal  normal->wide    wide->wide   */
-	{
-		{antic_mode_0_xx,antic_mode_0_xx,antic_mode_0_xx,antic_mode_0_xx},
-		{antic_mode_0_xx,antic_mode_0_xx,antic_mode_0_xx,antic_mode_0_xx},
-		{antic_mode_0_xx,antic_mode_2_40,antic_mode_2_48,antic_mode_2_48},
-		{antic_mode_0_xx,antic_mode_3_40,antic_mode_3_48,antic_mode_3_48},
-		{antic_mode_0_xx,antic_mode_4_40,antic_mode_4_48,antic_mode_4_48},
-		{antic_mode_0_xx,antic_mode_5_40,antic_mode_5_48,antic_mode_5_48},
-		{antic_mode_0_xx,antic_mode_6_40,antic_mode_6_48,antic_mode_6_48},
-		{antic_mode_0_xx,antic_mode_7_40,antic_mode_7_48,antic_mode_7_48},
-		{antic_mode_0_xx,antic_mode_8_40,antic_mode_8_48,antic_mode_8_48},
-		{antic_mode_0_xx,antic_mode_9_40,antic_mode_9_48,antic_mode_9_48},
-		{antic_mode_0_xx,antic_mode_a_40,antic_mode_a_48,antic_mode_a_48},
-		{antic_mode_0_xx,antic_mode_b_40,antic_mode_b_48,antic_mode_b_48},
-		{antic_mode_0_xx,antic_mode_c_40,antic_mode_c_48,antic_mode_c_48},
-		{antic_mode_0_xx,antic_mode_d_40,antic_mode_d_48,antic_mode_d_48},
-		{antic_mode_0_xx,antic_mode_e_40,antic_mode_e_48,antic_mode_e_48},
-		{antic_mode_0_xx,antic_mode_f_40,antic_mode_f_48,antic_mode_f_48},
-		{antic_mode_0_xx, gtia_mode_1_40, gtia_mode_1_48, gtia_mode_1_48},
-		{antic_mode_0_xx, gtia_mode_2_40, gtia_mode_2_48, gtia_mode_2_48},
-		{antic_mode_0_xx, gtia_mode_3_40, gtia_mode_3_48, gtia_mode_3_48},
-	}
-};
-
 /*****************************************************************************
  *
  *  Antic Line Done
@@ -1163,7 +1117,7 @@ TIMER_CALLBACK_MEMBER( atari_common_state::antic_scanline_render )
 	VIDEO *video = antic.video[antic.scanline];
 	LOG(("           @cycle #%3d render mode $%X lines to go #%d\n", cycle(), (antic.cmd & 0x0f), antic.modelines));
 
-	(*antic.renderer)(space, video);
+	antic_render(space, video, m_antic_render1, m_antic_render2, m_antic_render3);
 
 	/* if player/missile graphics is enabled */
 	if( antic.scanline < 256 && (antic.w.dmactl & (DMA_PLAYER|DMA_MISSILE)) )
@@ -1264,7 +1218,8 @@ void atari_common_state::antic_scanline_dma(int param)
 		{
 			if( antic.modelines <= 0 )
 			{
-				int h = 0, w = antic.w.dmactl & 3;
+				m_antic_render1 = 0;
+				m_antic_render3 = antic.w.dmactl & 3;
 				UINT8 vscrol_subtract = 0;
 				UINT8 new_cmd;
 
@@ -1295,7 +1250,7 @@ void atari_common_state::antic_scanline_dma(int param)
 					/* does this command have horizontal scroll enabled ? */
 					if( new_cmd & ANTIC_HSCR )
 					{
-						h = 1;
+						m_antic_render1 = 1;
 						antic.hscrol_old = antic.w.hscrol;
 					}
 					else
@@ -1304,7 +1259,7 @@ void atari_common_state::antic_scanline_dma(int param)
 					}
 				}
 				/* Set the ANTIC mode renderer function */
-				antic.renderer = renderer[h][new_cmd & ANTIC_MODE][w];
+				m_antic_render2 = new_cmd & ANTIC_MODE;
 
 				switch( new_cmd & ANTIC_MODE )
 				{
@@ -1431,9 +1386,9 @@ void atari_common_state::antic_scanline_dma(int param)
 					switch (m_gtia->get_w_prior() >> 6)
 					{
 						case 0: break;
-						case 1: antic.renderer = renderer[h][16][w];  break;
-						case 2: antic.renderer = renderer[h][17][w];  break;
-						case 3: antic.renderer = renderer[h][18][w];  break;
+						case 1: m_antic_render2 = 16;  break;
+						case 2: m_antic_render2 = 17;  break;
+						case 3: m_antic_render2 = 18;  break;
 					}
 					antic.modelines = 1;
 					break;
@@ -1446,14 +1401,18 @@ void atari_common_state::antic_scanline_dma(int param)
 		{
 			LOG(("           out of visible range\n"));
 			antic.cmd = 0x00;
-			antic.renderer = antic_mode_0_xx;
+			m_antic_render1 = 0;
+			m_antic_render2 = 0;
+			m_antic_render3 = 0;
 		}
 	}
 	else
 	{
 		LOG(("           DMA is off\n"));
 		antic.cmd = 0x00;
-		antic.renderer = antic_mode_0_xx;
+		m_antic_render1 = 0;
+		m_antic_render2 = 0;
+		m_antic_render3 = 0;
 	}
 
 	antic.r.nmist &= ~DLI_NMI;
@@ -1489,8 +1448,10 @@ void atari_common_state::generic_atari_interrupt(int button_count)
 
 		/* do nothing new for the rest of the frame */
 		antic.modelines = machine().first_screen()->height() - VBL_START;
-		antic.renderer = antic_mode_0_xx;
-
+		m_antic_render1 = 0;
+		m_antic_render2 = 0;
+		m_antic_render3 = 0;
+		
 		/* if the CPU want's to be interrupted at vertical blank... */
 		if( antic.w.nmien & VBL_NMI )
 		{

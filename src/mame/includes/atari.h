@@ -59,6 +59,8 @@ private:
 	inline void LMS(int new_cmd);
 	void antic_scanline_dma(int param);
 	void generic_atari_interrupt(int button_count);
+	
+	int m_antic_render1, m_antic_render2, m_antic_render3;
 };
 
 /* video */
@@ -559,61 +561,7 @@ extern ANTIC antic;
 
 void antic_start(running_machine &machine);
 void antic_reset(void);
+void antic_render(address_space &space, VIDEO *video, int param1, int param2, int param3);
 
-
-#define ANTIC_RENDERER(name) void name(address_space &space, VIDEO *video)
-
-ANTIC_RENDERER( antic_mode_0_xx );
-ANTIC_RENDERER( antic_mode_2_32 );
-ANTIC_RENDERER( antic_mode_2_40 );
-ANTIC_RENDERER( antic_mode_2_48 );
-ANTIC_RENDERER( antic_mode_3_32 );
-ANTIC_RENDERER( antic_mode_3_40 );
-ANTIC_RENDERER( antic_mode_3_48 );
-ANTIC_RENDERER( antic_mode_4_32 );
-ANTIC_RENDERER( antic_mode_4_40 );
-ANTIC_RENDERER( antic_mode_4_48 );
-ANTIC_RENDERER( antic_mode_5_32 );
-ANTIC_RENDERER( antic_mode_5_40 );
-ANTIC_RENDERER( antic_mode_5_48 );
-ANTIC_RENDERER( antic_mode_6_32 );
-ANTIC_RENDERER( antic_mode_6_40 );
-ANTIC_RENDERER( antic_mode_6_48 );
-ANTIC_RENDERER( antic_mode_7_32 );
-ANTIC_RENDERER( antic_mode_7_40 );
-ANTIC_RENDERER( antic_mode_7_48 );
-ANTIC_RENDERER( antic_mode_8_32 );
-ANTIC_RENDERER( antic_mode_8_40 );
-ANTIC_RENDERER( antic_mode_8_48 );
-ANTIC_RENDERER( antic_mode_9_32 );
-ANTIC_RENDERER( antic_mode_9_40 );
-ANTIC_RENDERER( antic_mode_9_48 );
-ANTIC_RENDERER( antic_mode_a_32 );
-ANTIC_RENDERER( antic_mode_a_40 );
-ANTIC_RENDERER( antic_mode_a_48 );
-ANTIC_RENDERER( antic_mode_b_32 );
-ANTIC_RENDERER( antic_mode_b_40 );
-ANTIC_RENDERER( antic_mode_b_48 );
-ANTIC_RENDERER( antic_mode_c_32 );
-ANTIC_RENDERER( antic_mode_c_40 );
-ANTIC_RENDERER( antic_mode_c_48 );
-ANTIC_RENDERER( antic_mode_d_32 );
-ANTIC_RENDERER( antic_mode_d_40 );
-ANTIC_RENDERER( antic_mode_d_48 );
-ANTIC_RENDERER( antic_mode_e_32 );
-ANTIC_RENDERER( antic_mode_e_40 );
-ANTIC_RENDERER( antic_mode_e_48 );
-ANTIC_RENDERER( antic_mode_f_32 );
-ANTIC_RENDERER( antic_mode_f_40 );
-ANTIC_RENDERER( antic_mode_f_48 );
-ANTIC_RENDERER( gtia_mode_1_32 );
-ANTIC_RENDERER( gtia_mode_1_40 );
-ANTIC_RENDERER( gtia_mode_1_48 );
-ANTIC_RENDERER( gtia_mode_2_32 );
-ANTIC_RENDERER( gtia_mode_2_40 );
-ANTIC_RENDERER( gtia_mode_2_48 );
-ANTIC_RENDERER( gtia_mode_3_32 );
-ANTIC_RENDERER( gtia_mode_3_40 );
-ANTIC_RENDERER( gtia_mode_3_48 );
 
 #endif /* ATARI_H */
