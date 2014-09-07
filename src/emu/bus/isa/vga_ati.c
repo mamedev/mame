@@ -52,6 +52,11 @@ ROM_START( mach64 )
 
 	ROM_SYSTEM_BIOS( 3, "pci", "PCI BIOS 113-25420-100" )
 	ROMX_LOAD("pci_mach64__113-25420-100-1995.27c256.u1.bin", 0x00000, 0x8000, CRC(762596e8) SHA1(9544b073ac182ec2990e18f54afbb96d52db744a), ROM_BIOS(4) )
+
+	ROM_SYSTEM_BIOS( 4, "pci_v1", "PCI mach64 V1 BIOS 113-34404-104" )
+	ROMX_LOAD("pci_mach64_v1_113-34404-104_1996.bin", 0x00000, 0x8000, CRC(c6a39c3f) SHA1(0f4cf9221179c675dafafde638bc00244b6feb63), ROM_BIOS(5) )
+	ROM_IGNORE(0x8000)
+
 ROM_END
 
 //**************************************************************************
