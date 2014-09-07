@@ -1,21 +1,16 @@
 /********************************************************************
 
- dgPIX VRender0 hardware driver
+ dgPIX VRender0 hardware
 
  Games Supported:
  ---------------------------------------------------------------------------
+ - Elfin                               (c) 1999 dgPIX Entertainment Inc.
  - Jump Jump                           (c) 1999 dgPIX Entertainment Inc.
- - X-Files                             (c) 1999 dgPIX Entertainment Inc.
+ - The X-Files (2 sets)                (c) 1999 dgPIX Entertainment Inc.
  - King of Dynast Gear (version 1.8)   (c) 1999 EZ Graphics [*]
  - Fishing Maniac 3                    (c) 2002 Saero Entertainment
 
  [*] the version number is written in the flash roms at the beginning of the game settings
-
-
- Games Needed:
- ---------------------------------------------------------------------------
- - Elfin                               (c) 1999 dgPIX Entertainment Inc.
- - X-Files (Alternate title screen)    (c) 1999 dgPIX Entertainment Inc.
 
 
  Original bugs:
@@ -26,6 +21,7 @@
  - "The 16-bit CPU core was Sequoia's design and was licensed to Samsung.
     It was a 16-bit core with a nearly perfectly orthogonal instruction set.
     You could even multiply the PC by the stack pointer if you wanted."
+    AKA Samsung's Omniwave MULTIMEDIA AUDIO
 
 
  driver by Pierpaolo Prazzoli & Tomasz Slanina
@@ -54,7 +50,7 @@
 PCB Layout
 ----------
 
-X-Files
+The X-Files
 Fishing Maniac 3
 
 VRenderO Minus Rev4 dgPIX Entertainment Inc. 1999
@@ -175,10 +171,12 @@ public:
 	DECLARE_WRITE32_MEMBER(vbuffer_w);
 	DECLARE_WRITE32_MEMBER(coin_w);
 	DECLARE_READ32_MEMBER(vblank_r);
-	DECLARE_DRIVER_INIT(fmaniac3);
-	DECLARE_DRIVER_INIT(xfiles);
-	DECLARE_DRIVER_INIT(kdynastg);
+	DECLARE_DRIVER_INIT(elfin);
 	DECLARE_DRIVER_INIT(jumpjump);
+	DECLARE_DRIVER_INIT(xfiles);
+	DECLARE_DRIVER_INIT(xfilesk);
+	DECLARE_DRIVER_INIT(kdynastg);
+	DECLARE_DRIVER_INIT(fmaniac3);
 	virtual void machine_reset();
 	virtual void video_start();
 	UINT32 screen_update_dgpix(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -430,6 +428,28 @@ MACHINE_CONFIG_END
 
 
 /*
+Elfin
+dgPIX Entertainment Inc. 1999
+
+PCB combo:
+VRenderO Minus Rev5 dgPIX Entertainment Inc. 1999
+Flash Module Type-A REV2 dgPIX Entertainment Inc. 1999
+
+*/
+ROM_START( elfin )
+	ROM_REGION32_BE( 0x2000000, "flash", ROMREGION_ERASE00 ) /* Hyperstone CPU Code & Data */
+	/* 0 - 0x17fffff empty space */
+	ROM_LOAD16_WORD_SWAP( "flash.u8", 0x1800000, 0x400000, CRC(eb56d7ca) SHA1(7c1cfcc68579cf3bdd9707da7d745a410223b8d9) )
+	ROM_LOAD16_WORD_SWAP( "flash.u9", 0x1c00000, 0x400000, CRC(9ca6a209) SHA1(cfba8fa2e83aa1bb205f56ea59a4b432fb198cb5) )
+
+	ROM_REGION( 0x400000, "cpu1", 0 ) /* sound rom */
+	ROM_LOAD16_WORD_SWAP( "flash.u10", 0x000000, 0x400000, CRC(d378fe55) SHA1(5cc7bc5ae258cd48816857793a262e7c6c330795) )
+
+	ROM_REGION( 0x1000, "cpu2", ROMREGION_ERASEFF ) /* PIC */
+	ROM_LOAD( "elfin_pic",  0x0000, 0x1000, NO_DUMP ) // protected
+ROM_END
+
+/*
 Jump Jump
 dgPIX Entertainment Inc. 1999
 
@@ -453,7 +473,32 @@ ROM_END
 
 /*
 
-X-Files
+The X-Files
+dgPIX Entertainment Inc. 1999
+
+PCB combo:
+VRenderO Minus Rev4 dgPIX Entertainment Inc. 1999
+Flash Module Type-A REV2 dgPIX Entertainment Inc. 1999
+
+Uncensored World version
+
+*/
+ROM_START( xfiles )
+	ROM_REGION32_BE( 0x2000000, "flash", ROMREGION_ERASE00 ) /* Hyperstone CPU Code & Data */
+	/* 0 - 0x17fffff empty space */
+	ROM_LOAD16_WORD_SWAP( "flash.u8",  0x1800000, 0x400000, CRC(231ad82a) SHA1(a1cc5c4122605e564d51137f1dca2afa82616202) )
+	ROM_LOAD16_WORD_SWAP( "flash.u9",  0x1c00000, 0x400000, CRC(d68994b7) SHA1(c1752d6795f7aaa6beef73643327205a1c32f0f5) )
+
+	ROM_REGION( 0x400000, "cpu1", 0 ) /* sound rom */
+	ROM_LOAD16_WORD_SWAP( "flash.u10", 0x0000000, 0x400000, CRC(1af33cda) SHA1(9bbcfb07a4a5bcff3efc1c7bcc51bc16c47ca9e6) )
+
+	ROM_REGION( 0x1000, "cpu2", 0 ) /* PIC */
+	ROM_LOAD( "xfiles_pic",  0x0000, 0x1000, NO_DUMP ) // protected
+ROM_END
+
+/*
+
+The X-Files
 dgPIX Entertainment Inc. 1999
 
 PCB combo:
@@ -467,10 +512,11 @@ At the end of the level, you are presented with a babe, where you can use
 the joystick and buttons to scroll up and down and zoom in for erm...
 a closer inspection of the 'merchandise' ;-))
 
+Censored version for the Korean market
 Korean text on Mode Select screen and the following screen
 
 */
-ROM_START( xfiles )
+ROM_START( xfilesk )
 	ROM_REGION32_BE( 0x2000000, "flash", ROMREGION_ERASE00 ) /* Hyperstone CPU Code & Data */
 	/* 0 - 0x17fffff empty space */
 	ROM_LOAD16_WORD_SWAP( "u8.bin",  0x1800000, 0x400000, CRC(3b2c2bc1) SHA1(1c07fb5bd8a8c9b5fb169e6400fef845f3aee7aa) )
@@ -480,7 +526,7 @@ ROM_START( xfiles )
 	ROM_LOAD16_WORD_SWAP( "u10.bin", 0x0000000, 0x400000, CRC(f2ef1eb9) SHA1(d033d140fce6716d7d78509aa5387829f0a1404c) )
 
 	ROM_REGION( 0x1000, "cpu2", 0 ) /* PIC */
-	ROM_LOAD( "xfiles_pic",  0x0000, 0x1000, NO_DUMP ) // protected
+	ROM_LOAD( "xfilesk_pic",  0x0000, 0x1000, NO_DUMP ) // protected - same PIC as parent??
 ROM_END
 
 /*
@@ -533,6 +579,20 @@ ROM_END
 
 
 
+DRIVER_INIT_MEMBER(dgpix_state,elfin)
+{
+	UINT8 *rom = (UINT8 *)memregion("flash")->base() + 0x1c00000;
+
+	rom[BYTE4_XOR_BE(0x3a9e94)] = 3;
+	rom[BYTE4_XOR_BE(0x3a9e95)] = 0;
+	rom[BYTE4_XOR_BE(0x3a9e96)] = 3;
+	rom[BYTE4_XOR_BE(0x3a9e97)] = 0;
+	rom[BYTE4_XOR_BE(0x3a9e98)] = 3;
+	rom[BYTE4_XOR_BE(0x3a9e99)] = 0;
+
+	m_flash_roms = 2;
+}
+
 DRIVER_INIT_MEMBER(dgpix_state,jumpjump)
 {
 	UINT8 *rom = (UINT8 *)memregion("flash")->base() + 0x1c00000;
@@ -548,6 +608,20 @@ DRIVER_INIT_MEMBER(dgpix_state,jumpjump)
 }
 
 DRIVER_INIT_MEMBER(dgpix_state,xfiles)
+{
+	UINT8 *rom = (UINT8 *)memregion("flash")->base() + 0x1c00000;
+
+	rom[BYTE4_XOR_BE(0x3a9a2a)] = 3;
+	rom[BYTE4_XOR_BE(0x3a9a2b)] = 0;
+	rom[BYTE4_XOR_BE(0x3a9a2c)] = 3;
+	rom[BYTE4_XOR_BE(0x3a9a2d)] = 0;
+	rom[BYTE4_XOR_BE(0x3a9a2e)] = 3;
+	rom[BYTE4_XOR_BE(0x3a9a2f)] = 0;
+
+	m_flash_roms = 2;
+}
+
+DRIVER_INIT_MEMBER(dgpix_state,xfilesk)
 {
 	UINT8 *rom = (UINT8 *)memregion("flash")->base() + 0x1c00000;
 
@@ -588,7 +662,10 @@ DRIVER_INIT_MEMBER(dgpix_state,fmaniac3)
 {
 	m_flash_roms = 2;
 }
-GAME( 1999, jumpjump, 0, dgpix, dgpix, dgpix_state, jumpjump, ROT0, "dgPIX Entertainment Inc.", "Jump Jump",                         GAME_NO_SOUND )
-GAME( 1999, xfiles,   0, dgpix, dgpix, dgpix_state, xfiles,   ROT0, "dgPIX Entertainment Inc.", "X-Files",                           GAME_NO_SOUND )
-GAME( 1999, kdynastg, 0, dgpix, dgpix, dgpix_state, kdynastg, ROT0, "EZ Graphics",              "King of Dynast Gear (version 1.8)", GAME_NO_SOUND )
-GAME( 2002, fmaniac3, 0, dgpix, dgpix, dgpix_state, fmaniac3, ROT0, "Saero Entertainment",      "Fishing Maniac 3",                  GAME_NO_SOUND )
+
+GAME( 1999, elfin,          0, dgpix, dgpix, dgpix_state, elfin,    ROT0, "dgPIX Entertainment Inc.", "Elfin",                             GAME_NO_SOUND )
+GAME( 1999, jumpjump,       0, dgpix, dgpix, dgpix_state, jumpjump, ROT0, "dgPIX Entertainment Inc.", "Jump Jump",                         GAME_NO_SOUND )
+GAME( 1999, xfiles,         0, dgpix, dgpix, dgpix_state, xfiles,   ROT0, "dgPIX Entertainment Inc.", "The X-Files",                       GAME_NO_SOUND )
+GAME( 1999, xfilesk,   xfiles, dgpix, dgpix, dgpix_state, xfilesk,  ROT0, "dgPIX Entertainment Inc.", "The X-Files (Censored, Korea)",     GAME_NO_SOUND )
+GAME( 1999, kdynastg,       0, dgpix, dgpix, dgpix_state, kdynastg, ROT0, "EZ Graphics",              "King of Dynast Gear (version 1.8)", GAME_NO_SOUND )
+GAME( 2002, fmaniac3,       0, dgpix, dgpix, dgpix_state, fmaniac3, ROT0, "Saero Entertainment",      "Fishing Maniac 3",                  GAME_NO_SOUND )
