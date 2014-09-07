@@ -77,6 +77,8 @@ protected:
 	UINT8 m_sub2main[2];
 	int m_main2sub_pending;
 	int m_sub2main_pending;
+	UINT8 m_rst10_irq;
+	UINT8 m_rst18_irq;
 
 	enum
 	{
@@ -92,10 +94,6 @@ extern const device_type SEIBU_SOUND;
 
 
 // Seibu ADPCM device
-
-struct seibu_adpcm_interface
-{
-};
 
 class seibu_adpcm_device : public device_t,
 									public device_sound_interface
@@ -125,7 +123,6 @@ protected:
 	UINT32 m_end;
 	UINT8 m_nibble;
 	UINT8 m_playing;
-	//UINT8 m_allocated;
 	const char *m_rom_tag;
 	UINT8 *m_base;
 };

@@ -77,7 +77,9 @@ const device_type SEIBU_SOUND = &device_creator<seibu_sound_device>;
 seibu_sound_device::seibu_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, SEIBU_SOUND, "Seibu Sound System", tag, owner, clock, "seibu_sound", __FILE__),
 		m_main2sub_pending(0),
-		m_sub2main_pending(0)
+		m_sub2main_pending(0),
+		m_rst10_irq(0xff),
+		m_rst18_irq(0xff)
 {
 }
 
@@ -90,17 +92,12 @@ void seibu_sound_device::device_start()
 	m_main2sub[0] = m_main2sub[1] = 0;
 	m_sub2main[0] = m_sub2main[1] = 0;
 
-	save_item(NAME(m_main2sub_pending));
-	save_item(NAME(m_sub2main_pending));
-
 	save_item(NAME(m_main2sub));
 	save_item(NAME(m_sub2main));
-
-	for (int i = 0; i < 2; i++)
-	{
-		save_item(NAME(m_main2sub[i]), i);
-		save_item(NAME(m_sub2main[i]), i);
-	}
+	save_item(NAME(m_main2sub_pending));
+	save_item(NAME(m_sub2main_pending));
+	save_item(NAME(m_rst10_irq));
+	save_item(NAME(m_rst18_irq));
 }
 
 //-------------------------------------------------
@@ -179,39 +176,41 @@ void seibu_sound_device::decrypt(const char *cpu,int length)
 
 void seibu_sound_device::update_irq_lines(int param)
 {
-	static int irq1,irq2;
+	// note: we use 0xff here for inactive irq
 
-	switch(param)
+	switch (param)
 	{
 		case VECTOR_INIT:
-			irq1 = irq2 = 0xff;
+			m_rst10_irq = m_rst18_irq = 0xff;
 			break;
 
 		case RST10_ASSERT:
-			irq1 = 0xd7;
+			m_rst10_irq = 0xd7;
 			break;
 
 		case RST10_CLEAR:
-			irq1 = 0xff;
+			m_rst10_irq = 0xff;
 			break;
 
 		case RST18_ASSERT:
-			irq2 = 0xdf;
+			m_rst18_irq = 0xdf;
 			break;
 
 		case RST18_CLEAR:
-			irq2 = 0xff;
+			m_rst18_irq = 0xff;
 			break;
 	}
 
 	if (m_sound_cpu != NULL)
-			if ((irq1 & irq2) == 0xff)  /* no IRQs pending */
-				m_sound_cpu->execute().set_input_line(0,CLEAR_LINE);
-			else    /* IRQ pending */
-				m_sound_cpu->execute().set_input_line_and_vector(0,ASSERT_LINE,irq1 & irq2);
-	else
-	return;
+	{
+		if ((m_rst10_irq & m_rst18_irq) == 0xff) /* no IRQs pending */
+			m_sound_cpu->execute().set_input_line(0, CLEAR_LINE);
+		else /* IRQ pending */
+			m_sound_cpu->execute().set_input_line_and_vector(0, ASSERT_LINE, m_rst10_irq & m_rst18_irq);
 	}
+	else
+		return;
+}
 
 
 WRITE8_MEMBER( seibu_sound_device::irq_clear_w )
@@ -252,8 +251,8 @@ WRITE8_MEMBER( seibu_sound_device::bank_w )
 
 WRITE8_MEMBER( seibu_sound_device::coin_w )
 {
-	coin_counter_w(space.machine(), 0,data & 1);
-	coin_counter_w(space.machine(), 1,data & 2);
+	coin_counter_w(space.machine(), 0, data & 1);
+	coin_counter_w(space.machine(), 1, data & 2);
 }
 
 READ8_MEMBER( seibu_sound_device::soundlatch_r )
@@ -333,8 +332,10 @@ WRITE8_MEMBER( seibu_sound_device::main_v30_w )
 
 WRITE16_MEMBER( seibu_sound_device::main_mustb_w )
 {
-	m_main2sub[0] = data&0xff;
-	m_main2sub[1] = data>>8;
+	if (ACCESSING_BITS_0_7)
+		m_main2sub[0] = data & 0xff;
+	if (ACCESSING_BITS_8_15)
+		m_main2sub[1] = data >> 8;
 
 //  logerror("seibu_main_mustb_w: %x -> %x %x\n", data, main2sub[0], main2sub[1]);
 
@@ -490,7 +491,6 @@ seibu_adpcm_device::seibu_adpcm_device(const machine_config &mconfig, const char
 		m_end(0),
 		m_nibble(0),
 		m_playing(0),
-		//m_allocated(0),
 		m_rom_tag(NULL),
 		m_base(NULL)
 {
@@ -527,6 +527,7 @@ WRITE8_MEMBER( seibu_adpcm_device::adr_w )
 {
 	if (m_stream)
 		m_stream->update();
+
 	if (offset)
 	{
 		m_end = data<<8;
@@ -543,6 +544,7 @@ WRITE8_MEMBER( seibu_adpcm_device::ctl_w )
 	// sequence is 00 02 01 each time.
 	if (m_stream)
 		m_stream->update();
+
 	switch (data)
 	{
 		case 0:
@@ -553,7 +555,6 @@ WRITE8_MEMBER( seibu_adpcm_device::ctl_w )
 		case 1:
 			m_playing = 1;
 			break;
-
 	}
 }
 
