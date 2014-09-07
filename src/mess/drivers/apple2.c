@@ -226,6 +226,7 @@ Address bus A0-A11 is Y0-Y11
 #include "bus/a2bus/a2mcms.h"
 #include "bus/a2bus/a2dx1.h"
 #include "bus/a2bus/timemasterho.h"
+#include "bus/a2bus/mouse.h"
 #include "bus/a2bus/a2estd80col.h"
 #include "bus/a2bus/a2eext80col.h"
 #include "bus/a2bus/a2eramworks3.h"
@@ -366,12 +367,12 @@ INPUT_PORTS_END
     PORT_CODE_DEC(JOYCODE_Y_UP_SWITCH)      PORT_CODE_INC(JOYCODE_Y_DOWN_SWITCH)
 INPUT_PORTS_END
 */
-static INPUT_PORTS_START( apple2_gameport )
+INPUT_PORTS_START( apple2_gameport )
 	PORT_INCLUDE( apple2_joystick )
 	//PORT_INCLUDE( apple2_paddle )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( apple2_sysconfig )
+INPUT_PORTS_START( apple2_sysconfig )
 	PORT_START("a2_config")
 	PORT_CONFNAME(0x03, 0x00, "Composite monitor type")
 	PORT_CONFSETTING(0x00, "Color")
@@ -1028,6 +1029,7 @@ static SLOT_INTERFACE_START(apple2_cards)
 	SLOT_INTERFACE("mcms2", A2BUS_MCMS2)  /* Mountain Computer Music System, card 2 of 2.  must be in card 1's slot + 1! */
 	SLOT_INTERFACE("dx1", A2BUS_DX1)    /* Decillonix DX-1 sampler card */
 	SLOT_INTERFACE("tm2ho", A2BUS_TIMEMASTERHO)	/* Applied Engineering TimeMaster II H.O. */
+	SLOT_INTERFACE("mouse", A2BUS_MOUSE)	/* Apple II Mouse Card */
 SLOT_INTERFACE_END
 
 static SLOT_INTERFACE_START(apple2eaux_cards)

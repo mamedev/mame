@@ -764,6 +764,7 @@ BUSOBJS += $(BUSOBJ)/a2bus/a2diskiing.o
 BUSOBJS += $(BUSOBJ)/a2bus/a2mcms.o
 BUSOBJS += $(BUSOBJ)/a2bus/a2dx1.o
 BUSOBJS += $(BUSOBJ)/a2bus/timemasterho.o
+BUSOBJS += $(BUSOBJ)/a2bus/mouse.o
 endif
 
 #-------------------------------------------------
