@@ -2005,6 +2005,8 @@ void s3_vga_device::device_reset()
 	// Power-on strapping bits.  Sampled at reset, but can be modified later.
 	// These are just assumed defaults.
 	s3.strapping = 0x000f0b1e;
+	s3.sr10 = 0x42;
+	s3.sr11 = 0x41;
 }
 
 READ8_MEMBER(vga_device::mem_r)
@@ -3240,6 +3242,10 @@ UINT8 s3_vga_device::s3_seq_reg_read(UINT8 index)
 			break;
 		case 0x15:
 			res = s3.sr15;
+			break;
+		case 0x17:
+			res = s3.sr17;  // CLKSYN test register
+			s3.sr17--;  // who knows what it should return, docs only say it defaults to 0, and is reserved for testing of the clock synthesiser
 			break;
 		}
 	}

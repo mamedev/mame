@@ -584,6 +584,7 @@ protected:
 		UINT8 sr12;   // DCLK PLL
 		UINT8 sr13;   // DCLK PLL
 		UINT8 sr15;   // CLKSYN control 2
+		UINT8 sr17;   // CLKSYN test
 		UINT8 clk_pll_r;  // individual DCLK PLL values
 		UINT8 clk_pll_m;
 		UINT8 clk_pll_n;

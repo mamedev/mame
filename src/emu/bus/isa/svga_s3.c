@@ -16,7 +16,7 @@ ROM_START( s3_764 )
 	ROM_IGNORE( 0x8000 )
 
 	// The following are from Trio64V2/DX based cards
-	ROM_SYSTEM_BIOS( 1, "s3_9503", "PCI S3 9503-62 (S3 Trio64V2/DX)" )
+	ROM_SYSTEM_BIOS( 1, "trio64v2", "PCI S3 86C765 v1.03-08N (S3 Trio64V2/DX)" )
 	ROMX_LOAD("pci_9503-62_s3.bin", 0x00000, 0x8000, CRC(0e9d79d8) SHA1(274b5b98cc998f2783567000cdb12b14308bc290), ROM_BIOS(2) )
 
 	ROM_SYSTEM_BIOS( 2, "winner1k", "PCI Elsa Winner 1000/T2D 6.01.00 (S3 Trio64V2/DX)" )
