@@ -68,6 +68,31 @@ void wozfdc_device::device_start()
 
 	timer = timer_alloc(0);
 	delay_timer = timer_alloc(1);
+
+	save_item(NAME(last_6502_write));
+	save_item(NAME(mode_write));
+	save_item(NAME(mode_load));
+	save_item(NAME(active));
+	save_item(NAME(phases));
+	save_item(NAME(external_io_select));
+	save_item(NAME(cur_lss.tm));
+	save_item(NAME(cur_lss.cycles));
+	save_item(NAME(cur_lss.data_reg));
+	save_item(NAME(cur_lss.address));
+	save_item(NAME(cur_lss.write_start_time));
+//	save_item(NAME(cur_lss.write_buffer));
+	save_item(NAME(cur_lss.write_position));
+	save_item(NAME(cur_lss.write_line_active));
+	save_item(NAME(predicted_lss.tm));
+	save_item(NAME(predicted_lss.cycles));
+	save_item(NAME(predicted_lss.data_reg));
+	save_item(NAME(predicted_lss.address));
+	save_item(NAME(predicted_lss.write_start_time));
+//	save_item(NAME(predicted_lss.write_buffer));
+	save_item(NAME(predicted_lss.write_position));
+	save_item(NAME(predicted_lss.write_line_active));
+	save_item(NAME(drvsel));
+	save_item(NAME(enable1));
 }
 
 void wozfdc_device::device_reset()
@@ -92,7 +117,7 @@ void wozfdc_device::a3_update_drive_sel()
 {
 	floppy_image_device *newflop = NULL;
 
-	if (!enable1)
+	if ((!enable1) || (!external_io_select))
 	{
 		newflop = floppy0->get_device();
 	}
@@ -235,12 +260,13 @@ void wozfdc_device::control(int offset)
 				break;
 			}
 			break;
-		case 0xa:
-			if(floppy != floppy0->get_device()) {
-				if(active) {
-					lss_sync();
-					floppy->mon_w(true);
-				}
+			case 0xa:
+				external_io_select = false;
+				if(floppy != floppy0->get_device()) {
+					if(active) {
+						lss_sync();
+						floppy->mon_w(true);
+					}
 				floppy = floppy0->get_device();
 				if(active) {
 					floppy->mon_w(false);
@@ -249,6 +275,7 @@ void wozfdc_device::control(int offset)
 			}
 			break;
 		case 0xb:
+			external_io_select = true;
 			if (!external_drive_select)
 			{
 				if (floppy != floppy1->get_device())

@@ -66,6 +66,7 @@ private:
 	UINT8 phases;
 	emu_timer *timer, *delay_timer;
 	bool external_drive_select;
+	bool external_io_select;
 
 	lss cur_lss, predicted_lss;
 
