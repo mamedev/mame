@@ -72,13 +72,14 @@
 #define CLK_ADDR    0x0fe0
 #define RAM_ADDR    0x1000
 
-#define TRACE_EMU 1
-#define TRACE_CRU 1
-#define TRACE_COMP 1
+#define TRACE_EMU 0
+#define TRACE_CRU 0
+#define TRACE_COMP 0
 #define TRACE_RAM 0
 #define TRACE_ROM 0
-#define TRACE_LINES 1
-#define TRACE_MOTOR 1
+#define TRACE_LINES 0
+#define TRACE_MOTOR 0
+#define TRACE_DMA 0
 
 // =========================================================================
 
@@ -179,14 +180,28 @@ READ8Z_MEMBER(myarc_hfdc_device::readz)
 			// 0101 11xx xxxx xxxx  bank 3
 			int bank = (m_address & 0x0c00) >> 10;
 			*value = m_buffer_ram[(m_ram_page[bank]<<10) | (m_address & 0x03ff)];
-			if (TRACE_RAM) logerror("%s: %04x[%02x] -> %02x\n", tag(), m_address & 0xffff, m_ram_page[bank], *value);
+			if (TRACE_RAM)
+			{
+				if ((m_address & 1)==0)  // only show even addresses with words
+				{
+					int valword = (((*value) << 8) | m_buffer_ram[(m_ram_page[bank]<<10) | ((m_address+1) & 0x03ff)])&0xffff;
+					logerror("%s: %04x[%02x] -> %04x\n", tag(), m_address & 0xffff, m_ram_page[bank], valword);
+				}
+			}
 			return;
 		}
 
 		if (m_ROMsel)
 		{
 			*value = m_dsrrom[(m_rom_page << 12) | (m_address & 0x0fff)];
-			if (TRACE_ROM) logerror("%s: %04x[%02x] -> %02x\n", tag(), m_address & 0xffff, m_rom_page, *value);
+			if (TRACE_ROM)
+			{
+				if ((m_address & 1)==0)  // only show even addresses with words
+				{
+					int valword = (((*value) << 8) | m_dsrrom[(m_rom_page << 12) | ((m_address + 1) & 0x0fff)])&0xffff;
+					logerror("%s: %04x[%02x] -> %04x\n", tag(), m_address & 0xffff, m_rom_page, valword);
+				}
+			}
 			return;
 		}
 	}
@@ -381,9 +396,11 @@ WRITE8_MEMBER(myarc_hfdc_device::cruwrite)
 			m_CD = (data != 0)? (m_CD | 1) : (m_CD & 0xfe);
 
 			// Activate motor
-			if (data==0 && m_lastval==1)
-			{   // on falling edge, set motor_running for 4.23s
-				if (TRACE_CRU) logerror("%s: trigger motor (falling edge)\n", tag());
+			// When 1, let motor run continuously. When 0, a simple monoflop circuit keeps the line active for another 4 sec
+			// We keep triggering the monoflop for data==1
+			if (data==1)
+			{
+				if (TRACE_CRU) logerror("%s: trigger motor\n", tag());
 				set_floppy_motors_running(true);
 			}
 			m_lastval = data;
@@ -420,7 +437,7 @@ void myarc_hfdc_device::device_timer(emu_timer &timer, device_timer_id id, int p
 */
 void myarc_hfdc_device::floppy_index_callback(floppy_image_device *floppy, int state)
 {
-	logerror("%s: Index callback level=%d\n", tag(), state);
+	if (TRACE_LINES) if (state==1) logerror("%s: Index pulse\n", tag());
 	// m_status_latch = (state==ASSERT_LINE)? (m_status_latch | HDC_DS_INDEX) :  (m_status_latch & ~HDC_DS_INDEX);
 	set_bits(m_status_latch, HDC_DS_INDEX, (state==ASSERT_LINE));
 	signal_drive_status();
@@ -453,8 +470,6 @@ int myarc_hfdc_device::slog2(int value)
 void myarc_hfdc_device::signal_drive_status()
 {
 	UINT8 reply = 0;
-	//int index = 0;
-
 	// Status byte as defined by HDC9234
 	// +------+------+------+------+------+------+------+------+
 	// | ECC  |Index | SeekC| Tr00 | User | WrPrt| Ready|Fault |
@@ -467,13 +482,20 @@ void myarc_hfdc_device::signal_drive_status()
 	// |  0   | Index| SeekC| Tr00 |   0  | WrPrt| Ready|Fault |
 	// +------+------+------+------+------+------+------+------+
 	//
-	//  Ready = WDS.ready | DSK
-	//  SeekComplete = WDS.seekComplete | DSK
+	//  Ready = /WDS.ready* | DSK
+	//  SeekComplete = /WDS.seekComplete* | DSK
 
 	// If DSK is selected, set Ready and SeekComplete to 1
-	// If WDS is selected but not connected, Ready and SeekComplete are 1
-	if ((m_output1_latch & 0x10)!=0) reply |= 0x22;
+	if ((m_output1_latch & 0x10)!=0)
+	{
+		reply |= 0x22;
 
+		// Check for TRK00*
+		if ((m_current_floppy != NULL) && (!m_current_floppy->trk00_r()))
+			reply |= 0x10;
+	}
+
+	// If WDS is selected but not connected, WDS.ready* and WDS.seekComplete* are 1, so Ready=SeekComplete=0
 	reply |= m_status_latch;
 
 	m_hdc9234->auxbus_in(reply);
@@ -500,6 +522,7 @@ WRITE8_MEMBER( myarc_hfdc_device::auxbus_out )
 		// Value is dma address byte. Shift previous contents to the left.
 		// The value is latched inside the Gate Array.
 		m_dma_address = ((m_dma_address << 8) + (data&0xff))&0xffffff;
+		if (TRACE_DMA) logerror("%s: Setting DMA address; current value = %06x\n", tag(), m_dma_address);
 		break;
 
 	case HDC_OUTPUT_1:
@@ -511,7 +534,6 @@ WRITE8_MEMBER( myarc_hfdc_device::auxbus_out )
 		// +------+------+------+------+------+------+------+------+
 		// Accordingly, drive 0 is always the floppy; selected by the low nibble
 
-		logerror("%s: Setting OUTPUT1 latch to %02x\n", tag(), data);
 		m_output1_latch = data;
 
 		if ((data & 0x10) != 0)
@@ -525,16 +547,16 @@ WRITE8_MEMBER( myarc_hfdc_device::auxbus_out )
 			index = slog2((data>>4) & 0x0f);
 			if (index == -1)
 			{
-				logerror("%s: Unselect all drives\n", tag());
+				if (TRACE_LINES) logerror("%s: Unselect all drives\n", tag());
 			}
 			else
 			{
-				logerror("%s: Select hard disk WDS%d\n", tag(), index);
+				if (TRACE_LINES) logerror("%s: Select hard disk WDS%d\n", tag(), index);
 				//          if (index>=0) m_hdc9234->connect_hard_drive(m_harddisk_unit[index-1]);
 			}
 			if (m_current_harddisk==NULL)
 			{
-				set_bits(m_status_latch, HDC_DS_READY | HDC_DS_SKCOM, true);
+				set_bits(m_status_latch, HDC_DS_READY | HDC_DS_SKCOM, false);
 			}
 		}
 		break;
@@ -549,22 +571,19 @@ WRITE8_MEMBER( myarc_hfdc_device::auxbus_out )
 		// +------+------+------+------+------+------+------+------+
 		// | DS3* | WCur | Dir  | Step |           Head            |
 		// +------+------+------+------+------+------+------+------+
-		logerror("%s: Setting OUTPUT2 latch to %02x\n", tag(), data);
 		m_output2_latch = data;
 
 		// Output the step pulse to the selected floppy drive
 		if (m_current_floppy != NULL)
 		{
 			m_current_floppy->dir_w((data & 0x20)==0);
-			m_current_floppy->stp_w(0);
-			m_current_floppy->stp_w(1);
+			m_current_floppy->stp_w((data & 0x10)==0);
 		}
 
+		// We are pushing the drive status after OUTPUT2
+		signal_drive_status();
 		break;
 	}
-
-	// We are pushing the drive status after every output
-	signal_drive_status();
 }
 
 enum
@@ -580,26 +599,27 @@ void myarc_hfdc_device::connect_floppy_unit(int index)
 	{
 		if (m_floppy_unit[index] != m_current_floppy)
 		{
-			logerror("%s: Select floppy drive DSK%d\n", tag(), index);
+			if (TRACE_LINES) logerror("%s: Select floppy drive DSK%d\n", tag(), index+1);
 			if (m_current_floppy != NULL)
 			{
 				// Disconnect old drive from index line
+				if (TRACE_LINES) logerror("%s: Disconnect previous index callback DSK%d\n", tag(), index+1);
 				m_current_floppy->setup_index_pulse_cb(floppy_image_device::index_pulse_cb());
-
-				// Connect new drive
-				m_current_floppy = m_floppy_unit[index];
-
-				// We don't use the READY line of floppy drives.
-				// READY is asserted when DSKx = 1
-				// The controller fetches the state with the auxbus access
-				m_current_floppy->setup_index_pulse_cb(floppy_image_device::index_pulse_cb(FUNC(myarc_hfdc_device::floppy_index_callback), this));
 			}
+			// Connect new drive
+			m_current_floppy = m_floppy_unit[index];
+
+			// We don't use the READY line of floppy drives.
+			// READY is asserted when DSKx = 1
+			// The controller fetches the state with the auxbus access
+			if (TRACE_LINES) logerror("%s: Connect index callback DSK%d\n", tag(), index+1);
+			m_current_floppy->setup_index_pulse_cb(floppy_image_device::index_pulse_cb(FUNC(myarc_hfdc_device::floppy_index_callback), this));
 			m_hdc9234->connect_floppy_drive(m_floppy_unit[index]);
 		}
 	}
 	else
 	{
-		logerror("%s: Unselect all floppy drives\n", tag());
+		if (TRACE_LINES) logerror("%s: Unselect all floppy drives\n", tag());
 		// Disconnect current floppy
 		if (m_current_floppy != NULL)
 		{
@@ -607,7 +627,8 @@ void myarc_hfdc_device::connect_floppy_unit(int index)
 			m_current_floppy = NULL;
 		}
 	}
-	signal_drive_status();
+	// The drive status is supposed to be sampled after OUTPUT2
+	// signal_drive_status();
 }
 
 void myarc_hfdc_device::connect_harddisk_unit(int index)
@@ -616,7 +637,7 @@ void myarc_hfdc_device::connect_harddisk_unit(int index)
 //  {
 		m_current_harddisk = NULL;
 //  }
-	signal_drive_status();
+	// signal_drive_status();
 }
 
 /*
@@ -658,6 +679,19 @@ WRITE_LINE_MEMBER( myarc_hfdc_device::intrq_w )
 }
 
 /*
+    Called whenever the HDC9234 desires bus access to the buffer RAM. The
+    controller expects a call to dmarq in 1 byte time.
+*/
+WRITE_LINE_MEMBER( myarc_hfdc_device::dmarq_w )
+{
+	if (TRACE_LINES) logerror("%s: DMARQ pin from controller = %d\n", tag(), state);
+	if (state == ASSERT_LINE)
+	{
+		m_hdc9234->dmaack(ASSERT_LINE);
+	}
+}
+
+/*
     Called whenever the state of the HDC9234 DMA in progress changes.
 */
 WRITE_LINE_MEMBER( myarc_hfdc_device::dip_w )
@@ -670,8 +704,10 @@ WRITE_LINE_MEMBER( myarc_hfdc_device::dip_w )
 */
 READ8_MEMBER( myarc_hfdc_device::read_buffer )
 {
-	logerror("%s: Read access to onboard SRAM at %04x\n", tag(), offset & 0xffff);
-	return 0;
+	logerror("%s: Read access to onboard SRAM at %04x\n", tag(), m_dma_address);
+	UINT8 value = m_buffer_ram[m_dma_address & 0x7fff];
+	m_dma_address = (m_dma_address+1) & 0x7fff;
+	return value;
 }
 
 /*
@@ -679,7 +715,9 @@ READ8_MEMBER( myarc_hfdc_device::read_buffer )
 */
 WRITE8_MEMBER( myarc_hfdc_device::write_buffer )
 {
-	logerror("%s: Write access to onboard SRAM at %04x: %02x\n", tag(), offset & 0xffff, data);
+	if (TRACE_DMA) logerror("%s: Write access to onboard SRAM at %04x: %02x\n", tag(), m_dma_address, data);
+	m_buffer_ram[m_dma_address & 0x7fff] = data;
+	m_dma_address = (m_dma_address+1) & 0x7fff;
 }
 
 void myarc_hfdc_device::device_start()
@@ -774,7 +812,7 @@ INPUT_PORTS_START( ti99_hfdc )
 		PORT_DIPSETTING( 0x1f00, "1F00" )
 
 	PORT_START( "HFDCDIP" )
-	PORT_DIPNAME( 0xff, 0x55, "HFDC drive config" )
+	PORT_DIPNAME( 0xff, 0x00, "HFDC drive config" )
 		PORT_DIPSETTING( 0x00, "40 track, 16 ms")
 		PORT_DIPSETTING( 0xaa, "40 track, 8 ms")
 		PORT_DIPSETTING( 0x55, "80 track, 2 ms")
@@ -797,6 +835,7 @@ MACHINE_CONFIG_FRAGMENT( ti99_hfdc )
 	MCFG_HDC9234_INTRQ_CALLBACK(WRITELINE(myarc_hfdc_device, intrq_w))
 	MCFG_HDC9234_DIP_CALLBACK(WRITELINE(myarc_hfdc_device, dip_w))
 	MCFG_HDC9234_AUXBUS_OUT_CALLBACK(WRITE8(myarc_hfdc_device, auxbus_out))
+	MCFG_HDC9234_DMARQ_CALLBACK(WRITELINE(myarc_hfdc_device, dmarq_w))
 	MCFG_HDC9234_DMA_IN_CALLBACK(READ8(myarc_hfdc_device, read_buffer))
 	MCFG_HDC9234_DMA_OUT_CALLBACK(WRITE8(myarc_hfdc_device, write_buffer))
 

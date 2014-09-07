@@ -9,6 +9,7 @@
 
 #include "emu.h"
 #include "imagedev/floppy.h"
+#include "fdc_pll.h"
 
 extern const device_type HDC9234;
 
@@ -45,6 +46,10 @@ enum
 #define MCFG_HDC9234_INTRQ_CALLBACK(_write) \
 	devcb = &hdc9234_device::set_intrq_wr_callback(*device, DEVCB_##_write);
 
+/* DMA request line. To be connected with the controller PCB. */
+#define MCFG_HDC9234_DMARQ_CALLBACK(_write) \
+	devcb = &hdc9234_device::set_dmarq_wr_callback(*device, DEVCB_##_write);
+
 /* DMA in progress line. To be connected with the controller PCB. */
 #define MCFG_HDC9234_DIP_CALLBACK(_write) \
 	devcb = &hdc9234_device::set_dip_wr_callback(*device, DEVCB_##_write);
@@ -78,9 +83,11 @@ public:
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
 	DECLARE_WRITE_LINE_MEMBER( reset );
+	DECLARE_WRITE_LINE_MEMBER( dmaack );
 
 	// Callbacks
 	template<class _Object> static devcb_base &set_intrq_wr_callback(device_t &device, _Object object) { return downcast<hdc9234_device &>(device).m_out_intrq.set_callback(object); }
+	template<class _Object> static devcb_base &set_dmarq_wr_callback(device_t &device, _Object object) { return downcast<hdc9234_device &>(device).m_out_dmarq.set_callback(object); }
 	template<class _Object> static devcb_base &set_dip_wr_callback(device_t &device, _Object object) { return downcast<hdc9234_device &>(device).m_out_dip.set_callback(object); }
 	template<class _Object> static devcb_base &set_auxbus_wr_callback(device_t &device, _Object object) { return downcast<hdc9234_device &>(device).m_out_auxbus.set_callback(object); }
 	template<class _Object> static devcb_base &set_dma_rd_callback(device_t &device, _Object object) { return downcast<hdc9234_device &>(device).m_in_dma.set_callback(object); }
@@ -102,6 +109,7 @@ protected:
 
 private:
 	devcb_write_line   m_out_intrq;    // INT line
+	devcb_write_line   m_out_dmarq;    // DMA request line
 	devcb_write_line   m_out_dip;      // DMA in progress line
 	devcb_write8       m_out_auxbus;   // AB0-7 lines (using S0,S1 as address)
 	devcb_read8        m_in_dma;       // DMA read access to the cache buffer
@@ -111,8 +119,8 @@ private:
 	int m_register_pointer;
 
 	// Read and write registers
-	UINT8 m_register_r[12];
 	UINT8 m_register_w[12];
+	UINT8 m_register_r[15];
 
 	// Command processing
 	void  process_command(UINT8 opcode);
@@ -120,6 +128,9 @@ private:
 	// Command is done
 	void set_command_done(int flags);
 	void set_command_done();
+
+	// Are we in FM mode?
+	bool fm_mode();
 
 	// Recent command.
 	UINT8 m_command;
@@ -136,8 +147,14 @@ private:
 	// internal register OUTPUT2
 	UINT8 m_output2;
 
+	// Direction for track seek; +1 = towards center, -1 = towards rim
+	int m_step_direction;
+
 	// Write the output registers to the latches
 	void sync_latches_out();
+
+	// Write the DMA address to the external latches
+	void dma_address_out();
 
 	// Utility routine to set or reset bits
 	void set_bits(UINT8& byte, int mask, bool set);
@@ -148,10 +165,121 @@ private:
 	// Enable head load delays
 	bool m_head_load_delay_enable;
 
+	// Timers to delay execution/completion of commands */
+	emu_timer *m_timer;
+	emu_timer *m_cmd_timer;
+	emu_timer *m_live_timer;
+
+	// Timer callback
+	void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+
+	// Phase-locked loops
+	fdc_pll_t m_pll, m_checkpoint_pll;
+
+	void ready_callback(int level);
+	void index_callback(int level);
+	void seek_complete_callback(int level);
+
+	void wait_time(emu_timer *tm, int microsec, int next_substate);
+	void wait_time(emu_timer *tm, attotime delay, int param);
+
+	bool on_track00();
+	void wait_line(int substate);
+	// ===================================================
+	//   Utility functions
+	// ===================================================
+
+	astring tts(const attotime &t);
+	astring ttsn();
+
+	// ===================================================
+	//   Live state machine
+	// ===================================================
+
+	struct live_info
+	{
+		attotime time;
+		UINT16 shift_reg;
+		UINT16 crc;
+		int bit_counter;
+		int bit_count_total;    // used for timeout handling
+		bool data_separator_phase;
+		UINT8 data_reg;
+		int state;
+		int next_state;
+	};
+
+	void live_start(int state);
+	void live_run();
+	void live_run_until(attotime limit);
+	void wait_for_realtime(int state);
+	void live_sync();
+	void rollback();
+
+	void checkpoint();
+
+	live_info m_live_state, m_checkpoint_state;
+
+	// ===================================================
+	//   PLL functions and interface to floppy
+	// ===================================================
+
+	void pll_reset(const attotime &when);
+	bool read_one_bit(const attotime &limit);
+
+	int get_sector_size();
+
 	// ===================================================
 	//   Commands
 	// ===================================================
-	void drive_select(int driveparm);
+
+	void process_states();
+	void general_continue();
+
+	int m_main_state;
+	int m_substate;
+	int m_next_state;
+	int m_last_live_state;
+	int m_track_delta;
+	int m_retry_save;
+	bool m_multi_sector;
+	bool m_wait_for_index;
+	bool m_stop_after_index;
+	bool m_initialized;
+
+	// Intermediate storage
+	UINT8 m_data;
+
+	typedef void (hdc9234_device::*cmdfunc)(void);
+
+	typedef struct
+	{
+		UINT8 baseval;
+		UINT8 mask;
+		int state;
+		cmdfunc command;
+	} cmddef;
+
+	static const cmddef s_command[];
+
+	int get_step_time();
+	int pulse_width();
+
+	int m_seek_count;
+
+	void command_continue();
+	void register_write_continue();
+
+	// Commands
+	void drive_select();
+	void drive_deselect();
+	void restore_drive();
+	void step_drive();
+	void step_drive_continue();
+	void set_register_pointer();
+	void read_sector_physical();
+	void read_sector_logical();
+	void read_sector_continue();
 };
 
 #endif
