@@ -1129,29 +1129,35 @@ UINT32 raiden2_state::screen_update_raiden2(screen_device &screen, bitmap_rgb32 
 		popmessage("%02x", ccol);
 
 	bitmap.fill(m_palette->black_pen(), cliprect);
-	draw_sprites(cliprect);
+	if (!(raiden2_tilemap_enable & 16)) {
+		draw_sprites(cliprect);
 
-	blend_layer(bitmap, cliprect, sprite_buffer, cur_spri[0]);
+		blend_layer(bitmap, cliprect, sprite_buffer, cur_spri[0]);
+	}
 
 	if (!(raiden2_tilemap_enable & 1))
 		tilemap_draw_and_blend(screen, bitmap, cliprect, background_layer);
 
-	blend_layer(bitmap, cliprect, sprite_buffer, cur_spri[1]);
+	if (!(raiden2_tilemap_enable & 16))
+		blend_layer(bitmap, cliprect, sprite_buffer, cur_spri[1]);
 
 	if (!(raiden2_tilemap_enable & 2))
 		tilemap_draw_and_blend(screen, bitmap, cliprect, midground_layer);
 
-	blend_layer(bitmap, cliprect, sprite_buffer, cur_spri[2]);
+	if (!(raiden2_tilemap_enable & 16))
+		blend_layer(bitmap, cliprect, sprite_buffer, cur_spri[2]);
 
 	if (!(raiden2_tilemap_enable & 4))
 		tilemap_draw_and_blend(screen, bitmap, cliprect, foreground_layer);
 
-	blend_layer(bitmap, cliprect, sprite_buffer, cur_spri[3]);
+	if (!(raiden2_tilemap_enable & 16))
+		blend_layer(bitmap, cliprect, sprite_buffer, cur_spri[3]);
 
 	if (!(raiden2_tilemap_enable & 8))
 		tilemap_draw_and_blend(screen, bitmap, cliprect, text_layer);
 
-	blend_layer(bitmap, cliprect, sprite_buffer, cur_spri[4]);
+	if (!(raiden2_tilemap_enable & 16))
+		blend_layer(bitmap, cliprect, sprite_buffer, cur_spri[4]);
 
 
 	return 0;
@@ -1794,6 +1800,9 @@ static INPUT_PORTS_START( raidendx )
 	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
+	PORT_MODIFY("P1_P2")
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( zeroteam )
