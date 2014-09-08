@@ -644,20 +644,29 @@ int main(int argc, char *argv[])
 	catch (emu_fatalerror &fatal)
 	{
 		fprintf(stderr, "%s\n", fatal.string());
+		result = 1;
 		if (fatal.exitcode() != 0)
 			result = fatal.exitcode();
 	}
 	catch (emu_exception &)
 	{
 		fprintf(stderr, "Caught unhandled emulator exception\n");
+		result = 1;
 	}
-	catch (std::bad_alloc &)
+	catch (add_exception &aex)
 	{
-		fprintf(stderr, "Out of memory!\n");
+		fprintf(stderr, "Tag '%s' already exists in tagged_list\n", aex.tag());
+		result = 1;
+	}
+	catch (std::exception &ex)
+	{
+		fprintf(stderr, "Caught unhandled %s exception: %s\n", typeid(ex).name(), ex.what());
+		result = 1;
 	}
 	catch (...)
 	{
 		fprintf(stderr, "Caught unhandled exception\n");
+		result = 1;
 	}
 
 	osd_free(data);

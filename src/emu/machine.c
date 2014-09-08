@@ -414,6 +414,11 @@ int running_machine::run(bool firstrun)
 		osd_printf_error("Error performing a late bind of type %s to %s\n", btex.m_actual_type.name(), btex.m_target_type.name());
 		error = MAMERR_FATALERROR;
 	}
+	catch (add_exception &aex)
+	{
+		osd_printf_error("Tag '%s' already exists in tagged_list\n", aex.tag());
+		error = MAMERR_FATALERROR;
+	}
 	catch (std::exception &ex)
 	{
 		osd_printf_error("Caught unhandled %s exception: %s\n", typeid(ex).name(), ex.what());

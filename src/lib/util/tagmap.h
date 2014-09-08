@@ -194,6 +194,15 @@ private:
 
 // ======================> tagged_list
 
+class add_exception
+{
+public:
+	add_exception(const char *tag) : m_tag(tag) { }
+	const char *tag() const { return m_tag; }
+private:
+	const char *m_tag;
+};
+
 // a tagged_list is a class that maintains a list of objects that can be quickly looked up by tag
 template<class _ElementType>
 class tagged_list
@@ -203,15 +212,6 @@ class tagged_list
 	tagged_list &operator=(const tagged_list &);
 
 public:
-	class add_exception
-	{
-	public:
-		add_exception(const char *tag) : m_tag(tag) { }
-		const char *tag() const { return m_tag; }
-	private:
-		const char *m_tag;
-	};
-
 	// construction
 	tagged_list() { }
 
