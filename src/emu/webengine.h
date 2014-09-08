@@ -23,6 +23,7 @@ public:
 	web_engine(emu_options &options);
 	~web_engine();
 
+	void serve();
 	void push_message(const char *message);
 	void close();
 

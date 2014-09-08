@@ -287,27 +287,6 @@ static int ev_handler(struct mg_connection *conn, enum mg_event ev) {
 	}
 }
 
-static int iterate_callback(struct mg_connection *c, enum mg_event ev) {
-	if (ev == MG_POLL && c->is_websocket) {
-	char buf[20];
-	int len = snprintf(buf, sizeof(buf), "%lu",
-		(unsigned long) * (time_t *) c->callback_param);
-	mg_websocket_write(c, 1, buf, len);
-	}
-	return MG_TRUE;
-}
-
-static void *serve(void *server) {
-	time_t current_timer = 0, last_timer = time(NULL);
-	for (;;) mg_poll_server((struct mg_server *) server, 1000);
-	current_timer = time(NULL);
-	if (current_timer - last_timer > 0) {
-		last_timer = current_timer;
-		mg_iterate_over_connections((struct mg_server *)server, iterate_callback, &current_timer);
-	}
-	return NULL;
-}
-
 //-------------------------------------------------
 //  web_engine - constructor
 //-------------------------------------------------
@@ -325,8 +304,6 @@ web_engine::web_engine(emu_options &options)
 
 		mg_set_option(m_server, "listening_port", options.http_port());
 		mg_set_option(m_server, "document_root",  options.http_path());
-
-		mg_start_thread(serve, m_server);
 	}
 
 }
@@ -350,6 +327,11 @@ void web_engine::close()
 	m_exiting_core = 1;
 	// Cleanup, and free server instance
 	mg_destroy_server(&m_server);
+}
+
+void web_engine::serve()
+{
+	if (m_options.http()) mg_poll_server(m_server, 0);
 }
 
 static int websocket_callback(struct mg_connection *c, enum mg_event ev) {
