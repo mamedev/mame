@@ -418,7 +418,6 @@ BUSOBJS += $(BUSOBJ)/isa/sc499.o
 BUSOBJS += $(BUSOBJ)/isa/3c505.o
 BUSOBJS += $(BUSOBJ)/isa/aga.o
 BUSOBJS += $(BUSOBJ)/isa/svga_trident.o
-BUSOBJS += $(BUSOBJ)/isa/trident.o
 endif
 
 #-------------------------------------------------

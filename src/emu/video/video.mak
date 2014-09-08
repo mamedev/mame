@@ -381,6 +381,7 @@ VIDEOOBJS+= $(VIDEOOBJ)/cgapal.o
 
 ifneq ($(filter PC_VGA,$(VIDEOS)),)
 VIDEOOBJS+= $(VIDEOOBJ)/pc_vga.o
+VIDEOOBJS+= $(BUSOBJ)/isa/trident.o
 endif
 
 #-------------------------------------------------
