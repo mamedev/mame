@@ -722,7 +722,6 @@ bool hd6309_device::divq()
 			else if (old_q == 0 )
 				m_cc |= CC_Z;
 
-			m_temp.w = abs(m_temp.w);
 			put_q(old_q);
 		}
 	}
