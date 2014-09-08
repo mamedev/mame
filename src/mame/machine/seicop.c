@@ -2036,6 +2036,14 @@ READ16_MEMBER( seibu_cop_legacy_device::copdxbl_0_r )
 			return retvalue;
 		}
 
+		case 0x5b0/2:
+			return m_cop_status;
+
+		case 0x5b2/2:
+			return m_cop_dist;
+
+		case 0x5b4/2:
+			return m_cop_angle;
 		//case (0x47e/2):
 		//case (0x5b0/2):
 		//case (0x5b4/2):
@@ -2061,7 +2069,126 @@ WRITE16_MEMBER( seibu_cop_legacy_device::copdxbl_0_w )
 			logerror("%06x: COPX unhandled write data %04x at offset %04x\n", space.device().safe_pc(), data, offset*2);
 			break;
 		}
+		case (0x4a0/2): { m_cop_register[0] = (m_cop_register[0]&0x0000ffff)|(m_cop_mcu_ram[offset]<<16); break; }
+		case (0x4c0/2): { m_cop_register[0] = (m_cop_register[0]&0xffff0000)|(m_cop_mcu_ram[offset]<<0);  break; }
 
+		case (0x4a2/2): { m_cop_register[1] = (m_cop_register[1]&0x0000ffff)|(m_cop_mcu_ram[offset]<<16); break; }
+		case (0x4c2/2): { m_cop_register[1] = (m_cop_register[1]&0xffff0000)|(m_cop_mcu_ram[offset]<<0);  break; }
+
+		case (0x4a4/2): { m_cop_register[2] = (m_cop_register[2]&0x0000ffff)|(m_cop_mcu_ram[offset]<<16); break; }
+		case (0x4c4/2): { m_cop_register[2] = (m_cop_register[2]&0xffff0000)|(m_cop_mcu_ram[offset]<<0);  break; }
+
+		case (0x4a6/2): { m_cop_register[3] = (m_cop_register[3]&0x0000ffff)|(m_cop_mcu_ram[offset]<<16); break; }
+		case (0x4c6/2): { m_cop_register[3] = (m_cop_register[3]&0xffff0000)|(m_cop_mcu_ram[offset]<<0);  break; }
+
+		case (0x4a8/2): { m_cop_register[4] = (m_cop_register[4]&0x0000ffff)|(m_cop_mcu_ram[offset]<<16); break; }
+		case (0x4c8/2): { m_cop_register[4] = (m_cop_register[4]&0xffff0000)|(m_cop_mcu_ram[offset]<<0);  break; }
+
+		case (0x4aa/2): { m_cop_register[5] = (m_cop_register[5]&0x0000ffff)|(m_cop_mcu_ram[offset]<<16); break; }
+		case (0x4ca/2): { m_cop_register[5] = (m_cop_register[5]&0xffff0000)|(m_cop_mcu_ram[offset]<<0);  break; }
+
+		case (0x4ac/2): { m_cop_register[6] = (m_cop_register[6]&0x0000ffff)|(m_cop_mcu_ram[offset]<<16); break; }
+		case (0x4cc/2): { m_cop_register[6] = (m_cop_register[6]&0xffff0000)|(m_cop_mcu_ram[offset]<<0);  break; }
+
+		
+		case (0x500/2):
+		case (0x502/2):
+		case (0x504/2):
+			switch(m_cop_mcu_ram[offset])
+			{
+				case 0x8100:
+				{
+					int raw_angle = (space.read_word(m_cop_register[0]+(0x34^2)) & 0xff);
+					double angle = raw_angle * M_PI / 128;
+					double amp = (65536 >> 5)*(space.read_word(m_cop_register[0]+(0x36^2)) & 0xff);
+					int res;
+
+				/* TODO: up direction, why? */
+					if(raw_angle == 0xc0)
+						amp*=2;
+
+					res = int(amp*sin(angle)) << m_cop_scale;
+
+					space.write_dword(m_cop_register[0] + 0x10, res);
+
+					break;
+				}
+				case 0x8900:
+				{
+					int raw_angle = (space.read_word(m_cop_register[0]+(0x34^2)) & 0xff);
+					double angle = raw_angle * M_PI / 128;
+					double amp = (65536 >> 5)*(space.read_word(m_cop_register[0]+(0x36^2)) & 0xff);
+					int res;
+
+					/* TODO: left direction, why? */
+					if(raw_angle == 0x80)
+						amp*=2;
+
+					res = int(amp*cos(angle)) << m_cop_scale;
+
+					space.write_dword(m_cop_register[0] + 20, res);
+
+					break;
+				}
+				case 0x0205:
+				{
+					UINT8 offs;
+
+					offs = (offset & 3) * 4;
+					int ppos = space.read_dword(m_cop_register[0] + 4 + offs);
+					int npos = ppos + space.read_dword(m_cop_register[0] + 0x10 + offs);
+					int delta = (npos >> 16) - (ppos >> 16);
+
+					space.write_dword(m_cop_register[0] + 4 + offs, npos);
+					space.write_word(m_cop_register[0] + 0x1c + offs, space.read_word(m_cop_register[0] + 0x1c + offs) + delta);
+				
+					break;
+				}
+				case 0x130e:
+				case 0x138e:
+				{
+					int dy = space.read_dword(m_cop_register[1]+4) - space.read_dword(m_cop_register[0]+4);
+					int dx = space.read_dword(m_cop_register[1]+8) - space.read_dword(m_cop_register[0]+8);
+
+					m_cop_status = 7;
+					if(!dx) {
+						m_cop_status |= 0x8000;
+						m_cop_angle = 0;
+					} else {
+						m_cop_angle = atan(double(dy)/double(dx)) * 128.0 / M_PI;
+						if(dx<0)
+							m_cop_angle += 0x80;
+					}
+
+					m_r0 = dy;
+					m_r1 = dx;
+
+					if(m_cop_mcu_ram[offset] & 0x80)
+						space.write_word(m_cop_register[0]+(0x34^2), m_cop_angle);
+
+					break;
+				}
+				case 0x3b30:
+				case 0x3bb0:
+				{
+					int dy = m_r0;
+					int dx = m_r1;
+
+					dx >>= 16;
+					dy >>= 16;
+					m_cop_dist = sqrt((double)(dx*dx+dy*dy));
+
+					if(m_cop_mcu_ram[offset] & 0x80)
+						space.write_word(m_cop_register[0]+(0x38), m_cop_dist);
+
+					break;
+				}
+				default:
+					printf("%04x\n",m_cop_mcu_ram[offset]);
+					break;
+			}
+			break;
+		
 		/*TODO: kludge on x-axis.*/
 		case (0x660/2): { state->m_scrollram16[0] = m_cop_mcu_ram[offset] - 0x1f0; break; }
 		case (0x662/2): { state->m_scrollram16[1] = m_cop_mcu_ram[offset]; break; }
@@ -3108,7 +3235,8 @@ WRITE16_MEMBER( seibu_cop_legacy_device::generic_cop_w )
 			}
 
 			/* private buffer copies */
-			if ((m_cop_dma_trigger==0x14) || (m_cop_dma_trigger==0x15)) return;
+			if ((m_cop_dma_trigger==0x14) || (m_cop_dma_trigger==0x15))
+			return;
 
 			printf("SRC: %08x %08x DST:%08x SIZE:%08x TRIGGER: %08x\n",m_cop_dma_src[m_cop_dma_trigger] << 6,m_cop_dma_fade_table,m_cop_dma_dst[m_cop_dma_trigger] << 6,m_cop_dma_size[m_cop_dma_trigger] << 5,m_cop_dma_trigger);
 
