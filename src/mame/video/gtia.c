@@ -193,6 +193,16 @@ void gtia_device::device_start()
 	save_item(NAME(m_w.gractl));
 	save_item(NAME(m_w.hitclr));
 	save_item(NAME(m_w.cons));
+
+	save_item(NAME(m_lumpf1));
+	save_item(NAME(m_huepm0));
+	save_item(NAME(m_huepm1));
+	save_item(NAME(m_huepm2));
+	save_item(NAME(m_huepm3));
+	save_item(NAME(m_huepm4));
+	save_item(NAME(m_huepf2));
+	save_item(NAME(m_huebk));	
+
 	machine().save().register_postload(save_prepost_delegate(FUNC(gtia_device::gtia_postload), this));
 }
 
@@ -224,6 +234,15 @@ void gtia_device::device_reset()
 	m_r.cons = 0x07;     /* console keys */
 	SETCOL_B(ILL, 0x3e);     /* bright red */
 	SETCOL_B(EOR, 0xff);     /* yellow */
+
+	m_lumpf1 = 0;
+	m_huepm0 = 0;
+	m_huepm1 = 0;
+	m_huepm2 = 0;
+	m_huepm3 = 0;
+	m_huepm4 = 0;
+	m_huepf2 = 0;
+	m_huebk = 0;
 }
 
 
@@ -458,12 +477,9 @@ WRITE8_MEMBER( gtia_device::write )
 {
 	/* used for mixing hue/lum of different colors */
 //  static UINT8 lumpm0=0,lumpm1=0,lumpm2=0,lumpm3=0,lumpm4=0;
-	static UINT8 lumpf1=0;
 //  static UINT8 lumpf2=0;
 //  static UINT8 lumbk= 0;
-	static UINT8 huepm0=0,huepm1=0,huepm2=0,huepm3=0,huepm4=0;
 //  static UINT8 huepf1=0;
-	static UINT8 huepf2=0,huebk= 0;
 
 	switch (offset & 31)
 	{
@@ -569,8 +585,8 @@ WRITE8_MEMBER( gtia_device::write )
 		SETCOL_B(P000, data);    /* set player 0 both pixels 0 */
 		SETCOL_L(P001, data);    /* set player 0 left pixel 0 */
 		SETCOL_R(P010, data);    /* set player 0 right pixel 0 */
-		SPLIT_HUE(data, huepm0);
-		data = huepm0 | lumpf1;
+		SPLIT_HUE(data, m_huepm0);
+		data = m_huepm0 | m_lumpf1;
 		SETCOL_R(P001, data);    /* set player 0 right pixel 1 */
 		SETCOL_L(P010, data);    /* set player 0 left pixel 1 */
 		SETCOL_B(P011, data);    /* set player 0 both pixels 1 */
@@ -589,8 +605,8 @@ WRITE8_MEMBER( gtia_device::write )
 		SETCOL_B(P100, data);    /* set player 1 both pixels 0 */
 		SETCOL_L(P101, data);    /* set player 1 left pixel 0 */
 		SETCOL_R(P110, data);    /* set player 1 right pixel 0 */
-		SPLIT_HUE(data, huepm1);
-		data = huepm1 | lumpf1;
+		SPLIT_HUE(data, m_huepm1);
+		data = m_huepm1 | m_lumpf1;
 		SETCOL_R(P101, data);    /* set player 1 right pixel 1 */
 		SETCOL_L(P110, data);    /* set player 1 left pixel 1 */
 		SETCOL_B(P111, data);    /* set player 1 both pixels 1 */
@@ -609,8 +625,8 @@ WRITE8_MEMBER( gtia_device::write )
 		SETCOL_B(P200, data);    /* set player 2 both pixels 0 */
 		SETCOL_L(P201, data);    /* set player 2 left pixel 0 */
 		SETCOL_R(P210, data);    /* set player 2 right pixel 0 */
-		SPLIT_HUE(data, huepm2);
-		data = huepm2 | lumpf1;
+		SPLIT_HUE(data, m_huepm2);
+		data = m_huepm2 | m_lumpf1;
 		SETCOL_R(P201, data);    /* set player 2 right pixel 1 */
 		SETCOL_L(P210, data);    /* set player 2 left pixel 1 */
 		SETCOL_B(P211, data);    /* set player 2 both pixels 1 */
@@ -629,8 +645,8 @@ WRITE8_MEMBER( gtia_device::write )
 		SETCOL_B(P300, data);    /* set player 3 both pixels 0 */
 		SETCOL_L(P301, data);    /* set player 3 left pixel 0 */
 		SETCOL_R(P310, data);    /* set player 3 right pixel 0 */
-		SPLIT_HUE(data, huepm3);
-		data = huepm3 | lumpf1;
+		SPLIT_HUE(data, m_huepm3);
+		data = m_huepm3 | m_lumpf1;
 		SETCOL_R(P301, data);    /* set player 3 right pixel 1 */
 		SETCOL_L(P310, data);    /* set player 3 left pixel 1 */
 		SETCOL_B(P311, data);    /* set player 3 both pixels 1 */
@@ -656,32 +672,32 @@ WRITE8_MEMBER( gtia_device::write )
 
 		SETCOL_B(PF1, data);     /* set playfield 1 color */
 		SETCOL_B(GT2+5, data);   /* set GTIA mode 2 color 5 */
-		SPLIT_LUM(data, lumpf1);
-		data = huepf2 | lumpf1;
+		SPLIT_LUM(data, m_lumpf1);
+		data = m_huepf2 | m_lumpf1;
 		SETCOL_R(T01, data);     /* set text mode right pixel 1 */
 		SETCOL_L(T10, data);     /* set text mode left pixel 1 */
 		SETCOL_B(T11, data);     /* set text mode both pixels 1 */
-		data = huebk | lumpf1;
+		data = m_huebk | m_lumpf1;
 		SETCOL_R(G01, data);     /* set graphics mode right pixel 1 */
 		SETCOL_L(G10, data);     /* set graphics mode left pixel 1 */
 		SETCOL_B(G11, data);     /* set graphics mode both pixels 1 */
-		data = huepm0 | lumpf1;
+		data = m_huepm0 | m_lumpf1;
 		SETCOL_R(P001, data);    /* set player 0 right pixel 1 */
 		SETCOL_L(P010, data);    /* set player 0 left pixel 1 */
 		SETCOL_B(P011, data);    /* set player 0 both pixels 1 */
-		data = huepm1 | lumpf1;
+		data = m_huepm1 | m_lumpf1;
 		SETCOL_R(P101, data);    /* set player 1 right pixel 1 */
 		SETCOL_L(P110, data);    /* set player 1 left pixel 1 */
 		SETCOL_B(P111, data);    /* set player 1 both pixels 1 */
-		data = huepm2 | lumpf1;
+		data = m_huepm2 | m_lumpf1;
 		SETCOL_R(P201, data);    /* set player 2 right pixel 1 */
 		SETCOL_L(P210, data);    /* set player 2 left pixel 1 */
 		SETCOL_B(P211, data);    /* set player 2 both pixels 1 */
-		data = huepm3 | lumpf1;
+		data = m_huepm3 | m_lumpf1;
 		SETCOL_R(P301, data);    /* set player 3 right pixel 1 */
 		SETCOL_L(P310, data);    /* set player 3 left pixel 1 */
 		SETCOL_B(P311, data);    /* set player 3 both pixels 1 */
-		data = huepm4 | lumpf1;
+		data = m_huepm4 | m_lumpf1;
 		SETCOL_R(P401, data);    /* set missiles right pixel 1 */
 		SETCOL_L(P410, data);    /* set missiles left pixel 1 */
 		SETCOL_B(P411, data);    /* set missiles both pixels 1 */
@@ -699,8 +715,8 @@ WRITE8_MEMBER( gtia_device::write )
 		SETCOL_B(T00, data);     /* set text mode both pixels 0 */
 		SETCOL_L(T01, data);     /* set text mode left pixel 0 */
 		SETCOL_R(T10, data);     /* set text mode right pixel 0 */
-		SPLIT_HUE(data, huepf2);
-		data = huepf2 | lumpf1;
+		SPLIT_HUE(data, m_huepf2);
+		data = m_huepf2 | m_lumpf1;
 		SETCOL_R(T01, data);     /* set text mode right pixel 1 */
 		SETCOL_L(T10, data);     /* set text mode left pixel 1 */
 		SETCOL_B(T11, data);     /* set text mode both pixels 1 */
@@ -718,8 +734,8 @@ WRITE8_MEMBER( gtia_device::write )
 		SETCOL_B(P400, data);    /* set p/m xor mode both pixels 0 */
 		SETCOL_L(P401, data);    /* set p/m xor mode left pixel 0 */
 		SETCOL_R(P410, data);    /* set p/m xor mode right pixel 0 */
-		SPLIT_HUE(data, huepm4);
-		data = huepm4 | lumpf1;
+		SPLIT_HUE(data, m_huepm4);
+		data = m_huepm4 | m_lumpf1;
 		SETCOL_R(P401, data);    /* set p/m xor mode right pixel 1 */
 		SETCOL_L(P410, data);    /* set p/m xor mode left pixel 1 */
 		SETCOL_B(P411, data);    /* set p/m xor mode both pixels 1 */
@@ -744,8 +760,8 @@ WRITE8_MEMBER( gtia_device::write )
 		SETCOL_B(G00, data);     /* set 2 color graphics both pixels 0 */
 		SETCOL_L(G01, data);     /* set 2 color graphics left pixel 0 */
 		SETCOL_R(G10, data);     /* set 2 color graphics right pixel 0 */
-		SPLIT_HUE(data, huebk);
-		data = huebk | lumpf1;
+		SPLIT_HUE(data, m_huebk);
+		data = m_huebk | m_lumpf1;
 		SETCOL_R(G01, data);     /* set 2 color graphics right pixel 1 */
 		SETCOL_L(G10, data);     /* set 2 color graphics left pixel 1 */
 		SETCOL_B(G11, data);     /* set 2 color graphics both pixels 1 */

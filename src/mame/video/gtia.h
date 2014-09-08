@@ -163,17 +163,17 @@ protected:
 	void recalc_m2();
 	void recalc_m3();
 	
-	void player_render(UINT8 gfx, int size, UINT8 color, UINT8 *dst);
-	void missile_render(UINT8 gfx, int size, UINT8 color, UINT8 *dst);
+	inline void player_render(UINT8 gfx, int size, UINT8 color, UINT8 *dst);
+	inline void missile_render(UINT8 gfx, int size, UINT8 color, UINT8 *dst);
 	
 private:
 	gtia_readregs   m_r;          /* read registers */
 	gtia_writeregs  m_w;          /* write registers */
 	gtia_helpervars m_h;          /* helper variables */
 	
-//	UINT8 m_lumpf1;
-//	UINT8 m_huepm0, m_huepm1, m_huepm2, m_huepm3, m_huepm4;
-//	UINT8 m_huepf2, m_huebk;
+	UINT8 m_lumpf1;
+	UINT8 m_huepm0, m_huepm1, m_huepm2, m_huepm3, m_huepm4;
+	UINT8 m_huepf2, m_huebk;
 	
 	UINT16 m_color_lookup[256];  /* color lookup table */	// probably better fit to ANTIC, but it remains here for the moment...
 	
