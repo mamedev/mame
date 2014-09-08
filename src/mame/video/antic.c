@@ -1079,8 +1079,9 @@ static const atari_renderer_func renderer[2][19][5] = {
 	}
 };
 
-void antic_render(address_space &space, VIDEO *video, int param1, int param2, int param3)
+void antic_render(address_space &space, int param1, int param2, int param3)
 {
+	VIDEO *video = antic.video[antic.scanline];
 	(*renderer[param1][param2][param3])(space, video);
 }
 

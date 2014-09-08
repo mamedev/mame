@@ -394,10 +394,9 @@ TIMER_CALLBACK_MEMBER( atari_common_state::antic_scanline_render )
 {
 	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 
-	VIDEO *video = antic.video[antic.scanline];
 	LOG(("           @cycle #%3d render mode $%X lines to go #%d\n", cycle(), (antic.cmd & 0x0f), antic.modelines));
 
-	antic_render(space, video, m_antic_render1, m_antic_render2, m_antic_render3);
+	antic_render(space, m_antic_render1, m_antic_render2, m_antic_render3);
 
 	/* if player/missile graphics is enabled */
 	if( antic.scanline < 256 && (antic.w.dmactl & (DMA_PLAYER|DMA_MISSILE)) )

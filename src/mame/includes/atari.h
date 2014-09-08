@@ -562,7 +562,7 @@ extern ANTIC antic;
 void antic_start(running_machine &machine);
 void antic_vstart(running_machine &machine);
 void antic_reset(void);
-void antic_render(address_space &space, VIDEO *video, int param1, int param2, int param3);
+void antic_render(address_space &space, int param1, int param2, int param3);
 
 
 #endif /* ATARI_H */
