@@ -34,6 +34,7 @@ class validity_checker
 
 public:
 	validity_checker(emu_options &options);
+	~validity_checker();
 
 	// getters
 	int errors() const { return m_errors; }

@@ -141,6 +141,14 @@ validity_checker::validity_checker(emu_options &options)
 	}
 }
 
+//-------------------------------------------------
+//  validity_checker - destructor
+//-------------------------------------------------
+
+validity_checker::~validity_checker()
+{
+	validate_end();
+}
 
 //-------------------------------------------------
 //  check_driver - check a single driver
@@ -343,6 +351,7 @@ void validity_checker::validate_core()
 	if (sizeof(void *) != 4) osd_printf_error("PTR64 flag not enabled, but was compiled for 64-bit target\n");
 #endif
 
+	// TODO: check if this is actually working
 	// check endianness definition
 	UINT16 lsbtest = 0;
 	*(UINT8 *)&lsbtest = 0xff;
