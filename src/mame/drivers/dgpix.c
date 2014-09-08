@@ -12,6 +12,7 @@
 
  [*] the version number is written in the flash roms at the beginning of the game settings
 
+Note: There is known to exist an alternate version of The X-Files titled The Sex Files which is undumped
 
  Original bugs:
  - In King of Dynast Gear, Roger's fast attack shows some blank lines
@@ -42,7 +43,7 @@
  - TS 2005.02.06
    Preliminary emulation of X-Files. VRender0- is probably just framebuffer.
    Patch in DRIVER_INIT removes call at RAM adr $8f30 - protection ?
-   (without fix, game freezes int one of startup screens - like on real
+   (without fix, game freezes at one of startup screens - like on real
    board  with  protection PIC removed)
 
 *********************************************************************
@@ -50,7 +51,8 @@
 PCB Layout
 ----------
 
-The X-Files
+Elfin
+The X-Files (Korean region)
 Fishing Maniac 3
 
 VRenderO Minus Rev4 dgPIX Entertainment Inc. 1999
@@ -87,6 +89,7 @@ Notes:
 
 
 
+The X-Files (uncensored version)
 Jump Jump
 King of Dynast Gear
 
@@ -432,7 +435,7 @@ Elfin
 dgPIX Entertainment Inc. 1999
 
 PCB combo:
-VRenderO Minus Rev5 dgPIX Entertainment Inc. 1999
+VRenderO Minus Rev4 dgPIX Entertainment Inc. 1999
 Flash Module Type-A REV2 dgPIX Entertainment Inc. 1999
 
 */
@@ -477,7 +480,7 @@ The X-Files
 dgPIX Entertainment Inc. 1999
 
 PCB combo:
-VRenderO Minus Rev4 dgPIX Entertainment Inc. 1999
+VRenderO Minus Rev5 dgPIX Entertainment Inc. 1999
 Flash Module Type-A REV2 dgPIX Entertainment Inc. 1999
 
 Uncensored World version
