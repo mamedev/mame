@@ -41,15 +41,11 @@ void atari_common_state::video_start()
  ************************************************************************/
 UINT32 atari_common_state::screen_update_atari(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT32 new_tv_artifacts;
-
+	UINT32 new_tv_artifacts = screen.ioport("artifacts")->read_safe(0);
 	copybitmap(bitmap, *antic.bitmap, 0, 0, 0, 0, cliprect);
 
-	new_tv_artifacts = screen.ioport("artifacts")->read_safe(0);
-	if( tv_artifacts != new_tv_artifacts )
-	{
+	if (tv_artifacts != new_tv_artifacts)
 		tv_artifacts = new_tv_artifacts;
-	}
 
 	return 0;
 }

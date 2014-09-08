@@ -7110,6 +7110,7 @@ src/mame/video/ampoker2.c svneol=native#text/plain
 src/mame/video/amspdwy.c svneol=native#text/plain
 src/mame/video/angelkds.c svneol=native#text/plain
 src/mame/video/antic.c svneol=native#text/plain
+src/mame/video/antic.h svneol=native#text/plain
 src/mame/video/appoooh.c svneol=native#text/plain
 src/mame/video/aquarium.c svneol=native#text/plain
 src/mame/video/arabian.c svneol=native#text/plain
