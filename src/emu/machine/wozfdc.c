@@ -117,7 +117,7 @@ void wozfdc_device::a3_update_drive_sel()
 {
 	floppy_image_device *newflop = NULL;
 
-	if ((!enable1) || (!external_io_select))
+	if (!external_io_select)
 	{
 		newflop = floppy0->get_device();
 	}
