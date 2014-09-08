@@ -799,9 +799,6 @@ void raiden2_state::draw_sprites(const rectangle &cliprect)
 	UINT16 *source = sprites + sprites_cur_start/2;
 	sprite_buffer.fill(0xf, cliprect);
 
-	if (raiden2_tilemap_enable & 0x10)
-		return;
-
 	gfx_element *gfx = m_gfxdecode->gfx(2);
 
 	/*
