@@ -240,6 +240,10 @@ READ8_MEMBER(apple3_state::apple3_c0xx_r)
 			result = 0x00;
 			break;
 
+		case 0xd9:
+			popmessage("Smooth scroll enabled, contact MESSdev");
+			break;
+
 		case 0xDB:
 			apple3_write_charmem();
 			break;
@@ -376,6 +380,10 @@ WRITE8_MEMBER(apple3_state::apple3_c0xx_w)
 			m_fdc->write_c0dx(space, offset&0xf, data);
 			break;
 
+		case 0xd9:
+			popmessage("Smooth scroll enabled, contact MESSdev");
+			break;
+
 		case 0xDB:
 			apple3_write_charmem();
 			break;
@@ -437,7 +445,7 @@ void apple3_state::apple3_update_memory()
 		logerror("apple3_update_memory(): via_0_b=0x%02x via_1_a=0x0x%02x\n", m_via_0_b, m_via_1_a);
 	}
 
-	machine().device("maincpu")->set_unscaled_clock((m_via_0_a & ENV_SLOWSPEED) ? 1000000 : 2000000);
+	machine().device("maincpu")->set_unscaled_clock((m_via_0_a & ENV_SLOWSPEED) ? 1021800 : 2000000);
 
 	/* bank 2 (0100-01FF) */
 	if (!(m_via_0_a & ENV_STACK1XX))
