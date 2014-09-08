@@ -26,6 +26,8 @@ public:
 		m_gtia(*this, "gtia"),
 		tv_artifacts(0) { }
 
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+
 	virtual void video_start();
 	UINT32 screen_update_atari(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -44,6 +46,11 @@ public:
 	POKEY_KEYBOARD_CB_MEMBER(a800_keyboard);
 
 private:
+	static const device_timer_id TIMER_CYCLE_STEAL = 0;
+	static const device_timer_id TIMER_ISSUE_DLI = 1;
+	static const device_timer_id TIMER_LINE_REND = 2;
+	static const device_timer_id TIMER_LINE_DONE = 3;
+
 	required_device<gtia_device> m_gtia;
 	UINT32 tv_artifacts;
 	void prio_init();
