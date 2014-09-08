@@ -1834,6 +1834,7 @@ void sega315_5124_device::device_start()
 	save_item(NAME(m_sprite_height));
 	save_item(NAME(m_sprite_zoom));
 	save_item(NAME(m_CRAM));
+	save_item(NAME(m_latched_reg6));
 
 	machine().save().register_postload(save_prepost_delegate(FUNC(sega315_5124_device::vdp_postload), this));
 }
