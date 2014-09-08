@@ -144,6 +144,7 @@ protected:
 	int              m_sprite_count;
 	int              m_sprite_height;
 	int              m_sprite_zoom;
+	UINT8            m_latched_reg6;
 
 	/* line_buffer will be used to hold 5 lines of line data. Line #0 is the regular blitting area.
 	   Lines #1-#4 will be used as a kind of cache to be used for vertical scaling in the gamegear

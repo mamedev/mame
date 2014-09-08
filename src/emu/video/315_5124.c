@@ -156,6 +156,7 @@ sega315_5124_device::sega315_5124_device(const machine_config &mconfig, const ch
 	, m_cram_size( SEGA315_5124_CRAM_SIZE )
 	, m_palette_offset( 0 )
 	, m_supports_224_240( false )
+	, m_latched_reg6(0)
 	, m_is_pal(false)
 	, m_int_cb(*this)
 	, m_pause_cb(*this)
@@ -172,6 +173,7 @@ sega315_5124_device::sega315_5124_device(const machine_config &mconfig, device_t
 	, m_cram_size( cram_size )
 	, m_palette_offset( palette_offset )
 	, m_supports_224_240( supports_224_240 )
+	, m_latched_reg6(0)
 	, m_is_pal(false)
 	, m_int_cb(*this)
 	, m_pause_cb(*this)
@@ -367,6 +369,7 @@ void sega315_5124_device::device_timer(emu_timer &timer, device_timer_id id, int
 					m_int_cb(ASSERT_LINE);
 			}
 		}
+		m_latched_reg6 = m_reg[0x06];
 		break;
 
 	case TIMER_VINT:
@@ -465,13 +468,13 @@ void sega315_5124_device::process_line_timer()
 		if (m_line_counter == 0x00)
 		{
 			m_line_counter = m_reg[0x0a];
-			m_hint_timer->adjust( m_screen->time_until_pos( vpos, HINT_HPOS ) );
 			m_pending_status |= STATUS_HINT;
 		}
 		else
 		{
 			m_line_counter--;
 		}
+		m_hint_timer->adjust( m_screen->time_until_pos( vpos, HINT_HPOS ) );
 
 		/* Draw borders */
 		m_lborder_timer->adjust( m_screen->time_until_pos( vpos, SEGA315_5124_LBORDER_START ), vpos );
@@ -977,7 +980,7 @@ void sega315_5124_device::draw_sprites_mode4( int *line_buffer, int *priority_se
 			sprite_x -= 0x08;    /* sprite shift */
 		}
 
-		if (m_reg[0x06] & 0x04)
+		if (m_latched_reg6 & 0x04)
 		{
 			sprite_tile_selected += 256; /* pattern table select */
 		}
@@ -1109,7 +1112,7 @@ void sega315_5124_device::draw_sprites_tms9918_mode( int *line_buffer, int line 
 {
 	bool sprite_col_occurred = false;
 	int sprite_col_x = m_screen->width();
-	UINT16 sprite_pattern_base = ((m_reg[0x06] & 0x07) << 11);
+	UINT16 sprite_pattern_base = ((m_latched_reg6 & 0x07) << 11);
 
 	if (m_display_disabled)
 		return;
