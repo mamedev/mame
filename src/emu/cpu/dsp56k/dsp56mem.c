@@ -571,7 +571,6 @@ READ16_MEMBER( dsp56k_device::peripheral_register_r )
 				DSP56K::HRDF_bit_set(cpustate, 0);
 				return value;
 			}
-			break;
 		// COSR
 		case 0xffe8: break;
 
@@ -931,7 +930,6 @@ UINT8 dsp56k_host_interface_read(device_t* device, UINT8 offset)
 				return 0xbf;
 			else
 				return RXH;
-			break;
 
 		// Receive byte register - low byte (RXL)
 		case 0x07:
@@ -944,7 +942,6 @@ UINT8 dsp56k_host_interface_read(device_t* device, UINT8 offset)
 				DSP56K::RXDF_bit_set(cpustate, 0);
 				return value;
 			}
-			break;
 
 		default: logerror("DSP56k : dsp56k_host_interface_read called with invalid address 0x%02x.\n", offset);
 	}

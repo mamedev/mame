@@ -1213,7 +1213,6 @@ READ32_MEMBER(mac_state::macwd_r)
 			{
 				return 0;
 			}
-			break;
 
 		default:
 //            printf("macwd_r: @ %x, mask %08x (PC=%x)\n", offset, mem_mask, m_maincpu->pc());

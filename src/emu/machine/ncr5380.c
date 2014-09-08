@@ -61,7 +61,8 @@ static int get_cmd_len(int cbyte)
 
 	fatalerror("NCR5380: Unknown SCSI command group %d\n", group);
 
-	return 6;
+	// never executed
+	//return 6;
 }
 
 

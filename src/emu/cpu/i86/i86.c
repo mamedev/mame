@@ -2194,7 +2194,6 @@ bool i8086_common_cpu_device::common_op(UINT8 op)
 					set_SZPF_Word(tmp);
 					CLKM(ALU_RI16,ALU_MI16_RO);
 					break;
-					break;
 				case 0x10:  /* NOT */
 					PutbackRMWord(~tmp);
 					CLKM(NEGNOT_R16,NEGNOT_M16);

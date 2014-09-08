@@ -180,7 +180,8 @@ int jvs_device::handle_message(const UINT8 *send_buffer, UINT32 send_size, UINT8
 		return 0;
 	}
 
-	return -1;
+	// never executed
+	//return -1;
 }
 
 bool jvs_device::get_address_set_line()

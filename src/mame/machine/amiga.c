@@ -297,7 +297,6 @@ void amiga_state::device_timer(emu_timer &timer, device_timer_id id, int param, 
 		break;
 	default:
 		fatalerror("Invalid timer: %d\n", id);
-		break;
 	}
 }
 
@@ -1345,7 +1344,6 @@ WRITE16_MEMBER( amiga_state::custom_chip_w )
 		case REG_SERDATR:   case REG_DSKBYTR:   case REG_INTENAR:   case REG_INTREQR:
 			// read-only registers
 			return;
-			break;
 
 		case REG_DSKDAT:
 			popmessage("DSKDAT W %04x, contact MESSdev",data);

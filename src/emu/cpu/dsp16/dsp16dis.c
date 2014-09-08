@@ -54,7 +54,8 @@ astring disasmYField(const UINT8& Y)
 
 		default: return "UNKNOWN";
 	}
-	return "";
+	// never executed
+	//return "";
 }
 
 astring disasmZField(const UINT8& Z)
@@ -83,7 +84,8 @@ astring disasmZField(const UINT8& Z)
 
 		default: return "UNKNOWN";
 	}
-	return "";
+	// never executed
+	//return "";
 }
 
 astring disasmF2Field(const UINT8& F2, const UINT8& D, const UINT8& S)
@@ -139,7 +141,8 @@ astring disasmCONField(const UINT8& CON)
 
 		default: return "RESERVED";
 	}
-	return "";
+	// never executed
+	//return "";
 }
 
 astring disasmBField(const UINT8& B)
@@ -157,7 +160,8 @@ astring disasmBField(const UINT8& B)
 
 		default: return "UNKNOWN";
 	}
-	return "";
+	// never executed
+	//return "";
 }
 
 astring disasmRImmediateField(const UINT8& R)
@@ -175,7 +179,8 @@ astring disasmRImmediateField(const UINT8& R)
 
 		default: return "UNKNOWN";
 	}
-	return "";
+	// never executed
+	//return "";
 }
 
 astring disasmRField(const UINT8& R)
@@ -213,7 +218,8 @@ astring disasmRField(const UINT8& R)
 
 		default: return "RESERVED";
 	}
-	return "";
+	// never executed
+	//return "";
 }
 
 astring disasmIField(const UINT8& I)
@@ -227,7 +233,8 @@ astring disasmIField(const UINT8& I)
 
 		default: return "UNKNOWN";
 	}
-	return "";
+	// never executed
+	//return "";
 }
 
 bool disasmSIField(const UINT8& SI)

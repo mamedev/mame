@@ -394,7 +394,6 @@ UINT16 strataflash_device::read8_16(address_space& space, offs_t offset, bus_wid
 		case 0x3f:
 			return 0x00;
 		}
-		break;
 	}
 
 	return 0;

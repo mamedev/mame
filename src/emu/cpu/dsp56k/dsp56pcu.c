@@ -479,7 +479,8 @@ int dsp56k_get_irq_index_by_tag(const char* tag)
 	}
 
 	fatalerror("DSP56K ERROR : IRQ TAG specified incorrectly (get_vector_by_tag) : %s.\n", tag);
-	return -1;
+	// never executed
+	//return -1;
 }
 
 } // namespace DSP56K

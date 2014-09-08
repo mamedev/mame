@@ -2469,7 +2469,6 @@ void ppc_device::ppc4xx_dma_exec(int dmachan)
 		/* fly-by mode DMA */
 		case 1:
 			fatalerror("ppc4xx_dma_exec: fly-by DMA not implemented\n");
-			break;
 
 		/* software initiated memory-to-memory mode DMA */
 		case 2:
@@ -2525,7 +2524,6 @@ void ppc_device::ppc4xx_dma_exec(int dmachan)
 		/* hardware initiated memory-to-memory mode DMA */
 		case 3:
 			fatalerror("ppc4xx_dma_exec: HW mem-to-mem DMA not implemented\n");
-			break;
 	}
 }
 
@@ -2806,8 +2804,6 @@ WRITE8_MEMBER( ppc4xx_device::ppc4xx_spu_w )
 			m_spu.regs[offset] = data;
 			if ((oldstate ^ data) & 0x09)
 				ppc4xx_spu_timer_reset();
-			break;
-
 			break;
 
 		case SPU4XX_BUFFER:

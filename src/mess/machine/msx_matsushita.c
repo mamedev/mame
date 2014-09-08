@@ -78,7 +78,6 @@ READ8_MEMBER(msx_matsushita_device::io_read)
 				m_pattern = (m_pattern << 2) | (m_pattern >> 6);
 				return result;
 			}
-			break;
 
 		case 0x09:   // Data
 			if (m_address < m_sram.count())

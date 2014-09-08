@@ -154,7 +154,6 @@ void pc9801_118_device::install_device(offs_t start, offs_t end, offs_t mask, of
 			break;
 		default:
 			fatalerror("PC-9801-118: Bus width %d not supported\n", buswidth);
-			break;
 	}
 }
 

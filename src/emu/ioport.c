@@ -4006,7 +4006,6 @@ analog_field::analog_field(ioport_field &field)
 
 		default:
 			fatalerror("Unknown analog port type -- don't know if it is absolute or not\n");
-			break;
 	}
 
 	// further processing for absolute controls

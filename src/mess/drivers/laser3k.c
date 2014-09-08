@@ -394,7 +394,6 @@ READ8_MEMBER( laser3k_state::io_r )
 				m_strobe = 0;
 				return rv;
 			}
-			break;
 
 		case 0x7c:
 			return m_bank0val;

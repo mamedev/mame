@@ -330,7 +330,6 @@ void dsp32c_device::state_import(const device_state_entry &entry)
 
 		default:
 			fatalerror("dsp32c_device::state_import called for unexpected value\n");
-			break;
 	}
 }
 
@@ -361,7 +360,6 @@ void dsp32c_device::state_export(const device_state_entry &entry)
 
 		default:
 			fatalerror("dsp32c_device::state_export called for unexpected value\n");
-			break;
 	}
 }
 

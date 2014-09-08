@@ -172,7 +172,6 @@ static const char *line_value_string(cococart_line_value value)
 			break;
 		default:
 			fatalerror("Invalid value\n");
-			break;
 	}
 	return s;
 }

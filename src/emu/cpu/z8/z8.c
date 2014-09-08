@@ -786,7 +786,6 @@ void z8_device::state_import(const device_state_entry &entry)
 
 		default:
 			fatalerror("CPU_IMPORT_STATE(z8) called for unexpected value\n");
-			break;
 	}
 }
 
@@ -805,7 +804,6 @@ void z8_device::state_export(const device_state_entry &entry)
 
 		default:
 			fatalerror("CPU_EXPORT_STATE(z8) called for unexpected value\n");
-			break;
 	}
 }
 

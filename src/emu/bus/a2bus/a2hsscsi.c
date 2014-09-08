@@ -176,7 +176,6 @@ UINT8 a2bus_hsscsi_device::read_c0nx(address_space &space, UINT8 offset)
 		case 7:
 //          printf("Read 5380 @ %x\n", offset);
 			return m_ncr5380->read(space, offset);
-			break;
 
 		case 0xc:
 			return 0x00;    // indicate watchdog?

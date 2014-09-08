@@ -222,7 +222,6 @@ UINT32 nubus_spec8s3_device::screen_update(screen_device &screen, bitmap_rgb32 &
 
 		default:
 			fatalerror("spec8s3: unknown video mode %d\n", m_mode);
-			break;
 	}
 	return 0;
 }

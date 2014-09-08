@@ -473,7 +473,6 @@ READ8_MEMBER(smc777_state::key_r)
 
 			return (offset == 0) ? m_keyb_press : ((m_shift_press_flag << 6) | (m_keyb_press_flag << 2) | (m_keyb_press_flag));
 		}
-		break;
 		default:
 		{
 			//if(offset == 1)
@@ -483,7 +482,8 @@ READ8_MEMBER(smc777_state::key_r)
 		}
 	}
 
-	return 0x00;
+	// never executed
+	//return 0x00;
 }
 
 /* TODO: the packet commands strikes me as something I've already seen before, don't remember where however ... */

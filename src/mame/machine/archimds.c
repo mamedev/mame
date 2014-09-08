@@ -349,7 +349,8 @@ READ32_MEMBER(archimedes_state::archimedes_memc_logical_r)
 		}
 	}
 
-	return 0;
+	// never executed
+	//return 0;
 }
 
 
@@ -428,7 +429,8 @@ READ32_MEMBER(archimedes_state::aristmk5_drame_memc_logical_r)
 		}
 	}
 
-	return 0;
+	// never executed
+	//return 0;
 }
 
 void archimedes_state::archimedes_driver_init()

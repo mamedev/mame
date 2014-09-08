@@ -1329,7 +1329,6 @@ READ8_MEMBER(isa16_gus_device::board_r)
 		logerror("GUS: Invalid or unimplemented read of port 0x2X%01x\n",offset);
 		return 0xff;
 	}
-	return 0xff;
 }
 
 WRITE8_MEMBER(isa16_gus_device::board_w)
@@ -1385,7 +1384,6 @@ READ8_MEMBER(isa16_gus_device::synth_r)
 		logerror("GUS: Invalid or unimplemented register read of port 0x3X%01x\n",offset);
 		return 0xff;
 	}
-	return 0xff;
 }
 
 WRITE8_MEMBER(isa16_gus_device::synth_w)

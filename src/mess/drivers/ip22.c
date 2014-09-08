@@ -316,7 +316,6 @@ READ32_MEMBER(ip22_state::hpc3_pbus6_r)
 		//verboselog(0, "Unknown HPC PBUS6 Read: 0x%08x (%08x)\n", 0x1fbd9800 + ( offset << 2 ), mem_mask );
 		return 0;
 	}
-	return 0;
 }
 
 WRITE32_MEMBER(ip22_state::hpc3_pbus6_w)
@@ -434,7 +433,6 @@ READ32_MEMBER(ip22_state::hpc3_hd_enet_r)
 		//verboselog((machine, 0, "Unknown HPC3 ENET/HDx Read: %08x (%08x)\n", 0x1fb90000 + ( offset << 2 ), mem_mask );
 		return 0;
 	}
-	return 0;
 }
 
 WRITE32_MEMBER(ip22_state::hpc3_hd_enet_w)
@@ -493,7 +491,6 @@ READ32_MEMBER(ip22_state::hpc3_hd0_r)
 		//verboselog((machine, 0, "Unknown HPC3 HD0 Read: %08x (%08x) [%x] PC=%x\n", 0x1fbc0000 + ( offset << 2 ), mem_mask, offset, space.device().safe_pc() );
 		return 0;
 	}
-	return 0;
 }
 
 WRITE32_MEMBER(ip22_state::hpc3_hd0_w)
@@ -540,7 +537,6 @@ READ32_MEMBER(ip22_state::hpc3_pbus4_r)
 		//verboselog((machine, 0, "Unknown HPC3 PBUS4 Read: %08x (%08x)\n", 0x1fbd9000 + ( offset << 2 ), mem_mask );
 		return 0;
 	}
-	return 0;
 }
 
 WRITE32_MEMBER(ip22_state::hpc3_pbus4_w)
@@ -1006,7 +1002,7 @@ WRITE32_MEMBER(ip22_state::hal2_w)
 		return;
 		/* FIXME: this code is never excuted */
 		//verboselog((machine, 0, "    Read Back Index: %01x\n", ( data & H2_IAR_RB_INDEX ) );
-		break;
+		//break;
 	case 0x0040/4:
 		//verboselog((machine, 0, "HAL2 Indirect Data Register 0 Write: 0x%08x (%08x)\n", data, mem_mask );
 		m_HAL2.nIDR[0] = data;

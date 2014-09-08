@@ -188,7 +188,6 @@ UINT8 a2bus_vulcanbase_device::read_c0nx(address_space &space, UINT8 offset)
 			{
 				return m_ata->read_cs0(space, offset, 0xff);
 			}
-			break;
 
 		case 2:
 		case 3:

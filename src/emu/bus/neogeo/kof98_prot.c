@@ -104,7 +104,8 @@ READ16_MEMBER(kof98_prot_device::kof98_prot_r)
 	else
 		return m_default_rom[1];
 
-	return 0xffff;
+	// never executed
+	//return 0xffff;
 }
 
 WRITE16_MEMBER( kof98_prot_device::kof98_prot_w )

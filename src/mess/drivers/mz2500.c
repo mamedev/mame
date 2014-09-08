@@ -821,12 +821,10 @@ UINT8 mz2500_state::mz2500_ram_read(UINT16 offset, UINT8 bank_num)
 			else //PCG RAM
 				return m_pcg_ram[offset];
 		}
-		break;
 		case 0x3a:
 		{
 			return m_dic_rom[(offset & 0x1fff) + ((m_dic_bank & 0x1f)*0x2000)];
 		}
-		break;
 		case 0x3c:
 		case 0x3d:
 		case 0x3e:
@@ -834,10 +832,10 @@ UINT8 mz2500_state::mz2500_ram_read(UINT16 offset, UINT8 bank_num)
 		{
 			return m_phone_rom[offset+(cur_bank & 3)*0x2000];
 		}
-		break;
 		default: return ram[offset+cur_bank*0x2000];
 	}
 
+	// never executed
 	return 0xff;
 }
 

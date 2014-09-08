@@ -2022,7 +2022,6 @@ READ8_MEMBER(towns_state::towns_volume_r)
 	default:
 		return 0;
 	}
-	return 0;
 }
 
 WRITE8_MEMBER(towns_state::towns_volume_w)

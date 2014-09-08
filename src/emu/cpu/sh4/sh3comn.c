@@ -123,7 +123,8 @@ READ32_MEMBER( sh3_base_device::sh3_internal_high_r )
 		case SH3_INTEVT_ADDR:
 			logerror("'%s' (%08x): unmapped internal read from %08x mask %08x (SH3 INTEVT - %08x)\n",tag(), m_pc & AM,(offset *4)+SH3_UPPER_REGBASE,mem_mask, m_sh3internal_upper[offset]);
 			fatalerror("INTEVT unsupported on SH3\n");
-			return m_sh3internal_upper[offset];
+			// never executed
+			//return m_sh3internal_upper[offset];
 
 
 		default:
@@ -163,7 +164,6 @@ READ32_MEMBER( sh3_base_device::sh3_internal_r )
 				//  logerror("'%s' (%08x): unmapped internal read from %08x mask %08x (INTEVT2)\n",tag(), m_pc & AM,(offset *4)+0x4000000,mem_mask);
 					return m_sh3internal_lower[offset];
 				}
-				break;
 
 
 			case IRR0_IRR1:
@@ -184,7 +184,6 @@ READ32_MEMBER( sh3_base_device::sh3_internal_r )
 						fatalerror("'%s' (%08x): unmapped internal read from %08x mask %08x (IRR0/1 unused bits)\n",tag(), m_pc & AM,(offset *4)+0x4000000,mem_mask);
 					}
 				}
-				break;
 
 			case PADR_PBDR:
 				{

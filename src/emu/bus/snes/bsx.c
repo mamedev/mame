@@ -329,7 +329,8 @@ READ8_MEMBER(sns_rom_bsx_device::read_l)
 		return m_rom[rom_bank_map[bank] * 0x8000 + (offset & 0x7fff)];
 	}
 
-	return 0x00;
+	// never executed
+	//return 0x00;
 }
 
 
@@ -353,7 +354,8 @@ READ8_MEMBER(sns_rom_bsx_device::read_h)
 		return m_rom[rom_bank_map[bank] * 0x8000 + (offset & 0x7fff)];
 	}
 
-	return 0x00;
+	// never executed
+	//return 0x00;
 }
 
 WRITE8_MEMBER(sns_rom_bsx_device::write_l)

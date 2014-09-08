@@ -1388,7 +1388,6 @@ static _OP DecodeOp(UINT16 Opcode)
 								return MVFC;
 							else
 								return MVTC;
-							break;
 					}
 					break;
 			}

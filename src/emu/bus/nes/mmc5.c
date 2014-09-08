@@ -266,7 +266,6 @@ void nes_exrom_device::set_mirror(int page, int src)
 			break;
 		default:
 			fatalerror("This should never happen\n");
-			break;
 	}
 }
 

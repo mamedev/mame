@@ -233,7 +233,6 @@ UINT32 nubus_xceedmc30_device::screen_update(screen_device &screen, bitmap_rgb32
 
 		default:
 			fatalerror("xceedmc30: unknown video mode %d\n", m_mode);
-			break;
 	}
 	return 0;
 }

@@ -203,7 +203,6 @@ WRITE32_MEMBER(gba_rom_flash_device::write_ram)
 			break;
 		default:
 			fatalerror("Unknown mem_mask for GBA flash write %x\n", mem_mask);
-			break;
 	}
 }
 
@@ -255,7 +254,6 @@ WRITE32_MEMBER(gba_rom_flash1m_device::write_ram)
 			break;
 		default:
 			fatalerror("Unknown mem_mask for GBA flash write %x\n", mem_mask);
-			break;
 	}
 }
 

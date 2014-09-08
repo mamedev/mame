@@ -151,19 +151,16 @@ int hp49gp_state::lcd_spi_line_r( int line)
 			verboselog( 7, "LCD_SPI_LINE_1 -> %d\n", m_lcd_spi.l1);
 			return m_lcd_spi.l1;
 		}
-		break;
 		case LCD_SPI_LINE_DATA :
 		{
 			verboselog( 7, "LCD_SPI_LINE_DATA -> %d\n", m_lcd_spi.data);
 			return m_lcd_spi.data;
 		}
-		break;
 		case LCD_SPI_LINE_3 :
 		{
 			verboselog( 7, "LCD_SPI_LINE_3 -> %d\n", m_lcd_spi.l3);
 			return m_lcd_spi.l3;
 		}
-		break;
 	}
 	return 0;
 }

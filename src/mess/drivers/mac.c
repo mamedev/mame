@@ -547,7 +547,8 @@ READ8_MEMBER(mac_state::mac_5396_r)
 		return m_539x_1->read(space, 2);
 	}
 
-	return 0;
+	// never executed
+	//return 0;
 }
 
 WRITE8_MEMBER(mac_state::mac_5396_w)

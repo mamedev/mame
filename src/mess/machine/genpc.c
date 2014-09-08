@@ -541,7 +541,6 @@ void ibm5160_mb_device::install_device(offs_t start, offs_t end, offs_t mask, of
 			break;
 		default:
 			fatalerror("IBM5160_MOTHERBOARD: Bus width %d not supported\n", buswidth);
-			break;
 	}
 }
 

@@ -240,7 +240,6 @@ READ16_MEMBER(concept_state::concept_io_r)
 			case 3: // IO3 registers
 			case 4: // IO4 registers
 				return m_exp[((offset >> 4) & 7) - 1]->reg_r(space, offset & 0x0f);
-			break;
 
 			default: // ???
 				logerror("concept_io_r: Slot I/O memory accessed for unknown purpose at address 0x03%4.4x\n", offset << 1);
@@ -254,7 +253,6 @@ READ16_MEMBER(concept_state::concept_io_r)
 	case 4: // IO4 ROM
 		LOG(("concept_io_r: Slot ROM memory accessed for slot %d at address 0x03%4.4x\n", ((offset >> 8) & 7) - 1, offset << 1));
 		return m_exp[((offset >> 8) & 7) - 1]->rom_r(space, offset & 0xff);
-		break;
 
 	case 5:
 		/* slot status */
@@ -304,12 +302,10 @@ READ16_MEMBER(concept_state::concept_io_r)
 		case 1:
 			/* NSR0 data comm port 0 */
 			return m_acia0->read(space, (offset & 3));
-			break;
 
 		case 2:
 			/* NSR1 data comm port 1 */
 			return m_acia1->read(space, (offset & 3));
-			break;
 
 		case 3:
 			/* NVIA versatile system interface */
@@ -318,7 +314,6 @@ READ16_MEMBER(concept_state::concept_io_r)
 				via6522_device *via_0 = machine().device<via6522_device>("via6522_0");
 				return via_0->read(space, offset & 0xf);
 			}
-			break;
 
 		case 4:
 			/* NCALM clock calendar address and strobe register */
@@ -365,7 +360,6 @@ WRITE16_MEMBER(concept_state::concept_io_w)
 			case 3: // IO3 registers
 			case 4: // IO4 registers
 				return m_exp[((offset >> 4) & 7) - 1]->reg_w(space, offset & 0x0f, data);
-				break;
 
 			default:    // ???
 				logerror("concept_io_w: Slot I/O memory written for unknown purpose at address 0x03%4.4x, data: 0x%4.4x\n", offset << 1, data);
@@ -379,7 +373,6 @@ WRITE16_MEMBER(concept_state::concept_io_w)
 	case 4: // IO4 ROM
 		LOG(("concept_io_w: Slot ROM memory written to for slot %d at address 0x03%4.4x, data: 0x%4.4x\n", ((offset >> 8) & 7) - 1, offset << 1, data));
 		return m_exp[((offset >> 8) & 7) - 1]->rom_w(space, offset & 0xff, data);
-		break;
 
 	case 5:
 		/* slot status */

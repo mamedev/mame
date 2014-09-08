@@ -1055,7 +1055,6 @@ void i8085a_cpu_device::state_import(const device_state_entry &entry)
 
 		default:
 			fatalerror("CPU_IMPORT_STATE(i808x) called for unexpected value\n");
-			break;
 	}
 }
 
@@ -1079,7 +1078,6 @@ void i8085a_cpu_device::state_export(const device_state_entry &entry)
 
 		default:
 			fatalerror("CPU_EXPORT_STATE(i808x) called for unexpected value\n");
-			break;
 	}
 }
 

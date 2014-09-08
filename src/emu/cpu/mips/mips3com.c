@@ -305,7 +305,8 @@ UINT32 mips3_device::compute_prid_register()
 		default:
 			fatalerror("Unknown MIPS flavor specified\n");
 	}
-	return 0x2000;
+	// never executed
+	//return 0x2000;
 }
 
 

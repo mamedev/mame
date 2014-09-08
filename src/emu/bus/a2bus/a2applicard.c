@@ -150,7 +150,6 @@ UINT8 a2bus_applicard_device::read_c0nx(address_space &space, UINT8 offset)
 
 		case 6: // IRQ on Z80 via CTC channel 3 (CP/M doesn't use the CTC or IRQs)
 			fatalerror("Applicard: Z80 IRQ not supported yet\n");
-			break;
 
 		case 7: // NMI on Z80 (direct)
 			m_z80->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
@@ -255,7 +254,8 @@ READ8_MEMBER( a2bus_applicard_device::dma_r )
 	{
 		return m_z80ram[offset];
 	}
-	return 0xff;
+	// never executed
+	//return 0xff;
 }
 
 

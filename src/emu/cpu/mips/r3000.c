@@ -417,7 +417,6 @@ void r3000_device::state_import(const device_state_entry &entry)
 
 		default:
 			fatalerror("r3000_device::state_import called for unexpected value\n");
-			break;
 	}
 }
 
@@ -435,7 +434,6 @@ void r3000_device::state_export(const device_state_entry &entry)
 
 		default:
 			fatalerror("r3000_device::state_export called for unexpected value\n");
-			break;
 	}
 }
 

@@ -806,7 +806,6 @@ READ16_MEMBER( cdi68070_device::periphs_r )
 				verboselog(machine(), 2, "cdi68070_periphs_r: MMU Status: %02x & %04x\n", m_mmu.status, mem_mask);
 				return m_mmu.status;
 			}
-			break;
 		case 0x8040/2:
 		case 0x8048/2:
 		case 0x8050/2:

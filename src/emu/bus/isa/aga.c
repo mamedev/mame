@@ -921,7 +921,6 @@ READ8_MEMBER( isa8_aga_pc200_device::pc200_videoram_r )
 		case AGA_MONO:
 			return m_videoram[offset];
 	}
-	return 0;
 }
 
 WRITE8_MEMBER ( isa8_aga_pc200_device::pc200_videoram_w )

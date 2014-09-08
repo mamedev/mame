@@ -1162,7 +1162,6 @@ READ8_MEMBER(fm7_state::fm77av_alu_r)
 			logerror("ALU: read from invalid register 0x%02x\n",offset);
 			return 0xff;
 	}
-	return 0xff;
 }
 
 WRITE8_MEMBER(fm7_state::fm77av_alu_w)
@@ -1341,7 +1340,6 @@ READ8_MEMBER(fm7_state::fm7_sub_ram_ports_banked_r)
 			logerror("Unmapped read from sub CPU port 0xd%03x via MMR banking\n",offset);
 			return 0xff;
 	}
-	return 0xff;
 }
 
 WRITE8_MEMBER(fm7_state::fm7_sub_ram_ports_banked_w)

@@ -292,7 +292,6 @@ const char *mc6847_friend_device::scanline_zone_string(scanline_zone zone)
 		case SCANLINE_ZONE_FRAME_END:       result = "SCANLINE_ZONE_FRAME_END";     break;
 		default:
 			fatalerror("Should not get here\n");
-			break;
 	}
 	return result;
 }
@@ -715,7 +714,6 @@ ATTR_FORCE_INLINE void mc6847_base_device::record_body_scanline(UINT16 physical_
 			default:
 				/* should not get here */
 				fatalerror("should not get here\n");
-				break;
 		}
 	}
 	else
@@ -799,7 +797,6 @@ ATTR_FORCE_INLINE mc6847_base_device::pixel_t mc6847_base_device::border_value(U
 			break;
 		default:
 			fatalerror("Should not get here\n");
-			break;
 	}
 	return result;
 }

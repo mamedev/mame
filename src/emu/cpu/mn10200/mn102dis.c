@@ -288,7 +288,6 @@ static int mn102_disassemble(char *buffer, UINT32 pc, const UINT8 *oprom)
 		default:
 			goto illegal2;
 		}
-		break;
 
 	case 0xf1:
 		opcode = program_read_byte(pc+1);
@@ -375,7 +374,6 @@ static int mn102_disassemble(char *buffer, UINT32 pc, const UINT8 *oprom)
 		default:
 			goto illegal2;
 		}
-		break;
 
 	case 0xf3:
 		opcode = program_read_byte(pc+1);
@@ -485,7 +483,6 @@ static int mn102_disassemble(char *buffer, UINT32 pc, const UINT8 *oprom)
 			default:
 				goto illegal3;
 			}
-			break;
 
 		case 0xff:
 			opcode = program_read_byte(pc+2);
@@ -516,12 +513,10 @@ static int mn102_disassemble(char *buffer, UINT32 pc, const UINT8 *oprom)
 			default:
 				goto illegal3;
 			}
-			break;
 
 		default:
 			goto illegal2;
 		}
-		break;
 
 	case 0xf4:
 		opcode = program_read_byte(pc+1);
@@ -667,7 +662,6 @@ static int mn102_disassemble(char *buffer, UINT32 pc, const UINT8 *oprom)
 		default:
 			goto illegal2;
 		}
-		break;
 
 	case 0xf5:
 		opcode = program_read_byte(pc+1);
@@ -721,7 +715,6 @@ static int mn102_disassemble(char *buffer, UINT32 pc, const UINT8 *oprom)
 			default:
 				goto illegal3;
 			}
-			break;
 		}
 
 		case 0x50: case 0x51: case 0x52: case 0x53: case 0x54: case 0x55: case 0x56: case 0x57:
@@ -742,7 +735,6 @@ static int mn102_disassemble(char *buffer, UINT32 pc, const UINT8 *oprom)
 			default:
 				goto illegal3;
 			}
-			break;
 		}
 
 		case 0x70: case 0x71: case 0x72: case 0x73: case 0x74: case 0x75: case 0x76: case 0x77:
@@ -870,7 +862,6 @@ static int mn102_disassemble(char *buffer, UINT32 pc, const UINT8 *oprom)
 			default:
 				goto illegal3;
 			}
-			break;
 		}
 
 		case 0xfc:
@@ -892,7 +883,6 @@ static int mn102_disassemble(char *buffer, UINT32 pc, const UINT8 *oprom)
 		default:
 			goto illegal2;
 		}
-		break;
 
 	case 0xf6:
 		sprintf(buffer, "nop");
@@ -1002,7 +992,6 @@ static int mn102_disassemble(char *buffer, UINT32 pc, const UINT8 *oprom)
 		default:
 			goto illegal2;
 		}
-		break;
 
 	case 0xf8: case 0xf9: case 0xfa: case 0xfb:
 		sprintf(buffer, "mov %s, d%d", i16str(r16s(pc+1)), opcode & 3);

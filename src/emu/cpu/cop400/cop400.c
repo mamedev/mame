@@ -243,7 +243,6 @@ cop400_cpu_device::cop400_cpu_device(const machine_config &mconfig, device_type 
 
 		default:
 			fatalerror("No or unknown featuremask supplied\n");
-			break;
 	}
 }
 

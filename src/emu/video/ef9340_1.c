@@ -219,7 +219,6 @@ void ef9340_1_device::ef9341_write( UINT8 command, UINT8 b, UINT8 data )
 				case 0xA0:  /* Read slice */
 				default:
 					fatalerror/*logerror*/("ef9341 unimplemented data action %02X\n", m_ef9340.M & 0xE0 );
-					break;
 			}
 			m_ef9341.busy = 0;
 		}

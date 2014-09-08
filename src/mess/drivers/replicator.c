@@ -202,7 +202,6 @@ READ8_MEMBER(replicator_state::port_r)
 		printf("[%08X] Port A READ (A-axis signals + B-axis STEP&DIR)\n", m_maincpu->m_shifted_pc);
 #endif
 		return 0x00;
-		break;
 	}
 		case AVR8_IO_PORTB:
 	{
@@ -210,7 +209,6 @@ READ8_MEMBER(replicator_state::port_r)
 		printf("[%08X] Port B READ (SD-CS; 1280-MISO/MOSI/SCK; EX2-FAN/HEAT/PWR-CHECK; BLINK)\n", m_maincpu->m_shifted_pc);
 #endif
 		return 0x00;
-		break;
 	}
 		case AVR8_IO_PORTC:
 	{
@@ -218,7 +216,6 @@ READ8_MEMBER(replicator_state::port_r)
 		printf("[%08X] Port C READ (1280-EX1/EX2; LCD-signals; R&G-LED; DETECT)\n", m_maincpu->m_shifted_pc);
 #endif
 		return DETECT; //indicated that the Interface board is present.
-		break;
 	}
 		case AVR8_IO_PORTD:
 	{
@@ -226,7 +223,6 @@ READ8_MEMBER(replicator_state::port_r)
 		printf("[%08X] Port D READ (SDA/SCL; 1280-EX-TX/RX)\n", m_maincpu->m_shifted_pc);
 #endif
 		return 0x00;
-		break;
 	}
 		case AVR8_IO_PORTE:
 	{
@@ -234,7 +230,6 @@ READ8_MEMBER(replicator_state::port_r)
 		printf("[%08X] Port E READ (1280-TX/RX; THERMO-signals)\n", m_maincpu->m_shifted_pc);
 #endif
 		return 0x00;
-		break;
 	}
 		case AVR8_IO_PORTF:
 	{
@@ -242,7 +237,6 @@ READ8_MEMBER(replicator_state::port_r)
 		printf("[%08X] Port F READ (X-axis & Y-axis signals)\n", m_maincpu->m_shifted_pc);
 #endif
 		return 0x00;
-		break;
 	}
 		case AVR8_IO_PORTG:
 	{
@@ -250,7 +244,6 @@ READ8_MEMBER(replicator_state::port_r)
 		printf("[%08X] Port G READ (BUZZ; Cutoff-sr-check; B-axis EN; 1280-EX3/EX4)\n", m_maincpu->m_shifted_pc);
 #endif
 		return 0x00;
-		break;
 	}
 		case AVR8_IO_PORTH:
 	{
@@ -258,7 +251,6 @@ READ8_MEMBER(replicator_state::port_r)
 		printf("[%08X] Port H READ (cuttoff-text/reset; EX1-FAN/HEAT/PWR-CHECK; SD-CD/SD-WP)\n", m_maincpu->m_shifted_pc);
 #endif
 		return 0x00;
-		break;
 	}
 		case AVR8_IO_PORTJ:
 	{
@@ -266,7 +258,6 @@ READ8_MEMBER(replicator_state::port_r)
 		printf("[%08X] Port J READ (Interface buttons; POTS-SCL; B-axis-POT)\n", m_maincpu->m_shifted_pc);
 #endif
 		return ioport("keypad")->read();
-		break;
 	}
 		case AVR8_IO_PORTK:
 	{
@@ -274,7 +265,6 @@ READ8_MEMBER(replicator_state::port_r)
 		printf("[%08X] Port K READ (Z-axis signals; HBP-THERM; 1280-EX5/6/7)\n", m_maincpu->m_shifted_pc);
 #endif
 		return 0x00;
-		break;
 	}
 		case AVR8_IO_PORTL:
 	{
@@ -282,7 +272,6 @@ READ8_MEMBER(replicator_state::port_r)
 		printf("[%08X] Port L READ (HBP; EXTRA-FET; X-MIN/MAX; Y-MIN/MAX; Z-MIN/MAX)\n", m_maincpu->m_shifted_pc);
 #endif
 		return 0x00;
-		break;
 	}
 	}
 	return 0;

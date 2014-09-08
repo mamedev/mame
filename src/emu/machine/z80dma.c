@@ -684,7 +684,6 @@ void z80dma_device::write(UINT8 data)
 			{
 				case COMMAND_ENABLE_AFTER_RETI:
 					fatalerror("Z80DMA '%s' Unimplemented WR6 command %02x\n", tag(), data);
-					break;
 				case COMMAND_READ_STATUS_BYTE:
 					if (LOG) logerror("Z80DMA '%s' CMD Read status Byte\n", tag());
 					READ_MASK = 1;

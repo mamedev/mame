@@ -467,7 +467,6 @@ UINT8 nscsi_full_device::scsi_get_data(int id, int pos)
 		return scsi_sense_buffer[pos];
 	default:
 		fatalerror("nscsi_full_device::scsi_get_data - unknown id\n");
-		return 0; // shut up compiler
 	}
 }
 

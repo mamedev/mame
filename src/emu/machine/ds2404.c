@@ -116,7 +116,6 @@ void ds2404_device::ds2404_rom_cmd(UINT8 cmd)
 
 		default:
 			fatalerror("DS2404: Unknown ROM command %02X\n", cmd);
-			break;
 	}
 }
 
@@ -151,7 +150,6 @@ void ds2404_device::ds2404_cmd(UINT8 cmd)
 
 		default:
 			fatalerror("DS2404: Unknown command %02X\n", cmd);
-			break;
 	}
 }
 

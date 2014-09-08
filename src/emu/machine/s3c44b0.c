@@ -579,7 +579,7 @@ void s3c44b0_device::lcd_configure()
 		case S3C44B0_PNRMODE_STN_04_SS : width = ((hozval + 1) * 4); break;
 		case S3C44B0_PNRMODE_STN_04_DS : width = ((hozval + 1) * 4); break;
 		case S3C44B0_PNRMODE_STN_08_SS : width = ((hozval + 1) * 8); break;
-		default : fatalerror("invalid display mode (%d)\n", dismode); break;
+		default : fatalerror("invalid display mode (%d)\n", dismode);
 	}
 	height = lineval + 1;
 	m_lcd.framerate = framerate;

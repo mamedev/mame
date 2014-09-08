@@ -148,28 +148,20 @@ pstring netlist_setup_t::objtype_as_astr(netlist_object_t &in) const
 	{
 		case netlist_terminal_t::TERMINAL:
 			return "TERMINAL";
-			break;
 		case netlist_terminal_t::INPUT:
 			return "INPUT";
-			break;
 		case netlist_terminal_t::OUTPUT:
 			return "OUTPUT";
-			break;
 		case netlist_terminal_t::NET:
 			return "NET";
-			break;
 		case netlist_terminal_t::PARAM:
 			return "PARAM";
-			break;
 		case netlist_terminal_t::DEVICE:
 			return "DEVICE";
-			break;
 		case netlist_terminal_t::NETLIST:
 			return "NETLIST";
-			break;
 		case netlist_terminal_t::QUEUE:
 			return "QUEUE";
-			break;
 	}
 	// FIXME: noreturn
 	netlist().error("Unknown object type %d\n", in.type());

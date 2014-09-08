@@ -482,7 +482,8 @@ UINT32 am29000_cpu_device::read_program_word(UINT32 address)
 	{
 		fatalerror("Am29000 instruction MMU translation enabled!\n");
 	}
-	return 0;
+	// never executed
+	//return 0;
 }
 
 /***************************************************************************

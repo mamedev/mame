@@ -227,7 +227,6 @@ int arm7_cpu_device::detect_fault(int permission, int ap, int flags)
 		{
 			return FAULT_DOMAIN;
 		}
-		break;
 		case 1 : // "Client - Accesses are checked against the access permission bits in the section or page descriptor"
 		{
 			switch (ap)
@@ -286,7 +285,6 @@ int arm7_cpu_device::detect_fault(int permission, int ap, int flags)
 				{
 					return FAULT_NONE;
 				}
-				break;
 			}
 		}
 		break;
@@ -294,12 +292,10 @@ int arm7_cpu_device::detect_fault(int permission, int ap, int flags)
 		{
 			return FAULT_DOMAIN;
 		}
-		break;
 		case 3 : // "Manager - Accesses are not checked against the access permission bits so a permission fault cannot be generated"
 		{
 			return FAULT_NONE;
 		}
-		break;
 	}
 	return FAULT_NONE;
 }
@@ -749,7 +745,6 @@ void arm7_cpu_device::execute_run()
 					break;
 				case COND_NV:
 					{ UNEXECUTED();  goto skip_exec; }
-					break;
 			}
 			/*******************************************************************/
 			/* If we got here - condition satisfied, so decode the instruction */

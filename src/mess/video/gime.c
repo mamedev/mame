@@ -469,7 +469,6 @@ const char *gime_base_device::timer_type_string(void)
 			break;
 		default:
 			fatalerror("Should not get here\n");
-			break;
 	}
 	return result;
 }
@@ -1252,7 +1251,6 @@ void gime_base_device::update_border(UINT16 physical_scanline)
 				break;
 			default:
 				fatalerror("Should not get here\n");
-				break;
 		}
 	}
 	else
@@ -1319,7 +1317,6 @@ ATTR_FORCE_INLINE UINT16 gime_base_device::get_lines_per_row(void)
 
 			default:
 				fatalerror("Should not get here\n");
-				break;
 		}
 	}
 	else
@@ -1350,7 +1347,6 @@ ATTR_FORCE_INLINE UINT16 gime_base_device::get_lines_per_row(void)
 				break;
 			default:
 				fatalerror("Should not get here\n");
-				break;
 		}
 	}
 	return lines_per_row;
@@ -1498,7 +1494,6 @@ void gime_base_device::record_body_scanline(UINT16 physical_scanline, UINT16 log
 			default:
 				/* should not get here */
 				fatalerror("Should not get here\n");
-				return;
 		}
 	}
 	else
@@ -1523,7 +1518,6 @@ void gime_base_device::record_body_scanline(UINT16 physical_scanline, UINT16 log
 				case 0x1C:  pitch = record_scanline_res<160, &gime_base_device::get_data_without_attributes, false>(physical_scanline); break;
 				default:
 					fatalerror("Should not get here\n");
-					return;
 			}
 		}
 		else
@@ -1541,7 +1535,6 @@ void gime_base_device::record_body_scanline(UINT16 physical_scanline, UINT16 log
 				case 0x15:  pitch = record_scanline_res< 80, &gime_base_device::get_data_with_attributes,    true>(physical_scanline);  break;
 				default:
 					fatalerror("Should not get here\n");
-					return;
 			}
 		}
 
@@ -1616,7 +1609,6 @@ void gime_base_device::update_geometry(void)
 
 		default:
 			fatalerror("Should not get here\n");
-			break;
 	}
 
 	// bit 3 of $FF99 controls "wideness"
@@ -1639,7 +1631,6 @@ void gime_base_device::update_geometry(void)
 UINT32 gime_base_device::emit_dummy_samples(const scanline_record *scanline, int sample_start, int sample_count, pixel_t *pixels, const pixel_t *palette)
 {
 	fatalerror("Should not get here\n");
-	return 0;
 }
 
 //-------------------------------------------------

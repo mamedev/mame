@@ -236,7 +236,6 @@ UINT32 nubus_specpdq_device::screen_update(screen_device &screen, bitmap_rgb32 &
 
 		default:
 			fatalerror("specpdq: unknown video mode %d\n", m_mode);
-			break;
 	}
 	return 0;
 }

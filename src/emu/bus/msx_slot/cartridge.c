@@ -273,8 +273,6 @@ int msx_slot_cartridge_device::get_cart_type(UINT8 *rom, UINT32 length)
 	{
 		return (asc8 > asc16) ? ASCII8 : ASCII16;
 	}
-
-	return NOMAPPER;
 }
 
 

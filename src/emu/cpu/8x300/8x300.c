@@ -80,7 +80,6 @@ UINT8 n8x300_cpu_device::get_reg(UINT8 reg)
 //  IVR is write-only
 	default: logerror("8X300: Invalid register %02x read.\n",reg); return 0;
 	}
-	return 0;
 }
 
 void n8x300_cpu_device::device_start()

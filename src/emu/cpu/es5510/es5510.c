@@ -215,7 +215,8 @@ static inline char * DESCRIBE_REG(char *s, UINT8 r, const char *name) {
 		return stpcpy_int(s, REGNAME(r));
 	}
 
-	return 0;
+	// never executed
+	//return 0;
 }
 
 const alu_op_t es5510_device::ALU_OPS[16] = {

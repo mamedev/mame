@@ -470,7 +470,8 @@ UINT8 lsi53c810_device::lsi53c810_reg_r( int offset )
 			fatalerror("LSI53C810: reg_r: Unknown reg %02X\n", offset);
 	}
 
-	return 0;
+	// never executed
+	//return 0;
 }
 
 void lsi53c810_device::lsi53c810_reg_w(int offset, UINT8 data)
@@ -779,7 +780,6 @@ unsigned lsi53c810_device::lsi53c810_dasm(char *buf, UINT32 pc)
 
 			default:
 				fatalerror("unknown op 0x%08X\n", op);
-				break;
 		}
 		result = 8;
 	}

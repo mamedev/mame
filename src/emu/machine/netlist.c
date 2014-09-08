@@ -279,7 +279,6 @@ void netlist_mame_t::verror(const loglevel_e level, const char *format, va_list 
 		case NL_ERROR:
 			emu_fatalerror error("netlist ERROR: %s\n", errstr.cstr());
 			throw error;
-			break;
 	}
 }
 

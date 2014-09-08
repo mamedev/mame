@@ -520,7 +520,6 @@ int drcbe_c::execute(code_handle &entry)
 
 				// these opcodes should be processed at compile-time only
 				fatalerror("Unexpected opcode\n");
-				break;
 
 			case MAKE_OPCODE_SHORT(OP_DEBUG, 4, 0):     // DEBUG   pc
 				debugger_instruction_hook(&m_device, PARAM0);
@@ -2074,14 +2073,14 @@ int drcbe_c::execute(code_handle &entry)
 
 			default:
 				fatalerror("Unexpected opcode!\n");
-				break;
 		}
 
 		// advance past the parameters and immediates
 		inst += OPCODE_GET_PWORDS(opcode);
 	}
 
-	return 0;
+	// never executed
+	//return 0;
 }
 
 
@@ -2165,7 +2164,6 @@ void drcbe_c::output_parameter(drcbec_instruction **dstptr, void **immedptr, int
 
 		default:
 			fatalerror("Unexpected param->type\n");
-			break;
 	}
 
 	*dstptr = dst;

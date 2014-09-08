@@ -33,7 +33,6 @@ READ8_MEMBER(msx_s1985_device::io_read)
 				m_7 = ( m_7 << 1 ) | ( m_7 >> 7 );
 				return data;
 			}
-			break;
 
 		default:
 			printf("msx_s1985: unhandled read from offset %02x\n", offset);

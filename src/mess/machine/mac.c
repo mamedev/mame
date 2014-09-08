@@ -1231,10 +1231,7 @@ READ8_MEMBER(mac_state::mac_via_in_a)
 
 		default:
 			return 0x80;
-
 	}
-
-	return 0x80;
 }
 
 READ8_MEMBER(mac_state::mac_via_in_a_pmu)
@@ -1813,7 +1810,6 @@ void mac_state::machine_reset()
 
 		default:
 			fatalerror("mac: unknown clock\n");
-			break;
 	}
 
 	// clear PMU response timer

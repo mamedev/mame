@@ -307,7 +307,7 @@ UINT32 v60_device::v60_update_psw_for_exception(int is_interrupt, int target_lev
 UINT32 v60_device::opUNHANDLED()
 {
 	fatalerror("Unhandled OpCode found : %02x at %08x\n", OpRead16(PC), PC);
-	return 0; /* never reached, fatalerror won't return */
+	//return 0; /* never reached, fatalerror won't return */
 }
 
 // Opcode jump table

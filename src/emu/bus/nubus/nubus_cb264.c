@@ -219,7 +219,6 @@ UINT32 nubus_cb264_device::screen_update(screen_device &screen, bitmap_rgb32 &bi
 
 		default:
 			fatalerror("cb264: unknown video mode %d\n", m_cb264_mode);
-			break;
 	}
 
 	return 0;

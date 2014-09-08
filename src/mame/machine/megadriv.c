@@ -70,7 +70,8 @@ READ8_MEMBER(md_base_state::megadriv_68k_YM2612_read)
 		return 0;
 	}
 
-	return -1;
+	// never executed
+	//return -1;
 }
 
 

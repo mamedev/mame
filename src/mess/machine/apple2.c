@@ -554,7 +554,8 @@ READ8_MEMBER(apple2_state::apple2_c1xx_r )
 	}
 
 	// else fall through to floating bus
-	return apple2_getfloatingbusvalue();
+	// never executed
+	//return apple2_getfloatingbusvalue();
 }
 
 WRITE8_MEMBER(apple2_state::apple2_c1xx_w )
@@ -602,7 +603,8 @@ READ8_MEMBER(apple2_state::apple2_c3xx_r )
 	}
 
 	// else fall through to floating bus
-	return apple2_getfloatingbusvalue();
+	// never executed
+	//return apple2_getfloatingbusvalue();
 }
 
 WRITE8_MEMBER(apple2_state::apple2_c3xx_w )
@@ -654,7 +656,8 @@ READ8_MEMBER(apple2_state::apple2_c4xx_r )
 	}
 
 	// else fall through to floating bus
-	return apple2_getfloatingbusvalue();
+	// never executed
+	//return apple2_getfloatingbusvalue();
 }
 
 WRITE8_MEMBER ( apple2_state::apple2_c4xx_w )

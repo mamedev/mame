@@ -460,7 +460,6 @@ void apple2gs_state::adb_do_command()
 
 		default:
 			fatalerror("ADB command 0x%02x unimplemented\n", m_adb_command);
-			break;
 	}
 	m_adb_kmstatus |= 0x20;
 }
@@ -583,8 +582,6 @@ void apple2gs_state::adb_write_datareg(UINT8 data)
 
 				default:
 					fatalerror("ADB command 0x%02x unimplemented\n", data);
-					break;
-
 			}
 
 			if (m_adb_command_length > 0)

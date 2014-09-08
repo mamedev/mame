@@ -1423,8 +1423,6 @@ READ8_MEMBER(pce_cd_device::acard_r)
 		case 0x09: return m_acard_ctrl[r_num];
 		default:   return 0;
 	}
-
-	return 0;
 }
 
 WRITE8_MEMBER(pce_cd_device::acard_w)

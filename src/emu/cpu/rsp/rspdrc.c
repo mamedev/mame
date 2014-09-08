@@ -3136,7 +3136,8 @@ inline UINT16 rsp_device::SATURATE_ACCUM1(int accum, UINT16 negative, UINT16 pos
 			}
 		}
 	}
-	return 0;
+	// never executed
+	//return 0;
 }
 
 #if USE_SIMD

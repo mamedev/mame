@@ -701,7 +701,6 @@ void konamim2_state::cde_handle_command()
 		default:
 		{
 			fatalerror("CDE: unknown command %08X\n", m_cde_command_bytes[0]);
-			break;
 		}
 	}
 }

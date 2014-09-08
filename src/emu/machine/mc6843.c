@@ -357,7 +357,7 @@ int mc6843_device::address_search( chrn_id* id )
 		}
 	}
 
-	return 0; /* unreachable */
+	//return 0; /* unreachable */
 }
 
 

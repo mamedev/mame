@@ -1035,7 +1035,6 @@ READ8_MEMBER( c65_state::c65_read_io )
 			return c65_ram_expansion_r(space, offset & 0x1f, mem_mask);
 			/*return; ram expansion crtl optional */
 		}
-		break;
 	case 0x100:
 	case 0x200:
 	case 0x300:

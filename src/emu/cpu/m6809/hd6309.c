@@ -321,7 +321,7 @@ ATTR_FORCE_INLINE UINT8 hd6309_device::read_operand()
 		case ADDRESSING_MODE_REGISTER_B:    return m_d.b.l;
 		case ADDRESSING_MODE_REGISTER_E:    return m_w.b.h;
 		case ADDRESSING_MODE_REGISTER_F:    return m_w.b.l;
-		default:                            fatalerror("Unexpected");   return 0x00;
+		default:                            fatalerror("Unexpected");
 	}
 }
 
@@ -345,7 +345,7 @@ ATTR_FORCE_INLINE UINT8 hd6309_device::read_operand(int ordinal)
 		case ADDRESSING_MODE_REGISTER_V:    return (ordinal & 1) ? m_v.b.l : m_v.b.h;
 		case ADDRESSING_MODE_REGISTER_PC:   return (ordinal & 1) ? m_pc.b.l : m_pc.b.h;
 		case ADDRESSING_MODE_ZERO:          return 0x00;
-		default:                            fatalerror("Unexpected");   return 0x00;
+		default:                            fatalerror("Unexpected");
 	}
 }
 
@@ -364,7 +364,7 @@ ATTR_FORCE_INLINE void hd6309_device::write_operand(UINT8 data)
 		case ADDRESSING_MODE_REGISTER_E:    m_w.b.h = data;                 break;
 		case ADDRESSING_MODE_REGISTER_F:    m_w.b.l = data;                 break;
 		case ADDRESSING_MODE_ZERO:                                          break;
-		default:                            fatalerror("Unexpected");       break;
+		default:                            fatalerror("Unexpected");
 	}
 }
 
@@ -387,7 +387,7 @@ ATTR_FORCE_INLINE void hd6309_device::write_operand(int ordinal, UINT8 data)
 		case ADDRESSING_MODE_REGISTER_V:    *((ordinal & 1) ? &m_v.b.l : &m_v.b.h) = data;      break;
 		case ADDRESSING_MODE_REGISTER_PC:   *((ordinal & 1) ? &m_pc.b.l : &m_pc.b.h) = data;    break;
 		case ADDRESSING_MODE_ZERO:                                                              break;
-		default:                            fatalerror("Unexpected");                           break;
+		default:                            fatalerror("Unexpected");
 	}
 }
 
@@ -470,7 +470,6 @@ ATTR_FORCE_INLINE m6809_base_device::exgtfr_register hd6309_device::read_exgtfr_
 		case 15: value = ((UINT16) m_w.b.l) << 8 | m_w.b.l; break;  // F
 		default:
 			fatalerror("Should not reach here");
-			break;
 	}
 
 	exgtfr_register result;
@@ -507,7 +506,6 @@ ATTR_FORCE_INLINE void hd6309_device::write_exgtfr_register(UINT8 reg, m6809_bas
 		case 15: m_w.b.l = (UINT8) (value.word_value >> 0); break;  // F
 		default:
 			fatalerror("Should not reach here");
-			break;
 	}
 }
 
@@ -614,7 +612,6 @@ void hd6309_device::register_register_op()
 		case 15: if (promote) set_regop16(m_w);     else set_regop8(m_w.b.l);       break;  // F
 		default:
 			fatalerror("Should not reach here");
-			break;
 	}
 
 	// set source
@@ -638,7 +635,6 @@ void hd6309_device::register_register_op()
 		case 15: m_addressing_mode = promote ? ADDRESSING_MODE_REGISTER_W : ADDRESSING_MODE_REGISTER_F; break;  // F
 		default:
 			fatalerror("Should not reach here");
-			break;
 	}
 
 	// eat a single CPU cycle

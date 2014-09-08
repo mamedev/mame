@@ -301,7 +301,6 @@ void isa8_device::install_space(address_spacenum spacenum, offs_t start, offs_t 
 			break;
 		default:
 			fatalerror("ISA8: Bus width %d not supported\n", buswidth);
-			break;
 	}
 }
 
@@ -530,7 +529,6 @@ void isa16_device::install16_device(offs_t start, offs_t end, offs_t mask, offs_
 			break;
 		default:
 			fatalerror("ISA16: Bus width %d not supported\n", buswidth);
-			break;
 	}
 }
 

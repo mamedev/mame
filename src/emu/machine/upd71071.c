@@ -189,7 +189,6 @@ TIMER_CALLBACK_MEMBER(upd71071_device::dma_transfer_timer)
 					if (!m_dma_read_3_cb.isnull())
 						data = m_dma_read_3_cb(0);
 					break;
-				break;
 			}
 			space.write_byte(m_reg.address_current[channel], data & 0xff);
 			if (m_reg.mode_control[channel] & 0x20)  // Address direction
@@ -228,7 +227,6 @@ TIMER_CALLBACK_MEMBER(upd71071_device::dma_transfer_timer)
 					if (!m_dma_write_3_cb.isnull())
 						m_dma_write_3_cb((offs_t)0, data);
 					break;
-				break;
 			}
 			if (m_reg.mode_control[channel] & 0x20)  // Address direction
 				m_reg.address_current[channel]--;

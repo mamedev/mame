@@ -369,7 +369,6 @@ void score7_cpu_device::gen_exception(int cause, UINT32 param)
 		case EXCEPTION_CPE:
 		case EXCEPTION_BUSEL_DATA:
 			fatalerror("unhandled exception: %d 0x%08x (PC=0x%08x)\n", cause, param, m_ppc);
-			break;
 	}
 }
 

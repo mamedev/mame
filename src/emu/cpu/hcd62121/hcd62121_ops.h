@@ -1019,4 +1019,3 @@ case 0xFF:      /* nop */
 
 default:
 	/*logerror*/fatalerror( "%02x:%04x: unimplemented instruction %02x encountered\n", m_cseg, m_ip-1, op );
-	break;

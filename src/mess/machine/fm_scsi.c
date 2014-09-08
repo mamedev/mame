@@ -91,7 +91,8 @@ int fmscsi_device::get_scsi_cmd_len(UINT8 cbyte)
 
 	fatalerror("fmscsi: Unknown SCSI command group %d\n", group);
 
-	return 6;
+	// never executed
+	//return 6;
 }
 
 void fmscsi_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)

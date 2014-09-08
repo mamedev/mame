@@ -155,7 +155,6 @@ UINT32 mpc105_device::pci_read(pci_bus_device *pcibus, int function, int offset,
 
 				default:
 					fatalerror("Unknown CPU\n");
-					break;
 			}
 			break;
 

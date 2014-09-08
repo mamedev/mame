@@ -2057,7 +2057,6 @@ READ16_MEMBER( mc68328_device::read )
 				verboselog(machine(), 2, "mc68328_r (%04x): PADIR = %02x\n", mem_mask, m_regs.padir);
 				return m_regs.padir << 8;
 			}
-			break;
 
 		case 0x402:
 			if (mem_mask & 0x00ff)
@@ -2089,7 +2088,6 @@ READ16_MEMBER( mc68328_device::read )
 				verboselog(machine(), 2, "mc68328_r (%04x): PBDIR = %02x\n", mem_mask, m_regs.pbdir);
 				return m_regs.pbdir << 8;
 			}
-			break;
 
 		case 0x40a:
 			if (mem_mask & 0x00ff)
@@ -2121,7 +2119,6 @@ READ16_MEMBER( mc68328_device::read )
 				verboselog(machine(), 2, "mc68328_r (%04x): PCDIR = %02x\n", mem_mask, m_regs.pcdir);
 				return m_regs.pcdir << 8;
 			}
-			break;
 
 		case 0x412:
 			if (mem_mask & 0x00ff)
@@ -2153,7 +2150,6 @@ READ16_MEMBER( mc68328_device::read )
 				verboselog(machine(), 2, "mc68328_r (%04x): PDDIR = %02x\n", mem_mask, m_regs.pddir);
 				return m_regs.pddir << 8;
 			}
-			break;
 
 		case 0x41a:
 			if (mem_mask & 0x00ff)
@@ -2178,7 +2174,6 @@ READ16_MEMBER( mc68328_device::read )
 				verboselog(machine(), 2, "mc68328_r (%04x): PDPOL = %02x\n", mem_mask, m_regs.pdpol);
 				return m_regs.pdpol << 8;
 			}
-			break;
 
 		case 0x41e:
 			if (mem_mask & 0x00ff)
@@ -2210,7 +2205,6 @@ READ16_MEMBER( mc68328_device::read )
 				verboselog(machine(), 2, "mc68328_r (%04x): PEDIR = %02x\n", mem_mask, m_regs.pedir);
 				return m_regs.pedir << 8;
 			}
-			break;
 
 		case 0x422:
 			if (mem_mask & 0x00ff)
@@ -2223,7 +2217,6 @@ READ16_MEMBER( mc68328_device::read )
 				verboselog(machine(), 2, "mc68328_r (%04x): PEPUEN = %02x\n", mem_mask, m_regs.pepuen);
 				return m_regs.pepuen << 8;
 			}
-			break;
 
 		case 0x428:
 			if (mem_mask & 0x00ff)
@@ -2243,7 +2236,6 @@ READ16_MEMBER( mc68328_device::read )
 				verboselog(machine(), 2, "mc68328_r (%04x): PFDIR = %02x\n", mem_mask, m_regs.pfdir);
 				return m_regs.pfdir << 8;
 			}
-			break;
 
 		case 0x42a:
 			if (mem_mask & 0x00ff)
@@ -2256,7 +2248,6 @@ READ16_MEMBER( mc68328_device::read )
 				verboselog(machine(), 2, "mc68328_r (%04x): PFPUEN = %02x\n", mem_mask, m_regs.pfpuen);
 				return m_regs.pfpuen << 8;
 			}
-			break;
 
 		case 0x430:
 			if (mem_mask & 0x00ff)
@@ -2276,7 +2267,6 @@ READ16_MEMBER( mc68328_device::read )
 				verboselog(machine(), 2, "mc68328_r (%04x): PGDIR = %02x\n", mem_mask, m_regs.pgdir);
 				return m_regs.pgdir << 8;
 			}
-			break;
 
 		case 0x432:
 			if (mem_mask & 0x00ff)
@@ -2289,7 +2279,6 @@ READ16_MEMBER( mc68328_device::read )
 				verboselog(machine(), 2, "mc68328_r (%04x): PGPUEN = %02x\n", mem_mask, m_regs.pgpuen);
 				return m_regs.pgpuen << 8;
 			}
-			break;
 
 		case 0x438:
 			if (mem_mask & 0x00ff)
@@ -2309,7 +2298,6 @@ READ16_MEMBER( mc68328_device::read )
 				verboselog(machine(), 2, "mc68328_r (%04x): PJDIR = %02x\n", mem_mask, m_regs.pjdir);
 				return m_regs.pjdir << 8;
 			}
-			break;
 
 		case 0x43a:
 			if (mem_mask & 0x00ff)
@@ -2341,7 +2329,6 @@ READ16_MEMBER( mc68328_device::read )
 				verboselog(machine(), 2, "mc68328_r (%04x): PKDIR = %02x\n", mem_mask, m_regs.pkdir);
 				return m_regs.pkdir << 8;
 			}
-			break;
 
 		case 0x442:
 			if (mem_mask & 0x00ff)
@@ -2354,7 +2341,6 @@ READ16_MEMBER( mc68328_device::read )
 				verboselog(machine(), 2, "mc68328_r (%04x): PKPUEN = %02x\n", mem_mask, m_regs.pkpuen);
 				return m_regs.pkpuen << 8;
 			}
-			break;
 
 		case 0x448:
 			if (mem_mask & 0x00ff)
@@ -2374,7 +2360,6 @@ READ16_MEMBER( mc68328_device::read )
 				verboselog(machine(), 2, "mc68328_r (%04x): PMDIR = %02x\n", mem_mask, m_regs.pmdir);
 				return m_regs.pmdir << 8;
 			}
-			break;
 
 		case 0x44a:
 			if (mem_mask & 0x00ff)
@@ -2387,7 +2372,6 @@ READ16_MEMBER( mc68328_device::read )
 				verboselog(machine(), 2, "mc68328_r (%04x): PMPUEN = %02x\n", mem_mask, m_regs.pmpuen);
 				return m_regs.pmpuen << 8;
 			}
-			break;
 
 		case 0x500:
 			verboselog(machine(), 2, "mc68328_r (%04x): PWMC = %04x\n", mem_mask, m_regs.pwmc);
@@ -2578,7 +2562,6 @@ READ16_MEMBER( mc68328_device::read )
 				verboselog(machine(), 2, "mc68328_r (%04x): LPICF = %02x\n", mem_mask, m_regs.lpicf);
 				return m_regs.lpicf << 8;
 			}
-			break;
 
 		case 0xa22:
 			if (mem_mask & 0x00ff)

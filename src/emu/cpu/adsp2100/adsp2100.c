@@ -711,7 +711,6 @@ void adsp21xx_device::state_import(const device_state_entry &entry)
 
 		default:
 			fatalerror("CPU_IMPORT_STATE(adsp21xx) called for unexpected value\n");
-			break;
 	}
 }
 

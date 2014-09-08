@@ -103,7 +103,6 @@ UINT32 arm7_cpu_device::decodeShift(UINT32 insn, UINT32 *pCarry)
 			}
 			return k ? LSL(rm, k) : rm;
 		}
-		break;
 
 	case 1:                         /* LSR */
 		if (k == 0 || k == 32)
@@ -124,7 +123,6 @@ UINT32 arm7_cpu_device::decodeShift(UINT32 insn, UINT32 *pCarry)
 				*pCarry = (rm & (1 << (k - 1)));
 			return LSR(rm, k);
 		}
-		break;
 
 	case 2:                     /* ASR */
 		if (k == 0 || k > 32)
@@ -141,7 +139,6 @@ UINT32 arm7_cpu_device::decodeShift(UINT32 insn, UINT32 *pCarry)
 			else
 				return LSR(rm, k);
 		}
-		break;
 
 	case 3:                     /* ROR and RRX */
 		if (k)
@@ -159,7 +156,6 @@ UINT32 arm7_cpu_device::decodeShift(UINT32 insn, UINT32 *pCarry)
 				*pCarry = (rm & 1);
 			return LSR(rm, 1) | ((GET_CPSR & C_MASK) << 2);
 		}
-		break;
 	}
 
 	LOG(("%08x: Decodeshift error\n", R15));

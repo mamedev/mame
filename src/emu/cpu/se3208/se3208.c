@@ -1670,7 +1670,6 @@ se3208_device::_OP se3208_device::DecodeOp(UINT16 Opcode)
 								return &se3208_device::MVFC;
 							else
 								return &se3208_device::MVTC;
-							break;
 					}
 					break;
 			}

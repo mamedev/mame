@@ -1011,7 +1011,8 @@ int tlcs90_device::sprint_arg(char *buffer, UINT32 pc, const char *pre, const e_
 			fatalerror("%04x: unimplemented addr mode = %d\n",pc,mode);
 	}
 
-	return 0;
+	// never executed
+	//return 0;
 }
 
 offs_t tlcs90_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
@@ -1237,7 +1238,9 @@ int tlcs90_device::Test( UINT8 cond )
 		default:
 			fatalerror("%04x: unimplemented condition = %d\n",m_pc.w.l,cond);
 	}
-	return 0;
+
+	// never executed
+	//return 0;
 }
 
 void tlcs90_device::Push( UINT16 rr )

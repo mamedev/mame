@@ -769,7 +769,8 @@ READ8_MEMBER(rainbow_state::share_z80_r)
 		return m_shared[offset];
 	}
 
-	return 0xff;
+	// never executed
+	//return 0xff;
 }
 
 WRITE8_MEMBER(rainbow_state::share_z80_w)

@@ -425,7 +425,6 @@ void mb86233_cpu_device::ALU( UINT32 alu)
 
 		default:
 			fatalerror( "TGP: Unknown ALU op %x at PC:%04x\n", alu, GETPC() );
-		break;
 	}
 }
 
@@ -718,7 +717,6 @@ UINT32 mb86233_cpu_device::GETREGS( UINT32 reg, int source )
 
 			default:
 				fatalerror( "TGP: Unknown GETREG (%d) at PC=%04x\n", reg, GETPC() );
-			break;
 		}
 	}
 	else if ( mode == 2 )   /* Indexed */
@@ -783,7 +781,8 @@ UINT32 mb86233_cpu_device::GETREGS( UINT32 reg, int source )
 		fatalerror( "TGP: Unknown GETREG mode %d at PC:%04x\n", mode, GETPC() );
 	}
 
-	return 0;
+	// never executed
+	//return 0;
 }
 
 void mb86233_cpu_device::SETREGS( UINT32 reg, UINT32 val )
@@ -886,10 +885,7 @@ void mb86233_cpu_device::SETREGS( UINT32 reg, UINT32 val )
 			break;
 
 			default:
-			{
 				fatalerror( "TGP: Unknown register write (r:%d, mode:%d) at PC:%04x\n", reg, mode, GETPC());
-			}
-			break;
 		}
 	}
 	else
@@ -980,7 +976,8 @@ UINT32 mb86233_cpu_device::INDIRECT( UINT32 reg, int source )
 		fatalerror( "TGP: Unknown INDIRECT mode %d at PC:%04x\n", mode, GETPC() );
 	}
 
-	return 0;
+	// never executed
+	//return 0;
 }
 
 /***************************************************************************
@@ -1249,7 +1246,6 @@ void mb86233_cpu_device::execute_run()
 
 					default:
 						fatalerror( "TGP: Unknown TGP move (op=%02x) at PC:%x\n", op, GETPC());
-					break;
 				}
 			}
 			break;
@@ -1564,11 +1560,9 @@ void mb86233_cpu_device::execute_run()
 
 						case 0x0e:  /* RIIF */
 							fatalerror( "TGP: RIIF unimplemented at PC:%04x\n", GETPC() );
-						break;
 
 						default:
 							fatalerror( "TGP: Unknown Branch opcode (subtype=%d) at PC:%04x\n", subtype, GETPC() );
-						break;
 					}
 				}
 			}
@@ -1625,11 +1619,9 @@ void mb86233_cpu_device::execute_run()
 
 						case 0x0e:  /* RIUL */
 							fatalerror( "TGP: RIUL unimplemented at PC:%04x\n", GETPC() );
-						break;
 
 						default:
 							fatalerror( "TGP: Unknown Branch opcode (subtype=%d) at PC:%04x\n", subtype, GETPC() );
-						break;
 					}
 				}
 			}
@@ -1642,7 +1634,6 @@ void mb86233_cpu_device::execute_run()
 
 			default:
 				fatalerror( "TGP: unknown opcode %08x at PC:%04x (%02x)\n", opcode, GETPC(),(opcode >> 26) & 0x3f );
-			break;
 		}
 
 		if ( GETFIFOWAIT() == 0 )

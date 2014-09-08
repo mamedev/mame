@@ -502,7 +502,6 @@ void tms3203x_device::state_import(const device_state_entry &entry)
 
 		default:
 			fatalerror("CPU_IMPORT_STATE(tms3203x) called for unexpected value\n");
-			break;
 	}
 }
 
@@ -529,7 +528,6 @@ void tms3203x_device::state_export(const device_state_entry &entry)
 
 		default:
 			fatalerror("CPU_IMPORT_STATE(tms3203x) called for unexpected value\n");
-			break;
 	}
 }
 

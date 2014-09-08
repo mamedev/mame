@@ -118,7 +118,6 @@ void adc0808_device::device_timer(emu_timer &timer, device_timer_id id, int para
 					case 7:
 						input = m_in_in_7_cb();
 						break;
-					break;
 				}
 				m_sar = (255 * (input - vref_neg)) / (vref_pos - vref_neg);
 

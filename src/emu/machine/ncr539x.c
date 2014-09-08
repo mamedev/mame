@@ -280,7 +280,6 @@ void ncr539x_device::device_timer(emu_timer &timer, device_timer_id tid, int par
 
 				default:
 					fatalerror("539x: Unhandled command %02x\n", m_command);
-					break;
 			}
 			break;
 

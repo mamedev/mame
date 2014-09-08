@@ -178,7 +178,6 @@ void tms32082_mp_device::vector_loadstore()
 
 		default:
 			fatalerror("vector_loadstore(): ls bits = %02X\n", vector_ls_bits);
-			break;
 	}
 }
 

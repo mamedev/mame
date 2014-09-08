@@ -2191,7 +2191,6 @@ void mcs51_cpu_device::state_import(const device_state_entry &entry)
 
 		default:
 			fatalerror("CPU_IMPORT_STATE(mcs48) called for unexpected value\n");
-			break;
 	}
 }
 
@@ -2216,7 +2215,6 @@ void mcs51_cpu_device::state_export(const device_state_entry &entry)
 
 		default:
 			fatalerror("CPU_EXPORT_STATE(mcs51) called for unexpected value\n");
-			break;
 	}
 }
 

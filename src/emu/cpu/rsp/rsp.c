@@ -1536,7 +1536,8 @@ inline UINT16 rsp_device::SATURATE_ACCUM1(int accum, UINT16 negative, UINT16 pos
 		}
 	}
 
-	return 0;
+	// never executed
+	//return 0;
 }
 
 #define WRITEBACK_RESULT() {memcpy(&m_v[VDREG].s[0], &vres[0], 16);}

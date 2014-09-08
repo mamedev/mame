@@ -466,7 +466,7 @@ void uml::instruction::simplify()
 						case SIZE_WORD:     convert_to_mov_immediate((INT16)m_param[1].immediate());    break;
 						case SIZE_DWORD:    convert_to_mov_immediate((INT32)m_param[1].immediate());    break;
 						case SIZE_QWORD:    convert_to_mov_immediate((INT64)m_param[1].immediate());    break;
-						case SIZE_DQWORD:   fatalerror("Invalid SEXT target size\n");                   break;
+						case SIZE_DQWORD:   fatalerror("Invalid SEXT target size\n");
 					}
 				break;
 

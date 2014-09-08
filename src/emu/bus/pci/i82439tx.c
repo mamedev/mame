@@ -134,7 +134,6 @@ UINT32 i82439tx_device::pci_read(pci_bus_device *pcibus, int function, int offse
 
 		default:
 			fatalerror("i82439tx_pci_read(): Unexpected PCI read 0x%02X\n", offset);
-			break;
 	}
 	return result;
 }
@@ -251,7 +250,6 @@ void i82439tx_device::pci_write(pci_bus_device *pcibus, int function, int offset
 
 		default:
 			fatalerror("i82439tx_pci_write(): Unexpected PCI write 0x%02X <-- 0x%08X\n", offset, data);
-			break;
 	}
 }
 

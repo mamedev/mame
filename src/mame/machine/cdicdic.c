@@ -475,7 +475,6 @@ void cdicdic_device::decode_audio_sector(const UINT8 *xa, INT32 triggered)
 
 		default:
 			fatalerror("play_xa: unhandled xa mode %08x\n",hdr[2]);
-			return;
 	}
 
 	dmadac_set_frequency(&state->m_dmadac[0], 2, m_audio_sample_freq);

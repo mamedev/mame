@@ -218,7 +218,6 @@ UINT32 nubus_m2hires_device::screen_update(screen_device &screen, bitmap_rgb32 &
 
 		default:
 			fatalerror("m2hires: unknown video mode %d\n", m_mode);
-			break;
 	}
 	return 0;
 }

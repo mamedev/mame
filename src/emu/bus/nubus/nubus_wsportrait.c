@@ -206,7 +206,6 @@ UINT32 nubus_wsportrait_device::screen_update(screen_device &screen, bitmap_rgb3
 
 		default:
 			fatalerror("wsportrait: unknown video mode %d\n", m_mode);
-			break;
 	}
 	return 0;
 }

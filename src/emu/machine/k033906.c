@@ -58,7 +58,8 @@ UINT32 k033906_device::reg_r(int reg)
 		default:
 			fatalerror("%s: k033906_reg_r: %08X\n", machine().describe_context(), reg);
 	}
-	return 0;
+	// never executed
+	//return 0;
 }
 
 void k033906_device::reg_w(int reg, UINT32 data)

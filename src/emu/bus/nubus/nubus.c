@@ -138,7 +138,6 @@ void nubus_device::install_device(offs_t start, offs_t end, read8_delegate rhand
 			break;
 		default:
 			fatalerror("NUBUS: Bus width %d not supported\n", buswidth);
-			break;
 	}
 }
 
@@ -156,7 +155,6 @@ void nubus_device::install_device(offs_t start, offs_t end, read16_delegate rhan
 			break;
 		default:
 			fatalerror("NUBUS: Bus width %d not supported\n", buswidth);
-			break;
 	}
 }
 
@@ -174,7 +172,6 @@ void nubus_device::install_device(offs_t start, offs_t end, read32_delegate rhan
 			break;
 		default:
 			fatalerror("NUBUS: Bus width %d not supported\n", buswidth);
-			break;
 	}
 }
 
@@ -192,7 +189,6 @@ void nubus_device::install_readonly_device(offs_t start, offs_t end, read32_dele
 			break;
 		default:
 			fatalerror("NUBUS: Bus width %d not supported\n", buswidth);
-			break;
 	}
 }
 
@@ -210,7 +206,6 @@ void nubus_device::install_writeonly_device(offs_t start, offs_t end, write32_de
 			break;
 		default:
 			fatalerror("NUBUS: Bus width %d not supported\n", buswidth);
-			break;
 	}
 }
 
@@ -443,7 +438,6 @@ void device_nubus_card_interface::install_declaration_rom(device_t *dev, const c
 
 		default:
 			fatalerror("NuBus: unhandled byteLanes value %02x\n", byteLanes);
-			break;
 	}
 
 	// the slot manager can supposedly handle inverted ROMs by itself, but let's do it for it anyway

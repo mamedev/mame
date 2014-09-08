@@ -1229,5 +1229,4 @@ int psxcd_device::add_system_event(int type, UINT64 t, command_result *ptr)
 		}
 	}
 	fatalerror("psxcd: out of timers\n");
-	return 0;
 }

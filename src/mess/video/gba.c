@@ -1877,7 +1877,6 @@ void gba_state::draw_scanline(int y)
 			break;
 		default:
 			fatalerror("Invalid screen mode (6 or 7)!\n");
-			break;
 	}
 
 	for (int x = 0; x < 240; x++)

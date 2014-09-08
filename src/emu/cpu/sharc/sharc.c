@@ -135,7 +135,6 @@ UINT32 adsp21062_device::sharc_iop_r(UINT32 address)
 		}
 		default:        fatalerror("sharc_iop_r: Unimplemented IOP reg %02X at %08X\n", address, m_pc);
 	}
-	return 0;
 }
 
 void adsp21062_device::sharc_iop_w(UINT32 address, UINT32 data)

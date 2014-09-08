@@ -586,5 +586,6 @@ int scsihle_device::get_scsi_cmd_len(int cbyte)
 
 	fatalerror("scsihle: Unknown SCSI command group %d, command byte=%02X\n", group,cbyte);
 
-	return 6;
+	// never executed
+	//return 6;
 }

@@ -284,7 +284,7 @@ void s3virge_vga_device::s3_define_video_mode()
 			case 0x03: svga.rgb15_en = 1; divisor = 2; break;
 			case 0x05: svga.rgb16_en = 1; divisor = 2; break;
 			case 0x0d: svga.rgb32_en = 1; divisor = 1; break;
-			default: fatalerror("TODO: s3 video mode not implemented %02x\n",((s3.ext_misc_ctrl_2) >> 4)); break;
+			default: fatalerror("TODO: s3 video mode not implemented %02x\n",((s3.ext_misc_ctrl_2) >> 4));
 		}
 	}
 	else

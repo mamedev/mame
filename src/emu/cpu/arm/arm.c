@@ -1295,7 +1295,6 @@ UINT32 arm_cpu_device::decodeShift(UINT32 insn, UINT32 *pCarry)
 			if (pCarry) *pCarry = (rm & (1 << (k - 1)));
 			return LSR(rm, k);
 		}
-		break;
 
 	case 2:                     /* ASR */
 		if (k == 0 || k > 32)
@@ -1310,7 +1309,6 @@ UINT32 arm_cpu_device::decodeShift(UINT32 insn, UINT32 *pCarry)
 			else
 				return LSR(rm, k);
 		}
-		break;
 
 	case 3:                     /* ROR and RRX */
 		if (k)
@@ -1324,7 +1322,6 @@ UINT32 arm_cpu_device::decodeShift(UINT32 insn, UINT32 *pCarry)
 			if (pCarry) *pCarry = (rm & 1);
 			return LSR(rm, 1) | ((R15 & C_MASK) << 2);
 		}
-		break;
 	}
 
 	logerror("%08x: Decodeshift error\n",R15);

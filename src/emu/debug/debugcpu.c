@@ -947,7 +947,6 @@ UINT64 debug_read_opcode(address_space &space, offs_t address, int size, int arg
 
 		default:
 			fatalerror("debug_read_opcode: unknown type = %d\n", space.data_width() / 8 * 10 + size);
-			break;
 	}
 
 	/* turn on debugger access */

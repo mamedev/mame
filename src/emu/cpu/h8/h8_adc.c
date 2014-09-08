@@ -496,5 +496,4 @@ void h8_adc_2655_device::do_buffering(int buffer)
 int h8_adc_2655_device::get_channel_index(int count)
 {
 	abort();
-	return 0;
 }

@@ -597,7 +597,6 @@ READ16_MEMBER(pc88va_state::sys_mem_r)
 
 			return knj_ram[knj_offset];
 		}
-		break;
 		case 0xc: // Dictionary ROM
 		case 0xd:
 		{

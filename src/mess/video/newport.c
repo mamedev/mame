@@ -471,7 +471,6 @@ READ32_MEMBER( newport_video_device::vc2_r )
 		//verboselog(machine(), 2, "Unknown VC2 Register Read: %02x\n", m_REX3.nDCBRegSelect );
 		return 0;
 	}
-	return 0;
 }
 
 WRITE32_MEMBER( newport_video_device::vc2_w )
@@ -873,7 +872,6 @@ READ32_MEMBER( newport_video_device::rex3_r )
 		//verboselog(machine(), 2, "Unknown REX3 Read: %08x (%08x)\n", 0x1f0f0000 + ( offset << 2 ), mem_mask );
 		return 0;
 	}
-	return 0;
 }
 
 void newport_video_device::DoREX3Command()

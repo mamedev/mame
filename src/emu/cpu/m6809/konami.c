@@ -137,7 +137,7 @@ inline ATTR_FORCE_INLINE UINT8 konami_cpu_device::read_operand(int ordinal)
 		case ADDRESSING_MODE_EA:            return read_memory(m_ea.w + ordinal);
 		case ADDRESSING_MODE_IMMEDIATE:     return read_opcode_arg();
 		case ADDRESSING_MODE_REGISTER_D:    return (ordinal & 1) ? m_d.b.l : m_d.b.h;
-		default:                            fatalerror("Unexpected");   return 0x00;
+		default:                            fatalerror("Unexpected");
 	}
 }
 
@@ -164,7 +164,7 @@ ATTR_FORCE_INLINE void konami_cpu_device::write_operand(int ordinal, UINT8 data)
 		case ADDRESSING_MODE_IMMEDIATE:     /* do nothing */                                break;
 		case ADDRESSING_MODE_EA:            write_memory(m_ea.w + ordinal, data);           break;
 		case ADDRESSING_MODE_REGISTER_D:    *((ordinal & 1) ? &m_d.b.l : &m_d.b.h) = data;  break;
-		default:                            fatalerror("Unexpected");                       break;
+		default:                            fatalerror("Unexpected");
 	}
 }
 
@@ -184,7 +184,8 @@ ATTR_FORCE_INLINE UINT16 &konami_cpu_device::ireg()
 		case 0x70:  return m_pc.w;
 		default:
 			fatalerror("Should not get here");
-			return m_x.w;
+			// never executed
+			//return m_x.w;
 	}
 }
 

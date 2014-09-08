@@ -248,7 +248,6 @@ int i8089_channel::execute_run()
 
 		case DMA_WAIT_FOR_SOURCE_DRQ:
 			fatalerror("%s('%s'): wait for source drq not supported\n", shortname(), tag());
-			break;
 
 		case DMA_FETCH:
 			if (VERBOSE_DMA)
@@ -306,11 +305,9 @@ int i8089_channel::execute_run()
 
 		case DMA_TRANSLATE:
 			fatalerror("%s('%s'): dma translate requested\n", shortname(), tag());
-			break;
 
 		case DMA_WAIT_FOR_DEST_DRQ:
 			fatalerror("%s('%s'): wait for destination drq not supported\n", shortname(), tag());
-			break;
 
 		case DMA_STORE:
 			if (VERBOSE_DMA)
@@ -348,7 +345,6 @@ int i8089_channel::execute_run()
 
 		case DMA_COMPARE:
 			fatalerror("%s('%s'): dma compare requested\n", shortname(), tag());
-			break;
 
 		case DMA_TERMINATE:
 			if (VERBOSE_DMA)

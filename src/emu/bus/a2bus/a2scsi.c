@@ -167,7 +167,6 @@ UINT8 a2bus_scsi_device::read_c0nx(address_space &space, UINT8 offset)
 		case 7:
 //          printf("Read 5380 @ %x\n", offset);
 			return m_ncr5380->read(space, offset);
-			break;
 
 		case 8:     // read and DACK
 			return m_ncr5380->dma_r();

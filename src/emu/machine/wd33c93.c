@@ -613,7 +613,6 @@ READ8_MEMBER(wd33c93_device::read)
 			/* read aux status */
 			return regs[WD_AUXILIARY_STATUS];
 		}
-		break;
 
 		case 1:
 		{

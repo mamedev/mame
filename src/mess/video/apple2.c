@@ -334,7 +334,6 @@ void apple2_state::apple2_hires_draw(bitmap_ind16 &bitmap, const rectangle &clip
 
 				default:
 					fatalerror("Invalid column count\n");
-					break;
 			}
 		}
 
@@ -447,7 +446,6 @@ void apple2_state::apple2_hires_draw(bitmap_ind16 &bitmap, const rectangle &clip
 
 				default:
 					fatalerror("Invalid column count\n");
-					break;
 			}
 		}
 	}

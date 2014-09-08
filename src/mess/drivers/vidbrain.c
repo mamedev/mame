@@ -221,7 +221,6 @@ WRITE8_MEMBER( vidbrain_state::f3853_w )
 	case 3:
 		// timer 8-bit polynomial counter
 		fatalerror("%s: F3853 Timer not supported!\n", machine().describe_context());
-		break;
 	}
 }
 

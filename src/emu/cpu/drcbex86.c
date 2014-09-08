@@ -323,7 +323,6 @@ drcbe_x86::be_parameter::be_parameter(drcbe_x86 &drcbe, const parameter &param, 
 		// everything else is unexpected
 		default:
 			fatalerror("Unexpected parameter type\n");
-			break;
 	}
 }
 

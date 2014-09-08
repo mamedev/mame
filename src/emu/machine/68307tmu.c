@@ -20,8 +20,6 @@ READ16_MEMBER( m68307cpu_device::m68307_internal_timer_r )
 			case m68307TIMER_TCN: /* 0x3 (0x126 / 0x136) */
 				//if (pc!=0x2182e) logerror("%08x m68307_internal_timer_r %08x (%04x) (TCN - Timer Counter for timer %d)\n", pc, offset*2,mem_mask, which);
 				return timer->read_tcn(mem_mask, which);
-				break;
-
 
 			default:
 				logerror("%08x m68307_internal_timer_r %08x, (%04x)\n", pc, offset*2,mem_mask);

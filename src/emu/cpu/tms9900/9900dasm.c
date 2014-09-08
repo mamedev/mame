@@ -336,7 +336,6 @@ static int print_arg (char *dest, int mode, int arg, const UINT8 *opram, unsigne
 				return sprintf (dest, "@>%04x(R%d)", base, arg);
 			else        /* symbolic (direct) */
 				return sprintf (dest, "@>%04x", base);
-			break;
 		case 0x3:   /* workspace register indirect auto increment */
 			return sprintf (dest, "*R%d+", arg);
 	}

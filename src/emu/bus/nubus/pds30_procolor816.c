@@ -237,7 +237,6 @@ UINT32 nubus_procolor816_device::screen_update(screen_device &screen, bitmap_rgb
 
 		default:
 			fatalerror("procolor816: unknown video mode %d\n", m_mode);
-			break;
 	}
 	return 0;
 }
