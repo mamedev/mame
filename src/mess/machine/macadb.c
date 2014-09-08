@@ -1068,7 +1068,6 @@ void mac_state::pmu_exec()
 
 		default:
 			fatalerror("PMU: Unhandled command %02x\n", m_pm_cmd[0]);
-			break;
 	}
 
 	if (m_pm_slen > 0)

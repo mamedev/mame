@@ -179,7 +179,7 @@ READ8_MEMBER(apple3_state::apple3_c0xx_r)
 
 		case 0x66:  // paddle A/D conversion done (bit 7 = 1 while counting, 0 when done)
 		case 0x6e:
-			return m_ramp_active ? 0x80 : 0x00;
+			result = m_ramp_active ? 0x80 : 0x00;
 			break;
 
 		case 0x70: case 0x71: case 0x72: case 0x73:
