@@ -10,6 +10,7 @@
 #include "emu.h"
 #include "isa.h"
 #include "video/pc_vga.h"
+#include "bus/isa/trident.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS

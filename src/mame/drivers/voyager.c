@@ -19,6 +19,7 @@ TODO: VIA KT133a chipset support, GeForce 2MX video support, lots of things ;-)
 #include "machine/pckeybrd.h"
 #include "machine/idectrl.h"
 #include "video/pc_vga.h"
+#include "bus/isa/trident.h"
 
 class voyager_state : public pcat_base_state
 {

@@ -127,6 +127,7 @@ something wrong in the disk geometry reported by calchase.chd (20,255,63) since 
 #include "video/pc_vga.h"
 #include "sound/dac.h"
 #include "machine/pcshare.h"
+#include "bus/isa/trident.h"
 
 
 class calchase_state : public pcat_base_state
