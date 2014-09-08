@@ -2892,6 +2892,26 @@ static INPUT_PORTS_START( woodpek )
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( numcrash )
+	PORT_INCLUDE( woodpek )
+
+	PORT_MODIFY("IN0")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 )
+
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 )
+
+	PORT_MODIFY("DSW1") 
+	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Coinage ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( bigbucks )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP   ) PORT_4WAY
@@ -6541,7 +6561,7 @@ GAME( 1986, rocktrv2, 0,        rocktrv2, rocktrv2, pacman_state,  rocktrv2, ROT
 
 GAME( 1986, bigbucks, 0,        bigbucks, bigbucks, driver_device, 0,        ROT90,  "Dynasoft Inc.", "Big Bucks", GAME_SUPPORTS_SAVE )
 
-GAME( 1983, numcrash, 0,        woodpek,  woodpek,  driver_device, 0,        ROT90,  "Hanshin Goraku", "Number Crash", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+GAME( 1983, numcrash, 0,        woodpek,  numcrash, driver_device, 0,        ROT90,  "Hanshin Goraku", "Number Crash", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
 
 GAME( 198?, cannonbp, 0,        pacman,   cannonbp, pacman_state,  cannonbp, ROT90,  "Novomatic", "Cannon Ball (Pac-Man Hardware)", GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
 
