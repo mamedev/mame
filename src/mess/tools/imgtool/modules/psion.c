@@ -242,7 +242,6 @@ char *stream_getline(imgtool_stream *source, UINT16 max_len)
 					stream_seek(source, -1, SEEK_CUR);
 			case '\n':
 				return line;
-				break;
 			default:
 				line[pos++] = data;
 				break;

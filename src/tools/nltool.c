@@ -182,7 +182,6 @@ protected:
 				vprintf(format, ap);
 				printf("\n");
 				throw;
-				break;
 		}
 	}
 

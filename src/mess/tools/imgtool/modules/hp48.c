@@ -297,7 +297,8 @@ static int find_file(hp48_partition* p, const char* filename, int *ptotalsize, i
 
 		}
 
-		return -1;
+		// never executed
+		//return -1;
 }
 
 
