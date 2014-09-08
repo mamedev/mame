@@ -709,7 +709,7 @@ void sms_state::setup_media_slots()
 	// Set offset for Light Phaser
 	if (!m_is_mark_iii)
 	{
-		m_lphaser_x_offs = 44;
+		m_lphaser_x_offs = 36;
 
 		if (m_mem_device_enabled & ENABLE_CART)
 			m_lphaser_x_offs = m_cartslot->m_cart->get_lphaser_xoffs();
