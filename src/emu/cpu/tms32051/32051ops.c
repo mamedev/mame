@@ -336,7 +336,12 @@ void tms32051_device::op_add_limm()
 
 void tms32051_device::op_add_s16_mem()
 {
-	fatalerror("32051: unimplemented op add s16 mem at %08X\n", m_pc-1);
+	UINT16 ea = GET_ADDRESS();
+	UINT32 data = DM_READ16(ea) << 16;
+
+	m_acc = ADD(m_acc, data);
+
+	CYCLES(1);
 }
 
 void tms32051_device::op_addb()
