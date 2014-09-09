@@ -14,9 +14,9 @@ void rm380z_state::put_point(int charnum,int x,int y,int col)
 	int mx=3;
 	if (y==6) mx=4;
 
-	for (int r=y;r<(y+mx);r++)
+	for (unsigned int r=y;r<(y+mx);r++)
 	{
-		for (int c=x;c<(x+3);c++)
+		for (unsigned int c=x;c<(x+3);c++)
 		{
 			m_graphic_chars[charnum][c+(r*(RM380Z_CHDIMX+1))]=col;
 		}
