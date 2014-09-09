@@ -42,6 +42,7 @@ private:
 	struct mg_server *  m_server;
 	//osd_ticks_t         m_lastupdatetime;
 	bool                m_exiting_core;
+	bool                m_http;
 };
 
 #endif  /* __web_engine_H__ */

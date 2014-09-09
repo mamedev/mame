@@ -444,10 +444,11 @@ web_engine::web_engine(emu_options &options)
 		m_machine(NULL),
 		m_server(NULL),
 		//m_lastupdatetime(0),
-		m_exiting_core(false)
+		m_exiting_core(false),
+		m_http(m_options.http())
 
 {
-	if (m_options.http()) {
+	if (m_http) {
 		m_server = mg_create_server(this, ev_handler);
 
 		mg_set_option(m_server, "listening_port", options.http_port());
@@ -462,7 +463,7 @@ web_engine::web_engine(emu_options &options)
 
 web_engine::~web_engine()
 {
-	if (m_options.http())
+	if (m_http)
 		close();
 }
 
@@ -479,7 +480,7 @@ void web_engine::close()
 
 void web_engine::serve()
 {
-	if (m_options.http()) mg_poll_server(m_server, 0);
+	if (m_http) mg_poll_server(m_server, 0);
 }
 
 static int websocket_callback(struct mg_connection *c, enum mg_event ev) {
