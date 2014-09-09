@@ -1109,19 +1109,23 @@ static ANTIC_RENDERER( antic_mode_0_xx )
 static ANTIC_RENDERER( antic_mode_2_32 )
 {
 	PREPARE_TXT2(space, 32);
-	REP32(MODE2);
+	ERASE(8); 
+	REP(MODE2, 32);
+	ERASE(8); 
 	POST_TXT(32);
 }
 static ANTIC_RENDERER( antic_mode_2_40 )
 {
 	PREPARE_TXT2(space, 40);
-	REP40(MODE2);
+	ERASE(4);
+	REP(MODE2, 40);
+	ERASE(4);
 	POST_TXT(40);
 }
 static ANTIC_RENDERER( antic_mode_2_48 )
 {
 	PREPARE_TXT2(space, 48);
-	REP48(MODE2);
+	REP(MODE2, 48);
 	POST_TXT(48);
 }
 
@@ -1133,19 +1137,23 @@ static ANTIC_RENDERER( antic_mode_2_48 )
 static ANTIC_RENDERER( antic_mode_3_32 )
 {
 	PREPARE_TXT3(space, 32);
-	REP32(MODE3);
+	ERASE(8); 
+	REP(MODE3, 32);
+	ERASE(8); 
 	POST_TXT(32);
 }
 static ANTIC_RENDERER( antic_mode_3_40 )
 {
 	PREPARE_TXT3(space, 40);
-	REP40(MODE3);
+	ERASE(4);
+	REP(MODE3, 40);
+	ERASE(4);
 	POST_TXT(40);
 }
 static ANTIC_RENDERER( antic_mode_3_48 )
 {
 	PREPARE_TXT3(space, 48);
-	REP48(MODE3);
+	REP(MODE3, 48);
 	POST_TXT(48);
 }
 
@@ -1157,19 +1165,23 @@ static ANTIC_RENDERER( antic_mode_3_48 )
 static ANTIC_RENDERER( antic_mode_4_32 )
 {
 	PREPARE_TXT45(space, 32,0);
-	REP32(MODE4);
+	ERASE(8); 
+	REP(MODE4, 32);
+	ERASE(8); 
 	POST_TXT(32);
 }
 static ANTIC_RENDERER( antic_mode_4_40 )
 {
 	PREPARE_TXT45(space, 40,0);
-	REP40(MODE4);
+	ERASE(4);
+	REP(MODE4, 40);
+	ERASE(4);
 	POST_TXT(40);
 }
 static ANTIC_RENDERER( antic_mode_4_48 )
 {
 	PREPARE_TXT45(space, 48,0);
-	REP48(MODE4);
+	REP(MODE4, 48);
 	POST_TXT(48);
 }
 
@@ -1181,19 +1193,23 @@ static ANTIC_RENDERER( antic_mode_4_48 )
 static ANTIC_RENDERER( antic_mode_5_32 )
 {
 	PREPARE_TXT45(space, 32,1);
-	REP32(MODE5);
+	ERASE(8); 
+	REP(MODE5, 32);
+	ERASE(8); 
 	POST_TXT(32);
 }
 static ANTIC_RENDERER( antic_mode_5_40 )
 {
 	PREPARE_TXT45(space, 40,1);
-	REP40(MODE5);
+	ERASE(4);
+	REP(MODE5, 40);
+	ERASE(4);
 	POST_TXT(40);
 }
 static ANTIC_RENDERER( antic_mode_5_48 )
 {
 	PREPARE_TXT45(space, 48,1);
-	REP48(MODE5);
+	REP(MODE5, 48);
 	POST_TXT(48);
 }
 
@@ -1205,19 +1221,23 @@ static ANTIC_RENDERER( antic_mode_5_48 )
 static ANTIC_RENDERER( antic_mode_6_32 )
 {
 	PREPARE_TXT67(space, 16,0);
-	REP16(MODE6);
+	ERASE(8);
+	REP(MODE6, 16);
+	ERASE(8);
 	POST_TXT(16);
 }
 static ANTIC_RENDERER( antic_mode_6_40 )
 {
 	PREPARE_TXT67(space, 20,0);
-	REP20(MODE6);
+	ERASE(4);
+	REP(MODE6, 20);
+	ERASE(4);
 	POST_TXT(20);
 }
 static ANTIC_RENDERER( antic_mode_6_48 )
 {
 	PREPARE_TXT67(space, 24,0);
-	REP24(MODE6);
+	REP(MODE6, 24);
 	POST_TXT(24);
 }
 
@@ -1229,19 +1249,23 @@ static ANTIC_RENDERER( antic_mode_6_48 )
 static ANTIC_RENDERER( antic_mode_7_32 )
 {
 	PREPARE_TXT67(space, 16,1);
-	REP16(MODE7);
+	ERASE(8);
+	REP(MODE7, 16);
+	ERASE(8);
 	POST_TXT(16);
 }
 static ANTIC_RENDERER( antic_mode_7_40 )
 {
 	PREPARE_TXT67(space, 20,1);
-	REP20(MODE7);
+	ERASE(4);
+	REP(MODE7, 20);
+	ERASE(4);
 	POST_TXT(20);
 }
 static ANTIC_RENDERER( antic_mode_7_48 )
 {
 	PREPARE_TXT67(space, 24,1);
-	REP24(MODE7);
+	REP(MODE7, 24);
 	POST_TXT(24);
 }
 
@@ -1253,19 +1277,23 @@ static ANTIC_RENDERER( antic_mode_7_48 )
 static ANTIC_RENDERER( antic_mode_8_32 )
 {
 	PREPARE_GFX8(space, 8);
-	REP08(MODE8);
+	ERASE(8);
+	REP(MODE8, 8);
+	ERASE(8);
 	POST_GFX(8);
 }
 static ANTIC_RENDERER( antic_mode_8_40 )
 {
 	PREPARE_GFX8(space, 10);
-	REP10(MODE8);
+	ERASE(4);
+	REP(MODE8, 10);
+	ERASE(4);
 	POST_GFX(10);
 }
 static ANTIC_RENDERER( antic_mode_8_48 )
 {
 	PREPARE_GFX8(space, 12);
-	REP12(MODE8);
+	REP(MODE8, 12);
 	POST_GFX(12);
 }
 
@@ -1277,19 +1305,23 @@ static ANTIC_RENDERER( antic_mode_8_48 )
 static ANTIC_RENDERER( antic_mode_9_32 )
 {
 	PREPARE_GFX9BC(space, 16);
-	REP16(MODE9);
+	ERASE(8);
+	REP(MODE9, 16);
+	ERASE(8);
 	POST_GFX(16);
 }
 static ANTIC_RENDERER( antic_mode_9_40 )
 {
 	PREPARE_GFX9BC(space, 20);
-	REP20(MODE9);
+	ERASE(4);
+	REP(MODE9, 20);
+	ERASE(4);
 	POST_GFX(20);
 }
 static ANTIC_RENDERER( antic_mode_9_48 )
 {
 	PREPARE_GFX9BC(space, 24);
-	REP24(MODE9);
+	REP(MODE9, 24);
 	POST_GFX(24);
 }
 
@@ -1301,19 +1333,23 @@ static ANTIC_RENDERER( antic_mode_9_48 )
 static ANTIC_RENDERER( antic_mode_a_32 )
 {
 	PREPARE_GFXA(space, 16);
-	REP16(MODEA);
+	ERASE(8);
+	REP(MODEA, 16);
+	ERASE(8);
 	POST_GFX(16);
 }
 static ANTIC_RENDERER( antic_mode_a_40 )
 {
 	PREPARE_GFXA(space, 20);
-	REP20(MODEA);
+	ERASE(4);
+	REP(MODEA, 20);
+	ERASE(4);
 	POST_GFX(20);
 }
 static ANTIC_RENDERER( antic_mode_a_48 )
 {
 	PREPARE_GFXA(space, 24);
-	REP24(MODEA);
+	REP(MODEA, 24);
 	POST_GFX(24);
 }
 
@@ -1325,19 +1361,23 @@ static ANTIC_RENDERER( antic_mode_a_48 )
 static ANTIC_RENDERER( antic_mode_b_32 )
 {
 	PREPARE_GFX9BC(space, 16);
-	REP16(MODEB);
+	ERASE(8);
+	REP(MODEB, 16);
+	ERASE(8);
 	POST_GFX(16);
 }
 static ANTIC_RENDERER( antic_mode_b_40 )
 {
 	PREPARE_GFX9BC(space, 20);
-	REP20(MODEB);
+	ERASE(4);
+	REP(MODEB, 20);
+	ERASE(4);
 	POST_GFX(20);
 }
 static ANTIC_RENDERER( antic_mode_b_48 )
 {
 	PREPARE_GFX9BC(space, 24);
-	REP24(MODEB);
+	REP(MODEB, 24);
 	POST_GFX(24);
 }
 
@@ -1349,19 +1389,23 @@ static ANTIC_RENDERER( antic_mode_b_48 )
 static ANTIC_RENDERER( antic_mode_c_32 )
 {
 	PREPARE_GFX9BC(space, 16);
-	REP16(MODEC);
+	ERASE(8);
+	REP(MODEC, 16);
+	ERASE(8);
 	POST_GFX(16);
 }
 static ANTIC_RENDERER( antic_mode_c_40 )
 {
 	PREPARE_GFX9BC(space, 20);
-	REP20(MODEC);
+	ERASE(4);
+	REP(MODEC, 20);
+	ERASE(4);
 	POST_GFX(20);
 }
 static ANTIC_RENDERER( antic_mode_c_48 )
 {
 	PREPARE_GFX9BC(space, 24);
-	REP24(MODEC);
+	REP(MODEC, 24);
 	POST_GFX(24);
 }
 
@@ -1373,19 +1417,23 @@ static ANTIC_RENDERER( antic_mode_c_48 )
 static ANTIC_RENDERER( antic_mode_d_32 )
 {
 	PREPARE_GFXDE(space, 32);
-	REP32(MODED);
+	ERASE(8); 
+	REP(MODED, 32);
+	ERASE(8); 
 	POST_GFX(32);
 }
 static ANTIC_RENDERER( antic_mode_d_40 )
 {
 	PREPARE_GFXDE(space, 40);
-	REP40(MODED);
+	ERASE(4);
+	REP(MODED, 40);
+	ERASE(4);
 	POST_GFX(40);
 }
 static ANTIC_RENDERER( antic_mode_d_48 )
 {
 	PREPARE_GFXDE(space, 48);
-	REP48(MODED);
+	REP(MODED, 48);
 	POST_GFX(48);
 }
 
@@ -1397,19 +1445,23 @@ static ANTIC_RENDERER( antic_mode_d_48 )
 static ANTIC_RENDERER( antic_mode_e_32 )
 {
 	PREPARE_GFXDE(space, 32);
-	REP32(MODEE);
+	ERASE(8); 
+	REP(MODEE, 32);
+	ERASE(8); 
 	POST_GFX(32);
 }
 static ANTIC_RENDERER( antic_mode_e_40 )
 {
 	PREPARE_GFXDE(space, 40);
-	REP40(MODEE);
+	ERASE(4);
+	REP(MODEE, 40);
+	ERASE(4);
 	POST_GFX(40);
 }
 static ANTIC_RENDERER( antic_mode_e_48 )
 {
 	PREPARE_GFXDE(space, 48);
-	REP48(MODEE);
+	REP(MODEE, 48);
 	POST_GFX(48);
 }
 
@@ -1421,19 +1473,23 @@ static ANTIC_RENDERER( antic_mode_e_48 )
 static ANTIC_RENDERER( antic_mode_f_32 )
 {
 	PREPARE_GFXF(space, 32);
-	REP32(MODEF);
+	ERASE(8); 
+	REP(MODEF, 32);
+	ERASE(8); 
 	POST_GFX(32);
 }
 static ANTIC_RENDERER( antic_mode_f_40 )
 {
 	PREPARE_GFXF(space, 40);
-	REP40(MODEF);
+	ERASE(4);
+	REP(MODEF, 40);
+	ERASE(4);
 	POST_GFX(40);
 }
 static ANTIC_RENDERER( antic_mode_f_48 )
 {
 	PREPARE_GFXF(space, 48);
-	REP48(MODEF);
+	REP(MODEF, 48);
 	POST_GFX(48);
 }
 
@@ -1445,19 +1501,23 @@ static ANTIC_RENDERER( antic_mode_f_48 )
 static ANTIC_RENDERER( gtia_mode_1_32 )
 {
 	PREPARE_GFXG1(space, 32);
-	REP32(GTIA1);
+	ERASE(8); 
+	REP(GTIA1, 32);
+	ERASE(8); 
 	POST_GFX(32);
 }
 static ANTIC_RENDERER( gtia_mode_1_40 )
 {
 	PREPARE_GFXG1(space, 40);
-	REP40(GTIA1);
+	ERASE(4);
+	REP(GTIA1, 40);
+	ERASE(4);
 	POST_GFX(40);
 }
 static ANTIC_RENDERER( gtia_mode_1_48 )
 {
 	PREPARE_GFXG1(space, 48);
-	REP48(GTIA1);
+	REP(GTIA1, 48);
 	POST_GFX(48);
 }
 
@@ -1469,19 +1529,23 @@ static ANTIC_RENDERER( gtia_mode_1_48 )
 static ANTIC_RENDERER( gtia_mode_2_32 )
 {
 	PREPARE_GFXG2(space, 32);
-	REP32(GTIA2);
+	ERASE(8); 
+	REP(GTIA2, 32);
+	ERASE(8); 
 	POST_GFX(32);
 }
 static ANTIC_RENDERER( gtia_mode_2_40 )
 {
 	PREPARE_GFXG2(space, 40);
-	REP40(GTIA2);
+	ERASE(4);
+	REP(GTIA2, 40);
+	ERASE(4);
 	POST_GFX(40);
 }
 static ANTIC_RENDERER( gtia_mode_2_48 )
 {
 	PREPARE_GFXG2(space, 48);
-	REP48(GTIA2);
+	REP(GTIA2, 48);
 	POST_GFX(48);
 }
 
@@ -1493,19 +1557,23 @@ static ANTIC_RENDERER( gtia_mode_2_48 )
 static ANTIC_RENDERER( gtia_mode_3_32 )
 {
 	PREPARE_GFXG3(space, 32);
-	REP32(GTIA3);
+	ERASE(8); 
+	REP(GTIA3, 32);
+	ERASE(8); 
 	POST_GFX(32);
 }
 static ANTIC_RENDERER( gtia_mode_3_40 )
 {
 	PREPARE_GFXG3(space, 40);
-	REP40(GTIA3);
+	ERASE(4);
+	REP(GTIA3, 40);
+	ERASE(4);
 	POST_GFX(40);
 }
 static ANTIC_RENDERER( gtia_mode_3_48 )
 {
 	PREPARE_GFXG3(space, 48);
-	REP48(GTIA3);
+	REP(GTIA3, 48);
 	POST_GFX(48);
 }
 

@@ -365,12 +365,11 @@ struct ANTIC {
 		antic.w.chbasl++
 
 /* erase a number of color clocks to background color PBK */
-#define ERASE4  {   \
-	*dst++ = (PBK << 24) | (PBK << 16) | (PBK << 8) | PBK;  \
-	*dst++ = (PBK << 24) | (PBK << 16) | (PBK << 8) | PBK;  \
-	*dst++ = (PBK << 24) | (PBK << 16) | (PBK << 8) | PBK;  \
-	*dst++ = (PBK << 24) | (PBK << 16) | (PBK << 8) | PBK;  \
-	}
+#define ERASE(size)							\
+	for (int i = 0; i < size; i++)			\
+	{										\
+		*dst++ = (PBK << 24) | (PBK << 16) | (PBK << 8) | PBK;  \
+	}										\
 
 #define ZAP48()                                                 \
 	dst = (UINT32 *)&antic.cclock[PMOFFSET];                    \
@@ -381,92 +380,11 @@ struct ANTIC {
 	dst[46] = (PBK << 24) | (PBK << 16) | (PBK << 8) | PBK;     \
 	dst[47] = (PBK << 24) | (PBK << 16) | (PBK << 8) | PBK
 
-#define ERASE8  \
-	ERASE4;     \
-	ERASE4
-
-#define REP08(FUNC)                         \
-	ERASE8;                                 \
-	FUNC( 0); FUNC( 1); FUNC( 2); FUNC( 3); \
-	FUNC( 4); FUNC( 5); FUNC( 6); FUNC( 7); \
-	ERASE8
-
-#define REP10(FUNC)                         \
-	ERASE4;                                 \
-	FUNC( 0); FUNC( 1); FUNC( 2); FUNC( 3); \
-	FUNC( 4); FUNC( 5); FUNC( 6); FUNC( 7); \
-	FUNC( 8); FUNC( 9);                     \
-	ERASE4
-
-#define REP12(FUNC)                         \
-	FUNC( 0); FUNC( 1); FUNC( 2); FUNC( 3); \
-	FUNC( 4); FUNC( 5); FUNC( 6); FUNC( 7); \
-	FUNC( 8); FUNC( 9); FUNC(10); FUNC(11)
-
-#define REP16(FUNC)                         \
-	ERASE8;                                 \
-	FUNC( 0); FUNC( 1); FUNC( 2); FUNC( 3); \
-	FUNC( 4); FUNC( 5); FUNC( 6); FUNC( 7); \
-	FUNC( 8); FUNC( 9); FUNC(10); FUNC(11); \
-	FUNC(12); FUNC(13); FUNC(14); FUNC(15); \
-	ERASE8
-
-#define REP20(FUNC)                         \
-	ERASE4;                                 \
-	FUNC( 0); FUNC( 1); FUNC( 2); FUNC( 3); \
-	FUNC( 4); FUNC( 5); FUNC( 6); FUNC( 7); \
-	FUNC( 8); FUNC( 9); FUNC(10); FUNC(11); \
-	FUNC(12); FUNC(13); FUNC(14); FUNC(15); \
-	FUNC(16); FUNC(17); FUNC(18); FUNC(19); \
-	ERASE4
-
-#define REP24(FUNC)                         \
-	FUNC( 0); FUNC( 1); FUNC( 2); FUNC( 3); \
-	FUNC( 4); FUNC( 5); FUNC( 6); FUNC( 7); \
-	FUNC( 8); FUNC( 9); FUNC(10); FUNC(11); \
-	FUNC(12); FUNC(13); FUNC(14); FUNC(15); \
-	FUNC(16); FUNC(17); FUNC(18); FUNC(19); \
-	FUNC(20); FUNC(21); FUNC(22); FUNC(23)
-
-#define REP32(FUNC)                         \
-	ERASE8;                                 \
-	FUNC( 0); FUNC( 1); FUNC( 2); FUNC( 3); \
-	FUNC( 4); FUNC( 5); FUNC( 6); FUNC( 7); \
-	FUNC( 8); FUNC( 9); FUNC(10); FUNC(11); \
-	FUNC(12); FUNC(13); FUNC(14); FUNC(15); \
-	FUNC(16); FUNC(17); FUNC(18); FUNC(19); \
-	FUNC(20); FUNC(21); FUNC(22); FUNC(23); \
-	FUNC(24); FUNC(25); FUNC(26); FUNC(27); \
-	FUNC(28); FUNC(29); FUNC(30); FUNC(31); \
-	ERASE8
-
-#define REP40(FUNC)                         \
-	ERASE4;                                 \
-	FUNC( 0); FUNC( 1); FUNC( 2); FUNC( 3); \
-	FUNC( 4); FUNC( 5); FUNC( 6); FUNC( 7); \
-	FUNC( 8); FUNC( 9); FUNC(10); FUNC(11); \
-	FUNC(12); FUNC(13); FUNC(14); FUNC(15); \
-	FUNC(16); FUNC(17); FUNC(18); FUNC(19); \
-	FUNC(20); FUNC(21); FUNC(22); FUNC(23); \
-	FUNC(24); FUNC(25); FUNC(26); FUNC(27); \
-	FUNC(28); FUNC(29); FUNC(30); FUNC(31); \
-	FUNC(32); FUNC(33); FUNC(34); FUNC(35); \
-	FUNC(36); FUNC(37); FUNC(38); FUNC(39); \
-	ERASE4
-
-#define REP48(FUNC)                         \
-	FUNC( 0); FUNC( 1); FUNC( 2); FUNC( 3); \
-	FUNC( 4); FUNC( 5); FUNC( 6); FUNC( 7); \
-	FUNC( 8); FUNC( 9); FUNC(10); FUNC(11); \
-	FUNC(12); FUNC(13); FUNC(14); FUNC(15); \
-	FUNC(16); FUNC(17); FUNC(18); FUNC(19); \
-	FUNC(20); FUNC(21); FUNC(22); FUNC(23); \
-	FUNC(24); FUNC(25); FUNC(26); FUNC(27); \
-	FUNC(28); FUNC(29); FUNC(30); FUNC(31); \
-	FUNC(32); FUNC(33); FUNC(34); FUNC(35); \
-	FUNC(36); FUNC(37); FUNC(38); FUNC(39); \
-	FUNC(40); FUNC(41); FUNC(42); FUNC(43); \
-	FUNC(44); FUNC(45); FUNC(46); FUNC(47);
+#define REP(FUNC, size)                     \
+	for (int i = 0; i < size; i++)			\
+	{										\
+		FUNC(i);							\
+	}										\
 
 
 void antic_start(running_machine &machine);
