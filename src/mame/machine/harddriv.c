@@ -1143,9 +1143,6 @@ READ16_MEMBER( harddriv_state::hdds3_sdsp_control_r )
 		default:
 			return m_ds3sdsp_regs[offset];
 	}
-
-	// never executed
-	//return 0xff;
 }
 
 

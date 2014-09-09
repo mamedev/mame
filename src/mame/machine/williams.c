@@ -643,9 +643,6 @@ READ8_MEMBER(williams2_state::tshoot_input_port_0_3_r)
 	int data = ioport("IN0")->read();
 	int gun = (data & 0x3f) ^ ((data & 0x3f) >> 1);
 	return (data & 0xc0) | gun;
-
-	// FIXME: this code is never reached
-	//return 0;
 }
 
 
@@ -666,7 +663,6 @@ WRITE8_MEMBER(williams2_state::tshoot_lamp_w)
 	output_set_value("Player1_Gun_Recoil", (data & 0x10)>>4 );
 	/* feather coil */
 	output_set_value("Feather_Blower", (data & 0x20)>>5 );
-
 }
 
 

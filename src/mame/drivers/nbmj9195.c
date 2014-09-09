@@ -142,8 +142,6 @@ READ8_MEMBER(nbmj9195_state::mscoutm_cpu_portb_r)
 		return (ioport("KEY0")->read() & ioport("KEY1")->read() & ioport("KEY2")->read()
 			& ioport("KEY3")->read() & ioport("KEY4")->read());
 	}
-	// never executed
-	//return 0xff;
 }
 
 READ8_MEMBER(nbmj9195_state::mscoutm_cpu_portc_r)
@@ -165,8 +163,6 @@ READ8_MEMBER(nbmj9195_state::mscoutm_cpu_portc_r)
 		return (ioport("KEY5")->read() & ioport("KEY6")->read() & ioport("KEY7")->read()
 			& ioport("KEY8")->read() & ioport("KEY9")->read());
 	}
-	// never executed
-	//return 0xff;
 }
 
 
@@ -213,8 +209,6 @@ READ8_MEMBER(nbmj9195_state::others_cpu_portb_r)
 	default:
 		return (ioport("KEY0")->read() & ioport("KEY1")->read() & ioport("KEY2")->read() & ioport("KEY3")->read() & (ioport("KEY4")->read() & 0x7f));
 	}
-	// ever executed
-	//return 0xff;
 }
 
 READ8_MEMBER(nbmj9195_state::others_cpu_portc_r)
@@ -235,8 +229,6 @@ READ8_MEMBER(nbmj9195_state::others_cpu_portc_r)
 	default:
 		return (ioport("KEY5")->read() & ioport("KEY6")->read() & ioport("KEY7")->read() & ioport("KEY8")->read() & (ioport("KEY9")->read() & 0x7f));
 	}
-	// never executed
-	//return 0xff;
 }
 
 

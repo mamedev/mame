@@ -492,9 +492,6 @@ UINT32 sss_prot_read_callback( address_space &space, int protaddr, UINT32 key )
 			}
 			return res;
 	}
-
-	// never executed
-	//return 0;
 }
 
 UINT32 astrass_prot_read_callback( address_space &space, int protaddr, UINT32 key )

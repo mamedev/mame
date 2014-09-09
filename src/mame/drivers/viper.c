@@ -1521,8 +1521,6 @@ static UINT32 voodoo3_pci_r(device_t *busdevice, device_t *device, int function,
 		default:
 			fatalerror("voodoo3_pci_r: %08X at %08X\n", reg, device->machine().device("maincpu")->safe_pc());
 	}
-	// never executed
-	//return 0;
 }
 
 static void voodoo3_pci_w(device_t *busdevice, device_t *device, int function, int reg, UINT32 data, UINT32 mem_mask)
