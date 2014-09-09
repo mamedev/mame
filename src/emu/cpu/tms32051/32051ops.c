@@ -1215,7 +1215,18 @@ void tms32051_device::op_bldd_dlimm()
 
 void tms32051_device::op_bldd_sbmar()
 {
-	fatalerror("32051: unimplemented op bldd sbmar at %08X\n", m_pc-1);
+	UINT16 pfc = m_bmar;
+
+	while (m_rptc > -1)
+	{
+		UINT16 ea = GET_ADDRESS();
+		UINT16 data = DM_READ16(pfc);
+		DM_WRITE16(ea, data);
+		pfc++;
+		CYCLES(2);
+
+		m_rptc--;
+	};
 }
 
 void tms32051_device::op_bldd_dbmar()

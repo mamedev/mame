@@ -162,6 +162,7 @@ void tms32051_device::device_start()
 	m_cbsr2 = 0;
 	m_cber2 = 0;
 	memset(&m_timer, 0, sizeof(m_timer));
+	memset(&m_serial, 0, sizeof(m_serial));
 
 	state_add( TMS32051_PC,    "PC", m_pc).formatstr("%04X");
 	state_add( TMS32051_ACC,   "ACC", m_acc).formatstr("%08X");
@@ -374,7 +375,7 @@ READ16_MEMBER( tms32051_device::cpuregs_r )
 		case 0x04:  return m_imr;
 		case 0x06:  return m_ifr;
 
-		case 0x07:      // PMST
+		case 0x07: // PMST
 		{
 			UINT16 r = 0;
 			r |= m_pmst.iptr << 11;
@@ -388,27 +389,31 @@ READ16_MEMBER( tms32051_device::cpuregs_r )
 			return r;
 		}
 
-		case 0x09:  return m_brcr;
-		case 0x10:  return m_ar[0];
-		case 0x11:  return m_ar[1];
-		case 0x12:  return m_ar[2];
-		case 0x13:  return m_ar[3];
-		case 0x14:  return m_ar[4];
-		case 0x15:  return m_ar[5];
-		case 0x16:  return m_ar[6];
-		case 0x17:  return m_ar[7];
-		case 0x18:  return m_indx;
-		case 0x19:  return m_arcr;
-		case 0x1a:  return m_cbsr1;
-		case 0x1b:  return m_cber1;
-		case 0x1c:  return m_cbsr2;
-		case 0x1d:  return m_cber2;
-		case 0x1e:  return m_cbcr;
-		case 0x1f:  return m_bmar;
-		case 0x24:  return m_timer.tim;
-		case 0x25:  return m_timer.prd;
+		case 0x09: return m_brcr;
+		case 0x10: return m_ar[0];
+		case 0x11: return m_ar[1];
+		case 0x12: return m_ar[2];
+		case 0x13: return m_ar[3];
+		case 0x14: return m_ar[4];
+		case 0x15: return m_ar[5];
+		case 0x16: return m_ar[6];
+		case 0x17: return m_ar[7];
+		case 0x18: return m_indx;
+		case 0x19: return m_arcr;
+		case 0x1a: return m_cbsr1;
+		case 0x1b: return m_cber1;
+		case 0x1c: return m_cbsr2;
+		case 0x1d: return m_cber2;
+		case 0x1e: return m_cbcr;
+		case 0x1f: return m_bmar;
+		
+		case 0x20: return m_serial.drr;
+		case 0x21: return m_serial.dxr;
 
-		case 0x26:      // TCR
+		case 0x24: return m_timer.tim;
+		case 0x25: return m_timer.prd;
+
+		case 0x26: // TCR
 		{
 			UINT16 r = 0;
 			r |= (m_timer.psc & 0xf) << 6;
@@ -416,7 +421,8 @@ READ16_MEMBER( tms32051_device::cpuregs_r )
 			return r;
 		}
 
-		case 0x28:  return 0;   // PDWSR
+		case 0x28: // PDWSR
+			return 0;
 
 		default:
 			if (!space.debugger_access())
@@ -430,9 +436,10 @@ WRITE16_MEMBER( tms32051_device::cpuregs_w )
 {
 	switch (offset)
 	{
-		case 0x00:  break;
-		case 0x04:  m_imr = data; break;
-		case 0x06:      // IFR
+		case 0x00: break;
+		case 0x04: m_imr = data; break;
+
+		case 0x06: // IFR
 		{
 			for (int i = 0; i < 16; i++)
 			{
@@ -444,7 +451,7 @@ WRITE16_MEMBER( tms32051_device::cpuregs_w )
 			break;
 		}
 
-		case 0x07:      // PMST
+		case 0x07: // PMST
 		{
 			m_pmst.iptr = (data >> 11) & 0x1f;
 			m_pmst.avis = (data & 0x80) ? 1 : 0;
@@ -457,29 +464,34 @@ WRITE16_MEMBER( tms32051_device::cpuregs_w )
 			break;
 		}
 
-		case 0x09:  m_brcr = data; break;
-		case 0x0e:  m_treg2 = data; break;
-		case 0x0f:  m_dbmr = data; break;
-		case 0x10:  m_ar[0] = data; break;
-		case 0x11:  m_ar[1] = data; break;
-		case 0x12:  m_ar[2] = data; break;
-		case 0x13:  m_ar[3] = data; break;
-		case 0x14:  m_ar[4] = data; break;
-		case 0x15:  m_ar[5] = data; break;
-		case 0x16:  m_ar[6] = data; break;
-		case 0x17:  m_ar[7] = data; break;
-		case 0x18:  m_indx = data; break;
-		case 0x19:  m_arcr = data; break;
-		case 0x1a:  m_cbsr1 = data; break;
-		case 0x1b:  m_cber1 = data; break;
-		case 0x1c:  m_cbsr2 = data; break;
-		case 0x1d:  m_cber2 = data; break;
-		case 0x1e:  m_cbcr = data; break;
-		case 0x1f:  m_bmar = data; break;
-		case 0x24:  m_timer.tim = data; break;
-		case 0x25:  m_timer.prd = data; break;
+		case 0x09: m_brcr = data; break;
+		case 0x0e: m_treg2 = data; break;
+		case 0x0f: m_dbmr = data; break;
+		case 0x10: m_ar[0] = data; break;
+		case 0x11: m_ar[1] = data; break;
+		case 0x12: m_ar[2] = data; break;
+		case 0x13: m_ar[3] = data; break;
+		case 0x14: m_ar[4] = data; break;
+		case 0x15: m_ar[5] = data; break;
+		case 0x16: m_ar[6] = data; break;
+		case 0x17: m_ar[7] = data; break;
+		case 0x18: m_indx = data; break;
+		case 0x19: m_arcr = data; break;
+		case 0x1a: m_cbsr1 = data; break;
+		case 0x1b: m_cber1 = data; break;
+		case 0x1c: m_cbsr2 = data; break;
+		case 0x1d: m_cber2 = data; break;
+		case 0x1e: m_cbcr = data; break;
+		case 0x1f: m_bmar = data; break;
 
-		case 0x26:      // TCR
+		case 0x20: m_serial.drr = data; break;
+		case 0x21: m_serial.dxr = data; break;
+		case 0x22: m_serial.spc = data; break;
+
+		case 0x24: m_timer.tim = data; break;
+		case 0x25: m_timer.prd = data; break;
+
+		case 0x26: // TCR
 		{
 			m_timer.tddr = data & 0xf;
 			m_timer.psc = (data >> 6) & 0xf;
@@ -492,7 +504,8 @@ WRITE16_MEMBER( tms32051_device::cpuregs_w )
 			break;
 		}
 
-		case 0x28:  break;      // PDWSR
+		case 0x28: // PDWSR
+			break;
 
 		default:
 			if (!space.debugger_access())

@@ -134,6 +134,13 @@ private:
 		UINT16 tim;
 		UINT16 prd;
 	} m_timer;
+	
+	struct
+	{
+		UINT16 drr;
+		UINT16 dxr;
+		UINT16 spc;
+	} m_serial;
 
 	struct
 	{
