@@ -2247,7 +2247,7 @@ GAME( 1984, trivia12, triviag1, balsente, triviag1, balsente_state, triviag1, RO
 /* Board: Unknown (From a picture on eBay Snacks'n Jaxson does not match any documented types here.) */
 GAME( 1984, otwalls,  0,        balsente, otwalls, balsente_state,  otwalls,  ROT0, "Bally/Sente",  "Off the Wall (Sente)", GAME_SUPPORTS_SAVE )
 GAME( 1984, snakepit, 0,        balsente, sentetst, balsente_state, snakepit, ROT0, "Bally/Sente",  "Snake Pit", GAME_SUPPORTS_SAVE )
-GAME( 1983, snakepit2,snakepit, balsente, sentetst, balsente_state, snakepit, ROT0, "Sente Technologies Inc.",  "Snake Pit (9/14/84)", GAME_SUPPORTS_SAVE )
+GAME( 1984, snakepit2,snakepit, balsente, sentetst, balsente_state, snakepit, ROT0, "Sente Technologies Inc.", "Snake Pit (9/14/84)", GAME_SUPPORTS_SAVE ) // 1984, even though titlescreen says 1983
 GAME( 1984, snakjack, 0,        balsente, snakjack, balsente_state, snakjack, ROT0, "Bally/Sente",  "Snacks'n Jaxson", GAME_SUPPORTS_SAVE )
 
 /* Board: 006-8025-01-0B Rev B */
