@@ -6,10 +6,7 @@
     Juergen Buchmueller, June 1998
 ******************************************************************************/
 
-#include "emu.h"
 #include "antic.h"
-#include "includes/atari.h"
-#include "cpu/m6502/m6502.h"
 
 #ifdef MAME_DEBUG
 #define VERBOSE 1
@@ -18,6 +15,107 @@
 #endif
 
 #define LOG(x)  do { if (VERBOSE) logerror x; } while (0)
+
+// devices
+const device_type ATARI_ANTIC = &device_creator<antic_device>;
+
+//-------------------------------------------------
+//  upd7220_device - constructor
+//-------------------------------------------------
+
+antic_device::antic_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+				device_t(mconfig, ATARI_ANTIC, "Atari ANTIC", tag, owner, clock, "antic", __FILE__),
+				m_gtia_tag(NULL)
+{
+}
+
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void antic_device::device_start()
+{
+	m_gtia = machine().device<gtia_device>(m_gtia_tag);
+	assert(m_gtia);
+
+	/* save states */
+	save_pointer(NAME((UINT8 *) &m_r), sizeof(m_r));
+	save_pointer(NAME((UINT8 *) &m_w), sizeof(m_w));
+	
+	m_bitmap = auto_bitmap_ind16_alloc(machine(), machine().first_screen()->width(), machine().first_screen()->height());
+	
+	m_cclk_expand = auto_alloc_array(machine(), UINT32, 21 * 256);
+	
+	m_pf_21       = &m_cclk_expand[ 0 * 256];
+	m_pf_x10b     = &m_cclk_expand[ 1 * 256];
+	m_pf_3210b2   = &m_cclk_expand[ 3 * 256];
+	m_pf_210b4    = &m_cclk_expand[11 * 256];
+	m_pf_210b2    = &m_cclk_expand[15 * 256];
+	m_pf_1b       = &m_cclk_expand[17 * 256];
+	m_pf_gtia1    = &m_cclk_expand[18 * 256];
+	m_pf_gtia2    = &m_cclk_expand[19 * 256];
+	m_pf_gtia3    = &m_cclk_expand[20 * 256];
+	
+	m_used_colors = auto_alloc_array(machine(), UINT8, 21 * 256);
+	
+	memset(m_used_colors, 0, 21 * 256 * sizeof(UINT8));
+	
+	m_uc_21       = &m_used_colors[ 0 * 256];
+	m_uc_x10b     = &m_used_colors[ 1 * 256];
+	m_uc_3210b2   = &m_used_colors[ 3 * 256];
+	m_uc_210b4    = &m_used_colors[11 * 256];
+	m_uc_210b2    = &m_used_colors[15 * 256];
+	m_uc_1b       = &m_used_colors[17 * 256];
+	m_uc_g1       = &m_used_colors[18 * 256];
+	m_uc_g2       = &m_used_colors[19 * 256];
+	m_uc_g3       = &m_used_colors[20 * 256];
+	
+	LOG(("atari cclk_init\n"));
+	cclk_init();
+	
+	for (int i = 0; i < 64; i++)
+		m_prio_table[i] = auto_alloc_array(machine(), UINT8, 8*256);
+	
+	LOG(("atari prio_init\n"));
+	prio_init();
+	
+	for (int i = 0; i < machine().first_screen()->height(); i++)
+		m_video[i] = auto_alloc_clear(machine(), VIDEO);
+}
+
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void antic_device::device_reset()
+{
+	/* reset the ANTIC read / write registers */
+	memset(&m_r, 0, sizeof(m_r));
+	memset(&m_w, 0, sizeof(m_w));
+	m_r.antic00 = 0xff;
+	m_r.antic01 = 0xff;
+	m_r.antic02 = 0xff;
+	m_r.antic03 = 0xff;
+	m_r.antic04 = 0xff;
+	m_r.antic05 = 0xff;
+	m_r.antic06 = 0xff;
+	m_r.antic07 = 0xff;
+	m_r.antic08 = 0xff;
+	m_r.antic09 = 0xff;
+	m_r.antic0a = 0xff;
+	m_r.penh    = 0x00;
+	m_r.penv    = 0x00;
+	m_r.antic0e = 0xff;
+	m_r.nmist   = 0x1f;
+	
+	m_render1 = 0;
+	m_render2 = 0;
+	m_render3 = 0;
+	m_tv_artifacts = 0;
+}
+
 
 /*************************************************************************
  * The priority tables tell which playfield, player or missile colors
@@ -77,7 +175,7 @@
  * luminance of the modes foreground (ie. colpf1).
  * Any combination of players/missiles (256) is checked for the highest
  * priority player or missile and the resulting color is stored into
- * antic.prio_table. The second part (20-3F) contains the resulting
+ * m_prio_table. The second part (20-3F) contains the resulting
  * color values for the EOR mode, which is derived from the *visible*
  * player/missile colors calculated for the first part (00-1F).
  * The priorities of combining priority bits (which games use!) are:
@@ -409,7 +507,7 @@ static const UINT8 _pm_colors[32][8*2*8] = {
  * prio_init
  * Initialize player/missile priority lookup tables
  ************************************************************************/
-void prio_init()
+void antic_device::prio_init()
 {
 	int i, j, pm, p, c;
 	const UINT8 * prio;
@@ -430,14 +528,14 @@ void prio_init()
 					if (((prio[p] & pm) == prio[p]) && (prio[p+1]))
 						c = prio[p+1];
 				}
-				antic.prio_table[i][(j << 8) + pm] = c;
+				m_prio_table[i][(j << 8) + pm] = c;
 				if( (c==PL0 || c==P000 || c==P001 || c==P010 || c==P011) &&
 				   (pm & (P0+P1))==(P0+P1))
 					c = EOR;
 				if( (c==PL2 || c==P200 || c==P201 || c==P210 || c==P211) &&
 				   (pm & (P2+P3))==(P2+P3))
 					c = EOR;
-				antic.prio_table[32 + i][(j << 8) + pm] = c;
+				m_prio_table[32 + i][(j << 8) + pm] = c;
 			}
 		}
 	}
@@ -447,7 +545,7 @@ void prio_init()
  * cclk_init
  * Initialize "color clock" lookup tables
  ************************************************************************/
-static void cclk_init()
+void antic_device::cclk_init()
 {
 	static const UINT8 _pf_21[4] =   {T00,T01,T10,T11};
 	static const UINT8 _pf_1b[4] =   {G00,G01,G10,G11};
@@ -460,26 +558,26 @@ static void cclk_init()
 	for( i = 0; i < 256; i++ )
 	{
 		/****** text mode (2,3) **********/
-		dst = (UINT8 *)&antic.pf_21[0x000+i];
+		dst = (UINT8 *)&m_pf_21[0x000+i];
 		*dst++ = _pf_21[(i>>6)&3];
 		*dst++ = _pf_21[(i>>4)&3];
 		*dst++ = _pf_21[(i>>2)&3];
 		*dst++ = _pf_21[(i>>0)&3];
 		
 		/****** 4 color text (4,5) with pf2, D, E **********/
-		dst = (UINT8 *)&antic.pf_x10b[0x000+i];
+		dst = (UINT8 *)&m_pf_x10b[0x000+i];
 		*dst++ = _pf_210b[(i>>6)&3];
 		*dst++ = _pf_210b[(i>>4)&3];
 		*dst++ = _pf_210b[(i>>2)&3];
 		*dst++ = _pf_210b[(i>>0)&3];
-		dst = (UINT8 *)&antic.pf_x10b[0x100+i];
+		dst = (UINT8 *)&m_pf_x10b[0x100+i];
 		*dst++ = _pf_310b[(i>>6)&3];
 		*dst++ = _pf_310b[(i>>4)&3];
 		*dst++ = _pf_310b[(i>>2)&3];
 		*dst++ = _pf_310b[(i>>0)&3];
 		
 		/****** pf0 color text (6,7), 9, B, C **********/
-		dst = (UINT8 *)&antic.pf_3210b2[0x000+i*2];
+		dst = (UINT8 *)&m_pf_3210b2[0x000+i*2];
 		*dst++ = (i&0x80)?PF0:PBK;
 		*dst++ = (i&0x40)?PF0:PBK;
 		*dst++ = (i&0x20)?PF0:PBK;
@@ -490,7 +588,7 @@ static void cclk_init()
 		*dst++ = (i&0x01)?PF0:PBK;
 		
 		/****** pf1 color text (6,7), 9, B, C **********/
-		dst = (UINT8 *)&antic.pf_3210b2[0x200+i*2];
+		dst = (UINT8 *)&m_pf_3210b2[0x200+i*2];
 		*dst++ = (i&0x80)?PF1:PBK;
 		*dst++ = (i&0x40)?PF1:PBK;
 		*dst++ = (i&0x20)?PF1:PBK;
@@ -501,7 +599,7 @@ static void cclk_init()
 		*dst++ = (i&0x01)?PF1:PBK;
 		
 		/****** pf2 color text (6,7), 9, B, C **********/
-		dst = (UINT8 *)&antic.pf_3210b2[0x400+i*2];
+		dst = (UINT8 *)&m_pf_3210b2[0x400+i*2];
 		*dst++ = (i&0x80)?PF2:PBK;
 		*dst++ = (i&0x40)?PF2:PBK;
 		*dst++ = (i&0x20)?PF2:PBK;
@@ -512,7 +610,7 @@ static void cclk_init()
 		*dst++ = (i&0x01)?PF2:PBK;
 		
 		/****** pf3 color text (6,7), 9, B, C **********/
-		dst = (UINT8 *)&antic.pf_3210b2[0x600+i*2];
+		dst = (UINT8 *)&m_pf_3210b2[0x600+i*2];
 		*dst++ = (i&0x80)?PF3:PBK;
 		*dst++ = (i&0x40)?PF3:PBK;
 		*dst++ = (i&0x20)?PF3:PBK;
@@ -523,7 +621,7 @@ static void cclk_init()
 		*dst++ = (i&0x01)?PF3:PBK;
 		
 		/****** 4 color graphics 4 cclks (8) **********/
-		dst = (UINT8 *)&antic.pf_210b4[i*4];
+		dst = (UINT8 *)&m_pf_210b4[i*4];
 		*dst++ = _pf_210b[(i>>6)&3];
 		*dst++ = _pf_210b[(i>>6)&3];
 		*dst++ = _pf_210b[(i>>6)&3];
@@ -542,7 +640,7 @@ static void cclk_init()
 		*dst++ = _pf_210b[(i>>0)&3];
 		
 		/****** 4 color graphics 2 cclks (A) **********/
-		dst = (UINT8 *)&antic.pf_210b2[i*2];
+		dst = (UINT8 *)&m_pf_210b2[i*2];
 		*dst++ = _pf_210b[(i>>6)&3];
 		*dst++ = _pf_210b[(i>>6)&3];
 		*dst++ = _pf_210b[(i>>4)&3];
@@ -553,28 +651,28 @@ static void cclk_init()
 		*dst++ = _pf_210b[(i>>0)&3];
 		
 		/****** high resolution graphics (F) **********/
-		dst = (UINT8 *)&antic.pf_1b[i];
+		dst = (UINT8 *)&m_pf_1b[i];
 		*dst++ = _pf_1b[(i>>6)&3];
 		*dst++ = _pf_1b[(i>>4)&3];
 		*dst++ = _pf_1b[(i>>2)&3];
 		*dst++ = _pf_1b[(i>>0)&3];
 		
 		/****** gtia mode 1 **********/
-		dst = (UINT8 *)&antic.pf_gtia1[i];
+		dst = (UINT8 *)&m_pf_gtia1[i];
 		*dst++ = GT1+((i>>4)&15);
 		*dst++ = GT1+((i>>4)&15);
 		*dst++ = GT1+(i&15);
 		*dst++ = GT1+(i&15);
 		
 		/****** gtia mode 2 **********/
-		dst = (UINT8 *)&antic.pf_gtia2[i];
+		dst = (UINT8 *)&m_pf_gtia2[i];
 		*dst++ = GT2+((i>>4)&15);
 		*dst++ = GT2+((i>>4)&15);
 		*dst++ = GT2+(i&15);
 		*dst++ = GT2+(i&15);
 		
 		/****** gtia mode 3 **********/
-		dst = (UINT8 *)&antic.pf_gtia3[i];
+		dst = (UINT8 *)&m_pf_gtia3[i];
 		*dst++ = GT3+((i>>4)&15);
 		*dst++ = GT3+((i>>4)&15);
 		*dst++ = GT3+(i&15);
@@ -586,266 +684,183 @@ static void cclk_init()
 	for( i = 0; i < 256; i++ )
 	{
 		/* used colors in text modes 2,3 */
-		antic.uc_21[i] = (i) ? PF2 | PF1 : PF2;
+		m_uc_21[i] = (i) ? PF2 | PF1 : PF2;
 		
 		/* used colors in text modes 4,5 and graphics modes D,E */
 		switch( i & 0x03 )
 		{
-			case 0x01: antic.uc_x10b[0x000+i] |= PF0; antic.uc_x10b[0x100+i] |= PF0; break;
-			case 0x02: antic.uc_x10b[0x000+i] |= PF1; antic.uc_x10b[0x100+i] |= PF1; break;
-			case 0x03: antic.uc_x10b[0x000+i] |= PF2; antic.uc_x10b[0x100+i] |= PF3; break;
+			case 0x01: m_uc_x10b[0x000+i] |= PF0; m_uc_x10b[0x100+i] |= PF0; break;
+			case 0x02: m_uc_x10b[0x000+i] |= PF1; m_uc_x10b[0x100+i] |= PF1; break;
+			case 0x03: m_uc_x10b[0x000+i] |= PF2; m_uc_x10b[0x100+i] |= PF3; break;
 		}
 		switch( i & 0x0c )
 		{
-			case 0x04: antic.uc_x10b[0x000+i] |= PF0; antic.uc_x10b[0x100+i] |= PF0; break;
-			case 0x08: antic.uc_x10b[0x000+i] |= PF1; antic.uc_x10b[0x100+i] |= PF1; break;
-			case 0x0c: antic.uc_x10b[0x000+i] |= PF2; antic.uc_x10b[0x100+i] |= PF3; break;
+			case 0x04: m_uc_x10b[0x000+i] |= PF0; m_uc_x10b[0x100+i] |= PF0; break;
+			case 0x08: m_uc_x10b[0x000+i] |= PF1; m_uc_x10b[0x100+i] |= PF1; break;
+			case 0x0c: m_uc_x10b[0x000+i] |= PF2; m_uc_x10b[0x100+i] |= PF3; break;
 		}
 		switch( i & 0x30 )
 		{
-			case 0x10: antic.uc_x10b[0x000+i] |= PF0; antic.uc_x10b[0x100+i] |= PF0; break;
-			case 0x20: antic.uc_x10b[0x000+i] |= PF1; antic.uc_x10b[0x100+i] |= PF1; break;
-			case 0x30: antic.uc_x10b[0x000+i] |= PF2; antic.uc_x10b[0x100+i] |= PF3; break;
+			case 0x10: m_uc_x10b[0x000+i] |= PF0; m_uc_x10b[0x100+i] |= PF0; break;
+			case 0x20: m_uc_x10b[0x000+i] |= PF1; m_uc_x10b[0x100+i] |= PF1; break;
+			case 0x30: m_uc_x10b[0x000+i] |= PF2; m_uc_x10b[0x100+i] |= PF3; break;
 		}
 		switch( i & 0xc0 )
 		{
-			case 0x40: antic.uc_x10b[0x000+i] |= PF0; antic.uc_x10b[0x100+i] |= PF0; break;
-			case 0x80: antic.uc_x10b[0x000+i] |= PF1; antic.uc_x10b[0x100+i] |= PF1; break;
-			case 0xc0: antic.uc_x10b[0x000+i] |= PF2; antic.uc_x10b[0x100+i] |= PF3; break;
+			case 0x40: m_uc_x10b[0x000+i] |= PF0; m_uc_x10b[0x100+i] |= PF0; break;
+			case 0x80: m_uc_x10b[0x000+i] |= PF1; m_uc_x10b[0x100+i] |= PF1; break;
+			case 0xc0: m_uc_x10b[0x000+i] |= PF2; m_uc_x10b[0x100+i] |= PF3; break;
 		}
 		
 		/* used colors in text modes 6,7 and graphics modes 9,B,C */
 		if( i )
 		{
-			antic.uc_3210b2[0x000+i*2] |= PF0;
-			antic.uc_3210b2[0x200+i*2] |= PF1;
-			antic.uc_3210b2[0x400+i*2] |= PF2;
-			antic.uc_3210b2[0x600+i*2] |= PF3;
+			m_uc_3210b2[0x000+i*2] |= PF0;
+			m_uc_3210b2[0x200+i*2] |= PF1;
+			m_uc_3210b2[0x400+i*2] |= PF2;
+			m_uc_3210b2[0x600+i*2] |= PF3;
 		}
 		
 		/* used colors in graphics mode 8 */
 		switch( i & 0x03 )
 		{
-			case 0x01: antic.uc_210b4[i*4] |= PF0; break;
-			case 0x02: antic.uc_210b4[i*4] |= PF1; break;
-			case 0x03: antic.uc_210b4[i*4] |= PF2; break;
+			case 0x01: m_uc_210b4[i*4] |= PF0; break;
+			case 0x02: m_uc_210b4[i*4] |= PF1; break;
+			case 0x03: m_uc_210b4[i*4] |= PF2; break;
 		}
 		switch( i & 0x0c )
 		{
-			case 0x04: antic.uc_210b4[i*4] |= PF0; break;
-			case 0x08: antic.uc_210b4[i*4] |= PF1; break;
-			case 0x0c: antic.uc_210b4[i*4] |= PF2; break;
+			case 0x04: m_uc_210b4[i*4] |= PF0; break;
+			case 0x08: m_uc_210b4[i*4] |= PF1; break;
+			case 0x0c: m_uc_210b4[i*4] |= PF2; break;
 		}
 		switch( i & 0x30 )
 		{
-			case 0x10: antic.uc_210b4[i*4] |= PF0; break;
-			case 0x20: antic.uc_210b4[i*4] |= PF1; break;
-			case 0x30: antic.uc_210b4[i*4] |= PF2; break;
+			case 0x10: m_uc_210b4[i*4] |= PF0; break;
+			case 0x20: m_uc_210b4[i*4] |= PF1; break;
+			case 0x30: m_uc_210b4[i*4] |= PF2; break;
 		}
 		switch( i & 0xc0 )
 		{
-			case 0x40: antic.uc_210b4[i*4] |= PF0; break;
-			case 0x80: antic.uc_210b4[i*4] |= PF1; break;
-			case 0xc0: antic.uc_210b4[i*4] |= PF2; break;
+			case 0x40: m_uc_210b4[i*4] |= PF0; break;
+			case 0x80: m_uc_210b4[i*4] |= PF1; break;
+			case 0xc0: m_uc_210b4[i*4] |= PF2; break;
 		}
 		
 		/* used colors in graphics mode A */
 		switch( i & 0x03 )
 		{
-			case 0x01: antic.uc_210b2[i*2] |= PF0; break;
-			case 0x02: antic.uc_210b2[i*2] |= PF1; break;
-			case 0x03: antic.uc_210b2[i*2] |= PF2; break;
+			case 0x01: m_uc_210b2[i*2] |= PF0; break;
+			case 0x02: m_uc_210b2[i*2] |= PF1; break;
+			case 0x03: m_uc_210b2[i*2] |= PF2; break;
 		}
 		switch( i & 0x0c )
 		{
-			case 0x04: antic.uc_210b2[i*2] |= PF0; break;
-			case 0x08: antic.uc_210b2[i*2] |= PF1; break;
-			case 0x0c: antic.uc_210b2[i*2] |= PF2; break;
+			case 0x04: m_uc_210b2[i*2] |= PF0; break;
+			case 0x08: m_uc_210b2[i*2] |= PF1; break;
+			case 0x0c: m_uc_210b2[i*2] |= PF2; break;
 		}
 		switch( i & 0x30 )
 		{
-			case 0x10: antic.uc_210b2[i*2] |= PF0; break;
-			case 0x20: antic.uc_210b2[i*2] |= PF1; break;
-			case 0x30: antic.uc_210b2[i*2] |= PF2; break;
+			case 0x10: m_uc_210b2[i*2] |= PF0; break;
+			case 0x20: m_uc_210b2[i*2] |= PF1; break;
+			case 0x30: m_uc_210b2[i*2] |= PF2; break;
 		}
 		switch( i & 0xc0 )
 		{
-			case 0x40: antic.uc_210b2[i*2] |= PF0; break;
-			case 0x80: antic.uc_210b2[i*2] |= PF1; break;
-			case 0xc0: antic.uc_210b2[i*2] |= PF2; break;
+			case 0x40: m_uc_210b2[i*2] |= PF0; break;
+			case 0x80: m_uc_210b2[i*2] |= PF1; break;
+			case 0xc0: m_uc_210b2[i*2] |= PF2; break;
 		}
 		
 		/* used colors in graphics mode F */
 		if( i )
-			antic.uc_1b[i] |= PF1;
+			m_uc_1b[i] |= PF1;
 		
 		/* used colors in GTIA graphics modes */
 		/* GTIA 1 is 16 different luminances with hue of colbk */
-		antic.uc_g1[i] = 0x00;
+		m_uc_g1[i] = 0x00;
 		/* GTIA 2 is all 9 colors (8..15 is colbk) */
 		switch( i & 0x0f )
 		{
-			case 0x00: antic.uc_g2[i] = 0x10; break;
-			case 0x01: antic.uc_g2[i] = 0x20; break;
-			case 0x02: antic.uc_g2[i] = 0x40; break;
-			case 0x03: antic.uc_g2[i] = 0x80; break;
-			case 0x04: antic.uc_g2[i] = 0x01; break;
-			case 0x05: antic.uc_g2[i] = 0x02; break;
-			case 0x06: antic.uc_g2[i] = 0x04; break;
-			case 0x07: antic.uc_g2[i] = 0x08; break;
-			default:   antic.uc_g2[i] = 0x00;
+			case 0x00: m_uc_g2[i] = 0x10; break;
+			case 0x01: m_uc_g2[i] = 0x20; break;
+			case 0x02: m_uc_g2[i] = 0x40; break;
+			case 0x03: m_uc_g2[i] = 0x80; break;
+			case 0x04: m_uc_g2[i] = 0x01; break;
+			case 0x05: m_uc_g2[i] = 0x02; break;
+			case 0x06: m_uc_g2[i] = 0x04; break;
+			case 0x07: m_uc_g2[i] = 0x08; break;
+			default:   m_uc_g2[i] = 0x00;
 		}
 		
 		/* GTIA 3 is 16 different hues with luminance of colbk */
-		antic.uc_g3[i] = 0x00;
+		m_uc_g3[i] = 0x00;
 	}
 }
 
 
-
-ANTIC antic;
-
-void antic_start(running_machine &machine)
-{	
-	/* save states */
-	machine.save().save_pointer(NAME((UINT8 *) &antic.r), sizeof(antic.r));
-	machine.save().save_pointer(NAME((UINT8 *) &antic.w), sizeof(antic.w));
-}
-
-void antic_vstart(running_machine &machine)
-{	
-	LOG(("atari antic_vh_start\n"));
-	memset(&antic, 0, sizeof(antic));
-	
-	antic.bitmap = auto_bitmap_ind16_alloc(machine, machine.first_screen()->width(), machine.first_screen()->height());
-	
-	antic.cclk_expand = auto_alloc_array(machine, UINT32, 21 * 256);
-	
-	antic.pf_21       = &antic.cclk_expand[ 0 * 256];
-	antic.pf_x10b     = &antic.cclk_expand[ 1 * 256];
-	antic.pf_3210b2   = &antic.cclk_expand[ 3 * 256];
-	antic.pf_210b4    = &antic.cclk_expand[11 * 256];
-	antic.pf_210b2    = &antic.cclk_expand[15 * 256];
-	antic.pf_1b       = &antic.cclk_expand[17 * 256];
-	antic.pf_gtia1    = &antic.cclk_expand[18 * 256];
-	antic.pf_gtia2    = &antic.cclk_expand[19 * 256];
-	antic.pf_gtia3    = &antic.cclk_expand[20 * 256];
-	
-	antic.used_colors = auto_alloc_array(machine, UINT8, 21 * 256);
-	
-	memset(antic.used_colors, 0, 21 * 256 * sizeof(UINT8));
-	
-	antic.uc_21       = &antic.used_colors[ 0 * 256];
-	antic.uc_x10b     = &antic.used_colors[ 1 * 256];
-	antic.uc_3210b2   = &antic.used_colors[ 3 * 256];
-	antic.uc_210b4    = &antic.used_colors[11 * 256];
-	antic.uc_210b2    = &antic.used_colors[15 * 256];
-	antic.uc_1b       = &antic.used_colors[17 * 256];
-	antic.uc_g1       = &antic.used_colors[18 * 256];
-	antic.uc_g2       = &antic.used_colors[19 * 256];
-	antic.uc_g3       = &antic.used_colors[20 * 256];
-	
-	LOG(("atari cclk_init\n"));
-	cclk_init();
-	
-	for (int i = 0; i < 64; i++)
-		antic.prio_table[i] = auto_alloc_array(machine, UINT8, 8*256);
-	
-	LOG(("atari prio_init\n"));
-	prio_init();
-	
-	for (int i = 0; i < machine.first_screen()->height(); i++)
-		antic.video[i] = auto_alloc_clear(machine, VIDEO);
-}
-
-/**************************************************************
- *
- * Reset ANTIC
- *
- **************************************************************/
-
-void antic_reset(void)
-{
-	/* reset the ANTIC read / write registers */
-	memset(&antic.r, 0, sizeof(antic.r));
-	memset(&antic.w, 0, sizeof(antic.w));
-	antic.r.antic00 = 0xff;
-	antic.r.antic01 = 0xff;
-	antic.r.antic02 = 0xff;
-	antic.r.antic03 = 0xff;
-	antic.r.antic04 = 0xff;
-	antic.r.antic05 = 0xff;
-	antic.r.antic06 = 0xff;
-	antic.r.antic07 = 0xff;
-	antic.r.antic08 = 0xff;
-	antic.r.antic09 = 0xff;
-	antic.r.antic0a = 0xff;
-	antic.r.penh    = 0x00;
-	antic.r.penv    = 0x00;
-	antic.r.antic0e = 0xff;
-	antic.r.nmist   = 0x1f;
-}
 
 /**************************************************************
  *
  * Read ANTIC hardware registers
  *
  **************************************************************/
-READ8_MEMBER ( atari_common_state::atari_antic_r )
+READ8_MEMBER ( antic_device::read )
 {
 	UINT8 data = 0xff;
 
 	switch (offset & 15)
 	{
 	case  0: /* nothing */
-		data = antic.r.antic00;
+		data = m_r.antic00;
 		break;
 	case  1: /* nothing */
-		data = antic.r.antic01;
+		data = m_r.antic01;
 		break;
 	case  2: /* nothing */
-		data = antic.r.antic02;
+		data = m_r.antic02;
 		break;
 	case  3: /* nothing */
-		data = antic.r.antic03;
+		data = m_r.antic03;
 		break;
 	case  4: /* nothing */
-		data = antic.r.antic04;
+		data = m_r.antic04;
 		break;
 	case  5: /* nothing */
-		data = antic.r.antic05;
+		data = m_r.antic05;
 		break;
 	case  6: /* nothing */
-		data = antic.r.antic06;
+		data = m_r.antic06;
 		break;
 	case  7: /* nothing */
-		data = antic.r.antic07;
+		data = m_r.antic07;
 		break;
 	case  8: /* nothing */
-		data = antic.r.antic08;
+		data = m_r.antic08;
 		break;
 	case  9: /* nothing */
-		data = antic.r.antic09;
+		data = m_r.antic09;
 		break;
 	case 10: /* WSYNC read */
 		space.machine().device("maincpu")->execute().spin_until_trigger(TRIGGER_HSYNC);
-		antic.w.wsync = 1;
-		data = antic.r.antic0a;
+		m_w.wsync = 1;
+		data = m_r.antic0a;
 		break;
 	case 11: /* vert counter (scanline / 2) */
-		data = antic.r.vcount = antic.scanline >> 1;
+		data = m_r.vcount = m_scanline >> 1;
 		break;
 	case 12: /* light pen horz pos */
-		data = antic.r.penh;
+		data = m_r.penh;
 		break;
 	case 13: /* light pen vert pos */
-		data = antic.r.penv;
+		data = m_r.penv;
 		break;
 	case 14: /* NMI enable */
-		data = antic.r.antic0e;
+		data = m_r.antic0e;
 		break;
 	case 15: /* NMI status */
-		data = antic.r.nmist;
+		data = m_r.nmist;
 		break;
 	}
 	return data;
@@ -857,118 +872,118 @@ READ8_MEMBER ( atari_common_state::atari_antic_r )
  *
  **************************************************************/
 
-WRITE8_MEMBER ( atari_common_state::atari_antic_w )
+WRITE8_MEMBER ( antic_device::write )
 {
 	int temp;
 
 	switch (offset & 15)
 	{
 	case  0:
-		if( data == antic.w.dmactl )
+		if( data == m_w.dmactl )
 			break;
 		LOG(("ANTIC 00 write DMACTL $%02X\n", data));
-		antic.w.dmactl = data;
+		m_w.dmactl = data;
 		switch (data & 3)
 		{
-			case 0: antic.pfwidth =  0; break;
-			case 1: antic.pfwidth = 32; break;
-			case 2: antic.pfwidth = 40; break;
-			case 3: antic.pfwidth = 48; break;
+			case 0: m_pfwidth =  0; break;
+			case 1: m_pfwidth = 32; break;
+			case 2: m_pfwidth = 40; break;
+			case 3: m_pfwidth = 48; break;
 		}
 		break;
 	case  1:
-		if( data == antic.w.chactl )
+		if( data == m_w.chactl )
 			break;
 		LOG(("ANTIC 01 write CHACTL $%02X\n", data));
-		antic.w.chactl = data;
-		antic.chand = (data & 1) ? 0x00 : 0xff;
-		antic.chxor = (data & 2) ? 0xff : 0x00;
+		m_w.chactl = data;
+		m_chand = (data & 1) ? 0x00 : 0xff;
+		m_chxor = (data & 2) ? 0xff : 0x00;
 		break;
 	case  2:
 		LOG(("ANTIC 02 write DLISTL $%02X\n", data));
-		antic.w.dlistl = data;
-		temp = (antic.w.dlisth << 8) + antic.w.dlistl;
-		antic.dpage = temp & DPAGE;
-		antic.doffs = temp & DOFFS;
+		m_w.dlistl = data;
+		temp = (m_w.dlisth << 8) + m_w.dlistl;
+		m_dpage = temp & DPAGE;
+		m_doffs = temp & DOFFS;
 		break;
 	case  3:
 		LOG(("ANTIC 03 write DLISTH $%02X\n", data));
-		antic.w.dlisth = data;
-		temp = (antic.w.dlisth << 8) + antic.w.dlistl;
-		antic.dpage = temp & DPAGE;
-		antic.doffs = temp & DOFFS;
+		m_w.dlisth = data;
+		temp = (m_w.dlisth << 8) + m_w.dlistl;
+		m_dpage = temp & DPAGE;
+		m_doffs = temp & DOFFS;
 		break;
 	case  4:
-		if( data == antic.w.hscrol )
+		if( data == m_w.hscrol )
 			break;
 		LOG(("ANTIC 04 write HSCROL $%02X\n", data));
-		antic.w.hscrol = data & 15;
+		m_w.hscrol = data & 15;
 		break;
 	case  5:
-		if( data == antic.w.vscrol )
+		if( data == m_w.vscrol )
 			break;
 		LOG(("ANTIC 05 write VSCROL $%02X\n", data));
-		antic.w.vscrol = data & 15;
+		m_w.vscrol = data & 15;
 		break;
 	case  6:
-		if( data == antic.w.pmbasl )
+		if( data == m_w.pmbasl )
 			break;
 		LOG(("ANTIC 06 write PMBASL $%02X\n", data));
-		/* antic.w.pmbasl = data; */
+		/* m_w.pmbasl = data; */
 		break;
 	case  7:
-		if( data == antic.w.pmbash )
+		if( data == m_w.pmbash )
 			break;
 		LOG(("ANTIC 07 write PMBASH $%02X\n", data));
-		antic.w.pmbash = data;
-		antic.pmbase_s = (data & 0xfc) << 8;
-		antic.pmbase_d = (data & 0xf8) << 8;
+		m_w.pmbash = data;
+		m_pmbase_s = (data & 0xfc) << 8;
+		m_pmbase_d = (data & 0xf8) << 8;
 		break;
 	case  8:
-		if( data == antic.w.chbasl )
+		if( data == m_w.chbasl )
 			break;
 		LOG(("ANTIC 08 write CHBASL $%02X\n", data));
-		/* antic.w.chbasl = data; */
+		/* m_w.chbasl = data; */
 		break;
 	case  9:
-		if( data == antic.w.chbash )
+		if( data == m_w.chbash )
 			break;
 		LOG(("ANTIC 09 write CHBASH $%02X\n", data));
-		antic.w.chbash = data;
+		m_w.chbash = data;
 		break;
 	case 10: /* WSYNC write */
 		LOG(("ANTIC 0A write WSYNC  $%02X\n", data));
 		space.machine().device("maincpu")->execute().spin_until_trigger(TRIGGER_HSYNC);
-		antic.w.wsync = 1;
+		m_w.wsync = 1;
 		break;
 	case 11:
-		if( data == antic.w.antic0b )
+		if( data == m_w.antic0b )
 			break;
 		LOG(("ANTIC 0B write ?????? $%02X\n", data));
-		antic.w.antic0b = data;
+		m_w.antic0b = data;
 		break;
 	case 12:
-		if( data == antic.w.antic0c )
+		if( data == m_w.antic0c )
 			break;
 		LOG(("ANTIC 0C write ?????? $%02X\n", data));
-		antic.w.antic0c = data;
+		m_w.antic0c = data;
 		break;
 	case 13:
-		if( data == antic.w.antic0d )
+		if( data == m_w.antic0d )
 			break;
 		LOG(("ANTIC 0D write ?????? $%02X\n", data));
-		antic.w.antic0d = data;
+		m_w.antic0d = data;
 		break;
 	case 14:
-		if( data == antic.w.nmien )
+		if( data == m_w.nmien )
 			break;
 		LOG(("ANTIC 0E write NMIEN  $%02X\n", data));
-		antic.w.nmien  = data;
+		m_w.nmien  = data;
 		break;
 	case 15:
 		LOG(("ANTIC 0F write NMIRES $%02X\n", data));
-		antic.r.nmist = 0x1f;
-		antic.w.nmires = data;
+		m_r.nmist = 0x1f;
+		m_w.nmires = data;
 		break;
 	}
 }
@@ -976,7 +991,7 @@ WRITE8_MEMBER ( atari_common_state::atari_antic_w )
 /*************  ANTIC mode 00: *********************************
  * generate 1-8 empty scanlines
  ***************************************************************/
-static inline void antic_mode_0_xx(address_space &space, VIDEO *video)
+inline void antic_device::mode_0(address_space &space, VIDEO *video)
 {
 	PREPARE();
 	memset(dst, PBK, HWIDTH*4);
@@ -991,9 +1006,9 @@ static inline void antic_mode_0_xx(address_space &space, VIDEO *video)
 /*************  ANTIC mode 02: *********************************
  * character mode 8x8:2 (32/40/48 byte per line)
  ***************************************************************/
-#define MODE2(s) COPY4(dst, antic.pf_21[video->data[s]])
+#define MODE2(s) COPY4(dst, m_pf_21[video->data[s]])
 
-static inline void antic_mode_2(address_space &space, VIDEO *video, int bytes, int erase)
+inline void antic_device::mode_2(address_space &space, VIDEO *video, int bytes, int erase)
 {
 	PREPARE_TXT2(space, bytes);
 	ERASE(erase);
@@ -1005,9 +1020,9 @@ static inline void antic_mode_2(address_space &space, VIDEO *video, int bytes, i
 /*************  ANTIC mode 03: *********************************
  * character mode 8x10:2 (32/40/48 byte per line)
  ***************************************************************/
-#define MODE3(s) COPY4(dst, antic.pf_21[video->data[s]])
+#define MODE3(s) COPY4(dst, m_pf_21[video->data[s]])
 
-static inline void antic_mode_3(address_space &space, VIDEO *video, int bytes, int erase)
+inline void antic_device::mode_3(address_space &space, VIDEO *video, int bytes, int erase)
 {
 	PREPARE_TXT3(space, bytes);
 	ERASE(erase);
@@ -1019,9 +1034,9 @@ static inline void antic_mode_3(address_space &space, VIDEO *video, int bytes, i
 /*************  ANTIC mode 04: *********************************
  * character mode 8x8:4 multi color (32/40/48 byte per line)
  ***************************************************************/
-#define MODE4(s) COPY4(dst, antic.pf_x10b[video->data[s]])
+#define MODE4(s) COPY4(dst, m_pf_x10b[video->data[s]])
 
-static inline void antic_mode_4(address_space &space, VIDEO *video, int bytes, int erase)
+inline void antic_device::mode_4(address_space &space, VIDEO *video, int bytes, int erase)
 {
 	PREPARE_TXT45(space, bytes, 0);
 	ERASE(erase);
@@ -1033,9 +1048,9 @@ static inline void antic_mode_4(address_space &space, VIDEO *video, int bytes, i
 /*************  ANTIC mode 05: *********************************
  * character mode 8x16:4 multi color (32/40/48 byte per line)
  ***************************************************************/
-#define MODE5(s) COPY4(dst, antic.pf_x10b[video->data[s]])
+#define MODE5(s) COPY4(dst, m_pf_x10b[video->data[s]])
 
-static inline void antic_mode_5(address_space &space, VIDEO *video, int bytes, int erase)
+inline void antic_device::mode_5(address_space &space, VIDEO *video, int bytes, int erase)
 {
 	PREPARE_TXT45(space, bytes, 1);
 	ERASE(erase);
@@ -1047,9 +1062,9 @@ static inline void antic_mode_5(address_space &space, VIDEO *video, int bytes, i
 /*************  ANTIC mode 06: *********************************
  * character mode 16x8:5 single color (16/20/24 byte per line)
  ***************************************************************/
-#define MODE6(s) COPY8(dst, antic.pf_3210b2[video->data[s]], antic.pf_3210b2[video->data[s]+1])
+#define MODE6(s) COPY8(dst, m_pf_3210b2[video->data[s]], m_pf_3210b2[video->data[s]+1])
 
-static inline void antic_mode_6(address_space &space, VIDEO *video, int bytes, int erase)
+inline void antic_device::mode_6(address_space &space, VIDEO *video, int bytes, int erase)
 {
 	PREPARE_TXT67(space, bytes, 0);
 	ERASE(erase);
@@ -1061,9 +1076,9 @@ static inline void antic_mode_6(address_space &space, VIDEO *video, int bytes, i
 /*************  ANTIC mode 07: *********************************
  * character mode 16x16:5 single color (16/20/24 byte per line)
  ***************************************************************/
-#define MODE7(s) COPY8(dst, antic.pf_3210b2[video->data[s]], antic.pf_3210b2[video->data[s]+1])
+#define MODE7(s) COPY8(dst, m_pf_3210b2[video->data[s]], m_pf_3210b2[video->data[s]+1])
 
-static inline void antic_mode_7(address_space &space, VIDEO *video, int bytes, int erase)
+inline void antic_device::mode_7(address_space &space, VIDEO *video, int bytes, int erase)
 {
 	PREPARE_TXT67(space, bytes, 1);
 	ERASE(erase);
@@ -1075,9 +1090,9 @@ static inline void antic_mode_7(address_space &space, VIDEO *video, int bytes, i
 /*************  ANTIC mode 08: *********************************
  * graphics mode 8x8:4 (8/10/12 byte per line)
  ***************************************************************/
-#define MODE8(s) COPY16(dst, antic.pf_210b4[video->data[s]],antic.pf_210b4[video->data[s]+1],antic.pf_210b4[video->data[s]+2],antic.pf_210b4[video->data[s]+3])
+#define MODE8(s) COPY16(dst, m_pf_210b4[video->data[s]],m_pf_210b4[video->data[s]+1],m_pf_210b4[video->data[s]+2],m_pf_210b4[video->data[s]+3])
 
-static inline void antic_mode_8(address_space &space, VIDEO *video, int bytes, int erase)
+inline void antic_device::mode_8(address_space &space, VIDEO *video, int bytes, int erase)
 {
 	PREPARE_GFX8(space, bytes);
 	ERASE(erase);
@@ -1089,9 +1104,9 @@ static inline void antic_mode_8(address_space &space, VIDEO *video, int bytes, i
 /*************  ANTIC mode 09: *********************************
  * graphics mode 4x4:2 (8/10/12 byte per line)
  ***************************************************************/
-#define MODE9(s) COPY8(dst, antic.pf_3210b2[video->data[s]], antic.pf_3210b2[video->data[s]+1])
+#define MODE9(s) COPY8(dst, m_pf_3210b2[video->data[s]], m_pf_3210b2[video->data[s]+1])
 
-static inline void antic_mode_9(address_space &space, VIDEO *video, int bytes, int erase)
+inline void antic_device::mode_9(address_space &space, VIDEO *video, int bytes, int erase)
 {
 	PREPARE_GFX9BC(space, bytes);
 	ERASE(erase);
@@ -1103,9 +1118,9 @@ static inline void antic_mode_9(address_space &space, VIDEO *video, int bytes, i
 /*************  ANTIC mode 0A: *********************************
  * graphics mode 4x4:4 (16/20/24 byte per line)
  ***************************************************************/
-#define MODEA(s) COPY8(dst, antic.pf_210b2[video->data[s]], antic.pf_210b2[video->data[s]+1])
+#define MODEA(s) COPY8(dst, m_pf_210b2[video->data[s]], m_pf_210b2[video->data[s]+1])
 
-static inline void antic_mode_a(address_space &space, VIDEO *video, int bytes, int erase)
+inline void antic_device::mode_a(address_space &space, VIDEO *video, int bytes, int erase)
 {
 	PREPARE_GFXA(space, bytes);
 	ERASE(erase);
@@ -1117,9 +1132,9 @@ static inline void antic_mode_a(address_space &space, VIDEO *video, int bytes, i
 /*************  ANTIC mode 0B: *********************************
  * graphics mode 2x2:2 (16/20/24 byte per line)
  ***************************************************************/
-#define MODEB(s) COPY8(dst, antic.pf_3210b2[video->data[s]], antic.pf_3210b2[video->data[s]+1])
+#define MODEB(s) COPY8(dst, m_pf_3210b2[video->data[s]], m_pf_3210b2[video->data[s]+1])
 
-static inline void antic_mode_b(address_space &space, VIDEO *video, int bytes, int erase)
+inline void antic_device::mode_b(address_space &space, VIDEO *video, int bytes, int erase)
 {
 	PREPARE_GFX9BC(space, bytes);
 	ERASE(erase);
@@ -1131,9 +1146,9 @@ static inline void antic_mode_b(address_space &space, VIDEO *video, int bytes, i
 /*************  ANTIC mode 0C: *********************************
  * graphics mode 2x1:2 (16/20/24 byte per line)
  ***************************************************************/
-#define MODEC(s) COPY8(dst, antic.pf_3210b2[video->data[s]], antic.pf_3210b2[video->data[s]+1])
+#define MODEC(s) COPY8(dst, m_pf_3210b2[video->data[s]], m_pf_3210b2[video->data[s]+1])
 
-static inline void antic_mode_c(address_space &space, VIDEO *video, int bytes, int erase)
+inline void antic_device::mode_c(address_space &space, VIDEO *video, int bytes, int erase)
 {
 	PREPARE_GFX9BC(space, bytes);
 	ERASE(erase);
@@ -1145,9 +1160,9 @@ static inline void antic_mode_c(address_space &space, VIDEO *video, int bytes, i
 /*************  ANTIC mode 0D: *********************************
  * graphics mode 2x2:4 (32/40/48 byte per line)
  ***************************************************************/
-#define MODED(s) COPY4(dst, antic.pf_x10b[video->data[s]])
+#define MODED(s) COPY4(dst, m_pf_x10b[video->data[s]])
 
-static inline void antic_mode_d(address_space &space, VIDEO *video, int bytes, int erase)
+inline void antic_device::mode_d(address_space &space, VIDEO *video, int bytes, int erase)
 {
 	PREPARE_GFXDE(space, bytes);
 	ERASE(erase);
@@ -1159,9 +1174,9 @@ static inline void antic_mode_d(address_space &space, VIDEO *video, int bytes, i
 /*************  ANTIC mode 0E: *********************************
  * graphics mode 2x1:4 (32/40/48 byte per line)
  ***************************************************************/
-#define MODEE(s) COPY4(dst, antic.pf_x10b[video->data[s]])
+#define MODEE(s) COPY4(dst, m_pf_x10b[video->data[s]])
 
-static inline void antic_mode_e(address_space &space, VIDEO *video, int bytes, int erase)
+inline void antic_device::mode_e(address_space &space, VIDEO *video, int bytes, int erase)
 {
 	PREPARE_GFXDE(space, bytes);
 	ERASE(erase);
@@ -1173,9 +1188,9 @@ static inline void antic_mode_e(address_space &space, VIDEO *video, int bytes, i
 /*************  ANTIC mode 0F: *********************************
  * graphics mode 1x1:2 (32/40/48 byte per line)
  ***************************************************************/
-#define MODEF(s) COPY4(dst, antic.pf_1b[video->data[s]])
+#define MODEF(s) COPY4(dst, m_pf_1b[video->data[s]])
 
-static inline void antic_mode_f(address_space &space, VIDEO *video, int bytes, int erase)
+inline void antic_device::mode_f(address_space &space, VIDEO *video, int bytes, int erase)
 {
 	PREPARE_GFXF(space, bytes);
 	ERASE(erase);
@@ -1187,9 +1202,9 @@ static inline void antic_mode_f(address_space &space, VIDEO *video, int bytes, i
 /*************  ANTIC mode 0F : GTIA mode 1 ********************
  * graphics mode 8x1:16 (32/40/48 byte per line)
  ***************************************************************/
-#define GTIA1(s) COPY4(dst, antic.pf_gtia1[video->data[s]])
+#define GTIA1(s) COPY4(dst, m_pf_gtia1[video->data[s]])
 
-static inline void antic_mode_gtia1(address_space &space, VIDEO *video, int bytes, int erase)
+inline void antic_device::mode_gtia1(address_space &space, VIDEO *video, int bytes, int erase)
 {
 	PREPARE_GFXG1(space, bytes);
 	ERASE(erase);
@@ -1201,9 +1216,9 @@ static inline void antic_mode_gtia1(address_space &space, VIDEO *video, int byte
 /*************  ANTIC mode 0F : GTIA mode 2 ********************
  * graphics mode 8x1:16 (32/40/48 byte per line)
  ***************************************************************/
-#define GTIA2(s) COPY4(dst, antic.pf_gtia2[video->data[s]])
+#define GTIA2(s) COPY4(dst, m_pf_gtia2[video->data[s]])
 
-static inline void antic_mode_gtia2(address_space &space, VIDEO *video, int bytes, int erase)
+inline void antic_device::mode_gtia2(address_space &space, VIDEO *video, int bytes, int erase)
 {
 	PREPARE_GFXG2(space, bytes);
 	ERASE(erase);
@@ -1215,9 +1230,9 @@ static inline void antic_mode_gtia2(address_space &space, VIDEO *video, int byte
 /*************  ANTIC mode 0F : GTIA mode 3 ********************
  * graphics mode 8x1:16 (32/40/48 byte per line)
  ***************************************************************/
-#define GTIA3(s) COPY4(dst, antic.pf_gtia3[video->data[s]])
+#define GTIA3(s) COPY4(dst, m_pf_gtia3[video->data[s]])
 
-static inline void antic_mode_gtia3(address_space &space, VIDEO *video, int bytes, int erase)
+inline void antic_device::mode_gtia3(address_space &space, VIDEO *video, int bytes, int erase)
 {
 	PREPARE_GFXG3(space, bytes);
 	ERASE(erase);
@@ -1229,14 +1244,14 @@ static inline void antic_mode_gtia3(address_space &space, VIDEO *video, int byte
 
 /*************  ANTIC render ********************/
 
-void antic_render(address_space &space, int param1, int param2, int param3)
+void antic_device::render(address_space &space, int param1, int param2, int param3)
 {
-	VIDEO *video = antic.video[antic.scanline];
+	VIDEO *video = m_video[m_scanline];
 	int add_bytes = 0, erase = 0;
 	
 	if (param3 == 0 || param2 <= 1)
 	{
-		antic_mode_0_xx(space, video);
+		mode_0(space, video);
 		return;
 	}
 	
@@ -1262,55 +1277,55 @@ void antic_render(address_space &space, int param1, int param2, int param3)
 	switch (param2)
 	{
 		case 0x02:
-			antic_mode_2(space, video, add_bytes, erase);
+			mode_2(space, video, add_bytes, erase);
 			return;
 		case 0x03:
-			antic_mode_3(space, video, add_bytes, erase);
+			mode_3(space, video, add_bytes, erase);
 			return;
 		case 0x04:
-			antic_mode_4(space, video, add_bytes, erase);
+			mode_4(space, video, add_bytes, erase);
 			return;
 		case 0x05:
-			antic_mode_5(space, video, add_bytes, erase);
+			mode_5(space, video, add_bytes, erase);
 			return;
 		case 0x06:
-			antic_mode_6(space, video, add_bytes >> 1, erase);
+			mode_6(space, video, add_bytes >> 1, erase);
 			return;
 		case 0x07:
-			antic_mode_7(space, video, add_bytes >> 1, erase);
+			mode_7(space, video, add_bytes >> 1, erase);
 			return;
 		case 0x08:
-			antic_mode_8(space, video, add_bytes >> 2, erase);
+			mode_8(space, video, add_bytes >> 2, erase);
 			return;
 		case 0x09:
-			antic_mode_9(space, video, add_bytes >> 1, erase);
+			mode_9(space, video, add_bytes >> 1, erase);
 			return;
 		case 0x0a:
-			antic_mode_a(space, video, add_bytes >> 1, erase);
+			mode_a(space, video, add_bytes >> 1, erase);
 			return;
 		case 0x0b:
-			antic_mode_b(space, video, add_bytes >> 1, erase);
+			mode_b(space, video, add_bytes >> 1, erase);
 			return;
 		case 0x0c:
-			antic_mode_c(space, video, add_bytes >> 1, erase);
+			mode_c(space, video, add_bytes >> 1, erase);
 			return;
 		case 0x0d:
-			antic_mode_d(space, video, add_bytes, erase);
+			mode_d(space, video, add_bytes, erase);
 			return;
 		case 0x0e:
-			antic_mode_e(space, video, add_bytes, erase);
+			mode_e(space, video, add_bytes, erase);
 			return;
 		case 0x0f:
-			antic_mode_f(space, video, add_bytes, erase);
+			mode_f(space, video, add_bytes, erase);
 			return;
 		case 0x10:
-			antic_mode_gtia1(space, video, add_bytes, erase);
+			mode_gtia1(space, video, add_bytes, erase);
 			return;
 		case 0x11:
-			antic_mode_gtia2(space, video, add_bytes, erase);
+			mode_gtia2(space, video, add_bytes, erase);
 			return;
 		case 0x12:
-			antic_mode_gtia3(space, video, add_bytes, erase);
+			mode_gtia3(space, video, add_bytes, erase);
 			return;
 		default:
 			return;
@@ -1318,24 +1333,23 @@ void antic_render(address_space &space, int param1, int param2, int param3)
 }
 
 
-
 /************************************************************************
  * atari_vh_screenrefresh
  * Refresh screen bitmap.
  * Note: Actual drawing is done scanline wise during atari_interrupt
  ************************************************************************/
-UINT32 atari_common_state::screen_update_atari(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 antic_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	UINT32 new_tv_artifacts = screen.ioport("artifacts")->read_safe(0);
-	copybitmap(bitmap, *antic.bitmap, 0, 0, 0, 0, cliprect);
+	copybitmap(bitmap, *m_bitmap, 0, 0, 0, 0, cliprect);
 	
-	if (tv_artifacts != new_tv_artifacts)
-		tv_artifacts = new_tv_artifacts;
+	if (m_tv_artifacts != new_tv_artifacts)
+		m_tv_artifacts = new_tv_artifacts;
 	
 	return 0;
 }
 
-void atari_common_state::artifacts_gfx(UINT8 *src, UINT8 *dst, int width)
+void antic_device::artifacts_gfx(UINT8 *src, UINT8 *dst, int width)
 {
 	UINT8 n, bits = 0;
 	UINT8 b = m_gtia->get_w_colbk() & 0xf0;
@@ -1409,7 +1423,7 @@ void atari_common_state::artifacts_gfx(UINT8 *src, UINT8 *dst, int width)
 	}
 }
 
-void atari_common_state::artifacts_txt(UINT8 * src, UINT8 * dst, int width)
+void antic_device::artifacts_txt(UINT8 * src, UINT8 * dst, int width)
 {
 	UINT8 n, bits = 0;
 	UINT8 b = m_gtia->get_w_colpf2() & 0xf0;
@@ -1484,7 +1498,7 @@ void atari_common_state::artifacts_txt(UINT8 * src, UINT8 * dst, int width)
 }
 
 
-void atari_common_state::antic_linerefresh()
+void antic_device::linerefresh()
 {
 	int x, y;
 	UINT8 *src;
@@ -1493,31 +1507,31 @@ void atari_common_state::antic_linerefresh()
 	UINT16 *color_lookup = m_gtia->get_color_lookup();
 	
 	/* increment the scanline */
-	if( ++antic.scanline == machine().first_screen()->height() )
+	if( ++m_scanline == machine().first_screen()->height() )
 	{
 		/* and return to the top if the frame was complete */
-		antic.scanline = 0;
-		antic.modelines = 0;
+		m_scanline = 0;
+		m_modelines = 0;
 		/* count frames gone since last write to hitclr */
 		m_gtia->count_hitclr_frames();
 	}
 	
-	if( antic.scanline < MIN_Y || antic.scanline > MAX_Y )
+	if( m_scanline < MIN_Y || m_scanline > MAX_Y )
 		return;
 	
-	y = antic.scanline - MIN_Y;
-	src = &antic.cclock[PMOFFSET - antic.hscrol_old + 12];
+	y = m_scanline - MIN_Y;
+	src = &m_cclock[PMOFFSET - m_hscrol_old + 12];
 	dst = scanline;
 	
-	if( tv_artifacts )
+	if( m_tv_artifacts )
 	{
-		if( (antic.cmd & 0x0f) == 2 || (antic.cmd & 0x0f) == 3 )
+		if( (m_cmd & 0x0f) == 2 || (m_cmd & 0x0f) == 3 )
 		{
 			artifacts_txt(src, (UINT8*)(dst + 3), HCHARS);
 			return;
 		}
 		else
-			if( (antic.cmd & 0x0f) == 15 )
+			if( (m_cmd & 0x0f) == 15 )
 			{
 				artifacts_gfx(src, (UINT8*)(dst + 3), HCHARS);
 				return;
@@ -1526,7 +1540,7 @@ void atari_common_state::antic_linerefresh()
 	dst[0] = color_lookup[PBK] | color_lookup[PBK] << 16;
 	dst[1] = color_lookup[PBK] | color_lookup[PBK] << 16;
 	dst[2] = color_lookup[PBK] | color_lookup[PBK] << 16;
-	if ( (antic.cmd & ANTIC_HSCR) == 0  || (antic.pfwidth == 48) || (antic.pfwidth == 32))
+	if ( (m_cmd & ANTIC_HSCR) == 0  || (m_pfwidth == 48) || (m_pfwidth == 32))
 	{
 		/* no hscroll */
 		dst[3] = color_lookup[src[BYTE_XOR_LE(0)]] | color_lookup[src[BYTE_XOR_LE(1)]] << 16;
@@ -1544,7 +1558,7 @@ void atari_common_state::antic_linerefresh()
 	{
 		/* if hscroll is enabled, more data are fetched by ANTIC, but it still renders playfield
 		 of width defined by pfwidth. */
-		switch( antic.pfwidth )
+		switch( m_pfwidth )
 		{
 			case 0:
 			{
@@ -1590,43 +1604,43 @@ void atari_common_state::antic_linerefresh()
 	dst[2] = color_lookup[PBK] | color_lookup[PBK] << 16;
 	dst[3] = color_lookup[PBK] | color_lookup[PBK] << 16;
 	
-	draw_scanline8(*antic.bitmap, 12, y, MIN(antic.bitmap->width() - 12, sizeof(scanline)), (const UINT8 *) scanline, NULL);
+	draw_scanline8(*m_bitmap, 12, y, MIN(m_bitmap->width() - 12, sizeof(scanline)), (const UINT8 *) scanline, NULL);
 }
 
 
 #define ANTIC_TIME_FROM_CYCLES(cycles)	\
 (attotime)(machine().first_screen()->scan_period() * (cycles) / CYCLES_PER_LINE)
 
-void atari_common_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void antic_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
 	switch (id)
 	{
 		case TIMER_CYCLE_STEAL:
-			antic_steal_cycles(ptr, param);
+			steal_cycles(ptr, param);
 			break;
 		case TIMER_ISSUE_DLI:
-			antic_issue_dli(ptr, param);
+			issue_dli(ptr, param);
 			break;
 		case TIMER_LINE_REND:
-			antic_scanline_render(ptr, param);
+			scanline_render(ptr, param);
 			break;
 		case TIMER_LINE_DONE:
-			antic_line_done(ptr, param);
+			line_done(ptr, param);
 			break;
 	}
 }
 
-int atari_common_state::cycle()
+int antic_device::cycle()
 {
 	return machine().first_screen()->hpos() * CYCLES_PER_LINE / machine().first_screen()->width();
 }
 
-TIMER_CALLBACK_MEMBER( atari_common_state::antic_issue_dli )
+TIMER_CALLBACK_MEMBER( antic_device::issue_dli )
 {
-	if( antic.w.nmien & DLI_NMI )
+	if( m_w.nmien & DLI_NMI )
 	{
 		LOG(("           @cycle #%3d issue DLI\n", cycle()));
-		antic.r.nmist |= DLI_NMI;
+		m_r.nmist |= DLI_NMI;
 		machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	}
 	else
@@ -1641,23 +1655,23 @@ TIMER_CALLBACK_MEMBER( atari_common_state::antic_issue_dli )
  *  Antic Line Done
  *
  *****************************************************************************/
-TIMER_CALLBACK_MEMBER( atari_common_state::antic_line_done )
+TIMER_CALLBACK_MEMBER( antic_device::line_done )
 {
-	LOG(("           @cycle #%3d antic_line_done\n", cycle()));
-	if( antic.w.wsync )
+	LOG(("           @cycle #%3d line_done\n", cycle()));
+	if( m_w.wsync )
 	{
 		LOG(("           @cycle #%3d release WSYNC\n", cycle()));
 		/* release the CPU if it was actually waiting for HSYNC */
 		machine().scheduler().trigger(TRIGGER_HSYNC);
 		/* and turn off the 'wait for hsync' flag */
-		antic.w.wsync = 0;
+		m_w.wsync = 0;
 	}
 	LOG(("           @cycle #%3d release CPU\n", cycle()));
 	/* release the CPU (held for emulating cycles stolen by ANTIC DMA) */
 	machine().scheduler().trigger(TRIGGER_STEAL);
 	
 	/* refresh the display (translate color clocks to pixels) */
-	antic_linerefresh();
+	linerefresh();
 }
 
 /*****************************************************************************
@@ -1669,11 +1683,11 @@ TIMER_CALLBACK_MEMBER( atari_common_state::antic_line_done )
  *  TRIGGER_HSYNC if WSYNC (D01A) was accessed
  *
  *****************************************************************************/
-TIMER_CALLBACK_MEMBER( atari_common_state::antic_steal_cycles )
+TIMER_CALLBACK_MEMBER( antic_device::steal_cycles )
 {
-	LOG(("           @cycle #%3d steal %d cycles\n", cycle(), antic.steal_cycles));
-	timer_set(ANTIC_TIME_FROM_CYCLES(antic.steal_cycles), TIMER_LINE_DONE);
-	antic.steal_cycles = 0;
+	LOG(("           @cycle #%3d steal %d cycles\n", cycle(), m_steal_cycles));
+	timer_set(ANTIC_TIME_FROM_CYCLES(m_steal_cycles), TIMER_LINE_DONE);
+	m_steal_cycles = 0;
 	machine().device("maincpu")->execute().spin_until_trigger(TRIGGER_STEAL);
 }
 
@@ -1686,30 +1700,30 @@ TIMER_CALLBACK_MEMBER( atari_common_state::antic_steal_cycles )
  *  of the GTIA if enabled (DMA_PLAYER or DMA_MISSILE)
  *
  *****************************************************************************/
-TIMER_CALLBACK_MEMBER( atari_common_state::antic_scanline_render )
+TIMER_CALLBACK_MEMBER( antic_device::scanline_render )
 {
 	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 	
-	LOG(("           @cycle #%3d render mode $%X lines to go #%d\n", cycle(), (antic.cmd & 0x0f), antic.modelines));
+	LOG(("           @cycle #%3d render mode $%X lines to go #%d\n", cycle(), (m_cmd & 0x0f), m_modelines));
 	
-	antic_render(space, m_antic_render1, m_antic_render2, m_antic_render3);
+	render(space, m_render1, m_render2, m_render3);
 	
 	/* if player/missile graphics is enabled */
-	if( antic.scanline < 256 && (antic.w.dmactl & (DMA_PLAYER|DMA_MISSILE)) )
+	if( m_scanline < 256 && (m_w.dmactl & (DMA_PLAYER|DMA_MISSILE)) )
 	{
 		/* new player/missile graphics data for every scanline ? */
-		if( antic.w.dmactl & DMA_PM_DBLLINE )
+		if( m_w.dmactl & DMA_PM_DBLLINE )
 		{
 			/* transport missile data to GTIA ? */
-			if( antic.w.dmactl & DMA_MISSILE )
+			if( m_w.dmactl & DMA_MISSILE )
 			{
-				antic.steal_cycles += 1;
+				m_steal_cycles += 1;
 				m_gtia->write(space, 0x11, RDPMGFXD(space, 3*256));
 			}
 			/* transport player data to GTIA ? */
-			if( antic.w.dmactl & DMA_PLAYER )
+			if( m_w.dmactl & DMA_PLAYER )
 			{
-				antic.steal_cycles += 4;
+				m_steal_cycles += 4;
 				m_gtia->write(space, 0x0d, RDPMGFXD(space, 4*256));
 				m_gtia->write(space, 0x0e, RDPMGFXD(space, 5*256));
 				m_gtia->write(space, 0x0f, RDPMGFXD(space, 6*256));
@@ -1719,17 +1733,17 @@ TIMER_CALLBACK_MEMBER( atari_common_state::antic_scanline_render )
 		else
 		{
 			/* transport missile data to GTIA ? */
-			if( antic.w.dmactl & DMA_MISSILE )
+			if( m_w.dmactl & DMA_MISSILE )
 			{
-				if( (antic.scanline & 1) == 0 )      /* even line ? */
-					antic.steal_cycles += 1;
+				if( (m_scanline & 1) == 0 )      /* even line ? */
+					m_steal_cycles += 1;
 				m_gtia->write(space, 0x11, RDPMGFXS(space, 3*128));
 			}
 			/* transport player data to GTIA ? */
-			if( antic.w.dmactl & DMA_PLAYER )
+			if( m_w.dmactl & DMA_PLAYER )
 			{
-				if( (antic.scanline & 1) == 0 )      /* even line ? */
-					antic.steal_cycles += 4;
+				if( (m_scanline & 1) == 0 )      /* even line ? */
+					m_steal_cycles += 4;
 				m_gtia->write(space, 0x0d, RDPMGFXS(space, 4*128));
 				m_gtia->write(space, 0x0e, RDPMGFXS(space, 5*128));
 				m_gtia->write(space, 0x0f, RDPMGFXS(space, 6*128));
@@ -1738,17 +1752,17 @@ TIMER_CALLBACK_MEMBER( atari_common_state::antic_scanline_render )
 		}
 	}
 	
-	if (antic.scanline >= VBL_END && antic.scanline < 256)
-		m_gtia->render((UINT8 *)antic.pmbits + PMOFFSET, (UINT8 *)antic.cclock + PMOFFSET - antic.hscrol_old, (UINT8 *)antic.prio_table[m_gtia->get_w_prior() & 0x3f], (UINT8 *)&antic.pmbits);
+	if (m_scanline >= VBL_END && m_scanline < 256)
+		m_gtia->render((UINT8 *)m_pmbits + PMOFFSET, (UINT8 *)m_cclock + PMOFFSET - m_hscrol_old, (UINT8 *)m_prio_table[m_gtia->get_w_prior() & 0x3f], (UINT8 *)&m_pmbits);
 	
-	antic.steal_cycles += CYCLES_REFRESH;
-	LOG(("           run CPU for %d cycles\n", CYCLES_HSYNC - CYCLES_HSTART - antic.steal_cycles));
-	timer_set(ANTIC_TIME_FROM_CYCLES(CYCLES_HSYNC - CYCLES_HSTART - antic.steal_cycles), TIMER_CYCLE_STEAL);
+	m_steal_cycles += CYCLES_REFRESH;
+	LOG(("           run CPU for %d cycles\n", CYCLES_HSYNC - CYCLES_HSTART - m_steal_cycles));
+	timer_set(ANTIC_TIME_FROM_CYCLES(CYCLES_HSYNC - CYCLES_HSTART - m_steal_cycles), TIMER_CYCLE_STEAL);
 }
 
 
 
-void atari_common_state::LMS(int new_cmd)
+void antic_device::LMS(int new_cmd)
 {
 	/**************************************************************
 	 * If the LMS bit (load memory scan) of the current display
@@ -1760,14 +1774,14 @@ void atari_common_state::LMS(int new_cmd)
 	{
 		address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 		int addr = RDANTIC(space);
-		antic.doffs = (antic.doffs + 1) & DOFFS;
+		m_doffs = (m_doffs + 1) & DOFFS;
 		addr += 256 * RDANTIC(space);
-		antic.doffs = (antic.doffs + 1) & DOFFS;
-		antic.vpage = addr & VPAGE;
-		antic.voffs = addr & VOFFS;
+		m_doffs = (m_doffs + 1) & DOFFS;
+		m_vpage = addr & VPAGE;
+		m_voffs = addr & VOFFS;
 		LOG(("           LMS $%04x\n", addr));
 		/* steal two more clock cycles from the cpu */
-		antic.steal_cycles += 2;
+		m_steal_cycles += 2;
 	}
 }
 
@@ -1781,71 +1795,71 @@ void atari_common_state::LMS(int new_cmd)
  *  if so, read a new command and set up the renderer function
  *
  *****************************************************************************/
-void atari_common_state::antic_scanline_dma(int param)
+void antic_device::scanline_dma(int param)
 {
 	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 	LOG(("           @cycle #%3d DMA fetch\n", cycle()));
-	if (antic.scanline == VBL_END)
-		antic.r.nmist &= ~VBL_NMI;
-	if( antic.w.dmactl & DMA_ANTIC )
+	if (m_scanline == VBL_END)
+		m_r.nmist &= ~VBL_NMI;
+	if( m_w.dmactl & DMA_ANTIC )
 	{
-		if( antic.scanline >= VBL_END && antic.scanline < VBL_START )
+		if( m_scanline >= VBL_END && m_scanline < VBL_START )
 		{
-			if( antic.modelines <= 0 )
+			if( m_modelines <= 0 )
 			{
-				m_antic_render1 = 0;
-				m_antic_render3 = antic.w.dmactl & 3;
+				m_render1 = 0;
+				m_render3 = m_w.dmactl & 3;
 				UINT8 vscrol_subtract = 0;
 				UINT8 new_cmd;
 				
 				new_cmd = RDANTIC(space);
-				antic.doffs = (antic.doffs + 1) & DOFFS;
+				m_doffs = (m_doffs + 1) & DOFFS;
 				/* steal at one clock cycle from the CPU for fetching the command */
-				antic.steal_cycles += 1;
+				m_steal_cycles += 1;
 				LOG(("           ANTIC CMD $%02x\n", new_cmd));
 				/* command 1 .. 15 ? */
 				if (new_cmd & ANTIC_MODE)
 				{
-					antic.w.chbasl = 0;
+					m_w.chbasl = 0;
 					/* vertical scroll mode changed ? */
-					if( (antic.cmd ^ new_cmd) & ANTIC_VSCR )
+					if( (m_cmd ^ new_cmd) & ANTIC_VSCR )
 					{
 						/* vertical scroll activate now ? */
 						if( new_cmd & ANTIC_VSCR )
 						{
-							antic.vscrol_old =
+							m_vscrol_old =
 							vscrol_subtract =
-							antic.w.chbasl = antic.w.vscrol;
+							m_w.chbasl = m_w.vscrol;
 						}
 						else
 						{
-							vscrol_subtract = ~antic.vscrol_old;
+							vscrol_subtract = ~m_vscrol_old;
 						}
 					}
 					/* does this command have horizontal scroll enabled ? */
 					if( new_cmd & ANTIC_HSCR )
 					{
-						m_antic_render1 = 1;
-						antic.hscrol_old = antic.w.hscrol;
+						m_render1 = 1;
+						m_hscrol_old = m_w.hscrol;
 					}
 					else
 					{
-						antic.hscrol_old = 0;
+						m_hscrol_old = 0;
 					}
 				}
 				/* Set the ANTIC mode renderer function */
-				m_antic_render2 = new_cmd & ANTIC_MODE;
+				m_render2 = new_cmd & ANTIC_MODE;
 				
 				switch( new_cmd & ANTIC_MODE )
 				{
 					case 0x00:
 						/* generate 1 .. 8 empty lines */
-						antic.modelines = ((new_cmd >> 4) & 7) + 1;
+						m_modelines = ((new_cmd >> 4) & 7) + 1;
 						/* did the last ANTIC command have vertical scroll enabled ? */
-						if( antic.cmd & ANTIC_VSCR )
+						if( m_cmd & ANTIC_VSCR )
 						{
 							/* yes, generate vscrol_old additional empty lines */
-							antic.modelines += antic.vscrol_old;
+							m_modelines += m_vscrol_old;
 						}
 						/* leave only bit 7 (DLI) set in ANTIC command */
 						new_cmd &= ANTIC_DLI;
@@ -1862,97 +1876,97 @@ void atari_common_state::antic_scanline_dma(int param)
 						if( new_cmd & ANTIC_LMS )
 						{
 							int addr = RDANTIC(space);
-							antic.doffs = (antic.doffs + 1) & DOFFS;
+							m_doffs = (m_doffs + 1) & DOFFS;
 							addr += 256 * RDANTIC(space);
-							antic.dpage = addr & DPAGE;
-							antic.doffs = addr & DOFFS;
+							m_dpage = addr & DPAGE;
+							m_doffs = addr & DOFFS;
 							/* produce empty scanlines until vblank start */
-							antic.modelines = VBL_START + 1 - antic.scanline;
-							if( antic.modelines < 0 )
-								antic.modelines = machine().first_screen()->height() - antic.scanline;
-							LOG(("           JVB $%04x\n", antic.dpage|antic.doffs));
+							m_modelines = VBL_START + 1 - m_scanline;
+							if( m_modelines < 0 )
+								m_modelines = machine().first_screen()->height() - m_scanline;
+							LOG(("           JVB $%04x\n", m_dpage|m_doffs));
 						}
 						else
 						{
 							int addr = RDANTIC(space);
-							antic.doffs = (antic.doffs + 1) & DOFFS;
+							m_doffs = (m_doffs + 1) & DOFFS;
 							addr += 256 * RDANTIC(space);
-							antic.dpage = addr & DPAGE;
-							antic.doffs = addr & DOFFS;
+							m_dpage = addr & DPAGE;
+							m_doffs = addr & DOFFS;
 							/* produce a single empty scanline */
-							antic.modelines = 1;
-							LOG(("           JMP $%04x\n", antic.dpage|antic.doffs));
+							m_modelines = 1;
+							LOG(("           JMP $%04x\n", m_dpage|m_doffs));
 						}
 						break;
 					case 0x02:
 						LMS(new_cmd);
-						antic.chbase = (antic.w.chbash & 0xfc) << 8;
-						antic.modelines = 8 - (vscrol_subtract & 7);
-						if( antic.w.chactl & 4 )    /* decrement chbasl? */
-							antic.w.chbasl = antic.modelines - 1;
+						m_chbase = (m_w.chbash & 0xfc) << 8;
+						m_modelines = 8 - (vscrol_subtract & 7);
+						if( m_w.chactl & 4 )    /* decrement chbasl? */
+							m_w.chbasl = m_modelines - 1;
 						break;
 					case 0x03:
 						LMS(new_cmd);
-						antic.chbase = (antic.w.chbash & 0xfc) << 8;
-						antic.modelines = 10 - (vscrol_subtract & 9);
-						if( antic.w.chactl & 4 )    /* decrement chbasl? */
-							antic.w.chbasl = antic.modelines - 1;
+						m_chbase = (m_w.chbash & 0xfc) << 8;
+						m_modelines = 10 - (vscrol_subtract & 9);
+						if( m_w.chactl & 4 )    /* decrement chbasl? */
+							m_w.chbasl = m_modelines - 1;
 						break;
 					case 0x04:
 						LMS(new_cmd);
-						antic.chbase = (antic.w.chbash & 0xfc) << 8;
-						antic.modelines = 8 - (vscrol_subtract & 7);
-						if( antic.w.chactl & 4 )    /* decrement chbasl? */
-							antic.w.chbasl = antic.modelines - 1;
+						m_chbase = (m_w.chbash & 0xfc) << 8;
+						m_modelines = 8 - (vscrol_subtract & 7);
+						if( m_w.chactl & 4 )    /* decrement chbasl? */
+							m_w.chbasl = m_modelines - 1;
 						break;
 					case 0x05:
 						LMS(new_cmd);
-						antic.chbase = (antic.w.chbash & 0xfc) << 8;
-						antic.modelines = 16 - (vscrol_subtract & 15);
-						if( antic.w.chactl & 4 )    /* decrement chbasl? */
-							antic.w.chbasl = antic.modelines - 1;
+						m_chbase = (m_w.chbash & 0xfc) << 8;
+						m_modelines = 16 - (vscrol_subtract & 15);
+						if( m_w.chactl & 4 )    /* decrement chbasl? */
+							m_w.chbasl = m_modelines - 1;
 						break;
 					case 0x06:
 						LMS(new_cmd);
-						antic.chbase = (antic.w.chbash & 0xfe) << 8;
-						antic.modelines = 8 - (vscrol_subtract & 7);
-						if( antic.w.chactl & 4 )    /* decrement chbasl? */
-							antic.w.chbasl = antic.modelines - 1;
+						m_chbase = (m_w.chbash & 0xfe) << 8;
+						m_modelines = 8 - (vscrol_subtract & 7);
+						if( m_w.chactl & 4 )    /* decrement chbasl? */
+							m_w.chbasl = m_modelines - 1;
 						break;
 					case 0x07:
 						LMS(new_cmd);
-						antic.chbase = (antic.w.chbash & 0xfe) << 8;
-						antic.modelines = 16 - (vscrol_subtract & 15);
-						if( antic.w.chactl & 4 )    /* decrement chbasl? */
-							antic.w.chbasl = antic.modelines - 1;
+						m_chbase = (m_w.chbash & 0xfe) << 8;
+						m_modelines = 16 - (vscrol_subtract & 15);
+						if( m_w.chactl & 4 )    /* decrement chbasl? */
+							m_w.chbasl = m_modelines - 1;
 						break;
 					case 0x08:
 						LMS(new_cmd);
-						antic.modelines = 8 - (vscrol_subtract & 7);
+						m_modelines = 8 - (vscrol_subtract & 7);
 						break;
 					case 0x09:
 						LMS(new_cmd);
-						antic.modelines = 4 - (vscrol_subtract & 3);
+						m_modelines = 4 - (vscrol_subtract & 3);
 						break;
 					case 0x0a:
 						LMS(new_cmd);
-						antic.modelines = 4 - (vscrol_subtract & 3);
+						m_modelines = 4 - (vscrol_subtract & 3);
 						break;
 					case 0x0b:
 						LMS(new_cmd);
-						antic.modelines = 2 - (vscrol_subtract & 1);
+						m_modelines = 2 - (vscrol_subtract & 1);
 						break;
 					case 0x0c:
 						LMS(new_cmd);
-						antic.modelines = 1;
+						m_modelines = 1;
 						break;
 					case 0x0d:
 						LMS(new_cmd);
-						antic.modelines = 2 - (vscrol_subtract & 1);
+						m_modelines = 2 - (vscrol_subtract & 1);
 						break;
 					case 0x0e:
 						LMS(new_cmd);
-						antic.modelines = 1;
+						m_modelines = 1;
 						break;
 					case 0x0f:
 						LMS(new_cmd);
@@ -1961,38 +1975,83 @@ void atari_common_state::antic_scanline_dma(int param)
 						switch (m_gtia->get_w_prior() >> 6)
 					{
 						case 0: break;
-						case 1: m_antic_render2 = 16;  break;
-						case 2: m_antic_render2 = 17;  break;
-						case 3: m_antic_render2 = 18;  break;
+						case 1: m_render2 = 16;  break;
+						case 2: m_render2 = 17;  break;
+						case 3: m_render2 = 18;  break;
 					}
-						antic.modelines = 1;
+						m_modelines = 1;
 						break;
 				}
 				/* set new (current) antic command */
-				antic.cmd = new_cmd;
+				m_cmd = new_cmd;
 			}
 		}
 		else
 		{
 			LOG(("           out of visible range\n"));
-			antic.cmd = 0x00;
-			m_antic_render1 = 0;
-			m_antic_render2 = 0;
-			m_antic_render3 = 0;
+			m_cmd = 0x00;
+			m_render1 = 0;
+			m_render2 = 0;
+			m_render3 = 0;
 		}
 	}
 	else
 	{
 		LOG(("           DMA is off\n"));
-		antic.cmd = 0x00;
-		m_antic_render1 = 0;
-		m_antic_render2 = 0;
-		m_antic_render3 = 0;
+		m_cmd = 0x00;
+		m_render1 = 0;
+		m_render2 = 0;
+		m_render3 = 0;
 	}
 	
-	antic.r.nmist &= ~DLI_NMI;
-	if (antic.modelines == 1 && (antic.cmd & antic.w.nmien & DLI_NMI))
+	m_r.nmist &= ~DLI_NMI;
+	if (m_modelines == 1 && (m_cmd & m_w.nmien & DLI_NMI))
 		timer_set(ANTIC_TIME_FROM_CYCLES(CYCLES_DLI_NMI), TIMER_ISSUE_DLI);
 	
 	timer_set(ANTIC_TIME_FROM_CYCLES(CYCLES_HSTART), TIMER_LINE_REND);
 }
+
+/*****************************************************************************
+ *
+ *  Generic Atari Interrupt Dispatcher
+ *  This is called once per scanline and handles:
+ *  vertical blank interrupt
+ *  ANTIC DMA to possibly access the next display list command
+ *
+ *****************************************************************************/
+
+void antic_device::generic_interrupt(int button_count)
+{
+	LOG(("ANTIC #%3d @cycle #%d scanline interrupt\n", m_scanline, cycle()));
+	
+	if( m_scanline < VBL_START )
+	{
+		scanline_dma(0);
+		return;
+	}
+	
+	if( m_scanline == VBL_START )
+	{
+		/* specify buttons relevant to this Atari variant */
+		m_gtia->button_interrupt(button_count, machine().root_device().ioport("djoy_b")->read_safe(0));
+		
+		/* do nothing new for the rest of the frame */
+		m_modelines = machine().first_screen()->height() - VBL_START;
+		m_render1 = 0;
+		m_render2 = 0;
+		m_render3 = 0;
+		
+		/* if the CPU want's to be interrupted at vertical blank... */
+		if( m_w.nmien & VBL_NMI )
+		{
+			LOG(("           cause VBL NMI\n"));
+			/* set the VBL NMI status bit */
+			m_r.nmist |= VBL_NMI;
+			machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		}
+	}
+	
+	/* refresh the display (translate color clocks to pixels) */
+	linerefresh();
+}
+

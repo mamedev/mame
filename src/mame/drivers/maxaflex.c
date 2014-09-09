@@ -65,7 +65,6 @@ public:
 	WRITE_LINE_MEMBER(pia_cb2_w) { }  // This is used by Floppy drive on Atari 8bits Home Computers
 	TIMER_DEVICE_CALLBACK_MEMBER(mcu_timer_proc);
 	int atari_input_disabled();
-	virtual void machine_start();
 	virtual void machine_reset();
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_mcu;
@@ -289,7 +288,7 @@ static ADDRESS_MAP_START(a600xl_mem, AS_PROGRAM, 8, maxaflex_state )
 	AM_RANGE(0xd100, 0xd1ff) AM_NOP
 	AM_RANGE(0xd200, 0xd2ff) AM_DEVREADWRITE("pokey", pokey_device, read, write)
 	AM_RANGE(0xd300, 0xd3ff) AM_DEVREADWRITE("pia", pia6821_device, read_alt, write_alt)
-	AM_RANGE(0xd400, 0xd4ff) AM_READWRITE(atari_antic_r, atari_antic_w)
+	AM_RANGE(0xd400, 0xd4ff) AM_DEVREADWRITE("antic", antic_device, read, write)
 	AM_RANGE(0xd500, 0xd7ff) AM_NOP
 	AM_RANGE(0xd800, 0xffff) AM_ROM /* OS */
 ADDRESS_MAP_END
@@ -385,17 +384,10 @@ READ8_MEMBER(maxaflex_state::pia_pb_r)
 }
 
 
-void maxaflex_state::machine_start()
-{
-	/* ANTIC */
-	antic_start(machine());
-}
-
 void maxaflex_state::machine_reset()
 {
 	pokey_device *pokey = machine().device<pokey_device>("pokey");
 	pokey->write(15,0);
-	antic_reset();
 
 	// Supervisor board reset
 	m_portA_in = m_portA_out = m_ddrA = 0;
@@ -426,6 +418,9 @@ static MACHINE_CONFIG_START( maxaflex, maxaflex_state )
 	MCFG_DEVICE_ADD("gtia", ATARI_GTIA, 0)
 	MCFG_GTIA_READ_CB(IOPORT("console"))
 
+	MCFG_DEVICE_ADD("antic", ATARI_ANTIC, 0)
+	MCFG_ANTIC_GTIA("gtia")
+
 	MCFG_DEVICE_ADD("pia", PIA6821, 0)
 	MCFG_PIA_READPA_HANDLER(READ8(maxaflex_state, pia_pa_r))
 	MCFG_PIA_READPB_HANDLER(READ8(maxaflex_state, pia_pb_r))
@@ -440,7 +435,7 @@ static MACHINE_CONFIG_START( maxaflex, maxaflex_state )
 	MCFG_SCREEN_VISIBLE_AREA(MIN_X, MAX_X, MIN_Y, MAX_Y)
 	MCFG_SCREEN_REFRESH_RATE(FRAME_RATE_60HZ)
 	MCFG_SCREEN_SIZE(HWIDTH*8, TOTAL_LINES_60HZ)
-	MCFG_SCREEN_UPDATE_DRIVER(atari_common_state, screen_update_atari)
+	MCFG_SCREEN_UPDATE_DEVICE("antic", antic_device, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 256)

@@ -30,7 +30,6 @@ public:
 		: atari_common_state(mconfig, type, tag),
 		m_maincpu(*this, "maincpu") { }
 
-	virtual void machine_start();
 	virtual void machine_reset();
 	required_device<cpu_device> m_maincpu;
 };
@@ -40,7 +39,7 @@ static ADDRESS_MAP_START(a5200_mem, AS_PROGRAM, 8, bartop52_state )
 	AM_RANGE(0x0000, 0x3fff) AM_RAM
 	AM_RANGE(0x4000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc0ff) AM_DEVREADWRITE("gtia", gtia_device, read, write)
-	AM_RANGE(0xd400, 0xd5ff) AM_READWRITE(atari_antic_r, atari_antic_w)
+	AM_RANGE(0xd400, 0xd5ff) AM_DEVREADWRITE("antic", antic_device, read, write)
 	AM_RANGE(0xe800, 0xe8ff) AM_DEVREADWRITE("pokey", pokey_device, read, write)
 	AM_RANGE(0xf800, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -102,17 +101,10 @@ static INPUT_PORTS_START(bartop52)
 INPUT_PORTS_END
 
 
-void bartop52_state::machine_start()
-{
-	/* ANTIC */
-	antic_start(machine());
-}
-
 void bartop52_state::machine_reset()
 {
 	pokey_device *pokey = machine().device<pokey_device>("pokey");
 	pokey->write(15,0);
-	antic_reset();
 }
 
 
@@ -124,13 +116,16 @@ static MACHINE_CONFIG_START( a5200, bartop52_state )
 
 	MCFG_DEVICE_ADD("gtia", ATARI_GTIA, 0)
 
+	MCFG_DEVICE_ADD("antic", ATARI_ANTIC, 0)
+	MCFG_ANTIC_GTIA("gtia")
+
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(1))
 	MCFG_SCREEN_VISIBLE_AREA(MIN_X, MAX_X, MIN_Y, MAX_Y)
 	MCFG_SCREEN_REFRESH_RATE(FRAME_RATE_60HZ)
 	MCFG_SCREEN_SIZE(HWIDTH*8, TOTAL_LINES_60HZ)
-	MCFG_SCREEN_UPDATE_DRIVER(atari_common_state, screen_update_atari)
+	MCFG_SCREEN_UPDATE_DEVICE("antic", antic_device, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 256)

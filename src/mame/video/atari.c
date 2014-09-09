@@ -8,7 +8,6 @@
 
 #include "emu.h"
 #include "includes/atari.h"
-#include "video/gtia.h"
 
 #define VERBOSE 0
 
@@ -16,7 +15,7 @@
 
 
 /************************************************************************
- * atari_vh_start
+ * video_start
  * Initialize the ATARI800 video emulation
  ************************************************************************/
 
@@ -24,81 +23,35 @@ void atari_common_state::video_start()
 {
 	palette_device *m_palette = machine().first_screen()->palette();
 
-	m_antic_render1 = 0;
-	m_antic_render2 = 0;
-	m_antic_render3 = 0;
-
 	for (int i = 0; i < 256; i++)
 		m_gtia->set_color_lookup(i, (m_palette->pen(0) << 8) + m_palette->pen(0));
-	
-	antic_vstart(machine());
 }
 
 
-/*****************************************************************************
+/**************************************************************
  *
- *  Generic Atari Interrupt Dispatcher
- *  This is called once per scanline and handles:
- *  vertical blank interrupt
- *  ANTIC DMA to possibly access the next display list command
+ * Interrupts
  *
- *****************************************************************************/
-
-void atari_common_state::generic_atari_interrupt(int button_count)
-{
-	LOG(("ANTIC #%3d @cycle #%d scanline interrupt\n", antic.scanline, cycle()));
-
-	if( antic.scanline < VBL_START )
-	{
-		antic_scanline_dma(0);
-		return;
-	}
-
-	if( antic.scanline == VBL_START )
-	{
-		/* specify buttons relevant to this Atari variant */
-		m_gtia->button_interrupt(button_count, machine().root_device().ioport("djoy_b")->read_safe(0));
-
-		/* do nothing new for the rest of the frame */
-		antic.modelines = machine().first_screen()->height() - VBL_START;
-		m_antic_render1 = 0;
-		m_antic_render2 = 0;
-		m_antic_render3 = 0;
-		
-		/* if the CPU want's to be interrupted at vertical blank... */
-		if( antic.w.nmien & VBL_NMI )
-		{
-			LOG(("           cause VBL NMI\n"));
-			/* set the VBL NMI status bit */
-			antic.r.nmist |= VBL_NMI;
-			machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-		}
-	}
-
-	/* refresh the display (translate color clocks to pixels) */
-	antic_linerefresh();
-}
-
-
+ **************************************************************/
 
 TIMER_DEVICE_CALLBACK_MEMBER( atari_common_state::a400_interrupt )
 {
-	generic_atari_interrupt(4);
+	m_antic->generic_interrupt(4);
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER( atari_common_state::a800_interrupt )
 {
-	generic_atari_interrupt(4);
+	m_antic->generic_interrupt(4);
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER( atari_common_state::a800xl_interrupt )
 {
-	generic_atari_interrupt(2);
+	m_antic->generic_interrupt(2);
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER( atari_common_state::a5200_interrupt )
 {
-	generic_atari_interrupt(4);
+	m_antic->generic_interrupt(4);
 }
 
 /**************************************************************

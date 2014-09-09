@@ -263,7 +263,7 @@ public:
 
 	DECLARE_MACHINE_RESET(a400);
 
-	DECLARE_WRITE8_MEMBER(gtia_write);
+	DECLARE_WRITE8_MEMBER(gtia_cb);
 
 	DECLARE_WRITE8_MEMBER(a600xl_pia_pb_w);
 	DECLARE_WRITE8_MEMBER(a800xl_pia_pb_w);
@@ -304,10 +304,6 @@ protected:
 	
 	void setup_ram(int bank,UINT32 size);
 	void setup_cart(a800_cart_slot_device *slot);
-
-	// start helper (until GTIA & ANTIC are device-fied)
-	void common_start();
-	void a5200_start();
 };
 
 
@@ -535,7 +531,7 @@ static ADDRESS_MAP_START(a400_mem, AS_PROGRAM, 8, a400_state)
 	AM_RANGE(0xd100, 0xd1ff) AM_NOP
 	AM_RANGE(0xd200, 0xd2ff) AM_DEVREADWRITE("pokey", pokey_device, read, write)
 	AM_RANGE(0xd300, 0xd3ff) AM_DEVREADWRITE("pia", pia6821_device, read_alt, write_alt)
-	AM_RANGE(0xd400, 0xd4ff) AM_READWRITE(atari_antic_r, atari_antic_w)
+	AM_RANGE(0xd400, 0xd4ff) AM_DEVREADWRITE("antic", antic_device, read, write)
 	AM_RANGE(0xd500, 0xd7ff) AM_NOP
 	AM_RANGE(0xd800, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -550,7 +546,7 @@ static ADDRESS_MAP_START(a600xl_mem, AS_PROGRAM, 8, a400_state)
 	AM_RANGE(0xd100, 0xd1ff) AM_NOP
 	AM_RANGE(0xd200, 0xd2ff) AM_DEVREADWRITE("pokey", pokey_device, read, write)
 	AM_RANGE(0xd300, 0xd3ff) AM_DEVREADWRITE("pia", pia6821_device, read_alt, write_alt)
-	AM_RANGE(0xd400, 0xd4ff) AM_READWRITE(atari_antic_r, atari_antic_w)
+	AM_RANGE(0xd400, 0xd4ff) AM_DEVREADWRITE("antic", antic_device, read, write)
 	AM_RANGE(0xd500, 0xd7ff) AM_NOP
 	AM_RANGE(0xd800, 0xffff) AM_ROM // OS
 ADDRESS_MAP_END
@@ -562,7 +558,7 @@ static ADDRESS_MAP_START(a1200xl_mem, AS_PROGRAM, 8, a400_state)
 	AM_RANGE(0xd100, 0xd1ff) AM_NOP
 	AM_RANGE(0xd200, 0xd2ff) AM_DEVREADWRITE("pokey", pokey_device, read, write)
 	AM_RANGE(0xd300, 0xd3ff) AM_DEVREADWRITE("pia", pia6821_device, read_alt, write_alt)
-	AM_RANGE(0xd400, 0xd4ff) AM_READWRITE(atari_antic_r, atari_antic_w)
+	AM_RANGE(0xd400, 0xd4ff) AM_DEVREADWRITE("antic", antic_device, read, write)
 	AM_RANGE(0xd500, 0xd7ff) AM_NOP
 	AM_RANGE(0xd800, 0xffff) AM_READWRITE(a800xl_high_r, a800xl_high_w)
 ADDRESS_MAP_END
@@ -574,7 +570,7 @@ static ADDRESS_MAP_START(a800xl_mem, AS_PROGRAM, 8, a400_state)
 	AM_RANGE(0xd100, 0xd1ff) AM_NOP
 	AM_RANGE(0xd200, 0xd2ff) AM_DEVREADWRITE("pokey", pokey_device, read, write)
 	AM_RANGE(0xd300, 0xd3ff) AM_DEVREADWRITE("pia", pia6821_device, read_alt, write_alt)
-	AM_RANGE(0xd400, 0xd4ff) AM_READWRITE(atari_antic_r, atari_antic_w)
+	AM_RANGE(0xd400, 0xd4ff) AM_DEVREADWRITE("antic", antic_device, read, write)
 	AM_RANGE(0xd500, 0xd7ff) AM_NOP
 	AM_RANGE(0xd800, 0xffff) AM_READWRITE(a800xl_high_r, a800xl_high_w)
 ADDRESS_MAP_END
@@ -586,7 +582,7 @@ static ADDRESS_MAP_START(a130xe_mem, AS_PROGRAM, 8, a400_state)
 	AM_RANGE(0xd100, 0xd1ff) AM_NOP
 	AM_RANGE(0xd200, 0xd2ff) AM_DEVREADWRITE("pokey", pokey_device, read, write)
 	AM_RANGE(0xd300, 0xd3ff) AM_DEVREADWRITE("pia", pia6821_device, read_alt, write_alt)
-	AM_RANGE(0xd400, 0xd4ff) AM_READWRITE(atari_antic_r, atari_antic_w)
+	AM_RANGE(0xd400, 0xd4ff) AM_DEVREADWRITE("antic", antic_device, read, write)
 	AM_RANGE(0xd500, 0xd7ff) AM_NOP
 	AM_RANGE(0xd800, 0xffff) AM_READWRITE(a800xl_high_r, a800xl_high_w)
 ADDRESS_MAP_END
@@ -598,7 +594,7 @@ static ADDRESS_MAP_START(xegs_mem, AS_PROGRAM, 8, a400_state)
 	AM_RANGE(0xd100, 0xd1ff) AM_NOP
 	AM_RANGE(0xd200, 0xd2ff) AM_DEVREADWRITE("pokey", pokey_device, read, write)
 	AM_RANGE(0xd300, 0xd3ff) AM_DEVREADWRITE("pia", pia6821_device, read_alt, write_alt)
-	AM_RANGE(0xd400, 0xd4ff) AM_READWRITE(atari_antic_r, atari_antic_w)
+	AM_RANGE(0xd400, 0xd4ff) AM_DEVREADWRITE("antic", antic_device, read, write)
 	AM_RANGE(0xd500, 0xd7ff) AM_NOP
 	AM_RANGE(0xd800, 0xffff) AM_READWRITE(a800xl_high_r, a800xl_high_w)
 ADDRESS_MAP_END
@@ -608,7 +604,7 @@ static ADDRESS_MAP_START(a5200_mem, AS_PROGRAM, 8, a400_state)
 	AM_RANGE(0x0000, 0x3fff) AM_RAM
 	AM_RANGE(0x4000, 0xbfff) AM_NOP // ROM installed at machine start
 	AM_RANGE(0xc000, 0xcfff) AM_DEVREADWRITE("gtia", gtia_device, read, write)
-	AM_RANGE(0xd400, 0xdfff) AM_READWRITE(atari_antic_r, atari_antic_w)
+	AM_RANGE(0xd400, 0xdfff) AM_DEVREADWRITE("antic", antic_device, read, write)
 	// 0xe000-0xe7ff - Expansion?
 	AM_RANGE(0xe800, 0xefff) AM_DEVREADWRITE("pokey", pokey_device, read, write)
 	AM_RANGE(0xf000, 0xffff) AM_ROM
@@ -1931,29 +1927,15 @@ void a400_state::setup_cart(a800_cart_slot_device *slot)
 }
 
 
-void a400_state::common_start()
-{	
-	/* ANTIC */
-	antic_start(machine());
-}
-
-void a400_state::a5200_start()
-{
-	/* ANTIC */
-	antic_start(machine());
-}
-
 MACHINE_RESET_MEMBER( a400_state, a400 )
 {
 	pokey_device *pokey = machine().device<pokey_device>("pokey");
 	pokey->write(15,0);
-	antic_reset();
 }
 
 
 MACHINE_START_MEMBER( a400_state, a400 )
 {
-	common_start();
 	setup_ram(0, m_ram->size());
 	setup_ram(1, m_ram->size());
 	setup_ram(2, m_ram->size());
@@ -1966,7 +1948,6 @@ MACHINE_START_MEMBER( a400_state, a400 )
 
 MACHINE_START_MEMBER( a400_state, a800 )
 {
-	common_start();
 	setup_ram(0, m_ram->size());
 	setup_ram(1, m_ram->size());
 	setup_ram(2, m_ram->size());
@@ -1981,7 +1962,6 @@ MACHINE_START_MEMBER( a400_state, a800xl )
 {
 	m_mmu = 0xfd;
 	m_ext_bank = 0x03;	// only used by a130xe
-	common_start();
 	setup_cart(m_cartslot);
 
 	save_item(NAME(m_cart_disabled));
@@ -1993,7 +1973,6 @@ MACHINE_START_MEMBER( a400_state, a800xl )
 
 MACHINE_START_MEMBER( a400_state, a5200 )
 {
-	a5200_start();
 	setup_cart(m_cartslot);
 
 	save_item(NAME(m_cart_disabled));
@@ -2007,7 +1986,7 @@ MACHINE_START_MEMBER( a400_state, a5200 )
  *
  **************************************************************/
 
-WRITE8_MEMBER(a400_state::gtia_write)
+WRITE8_MEMBER(a400_state::gtia_cb)
 {
 	dac_device *dac = machine().device<dac_device>("dac");
 	if (data & 0x08)
@@ -2062,7 +2041,7 @@ static MACHINE_CONFIG_START( atari_common_nodac, a400_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(1))
 	MCFG_SCREEN_VISIBLE_AREA(MIN_X, MAX_X, MIN_Y, MAX_Y)
-	MCFG_SCREEN_UPDATE_DRIVER(atari_common_state, screen_update_atari)
+	MCFG_SCREEN_UPDATE_DEVICE("antic", antic_device, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", sizeof(atari_palette) / 3)
@@ -2102,7 +2081,10 @@ static MACHINE_CONFIG_DERIVED( atari_common, atari_common_nodac )
 
 	MCFG_DEVICE_ADD("gtia", ATARI_GTIA, 0)
 	MCFG_GTIA_READ_CB(IOPORT("console"))
-	MCFG_GTIA_WRITE_CB(WRITE8(a400_state, gtia_write))
+	MCFG_GTIA_WRITE_CB(WRITE8(a400_state, gtia_cb))
+
+	MCFG_DEVICE_ADD("antic", ATARI_ANTIC, 0)
+	MCFG_ANTIC_GTIA("gtia")
 
 	/* devices */
 	MCFG_DEVICE_ADD("fdc", ATARI_FDC, 0)
@@ -2289,6 +2271,9 @@ static MACHINE_CONFIG_DERIVED( a5200, atari_common_nodac )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MCFG_DEVICE_ADD("gtia", ATARI_GTIA, 0)
+
+	MCFG_DEVICE_ADD("antic", ATARI_ANTIC, 0)
+	MCFG_ANTIC_GTIA("gtia")
 
 	MCFG_DEVICE_MODIFY("pia")
 	MCFG_PIA_READPA_HANDLER(NULL) // FIXME: is there anything connected here

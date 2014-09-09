@@ -9,10 +9,8 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/m6502/m6502.h"
 #include "includes/atari.h"
 #include "sound/pokey.h"
-#include "sound/dac.h"
 
 #define VERBOSE_POKEY   1
 #define VERBOSE_SERIAL  1
