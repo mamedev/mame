@@ -333,10 +333,45 @@ const UINT8 raiden2_state::fade_table(int v)
 	return (low * (high | (high >> 5)) + 0x210) >> 10;
 }
 
+WRITE16_MEMBER(raiden2_state::m_videoram_private_w)
+{
+	//AM_RANGE(0x0d000, 0x0d7ff) AM_RAM_WRITE(raiden2_background_w) AM_SHARE("back_data")
+	//AM_RANGE(0x0d800, 0x0dfff) AM_RAM_WRITE(raiden2_foreground_w) AM_SHARE("fore_data")
+	//AM_RANGE(0x0e000, 0x0e7ff) AM_RAM_WRITE(raiden2_midground_w)  AM_SHARE("mid_data")
+	//AM_RANGE(0x0e800, 0x0f7ff) AM_RAM_WRITE(raiden2_text_w) AM_SHARE("text_data")
+
+	if (offset < 0x800 / 2)
+	{
+		raiden2_background_w(space, offset, data, 0xffff);
+	}
+	else if (offset < 0x1000 /2)
+	{
+		offset -= 0x800 / 2;
+		raiden2_foreground_w(space, offset, data, 0xffff);
+	}
+	else if (offset < 0x1800/2)
+	{
+		offset -= 0x1000 / 2;
+		raiden2_midground_w(space, offset, data, 0xffff);
+	}
+	else if (offset < 0x2800/2)
+	{
+		offset -= 0x1800 / 2;
+		raiden2_text_w(space, offset, data, 0xffff);
+	}
+}
+
 WRITE16_MEMBER(raiden2_state::cop_dma_trigger_w)
 {
-	//  logerror("COP DMA mode=%x adr=%x size=%x vals=%x %x %x\n", cop_dma_mode, cop_dma_src[cop_dma_mode], cop_dma_size[cop_dma_mode], cop_dma_v1[cop_dma_mode], cop_dma_v2[cop_dma_mode], cop_dma_dst[cop_dma_mode]);
-
+	/*
+	printf("COP DMA mode=%x adr=%x size=%x vals=%x %x %x\n",
+		cop_dma_mode,
+		cop_dma_src[cop_dma_mode]<<6,
+		cop_dma_size[cop_dma_mode]<<4,
+		cop_dma_v1,
+		cop_dma_v2,
+		cop_dma_dst[cop_dma_mode]);
+	*/
 	switch(cop_dma_mode) {
 	case 0x14: {
 		/* TODO: this transfers the whole VRAM, not only spriteram!
@@ -344,6 +379,27 @@ WRITE16_MEMBER(raiden2_state::cop_dma_trigger_w)
 		   Raiden 2 uses this DMA with cop_dma_dst == 0xfffe, effectively changing the order of the uploaded VRAMs.
 		   Also the size is used for doing a sprite limit trickery.
 		*/
+		// based on legionna this should probably only transfer tilemaps, although maybe on this HW things are different
+		// we might be misinterpreting params.  For legionna.c it always points to the start of RAM where the tilemaps are
+		// for zeroteam likewise, but for Raiden 2 the pointer is wrong??
+
+		// tilemap DMA
+		{
+			int src = cop_dma_src[cop_dma_mode] << 6;
+			if (src == 0xcfc0) src = 0xd000; // R2, why?? everything else sets the right pointer
+			
+			for (int i = 0; i < 0x2800 /2; i++)
+			{
+				UINT16 tileval = space.read_word(src);
+				src += 2;
+				//m_videoramout_cb(space, i, tileval, 0xffff);
+				m_videoram_private_w(space, i, tileval, 0xffff);
+			}
+
+		}
+
+
+		// sprite DMA part
 		static int rsize = ((0x80 - cop_dma_size[cop_dma_mode]) & 0x7f) +1;
 
 		sprites_cur_start = 0x1000 - (rsize << 5);
@@ -356,6 +412,7 @@ WRITE16_MEMBER(raiden2_state::cop_dma_trigger_w)
 		#endif
 		break;
 	}
+	// case 0x15: points at palette in legionna.c and here
 	case 0x82: {
 		UINT32 src,dst,size;
 		int i;
@@ -1054,6 +1111,11 @@ TILE_GET_INFO_MEMBER(raiden2_state::get_text_tile_info)
 
 VIDEO_START_MEMBER(raiden2_state,raiden2)
 {
+	back_data = auto_alloc_array_clear(machine(), UINT16, 0x800/2);
+	fore_data =  auto_alloc_array_clear(machine(), UINT16, 0x800/2);
+	mid_data =  auto_alloc_array_clear(machine(), UINT16, 0x800/2);
+	text_data =  auto_alloc_array_clear(machine(), UINT16, 0x1000/2);
+
 	text_layer       = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(raiden2_state::get_text_tile_info),this), TILEMAP_SCAN_ROWS,  8, 8, 64,32 );
 	background_layer = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(raiden2_state::get_back_tile_info),this), TILEMAP_SCAN_ROWS, 16,16, 32,32 );
 	midground_layer  = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(raiden2_state::get_mid_tile_info),this),  TILEMAP_SCAN_ROWS, 16,16, 32,32 );
@@ -1626,10 +1688,10 @@ static ADDRESS_MAP_START( raiden2_mem, AS_PROGRAM, 16, raiden2_state )
 	AM_RANGE(0x00800, 0x0bfff) AM_RAM
 
 	AM_RANGE(0x0c000, 0x0cfff) AM_RAM AM_SHARE("sprites")
-	AM_RANGE(0x0d000, 0x0d7ff) AM_RAM_WRITE(raiden2_background_w) AM_SHARE("back_data")
-	AM_RANGE(0x0d800, 0x0dfff) AM_RAM_WRITE(raiden2_foreground_w) AM_SHARE("fore_data")
-	AM_RANGE(0x0e000, 0x0e7ff) AM_RAM_WRITE(raiden2_midground_w)  AM_SHARE("mid_data")
-	AM_RANGE(0x0e800, 0x0f7ff) AM_RAM_WRITE(raiden2_text_w) AM_SHARE("text_data")
+	AM_RANGE(0x0d000, 0x0d7ff) AM_RAM // _WRITE(raiden2_background_w) AM_SHARE("back_data")
+	AM_RANGE(0x0d800, 0x0dfff) AM_RAM // _WRITE(raiden2_foreground_w) AM_SHARE("fore_data")
+	AM_RANGE(0x0e000, 0x0e7ff) AM_RAM // _WRITE(raiden2_midground_w)  AM_SHARE("mid_data")
+	AM_RANGE(0x0e800, 0x0f7ff) AM_RAM // _WRITE(raiden2_text_w) AM_SHARE("text_data")
 	AM_RANGE(0x0f800, 0x0ffff) AM_RAM /* Stack area */
 
 	AM_RANGE(0x10000, 0x1efff) AM_RAM
@@ -1666,10 +1728,10 @@ static ADDRESS_MAP_START( zeroteam_mem, AS_PROGRAM, 16, raiden2_state )
 	AM_RANGE(0x0074c, 0x0074d) AM_READ_PORT("SYSTEM")
 
 	AM_RANGE(0x00800, 0x0b7ff) AM_RAM
-	AM_RANGE(0x0b800, 0x0bfff) AM_RAM_WRITE(raiden2_background_w) AM_SHARE("back_data")
-	AM_RANGE(0x0c000, 0x0c7ff) AM_RAM_WRITE(raiden2_foreground_w) AM_SHARE("fore_data")
-	AM_RANGE(0x0c800, 0x0cfff) AM_RAM_WRITE(raiden2_midground_w) AM_SHARE("mid_data")
-	AM_RANGE(0x0d000, 0x0dfff) AM_RAM_WRITE(raiden2_text_w) AM_SHARE("text_data")
+	AM_RANGE(0x0b800, 0x0bfff) AM_RAM // _WRITE(raiden2_background_w) AM_SHARE("back_data")
+	AM_RANGE(0x0c000, 0x0c7ff) AM_RAM // _WRITE(raiden2_foreground_w) AM_SHARE("fore_data")
+	AM_RANGE(0x0c800, 0x0cfff) AM_RAM // _WRITE(raiden2_midground_w) AM_SHARE("mid_data")
+	AM_RANGE(0x0d000, 0x0dfff) AM_RAM // _WRITE(raiden2_text_w) AM_SHARE("text_data")
 	AM_RANGE(0x0e000, 0x0efff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x0f000, 0x0ffff) AM_RAM AM_SHARE("sprites")
 	AM_RANGE(0x10000, 0x1ffff) AM_RAM
@@ -1697,10 +1759,10 @@ static ADDRESS_MAP_START( xsedae_mem, AS_PROGRAM, 16, raiden2_state )
 	AM_RANGE(0x0074c, 0x0074d) AM_READ_PORT("SYSTEM")
 
 	AM_RANGE(0x00800, 0x0b7ff) AM_RAM
-	AM_RANGE(0x0b800, 0x0bfff) AM_RAM_WRITE(raiden2_background_w) AM_SHARE("back_data")
-	AM_RANGE(0x0c000, 0x0c7ff) AM_RAM_WRITE(raiden2_foreground_w) AM_SHARE("fore_data")
-	AM_RANGE(0x0c800, 0x0cfff) AM_RAM_WRITE(raiden2_midground_w) AM_SHARE("mid_data")
-	AM_RANGE(0x0d000, 0x0dfff) AM_RAM_WRITE(raiden2_text_w) AM_SHARE("text_data")
+	AM_RANGE(0x0b800, 0x0bfff) AM_RAM // _WRITE(raiden2_background_w) AM_SHARE("back_data")
+	AM_RANGE(0x0c000, 0x0c7ff) AM_RAM // _WRITE(raiden2_foreground_w) AM_SHARE("fore_data")
+	AM_RANGE(0x0c800, 0x0cfff) AM_RAM // _WRITE(raiden2_midground_w) AM_SHARE("mid_data")
+	AM_RANGE(0x0d000, 0x0dfff) AM_RAM // _WRITE(raiden2_text_w) AM_SHARE("text_data")
 	AM_RANGE(0x0e000, 0x0efff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x0f000, 0x0ffff) AM_RAM AM_SHARE("sprites")
 

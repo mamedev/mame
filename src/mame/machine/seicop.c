@@ -3257,8 +3257,11 @@ WRITE16_MEMBER( seibu_cop_legacy_device::generic_cop_w )
 				return;
 			}
 
-			/* privaet buffer copy - sprites? */
-			if (m_cop_dma_trigger==0x15)
+			/* private buffer copy - palette? */
+			if (m_cop_dma_trigger == 0x15)
+			{
+				//printf("SRC: %08x %08x DST:%08x SIZE:%08x TRIGGER: %08x\n",m_cop_dma_src[m_cop_dma_trigger] << 6,m_cop_dma_fade_table,m_cop_dma_dst[m_cop_dma_trigger] << 6,m_cop_dma_size[m_cop_dma_trigger] << 5,m_cop_dma_trigger);
+			}
 			return;
 
 			printf("SRC: %08x %08x DST:%08x SIZE:%08x TRIGGER: %08x\n",m_cop_dma_src[m_cop_dma_trigger] << 6,m_cop_dma_fade_table,m_cop_dma_dst[m_cop_dma_trigger] << 6,m_cop_dma_size[m_cop_dma_trigger] << 5,m_cop_dma_trigger);

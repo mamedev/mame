@@ -5,10 +5,12 @@ class raiden2_state : public driver_device
 public:
 	raiden2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
+		/*
 		  back_data(*this, "back_data"),
 		  fore_data(*this, "fore_data"),
 		  mid_data(*this, "mid_data"),
 		  text_data(*this, "text_data"),
+		  */
 		  sprites(*this, "sprites") ,
 		  m_maincpu(*this, "maincpu"),
 		  m_seibu_sound(*this, "seibu_sound"),
@@ -18,7 +20,8 @@ public:
 		  sprite_buffer(320, 256)
 	{ }
 
-	required_shared_ptr<UINT16> back_data,fore_data,mid_data, text_data, sprites;
+	UINT16 *back_data, *fore_data, *mid_data, *text_data;
+	required_shared_ptr<UINT16> sprites;
 	required_device<cpu_device> m_maincpu;
 	required_device<seibu_sound_device> m_seibu_sound;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -74,6 +77,7 @@ public:
 	DECLARE_WRITE16_MEMBER ( raiden2_foreground_w );
 	DECLARE_WRITE16_MEMBER ( raiden2_midground_w );
 	DECLARE_WRITE16_MEMBER ( raiden2_text_w );
+	DECLARE_WRITE16_MEMBER(m_videoram_private_w);
 
 	DECLARE_WRITE16_MEMBER( sprcpt_val_1_w );
 	DECLARE_WRITE16_MEMBER( sprcpt_val_2_w );
