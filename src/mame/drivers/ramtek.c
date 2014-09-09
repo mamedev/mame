@@ -11,9 +11,9 @@
  Knockout (1974)            UNKNOWN
  Sea Battle (1976)          UNKNOWN
  Soccer (1973)              UNKNOWN
- Trivia (1976)              YES
+ Trivia (1975)              YES
  Volly/Volley (1973)        YES
- Wipe Out (1974)            YES
+ Wipe Out (1973)            YES
 
  ***************************************************************************/
 
@@ -220,9 +220,9 @@ ROM_END
 
 
 GAME( 1973, vollyrmt,  0, ramtek, 0, driver_device,  0, ROT0, "Ramtek", "Volly (Ramtek) [TTL]", GAME_IS_SKELETON )
+GAME( 1973, wipeormt,  0, ramtek, 0, driver_device,  0, ROT0, "Ramtek", "Wipeout (Ramtek) [TTL]", GAME_IS_SKELETON )
 GAME( 1974, bballrmt,  0, ramtek, 0, driver_device,  0, ROT0, "Ramtek", "Baseball (Ramtek) [TTL]", GAME_IS_SKELETON )
 GAME( 1974, cleanswp,  0, ramtek, 0, driver_device,  0, ROT0, "Ramtek", "Clean Sweep [TTL]", GAME_IS_SKELETON )
-GAME( 1974, wipeormt,  0, ramtek, 0, driver_device,  0, ROT0, "Ramtek", "Wipeout (Ramtek) [TTL]", GAME_IS_SKELETON )
-GAME( 1976, trivia,    0, ramtek, 0, driver_device,  0, ROT0, "Ramtek", "Trivia (Rev B) [TTL]", GAME_IS_SKELETON )
+GAME( 1975, trivia,    0, ramtek, 0, driver_device,  0, ROT0, "Ramtek", "Trivia (Rev B) [TTL]", GAME_IS_SKELETON )
 
 GAME( 197?, ramtek3,   0, ramtek, 0, driver_device,  0, ROT0, "Ramtek", "unknown Ramtek Game (Maybe Hockey?) [TTL]", GAME_IS_SKELETON )
