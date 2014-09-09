@@ -2885,6 +2885,12 @@ static INT32 register_w(voodoo_state *v, offs_t offset, UINT32 data)
 			}
 			break;
 
+		case trexInit1:
+			/* send tmu config data to the frame buffer */
+			v->send_config = (TREXINIT_SEND_TMU_CONFIG(data) > 0);
+			goto default_case;
+			break;
+
 		/* these registers are referenced in the renderer; we must wait for pending work before changing */
 		case chromaRange:
 		case chromaKey:
@@ -2901,6 +2907,7 @@ static INT32 register_w(voodoo_state *v, offs_t offset, UINT32 data)
 
 		/* by default, just feed the data to the chips */
 		default:
+default_case:
 			if (chips & 1) v->reg[0x000 + regnum].u = data;
 			if (chips & 2) v->reg[0x100 + regnum].u = data;
 			if (chips & 4) v->reg[0x200 + regnum].u = data;
@@ -4913,6 +4920,8 @@ void voodoo_device::common_start_voodoo(UINT8 type)
 		}
 	}
 
+	v->tmu_config = 0x11;	// revision 1
+
 	/* configure type-specific values */
 	switch (v->type)
 	{
@@ -4928,6 +4937,7 @@ void voodoo_device::common_start_voodoo(UINT8 type)
 			v->regnames = voodoo_reg_name;
 			v->alt_regmap = 0;
 			v->fbi.lfb_stride = 10;
+			v->tmu_config |= 0x800;
 			break;
 
 		case TYPE_VOODOO_BANSHEE:
@@ -4963,6 +4973,10 @@ void voodoo_device::common_start_voodoo(UINT8 type)
 	assert_always(v->screen != NULL, "Unable to find screen attached to voodoo");
 	v->cpu = machine().device(m_cputag);
 	assert_always(v->cpu != NULL, "Unable to find CPU attached to voodoo");
+
+	if (m_tmumem1 != 0)
+		v->tmu_config |= 0xc0;	// two TMUs
+
 	v->chipmask = 0x01;
 	v->attoseconds_per_cycle = ATTOSECONDS_PER_SECOND / v->freq;
 	v->trigger = 51324 + v->index;
@@ -5007,6 +5021,7 @@ void voodoo_device::common_start_voodoo(UINT8 type)
 	{
 		init_tmu(v, &v->tmu[1], &v->reg[0x200], tmumem[1], m_tmumem1 << 20);
 		v->chipmask |= 0x04;
+		v->tmu_config |= 0x40;
 	}
 
 	/* initialize some registers */
