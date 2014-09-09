@@ -2372,8 +2372,6 @@ READ16_MEMBER(igs017_state::lhzb2a_prot_r)
 
 			logerror("%s: read bitswap - val %04x -> %02x\n", machine().describe_context(), m_prot_val, res);
 			return res;
-
-			break;
 		}
 
 		default:

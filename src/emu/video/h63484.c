@@ -711,7 +711,6 @@ bool h63484_device::set_dot(INT16 x, INT16 y, INT16 px, INT16 py)
 		case 0x03:
 			fatalerror("HD63484 color modes (Pattern RAM indirect)\n");
 			// TODO
-			break;
 	}
 
 	return false;
@@ -1766,7 +1765,6 @@ void h63484_device::process_fifo()
 		default:
 			printf("%04x\n",m_cr);
 			fatalerror("stop!\n");
-			break;
 	}
 }
 

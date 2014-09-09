@@ -691,7 +691,6 @@ READ32_MEMBER( magictg_state::adsp_idma_data_r )
 	else
 	{
 		fatalerror("????\n");
-		return 0;
 	}
 }
 

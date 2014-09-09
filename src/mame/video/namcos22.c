@@ -703,7 +703,6 @@ void namcos22_renderer::render_scene_nodes(screen_device &screen, bitmap_rgb32 &
 
 					default:
 						fatalerror("invalid node->type\n");
-						break;
 				}
 				free_scenenode(node);
 				node = next;

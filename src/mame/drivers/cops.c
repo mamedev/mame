@@ -366,7 +366,6 @@ READ8_MEMBER(cops_state::io1_r)
 			logerror("Unknown io1_r, offset = %03x\n", offset);
 			return 0;
 	}
-	return 0;
 }
 
 WRITE8_MEMBER(cops_state::io1_w)

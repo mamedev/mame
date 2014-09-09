@@ -252,7 +252,7 @@ void k001604_device::draw_back_layer( bitmap_rgb32 &bitmap, const rectangle &cli
 		case 0: window_xmask = (128 * tile_size) - 1; break;
 		case 2: window_xmask = (64 * tile_size) - 1; break;
 		case 3: window_xmask = (32 * tile_size) - 1; break;
-		default: fatalerror("k001604_draw_back_layer(): layer_size %d\n", layer_size); break;
+		default: fatalerror("k001604_draw_back_layer(): layer_size %d\n", layer_size);
 	}
 
 	window_ymask = pixmap.height() - 1;

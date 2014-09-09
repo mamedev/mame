@@ -689,7 +689,6 @@ void model3_state::real3d_upload_texture(UINT32 header, UINT32 *data)
 			break;
 		default:
 			fatalerror("Unknown texture type: %02X\n", header >> 24);
-			break;
 	}
 }
 

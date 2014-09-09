@@ -279,8 +279,6 @@ READ8_MEMBER( k051960_device::k051937_r )
 		//logerror("%04x: read unknown 051937 address %x\n", device->cpu->safe_pc(), offset);
 		return 0;
 	}
-
-	return 0;
 }
 
 WRITE8_MEMBER( k051960_device::k051937_w )

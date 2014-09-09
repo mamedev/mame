@@ -1989,37 +1989,29 @@ UINT32 nv2a_renderer::texture_get_texel(int number,int x,int y)
 		switch (c) {
 		case 0:
 			return 0xff000000 + convert_r5g6b5_r8g8b8(color0);
-			break;
 		case 1:
 			return 0xff000000 + convert_r5g6b5_r8g8b8(color1);
-			break;
 		case 2:
 			cb = pal5bit(((color0m2 & 0x003e) + (color1 & 0x001f)) / 3);
 			cg = pal6bit(((color0m2 & 0x0fc0) + (color1 & 0x07e0)) / 3 >> 5);
 			cr = pal5bit(((color0m2 & 0x1f000) + color1) / 3 >> 11);
 			return 0xff000000 | (cr << 16) | (cg << 8) | (cb);
-			break;
 		case 3:
 			cb = pal5bit(((color1m2 & 0x003e) + (color0 & 0x001f)) / 3);
 			cg = pal6bit(((color1m2 & 0x0fc0) + (color0 & 0x07e0)) / 3 >> 5);
 			cr = pal5bit(((color1m2 & 0x1f000) + color0) / 3 >> 11);
 			return 0xff000000 | (cr << 16) | (cg << 8) | (cb);
-			break;
 		case 4:
 			return 0xff000000 + convert_r5g6b5_r8g8b8(color0);
-			break;
 		case 5:
 			return 0xff000000 + convert_r5g6b5_r8g8b8(color1);
-			break;
 		case 6:
 			cb = pal5bit(((color0 & 0x001f) + (color1 & 0x001f)) / 2);
 			cg = pal6bit(((color0 & 0x07e0) + (color1 & 0x07e0)) / 2 >> 5);
 			cr = pal5bit(((color0 & 0xf800) + (color1 & 0xf800)) / 2 >> 11);
 			return 0xff000000 | (cr << 16) | (cg << 8) | (cb);
-			break;
 		default:
 			return 0xff000000;
-			break;
 		}
 	case DXT3:
 		bx = x >> 2;
@@ -2038,24 +2030,19 @@ UINT32 nv2a_renderer::texture_get_texel(int number,int x,int y)
 		switch (c) {
 		case 0:
 			return ((ca + (ca << 4)) << 24) + convert_r5g6b5_r8g8b8(color0);
-			break;
 		case 1:
 			return ((ca + (ca << 4)) << 24) + convert_r5g6b5_r8g8b8(color1);
-			break;
 		case 2:
 			cb = pal5bit((2 * (color0 & 0x001f) + (color1 & 0x001f)) / 3);
 			cg = pal6bit((2 * (color0 & 0x07e0) + (color1 & 0x07e0)) / 3 >> 5);
 			cr = pal5bit((2 * (color0 & 0xf800) + (color1 & 0xf800)) / 3 >> 11);
 			return ((ca + (ca << 4)) << 24) | (cr << 16) | (cg << 8) | (cb);
-			break;
 		default:
 			cb = pal5bit(((color0 & 0x001f) + 2 * (color1 & 0x001f)) / 3);
 			cg = pal6bit(((color0 & 0x07e0) + 2 * (color1 & 0x07e0)) / 3 >> 5);
 			cr = pal5bit(((color0 & 0xf800) + 2 * (color1 & 0xf800)) / 3 >> 11);
 			return ((ca + (ca << 4)) << 24) | (cr << 16) | (cg << 8) | (cb);
-			break;
 		}
-		break;
 	case A4R4G4B4:
 		to = dilated0[texture[number].dilate][x] + dilated1[texture[number].dilate][y]; // offset of texel in texture memory
 		a4r4g4b4 = *(((UINT16 *)texture[number].buffer) + to); // get texel color
@@ -2144,22 +2131,18 @@ UINT32 nv2a_renderer::texture_get_texel(int number,int x,int y)
 		switch (c) {
 		case 0:
 			return (ca << 24) + convert_r5g6b5_r8g8b8(color0);
-			break;
 		case 1:
 			return (ca << 24) + convert_r5g6b5_r8g8b8(color1);
-			break;
 		case 2:
 			cb = pal5bit((2 * (color0 & 0x001f) + (color1 & 0x001f)) / 3);
 			cg = pal6bit((2 * (color0 & 0x07e0) + (color1 & 0x07e0)) / 3 >> 5);
 			cr = pal5bit((2 * (color0 & 0xf800) + (color1 & 0xf800)) / 3 >> 11);
 			return (ca << 24) | (cr << 16) | (cg << 8) | (cb);
-			break;
 		default:
 			cb = pal5bit(((color0 & 0x001f) + 2 * (color1 & 0x001f)) / 3);
 			cg = pal6bit(((color0 & 0x07e0) + 2 * (color1 & 0x07e0)) / 3 >> 5);
 			cr = pal5bit(((color0 & 0xf800) + 2 * (color1 & 0xf800)) / 3 >> 11);
 			return (ca << 24) | (cr << 16) | (cg << 8) | (cb);
-			break;
 		}
 	default:
 		return 0xff00ff00;
@@ -2192,7 +2175,6 @@ void nv2a_renderer::write_pixel(int x, int y, UINT32 color)
 		switch (alpha_func) {
 		case nv2a_renderer::NEVER:
 			return;
-			break;
 		case nv2a_renderer::ALWAYS:
 		default:
 			break;
@@ -3563,49 +3545,36 @@ float nv2a_renderer::combiner_map_input_select(int code,int index)
 		case 0:
 		default:
 			return combiner.register_zero[index];
-		break;
 		case 1:
 			return combiner.register_color0[index];
-		break;
 		case 2:
 			return combiner.register_color1[index];
-		break;
 		case 3:
 			return combiner.register_fogcolor[index];
-		break;
 		case 4:
 			return combiner.register_primarycolor[index];
-		break;
 		case 5:
 			return combiner.register_secondarycolor[index];
-		break;
 		case 8:
 			return combiner.register_texture0color[index];
-		break;
 		case 9:
 			return combiner.register_texture1color[index];
-		break;
 		case 10:
 			return combiner.register_texture2color[index];
-		break;
 		case 11:
 			return combiner.register_texture3color[index];
-		break;
 		case 12:
 			return combiner.register_spare0[index];
-		break;
 		case 13:
 			return combiner.register_spare1[index];
-		break;
 		case 14:
 			return combiner.variable_sumclamp[index];
-		break;
 		case 15:
 			return combiner.variable_EF[index];
-		break;
 	}
 
-	return 0;
+	// never executed
+	//return 0;
 }
 
 float *nv2a_renderer::combiner_map_input_select3(int code)
@@ -3614,49 +3583,36 @@ float *nv2a_renderer::combiner_map_input_select3(int code)
 		case 0:
 		default:
 			return combiner.register_zero;
-		break;
 		case 1:
 			return combiner.register_color0;
-		break;
 		case 2:
 			return combiner.register_color1;
-		break;
 		case 3:
 			return combiner.register_fogcolor;
-		break;
 		case 4:
 			return combiner.register_primarycolor;
-		break;
 		case 5:
 			return combiner.register_secondarycolor;
-		break;
 		case 8:
 			return combiner.register_texture0color;
-		break;
 		case 9:
 			return combiner.register_texture1color;
-		break;
 		case 10:
 			return combiner.register_texture2color;
-		break;
 		case 11:
 			return combiner.register_texture3color;
-		break;
 		case 12:
 			return combiner.register_spare0;
-		break;
 		case 13:
 			return combiner.register_spare1;
-		break;
 		case 14:
 			return combiner.variable_sumclamp;
-		break;
 		case 15:
 			return combiner.variable_EF;
-		break;
 	}
 
-	return 0;
+	// never executed
+	//return 0;
 }
 
 float *nv2a_renderer::combiner_map_output_select3(int code)
@@ -3664,50 +3620,34 @@ float *nv2a_renderer::combiner_map_output_select3(int code)
 	switch (code) {
 		case 0:
 			return 0;
-		break;
 		case 1:
 			return 0;
-		break;
 		case 2:
 			return 0;
-		break;
 		case 3:
 			return 0;
-		break;
 		case 4:
 			return combiner.register_primarycolor;
-		break;
 		case 5:
 			return combiner.register_secondarycolor;
-		break;
 		case 8:
 			return combiner.register_texture0color;
-		break;
 		case 9:
 			return combiner.register_texture1color;
-		break;
 		case 10:
 			return combiner.register_texture2color;
-		break;
 		case 11:
 			return combiner.register_texture3color;
-		break;
 		case 12:
 			return combiner.register_spare0;
-		break;
 		case 13:
 			return combiner.register_spare1;
-		break;
 		case 14:
 			return 0;
-		break;
 		case 15:
 		default:
 			return 0;
-		break;
 	}
-
-	return 0;
 }
 
 float nv2a_renderer::combiner_map_input_function(int code,float value)
@@ -3717,33 +3657,26 @@ float nv2a_renderer::combiner_map_input_function(int code,float value)
 	switch (code) {
 		case 0:
 			return MAX(0.0,value);
-		break;
 		case 1:
 			t=MAX(value, 0.0);
 			return 1.0 - MIN(t, 1.0);
-		break;
 		case 2:
 			return 2.0 * MAX(0.0, value) - 1.0;
-		break;
 		case 3:
 			return -2.0 * MAX(0.0, value) + 1.0;
-		break;
 		case 4:
 			return MAX(0.0, value) - 0.5;
-		break;
 		case 5:
 			return -MAX(0.0, value) + 0.5;
-		break;
 		case 6:
 			return value;
-		break;
 		case 7:
 		default:
 			return -value;
-		break;
 	}
 
-	return 0;
+	// never executed
+	//return 0;
 }
 
 void nv2a_renderer::combiner_map_input_function3(int code,float *data)
@@ -3786,7 +3719,6 @@ void nv2a_renderer::combiner_map_input_function3(int code,float *data)
 		break;
 		case 6:
 			return;
-		break;
 		case 7:
 		default:
 			data[0]=-data[0];

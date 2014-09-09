@@ -228,7 +228,6 @@ READ8_MEMBER(thief_state::thief_coprocessor_r){
 			int result = 0xc000 | (addr>>3);
 			return (offset==0x03)?(result>>8):(result&0xff);
 		}
-		break;
 
 	case GFX_PORT:
 		{
@@ -255,7 +254,6 @@ READ8_MEMBER(thief_state::thief_coprocessor_r){
 				return 0x80>>dx; // no flip
 			}
 		}
-		break;
 	}
 
 	return thief_coprocessor.param[offset];

@@ -290,9 +290,6 @@ READ16_MEMBER(igs025_device::killbld_igs025_prot_r)
 						default: // >= 5
 							return 0x3f00 | BITSWAP8(m_kb_prot_hold, 5, 2, 9, 7, 10, 13, 12, 15);
 						}
-
-						return 0x3f00;
-						//return 0;
 		}
 
 		case 0x40:

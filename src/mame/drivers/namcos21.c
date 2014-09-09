@@ -793,9 +793,7 @@ RenderSlaveOutput( running_machine &machine, UINT16 data )
 	namcos21_state *state = machine.driver_data<namcos21_state>();
 	if( state->m_mpDspState->slaveOutputSize >= 4096 )
 	{
-		logerror( "FATAL ERROR: SLAVE OVERFLOW (0x%x)\n",state->m_mpDspState->slaveOutputBuffer[0]  );
-		exit(1);
-		return;
+		fatalerror( "FATAL ERROR: SLAVE OVERFLOW (0x%x)\n",state->m_mpDspState->slaveOutputBuffer[0]  );
 	}
 
 	/* append word to slave output buffer */

@@ -245,7 +245,7 @@ READ8_MEMBER(airbustr_state::devram_r)
 				return (x & 0x00ff) >> 0;
 			else
 				return (x & 0xff00) >> 8;
-		}   break;
+		}
 
 		/* Reading eff4, F0 times must yield at most 80-1 consecutive
 		   equal values */

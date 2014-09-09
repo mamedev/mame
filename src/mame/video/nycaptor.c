@@ -21,8 +21,6 @@ int nycaptor_state::nycaptor_spot(  )
 		return m_sharedram[0x299] ? m_sharedram[0x298] : 0;
 	else
 		return 0;
-
-	return 0;
 }
 
 TILE_GET_INFO_MEMBER(nycaptor_state::get_tile_info)

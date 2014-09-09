@@ -645,7 +645,7 @@ READ8_MEMBER(williams2_state::tshoot_input_port_0_3_r)
 	return (data & 0xc0) | gun;
 
 	// FIXME: this code is never reached
-	return 0;
+	//return 0;
 }
 
 

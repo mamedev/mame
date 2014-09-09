@@ -350,7 +350,6 @@ READ8_MEMBER( nb1413m3_device::inputport1_r )
 				case 0x04:  return 0xff;
 				default:    return 0xff;
 			}
-			break;
 		case NB1413M3_MSJIKEN:
 		case NB1413M3_TELMAHJN:
 			if (root.ioport("DSWA")->read() & 0x80)
@@ -367,7 +366,6 @@ READ8_MEMBER( nb1413m3_device::inputport1_r )
 				}
 			}
 			else return root.ioport("JAMMA2")->read();
-			break;
 		case NB1413M3_PAIRSNB:
 		case NB1413M3_PAIRSTEN:
 		case NB1413M3_OHPAIPEE:
@@ -384,7 +382,6 @@ READ8_MEMBER( nb1413m3_device::inputport1_r )
 				default:    return (root.ioport("KEY0")->read() & root.ioport("KEY1")->read() & root.ioport("KEY2")->read()
 									& root.ioport("KEY3")->read() & root.ioport("KEY4")->read());
 			}
-			break;
 	}
 }
 
@@ -402,7 +399,6 @@ READ8_MEMBER( nb1413m3_device::inputport2_r )
 				case 0x04:  return root.ioport("IN2")->read();
 				default:    return 0xff;
 			}
-			break;
 		case NB1413M3_MSJIKEN:
 		case NB1413M3_TELMAHJN:
 			if (root.ioport("DSWA")->read() & 0x80)
@@ -419,7 +415,6 @@ READ8_MEMBER( nb1413m3_device::inputport2_r )
 				}
 			}
 			else return root.ioport("JAMMA1")->read();
-			break;
 		case NB1413M3_PAIRSNB:
 		case NB1413M3_PAIRSTEN:
 		case NB1413M3_OHPAIPEE:
@@ -436,7 +431,6 @@ READ8_MEMBER( nb1413m3_device::inputport2_r )
 				default:    return (root.ioport("KEY5")->read() & root.ioport("KEY6")->read() & root.ioport("KEY7")->read()
 									& root.ioport("KEY8")->read() & root.ioport("KEY9")->read());
 			}
-			break;
 	}
 }
 

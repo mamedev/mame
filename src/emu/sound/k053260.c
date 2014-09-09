@@ -397,7 +397,6 @@ READ8_MEMBER( k053260_device::k053260_r )
 
 				return status;
 			}
-		break;
 
 		case 0x2e: /* read ROM */
 			if ( m_mode & 1 )

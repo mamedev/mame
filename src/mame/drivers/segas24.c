@@ -852,7 +852,6 @@ void segas24_state::irq_timer_start(int old_tmode)
 	}
 	case 2:
 		fatalerror("egas24_state::irq_timer_start - case 2\n");
-		break;
 	case 3: {
 		int count = 0x1000 - irq_tval;
 		irq_timer->adjust(attotime::from_hz(TIMER_CLOCK)*count);

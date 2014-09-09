@@ -1905,7 +1905,6 @@ int firebeat_state::ibutton_w(UINT8 data)
 				default:
 				{
 					fatalerror("ibutton: unknown normal mode cmd %02X\n", data);
-					break;
 				}
 			}
 			break;

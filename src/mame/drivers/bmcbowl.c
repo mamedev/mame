@@ -215,7 +215,6 @@ READ16_MEMBER(bmcbowl_state::bmc_protection_r)
 				case 0x1013: return 0;
 				default:         return 0x46<<8;
 			}
-			break;
 	}
 	logerror("Protection read @ %X\n",space.device().safe_pcbase());
 	return machine().rand();

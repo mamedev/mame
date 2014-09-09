@@ -152,7 +152,6 @@ READ32_MEMBER(mpu5_state::mpu5_mem_r)
 				case 0xf0:
 				{
 					return asic_r32(space, offset&3,mem_mask);
-					break;
 				}
 				
 				default:

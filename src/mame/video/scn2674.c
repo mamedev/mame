@@ -588,8 +588,6 @@ WRITE8_MEMBER( scn2674_device::mpu4_vid_scn2674_w )
 			m_scn2674_spl1 = (data & 0x40);
 			m_scn2674_spl2 = (data & 0x80);
 			break;
-
-		break;
 	}
 }
 

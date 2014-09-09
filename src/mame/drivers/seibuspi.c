@@ -957,7 +957,8 @@ READ32_MEMBER(seibuspi_state::ejsakura_keyboard_r)
 		default:
 			return ioport("SYSTEM")->read();
 	}
-	return 0xffffffff;
+	// never executed
+	//return 0xffffffff;
 }
 
 WRITE32_MEMBER(seibuspi_state::ejsakura_input_select_w)

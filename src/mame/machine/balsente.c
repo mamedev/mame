@@ -754,7 +754,6 @@ READ8_MEMBER(balsente_state::balsente_counter_8253_r)
 				m_counter[which].readbyte = 0;
 				return (m_counter[which].count >> 8) & 0xff;
 			}
-			break;
 	}
 	return 0;
 }

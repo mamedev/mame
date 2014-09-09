@@ -215,7 +215,8 @@ READ8_MEMBER(hitpoker_state::eeprom_r)
 	return ret;
 	/*** ***/
 
-	return m_eeprom_data[m_eeprom_index & 0xfff];
+	// FIXME: never executed
+	//return m_eeprom_data[m_eeprom_index & 0xfff];
 }
 
 READ8_MEMBER(hitpoker_state::hitpoker_pic_r)

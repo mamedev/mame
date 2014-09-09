@@ -2078,7 +2078,6 @@ static void copro_fifoin_push(address_space &space, UINT32 data)
 	if (state->m_copro_fifoin_num == FIFO_SIZE)
 	{
 		fatalerror("Copro FIFOIN overflow (at %08X)\n", space.device().safe_pc());
-		return;
 	}
 
 	state->m_copro_fifoin_data[state->m_copro_fifoin_wpos++] = data;
@@ -2123,7 +2122,6 @@ WRITE32_MEMBER(model1_state::copro_fifoout_push)
 	if (m_copro_fifoout_num == FIFO_SIZE)
 	{
 		fatalerror("Copro FIFOOUT overflow (at %08X)\n", m_tgp->pc());
-		return;
 	}
 
 	m_copro_fifoout_data[m_copro_fifoout_wpos++] = data;

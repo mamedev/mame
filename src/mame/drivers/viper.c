@@ -1521,7 +1521,8 @@ static UINT32 voodoo3_pci_r(device_t *busdevice, device_t *device, int function,
 		default:
 			fatalerror("voodoo3_pci_r: %08X at %08X\n", reg, device->machine().device("maincpu")->safe_pc());
 	}
-	return 0;
+	// never executed
+	//return 0;
 }
 
 static void voodoo3_pci_w(device_t *busdevice, device_t *device, int function, int reg, UINT32 data, UINT32 mem_mask)
@@ -1744,7 +1745,7 @@ void viper_state::DS2430_w(int bit)
 				{
 					case 0x33:      ds2430_state = DS2430_STATE_READ_ROM; break;
 					case 0xcc:      ds2430_state = DS2430_STATE_MEM_FUNCTION; break;
-					default:        fatalerror("DS2430_w: unimplemented rom command %02X\n", ds2430_cmd); break;
+					default:        fatalerror("DS2430_w: unimplemented rom command %02X\n", ds2430_cmd);
 				}
 			}
 			break;
@@ -1758,7 +1759,7 @@ void viper_state::DS2430_w(int bit)
 				switch (ds2430_cmd)
 				{
 					case 0xf0:      ds2430_state = DS2430_STATE_READ_MEM_ADDRESS; break;
-					default:        fatalerror("DS2430_w: unimplemented mem function %02X\n", ds2430_cmd); break;
+					default:        fatalerror("DS2430_w: unimplemented mem function %02X\n", ds2430_cmd);
 				}
 			}
 			break;

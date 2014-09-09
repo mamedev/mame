@@ -224,13 +224,11 @@ READ8_MEMBER(mitchell_state::input_r)
 				return mahjong_input_r(space, offset - 1);
 			else
 				return ioport("IN0")->read();
-			break;
 		case 2:     /* Block Block - dial control */
 			if (offset)
 				return block_input_r(space, offset - 1);
 			else
 				return ioport("IN0")->read();
-			break;
 		case 3:     /* Super Pang - simulate START 1 press to initialize EEPROM */
 			return ioport(portnames[offset])->read();
 	}

@@ -218,9 +218,6 @@ inline UINT8 metro_state::get_tile_pix( UINT16 code, UINT8 x, UINT8 y, int big, 
 		else
 			return 0;
 	}
-
-	// shouldn't get here..
-	return 0;
 }
 
 

@@ -448,6 +448,4 @@ READ16_MEMBER(zsg2_device::read)
 	{
 		return control_r(offset - 0x300);
 	}
-
-	return 0;
 }

@@ -781,8 +781,9 @@ WRITE16_MEMBER(model1_state::network_ctl_w)
 WRITE16_MEMBER(model1_state::md1_w)
 {
 	COMBINE_DATA(m_display_list1+offset);
-	if(0 && offset)
-		return;
+	// never executed
+	//if(0 && offset)
+	//	return;
 	if(1 && m_dump)
 		logerror("TGP: md1_w %x, %04x @ %04x (%x)\n", offset, data, mem_mask, space.device().safe_pc());
 }
@@ -790,8 +791,9 @@ WRITE16_MEMBER(model1_state::md1_w)
 WRITE16_MEMBER(model1_state::md0_w)
 {
 	COMBINE_DATA(m_display_list0+offset);
-	if(0 && offset)
-		return;
+	// never executed
+	//if(0 && offset)
+	//	return;
 	if(1 && m_dump)
 		logerror("TGP: md0_w %x, %04x @ %04x (%x)\n", offset, data, mem_mask, space.device().safe_pc());
 }

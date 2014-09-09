@@ -1654,7 +1654,6 @@ static UINT32 cmdfifo_execute(voodoo_state *v, cmdfifo_info *f)
 				case 2:     /* RET */
 					if (LOG_CMDFIFO) logerror("  RET $%06X\n", target);
 					fatalerror("RET in CMDFIFO!\n");
-					break;
 
 				case 3:     /* JMP LOCAL FRAME BUFFER */
 					if (LOG_CMDFIFO) logerror("  JMP LOCAL FRAMEBUF $%06X\n", target);
@@ -1670,7 +1669,6 @@ static UINT32 cmdfifo_execute(voodoo_state *v, cmdfifo_info *f)
 				default:
 					osd_printf_debug("INVALID JUMP COMMAND!\n");
 					fatalerror("  INVALID JUMP COMMAND\n");
-					break;
 			}
 			break;
 
@@ -2889,7 +2887,6 @@ static INT32 register_w(voodoo_state *v, offs_t offset, UINT32 data)
 			/* send tmu config data to the frame buffer */
 			v->send_config = (TREXINIT_SEND_TMU_CONFIG(data) > 0);
 			goto default_case;
-			break;
 
 		/* these registers are referenced in the renderer; we must wait for pending work before changing */
 		case chromaRange:
@@ -4571,7 +4568,6 @@ WRITE32_MEMBER( voodoo_banshee_device::banshee_agp_w )
 
 		case cmdBump0:
 			fatalerror("cmdBump0\n");
-			break;
 
 		case cmdRdPtrL0:
 			v->fbi.cmdfifo[0].rdptr = data;
@@ -4608,7 +4604,6 @@ WRITE32_MEMBER( voodoo_banshee_device::banshee_agp_w )
 
 		case cmdBump1:
 			fatalerror("cmdBump1\n");
-			break;
 
 		case cmdRdPtrL1:
 			v->fbi.cmdfifo[1].rdptr = data;
@@ -4956,7 +4951,6 @@ void voodoo_device::common_start_voodoo(UINT8 type)
 
 		default:
 			fatalerror("Unsupported voodoo card in voodoo_start!\n");
-			break;
 	}
 
 	/* set the type, and initialize the chip mask */

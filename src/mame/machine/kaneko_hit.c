@@ -120,7 +120,6 @@ READ16_MEMBER(kaneko_hit_device::kaneko_hit_r)
 
 		default:
 			fatalerror("kaneko_hit_r called, but m_hittype not set\n");
-			return 0;
 	}
 }
 
@@ -134,7 +133,6 @@ WRITE16_MEMBER(kaneko_hit_device::kaneko_hit_w)
 
 		default:
 			fatalerror("kaneko_hit_r called, but m_hittype not set\n");
-			break;
 	}
 }
 

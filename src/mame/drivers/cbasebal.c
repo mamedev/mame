@@ -51,7 +51,6 @@ READ8_MEMBER(cbasebal_state::bankedram_r)
 			return m_palette->basemem().read8(offset);
 		else
 			return 0;
-		break;
 	default:
 		return cbasebal_scrollram_r(space, offset); /* SCROLL */
 	}

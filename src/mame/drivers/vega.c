@@ -303,16 +303,13 @@ READ8_MEMBER(vega_state::extern_r)
 		{
 			return m_i8255->read( space, m_p2_data>>6); /* A6,A7 -> A0,A1 */
 		}
-		break;
 
 		case 1: /* 04-07 */
 		{
 			/* AY 3-8910 */
 			m_ay8910->data_w(space, 0, offset);
 			return 0xff;//mame_rand(space.machine);
-
 		}
-		break;
 
 		case 2: /* 08-0b */
 		{
@@ -327,9 +324,7 @@ READ8_MEMBER(vega_state::extern_r)
 				//register r ?
 				return m_ins8154->ins8154_r(space,offset&0x7f);
 			}
-
 		}
-		break;
 #if 0
 		case 3: /* 0c-0f */
 		{

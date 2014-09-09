@@ -346,7 +346,6 @@ READ16_MEMBER( namcos2_state::namcos2_68k_key_r )
 	//  case 3: popmessage("blah %08x",space.device().safe_pc());
 		default: return space.machine().rand();
 		}
-		break;
 
 	case NAMCOS2_SUPER_WSTADIUM_92:
 		switch(offset)

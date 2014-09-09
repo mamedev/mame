@@ -1248,7 +1248,6 @@ static void model2_3d_push( raster_state *raster, UINT32 input )
 			{
 				fatalerror( "SEGA 3D: Unknown rasterizer command %08x\n", raster->cur_command );
 			}
-			break;
 		}
 	}
 	else

@@ -1050,7 +1050,6 @@ READ16_MEMBER( ygv608_device::read )
 			}
 			return (data << 8);
 		}
-		break;
 
 		case 0x01: /* P#1 - sprite data port */
 			data = m_sprite_attribute_table.b[m_regs.s.saa];
@@ -1096,7 +1095,6 @@ READ16_MEMBER( ygv608_device::read )
 			}
 			return (data << 8);
 		}
-		break;
 
 		case 0x05:
 			break;

@@ -319,7 +319,6 @@ READ8_MEMBER(lethal_state::guns_r)
 				return 0;
 			else
 				return (232 - GUNY(1));
-			break;
 		case 2:
 			return GUNX(2) >> 1;
 		case 3:
@@ -327,7 +326,6 @@ READ8_MEMBER(lethal_state::guns_r)
 				return 0;
 			else
 				return (232 - GUNY(2));
-			break;
 	}
 
 	return 0;

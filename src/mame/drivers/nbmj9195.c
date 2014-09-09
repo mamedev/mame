@@ -130,26 +130,20 @@ READ8_MEMBER(nbmj9195_state::mscoutm_cpu_portb_r)
 	{
 	case 0x01:
 		return ioport("KEY0")->read();
-		break;
 	case 0x02:
 		return ioport("KEY1")->read();
-		break;
 	case 0x04:
 		return ioport("KEY2")->read();
-		break;
 	case 0x08:
 		return ioport("KEY3")->read();
-		break;
 	case 0x10:
 		return ioport("KEY4")->read();
-		break;
 	default:
 		return (ioport("KEY0")->read() & ioport("KEY1")->read() & ioport("KEY2")->read()
 			& ioport("KEY3")->read() & ioport("KEY4")->read());
-		break;
 	}
-
-	return 0xff;
+	// never executed
+	//return 0xff;
 }
 
 READ8_MEMBER(nbmj9195_state::mscoutm_cpu_portc_r)
@@ -159,25 +153,20 @@ READ8_MEMBER(nbmj9195_state::mscoutm_cpu_portc_r)
 	{
 	case 0x01:
 		return ioport("KEY5")->read();
-		break;
 	case 0x02:
 		return ioport("KEY6")->read();
-		break;
 	case 0x04:
 		return ioport("KEY7")->read();
-		break;
 	case 0x08:
 		return ioport("KEY8")->read();
-		break;
 	case 0x10:
 		return ioport("KEY9")->read();
-		break;
 	default:
 		return (ioport("KEY5")->read() & ioport("KEY6")->read() & ioport("KEY7")->read()
 			& ioport("KEY8")->read() & ioport("KEY9")->read());
-		break;
 	}
-	return 0xff;
+	// never executed
+	//return 0xff;
 }
 
 
@@ -213,24 +202,19 @@ READ8_MEMBER(nbmj9195_state::others_cpu_portb_r)
 	{
 	case 0x01:
 		return ioport("KEY0")->read();
-		break;
 	case 0x02:
 		return ioport("KEY1")->read();
-		break;
 	case 0x04:
 		return ioport("KEY2")->read();
-		break;
 	case 0x08:
 		return ioport("KEY3")->read();
-		break;
 	case 0x10:
 		return ((ioport("KEY4")->read() & 0x7f) | (nbmj9195_dipsw_r() << 7));
-		break;
 	default:
 		return (ioport("KEY0")->read() & ioport("KEY1")->read() & ioport("KEY2")->read() & ioport("KEY3")->read() & (ioport("KEY4")->read() & 0x7f));
-		break;
 	}
-	return 0xff;
+	// ever executed
+	//return 0xff;
 }
 
 READ8_MEMBER(nbmj9195_state::others_cpu_portc_r)
@@ -240,24 +224,19 @@ READ8_MEMBER(nbmj9195_state::others_cpu_portc_r)
 	{
 	case 0x01:
 		return ioport("KEY5")->read();
-		break;
 	case 0x02:
 		return ioport("KEY6")->read();
-		break;
 	case 0x04:
 		return ioport("KEY7")->read();
-		break;
 	case 0x08:
 		return ioport("KEY8")->read();
-		break;
 	case 0x10:
 		return ioport("KEY9")->read() & 0x7f;
-		break;
 	default:
 		return (ioport("KEY5")->read() & ioport("KEY6")->read() & ioport("KEY7")->read() & ioport("KEY8")->read() & (ioport("KEY9")->read() & 0x7f));
-		break;
 	}
-	return 0xff;;
+	// never executed
+	//return 0xff;
 }
 
 

@@ -1144,7 +1144,8 @@ READ16_MEMBER( harddriv_state::hdds3_sdsp_control_r )
 			return m_ds3sdsp_regs[offset];
 	}
 
-	return 0xff;
+	// never executed
+	//return 0xff;
 }
 
 
@@ -1209,7 +1210,8 @@ READ16_MEMBER( harddriv_state::hdds3_xdsp_control_r )
 			return m_ds3xdsp_regs[offset];
 	}
 
-	return 0xff;
+	// never executed
+	//return 0xff;
 }
 
 

@@ -687,7 +687,6 @@ READ16_MEMBER(jpmsys5_state::coins_awp_r)
 		{
 			return ioport("COINS")->read() << 8;
 		}
-		break;
 		default:
 		{
 			logerror("coins read offset: %x",offset);
