@@ -8,16 +8,6 @@
 #include "debugger.h"
 #include "tms32051.h"
 
-#define INTERRUPT_INT1      0
-#define INTERRUPT_INT2      1
-#define INTERRUPT_INT3      2
-#define INTERRUPT_TINT      3
-#define INTERRUPT_RINT      4
-#define INTERRUPT_XINT      5
-#define INTERRUPT_TRNT      6
-#define INTERRUPT_TXNT      7
-#define INTERRUPT_INT4      8
-
 enum
 {
 	TMS32051_PC = 1,
@@ -55,7 +45,7 @@ const device_type TMS32051 = &device_creator<tms32051_device>;
  **************************************************************************/
 
 static ADDRESS_MAP_START( internal_pgm, AS_PROGRAM, 16, tms32051_device )
-	AM_RANGE(0x0000, 0x1fff) AM_ROM                         // ROM          TODO: is off-chip if MP/_MC = 0
+//	AM_RANGE(0x0000, 0x1fff) AM_ROM                         // ROM          TODO: is off-chip if MP/_MC = 0
 	AM_RANGE(0x2000, 0x23ff) AM_RAM AM_SHARE("saram")       // SARAM        TODO: is off-chip if RAM bit = 0
 	AM_RANGE(0xfe00, 0xffff) AM_RAM AM_SHARE("daram_b0")    // DARAM B0     TODO: is off-chip if CNF = 0
 ADDRESS_MAP_END
@@ -251,11 +241,9 @@ void tms32051_device::device_reset()
 
 void tms32051_device::check_interrupts()
 {
-	int i;
-
 	if (m_st0.intm == 0 && m_ifr != 0)
 	{
-		for (i=0; i < 16; i++)
+		for (int i = 0; i < 16; i++)
 		{
 			if (m_ifr & (1 << i))
 			{
@@ -274,14 +262,14 @@ void tms32051_device::check_interrupts()
 
 void tms32051_device::save_interrupt_context()
 {
-	m_shadow.acc        = m_acc;
-	m_shadow.accb       = m_accb;
-	m_shadow.arcr       = m_arcr;
-	m_shadow.indx       = m_indx;
-	m_shadow.preg       = m_preg;
-	m_shadow.treg0  = m_treg0;
-	m_shadow.treg1  = m_treg1;
-	m_shadow.treg2  = m_treg2;
+	m_shadow.acc = m_acc;
+	m_shadow.accb = m_accb;
+	m_shadow.arcr = m_arcr;
+	m_shadow.indx = m_indx;
+	m_shadow.preg = m_preg;
+	m_shadow.treg0 = m_treg0;
+	m_shadow.treg1 = m_treg1;
+	m_shadow.treg2 = m_treg2;
 	memcpy(&m_shadow.pmst, &m_pmst, sizeof(TMS32051_PMST));
 	memcpy(&m_shadow.st0, &m_st0, sizeof(TMS32051_ST0));
 	memcpy(&m_shadow.st1, &m_st1, sizeof(TMS32051_ST1));
@@ -289,14 +277,14 @@ void tms32051_device::save_interrupt_context()
 
 void tms32051_device::restore_interrupt_context()
 {
-	m_acc               = m_shadow.acc;
-	m_accb          = m_shadow.accb;
-	m_arcr          = m_shadow.arcr;
-	m_indx          = m_shadow.indx;
-	m_preg          = m_shadow.preg;
-	m_treg0         = m_shadow.treg0;
-	m_treg1         = m_shadow.treg1;
-	m_treg2         = m_shadow.treg2;
+	m_acc = m_shadow.acc;
+	m_accb = m_shadow.accb;
+	m_arcr = m_shadow.arcr;
+	m_indx = m_shadow.indx;
+	m_preg = m_shadow.preg;
+	m_treg0 = m_shadow.treg0;
+	m_treg1 = m_shadow.treg1;
+	m_treg2 = m_shadow.treg2;
 	memcpy(&m_pmst, &m_shadow.pmst, sizeof(TMS32051_PMST));
 	memcpy(&m_st0, &m_shadow.st0, sizeof(TMS32051_ST0));
 	memcpy(&m_st1, &m_shadow.st1, sizeof(TMS32051_ST1));
@@ -304,7 +292,7 @@ void tms32051_device::restore_interrupt_context()
 
 void tms32051_device::execute_set_input(int irq, int state)
 {
-	if ( state == ASSERT_LINE )
+	if (state == ASSERT_LINE)
 	{
 		if ((m_imr & (1 << irq)) != 0)
 		{
@@ -318,7 +306,7 @@ void tms32051_device::execute_set_input(int irq, int state)
 
 void tms32051_device::execute_run()
 {
-	while(m_icount > 0)
+	while (m_icount > 0)
 	{
 		UINT16 ppc;
 
@@ -370,7 +358,7 @@ void tms32051_device::execute_run()
 				// reset timer
 				m_timer.tim = m_timer.prd;
 
-				execute_set_input(INTERRUPT_TINT, ASSERT_LINE);
+				execute_set_input(TMS32051_TINT, ASSERT_LINE);
 			}
 		}
 	}
@@ -409,6 +397,12 @@ READ16_MEMBER( tms32051_device::cpuregs_r )
 		case 0x15:  return m_ar[5];
 		case 0x16:  return m_ar[6];
 		case 0x17:  return m_ar[7];
+		case 0x18:  return m_indx;
+		case 0x19:  return m_arcr;
+		case 0x1a:  return m_cbsr1;
+		case 0x1b:  return m_cber1;
+		case 0x1c:  return m_cbsr2;
+		case 0x1d:  return m_cber2;
 		case 0x1e:  return m_cbcr;
 		case 0x1f:  return m_bmar;
 		case 0x24:  return m_timer.tim;
@@ -423,9 +417,10 @@ READ16_MEMBER( tms32051_device::cpuregs_r )
 		}
 
 		case 0x28:  return 0;   // PDWSR
+
 		default:
-		if(!space.debugger_access())
-			fatalerror("32051: cpuregs_r: unimplemented memory-mapped register %02X at %04X\n", offset, m_pc-1);
+			if (!space.debugger_access())
+				fatalerror("32051: cpuregs_r: unimplemented memory-mapped register %02X at %04X\n", offset, m_pc-1);
 	}
 
 	return 0;
@@ -439,8 +434,7 @@ WRITE16_MEMBER( tms32051_device::cpuregs_w )
 		case 0x04:  m_imr = data; break;
 		case 0x06:      // IFR
 		{
-			int i;
-			for (i=0; i < 16; i++)
+			for (int i = 0; i < 16; i++)
 			{
 				if (data & (1 << i))
 				{
@@ -499,15 +493,15 @@ WRITE16_MEMBER( tms32051_device::cpuregs_w )
 		}
 
 		case 0x28:  break;      // PDWSR
+
 		default:
-		if(!space.debugger_access())
-			fatalerror("32051: cpuregs_w: unimplemented memory-mapped register %02X, data %04X at %04X\n", offset, data, m_pc-1);
+			if (!space.debugger_access())
+				fatalerror("32051: cpuregs_w: unimplemented memory-mapped register %02X, data %04X at %04X\n", offset, data, m_pc-1);
 	}
 }
 
 
 bool tms32051_device::memory_read(address_spacenum spacenum, offs_t offset, int size, UINT64 &value)
-
 {
 	/* TODO: alignment if offset is odd */
 	if (spacenum == AS_PROGRAM)

@@ -893,7 +893,8 @@ WRITE16_MEMBER(taitojc_state::dsp_unk2_w)
 }
 
 static ADDRESS_MAP_START( tms_program_map, AS_PROGRAM, 16, taitojc_state )
-	AM_RANGE(0x4000, 0x7fff) AM_RAM
+	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_MIRROR(0x4000)
+	AM_RANGE(0x6000, 0x7fff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tms_data_map, AS_DATA, 16, taitojc_state )
