@@ -186,6 +186,7 @@ public:
 	DECLARE_DRIVER_INIT(misncrft);
 	DECLARE_DRIVER_INIT(boonggab);
 	DECLARE_DRIVER_INIT(wyvernwg);
+	DECLARE_DRIVER_INIT(yorizori);
 	UINT32 screen_update_common(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_aoh(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
@@ -379,12 +380,12 @@ READ32_MEMBER(vamphalf_state::yorizori_10_r)
 }
 READ32_MEMBER(vamphalf_state::yorizori_1c_r)
 {
-	printf("yorizori_1c_r %08x\n", space.device().safe_pc());
-	return 0xaa;
+//	printf("yorizori_1c_r %08x\n", space.device().safe_pc());
+	return 0x00;// 0xaa;
 }
 WRITE32_MEMBER(vamphalf_state::yorizori_1c_w)
 {
-	printf("yorizori_1c_w %08x %08x\n", space.device().safe_pc(), data);
+//	printf("yorizori_1c_w %08x %08x\n", space.device().safe_pc(), data);
 }
 
 WRITE32_MEMBER( vamphalf_state::wyvernwg_snd_w )
@@ -2762,6 +2763,20 @@ DRIVER_INIT_MEMBER(vamphalf_state,wyvernwg)
 	membank("qs1000:data")->configure_entries(0, 16, memregion("qs1000:cpu")->base()+0x100, 0x8000-0x100);
 }
 
+DRIVER_INIT_MEMBER(vamphalf_state,yorizori)
+{
+	m_palshift = 0;
+	m_flip_bit = 1;
+
+	m_semicom_prot_idx = 8;
+	m_semicom_prot_data[0] = 2;
+	m_semicom_prot_data[1] = 1;
+
+	// Configure the QS1000 ROM banking. Care must be taken not to overlap the 256b internal RAM
+	machine().device("qs1000:cpu")->memory().space(AS_IO).install_read_bank(0x0100, 0xffff, "data");
+	membank("qs1000:data")->configure_entries(0, 16, memregion("qs1000:cpu")->base()+0x100, 0x8000-0x100);
+}
+
 DRIVER_INIT_MEMBER(vamphalf_state,finalgdr)
 {
 	m_finalgdr_backupram_bank = 1;
@@ -2874,4 +2889,4 @@ GAME( 2001, wyvernwg, wivernwg, wyvernwg, common, vamphalf_state,   wyvernwg, RO
 GAME( 2001, wyvernwga,wivernwg, wyvernwg, common, vamphalf_state,   wyvernwg, ROT270, "SemiCom (Game Vision license)", "Wyvern Wings (set 2)", GAME_IMPERFECT_SOUND )
 GAME( 2001, aoh,      0,        aoh,      aoh, vamphalf_state,      aoh,      ROT0,   "Unico",             "Age Of Heroes - Silkroad 2 (v0.63 - 2001/02/07)", 0 )
 GAME( 2001, boonggab, 0,        boonggab, boonggab, vamphalf_state, boonggab, ROT270, "Taff System",       "Boong-Ga Boong-Ga (Spank'em!)", 0 )
-GAME( 199?, yorizori, 0,        yorizori, common, vamphalf_state,   misncrft, ROT0,  "<unknown>",         "Yori Zori Kuk Kuk", GAME_IMPERFECT_SOUND )
+GAME( 199?, yorizori, 0,        yorizori, common, vamphalf_state,   yorizori, ROT0,   "<unknown>",         "Yori Zori Kuk Kuk", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND )
