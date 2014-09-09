@@ -35,7 +35,7 @@
 
  Pierpaolo Prazzoli
  - Fixed LDxx.N/P/S opcodes not to increment the destination register when
-   it's the same as the source or "next source" one.
+   it's the same as the source or"next source" one.
 
  Pierpaolo Prazzoli
  - Removed nested delays
@@ -59,7 +59,7 @@
  - Added nested delays
 
  Tomasz Slanina
- - Added "undefined" C flag to shift left instructions
+ - Added"undefined" C flag to shift left instructions
 
  Pierpaolo Prazzoli
  - Added interrupts-block for delay instructions
@@ -177,13 +177,13 @@
     - Implemented a crude hack to set FL in the SR to 6, since according to the docs
       that's supposed to happen each time a trap occurs, apparently including when
       the processor starts up. The 3rd opcode executed in vamphalf checks to see if
-      the FL flag in SR 6, so it's apparently the "correct" behaviour despite the
+      the FL flag in SR 6, so it's apparently the"correct" behaviour despite the
       docs not saying anything on it. If FL is not 6, the branch falls through and
       encounters a CHK PC, L2, which at that point will always throw a range trap.
       The range trap vector contains 00000000 (CHK PC, PC), which according to the
       docs will always throw a range trap (which would effectively lock the system).
       This revealed a bug: CHK PC, PC apparently does not throw a range trap, which
-      needs to be fixed. Now that the "correct" behaviour is hacked in with the FL
+      needs to be fixed. Now that the"correct" behaviour is hacked in with the FL
       flags, it reveals yet another bug in that the branch is interpreted as being
       +0x8700. This means that the PC then wraps around to 000082B0, give or take
       a few bytes. While it does indeed branch to valid code, I highly doubt that
@@ -211,9 +211,9 @@
 
 *********************************************************************/
 
-#include "emu.h"
-#include "debugger.h"
-#include "e132xs.h"
+#include"emu.h"
+#include"debugger.h"
+#include"e132xs.h"
 
 #ifdef MAME_DEBUG
 #define DEBUG_PRINTF(x) do { osd_printf_debug x; } while (0)
@@ -308,7 +308,7 @@ hyperstone_device::hyperstone_device(const machine_config &mconfig, const char *
 //-------------------------------------------------
 
 e116t_device::e116t_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: hyperstone_device(mconfig, "E1-16T", tag, owner, clock, E116T, 16, 16, ADDRESS_MAP_NAME(e116_4k_iram_map), "e116t", __FILE__)
+	: hyperstone_device(mconfig,"E1-16T", tag, owner, clock, E116T, 16, 16, ADDRESS_MAP_NAME(e116_4k_iram_map),"e116t", __FILE__)
 {
 }
 
@@ -318,7 +318,7 @@ e116t_device::e116t_device(const machine_config &mconfig, const char *tag, devic
 //-------------------------------------------------
 
 e116xt_device::e116xt_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: hyperstone_device(mconfig, "E1-16XT", tag, owner, clock, E116XT, 16, 16, ADDRESS_MAP_NAME(e116_8k_iram_map), "e116xt", __FILE__)
+	: hyperstone_device(mconfig,"E1-16XT", tag, owner, clock, E116XT, 16, 16, ADDRESS_MAP_NAME(e116_8k_iram_map),"e116xt", __FILE__)
 {
 }
 
@@ -328,7 +328,7 @@ e116xt_device::e116xt_device(const machine_config &mconfig, const char *tag, dev
 //-------------------------------------------------
 
 e116xs_device::e116xs_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: hyperstone_device(mconfig, "E1-16XS", tag, owner, clock, E116XS, 16, 16, ADDRESS_MAP_NAME(e116_16k_iram_map), "e116xs", __FILE__)
+	: hyperstone_device(mconfig,"E1-16XS", tag, owner, clock, E116XS, 16, 16, ADDRESS_MAP_NAME(e116_16k_iram_map),"e116xs", __FILE__)
 {
 }
 
@@ -338,7 +338,7 @@ e116xs_device::e116xs_device(const machine_config &mconfig, const char *tag, dev
 //-------------------------------------------------
 
 e116xsr_device::e116xsr_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: hyperstone_device(mconfig, "E1-16XSR", tag, owner, clock, E116XT, 16, 16, ADDRESS_MAP_NAME(e116_16k_iram_map), "e116xsr", __FILE__)
+	: hyperstone_device(mconfig,"E1-16XSR", tag, owner, clock, E116XT, 16, 16, ADDRESS_MAP_NAME(e116_16k_iram_map),"e116xsr", __FILE__)
 {
 }
 
@@ -348,7 +348,7 @@ e116xsr_device::e116xsr_device(const machine_config &mconfig, const char *tag, d
 //-------------------------------------------------
 
 e132n_device::e132n_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: hyperstone_device(mconfig, "E1-32N", tag, owner, clock, E132N, 32, 32, ADDRESS_MAP_NAME(e132_4k_iram_map), "e132n", __FILE__)
+	: hyperstone_device(mconfig,"E1-32N", tag, owner, clock, E132N, 32, 32, ADDRESS_MAP_NAME(e132_4k_iram_map),"e132n", __FILE__)
 {
 }
 
@@ -358,7 +358,7 @@ e132n_device::e132n_device(const machine_config &mconfig, const char *tag, devic
 //-------------------------------------------------
 
 e132t_device::e132t_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: hyperstone_device(mconfig, "E1-32T", tag, owner, clock, E132T, 32, 32, ADDRESS_MAP_NAME(e132_4k_iram_map), "e132t", __FILE__)
+	: hyperstone_device(mconfig,"E1-32T", tag, owner, clock, E132T, 32, 32, ADDRESS_MAP_NAME(e132_4k_iram_map),"e132t", __FILE__)
 {
 }
 
@@ -368,7 +368,7 @@ e132t_device::e132t_device(const machine_config &mconfig, const char *tag, devic
 //-------------------------------------------------
 
 e132xn_device::e132xn_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: hyperstone_device(mconfig, "E1-32XN", tag, owner, clock, E132XN, 32, 32, ADDRESS_MAP_NAME(e132_8k_iram_map), "e132xn", __FILE__)
+	: hyperstone_device(mconfig,"E1-32XN", tag, owner, clock, E132XN, 32, 32, ADDRESS_MAP_NAME(e132_8k_iram_map),"e132xn", __FILE__)
 {
 }
 
@@ -378,7 +378,7 @@ e132xn_device::e132xn_device(const machine_config &mconfig, const char *tag, dev
 //-------------------------------------------------
 
 e132xt_device::e132xt_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: hyperstone_device(mconfig, "E1-32XT", tag, owner, clock, E132XT, 32, 32, ADDRESS_MAP_NAME(e132_8k_iram_map), "e132xt", __FILE__)
+	: hyperstone_device(mconfig,"E1-32XT", tag, owner, clock, E132XT, 32, 32, ADDRESS_MAP_NAME(e132_8k_iram_map),"e132xt", __FILE__)
 {
 }
 
@@ -388,7 +388,7 @@ e132xt_device::e132xt_device(const machine_config &mconfig, const char *tag, dev
 //-------------------------------------------------
 
 e132xs_device::e132xs_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: hyperstone_device(mconfig, "E1-32XS", tag, owner, clock, E132XS, 32, 32, ADDRESS_MAP_NAME(e132_16k_iram_map), "e132xs", __FILE__)
+	: hyperstone_device(mconfig,"E1-32XS", tag, owner, clock, E132XS, 32, 32, ADDRESS_MAP_NAME(e132_16k_iram_map),"e132xs", __FILE__)
 {
 }
 
@@ -398,7 +398,7 @@ e132xs_device::e132xs_device(const machine_config &mconfig, const char *tag, dev
 //-------------------------------------------------
 
 e132xsr_device::e132xsr_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: hyperstone_device(mconfig, "E1-32XSR", tag, owner, clock, E132XSR, 32, 32, ADDRESS_MAP_NAME(e132_16k_iram_map), "e132xsr", __FILE__)
+	: hyperstone_device(mconfig,"E1-32XSR", tag, owner, clock, E132XSR, 32, 32, ADDRESS_MAP_NAME(e132_16k_iram_map),"e132xsr", __FILE__)
 {
 }
 
@@ -408,7 +408,7 @@ e132xsr_device::e132xsr_device(const machine_config &mconfig, const char *tag, d
 //-------------------------------------------------
 
 gms30c2116_device::gms30c2116_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: hyperstone_device(mconfig, "GMS30C2116", tag, owner, clock, GMS30C2116, 16, 16, ADDRESS_MAP_NAME(e116_4k_iram_map), "gms30c2116", __FILE__)
+	: hyperstone_device(mconfig,"GMS30C2116", tag, owner, clock, GMS30C2116, 16, 16, ADDRESS_MAP_NAME(e116_4k_iram_map),"gms30c2116", __FILE__)
 {
 }
 
@@ -418,7 +418,7 @@ gms30c2116_device::gms30c2116_device(const machine_config &mconfig, const char *
 //-------------------------------------------------
 
 gms30c2132_device::gms30c2132_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: hyperstone_device(mconfig, "GMS30C2132", tag, owner, clock, GMS30C2132, 32, 32, ADDRESS_MAP_NAME(e132_4k_iram_map), "gms30c2132", __FILE__)
+	: hyperstone_device(mconfig,"GMS30C2132", tag, owner, clock, GMS30C2132, 32, 32, ADDRESS_MAP_NAME(e132_4k_iram_map),"gms30c2132", __FILE__)
 {
 }
 
@@ -428,7 +428,7 @@ gms30c2132_device::gms30c2132_device(const machine_config &mconfig, const char *
 //-------------------------------------------------
 
 gms30c2216_device::gms30c2216_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: hyperstone_device(mconfig, "GMS30C2216", tag, owner, clock, GMS30C2216, 16, 16, ADDRESS_MAP_NAME(e116_8k_iram_map), "gms30c2216", __FILE__)
+	: hyperstone_device(mconfig,"GMS30C2216", tag, owner, clock, GMS30C2216, 16, 16, ADDRESS_MAP_NAME(e116_8k_iram_map),"gms30c2216", __FILE__)
 {
 }
 
@@ -438,7 +438,7 @@ gms30c2216_device::gms30c2216_device(const machine_config &mconfig, const char *
 //-------------------------------------------------
 
 gms30c2232_device::gms30c2232_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: hyperstone_device(mconfig, "GMS30C2232", tag, owner, clock, GMS30C2232, 32, 32, ADDRESS_MAP_NAME(e132_8k_iram_map), "gms30c2232", __FILE__)
+	: hyperstone_device(mconfig,"GMS30C2232", tag, owner, clock, GMS30C2232, 32, 32, ADDRESS_MAP_NAME(e132_8k_iram_map),"gms30c2232", __FILE__)
 {
 }
 
@@ -459,7 +459,7 @@ UINT32 hyperstone_device::get_trap_addr(UINT8 trapno)
 	return addr;
 }
 
-/* Return the entry point for a determinated emulated code (the one for "extend" opcode is reserved) */
+/* Return the entry point for a determinated emulated code (the one for"extend" opcode is reserved) */
 UINT32 hyperstone_device::get_emu_code_addr(UINT8 num) /* num is OP */
 {
 	UINT32 addr;
@@ -1561,120 +1561,120 @@ void hyperstone_device::init(int scale_mask)
 
 	// register our state for the debugger
 	astring tempstr;
-	state_add(STATE_GENPC,     "GENPC",     m_global_regs[0]).noshow();
-	state_add(STATE_GENFLAGS,  "GENFLAGS",  m_global_regs[1]).callimport().callexport().formatstr("%40s").noshow();
-	state_add(E132XS_PC,       "PC  :%08X", m_global_regs[0]).mask(0xffffffff);
-	state_add(E132XS_SR,       "SR  :%08X", m_global_regs[1]).mask(0xffffffff);
-	state_add(E132XS_FER,      "FER :%08X", m_global_regs[2]).mask(0xffffffff);
-	state_add(E132XS_G3,       "G3  :%08X", m_global_regs[3]).mask(0xffffffff);
-	state_add(E132XS_G4,       "G4  :%08X", m_global_regs[4]).mask(0xffffffff);
-	state_add(E132XS_G5,       "G5  :%08X", m_global_regs[5]).mask(0xffffffff);
-	state_add(E132XS_G6,       "G6  :%08X", m_global_regs[6]).mask(0xffffffff);
-	state_add(E132XS_G7,       "G7  :%08X", m_global_regs[7]).mask(0xffffffff);
-	state_add(E132XS_G8,       "G8  :%08X", m_global_regs[8]).mask(0xffffffff);
-	state_add(E132XS_G9,       "G9  :%08X", m_global_regs[9]).mask(0xffffffff);
-	state_add(E132XS_G10,      "G10 :%08X", m_global_regs[10]).mask(0xffffffff);
-	state_add(E132XS_G11,      "G11 :%08X", m_global_regs[11]).mask(0xffffffff);
-	state_add(E132XS_G12,      "G12 :%08X", m_global_regs[12]).mask(0xffffffff);
-	state_add(E132XS_G13,      "G13 :%08X", m_global_regs[13]).mask(0xffffffff);
-	state_add(E132XS_G14,      "G14 :%08X", m_global_regs[14]).mask(0xffffffff);
-	state_add(E132XS_G15,      "G15 :%08X", m_global_regs[15]).mask(0xffffffff);
-	state_add(E132XS_G16,      "G16 :%08X", m_global_regs[16]).mask(0xffffffff);
-	state_add(E132XS_G17,      "G17 :%08X", m_global_regs[17]).mask(0xffffffff);
-	state_add(E132XS_SP,       "SP  :%08X", m_global_regs[18]).mask(0xffffffff);
-	state_add(E132XS_UB,       "UB  :%08X", m_global_regs[19]).mask(0xffffffff);
-	state_add(E132XS_BCR,      "BCR :%08X", m_global_regs[20]).mask(0xffffffff);
-	state_add(E132XS_TPR,      "TPR :%08X", m_global_regs[21]).mask(0xffffffff);
-	state_add(E132XS_TCR,      "TCR :%08X", m_global_regs[22]).mask(0xffffffff);
-	state_add(E132XS_TR,       "TR  :%08X", m_global_regs[23]).mask(0xffffffff);
-	state_add(E132XS_WCR,      "WCR :%08X", m_global_regs[24]).mask(0xffffffff);
-	state_add(E132XS_ISR,      "ISR :%08X", m_global_regs[25]).mask(0xffffffff);
-	state_add(E132XS_FCR,      "FCR :%08X", m_global_regs[26]).mask(0xffffffff);
-	state_add(E132XS_MCR,      "MCR :%08X", m_global_regs[27]).mask(0xffffffff);
-	state_add(E132XS_G28,      "G28 :%08X", m_global_regs[28]).mask(0xffffffff);
-	state_add(E132XS_G29,      "G29 :%08X", m_global_regs[29]).mask(0xffffffff);
-	state_add(E132XS_G30,      "G30 :%08X", m_global_regs[30]).mask(0xffffffff);
-	state_add(E132XS_G31,      "G31 :%08X", m_global_regs[31]).mask(0xffffffff);
-	state_add(E132XS_CL0,      "CL0 :%08X", m_local_regs[(0 + GET_FP) % 64]).mask(0xffffffff);
-	state_add(E132XS_CL1,      "CL1 :%08X", m_local_regs[(1 + GET_FP) % 64]).mask(0xffffffff);
-	state_add(E132XS_CL2,      "CL2 :%08X", m_local_regs[(2 + GET_FP) % 64]).mask(0xffffffff);
-	state_add(E132XS_CL3,      "CL3 :%08X", m_local_regs[(3 + GET_FP) % 64]).mask(0xffffffff);
-	state_add(E132XS_CL4,      "CL4 :%08X", m_local_regs[(4 + GET_FP) % 64]).mask(0xffffffff);
-	state_add(E132XS_CL5,      "CL5 :%08X", m_local_regs[(5 + GET_FP) % 64]).mask(0xffffffff);
-	state_add(E132XS_CL6,      "CL6 :%08X", m_local_regs[(6 + GET_FP) % 64]).mask(0xffffffff);
-	state_add(E132XS_CL7,      "CL7 :%08X", m_local_regs[(7 + GET_FP) % 64]).mask(0xffffffff);
-	state_add(E132XS_CL8,      "CL8 :%08X", m_local_regs[(8 + GET_FP) % 64]).mask(0xffffffff);
-	state_add(E132XS_CL9,      "CL9 :%08X", m_local_regs[(9 + GET_FP) % 64]).mask(0xffffffff);
-	state_add(E132XS_CL10,     "CL10:%08X", m_local_regs[(10 + GET_FP) % 64]).mask(0xffffffff);
-	state_add(E132XS_CL11,     "CL11:%08X", m_local_regs[(11 + GET_FP) % 64]).mask(0xffffffff);
-	state_add(E132XS_CL12,     "CL12:%08X", m_local_regs[(12 + GET_FP) % 64]).mask(0xffffffff);
-	state_add(E132XS_CL13,     "CL13:%08X", m_local_regs[(13 + GET_FP) % 64]).mask(0xffffffff);
-	state_add(E132XS_CL14,     "CL14:%08X", m_local_regs[(14 + GET_FP) % 64]).mask(0xffffffff);
-	state_add(E132XS_CL15,     "CL15:%08X", m_local_regs[(15 + GET_FP) % 64]).mask(0xffffffff);
-	state_add(E132XS_L0,       "L0  :%08X", m_local_regs[0]).mask(0xffffffff);
-	state_add(E132XS_L1,       "L1  :%08X", m_local_regs[1]).mask(0xffffffff);
-	state_add(E132XS_L2,       "L2  :%08X", m_local_regs[2]).mask(0xffffffff);
-	state_add(E132XS_L3,       "L3  :%08X", m_local_regs[3]).mask(0xffffffff);
-	state_add(E132XS_L4,       "L4  :%08X", m_local_regs[4]).mask(0xffffffff);
-	state_add(E132XS_L5,       "L5  :%08X", m_local_regs[5]).mask(0xffffffff);
-	state_add(E132XS_L6,       "L6  :%08X", m_local_regs[6]).mask(0xffffffff);
-	state_add(E132XS_L7,       "L7  :%08X", m_local_regs[7]).mask(0xffffffff);
-	state_add(E132XS_L8,       "L8  :%08X", m_local_regs[8]).mask(0xffffffff);
-	state_add(E132XS_L9,       "L9  :%08X", m_local_regs[9]).mask(0xffffffff);
-	state_add(E132XS_L10,      "L10 :%08X", m_local_regs[10]).mask(0xffffffff);
-	state_add(E132XS_L11,      "L11 :%08X", m_local_regs[11]).mask(0xffffffff);
-	state_add(E132XS_L12,      "L12 :%08X", m_local_regs[12]).mask(0xffffffff);
-	state_add(E132XS_L13,      "L13 :%08X", m_local_regs[13]).mask(0xffffffff);
-	state_add(E132XS_L14,      "L14 :%08X", m_local_regs[14]).mask(0xffffffff);
-	state_add(E132XS_L15,      "L15 :%08X", m_local_regs[15]).mask(0xffffffff);
-	state_add(E132XS_L16,      "L16 :%08X", m_local_regs[16]).mask(0xffffffff);
-	state_add(E132XS_L17,      "L17 :%08X", m_local_regs[17]).mask(0xffffffff);
-	state_add(E132XS_L18,      "L18 :%08X", m_local_regs[18]).mask(0xffffffff);
-	state_add(E132XS_L19,      "L19 :%08X", m_local_regs[19]).mask(0xffffffff);
-	state_add(E132XS_L20,      "L20 :%08X", m_local_regs[20]).mask(0xffffffff);
-	state_add(E132XS_L21,      "L21 :%08X", m_local_regs[21]).mask(0xffffffff);
-	state_add(E132XS_L22,      "L22 :%08X", m_local_regs[22]).mask(0xffffffff);
-	state_add(E132XS_L23,      "L23 :%08X", m_local_regs[23]).mask(0xffffffff);
-	state_add(E132XS_L24,      "L24 :%08X", m_local_regs[24]).mask(0xffffffff);
-	state_add(E132XS_L25,      "L25 :%08X", m_local_regs[25]).mask(0xffffffff);
-	state_add(E132XS_L26,      "L26 :%08X", m_local_regs[26]).mask(0xffffffff);
-	state_add(E132XS_L27,      "L27 :%08X", m_local_regs[27]).mask(0xffffffff);
-	state_add(E132XS_L28,      "L28 :%08X", m_local_regs[28]).mask(0xffffffff);
-	state_add(E132XS_L29,      "L29 :%08X", m_local_regs[29]).mask(0xffffffff);
-	state_add(E132XS_L30,      "L30 :%08X", m_local_regs[30]).mask(0xffffffff);
-	state_add(E132XS_L31,      "L31 :%08X", m_local_regs[31]).mask(0xffffffff);
-	state_add(E132XS_L32,      "L32 :%08X", m_local_regs[32]).mask(0xffffffff);
-	state_add(E132XS_L33,      "L33 :%08X", m_local_regs[33]).mask(0xffffffff);
-	state_add(E132XS_L34,      "L34 :%08X", m_local_regs[34]).mask(0xffffffff);
-	state_add(E132XS_L35,      "L35 :%08X", m_local_regs[35]).mask(0xffffffff);
-	state_add(E132XS_L36,      "L36 :%08X", m_local_regs[36]).mask(0xffffffff);
-	state_add(E132XS_L37,      "L37 :%08X", m_local_regs[37]).mask(0xffffffff);
-	state_add(E132XS_L38,      "L38 :%08X", m_local_regs[38]).mask(0xffffffff);
-	state_add(E132XS_L39,      "L39 :%08X", m_local_regs[39]).mask(0xffffffff);
-	state_add(E132XS_L40,      "L40 :%08X", m_local_regs[40]).mask(0xffffffff);
-	state_add(E132XS_L41,      "L41 :%08X", m_local_regs[41]).mask(0xffffffff);
-	state_add(E132XS_L42,      "L42 :%08X", m_local_regs[42]).mask(0xffffffff);
-	state_add(E132XS_L43,      "L43 :%08X", m_local_regs[43]).mask(0xffffffff);
-	state_add(E132XS_L44,      "L44 :%08X", m_local_regs[44]).mask(0xffffffff);
-	state_add(E132XS_L45,      "L45 :%08X", m_local_regs[45]).mask(0xffffffff);
-	state_add(E132XS_L46,      "L46 :%08X", m_local_regs[46]).mask(0xffffffff);
-	state_add(E132XS_L47,      "L47 :%08X", m_local_regs[47]).mask(0xffffffff);
-	state_add(E132XS_L48,      "L48 :%08X", m_local_regs[48]).mask(0xffffffff);
-	state_add(E132XS_L49,      "L49 :%08X", m_local_regs[49]).mask(0xffffffff);
-	state_add(E132XS_L50,      "L50 :%08X", m_local_regs[50]).mask(0xffffffff);
-	state_add(E132XS_L51,      "L51 :%08X", m_local_regs[51]).mask(0xffffffff);
-	state_add(E132XS_L52,      "L52 :%08X", m_local_regs[52]).mask(0xffffffff);
-	state_add(E132XS_L53,      "L53 :%08X", m_local_regs[53]).mask(0xffffffff);
-	state_add(E132XS_L54,      "L54 :%08X", m_local_regs[54]).mask(0xffffffff);
-	state_add(E132XS_L55,      "L55 :%08X", m_local_regs[55]).mask(0xffffffff);
-	state_add(E132XS_L56,      "L56 :%08X", m_local_regs[56]).mask(0xffffffff);
-	state_add(E132XS_L57,      "L57 :%08X", m_local_regs[57]).mask(0xffffffff);
-	state_add(E132XS_L58,      "L58 :%08X", m_local_regs[58]).mask(0xffffffff);
-	state_add(E132XS_L59,      "L59 :%08X", m_local_regs[59]).mask(0xffffffff);
-	state_add(E132XS_L60,      "L60 :%08X", m_local_regs[60]).mask(0xffffffff);
-	state_add(E132XS_L61,      "L61 :%08X", m_local_regs[61]).mask(0xffffffff);
-	state_add(E132XS_L62,      "L62 :%08X", m_local_regs[62]).mask(0xffffffff);
-	state_add(E132XS_L63,      "L63 :%08X", m_local_regs[63]).mask(0xffffffff);
+	state_add(STATE_GENPC,    "GENPC",     m_global_regs[0]).noshow();
+	state_add(STATE_GENFLAGS, "GENFLAGS",  m_global_regs[1]).callimport().callexport().formatstr("%40s").noshow();
+	state_add(E132XS_PC,      "PC", m_global_regs[0]).mask(0xffffffff);
+	state_add(E132XS_SR,      "SR", m_global_regs[1]).mask(0xffffffff);
+	state_add(E132XS_FER,     "FER", m_global_regs[2]).mask(0xffffffff);
+	state_add(E132XS_G3,      "G3", m_global_regs[3]).mask(0xffffffff);
+	state_add(E132XS_G4,      "G4", m_global_regs[4]).mask(0xffffffff);
+	state_add(E132XS_G5,      "G5", m_global_regs[5]).mask(0xffffffff);
+	state_add(E132XS_G6,      "G6", m_global_regs[6]).mask(0xffffffff);
+	state_add(E132XS_G7,      "G7", m_global_regs[7]).mask(0xffffffff);
+	state_add(E132XS_G8,      "G8", m_global_regs[8]).mask(0xffffffff);
+	state_add(E132XS_G9,      "G9", m_global_regs[9]).mask(0xffffffff);
+	state_add(E132XS_G10,     "G10", m_global_regs[10]).mask(0xffffffff);
+	state_add(E132XS_G11,     "G11", m_global_regs[11]).mask(0xffffffff);
+	state_add(E132XS_G12,     "G12", m_global_regs[12]).mask(0xffffffff);
+	state_add(E132XS_G13,     "G13", m_global_regs[13]).mask(0xffffffff);
+	state_add(E132XS_G14,     "G14", m_global_regs[14]).mask(0xffffffff);
+	state_add(E132XS_G15,     "G15", m_global_regs[15]).mask(0xffffffff);
+	state_add(E132XS_G16,     "G16", m_global_regs[16]).mask(0xffffffff);
+	state_add(E132XS_G17,     "G17", m_global_regs[17]).mask(0xffffffff);
+	state_add(E132XS_SP,      "SP", m_global_regs[18]).mask(0xffffffff);
+	state_add(E132XS_UB,      "UB", m_global_regs[19]).mask(0xffffffff);
+	state_add(E132XS_BCR,     "BCR", m_global_regs[20]).mask(0xffffffff);
+	state_add(E132XS_TPR,     "TPR", m_global_regs[21]).mask(0xffffffff);
+	state_add(E132XS_TCR,     "TCR", m_global_regs[22]).mask(0xffffffff);
+	state_add(E132XS_TR,      "TR", m_global_regs[23]).mask(0xffffffff);
+	state_add(E132XS_WCR,     "WCR", m_global_regs[24]).mask(0xffffffff);
+	state_add(E132XS_ISR,     "ISR", m_global_regs[25]).mask(0xffffffff);
+	state_add(E132XS_FCR,     "FCR", m_global_regs[26]).mask(0xffffffff);
+	state_add(E132XS_MCR,     "MCR", m_global_regs[27]).mask(0xffffffff);
+	state_add(E132XS_G28,     "G28", m_global_regs[28]).mask(0xffffffff);
+	state_add(E132XS_G29,     "G29", m_global_regs[29]).mask(0xffffffff);
+	state_add(E132XS_G30,     "G30", m_global_regs[30]).mask(0xffffffff);
+	state_add(E132XS_G31,     "G31", m_global_regs[31]).mask(0xffffffff);
+	state_add(E132XS_CL0,     "CL0", m_local_regs[(0 + GET_FP) % 64]).mask(0xffffffff);
+	state_add(E132XS_CL1,     "CL1", m_local_regs[(1 + GET_FP) % 64]).mask(0xffffffff);
+	state_add(E132XS_CL2,     "CL2", m_local_regs[(2 + GET_FP) % 64]).mask(0xffffffff);
+	state_add(E132XS_CL3,     "CL3", m_local_regs[(3 + GET_FP) % 64]).mask(0xffffffff);
+	state_add(E132XS_CL4,     "CL4", m_local_regs[(4 + GET_FP) % 64]).mask(0xffffffff);
+	state_add(E132XS_CL5,     "CL5", m_local_regs[(5 + GET_FP) % 64]).mask(0xffffffff);
+	state_add(E132XS_CL6,     "CL6", m_local_regs[(6 + GET_FP) % 64]).mask(0xffffffff);
+	state_add(E132XS_CL7,     "CL7", m_local_regs[(7 + GET_FP) % 64]).mask(0xffffffff);
+	state_add(E132XS_CL8,     "CL8", m_local_regs[(8 + GET_FP) % 64]).mask(0xffffffff);
+	state_add(E132XS_CL9,     "CL9", m_local_regs[(9 + GET_FP) % 64]).mask(0xffffffff);
+	state_add(E132XS_CL10,    "CL10", m_local_regs[(10 + GET_FP) % 64]).mask(0xffffffff);
+	state_add(E132XS_CL11,    "CL11", m_local_regs[(11 + GET_FP) % 64]).mask(0xffffffff);
+	state_add(E132XS_CL12,    "CL12", m_local_regs[(12 + GET_FP) % 64]).mask(0xffffffff);
+	state_add(E132XS_CL13,    "CL13", m_local_regs[(13 + GET_FP) % 64]).mask(0xffffffff);
+	state_add(E132XS_CL14,    "CL14", m_local_regs[(14 + GET_FP) % 64]).mask(0xffffffff);
+	state_add(E132XS_CL15,    "CL15", m_local_regs[(15 + GET_FP) % 64]).mask(0xffffffff);
+	state_add(E132XS_L0,      "L0", m_local_regs[0]).mask(0xffffffff);
+	state_add(E132XS_L1,      "L1", m_local_regs[1]).mask(0xffffffff);
+	state_add(E132XS_L2,      "L2", m_local_regs[2]).mask(0xffffffff);
+	state_add(E132XS_L3,      "L3", m_local_regs[3]).mask(0xffffffff);
+	state_add(E132XS_L4,      "L4", m_local_regs[4]).mask(0xffffffff);
+	state_add(E132XS_L5,      "L5", m_local_regs[5]).mask(0xffffffff);
+	state_add(E132XS_L6,      "L6", m_local_regs[6]).mask(0xffffffff);
+	state_add(E132XS_L7,      "L7", m_local_regs[7]).mask(0xffffffff);
+	state_add(E132XS_L8,      "L8", m_local_regs[8]).mask(0xffffffff);
+	state_add(E132XS_L9,      "L9", m_local_regs[9]).mask(0xffffffff);
+	state_add(E132XS_L10,     "L10", m_local_regs[10]).mask(0xffffffff);
+	state_add(E132XS_L11,     "L11", m_local_regs[11]).mask(0xffffffff);
+	state_add(E132XS_L12,     "L12", m_local_regs[12]).mask(0xffffffff);
+	state_add(E132XS_L13,     "L13", m_local_regs[13]).mask(0xffffffff);
+	state_add(E132XS_L14,     "L14", m_local_regs[14]).mask(0xffffffff);
+	state_add(E132XS_L15,     "L15", m_local_regs[15]).mask(0xffffffff);
+	state_add(E132XS_L16,     "L16", m_local_regs[16]).mask(0xffffffff);
+	state_add(E132XS_L17,     "L17", m_local_regs[17]).mask(0xffffffff);
+	state_add(E132XS_L18,     "L18", m_local_regs[18]).mask(0xffffffff);
+	state_add(E132XS_L19,     "L19", m_local_regs[19]).mask(0xffffffff);
+	state_add(E132XS_L20,     "L20", m_local_regs[20]).mask(0xffffffff);
+	state_add(E132XS_L21,     "L21", m_local_regs[21]).mask(0xffffffff);
+	state_add(E132XS_L22,     "L22", m_local_regs[22]).mask(0xffffffff);
+	state_add(E132XS_L23,     "L23", m_local_regs[23]).mask(0xffffffff);
+	state_add(E132XS_L24,     "L24", m_local_regs[24]).mask(0xffffffff);
+	state_add(E132XS_L25,     "L25", m_local_regs[25]).mask(0xffffffff);
+	state_add(E132XS_L26,     "L26", m_local_regs[26]).mask(0xffffffff);
+	state_add(E132XS_L27,     "L27", m_local_regs[27]).mask(0xffffffff);
+	state_add(E132XS_L28,     "L28", m_local_regs[28]).mask(0xffffffff);
+	state_add(E132XS_L29,     "L29", m_local_regs[29]).mask(0xffffffff);
+	state_add(E132XS_L30,     "L30", m_local_regs[30]).mask(0xffffffff);
+	state_add(E132XS_L31,     "L31", m_local_regs[31]).mask(0xffffffff);
+	state_add(E132XS_L32,     "L32", m_local_regs[32]).mask(0xffffffff);
+	state_add(E132XS_L33,     "L33", m_local_regs[33]).mask(0xffffffff);
+	state_add(E132XS_L34,     "L34", m_local_regs[34]).mask(0xffffffff);
+	state_add(E132XS_L35,     "L35", m_local_regs[35]).mask(0xffffffff);
+	state_add(E132XS_L36,     "L36", m_local_regs[36]).mask(0xffffffff);
+	state_add(E132XS_L37,     "L37", m_local_regs[37]).mask(0xffffffff);
+	state_add(E132XS_L38,     "L38", m_local_regs[38]).mask(0xffffffff);
+	state_add(E132XS_L39,     "L39", m_local_regs[39]).mask(0xffffffff);
+	state_add(E132XS_L40,     "L40", m_local_regs[40]).mask(0xffffffff);
+	state_add(E132XS_L41,     "L41", m_local_regs[41]).mask(0xffffffff);
+	state_add(E132XS_L42,     "L42", m_local_regs[42]).mask(0xffffffff);
+	state_add(E132XS_L43,     "L43", m_local_regs[43]).mask(0xffffffff);
+	state_add(E132XS_L44,     "L44", m_local_regs[44]).mask(0xffffffff);
+	state_add(E132XS_L45,     "L45", m_local_regs[45]).mask(0xffffffff);
+	state_add(E132XS_L46,     "L46", m_local_regs[46]).mask(0xffffffff);
+	state_add(E132XS_L47,     "L47", m_local_regs[47]).mask(0xffffffff);
+	state_add(E132XS_L48,     "L48", m_local_regs[48]).mask(0xffffffff);
+	state_add(E132XS_L49,     "L49", m_local_regs[49]).mask(0xffffffff);
+	state_add(E132XS_L50,     "L50", m_local_regs[50]).mask(0xffffffff);
+	state_add(E132XS_L51,     "L51", m_local_regs[51]).mask(0xffffffff);
+	state_add(E132XS_L52,     "L52", m_local_regs[52]).mask(0xffffffff);
+	state_add(E132XS_L53,     "L53", m_local_regs[53]).mask(0xffffffff);
+	state_add(E132XS_L54,     "L54", m_local_regs[54]).mask(0xffffffff);
+	state_add(E132XS_L55,     "L55", m_local_regs[55]).mask(0xffffffff);
+	state_add(E132XS_L56,     "L56", m_local_regs[56]).mask(0xffffffff);
+	state_add(E132XS_L57,     "L57", m_local_regs[57]).mask(0xffffffff);
+	state_add(E132XS_L58,     "L58", m_local_regs[58]).mask(0xffffffff);
+	state_add(E132XS_L59,     "L59", m_local_regs[59]).mask(0xffffffff);
+	state_add(E132XS_L60,     "L60", m_local_regs[60]).mask(0xffffffff);
+	state_add(E132XS_L61,     "L61", m_local_regs[61]).mask(0xffffffff);
+	state_add(E132XS_L62,     "L62", m_local_regs[62]).mask(0xffffffff);
+	state_add(E132XS_L63,     "L63", m_local_regs[63]).mask(0xffffffff);
 
 	save_item(NAME(m_global_regs));
 	save_item(NAME(m_local_regs));
@@ -4210,7 +4210,7 @@ void hyperstone_device::hyperstone_extend(struct hyperstone_device::regs_decode 
 	{
 		// signed or unsigned multiplication, single word product
 		case EMUL:
-		case 0x100: // used in "N" type cpu
+		case 0x100: // used in"N" type cpu
 		{
 			UINT32 result;
 
@@ -4437,7 +4437,7 @@ void hyperstone_device::hyperstone_lddp(struct hyperstone_device::regs_decode *d
 	SET_SREGF(READ_W(DREG + 4));
 
 	// post increment the destination register if it's different from the source one
-	// and from the "next source" one
+	// and from the"next source" one
 	if(!(decode->src == decode->dst && S_BIT == LOCAL) &&   !SAME_SRCF_DST )
 	{
 		SET_DREG(DREG + 8);
@@ -4861,7 +4861,7 @@ void hyperstone_device::hyperstone_trap(struct hyperstone_device::regs_decode *d
 }
 
 
-#include "e132xsop.inc"
+#include"e132xsop.inc"
 
 //**************************************************************************
 //  CORE EXECUTION LOOP
