@@ -36,6 +36,9 @@
  Mr Kicker is also known to exist (not dumped) on the F-E1-16-010 PCB that
    Semicom also used for Toy Land Adventure & SemiComDate Quiz Go Go Episode 2 game.
 
+ Mr Kicker: Doesn't boot without a valid default eeprom, but no longer seems to fail
+            after you get a high score (since eeprom rewrite).
+
  Boong-Ga Boong-Ga: the test mode is usable with a standard input configuration like the "common" one
 
  The Semicom boards (at least) have a strange visible area, with the display output cutting off 4 lines
@@ -2026,7 +2029,7 @@ GOLDEN BELL-002
 |P2 P1                93C46                    |
 |              PRG1    ROML00 ROML01 L02* L03* |
 |          GAL1                                |
-|CON2 CON2 CON1* 50MHz ROMH00 ROMH01 H02* H03* |
+|CON2 CON3 CON1* 50MHz ROMH00 ROMH01 H02* H03* |
 +----------------------------------------------+
 
 * Denotes unpopulated component
@@ -2039,7 +2042,7 @@ OSC - 50MHz, 27MHz, 24MHz & 7.3728MHz (unpopulated)
 QDSP QS1000 @ 24MHz (silkscreened as SND1)
      QS1001A Sample rom (silkscreened as SND3)
      SND2 Additional sound samples
-     SND5 80c32 CPU code for QS1000?
+     SND5 8052 CPU code for QS1000?
 
 EEPROM - Atmel 93C46 at U6
 
@@ -2076,8 +2079,6 @@ ROM_START( yorizori )
 	ROM_REGION32_BE( 0x200000, "user1", ROMREGION_ERASE00 ) /* Hyperstone CPU Code */
 	ROM_LOAD( "prg1", 0x000000, 0x200000, CRC(0e04eb40) SHA1(0cec9dc91aaf9cf7c459c7baac200cf0fcfddc18) )
 	
-
-
 	ROM_REGION( 0x080000, "qs1000:cpu", 0 ) /* QDSP (8052) Code */
 	ROM_LOAD( "snd5", 0x00000, 0x20000, CRC(79067367) SHA1(a8f0c02dd616ff8c5fb49dea1a116fea2aced19c) )
 	ROM_RELOAD(      0x20000, 0x20000 )
@@ -2874,26 +2875,26 @@ DRIVER_INIT_MEMBER(vamphalf_state,boonggab)
 	m_flip_bit = 1;
 }
 
-GAME( 1999, coolmini, 0,        coolmini, common, vamphalf_state,   coolmini, ROT0,   "SemiCom",           "Cool Minigame Collection", 0 )
-GAME( 1999, jmpbreak, 0,        jmpbreak, common, vamphalf_state,   jmpbreak, ROT0,   "F2 System",         "Jumping Break" , 0 )
-GAME( 1999, suplup,   0,        suplup,   common, vamphalf_state,   suplup,   ROT0,   "Omega System",      "Super Lup Lup Puzzle / Zhuan Zhuan Puzzle (version 4.0 / 990518)" , 0 )
-GAME( 1999, luplup,   suplup,   suplup,   common, vamphalf_state,   luplup,   ROT0,   "Omega System",      "Lup Lup Puzzle / Zhuan Zhuan Puzzle (version 3.0 / 990128)", 0 )
-GAME( 1999, luplup29, suplup,   suplup,   common, vamphalf_state,   luplup29, ROT0,   "Omega System",      "Lup Lup Puzzle / Zhuan Zhuan Puzzle (version 2.9 / 990108)", 0 )
-GAME( 1999, puzlbang, suplup,   suplup,   common, vamphalf_state,   puzlbang, ROT0,   "Omega System",      "Puzzle Bang Bang (Korea, version 2.9 / 990108)", 0 )
-GAME( 1999, puzlbanga,suplup,   suplup,   common, vamphalf_state,   puzlbang, ROT0,   "Omega System",      "Puzzle Bang Bang (Korea, version 2.8 / 990106)", 0 )
-GAME( 1999, vamphalf, 0,        vamphalf, common, vamphalf_state,   vamphalf, ROT0,   "Danbi / F2 System", "Vamf x1/2 (Europe)", 0 )
-GAME( 1999, vamphalfk,vamphalf, vamphalf, common, vamphalf_state,   vamphafk, ROT0,   "Danbi / F2 System", "Vamp x1/2 (Korea)", 0 )
-GAME( 2000, dquizgo2, 0,        coolmini, common, vamphalf_state,   dquizgo2, ROT0,   "SemiCom",           "Date Quiz Go Go Episode 2" , 0)
-GAME( 2000, misncrft, 0,        misncrft, common, vamphalf_state,   misncrft, ROT90,  "Sun",               "Mission Craft (version 2.7)", GAME_IMPERFECT_SOUND )
-GAME( 2000, misncrfta,misncrft, misncrft, common, vamphalf_state,   misncrft, ROT90,  "Sun",               "Mission Craft (version 2.4)", GAME_IMPERFECT_SOUND )
-GAME( 2000, mrdig,    0,        mrdig,    common, vamphalf_state,   mrdig,    ROT0,   "Sun",               "Mr. Dig", 0 )
-GAME( 2001, dtfamily, 0,        coolmini, common, vamphalf_state,   dtfamily, ROT0,   "SemiCom",           "Diet Family", 0 )
-GAME( 2001, finalgdr, 0,        finalgdr, finalgdr, vamphalf_state, finalgdr, ROT0,   "SemiCom",           "Final Godori (Korea, version 2.20.5915)", 0 )
-GAME( 2001, mrkicker, 0,        mrkicker, finalgdr, vamphalf_state, mrkicker, ROT0,   "SemiCom",           "Mr. Kicker", 0 ) // game still doesn't boot without a default valid eeprom, but no longer seems to fail after you get a high score (since eeprom rewrite)
-GAME( 2001, toyland,  0,        coolmini, common, vamphalf_state,   toyland,  ROT0,   "SemiCom",           "Toy Land Adventure", 0 )
-GAME( 2001, wivernwg, 0,        wyvernwg, common, vamphalf_state,   wyvernwg, ROT270, "SemiCom",            "Wivern Wings", GAME_IMPERFECT_SOUND )
-GAME( 2001, wyvernwg, wivernwg, wyvernwg, common, vamphalf_state,   wyvernwg, ROT270, "SemiCom (Game Vision license)", "Wyvern Wings (set 1)", GAME_IMPERFECT_SOUND )
-GAME( 2001, wyvernwga,wivernwg, wyvernwg, common, vamphalf_state,   wyvernwg, ROT270, "SemiCom (Game Vision license)", "Wyvern Wings (set 2)", GAME_IMPERFECT_SOUND )
-GAME( 2001, aoh,      0,        aoh,      aoh, vamphalf_state,      aoh,      ROT0,   "Unico",             "Age Of Heroes - Silkroad 2 (v0.63 - 2001/02/07)", 0 )
-GAME( 2001, boonggab, 0,        boonggab, boonggab, vamphalf_state, boonggab, ROT270, "Taff System",       "Boong-Ga Boong-Ga (Spank'em!)", 0 )
-GAME( 199?, yorizori, 0,        yorizori, common, vamphalf_state,   yorizori, ROT0,   "<unknown>",         "Yori Zori Kuk Kuk", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND )
+GAME( 1999, coolmini,  0,        coolmini, common,   vamphalf_state, coolmini, ROT0,   "SemiCom",           "Cool Minigame Collection", 0 )
+GAME( 1999, jmpbreak,  0,        jmpbreak, common,   vamphalf_state, jmpbreak, ROT0,   "F2 System",         "Jumping Break" , 0 )
+GAME( 1999, suplup,    0,        suplup,   common,   vamphalf_state, suplup,   ROT0,   "Omega System",      "Super Lup Lup Puzzle / Zhuan Zhuan Puzzle (version 4.0 / 990518)" , 0 )
+GAME( 1999, luplup,    suplup,   suplup,   common,   vamphalf_state, luplup,   ROT0,   "Omega System",      "Lup Lup Puzzle / Zhuan Zhuan Puzzle (version 3.0 / 990128)", 0 )
+GAME( 1999, luplup29,  suplup,   suplup,   common,   vamphalf_state, luplup29, ROT0,   "Omega System",      "Lup Lup Puzzle / Zhuan Zhuan Puzzle (version 2.9 / 990108)", 0 )
+GAME( 1999, puzlbang,  suplup,   suplup,   common,   vamphalf_state, puzlbang, ROT0,   "Omega System",      "Puzzle Bang Bang (Korea, version 2.9 / 990108)", 0 )
+GAME( 1999, puzlbanga, suplup,   suplup,   common,   vamphalf_state, puzlbang, ROT0,   "Omega System",      "Puzzle Bang Bang (Korea, version 2.8 / 990106)", 0 )
+GAME( 1999, vamphalf,  0,        vamphalf, common,   vamphalf_state, vamphalf, ROT0,   "Danbi / F2 System", "Vamf x1/2 (Europe)", 0 )
+GAME( 1999, vamphalfk, vamphalf, vamphalf, common,   vamphalf_state, vamphafk, ROT0,   "Danbi / F2 System", "Vamp x1/2 (Korea)", 0 )
+GAME( 2000, dquizgo2,  0,        coolmini, common,   vamphalf_state, dquizgo2, ROT0,   "SemiCom",           "Date Quiz Go Go Episode 2" , 0)
+GAME( 2000, misncrft,  0,        misncrft, common,   vamphalf_state, misncrft, ROT90,  "Sun",               "Mission Craft (version 2.7)", GAME_IMPERFECT_SOUND )
+GAME( 2000, misncrfta, misncrft, misncrft, common,   vamphalf_state, misncrft, ROT90,  "Sun",               "Mission Craft (version 2.4)", GAME_IMPERFECT_SOUND )
+GAME( 2000, mrdig,     0,        mrdig,    common,   vamphalf_state, mrdig,    ROT0,   "Sun",               "Mr. Dig", 0 )
+GAME( 2001, dtfamily,  0,        coolmini, common,   vamphalf_state, dtfamily, ROT0,   "SemiCom",           "Diet Family", 0 )
+GAME( 2001, finalgdr,  0,        finalgdr, finalgdr, vamphalf_state, finalgdr, ROT0,   "SemiCom",           "Final Godori (Korea, version 2.20.5915)", 0 )
+GAME( 2001, mrkicker,  0,        mrkicker, finalgdr, vamphalf_state, mrkicker, ROT0,   "SemiCom",           "Mr. Kicker", 0 )
+GAME( 2001, toyland,   0,        coolmini, common,   vamphalf_state, toyland,  ROT0,   "SemiCom",           "Toy Land Adventure", 0 )
+GAME( 2001, wivernwg,  0,        wyvernwg, common,   vamphalf_state, wyvernwg, ROT270, "SemiCom",           "Wivern Wings", GAME_IMPERFECT_SOUND )
+GAME( 2001, wyvernwg,  wivernwg, wyvernwg, common,   vamphalf_state, wyvernwg, ROT270, "SemiCom (Game Vision license)", "Wyvern Wings (set 1)", GAME_IMPERFECT_SOUND )
+GAME( 2001, wyvernwga, wivernwg, wyvernwg, common,   vamphalf_state, wyvernwg, ROT270, "SemiCom (Game Vision license)", "Wyvern Wings (set 2)", GAME_IMPERFECT_SOUND )
+GAME( 2001, aoh,       0,        aoh,      aoh,      vamphalf_state, aoh,      ROT0,   "Unico",             "Age Of Heroes - Silkroad 2 (v0.63 - 2001/02/07)", 0 )
+GAME( 2001, boonggab,  0,        boonggab, boonggab, vamphalf_state, boonggab, ROT270, "Taff System",       "Boong-Ga Boong-Ga (Spank'em!)", 0 )
+GAME( 199?, yorizori,  0,        yorizori, common,   vamphalf_state, yorizori, ROT0,   "<unknown>",         "Yori Zori Kuk Kuk", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND )
