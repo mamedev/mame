@@ -1639,7 +1639,8 @@ seibu_cop_legacy_device::seibu_cop_legacy_device(const machine_config &mconfig, 
 	m_cop_sprite_dma_abs_x(0),
 	m_cop_sprite_dma_abs_y(0),
 	m_cop_sprite_dma_size(0),
-	m_cop_sprite_dma_param(0)
+	m_cop_sprite_dma_param(0),
+	m_videoramout_cb(*this)
 {
 	memset(m_copd2_table, 0, sizeof(UINT16)*0x100);
 	memset(m_copd2_table_2, 0, sizeof(UINT16)*0x100/8);
@@ -1673,6 +1674,7 @@ void seibu_cop_legacy_device::device_config_complete()
 void seibu_cop_legacy_device::device_start()
 {
 	m_cop_mcu_ram = reinterpret_cast<UINT16 *>(machine().root_device().memshare("cop_mcu_ram")->ptr());
+	m_videoramout_cb.resolve_safe();
 
 	save_item(NAME(m_cop_438));
 	save_item(NAME(m_cop_43a));
@@ -3084,6 +3086,7 @@ WRITE16_MEMBER( seibu_cop_legacy_device::generic_cop_w )
 		case (0x2fc/2):
 		{
 			//seibu_cop_log("%06x: COPX execute current layer clear??? %04x\n", space.device().safe_pc(), data);
+			//printf("SRC: %08x %08x DST:%08x SIZE:%08x TRIGGER: %08x\n",m_cop_dma_src[m_cop_dma_trigger] << 6,m_cop_dma_fade_table,m_cop_dma_dst[m_cop_dma_trigger] << 6,m_cop_dma_size[m_cop_dma_trigger] << 5,m_cop_dma_trigger);
 
 			if (m_cop_dma_trigger >= 0x80 && m_cop_dma_trigger <= 0x87)
 			{
@@ -3234,8 +3237,28 @@ WRITE16_MEMBER( seibu_cop_legacy_device::generic_cop_w )
 				return;
 			}
 
-			/* private buffer copies */
-			if ((m_cop_dma_trigger==0x14) || (m_cop_dma_trigger==0x15))
+			/* private buffer copies - tilemaps */
+			if (m_cop_dma_trigger == 0x14)
+			{
+			//	AM_RANGE(0x101000, 0x1017ff) AM_RAM // _WRITE(legionna_background_w) AM_SHARE("back_data")
+			//	AM_RANGE(0x101800, 0x101fff) AM_RAM // _WRITE(legionna_foreground_w) AM_SHARE("fore_data")
+			//	AM_RANGE(0x102000, 0x1027ff) AM_RAM // _WRITE(legionna_midground_w) AM_SHARE("mid_data")
+			//	AM_RANGE(0x102800, 0x1037ff) AM_RAM // _WRITE(legionna_text_w) AM_SHARE("textram")
+				int src = m_cop_dma_src[m_cop_dma_trigger] << 6;
+
+				for (int i = 0; i < 0x2800 /2; i++)
+				{
+					UINT16 tileval = space.read_word(src);
+					//printf("reading source %04x (data is %04x)\n", src, data);
+					src += 2;
+					m_videoramout_cb(space, i, tileval, 0xffff);
+				}
+
+				return;
+			}
+
+			/* privaet buffer copy - sprites? */
+			if (m_cop_dma_trigger==0x15)
 			return;
 
 			printf("SRC: %08x %08x DST:%08x SIZE:%08x TRIGGER: %08x\n",m_cop_dma_src[m_cop_dma_trigger] << 6,m_cop_dma_fade_table,m_cop_dma_dst[m_cop_dma_trigger] << 6,m_cop_dma_size[m_cop_dma_trigger] << 5,m_cop_dma_trigger);

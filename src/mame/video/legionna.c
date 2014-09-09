@@ -40,6 +40,34 @@ void denjinmk_setgfxbank(running_machine &machine, UINT16 data)
 	state->m_text_layer->mark_all_dirty();
 }
 
+WRITE16_MEMBER(legionna_state::videowrite_cb_w)
+{
+	//	AM_RANGE(0x101000, 0x1017ff) AM_RAM // _WRITE(legionna_background_w) AM_SHARE("back_data")
+	//	AM_RANGE(0x101800, 0x101fff) AM_RAM // _WRITE(legionna_foreground_w) AM_SHARE("fore_data")
+	//	AM_RANGE(0x102000, 0x1027ff) AM_RAM // _WRITE(legionna_midground_w) AM_SHARE("mid_data")
+	//	AM_RANGE(0x102800, 0x1037ff) AM_RAM // _WRITE(legionna_text_w) AM_SHARE("textram")
+
+	if (offset < 0x800 / 2)
+	{
+		legionna_background_w(space, offset, data, 0xffff);
+	}
+	else if (offset < 0x1000 /2)
+	{
+		offset -= 0x800 / 2;
+		legionna_foreground_w(space, offset, data, 0xffff);
+	}
+	else if (offset < 0x1800/2)
+	{
+		offset -= 0x1000 / 2;
+		legionna_midground_w(space, offset, data, 0xffff);
+	}
+	else if (offset < 0x2800/2)
+	{
+		offset -= 0x1800 / 2;
+		legionna_text_w(space, offset, data, 0xffff);
+	}
+}
+
 WRITE16_MEMBER(legionna_state::legionna_background_w)
 {
 	COMBINE_DATA(&m_back_data[offset]);
@@ -141,8 +169,16 @@ TILE_GET_INFO_MEMBER(legionna_state::get_text_tile_info)
 	SET_TILE_INFO_MEMBER(0,tile,color,0);
 }
 
+
+
 VIDEO_START_MEMBER(legionna_state,legionna)
 {
+
+	m_back_data = auto_alloc_array_clear(machine(), UINT16, 0x800/2);
+	m_fore_data =  auto_alloc_array_clear(machine(), UINT16, 0x800/2);
+	m_mid_data =  auto_alloc_array_clear(machine(), UINT16, 0x800/2);
+	m_textram =  auto_alloc_array_clear(machine(), UINT16, 0x1000/2);
+
 	m_background_layer = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(legionna_state::get_back_tile_info),this),TILEMAP_SCAN_ROWS,16,16,32,32);
 	m_foreground_layer = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(legionna_state::get_fore_tile_info),this),TILEMAP_SCAN_ROWS,16,16,32,32);
 	m_midground_layer =  &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(legionna_state::get_mid_tile_info),this), TILEMAP_SCAN_ROWS,16,16,32,32);
@@ -163,6 +199,12 @@ VIDEO_START_MEMBER(legionna_state,legionna)
 
 VIDEO_START_MEMBER(legionna_state,denjinmk)
 {
+
+	m_back_data = auto_alloc_array_clear(machine(), UINT16, 0x800/2);
+	m_fore_data =  auto_alloc_array_clear(machine(), UINT16, 0x800/2);
+	m_mid_data =  auto_alloc_array_clear(machine(), UINT16, 0x800/2);
+	m_textram =  auto_alloc_array_clear(machine(), UINT16, 0x1000/2);
+
 	m_background_layer = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(legionna_state::get_back_tile_info),this),TILEMAP_SCAN_ROWS,16,16,32,32);
 	m_foreground_layer = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(legionna_state::get_fore_tile_info_denji),this),TILEMAP_SCAN_ROWS,16,16,32,32);
 	m_midground_layer =  &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(legionna_state::get_mid_tile_info_denji),this), TILEMAP_SCAN_ROWS,16,16,32,32);
@@ -183,6 +225,11 @@ VIDEO_START_MEMBER(legionna_state,denjinmk)
 
 VIDEO_START_MEMBER(legionna_state,cupsoc)
 {
+	m_back_data = auto_alloc_array_clear(machine(), UINT16, 0x800/2);
+	m_fore_data =  auto_alloc_array_clear(machine(), UINT16, 0x800/2);
+	m_mid_data =  auto_alloc_array_clear(machine(), UINT16, 0x800/2);
+	m_textram =  auto_alloc_array_clear(machine(), UINT16, 0x1000/2);
+
 	m_background_layer = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(legionna_state::get_back_tile_info),this),TILEMAP_SCAN_ROWS,16,16,32,32);
 	m_foreground_layer = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(legionna_state::get_fore_tile_info),this),TILEMAP_SCAN_ROWS,16,16,32,32);
 	m_midground_layer =  &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(legionna_state::get_mid_tile_info_cupsoc),this), TILEMAP_SCAN_ROWS,16,16,32,32);

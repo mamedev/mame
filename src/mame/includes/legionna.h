@@ -6,10 +6,10 @@ public:
 	legionna_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_spriteram(*this, "spriteram"),
-		m_back_data(*this, "back_data"),
+		/*m_back_data(*this, "back_data"),
 		m_fore_data(*this, "fore_data"),
 		m_mid_data(*this, "mid_data"),
-		m_textram(*this, "textram"),
+		m_textram(*this, "textram"),*/
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_oki(*this, "oki"),
@@ -17,10 +17,10 @@ public:
 		m_palette(*this, "palette") { }
 
 	required_shared_ptr<UINT16> m_spriteram;
-	required_shared_ptr<UINT16> m_back_data;
-	required_shared_ptr<UINT16> m_fore_data;
-	required_shared_ptr<UINT16> m_mid_data;
-	required_shared_ptr<UINT16> m_textram;
+	UINT16* m_back_data;
+	UINT16* m_fore_data;
+	UINT16* m_mid_data;
+	UINT16* m_textram;
 	UINT16 *m_scrollram16;
 	UINT16 m_layer_disable;
 	int m_sprite_xoffs;
@@ -35,6 +35,7 @@ public:
 	UINT16 m_fore_gfx_bank;
 	UINT16 m_mid_gfx_bank;
 
+	DECLARE_WRITE16_MEMBER(videowrite_cb_w);
 	DECLARE_WRITE16_MEMBER(denjin_paletteram16_xBBBBBGGGGGRRRRR_word_w);
 	DECLARE_WRITE16_MEMBER(legionna_background_w);
 	DECLARE_WRITE16_MEMBER(legionna_midground_w);

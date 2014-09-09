@@ -18,6 +18,9 @@ struct collision_info
 	UINT16 hitbox_x,hitbox_y;
 };
 
+#define MCFG_VIDEORAM_OUT_CB(_devcb) \
+	devcb = &seibu_cop_legacy_device::set_m_videoramout_cb(*device, DEVCB_##_devcb);
+
 class seibu_cop_legacy_device : public device_t
 {
 public:
@@ -43,6 +46,7 @@ seibu_cop_legacy_device(const machine_config &mconfig, const char *tag, device_t
 
 	//DECLARE_READ16_MEMBER( raiden2_mcu_r );   unused
 	//DECLARE_WRITE16_MEMBER( raiden2_mcu_w );  unused
+	template<class _Object> static devcb_base &set_m_videoramout_cb(device_t &device, _Object object) { return downcast<seibu_cop_legacy_device &>(device).m_videoramout_cb.set_callback(object); }
 
 protected:
 	// device-level overrides
@@ -92,6 +96,8 @@ private:
 	UINT8 cop_calculate_collsion_detection();
 	DECLARE_READ16_MEMBER( generic_cop_r );
 	DECLARE_WRITE16_MEMBER( generic_cop_w );
+	devcb_write16       m_videoramout_cb;
+
 };
 
 extern const device_type SEIBU_COP_LEGACY;
