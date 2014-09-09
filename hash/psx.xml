@@ -705,8 +705,57 @@ A few comments on these:
 		</part>
 	</software>
 
-
-
+  <!-- Redump.org sets -->
+  
+ 	<software name="raidendx" supported="yes"> <!-- Hamster re-release) -->
+		<description>Raiden DX (Japan, V1.1)</description>
+		<year>199?</year>
+		<publisher>Seibu / Hamster</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="raiden dx (japan) (v1.1)" sha1="03ad2726f3176f6b3880105187c6006c6f9ce6fb"/>
+			</diskarea>
+		</part>
+	</software>
+        
+ 	<software name="raidendxo" cloneof="raidendx" supported="yes"> <!-- original release) -->
+		<description>Raiden DX (Japan, V1.0)</description>
+		<year>199?</year>
+		<publisher>Seibu</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="raiden dx (japan) (v1.0)" sha1="1459421e695dea6515cf3459342380429ab04d8a"/>
+			</diskarea>
+		</part>
+	</software>
+ 
+   <software name="raidenpr" supported="yes">
+		<description>Raiden Project (USA)</description>
+		<year>199?</year>
+		<publisher>Seibu</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="raiden project, the (usa)" sha1="cb1e4fae25d42e70fcb3eec5e1c1afcbdc5c2af3"/>
+			</diskarea>
+		</part>
+	</software>  
+  
+  <!-- this image doesn't boot, some kind of copy protection? could be bad -->
+  <software name="raidenprj" cloneof="raidenpr" supported="no">
+		<description>Raiden Project (Japan)</description>
+		<year>199?</year>
+		<publisher>Seibu</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="raiden project (japan)" sha1="12ec8ee3117df1f95752dc65155a611f43725251"/>
+			</diskarea>
+		</part>
+	</software> 
+  
 	<!-- Images below are 'low-grade' ie not dumped to any specific standard, or verified to be of any specific quality, they could have bad gaps or audio tracks etc. -->
 	<!-- They should be replaced with better quality images once said images are available (and verified to be the same versions) -->
 
