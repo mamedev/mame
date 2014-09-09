@@ -479,6 +479,15 @@ void running_machine::schedule_exit()
 	// if we're executing, abort out immediately
 	m_scheduler.eat_all_cycles();
 
+#ifdef MAME_DEBUG
+	if (g_tagmap_counter_enabled)
+	{
+		g_tagmap_counter_enabled = false;
+		if (*(options().command()) == 0)
+			osd_printf_info("%d tagmap lookups\n", g_tagmap_finds);
+	}
+#endif
+
 	// if we're autosaving on exit, schedule a save as well
 	if (options().autosave() && (m_system.flags & GAME_SUPPORTS_SAVE) && this->time() > attotime::zero)
 		schedule_save("auto");
