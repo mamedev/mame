@@ -12,4 +12,5 @@
 
 #ifdef MAME_DEBUG
 INT32 g_tagmap_finds = 0;
+bool g_tagmap_counter_enabled = false;
 #endif

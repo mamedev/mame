@@ -361,6 +361,12 @@ int running_machine::run(bool firstrun)
 		// perform a soft reset -- this takes us to the running phase
 		soft_reset();
 
+#ifdef MAME_DEBUG
+		g_tagmap_finds = 0;
+		if (strcmp(config().m_gamedrv.name, "___empty") != 0)
+			g_tagmap_counter_enabled = true;
+#endif
+
 		// run the CPUs until a reset or exit
 		m_hard_reset_pending = false;
 		while ((!m_hard_reset_pending && !m_exit_pending) || m_saveload_schedule != SLS_NONE)
@@ -429,6 +435,15 @@ int running_machine::run(bool firstrun)
 		osd_printf_error("Caught unhandled exception\n");
 		error = MAMERR_FATALERROR;
 	}
+
+#ifdef MAME_DEBUG
+	if (g_tagmap_counter_enabled)
+	{
+		g_tagmap_counter_enabled = false;
+		if (*(options().command()) == 0)
+			osd_printf_info("%d tagmap lookups\n", g_tagmap_finds);
+	}
+#endif
 
 	// make sure our phase is set properly before cleaning up,
 	// in case we got here via exception
