@@ -22,13 +22,33 @@ public:
 	virtual WRITE8_MEMBER(port_03d0_w);
 	virtual READ8_MEMBER(mem_r);
 	virtual WRITE8_MEMBER(mem_w);
-
 protected:
-
+	virtual void device_start();
+	virtual void device_reset();
+	struct
+	{
+		UINT8 sr0c;
+		UINT8 sr0d_old;
+		UINT8 sr0d_new;
+		UINT8 sr0e_old;
+		UINT8 sr0e_new;
+		UINT8 sr0f;
+		UINT8 gc0e;
+		UINT8 gc0f;
+		UINT8 cr1f;
+		bool new_mode;
+		bool port_3c3;
+		UINT8 clock;
+		UINT8 pixel_depth;
+	} tri;
 private:
 	UINT8 trident_seq_reg_read(UINT8 index);
 	void trident_seq_reg_write(UINT8 index, UINT8 data);
-
+	void trident_define_video_mode();
+	UINT8 trident_crtc_reg_read(UINT8 index);
+	void trident_crtc_reg_write(UINT8 index, UINT8 data);
+	UINT8 trident_gc_reg_read(UINT8 index);
+	void trident_gc_reg_write(UINT8 index, UINT8 data);
 };
 
 
