@@ -398,6 +398,15 @@ int running_machine::run(bool firstrun)
 		// and out via the exit phase
 		m_current_phase = MACHINE_PHASE_EXIT;
 
+#ifdef MAME_DEBUG
+		if (g_tagmap_counter_enabled)
+		{
+			g_tagmap_counter_enabled = false;
+			if (*(options().command()) == 0)
+				osd_printf_info("%d tagmap lookups\n", g_tagmap_finds);
+		}
+#endif
+
 		// save the NVRAM and configuration
 		sound().ui_mute(true);
 		nvram_save();
@@ -436,6 +445,10 @@ int running_machine::run(bool firstrun)
 		error = MAMERR_FATALERROR;
 	}
 
+	// make sure our phase is set properly before cleaning up,
+	// in case we got here via exception
+	m_current_phase = MACHINE_PHASE_EXIT;
+
 #ifdef MAME_DEBUG
 	if (g_tagmap_counter_enabled)
 	{
@@ -444,10 +457,6 @@ int running_machine::run(bool firstrun)
 			osd_printf_info("%d tagmap lookups\n", g_tagmap_finds);
 	}
 #endif
-
-	// make sure our phase is set properly before cleaning up,
-	// in case we got here via exception
-	m_current_phase = MACHINE_PHASE_EXIT;
 
 	// call all exit callbacks registered
 	call_notifiers(MACHINE_NOTIFY_EXIT);
