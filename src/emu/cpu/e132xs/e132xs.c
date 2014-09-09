@@ -35,7 +35,7 @@
 
  Pierpaolo Prazzoli
  - Fixed LDxx.N/P/S opcodes not to increment the destination register when
-   it's the same as the source or"next source" one.
+   it's the same as the source or "next source" one.
 
  Pierpaolo Prazzoli
  - Removed nested delays
@@ -59,7 +59,7 @@
  - Added nested delays
 
  Tomasz Slanina
- - Added"undefined" C flag to shift left instructions
+ - Added "undefined" C flag to shift left instructions
 
  Pierpaolo Prazzoli
  - Added interrupts-block for delay instructions
@@ -177,13 +177,13 @@
     - Implemented a crude hack to set FL in the SR to 6, since according to the docs
       that's supposed to happen each time a trap occurs, apparently including when
       the processor starts up. The 3rd opcode executed in vamphalf checks to see if
-      the FL flag in SR 6, so it's apparently the"correct" behaviour despite the
+      the FL flag in SR 6, so it's apparently the "correct" behaviour despite the
       docs not saying anything on it. If FL is not 6, the branch falls through and
       encounters a CHK PC, L2, which at that point will always throw a range trap.
       The range trap vector contains 00000000 (CHK PC, PC), which according to the
       docs will always throw a range trap (which would effectively lock the system).
       This revealed a bug: CHK PC, PC apparently does not throw a range trap, which
-      needs to be fixed. Now that the"correct" behaviour is hacked in with the FL
+      needs to be fixed. Now that the "correct" behaviour is hacked in with the FL
       flags, it reveals yet another bug in that the branch is interpreted as being
       +0x8700. This means that the PC then wraps around to 000082B0, give or take
       a few bytes. While it does indeed branch to valid code, I highly doubt that
@@ -211,9 +211,9 @@
 
 *********************************************************************/
 
-#include"emu.h"
-#include"debugger.h"
-#include"e132xs.h"
+#include "emu.h"
+#include "debugger.h"
+#include "e132xs.h"
 
 #ifdef MAME_DEBUG
 #define DEBUG_PRINTF(x) do { osd_printf_debug x; } while (0)
@@ -308,7 +308,7 @@ hyperstone_device::hyperstone_device(const machine_config &mconfig, const char *
 //-------------------------------------------------
 
 e116t_device::e116t_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: hyperstone_device(mconfig,"E1-16T", tag, owner, clock, E116T, 16, 16, ADDRESS_MAP_NAME(e116_4k_iram_map),"e116t", __FILE__)
+	: hyperstone_device(mconfig, "E1-16T", tag, owner, clock, E116T, 16, 16, ADDRESS_MAP_NAME(e116_4k_iram_map), "e116t", __FILE__)
 {
 }
 
@@ -318,7 +318,7 @@ e116t_device::e116t_device(const machine_config &mconfig, const char *tag, devic
 //-------------------------------------------------
 
 e116xt_device::e116xt_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: hyperstone_device(mconfig,"E1-16XT", tag, owner, clock, E116XT, 16, 16, ADDRESS_MAP_NAME(e116_8k_iram_map),"e116xt", __FILE__)
+	: hyperstone_device(mconfig, "E1-16XT", tag, owner, clock, E116XT, 16, 16, ADDRESS_MAP_NAME(e116_8k_iram_map), "e116xt", __FILE__)
 {
 }
 
@@ -328,7 +328,7 @@ e116xt_device::e116xt_device(const machine_config &mconfig, const char *tag, dev
 //-------------------------------------------------
 
 e116xs_device::e116xs_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: hyperstone_device(mconfig,"E1-16XS", tag, owner, clock, E116XS, 16, 16, ADDRESS_MAP_NAME(e116_16k_iram_map),"e116xs", __FILE__)
+	: hyperstone_device(mconfig, "E1-16XS", tag, owner, clock, E116XS, 16, 16, ADDRESS_MAP_NAME(e116_16k_iram_map), "e116xs", __FILE__)
 {
 }
 
@@ -338,7 +338,7 @@ e116xs_device::e116xs_device(const machine_config &mconfig, const char *tag, dev
 //-------------------------------------------------
 
 e116xsr_device::e116xsr_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: hyperstone_device(mconfig,"E1-16XSR", tag, owner, clock, E116XT, 16, 16, ADDRESS_MAP_NAME(e116_16k_iram_map),"e116xsr", __FILE__)
+	: hyperstone_device(mconfig, "E1-16XSR", tag, owner, clock, E116XT, 16, 16, ADDRESS_MAP_NAME(e116_16k_iram_map), "e116xsr", __FILE__)
 {
 }
 
@@ -348,7 +348,7 @@ e116xsr_device::e116xsr_device(const machine_config &mconfig, const char *tag, d
 //-------------------------------------------------
 
 e132n_device::e132n_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: hyperstone_device(mconfig,"E1-32N", tag, owner, clock, E132N, 32, 32, ADDRESS_MAP_NAME(e132_4k_iram_map),"e132n", __FILE__)
+	: hyperstone_device(mconfig, "E1-32N", tag, owner, clock, E132N, 32, 32, ADDRESS_MAP_NAME(e132_4k_iram_map), "e132n", __FILE__)
 {
 }
 
@@ -358,7 +358,7 @@ e132n_device::e132n_device(const machine_config &mconfig, const char *tag, devic
 //-------------------------------------------------
 
 e132t_device::e132t_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: hyperstone_device(mconfig,"E1-32T", tag, owner, clock, E132T, 32, 32, ADDRESS_MAP_NAME(e132_4k_iram_map),"e132t", __FILE__)
+	: hyperstone_device(mconfig, "E1-32T", tag, owner, clock, E132T, 32, 32, ADDRESS_MAP_NAME(e132_4k_iram_map), "e132t", __FILE__)
 {
 }
 
@@ -368,7 +368,7 @@ e132t_device::e132t_device(const machine_config &mconfig, const char *tag, devic
 //-------------------------------------------------
 
 e132xn_device::e132xn_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: hyperstone_device(mconfig,"E1-32XN", tag, owner, clock, E132XN, 32, 32, ADDRESS_MAP_NAME(e132_8k_iram_map),"e132xn", __FILE__)
+	: hyperstone_device(mconfig, "E1-32XN", tag, owner, clock, E132XN, 32, 32, ADDRESS_MAP_NAME(e132_8k_iram_map), "e132xn", __FILE__)
 {
 }
 
@@ -378,7 +378,7 @@ e132xn_device::e132xn_device(const machine_config &mconfig, const char *tag, dev
 //-------------------------------------------------
 
 e132xt_device::e132xt_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: hyperstone_device(mconfig,"E1-32XT", tag, owner, clock, E132XT, 32, 32, ADDRESS_MAP_NAME(e132_8k_iram_map),"e132xt", __FILE__)
+	: hyperstone_device(mconfig, "E1-32XT", tag, owner, clock, E132XT, 32, 32, ADDRESS_MAP_NAME(e132_8k_iram_map), "e132xt", __FILE__)
 {
 }
 
@@ -388,7 +388,7 @@ e132xt_device::e132xt_device(const machine_config &mconfig, const char *tag, dev
 //-------------------------------------------------
 
 e132xs_device::e132xs_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: hyperstone_device(mconfig,"E1-32XS", tag, owner, clock, E132XS, 32, 32, ADDRESS_MAP_NAME(e132_16k_iram_map),"e132xs", __FILE__)
+	: hyperstone_device(mconfig, "E1-32XS", tag, owner, clock, E132XS, 32, 32, ADDRESS_MAP_NAME(e132_16k_iram_map), "e132xs", __FILE__)
 {
 }
 
@@ -398,7 +398,7 @@ e132xs_device::e132xs_device(const machine_config &mconfig, const char *tag, dev
 //-------------------------------------------------
 
 e132xsr_device::e132xsr_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: hyperstone_device(mconfig,"E1-32XSR", tag, owner, clock, E132XSR, 32, 32, ADDRESS_MAP_NAME(e132_16k_iram_map),"e132xsr", __FILE__)
+	: hyperstone_device(mconfig, "E1-32XSR", tag, owner, clock, E132XSR, 32, 32, ADDRESS_MAP_NAME(e132_16k_iram_map), "e132xsr", __FILE__)
 {
 }
 
@@ -408,7 +408,7 @@ e132xsr_device::e132xsr_device(const machine_config &mconfig, const char *tag, d
 //-------------------------------------------------
 
 gms30c2116_device::gms30c2116_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: hyperstone_device(mconfig,"GMS30C2116", tag, owner, clock, GMS30C2116, 16, 16, ADDRESS_MAP_NAME(e116_4k_iram_map),"gms30c2116", __FILE__)
+	: hyperstone_device(mconfig, "GMS30C2116", tag, owner, clock, GMS30C2116, 16, 16, ADDRESS_MAP_NAME(e116_4k_iram_map), "gms30c2116", __FILE__)
 {
 }
 
@@ -418,7 +418,7 @@ gms30c2116_device::gms30c2116_device(const machine_config &mconfig, const char *
 //-------------------------------------------------
 
 gms30c2132_device::gms30c2132_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: hyperstone_device(mconfig,"GMS30C2132", tag, owner, clock, GMS30C2132, 32, 32, ADDRESS_MAP_NAME(e132_4k_iram_map),"gms30c2132", __FILE__)
+	: hyperstone_device(mconfig, "GMS30C2132", tag, owner, clock, GMS30C2132, 32, 32, ADDRESS_MAP_NAME(e132_4k_iram_map), "gms30c2132", __FILE__)
 {
 }
 
@@ -428,7 +428,7 @@ gms30c2132_device::gms30c2132_device(const machine_config &mconfig, const char *
 //-------------------------------------------------
 
 gms30c2216_device::gms30c2216_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: hyperstone_device(mconfig,"GMS30C2216", tag, owner, clock, GMS30C2216, 16, 16, ADDRESS_MAP_NAME(e116_8k_iram_map),"gms30c2216", __FILE__)
+	: hyperstone_device(mconfig, "GMS30C2216", tag, owner, clock, GMS30C2216, 16, 16, ADDRESS_MAP_NAME(e116_8k_iram_map), "gms30c2216", __FILE__)
 {
 }
 
@@ -438,7 +438,7 @@ gms30c2216_device::gms30c2216_device(const machine_config &mconfig, const char *
 //-------------------------------------------------
 
 gms30c2232_device::gms30c2232_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: hyperstone_device(mconfig,"GMS30C2232", tag, owner, clock, GMS30C2232, 32, 32, ADDRESS_MAP_NAME(e132_8k_iram_map),"gms30c2232", __FILE__)
+	: hyperstone_device(mconfig, "GMS30C2232", tag, owner, clock, GMS30C2232, 32, 32, ADDRESS_MAP_NAME(e132_8k_iram_map), "gms30c2232", __FILE__)
 {
 }
 
@@ -459,7 +459,7 @@ UINT32 hyperstone_device::get_trap_addr(UINT8 trapno)
 	return addr;
 }
 
-/* Return the entry point for a determinated emulated code (the one for"extend" opcode is reserved) */
+/* Return the entry point for a determinated emulated code (the one for "extend" opcode is reserved) */
 UINT32 hyperstone_device::get_emu_code_addr(UINT8 num) /* num is OP */
 {
 	UINT32 addr;
@@ -4210,7 +4210,7 @@ void hyperstone_device::hyperstone_extend(struct hyperstone_device::regs_decode 
 	{
 		// signed or unsigned multiplication, single word product
 		case EMUL:
-		case 0x100: // used in"N" type cpu
+		case 0x100: // used in "N" type cpu
 		{
 			UINT32 result;
 
@@ -4437,7 +4437,7 @@ void hyperstone_device::hyperstone_lddp(struct hyperstone_device::regs_decode *d
 	SET_SREGF(READ_W(DREG + 4));
 
 	// post increment the destination register if it's different from the source one
-	// and from the"next source" one
+	// and from the "next source" one
 	if(!(decode->src == decode->dst && S_BIT == LOCAL) &&   !SAME_SRCF_DST )
 	{
 		SET_DREG(DREG + 8);
@@ -4861,7 +4861,7 @@ void hyperstone_device::hyperstone_trap(struct hyperstone_device::regs_decode *d
 }
 
 
-#include"e132xsop.inc"
+#include "e132xsop.inc"
 
 //**************************************************************************
 //  CORE EXECUTION LOOP
