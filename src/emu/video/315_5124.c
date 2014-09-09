@@ -197,10 +197,10 @@ sega315_5378_device::sega315_5378_device(const machine_config &mconfig, const ch
 
 void sega315_5124_device::set_display_settings()
 {
-	bool M1 = m_reg[0x01] & 0x10;
-	bool M2 = m_reg[0x00] & 0x02;
-	bool M3 = m_reg[0x01] & 0x08;
-	bool M4 = m_reg[0x00] & 0x04;
+	const bool M1 = m_reg[0x01] & 0x10;
+	const bool M2 = m_reg[0x00] & 0x02;
+	const bool M3 = m_reg[0x01] & 0x08;
+	const bool M4 = m_reg[0x00] & 0x04;
 
 	m_y_pixels = 192;
 
@@ -274,8 +274,8 @@ void sega315_5124_device::set_display_settings()
 
 READ8_MEMBER( sega315_5124_device::vcount_read )
 {
+	const int active_scr_start = m_frame_timing[VERTICAL_BLANKING] + m_frame_timing[TOP_BLANKING] + m_frame_timing[TOP_BORDER];
 	int vpos = m_screen->vpos();
-	int active_scr_start = m_frame_timing[VERTICAL_BLANKING] + m_frame_timing[TOP_BLANKING] + m_frame_timing[TOP_BORDER];
 
 	if (m_screen->hpos() < VCOUNT_CHANGE_HPOS)
 	{
@@ -296,6 +296,8 @@ READ8_MEMBER( sega315_5124_device::hcount_read )
 
 void sega315_5124_device::hcount_latch_at_hpos( int hpos )
 {
+	const int active_scr_start = 46;      /* 9 + 2 + 14 + 8 + 13 */
+
 	/* The emulation core returns a screen hpos that is one position ahead in comparison
 	   with the expected VDP hclock value, if the same range is used (from 0 to width-1). */
 	int hclock = hpos - 1;
@@ -303,7 +305,7 @@ void sega315_5124_device::hcount_latch_at_hpos( int hpos )
 		hclock += m_screen->width();
 
 	/* Calculate and store the new hcount. */
-	m_hcounter = ((hclock - 46) >> 1) & 0xff;
+	m_hcounter = ((hclock - active_scr_start) >> 1) & 0xff;
 }
 
 
@@ -321,6 +323,11 @@ void sega315_5124_device::device_timer(emu_timer &timer, device_timer_id id, int
 	{
 	case TIMER_LINE:
 		process_line_timer();
+		break;
+
+	case TIMER_FLAGS:
+		/* Activate flags that were pending until the end of the line. */
+		check_pending_flags();
 		break;
 
 	case TIMER_DRAW:
@@ -395,15 +402,12 @@ void sega315_5124_device::device_timer(emu_timer &timer, device_timer_id id, int
 
 void sega315_5124_device::process_line_timer()
 {
-	int vpos = m_screen->vpos();
+	const int vpos = m_screen->vpos();
 	int vpos_limit = m_frame_timing[VERTICAL_BLANKING] + m_frame_timing[TOP_BLANKING]
 					+ m_frame_timing[TOP_BORDER] + m_frame_timing[ACTIVE_DISPLAY_V]
 					+ m_frame_timing[BOTTOM_BORDER] + m_frame_timing[BOTTOM_BLANKING];
 
 	m_display_disabled = !(m_reg[0x01] & 0x40);
-
-	/* Activate flags that were pending until the end of previous line. */
-	check_pending_flags();
 
 	vpos_limit -= m_frame_timing[BOTTOM_BLANKING];
 
@@ -550,10 +554,19 @@ void sega315_5124_device::check_pending_flags()
 		return;
 	}
 
-	hpos = m_screen->hpos();
-	if (hpos < DISPLAY_CB_HPOS || m_display_timer->remaining() == attotime::zero)
+	/* A timer ensures that this function will run at least at end of each line.
+	   When this function runs through a CPU instruction executed when the timer
+	   was about to fire, the time added in the CPU timeslice may make hpos()
+	   return some position in the begining of next line. To ensure the instruction
+	   will get updated status, here a maximum hpos is set if the timer reports no
+	   remaining time, what could also occur due to the ahead time of the timeslice. */
+	if (m_pending_flags_timer->remaining() == attotime::zero)
 	{
-		hpos = m_screen->width();
+		hpos = m_screen->width() - 1;
+	}
+	else
+	{
+		hpos = m_screen->hpos();
 	}
 
 	if ((m_pending_status & STATUS_HINT) && hpos >= HINT_HPOS)
@@ -785,17 +798,17 @@ UINT16 sega315_5378_device::get_name_table_address()
 void sega315_5124_device::draw_scanline_mode4( int *line_buffer, int *priority_selected, int line )
 {
 	int tile_column;
-	int x_scroll, y_scroll, x_scroll_start_column;
+	int y_scroll;
 	int pixel_x, pixel_plot_x;
 	int bit_plane_0, bit_plane_1, bit_plane_2, bit_plane_3;
-	int scroll_mod = ( m_y_pixels != 192 ) ? 256 : 224;
-	UINT16 name_table_address = get_name_table_address();
+	const int scroll_mod = ( m_y_pixels != 192 ) ? 256 : 224;
+	const UINT16 name_table_address = get_name_table_address();
 
 	/* if top 2 rows of screen not affected by horizontal scrolling, then x_scroll = 0 */
 	/* else x_scroll = m_reg8copy                                                      */
-	x_scroll = (((m_reg[0x00] & 0x40) && (line < 16)) ? 0 : 0x0100 - m_reg8copy);
+	const int x_scroll = (((m_reg[0x00] & 0x40) && (line < 16)) ? 0 : 0x0100 - m_reg8copy);
 
-	x_scroll_start_column = (x_scroll >> 3);             /* x starting column tile */
+	const int x_scroll_start_column = (x_scroll >> 3);             /* x starting column tile */
 
 	/* Draw background layer */
 	for (tile_column = 0; tile_column < 33; tile_column++)
@@ -863,11 +876,9 @@ void sega315_5124_device::draw_scanline_mode4( int *line_buffer, int *priority_s
 
 void sega315_5124_device::select_sprites( int line )
 {
-	int sprite_index = 0;
-	int max_sprites = 0;
+	int max_sprites;
 
 	m_sprite_count = 0;
-	m_sprite_base = ((m_reg[0x05] << 7) & 0x3f00);
 
 	if ( m_vdp_mode == 0 || m_vdp_mode == 2 )
 	{
@@ -883,7 +894,7 @@ void sega315_5124_device::select_sprites( int line )
 		if (m_reg[0x01] & 0x01)                         /* Check if MAG is set */
 			m_sprite_height = m_sprite_height * 2;
 
-		for (sprite_index = 0; (sprite_index < 32 * 4) && (m_sprite_count <= max_sprites); sprite_index += 4)
+		for (int sprite_index = 0; (sprite_index < 32 * 4) && (m_sprite_count <= max_sprites); sprite_index += 4)
 		{
 			int sprite_y = space().read_byte(m_sprite_base + sprite_index);
 			if (sprite_y == 0xd0)
@@ -915,7 +926,7 @@ void sega315_5124_device::select_sprites( int line )
 		m_sprite_height = (m_reg[0x01] & 0x02) ? 16 : 8;
 		m_sprite_zoom = (m_reg[0x01] & 0x01) ? 2 : 1;
 
-		for (sprite_index = 0; (sprite_index < 64) && (m_sprite_count <= max_sprites); sprite_index++)
+		for (int sprite_index = 0; (sprite_index < 64) && (m_sprite_count <= max_sprites); sprite_index++)
 		{
 			int sprite_y = space().read_byte(m_sprite_base + sprite_index);
 			if (m_y_pixels == 192 && sprite_y == 0xd0)
@@ -1112,7 +1123,7 @@ void sega315_5124_device::draw_sprites_tms9918_mode( int *line_buffer, int line 
 {
 	bool sprite_col_occurred = false;
 	int sprite_col_x = m_screen->width();
-	UINT16 sprite_pattern_base = ((m_latched_reg6 & 0x07) << 11);
+	const UINT16 sprite_pattern_base = ((m_latched_reg6 & 0x07) << 11);
 
 	if (m_display_disabled)
 		return;
@@ -1747,6 +1758,7 @@ UINT32 sega315_5124_device::screen_update( screen_device &screen, bitmap_rgb32 &
 void sega315_5124_device::stop_timers()
 {
 	m_display_timer->adjust(attotime::never);
+	m_pending_flags_timer->adjust(attotime::never);
 	m_hint_timer->adjust(attotime::never);
 	m_vint_timer->adjust(attotime::never);
 	m_nmi_timer->adjust(attotime::never);
@@ -1796,6 +1808,8 @@ void sega315_5124_device::device_start()
 
 	m_display_timer = timer_alloc(TIMER_LINE);
 	m_display_timer->adjust(m_screen->time_until_pos(0, DISPLAY_CB_HPOS), 0, m_screen->scan_period());
+	m_pending_flags_timer = timer_alloc(TIMER_FLAGS);
+	m_pending_flags_timer->adjust(m_screen->time_until_pos(0, m_screen->width() - 1), 0, m_screen->scan_period());
 	m_draw_timer = timer_alloc(TIMER_DRAW);
 	m_lborder_timer = timer_alloc(TIMER_LBORDER);
 	m_rborder_timer = timer_alloc(TIMER_RBORDER);
