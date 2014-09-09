@@ -2739,6 +2739,7 @@ WRITE16_MEMBER( seibu_cop_legacy_device::generic_cop_w )
 						m_cop_angle += 0x80;
 				}
 
+				m_cop_angle-=0x80;
 				m_r0 = dy;
 				m_r1 = dx;
 
@@ -2911,31 +2912,35 @@ WRITE16_MEMBER( seibu_cop_legacy_device::generic_cop_w )
 			{
 				UINT8 offs;
 				int div;
+				INT16 dir_offset;
 //              INT16 offs_val;
 
 				/* TODO: [4-7] could be mirrors of [0-3] (this is the only command so far that uses 4-7 actually)*/
-				/* 0 + [4] */
-				/* 4 + [5] */
-				/* 8 + [4] */
-				/* 4 + [6] */
+				/* ? 0 + [4] */
+				/* sub32 4 + [5] */
+				/* write16h 8 + [4] */
+				/* addmem16 4 + [6] */
 
 				// these two are obvious ...
 				// 0xf x 16 = 240
 				// 0x14 x 16 = 320
-				// what are these two instead? scale factor? offsets?
+				// what are these two instead? scale factor? offsets? (edit: offsets to apply from the initial sprite data)
 				// 0xfc69 ?
 				// 0x7f4 ?
 				//printf("%08x %08x %08x %08x %08x %08x %08x\n",m_cop_register[0],m_cop_register[1],m_cop_register[2],m_cop_register[3],m_cop_register[4],m_cop_register[5],m_cop_register[6]);
 
 				offs = (offset & 3) * 4;
 
-				div = space.read_word(m_cop_register[4] + offs) + 1;
+				div = space.read_word(m_cop_register[4] + offs);
+				dir_offset = space.read_word(m_cop_register[4] + offs + 8);
 //              offs_val = space.read_word(m_cop_register[3] + offs);
 				//420 / 180 = 500 : 400 = 30 / 50 = 98 / 18
-
+				
+				/* TODO: this probably trips a cop status flag */
 				if(div == 0) { div = 1; }
-
-				space.write_word((m_cop_register[6] + offs + 4), ((space.read_word(m_cop_register[5] + offs + 4)) / div));
+				
+				
+				space.write_word((m_cop_register[6] + offs + 4), ((space.read_word(m_cop_register[5] + offs + 4) + dir_offset) / div));
 				return;
 			}
 
