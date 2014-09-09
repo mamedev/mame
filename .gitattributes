@@ -6604,6 +6604,7 @@ src/mame/layout/invaders.lay svneol=native#text/xml
 src/mame/layout/jankenmn.lay svneol=native#text/xml
 src/mame/layout/jeutel.lay svneol=native#text/plain
 src/mame/layout/jollycrd.lay svneol=native#text/xml
+src/mame/layout/jp.lay svneol=native#text/plain
 src/mame/layout/jpmimpct.lay svneol=native#text/xml
 src/mame/layout/jpmmps.lay svneol=native#text/xml
 src/mame/layout/jpms80.lay svneol=native#text/xml

@@ -2653,6 +2653,7 @@ $(DRIVERS)/inder.o:     $(LAYOUT)/inder.lh
 $(DRIVERS)/jankenmn.o:  $(LAYOUT)/jankenmn.lh
 
 $(DRIVERS)/jeutel.o:    $(LAYOUT)/jeutel.lh
+$(DRIVERS)/jp.o:        $(LAYOUT)/jp.lh
 
 $(DRIVERS)/jpmimpct.o:  $(LAYOUT)/jpmimpct.lh
 
