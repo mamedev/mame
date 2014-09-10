@@ -438,7 +438,7 @@ int vcs_cart_slot_device::detect_modeFE(UINT8 *cart, UINT32 len)
 
 	if (len == 0x2000)
 	{
-		for (int i = 0; i < len - (sizeof signatures/sizeof signatures[0]); i++)
+		for (int i = 0; i < len - sizeof signatures[0]; i++)
 		{
 			for (int j = 0; j < (sizeof signatures/sizeof signatures[0]) && !numfound; j++)
 			{
@@ -468,7 +468,7 @@ int vcs_cart_slot_device::detect_modeE0(UINT8 *cart, UINT32 len)
 
 	if (len == 0x2000)
 	{
-		for (int i = 0; i < len - (sizeof signatures/sizeof signatures[0]); i++)
+		for (int i = 0; i < len - sizeof signatures[0]; i++)
 		{
 			for (int j = 0; j < (sizeof signatures/sizeof signatures[0]) && !numfound; j++)
 			{
@@ -494,7 +494,7 @@ int vcs_cart_slot_device::detect_modeCV(UINT8 *cart, UINT32 len)
 
 	if (len == 0x0800 || len == 0x1000)
 	{
-		for (int i = 0; i < len - (sizeof signatures/sizeof signatures[0]); i++)
+		for (int i = 0; i < len - sizeof signatures[0]; i++)
 		{
 			for (int j = 0; j < (sizeof signatures/sizeof signatures[0]) && !numfound; j++)
 			{
@@ -517,7 +517,7 @@ int vcs_cart_slot_device::detect_modeFV(UINT8 *cart, UINT32 len)
 
 	if (len == 0x2000)
 	{
-		for (int i = 0; i < len - (sizeof signatures/sizeof signatures[0]); i++)
+		for (int i = 0; i < len - sizeof signatures[0]; i++)
 		{
 			for (int j = 0; j < (sizeof signatures/sizeof signatures[0]) && !numfound; j++)
 			{
@@ -543,7 +543,7 @@ int vcs_cart_slot_device::detect_modeJVP(UINT8 *cart, UINT32 len)
 
 	if (len == 0x4000 || len == 0x2000)
 	{
-		for (int i = 0; i < len - (sizeof signatures/sizeof signatures[0]); i++)
+		for (int i = 0; i < len - sizeof signatures[0]; i++)
 		{
 			for (int j = 0; j < (sizeof signatures/sizeof signatures[0]) && !numfound; j++)
 			{
@@ -569,7 +569,7 @@ int vcs_cart_slot_device::detect_modeE7(UINT8 *cart, UINT32 len)
 
 	if (len == 0x2000 || len == 0x4000)
 	{
-		for (int i = 0; i < len - (sizeof signatures/sizeof signatures[0]); i++)
+		for (int i = 0; i < len - sizeof signatures[0]; i++)
 		{
 			for (int j = 0; j < (sizeof signatures/sizeof signatures[0]) && !numfound; j++)
 			{
