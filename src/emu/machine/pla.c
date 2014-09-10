@@ -160,11 +160,11 @@ UINT32 pla_device::read(UINT32 input)
 
 	for (int i = 0; i < m_terms; ++i)
 	{
-		term term = m_term[i];
+		term* term = &m_term[i];
 
-		if ((term.m_and | inputs) == m_input_mask)
+		if ((term->m_and | inputs) == m_input_mask)
 		{
-			s |= term.m_or;
+			s |= term->m_or;
 		}
 	}
 
