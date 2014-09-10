@@ -6,6 +6,13 @@
   All manuals are in Spanish.
   Schematic has a number of errors and omissions, so referring to PinMAME.
 
+ToDo:
+- Mechanical sounds
+- Extra sound board for some games
+- Lortium: a rom is missing
+- Pimbal: outhole not working
+- Petaco: different hardware
+
 *******************************************************************************************************/
 
 #include "machine/genpin.h"
@@ -30,7 +37,9 @@ public:
 	DECLARE_WRITE8_MEMBER(lamp2_w) {};
 	DECLARE_DRIVER_INIT(jp);
 private:
+	bool m_clock_bit;
 	UINT8 m_row;
+	UINT32 m_disp_data;
 	virtual void machine_reset();
 	required_device<cpu_device> m_maincpu;
 };
@@ -49,10 +58,160 @@ static ADDRESS_MAP_START( jp_map, AS_PROGRAM, 8, jp_state )
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( jp )
+	PORT_START("SW.0")
+	PORT_DIPNAME( 0x01, 0x01, "SW 1")
+	PORT_DIPSETTING(    0x01, DEF_STR(Off))
+	PORT_DIPSETTING(    0x00, DEF_STR(On))
+	PORT_DIPNAME( 0x02, 0x02, "SW 2")
+	PORT_DIPSETTING(    0x02, DEF_STR(Off))
+	PORT_DIPSETTING(    0x00, DEF_STR(On))
+	PORT_DIPNAME( 0x04, 0x04, "SW 3")
+	PORT_DIPSETTING(    0x04, DEF_STR(Off))
+	PORT_DIPSETTING(    0x00, DEF_STR(On))
+	PORT_DIPNAME( 0x08, 0x08, "SW 5")
+	PORT_DIPSETTING(    0x08, DEF_STR(Off))
+	PORT_DIPSETTING(    0x00, DEF_STR(On))
+	PORT_DIPNAME( 0x10, 0x10, "SW 6")
+	PORT_DIPSETTING(    0x10, DEF_STR(Off))
+	PORT_DIPSETTING(    0x00, DEF_STR(On))
+	PORT_DIPNAME( 0x20, 0x20, "SW 7")
+	PORT_DIPSETTING(    0x20, DEF_STR(Off))
+	PORT_DIPSETTING(    0x00, DEF_STR(On))
+	PORT_DIPNAME( 0x40, 0x40, "SW 8")
+	PORT_DIPSETTING(    0x40, DEF_STR(Off))
+	PORT_DIPSETTING(    0x00, DEF_STR(On))
+	PORT_DIPNAME( 0x80, 0x80, "SW 9")
+	PORT_DIPSETTING(    0x80, DEF_STR(Off))
+	PORT_DIPSETTING(    0x00, DEF_STR(On))
+
+	PORT_START("SW.1")
+	PORT_DIPNAME( 0x01, 0x01, "SW 10")
+	PORT_DIPSETTING(    0x01, DEF_STR(Off))
+	PORT_DIPSETTING(    0x00, DEF_STR(On))
+	PORT_DIPNAME( 0x02, 0x02, "SW 13")
+	PORT_DIPSETTING(    0x02, DEF_STR(Off))
+	PORT_DIPSETTING(    0x00, DEF_STR(On))
+	PORT_DIPNAME( 0x04, 0x04, "Balls") // SW12 confirmed
+	PORT_DIPSETTING(    0x04, "3")
+	PORT_DIPSETTING(    0x00, "5")
+	PORT_DIPNAME( 0x08, 0x08, "SW 14")
+	PORT_DIPSETTING(    0x08, DEF_STR(Off))
+	PORT_DIPSETTING(    0x00, DEF_STR(On))
+	PORT_DIPNAME( 0x10, 0x10, "SW 4") // confirmed
+	PORT_DIPSETTING(    0x10, DEF_STR(Off))
+	PORT_DIPSETTING(    0x00, DEF_STR(On))
+	PORT_DIPNAME( 0x20, 0x20, "SW 15")
+	PORT_DIPSETTING(    0x20, DEF_STR(Off))
+	PORT_DIPSETTING(    0x00, DEF_STR(On))
+	PORT_DIPNAME( 0x40, 0x40, "SW 11") // confirmed
+	PORT_DIPSETTING(    0x40, DEF_STR(Off))
+	PORT_DIPSETTING(    0x00, DEF_STR(On))
+	PORT_DIPNAME( 0x80, 0x80, "SW 16")
+	PORT_DIPSETTING(    0x80, DEF_STR(Off))
+	PORT_DIPSETTING(    0x00, DEF_STR(On))
+
+	PORT_START("SW.2")
+	PORT_DIPNAME( 0x01, 0x01, "SW A")
+	PORT_DIPSETTING(    0x01, DEF_STR(Off))
+	PORT_DIPSETTING(    0x00, DEF_STR(On))
+	PORT_DIPNAME( 0x02, 0x02, "SW B")
+	PORT_DIPSETTING(    0x02, DEF_STR(Off))
+	PORT_DIPSETTING(    0x00, DEF_STR(On))
+	PORT_DIPNAME( 0x04, 0x04, "SW C")
+	PORT_DIPSETTING(    0x04, DEF_STR(Off))
+	PORT_DIPSETTING(    0x00, DEF_STR(On))
+	PORT_DIPNAME( 0x08, 0x08, "SW D")
+	PORT_DIPSETTING(    0x40, DEF_STR(Off))
+	PORT_DIPSETTING(    0x00, DEF_STR(On))
+	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("SW.3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Z)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_C)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_V)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_B)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_N)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_M)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_COMMA)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_STOP)
+
+	PORT_START("SW.4")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Q)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_W)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_E)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_R)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Y)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_U)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_I)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_O)
+
+	PORT_START("SW.5")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_A)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_S)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_D)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_F)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_G)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_H)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_J)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_K)
+
+	PORT_START("SW.6")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_X) PORT_NAME("Outhole")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN3 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_TILT )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_TILT )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_SLASH)
+
+	PORT_START("SW.7")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_L)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_QUOTE)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_EQUALS)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_BACKSPACE)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_OPENBRACE)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_CLOSEBRACE)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_BACKSLASH)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_COLON)
 INPUT_PORTS_END
 
 WRITE8_MEMBER( jp_state::disp_w )
 {
+	UINT8 i;
+	m_row = data >> 3; // d3..d7 = switch strobes
+
+	// d0 = data; d1 = clock; d2 = strobe
+	data ^= 7;
+	if ((data & 6) == 2)
+	{
+		m_clock_bit = BIT(data, 1);
+		m_disp_data = (m_disp_data << 1) | BIT(data, 0);
+	}
+
+	if BIT(data, 2)
+	{
+		UINT8 segment, t = (m_disp_data >> 24) & 15;
+		if (t == 8)
+		{ // ball number
+			segment = m_disp_data >> 6;
+			output_set_digit_value(94, BITSWAP8(segment, 0, 1, 2, 3, 4, 5, 6, 7) ^ 0xff);
+		}
+		else
+		if (t < 8)
+		{ // main displays
+			if (t == 7)
+				segment = 128;
+			else
+				segment = 1 << (6-t);
+
+			for (i = 0; i < 32; i++)
+				if BIT(m_disp_data, i)
+					output_set_digit_value(i, (output_get_digit_value(i) & ~segment));
+				else
+					output_set_digit_value(i, (output_get_digit_value(i) | segment));
+		}
+	}
 }
 
 WRITE8_MEMBER( jp_state::porta_w )
@@ -61,18 +220,45 @@ WRITE8_MEMBER( jp_state::porta_w )
 
 READ8_MEMBER( jp_state::porta_r )
 {
+	switch (m_row)
+	{
+		case 0x1e:
+			return ioport("SW.1")->read();
+		case 0x1d:
+			return ioport("SW.7")->read();
+		case 0x0f:
+			return ioport("SW.2")->read();
+	}
 	return 0xff;
 }
 
 READ8_MEMBER( jp_state::portb_r )
 {
+	switch (m_row)
+	{
+		case 0x1e:
+			return ioport("SW.0")->read();
+		case 0x1d:
+			return ioport("SW.3")->read();
+		case 0x1b:
+			return ioport("SW.4")->read();
+		case 0x17:
+			return ioport("SW.5")->read();
+		case 0x0f:
+			return ioport("SW.6")->read();
+	}
 	return 0xff;
 }
 
 void jp_state::machine_reset()
 {
 	m_row = 0;
+	m_clock_bit = 0;
 	//m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	output_set_digit_value(96, 0x3f);
+	output_set_digit_value(97, 0x3f);
+	output_set_digit_value(98, 0x3f);
+	output_set_digit_value(99, 0x3f);
 }
 
 DRIVER_INIT_MEMBER( jp_state, jp )
@@ -100,7 +286,7 @@ static MACHINE_CONFIG_START( jp, jp_state )
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------------------------
-/ America 1492
+/ America 1492 #1107
 /-------------------------------------------------------------------*/
 ROM_START(america)
 	ROM_REGION(0x4000, "maincpu", 0)
@@ -120,7 +306,7 @@ ROM_START(america)
 ROM_END
 
 /*-------------------------------------------------------------------
-/ Aqualand
+/ Aqualand #1105
 /-------------------------------------------------------------------*/
 ROM_START(aqualand)
 	ROM_REGION(0x4000, "maincpu", 0)
@@ -147,7 +333,7 @@ ROM_START(aqualand)
 ROM_END
 
 /*-------------------------------------------------------------------
-/ Faeton
+/ Faeton #1103
 /-------------------------------------------------------------------*/
 ROM_START(faeton)
 	ROM_REGION(0x4000, "maincpu", 0)
@@ -155,7 +341,7 @@ ROM_START(faeton)
 ROM_END
 
 /*-------------------------------------------------------------------
-/ Halley Comet
+/ Halley Comet #1104
 /-------------------------------------------------------------------*/
 ROM_START(halley)
 	ROM_REGION(0x4000, "maincpu", 0)
@@ -210,7 +396,7 @@ ROM_START(halleya)
 ROM_END
 
 /*-------------------------------------------------------------------
-/ Lortium
+/ Lortium #1110
 /-------------------------------------------------------------------*/
 ROM_START(lortium)
 	ROM_REGION(0x4000, "maincpu", 0)
@@ -228,7 +414,7 @@ ROM_START(pimbal)
 ROM_END
 
 /*-------------------------------------------------------------------
-/ Olympus
+/ Olympus #1108
 /-------------------------------------------------------------------*/
 ROM_START(olympus)
 	ROM_REGION(0x4000, "maincpu", 0)
@@ -248,7 +434,7 @@ ROM_START(olympus)
 ROM_END
 
 /*-------------------------------------------------------------------
-/ Petaco
+/ Petaco #1101
 /-------------------------------------------------------------------*/
 ROM_START(petaco)
 	ROM_REGION(0x4000, "maincpu", 0)
@@ -276,13 +462,16 @@ ROM_START(petaco2)
 	ROM_LOAD("jpsonid7.dat", 0x30000, 0x8000, CRC(ff430b1b) SHA1(423592a40eba174108dfc6817e549c643bb3c80f))
 ROM_END
 
-GAME(1986,  america,    0,      jp, jp, jp_state,   jp, ROT0, "Juegos Populares", "America 1492", GAME_IS_SKELETON_MECHANICAL)
-GAME(1986,  aqualand,   0,      jp, jp, jp_state,   jp, ROT0, "Juegos Populares", "Aqualand",     GAME_IS_SKELETON_MECHANICAL)
-GAME(1985,  faeton,     0,      jp, jp, jp_state,   jp, ROT0, "Juegos Populares", "Faeton",       GAME_IS_SKELETON_MECHANICAL)
+// different hardware
+GAME(1984,  petaco,     0,      jp, jp, jp_state,   jp, ROT0, "Juegos Populares", "Petaco",       GAME_IS_SKELETON_MECHANICAL)
+
+// mostly ok
+GAME(1985,  petaco2,    0,      jp, jp, jp_state,   jp, ROT0, "Juegos Populares", "Petaco 2",     GAME_MECHANICAL | GAME_IMPERFECT_SOUND )
+GAME(1985,  faeton,     0,      jp, jp, jp_state,   jp, ROT0, "Juegos Populares", "Faeton",       GAME_MECHANICAL)
+GAME(1986,  halley,     0,      jp, jp, jp_state,   jp, ROT0, "Juegos Populares", "Halley Comet", GAME_MECHANICAL | GAME_IMPERFECT_SOUND )
+GAME(1986,  halleya,    halley, jp, jp, jp_state,   jp, ROT0, "Juegos Populares", "Halley Comet (alternate version)", GAME_MECHANICAL | GAME_IMPERFECT_SOUND )
+GAME(1986,  aqualand,   0,      jp, jp, jp_state,   jp, ROT0, "Juegos Populares", "Aqualand",     GAME_MECHANICAL | GAME_IMPERFECT_SOUND )
+GAME(1986,  america,    0,      jp, jp, jp_state,   jp, ROT0, "Juegos Populares", "America 1492", GAME_MECHANICAL | GAME_IMPERFECT_SOUND )
+GAME(1986,  olympus,    0,      jp, jp, jp_state,   jp, ROT0, "Juegos Populares", "Olympus",      GAME_MECHANICAL | GAME_IMPERFECT_SOUND )
 GAME(1987,  lortium,    0,      jp, jp, jp_state,   jp, ROT0, "Juegos Populares", "Lortium",      GAME_IS_SKELETON_MECHANICAL)
 GAME(19??,  pimbal,     0,      jp, jp, jp_state,   jp, ROT0, "Juegos Populares", "Pimbal (Pinball 3000)", GAME_IS_SKELETON_MECHANICAL)
-GAME(1984,  petaco,     0,      jp, jp, jp_state,   jp, ROT0, "Juegos Populares", "Petaco",       GAME_IS_SKELETON_MECHANICAL)
-GAME(1985,  petaco2,    0,      jp, jp, jp_state,   jp, ROT0, "Juegos Populares", "Petaco 2",     GAME_IS_SKELETON_MECHANICAL)
-GAME(1986,  halley,     0,      jp, jp, jp_state,   jp, ROT0, "Juegos Populares", "Halley Comet", GAME_IS_SKELETON_MECHANICAL)
-GAME(1986,  halleya,    halley, jp, jp, jp_state,   jp, ROT0, "Juegos Populares", "Halley Comet (alternate version)", GAME_IS_SKELETON_MECHANICAL)
-GAME(1986,  olympus,    0,      jp, jp, jp_state,   jp, ROT0, "Juegos Populares", "Olympus", GAME_IS_SKELETON_MECHANICAL)
