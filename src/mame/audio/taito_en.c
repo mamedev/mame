@@ -5,6 +5,8 @@
     TODO:
 
     * Implement ES5510 ESP
+    * Where does the MB8421 go? Taito F3(and Super Chase) have 2 of them on
+      the sound area, Taito JC has one.
 
 ****************************************************************************/
 

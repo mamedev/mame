@@ -19,7 +19,7 @@ TODO:
 - dendego attract mode train doesn't ride, demo mode doesn't set the throttle, but it does set the brake pressure
 - landgear has some weird crashes (after playing one round, after a couple of loops in attract mode) (needs testing -AS)
 - landgear has huge 3d problems on gameplay (CPU comms?)
-- dangcurv DSP program crashes very soon due to undumped rom, so no 3d is currently shown.
+- dangcurv DSP program crashes very soon, so no 3d is currently shown. - due to undumped rom? maybe not?
 - add idle skips if possible
 
 BTANB:
@@ -455,6 +455,7 @@ static const int dendego_pressure_table[0x100] =
 
 ***************************************************************************/
 
+// boob :( this is probably not the MB8421, need to change this
 WRITE_LINE_MEMBER(taitojc_state::mb8421_intl)
 {
 	// shared ram interrupt request from dsp side
