@@ -101,7 +101,7 @@ static bool find_include_file(astring &srcincpath, int srcrootlen, const astring
     main - main entry point
 -------------------------------------------------*/
 
-void usage(const char *argv0)
+void ATTR_NORETURN usage(const char *argv0)
 {
 	fprintf(stderr, "Usage:\n%s <srcroot> [-Iincpath [-Iincpath [...]]]\n", argv0);
 	exit(1);
