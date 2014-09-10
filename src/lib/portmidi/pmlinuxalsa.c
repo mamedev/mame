@@ -756,6 +756,7 @@ PmError pm_linuxalsa_init( void )
 			if (caps & SND_SEQ_PORT_CAP_SUBS_READ) {
 				if (pm_default_input_device_id == -1)
 					pm_default_input_device_id = pm_descriptor_index;
+				// FIXME: pm_strdup() result is leaked
 				pm_add_device((char *)"ALSA",
 								pm_strdup(snd_seq_port_info_get_name(pinfo)),
 								TRUE,
