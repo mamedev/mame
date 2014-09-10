@@ -128,8 +128,7 @@ void mcs96_device::execute_run()
 			int picount = inst_state >= 0x200 ? -1 : icount;
 			do_exec_full();
 			if(icount == picount) {
-				fprintf(stderr, "Unhandled %x (%04x)\n", inst_state, PPC);
-				exit(0);
+				fatalerror("Unhandled %x (%04x)\n", inst_state, PPC);
 			}
 		}
 		while(bcount && icount <= bcount)
