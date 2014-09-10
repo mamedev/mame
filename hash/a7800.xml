@@ -1309,11 +1309,18 @@ the buttons not work in emulators.
 		</part>
 	</software>
 
+<!--
+The code has some race conditions for NMIs (related to input readings) 
+and often fails to boot on real systems too. To successfully start the 
+game, you can keep pressed Button 1 during Atari logo (thanks to Mike
+Saarna for debugging the problem)
+-->
 	<software name="klax">
 		<description>Klax (NTSC, Prototype)</description>
 		<year>1992</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX7888"/>
+		<info name="usage" value="Keep Button 1 pressed during Atari logo"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="pcb_type" value="TYPE-2" />
