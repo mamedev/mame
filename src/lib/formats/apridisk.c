@@ -4,6 +4,7 @@
 
 ***************************************************************************/
 
+#include "emu.h"
 #include "apridisk.h"
 #include "imageutl.h"
 #include "coretmpl.h"
@@ -188,8 +189,7 @@ FLOPPY_CONSTRUCT( apridisk_construct )
 
 				/* not sure if this is possible */
 				if (length != 512) {
-					printf("Compression unsupported");
-					exit(-1); // TODO: NO!
+					fatalerror("Compression unsupported\n");
 				}
 
 				memset(&tag->sectors[cur_sector].data, value, length);
