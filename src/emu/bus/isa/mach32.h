@@ -27,6 +27,7 @@ public:
 protected:
 	virtual void device_start();
 	virtual void device_reset();
+	virtual void device_config_complete();
 
 	UINT16 m_chip_ID;
 	UINT16 m_membounds;
@@ -142,6 +143,7 @@ public:
 protected:
 	virtual void device_start();
 	virtual void device_reset();
+	virtual void device_config_complete();
 };
 
 // main SVGA device

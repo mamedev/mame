@@ -54,6 +54,11 @@ machine_config_constructor mach32_device::device_mconfig_additions() const
 	return MACHINE_CONFIG_NAME( mach32_8514a );
 }
 
+void mach32_8514a_device::device_config_complete()
+{
+	m_vga = dynamic_cast<vga_device*>(owner());
+}
+
 void mach32_8514a_device::device_start()
 {
 	mach8_device::device_start();
@@ -116,6 +121,11 @@ MACHINE_CONFIG_END
 machine_config_constructor mach64_device::device_mconfig_additions() const
 {
 	return MACHINE_CONFIG_NAME( mach64_8514a );
+}
+
+void mach64_8514a_device::device_config_complete()
+{
+	m_vga = dynamic_cast<vga_device*>(owner());
 }
 
 void mach64_8514a_device::device_start()

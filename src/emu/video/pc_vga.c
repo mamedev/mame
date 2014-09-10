@@ -5164,12 +5164,12 @@ READ8_MEMBER(ati_vga_device::mem_r)
 		if(ati.ext_reg[0x3d] & 0x04)
 		{
 			offset &= 0x1ffff;
-			return vga.memory[(offset+svga.bank_r*0x20000)];
+			return vga.memory[(offset+svga.bank_r*0x20000) % vga.svga_intf.vram_size];
 		}
 		else
 		{
 			offset &= 0xffff;
-			return vga.memory[(offset+svga.bank_r*0x10000)];
+			return vga.memory[(offset+svga.bank_r*0x10000) % vga.svga_intf.vram_size];
 		}
 	}
 
@@ -5183,12 +5183,12 @@ WRITE8_MEMBER(ati_vga_device::mem_w)
 		if(ati.ext_reg[0x3d] & 0x04)
 		{
 			offset &= 0x1ffff;
-			vga.memory[(offset+svga.bank_w*0x20000)] = data;
+			vga.memory[(offset+svga.bank_w*0x20000) % vga.svga_intf.vram_size] = data;
 		}
 		else
 		{
 			offset &= 0xffff;
-			vga.memory[(offset+svga.bank_w*0x10000)] = data;
+			vga.memory[(offset+svga.bank_w*0x10000) % vga.svga_intf.vram_size] = data;
 		}
 	}
 	else

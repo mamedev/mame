@@ -340,6 +340,8 @@ public:
 protected:
 	virtual void device_start();
 	virtual void device_config_complete();
+	vga_device* m_vga;  // for pass-through
+	astring m_vga_tag;  // pass-through device tag
 private:
 	void ibm8514_draw_vector(UINT8 len, UINT8 dir, bool draw);
 	void ibm8514_wait_draw_ssv();
@@ -349,8 +351,6 @@ private:
 	void ibm8514_write_bg(UINT32 offset);
 	void ibm8514_write(UINT32 offset, UINT32 src);
 
-	vga_device* m_vga;  // for pass-through
-	astring m_vga_tag;  // pass-through device tag
 	//UINT8* m_vram;  // the original 8514/A has it's own VRAM, but most VGA+8514 combination cards will have
 					// only one set of VRAM, so this will only be needed in standalone 8514/A cards
 	//UINT32 m_vramsize;
