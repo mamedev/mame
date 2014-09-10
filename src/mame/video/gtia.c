@@ -161,6 +161,7 @@ void gtia_device::device_start()
 	save_item(NAME(m_r.gtia1d));
 	save_item(NAME(m_r.gtia1e));
 	save_item(NAME(m_r.cons));
+
 	save_item(NAME(m_w.hposp0));
 	save_item(NAME(m_w.hposp1));
 	save_item(NAME(m_w.hposp2));
@@ -194,6 +195,30 @@ void gtia_device::device_start()
 	save_item(NAME(m_w.hitclr));
 	save_item(NAME(m_w.cons));
 
+	save_item(NAME(m_h.grafp0));
+	save_item(NAME(m_h.grafp1));
+	save_item(NAME(m_h.grafp2));
+	save_item(NAME(m_h.grafp3));
+	save_item(NAME(m_h.grafm0));
+	save_item(NAME(m_h.grafm1));
+	save_item(NAME(m_h.grafm2));
+	save_item(NAME(m_h.grafm3));
+	save_item(NAME(m_h.hitclr_frames));
+	save_item(NAME(m_h.sizem));
+	save_item(NAME(m_h.usedp));
+	save_item(NAME(m_h.usedm0));
+	save_item(NAME(m_h.usedm1));
+	save_item(NAME(m_h.usedm2));
+	save_item(NAME(m_h.usedm3));
+	save_item(NAME(m_h.vdelay_m0));
+	save_item(NAME(m_h.vdelay_m1));
+	save_item(NAME(m_h.vdelay_m2));
+	save_item(NAME(m_h.vdelay_m3));
+	save_item(NAME(m_h.vdelay_p0));
+	save_item(NAME(m_h.vdelay_p1));
+	save_item(NAME(m_h.vdelay_p2));
+	save_item(NAME(m_h.vdelay_p3));
+	
 	save_item(NAME(m_lumpf1));
 	save_item(NAME(m_huepm0));
 	save_item(NAME(m_huepm1));
@@ -202,6 +227,8 @@ void gtia_device::device_start()
 	save_item(NAME(m_huepm4));
 	save_item(NAME(m_huepf2));
 	save_item(NAME(m_huebk));	
+
+	save_item(NAME(m_color_lookup));	
 
 	machine().save().register_postload(save_prepost_delegate(FUNC(gtia_device::gtia_postload), this));
 }
@@ -217,6 +244,9 @@ void gtia_device::device_reset()
 	for (int i = 0; i < 32; i++)
 		write(machine().driver_data()->generic_space(), i, 0);
 	memset(&m_r, 0, sizeof(m_r));
+	memset(&m_h, 0, sizeof(m_h));
+	memset(m_color_lookup, 0, sizeof(m_color_lookup));
+
 	if (is_ntsc())
 		m_r.pal = 0xff;
 	else

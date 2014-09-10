@@ -30,32 +30,6 @@ void atari_common_state::video_start()
 
 /**************************************************************
  *
- * Interrupts
- *
- **************************************************************/
-
-TIMER_DEVICE_CALLBACK_MEMBER( atari_common_state::a400_interrupt )
-{
-	m_antic->generic_interrupt(4);
-}
-
-TIMER_DEVICE_CALLBACK_MEMBER( atari_common_state::a800_interrupt )
-{
-	m_antic->generic_interrupt(4);
-}
-
-TIMER_DEVICE_CALLBACK_MEMBER( atari_common_state::a800xl_interrupt )
-{
-	m_antic->generic_interrupt(2);
-}
-
-TIMER_DEVICE_CALLBACK_MEMBER( atari_common_state::a5200_interrupt )
-{
-	m_antic->generic_interrupt(4);
-}
-
-/**************************************************************
- *
  * Palette
  *
  **************************************************************/

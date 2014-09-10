@@ -25,7 +25,27 @@ const device_type ATARI_ANTIC = &device_creator<antic_device>;
 
 antic_device::antic_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 				device_t(mconfig, ATARI_ANTIC, "Atari ANTIC", tag, owner, clock, "antic", __FILE__),
-				m_gtia_tag(NULL)
+				m_gtia_tag(NULL),
+				m_tv_artifacts(0),
+				m_render1(0),
+				m_render2(0),
+				m_render3(0),
+				m_cmd(0),
+				m_steal_cycles(0),
+				m_vscrol_old(0),
+				m_hscrol_old(0),
+				m_modelines(0),
+				m_chbase(0),
+				m_chand(0),
+				m_chxor(0),
+				m_scanline(0),
+				m_pfwidth(0),
+				m_dpage(0),
+				m_doffs(0),
+				m_vpage(0),
+				m_voffs(0),
+				m_pmbase_s(0),
+				m_pmbase_d(0)
 {
 }
 
@@ -38,14 +58,10 @@ void antic_device::device_start()
 {
 	m_gtia = machine().device<gtia_device>(m_gtia_tag);
 	assert(m_gtia);
-
-	/* save states */
-	save_pointer(NAME((UINT8 *) &m_r), sizeof(m_r));
-	save_pointer(NAME((UINT8 *) &m_w), sizeof(m_w));
 	
 	m_bitmap = auto_bitmap_ind16_alloc(machine(), machine().first_screen()->width(), machine().first_screen()->height());
 	
-	m_cclk_expand = auto_alloc_array(machine(), UINT32, 21 * 256);
+	m_cclk_expand = auto_alloc_array_clear(machine(), UINT32, 21 * 256);
 	
 	m_pf_21       = &m_cclk_expand[ 0 * 256];
 	m_pf_x10b     = &m_cclk_expand[ 1 * 256];
@@ -75,13 +91,44 @@ void antic_device::device_start()
 	cclk_init();
 	
 	for (int i = 0; i < 64; i++)
-		m_prio_table[i] = auto_alloc_array(machine(), UINT8, 8*256);
+		m_prio_table[i] = auto_alloc_array_clear(machine(), UINT8, 8*256);
 	
 	LOG(("atari prio_init\n"));
 	prio_init();
 	
 	for (int i = 0; i < machine().first_screen()->height(); i++)
 		m_video[i] = auto_alloc_clear(machine(), VIDEO);
+	
+	/* save states */
+	save_pointer(NAME((UINT8 *) &m_r), sizeof(m_r));
+	save_pointer(NAME((UINT8 *) &m_w), sizeof(m_w));
+	// TODO: save VIDEO items
+	
+	save_item(NAME(m_tv_artifacts));
+	save_item(NAME(m_render1));
+	save_item(NAME(m_render2));
+	save_item(NAME(m_render3));
+	save_item(NAME(m_cmd));
+	save_item(NAME(m_steal_cycles));
+	save_item(NAME(m_vscrol_old));
+	save_item(NAME(m_hscrol_old));
+	save_item(NAME(m_modelines));
+	save_item(NAME(m_chbase));
+	save_item(NAME(m_chand));
+	save_item(NAME(m_chxor));
+	save_item(NAME(m_scanline));
+	save_item(NAME(m_pfwidth));
+	save_item(NAME(m_dpage));
+	save_item(NAME(m_doffs));
+	save_item(NAME(m_vpage));
+	save_item(NAME(m_voffs));
+	save_item(NAME(m_pmbase_s));
+	save_item(NAME(m_pmbase_d));
+	save_item(NAME(m_cclock));
+	save_item(NAME(m_pmbits));
+
+	save_pointer(NAME(m_cclk_expand), 21 * 256);
+	save_pointer(NAME(m_used_colors), 21 * 256);
 }
 
 
@@ -109,11 +156,9 @@ void antic_device::device_reset()
 	m_r.penv    = 0x00;
 	m_r.antic0e = 0xff;
 	m_r.nmist   = 0x1f;
-	
-	m_render1 = 0;
-	m_render2 = 0;
-	m_render3 = 0;
-	m_tv_artifacts = 0;
+
+	memset(m_cclock, 0, sizeof(m_cclock));
+	memset(m_pmbits, 0, sizeof(m_pmbits));
 }
 
 

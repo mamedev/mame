@@ -63,6 +63,7 @@ public:
 	DECLARE_READ8_MEMBER(pia_pb_r);
 	WRITE8_MEMBER(pia_pb_w) { mmu(data); }
 	WRITE_LINE_MEMBER(pia_cb2_w) { }  // This is used by Floppy drive on Atari 8bits Home Computers
+	TIMER_DEVICE_CALLBACK_MEMBER(mf_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(mcu_timer_proc);
 	int atari_input_disabled();
 	virtual void machine_reset();
@@ -405,12 +406,16 @@ void maxaflex_state::machine_reset()
 	output_set_digit_value(2, 0x00);
 }
 
+TIMER_DEVICE_CALLBACK_MEMBER( maxaflex_state::mf_interrupt )
+{
+	m_antic->generic_interrupt(2);
+}
 
 static MACHINE_CONFIG_START( maxaflex, maxaflex_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, FREQ_17_EXACT)
 	MCFG_CPU_PROGRAM_MAP(a600xl_mem)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", atari_common_state, a800xl_interrupt, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", maxaflex_state, mf_interrupt, "screen", 0, 1)
 
 	MCFG_CPU_ADD("mcu", M68705, 3579545)
 	MCFG_CPU_PROGRAM_MAP(mcu_mem)

@@ -29,18 +29,13 @@ public:
 
 	virtual void video_start();
 
-	TIMER_DEVICE_CALLBACK_MEMBER( a400_interrupt );
-	TIMER_DEVICE_CALLBACK_MEMBER( a800_interrupt );
-	TIMER_DEVICE_CALLBACK_MEMBER( a800xl_interrupt );
-	TIMER_DEVICE_CALLBACK_MEMBER( a5200_interrupt );
-
 	DECLARE_PALETTE_INIT(atari);
 
 	POKEY_INTERRUPT_CB_MEMBER(interrupt_cb);
 	POKEY_KEYBOARD_CB_MEMBER(a5200_keypads);
 	POKEY_KEYBOARD_CB_MEMBER(a800_keyboard);
 
-private:
+protected:
 	required_device<gtia_device> m_gtia;
 	required_device<antic_device> m_antic;
 };

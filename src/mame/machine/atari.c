@@ -168,7 +168,11 @@ POKEY_KEYBOARD_CB_MEMBER(atari_common_state::a5200_keypads)
 		ret |= ((machine().root_device().ioport(tag[0])->read_safe(0) & 0x01) ? 0x02 : 0x00);
 		break;
 	case pokey_device::POK_KEY_CTRL:
+		break;
 	case pokey_device::POK_KEY_SHIFT:
+		// button 2 from joypads
+		ipt = machine().root_device().ioport("djoy_b")->read() & (0x10 << ((k543210 >> 3) & 0x03));
+		ret |= !ipt ? 0x02 : 0; 
 		break;
 	}
 

@@ -30,6 +30,8 @@ public:
 		: atari_common_state(mconfig, type, tag),
 		m_maincpu(*this, "maincpu") { }
 
+	TIMER_DEVICE_CALLBACK_MEMBER( bartop_interrupt );
+
 	virtual void machine_reset();
 	required_device<cpu_device> m_maincpu;
 };
@@ -48,12 +50,12 @@ ADDRESS_MAP_END
 #define JOYSTICK_SENSITIVITY    200
 
 static INPUT_PORTS_START(bartop52)
-	PORT_START("djoy_b")    /* IN3 digital joystick buttons (GTIA button bits) */
+	PORT_START("djoy_b")
 	PORT_BIT(0x01, 0x01, IPT_BUTTON1) PORT_CODE(JOYCODE_BUTTON1) PORT_PLAYER(1)
-	PORT_BIT(0x02, 0x02, IPT_BUTTON1) PORT_CODE(JOYCODE_BUTTON2) PORT_PLAYER(2)
+	PORT_BIT(0x02, 0x02, IPT_BUTTON1) PORT_CODE(JOYCODE_BUTTON1) PORT_PLAYER(2)
 	PORT_BIT(0x04, 0x04, IPT_UNUSED)
 	PORT_BIT(0x08, 0x08, IPT_UNUSED)
-	PORT_BIT(0x10, 0x10, IPT_BUTTON2) PORT_CODE(JOYCODE_BUTTON1) PORT_PLAYER(1)
+	PORT_BIT(0x10, 0x10, IPT_BUTTON2) PORT_CODE(JOYCODE_BUTTON2) PORT_PLAYER(1)
 	PORT_BIT(0x20, 0x20, IPT_BUTTON2) PORT_CODE(JOYCODE_BUTTON2) PORT_PLAYER(2)
 	PORT_BIT(0x40, 0x40, IPT_UNUSED)
 	PORT_BIT(0x80, 0x80, IPT_UNUSED)
@@ -107,12 +109,16 @@ void bartop52_state::machine_reset()
 	pokey->write(15,0);
 }
 
+TIMER_DEVICE_CALLBACK_MEMBER( bartop52_state::bartop_interrupt )
+{
+	m_antic->generic_interrupt(4);
+}
 
 static MACHINE_CONFIG_START( a5200, bartop52_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, FREQ_17_EXACT)
 	MCFG_CPU_PROGRAM_MAP(a5200_mem)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", atari_common_state, a5200_interrupt, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", bartop52_state, bartop_interrupt, "screen", 0, 1)
 
 	MCFG_DEVICE_ADD("gtia", ATARI_GTIA, 0)
 
