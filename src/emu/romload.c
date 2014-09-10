@@ -1377,7 +1377,7 @@ void load_software_part_region(device_t &device, software_list_device &swlist, c
 		if (ROMREGION_ISROMDATA(region))
 			process_rom_entries(romdata, locationtag, region, region + 1, &device, TRUE);
 		else if (ROMREGION_ISDISKDATA(region))
-			process_disk_entries(romdata, core_strdup(regiontag.cstr()), region, region + 1, locationtag);
+			process_disk_entries(romdata, regiontag, region, region + 1, locationtag);
 	}
 
 	/* now go back and post-process all the regions */
