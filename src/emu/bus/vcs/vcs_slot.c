@@ -660,7 +660,7 @@ int vcs_cart_slot_device::detect_super_chip(UINT8 *cart, UINT32 len)
 
 	if (len == 0x4000)
 	{
-		for (int i = 0; i < len - (sizeof signatures/sizeof signatures[0]); i++)
+		for (int i = 0; i < len - sizeof signatures[0]; i++)
 		{
 			for (int j = 0; j < (sizeof signatures/sizeof signatures[0]); j++)
 			{
