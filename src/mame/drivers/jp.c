@@ -8,10 +8,11 @@
 
 ToDo:
 - Mechanical sounds
-- Extra sound board for some games
+- Extra sound board for some games - no schematic available
+- Even though nvram is fitted, all credits and scores are lost at reboot
 - Lortium: a rom is missing
 - Pimbal: outhole not working
-- Petaco: different hardware
+- Petaco: different hardware - manual is very poor copy
 
 *******************************************************************************************************/
 

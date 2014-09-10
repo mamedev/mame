@@ -44,6 +44,12 @@ Driver Notes:
 Can't do much with this, I'm pretty sure the game code is in the custom block
 so even the Main CPU is unknown, assuming the 8085 is the sound CPU
 
+Notes added 2014-09-10:
+- Rom in "user1" contains Z80 code (not 8085 code), and fits in the memory map at 4000-5FFF.
+   It contains subroutines meant to be called from elsewhere.
+- Rom in "maincpu" is not 8085 code (unless it is scrambled)
+
+
 */
 
 
