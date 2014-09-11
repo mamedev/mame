@@ -1040,8 +1040,9 @@ void avr8_device::update_interrupt(int source)
 {
 	const CInterruptCondition &condition = s_int_conditions[source];
 
-	int intstate = (m_r[condition.m_regindex] & condition.m_regmask) ? 1 : 0;
-	intstate = (m_r[condition.m_intreg] & condition.m_intmask) ? intstate : 0;
+	int intstate = 0;
+	if (m_r[condition.m_intreg] & condition.m_intmask)
+		intstate = (m_r[condition.m_regindex] & condition.m_regmask) ? 1 : 0;
 
 	set_irq_line(condition.m_intindex, intstate);
 
@@ -1071,8 +1072,9 @@ void atmega644_device::update_interrupt(int source)
 {
 	const CInterruptCondition &condition = s_mega644_int_conditions[source];
 
-	int intstate = (m_r[condition.m_regindex] & condition.m_regmask) ? 1 : 0;
-	intstate = (m_r[condition.m_intreg] & condition.m_intmask) ? intstate : 0;
+	int intstate = 0;
+	if (m_r[condition.m_intreg] & condition.m_intmask)
+		intstate = (m_r[condition.m_regindex] & condition.m_regmask) ? 1 : 0;
 
 	set_irq_line(condition.m_intindex << 1, intstate);
 
@@ -1087,8 +1089,9 @@ void atmega1280_device::update_interrupt(int source)
 {
 	const CInterruptCondition &condition = s_mega644_int_conditions[source];
 
-	int intstate = (m_r[condition.m_regindex] & condition.m_regmask) ? 1 : 0;
-	intstate = (m_r[condition.m_intreg] & condition.m_intmask) ? intstate : 0;
+	int intstate = 0;
+	if (m_r[condition.m_intreg] & condition.m_intmask)
+		intstate = (m_r[condition.m_regindex] & condition.m_regmask) ? 1 : 0;
 
 	set_irq_line(condition.m_intindex << 1, intstate);
 
@@ -1103,8 +1106,9 @@ void atmega2560_device::update_interrupt(int source)
 {
 	const CInterruptCondition &condition = s_mega644_int_conditions[source];
 
-	int intstate = (m_r[condition.m_regindex] & condition.m_regmask) ? 1 : 0;
-	intstate = (m_r[condition.m_intreg] & condition.m_intmask) ? intstate : 0;
+	int intstate = 0;
+	if (m_r[condition.m_intreg] & condition.m_intmask)
+		intstate = (m_r[condition.m_regindex] & condition.m_regmask) ? 1 : 0;
 
 	set_irq_line(condition.m_intindex << 1, intstate);
 
