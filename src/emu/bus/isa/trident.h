@@ -22,6 +22,7 @@ public:
 	virtual WRITE8_MEMBER(port_03d0_w);
 	virtual READ8_MEMBER(mem_r);
 	virtual WRITE8_MEMBER(mem_w);
+	virtual UINT16 offset();
 protected:
 	virtual void device_start();
 	virtual void device_reset();
@@ -36,10 +37,14 @@ protected:
 		UINT8 gc0e;
 		UINT8 gc0f;
 		UINT8 cr1f;
+		UINT8 dac;
 		bool new_mode;
 		bool port_3c3;
 		UINT8 clock;
 		UINT8 pixel_depth;
+		UINT8 revision;
+		bool dac_active;
+		UINT8 dac_count;
 	} tri;
 private:
 	UINT8 trident_seq_reg_read(UINT8 index);

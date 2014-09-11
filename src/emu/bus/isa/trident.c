@@ -29,8 +29,16 @@ void trident_vga_device::device_start()
 void trident_vga_device::device_reset()
 {
 	svga_device::device_reset();
-	svga.id = 0xd3;  // identifies at TGUI9660XGi (closest known to the 9680)
+	svga.id = 0xd3;  // identifies at TGUI9660XGi
+	tri.revision = 0x01;  // revision identifies as TGUI9680
 	tri.new_mode = false;  // start up in old mode
+	tri.dac_active = false;
+}
+
+UINT16 trident_vga_device::offset()
+{
+	UINT16 off = svga_device::offset();
+	return off;
 }
 
 void trident_vga_device::trident_define_video_mode()
@@ -74,7 +82,7 @@ void trident_vga_device::trident_define_video_mode()
 	{
 	case 0:
 	default: if(!(tri.pixel_depth & 0x10)) svga.rgb8_en = 1; break;
-	case 1:  svga.rgb16_en = 1; break;  // for 15 or 16 bit modes, can we tell the difference?
+	case 1:  if((tri.dac & 0xf0) == 0x30) svga.rgb16_en = 1; else svga.rgb15_en = 1; break;
 	case 2:  svga.rgb32_en = 1; break;
 	}
 
@@ -93,6 +101,9 @@ UINT8 trident_vga_device::trident_seq_reg_read(UINT8 index)
 	{
 		switch(index)
 		{
+			case 0x09:
+				res = tri.revision;
+				break;
 			case 0x0b:
 				res = svga.id;
 				tri.new_mode = true;
@@ -125,6 +136,7 @@ UINT8 trident_vga_device::trident_seq_reg_read(UINT8 index)
 
 void trident_vga_device::trident_seq_reg_write(UINT8 index, UINT8 data)
 {
+	//logerror("Trident SR%02X: %s mode write %02x\n",index,tri.new_mode ? "new" : "old",data);
 	if(index <= 0x04)
 	{
 		vga.sequencer.data[vga.sequencer.index] = data;
@@ -205,6 +217,7 @@ UINT8 trident_vga_device::trident_crtc_reg_read(UINT8 index)
 }
 void trident_vga_device::trident_crtc_reg_write(UINT8 index, UINT8 data)
 {
+	//logerror("Trident CR%02X: write %02x\n",index,data);
 	if(index <= 0x18)
 	{
 		crtc_reg_write(index,data);
@@ -254,6 +267,7 @@ UINT8 trident_vga_device::trident_gc_reg_read(UINT8 index)
 
 void trident_vga_device::trident_gc_reg_write(UINT8 index, UINT8 data)
 {
+	//logerror("Trident GC%02X: write %02x\n",index,data);
 	if(index <= 0x0d)
 		gc_reg_write(index,data);
 	else
@@ -287,6 +301,22 @@ READ8_MEMBER(trident_vga_device::port_03c0_r)
 		case 0x05:
 			res = trident_seq_reg_read(vga.sequencer.index);
 			break;
+		case 0x06:
+			tri.dac_count++;
+			if(tri.dac_count > 3)
+				tri.dac_active = true;
+			if(tri.dac_active)
+				res = tri.dac;
+			else
+				res = vga_device::port_03c0_r(space,offset,mem_mask);
+			break;
+		case 0x07:
+		case 0x08:
+		case 0x09:
+			tri.dac_active = false;
+			tri.dac_count = 0;
+			res = vga_device::port_03c0_r(space,offset,mem_mask);
+			break;
 		case 0x0f:
 			res = trident_gc_reg_read(vga.gc.index);
 			break;
@@ -304,6 +334,24 @@ WRITE8_MEMBER(trident_vga_device::port_03c0_w)
 	{
 		case 0x05:
 			trident_seq_reg_write(vga.sequencer.index,data);
+			break;
+		case 0x06:
+			if(tri.dac_active)
+			{
+				tri.dac = data;  // DAC command register
+				tri.dac_active = false;
+				tri.dac_count = 0;
+				trident_define_video_mode();
+			}
+			else
+				vga_device::port_03c0_w(space,offset,data,mem_mask);
+			break;
+		case 0x07:
+		case 0x08:
+		case 0x09:
+			tri.dac_active = false;
+			tri.dac_count = 0;
+			vga_device::port_03c0_w(space,offset,data,mem_mask);
 			break;
 		case 0x0f:
 			trident_gc_reg_write(vga.gc.index,data);
