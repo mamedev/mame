@@ -470,8 +470,13 @@ static UINT32 apple35_get_offset(floppy_image_legacy *floppy, int head, int trac
 	{
 		*tag_offset = sector_index * 12;
 		if (*tag_offset >= tag->tag_size)
+		{
 			*tag_offset = ~0;
-		*tag_offset += tag->tag_offset;
+		}
+		else
+		{
+			*tag_offset += tag->tag_offset;
+		}
 	}
 	return sector_index * 0x200 + tag->data_offset;
 }
