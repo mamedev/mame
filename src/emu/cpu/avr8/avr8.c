@@ -1038,7 +1038,7 @@ static const CInterruptCondition s_int_conditions[AVR8_INTIDX_COUNT] =
 
 void avr8_device::update_interrupt(int source)
 {
-	CInterruptCondition condition = s_int_conditions[source];
+	const CInterruptCondition &condition = s_int_conditions[source];
 
 	int intstate = (m_r[condition.m_regindex] & condition.m_regmask) ? 1 : 0;
 	intstate = (m_r[condition.m_intreg] & condition.m_intmask) ? intstate : 0;
@@ -1069,7 +1069,7 @@ static const CInterruptCondition s_mega644_int_conditions[AVR8_INTIDX_COUNT] =
 
 void atmega644_device::update_interrupt(int source)
 {
-	CInterruptCondition condition = s_mega644_int_conditions[source];
+	const CInterruptCondition &condition = s_mega644_int_conditions[source];
 
 	int intstate = (m_r[condition.m_regindex] & condition.m_regmask) ? 1 : 0;
 	intstate = (m_r[condition.m_intreg] & condition.m_intmask) ? intstate : 0;
@@ -1085,7 +1085,7 @@ void atmega644_device::update_interrupt(int source)
 //TODO: review this!
 void atmega1280_device::update_interrupt(int source)
 {
-	CInterruptCondition condition = s_mega644_int_conditions[source];
+	const CInterruptCondition &condition = s_mega644_int_conditions[source];
 
 	int intstate = (m_r[condition.m_regindex] & condition.m_regmask) ? 1 : 0;
 	intstate = (m_r[condition.m_intreg] & condition.m_intmask) ? intstate : 0;
@@ -1101,7 +1101,7 @@ void atmega1280_device::update_interrupt(int source)
 //TODO: review this!
 void atmega2560_device::update_interrupt(int source)
 {
-	CInterruptCondition condition = s_mega644_int_conditions[source];
+	const CInterruptCondition &condition = s_mega644_int_conditions[source];
 
 	int intstate = (m_r[condition.m_regindex] & condition.m_regmask) ? 1 : 0;
 	intstate = (m_r[condition.m_intreg] & condition.m_intmask) ? intstate : 0;
