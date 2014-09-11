@@ -636,10 +636,6 @@ WRITE16_MEMBER(raiden2_state::cop_cmd_w)
 		int npos = ppos + space.read_dword(cop_regs[0] + 0x10 + offset*4);
 		int delta = (npos >> 16) - (ppos >> 16);
 		space.write_dword(cop_regs[0] + 4 + offset*4, npos);
-
-		/* TODO: check the following, makes Zero Team to crash as soon
-		   as this command is triggered (see above) --- or not, since
-		   it was just changed */
 		space.write_word(cop_regs[0] + 0x1e + offset*4, space.read_word(cop_regs[0] + 0x1e + offset*4) + delta);
 		break;
 	}
@@ -2094,7 +2090,7 @@ static MACHINE_CONFIG_START( raiden2, raiden2_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
 	MCFG_SCREEN_REFRESH_RATE(55.47)    /* verified on pcb */
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate *//2)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(500) /* not accurate */)
 	MCFG_SCREEN_SIZE(44*8, 34*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(raiden2_state, screen_update_raiden2)
