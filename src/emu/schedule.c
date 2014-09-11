@@ -814,7 +814,7 @@ void device_scheduler::rebuild_execute_list()
 emu_timer &device_scheduler::timer_list_insert(emu_timer &timer)
 {
 	// disabled timers sort to the end
-	attotime expire = timer.m_enabled ? timer.m_expire : attotime::never;
+	const attotime &expire = timer.m_enabled ? timer.m_expire : attotime::never;
 
 	// loop over the timer list
 	emu_timer *prevtimer = NULL;
