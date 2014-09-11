@@ -37,6 +37,7 @@ static const nes_pcb pcb_list[] =
 	{ "tqrom",            STD_TQROM },
 	{ "txsrom",           STD_TXSROM },
 	{ "exrom",            STD_EXROM },
+	{ "disksys",          STD_DISKSYS },
 	{ "pal_zz",           PAL_ZZ },
 	{ "nes_qj",           NES_QJ },
 	{ "nes_event",        STD_EVENT },

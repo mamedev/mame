@@ -878,6 +878,7 @@ BUSOBJS += $(BUSOBJ)/nes/cne.o
 BUSOBJS += $(BUSOBJ)/nes/cony.o
 BUSOBJS += $(BUSOBJ)/nes/datach.o
 BUSOBJS += $(BUSOBJ)/nes/discrete.o
+BUSOBJS += $(BUSOBJ)/nes/disksys.o
 BUSOBJS += $(BUSOBJ)/nes/event.o
 BUSOBJS += $(BUSOBJ)/nes/ggenie.o
 BUSOBJS += $(BUSOBJ)/nes/henggedianzi.o

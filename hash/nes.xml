@@ -79008,4 +79008,25 @@ that the real dumps might surface -->
 		</part>
 	</software>
 
+<!-- Romless cart for the RAM expansion + Disk System drive (drive ROM is included in the drive device) -->
+	<software name="disksys">
+		<description>Family Computer Disk System (Jpn)</description>
+		<year>1986</year>
+		<publisher>Nintendo</publisher>
+		<info name="usage" value="This only is only supported by Famicom"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="disksys" />
+			<!-- This is a fake and unused PRG dataarea to avoid changing the loading routines for the moment-->
+			<dataarea name="prg" size="32768">
+				<rom value="0xff" size="32768" offset="0" loadflag="fill" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+			<!-- 32k WRAM on cartridge -->
+			<dataarea name="wram" size="32768">
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>

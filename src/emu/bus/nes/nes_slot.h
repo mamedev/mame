@@ -21,6 +21,7 @@ enum
 	STD_UXROM, STD_UN1ROM, UXROM_CC,
 	HVC_FAMBASIC, NES_QJ, PAL_ZZ, STD_EVENT,
 	STD_SXROM_A, STD_SOROM, STD_SOROM_A,
+	STD_DISKSYS,
 	STD_NROM368,//homebrew extension of NROM!
 	/* Discrete components boards (by various manufacturer) */
 	DIS_74X161X138, DIS_74X139X74,
@@ -172,6 +173,9 @@ public:
 	virtual DECLARE_READ8_MEMBER(nt_r);
 	virtual DECLARE_WRITE8_MEMBER(nt_w);
 
+	// hack until disk system is made modern!
+	virtual void disk_flip_side() { }
+
 	void prg_alloc(size_t size);
 	void prgram_alloc(size_t size);
 	void vrom_alloc(size_t size);
@@ -212,7 +216,7 @@ public:
 	virtual void scanline_irq(int scanline, int vblank, int blanked) {}
 
 	virtual void pcb_reset() {} // many pcb expect specific PRG/CHR banking at start
-	void pcb_start(running_machine &machine, UINT8 *ciram_ptr);
+	void pcb_start(running_machine &machine, UINT8 *ciram_ptr, bool cart_mounted);
 	void pcb_reg_postload(running_machine &machine);
 	void nes_banks_restore();
 
@@ -356,6 +360,7 @@ public:
 	const char * get_default_card_unif(UINT8 *ROM, UINT32 len);
 	const char * nes_get_slot(int pcb_id);
 	int nes_get_pcb_id(const char *slot);
+	bool cart_mounted() { return !m_empty; }
 
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read_l);
@@ -366,7 +371,10 @@ public:
 	virtual DECLARE_WRITE8_MEMBER(write_m);
 	virtual DECLARE_WRITE8_MEMBER(write_h);
 	virtual DECLARE_WRITE8_MEMBER(write_ex);
-
+	
+	// hack until disk system is made modern!
+	virtual void disk_flip_side() { if (m_cart) m_cart->disk_flip_side(); }
+	
 	int get_pcb_id() { return m_pcb_id; };
 
 	void pcb_start(UINT8 *ciram_ptr);
@@ -384,6 +392,7 @@ public:
 	device_nes_cart_interface*      m_cart;
 	int m_pcb_id;
 	bool                            m_must_be_loaded;
+	bool                            m_empty;
 };
 
 // device type definition
@@ -400,5 +409,11 @@ extern const device_type NES_CART_SLOT;
 
 #define MCFG_NES_CARTRIDGE_NOT_MANDATORY                                     \
 	static_cast<nes_cart_slot_device *>(device)->set_must_be_loaded(FALSE);
+
+// Hacky configuration to add a slot with fixed disksys interface
+#define MCFG_DISKSYS_ADD(_tag, _slot_intf, _def_slot) \
+	MCFG_DEVICE_ADD(_tag, NES_CART_SLOT, 0) \
+	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, true) \
+	MCFG_NES_CARTRIDGE_NOT_MANDATORY
 
 #endif

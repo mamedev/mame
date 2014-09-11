@@ -34,12 +34,14 @@ int nes_state::nes_ppu_vidaccess( int address, int data )
 	return data;
 }
 
+//-------------------------------------------------
+//  machine_reset
+//-------------------------------------------------
+
 void nes_state::machine_reset()
 {
-	/* Reset the mapper variables. Will also mark the char-gen ram as dirty */
-	if (m_disk_expansion && m_cartslot && !m_cartslot->m_cart)
-		m_ppu->set_hblank_callback(ppu2c0x_hblank_delegate(FUNC(nes_state::fds_irq),this));
-	else if (m_cartslot)
+	// Reset the mapper variables. Will also mark the char-gen ram as dirty
+	if (m_cartslot)
 		m_cartslot->pcb_reset();
 
 	m_maincpu->reset();
@@ -50,25 +52,15 @@ void nes_state::machine_reset()
 	m_paddle_btn_latch = 0;
 }
 
+//-------------------------------------------------
+//  machine_start
+//-------------------------------------------------
+
 void nes_state::state_register()
 {
 	save_item(NAME(m_last_frame_flip));
 
-	save_item(NAME(m_fds_motor_on));
-	save_item(NAME(m_fds_door_closed));
-	save_item(NAME(m_fds_current_side));
-	save_item(NAME(m_fds_head_position));
-	save_item(NAME(m_fds_status0));
-	save_item(NAME(m_fds_read_mode));
-	save_item(NAME(m_fds_write_reg));
-	save_item(NAME(m_fds_last_side));
-	save_item(NAME(m_fds_count));
-	save_item(NAME(m_fds_mirroring));
-
 	save_pointer(NAME(m_ciram), 0x800);
-
-	if (m_disk_expansion)
-		save_pointer(NAME(m_vram), 0x2000);
 
 	save_item(NAME(m_pad_latch));
 	save_item(NAME(m_zapper_latch));
@@ -80,18 +72,9 @@ void nes_state::state_register()
 	save_item(NAME(m_mic_obstruct));
 	save_item(NAME(m_powerpad_latch));
 	save_item(NAME(m_ftrainer_scan));
-	save_item(NAME(m_IRQ_enable));
-	save_item(NAME(m_IRQ_enable_latch));
-	save_item(NAME(m_IRQ_count));
-	save_item(NAME(m_IRQ_count_latch));
 }
 
-
-//-------------------------------------------------
-//  machine_start
-//-------------------------------------------------
-
-void nes_state::machine_start()
+void nes_state::setup_ioports()
 {
 	for (int i = 0; i < 9; i++)
 	{
@@ -115,7 +98,7 @@ void nes_state::machine_start()
 		sprintf(str, "FT_COL%i", i);
 		m_io_ftrainer[i] = ioport(str);
 	}
-
+	
 	m_io_ctrlsel        = ioport("CTRLSEL");
 	m_io_exp            = ioport("EXP");
 	m_io_paddle         = ioport("PADDLE");
@@ -130,7 +113,11 @@ void nes_state::machine_start()
 	m_io_zapper2_y      = ioport("ZAPPER2_Y");
 	m_io_powerpad[0]    = ioport("POWERPAD1");
 	m_io_powerpad[1]    = ioport("POWERPAD2");
+	m_io_disksel        = ioport("FLIPDISK");
+}
 
+void nes_state::machine_start()
+{
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
 	// CIRAM (Character Internal RAM)
@@ -139,6 +126,8 @@ void nes_state::machine_start()
 	// function). CIRAM can also be disabled by the game (if e.g. VROM or cart RAM has to be used in PPU...
 	m_ciram = auto_alloc_array(machine(), UINT8, 0x800);
 	// other pointers got set in the loading routine, because they 'belong' to the cart itself
+
+	setup_ioports();
 
 	if (m_cartslot && m_cartslot->m_cart)
 	{
@@ -153,8 +142,6 @@ void nes_state::machine_start()
 		space.install_read_bank(0xe000, 0xffff, "prg3");
 		space.install_write_handler(0x8000, 0xffff, write8_delegate(FUNC(nes_cart_slot_device::write_h), (nes_cart_slot_device *)m_cartslot));
 
-		m_cartslot->pcb_start(m_ciram);
-		m_cartslot->m_cart->pcb_reg_postload(machine());
 		m_ppu->space(AS_PROGRAM).install_readwrite_handler(0, 0x1fff, read8_delegate(FUNC(device_nes_cart_interface::chr_r),m_cartslot->m_cart), write8_delegate(FUNC(device_nes_cart_interface::chr_w),m_cartslot->m_cart));
 		m_ppu->space(AS_PROGRAM).install_readwrite_handler(0x2000, 0x3eff, read8_delegate(FUNC(device_nes_cart_interface::nt_r),m_cartslot->m_cart), write8_delegate(FUNC(device_nes_cart_interface::nt_w),m_cartslot->m_cart));
 		m_ppu->set_scanline_callback(ppu2c0x_scanline_delegate(FUNC(device_nes_cart_interface::scanline_irq),m_cartslot->m_cart));
@@ -162,7 +149,7 @@ void nes_state::machine_start()
 		m_ppu->set_latch(ppu2c0x_latch_delegate(FUNC(device_nes_cart_interface::ppu_latch),m_cartslot->m_cart));
 
 		// install additional handlers (read_h, read_ex, write_ex)
-		if (m_cartslot->get_pcb_id() == STD_EXROM || m_cartslot->get_pcb_id() == STD_NROM368
+		if (m_cartslot->get_pcb_id() == STD_EXROM || m_cartslot->get_pcb_id() == STD_NROM368 || m_cartslot->get_pcb_id() == STD_DISKSYS
 			|| m_cartslot->get_pcb_id() == GG_NROM || m_cartslot->get_pcb_id() == CAMERICA_ALADDIN || m_cartslot->get_pcb_id() == SUNSOFT_DCS
 			|| m_cartslot->get_pcb_id() == BANDAI_DATACH || m_cartslot->get_pcb_id() == BANDAI_KARAOKE || m_cartslot->get_pcb_id() == BTL_2A03_PURITANS || m_cartslot->get_pcb_id() == AVE_MAXI15
 			|| m_cartslot->get_pcb_id() == KAISER_KS7022 || m_cartslot->get_pcb_id() == KAISER_KS7031 || m_cartslot->get_pcb_id() == BMC_VT5201
@@ -181,32 +168,15 @@ void nes_state::machine_start()
 			space.install_write_handler(0x4020, 0x40ff, write8_delegate(FUNC(nes_cart_slot_device::write_ex), (nes_cart_slot_device *)m_cartslot));
 		}
 
-		if (m_cartslot->get_pcb_id() == KAISER_KS7017 || m_cartslot->get_pcb_id() == UNL_603_5052)
+		if (m_cartslot->get_pcb_id() == KAISER_KS7017 || m_cartslot->get_pcb_id() == UNL_603_5052 || m_cartslot->get_pcb_id() == STD_DISKSYS)
 		{
 			logerror("write_ex & read_ex installed!\n");
 			space.install_read_handler(0x4020, 0x40ff, read8_delegate(FUNC(nes_cart_slot_device::read_ex), (nes_cart_slot_device *)m_cartslot));
 			space.install_write_handler(0x4020, 0x40ff, write8_delegate(FUNC(nes_cart_slot_device::write_ex), (nes_cart_slot_device *)m_cartslot));
 		}
-	}
-	else if (m_disk_expansion)  // if there is Disk Expansion and no cart has been loaded, setup memory accordingly
-	{
-		m_ppu->space(AS_PROGRAM).install_readwrite_handler(0, 0x1fff, read8_delegate(FUNC(nes_state::fds_chr_r),this), write8_delegate(FUNC(nes_state::fds_chr_w),this));
-		m_ppu->space(AS_PROGRAM).install_readwrite_handler(0x2000, 0x3eff, read8_delegate(FUNC(nes_state::fds_nt_r),this), write8_delegate(FUNC(nes_state::fds_nt_w),this));
 
-		if (!m_fds_ram)
-			m_fds_ram = auto_alloc_array(machine(), UINT8, 0x8000);
-		if (!m_vram)
-			m_vram = auto_alloc_array(machine(), UINT8, 0x2000);
-
-		space.install_read_handler(0x4030, 0x403f, read8_delegate(FUNC(nes_state::nes_fds_r),this));
-		space.install_read_bank(0x6000, 0xdfff, "fdsram");
-		space.install_read_bank(0xe000, 0xffff, "bank1");
-
-		space.install_write_handler(0x4020, 0x402f, write8_delegate(FUNC(nes_state::nes_fds_w),this));
-		space.install_write_bank(0x6000, 0xdfff, "fdsram");
-
-		membank("bank1")->set_base(machine().root_device().memregion("maincpu")->base() + 0xe000);
-		membank("fdsram")->set_base(m_fds_ram);
+		m_cartslot->pcb_start(m_ciram);
+		m_cartslot->m_cart->pcb_reg_postload(machine());
 	}
 
 	state_register();
@@ -734,242 +704,8 @@ void nes_state::device_timer(emu_timer &timer, device_timer_id id, int param, vo
 }
 
 
-/**************************
-
- Disk System emulation
-
-**************************/
-
-void nes_state::fds_irq( int scanline, int vblank, int blanked )
-{
-	if (m_IRQ_enable_latch)
-		m_maincpu->set_input_line(M6502_IRQ_LINE, HOLD_LINE);
-
-	if (m_IRQ_enable)
-	{
-		if (m_IRQ_count <= 114)
-		{
-			m_maincpu->set_input_line(M6502_IRQ_LINE, HOLD_LINE);
-			m_IRQ_enable = 0;
-			m_fds_status0 |= 0x01;
-		}
-		else
-			m_IRQ_count -= 114;
-	}
-}
-
-READ8_MEMBER(nes_state::nes_fds_r)
-{
-	UINT8 ret = 0x00;
-
-	switch (offset)
-	{
-		case 0x00: /* $4030 - disk status 0 */
-			ret = m_fds_status0;
-			/* clear the disk IRQ detect flag */
-			m_fds_status0 &= ~0x01;
-			break;
-		case 0x01: /* $4031 - data latch */
-			/* don't read data if disk is unloaded */
-			if (!m_fds_data)
-				ret = 0;
-			else if (m_fds_current_side)
-			{
-				// a bunch of games (e.g. bshashsc and fairypin) keep reading beyond the last track
-				// what is the expected behavior?
-				if (m_fds_head_position > 65500)
-					m_fds_head_position = 0;
-				ret = m_fds_data[(m_fds_current_side - 1) * 65500 + m_fds_head_position++];
-			}
-			else
-				ret = 0;
-			break;
-		case 0x02: /* $4032 - disk status 1 */
-			/* return "no disk" status if disk is unloaded */
-			if (!m_fds_data)
-				ret = 1;
-			else if (m_fds_last_side != m_fds_current_side)
-			{
-				/* If we've switched disks, report "no disk" for a few reads */
-				ret = 1;
-				m_fds_count++;
-				if (m_fds_count == 50)
-				{
-					m_fds_last_side = m_fds_current_side;
-					m_fds_count = 0;
-				}
-			}
-			else
-				ret = (m_fds_current_side == 0); /* 0 if a disk is inserted */
-			break;
-		case 0x03: /* $4033 */
-			ret = 0x80;
-			break;
-		default:
-			ret = 0x00;
-			break;
-	}
-
-	return ret;
-}
-
-WRITE8_MEMBER(nes_state::nes_fds_w)
-{
-	switch (offset)
-	{
-		case 0x00:
-			m_IRQ_count_latch = (m_IRQ_count_latch & 0xff00) | data;
-			break;
-		case 0x01:
-			m_IRQ_count_latch = (m_IRQ_count_latch & 0x00ff) | (data << 8);
-			break;
-		case 0x02:
-			m_IRQ_count = m_IRQ_count_latch;
-			m_IRQ_enable = data;
-			break;
-		case 0x03:
-			// d0 = sound io (1 = enable)
-			// d1 = disk io (1 = enable)
-			break;
-		case 0x04:
-			/* write data out to disk */
-			break;
-		case 0x05:
-			m_fds_motor_on = BIT(data, 0);
-
-			if (BIT(data, 1))
-				m_fds_head_position = 0;
-
-			m_fds_read_mode = BIT(data, 2);
-			if (BIT(data, 3))
-				m_fds_mirroring = PPU_MIRROR_HORZ;
-			else
-				m_fds_mirroring = PPU_MIRROR_VERT;
-
-			if ((!(data & 0x40)) && (m_fds_write_reg & 0x40))
-				m_fds_head_position -= 2; // ???
-
-			m_IRQ_enable_latch = BIT(data, 7);
-			m_fds_write_reg = data;
-			break;
-	}
-}
-
-WRITE8_MEMBER(nes_state::fds_chr_w)
-{
-	m_vram[offset] = data;
-}
-
-READ8_MEMBER(nes_state::fds_chr_r)
-{
-	return m_vram[offset];
-}
-
-WRITE8_MEMBER(nes_state::fds_nt_w)
-{
-	int page = ((offset & 0xc00) >> 10);
-	int bank;
-
-	switch (page)
-	{
-		case 0:
-			bank = 0;
-			break;
-		case 1:
-			bank = (m_fds_mirroring == PPU_MIRROR_VERT) ? 1 : 0;
-			break;
-		case 2:
-			bank = (m_fds_mirroring == PPU_MIRROR_VERT) ? 0 : 1;
-			break;
-		case 3:
-		default:
-			bank = 1;
-			break;
-	}
-
-	m_ciram[(bank * 0x400) + (offset & 0x3ff)] = data;
-}
-
-READ8_MEMBER(nes_state::fds_nt_r)
-{
-	int page = ((offset & 0xc00) >> 10);
-	int bank;
-
-	switch (page)
-	{
-		case 0:
-			bank = 0;
-			break;
-		case 1:
-			bank = (m_fds_mirroring == PPU_MIRROR_VERT) ? 1 : 0;
-			break;
-		case 2:
-			bank = (m_fds_mirroring == PPU_MIRROR_VERT) ? 0 : 1;
-			break;
-		case 3:
-		default:
-			bank = 1;
-			break;
-	}
-
-	return m_ciram[(bank * 0x400) + (offset & 0x3ff)];
-}
-
-
-// Disk interface
-
-static void nes_load_proc( device_image_interface &image )
-{
-	nes_state *state = image.device().machine().driver_data<nes_state>();
-	int header = 0;
-	state->m_fds_sides = 0;
-
-	if (image.length() % 65500)
-		header = 0x10;
-
-	state->m_fds_sides = (image.length() - header) / 65500;
-
-	if (!state->m_fds_data)
-		state->m_fds_data = auto_alloc_array(image.device().machine(),UINT8,state->m_fds_sides * 65500);    // I don't think we can arrive here ever, probably it can be removed...
-
-	/* if there is an header, skip it */
-	image.fseek(header, SEEK_SET);
-
-	image.fread(state->m_fds_data, 65500 * state->m_fds_sides);
-	return;
-}
-
-static void nes_unload_proc( device_image_interface &image )
-{
-	nes_state *state = image.device().machine().driver_data<nes_state>();
-
-	/* TODO: should write out changes here as well */
-	state->m_fds_sides =  0;
-}
-
 DRIVER_INIT_MEMBER(nes_state,famicom)
 {
-	/* initialize the disk system */
-	m_disk_expansion = 1;
-
-	m_fds_sides = 0;
-	m_fds_last_side = 0;
-	m_fds_count = 0;
-	m_fds_motor_on = 0;
-	m_fds_door_closed = 0;
-	m_fds_current_side = 1;
-	m_fds_head_position = 0;
-	m_fds_status0 = 0;
-	m_fds_read_mode = m_fds_write_reg = 0;
-
-	m_fds_mirroring = PPU_MIRROR_VERT;  // correct?
-
-	m_fds_ram = auto_alloc_array_clear(machine(), UINT8, 0x8000);
-	save_pointer(NAME(m_fds_ram), 0x8000);
-
-	floppy_get_device(machine(), 0)->floppy_install_load_proc(nes_load_proc);
-	floppy_get_device(machine(), 0)->floppy_install_unload_proc(nes_unload_proc);
-
 	// setup alt input handlers for additional FC input devices
 	address_space &space = machine().device<cpu_device>("maincpu")->space(AS_PROGRAM);
 	space.install_read_handler(0x4016, 0x4016, read8_delegate(FUNC(nes_state::fc_in0_r), this));

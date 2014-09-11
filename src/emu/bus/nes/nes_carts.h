@@ -20,6 +20,7 @@
 #include "bandai.h"
 #include "datach.h"
 #include "discrete.h"
+#include "disksys.h"
 #include "event.h"
 #include "irem.h"
 #include "jaleco.h"
@@ -65,5 +66,6 @@
 
 // supported devices
 SLOT_INTERFACE_EXTERN(nes_cart);
+SLOT_INTERFACE_EXTERN(disksys_only);
 
 #endif // __NES_CARTS_H__

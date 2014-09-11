@@ -56,12 +56,14 @@ jaguarcd  // Atari Jaguar CD
 
 // Nintendo
 nes       // Nintendo Entertainment System
-nespal  // Nintendo Entertainment System PAL
+nespal    // Nintendo Entertainment System PAL
 m82       // Nintendo M82 Display Unit
-famicom   // Nintendo Family Computer (a.k.a. Famicom) + Disk System add-on
+famicom   // Nintendo Family Computer (a.k.a. Famicom)
+fds       // Nintendo Family Computer (a.k.a. Famicom) + Disk System add-on
 famitwin  // Sharp Famicom Twin System
 drpcjr    // Bung Doctor PC Jr
 dendy     // Dendy (Classic russian famiclone)
+gchinatv  // Golden China TV Game Centre (Chinese famiclone)
 gameboy   // Nintendo Game Boy Handheld
 supergb   // Nintendo Super Game Boy SNES Cartridge
 gbpocket  // Nintendo Game Boy Pocket Handheld
@@ -72,7 +74,6 @@ snespal   // Nintendo Super Nintendo PAL
 n64       // Nintendo N64
 n64dd     // Nintendo N64 (64DD Attachment)
 pokemini  // Nintendo Pokemon Mini
-gchinatv // Golden China TV Game Centre
 
 megaduck  // Megaduck
 

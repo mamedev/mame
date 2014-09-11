@@ -663,23 +663,29 @@ WRITE8_MEMBER(device_nes_cart_interface::write_h)
 }
 
 
-void device_nes_cart_interface::pcb_start(running_machine &machine, UINT8 *ciram_ptr)
+void device_nes_cart_interface::pcb_start(running_machine &machine, UINT8 *ciram_ptr, bool cart_mounted)
 {
-	// Setup PRG
-	m_prg_bank_mem[0] = machine.root_device().membank("prg0");
-	m_prg_bank_mem[1] = machine.root_device().membank("prg1");
-	m_prg_bank_mem[2] = machine.root_device().membank("prg2");
-	m_prg_bank_mem[3] = machine.root_device().membank("prg3");
-	for (int i = 0; i < 4; i++)
+	if (cart_mounted)		// disksys expansion can arrive here without the memory banks!
 	{
-		m_prg_bank_mem[i]->configure_entries(0, m_prg.count() / 0x2000, m_prg, 0x2000);
-		m_prg_bank_mem[i]->set_entry(i);
-		m_prg_bank[i] = i;
+		// Setup PRG
+		m_prg_bank_mem[0] = machine.root_device().membank("prg0");
+		m_prg_bank_mem[1] = machine.root_device().membank("prg1");
+		m_prg_bank_mem[2] = machine.root_device().membank("prg2");
+		m_prg_bank_mem[3] = machine.root_device().membank("prg3");
+		for (int i = 0; i < 4; i++)
+		{
+			if (m_prg_bank_mem[i])
+			{
+				m_prg_bank_mem[i]->configure_entries(0, m_prg.count() / 0x2000, m_prg, 0x2000);
+				m_prg_bank_mem[i]->set_entry(i);
+				m_prg_bank[i] = i;
+			}
+		}
+		
+		// Setup CHR
+		m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
+		chr8(0, m_chr_source);
 	}
-
-	// Setup CHR
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
-	chr8(0, m_chr_source);
 
 	// Setup NT
 	m_ciram = ciram_ptr;
@@ -733,7 +739,8 @@ nes_cart_slot_device::nes_cart_slot_device(const machine_config &mconfig, const 
 						device_slot_interface(mconfig, *this),
 						m_crc_hack(0),
 						m_pcb_id(NO_BOARD),
-						m_must_be_loaded(1)
+						m_must_be_loaded(1),
+						m_empty(TRUE)
 {
 }
 
@@ -770,7 +777,7 @@ void nes_cart_slot_device::device_config_complete()
 void nes_cart_slot_device::pcb_start(UINT8 *ciram_ptr)
 {
 	if (m_cart)
-		m_cart->pcb_start(machine(), ciram_ptr);
+		m_cart->pcb_start(machine(), ciram_ptr, cart_mounted());
 }
 
 void nes_cart_slot_device::pcb_reset()
@@ -835,6 +842,7 @@ bool nes_cart_slot_device::call_load()
 				}
 
 				call_load_ines();
+				m_empty = FALSE;
 			}
 			else if ((magic[0] == 'U') && (magic[1] == 'N') && (magic[2] == 'I') && (magic[3] == 'F')) /* If header starts with 'UNIF' it is UNIF */
 			{
@@ -845,6 +853,7 @@ bool nes_cart_slot_device::call_load()
 				}
 
 				call_load_unif();
+				m_empty = FALSE;
 			}
 			else
 			{
@@ -853,7 +862,10 @@ bool nes_cart_slot_device::call_load()
 			}
 		}
 		else
+		{
 			call_load_pcb();
+			m_empty = FALSE;
+		}
 	}
 
 	return IMAGE_INIT_PASS;

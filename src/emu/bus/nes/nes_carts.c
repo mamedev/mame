@@ -51,6 +51,8 @@ SLOT_INTERFACE_START(nes_cart)
 	SLOT_INTERFACE_INTERNAL("txsrom",           NES_TXSROM)
 // ExROM
 	SLOT_INTERFACE_INTERNAL("exrom",            NES_EXROM)
+// RAM expansion + Disk System add-on
+	SLOT_INTERFACE_INTERNAL("disksys",          NES_DISKSYS)
 // Nintendo Custom boards
 	SLOT_INTERFACE_INTERNAL("pal_zz",           NES_ZZ_PCB)
 	SLOT_INTERFACE_INTERNAL("nes_qj",           NES_QJ_PCB)
@@ -354,4 +356,9 @@ SLOT_INTERFACE_START(nes_cart)
 	SLOT_INTERFACE_INTERNAL("test",             NES_NROM)
 //
 	SLOT_INTERFACE_INTERNAL("unknown",          NES_NROM)  //  a few pirate dumps uses the wrong mapper...
+SLOT_INTERFACE_END
+
+SLOT_INTERFACE_START(disksys_only)
+	// RAM expansion + Disk System add-on
+	SLOT_INTERFACE("disksys",                   NES_DISKSYS)
 SLOT_INTERFACE_END

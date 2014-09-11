@@ -13,8 +13,6 @@
 #include "emu.h"
 #include "includes/nes.h"
 #include "cpu/m6502/n2a03.h"
-#include "imagedev/flopdrv.h"
-#include "formats/nes_dsk.h"
 
 READ8_MEMBER(nes_state::psg_4015_r)
 {
@@ -646,14 +644,6 @@ void nes_state::ppu_nmi(int *ppu_regs)
 }
 
 
-static const floppy_interface nes_floppy_interface =
-{
-	FLOPPY_STANDARD_5_25_DSHD,
-	LEGACY_FLOPPY_OPTIONS_NAME(nes_only),
-	"floppy_5_25"
-};
-
-
 static MACHINE_CONFIG_START( nes, nes_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", N2A03, NTSC_CLOCK)
@@ -739,22 +729,108 @@ static MACHINE_CONFIG_DERIVED( dendy, nes )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( famicom, nes )
-	MCFG_DEVICE_REMOVE("nes_slot")
-	MCFG_NES_CARTRIDGE_ADD("nes_slot", nes_cart, NULL)
-	MCFG_NES_CARTRIDGE_NOT_MANDATORY
-
-	MCFG_LEGACY_FLOPPY_DRIVE_ADD(FLOPPY_0, nes_floppy_interface)
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "famicom_flop")
-
 	MCFG_CASSETTE_ADD( "tape" )
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
 	MCFG_CASSETTE_INTERFACE("fc_cass")
 
+	MCFG_SOFTWARE_LIST_ADD("flop_list", "famicom_flop")
 	MCFG_SOFTWARE_LIST_ADD("cass_list", "famicom_cass")
 MACHINE_CONFIG_END
 
+void nes_state::setup_disk(nes_cart_slot_device *slot)
+{
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 
-/* rom regions are just place-holders: they get removed and re-allocated when a cart is loaded */
+	if (slot)
+	{
+		// Set up memory handlers
+		space.install_read_handler(0x4020, 0x40ff, read8_delegate(FUNC(nes_cart_slot_device::read_ex), (nes_cart_slot_device *)slot));
+		space.install_write_handler(0x4020, 0x40ff, write8_delegate(FUNC(nes_cart_slot_device::write_ex), (nes_cart_slot_device *)slot));
+		space.install_read_handler(0x4100, 0x5fff, read8_delegate(FUNC(nes_cart_slot_device::read_l), (nes_cart_slot_device *)slot));
+		space.install_write_handler(0x4100, 0x5fff, write8_delegate(FUNC(nes_cart_slot_device::write_l), (nes_cart_slot_device *)slot));
+		space.install_read_handler(0x6000, 0x7fff, read8_delegate(FUNC(nes_cart_slot_device::read_m), (nes_cart_slot_device *)slot));
+		space.install_write_handler(0x6000, 0x7fff, write8_delegate(FUNC(nes_cart_slot_device::write_m), (nes_cart_slot_device *)slot));
+		space.install_read_handler(0x8000, 0xffff, read8_delegate(FUNC(nes_cart_slot_device::read_h), (nes_cart_slot_device *)slot));
+		space.install_write_handler(0x8000, 0xffff, write8_delegate(FUNC(nes_cart_slot_device::write_h), (nes_cart_slot_device *)slot));
+		
+		slot->m_cart->vram_alloc(0x2000);
+		slot->m_cart->prgram_alloc(0x8000);
+		
+		slot->pcb_start(m_ciram);
+		slot->m_cart->pcb_reg_postload(machine());
+		m_ppu->space(AS_PROGRAM).install_readwrite_handler(0, 0x1fff, read8_delegate(FUNC(device_nes_cart_interface::chr_r),slot->m_cart), write8_delegate(FUNC(device_nes_cart_interface::chr_w),slot->m_cart));
+		m_ppu->space(AS_PROGRAM).install_readwrite_handler(0x2000, 0x3eff, read8_delegate(FUNC(device_nes_cart_interface::nt_r),slot->m_cart), write8_delegate(FUNC(device_nes_cart_interface::nt_w),slot->m_cart));
+		m_ppu->set_scanline_callback(ppu2c0x_scanline_delegate(FUNC(device_nes_cart_interface::scanline_irq),slot->m_cart));
+		m_ppu->set_hblank_callback(ppu2c0x_hblank_delegate(FUNC(device_nes_cart_interface::hblank_irq),slot->m_cart));
+		m_ppu->set_latch(ppu2c0x_latch_delegate(FUNC(device_nes_cart_interface::ppu_latch),slot->m_cart));
+	}
+}
+
+
+MACHINE_START_MEMBER( nes_state, fds )
+{	
+	m_ciram = auto_alloc_array(machine(), UINT8, 0x800);
+	setup_ioports();
+	// setup the disk expansion instead
+	setup_disk(m_cartslot);
+}
+
+static MACHINE_CONFIG_DERIVED( fds, famicom )
+	MCFG_MACHINE_START_OVERRIDE( nes_state, fds )
+	MCFG_DEVICE_REMOVE("tape")
+
+	MCFG_DEVICE_REMOVE("nes_slot")
+	MCFG_DISKSYS_ADD("nes_slot", disksys_only, "disksys")
+
+	MCFG_DEVICE_REMOVE("cart_list")
+	MCFG_DEVICE_REMOVE("cass_list")
+MACHINE_CONFIG_END
+
+
+MACHINE_START_MEMBER( nes_state, famitwin )
+{
+	// start the base nes stuff
+	machine_start();
+
+	// if there is no cart inserted, setup the disk expansion instead
+	if (!m_cartslot->m_cart)
+		setup_disk(m_cartslot2);
+}
+
+MACHINE_RESET_MEMBER( nes_state, famitwin )
+{
+	// Reset the mapper variables. Will also mark the char-gen ram as dirty
+	m_cartslot->pcb_reset();
+	// if there is no cart inserted, initialize the disk expansion instead
+	if (!m_cartslot->m_cart)
+		m_cartslot2->pcb_reset();
+	
+	// the rest is the same as for nes/famicom/dendy
+	m_maincpu->reset();
+	
+	memset(m_pad_latch, 0, sizeof(m_pad_latch));
+	memset(m_zapper_latch, 0, sizeof(m_zapper_latch));
+	m_paddle_latch = 0;
+	m_paddle_btn_latch = 0;	
+}
+
+static MACHINE_CONFIG_DERIVED( famitwin, famicom )
+
+	MCFG_MACHINE_START_OVERRIDE( nes_state, famitwin )
+	MCFG_MACHINE_RESET_OVERRIDE( nes_state, famitwin )
+
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE_DRIVER(nes_state, screen_update_famitwin)
+
+	MCFG_DEVICE_REMOVE("nes_slot")
+	MCFG_NES_CARTRIDGE_ADD("nes_slot", nes_cart, NULL)
+	MCFG_NES_CARTRIDGE_NOT_MANDATORY
+
+	MCFG_DISKSYS_ADD("disk_slot", disksys_only, "disksys")
+MACHINE_CONFIG_END
+
+
+
 ROM_START( nes )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )  /* Main RAM */
 ROM_END
@@ -764,12 +840,10 @@ ROM_START( nespal )
 ROM_END
 
 ROM_START( famicom )
-	ROM_REGION( 0x10000, "maincpu", 0 )  /* Main RAM */
-	ROM_SYSTEM_BIOS( 0, "2c33a-01a", "Famicom Disk System Bios")
-	ROMX_LOAD( "rp2c33a-01a.bin", 0xe000, 0x2000, CRC(5e607dcf) SHA1(57fe1bdee955bb48d357e463ccbf129496930b62), ROM_BIOS(1)) // newer, Nintendo logo has no shadow
-	ROM_SYSTEM_BIOS( 1, "2c33-01", "Famicom Disk System Bios, older")
-	ROMX_LOAD( "rp2c33-01.bin", 0xe000, 0x2000, CRC(1c7ae5d5) SHA1(af5af53f66982e749643fdf8b2acbb7d4d3ed229), ROM_BIOS(2)) // older, Nintendo logo has shadow
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )  /* Main RAM */
 ROM_END
+
+#define rom_fds rom_famicom
 
 ROM_START( famitwin )
 	ROM_REGION( 0x10000, "maincpu", 0 )  /* Main RAM */
@@ -799,7 +873,6 @@ ROM_END
 
 ROM_START( gchinatv )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )  /* Main RAM */
-	ROM_REGION( 0x800,   "ciram", ROMREGION_ERASE00 )  /* CI RAM */
 ROM_END
 
 /***************************************************************************
@@ -809,11 +882,12 @@ ROM_END
 ***************************************************************************/
 
 /*     YEAR  NAME      PARENT  COMPAT MACHINE   INPUT    INIT    COMPANY       FULLNAME */
-CONS( 1985, nes,       0,      0,     nes,      nes, driver_device,     0,       "Nintendo",  "Nintendo Entertainment System / Famicom (NTSC)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
-CONS( 1987, nespal,    nes,    0,     nespal,   nes, driver_device,     0,       "Nintendo",  "Nintendo Entertainment System (PAL)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
-CONS( 1983, famicom,   nes,    0,     famicom,  famicom, nes_state, famicom, "Nintendo",  "Famicom (w/ Disk System add-on)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
-CONS( 1986, famitwin,  nes,    0,     famicom,  famicom, nes_state, famicom, "Sharp",     "Famicom Twin", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
-CONS( 198?, m82,       nes,    0,     nes,      nes, driver_device,     0,       "Nintendo",  "M82 Display Unit", GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
-CONS( 1996, drpcjr,    nes,    0,     famicom,  famicom, nes_state, famicom, "Bung",      "Doctor PC Jr", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
-CONS( 1992, dendy,     nes,    0,     dendy,    nes, driver_device,     0,       "Steepler",  "Dendy Classic", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
-CONS( 198?, gchinatv,  nes,    0,     nespal,   nes, driver_device,     0,       "Golden China",  "Golden China TV Game", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+CONS( 1985, nes,       0,      0,     nes,      nes,     driver_device,     0,       "Nintendo",  "Nintendo Entertainment System / Famicom (NTSC)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+CONS( 1987, nespal,    nes,    0,     nespal,   nes,     driver_device,     0,       "Nintendo",  "Nintendo Entertainment System (PAL)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+CONS( 1983, famicom,   nes,    0,     famicom,  famicom, nes_state,         famicom, "Nintendo",  "Famicom (NTSC)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+CONS( 1983, fds,       nes,    0,     fds,      famicom, nes_state,         famicom, "Nintendo",  "Famicom (w/ Disk System add-on)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+CONS( 1986, famitwin,  nes,    0,     famitwin, famicom, nes_state,         famicom, "Sharp",     "Famicom Twin", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+CONS( 198?, m82,       nes,    0,     nes,      nes,     driver_device,     0,       "Nintendo",  "M82 Display Unit", GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+CONS( 1996, drpcjr,    nes,    0,     famicom,  famicom, nes_state,         famicom, "Bung",      "Doctor PC Jr", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+CONS( 1992, dendy,     nes,    0,     dendy,    nes,     driver_device,     0,       "Steepler",  "Dendy Classic", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+CONS( 198?, gchinatv,  nes,    0,     nespal,   nes,     driver_device,     0,       "Golden China",  "Golden China TV Game", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )

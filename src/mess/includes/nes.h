@@ -69,6 +69,7 @@ public:
 			m_ppu(*this, "ppu"),
 			m_sound(*this, "nessound"),
 			m_cartslot(*this, "nes_slot"),
+			m_cartslot2(*this, "disk_slot"),	// temp hack for famitwin
 			m_cassette(*this, "tape")
 		{ }
 
@@ -76,7 +77,6 @@ public:
 	int m_last_frame_flip;
 
 	/* misc */
-
 	ioport_port       *m_io_ctrlsel;
 	ioport_port       *m_io_fckey[9];
 	ioport_port       *m_io_subkey[13];
@@ -95,6 +95,7 @@ public:
 	ioport_port       *m_io_paddle;
 	ioport_port       *m_io_paddle_btn;
 	ioport_port       *m_io_exp;
+	ioport_port       *m_io_disksel;
 
 	UINT8      *m_vram;
 	UINT8      *m_ciram; //PPU nametable RAM - external to PPU!
@@ -103,6 +104,7 @@ public:
 	required_device<ppu2c0x_device> m_ppu;
 	required_device<nesapu_device> m_sound;
 	optional_device<nes_cart_slot_device> m_cartslot;
+	optional_device<nes_cart_slot_device> m_cartslot2;
 	optional_device<cassette_image_device> m_cassette;
 
 	int nes_ppu_vidaccess(int address, int data);
@@ -122,48 +124,20 @@ public:
 	virtual void video_reset();
 	DECLARE_PALETTE_INIT(nes);
 	UINT32 screen_update_nes(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_famitwin(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_READ8_MEMBER(psg_4015_r);
 	DECLARE_WRITE8_MEMBER(psg_4015_w);
 	DECLARE_WRITE8_MEMBER(psg_4017_w);
 	void state_register();
+	void setup_ioports();
 
-	/***** FDS-floppy related *****/
-
-	DECLARE_WRITE8_MEMBER(fds_chr_w);
-	DECLARE_READ8_MEMBER(fds_chr_r);
-	DECLARE_WRITE8_MEMBER(fds_nt_w);
-	DECLARE_READ8_MEMBER(fds_nt_r);
-
-	int m_disk_expansion;
-
-	UINT8 m_fds_sides;
-	UINT8 *m_fds_data;    // here, we store a copy of the disk
-	UINT8 *m_fds_ram; // here, we emulate the RAM adapter
-
-	/* Variables which can change */
-	UINT8 m_fds_motor_on;
-	UINT8 m_fds_door_closed;
-	UINT8 m_fds_current_side;
-	UINT32 m_fds_head_position;
-	UINT8 m_fds_status0;
-	UINT8 m_fds_read_mode;
-	UINT8 m_fds_write_reg;
-	int m_fds_mirroring;
-
-	int m_IRQ_enable, m_IRQ_enable_latch;
-	UINT16 m_IRQ_count, m_IRQ_count_latch;
-
-	/* these are used in the mapper 20 handlers */
-	int m_fds_last_side;
-	int m_fds_count;
-	DECLARE_READ8_MEMBER(nes_fds_r);
-	DECLARE_WRITE8_MEMBER(nes_fds_w);
 	DECLARE_DRIVER_INIT(famicom);
 
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(nes_disk);
-	DECLARE_DEVICE_IMAGE_UNLOAD_MEMBER(nes_disk);
-
-	void fds_irq(int scanline, int vblank, int blanked);
+	// these are needed until we modernize the FDS controller
+	DECLARE_MACHINE_START(fds);
+	DECLARE_MACHINE_START(famitwin);
+	DECLARE_MACHINE_RESET(famitwin);
+	void setup_disk(nes_cart_slot_device *slot);
 
 	// input related
 	UINT32 m_pad_latch[4];
