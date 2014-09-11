@@ -41,38 +41,6 @@
 
 /***************************************************************************
 
-                            Memory Handlers
-
-***************************************************************************/
-
-#ifdef UNUSED_FUNCTION
-READ8_MEMBER(skyfox_state::skyfox_vregs_r)// for debug
-{
-	return m_vreg[offset];
-}
-#endif
-
-WRITE8_MEMBER(skyfox_state::skyfox_vregs_w)
-{
-	m_vreg[offset] = data;
-
-	switch (offset)
-	{
-		case 0: m_bg_ctrl = data;   break;
-		case 1: soundlatch_byte_w(space, 0, data);  break;
-		case 2: break;
-		case 3: break;
-		case 4: break;
-		case 5: break;
-		case 6: break;
-		case 7: break;
-	}
-}
-
-
-
-/***************************************************************************
-
   Convert the color PROMs into a more useable format.
 
   There are three 256x4 palette PROMs (one per gun).
@@ -89,9 +57,8 @@ WRITE8_MEMBER(skyfox_state::skyfox_vregs_w)
 PALETTE_INIT_MEMBER(skyfox_state, skyfox)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
-	int i;
 
-	for (i = 0; i < 256; i++)
+	for (int i = 0; i < 256; i++)
 	{
 		int bit0, bit1, bit2, bit3, r, g, b;
 
@@ -117,8 +84,8 @@ PALETTE_INIT_MEMBER(skyfox_state, skyfox)
 		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
 
-	/* Grey scale for the background??? */
-	for (i = 0; i < 256; i++)
+	/* Grey scale for the background??? is wrong */
+	for (int i = 0; i < 256; i++)
 	{
 		palette.set_pen_color(i + 256, rgb_t(i, i, i));
 	}
@@ -159,45 +126,35 @@ Offset:         Value:
 
 void skyfox_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	int offs;
-
+	gfx_element *gfx = m_gfxdecode->gfx(0);
 	int width = m_screen->width();
 	int height = m_screen->height();
 
 	/* The 32x32 tiles in the 80-ff range are bankswitched */
-	int shift =(m_bg_ctrl & 0x80) ? (4 - 1) : 4;
+	int shift = (m_bg_ctrl & 0x80) ? (4 - 1) : 4;
 
-	for (offs = 0; offs < m_spriteram.bytes(); offs += 4)
+	for (int offs = 0; offs < m_spriteram.bytes(); offs += 4)
 	{
 		int xstart, ystart, xend, yend;
 		int xinc, yinc, dx, dy;
 		int low_code, high_code, n;
 
-		int y = m_spriteram[offs + 0];
-		int x = m_spriteram[offs + 1];
-		int code = m_spriteram[offs + 2] + m_spriteram[offs + 3] * 256;
+		int code = m_spriteram[offs + 3] << 8 | m_spriteram[offs + 2];
 		int flipx = code & 0x2;
 		int flipy = code & 0x4;
-
-		x = x * 2 + (code & 1); // add the least significant bit
+		int y = m_spriteram[offs + 0];
+		int x = m_spriteram[offs + 1] << 1 | (code & 1);
 
 		high_code = ((code >> 4) & 0x7f0) + ((code & 0x8000) >> shift);
 
-		switch( code & 0x88 )
+		switch (code & 0x88)
 		{
-			case 0x88:  n = 4; low_code = 0;                                        break;
-			case 0x08:  n = 2; low_code = ((code & 0x20) ? 8 : 0) + ((code & 0x10) ? 2 : 0);    break;
-			default:    n = 1; low_code = (code >> 4) & 0xf;
+			case 0x88:  n = 4; low_code = 0; break;
+			case 0x08:  n = 2; low_code = (code & 0x20) >> 2 | (code & 0x10) >> 3; break;
+			default:    n = 1; low_code = (code >> 4) & 0xf; break;
 		}
 
-#define DRAW_SPRITE(DX,DY,CODE) \
-		m_gfxdecode->gfx(0)->transpen(bitmap,\
-				cliprect, \
-				(CODE), \
-				0, \
-				flipx,flipy, \
-				x + (DX),y + (DY), 0xff);
-		if (m_bg_ctrl & 1)   // flipscreen
+		if (m_bg_ctrl & 1) // flipscreen
 		{
 			x = width  - x - (n - 1) * 8;
 			y = height - y - (n - 1) * 8;
@@ -217,14 +174,16 @@ void skyfox_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect
 		for (dy = ystart; dy != yend; dy += yinc)
 		{
 			for (dx = xstart; dx != xend; dx += xinc)
-				DRAW_SPRITE(dx * 8, dy * 8, code++);
+			{
+				gfx->transpen(bitmap, cliprect, code, 0, flipx, flipy, dx*8 + x, dy*8 + y, 0xff);
+				code++;
+			}
 
-			if (n == 2) code += 2;
+			if (n == 2)
+				code += 2;
 		}
 	}
 }
-
-
 
 
 
@@ -236,45 +195,37 @@ void skyfox_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect
 
 void skyfox_state::draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 *RAM = memregion("gfx2")->base();
-	int x, y, i;
+	UINT8 *rom = memregion("gfx2")->base();
 
 	/* The foreground stars (sprites) move at twice this speed when
-	   the bg scroll rate [e.g. (skyfox_bg_reg >> 1) & 7] is 4 */
+	   the bg scroll rate [e.g. (m_bg_ctrl >> 1) & 7] is 4 */
 	int pos = (m_bg_pos >> 4) & (512 * 2 - 1);
 
-	for (i = 0 ; i < 0x1000; i++)
+	for (int i = 0; i < 0x1000; i++)
 	{
-		int pen, offs, j;
+		int offs = (i * 2 + ((m_bg_ctrl >> 4) & 0x3) * 0x2000) % 0x8000;
 
-		offs    = (i * 2 + ((m_bg_ctrl >> 4) & 0x3) * 0x2000) % 0x8000;
+		int pen = rom[offs];
+		int x = rom[offs + 1] * 2 + (i & 1) + pos + ((i & 8) ? 512 : 0);
+		int y = ((i / 8) / 2) * 8 + (i % 8);
 
-		pen = RAM[offs];
-		x = RAM[offs + 1] * 2 + (i & 1) + pos + ((i & 8) ? 512 : 0);
-		y = ((i / 8) / 2) * 8 + (i % 8);
-
-		if (m_bg_ctrl & 1)   // flipscreen
+		if (m_bg_ctrl & 1) // flipscreen
 		{
 			x = 512 * 2 - (x % (512 * 2));
 			y = 256     - (y % 256);
 		}
 
-		for (j = 0 ; j <= ((pen & 0x80) ? 0 : 3); j++)
-			bitmap.pix16(
-							(((j / 2) & 1) + y) % 256,
-							((j & 1)     + x) % 512) = 256 + (pen & 0x7f);
+		for (int j = 0; j <= ((pen & 0x80) ? 0 : 3); j++)
+			bitmap.pix16((((j / 2) & 1) + y) % 256, ((j & 1) + x) % 512) = 256 + (pen & 0x7f);
 	}
 }
 
 
 /***************************************************************************
 
-
                                 Screen Drawing
 
-
 ***************************************************************************/
-
 
 UINT32 skyfox_state::screen_update_skyfox(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {

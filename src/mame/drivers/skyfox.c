@@ -16,6 +16,7 @@ To Do:  The background rendering is entirely guesswork
 Verified Dip locations and recommended settings with manual
 
 ***************************************************************************/
+
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/2203intf.h"
@@ -24,61 +25,60 @@ Verified Dip locations and recommended settings with manual
 
 /***************************************************************************
 
-
                                 Main CPU
 
-
 ***************************************************************************/
 
+WRITE8_MEMBER(skyfox_state::skyfox_vregs_w)
+{
+	switch (offset)
+	{
+		case 0:
+			m_bg_ctrl = data;
+			break;
 
-/***************************************************************************
-                                Sky Fox
-***************************************************************************/
+		case 1:
+			soundlatch_byte_w(space, 0, data);
+			break;
+
+		default:
+			break;
+	}
+}
 
 static ADDRESS_MAP_START( skyfox_map, AS_PROGRAM, 8, skyfox_state )
-	AM_RANGE(0x0000, 0xbfff) AM_ROM                         // ROM
-	AM_RANGE(0xc000, 0xcfff) AM_RAM                         // RAM
-	AM_RANGE(0xd000, 0xd3ff) AM_RAM AM_SHARE("spriteram")   // Sprites
-	AM_RANGE(0xd400, 0xdfff) AM_RAM                         // RAM?
-	AM_RANGE(0xe000, 0xe000) AM_READ_PORT("INPUTS")         // Input Ports
-	AM_RANGE(0xe001, 0xe001) AM_READ_PORT("DSW0")           //
-	AM_RANGE(0xe002, 0xe002) AM_READ_PORT("DSW1")           //
-	AM_RANGE(0xe008, 0xe00f) AM_WRITE(skyfox_vregs_w)       // Video Regs
-	AM_RANGE(0xf001, 0xf001) AM_READ_PORT("DSW2")           //
-//  AM_RANGE(0xff00, 0xff07) AM_READ(skyfox_vregs_r)        // fake to read the vregs
+	AM_RANGE(0x0000, 0xbfff) AM_ROM
+	AM_RANGE(0xc000, 0xcfff) AM_RAM
+	AM_RANGE(0xd000, 0xd3ff) AM_RAM AM_SHARE("spriteram")
+	AM_RANGE(0xd400, 0xdfff) AM_RAM // ?
+	AM_RANGE(0xe000, 0xe000) AM_READ_PORT("INPUTS")
+	AM_RANGE(0xe001, 0xe001) AM_READ_PORT("DSW0")
+	AM_RANGE(0xe002, 0xe002) AM_READ_PORT("DSW1")
+	AM_RANGE(0xe008, 0xe00f) AM_WRITE(skyfox_vregs_w)
+	AM_RANGE(0xf001, 0xf001) AM_READ_PORT("DSW2")
 ADDRESS_MAP_END
 
 
 /***************************************************************************
-
 
                                 Sound CPU
 
-
 ***************************************************************************/
-
-
-/***************************************************************************
-                                Sky Fox
-***************************************************************************/
-
 
 static ADDRESS_MAP_START( skyfox_sound_map, AS_PROGRAM, 8, skyfox_state )
-	AM_RANGE(0x0000, 0x7fff) AM_ROM                             // ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM                             // RAM
-//  AM_RANGE(0x9000, 0x9001) AM_WRITENOP                        // ??
-	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE("ym1", ym2203_device, read, write) // YM2203 #1
-//  AM_RANGE(0xb000, 0xb001) AM_WRITENOP                        // ??
-	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("ym2", ym2203_device, read, write) // YM2203 #2
-	AM_RANGE(0xb000, 0xb000) AM_READ(soundlatch_byte_r)             // From Main CPU
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0x87ff) AM_RAM
+//  AM_RANGE(0x9000, 0x9001) AM_WRITENOP // ??
+	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE("ym1", ym2203_device, read, write)
+//  AM_RANGE(0xb000, 0xb001) AM_WRITENOP // ??
+	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("ym2", ym2203_device, read, write)
+	AM_RANGE(0xb000, 0xb000) AM_READ(soundlatch_byte_r)
 ADDRESS_MAP_END
 
 
 /***************************************************************************
 
-
                                 Input Ports
-
 
 ***************************************************************************/
 
@@ -147,8 +147,8 @@ static INPUT_PORTS_START( skyfox )
 	PORT_DIPSETTING(    0x02, "3" )
 	PORT_DIPSETTING(    0x03, "4" )
 	PORT_DIPSETTING(    0x04, "5" )
-//  PORT_DIPSETTING(    0x05, "5" )
-//  PORT_DIPSETTING(    0x06, "5" )
+	PORT_DIPSETTING(    0x05, "5" ) // dupe
+	PORT_DIPSETTING(    0x06, "5" ) // dupe
 	PORT_DIPSETTING(    0x07, "Infinite (Cheat)")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -166,9 +166,7 @@ INPUT_PORTS_END
 
 /***************************************************************************
 
-
                                 Graphics Layouts
-
 
 ***************************************************************************/
 
@@ -187,26 +185,15 @@ static const gfx_layout layout_8x8x8 =
 	8*8*8
 };
 
-/***************************************************************************
-                                Sky Fox
-***************************************************************************/
-
 static GFXDECODE_START( skyfox )
-	GFXDECODE_ENTRY( "gfx1", 0, layout_8x8x8,   0, 1 ) // [0] Sprites
+	GFXDECODE_ENTRY( "gfx1", 0, layout_8x8x8, 0, 1 ) // [0] Sprites
 GFXDECODE_END
 
 
 /***************************************************************************
 
-
                                 Machine Drivers
 
-
-***************************************************************************/
-
-
-/***************************************************************************
-                                Sky Fox
 ***************************************************************************/
 
 /* Scroll the background on every vblank (guess). */
@@ -234,23 +221,22 @@ static MACHINE_CONFIG_START( skyfox, skyfox_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_8MHz/2) /* Verified at 4MHz */
 	MCFG_CPU_PROGRAM_MAP(skyfox_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", skyfox_state,  skyfox_interrupt)       /* NMI caused by coin insertion */
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", skyfox_state, skyfox_interrupt)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_14_31818MHz/8) /* Verified at 1.789772MHz */
 	MCFG_CPU_PROGRAM_MAP(skyfox_sound_map)
 
-
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(62.65)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)   // we're using PORT_VBLANK
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(512, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0+0x60, 320-1+0x60, 0+16, 256-1-16)    // from $30*2 to $CC*2+8
+	MCFG_SCREEN_VISIBLE_AREA(0+0x60, 320-1+0x60, 0+16, 256-1-16) // from $30*2 to $CC*2+8
 	MCFG_SCREEN_UPDATE_DRIVER(skyfox_state, screen_update_skyfox)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", skyfox)
-	MCFG_PALETTE_ADD("palette", 256+256)    /* 256 static colors (+256 for the background??) */
+	MCFG_PALETTE_ADD("palette", 256+256) /* 256 static colors (+256 for the background??) */
 	MCFG_PALETTE_INIT_OWNER(skyfox_state, skyfox)
 
 	/* sound hardware */
@@ -265,20 +251,11 @@ MACHINE_CONFIG_END
 
 
 
-
-
-
 /***************************************************************************
-
 
                                 ROMs Loading
 
-
-***************************************************************************/
-
-
-
-/***************************************************************************
+****************************************************************************
 
                                     Sky Fox
 
@@ -287,9 +264,7 @@ c042    :   Lives
 c044-5  :   Score (BCD)
 c048-9  :   Power (BCD)
 
-***************************************************************************/
-
-/***************************************************************************
+****************************************************************************
 
                                 Exerizer [Bootleg]
 
@@ -417,28 +392,24 @@ ROM_START( exerizerb )
 ROM_END
 
 
-
-
 /* Untangle the graphics: cut each 32x32x8 tile in 16 8x8x8 tiles */
 DRIVER_INIT_MEMBER(skyfox_state,skyfox)
 {
-	UINT8 *RAM = memregion("gfx1")->base();
-	UINT8 *end = RAM + memregion("gfx1")->bytes();
+	UINT8 *rom = memregion("gfx1")->base();
+	UINT8 *end = rom + memregion("gfx1")->bytes();
 	UINT8 buf[32 * 32];
 
-	while (RAM < end)
+	while (rom < end)
 	{
-		int i;
-		for (i = 0; i < (32 * 32); i++)
-			buf[i] = RAM[(i % 8) + ((i / 8) % 8) * 32 + ((i / 64) % 4) * 8 + (i / 256) * 256];
+		for (int i = 0; i < (32 * 32); i++)
+			buf[i] = rom[(i % 8) + ((i / 8) % 8) * 32 + ((i / 64) % 4) * 8 + (i / 256) * 256];
 
-		memcpy(RAM, buf, 32 * 32);
-		RAM += 32 * 32;
+		memcpy(rom, buf, 32 * 32);
+		rom += 32 * 32;
 	}
 }
 
 
-
-GAME( 1987, skyfox,    0,      skyfox, skyfox, skyfox_state, skyfox, ROT90, "Jaleco (Nichibutsu USA license)", "Sky Fox" , GAME_SUPPORTS_SAVE )
+GAME( 1987, skyfox,    0,      skyfox, skyfox, skyfox_state, skyfox, ROT90, "Jaleco (Nichibutsu USA license)", "Sky Fox", GAME_SUPPORTS_SAVE )
 GAME( 1987, exerizer,  skyfox, skyfox, skyfox, skyfox_state, skyfox, ROT90, "Jaleco", "Exerizer (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1987, exerizerb, skyfox, skyfox, skyfox, skyfox_state, skyfox, ROT90, "bootleg", "Exerizer (Japan) (bootleg)", GAME_SUPPORTS_SAVE )
+GAME( 1987, exerizerb, skyfox, skyfox, skyfox, skyfox_state, skyfox, ROT90, "bootleg", "Exerizer (bootleg)", GAME_SUPPORTS_SAVE )
