@@ -1239,3 +1239,40 @@ TIMER_DEVICE_CALLBACK_MEMBER(apple3_state::paddle_timer)
 		m_pdltimer->adjust(attotime::from_hz(1000000.0));
 	}
 }
+
+WRITE_LINE_MEMBER(apple3_state::a2bus_irq_w)
+{
+	UINT8 irq_mask = m_a2bus->get_a2bus_irq_mask();
+
+	m_via_1->write_ca1(state);
+	m_via_1->write_pa7(state);
+
+	if (irq_mask & (1<<4))
+	{
+		m_via_1->write_pa4(ASSERT_LINE);
+	}
+	else
+	{
+		m_via_1->write_pa4(CLEAR_LINE);
+	}
+
+	if (irq_mask & (1<<3))
+	{
+		m_via_1->write_pa5(ASSERT_LINE);
+	}
+	else
+	{
+		m_via_1->write_pa5(CLEAR_LINE);
+	}
+}
+
+WRITE_LINE_MEMBER(apple3_state::a2bus_nmi_w)
+{
+	m_via_1->write_pb7(state);
+
+	if (m_via_0_a & ENV_NMIENABLE)
+	{
+		m_maincpu->set_input_line(INPUT_LINE_NMI, state);
+	}
+}
+

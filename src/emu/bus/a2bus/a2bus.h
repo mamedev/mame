@@ -92,9 +92,11 @@ public:
 
 	void add_a2bus_card(int slot, device_a2bus_card_interface *card);
 	device_a2bus_card_interface *get_a2bus_card(int slot);
+	UINT8 get_a2bus_irq_mask();
+	UINT8 get_a2bus_nmi_mask();
 
-	void set_irq_line(int state);
-	void set_nmi_line(int state);
+	void set_irq_line(int state, int slot);
+	void set_nmi_line(int state, int slot);
 	void set_inh_slotnum(int slot);
 
 	DECLARE_WRITE_LINE_MEMBER( irq_w );
@@ -114,6 +116,9 @@ protected:
 
 	device_a2bus_card_interface *m_device_list[8];
 	const char *m_cputag;
+
+	UINT8 m_slot_irq_mask;
+	UINT8 m_slot_nmi_mask;
 };
 
 
@@ -148,10 +153,10 @@ public:
 	UINT32 get_slotromspace() { return 0xc000 | (m_slot<<8); }      // return Cn00 address for this slot
 	UINT32 get_slotiospace() { return 0xc080 + (m_slot<<4); }       // return C0n0 address for this slot
 
-	void raise_slot_irq() { m_a2bus->set_irq_line(ASSERT_LINE); }
-	void lower_slot_irq() { m_a2bus->set_irq_line(CLEAR_LINE); }
-	void raise_slot_nmi() { m_a2bus->set_nmi_line(ASSERT_LINE); }
-	void lower_slot_nmi() { m_a2bus->set_nmi_line(CLEAR_LINE); }
+	void raise_slot_irq() { m_a2bus->set_irq_line(ASSERT_LINE, m_slot); }
+	void lower_slot_irq() { m_a2bus->set_irq_line(CLEAR_LINE, m_slot); }
+	void raise_slot_nmi() { m_a2bus->set_nmi_line(ASSERT_LINE, m_slot); }
+	void lower_slot_nmi() { m_a2bus->set_nmi_line(CLEAR_LINE, m_slot); }
 	void raise_slot_inh() { m_a2bus->set_inh_slotnum(m_slot); }
 	void lower_slot_inh() { m_a2bus->set_inh_slotnum(INH_SLOT_INVALID); }
 

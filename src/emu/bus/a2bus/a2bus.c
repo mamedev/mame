@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:R. Belmont
 /***************************************************************************
 
   a2bus.c - Apple II slot bus and card emulation
@@ -169,6 +171,8 @@ void a2bus_device::device_start()
 	{
 		m_device_list[i] = NULL;
 	}
+
+	m_slot_irq_mask = m_slot_nmi_mask = 0;
 }
 
 //-------------------------------------------------
@@ -199,14 +203,42 @@ void a2bus_device::add_a2bus_card(int slot, device_a2bus_card_interface *card)
 	m_device_list[slot] = card;
 }
 
-void a2bus_device::set_irq_line(int state)
+UINT8 a2bus_device::get_a2bus_irq_mask()
 {
-	m_out_irq_cb(state);
+	return m_slot_irq_mask;
 }
 
-void a2bus_device::set_nmi_line(int state)
+UINT8 a2bus_device::get_a2bus_nmi_mask()
+{
+	return m_slot_nmi_mask;
+}
+
+void a2bus_device::set_irq_line(int state, int slot)
+{
+	m_out_irq_cb(state);
+
+	if (state == CLEAR_LINE)
+	{
+		m_slot_irq_mask &= ~(1<<slot);
+	}
+	else if (state == ASSERT_LINE)
+	{
+		m_slot_irq_mask |= (1<<slot);
+	}
+}
+
+void a2bus_device::set_nmi_line(int state, int slot)
 {
 	m_out_nmi_cb(state);
+
+	if (state == CLEAR_LINE)
+	{
+		m_slot_nmi_mask &= ~(1<<slot);
+	}
+	else if (state == ASSERT_LINE)
+	{
+		m_slot_nmi_mask |= (1<<slot);
+	}
 }
 
 void a2bus_device::set_inh_slotnum(int slot)
