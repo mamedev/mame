@@ -8,15 +8,15 @@
     These use the INS8060 (SC/MP) processor, and are Zaccaria's first
     digital machines.
 
-    The inputs work with 'strike' and 'skijump'.
-    The playboard inputs are unknown.
+    After starting a game, press X, wait for the sound of the ball
+    being ejected, then press Z. Now you can get a score.
+
+    The ball number is how many balls are left. 1 = last ball.
+
 
 ToDo:
-- Mirrors of ram and switches
-- battery backup of ram
-- Inputs
-- Outputs
-- Sound
+- Mechanical
+- Sound board, no info available. Also knocker output not known.
 
 **********************************************************************/
 
@@ -24,11 +24,11 @@ ToDo:
 #include "cpu/scmp/scmp.h"
 #include "zac_proto.lh"
 
-class zac_proto_state : public driver_device
+class zac_proto_state : public genpin_class
 {
 public:
 	zac_proto_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
+		: genpin_class(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 	{ }
 
@@ -63,50 +63,43 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( zac_proto )
 	// playfield inputs
 	PORT_START("PL0")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_START )
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER)
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER)
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_COIN2 )
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_START )
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_TILT)
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_Z)
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_X) PORT_NAME("Outhole")
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_COLON)
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_QUOTE)
 	PORT_START("PL1")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER)
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER)
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_Q)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_W)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_E)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_R)
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_Y)
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_U)
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_I)
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_O)
 	PORT_START("PL2")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER)
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER)
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_A)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_S)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_D)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_F)
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_G)
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_H)
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_J)
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_K)
 	PORT_START("PL3")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER)
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER)
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_L)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_C)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_V)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_B)
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_N)
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_M)
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_COMMA)
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_STOP)
 	PORT_START("PL4")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER)
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER)
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER)
+	PORT_BIT(0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	// dipswitches
 	PORT_START("PL5")
@@ -191,9 +184,26 @@ static INPUT_PORTS_START( zac_proto )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 INPUT_PORTS_END
 
+// solenoids (not knocker)
 WRITE8_MEMBER( zac_proto_state::out0_w )
 {
-// solenoids
+	UINT16 t = data | (offset << 8);
+
+	switch (t)
+	{
+		case 1:
+			m_samples->start(0, 5); // outhole
+			break;
+		case 2:
+		case 4:
+			m_samples->start(4, 7); // slings
+			break;
+		case 8:
+		case 16:
+		case 32:
+			m_samples->start(5, 0); // bumpers
+			break;
+	}
 }
 
 WRITE8_MEMBER( zac_proto_state::out1_w )
@@ -204,7 +214,7 @@ WRITE8_MEMBER( zac_proto_state::out1_w )
 // need to implement blanking of leading zeroes
 WRITE8_MEMBER( zac_proto_state::digit_w )
 {
-	static const UINT8 patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x6f, 0, 0, 0, 0, 0, 0 };
+	static const UINT8 patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x6f, 0x77, 0x7c, 0x39, 0x5e, 0x79, 0x71 }; // 9368 (outputs 0-9,A-F)
 	static const UINT8 decimals[10] = { 0, 0, 0x80, 0, 0, 0x80, 0, 0, 0, 0 };
 	offset<<=1;
 	output_set_digit_value(offset, patterns[data&15] | decimals[offset]);
@@ -214,6 +224,7 @@ WRITE8_MEMBER( zac_proto_state::digit_w )
 
 WRITE8_MEMBER( zac_proto_state::sound_w )
 {
+// to unknown sound board
 }
 
 void zac_proto_state::machine_reset()
@@ -223,12 +234,15 @@ void zac_proto_state::machine_reset()
 
 static MACHINE_CONFIG_START( zac_proto, zac_proto_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", SCMP, 1000000)
+	MCFG_CPU_ADD("maincpu", INS8060, XTAL_4MHz / 2) // Using SC/MP II chip which has an internal /2 circuit.
 	MCFG_CPU_PROGRAM_MAP(zac_proto_map)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* Video */
 	MCFG_DEFAULT_LAYOUT(layout_zac_proto)
+
+	/* Sound */
+	MCFG_FRAGMENT_ADD( genpin_audio )
 MACHINE_CONFIG_END
 
 /*--------------------------------
@@ -264,6 +278,6 @@ ROM_START(spacecty)
 	ROM_LOAD("zsc4.dat", 0x1400, 0x0400, CRC(69e0bb95) SHA1(d9a1d0159bf49445b0ece0f9d7806ed80657c2b2))
 ROM_END
 
-GAME(1978,  skijump,   0,  zac_proto,  zac_proto, driver_device,  0,  ROT0,  "Zaccaria",    "Ski Jump",        GAME_IS_SKELETON_MECHANICAL)
-GAME(1979,  spacecty,  0,  zac_proto,  zac_proto, driver_device,  0,  ROT0,  "Zaccaria",    "Space City",      GAME_IS_SKELETON_MECHANICAL)
-GAME(1978,  strike,    0,  zac_proto,  zac_proto, driver_device,  0,  ROT0,  "Zaccaria",    "Strike",          GAME_IS_SKELETON_MECHANICAL)
+GAME(1978,  skijump,   0,  zac_proto,  zac_proto, driver_device,  0,  ROT0, "Zaccaria", "Ski Jump", GAME_MECHANICAL | GAME_IMPERFECT_SOUND )
+GAME(1979,  spacecty,  0,  zac_proto,  zac_proto, driver_device,  0,  ROT0, "Zaccaria", "Space City", GAME_MECHANICAL | GAME_IMPERFECT_SOUND )
+GAME(1978,  strike,    0,  zac_proto,  zac_proto, driver_device,  0,  ROT0, "Zaccaria", "Strike", GAME_MECHANICAL | GAME_IMPERFECT_SOUND )
