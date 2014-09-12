@@ -409,6 +409,10 @@ OSDOBJS = \
 	$(SDLOBJ)/output.o \
 	$(SDLOBJ)/watchdog.o \
 
+ifeq ($(BASE_TARGETOS),win32)
+	$(OSDOBJ)/modules/sound/direct_sound.o
+endif
+
 ifdef NO_USE_MIDI
 DEFS += -DDISABLE_MIDI=1
 endif
