@@ -599,6 +599,31 @@ ROM_START( vendetta2p )
 	ROM_LOAD( "vendetta.nv", 0x0000, 0x080, CRC(fbac4e30) SHA1(d3ff3a392550d9b06400b9292a44bdac7ba5c801) )
 ROM_END
 
+ROM_START( vendetta2punk )
+	ROM_REGION( 0x48000, "maincpu", 0 ) /* code + banked roms + banked ram */
+	ROM_LOAD( "eb-401.17c", 0x10000, 0x38000, CRC(8430bb52) SHA1(54e896510fa44e76b0640b17150210fbf6b3b5bc))
+	ROM_CONTINUE(       0x08000, 0x08000 )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 64k for the sound CPU */
+	ROM_LOAD( "081b02", 0x000000, 0x10000, CRC(4c604d9b) SHA1(22d979f5dbde7912dd927bf5538fdbfc5b82905e) )
+
+	ROM_REGION( 0x100000, "k052109", 0 )    /* tiles */
+	ROM_LOAD32_WORD( "081a09", 0x000000, 0x080000, CRC(b4c777a9) SHA1(cc2b1dff4404ecd72b604e25d00fffdf7f0f8b52) )
+	ROM_LOAD32_WORD( "081a08", 0x000002, 0x080000, CRC(272ac8d9) SHA1(2da12fe4c13921bf0d4ebffec326f8d207ec4fad) )
+
+	ROM_REGION( 0x400000, "gfx2", 0 ) /* graphics ( don't dispose as the program can read them ) */
+	ROM_LOAD64_WORD( "081a04", 0x000000, 0x100000, CRC(464b9aa4) SHA1(28066ff0a07c3e56e7192918a882778c1b316b37) ) /* sprites */
+	ROM_LOAD64_WORD( "081a05", 0x000002, 0x100000, CRC(4e173759) SHA1(ce803f2aca7d7dedad00ab30e112443848747bd2) ) /* sprites */
+	ROM_LOAD64_WORD( "081a06", 0x000004, 0x100000, CRC(e9fe6d80) SHA1(2b7fc9d7fe43cd85dc8b975fe639c273cb0d9256) ) /* sprites */
+	ROM_LOAD64_WORD( "081a07", 0x000006, 0x100000, CRC(8a22b29a) SHA1(be539f21518e13038ab1d4cc2b2a901dd3e621f4) ) /* sprites */
+
+	ROM_REGION( 0x100000, "k053260", 0 ) /* 053260 samples */
+	ROM_LOAD( "081a03", 0x000000, 0x100000, CRC(14b6baea) SHA1(fe15ee57f19f5acaad6c1642d51f390046a7468a) )
+
+	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting upside down with error
+	ROM_LOAD( "vendetta.nv", 0x0000, 0x080, CRC(fbac4e30) SHA1(d3ff3a392550d9b06400b9292a44bdac7ba5c801) )
+ROM_END
+
 ROM_START( vendetta2pu )
 	ROM_REGION( 0x48000, "maincpu", 0 ) /* code + banked roms + banked ram */
 	ROM_LOAD( "081u01", 0x10000, 0x38000, CRC(b4d9ade5) SHA1(fbd543738cb0b68c80ff05eed7849b608de03395) )
@@ -648,6 +673,9 @@ ROM_START( vendetta2pd )
 	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting upside down with error
 	ROM_LOAD( "vendetta.nv", 0x0000, 0x080, CRC(fbac4e30) SHA1(d3ff3a392550d9b06400b9292a44bdac7ba5c801) )
 ROM_END
+
+
+
 
 ROM_START( vendettaj )
 	ROM_REGION( 0x48000, "maincpu", 0 ) /* code + banked roms + banked ram */
@@ -744,11 +772,12 @@ DRIVER_INIT_MEMBER(vendetta_state,esckids)
 
 
 
-GAME( 1991, vendetta,    0,        vendetta, vendet4p, vendetta_state, vendetta, ROT0, "Konami", "Vendetta (World 4 Players ver. T)", GAME_SUPPORTS_SAVE )
-GAME( 1991, vendettar,   vendetta, vendetta, vendet4p, vendetta_state, vendetta, ROT0, "Konami", "Vendetta (World 4 Players ver. R)", GAME_SUPPORTS_SAVE )
-GAME( 1991, vendetta2p,  vendetta, vendetta, vendetta, vendetta_state, vendetta, ROT0, "Konami", "Vendetta (World 2 Players ver. W)", GAME_SUPPORTS_SAVE )
-GAME( 1991, vendetta2pu, vendetta, vendetta, vendetta, vendetta_state, vendetta, ROT0, "Konami", "Vendetta (Asia 2 Players ver. U)", GAME_SUPPORTS_SAVE )
-GAME( 1991, vendetta2pd, vendetta, vendetta, vendetta, vendetta_state, vendetta, ROT0, "Konami", "Vendetta (Asia 2 Players ver. D)", GAME_SUPPORTS_SAVE )
-GAME( 1991, vendettaj,   vendetta, vendetta, vendetta, vendetta_state, vendetta, ROT0, "Konami", "Crime Fighters 2 (Japan 2 Players ver. P)", GAME_SUPPORTS_SAVE )
+GAME( 1991, vendetta,    0,        vendetta, vendet4p, vendetta_state, vendetta, ROT0, "Konami", "Vendetta (World, 4 Players, ver. T)", GAME_SUPPORTS_SAVE )
+GAME( 1991, vendettar,   vendetta, vendetta, vendet4p, vendetta_state, vendetta, ROT0, "Konami", "Vendetta (World, 4 Players, ver. R)", GAME_SUPPORTS_SAVE )
+GAME( 1991, vendetta2p,  vendetta, vendetta, vendetta, vendetta_state, vendetta, ROT0, "Konami", "Vendetta (World, 2 Players, ver. W)", GAME_SUPPORTS_SAVE )
+GAME( 1991, vendetta2punk,vendetta,vendetta, vendetta, vendetta_state, vendetta, ROT0, "Konami", "Vendetta (World, 2 Players, ver. unknown)", GAME_SUPPORTS_SAVE )
+GAME( 1991, vendetta2pu, vendetta, vendetta, vendetta, vendetta_state, vendetta, ROT0, "Konami", "Vendetta (Asia, 2 Players, ver. U)", GAME_SUPPORTS_SAVE )
+GAME( 1991, vendetta2pd, vendetta, vendetta, vendetta, vendetta_state, vendetta, ROT0, "Konami", "Vendetta (Asia, 2 Players, ver. D)", GAME_SUPPORTS_SAVE )
+GAME( 1991, vendettaj,   vendetta, vendetta, vendetta, vendetta_state, vendetta, ROT0, "Konami", "Crime Fighters 2 (Japan, 2 Players, ver. P)", GAME_SUPPORTS_SAVE )
 GAME( 1991, esckids,     0,        esckids,  esckids, vendetta_state,  esckids,  ROT0, "Konami", "Escape Kids (Asia, 4 Players)", GAME_SUPPORTS_SAVE )
 GAME( 1991, esckidsj,    esckids,  esckids,  esckidsj, vendetta_state, esckids,  ROT0, "Konami", "Escape Kids (Japan, 2 Players)", GAME_SUPPORTS_SAVE )
