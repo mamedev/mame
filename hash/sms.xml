@@ -5953,7 +5953,7 @@
 
 	<software name="strider">
 		<description>Strider (Euro, USA, Bra, Kor)</description>
-		<year>1993</year>
+		<year>1991</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="9005, GB4028JG"/>
 		<part name="cart" interface="sms_cart">
@@ -5968,7 +5968,7 @@
 
 	<software name="striderd" cloneof="strider">
 		<description>Strider (USA, Display Unit Sample)</description>
-		<year>1993</year>
+		<year>1991</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="131072">

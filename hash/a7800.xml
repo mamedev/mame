@@ -34,7 +34,7 @@ Touchdown Football - NTSC only    CX7823
 One-on-One Basketball             CX7824
 Sky Fox                           CX7825 (Not Released)
 Summer Games - NTSC only          CX7826
-GATO                  CX7827 (Prototype)
+GATO                              CX7827 (Prototype)
 Super Huey UH-IX                  CX7828
 Hat Trick                         CX7829
 Sarge                             CX7830 (Not Released)
@@ -81,7 +81,7 @@ Ninja Golf                        CX7870
                                   CX7871
                                   CX7872
                                   CX7873
-Electrocop                        CX7874
+Electrocop                        CX7874 (Not Released)
 Meltdown                          CX7875
                                   CX7876
                                   CX7877
@@ -558,7 +558,7 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 	<software name="crackedu" cloneof="cracked">
 		<description>Crack'ed (NTSC)</description>
 		<year>1987</year>
-		<publisher>Atari / Data East</publisher>
+		<publisher>Atari</publisher>
 		<info name="serial" value="CX7836"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
@@ -573,7 +573,7 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 	<software name="cracked">
 		<description>Crack'ed (PAL)</description>
 		<year>1987</year>
-		<publisher>Atari / Data East</publisher>
+		<publisher>Atari</publisher>
 		<info name="serial" value="CX7836"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a7800_cart">
@@ -882,7 +882,7 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 	<software name="fightnu" cloneof="fightn">
 		<description>Fight Night (NTSC)</description>
 		<year>1988</year>
-		<publisher>Accolde</publisher>
+		<publisher>Atari / Accolade</publisher>
 		<info name="serial" value="CX7851"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
@@ -897,7 +897,7 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 	<software name="fightn">
 		<description>Fight Night (PAL)</description>
 		<year>1988</year>
-		<publisher>Accolde</publisher>
+		<publisher>Atari / Accolade</publisher>
 		<info name="serial" value="CX7851"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a7800_cart">
@@ -942,7 +942,7 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 	<software name="galagau" cloneof="galaga">
 		<description>Galaga (NTSC)</description>
 		<year>1984</year>
-		<publisher>Atari</publisher>
+		<publisher>Atari / Namco</publisher>
 		<info name="serial" value="CX7805"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
@@ -957,7 +957,7 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 	<software name="galaga">
 		<description>Galaga (PAL)</description>
 		<year>1984</year>
-		<publisher>Atari</publisher>
+		<publisher>Atari / Namco</publisher>
 		<info name="serial" value="CX7805"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a7800_cart">
@@ -1141,7 +1141,7 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 	<software name="ikariu" cloneof="ikari">
 		<description>Ikari Warriors (NTSC)</description>
 		<year>1990</year>
-		<publisher>Atari</publisher>
+		<publisher>Atari / SNK</publisher>
 		<info name="serial" value="CX7862"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
@@ -1774,7 +1774,7 @@ almost nothing like the prototype.
 
 	<software name="pitfight">
 		<description>Pit Fighter (Prototype)</description>
-		<year>198?</year>
+		<year>199?</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX7891"/>
 		<part name="cart" interface="a7800_cart">
@@ -2378,7 +2378,7 @@ almost nothing like the prototype.
 	<software name="xeviousu" cloneof="xevious">
 		<description>Xevious (NTSC)</description>
 		<year>1984</year>
-		<publisher>Atari</publisher>
+		<publisher>Atari / Namco</publisher>
 		<info name="serial" value="CX7810"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
@@ -2393,7 +2393,7 @@ almost nothing like the prototype.
 	<software name="xevious">
 		<description>Xevious (PAL)</description>
 		<year>1984</year>
-		<publisher>Atari</publisher>
+		<publisher>Atari / Namco</publisher>
 		<info name="serial" value="CX7810"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a7800_cart">
