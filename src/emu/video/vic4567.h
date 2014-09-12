@@ -238,7 +238,7 @@ extern const device_type VIC3;
 
 
 #define MCFG_VIC3_CPU(_tag) \
-	vic3_device::static_set_cpu_tag(*device, "^"_tag);
+	vic3_device::static_set_cpu_tag(*device, "^" _tag);
 
 #define MCFG_VIC3_TYPE(_type) \
 	vic3_device::set_vic3_type(*device, _type);

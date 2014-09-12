@@ -53,7 +53,7 @@ private:
 extern const device_type C6280;
 
 #define MCFG_C6280_CPU(_tag) \
-	c6280_device::set_devicecpu_tag(*device, "^"_tag);
+	c6280_device::set_devicecpu_tag(*device, "^" _tag);
 
 
 #endif /* __C6280_H__ */

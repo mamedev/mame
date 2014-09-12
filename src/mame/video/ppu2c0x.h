@@ -106,7 +106,7 @@ enum
 #define MCFG_PPU2C0X_SET_SCREEN MCFG_VIDEO_SET_SCREEN
 
 #define MCFG_PPU2C0X_CPU(_tag) \
-	ppu2c0x_device::set_cpu_tag(*device, "^"_tag);
+	ppu2c0x_device::set_cpu_tag(*device, "^" _tag);
 
 #define MCFG_PPU2C0X_COLORBASE(_color) \
 	ppu2c0x_device::set_color_base(*device, _color);

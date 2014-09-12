@@ -704,7 +704,7 @@ private:
 extern const device_type MC68328;
 
 #define MCFG_MC68328_CPU(_tag) \
-	mc68328_device::static_set_cpu_tag(*device, "^"_tag);
+	mc68328_device::static_set_cpu_tag(*device, "^" _tag);
 
 #define MCFG_MC68328_OUT_PORT_A_CB(_devcb) \
 	devcb = &mc68328_device::set_out_port_a_callback(*device, DEVCB_##_devcb);

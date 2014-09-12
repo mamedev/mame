@@ -94,7 +94,7 @@ private:
 extern const device_type UPD71071;
 
 #define MCFG_UPD71071_CPU(_tag) \
-	upd71071_device::static_set_cpu_tag(*device, "^"_tag);
+	upd71071_device::static_set_cpu_tag(*device, "^" _tag);
 
 #define MCFG_UPD71071_CLOCK(_clk) \
 	upd71071_device::set_clock(*device, _clk);

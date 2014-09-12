@@ -92,7 +92,7 @@
 //***************************************************************************
 
 #define MCFG_MOS6566_CPU(_tag) \
-	mos6566_device::static_set_cpu_tag(*device, "^"_tag);
+	mos6566_device::static_set_cpu_tag(*device, "^" _tag);
 
 #define MCFG_MOS6566_IRQ_CALLBACK(_write) \
 	devcb = &mos6566_device::set_irq_wr_callback(*device, DEVCB_##_write);
