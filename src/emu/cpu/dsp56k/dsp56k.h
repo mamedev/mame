@@ -22,23 +22,6 @@
 #define DSP56K_IRQ_MODC  2
 #define DSP56K_IRQ_RESET 3  /* Is this needed? */
 
-// Needed for MAME
-CPU_GET_INFO( dsp56k );
-
-class dsp56k_device : public legacy_cpu_device
-{
-public:
-	dsp56k_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, UINT32 clock);
-
-	DECLARE_DIRECT_UPDATE_MEMBER(dsp56k_direct_handler);
-	DECLARE_READ16_MEMBER( program_r );
-	DECLARE_WRITE16_MEMBER( program_w );
-	DECLARE_READ16_MEMBER( peripheral_register_r );
-	DECLARE_WRITE16_MEMBER( peripheral_register_w );
-};
-
-extern const device_type DSP56156;
-
 
 /***************************************************************************
     STRUCTURES & TYPEDEFS
@@ -204,7 +187,7 @@ struct dsp56k_core
 	UINT32          op;
 	int             interrupt_cycles;
 	void            (*output_pins_changed)(UINT32 pins);
-	legacy_cpu_device *device;
+	cpu_device *device;
 	address_space *program;
 	direct_read_data *direct;
 	address_space *data;
@@ -214,20 +197,61 @@ struct dsp56k_core
 };
 
 
-INLINE dsp56k_core *get_safe_token(device_t *device)
+class dsp56k_device : public cpu_device
 {
-	assert(device != NULL);
-	assert(device->type() == DSP56156);
-	return (dsp56k_core *)downcast<legacy_cpu_device *>(device)->token();
-}
+public:
+	dsp56k_device(const machine_config &mconfig, const char *_tag, device_t *_owner, UINT32 _clock);
+
+	DECLARE_DIRECT_UPDATE_MEMBER(dsp56k_direct_handler);
+	DECLARE_READ16_MEMBER( program_r );
+	DECLARE_WRITE16_MEMBER( program_w );
+	DECLARE_READ16_MEMBER( peripheral_register_r );
+	DECLARE_WRITE16_MEMBER( peripheral_register_w );
+
+	void  host_interface_write(UINT8 offset, UINT8 data);
+	UINT8 host_interface_read(UINT8 offset);
+
+	UINT16 get_peripheral_memory(UINT16 addr);
+
+protected:
+	// device-level overrides
+	virtual void device_start();
+	virtual void device_reset();
+
+	// device_execute_interface overrides
+	virtual UINT64 execute_clocks_to_cycles(UINT64 clocks) const { return (clocks + 2 - 1) / 2; }
+	virtual UINT64 execute_cycles_to_clocks(UINT64 cycles) const { return (cycles * 2); }
+	virtual UINT32 execute_min_cycles() const { return 1; }
+	virtual UINT32 execute_max_cycles() const { return 8; }
+	virtual UINT32 execute_input_lines() const { return 4; }
+	virtual UINT32 execute_default_irq_vector() const { return 0; }
+	virtual void execute_run();
+	virtual void execute_set_input(int inputnum, int state);
+
+	// device_memory_interface overrides
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const { return (spacenum == AS_PROGRAM) ? &m_program_config : ((spacenum == AS_DATA) ? &m_data_config : NULL ); }
+
+	// device_state_interface overrides
+	void state_string_export(const device_state_entry &entry, astring &string);
+
+	// device_disasm_interface overrides
+	virtual UINT32 disasm_min_opcode_bytes() const { return 2; }
+	virtual UINT32 disasm_max_opcode_bytes() const { return 4; }
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
+
+private:
+	address_space_config m_program_config;
+	address_space_config m_data_config;
+
+	dsp56k_core m_dsp56k_core;
+
+	void agu_init();
+	void alu_init();
+
+};
 
 
-/***************************************************************************
-    PUBLIC FUNCTIONS - ACCESSIBLE TO DRIVERS
-***************************************************************************/
-void  dsp56k_host_interface_write(device_t* device, UINT8 offset, UINT8 data);
-UINT8 dsp56k_host_interface_read(device_t* device, UINT8 offset);
+extern const device_type DSP56156;
 
-UINT16 dsp56k_get_peripheral_memory(device_t* device, UINT16 addr);
 
 #endif /* __DSP56K_H__ */

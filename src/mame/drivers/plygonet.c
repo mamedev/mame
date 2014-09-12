@@ -198,7 +198,7 @@ READ32_MEMBER(polygonet_state::dsp_host_interface_r)
 	if (mem_mask == 0x0000ff00) { hi_addr++; }  /* Low byte */
 	if (mem_mask == 0xff000000) {}              /* High byte */
 
-	value = dsp56k_host_interface_read(m_dsp, hi_addr);
+	value = m_dsp->host_interface_read(hi_addr);
 
 	if (mem_mask == 0x0000ff00) { value <<= 8;  }
 	if (mem_mask == 0xff000000) { value <<= 24; }
@@ -278,7 +278,7 @@ WRITE32_MEMBER(polygonet_state::dsp_host_interface_w)
 	if (mem_mask == 0xff000000) { hi_data = (data & 0xff000000) >> 24; }
 
 	logerror("write (host-side) %08x %08x %08x (HI %04x)\n", offset, mem_mask, data, hi_addr);
-	dsp56k_host_interface_write(m_dsp, hi_addr, hi_data);
+	m_dsp->host_interface_write(hi_addr, hi_data);
 }
 
 
@@ -353,7 +353,7 @@ DIRECT_UPDATE_MEMBER(polygonet_state::plygonet_dsp56k_direct_handler)
 
 static UINT8 dsp56k_bank_group(device_t* cpu)
 {
-	UINT16 portC = dsp56k_get_peripheral_memory(cpu, 0xffe3);
+	UINT16 portC = ((dsp56k_device *)cpu)->get_peripheral_memory(0xffe3);
 
 	/* If bank group B is on, it overrides bank group A */
 	if (portC & 0x0002)
@@ -366,7 +366,7 @@ static UINT8 dsp56k_bank_group(device_t* cpu)
 
 static UINT8 dsp56k_bank_num(device_t* cpu, UINT8 bank_group)
 {
-	UINT16 portC = dsp56k_get_peripheral_memory(cpu, 0xffe3);
+	UINT16 portC = ((dsp56k_device *)cpu)->get_peripheral_memory(0xffe3);
 
 	if (bank_group == BANK_GROUP_A)
 	{

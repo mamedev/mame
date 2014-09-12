@@ -1,5 +1,6 @@
 #include "machine/eepromser.h"
 #include "video/k053936.h"
+#include "cpu/dsp56k/dsp56k.h"
 
 
 static const UINT16 dsp56k_bank00_size = 0x1000;
@@ -28,7 +29,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
-	required_device<cpu_device> m_dsp;
+	required_device<dsp56k_device> m_dsp;
 	required_device<eeprom_serial_er5911_device> m_eeprom;
 	required_device<k053936_device> m_k053936;
 

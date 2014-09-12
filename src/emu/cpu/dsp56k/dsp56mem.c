@@ -488,20 +488,18 @@ void dsp56k_io_reset(dsp56k_core* cpustate)
 
 READ16_MEMBER( dsp56k_device::program_r )
 {
-	dsp56k_core* cpustate = get_safe_token(this);
-	return cpustate->program_ram[offset];
+	return m_dsp56k_core.program_ram[offset];
 }
 
 WRITE16_MEMBER( dsp56k_device::program_w )
 {
-	dsp56k_core* cpustate = get_safe_token(this);
-	cpustate->program_ram[offset] = data;
+	m_dsp56k_core.program_ram[offset] = data;
 }
 
 /* Work */
 READ16_MEMBER( dsp56k_device::peripheral_register_r )
 {
-	dsp56k_core* cpustate = get_safe_token(this);
+	dsp56k_core* cpustate = &m_dsp56k_core;
 	// (printf) logerror("Peripheral read 0x%04x\n", O2A(offset));
 
 	switch (O2A(offset))
@@ -635,7 +633,7 @@ READ16_MEMBER( dsp56k_device::peripheral_register_r )
 
 WRITE16_MEMBER( dsp56k_device::peripheral_register_w )
 {
-	dsp56k_core* cpustate = get_safe_token(this);
+	dsp56k_core* cpustate = &m_dsp56k_core;
 
 	// Its primary behavior is RAM
 	// COMBINE_DATA(&cpustate->peripheral_ram[offset]);
@@ -790,9 +788,9 @@ WRITE16_MEMBER( dsp56k_device::peripheral_register_w )
 
 /* These two functions are exposed to the outside world */
 /* They represent the host side of the dsp56k's host interface */
-void dsp56k_host_interface_write(device_t* device, UINT8 offset, UINT8 data)
+void dsp56k_device::host_interface_write(UINT8 offset, UINT8 data)
 {
-	dsp56k_core* cpustate = get_safe_token(device);
+	dsp56k_core* cpustate = &m_dsp56k_core;
 
 	/* Not exactly correct since the bootstrap hack doesn't need this to be true */
 	/*
@@ -886,9 +884,9 @@ void dsp56k_host_interface_write(device_t* device, UINT8 offset, UINT8 data)
 	}
 }
 
-UINT8 dsp56k_host_interface_read(device_t* device, UINT8 offset)
+UINT8 dsp56k_device::host_interface_read(UINT8 offset)
 {
-	dsp56k_core* cpustate = get_safe_token(device);
+	dsp56k_core* cpustate = &m_dsp56k_core;
 
 	/* Not exactly correct since the bootstrap hack doesn't need this to be true */
 	/*
@@ -951,8 +949,8 @@ UINT8 dsp56k_host_interface_read(device_t* device, UINT8 offset)
 }
 
 /* MISC*/
-UINT16 dsp56k_get_peripheral_memory(device_t* device, UINT16 addr)
+UINT16 dsp56k_device::get_peripheral_memory(UINT16 addr)
 {
-	dsp56k_core* cpustate = get_safe_token(device);
+	dsp56k_core* cpustate = &m_dsp56k_core;
 	return cpustate->peripheral_ram[A2O(addr)];
 }
