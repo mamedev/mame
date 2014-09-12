@@ -84,7 +84,7 @@ extern const device_type MB_VCU;
 //**************************************************************************
 
 #define MCFG_MB_VCU_CPU(_tag) \
-	mb_vcu_device::set_cpu_tag(*device, "^"_tag);
+	mb_vcu_device::set_cpu_tag(*device, "^" _tag);
 
 #define MCFG_MB_VCU_PALETTE(_palette_tag) \
 	mb_vcu_device::static_set_palette_tag(*device, "^" _palette_tag);

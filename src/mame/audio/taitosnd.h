@@ -7,10 +7,10 @@
 //**************************************************************************
 
 #define MCFG_TC0140SYT_MASTER_CPU(_tag) \
-	tc0140syt_device::set_master_tag(*device, "^"_tag);
+	tc0140syt_device::set_master_tag(*device, "^" _tag);
 
 #define MCFG_TC0140SYT_SLAVE_CPU(_tag) \
-	tc0140syt_device::set_slave_tag(*device, "^"_tag);
+	tc0140syt_device::set_slave_tag(*device, "^" _tag);
 
 
 //**************************************************************************

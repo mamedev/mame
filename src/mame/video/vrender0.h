@@ -61,6 +61,6 @@ extern const device_type VIDEO_VRENDER0;
 
 
 #define MCFG_VIDEO_VRENDER0_CPU(_tag) \
-	vr0video_device::set_cpu_tag(*device, "^"_tag);
+	vr0video_device::set_cpu_tag(*device, "^" _tag);
 
 #endif /* __VR0VIDEO_H__ */
