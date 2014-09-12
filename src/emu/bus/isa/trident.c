@@ -38,7 +38,11 @@ void trident_vga_device::device_reset()
 UINT16 trident_vga_device::offset()
 {
 	UINT16 off = svga_device::offset();
-	return off;
+
+	if (svga.rgb8_en || svga.rgb15_en || svga.rgb16_en || svga.rgb32_en)
+		return vga.crtc.offset << 3;  // don't know if this is right, but Eggs Playing Chicken switches off doubleword mode, but expects the same offset length
+	else
+		return off;
 }
 
 void trident_vga_device::trident_define_video_mode()
@@ -136,7 +140,6 @@ UINT8 trident_vga_device::trident_seq_reg_read(UINT8 index)
 
 void trident_vga_device::trident_seq_reg_write(UINT8 index, UINT8 data)
 {
-	//logerror("Trident SR%02X: %s mode write %02x\n",index,tri.new_mode ? "new" : "old",data);
 	if(index <= 0x04)
 	{
 		vga.sequencer.data[vga.sequencer.index] = data;
@@ -145,6 +148,7 @@ void trident_vga_device::trident_seq_reg_write(UINT8 index, UINT8 data)
 	}
 	else
 	{
+		logerror("Trident SR%02X: %s mode write %02x\n",index,tri.new_mode ? "new" : "old",data);
 		switch(index)
 		{
 			case 0x0b:
@@ -217,7 +221,6 @@ UINT8 trident_vga_device::trident_crtc_reg_read(UINT8 index)
 }
 void trident_vga_device::trident_crtc_reg_write(UINT8 index, UINT8 data)
 {
-	//logerror("Trident CR%02X: write %02x\n",index,data);
 	if(index <= 0x18)
 	{
 		crtc_reg_write(index,data);
@@ -225,6 +228,7 @@ void trident_vga_device::trident_crtc_reg_write(UINT8 index, UINT8 data)
 	}
 	else
 	{
+		logerror("Trident CR%02X: write %02x\n",index,data);
 		switch(index)
 		{
 		case 0x1f:
@@ -267,11 +271,11 @@ UINT8 trident_vga_device::trident_gc_reg_read(UINT8 index)
 
 void trident_vga_device::trident_gc_reg_write(UINT8 index, UINT8 data)
 {
-	//logerror("Trident GC%02X: write %02x\n",index,data);
 	if(index <= 0x0d)
 		gc_reg_write(index,data);
 	else
 	{
+		logerror("Trident GC%02X: write %02x\n",index,data);
 		switch(index)
 		{
 		case 0x0e:  // New Source Address Register (bit 1 is inverted here, also)
