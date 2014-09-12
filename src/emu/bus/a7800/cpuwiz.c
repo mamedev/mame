@@ -33,8 +33,9 @@
 //-------------------------------------------------
 
 const device_type A78_ROM_VERSABOARD = &device_creator<a78_versaboard_device>;
-const device_type A78_ROM_VERSAPOKEY = &device_creator<a78_versapokey_device>;
 const device_type A78_ROM_MEGACART = &device_creator<a78_megacart_device>;
+
+const device_type A78_ROM_P450_VB = &device_creator<a78_rom_p450_vb_device>;
 
 
 a78_versaboard_device::a78_versaboard_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
@@ -47,14 +48,16 @@ a78_versaboard_device::a78_versaboard_device(const machine_config &mconfig, cons
 {
 }
 
-a78_versapokey_device::a78_versapokey_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-					: a78_versaboard_device(mconfig, A78_ROM_VERSAPOKEY, "Atari 7800 VersaBoard + POKEY @ 0x0450 Cart", tag, owner, clock, "a78_versapokey", __FILE__),
-						m_pokey(*this, "pokey")
-{
-}
 
 a78_megacart_device::a78_megacart_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: a78_versaboard_device(mconfig, A78_ROM_MEGACART, "Atari 7800 MegaCart+", tag, owner, clock, "a78_megacart", __FILE__)
+{
+}
+
+
+a78_rom_p450_vb_device::a78_rom_p450_vb_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+					: a78_versaboard_device(mconfig, A78_ROM_P450_VB, "Atari 7800 VersaBoard + POKEY @ 0x0450 Cart", tag, owner, clock, "a78_versapokey", __FILE__),
+						m_pokey450(*this, "pokey450")
 {
 }
 
@@ -97,51 +100,6 @@ WRITE8_MEMBER(a78_versaboard_device::write_40xx)
 }
 
 
-// VersaBoard + POKEY @ 0x0450
-
-static MACHINE_CONFIG_FRAGMENT( a78_pokey )
-	MCFG_SPEAKER_STANDARD_MONO("addon")
-
-	MCFG_SOUND_ADD("pokey", POKEY, XTAL_14_31818MHz/8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "addon", 1.00)
-MACHINE_CONFIG_END
-
-machine_config_constructor a78_versapokey_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( a78_pokey );
-}
-
-READ8_MEMBER(a78_versapokey_device::read_04xx)
-{
-	if (offset >= 0x50 && offset < 0x60)
-		return m_pokey->read(space, offset & 0x0f);
-	else
-		return 0xff;
-}
-
-WRITE8_MEMBER(a78_versapokey_device::write_04xx)
-{
-	if (offset >= 0x50 && offset < 0x60)
-		m_pokey->write(space, offset & 0x0f, data);
-}
-
-READ8_MEMBER(a78_versapokey_device::read_40xx)
-{
-	if (offset < 0x4000)
-		return m_rom[(offset & 0x3fff)];
-	else if (offset < 0x8000)
-		return m_rom[(offset & 0x3fff) + (m_bank * 0x4000)];
-	else
-		return m_rom[(offset & 0x3fff) + ((m_bank_mask + 1) * 0x4000)];	// last bank
-}
-
-WRITE8_MEMBER(a78_versapokey_device::write_40xx)
-{
-	if (offset >= 0x4000 && offset < 0x8000)
-		m_bank = (data & m_bank_mask) + 1;
-}
-
-
 // MegaCart+
 
 WRITE8_MEMBER(a78_megacart_device::write_40xx)
@@ -155,4 +113,20 @@ WRITE8_MEMBER(a78_megacart_device::write_40xx)
 		m_ram_bank = BIT(data, 5);
 	}
 }
+
+
+// VersaBoard + POKEY @ 0x0450
+
+static MACHINE_CONFIG_FRAGMENT( a78_pokeyvb )
+	MCFG_SPEAKER_STANDARD_MONO("addon")
+
+	MCFG_SOUND_ADD("pokey450", POKEY, XTAL_14_31818MHz/8)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "addon", 1.00)
+MACHINE_CONFIG_END
+
+machine_config_constructor a78_rom_p450_vb_device::device_mconfig_additions() const
+{
+	return MACHINE_CONFIG_NAME( a78_pokeyvb );
+}
+
 

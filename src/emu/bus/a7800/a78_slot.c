@@ -157,6 +157,136 @@ void a78_cart_slot_device::device_config_complete()
  call load
  -------------------------------------------------*/
 
+int a78_cart_slot_device::validate_header(int head, bool log)
+{
+	switch (head & 0x3d)
+	{
+		case 0x05:
+			if (log)
+			{
+				printf("POKEY + RAM at $4000 (Header 0x05)\n");
+				printf("Disabling POKEY\n");
+			}
+			head &= ~0x01;
+			break;
+		case 0x09:
+			if (log)
+			{
+				printf("POKEY + Bank 0 of 144K ROM  at $4000 (Header 0x09)\n");
+				printf("Disabling POKEY\n");
+			}
+			head &= ~0x01;
+			break;
+		case 0x11:
+			if (log)
+			{
+				printf("POKEY + Bank 6 ROM at $4000 (Header 0x11)\n");
+				printf("Disabling POKEY\n");
+			}
+			head &= ~0x01;
+			break;
+		case 0x21:
+			if (log)
+			{
+				printf("POKEY + banked RAM at $4000 (Header 0x21)\n");
+				printf("Disabling POKEY\n");
+			}
+			head &= ~0x01;
+			break;
+		case 0x0c:
+			if (log)
+			{
+				printf("RAM + Bank 0 of 144K ROM at $4000 (Header 0x0c)\n");
+				printf("Disabling RAM\n");
+			}
+			head &= ~0x04;
+			break;
+		case 0x14:
+			if (log)
+			{
+				printf("RAM + Bank 6 ROM at $4000 (Header 0x14)\n");
+				printf("Disabling RAM\n");
+			}
+			head &= ~0x04;
+			break;
+		case 0x24:
+			if (log)
+			{
+				printf("RAM + Banked RAM at $4000 (Header 0x24)\n");
+				printf("Disabling RAM\n");
+			}
+			head &= ~0x04;
+			break;
+		case 0x18:
+			if (log)
+			{
+				printf("Bank 0 of 144K ROM + Bank 6 ROM at $4000 (Header 0x18)\n");
+				printf("Disabling Bank 0 ROM\n");
+			}
+			head &= ~0x08;
+			break;
+		case 0x28:
+			if (log)
+			{
+				printf("Bank 0 of 144K ROM + Banked RAM at $4000 (Header 0x28)\n");
+				printf("Disabling Bank 0 ROM\n");
+			}
+			head &= ~0x08;
+			break;
+		case 0x30:
+			if (log)
+			{
+				printf("Bank 6 ROM + banked RAM at $4000 (Header 0x30)\n");
+				printf("Disabling Bank 6 ROM\n");
+			}
+			head &= ~0x10;
+			break;
+	}
+
+	if ((head & 0x3c) && !(head & 0x02))
+	{
+		if (log)
+		{
+			printf("SuperCart bankswitch detected at $4000, with no SuperCart bit (Header 0x%X)\n", head);
+			printf("Enablig SuperCart bankswitch\n");
+		}
+		head |= 0x02;
+	}
+
+	if ((head & 0xff00) == 0x100 && (head & 0xff))
+	{
+		if (log)
+		{
+			printf("Bankswitch detected for an Activision cart (Header 0x%X)\n", head);
+			printf("Disabling bankswitch\n");
+		}
+		head &= 0xff00;
+	}
+
+	if ((head & 0xff00) == 0x200 && (head & 0xff))
+	{
+		if (log)
+		{
+			printf("Bankswitch detected for an Absolute cart (Header 0x%X)\n", head);
+			printf("Disabling bankswitch\n");
+		}
+		head &= 0xff00;
+	}
+	
+	if ((head & 0xff00) > 0x300)
+	{
+		if (log)
+		{
+			printf("Unsupported mapper, please contact MESSdevs (Header 0x%X)\n", head);
+			printf("Disabling special bits\n");
+		}
+		head &= 0x00ff;
+	}
+	
+	return head;
+}
+
+
 //-------------------------------------------------
 //  A78 PCBs
 //-------------------------------------------------
@@ -167,6 +297,8 @@ struct a78_slot
 	const char              *slot_option;
 };
 
+#define A78_POKEY0450 0x20
+
 // Here, we take the feature attribute from .xml (i.e. the PCB name) and we assign a unique ID to it
 static const a78_slot slot_list[] =
 {
@@ -176,7 +308,6 @@ static const a78_slot slot_list[] =
 	{ A78_TYPE3,      "a78_sg_pokey" },
 	{ A78_TYPE6,      "a78_sg_ram" },
 	{ A78_TYPEA,      "a78_sg9" },
-	{ A78_TYPEB,      "a78_sg9_pokey" },
 	{ A78_ABSOLUTE,   "a78_abs" },
 	{ A78_ACTIVISION, "a78_act" },
 	{ A78_HSC,        "a78_hsc" },
@@ -184,7 +315,11 @@ static const a78_slot slot_list[] =
 	{ A78_XM_BOARD,   "a78_xm" },
 	{ A78_MEGACART,   "a78_megacart" },
 	{ A78_VERSABOARD, "a78_versa" },
-	{ A78_VERSAPOKEY, "a78_versap" },
+	{ A78_TYPE0_POK450, "a78_p450_t0" },
+	{ A78_TYPE1_POK450, "a78_p450_t1" },
+	{ A78_TYPE6_POK450, "a78_p450_t6" },
+	{ A78_TYPEA_POK450, "a78_p450_ta" },
+	{ A78_VERSA_POK450, "a78_p450_vb" },
 	{ A78_NOCART,     "empty" },	// the code should never get here, of course...
 };
 
@@ -195,7 +330,7 @@ static int a78_get_pcb_id(const char *slot)
 		if (!core_stricmp(slot_list[i].slot_option, slot))
 			return slot_list[i].pcb_id;
 	}
-
+	
 	return 0;
 }
 
@@ -206,7 +341,7 @@ static const char *a78_get_slot(int type)
 		if (slot_list[i].pcb_id == type)
 			return slot_list[i].slot_option;
 	}
-
+	
 	return "a78_rom";
 }
 
@@ -234,6 +369,7 @@ bool a78_cart_slot_device::call_load()
 		else
 		{
 			// Load and check the header
+			int mapper;
 			char head[128];		
 			fread(head, 128);
 			
@@ -247,19 +383,16 @@ bool a78_cart_slot_device::call_load()
 				len = length() - 128;
 			}
 			
-			switch ((head[53] << 8) | head[54])
+			// let's try to auto-fix some common errors in the header
+			mapper = validate_header((head[53] << 8) | head[54], TRUE);
+
+			switch (mapper & 0xfe)
 			{
 				case 0x0000:
-					m_type = A78_TYPE0;
-					break;
-				case 0x0001:
-					m_type = A78_TYPE1;
+					m_type = BIT(mapper, 0) ? A78_TYPE1 : A78_TYPE0;
 					break;
 				case 0x0002:
-					m_type = A78_TYPE2;
-					break;
-				case 0x0003:
-					m_type = A78_TYPE3;
+					m_type = BIT(mapper, 0) ? A78_TYPE3 : A78_TYPE2;
 					break;
 				case 0x0006:
 					m_type = A78_TYPE6;
@@ -267,25 +400,30 @@ bool a78_cart_slot_device::call_load()
 				case 0x000a:
 					m_type = A78_TYPEA;
 					break;
-				case 0x000b:
-					m_type = A78_TYPEB;
-					break;
-				case 0x0020:
+				case 0x0022:
+				case 0x0026:
 					if (len > 0x40000)
 						m_type = A78_MEGACART;
 					else
 						m_type = A78_VERSABOARD;
 					break;
-				case 0x0021:
-					m_type = A78_VERSAPOKEY;
-					break;
-				case 0x0100:
-					m_type = A78_ACTIVISION;
-					break;
-				case 0x0200:
-					m_type = A78_ABSOLUTE;
-					break;
 			}
+
+			// check special bits, which override the previous
+			if ((mapper & 0xff00) == 0x0100)
+				m_type = A78_ACTIVISION;
+			else if ((mapper & 0xff00) == 0x0200)
+				m_type = A78_ABSOLUTE;
+			else if ((mapper & 0xff00) == 0x0300)
+			{
+				// the cart has a POKEY at $0450 (typically a VersaBoard variant)!
+				if (m_type != A78_TYPE2)
+				{
+					m_type &= ~0x02;
+					m_type += A78_POKEY0450;
+				}
+			}
+
 			logerror("Cart type: %x\n", m_type);
 			
 			internal_header_logging((UINT8 *)head, length());
@@ -299,7 +437,7 @@ bool a78_cart_slot_device::call_load()
 		
 		if (m_type == A78_TYPE6)
 			m_cart->ram_alloc(0x4000);
-		if (m_type == A78_MEGACART || m_type == A78_VERSABOARD || m_type == A78_VERSAPOKEY)
+		if (m_type == A78_MEGACART || (m_type >= A78_VERSABOARD && m_type <= A78_VERSA_POK450))
 			m_cart->ram_alloc(0x8000);
 		if (m_type == A78_XB_BOARD || m_type == A78_XM_BOARD)
 			m_cart->ram_alloc(0x20000);
@@ -374,23 +512,21 @@ void a78_cart_slot_device::get_default_card_software(astring &result)
 	{
 		const char *slot_string = "a78_rom";
 		dynamic_buffer head(128);
-		int type = A78_TYPE0;
+		int type = A78_TYPE0, mapper;
 		
 		// Load and check the header
 		core_fread(m_file, head, 128);		
-		switch ((head[53] << 8) | head[54])
+
+		// let's try to auto-fix some common errors in the header
+		mapper = validate_header((head[53] << 8) | head[54], FALSE);
+		
+		switch (mapper & 0xfe)
 		{
 			case 0x0000:
-				type = A78_TYPE0;
-				break;
-			case 0x0001:
-				type = A78_TYPE1;
+				type = BIT(mapper, 0) ? A78_TYPE1 : A78_TYPE0;
 				break;
 			case 0x0002:
-				type = A78_TYPE2;
-				break;
-			case 0x0003:
-				type = A78_TYPE3;
+				type = BIT(mapper, 0) ? A78_TYPE3 : A78_TYPE2;
 				break;
 			case 0x0006:
 				type = A78_TYPE6;
@@ -398,25 +534,30 @@ void a78_cart_slot_device::get_default_card_software(astring &result)
 			case 0x000a:
 				type = A78_TYPEA;
 				break;
-			case 0x000b:
-				type = A78_TYPEB;
-				break;
-			case 0x0020:
+			case 0x0022:
+			case 0x0026:
 				if (core_fsize(m_file) > 0x40000)
 					type = A78_MEGACART;
 				else
 					type = A78_VERSABOARD;
 				break;
-			case 0x0021:
-				type = A78_VERSAPOKEY;
-				break;
-			case 0x0100:
-				type = A78_ACTIVISION;
-				break;
-			case 0x0200:
-				type = A78_ABSOLUTE;
-				break;
 		}
+		
+		// check special bits, which override the previous
+		if ((mapper & 0xff00) == 0x0100)
+			type = A78_ACTIVISION;
+		else if ((mapper & 0xff00) == 0x0200)
+			type = A78_ABSOLUTE;
+		else if ((mapper & 0xff00) == 0x0300)
+		{
+			// the cart has a POKEY at $0450 (typically a VersaBoard variant)!
+			if (type != A78_TYPE2)
+			{
+				type &= ~0x02;
+				type += A78_POKEY0450;
+			}
+		}
+
 		logerror("Cart type: %x\n", type);
 		slot_string = a78_get_slot(type);
 		
@@ -497,6 +638,66 @@ WRITE8_MEMBER(a78_cart_slot_device::write_40xx)
 
 /*-------------------------------------------------
  A78 header logging
+ 
+ A78 HEADER FORMAT
+ 
+ Bytes  | Content           | Length
+ ========================================
+ 0      | Header version    |  1 byte
+ -------|-------------------|------------
+ 1..16  | "ATARI7800     "  | 16 bytes
+ -------|-------------------|------------
+ 17..48 | Cart title        | 32 bytes
+ -------|-------------------|------------
+ 49..52 | Data length       |  4 bytes
+ -------|-------------------|------------
+ 53..54 | Cart type [*]     |  2 bytes
+ -------|-------------------|------------
+ 55     | Controller 1 type |  1 byte
+		|                   |
+        | 0 = None          |
+        | 1 = Joystick      |
+        | 2 = Light Gun     |
+ -------|-------------------|------------
+ 56     | Controller 2 type |  1 byte
+        |                   |
+        | As above          |
+ -------|-------------------|------------
+ 57     | TV System         |  1 byte
+        |                   |
+		| 0 = NTSC/1 = PAL  |
+ -------|-------------------|------------
+ 58     | Save data         |  1 byte
+        |                   |  (only v2)
+        | 0 = None / Unk    |
+        | 1 = High Score    |
+        | 2 = Savekey       |
+ -------|-------------------|----------- 
+ 63     | Expansion module  |  1 byte
+        |                   |
+        | 0 = No expansion  |
+        |     module        |
+        | 1 = Expansion     |
+        |     required      |
+ -------|-------------------|----------- 
+ 
+ 
+ [*] Cart type:
+
+ bit 0-7 - Hardware "flags"
+ bit 0 [0x01] - POKEY at $4000
+ bit 1 [0x02] - SuperCart bank switched
+ bit 2 [0x04] - SuperCart RAM at $4000
+ bit 3 [0x08] - bank 0 of 144K ROM at $4000
+ bit 4 [0x10] - bank 6 at $4000
+ bit 5 [0x20] - banked RAM at $4000
+ 
+ bit 8-15 - Special values
+ 0 = Normal cart
+ 1 = Absolute (F18 Hornet)
+ 2 = Activision (Double Dragon & Rampage)
+ 3 = POKEY at $0450
+ 
  -------------------------------------------------*/
 
 void a78_cart_slot_device::internal_header_logging(UINT8 *header, UINT32 len)

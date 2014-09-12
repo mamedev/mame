@@ -16,15 +16,19 @@ enum
 	A78_TYPE3,			// as TYPE1 + POKEY chip on the PCB
 	A78_TYPE6,			// as TYPE1 + RAM IC on the PCB
 	A78_TYPEA,			// Alien Brigade, Crossbow (9x16K banks with diff bankswitch)
-	A78_TYPEB,			// Cart exploiting the XB board, but possibly also compatible with non-expanded A7800
 	A78_ABSOLUTE,		// F18 Hornet
 	A78_ACTIVISION,		// Double Dragon, Rampage
 	A78_HSC,			// Atari HighScore cart
 	A78_XB_BOARD,		// A7800 Expansion Board (it shall more or less apply to the Expansion Module too, but this is not officially released yet)
 	A78_XM_BOARD,		// A7800 XM Expansion Module (theoretical specs only, since this is not officially released yet)
-	A78_MEGACART,		// Homebrew by CPUWIZ, consists of SuperGame bank up to 512K + 32K RAM banked
-	A78_VERSABOARD,		// Homebrew by CPUWIZ, consists of SuperGame bank up to 256K + 32K RAM banked
-	A78_VERSAPOKEY,		// For debugging purpose, same as VersaBoard + SG 9 Banks + POKEY at 0x0450
+	A78_MEGACART,				// Homebrew by CPUWIZ, consists of SuperGame bank up to 512K + 32K RAM banked
+	A78_VERSABOARD = 0x10,		// Homebrew by CPUWIZ, consists of SuperGame bank up to 256K + 32K RAM banked
+	// VersaBoard variants configured as Type 1/3/A or VersaBoard + POKEY at $0450
+	A78_TYPE0_POK450 = 0x20,
+	A78_TYPE1_POK450 = 0x21,
+	A78_TYPE6_POK450 = 0x24,
+	A78_TYPEA_POK450 = 0x25,
+	A78_VERSA_POK450 = 0x30,
 	A78_NOCART
 };
 
@@ -126,6 +130,7 @@ private:
 	int m_stick_type;
 
 	int verify_header(char *header);
+	int validate_header(int head, bool log);
 	void internal_header_logging(UINT8 *header, UINT32 len);
 };
 
