@@ -1299,7 +1299,7 @@ void mcs48_cpu_device::state_string_export(const device_state_entry &entry, astr
 {
 	switch (entry.index())
 	{
-		case CPUINFO_STR_FLAGS:
+		case STATE_GENFLAGS:
 			string.printf("%c%c %c%c%c%c%c%c%c%c",
 				m_irq_state ? 'I':'.',
 				m_a11       ? 'M':'.',

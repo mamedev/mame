@@ -178,7 +178,7 @@ void mn10200_device::state_string_export(const device_state_entry &entry, astrin
 {
 	switch (entry.index())
 	{
-		case CPUINFO_STR_FLAGS:
+		case STATE_GENFLAGS:
 			string.printf( "S=%d irq=%s im=%d %c%c%c%c %c%c%c%c",
 				(m_psw >> 12) & 3,
 				m_psw & FLAG_IE ? "on " : "off",
