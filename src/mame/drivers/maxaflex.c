@@ -27,9 +27,15 @@ class maxaflex_state : public atari_common_state
 public:
 	maxaflex_state(const machine_config &mconfig, device_type type, const char *tag)
 		: atari_common_state(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
 		m_mcu(*this, "mcu"),
-		m_speaker(*this, "speaker") { }
+		m_speaker(*this, "speaker"),
+		m_region_maincpu(*this, "maincpu"),
+		m_dsw(*this, "dsw"),
+		m_coin(*this, "coin"),
+		m_console(*this, "console"),
+		m_joy01(*this, "djoy_0_1"),
+		m_joy23(*this, "djoy_2_3")
+	{ }
 
 	UINT8 m_portA_in;
 	UINT8 m_portA_out;
@@ -67,9 +73,15 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(mcu_timer_proc);
 	int atari_input_disabled();
 	virtual void machine_reset();
-	required_device<cpu_device> m_maincpu;
+	//required_device<cpu_device> m_maincpu;	// maincpu is already contained in atari_common_state
 	required_device<cpu_device> m_mcu;
 	required_device<speaker_sound_device> m_speaker;
+	required_memory_region m_region_maincpu;
+	required_ioport m_dsw;
+	required_ioport m_coin;
+	required_ioport m_console;
+	required_ioport m_joy01;
+	required_ioport m_joy23;
 };
 
 
@@ -79,14 +91,14 @@ void maxaflex_state::mmu(UINT8 new_mmu)
 	if (new_mmu & 0x80)
 	{
 		logerror("%s MMU SELFTEST RAM\n", machine().system().name);
-		machine().device("maincpu")->memory().space(AS_PROGRAM).nop_readwrite(0x5000, 0x57ff);
+		m_maincpu->space(AS_PROGRAM).nop_readwrite(0x5000, 0x57ff);
 	}
 	else
 	{
 		logerror("%s MMU SELFTEST ROM\n", machine().system().name);
-		machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_bank(0x5000, 0x57ff, "bank2");
-		machine().device("maincpu")->memory().space(AS_PROGRAM).unmap_write(0x5000, 0x57ff);
-		machine().root_device().membank("bank2")->set_base(machine().root_device().memregion("maincpu")->base() + 0xd000);
+		m_maincpu->space(AS_PROGRAM).install_read_bank(0x5000, 0x57ff, "bank2");
+		m_maincpu->space(AS_PROGRAM).unmap_write(0x5000, 0x57ff);
+		machine().root_device().membank("bank2")->set_base(m_region_maincpu->base() + 0xd000);
 	}
 }
 
@@ -107,7 +119,7 @@ void maxaflex_state::mmu(UINT8 new_mmu)
 
 READ8_MEMBER(maxaflex_state::mcu_portA_r)
 {
-	m_portA_in = ioport("dsw")->read() | (ioport("coin")->read() << 4) | (ioport("console")->read() << 5);
+	m_portA_in = m_dsw->read() | (m_coin->read() << 4) | (m_console->read() << 5);
 	return (m_portA_in & ~m_ddrA) | (m_portA_out & m_ddrA);
 }
 
@@ -376,12 +388,12 @@ INPUT_PORTS_END
 
 READ8_MEMBER(maxaflex_state::pia_pa_r)
 {
-	return atari_input_disabled() ? 0xff : ioport("djoy_0_1")->read_safe(0);
+	return atari_input_disabled() ? 0xff : m_joy01->read_safe(0);
 }
 
 READ8_MEMBER(maxaflex_state::pia_pb_r)
 {
-	return atari_input_disabled() ? 0xff : ioport("djoy_2_3")->read_safe(0);
+	return atari_input_disabled() ? 0xff : m_joy23->read_safe(0);
 }
 
 

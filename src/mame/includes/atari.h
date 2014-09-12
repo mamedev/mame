@@ -23,8 +23,13 @@ class atari_common_state : public driver_device
 public:
 	atari_common_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
 		m_gtia(*this, "gtia"),
-		m_antic(*this, "antic")
+		m_antic(*this, "antic"),
+		m_keyboard(*this, "keyboard"),
+		m_keypad(*this, "keypad"),
+		m_djoy_b(*this, "djoy_b"),
+		m_fake(*this, "fake")
 		{ }
 
 	virtual void video_start();
@@ -36,8 +41,13 @@ public:
 	POKEY_KEYBOARD_CB_MEMBER(a800_keyboard);
 
 protected:
+	required_device<cpu_device> m_maincpu;
 	required_device<gtia_device> m_gtia;
 	required_device<antic_device> m_antic;
+	optional_ioport_array<8> m_keyboard;
+	optional_ioport_array<4> m_keypad;
+	optional_ioport m_djoy_b;
+	optional_ioport m_fake;
 };
 
 #endif /* ATARI_H */

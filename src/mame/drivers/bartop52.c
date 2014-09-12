@@ -27,13 +27,13 @@ class bartop52_state : public atari_common_state
 {
 public:
 	bartop52_state(const machine_config &mconfig, device_type type, const char *tag)
-		: atari_common_state(mconfig, type, tag),
-		m_maincpu(*this, "maincpu") { }
+		: atari_common_state(mconfig, type, tag)
+		{ }
 
 	TIMER_DEVICE_CALLBACK_MEMBER( bartop_interrupt );
 
 	virtual void machine_reset();
-	required_device<cpu_device> m_maincpu;
+	//required_device<cpu_device> m_maincpu;	// maincpu is already contained in atari_common_state
 };
 
 
@@ -60,28 +60,28 @@ static INPUT_PORTS_START(bartop52)
 	PORT_BIT(0x40, 0x40, IPT_UNUSED)
 	PORT_BIT(0x80, 0x80, IPT_UNUSED)
 
-	PORT_START("keypad_0")
+	PORT_START("keypad.0")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("(Break)") PORT_CODE(KEYCODE_PAUSE)    // is this correct?
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Wind-Up") PORT_CODE(KEYCODE_ENTER_PAD)
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("[0]") PORT_CODE(KEYCODE_0_PAD)
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("No Wind-Up") PORT_CODE(KEYCODE_PLUS_PAD)
 	PORT_BIT(0xf0, IP_ACTIVE_HIGH, IPT_UNUSED)
 
-	PORT_START("keypad_1")
+	PORT_START("keypad.1")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Reset") PORT_CODE(KEYCODE_F3)
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Fast Ball Low") PORT_CODE(KEYCODE_9_PAD)
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Change-Up Low") PORT_CODE(KEYCODE_8_PAD)
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Curve Low") PORT_CODE(KEYCODE_7_PAD)
 	PORT_BIT(0xf0, IP_ACTIVE_HIGH, IPT_UNUSED)
 
-	PORT_START("keypad_2")
+	PORT_START("keypad.2")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME(DEF_STR(Pause)) PORT_CODE(KEYCODE_F2)
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Fast Ball Med.") PORT_CODE(KEYCODE_6_PAD)
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Change-Up Med.") PORT_CODE(KEYCODE_5_PAD)
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Curve Med") PORT_CODE(KEYCODE_4_PAD)
 	PORT_BIT(0xf0, IP_ACTIVE_HIGH, IPT_UNUSED)
 
-	PORT_START("keypad_3")
+	PORT_START("keypad.3")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_START)    PORT_NAME("Start")
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Fast Ball High") PORT_CODE(KEYCODE_3_PAD)
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Change-Up High") PORT_CODE(KEYCODE_2_PAD)
