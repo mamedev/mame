@@ -599,9 +599,9 @@ ROM_START( vendetta2p )
 	ROM_LOAD( "vendetta.nv", 0x0000, 0x080, CRC(fbac4e30) SHA1(d3ff3a392550d9b06400b9292a44bdac7ba5c801) )
 ROM_END
 
-ROM_START( vendetta2punk )
+ROM_START( vendetta2peba )
 	ROM_REGION( 0x48000, "maincpu", 0 ) /* code + banked roms + banked ram */
-	ROM_LOAD( "eb-401.17c", 0x10000, 0x38000, CRC(8430bb52) SHA1(54e896510fa44e76b0640b17150210fbf6b3b5bc))
+	ROM_LOAD( "081-eb-a01.17c", 0x10000, 0x38000, CRC(8430bb52) SHA1(54e896510fa44e76b0640b17150210fbf6b3b5bc)) // Label was unclear apart from EB stamp on the middle line.  Bottom line looked like 401, but probably A01
 	ROM_CONTINUE(       0x08000, 0x08000 )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 64k for the sound CPU */
@@ -775,7 +775,7 @@ DRIVER_INIT_MEMBER(vendetta_state,esckids)
 GAME( 1991, vendetta,    0,        vendetta, vendet4p, vendetta_state, vendetta, ROT0, "Konami", "Vendetta (World, 4 Players, ver. T)", GAME_SUPPORTS_SAVE )
 GAME( 1991, vendettar,   vendetta, vendetta, vendet4p, vendetta_state, vendetta, ROT0, "Konami", "Vendetta (World, 4 Players, ver. R)", GAME_SUPPORTS_SAVE )
 GAME( 1991, vendetta2p,  vendetta, vendetta, vendetta, vendetta_state, vendetta, ROT0, "Konami", "Vendetta (World, 2 Players, ver. W)", GAME_SUPPORTS_SAVE )
-GAME( 1991, vendetta2punk,vendetta,vendetta, vendetta, vendetta_state, vendetta, ROT0, "Konami", "Vendetta (World, 2 Players, ver. unknown)", GAME_SUPPORTS_SAVE )
+GAME( 1991, vendetta2peba,vendetta,vendetta, vendetta, vendetta_state, vendetta, ROT0, "Konami", "Vendetta (World, 2 Players, ver. EB-A?)", GAME_SUPPORTS_SAVE )
 GAME( 1991, vendetta2pu, vendetta, vendetta, vendetta, vendetta_state, vendetta, ROT0, "Konami", "Vendetta (Asia, 2 Players, ver. U)", GAME_SUPPORTS_SAVE )
 GAME( 1991, vendetta2pd, vendetta, vendetta, vendetta, vendetta_state, vendetta, ROT0, "Konami", "Vendetta (Asia, 2 Players, ver. D)", GAME_SUPPORTS_SAVE )
 GAME( 1991, vendettaj,   vendetta, vendetta, vendetta, vendetta_state, vendetta, ROT0, "Konami", "Crime Fighters 2 (Japan, 2 Players, ver. P)", GAME_SUPPORTS_SAVE )
