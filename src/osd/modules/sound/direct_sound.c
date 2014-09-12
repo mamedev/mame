@@ -240,13 +240,15 @@ HRESULT sound_direct_sound::dsound_init()
 
 	// set the cooperative level
 	#ifndef SDLMAME_WIN32
+	result = IDirectSound_SetCooperativeLevel(dsound, (HWND *)sdl_window_list->windows_hwnd, DSSCL_PRIORITY);
+	#else
 	result = IDirectSound_SetCooperativeLevel(dsound, win_window_list->m_hwnd, DSSCL_PRIORITY);
+	#endif
 	if (result != DS_OK)
 	{
 		osd_printf_error("Error setting DirectSound cooperative level: %08x\n", (UINT32)result);
 		goto error;
 	}
-	#endif
 
 	// make a format description for what we want
 	stream_format.wBitsPerSample    = 16;
@@ -260,7 +262,7 @@ HRESULT sound_direct_sound::dsound_init()
 	// compute the buffer size based on the output sample rate
 	int audio_latency;
 	#ifdef SDLMAME_WIN32
-	audio_latency = downcast<sdl_options &>(machine.options()).audio_latency();
+	audio_latency = downcast<sdl_options &>(m_osd.machine().options()).audio_latency();
 	#else
 	audio_latency = downcast<windows_options &>(m_osd.machine().options()).audio_latency();
 	#endif

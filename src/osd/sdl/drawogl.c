@@ -519,6 +519,13 @@ static int drawogl_window_create(sdl_window_info *window, int width, int height)
 		return 1;
 	}
 
+	#if SDLMAME_WIN32
+	SDL_SysWMinfo wminfo;
+	SDL_VERSION(wminfo.version);
+	SDL_GetWindowWMInfo(window->sdl_window, &wminfo);
+	window->windows_hwnd = (void *)wminfo.win.info;
+	#endif
+
 	if (window->fullscreen && video_config.switchres)
 	{
 		SDL_DisplayMode mode;
