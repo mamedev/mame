@@ -210,7 +210,7 @@ const ti99_sdf_format::format ti99_sdf_format::formats[] =
 		4000, 9, 40, 2, SECTOR_SIZE, {}, 0, {}, 16, 11, 45
 	},
 	{   //  160K 5.25" single sided double density 16 sectors (rare)
-		floppy_image::FF_525, floppy_image::DSSD, floppy_image::FM,
+		floppy_image::FF_525, floppy_image::DSSD, floppy_image::MFM,
 		2000, 16, 40, 1, SECTOR_SIZE, {}, 0, {}, 40, 22, 24
 	},
 	{   //  180K 5.25" single sided double density
