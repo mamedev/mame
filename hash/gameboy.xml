@@ -3658,6 +3658,18 @@
 		</part>
 	</software>
 
+	<software name="cosmotnkjp" cloneof="cosmotnk">
+		<description>Cosmo Tank (Jpn, Prototype)</description>
+		<year>1990</year>
+		<publisher>Atlus</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc1" />
+			<dataarea name="rom" size="131072">
+				<rom name="cosmo tank (j) (proto).bin" size="131072" crc="2022bbb9" sha1="8963c2e8e42c452528078f10df699fd266f01749" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="cosmotnk">
 		<description>Cosmo Tank (USA)</description>
 		<year>1990</year>
@@ -6918,10 +6930,10 @@
 
 	<software name="gbsjousse" cloneof="gbsjous">
 		<description>Goukaku Boy GOLD - Shikakui Atama o Maruku Suru - Joushiki no Sho (Jpn, Special Edition)</description>
-		<year>2000</year>
-		<publisher>Imagineer</publisher>
+		<year>2002</year>
+		<publisher>IE Institute</publisher>
 		<info name="serial" value="DMG-BS4J-JPN"/>
-		<info name="release" value="20000317"/>
+		<info name="release" value="200203xx"/>
 		<info name="alt_title" value="ゴールド シカクいアタマをマルくする。 合格ボーイGOLD ■いアタマを●くする。 国語 算数 理科 社会 常識の書 スペシャルエディション"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
@@ -7230,10 +7242,10 @@
 
 	<software name="gbskokugse" cloneof="gbskokug">
 		<description>Goukaku Boy Series - Shikakui Atama o Maruku Suru - Kokugo Battle Hen (Jpn, Special Edition)</description>
-		<year>1999</year>
-		<publisher>Imagineer</publisher>
+		<year>2002</year>
+		<publisher>IE Institute</publisher>
 		<info name="serial" value="DMG-BF3J-JPN"/>
-		<info name="release" value="19990924"/>
+		<info name="release" value="200203xx"/>
 		<info name="alt_title" value="シカクいアタマをマルくする。 合格ボーイシリーズ ■いアタマを●くする。 国語バトル編 スペシャルエディション"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
@@ -7258,6 +7270,21 @@
 		</part>
 	</software>
 
+	<software name="gbsrikbtse" cloneof="gbsrikbt">
+		<description>Goukaku Boy Series - Shikakui Atama o Maruku Suru - Rika Battle Hen (Jpn, Special Edition)</description>
+		<year>2002</year>
+		<publisher>IE Institute</publisher>
+		<info name="serial" value="DMG-BH4J-JPN"/>
+		<info name="release" value="200203xx"/>
+		<info name="alt_title" value="シカクいアタマをマルくする。 合格ボーイシリーズ ■いアタマを●くする。 理科バトル編 スペシャルエディション"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc1" />
+			<dataarea name="rom" size="262144">
+				<rom name="goukaku boy series - shikakui atama o marukusuru - rika battle hen (japan) (special edition).bin" size="262144" crc="62aa54a4" sha1="4569f5cc0f528fdf46cfd1b3a8ef8a6fd3953d7e" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="gbssanbt">
 		<description>Goukaku Boy Series - Shikakui Atama o Maruku Suru - Sansuu Battle Hen (Jpn)</description>
 		<year>1999</year>
@@ -7273,6 +7300,21 @@
 		</part>
 	</software>
 
+	<software name="gbssanbtse" cloneof="gbssanbt">
+		<description>Goukaku Boy Series - Shikakui Atama o Maruku Suru - Sansuu Battle Hen (Jpn, Special Edition)</description>
+		<year>2002</year>
+		<publisher>IE Institute</publisher>
+		<info name="serial" value="DMG-BB4J-JPN"/>
+		<info name="release" value="200203xx"/>
+		<info name="alt_title" value="シカクいアタマをマルくする。 合格ボーイシリーズ ■いアタマを●くする。 算数バトル編 スペシャルエディション"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc1" />
+			<dataarea name="rom" size="262144">
+				<rom name="goukaku boy series - shikakui atama o marukusuru - sansuu battle hen (japan) (special edition).bin" size="262144" crc="de74fd69" sha1="1e0fe5a54b4eb03a1f108d8650ad5ef8814d7444" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="gbsshkbt">
 		<description>Goukaku Boy Series - Shikakui Atama o Maruku Suru - Shakai Battle Hen (Jpn)</description>
 		<year>1999</year>
@@ -7284,6 +7326,21 @@
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
 				<rom name="goukaku boy series - shikakui atama o marukusuru - shakai battle hen (japan).bin" size="262144" crc="87f0cfad" sha1="edfc194f9f58ef97dfe87092eebd4c73359925e1" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gbsshkbtse" cloneof="gbsshkbt">
+		<description>Goukaku Boy Series - Shikakui Atama o Maruku Suru - Shakai Battle Hen (Jpn, Special Edition)</description>
+		<year>2002</year>
+		<publisher>IE Institute</publisher>
+		<info name="serial" value="DMG-BE3J-JPN"/>
+		<info name="release" value="200203xx"/>
+		<info name="alt_title" value="シカクいアタマをマルくする。 合格ボーイシリーズ ■いアタマを●くする。 社会バトル編 スペシャルエディション"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc1" />
+			<dataarea name="rom" size="262144">
+				<rom name="goukaku boy series - shikakui atama o marukusuru - shakai battle hen (japan) (special edition).bin" size="262144" crc="8ba62b3d" sha1="dfdcabdc06b74f896b9ef47db2a9cc49ddb104c4" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
