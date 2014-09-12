@@ -554,13 +554,6 @@ static int drawsdl2_window_create(sdl_window_info *window, int width, int height
 	window->sdl_window = SDL_CreateWindow(window->title, SDL_WINDOWPOS_UNDEFINED_DISPLAY(window->monitor->handle), SDL_WINDOWPOS_UNDEFINED,
 			width, height, sdl->extra_flags);
 
-	#if SDLMAME_WIN32
-	SDL_SysWMinfo wminfo;
-	SDL_VERSION(wminfo.version);
-	SDL_GetWindowWMInfo(window->sdl_window, &wminfo);
-	window->windows_hwnd = (void *)wminfo.win.info;
-	#endif
-
 	if (window->fullscreen && video_config.switchres)
 	{
 		SDL_DisplayMode mode;

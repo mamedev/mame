@@ -26,6 +26,11 @@
 
 #ifdef SDLMAME_WIN32
 #include "../../sdl/osdsdl.h"
+#if (SDLMAME_SDL2)
+#include <SDL2/SDL_syswm.h>
+#else
+#include <SDL/SDL_syswm.h>
+#endif
 #else
 #include "winmain.h"
 #include "window.h"
@@ -239,8 +244,11 @@ HRESULT sound_direct_sound::dsound_init()
 	}
 
 	// set the cooperative level
-	#ifndef SDLMAME_WIN32
-	result = IDirectSound_SetCooperativeLevel(dsound, (HWND *)sdl_window_list->windows_hwnd, DSSCL_PRIORITY);
+	#ifdef SDLMAME_WIN32
+	SDL_SysWMinfo wminfo;
+	SDL_VERSION(&wminfo.version);
+	SDL_GetWindowWMInfo(sdl_window_list->sdl_window, &wminfo);
+	result = IDirectSound_SetCooperativeLevel(dsound, wminfo.win.window, DSSCL_PRIORITY);
 	#else
 	result = IDirectSound_SetCooperativeLevel(dsound, win_window_list->m_hwnd, DSSCL_PRIORITY);
 	#endif
