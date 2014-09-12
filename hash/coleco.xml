@@ -436,35 +436,18 @@
 	</software>
 
 	<software name="choplift">
-		<!-- Choplifter (1984)(Coleco).bin -->
+		<!-- Choplifter (1984)(Coleco)[a].bin -->
+        <!-- Other available dump has corrupted gfx -->
 		<description>Choplifter!</description>
 		<year>1984</year>
 		<publisher>Coleco / CBS</publisher>
-		<info name="developer" value="Br0derbund" />
+		<info name="developer" value="Brøderbund" />
 		<info name="author" value="Dan Gorlin" />
 		<info name="serial" value="2690" />
 		<part name="cart" interface="coleco_cart">
 			<dataarea name="rom" size="16384">
 				<rom name="choplift.1" size="8192" crc="78564c16" sha1="a1a34df5dfc11be9687949b67c95564269b43049" offset="0x0000" />
-				<rom name="choplift.2" size="8192" crc="550403f2" sha1="1ec3cf1da9fc7279beaa2742c52ad09b709cbddc" offset="0x2000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="choplifta" cloneof="choplift">
-		<!-- Choplifter (1984)(Coleco)[a].bin -->
-		<!-- 0x397d : 0x00 ('choplift') - 0xff ('choplifta') -->
-		<!-- 0x3fff : 0x00 ('choplift') - 0x60 ('choplifta') -->
-		<description>Choplifter! (Alt)</description>
-		<year>1984</year>
-		<publisher>Coleco / CBS</publisher>
-		<info name="developer" value="Br0derbund" />
-		<info name="author" value="Dan Gorlin" />
-		<info name="serial" value="2690" />
-		<part name="cart" interface="coleco_cart">
-			<dataarea name="rom" size="16384">
-				<rom name="choplift.1"  size="8192" crc="78564c16" sha1="a1a34df5dfc11be9687949b67c95564269b43049" offset="0x0000" />
-				<rom name="choplifta.2" size="8192" crc="b1abf125" sha1="192afa761a822cab9095a8d63a2cbf99de4a23d8" offset="0x2000" />
+				<rom name="choplift.2" size="8192" crc="b1abf125" sha1="192afa761a822cab9095a8d63a2cbf99de4a23d8" offset="0x2000" />
 			</dataarea>
 		</part>
 	</software>
