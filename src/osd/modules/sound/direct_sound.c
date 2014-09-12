@@ -31,6 +31,7 @@
 #else
 #include <SDL/SDL_syswm.h>
 #endif
+#include "../../sdl/window.h"
 #else
 #include "winmain.h"
 #include "window.h"
@@ -248,7 +249,7 @@ HRESULT sound_direct_sound::dsound_init()
 	SDL_SysWMinfo wminfo;
 	SDL_VERSION(&wminfo.version);
 	SDL_GetWindowWMInfo(sdl_window_list->sdl_window, &wminfo);
-	result = IDirectSound_SetCooperativeLevel(dsound, wminfo.win.window, DSSCL_PRIORITY);
+	result = IDirectSound_SetCooperativeLevel(dsound, wminfo.info.win.window, DSSCL_PRIORITY);
 	#else
 	result = IDirectSound_SetCooperativeLevel(dsound, win_window_list->m_hwnd, DSSCL_PRIORITY);
 	#endif
