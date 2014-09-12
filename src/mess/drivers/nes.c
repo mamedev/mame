@@ -794,7 +794,13 @@ MACHINE_START_MEMBER( nes_state, famitwin )
 
 	// if there is no cart inserted, setup the disk expansion instead
 	if (!m_cartslot->m_cart)
+	{
 		setup_disk(m_cartslot2);
+		
+		// replace the famicom disk ROM with the famicom twin one (until we modernize the floppy drive)
+		m_maincpu->space(AS_PROGRAM).install_read_bank(0xe000, 0xffff, "ftbios");
+		membank("ftbios")->set_base(machine().root_device().memregion("maincpu")->base() + 0xe000);
+	}
 }
 
 MACHINE_RESET_MEMBER( nes_state, famitwin )
