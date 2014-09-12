@@ -410,7 +410,7 @@ OSDOBJS = \
 	$(SDLOBJ)/watchdog.o \
 
 ifeq ($(BASE_TARGETOS),win32)
-	$(OSDOBJ)/modules/sound/direct_sound.o
+	OSDOBJS += $(OSDOBJ)/modules/sound/direct_sound.o
 endif
 
 ifdef NO_USE_MIDI

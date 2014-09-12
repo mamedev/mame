@@ -23,8 +23,13 @@
 
 // MAMEOS headers
 #include "direct_sound.h"
+
+#ifdef SDLMAME_WIN32
+#include "../../sdl/osdsdl.h"
+#else
 #include "winmain.h"
 #include "window.h"
+#endif
 
 //============================================================
 //  DEBUGGING
@@ -234,12 +239,14 @@ HRESULT sound_direct_sound::dsound_init()
 	}
 
 	// set the cooperative level
+	#ifndef SDLMAME_WIN32
 	result = IDirectSound_SetCooperativeLevel(dsound, win_window_list->m_hwnd, DSSCL_PRIORITY);
 	if (result != DS_OK)
 	{
 		osd_printf_error("Error setting DirectSound cooperative level: %08x\n", (UINT32)result);
 		goto error;
 	}
+	#endif
 
 	// make a format description for what we want
 	stream_format.wBitsPerSample    = 16;
@@ -249,8 +256,15 @@ HRESULT sound_direct_sound::dsound_init()
 	stream_format.nBlockAlign       = stream_format.wBitsPerSample * stream_format.nChannels / 8;
 	stream_format.nAvgBytesPerSec   = stream_format.nSamplesPerSec * stream_format.nBlockAlign;
 
+
 	// compute the buffer size based on the output sample rate
-	stream_buffer_size = stream_format.nSamplesPerSec * stream_format.nBlockAlign * downcast<windows_options &>(m_osd.machine().options()).audio_latency() / 10;
+	int audio_latency;
+	#ifdef SDLMAME_WIN32
+	audio_latency = downcast<sdl_options &>(machine.options()).audio_latency();
+	#else
+	audio_latency = downcast<windows_options &>(m_osd.machine().options()).audio_latency();
+	#endif
+	stream_buffer_size = stream_format.nSamplesPerSec * stream_format.nBlockAlign * audio_latency / 10;
 	stream_buffer_size = (stream_buffer_size / 1024) * 1024;
 	if (stream_buffer_size < 1024)
 		stream_buffer_size = 1024;
