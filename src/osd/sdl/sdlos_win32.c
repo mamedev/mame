@@ -20,6 +20,8 @@
 #include "osdcore.h"
 #include "strconv.h"
 
+#include "../windows/winos.c"
+
 //============================================================
 //  PROTOTYPES
 //============================================================
@@ -158,21 +160,6 @@ void osd_sleep(osd_ticks_t duration)
 }
 
 //============================================================
-//  osd_num_processors
-//============================================================
-
-int osd_get_num_processors(void)
-{
-	SYSTEM_INFO info;
-
-	// otherwise, fetch the info from the system
-	GetSystemInfo(&info);
-
-	// max out at 4 for now since scaling above that seems to do poorly
-	return MIN(info.dwNumberOfProcessors, 4);
-}
-
-//============================================================
 //  osd_malloc
 //============================================================
 
@@ -251,15 +238,6 @@ void osd_free(void *ptr)
 		VirtualFree(reinterpret_cast<void *>(page_base - PAGE_SIZE), 0, MEM_RELEASE);
 	}
 #endif
-}
-
-//============================================================
-//  osd_getenv
-//============================================================
-
-char *osd_getenv(const char *name)
-{
-	return getenv(name);
 }
 
 //============================================================

@@ -21,6 +21,7 @@
 #include "osdcore.h"
 
 #include "winsync.h"
+#include "winos.h"
 
 #include "eminline.h"
 
@@ -34,6 +35,9 @@
 //============================================================
 //  PARAMETERS
 //============================================================
+
+#define ENV_PROCESSORS               "OSDPROCESSORS"
+#define ENV_WORKQUEUEMAXTHREADS      "OSDWORKQUEUEMAXTHREADS"
 
 #define SPIN_LOOP_TIME          (osd_ticks_per_second() / 1000)
 
@@ -156,7 +160,7 @@ osd_work_queue *osd_work_queue_alloc(int flags)
 	int numprocs = effective_num_processors();
 	osd_work_queue *queue;
 	int threadnum;
-	TCHAR *osdworkqueuemaxthreads = _tgetenv(_T("OSDWORKQUEUEMAXTHREADS"));
+	char *osdworkqueuemaxthreads = osd_getenv("OSDWORKQUEUEMAXTHREADS");
 
 	// allocate a new queue
 	queue = (osd_work_queue *)osd_malloc(sizeof(*queue));
@@ -187,7 +191,7 @@ osd_work_queue *osd_work_queue_alloc(int flags)
 	else
 		queue->threads = (flags & WORK_QUEUE_FLAG_MULTI) ? numprocs : 1;
 
-	if (osdworkqueuemaxthreads != NULL && _stscanf(osdworkqueuemaxthreads, _T("%d"), &threadnum) == 1 && queue->threads > threadnum)
+	if (osdworkqueuemaxthreads != NULL && sscanf(osdworkqueuemaxthreads, "%d", &threadnum) == 1 && queue->threads > threadnum)
 		queue->threads = threadnum;
 
 	// multi-queues with high frequency items should top out at 4 for now
@@ -349,12 +353,13 @@ void osd_work_queue_free(osd_work_queue *queue)
 		{
 			work_thread_info *thread = &queue->thread[threadnum];
 			osd_ticks_t total = thread->runtime + thread->waittime + thread->spintime;
-			printf("Thread %d:  items=%9d  run=%5.2f%% (%5.2f%%)  spin=%5.2f%%  wait/other=%5.2f%%\n",
+			printf("Thread %d:  items=%9d run=%5.2f%% (%5.2f%%)  spin=%5.2f%%  wait/other=%5.2f%% total=%9d\n",
 					threadnum, thread->itemsdone,
 					(double)thread->runtime * 100.0 / (double)total,
 					(double)thread->actruntime * 100.0 / (double)total,
 					(double)thread->spintime * 100.0 / (double)total,
-					(double)thread->waittime * 100.0 / (double)total);
+					(double)thread->waittime * 100.0 / (double)total,
+					(UINT32) total);
 		}
 #endif
 	}
@@ -559,26 +564,26 @@ void osd_work_item_release(osd_work_item *item)
 
 static int effective_num_processors(void)
 {
-	SYSTEM_INFO info;
-	// fetch the info from the system
-	GetSystemInfo(&info);
+	int physprocs = osd_get_num_processors();
 
+	// osd_num_processors == 0 for 'auto'
 	if (osd_num_processors > 0)
 	{
-		return MIN(info.dwNumberOfProcessors * 4, osd_num_processors);
+		return MIN(4 * physprocs, osd_num_processors);
 	}
 	else
 	{
-		TCHAR *procsoverride;
+		char *procsoverride;
 		int numprocs = 0;
 
 		// if the OSDPROCESSORS environment variable is set, use that value if valid
 		// note that we permit more than the real number of processors for testing
-		procsoverride = _tgetenv(_T("OSDPROCESSORS"));
-		if (procsoverride != NULL && _stscanf(procsoverride, _T("%d"), &numprocs) == 1 && numprocs > 0)
-			return MIN(info.dwNumberOfProcessors * 4, numprocs);
+		procsoverride = osd_getenv(ENV_PROCESSORS);
+		if (procsoverride != NULL && sscanf(procsoverride, "%d", &numprocs) == 1 && numprocs > 0)
+			return MIN(4 * physprocs, numprocs);
 
-		return info.dwNumberOfProcessors;
+		// otherwise, return the info from the system
+		return physprocs;
 	}
 }
 
