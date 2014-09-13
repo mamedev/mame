@@ -1519,10 +1519,6 @@ void _39in1_state::pxa255_start()
 {
 	int index = 0;
 
-	//pxa255_t* pxa255 = pxa255_get_safe_token( device );
-
-	//pxa255->iface = device->base_config().static_config();
-
 	for(index = 0; index < 16; index++)
 	{
 		m_dma_regs.dcsr[index] = 0x00000008;
@@ -1543,8 +1539,6 @@ void _39in1_state::pxa255_start()
 	m_lcd_regs.dma[1].eof = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(_39in1_state::pxa255_lcd_dma_eof),this));
 	m_lcd_regs.trgbr = 0x00aa5500;
 	m_lcd_regs.tcr = 0x0000754f;
-
-	//pxa255_register_state_save(device);
 }
 
 void _39in1_state::machine_start()

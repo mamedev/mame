@@ -2,9 +2,6 @@
 #include "flt_rc.h"
 
 
-const flt_rc_config flt_rc_ac_default = {FLT_RC_AC, 10000, 0, 0, CAP_U(1)};
-
-
 // device type definition
 const device_type FILTER_RC = &device_creator<filter_rc_device>;
 
@@ -23,7 +20,11 @@ filter_rc_device::filter_rc_device(const machine_config &mconfig, const char *ta
 		m_stream(NULL),
 		m_k(0),
 		m_memory(0),
-		m_type(0)
+		m_type(FLT_RC_LOWPASS),
+		m_R1(1),
+		m_R2(1),
+		m_R3(1),
+		m_C(0)
 {
 }
 
@@ -34,13 +35,8 @@ filter_rc_device::filter_rc_device(const machine_config &mconfig, const char *ta
 
 void filter_rc_device::device_start()
 {
-	const flt_rc_config *conf = (const flt_rc_config *)static_config();
-
 	m_stream = stream_alloc(1, 1, machine().sample_rate());
-	if (conf)
-		set_RC_info(conf->type, conf->R1, conf->R2, conf->R3, conf->C);
-	else
-		set_RC_info(FLT_RC_LOWPASS, 1, 1, 1, 0);
+	recalc();
 }
 
 
@@ -76,33 +72,31 @@ void filter_rc_device::sound_stream_update(sound_stream &stream, stream_sample_t
 }
 
 
-void filter_rc_device::set_RC_info(int type, double R1, double R2, double R3, double C)
+void filter_rc_device::recalc()
 {
 	double Req;
-
-	m_type = type;
 
 	switch (m_type)
 	{
 		case FLT_RC_LOWPASS:
-			if (C == 0.0)
+			if (m_C == 0.0)
 			{
 				/* filter disabled */
 				m_k = 0x10000;
 				return;
 			}
-			Req = (R1 * (R2 + R3)) / (R1 + R2 + R3);
+			Req = (m_R1 * (m_R2 + m_R3)) / (m_R1 + m_R2 + m_R3);
 			break;
 		case FLT_RC_HIGHPASS:
 		case FLT_RC_AC:
-			if (C == 0.0)
+			if (m_C == 0.0)
 			{
 				/* filter disabled */
 				m_k = 0x0;
 				m_memory = 0x0;
 				return;
 			}
-			Req = R1;
+			Req = m_R1;
 			break;
 		default:
 			fatalerror("filter_rc_setRC: Wrong filter type %d\n", m_type);
@@ -110,12 +104,26 @@ void filter_rc_device::set_RC_info(int type, double R1, double R2, double R3, do
 
 	/* Cut Frequency = 1/(2*Pi*Req*C) */
 	/* k = (1-(EXP(-TIMEDELTA/RC)))    */
-	m_k = 0x10000 - 0x10000 * (exp(-1 / (Req * C) / machine().sample_rate()));
+	m_k = 0x10000 - 0x10000 * (exp(-1 / (Req * m_C) / machine().sample_rate()));
 }
 
 
 void filter_rc_device::filter_rc_set_RC(int type, double R1, double R2, double R3, double C)
 {
 	m_stream->update();
-	set_RC_info(type, R1, R2, R3, C);
+	m_type = type;
+	m_R1 = R1;
+	m_R2 = R2;
+	m_R3 = R3;
+	m_C = C;
+	recalc();
+}
+
+void filter_rc_device::static_set_rc(device_t &device, int type, double R1, double R2, double R3, double C)
+{
+	downcast<filter_rc_device &>(device).m_type = type;
+	downcast<filter_rc_device &>(device).m_R1 = R1;
+	downcast<filter_rc_device &>(device).m_R2 = R2;
+	downcast<filter_rc_device &>(device).m_R3 = R3;
+	downcast<filter_rc_device &>(device).m_C = C;
 }
