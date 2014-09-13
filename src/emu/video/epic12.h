@@ -3,10 +3,6 @@
 #define MCFG_EPIC12_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, EPIC12, 0)
 
-//#define MCFG_EP1C12_ADD(_tag,_config,_map)
-//  MCFG_DEVICE_CONFIG(_config)
-//  MCFG_DEVICE_ADDRESS_MAP(AS_0, _map)
-
 #define MCFG_EPIC12_SET_MAINRAMSIZE( _rgn ) \
 	epic12_device::set_mainramsize(*device, _rgn);
 

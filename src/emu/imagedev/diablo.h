@@ -79,9 +79,6 @@ extern const device_type DIABLO;
 
 #define MCFG_DIABLO_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, DIABLO, 0)
-#define MCFG_DIABLO_CONFIG_ADD(_tag,_config) \
-	MCFG_DEVICE_ADD(_tag, DIABLO, 0) \
-	MCFG_DEVICE_CONFIG(_config)
 
 #define MCFG_DIABLO_LOAD(_class,_method)                                \
 	diablo_image_device::static_set_device_load(*device, device_image_load_delegate(&DEVICE_IMAGE_LOAD_NAME(_class,_method), #_class "::device_image_load_" #_method, downcast<_class *>(owner)));

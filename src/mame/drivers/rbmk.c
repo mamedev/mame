@@ -575,7 +575,6 @@ static MACHINE_CONFIG_START( rbmk, rbmk_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.47)
 
 	MCFG_YM2151_ADD("ymsnd", 22000000 / 8)
-//  MCFG_SOUND_CONFIG(ym2151_config)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.60)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.60)
 MACHINE_CONFIG_END

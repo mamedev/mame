@@ -724,7 +724,6 @@ static MACHINE_CONFIG_START( josvolly, gsword_state )
 
 #if 0
 	MCFG_SOUND_ADD("msm", MSM5205, 384000)
-	MCFG_SOUND_CONFIG(msm5205_config)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 #endif
 MACHINE_CONFIG_END
