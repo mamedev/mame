@@ -59,16 +59,18 @@
 
 #ifndef YieldProcessor
 #ifdef __GNUC__
-INLINE void YieldProcessor(void)
+INLINE void osd_yield_processor(void)
 {
 	__asm__ __volatile__ ( "rep; nop" );
 }
 #else
-INLINE void YieldProcessor(void)
+INLINE void osd_yield_processor(void)
 {
 	__asm { rep nop }
 }
 #endif
+#else
+#define osd_yield_processor YieldProcessor
 #endif
 
 
@@ -186,7 +188,7 @@ INLINE INT32 scalable_lock_acquire(scalable_lock *lock)
 	{
 		INT32 backcount;
 		for (backcount = 0; backcount < backoff; backcount++)
-			YieldProcessor();
+			osd_yield_processor();
 		backoff <<= 1;
 	}
 	lock->slot[myslot].haslock = FALSE;
@@ -352,7 +354,7 @@ int osd_work_queue_wait(osd_work_queue *queue, osd_ticks_t timeout)
 			// spin until we're done
 			begin_timing(thread->spintime);
 			while (queue->items != 0 && osd_ticks() < stopspin)
-				YieldProcessor();
+				osd_yield_processor();
 			end_timing(thread->spintime);
 
 			begin_timing(thread->waittime);
@@ -582,7 +584,7 @@ int osd_work_item_wait(osd_work_item *item, osd_ticks_t timeout)
 	{
 		osd_ticks_t stopspin = osd_ticks() + timeout;
 		while (!item->done && osd_ticks() < stopspin)
-			YieldProcessor();
+			osd_yield_processor();
 	}
 
 	// otherwise, block on the event until done
@@ -695,7 +697,7 @@ static unsigned __stdcall worker_thread_entry(void *param)
 				begin_timing(thread->spintime);
 				stopspin = osd_ticks() + SPIN_LOOP_TIME;
 				while (queue->list == NULL && osd_ticks() < stopspin)
-					YieldProcessor();
+					osd_yield_processor();
 				end_timing(thread->spintime);
 			}
 
