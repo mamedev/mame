@@ -415,12 +415,6 @@ INPUT_PORTS_END
 
 static const INT16 speaker_levels[] = {-32768, 0, 32767, 0};
 
-static const speaker_interface vtech1_speaker_interface =
-{
-	4,
-	speaker_levels
-};
-
 static MACHINE_CONFIG_START( laser110, vtech1_state )
 
 	// basic machine hardware
@@ -444,7 +438,7 @@ static MACHINE_CONFIG_START( laser110, vtech1_state )
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
-	MCFG_SOUND_CONFIG(vtech1_speaker_interface)
+	MCFG_SPEAKER_LEVELS(4, speaker_levels)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
 	// peripheral and memory expansion slots

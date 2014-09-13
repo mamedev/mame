@@ -83,29 +83,10 @@ const device_type SPEAKER_SOUND = &device_creator<speaker_sound_device>;
 
 speaker_sound_device::speaker_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: device_t(mconfig, SPEAKER_SOUND, "Filtered 1-bit DAC", tag, owner, clock, "speaker_sound", __FILE__),
-						device_sound_interface(mconfig, *this)
+						device_sound_interface(mconfig, *this),
+						m_num_levels(2),
+						m_levels(default_levels)
 {
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void speaker_sound_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const speaker_interface *intf = reinterpret_cast<const speaker_interface *>(static_config());
-	if (intf != NULL)
-		*static_cast<speaker_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-		m_num_levels = 2;
-		m_levels = default_levels;
-	}
 }
 
 //-------------------------------------------------

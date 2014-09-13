@@ -1750,14 +1750,6 @@ void pokemini_state::device_timer(emu_timer &timer, device_timer_id id, int para
 
 static const INT16 speaker_levels[] = {-32768, 0, 32767};
 
-
-static const speaker_interface pokemini_speaker_interface =
-{
-	3,              /* optional: number of different levels */
-	speaker_levels  /* optional: level lookup table */
-};
-
-
 void pokemini_state::video_start()
 {
 	machine().first_screen()->register_screen_bitmap(m_bitmap);
@@ -1797,7 +1789,7 @@ static MACHINE_CONFIG_START( pokemini, pokemini_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
-	MCFG_SOUND_CONFIG(pokemini_speaker_interface)
+	MCFG_SPEAKER_LEVELS(3, speaker_levels)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* cartridge */

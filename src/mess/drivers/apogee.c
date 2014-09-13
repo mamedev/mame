@@ -144,12 +144,6 @@ INPUT_PORTS_END
 
 static const INT16 speaker_levels[] = {-32767, -10922, 10922, 32767};
 
-static const speaker_interface apogee_speaker_interface =
-{
-	4,
-	speaker_levels
-};
-
 WRITE_LINE_MEMBER(apogee_state::pit8253_out0_changed)
 {
 	m_out0 = state;
@@ -252,7 +246,7 @@ static MACHINE_CONFIG_START( apogee, apogee_state )
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
-	MCFG_SOUND_CONFIG(apogee_speaker_interface)
+	MCFG_SPEAKER_LEVELS(4, speaker_levels)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
 	MCFG_DEVICE_ADD("dma8257", I8257, XTAL_16MHz / 9)

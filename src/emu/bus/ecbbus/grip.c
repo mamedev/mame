@@ -270,13 +270,6 @@ MC6845_ON_UPDATE_ADDR_CHANGED( grip_device::grip5_addr_changed )
 
 static const INT16 speaker_levels[] = { -32768, 0, 32767, 0 };
 
-static const speaker_interface speaker_intf =
-{
-	4,
-	speaker_levels
-};
-
-
 //-------------------------------------------------
 //  I8255A interface
 //-------------------------------------------------
@@ -481,7 +474,7 @@ static MACHINE_CONFIG_FRAGMENT( grip )
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
-	MCFG_SOUND_CONFIG(speaker_intf)
+	MCFG_SPEAKER_LEVELS(4, speaker_levels)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	// devices
