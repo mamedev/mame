@@ -248,8 +248,13 @@ HRESULT sound_direct_sound::dsound_init()
 	#ifdef SDLMAME_WIN32
 	SDL_SysWMinfo wminfo;
 	SDL_VERSION(&wminfo.version);
+#if (SDLMAME_SDL2)
 	SDL_GetWindowWMInfo(sdl_window_list->sdl_window, &wminfo);
 	result = IDirectSound_SetCooperativeLevel(dsound, wminfo.info.win.window, DSSCL_PRIORITY);
+#else
+	SDL_GetWMInfo(&wminfo);
+	result = IDirectSound_SetCooperativeLevel(dsound, wminfo.window, DSSCL_PRIORITY);
+#endif
 	#else
 	result = IDirectSound_SetCooperativeLevel(dsound, win_window_list->m_hwnd, DSSCL_PRIORITY);
 	#endif
