@@ -3726,7 +3726,7 @@ static MACHINE_CONFIG_DERIVED( goldnpkr, goldnpkr_base )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
-	MCFG_SOUND_CONFIG_DISCRETE(goldnpkr)
+	MCFG_DISCRETE_INTF(goldnpkr)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -3744,7 +3744,7 @@ static MACHINE_CONFIG_DERIVED( pottnpkr, goldnpkr_base )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
-	MCFG_SOUND_CONFIG_DISCRETE(pottnpkr)
+	MCFG_DISCRETE_INTF(pottnpkr)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -3766,7 +3766,7 @@ static MACHINE_CONFIG_DERIVED( witchcrd, goldnpkr_base )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
-	MCFG_SOUND_CONFIG_DISCRETE(goldnpkr)
+	MCFG_DISCRETE_INTF(goldnpkr)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -3813,7 +3813,7 @@ static MACHINE_CONFIG_DERIVED( wildcard, goldnpkr_base )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
-	MCFG_SOUND_CONFIG_DISCRETE(goldnpkr)
+	MCFG_DISCRETE_INTF(goldnpkr)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -3837,7 +3837,7 @@ static MACHINE_CONFIG_DERIVED( wcrdxtnd, goldnpkr_base )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
-	MCFG_SOUND_CONFIG_DISCRETE(goldnpkr)
+	MCFG_DISCRETE_INTF(goldnpkr)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -3888,7 +3888,7 @@ static MACHINE_CONFIG_DERIVED( genie, goldnpkr_base )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
-	MCFG_SOUND_CONFIG_DISCRETE(goldnpkr)
+	MCFG_DISCRETE_INTF(goldnpkr)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -3905,7 +3905,7 @@ static MACHINE_CONFIG_DERIVED( mondial, goldnpkr_base )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
-	MCFG_SOUND_CONFIG_DISCRETE(goldnpkr)
+	MCFG_DISCRETE_INTF(goldnpkr)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -3930,7 +3930,7 @@ static MACHINE_CONFIG_DERIVED( bchancep, goldnpkr_base )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
-	MCFG_SOUND_CONFIG_DISCRETE(pottnpkr)
+	MCFG_DISCRETE_INTF(pottnpkr)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

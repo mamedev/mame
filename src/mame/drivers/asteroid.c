@@ -665,7 +665,7 @@ static MACHINE_CONFIG_START( asteroid, asteroid_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
-	MCFG_SOUND_CONFIG_DISCRETE(asteroid)
+	MCFG_DISCRETE_INTF(asteroid)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.4)
 MACHINE_CONFIG_END
 
@@ -687,7 +687,7 @@ static MACHINE_CONFIG_DERIVED( astdelux, asteroid )
 
 	/* sound hardware */
 	MCFG_SOUND_REPLACE("discrete", DISCRETE, 0)
-	MCFG_SOUND_CONFIG_DISCRETE(astdelux)
+	MCFG_DISCRETE_INTF(astdelux)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_SOUND_ADD("pokey", POKEY, MASTER_CLOCK/8)
@@ -713,7 +713,7 @@ static MACHINE_CONFIG_DERIVED( llander, asteroid )
 
 	/* sound hardware */
 	MCFG_SOUND_REPLACE("discrete", DISCRETE, 0)
-	MCFG_SOUND_CONFIG_DISCRETE(llander)
+	MCFG_DISCRETE_INTF(llander)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

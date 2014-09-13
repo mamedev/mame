@@ -1329,7 +1329,7 @@ static MACHINE_CONFIG_START( btime, btime_state )
 	MCFG_SOUND_ROUTE_EX(2, "discrete", 1.0, 5)
 
 	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
-	MCFG_SOUND_CONFIG_DISCRETE(btime_sound)
+	MCFG_DISCRETE_INTF(btime_sound)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

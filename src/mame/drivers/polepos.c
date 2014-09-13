@@ -907,7 +907,7 @@ static MACHINE_CONFIG_START( polepos, polepos_state )
 
 	/* discrete circuit on the 54XX outputs */
 	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
-	MCFG_SOUND_CONFIG_DISCRETE(polepos)
+	MCFG_DISCRETE_INTF(polepos)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.90)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.90)
 

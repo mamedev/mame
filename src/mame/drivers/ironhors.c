@@ -392,7 +392,7 @@ static MACHINE_CONFIG_START( ironhors, ironhors_state )
 	MCFG_SOUND_ROUTE_EX(3, "disc_ih", 1.0, 3)
 
 	MCFG_SOUND_ADD("disc_ih", DISCRETE, 0)
-	MCFG_SOUND_CONFIG_DISCRETE(ironhors)
+	MCFG_DISCRETE_INTF(ironhors)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 MACHINE_CONFIG_END

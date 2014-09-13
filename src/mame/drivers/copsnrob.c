@@ -264,7 +264,7 @@ static MACHINE_CONFIG_START( copsnrob, copsnrob_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
-	MCFG_SOUND_CONFIG_DISCRETE(copsnrob)
+	MCFG_DISCRETE_INTF(copsnrob)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END

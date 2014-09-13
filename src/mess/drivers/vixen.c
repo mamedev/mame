@@ -770,7 +770,7 @@ static MACHINE_CONFIG_START( vixen, vixen_state )
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD(DISCRETE_TAG, DISCRETE, 0)
-	MCFG_SOUND_CONFIG_DISCRETE(vixen)
+	MCFG_DISCRETE_INTF(vixen)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
 	// devices

@@ -718,7 +718,7 @@ static MACHINE_CONFIG_START( cliffhgr, cliffhgr_state )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
 	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
-	MCFG_SOUND_CONFIG_DISCRETE(cliffhgr)
+	MCFG_DISCRETE_INTF(cliffhgr)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 MACHINE_CONFIG_END
 

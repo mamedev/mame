@@ -1255,7 +1255,7 @@ static MACHINE_CONFIG_START( noraut_base, norautp_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
-	MCFG_SOUND_CONFIG_DISCRETE(norautp)
+	MCFG_DISCRETE_INTF(norautp)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -1276,7 +1276,7 @@ static MACHINE_CONFIG_DERIVED( norautpl, noraut_base )
 
 	/* sound hardware */
 	MCFG_SOUND_MODIFY("discrete")
-	MCFG_SOUND_CONFIG_DISCRETE(kimble)
+	MCFG_DISCRETE_INTF(kimble)
 MACHINE_CONFIG_END
 
 
@@ -1327,7 +1327,7 @@ static MACHINE_CONFIG_DERIVED( kimble, noraut_base )
 
 	/* sound hardware */
 	MCFG_SOUND_MODIFY("discrete")
-	MCFG_SOUND_CONFIG_DISCRETE(kimble)
+	MCFG_DISCRETE_INTF(kimble)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( newhilop, noraut_base )
@@ -1351,7 +1351,7 @@ static MACHINE_CONFIG_DERIVED( dphl, noraut_base )
 
 	/* sound hardware */
 	MCFG_SOUND_MODIFY("discrete")
-	MCFG_SOUND_CONFIG_DISCRETE(dphl)
+	MCFG_DISCRETE_INTF(dphl)
 MACHINE_CONFIG_END
 
 
@@ -1364,7 +1364,7 @@ static MACHINE_CONFIG_DERIVED( dphla, noraut_base )
 
 	/* sound hardware */
 	MCFG_SOUND_MODIFY("discrete")
-	MCFG_SOUND_CONFIG_DISCRETE(dphl)
+	MCFG_DISCRETE_INTF(dphl)
 MACHINE_CONFIG_END
 
 
@@ -1377,7 +1377,7 @@ static MACHINE_CONFIG_DERIVED( kimbldhl, noraut_base )
 
 	/* sound hardware */
 	MCFG_SOUND_MODIFY("discrete")
-	MCFG_SOUND_CONFIG_DISCRETE(kimble)
+	MCFG_DISCRETE_INTF(kimble)
 MACHINE_CONFIG_END
 
 
@@ -1390,7 +1390,7 @@ static MACHINE_CONFIG_DERIVED( dphltest, noraut_base )
 
 	/* sound hardware */
 	MCFG_SOUND_MODIFY("discrete")
-	MCFG_SOUND_CONFIG_DISCRETE(dphl)
+	MCFG_DISCRETE_INTF(dphl)
 MACHINE_CONFIG_END
 
 
@@ -1403,7 +1403,7 @@ static MACHINE_CONFIG_DERIVED( drhl, noraut_base )
 
 	/* sound hardware */
 	MCFG_SOUND_MODIFY("discrete")
-	MCFG_SOUND_CONFIG_DISCRETE(dphl)
+	MCFG_DISCRETE_INTF(dphl)
 MACHINE_CONFIG_END
 
 
@@ -1416,7 +1416,7 @@ static MACHINE_CONFIG_DERIVED( ssjkrpkr, noraut_base )
 
 	/* sound hardware */
 	MCFG_SOUND_MODIFY("discrete")
-	MCFG_SOUND_CONFIG_DISCRETE(dphl)
+	MCFG_DISCRETE_INTF(dphl)
 MACHINE_CONFIG_END
 
 

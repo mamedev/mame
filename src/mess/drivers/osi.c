@@ -734,7 +734,7 @@ static MACHINE_CONFIG_START( osi600, sb2m600_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD(DISCRETE_TAG, DISCRETE, 0)
-	MCFG_SOUND_CONFIG_DISCRETE(osi600_discrete_interface)
+	MCFG_DISCRETE_INTF(osi600_discrete_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* cassette ACIA */
@@ -790,7 +790,7 @@ static MACHINE_CONFIG_START( c1p, c1p_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD(DISCRETE_TAG, DISCRETE, 0)
-	MCFG_SOUND_CONFIG_DISCRETE(osi600c_discrete_interface)
+	MCFG_DISCRETE_INTF(osi600c_discrete_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 	MCFG_SOUND_ADD("beeper", BEEP, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)

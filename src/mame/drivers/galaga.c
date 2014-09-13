@@ -1675,7 +1675,7 @@ static MACHINE_CONFIG_START( bosco, bosco_state )
 
 	/* discrete circuit on the 54XX outputs */
 	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
-	MCFG_SOUND_CONFIG_DISCRETE(bosco)
+	MCFG_DISCRETE_INTF(bosco)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 MACHINE_CONFIG_END
 
@@ -1739,7 +1739,7 @@ static MACHINE_CONFIG_START( galaga, galaga_state )
 
 	/* discrete circuit on the 54XX outputs */
 	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
-	MCFG_SOUND_CONFIG_DISCRETE(galaga)
+	MCFG_DISCRETE_INTF(galaga)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 MACHINE_CONFIG_END
 
@@ -1827,7 +1827,7 @@ static MACHINE_CONFIG_START( xevious, xevious_state )
 
 	/* discrete circuit on the 54XX outputs */
 	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
-	MCFG_SOUND_CONFIG_DISCRETE(galaga)
+	MCFG_DISCRETE_INTF(galaga)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 MACHINE_CONFIG_END
 

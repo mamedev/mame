@@ -531,7 +531,7 @@ static MACHINE_CONFIG_START( gyruss, gyruss_state )
 	MCFG_SOUND_ROUTE_EX(2, "discrete", 1.0, 14)
 
 	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
-	MCFG_SOUND_CONFIG_DISCRETE(gyruss_sound)
+	MCFG_DISCRETE_INTF(gyruss_sound)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "lspeaker",  1.0)
 MACHINE_CONFIG_END

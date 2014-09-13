@@ -875,7 +875,7 @@ static MACHINE_CONFIG_START( firetrk, firetrk_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
-	MCFG_SOUND_CONFIG_DISCRETE(firetrk)
+	MCFG_DISCRETE_INTF(firetrk)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -899,7 +899,7 @@ static MACHINE_CONFIG_DERIVED( superbug, firetrk )
 
 	/* sound hardware */
 	MCFG_SOUND_REPLACE("discrete", DISCRETE, 0)
-	MCFG_SOUND_CONFIG_DISCRETE(superbug)
+	MCFG_DISCRETE_INTF(superbug)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -923,7 +923,7 @@ static MACHINE_CONFIG_DERIVED( montecar, firetrk )
 
 	/* sound hardware */
 	MCFG_SOUND_REPLACE("discrete", DISCRETE, 0)
-	MCFG_SOUND_CONFIG_DISCRETE(montecar)
+	MCFG_DISCRETE_INTF(montecar)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

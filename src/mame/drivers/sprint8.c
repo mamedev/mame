@@ -479,7 +479,7 @@ static MACHINE_CONFIG_START( sprint8, sprint8_state )
 	MCFG_SPEAKER_ADD("speaker_4_8", 0.2, 0.0, 1.0)      /* right */
 
 	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
-	MCFG_SOUND_CONFIG_DISCRETE(sprint8)
+	MCFG_DISCRETE_INTF(sprint8)
 	MCFG_SOUND_ROUTE(0, "speaker_1_2", 1.0)
 	/* volumes on other channels defaulted to off, */
 	/* user can turn them up if needed. */

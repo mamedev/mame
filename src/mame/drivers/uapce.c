@@ -339,7 +339,7 @@ static MACHINE_CONFIG_START( uapce, uapce_state )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.5)
 
 	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
-	MCFG_SOUND_CONFIG_DISCRETE(uapce)
+	MCFG_DISCRETE_INTF(uapce)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 1.00)
 MACHINE_CONFIG_END
 

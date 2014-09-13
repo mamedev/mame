@@ -181,7 +181,7 @@ static MACHINE_CONFIG_START( madalien, madalien_state )
 	MCFG_SOUND_ROUTE_EX(2, "discrete", 1.0, 2)
 
 	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
-	MCFG_SOUND_CONFIG_DISCRETE(madalien)
+	MCFG_DISCRETE_INTF(madalien)
 
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END

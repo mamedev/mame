@@ -859,7 +859,7 @@ void discrete_device::device_start()
 	// create the stream
 	//m_stream = machine().sound().stream_alloc(*this, 0, 2, 22257);
 
-	const discrete_block *intf_start = (m_intf != NULL) ? m_intf : (discrete_block *) static_config();
+	const discrete_block *intf_start = m_intf;
 	char name[32];
 
 	/* If a clock is specified we will use it, otherwise run at the audio sample rate. */

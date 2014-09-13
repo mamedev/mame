@@ -429,7 +429,7 @@ static MACHINE_CONFIG_START( hec2hr, hec2hrp_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.1)
 
 	MCFG_SOUND_ADD("discrete", DISCRETE, 0) /* Son 1bit*/
-	MCFG_SOUND_CONFIG_DISCRETE( hec2hrp )
+	MCFG_DISCRETE_INTF( hec2hrp )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	/* Gestion cassette*/
@@ -475,7 +475,7 @@ static MACHINE_CONFIG_START( hec2hrp, hec2hrp_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.1)
 
 	MCFG_SOUND_ADD("discrete", DISCRETE, 0) // Son 1bit
-	MCFG_SOUND_CONFIG_DISCRETE( hec2hrp )
+	MCFG_DISCRETE_INTF( hec2hrp )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	/* Gestion cassette*/
@@ -535,7 +535,7 @@ static MACHINE_CONFIG_START( hec2mx40, hec2hrp_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.1)
 
 	MCFG_SOUND_ADD("discrete", DISCRETE, 0) // Son 1bit
-	MCFG_SOUND_CONFIG_DISCRETE( hec2hrp )
+	MCFG_DISCRETE_INTF( hec2hrp )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	/* Gestion cassette*/
@@ -590,7 +590,7 @@ static MACHINE_CONFIG_START( hec2hrx, hec2hrp_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.1)
 
 	MCFG_SOUND_ADD("discrete", DISCRETE, 0) // Son 1bit
-	MCFG_SOUND_CONFIG_DISCRETE( hec2hrp )
+	MCFG_DISCRETE_INTF( hec2hrp )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	// Gestion cassette
@@ -643,7 +643,7 @@ static MACHINE_CONFIG_START( hec2mdhrx, hec2hrp_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.1)
 
 	MCFG_SOUND_ADD("discrete", DISCRETE, 0) // Son 1bit
-	MCFG_SOUND_CONFIG_DISCRETE( hec2hrp )
+	MCFG_DISCRETE_INTF( hec2hrp )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	// Gestion cassette
@@ -699,7 +699,7 @@ static MACHINE_CONFIG_START( hec2mx80, hec2hrp_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.1)
 
 	MCFG_SOUND_ADD("discrete", DISCRETE, 0) // Son 1bit
-	MCFG_SOUND_CONFIG_DISCRETE( hec2hrp )
+	MCFG_DISCRETE_INTF( hec2hrp )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	/* Gestion cassette*/

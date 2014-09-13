@@ -153,7 +153,7 @@ static MACHINE_CONFIG_START( interact, interact_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.1)
 
 	MCFG_SOUND_ADD("discrete", DISCRETE, 0) /* Son 1bit*/
-	MCFG_SOUND_CONFIG_DISCRETE( hec2hrp )
+	MCFG_DISCRETE_INTF( hec2hrp )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_CASSETTE_ADD( "cassette" )
@@ -200,7 +200,7 @@ static MACHINE_CONFIG_START( hector1, interact_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.1)
 
 	MCFG_SOUND_ADD("discrete", DISCRETE, 0) /* Son 1bit*/
-	MCFG_SOUND_CONFIG_DISCRETE( hec2hrp )
+	MCFG_DISCRETE_INTF( hec2hrp )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_CASSETTE_ADD( "cassette" )

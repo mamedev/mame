@@ -323,7 +323,7 @@ static MACHINE_CONFIG_START( ultratnk, ultratnk_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
-	MCFG_SOUND_CONFIG_DISCRETE(ultratnk)
+	MCFG_DISCRETE_INTF(ultratnk)
 	MCFG_SOUND_ROUTE(0, "mono", 1.0)
 
 MACHINE_CONFIG_END
