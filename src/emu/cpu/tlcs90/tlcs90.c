@@ -1317,13 +1317,16 @@ void tlcs90_device::take_interrupt(tlcs90_e_irq irq)
 void tlcs90_device::check_interrupts()
 {
 	tlcs90_e_irq irq;
+	int mask;
 
 	if (!(F & IF))
 		return;
 
-	for (irq = INT0; irq < INTMAX; irq++)
+	for (irq = INTSWI; irq < INTMAX; irq++)
 	{
-		if ( m_irq_state & m_irq_mask & (1 << irq) )
+		mask = (1 << irq);
+		if(irq >= INT0) mask &= m_irq_mask;
+		if ( m_irq_state & mask )
 		{
 			take_interrupt( irq );
 			return;
@@ -2342,11 +2345,6 @@ void tlcs90_device::t90_start_timer(int i)
 			break;
 		case 1:
 			// 16-bit mode
-			if (i & 1)
-			{
-				logerror("%04X: CPU Timer %d clocked by Timer %d overflow signal\n", m_pc.w.l, i,i-1);
-				return;
-			}
 			break;
 		case 2:
 			logerror("%04X: CPU Timer %d, unsupported PPG mode\n", m_pc.w.l, i);
@@ -2411,71 +2409,60 @@ void tlcs90_device::t90_stop_timer4()
 
 TIMER_CALLBACK_MEMBER( tlcs90_device::t90_timer_callback )
 {
-	int is16bit;
+	int mode, timer_fired;
 	int i = param;
 
 	if ( (m_internal_registers[ T90_TRUN - T90_IOBASE ] & (1 << i)) == 0 )
 		return;
 
-//  logerror("CPU Timer %d fired! value = %d\n", i,(unsigned)m_timer_value[i]);
+  timer_fired = 0;
 
-	m_timer_value[i]++;
-
-	is16bit = ((m_internal_registers[ T90_TMOD - T90_IOBASE ] >> (i/2 * 2 + 2)) & 0x03) == 1;
-
+	mode = (m_internal_registers[ T90_TMOD - T90_IOBASE ] >> ((i & ~1) + 2)) & 0x03;
 	// Match
+  switch (mode)
+  {
+    case 0x02: // 8bit PPG
+    case 0x03: // 8bit PWM
+      logerror("CPU Timer %d expired with unhandled mode %d\n", i, mode);
+      // TODO: hmm...
+    case 0x00: // 8bit
+      m_timer_value[i]++;
+      if ( m_timer_value[i] == m_internal_registers[ T90_TREG0+i - T90_IOBASE ] )
+        timer_fired = 1;
+      break;
 
-	if ( m_timer_value[i] == m_internal_registers[ T90_TREG0+i - T90_IOBASE ] )
-	{
-//      logerror("CPU Timer %d match\n", i);
+    case 0x01: // 16bit
+      if(i & 1)
+        break;
+      m_timer_value[i]++;
+      if(m_timer_value[i] == 0) m_timer_value[i+1]++;
+      if(m_timer_value[i+1] == m_internal_registers[ T90_TREG0+i+1 - T90_IOBASE ])
+        if(m_timer_value[i] == m_internal_registers[ T90_TREG0+i - T90_IOBASE ])
+          timer_fired = 1;
+      break;
+  }
 
-		if (is16bit)
-		{
-			if (i & 1)
-			{
-				if ( m_timer_value[i-1] == m_internal_registers[ T90_TREG0+i-1 - T90_IOBASE ] )
-				{
-					m_timer_value[i]   = 0;
-					m_timer_value[i-1] = 0;
-
-					set_irq_line(INTT0 + i, 1);
-				}
-			}
-			else
-				set_irq_line(INTT0 + i, 1);
-		}
-		else
-		{
-			m_timer_value[i] = 0;
-			set_irq_line(INTT0 + i, 1);
-		}
-
-		switch (i)
-		{
-			case 0:
-			case 2:
-				if ( !is16bit )
-					if ( (m_internal_registers[ T90_TCLK - T90_IOBASE ] & (0x03 << (i * 2 + 2))) == 0 ) // T0/T1 match signal clocks T1/T3
-						t90_timer_callback(ptr, i+1);
-				break;
-		}
-	}
-
-	// Overflow
-
-	if ( m_timer_value[i] == 0 )
-	{
-//      logerror("CPU Timer %d overflow\n", i);
-
-		switch (i)
-		{
-			case 0:
-			case 2:
-				if ( is16bit )  // T0/T1 overflow signal clocks T1/T3
-					t90_timer_callback(ptr, i+1);
-				break;
-		}
-	}
+  if(timer_fired) {
+    // special stuff handling
+    switch(mode) {
+      case 0x02: // 8bit PPG
+      case 0x03: // 8bit PWM
+        // TODO: hmm...
+      case 0x00: // 8bit
+        if(i & 1)
+          break;
+        if ( (m_internal_registers[ T90_TCLK - T90_IOBASE ] & (0x0C << (i * 2))) == 0 ) // T0/T1 match signal clocks T1/T3
+          t90_timer_callback(ptr, i+1);
+        break;
+      case 0x01: // 16bit, only can happen for i=0,2
+        m_timer_value[i+1] = 0;
+        set_irq_line(INTT0 + i+1, 1);
+        break;
+    }
+    // regular handling
+    m_timer_value[i] = 0;
+    set_irq_line(INTT0 + i, 1);
+  }
 }
 
 TIMER_CALLBACK_MEMBER( tlcs90_device::t90_timer4_callback )
@@ -2523,10 +2510,12 @@ WRITE8_MEMBER( tlcs90_device::t90_internal_registers_w )
 			{
 				if ( (old ^ data) & (0x20 | (1 << i)) ) // if timer bit or prescaler bit changed
 				{
-					if ( data == (0x20 | (1 << i)) )    t90_start_timer(i);
-					else                                t90_stop_timer(i);
+					if ( (data & (1 << i)) && (data & 0x20) )    t90_start_timer(i);
+					else                                         t90_stop_timer(i);
 				}
 			}
+
+
 			// Timer 4
 			if ( (old ^ data) & (0x20 | 0x10) )
 			{

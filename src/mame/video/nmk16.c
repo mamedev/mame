@@ -139,6 +139,8 @@ VIDEO_START_MEMBER(nmk16_state,strahl)
 	m_fg_tilemap->set_transparent_pen(15);
 	m_tx_tilemap->set_transparent_pen(15);
 
+	m_sprdma_base = 0xf000;
+
 	nmk16_video_init();
 }
 
@@ -779,40 +781,6 @@ UINT32 nmk16_state::screen_update_bjtwin(screen_device &screen, bitmap_ind16 &bi
 {
 	return nmk16_bg_spr_update(screen, bitmap, cliprect);
 }
-
-void nmk16_state::screen_eof_nmk(screen_device &screen, bool state)
-{
-	// rising edge
-	if (state)
-	{
-		/* sprites are DMA'd from Main RAM to a private buffer automatically
-		   (or at least this is how I interpret the datasheet) */
-
-		/* -- I actually see little evidence to support this, sprite lag
-		      in some games should be checked on real boards */
-
-	//  memcpy(m_spriteram_old2,m_spriteram_old,0x1000);
-		memcpy(m_spriteram_old2,m_mainram+0x8000/2,0x1000);
-	}
-}
-
-void nmk16_state::screen_eof_strahl(screen_device &screen, bool state)
-{
-	// rising edge
-	if (state)
-	{
-		/* sprites are DMA'd from Main RAM to a private buffer automatically
-		   (or at least this is how I interpret the datasheet) */
-
-		/* -- I actually see little evidence to support this, sprite lag
-		      in some games should be checked on real boards */
-
-		/* strahl sprites are allocated in memory range FF000-FFFFF */
-
-		memcpy(m_spriteram_old2,m_mainram+0xF000/2,0x1000);
-	}
-}
-
 
 
 /***************************************************************************
