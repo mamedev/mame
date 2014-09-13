@@ -164,80 +164,80 @@ int a78_cart_slot_device::validate_header(int head, bool log)
 		case 0x05:
 			if (log)
 			{
-				printf("POKEY + RAM at $4000 (Header 0x05)\n");
-				printf("Disabling POKEY\n");
+				osd_printf_info("POKEY + RAM at $4000 (Header 0x05)\n");
+				osd_printf_info("Disabling POKEY\n");
 			}
 			head &= ~0x01;
 			break;
 		case 0x09:
 			if (log)
 			{
-				printf("POKEY + Bank 0 of 144K ROM  at $4000 (Header 0x09)\n");
-				printf("Disabling POKEY\n");
+				osd_printf_info("POKEY + Bank 0 of 144K ROM  at $4000 (Header 0x09)\n");
+				osd_printf_info("Disabling POKEY\n");
 			}
 			head &= ~0x01;
 			break;
 		case 0x11:
 			if (log)
 			{
-				printf("POKEY + Bank 6 ROM at $4000 (Header 0x11)\n");
-				printf("Disabling POKEY\n");
+				osd_printf_info("POKEY + Bank 6 ROM at $4000 (Header 0x11)\n");
+				osd_printf_info("Disabling POKEY\n");
 			}
 			head &= ~0x01;
 			break;
 		case 0x21:
 			if (log)
 			{
-				printf("POKEY + banked RAM at $4000 (Header 0x21)\n");
-				printf("Disabling POKEY\n");
+				osd_printf_info("POKEY + banked RAM at $4000 (Header 0x21)\n");
+				osd_printf_info("Disabling POKEY\n");
 			}
 			head &= ~0x01;
 			break;
 		case 0x0c:
 			if (log)
 			{
-				printf("RAM + Bank 0 of 144K ROM at $4000 (Header 0x0c)\n");
-				printf("Disabling RAM\n");
+				osd_printf_info("RAM + Bank 0 of 144K ROM at $4000 (Header 0x0c)\n");
+				osd_printf_info("Disabling RAM\n");
 			}
 			head &= ~0x04;
 			break;
 		case 0x14:
 			if (log)
 			{
-				printf("RAM + Bank 6 ROM at $4000 (Header 0x14)\n");
-				printf("Disabling RAM\n");
+				osd_printf_info("RAM + Bank 6 ROM at $4000 (Header 0x14)\n");
+				osd_printf_info("Disabling RAM\n");
 			}
 			head &= ~0x04;
 			break;
 		case 0x24:
 			if (log)
 			{
-				printf("RAM + Banked RAM at $4000 (Header 0x24)\n");
-				printf("Disabling RAM\n");
+				osd_printf_info("RAM + Banked RAM at $4000 (Header 0x24)\n");
+				osd_printf_info("Disabling RAM\n");
 			}
 			head &= ~0x04;
 			break;
 		case 0x18:
 			if (log)
 			{
-				printf("Bank 0 of 144K ROM + Bank 6 ROM at $4000 (Header 0x18)\n");
-				printf("Disabling Bank 0 ROM\n");
+				osd_printf_info("Bank 0 of 144K ROM + Bank 6 ROM at $4000 (Header 0x18)\n");
+				osd_printf_info("Disabling Bank 0 ROM\n");
 			}
 			head &= ~0x08;
 			break;
 		case 0x28:
 			if (log)
 			{
-				printf("Bank 0 of 144K ROM + Banked RAM at $4000 (Header 0x28)\n");
-				printf("Disabling Bank 0 ROM\n");
+				osd_printf_info("Bank 0 of 144K ROM + Banked RAM at $4000 (Header 0x28)\n");
+				osd_printf_info("Disabling Bank 0 ROM\n");
 			}
 			head &= ~0x08;
 			break;
 		case 0x30:
 			if (log)
 			{
-				printf("Bank 6 ROM + banked RAM at $4000 (Header 0x30)\n");
-				printf("Disabling Bank 6 ROM\n");
+				osd_printf_info("Bank 6 ROM + banked RAM at $4000 (Header 0x30)\n");
+				osd_printf_info("Disabling Bank 6 ROM\n");
 			}
 			head &= ~0x10;
 			break;
@@ -247,8 +247,8 @@ int a78_cart_slot_device::validate_header(int head, bool log)
 	{
 		if (log)
 		{
-			printf("SuperCart bankswitch detected at $4000, with no SuperCart bit (Header 0x%X)\n", head);
-			printf("Enablig SuperCart bankswitch\n");
+			osd_printf_info("SuperCart bankswitch detected at $4000, with no SuperCart bit (Header 0x%X)\n", head);
+			osd_printf_info("Enablig SuperCart bankswitch\n");
 		}
 		head |= 0x02;
 	}
@@ -257,8 +257,8 @@ int a78_cart_slot_device::validate_header(int head, bool log)
 	{
 		if (log)
 		{
-			printf("Bankswitch detected for an Activision cart (Header 0x%X)\n", head);
-			printf("Disabling bankswitch\n");
+			osd_printf_info("Bankswitch detected for an Activision cart (Header 0x%X)\n", head);
+			osd_printf_info("Disabling bankswitch\n");
 		}
 		head &= 0xff00;
 	}
@@ -267,8 +267,8 @@ int a78_cart_slot_device::validate_header(int head, bool log)
 	{
 		if (log)
 		{
-			printf("Bankswitch detected for an Absolute cart (Header 0x%X)\n", head);
-			printf("Disabling bankswitch\n");
+			osd_printf_info("Bankswitch detected for an Absolute cart (Header 0x%X)\n", head);
+			osd_printf_info("Disabling bankswitch\n");
 		}
 		head &= 0xff00;
 	}
@@ -277,8 +277,8 @@ int a78_cart_slot_device::validate_header(int head, bool log)
 	{
 		if (log)
 		{
-			printf("Unsupported mapper, please contact MESSdevs (Header 0x%X)\n", head);
-			printf("Disabling special bits\n");
+			osd_printf_info("Unsupported mapper, please contact MESSdevs (Header 0x%X)\n", head);
+			osd_printf_info("Disabling special bits\n");
 		}
 		head &= 0x00ff;
 	}
@@ -424,8 +424,25 @@ bool a78_cart_slot_device::call_load()
 				}
 			}
 
-			logerror("Cart type: %x\n", m_type);
-			
+			logerror("Cart type: 0x%x\n", m_type);
+
+			if (head[58] == 1)
+			{
+				osd_printf_info("This cart support external NVRAM savings, using HSC.\n");
+				osd_printf_info("Run it with the High Score Cart mounted to exploit this feature.\n");
+			}
+			else if (head[58] == 2)
+			{
+				osd_printf_info("This cart support external NVRAM savings, using SaveKey.\n");
+				osd_printf_info("This is not supported in MESS currently.\n");
+			}
+
+			if (head[63])
+			{
+				osd_printf_info("This cart requires XBoarD / XM expansion\n");
+				osd_printf_info("Run it through the expansion to exploit this feature.\n");
+			}
+
 			internal_header_logging((UINT8 *)head, length());
 			
 			m_cart->rom_alloc(len);
@@ -782,12 +799,12 @@ void a78_cart_slot_device::internal_header_logging(UINT8 *header, UINT32 len)
 	
 	logerror( "ROM DETAILS\n" );
 	logerror( "===========\n\n" );
-	logerror( "\tTotal length (with header):  0x%x (%dK + 128b header)\n\nn", len, len/0x400);	
+	logerror( "\tTotal length (with header):  0x%x (%dK + 128b header)\n\n", len, len/0x400);	
 	logerror( "HEADER DETAILS\n" );
 	logerror( "==============\n\n" );
 	logerror( "\tTitle:           %.32s\n", head_title);
 	logerror( "\tLength:          0x%X [real 0x%X]\n", head_length, len);
-	logerror( "\tMapper:          %s\n", cart_mapper.cstr());
+	logerror( "\tMapper:          %s [0x%X]\n", cart_mapper.cstr(), head_mapper);
 	logerror( "\t\tPOKEY:           %s\n", BIT(head_mapper, 0) ? "Yes" : "No");
 	logerror( "\t\tSC Bankswitch:   %s\n", BIT(head_mapper, 1) ? "Yes" : "No");
 	logerror( "\t\tRAM at $4000:    %s\n", BIT(head_mapper, 2) ? "Yes" : "No");
