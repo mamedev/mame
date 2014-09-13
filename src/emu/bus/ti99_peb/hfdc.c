@@ -41,7 +41,7 @@
     27C128        - EPROM 16K x 8
 
     Author: Michael Zapf
-    June 2014: Rewritten for modern floppy implementation
+    September 2014: Rewritten for modern floppy implementation
 
     WORK IN PROGRESS
 
@@ -80,6 +80,7 @@
 #define TRACE_LINES 0
 #define TRACE_MOTOR 0
 #define TRACE_DMA 0
+#define TRACE_INT 0
 
 // =========================================================================
 
@@ -543,14 +544,15 @@ WRITE8_MEMBER( myarc_hfdc_device::auxbus_out )
 		}
 		else
 		{
-			// HD selected
 			index = slog2((data>>4) & 0x0f);
 			if (index == -1)
 			{
-				if (TRACE_LINES) logerror("%s: Unselect all drives\n", tag());
+				if (TRACE_LINES) logerror("%s: Unselect all HD drives\n", tag());
+				connect_floppy_unit(index);
 			}
 			else
 			{
+				// HD selected
 				if (TRACE_LINES) logerror("%s: Select hard disk WDS%d\n", tag(), index);
 				//          if (index>=0) m_hdc9234->connect_hard_drive(m_harddisk_unit[index-1]);
 			}
@@ -576,6 +578,7 @@ WRITE8_MEMBER( myarc_hfdc_device::auxbus_out )
 		// Output the step pulse to the selected floppy drive
 		if (m_current_floppy != NULL)
 		{
+			m_current_floppy->ss_w(data & 0x01);
 			m_current_floppy->dir_w((data & 0x20)==0);
 			m_current_floppy->stp_w((data & 0x10)==0);
 		}
@@ -670,7 +673,7 @@ void myarc_hfdc_device::set_floppy_motors_running(bool run)
 WRITE_LINE_MEMBER( myarc_hfdc_device::intrq_w )
 {
 	m_irq = (line_state)state;
-	if (TRACE_LINES) logerror("%s: INT pin from controller = %d, propagating to INTA*\n", tag(), state);
+	if (TRACE_INT) logerror("%s: INT pin from controller = %d, propagating to INTA*\n", tag(), state);
 
 	// Set INTA*
 	// Signal from SMC is active high, INTA* is active low; board inverts signal
@@ -684,7 +687,7 @@ WRITE_LINE_MEMBER( myarc_hfdc_device::intrq_w )
 */
 WRITE_LINE_MEMBER( myarc_hfdc_device::dmarq_w )
 {
-	if (TRACE_LINES) logerror("%s: DMARQ pin from controller = %d\n", tag(), state);
+	if (TRACE_DMA) logerror("%s: DMARQ pin from controller = %d\n", tag(), state);
 	if (state == ASSERT_LINE)
 	{
 		m_hdc9234->dmaack(ASSERT_LINE);
@@ -704,7 +707,7 @@ WRITE_LINE_MEMBER( myarc_hfdc_device::dip_w )
 */
 READ8_MEMBER( myarc_hfdc_device::read_buffer )
 {
-	logerror("%s: Read access to onboard SRAM at %04x\n", tag(), m_dma_address);
+	if (TRACE_DMA) logerror("%s: Read access to onboard SRAM at %04x\n", tag(), m_dma_address);
 	UINT8 value = m_buffer_ram[m_dma_address & 0x7fff];
 	m_dma_address = (m_dma_address+1) & 0x7fff;
 	return value;

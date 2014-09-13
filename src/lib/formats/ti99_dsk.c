@@ -284,7 +284,7 @@ floppy_image_format_t::desc_e* ti99_sdf_format::get_desc_mfm(const format &f, in
 {
 	static floppy_image_format_t::desc_e desc_mfm[] =
 	{
-		{ SECTOR_INTERLEAVE_SKEW, 6, 6 },         // Possible ilv: 0, 4, 6, 10, 12, 16.
+		{ SECTOR_INTERLEAVE_SKEW, 4, 0 },         // Possible ilv: 0, 4, 6, 10, 12, 16.
 		{ MFM, 0x4e, f.gap_1 },                  // track lead-in
 		{ SECTOR_LOOP_START, 0, 17 },            // 18 sectors
 			{ CRC_CCITT_START, 1 },
