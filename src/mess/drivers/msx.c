@@ -43,11 +43,13 @@
 ** - expertac: Does not boot
 ** - fsa1gt: Add Turbo-R support
 ** - fsa1st: Add Turbo-R support
+** - Add Canon V-25 (64KB VRAM)
+** - Add Hitachi MB-H3 (64KB VRAM)
 **
 ************************************************************************
 
 This following list is probably incomplete. Corrections are welcome.
-+
+
 Al Alamiah AX-170 - MSX1 - ax170
 Al Alamiah AX-350 - MSX2 - ax350
 Al Alamiah AX-370 - MSX2 - ax370
@@ -1163,6 +1165,11 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_FRAGMENT( msx_ym2413 )
 	MCFG_SOUND_ADD("ym2413", YM2413, XTAL_21_4772MHz/6)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_FRAGMENT( msx2_64kb_vram )
+	MCFG_DEVICE_MODIFY("v9938")
+	v9938_device::static_set_vram_size(*device, 0x10000);
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( msx, msx_state )
@@ -4831,11 +4838,14 @@ static MACHINE_CONFIG_DERIVED( tpp311, msx2_pal )
 	// AY8910/YM2149?
 	// FDC: None, 0 drives
 	// 0 Cartridge slots?
+	// 64KB VRAM
 
 	MCFG_MSX_LAYOUT_ROM("bios", 0, 0, 0, 2, "maincpu", 0x0000)
 	MCFG_MSX_LAYOUT_RAM_MM("ram_mm", 1, 0, 0x10000)   /* 64KB?? Mapper RAM */
 	MCFG_MSX_LAYOUT_ROM("logo", 2, 0, 1, 2, "maincpu", 0xc000)
 	MCFG_MSX_LAYOUT_ROM("ext", 3, 0, 0, 1, "maincpu", 0x8000)
+
+	MCFG_FRAGMENT_ADD( msx2_64kb_vram )
 MACHINE_CONFIG_END
 
 /* MSX2 - Talent TPS-312 */
@@ -4852,6 +4862,7 @@ static MACHINE_CONFIG_DERIVED( tps312, msx2_pal )
 	// AY8910/YM2149?
 	// FDC: None, 0 drives
 	// 2 Cartridge slots?
+	// 64KB VRAM
 
 	MCFG_MSX_LAYOUT_ROM("bios", 0, 0, 0, 2, "maincpu", 0x0000)
 	MCFG_MSX_LAYOUT_RAM_MM("ram_mm", 1, 0, 0x20000)   /* 128KB?? Mapper RAM */
@@ -4863,6 +4874,8 @@ static MACHINE_CONFIG_DERIVED( tps312, msx2_pal )
 	MCFG_MSX_LAYOUT_CARTRIDGE("cartslot2", 3, 3)
 
 	MCFG_FRAGMENT_ADD( msx2_cartlist )
+
+	MCFG_FRAGMENT_ADD( msx2_64kb_vram )
 MACHINE_CONFIG_END
 
 /* MSX2 - Toshiba HX-23 */
@@ -4878,6 +4891,7 @@ static MACHINE_CONFIG_DERIVED( hx23, msx2_pal )
 	// AY8910/YM2149?
 	// FDC: None, 0 drives
 	// 2 Cartridge slots?
+	// 64KB VRAM
 
 	MCFG_MSX_LAYOUT_ROM("bios", 0, 0, 0, 2, "maincpu", 0x0000)
 	MCFG_MSX_LAYOUT_RAM("ram1", 0, 0, 2, 2)   /* 32KB RAM */
@@ -4888,6 +4902,8 @@ static MACHINE_CONFIG_DERIVED( hx23, msx2_pal )
 	MCFG_MSX_LAYOUT_ROM("word", 3, 3, 1, 2, "maincpu", 0xc000)
 
 	MCFG_FRAGMENT_ADD( msx2_cartlist )
+
+	MCFG_FRAGMENT_ADD( msx2_64kb_vram )
 MACHINE_CONFIG_END
 
 /* MSX2 - Toshiba HX-23F */
