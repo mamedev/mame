@@ -36,6 +36,11 @@ struct osd_lock
 	CRITICAL_SECTION    critsect;
 };
 
+struct osd_event
+{
+	void *  ptr;
+};
+
 struct osd_scalable_lock
 {
 #if USE_SCALABLE_LOCKS
@@ -182,6 +187,52 @@ INT32 win_atomic_exchange32(INT32 volatile *ptr, INT32 exchange)
 INT32 win_atomic_add32(INT32 volatile *ptr, INT32 delta)
 {
 	return InterlockedExchangeAdd((LONG *) ptr, delta) + delta;
+}
+
+//============================================================
+//  osd_event_alloc
+//============================================================
+
+osd_event *osd_event_alloc(int manualreset, int initialstate)
+{
+	return (osd_event *) CreateEvent(NULL, manualreset, initialstate, NULL);
+}
+
+//============================================================
+//  osd_event_free
+//============================================================
+
+void osd_event_free(osd_event *event)
+{
+	CloseHandle((HANDLE) event);
+}
+
+//============================================================
+//  osd_event_set
+//============================================================
+
+void osd_event_set(osd_event *event)
+{
+	SetEvent((HANDLE) event);
+}
+
+//============================================================
+//  osd_event_reset
+//============================================================
+
+void osd_event_reset(osd_event *event)
+{
+	ResetEvent((HANDLE) event);
+}
+
+//============================================================
+//  osd_event_wait
+//============================================================
+
+int osd_event_wait(osd_event *event, osd_ticks_t timeout)
+{
+	int ret = WaitForSingleObject((HANDLE) event, timeout * 1000 / osd_ticks_per_second());
+	return ( ret == WAIT_OBJECT_0);
 }
 
 //============================================================

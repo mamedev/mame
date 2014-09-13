@@ -83,7 +83,7 @@ struct work_thread_info
 {
 	osd_work_queue *    queue;          // pointer back to the queue
 	HANDLE              handle;         // handle to the thread
-	HANDLE              wakeevent;      // wake event for the thread
+	osd_event *         wakeevent;      // wake event for the thread
 	volatile INT32      active;         // are we actively processing work?
 
 #if KEEP_STATISTICS
@@ -109,7 +109,7 @@ struct osd_work_queue
 	UINT32              threads;        // number of threads in this queue
 	UINT32              flags;          // creation flags
 	work_thread_info *  thread;         // array of thread information
-	HANDLE              doneevent;      // event signalled when work is complete
+	osd_event   *       doneevent;      // event signalled when work is complete
 
 #if KEEP_STATISTICS
 	volatile INT32      itemsqueued;    // total items queued
@@ -127,7 +127,7 @@ struct osd_work_item
 	osd_work_callback   callback;       // callback function
 	void *              param;          // callback parameter
 	void *              result;         // callback result
-	HANDLE              event;          // event signalled when complete
+	osd_event *         event;          // event signalled when complete
 	UINT32              flags;          // creation flags
 	volatile INT32      done;           // is the item done?
 };
@@ -169,7 +169,7 @@ osd_work_queue *osd_work_queue_alloc(int flags)
 	queue->flags = flags;
 
 	// allocate events for the queue
-	queue->doneevent = CreateEvent(NULL, TRUE, TRUE, NULL);     // manual reset, signalled
+	queue->doneevent = osd_event_alloc(TRUE, TRUE);     // manual reset, signalled
 	if (queue->doneevent == NULL)
 		goto error;
 
@@ -214,7 +214,7 @@ osd_work_queue *osd_work_queue_alloc(int flags)
 		thread->queue = queue;
 
 		// create the per-thread wake event
-		thread->wakeevent = CreateEvent(NULL, FALSE, FALSE, NULL);  // auto-reset, not signalled
+		thread->wakeevent = osd_event_alloc(FALSE, FALSE);  // auto-reset, not signalled
 		if (thread->wakeevent == NULL)
 			goto error;
 
@@ -295,10 +295,10 @@ int osd_work_queue_wait(osd_work_queue *queue, osd_ticks_t timeout)
 	}
 
 	// reset our done event and double-check the items before waiting
-	ResetEvent(queue->doneevent);
+	osd_event_reset(queue->doneevent);
 	atomic_exchange32(&queue->waiting, TRUE);
 	if (queue->items != 0)
-		WaitForSingleObject(queue->doneevent, timeout * 1000 / osd_ticks_per_second());
+		osd_event_wait(queue->doneevent, timeout);
 	atomic_exchange32(&queue->waiting, FALSE);
 
 	// return TRUE if we actually hit 0
@@ -326,7 +326,7 @@ void osd_work_queue_free(osd_work_queue *queue)
 		{
 			work_thread_info *thread = &queue->thread[threadnum];
 			if (thread->wakeevent != NULL)
-				SetEvent(thread->wakeevent);
+				osd_event_set(thread->wakeevent);
 		}
 
 		// wait for all the threads to go away
@@ -343,7 +343,7 @@ void osd_work_queue_free(osd_work_queue *queue)
 
 			// clean up the wake event
 			if (thread->wakeevent != NULL)
-				CloseHandle(thread->wakeevent);
+				osd_event_free(thread->wakeevent);
 		}
 
 #if KEEP_STATISTICS
@@ -368,7 +368,7 @@ void osd_work_queue_free(osd_work_queue *queue)
 
 	// free all the events
 	if (queue->doneevent != NULL)
-		CloseHandle(queue->doneevent);
+		osd_event_free(queue->doneevent);
 
 	// free all items in the free list
 	while (queue->free != NULL)
@@ -376,7 +376,7 @@ void osd_work_queue_free(osd_work_queue *queue)
 		osd_work_item *item = (osd_work_item *)queue->free;
 		queue->free = item->next;
 		if (item->event != NULL)
-			CloseHandle(item->event);
+			osd_event_free(item->event);
 		osd_free(item);
 	}
 
@@ -386,7 +386,7 @@ void osd_work_queue_free(osd_work_queue *queue)
 		osd_work_item *item = (osd_work_item *)queue->list;
 		queue->list = item->next;
 		if (item->event != NULL)
-			CloseHandle(item->event);
+			osd_event_free(item->event);
 		osd_free(item);
 	}
 
@@ -474,7 +474,7 @@ osd_work_item *osd_work_item_queue_multiple(osd_work_queue *queue, osd_work_call
 			// if this thread is not active, wake him up
 			if (!thread->active)
 			{
-				SetEvent(thread->wakeevent);
+				osd_event_set(thread->wakeevent);
 				add_to_stat(&queue->setevents, 1);
 
 				// for non-shared, the first one we find is good enough
@@ -505,9 +505,9 @@ int osd_work_item_wait(osd_work_item *item, osd_ticks_t timeout)
 
 	// if we don't have an event, create one
 	if (item->event == NULL)
-		item->event = CreateEvent(NULL, TRUE, FALSE, NULL);     // manual reset, not signalled
+		item->event = osd_event_alloc(TRUE, FALSE);     // manual reset, not signalled
 	else
-		ResetEvent(item->event);
+			osd_event_reset(item->event);
 
 	// if we don't have an event, we need to spin (shouldn't ever really happen)
 	if (item->event == NULL)
@@ -519,7 +519,7 @@ int osd_work_item_wait(osd_work_item *item, osd_ticks_t timeout)
 
 	// otherwise, block on the event until done
 	else if (!item->done)
-		WaitForSingleObject(item->event, timeout * 1000 / osd_ticks_per_second());
+		osd_event_wait(item->event, timeout);
 
 	// return TRUE if the refcount actually hit 0
 	return item->done;
@@ -598,11 +598,12 @@ static unsigned __stdcall worker_thread_entry(void *param)
 	// loop until we exit
 	for ( ;; )
 	{
+		// block waiting for work or exit
 		// bail on exit, and only wait if there are no pending items in queue
 		if (!queue->exiting && queue->list == NULL)
 		{
 			begin_timing(thread->waittime);
-			WaitForSingleObject(thread->wakeevent, INFINITE);
+			osd_event_wait(thread->wakeevent, INFINITE);
 			end_timing(thread->waittime);
 		}
 		if (queue->exiting)
@@ -695,7 +696,7 @@ static void worker_thread_process(osd_work_queue *queue, work_thread_info *threa
 			// set the result and signal the event
 			else if (item->event != NULL)
 			{
-				SetEvent(item->event);
+				osd_event_set(item->event);
 				add_to_stat(&item->queue->setevents, 1);
 			}
 
@@ -708,7 +709,7 @@ static void worker_thread_process(osd_work_queue *queue, work_thread_info *threa
 	// we don't need to set the doneevent for multi queues because they spin
 	if (queue->waiting)
 	{
-		SetEvent(queue->doneevent);
+		osd_event_set(queue->doneevent);
 		add_to_stat(&queue->setevents, 1);
 	}
 
