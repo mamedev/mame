@@ -122,19 +122,6 @@ private:
 	UINT8 m_register_w[12];
 	UINT8 m_register_r[15];
 
-	// Command processing
-	void  process_command(UINT8 opcode);
-
-	// Command is done
-	void set_command_done(int flags);
-	void set_command_done();
-
-	// Are we in FM mode?
-	bool fm_mode();
-
-	// Recent command.
-	UINT8 m_command;
-
 	// Interrupt management (outgoing INT pin)
 	void set_interrupt(line_state intr);
 
@@ -147,23 +134,20 @@ private:
 	// internal register OUTPUT2
 	UINT8 m_output2;
 
-	// Direction for track seek; +1 = towards center, -1 = towards rim
-	int m_step_direction;
-
 	// Write the output registers to the latches
-	void sync_latches_out();
+	void auxbus_out();
 
 	// Write the DMA address to the external latches
 	void dma_address_out();
 
-	// Utility routine to set or reset bits
-	void set_bits(UINT8& byte, int mask, bool set);
+	// Intermediate storage
+	UINT8 m_data;
 
 	// Drive type that has been selected in drive_select
 	int m_selected_drive_type;
 
-	// Enable head load delays
-	bool m_head_load_delay_enable;
+	// Indicates whether the device has completed initialization
+	bool m_initialized;
 
 	// Timers to delay execution/completion of commands */
 	emu_timer *m_timer;
@@ -173,28 +157,28 @@ private:
 	// Timer callback
 	void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
-	// Phase-locked loops
-	fdc_pll_t m_pll, m_checkpoint_pll;
-
+	// Callbacks
 	void ready_callback(int level);
 	void index_callback(int level);
 	void seek_complete_callback(int level);
 
+	// Wait for some time to pass or for a line to be raised
 	void wait_time(emu_timer *tm, int microsec, int next_substate);
 	void wait_time(emu_timer *tm, attotime delay, int param);
-
-	bool on_track00();
 	void wait_line(int substate);
-	// ===================================================
-	//   Utility functions
-	// ===================================================
 
+	// Converts attotime to a string
 	astring tts(const attotime &t);
+
+	// Current time
 	astring ttsn();
 
-	// ===================================================
+	// Utility routine to set or reset bits
+	void set_bits(UINT8& byte, int mask, bool set);
+
+	// ==============================================
 	//   Live state machine
-	// ===================================================
+	// ==============================================
 
 	struct live_info
 	{
@@ -203,52 +187,62 @@ private:
 		UINT16 crc;
 		int bit_counter;
 		int bit_count_total;    // used for timeout handling
+		int byte_counter;
 		bool data_separator_phase;
+		bool last_data_bit;
 		UINT8 data_reg;
 		int state;
 		int next_state;
 	};
 
+	live_info m_live_state, m_checkpoint_state;
+	int m_last_live_state;
+
+	// Starts the live run
 	void live_start(int state);
-	void live_run();
+
+	// Analyses the track until the given time
 	void live_run_until(attotime limit);
+
+	// Live run until next index pulse
+	void live_run();
+
+	// Control functions for syncing the track analyser with the machine time
 	void wait_for_realtime(int state);
 	void live_sync();
 	void rollback();
-
 	void checkpoint();
 
-	live_info m_live_state, m_checkpoint_state;
+	// ==============================================
+	//    PLL functions and interface to floppy
+	// ==============================================
 
-	// ===================================================
-	//   PLL functions and interface to floppy
-	// ===================================================
+	// Phase-locked loops
+	fdc_pll_t m_pll, m_checkpoint_pll;
 
+	// Resets the PLL to the given time
 	void pll_reset(const attotime &when);
+
+	// Encodes the byte using FM or MFM. Changes the m_live_state members
+	// shift_reg, data_reg, and last_data_bit
+	void encode_byte(UINT8 byte);
+
+	// Puts the word into the shift register directly. Changes the m_live_state members
+	// shift_reg, and last_data_bit
+	void encode_raw(UINT16 word);
+
+	// Reads from the current position on the track
 	bool read_one_bit(const attotime &limit);
 
-	int get_sector_size();
+	// Writes to the current position on the track
+	bool write_one_bit(const attotime &limit);
 
-	// ===================================================
-	//   Commands
-	// ===================================================
+	// ==============================================
+	//   Command state machine
+	// ==============================================
 
-	void process_states();
-	void general_continue();
-
-	int m_main_state;
 	int m_substate;
-	int m_next_state;
-	int m_last_live_state;
-	int m_track_delta;
-	int m_retry_save;
-	bool m_multi_sector;
-	bool m_wait_for_index;
-	bool m_stop_after_index;
-	bool m_initialized;
-
-	// Intermediate storage
-	UINT8 m_data;
+	int m_state_after_line;
 
 	typedef void (hdc9234_device::*cmdfunc)(void);
 
@@ -256,30 +250,124 @@ private:
 	{
 		UINT8 baseval;
 		UINT8 mask;
-		int state;
 		cmdfunc command;
 	} cmddef;
 
 	static const cmddef s_command[];
 
-	int get_step_time();
-	int pulse_width();
+	// Indicates whether a command is currently being executed
+	bool m_executing;
 
+	// Keeps the pointer to the function for later continuation
+	cmdfunc m_command;
+
+	// Invoked after the commit period for command initiation or register write access
+	void process_command();
+
+	// Re-enters the state machine after a delay
+	void reenter_command_processing();
+
+	// Command is done
+	void set_command_done(int flags);
+	void set_command_done();
+
+	// Difference between current cylinder and desired cylinder
+	int m_track_delta;
+
+	// Used to restore the retry count for multi-sector operations
+	int m_retry_save;
+
+	// ==============================================
+	//   Operation properties
+	// ==============================================
+
+	// Precompensation value
+	int m_precompensation;
+
+	// Do we have a multi-sector operation?
+	bool m_multi_sector;
+
+	// Shall we wait for the index hole?
+	bool m_wait_for_index;
+
+	// Shall we stop after the next index hole?
+	bool m_stop_after_index;
+
+	// Is data transfer enabled for read operations?
+	bool m_transfer_enabled;
+
+	// Is it a read or a write operation?
+	bool m_write;
+
+	// Have we found a deleted sector?
+	bool m_deleted;
+
+	// Do we apply a reduced write current?
+	bool m_reduced_write_current;
+
+	// Enables head load delays
+	bool m_head_load_delay_enable;
+
+	// Used in RESTORE to find out when to give up
 	int m_seek_count;
 
-	void command_continue();
-	void register_write_continue();
+	// Are we in FM mode?
+	bool fm_mode();
 
-	// Commands
+	// Delivers the desired head
+	int desired_head();
+
+	// Delivers the desired sector
+	int desired_sector();
+
+	// Delivers the desired cylinder. The value is spread over two registers.
+	int desired_cylinder();
+
+	// Delivers the current head as read from the track
+	int current_head();
+
+	// Delivers the current sector as read from the track
+	int current_sector();
+
+	// Delivers the current cylinder as read from the track
+	int current_cylinder();
+
+	// Delivers the current command
+	UINT8 current_command();
+
+	// Step time (minus pulse width)
+	int step_time();
+
+	// Step pulse width
+	int pulse_width();
+
+	// Sector size as read from the track
+	int calc_sector_size();
+
+	// Are we on track 0?
+	bool on_track00();
+
+	// Common subprograms READ ID, VERIFY, and DATA TRANSFER
+	void read_id(int& cont, bool implied_seek);
+	void verify(int& cont, bool verify_all);
+	void data_transfer(int& cont);
+
+	// Activates the step line
+	void step_on(bool towards00, int next);
+
+	// Clears the step line (after the pulse length time)
+	void step_off(int next);
+
+	// ===================================================
+	//   Commands
+	// ===================================================
 	void drive_select();
 	void drive_deselect();
 	void restore_drive();
 	void step_drive();
-	void step_drive_continue();
 	void set_register_pointer();
-	void read_sector_physical();
-	void read_sector_logical();
-	void read_sector_continue();
+	void read_sectors();
+	void write_sector_logical();
 };
 
 #endif
