@@ -82,7 +82,7 @@ INLINE void osd_yield_processor(void)
 struct work_thread_info
 {
 	osd_work_queue *    queue;          // pointer back to the queue
-	HANDLE              handle;         // handle to the thread
+	osd_thread *        handle;         // handle to the thread
 	osd_event *         wakeevent;      // wake event for the thread
 	volatile INT32      active;         // are we actively processing work?
 
@@ -143,7 +143,7 @@ int osd_num_processors = 0;
 //============================================================
 
 static int effective_num_processors(void);
-static unsigned __stdcall worker_thread_entry(void *param);
+static void * worker_thread_entry(void *param);
 static void worker_thread_process(osd_work_queue *queue, work_thread_info *thread);
 
 
@@ -208,7 +208,6 @@ osd_work_queue *osd_work_queue_alloc(int flags)
 	for (threadnum = 0; threadnum < queue->threads; threadnum++)
 	{
 		work_thread_info *thread = &queue->thread[threadnum];
-		uintptr_t handle;
 
 		// set a pointer back to the queue
 		thread->queue = queue;
@@ -219,17 +218,16 @@ osd_work_queue *osd_work_queue_alloc(int flags)
 			goto error;
 
 		// create the thread
-		handle = _beginthreadex(NULL, 0, worker_thread_entry, thread, 0, NULL);
-		thread->handle = (HANDLE)handle;
+		thread->handle = osd_thread_create(worker_thread_entry, thread);
 		if (thread->handle == NULL)
 			goto error;
 
 		// set its priority: I/O threads get high priority because they are assumed to be
 		// blocked most of the time; other threads just match the creator's priority
 		if (flags & WORK_QUEUE_FLAG_IO)
-			SetThreadPriority(thread->handle, THREAD_PRIORITY_ABOVE_NORMAL);
+			osd_thread_adjust_priority(thread->handle, 1);
 		else
-			SetThreadPriority(thread->handle, GetThreadPriority(GetCurrentThread()));
+			osd_thread_adjust_priority(thread->handle, 0);
 	}
 
 	// start a timer going for "waittime" on the main thread
@@ -337,8 +335,7 @@ void osd_work_queue_free(osd_work_queue *queue)
 			// block on the thread going away, then close the handle
 			if (thread->handle != NULL)
 			{
-				WaitForSingleObject(thread->handle, INFINITE);
-				CloseHandle(thread->handle);
+				osd_thread_wait_free(thread->handle);
 			}
 
 			// clean up the wake event
@@ -590,7 +587,7 @@ static int effective_num_processors(void)
 //  worker_thread_entry
 //============================================================
 
-static unsigned __stdcall worker_thread_entry(void *param)
+static void *worker_thread_entry(void *param)
 {
 	work_thread_info *thread = (work_thread_info *)param;
 	osd_work_queue *queue = thread->queue;
@@ -642,7 +639,7 @@ static unsigned __stdcall worker_thread_entry(void *param)
 		atomic_exchange32(&thread->active, FALSE);
 		atomic_decrement32(&queue->livethreads);
 	}
-	return 0;
+	return NULL;
 }
 
 

@@ -10,10 +10,12 @@
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #include <stdlib.h>
+#include <process.h>
 
 // MAME headers
 #include "osdcore.h"
 #include "osinline.h"
+#include "winsync.h"
 
 
 //============================================================
@@ -39,6 +41,12 @@ struct osd_lock
 struct osd_event
 {
 	void *  ptr;
+};
+
+struct osd_thread {
+	HANDLE handle;
+	osd_thread_callback callback;
+	void *param;
 };
 
 struct osd_scalable_lock
@@ -233,6 +241,77 @@ int osd_event_wait(osd_event *event, osd_ticks_t timeout)
 {
 	int ret = WaitForSingleObject((HANDLE) event, timeout * 1000 / osd_ticks_per_second());
 	return ( ret == WAIT_OBJECT_0);
+}
+
+//============================================================
+//  osd_thread_create
+//============================================================
+
+static unsigned __stdcall worker_thread_entry(void *param)
+{
+	osd_thread *thread = (osd_thread *) param;
+	void *res;
+	res = thread->callback(thread->param);
+#ifdef PTR64
+	return (unsigned) (long long) res;
+#else
+	return (unsigned) res;
+#endif
+}
+
+osd_thread *osd_thread_create(osd_thread_callback callback, void *cbparam)
+{
+	osd_thread *thread;
+	uintptr_t handle;
+
+	thread = (osd_thread *)calloc(1, sizeof(osd_thread));
+	thread->callback = callback;
+	thread->param = cbparam;
+	handle = _beginthreadex(NULL, 0, worker_thread_entry, thread, 0, NULL);
+	thread->handle = (HANDLE) handle;
+	return thread;
+}
+
+//============================================================
+//  osd_thread_wait_free
+//============================================================
+
+void osd_thread_wait_free(osd_thread *thread)
+{
+	WaitForSingleObject(thread->handle, INFINITE);
+	CloseHandle(thread->handle);
+	free(thread);
+}
+
+//============================================================
+//  osd_thread_adjust_priority
+//============================================================
+
+int osd_thread_adjust_priority(osd_thread *thread, int adjust)
+{
+	if (adjust)
+		SetThreadPriority(thread->handle, THREAD_PRIORITY_ABOVE_NORMAL);
+	else
+		SetThreadPriority(thread->handle, GetThreadPriority(GetCurrentThread()));
+	return TRUE;
+}
+
+//============================================================
+//  osd_thread_cpu_affinity
+//============================================================
+
+int osd_thread_cpu_affinity(osd_thread *thread, UINT32 mask)
+{
+	return TRUE;
+}
+
+//============================================================
+//  osd_process_kill
+//============================================================
+
+void osd_process_kill(void)
+{
+	TerminateProcess(GetCurrentProcess(), -1);
 }
 
 //============================================================
