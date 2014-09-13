@@ -2810,6 +2810,8 @@ Info from Atariage and Atarimania
 			<dataarea name="rom" size="16384">
 				<rom name="bump 'n' jump (1983) (m network, david akers, joe 'ferreira' king, patricia lewis du long, jeff ratcliff - intv) (mt7045).bin" size="16384" crc="df2bc303" sha1="1819ef408c1216c83dcfeceec28d13f6ea5ca477" offset="0" />
 			</dataarea>
+			<dataarea name="ram" size="2048">
+			</dataarea>
 		</part>
 	</software>
 
@@ -2857,6 +2859,8 @@ Info from Atariage and Atarimania
 			<feature name="slot" value="a26_e7" />
 			<dataarea name="rom" size="16384">
 				<rom name="burgertime (1983) (m network, patricia lewis du long, ron surratt - intv) (mt4518).bin" size="16384" crc="c183fbbc" sha1="49e01b8048ae344cb65838f6b1c1de0e1f416f29" offset="0" />
+			</dataarea>
+			<dataarea name="ram" size="2048">
 			</dataarea>
 		</part>
 	</software>
@@ -4136,6 +4140,8 @@ Info from Atariage and Atarimania
 			<dataarea name="rom" size="16384">
 				<rom name="crack'ed (11-28-1988) (atari, randy bowker) (cx26142) (prototype).bin" size="16384" crc="1b5e52a7" sha1="d226e8af4e38d1d4eb8bb69cdf6bccdad561c804" offset="0" />
 			</dataarea>
+			<dataarea name="ram" size="128">
+			</dataarea>
 		</part>
 	</software>
 
@@ -4355,6 +4361,8 @@ Info from Atariage and Atarimania
 			<dataarea name="rom" size="16384">
 				<rom name="crystal castles (1984) (atari, michael kosaka, peter c. niday, robert vieira) (cx26110).bin" size="16384" crc="9007b5ac" sha1="2e4ee5ee040b08be1fe568602d1859664e607efb" offset="0" />
 			</dataarea>
+			<dataarea name="ram" size="128">
+			</dataarea>
 		</part>
 	</software>
 
@@ -4381,6 +4389,8 @@ Info from Atariage and Atarimania
 			<feature name="slot" value="a26_f6" />
 			<dataarea name="rom" size="16384">
 				<rom name="crystal castles (1984) (atari, michael kosaka, peter c. niday, robert vieira) (cx26110) (pal).bin" size="16384" crc="d5622d0b" sha1="3311ea53afc8901d665e487036e7da0ae1cdb276" offset="0" />
+			</dataarea>
+			<dataarea name="ram" size="128">
 			</dataarea>
 		</part>
 	</software>
@@ -4495,6 +4505,8 @@ Info from Atariage and Atarimania
 			<dataarea name="rom" size="16384">
 				<rom name="dark chambers (dungeon, dungeon masters) (1988) (atari, adam clayton, john howard palevich) (cx26151).bin" size="16384" crc="83900281" sha1="fbb4814973fcb4e101521515e04daa6424c45f5c" offset="0" />
 			</dataarea>
+			<dataarea name="ram" size="128">
+			</dataarea>
 		</part>
 	</software>
 
@@ -4509,6 +4521,8 @@ Info from Atariage and Atarimania
 			<dataarea name="rom" size="16384">
 				<rom name="dark chambers (dungeon, dungeon masters) (1988) (atari, adam clayton, john howard palevich) (cx26151, cx26151p) (pal).bin" size="16384" crc="844ba468" sha1="0ea0dea570acedc806aae630a92f68b3e1d63868" offset="0" />
 			</dataarea>
+			<dataarea name="ram" size="128">
+			</dataarea>
 		</part>
 	</software>
 
@@ -4522,6 +4536,8 @@ Info from Atariage and Atarimania
 			<feature name="slot" value="a26_f6" />
 			<dataarea name="rom" size="16384">
 				<rom name="dark chambers (dungeon, dungeon masters) (1988) (atari, adam clayton, john howard palevich) (cx26151, cx26151p) (prototype) (pal).bin" size="16384" crc="19e38e50" sha1="72563f872ebfd285ef51b9f2fe7d3a8f55f1b0fa" offset="0" />
+			</dataarea>
+			<dataarea name="ram" size="128">
 			</dataarea>
 		</part>
 	</software>
@@ -4649,6 +4665,8 @@ Info from Atariage and Atarimania
 			<dataarea name="rom" size="8192">
 				<rom name="defender ii (aka stargate) (1988) (atari, bill aspromonte, andrew fuchs) (cx26120).bin" size="8192" crc="93217704" sha1="d7b506b84f28e1b917a2978753d5a40eb197537a" offset="0" />
 			</dataarea>
+			<dataarea name="ram" size="128">
+			</dataarea>
 		</part>
 	</software>
 
@@ -4662,6 +4680,8 @@ Info from Atariage and Atarimania
 			<feature name="slot" value="a26_f8" />
 			<dataarea name="rom" size="8192">
 				<rom name="defender ii (aka stargate) (1988) (atari, bill aspromonte, andrew fuchs) (cx26120) (pal).bin" size="8192" crc="8d348d62" sha1="aba4e94d01b10cdf9b882f25e620a126dd80df19" offset="0" />
+			</dataarea>
+			<dataarea name="ram" size="128">
 			</dataarea>
 		</part>
 	</software>
@@ -4876,6 +4896,8 @@ Info from Atariage and Atarimania
 			<dataarea name="rom" size="16384">
 				<rom name="desert falcon (nile flyer, sphinx) (1987) (atari, robert c. polaro) (cx26140).bin" size="16384" crc="caa0054e" sha1="ccea2d5095441d7e1b1468e3879a6ab556dc8b7a" offset="0" />
 			</dataarea>
+			<dataarea name="ram" size="128">
+			</dataarea>
 		</part>
 	</software>
 
@@ -4890,6 +4912,8 @@ Info from Atariage and Atarimania
 			<dataarea name="rom" size="16384">
 				<rom name="desert falcon (nile flyer, sphinx) (1987) (atari, robert c. polaro) (cx26140, cx26140p) (pal).bin" size="16384" crc="711d6648" sha1="b6ed9257bd542acfa8c4a3426094f46adbc6a93b" offset="0" />
 			</dataarea>
+			<dataarea name="ram" size="128">
+			</dataarea>
 		</part>
 	</software>
 
@@ -4903,6 +4927,8 @@ Info from Atariage and Atarimania
 			<feature name="slot" value="a26_f8" />
 			<dataarea name="rom" size="8192">
 				<rom name="desert falcon (nile flyer, sphinx) (05-27-1987) (atari, robert c. polaro) (cx26140, cx26140p) (prototype) (pal).bin" size="8192" crc="85a0be98" sha1="5d9619410fd058ab8315f25910a38f4805c4b1c2" offset="0" />
+			</dataarea>
+			<dataarea name="ram" size="128">
 			</dataarea>
 		</part>
 	</software>
@@ -5017,6 +5043,8 @@ Info from Atariage and Atarimania
 			<dataarea name="rom" size="16384">
 				<rom name="dig dug (1983) (atari - gcc, douglas b. macrae) (cx2677).bin" size="16384" crc="ee7b80d1" sha1="79e746524520da546249149c33614fc23a4f2a51" offset="0" />
 			</dataarea>
+			<dataarea name="ram" size="128">
+			</dataarea>
 		</part>
 	</software>
 
@@ -5030,6 +5058,8 @@ Info from Atariage and Atarimania
 			<feature name="slot" value="a26_f6" />
 			<dataarea name="rom" size="16384">
 				<rom name="dig dug (1983) (atari - gcc, douglas b. macrae) (cx2677, cx2677p) (pal).bin" size="16384" crc="de5c5553" sha1="816abcef9cc8fca5007cc400534e84d00285f199" offset="0" />
+			</dataarea>
+			<dataarea name="ram" size="128">
 			</dataarea>
 		</part>
 	</software>
@@ -5600,6 +5630,8 @@ Info from Atariage and Atarimania
 			<dataarea name="rom" size="8192">
 				<rom name="elevator action (1983) (atari, dan hitchens) (cx26126) (prototype).bin" size="8192" crc="dc5a9d77" sha1="bab872ee41695cefe41d88e4932132eca6c4e69c" offset="0" />
 			</dataarea>
+			<dataarea name="ram" size="128">
+			</dataarea>
 		</part>
 	</software>
 
@@ -5963,6 +5995,8 @@ Info from Atariage and Atarimania
 			<dataarea name="rom" size="32768">
 				<rom name="fatal run (ultimate driving) (1989) (atari - sculptured software, steve aguirre) (cx26162) (pal).bin" size="32768" crc="991d2348" sha1="d0bb58ea1fc37e929e5f7cdead037bb14a166451" offset="0" />
 			</dataarea>
+			<dataarea name="ram" size="128">
+			</dataarea>
 		</part>
 	</software>
 
@@ -5976,6 +6010,8 @@ Info from Atariage and Atarimania
 			<feature name="slot" value="a26_f4" />
 			<dataarea name="rom" size="32768">
 				<rom name="fatal run (ultimate driving) (1989) (atari - sculptured software, steve aguirre) (cx26162) (prototype).bin" size="32768" crc="60b08497" sha1="59d004547e693aa05bb3333f055163ade2c9ea95" offset="0" />
+			</dataarea>
+			<dataarea name="ram" size="128">
 			</dataarea>
 		</part>
 	</software>
@@ -7921,6 +7957,8 @@ Info from Atariage and Atarimania
 			<dataarea name="rom" size="16384">
 				<rom name="jr. pac-man (1984) (atari - gcc, ava-robin cohen) (cx26123).bin" size="16384" crc="5c345bac" sha1="cd2cf245d6e924ff2100cc93d20223c4a231e160" offset="0" />
 			</dataarea>
+			<dataarea name="ram" size="128">
+			</dataarea>
 		</part>
 	</software>
 
@@ -7934,6 +7972,8 @@ Info from Atariage and Atarimania
 			<feature name="slot" value="a26_f6" />
 			<dataarea name="rom" size="16384">
 				<rom name="jr. pac-man (1984) (atari - gcc, ava-robin cohen) (cx26123, cx26123p) (pal).bin" size="16384" crc="a1aa87dd" sha1="a343d6553fa0367f49752ff8389116cee3605451" offset="0" />
+			</dataarea>
+			<dataarea name="ram" size="128">
 			</dataarea>
 		</part>
 	</software>
@@ -8364,6 +8404,8 @@ Info from Atariage and Atarimania
 			<dataarea name="rom" size="16384">
 				<rom name="klax (1990) (atari - axlon, steve defrisco) (cx26192) (pal).bin" size="16384" crc="a8aaf68b" sha1="45623a1c8fb5074de98c37f005edd5b1d0937dae" offset="0" />
 			</dataarea>
+			<dataarea name="ram" size="128">
+			</dataarea>
 		</part>
 	</software>
 
@@ -8378,6 +8420,8 @@ Info from Atariage and Atarimania
 			<dataarea name="rom" size="16384">
 				<rom name="klax (08-18-1990) (atari - axlon, steve defrisco) (cx26192) (prototype).bin" size="16384" crc="6bc47721" sha1="3162259c6dbfbb57a2ea41d849155702151ee39b" offset="0" />
 			</dataarea>
+			<dataarea name="ram" size="128">
+			</dataarea>
 		</part>
 	</software>
 
@@ -8391,6 +8435,8 @@ Info from Atariage and Atarimania
 			<feature name="slot" value="a26_f6" />
 			<dataarea name="rom" size="16384">
 				<rom name="klax (06-14-1990) (atari - axlon, steve defrisco) (cx26192) (prototype).bin" size="16384" crc="ce778afd" sha1="991089a63734a859c89eb465f3fc074e57c3ee4d" offset="0" />
+			</dataarea>
+			<dataarea name="ram" size="128">
 			</dataarea>
 		</part>
 	</software>
@@ -8923,6 +8969,8 @@ Info from Atariage and Atarimania
 			<dataarea name="rom" size="2048">
 				<rom name="magicard (keyboard controller) (1981) (computer magic - commavid, john bronstein) (cm-001).bin" size="2048" crc="14f126c0" sha1="4c66b84ab0d25e46729bbcf23f985d59ca8520ad" offset="0" />
 			</dataarea>
+			<dataarea name="ram" size="1024">
+			</dataarea>
 		</part>
 	</software>
 
@@ -9102,6 +9150,8 @@ Info from Atariage and Atarimania
 			<feature name="slot" value="a26_e7" />
 			<dataarea name="rom" size="16384">
 				<rom name="masters of the universe - the power of he-man (1983) (m network, connie goldman, joe king, patricia lewis du long, gerald moore, mike sanders, jossef wagner - intv) (mt4319).bin" size="16384" crc="0603e177" sha1="6db8fa65755db86438ada3d90f4c39cc288dcf84" offset="0" />
+			</dataarea>
+			<dataarea name="ram" size="2048">
 			</dataarea>
 		</part>
 	</software>
@@ -9405,6 +9455,8 @@ Info from Atariage and Atarimania
 			<dataarea name="rom" size="16384">
 				<rom name="millipede (1984) (atari, jerome domurat, andrew fuchs, dave staugas, robert vieira) (cx26118).bin" size="16384" crc="ccc82dd0" sha1="0616f0dde6d697816dda92ed9e5a4c3d77a39408" offset="0" />
 			</dataarea>
+			<dataarea name="ram" size="128">
+			</dataarea>
 		</part>
 	</software>
 
@@ -9419,6 +9471,8 @@ Info from Atariage and Atarimania
 			<dataarea name="rom" size="16384">
 				<rom name="millipede (01-04-1984) (atari, jerome domurat, andrew fuchs, dave staugas, robert vieira) (cx26118) (prototype).bin" size="16384" crc="82d88744" sha1="6be6c8c8193e43e9fd0fd37e5344848d5a42bb4f" offset="0" />
 			</dataarea>
+			<dataarea name="ram" size="128">
+			</dataarea>
 		</part>
 	</software>
 
@@ -9432,6 +9486,8 @@ Info from Atariage and Atarimania
 			<feature name="slot" value="a26_f6" />
 			<dataarea name="rom" size="16384">
 				<rom name="millipede (1984) (atari, jerome domurat, andrew fuchs, dave staugas, robert vieira) (cx26118) (prototype).bin" size="16384" crc="41332631" sha1="42e97d1ba19781187e605430fd70049f0450ef75" offset="0" />
+			</dataarea>
+			<dataarea name="ram" size="128">
 			</dataarea>
 		</part>
 	</software>
@@ -9448,6 +9504,8 @@ Info from Atariage and Atarimania
 			<dataarea name="rom" size="16384">
 				<rom name="millipede (1984) (atari, jerome domurat, andrew fuchs, dave staugas, robert vieira) (cx26118, cx26118p) (pal).bin" size="16384" crc="eea33418" sha1="7ba2e2c0b3b66a50692f4dece817368527e29180" offset="0" />
 			</dataarea>
+			<dataarea name="ram" size="128">
+			</dataarea>
 		</part>
 	</software>
 
@@ -9462,6 +9520,8 @@ Info from Atariage and Atarimania
 			<feature name="slot" value="a26_f6" />
 			<dataarea name="rom" size="16384">
 				<rom name="millipede (1984) (atari - gcc) (cx26118) (prototype) (pal).bin" size="16384" crc="dcb13020" sha1="06092998a30e816a97fe9e4d3f27085b913ec9f9" offset="0" />
+			</dataarea>
+			<dataarea name="ram" size="128">
 			</dataarea>
 		</part>
 	</software>
@@ -10088,6 +10148,8 @@ Info from Atariage and Atarimania
 			<dataarea name="rom" size="12288">
 				<rom name="mountain king (1983) (cbs electronics, e.f. dreyer, ed salvo) (4l 2738 0000).bin" size="12288" crc="ed778991" sha1="0a84b0a6bd0e79f5fa0b1bb9112160cb564ab836" offset="0" />
 			</dataarea>
+			<dataarea name="ram" size="256">
+			</dataarea>
 		</part>
 	</software>
 
@@ -10579,6 +10641,8 @@ Info from Atariage and Atarimania
 			<dataarea name="rom" size="16384">
 				<rom name="off the wall (bizarre breakout, peasant king, zip 'n' zap) (1989) (atari - axlon) (cx26168).bin" size="16384" crc="a09779ea" sha1="3dcfe93399044148561586056288c6f8e5c96e2b" offset="0" />
 			</dataarea>
+			<dataarea name="ram" size="128">
+			</dataarea>
 		</part>
 	</software>
 
@@ -10592,6 +10656,8 @@ Info from Atariage and Atarimania
 			<feature name="slot" value="a26_f6" />
 			<dataarea name="rom" size="16384">
 				<rom name="off the wall (bizarre breakout, peasant king, zip 'n' zap) (1989) (atari - axlon) (cx26168) (pal).bin" size="16384" crc="182af080" sha1="9ebc01bd86faceef87432597f1fc5fb6ce088ef5" offset="0" />
+			</dataarea>
+			<dataarea name="ram" size="128">
 			</dataarea>
 		</part>
 	</software>
@@ -10660,6 +10726,8 @@ Info from Atariage and Atarimania
 			<feature name="slot" value="a26_fa" />
 			<dataarea name="rom" size="12288">
 				<rom name="omega race (booster grip) (1983) (cbs electronics) (4l 2737 0000).bin" size="12288" crc="e9876116" sha1="dcaab259e7617c7ac7d349893451896a9ca0e292" offset="0" />
+			</dataarea>
+			<dataarea name="ram" size="256">
 			</dataarea>
 		</part>
 	</software>
@@ -12299,6 +12367,8 @@ Info from Atariage and Atarimania
 			<dataarea name="rom" size="16384">
 				<rom name="radar lock (dog fight) (1989) (atari, douglas neubauer) (cx26176).bin" size="16384" crc="c29f7285" sha1="33f016c941fab01e1e2d0d7ba7930e3bcd8feaa3" offset="0" />
 			</dataarea>
+			<dataarea name="ram" size="128">
+			</dataarea>
 		</part>
 	</software>
 
@@ -12312,6 +12382,8 @@ Info from Atariage and Atarimania
 			<feature name="slot" value="a26_f6" />
 			<dataarea name="rom" size="16384">
 				<rom name="radar lock (dog fight) (1989) (atari, douglas neubauer) (cx26176) (pal).bin" size="16384" crc="d7c72da0" sha1="cb36828a2a23eaf8d736af4790ffd7e948ebbf1e" offset="0" />
+			</dataarea>
+			<dataarea name="ram" size="128">
 			</dataarea>
 		</part>
 	</software>
@@ -13341,6 +13413,8 @@ Info from Atariage and Atarimania
 			<dataarea name="rom" size="16384">
 				<rom name="save mary! (saving mary) (10-24-1991) (atari - axlon, tod frye) (cx26178) (prototype) (pal).bin" size="16384" crc="eb2e801d" sha1="44357b828b3214441d702d4912a1949951d80472" offset="0" />
 			</dataarea>
+			<dataarea name="ram" size="128">
+			</dataarea>
 		</part>
 	</software>
 
@@ -13354,6 +13428,8 @@ Info from Atariage and Atarimania
 			<feature name="slot" value="a26_f6" />
 			<dataarea name="rom" size="16384">
 				<rom name="save mary! (saving mary) (11-21-1989) (atari - axlon, tod frye) (cx26178) (prototype).bin" size="16384" crc="01e18f53" sha1="ecd8ef49ae23ddd3e10ec60839b95c8e7764ea27" offset="0" />
+			</dataarea>
+			<dataarea name="ram" size="128">
 			</dataarea>
 		</part>
 	</software>
@@ -13655,6 +13731,8 @@ Info from Atariage and Atarimania
 			<dataarea name="rom" size="16384">
 				<rom name="secret quest (1989) (atari - axlon, steve defrisco) (cx26170).bin" size="16384" crc="93c9eb47" sha1="af11f1666d345267196a1c35223727e2ef93483a" offset="0" />
 			</dataarea>
+			<dataarea name="ram" size="128">
+			</dataarea>
 		</part>
 	</software>
 
@@ -13668,6 +13746,8 @@ Info from Atariage and Atarimania
 			<feature name="slot" value="a26_f6" />
 			<dataarea name="rom" size="16384">
 				<rom name="secret quest (1989) (atari - axlon, steve defrisco) (cx26170, cx26170p) (pal).bin" size="16384" crc="f4337a77" sha1="8439f2f829152a4bac27736102ae131eac376d0e" offset="0" />
+			</dataarea>
+			<dataarea name="ram" size="128">
 			</dataarea>
 		</part>
 	</software>
@@ -13740,6 +13820,8 @@ Info from Atariage and Atarimania
 			<dataarea name="rom" size="16384">
 				<rom name="shooting arcade (light gun) (09-19-1989) (atari - axlon, tod frye) (cx26169) (prototype).bin" size="16384" crc="6f6fb3d6" sha1="6e6daa34878d3e331c630359c7125a4ffba1b22d" offset="0" />
 			</dataarea>
+			<dataarea name="ram" size="128">
+			</dataarea>
 		</part>
 	</software>
 
@@ -13753,6 +13835,8 @@ Info from Atariage and Atarimania
 			<feature name="slot" value="a26_f6" />
 			<dataarea name="rom" size="16384">
 				<rom name="shooting arcade (light gun) (01-16-1990) (atari - axlon, tod frye) (cx26169) (prototype) (pal).bin" size="16384" crc="1aee6f09" sha1="f20ab57ad7ca60c566376409c8f94c9f1b4003bd" offset="0" />
+			</dataarea>
+			<dataarea name="ram" size="128">
 			</dataarea>
 		</part>
 	</software>
@@ -15099,6 +15183,8 @@ Info from Atariage and Atarimania
 			<dataarea name="rom" size="16384">
 				<rom name="sprint master (sprint 88, sprint 2600) (1988) (atari, robert c. polaro) (cx26155).bin" size="16384" crc="c495904e" sha1="c0e29b86fc1cc41a1c8afa37572c3c5698ae70b2" offset="0" />
 			</dataarea>
+			<dataarea name="ram" size="128">
+			</dataarea>
 		</part>
 	</software>
 
@@ -15112,6 +15198,8 @@ Info from Atariage and Atarimania
 			<feature name="slot" value="a26_f6" />
 			<dataarea name="rom" size="16384">
 				<rom name="sprint master (sprint 88, sprint 2600) (1988) (atari, robert c. polaro) (cx26155p) (pal).bin" size="16384" crc="040f0b14" sha1="dcaac1fac0fe15aaa4553c2fa02b923a6dfb6880" offset="0" />
+			</dataarea>
+			<dataarea name="ram" size="128">
 			</dataarea>
 		</part>
 	</software>
@@ -15591,6 +15679,8 @@ Info from Atariage and Atarimania
 			<dataarea name="rom" size="8192">
 				<rom name="stargate (1984) (atari, andrew fuchs) (cx26120).bin" size="8192" crc="cde3530e" sha1="4f87be0ef16a1d0389226d1fbda9b4c16b06e13e" offset="0" />
 			</dataarea>
+			<dataarea name="ram" size="128">
+			</dataarea>
 		</part>
 	</software>
 
@@ -15604,6 +15694,8 @@ Info from Atariage and Atarimania
 			<feature name="slot" value="a26_f8" />
 			<dataarea name="rom" size="8192">
 				<rom name="stargate (1984) (atari, bill aspromonte, andrew fuchs) (cx26120) (pal).bin" size="8192" crc="d3f6a968" sha1="07920046ed55519797274117f2f8c8c7e530f623" offset="0" />
+			</dataarea>
+			<dataarea name="ram" size="128">
 			</dataarea>
 		</part>
 	</software>
@@ -16043,6 +16135,8 @@ Info from Atariage and Atarimania
 			<dataarea name="rom" size="2048">
 				<rom name="starpath supercharger.bin" size="2048" crc="c3a3f073" sha1="cd9d030a59f5bdcc88f1f80a6cc9fc2cd932f7db" offset="0" />
 			</dataarea>
+			<dataarea name="ram" size="6144">
+			</dataarea>
 		</part>
 	</software>
 
@@ -16116,6 +16210,8 @@ Info from Atariage and Atarimania
 			<dataarea name="rom" size="16384">
 				<rom name="super football (1988) (atari, douglas neubauer) (cx26154).bin" size="16384" crc="c9b16f3c" sha1="eaca6b474fd552ab4aaf75526618828165a91934" offset="0" />
 			</dataarea>
+			<dataarea name="ram" size="128">
+			</dataarea>
 		</part>
 	</software>
 
@@ -16142,6 +16238,8 @@ Info from Atariage and Atarimania
 			<feature name="slot" value="a26_f6" />
 			<dataarea name="rom" size="16384">
 				<rom name="super football (1988) (atari, douglas neubauer) (cx26154, cx26154p) (pal).bin" size="16384" crc="d3004956" sha1="fa8db954eff4302ec518aaf7a477a073c1967a08" offset="0" />
+			</dataarea>
+			<dataarea name="ram" size="128">
 			</dataarea>
 		</part>
 	</software>
@@ -17197,6 +17295,8 @@ Info from Atariage and Atarimania
 			<dataarea name="rom" size="12288">
 				<rom name="tunnel runner (black box) (1983) (cbs electronics, richard k. balaska jr., andy frank, stuart ross) (4l 2520 5000).bin" size="12288" crc="a02745f8" sha1="fc1a0b58765a7dcbd8e33562e1074ddd9e0ac624" offset="0" />
 			</dataarea>
+			<dataarea name="ram" size="256">
+			</dataarea>
 		</part>
 	</software>
 
@@ -17209,6 +17309,8 @@ Info from Atariage and Atarimania
 			<feature name="slot" value="a26_fa" />
 			<dataarea name="rom" size="12288">
 				<rom name="tunnel runner (black box) (1983) (cbs electronics, richard k. balaska jr., andy frank, stuart ross) (4l 2520 5000) (prototype).bin" size="12288" crc="bd2d975a" sha1="af202ee515b41113660bdf4500802108b12f85a3" offset="0" />
+			</dataarea>
+			<dataarea name="ram" size="256">
 			</dataarea>
 		</part>
 	</software>
@@ -17571,6 +17673,8 @@ Info from Atariage and Atarimania
 			<dataarea name="rom" size="2048">
 				<rom name="video life (1981) (commavid, john bronstein) (cm-002).bin" size="2048" crc="34b0b5c2" sha1="3b18db73933747851eba9a0ffa3c12b9f602a95c" offset="0" />
 			</dataarea>
+			<dataarea name="ram" size="1024">
+			</dataarea>
 		</part>
 	</software>
 
@@ -17584,6 +17688,8 @@ Info from Atariage and Atarimania
 			<feature name="slot" value="a26_cv" />
 			<dataarea name="rom" size="2048">
 				<rom name="video life (1981) (commavid, john bronstein) (cm-002) [higher sounds].bin" size="2048" crc="bb1249a9" sha1="08c7c4ab5b25c008cc8a87fb1406b7d12df56124" offset="0" />
+			</dataarea>
+			<dataarea name="ram" size="1024">
 			</dataarea>
 		</part>
 	</software>
@@ -17899,6 +18005,8 @@ Info from Atariage and Atarimania
 			<dataarea name="rom" size="12288">
 				<rom name="wings (10-10-1983) (cbs electronics, stuart ross) (prototype) (pal).bin" size="12288" crc="dd0aa66f" sha1="3e63feca31fb98cc46fdfe90ec69e4937f9defa6" offset="0" />
 			</dataarea>
+			<dataarea name="ram" size="256">
+			</dataarea>
 		</part>
 	</software>
 
@@ -17911,6 +18019,8 @@ Info from Atariage and Atarimania
 			<feature name="slot" value="a26_fa" />
 			<dataarea name="rom" size="12288">
 				<rom name="wings (06-03-1983) (cbs electronics, stuart ross) (prototype).bin" size="12288" crc="5e89b8af" sha1="419e7dd24c810afb8b8e555ed8489853b0bf05d8" offset="0" />
+			</dataarea>
+			<dataarea name="ram" size="256">
 			</dataarea>
 		</part>
 	</software>

@@ -216,6 +216,7 @@ bool vcs_cart_slot_device::call_load()
 		if (software_entry() != NULL)
 		{
 			const char *pcb_name;
+			bool has_ram = get_software_region("ram") ? TRUE : FALSE;
 			memcpy(ROM, get_software_region("rom"), len);
 			
 			if ((pcb_name = get_feature("slot")) != NULL)
@@ -258,44 +259,46 @@ bool vcs_cart_slot_device::call_load()
 						printf("Unrecognized cart type!\n");
 						break;
 				}
-				
 			}
+
+			if (has_ram)
+				m_cart->ram_alloc(get_software_region_length("ram"));
 		}
 		else
 		{
 			fread(ROM, len);
 			m_type = identify_cart_type(ROM, len);
+			
+			// check for Special Chip (128bytes of RAM)
+			if (len == 0x2000 || len == 0x4000 || len == 0x8000)
+				if (detect_super_chip(ROM, len))
+				{
+					m_cart->ram_alloc(0x80);
+					//printf("Super Chip detected!\n");
+				}
+			// Super chip games:
+			// dig dig, crystal castles, millipede, stargate, defender ii, jr. Pac Man,
+			// desert falcon, dark chambers, super football, sprintmaster, fatal run,
+			// off the wall, shooting arcade, secret quest, radar lock, save mary, klax
+			
+			// add CBS RAM+ (256bytes of RAM)
+			if (m_type == A26_FA)
+				m_cart->ram_alloc(0x100);
+			// add M Network RAM
+			else if (m_type == A26_E7)
+				m_cart->ram_alloc(0x800);
+			// add Commavid RAM
+			else if (m_type == A26_CV)
+				m_cart->ram_alloc(0x400);
+			// add Starpath Superchager RAM
+			else if (m_type == A26_SS)
+				m_cart->ram_alloc(0x1800);
+			// add Boulder Dash RAM
+			else if (m_type == A26_3E)
+				m_cart->ram_alloc(0x8000);
 		}
 		
 		//printf("Type: %s\n", vcs_get_slot(m_type));
-		
-		// check for Special Chip (128bytes of RAM)
-		if (len == 0x2000 || len == 0x4000 || len == 0x8000)
-			if (detect_super_chip(ROM, len))
-			{
-				m_cart->ram_alloc(0x80);
-				//printf("Super Chip detected!\n");
-			}
-		// Super chip games:
-		// dig dig, crystal castles, millipede, stargate, defender ii, jr. Pac Man,
-		// desert falcon, dark chambers, super football, sprintmaster, fatal run,
-		// off the wall, shooting arcade, secret quest, radar lock, save mary, klax
-		
-		// add CBS RAM+ (128bytes of RAM)
-		if (m_type == A26_FA)
-			m_cart->ram_alloc(0x100);
-		// add M Network RAM
-		else if (m_type == A26_E7)
-			m_cart->ram_alloc(0x800);
-		// add Commavid RAM
-		else if (m_type == A26_CV)
-			m_cart->ram_alloc(0x400);
-		// add Starpath Superchager RAM
-		else if (m_type == A26_SS)
-			m_cart->ram_alloc(0x1800);
-		// add Boulder Dash RAM
-		else if (m_type == A26_3E)
-			m_cart->ram_alloc(0x8000);
 		
 		// pass a pointer to the now allocated ROM for the DPC chip
 		if (m_type == A26_DPC)
