@@ -322,7 +322,7 @@ static MACHINE_CONFIG_START( wpc_dot, wpc_dot_state )
 MACHINE_CONFIG_END
 
 /*-----------------
-/ Gilligan's Island
+/ Gilligan's Island #20003
 /------------------*/
 ROM_START(gi_l9)
 	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
@@ -401,7 +401,7 @@ ROM_START(gi_l6)
 ROM_END
 
 /*-----------------
-/ Hot Shot
+/ Hot Shot #60017
 /------------------*/
 ROM_START(hshot_p8)
 	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
@@ -416,7 +416,7 @@ ROM_START(hshot_p8)
 ROM_END
 
 /*-----------------
-/  Hurricane
+/  Hurricane #50012
 /------------------*/
 ROM_START(hurr_l2)
 	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
@@ -438,7 +438,7 @@ ROM_START(hurr_l2)
 ROM_END
 
 /*-----------------
-/  Party Zone
+/  Party Zone #20004
 /------------------*/
 ROM_START(pz_f4)
 	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
@@ -509,7 +509,7 @@ ROM_START(pz_l3)
 ROM_END
 
 /*--------------------
-/ Slugfest baseball
+/ Slugfest baseball #60001,60021
 /--------------------*/
 ROM_START(sf_l1)
 	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
@@ -531,7 +531,7 @@ ROM_START(sf_l1)
 ROM_END
 
 /*-----------------
-/  Terminator 2: Judgment Day
+/  Terminator 2: Judgment Day #50013
 /------------------*/
 ROM_START(t2_l8)
 	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)

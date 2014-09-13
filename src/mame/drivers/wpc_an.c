@@ -337,7 +337,7 @@ static MACHINE_CONFIG_START( wpc_an_dd, wpc_an_state )
 MACHINE_CONFIG_END
 
 /*-----------------
-/  Dr. Dude
+/  Dr. Dude #2016
 /------------------*/
 ROM_START(dd_p7)
 	ROM_REGION(0x30000, "maincpu", ROMREGION_ERASEFF)
@@ -362,7 +362,7 @@ ROM_START(dd_p06)
 ROM_END
 
 /*-------------
-/ Funhouse
+/ Funhouse #50003
 /--------------*/
 ROM_START(fh_l9)
 	ROM_REGION(0x50000, "maincpu", ROMREGION_ERASEFF)
@@ -486,7 +486,7 @@ ROM_END
 
 
 /*-----------------
-/  Harley Davidson
+/  Harley Davidson #20001
 /------------------*/
 ROM_START(hd_l3)
 	ROM_REGION(0x30000, "maincpu", ROMREGION_ERASEFF)
@@ -521,7 +521,7 @@ ROM_START(hd_l1)
 ROM_END
 
 /*-----------------
-/  The Machine: Bride of Pinbot
+/  The Machine: Bride of Pinbot #50001
 /------------------*/
 ROM_START(bop_l7)
 	ROM_REGION(0x50000, "maincpu", ROMREGION_ERASEFF)

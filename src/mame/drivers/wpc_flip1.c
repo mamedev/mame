@@ -178,7 +178,7 @@ static MACHINE_CONFIG_START( wpc_flip1, wpc_flip1_state )
 MACHINE_CONFIG_END
 
 /*-----------------
-/  The Addams Family
+/  The Addams Family #20017
 /------------------*/
 ROM_START(taf_p2)
 	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)

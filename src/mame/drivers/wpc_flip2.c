@@ -207,7 +207,7 @@ static MACHINE_CONFIG_START( wpc_flip2, wpc_flip2_state )
 MACHINE_CONFIG_END
 
 /*-----------------
-/  Black Rose
+/  Black Rose #20013
 /------------------*/
 ROM_START(br_l4)
 	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
@@ -278,7 +278,7 @@ ROM_START(br_l3)
 ROM_END
 
 /*-----------------
-/  Bram Stoker's Dracula
+/  Bram Stoker's Dracula #50001
 /------------------*/
 ROM_START(drac_l1)
 	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
@@ -301,7 +301,7 @@ ROM_START(drac_p11)
 ROM_END
 
 /*-----------------
-/  Creature from the Black Lagoon
+/  Creature from the Black Lagoon #20018
 /------------------*/
 ROM_START(cftbl_l4)
 	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
@@ -330,7 +330,7 @@ ROM_START(cftbl_l3)
 ROM_END
 
 /*-----------------
-/  Doctor Who
+/  Doctor Who #20006
 /------------------*/
 ROM_START(dw_l2)
 	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
@@ -372,7 +372,7 @@ ROM_START(dw_p5)
 ROM_END
 
 /*-----------------
-/  Fish Tales
+/  Fish Tales #50005
 /------------------*/
 ROM_START(ft_l5)
 	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
@@ -407,7 +407,7 @@ ROM_START(ft_p4)
 ROM_END
 
 /*-----------------
-/  The Addams Family Special Collectors Edition
+/  The Addams Family Special Collectors Edition #50038
 /------------------*/
 ROM_START(tafg_lx3)
 	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
@@ -449,7 +449,7 @@ ROM_START(tafg_la3)
 	ROM_LOAD("ag_u18_s.l1", 0x100000, 0x80000, CRC(02e824a9) SHA1(ed8aa5161ea6c12cc9e646939290d848408a59a3))
 ROM_END
 /*-----------------
-/  The Getaway: High Speed II
+/  The Getaway: High Speed II #50004
 /------------------*/
 ROM_START(gw_l5)
 	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
@@ -507,7 +507,7 @@ ROM_START(gw_p7)
 	ROM_LOAD("u18-sp1.rom", 0x100000, 0x80000, CRC(fc5a5ff6) SHA1(bbe810135e05f81d1399ee0cb490ee93d6f9bb03))
 ROM_END
 /*-----------------
-/  Twilight Zone
+/  Twilight Zone #50020
 /------------------*/
 ROM_START(tz_92)
 	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
@@ -670,7 +670,7 @@ ROM_START(tz_p4)
 ROM_END
 
 /*-----------------
-/  White Water
+/  White Water #50018
 /------------------*/
 ROM_START(ww_l5)
 	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)

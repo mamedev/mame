@@ -2261,7 +2261,7 @@ static MACHINE_CONFIG_START( wpc_95, wpc_95_state )
 MACHINE_CONFIG_END
 
 /*-----------------
-/  Attack From Mars
+/  Attack From Mars #50041
 /------------------*/
 ROM_START(afm_11)
 	ROM_REGION(0x100000, "maincpu", 0)
@@ -2312,7 +2312,7 @@ ROM_START(afm_11u)
 ROM_END
 
 /*-----------------
-/  Cactus Canyon
+/  Cactus Canyon #50066
 /------------------*/
 ROM_START(cc_12)
 	ROM_REGION(0x100000, "maincpu", 0)
@@ -2363,7 +2363,7 @@ ROM_START(cc_104)
 ROM_END
 
 /*-----------------
-/  Cirqus Voltaire
+/  Cirqus Voltaire #50062
 /------------------*/
 ROM_START(cv_14)
 	ROM_REGION(0x100000, "maincpu", 0)
@@ -2426,7 +2426,7 @@ ROM_START(cv_13)
 ROM_END
 
 /*-----------------
-/  Congo
+/  Congo #50050
 /------------------*/
 ROM_START(congo_21)
 	ROM_REGION(0x100000, "maincpu", 0)
@@ -2469,7 +2469,7 @@ ROM_START(congo_11)
 ROM_END
 
 /*-----------------
-/  Junk Yard
+/  Junk Yard #50052
 /------------------*/
 ROM_START(jy_12)
 	ROM_REGION(0x100000, "maincpu", 0)
@@ -2507,7 +2507,7 @@ ROM_START(jy_03)
 ROM_END
 
 /*-----------------
-/  Medieval Madness
+/  Medieval Madness #50059
 /------------------*/
 ROM_START(mm_109)
 	ROM_REGION(0x100000, "maincpu", 0)
@@ -2585,7 +2585,7 @@ ROM_START(mm_05)
 ROM_END
 
 /*-----------------
-/  Monster Bash
+/  Monster Bash #50065
 /------------------*/
 ROM_START(mb_106)
 	ROM_REGION(0x100000, "maincpu", 0)
@@ -2627,7 +2627,7 @@ ROM_START(mb_10)
 ROM_END
 
 /*-----------------
-/  NBA Fastbreak
+/  NBA Fastbreak #50053
 /------------------*/
 ROM_START(nbaf_31)
 	ROM_REGION(0x100000, "maincpu", 0)
@@ -2745,7 +2745,7 @@ ROM_START(nbaf_23)
 ROM_END
 
 /*-----------------
-/  No Good Gofers
+/  No Good Gofers #50061
 /------------------*/
 ROM_START(ngg_13)
 	ROM_REGION(0x100000, "maincpu", 0)
@@ -2787,7 +2787,7 @@ ROM_START(ngg_p06)
 ROM_END
 
 /*-----------------
-/  Safe Cracker
+/  Safe Cracker #90003
 /------------------*/
 ROM_START(sc_18)
 	ROM_REGION(0x100000, "maincpu", 0)
@@ -2860,7 +2860,7 @@ ROM_START(sc_091)
 ROM_END
 
 /*-----------------
-/  Scared Stiff
+/  Scared Stiff #50048
 /------------------*/
 ROM_START(ss_15)
 	ROM_REGION(0x100000, "maincpu", 0)
@@ -2913,7 +2913,7 @@ ROM_START(ss_01)
 ROM_END
 
 /*-----------------
-/  Tales Of The Arabian Nights
+/  Tales Of The Arabian Nights #50047
 /------------------*/
 ROM_START(totan_14)
 	ROM_REGION(0x100000, "maincpu", 0)
@@ -2964,7 +2964,7 @@ ROM_START(totan_04)
 ROM_END
 
 /*-----------------
-/  The Champion Pub
+/  The Champion Pub #50063
 /------------------*/
 ROM_START(cp_16)
 	ROM_REGION(0x100000, "maincpu", 0)
@@ -2995,7 +2995,7 @@ ROM_START(cp_15)
 ROM_END
 
 /*-------------
-/ Ticket Tac Toe
+/ Ticket Tac Toe #90005
 /--------------*/
 ROM_START(ttt_10)
 	ROM_REGION(0x100000, "maincpu", 0)

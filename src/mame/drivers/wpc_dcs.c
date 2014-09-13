@@ -436,7 +436,7 @@ static MACHINE_CONFIG_START( wpc_dcs, wpc_dcs_state )
 MACHINE_CONFIG_END
 
 /*-------------
-/ Demolition Man
+/ Demolition Man #50028
 /--------------*/
 ROM_START(dm_pa2)
 	ROM_REGION(0x80000, "maincpu", 0)
@@ -527,7 +527,7 @@ ROM_START(dm_h6)
 ROM_END
 
 /*-----------------
-/  Indiana Jones
+/  Indiana Jones #50017
 /------------------*/
 ROM_START(ij_l7)
 	ROM_REGION(0x80000, "maincpu", 0)
@@ -608,7 +608,7 @@ ROM_START(ij_l3)
 ROM_END
 
 /*-----------------
-/  Judge Dredd
+/  Judge Dredd #20020
 /------------------*/
 ROM_START(jd_l7)
 	ROM_REGION(0x80000, "maincpu", 0)
@@ -681,7 +681,7 @@ ROM_START(jd_l4)
 ROM_END
 
 /*-----------------
-/ Popeye Saves The Earth
+/ Popeye Saves The Earth #50022
 /------------------*/
 ROM_START(pop_lx5)
 	ROM_REGION(0x80000, "maincpu", 0)
@@ -721,7 +721,7 @@ ROM_END
 
 
 /*-----------------
-/ Star Trek: The Next Generation
+/ Star Trek: The Next Generation #50023
 /------------------*/
 ROM_START(sttng_l7)
 	ROM_REGION(0x80000, "maincpu", 0)

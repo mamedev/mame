@@ -1983,7 +1983,7 @@ static MACHINE_CONFIG_START( wpc_s, wpc_s_state )
 MACHINE_CONFIG_END
 
 /*-----------------
-/  Corvette
+/  Corvette #50036
 /------------------*/
 ROM_START(corv_21)
 	ROM_REGION(0x80000, "maincpu", 0)
@@ -2046,7 +2046,7 @@ ROM_START(corv_la1)
 ROM_END
 
 /*-----------------
-/  Dirty Harry
+/  Dirty Harry #50030
 /------------------*/
 ROM_START(dh_lx2)
 	ROM_REGION(0x80000, "maincpu", 0)
@@ -2060,7 +2060,7 @@ ROM_START(dh_lx2)
 ROM_END
 
 /*-----------------
-/  Indianapolis 500
+/  Indianapolis 500 #50026
 /------------------*/
 ROM_START(i500_11r)
 	ROM_REGION(0x80000, "maincpu", 0)
@@ -2099,7 +2099,7 @@ ROM_START(i500_10r)
 ROM_END
 
 /*-----------------
-/  Jack*Bot
+/  Jack*Bot #50051
 /------------------*/
 ROM_START(jb_10r)
 	ROM_REGION(0x80000, "maincpu", 0)
@@ -2124,7 +2124,7 @@ ROM_START(jb_10b)
 ROM_END
 
 /*-----------------
-/  Johnny Mnemonic
+/  Johnny Mnemonic #50042
 /------------------*/
 ROM_START(jm_12r)
 	ROM_REGION(0x80000, "maincpu", 0)
@@ -2166,7 +2166,7 @@ ROM_START(jm_05r)
 ROM_END
 
 /*-----------------
-/  No Fear: Dangerous Sports
+/  No Fear: Dangerous Sports #50025
 /------------------*/
 ROM_START(nf_23x)
 	ROM_REGION(0x80000, "maincpu", 0)
@@ -2241,7 +2241,7 @@ ROM_START(nf_10)
 ROM_END
 
 /*-----------------
-/  Red and Ted's Road Show
+/  Red and Ted's Road Show #50024
 /------------------*/
 ROM_START(rs_l6)
 	ROM_REGION(0x80000, "maincpu", 0)
@@ -2335,7 +2335,7 @@ ROM_START(rs_lx2)
 ROM_END
 
 /*-----------------
-/  The Flintstones
+/  The Flintstones #50029
 /------------------*/
 ROM_START(fs_lx5)
 	ROM_REGION(0x80000, "maincpu", 0)
@@ -2394,11 +2394,11 @@ ROM_START(fs_lx4)
 ROM_END
 
 /*-------------
-/ The Pinball Circus
+/ The Pinball Circus #60020
 /--------------*/
 
 /*-----------------
-/  The Shadow
+/  The Shadow #50032
 /------------------*/
 ROM_START(ts_lh6)
 	ROM_REGION(0x80000, "maincpu", 0)
@@ -2497,7 +2497,7 @@ ROM_START(ts_lm6)
 ROM_END
 
 /*-----------------
-/  Theatre Of Magic
+/  Theatre Of Magic #50039
 /------------------*/
 ROM_START(tom_14h)
 	ROM_REGION(0x80000, "maincpu", 0)
@@ -2560,7 +2560,7 @@ ROM_START(tom_06)
 ROM_END
 
 /*-----------------
-/  Who Dunnit
+/  Who Dunnit #50044
 /------------------*/
 ROM_START(wd_12)
 	ROM_REGION(0x80000, "maincpu", 0)
@@ -2659,7 +2659,7 @@ ROM_START(wd_048r)
 ROM_END
 
 /*--------------
-/  World Cup Soccer
+/  World Cup Soccer #50031
 /---------------*/
 ROM_START(wcs_l2)
 	ROM_REGION(0x80000, "maincpu", 0)
