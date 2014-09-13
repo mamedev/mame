@@ -19,6 +19,9 @@
 
 // MAME headers
 #include "osdcore.h"
+
+#include "winsync.h"
+
 #include "eminline.h"
 
 
@@ -27,9 +30,6 @@
 //============================================================
 
 #define KEEP_STATISTICS         (0)
-#define USE_SCALABLE_LOCKS      (0)
-
-
 
 //============================================================
 //  PARAMETERS
@@ -79,21 +79,6 @@ INLINE void osd_yield_processor(void)
 //  TYPE DEFINITIONS
 //============================================================
 
-struct scalable_lock
-{
-#if USE_SCALABLE_LOCKS
-	struct
-	{
-		volatile INT32  haslock;        // do we have the lock?
-		INT32           filler[64/4-1]; // assumes a 64-byte cache line
-	} slot[WORK_MAX_THREADS];           // one slot per thread
-	volatile INT32      nextindex;      // index of next slot to use
-#else
-	CRITICAL_SECTION    section;
-#endif
-};
-
-
 struct work_thread_info
 {
 	osd_work_queue *    queue;          // pointer back to the queue
@@ -113,7 +98,7 @@ struct work_thread_info
 
 struct osd_work_queue
 {
-	scalable_lock       lock;           // lock for protecting the queue
+	osd_scalable_lock * lock;           // lock for protecting the queue
 	osd_work_item * volatile list;      // list of items in the queue
 	osd_work_item ** volatile tailptr;  // pointer to the tail pointer of work items in the queue
 	osd_work_item * volatile free;      // free list of work items
@@ -162,63 +147,6 @@ static unsigned __stdcall worker_thread_entry(void *param);
 static void worker_thread_process(osd_work_queue *queue, work_thread_info *thread);
 
 
-
-//============================================================
-//  Scalable Locks
-//============================================================
-
-INLINE void scalable_lock_init(scalable_lock *lock)
-{
-	memset(lock, 0, sizeof(*lock));
-#if USE_SCALABLE_LOCKS
-	lock->slot[0].haslock = TRUE;
-#else
-	InitializeCriticalSection(&lock->section);
-#endif
-}
-
-
-INLINE INT32 scalable_lock_acquire(scalable_lock *lock)
-{
-#if USE_SCALABLE_LOCKS
-	INT32 myslot = (atomic_increment32(&lock->nextindex) - 1) & (WORK_MAX_THREADS - 1);
-	INT32 backoff = 1;
-
-	while (!lock->slot[myslot].haslock)
-	{
-		INT32 backcount;
-		for (backcount = 0; backcount < backoff; backcount++)
-			osd_yield_processor();
-		backoff <<= 1;
-	}
-	lock->slot[myslot].haslock = FALSE;
-	return myslot;
-#else
-	EnterCriticalSection(&lock->section);
-	return 0;
-#endif
-}
-
-
-INLINE void scalable_lock_release(scalable_lock *lock, INT32 myslot)
-{
-#if USE_SCALABLE_LOCKS
-	atomic_exchange32(&lock->slot[(myslot + 1) & (WORK_MAX_THREADS - 1)].haslock, TRUE);
-#else
-	LeaveCriticalSection(&lock->section);
-#endif
-}
-
-
-INLINE void scalable_lock_delete(scalable_lock *lock)
-{
-#if USE_SCALABLE_LOCKS
-#else
-	DeleteCriticalSection(&lock->section);
-#endif
-}
-
-
 //============================================================
 //  osd_work_queue_alloc
 //============================================================
@@ -246,7 +174,9 @@ osd_work_queue *osd_work_queue_alloc(int flags)
 		goto error;
 
 	// initialize the critical section
-	scalable_lock_init(&queue->lock);
+	queue->lock = osd_scalable_lock_alloc();
+	if (queue->lock == NULL)
+		goto error;
 
 	// determine how many threads to create...
 	// on a single-CPU system, create 1 thread for I/O queues, and 0 threads for everything else
@@ -341,7 +271,6 @@ int osd_work_queue_wait(osd_work_queue *queue, osd_ticks_t timeout)
 	if (queue->flags & WORK_QUEUE_FLAG_MULTI)
 	{
 		work_thread_info *thread = &queue->thread[queue->threads];
-		osd_ticks_t stopspin = osd_ticks() + timeout;
 
 		end_timing(thread->waittime);
 
@@ -351,6 +280,8 @@ int osd_work_queue_wait(osd_work_queue *queue, osd_ticks_t timeout)
 		// if we're a high frequency queue, spin until done
 		if (queue->flags & WORK_QUEUE_FLAG_HIGH_FREQ)
 		{
+			osd_ticks_t stopspin = osd_ticks() + timeout;
+
 			// spin until we're done
 			begin_timing(thread->spintime);
 			while (queue->items != 0 && osd_ticks() < stopspin)
@@ -435,8 +366,6 @@ void osd_work_queue_free(osd_work_queue *queue)
 	if (queue->thread != NULL)
 		free(queue->thread);
 
-	scalable_lock_delete(&queue->lock);
-
 	// free all the events
 	if (queue->doneevent != NULL)
 		CloseHandle(queue->doneevent);
@@ -468,6 +397,7 @@ void osd_work_queue_free(osd_work_queue *queue)
 	printf("Spin loops     = %9d\n", queue->spinloops);
 #endif
 
+	osd_scalable_lock_free(queue->lock);
 	// free the queue itself
 	free(queue);
 }
@@ -522,10 +452,10 @@ osd_work_item *osd_work_item_queue_multiple(osd_work_queue *queue, osd_work_call
 	}
 
 	// enqueue the whole thing within the critical section
-	lockslot = scalable_lock_acquire(&queue->lock);
+	lockslot = osd_scalable_lock_acquire(queue->lock);
 	*queue->tailptr = itemlist;
 	queue->tailptr = item_tailptr;
-	scalable_lock_release(&queue->lock, lockslot);
+	osd_scalable_lock_release(queue->lock, lockslot);
 
 	// increment the number of items in the queue
 	atomic_add32(&queue->items, numitems);
@@ -732,7 +662,7 @@ static void worker_thread_process(osd_work_queue *queue, work_thread_info *threa
 		INT32 lockslot;
 
 		// use a critical section to synchronize the removal of items
-		lockslot = scalable_lock_acquire(&queue->lock);
+		lockslot = osd_scalable_lock_acquire(queue->lock);
 		{
 			// pull the item from the queue
 			item = (osd_work_item *)queue->list;
@@ -743,7 +673,7 @@ static void worker_thread_process(osd_work_queue *queue, work_thread_info *threa
 					queue->tailptr = (osd_work_item **)&queue->list;
 			}
 		}
-		scalable_lock_release(&queue->lock, lockslot);
+		osd_scalable_lock_release(queue->lock, lockslot);
 
 		// process non-NULL items
 		if (item != NULL)

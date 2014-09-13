@@ -156,6 +156,10 @@ void osd_scalable_lock_release(osd_scalable_lock *lock, INT32 myslot)
 
 void osd_scalable_lock_free(osd_scalable_lock *lock)
 {
+#if USE_SCALABLE_LOCKS
+#else
+	DeleteCriticalSection(&lock->section);
+#endif
 	free(lock);
 }
 

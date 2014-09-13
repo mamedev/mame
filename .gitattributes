@@ -9556,6 +9556,7 @@ src/osd/windows/winprefix.h svneol=native#text/plain
 src/osd/windows/winptty.c svneol=native#text/plain
 src/osd/windows/winsocket.c svneol=native#text/plain
 src/osd/windows/winsync.c svneol=native#text/plain
+src/osd/windows/winsync.h svneol=native#text/plain
 src/osd/windows/wintime.c svneol=native#text/plain
 src/osd/windows/winutf8.c svneol=native#text/plain
 src/osd/windows/winutf8.h svneol=native#text/plain

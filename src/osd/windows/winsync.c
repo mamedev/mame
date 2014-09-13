@@ -21,6 +21,7 @@
 //============================================================
 
 #define DEBUG_SLOW_LOCKS    0
+#define USE_SCALABLE_LOCKS      (0)
 
 
 
@@ -35,6 +36,19 @@ struct osd_lock
 	CRITICAL_SECTION    critsect;
 };
 
+struct osd_scalable_lock
+{
+#if USE_SCALABLE_LOCKS
+	struct
+	{
+		volatile INT32  haslock;        // do we have the lock?
+		INT32           filler[64/4-1]; // assumes a 64-byte cache line
+	} slot[WORK_MAX_THREADS];           // one slot per thread
+	volatile INT32      nextindex;      // index of next slot to use
+#else
+	CRITICAL_SECTION    section;
+#endif
+};
 
 
 //============================================================
@@ -168,4 +182,65 @@ INT32 win_atomic_exchange32(INT32 volatile *ptr, INT32 exchange)
 INT32 win_atomic_add32(INT32 volatile *ptr, INT32 delta)
 {
 	return InterlockedExchangeAdd((LONG *) ptr, delta) + delta;
+}
+
+//============================================================
+//  Scalable Locks
+//============================================================
+
+osd_scalable_lock *osd_scalable_lock_alloc(void)
+{
+	osd_scalable_lock *lock;
+
+	lock = (osd_scalable_lock *)calloc(1, sizeof(*lock));
+
+	memset(lock, 0, sizeof(*lock));
+#if USE_SCALABLE_LOCKS
+	lock->slot[0].haslock = TRUE;
+#else
+	InitializeCriticalSection(&lock->section);
+#endif
+	return lock;
+}
+
+
+INT32 osd_scalable_lock_acquire(osd_scalable_lock *lock)
+{
+#if USE_SCALABLE_LOCKS
+	INT32 myslot = (atomic_increment32(&lock->nextindex) - 1) & (WORK_MAX_THREADS - 1);
+	INT32 backoff = 1;
+
+	while (!lock->slot[myslot].haslock)
+	{
+		INT32 backcount;
+		for (backcount = 0; backcount < backoff; backcount++)
+			osd_yield_processor();
+		backoff <<= 1;
+	}
+	lock->slot[myslot].haslock = FALSE;
+	return myslot;
+#else
+	EnterCriticalSection(&lock->section);
+	return 0;
+#endif
+}
+
+
+void osd_scalable_lock_release(osd_scalable_lock *lock, INT32 myslot)
+{
+#if USE_SCALABLE_LOCKS
+	atomic_exchange32(&lock->slot[(myslot + 1) & (WORK_MAX_THREADS - 1)].haslock, TRUE);
+#else
+	LeaveCriticalSection(&lock->section);
+#endif
+}
+
+
+void osd_scalable_lock_free(osd_scalable_lock *lock)
+{
+#if USE_SCALABLE_LOCKS
+#else
+	DeleteCriticalSection(&lock->section);
+#endif
+	free(lock);
 }
