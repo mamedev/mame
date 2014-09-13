@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:etabeta
 #ifndef __A800_SPARTA_H
 #define __A800_SPARTA_H
 

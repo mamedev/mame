@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:etabeta
 #ifndef __A78_XBOARD_H
 #define __A78_XBOARD_H
 

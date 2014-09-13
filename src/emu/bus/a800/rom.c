@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:etabeta
 /***********************************************************************************************************
 
  A800/A5200/XEGS ROM cart emulation

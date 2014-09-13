@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:etabeta
 /***********************************************************************************************************
 
  A7800 XBoarD & XM expansions emulation
