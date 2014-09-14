@@ -1197,6 +1197,7 @@ void geneve_mapper_device::device_reset()
 	m_cartridge_secondpage = false;
 	m_cartridge6_writable = false;
 	m_cartridge7_writable = false;
+	m_grom_address = 0;
 
 	// Clear map
 	for (int i=0; i < 8; i++) m_map[i] = 0;
