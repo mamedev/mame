@@ -47,11 +47,13 @@
 #include "ssi2001.h"
 #include "stereo_fx.h"
 #include "dectalk.h"
+#include "sb16.h"
 
 // network
 #include "3c503.h"
 #include "ne1000.h"
 #include "ne2000.h"
+#include "3c505.h"
 
 // communication ports
 #include "lpt.h"
