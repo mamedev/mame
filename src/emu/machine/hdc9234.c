@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Michael Zapf
 /**************************************************************************
 
     HDC9234 Hard and Floppy Disk Controller
@@ -190,6 +192,8 @@ enum
 	OUT2_HEADSEL    = 0x0f
 };
 
+#define NODRIVE -1
+
 enum
 {
 	TYPE_AT = 0x00,
@@ -229,6 +233,13 @@ static const int step_flop8[]   = { 218, 500, 1000, 2000, 4000, 8000, 16000, 320
 static const int step_flop5[]   = { 436, 1000, 2000, 4000, 8000, 16000, 32000, 64000 };
 
 /*
+    Head load timer increments in usec. Delay value is calculated from this value
+    multiplied by the factor in the DATA/DELAY register. For FM mode all
+    values are doubled. The values depend on the drive type.
+*/
+static const int head_load_timer_increment[] = { 200, 200, 2000, 4000 };
+
+/*
     ID fields association to registers
 */
 static const int id_field[] = { CURRENT_CYLINDER, CURRENT_HEAD, CURRENT_SECTOR, CURRENT_SIZE, CURRENT_CRC1, CURRENT_CRC2 };
@@ -265,6 +276,7 @@ enum
 	RESTORE_CHECK1,
 	RESTORE_CHECK2,
 	SEEK_COMPLETE,
+	HEAD_DELAY,
 
 	READ_ID = 0x40,
 	READ_ID1,
@@ -312,7 +324,7 @@ enum
 
 const hdc9234_device::cmddef hdc9234_device::s_command[] =
 {
-	{ 0x00, 0xff, &hdc9234_device::device_reset },
+	{ 0x00, 0xff, &hdc9234_device::reset_controller },
 	{ 0x01, 0xff, &hdc9234_device::drive_deselect },
 	{ 0x02, 0xfe, &hdc9234_device::restore_drive },
 	{ 0x04, 0xfc, &hdc9234_device::step_drive },
@@ -510,7 +522,7 @@ void hdc9234_device::read_id(int& cont, bool implied_seek)
 			// If an error occured (no IDAM found), terminate the command
 			if ((m_register_r[CHIP_STATUS] & CS_SYNCERR) != 0)
 			{
-				logerror("%s: READ_ID failed to find an IDAM\n", tag());
+				logerror("%s: READ_ID failed to find any IDAM\n", tag());
 				cont = ERROR;
 				break;
 			}
@@ -602,7 +614,7 @@ void hdc9234_device::verify(int& cont, bool verify_all)
 			// (This test is only relevant when we did not have a seek phase before)
 			if ((m_register_r[CHIP_STATUS] & CS_SYNCERR) != 0)
 			{
-				logerror("%s: VERIFY failed to find an IDAM\n", tag());
+				logerror("%s: VERIFY failed to find any IDAM\n", tag());
 				cont = ERROR;
 				break;
 			}
@@ -853,39 +865,22 @@ void hdc9234_device::data_transfer(int& cont)
 // ===========================================================================
 
 /*
+    RESET
+*/
+void hdc9234_device::reset_controller()
+{
+	if (TRACE_COMMAND) logerror("%s: RESET command\n", tag());
+	device_reset();
+}
+/*
     DESELECT DRIVE
-    done when no drive is in use
 */
 void hdc9234_device::drive_deselect()
 {
 	if (TRACE_COMMAND) logerror("%s: DESELECT command\n", tag());
-	set_bits(m_output1, OUT1_DRVSEL3|OUT1_DRVSEL2|OUT1_DRVSEL1|OUT1_DRVSEL0, false);
+	m_selected_drive_number = NODRIVE;
 	auxbus_out();
 	set_command_done(TC_SUCCESS);
-}
-
-/*
-    Step on / off; used by RESTORE and STEP IN/OUT
-*/
-void hdc9234_device::step_on(bool towards00, int next)
-{
-	if (TRACE_ACT) logerror("%s: substate STEP_ON\n", tag());
-
-	// STEPDIR = 0 -> towards TRK00
-	set_bits(m_output2, OUT2_STEPDIR, !towards00);
-
-	// Raising edge (note that all signals must be inverted before leading them to the drive)
-	set_bits(m_output2, OUT2_STEPPULSE, true);
-	auxbus_out();
-	wait_time(m_timer, pulse_width(), next);
-}
-
-void hdc9234_device::step_off(int next)
-{
-	if (TRACE_ACT) logerror("%s: substate STEP_OFF\n", tag());
-	set_bits(m_output2, OUT2_STEPPULSE, false);
-	auxbus_out();
-	wait_time(m_timer, step_time(), next);
 }
 
 /*
@@ -1023,34 +1018,55 @@ void hdc9234_device::step_drive()
 
 void hdc9234_device::drive_select()
 {
-	int driveparm = current_command() & 0x1f;
+	int cont = CONTINUE;
+	int head_load_delay = 0;
 
-	m_output1 = (0x10 << (driveparm & 0x03)) | (m_register_w[RETRY_COUNT]&0x0f);
-
-	// The drive type is used to configure DMA burst mode ([1], p.12)
-	// and to select the timing parameters
-	m_selected_drive_type = (driveparm>>2) & 0x03;
-	m_head_load_delay_enable = (driveparm>>4)&0x01;
-
-	if (TRACE_COMMAND) logerror("%s: DRIVE SELECT command (%02x): head load delay=%d, type=%d, drive=%d, pout=%02x\n", tag(), current_command(), m_head_load_delay_enable, m_selected_drive_type, driveparm&3, m_register_w[RETRY_COUNT]&0x0f);
-
-	if (m_substate != UNDEF)
+	if (m_substate == UNDEF)
 	{
-		logerror("%s: substate = %d\n", tag(), m_substate);
+		int driveparm = current_command() & 0x1f;
+		bool head_load_delay_enable = (driveparm & 0x10)!=0;
+
+		// The drive type is used to configure DMA burst mode ([1], p.12)
+		// and to select the timing parameters
+		m_selected_drive_type = (driveparm>>2) & 0x03;
+		m_selected_drive_number = driveparm & 0x03;
+
+		// Calculate the head load delays
+		head_load_delay = head_load_delay_enable? m_register_w[DATA] * head_load_timer_increment[m_selected_drive_type] : 0;
+		if (fm_mode()) head_load_delay <<= 1;
+
+		if (TRACE_COMMAND) logerror("%s: DRIVE SELECT command (%02x): head load delay=%d, type=%d, drive=%d, pout=%02x\n", tag(), current_command(), head_load_delay, m_selected_drive_type, driveparm&3, m_register_w[RETRY_COUNT]&0x0f);
+
+		// Copy the DMA registers to registers CURRENT_HEAD, CURRENT_CYLINDER,
+		// and CURRENT_IDENT. This is required during formatting ([1], p. 14)
+		// as the format command reuses the registers for formatting parameters.
+		m_register_r[CURRENT_HEAD] = m_register_r[DMA7_0];
+		m_register_r[CURRENT_CYLINDER] = m_register_r[DMA15_8];
+		m_register_r[CURRENT_IDENT] = m_register_r[DMA23_16];
+
+		// Copy the selected drive number to the chip status register
+		m_register_r[CHIP_STATUS] = (m_register_r[CHIP_STATUS] & 0xfc) | m_selected_drive_number;
+		auxbus_out();
+
+		m_substate = (head_load_delay>0)? HEAD_DELAY : DONE;
 	}
 
-	// Copy the DMA registers to registers CURRENT_HEAD, CURRENT_CYLINDER,
-	// and CURRENT_IDENT. This is required during formatting ([1], p. 14)
-	// as the format command reuses the registers for formatting parameters.
-	m_register_r[CURRENT_HEAD] = m_register_r[DMA7_0];
-	m_register_r[CURRENT_CYLINDER] = m_register_r[DMA15_8];
-	m_register_r[CURRENT_IDENT] = m_register_r[DMA23_16];
+	// As for the head delay, the specs are not clear when it is applied.
+	// There is no input line indicating whether the head is already loaded
+	// (see WD17xx: HLT). Let's assume for now that the head is loaded with
+	// this drive select operation, and that we have the delay here.
+	switch (m_substate)
+	{
+	case HEAD_DELAY:
+		wait_time(m_timer, head_load_delay, DONE);
+		cont = WAIT;
+		break;
+	case DONE:
+		cont = SUCCESS;
+		break;
+	}
 
-	// Copy the selected drive number to the chip status register
-	m_register_r[CHIP_STATUS] = (m_register_r[CHIP_STATUS] & 0xfc) | (driveparm & 0x03);
-
-	auxbus_out();
-	set_command_done(TC_SUCCESS);
+	if (cont==SUCCESS) set_command_done(TC_SUCCESS);
 }
 
 /*
@@ -1195,6 +1211,30 @@ void hdc9234_device::reenter_command_processing()
 }
 
 // ===========================================================================
+
+/*
+    Step on / off; used by RESTORE and STEP IN/OUT
+*/
+void hdc9234_device::step_on(bool towards00, int next)
+{
+	if (TRACE_ACT) logerror("%s: substate STEP_ON\n", tag());
+
+	// STEPDIR = 0 -> towards TRK00
+	set_bits(m_output2, OUT2_STEPDIR, !towards00);
+
+	// Raising edge (note that all signals must be inverted before leading them to the drive)
+	set_bits(m_output2, OUT2_STEPPULSE, true);
+	auxbus_out();
+	wait_time(m_timer, pulse_width(), next);
+}
+
+void hdc9234_device::step_off(int next)
+{
+	if (TRACE_ACT) logerror("%s: substate STEP_OFF\n", tag());
+	set_bits(m_output2, OUT2_STEPPULSE, false);
+	auxbus_out();
+	wait_time(m_timer, step_time(), next);
+}
 
 /*
     Delivers the step time (in microseconds) minus the pulse width
@@ -1697,8 +1737,9 @@ void hdc9234_device::live_run_until(attotime limit)
 
 			if (m_transfer_enabled)
 			{
+				m_register_r[DATA] = m_register_w[DATA] = m_live_state.data_reg;
 				m_out_dip(ASSERT_LINE);
-				m_out_dma(0, m_live_state.data_reg, 0xff);
+				m_out_dma(0, m_register_r[DATA], 0xff);
 				m_out_dip(CLEAR_LINE);
 
 				m_out_dmarq(CLEAR_LINE);
@@ -1843,9 +1884,9 @@ void hdc9234_device::live_run_until(attotime limit)
 			{
 				// Read byte via DMA
 				m_out_dip(ASSERT_LINE);
-				UINT8 data = m_in_dma(0, 0xff);
-				if (TRACE_WRITE) logerror("%s: [%s] Write %02x\n", tag(), tts(m_live_state.time).cstr(), data);
-				encode_byte(data);
+				m_register_r[DATA] = m_register_w[DATA] = m_in_dma(0, 0xff);
+				if (TRACE_WRITE) logerror("%s: [%s] Write %02x\n", tag(), tts(m_live_state.time).cstr(), m_register_r[DATA]);
+				encode_byte(m_register_r[DATA]);
 				m_out_dip(CLEAR_LINE);
 				m_out_dmarq(CLEAR_LINE);
 
@@ -2148,20 +2189,20 @@ READ8_MEMBER( hdc9234_device::read )
 */
 WRITE8_MEMBER( hdc9234_device::write )
 {
-	m_data = data & 0xff;
-
 	if ((offset & 1) == 0)
 	{
+		m_regvalue = data & 0xff;
 		wait_time(m_cmd_timer, attotime::from_nsec(REGISTER_COMMIT), REGISTER_ACCESS);
 	}
 	else
 	{
 		if (m_executing)
 		{
-			logerror("%s: [%s] Error - previous command %02x not completed; new command %02x ignored\n", tag(), ttsn().cstr(), current_command(), m_data);
+			logerror("%s: [%s] Error - previous command %02x not completed; new command %02x ignored\n", tag(), ttsn().cstr(), current_command(), data);
 		}
 		else
 		{
+			m_register_w[COMMAND] = data;
 			wait_time(m_cmd_timer, attotime::from_nsec(COMMAND_COMMIT), COMMAND_INIT);
 		}
 	}
@@ -2179,11 +2220,11 @@ void hdc9234_device::process_command()
 		if (TRACE_REG)
 		{
 			if (m_register_pointer == INT_COMM_TERM)
-				logerror("%s: Setting interrupt trigger DONE=%d READY=%d\n", tag(), (m_data & TC_INTDONE)? 1:0, (m_data & TC_INTRDCH)? 1:0);
+				logerror("%s: Setting interrupt trigger DONE=%d READY=%d\n", tag(), (m_regvalue & TC_INTDONE)? 1:0, (m_regvalue & TC_INTRDCH)? 1:0);
 			else
-				logerror("%s: register[%d] <- %02x\n", tag(), m_register_pointer, m_data);
+				logerror("%s: register[%d] <- %02x\n", tag(), m_register_pointer, m_regvalue);
 		}
-		m_register_w[m_register_pointer] = m_data;
+		m_register_w[m_register_pointer] = m_regvalue;
 
 		// Changes to these registers must be output via the auxbus
 		if (m_register_pointer == DESIRED_HEAD || m_register_pointer == RETRY_COUNT)
@@ -2191,7 +2232,7 @@ void hdc9234_device::process_command()
 
 		// The DMA registers and the sector register for read and
 		// write are identical, so in that case we copy the contents
-		if (m_register_pointer < DESIRED_HEAD) m_register_r[m_register_pointer] = m_data;
+		if (m_register_pointer < DESIRED_HEAD) m_register_r[m_register_pointer] = m_regvalue;
 
 		// Autoincrement until DATA is reached.
 		if (m_register_pointer < DATA)  m_register_pointer++;
@@ -2207,31 +2248,28 @@ void hdc9234_device::process_command()
 		// Clear Interrupt Pending and Ready Change
 		set_bits(m_register_r[INT_STATUS], ST_INTPEND | ST_RDYCHNG, false);
 
-		// Store command
-		UINT8 command = m_data;
-		m_register_w[COMMAND] = command;
-		m_stop_after_index = false;
-		m_wait_for_index = false;
-
 		int index = 0;
 		bool found = false;
 
 		while (s_command[index].mask!=0 && !found)
 		{
-			if ((command & s_command[index].mask) == s_command[index].baseval)
+			if ((m_register_w[COMMAND] & s_command[index].mask) == s_command[index].baseval)
 			{
-				// Invoke command
-				m_substate = UNDEF;
 				found = true;
+
+				m_stop_after_index = false;
+				m_wait_for_index = false;
+				m_substate = UNDEF;
 				m_executing = true;
 				m_command = s_command[index].command;
+				// Invoke command
 				(this->*m_command)();
 			}
 			else index++;
 		}
 		if (!found)
 		{
-			logerror("%s: Command %02x not defined\n", tag(), command);
+			logerror("%s: Command %02x not defined\n", tag(), m_register_w[COMMAND]);
 		}
 	}
 }
@@ -2405,6 +2443,9 @@ bool hdc9234_device::on_track00()
 */
 void hdc9234_device::auxbus_out()
 {
+	m_output1 = (m_selected_drive_number != NODRIVE)? (0x10 << m_selected_drive_number) : 0;
+	m_output1 |= (m_register_w[RETRY_COUNT]&0x0f);
+
 	if (TRACE_AUXBUS) logerror("%s: Setting OUTPUT1 to %02x\n", tag(), m_output1);
 	m_out_auxbus((offs_t)HDC_OUTPUT_1, m_output1);
 
@@ -2454,7 +2495,7 @@ WRITE_LINE_MEMBER( hdc9234_device::dmaack )
 {
 	if (state==ASSERT_LINE)
 	{
-		if (TRACE_LINES) logerror("%s: [%s] DMA acknowledged\n", tag(), ttsn().cstr());
+		if (TRACE_LIVE) logerror("%s: [%s] DMA acknowledged\n", tag(), ttsn().cstr());
 		set_bits(m_register_r[INT_STATUS], ST_OVRUN, false);
 	}
 }
@@ -2466,14 +2507,13 @@ WRITE_LINE_MEMBER( hdc9234_device::reset )
 {
 	if (state == ASSERT_LINE)
 	{
-		if (TRACE_ACT) logerror("%s: Reset via RST line\n", tag());
+		if (TRACE_LINES) logerror("%s: Reset via RST line\n", tag());
 		device_reset();
 	}
 }
 
 void hdc9234_device::device_start()
 {
-	logerror("%s: Start\n", tag());
 	m_out_intrq.resolve_safe();
 	m_out_dip.resolve_safe();
 	m_out_auxbus.resolve_safe();
@@ -2491,50 +2531,36 @@ void hdc9234_device::device_start()
 
 void hdc9234_device::device_reset()
 {
-	logerror("%s: Reset\n", tag());
-
-	m_selected_drive_type = 0;
-	m_head_load_delay_enable = false;
-
-	m_register_pointer = 0;
-
+	m_deleted = false;
+	m_executing = false;
+	m_initialized = true;
+	m_live_state.state = IDLE;
+	m_live_state.time = attotime::never;
+	m_multi_sector = false;
 	m_output1 = 0;
 	m_output2 = 0x80;
-
-	set_interrupt(CLEAR_LINE);
-	m_out_dip(CLEAR_LINE);
-	m_out_dmarq(CLEAR_LINE);
+	m_precompensation = 0;
+	m_reduced_write_current = false;
+	m_regvalue = 0;
+	m_register_pointer = 0;
+	m_retry_save = 0;
+	m_seek_count = 0;
+	m_selected_drive_number = NODRIVE;
+	m_selected_drive_type = 0;
+	m_state_after_line = UNDEF;
+	m_stop_after_index = false;
+	m_substate = UNDEF;
+	m_track_delta = 0;
+	m_transfer_enabled = true;
+	m_wait_for_index = false;
+	m_write = false;
 
 	for (int i=0; i<=11; i++)
 		m_register_r[i] = m_register_w[i] = 0;
 
-	m_state_after_line = UNDEF;
-	m_seek_count = 0;
-
-	m_live_state.time = attotime::never;
-	m_live_state.state = IDLE;
-
-	m_track_delta = 0;
-
-	m_multi_sector = false;
-	m_retry_save = 0;
-
-	m_substate = UNDEF;
-
-	m_executing = false;
-
-	m_stop_after_index = false;
-	m_wait_for_index = false;
-
-	m_transfer_enabled = true;
-	m_write = false;
-	m_deleted = false;
-
-	m_data = 0;
-	m_precompensation = 0;
-	m_reduced_write_current = false;
-
-	m_initialized = true;
+	set_interrupt(CLEAR_LINE);
+	m_out_dip(CLEAR_LINE);
+	m_out_dmarq(CLEAR_LINE);
 }
 
 const device_type HDC9234 = &device_creator<hdc9234_device>;

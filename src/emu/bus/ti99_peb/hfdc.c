@@ -94,15 +94,19 @@ myarc_hfdc_device::myarc_hfdc_device(const machine_config &mconfig, const char *
 {
 }
 
-
 SETADDRESS_DBIN_MEMBER( myarc_hfdc_device::setaddress_dbin )
 {
+	// Debugger does not run safely with HFDC
+	// TODO: Check why debugger messes up the access (likely to happen at other locations, too)
+	if (space.debugger_access()) return;
+
 	// Selection login in the PAL and some circuits on the board
 
 	// Is the card being selected?
 	// Area = 4000-5fff
 	// 010x xxxx xxxx xxxx
 	m_address = offset;
+
 	m_inDsrArea = ((m_address & m_select_mask)==m_select_value);
 
 	if (!m_inDsrArea) return;
@@ -151,6 +155,9 @@ SETADDRESS_DBIN_MEMBER( myarc_hfdc_device::setaddress_dbin )
 */
 READ8Z_MEMBER(myarc_hfdc_device::readz)
 {
+	// Debugger does not run safely with HFDC
+	if (space.debugger_access()) return;
+
 	if (m_inDsrArea && m_selected)
 	{
 		if (m_tapesel)
@@ -161,14 +168,14 @@ READ8Z_MEMBER(myarc_hfdc_device::readz)
 
 		if (m_HDCsel)
 		{
-			if (!space.debugger_access()) *value = m_hdc9234->read(space, (m_address>>2)&1, 0xff);
+			*value = m_hdc9234->read(space, (m_address>>2)&1, 0xff);
 			if (TRACE_COMP) logerror("%s: %04x[HDC] -> %02x\n", tag(), m_address & 0xffff, *value);
 			return;
 		}
 
 		if (m_RTCsel)
 		{
-			if (!space.debugger_access()) *value = m_clock->read(space, (m_address & 0x001e) >> 1);
+			*value = m_clock->read(space, (m_address & 0x001e) >> 1);
 			if (TRACE_COMP) logerror("%s: %04x[CLK] -> %02x\n", tag(), m_address & 0xffff, *value);
 			return;
 		}
@@ -222,6 +229,9 @@ READ8Z_MEMBER(myarc_hfdc_device::readz)
 */
 WRITE8_MEMBER( myarc_hfdc_device::write )
 {
+	// Debugger does not run safely with HFDC
+	if (space.debugger_access()) return;
+
 	if (m_inDsrArea && m_selected)
 	{
 		if (m_tapesel)
@@ -233,14 +243,14 @@ WRITE8_MEMBER( myarc_hfdc_device::write )
 		if (m_HDCsel)
 		{
 			if (TRACE_COMP) logerror("%s: %04x[HDC] <- %02x\n", tag(), m_address & 0xffff, data);
-			if (!space.debugger_access()) m_hdc9234->write(space, (m_address>>2)&1, data, 0xff);
+			m_hdc9234->write(space, (m_address>>2)&1, data, 0xff);
 			return;
 		}
 
 		if (m_RTCsel)
 		{
 			if (TRACE_COMP) logerror("%s: %04x[CLK] <- %02x\n", tag(), m_address & 0xffff, data);
-			if (!space.debugger_access()) m_clock->write(space, (m_address & 0x001e) >> 1, data);
+			m_clock->write(space, (m_address & 0x001e) >> 1, data);
 			return;
 		}
 

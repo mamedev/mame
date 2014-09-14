@@ -140,11 +140,14 @@ private:
 	// Write the DMA address to the external latches
 	void dma_address_out();
 
-	// Intermediate storage
-	UINT8 m_data;
+	// Intermediate storage for register
+	UINT8 m_regvalue;
 
 	// Drive type that has been selected in drive_select
 	int m_selected_drive_type;
+
+	// Drive numbere that has been selected in drive_select
+	int m_selected_drive_number;
 
 	// Indicates whether the device has completed initialization
 	bool m_initialized;
@@ -305,9 +308,6 @@ private:
 	// Do we apply a reduced write current?
 	bool m_reduced_write_current;
 
-	// Enables head load delays
-	bool m_head_load_delay_enable;
-
 	// Used in RESTORE to find out when to give up
 	int m_seek_count;
 
@@ -361,6 +361,8 @@ private:
 	// ===================================================
 	//   Commands
 	// ===================================================
+
+	void reset_controller();
 	void drive_select();
 	void drive_deselect();
 	void restore_drive();
