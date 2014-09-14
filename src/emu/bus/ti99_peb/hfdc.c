@@ -96,8 +96,8 @@ myarc_hfdc_device::myarc_hfdc_device(const machine_config &mconfig, const char *
 
 SETADDRESS_DBIN_MEMBER( myarc_hfdc_device::setaddress_dbin )
 {
-	// Debugger does not run safely with HFDC
-	// TODO: Check why debugger messes up the access (likely to happen at other locations, too)
+	// Do not allow setaddress for the debugger. It will mess up the
+	// setaddress/memory access pairs when the CPU enters wait states.
 	if (space.debugger_access()) return;
 
 	// Selection login in the PAL and some circuits on the board
@@ -139,6 +139,41 @@ SETADDRESS_DBIN_MEMBER( myarc_hfdc_device::setaddress_dbin )
 }
 
 /*
+    Access for debugger. This is a stripped-down version of the
+    main methods below. We only allow ROM and RAM access.
+*/
+void myarc_hfdc_device::debug_read(offs_t offset, UINT8* value)
+{
+	if (((offset & m_select_mask)==m_select_value) && m_selected)
+	{
+		if ((offset & 0x1000)==RAM_ADDR)
+		{
+			int bank = (offset & 0x0c00) >> 10;
+			*value = m_buffer_ram[(m_ram_page[bank]<<10) | (offset & 0x03ff)];
+		}
+		else
+		{
+			if ((offset & 0x0fc0)!=0x0fc0)
+			{
+				*value = m_dsrrom[(m_rom_page << 12) | (offset & 0x0fff)];
+			}
+		}
+	}
+}
+
+void myarc_hfdc_device::debug_write(offs_t offset, UINT8 data)
+{
+	if (((offset & m_select_mask)==m_select_value) && m_selected)
+	{
+		if ((offset & 0x1000)==RAM_ADDR)
+		{
+			int bank = (offset & 0x0c00) >> 10;
+			m_buffer_ram[(m_ram_page[bank]<<10) | (m_address & 0x03ff)] = data;
+		}
+	}
+}
+
+/*
     Read a byte from the memory address space of the HFDC
 
     0x4000 - 0x4fbf one of four possible ROM pages
@@ -155,8 +190,11 @@ SETADDRESS_DBIN_MEMBER( myarc_hfdc_device::setaddress_dbin )
 */
 READ8Z_MEMBER(myarc_hfdc_device::readz)
 {
-	// Debugger does not run safely with HFDC
-	if (space.debugger_access()) return;
+	if (space.debugger_access())
+	{
+		debug_read(offset, value);
+		return;
+	}
 
 	if (m_inDsrArea && m_selected)
 	{
@@ -229,8 +267,11 @@ READ8Z_MEMBER(myarc_hfdc_device::readz)
 */
 WRITE8_MEMBER( myarc_hfdc_device::write )
 {
-	// Debugger does not run safely with HFDC
-	if (space.debugger_access()) return;
+	if (space.debugger_access())
+	{
+		debug_write(offset, data);
+		return;
+	}
 
 	if (m_inDsrArea && m_selected)
 	{

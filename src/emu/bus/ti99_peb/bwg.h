@@ -54,6 +54,10 @@ protected:
 private:
 	void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
+	// Debugger accessors
+	void debug_read(offs_t offset, UINT8* value);
+	void debug_write(offs_t offset, UINT8 data);
+
 	// Wait state logic
 	void operate_ready_line();
 

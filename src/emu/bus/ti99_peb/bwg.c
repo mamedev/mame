@@ -136,6 +136,9 @@ WRITE_LINE_MEMBER( snug_bwg_device::fdc_drq_w )
 
 SETADDRESS_DBIN_MEMBER( snug_bwg_device::setaddress_dbin )
 {
+	// Do not allow setaddress for debugger
+	if (space.debugger_access()) return;
+
 	// Selection login in the PAL and some circuits on the board
 
 	// Is the card being selected?
@@ -181,11 +184,44 @@ SETADDRESS_DBIN_MEMBER( snug_bwg_device::setaddress_dbin )
 }
 
 /*
+    Access for debugger. This is a stripped-down version of the
+    main methods below. We only allow ROM and RAM access.
+*/
+void snug_bwg_device::debug_read(offs_t offset, UINT8* value)
+{
+	if (((offset & m_select_mask)==m_select_value) && m_selected)
+	{
+		if ((offset & 0x1c00)==0x1c00)
+		{
+			if ((offset & 0x1fe0)!=0x1fe0)
+				*value = m_buffer_ram[(m_ram_page<<10) | (offset & 0x03ff)];
+		}
+		else
+			*value = m_dsrrom[(m_rom_page<<13) | (offset & 0x1fff)];
+	}
+}
+
+void snug_bwg_device::debug_write(offs_t offset, UINT8 data)
+{
+	if (((offset & m_select_mask)==m_select_value) && m_selected)
+	{
+		if (((offset & 0x1c00)==0x1c00) && ((offset & 0x1fe0)!=0x1fe0))
+				m_buffer_ram[(m_ram_page<<10) | (m_address & 0x03ff)] = data;
+	}
+}
+
+/*
     Read a byte from ROM, RAM, FDC, or RTC. See setaddress_dbin for selection
     logic.
 */
 READ8Z_MEMBER(snug_bwg_device::readz)
 {
+	if (space.debugger_access())
+	{
+		debug_read(offset, value);
+		return;
+	}
+
 	if (m_inDsrArea && m_selected)
 	{
 		// 010x xxxx xxxx xxxx
@@ -197,7 +233,7 @@ READ8Z_MEMBER(snug_bwg_device::readz)
 				if (m_RTCsel)
 				{
 					// .... ..11 111x xxx0
-					if (!space.debugger_access()) *value = m_clock->read(space, (m_address & 0x001e) >> 1);
+					*value = m_clock->read(space, (m_address & 0x001e) >> 1);
 					if (TRACE_RW) logerror("bwg: read RTC: %04x -> %02x\n", m_address & 0xffff, *value);
 				}
 				else
@@ -213,7 +249,7 @@ READ8Z_MEMBER(snug_bwg_device::readz)
 					// .... ..11 1111 0xx0
 					// Note that the value is inverted again on the board,
 					// so we can drop the inversion
-					if (!space.debugger_access()) *value = m_wd1773->gen_r((m_address >> 1)&0x03);
+					*value = m_wd1773->gen_r((m_address >> 1)&0x03);
 					if (TRACE_RW) logerror("bwg: read FDC: %04x -> %02x\n", m_address & 0xffff, *value);
 					if (TRACE_DATA)
 					{
@@ -250,6 +286,12 @@ READ8Z_MEMBER(snug_bwg_device::readz)
 */
 WRITE8_MEMBER(snug_bwg_device::write)
 {
+	if (space.debugger_access())
+	{
+		debug_write(offset, data);
+		return;
+	}
+
 	if (m_inDsrArea && m_selected)
 	{
 		if (m_lastK)
@@ -260,7 +302,7 @@ WRITE8_MEMBER(snug_bwg_device::write)
 				{
 					// .... ..11 111x xxx0
 					if (TRACE_RW) logerror("bwg: write RTC: %04x <- %02x\n", m_address & 0xffff, data);
-					if (!space.debugger_access()) m_clock->write(space, (m_address & 0x001e) >> 1, data);
+					m_clock->write(space, (m_address & 0x001e) >> 1, data);
 				}
 				else
 				{
@@ -276,7 +318,7 @@ WRITE8_MEMBER(snug_bwg_device::write)
 					// Note that the value is inverted again on the board,
 					// so we can drop the inversion
 					if (TRACE_RW) logerror("bwg: write FDC: %04x <- %02x\n", m_address & 0xffff, data);
-					if (!space.debugger_access()) m_wd1773->gen_w((m_address >> 1)&0x03, data);
+					m_wd1773->gen_w((m_address >> 1)&0x03, data);
 				}
 				else
 				{

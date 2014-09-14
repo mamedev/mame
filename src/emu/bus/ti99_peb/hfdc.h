@@ -59,6 +59,10 @@ private:
 	machine_config_constructor device_mconfig_additions() const;
 	ioport_constructor device_input_ports() const;
 
+	// Debug accessors
+	void debug_read(offs_t offset, UINT8* value);
+	void debug_write(offs_t offset, UINT8 data);
+
 	// Callback for the index hole
 	void floppy_index_callback(floppy_image_device *floppy, int state);
 
