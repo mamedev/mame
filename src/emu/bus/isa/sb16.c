@@ -689,7 +689,7 @@ sb16_lle_device::sb16_lle_device(const machine_config &mconfig, const char *tag,
 
 void sb16_lle_device::device_start()
 {
-	address_space &space = m_cpu->space(AS_PROGRAM);
+	//address_space &space = m_cpu->space(AS_PROGRAM);
 	UINT8 *rom = memregion("sb16_cpu")->base();
 	UINT8 *xor_table = memregion("xor_table")->base();
 
