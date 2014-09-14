@@ -454,7 +454,7 @@ UINT8 sb16_lle_device::dack_r(int line)
 		if(m_adc_h)
 			return ret;
 	}
-	if((!(m_mode & 0x40) && !(m_mode & 1)) || (!(m_mode & 0x80) && !(m_mode & 1)))
+	if((!(m_mode & 0x40) && (m_mode & 1)) || (!(m_mode & 0x80) && !(m_mode & 1)))
 	{
 		m_adc_r = !m_adc_r;
 		if(m_adc_r)
