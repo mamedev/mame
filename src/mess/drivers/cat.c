@@ -856,7 +856,6 @@ READ16_MEMBER( cat_state::cat_wdt_r )
 // 0x860000: 'tcb' "test control bits" test mode register; what the bits do is
 // unknown. 0x0000 is written here to disable test mode, and that is the extent
 // of the cat touching this register.
-// it is possible that writing ANYTHING here will set the PFAIL state from 0 to 1, assuming the guessed information about pfail above is correct.
 WRITE16_MEMBER( cat_state::cat_tcb_w )
 {
 #ifdef DEBUG_TEST_W
@@ -909,7 +908,7 @@ a23 a22 a21 a20 a19 a18 a17 a16 a15 a14 a13 a12 a11 a10 a9  a8  a7  a6  a5  a4  
                                                                             0   1   0   0   0       R   {'fd.status'} Floppy status lines (write protect, ready, index, track0)
                                                                             0   1   0   1   0       R   Keyboard Column Read
                                                                             0   1   1   0   0       W?  Unknown (reads as 0x00)
-                                                                            0   1   1   1   0       RW  Read: Battery status (MSB bit, 0 = ok, 1 = dead, other bits read as 0)/Write: Centronics Printer and Keyboard LED/Country Code Related
+                                                                            0   1   1   1   0       RW  {'pr.cont'} Read: Battery status (MSB bit, 0 = ok, 1 = dead, other bits read as 0)/Write: Centronics Printer and Keyboard LED/Country Code Related
                                                                             1   x   x   x   0       W?  Unknown (reads as 0x00)
 1   0   0   x   x   0   0   1   x   x   x   x   x   x   x   x   x   x   x   *   *   *   *   1       RW  {'duart'} 68681 DUART at ic34 [controlled via GA2 /DUARTCS]
 1   0   0   x   x   0   1   0   x   x   x   x   x   x   x   x   x   x   *   *   *   *   *   0       RW  {'modem'} Modem Chip AMI S35213 @ IC37 DATA BIT 7 ONLY [controlled via GA2 /SMCS]
