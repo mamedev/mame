@@ -1,4 +1,6 @@
 #include "sound/okim6295.h"
+#include "machine/raiden2cop.h"
+
 
 class legionna_state : public driver_device
 {
@@ -14,7 +16,9 @@ public:
 		m_audiocpu(*this, "audiocpu"),
 		m_oki(*this, "oki"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette"),
+		m_wordswapram(*this, "wordswapram")
+	{ }
 
 	required_shared_ptr<UINT16> m_spriteram;
 	UINT16* m_back_data;
@@ -36,7 +40,7 @@ public:
 	UINT16 m_mid_gfx_bank;
 
 	DECLARE_WRITE16_MEMBER(videowrite_cb_w);
-	DECLARE_WRITE16_MEMBER(denjin_paletteram16_xBBBBBGGGGGRRRRR_word_w);
+	DECLARE_WRITE16_MEMBER(wordswapram_w);
 	DECLARE_WRITE16_MEMBER(legionna_background_w);
 	DECLARE_WRITE16_MEMBER(legionna_midground_w);
 	DECLARE_WRITE16_MEMBER(legionna_foreground_w);
@@ -70,6 +74,8 @@ public:
 	required_device<okim6295_device> m_oki;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	optional_shared_ptr<UINT16> m_wordswapram;
+
 };
 
 /*----------- defined in video/legionna.c -----------*/

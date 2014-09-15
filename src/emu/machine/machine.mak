@@ -1411,15 +1411,6 @@ endif
 
 #-------------------------------------------------
 #
-#@src/emu/machine/seibu_cop.h,MACHINES += SEIBU_COP
-#-------------------------------------------------
-
-ifneq ($(filter SEIBU_COP,$(MACHINES)),)
-MACHINEOBJS += $(MACHINEOBJ)/seibu_cop.o
-endif
-
-#-------------------------------------------------
-#
 #@src/emu/machine/serflash.h,MACHINES += SERFLASH
 #-------------------------------------------------
 

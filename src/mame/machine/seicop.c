@@ -1607,8 +1607,6 @@ seibu_cop_legacy_device::seibu_cop_legacy_device(const machine_config &mconfig, 
 	m_cop_438(0),
 	m_cop_43a(0),
 	m_cop_43c(0),
-	m_cop_dma_fade_table(0),
-	m_cop_dma_trigger(0),
 	m_cop_scale(0),
 	m_cop_rng_max_value(0),
 	m_copd2_offs(0),
@@ -1632,23 +1630,17 @@ seibu_cop_legacy_device::seibu_cop_legacy_device(const machine_config &mconfig, 
 	m_cop_rom_addr_unk(0),
 	m_u1(0),
 	m_u2(0),
-	m_fill_val(0),
-	m_pal_brightness_val(0),
-	m_pal_brightness_mode(0),
 	m_cop_sprite_dma_src(0),
 	m_cop_sprite_dma_abs_x(0),
 	m_cop_sprite_dma_abs_y(0),
 	m_cop_sprite_dma_size(0),
 	m_cop_sprite_dma_param(0),
-	m_videoramout_cb(*this)
+	m_raiden2cop(*this, ":raiden2cop")
 {
 	memset(m_copd2_table, 0, sizeof(UINT16)*0x100);
 	memset(m_copd2_table_2, 0, sizeof(UINT16)*0x100/8);
 	memset(m_copd2_table_3, 0, sizeof(UINT16)*0x100/8);
 	memset(m_copd2_table_4, 0, sizeof(UINT16)*0x100/8);
-	memset(m_cop_dma_src, 0, sizeof(UINT16)*0x200);
-	memset(m_cop_dma_size, 0, sizeof(UINT16)*0x200);
-	memset(m_cop_dma_dst, 0, sizeof(UINT16)*0x200);
 	memset(m_seibu_vregs, 0, sizeof(UINT16)*0x50/2);
 
 	for (int i = 0; i < 8; i++)
@@ -1674,13 +1666,12 @@ void seibu_cop_legacy_device::device_config_complete()
 void seibu_cop_legacy_device::device_start()
 {
 	m_cop_mcu_ram = reinterpret_cast<UINT16 *>(machine().root_device().memshare("cop_mcu_ram")->ptr());
-	m_videoramout_cb.resolve_safe();
 
 	save_item(NAME(m_cop_438));
 	save_item(NAME(m_cop_43a));
 	save_item(NAME(m_cop_43c));
-	save_item(NAME(m_cop_dma_fade_table));
-	save_item(NAME(m_cop_dma_trigger));
+	//save_item(NAME(m_cop_dma_fade_table));
+	//save_item(NAME(m_cop_dma_trigger));
 	save_item(NAME(m_cop_scale));
 	save_item(NAME(m_cop_rng_max_value));
 	save_item(NAME(m_copd2_offs));
@@ -1704,9 +1695,9 @@ void seibu_cop_legacy_device::device_start()
 	save_item(NAME(m_cop_rom_addr_unk));
 	save_item(NAME(m_u1));
 	save_item(NAME(m_u2));
-	save_item(NAME(m_fill_val));
-	save_item(NAME(m_pal_brightness_val));
-	save_item(NAME(m_pal_brightness_mode));
+//	save_item(NAME(m_fill_val));
+//	save_item(NAME(m_pal_brightness_val));
+//	save_item(NAME(m_pal_brightness_mode));
 	save_item(NAME(m_cop_sprite_dma_src));
 	save_item(NAME(m_cop_sprite_dma_abs_x));
 	save_item(NAME(m_cop_sprite_dma_abs_y));
@@ -1716,9 +1707,9 @@ void seibu_cop_legacy_device::device_start()
 	save_item(NAME(m_copd2_table_2));
 	save_item(NAME(m_copd2_table_3));
 	save_item(NAME(m_copd2_table_4));
-	save_item(NAME(m_cop_dma_src));
-	save_item(NAME(m_cop_dma_size));
-	save_item(NAME(m_cop_dma_dst));
+//	save_item(NAME(m_cop_dma_src));
+//	save_item(NAME(m_cop_dma_size));
+//	save_item(NAME(m_cop_dma_dst));
 	save_item(NAME(m_seibu_vregs));
 }
 
@@ -2216,6 +2207,7 @@ WRITE16_MEMBER( seibu_cop_legacy_device::copdxbl_0_w )
      which seems common to all the games
 */
 
+#if 0
 /* RE from Seibu Cup Soccer bootleg */
 static const UINT8 fade_table(int v)
 {
@@ -2224,7 +2216,7 @@ static const UINT8 fade_table(int v)
 
 	return (low * (high | (high >> 5)) + 0x210) >> 10;
 }
-
+#endif
 
 #define COP_CMD(_1_,_2_,_3_,_4_,_5_,_6_,_7_,_8_,_m_u1_,_m_u2_) \
 	(m_copd2_table[command+0] == _1_ && m_copd2_table[command+1] == _2_ && m_copd2_table[command+2] == _3_ && m_copd2_table[command+3] == _4_ && \
@@ -2430,10 +2422,12 @@ WRITE16_MEMBER( seibu_cop_legacy_device::generic_cop_w )
 			*/
 			break;
 
-		case (0x028/2):
-		case (0x02a/2):
-			m_fill_val = (m_cop_mcu_ram[0x028/2]) | (m_cop_mcu_ram[0x02a/2] << 16);
-			break;
+		// ram fill
+		case (0x028 / 2) : m_raiden2cop->cop_dma_v1_w(space, offset, data, mem_mask); break;
+		case (0x02a / 2) : m_raiden2cop->cop_dma_v2_w(space, offset, data, mem_mask); break;
+
+			
+			
 
 		/* max possible value returned by the RNG at 0x5a*, trusted */
 		case (0x02c/2): m_cop_rng_max_value = m_cop_mcu_ram[0x2c/2] & 0xff; break;
@@ -2459,9 +2453,9 @@ WRITE16_MEMBER( seibu_cop_legacy_device::generic_cop_w )
 		case (0x04a/2): { m_cop_rom_addr_hi = data & 0xffff; break; }
 
 		/* brightness control */
-		case (0x05a/2): m_pal_brightness_val = data & 0xff; break;
-		case (0x05c/2): m_pal_brightness_mode = data & 0xff; break;
-
+		case (0x05a / 2) : m_raiden2cop->cop_pal_brightness_val_w(space, offset, data, mem_mask); break;
+		case (0x05c / 2) : m_raiden2cop->cop_pal_brightness_mode_w(space, offset, data, mem_mask); break;
+	
 		/* DMA / layer clearing section */
 		case (0x074/2):
 			/*
@@ -2475,44 +2469,19 @@ WRITE16_MEMBER( seibu_cop_legacy_device::generic_cop_w )
 			*/
 			break;
 
-		/* used in palette DMAs, for fading effects */
-		case (0x076/2):
-			m_cop_dma_fade_table = data;
-			break;
+		
+		case (0x076 / 2) : m_raiden2cop->cop_dma_adr_rel_w(space, offset, data, mem_mask); break; /* used in palette DMAs, for fading effects */
+		case (0x078 / 2) : m_raiden2cop->cop_dma_src_w(space, offset, data, mem_mask); break; /* DMA source address */
+		case (0x07a / 2) : m_raiden2cop->cop_dma_size_w(space, offset, data, mem_mask); break;/* DMA length */
+		case (0x07c/2): m_raiden2cop->cop_dma_dst_w(space, offset, data, mem_mask); break; /* DMA destination */
+		case (0x07e/2): m_raiden2cop->cop_dma_mode_w(space, offset, data, mem_mask); break; /* DMA parameter */
 
-		case (0x078/2): /* DMA source address */
-		{
-			m_cop_dma_src[m_cop_dma_trigger] = data; // << 6 to get actual address
-			//seibu_cop_log("%06x: COPX set layer clear address to %04x (actual %08x)\n", space.device().safe_pc(), data, data<<6);
-			break;
-		}
 
-		case (0x07a/2): /* DMA length */
-		{
-			m_cop_dma_size[m_cop_dma_trigger] = data;
-			//seibu_cop_log("%06x: COPX set layer clear length to %04x (actual %08x)\n", space.device().safe_pc(), data, data<<5);
-			break;
-		}
 
-		case (0x07c/2): /* DMA destination */
-		{
-			m_cop_dma_dst[m_cop_dma_trigger] = data;
-			//seibu_cop_log("%06x: COPX set layer clear value to %04x (actual %08x)\n", space.device().safe_pc(), data, data<<6);
-			break;
-		}
 
-		case (0x07e/2): /* DMA parameter */
-		{
-			m_cop_dma_trigger = data;
-			//seibu_cop_log("%06x: COPX set layer clear trigger? to %04x\n", space.device().safe_pc(), data);
-			if (data>=0x1ff)
-			{
-				seibu_cop_log("invalid DMA trigger!, >0x1ff\n");
-				m_cop_dma_trigger = 0;
-			}
 
-			break;
-		}
+
+
 
 		case (0x08c/2): m_cop_sprite_dma_abs_y = (m_cop_mcu_ram[0x08c/2]); break;
 		case (0x08e/2): m_cop_sprite_dma_abs_x = (m_cop_mcu_ram[0x08e/2]); break;
@@ -3088,191 +3057,8 @@ WRITE16_MEMBER( seibu_cop_legacy_device::generic_cop_w )
 		}
 
 		/* DMA go register */
-		case (0x2fc/2):
-		{
-			//seibu_cop_log("%06x: COPX execute current layer clear??? %04x\n", space.device().safe_pc(), data);
-			//printf("SRC: %08x %08x DST:%08x SIZE:%08x TRIGGER: %08x\n",m_cop_dma_src[m_cop_dma_trigger] << 6,m_cop_dma_fade_table,m_cop_dma_dst[m_cop_dma_trigger] << 6,m_cop_dma_size[m_cop_dma_trigger] << 5,m_cop_dma_trigger);
+		case (0x2fc/2):	m_raiden2cop->cop_dma_trigger_w(space, offset, data, mem_mask);	break;
 
-			if (m_cop_dma_trigger >= 0x80 && m_cop_dma_trigger <= 0x87)
-			{
-				UINT32 src,dst,size,i;
-
-				/*
-				Apparently all of those are just different DMA channels, brightness effects are done through a RAM table and the m_pal_brightness_val / mode
-				0x80 is used by Legionnaire
-				0x81 is used by SD Gundam and Godzilla
-				0x82 is used by Zero Team and X Se Dae
-				0x86 is used by Seibu Cup Soccer
-				0x87 is used by Denjin Makai
-
-				TODO:
-				- Denjin Makai mode 4 is totally guessworked.
-				- SD Gundam doesn't fade colors correctly, it should have the text layer / sprites with normal gradient and the rest dimmed in most cases,
-				  presumably bad RAM table or bad algorithm
-				*/
-
-				//if(dma_trigger != 0x87)
-				//printf("SRC: %08x %08x DST:%08x SIZE:%08x TRIGGER: %08x %02x %02x\n",m_cop_dma_src[m_cop_dma_trigger] << 6,m_cop_dma_fade_table * 0x400,m_cop_dma_dst[m_cop_dma_trigger] << 6,m_cop_dma_size[m_cop_dma_trigger] << 5,m_cop_dma_trigger,m_pal_brightness_val,m_pal_brightness_mode);
-
-				src = (m_cop_dma_src[m_cop_dma_trigger] << 6);
-				dst = (m_cop_dma_dst[m_cop_dma_trigger] << 6);
-				size = ((m_cop_dma_size[m_cop_dma_trigger] << 5) - (m_cop_dma_dst[m_cop_dma_trigger] << 6) + 0x20)/2;
-
-				for(i = 0;i < size;i++)
-				{
-					UINT16 pal_val;
-					int r,g,b;
-					int rt,gt,bt;
-
-					if(m_pal_brightness_mode == 5)
-					{
-						bt = ((space.read_word(src + (m_cop_dma_fade_table * 0x400))) & 0x7c00) >> 5;
-						bt = fade_table(bt|(m_pal_brightness_val ^ 0));
-						b = ((space.read_word(src)) & 0x7c00) >> 5;
-						b = fade_table(b|(m_pal_brightness_val ^ 0x1f));
-						pal_val = ((b + bt) & 0x1f) << 10;
-						gt = ((space.read_word(src + (m_cop_dma_fade_table * 0x400))) & 0x03e0);
-						gt = fade_table(gt|(m_pal_brightness_val ^ 0));
-						g = ((space.read_word(src)) & 0x03e0);
-						g = fade_table(g|(m_pal_brightness_val ^ 0x1f));
-						pal_val |= ((g + gt) & 0x1f) << 5;
-						rt = ((space.read_word(src + (m_cop_dma_fade_table * 0x400))) & 0x001f) << 5;
-						rt = fade_table(rt|(m_pal_brightness_val ^ 0));
-						r = ((space.read_word(src)) & 0x001f) << 5;
-						r = fade_table(r|(m_pal_brightness_val ^ 0x1f));
-						pal_val |= ((r + rt) & 0x1f);
-					}
-					else if(m_pal_brightness_mode == 4) //Denjin Makai
-					{
-						bt =(space.read_word(src + (m_cop_dma_fade_table * 0x400)) & 0x7c00) >> 10;
-						b = (space.read_word(src) & 0x7c00) >> 10;
-						gt =(space.read_word(src + (m_cop_dma_fade_table * 0x400)) & 0x03e0) >> 5;
-						g = (space.read_word(src) & 0x03e0) >> 5;
-						rt =(space.read_word(src + (m_cop_dma_fade_table * 0x400)) & 0x001f) >> 0;
-						r = (space.read_word(src) & 0x001f) >> 0;
-
-						if(m_pal_brightness_val == 0x10)
-							pal_val = bt << 10 | gt << 5 | rt << 0;
-						else if(m_pal_brightness_val == 0xff) // TODO: might be the back plane or it still doesn't do any mod, needs PCB tests
-							pal_val = 0;
-						else
-						{
-							bt = fade_table(bt<<5|((m_pal_brightness_val*2) ^ 0));
-							b =  fade_table(b<<5|((m_pal_brightness_val*2) ^ 0x1f));
-							pal_val = ((b + bt) & 0x1f) << 10;
-							gt = fade_table(gt<<5|((m_pal_brightness_val*2) ^ 0));
-							g =  fade_table(g<<5|((m_pal_brightness_val*2) ^ 0x1f));
-							pal_val |= ((g + gt) & 0x1f) << 5;
-							rt = fade_table(rt<<5|((m_pal_brightness_val*2) ^ 0));
-							r =  fade_table(r<<5|((m_pal_brightness_val*2) ^ 0x1f));
-							pal_val |= ((r + rt) & 0x1f);
-						}
-					}
-					else
-					{
-						printf("Warning: palette DMA used with mode %02x!\n",m_pal_brightness_mode);
-						pal_val = space.read_word(src);
-					}
-
-					space.write_word(dst, pal_val);
-					src+=2;
-					dst+=2;
-				}
-
-				return;
-			}
-
-			/* Seibu Cup Soccer trigger this*/
-			if (m_cop_dma_trigger == 0x0e)
-			{
-				UINT32 src,dst,size,i;
-
-				src = (m_cop_dma_src[m_cop_dma_trigger] << 6);
-				dst = (m_cop_dma_dst[m_cop_dma_trigger] << 6);
-				size = ((m_cop_dma_size[m_cop_dma_trigger] << 5) - (m_cop_dma_dst[m_cop_dma_trigger] << 6) + 0x20)/2;
-
-				for(i = 0;i < size;i++)
-				{
-					space.write_word(dst, space.read_word(src));
-					src+=2;
-					dst+=2;
-				}
-
-				return;
-			}
-
-			/* do the fill  */
-			if (m_cop_dma_trigger >= 0x118 && m_cop_dma_trigger <= 0x11f)
-			{
-				UINT32 length, address;
-				int i;
-				if(m_cop_dma_dst[m_cop_dma_trigger] != 0x0000) // Invalid?
-					return;
-
-				address = (m_cop_dma_src[m_cop_dma_trigger] << 6);
-				length = (m_cop_dma_size[m_cop_dma_trigger]+1) << 5;
-
-				//printf("%08x %08x\n",address,length);
-
-				for (i=address;i<address+length;i+=4)
-				{
-					space.write_dword(i, m_fill_val);
-				}
-
-				return;
-			}
-
-			/* Godzilla specific */
-			if (m_cop_dma_trigger == 0x116)
-			{
-				UINT32 length, address;
-				int i;
-
-				//if(m_cop_dma_dst[m_cop_dma_trigger] != 0x0000) // Invalid?
-				//  return;
-
-				address = (m_cop_dma_src[m_cop_dma_trigger] << 6);
-				length = ((m_cop_dma_size[m_cop_dma_trigger]+1) << 4);
-
-				for (i=address;i<address+length;i+=4)
-				{
-					space.write_dword(i, m_fill_val);
-				}
-
-				return;
-			}
-
-			/* private buffer copies - tilemaps */
-			if (m_cop_dma_trigger == 0x14)
-			{
-			//	AM_RANGE(0x101000, 0x1017ff) AM_RAM // _WRITE(legionna_background_w) AM_SHARE("back_data")
-			//	AM_RANGE(0x101800, 0x101fff) AM_RAM // _WRITE(legionna_foreground_w) AM_SHARE("fore_data")
-			//	AM_RANGE(0x102000, 0x1027ff) AM_RAM // _WRITE(legionna_midground_w) AM_SHARE("mid_data")
-			//	AM_RANGE(0x102800, 0x1037ff) AM_RAM // _WRITE(legionna_text_w) AM_SHARE("textram")
-				int src = m_cop_dma_src[m_cop_dma_trigger] << 6;
-
-				for (int i = 0; i < 0x2800 /2; i++)
-				{
-					UINT16 tileval = space.read_word(src);
-					//printf("reading source %04x (data is %04x)\n", src, data);
-					src += 2;
-					m_videoramout_cb(space, i, tileval, 0xffff);
-				}
-
-				return;
-			}
-
-			/* private buffer copy - palette? */
-			if (m_cop_dma_trigger == 0x15)
-			{
-				//printf("SRC: %08x %08x DST:%08x SIZE:%08x TRIGGER: %08x\n",m_cop_dma_src[m_cop_dma_trigger] << 6,m_cop_dma_fade_table,m_cop_dma_dst[m_cop_dma_trigger] << 6,m_cop_dma_size[m_cop_dma_trigger] << 5,m_cop_dma_trigger);
-			}
-			return;
-
-			printf("SRC: %08x %08x DST:%08x SIZE:%08x TRIGGER: %08x\n",m_cop_dma_src[m_cop_dma_trigger] << 6,m_cop_dma_fade_table,m_cop_dma_dst[m_cop_dma_trigger] << 6,m_cop_dma_size[m_cop_dma_trigger] << 5,m_cop_dma_trigger);
-
-			break;
-		}
 
 		/* sort-DMA, oh my ... */
 		case (0x054/2): { m_cop_sort_lookup = (m_cop_sort_lookup&0x0000ffff)|(m_cop_mcu_ram[offset]<<16); break; }

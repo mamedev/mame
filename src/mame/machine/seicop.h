@@ -1,4 +1,6 @@
 
+#include "raiden2cop.h"
+
 struct collision_info
 {
 		collision_info():
@@ -18,8 +20,6 @@ struct collision_info
 	UINT16 hitbox_x,hitbox_y;
 };
 
-#define MCFG_VIDEORAM_OUT_CB(_devcb) \
-	devcb = &seibu_cop_legacy_device::set_m_videoramout_cb(*device, DEVCB_##_devcb);
 
 class seibu_cop_legacy_device : public device_t
 {
@@ -44,10 +44,6 @@ seibu_cop_legacy_device(const machine_config &mconfig, const char *tag, device_t
 	DECLARE_READ16_MEMBER( legionna_mcu_r );
 	DECLARE_WRITE16_MEMBER( legionna_mcu_w );
 
-	//DECLARE_READ16_MEMBER( raiden2_mcu_r );   unused
-	//DECLARE_WRITE16_MEMBER( raiden2_mcu_w );  unused
-	template<class _Object> static devcb_base &set_m_videoramout_cb(device_t &device, _Object object) { return downcast<seibu_cop_legacy_device &>(device).m_videoramout_cb.set_callback(object); }
-
 protected:
 	// device-level overrides
 	virtual void device_config_complete();
@@ -63,11 +59,7 @@ private:
 	UINT16 m_cop_438;
 	UINT16 m_cop_43a;
 	UINT16 m_cop_43c;
-	UINT16 m_cop_dma_src[0x200];
-	UINT16 m_cop_dma_size[0x200];
-	UINT16 m_cop_dma_dst[0x200];
-	UINT16 m_cop_dma_fade_table;
-	UINT16 m_cop_dma_trigger;
+
 	UINT16 m_cop_scale;
 	UINT8 m_cop_rng_max_value;
 	UINT16 m_copd2_offs;
@@ -83,8 +75,7 @@ private:
 	int m_r0, m_r1;
 	UINT16 m_cop_rom_addr_lo,m_cop_rom_addr_hi,m_cop_rom_addr_unk;
 	UINT16 m_u1,m_u2;
-	UINT32 m_fill_val;
-	UINT8 m_pal_brightness_val,m_pal_brightness_mode;
+
 	UINT32 m_cop_sprite_dma_src;
 	int m_cop_sprite_dma_abs_x,m_cop_sprite_dma_abs_y,m_cop_sprite_dma_size;
 	UINT32 m_cop_sprite_dma_param;
@@ -96,7 +87,8 @@ private:
 	UINT8 cop_calculate_collsion_detection();
 	DECLARE_READ16_MEMBER( generic_cop_r );
 	DECLARE_WRITE16_MEMBER( generic_cop_w );
-	devcb_write16       m_videoramout_cb;
+
+	required_device<raiden2cop_device> m_raiden2cop;
 
 };
 
@@ -104,3 +96,4 @@ extern const device_type SEIBU_COP_LEGACY;
 
 #define MCFG_SEIBU_COP_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, SEIBU_COP_LEGACY, 0)
+
