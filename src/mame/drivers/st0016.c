@@ -515,6 +515,12 @@ ROM_START( dcrowna )
 	ROM_LOAD( "dcn-3.1f",     0x180000, 0x080000, CRC(ec2e88bc) SHA1(2a8deee63e123dae411e2b834eca69be6f646d66) )
 ROM_END
 
+ROM_START( gostop )
+	ROM_REGION( 0x200000, "maincpu", 0 )
+	ROM_LOAD( "go-stop_rom1.u31",0x000000, 0x80000, CRC(93decaa2) SHA1(a30958b76dfe5752a341ecdc950119c10e864586) )
+	ROM_LOAD( "go-stop_rom2.u32",0x080000, 0x80000, CRC(3c5402ff) SHA1(bdc38922b5cbad0150adf9c6cc0fefc5705a16a2) )
+ROM_END
+
 /*
 Koi Koi Shimasho
 Visco
@@ -660,6 +666,10 @@ DRIVER_INIT_MEMBER(st0016_state,mayjisn2)
 	membank("bank2")->set_base(memregion("user1")->base());
 }
 
+
+
+
+
 /*************************************
  *
  *  Game driver(s)
@@ -674,3 +684,4 @@ GAME(  1995, koikois,   0,      st0016,   koikois, st0016_state,  renju,    ROT0
 GAME( 1994, mayjinsn,   0,      mayjinsn, st0016, st0016_state,   mayjinsn, ROT0, "Seta",      "Mayjinsen",GAME_IMPERFECT_GRAPHICS|GAME_NOT_WORKING)
 GAME( 1994, dcrown,     0,      st0016,   renju, st0016_state,    renju,    ROT0, "Nippon Data Kiki", "Dream Crown (Set 1)", GAME_NOT_WORKING) // (c) 1994 Nippon Data Kiki is uploaded near the Japanese Insert coin text
 GAME( 1994, dcrowna,    dcrown, st0016,   renju, st0016_state,    renju,    ROT0, "Nippon Data Kiki", "Dream Crown (Set 2)", GAME_NOT_WORKING) // the Insert Coin text has been translated to English and no (c) is uploaded
+GAME( 2001, gostop,     0,      st0016,   renju, st0016_state,    renju,    ROT0, "Visco", "Go-Stop", GAME_NOT_WORKING)
