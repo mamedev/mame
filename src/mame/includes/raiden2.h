@@ -91,6 +91,12 @@ public:
 
 	void common_reset();
 
+	static UINT16 const raiden_blended_colors[];
+	static UINT16 const xsedae_blended_colors[];
+	static UINT16 const zeroteam_blended_colors[];
+
+	bool blend_active[0x800];
+
 	tilemap_t *background_layer,*midground_layer,*foreground_layer,*text_layer;
 	int bg_bank, fg_bank, mid_bank;
 	UINT16 raiden2_tilemap_enable;
@@ -174,6 +180,8 @@ public:
 
 	void blend_layer(bitmap_rgb32 &bitmap, const rectangle &cliprect, bitmap_ind16 &source, int layer);
 	void tilemap_draw_and_blend(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, tilemap_t *tilemap);
+
+	void init_blending(const UINT16 *table);
 
 	required_device<raiden2cop_device> m_raiden2cop;
 

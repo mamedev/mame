@@ -944,12 +944,6 @@ void raiden2_state::blend_layer(bitmap_rgb32 &bitmap, const rectangle &cliprect,
 	if(layer == -1)
 		return;
 
-	// Tuned for raiden2
-	const UINT8 alpha_active[0x20] = { // MSB first
-		//00    08    10    18    20    28    30    38    40    48    50    58    60    68    70    78
-		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x05, 0x3f, 0x73, 0xff, 0x7c, 0xff, 0xff, 0x4f
-	};
-
 	const pen_t *pens = &m_palette->pen(0);
 	layer <<= 14;
 	for(int y = cliprect.min_y; y <= cliprect.max_y; y++) {
@@ -959,15 +953,8 @@ void raiden2_state::blend_layer(bitmap_rgb32 &bitmap, const rectangle &cliprect,
 			UINT16 val = *src++;
 			if((val & 0xc000) == layer && (val & 0x000f) != 0x000f) {
 				val &= 0x07ff;
-				int page = val >> 4;
-				bool active = false;
-				if((val & 0x8) == 0x8 && (alpha_active[page >> 3] & (0x80 >> (page & 7))))
-					active = true;
 
-				if(page == ccol)
-					active = !active;
-
-				if(active)
+				if(blend_active[val])
 					*dst = alpha_blend_r32(*dst, pens[val], 0x7f);
 				else
 					*dst = pens[val];
@@ -985,23 +972,6 @@ void raiden2_state::tilemap_draw_and_blend(screen_device &screen, bitmap_rgb32 &
 
 UINT32 raiden2_state::screen_update_raiden2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	cnt++;
-	int ocol = ccol;
-
-	if((cnt & 3) == 0) {
-		if (machine().input().code_pressed(KEYCODE_Q))
-			ccol--;
-		if (machine().input().code_pressed(KEYCODE_W))
-			ccol++;
-	}
-	if(ccol == 0x80)
-		ccol = -1;
-	if(ccol == -2)
-		ccol = 0x7f;
-
-	if(ccol != ocol)
-		popmessage("%02x", ccol);
-
 	bitmap.fill(m_palette->black_pen(), cliprect);
 	if (!(raiden2_tilemap_enable & 16)) {
 		draw_sprites(cliprect);
@@ -3227,8 +3197,63 @@ ROM_START( xsedae )
 	ROM_REGION( 0x100000, "oki2", ROMREGION_ERASEFF )   /* ADPCM samples */
 ROM_END
 
+const UINT16 raiden2_state::raiden_blended_colors[] = {
+	// bridge tunnel entrance shadow
+	0x380,
+
+	// cloud
+	0x3c0, 0x3c1, 0x3c2, 0x3c3, 0x3c4, 0x3c5, 0x3c6, 0x3c7, 0x3c8, 0x3c9, 0x3ca, 0x3cb, 0x3cc, 0x3cd, 0x3ce,
+
+	// engine
+	0x3d0, 0x3d1, 0x3d2, 0x3d3, 0x3d4, 0x3d5, 0x3d6, 0x3d7, 0x3d8, 0x3d9, 0x3da, 0x3db, 0x3dc, 0x3dd, 0x3de,
+
+	// level 1 boss legs
+	0x3f0, 0x3f1, 0x3f2, 0x3f3, 0x3f4, 0x3f5, 0x3f6, 0x3f7, 0x3f8, 0x3f9, 0x3fa, 0x3fb, 0x3fc, 0x3fd, 0x3fe,
+
+	// water
+	0x4f8, 0x4f9, 0x4fa, 0x4fb, 0x4fc, 0x4fd, 0x4fe,
+	0x5c8, 0x5c9, 0x5ca, 0x5cb, 0x5cc, 0x5cd, 0x5ce,
+
+	// wall shadow
+	0x5de,
+
+	// house shadow
+	0x5fe,
+
+	// water and trees
+	0x6c8, 0x6c9, 0x6ca, 0x6cb, 0x6cc, 0x6cd, 0x6ce,
+	0x6d8, 0x6d9, 0x6da, 0x6db, 0x6dc, 0x6dd, 0x6de,
+	0x6e8, 0x6e9, 0x6ea, 0x6eb, 0x6ec, 0x6ed, 0x6ee,
+	0x6f8, 0x6f9, 0x6fa, 0x6fb, 0x6fc, 0x6fd, 0x6fe,
+
+	// stage end panel plus misc stuff
+	0x70d, 0x70e,
+	0x71c,
+	0x71d, 0x71e,
+	0x72d, 0x72e,
+	0x73d, 0x73e,
+	0x74d, 0x74e,
+	0x75c,
+	0x76d, 0x76e,
+	0x77d, 0x77e,
+
+	// logo in attract mode
+	0x7c8, 0x7c9, 0x7ca, 0x7cb, 0x7cc, 0x7cd, 0x7ce,
+
+	0xffff,
+};
+
+void raiden2_state::init_blending(const UINT16 *table)
+{
+	for(int i=0; i<0x800; i++)
+		blend_active[i] = false;
+	while(*table != 0xffff)
+		blend_active[*table++] = true;
+}
+
 DRIVER_INIT_MEMBER(raiden2_state,raiden2)
 {
+	init_blending(raiden_blended_colors);
 	static const int spri[5] = { 0, 1, 2, 3, -1 };
 	cur_spri = spri;
 	membank("mainbank1")->configure_entries(0, 4, memregion("mainprg")->base(), 0x10000);
@@ -3238,6 +3263,7 @@ DRIVER_INIT_MEMBER(raiden2_state,raiden2)
 
 DRIVER_INIT_MEMBER(raiden2_state,raidendx)
 {
+	init_blending(raiden_blended_colors);
 	static const int spri[5] = { 0, 1, 2, 3, -1 };
 	cur_spri = spri;
 	membank("mainbank1")->configure_entries(0, 0x20, memregion("mainprg")->base(), 0x10000);
@@ -3245,15 +3271,21 @@ DRIVER_INIT_MEMBER(raiden2_state,raidendx)
 	raiden2_decrypt_sprites(machine());
 }
 
+const UINT16 raiden2_state::xsedae_blended_colors[] = {
+	0xffff,
+};
+
 DRIVER_INIT_MEMBER(raiden2_state,xsedae)
 {
-	static const int spri[5] = { 0, 1, 2, 3, -1 };
+	init_blending(xsedae_blended_colors);
+	static const int spri[5] = { -1, 0, 1, 2, 3 };
 	cur_spri = spri;
 	/* doesn't have banking */
 }
 
 DRIVER_INIT_MEMBER(raiden2_state,zeroteam)
 {
+	init_blending(xsedae_blended_colors);
 	static const int spri[5] = { -1, 0, 1, 2, 3 };
 	cur_spri = spri;
 	membank("mainbank1")->configure_entries(0, 4, memregion("mainprg")->base(), 0x10000);
