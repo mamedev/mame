@@ -1293,13 +1293,12 @@ void cli_frontend::listsoftware(const char *gamename)
 	{
 		software_list_device_iterator iter(drivlist.config().root_device());
 		for (software_list_device *swlistdev = iter.first(); swlistdev != NULL; swlistdev = iter.next())
-			if (swlistdev->list_type() == SOFTWARE_LIST_ORIGINAL_SYSTEM)
-				if (list_map.add(swlistdev->list_name(), 0, false) != TMERR_DUPLICATE)
-					if (swlistdev->first_software_info() != NULL)
-					{
-						if (isfirst) { fprintf(out, SOFTLIST_XML_BEGIN); isfirst = false; }
-						output_single_softlist(out, *swlistdev);
-					}
+			if (list_map.add(swlistdev->list_name(), 0, false) != TMERR_DUPLICATE)
+				if (swlistdev->first_software_info() != NULL)
+				{
+					if (isfirst) { fprintf(out, SOFTLIST_XML_BEGIN); isfirst = false; }
+					output_single_softlist(out, *swlistdev);
+				}
 	}
 
 	if (!isfirst)
