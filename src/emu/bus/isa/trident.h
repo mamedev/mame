@@ -20,6 +20,8 @@ public:
 	virtual WRITE8_MEMBER(port_03c0_w);
 	virtual READ8_MEMBER(port_03d0_r);
 	virtual WRITE8_MEMBER(port_03d0_w);
+	DECLARE_READ8_MEMBER(port_83c6_r);
+	DECLARE_WRITE8_MEMBER(port_83c6_w);
 	virtual READ8_MEMBER(mem_r);
 	virtual WRITE8_MEMBER(mem_w);
 	virtual UINT16 offset();
@@ -36,7 +38,13 @@ protected:
 		UINT8 sr0f;
 		UINT8 gc0e;
 		UINT8 gc0f;
+		UINT8 gc2f;
+		UINT8 cr1e;
 		UINT8 cr1f;
+		UINT8 cr21;
+		UINT8 cr29;
+		UINT8 cr39;
+		UINT8 cr50;
 		UINT8 dac;
 		bool new_mode;
 		bool port_3c3;
@@ -45,6 +53,9 @@ protected:
 		UINT8 revision;
 		bool dac_active;
 		UINT8 dac_count;
+		UINT32 linear_address;
+		bool linear_active;
+		bool mmio_active;
 	} tri;
 private:
 	UINT8 trident_seq_reg_read(UINT8 index);

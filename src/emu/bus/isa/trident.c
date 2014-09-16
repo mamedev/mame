@@ -8,6 +8,7 @@
 
 #include "emu.h"
 #include "trident.h"
+#include "debugger.h"
 
 const device_type TRIDENT_VGA = &device_creator<trident_vga_device>;
 
@@ -20,7 +21,28 @@ trident_vga_device::trident_vga_device(const machine_config &mconfig, const char
 
 void trident_vga_device::device_start()
 {
-	svga_device::device_start();
+	memset(&vga, 0, sizeof(vga));
+	memset(&svga, 0, sizeof(svga));
+
+	int i;
+	for (i = 0; i < 0x100; i++)
+		m_palette->set_pen_color(i, 0, 0, 0);
+
+	// Avoid an infinite loop when displaying.  0 is not possible anyway.
+	vga.crtc.maximum_scan_line = 1;
+
+
+	// copy over interfaces
+	vga.read_dipswitch = read8_delegate(); //read_dipswitch;
+	vga.svga_intf.vram_size = 0x200000;
+
+	vga.memory.resize_and_clear(vga.svga_intf.vram_size);
+	save_item(NAME(vga.memory));
+	save_pointer(vga.crtc.data,"CRTC Registers",0x100);
+	save_pointer(vga.sequencer.data,"Sequencer Registers",0x100);
+	save_pointer(vga.attribute.data,"Attribute Registers", 0x15);
+
+	m_vblank_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(vga_device::vblank_timer_cb),this));
 	vga.svga_intf.seq_regcount = 0x0f;
 	vga.svga_intf.crtc_regcount = 0x50;
 	memset(&tri, 0, sizeof(tri));
@@ -30,9 +52,11 @@ void trident_vga_device::device_reset()
 {
 	svga_device::device_reset();
 	svga.id = 0xd3;  // identifies at TGUI9660XGi
-	tri.revision = 0x01;  // revision identifies as TGUI9680
+	tri.revision = 0x05;  // revision identifies as TGUI9680
 	tri.new_mode = false;  // start up in old mode
 	tri.dac_active = false;
+	tri.linear_active = false;
+	tri.mmio_active = false;
 }
 
 UINT16 trident_vga_device::offset()
@@ -111,6 +135,7 @@ UINT8 trident_vga_device::trident_seq_reg_read(UINT8 index)
 			case 0x0b:
 				res = svga.id;
 				tri.new_mode = true;
+				//debugger_break(machine());
 				break;
 			case 0x0c:  // Power Up Mode register 1
 				res = tri.sr0c & 0xef;
@@ -134,7 +159,7 @@ UINT8 trident_vga_device::trident_seq_reg_read(UINT8 index)
 				break;
 		}
 	}
-
+	logerror("Trident SR%02X: read %02x\n",index,res);
 	return res;
 }
 
@@ -176,17 +201,17 @@ void trident_vga_device::trident_seq_reg_write(UINT8 index, UINT8 data)
 				if(tri.new_mode)
 				{
 					tri.sr0e_new = data ^ 0x02;
-					svga.bank_w = (data & 0x0f) ^ 0x02;  // bit 1 is inverted, used for card detection, it is not XORed on reading
+					svga.bank_w = (data & 0x1f) ^ 0x02;  // bit 1 is inverted, used for card detection, it is not XORed on reading
 					if(!(tri.gc0f & 0x01))
-						svga.bank_r = (data & 0x0f) ^ 0x02;
+						svga.bank_r = (data & 0x1f) ^ 0x02;
 					// TODO: handle planar modes, where bits 0 and 2 only are used
 				}
 				else
 				{
 					tri.sr0e_old = data;
-					svga.bank_w = data & 0x06;
+					svga.bank_w = data & 0x0e;
 					if(!(tri.gc0f & 0x01))
-						svga.bank_r = data & 0x06;
+						svga.bank_r = data & 0x0e;
 				}
 				break;
 			case 0x0f:  // Power Up Mode 2
@@ -206,17 +231,36 @@ UINT8 trident_vga_device::trident_crtc_reg_read(UINT8 index)
 	{
 		switch(index)
 		{
+		case 0x1e:
+			res = tri.cr1e;
+			break;
 		case 0x1f:
 			res = tri.cr1f;
 			break;
+		case 0x21:
+			res = tri.cr21;
+			break;
+		case 0x27:
+			res = (vga.crtc.start_addr & 0x60000) >> 17;
+			break;
+		case 0x29:
+			res = tri.cr29;
+			break;
 		case 0x38:
 			res = tri.pixel_depth;
+			break;
+		case 0x39:
+			res = tri.cr39;
+			break;
+		case 0x50:
+			res = tri.cr50;
 			break;
 		default:
 			res = vga.crtc.data[index];
 			break;
 		}
 	}
+	logerror("Trident CR%02X: read %02x\n",index,res);
 	return res;
 }
 void trident_vga_device::trident_crtc_reg_write(UINT8 index, UINT8 data)
@@ -231,15 +275,42 @@ void trident_vga_device::trident_crtc_reg_write(UINT8 index, UINT8 data)
 		logerror("Trident CR%02X: write %02x\n",index,data);
 		switch(index)
 		{
+		case 0x1e:  // Module Testing Register
+			tri.cr1e = data;
+			vga.crtc.start_addr = (vga.crtc.start_addr & 0xfffeffff) | ((data & 0x20)<<11);
+			break;
 		case 0x1f:
 			tri.cr1f = data;  // "Software Programming Register"  written to by software (BIOS?)
+			break;
+		case 0x21:  // Linear aperture
+			tri.cr21 = data;
+			tri.linear_address = ((data & 0xc0)<<18) | ((data & 0x0f)<<20);
+			tri.linear_active = data & 0x20;
+			if(tri.linear_active)
+				popmessage("Trident: Linear Aperture active - %08x, %s",tri.linear_address,(tri.cr21 & 0x10) ? "2MB" : "1MB" );
+			break;
+		case 0x27:
+			vga.crtc.start_addr = (vga.crtc.start_addr & 0xfff9ffff) | ((data & 0x03)<<17);
+			break;
+		case 0x29:
+			tri.cr29 = data;
+			vga.crtc.offset = (vga.crtc.offset & 0xfeff) | ((data & 0x10)<<4);
 			break;
 		case 0x38:
 			tri.pixel_depth = data;
 			trident_define_video_mode();
 			break;
+		case 0x39:
+			tri.cr39 = data;
+			tri.mmio_active = data & 0x01;
+			if(tri.mmio_active)
+				popmessage("Trident: MMIO activated");
+			break;
+		case 0x50:
+			tri.cr50 = data;
+			break;
 		default:
-			logerror("Trident: 3D4 index %02x write %02x\n",index,data);
+			//logerror("Trident: 3D4 index %02x write %02x\n",index,data);
 			break;
 		}
 	}
@@ -261,11 +332,15 @@ UINT8 trident_vga_device::trident_gc_reg_read(UINT8 index)
 		case 0x0f:
 			res = tri.gc0f;
 			break;
+		case 0x2f:
+			res = tri.gc2f;
+			break;
 		default:
 			res = 0xff;
 			break;
 		}
 	}
+	logerror("Trident GC%02X: read %02x\n",index,res);
 	return res;
 }
 
@@ -289,8 +364,11 @@ void trident_vga_device::trident_gc_reg_write(UINT8 index, UINT8 data)
 		case 0x0f:
 			tri.gc0f = data;
 			break;
+		case 0x2f:  // XFree86 refers to this register as "MiscIntContReg", setting bit 2, but gives no indication as to what it does
+			tri.gc2f = data;
+			break;
 		default:
-			logerror("Trident: Unimplemented GC register %02x write %02x\n",index,data);
+			//logerror("Trident: Unimplemented GC register %02x write %02x\n",index,data);
 			break;
 		}
 	}
@@ -431,6 +509,38 @@ WRITE8_MEMBER(trident_vga_device::port_03d0_w)
 				vga_device::port_03d0_w(space,offset,data,mem_mask);
 				break;
 		}
+	}
+}
+
+READ8_MEMBER(trident_vga_device::port_83c6_r)
+{
+	UINT8 res = 0xff;
+	switch(offset)
+	{
+	case 2:
+		res = port_03c0_r(space,5,mem_mask);
+		logerror("Trident: 83c6 read %02x\n",res);
+		break;
+	case 4:
+		res = vga.sequencer.index;
+		logerror("Trident: 83c8 seq read %02x\n",res);
+		break;
+	}
+	return res;
+}
+
+WRITE8_MEMBER(trident_vga_device::port_83c6_w)
+{
+	switch(offset)
+	{
+	case 2:
+		logerror("Trident: 83c6 seq write %02x\n",data);
+		port_03c0_w(space,5,data,mem_mask);
+		break;
+	case 4:
+		logerror("Trident: 83c8 seq index write %02x\n",data);
+		vga.sequencer.index = data;
+		break;
 	}
 }
 

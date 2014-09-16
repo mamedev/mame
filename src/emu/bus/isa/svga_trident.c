@@ -81,6 +81,7 @@ void isa8_svga_tgui9680_device::device_start()
 	m_isa->install_device(0x3b0, 0x3bf, 0, 0, read8_delegate(FUNC(trident_vga_device::port_03b0_r),m_vga), write8_delegate(FUNC(trident_vga_device::port_03b0_w),m_vga));
 	m_isa->install_device(0x3c0, 0x3cf, 0, 0, read8_delegate(FUNC(trident_vga_device::port_03c0_r),m_vga), write8_delegate(FUNC(trident_vga_device::port_03c0_w),m_vga));
 	m_isa->install_device(0x3d0, 0x3df, 0, 0, read8_delegate(FUNC(trident_vga_device::port_03d0_r),m_vga), write8_delegate(FUNC(trident_vga_device::port_03d0_w),m_vga));
+	m_isa->install_device(0x83c4, 0x83cb, 0, 0, read8_delegate(FUNC(trident_vga_device::port_83c6_r),m_vga), write8_delegate(FUNC(trident_vga_device::port_83c6_w),m_vga));
 
 	m_isa->install_memory(0xa0000, 0xbffff, 0, 0, read8_delegate(FUNC(trident_vga_device::mem_r),m_vga), write8_delegate(FUNC(trident_vga_device::mem_w),m_vga));
 }
