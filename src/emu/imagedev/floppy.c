@@ -901,11 +901,11 @@ void ui_menu_control_floppy_image::hook_load(astring filename, bool softlist)
 			bool has_crc = hash_collection(ROM_GETHASHDATA(romp)).crc(crc);
 
 			filename = try_file(astring(swlistdev->list_name()) + PATH_SEPARATOR + astring(swinfo_name), ROM_GETNAME(romp), has_crc, crc);
-			if(filename == "")
+			if(filename == "" && parentname)
 				filename = try_file(astring(swlist_name) + PATH_SEPARATOR + astring(parentname), ROM_GETNAME(romp), has_crc, crc);
 			if(filename == "")
 				filename = try_file(swinfo_name, ROM_GETNAME(romp), has_crc, crc);
-			if(filename == "")
+			if(filename == "" && parentname)
 				filename = try_file(parentname, ROM_GETNAME(romp), has_crc, crc);
 			if(filename != "")
 				break;
