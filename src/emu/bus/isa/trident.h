@@ -22,6 +22,8 @@ public:
 	virtual WRITE8_MEMBER(port_03d0_w);
 	DECLARE_READ8_MEMBER(port_83c6_r);
 	DECLARE_WRITE8_MEMBER(port_83c6_w);
+	DECLARE_READ8_MEMBER(vram_r) { if (svga.rgb8_en || svga.rgb15_en || svga.rgb16_en || svga.rgb32_en) return vga.memory[offset % vga.svga_intf.vram_size]; else return 0xff; }
+	DECLARE_WRITE8_MEMBER(vram_w) { if (svga.rgb8_en || svga.rgb15_en || svga.rgb16_en || svga.rgb32_en) vga.memory[offset % vga.svga_intf.vram_size] = data; }
 	virtual READ8_MEMBER(mem_r);
 	virtual WRITE8_MEMBER(mem_w);
 	virtual UINT16 offset();

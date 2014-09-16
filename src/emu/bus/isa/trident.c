@@ -44,7 +44,7 @@ void trident_vga_device::device_start()
 
 	m_vblank_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(vga_device::vblank_timer_cb),this));
 	vga.svga_intf.seq_regcount = 0x0f;
-	vga.svga_intf.crtc_regcount = 0x50;
+	vga.svga_intf.crtc_regcount = 0x60;
 	memset(&tri, 0, sizeof(tri));
 }
 
@@ -52,7 +52,7 @@ void trident_vga_device::device_reset()
 {
 	svga_device::device_reset();
 	svga.id = 0xd3;  // identifies at TGUI9660XGi
-	tri.revision = 0x05;  // revision identifies as TGUI9680
+	tri.revision = 0x01;  // revision identifies as TGUI9680
 	tri.new_mode = false;  // start up in old mode
 	tri.dac_active = false;
 	tri.linear_active = false;
@@ -201,9 +201,9 @@ void trident_vga_device::trident_seq_reg_write(UINT8 index, UINT8 data)
 				if(tri.new_mode)
 				{
 					tri.sr0e_new = data ^ 0x02;
-					svga.bank_w = (data & 0x1f) ^ 0x02;  // bit 1 is inverted, used for card detection, it is not XORed on reading
+					svga.bank_w = (data & 0x3f) ^ 0x02;  // bit 1 is inverted, used for card detection, it is not XORed on reading
 					if(!(tri.gc0f & 0x01))
-						svga.bank_r = (data & 0x1f) ^ 0x02;
+						svga.bank_r = (data & 0x3f) ^ 0x02;
 					// TODO: handle planar modes, where bits 0 and 2 only are used
 				}
 				else
@@ -281,6 +281,7 @@ void trident_vga_device::trident_crtc_reg_write(UINT8 index, UINT8 data)
 			break;
 		case 0x1f:
 			tri.cr1f = data;  // "Software Programming Register"  written to by software (BIOS?)
+			debugger_break(machine());
 			break;
 		case 0x21:  // Linear aperture
 			tri.cr21 = data;
@@ -458,14 +459,14 @@ READ8_MEMBER(trident_vga_device::port_03d0_r)
 				break;
 			case 8:
 				if(tri.gc0f & 0x04)  // if enabled
-					res = svga.bank_w & 0x1f;
+					res = svga.bank_w & 0x3f;
 				else
 					res = 0xff;
 				break;
 			case 9:
 				if(tri.gc0f & 0x04)  // if enabled
 					if(tri.gc0f & 0x01)  // and if bank regs are separated
-						res = svga.bank_r & 0x1f;
+						res = svga.bank_r & 0x3f;
 					else
 						res = 0xff;
 				else
@@ -493,16 +494,16 @@ WRITE8_MEMBER(trident_vga_device::port_03d0_w)
 			case 8:
 				if(tri.gc0f & 0x04)  // if enabled
 				{
-					svga.bank_w = data & 0x1f;
+					svga.bank_w = data & 0x3f;
 					if(!(tri.gc0f & 0x01))  // if bank regs are not separated
-						svga.bank_r = data & 0x1f; // then this is also the read bank register
+						svga.bank_r = data & 0x3f; // then this is also the read bank register
 				}
 				break;
 			case 9:
 				if(tri.gc0f & 0x04)  // if enabled
 				{
 					if(tri.gc0f & 0x01)  // and if bank regs are separated
-						svga.bank_r = data & 0x1f;
+						svga.bank_r = data & 0x3f;
 				}
 				break;
 			default:
