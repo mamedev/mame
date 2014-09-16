@@ -114,6 +114,7 @@ protected:
 	UINT8            m_reg[16];                  /* All the registers */
 	UINT8            m_status;                   /* Status register */
 	UINT8            m_pending_status;           /* Pending status flags */
+	UINT8            m_reg6copy;                 /* Internal copy of register 6 (Sprite Patterns) */
 	UINT8            m_reg8copy;                 /* Internal copy of register 8 (X-Scroll) */
 	UINT8            m_reg9copy;                 /* Internal copy of register 9 (Y-Scroll) */
 	UINT8            m_addrmode;                 /* Type of VDP action */
@@ -144,7 +145,6 @@ protected:
 	int              m_sprite_count;
 	int              m_sprite_height;
 	int              m_sprite_zoom;
-	UINT8            m_latched_reg6;
 
 	/* line_buffer will be used to hold 5 lines of line data. Line #0 is the regular blitting area.
 	   Lines #1-#4 will be used as a kind of cache to be used for vertical scaling in the gamegear

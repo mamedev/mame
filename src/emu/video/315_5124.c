@@ -71,7 +71,8 @@ PAL frame timing
 #define SPROVR_HPOS           24
 #define SPRCOL_BASEHPOS       59
 #define X_SCROLL_HPOS         21
-#define DISPLAY_DISABLED_HPOS 17 /* fixes 'fantdizzy' (SMS PAL game) flicker */
+#define DISPLAY_DISABLED_HPOS 24 /* not verified, works if above 18 (for 'pstrike2') and below 25 (for 'fantdizzy') */
+#define SPR_PATTERN_HPOS      26 /* not verified, needed for 'backtof3' (SMS PAL game) title screen */
 #define DISPLAY_CB_HPOS       2  /* fixes 'roadrash' (SMS game) title scrolling, due to line counter reload timing */
 
 #define DRAW_TIME_GG        94      /* 9 + 2 + 14 + 8 + 13 + 96/2 */
@@ -156,7 +157,6 @@ sega315_5124_device::sega315_5124_device(const machine_config &mconfig, const ch
 	, m_cram_size( SEGA315_5124_CRAM_SIZE )
 	, m_palette_offset( 0 )
 	, m_supports_224_240( false )
-	, m_latched_reg6(0)
 	, m_is_pal(false)
 	, m_int_cb(*this)
 	, m_pause_cb(*this)
@@ -173,7 +173,6 @@ sega315_5124_device::sega315_5124_device(const machine_config &mconfig, device_t
 	, m_cram_size( cram_size )
 	, m_palette_offset( palette_offset )
 	, m_supports_224_240( supports_224_240 )
-	, m_latched_reg6(0)
 	, m_is_pal(false)
 	, m_int_cb(*this)
 	, m_pause_cb(*this)
@@ -302,7 +301,7 @@ void sega315_5124_device::hcount_latch_at_hpos( int hpos )
 	   with the expected VDP hclock value, if the same range is used (from 0 to width-1). */
 	int hclock = hpos - 1;
 	if (hclock < 0)
-		hclock += m_screen->width();
+		hclock += SEGA315_5124_WIDTH;
 
 	/* Calculate and store the new hcount. */
 	m_hcounter = ((hclock - active_scr_start) >> 1) & 0xff;
@@ -376,7 +375,6 @@ void sega315_5124_device::device_timer(emu_timer &timer, device_timer_id id, int
 					m_int_cb(ASSERT_LINE);
 			}
 		}
-		m_latched_reg6 = m_reg[0x06];
 		break;
 
 	case TIMER_VINT:
@@ -407,7 +405,10 @@ void sega315_5124_device::process_line_timer()
 					+ m_frame_timing[TOP_BORDER] + m_frame_timing[ACTIVE_DISPLAY_V]
 					+ m_frame_timing[BOTTOM_BORDER] + m_frame_timing[BOTTOM_BLANKING];
 
+	/* copy current values in case they are not changed until latch time */
 	m_display_disabled = !(m_reg[0x01] & 0x40);
+	m_reg6copy = m_reg[0x06];
+	m_reg8copy = m_reg[0x08];
 
 	vpos_limit -= m_frame_timing[BOTTOM_BLANKING];
 
@@ -467,18 +468,17 @@ void sega315_5124_device::process_line_timer()
 		{
 			m_reg9copy = m_reg[0x09];
 		}
-		m_reg8copy = m_reg[0x08];
 
 		if (m_line_counter == 0x00)
 		{
 			m_line_counter = m_reg[0x0a];
+			m_hint_timer->adjust( m_screen->time_until_pos( vpos, HINT_HPOS ) );
 			m_pending_status |= STATUS_HINT;
 		}
 		else
 		{
 			m_line_counter--;
 		}
-		m_hint_timer->adjust( m_screen->time_until_pos( vpos, HINT_HPOS ) );
 
 		/* Draw borders */
 		m_lborder_timer->adjust( m_screen->time_until_pos( vpos, SEGA315_5124_LBORDER_START ), vpos );
@@ -562,7 +562,7 @@ void sega315_5124_device::check_pending_flags()
 	   remaining time, what could also occur due to the ahead time of the timeslice. */
 	if (m_pending_flags_timer->remaining() == attotime::zero)
 	{
-		hpos = m_screen->width() - 1;
+		hpos = SEGA315_5124_WIDTH - 1;
 	}
 	else
 	{
@@ -649,7 +649,7 @@ WRITE8_MEMBER( sega315_5124_device::vram_write )
 
 WRITE8_MEMBER( sega315_5124_device::register_write )
 {
-	int reg_num, hpos;
+	int reg_num;
 
 	if (m_pending_reg_write == 0)
 	{
@@ -677,19 +677,27 @@ WRITE8_MEMBER( sega315_5124_device::register_write )
 			reg_num = data & 0x0f;
 			m_reg[reg_num] = m_addr & 0xff;
 			//logerror("%s: %s: setting register %x to %02x\n", machine().describe_context(), tag(), reg_num, m_addr & 0xf );
-			if ( reg_num == 0 && ( m_addr & 0x02 ) )
-				logerror("overscan enabled.\n");
-
-			if (reg_num == 0 || reg_num == 1)
+			
+			switch (reg_num)
+			{
+			case 0:
 				set_display_settings();
-
-			hpos = m_screen->hpos();
-
-			if (reg_num == 1 && hpos <= DISPLAY_DISABLED_HPOS)
-				m_display_disabled = !(m_reg[0x01] & 0x40);
-
-			if (reg_num == 8 && hpos <= X_SCROLL_HPOS)
-				m_reg8copy = m_reg[0x08];
+				if (m_addr & 0x02)
+					logerror("overscan enabled.\n");
+				break;
+			case 1:
+				set_display_settings();
+				if (m_screen->hpos() <= DISPLAY_DISABLED_HPOS)
+					m_display_disabled = !(m_reg[0x01] & 0x40);
+				break;
+			case 6:
+				if (m_screen->hpos() <= SPR_PATTERN_HPOS)
+					m_reg6copy = m_reg[0x06];
+				break;
+			case 8:
+				if (m_screen->hpos() <= X_SCROLL_HPOS)
+					m_reg8copy = m_reg[0x08];
+			}
 
 			check_pending_flags();
 
@@ -966,9 +974,9 @@ void sega315_5124_device::select_sprites( int line )
 void sega315_5124_device::draw_sprites_mode4( int *line_buffer, int *priority_selected, int line )
 {
 	bool sprite_col_occurred = false;
-	int sprite_col_x = m_screen->width();
+	int sprite_col_x = SEGA315_5124_WIDTH;
 
-	if (m_display_disabled)
+	if (m_display_disabled || m_sprite_count == 0)
 		return;
 
 	memset(m_collision_buffer, 0, SEGA315_5124_WIDTH);
@@ -991,7 +999,7 @@ void sega315_5124_device::draw_sprites_mode4( int *line_buffer, int *priority_se
 			sprite_x -= 0x08;    /* sprite shift */
 		}
 
-		if (m_latched_reg6 & 0x04)
+		if (m_reg6copy & 0x04)
 		{
 			sprite_tile_selected += 256; /* pattern table select */
 		}
@@ -1122,12 +1130,13 @@ void sega315_5124_device::draw_sprites_mode4( int *line_buffer, int *priority_se
 void sega315_5124_device::draw_sprites_tms9918_mode( int *line_buffer, int line )
 {
 	bool sprite_col_occurred = false;
-	int sprite_col_x = m_screen->width();
-	const UINT16 sprite_pattern_base = ((m_latched_reg6 & 0x07) << 11);
+	int sprite_col_x = SEGA315_5124_WIDTH;
+	UINT16 sprite_pattern_base;
 
-	if (m_display_disabled)
+	if (m_display_disabled || m_sprite_count == 0)
 		return;
 
+	sprite_pattern_base = ((m_reg6copy & 0x07) << 11);
 	memset(m_collision_buffer, 0, SEGA315_5124_WIDTH);
 
 	/* Draw sprite layer */
@@ -1400,6 +1409,9 @@ void sega315_5124_device::draw_scanline( int pixel_offset_x, int pixel_plot_y, i
 	int x;
 	int *blitline_buffer = m_line_buffer;
 	int priority_selected[256];
+
+	/* Sprite processing is restricted because collisions on top border of extended
+	   resolution break the scoreboard of Fantasy Dizzy (SMS) on smspal driver */
 
 	if ( line < m_frame_timing[ACTIVE_DISPLAY_V] )
 	{
@@ -1809,7 +1821,7 @@ void sega315_5124_device::device_start()
 	m_display_timer = timer_alloc(TIMER_LINE);
 	m_display_timer->adjust(m_screen->time_until_pos(0, DISPLAY_CB_HPOS), 0, m_screen->scan_period());
 	m_pending_flags_timer = timer_alloc(TIMER_FLAGS);
-	m_pending_flags_timer->adjust(m_screen->time_until_pos(0, m_screen->width() - 1), 0, m_screen->scan_period());
+	m_pending_flags_timer->adjust(m_screen->time_until_pos(0, SEGA315_5124_WIDTH - 1), 0, m_screen->scan_period());
 	m_draw_timer = timer_alloc(TIMER_DRAW);
 	m_lborder_timer = timer_alloc(TIMER_LBORDER);
 	m_rborder_timer = timer_alloc(TIMER_RBORDER);
@@ -1820,6 +1832,7 @@ void sega315_5124_device::device_start()
 	save_item(NAME(m_status));
 	save_item(NAME(m_pending_status));
 	save_item(NAME(m_pending_sprcol_x));
+	save_item(NAME(m_reg6copy));
 	save_item(NAME(m_reg8copy));
 	save_item(NAME(m_reg9copy));
 	save_item(NAME(m_addrmode));
@@ -1848,7 +1861,6 @@ void sega315_5124_device::device_start()
 	save_item(NAME(m_sprite_height));
 	save_item(NAME(m_sprite_zoom));
 	save_item(NAME(m_CRAM));
-	save_item(NAME(m_latched_reg6));
 
 	machine().save().register_postload(save_prepost_delegate(FUNC(sega315_5124_device::vdp_postload), this));
 }
@@ -1869,6 +1881,7 @@ void sega315_5124_device::device_reset()
 	m_pending_status = 0;
 	m_pending_sprcol_x = 0;
 	m_pending_reg_write = 0;
+	m_reg6copy = 0;
 	m_reg8copy = 0;
 	m_reg9copy = 0;
 	m_addrmode = 0;
