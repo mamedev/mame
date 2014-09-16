@@ -3487,59 +3487,23 @@ void address_table::subtable_close(offs_t l1index)
 
 const char *address_table::handler_name(UINT16 entry) const
 {
-	static const char *const strings[] =
-	{
-		"invalid",      "bank 1",       "bank 2",       "bank 3",
-		"bank 4",       "bank 5",       "bank 6",       "bank 7",
-		"bank 8",       "bank 9",       "bank 10",      "bank 11",
-		"bank 12",      "bank 13",      "bank 14",      "bank 15",
-		"bank 16",      "bank 17",      "bank 18",      "bank 19",
-		"bank 20",      "bank 21",      "bank 22",      "bank 23",
-		"bank 24",      "bank 25",      "bank 26",      "bank 27",
-		"bank 28",      "bank 29",      "bank 30",      "bank 31",
-		"bank 32",      "bank 33",      "bank 34",      "bank 35",
-		"bank 36",      "bank 37",      "bank 38",      "bank 39",
-		"bank 40",      "bank 41",      "bank 42",      "bank 43",
-		"bank 44",      "bank 45",      "bank 46",      "bank 47",
-		"bank 48",      "bank 49",      "bank 50",      "bank 51",
-		"bank 52",      "bank 53",      "bank 54",      "bank 55",
-		"bank 56",      "bank 57",      "bank 58",      "bank 59",
-		"bank 60",      "bank 61",      "bank 62",      "bank 63",
-		"bank 64",      "bank 65",      "bank 66",      "bank 67",
-		"bank 68",      "bank 69",      "bank 70",      "bank 71",
-		"bank 72",      "bank 73",      "bank 74",      "bank 75",
-		"bank 76",      "bank 77",      "bank 78",      "bank 79",
-		"bank 80",      "bank 81",      "bank 82",      "bank 83",
-		"bank 84",      "bank 85",      "bank 86",      "bank 87",
-		"bank 88",      "bank 89",      "bank 90",      "bank 91",
-		"bank 92",      "bank 93",      "bank 94",      "bank 95",
-		"bank 96",      "bank 97",      "bank 98",      "bank 99",
-		"bank 100",     "bank 101",     "bank 102",     "bank 103",
-		"bank 104",     "bank 105",     "bank 106",     "bank 107",
-		"bank 108",     "bank 109",     "bank 110",     "bank 111",
-		"bank 112",     "bank 113",     "bank 114",     "bank 115",
-		"bank 116",     "bank 117",     "bank 118",     "bank 119",
-		"bank 120",     "bank 121",     "bank 122",     "ram",
-		"rom",          "nop",          "unmapped",     "watchpoint"
-	};
-
 	// banks have names
 	if (entry >= STATIC_BANK1 && entry <= STATIC_BANKMAX)
 		for (memory_bank *info = m_space.manager().first_bank(); info != NULL; info = info->next())
 			if (info->index() == entry)
 				return info->name();
 
-	// constant strings for lower entries
-	if (entry < ARRAY_LENGTH(strings))
-		return strings[entry];
-	else
-	{
-		static char desc[4096];
-		handler(entry).description(desc);
-		if (desc[0])
-			return desc;
-		return "???";
-	}
+	// constant strings for static entries
+	if (entry == STATIC_INVALID) return "invalid";
+	if (entry == STATIC_NOP) return "nop";
+	if (entry == STATIC_UNMAP) return "unmapped";
+	if (entry == STATIC_WATCHPOINT) return "watchpoint";
+
+	static char desc[4096];
+	handler(entry).description(desc);
+	if (desc[0])
+		return desc;
+	return "???";
 }
 
 
