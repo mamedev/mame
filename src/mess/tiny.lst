@@ -38,6 +38,5 @@
 
 ******************************************************************************/
 
-coleco      // ColecoVision (Original BIOS)
-colecoa     // ColecoVision (Thick Characters)
-colecob     // Spectravideo SVI-603 Coleco Game Adapter
+coleco      // NTSC ColecoVision
+colecop     // PAL Colecovision		 
