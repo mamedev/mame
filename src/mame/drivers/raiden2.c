@@ -1238,17 +1238,17 @@ WRITE16_MEMBER(raiden2_state::sprite_prot_src_w)
 	sprite_prot_src_addr[1] = data;
 	UINT32 src = (sprite_prot_src_addr[0]<<4)+sprite_prot_src_addr[1];
 
-	int x = ((space.read_dword(src+0x08) >> 16) - (sprite_prot_x)) & 0xffff;
-	int y = ((space.read_dword(src+0x04) >> 16) - (sprite_prot_y)) & 0xffff;
+	int x = INT16((space.read_dword(src+0x08) >> 16) - (sprite_prot_x));
+	int y = INT16((space.read_dword(src+0x04) >> 16) - (sprite_prot_y));
 
 	UINT16 head1 = space.read_word(src+cop_spr_off);
 	UINT16 head2 = space.read_word(src+cop_spr_off+2);
 
-	int w = (((head1 >> 8 ) & 7) + 1) << 3;
-	int h = (((head1 >> 12) & 7) + 1) << 3;
+	int w = (((head1 >> 8 ) & 7) + 1) << 4;
+	int h = (((head1 >> 12) & 7) + 1) << 4;
 
-	UINT16 flag = x-w > -w && x-w < cop_spr_maxx+w && y-h > -h && y-h < 240+h ? 1 : 0;
-	
+	UINT16 flag = x-w/2 > -w && x-w/2 < cop_spr_maxx+w && y-h/2 > -h && y-h/2 < 256+h ? 1 : 0;
+
 	flag = (space.read_word(src) & 0xfffe) | flag;
 	space.write_word(src, flag);
 
@@ -1256,8 +1256,8 @@ WRITE16_MEMBER(raiden2_state::sprite_prot_src_w)
 	{
 		space.write_word(dst1,   head1);
 		space.write_word(dst1+2, head2);
-		space.write_word(dst1+4, x-w);
-		space.write_word(dst1+6, y-h);
+		space.write_word(dst1+4, x-w/2);
+		space.write_word(dst1+6, y-h/2);
 
 		dst1 += 8;
 	}
