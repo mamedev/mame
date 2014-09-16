@@ -95,7 +95,7 @@ private:
 	bool m_data_out;
 	UINT8 m_out_byte;
 
-	UINT8 m_freq, m_mode, m_dac_fifo_ctrl, m_adc_fifo_ctrl, m_ctrl8, m_ctrl16, m_bps, m_mpu_byte;
+	UINT8 m_freq, m_mode, m_dac_fifo_ctrl, m_adc_fifo_ctrl, m_ctrl8, m_ctrl16, m_mpu_byte;
 	UINT16 m_dma8_len, m_dma16_len, m_dma8_cnt, m_dma16_cnt;
 	typedef union {
 		UINT32 w;
