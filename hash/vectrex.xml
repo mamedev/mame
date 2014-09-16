@@ -245,7 +245,7 @@ guys
 		</part>
 	</software>
 
-	<software name="minestr2">
+	<software name="minestr2" cloneof="minestrm">
 		<description>Mine Storm II</description>
 		<year>1983</year>
 		<publisher>GCE</publisher>
@@ -410,7 +410,7 @@ guys
 		</part>
 	</software>
 
-	<software name="starship">
+	<software name="starship" cloneof="startrek">
 		<description>Star Ship</description>
 		<year>1982</year>
 		<publisher>GCE</publisher>
@@ -476,7 +476,7 @@ guys
 		</part>
 	</software>
 
-	<software name="webwars">
+	<software name="webwars" cloneof="webwarp">
 		<description>Web Wars</description>
 		<year>1983</year>
 		<publisher>GCE</publisher>
