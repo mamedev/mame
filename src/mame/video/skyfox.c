@@ -36,6 +36,7 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "video/resnet.h"
 #include "includes/skyfox.h"
 
 
@@ -44,45 +45,42 @@
   Convert the color PROMs into a more useable format.
 
   There are three 256x4 palette PROMs (one per gun).
-  I don't know the exact values of the resistors between the RAM and the
-  RGB output. I assumed these values (the same as Commando)
+  The palette PROMs are connected to the RGB output this way:
 
-  bit 3 -- 220 ohm resistor  -- RED/GREEN/BLUE
-        -- 470 ohm resistor  -- RED/GREEN/BLUE
-        -- 1  kohm resistor  -- RED/GREEN/BLUE
-  bit 0 -- 2.2kohm resistor  -- RED/GREEN/BLUE
+  bit 3 -- 110 ohm resistor  -- RED/GREEN/BLUE
+        -- 220 ohm resistor  -- RED/GREEN/BLUE
+        -- 680 ohm resistor  -- RED/GREEN/BLUE
+  bit 0 -- 1.2kohm resistor  -- RED/GREEN/BLUE
 
 ***************************************************************************/
+
+static const res_net_decode_info skyfox_decode_info =
+{
+	1,
+	0, 255, // start/end
+	// R,     G,     B,
+	{  0,     0x100, 0x200, }, // offsets
+	{  0,     0,     0,     }, // shifts
+	{  0xf,   0xf,   0xf,   }  // masks
+};
+
+static const res_net_info skyfox_net_info =
+{
+	RES_NET_VCC_5V | RES_NET_VBIAS_5V | RES_NET_VIN_TTL_OUT,
+	{
+		{ RES_NET_AMP_NONE, 0, 0, 4, { 1200, 680, 220, 110 } },
+		{ RES_NET_AMP_NONE, 0, 0, 4, { 1200, 680, 220, 110 } },
+		{ RES_NET_AMP_NONE, 0, 0, 4, { 1200, 680, 220, 110 } }
+	}
+};
 
 PALETTE_INIT_MEMBER(skyfox_state, skyfox)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
+	dynamic_array<rgb_t> rgb;
 
-	for (int i = 0; i < 256; i++)
-	{
-		int bit0, bit1, bit2, bit3, r, g, b;
-
-		/* red component */
-		bit0 = (color_prom[i] >> 0) & 0x01;
-		bit1 = (color_prom[i] >> 1) & 0x01;
-		bit2 = (color_prom[i] >> 2) & 0x01;
-		bit3 = (color_prom[i] >> 3) & 0x01;
-		r = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
-		/* green component */
-		bit0 = (color_prom[i + 256] >> 0) & 0x01;
-		bit1 = (color_prom[i + 256] >> 1) & 0x01;
-		bit2 = (color_prom[i + 256] >> 2) & 0x01;
-		bit3 = (color_prom[i + 256] >> 3) & 0x01;
-		g = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
-		/* blue component */
-		bit0 = (color_prom[i + 2*256] >> 0) & 0x01;
-		bit1 = (color_prom[i + 2*256] >> 1) & 0x01;
-		bit2 = (color_prom[i + 2*256] >> 2) & 0x01;
-		bit3 = (color_prom[i + 2*256] >> 3) & 0x01;
-		b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
-
-		palette.set_pen_color(i, rgb_t(r, g, b));
-	}
+	compute_res_net_all(rgb, color_prom, skyfox_decode_info, skyfox_net_info);
+	palette.set_pen_colors(0, rgb, 256);
 
 	/* Grey scale for the background??? is wrong */
 	for (int i = 0; i < 256; i++)
@@ -90,7 +88,6 @@ PALETTE_INIT_MEMBER(skyfox_state, skyfox)
 		palette.set_pen_color(i + 256, rgb_t(i, i, i));
 	}
 }
-
 
 
 /***************************************************************************
@@ -173,10 +170,12 @@ void skyfox_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect
 
 		for (dy = ystart; dy != yend; dy += yinc)
 		{
-			for (dx = xstart; dx != xend; dx += xinc)
+			for (dx = xstart; dx != xend; dx += xinc, code++)
 			{
 				gfx->transpen(bitmap, cliprect, code, 0, flipx, flipy, dx*8 + x, dy*8 + y, 0xff);
-				code++;
+				
+				// wraparound y - BTANB: large sprites exiting the screen sometimes reappear on the other edge
+				gfx->transpen(bitmap, cliprect, code, 0, flipx, flipy, dx*8 + x, dy*8 + y - 256, 0xff);
 			}
 
 			if (n == 2)
@@ -229,7 +228,7 @@ void skyfox_state::draw_background(bitmap_ind16 &bitmap, const rectangle &clipre
 
 UINT32 skyfox_state::screen_update_skyfox(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	bitmap.fill(255, cliprect); // the bg is black
+	bitmap.fill(m_palette->black_pen(), cliprect);
 	draw_background(bitmap, cliprect);
 	draw_sprites(bitmap, cliprect);
 	return 0;
