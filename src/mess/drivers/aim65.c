@@ -144,82 +144,43 @@ INPUT_PORTS_END
     MACHINE DRIVERS
 ***************************************************************************/
 
-struct aim_cart_range
+int aim65_state::load_cart(device_image_interface &image, generic_slot_device *slot, const char *slot_tag)
 {
-	const char *tag;
-	int offset;
-};
-
-static const struct aim_cart_range aim_cart_table[] =
-{
-	{ ":z24",   0xd000 },
-	{ ":z25",   0xc000 },
-	{ ":z26",   0xb000 },
-	{ 0 }
-};
-
-DEVICE_IMAGE_LOAD_MEMBER( aim65_state, aim65_cart )
-{
+	UINT8 *cart;
 	UINT32 size;
-	const struct aim_cart_range *aim_cart = &aim_cart_table[0], *this_cart;
 
-	/* First, determine where this cart has to be loaded */
-	while (aim_cart->tag)
+	if (image.software_entry() == NULL)
+		size = image.length();
+	else
+		size = image.get_software_region_length("rom");
+	
+	if (size > 0x1000)
 	{
-		if (strcmp(aim_cart->tag, image.device().tag()) == 0)
-			break;
-
-		aim_cart++;
-	}
-
-	this_cart = aim_cart;
-
-	if (!this_cart->tag)
-	{
-		astring errmsg;
-		errmsg.printf("Tag '%s' could not be found", image.device().tag());
-		image.seterror(IMAGE_ERROR_UNSPECIFIED, errmsg.cstr());
+		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
 		return IMAGE_INIT_FAIL;
 	}
 
-	dynamic_buffer temp_copy;
+	slot->rom_alloc(size, 1);
+	cart = slot->get_rom_base();
+
 	if (image.software_entry() == NULL)
-	{
-		size = image.length();
-
-		if (size > 0x1000)
-		{
-			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
-			return IMAGE_INIT_FAIL;
-		}
-
-		temp_copy.resize(size);
-		if (image.fread(temp_copy, size) != size)
-		{
-			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unable to fully read from file");
-			return IMAGE_INIT_FAIL;
-		}
-	}
+		image.fread(cart, size);
 	else
 	{
-		if (image.get_software_region(this_cart->tag + 1) == NULL)
+		if (image.get_software_region(slot_tag) == NULL)
 		{
 			astring errmsg;
-			errmsg.printf("Attempted to load file with wrong extension\nCartslot '%s' only accepts files with '.%s' extension",
-							this_cart->tag, this_cart->tag + 1);
+			errmsg.printf("Attempted to load file with wrong extension\nSocket '%s' only accepts files with '.%s' extension",
+						  slot_tag, slot_tag);
 			image.seterror(IMAGE_ERROR_UNSPECIFIED, errmsg.cstr());
 			return IMAGE_INIT_FAIL;
 		}
-
-		size = image.get_software_region_length(this_cart->tag + 1);
-		temp_copy.resize(size);
-		memcpy(temp_copy, image.get_software_region(this_cart->tag + 1), size);
+		memcpy(cart, image.get_software_region(slot_tag), size);
 	}
-
-	memcpy(memregion("maincpu")->base() + this_cart->offset, temp_copy, size);
 
 	return IMAGE_INIT_PASS;
 }
+
 
 static MACHINE_CONFIG_START( aim65, aim65_state )
 	/* basic machine hardware */
@@ -276,23 +237,17 @@ static MACHINE_CONFIG_START( aim65, aim65_state )
 	MCFG_CASSETTE_ADD( "cassette2" )
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_RECORD | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED)
 
-	MCFG_CARTSLOT_ADD("z26")
-	MCFG_CARTSLOT_EXTENSION_LIST("z26")
-	MCFG_CARTSLOT_INTERFACE("aim65_cart")
-	MCFG_CARTSLOT_LOAD(aim65_state, aim65_cart)
-	MCFG_CARTSLOT_NOT_MANDATORY
+	MCFG_GENERIC_SOCKET_ADD("z26", GENERIC_ROM8_WIDTH, generic_plain_slot, "aim65_cart")
+	MCFG_GENERIC_EXTENSIONS("z26")
+	MCFG_GENERIC_LOAD(aim65_state, z26_load)
 
-	MCFG_CARTSLOT_ADD("z25")
-	MCFG_CARTSLOT_EXTENSION_LIST("z25")
-	MCFG_CARTSLOT_INTERFACE("aim65_cart")
-	MCFG_CARTSLOT_LOAD(aim65_state, aim65_cart)
-	MCFG_CARTSLOT_NOT_MANDATORY
+	MCFG_GENERIC_SOCKET_ADD("z25", GENERIC_ROM8_WIDTH, generic_plain_slot, "aim65_cart")
+	MCFG_GENERIC_EXTENSIONS("z25")
+	MCFG_GENERIC_LOAD(aim65_state, z25_load)
 
-	MCFG_CARTSLOT_ADD("z24")
-	MCFG_CARTSLOT_EXTENSION_LIST("z24")
-	MCFG_CARTSLOT_INTERFACE("aim65_cart")
-	MCFG_CARTSLOT_NOT_MANDATORY
-	MCFG_CARTSLOT_LOAD(aim65_state, aim65_cart)
+	MCFG_GENERIC_SOCKET_ADD("z24", GENERIC_ROM8_WIDTH, generic_plain_slot, "aim65_cart")
+	MCFG_GENERIC_EXTENSIONS("z24")
+	MCFG_GENERIC_LOAD(aim65_state, z24_load)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

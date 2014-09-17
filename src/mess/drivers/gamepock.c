@@ -3,7 +3,7 @@
 #include "emu.h"
 #include "cpu/upd7810/upd7810.h"
 #include "sound/speaker.h"
-#include "imagedev/cartslot.h"
+#include "bus/generic/carts.h"
 #include "includes/gamepock.h"
 #include "rendlay.h"
 
@@ -12,8 +12,8 @@ static ADDRESS_MAP_START(gamepock_mem, AS_PROGRAM, 8, gamepock_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000,0x0fff) AM_ROM
 	AM_RANGE(0x1000,0x3fff) AM_NOP
-	AM_RANGE(0x4000,0xBfff) AM_ROM AM_REGION("user1", 0)
-	AM_RANGE(0xC000,0xC7ff) AM_MIRROR(0x0800) AM_RAM
+	//AM_RANGE(0x4000,0xbfff) AM_ROM		// mapped by the cartslot
+	AM_RANGE(0xc000,0xc7ff) AM_MIRROR(0x0800) AM_RAM
 	AM_RANGE(0xff80,0xffff) AM_RAM              /* 128 bytes microcontroller RAM */
 ADDRESS_MAP_END
 
@@ -42,26 +42,6 @@ static INPUT_PORTS_START( gamepock )
 INPUT_PORTS_END
 
 
-DEVICE_IMAGE_LOAD_MEMBER(gamepock_state,gamepock_cart) {
-	UINT8 *cart = memregion("user1" )->base();
-
-	if ( image.software_entry() == NULL )
-	{
-		int size = image.length();
-		if ( image.fread( cart, size ) != size ) {
-			image.seterror( IMAGE_ERROR_UNSPECIFIED, "Unable to fully read from file" );
-			return IMAGE_INIT_FAIL;
-		}
-	}
-	else
-	{
-		memcpy( cart, image.get_software_region( "rom" ), image.get_software_region_length("rom") );
-	}
-
-	return IMAGE_INIT_PASS;
-}
-
-
 static MACHINE_CONFIG_START( gamepock, gamepock_state )
 	MCFG_CPU_ADD("maincpu", UPD78C06, XTAL_6MHz)    /* uPD78C06AG */
 	MCFG_CPU_PROGRAM_MAP( gamepock_mem)
@@ -85,11 +65,7 @@ static MACHINE_CONFIG_START( gamepock, gamepock_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* cartridge */
-	MCFG_CARTSLOT_ADD("cart")
-	MCFG_CARTSLOT_INTERFACE("gamepock_cart")
-	MCFG_CARTSLOT_EXTENSION_LIST("bin")
-	MCFG_CARTSLOT_NOT_MANDATORY
-	MCFG_CARTSLOT_LOAD(gamepock_state,gamepock_cart)
+	MCFG_GENERIC_CARTSLOT_ADD("cartslot", GENERIC_ROM8_WIDTH, generic_plain_slot, "gamepock_cart")
 
 	/* Software lists */
 	MCFG_SOFTWARE_LIST_ADD("cart_list","gamepock")
@@ -99,7 +75,6 @@ MACHINE_CONFIG_END
 ROM_START( gamepock )
 	ROM_REGION( 0x1000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "egpcboot.bin", 0x0000, 0x1000, CRC(ee1ea65d) SHA1(9c7731b5ead721d2cc7f7e2655c5fed9e56db8b0) )
-	ROM_REGION( 0x8000, "user1", ROMREGION_ERASEFF )
 ROM_END
 
 

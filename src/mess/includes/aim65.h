@@ -16,9 +16,10 @@
 #include "machine/6532riot.h"
 #include "machine/6821pia.h"
 #include "machine/ram.h"
-#include "imagedev/cartslot.h"
 #include "imagedev/cassette.h"
 #include "sound/wave.h"
+#include "bus/generic/slot.h"
+#include "bus/generic/carts.h"
 
 
 /** R6502 Clock.
@@ -38,6 +39,9 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_cassette1(*this, "cassette"),
 		m_cassette2(*this, "cassette2"),
+		m_z24(*this, "z24"),
+		m_z25(*this, "z25"),
+		m_z26(*this, "z26"),
 		m_ram(*this, RAM_TAG),
 		m_ds1(*this, "ds1"),
 		m_ds2(*this, "ds2"),
@@ -62,6 +66,9 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cassette1;
 	required_device<cassette_image_device> m_cassette2;
+	required_device<generic_slot_device> m_z24;
+	required_device<generic_slot_device> m_z25;
+	required_device<generic_slot_device> m_z26;
 	required_device<ram_device> m_ram;
 	required_device<dl1416_device> m_ds1;
 	required_device<dl1416_device> m_ds2;
@@ -80,7 +87,10 @@ public:
 
 	void dl1416_update(dl1416_device *device, int index);
 
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(aim65_cart);
+	int load_cart(device_image_interface &image, generic_slot_device *slot, const char *slot_tag);
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(z24_load) { return load_cart(image, m_z24, "z24"); }
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(z25_load) { return load_cart(image, m_z25, "z25"); }
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(z26_load) { return load_cart(image, m_z26, "z26"); }
 };
 
 

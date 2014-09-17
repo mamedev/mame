@@ -1,6 +1,7 @@
 #ifndef _GAMEPOCK_H_
 #define _GAMEPOCK_H_
 #include "sound/speaker.h"
+#include "bus/generic/slot.h"
 
 struct HD44102CH {
 	UINT8   enabled;
@@ -16,7 +17,9 @@ public:
 	gamepock_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_speaker(*this, "speaker") { }
+		m_speaker(*this, "speaker"),
+		m_cart(*this, "cartslot")
+		{ }
 
 	virtual void machine_reset();
 
@@ -33,11 +36,10 @@ public:
 	DECLARE_WRITE8_MEMBER( port_b_w );
 	DECLARE_READ8_MEMBER( port_c_r );
 	UINT32 screen_update_gamepock(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(gamepock_cart);
 	required_device<cpu_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
+	required_device<generic_slot_device> m_cart;
 	DECLARE_WRITE_LINE_MEMBER(gamepock_to_w);
-
 };
 
 #endif

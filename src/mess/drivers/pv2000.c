@@ -30,10 +30,11 @@ For BIOS CRC confirmation
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/sn76496.h"
-#include "video/tms9928a.h"
-#include "imagedev/cartslot.h"
-#include "imagedev/cassette.h"
 #include "sound/wave.h"
+#include "video/tms9928a.h"
+#include "imagedev/cassette.h"
+#include "bus/generic/slot.h"
+#include "bus/generic/carts.h"
 
 
 class pv2000_state : public driver_device
@@ -41,18 +42,20 @@ class pv2000_state : public driver_device
 public:
 	pv2000_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-	m_maincpu(*this, "maincpu"),
-	m_cass(*this, "cassette"),
-	m_last_state(0)
-	{ }
+		m_maincpu(*this, "maincpu"),
+		m_cass(*this, "cassette"),
+		m_cart(*this, "cartslot"),
+		m_last_state(0)
+		{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cass;
-	DECLARE_WRITE8_MEMBER(pv2000_cass_conf_w);
-	DECLARE_WRITE8_MEMBER(pv2000_keys_w);
-	DECLARE_READ8_MEMBER(pv2000_keys_hi_r);
-	DECLARE_READ8_MEMBER(pv2000_keys_lo_r);
-	DECLARE_READ8_MEMBER(pv2000_keys_mod_r);
+	required_device<generic_slot_device> m_cart;
+	DECLARE_WRITE8_MEMBER(cass_conf_w);
+	DECLARE_WRITE8_MEMBER(keys_w);
+	DECLARE_READ8_MEMBER(keys_hi_r);
+	DECLARE_READ8_MEMBER(keys_lo_r);
+	DECLARE_READ8_MEMBER(keys_mod_r);
 	DECLARE_WRITE_LINE_MEMBER(pv2000_vdp_interrupt);
 	DECLARE_READ8_MEMBER(cass_in);
 	DECLARE_WRITE8_MEMBER(cass_out);
@@ -62,26 +65,26 @@ public:
 	UINT8 m_cass_conf;
 	virtual void machine_start();
 	virtual void machine_reset();
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( pv2000_cart );
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(pv2000_cart);
 };
 
 
-WRITE8_MEMBER( pv2000_state::pv2000_cass_conf_w )
+WRITE8_MEMBER( pv2000_state::cass_conf_w )
 {
-	logerror( "%s: pv2000_cass_conf_w %02x\n", machine().describe_context(), data );
+	logerror( "%s: cass_conf_w %02x\n", machine().describe_context(), data );
 
 	m_cass_conf = data & 0x0f;
 
 	if ( m_cass_conf & 0x01 )
-		m_cass->change_state(CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR );
+		m_cass->change_state(CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
 	else
-		m_cass->change_state(CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR );
+		m_cass->change_state(CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 }
 
 
-WRITE8_MEMBER( pv2000_state::pv2000_keys_w )
+WRITE8_MEMBER( pv2000_state::keys_w )
 {
-	logerror( "%s: pv2000_keys_w %02x\n", machine().describe_context(), data );
+	logerror( "%s: keys_w %02x\n", machine().describe_context(), data );
 
 	m_keyb_column = data & 0x0f;
 
@@ -89,7 +92,7 @@ WRITE8_MEMBER( pv2000_state::pv2000_keys_w )
 }
 
 
-READ8_MEMBER( pv2000_state::pv2000_keys_hi_r )
+READ8_MEMBER( pv2000_state::keys_hi_r )
 {
 	UINT8 data = 0;
 	char kbdrow[6];
@@ -113,7 +116,7 @@ READ8_MEMBER( pv2000_state::pv2000_keys_hi_r )
 }
 
 
-READ8_MEMBER( pv2000_state::pv2000_keys_lo_r )
+READ8_MEMBER( pv2000_state::keys_lo_r )
 {
 	UINT8 data = 0;
 	char kbdrow[6];
@@ -140,7 +143,7 @@ READ8_MEMBER( pv2000_state::pv2000_keys_lo_r )
 }
 
 
-READ8_MEMBER( pv2000_state::pv2000_keys_mod_r )
+READ8_MEMBER( pv2000_state::keys_mod_r )
 {
 	return 0xf0 | ioport( "MOD" )->read();
 }
@@ -169,14 +172,14 @@ WRITE8_MEMBER( pv2000_state::cass_out )
 /* Memory Maps */
 
 static ADDRESS_MAP_START( pv2000_map, AS_PROGRAM, 8, pv2000_state )
-	AM_RANGE(0x0000, 0x3FFF) AM_ROM
+	AM_RANGE(0x0000, 0x3fff) AM_ROM
 
 	AM_RANGE(0x4000, 0x4000) AM_DEVREADWRITE("tms9928a", tms9928a_device, vram_read, vram_write)
 	AM_RANGE(0x4001, 0x4001) AM_DEVREADWRITE("tms9928a", tms9928a_device, register_read, register_write)
 
-	AM_RANGE(0x7000, 0x7FFF) AM_RAM
-	//AM_RANGE(0x8000, 0xBFFF) ext ram?
-	AM_RANGE(0xC000, 0xFFFF) AM_ROM  //cart
+	AM_RANGE(0x7000, 0x7fff) AM_RAM
+	//AM_RANGE(0x8000, 0xbfff) ext ram?
+	//AM_RANGE(0xc000, 0xffff)		// mapped by the cartslot
 ADDRESS_MAP_END
 
 
@@ -184,14 +187,14 @@ static ADDRESS_MAP_START( pv2000_io_map, AS_IO, 8, pv2000_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 
 	//theres also printer and tape I/O (TODO)
-	AM_RANGE(0x00, 0x00) AM_WRITE(pv2000_cass_conf_w)
+	AM_RANGE(0x00, 0x00) AM_WRITE(cass_conf_w)
 
 	//keyboard/joystick
-	AM_RANGE(0x10, 0x10) AM_READ(pv2000_keys_hi_r)
-	AM_RANGE(0x20, 0x20) AM_READWRITE(pv2000_keys_lo_r, pv2000_keys_w)
+	AM_RANGE(0x10, 0x10) AM_READ(keys_hi_r)
+	AM_RANGE(0x20, 0x20) AM_READWRITE(keys_lo_r, keys_w)
 
 	//sn76489a
-	AM_RANGE(0x40, 0x40) AM_READ(pv2000_keys_mod_r) AM_DEVWRITE("sn76489a", sn76489a_device, write)
+	AM_RANGE(0x40, 0x40) AM_READ(keys_mod_r) AM_DEVWRITE("sn76489a", sn76489a_device, write)
 
 	/* Cassette input. Gets hit a lot after a GLOAD command */
 	AM_RANGE(0x60, 0x60) AM_READWRITE(cass_in,cass_out)
@@ -341,6 +344,8 @@ WRITE_LINE_MEMBER( pv2000_state::pv2000_vdp_interrupt )
 
 void pv2000_state::machine_start()
 {
+	if (m_cart->cart_mounted())
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0xc000, 0xffff, read8_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_cart));
 }
 
 void pv2000_state::machine_reset()
@@ -355,31 +360,28 @@ void pv2000_state::machine_reset()
 
 DEVICE_IMAGE_LOAD_MEMBER( pv2000_state, pv2000_cart )
 {
-	UINT8 *cart = memregion("maincpu")->base() + 0xC000;
+	UINT8 *cart;
 	UINT32 size;
-
+	
 	if (image.software_entry() == NULL)
 		size = image.length();
 	else
 		size = image.get_software_region_length("rom");
-
+	
 	if (size != 0x2000 && size != 0x4000)
 	{
 		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
 		return IMAGE_INIT_FAIL;
 	}
-
+	
+	m_cart->rom_alloc(size, 1);
+	cart = m_cart->get_rom_base();
+	
 	if (image.software_entry() == NULL)
-	{
-		if (image.fread( cart, size) != size)
-		{
-			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unable to fully read from file");
-			return IMAGE_INIT_FAIL;
-		}
-	}
+		image.fread(cart, size);
 	else
 		memcpy(cart, image.get_software_region("rom"), size);
-
+	
 	return IMAGE_INIT_PASS;
 }
 
@@ -390,7 +392,6 @@ static MACHINE_CONFIG_START( pv2000, pv2000_state )
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_7_15909MHz/2) // 3.579545 MHz
 	MCFG_CPU_PROGRAM_MAP(pv2000_map)
 	MCFG_CPU_IO_MAP(pv2000_io_map)
-
 
 	// video hardware
 	MCFG_DEVICE_ADD( "tms9928a", TMS9928A, XTAL_10_738635MHz / 2 )
@@ -413,11 +414,9 @@ static MACHINE_CONFIG_START( pv2000, pv2000_state )
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED)
 
 	/* cartridge */
-	MCFG_CARTSLOT_ADD("cart")
-	MCFG_CARTSLOT_EXTENSION_LIST("rom,col,bin")
-	MCFG_CARTSLOT_NOT_MANDATORY
-	MCFG_CARTSLOT_LOAD(pv2000_state,pv2000_cart)
-	MCFG_CARTSLOT_INTERFACE("pv2000_cart")
+	MCFG_GENERIC_CARTSLOT_ADD("cartslot", GENERIC_ROM8_WIDTH, generic_plain_slot, "pv2000_cart")
+	MCFG_GENERIC_EXTENSIONS("bin,rom,col")
+	MCFG_GENERIC_LOAD(pv2000_state, pv2000_cart)
 
 	/* Software lists */
 	MCFG_SOFTWARE_LIST_ADD("cart_list","pv2000")
@@ -429,7 +428,6 @@ MACHINE_CONFIG_END
 ROM_START (pv2000)
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "hn613128pc64.bin", 0x0000, 0x4000, CRC(8f31f297) SHA1(94b5f54dd7bce321e377fdaaf592acd3870cf621) )
-	ROM_CART_LOAD("cart", 0xC000, 0x4000, ROM_OPTIONAL)
 ROM_END
 
 

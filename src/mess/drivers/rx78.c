@@ -43,10 +43,11 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/sn76496.h"
-#include "imagedev/cartslot.h"
 #include "imagedev/cassette.h"
 #include "sound/wave.h"
 #include "machine/ram.h"
+#include "bus/generic/slot.h"
+#include "bus/generic/carts.h"
 
 
 class rx78_state : public driver_device
@@ -56,6 +57,7 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_cass(*this, "cassette"),
+		m_cart(*this, "cartslot"),
 		m_ram(*this, RAM_TAG),
 		m_palette(*this, "palette")
 	{ }
@@ -82,6 +84,7 @@ public:
 	DECLARE_DRIVER_INIT(rx78);
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cass;
+	required_device<generic_slot_device> m_cart;
 	required_device<ram_device> m_ram;
 	required_device<palette_device> m_palette;
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( rx78_cart );
@@ -256,7 +259,7 @@ WRITE8_MEMBER( rx78_state::vdp_pri_mask_w )
 static ADDRESS_MAP_START(rx78_mem, AS_PROGRAM, 8, rx78_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x5fff) AM_ROM AM_REGION("cart_img", 0x0000)
+	//AM_RANGE(0x2000, 0x5fff)		// mapped by the cartslot
 	AM_RANGE(0x6000, 0xafff) AM_RAM //ext RAM
 	AM_RANGE(0xb000, 0xebff) AM_RAM
 	AM_RANGE(0xec00, 0xffff) AM_READWRITE(rx78_vram_r, rx78_vram_w)
@@ -406,11 +409,14 @@ INPUT_PORTS_END
 
 void rx78_state::machine_reset()
 {
+	address_space &prg = m_maincpu->space(AS_PROGRAM);	
+	if (m_cart->cart_mounted())
+		prg.install_read_handler(0x2000, 0x5fff, read8_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_cart));
 }
 
 DEVICE_IMAGE_LOAD_MEMBER( rx78_state, rx78_cart )
 {
-	UINT8 *cart = memregion("cart_img")->base();
+	UINT8 *cart;
 	UINT32 size;
 
 	if (image.software_entry() == NULL)
@@ -423,18 +429,15 @@ DEVICE_IMAGE_LOAD_MEMBER( rx78_state, rx78_cart )
 		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
 		return IMAGE_INIT_FAIL;
 	}
-
+	
+	m_cart->rom_alloc(size, 1);
+	cart = m_cart->get_rom_base();
+	
 	if (image.software_entry() == NULL)
-	{
-		if (image.fread( cart, size) != size)
-		{
-			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unable to fully read from file");
-			return IMAGE_INIT_FAIL;
-		}
-	}
+		image.fread(cart, size);
 	else
 		memcpy(cart, image.get_software_region("rom"), size);
-
+	
 	return IMAGE_INIT_PASS;
 }
 
@@ -476,11 +479,9 @@ static MACHINE_CONFIG_START( rx78, rx78_state )
 	MCFG_PALETTE_ADD("palette", 16+1) //+1 for the background color
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", rx78)
 
-	MCFG_CARTSLOT_ADD("cart")
-	MCFG_CARTSLOT_EXTENSION_LIST("rom")
-	MCFG_CARTSLOT_NOT_MANDATORY
-	MCFG_CARTSLOT_LOAD(rx78_state,rx78_cart)
-	MCFG_CARTSLOT_INTERFACE("rx78_cart")
+	MCFG_GENERIC_CARTSLOT_ADD("cartslot", GENERIC_ROM8_WIDTH, generic_plain_slot, "rx78_cart")
+	MCFG_GENERIC_EXTENSIONS("bin,rom")
+	MCFG_GENERIC_LOAD(rx78_state, rx78_cart)
 
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("32k")
@@ -505,9 +506,6 @@ ROM_START( rx78 )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "ipl.rom", 0x0000, 0x2000, CRC(a194ea53) SHA1(ba39e73e6eb7cbb8906fff1f81a98964cd62af0d))
 
-	ROM_REGION( 0x4000, "cart_img", ROMREGION_ERASEFF )
-	ROM_CART_LOAD("cart", 0x0000, 0x4000, ROM_OPTIONAL | ROM_NOMIRROR)
-
 	ROM_REGION( 6 * 0x2000, "vram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -516,7 +514,7 @@ DRIVER_INIT_MEMBER(rx78_state,rx78)
 	UINT32 ram_size = m_ram->size();
 	address_space &prg = m_maincpu->space(AS_PROGRAM);
 
-	if(ram_size == 0x4000)
+	if (ram_size == 0x4000)
 		prg.unmap_readwrite(0x6000, 0xafff);
 }
 

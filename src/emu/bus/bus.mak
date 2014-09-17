@@ -313,6 +313,20 @@ endif
 
 #-------------------------------------------------
 #
+#@src/emu/bus/generic/slot.h,BUSES += GENERIC
+#-------------------------------------------------
+
+ifneq ($(filter GENERIC,$(BUSES)),)
+OBJDIRS += $(BUSOBJ)/generic
+BUSOBJS += $(BUSOBJ)/generic/slot.o
+BUSOBJS += $(BUSOBJ)/generic/carts.o
+BUSOBJS += $(BUSOBJ)/generic/ram.o
+BUSOBJS += $(BUSOBJ)/generic/rom.o
+endif
+
+
+#-------------------------------------------------
+#
 #@src/emu/bus/ieee488/ieee488.h,BUSES += IEEE488
 #-------------------------------------------------
 
