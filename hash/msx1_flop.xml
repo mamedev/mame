@@ -25,6 +25,18 @@
 		</part>
 	</software>
 
+	<software name="laserfig">
+		<description>Laserfight!</description>
+		<year>1989</year>
+		<publisher>Login Soft</publisher>
+		<info name="developer" value="Shinobu Yagawa" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="laserfight! (1989)(login soft)(jp).dsk" size="737280" crc="4811c8b6" sha1="b4cad1e07a2b0e54bae8d96e2f99cda7d3d01f29" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="ohmummy">
 		<description>Oh Mummy!!</description>
 		<year>1984</year>
