@@ -684,4 +684,4 @@ GAME(  1995, koikois,   0,      st0016,   koikois, st0016_state,  renju,    ROT0
 GAME( 1994, mayjinsn,   0,      mayjinsn, st0016, st0016_state,   mayjinsn, ROT0, "Seta",      "Mayjinsen",GAME_IMPERFECT_GRAPHICS|GAME_NOT_WORKING)
 GAME( 1994, dcrown,     0,      st0016,   renju, st0016_state,    renju,    ROT0, "Nippon Data Kiki", "Dream Crown (Set 1)", GAME_NOT_WORKING) // (c) 1994 Nippon Data Kiki is uploaded near the Japanese Insert coin text
 GAME( 1994, dcrowna,    dcrown, st0016,   renju, st0016_state,    renju,    ROT0, "Nippon Data Kiki", "Dream Crown (Set 2)", GAME_NOT_WORKING) // the Insert Coin text has been translated to English and no (c) is uploaded
-GAME( 2001, gostop,     0,      st0016,   renju, st0016_state,    renju,    ROT0, "Visco", "Go-Stop", GAME_NOT_WORKING)
+GAME( 2001, gostop,     0,      st0016,   renju, st0016_state,    renju,    ROT0, "Visco", "Kankoku Hanafuda Go-Stop", GAME_NOT_WORKING)
