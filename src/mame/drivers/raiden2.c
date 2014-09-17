@@ -164,6 +164,80 @@ Current Problem(s) - in order of priority
 #include "includes/raiden2.h"
 #include "video/seibu_crtc.h"
 
+
+void raiden2_state::machine_start()
+{
+	save_item(NAME(bg_bank));
+	save_item(NAME(fg_bank));
+	save_item(NAME(mid_bank));
+	save_item(NAME(raiden2_tilemap_enable));
+	save_item(NAME(prg_bank));
+	save_item(NAME(cop_bank));
+	save_item(NAME(cop_itoa));
+	save_item(NAME(cop_status));
+	save_item(NAME(cop_scale));
+	save_item(NAME(cop_itoa_digit_count));
+	save_item(NAME(cop_angle));
+	save_item(NAME(cop_dist));
+	save_item(NAME(cop_latch_addr));
+	save_item(NAME(cop_latch_trigger));
+	save_item(NAME(cop_latch_value));
+	save_item(NAME(cop_latch_mask));
+	save_item(NAME(cop_angle_target));
+	save_item(NAME(cop_angle_step));
+	save_item(NAME(sprite_prot_x));
+	save_item(NAME(sprite_prot_y));
+	save_item(NAME(dst1));
+	save_item(NAME(cop_spr_maxx));
+	save_item(NAME(cop_spr_off));
+	save_item(NAME(cop_hit_status));
+	save_item(NAME(cop_hit_baseadr));
+	save_item(NAME(cop_hit_val_x));
+	save_item(NAME(	cop_hit_val_y));
+	save_item(NAME(cop_hit_val_z));
+	save_item(NAME(cop_hit_val_unk));
+	save_item(NAME(cop_sort_ram_addr));
+	save_item(NAME(cop_sort_lookup));
+	save_item(NAME(cop_sort_param));
+	
+	save_item(NAME(scrollvals));
+	save_item(NAME(cop_regs));
+	save_item(NAME(cop_itoa_digits));
+	save_item(NAME(cop_func_trigger));
+	save_item(NAME(cop_func_value));
+	save_item(NAME(cop_func_mask));
+	save_item(NAME(cop_program));
+	save_item(NAME(sprite_prot_src_addr));
+
+//	save_pointer(NAME(cop_collision_info), sizeof(colinfo)*2); // this is illegal
+	save_item(NAME(cop_collision_info[0].x));
+	save_item(NAME(cop_collision_info[0].y));
+	save_item(NAME(cop_collision_info[0].z));
+
+	save_item(NAME(cop_collision_info[0].min_x));
+	save_item(NAME(cop_collision_info[0].min_y));
+	save_item(NAME(cop_collision_info[0].min_z));
+
+	save_item(NAME(cop_collision_info[0].max_x));
+	save_item(NAME(cop_collision_info[0].max_y));
+	save_item(NAME(cop_collision_info[0].max_z));
+
+	save_item(NAME(cop_collision_info[1].x));
+	save_item(NAME(cop_collision_info[1].y));
+	save_item(NAME(cop_collision_info[1].z));
+
+	save_item(NAME(cop_collision_info[1].min_x));
+	save_item(NAME(cop_collision_info[1].min_y));
+	save_item(NAME(cop_collision_info[1].min_z));
+
+	save_item(NAME(cop_collision_info[1].max_x));
+	save_item(NAME(cop_collision_info[1].max_y));
+	save_item(NAME(cop_collision_info[1].max_z));
+
+//	save_item(NAME(tile_buffer));
+//	save_item(NAME(sprite_buffer));
+}
+
 UINT16 raiden2_state::rps()
 {
 	return m_maincpu->state_int(NEC_CS);

@@ -12,9 +12,18 @@ const device_type RAIDEN2COP = &device_creator<raiden2cop_device>;
 
 raiden2cop_device::raiden2cop_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, RAIDEN2COP, "RAIDEN2COP", tag, owner, clock, "raiden2cop", __FILE__),
+	cop_dma_v1(0),
+	cop_dma_v2(0),
+	cop_dma_mode(0),
+	cop_dma_adr_rel(0),
+	pal_brightness_val(0),
+	pal_brightness_mode(0),
 	m_videoramout_cb(*this),
 	m_palette(*this, ":palette")
 {
+	  memset(cop_dma_src, 0, sizeof(UINT16)*(0x200));
+	  memset(cop_dma_dst, 0, sizeof(UINT16)*(0x200));
+	  memset(cop_dma_size, 0, sizeof(UINT16)*(0x200));
 }
 
 
@@ -23,6 +32,17 @@ raiden2cop_device::raiden2cop_device(const machine_config &mconfig, const char *
 //-------------------------------------------------
 void raiden2cop_device::device_start()
 {
+	save_item(NAME(cop_dma_v1));
+	save_item(NAME(cop_dma_v2));
+	save_item(NAME(cop_dma_mode));
+	save_item(NAME(cop_dma_adr_rel));
+	save_item(NAME(pal_brightness_val));
+	save_item(NAME(pal_brightness_mode));
+
+	save_item(NAME(cop_dma_src));
+	save_item(NAME(cop_dma_dst));
+	save_item(NAME(cop_dma_size));
+
 	m_videoramout_cb.resolve_safe();
 }
 
