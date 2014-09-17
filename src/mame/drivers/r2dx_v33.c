@@ -797,7 +797,6 @@ DRIVER_INIT_MEMBER(r2dx_v33_state,zerotm2k)
 	//zeroteam_decrypt_sprites(machine());
 
 	membank("bank1")->set_entry(1);
-
 }
 
 /*
@@ -892,7 +891,7 @@ ROM_START( r2dx_v33 )
 
 	ROM_REGION16_BE( 0x80, "eeprom", 0 )
 	ROM_LOAD16_WORD( "raidenii_eeprom-r2dx_v33.bin", 0x0000, 0x0080, CRC(ba454777) SHA1(101c5364e8664d17bfb1e759515d135a2673d67e) ) // for booting as Raiden 2
-	ROM_LOAD16_WORD( "raidendx_eeprom-r2dx_v33.bi",  0x0000, 0x0080, CRC(0b34c0ca) SHA1(20612d5a1d819d3997ea47e8de7a194ec61b537d) ) // for booting as Raiden DX
+	ROM_LOAD16_WORD( "raidendx_eeprom-r2dx_v33.bin", 0x0000, 0x0080, CRC(0b34c0ca) SHA1(20612d5a1d819d3997ea47e8de7a194ec61b537d) ) // for booting as Raiden DX
 ROM_END
 
 ROM_START( nzeroteam ) /* V33 SYSTEM TYPE_B hardware, uses SEI333 (AKA COPX-D3) for protection  */

@@ -228,7 +228,7 @@ void skyfox_state::draw_background(bitmap_ind16 &bitmap, const rectangle &clipre
 
 UINT32 skyfox_state::screen_update_skyfox(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	bitmap.fill(m_palette->black_pen(), cliprect);
+	bitmap.fill(0xff, cliprect); // the bg is black
 	draw_background(bitmap, cliprect);
 	draw_sprites(bitmap, cliprect);
 	return 0;
