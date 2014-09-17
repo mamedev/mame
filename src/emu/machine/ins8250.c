@@ -97,7 +97,12 @@ ins8250_uart_device::ins8250_uart_device(const machine_config &mconfig, device_t
 			m_out_rts_cb(*this),
 			m_out_int_cb(*this),
 			m_out_out1_cb(*this),
-			m_out_out2_cb(*this)
+			m_out_out2_cb(*this),
+			m_rxd(1),
+			m_dcd(1),
+			m_dsr(1),
+			m_ri(1),
+			m_cts(1)
 {
 }
 
@@ -212,20 +217,11 @@ WRITE8_MEMBER( ins8250_uart_device::ins8250_w )
 			{
 				m_regs.thr = data;
 				m_regs.lsr &= ~0x20;
-				if ( m_regs.mcr & 0x10 )
-				{
-					m_regs.lsr |= 0x61;
-					m_regs.rbr = data;
-					trigger_int(COM_INT_PENDING_RECEIVED_DATA_AVAILABLE);
-				}
-				else
-				{
-					if((m_device_type >= TYPE_NS16550) && (m_regs.fcr & 1))
-						push_tx(data);
-					clear_int(COM_INT_PENDING_TRANSMITTER_HOLDING_REGISTER_EMPTY);
-					if(m_regs.lsr & 0x40)
-						tra_complete();
-				}
+				if((m_device_type >= TYPE_NS16550) && (m_regs.fcr & 1))
+					push_tx(data);
+				clear_int(COM_INT_PENDING_TRANSMITTER_HOLDING_REGISTER_EMPTY);
+				if(m_regs.lsr & 0x40)
+					tra_complete();
 			}
 			break;
 		case 1:
@@ -289,25 +285,25 @@ WRITE8_MEMBER( ins8250_uart_device::ins8250_w )
 			{
 				m_regs.mcr = data & 0x1f;
 
-				if ( m_regs.mcr & 0x10 )        /* loopback test */
+				update_msr();
+
+				if (m_regs.mcr & 0x10)        /* loopback test */
 				{
-					data = ( ( m_regs.mcr & 0x0c ) << 4 ) | ( ( m_regs.mcr & 0x01 ) << 5 ) | ( ( m_regs.mcr & 0x02 ) << 3 );
-					if ( ( m_regs.msr & 0x20 ) != ( data & 0x20 ) )
-						data |= 0x02;
-					if ( ( m_regs.msr & 0x10 ) != ( data & 0x10 ) )
-						data |= 0x01;
-					if ( ( m_regs.msr & 0x40 ) && ! ( data & 0x40 ) )
-						data |= 0x04;
-					if ( ( m_regs.msr & 0x80 ) != ( data & 0x80 ) )
-						data |= 0x08;
-					m_regs.msr = data;
+					m_out_tx_cb(1);
+					device_serial_interface::rx_w(m_txd);
+					m_out_dtr_cb(1);
+					m_out_rts_cb(1);
+					m_out_out1_cb(1);
+					m_out_out2_cb(1);
 				}
 				else
 				{
-					m_out_dtr_cb((m_regs.mcr & 1) ? 1 : 0);
-					m_out_rts_cb((m_regs.mcr & 2) ? 1 : 0);
-					m_out_out1_cb((m_regs.mcr & 4) ? 1 : 0);
-					m_out_out2_cb((m_regs.mcr & 8) ? 1 : 0);
+					m_out_tx_cb(m_txd);
+					device_serial_interface::rx_w(m_rxd);
+					m_out_dtr_cb((m_regs.mcr & 1) ? 0 : 1);
+					m_out_rts_cb((m_regs.mcr & 2) ? 0 : 1);
+					m_out_out1_cb((m_regs.mcr & 4) ? 0 : 1);
+					m_out_out2_cb((m_regs.mcr & 8) ? 0 : 1);
 				}
 			}
 			break;
@@ -327,15 +323,7 @@ WRITE8_MEMBER( ins8250_uart_device::ins8250_w )
 
 			break;
 		case 6:
-			/*
-			  This register can be written, but if you write a 1 bit into any of
-			  bits 3 - 0, you could cause an interrupt if the appropriate IER bit
-			  is set.
-			 */
-			m_regs.msr = data;
-
-			if ( m_regs.msr & 0x0f )
-				trigger_int(COM_INT_PENDING_MODEM_STATUS_REGISTER);
+			// modem status register is read only
 			break;
 		case 7:
 			m_regs.scr = data;
@@ -354,7 +342,7 @@ READ8_MEMBER( ins8250_uart_device::ins8250_r )
 				data = (m_regs.dl & 0xff);
 			else
 			{
-				if((m_device_type >= TYPE_NS16550) && (m_regs.fcr & 1) && !(m_regs.mcr & 0x10))
+				if((m_device_type >= TYPE_NS16550) && (m_regs.fcr & 1))
 					m_regs.rbr = pop_rx();
 				else
 				{
@@ -482,37 +470,66 @@ void ins8250_uart_device::tra_complete()
 
 void ins8250_uart_device::tra_callback()
 {
-	m_out_tx_cb(transmit_register_get_data_bit());
+	m_txd = transmit_register_get_data_bit();
+	if (m_regs.mcr & 0x10)
+	{
+		device_serial_interface::rx_w(m_txd);
+	}
+	else
+	{
+		m_out_tx_cb(m_txd);
+	}
 }
 
-void ins8250_uart_device::update_msr(int bit, UINT8 state)
+void ins8250_uart_device::update_msr()
 {
-	UINT8 mask = (1<<bit);
-	if((m_regs.msr & mask) == (state<<bit))
-		return;
-	m_regs.msr |= mask;
-	m_regs.msr = (m_regs.msr & ~(mask << 4)) | (state<<(bit+4));
-	trigger_int(COM_INT_PENDING_MODEM_STATUS_REGISTER);
+	UINT8 data;
+
+	if (m_regs.mcr & 0x10)
+		data = ((m_regs.mcr & 0x0c) << 4) | ((m_regs.mcr & 0x01) << 5) | ((m_regs.mcr & 0x02) << 3);
+	else
+		data = (!m_dcd << 7) | (!m_ri << 6) | (!m_dsr << 5) | (!m_cts << 4);
+
+	int change = (m_regs.msr ^ data) >> 4;
+
+	if (change)
+	{
+		m_regs.msr = data | (m_regs.msr & 0xf) | change;
+
+		trigger_int(COM_INT_PENDING_MODEM_STATUS_REGISTER);
+	}
 }
 
 WRITE_LINE_MEMBER(ins8250_uart_device::dcd_w)
 {
-	update_msr(3, (state ? 1 : 0));
+	m_dcd = state;
+	update_msr();
 }
 
 WRITE_LINE_MEMBER(ins8250_uart_device::dsr_w)
 {
-	update_msr(1, (state ? 1 : 0));
+	m_dsr = state;
+	update_msr();
 }
 
 WRITE_LINE_MEMBER(ins8250_uart_device::ri_w)
 {
-	update_msr(2, (state ? 1 : 0));
+	m_ri = state;
+	update_msr();
 }
 
 WRITE_LINE_MEMBER(ins8250_uart_device::cts_w)
 {
-	update_msr(0, (state ? 1 : 0));
+	m_cts = state;
+	update_msr();
+}
+
+WRITE_LINE_MEMBER(ins8250_uart_device::rx_w)
+{
+	m_rxd = state;
+
+	if (!(m_regs.mcr & 0x10))
+		device_serial_interface::rx_w(m_rxd);
 }
 
 void ins8250_uart_device::device_start()
@@ -525,7 +542,6 @@ void ins8250_uart_device::device_start()
 	m_out_out2_cb.resolve_safe();
 	set_tra_rate(0);
 	set_rcv_rate(0);
-	memset(&m_regs, 0x00, sizeof(m_regs));
 
 	device_serial_interface::register_save_state(machine().save(), name(), tag());
 	save_item(NAME(m_regs.thr));
@@ -540,24 +556,32 @@ void ins8250_uart_device::device_start()
 	save_item(NAME(m_regs.msr));
 	save_item(NAME(m_regs.scr));
 	save_item(NAME(m_int_pending));
+	save_item(NAME(m_txd));
+	save_item(NAME(m_rxd));
+	save_item(NAME(m_dcd));
+	save_item(NAME(m_dsr));
+	save_item(NAME(m_ri));
+	save_item(NAME(m_cts));
 }
 
 void ins8250_uart_device::device_reset()
 {
-	memset(&m_regs, 0x00, sizeof(m_regs));
 	m_regs.ier = 0;
 	m_regs.iir = 1;
 	m_regs.lcr = 0;
 	m_regs.mcr = 0;
 	m_regs.lsr = (1<<5) | (1<<6);
+	update_msr();
+	m_regs.msr &= 0xf0;
 	m_int_pending = 0;
 	receive_register_reset();
 	transmit_register_reset();
-	m_out_rts_cb(0);
-	m_out_dtr_cb(0);
-	m_out_out1_cb(0);
-	m_out_out2_cb(0);
+	m_txd = 1;
 	m_out_tx_cb(1);
+	m_out_rts_cb(1);
+	m_out_dtr_cb(1);
+	m_out_out1_cb(1);
+	m_out_out2_cb(1);
 }
 
 void ins8250_uart_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)

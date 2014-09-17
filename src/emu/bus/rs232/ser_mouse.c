@@ -13,6 +13,8 @@ serial_mouse_device::serial_mouse_device(const machine_config &mconfig, device_t
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	device_rs232_port_interface(mconfig, *this),
 	device_serial_interface(mconfig, *this),
+	m_dtr(1),
+	m_rts(1),
 	m_x(*this, "ser_mouse_x"),
 	m_y(*this, "ser_mouse_y"),
 	m_btn(*this, "ser_mouse_btn")
@@ -23,7 +25,6 @@ const device_type MSFT_SERIAL_MOUSE = &device_creator<microsoft_mouse_device>;
 
 microsoft_mouse_device::microsoft_mouse_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: serial_mouse_device(mconfig, MSFT_SERIAL_MOUSE, "Microsoft Serial Mouse", tag, owner, clock, "microsoft_mouse", __FILE__)
-	, m_dtr(0)
 {
 }
 
@@ -40,9 +41,18 @@ void serial_mouse_device::device_start()
 	m_enabled = false;
 	set_frame();
 	set_tra_rate(1200);
+	reset_mouse();
+
+	save_item(NAME(m_dtr));
+	save_item(NAME(m_rts));
+	save_item(NAME(m_queue));
+	save_item(NAME(m_head));
+	save_item(NAME(m_tail));
+	save_item(NAME(m_mb));
+	save_item(NAME(m_enabled));
 }
 
-void serial_mouse_device::device_reset()
+void serial_mouse_device::reset_mouse()
 {
 	m_head = m_tail = 0;
 	output_rxd(1);
@@ -202,24 +212,30 @@ void serial_mouse_device::set_mouse_enable(bool state)
 
 }
 
-void microsoft_mouse_device::check_state()
+
+WRITE_LINE_MEMBER(serial_mouse_device::input_dtr)
 {
-	if (m_dtr && m_rts)
+	m_dtr = state;
+	check_state();
+}
+
+WRITE_LINE_MEMBER(serial_mouse_device::input_rts)
+{
+	m_rts = state;
+	check_state();
+}
+
+WRITE_LINE_MEMBER(microsoft_mouse_device::input_rts)
+{
+	if (!m_dtr && m_rts && !state)
 	{
-		/* RTS toggled */
-		if (!m_old_rts && m_rts)
-		{
-			/* reset mouse */
-			serial_mouse_device::device_reset();
-			/* Identify as Microsoft 3 Button Mouse */
-			queue_data('M');
-			queue_data('3');
-		}
-		/* start a timer to scan the mouse input */
-		set_mouse_enable(true);
+		reset_mouse();
+		/* Identify as Microsoft 3 Button Mouse */
+		queue_data('M');
+		queue_data('3');
 	}
-	else
-		set_mouse_enable(false);
+
+	serial_mouse_device::input_rts(state);
 }
 
 

@@ -32,7 +32,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( dsr_w );
 	DECLARE_WRITE_LINE_MEMBER( ri_w );
 	DECLARE_WRITE_LINE_MEMBER( cts_w );
-	DECLARE_WRITE_LINE_MEMBER( rx_w ) { device_serial_interface::rx_w(state); }
+	DECLARE_WRITE_LINE_MEMBER( rx_w );
 
 protected:
 	virtual void device_start();
@@ -81,7 +81,14 @@ private:
 	devcb_write_line    m_out_out2_cb;
 
 	void update_interrupt();
-	void update_msr(int bit, UINT8 state);
+	void update_msr();
+
+	int m_txd;
+	int m_rxd;
+	int m_dcd;
+	int m_dsr;
+	int m_ri;
+	int m_cts;
 };
 
 class ins8250_device : public ins8250_uart_device

@@ -21,7 +21,6 @@ public:
 
 protected:
 	virtual void device_start();
-	virtual void device_reset();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 	virtual void mouse_trans(int dx, int dy, int nb, int mbc) = 0;
 	virtual void set_frame() = 0;
@@ -30,6 +29,13 @@ protected:
 	UINT8 unqueue_data() {UINT8 ret = m_queue[m_tail]; ++m_tail %= 256; return ret;}
 	virtual void tra_complete();
 	virtual void tra_callback();
+	void reset_mouse();
+
+	virtual WRITE_LINE_MEMBER(input_dtr);
+	virtual WRITE_LINE_MEMBER(input_rts);
+	int m_dtr;
+	int m_rts;
+
 private:
 	UINT8 m_queue[256];
 	UINT8 m_head, m_tail, m_mb;
@@ -40,25 +46,20 @@ private:
 	required_ioport m_x;
 	required_ioport m_y;
 	required_ioport m_btn;
+
+	void check_state() { set_mouse_enable(!m_dtr && !m_rts); }
 };
 
 class microsoft_mouse_device : public serial_mouse_device
 {
 public:
 	microsoft_mouse_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	virtual DECLARE_WRITE_LINE_MEMBER( input_dtr ) { m_dtr = state; check_state(); }
-	virtual DECLARE_WRITE_LINE_MEMBER( input_rts ) { m_rts = state; check_state(); m_old_rts = state; }
 
 protected:
+	virtual WRITE_LINE_MEMBER(input_rts);
+
 	virtual void set_frame() { set_data_frame(1, 7, PARITY_NONE, STOP_BITS_2); }
 	virtual void mouse_trans(int dx, int dy, int nb, int mbc);
-	virtual void device_reset() {m_old_rts = 0; serial_mouse_device::device_reset();}
-
-private:
-	void check_state();
-	int m_dtr;
-	int m_rts;
-	int m_old_rts;
 };
 
 extern const device_type MSFT_SERIAL_MOUSE;
@@ -67,17 +68,10 @@ class mouse_systems_mouse_device : public serial_mouse_device
 {
 public:
 	mouse_systems_mouse_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	virtual DECLARE_WRITE_LINE_MEMBER( input_dtr ) { m_dtr = state; check_state(); }
-	virtual DECLARE_WRITE_LINE_MEMBER( input_rts ) { m_rts = state; check_state(); }
 
 protected:
 	virtual void set_frame() { set_data_frame(1, 8, PARITY_NONE, STOP_BITS_2); }
 	virtual void mouse_trans(int dx, int dy, int nb, int mbc);
-
-private:
-	void check_state() { set_mouse_enable((m_dtr && m_rts)?true:false); }
-	int m_dtr;
-	int m_rts;
 };
 
 extern const device_type MSYSTEM_SERIAL_MOUSE;

@@ -50,16 +50,16 @@ void rs232_port_device::device_start()
 	save_item(NAME(m_cts));
 
 	m_rxd = 1;
-	m_dcd = 0;
-	m_dsr = 0;
-	m_ri = 0;
-	m_cts = 0;
+	m_dcd = 1;
+	m_dsr = 1;
+	m_ri = 1;
+	m_cts = 1;
 
 	m_rxd_handler(1);
-	m_dcd_handler(0);
-	m_dsr_handler(0);
-	m_ri_handler(0);
-	m_cts_handler(0);
+	m_dcd_handler(1);
+	m_dsr_handler(1);
+	m_ri_handler(1);
+	m_cts_handler(1);
 }
 
 WRITE_LINE_MEMBER( rs232_port_device::write_txd )
