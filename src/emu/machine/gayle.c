@@ -131,7 +131,7 @@ WRITE16_MEMBER( gayle_device::gayle_w )
 
 	// swap
 	mem_mask = (mem_mask << 8) | (mem_mask >> 8);
-	data = (data << 8) | (data >> 8);
+	data = ((data << 8) | (data >> 8)) & mem_mask;
 
 	if (VERBOSE)
 		logerror("gayle_w(%06x): %04x & %04x\n", offset, data, mem_mask);
