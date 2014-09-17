@@ -1216,7 +1216,7 @@ software_part *device_image_interface::find_software_item(const char *path, bool
 	software_list_device_iterator deviter(device().mconfig().root_device());
 	for (software_list_device *swlistdev = deviter.first(); swlistdev != NULL; swlistdev = deviter.next())
 	{
-		if (swlist_name == swlistdev->list_name())
+		if (swlist_name == swlistdev->list_name() || !(swlist_name.len() > 0))
 		{
 			software_info *info = swlistdev->find(swinfo_name);
 			if (info != NULL)
@@ -1226,7 +1226,8 @@ software_part *device_image_interface::find_software_item(const char *path, bool
 					return part;
 			}
 		}
-		else if (swinfo_name == swlistdev->list_name())
+
+		if (swinfo_name == swlistdev->list_name())
 		{
 			// ad hoc handling for the case path = swlist_name:swinfo_name (e.g. 
 			// gameboy:sml) which is not handled properly by software_name_split 
