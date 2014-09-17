@@ -44,6 +44,7 @@ static ADDRESS_MAP_START( mpu6500_map, AS_PROGRAM, 8, amigakbd_device )
 	AM_RANGE(0x089, 0x089) AM_WRITE(clear_pa0_detect)
 	AM_RANGE(0x08a, 0x08a) AM_WRITE(clear_pa1_detect)
 	AM_RANGE(0x08f, 0x08f) AM_READWRITE(control_r, control_w)
+	AM_RANGE(0x090, 0x0ff) AM_NOP
 	AM_RANGE(0x800, 0xfff) AM_ROM AM_REGION("mos6570_036", 0)
 ADDRESS_MAP_END
 
@@ -63,7 +64,7 @@ machine_config_constructor amigakbd_device::device_mconfig_additions() const
 
 ROM_START( mos6570_036 )
 	ROM_REGION(0x800, "mos6570_036", 0)
-	ROM_LOAD("328191-01.ic1", 0x000, 0x800, CRC(4a3fc332) SHA1(83b21d0c8b93fc9b9b3b287fde4ec8f3badac5a2))
+	ROM_LOAD("328191-02.ic1", 0x000, 0x800, CRC(4a3fc332) SHA1(83b21d0c8b93fc9b9b3b287fde4ec8f3badac5a2))
 ROM_END
 
 const rom_entry *amigakbd_device::device_rom_region() const
