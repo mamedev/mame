@@ -438,8 +438,9 @@ static ADDRESS_MAP_START( rdx_v33_map, AS_PROGRAM, 16, r2dx_v33_state )
 	AM_RANGE(0x10000, 0x1efff) AM_RAM
 	AM_RANGE(0x1f000, 0x1ffff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 
-	AM_RANGE(0x20000, 0x3ffff) AM_ROMBANK("bank1")
-	AM_RANGE(0x40000, 0xfffff) AM_ROM AM_REGION("mainprg", 0x40000 )
+	AM_RANGE(0x20000, 0x2ffff) AM_ROMBANK("bank1")
+	AM_RANGE(0x30000, 0x3ffff) AM_ROMBANK("bank2")
+	AM_RANGE(0x40000, 0xfffff) AM_ROM AM_ROMBANK("bank3")
 ADDRESS_MAP_END
 
 READ16_MEMBER(r2dx_v33_state::nzerotea_sound_comms_r)
@@ -757,11 +758,26 @@ MACHINE_CONFIG_END
 
 DRIVER_INIT_MEMBER(r2dx_v33_state,rdx_v33)
 {
-	membank("bank1")->configure_entries(0, 0x20, memregion("mainprg")->base(), 0x20000);
+	membank("bank1")->configure_entries(0, 0x40, memregion("mainprg")->base(), 0x10000);
+	membank("bank2")->configure_entries(0, 0x40, memregion("mainprg")->base(), 0x10000);
+
+	membank("bank3")->configure_entry(0, memregion("mainprg")->base()+0x040000); // 0x40000 - 0xfffff bank for Raiden 2
+	membank("bank3")->configure_entry(1, memregion("mainprg")->base()+0x240000); // 0x40000 - 0xfffff bank for Raiden DX
+
 
 	raiden2_decrypt_sprites(machine());
 
-	membank("bank1")->set_entry(1);
+//  sensible defaults if booting as R2
+//	membank("bank1")->set_entry(2);
+//	membank("bank2")->set_entry(3);
+//	membank("bank3")->set_entry(0);
+
+//  sensible defaults if booting as RDX
+	membank("bank1")->set_entry(0x20+16);
+	membank("bank2")->set_entry(0x20+3);
+	membank("bank3")->set_entry(1);
+
+
 }
 
 DRIVER_INIT_MEMBER(r2dx_v33_state,nzerotea)
@@ -875,7 +891,8 @@ ROM_START( r2dx_v33 )
 	ROM_LOAD( "copx_d3.357", 0x00000, 0x20000, CRC(fa2cf3ad) SHA1(13eee40704d3333874b6e3da9ee7d969c6dc662a) )
 
 	ROM_REGION16_BE( 0x80, "eeprom", 0 )
-	ROM_LOAD16_WORD( "eeprom-r2dx_v33.bin", 0x0000, 0x0080, CRC(ba454777) SHA1(101c5364e8664d17bfb1e759515d135a2673d67e) )
+	ROM_LOAD16_WORD( "raidenii_eeprom-r2dx_v33.bin", 0x0000, 0x0080, CRC(ba454777) SHA1(101c5364e8664d17bfb1e759515d135a2673d67e) ) // for booting as Raiden 2
+	ROM_LOAD16_WORD( "raidendx_eeprom-r2dx_v33.bi",  0x0000, 0x0080, CRC(0b34c0ca) SHA1(20612d5a1d819d3997ea47e8de7a194ec61b537d) ) // for booting as Raiden DX
 ROM_END
 
 ROM_START( nzeroteam ) /* V33 SYSTEM TYPE_B hardware, uses SEI333 (AKA COPX-D3) for protection  */
