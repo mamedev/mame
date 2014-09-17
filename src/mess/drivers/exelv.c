@@ -544,7 +544,7 @@ static MACHINE_CONFIG_START( exl100, exelv_state )
 	MCFG_CARTSLOT_NOT_MANDATORY
 	MCFG_CARTSLOT_LOAD(exelv_state,exelvision_cartridge)
 	MCFG_CARTSLOT_INTERFACE("exelvision_cart")
-	MCFG_SOFTWARE_LIST_ADD("cart_list","exelvision_cart")
+	//MCFG_SOFTWARE_LIST_ADD("cart_list","exelvision_cart")
 MACHINE_CONFIG_END
 
 

@@ -586,7 +586,7 @@ static MACHINE_CONFIG_START( ti95, ti74_state )
 	MCFG_CARTSLOT_NOT_MANDATORY
 	MCFG_CARTSLOT_LOAD(ti74_state, ti74_cartridge)
 	MCFG_CARTSLOT_INTERFACE("ti95_cart")
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "ti95_cart")
+	//MCFG_SOFTWARE_LIST_ADD("cart_list", "ti95_cart")
 MACHINE_CONFIG_END
 
 
