@@ -33,6 +33,7 @@ public:
 		m_joy1(*this, CONTROL1_TAG),
 		m_joy2(*this, CONTROL2_TAG) ,
 		m_cartslot(*this, "cartslot"),
+		m_tia(*this, "tia_video"),
 		m_maincpu(*this, "maincpu"),
 		m_screen(*this, "screen") { }
 
@@ -49,6 +50,7 @@ public:
 	DECLARE_READ8_MEMBER(a2600_get_databus_contents);
 	DECLARE_WRITE16_MEMBER(a2600_tia_vsync_callback);
 	DECLARE_WRITE16_MEMBER(a2600_tia_vsync_callback_pal);
+	DECLARE_WRITE8_MEMBER(cart_over_tia_w);
 	// investigate how the carts mapped here (Mapper JVP) interact with the RIOT device
 	DECLARE_READ8_MEMBER(cart_over_riot_r);
 	DECLARE_WRITE8_MEMBER(cart_over_riot_w);
@@ -57,6 +59,7 @@ protected:
 	required_device<vcs_control_port_device> m_joy1;
 	required_device<vcs_control_port_device> m_joy2;
 	required_device<vcs_cart_slot_device> m_cartslot;
+	required_device<tia_video_device> m_tia;
 
 	unsigned long detect_2600controllers();
 	required_device<m6502_device> m_maincpu;
@@ -246,6 +249,15 @@ WRITE8_MEMBER(a2600_state::cart_over_riot_w)
 	
 }
 
+WRITE8_MEMBER(a2600_state::cart_over_tia_w)
+{
+	// Both Cart & TIA see these addresses
+	if (m_cartslot)
+		m_cartslot->write_bank(space, offset, data);
+	
+	m_tia->write(space, offset, data);	
+}
+
 MACHINE_START_MEMBER(a2600_state,a2600)
 {
 	m_current_screen_height = m_screen->height();
@@ -279,11 +291,11 @@ MACHINE_START_MEMBER(a2600_state,a2600)
 			break;
 		case A26_3E:
 			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x1000, 0x1fff, read8_delegate(FUNC(vcs_cart_slot_device::read_rom),(vcs_cart_slot_device*)m_cartslot), write8_delegate(FUNC(vcs_cart_slot_device::write_ram),(vcs_cart_slot_device*)m_cartslot));
-			m_maincpu->space(AS_PROGRAM).install_write_handler(0x3e, 0x3f, write8_delegate(FUNC(vcs_cart_slot_device::write_bank),(vcs_cart_slot_device*)m_cartslot));
+			m_maincpu->space(AS_PROGRAM).install_write_handler(0x00, 0x3f, write8_delegate(FUNC(a2600_state::cart_over_tia_w), this));
 			break;
 		case A26_3F:
 			m_maincpu->space(AS_PROGRAM).install_read_handler(0x1000, 0x1fff, read8_delegate(FUNC(vcs_cart_slot_device::read_rom),(vcs_cart_slot_device*)m_cartslot));
-			m_maincpu->space(AS_PROGRAM).install_write_handler(0x00, 0x3f, write8_delegate(FUNC(vcs_cart_slot_device::write_bank),(vcs_cart_slot_device*)m_cartslot));
+			m_maincpu->space(AS_PROGRAM).install_write_handler(0x00, 0x3f, write8_delegate(FUNC(a2600_state::cart_over_tia_w), this));
 			break;
 		case A26_UA:
 			m_maincpu->space(AS_PROGRAM).install_read_handler(0x1000, 0x1fff, read8_delegate(FUNC(vcs_cart_slot_device::read_rom),(vcs_cart_slot_device*)m_cartslot));

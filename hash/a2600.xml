@@ -18400,4 +18400,34 @@ Info from Atariage and Atarimania
 			</dataarea>
 		</part>
 	</software>
+
+
+<!-- Since the released cart is undumped, let us include at least these demos to test 3E bankswitch code -->
+	<software name="bdash">
+		<description>Boulder Dash (Demo v2)</description>
+		<year>2014</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<part name="cart" interface="a2600_cart">
+			<feature name="slot" value="a26_3e" />
+			<dataarea name="rom" size="32768">
+				<rom name="boulder dash (demo 2).bin" size="32768" crc="2f7b6112" sha1="adcb4b38413ad6851a1562cacd376dbf25a4dd00" offset="0" />
+			</dataarea>
+			<dataarea name="ram" size="32768">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bdash1" cloneof="bdash">
+		<description>Boulder Dash (Demo v1)</description>
+		<year>2011</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<part name="cart" interface="a2600_cart">
+			<feature name="slot" value="a26_3e" />
+			<dataarea name="rom" size="32768">
+				<rom name="boulderdash100.bin" size="32768" crc="9ba60c62" sha1="660360ee11ab442d5f9db44848d3c0c99ee61e1c" offset="0" />
+			</dataarea>
+			<dataarea name="ram" size="32768">
+			</dataarea>
+		</part>
+	</software>
 </softwarelist>
