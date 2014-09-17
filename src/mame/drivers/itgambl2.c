@@ -148,8 +148,7 @@ UINT32 itgambl2_state::screen_update_itgambl2(screen_device &screen, bitmap_rgb3
 *************************/
 
 static ADDRESS_MAP_START( itgambl2_map, AS_PROGRAM, 16, itgambl2_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xffffff)
-	AM_RANGE(0x000000, 0xffffff) AM_ROM
+	AM_RANGE(0x000000, 0x3fff) AM_ROM
 ADDRESS_MAP_END
 
 
