@@ -204,6 +204,18 @@ ROM_START( kinniku )
 	DISK_IMAGE_READONLY( "kn1-b", 0, SHA1(2f0f9ebe74cdafe3713890221532b4d1dc18c74f) )
 ROM_END
 
+ROM_START( kinniku2 )
+	ROM_REGION(0x200000, "bios", 0)
+	SYSTEM256_BIOS
+
+	ROM_REGION(0x840000, "key", ROMREGION_ERASE00)
+	ROM_LOAD( "kn2vera.ic002", 0x000000, 0x800000, CRC(fb2f71f7) SHA1(29a331cc171d395ad10b352b9b30a61a455a50fe) ) 
+	ROM_LOAD( "kn2vera_spr.ic002", 0x800000, 0x040000, CRC(9c18fa50) SHA1(1f75052cf264c3f2e5b332a755d30544d6e5f45c) ) 
+
+	DISK_REGION("dvd")
+	DISK_IMAGE_READONLY( "kn2vera", 0, SHA1(3e1b773cc584911b673d46f9296a5b1a2cef9a45) )
+ROM_END
+
 ROM_START( netchu02 )
 	ROM_REGION(0x200000, "bios", 0)
 	SYSTEM246_BIOS
@@ -542,6 +554,18 @@ ROM_START( gdvsgd )
 	DISK_IMAGE_READONLY( "gdvsgd", 0, SHA1(3cf9ade5495982fcb8e106e7be4067429530f864) )
 ROM_END
 
+ROM_START( gdvsgdnx )
+	ROM_REGION(0x200000, "bios", 0)
+	SYSTEM256_BIOS
+
+	ROM_REGION(0x840000, "key", ROMREGION_ERASE00)
+	ROM_LOAD( "gnx1001-na-a.ic002", 0x000000, 0x800000, CRC(1d6d2f54) SHA1(17f6e7278e61b5b81605175d3f2df7b747ca7246) ) 
+	ROM_LOAD( "gnx1001-na-a_spr.ic002", 0x800000, 0x040000, CRC(a999ba5c) SHA1(009a56f7be50b57bf435fb8c8b41cf14086b1d1a) ) 
+
+	DISK_REGION("dvd")	// actually HDD for this game
+	DISK_IMAGE_READONLY( "gnx100-1na-a", 0, SHA1(a2344f533895793a2e13198c7de0c759f0dbf817) )
+ROM_END
+
 ROM_START( yuyuhaku )
 	ROM_REGION(0x200000, "bios", 0)
 	SYSTEM256_BIOS
@@ -551,6 +575,18 @@ ROM_START( yuyuhaku )
 
 	DISK_REGION("dvd")
 	DISK_IMAGE_READONLY( "yuyuhaku", 0, SHA1(ffdf1333d2c235e5fcec3780480f110afd20a7df) )
+ROM_END
+
+ROM_START( sbxc )
+	ROM_REGION(0x200000, "bios", 0)
+	SYSTEM246_BIOS
+
+	ROM_REGION(0x840000, "key", ROMREGION_ERASE00)
+	ROM_LOAD( "bax1vera.ic002", 0x000000, 0x800000, CRC(18a6f424) SHA1(027a8d371fb6782c906434b86db9779057eaa954) ) 
+	ROM_LOAD( "bax1vera_spr.ic002", 0x800000, 0x040000, CRC(abfb749b) SHA1(b45f8c79dd0cc0359f27c33f55626d6cad82127c) ) 
+
+	DISK_REGION("dvd")
+	DISK_IMAGE_READONLY( "bax1_dvd0", 0, SHA1(56d58e66eeaa57ff07668000491360853b064936) )
 ROM_END
 
 GAME(2001, sys246,          0, system246, system246, driver_device, 0, ROT0, "Namco", "System 246 BIOS", GAME_IS_SKELETON|GAME_IS_BIOS_ROOT)
@@ -579,6 +615,7 @@ GAME(2005, soulclb3,   sys246, system246, system246, driver_device, 0, ROT0, "Na
 GAME(2005, soulclb3a,soulclb3, system246, system246, driver_device, 0, ROT0, "Namco", "Soul Calibur III (SC31002-NA-A)", GAME_IS_SKELETON)
 GAME(2008, fateulc,    sys246, system246, system246, driver_device, 0, ROT0, "Capcom / Namco", "Fate: Unlimited Codes (FUD1 ver. A)", GAME_IS_SKELETON)
 GAME(2008, fateulcb,  fateulc, system246, system246, driver_device, 0, ROT0, "bootleg", "Fate: Unlimited Codes (bootleg)", GAME_IS_SKELETON)
+GAME(2008, sbxc,       sys246, system246, system246, driver_device, 0, ROT0, "Capcom / Arc System Works", "Sengoku Basara X Cross", GAME_IS_SKELETON)
 
 GAME(2004, sys256,          0, system256, system246, driver_device, 0, ROT0, "Namco", "System 256 BIOS", GAME_IS_SKELETON|GAME_IS_BIOS_ROOT)
 GAME(2005, tekken51,   sys256, system256, system246, driver_device, 0, ROT0, "Namco", "Tekken 5.1 (TE51 Ver. B)", GAME_IS_SKELETON)
@@ -586,5 +623,7 @@ GAME(2005, superdbz,   sys256, system256, system246, driver_device, 0, ROT0, "Ba
 GAME(2006, kinniku,    sys256, system256, system246, driver_device, 0, ROT0, "Namco", "Kinnikuman Muscle Grand Prix (KN1 Ver. A)", GAME_IS_SKELETON)
 GAME(2006, taiko9,     sys256, system256, system246, driver_device, 0, ROT0, "Namco", "Taiko No Tatsujin 9 (TK91001-NA-A)", GAME_IS_SKELETON)
 GAME(2006, yuyuhaku,   sys256, system256, system246, driver_device, 0, ROT0, "Banpresto", "The Battle of Yu Yu Hakusho: Shitou! Ankoku Bujutsukai!", GAME_IS_SKELETON)
+GAME(2007, kinniku2,   sys256, system256, system246, driver_device, 0, ROT0, "Namco", "Kinnikuman Muscle Grand Prix 2 (KN2 Ver. A)", GAME_IS_SKELETON)
 GAME(2007, taiko10,    sys256, system256, system246, driver_device, 0, ROT0, "Namco", "Taiko No Tatsujin 10 (T101001-NA-A)", GAME_IS_SKELETON)
 GAME(2008, gdvsgd,     sys256, system256, system246, driver_device, 0, ROT0, "Capcom / Bandai", "Gundam vs. Gundam", GAME_IS_SKELETON)
+GAME(2009, gdvsgdnx,   sys256, system256, system246, driver_device, 0, ROT0, "Capcom / Bandai", "Gundam vs. Gundam Next", GAME_IS_SKELETON)
