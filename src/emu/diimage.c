@@ -1163,6 +1163,11 @@ void device_image_interface::update_names(const device_type device_type, const c
 //  str1:str2:str3  => swlist_name - str1, swname - str2, swpart - str3
 //  str1:str2       => swlist_name - NULL, swname - str1, swpart - str2
 //  str1            => swlist_name - NULL, swname - str1, swpart - NULL
+//
+//  Notice however that we could also have been
+//  passed a string swlist_name:swname, and thus
+//  some special check has to be performed in this
+//  case.
 //-------------------------------------------------
 
 void device_image_interface::software_name_split(const char *swlist_swname, astring &swlist_name, astring &swname, astring &swpart)
@@ -1198,18 +1203,9 @@ void device_image_interface::software_name_split(const char *swlist_swname, astr
 
 software_part *device_image_interface::find_software_item(const char *path, bool restrict_to_interface)
 {
-	//
-	// Note: old code would explicitly load swlist_name if it was specified, rather than
-	// searching the devices.
-	//
-	// Also if not found, old code would attempt to open <drivername>.xml and even
-	// <swinfo_name>.xml. Hopefully removing this won't break anything.
-	//
-
 	// split full software name into software list name and short software name
 	astring swlist_name, swinfo_name, swpart_name;
 	software_name_split(path, swlist_name, swinfo_name, swpart_name);
-	bool explicit_name = (swlist_name.len() > 0);
 
 	// determine interface
 	const char *interface = NULL;
@@ -1219,7 +1215,8 @@ software_part *device_image_interface::find_software_item(const char *path, bool
 	// find the software list if explicitly specified
 	software_list_device_iterator deviter(device().mconfig().root_device());
 	for (software_list_device *swlistdev = deviter.first(); swlistdev != NULL; swlistdev = deviter.next())
-		if (!explicit_name || swlist_name == swlistdev->list_name())
+	{
+		if (swlist_name == swlistdev->list_name())
 		{
 			software_info *info = swlistdev->find(swinfo_name);
 			if (info != NULL)
@@ -1229,6 +1226,21 @@ software_part *device_image_interface::find_software_item(const char *path, bool
 					return part;
 			}
 		}
+		else if (swinfo_name == swlistdev->list_name())
+		{
+			// ad hoc handling for the case path = swlist_name:swinfo_name (e.g. 
+			// gameboy:sml) which is not handled properly by software_name_split 
+			// since the function cannot distinguish between this and the case 
+			// path = swinfo_name:swpart_name
+			software_info *info = swlistdev->find(swpart_name);
+			if (info != NULL)
+			{
+				software_part *part = info->find_part(NULL, interface);
+				if (part != NULL)
+					return part;
+			}
+		}
+	}
 
 	// if explicitly specified and not found, just error here
 	return NULL;
