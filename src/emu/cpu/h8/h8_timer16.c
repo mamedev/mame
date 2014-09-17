@@ -199,7 +199,7 @@ void h8_timer16_channel_device::update_counter(UINT64 cur_time)
 		return;
 
 	if(!cur_time)
-		cur_time = cpu->get_cycle();
+		cur_time = cpu->total_cycles();
 
 	if(!channel_active) {
 		last_clock_update = cur_time;
@@ -257,7 +257,7 @@ void h8_timer16_channel_device::recalc_event(UINT64 cur_time)
 	}
 
 	if(!cur_time)
-		cur_time = cpu->get_cycle();
+		cur_time = cpu->total_cycles();
 
 	if(counter_incrementing) {
 		UINT32 event_delay = 0xffffffff;
@@ -297,7 +297,7 @@ void h8_timer16_channel_device::recalc_event(UINT64 cur_time)
 			event_time = 0;
 
 		if(event_time && 0)
-			logerror("%s: next event in %d cycles (%ld)\n", tag(), int(event_time - cpu->get_cycle()), long(event_time));
+			logerror("%s: next event in %d cycles (%ld)\n", tag(), int(event_time - cpu->total_cycles()), long(event_time));
 
 	} else {
 		logerror("decrementing counter\n");

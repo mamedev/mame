@@ -461,19 +461,19 @@ void h8_sci_device::clock_start(int mode)
 		case CLKM_INTERNAL_ASYNC_OUT:
 		case CLKM_INTERNAL_SYNC_OUT:
 			logerror("%s: Starting internal clock\n", tag());
-			clock_base = cpu->get_cycle();
+			clock_base = cpu->total_cycles();
 			cpu->internal_update();
 			break;
 
 		case CLKM_EXTERNAL_RATE_ASYNC:
 			logerror("%s: Simulating external clock async\n", tag());
-			clock_base = UINT64(cpu->get_cycle()*internal_to_external_ratio);
+			clock_base = UINT64(cpu->total_cycles()*internal_to_external_ratio);
 			cpu->internal_update();
 			break;
 
 		case CLKM_EXTERNAL_RATE_SYNC:
 			logerror("%s: Simulating external clock sync\n", tag());
-			clock_base = UINT64(cpu->get_cycle()*2*internal_to_external_ratio);
+			clock_base = UINT64(cpu->total_cycles()*2*internal_to_external_ratio);
 			cpu->internal_update();
 			break;
 

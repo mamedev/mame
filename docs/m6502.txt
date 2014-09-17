@@ -95,13 +95,13 @@ everything goes through normal memory-map read/write calls.  The state
 of the sync line is given by the cpu method get_sync(), making
 implementing the decryption in the handler possible.
 
-In a final addition, the cpu method get_cycle() gives the current time
-in cycles since the start of the machine from the point of view of the
-cpu.  Or, in other words, what is usually called the cycle number for
-the cpu when somebody talks about bus contention or wait states.  The
-call is designed to be fast (no system-wide sync, usually no call to
-machine.time()) and is precise.  Cycle number for every access is
-exact at the sub-instruction level.
+Also, as for every executable device, the cpu method total_cycles()
+gives the current time in cycles since the start of the machine from
+the point of view of the cpu.  Or, in other words, what is usually
+called the cycle number for the cpu when somebody talks about bus
+contention or wait states.  The call is designed to be fast (no
+system-wide sync, no call to machine.time()) and is precise.  Cycle
+number for every access is exact at the sub-instruction level.
 
 The 4510 special nomap line is accessible through get_nomap().
 

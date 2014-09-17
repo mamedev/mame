@@ -87,7 +87,7 @@ void i8x9x_device::commit_hso_cam()
 			hso_info[i].active = true;
 			hso_info[i].command = hso_command;
 			hso_info[i].time = hso_time;
-			internal_update(get_cycle());
+			internal_update(total_cycles());
 			return;
 		}
 	hso_cam_hold.active = true;
@@ -105,7 +105,7 @@ void i8x9x_device::ad_start(UINT64 current_time)
 void i8x9x_device::serial_send(UINT8 data)
 {
 	serial_send_buf = data;
-	serial_send_timer = get_cycle() + 9600;
+	serial_send_timer = total_cycles() + 9600;
 }
 
 void i8x9x_device::serial_send_done()
@@ -123,7 +123,7 @@ void i8x9x_device::io_w8(UINT8 adr, UINT8 data)
 	case 0x02:
 		ad_command = data;
 		if(ad_command & 8)
-			ad_start(get_cycle());
+			ad_start(total_cycles());
 		break;
 	case 0x03:
 		logerror("%s: hsi_mode %02x (%04x)\n", tag(), data, PPC);
@@ -229,16 +229,16 @@ UINT8 i8x9x_device::io_r8(UINT8 adr)
 		return pending_irq;
 	case 0x0a:
 		logerror("%s: read timer1 l (%04x)\n", tag(), PPC);
-		return timer_value(1, get_cycle());
+		return timer_value(1, total_cycles());
 	case 0x0b:
 		logerror("%s: read timer1 h (%04x)\n", tag(), PPC);
-		return timer_value(1, get_cycle()) >> 8;
+		return timer_value(1, total_cycles()) >> 8;
 	case 0x0c:
 		logerror("%s: read timer2 l (%04x)\n", tag(), PPC);
-		return timer_value(2, get_cycle());
+		return timer_value(2, total_cycles());
 	case 0x0d:
 		logerror("%s: read timer2 h (%04x)\n", tag(), PPC);
-		return timer_value(2, get_cycle()) >> 8;
+		return timer_value(2, total_cycles()) >> 8;
 	case 0x0e: {
 		static int last = -1;
 		if(io->read_word(P0*2) != last) {
@@ -282,10 +282,10 @@ UINT16 i8x9x_device::io_r16(UINT8 adr)
 		logerror("%s: read hsi time (%04x)\n", tag(), PPC);
 		return 0x0000;
 	case 0x0a:
-		return timer_value(1, get_cycle());
+		return timer_value(1, total_cycles());
 	case 0x0c:
 		logerror("%s: read timer2 (%04x)\n", tag(), PPC);
-		return timer_value(2, get_cycle());
+		return timer_value(2, total_cycles());
 	default:
 		return io_r8(adr) | (io_r8(adr+1) << 8);
 	}

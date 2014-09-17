@@ -212,7 +212,7 @@ void h8_timer8_channel_device::update_counter(UINT64 cur_time)
 		return;
 
 	if(!cur_time)
-		cur_time = cpu->get_cycle();
+		cur_time = cpu->total_cycles();
 
 	UINT64 base_time = (last_clock_update + clock_divider/2) / clock_divider;
 	UINT64 new_time = (cur_time + clock_divider/2) / clock_divider;
@@ -262,7 +262,7 @@ void h8_timer8_channel_device::recalc_event(UINT64 cur_time)
 	}
 
 	if(!cur_time)
-		cur_time = cpu->get_cycle();
+		cur_time = cpu->total_cycles();
 
 	UINT32 event_delay = 0xffffffff;
 	if(clear_type == CLEAR_A || clear_type == CLEAR_B)

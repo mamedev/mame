@@ -76,7 +76,6 @@ public:
 
 	h8_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, bool mode_a16, address_map_delegate map_delegate);
 
-	UINT64 get_cycle();
 	void internal_update();
 
 	void set_irq(int irq_vector, int irq_level, bool irq_nmi);
@@ -214,7 +213,6 @@ protected:
 
 	int inst_state, inst_substate;
 	int icount, bcount;
-	UINT64 start_cycles, end_cycles;
 	int irq_vector, taken_irq_vector;
 	int irq_level, taken_irq_level;
 	bool irq_required, irq_nmi;

@@ -48,8 +48,6 @@ public:
 
 	mcs96_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, int data_width, const char *shortname, const char *source);
 
-	UINT64 get_cycle();
-
 protected:
 	enum {
 		STATE_FETCH = 0x200,
@@ -127,7 +125,6 @@ protected:
 	address_space *program;
 	direct_read_data *direct;
 
-	UINT64 end_cycles;
 	int icount, bcount, inst_state, cycles_scaling;
 	UINT8 pending_irq;
 	UINT16 PC, PPC, PSW;

@@ -77,7 +77,6 @@ void m740_device::device_reset()
 	apu_irq_state = false;
 	irq_taken = false;
 	v_state = false;
-	end_cycles = 0;
 	sync = false;
 	inhibit_interrupts = false;
 	SP = 0x00ff;

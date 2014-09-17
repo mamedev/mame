@@ -152,7 +152,7 @@ void h8_adc_device::conversion_wait(bool first, bool poweron, UINT64 current_tim
 	if(current_time)
 		next_event = current_time + conversion_time(first, poweron);
 	else {
-		next_event = cpu->get_cycle() + conversion_time(first, poweron);
+		next_event = cpu->total_cycles() + conversion_time(first, poweron);
 		cpu->internal_update();
 	}
 }
