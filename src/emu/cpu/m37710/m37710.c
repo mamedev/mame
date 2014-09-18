@@ -72,7 +72,7 @@ const device_type M37710S4 = &device_creator<m37710s4_device>;
 DEVICE_ADDRESS_MAP_START( map, 16, m37702m2_device )
 	AM_RANGE(0x000000, 0x00007f) AM_READWRITE(m37710_internal_word_r, m37710_internal_word_w)
 	AM_RANGE(0x000080, 0x00027f) AM_RAM
-	AM_RANGE(0x00c000, 0x00ffff) AM_ROM AM_REGION("internal", 0)
+	AM_RANGE(0x00c000, 0x00ffff) AM_ROM AM_REGION(M37710_INTERNAL_ROM_REGION, 0)
 ADDRESS_MAP_END
 
 

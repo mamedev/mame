@@ -84,6 +84,10 @@ enum
 };
 
 
+// internal ROM region
+#define M37710_INTERNAL_ROM_REGION "internal"
+#define M37710_INTERNAL_ROM(_tag) (_tag ":" M33710_INTERNAL_ROM_REGION)
+
 class m37710_cpu_device : public cpu_device
 {
 public:

@@ -15,9 +15,7 @@
 #include "sound/es5503.h"
 #include "machine/nvram.h"
 #include "cpu/g65816/g65816.h"
-#if RUN_ADB_MICRO
 #include "cpu/m6502/m5074x.h"
-#endif
 
 #define ADBMICRO_TAG    "adbmicro"
 

@@ -473,7 +473,7 @@ static ADDRESS_MAP_START( m50740_map, AS_PROGRAM, 8, m50740_device )
 	AM_RANGE(0x0000, 0x005f) AM_RAM
 	AM_RANGE(0x00e0, 0x00e9) AM_READWRITE(ports_r, ports_w)
 	AM_RANGE(0x00f9, 0x00ff) AM_READWRITE(tmrirq_r, tmrirq_w)
-	AM_RANGE(0x1400, 0x1fff) AM_ROM AM_REGION("internal", 0)
+	AM_RANGE(0x1400, 0x1fff) AM_ROM AM_REGION(M5074X_INTERNAL_ROM_REGION, 0)
 ADDRESS_MAP_END
 
 m50740_device::m50740_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
