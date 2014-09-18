@@ -130,7 +130,8 @@ WRITE16_MEMBER(r2dx_v33_state::rdx_v33_eeprom_w)
 
 		r2dx_setbanking();
 
-		if (data&0x03) printf("eeprom_w extra bits used %04x\n",data & 3);
+		membank("okibank")->set_entry(data&3);
+
 	}
 	else
 	{
@@ -608,6 +609,9 @@ MACHINE_RESET_MEMBER(r2dx_v33_state,nzeroteam)
 	mid_bank = 1;
 }
 
+static ADDRESS_MAP_START( r2dx_oki_map, AS_0, 8, r2dx_v33_state )
+	AM_RANGE(0x00000, 0x3ffff) AM_ROMBANK("okibank")
+ADDRESS_MAP_END
 
 static MACHINE_CONFIG_START( rdx_v33, r2dx_v33_state )
 
@@ -643,6 +647,7 @@ static MACHINE_CONFIG_START( rdx_v33, r2dx_v33_state )
 
 	MCFG_OKIM6295_ADD("oki", 1000000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
+	MCFG_DEVICE_ADDRESS_MAP(AS_0, r2dx_oki_map)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( nzerotea, r2dx_v33_state )
@@ -703,6 +708,9 @@ DRIVER_INIT_MEMBER(r2dx_v33_state,rdx_v33)
 	membank("bank2")->set_entry(3);
 	membank("bank3")->set_entry(0);
 
+
+	membank("okibank")->configure_entries(0, 4, memregion("oki")->base(), 0x40000);
+	membank("okibank")->set_entry(0);
 //  sensible defaults if booting as RDX - we set now set this later..
 //	membank("bank1")->set_entry(0x20+16);
 //	membank("bank2")->set_entry(0x20+3);
