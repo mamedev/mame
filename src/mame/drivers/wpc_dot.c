@@ -509,7 +509,7 @@ ROM_START(pz_l3)
 ROM_END
 
 /*--------------------
-/ Slugfest baseball #60001,60021
+/ Slugfest baseball #60001
 /--------------------*/
 ROM_START(sf_l1)
 	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
