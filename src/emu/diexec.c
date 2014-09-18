@@ -146,7 +146,7 @@ void device_execute_interface::static_set_irq_acknowledge_callback(device_t &dev
 
 bool device_execute_interface::executing() const
 {
-	return (this == device().machine().scheduler().currently_executing());
+	return (this == m_scheduler->currently_executing());
 }
 
 
@@ -204,7 +204,7 @@ void device_execute_interface::adjust_icount(int delta)
 void device_execute_interface::abort_timeslice()
 {
 	// ignore if not the executing device
-	if (this != device().machine().scheduler().currently_executing())
+	if (!executing())
 		return;
 
 	// swallow the remaining cycles
@@ -225,7 +225,7 @@ void device_execute_interface::abort_timeslice()
 void device_execute_interface::suspend_resume_changed()
 {
 	// inform the scheduler
-	device().machine().scheduler().suspend_resume_changed();
+	m_scheduler->suspend_resume_changed();
 
 	// if we're active, synchronize
 	abort_timeslice();
@@ -273,7 +273,7 @@ void device_execute_interface::spin_until_time(const attotime &duration)
 	suspend_until_trigger(TRIGGER_SUSPENDTIME + timetrig, true);
 
 	// then set a timer for it
-	device().machine().scheduler().timer_set(duration, FUNC(static_timed_trigger_callback), TRIGGER_SUSPENDTIME + timetrig, this);
+	m_scheduler->timer_set(duration, FUNC(static_timed_trigger_callback), TRIGGER_SUSPENDTIME + timetrig, this);
 	timetrig = (timetrig + 1) % 256;
 }
 
@@ -469,6 +469,8 @@ void device_execute_interface::interface_validity_check(validity_checker &valid)
 
 void device_execute_interface::interface_pre_start()
 {
+	m_scheduler = &device().machine().scheduler();
+
 	// bind delegates
 	m_vblank_interrupt.bind_relative_to(*device().owner());
 	m_timed_interrupt.bind_relative_to(*device().owner());
@@ -483,7 +485,7 @@ void device_execute_interface::interface_pre_start()
 
 	// allocate timers if we need them
 	if (m_timed_interrupt_period != attotime::zero)
-		m_timedint_timer = device().machine().scheduler().timer_alloc(FUNC(static_trigger_periodic_interrupt), (void *)this);
+		m_timedint_timer = m_scheduler->timer_alloc(FUNC(static_trigger_periodic_interrupt), (void *)this);
 }
 
 
@@ -595,7 +597,7 @@ void device_execute_interface::interface_clock_changed()
 	m_divisor = attos;
 
 	// re-compute the perfect interleave factor
-	device().machine().scheduler().compute_perfect_interleave();
+	m_scheduler->compute_perfect_interleave();
 }
 
 
@@ -711,7 +713,6 @@ void device_execute_interface::trigger_periodic_interrupt()
 
 device_execute_interface::device_input::device_input()
 	: m_execute(NULL),
-		m_device(NULL),
 		m_linenum(0),
 		m_stored_vector(0),
 		m_curvector(0),
@@ -730,14 +731,14 @@ device_execute_interface::device_input::device_input()
 void device_execute_interface::device_input::start(device_execute_interface *execute, int linenum)
 {
 	m_execute = execute;
-	m_device = &m_execute->device();
 	m_linenum = linenum;
 
 	reset();
 
-	m_device->save_item(NAME(m_stored_vector), m_linenum);
-	m_device->save_item(NAME(m_curvector), m_linenum);
-	m_device->save_item(NAME(m_curstate), m_linenum);
+	device_t &device = m_execute->device();
+	device.save_item(NAME(m_stored_vector), m_linenum);
+	device.save_item(NAME(m_curvector), m_linenum);
+	device.save_item(NAME(m_curstate), m_linenum);
 }
 
 
@@ -759,9 +760,9 @@ void device_execute_interface::device_input::reset()
 
 void device_execute_interface::device_input::set_state_synced(int state, int vector)
 {
-	LOG(("set_state_synced('%s',%d,%d,%02x)\n", m_device->tag(), m_linenum, state, vector));
+	LOG(("set_state_synced('%s',%d,%d,%02x)\n", m_execute->device().tag(), m_linenum, state, vector));
 
-if (TEMPLOG) printf("setline(%s,%d,%d,%d)\n", m_device->tag(), m_linenum, state, (vector == USE_STORED_VECTOR) ? 0 : vector);
+if (TEMPLOG) printf("setline(%s,%d,%d,%d)\n", m_execute->device().tag(), m_linenum, state, (vector == USE_STORED_VECTOR) ? 0 : vector);
 	assert(state == ASSERT_LINE || state == HOLD_LINE || state == CLEAR_LINE || state == PULSE_LINE);
 
 	// treat PULSE_LINE as ASSERT+CLEAR
@@ -769,7 +770,7 @@ if (TEMPLOG) printf("setline(%s,%d,%d,%d)\n", m_device->tag(), m_linenum, state,
 	{
 		// catch errors where people use PULSE_LINE for devices that don't support it
 		if (m_linenum != INPUT_LINE_NMI && m_linenum != INPUT_LINE_RESET)
-			throw emu_fatalerror("device '%s': PULSE_LINE can only be used for NMI and RESET lines\n", m_device->tag());
+			throw emu_fatalerror("device '%s': PULSE_LINE can only be used for NMI and RESET lines\n", m_execute->device().tag());
 
 		set_state_synced(ASSERT_LINE, vector);
 		set_state_synced(CLEAR_LINE, vector);
@@ -783,7 +784,7 @@ if (TEMPLOG) printf("setline(%s,%d,%d,%d)\n", m_device->tag(), m_linenum, state,
 		m_qindex--;
 		empty_event_queue();
 		event_index = m_qindex++;
-		logerror("Exceeded pending input line event queue on device '%s'!\n", m_device->tag());
+		logerror("Exceeded pending input line event queue on device '%s'!\n", m_execute->device().tag());
 	}
 
 	// enqueue the event
@@ -795,7 +796,7 @@ if (TEMPLOG) printf("setline(%s,%d,%d,%d)\n", m_device->tag(), m_linenum, state,
 
 		// if this is the first one, set the timer
 		if (event_index == 0)
-			m_execute->device().machine().scheduler().synchronize(FUNC(static_empty_event_queue), 0, (void *)this);
+			m_execute->scheduler().synchronize(FUNC(static_empty_event_queue), 0, (void *)this);
 	}
 }
 
@@ -811,7 +812,7 @@ TIMER_CALLBACK( device_execute_interface::device_input::static_empty_event_queue
 
 void device_execute_interface::device_input::empty_event_queue()
 {
-if (TEMPLOG) printf("empty_queue(%s,%d,%d)\n", m_device->tag(), m_linenum, m_qindex);
+if (TEMPLOG) printf("empty_queue(%s,%d,%d)\n", m_execute->device().tag(), m_linenum, m_qindex);
 	// loop over all events
 	for (int curevent = 0; curevent < m_qindex; curevent++)
 	{
@@ -834,7 +835,7 @@ if (TEMPLOG) printf(" (%d,%d)\n", m_curstate, m_curvector);
 			// if we're clearing the line that was previously asserted, reset the device
 			else if (m_execute->suspended(SUSPEND_REASON_RESET))
 			{
-				m_device->reset();
+				m_execute->device().reset();
 				m_execute->resume(SUSPEND_REASON_RESET);
 			}
 		}
@@ -867,7 +868,7 @@ if (TEMPLOG) printf(" (%d,%d)\n", m_curstate, m_curvector);
 					break;
 
 				default:
-					logerror("empty_event_queue device '%s', line %d, unknown state %d\n", m_device->tag(), m_linenum, m_curstate);
+					logerror("empty_event_queue device '%s', line %d, unknown state %d\n", m_execute->device().tag(), m_linenum, m_curstate);
 					break;
 			}
 
@@ -894,7 +895,7 @@ int device_execute_interface::device_input::default_irq_callback()
 	// if the IRQ state is HOLD_LINE, clear it
 	if (m_curstate == HOLD_LINE)
 	{
-		LOG(("->set_irq_line('%s',%d,%d)\n", m_device->tag(), m_linenum, CLEAR_LINE));
+		LOG(("->set_irq_line('%s',%d,%d)\n", m_execute->device().tag(), m_linenum, CLEAR_LINE));
 		m_execute->execute_set_input(m_linenum, CLEAR_LINE);
 		m_curstate = CLEAR_LINE;
 	}

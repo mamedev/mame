@@ -113,6 +113,7 @@ enum
 
 class emu_timer;
 class screen_device;
+class device_scheduler;
 
 
 // interrupt callback for VBLANK and timed interrupts
@@ -154,6 +155,7 @@ public:
 	static void static_set_irq_acknowledge_callback(device_t &device, device_irq_acknowledge_delegate callback);
 
 	// execution management
+	device_scheduler &scheduler() const { assert(m_scheduler != NULL); return *m_scheduler; }
 	bool executing() const;
 	INT32 cycles_remaining() const;
 	void eat_cycles(int cycles);
@@ -239,7 +241,6 @@ protected:
 		int default_irq_callback();
 
 		device_execute_interface *m_execute;// pointer to the execute interface
-		device_t *      m_device;           // pointer to our device
 		int             m_linenum;          // which input line we are
 
 		INT32           m_stored_vector;    // most recently written vector
@@ -252,6 +253,9 @@ protected:
 		static void static_empty_event_queue(running_machine &machine, void *ptr, int param);
 		void empty_event_queue();
 	};
+
+	// scheduler
+	device_scheduler *      m_scheduler;                // pointer to the machine scheduler
 
 	// configuration
 	bool                    m_disabled;                 // disabled from executing?
