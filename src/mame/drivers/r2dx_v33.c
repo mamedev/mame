@@ -51,6 +51,8 @@ public:
 	DECLARE_DRIVER_INIT(nzerotea);
 	DECLARE_DRIVER_INIT(zerotm2k);
 
+	DECLARE_MACHINE_RESET(r2dx_v33);
+	DECLARE_MACHINE_RESET(nzeroteam);
 
 	UINT32 screen_update_rdx_v33(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(rdx_v33_interrupt);
@@ -66,7 +68,12 @@ WRITE16_MEMBER(r2dx_v33_state::rdx_v33_eeprom_w)
 		m_eeprom->di_write((data & 0x20) >> 5);
 		m_eeprom->cs_write((data & 0x08) ? ASSERT_LINE : CLEAR_LINE);
 
-		if (data&0xc7) printf("eeprom_w extra bits used %04x\n",data);
+		// 0x40 - coin counter 1?
+		// 0x80 - coin counter 2?
+
+		// 0x04 is active in Raiden DX mode, it could be part of the rom bank (which half of the rom to use) or the FG tile bank (or both?)
+
+		if (data&0x07) printf("eeprom_w extra bits used %04x\n",data & 7);
 	}
 	else
 	{
@@ -153,8 +160,8 @@ WRITE16_MEMBER(r2dx_v33_state::mcu_table2_w)
 static ADDRESS_MAP_START( rdx_v33_map, AS_PROGRAM, 16, r2dx_v33_state )
 	AM_RANGE(0x00000, 0x003ff) AM_RAM // vectors copied here
 
-	AM_RANGE(0x00400, 0x00407) AM_WRITE(mcu_table_w)
-	AM_RANGE(0x00420, 0x00429) AM_WRITE(mcu_table2_w)
+//	AM_RANGE(0x00400, 0x00407) AM_WRITE(mcu_table_w)
+//	AM_RANGE(0x00420, 0x00429) AM_WRITE(mcu_table2_w)
 
 	/* results from cop? */
 	AM_RANGE(0x00430, 0x00431) AM_READ(rdx_v33_unknown_r)
@@ -461,6 +468,21 @@ static INPUT_PORTS_START( nzerotea )
 INPUT_PORTS_END
 
 
+MACHINE_RESET_MEMBER(r2dx_v33_state,r2dx_v33)
+{
+	common_reset();
+}
+
+MACHINE_RESET_MEMBER(r2dx_v33_state,nzeroteam)
+{
+	common_reset();
+
+	bg_bank = 0;
+	fg_bank = 2;
+	mid_bank = 1;
+}
+
+
 static MACHINE_CONFIG_START( rdx_v33, r2dx_v33_state )
 
 	/* basic machine hardware */
@@ -468,7 +490,7 @@ static MACHINE_CONFIG_START( rdx_v33, r2dx_v33_state )
 	MCFG_CPU_PROGRAM_MAP(rdx_v33_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", r2dx_v33_state,  rdx_v33_interrupt)
 
-	//MCFG_MACHINE_RESET_OVERRIDE(r2dx_v33_state,rdx_v33)
+	MCFG_MACHINE_RESET_OVERRIDE(r2dx_v33_state,r2dx_v33)
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
@@ -503,6 +525,9 @@ static MACHINE_CONFIG_START( nzerotea, r2dx_v33_state )
 	MCFG_CPU_ADD("maincpu", V33,XTAL_32MHz/2) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(nzerotea_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", r2dx_v33_state,  rdx_v33_interrupt)
+
+	MCFG_MACHINE_RESET_OVERRIDE(r2dx_v33_state,nzeroteam)
+
 
 	//  SEIBU2_RAIDEN2_SOUND_SYSTEM_CPU(14318180/4)
 	SEIBU_NEWZEROTEAM_SOUND_SYSTEM_CPU(14318180/4)
@@ -746,8 +771,8 @@ ROM_START( zerotm2k ) /* V33 SYSTEM TYPE_C VER2 hardware, uses SEI333 (AKA COPX-
 	ROM_LOAD( "szy-01.u099", 0x00000, 0x40000,  CRC(48be32b1) SHA1(969d2191a3c46871ee8bf93088b3cecce3eccf0c) ) /* PCB silkscreened PCM, Same as other Zero Team sets */
 ROM_END
 
-// newer PCB, with V33 CPU and COPD3 protection, but weak sound hardware. - was marked as Raiden DX New in the rom dump, but boots as Raiden 2 New version, is it switchable?
-GAME( 1996, r2dx_v33, 0,          rdx_v33,  rdx_v33, r2dx_v33_state,  rdx_v33,   ROT270, "Seibu Kaihatsu", "Raiden II / DX (newer V33 PCB)", GAME_NOT_WORKING|GAME_NO_SOUND)
+// newer PCB, with V33 CPU and COPD3 protection, but weak sound hardware. - was marked as Raiden DX New in the rom dump, but boots as Raiden 2 New version, the rom contains both
+GAME( 1996, r2dx_v33, 0,          rdx_v33,  rdx_v33, r2dx_v33_state,  rdx_v33,   ROT270, "Seibu Kaihatsu", "Raiden II New / Raiden DX (newer V33 PCB)", GAME_NOT_WORKING|GAME_NO_SOUND)
 
 // 'V33 system type_b' - uses V33 CPU, COPX-D3 external protection rom, but still has the proper sound system
 GAME( 1997, nzeroteam, zeroteam,  nzerotea, nzerotea, r2dx_v33_state, nzerotea,  ROT0,   "Seibu Kaihatsu", "New Zero Team", GAME_NOT_WORKING|GAME_NO_SOUND)
