@@ -22,6 +22,7 @@
 #define VIDEO_MODE_GDI      1
 #define VIDEO_MODE_DDRAW    2
 #define VIDEO_MODE_D3D      3
+#define VIDEO_MODE_BGFX     4
 
 
 

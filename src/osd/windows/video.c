@@ -391,6 +391,8 @@ static void extract_video_config(running_machine &machine)
 		video_config.mode = VIDEO_MODE_DDRAW;
 	else if (strcmp(stemp, "gdi") == 0)
 		video_config.mode = VIDEO_MODE_GDI;
+	else if (strcmp(stemp, "bgfx") == 0)
+		video_config.mode = VIDEO_MODE_BGFX;
 	else if (strcmp(stemp, "none") == 0)
 	{
 		video_config.mode = VIDEO_MODE_NONE;

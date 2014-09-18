@@ -353,6 +353,7 @@ OSDOBJS = \
 	$(WINOBJ)/drawdd.o \
 	$(WINOBJ)/drawgdi.o \
 	$(WINOBJ)/drawnone.o \
+	$(WINOBJ)/drawbgfx.o \
 	$(WINOBJ)/input.o \
 	$(WINOBJ)/output.o \
 	$(OSDOBJ)/modules/sound/direct_sound.o \
@@ -385,6 +386,7 @@ OSDOBJS += \
 # add a stub resource file
 RESFILE = $(WINOBJ)/mame.res
 
+INCPATH += -I$(LIBSRC)/bgfx/include
 #-------------------------------------------------
 # QT Debug library
 #-------------------------------------------------
