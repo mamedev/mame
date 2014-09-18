@@ -72,13 +72,13 @@ WRITE16_MEMBER(r2dx_v33_state::tile_bank_w)
 {
 	if(ACCESSING_BITS_0_7) {
 		int new_bank;
-		new_bank = 0 | ((data & 0x10)>>3);
+		new_bank = ((data & 0x10)>>4);
 		if(new_bank != bg_bank) {
 			bg_bank = new_bank;
 			background_layer->mark_all_dirty();
 		}
 
-		new_bank = 1 | ((data & 0x20)>>4);
+		new_bank = 2 + ((data & 0x20)>>5);
 		if(new_bank != mid_bank) {
 			mid_bank = new_bank;
 			midground_layer->mark_all_dirty();
@@ -215,6 +215,10 @@ WRITE16_MEMBER(r2dx_v33_state::r2dx_rom_bank_w)
 
 static ADDRESS_MAP_START( rdx_v33_map, AS_PROGRAM, 16, r2dx_v33_state )
 	AM_RANGE(0x00000, 0x003ff) AM_RAM // vectors copied here
+
+	AM_RANGE(0x00400, 0x00401) AM_WRITENOP // tilemaps to private buffer
+	AM_RANGE(0x00402, 0x00403) AM_WRITENOP // palettes to private buffer
+
 
 	AM_RANGE(0x00404, 0x00405) AM_WRITE(r2dx_rom_bank_w)
 	AM_RANGE(0x00406, 0x00407) AM_WRITE(tile_bank_w)
