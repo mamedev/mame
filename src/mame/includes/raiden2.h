@@ -22,6 +22,7 @@ public:
 		  bg_bank(0),
 		  fg_bank(0),
 		  mid_bank(0),
+		  tx_bank(0),
 		  raiden2_tilemap_enable(0),
 		  prg_bank(0),
 		  cop_bank(0),
@@ -145,7 +146,7 @@ public:
 	tilemap_t *background_layer,*midground_layer,*foreground_layer,*text_layer;
 	
 	
-	int bg_bank, fg_bank, mid_bank;
+	int bg_bank, fg_bank, mid_bank, tx_bank;
 	UINT16 raiden2_tilemap_enable;
 	UINT8 prg_bank;
 	UINT16 cop_bank;

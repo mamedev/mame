@@ -72,6 +72,8 @@ WRITE16_MEMBER(r2dx_v33_state::rdx_v33_eeprom_w)
 		// 0x80 - coin counter 2?
 
 		// 0x04 is active in Raiden DX mode, it could be part of the rom bank (which half of the rom to use) or the FG tile bank (or both?)
+		tx_bank = (data & 0x04) >> 2;
+		text_layer->mark_all_dirty();
 
 		if (data&0x07) printf("eeprom_w extra bits used %04x\n",data & 7);
 	}

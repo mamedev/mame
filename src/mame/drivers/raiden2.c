@@ -169,6 +169,7 @@ void raiden2_state::machine_start()
 	save_item(NAME(bg_bank));
 	save_item(NAME(fg_bank));
 	save_item(NAME(mid_bank));
+	save_item(NAME(tx_bank));
 	save_item(NAME(raiden2_tilemap_enable));
 	save_item(NAME(prg_bank));
 	save_item(NAME(cop_bank));
@@ -991,7 +992,7 @@ TILE_GET_INFO_MEMBER(raiden2_state::get_text_tile_info)
 
 	tile &= 0xfff;
 
-	SET_TILE_INFO_MEMBER(0,tile,color,0);
+	SET_TILE_INFO_MEMBER(0,tile + tx_bank * 0x1000,color,0);
 }
 
 /* VIDEO START (move to video file) */
@@ -1213,6 +1214,7 @@ void raiden2_state::common_reset()
 	bg_bank=0;
 	fg_bank=6;
 	mid_bank=1;
+	tx_bank = 0;
 	cop_itoa_digit_count = 4; //TODO: Raiden 2 never inits the BCD register, value here is a guess (8 digits, as WR is 10.000.000 + a)
 }
 
@@ -1246,6 +1248,7 @@ MACHINE_RESET_MEMBER(raiden2_state,zeroteam)
 	bg_bank = 0;
 	fg_bank = 2;
 	mid_bank = 1;
+	tx_bank = 0;
 	sprcpt_init();
 
 	membank("mainbank1")->set_entry(2);
@@ -1260,6 +1263,7 @@ MACHINE_RESET_MEMBER(raiden2_state,xsedae)
 	bg_bank = 0;
 	fg_bank = 2;
 	mid_bank = 1;
+	tx_bank = 0;
 	sprcpt_init();
 }
 
