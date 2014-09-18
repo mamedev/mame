@@ -26,7 +26,9 @@ class r2dx_v33_state : public raiden2_state
 public:
 	r2dx_v33_state(const machine_config &mconfig, device_type type, const char *tag)
 		: raiden2_state(mconfig, type, tag),
-		m_eeprom(*this, "eeprom")
+		m_eeprom(*this, "eeprom"),
+		m_r2dxbank(0),
+		m_r2dxgameselect(0)
 	{ }
 
 	optional_device<eeprom_serial_93cxx_device> m_eeprom;
@@ -48,12 +50,18 @@ public:
 	DECLARE_WRITE16_MEMBER(mcu_prog_w2);
 	DECLARE_WRITE16_MEMBER(mcu_prog_offs_w);
 	DECLARE_WRITE16_MEMBER(rdx_v33_eeprom_w);
+	DECLARE_WRITE16_MEMBER(r2dx_rom_bank_w);
 	DECLARE_DRIVER_INIT(rdx_v33);
 	DECLARE_DRIVER_INIT(nzerotea);
 	DECLARE_DRIVER_INIT(zerotm2k);
 
+	void r2dx_setbanking(void);
+
 	DECLARE_MACHINE_RESET(r2dx_v33);
 	DECLARE_MACHINE_RESET(nzeroteam);
+
+	int m_r2dxbank;
+	int m_r2dxgameselect;
 
 	UINT32 screen_update_rdx_v33(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(rdx_v33_interrupt);
@@ -84,6 +92,13 @@ WRITE16_MEMBER(r2dx_v33_state::tile_bank_w)
 	}
 }
 
+void r2dx_v33_state::r2dx_setbanking(void)
+{
+	membank("bank1")->set_entry(m_r2dxgameselect*0x20 + m_r2dxbank + 16);
+	membank("bank2")->set_entry(m_r2dxgameselect*0x20 + 3);
+	membank("bank3")->set_entry(m_r2dxgameselect);
+}
+
 WRITE16_MEMBER(r2dx_v33_state::rdx_v33_eeprom_w)
 {
 	if (ACCESSING_BITS_0_7)
@@ -97,25 +112,14 @@ WRITE16_MEMBER(r2dx_v33_state::rdx_v33_eeprom_w)
 
 		// 0x04 is active in Raiden DX mode, it could be part of the rom bank (which half of the rom to use) or the FG tile bank (or both?)
 		// the bit gets set if it reads RAIDENDX from the EEPROM
-		tx_bank = (data & 0x04) >> 2;
+		m_r2dxgameselect = (data & 0x04) >> 2;
+		
+		tx_bank = m_r2dxgameselect;
 		text_layer->mark_all_dirty();
 
-		if (data & 4) // todo: almost certainly wrong
-		{
-			// sensible defaults if booting as RDX
-			membank("bank1")->set_entry(0x20+16);
-			membank("bank2")->set_entry(0x20+3);
-			membank("bank3")->set_entry(1);
-		}
-		else
-		{
-			membank("bank1")->set_entry(2);
-			membank("bank2")->set_entry(3);
-			membank("bank3")->set_entry(0);
-		}
+		r2dx_setbanking();
 
-
-		if (data&0x07) printf("eeprom_w extra bits used %04x\n",data & 7);
+		if (data&0x03) printf("eeprom_w extra bits used %04x\n",data & 3);
 	}
 	else
 	{
@@ -200,10 +204,19 @@ WRITE16_MEMBER(r2dx_v33_state::mcu_table2_w)
 	//popmessage("%04x %04x %04x %04x | %04x %04x %04x %04x",mcu_data[0/2],mcu_data[2/2],mcu_data[4/2],mcu_data[6/2],mcu_data[8/2],mcu_data[0xa/2],mcu_data[0xc/2],mcu_data[0xe/2]);
 }
 
+WRITE16_MEMBER(r2dx_v33_state::r2dx_rom_bank_w)
+{
+	printf("rom bank %04x %04x\n", data, mem_mask);
+	m_r2dxbank = data & 0xf;
+	r2dx_setbanking();
+
+}
+
 
 static ADDRESS_MAP_START( rdx_v33_map, AS_PROGRAM, 16, r2dx_v33_state )
 	AM_RANGE(0x00000, 0x003ff) AM_RAM // vectors copied here
 
+	AM_RANGE(0x00404, 0x00405) AM_WRITE(r2dx_rom_bank_w)
 	AM_RANGE(0x00406, 0x00407) AM_WRITE(tile_bank_w)
 
 //	AM_RANGE(0x00400, 0x00407) AM_WRITE(mcu_table_w)
@@ -219,11 +232,11 @@ static ADDRESS_MAP_START( rdx_v33_map, AS_PROGRAM, 16, r2dx_v33_state )
 //	AM_RANGE(0x00650, 0x0068f) AM_RAM //???
 
 //	AM_RANGE(0x0068e, 0x0068f) AM_WRITENOP // synch for the MCU?
-	AM_RANGE(0x006b0, 0x006b1) AM_WRITE(mcu_prog_w)
-	AM_RANGE(0x006b2, 0x006b3) AM_WRITE(mcu_prog_w2)
+//	AM_RANGE(0x006b0, 0x006b1) AM_WRITE(mcu_prog_w)
+//	AM_RANGE(0x006b2, 0x006b3) AM_WRITE(mcu_prog_w2)
 //  AM_RANGE(0x006b4, 0x006b5) AM_WRITENOP
 //  AM_RANGE(0x006b6, 0x006b7) AM_WRITENOP
-	AM_RANGE(0x006bc, 0x006bd) AM_WRITE(mcu_prog_offs_w)
+//	AM_RANGE(0x006bc, 0x006bd) AM_WRITE(mcu_prog_offs_w)
 //	AM_RANGE(0x006be, 0x006bf) AM_WRITENOP // MCU program related
 
 	// sprite protection not 100% verified as the same
