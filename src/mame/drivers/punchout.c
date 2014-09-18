@@ -212,7 +212,7 @@ ADDRESS_MAP_END
 
 // The RP5C01 features don't seem to be used at all except for very basic protection
 // e.g. relying on the masking done by the internal registers.
-// The RP5H01 one-time PROM (OTP) is assumed to be unprogrammed.
+// The RP5H01 one-time PROM (OTP) is confirmed to be unprogrammed.
 
 READ8_MEMBER(punchout_state::spunchout_exp_r)
 {
