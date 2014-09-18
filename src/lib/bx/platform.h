@@ -38,14 +38,14 @@
 // http://sourceforge.net/apps/mediawiki/predef/index.php?title=Compilers
 #if defined(_MSC_VER)
 #	undef BX_COMPILER_MSVC
-#	define BX_COMPILER_MSVC 1
+#	define BX_COMPILER_MSVC _MSC_VER
 #elif defined(__clang__)
 // clang defines __GNUC__
 #	undef BX_COMPILER_CLANG
 #	define BX_COMPILER_CLANG 1
 #elif defined(__GNUC__)
 #	undef BX_COMPILER_GCC
-#	define BX_COMPILER_GCC 1
+#	define BX_COMPILER_GCC (__GNUC__ * 10000 + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__)
 #else
 #	error "BX_COMPILER_* is not defined!"
 #endif //
@@ -158,11 +158,24 @@
 #endif // BX_CONFIG_ENABLE_MSVC_LEVEL4_WARNINGS
 
 #if BX_COMPILER_GCC
-#	define BX_COMPILER_NAME "GCC"
+#	define BX_COMPILER_NAME "GCC " \
+				BX_STRINGIZE(__GNUC__) "." \
+				BX_STRINGIZE(__GNUC_MINOR__) "." \
+				BX_STRINGIZE(__GNUC_PATCHLEVEL__)
 #elif BX_COMPILER_CLANG
 #	define BX_COMPILER_NAME "Clang"
 #elif BX_COMPILER_MSVC
-#	define BX_COMPILER_NAME "MSVC"
+#	if BX_COMPILER_MSVC >= 1800
+#		define BX_COMPILER_NAME "MSVC 12.0"
+#	elif BX_COMPILER_MSVC >= 1700
+#		define BX_COMPILER_NAME "MSVC 11.0"
+#	elif BX_COMPILER_MSVC >= 1600
+#		define BX_COMPILER_NAME "MSVC 10.0"
+#	elif BX_COMPILER_MSVC >= 1500
+#		define BX_COMPILER_NAME "MSVC 9.0"
+#	else
+#		define BX_COMPILER_NAME "MSVC"
+#	endif //
 #endif // BX_COMPILER_
 
 #if BX_PLATFORM_ANDROID

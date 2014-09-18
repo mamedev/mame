@@ -344,6 +344,8 @@ namespace bgfx
 
 			ATI_meminfo,
 
+			CHROMIUM_color_buffer_float_rgb,
+			CHROMIUM_color_buffer_float_rgba,
 			CHROMIUM_depth_texture,
 			CHROMIUM_framebuffer_multisample,
 			CHROMIUM_texture_compression_dxt3,
@@ -356,6 +358,7 @@ namespace bgfx
 			EXT_compressed_ETC1_RGB8_sub_texture,
 			EXT_debug_label,
 			EXT_debug_marker,
+			EXT_draw_buffers,
 			EXT_frag_depth,
 			EXT_framebuffer_blit,
 			EXT_framebuffer_object,
@@ -499,6 +502,8 @@ namespace bgfx
 
 		{ "ATI_meminfo",                           false,                             true  },
 
+		{ "CHROMIUM_color_buffer_float_rgb",       false,                             true  },
+		{ "CHROMIUM_color_buffer_float_rgba",      false,                             true  },
 		{ "CHROMIUM_depth_texture",                false,                             true  },
 		{ "CHROMIUM_framebuffer_multisample",      false,                             true  },
 		{ "CHROMIUM_texture_compression_dxt3",     false,                             true  },
@@ -511,6 +516,7 @@ namespace bgfx
 		{ "EXT_compressed_ETC1_RGB8_sub_texture",  false,                             true  }, // GLES2 extension.
 		{ "EXT_debug_label",                       false,                             true  },
 		{ "EXT_debug_marker",                      false,                             true  },
+		{ "EXT_draw_buffers",                      false,                             true  }, // GLES2 extension.
 		{ "EXT_frag_depth",                        false,                             true  }, // GLES2 extension.
 		{ "EXT_framebuffer_blit",                  BGFX_CONFIG_RENDERER_OPENGL >= 30, true  },
 		{ "EXT_framebuffer_object",                BGFX_CONFIG_RENDERER_OPENGL >= 30, true  },
@@ -826,7 +832,8 @@ namespace bgfx
 	struct RendererContextGL : public RendererContextI
 	{
 		RendererContextGL()
-			: m_rtMsaa(false)
+			: m_numWindows(1)
+			, m_rtMsaa(false)
 			, m_capture(NULL)
 			, m_captureSize(0)
 			, m_maxAnisotropy(0.0f)
@@ -1169,7 +1176,8 @@ namespace bgfx
 			g_caps.maxTextureSize = glGet(GL_MAX_TEXTURE_SIZE);
 
 			if (BX_ENABLED(BGFX_CONFIG_RENDERER_OPENGL)
-			||  BX_ENABLED(BGFX_CONFIG_RENDERER_OPENGLES >= 30) )
+			||  BX_ENABLED(BGFX_CONFIG_RENDERER_OPENGLES >= 30)
+			||  s_extension[Extension::EXT_draw_buffers].m_supported)
 			{
 				g_caps.maxFBAttachments = bx::uint32_min(glGet(GL_MAX_COLOR_ATTACHMENTS), BGFX_CONFIG_MAX_FRAME_BUFFER_ATTACHMENTS);
 			}
@@ -1376,6 +1384,10 @@ namespace bgfx
 		{
 			if (m_flip)
 			{
+				for (uint32_t ii = 1, num = m_numWindows; ii < num; ++ii)
+				{
+					m_glctx.swap(m_frameBuffers[m_windows[ii].idx].m_swapChain);
+				}
 				m_glctx.swap();
 			}
 		}
@@ -1491,9 +1503,26 @@ namespace bgfx
 			m_frameBuffers[_handle.idx].create(_num, _textureHandles);
 		}
 
+		void createFrameBuffer(FrameBufferHandle _handle, void* _nwh, uint32_t _width, uint32_t _height, TextureFormat::Enum _depthFormat) BX_OVERRIDE
+		{
+			uint16_t denseIdx = m_numWindows++;
+			m_windows[denseIdx] = _handle;
+			m_frameBuffers[_handle.idx].create(denseIdx, _nwh, _width, _height, _depthFormat);
+		}
+
 		void destroyFrameBuffer(FrameBufferHandle _handle) BX_OVERRIDE
 		{
-			m_frameBuffers[_handle.idx].destroy();
+			uint16_t denseIdx = m_frameBuffers[_handle.idx].destroy();
+			if (UINT16_MAX != denseIdx)
+			{
+				--m_numWindows;
+				if (m_numWindows > 1)
+				{
+					FrameBufferHandle handle = m_windows[m_numWindows];
+					m_windows[denseIdx] = handle;
+					m_frameBuffers[handle.idx].m_denseIdx = denseIdx;
+				}
+			}
 		}
 
 		void createUniform(UniformHandle _handle, UniformType::Enum _type, uint16_t _num, const char* _name) BX_OVERRIDE
@@ -1655,6 +1684,8 @@ namespace bgfx
 				frameBuffer.resolve();
 			}
 
+			m_glctx.makeCurrent(NULL);
+
 			if (!isValid(_fbh) )
 			{
 				GL_CHECK(glBindFramebuffer(GL_FRAMEBUFFER, m_msaaBackBufferFbo) );
@@ -1662,8 +1693,17 @@ namespace bgfx
 			else
 			{
 				FrameBufferGL& frameBuffer = m_frameBuffers[_fbh.idx];
-				GL_CHECK(glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer.m_fbo[0]) );
-				_height = frameBuffer.m_height;
+				if (UINT16_MAX != frameBuffer.m_denseIdx)
+				{
+					m_glctx.makeCurrent(frameBuffer.m_swapChain);
+					GL_CHECK(glBindFramebuffer(GL_FRAMEBUFFER, 0) );
+				}
+				else
+				{
+					m_glctx.makeCurrent(NULL);
+					GL_CHECK(glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer.m_fbo[0]) );
+					_height = frameBuffer.m_height;
+				}
 			}
 
 			m_fbh = _fbh;
@@ -1764,8 +1804,7 @@ namespace bgfx
 
 #if BX_PLATFORM_IOS
 					// iOS: need to figure out how to deal with FBO created by context.
-					m_backBufferFbo = m_glctx.m_fbo;
-					m_msaaBackBufferFbo = m_glctx.m_fbo;
+					m_backBufferFbo = m_msaaBackBufferFbo = m_glctx.getFbo();
 #endif // BX_PLATFORM_IOS
 				}
 				else
@@ -2202,6 +2241,9 @@ namespace bgfx
 					) );
 			}
 		}
+
+		uint16_t m_numWindows;
+		FrameBufferHandle m_windows[BGFX_CONFIG_MAX_FRAME_BUFFERS];
 
 		IndexBufferGL m_indexBuffers[BGFX_CONFIG_MAX_INDEX_BUFFERS];
 		VertexBufferGL m_vertexBuffers[BGFX_CONFIG_MAX_VERTEX_BUFFERS];
@@ -3387,6 +3429,8 @@ namespace bgfx
 						&& bx::findIdentifierMatch(code, s_OES_standard_derivatives)
 						;
 
+					bool usesFragData  = !!bx::findIdentifierMatch(code, "gl_FragData");
+
 					bool usesFragDepth = !!bx::findIdentifierMatch(code, "gl_FragDepth");
 
 					bool usesShadowSamplers = !!bx::findIdentifierMatch(code, s_EXT_shadow_samplers);
@@ -3402,6 +3446,14 @@ namespace bgfx
 					if (usesDerivatives)
 					{
 						writeString(&writer, "#extension GL_OES_standard_derivatives : enable\n");
+					}
+
+					if (usesFragData)
+					{
+						BX_WARN(s_extension[Extension::EXT_draw_buffers].m_supported, "EXT_draw_buffers is used but not supported by GLES2 driver.");
+						writeString(&writer
+							, "#extension GL_EXT_draw_buffers : enable\n"
+							);
 					}
 
 					bool insertFragDepth = false;
@@ -3700,6 +3752,7 @@ namespace bgfx
 		GL_CHECK(glGenFramebuffers(1, &m_fbo[0]) );
 		GL_CHECK(glBindFramebuffer(GL_FRAMEBUFFER, m_fbo[0]) );
 
+//		m_denseIdx = UINT16_MAX;
 		bool needResolve = false;
 
 		GLenum buffers[BGFX_CONFIG_MAX_FRAME_BUFFER_ATTACHMENTS];
@@ -3807,11 +3860,31 @@ namespace bgfx
 		GL_CHECK(glBindFramebuffer(GL_FRAMEBUFFER, s_renderGL->m_msaaBackBufferFbo) );
 	}
 
-	void FrameBufferGL::destroy()
+	void FrameBufferGL::create(uint16_t _denseIdx, void* _nwh, uint32_t _width, uint32_t _height, TextureFormat::Enum _depthFormat)
+	{
+		BX_UNUSED(_depthFormat);
+		m_swapChain = s_renderGL->m_glctx.createSwapChain(_nwh);
+		m_width     = _width;
+		m_height    = _height;
+		m_denseIdx  = _denseIdx;
+	}
+
+	uint16_t FrameBufferGL::destroy()
 	{
 		GL_CHECK(glDeleteFramebuffers(0 == m_fbo[1] ? 1 : 2, m_fbo) );
 		memset(m_fbo, 0, sizeof(m_fbo) );
 		m_num = 0;
+
+		if (NULL != m_swapChain)
+		{
+			s_renderGL->m_glctx.destorySwapChain(m_swapChain);
+			m_swapChain = NULL;
+		}
+
+		uint16_t denseIdx = m_denseIdx;
+		m_denseIdx = UINT16_MAX;
+		
+		return denseIdx;
 	}
 
 	void FrameBufferGL::resolve()
@@ -3840,6 +3913,8 @@ namespace bgfx
 
 	void RendererContextGL::submit(Frame* _render, ClearQuad& _clearQuad, TextVideoMemBlitter& _textVideoMemBlitter)
 	{
+		m_glctx.makeCurrent(NULL);
+
 		const GLuint defaultVao = s_renderGL->m_vao;
 		if (0 != defaultVao)
 		{
@@ -4733,6 +4808,7 @@ namespace bgfx
 			}
 		}
 
+		m_glctx.makeCurrent(NULL);
 		int64_t now = bx::getHPCounter();
 		elapsed += now;
 

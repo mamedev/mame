@@ -503,8 +503,14 @@ namespace bgfx
 			
 			struct Mem
 			{
+				Mem(const void* _data, size_t _size)
+					: data(_data)
+					, size(_size)
+				{
+				}
+
 				const void*  data;
-				const size_t size;
+				size_t size;
 			};
 
 			const Memory* fragMem[BGFX_CONFIG_MAX_FRAME_BUFFER_ATTACHMENTS];
@@ -514,19 +520,19 @@ namespace bgfx
 
 				const Mem mem[] =
 				{
-					{ fs_clear0_dx9, sizeof(fs_clear0_dx9) },
-					{ fs_clear1_dx9, sizeof(fs_clear1_dx9) },
-					{ fs_clear2_dx9, sizeof(fs_clear2_dx9) },
-					{ fs_clear3_dx9, sizeof(fs_clear3_dx9) },
-					{ fs_clear4_dx9, sizeof(fs_clear4_dx9) },
-					{ fs_clear5_dx9, sizeof(fs_clear5_dx9) },
-					{ fs_clear6_dx9, sizeof(fs_clear6_dx9) },
-					{ fs_clear7_dx9, sizeof(fs_clear7_dx9) },
+					Mem(fs_clear0_dx9, sizeof(fs_clear0_dx9) ),
+					Mem(fs_clear1_dx9, sizeof(fs_clear1_dx9) ),
+					Mem(fs_clear2_dx9, sizeof(fs_clear2_dx9) ),
+					Mem(fs_clear3_dx9, sizeof(fs_clear3_dx9) ),
+					Mem(fs_clear4_dx9, sizeof(fs_clear4_dx9) ),
+					Mem(fs_clear5_dx9, sizeof(fs_clear5_dx9) ),
+					Mem(fs_clear6_dx9, sizeof(fs_clear6_dx9) ),
+					Mem(fs_clear7_dx9, sizeof(fs_clear7_dx9) ),
 				};
 
 				for (uint32_t ii = 0, num = g_caps.maxFBAttachments; ii < num; ++ii)
 				{
-					fragMem[ii] = makeRef(mem[ii].data, mem[ii].size);
+					fragMem[ii] = makeRef(mem[ii].data, uint32_t(mem[ii].size) );
 				}
 			}
 			else if (RendererType::Direct3D11 == g_caps.rendererType)
@@ -535,19 +541,19 @@ namespace bgfx
 
 				const Mem mem[] =
 				{
-					{ fs_clear0_dx11, sizeof(fs_clear0_dx11) },
-					{ fs_clear1_dx11, sizeof(fs_clear1_dx11) },
-					{ fs_clear2_dx11, sizeof(fs_clear2_dx11) },
-					{ fs_clear3_dx11, sizeof(fs_clear3_dx11) },
-					{ fs_clear4_dx11, sizeof(fs_clear4_dx11) },
-					{ fs_clear5_dx11, sizeof(fs_clear5_dx11) },
-					{ fs_clear6_dx11, sizeof(fs_clear6_dx11) },
-					{ fs_clear7_dx11, sizeof(fs_clear7_dx11) },
+					Mem(fs_clear0_dx11, sizeof(fs_clear0_dx11) ),
+					Mem(fs_clear1_dx11, sizeof(fs_clear1_dx11) ),
+					Mem(fs_clear2_dx11, sizeof(fs_clear2_dx11) ),
+					Mem(fs_clear3_dx11, sizeof(fs_clear3_dx11) ),
+					Mem(fs_clear4_dx11, sizeof(fs_clear4_dx11) ),
+					Mem(fs_clear5_dx11, sizeof(fs_clear5_dx11) ),
+					Mem(fs_clear6_dx11, sizeof(fs_clear6_dx11) ),
+					Mem(fs_clear7_dx11, sizeof(fs_clear7_dx11) ),
 				};
 
 				for (uint32_t ii = 0, num = g_caps.maxFBAttachments; ii < num; ++ii)
 				{
-					fragMem[ii] = makeRef(mem[ii].data, mem[ii].size);
+					fragMem[ii] = makeRef(mem[ii].data, uint32_t(mem[ii].size) );
 				}
 			}
 			else if (RendererType::OpenGLES == g_caps.rendererType
@@ -557,19 +563,19 @@ namespace bgfx
 
 				const Mem mem[] =
 				{
-					{ fs_clear0_glsl, sizeof(fs_clear0_glsl) },
-					{ fs_clear1_glsl, sizeof(fs_clear1_glsl) },
-					{ fs_clear2_glsl, sizeof(fs_clear2_glsl) },
-					{ fs_clear3_glsl, sizeof(fs_clear3_glsl) },
-					{ fs_clear4_glsl, sizeof(fs_clear4_glsl) },
-					{ fs_clear5_glsl, sizeof(fs_clear5_glsl) },
-					{ fs_clear6_glsl, sizeof(fs_clear6_glsl) },
-					{ fs_clear7_glsl, sizeof(fs_clear7_glsl) },
+					Mem(fs_clear0_glsl, sizeof(fs_clear0_glsl) ),
+					Mem(fs_clear1_glsl, sizeof(fs_clear1_glsl) ),
+					Mem(fs_clear2_glsl, sizeof(fs_clear2_glsl) ),
+					Mem(fs_clear3_glsl, sizeof(fs_clear3_glsl) ),
+					Mem(fs_clear4_glsl, sizeof(fs_clear4_glsl) ),
+					Mem(fs_clear5_glsl, sizeof(fs_clear5_glsl) ),
+					Mem(fs_clear6_glsl, sizeof(fs_clear6_glsl) ),
+					Mem(fs_clear7_glsl, sizeof(fs_clear7_glsl) ),
 				};
 
 				for (uint32_t ii = 0, num = g_caps.maxFBAttachments; ii < num; ++ii)
 				{
-					fragMem[ii] = makeRef(mem[ii].data, mem[ii].size);
+					fragMem[ii] = makeRef(mem[ii].data, uint32_t(mem[ii].size) );
 				}
 			}
 
@@ -693,12 +699,13 @@ namespace bgfx
 		BX_WARN(invalidHandle != m_key.m_program, "Program with invalid handle");
 		if (invalidHandle != m_key.m_program)
 		{
-			m_key.m_depth = _depth;
-			m_key.m_view = _id;
-			m_key.m_seq = s_ctx->m_seq[_id] & s_ctx->m_seqMask[_id];
+			m_key.m_depth  = _depth;
+			m_key.m_view   = _id;
+			m_key.m_seq    = s_ctx->m_seq[_id] & s_ctx->m_seqMask[_id];
 			s_ctx->m_seq[_id]++;
+
 			uint64_t key = m_key.encodeDraw();
-			m_sortKeys[m_num] = key;
+			m_sortKeys[m_num]   = key;
 			m_sortValues[m_num] = m_numRenderItems;
 			++m_num;
 
@@ -743,11 +750,12 @@ namespace bgfx
 				viewMask >>= ntz;
 				id += ntz;
 
-				m_key.m_view = id;
-				m_key.m_seq = s_ctx->m_seq[id] & s_ctx->m_seqMask[id];
+				m_key.m_view   = id;
+				m_key.m_seq    = s_ctx->m_seq[id] & s_ctx->m_seqMask[id];
 				s_ctx->m_seq[id]++;
+
 				uint64_t key = m_key.encodeDraw();
-				m_sortKeys[m_num] = key;
+				m_sortKeys[m_num]   = key;
 				m_sortValues[m_num] = m_numRenderItems;
 				++m_num;
 			}
@@ -788,12 +796,13 @@ namespace bgfx
 		m_key.m_program = _handle.idx;
 		if (invalidHandle != m_key.m_program)
 		{
-			m_key.m_depth = 0;
-			m_key.m_view = _id;
-			m_key.m_seq = s_ctx->m_seq[_id] & s_ctx->m_seqMask[_id];
+			m_key.m_depth  = 0;
+			m_key.m_view   = _id;
+			m_key.m_seq    = s_ctx->m_seq[_id] & s_ctx->m_seqMask[_id];
 			s_ctx->m_seq[_id]++;
+
 			uint64_t key = m_key.encodeCompute();
-			m_sortKeys[m_num] = key;
+			m_sortKeys[m_num]   = key;
 			m_sortValues[m_num] = m_numRenderItems;
 			++m_num;
 
@@ -1088,7 +1097,6 @@ namespace bgfx
 			CHECK_HANDLE_LEAK(m_textureHandle);
 			CHECK_HANDLE_LEAK(m_frameBufferHandle);
 			CHECK_HANDLE_LEAK(m_uniformHandle);
-
 #undef CHECK_HANDLE_LEAK
 		}
 	}
@@ -1775,16 +1783,38 @@ again:
 					FrameBufferHandle handle;
 					_cmdbuf.read(handle);
 
-					uint8_t num;
-					_cmdbuf.read(num);
+					bool window;
+					_cmdbuf.read(window);
 
-					TextureHandle textureHandles[BGFX_CONFIG_MAX_FRAME_BUFFER_ATTACHMENTS];
-					for (uint32_t ii = 0; ii < num; ++ii)
+					if (window)
 					{
-						_cmdbuf.read(textureHandles[ii]);
-					}
+						void* nwh;
+						_cmdbuf.read(nwh);
 
-					m_renderCtx->createFrameBuffer(handle, num, textureHandles);
+						uint16_t width;
+						_cmdbuf.read(width);
+
+						uint16_t height;
+						_cmdbuf.read(height);
+
+						TextureFormat::Enum depthFormat;
+						_cmdbuf.read(depthFormat);
+
+						m_renderCtx->createFrameBuffer(handle, nwh, width, height, depthFormat);
+					}
+					else
+					{
+						uint8_t num;
+						_cmdbuf.read(num);
+
+						TextureHandle textureHandles[BGFX_CONFIG_MAX_FRAME_BUFFER_ATTACHMENTS];
+						for (uint32_t ii = 0; ii < num; ++ii)
+						{
+							_cmdbuf.read(textureHandles[ii]);
+						}
+
+						m_renderCtx->createFrameBuffer(handle, num, textureHandles);
+					}
 				}
 				break;
 
@@ -2471,6 +2501,12 @@ again:
 		}
 
 		return handle;
+	}
+
+	FrameBufferHandle createFrameBuffer(void* _nwh, uint16_t _width, uint16_t _height, TextureFormat::Enum _depthFormat)
+	{
+		BGFX_CHECK_MAIN_THREAD();
+		return s_ctx->createFrameBuffer(_nwh, _width, _height, _depthFormat);
 	}
 
 	void destroyFrameBuffer(FrameBufferHandle _handle)
@@ -3166,6 +3202,13 @@ BGFX_C_API bgfx_frame_buffer_handle_t bgfx_create_frame_buffer_from_handles(uint
 	return handle.c;
 }
 
+BGFX_C_API bgfx_frame_buffer_handle_t bgfx_create_frame_buffer_from_nwh(void* _nwh, uint16_t _width, uint16_t _height, bgfx_texture_format_t _depthFormat)
+{
+	union { bgfx_frame_buffer_handle_t c; bgfx::FrameBufferHandle cpp; } handle;
+	handle.cpp = bgfx::createFrameBuffer(_nwh, _width, _height, bgfx::TextureFormat::Enum(_depthFormat) );
+	return handle.c;
+}
+
 BGFX_C_API void bgfx_destroy_frame_buffer(bgfx_frame_buffer_handle_t _handle)
 {
 	union { bgfx_frame_buffer_handle_t c; bgfx::FrameBufferHandle cpp; } handle = { _handle };
@@ -3220,7 +3263,7 @@ BGFX_C_API void bgfx_set_view_clear(uint8_t _id, uint8_t _flags, uint32_t _rgba,
 	bgfx::setViewClear(_id, _flags, _rgba, _depth, _stencil);
 }
 
-BGFX_C_API void bgfx_set_view_clear_mrt7(uint8_t _id, uint8_t _flags, float _depth, uint8_t _stencil, uint8_t _0, uint8_t _1, uint8_t _2, uint8_t _3, uint8_t _4, uint8_t _5, uint8_t _6, uint8_t _7)
+BGFX_C_API void bgfx_set_view_clear_mrt(uint8_t _id, uint8_t _flags, float _depth, uint8_t _stencil, uint8_t _0, uint8_t _1, uint8_t _2, uint8_t _3, uint8_t _4, uint8_t _5, uint8_t _6, uint8_t _7)
 {
 	bgfx::setViewClear(_id, _flags, _depth, _stencil, _0, _1, _2, _3, _4, _5, _6, _7);
 }

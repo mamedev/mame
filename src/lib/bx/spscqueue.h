@@ -203,4 +203,4 @@ namespace bx
 
 } // namespace bx
 
-#endif // BX_RINGBUFFER_H_HEADER_GUARD
+#endif // BX_SPSCQUEUE_H_HEADER_GUARD

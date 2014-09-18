@@ -815,6 +815,18 @@ namespace bgfx
 	///
 	FrameBufferHandle createFrameBuffer(uint8_t _num, TextureHandle* _handles, bool _destroyTextures = false);
 
+	/// Create frame buffer for multiple window rendering.
+	///
+	/// @param _nwh OS' target native window handle.
+	/// @param _width Window back buffer width.
+	/// @param _height Window back buffer height.
+	/// @param _depthFormat Window back buffer depth format.
+	///
+	/// NOTE:
+	///   Frame buffer cannnot be used for sampling.
+	///
+	FrameBufferHandle createFrameBuffer(void* _nwh, uint16_t _width, uint16_t _height, TextureFormat::Enum _depthFormat = TextureFormat::UnknownDepth);
+
 	/// Destroy frame buffer.
 	void destroyFrameBuffer(FrameBufferHandle _handle);
 
@@ -971,6 +983,9 @@ namespace bgfx
 	///   frame buffer handle will draw primitives from this view into
 	///   default back buffer.
 	///
+	/// NOTE:
+	///   Not persistent after bgfx::reset call.
+	///
 	void setViewFrameBuffer(uint8_t _id, FrameBufferHandle _handle);
 
 	/// Set view frame buffer for multiple views.
@@ -979,6 +994,9 @@ namespace bgfx
 	/// @param _handle Frame buffer handle. Passing BGFX_INVALID_HANDLE as
 	///   frame buffer handle will draw primitives from this view into
 	///   default back buffer.
+	///
+	/// NOTE:
+	///   Not persistent after bgfx::reset call.
 	///
 	void setViewFrameBufferMask(uint32_t _viewMask, FrameBufferHandle _handle);
 
@@ -1005,7 +1023,7 @@ namespace bgfx
 	///   BGFX_STATE_CULL_* - Backface culling mode.
 	///   BGFX_STATE_RGB_WRITE - Enable RGB write.
 	///   BGFX_STATE_MSAA - Enable MSAA.
-	///   BGFX_STATE_PT_[LINES/POINTS] - Primitive type.
+	///   BGFX_STATE_PT_[TRISTRIP/LINES/POINTS] - Primitive type.
 	///
 	/// @param _rgba Sets blend factor used by BGFX_STATE_BLEND_FACTOR and
 	///   BGFX_STATE_BLEND_INV_FACTOR blend modes.
