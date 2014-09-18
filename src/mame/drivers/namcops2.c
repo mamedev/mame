@@ -37,7 +37,6 @@ List of Namco System 246 games:
 * Pride GP 2003 (Capcom, 2003)
 * Quiz and Variety Sukusuku Inufuku 2 (Namco / AMI / Hamster, 2007)
 * Quiz Mobile Suit Gundam: Tou. Senshi (Banpresto, 2006)
-* Raizin Ping Pong (Taito, 2001)
 * Ridge Racer V: Arcade Battle (Namco, 2000)
 * Sengoku Basara X Cross (Capcom / ARC System Works, 2008)
 * Smash Court Pro Tournament (Namco, 2001)
@@ -213,7 +212,7 @@ ROM_START( kinniku2 )
 	ROM_LOAD( "kn2vera_spr.ic002", 0x800000, 0x040000, CRC(9c18fa50) SHA1(1f75052cf264c3f2e5b332a755d30544d6e5f45c) ) 
 
 	DISK_REGION("dvd")
-	DISK_IMAGE_READONLY( "kn2vera", 0, SHA1(3e1b773cc584911b673d46f9296a5b1a2cef9a45) )
+	DISK_IMAGE_READONLY( "kn2", 0, SHA1(3e1b773cc584911b673d46f9296a5b1a2cef9a45) )
 ROM_END
 
 ROM_START( netchu02 )
@@ -527,7 +526,7 @@ ROM_START( fateulc )
 	ROM_LOAD( "fud1vera.ic002", 0x000000, 0x800000, CRC(892ffdd1) SHA1(4a444ed49e5c89dd0af4f026626a164b9eec61d1) )
 	ROM_LOAD( "fud1vera_spr.ic002", 0x800000, 0x040000, CRC(0fca4e99) SHA1(0bd74de26f10089ee848f03093229abfa8c84663) )
 
-	DISK_REGION("dvd")
+	DISK_REGION("dvd")	// actually HDD for this game
 	DISK_IMAGE_READONLY( "fud-hdd0-a", 0, SHA1(1189863ae0e339e11708b9660521f86b3b97bc9e) )
 ROM_END
 
@@ -574,7 +573,7 @@ ROM_START( yuyuhaku )
 	ROM_LOAD( "dongle.bin",   0x000000, 0x840000, CRC(36492878) SHA1(afd14aee033cf360c07d281112566d0463d17a1f) )
 
 	DISK_REGION("dvd")
-	DISK_IMAGE_READONLY( "yuyuhaku", 0, SHA1(ffdf1333d2c235e5fcec3780480f110afd20a7df) )
+	DISK_IMAGE_READONLY( "yh1", 0, SHA1(ffdf1333d2c235e5fcec3780480f110afd20a7df) )
 ROM_END
 
 ROM_START( sbxc )
