@@ -171,8 +171,11 @@ WRITE8_MEMBER(aquarius_state::scrambler_w)
 
 READ8_MEMBER(aquarius_state::cartridge_r)
 {
-	UINT8 *rom = m_rom->base() + 0xc000;
-	return rom[offset] ^ m_scrambler;
+	UINT8 data = 0;
+	if (m_cart->cart_mounted())
+		data = m_cart->read_rom(space, offset);
+
+	return data ^ m_scrambler;
 }
 
 
@@ -373,10 +376,7 @@ static MACHINE_CONFIG_START( aquarius, aquarius_state )
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED)
 
 	/* cartridge */
-	MCFG_CARTSLOT_ADD("cart")
-	MCFG_CARTSLOT_EXTENSION_LIST("bin")
-	MCFG_CARTSLOT_NOT_MANDATORY
-	MCFG_CARTSLOT_INTERFACE("aquarius_cart")
+	MCFG_GENERIC_CARTSLOT_ADD("cartslot", GENERIC_ROM8_WIDTH, generic_linear_slot, "aquarius_cart")
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -401,9 +401,6 @@ ROM_START( aquarius )
 	ROMX_LOAD("aq1.u2", 0x0000, 0x2000, NO_DUMP, ROM_BIOS(1))
 	ROM_SYSTEM_BIOS(1, "rev2", "Revision 2")
 	ROMX_LOAD("aq2.u2", 0x0000, 0x2000, CRC(a2d15bcf) SHA1(ca6ef55e9ead41453efbf5062d6a60285e9661a6), ROM_BIOS(2))
-
-	/* cartridge */
-	ROM_CART_LOAD("cart", 0xc000, 0x4000, ROM_MIRROR)
 
 	/* charrom */
 	ROM_REGION(0x800, "gfx1", 0)

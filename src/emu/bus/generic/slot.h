@@ -101,6 +101,8 @@ public:
 	virtual bool call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry);
 
 	bool cart_mounted() { return !m_empty; }
+	UINT32 common_get_size(const char *region);
+	void common_load_rom(UINT8 *ROM, UINT32 len, const char *region);
 
 	virtual iodevice_t image_type() const { return IO_CARTSLOT; }
 	virtual bool is_readable()  const { return 1; }

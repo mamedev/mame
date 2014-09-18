@@ -135,17 +135,10 @@ bool generic_slot_device::call_load()
 		}
 		else
 		{
-			UINT32 len = (software_entry() == NULL) ? length() : get_software_region_length("rom");
-			UINT8 *ROM;
+			UINT32 len = common_get_size("rom");
 			
-			rom_alloc(len, m_width);			
-			ROM = get_rom_base();
-			
-			if (software_entry() == NULL)
-				fread(ROM, len);
-			else
-				memcpy(ROM, get_software_region("rom"), len);
-			
+			rom_alloc(len, m_width);
+			common_load_rom(get_rom_base(), len, "rom");			
 			m_empty = FALSE;
 
 			return IMAGE_INIT_PASS;
@@ -188,6 +181,46 @@ void generic_slot_device::get_default_card_software(astring &result)
 	software_get_default_slot(result, m_default_card);
 }
 
+
+/**************************************************
+
+ Implementation 
+ 
+ **************************************************/
+
+
+/*-------------------------------------------------
+ common_get_size - it gets image file size both 
+ for fullpath and for softlist
+ -------------------------------------------------*/
+
+UINT32 generic_slot_device::common_get_size(const char *region)
+{
+	// if we are loading from softlist, you have to specify a region
+	assert((software_entry() != NULL) && !region);
+
+	return (software_entry() == NULL) ? length() : get_software_region_length(region);
+}
+
+/*-------------------------------------------------
+ common_load_rom - it loads from image file both 
+ for fullpath and for softlist
+ -------------------------------------------------*/
+
+void generic_slot_device::common_load_rom(UINT8 *ROM, UINT32 len, const char *region)
+{
+	// basic sanity check
+	assert((ROM != NULL) && (len > 0));
+
+	// if we are loading from softlist, you have to specify a region
+	assert((software_entry() == NULL) || (region != NULL));
+
+	if (software_entry() == NULL)
+		fread(ROM, len);
+	else
+		memcpy(ROM, get_software_region(region), len);
+}
+
 /*-------------------------------------------------
  read_rom
  -------------------------------------------------*/
@@ -225,7 +258,7 @@ READ8_MEMBER(generic_slot_device::read_ram)
 }
 
 /*-------------------------------------------------
- write
+ write_ram
  -------------------------------------------------*/
 
 WRITE8_MEMBER(generic_slot_device::write_ram)

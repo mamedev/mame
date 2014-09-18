@@ -360,13 +360,7 @@ void pv2000_state::machine_reset()
 
 DEVICE_IMAGE_LOAD_MEMBER( pv2000_state, pv2000_cart )
 {
-	UINT8 *cart;
-	UINT32 size;
-	
-	if (image.software_entry() == NULL)
-		size = image.length();
-	else
-		size = image.get_software_region_length("rom");
+	UINT32 size = m_cart->common_get_size("rom");
 	
 	if (size != 0x2000 && size != 0x4000)
 	{
@@ -375,12 +369,7 @@ DEVICE_IMAGE_LOAD_MEMBER( pv2000_state, pv2000_cart )
 	}
 	
 	m_cart->rom_alloc(size, 1);
-	cart = m_cart->get_rom_base();
-	
-	if (image.software_entry() == NULL)
-		image.fread(cart, size);
-	else
-		memcpy(cart, image.get_software_region("rom"), size);
+	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");			
 	
 	return IMAGE_INIT_PASS;
 }

@@ -16,7 +16,8 @@
 #include "video/tms9928a.h"
 #include "machine/z80pio.h"
 #include "cpu/z80/z80daisy.h"
-#include "imagedev/cartslot.h"
+#include "bus/generic/slot.h"
+#include "bus/generic/carts.h"
 
 
 class bbcbc_state : public driver_device
@@ -24,15 +25,15 @@ class bbcbc_state : public driver_device
 public:
 	bbcbc_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-	m_maincpu(*this, "maincpu")
+		m_maincpu(*this, "maincpu"),
+		m_cart(*this, "cartslot")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
+	required_device<generic_slot_device> m_cart;
 	virtual void machine_start();
 	virtual void machine_reset();
 	DECLARE_WRITE_LINE_MEMBER(tms_interrupt);
-
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( bbcbc_cart );
 };
 
 
@@ -41,7 +42,7 @@ public:
 
 static ADDRESS_MAP_START( bbcbc_prg, AS_PROGRAM, 8, bbcbc_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0xbfff) AM_ROM
+	//AM_RANGE(0x4000, 0xbfff)	// mapped by the cartslot
 	AM_RANGE(0xe000, 0xe02f) AM_RAM
 	AM_RANGE(0xe030, 0xe030) AM_READ_PORT("LINE01")
 	AM_RANGE(0xe031, 0xe031) AM_READ_PORT("LINE02")
@@ -115,32 +116,10 @@ static const z80_daisy_config bbcbc_daisy_chain[] =
 };
 
 
-DEVICE_IMAGE_LOAD_MEMBER( bbcbc_state, bbcbc_cart )
-{
-	UINT8 *cart = memregion("maincpu" )->base() + 0x4000;
-
-	if ( image.software_entry() == NULL )
-	{
-		int size = image.length();
-		if ( image.fread(cart, size ) != size ) {
-			image.seterror( IMAGE_ERROR_UNSPECIFIED, "Unable to fully read from file" );
-			return IMAGE_INIT_FAIL;
-		}
-	}
-	else
-	{
-		UINT8 *reg = image.get_software_region( "rom" );
-		int reg_len = image.get_software_region_length( "rom" );
-
-		memcpy( cart, reg, MIN(reg_len, 0x8000) );
-	}
-
-	return IMAGE_INIT_PASS;
-
-}
-
 void bbcbc_state::machine_start()
 {
+	if (m_cart->cart_mounted())
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0x4000, 0xbfff, read8_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_cart));
 }
 
 void bbcbc_state::machine_reset()
@@ -162,10 +141,7 @@ static MACHINE_CONFIG_START( bbcbc, bbcbc_state )
 	MCFG_TMS9928A_SCREEN_ADD_PAL( "screen" )
 	MCFG_SCREEN_UPDATE_DEVICE( "tms9129", tms9928a_device, screen_update )
 
-	MCFG_CARTSLOT_ADD("cart")
-	MCFG_CARTSLOT_NOT_MANDATORY
-	MCFG_CARTSLOT_INTERFACE("bbcbc_cart")
-	MCFG_CARTSLOT_LOAD( bbcbc_state, bbcbc_cart )
+	MCFG_GENERIC_CARTSLOT_ADD("cartslot", GENERIC_ROM8_WIDTH, generic_plain_slot, "bbcbc_cart")
 
 	/* Software lists */
 	MCFG_SOFTWARE_LIST_ADD("cart_list","bbcbc")

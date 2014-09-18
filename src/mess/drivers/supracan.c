@@ -1753,27 +1753,16 @@ WRITE16_MEMBER( supracan_state::video_w )
 
 DEVICE_IMAGE_LOAD_MEMBER( supracan_state, supracan_cart )
 {
-	UINT8 *cart;
-	UINT32 size;
-	
-	if (image.software_entry() == NULL)
-		size = image.length();
-	else
-		size = image.get_software_region_length("rom");
+	UINT32 size = m_cart->common_get_size("rom");
 	
 	if (size > 0x400000)
 	{
 		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
 		return IMAGE_INIT_FAIL;
 	}
-	
-	m_cart->rom_alloc(size, 1);
-	cart = m_cart->get_rom_base();
-	
-	if (image.software_entry() == NULL)
-		image.fread(cart, size);
-	else
-		memcpy(cart, image.get_software_region("rom"), size);
+
+	m_cart->rom_alloc(size, 2);
+	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");			
 	
 	return IMAGE_INIT_PASS;
 }

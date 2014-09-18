@@ -8,10 +8,11 @@
 #include "bus/rs232/rs232.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/m6800/m6800.h"
-#include "imagedev/cartslot.h"
 #include "machine/6850acia.h"
 #include "machine/8530scc.h"
 #include "bus/centronics/ctronics.h"
+#include "bus/generic/slot.h"
+#include "bus/generic/carts.h"
 #include "machine/mc68901.h"
 #include "machine/ram.h"
 #include "machine/rescap.h"
@@ -87,6 +88,7 @@ public:
 			m_acia0(*this, MC6850_0_TAG),
 			m_acia1(*this, MC6850_1_TAG),
 			m_centronics(*this, CENTRONICS_TAG),
+			m_cart(*this, "cartslot"),
 			m_ram(*this, RAM_TAG),
 			m_rs232(*this, RS232_TAG),
 			m_p31(*this, "P31"),
@@ -127,6 +129,7 @@ public:
 	required_device<acia6850_device> m_acia0;
 	required_device<acia6850_device> m_acia1;
 	required_device<centronics_device> m_centronics;
+	required_device<generic_slot_device> m_cart;
 	required_device<ram_device> m_ram;
 	required_device<rs232_port_device> m_rs232;
 	required_ioport m_p31;
