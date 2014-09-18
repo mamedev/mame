@@ -158,8 +158,8 @@ OSC3: 48.384MHz
 #include "emu.h"
 #include "includes/namcoic.h"
 #include "cpu/i960/i960.h"
-#include "cpu/m37710/m37710.h"
 #include "sound/c352.h"
+#include "machine/namcomcu.h"
 #include "machine/nvram.h"
 #include "namcofl.lh"
 #include "includes/namcofl.h"
@@ -324,7 +324,6 @@ READ8_MEMBER(namcofl_state::dac0_r){ return 0xff; }
 static ADDRESS_MAP_START( namcoc75_am, AS_PROGRAM, 16, namcofl_state )
 	AM_RANGE(0x002000, 0x002fff) AM_DEVREADWRITE("c352", c352_device, read, write)
 	AM_RANGE(0x004000, 0x00bfff) AM_RAM_WRITE(mcu_shared_w) AM_SHARE("shareram")
-	AM_RANGE(0x00c000, 0x00ffff) AM_ROM AM_REGION("c75", 0)
 	AM_RANGE(0x200000, 0x27ffff) AM_ROM AM_REGION("c75data", 0)
 ADDRESS_MAP_END
 
@@ -582,7 +581,7 @@ static MACHINE_CONFIG_START( namcofl, namcofl_state )
 	MCFG_CPU_ADD("maincpu", I960, 20000000) // i80960KA-20 == 20 MHz part
 	MCFG_CPU_PROGRAM_MAP(namcofl_mem)
 
-	MCFG_CPU_ADD("mcu", M37702, 48384000/3)
+	MCFG_CPU_ADD("mcu", NAMCO_C75, 48384000/3)
 	MCFG_CPU_PROGRAM_MAP(namcoc75_am)
 	MCFG_CPU_IO_MAP(namcoc75_io)
 	/* TODO: irq generation for these */
@@ -628,9 +627,6 @@ ROM_START( speedrcr )
 	ROM_LOAD32_BYTE("se1_dat1.14a",   0x000001, 0x080000, CRC(ddc8b306) SHA1(f169d521b800c108deffdef9fc6b0058621ee909) )
 	ROM_LOAD32_BYTE("se1_dat2.15a",   0x000002, 0x080000, CRC(2a29abbb) SHA1(945419ed61e9a656a340214a63a01818396fbe98) )
 	ROM_LOAD32_BYTE("se1_dat3.16a",   0x000003, 0x080000, CRC(49849aff) SHA1(b7c7eea1d56304e40e996ee998c971313ff03614) )
-
-	ROM_REGION16_LE( 0x4000, "c75", 0 ) // C75 program
-	ROM_LOAD( "c75.bin", 0, 0x4000, CRC(42f539a5) SHA1(3103e5a0a2867620309fd4fe478a2be0effbeff8) )
 
 	ROM_REGION16_LE( 0x80000, "c75data", 0 ) // C75 data
 	ROM_LOAD("se1_spr.21l",   0x000000,  0x80000, CRC(850a27ac) SHA1(7d5db840ec67659a1f2e69a62cdb03ce6ee0b47b) )
@@ -681,9 +677,6 @@ ROM_START( finalapr )
 
 	ROM_REGION32_LE( 0x200000, "data", ROMREGION_ERASEFF ) // Data
 
-	ROM_REGION16_LE( 0x4000, "c75", 0 ) // C75 program
-	ROM_LOAD( "c75.bin", 0, 0x4000, CRC(42f539a5) SHA1(3103e5a0a2867620309fd4fe478a2be0effbeff8) )
-
 	ROM_REGION16_LE( 0x80000, "c75data", 0 ) // C75 data
 	ROM_LOAD("flr1spr.21l",   0x000000,  0x20000, CRC(69bb0f5e) SHA1(6831d618de42a165e508ad37db594d3aa290c530) )
 
@@ -722,9 +715,6 @@ ROM_START( finalapro )
 	ROM_LOAD32_WORD("flr2mpo.18a",   0x000002, 0x080000, CRC(8118f465) SHA1(c4b79878a82fd36b5707e92aa893f69c2b942d57) )
 
 	ROM_REGION32_LE( 0x200000, "data", ROMREGION_ERASEFF ) // Data
-
-	ROM_REGION16_LE( 0x4000, "c75", 0 ) // C75 program
-	ROM_LOAD( "c75.bin", 0, 0x4000, CRC(42f539a5) SHA1(3103e5a0a2867620309fd4fe478a2be0effbeff8) )
 
 	ROM_REGION16_LE( 0x80000, "c75data", 0 ) // C75 data
 	ROM_LOAD("flr1spr.21l",   0x000000,  0x20000, CRC(69bb0f5e) SHA1(6831d618de42a165e508ad37db594d3aa290c530) )
@@ -765,9 +755,6 @@ ROM_START( finalaprj )
 	ROM_LOAD32_WORD("flr1_mpoc.18a", 0x000002, 0x080000, CRC(b11fe577) SHA1(70b51a1e66a3bb92f027aad7ba0f358c0e139b3c) )
 
 	ROM_REGION32_LE( 0x200000, "data", ROMREGION_ERASEFF ) // Data
-
-	ROM_REGION16_LE( 0x4000, "c75", 0 ) // C75 program
-	ROM_LOAD( "c75.bin", 0, 0x4000, CRC(42f539a5) SHA1(3103e5a0a2867620309fd4fe478a2be0effbeff8) )
 
 	ROM_REGION16_LE( 0x80000, "c75data", 0 ) // C75 data
 	ROM_LOAD("flr1spr.21l",   0x000000,  0x20000, CRC(69bb0f5e) SHA1(6831d618de42a165e508ad37db594d3aa290c530) )

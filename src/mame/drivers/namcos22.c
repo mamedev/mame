@@ -1158,7 +1158,7 @@
 #include "includes/namcos22.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/tms32025/tms32025.h"
-#include "cpu/m37710/m37710.h"
+#include "machine/namcomcu.h"
 #include "sound/c352.h"
 
 #define SS22_MASTER_CLOCK   (XTAL_49_152MHz)    /* info from Guru */
@@ -2714,7 +2714,6 @@ READ8_MEMBER(namcos22_state::iomcu_port4_s22_r)
 static ADDRESS_MAP_START( mcu_s22_program, AS_PROGRAM, 16, namcos22_state )
 	AM_RANGE(0x002000, 0x002fff) AM_DEVREADWRITE("c352", c352_device, read, write)
 	AM_RANGE(0x004000, 0x00bfff) AM_READWRITE(s22mcu_shared_r, s22mcu_shared_w )
-	AM_RANGE(0x00c000, 0x00ffff) AM_ROM AM_REGION("mcu_c74", 0)
 	AM_RANGE(0x080000, 0x0fffff) AM_ROM AM_REGION("mcu", 0)
 	AM_RANGE(0x200000, 0x27ffff) AM_ROM AM_REGION("mcu", 0)
 	AM_RANGE(0x280000, 0x2fffff) AM_ROM AM_REGION("mcu", 0)
@@ -2723,7 +2722,7 @@ static ADDRESS_MAP_START( mcu_s22_program, AS_PROGRAM, 16, namcos22_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( iomcu_s22_program, AS_PROGRAM, 16, namcos22_state )
-	AM_RANGE(0x00c000, 0x00ffff) AM_ROM AM_REGION("iomcu", 0)
+	// is there any external memory or MMIO on this one?
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mcu_s22_io, AS_IO, 8, namcos22_state )
@@ -3762,11 +3761,11 @@ static MACHINE_CONFIG_START( namcos22, namcos22_state )
 	MCFG_CPU_IO_MAP(slave_dsp_io)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("slave_st", namcos22_state, dsp_slave_serial_irq, "screen", 0, 1)
 
-	MCFG_CPU_ADD("mcu", M37702, SS22_MASTER_CLOCK/3) // C74 on the CPU board has no periodic interrupts, it runs entirely off Timer A0
+	MCFG_CPU_ADD("mcu", NAMCO_C74, SS22_MASTER_CLOCK/3) // C74 on the CPU board has no periodic interrupts, it runs entirely off Timer A0
 	MCFG_CPU_PROGRAM_MAP( mcu_s22_program)
 	MCFG_CPU_IO_MAP( mcu_s22_io)
 
-	MCFG_CPU_ADD("iomcu", M37702, XTAL_6_144MHz) // 6.144MHz XTAL on I/O board, not sure if it has a divider
+	MCFG_CPU_ADD("iomcu", NAMCO_C74, XTAL_6_144MHz) // 6.144MHz XTAL on I/O board, not sure if it has a divider
 	MCFG_CPU_PROGRAM_MAP( iomcu_s22_program)
 	MCFG_CPU_IO_MAP( iomcu_s22_io)
 
@@ -3813,7 +3812,7 @@ static MACHINE_CONFIG_START( namcos22s, namcos22_state )
 	MCFG_CPU_IO_MAP(slave_dsp_io)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("slave_st", namcos22_state, dsp_slave_serial_irq, "screen", 0, 1)
 
-	MCFG_CPU_ADD("mcu", M37710, SS22_MASTER_CLOCK/3)
+	MCFG_CPU_ADD("mcu", M37710S4, SS22_MASTER_CLOCK/3)
 	MCFG_CPU_PROGRAM_MAP(mcu_program)
 	MCFG_CPU_IO_MAP(mcu_io)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("mcu_st", namcos22_state, mcu_irq, "screen", 0, 1)
@@ -3908,12 +3907,6 @@ ROM_START( ridgerac )
 	ROM_REGION( 0x10000*2, "slave", 0 ) /* Slave DSP */
 	ROM_LOAD16_WORD( "c71.bin", 0,0x1000*2, CRC(47c623ab) SHA1(e363ac50f5556f83308d4cc191b455e9b62bcfc8) )
 
-	ROM_REGION16_LE( 0x4000, "iomcu", 0 ) /* I/O MCU BIOS */
-	ROM_LOAD( "c74.bin", 0x0000, 0x4000, CRC(a3dce360) SHA1(8f3248b1890abb2e649927240ae46f73bb171e3b) )
-
-	ROM_REGION16_LE( 0x4000, "mcu_c74", 0 ) /* SUB/SOUND MCU BIOS */
-	ROM_LOAD( "c74.bin", 0x0000, 0x4000, CRC(a3dce360) SHA1(8f3248b1890abb2e649927240ae46f73bb171e3b) )
-
 	ROM_REGION16_LE( 0x80000, "mcu", 0 ) /* sound data */
 	ROM_LOAD( "rr1data.6r", 0, 0x080000, CRC(18f5f748) SHA1(e0d149a66de36156edd9b55f604c9a9801aaefa8) )
 
@@ -3959,12 +3952,6 @@ ROM_START( ridgeracb )
 
 	ROM_REGION( 0x10000*2, "slave", 0 ) /* Slave DSP */
 	ROM_LOAD16_WORD( "c71.bin", 0,0x1000*2, CRC(47c623ab) SHA1(e363ac50f5556f83308d4cc191b455e9b62bcfc8) )
-
-	ROM_REGION16_LE( 0x4000, "iomcu", 0 ) /* I/O MCU BIOS */
-	ROM_LOAD( "c74.bin", 0x0000, 0x4000, CRC(a3dce360) SHA1(8f3248b1890abb2e649927240ae46f73bb171e3b) )
-
-	ROM_REGION16_LE( 0x4000, "mcu_c74", 0 ) /* SUB/SOUND MCU BIOS */
-	ROM_LOAD( "c74.bin", 0x0000, 0x4000, CRC(a3dce360) SHA1(8f3248b1890abb2e649927240ae46f73bb171e3b) )
 
 	ROM_REGION16_LE( 0x80000, "mcu", 0 ) /* sound data */
 	ROM_LOAD( "rr1data.6r", 0, 0x080000, CRC(18f5f748) SHA1(e0d149a66de36156edd9b55f604c9a9801aaefa8) )
@@ -4012,12 +3999,6 @@ ROM_START( ridgeracj )
 	ROM_REGION( 0x10000*2, "slave", 0 ) /* Slave DSP */
 	ROM_LOAD16_WORD( "c71.bin", 0,0x1000*2, CRC(47c623ab) SHA1(e363ac50f5556f83308d4cc191b455e9b62bcfc8) )
 
-	ROM_REGION16_LE( 0x4000, "iomcu", 0 ) /* I/O MCU BIOS */
-	ROM_LOAD( "c74.bin", 0x0000, 0x4000, CRC(a3dce360) SHA1(8f3248b1890abb2e649927240ae46f73bb171e3b) )
-
-	ROM_REGION16_LE( 0x4000, "mcu_c74", 0 ) /* SUB/SOUND MCU BIOS */
-	ROM_LOAD( "c74.bin", 0x0000, 0x4000, CRC(a3dce360) SHA1(8f3248b1890abb2e649927240ae46f73bb171e3b) )
-
 	ROM_REGION16_LE( 0x80000, "mcu", 0 ) /* sound data */
 	ROM_LOAD( "rr1data.6r", 0, 0x080000, CRC(18f5f748) SHA1(e0d149a66de36156edd9b55f604c9a9801aaefa8) )
 
@@ -4064,12 +4045,6 @@ ROM_START( ridgerac3 )
 	ROM_REGION( 0x10000*2, "slave", 0 ) /* Slave DSP */
 	ROM_LOAD16_WORD( "c71.bin", 0,0x1000*2, CRC(47c623ab) SHA1(e363ac50f5556f83308d4cc191b455e9b62bcfc8) )
 
-	ROM_REGION16_LE( 0x4000, "iomcu", 0 ) /* I/O MCU BIOS */
-	ROM_LOAD( "c74.bin", 0x0000, 0x4000, CRC(a3dce360) SHA1(8f3248b1890abb2e649927240ae46f73bb171e3b) )
-
-	ROM_REGION16_LE( 0x4000, "mcu_c74", 0 ) /* SUB/SOUND MCU BIOS */
-	ROM_LOAD( "c74.bin", 0x0000, 0x4000, CRC(a3dce360) SHA1(8f3248b1890abb2e649927240ae46f73bb171e3b) )
-
 	ROM_REGION16_LE( 0x80000, "mcu", 0 ) /* sound data */
 	ROM_LOAD( "rr1data.6r", 0, 0x080000, CRC(18f5f748) SHA1(e0d149a66de36156edd9b55f604c9a9801aaefa8) )
 
@@ -4115,12 +4090,6 @@ ROM_START( ridgeracf )
 
 	ROM_REGION( 0x10000*2, "slave", 0 ) /* Slave DSP */
 	ROM_LOAD16_WORD( "c71.bin", 0,0x1000*2, CRC(47c623ab) SHA1(e363ac50f5556f83308d4cc191b455e9b62bcfc8) )
-
-	ROM_REGION16_LE( 0x4000, "iomcu", 0 ) /* I/O MCU BIOS */
-	ROM_LOAD( "c74.bin", 0x0000, 0x4000, CRC(a3dce360) SHA1(8f3248b1890abb2e649927240ae46f73bb171e3b) )
-
-	ROM_REGION16_LE( 0x4000, "mcu_c74", 0 ) /* SUB/SOUND MCU BIOS */
-	ROM_LOAD( "c74.bin", 0x0000, 0x4000, CRC(a3dce360) SHA1(8f3248b1890abb2e649927240ae46f73bb171e3b) )
 
 	ROM_REGION16_LE( 0x80000, "mcu", 0 ) /* sound data */
 	ROM_LOAD( "rrf1data.6r", 0, 0x080000, CRC(ce3c6ed6) SHA1(23e033364bc967c10c49fd1d5413dda837670633) )
@@ -4170,12 +4139,6 @@ ROM_START( ridgera2 )
 	ROM_REGION( 0x10000*2, "slave", 0 ) /* Slave DSP */
 	ROM_LOAD16_WORD( "c71.bin", 0,0x1000*2, CRC(47c623ab) SHA1(e363ac50f5556f83308d4cc191b455e9b62bcfc8) )
 
-	ROM_REGION16_LE( 0x4000, "iomcu", 0 ) /* I/O MCU BIOS */
-	ROM_LOAD( "c74.bin", 0x0000, 0x4000, CRC(a3dce360) SHA1(8f3248b1890abb2e649927240ae46f73bb171e3b) )
-
-	ROM_REGION16_LE( 0x4000, "mcu_c74", 0 ) /* SUB/SOUND MCU BIOS */
-	ROM_LOAD( "c74.bin", 0x0000, 0x4000, CRC(a3dce360) SHA1(8f3248b1890abb2e649927240ae46f73bb171e3b) )
-
 	ROM_REGION16_LE( 0x80000, "mcu", 0 ) /* sound data */
 	ROM_LOAD( "rrs1data.6r", 0, 0x080000, CRC(b7063aa8) SHA1(08ff689e8dd529b91eee423c93f084945c6de417) )
 
@@ -4221,12 +4184,6 @@ ROM_START( ridgera2j )
 
 	ROM_REGION( 0x10000*2, "slave", 0 ) /* Slave DSP */
 	ROM_LOAD16_WORD( "c71.bin", 0,0x1000*2, CRC(47c623ab) SHA1(e363ac50f5556f83308d4cc191b455e9b62bcfc8) )
-
-	ROM_REGION16_LE( 0x4000, "iomcu", 0 ) /* I/O MCU BIOS */
-	ROM_LOAD( "c74.bin", 0x0000, 0x4000, CRC(a3dce360) SHA1(8f3248b1890abb2e649927240ae46f73bb171e3b) )
-
-	ROM_REGION16_LE( 0x4000, "mcu_c74", 0 ) /* SUB/SOUND MCU BIOS */
-	ROM_LOAD( "c74.bin", 0x0000, 0x4000, CRC(a3dce360) SHA1(8f3248b1890abb2e649927240ae46f73bb171e3b) )
 
 	ROM_REGION16_LE( 0x80000, "mcu", 0 ) /* sound data */
 	ROM_LOAD( "rrs1data.6r", 0, 0x080000, CRC(b7063aa8) SHA1(08ff689e8dd529b91eee423c93f084945c6de417) )
@@ -4274,12 +4231,6 @@ ROM_START( ridgera2ja )
 	ROM_REGION( 0x10000*2, "slave", 0 ) /* Slave DSP */
 	ROM_LOAD16_WORD( "c71.bin", 0,0x1000*2, CRC(47c623ab) SHA1(e363ac50f5556f83308d4cc191b455e9b62bcfc8) )
 
-	ROM_REGION16_LE( 0x4000, "iomcu", 0 ) /* I/O MCU BIOS */
-	ROM_LOAD( "c74.bin", 0x0000, 0x4000, CRC(a3dce360) SHA1(8f3248b1890abb2e649927240ae46f73bb171e3b) )
-
-	ROM_REGION16_LE( 0x4000, "mcu_c74", 0 ) /* SUB/SOUND MCU BIOS */
-	ROM_LOAD( "c74.bin", 0x0000, 0x4000, CRC(a3dce360) SHA1(8f3248b1890abb2e649927240ae46f73bb171e3b) )
-
 	ROM_REGION16_LE( 0x80000, "mcu", 0 ) /* sound data */
 	ROM_LOAD( "rrs1data.6r", 0, 0x080000, CRC(b7063aa8) SHA1(08ff689e8dd529b91eee423c93f084945c6de417) )
 
@@ -4326,12 +4277,6 @@ ROM_START( raveracw )
 
 	ROM_REGION( 0x10000*2, "slave", 0 ) /* Slave DSP */
 	ROM_LOAD16_WORD( "c71.bin", 0,0x1000*2, CRC(47c623ab) SHA1(e363ac50f5556f83308d4cc191b455e9b62bcfc8) )
-
-	ROM_REGION16_LE( 0x4000, "iomcu", 0 ) /* I/O MCU BIOS */
-	ROM_LOAD( "c74.bin", 0x0000, 0x4000, CRC(a3dce360) SHA1(8f3248b1890abb2e649927240ae46f73bb171e3b) )
-
-	ROM_REGION16_LE( 0x4000, "mcu_c74", 0 ) /* SUB/SOUND MCU BIOS */
-	ROM_LOAD( "c74.bin", 0x0000, 0x4000, CRC(a3dce360) SHA1(8f3248b1890abb2e649927240ae46f73bb171e3b) )
 
 	ROM_REGION16_LE( 0x80000, "mcu", 0 ) /* sound data */
 	ROM_LOAD( "rv1data.6r", 0, 0x080000, CRC(d358ec20) SHA1(140c513349240417bb546dd2d151f3666b818e91) )
@@ -4392,12 +4337,6 @@ ROM_START( raveracj )
 	ROM_REGION( 0x10000*2, "slave", 0 ) /* Slave DSP */
 	ROM_LOAD16_WORD( "c71.bin", 0,0x1000*2, CRC(47c623ab) SHA1(e363ac50f5556f83308d4cc191b455e9b62bcfc8) )
 
-	ROM_REGION16_LE( 0x4000, "iomcu", 0 ) /* I/O MCU BIOS */
-	ROM_LOAD( "c74.bin", 0x0000, 0x4000, CRC(a3dce360) SHA1(8f3248b1890abb2e649927240ae46f73bb171e3b) )
-
-	ROM_REGION16_LE( 0x4000, "mcu_c74", 0 ) /* SUB/SOUND MCU BIOS */
-	ROM_LOAD( "c74.bin", 0x0000, 0x4000, CRC(a3dce360) SHA1(8f3248b1890abb2e649927240ae46f73bb171e3b) )
-
 	ROM_REGION16_LE( 0x80000, "mcu", 0 ) /* sound data */
 	ROM_LOAD( "rv1data.6r", 0, 0x080000, CRC(d358ec20) SHA1(140c513349240417bb546dd2d151f3666b818e91) )
 
@@ -4456,12 +4395,6 @@ ROM_START( raveracja )
 
 	ROM_REGION( 0x10000*2, "slave", 0 ) /* Slave DSP */
 	ROM_LOAD16_WORD( "c71.bin", 0,0x1000*2, CRC(47c623ab) SHA1(e363ac50f5556f83308d4cc191b455e9b62bcfc8) )
-
-	ROM_REGION16_LE( 0x4000, "iomcu", 0 ) /* I/O MCU BIOS */
-	ROM_LOAD( "c74.bin", 0x0000, 0x4000, CRC(a3dce360) SHA1(8f3248b1890abb2e649927240ae46f73bb171e3b) )
-
-	ROM_REGION16_LE( 0x4000, "mcu_c74", 0 ) /* SUB/SOUND MCU BIOS */
-	ROM_LOAD( "c74.bin", 0x0000, 0x4000, CRC(a3dce360) SHA1(8f3248b1890abb2e649927240ae46f73bb171e3b) )
 
 	ROM_REGION16_LE( 0x80000, "mcu", 0 ) /* sound data */
 	ROM_LOAD( "rv1data.6r", 0, 0x080000, CRC(d358ec20) SHA1(140c513349240417bb546dd2d151f3666b818e91) )
@@ -4523,12 +4456,6 @@ ROM_START( cybrcomm )
 	ROM_REGION( 0x10000*2, "slave", 0 ) /* Slave DSP */
 	ROM_LOAD16_WORD( "c71.bin", 0,0x1000*2, CRC(47c623ab) SHA1(e363ac50f5556f83308d4cc191b455e9b62bcfc8) )
 
-	ROM_REGION16_LE( 0x4000, "iomcu", 0 ) /* I/O MCU BIOS */
-	ROM_LOAD( "c74.bin", 0x0000, 0x4000, CRC(a3dce360) SHA1(8f3248b1890abb2e649927240ae46f73bb171e3b) )
-
-	ROM_REGION16_LE( 0x4000, "mcu_c74", 0 ) /* SUB/SOUND MCU BIOS */
-	ROM_LOAD( "c74.bin", 0x0000, 0x4000, CRC(a3dce360) SHA1(8f3248b1890abb2e649927240ae46f73bb171e3b) )
-
 	ROM_REGION16_LE( 0x80000, "mcu", 0 ) /* sound data */
 	ROM_LOAD( "cy1data.6r", 0x00000, 0x20000, CRC(10d0005b) SHA1(10508eeaf74d24a611b44cd3bb12417ceb78904f) )
 	ROM_RELOAD(             0x20000, 0x20000)
@@ -4589,12 +4516,6 @@ ROM_START( acedrvrw )
 	ROM_REGION( 0x10000*2, "slave", 0 ) /* Slave DSP */
 	ROM_LOAD16_WORD( "c71.bin", 0,0x1000*2, CRC(47c623ab) SHA1(e363ac50f5556f83308d4cc191b455e9b62bcfc8) )
 
-	ROM_REGION16_LE( 0x4000, "iomcu", 0 ) /* I/O MCU BIOS */
-	ROM_LOAD( "c74.bin", 0x0000, 0x4000, CRC(a3dce360) SHA1(8f3248b1890abb2e649927240ae46f73bb171e3b) )
-
-	ROM_REGION16_LE( 0x4000, "mcu_c74", 0 ) /* SUB/SOUND MCU BIOS */
-	ROM_LOAD( "c74.bin", 0x0000, 0x4000, CRC(a3dce360) SHA1(8f3248b1890abb2e649927240ae46f73bb171e3b) )
-
 	ROM_REGION16_LE( 0x80000, "mcu", 0 ) /* sound data */
 	ROM_LOAD( "ad1data.6r", 0, 0x080000, CRC(82024f74) SHA1(711ab0c4f027716aeab18e3a5d3d06fa82af8007) )
 
@@ -4641,12 +4562,6 @@ ROM_START( victlapw )
 
 	ROM_REGION( 0x10000*2, "slave", 0 ) /* Slave DSP */
 	ROM_LOAD16_WORD( "c71.bin", 0,0x1000*2, CRC(47c623ab) SHA1(e363ac50f5556f83308d4cc191b455e9b62bcfc8) )
-
-	ROM_REGION16_LE( 0x4000, "iomcu", 0 ) /* I/O MCU BIOS */
-	ROM_LOAD( "c74.bin", 0x0000, 0x4000, CRC(a3dce360) SHA1(8f3248b1890abb2e649927240ae46f73bb171e3b) )
-
-	ROM_REGION16_LE( 0x4000, "mcu_c74", 0 ) /* SUB/SOUND MCU BIOS */
-	ROM_LOAD( "c74.bin", 0x0000, 0x4000, CRC(a3dce360) SHA1(8f3248b1890abb2e649927240ae46f73bb171e3b) )
 
 	ROM_REGION16_LE( 0x80000, "mcu", 0 ) /* sound data */
 	ROM_LOAD( "adv1data.6r", 0, 0x080000, CRC(10eecdb4) SHA1(aaedeed166614e6670e765e0d7e4e9eb5f38ad10) )

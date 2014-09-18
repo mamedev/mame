@@ -293,12 +293,12 @@ void device_memory_interface::interface_validity_check(validity_checker &valid) 
 				}
 
 				// if this entry references a memory region, validate it
-				if (entry->m_region != NULL && entry->m_sharetag == 0)
+				if (entry->m_region != NULL && entry->m_share == 0)
 				{
 					// make sure we can resolve the full path to the region
 					bool found = false;
 					astring entry_region;
-					device().siblingtag(entry_region, entry->m_region);
+					entry->m_devbase.subtag(entry_region, entry->m_region);
 
 					// look for the region
 					device_iterator deviter(device().mconfig().root_device());
@@ -323,6 +323,7 @@ void device_memory_interface::interface_validity_check(validity_checker &valid) 
 				}
 
 				// make sure all devices exist
+				// FIXME: This doesn't work! AMH_DEVICE_DELEGATE entries don't even set m_tag, the device tag is inside the proto-delegate
 				if (entry->m_read.m_type == AMH_DEVICE_DELEGATE && entry->m_read.m_tag != NULL)
 				{
 					astring temp(entry->m_read.m_tag);
@@ -346,8 +347,8 @@ void device_memory_interface::interface_validity_check(validity_checker &valid) 
 					valid.validate_tag(entry->m_read.m_tag);
 				if (entry->m_write.m_type == AMH_BANK)
 					valid.validate_tag(entry->m_write.m_tag);
-				if (entry->m_sharetag != NULL)
-					valid.validate_tag(entry->m_sharetag);
+				if (entry->m_share != NULL)
+					valid.validate_tag(entry->m_share);
 			}
 
 			// release the address map

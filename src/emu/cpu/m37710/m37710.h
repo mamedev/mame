@@ -88,8 +88,7 @@ class m37710_cpu_device : public cpu_device
 {
 public:
 	// construction/destruction
-	m37710_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	m37710_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	m37710_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, address_map_delegate map_delegate);
 
 	DECLARE_READ16_MEMBER( m37710_internal_word_r );
 	DECLARE_WRITE16_MEMBER( m37710_internal_word_w );
@@ -2005,16 +2004,38 @@ private:
 };
 
 
-class m37702_cpu_device : public m37710_cpu_device
+class m37702s1_device : public m37710_cpu_device
 {
 public:
 	// construction/destruction
-	m37702_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	m37702s1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+protected:
+	DECLARE_ADDRESS_MAP(map, 16);
+};
+
+class m37702m2_device : public m37710_cpu_device
+{
+public:
+	// construction/destruction
+	m37702m2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	m37702m2_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+protected:
+	DECLARE_ADDRESS_MAP(map, 16);
+};
+
+class m37710s4_device : public m37710_cpu_device
+{
+public:
+	// construction/destruction
+	m37710s4_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+protected:
+	DECLARE_ADDRESS_MAP(map, 16);
 };
 
 
-extern const device_type M37710;
-extern const device_type M37702;
+extern const device_type M37702M2;
+extern const device_type M37702S1;
+extern const device_type M37710S4;
 
 
 /* ======================================================================== */

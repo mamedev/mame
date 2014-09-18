@@ -1832,11 +1832,11 @@ void address_space::prepare_map()
 		adjust_addresses(entry->m_bytestart, entry->m_byteend, entry->m_bytemask, entry->m_bytemirror);
 
 		// if we have a share entry, add it to our map
-		if (entry->m_sharetag != NULL)
+		if (entry->m_share != NULL)
 		{
 			// if we can't find it, add it to our map
 			astring fulltag;
-			if (manager().m_sharelist.find(entry->m_sharebase->subtag(fulltag, entry->m_sharetag).cstr()) == NULL)
+			if (manager().m_sharelist.find(entry->m_devbase.subtag(fulltag, entry->m_share).cstr()) == NULL)
 			{
 				VPRINTF(("Creating share '%s' of length 0x%X\n", fulltag.cstr(), entry->m_byteend + 1 - entry->m_bytestart));
 				memory_share *share = global_alloc(memory_share(m_map->m_databits, entry->m_byteend + 1 - entry->m_bytestart, endianness()));
@@ -1856,11 +1856,11 @@ void address_space::prepare_map()
 		}
 
 		// validate adjusted addresses against implicit regions
-		if (entry->m_region != NULL && entry->m_sharetag == NULL)
+		if (entry->m_region != NULL && entry->m_share == NULL)
 		{
 			// determine full tag
 			astring fulltag;
-			device().siblingtag(fulltag, entry->m_region);
+			entry->m_devbase.subtag(fulltag, entry->m_region);
 
 			// find the region
 			memory_region *region = machine().root_device().memregion(fulltag);
@@ -1877,7 +1877,7 @@ void address_space::prepare_map()
 		{
 			// determine full tag
 			astring fulltag;
-			device().siblingtag(fulltag, entry->m_region);
+			entry->m_devbase.subtag(fulltag, entry->m_region);
 
 			// set the memory address
 			entry->m_memory = machine().root_device().memregion(fulltag.cstr())->base() + entry->m_rgnoffs;
@@ -1962,18 +1962,18 @@ void address_space::populate_map_entry(const address_map_entry &entry, read_or_w
 			if (readorwrite == ROW_READ)
 				switch (data.m_bits)
 				{
-					case 8:     install_read_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, read8_delegate(entry.m_rproto8, *entry.m_read.m_devbase), data.m_mask); break;
-					case 16:    install_read_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, read16_delegate(entry.m_rproto16, *entry.m_read.m_devbase), data.m_mask); break;
-					case 32:    install_read_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, read32_delegate(entry.m_rproto32, *entry.m_read.m_devbase), data.m_mask); break;
-					case 64:    install_read_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, read64_delegate(entry.m_rproto64, *entry.m_read.m_devbase), data.m_mask); break;
+					case 8:     install_read_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, read8_delegate(entry.m_rproto8, entry.m_devbase), data.m_mask); break;
+					case 16:    install_read_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, read16_delegate(entry.m_rproto16, entry.m_devbase), data.m_mask); break;
+					case 32:    install_read_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, read32_delegate(entry.m_rproto32, entry.m_devbase), data.m_mask); break;
+					case 64:    install_read_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, read64_delegate(entry.m_rproto64, entry.m_devbase), data.m_mask); break;
 				}
 			else
 				switch (data.m_bits)
 				{
-					case 8:     install_write_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, write8_delegate(entry.m_wproto8, *entry.m_write.m_devbase), data.m_mask); break;
-					case 16:    install_write_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, write16_delegate(entry.m_wproto16, *entry.m_write.m_devbase), data.m_mask); break;
-					case 32:    install_write_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, write32_delegate(entry.m_wproto32, *entry.m_write.m_devbase), data.m_mask); break;
-					case 64:    install_write_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, write64_delegate(entry.m_wproto64, *entry.m_write.m_devbase), data.m_mask); break;
+					case 8:     install_write_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, write8_delegate(entry.m_wproto8, entry.m_devbase), data.m_mask); break;
+					case 16:    install_write_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, write16_delegate(entry.m_wproto16, entry.m_devbase), data.m_mask); break;
+					case 32:    install_write_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, write32_delegate(entry.m_wproto32, entry.m_devbase), data.m_mask); break;
+					case 64:    install_write_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, write64_delegate(entry.m_wproto64, entry.m_devbase), data.m_mask); break;
 				}
 			break;
 
@@ -2001,7 +2001,7 @@ void address_space::populate_map_entry(const address_map_entry &entry, read_or_w
 void address_space::populate_map_entry_setoffset(const address_map_entry &entry)
 {
 	install_setoffset_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask,
-		entry.m_addrmirror, setoffset_delegate(entry.m_soproto, *entry.m_setoffsethd.m_devbase), entry.m_setoffsethd.m_mask);
+		entry.m_addrmirror, setoffset_delegate(entry.m_soproto, entry.m_devbase), entry.m_setoffsethd.m_mask);
 }
 
 //-------------------------------------------------
@@ -2151,18 +2151,18 @@ address_map_entry *address_space::block_assign_intersecting(offs_t bytestart, of
 	for (address_map_entry *entry = m_map->m_entrylist.first(); entry != NULL; entry = entry->next())
 	{
 		// if we haven't assigned this block yet, see if we have a mapped shared pointer for it
-		if (entry->m_memory == NULL && entry->m_sharetag != NULL)
+		if (entry->m_memory == NULL && entry->m_share != NULL)
 		{
 			astring fulltag;
-			memory_share *share = manager().m_sharelist.find(entry->m_sharebase->subtag(fulltag, entry->m_sharetag).cstr());
+			memory_share *share = manager().m_sharelist.find(entry->m_devbase.subtag(fulltag, entry->m_share).cstr());
 			if (share != NULL && share->ptr() != NULL)
 			{
 				entry->m_memory = share->ptr();
-				VPRINTF(("memory range %08X-%08X -> shared_ptr '%s' [%p]\n", entry->m_addrstart, entry->m_addrend, entry->m_sharetag, entry->m_memory));
+				VPRINTF(("memory range %08X-%08X -> shared_ptr '%s' [%p]\n", entry->m_addrstart, entry->m_addrend, entry->m_share, entry->m_memory));
 			}
 			else
 			{
-				VPRINTF(("memory range %08X-%08X -> shared_ptr '%s' but not found\n", entry->m_addrstart, entry->m_addrend, entry->m_sharetag));
+				VPRINTF(("memory range %08X-%08X -> shared_ptr '%s' but not found\n", entry->m_addrstart, entry->m_addrend, entry->m_share));
 			}
 		}
 
@@ -2174,14 +2174,14 @@ address_map_entry *address_space::block_assign_intersecting(offs_t bytestart, of
 		}
 
 		// if we're the first match on a shared pointer, assign it now
-		if (entry->m_memory != NULL && entry->m_sharetag != NULL)
+		if (entry->m_memory != NULL && entry->m_share != NULL)
 		{
 			astring fulltag;
-			memory_share *share = manager().m_sharelist.find(entry->m_sharebase->subtag(fulltag, entry->m_sharetag).cstr());
+			memory_share *share = manager().m_sharelist.find(entry->m_devbase.subtag(fulltag, entry->m_share).cstr());
 			if (share != NULL && share->ptr() == NULL)
 			{
 				share->set_ptr(entry->m_memory);
-				VPRINTF(("setting shared_ptr '%s' = %p\n", entry->m_sharetag, entry->m_memory));
+				VPRINTF(("setting shared_ptr '%s' = %p\n", entry->m_share, entry->m_memory));
 			}
 		}
 
@@ -2610,10 +2610,10 @@ void *address_space::find_backing_memory(offs_t addrstart, offs_t addrend)
 bool address_space::needs_backing_store(const address_map_entry *entry)
 {
 	// if we are sharing, and we don't have a pointer yet, create one
-	if (entry->m_sharetag != NULL)
+	if (entry->m_share != NULL)
 	{
 		astring fulltag;
-		memory_share *share = manager().m_sharelist.find(entry->m_sharebase->subtag(fulltag, entry->m_sharetag).cstr());
+		memory_share *share = manager().m_sharelist.find(entry->m_devbase.subtag(fulltag, entry->m_share).cstr());
 		if (share != NULL && share->ptr() == NULL)
 			return true;
 	}

@@ -60,35 +60,66 @@
 #define M37710_DEBUG    (0) // enables verbose logging for peripherals, etc.
 
 
-const device_type M37710 = &device_creator<m37710_cpu_device>;
-const device_type M37702 = &device_creator<m37702_cpu_device>;
+const device_type M37702M2 = &device_creator<m37702m2_device>;
+const device_type M37702S1 = &device_creator<m37702s1_device>;
+const device_type M37710S4 = &device_creator<m37710s4_device>;
 
 
-// On-board RAM and peripherals
-static ADDRESS_MAP_START( m37710_internal_map, AS_PROGRAM, 16, m37710_cpu_device )
+// On-board RAM, ROM, and peripherals
+
+// M37702M2: 512 bytes internal RAM, 16K internal mask ROM
+// (M37702E2: same with EPROM instead of mask ROM)
+DEVICE_ADDRESS_MAP_START( map, 16, m37702m2_device )
+	AM_RANGE(0x000000, 0x00007f) AM_READWRITE(m37710_internal_word_r, m37710_internal_word_w)
+	AM_RANGE(0x000080, 0x00027f) AM_RAM
+	AM_RANGE(0x00c000, 0x00ffff) AM_ROM AM_REGION("internal", 0)
+ADDRESS_MAP_END
+
+
+// M37702S1: 512 bytes internal RAM, no internal ROM
+DEVICE_ADDRESS_MAP_START( map, 16, m37702s1_device )
 	AM_RANGE(0x000000, 0x00007f) AM_READWRITE(m37710_internal_word_r, m37710_internal_word_w)
 	AM_RANGE(0x000080, 0x00027f) AM_RAM
 ADDRESS_MAP_END
 
 
-m37710_cpu_device::m37710_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: cpu_device(mconfig, M37710, "M37710", tag, owner, clock, "m37710", __FILE__)
-	, m_program_config("program", ENDIANNESS_LITTLE, 16, 24, 0, ADDRESS_MAP_NAME(m37710_internal_map))
-	, m_io_config("io", ENDIANNESS_LITTLE, 8, 16, 0)
-{
-}
+// M37710S4: 2048 bytes internal RAM, no internal ROM
+DEVICE_ADDRESS_MAP_START( map, 16, m37710s4_device )
+	AM_RANGE(0x000000, 0x00007f) AM_READWRITE(m37710_internal_word_r, m37710_internal_word_w)
+	AM_RANGE(0x000080, 0x00087f) AM_RAM
+ADDRESS_MAP_END
+
+// many other combinations of RAM and ROM size exist
 
 
-m37710_cpu_device::m37710_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+m37710_cpu_device::m37710_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, address_map_delegate map_delegate)
 	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
-	, m_program_config("program", ENDIANNESS_LITTLE, 16, 24, 0, ADDRESS_MAP_NAME(m37710_internal_map))
+	, m_program_config("program", ENDIANNESS_LITTLE, 16, 24, 0, map_delegate)
 	, m_io_config("io", ENDIANNESS_LITTLE, 8, 16, 0)
 {
 }
 
 
-m37702_cpu_device::m37702_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: m37710_cpu_device(mconfig, M37702, "M37702", tag, owner, clock, "m37702", __FILE__)
+m37702m2_device::m37702m2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: m37710_cpu_device(mconfig, M37702M2, "M37702M2", tag, owner, clock, "m37702m2", __FILE__, address_map_delegate(FUNC(m37702m2_device::map), this))
+{
+}
+
+
+m37702m2_device::m37702m2_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+	: m37710_cpu_device(mconfig, type, name, tag, owner, clock, shortname, source, address_map_delegate(FUNC(m37702m2_device::map), this))
+{
+}
+
+
+m37702s1_device::m37702s1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: m37710_cpu_device(mconfig, M37702S1, "M37702S1", tag, owner, clock, "m37702s1", __FILE__, address_map_delegate(FUNC(m37702s1_device::map), this))
+{
+}
+
+
+m37710s4_device::m37710s4_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: m37710_cpu_device(mconfig, M37710S4, "M37710S4", tag, owner, clock, "m37710s4", __FILE__, address_map_delegate(FUNC(m37710s4_device::map), this))
 {
 }
 

@@ -273,8 +273,8 @@ GFX:                Custom 145     ( 80 pin PQFP)
 #include "cpu/m68000/m68000.h"
 #include "includes/namconb1.h"
 #include "includes/namcoic.h"
+#include "machine/namcomcu.h"
 #include "sound/c352.h"
-#include "cpu/m37710/m37710.h"
 
 #define MASTER_CLOCK    XTAL_48_384MHz
 
@@ -717,7 +717,6 @@ WRITE16_MEMBER(namconb1_state::nbmcu_shared_w)
 static ADDRESS_MAP_START( namcoc75_am, AS_PROGRAM, 16, namconb1_state )
 	AM_RANGE(0x002000, 0x002fff) AM_DEVREADWRITE("c352", c352_device, read, write)
 	AM_RANGE(0x004000, 0x00bfff) AM_RAM_WRITE(nbmcu_shared_w) AM_SHARE("namconb_share")
-	AM_RANGE(0x00c000, 0x00ffff) AM_ROM AM_REGION("c75", 0)
 	AM_RANGE(0x200000, 0x27ffff) AM_ROM AM_REGION("c75data", 0)
 ADDRESS_MAP_END
 
@@ -1099,7 +1098,7 @@ static MACHINE_CONFIG_START( namconb1, namconb1_state )
 	MCFG_CPU_ADD("maincpu", M68EC020, MASTER_CLOCK/2)
 	MCFG_CPU_PROGRAM_MAP(namconb1_am)
 
-	MCFG_CPU_ADD("mcu", M37702, MASTER_CLOCK/3)
+	MCFG_CPU_ADD("mcu", NAMCO_C75, MASTER_CLOCK/3)
 	MCFG_CPU_PROGRAM_MAP(namcoc75_am)
 	MCFG_CPU_IO_MAP(namcoc75_io)
 
@@ -1136,7 +1135,7 @@ static MACHINE_CONFIG_START( namconb2, namconb1_state )
 	MCFG_CPU_ADD("maincpu", M68EC020, MASTER_CLOCK/2)
 	MCFG_CPU_PROGRAM_MAP(namconb2_am)
 
-	MCFG_CPU_ADD("mcu", M37702, MASTER_CLOCK/3)
+	MCFG_CPU_ADD("mcu", NAMCO_C75, MASTER_CLOCK/3)
 	MCFG_CPU_PROGRAM_MAP(namcoc75_am)
 	MCFG_CPU_IO_MAP(namcoc75_io)
 
@@ -1177,9 +1176,6 @@ ROM_START( ptblank ) /* World set using 4Mb sound data rom (verified) */
 	ROM_LOAD32_WORD( "gn2_mprlb.15b", 0x00002, 0x80000, CRC(fe2d9425) SHA1(51b166a629cbb522720d63720558816b496b6b76) )
 	ROM_LOAD32_WORD( "gn2_mprub.13b", 0x00000, 0x80000, CRC(3bf4985a) SHA1(f559e0d5f55d23d886fe61bd7d5ca556acc7f87c) )
 
-	ROM_REGION16_LE( 0x4000, "c75", 0 ) /* C75 program */
-	ROM_LOAD( "c75.bin", 0, 0x4000, CRC(42f539a5) SHA1(3103e5a0a2867620309fd4fe478a2be0effbeff8) )
-
 	ROM_REGION16_LE( 0x80000, "c75data", 0 ) /* sound data - JP1 jumper selectable between 1Mb (27C1024) or 4Mb (27C4096) either rom is correct */
 //  ROM_LOAD( "gn1_spr0.5b", 0, 0x20000, CRC(6836ba38) SHA1(6ea17ea4bbb59be108e8887acd7871409580732f) ) /* 1Megabit, same data as the 4Mb rom at 0x00000-0x1ffff */
 	ROM_LOAD( "gn1-spr0.5b", 0, 0x80000, CRC(71773811) SHA1(e482784d9b9ebf8c2e4a2a3f6f6c4dc8304d2251) ) /* 4Megabit, same data at 0x00000-0x1ffff, 0x20000-0x7ffff is 0xff filled */
@@ -1210,9 +1206,6 @@ ROM_START( gunbuletw ) /* World set using 4Mb sound data rom (verified) */
 	ROM_REGION( 0x100000, "maincpu", 0 ) /* main program */
 	ROM_LOAD32_WORD( "gn3_mprlb.15b", 0x00002, 0x80000, CRC(9260fce5) SHA1(064579be1ac90e04082a8b403c6adf35dbb46a7e) )
 	ROM_LOAD32_WORD( "gn3_mprub.13b", 0x00000, 0x80000, CRC(6c1ac697) SHA1(7b52b5ef8154a5d741ac24673f3e6bbfa246a494) )
-
-	ROM_REGION16_LE( 0x4000, "c75", 0 ) /* C75 program */
-	ROM_LOAD( "c75.bin", 0, 0x4000, CRC(42f539a5) SHA1(3103e5a0a2867620309fd4fe478a2be0effbeff8) )
 
 	ROM_REGION16_LE( 0x80000, "c75data", 0 ) /* sound data - JP1 jumper selectable between 1Mb (27C1024) or 4Mb (27C4096) either rom is correct */
 //  ROM_LOAD( "gn1_spr0.5b", 0, 0x20000, CRC(6836ba38) SHA1(6ea17ea4bbb59be108e8887acd7871409580732f) ) /* 1Megabit, same data as the 4Mb rom at 0x00000-0x1ffff */
@@ -1245,9 +1238,6 @@ ROM_START( gunbuletj ) /* Japanese set using 1Mb sound data rom (verified) */
 	ROM_LOAD32_WORD( "gn1_mprl.15b", 0x00002, 0x80000, CRC(f99e309e) SHA1(3fe0ddf756e6849f8effc7672456cbe32f65c98a) )
 	ROM_LOAD32_WORD( "gn1_mpru.13b", 0x00000, 0x80000, CRC(72a4db07) SHA1(8c5e1e51cd961b311d03f7b21f36a5bd5e8e9104) )
 
-	ROM_REGION16_LE( 0x4000, "c75", 0 ) /* C75 program */
-	ROM_LOAD( "c75.bin", 0, 0x4000, CRC(42f539a5) SHA1(3103e5a0a2867620309fd4fe478a2be0effbeff8) )
-
 	ROM_REGION16_LE( 0x80000, "c75data", 0 ) /* sound data - JP1 jumper selectable between 1Mb (27C1024) or 4Mb (27C4096) either rom is correct */
 	ROM_LOAD( "gn1_spr0.5b", 0, 0x20000, CRC(6836ba38) SHA1(6ea17ea4bbb59be108e8887acd7871409580732f) ) /* 1Megabit, same data as the 4Mb rom at 0x00000-0x1ffff */
 //  ROM_LOAD( "gn1-spr0.5b", 0, 0x80000, CRC(71773811) SHA1(e482784d9b9ebf8c2e4a2a3f6f6c4dc8304d2251) ) /* 4Megabit, same data at 0x00000-0x1ffff, 0x20000-0x7ffff is 0xff filled */
@@ -1278,9 +1268,6 @@ ROM_START( nebulray )
 	ROM_REGION( 0x100000, "maincpu", 0 ) /* main program */
 	ROM_LOAD32_WORD( "nr2_mprl.15b", 0x00002, 0x80000, CRC(0431b6d4) SHA1(54c96e8ac9e753956c31bdef79d390f1c20e10ff) )
 	ROM_LOAD32_WORD( "nr2_mpru.13b", 0x00000, 0x80000, CRC(049b97cb) SHA1(0e344b29a4d4bdc854fa9849589772df2eeb0a05) )
-
-	ROM_REGION16_LE( 0x4000, "c75", 0 ) /* C75 program */
-	ROM_LOAD( "c75.bin", 0, 0x4000, CRC(42f539a5) SHA1(3103e5a0a2867620309fd4fe478a2be0effbeff8) )
 
 	ROM_REGION16_LE( 0x80000, "c75data", 0 ) /* sound data */
 	ROM_LOAD( "nr1-spr0", 0, 0x20000, CRC(1cc2b44b) SHA1(161f4ed39fabe89d7ee1d539f8b9f08cd0ff3111) )
@@ -1316,9 +1303,6 @@ ROM_START( nebulrayj )
 	ROM_LOAD32_WORD( "nr1_mprl.15b", 0x00002, 0x80000, CRC(fae5f62c) SHA1(143d716abbc834aac6270db3bbb89ec71ea3804d) )
 	ROM_LOAD32_WORD( "nr1_mpru.13b", 0x00000, 0x80000, CRC(42ef71f9) SHA1(20e3cb63e1fde293c60c404b378d901d635c4b79) )
 
-	ROM_REGION16_LE( 0x4000, "c75", 0 ) /* C75 program */
-	ROM_LOAD( "c75.bin", 0, 0x4000, CRC(42f539a5) SHA1(3103e5a0a2867620309fd4fe478a2be0effbeff8) )
-
 	ROM_REGION16_LE( 0x80000, "c75data", 0 ) /* sound data */
 	ROM_LOAD( "nr1-spr0", 0, 0x20000, CRC(1cc2b44b) SHA1(161f4ed39fabe89d7ee1d539f8b9f08cd0ff3111) )
 
@@ -1353,9 +1337,6 @@ ROM_START( gslgr94u )
 	ROM_LOAD32_WORD( "gse2mprl.15b", 0x00002, 0x80000, CRC(a514349c) SHA1(1f7ec81cd6193410d2f01e6f0f84878561fc8035) )
 	ROM_LOAD32_WORD( "gse2mpru.13b", 0x00000, 0x80000, CRC(b6afd238) SHA1(438a3411ac8ce3d22d5da8c0800738cb8d2994a9) )
 
-	ROM_REGION16_LE( 0x4000, "c75", 0 ) /* C75 program */
-	ROM_LOAD( "c75.bin", 0, 0x4000, CRC(42f539a5) SHA1(3103e5a0a2867620309fd4fe478a2be0effbeff8) )
-
 	ROM_REGION16_LE( 0x80000, "c75data", 0 ) /* sound data */
 	ROM_LOAD( "gse2spr0.bin", 0, 0x20000, CRC(17e87cfc) SHA1(9cbeadb6dfcb736e8c80eab344f70fc2f58469d6) )
 
@@ -1380,9 +1361,6 @@ ROM_START( gslgr94j )
 	ROM_REGION( 0x100000, "maincpu", 0 ) /* main program */
 	ROM_LOAD32_WORD( "gs41mprl.15b", 0x00002, 0x80000, CRC(5759bdb5) SHA1(a0fb332c484e168369a69cd9dd8ea72e5f4565df) )
 	ROM_LOAD32_WORD( "gs41mpru.13b", 0x00000, 0x80000, CRC(78bde1e7) SHA1(911d33897f03c59c6505f5f755d80471ff019812) )
-
-	ROM_REGION16_LE( 0x4000, "c75", 0 ) /* C75 program */
-	ROM_LOAD( "c75.bin", 0, 0x4000, CRC(42f539a5) SHA1(3103e5a0a2867620309fd4fe478a2be0effbeff8) )
 
 	ROM_REGION16_LE( 0x80000, "c75data", 0 ) /* sound data */
 	ROM_LOAD( "gs41spr0.5b", 0, 0x80000, CRC(3e2b6d55) SHA1(f6a1ecaee3a9a7a535850084e469aa7f873f301e) )
@@ -1536,9 +1514,6 @@ ROM_START( gslugrsj )
 	ROM_LOAD32_WORD( "gs1mprl.15b", 0x00002, 0x80000, CRC(1e6c3626) SHA1(56abe21884fd87df10996db19c49ce14214d4b73) )
 	ROM_LOAD32_WORD( "gs1mpru.13b", 0x00000, 0x80000, CRC(ef355179) SHA1(0ab0ef4301a318681bb5827d35734a0732b35484) )
 
-	ROM_REGION16_LE( 0x4000, "c75", 0 ) /* C75 program */
-	ROM_LOAD( "c75.bin", 0, 0x4000, CRC(42f539a5) SHA1(3103e5a0a2867620309fd4fe478a2be0effbeff8) )
-
 	ROM_REGION16_LE( 0x80000, "c75data", 0 ) /* sound data */
 	ROM_LOAD( "gs1spr0.5b", 0, 0x80000, CRC(561ea20f) SHA1(adac6b77effc3a82079a9b228bafca0fcef72ba5) )
 
@@ -1563,9 +1538,6 @@ ROM_START( sws95 )
 	ROM_REGION( 0x100000, "maincpu", 0 ) /* main program */
 	ROM_LOAD32_WORD( "ss51mprl.bin", 0x00002, 0x80000, CRC(c9e0107d) SHA1(0f10582416023a86ea1ef2679f3f06016c086e08) )
 	ROM_LOAD32_WORD( "ss51mpru.bin", 0x00000, 0x80000, CRC(0d93d261) SHA1(5edef26e2c86dbc09727d910af92747d022e4fed) )
-
-	ROM_REGION16_LE( 0x4000, "c75", 0 ) /* C75 program */
-	ROM_LOAD( "c75.bin", 0, 0x4000, CRC(42f539a5) SHA1(3103e5a0a2867620309fd4fe478a2be0effbeff8) )
 
 	ROM_REGION16_LE( 0x80000, "c75data", 0 ) /* sound data */
 	ROM_LOAD( "ss51spr0.bin", 0, 0x80000, CRC(71cb12f5) SHA1(6e13bd16a5ba14d6e47a21875db3663ada3c06a5) )
@@ -1593,9 +1565,6 @@ ROM_START( sws96 )
 	ROM_LOAD32_WORD( "ss61mprl.bin", 0x00002, 0x80000, CRC(06f55e73) SHA1(6be26f8a2ef600bf07c580f210d7b265ac464002) )
 	ROM_LOAD32_WORD( "ss61mpru.bin", 0x00000, 0x80000, CRC(0abdbb83) SHA1(67e8b712291f9bcf2c3a52fbc451fad54679cab8) )
 
-	ROM_REGION16_LE( 0x4000, "c75", 0 ) /* C75 program */
-	ROM_LOAD( "c75.bin", 0, 0x4000, CRC(42f539a5) SHA1(3103e5a0a2867620309fd4fe478a2be0effbeff8) )
-
 	ROM_REGION16_LE( 0x80000, "c75data", 0 ) /* sound data */
 	ROM_LOAD( "ss61spr0.bin", 0, 0x80000, CRC(71cb12f5) SHA1(6e13bd16a5ba14d6e47a21875db3663ada3c06a5) )
 
@@ -1621,9 +1590,6 @@ ROM_START( sws97 )
 	ROM_LOAD32_WORD( "ss71mprl.bin", 0x00002, 0x80000, CRC(bd60b50e) SHA1(9e00bacd506182ab2af2c0efdd5cc401b3e46485) )
 	ROM_LOAD32_WORD( "ss71mpru.bin", 0x00000, 0x80000, CRC(3444f5a8) SHA1(8d0f35b3ba8f65dbc67c3b2d273833227a8b8b2a) )
 
-	ROM_REGION16_LE( 0x4000, "c75", 0 ) /* C75 program */
-	ROM_LOAD( "c75.bin", 0, 0x4000, CRC(42f539a5) SHA1(3103e5a0a2867620309fd4fe478a2be0effbeff8) )
-
 	ROM_REGION16_LE( 0x80000, "c75data", 0 ) /* sound data */
 	ROM_LOAD( "ss71spr0.bin", 0, 0x80000, CRC(71cb12f5) SHA1(6e13bd16a5ba14d6e47a21875db3663ada3c06a5) )
 
@@ -1648,9 +1614,6 @@ ROM_START( vshoot )
 	ROM_REGION( 0x100000, "maincpu", 0 ) /* main program */
 	ROM_LOAD32_WORD( "vsj1mprl.15b", 0x00002, 0x80000, CRC(83a60d92) SHA1(c3db0c79f772a79418914353a3d6ecc4883ea54e) )
 	ROM_LOAD32_WORD( "vsj1mpru.13b", 0x00000, 0x80000, CRC(c63eb92d) SHA1(f93bd4b91daee645677955020dc8df14dc9bfd27) )
-
-	ROM_REGION16_LE( 0x4000, "c75", 0 ) /* C75 program */
-	ROM_LOAD( "c75.bin", 0, 0x4000, CRC(42f539a5) SHA1(3103e5a0a2867620309fd4fe478a2be0effbeff8) )
 
 	ROM_REGION16_LE( 0x80000, "c75data", 0 ) /* sound data */
 	ROM_LOAD( "vsj1spr0.5b", 0, 0x80000, CRC(b0c71aa6) SHA1(a94fae02b46a645ff728d2f98827c85ff155892b) )
@@ -1837,9 +1800,6 @@ ROM_START( outfxies )
 	ROM_LOAD32_WORD( "ou2_mprl.11c", 0x00002, 0x80000, CRC(f414a32e) SHA1(9733ab087cfde1b8fb5b676d8a2eb5325ebdbb56) )
 	ROM_LOAD32_WORD( "ou2_mpru.11d", 0x00000, 0x80000, CRC(ab5083fb) SHA1(cb2e7a4838c2b80057edb83ea63116bccb1394d3) )
 
-	ROM_REGION( 0x4000, "c75", 0 ) /* C75 program */
-	ROM_LOAD( "c75.bin", 0, 0x4000, CRC(42f539a5) SHA1(3103e5a0a2867620309fd4fe478a2be0effbeff8) )
-
 	ROM_REGION16_LE( 0x80000, "c75data", 0 ) /* sound data */
 	ROM_LOAD( "ou1spr0.5b", 0, 0x80000, CRC(60cee566) SHA1(2f3b96793816d90011586e0f9f71c58b636b6d4c) )
 
@@ -1881,9 +1841,6 @@ ROM_START( outfxiesj )
 	ROM_REGION( 0x100000, "maincpu", 0 ) /* main program */
 	ROM_LOAD32_WORD( "ou1_mprl.11c", 0x00002, 0x80000, CRC(d3b9e530) SHA1(3f5fe5eea817a23dfe42e76f32912ce94d4c49c9) )
 	ROM_LOAD32_WORD( "ou1_mpru.11d", 0x00000, 0x80000, CRC(d98308fb) SHA1(fdefeebf56464a20e3aaefd88df4eee9f7b5c4f3) )
-
-	ROM_REGION( 0x4000, "c75", 0 ) /* C75 program */
-	ROM_LOAD( "c75.bin", 0, 0x4000, CRC(42f539a5) SHA1(3103e5a0a2867620309fd4fe478a2be0effbeff8) )
 
 	ROM_REGION16_LE( 0x80000, "c75data", 0 ) /* sound data */
 	ROM_LOAD( "ou1spr0.5b", 0, 0x80000, CRC(60cee566) SHA1(2f3b96793816d90011586e0f9f71c58b636b6d4c) )
@@ -1927,9 +1884,6 @@ ROM_START( machbrkr )
 	ROM_REGION( 0x100000, "maincpu", 0 ) /* main program */
 	ROM_LOAD32_WORD( "mb1_mprl.11c", 0x00002, 0x80000, CRC(86cf0644) SHA1(07eeadda1d94c9be2f882edb6f2eb0b98292e500) )
 	ROM_LOAD32_WORD( "mb1_mpru.11d", 0x00000, 0x80000, CRC(fb1ff916) SHA1(e0ba96c1f26a60f87d8050e582e164d91e132183) )
-
-	ROM_REGION( 0x4000, "c75", 0 ) /* C75 program */
-	ROM_LOAD( "c75.bin", 0, 0x4000, CRC(42f539a5) SHA1(3103e5a0a2867620309fd4fe478a2be0effbeff8) )
 
 	ROM_REGION16_LE( 0x80000, "c75data", 0 ) /* sound data */
 	ROM_LOAD( "mb1_spr0.5b", 0, 0x80000, CRC(d10f6272) SHA1(cb99e06e050dbf86998ea51ef2ca130b2acfb2f6) )

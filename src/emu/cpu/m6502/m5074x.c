@@ -39,7 +39,7 @@ const device_type M50741 = &device_creator<m50741_device>;
 //-------------------------------------------------
 m5074x_device::m5074x_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, address_map_constructor internal_map, const char *shortname, const char *source) :
 	m740_device(mconfig, type, name, tag, owner, clock, shortname, source),
-	m_program_config("program", ENDIANNESS_LITTLE, 8, 16, 0, internal_map),
+	m_program_config("program", ENDIANNESS_LITTLE, 8, 13, 0, internal_map),
 	read_p0(*this),
 	read_p1(*this),
 	read_p2(*this),
@@ -470,11 +470,10 @@ WRITE8_MEMBER(m5074x_device::tmrirq_w)
 
 /* M50740 - baseline for this familiy */
 static ADDRESS_MAP_START( m50740_map, AS_PROGRAM, 8, m50740_device )
-	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
 	AM_RANGE(0x0000, 0x005f) AM_RAM
 	AM_RANGE(0x00e0, 0x00e9) AM_READWRITE(ports_r, ports_w)
 	AM_RANGE(0x00f9, 0x00ff) AM_READWRITE(tmrirq_r, tmrirq_w)
-	AM_RANGE(0x1400, 0x1fff) AM_ROM AM_REGION(":m50740", 0)
+	AM_RANGE(0x1400, 0x1fff) AM_ROM AM_REGION("internal", 0)
 ADDRESS_MAP_END
 
 m50740_device::m50740_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
@@ -489,11 +488,10 @@ m50740_device::m50740_device(const machine_config &mconfig, device_type type, co
 
 /* M50741 - 50740 with a larger internal ROM */
 static ADDRESS_MAP_START( m50741_map, AS_PROGRAM, 8, m50741_device )
-	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
 	AM_RANGE(0x0000, 0x005f) AM_RAM
 	AM_RANGE(0x00e0, 0x00e9) AM_READWRITE(ports_r, ports_w)
 	AM_RANGE(0x00f9, 0x00ff) AM_READWRITE(tmrirq_r, tmrirq_w)
-	AM_RANGE(0x1000, 0x1fff) AM_ROM AM_REGION(":m50741", 0)
+	AM_RANGE(0x1000, 0x1fff) AM_ROM AM_REGION("internal", 0)
 ADDRESS_MAP_END
 
 m50741_device::m50741_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :

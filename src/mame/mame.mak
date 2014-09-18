@@ -1517,6 +1517,7 @@ $(MAMEOBJ)/namco.a: \
 	$(MACHINE)/namco51.o \
 	$(MACHINE)/namco53.o \
 	$(MACHINE)/namco62.o \
+	$(MACHINE)/namcomcu.o \
 	$(AUDIO)/namco52.o \
 	$(AUDIO)/namco54.o \
 	$(VIDEO)/c116.o \
