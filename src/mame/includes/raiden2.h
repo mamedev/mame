@@ -1,5 +1,6 @@
 #include "audio/seibu.h"
 #include "machine/raiden2cop.h"
+#include "video/seibu_crtc.h"
 
 class raiden2_state : public driver_device
 {

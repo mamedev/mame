@@ -162,7 +162,6 @@ Current Problem(s) - in order of priority
 #include "machine/eepromser.h"
 #include "sound/okim6295.h"
 #include "includes/raiden2.h"
-#include "video/seibu_crtc.h"
 
 
 void raiden2_state::machine_start()

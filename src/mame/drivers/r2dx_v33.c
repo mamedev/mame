@@ -66,7 +66,7 @@ WRITE16_MEMBER(r2dx_v33_state::rdx_v33_eeprom_w)
 		m_eeprom->di_write((data & 0x20) >> 5);
 		m_eeprom->cs_write((data & 0x08) ? ASSERT_LINE : CLEAR_LINE);
 
-		if (data&0xc7) logerror("eeprom_w extra bits used %04x\n",data);
+		if (data&0xc7) printf("eeprom_w extra bits used %04x\n",data);
 	}
 	else
 	{
@@ -162,16 +162,16 @@ static ADDRESS_MAP_START( rdx_v33_map, AS_PROGRAM, 16, r2dx_v33_state )
 	AM_RANGE(0x00434, 0x00435) AM_READ(rdx_v33_unknown_r)
 	AM_RANGE(0x00436, 0x00437) AM_READ(rdx_v33_unknown_r)
 
-	AM_RANGE(0x00600, 0x0064f) AM_RAM AM_SHARE("crtc_regs")
-	AM_RANGE(0x00650, 0x0068f) AM_RAM //???
+	AM_RANGE(0x00600, 0x0064f) AM_DEVREADWRITE("crtc", seibu_crtc_device, read, write)
+//	AM_RANGE(0x00650, 0x0068f) AM_RAM //???
 
-	AM_RANGE(0x0068e, 0x0068f) AM_WRITENOP // synch for the MCU?
+//	AM_RANGE(0x0068e, 0x0068f) AM_WRITENOP // synch for the MCU?
 	AM_RANGE(0x006b0, 0x006b1) AM_WRITE(mcu_prog_w)
 	AM_RANGE(0x006b2, 0x006b3) AM_WRITE(mcu_prog_w2)
 //  AM_RANGE(0x006b4, 0x006b5) AM_WRITENOP
 //  AM_RANGE(0x006b6, 0x006b7) AM_WRITENOP
 	AM_RANGE(0x006bc, 0x006bd) AM_WRITE(mcu_prog_offs_w)
-	AM_RANGE(0x006be, 0x006bf) AM_WRITENOP // MCU program related
+//	AM_RANGE(0x006be, 0x006bf) AM_WRITENOP // MCU program related
 
 	// sprite protection not 100% verified as the same
 	AM_RANGE(0x006c0, 0x006c1) AM_READWRITE(sprite_prot_off_r, sprite_prot_off_w)
@@ -486,6 +486,10 @@ static MACHINE_CONFIG_START( rdx_v33, r2dx_v33_state )
 
 	MCFG_VIDEO_START_OVERRIDE(raiden2_state,raiden2)
 
+	MCFG_DEVICE_ADD("crtc", SEIBU_CRTC, 0)
+	MCFG_SEIBU_CRTC_LAYER_EN_CB(WRITE16(raiden2_state, tilemap_enable_w))
+	MCFG_SEIBU_CRTC_LAYER_SCROLL_CB(WRITE16(raiden2_state, tile_scroll_w))
+
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
@@ -516,6 +520,10 @@ static MACHINE_CONFIG_START( nzerotea, r2dx_v33_state )
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	MCFG_VIDEO_START_OVERRIDE(raiden2_state,raiden2)
+
+	MCFG_DEVICE_ADD("crtc", SEIBU_CRTC, 0)
+	MCFG_SEIBU_CRTC_LAYER_EN_CB(WRITE16(raiden2_state, tilemap_enable_w))
+	MCFG_SEIBU_CRTC_LAYER_SCROLL_CB(WRITE16(raiden2_state, tile_scroll_w))
 
 	/* sound hardware */
 //  SEIBU_SOUND_SYSTEM_YM2151_RAIDEN2_INTERFACE(28636360/8,28636360/28,1,2)
