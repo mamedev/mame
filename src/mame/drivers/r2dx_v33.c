@@ -172,16 +172,23 @@ static ADDRESS_MAP_START( rdx_v33_map, AS_PROGRAM, 16, r2dx_v33_state )
 //  AM_RANGE(0x006b6, 0x006b7) AM_WRITENOP
 	AM_RANGE(0x006bc, 0x006bd) AM_WRITE(mcu_prog_offs_w)
 	AM_RANGE(0x006be, 0x006bf) AM_WRITENOP // MCU program related
-	AM_RANGE(0x006d8, 0x006d9) AM_WRITE(mcu_xval_w)
-	AM_RANGE(0x006da, 0x006db) AM_WRITE(mcu_yval_w)
-//  AM_RANGE(0x006dc, 0x006dd) AM_READ(rdx_v33_unknown2_r)
-//  AM_RANGE(0x006de, 0x006df) AM_WRITE(mcu_unkaa_w) // mcu command related?
+
+	// sprite protection not 100% verified as the same
+	AM_RANGE(0x006c0, 0x006c1) AM_READWRITE(sprite_prot_off_r, sprite_prot_off_w)
+	AM_RANGE(0x006c2, 0x006c3) AM_READWRITE(sprite_prot_src_seg_r, sprite_prot_src_seg_w)
+	AM_RANGE(0x006c6, 0x006c7) AM_WRITE(sprite_prot_dst1_w)
+
+	AM_RANGE(0x006d8, 0x006d9) AM_WRITE(sprite_prot_x_w)
+	AM_RANGE(0x006da, 0x006db) AM_WRITE(sprite_prot_y_w)
+	AM_RANGE(0x006dc, 0x006dd) AM_READWRITE(sprite_prot_maxx_r, sprite_prot_maxx_w)
+	AM_RANGE(0x006de, 0x006df) AM_WRITE(sprite_prot_src_w)
+	
 
 	AM_RANGE(0x00700, 0x00701) AM_WRITE(rdx_v33_eeprom_w)
 //  AM_RANGE(0x00740, 0x00741) AM_READ(rdx_v33_unknown2_r)
 	AM_RANGE(0x00744, 0x00745) AM_READ_PORT("INPUT")
 	AM_RANGE(0x0074c, 0x0074d) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x00762, 0x00763) AM_READNOP
+	AM_RANGE(0x00762, 0x00763) AM_READ(sprite_prot_dst1_r)
 
 	AM_RANGE(0x00780, 0x00781) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff) // single OKI chip on this version
 
@@ -198,9 +205,9 @@ static ADDRESS_MAP_START( rdx_v33_map, AS_PROGRAM, 16, r2dx_v33_state )
 	AM_RANGE(0x10000, 0x1efff) AM_RAM
 	AM_RANGE(0x1f000, 0x1ffff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 
-	AM_RANGE(0x20000, 0x2ffff) AM_ROMBANK("bank1")
-	AM_RANGE(0x30000, 0x3ffff) AM_ROMBANK("bank2")
-	AM_RANGE(0x40000, 0xfffff) AM_ROM AM_ROMBANK("bank3")
+	AM_RANGE(0x20000, 0x2ffff) AM_ROM AM_ROMBANK("bank1") AM_WRITENOP
+	AM_RANGE(0x30000, 0x3ffff) AM_ROM AM_ROMBANK("bank2") AM_WRITENOP
+	AM_RANGE(0x40000, 0xfffff) AM_ROM AM_ROMBANK("bank3") AM_WRITENOP
 ADDRESS_MAP_END
 
 READ16_MEMBER(r2dx_v33_state::nzerotea_sound_comms_r)
