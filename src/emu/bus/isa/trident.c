@@ -57,6 +57,10 @@ void trident_vga_device::device_reset()
 	tri.dac_active = false;
 	tri.linear_active = false;
 	tri.mmio_active = false;
+	tri.sr0f = 0x6f;
+	tri.sr0c = 0x78;
+	tri.port_3c3 = true;
+	tri.accel_busy = false;
 }
 
 UINT16 trident_vga_device::offset()
@@ -141,6 +145,7 @@ UINT8 trident_vga_device::trident_seq_reg_read(UINT8 index)
 				res = tri.sr0c & 0xef;
 				if(tri.port_3c3)
 					res |= 0x10;
+				break;
 			case 0x0d:  // Mode Control 2
 				//res = svga.rgb15_en;
 				if(tri.new_mode)
@@ -281,7 +286,6 @@ void trident_vga_device::trident_crtc_reg_write(UINT8 index, UINT8 data)
 			break;
 		case 0x1f:
 			tri.cr1f = data;  // "Software Programming Register"  written to by software (BIOS?)
-			debugger_break(machine());
 			break;
 		case 0x21:  // Linear aperture
 			tri.cr21 = data;
@@ -585,3 +589,362 @@ WRITE8_MEMBER(trident_vga_device::mem_w)
 	vga_device::mem_w(space,offset,data,mem_mask);
 }
 
+// 2D Acceleration functions (very WIP)
+
+// From XFree86 source:
+/*
+Graphics Engine for 9440/9660/9680
+
+#define GER_STATUS	0x2120
+#define		GE_BUSY	0x80
+#define GER_OPERMODE	0x2122		 Byte for 9440, Word for 96xx
+#define		DST_ENABLE	0x200	// Destination Transparency
+#define GER_COMMAND	0x2124
+#define		GE_NOP		0x00	// No Operation
+#define		GE_BLT		0x01	// BitBLT ROP3 only
+#define		GE_BLT_ROP4	0x02	// BitBLT ROP4 (96xx only)
+#define		GE_SCANLINE	0x03	// Scan Line
+#define		GE_BRESLINE	0x04	// Bresenham Line
+#define		GE_SHVECTOR	0x05	// Short Vector
+#define		GE_FASTLINE	0x06	// Fast Line (96xx only)
+#define		GE_TRAPEZ	0x07	// Trapezoidal fill (96xx only)
+#define		GE_ELLIPSE	0x08	// Ellipse (96xx only) (RES)
+#define		GE_ELLIP_FILL	0x09	// Ellipse Fill (96xx only) (RES)
+#define	GER_FMIX	0x2127
+#define GER_DRAWFLAG	0x2128		// long
+#define		FASTMODE	1<<28
+#define		STENCIL		0x8000
+#define		SOLIDFILL	0x4000
+#define		TRANS_ENABLE	0x1000
+#define 	TRANS_REVERSE	0x2000
+#define		YMAJ		0x0400
+#define		XNEG		0x0200
+#define		YNEG		0x0100
+#define		SRCMONO		0x0040
+#define		PATMONO		0x0020
+#define		SCR2SCR		0x0004
+#define		PAT2SCR		0x0002
+#define GER_FCOLOUR	0x212C		// Word for 9440, long for 96xx
+#define GER_BCOLOUR	0x2130		// Word for 9440, long for 96xx
+#define GER_PATLOC	0x2134		// Word
+#define GER_DEST_XY	0x2138
+#define GER_DEST_X	0x2138		// Word
+#define GER_DEST_Y	0x213A		// Word
+#define GER_SRC_XY	0x213C
+#define GER_SRC_X	0x213C		// Word
+#define GER_SRC_Y	0x213E		// Word
+#define GER_DIM_XY	0x2140
+#define GER_DIM_X	0x2140		// Word
+#define GER_DIM_Y	0x2142		// Word
+#define GER_STYLE	0x2144		// Long
+#define GER_CKEY	0x2168		// Long
+#define GER_FPATCOL	0x2178
+#define GER_BPATCOL	0x217C
+#define GER_PATTERN	0x2180		// from 0x2180 to 0x21FF
+
+ Additional - Graphics Engine for 96xx
+#define GER_SRCCLIP_XY	0x2148
+#define GER_SRCCLIP_X	0x2148		// Word
+#define GER_SRCCLIP_Y	0x214A		// Word
+#define GER_DSTCLIP_XY	0x214C
+#define GER_DSTCLIP_X	0x214C		// Word
+#define GER_DSTCLIP_Y	0x214E		// Word
+*/
+
+READ8_MEMBER(trident_vga_device::accel_r)
+{
+	UINT8 res = 0xff;
+
+	if(offset >= 0x60)
+		return tri.accel_pattern[(offset-0x60) % 0x80];
+
+	switch(offset)
+	{
+	case 0x00:  // Status
+		if(tri.accel_busy)
+			res = 0x80;
+		else
+			res = 0x00;
+		break;
+	case 0x02:  // Operation Mode
+		res = tri.accel_opermode & 0x00ff;
+		break;
+	case 0x03:
+		res = (tri.accel_opermode & 0xff00) >> 8;
+		break;
+	case 0x04:  // Command register
+		res = tri.accel_command;
+		break;
+	case 0x07:  // Foreground Mix?
+		res = tri.accel_fmix;
+		break;
+	default:
+		logerror("Trident: unimplemented acceleration register offset %02x read\n",offset);
+	}
+	return res;
+}
+
+WRITE8_MEMBER(trident_vga_device::accel_w)
+{
+	if(offset >= 0x60)
+	{
+		tri.accel_pattern[(offset-0x60) % 0x80] = data;
+		return;
+	}
+
+	switch(offset)
+	{
+	case 0x02:  // Operation Mode
+		tri.accel_opermode = (tri.accel_opermode & 0xff00) | data;
+		logerror("Trident: Operation Mode set to %04x\n",tri.accel_opermode);
+		break;
+	case 0x03:
+		tri.accel_opermode = (tri.accel_opermode & 0x00ff) | (data << 8);
+		logerror("Trident: Operation Mode set to %04x\n",tri.accel_opermode);
+		break;
+	case 0x04:  // Command register
+		tri.accel_command = data;
+		switch(data)
+		{
+		case 0x00:
+			logerror("Trident: Command: NOP\n");
+			break;
+		case 0x01:
+			logerror("Trident: Command: BitBLT ROP3\n");
+			break;
+		case 0x02:
+			logerror("Trident: Command: BitBLT ROP4\n");
+			break;
+		case 0x03:
+			logerror("Trident: Command: Scanline\n");
+			break;
+		case 0x04:
+			logerror("Trident: Command: Bresenham Line\n");
+			break;
+		case 0x05:
+			logerror("Trident: Command: Short Vector\n");
+			break;
+		case 0x06:
+			logerror("Trident: Command: Fast Line\n");
+			break;
+		case 0x07:
+			logerror("Trident: Command: Trapezoid Fill\n");
+			break;
+		case 0x08:
+			logerror("Trident: Command: Ellipse\n");
+			break;
+		case 0x09:
+			logerror("Trident: Command: Ellipse Fill\n");
+			break;
+		default:
+			logerror("Trident: Unknown acceleration command %02x\n",data);
+		}
+		break;
+	case 0x07:  // Foreground Mix?
+		tri.accel_fmix = data;
+		logerror("Trident: FMIX set to %02x\n",data);
+		break;
+	case 0x08:  // Draw flags
+		tri.accel_drawflags = (tri.accel_drawflags & 0xffffff00) | data;
+		logerror("Trident: Draw flags set to %08x\n",tri.accel_drawflags);
+		break;
+	case 0x09:
+		tri.accel_drawflags = (tri.accel_drawflags & 0xffff00ff) | (data << 8);
+		logerror("Trident: Draw flags set to %08x\n",tri.accel_drawflags);
+		break;
+	case 0x0a:
+		tri.accel_drawflags = (tri.accel_drawflags & 0xff00ffff) | (data << 16);
+		logerror("Trident: Draw flags set to %08x\n",tri.accel_drawflags);
+		break;
+	case 0x0b:
+		tri.accel_drawflags = (tri.accel_drawflags & 0x00ffffff) | (data << 24);
+		logerror("Trident: Draw flags set to %08x\n",tri.accel_drawflags);
+		break;
+	case 0x0c:  // Foreground Colour
+		tri.accel_fgcolour = (tri.accel_fgcolour & 0xffffff00) | data;
+		logerror("Trident: Foreground Colour set to %08x\n",tri.accel_fgcolour);
+		break;
+	case 0x0d:
+		tri.accel_fgcolour = (tri.accel_fgcolour & 0xffff00ff) | (data << 8);
+		logerror("Trident: Foreground Colour set to %08x\n",tri.accel_fgcolour);
+		break;
+	case 0x0e:
+		tri.accel_fgcolour = (tri.accel_fgcolour & 0xff00ffff) | (data << 16);
+		logerror("Trident: Foreground Colour set to %08x\n",tri.accel_fgcolour);
+		break;
+	case 0x0f:
+		tri.accel_fgcolour = (tri.accel_fgcolour & 0x00ffffff) | (data << 24);
+		logerror("Trident: Foreground Colour set to %08x\n",tri.accel_fgcolour);
+		break;
+	case 0x10:  // Background Colour
+		tri.accel_bgcolour = (tri.accel_bgcolour & 0xffffff00) | data;
+		logerror("Trident: Background Colour set to %08x\n",tri.accel_bgcolour);
+		break;
+	case 0x11:
+		tri.accel_bgcolour = (tri.accel_bgcolour & 0xffff00ff) | (data << 8);
+		logerror("Trident: Background Colour set to %08x\n",tri.accel_bgcolour);
+		break;
+	case 0x12:
+		tri.accel_bgcolour = (tri.accel_bgcolour & 0xff00ffff) | (data << 16);
+		logerror("Trident: Background Colour set to %08x\n",tri.accel_bgcolour);
+		break;
+	case 0x13:
+		tri.accel_bgcolour = (tri.accel_bgcolour & 0x00ffffff) | (data << 24);
+		logerror("Trident: Background Colour set to %08x\n",tri.accel_bgcolour);
+		break;
+	case 0x14:  // Pattern Location
+		tri.accel_pattern_loc = (tri.accel_pattern_loc & 0xff00) | data;
+		logerror("Trident: Pattern Location set to %04x\n",tri.accel_pattern_loc);
+		break;
+	case 0x15:
+		tri.accel_pattern_loc = (tri.accel_pattern_loc & 0x00ff) | (data << 8);
+		logerror("Trident: Pattern Location set to %04x\n",tri.accel_pattern_loc);
+		break;
+	case 0x18:  // Destination X
+		tri.accel_dest_x = (tri.accel_dest_x & 0xff00) | data;
+		logerror("Trident: Destination X set to %04x\n",tri.accel_dest_x);
+		break;
+	case 0x19:
+		tri.accel_dest_x = (tri.accel_dest_x & 0x00ff) | (data << 8);
+		logerror("Trident: Destination X set to %04x\n",tri.accel_dest_x);
+		break;
+	case 0x1a:  // Destination Y
+		tri.accel_dest_y = (tri.accel_dest_y & 0xff00) | data;
+		logerror("Trident: Destination Y set to %04x\n",tri.accel_dest_y);
+		break;
+	case 0x1b:
+		tri.accel_dest_y = (tri.accel_dest_y & 0x00ff) | (data << 8);
+		logerror("Trident: Destination Y set to %04x\n",tri.accel_dest_y);
+		break;
+	case 0x1c:  // Source X
+		tri.accel_source_x = (tri.accel_source_x & 0xff00) | data;
+		logerror("Trident: Source X set to %04x\n",tri.accel_source_x);
+		break;
+	case 0x1d:
+		tri.accel_source_x = (tri.accel_source_x & 0x00ff) | (data << 8);
+		logerror("Trident: Source X set to %04x\n",tri.accel_source_x);
+		break;
+	case 0x1e:  // Source Y
+		tri.accel_source_y = (tri.accel_source_y & 0xff00) | data;
+		logerror("Trident: Source Y set to %04x\n",tri.accel_source_y);
+		break;
+	case 0x1f:
+		tri.accel_source_y = (tri.accel_source_y & 0x00ff) | (data << 8);
+		logerror("Trident: Source Y set to %04x\n",tri.accel_source_y);
+		break;
+	case 0x20:  // Dimension(?) X
+		tri.accel_dim_x = (tri.accel_dim_x & 0xff00) | data;
+		logerror("Trident: Dimension X set to %04x\n",tri.accel_dim_x);
+		break;
+	case 0x21:
+		tri.accel_dim_x = (tri.accel_dim_x & 0x00ff) | (data << 8);
+		logerror("Trident: Dimension X set to %04x\n",tri.accel_dim_x);
+		break;
+	case 0x22:  // Dimension(?) Y
+		tri.accel_dim_y = (tri.accel_dim_y & 0xff00) | data;
+		logerror("Trident: Dimension y set to %04x\n",tri.accel_dim_y);
+		break;
+	case 0x23:
+		tri.accel_dim_y = (tri.accel_dim_y & 0x00ff) | (data << 8);
+		logerror("Trident: Dimension y set to %04x\n",tri.accel_dim_y);
+		break;
+	case 0x24:  // Style
+		tri.accel_style = (tri.accel_style & 0xffffff00) | data;
+		logerror("Trident: Style set to %08x\n",tri.accel_style);
+		break;
+	case 0x25:
+		tri.accel_style = (tri.accel_style & 0xffff00ff) | (data << 8);
+		logerror("Trident: Style set to %08x\n",tri.accel_style);
+		break;
+	case 0x26:
+		tri.accel_style = (tri.accel_style & 0xff00ffff) | (data << 16);
+		logerror("Trident: Style set to %08x\n",tri.accel_style);
+		break;
+	case 0x27:
+		tri.accel_style = (tri.accel_style & 0x00ffffff) | (data << 24);
+		logerror("Trident: Style set to %08x\n",tri.accel_style);
+		break;
+	case 0x28:  // Source Clip X
+		tri.accel_source_x_clip = (tri.accel_source_x_clip & 0xff00) | data;
+		logerror("Trident: Source X Clip set to %04x\n",tri.accel_source_x_clip);
+		break;
+	case 0x29:
+		tri.accel_source_x_clip = (tri.accel_source_x_clip & 0x00ff) | (data << 8);
+		logerror("Trident: Source X Clip set to %04x\n",tri.accel_source_x_clip);
+		break;
+	case 0x2a:  // Source Clip Y
+		tri.accel_source_y_clip = (tri.accel_source_y_clip & 0xff00) | data;
+		logerror("Trident: Source Y Clip set to %04x\n",tri.accel_source_y_clip);
+		break;
+	case 0x2b:
+		tri.accel_source_y_clip = (tri.accel_source_y_clip & 0x00ff) | (data << 8);
+		logerror("Trident: Source Y Clip set to %04x\n",tri.accel_source_y_clip);
+		break;
+	case 0x2c:  // Destination Clip X
+		tri.accel_dest_x_clip = (tri.accel_dest_x_clip & 0xff00) | data;
+		logerror("Trident: Destination X Clip set to %04x\n",tri.accel_dest_x_clip);
+		break;
+	case 0x2d:
+		tri.accel_dest_x_clip = (tri.accel_dest_x_clip & 0x00ff) | (data << 8);
+		logerror("Trident: Destination X Clip set to %04x\n",tri.accel_dest_x_clip);
+		break;
+	case 0x2e:  // Destination Clip Y
+		tri.accel_dest_y_clip = (tri.accel_dest_y_clip & 0xff00) | data;
+		logerror("Trident: Destination Y Clip set to %04x\n",tri.accel_dest_y_clip);
+		break;
+	case 0x2f:
+		tri.accel_dest_y_clip = (tri.accel_dest_y_clip & 0x00ff) | (data << 8);
+		logerror("Trident: Destination Y Clip set to %04x\n",tri.accel_dest_y_clip);
+		break;
+	case 0x48:  // CKEY (Chromakey?)
+		tri.accel_ckey = (tri.accel_ckey & 0xffffff00) | data;
+		logerror("Trident: CKey set to %08x\n",tri.accel_ckey);
+		break;
+	case 0x49:
+		tri.accel_ckey = (tri.accel_ckey & 0xffff00ff) | (data << 8);
+		logerror("Trident: CKey set to %08x\n",tri.accel_ckey);
+		break;
+	case 0x4a:
+		tri.accel_ckey = (tri.accel_ckey & 0xff00ffff) | (data << 16);
+		logerror("Trident: CKey set to %08x\n",tri.accel_ckey);
+		break;
+	case 0x4b:
+		tri.accel_ckey = (tri.accel_ckey & 0x00ffffff) | (data << 24);
+		logerror("Trident: CKey set to %08x\n",tri.accel_ckey);
+		break;
+	case 0x58:  // Foreground Pattern Colour
+		tri.accel_fg_pattern_colour = (tri.accel_fg_pattern_colour & 0xffffff00) | data;
+		logerror("Trident: FG Pattern Colour set to %08x\n",tri.accel_fg_pattern_colour);
+		break;
+	case 0x59:
+		tri.accel_fg_pattern_colour = (tri.accel_fg_pattern_colour & 0xffff00ff) | (data << 8);
+		logerror("Trident: FG Pattern Colour set to %08x\n",tri.accel_fg_pattern_colour);
+		break;
+	case 0x5a:
+		tri.accel_fg_pattern_colour = (tri.accel_fg_pattern_colour & 0xff00ffff) | (data << 16);
+		logerror("Trident: FG Pattern Colour set to %08x\n",tri.accel_fg_pattern_colour);
+		break;
+	case 0x5b:
+		tri.accel_fg_pattern_colour = (tri.accel_fg_pattern_colour & 0x00ffffff) | (data << 24);
+		logerror("Trident: FG Pattern Colour set to %08x\n",tri.accel_fg_pattern_colour);
+		break;
+	case 0x5c:  // Background Pattern Colour
+		tri.accel_bg_pattern_colour = (tri.accel_bg_pattern_colour & 0xffffff00) | data;
+		logerror("Trident: BG Pattern Colour set to %08x\n",tri.accel_bg_pattern_colour);
+		break;
+	case 0x5d:
+		tri.accel_bg_pattern_colour = (tri.accel_bg_pattern_colour & 0xffff00ff) | (data << 8);
+		logerror("Trident: BG Pattern Colour set to %08x\n",tri.accel_bg_pattern_colour);
+		break;
+	case 0x5e:
+		tri.accel_bg_pattern_colour = (tri.accel_bg_pattern_colour & 0xff00ffff) | (data << 16);
+		logerror("Trident: BG Pattern Colour set to %08x\n",tri.accel_bg_pattern_colour);
+		break;
+	case 0x5f:
+		tri.accel_bg_pattern_colour = (tri.accel_bg_pattern_colour & 0x00ffffff) | (data << 24);
+		logerror("Trident: BG Pattern Colour set to %08x\n",tri.accel_bg_pattern_colour);
+		break;
+	default:
+		logerror("Trident: unimplemented acceleration register offset %02x write %02x\n",offset,data);
+	}
+}

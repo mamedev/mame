@@ -27,6 +27,10 @@ public:
 	virtual READ8_MEMBER(mem_r);
 	virtual WRITE8_MEMBER(mem_w);
 	virtual UINT16 offset();
+
+	DECLARE_READ8_MEMBER(accel_r);
+	DECLARE_WRITE8_MEMBER(accel_w);
+
 protected:
 	virtual void device_start();
 	virtual void device_reset();
@@ -58,6 +62,31 @@ protected:
 		UINT32 linear_address;
 		bool linear_active;
 		bool mmio_active;
+
+		// 2D acceleration
+		UINT16 accel_opermode;
+		UINT8 accel_command;
+		UINT8 accel_fmix;
+		UINT32 accel_drawflags;
+		UINT32 accel_fgcolour;
+		UINT32 accel_bgcolour;
+		UINT16 accel_pattern_loc;
+		UINT16 accel_source_x;
+		UINT16 accel_source_y;
+		UINT16 accel_dest_x;
+		UINT16 accel_dest_y;
+		UINT16 accel_dim_x;
+		UINT16 accel_dim_y;
+		UINT32 accel_style;
+		UINT32 accel_ckey;
+		UINT16 accel_source_x_clip;
+		UINT16 accel_source_y_clip;
+		UINT16 accel_dest_x_clip;
+		UINT16 accel_dest_y_clip;
+		UINT32 accel_fg_pattern_colour;
+		UINT32 accel_bg_pattern_colour;
+		UINT8 accel_pattern[0x80];
+		bool accel_busy;
 	} tri;
 private:
 	UINT8 trident_seq_reg_read(UINT8 index);
