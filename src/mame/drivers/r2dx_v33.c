@@ -33,6 +33,17 @@ public:
 
 	optional_device<eeprom_serial_93cxx_device> m_eeprom;
 
+	DECLARE_WRITE16_MEMBER(r2dx_angle_w);
+	DECLARE_WRITE16_MEMBER(r2dx_dx_w);
+	DECLARE_WRITE16_MEMBER(r2dx_dy_w);
+
+	DECLARE_WRITE16_MEMBER(r2dx_unk1_w);
+	DECLARE_WRITE16_MEMBER(r2dx_unk2_w);
+
+	DECLARE_READ16_MEMBER(rdx_angle_r);
+	DECLARE_READ16_MEMBER(rdx_dist_r);
+	DECLARE_READ16_MEMBER(r2dx_sin_r);
+	DECLARE_READ16_MEMBER(r2dx_cos_r);
 
 	DECLARE_WRITE16_MEMBER(tile_bank_w);
 	DECLARE_WRITE16_MEMBER(rdx_bg_vram_w);
@@ -212,6 +223,55 @@ WRITE16_MEMBER(r2dx_v33_state::r2dx_rom_bank_w)
 
 }
 
+//Olivier Galibert: ok, write angle at 428, get sin/cos results at 434/436
+//Olivier Galibert: 16-bits signed
+//Olivier Galibert: write dx/dy at 424/426, get dist and angle at 432/430 
+
+WRITE16_MEMBER(r2dx_v33_state::r2dx_angle_w)
+{
+
+}
+
+WRITE16_MEMBER(r2dx_v33_state::r2dx_dx_w)
+{
+
+}
+
+WRITE16_MEMBER(r2dx_v33_state::r2dx_dy_w)
+{
+
+}
+
+READ16_MEMBER(r2dx_v33_state::rdx_angle_r)
+{
+	return 0x0000;
+}
+
+READ16_MEMBER(r2dx_v33_state::rdx_dist_r)
+{
+	return 0x0000;
+}
+
+READ16_MEMBER(r2dx_v33_state::r2dx_sin_r)
+{
+	return 0x0000;
+}
+
+READ16_MEMBER(r2dx_v33_state::r2dx_cos_r)
+{
+	return 0x0000;
+}
+
+WRITE16_MEMBER(r2dx_v33_state::r2dx_unk1_w)
+{
+
+}
+
+WRITE16_MEMBER(r2dx_v33_state::r2dx_unk2_w)
+{
+
+}
+
 
 static ADDRESS_MAP_START( rdx_v33_map, AS_PROGRAM, 16, r2dx_v33_state )
 	AM_RANGE(0x00000, 0x003ff) AM_RAM // vectors copied here
@@ -223,25 +283,28 @@ static ADDRESS_MAP_START( rdx_v33_map, AS_PROGRAM, 16, r2dx_v33_state )
 	AM_RANGE(0x00404, 0x00405) AM_WRITE(r2dx_rom_bank_w)
 	AM_RANGE(0x00406, 0x00407) AM_WRITE(tile_bank_w)
 
-//	AM_RANGE(0x00400, 0x00407) AM_WRITE(mcu_table_w)
-	AM_RANGE(0x00420, 0x00429) AM_WRITE(mcu_table2_w)
+	AM_RANGE(0x00420, 0x00421) AM_WRITE(r2dx_unk1_w) // frequent
+	AM_RANGE(0x00422, 0x00423) AM_WRITE(r2dx_unk2_w) // frequent
 
-	/* results from cop? */
-	AM_RANGE(0x00430, 0x00431) AM_READ(rdx_v33_unknown_r)
-	AM_RANGE(0x00432, 0x00433) AM_READ(rdx_v33_unknown_r)
-	AM_RANGE(0x00434, 0x00435) AM_READ(rdx_v33_unknown_r)
-	AM_RANGE(0x00436, 0x00437) AM_READ(rdx_v33_unknown_r)
+	AM_RANGE(0x00424, 0x00425) AM_WRITE(r2dx_dx_w)
+	AM_RANGE(0x00426, 0x00427) AM_WRITE(r2dx_dy_w)
+	AM_RANGE(0x00428, 0x00429) AM_WRITE(r2dx_angle_w)
+
+	AM_RANGE(0x00430, 0x00431) AM_READ(rdx_angle_r)
+	AM_RANGE(0x00432, 0x00433) AM_READ(rdx_dist_r)
+	AM_RANGE(0x00434, 0x00435) AM_READ(r2dx_sin_r)
+	AM_RANGE(0x00436, 0x00437) AM_READ(r2dx_cos_r)
 
 	AM_RANGE(0x00600, 0x0064f) AM_DEVREADWRITE("crtc", seibu_crtc_device, read, write)
 //	AM_RANGE(0x00650, 0x0068f) AM_RAM //???
 
-//	AM_RANGE(0x0068e, 0x0068f) AM_WRITENOP // synch for the MCU?
-//	AM_RANGE(0x006b0, 0x006b1) AM_WRITE(mcu_prog_w)
-//	AM_RANGE(0x006b2, 0x006b3) AM_WRITE(mcu_prog_w2)
+	AM_RANGE(0x0068e, 0x0068f) AM_WRITENOP // maybe a watchdog?
+	AM_RANGE(0x006b0, 0x006b1) AM_WRITE(mcu_prog_w) // could be encryption key uploads just like raiden2.c ?
+	AM_RANGE(0x006b2, 0x006b3) AM_WRITE(mcu_prog_w2)
 //  AM_RANGE(0x006b4, 0x006b5) AM_WRITENOP
 //  AM_RANGE(0x006b6, 0x006b7) AM_WRITENOP
-//	AM_RANGE(0x006bc, 0x006bd) AM_WRITE(mcu_prog_offs_w)
-//	AM_RANGE(0x006be, 0x006bf) AM_WRITENOP // MCU program related
+	AM_RANGE(0x006bc, 0x006bd) AM_WRITE(mcu_prog_offs_w)
+//	AM_RANGE(0x006be, 0x006bf) AM_WRITENOP 
 
 	// sprite protection not 100% verified as the same
 	AM_RANGE(0x006c0, 0x006c1) AM_READWRITE(sprite_prot_off_r, sprite_prot_off_w)
