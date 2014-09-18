@@ -9,13 +9,18 @@ Etched in copper on top of board:
     MADE IN USA
     PAT NO 3793483
 
+
+TODO:
+- discrete sound
+- accurate video timing
+
 ***************************************************************************/
 
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
 
-#define MASTER_CLOCK ( XTAL_12_096MHz )
-
+#define MASTER_CLOCK    XTAL_12_096MHz
+#define PIXEL_CLOCK     (MASTER_CLOCK / 2)
 
 
 class flyball_state : public driver_device
@@ -23,7 +28,8 @@ class flyball_state : public driver_device
 public:
 	enum
 	{
-		TIMER_FLYBALL_JOYSTICK,
+		TIMER_FLYBALL_POT_ASSERT,
+		TIMER_FLYBALL_POT_CLEAR,
 		TIMER_FLYBALL_QUARTER
 	};
 
@@ -105,9 +111,7 @@ TILE_GET_INFO_MEMBER(flyball_state::flyball_get_tile_info)
 	int code = data & 63;
 
 	if ((flags & TILE_FLIPX) && (flags & TILE_FLIPY))
-	{
 		code += 64;
-	}
 
 	SET_TILE_INFO_MEMBER(0, code, 0, flags);
 }
@@ -127,9 +131,6 @@ UINT32 flyball_state::screen_update_flyball(screen_device &screen, bitmap_ind16 
 	int ballx = m_ball_horz - 1;
 	int bally = m_ball_vert - 17;
 
-	int x;
-	int y;
-
 	m_tmap->mark_all_dirty();
 
 	/* draw playfield */
@@ -139,11 +140,11 @@ UINT32 flyball_state::screen_update_flyball(screen_device &screen, bitmap_ind16 
 	m_gfxdecode->gfx(1)->transpen(bitmap,cliprect, m_pitcher_pic ^ 0xf, 0, 1, 0, pitcherx, pitchery, 1);
 
 	/* draw ball */
-
-	for (y = bally; y < bally + 2; y++)
-		for (x = ballx; x < ballx + 2; x++)
+	for (int y = bally; y < bally + 2; y++)
+		for (int x = ballx; x < ballx + 2; x++)
 			if (cliprect.contains(x, y))
 				bitmap.pix16(y, x) = 1;
+
 	return 0;
 }
 
@@ -152,12 +153,16 @@ void flyball_state::device_timer(emu_timer &timer, device_timer_id id, int param
 {
 	switch (id)
 	{
-	case TIMER_FLYBALL_JOYSTICK:
+	case TIMER_FLYBALL_POT_ASSERT:
 		flyball_joystick_callback(ptr, param);
+		break;
+	case TIMER_FLYBALL_POT_CLEAR:
+		m_maincpu->set_input_line(0, CLEAR_LINE);
 		break;
 	case TIMER_FLYBALL_QUARTER:
 		flyball_quarter_callback(ptr, param);
 		break;
+
 	default:
 		assert_always(FALSE, "Unknown id in flyball_state::device_timer");
 	}
@@ -169,7 +174,11 @@ TIMER_CALLBACK_MEMBER(flyball_state::flyball_joystick_callback)
 	int potsense = param;
 
 	if (potsense & ~m_potmask)
-		generic_pulse_irq_line(*m_maincpu, 0, 1);
+	{
+		// pot irq is active at hsync
+		m_maincpu->set_input_line(0, ASSERT_LINE);
+		timer_set(attotime::from_ticks(32, PIXEL_CLOCK), TIMER_FLYBALL_POT_CLEAR, 0);
+	}
 
 	m_potsense |= potsense;
 }
@@ -189,7 +198,7 @@ TIMER_CALLBACK_MEMBER(flyball_state::flyball_quarter_callback)
 
 	for (i = 0; i < 64; i++)
 		if (potsense[i] != 0)
-			timer_set(m_screen->time_until_pos(scanline + i), TIMER_FLYBALL_JOYSTICK, potsense[i]);
+			timer_set(m_screen->time_until_pos(scanline + i), TIMER_FLYBALL_POT_ASSERT, potsense[i]);
 
 	scanline += 0x40;
 	scanline &= 0xff;
@@ -418,12 +427,10 @@ void flyball_state::machine_start()
 
 void flyball_state::machine_reset()
 {
-	int i;
-
 	/* address bits 0 through 8 are inverted */
 	UINT8* ROM = memregion("maincpu")->base() + 0x2000;
 
-	for (i = 0; i < 0x1000; i++)
+	for (int i = 0; i < 0x1000; i++)
 		m_rombase[i] = ROM[i ^ 0x1ff];
 
 	m_maincpu->reset();
@@ -445,8 +452,7 @@ static MACHINE_CONFIG_START( flyball, flyball_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, MASTER_CLOCK/16)
 	MCFG_CPU_PROGRAM_MAP(flyball_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", flyball_state,  nmi_line_pulse)
-
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", flyball_state, nmi_line_pulse)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
