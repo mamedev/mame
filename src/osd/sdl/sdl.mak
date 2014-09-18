@@ -86,6 +86,8 @@ SDL_FRAMEWORK_PATH = /Library/Frameworks/
 OSDSRC = $(SRC)/osd
 OSDOBJ = $(OBJ)/osd
 
+INCPATH += -I$(LIBSRC)/bgfx/include
+
 ifndef NO_USE_QTDEBUG
 OBJDIRS += $(OSDOBJ)/modules/debugger/qt
 endif
@@ -421,6 +423,7 @@ endif
 
 ifeq ($(SDL_LIBVER),sdl2)
 OSDOBJS += $(SDLOBJ)/draw13.o
+OSDOBJS += $(SDLOBJ)/drawbgfx.o
 endif
 
 # add an ARCH define

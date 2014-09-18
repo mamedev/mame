@@ -9564,6 +9564,7 @@ src/osd/sdl/SDLMain_tmpl.m svneol=native#text/plain
 src/osd/sdl/blit13.h svneol=native#text/plain
 src/osd/sdl/build.mak svneol=native#text/plain
 src/osd/sdl/draw13.c svneol=native#text/plain
+src/osd/sdl/drawbgfx.c svneol=native#text/plain
 src/osd/sdl/drawogl.c svneol=native#text/plain
 src/osd/sdl/drawsdl.c svneol=native#text/plain
 src/osd/sdl/gl_shader_mgr.c svneol=native#text/plain
