@@ -21,33 +21,16 @@ Then it puts settings at 0x9e08 and 0x9e0a (bp 91acb)
 #include "includes/raiden2.h"
 
 
-class r2dx_v33_state : public driver_device
+class r2dx_v33_state : public raiden2_state
 {
 public:
 	r2dx_v33_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_spriteram(*this, "spriteram"),
-		m_bg_vram(*this, "bg_vram"),
-		m_md_vram(*this, "md_vram"),
-		m_fg_vram(*this, "fg_vram"),
-		m_tx_vram(*this, "tx_vram"),
-		m_maincpu(*this, "maincpu"),
-		m_seibu_sound(*this, "seibu_sound"),
-		m_eeprom(*this, "eeprom"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") { }
+		: raiden2_state(mconfig, type, tag),
+		m_eeprom(*this, "eeprom")
+	{ }
 
-	required_shared_ptr<UINT16> m_spriteram;
-	required_shared_ptr<UINT16> m_bg_vram;
-	required_shared_ptr<UINT16> m_md_vram;
-	required_shared_ptr<UINT16> m_fg_vram;
-	required_shared_ptr<UINT16> m_tx_vram;
-
-	required_device<cpu_device> m_maincpu;
-	optional_device<seibu_sound_device> m_seibu_sound;
 	optional_device<eeprom_serial_93cxx_device> m_eeprom;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
+
 
 	DECLARE_WRITE16_MEMBER(rdx_bg_vram_w);
 	DECLARE_WRITE16_MEMBER(rdx_md_vram_w);
@@ -67,212 +50,13 @@ public:
 	DECLARE_DRIVER_INIT(rdx_v33);
 	DECLARE_DRIVER_INIT(nzerotea);
 	DECLARE_DRIVER_INIT(zerotm2k);
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	TILE_GET_INFO_MEMBER(get_md_tile_info);
-	TILE_GET_INFO_MEMBER(get_fg_tile_info);
-	TILE_GET_INFO_MEMBER(get_tx_tile_info);
 
-	tilemap_t *m_bg_tilemap;
-	tilemap_t *m_md_tilemap;
-	tilemap_t *m_fg_tilemap;
-	tilemap_t *m_tx_tilemap;
-	virtual void video_start();
+
 	UINT32 screen_update_rdx_v33(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(rdx_v33_interrupt);
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect,int pri);
 };
 
-
-TILE_GET_INFO_MEMBER(r2dx_v33_state::get_bg_tile_info)
-{
-	int tile = m_bg_vram[tile_index];
-	int color = (tile>>12)&0xf;
-
-	tile &= 0xfff;
-
-	SET_TILE_INFO_MEMBER(1,tile + 0x0000,color,0);
-}
-
-TILE_GET_INFO_MEMBER(r2dx_v33_state::get_md_tile_info)
-{
-	int tile = m_md_vram[tile_index];
-	int color = (tile>>12)&0xf;
-
-	tile &= 0xfff;
-
-	SET_TILE_INFO_MEMBER(2,tile + 0x2000,color,0);
-}
-
-TILE_GET_INFO_MEMBER(r2dx_v33_state::get_fg_tile_info)
-{
-	int tile = m_fg_vram[tile_index];
-	int color = (tile>>12)&0xf;
-
-	tile &= 0xfff;
-
-	SET_TILE_INFO_MEMBER(3,tile + 0x1000,color,0);
-}
-
-TILE_GET_INFO_MEMBER(r2dx_v33_state::get_tx_tile_info)
-{
-	int tile = m_tx_vram[tile_index];
-	int color = (tile>>12)&0xf;
-
-	tile &= 0xfff;
-
-	SET_TILE_INFO_MEMBER(4,tile,color,0);
-}
-
-/* copied from Legionnaire */
-void r2dx_v33_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect,int pri)
-{
-	UINT16 *spriteram16 = m_spriteram;
-	int offs,fx,fy,x,y,color,sprite;
-//  int cur_pri;
-	int dx,dy,ax,ay;
-
-	for (offs = 0x400-4;offs >= 0;offs -= 4)
-	{
-		UINT16 data = spriteram16[offs];
-		//if (!(data &0x8000)) continue;
-
-		//cur_pri = (spriteram16[offs+1] & 0xc000) >> 14;
-		//if (cur_pri!=pri) continue;
-
-		sprite = spriteram16[offs+1];
-
-		//sprite &= 0x7fff;
-		//if(data & 0x8000) sprite |= 0x4000;
-		//if(spriteram16[offs+3] & 0x8000) sprite |= 0x8000;//tile banking?,used in Denjin Makai
-
-		y = spriteram16[offs+3];
-		x = spriteram16[offs+2];
-
-		x&=0xfff;
-		y&=0xfff;
-
-		if (x&0x8000) x-=0x10000;
-		if (y&0x8000) y-=0x10000;
-
-		color = (data &0x3f);
-		fx =  (data &0x8000) >> 15;
-		fy =  (data &0x0800) >> 11;
-		dx = ((data &0x0700) >> 8)  + 1;
-		dy = ((data &0x7000) >> 12) + 1;
-
-		if (!fx)
-		{
-			if(!fy)
-			{
-				for (ax=0; ax<dx; ax++)
-					for (ay=0; ay<dy; ay++)
-					{
-						m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
-						sprite++,
-						color,fx,fy,x+ax*16,y+ay*16,15);
-					}
-			}
-			else
-			{
-				for (ax=0; ax<dx; ax++)
-					for (ay=0; ay<dy; ay++)
-					{
-						m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
-						sprite++,
-						color,fx,fy,x+ax*16,y+(dy-ay-1)*16,15);
-					}
-			}
-		}
-		else
-		{
-			if(!fy)
-			{
-				for (ax=0; ax<dx; ax++)
-					for (ay=0; ay<dy; ay++)
-					{
-						m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
-						sprite++,
-						color,fx,fy,x+(dx-ax-1)*16,y+ay*16,15);
-					}
-			}
-			else
-			{
-				for (ax=0; ax<dx; ax++)
-					for (ay=0; ay<dy; ay++)
-					{
-						m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
-						sprite++,
-						color,fx,fy,x+(dx-ax-1)*16,y+(dy-ay-1)*16,15);
-					}
-			}
-		}
-	}
-}
-
-void r2dx_v33_state::video_start()
-{
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(r2dx_v33_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS,16,16,32,32);
-	m_md_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(r2dx_v33_state::get_md_tile_info),this), TILEMAP_SCAN_ROWS,16,16,32,32);
-	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(r2dx_v33_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS,16,16,32,32);
-	m_tx_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(r2dx_v33_state::get_tx_tile_info),this), TILEMAP_SCAN_ROWS,8, 8, 64,32);
-
-	m_bg_tilemap->set_transparent_pen(15);
-	m_md_tilemap->set_transparent_pen(15);
-	m_fg_tilemap->set_transparent_pen(15);
-	m_tx_tilemap->set_transparent_pen(15);
-}
-
-UINT32 r2dx_v33_state::screen_update_rdx_v33(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	bitmap.fill(m_palette->black_pen(), cliprect);
-
-	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-	m_md_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-
-	draw_sprites(bitmap,cliprect,0);
-
-	m_tx_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-
-	/* debug DMA processing */
-	if(0)
-	{
-		static UINT32 src_addr = 0x100000;
-		static int frame;
-		address_space &space = m_maincpu->space(AS_PROGRAM);
-
-		//if(machine().input().code_pressed_once(KEYCODE_A))
-		//  src_addr+=0x800;
-
-		//if(machine().input().code_pressed_once(KEYCODE_S))
-		//  src_addr-=0x800;
-
-		frame++;
-
-		popmessage("%08x 0",src_addr);
-
-		//if(machine().input().code_pressed_once(KEYCODE_Z))
-		if(frame == 5)
-		{
-			int i,data;
-			static UINT8 *rom = memregion("mainprg")->base();
-
-			for(i=0;i<0x800;i+=2)
-			{
-				data = rom[src_addr+i+0];
-				space.write_byte(i+0xd000+0, data);
-				data = rom[src_addr+i+1];
-				space.write_byte(i+0xd000+1, data);
-			}
-
-			popmessage("%08x 1",src_addr);
-			m_bg_tilemap->mark_all_dirty();
-			frame = 0;
-			src_addr+=0x800;
-		}
-	}
-	return 0;
-}
 
 WRITE16_MEMBER(r2dx_v33_state::rdx_v33_eeprom_w)
 {
@@ -325,30 +109,6 @@ WRITE16_MEMBER(r2dx_v33_state::mcu_prog_w2)
 WRITE16_MEMBER(r2dx_v33_state::mcu_prog_offs_w)
 {
 	mcu_prog_offs = data;
-}
-
-WRITE16_MEMBER(r2dx_v33_state::rdx_bg_vram_w)
-{
-	COMBINE_DATA(&m_bg_vram[offset]);
-	m_bg_tilemap->mark_tile_dirty(offset);
-}
-
-WRITE16_MEMBER(r2dx_v33_state::rdx_md_vram_w)
-{
-	COMBINE_DATA(&m_md_vram[offset]);
-	m_md_tilemap->mark_tile_dirty(offset);
-}
-
-WRITE16_MEMBER(r2dx_v33_state::rdx_fg_vram_w)
-{
-	COMBINE_DATA(&m_fg_vram[offset]);
-	m_fg_tilemap->mark_tile_dirty(offset);
-}
-
-WRITE16_MEMBER(r2dx_v33_state::rdx_tx_vram_w)
-{
-	COMBINE_DATA(&m_tx_vram[offset]);
-	m_tx_tilemap->mark_tile_dirty(offset);
 }
 
 READ16_MEMBER(r2dx_v33_state::rdx_v33_unknown_r)
@@ -428,12 +188,12 @@ static ADDRESS_MAP_START( rdx_v33_map, AS_PROGRAM, 16, r2dx_v33_state )
 	AM_RANGE(0x00800, 0x00fff) AM_RAM // copies eeprom here?
 	AM_RANGE(0x01000, 0x0bfff) AM_RAM
 
-	AM_RANGE(0x0c000, 0x0c7ff) AM_RAM AM_SHARE("spriteram")
+	AM_RANGE(0x0c000, 0x0c7ff) AM_RAM AM_SHARE("sprites")
 	AM_RANGE(0x0c800, 0x0cfff) AM_RAM
-	AM_RANGE(0x0d000, 0x0d7ff) AM_RAM_WRITE(rdx_bg_vram_w) AM_SHARE("bg_vram")
-	AM_RANGE(0x0d800, 0x0dfff) AM_RAM_WRITE(rdx_md_vram_w) AM_SHARE("md_vram")
-	AM_RANGE(0x0e000, 0x0e7ff) AM_RAM_WRITE(rdx_fg_vram_w) AM_SHARE("fg_vram")
-	AM_RANGE(0x0e800, 0x0f7ff) AM_RAM_WRITE(rdx_tx_vram_w) AM_SHARE("tx_vram")
+	AM_RANGE(0x0d000, 0x0d7ff) AM_RAM_WRITE(raiden2_background_w) AM_SHARE("back_data")
+	AM_RANGE(0x0d800, 0x0dfff) AM_RAM_WRITE(raiden2_foreground_w) AM_SHARE("fore_data")
+	AM_RANGE(0x0e000, 0x0e7ff) AM_RAM_WRITE(raiden2_midground_w)  AM_SHARE("mid_data")
+	AM_RANGE(0x0e800, 0x0f7ff) AM_RAM_WRITE(raiden2_text_w) AM_SHARE("text_data")
 	AM_RANGE(0x0f800, 0x0ffff) AM_RAM /* Stack area */
 	AM_RANGE(0x10000, 0x1efff) AM_RAM
 	AM_RANGE(0x1f000, 0x1ffff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
@@ -502,12 +262,12 @@ static ADDRESS_MAP_START( nzerotea_map, AS_PROGRAM, 16, r2dx_v33_state )
 	AM_RANGE(0x00800, 0x00fff) AM_RAM
 	AM_RANGE(0x01000, 0x0bfff) AM_RAM
 
-	AM_RANGE(0x0c000, 0x0c7ff) AM_RAM AM_SHARE("spriteram")
+	AM_RANGE(0x0c000, 0x0c7ff) AM_RAM AM_SHARE("sprites")
 	AM_RANGE(0x0c800, 0x0cfff) AM_RAM
-	AM_RANGE(0x0d000, 0x0d7ff) AM_RAM_WRITE(rdx_bg_vram_w) AM_SHARE("bg_vram")
-	AM_RANGE(0x0d800, 0x0dfff) AM_RAM_WRITE(rdx_md_vram_w) AM_SHARE("md_vram")
-	AM_RANGE(0x0e000, 0x0e7ff) AM_RAM_WRITE(rdx_fg_vram_w) AM_SHARE("fg_vram")
-	AM_RANGE(0x0e800, 0x0f7ff) AM_RAM_WRITE(rdx_tx_vram_w) AM_SHARE("tx_vram")
+	AM_RANGE(0x0d000, 0x0d7ff) AM_RAM_WRITE(raiden2_background_w) AM_SHARE("back_data")
+	AM_RANGE(0x0d800, 0x0dfff) AM_RAM_WRITE(raiden2_foreground_w) AM_SHARE("fore_data")
+	AM_RANGE(0x0e000, 0x0e7ff) AM_RAM_WRITE(raiden2_midground_w)  AM_SHARE("mid_data")
+	AM_RANGE(0x0e800, 0x0f7ff) AM_RAM_WRITE(raiden2_text_w) AM_SHARE("text_data")
 	AM_RANGE(0x0f800, 0x0ffff) AM_RAM /* Stack area */
 	AM_RANGE(0x10000, 0x1efff) AM_RAM
 	AM_RANGE(0x1f000, 0x1ffff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
@@ -561,11 +321,11 @@ static const gfx_layout rdx_v33_spritelayout =
 };
 
 static GFXDECODE_START( rdx_v33 )
-	GFXDECODE_ENTRY( "gfx3", 0x00000, rdx_v33_spritelayout, 0x000, 0x40 )
-	GFXDECODE_ENTRY( "gfx2", 0x00000, rdx_v33_tilelayout,   0x400, 0x10 )
+	GFXDECODE_ENTRY( "gfx1", 0x00000, rdx_v33_charlayout,   0x700, 128 )
+	GFXDECODE_ENTRY( "gfx2", 0x00000, rdx_v33_tilelayout,   0x400, 128 )
+	GFXDECODE_ENTRY( "gfx3", 0x00000, rdx_v33_spritelayout, 0x000, 4096 )
 	GFXDECODE_ENTRY( "gfx2", 0x00000, rdx_v33_tilelayout,   0x500, 0x10 )
 	GFXDECODE_ENTRY( "gfx2", 0x00000, rdx_v33_tilelayout,   0x600, 0x10 )
-	GFXDECODE_ENTRY( "gfx1", 0x00000, rdx_v33_charlayout,   0x700, 0x10 )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, rdx_v33_tilelayout,   0x700, 0x10 ) // debugging, to be removed
 GFXDECODE_END
 
@@ -705,18 +465,19 @@ static MACHINE_CONFIG_START( rdx_v33, r2dx_v33_state )
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
-	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(64*8, 64*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(r2dx_v33_state, screen_update_rdx_v33)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
+	MCFG_SCREEN_REFRESH_RATE(55.47)    /* verified on pcb */
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(500) /* not accurate */)
+	MCFG_SCREEN_SIZE(44*8, 34*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0, 30*8-1)
+	MCFG_SCREEN_UPDATE_DRIVER(raiden2_state, screen_update_raiden2)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", rdx_v33)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+
+	MCFG_VIDEO_START_OVERRIDE(raiden2_state,raiden2)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -735,19 +496,19 @@ static MACHINE_CONFIG_START( nzerotea, r2dx_v33_state )
 	//  SEIBU2_RAIDEN2_SOUND_SYSTEM_CPU(14318180/4)
 	SEIBU_NEWZEROTEAM_SOUND_SYSTEM_CPU(14318180/4)
 
-	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
 	MCFG_SCREEN_REFRESH_RATE(55.47)    /* verified on pcb */
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate *//2)
-	MCFG_SCREEN_SIZE(64*8, 64*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(r2dx_v33_state, screen_update_rdx_v33)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(500) /* not accurate */)
+	MCFG_SCREEN_SIZE(44*8, 34*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0, 30*8-1)
+	MCFG_SCREEN_UPDATE_DRIVER(raiden2_state, screen_update_raiden2)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", rdx_v33)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+
+	MCFG_VIDEO_START_OVERRIDE(raiden2_state,raiden2)
 
 	/* sound hardware */
 //  SEIBU_SOUND_SYSTEM_YM2151_RAIDEN2_INTERFACE(28636360/8,28636360/28,1,2)
@@ -758,6 +519,10 @@ MACHINE_CONFIG_END
 
 DRIVER_INIT_MEMBER(r2dx_v33_state,rdx_v33)
 {
+	init_blending(raiden_blended_colors);
+	static const int spri[5] = { 0, 1, 2, 3, -1 };
+	cur_spri = spri;
+
 	membank("bank1")->configure_entries(0, 0x40, memregion("mainprg")->base(), 0x10000);
 	membank("bank2")->configure_entries(0, 0x40, memregion("mainprg")->base(), 0x10000);
 
@@ -782,6 +547,10 @@ DRIVER_INIT_MEMBER(r2dx_v33_state,rdx_v33)
 
 DRIVER_INIT_MEMBER(r2dx_v33_state,nzerotea)
 {
+	init_blending(raiden_blended_colors);
+	static const int spri[5] = { 0, 1, 2, 3, -1 };
+	cur_spri = spri;
+
 	membank("bank1")->configure_entries(0, 2, memregion("mainprg")->base(), 0x20000);
 
 	zeroteam_decrypt_sprites(machine());
@@ -791,6 +560,10 @@ DRIVER_INIT_MEMBER(r2dx_v33_state,nzerotea)
 
 DRIVER_INIT_MEMBER(r2dx_v33_state,zerotm2k)
 {
+	init_blending(raiden_blended_colors);
+	static const int spri[5] = { 0, 1, 2, 3, -1 };
+	cur_spri = spri;
+
 	membank("bank1")->configure_entries(0, 2, memregion("mainprg")->base(), 0x20000);
 
 	// sprites are NOT encrypted
@@ -879,7 +652,7 @@ ROM_START( r2dx_v33 )
 	ROM_REGION( 0x400000, "gfx2", 0 ) /* background gfx */
 	ROM_LOAD( "bg.612", 0x000000, 0x400000, CRC(162c61e9) SHA1(bd0a6a29804b84196ba6bf3402e9f30a25da9269) )
 
-	ROM_REGION( 0x800000, "gfx3", 0 ) /* sprite gfx (encrypted) */
+	ROM_REGION( 0x800000, "gfx3", 0 ) /* sprite gfx (encrypted) */ // roughly 1/4 of the rom does not decrypt properly with the R2 keys?
 	ROM_LOAD32_WORD( "obj1.724", 0x000000, 0x400000, CRC(7d218985) SHA1(777241a533defcbea3d7e735f309478d260bad52) )
 	ROM_LOAD32_WORD( "obj2.725", 0x000002, 0x400000, CRC(b09434d9) SHA1(da75252b7693ab791fece4c10b8a4910edb76c88) )
 
@@ -949,7 +722,7 @@ ROM_START( zerotm2k ) /* V33 SYSTEM TYPE_C VER2 hardware, uses SEI333 (AKA COPX-
 	ROM_LOAD( "mt28f400b1.u0619", 0x100000, 0x080000, CRC(266acee6) SHA1(2a9da66c313a7536c7fb393134b9df0bb122cb2b) ) /* SMT rom, PCB silkscreened BG3 */
 	/* PCB has an unpopulated socket rom space for a LH535A00D at u0615 for alt BG3 location */
 
-	ROM_REGION( 0x800000, "gfx3", 0 ) /* sprite gfx (encrypted) */
+	ROM_REGION( 0x800000, "gfx3", 0 ) /* sprite gfx (NOT encrypted) */
 	ROM_LOAD32_WORD( "musha_obj-1a.u0729", 0x000000, 0x200000, CRC(9b2cf68c) SHA1(cd8cb277091bfa125fd0f68410de39f72f1c7047) ) /* PCB silkscreened OBJ1 */
 	ROM_LOAD32_WORD( "musha_obj-2a.u0730", 0x000002, 0x200000, CRC(fcabee05) SHA1(b2220c0311b3bd2fd44fb56fff7c27bed0816fe9) ) /* PCB silkscreened OBJ2 */
 	/* PCB has unpopulated rom space for two SMT roms at u0734 & u0736 for alt OBJ1 & OBJ2 locations) */

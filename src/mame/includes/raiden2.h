@@ -69,7 +69,7 @@ public:
 	UINT16 *back_data, *fore_data, *mid_data, *text_data; // private buffers, allocated in init
 	required_shared_ptr<UINT16> sprites;
 	required_device<cpu_device> m_maincpu;
-	required_device<seibu_sound_device> m_seibu_sound;
+	optional_device<seibu_sound_device> m_seibu_sound;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
@@ -231,7 +231,7 @@ public:
 	void init_blending(const UINT16 *table);
 
 	bitmap_ind16 tile_buffer, sprite_buffer;
-	required_device<raiden2cop_device> m_raiden2cop;
+	optional_device<raiden2cop_device> m_raiden2cop;
 
 protected:
 	virtual void machine_start();
