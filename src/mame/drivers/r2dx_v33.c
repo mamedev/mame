@@ -72,8 +72,24 @@ WRITE16_MEMBER(r2dx_v33_state::rdx_v33_eeprom_w)
 		// 0x80 - coin counter 2?
 
 		// 0x04 is active in Raiden DX mode, it could be part of the rom bank (which half of the rom to use) or the FG tile bank (or both?)
+		// the bit gets set if it reads RAIDENDX from the EEPROM
 		tx_bank = (data & 0x04) >> 2;
 		text_layer->mark_all_dirty();
+
+		if (data & 4) // todo: almost certainly wrong
+		{
+			// sensible defaults if booting as RDX
+			membank("bank1")->set_entry(0x20+16);
+			membank("bank2")->set_entry(0x20+3);
+			membank("bank3")->set_entry(1);
+		}
+		else
+		{
+			membank("bank1")->set_entry(2);
+			membank("bank2")->set_entry(3);
+			membank("bank3")->set_entry(0);
+		}
+
 
 		if (data&0x07) printf("eeprom_w extra bits used %04x\n",data & 7);
 	}
@@ -153,6 +169,8 @@ WRITE16_MEMBER(r2dx_v33_state::mcu_table_w)
 
 WRITE16_MEMBER(r2dx_v33_state::mcu_table2_w)
 {
+//	printf("mcu_table2_w %04x %04x\n", data, mem_mask);
+
 	mcu_data[offset+4] = data;
 
 	//popmessage("%04x %04x %04x %04x | %04x %04x %04x %04x",mcu_data[0/2],mcu_data[2/2],mcu_data[4/2],mcu_data[6/2],mcu_data[8/2],mcu_data[0xa/2],mcu_data[0xc/2],mcu_data[0xe/2]);
@@ -163,7 +181,7 @@ static ADDRESS_MAP_START( rdx_v33_map, AS_PROGRAM, 16, r2dx_v33_state )
 	AM_RANGE(0x00000, 0x003ff) AM_RAM // vectors copied here
 
 //	AM_RANGE(0x00400, 0x00407) AM_WRITE(mcu_table_w)
-//	AM_RANGE(0x00420, 0x00429) AM_WRITE(mcu_table2_w)
+	AM_RANGE(0x00420, 0x00429) AM_WRITE(mcu_table2_w)
 
 	/* results from cop? */
 	AM_RANGE(0x00430, 0x00431) AM_READ(rdx_v33_unknown_r)
@@ -575,14 +593,14 @@ DRIVER_INIT_MEMBER(r2dx_v33_state,rdx_v33)
 	raiden2_decrypt_sprites(machine());
 
 //  sensible defaults if booting as R2
-//	membank("bank1")->set_entry(2);
-//	membank("bank2")->set_entry(3);
-//	membank("bank3")->set_entry(0);
+	membank("bank1")->set_entry(2);
+	membank("bank2")->set_entry(3);
+	membank("bank3")->set_entry(0);
 
-//  sensible defaults if booting as RDX
-	membank("bank1")->set_entry(0x20+16);
-	membank("bank2")->set_entry(0x20+3);
-	membank("bank3")->set_entry(1);
+//  sensible defaults if booting as RDX - we set now set this later..
+//	membank("bank1")->set_entry(0x20+16);
+//	membank("bank2")->set_entry(0x20+3);
+//	membank("bank3")->set_entry(1);
 
 
 }
@@ -643,7 +661,7 @@ DIPs  : 8 position (x1)
         8   OFF = Normal Screen, ON = FLIP Screen
 
 OTHER : Controls are 8-way + 3 Buttons
-        Amtel 93C46 EEPROM (SOIC8)
+        Atmel 93C46 EEPROM (SOIC8)
         PALCE16V8 (x1, near BG ROM, SOIC20)
         SEIBU SEI360 SB06-1937   (160 pin PQFP)
         SEIBI SIE150             (100 pin PQFP, Note SIE, not a typo)
@@ -698,6 +716,49 @@ ROM_START( r2dx_v33 )
 	ROM_LOAD32_WORD( "obj1.724", 0x000000, 0x400000, CRC(7d218985) SHA1(777241a533defcbea3d7e735f309478d260bad52) )
 	ROM_LOAD32_WORD( "obj2.725", 0x000002, 0x400000, CRC(b09434d9) SHA1(da75252b7693ab791fece4c10b8a4910edb76c88) )
 
+	// temp, load these for now, they decrypt 100%
+	ROM_LOAD32_WORD( "obj1",        0x000000, 0x200000, CRC(ff08ef0b) SHA1(a1858430e8171ca8bab785457ef60e151b5e5cf1) ) /* Shared with original Raiden 2 */
+	ROM_LOAD32_WORD( "obj2",        0x000002, 0x200000, CRC(638eb771) SHA1(9774cc070e71668d7d1d20795502dccd21ca557b) ) /* Shared with original Raiden 2 */
+	ROM_LOAD32_WORD( "dx_obj3.4k",  0x400000, 0x200000, CRC(ba381227) SHA1(dfc4d659aca1722a981fa56a31afabe66f444d5d) )
+	ROM_LOAD32_WORD( "dx_obj4.6k",  0x400002, 0x200000, CRC(65e50d19) SHA1(c46147b4132abce7314b46bf419ce4773e024b05) )
+
+
+	ROM_REGION( 0x100000, "oki", 0 ) /* ADPCM samples */
+	ROM_LOAD( "pcm.099", 0x00000, 0x100000, CRC(97ca2907) SHA1(bfe8189300cf72089d0beaeab8b1a0a1a4f0a5b6) )
+
+	ROM_REGION( 0x40000, "user2", 0 ) /* SEI333 (AKA COPX-D3) data */
+	ROM_LOAD( "copx_d3.357", 0x00000, 0x20000, CRC(fa2cf3ad) SHA1(13eee40704d3333874b6e3da9ee7d969c6dc662a) )
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
+	ROM_LOAD16_WORD( "raidendx_eeprom-r2dx_v33.bin", 0x0000, 0x0080, CRC(0b34c0ca) SHA1(20612d5a1d819d3997ea47e8de7a194ec61b537d) ) // for booting as Raiden DX
+ROM_END
+
+ROM_START( r2dx_v33_r2 )
+	ROM_REGION( 0x400000, "mainprg", 0 ) /* v33 main cpu */
+	ROM_LOAD("prg.223", 0x000000, 0x400000, CRC(b3dbcf98) SHA1(30d6ec2090531c8c579dff74c4898889902d7d87) )
+
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF ) /* v33 main cpu */
+
+//  ROM_REGION( 0x20000, "cpu1", ROMREGION_ERASE00 ) /* 64k code for sound Z80 */
+	/* nothing?  no z80*/
+
+	ROM_REGION( 0x040000, "gfx1", 0 ) /* chars */
+	ROM_LOAD( "fix.613", 0x000000, 0x040000, CRC(3da27e39) SHA1(3d446990bf36dd0a3f8fadb68b15bed54904c8b5) )
+
+	ROM_REGION( 0x400000, "gfx2", 0 ) /* background gfx */
+	ROM_LOAD( "bg.612", 0x000000, 0x400000, CRC(162c61e9) SHA1(bd0a6a29804b84196ba6bf3402e9f30a25da9269) )
+
+	ROM_REGION( 0x800000, "gfx3", 0 ) /* sprite gfx (encrypted) */ // roughly 1/4 of the rom does not decrypt properly with the R2 keys?
+	ROM_LOAD32_WORD( "obj1.724", 0x000000, 0x400000, CRC(7d218985) SHA1(777241a533defcbea3d7e735f309478d260bad52) )
+	ROM_LOAD32_WORD( "obj2.725", 0x000002, 0x400000, CRC(b09434d9) SHA1(da75252b7693ab791fece4c10b8a4910edb76c88) )
+
+	// temp, load these for now, they decrypt 100%
+	ROM_LOAD32_WORD( "obj1",        0x000000, 0x200000, CRC(ff08ef0b) SHA1(a1858430e8171ca8bab785457ef60e151b5e5cf1) ) /* Shared with original Raiden 2 */
+	ROM_LOAD32_WORD( "obj2",        0x000002, 0x200000, CRC(638eb771) SHA1(9774cc070e71668d7d1d20795502dccd21ca557b) ) /* Shared with original Raiden 2 */
+	ROM_LOAD32_WORD( "dx_obj3.4k",  0x400000, 0x200000, CRC(ba381227) SHA1(dfc4d659aca1722a981fa56a31afabe66f444d5d) )
+	ROM_LOAD32_WORD( "dx_obj4.6k",  0x400002, 0x200000, CRC(65e50d19) SHA1(c46147b4132abce7314b46bf419ce4773e024b05) )
+
+
 	ROM_REGION( 0x100000, "oki", 0 ) /* ADPCM samples */
 	ROM_LOAD( "pcm.099", 0x00000, 0x100000, CRC(97ca2907) SHA1(bfe8189300cf72089d0beaeab8b1a0a1a4f0a5b6) )
 
@@ -706,8 +767,8 @@ ROM_START( r2dx_v33 )
 
 	ROM_REGION16_BE( 0x80, "eeprom", 0 )
 	ROM_LOAD16_WORD( "raidenii_eeprom-r2dx_v33.bin", 0x0000, 0x0080, CRC(ba454777) SHA1(101c5364e8664d17bfb1e759515d135a2673d67e) ) // for booting as Raiden 2
-	ROM_LOAD16_WORD( "raidendx_eeprom-r2dx_v33.bin", 0x0000, 0x0080, CRC(0b34c0ca) SHA1(20612d5a1d819d3997ea47e8de7a194ec61b537d) ) // for booting as Raiden DX
 ROM_END
+
 
 ROM_START( nzeroteam ) /* V33 SYSTEM TYPE_B hardware, uses SEI333 (AKA COPX-D3) for protection  */
 	ROM_REGION( 0x100000, "mainprg", 0 ) /* v30 main cpu */
@@ -774,7 +835,9 @@ ROM_START( zerotm2k ) /* V33 SYSTEM TYPE_C VER2 hardware, uses SEI333 (AKA COPX-
 ROM_END
 
 // newer PCB, with V33 CPU and COPD3 protection, but weak sound hardware. - was marked as Raiden DX New in the rom dump, but boots as Raiden 2 New version, the rom contains both
-GAME( 1996, r2dx_v33, 0,          rdx_v33,  rdx_v33, r2dx_v33_state,  rdx_v33,   ROT270, "Seibu Kaihatsu", "Raiden II New / Raiden DX (newer V33 PCB)", GAME_NOT_WORKING|GAME_NO_SOUND)
+// is there a switching method? for now I've split it into 2 sets with different EEPROM, the game checks that on startup and runs different code depending on what it finds
+GAME( 1996, r2dx_v33,    0,          rdx_v33,  rdx_v33, r2dx_v33_state,  rdx_v33,   ROT270, "Seibu Kaihatsu", "Raiden II New / Raiden DX (newer V33 PCB) (Raiden DX EEPROM)", GAME_NOT_WORKING|GAME_NO_SOUND)
+GAME( 1996, r2dx_v33_r2, r2dx_v33,   rdx_v33,  rdx_v33, r2dx_v33_state,  rdx_v33,   ROT270, "Seibu Kaihatsu", "Raiden II New / Raiden DX (newer V33 PCB) (Raiden II EEPROM)", GAME_NOT_WORKING|GAME_NO_SOUND)
 
 // 'V33 system type_b' - uses V33 CPU, COPX-D3 external protection rom, but still has the proper sound system
 GAME( 1997, nzeroteam, zeroteam,  nzerotea, nzerotea, r2dx_v33_state, nzerotea,  ROT0,   "Seibu Kaihatsu", "New Zero Team", GAME_NOT_WORKING|GAME_NO_SOUND)
