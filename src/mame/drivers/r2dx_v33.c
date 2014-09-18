@@ -32,6 +32,7 @@ public:
 	optional_device<eeprom_serial_93cxx_device> m_eeprom;
 
 
+	DECLARE_WRITE16_MEMBER(tile_bank_w);
 	DECLARE_WRITE16_MEMBER(rdx_bg_vram_w);
 	DECLARE_WRITE16_MEMBER(rdx_md_vram_w);
 	DECLARE_WRITE16_MEMBER(rdx_fg_vram_w);
@@ -59,6 +60,29 @@ public:
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect,int pri);
 };
 
+WRITE16_MEMBER(r2dx_v33_state::tile_bank_w)
+{
+	if(ACCESSING_BITS_0_7) {
+		int new_bank;
+		new_bank = 0 | ((data & 0x10)>>3);
+		if(new_bank != bg_bank) {
+			bg_bank = new_bank;
+			background_layer->mark_all_dirty();
+		}
+
+		new_bank = 1 | ((data & 0x20)>>4);
+		if(new_bank != mid_bank) {
+			mid_bank = new_bank;
+			midground_layer->mark_all_dirty();
+		}
+
+		new_bank = 4 | (data & 3);
+		if(new_bank != fg_bank) {
+			fg_bank = new_bank;
+			foreground_layer->mark_all_dirty();
+		}
+	}
+}
 
 WRITE16_MEMBER(r2dx_v33_state::rdx_v33_eeprom_w)
 {
@@ -179,6 +203,8 @@ WRITE16_MEMBER(r2dx_v33_state::mcu_table2_w)
 
 static ADDRESS_MAP_START( rdx_v33_map, AS_PROGRAM, 16, r2dx_v33_state )
 	AM_RANGE(0x00000, 0x003ff) AM_RAM // vectors copied here
+
+	AM_RANGE(0x00406, 0x00407) AM_WRITE(tile_bank_w)
 
 //	AM_RANGE(0x00400, 0x00407) AM_WRITE(mcu_table_w)
 	AM_RANGE(0x00420, 0x00429) AM_WRITE(mcu_table2_w)
