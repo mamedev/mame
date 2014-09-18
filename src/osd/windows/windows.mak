@@ -340,6 +340,7 @@ OSDCOREOBJS = \
 	$(WINOBJ)/winsocket.o \
 	$(WINOBJ)/winwork.o \
 	$(WINOBJ)/winptty.o \
+	$(WINOBJ)/winos.o \
 
 
 #-------------------------------------------------
