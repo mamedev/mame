@@ -68,9 +68,6 @@ enum
 
 
 
-typedef device_delegate<void (int layer, int bank, int *code, int *color, int *flags)> generic_load_delegate;
-
-
 // ======================> generic_slot_device
 
 class generic_slot_device : public device_t,

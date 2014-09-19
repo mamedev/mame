@@ -6,7 +6,6 @@
 
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
-#include "imagedev/cartslot.h"
 #include "imagedev/cassette.h"
 #include "imagedev/flopdrv.h"
 #include "machine/ram.h"
@@ -20,6 +19,8 @@
 #include "machine/i8271.h"
 #include "sound/speaker.h"
 #include "video/mc6847.h"
+#include "bus/generic/slot.h"
+#include "bus/generic/carts.h"
 
 #define SY6502_TAG      "ic22"
 #define INS8255_TAG     "ic25"
@@ -30,8 +31,6 @@
 #define SCREEN_TAG      "screen"
 #define CENTRONICS_TAG  "centronics"
 #define BASERAM_TAG     "baseram"
-#define EXTROM_TAG      "a000"
-#define DOSROM_TAG      "e000"
 
 
 #define X1  XTAL_3_579545MHz    // MC6847 Clock
@@ -47,7 +46,7 @@ public:
 			m_cassette(*this, "cassette"),
 			m_centronics(*this, CENTRONICS_TAG),
 			m_speaker(*this, "speaker"),
-			m_extrom(*this, EXTROM_TAG),
+			m_cart(*this, "cartslot"),
 			m_y0(*this, "Y0"),
 			m_y1(*this, "Y1"),
 			m_y2(*this, "Y2"),
@@ -68,7 +67,7 @@ public:
 	required_device<cassette_image_device> m_cassette;
 	required_device<centronics_device> m_centronics;
 	required_device<speaker_sound_device> m_speaker;
-	required_memory_region m_extrom;
+	optional_device<generic_slot_device> m_cart;
 	required_ioport m_y0;
 	required_ioport m_y1;
 	required_ioport m_y2;
@@ -87,8 +86,6 @@ public:
 
 	void bankswitch();
 
-	DECLARE_READ8_MEMBER( eprom_r );
-	DECLARE_WRITE8_MEMBER( eprom_w );
 	DECLARE_WRITE8_MEMBER( ppi_pa_w );
 	DECLARE_READ8_MEMBER( ppi_pb_r );
 	DECLARE_READ8_MEMBER( ppi_pc_r );
@@ -96,9 +93,6 @@ public:
 	DECLARE_READ8_MEMBER( vdg_videoram_r );
 	DECLARE_INPUT_CHANGED_MEMBER( trigger_reset );
 	DECLARE_WRITE_LINE_MEMBER( atom_8271_interrupt_callback );
-
-	/* eprom state */
-	int m_eprom;
 
 	/* video state */
 	required_shared_ptr<UINT8> m_video_ram;
@@ -114,20 +108,56 @@ public:
 	/* devices */
 	int m_previous_i8271_int_state;
 	TIMER_DEVICE_CALLBACK_MEMBER(cassette_output_tick);
-
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( atom_cart );
+	
+	int load_cart(device_image_interface &image, generic_slot_device *slot);
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load) { return load_cart(image, m_cart); }	
 	DECLARE_QUICKLOAD_LOAD_MEMBER(atom_atm);
-	void image_fread_memory(device_image_interface &image, UINT16 addr, UINT32 count);
 };
 
 class atomeb_state : public atom_state
 {
 public:
 	atomeb_state(const machine_config &mconfig, device_type type, const char *tag)
-		: atom_state(mconfig, type, tag)
-	{ }
+		: atom_state(mconfig, type, tag),
+		m_e0(*this, "e0"),
+		m_e1(*this, "e1")
+	{ 
+	}
 
 	virtual void machine_start();
+
+	DECLARE_READ8_MEMBER(eprom_r);
+	DECLARE_WRITE8_MEMBER(eprom_w);
+	DECLARE_READ8_MEMBER(ext_r);
+	DECLARE_READ8_MEMBER(dos_r);
+
+	DECLARE_DRIVER_INIT(atomeb);
+	
+	/* eprom state */
+	int m_eprom;
+	
+	generic_slot_device *m_ext[16];
+	required_device<generic_slot_device> m_e0;
+	required_device<generic_slot_device> m_e1;
+
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(a0_load) { return load_cart(image, m_ext[0x0]); }
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(a1_load) { return load_cart(image, m_ext[0x1]); }
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(a2_load) { return load_cart(image, m_ext[0x2]); }
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(a3_load) { return load_cart(image, m_ext[0x3]); }
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(a4_load) { return load_cart(image, m_ext[0x4]); }
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(a5_load) { return load_cart(image, m_ext[0x5]); }
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(a6_load) { return load_cart(image, m_ext[0x6]); }
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(a7_load) { return load_cart(image, m_ext[0x7]); }
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(a8_load) { return load_cart(image, m_ext[0x8]); }
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(a9_load) { return load_cart(image, m_ext[0x9]); }
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(aa_load) { return load_cart(image, m_ext[0xa]); }
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(ab_load) { return load_cart(image, m_ext[0xb]); }
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(ac_load) { return load_cart(image, m_ext[0xc]); }
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(ad_load) { return load_cart(image, m_ext[0xd]); }
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(ae_load) { return load_cart(image, m_ext[0xe]); }
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(af_load) { return load_cart(image, m_ext[0xf]); }
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(e0_load) { return load_cart(image, m_e0); }
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(e1_load) { return load_cart(image, m_e1); }
 };
 
 #endif

@@ -11,6 +11,8 @@
 #include "bus/vic20/user.h"
 #include "bus/pet/cass.h"
 #include "bus/vcs_ctrl/ctrl.h"
+#include "bus/generic/slot.h"
+#include "bus/generic/carts.h"
 #include "imagedev/snapquik.h"
 #include "cpu/m6502/m8502.h"
 #include "machine/mos6526.h"
@@ -58,8 +60,8 @@ public:
 		m_user(*this, PET_USER_PORT_TAG),
 		m_ram(*this, RAM_TAG),
 		m_cassette(*this, PET_DATASSETTE_PORT_TAG),
-		m_rom(*this, M8502_TAG),
 		m_from(*this, "from"),
+		m_rom(*this, M8502_TAG),
 		m_charom(*this, "charom"),
 		m_color_ram(*this, "color_ram"),
 		m_row0(*this, "ROW0"),
@@ -116,8 +118,8 @@ public:
 	required_device<pet_user_port_device> m_user;
 	required_device<ram_device> m_ram;
 	required_device<pet_datassette_port_device> m_cassette;
+	required_device<generic_slot_device> m_from;
 	required_memory_region m_rom;
-	required_memory_region m_from;
 	required_memory_region m_charom;
 	optional_shared_ptr<UINT8> m_color_ram;
 	required_ioport m_row0;

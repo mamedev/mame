@@ -146,13 +146,7 @@ INPUT_PORTS_END
 
 int aim65_state::load_cart(device_image_interface &image, generic_slot_device *slot, const char *slot_tag)
 {
-	UINT8 *cart;
-	UINT32 size;
-
-	if (image.software_entry() == NULL)
-		size = image.length();
-	else
-		size = image.get_software_region_length("rom");
+	UINT32 size = slot->common_get_size("rom");
 	
 	if (size > 0x1000)
 	{
@@ -160,23 +154,17 @@ int aim65_state::load_cart(device_image_interface &image, generic_slot_device *s
 		return IMAGE_INIT_FAIL;
 	}
 
-	slot->rom_alloc(size, 1);
-	cart = slot->get_rom_base();
-
-	if (image.software_entry() == NULL)
-		image.fread(cart, size);
-	else
+	if (image.software_entry() != NULL && image.get_software_region(slot_tag) == NULL)
 	{
-		if (image.get_software_region(slot_tag) == NULL)
-		{
-			astring errmsg;
-			errmsg.printf("Attempted to load file with wrong extension\nSocket '%s' only accepts files with '.%s' extension",
-						  slot_tag, slot_tag);
-			image.seterror(IMAGE_ERROR_UNSPECIFIED, errmsg.cstr());
-			return IMAGE_INIT_FAIL;
-		}
-		memcpy(cart, image.get_software_region(slot_tag), size);
+		astring errmsg;
+		errmsg.printf("Attempted to load file with wrong extension\nSocket '%s' only accepts files with '.%s' extension",
+					  slot_tag, slot_tag);
+		image.seterror(IMAGE_ERROR_UNSPECIFIED, errmsg.cstr());
+		return IMAGE_INIT_FAIL;
 	}
+
+	slot->rom_alloc(size, 1);
+	slot->common_load_rom(slot->get_rom_base(), size, slot_tag);
 
 	return IMAGE_INIT_PASS;
 }

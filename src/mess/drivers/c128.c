@@ -190,9 +190,9 @@ UINT8 c128_state::read_memory(address_space &space, offs_t offset, offs_t vma, i
 	{
 		data = m_vic->read(space, offset & 0x3f);
 	}
-	if (!BIT(plaout, PLA_OUT_FROM1))
+	if (!BIT(plaout, PLA_OUT_FROM1) && m_from->cart_mounted())
 	{
-		data = m_from->base()[offset & 0x7fff];
+		data = m_from->read_rom(space, offset & 0x7fff);
 	}
 	if (!BIT(plaout, PLA_OUT_IOCS) && BIT(offset, 10))
 	{
@@ -1549,9 +1549,8 @@ static MACHINE_CONFIG_START( ntsc, c128_state )
 	MCFG_SOFTWARE_LIST_FILTER("from_list", "NTSC")
 
 	// function ROM
-	MCFG_CARTSLOT_ADD("from")
-	MCFG_CARTSLOT_EXTENSION_LIST("bin,rom")
-	MCFG_CARTSLOT_INTERFACE("c128_rom")
+	MCFG_GENERIC_SOCKET_ADD("from", GENERIC_ROM8_WIDTH, generic_plain_slot, "c128_rom")
+	MCFG_GENERIC_EXTENSIONS("bin,rom")
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)
@@ -1724,9 +1723,8 @@ static MACHINE_CONFIG_START( pal, c128_state )
 	MCFG_SOFTWARE_LIST_FILTER("from_list", "PAL")
 
 	// function ROM
-	MCFG_CARTSLOT_ADD("from")
-	MCFG_CARTSLOT_EXTENSION_LIST("bin,rom")
-	MCFG_CARTSLOT_INTERFACE("c128_rom")
+	MCFG_GENERIC_SOCKET_ADD("from", GENERIC_ROM8_WIDTH, generic_plain_slot, "c128_rom")
+	MCFG_GENERIC_EXTENSIONS("bin,rom")
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)
@@ -1786,9 +1784,6 @@ ROM_START( c128 )
 	ROMX_LOAD( "318019-04.u34", 0x8000, 0x4000, CRC(6e2c91a7) SHA1(c4fb4a714e48a7bf6c28659de0302183a0e0d6c0), ROM_BIOS(4) )
 	ROMX_LOAD( "quicksilver128.u35", 0xc000, 0x4000, CRC(c2e74338) SHA1(916cdcc62eb631073aa7f096815dcf33b3229ca8), ROM_BIOS(4) )
 
-	ROM_REGION( 0x8000, "from", 0 )
-	ROM_CART_LOAD( "from", 0x0000, 0x8000, ROM_NOMIRROR )
-
 	ROM_REGION( 0x2000, "charom", 0 )
 	ROM_LOAD( "390059-01.u18", 0x0000, 0x2000, CRC(6aaaafe6) SHA1(29ed066d513f2d5c09ff26d9166ba23c2afb2b3f) )
 
@@ -1821,9 +1816,6 @@ ROM_START( c128_de )
 	ROMX_LOAD( "318019-04.u34", 0x8000, 0x4000, CRC(6e2c91a7) SHA1(c4fb4a714e48a7bf6c28659de0302183a0e0d6c0), ROM_BIOS(2) )
 	ROMX_LOAD( "315078-02.u35", 0xc000, 0x4000, CRC(b275bb2e) SHA1(78ac5dcdd840b092ba1ee6d19b33af079613291f), ROM_BIOS(2) )
 
-	ROM_REGION( 0x8000, "from", 0 )
-	ROM_CART_LOAD( "from", 0x0000, 0x8000, ROM_NOMIRROR )
-
 	ROM_REGION( 0x2000, "charom", 0 )
 	ROM_LOAD( "315079-01.u18", 0x00000, 0x2000, CRC(fe5a2db1) SHA1(638f8aff51c2ac4f99a55b12c4f8c985ef4bebd3) )
 
@@ -1843,9 +1835,6 @@ ROM_START( c128_se )
 	ROM_LOAD( "318018-02.u33", 0x4000, 0x4000, CRC(2ee6e2fa) SHA1(60e1491e1d5782e3cf109f518eb73427609badc6) )
 	ROM_LOAD( "318019-02.u34", 0x8000, 0x4000, CRC(d551fce0) SHA1(4d223883e866645328f86a904b221464682edc4f) )
 	ROM_LOAD( "325189-01.u35", 0xc000, 0x4000, CRC(9526fac4) SHA1(a01dd871241c801db51e8ebc30fedfafd8cc506b) ) // "C128 Ker Sw/Fi"
-
-	ROM_REGION( 0x8000, "from", 0 )
-	ROM_CART_LOAD( "from", 0x0000, 0x8000, ROM_NOMIRROR )
 
 	ROM_REGION( 0x2000, "charom", 0 )
 	ROM_LOAD( "325181-01.bin", 0x0000, 0x2000, CRC(7a70d9b8) SHA1(aca3f7321ee7e6152f1f0afad646ae41964de4fb) ) // "C128 Char Sw/Fi"
@@ -1873,9 +1862,6 @@ ROM_START( c128cr )
 	ROM_LOAD( "252343-04.u32", 0x0000, 0x4000, CRC(cc6bdb69) SHA1(36286b2e8bea79f7767639fd85e12c5447c7041b) ) // "252343-04 // US // U32"
 	ROM_CONTINUE(              0xc000, 0x4000 )
 
-	ROM_REGION( 0x8000, "from", 0 )
-	ROM_CART_LOAD( "from", 0x0000, 0x8000, ROM_NOMIRROR )
-
 	ROM_REGION( 0x2000, "charom", 0 )
 	ROM_LOAD( "390059-01.u18", 0x0000, 0x2000, CRC(6aaaafe6) SHA1(29ed066d513f2d5c09ff26d9166ba23c2afb2b3f) ) // "MOS // (C)1985 CBM // 390059-01 // M468613 8547H"
 
@@ -1894,9 +1880,6 @@ ROM_START( c128dcr )
 	ROM_LOAD( "318022-02.u34", 0x4000, 0x8000, CRC(af1ae1e8) SHA1(953dcdf5784a6b39ef84dd6fd968c7a03d8d6816) )
 	ROM_LOAD( "318023-02.u32", 0x0000, 0x4000, CRC(eedc120a) SHA1(f98c5a986b532c78bb68df9ec6dbcf876913b99f) )
 	ROM_CONTINUE(              0xc000, 0x4000 )
-
-	ROM_REGION( 0x8000, "from", 0 )
-	ROM_CART_LOAD( "from", 0x0000, 0x8000, ROM_NOMIRROR )
 
 	ROM_REGION( 0x2000, "charom", 0 )
 	ROM_LOAD( "390059-01.u18", 0x0000, 0x2000, CRC(6aaaafe6) SHA1(29ed066d513f2d5c09ff26d9166ba23c2afb2b3f) )
@@ -1919,9 +1902,6 @@ ROM_START( c128dcr_de )
 	ROM_LOAD( "318077-01.u32", 0x0000, 0x4000, CRC(eb6e2c8f) SHA1(6b3d891fedabb5335f388a5d2a71378472ea60f4) )
 	ROM_CONTINUE(              0xc000, 0x4000 )
 
-	ROM_REGION( 0x8000, "from", 0 )
-	ROM_CART_LOAD( "from", 0x0000, 0x8000, ROM_NOMIRROR )
-
 	ROM_REGION( 0x2000, "charom", 0 )
 	ROM_LOAD( "315079-01.u18", 0x0000, 0x2000, CRC(fe5a2db1) SHA1(638f8aff51c2ac4f99a55b12c4f8c985ef4bebd3) )
 
@@ -1940,9 +1920,6 @@ ROM_START( c128dcr_se )
 	ROM_LOAD( "318022-02.u34", 0x4000, 0x8000, CRC(af1ae1e8) SHA1(953dcdf5784a6b39ef84dd6fd968c7a03d8d6816) )
 	ROM_LOAD( "318034-01.u32", 0x0000, 0x4000, CRC(cb4e1719) SHA1(9b0a0cef56d00035c611e07170f051ee5e63aa3a) )
 	ROM_CONTINUE(              0xc000, 0x4000 )
-
-	ROM_REGION( 0x8000, "from", 0 )
-	ROM_CART_LOAD( "from", 0x0000, 0x8000, ROM_NOMIRROR )
 
 	ROM_REGION( 0x2000, "charom", 0 )
 	ROM_LOAD( "325181-01.u18", 0x0000, 0x2000, CRC(7a70d9b8) SHA1(aca3f7321ee7e6152f1f0afad646ae41964de4fb) )

@@ -125,17 +125,6 @@ Hardware:   PPIA 8255
 ***************************************************************************/
 
 /*-------------------------------------------------
-    image_fread_memory - read image to memory
--------------------------------------------------*/
-
-void atom_state::image_fread_memory(device_image_interface &image, UINT16 addr, UINT32 count)
-{
-	void *ptr = m_maincpu->space(AS_PROGRAM).get_write_ptr(addr);
-
-	image.fread( ptr, count);
-}
-
-/*-------------------------------------------------
     QUICKLOAD_LOAD_MEMBER( atom_state, atom_atm )
 -------------------------------------------------*/
 
@@ -156,6 +145,7 @@ QUICKLOAD_LOAD_MEMBER( atom_state, atom_atm )
 	*/
 
 	UINT8 header[0x16] = { 0 };
+	void *ptr;
 
 	image.fread(header, 0x16);
 
@@ -172,7 +162,8 @@ QUICKLOAD_LOAD_MEMBER( atom_state, atom_atm )
 		logerror("ATM size: %04x\n", size);
 	}
 
-	image_fread_memory(image, start_address, size);
+	ptr = m_maincpu->space(AS_PROGRAM).get_write_ptr(start_address);
+	image.fread(ptr, size);
 
 	m_maincpu->set_pc(run_address);
 
@@ -184,23 +175,10 @@ QUICKLOAD_LOAD_MEMBER( atom_state, atom_atm )
 ***************************************************************************/
 
 /*-------------------------------------------------
-    bankswitch - EPROM bankswitch
--------------------------------------------------*/
-
-void atom_state::bankswitch()
-{
-	address_space &program = m_maincpu->space(AS_PROGRAM);
-
-	UINT8 *eprom = m_extrom->base() + (m_eprom << 12);
-
-	program.install_rom(0xa000, 0xafff, eprom);
-}
-
-/*-------------------------------------------------
      eprom_r - EPROM slot select read
 -------------------------------------------------*/
 
-READ8_MEMBER( atom_state::eprom_r )
+READ8_MEMBER( atomeb_state::eprom_r )
 {
 	return m_eprom;
 }
@@ -209,7 +187,7 @@ READ8_MEMBER( atom_state::eprom_r )
      eprom_w - EPROM slot select write
 -------------------------------------------------*/
 
-WRITE8_MEMBER( atom_state::eprom_w )
+WRITE8_MEMBER( atomeb_state::eprom_w )
 {
 	/*
 
@@ -226,13 +204,36 @@ WRITE8_MEMBER( atom_state::eprom_w )
 
 	*/
 
-	/* block A */
-	m_eprom = data & 0x0f;
-
-	/* TODO block E */
-
-	bankswitch();
+	/* block A and E */
+	m_eprom = data;
 }
+
+/*-------------------------------------------------
+ ext_r - read external roms at 0xa000
+ -------------------------------------------------*/
+
+READ8_MEMBER( atomeb_state::ext_r )
+{
+	if (m_ext[m_eprom & 0x0f]->cart_mounted())
+		return m_ext[m_eprom & 0x0f]->read_rom(space, offset);
+	else
+		return 0xff;
+}
+
+/*-------------------------------------------------
+ dor_r - read DOS roms at 0xe000
+ -------------------------------------------------*/
+
+READ8_MEMBER( atomeb_state::dos_r )
+{
+	if (m_e0->cart_mounted() && !BIT(m_eprom, 7))
+		return m_e0->read_rom(space, offset);
+	else if (m_e1->cart_mounted() && BIT(m_eprom, 7))
+		return m_e1->read_rom(space, offset);
+	else
+		return 0xff;
+}
+
 
 /***************************************************************************
     MEMORY MAPS
@@ -249,7 +250,7 @@ static ADDRESS_MAP_START( atom_mem, AS_PROGRAM, 8, atom_state )
 	AM_RANGE(0x0a05, 0x7fff) AM_RAM
 	AM_RANGE(0x8000, 0x97ff) AM_RAM AM_SHARE("video_ram")
 	AM_RANGE(0x9800, 0x9fff) AM_RAM
-	AM_RANGE(0xa000, 0xafff) AM_ROM AM_REGION(EXTROM_TAG, 0)
+//  AM_RANGE(0xa000, 0xafff)		// mapped by the cartslot
 	AM_RANGE(0xb000, 0xb003) AM_MIRROR(0x3fc) AM_DEVREADWRITE(INS8255_TAG, i8255_device, read, write)
 //  AM_RANGE(0xb400, 0xb403) AM_DEVREADWRITE(MC6854_TAG, mc6854_device, read, write)
 //  AM_RANGE(0xb404, 0xb404) AM_READ_PORT("ECONET")
@@ -261,9 +262,11 @@ ADDRESS_MAP_END
     ADDRESS_MAP( atomeb_mem )
 -------------------------------------------------*/
 
-static ADDRESS_MAP_START( atomeb_mem, AS_PROGRAM, 8, atom_state )
+static ADDRESS_MAP_START( atomeb_mem, AS_PROGRAM, 8, atomeb_state )
 	AM_IMPORT_FROM(atom_mem)
+	AM_RANGE(0xa000, 0xafff) AM_READ(ext_r)
 	AM_RANGE(0xbfff, 0xbfff) AM_READWRITE(eprom_r, eprom_w)
+	AM_RANGE(0xe000, 0xefff) AM_READ(dos_r)
 ADDRESS_MAP_END
 
 /*-------------------------------------------------
@@ -276,8 +279,8 @@ static ADDRESS_MAP_START( atombb_mem, AS_PROGRAM, 8, atom_state )
 
 	AM_RANGE(0x7000, 0x7003) AM_MIRROR(0x3fc) AM_DEVREADWRITE(INS8255_TAG, i8255_device, read, write)
 	AM_RANGE(0x7800, 0x780f) AM_MIRROR(0x3f0) AM_DEVREADWRITE(R6522_TAG, via6522_device, read, write)
-	AM_RANGE(0x8000, 0xbfff) AM_ROM AM_REGION(EXTROM_TAG, 0)
-	AM_RANGE(0xF000, 0xffff) AM_ROM AM_REGION(SY6502_TAG, 0)
+	AM_RANGE(0x8000, 0xbfff) AM_ROM AM_REGION("basic", 0)
+	AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION(SY6502_TAG, 0)
 ADDRESS_MAP_END
 
 /***************************************************************************
@@ -648,6 +651,9 @@ void atom_state::machine_start()
 	m_baseram[0x09] = machine().rand() & 0x0ff;
 	m_baseram[0x0a] = machine().rand() & 0x0ff;
 	m_baseram[0x0b] = machine().rand() & 0x0ff;
+
+	if (m_cart && m_cart->cart_mounted())
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0xa000, 0xafff, read8_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_cart));
 }
 
 /*-------------------------------------------------
@@ -657,100 +663,24 @@ void atom_state::machine_start()
 void atomeb_state::machine_start()
 {
 	atom_state::machine_start();
-
-	bankswitch();
 }
 
 /***************************************************************************
     MACHINE DRIVERS
 ***************************************************************************/
 
-struct atom_cart_range
+int atom_state::load_cart(device_image_interface &image, generic_slot_device *slot)
 {
-	const char *tag;
-	int offset;
-	const char *region;
-};
+	UINT32 size = slot->common_get_size("rom");
 
-static const struct atom_cart_range atom_cart_table[] =
-{
-	{ ":cart", 0x0000, "a000" },
-	{ ":a0",   0x0000, "a000" },
-	{ ":a1",   0x1000, "a000" },
-	{ ":a2",   0x2000, "a000" },
-	{ ":a3",   0x3000, "a000" },
-	{ ":a4",   0x4000, "a000" },
-	{ ":a5",   0x5000, "a000" },
-	{ ":a6",   0x6000, "a000" },
-	{ ":a7",   0x7000, "a000" },
-	{ ":a8",   0x8000, "a000" },
-	{ ":a9",   0x9000, "a000" },
-	{ ":aa",   0xa000, "a000" },
-	{ ":ab",   0xb000, "a000" },
-	{ ":ac",   0xc000, "a000" },
-	{ ":ad",   0xd000, "a000" },
-	{ ":ae",   0xe000, "a000" },
-	{ ":af",   0xf000, "a000" },
-	{ ":e0",   0x0000, "e000" },
-	{ ":e1",   0x1000, "e000" },
-	{ 0 }
-};
-
-DEVICE_IMAGE_LOAD_MEMBER( atom_state, atom_cart )
-{
-	UINT32 size;
-	int mirror, i;
-	const struct atom_cart_range *atom_cart = &atom_cart_table[0], *this_cart;
-
-	/* First, determine where this cart has to be loaded */
-	while (atom_cart->tag)
+	if (size > 0x1000)
 	{
-		if (strcmp(atom_cart->tag, image.device().tag()) == 0)
-			break;
-
-		atom_cart++;
-	}
-
-	this_cart = atom_cart;
-
-	if( !this_cart->tag )
-	{
-		astring errmsg;
-		errmsg.printf("Tag '%s' could not be found", image.device().tag());
-		image.seterror(IMAGE_ERROR_UNSPECIFIED, errmsg.cstr());
+		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
 		return IMAGE_INIT_FAIL;
 	}
 
-	dynamic_buffer temp_copy;
-	if (image.software_entry() == NULL)
-	{
-		size = image.length();
-
-		if (size > 0x1000)
-		{
-			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
-			return IMAGE_INIT_FAIL;
-		}
-
-		temp_copy.resize(size);
-		if (image.fread(temp_copy, size) != size)
-		{
-			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unable to fully read from file");
-			return IMAGE_INIT_FAIL;
-		}
-	}
-	else
-	{
-		size = image.get_software_region_length( "rom");
-		temp_copy.resize(size);
-		memcpy(temp_copy, image.get_software_region("rom"), size);
-	}
-
-	mirror = 0x1000 / size;
-
-	/* With the following, we mirror the cart in the whole memory region */
-	for (i = 0; i < mirror; i++)
-		memcpy(memregion(this_cart->region)->base() + this_cart->offset + i * size, temp_copy, size);
+	slot->rom_alloc(size, 1);
+	slot->common_load_rom(slot->get_rom_base(), size, "rom");			
 
 	return IMAGE_INIT_PASS;
 }
@@ -759,13 +689,6 @@ DEVICE_IMAGE_LOAD_MEMBER( atom_state, atom_cart )
 /*-------------------------------------------------
     MACHINE_DRIVER( atom )
 -------------------------------------------------*/
-
-#define MCFG_ATOM_CARTSLOT_ADD(_tag) \
-	MCFG_CARTSLOT_ADD(_tag) \
-	MCFG_CARTSLOT_EXTENSION_LIST("bin,rom") \
-	MCFG_CARTSLOT_INTERFACE("atom_cart") \
-	MCFG_CARTSLOT_LOAD(atom_state, atom_cart)
-
 
 static MACHINE_CONFIG_START( atom, atom_state )
 	/* basic machine hardware */
@@ -815,7 +738,9 @@ static MACHINE_CONFIG_START( atom, atom_state )
 	MCFG_QUICKLOAD_ADD("quickload", atom_state, atom_atm, "atm", 0)
 
 	/* cartridge */
-	MCFG_ATOM_CARTSLOT_ADD("cart")
+	MCFG_GENERIC_CARTSLOT_ADD("cartslot", GENERIC_ROM8_WIDTH, generic_linear_slot, "atom_cart")
+	MCFG_GENERIC_EXTENSIONS("bin,rom")
+	MCFG_GENERIC_LOAD(atom_state, cart_load)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -830,31 +755,37 @@ MACHINE_CONFIG_END
     MACHINE_DRIVER( atomeb )
 -------------------------------------------------*/
 
+#define MCFG_ATOM_ROM_ADD(_tag, _load) \
+	MCFG_GENERIC_SOCKET_ADD(_tag, GENERIC_ROM8_WIDTH, generic_linear_slot, "atom_cart") \
+	MCFG_GENERIC_EXTENSIONS("bin,rom") \
+	MCFG_GENERIC_LOAD(atomeb_state, _load)
+
 static MACHINE_CONFIG_DERIVED_CLASS( atomeb, atom, atomeb_state )
 	MCFG_CPU_MODIFY(SY6502_TAG)
 	MCFG_CPU_PROGRAM_MAP(atomeb_mem)
 
 	/* cartridges */
-	MCFG_DEVICE_REMOVE("cart")
-	MCFG_ATOM_CARTSLOT_ADD("a0")
-	MCFG_ATOM_CARTSLOT_ADD("a1")
-	MCFG_ATOM_CARTSLOT_ADD("a2")
-	MCFG_ATOM_CARTSLOT_ADD("a3")
-	MCFG_ATOM_CARTSLOT_ADD("a4")
-	MCFG_ATOM_CARTSLOT_ADD("a5")
-	MCFG_ATOM_CARTSLOT_ADD("a6")
-	MCFG_ATOM_CARTSLOT_ADD("a7")
-	MCFG_ATOM_CARTSLOT_ADD("a8")
-	MCFG_ATOM_CARTSLOT_ADD("a9")
-	MCFG_ATOM_CARTSLOT_ADD("aa")
-	MCFG_ATOM_CARTSLOT_ADD("ab")
-	MCFG_ATOM_CARTSLOT_ADD("ac")
-	MCFG_ATOM_CARTSLOT_ADD("ad")
-	MCFG_ATOM_CARTSLOT_ADD("ae")
-	MCFG_ATOM_CARTSLOT_ADD("af")
+	MCFG_DEVICE_REMOVE("cartslot")
 
-	MCFG_ATOM_CARTSLOT_ADD("e0")
-	MCFG_ATOM_CARTSLOT_ADD("e1")
+	MCFG_ATOM_ROM_ADD("a0", a0_load)
+	MCFG_ATOM_ROM_ADD("a1", a1_load)
+	MCFG_ATOM_ROM_ADD("a2", a2_load)
+	MCFG_ATOM_ROM_ADD("a3", a3_load)
+	MCFG_ATOM_ROM_ADD("a4", a4_load)
+	MCFG_ATOM_ROM_ADD("a5", a5_load)
+	MCFG_ATOM_ROM_ADD("a6", a6_load)
+	MCFG_ATOM_ROM_ADD("a7", a7_load)
+	MCFG_ATOM_ROM_ADD("a8", a8_load)
+	MCFG_ATOM_ROM_ADD("a9", a9_load)
+//	MCFG_ATOM_ROM_ADD("aa", aa_load)
+//	MCFG_ATOM_ROM_ADD("ab", ab_load)
+//	MCFG_ATOM_ROM_ADD("ac", ac_load)
+//	MCFG_ATOM_ROM_ADD("ad", ad_load)
+//	MCFG_ATOM_ROM_ADD("ae", ae_load)
+//	MCFG_ATOM_ROM_ADD("af", af_load)
+
+	MCFG_ATOM_ROM_ADD("e0", e0_load)
+	MCFG_ATOM_ROM_ADD("e1", e1_load)
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------
@@ -922,8 +853,6 @@ ROM_START( atom )
 	ROM_CONTINUE(            0x3000, 0x1000 )
 	ROM_LOAD( "afloat.ic21", 0x1000, 0x1000, CRC(81d86af7) SHA1(ebcde5b36cb3a3344567cbba4c7b9fde015f4802) )
 	ROM_LOAD( "dosrom.u15",  0x2000, 0x1000, CRC(c431a9b7) SHA1(71ea0a4b8d9c3caf9718fc7cc279f4306a23b39c) )
-
-	ROM_REGION( 0x1000, "a000", ROMREGION_ERASEFF )
 ROM_END
 
 /*-------------------------------------------------
@@ -936,10 +865,6 @@ ROM_START( atomeb )
 	ROM_CONTINUE(            0x3000, 0x1000 )
 	ROM_LOAD( "afloat.ic21", 0x1000, 0x1000, CRC(81d86af7) SHA1(ebcde5b36cb3a3344567cbba4c7b9fde015f4802) )
 	ROM_LOAD( "dosrom.u15",  0x2000, 0x1000, CRC(c431a9b7) SHA1(71ea0a4b8d9c3caf9718fc7cc279f4306a23b39c) )
-
-	ROM_REGION( 0x10000, EXTROM_TAG, ROMREGION_ERASEFF )
-
-	ROM_REGION( 0x2000, DOSROM_TAG, ROMREGION_ERASEFF )
 ROM_END
 
 /*-------------------------------------------------
@@ -947,11 +872,24 @@ ROM_END
 -------------------------------------------------*/
 
 ROM_START( atombb )
-	ROM_REGION( 0x4000, "a000", 0)
-	ROM_LOAD( "bbcbasic.rom", 0x0000, 0x4000, CRC(79434781) SHA1(4a7393f3a45ea309f744441c16723e2ef447a281) )
 	ROM_REGION( 0x1000, SY6502_TAG, 0 )
 	ROM_LOAD( "mos.rom",0x0000, 0x1000, CRC(20158bd8) SHA1(5ee4c0d2b65be72646e17d69b76fb00a0e5298df) )
+	ROM_REGION( 0x4000, "basic", 0)
+	ROM_LOAD( "bbcbasic.rom", 0x0000, 0x4000, CRC(79434781) SHA1(4a7393f3a45ea309f744441c16723e2ef447a281) )
 ROM_END
+
+
+DRIVER_INIT_MEMBER(atomeb_state, atomeb)
+{
+	// these have to be set here, so that we can pass m_ext[*] to device_image_load!
+	char str[4];	
+	for (int i = 0; i < 16; i++)
+	{
+		sprintf(str,"a%x", i);
+		m_ext[i] = machine().device<generic_slot_device>(str);
+	}			
+}
+
 
 /***************************************************************************
     SYSTEM DRIVERS
@@ -959,6 +897,6 @@ ROM_END
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     INIT      COMPANY   FULLNAME */
 COMP( 1979, atom,     0,        0,      atom,     atom, driver_device,     0,        "Acorn",  "Atom" , 0)
-COMP( 1979, atomeb,   atom,     0,      atomeb,   atom, driver_device,     0,        "Acorn",  "Atom with Eprom Box" , 0)
+COMP( 1979, atomeb,   atom,     0,      atomeb,   atom, atomeb_state, atomeb,        "Acorn",  "Atom with Eprom Box" , 0)
 COMP( 1979, atombb,   atom,     0,      atombb,   atom, driver_device,     0,        "Acorn",  "Atom with BBC Basic" , 0)
 //COMP( 1983, prophet2, atom,     0,        atom,     atom, driver_device,     0,        "Busicomputers",  "Prophet 2" , 0)
