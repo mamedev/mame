@@ -61,6 +61,7 @@ public:
 	DECLARE_WRITE16_MEMBER(mcu_prog_w2);
 	DECLARE_WRITE16_MEMBER(mcu_prog_offs_w);
 	DECLARE_WRITE16_MEMBER(rdx_v33_eeprom_w);
+	DECLARE_WRITE16_MEMBER(zerotm2k_eeprom_w);
 	DECLARE_WRITE16_MEMBER(r2dx_rom_bank_w);
 	DECLARE_DRIVER_INIT(rdx_v33);
 	DECLARE_DRIVER_INIT(nzerotea);
@@ -369,8 +370,13 @@ WRITE16_MEMBER(r2dx_v33_state::nzerotea_sound_comms_w)
 	}
 }
 
-static ADDRESS_MAP_START( nzerotea_map, AS_PROGRAM, 16, r2dx_v33_state )
+static ADDRESS_MAP_START( nzeroteam_base_map, AS_PROGRAM, 16, r2dx_v33_state )
 	AM_RANGE(0x00000, 0x003ff) AM_RAM //stack area
+
+	AM_RANGE(0x00400, 0x00401) AM_WRITENOP // tilemaps to private buffer
+	AM_RANGE(0x00402, 0x00403) AM_WRITENOP // palettes to private buffer
+	// 0x404 is bank on r2dx, this doesn't need it
+	// AM_RANGE(0x00406, 0x00407) AM_WRITE(tile_bank_w) // not the same?
 
 	AM_RANGE(0x00420, 0x00421) AM_WRITE(r2dx_unk1_w) // frequent
 	AM_RANGE(0x00422, 0x00423) AM_WRITE(r2dx_unk2_w) // frequent
@@ -396,9 +402,7 @@ static ADDRESS_MAP_START( nzerotea_map, AS_PROGRAM, 16, r2dx_v33_state )
 //  AM_RANGE(0x006dc, 0x006dd) AM_READ(nzerotea_unknown_r)
 //  AM_RANGE(0x006de, 0x006df) AM_WRITE(mcu_unkaa_w) // mcu command related?
 	//AM_RANGE(0x00700, 0x00701) AM_WRITE(rdx_v33_eeprom_w)
-	AM_RANGE(0x00740, 0x00741) AM_READ_PORT("DSW")
-	AM_RANGE(0x00744, 0x00745) AM_READ_PORT("INPUT")
-	AM_RANGE(0x0074c, 0x0074d) AM_READ_PORT("SYSTEM")
+
 //  AM_RANGE(0x00762, 0x00763) AM_READ(nzerotea_unknown_r)
 
 	AM_RANGE(0x00780, 0x0079f) AM_READWRITE(nzerotea_sound_comms_r,nzerotea_sound_comms_w)
@@ -418,6 +422,32 @@ static ADDRESS_MAP_START( nzerotea_map, AS_PROGRAM, 16, r2dx_v33_state )
 
 	AM_RANGE(0x20000, 0xfffff) AM_ROM AM_REGION("mainprg", 0x20000 )
 ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( nzerotea_map, AS_PROGRAM, 16, r2dx_v33_state )
+	AM_IMPORT_FROM( nzeroteam_base_map )
+	AM_RANGE(0x00740, 0x00741) AM_READ_PORT("DSW")
+	AM_RANGE(0x00744, 0x00745) AM_READ_PORT("INPUT")
+	AM_RANGE(0x0074c, 0x0074d) AM_READ_PORT("SYSTEM")
+ADDRESS_MAP_END
+
+WRITE16_MEMBER(r2dx_v33_state::zerotm2k_eeprom_w)
+{
+//	printf("zerotm2k_eeprom_w %04x %04x\n", data, mem_mask);
+
+	m_eeprom->clk_write((data & 0x02) ? ASSERT_LINE : CLEAR_LINE);
+	m_eeprom->di_write((data & 0x04) >> 2);
+	m_eeprom->cs_write((data & 0x01) ? ASSERT_LINE : CLEAR_LINE);
+}
+
+static ADDRESS_MAP_START( zerotm2k_map, AS_PROGRAM, 16, r2dx_v33_state )
+	AM_IMPORT_FROM( nzeroteam_base_map )
+	AM_RANGE(0x00740, 0x00741) AM_READ_PORT("DSW") // doesn't have dips but address is still read (maybe service switch, check)
+	AM_RANGE(0x00744, 0x00745) AM_READ_PORT("INPUT")
+	AM_RANGE(0x0074c, 0x0074d) AM_READ_PORT("SYSTEM")
+	AM_RANGE(0x00748, 0x00749) AM_WRITE(zerotm2k_eeprom_w)
+ADDRESS_MAP_END
+
+
 
 INTERRUPT_GEN_MEMBER(r2dx_v33_state::rdx_v33_interrupt)
 {
@@ -513,7 +543,7 @@ static INPUT_PORTS_START( nzerotea )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNUSED )
-	//PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_DIPNAME( 0x0040, 0x0040, "Test Mode" )
 	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
@@ -591,6 +621,13 @@ static INPUT_PORTS_START( nzerotea )
 	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( zerotm2k )
+	PORT_INCLUDE( nzerotea )
+	
+	PORT_MODIFY("INPUT")
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 INPUT_PORTS_END
 
 
@@ -686,6 +723,12 @@ static MACHINE_CONFIG_START( nzerotea, r2dx_v33_state )
 
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( zerotm2k, nzerotea )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(zerotm2k_map)
+
+	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+MACHINE_CONFIG_END
 
 DRIVER_INIT_MEMBER(r2dx_v33_state,rdx_v33)
 {
@@ -939,4 +982,4 @@ GAME( 1996, r2dx_v33_r2, r2dx_v33,   rdx_v33,  rdx_v33, r2dx_v33_state,  rdx_v33
 GAME( 1997, nzeroteam, zeroteam,  nzerotea, nzerotea, r2dx_v33_state, nzerotea,  ROT0,   "Seibu Kaihatsu", "New Zero Team", GAME_NOT_WORKING|GAME_NO_SOUND)
 
 // 'V33 SYSTEM TYPE_C VER2' - uses V33 CPU, COPX-D3 external protection rom, but still has the proper sound system, unencrypted sprites, EEPROM for settings.  PCB also seen without 'VER2', looks the same
-GAME( 2000, zerotm2k,  zeroteam,  nzerotea, nzerotea, r2dx_v33_state, zerotm2k,  ROT0,   "Seibu Kaihatsu", "Zero Team 2000", GAME_NOT_WORKING|GAME_NO_SOUND)
+GAME( 2000, zerotm2k,  zeroteam,  zerotm2k, zerotm2k, r2dx_v33_state, zerotm2k,  ROT0,   "Seibu Kaihatsu", "Zero Team 2000", GAME_NOT_WORKING|GAME_NO_SOUND)
