@@ -32,22 +32,21 @@ public:
 	r2dx_v33_state(const machine_config &mconfig, device_type type, const char *tag)
 		: raiden2_state(mconfig, type, tag),
 		m_eeprom(*this, "eeprom"),
+		m_math(*this, "math"),
 		m_r2dxbank(0),
 		m_r2dxgameselect(0)
 	{ }
 
 	optional_device<eeprom_serial_93cxx_device> m_eeprom;
+	required_memory_region m_math;
 
 	DECLARE_WRITE16_MEMBER(r2dx_angle_w);
-
-	DECLARE_WRITE16_MEMBER(r2dx_unk1_w);
-	DECLARE_WRITE16_MEMBER(r2dx_unk2_w);
 	DECLARE_WRITE16_MEMBER(r2dx_dx_w);
 	DECLARE_WRITE16_MEMBER(r2dx_dy_w);
-
-	DECLARE_READ16_MEMBER(rdx_angle_r);
-	DECLARE_READ16_MEMBER(rdx_dist_r);
-
+	DECLARE_WRITE16_MEMBER(r2dx_sdistl_w);
+	DECLARE_WRITE16_MEMBER(r2dx_sdisth_w);
+	DECLARE_READ16_MEMBER(r2dx_angle_r);
+	DECLARE_READ16_MEMBER(r2dx_dist_r);
 	DECLARE_READ16_MEMBER(r2dx_sin_r);
 	DECLARE_READ16_MEMBER(r2dx_cos_r);
 
@@ -71,8 +70,6 @@ public:
 	DECLARE_DRIVER_INIT(nzerotea);
 	DECLARE_DRIVER_INIT(zerotm2k);
 
-	DECLARE_READ16_MEMBER(rdx_v33_unknown2_r);
-
 	void r2dx_setbanking(void);
 
 	DECLARE_MACHINE_RESET(r2dx_v33);
@@ -81,6 +78,9 @@ public:
 	int m_r2dxbank;
 	int m_r2dxgameselect;
 	INT16 m_r2dx_angle;
+
+	UINT16 r2dx_i_dx, r2dx_i_dy, r2dx_i_angle;
+	UINT32 r2dx_i_sdist;
 
 	UINT32 screen_update_rdx_v33(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(rdx_v33_interrupt);
@@ -232,69 +232,51 @@ WRITE16_MEMBER(r2dx_v33_state::r2dx_rom_bank_w)
 
 }
 
-//Olivier Galibert: ok, write angle at 428, get sin/cos results at 434/436
-//Olivier Galibert: 16-bits signed
-//Olivier Galibert: write dx/dy at 424/426, get dist and angle at 432/430 
-
-// Angle protection 1:
-// writes angle
 WRITE16_MEMBER(r2dx_v33_state::r2dx_angle_w)
 {
-	m_r2dx_angle = data;
+	COMBINE_DATA(&r2dx_i_angle);
 }
 
-// reads sin and cos
-READ16_MEMBER(r2dx_v33_state::r2dx_sin_r)
-{
-	double angle = m_r2dx_angle * M_PI / 128;
-	return int(4096*sin(angle));
-}
-
-READ16_MEMBER(r2dx_v33_state::r2dx_cos_r)
-{
-	double angle = m_r2dx_angle * M_PI / 128;
-	return int(4096*cos(angle));
-}
-
-// Angle protection 2:
-// write 2 co-ordinates?
 WRITE16_MEMBER(r2dx_v33_state::r2dx_dx_w)
 {
-
+	COMBINE_DATA(&r2dx_i_dx);
 }
 
 WRITE16_MEMBER(r2dx_v33_state::r2dx_dy_w)
 {
-
+	COMBINE_DATA(&r2dx_i_dy);
 }
 
-WRITE16_MEMBER(r2dx_v33_state::r2dx_unk1_w)
+READ16_MEMBER(r2dx_v33_state::r2dx_angle_r)
 {
-
+	return m_math->base()[((r2dx_i_dy & 0xff) << 8) | (r2dx_i_dx & 0xff)];
 }
 
-WRITE16_MEMBER(r2dx_v33_state::r2dx_unk2_w)
+READ16_MEMBER(r2dx_v33_state::r2dx_dist_r)
 {
-
+	return sqrt(double(r2dx_i_sdist));
 }
 
-// reads angle and distance
-READ16_MEMBER(r2dx_v33_state::rdx_angle_r)
+READ16_MEMBER(r2dx_v33_state::r2dx_sin_r)
 {
-	return 0x0000;
+	int off = 65536 + (r2dx_i_angle & 0xff)*4;
+	return (m_math->base()[off+0]) | (m_math->base()[off+1] << 8);
 }
 
-READ16_MEMBER(r2dx_v33_state::rdx_dist_r)
+READ16_MEMBER(r2dx_v33_state::r2dx_cos_r)
 {
-	return 0x0000;
+	int off = 65536 + (r2dx_i_angle & 0xff)*4;
+	return (m_math->base()[off+2]) | (m_math->base()[off+3] << 8);
 }
 
-
-
-READ16_MEMBER(r2dx_v33_state::rdx_v33_unknown2_r)
+WRITE16_MEMBER(r2dx_v33_state::r2dx_sdistl_w)
 {
-	// debug port maybe? read on R2 startup, player can't die if you return 0x0000
-	return 0xffff;
+	r2dx_i_sdist = (r2dx_i_sdist & (0xffff0000 | UINT16(~mem_mask))) | (data & mem_mask);
+}
+
+WRITE16_MEMBER(r2dx_v33_state::r2dx_sdisth_w)
+{
+	r2dx_i_sdist = (r2dx_i_sdist & (0x0000ffff | (UINT16(~mem_mask)) << 16)) | ((data & mem_mask) << 16);
 }
 
 static ADDRESS_MAP_START( rdx_v33_map, AS_PROGRAM, 16, r2dx_v33_state )
@@ -307,16 +289,14 @@ static ADDRESS_MAP_START( rdx_v33_map, AS_PROGRAM, 16, r2dx_v33_state )
 	AM_RANGE(0x00404, 0x00405) AM_WRITE(r2dx_rom_bank_w)
 	AM_RANGE(0x00406, 0x00407) AM_WRITE(tile_bank_w)
 
-	AM_RANGE(0x00420, 0x00421) AM_WRITE(r2dx_unk1_w)
-	AM_RANGE(0x00422, 0x00423) AM_WRITE(r2dx_unk2_w)
-	AM_RANGE(0x00424, 0x00425) AM_WRITE(r2dx_dx_w)
-	AM_RANGE(0x00426, 0x00427) AM_WRITE(r2dx_dy_w)
-
+	AM_RANGE(0x00420, 0x00421) AM_WRITE(r2dx_dx_w)
+	AM_RANGE(0x00422, 0x00423) AM_WRITE(r2dx_dy_w)
+	AM_RANGE(0x00424, 0x00425) AM_WRITE(r2dx_sdistl_w)
+	AM_RANGE(0x00426, 0x00427) AM_WRITE(r2dx_sdisth_w)
 	AM_RANGE(0x00428, 0x00429) AM_WRITE(r2dx_angle_w)
 
-	AM_RANGE(0x00430, 0x00431) AM_READ(rdx_angle_r)
-	AM_RANGE(0x00432, 0x00433) AM_READ(rdx_dist_r)
-
+	AM_RANGE(0x00430, 0x00431) AM_READ(r2dx_angle_r)
+	AM_RANGE(0x00432, 0x00433) AM_READ(r2dx_dist_r)
 	AM_RANGE(0x00434, 0x00435) AM_READ(r2dx_sin_r)
 	AM_RANGE(0x00436, 0x00437) AM_READ(r2dx_cos_r)
 
@@ -343,7 +323,6 @@ static ADDRESS_MAP_START( rdx_v33_map, AS_PROGRAM, 16, r2dx_v33_state )
 	
 
 	AM_RANGE(0x00700, 0x00701) AM_WRITE(rdx_v33_eeprom_w)
-  AM_RANGE(0x00740, 0x00741) AM_READ(rdx_v33_unknown2_r)
 	AM_RANGE(0x00744, 0x00745) AM_READ_PORT("INPUT")
 	AM_RANGE(0x0074c, 0x0074d) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x00762, 0x00763) AM_READ(sprite_prot_dst1_r)
@@ -377,16 +356,14 @@ static ADDRESS_MAP_START( nzeroteam_base_map, AS_PROGRAM, 16, r2dx_v33_state )
 	// 0x404 is bank on r2dx, this doesn't need it
 	// AM_RANGE(0x00406, 0x00407) AM_WRITE(tile_bank_w) // not the same?
 
-	AM_RANGE(0x00420, 0x00421) AM_WRITE(r2dx_unk1_w)
-	AM_RANGE(0x00422, 0x00423) AM_WRITE(r2dx_unk2_w)
-	AM_RANGE(0x00424, 0x00425) AM_WRITE(r2dx_dx_w)
-	AM_RANGE(0x00426, 0x00427) AM_WRITE(r2dx_dy_w)
-
+	AM_RANGE(0x00420, 0x00421) AM_WRITE(r2dx_dx_w)
+	AM_RANGE(0x00422, 0x00423) AM_WRITE(r2dx_dy_w)
+	AM_RANGE(0x00424, 0x00425) AM_WRITE(r2dx_sdistl_w)
+	AM_RANGE(0x00426, 0x00427) AM_WRITE(r2dx_sdisth_w)
 	AM_RANGE(0x00428, 0x00429) AM_WRITE(r2dx_angle_w)
 
-	AM_RANGE(0x00430, 0x00431) AM_READ(rdx_angle_r)
-	AM_RANGE(0x00432, 0x00433) AM_READ(rdx_dist_r)
-
+	AM_RANGE(0x00430, 0x00431) AM_READ(r2dx_angle_r)
+	AM_RANGE(0x00432, 0x00433) AM_READ(r2dx_dist_r)
 	AM_RANGE(0x00434, 0x00435) AM_READ(r2dx_sin_r)
 	AM_RANGE(0x00436, 0x00437) AM_READ(r2dx_cos_r)
 
@@ -875,7 +852,7 @@ ROM_START( r2dx_v33 )
 	ROM_REGION( 0x100000, "oki", 0 ) /* ADPCM samples */
 	ROM_LOAD( "pcm.099", 0x00000, 0x100000, CRC(97ca2907) SHA1(bfe8189300cf72089d0beaeab8b1a0a1a4f0a5b6) )
 
-	ROM_REGION( 0x40000, "user2", 0 ) /* SEI333 (AKA COPX-D3) data */
+	ROM_REGION( 0x40000, "math", 0 ) /* SEI333 (AKA COPX-D3) data */
 	ROM_LOAD( "copx_d3.357", 0x00000, 0x20000, CRC(fa2cf3ad) SHA1(13eee40704d3333874b6e3da9ee7d969c6dc662a) )
 
 	ROM_REGION16_BE( 0x80, "eeprom", 0 )
@@ -902,7 +879,7 @@ ROM_START( r2dx_v33_r2 )
 	ROM_REGION( 0x100000, "oki", 0 ) /* ADPCM samples */
 	ROM_LOAD( "pcm.099", 0x00000, 0x100000, CRC(97ca2907) SHA1(bfe8189300cf72089d0beaeab8b1a0a1a4f0a5b6) )
 
-	ROM_REGION( 0x40000, "user2", 0 ) /* SEI333 (AKA COPX-D3) data */
+	ROM_REGION( 0x40000, "math", 0 ) /* SEI333 (AKA COPX-D3) data */
 	ROM_LOAD( "copx_d3.357", 0x00000, 0x20000, CRC(fa2cf3ad) SHA1(13eee40704d3333874b6e3da9ee7d969c6dc662a) )
 
 	ROM_REGION16_BE( 0x80, "eeprom", 0 )
@@ -917,7 +894,7 @@ ROM_START( nzeroteam ) /* V33 SYSTEM TYPE_B hardware, uses SEI333 (AKA COPX-D3) 
 
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF ) /* v33 main cpu */
 
-	ROM_REGION( 0x40000, "user2", 0 ) /* SEI333 (AKA COPX-D3) data */
+	ROM_REGION( 0x40000, "math", 0 ) /* SEI333 (AKA COPX-D3) data */
 	ROM_LOAD( "copx-d3.bin", 0x00000, 0x20000, CRC(fa2cf3ad) SHA1(13eee40704d3333874b6e3da9ee7d969c6dc662a) ) /* Not from this set, but same data as Zero Team 2000 & Raiden II New */
 
 	ROM_REGION( 0x20000, "audiocpu", 0 ) /* 64k code for sound Z80 */
@@ -949,7 +926,7 @@ ROM_START( zerotm2k ) /* V33 SYSTEM TYPE_C VER2 hardware, uses SEI333 (AKA COPX-
 
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF ) /* v33 main cpu */
 
-	ROM_REGION( 0x40000, "user2", 0 ) /* SEI333 (AKA COPX-D3) data */
+	ROM_REGION( 0x40000, "math", 0 ) /* SEI333 (AKA COPX-D3) data */
 	ROM_LOAD( "mx27c1000mc.u0366", 0x00000, 0x20000, CRC(fa2cf3ad) SHA1(13eee40704d3333874b6e3da9ee7d969c6dc662a) ) /* PCB silkscreened 333ROM */
 
 	ROM_REGION( 0x20000, "audiocpu", 0 ) /* 64k code for sound Z80 */
