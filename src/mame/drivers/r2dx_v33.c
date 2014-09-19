@@ -378,8 +378,8 @@ static ADDRESS_MAP_START( nzerotea_map, AS_PROGRAM, 16, r2dx_v33_state )
 	AM_RANGE(0x00434, 0x00435) AM_READ(rdx_v33_unknown_r)
 	AM_RANGE(0x00436, 0x00437) AM_READ(rdx_v33_unknown_r)
 
-	AM_RANGE(0x00400, 0x00407) AM_WRITE(mcu_table_w)
-	AM_RANGE(0x00420, 0x00427) AM_WRITE(mcu_table2_w)
+//	AM_RANGE(0x00400, 0x00407) AM_WRITE(mcu_table_w)
+//	AM_RANGE(0x00420, 0x00427) AM_WRITE(mcu_table2_w)
 
 	AM_RANGE(0x00600, 0x0064f) AM_RAM AM_SHARE("crtc_regs")
 
@@ -413,8 +413,7 @@ static ADDRESS_MAP_START( nzerotea_map, AS_PROGRAM, 16, r2dx_v33_state )
 	AM_RANGE(0x10000, 0x1efff) AM_RAM
 	AM_RANGE(0x1f000, 0x1ffff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 
-	AM_RANGE(0x20000, 0x3ffff) AM_ROMBANK("bank1")
-	AM_RANGE(0x40000, 0xfffff) AM_ROM AM_REGION("mainprg", 0x40000 )
+	AM_RANGE(0x20000, 0xfffff) AM_ROM AM_REGION("mainprg", 0x20000 )
 ADDRESS_MAP_END
 
 INTERRUPT_GEN_MEMBER(r2dx_v33_state::rdx_v33_interrupt)
@@ -725,11 +724,11 @@ DRIVER_INIT_MEMBER(r2dx_v33_state,nzerotea)
 	static const int spri[5] = { 0, 1, 2, 3, -1 };
 	cur_spri = spri;
 
-	membank("bank1")->configure_entries(0, 2, memregion("mainprg")->base(), 0x20000);
+//	membank("bank1")->configure_entries(0, 2, memregion("mainprg")->base(), 0x20000);
 
 	zeroteam_decrypt_sprites(machine());
 
-	membank("bank1")->set_entry(1);
+//	membank("bank1")->set_entry(1);
 }
 
 DRIVER_INIT_MEMBER(r2dx_v33_state,zerotm2k)
@@ -738,12 +737,12 @@ DRIVER_INIT_MEMBER(r2dx_v33_state,zerotm2k)
 	static const int spri[5] = { 0, 1, 2, 3, -1 };
 	cur_spri = spri;
 
-	membank("bank1")->configure_entries(0, 2, memregion("mainprg")->base(), 0x20000);
+	//membank("bank1")->configure_entries(0, 2, memregion("mainprg")->base(), 0x20000);
 
 	// sprites are NOT encrypted
 	//zeroteam_decrypt_sprites(machine());
 
-	membank("bank1")->set_entry(1);
+	//membank("bank1")->set_entry(1);
 }
 
 /*
