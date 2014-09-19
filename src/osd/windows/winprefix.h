@@ -6,8 +6,11 @@
 //
 //============================================================
 
-#define _WIN32_WINNT 0x0501
-
+#ifdef PTR64
+#define _WIN32_WINNT 0x0601 // Windows 7
+#else
+#define _WIN32_WINNT 0x0501 // Windows XP
+#endif
 #ifdef _MSC_VER
 #include <assert.h>
 #include <malloc.h>

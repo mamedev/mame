@@ -115,17 +115,6 @@ namespace bgfx
 		D3D11_CULL_BACK,
 	};
 
-	static DXGI_FORMAT s_colorFormat[] =
-	{
-		DXGI_FORMAT_UNKNOWN, // ignored
-		DXGI_FORMAT_R8G8B8A8_UNORM,
-		DXGI_FORMAT_R10G10B10A2_UNORM,
-		DXGI_FORMAT_R16G16B16A16_UNORM,
-		DXGI_FORMAT_R16G16B16A16_FLOAT,
-		DXGI_FORMAT_R16_FLOAT,
-		DXGI_FORMAT_R32_FLOAT,
-	};
-
 	static const DXGI_FORMAT s_depthFormat[] =
 	{
 		DXGI_FORMAT_UNKNOWN,           // ignored
@@ -2105,6 +2094,7 @@ namespace bgfx
 					, regIndex
 					, regCount
 					);
+				BX_UNUSED(kind);
 			}
 
 			m_constantBuffer->finish();
@@ -2767,7 +2757,7 @@ namespace bgfx
 							commitShaderConstants();
 						}
 					}
-
+					BX_UNUSED(programChanged);
 					ID3D11UnorderedAccessView* uav[BGFX_MAX_COMPUTE_BINDINGS] = {};
 					ID3D11ShaderResourceView*  srv[BGFX_MAX_COMPUTE_BINDINGS] = {};
 					ID3D11SamplerState*    sampler[BGFX_CONFIG_MAX_TEXTURE_SAMPLERS] = {};
