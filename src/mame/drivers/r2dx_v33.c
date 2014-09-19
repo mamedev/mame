@@ -71,6 +71,8 @@ public:
 	DECLARE_DRIVER_INIT(nzerotea);
 	DECLARE_DRIVER_INIT(zerotm2k);
 
+	DECLARE_READ16_MEMBER(rdx_v33_unknown2_r);
+
 	void r2dx_setbanking(void);
 
 	DECLARE_MACHINE_RESET(r2dx_v33);
@@ -289,7 +291,11 @@ READ16_MEMBER(r2dx_v33_state::rdx_dist_r)
 
 
 
-
+READ16_MEMBER(r2dx_v33_state::rdx_v33_unknown2_r)
+{
+	// debug port maybe? read on R2 startup, player can't die if you return 0x0000
+	return 0xffff;
+}
 
 static ADDRESS_MAP_START( rdx_v33_map, AS_PROGRAM, 16, r2dx_v33_state )
 	AM_RANGE(0x00000, 0x003ff) AM_RAM // vectors copied here
@@ -337,7 +343,7 @@ static ADDRESS_MAP_START( rdx_v33_map, AS_PROGRAM, 16, r2dx_v33_state )
 	
 
 	AM_RANGE(0x00700, 0x00701) AM_WRITE(rdx_v33_eeprom_w)
-//  AM_RANGE(0x00740, 0x00741) AM_READ(rdx_v33_unknown2_r)
+  AM_RANGE(0x00740, 0x00741) AM_READ(rdx_v33_unknown2_r)
 	AM_RANGE(0x00744, 0x00745) AM_READ_PORT("INPUT")
 	AM_RANGE(0x0074c, 0x0074d) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x00762, 0x00763) AM_READ(sprite_prot_dst1_r)
