@@ -282,8 +282,7 @@ void tms9928a_device::device_timer(emu_timer &timer, device_timer_id id, int par
 	if ( y < 0 || y >= 192 || ! (m_Regs[1] & 0x40) )
 	{
 		/* Draw backdrop colour */
-		for ( int i = 0; i < TMS9928A_TOTAL_HORZ; i++ )
-			p[i] = m_palette[BackColour];
+		memset(p, m_palette[BackColour], TMS9928A_TOTAL_HORZ);
 
 		/* vblank is set at the last cycle of the first inactive line */
 		if ( y == 193 )
@@ -297,8 +296,7 @@ void tms9928a_device::device_timer(emu_timer &timer, device_timer_id id, int par
 		/* Draw regular line */
 
 		/* Left border */
-		for ( int i = 0; i < TMS9928A_HORZ_DISPLAY_START; i++ )
-			p[i] = m_palette[BackColour];
+		memset(p, m_palette[BackColour], TMS9928A_HORZ_DISPLAY_START);
 
 		/* Active display */
 
