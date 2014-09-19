@@ -50,7 +50,9 @@ public:
 			m_fdc(*this, "upd765a"),
 			m_video_ram(*this, "video_ram"),
 			m_beeper(*this, "beeper"),
-			m_palette(*this, "palette")
+			m_palette(*this, "palette"),
+			m_system_dsw(*this, "SYSTEM_DSW"),
+			m_fd_dsw(*this, "FD_DSW")
 	{ }
 
 	// devices
@@ -106,6 +108,11 @@ protected:
 	virtual void machine_reset();
 
 	virtual void video_start();
+
+private:
+	required_ioport m_system_dsw;
+	required_ioport m_fd_dsw;
+	floppy_connector *m_floppy_connector[4];
 };
 
 void mz3500_state::video_start()
@@ -473,9 +480,9 @@ READ8_MEMBER(mz3500_state::mz3500_io_r)
 	switch(offset)
 	{
 		case 2:
-			return ((ioport("SYSTEM_DSW")->read() & 0x0f) << 1) | ((ioport("FD_DSW")->read() & 0x8) >> 3);
+			return ((m_system_dsw->read() & 0x0f) << 1) | ((m_fd_dsw->read() & 0x8) >> 3);
 		case 3:
-			return ((ioport("FD_DSW")->read() & 0x7)<<5) | (m_srdy << 4);
+			return ((m_fd_dsw->read() & 0x7)<<5) | (m_srdy << 4);
 	}
 
 	return 0;
@@ -534,15 +541,13 @@ WRITE8_MEMBER(mz3500_state::mz3500_crtc_w)
 
 READ8_MEMBER(mz3500_state::mz3500_fdc_r)
 {
-	static const char *const m_fddnames[4] = { "upd765a:0", "upd765a:1", "upd765a:2", "upd765a:3"};
-
 	/*
 	---- -x-- Motor
 	---- --x- Index
 	---- ---x Drq
 	*/
-	floppy_image_device *floppy;
-	floppy = machine().device<floppy_connector>(m_fddnames[m_fdd_sel])->get_device();
+
+	floppy_image_device *floppy = m_floppy_connector[m_fdd_sel]->get_device();
 
 	return (floppy->mon_r() << 2) | (floppy->idx_r() << 1) | (m_fdc->get_drq() & 1);
 }
@@ -556,7 +561,6 @@ WRITE8_MEMBER(mz3500_state::mz3500_fdc_w)
 	---x ---- motor on signal
 	---- xxxx Select FDD 0-3 (bit-wise)
 	*/
-	static const char *const m_fddnames[4] = { "upd765a:0", "upd765a:1", "upd765a:2", "upd765a:3"};
 
 	if(data & 0x40)
 	{
@@ -570,7 +574,7 @@ WRITE8_MEMBER(mz3500_state::mz3500_fdc_w)
 		}
 	}
 
-	machine().device<floppy_connector>(m_fddnames[m_fdd_sel])->get_device()->mon_w(data & 0x10 ? CLEAR_LINE : ASSERT_LINE);
+	m_floppy_connector[m_fdd_sel]->get_device()->mon_w(data & 0x10 ? CLEAR_LINE : ASSERT_LINE);
 
 }
 
@@ -740,6 +744,13 @@ void mz3500_state::machine_start()
 	m_char_rom = memregion("gfx1")->base();
 	m_work_ram = auto_alloc_array_clear(machine(), UINT8, 0x40000);
 	m_shared_ram = auto_alloc_array_clear(machine(), UINT8, 0x800);
+
+	static const char *const m_fddnames[4] = { "upd765a:0", "upd765a:1", "upd765a:2", "upd765a:3"};
+
+	for (int i = 0; i < 4; i++)
+	{
+		m_floppy_connector[i] = machine().device<floppy_connector>(m_fddnames[i]);
+	}
 }
 
 void mz3500_state::machine_reset()
@@ -760,12 +771,10 @@ void mz3500_state::machine_reset()
 	{
 		m_fdd_sel = 0;
 		{
-			static const char *const m_fddnames[4] = { "upd765a:0", "upd765a:1", "upd765a:2", "upd765a:3"};
-
 			for(int i=0;i<4;i++)
 			{
-				machine().device<floppy_connector>(m_fddnames[i])->get_device()->mon_w(ASSERT_LINE);
-				machine().device<floppy_connector>(m_fddnames[i])->get_device()->set_rpm(300);
+				m_floppy_connector[i]->get_device()->mon_w(ASSERT_LINE);
+				m_floppy_connector[i]->get_device()->set_rpm(300);
 			}
 
 			machine().device<upd765a_device>("upd765a")->set_rate(250000);
