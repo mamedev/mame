@@ -71,18 +71,18 @@ protected:
 		UINT32 accel_fgcolour;
 		UINT32 accel_bgcolour;
 		UINT16 accel_pattern_loc;
-		UINT16 accel_source_x;
-		UINT16 accel_source_y;
-		UINT16 accel_dest_x;
-		UINT16 accel_dest_y;
-		UINT16 accel_dim_x;
-		UINT16 accel_dim_y;
+		INT16 accel_source_x;
+		INT16 accel_source_y;
+		INT16 accel_dest_x;
+		INT16 accel_dest_y;
+		INT16 accel_dim_x;
+		INT16 accel_dim_y;
 		UINT32 accel_style;
 		UINT32 accel_ckey;
-		UINT16 accel_source_x_clip;
-		UINT16 accel_source_y_clip;
-		UINT16 accel_dest_x_clip;
-		UINT16 accel_dest_y_clip;
+		INT16 accel_source_x_clip;
+		INT16 accel_source_y_clip;
+		INT16 accel_dest_x_clip;
+		INT16 accel_dest_y_clip;
 		UINT32 accel_fg_pattern_colour;
 		UINT32 accel_bg_pattern_colour;
 		UINT8 accel_pattern[0x80];
@@ -96,6 +96,10 @@ private:
 	void trident_crtc_reg_write(UINT8 index, UINT8 data);
 	UINT8 trident_gc_reg_read(UINT8 index);
 	void trident_gc_reg_write(UINT8 index, UINT8 data);
+
+	void accel_command();
+	void accel_bitblt();
+	void accel_line();
 };
 
 
