@@ -55,7 +55,8 @@ TODO:
 #include "video/tms3556.h"
 #include "sound/tms5220.h"
 #include "machine/spchrom.h"
-#include "imagedev/cartslot.h"
+#include "bus/generic/slot.h"
+#include "bus/generic/carts.h"
 //#include "imagedev/cassette.h"
 
 
@@ -66,14 +67,14 @@ public:
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
 			m_tms3556(*this, "tms3556"),
-			m_tms5220c(*this, "tms5220c")
+			m_tms5220c(*this, "tms5220c"),
+			m_cart(*this, "cartslot")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<tms3556_device> m_tms3556;
 	required_device<tms5220c_device> m_tms5220c;
-
-	virtual void machine_start();
+	optional_device<generic_slot_device> m_cart;
 
 	DECLARE_READ8_MEMBER( mailbox_wx319_r );
 	DECLARE_WRITE8_MEMBER( mailbox_wx318_w );
@@ -85,6 +86,10 @@ public:
 	DECLARE_WRITE8_MEMBER( tms7041_portc_w );
 	DECLARE_READ8_MEMBER( tms7041_portd_r );
 	DECLARE_WRITE8_MEMBER( tms7041_portd_w );
+	DECLARE_READ8_MEMBER( rom_r );
+
+	DECLARE_MACHINE_START(exl100);
+	DECLARE_MACHINE_START(exeltel);
 
 	/* tms7020 i/o ports */
 	UINT8   m_tms7020_portb;
@@ -105,46 +110,11 @@ public:
 };
 
 
-DEVICE_IMAGE_LOAD_MEMBER( exelv_state, exelvision_cartridge )
-{
-	UINT8* pos = memregion("user1")->base();
-	offs_t size;
-
-	if (image.software_entry() == NULL)
-		size = image.length();
-	else
-		size = image.get_software_region_length("rom");
-
-
-	if (image.software_entry() == NULL)
-	{
-		image.fread( pos, size );
-	}
-	else
-	{
-		memcpy(pos, image.get_software_region("rom"), size);
-	}
-
-	return IMAGE_INIT_PASS;
-}
-
-
-
 TIMER_DEVICE_CALLBACK_MEMBER(exelv_state::exelv_hblank_interrupt)
 {
 	m_tms3556->interrupt(machine());
 }
 
-#ifdef UNUSED_FUNCTION
-static DEVICE_IMAGE_LOAD(exelv_cart)
-{
-	return IMAGE_INIT_PASS;
-}
-
-static DEVICE_IMAGE_UNLOAD( exelv_cart )
-{
-}
-#endif
 
 /*
     I/O CPU protocol (WIP):
@@ -389,6 +359,19 @@ WRITE8_MEMBER(exelv_state::tms7041_portd_w)
 	m_tms7041_portd = data;
 }
 
+
+/*
+	CARTRIDGE ACCESS
+*/
+READ8_MEMBER(exelv_state::rom_r)
+{
+	if (m_cart && m_cart->cart_mounted())
+		return m_cart->read_rom(space, offset + 0x200);
+
+	return 0;
+}
+
+
 /*
     Main CPU memory map summary:
 
@@ -423,7 +406,7 @@ static ADDRESS_MAP_START(tms7020_mem, AS_PROGRAM, 8, exelv_state)
 	AM_RANGE(0x012e, 0x012e) AM_DEVWRITE("tms3556", tms3556_device, vram_w)
 
 	AM_RANGE(0x0130, 0x0130) AM_READWRITE(mailbox_wx319_r, mailbox_wx318_w)
-	AM_RANGE(0x0200, 0x7fff) AM_ROMBANK("bank1")                                /* system ROM */
+	AM_RANGE(0x0200, 0x7fff) AM_READ(rom_r)
 	AM_RANGE(0x8000, 0xbfff) AM_NOP
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM                                     /* CPU RAM */
 	AM_RANGE(0xc800, 0xf7ff) AM_NOP
@@ -482,12 +465,8 @@ PALETTE_INIT_MEMBER(exelv_state, exelv)
 
 /* Machine Initialization */
 
-void exelv_state::machine_start()
-{
-	UINT8 *rom = memregion("user1")->base() + 0x0200;
-	membank("bank1")->configure_entry(0, rom);
-	membank("bank1")->set_entry(0);
-
+MACHINE_START_MEMBER( exelv_state, exl100)
+{	
 	/* register for state saving */
 	save_item(NAME(m_tms7020_portb));
 	save_item(NAME(m_tms7041_portb));
@@ -497,6 +476,22 @@ void exelv_state::machine_start()
 	save_item(NAME(m_wx319));
 }
 
+MACHINE_START_MEMBER( exelv_state, exeltel)
+{
+	UINT8 *rom = memregion("user1")->base() + 0x0200;
+	membank("bank1")->configure_entry(0, rom);
+	membank("bank1")->set_entry(0);
+	
+	/* register for state saving */
+	save_item(NAME(m_tms7020_portb));
+	save_item(NAME(m_tms7041_portb));
+	save_item(NAME(m_tms7041_portc));
+	save_item(NAME(m_tms7041_portd));
+	save_item(NAME(m_wx318));
+	save_item(NAME(m_wx319));
+}
+
+
 static MACHINE_CONFIG_START( exl100, exelv_state )
 
 	/* basic machine hardware */
@@ -504,6 +499,7 @@ static MACHINE_CONFIG_START( exl100, exelv_state )
 	MCFG_CPU_PROGRAM_MAP(tms7020_mem)
 	MCFG_CPU_IO_MAP(tms7020_port)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", exelv_state, exelv_hblank_interrupt, "screen", 0, 1)
+	MCFG_MACHINE_START_OVERRIDE(exelv_state, exl100)
 
 	MCFG_CPU_ADD("tms7041", TMS7041, XTAL_4_9152MHz)
 	MCFG_CPU_IO_MAP(tms7041_port)
@@ -538,13 +534,11 @@ static MACHINE_CONFIG_START( exl100, exelv_state )
 	// MCFG_TMS52XX_SPEECHROM("vsm")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-/* cartridge */
-	MCFG_CARTSLOT_ADD("cart")
-	MCFG_CARTSLOT_EXTENSION_LIST("bin,rom")
-	MCFG_CARTSLOT_NOT_MANDATORY
-	MCFG_CARTSLOT_LOAD(exelv_state,exelvision_cartridge)
-	MCFG_CARTSLOT_INTERFACE("exelvision_cart")
-	//MCFG_SOFTWARE_LIST_ADD("cart_list","exelvision_cart")
+	/* cartridge */
+	MCFG_GENERIC_CARTSLOT_ADD("cartslot", GENERIC_ROM8_WIDTH, generic_linear_slot, "exelvision_cart")
+	MCFG_GENERIC_EXTENSIONS("bin,rom")
+
+	MCFG_SOFTWARE_LIST_ADD("cart_list", "exl100_cart")
 MACHINE_CONFIG_END
 
 
@@ -555,6 +549,7 @@ static MACHINE_CONFIG_START( exeltel, exelv_state )
 	MCFG_CPU_PROGRAM_MAP(tms7040_mem)
 	MCFG_CPU_IO_MAP(tms7020_port)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", exelv_state, exelv_hblank_interrupt, "screen", 0, 1)
+	MCFG_MACHINE_START_OVERRIDE(exelv_state, exeltel)
 
 	MCFG_CPU_ADD("tms7042", TMS7042, XTAL_4_9152MHz)
 	MCFG_CPU_IO_MAP(tms7041_port)
@@ -601,8 +596,6 @@ ROM_START(exl100)
 	ROM_REGION(0x10000, "tms7041", 0)
 	ROM_LOAD("exl100_7041.bin", 0xf000, 0x1000, CRC(38f6fc7a) SHA1(b71d545664a974d8ad39bdf600c5b9884c3efab6))           /* TMS7041 internal ROM, correct  */
 //  ROM_REGION(0x8000, "vsm", 0)
-
-	ROM_REGION(0x10000, "user1", ROMREGION_ERASEFF)         /* cartridge area */
 ROM_END
 
 

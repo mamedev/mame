@@ -25,9 +25,10 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "imagedev/cartslot.h"
 #include "video/tms9928a.h"
 #include "sound/ay8910.h"
+#include "bus/generic/slot.h"
+#include "bus/generic/carts.h"
 
 
 class myvision_state : public driver_device
@@ -36,6 +37,7 @@ public:
 	myvision_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_cart(*this, "cartslot")
 		, m_io_row0(*this, "ROW0")
 		, m_io_row1(*this, "ROW1")
 		, m_io_row2(*this, "ROW2")
@@ -53,6 +55,7 @@ private:
 	virtual void machine_start();
 	virtual void machine_reset();
 	required_device<cpu_device> m_maincpu;
+	required_device<generic_slot_device> m_cart;
 	UINT8 m_column;
 	required_ioport m_io_row0;
 	required_ioport m_io_row1;
@@ -63,8 +66,8 @@ private:
 
 static ADDRESS_MAP_START(myvision_mem, AS_PROGRAM, 8, myvision_state)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x0000, 0x5fff ) AM_ROM
-	AM_RANGE( 0xa000, 0xa7ff ) AM_RAM
+	//AM_RANGE(0x0000, 0x5fff)		// mapped by the cartslot
+	AM_RANGE(0xa000, 0xa7ff) AM_RAM
 	AM_RANGE(0xe000, 0xe000) AM_DEVREADWRITE("tms9918", tms9918a_device, vram_read, vram_write)
 	AM_RANGE(0xe002, 0xe002) AM_DEVREADWRITE("tms9918", tms9918a_device, register_read, register_write)
 ADDRESS_MAP_END
@@ -125,6 +128,9 @@ INPUT_PORTS_END
 
 void myvision_state::machine_start()
 {
+	if (m_cart->cart_mounted())
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0x0000, 0x5fff, read8_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_cart));
+
 	save_item(NAME(m_column));
 }
 
@@ -137,28 +143,16 @@ void myvision_state::machine_reset()
 
 DEVICE_IMAGE_LOAD_MEMBER( myvision_state, cart )
 {
-	UINT8 *cart = memregion("maincpu")->base();
-
-	if (image.software_entry() == NULL)
+	UINT32 size = m_cart->common_get_size("rom");
+	
+	if (size != 0x4000 && size != 0x6000)
 	{
-		UINT32 filesize = image.length();
-
-		if (filesize != 0x4000 && filesize != 0x6000)
-		{
-			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Incorrect or unsupported cartridge size");
-			return IMAGE_INIT_FAIL;
-		}
-
-		if (image.fread( cart, filesize) != filesize)
-		{
-			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Error loading file");
-			return IMAGE_INIT_FAIL;
-		}
+		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
+		return IMAGE_INIT_FAIL;
 	}
-	else
-	{
-		memcpy(cart, image.get_software_region("rom"), image.get_software_region_length("rom"));
-	}
+	
+	m_cart->rom_alloc(size, 1);
+	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");			
 
 	return IMAGE_INIT_PASS;
 }
@@ -199,7 +193,7 @@ READ8_MEMBER( myvision_state::ay_port_a_r )
 
 READ8_MEMBER( myvision_state::ay_port_b_r )
 {
-	return 0xFF;
+	return 0xff;
 }
 
 
@@ -237,11 +231,9 @@ static MACHINE_CONFIG_START( myvision, myvision_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* cartridge */
-	MCFG_CARTSLOT_ADD("cart")
-	MCFG_CARTSLOT_EXTENSION_LIST("bin")
-	MCFG_CARTSLOT_MANDATORY
-	MCFG_CARTSLOT_LOAD(myvision_state,cart)
-	MCFG_CARTSLOT_INTERFACE("myvision_cart")
+	MCFG_GENERIC_CARTSLOT_ADD("cartslot", GENERIC_ROM8_WIDTH, generic_plain_slot, "myvision_cart")
+	MCFG_GENERIC_LOAD(myvision_state, cart)
+	//MCFG_GENERIC_MANDATORY
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("cart_list","myvision")
@@ -249,7 +241,7 @@ MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( myvision )
-	ROM_REGION( 0x6000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 ROM_END
 
 /* Driver */

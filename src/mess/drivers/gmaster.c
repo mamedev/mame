@@ -4,8 +4,9 @@
 
 #include "emu.h"
 #include "cpu/upd7810/upd7810.h"
-#include "imagedev/cartslot.h"
 #include "sound/speaker.h"
+#include "bus/generic/slot.h"
+#include "bus/generic/carts.h"
 #include "rendlay.h"
 
 
@@ -16,6 +17,7 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_speaker(*this, "speaker")
+		, m_cart(*this, "cartslot")
 		, m_io_joy(*this, "JOY")
 	{ }
 
@@ -45,6 +47,7 @@ private:
 	UINT8 m_ram[0x4000];
 	required_device<cpu_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
+	required_device<generic_slot_device> m_cart;
 	required_ioport m_io_joy;
 };
 
@@ -179,7 +182,7 @@ WRITE8_MEMBER(gmaster_state::gmaster_port_w)
 static ADDRESS_MAP_START( gmaster_mem, AS_PROGRAM, 8, gmaster_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x7fff) AM_READWRITE(gmaster_io_r, gmaster_io_w)
-	AM_RANGE(0x8000, 0xfeff) AM_ROM
+	//AM_RANGE(0x8000, 0xfeff)		// mapped by the cartslot
 	AM_RANGE(0xff00, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -260,6 +263,9 @@ UINT32 gmaster_state::screen_update_gmaster(screen_device &screen, bitmap_ind16 
 
 void gmaster_state::machine_start()
 {
+	if (m_cart->cart_mounted())
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0x8000, 0xfeff, read8_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_cart));
+
 	save_item(NAME(m_video.data));
 	save_item(NAME(m_video.index));
 	save_item(NAME(m_video.x));
@@ -297,10 +303,9 @@ static MACHINE_CONFIG_START( gmaster, gmaster_state )
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
 
-	MCFG_CARTSLOT_ADD("cart")
-	MCFG_CARTSLOT_EXTENSION_LIST("bin")
-	MCFG_CARTSLOT_MANDATORY
-	MCFG_CARTSLOT_INTERFACE("gmaster_cart")
+	MCFG_GENERIC_CARTSLOT_ADD("cartslot", GENERIC_ROM8_WIDTH, generic_linear_slot, "gmaster_cart")
+	MCFG_GENERIC_MANDATORY
+
 	MCFG_SOFTWARE_LIST_ADD("cart_list","gmaster")
 MACHINE_CONFIG_END
 
@@ -308,7 +313,6 @@ MACHINE_CONFIG_END
 ROM_START(gmaster)
 	ROM_REGION(0x10000,"maincpu", 0)
 	ROM_LOAD("d78c11agf_e19.u1", 0x0000, 0x1000, CRC(05cc45e5) SHA1(05d73638dea9657ccc2791c0202d9074a4782c1e) )
-	ROM_CART_LOAD("cart", 0x8000, 0x8000, 0)
 ROM_END
 
 

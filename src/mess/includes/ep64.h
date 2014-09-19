@@ -18,9 +18,10 @@
 #include "bus/rs232/rs232.h"
 #include "bus/ep64/exp.h"
 #include "cpu/z80/z80.h"
-#include "imagedev/cartslot.h"
 #include "imagedev/cassette.h"
 #include "bus/centronics/ctronics.h"
+#include "bus/generic/slot.h"
+#include "bus/generic/carts.h"
 #include "machine/ram.h"
 #include "video/nick.h"
 
@@ -45,6 +46,7 @@ public:
 			m_rs232(*this, RS232_TAG),
 			m_cassette1(*this, CASSETTE1_TAG),
 			m_cassette2(*this, CASSETTE2_TAG),
+			m_cart(*this, "cartslot"),
 			m_ram(*this, RAM_TAG),
 			m_rom(*this, Z80_TAG),
 			m_y0(*this, "Y0"),
@@ -66,6 +68,7 @@ public:
 	required_device<rs232_port_device> m_rs232;
 	required_device<cassette_image_device> m_cassette1;
 	required_device<cassette_image_device> m_cassette2;
+	required_device<generic_slot_device> m_cart;
 	required_device<ram_device> m_ram;
 	required_memory_region m_rom;
 	required_ioport m_y0;

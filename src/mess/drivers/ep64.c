@@ -320,7 +320,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dave_64k_mem, AS_PROGRAM, 8, ep64_state )
 	AM_RANGE(0x000000, 0x007fff) AM_ROM AM_REGION(Z80_TAG, 0)
-	AM_RANGE(0x010000, 0x01ffff) AM_ROM AM_REGION("cart", 0)
+	//AM_RANGE(0x010000, 0x01ffff)		// mapped by the cartslot
 	AM_RANGE(0x3f0000, 0x3fffff) AM_DEVICE(NICK_TAG, nick_device, vram_map)
 ADDRESS_MAP_END
 
@@ -470,6 +470,9 @@ INPUT_PORTS_END
 
 void ep64_state::machine_start()
 {
+	if (m_cart->cart_mounted())
+		m_dave->space(AS_PROGRAM).install_read_handler(0x010000, 0x01ffff, read8_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_cart));
+
 	// state saving
 	save_item(NAME(m_key));
 	save_item(NAME(m_centronics_busy));
@@ -538,10 +541,8 @@ static MACHINE_CONFIG_START( ep64, ep64_state )
 	MCFG_RAM_DEFAULT_SIZE("64K")
 
 	// cartridge
-	MCFG_CARTSLOT_ADD("cart")
-	MCFG_CARTSLOT_EXTENSION_LIST("rom,bin")
-	MCFG_CARTSLOT_NOT_MANDATORY
-	MCFG_CARTSLOT_INTERFACE("ep64_cart")
+	MCFG_GENERIC_CARTSLOT_ADD("cartslot", GENERIC_ROM8_WIDTH, generic_linear_slot, "ep64_cart")
+	MCFG_GENERIC_EXTENSIONS("bin,rom")
 
 	// software lists
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "ep64_cart")
@@ -576,9 +577,6 @@ MACHINE_CONFIG_END
 ROM_START( ep64 )
 	ROM_REGION( 0x8000, Z80_TAG, 0 )
 	ROM_LOAD( "9256ds-0038_enter05-23-a.u2", 0x0000, 0x8000, CRC(d421795f) SHA1(6033a0535136c40c47137e4d1cd9273c06d5fdff) )
-
-	ROM_REGION( 0x10000, "cart", 0 )
-	ROM_CART_LOAD( "cart", 0x00000, 0x10000, ROM_MIRROR )
 ROM_END
 
 #define rom_phc64   rom_ep64
@@ -591,9 +589,6 @@ ROM_END
 ROM_START( ep128 )
 	ROM_REGION( 0x8000, Z80_TAG, 0 )
 	ROM_LOAD( "9256ds-0019_enter08-45-a.u2", 0x0000, 0x8000, CRC(982a3b44) SHA1(55315b20fecb4441a07ee4bc5dc7153f396e0a2e) )
-
-	ROM_REGION( 0x10000, "cart", 0 )
-	ROM_CART_LOAD( "cart", 0x00000, 0x10000, ROM_MIRROR )
 ROM_END
 
 

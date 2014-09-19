@@ -25,7 +25,7 @@ TODO:
 - Cassette can be 600 or 1200 baud, how is 600 baud selected?
 - Hookup Graphics modes and colours
 - Unknown i/o ports
-- Need software
+- Need cart software (current code is just a guess)
 
 
 ****************************************************************************/
@@ -37,12 +37,13 @@ TODO:
 #include "machine/i8251.h"
 #include "machine/clock.h"
 #include "sound/ay8910.h"
-#include "imagedev/cartslot.h"
 #include "imagedev/cassette.h"
 #include "sound/wave.h"
 #include "formats/fc100_cas.h"
 #include "machine/buffer.h"
 #include "bus/centronics/ctronics.h"
+#include "bus/generic/slot.h"
+#include "bus/generic/carts.h"
 
 
 class fc100_state : public driver_device
@@ -54,6 +55,7 @@ public:
 		, m_vdg(*this, "vdg")
 		, m_p_videoram(*this, "videoram")
 		, m_cass(*this, "cassette")
+		, m_cart(*this, "cartslot")
 		, m_uart(*this, "uart")
 		, m_centronics(*this, "centronics")
 		, m_keyboard(*this, "KEY")
@@ -102,6 +104,7 @@ private:
 	required_device<mc6847_base_device> m_vdg;
 	required_shared_ptr<UINT8> m_p_videoram;
 	required_device<cassette_image_device> m_cass;
+	required_device<generic_slot_device> m_cart;
 	required_device<i8251_device> m_uart;
 	required_device<centronics_device> m_centronics;
 	required_ioport_array<16> m_keyboard;
@@ -111,9 +114,9 @@ private:
 static ADDRESS_MAP_START( fc100_mem, AS_PROGRAM, 8, fc100_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x5fff ) AM_ROM AM_REGION("roms", 0)
-	AM_RANGE( 0x6000, 0x77ff ) AM_ROM AM_REGION("cart", 0)
+	//AM_RANGE(0x6000, 0x6fff)		// mapped by the cartslot
 	AM_RANGE( 0x7800, 0x7fff ) AM_READ_BANK("bankr") AM_WRITE_BANK("bankw") // Banked RAM/ROM
-	AM_RANGE( 0x8000, 0xBFFF ) AM_RAM // expansion ram pack - if omitted you get a 'Pages?' prompt at boot
+	AM_RANGE( 0x8000, 0xbfff ) AM_RAM // expansion ram pack - if omitted you get a 'Pages?' prompt at boot
 	AM_RANGE( 0xc000, 0xffff ) AM_RAM AM_SHARE("videoram")
 ADDRESS_MAP_END
 
@@ -461,6 +464,9 @@ void fc100_state::machine_start()
 	m_intext = 0;
 	m_inv = 0;
 
+	if (m_cart->cart_mounted())
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0x6000, 0x6fff, read8_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_cart));
+
 	save_item(NAME(m_ag));
 	save_item(NAME(m_gm2));
 	save_item(NAME(m_gm1));
@@ -543,7 +549,9 @@ static MACHINE_CONFIG_START( fc100, fc100_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_c", fc100_state, timer_c, attotime::from_hz(4800)) // cass write
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_p", fc100_state, timer_p, attotime::from_hz(40000)) // cass read
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_k", fc100_state, timer_k, attotime::from_hz(300)) // keyb scan
-	MCFG_CARTSLOT_ADD("cart")
+
+	MCFG_GENERIC_CARTSLOT_ADD("cartslot", GENERIC_ROM8_WIDTH, generic_plain_slot, "fc100_cart")
+
 	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "printer")
 	MCFG_CENTRONICS_ACK_HANDLER(DEVWRITELINE("cent_status_in", input_buffer_device, write_bit4))
 	MCFG_CENTRONICS_BUSY_HANDLER(DEVWRITELINE("cent_status_in", input_buffer_device, write_bit5))
@@ -562,9 +570,6 @@ ROM_START( fc100 )
 
 	ROM_REGION( 0x1000, "chargen", 0 )
 	ROM_LOAD( "cg-04-01.u53",  0x0000, 0x1000, CRC(2de75b7f) SHA1(464369d98cbae92ffa322ebaa4404cf5b26825f1) )
-
-	ROM_REGION(0x2000,"cart", ROMREGION_ERASEFF)
-	ROM_CART_LOAD("cart", 0x0000, 0x2000, ROM_OPTIONAL)
 ROM_END
 
 /* Driver */
