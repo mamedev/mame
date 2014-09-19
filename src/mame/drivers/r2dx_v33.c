@@ -55,8 +55,6 @@ public:
 	DECLARE_WRITE16_MEMBER(mcu_yval_w);
 	DECLARE_WRITE16_MEMBER(mcu_table_w);
 	DECLARE_WRITE16_MEMBER(mcu_table2_w);
-	DECLARE_READ16_MEMBER(nzerotea_sound_comms_r);
-	DECLARE_WRITE16_MEMBER(nzerotea_sound_comms_w);
 	DECLARE_WRITE16_MEMBER(mcu_prog_w);
 	DECLARE_WRITE16_MEMBER(mcu_prog_w2);
 	DECLARE_WRITE16_MEMBER(mcu_prog_offs_w);
@@ -345,30 +343,6 @@ static ADDRESS_MAP_START( rdx_v33_map, AS_PROGRAM, 16, r2dx_v33_state )
 	AM_RANGE(0x40000, 0xfffff) AM_ROM AM_ROMBANK("bank3") AM_WRITENOP
 ADDRESS_MAP_END
 
-READ16_MEMBER(r2dx_v33_state::nzerotea_sound_comms_r)
-{
-	switch(offset+0x780)
-	{
-		case (0x788/2): return m_seibu_sound->main_word_r(space,2,0xffff);
-		case (0x78c/2): return m_seibu_sound->main_word_r(space,3,0xffff);
-		case (0x794/2): return m_seibu_sound->main_word_r(space,5,0xffff);
-	}
-
-	return 0xffff;
-}
-
-
-WRITE16_MEMBER(r2dx_v33_state::nzerotea_sound_comms_w)
-{
-	switch(offset+0x780)
-	{
-		case (0x780/2): { m_seibu_sound->main_word_w(space,0,data,0x00ff); break; }
-		case (0x784/2): { m_seibu_sound->main_word_w(space,1,data,0x00ff); break; }
-		//case (0x790/2): { m_seibu_sound->main_word_w(space,4,data,0x00ff); break; }
-		case (0x794/2): { m_seibu_sound->main_word_w(space,4,data,0x00ff); break; }
-		case (0x798/2): { m_seibu_sound->main_word_w(space,6,data,0x00ff); break; }
-	}
-}
 
 static ADDRESS_MAP_START( nzeroteam_base_map, AS_PROGRAM, 16, r2dx_v33_state )
 	AM_RANGE(0x00000, 0x003ff) AM_RAM //stack area
@@ -405,7 +379,7 @@ static ADDRESS_MAP_START( nzeroteam_base_map, AS_PROGRAM, 16, r2dx_v33_state )
 
 //  AM_RANGE(0x00762, 0x00763) AM_READ(nzerotea_unknown_r)
 
-	AM_RANGE(0x00780, 0x0079f) AM_READWRITE(nzerotea_sound_comms_r,nzerotea_sound_comms_w)
+	AM_RANGE(0x00780, 0x0079f) AM_READWRITE(raiden2_sound_comms_r,raiden2_sound_comms_w)
 
 	AM_RANGE(0x00800, 0x00fff) AM_RAM
 	AM_RANGE(0x01000, 0x0bfff) AM_RAM
