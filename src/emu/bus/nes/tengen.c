@@ -84,7 +84,7 @@ void nes_tengen032_device::device_start()
 	common_start();
 	irq_timer = timer_alloc(TIMER_IRQ);
 	irq_timer->reset();
-	timer_freq = machine().device<cpu_device>("maincpu")->cycles_to_attotime(4);
+	timer_freq = m_maincpu->cycles_to_attotime(4);
 
 	save_item(NAME(m_mmc_prg_bank));
 	save_item(NAME(m_mmc_vrom_bank));
@@ -177,7 +177,7 @@ inline void nes_tengen032_device::irq_clock(int blanked)
 
 	m_irq_count--;
 	if (m_irq_enable && !blanked && !m_irq_count)
-		machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
+		m_maincpu->set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
 }
 
 // we use the HBLANK IRQ latch from PPU for the scanline based IRQ mode
@@ -306,7 +306,7 @@ WRITE8_MEMBER(nes_tengen032_device::tengen032_write)
 
 		case 0x6000:
 			m_irq_enable = 0;
-			machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
+			m_maincpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
 			break;
 
 		case 0x6001:

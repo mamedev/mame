@@ -232,6 +232,7 @@ protected:
 	dynamic_buffer m_vram;
 	dynamic_buffer m_battery;
 	UINT8 *m_ciram;
+	cpu_device *m_maincpu;
 
 	// these are specific of some boards but must be accessible from the driver
 	// E.g. additional save ram for HKROM, X1-005 & X1-017 boards, or ExRAM for MMC5

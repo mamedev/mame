@@ -427,7 +427,7 @@ void nes_cityfight_device::device_start()
 {
 	common_start();
 	irq_timer = timer_alloc(TIMER_IRQ);
-	irq_timer->adjust(attotime::zero, 0, machine().device<cpu_device>("maincpu")->cycles_to_attotime(1));
+	irq_timer->adjust(attotime::zero, 0, m_maincpu->cycles_to_attotime(1));
 
 	save_item(NAME(m_prg_reg));
 	save_item(NAME(m_prg_mode));
@@ -580,7 +580,7 @@ void nes_futuremedia_device::hblank_irq(int scanline, int vblank, int blanked)
 		{
 			m_irq_count--;
 			if (!m_irq_count)
-				machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, HOLD_LINE);
+				m_maincpu->set_input_line(M6502_IRQ_LINE, HOLD_LINE);
 		}
 	}
 }
@@ -904,7 +904,7 @@ void nes_t230_device::hblank_irq(int scanline, int vblank, int blanked)
 	{
 		m_irq_count = m_irq_count_latch;
 		m_irq_enable = m_irq_enable_latch;
-		machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, HOLD_LINE);
+		m_maincpu->set_input_line(M6502_IRQ_LINE, HOLD_LINE);
 	}
 }
 
@@ -985,7 +985,7 @@ void nes_mk2_device::hblank_irq( int scanline, int vblank, int blanked )
 		{
 			LOG_MMC(("irq fired, scanline: %d (MAME %d, beam pos: %d)\n", scanline,
 						machine().first_screen()->vpos(), machine().first_screen()->hpos()));
-			machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, HOLD_LINE);
+			m_maincpu->set_input_line(M6502_IRQ_LINE, HOLD_LINE);
 		}
 	}
 	m_irq_clear = 0;
@@ -1039,7 +1039,7 @@ void nes_whero_device::hblank_irq(int scanline, int vblank, int blanked)
 	{
 		m_irq_count = m_irq_count_latch;
 		m_irq_enable = m_irq_enable_latch;
-		machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, HOLD_LINE);
+		m_maincpu->set_input_line(M6502_IRQ_LINE, HOLD_LINE);
 	}
 }
 
@@ -1166,7 +1166,7 @@ void nes_tf1201_device::hblank_irq(int scanline, int vblank, int blanked)
 	{
 		m_irq_count++;
 		if ((m_irq_count & 0xff) == 238)
-			machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, HOLD_LINE);
+			m_maincpu->set_input_line(M6502_IRQ_LINE, HOLD_LINE);
 	}
 }
 
@@ -1245,7 +1245,7 @@ void nes_cityfight_device::device_timer(emu_timer &timer, device_timer_id id, in
 		{
 			if (!m_irq_count)
 			{
-				machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, HOLD_LINE);
+				m_maincpu->set_input_line(M6502_IRQ_LINE, HOLD_LINE);
 				m_irq_count = 0xffff;
 			}
 			else

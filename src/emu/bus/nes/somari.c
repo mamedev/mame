@@ -232,7 +232,7 @@ WRITE8_MEMBER(nes_somari_device::mmc3_w)
 		case 0x2001: break;
 		case 0x4000: m_irq_count_latch = data; break;
 		case 0x4001: m_irq_count = 0; break;
-		case 0x6000: m_irq_enable = 0; machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, CLEAR_LINE); break;
+		case 0x6000: m_irq_enable = 0; m_maincpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE); break;
 		case 0x6001: m_irq_enable = 1; break;
 	}
 }

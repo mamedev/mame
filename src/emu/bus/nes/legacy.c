@@ -79,7 +79,7 @@ void nes_ffe4_device::device_start()
 {
 	common_start();
 	irq_timer = timer_alloc(TIMER_IRQ);
-	irq_timer->adjust(attotime::zero, 0, machine().device<cpu_device>("maincpu")->cycles_to_attotime(1));
+	irq_timer->adjust(attotime::zero, 0, m_maincpu->cycles_to_attotime(1));
 
 	save_item(NAME(m_exram));
 	save_item(NAME(m_exram_enabled));
@@ -167,7 +167,7 @@ void nes_ffe4_device::device_timer(emu_timer &timer, device_timer_id id, int par
 		{
 			if (m_irq_count == 0xffff)
 			{
-				machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
+				m_maincpu->set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
 				m_irq_count = 0;
 				m_irq_enable = 0;
 			}
@@ -193,7 +193,7 @@ WRITE8_MEMBER(nes_ffe4_device::write_l)
 
 		case 0x401:
 			m_irq_enable = 0;
-			machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
+			m_maincpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
 			break;
 		case 0x402:
 			m_irq_count = (m_irq_count & 0xff00) | data;
@@ -275,7 +275,7 @@ WRITE8_MEMBER(nes_ffe8_device::write_l)
 
 		case 0x401:
 			m_irq_enable = 0;
-			machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
+			m_maincpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
 			break;
 		case 0x402:
 			m_irq_count = (m_irq_count & 0xff00) | data;

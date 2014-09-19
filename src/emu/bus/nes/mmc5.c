@@ -235,7 +235,7 @@ void nes_exrom_device::hblank_irq(int scanline, int vblank, int blanked )
 	if (scanline == m_irq_count)
 	{
 		if (m_irq_enable)
-			machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
+			m_maincpu->set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
 
 		m_irq_status = 0xff;
 	}
@@ -444,7 +444,7 @@ READ8_MEMBER(nes_exrom_device::read_l)
 		case 0x1204:
 			value = m_irq_status;
 			m_irq_status &= ~0x80;
-			machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
+			m_maincpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
 			return value;
 
 		case 0x1205:

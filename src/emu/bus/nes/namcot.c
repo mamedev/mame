@@ -146,7 +146,7 @@ void nes_namcot340_device::device_start()
 {
 	common_start();
 	irq_timer = timer_alloc(TIMER_IRQ);
-	irq_timer->adjust(attotime::zero, 0, machine().device<cpu_device>("maincpu")->cycles_to_attotime(1));
+	irq_timer->adjust(attotime::zero, 0, m_maincpu->cycles_to_attotime(1));
 
 	save_item(NAME(m_irq_enable));
 	save_item(NAME(m_irq_count));
@@ -172,7 +172,7 @@ void nes_namcot175_device::device_start()
 {
 	common_start();
 	irq_timer = timer_alloc(TIMER_IRQ);
-	irq_timer->adjust(attotime::zero, 0, machine().device<cpu_device>("maincpu")->cycles_to_attotime(1));
+	irq_timer->adjust(attotime::zero, 0, m_maincpu->cycles_to_attotime(1));
 
 	save_item(NAME(m_irq_enable));
 	save_item(NAME(m_irq_count));
@@ -200,7 +200,7 @@ void nes_namcot163_device::device_start()
 {
 	common_start();
 	irq_timer = timer_alloc(TIMER_IRQ);
-	irq_timer->adjust(attotime::zero, 0, machine().device<cpu_device>("maincpu")->cycles_to_attotime(1));
+	irq_timer->adjust(attotime::zero, 0, m_maincpu->cycles_to_attotime(1));
 
 	save_item(NAME(m_irq_enable));
 	save_item(NAME(m_irq_count));
@@ -403,7 +403,7 @@ void nes_namcot340_device::device_timer(emu_timer &timer, device_timer_id id, in
 		if (m_irq_enable)
 		{
 			if (m_irq_count == 0x7fff)  // counter does not wrap to 0!
-				machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
+				m_maincpu->set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
 			else
 				m_irq_count++;
 		}
@@ -419,12 +419,12 @@ WRITE8_MEMBER(nes_namcot340_device::n340_lowrite)
 	{
 		case 0x1000: /* low byte of IRQ */
 			m_irq_count = (m_irq_count & 0x7f00) | data;
-			machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
+			m_maincpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
 			break;
 		case 0x1800: /* high byte of IRQ, IRQ enable in high bit */
 			m_irq_count = (m_irq_count & 0xff) | ((data & 0x7f) << 8);
 			m_irq_enable = data & 0x80;
-			machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
+			m_maincpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
 			break;
 	}
 }
@@ -438,10 +438,10 @@ READ8_MEMBER(nes_namcot340_device::n340_loread)
 	{
 		case 0x1000:
 			return m_irq_count & 0xff;
-			machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
+			m_maincpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
 		case 0x1800:
 			return (m_irq_count >> 8) & 0xff;
-			machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
+			m_maincpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
 		default:
 			return 0x00;
 	}

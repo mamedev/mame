@@ -62,7 +62,7 @@ void nes_cony_device::device_start()
 {
 	common_start();
 	irq_timer = timer_alloc(TIMER_IRQ);
-	irq_timer->adjust(attotime::zero, 0, machine().device<cpu_device>("maincpu")->cycles_to_attotime(1));
+	irq_timer->adjust(attotime::zero, 0, m_maincpu->cycles_to_attotime(1));
 
 	save_item(NAME(m_irq_enable));
 	save_item(NAME(m_irq_count));
@@ -98,7 +98,7 @@ void nes_yoko_device::device_start()
 {
 	common_start();
 	irq_timer = timer_alloc(TIMER_IRQ);
-	irq_timer->adjust(attotime::zero, 0, machine().device<cpu_device>("maincpu")->cycles_to_attotime(1));
+	irq_timer->adjust(attotime::zero, 0, m_maincpu->cycles_to_attotime(1));
 
 	save_item(NAME(m_irq_enable));
 	save_item(NAME(m_irq_count));
@@ -161,7 +161,7 @@ void nes_cony_device::device_timer(emu_timer &timer, device_timer_id id, int par
 		{
 			if (!m_irq_count)
 			{
-				machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, HOLD_LINE);
+				m_maincpu->set_input_line(M6502_IRQ_LINE, HOLD_LINE);
 				m_irq_enable = 0;
 				m_irq_count = 0xffff;
 			}

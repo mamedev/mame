@@ -202,7 +202,7 @@ void nes_txrom_device::hblank_irq(int scanline, int vblank, int blanked)
 		{
 			LOG_MMC(("irq fired, scanline: %d (MAME %d, beam pos: %d)\n", scanline,
 						machine().first_screen()->vpos(), machine().first_screen()->hpos()));
-			machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
+			m_maincpu->set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
 		}
 	}
 	m_irq_clear = 0;
@@ -301,7 +301,7 @@ WRITE8_MEMBER(nes_txrom_device::txrom_write)
 
 		case 0x6000:
 			m_irq_enable = 0;
-			machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
+			m_maincpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
 			break;
 
 		case 0x6001:

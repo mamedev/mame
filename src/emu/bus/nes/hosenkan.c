@@ -96,7 +96,7 @@ void nes_hosenkan_device::hblank_irq( int scanline, int vblank, int blanked )
 		{
 			LOG_MMC(("irq fired, scanline: %d (MAME %d, beam pos: %d)\n", scanline,
 						machine().first_screen()->vpos(), machine().first_screen()->hpos()));
-			machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, HOLD_LINE);
+			m_maincpu->set_input_line(M6502_IRQ_LINE, HOLD_LINE);
 		}
 	}
 	m_irq_clear = 0;

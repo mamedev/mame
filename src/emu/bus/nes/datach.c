@@ -242,8 +242,8 @@ void nes_datach_device::device_start()
 	common_start();
 	irq_timer = timer_alloc(TIMER_IRQ);
 	serial_timer = timer_alloc(TIMER_SERIAL);
-	irq_timer->adjust(attotime::zero, 0, machine().device<cpu_device>("maincpu")->cycles_to_attotime(1));
-	serial_timer->adjust(attotime::zero, 0, machine().device<cpu_device>("maincpu")->cycles_to_attotime(1000));
+	irq_timer->adjust(attotime::zero, 0, m_maincpu->cycles_to_attotime(1));
+	serial_timer->adjust(attotime::zero, 0, m_maincpu->cycles_to_attotime(1000));
 
 	save_item(NAME(m_irq_enable));
 	save_item(NAME(m_irq_count));
@@ -409,7 +409,7 @@ void nes_datach_device::device_timer(emu_timer &timer, device_timer_id id, int p
 
 			if (!m_irq_count)
 			{
-				machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
+				m_maincpu->set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
 				m_irq_enable = 0;
 			}
 		}

@@ -196,7 +196,7 @@ void nes_hengg_shjy3_device::hblank_irq(int scanline, int vblank, int blanked)
 		{
 			m_irq_count = m_irq_count_latch;
 			m_irq_enable = m_irq_enable | ((m_irq_enable & 0x01) << 1);
-			machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, HOLD_LINE);
+			m_maincpu->set_input_line(M6502_IRQ_LINE, HOLD_LINE);
 		}
 		else
 			m_irq_count++;

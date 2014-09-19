@@ -119,7 +119,7 @@ WRITE8_MEMBER(nes_ggenie_device::write_h)
 		if (offset == 0 && data == 0)
 		{
 			m_gg_bypass = 1;
-			machine().device<cpu_device>("maincpu")->set_pc(0xfffc);
+			m_maincpu->set_pc(0xfffc);
 		}
 		else
 		{

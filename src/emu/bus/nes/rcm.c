@@ -277,7 +277,7 @@ void nes_3dblock_device::hblank_irq(int scanline, int vblank, int blanked)
 	{
 		m_irq_count--;
 		if (!m_irq_count)
-			machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, HOLD_LINE);
+			m_maincpu->set_input_line(M6502_IRQ_LINE, HOLD_LINE);
 	}
 }
 
