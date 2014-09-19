@@ -334,21 +334,23 @@ address_map::address_map(device_t &device, address_spacenum spacenum)
 	if (!device.interface(memintf))
 		throw emu_fatalerror("No memory address space configuration found for device '%s', space %d\n", device.tag(), spacenum);
 
-	// append the internal device map (first so it takes priority) */
+	// construct the internal device map (first so it takes priority)
 	if (spaceconfig->m_internal_map != NULL)
 		(*spaceconfig->m_internal_map)(*this, device);
 	if (!spaceconfig->m_internal_map_delegate.isnull())
 		spaceconfig->m_internal_map_delegate(*this, device);
 
-	// construct the standard map */
+	// append the map provided by the owner
 	if (memintf->address_map(spacenum) != NULL)
 		(*memintf->address_map(spacenum))(*this, *device.owner());
-
-	// append the default device map (last so it can be overridden) */
-	if (spaceconfig->m_default_map != NULL)
-		(*spaceconfig->m_default_map)(*this, device);
-	if (!spaceconfig->m_default_map_delegate.isnull())
-		spaceconfig->m_default_map_delegate(*this, device);
+	else
+	{
+		// if the owner didn't provide a map, use the default device map
+		if (spaceconfig->m_default_map != NULL)
+			(*spaceconfig->m_default_map)(*this, device);
+		if (!spaceconfig->m_default_map_delegate.isnull())
+			spaceconfig->m_default_map_delegate(*this, device);
+	}
 }
 
 
