@@ -759,8 +759,8 @@ DRIVER_INIT_MEMBER(r2dx_v33_state,rdx_v33)
 
 DRIVER_INIT_MEMBER(r2dx_v33_state,nzerotea)
 {
-	init_blending(raiden_blended_colors);
-	static const int spri[5] = { 0, 1, 2, 3, -1 };
+	init_blending(xsedae_blended_colors);
+	static const int spri[5] = { -1, 0, 1, 2, 3 };
 	cur_spri = spri;
 
 	zeroteam_decrypt_sprites(machine());
@@ -768,8 +768,8 @@ DRIVER_INIT_MEMBER(r2dx_v33_state,nzerotea)
 
 DRIVER_INIT_MEMBER(r2dx_v33_state,zerotm2k)
 {
-	init_blending(raiden_blended_colors);
-	static const int spri[5] = { 0, 1, 2, 3, -1 };
+	init_blending(xsedae_blended_colors);
+	static const int spri[5] = { -1, 0, 1, 2, 3 };
 	cur_spri = spri;
 
 	// no sprite encryption(!)
