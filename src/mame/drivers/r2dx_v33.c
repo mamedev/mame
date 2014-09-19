@@ -245,13 +245,13 @@ WRITE16_MEMBER(r2dx_v33_state::r2dx_angle_w)
 READ16_MEMBER(r2dx_v33_state::r2dx_sin_r)
 {
 	double angle = m_r2dx_angle * M_PI / 128;
-	return int(2048*sin(angle));
+	return int(4096*sin(angle));
 }
 
 READ16_MEMBER(r2dx_v33_state::r2dx_cos_r)
 {
 	double angle = m_r2dx_angle * M_PI / 128;
-	return int(2048*cos(angle));
+	return int(4096*cos(angle));
 }
 
 // Angle protection 2:
