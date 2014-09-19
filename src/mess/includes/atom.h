@@ -119,8 +119,8 @@ class atomeb_state : public atom_state
 public:
 	atomeb_state(const machine_config &mconfig, device_type type, const char *tag)
 		: atom_state(mconfig, type, tag),
-		m_e0(*this, "e0"),
-		m_e1(*this, "e1")
+		m_e0(*this, "rom_e0"),
+		m_e1(*this, "rom_e1")
 	{ 
 	}
 

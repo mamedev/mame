@@ -767,25 +767,25 @@ static MACHINE_CONFIG_DERIVED_CLASS( atomeb, atom, atomeb_state )
 	/* cartridges */
 	MCFG_DEVICE_REMOVE("cartslot")
 
-	MCFG_ATOM_ROM_ADD("a0", a0_load)
-	MCFG_ATOM_ROM_ADD("a1", a1_load)
-	MCFG_ATOM_ROM_ADD("a2", a2_load)
-	MCFG_ATOM_ROM_ADD("a3", a3_load)
-	MCFG_ATOM_ROM_ADD("a4", a4_load)
-	MCFG_ATOM_ROM_ADD("a5", a5_load)
-	MCFG_ATOM_ROM_ADD("a6", a6_load)
-	MCFG_ATOM_ROM_ADD("a7", a7_load)
-	MCFG_ATOM_ROM_ADD("a8", a8_load)
-	MCFG_ATOM_ROM_ADD("a9", a9_load)
-//	MCFG_ATOM_ROM_ADD("aa", aa_load)
-//	MCFG_ATOM_ROM_ADD("ab", ab_load)
-//	MCFG_ATOM_ROM_ADD("ac", ac_load)
-//	MCFG_ATOM_ROM_ADD("ad", ad_load)
-//	MCFG_ATOM_ROM_ADD("ae", ae_load)
-//	MCFG_ATOM_ROM_ADD("af", af_load)
+	MCFG_ATOM_ROM_ADD("rom_a0", a0_load)
+	MCFG_ATOM_ROM_ADD("rom_a1", a1_load)
+	MCFG_ATOM_ROM_ADD("rom_a2", a2_load)
+	MCFG_ATOM_ROM_ADD("rom_a3", a3_load)
+	MCFG_ATOM_ROM_ADD("rom_a4", a4_load)
+	MCFG_ATOM_ROM_ADD("rom_a5", a5_load)
+	MCFG_ATOM_ROM_ADD("rom_a6", a6_load)
+	MCFG_ATOM_ROM_ADD("rom_a7", a7_load)
+	MCFG_ATOM_ROM_ADD("rom_a8", a8_load)
+	MCFG_ATOM_ROM_ADD("rom_a9", a9_load)
+	MCFG_ATOM_ROM_ADD("rom_aa", aa_load)
+	MCFG_ATOM_ROM_ADD("rom_ab", ab_load)
+	MCFG_ATOM_ROM_ADD("rom_ac", ac_load)
+	MCFG_ATOM_ROM_ADD("rom_ad", ad_load)
+	MCFG_ATOM_ROM_ADD("rom_ae", ae_load)
+	MCFG_ATOM_ROM_ADD("rom_af", af_load)
 
-	MCFG_ATOM_ROM_ADD("e0", e0_load)
-	MCFG_ATOM_ROM_ADD("e1", e1_load)
+	MCFG_ATOM_ROM_ADD("rom_e0", e0_load)
+	MCFG_ATOM_ROM_ADD("rom_e1", e1_load)
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------
@@ -882,10 +882,10 @@ ROM_END
 DRIVER_INIT_MEMBER(atomeb_state, atomeb)
 {
 	// these have to be set here, so that we can pass m_ext[*] to device_image_load!
-	char str[4];	
+	char str[8];	
 	for (int i = 0; i < 16; i++)
 	{
-		sprintf(str,"a%x", i);
+		sprintf(str,"rom_a%x", i);
 		m_ext[i] = machine().device<generic_slot_device>(str);
 	}			
 }
