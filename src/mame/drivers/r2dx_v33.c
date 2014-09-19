@@ -372,16 +372,19 @@ WRITE16_MEMBER(r2dx_v33_state::nzerotea_sound_comms_w)
 static ADDRESS_MAP_START( nzerotea_map, AS_PROGRAM, 16, r2dx_v33_state )
 	AM_RANGE(0x00000, 0x003ff) AM_RAM //stack area
 
-	/* results from cop? */
-	AM_RANGE(0x00430, 0x00431) AM_READ(rdx_v33_unknown_r)
-	AM_RANGE(0x00432, 0x00433) AM_READ(rdx_v33_unknown_r)
-	AM_RANGE(0x00434, 0x00435) AM_READ(rdx_v33_unknown_r)
-	AM_RANGE(0x00436, 0x00437) AM_READ(rdx_v33_unknown_r)
+	AM_RANGE(0x00420, 0x00421) AM_WRITE(r2dx_unk1_w) // frequent
+	AM_RANGE(0x00422, 0x00423) AM_WRITE(r2dx_unk2_w) // frequent
 
-//	AM_RANGE(0x00400, 0x00407) AM_WRITE(mcu_table_w)
-//	AM_RANGE(0x00420, 0x00427) AM_WRITE(mcu_table2_w)
+	AM_RANGE(0x00424, 0x00425) AM_WRITE(r2dx_dx_w)
+	AM_RANGE(0x00426, 0x00427) AM_WRITE(r2dx_dy_w)
+	AM_RANGE(0x00428, 0x00429) AM_WRITE(r2dx_angle_w)
 
-	AM_RANGE(0x00600, 0x0064f) AM_RAM AM_SHARE("crtc_regs")
+	AM_RANGE(0x00430, 0x00431) AM_READ(rdx_angle_r)
+	AM_RANGE(0x00432, 0x00433) AM_READ(rdx_dist_r)
+	AM_RANGE(0x00434, 0x00435) AM_READ(r2dx_sin_r)
+	AM_RANGE(0x00436, 0x00437) AM_READ(r2dx_cos_r)
+
+	AM_RANGE(0x00600, 0x0064f) AM_DEVREADWRITE("crtc", seibu_crtc_device, read, write)
 
 	AM_RANGE(0x0068e, 0x0068f) AM_WRITENOP // synch for the MCU?
 	AM_RANGE(0x006b0, 0x006b1) AM_WRITE(mcu_prog_w)
@@ -464,9 +467,6 @@ static GFXDECODE_START( rdx_v33 )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, rdx_v33_charlayout,   0x700, 128 )
 	GFXDECODE_ENTRY( "gfx2", 0x00000, rdx_v33_tilelayout,   0x400, 128 )
 	GFXDECODE_ENTRY( "gfx3", 0x00000, rdx_v33_spritelayout, 0x000, 4096 )
-	GFXDECODE_ENTRY( "gfx2", 0x00000, rdx_v33_tilelayout,   0x500, 0x10 )
-	GFXDECODE_ENTRY( "gfx2", 0x00000, rdx_v33_tilelayout,   0x600, 0x10 )
-	GFXDECODE_ENTRY( "gfx1", 0x00000, rdx_v33_tilelayout,   0x700, 0x10 ) // debugging, to be removed
 GFXDECODE_END
 
 static INPUT_PORTS_START( rdx_v33 )
@@ -724,11 +724,7 @@ DRIVER_INIT_MEMBER(r2dx_v33_state,nzerotea)
 	static const int spri[5] = { 0, 1, 2, 3, -1 };
 	cur_spri = spri;
 
-//	membank("bank1")->configure_entries(0, 2, memregion("mainprg")->base(), 0x20000);
-
 	zeroteam_decrypt_sprites(machine());
-
-//	membank("bank1")->set_entry(1);
 }
 
 DRIVER_INIT_MEMBER(r2dx_v33_state,zerotm2k)
@@ -737,12 +733,17 @@ DRIVER_INIT_MEMBER(r2dx_v33_state,zerotm2k)
 	static const int spri[5] = { 0, 1, 2, 3, -1 };
 	cur_spri = spri;
 
-	//membank("bank1")->configure_entries(0, 2, memregion("mainprg")->base(), 0x20000);
+	// no sprite encryption(!)
 
-	// sprites are NOT encrypted
-	//zeroteam_decrypt_sprites(machine());
+	// BG tile rom has 2 lines swapped
+	UINT8 *src = memregion("gfx2")->base()+0x100000;
+	int len = 0x080000;
 
-	//membank("bank1")->set_entry(1);
+	dynamic_buffer buffer(len);
+	int i;
+	for (i = 0; i < len; i ++)
+		buffer[i] = src[BITSWAP32(i,31,30,29,28,27,26,25,24,23,22,21,20,19,18,17,16,15,14,13,12,11,10,9,8,7,5,6,4,3,2,1,0)];
+	memcpy(src, buffer, len);
 }
 
 /*
@@ -882,8 +883,8 @@ ROM_START( r2dx_v33_r2 )
 	ROM_LOAD16_WORD( "raidenii_eeprom-r2dx_v33.bin", 0x0000, 0x0080, CRC(ba454777) SHA1(101c5364e8664d17bfb1e759515d135a2673d67e) ) // for booting as Raiden 2
 ROM_END
 
-
-ROM_START( nzeroteam ) /* V33 SYSTEM TYPE_B hardware, uses SEI333 (AKA COPX-D3) for protection  */
+// uses dipswitches
+ROM_START( nzeroteam ) /* V33 SYSTEM TYPE_B hardware, uses SEI333 (AKA COPX-D3) for protection  */ 
 	ROM_REGION( 0x100000, "mainprg", 0 ) /* v30 main cpu */
 	ROM_LOAD16_BYTE("prg1", 0x000000, 0x80000, CRC(3c7d9410) SHA1(25f2121b6c2be73f11263934266901ed5d64d2ee) )
 	ROM_LOAD16_BYTE("prg2", 0x000001, 0x80000, CRC(6cba032d) SHA1(bf5d488cd578fff09e62e3650efdee7658033e3f) )
@@ -914,6 +915,7 @@ ROM_START( nzeroteam ) /* V33 SYSTEM TYPE_B hardware, uses SEI333 (AKA COPX-D3) 
 	ROM_LOAD( "6.pcm", 0x00000, 0x40000, CRC(48be32b1) SHA1(969d2191a3c46871ee8bf93088b3cecce3eccf0c) ) /* Same as other Zero Team sets */
 ROM_END
 
+// uses a 93c46a eeprom
 ROM_START( zerotm2k ) /* V33 SYSTEM TYPE_C VER2 hardware, uses SEI333 (AKA COPX-D3) for protection  */
 	ROM_REGION( 0x100000, "mainprg", 0 ) /* v30 main cpu */
 	ROM_LOAD( "mt28f800b1.u0230", 0x000000, 0x100000, CRC(6ab49d8c) SHA1(d94ec9a46ff98a76c3372369246733268474de99) ) /* SMT rom, PCB silkscreened PRG01 */
@@ -935,7 +937,7 @@ ROM_START( zerotm2k ) /* V33 SYSTEM TYPE_C VER2 hardware, uses SEI333 (AKA COPX-
 
 	ROM_REGION( 0x400000, "gfx2", 0 ) /* background gfx */
 	ROM_LOAD( "szy-05.u0614",     0x000000, 0x100000, CRC(8b7f9219) SHA1(3412b6f8a4fe245e521ddcf185a53f2f4520eb57) ) /* PCB silkscreened BG12, Same as "MUSHA BACK-1" */
-	ROM_LOAD16_WORD_SWAP( "mt28f400b1.u0619", 0x100000, 0x080000, CRC(266acee6) SHA1(2a9da66c313a7536c7fb393134b9df0bb122cb2b) ) /* SMT rom, PCB silkscreened BG3 */
+	ROM_LOAD( "mt28f400b1.u0619", 0x100000, 0x080000, CRC(266acee6) SHA1(2a9da66c313a7536c7fb393134b9df0bb122cb2b) ) /* SMT rom, PCB silkscreened BG3 */
 	/* PCB has an unpopulated socket rom space for a LH535A00D at u0615 for alt BG3 location */
 
 	ROM_REGION( 0x800000, "gfx3", 0 ) /* sprite gfx (NOT encrypted) */
@@ -952,8 +954,8 @@ ROM_END
 GAME( 1996, r2dx_v33,    0,          rdx_v33,  rdx_v33, r2dx_v33_state,  rdx_v33,   ROT270, "Seibu Kaihatsu", "Raiden II New / Raiden DX (newer V33 PCB) (Raiden DX EEPROM)", GAME_NOT_WORKING|GAME_NO_SOUND)
 GAME( 1996, r2dx_v33_r2, r2dx_v33,   rdx_v33,  rdx_v33, r2dx_v33_state,  rdx_v33,   ROT270, "Seibu Kaihatsu", "Raiden II New / Raiden DX (newer V33 PCB) (Raiden II EEPROM)", GAME_NOT_WORKING|GAME_NO_SOUND)
 
-// 'V33 system type_b' - uses V33 CPU, COPX-D3 external protection rom, but still has the proper sound system
+// 'V33 system type_b' - uses V33 CPU, COPX-D3 external protection rom, but still has the proper sound system, DSW for settings
 GAME( 1997, nzeroteam, zeroteam,  nzerotea, nzerotea, r2dx_v33_state, nzerotea,  ROT0,   "Seibu Kaihatsu", "New Zero Team", GAME_NOT_WORKING|GAME_NO_SOUND)
 
-// 'V33 SYSTEM TYPE_C VER2' - uses V33 CPU, COPX-D3 external protection rom, but still has the proper sound system, unencrypted sprites
+// 'V33 SYSTEM TYPE_C VER2' - uses V33 CPU, COPX-D3 external protection rom, but still has the proper sound system, unencrypted sprites, EEPROM for settings.  PCB also seen without 'VER2', looks the same
 GAME( 2000, zerotm2k,  zeroteam,  nzerotea, nzerotea, r2dx_v33_state, zerotm2k,  ROT0,   "Seibu Kaihatsu", "Zero Team 2000", GAME_NOT_WORKING|GAME_NO_SOUND)
