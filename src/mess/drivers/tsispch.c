@@ -483,13 +483,13 @@ ROM_START( prose2k )
 	//
 	// Note U81 is optional; it can be replaced by a 74s138 instead of a prom,
 	// with A19, A18, A17 as inputs, for decoding the roms as:      
-	//      7 - to /CE of ROMs 0(U21) and 1(U44)   (0xE0000-0xF1FFF)
-	//      6 - to /CE of ROMs 2(U22) and 3(U45)   (0xE4000-0xF3FFF)
-	//      5 - to /CE of ROMs 4(U23) and 5(U46)   (0xE8000-0xF5FFF)
-	//      4 - to /CE of ROMs 6(U24) and 7(U47)   (0xEC000-0xF7FFF)
-	//      3 - to /CE of ROMs 8(U25) and 9(U48)   (0xF0000-0xF9FFF)
-	//      2 - to /CE of ROMs 10(U26) and 11(U49) (0xF4000-0xFBFFF)
-	//      1 - to /CE of ROMs 12(U27) and 13(U50) (0xF8000-0xFDFFF)
+	//      7 - to /CE of ROMs 0(U21) and 1(U44)   (0xE0000-0xE3FFF)
+	//      6 - to /CE of ROMs 2(U22) and 3(U45)   (0xE4000-0xE7FFF)
+	//      5 - to /CE of ROMs 4(U23) and 5(U46)   (0xE8000-0xEBFFF)
+	//      4 - to /CE of ROMs 6(U24) and 7(U47)   (0xEC000-0xEFFFF)
+	//      3 - to /CE of ROMs 8(U25) and 9(U48)   (0xF0000-0xF3FFF)
+	//      2 - to /CE of ROMs 10(U26) and 11(U49) (0xF4000-0xF7FFF)
+	//      1 - to /CE of ROMs 12(U27) and 13(U50) (0xF8000-0xFBFFF)
 	//      0 - to /CE of ROMs 14(U28) and 15(U51) (0xFC000-0xFFFFF)                                               
 	
 	ROM_REGION(0x1000, "proms", 0)
