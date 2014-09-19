@@ -15,16 +15,16 @@
   soundcard.
 
 Status
-- Bushido: If you quickly press 5 you get a sound.
-- Mach 2: Makes a sound if 5 pressed
-- Jolly Park: Display flashes. After a few moments it plays music
+- Bushido: Displays Bushido logo. If you quickly press 5 you get a sound.
+- Mach 2: Displays Mach2 logo. Makes a sound if 5 pressed
+- Jolly Park: Displays the Spinball logo. After a few moments it plays music
 - Verne's World: Display flashes for a second then goes blank. After a few moments music plays.
 
 ToDo:
-- Inputs and outputs (copied from inder.c)
+- Inputs and outputs (currently a copy of inder.c)
 - DMD doesn't act on commands
 - Electronic volume control on the music card
-- Display on jolypark and vrnwrld has dots of 2 intensities
+
 
 ****************************************************************************************************/
 
@@ -67,7 +67,6 @@ public:
 	DECLARE_WRITE8_MEMBER(ppi60b_w);
 	DECLARE_WRITE8_MEMBER(ppi64c_w);
 	DECLARE_READ8_MEMBER(sw_r);
-	DECLARE_WRITE8_MEMBER(sw_w);
 	DECLARE_WRITE8_MEMBER(dmdram_w);
 	DECLARE_READ8_MEMBER(dmdram_r);
 	DECLARE_READ8_MEMBER(sndcmd_r);
@@ -85,8 +84,8 @@ public:
 	DECLARE_DRIVER_INIT(game0);
 	DECLARE_DRIVER_INIT(game1);
 	DECLARE_DRIVER_INIT(game2);
+	DECLARE_PALETTE_INIT(spinb);
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	//UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 private:
 	bool m_pc0a;
 	bool m_pc0m;
@@ -109,6 +108,7 @@ private:
 	UINT8 *m_p_music;
 	UINT8 *m_p_dmdcpu;
 	virtual void machine_reset();
+	virtual void machine_start();
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<cpu_device> m_musiccpu;
@@ -304,12 +304,6 @@ WRITE8_MEMBER( spinb_state::p1_w )
 				break;
 		}
 	}
-
-	if (m_dmdbank==3)
-	{
-		m_p32 = 4;
-		m_dmdcpu->set_input_line(MCS51_INT0_LINE, CLEAR_LINE);
-	}
 }
 
 READ8_MEMBER( spinb_state::p3_r )
@@ -341,11 +335,6 @@ READ8_MEMBER( spinb_state::sw_r )
 	return m_switches[m_row]->read();
 }
 
-WRITE8_MEMBER( spinb_state::sw_w )
-{
-	m_row = offset;
-}
-
 WRITE8_MEMBER( spinb_state::sndcmd_w )
 {
 	m_sndcmd = data;
@@ -373,6 +362,8 @@ READ8_MEMBER( spinb_state::dmdram_r )
 			return m_p_dmdcpu[0x80000 + offset + (m_dmdextaddr << 16)];
 	}
 
+	m_p32 = 4;
+	m_dmdcpu->set_input_line(MCS51_INT0_LINE, CLEAR_LINE);
 	return m_dmdcmd;
 }
 
@@ -537,6 +528,11 @@ void spinb_state::machine_reset()
 	m_row = 0;
 }
 
+void spinb_state::machine_start()
+{
+	save_item(NAME(m_dmdram)); // make it visible in the debugger
+}
+
 DRIVER_INIT_MEMBER( spinb_state, game0 )
 {
 	m_p_audio = memregion("audiorom")->base();
@@ -560,29 +556,63 @@ DRIVER_INIT_MEMBER( spinb_state, game2 )
 	m_game = 2;
 }
 
+PALETTE_INIT_MEMBER( spinb_state, spinb )
+{
+	palette.set_pen_color(0, rgb_t(0x00, 0x00, 0x00));
+	palette.set_pen_color(1, rgb_t(0xf7, 0xaa, 0x00));
+	palette.set_pen_color(2, rgb_t(0x7c, 0x55, 0x00));
+}
+
 UINT32 spinb_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 y,gfx;
+	UINT8 y,gfx,gfx1;
 	UINT16 sy=0,ma,x;
 	address_space &internal = m_dmdcpu->space(AS_DATA);
 	ma = internal.read_byte(0x05) << 8; // find where display memory is
-	ma &= 0xfe00;
 
-	for(y=0; y<32; y++)
+	if (m_game)
 	{
-		UINT16 *p = &bitmap.pix16(sy++);
-		for(x = 0; x < 16; x++)
-		{
-			gfx = m_dmdram[ma++];
+		ma = ((ma - 0x200) & 0x1c00) + 0x200;
 
-			*p++ = BIT(gfx, 0);
-			*p++ = BIT(gfx, 1);
-			*p++ = BIT(gfx, 2);
-			*p++ = BIT(gfx, 3);
-			*p++ = BIT(gfx, 4);
-			*p++ = BIT(gfx, 5);
-			*p++ = BIT(gfx, 6);
-			*p++ = BIT(gfx, 7);
+		for(y=0; y<32; y++)
+		{
+			UINT16 *p = &bitmap.pix16(sy++);
+			for(x = 0; x < 16; x++)
+			{
+				gfx = m_dmdram[ma+0x200];
+				gfx1 = m_dmdram[ma++];
+
+				*p++ = BIT(gfx1, 0) ? 1 : BIT(gfx, 0) ? 2 : 0;
+				*p++ = BIT(gfx1, 1) ? 1 : BIT(gfx, 1) ? 2 : 0;
+				*p++ = BIT(gfx1, 2) ? 1 : BIT(gfx, 2) ? 2 : 0;
+				*p++ = BIT(gfx1, 3) ? 1 : BIT(gfx, 3) ? 2 : 0;
+				*p++ = BIT(gfx1, 4) ? 1 : BIT(gfx, 4) ? 2 : 0;
+				*p++ = BIT(gfx1, 5) ? 1 : BIT(gfx, 5) ? 2 : 0;
+				*p++ = BIT(gfx1, 6) ? 1 : BIT(gfx, 6) ? 2 : 0;
+				*p++ = BIT(gfx1, 7) ? 1 : BIT(gfx, 7) ? 2 : 0;
+			}
+		}
+	}
+	else
+	{
+		ma &= 0x1e00;
+
+		for(y=0; y<32; y++)
+		{
+			UINT16 *p = &bitmap.pix16(sy++);
+			for(x = 0; x < 16; x++)
+			{
+				gfx = m_dmdram[ma++];
+
+				*p++ = BIT(gfx, 0);
+				*p++ = BIT(gfx, 1);
+				*p++ = BIT(gfx, 2);
+				*p++ = BIT(gfx, 3);
+				*p++ = BIT(gfx, 4);
+				*p++ = BIT(gfx, 5);
+				*p++ = BIT(gfx, 6);
+				*p++ = BIT(gfx, 7);
+			}
 		}
 	}
 	return 0;
@@ -611,7 +641,8 @@ static MACHINE_CONFIG_START( spinb, spinb_state )
 	MCFG_SCREEN_SIZE(128, 32)
 	MCFG_SCREEN_VISIBLE_AREA(0, 127, 0, 31)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_PALETTE_ADD_MONOCHROME_AMBER("palette")
+	MCFG_PALETTE_ADD( "palette", 3 )
+	MCFG_PALETTE_INIT_OWNER(spinb_state, spinb)
 
 	/* Sound */
 	MCFG_FRAGMENT_ADD( genpin_audio )
