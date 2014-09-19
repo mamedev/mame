@@ -4,20 +4,27 @@
   Spinball (previously Inder)
 
   Hardware is much the same as Inder, except the digital display is replaced by a DMD controlled by
-  a i8031.
+  a i8031. You need to pick "Pixel Aspect (4:1)" video option in the tab menu.
 
-  Status
-  - Verne's World has different hardware, does nothing
-  - The others make a horrible noise when 5 pressed, nothing else, no display.
-  - Code for inputs and outputs is wrong (copied from inder.c)
-  - There are 2 sound cards (one for effects and one for music), however looks like they
-    both receive the same commands? Diagram only shows J9 for sound control.
-  - The DMD uses a i8031 but no luck getting it to do anything so far.
-  - There are mistakes in the sound board schematic: IC14 pin12 goes to IC5 pin13 only. IC16 pin 22
-    is the CS0 line only. So, they are not joined but are separate tracks. Also, according to PinMAME,
-    the outputs of IC11 are all wrong. They should be (from top to bottom): A16, A17, A18, NC, NC,
-    CS2, CS1, CS0.
+  There are mistakes in the sound board schematic: IC14 pin12 goes to IC5 pin13 only. IC16 pin 22
+  is the CS0 line only. So, they are not joined but are separate tracks. Also, according to PinMAME,
+  the outputs of IC11 are all wrong. They should be (from top to bottom): A16, A17, A18, NC, NC,
+  CS2, CS1, CS0.
 
+  Also, very unobvious is the fact that PIA ports A and B are swapped around compared to the Inder
+  soundcard.
+
+Status
+- Bushido: If you quickly press 5 you get a sound.
+- Mach 2: Makes a sound if 5 pressed
+- Jolly Park: Display flashes. After a few moments it plays music
+- Verne's World: Display flashes for a second then goes blank. After a few moments music plays.
+
+ToDo:
+- Inputs and outputs (copied from inder.c)
+- DMD doesn't act on commands
+- Electronic volume control on the music card
+- Display on jolypark and vrnwrld has dots of 2 intensities
 
 ****************************************************************************************************/
 
@@ -61,6 +68,8 @@ public:
 	DECLARE_WRITE8_MEMBER(ppi64c_w);
 	DECLARE_READ8_MEMBER(sw_r);
 	DECLARE_WRITE8_MEMBER(sw_w);
+	DECLARE_WRITE8_MEMBER(dmdram_w);
+	DECLARE_READ8_MEMBER(dmdram_r);
 	DECLARE_READ8_MEMBER(sndcmd_r);
 	DECLARE_WRITE8_MEMBER(sndbank_a_w);
 	DECLARE_WRITE8_MEMBER(sndbank_m_w);
@@ -73,7 +82,11 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(ic5m_w);
 	DECLARE_WRITE_LINE_MEMBER(vck_a_w);
 	DECLARE_WRITE_LINE_MEMBER(vck_m_w);
-	DECLARE_DRIVER_INIT(spinb);
+	DECLARE_DRIVER_INIT(game0);
+	DECLARE_DRIVER_INIT(game1);
+	DECLARE_DRIVER_INIT(game2);
+	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	//UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 private:
 	bool m_pc0a;
 	bool m_pc0m;
@@ -81,7 +94,12 @@ private:
 	UINT8 m_portc_a;
 	UINT8 m_portc_m;
 	UINT8 m_row;
-	UINT8 m_segment[8];
+	UINT8 m_p3;
+	UINT8 m_p32;
+	UINT8 m_dmdcmd;
+	UINT8 m_dmdbank;
+	UINT8 m_dmdextaddr;
+	UINT8 m_dmdram[0x2000];
 	UINT8 m_sndcmd;
 	UINT8 m_sndbank_a;
 	UINT8 m_sndbank_m;
@@ -89,6 +107,7 @@ private:
 	UINT32 m_sound_addr_m;
 	UINT8 *m_p_audio;
 	UINT8 *m_p_music;
+	UINT8 *m_p_dmdcpu;
 	virtual void machine_reset();
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
@@ -114,6 +133,19 @@ static ADDRESS_MAP_START( spinb_map, AS_PROGRAM, 8, spinb_state )
 	AM_RANGE(0x6ce0, 0x6ce0) AM_WRITENOP
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( vrnwrld_map, AS_PROGRAM, 8, spinb_state )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0x9fff) AM_RAM AM_SHARE("nvram") // 6164, battery-backed
+	AM_RANGE(0xc000, 0xc003) AM_MIRROR(0x13fc) AM_DEVREADWRITE("ppi60", i8255_device, read, write)
+	AM_RANGE(0xc400, 0xc403) AM_MIRROR(0x13fc) AM_DEVREADWRITE("ppi64", i8255_device, read, write)
+	AM_RANGE(0xc800, 0xc803) AM_MIRROR(0x13fc) AM_DEVREADWRITE("ppi68", i8255_device, read, write)
+	AM_RANGE(0xcc00, 0xcc03) AM_MIRROR(0x131c) AM_DEVREADWRITE("ppi6c", i8255_device, read, write)
+	AM_RANGE(0xcc20, 0xcc3f) AM_MIRROR(0x1300) AM_WRITE(sndcmd_w)
+	AM_RANGE(0xcc40, 0xcc45) AM_MIRROR(0x1300) AM_WRITE(lamp1_w)
+	AM_RANGE(0xcc60, 0xcc60) AM_MIRROR(0x1300) AM_WRITE(disp_w)
+	AM_RANGE(0xcce0, 0xcce0) AM_WRITENOP
+ADDRESS_MAP_END
+
 static ADDRESS_MAP_START( spinb_audio_map, AS_PROGRAM, 8, spinb_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x3fff) AM_RAM // 6164
@@ -136,7 +168,8 @@ static ADDRESS_MAP_START(dmd_mem, AS_PROGRAM, 8, spinb_state)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(dmd_io, AS_IO, 8, spinb_state)
-	AM_RANGE(0x0000, 0x1fff) AM_RAM
+	AM_RANGE(0x0000, 0x1fff) AM_WRITE(dmdram_w)
+	AM_RANGE(0x0000, 0xffff) AM_READ(dmdram_r)
 	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_WRITE(p1_w)
 	AM_RANGE(MCS51_PORT_P3, MCS51_PORT_P3) AM_READWRITE(p3_r, p3_w)
 ADDRESS_MAP_END
@@ -244,25 +277,63 @@ d4 = COLATCH  )
 d5 = part of the data input circuit
 d6 = STAT0
 d7 = STAT1
+
+m_game == 0 : P1.0 low for RAM, P1.5 low for data input. They shouldn't both be low.
+m_game == 1 : P1.0 low for RAM, P1.5 low for data input. They shouldn't both be low. Extra ROM selected by P3.4
+m_game == 2 : P1.0 and P1.5 go to 74LS139 selector: 0 = RAM; 1 = ROM1; 2 = ROM2; 3 = data input
 */
 WRITE8_MEMBER( spinb_state::p1_w )
 {
+	m_dmdbank = (BIT(data, 5) << 1) + BIT(data, 0);
+
+	if (m_game < 2)
+	{
+		switch (m_dmdbank)
+		{
+			case 0:
+				printf("DMD Illegal selection\n");
+				break;
+			case 1: // ram
+				m_dmdbank = 0;
+				break;
+			case 2: // input
+				m_dmdbank = 3;
+				break;
+			case 3: // nothing or (game1 external rom)
+				m_dmdbank = 1;
+				break;
+		}
+	}
+
+	if (m_dmdbank==3)
+	{
+		m_p32 = 4;
+		m_dmdcpu->set_input_line(MCS51_INT0_LINE, CLEAR_LINE);
+	}
 }
 
 READ8_MEMBER( spinb_state::p3_r )
 {
-	return 0;
+	return m_p3 | m_p32;
 }
 
 /*
 d0 = RXD - SDATA ) to DMD
 d1 = TXD - DOTCK )
 d2 = Interrupt Input when data is coming from maincpu
-d6 = R/W of RAM
-d7 = OE of RAM , also part of data input circuit
+d6 = External /WR
+d7 = External /RD
 */
 WRITE8_MEMBER( spinb_state::p3_w )
 {
+	m_p3 = data & 0xfb;
+	m_dmdextaddr = 0;
+
+	if (m_game == 1)
+		m_dmdextaddr = BIT(data, 3);// | (BIT(data, 5) << 1);
+	else
+	if (m_game == 2)
+		m_dmdextaddr = BIT(data, 3) | (BIT(data, 5) << 1) | (BIT(data, 4) << 2);
 }
 
 READ8_MEMBER( spinb_state::sw_r )
@@ -285,19 +356,31 @@ READ8_MEMBER( spinb_state::sndcmd_r )
 	return m_sndcmd;
 }
 
+WRITE8_MEMBER( spinb_state::dmdram_w )
+{
+	m_dmdram[offset & 0x1fff] = data;
+}
+
+READ8_MEMBER( spinb_state::dmdram_r )
+{
+	switch (m_dmdbank)
+	{
+		case 0:
+			return m_dmdram[offset & 0x1fff];
+		case 1:
+			return m_p_dmdcpu[offset + (m_dmdextaddr << 16)];
+		case 2:
+			return m_p_dmdcpu[0x80000 + offset + (m_dmdextaddr << 16)];
+	}
+
+	return m_dmdcmd;
+}
+
 WRITE8_MEMBER( spinb_state::disp_w )
 {
-	UINT8 i;
-	if (offset < 8)
-		m_segment[offset] = data;
-	else
-	// From here, only used on old cpu board
-	if (offset > 0x40)
-	{
-		offset = (offset >> 3) & 7;
-		for (i = 0; i < 5; i++)
-			output_set_digit_value(i*10+offset, m_segment[i]);
-	}
+	m_dmdcmd = data;
+	m_p32 = 0;
+	m_dmdcpu->set_input_line(MCS51_INT0_LINE, HOLD_LINE);
 }
 
 WRITE8_MEMBER( spinb_state::ppi60a_w )
@@ -319,18 +402,6 @@ WRITE8_MEMBER( spinb_state::ppi60b_w )
 
 WRITE8_MEMBER( spinb_state::ppi64c_w )
 {
-	UINT8 i;
-	data &= 15;
-	if BIT(data, 3) // 8 to 15
-	{
-		data ^= 15; // now 7 to 0
-		for (i = 0; i < 5; i++)
-		{
-			if ((m_game==1) && (i == 4))  // mundial,clown,250cc,atleta have credit and ball displays swapped
-				data ^= 4;
-			output_set_digit_value(i*10+data, m_segment[i]);
-		}
-	}
 }
 
 WRITE8_MEMBER( spinb_state::sndbank_a_w )
@@ -417,24 +488,24 @@ READ8_MEMBER( spinb_state::ppim_c_r )
 	return m_pc0m | m_portc_m;
 }
 
-WRITE8_MEMBER( spinb_state::ppia_a_w )
-{
-	m_sound_addr_a = (m_sound_addr_a & 0xfff00) | data;
-}
-
-WRITE8_MEMBER( spinb_state::ppim_a_w )
-{
-	m_sound_addr_m = (m_sound_addr_m & 0xfff00) | data;
-}
-
 WRITE8_MEMBER( spinb_state::ppia_b_w )
 {
-	m_sound_addr_a = (m_sound_addr_a & 0xf00ff) | (data << 8);
+	m_sound_addr_a = (m_sound_addr_a & 0xffff00) | data;
 }
 
 WRITE8_MEMBER( spinb_state::ppim_b_w )
 {
-	m_sound_addr_m = (m_sound_addr_m & 0xf00ff) | (data << 8);
+	m_sound_addr_m = (m_sound_addr_m & 0xffff00) | data;
+}
+
+WRITE8_MEMBER( spinb_state::ppia_a_w )
+{
+	m_sound_addr_a = (m_sound_addr_a & 0xff00ff) | (data << 8);
+}
+
+WRITE8_MEMBER( spinb_state::ppim_a_w )
+{
+	m_sound_addr_m = (m_sound_addr_m & 0xff00ff) | (data << 8);
 }
 
 WRITE8_MEMBER( spinb_state::ppia_c_w )
@@ -466,11 +537,55 @@ void spinb_state::machine_reset()
 	m_row = 0;
 }
 
-DRIVER_INIT_MEMBER( spinb_state, spinb )
+DRIVER_INIT_MEMBER( spinb_state, game0 )
 {
 	m_p_audio = memregion("audiorom")->base();
 	m_p_music = memregion("musicrom")->base();
 	m_game = 0;
+}
+
+DRIVER_INIT_MEMBER( spinb_state, game1 )
+{
+	m_p_audio = memregion("audiorom")->base();
+	m_p_music = memregion("musicrom")->base();
+	m_p_dmdcpu = memregion("dmdcpu")->base()+0x10000;
+	m_game = 1;
+}
+
+DRIVER_INIT_MEMBER( spinb_state, game2 )
+{
+	m_p_audio = memregion("audiorom")->base();
+	m_p_music = memregion("musicrom")->base();
+	m_p_dmdcpu = memregion("dmdcpu")->base()+0x10000;
+	m_game = 2;
+}
+
+UINT32 spinb_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	UINT8 y,gfx;
+	UINT16 sy=0,ma,x;
+	address_space &internal = m_dmdcpu->space(AS_DATA);
+	ma = internal.read_byte(0x05) << 8; // find where display memory is
+	ma &= 0xfe00;
+
+	for(y=0; y<32; y++)
+	{
+		UINT16 *p = &bitmap.pix16(sy++);
+		for(x = 0; x < 16; x++)
+		{
+			gfx = m_dmdram[ma++];
+
+			*p++ = BIT(gfx, 0);
+			*p++ = BIT(gfx, 1);
+			*p++ = BIT(gfx, 2);
+			*p++ = BIT(gfx, 3);
+			*p++ = BIT(gfx, 4);
+			*p++ = BIT(gfx, 5);
+			*p++ = BIT(gfx, 6);
+			*p++ = BIT(gfx, 7);
+		}
+	}
+	return 0;
 }
 
 static MACHINE_CONFIG_START( spinb, spinb_state )
@@ -487,6 +602,16 @@ static MACHINE_CONFIG_START( spinb, spinb_state )
 	MCFG_CPU_IO_MAP(dmd_io)
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
+
+	/* Video */
+	MCFG_SCREEN_ADD("screen", LCD)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
+	MCFG_SCREEN_UPDATE_DRIVER(spinb_state, screen_update)
+	MCFG_SCREEN_SIZE(128, 32)
+	MCFG_SCREEN_VISIBLE_AREA(0, 127, 0, 31)
+	MCFG_SCREEN_PALETTE("palette")
+	MCFG_PALETTE_ADD_MONOCHROME_AMBER("palette")
 
 	/* Sound */
 	MCFG_FRAGMENT_ADD( genpin_audio )
@@ -553,70 +678,109 @@ static MACHINE_CONFIG_START( spinb, spinb_state )
 	MCFG_7474_COMP_OUTPUT_CB(WRITELINE(spinb_state, ic5m_w))
 MACHINE_CONFIG_END
 
-#if 0
-static MACHINE_CONFIG_START( spinb, spinb_state )
+static MACHINE_CONFIG_DERIVED( vrnwrld, spinb )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8031, XTAL_16MHz)
-	MCFG_CPU_PROGRAM_MAP(spinb_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(vrnwrld_map)
 MACHINE_CONFIG_END
-#endif
+
 
 /*-------------------------------------------------------------------
 / Bushido (1993) - ( Last game by Inder - before becoming Spinball - but same hardware)
 /-------------------------------------------------------------------*/
 ROM_START(bushido)
-	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_REGION(0x4000, "maincpu", 0)
 	ROM_LOAD("0-z80.bin", 0x0000, 0x2000, CRC(3ea1eb1d) SHA1(cceb6c68e481f36a5646ff4f38d3dfc4275b0c79))
 	ROM_LOAD("1-z80.old", 0x2000, 0x2000, CRC(648da72b) SHA1(1005a13b4746e302d979c8b1da300e943cdcab3d))
-	ROM_REGION(0x32001, "dmdcpu", 0)
+
+	ROM_REGION(0x10000, "dmdcpu", 0)
 	ROM_LOAD("g-disply.bin", 0x00000, 0x10000, CRC(9a1df82f) SHA1(4ad6a12ae36ec898b8ac5243da6dec3abcd9dc33))
-	ROM_REGION(0x10000, "audiocpu", 0)
+
+	ROM_REGION(0x2000, "audiocpu", 0)
 	ROM_LOAD("a-sonido.bin", 0x0000, 0x2000, CRC(cf7d5399) SHA1(c79145826cfa6be2487e3add477d9b452c553762))
+
 	ROM_REGION(0x180000, "audiorom", 0)
 	ROM_LOAD("b-sonido.bin", 0x00000, 0x80000, CRC(cb4fc885) SHA1(569f389fa8f91f886b58f44f701d2752ef01f3fa))
 	ROM_LOAD("c-sonido.bin", 0x80000, 0x80000, CRC(35a43dd8) SHA1(f2b1994f67f749c65a88c95d970b655990d85b96))
-	ROM_REGION(0x10000, "musiccpu", 0)
+
+	ROM_REGION(0x2000, "musiccpu", 0)
 	ROM_LOAD("d-musica.bin", 0x0000, 0x2000, CRC(2cb9697c) SHA1(d5c66d616ccd5e299832704e494743429dafd569))
+
 	ROM_REGION(0x180000, "musicrom", 0)
 	ROM_LOAD("e-musica.bin", 0x00000, 0x80000, CRC(1414b921) SHA1(5df9e538ee109df28953ec8f162c60cb8c6e4d96))
 	ROM_LOAD("f-musica.bin", 0x80000, 0x80000, CRC(80f3a6df) SHA1(e09ad4660e511779c6e55559fa0c2c0b0c6600c8))
 ROM_END
 
 ROM_START(bushidoa)
-	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_REGION(0x4000, "maincpu", 0)
 	ROM_LOAD("0-cpu.bin", 0x0000, 0x2000, CRC(7f7e6642) SHA1(6872397eed7525f384b79cdea13531d273d8cf14))
 	ROM_LOAD("1-cpu.bin", 0x2000, 0x2000, CRC(a538d37f) SHA1(d2878ad0d31b4221b823812485c7faaf666ce185))
-	ROM_REGION(0x32001, "dmdcpu", 0)
+
+	ROM_REGION(0x10000, "dmdcpu", 0)
 	ROM_LOAD("g-disply.bin", 0x00000, 0x10000, CRC(9a1df82f) SHA1(4ad6a12ae36ec898b8ac5243da6dec3abcd9dc33))
-	ROM_REGION(0x10000, "audiocpu", 0)
+
+	ROM_REGION(0x2000, "audiocpu", 0)
 	ROM_LOAD("a-sonido.bin", 0x0000, 0x2000, CRC(cf7d5399) SHA1(c79145826cfa6be2487e3add477d9b452c553762))
+
 	ROM_REGION(0x180000, "audiorom", 0)
 	ROM_LOAD("b-sonido.bin", 0x00000, 0x80000, CRC(cb4fc885) SHA1(569f389fa8f91f886b58f44f701d2752ef01f3fa))
 	ROM_LOAD("c-sonido.bin", 0x80000, 0x80000, CRC(35a43dd8) SHA1(f2b1994f67f749c65a88c95d970b655990d85b96))
-	ROM_REGION(0x10000, "musiccpu", 0)
+
+	ROM_REGION(0x2000, "musiccpu", 0)
 	ROM_LOAD("d-musica.bin", 0x0000, 0x2000, CRC(2cb9697c) SHA1(d5c66d616ccd5e299832704e494743429dafd569))
+
 	ROM_REGION(0x180000, "musicrom", 0)
 	ROM_LOAD("e-musica.bin", 0x00000, 0x80000, CRC(1414b921) SHA1(5df9e538ee109df28953ec8f162c60cb8c6e4d96))
 	ROM_LOAD("f-musica.bin", 0x80000, 0x80000, CRC(80f3a6df) SHA1(e09ad4660e511779c6e55559fa0c2c0b0c6600c8))
 ROM_END
 
 /*-------------------------------------------------------------------
+/ Mach 2 (1995)
+/-------------------------------------------------------------------*/
+ROM_START(mach2)
+	ROM_REGION(0x4000, "maincpu", 0)
+	ROM_LOAD("m2cpu0.19", 0x0000, 0x2000, CRC(274c8040) SHA1(6b039b79b7e08f2bf2045bc4f1cbba790c999fed))
+	ROM_LOAD("m2cpu1.19", 0x2000, 0x2000, CRC(c445df0b) SHA1(1f346c1df8df0a3c4e8cb1186280d2f34959b3f8))
+
+	ROM_REGION(0x10000, "dmdcpu", 0)
+	ROM_LOAD("m2dmdf.01", 0x00000, 0x10000, CRC(c45ccc74) SHA1(8362e799a76536a16dd2d5dde500ad3db273180f))
+
+	ROM_REGION(0x2000, "audiocpu", 0)
+	ROM_LOAD("m2sndd.01", 0x0000, 0x2000, CRC(e789f22d) SHA1(36aa7eac1dd37a02c982d109462dddbd85a305cc))
+
+	ROM_REGION(0x180000, "audiorom", 0)
+	ROM_LOAD("m2snde.01", 0x00000, 0x80000, CRC(f5721119) SHA1(9082198e8d875b67323266c4bf8c2c378b63dfbb))
+
+	ROM_REGION(0x2000, "musiccpu", 0)
+	ROM_LOAD("m2musa.01", 0x0000, 0x2000, CRC(2d92a882) SHA1(cead22e434445e5c25414646b1e9ae2b9457439d))
+
+	ROM_REGION(0x180000, "musicrom", 0)
+	ROM_LOAD("m2musb.01", 0x00000, 0x80000, CRC(6689cd19) SHA1(430092d51704dfda8bd8264875f1c1f4461c56e5))
+	ROM_LOAD("m2musc.01", 0x80000, 0x80000, CRC(88851b82) SHA1(d0c9fa391ca213a69b7c8ae7ca52063503b5656e))
+ROM_END
+
+/*-------------------------------------------------------------------
 / Jolly Park (1996)
 /-------------------------------------------------------------------*/
 ROM_START(jolypark)
-	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_REGION(0x4000, "maincpu", 0)
 	ROM_LOAD("jpcpu0.rom", 0x0000, 0x2000, CRC(061967af) SHA1(45048e1d9f17efa3382460fd474a5aeb4191d617))
 	ROM_LOAD("jpcpu1.rom", 0x2000, 0x2000, CRC(ea99202f) SHA1(e04825e73fd25f6469b3315f063f598ea1ab44c7))
-	ROM_REGION(0x32001, "dmdcpu", 0)
+
+	ROM_REGION(0x30000, "dmdcpu", 0)
 	ROM_LOAD("jpdmd0.rom", 0x00000, 0x10000, CRC(b57565cb) SHA1(3fef66d298893029de78fdb6ecdb562c33d76180))
-	ROM_LOAD("jpdmd1.rom", 0x12000, 0x20000, CRC(40d1563f) SHA1(90dbea742202340da6fa950eedc2bceec5a2af7e))
-	ROM_REGION(0x10000, "audiocpu", 0)
+	ROM_LOAD("jpdmd1.rom", 0x10000, 0x20000, CRC(40d1563f) SHA1(90dbea742202340da6fa950eedc2bceec5a2af7e)) // according to schematic this rom should be twice as big
+
+	ROM_REGION(0x2000, "audiocpu", 0)
 	ROM_LOAD("jpsndc1.rom", 0x0000, 0x2000, CRC(0475318f) SHA1(7154bd5ca5b28019eb0ff598ec99bbe49260932b))
+
 	ROM_REGION(0x180000, "audiorom", 0)
 	ROM_LOAD("jpsndm4.rom", 0x00000, 0x80000, CRC(735f3db7) SHA1(81dc893f5194d6ac1af54b262555a40c5c3e0292))
 	ROM_LOAD("jpsndm5.rom", 0x80000, 0x80000, CRC(769374bd) SHA1(8121369714c55cc06c493b15e5c2ca79b13aff52))
-	ROM_REGION(0x10000, "musiccpu", 0)
+
+	ROM_REGION(0x2000, "musiccpu", 0)
 	ROM_LOAD("jpsndc0.rom", 0x0000, 0x2000, CRC(a97259dc) SHA1(58dea3f36b760112cfc32d306077da8cf6cdec5a))
+
 	ROM_REGION(0x180000, "musicrom", 0)
 	ROM_LOAD("jpsndm1.rom", 0x000000, 0x80000, CRC(fc91d2f1) SHA1(c838a0b31bbec9dbc96b46d692c8d6f1286fe46a))
 	ROM_LOAD("jpsndm2.rom", 0x080000, 0x80000, CRC(fb2d1882) SHA1(fb0ef9def54d9163a46354a0df0757fac6cbd57c))
@@ -624,50 +788,35 @@ ROM_START(jolypark)
 ROM_END
 
 /*-------------------------------------------------------------------
-/ Mach 2 (1995)
-/-------------------------------------------------------------------*/
-ROM_START(mach2)
-	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD("m2cpu0.19", 0x0000, 0x2000, CRC(274c8040) SHA1(6b039b79b7e08f2bf2045bc4f1cbba790c999fed))
-	ROM_LOAD("m2cpu1.19", 0x2000, 0x2000, CRC(c445df0b) SHA1(1f346c1df8df0a3c4e8cb1186280d2f34959b3f8))
-	ROM_REGION(0x32001, "dmdcpu", 0)
-	ROM_LOAD("m2dmdf.01", 0x00000, 0x10000, CRC(c45ccc74) SHA1(8362e799a76536a16dd2d5dde500ad3db273180f))
-	ROM_REGION(0x10000, "audiocpu", 0)
-	ROM_LOAD("m2sndd.01", 0x0000, 0x2000, CRC(e789f22d) SHA1(36aa7eac1dd37a02c982d109462dddbd85a305cc))
-	ROM_REGION(0x180000, "audiorom", 0)
-	ROM_LOAD("m2snde.01", 0x00000, 0x80000, CRC(f5721119) SHA1(9082198e8d875b67323266c4bf8c2c378b63dfbb))
-	ROM_REGION(0x10000, "musiccpu", 0)
-	ROM_LOAD("m2musa.01", 0x0000, 0x2000, CRC(2d92a882) SHA1(cead22e434445e5c25414646b1e9ae2b9457439d))
-	ROM_REGION(0x180000, "musicrom", 0)
-	ROM_LOAD("m2musb.01", 0x00000, 0x80000, CRC(6689cd19) SHA1(430092d51704dfda8bd8264875f1c1f4461c56e5))
-	ROM_LOAD("m2musc.01", 0x80000, 0x80000, CRC(88851b82) SHA1(d0c9fa391ca213a69b7c8ae7ca52063503b5656e))
-ROM_END
-
-/*-------------------------------------------------------------------
 / Verne's World (1996)
 /-------------------------------------------------------------------*/
 ROM_START(vrnwrld)
-	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_REGION(0x8000, "maincpu", 0)
 	ROM_LOAD("vwcpu0.rom", 0x0000, 0x4000, CRC(89c980e7) SHA1(09eeed0232255875cf119d59143d839ff40e30dd))
 	ROM_LOAD("vwcpu1.rom", 0x4000, 0x4000, CRC(a4db4e64) SHA1(fc55781295fc723741de24ad60311b7e33551830))
-	ROM_REGION(0x114000, "dmdcpu", 0)
+
+	ROM_REGION(0x110000, "dmdcpu", 0)
 	ROM_LOAD("vwdmd0.rom", 0x00000, 0x10000, CRC(40600060) SHA1(7ad619bcb5e5e50325360f4e946b5bfa072caead))
-	ROM_LOAD("vwdmd1.rom", 0x14000, 0x80000, CRC(de4a1060) SHA1(6b848dfd8aafdbcf7e1593f98bd1c3d69306aa11))
-	ROM_LOAD("vwdmd2.rom", 0x94000, 0x80000, CRC(29fc8da7) SHA1(2704f14a3338a63abda3bcbc56e9f984a679eb38))
-	ROM_REGION(0x10000, "audiocpu", 0)
+	ROM_LOAD("vwdmd1.rom", 0x10000, 0x80000, CRC(de4a1060) SHA1(6b848dfd8aafdbcf7e1593f98bd1c3d69306aa11))
+	ROM_LOAD("vwdmd2.rom", 0x90000, 0x80000, CRC(29fc8da7) SHA1(2704f14a3338a63abda3bcbc56e9f984a679eb38))
+
+	ROM_REGION(0x2000, "audiocpu", 0)
 	ROM_LOAD("vws2ic9.rom", 0x0000, 0x2000, CRC(ab8cb4c5) SHA1(92a702c11e2cef703992244529ba86079d5ab9b0))
+
 	ROM_REGION(0x180000, "audiorom", 0)
 	ROM_LOAD("vws3ic15.rom", 0x00000, 0x80000, CRC(d62c9443) SHA1(7c6b8662d88ba6592da8b83af11087647105e8dd))
-	ROM_REGION(0x10000, "musiccpu", 0)
+
+	ROM_REGION(0x2000, "musiccpu", 0)
 	ROM_LOAD("vws4ic30.rom", 0x0000, 0x2000, CRC(ecd18a19) SHA1(558e687e0429d31fafe8db05954d9a8ad90d6aeb))
+
 	ROM_REGION(0x180000, "musicrom", 0)
 	ROM_LOAD("vws5ic25.rom", 0x000000, 0x80000, CRC(56d349f0) SHA1(e71d2d03c3e978c552e272de8850cc265255fbd1))
 	ROM_LOAD("vws6ic26.rom", 0x080000, 0x80000, CRC(bee399c1) SHA1(b2c6e4830641ed32b9643dc8c1fa08a2da5a7e9b))
 	ROM_LOAD("vws7ic27.rom", 0x100000, 0x80000, CRC(7335b29c) SHA1(4de6de09f069feecbad2e5ef50032e8d381ff9b1))
 ROM_END
 
-GAME(1993, bushido,   0,       spinb,  spinb, spinb_state,  spinb,  ROT0,  "Inder/Spinball", "Bushido (set 1)", GAME_IS_SKELETON_MECHANICAL)
-GAME(1993, bushidoa,  bushido, spinb,  spinb, spinb_state,  spinb,  ROT0,  "Inder/Spinball", "Bushido (set 2)", GAME_IS_SKELETON_MECHANICAL)
-GAME(1996, jolypark,  0,       spinb,  spinb, spinb_state,  spinb,  ROT0,  "Spinball",       "Jolly Park",      GAME_IS_SKELETON_MECHANICAL)
-GAME(1995, mach2,     0,       spinb,  spinb, spinb_state,  spinb,  ROT0,  "Spinball",       "Mach 2",          GAME_IS_SKELETON_MECHANICAL)
-GAME(1996, vrnwrld,   0,       spinb,  spinb, spinb_state,  spinb,  ROT0,  "Spinball",       "Verne's World",   GAME_IS_SKELETON_MECHANICAL)
+GAME(1993, bushido,   0,       spinb,   spinb, spinb_state,  game0,  ROT0,  "Inder/Spinball", "Bushido (set 1)", GAME_IS_SKELETON_MECHANICAL)
+GAME(1993, bushidoa,  bushido, spinb,   spinb, spinb_state,  game0,  ROT0,  "Inder/Spinball", "Bushido (set 2)", GAME_IS_SKELETON_MECHANICAL)
+GAME(1995, mach2,     0,       spinb,   spinb, spinb_state,  game0,  ROT0,  "Spinball",       "Mach 2",          GAME_IS_SKELETON_MECHANICAL)
+GAME(1996, jolypark,  0,       spinb,   spinb, spinb_state,  game1,  ROT0,  "Spinball",       "Jolly Park",      GAME_IS_SKELETON_MECHANICAL)
+GAME(1996, vrnwrld,   0,       vrnwrld, spinb, spinb_state,  game2,  ROT0,  "Spinball",       "Verne's World",   GAME_IS_SKELETON_MECHANICAL)
