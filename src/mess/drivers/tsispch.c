@@ -7,27 +7,15 @@
 *  Prose 2020
 *  Copyright (C) 2011-2013 Jonathan Gevaryahu AKA Lord Nightmare and Kevin 'kevtris' Horton
 *
-*  This source file is dual-licensed under the following licenses:
-*  1. The MAME license as of September 2013
-*  2. The GNU LGPLv2.1:
-*
-*  This library is free software; you can redistribute it and/or
-*  modify it under the terms of the GNU Lesser General Public
-*  License as published by the Free Software Foundation; either
-*  version 2.1 of the License, or (at your option) any later version.
-*
-*  This library is distributed in the hope that it will be useful,
-*  but WITHOUT ANY WARRANTY; without even the implied warranty of
-*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-*  Lesser General Public License for more details.
-*
-*  You should have received a copy of the GNU Lesser General Public
-*  License along with this library; if not, write to the Free Software
-*  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
-*
-*  Please contact the author if you require other licensing.
-*
-*
+*  The Prose 2000 card is an IEEE 796 Multibus card, with additional connectors to facilitate power and serial input other than via multibus.
+*  There are two hardware versions of the card:
+*  - The 1981 Telesensory Systems Inc copyrighted version
+*    (lacks U82, has some rework on the power input to add a bypass capacitor and an extra power line to the 8086)
+*  - The 1986 Speech Plus copyrighted version
+*    (adds U82 as an extra buffer for status (not sure)? integrates the greenwire fixes from the above board, minor reorganizations of passives)
+*  Both versions encountered have been in non-multibus enclosures:
+*  - The 1981 Version appeared on a 'Voice V4' Speech board scrapped from a "Kurzweil Reading Machine" Talking Scanner (predecessor to the TSI/Kurzweil/Xerox 'Reading Edge' scanner which is SPARC based) [I'm very sorry I didn't get the OCR computing guts of the scanner itself too :( ]
+*  - The 1986 Version appeared in a 'Prose 2020' under-monitor RS232 speech unit.
 *
 *  DONE:
 *  Skeleton Written
@@ -57,6 +45,7 @@
 *  8259 PIC: figure out where IR4-7 come from, if anywhere.
 *  UPD7720 and 8259: hook up p0 and p1 as outputs, and figure out how 8259 IR0 is masked from 7720 p0.
 *  Add other dipswitches and jumpers (these may actually just control clock dividers for the two 8251s)
+*  Older v1.1 set gets stuck forever waiting for upd7720 status port to equal 0x20, which never happens.
 *  Everything else
 *
 *  Notes:
@@ -80,7 +69,7 @@
 *    When the unit is idle, leds 5 and 3 are on and upd7720 reset is low (write of 0b?1?0101?.
 *    On all character writes from i8251, bit 8 is unset, then set again, possibly to avoid interrupt clashes?
 *
-*  Bootup notes:
+*  Bootup notes v3.4.1:
 *    D3109: checks if 0x80 (S4-8) is set: if set, continue, else jump to D3123
 *    D3123: write 0x1C (0 0 0 [1 1 1 0] 0) to 3401
 *    then jump to D32B0
@@ -311,7 +300,7 @@ DRIVER_INIT_MEMBER(tsispch_state,prose2k)
      0   0   x   x    0   x   1   1    0   1  0  x   x  x  x  x   x  x  x  *  LEDS, dipswitches, and UPD77P20 control lines
      0   0   x   x    0   x   1   1    0   1  1  x   x  x  x  x   x  x  *  x  UPD77P20 data/status
      0   0   x   x    0   x   1   1    1   x  x                               Open bus, verified (returns 0x00EA)
-     0   0   x   x    1   x                                                   Open bus? (or maybe status?) (returns 0xFA,B,C,FFF)
+     0   0   x   x    1   x                                                   Open bus? (or maybe communication with multibus connector?) (returns 0xFA,B,C,FFF)
      0   1                                                                    Open bus, verified (returns 0x00EA)
      1   0                                                                    Open bus, verified (returns 0x00EA)
      1   1   0   *    *   *   *   *    *   *  *  *   *  *  *  *   *  *  *  s  ROMs 2 and 3
@@ -433,7 +422,7 @@ ROM_START( prose2k )
 	// mapping proms:
 	// All are am27s19 32x8 TriState PROMs (equivalent to 82s123/6331)
 	// L - always low; H - always high
-	// U77: unknown (what does this do?)
+	// U77: unknown (what does this do? likely as to do with multibus and possibly waitstates?)
 	//      input is A19 for I4, A18 for I3, A15 for I2, A13 for I1, A12 for I0
 	//      output bits 0bLLLLzyxH (TODO: recheck)
 	//      bit - function
@@ -445,10 +434,12 @@ ROM_START( prose2k )
 	//
 	// U79: SRAM and peripheral mapping:
 	//      input is A19 for I4, A18 for I3, A15 for I2, A13 for I1, A12 for I0, same as U77
-	//      On the Prose 2000 board dumped, only bits 3 and 0 are used;
+	//      On the Prose 2000 later board dumped, only bits 3 and 0 are used;
 	//      bits 7-4 are always low, bits 2 and 1 are always high.
 	//      SRAMS are only populated in U61 and U64.
-	//      output bits 0bLLLLyHHx
+	//      On the Prose 2000 earlier board dumped, bits 3,2,1,0 are all used;
+	//      bits 7-4 are always low. sram is in 6 6116s, mapped the same as the 2 6264s on the later board.
+	//      output bits 0bLLLL3210
 	//      7,6,5,4 - seem unconnected?
 	//      3 - to /EN3 (pin 4) of 74S138N at U80
 	//          AND to EN1 (pin 6) of 74S138N at U78
@@ -475,7 +466,7 @@ ROM_START( prose2k )
 	//      1 - to /CS1 on 6264 SRAMs at U62 and U65
 	//      0 - to /CS1 on 6264 SRAMs at U61 and U64
 	//
-	// U81: maps ROMS: input is A19-A15 for I4,3,2,1,0
+	// U81: (OPTIONAL) maps ROMS: input is A19-A15 for I4,3,2,1,0
 	//      On the Prose 2000 board dumped, only bits 6 and 5 are used,
 	//      the rest are always high; maps roms 0,1,2,3 to C0000-FFFFF.
 	//      The Prose 2000 board has empty unpopulated sockets for roms 4-15;
@@ -489,16 +480,57 @@ ROM_START( prose2k )
 	//      2 - to /CE of ROMs 8(U25) and 9(U48)
 	//      1 - to /CE of ROMs 10(U26) and 11(U49)
 	//      0 - to /CE of ROMs 12(U27) and 13(U50)
+	//
+	// Note U81 is optional; it can be replaced by a 74s138 instead of a prom,
+	// with A19, A18, A17 as inputs, for decoding the roms as:      
+	//      7 - to /CE of ROMs 0(U21) and 1(U44)   (0xE0000-0xF1FFF)
+	//      6 - to /CE of ROMs 2(U22) and 3(U45)   (0xE4000-0xF3FFF)
+	//      5 - to /CE of ROMs 4(U23) and 5(U46)   (0xE8000-0xF5FFF)
+	//      4 - to /CE of ROMs 6(U24) and 7(U47)   (0xEC000-0xF7FFF)
+	//      3 - to /CE of ROMs 8(U25) and 9(U48)   (0xF0000-0xF9FFF)
+	//      2 - to /CE of ROMs 10(U26) and 11(U49) (0xF4000-0xFBFFF)
+	//      1 - to /CE of ROMs 12(U27) and 13(U50) (0xF8000-0xFDFFF)
+	//      0 - to /CE of ROMs 14(U28) and 15(U51) (0xFC000-0xFFFFF)                                               
+	
 	ROM_REGION(0x1000, "proms", 0)
 	ROM_LOAD( "am27s19.u77", 0x0000, 0x0020, CRC(A88757FC) SHA1(9066D6DBC009D7A126D75B8461CA464DDF134412))
 	ROM_LOAD( "am27s19.u79", 0x0020, 0x0020, CRC(A165B090) SHA1(BFC413C79915C68906033741318C070AD5DD0F6B))
 	ROM_LOAD( "am27s19.u81", 0x0040, 0x0020, CRC(62E1019B) SHA1(ACADE372EDB08FD0DCB1FA3AF806C22C47081880))
 	ROM_END
 
+ROM_START( prose2ko )
+	// 'Older' prose2k set
+	ROM_REGION(0x100000,"maincpu", 0)
+	// prose 2000 firmware version 1.1
+	ROMX_LOAD( "v1.1__6__speech__plus__(c)1983.am2764.6.u24",   0xec000, 0x2000, CRC(C881F92D) SHA1(2D4EB96360ADAC54D4F0110595BFAF682280C1CA),ROM_SKIP(1))
+	ROMX_LOAD( "v1.1__7__speech__plus__(c)1983.am2764.7.u47",   0xec001, 0x2000, CRC(4D5771CB) SHA1(55ED59AD1CAD154804DBEEEBED98F062783C33C3),ROM_SKIP(1))
+	ROMX_LOAD( "v1.1__8__speech__plus__(c)1983.am2764.8.u25",   0xf0000, 0x2000, CRC(ADF9BFB8) SHA1(0B73561B52B388B740FABF07ADA2D70A52F22037),ROM_SKIP(1))
+	ROMX_LOAD( "v1.1__9__speech__plus__(c)1983.am2764.9.u48",   0xf0001, 0x2000, CRC(355F97D2) SHA1(7655FC55B577821E0BD8BF81FB74B8A20B1DF098),ROM_SKIP(1))
+	ROMX_LOAD( "v1.1__10__speech__plus__(c)1983.am2764.10.u26", 0xf4000, 0x2000, CRC(949A0344) SHA1(8E33C69DFC413AEA95F166B08902AD97B1E3E980),ROM_SKIP(1))
+	ROMX_LOAD( "v1.1__11__speech__plus__(c)1983.am2764.11.u49", 0xf4001, 0x2000, CRC(AD9A0670) SHA1(769F2F8696C7B6907706466AA9AB7A897ED9F889),ROM_SKIP(1))
+	ROMX_LOAD( "v1.1__12__speech__plus__(c)1983.am2764.12.u27", 0xf8000, 0x2000, CRC(9EAF9378) SHA1(D296B1D347C03E6123C38C208EAD25B1F43B9859),ROM_SKIP(1))
+	ROMX_LOAD( "v1.1__13__speech__plus__(c)1983.am2764.13.u50", 0xf8001, 0x2000, CRC(5E173667) SHA1(93230C2FEDE5095F56E10D20EA36A5A45A1E7356),ROM_SKIP(1))
+	ROMX_LOAD( "v1.1__14__speech__plus__(c)1983.am2764.14.u28", 0xfc000, 0x2000, CRC(E616BD6E) SHA1(5DFAE2C5079D89F791C9D7166F9504231A464203),ROM_SKIP(1))
+	ROMX_LOAD( "v1.1__15__speech__plus__(c)1983.am2764.15.u51", 0xfc001, 0x2000, CRC(BEB1FA19) SHA1(72130FE45C3FD3DE7CF794936DC68ED2D4193DAF),ROM_SKIP(1))
+
+	// TSI/Speech plus DSP firmware v?.? (no sticker, but S140025 printed on chip), unlabeled chip, but clearly a NEC UPD77P20C ceramic
+	// NOT DUMPED YET, using the 3.12 dsp firmware as a placeholder
+	ROM_REGION( 0x600, "dspprgload", 0) // packed 24 bit data
+	ROM_LOAD( "s140025__dsp_prog.u29", 0x0000, 0x0600, BAD_DUMP CRC(9E46425A) SHA1(80A915D731F5B6863AEEB448261149FF15E5B786))
+	ROM_REGION( 0x800, "dspprg", ROMREGION_ERASEFF) // for unpacking 24 bit data into 32 bit data which cpu core can understand
+	ROM_REGION( 0x400, "dspdata", 0)
+	ROM_LOAD( "s140025__dsp_data.u29", 0x0000, 0x0400, BAD_DUMP CRC(F4E4DD16) SHA1(6E184747DB2F26E45D0E02907105FF192E51BABA))
+
+	ROM_REGION(0x1000, "proms", 0)
+	ROM_LOAD( "dm74s288n.u77", 0x0000, 0x0020, CRC(A88757FC) SHA1(9066D6DBC009D7A126D75B8461CA464DDF134412)) // == am27s19.u77
+	ROM_LOAD( "dm74s288n.whitespot.u79", 0x0020, 0x0020, CRC(7FAEE6CB) SHA1(B6DD2A6909DAC9E89E7317C006A013FF0866382D))
+	// no third prom in this set, a 74S138 is used instead for e0000-fffff rom mapping
+	ROM_END
 
 /******************************************************************************
  Drivers
 ******************************************************************************/
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT   INIT    COMPANY     FULLNAME            FLAGS */
-COMP( 1985, prose2k,    0,      0,      prose2k,        prose2k, tsispch_state, prose2k,    "Telesensory Systems Inc/Speech Plus",  "Prose 2000/2020",  GAME_NOT_WORKING | GAME_NO_SOUND )
+COMP( 1985, prose2k,    0,      0,      prose2k,        prose2k, tsispch_state, prose2k,    "Telesensory Systems Inc/Speech Plus",  "Prose 2000/2020 v3.4.1",  GAME_NOT_WORKING | GAME_NO_SOUND )
+COMP( 1985, prose2ko, prose2k,      0,      prose2k,        prose2k, tsispch_state, prose2k,    "Telesensory Systems Inc/Speech Plus",  "Prose 2000/2020 v1.1",  GAME_NOT_WORKING | GAME_NO_SOUND )
