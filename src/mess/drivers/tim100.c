@@ -23,8 +23,12 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
+	virtual void machine_start();
 	virtual void machine_reset();
 	I8275_DRAW_CHARACTER_MEMBER( crtc_display_pixels );
+
+private:
+	UINT8 *m_charmap;
 };
 
 static ADDRESS_MAP_START(tim100_mem, AS_PROGRAM, 8, tim100_state)
@@ -57,6 +61,11 @@ static const rgb_t tim100_palette[3] = {
 	rgb_t(0xff, 0xff, 0xff)  // highlight
 };
 
+void tim100_state::machine_start()
+{
+	m_charmap = memregion("chargen")->base();
+}
+
 void tim100_state::machine_reset()
 {
 	m_palette->set_pen_colors(0, tim100_palette, ARRAY_LENGTH(tim100_palette));
@@ -85,8 +94,7 @@ I8275_DRAW_CHARACTER_MEMBER( tim100_state::crtc_display_pixels )
 {
 	int i;
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	UINT8 *charmap = memregion("chargen")->base();
-	UINT8 pixels = charmap[(linecount & 15) + (charcode << 4)];
+	UINT8 pixels = m_charmap[(linecount & 15) + (charcode << 4)];
 	if (vsp)
 	{
 		pixels = 0;
