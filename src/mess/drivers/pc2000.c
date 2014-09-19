@@ -1015,6 +1015,14 @@ ROM_START( gln ) // not Z80 code
 	ROM_CART_LOAD( "cart", 0, 0x40000, 0 )
 ROM_END
 
+ROM_START( pc1000 )
+	ROM_REGION( 0x20000, "bios", 0 )
+	ROM_LOAD( "27-00780-002-002.u4", 0x000000, 0x020000, CRC(705170ae) SHA1(825ce0ff2c7d0a7b1e2577d1465a37f7e8da383b))
+
+	ROM_REGION( 0x40000, "cart", ROMREGION_ERASEFF )
+	ROM_CART_LOAD( "cart", 0, 0x40000, 0 )
+ROM_END
+
 ROM_START( misterx )
 	ROM_REGION( 0x20000, "bios", 0 )
 	ROM_LOAD( "27-00882-001.bin", 0x000000, 0x020000, CRC(30e0dc94) SHA1(2f4675746a41399b3d9e3e8001a9b4a0dcc5b620))
@@ -1035,6 +1043,7 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME     PARENT  COMPAT   MACHINE    INPUT   CLASS          INIT    COMPANY   FULLNAME       FLAGS */
+COMP( 1988, pc1000,   0,       0,     misterx,   pc1000, driver_device,   0,  "Video Technology", "PreComputer 1000", GAME_NOT_WORKING)
 COMP( 1988, misterx,  0,       0,     misterx,   pc1000, driver_device,   0,  "Video Technology / Yeno", "MisterX", GAME_NOT_WORKING)
 COMP( 1993, pc2000,   0,       0,     pc2000,    pc2000, driver_device,   0,  "Video Technology", "PreComputer 2000", GAME_NOT_WORKING)
 COMP( 1993, gl2000,   0,       0,     gl2000,    pc2000, driver_device,   0,  "Video Technology", "Genius Leader 2000", GAME_NOT_WORKING)
