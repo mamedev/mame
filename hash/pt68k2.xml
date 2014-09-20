@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<softwarelist name="pt68k2" description="PT68K2 5.25 disks">
+
+	<software name="skdos33">
+		<description>SK*DOS 3.3 for PT68K2</description>
+		<year>1990</year>
+		<publisher>Star-K Software</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="371742">
+				<rom name="pt68k-2_skdos.imd" size="371742" crc="3112e58e" sha1="69613c2aded6d3c2cf7837b724c1d6e0297266f3" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>
+
