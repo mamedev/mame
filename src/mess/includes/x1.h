@@ -21,9 +21,10 @@
 #include "sound/wave.h"
 #include "imagedev/cassette.h"
 #include "imagedev/flopdrv.h"
-#include "imagedev/cartslot.h"
 #include "formats/basicdsk.h"
 #include "formats/x1_tap.h"
+#include "bus/generic/slot.h"
+#include "bus/generic/carts.h"
 
 
 // ======================> x1_keyboard_device
@@ -74,18 +75,20 @@ class x1_state : public driver_device
 public:
 	x1_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-	m_maincpu(*this,"x1_cpu"),
-	m_cassette(*this, "cassette"),
-	m_fdc(*this, "fdc"),
-	m_crtc(*this, "crtc"),
-	m_ctc(*this, "ctc"),
-	m_gfxdecode(*this, "gfxdecode"),
+		m_maincpu(*this,"x1_cpu"),
+		m_cassette(*this, "cassette"),
+		m_cart(*this, "cartslot"),
+		m_fdc(*this, "fdc"),
+		m_crtc(*this, "crtc"),
+		m_ctc(*this, "ctc"),
+		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_dma(*this, "dma")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cassette;
+	required_device<generic_slot_device> m_cart;
 	required_device<mb8877_device> m_fdc;
 	required_device<mc6845_device> m_crtc;
 	required_device<z80ctc_device> m_ctc;

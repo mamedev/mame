@@ -8,6 +8,8 @@
 #define __ADVISION__
 
 #include "sound/dac.h"
+#include "bus/generic/slot.h"
+#include "bus/generic/carts.h"
 
 #define SCREEN_TAG  "screen"
 #define I8048_TAG   "i8048"
@@ -21,12 +23,14 @@ public:
 			m_maincpu(*this, I8048_TAG),
 			m_soundcpu(*this, COP411_TAG),
 			m_dac(*this, "dac"),
+			m_cart(*this, "cartslot"),
 			m_palette(*this, "palette")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
 	required_device<dac_device> m_dac;
+	required_device<generic_slot_device> m_cart;
 	required_device<palette_device> m_palette;
 
 	virtual void machine_start();
@@ -39,6 +43,7 @@ public:
 	void vh_write(int data);
 	void vh_update(int x);
 
+	DECLARE_READ8_MEMBER( rom_r );
 	DECLARE_READ8_MEMBER( ext_ram_r );
 	DECLARE_WRITE8_MEMBER( ext_ram_w );
 	DECLARE_READ8_MEMBER( controller_r );
@@ -48,6 +53,8 @@ public:
 	DECLARE_READ8_MEMBER( sound_cmd_r );
 	DECLARE_WRITE8_MEMBER( sound_g_w );
 	DECLARE_WRITE8_MEMBER( sound_d_w );
+
+	memory_region *m_cart_rom;
 
 	/* external RAM state */
 	UINT8 *m_ext_ram;

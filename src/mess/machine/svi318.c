@@ -42,49 +42,33 @@ static INS8250_REFRESH_CONNECT( svi318_com_refresh_connected )
 
 /* Cartridge */
 
+bool svi318_state::cart_verify(UINT8 *ROM)
+{
+	if (ROM[0] != 0xf3 || ROM[1] != 0x31)
+		return false;
+
+	return true;
+}
+
 DEVICE_IMAGE_LOAD_MEMBER( svi318_state, svi318_cart )
 {
-	UINT8 *p = memregion("user1")->base();
-	UINT32 size;
-
-	if (image.software_entry() == NULL)
-		size = image.length();
-	else
-		size = image.get_software_region_length("rom");
+	UINT32 size = m_cart->common_get_size("rom");
 
 	if (size > 0x8000)
+	{
 		logerror("Cart image %s larger than expected. Please report the issue.\n", image.filename());
-
-	if (image.software_entry() == NULL)
-	{
-		if (image.fread(p, size) != size)
-		{
-			logerror("Can't read file %s\n", image.filename());
-			return IMAGE_INIT_FAIL;
-		}
-	}
-	else
-	{
-		memcpy(p, image.get_software_region("rom"), size);
-	}
-
-	if ( p[0] != 0xf3 || p[1] != 0x31 )
-	{
 		return IMAGE_INIT_FAIL;
 	}
 
-	m_pcart = p;
-	m_pcart_rom_size = size;
+	m_cart->rom_alloc(size, 1);
+	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");			
+
+	if (image.software_entry() == NULL && !cart_verify(m_cart->get_rom_base()))
+		return IMAGE_INIT_FAIL;
 
 	return IMAGE_INIT_PASS;
 }
 
-
-DEVICE_IMAGE_UNLOAD_MEMBER( svi318_state, svi318_cart )
-{
-	m_pcart = NULL;
-	m_pcart_rom_size = 0;
-}
 
 
 /* PPI */
@@ -487,12 +471,16 @@ DRIVER_INIT_MEMBER(svi318_state,svi318)
 	memset (m_svi.empty_bank, 0xff, 0x8000);
 }
 
-MACHINE_START_MEMBER(svi318_state,svi318_ntsc)
+MACHINE_START_MEMBER(svi318_state, svi318_ntsc)
 {
+	astring region_tag;
+	m_cart_rom = memregion(region_tag.cpy(m_cart->tag()).cat(GENERIC_ROM_REGION_TAG));
 }
 
-MACHINE_START_MEMBER(svi318_state,svi318_pal)
+MACHINE_START_MEMBER(svi318_state, svi318_pal)
 {
+	astring region_tag;
+	m_cart_rom = memregion(region_tag.cpy(m_cart->tag()).cat(GENERIC_ROM_REGION_TAG));
 }
 
 static void svi318_load_proc(device_image_interface &image)
@@ -591,10 +579,8 @@ void svi318_state::svi318_set_banks()
 		m_svi.bankLow_ptr = memregion("maincpu")->base();
 		break;
 	case SVI_CART:
-		if ( m_pcart )
-		{
-			m_svi.bankLow_ptr = m_pcart;
-		}
+		if (m_cart_rom)
+			m_svi.bankLow_ptr = m_cart_rom->base();
 		break;
 	case SVI_EXPRAM2:
 		if ( ram_size >= 64 * 1024 )
@@ -658,14 +644,10 @@ void svi318_state::svi318_set_banks()
 		m_svi.bankHigh1_read_only = 1;
 		m_svi.bankHigh2_ptr = m_svi.empty_bank;
 		m_svi.bankHigh2_read_only = 1;
-		if ( m_pcart && ! ( v & 0x80 ) )
-		{
-			m_svi.bankHigh2_ptr = m_pcart + 0x4000;
-		}
-		if ( m_pcart && ! ( v & 0x40 ) )
-		{
-			m_svi.bankHigh1_ptr = m_pcart;
-		}
+		if (m_cart_rom && !(v & 0x80))
+			m_svi.bankHigh2_ptr = m_cart_rom->base() + 0x4000;
+		if (m_cart_rom && !(v & 0x40))
+			m_svi.bankHigh1_ptr = m_cart_rom->base();
 	}
 
 	membank("bank1")->set_base(m_svi.bankLow_ptr );

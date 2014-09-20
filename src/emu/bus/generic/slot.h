@@ -44,6 +44,9 @@ enum
 	GENERIC_ROM16_WIDTH
 };
 
+#define GENERIC_ROM_REGION_TAG ":cart:rom"
+
+
 
 #define MCFG_GENERIC_MANDATORY       \
 	static_cast<generic_slot_device *>(device)->set_must_be_loaded(TRUE);

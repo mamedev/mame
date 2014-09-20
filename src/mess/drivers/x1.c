@@ -960,11 +960,11 @@ WRITE8_MEMBER( x1_state::x1_sub_io_w )
 
 READ8_MEMBER( x1_state::x1_rom_r )
 {
-	UINT8 *rom = memregion("cart_img")->base();
-
 //  printf("%06x\n",m_rom_index[0]<<16|m_rom_index[1]<<8|m_rom_index[2]<<0);
-
-	return rom[m_rom_index[0]<<16|m_rom_index[1]<<8|m_rom_index[2]<<0];
+	if (m_cart->cart_mounted())
+		return m_cart->read_rom(space, (m_rom_index[0] << 16) | (m_rom_index[1] << 8) | (m_rom_index[2] << 0));
+	else
+		return 0;
 }
 
 WRITE8_MEMBER( x1_state::x1_rom_w )
@@ -2478,9 +2478,8 @@ static MACHINE_CONFIG_START( x1, x1_state )
 	MCFG_DEVICE_ADD("fdc", MB8877, 0)
 	MCFG_WD17XX_DEFAULT_DRIVE4_TAGS
 
-	MCFG_CARTSLOT_ADD("cart")
-	MCFG_CARTSLOT_EXTENSION_LIST("rom")
-	MCFG_CARTSLOT_NOT_MANDATORY
+	MCFG_GENERIC_CARTSLOT_ADD("cartslot", GENERIC_ROM8_WIDTH, generic_plain_slot, "x1_cart")
+	MCFG_GENERIC_EXTENSIONS("bin,rom")
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
@@ -2561,9 +2560,6 @@ MACHINE_CONFIG_END
 	ROM_REGION(0x20000, "kanji", ROMREGION_ERASEFF)
 
 	ROM_REGION(0x20000, "raw_kanji", ROMREGION_ERASEFF)
-
-	ROM_REGION( 0x1000000, "cart_img", ROMREGION_ERASE00 )
-	ROM_CART_LOAD("cart", 0x0000, 0xffffff, ROM_OPTIONAL | ROM_NOMIRROR)
 ROM_END
 
 ROM_START( x1turbo )
@@ -2587,9 +2583,6 @@ ROM_START( x1turbo )
 	ROM_LOAD("kanji2.rom", 0x08000, 0x8000, CRC(e710628a) SHA1(103bbe459dc8da27a9400aa45b385255c18fcc75) )
 	ROM_LOAD("kanji3.rom", 0x10000, 0x8000, CRC(8cae13ae) SHA1(273f3329c70b332f6a49a3a95e906bbfe3e9f0a1) )
 	ROM_LOAD("kanji1.rom", 0x18000, 0x8000, CRC(5874f70b) SHA1(dad7ada1b70c45f1e9db11db273ef7b385ef4f17) )
-
-	ROM_REGION( 0x1000000, "cart_img", ROMREGION_ERASE00 )
-	ROM_CART_LOAD("cart", 0x0000, 0xffffff, ROM_OPTIONAL | ROM_NOMIRROR)
 ROM_END
 
 ROM_START( x1turbo40 )
@@ -2613,9 +2606,6 @@ ROM_START( x1turbo40 )
 	ROM_LOAD("kanji2.rom", 0x08000, 0x8000, CRC(e710628a) SHA1(103bbe459dc8da27a9400aa45b385255c18fcc75) )
 	ROM_LOAD("kanji3.rom", 0x10000, 0x8000, CRC(8cae13ae) SHA1(273f3329c70b332f6a49a3a95e906bbfe3e9f0a1) )
 	ROM_LOAD("kanji1.rom", 0x18000, 0x8000, CRC(5874f70b) SHA1(dad7ada1b70c45f1e9db11db273ef7b385ef4f17) )
-
-	ROM_REGION( 0x1000000, "cart_img", ROMREGION_ERASE00 )
-	ROM_CART_LOAD("cart", 0x0000, 0xffffff, ROM_OPTIONAL | ROM_NOMIRROR)
 ROM_END
 
 

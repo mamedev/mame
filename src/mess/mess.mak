@@ -2003,7 +2003,7 @@ $(MESSOBJ)/vidbrain.a:          \
 
 $(MESSOBJ)/videoton.a:          \
 	$(MESS_DRIVERS)/tvc.o       \
-	$(MESS_AUDIO)/tvc.o         \
+	$(MESS_AUDIO)/tvc_snd.o     \
 
 $(MESSOBJ)/visual.a:            \
 	$(MESS_DRIVERS)/v1050.o     \

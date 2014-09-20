@@ -10,22 +10,10 @@
 */
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "sound/wave.h"
-#include "video/mc6845.h"
 #include "includes/svi318.h"
-#include "video/tms9928a.h"
-#include "machine/i8255.h"
-#include "machine/wd17xx.h"
-#include "bus/centronics/ctronics.h"
 #include "imagedev/flopdrv.h"
 #include "formats/svi_dsk.h"
-#include "imagedev/cartslot.h"
-#include "imagedev/cassette.h"
 #include "formats/svi_cas.h"
-#include "sound/dac.h"
-#include "sound/ay8910.h"
-#include "machine/ram.h"
 #include "rendlay.h"
 
 static ADDRESS_MAP_START( svi318_mem, AS_PROGRAM, 8, svi318_state )
@@ -263,12 +251,9 @@ static const floppy_interface svi318_floppy_interface =
 };
 
 static MACHINE_CONFIG_FRAGMENT( svi318_cartslot )
-	MCFG_CARTSLOT_ADD("cart")
-	MCFG_CARTSLOT_EXTENSION_LIST("rom")
-	MCFG_CARTSLOT_NOT_MANDATORY
-	MCFG_CARTSLOT_INTERFACE("svi318_cart")
-	MCFG_CARTSLOT_LOAD(svi318_state,svi318_cart)
-	MCFG_CARTSLOT_UNLOAD(svi318_state,svi318_cart)
+	MCFG_GENERIC_CARTSLOT_ADD("cartslot", GENERIC_ROM8_WIDTH, generic_plain_slot, "svi318_cart")
+	MCFG_GENERIC_EXTENSIONS("bin,rom")
+	MCFG_GENERIC_LOAD(svi318_state, svi318_cart)
 
 	/* Software lists */
 	MCFG_SOFTWARE_LIST_ADD("cart_list","svi318_cart")
@@ -497,8 +482,6 @@ ROM_START( svi318 )
 	ROMX_LOAD("svi110.rom", 0x0000, 0x8000, CRC(709904e9) SHA1(7d8daf52f78371ca2c9443e04827c8e1f98c8f2c), ROM_BIOS(2))
 	ROM_SYSTEM_BIOS(2, "100", "SV BASIC v1.0")
 	ROMX_LOAD("svi100.rom", 0x0000, 0x8000, CRC(98d48655) SHA1(07758272df475e5e06187aa3574241df1b14035b), ROM_BIOS(3))
-
-	ROM_REGION( 0x8000, "user1", ROMREGION_ERASEFF )
 ROM_END
 
 ROM_START( svi318n  )
@@ -509,8 +492,6 @@ ROM_START( svi318n  )
 	ROMX_LOAD("svi110.rom", 0x0000, 0x8000, CRC(709904e9) SHA1(7d8daf52f78371ca2c9443e04827c8e1f98c8f2c), ROM_BIOS(2))
 	ROM_SYSTEM_BIOS(2, "100", "SV BASIC v1.0")
 	ROMX_LOAD("svi100.rom", 0x0000, 0x8000, CRC(98d48655) SHA1(07758272df475e5e06187aa3574241df1b14035b), ROM_BIOS(3))
-
-	ROM_REGION( 0x8000, "user1", ROMREGION_ERASEFF )
 ROM_END
 
 ROM_START( svi328 )
@@ -521,8 +502,6 @@ ROM_START( svi328 )
 	ROMX_LOAD("svi110.rom", 0x0000, 0x8000, CRC(709904e9) SHA1(7d8daf52f78371ca2c9443e04827c8e1f98c8f2c), ROM_BIOS(2))
 	ROM_SYSTEM_BIOS(2, "100", "SV BASIC v1.0")
 	ROMX_LOAD("svi100.rom", 0x0000, 0x8000, CRC(98d48655) SHA1(07758272df475e5e06187aa3574241df1b14035b), ROM_BIOS(3))
-
-	ROM_REGION( 0x8000, "user1", ROMREGION_ERASEFF )
 ROM_END
 
 ROM_START( svi328n )
@@ -533,8 +512,6 @@ ROM_START( svi328n )
 	ROMX_LOAD("svi110.rom", 0x0000, 0x8000, CRC(709904e9) SHA1(7d8daf52f78371ca2c9443e04827c8e1f98c8f2c), ROM_BIOS(2))
 	ROM_SYSTEM_BIOS(2, "100", "SV BASIC v1.0")
 	ROMX_LOAD("svi100.rom", 0x0000, 0x8000, CRC(98d48655) SHA1(07758272df475e5e06187aa3574241df1b14035b), ROM_BIOS(3))
-
-	ROM_REGION( 0x8000, "user1", ROMREGION_ERASEFF )
 ROM_END
 
 ROM_START( sv328p80 )
@@ -546,8 +523,6 @@ ROM_START( sv328p80 )
 	ROMX_LOAD("svi806.rom",   0x0000, 0x1000, CRC(850bc232) SHA1(ed45cb0e9bd18a9d7bd74f87e620f016a7ae840f), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS(1, "swedish", "Swedish Character Set")
 	ROMX_LOAD("svi806se.rom", 0x0000, 0x1000, CRC(daea8956) SHA1(3f16d5513ad35692488ae7d864f660e76c6e8ed3), ROM_BIOS(2))
-
-	ROM_REGION( 0x8000, "user1", ROMREGION_ERASEFF )
 ROM_END
 
 ROM_START( sv328n80 )
@@ -559,8 +534,6 @@ ROM_START( sv328n80 )
 	ROMX_LOAD("svi806.rom",   0x0000, 0x1000, CRC(850bc232) SHA1(ed45cb0e9bd18a9d7bd74f87e620f016a7ae840f), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS(1, "swedish", "Swedish Character Set")
 	ROMX_LOAD("svi806se.rom", 0x0000, 0x1000, CRC(daea8956) SHA1(3f16d5513ad35692488ae7d864f660e76c6e8ed3), ROM_BIOS(2))
-
-	ROM_REGION( 0x8000, "user1", ROMREGION_ERASEFF )
 ROM_END
 
 

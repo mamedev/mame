@@ -16,19 +16,23 @@
 
 */
 
-
 #include "emu.h"
 #include "includes/advision.h"
 #include "cpu/mcs48/mcs48.h"
 #include "cpu/cop400/cop400.h"
-#include "imagedev/cartslot.h"
 #include "sound/dac.h"
 
 /* Memory Maps */
 
+READ8_MEMBER( advision_state::rom_r )
+{
+	offset += 0x400;
+	return m_cart->read_rom(space, offset & 0xfff);
+}
+
 static ADDRESS_MAP_START( program_map, AS_PROGRAM, 8, advision_state )
 	AM_RANGE(0x0000, 0x03ff) AM_ROMBANK("bank1")
-	AM_RANGE(0x0400, 0x0fff) AM_ROM
+	AM_RANGE(0x0400, 0x0fff) AM_READ(rom_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( io_map, AS_IO, 8, advision_state )
@@ -69,7 +73,7 @@ static MACHINE_CONFIG_START( advision, advision_state )
 	MCFG_CPU_IO_MAP(io_map)
 
 	MCFG_CPU_ADD(COP411_TAG, COP411, 52631*16) // COP411L-KCN/N
-	MCFG_COP400_CONFIG( COP400_CKI_DIVISOR_4, COP400_CKO_RAM_POWER_SUPPLY, COP400_MICROBUS_DISABLED )
+	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_4, COP400_CKO_RAM_POWER_SUPPLY, COP400_MICROBUS_DISABLED)
 	MCFG_CPU_IO_MAP(sound_io_map)
 
 	/* video hardware */
@@ -90,10 +94,8 @@ static MACHINE_CONFIG_START( advision, advision_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	/* cartridge */
-	MCFG_CARTSLOT_ADD("cart")
-	MCFG_CARTSLOT_EXTENSION_LIST("bin")
-	MCFG_CARTSLOT_MANDATORY
-	MCFG_CARTSLOT_INTERFACE("advision_cart")
+	MCFG_GENERIC_CARTSLOT_ADD("cartslot", GENERIC_ROM8_WIDTH, generic_plain_slot, "advision_cart")
+	MCFG_GENERIC_MANDATORY
 
 	/* Software lists */
 	MCFG_SOFTWARE_LIST_ADD("cart_list","advision")
@@ -102,10 +104,7 @@ MACHINE_CONFIG_END
 /* ROMs */
 
 ROM_START( advision )
-	ROM_REGION( 0x1000, I8048_TAG, 0 )
-	ROM_CART_LOAD( "cart", 0x0000, 0x1000, ROM_NOMIRROR | ROM_FULLSIZE )
-
-	ROM_REGION( 0x400, "bios", 0 )
+	ROM_REGION( 0x1000, I8048_TAG, ROMREGION_ERASE00 )
 	ROM_LOAD( "avbios.u5", 0x000, 0x400, CRC(279e33d1) SHA1(bf7b0663e9125c9bfb950232eab627d9dbda8460) )
 
 	ROM_REGION( 0x200, COP411_TAG, 0 )

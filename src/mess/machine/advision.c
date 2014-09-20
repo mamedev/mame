@@ -27,9 +27,12 @@
 
 void advision_state::machine_start()
 {
+	astring region_tag;
+	m_cart_rom = memregion(region_tag.cpy(m_cart->tag()).cat(GENERIC_ROM_REGION_TAG));
+
 	/* configure EA banking */
-	membank("bank1")->configure_entry(0, memregion("bios")->base());
-	membank("bank1")->configure_entry(1, memregion(I8048_TAG)->base());
+	membank("bank1")->configure_entry(0, memregion(I8048_TAG)->base());
+	membank("bank1")->configure_entry(1, m_cart_rom->base());
 	m_maincpu->space(AS_PROGRAM).install_readwrite_bank(0x0000, 0x03ff, "bank1");
 	membank("bank1")->set_entry(0);
 

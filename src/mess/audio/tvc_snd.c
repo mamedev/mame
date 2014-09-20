@@ -7,7 +7,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/tvc.h"
+#include "tvc_snd.h"
 
 // device type definition
 const device_type TVC_SOUND = &device_creator<tvc_sound_device>;

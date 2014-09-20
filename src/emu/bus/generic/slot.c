@@ -46,7 +46,7 @@ void device_generic_cart_interface::rom_alloc(size_t size, int width, const char
 	if (m_rom == NULL)
 	{
 		astring tempstring(tag);
-		tempstring.cat(":cart:rom");
+		tempstring.cat(GENERIC_ROM_REGION_TAG);
 		m_rom = device().machine().memory().region_alloc(tempstring, size, width, ENDIANNESS_LITTLE)->base();
 		m_rom_size = size;
 	}

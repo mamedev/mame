@@ -170,10 +170,11 @@ A=AMA, P=PRO, these keys don't exist, and so the games cannot be played.
 #include "cpu/tms9900/tms9995.h"
 #include "sound/wave.h"
 #include "video/tms9928a.h"
-#include "imagedev/cartslot.h"
 #include "imagedev/cassette.h"
 #include "sound/sn76496.h"
 #include "bus/centronics/ctronics.h"
+#include "bus/generic/slot.h"
+#include "bus/generic/carts.h"
 
 
 class tutor_state : public driver_device
@@ -182,16 +183,22 @@ public:
 	tutor_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_cart(*this, "cartslot"),
 		m_cass(*this, "cassette"),
 		m_centronics(*this, "centronics"),
-		m_cent_data_out(*this, "cent_data_out")
+		m_cent_data_out(*this, "cent_data_out"),
+		m_bank1(*this, "bank1")
 	{
 	}
 
 	required_device<tms9995_device> m_maincpu;
+	required_device<generic_slot_device> m_cart;
 	optional_device<cassette_image_device> m_cass;
 	optional_device<centronics_device> m_centronics;
 	optional_device<output_latch_device> m_cent_data_out;
+	required_memory_bank m_bank1;	
+	memory_region *m_cart_rom;
+
 	DECLARE_READ8_MEMBER(key_r);
 	DECLARE_READ8_MEMBER(tutor_mapper_r);
 	DECLARE_WRITE8_MEMBER(tutor_mapper_w);
@@ -201,67 +208,38 @@ public:
 	DECLARE_WRITE8_MEMBER(tutor_printer_w);
 
 	DECLARE_READ8_MEMBER(tutor_highmem_r);
-	char m_cartridge_enable;
-	char m_tape_interrupt_enable;
+	int m_tape_interrupt_enable;
 	emu_timer *m_tape_interrupt_timer;
-	UINT8 m_printer_data;
-	char m_printer_strobe;
-	DECLARE_DRIVER_INIT(tutor);
-	DECLARE_DRIVER_INIT(pyuuta);
 	virtual void machine_start();
 	virtual void machine_reset();
 	TIMER_CALLBACK_MEMBER(tape_interrupt_handler);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( tutor_cart );
-	DECLARE_DEVICE_IMAGE_UNLOAD_MEMBER( tutor_cart );
 
 	int m_centronics_busy;
-	DECLARE_WRITE_LINE_MEMBER( write_centronics_busy );
+	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
 };
 
-
-/* mapper state */
-
-/* tape interface state */
-
-
-
-/* parallel interface state */
-
-enum
-{
-	basic_base = 0x8000,
-	cartridge_base = 0xe000
-};
-
-
-DRIVER_INIT_MEMBER(tutor_state,tutor)
-{
-	m_tape_interrupt_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tutor_state::tape_interrupt_handler),this));
-
-	membank("bank1")->configure_entry(0, memregion("maincpu")->base() + basic_base);
-	membank("bank1")->configure_entry(1, memregion("maincpu")->base() + cartridge_base);
-	membank("bank1")->set_entry(0);
-}
-
-
-DRIVER_INIT_MEMBER(tutor_state,pyuuta)
-{
-	DRIVER_INIT_CALL(tutor);
-	membank("bank1")->set_entry(1);
-}
 
 void tutor_state::machine_start()
 {
+	astring region_tag;
+	m_cart_rom = memregion(region_tag.cpy(m_cart->tag()).cat(GENERIC_ROM_REGION_TAG));
+	
+	m_tape_interrupt_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tutor_state::tape_interrupt_handler),this));
+	
+	m_bank1->configure_entry(0, memregion("maincpu")->base() + 0x8000);
+	m_bank1->set_entry(0);
+
+	if (m_cart_rom)
+	{
+		m_bank1->configure_entry(1, m_cart_rom->base());
+		m_bank1->set_entry(1);
+	}
 }
 
 void tutor_state::machine_reset()
 {
-	m_cartridge_enable = 0;
-
 	m_tape_interrupt_enable = 0;
-
-	m_printer_data = 0;
-	m_printer_strobe = 0;
+	m_centronics_busy = 0;
 
 	// Enable auto wait states by lowering READY during reset
 	m_maincpu->set_ready(CLEAR_LINE);
@@ -300,31 +278,6 @@ READ8_MEMBER( tutor_state::key_r )
 }
 
 
-DEVICE_IMAGE_LOAD_MEMBER( tutor_state, tutor_cart )
-{
-	UINT32 size;
-	UINT8 *ptr = memregion("maincpu")->base();
-
-	if (image.software_entry() == NULL)
-	{
-		size = image.length();
-		if (image.fread(ptr + cartridge_base, size) != size)
-			return IMAGE_INIT_FAIL;
-	}
-	else
-	{
-		size = image.get_software_region_length("rom");
-		memcpy(ptr + cartridge_base, image.get_software_region("rom"), size);
-	}
-
-	return IMAGE_INIT_PASS;
-}
-
-DEVICE_IMAGE_UNLOAD_MEMBER( tutor_state, tutor_cart )
-{
-	memset(memregion("maincpu")->base() + cartridge_base, 0, 0x6000);
-}
-
 /*
     Cartridge mapping:
 
@@ -346,7 +299,7 @@ READ8_MEMBER( tutor_state::tutor_mapper_r )
 	switch (offset)
 	{
 	case 0x10:
-		/* return 0x42 if we have an cartridge with an alternate boot ROM */
+		/* return 0x42 if we have a cartridge with an alternate boot ROM */
 		reply = 0;
 		break;
 
@@ -369,18 +322,17 @@ WRITE8_MEMBER( tutor_state::tutor_mapper_w )
 
 	case 0x08:
 		/* disable cartridge ROM, enable BASIC ROM at base >8000 */
-		m_cartridge_enable = 0;
-		membank("bank1")->set_entry(0);
+		m_bank1->set_entry(0);
 		break;
 
 	case 0x0c:
 		/* enable cartridge ROM, disable BASIC ROM at base >8000 */
-		m_cartridge_enable = 1;
-		membank("bank1")->set_entry(1);
+		if (m_cart_rom)
+			m_bank1->set_entry(1);
 		break;
 
 	default:
-		if (! (offset & 1))
+		if (!(offset & 1))
 			logerror("unknown port in %s %d\n", __FILE__, __LINE__);
 		break;
 	}
@@ -435,7 +387,7 @@ WRITE8_MEMBER( tutor_state::tutor_cassette_w )
 
 	if ((offset & 0x1f) == 0)
 	{
-		data = (offset & 0x20) != 0;
+		data = BIT(offset, 5);
 
 		switch ((offset >> 6) & 3)
 		{
@@ -446,10 +398,10 @@ WRITE8_MEMBER( tutor_state::tutor_cassette_w )
 		case 1:
 			/* interrupt control??? */
 			//logerror("ignoring write of %d to cassette port 1\n", data);
-			if (m_tape_interrupt_enable != ! data)
+			if (m_tape_interrupt_enable != data)
 			{
-				m_tape_interrupt_enable = ! data;
-				if (m_tape_interrupt_enable)
+				m_tape_interrupt_enable = data;
+				if (!m_tape_interrupt_enable)
 					m_tape_interrupt_timer->adjust(/*attotime::from_hz(44100)*/attotime::zero, 0, attotime::from_hz(44100));
 				else
 				{
@@ -618,7 +570,7 @@ Small note about natural keyboard support: currently,
 */
 
 static INPUT_PORTS_START(tutor)
-	PORT_START("LINE0")    /* col 0 */
+	PORT_START("LINE0")
 		PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_1)               PORT_CHAR('1') PORT_CHAR('!')
 		PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_2)               PORT_CHAR('2') PORT_CHAR('"')
 		PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_Q)               PORT_CHAR('Q')
@@ -628,7 +580,7 @@ static INPUT_PORTS_START(tutor)
 		PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_Z)               PORT_CHAR('Z')
 		PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_X)               PORT_CHAR('X')
 
-	PORT_START("LINE1")    /* col 1 */
+	PORT_START("LINE1")
 		PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_3)               PORT_CHAR('3') PORT_CHAR('#')
 		PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_4)               PORT_CHAR('4') PORT_CHAR('$')
 		PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_E)               PORT_CHAR('E')
@@ -638,7 +590,7 @@ static INPUT_PORTS_START(tutor)
 		PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_C)               PORT_CHAR('C')
 		PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_V)               PORT_CHAR('V')
 
-	PORT_START("LINE2")    /* col 2 */
+	PORT_START("LINE2")
 		PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_5)               PORT_CHAR('5') PORT_CHAR('%')
 		PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_6)               PORT_CHAR('6') PORT_CHAR('&')
 		PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_T)               PORT_CHAR('T')
@@ -648,7 +600,7 @@ static INPUT_PORTS_START(tutor)
 		PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_B)               PORT_CHAR('B')
 		PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_N)               PORT_CHAR('N')
 
-	PORT_START("LINE3")    /* col 3 */
+	PORT_START("LINE3")
 		PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_7)               PORT_CHAR('7') PORT_CHAR('\'')
 		PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_8)               PORT_CHAR('8') PORT_CHAR('(')
 		PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_9)               PORT_CHAR('9') PORT_CHAR(')')
@@ -658,7 +610,7 @@ static INPUT_PORTS_START(tutor)
 		PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_K)               PORT_CHAR('K')
 		PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_M)               PORT_CHAR('M')
 
-	PORT_START("LINE4")    /* col 4 */
+	PORT_START("LINE4")
 		PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_0)               PORT_CHAR('0') PORT_CHAR('=')
 		PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("-  b") PORT_CODE(KEYCODE_MINUS) PORT_CHAR('-')
 		PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_O)               PORT_CHAR('O')
@@ -668,7 +620,7 @@ static INPUT_PORTS_START(tutor)
 		PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_COMMA)           PORT_CHAR(',') PORT_CHAR('<')
 		PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_STOP)            PORT_CHAR('.') PORT_CHAR('>')
 
-	PORT_START("LINE4_alt")    /* col 4 */
+	PORT_START("LINE4_alt")
 		PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_PLAYER(1)
 		PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_PLAYER(1)
 		PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN) PORT_PLAYER(1) PORT_CODE(KEYCODE_2_PAD)
@@ -676,7 +628,7 @@ static INPUT_PORTS_START(tutor)
 		PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP) PORT_PLAYER(1) PORT_CODE(KEYCODE_8_PAD)
 		PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT) PORT_PLAYER(1) PORT_CODE(KEYCODE_6_PAD)
 
-	PORT_START("LINE5")    /* col 5 */
+	PORT_START("LINE5")
 		/* Unused? */
 		PORT_BIT(0x03, IP_ACTIVE_HIGH, IPT_UNUSED)
 
@@ -687,7 +639,7 @@ static INPUT_PORTS_START(tutor)
 		PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_SLASH)           PORT_CHAR('/') PORT_CHAR('?')
 		PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_CLOSEBRACE)      PORT_CHAR(']') PORT_CHAR('}') // this one is 4th line, 4th key after 'M'
 
-	PORT_START("LINE5_alt")    /* col 5 */
+	PORT_START("LINE5_alt")
 		PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_PLAYER(2)
 		PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_PLAYER(2)
 		PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN) PORT_PLAYER(2)
@@ -695,7 +647,7 @@ static INPUT_PORTS_START(tutor)
 		PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP) PORT_PLAYER(2)
 		PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT) PORT_PLAYER(2)
 
-	PORT_START("LINE6")    /* col 6 */
+	PORT_START("LINE6")
 		/* Unused? */
 		PORT_BIT(0x21, IP_ACTIVE_HIGH, IPT_UNUSED)
 
@@ -708,7 +660,7 @@ static INPUT_PORTS_START(tutor)
 		PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Mod") PORT_CODE(KEYCODE_F2) PORT_CHAR(UCHAR_MAMEKEY(F2))
 		PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_SPACE)           PORT_CHAR(' ')
 
-	PORT_START("LINE7")    /* col 7 */
+	PORT_START("LINE7")
 		PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Left") PORT_CODE(KEYCODE_LEFT) PORT_CHAR(UCHAR_MAMEKEY(LEFT))
 		PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Up") PORT_CODE(KEYCODE_UP) PORT_CHAR(UCHAR_MAMEKEY(UP))
 		PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Down") PORT_CODE(KEYCODE_DOWN) PORT_CHAR(UCHAR_MAMEKEY(DOWN))
@@ -776,11 +728,7 @@ static MACHINE_CONFIG_START( tutor, tutor_state )
 	MCFG_CASSETTE_ADD( "cassette" )
 
 	/* cartridge */
-	MCFG_CARTSLOT_ADD("cart")
-	MCFG_CARTSLOT_NOT_MANDATORY
-	MCFG_CARTSLOT_LOAD(tutor_state, tutor_cart)
-	MCFG_CARTSLOT_UNLOAD(tutor_state, tutor_cart)
-	MCFG_CARTSLOT_INTERFACE("tutor_cart")
+	MCFG_GENERIC_CARTSLOT_ADD("cartslot", GENERIC_ROM8_WIDTH, generic_linear_slot, "tutor_cart")
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("cart_list","tutor")
@@ -796,27 +744,25 @@ MACHINE_CONFIG_END
 /*
   ROM loading
 */
+
 ROM_START(tutor)
-	/*CPU memory space*/
-	ROM_REGION(0x14000,"maincpu",0)
+	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD("tutor1.bin", 0x0000, 0x8000, CRC(702c38ba) SHA1(ce60607c3038895e31915d41bb5cf71cb8522d7a))      /* system ROM */
 	ROM_LOAD("tutor2.bin", 0x8000, 0x4000, CRC(05f228f5) SHA1(46a14a45f6f9e2c30663a2b87ce60c42768a78d0))      /* BASIC ROM */
 ROM_END
 
 
 ROM_START(pyuuta)
-	/*CPU memory space*/
-	ROM_REGION(0x14000,"maincpu",0)
+	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD("tomy29.7", 0x0000, 0x8000, CRC(7553bb6a) SHA1(fa41c45cb6d3daf7435f2a82f77dfa286003255e))      /* system ROM */
 ROM_END
 
 ROM_START(pyuutajr)
-	/*CPU memory space*/
-	ROM_REGION(0x14000,"maincpu",0)
+	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD( "ipl.rom", 0x0000, 0x4000, CRC(2ca37e62) SHA1(eebdc5c37d3b532edd5e5ca65eb785269ebd1ac0))      /* system ROM */
 ROM_END
 
-/*   YEAR    NAME      PARENT      COMPAT  MACHINE     INPUT      INIT    COMPANY     FULLNAME */
-COMP(1983?,  tutor,    0,          0,      tutor,      tutor, tutor_state,     tutor,  "Tomy",   "Tomy Tutor" , 0)
-COMP(1982,   pyuuta,   tutor,      0,      tutor,      tutor, tutor_state,     pyuuta, "Tomy",   "Tomy Pyuuta" , 0)
-COMP(1983,   pyuutajr, tutor,      0,      pyuutajr,   pyuutajr, tutor_state,  pyuuta, "Tomy",   "Tomy Pyuuta Jr." , 0)
+/*   YEAR    NAME      PARENT      COMPAT  MACHINE     INPUT                      INIT    COMPANY     FULLNAME */
+COMP(1983?,  tutor,    0,          0,      tutor,      tutor,    driver_device,   0,      "Tomy",   "Tomy Tutor" , 0)
+COMP(1982,   pyuuta,   tutor,      0,      tutor,      tutor,    driver_device,   0,      "Tomy",   "Tomy Pyuuta" , 0)
+COMP(1983,   pyuutajr, tutor,      0,      pyuutajr,   pyuutajr, driver_device,   0,      "Tomy",   "Tomy Pyuuta Jr." , 0)

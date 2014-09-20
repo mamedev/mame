@@ -474,9 +474,8 @@ static MACHINE_CONFIG_START( x1twin, x1twin_state )
 	MCFG_DEVICE_ADD("fdc", MB8877, 0)
 	MCFG_WD17XX_DEFAULT_DRIVE4_TAGS
 
-	MCFG_CARTSLOT_ADD("cart")
-	MCFG_CARTSLOT_EXTENSION_LIST("rom")
-	MCFG_CARTSLOT_NOT_MANDATORY
+	MCFG_GENERIC_CARTSLOT_ADD("cartslot", GENERIC_ROM8_WIDTH, generic_plain_slot, "x1_cart")
+	MCFG_GENERIC_EXTENSIONS("bin,rom")
 
 	MCFG_SPEAKER_ADD("x1_l",-0.2, 0.0, 1.0)
 	MCFG_SPEAKER_ADD("x1_r",0.2, 0.0, 1.0)
@@ -547,9 +546,6 @@ ROM_START( x1twin )
 	ROM_LOAD("kanji2.rom", 0x08000, 0x8000, BAD_DUMP CRC(e710628a) SHA1(103bbe459dc8da27a9400aa45b385255c18fcc75) )
 	ROM_LOAD("kanji3.rom", 0x10000, 0x8000, BAD_DUMP CRC(8cae13ae) SHA1(273f3329c70b332f6a49a3a95e906bbfe3e9f0a1) )
 	ROM_LOAD("kanji1.rom", 0x18000, 0x8000, BAD_DUMP CRC(5874f70b) SHA1(dad7ada1b70c45f1e9db11db273ef7b385ef4f17) )
-
-	ROM_REGION( 0x1000000, "cart_img", ROMREGION_ERASE00 )
-	ROM_CART_LOAD("cart", 0x0000, 0xffffff, ROM_OPTIONAL | ROM_NOMIRROR)
 ROM_END
 
 COMP( 1986, x1twin,    x1,     0,       x1twin,      x1twin, x1_state,         x1_kanji,"Sharp",  "X1 Twin (CZ-830C)",    GAME_NOT_WORKING )

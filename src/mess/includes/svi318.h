@@ -13,11 +13,17 @@
 #include "machine/i8255.h"
 #include "machine/ins8250.h"
 #include "machine/wd17xx.h"
-#include "imagedev/cassette.h"
-#include "sound/dac.h"
 #include "machine/ram.h"
 #include "machine/buffer.h"
+#include "imagedev/cassette.h"
+#include "sound/dac.h"
+#include "sound/ay8910.h"
+#include "sound/wave.h"
+#include "video/mc6845.h"
+#include "video/tms9928a.h"
 #include "bus/centronics/ctronics.h"
+#include "bus/generic/slot.h"
+#include "bus/generic/carts.h"
 
 
 struct SVI_318
@@ -58,8 +64,6 @@ class svi318_state : public driver_device
 public:
 	svi318_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_pcart(NULL),
-		m_pcart_rom_size(0),
 		m_maincpu(*this, "maincpu"),
 		m_cassette(*this, "cassette"),
 		m_dac(*this, "dac"),
@@ -69,6 +73,7 @@ public:
 		m_cent_data_out(*this, "cent_data_out"),
 		m_ins8250_0(*this, "ins8250_0"),
 		m_ins8250_1(*this, "ins8250_1"),
+		m_cart(*this, "cartslot"),
 		m_line0(*this, "LINE0"),
 		m_line1(*this, "LINE1"),
 		m_line2(*this, "LINE2"),
@@ -85,8 +90,6 @@ public:
 		m_palette(*this, "palette")  { }
 
 	SVI_318 m_svi;
-	UINT8 *m_pcart;
-	UINT32 m_pcart_rom_size;
 	int m_centronics_busy;
 	SVI318_FDC_STRUCT m_fdc;
 	DECLARE_WRITE8_MEMBER(svi318_ppi_w);
@@ -115,12 +118,13 @@ public:
 	DECLARE_WRITE8_MEMBER(svi318_ppi_port_c_w);
 	DECLARE_WRITE_LINE_MEMBER(svi_fdc_intrq_w);
 	DECLARE_WRITE_LINE_MEMBER(svi_fdc_drq_w);
+	bool cart_verify(UINT8 *ROM);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(svi318_cart);
-	DECLARE_DEVICE_IMAGE_UNLOAD_MEMBER(svi318_cart);
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
 
 	MC6845_UPDATE_ROW(crtc_update_row);
-
+	memory_region *m_cart_rom;
+	
 	required_device<z80_device> m_maincpu;
 protected:
 	required_device<cassette_image_device> m_cassette;
@@ -131,6 +135,7 @@ protected:
 	required_device<output_latch_device> m_cent_data_out;
 	required_device<ins8250_device> m_ins8250_0;
 	required_device<ins8250_device> m_ins8250_1;
+	required_device<generic_slot_device> m_cart;
 	required_ioport m_line0;
 	required_ioport m_line1;
 	required_ioport m_line2;
