@@ -141,6 +141,8 @@ static MACHINE_CONFIG_START( ht68k, ht68k_state )
 	MCFG_FLOPPY_DRIVE_ADD("wd1770:1", ht68k_floppies, "525dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("wd1770:2", ht68k_floppies, "525dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("wd1770:3", ht68k_floppies, "525dd", floppy_image_device::default_floppy_formats)
+
+	MCFG_SOFTWARE_LIST_ADD("flop525_list", "ht68k")
 MACHINE_CONFIG_END
 
 /* ROM definition */

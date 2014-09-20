@@ -127,6 +127,7 @@ hash/horizon.xml svneol=native#text/xml
 hash/hp9835a_rom.xml svneol=native#text/xml
 hash/hp9845a_rom.xml svneol=native#text/xml
 hash/hp9845b_rom.xml svneol=native#text/xml
+hash/ht68k.xml svneol=native#text/plain
 hash/hx20_flop.xml svneol=native#text/xml
 hash/ibm5140.xml svneol=native#text/xml
 hash/ibm5150.xml svneol=native#text/xml
