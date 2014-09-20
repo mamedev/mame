@@ -33,7 +33,6 @@
     hardware.
 
     TO DO:
-    - Identify which rom slots the multi-rom programs should be fitted to.
     - Work on the other non-working programs
 
 ****************************************************************************/
@@ -41,9 +40,10 @@
 #include "emu.h"
 #include "cpu/m6809/m6809.h"
 #include "machine/6821pia.h"
-#include "imagedev/cartslot.h"
 #include "imagedev/cassette.h"
 #include "sound/wave.h"
+#include "bus/generic/slot.h"
+#include "bus/generic/carts.h"
 
 
 
@@ -56,12 +56,22 @@ public:
 	m_cass(*this, "cassette"),
 	m_pia_s(*this, "pia_s"),
 	m_pia_u(*this, "pia_u"),
+	m_exp_00(*this, "exp00"),
+	m_exp_01(*this, "exp01"),
+	m_exp_02(*this, "exp02"),
+	m_exp_0c(*this, "exp0c"),
+	m_exp_0d(*this, "exp0d"),
 	m_p_videoram(*this, "p_videoram"){ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cass;
 	required_device<pia6821_device> m_pia_s;
 	required_device<pia6821_device> m_pia_u;
+	required_device<generic_slot_device> m_exp_00;
+	required_device<generic_slot_device> m_exp_01;
+	required_device<generic_slot_device> m_exp_02;
+	required_device<generic_slot_device> m_exp_0c;
+	required_device<generic_slot_device> m_exp_0d;
 	DECLARE_READ8_MEMBER( pegasus_keyboard_r );
 	DECLARE_READ8_MEMBER( pegasus_protection_r );
 	DECLARE_READ8_MEMBER( pegasus_pcg_r );
@@ -84,12 +94,14 @@ public:
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_DRIVER_INIT(pegasus);
 	TIMER_DEVICE_CALLBACK_MEMBER(pegasus_firq);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(pegasus_cart_1);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(pegasus_cart_2);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(pegasus_cart_3);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(pegasus_cart_4);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(pegasus_cart_5);
-	void pegasus_decrypt_rom( UINT16 addr );
+	void pegasus_decrypt_rom(UINT8 *ROM);
+	
+	int load_cart(device_image_interface &image, generic_slot_device *slot, const char *reg_tag);
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(exp00_load) { return load_cart(image, m_exp_00, "0000"); }
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(exp01_load) { return load_cart(image, m_exp_01, "1000"); }
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(exp02_load) { return load_cart(image, m_exp_02, "2000"); }
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(exp0c_load) { return load_cart(image, m_exp_0c, "c000"); }
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(exp0d_load) { return load_cart(image, m_exp_0d, "d000"); }
 };
 
 TIMER_DEVICE_CALLBACK_MEMBER(pegasus_state::pegasus_firq)
@@ -171,10 +183,10 @@ READ8_MEMBER( pegasus_state::pegasus_protection_r )
 
 static ADDRESS_MAP_START(pegasus_mem, AS_PROGRAM, 8, pegasus_state)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x2fff) AM_ROM
+	//AM_RANGE(0x0000, 0x2fff)		// mapped by the cartslots 1-3
 	AM_RANGE(0xb000, 0xbdff) AM_RAM
 	AM_RANGE(0xbe00, 0xbfff) AM_RAM AM_SHARE("p_videoram")
-	AM_RANGE(0xc000, 0xdfff) AM_ROM AM_WRITENOP
+	//AM_RANGE(0xc000, 0xdfff)		// mapped by the cartslots 4-5
 	AM_RANGE(0xe000, 0xe1ff) AM_READ(pegasus_protection_r)
 	AM_RANGE(0xe200, 0xe3ff) AM_READWRITE(pegasus_pcg_r,pegasus_pcg_w)
 	AM_RANGE(0xe400, 0xe403) AM_MIRROR(0x1fc) AM_DEVREADWRITE("pia_u", pia6821_device, read, write)
@@ -377,68 +389,77 @@ GFXDECODE_END
 
 /* An encrypted single rom starts with 02, decrypted with 20. Not sure what
     multipart roms will have. */
-void pegasus_state::pegasus_decrypt_rom( UINT16 addr )
+void pegasus_state::pegasus_decrypt_rom(UINT8 *ROM)
 {
-	UINT8 b, *ROM = memregion("maincpu")->base();
-	UINT16 i, j;
-	UINT8 buff[0x1000];
-	if (ROM[addr] == 0x02)
+	UINT8 b;
+	UINT16 j;
+	dynamic_buffer temp_copy;
+	temp_copy.resize(0x1000);
+
+	if (ROM[0] == 0x02)
 	{
-		for (i = 0; i < 0x1000; i++)
+		for (int i = 0; i < 0x1000; i++)
 		{
-			b = ROM[addr|i];
-			j = BITSWAP16( i, 15, 14, 13, 12, 11, 10, 9, 8, 0, 1, 2, 3, 4, 5, 6, 7 );
-			b = BITSWAP8( b, 3, 2, 1, 0, 7, 6, 5, 4 );
-			buff[j&0xfff] = b;
+			b = ROM[i];
+			j = BITSWAP16(i, 15, 14, 13, 12, 11, 10, 9, 8, 0, 1, 2, 3, 4, 5, 6, 7);
+			b = BITSWAP8(b, 3, 2, 1, 0, 7, 6, 5, 4);
+			temp_copy[j & 0xfff] = b;
 		}
-		for (i = 0; i < 0x1000; i++)
-			ROM[addr|i] = buff[i];
+		memcpy(ROM, temp_copy, 0x1000);
 	}
 }
 
-DEVICE_IMAGE_LOAD_MEMBER( pegasus_state, pegasus_cart_1 )
+int pegasus_state::load_cart(device_image_interface &image, generic_slot_device *slot, const char *reg_tag)
 {
-	image.fread(memregion("maincpu")->base() + 0x0000, 0x1000);
-	pegasus_decrypt_rom( 0x0000 );
+	UINT32 size = slot->common_get_size(reg_tag);
+	bool any_socket = false;
+	
+	if (size > 0x1000)
+	{
+		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
+		return IMAGE_INIT_FAIL;
+	}
+	
+	if (image.software_entry() != NULL && size == 0)
+	{
+		// we might be loading a cart compatible with all sockets!
+		// so try to get region "rom"
+		printf("universal\n");		
+		size = slot->common_get_size("rom");
+		any_socket = true;
 
-	return IMAGE_INIT_PASS;
-}
+		if (size == 0)
+		{
+			astring errmsg;
+			errmsg.printf("Attempted to load a file that does not work in this socket.\nPlease check \"Usage\" field in the software list for the correct socket(s) to use.");
+			image.seterror(IMAGE_ERROR_UNSPECIFIED, errmsg.cstr());
+			return IMAGE_INIT_FAIL;
+		}
+	}
 
-DEVICE_IMAGE_LOAD_MEMBER( pegasus_state, pegasus_cart_2 )
-{
-	image.fread(memregion("maincpu")->base() + 0x1000, 0x1000);
-	pegasus_decrypt_rom( 0x1000 );
-
-	return IMAGE_INIT_PASS;
-}
-
-DEVICE_IMAGE_LOAD_MEMBER( pegasus_state, pegasus_cart_3 )
-{
-	image.fread(memregion("maincpu")->base() + 0x2000, 0x1000);
-	pegasus_decrypt_rom( 0x2000 );
-
-	return IMAGE_INIT_PASS;
-}
-
-DEVICE_IMAGE_LOAD_MEMBER( pegasus_state, pegasus_cart_4 )
-{
-	image.fread(memregion("maincpu")->base() + 0xc000, 0x1000);
-	pegasus_decrypt_rom( 0xc000 );
-
-	return IMAGE_INIT_PASS;
-}
-
-DEVICE_IMAGE_LOAD_MEMBER( pegasus_state, pegasus_cart_5 )
-{
-	image.fread(memregion("maincpu")->base() + 0xd000, 0x1000);
-	pegasus_decrypt_rom( 0xd000 );
-
+	slot->rom_alloc(0x1000, 1);	// we alloc 0x1000 also for smaller roms!
+	slot->common_load_rom(slot->get_rom_base(), size, any_socket ? "rom" : reg_tag);
+	
+	// raw images have to be decrypted
+	pegasus_decrypt_rom(slot->get_rom_base());
+	
 	return IMAGE_INIT_PASS;
 }
 
 void pegasus_state::machine_start()
 {
 	m_p_pcgram = memregion("pcg")->base();
+
+	if (m_exp_00->cart_mounted())
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0x0000, 0x0fff, read8_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_exp_00));
+	if (m_exp_01->cart_mounted())
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0x1000, 0x1fff, read8_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_exp_01));
+	if (m_exp_02->cart_mounted())
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0x2000, 0x2fff, read8_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_exp_02));
+	if (m_exp_0c->cart_mounted())
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0xc000, 0xcfff, read8_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_exp_0c));
+	if (m_exp_0d->cart_mounted())
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0xd000, 0xdfff, read8_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_exp_0d));
 }
 
 void pegasus_state::machine_reset()
@@ -448,9 +469,11 @@ void pegasus_state::machine_reset()
 	m_control_bits = 0;
 }
 
-DRIVER_INIT_MEMBER(pegasus_state,pegasus)
+DRIVER_INIT_MEMBER(pegasus_state, pegasus)
 {
-	pegasus_decrypt_rom( 0xf000 );
+	// decrypt monitor
+	UINT8 *base = memregion("maincpu")->base() + 0xf000;
+	pegasus_decrypt_rom(base);
 }
 
 static MACHINE_CONFIG_START( pegasus, pegasus_state )
@@ -488,27 +511,30 @@ static MACHINE_CONFIG_START( pegasus, pegasus_state )
 	MCFG_PIA_IRQA_HANDLER(DEVWRITELINE("maincpu", m6809e_device, irq_line))
 	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE("maincpu", m6809e_device, irq_line))
 
-	MCFG_DEVICE_ADD( "pia_u", PIA6821, 0)
+	MCFG_DEVICE_ADD("pia_u", PIA6821, 0)
 	MCFG_PIA_IRQA_HANDLER(DEVWRITELINE("maincpu", m6809e_device, irq_line))
 	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE("maincpu", m6809e_device, irq_line))
 
-	MCFG_CARTSLOT_ADD("cart1")
-	MCFG_CARTSLOT_EXTENSION_LIST("bin")
-	MCFG_CARTSLOT_LOAD(pegasus_state,pegasus_cart_1)
-	MCFG_CARTSLOT_ADD("cart2")
-	MCFG_CARTSLOT_EXTENSION_LIST("bin")
-	MCFG_CARTSLOT_LOAD(pegasus_state,pegasus_cart_2)
-	MCFG_CARTSLOT_ADD("cart3")
-	MCFG_CARTSLOT_EXTENSION_LIST("bin")
-	MCFG_CARTSLOT_LOAD(pegasus_state,pegasus_cart_3)
-	MCFG_CARTSLOT_ADD("cart4")
-	MCFG_CARTSLOT_EXTENSION_LIST("bin")
-	MCFG_CARTSLOT_LOAD(pegasus_state,pegasus_cart_4)
-	MCFG_CARTSLOT_ADD("cart5")
-	MCFG_CARTSLOT_EXTENSION_LIST("bin")
-	MCFG_CARTSLOT_LOAD(pegasus_state,pegasus_cart_5)
-	MCFG_CASSETTE_ADD( "cassette" )
+	MCFG_GENERIC_SOCKET_ADD("exp00", GENERIC_ROM8_WIDTH, generic_plain_slot, "pegasus_cart")
+	MCFG_GENERIC_LOAD(pegasus_state, exp00_load)
+
+	MCFG_GENERIC_SOCKET_ADD("exp01", GENERIC_ROM8_WIDTH, generic_plain_slot, "pegasus_cart")
+	MCFG_GENERIC_LOAD(pegasus_state, exp01_load)
+
+	MCFG_GENERIC_SOCKET_ADD("exp02", GENERIC_ROM8_WIDTH, generic_plain_slot, "pegasus_cart")
+	MCFG_GENERIC_LOAD(pegasus_state, exp02_load)
+
+	MCFG_GENERIC_SOCKET_ADD("exp0c", GENERIC_ROM8_WIDTH, generic_plain_slot, "pegasus_cart")
+	MCFG_GENERIC_LOAD(pegasus_state, exp0c_load)
+
+	MCFG_GENERIC_SOCKET_ADD("exp0d", GENERIC_ROM8_WIDTH, generic_plain_slot, "pegasus_cart")
+	MCFG_GENERIC_LOAD(pegasus_state, exp0d_load)
+
+	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED|CASSETTE_MOTOR_ENABLED)
+
+	/* Software lists */
+	MCFG_SOFTWARE_LIST_ADD("cart_list", "pegasus_cart")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( pegasusm, pegasus )

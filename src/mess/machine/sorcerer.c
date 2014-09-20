@@ -372,6 +372,9 @@ void sorcerer_state::machine_start()
 		space.unmap_readwrite(0x8000, endmem);
 		break;
 	}
+
+	if (m_cart->cart_mounted())
+		space.install_read_handler(0xc000, 0xdfff, read8_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_cart));
 }
 
 MACHINE_START_MEMBER(sorcerer_state,sorcererd)

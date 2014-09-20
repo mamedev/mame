@@ -38,17 +38,11 @@ U14-21 TMM416P-3 (4116-3 16k x 1bit dynamic RAM)
 U22    74LS05
 U23-24 SN74LS541
 
-BASIC CART PEN-700 11-50332-31 Rev.0
-SD-BASIC VERSION 2.0 FOR PENCIL II
-(c) 1983 SOUNDIC ELECTRONICS LTD HONG KONG ALL RIGHTS RESERVED
+
+SD-BASIC usage:
 All commands must be in uppercase, which is the default at boot.
 The 'capslock' is done by pressing Shift and Esc together, and the
 cursor will change to a checkerboard pattern.
-1 x 2732
-2 x 2764
-The roms were dumped by attaching a cable from the printer port to
-a Super-80 and writing programs in Basic to transfer the bytes.
-Therefore it is not known which rom "202" or "203" is which address range.
 
 
 MEMORY MAP
@@ -61,17 +55,9 @@ The 16k dynamic RAM holds the BASIC program and the video/gfx etc
 but is banked out of view of a BASIC program.
 
 
-KNOWN CARTS
-SD-BASIC V1.0
-SD-BASIC V2.0
-Zaxxon
-Smurf
-
-
 ToDo:
 - Cassette isn't working
 - Joysticks (no info)
-- Cart slot (only 1 cart has been dumped, so probably no point coding it)
 
 ****************************************************************************/
 
@@ -80,9 +66,10 @@ ToDo:
 #include "video/tms9928a.h"
 #include "sound/sn76496.h"
 #include "bus/centronics/ctronics.h"
-//#include "imagedev/cartslot.h"
 #include "imagedev/cassette.h"
 #include "sound/wave.h"
+#include "bus/generic/slot.h"
+#include "bus/generic/carts.h"
 
 
 class pencil2_state : public driver_device
@@ -93,6 +80,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_centronics(*this, "centronics")
 		, m_cass(*this, "cassette")
+		, m_cart(*this, "cartslot")
 	{}
 
 	DECLARE_WRITE8_MEMBER(port10_w);
@@ -105,20 +93,21 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(printer_ready_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(printer_ack_r);
 private:
-	virtual void machine_reset();
+	virtual void machine_start();
 	int m_centronics_busy;
 	int m_centronics_ack;
 	required_device<cpu_device> m_maincpu;
 	required_device<centronics_device> m_centronics;
 	required_device<cassette_image_device> m_cass;
+	required_device<generic_slot_device> m_cart;
 };
 
 static ADDRESS_MAP_START(pencil2_mem, AS_PROGRAM, 8, pencil2_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x5FFF) AM_WRITENOP  // stop error log filling up
+	AM_RANGE(0x2000, 0x5fff) AM_WRITENOP  // stop error log filling up
 	AM_RANGE(0x6000, 0x67ff) AM_MIRROR(0x1800) AM_RAM
-	AM_RANGE(0x8000, 0xffff) AM_ROM
+	//AM_RANGE(0x8000, 0xffff)		// mapped by the cartslot
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(pencil2_io, AS_IO, 8, pencil2_state)
@@ -283,8 +272,10 @@ static INPUT_PORTS_START( pencil2 )
 INPUT_PORTS_END
 
 
-void pencil2_state::machine_reset()
+void pencil2_state::machine_start()
 {
+	if (m_cart->cart_mounted())
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0x8000, 0xffff, read8_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_cart));
 }
 
 static MACHINE_CONFIG_START( pencil2, pencil2_state )
@@ -310,11 +301,7 @@ static MACHINE_CONFIG_START( pencil2, pencil2_state )
 	MCFG_CASSETTE_ADD( "cassette" )
 
 	/* cartridge */
-//  MCFG_CARTSLOT_ADD("cart")
-//  MCFG_CARTSLOT_EXTENSION_LIST("rom")
-//  MCFG_CARTSLOT_NOT_MANDATORY
-//  MCFG_CARTSLOT_LOAD(pencil2_cart)
-//  MCFG_CARTSLOT_INTERFACE("pencil2_cart")
+	MCFG_GENERIC_CARTSLOT_ADD("cartslot", GENERIC_ROM8_WIDTH, generic_plain_slot, "pencil2_cart")
 
 	/* printer */
 	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "printer")
@@ -322,17 +309,15 @@ static MACHINE_CONFIG_START( pencil2, pencil2_state )
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(pencil2_state, write_centronics_busy))
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
+
+	/* Software lists */
+	MCFG_SOFTWARE_LIST_ADD("cart_list", "pencil2")
 MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( pencil2 )
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD( "mt.u4", 0x0000, 0x2000, CRC(338d7b59) SHA1(2f89985ac06971e00210ff992bf1e30a296d10e7) )
-	ROM_LOAD( "1-or",  0xa000, 0x1000, CRC(1ddedccd) SHA1(5fc0d30b5997224b67bf286725468194359ced5a) )
-	ROM_RELOAD(        0xb000, 0x1000 )
-	ROM_LOAD( "203",   0x8000, 0x2000, CRC(f502175c) SHA1(cb2190e633e98586758008577265a7a2bc088233) )
-	ROM_LOAD( "202",   0xc000, 0x2000, CRC(5171097d) SHA1(171999bc04dc98c74c0722b2866310d193dc0f82) )
-//  ROM_CART_LOAD("cart", 0x8000, 0x8000, ROM_OPTIONAL)
 ROM_END
 
 /* Driver */

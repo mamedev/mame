@@ -15,13 +15,14 @@
 #include "bus/centronics/ctronics.h"
 #include "bus/centronics/covox.h"
 #include "machine/ram.h"
-#include "imagedev/cartslot.h"
 #include "imagedev/cassette.h"
 #include "imagedev/snapquik.h"
 #include "imagedev/flopdrv.h"
 #include "formats/sorc_dsk.h"
 #include "formats/sorc_cas.h"
 #include "machine/micropolis.h"
+#include "bus/generic/slot.h"
+#include "bus/generic/carts.h"
 
 #define SORCERER_USING_RS232 0
 
@@ -58,6 +59,7 @@ public:
 		, m_wave2(*this, WAVE2_TAG)
 		, m_uart(*this, "uart")
 		, m_centronics(*this, "centronics")
+		, m_cart(*this, "cartslot")
 		, m_ram(*this, RAM_TAG)
 		, m_iop_config(*this, "CONFIG")
 		, m_iop_vs(*this, "VS")
@@ -96,6 +98,7 @@ private:
 	required_device<wave_device> m_wave2;
 	required_device<ay31015_device> m_uart;
 	required_device<centronics_device> m_centronics;
+	required_device<generic_slot_device> m_cart;
 	required_device<ram_device> m_ram;
 	required_ioport m_iop_config;
 	required_ioport m_iop_vs;

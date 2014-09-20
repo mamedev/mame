@@ -73,7 +73,8 @@
 #include "cpu/tms7000/tms7000.h"
 #include "video/hd44780.h"
 #include "machine/nvram.h"
-#include "imagedev/cartslot.h"
+#include "bus/generic/slot.h"
+#include "bus/generic/carts.h"
 
 #include "ti74.lh"
 #include "ti95.lh"
@@ -85,10 +86,12 @@ public:
 	ti74_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_cart(*this, "cartslot"),
 		m_battery_inp(*this, "BATTERY")
 	{ }
 
 	required_device<tms70c46_device> m_maincpu;
+	required_device<generic_slot_device> m_cart;
 	required_ioport m_battery_inp;
 
 	ioport_port *m_key_matrix[8];
@@ -120,13 +123,7 @@ public:
 
 DEVICE_IMAGE_LOAD_MEMBER(ti74_state, ti74_cartridge)
 {
-	UINT8* pos = memregion("user1")->base();
-	offs_t size;
-
-	if (image.software_entry() == NULL)
-		size = image.length();
-	else
-		size = image.get_software_region_length("rom");
+	UINT32 size = m_cart->common_get_size("rom");
 
 	// max size is 32KB
 	if (size > 0x8000)
@@ -134,18 +131,10 @@ DEVICE_IMAGE_LOAD_MEMBER(ti74_state, ti74_cartridge)
 		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Invalid file size");
 		return IMAGE_INIT_FAIL;
 	}
-
-	if (image.software_entry() == NULL)
-	{
-		if (image.fread(pos, size) != size)
-		{
-			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unable to fully read file");
-			return IMAGE_INIT_FAIL;
-		}
-	}
-	else
-		memcpy(pos, image.get_software_region("rom"), size);
-
+	
+	m_cart->rom_alloc(size, 1);
+	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");			
+	
 	return IMAGE_INIT_PASS;
 }
 
@@ -276,7 +265,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, ti74_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x1000, 0x1001) AM_DEVREADWRITE("hd44780", hd44780_device, read, write)
 	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_SHARE("sysram.ic3")
-	AM_RANGE(0x4000, 0xbfff) AM_ROM AM_REGION("user1", 0)
+	//AM_RANGE(0x4000, 0xbfff)		// mapped by the cartslot
 	AM_RANGE(0xc000, 0xdfff) AM_ROMBANK("sysbank")
 ADDRESS_MAP_END
 
@@ -507,6 +496,9 @@ void ti74_state::machine_start()
 	for (int i = 0; i < 8; i++)
 		m_key_matrix[i] = ioport(tags[i]);
 
+	if (m_cart->cart_mounted())
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0x4000, 0xbfff, read8_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_cart));
+
 	membank("sysbank")->configure_entries(0, 4, memregion("system")->base(), 0x2000);
 	membank("sysbank")->set_entry(0);
 
@@ -546,11 +538,10 @@ static MACHINE_CONFIG_START( ti74, ti74_state )
 	MCFG_HD44780_PIXEL_UPDATE_CB(ti74_pixel_update)
 
 	/* cartridge */
-	MCFG_CARTSLOT_ADD("cart")
-	MCFG_CARTSLOT_EXTENSION_LIST("bin,rom,256")
-	MCFG_CARTSLOT_NOT_MANDATORY
-	MCFG_CARTSLOT_LOAD(ti74_state, ti74_cartridge)
-	MCFG_CARTSLOT_INTERFACE("ti74_cart")
+	MCFG_GENERIC_CARTSLOT_ADD("cartslot", GENERIC_ROM8_WIDTH, generic_plain_slot, "ti74_cart")
+	MCFG_GENERIC_EXTENSIONS("bin,rom,256")
+	MCFG_GENERIC_LOAD(ti74_state, ti74_cartridge)
+
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "ti74_cart")
 MACHINE_CONFIG_END
 
@@ -581,11 +572,10 @@ static MACHINE_CONFIG_START( ti95, ti74_state )
 	MCFG_HD44780_PIXEL_UPDATE_CB(ti95_pixel_update)
 
 	/* cartridge */
-	MCFG_CARTSLOT_ADD("cart")
-	MCFG_CARTSLOT_EXTENSION_LIST("bin,rom,256")
-	MCFG_CARTSLOT_NOT_MANDATORY
-	MCFG_CARTSLOT_LOAD(ti74_state, ti74_cartridge)
-	MCFG_CARTSLOT_INTERFACE("ti95_cart")
+	MCFG_GENERIC_CARTSLOT_ADD("cartslot", GENERIC_ROM8_WIDTH, generic_plain_slot, "ti95_cart")
+	MCFG_GENERIC_EXTENSIONS("bin,rom,256")
+	MCFG_GENERIC_LOAD(ti74_state, ti74_cartridge)
+
 	//MCFG_SOFTWARE_LIST_ADD("cart_list", "ti95_cart")
 MACHINE_CONFIG_END
 
@@ -603,8 +593,6 @@ ROM_START( ti74 )
 
 	ROM_REGION( 0x8000, "system", 0 )
 	ROM_LOAD( "hn61256pc93.ic1", 0x0000, 0x8000, CRC(019aaa2f) SHA1(04a1e694a49d50602e45a7834846de4d9f7d587d) ) // system rom, banked
-
-	ROM_REGION( 0x8000, "user1", ROMREGION_ERASEFF ) // cartridge area
 ROM_END
 
 
@@ -614,8 +602,6 @@ ROM_START( ti95 )
 
 	ROM_REGION( 0x8000, "system", 0 )
 	ROM_LOAD( "hn61256pc95.ic1", 0x0000, 0x8000, CRC(c46d29ae) SHA1(c653f08590dbc28241a9f5a6c2541641bdb0208b) ) // system rom, banked
-
-	ROM_REGION( 0x8000, "user1", ROMREGION_ERASEFF ) // cartridge area
 ROM_END
 
 

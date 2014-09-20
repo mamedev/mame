@@ -16,7 +16,8 @@
 #include "emu.h"
 #include "cpu/avr8/avr8.h"
 #include "sound/dac.h"
-#include "imagedev/cartslot.h"
+#include "bus/generic/slot.h"
+#include "bus/generic/carts.h"
 
 // overclocked to 8 * NTSC burst frequency
 #define MASTER_CLOCK 28618180
@@ -28,11 +29,12 @@ class uzebox_state : public driver_device
 public:
 	uzebox_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu")
-	{
-	}
+		m_maincpu(*this, "maincpu"),
+		m_cart(*this, "cartslot")
+	{ }
 
 	required_device<avr8_device> m_maincpu;
+	required_device<generic_slot_device> m_cart;
 
 	DECLARE_READ8_MEMBER(port_a_r);
 	DECLARE_WRITE8_MEMBER(port_a_w);
@@ -64,6 +66,9 @@ private:
 void uzebox_state::machine_start()
 {
 	machine().first_screen()->register_screen_bitmap(m_bitmap);
+
+	if (m_cart->cart_mounted())
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0x0000, 0xffff, read8_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_cart));
 }
 
 void uzebox_state::machine_reset()
@@ -265,28 +270,24 @@ UINT32 uzebox_state::screen_update_uzebox(screen_device &screen, bitmap_rgb32 &b
 	return 0;
 }
 
-DEVICE_IMAGE_LOAD_MEMBER(uzebox_state,uzebox_cart)
+DEVICE_IMAGE_LOAD_MEMBER(uzebox_state, uzebox_cart)
 {
-	UINT8* rom = (UINT8*)(*memregion("maincpu"));
-
-	memset(rom, 0xff, memregion("maincpu")->bytes());
+	UINT32 size = m_cart->common_get_size("rom");
+	
+	m_cart->rom_alloc(size, 1);
 
 	if (image.software_entry() == NULL)
 	{
-		UINT32 size = image.length();
 		dynamic_buffer data(size);
-
 		image.fread(data, size);
 
 		if (!strncmp((const char*)&data[0], "UZEBOX", 6))
-			memcpy(rom, data + 0x200, size - 0x200);
+			memcpy(m_cart->get_rom_base(), data + 0x200, size - 0x200);
 		else
-			memcpy(rom, data, size);
+			memcpy(m_cart->get_rom_base(), data, size);
 	}
 	else
-	{
-		memcpy(rom, image.get_software_region("rom"), image.get_software_region_length("rom"));
-	}
+		memcpy(m_cart->get_rom_base(), image.get_software_region("rom"), size);
 
 	return IMAGE_INIT_PASS;
 }
@@ -323,11 +324,11 @@ static MACHINE_CONFIG_START( uzebox, uzebox_state )
 	MCFG_SOUND_ADD("dac", DAC, 0)
 	MCFG_SOUND_ROUTE(0, "avr8", 1.00)
 
-	MCFG_CARTSLOT_ADD("cart1")
-	MCFG_CARTSLOT_EXTENSION_LIST("bin,uze")
-	MCFG_CARTSLOT_MANDATORY
-	MCFG_CARTSLOT_LOAD(uzebox_state,uzebox_cart)
-	MCFG_CARTSLOT_INTERFACE("uzebox")
+	MCFG_GENERIC_CARTSLOT_ADD("cartslot", GENERIC_ROM8_WIDTH, generic_plain_slot, "uzebox")
+	MCFG_GENERIC_EXTENSIONS("bin,uze")
+	MCFG_GENERIC_MANDATORY
+	MCFG_GENERIC_LOAD(uzebox_state, uzebox_cart)
+
 	MCFG_SOFTWARE_LIST_ADD("eprom_list","uzebox")
 MACHINE_CONFIG_END
 

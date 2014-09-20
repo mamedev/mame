@@ -27,10 +27,11 @@ Looking at the code of the cartridges it seems there is:
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "imagedev/cartslot.h"
 #include "machine/i8255.h"
 #include "sound/ay8910.h"
 #include "video/mc6847.h"
+#include "bus/generic/slot.h"
+#include "bus/generic/carts.h"
 
 
 class sv8000_state : public driver_device
@@ -40,6 +41,7 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_s68047p(*this, "s68047p")
+		, m_cart(*this, "cartslot")
 		, m_videoram(*this, "videoram")
 		, m_io_row0(*this, "ROW0")
 		, m_io_row1(*this, "ROW1")
@@ -69,6 +71,7 @@ private:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<s68047_device> m_s68047p;
+	required_device<generic_slot_device> m_cart;
 	required_shared_ptr<UINT8> m_videoram;
 	required_ioport m_io_row0;
 	required_ioport m_io_row1;
@@ -91,7 +94,7 @@ private:
 
 static ADDRESS_MAP_START(sv8000_mem, AS_PROGRAM, 8, sv8000_state)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x0000, 0x0fff ) AM_ROM
+	//AM_RANGE(0x0000, 0x0fff)		// mapped by the cartslot
 	AM_RANGE( 0x8000, 0x83ff ) AM_RAM // Work RAM??
 	AM_RANGE( 0xc000, 0xcbff ) AM_RAM AM_SHARE("videoram")
 ADDRESS_MAP_END
@@ -170,6 +173,9 @@ void sv8000_state::machine_start()
 	m_intext = 0;
 	m_inv = 0;
 
+	if (m_cart->cart_mounted())
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0x0000, 0x0fff, read8_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_cart));
+
 	save_item(NAME(m_column));
 	save_item(NAME(m_ag));
 	save_item(NAME(m_gm2));
@@ -190,29 +196,17 @@ void sv8000_state::machine_reset()
 
 DEVICE_IMAGE_LOAD_MEMBER( sv8000_state, cart )
 {
-	UINT8 *cart = memregion("maincpu")->base();
-
-	if (image.software_entry() == NULL)
+	UINT32 size = m_cart->common_get_size("rom");
+	
+	if (size != 0x1000)
 	{
-		UINT32 filesize = image.length();
-
-		if (filesize != 0x1000)
-		{
-			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Incorrect or not support cartridge size");
-			return IMAGE_INIT_FAIL;
-		}
-
-		if (image.fread( cart, filesize) != filesize)
-		{
-			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Error loading file");
-			return IMAGE_INIT_FAIL;
-		}
+		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Incorrect or not support cartridge size");
+		return IMAGE_INIT_FAIL;
 	}
-	else
-	{
-		memcpy(cart, image.get_software_region("rom"), image.get_software_region_length("rom"));
-	}
-
+	
+	m_cart->rom_alloc(size, 1);
+	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");			
+	
 	return IMAGE_INIT_PASS;
 }
 
@@ -261,7 +255,7 @@ WRITE8_MEMBER( sv8000_state::i8255_portb_w )
 READ8_MEMBER( sv8000_state::i8255_portc_r )
 {
 	//logerror("i8255_portc_r\n");
-	return 0xFF;
+	return 0xff;
 }
 
 
@@ -274,7 +268,7 @@ WRITE8_MEMBER( sv8000_state::i8255_portc_w )
 
 READ8_MEMBER( sv8000_state::ay_port_a_r )
 {
-	UINT8 data = 0xFF;
+	UINT8 data = 0xff;
 
 	//logerror("ay_port_a_r\n");
 	return data;
@@ -404,11 +398,9 @@ static MACHINE_CONFIG_START( sv8000, sv8000_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* cartridge */
-	MCFG_CARTSLOT_ADD("cart")
-	MCFG_CARTSLOT_EXTENSION_LIST("bin")
-	MCFG_CARTSLOT_MANDATORY
-	MCFG_CARTSLOT_LOAD(sv8000_state,cart)
-	MCFG_CARTSLOT_INTERFACE("sv8000_cart")
+	MCFG_GENERIC_CARTSLOT_ADD("cartslot", GENERIC_ROM8_WIDTH, generic_plain_slot, "sv8000_cart")
+	MCFG_GENERIC_MANDATORY
+	MCFG_GENERIC_LOAD(sv8000_state, cart)
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("cart_list","sv8000")

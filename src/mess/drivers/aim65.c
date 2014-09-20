@@ -146,8 +146,8 @@ INPUT_PORTS_END
 
 int aim65_state::load_cart(device_image_interface &image, generic_slot_device *slot, const char *slot_tag)
 {
-	UINT32 size = slot->common_get_size("rom");
-	
+	UINT32 size = slot->common_get_size(slot_tag);
+
 	if (size > 0x1000)
 	{
 		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");

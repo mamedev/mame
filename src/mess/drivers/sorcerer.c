@@ -163,7 +163,8 @@ static ADDRESS_MAP_START( sorcerer_mem, AS_PROGRAM, 8, sorcerer_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x07ff) AM_RAMBANK("boot")
 	AM_RANGE(0x0800, 0xbfff) AM_RAM
-	AM_RANGE(0xc000, 0xefff) AM_ROM                     /* rom pac and bios */
+	//AM_RANGE(0xc000, 0xdfff)		// mapped by the cartslot
+	AM_RANGE(0xe000, 0xefff) AM_ROM                     /* rom pac and bios */
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_REGION("maincpu", 0xf000)        /* screen ram */
 	AM_RANGE(0xf800, 0xfbff) AM_ROM                     /* char rom */
 	AM_RANGE(0xfc00, 0xffff) AM_RAM AM_REGION("maincpu", 0xfc00)        /* programmable chars */
@@ -175,7 +176,8 @@ static ADDRESS_MAP_START( sorcererd_mem, AS_PROGRAM, 8, sorcerer_state)
 	AM_RANGE(0x0800, 0xbbff) AM_RAM
 	AM_RANGE(0xbc00, 0xbcff) AM_ROM
 	AM_RANGE(0xbe00, 0xbe03) AM_DEVREADWRITE("fdc", micropolis_device, read, write)
-	AM_RANGE(0xc000, 0xefff) AM_ROM                     /* rom pac and bios */
+	//AM_RANGE(0xc000, 0xdfff)		// mapped by the cartslot
+	AM_RANGE(0xe000, 0xefff) AM_ROM                     /* rom pac and bios */
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_REGION("maincpu", 0xf000)        /* screen ram */
 	AM_RANGE(0xf800, 0xfbff) AM_ROM                     /* char rom */
 	AM_RANGE(0xfc00, 0xffff) AM_RAM AM_REGION("maincpu", 0xfc00)        /* programmable chars */
@@ -400,7 +402,6 @@ static MACHINE_CONFIG_START( sorcerer, sorcerer_state )
 	MCFG_CPU_PROGRAM_MAP(sorcerer_mem)
 	MCFG_CPU_IO_MAP(sorcerer_io)
 
-
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
@@ -449,9 +450,8 @@ static MACHINE_CONFIG_START( sorcerer, sorcerer_state )
 	MCFG_CASSETTE_INTERFACE("sorcerer_cass")
 
 	/* cartridge */
-	MCFG_CARTSLOT_ADD("cart")
-	MCFG_CARTSLOT_EXTENSION_LIST("rom,bin")
-	MCFG_CARTSLOT_INTERFACE("sorcerer_cart")
+	MCFG_GENERIC_CARTSLOT_ADD("cartslot", GENERIC_ROM8_WIDTH, generic_plain_slot, "sorcerer_cart")
+	MCFG_GENERIC_EXTENSIONS("bin,rom")
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("cart_list","sorcerer_cart")
@@ -477,7 +477,7 @@ static MACHINE_CONFIG_DERIVED( sorcererd, sorcerer )
 MACHINE_CONFIG_END
 
 
-DRIVER_INIT_MEMBER(sorcerer_state,sorcerer)
+DRIVER_INIT_MEMBER(sorcerer_state, sorcerer)
 {
 	UINT8 *RAM = memregion("maincpu")->base();
 	membank("boot")->configure_entries(0, 2, &RAM[0x0000], 0xe000);
@@ -493,7 +493,6 @@ ROM_START(sorcerer)
 	ROM_LOAD("exmo1-1.dat", 0xe000, 0x0800, CRC(ac924f67) SHA1(72fcad6dd1ed5ec0527f967604401284d0e4b6a1) ) /* monitor roms */
 	ROM_LOAD("exmo1-2.dat", 0xe800, 0x0800, CRC(ead1d0f6) SHA1(c68bed7344091bca135e427b4793cc7d49ca01be) )
 	ROM_LOAD("exchr-1.dat", 0xf800, 0x0400, CRC(4a7e1cdd) SHA1(2bf07a59c506b6e0c01ec721fb7b747b20f5dced) ) /* char rom */
-	ROM_CART_LOAD("cart",   0xc000, 0x2000, ROM_OPTIONAL)
 ROM_END
 
 ROM_START(sorcererd)
@@ -502,7 +501,6 @@ ROM_START(sorcererd)
 	ROM_LOAD("exmo1-1.dat", 0xe000, 0x0800, CRC(ac924f67) SHA1(72fcad6dd1ed5ec0527f967604401284d0e4b6a1) ) /* monitor roms */
 	ROM_LOAD("exmo1-2.dat", 0xe800, 0x0800, CRC(ead1d0f6) SHA1(c68bed7344091bca135e427b4793cc7d49ca01be) )
 	ROM_LOAD("exchr-1.dat", 0xf800, 0x0400, CRC(4a7e1cdd) SHA1(2bf07a59c506b6e0c01ec721fb7b747b20f5dced) ) /* char rom */
-	ROM_CART_LOAD("cart",   0xc000, 0x2000, ROM_OPTIONAL)
 
 	ROM_REGION( 0x200, "proms", 0 )
 	ROM_LOAD_OPTIONAL("bruce.dat",  0x0000, 0x0020, CRC(fae922cb) SHA1(470a86844cfeab0d9282242e03ff1d8a1b2238d1) ) /* video prom */
