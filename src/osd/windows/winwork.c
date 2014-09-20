@@ -280,7 +280,7 @@ int osd_work_queue_wait(osd_work_queue *queue, osd_ticks_t timeout)
 		worker_thread_process(queue, thread);
 
 		// if we're a high frequency queue, spin until done
-		if (queue->flags & WORK_QUEUE_FLAG_HIGH_FREQ)
+		if (queue->flags & WORK_QUEUE_FLAG_HIGH_FREQ && queue->items != 0)
 		{
 			osd_ticks_t stopspin = osd_ticks() + timeout;
 
@@ -315,7 +315,7 @@ int osd_work_queue_wait(osd_work_queue *queue, osd_ticks_t timeout)
 void osd_work_queue_free(osd_work_queue *queue)
 {
 	// if we have threads, clean them up
-	if (queue->threads > 0 && queue->thread != NULL)
+	if (queue->thread != NULL)
 	{
 		int threadnum;
 
@@ -624,7 +624,7 @@ static void *worker_thread_entry(void *param)
 			worker_thread_process(queue, thread);
 
 			// if we're a high frequency queue, spin for a while before giving up
-			if (queue->flags & WORK_QUEUE_FLAG_HIGH_FREQ)
+			if (queue->flags & WORK_QUEUE_FLAG_HIGH_FREQ && queue->list == NULL)
 			{
 				// spin for a while looking for more work
 				begin_timing(thread->spintime);
