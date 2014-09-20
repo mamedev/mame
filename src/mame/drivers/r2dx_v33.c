@@ -72,6 +72,7 @@ public:
 
 	DECLARE_WRITE16_MEMBER(r2dx_tilemapdma_w);
 	DECLARE_WRITE16_MEMBER(r2dx_paldma_w);
+	DECLARE_READ16_MEMBER(r2dx_debug_r);
 
 	void r2dx_setbanking(void);
 
@@ -307,6 +308,12 @@ WRITE16_MEMBER(r2dx_v33_state::r2dx_paldma_w)
 	}
 }
 
+READ16_MEMBER(r2dx_v33_state::r2dx_debug_r)
+{
+	// read once on startup, needed for player collisions to work
+	return 0xffff;
+}
+
 static ADDRESS_MAP_START( rdx_v33_map, AS_PROGRAM, 16, r2dx_v33_state )
 	AM_RANGE(0x00000, 0x003ff) AM_RAM // vectors copied here
 
@@ -351,6 +358,7 @@ static ADDRESS_MAP_START( rdx_v33_map, AS_PROGRAM, 16, r2dx_v33_state )
 	
 
 	AM_RANGE(0x00700, 0x00701) AM_WRITE(rdx_v33_eeprom_w)
+	AM_RANGE(0x00740, 0x00741) AM_READ(r2dx_debug_r)
 	AM_RANGE(0x00744, 0x00745) AM_READ_PORT("INPUT")
 	AM_RANGE(0x0074c, 0x0074d) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x00762, 0x00763) AM_READ(sprite_prot_dst1_r)
