@@ -3408,9 +3408,14 @@ DRIVER_INIT_MEMBER(raiden2_state,xsedae)
 	/* doesn't have banking */
 }
 
+const UINT16 raiden2_state::zeroteam_blended_colors[] = {
+	0x37e, 0x5de
+};
+
+
 DRIVER_INIT_MEMBER(raiden2_state,zeroteam)
 {
-	init_blending(xsedae_blended_colors);
+	init_blending(zeroteam_blended_colors);
 	static const int spri[5] = { -1, 0, 1, 2, 3 };
 	cur_spri = spri;
 	membank("mainbank1")->configure_entries(0, 4, memregion("mainprg")->base(), 0x10000);
