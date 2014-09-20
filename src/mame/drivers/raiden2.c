@@ -3409,7 +3409,14 @@ DRIVER_INIT_MEMBER(raiden2_state,xsedae)
 }
 
 const UINT16 raiden2_state::zeroteam_blended_colors[] = {
-	0x37e, 0x5de
+	// Player selection
+	0x37e,
+	// Scaffolding shadow
+	0x52e,
+	// Road brightening
+	0x5de,
+
+	0xffff
 };
 
 

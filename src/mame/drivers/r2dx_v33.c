@@ -392,6 +392,8 @@ static ADDRESS_MAP_START( nzeroteam_base_map, AS_PROGRAM, 16, r2dx_v33_state )
 	// 0x404 is bank on r2dx, this doesn't need it
 	// AM_RANGE(0x00406, 0x00407) AM_WRITE(tile_bank_w) // not the same?
 
+	AM_RANGE(0x00406, 0x00407) AM_NOP // always 6022, supposed to be the tile bank but ignroes the actual value???
+
 	AM_RANGE(0x00420, 0x00421) AM_WRITE(r2dx_dx_w)
 	AM_RANGE(0x00422, 0x00423) AM_WRITE(r2dx_dy_w)
 	AM_RANGE(0x00424, 0x00425) AM_WRITE(r2dx_sdistl_w)
