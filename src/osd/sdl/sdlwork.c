@@ -45,7 +45,6 @@ int osd_num_processors = 0;
 //============================================================
 
 #define ENV_PROCESSORS               "OSDPROCESSORS"
-#define ENV_CPUMASKS                 "OSDCPUMASKS"
 #define ENV_WORKQUEUEMAXTHREADS      "OSDWORKQUEUEMAXTHREADS"
 
 #define INFINITE                (osd_ticks_per_second() *  (osd_ticks_t) 10000)
@@ -138,7 +137,6 @@ int osd_num_processors = 0;
 //============================================================
 
 static int effective_num_processors(void);
-static UINT32 effective_cpu_mask(int index);
 static void * worker_thread_entry(void *param);
 static void worker_thread_process(osd_work_queue *queue, work_thread_info *thread);
 
@@ -220,14 +218,6 @@ osd_work_queue *osd_work_queue_alloc(int flags)
 			osd_thread_adjust_priority(thread->handle, 1);
 		else
 			osd_thread_adjust_priority(thread->handle, 0);
-
-		// Bind main thread to cpu 0
-		osd_thread_cpu_affinity(NULL, effective_cpu_mask(0));
-
-		if (flags & WORK_QUEUE_FLAG_IO)
-			osd_thread_cpu_affinity(thread->handle, effective_cpu_mask(1));
-		else
-			osd_thread_cpu_affinity(thread->handle, effective_cpu_mask(2+threadnum) );
 	}
 
 	// start a timer going for "waittime" on the main thread
@@ -593,43 +583,6 @@ static int effective_num_processors(void)
 	}
 }
 
-//============================================================
-//  effective_cpu_mask
-//============================================================
-
-static UINT32 effective_cpu_mask(int index)
-{
-	char    *s;
-	char    buf[5];
-	UINT32  mask = 0xFFFF;
-
-	s = osd_getenv(ENV_CPUMASKS);
-	if (s != NULL && strcmp(s,"none"))
-	{
-		if (!strcmp(s,"auto"))
-		{
-			if (index<2)
-				mask = 0x01; /* main thread and io threads on cpu #0 */
-			else
-				mask = (1 << (((index - 1) % (osd_get_num_processors() - 1)) + 1));
-		}
-		else
-		{
-			if (strlen(s) % 4 != 0 || strlen(s) < (index+1)*4)
-			{
-				fprintf(stderr,"Invalid cpu mask @index %d: %s\n", index, s);
-			}
-			else
-			{
-				memcpy(buf,s+4*index,4);
-				buf[4] = 0;
-				if (sscanf(buf, "%04x", &mask) != 1)
-					fprintf(stderr,"Invalid cpu mask element %d: %s\n", index, buf);
-			}
-		}
-	}
-	return mask;
-}
 
 //============================================================
 //  worker_thread_entry
