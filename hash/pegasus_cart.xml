@@ -1,0 +1,214 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<softwarelist name="pegasus" description="Technosys Aamber Pegasus ROM expansions">
+
+
+	<software name="basic">
+		<description>BASIC v1.1</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="This can be mounted in any slot"/>
+		<part name="cart" interface="pegasus_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="basic11_2569.bin" size="4096" crc="0ac9bcaf" sha1="bf1e004e52a8f0c0ee64d54a8d11c33803b4c04f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="forth11">
+		<description>FORTH v1.1</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Load both in &quot;cart1&quot; and &quot;cart2&quot;"/>
+		<part name="cart" interface="pegasus_cart">
+			<dataarea name="0000" size="4096">
+				<rom name="forth11a_2569.bin" size="4096" crc="f0c09ac3" sha1="1f13c86b1a1a53198b07729572e71f262b4d5e0e" offset="0" />
+			</dataarea>
+			<dataarea name="1000" size="4096">
+				<rom name="forth11b_2569.bin" size="4096" crc="4411b268" sha1="0e7a0799179bb2675da67c1725c1911fbd4a4433" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="forth13">
+		<description>FORTH v1.3</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Load both in &quot;cart1&quot; and &quot;cart2&quot;"/>
+		<part name="cart" interface="pegasus_cart">
+			<dataarea name="0000" size="4096">
+				<rom name="forth13a_2569.bin" size="4096" crc="1033d0c4" sha1="b8834b4d271b780e6afb2f0d671146a258b2f8b0" offset="0" />
+			</dataarea>
+			<dataarea name="1000" size="4096">
+				<rom name="forth13b_2569.bin" size="4096" crc="f65a5e36" sha1="2f667734f7b5ca8f65ad769cb325b70ff69d144c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gwarhang">
+		<description>Galaxy Wars + Hangman</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Load in &quot;cart1&quot;"/>
+		<part name="cart" interface="pegasus_cart">
+			<dataarea name="0000" size="4096">
+				<rom name="galaxy_hangman.bin" size="4096" crc="700d0e10" sha1="ef2a5bb02303340c6709136a82858f7b124eedd5" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="invaders11" cloneof="invaders">
+		<description>Invaders v1.1</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Load in &quot;cart1&quot;"/>
+		<part name="cart" interface="pegasus_cart">
+			<dataarea name="0000" size="4096">
+				<rom name="invaders11.bin" size="4096" crc="e19be9e4" sha1="77a2a3a7ddf2b30790860be994e9c4bab02c72d6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="invaders">
+		<description>Invaders v1.2</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Load in &quot;cart1&quot;"/>
+		<part name="cart" interface="pegasus_cart">
+			<dataarea name="0000" size="4096">
+				<rom name="invaders12.bin" size="4096" crc="d4ffaded" sha1="2e4c21672be35a91110f0b56c2f0ed21a39e637b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mad">
+		<description>MAD v1.1</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Load in &quot;cart1&quot;"/>
+		<part name="cart" interface="pegasus_cart">
+			<dataarea name="0000" size="4096">
+				<rom name="mad11_2569.bin" size="4096" crc="5410b220" sha1="30d197b3e4cd8a15415342740eba2319ed762987" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mada" cloneof="mad">
+		<description>MAD v1.1 (Alt)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Load in &quot;cart1&quot;"/>
+		<part name="cart" interface="pegasus_cart">
+			<dataarea name="0000" size="4096">
+				<rom name="mad11a.bin" size="4096" crc="55575af8" sha1="677db7511ddcaad6df85779f895a63ee5e35a8f8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pascal">
+		<description>PASCAL v1.0</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Load both in &quot;cart1&quot; and &quot;cart2&quot;"/>
+		<part name="cart" interface="pegasus_cart">
+			<dataarea name="0000" size="4096">
+				<rom name="pascal10a_2569.bin" size="4096" crc="7c4261db" sha1="cc8f668546c4d0a927ea158bc91e8861b20936ca" offset="0" />
+			</dataarea>
+			<dataarea name="1000" size="4096">
+				<rom name="pascal10b_2569.bin" size="4096" crc="b4ba1df0" sha1="70bb0fb601a7f2a05d4c06e5f935d9af78f8c0d0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tank11" cloneof="tank">
+		<description>Tank v1.1 (Tape2ROM)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="This can be mounted in any slot. Press &quot;L&quot; and then &quot;T&quot; to launch the game."/>
+		<part name="cart" interface="pegasus_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="tank11_t2r.bin" size="4096" crc="8824847f" sha1="e133f2ef3fc1e7aba5383cbbe2006ecddaaa1f00" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tank">
+		<description>Tank v1.2 (Tape2ROM)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="This can be mounted in any slot. Press &quot;L&quot; and then &quot;T&quot; to launch the game."/>
+		<part name="cart" interface="pegasus_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="tank12_t2r.bin" size="4096" crc="00908560" sha1="0451c71ff2a23fcf6f58316211a3feee10c1b1e6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="word11" cloneof="word">
+		<description>WORD v1.1</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="This can be mounted in any slot"/>
+		<part name="cart" interface="pegasus_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="word11_2569.bin" size="4096" crc="8e5e12ce" sha1="4b03956a8a20caac9fee04926211c489296ea329" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="word">
+		<description>WORD v1.2</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="This can be mounted in any slot"/>
+		<part name="cart" interface="pegasus_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="word12_2569.bin" size="4096" crc="84bb7e1e" sha1="d65af4904cb0b42724b881c5800854c1841f7940" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xbasic">
+		<description>XBASIC v1.0</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Load both in &quot;cart1&quot;, &quot;cart2&quot; and &quot;cart3&quot;"/>
+		<part name="cart" interface="pegasus_cart">
+			<dataarea name="0000" size="4096">
+				<rom name="xbasic10a_2569.bin" size="4096" crc="54d01145" sha1="cb427ed7f14d0d0cf718b2c4af5c664eefdfecdf" offset="0" />
+			</dataarea>
+			<dataarea name="1000" size="4096">
+				<rom name="xbasic10b_2569.bin" size="4096" crc="42c0bb45" sha1="076fc7dc5b74cd75e65ef9d2b1d53a938865512b" offset="0" />
+			</dataarea>
+			<dataarea name="2000" size="4096">
+				<rom name="xbasic10c_2569.bin" size="4096" crc="6d4acfe1" sha1="ea3db97242a9988a7dcdc1dbc6686063a241a009" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+
+<!-- what are these exactly? -->
+
+	<software name="gd3p" supported="no">
+		<description>GD3P</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="pegasus_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="gd3p.bin" size="2048" crc="ac5b2e2e" sha1="162cb94443d39a3aeb23460259f986f572d83ddb" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="utils" supported="no">
+		<description>UTILS</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="pegasus_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="utils.bin" size="2048" crc="9c7abadd" sha1="5e2c116186e6f820da3ac7fb068362de7ddf4cf1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>
