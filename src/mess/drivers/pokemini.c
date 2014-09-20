@@ -11,7 +11,8 @@ The LCD is likely to be a SSD1828 LCD.
 #include "sound/speaker.h"
 #include "machine/i2cmem.h"
 #include "cpu/minx/minx.h"
-#include "imagedev/cartslot.h"
+#include "bus/generic/slot.h"
+#include "bus/generic/carts.h"
 #include "rendlay.h"
 
 
@@ -54,10 +55,10 @@ public:
 		m_p_ram(*this, "p_ram"),
 		m_speaker(*this, "speaker"),
 		m_i2cmem(*this, "i2cmem"),
-		m_inputs(*this, "INPUTS") { }
+		m_cart(*this, "cartslot"),
+		m_inputs(*this, "INPUTS") 
+	{ }
 
-	required_device<cpu_device> m_maincpu;
-	required_shared_ptr<UINT8> m_p_ram;
 	UINT8 m_pm_reg[0x100];
 	PRC m_prc;
 	TIMERS m_timers;
@@ -67,17 +68,9 @@ public:
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_PALETTE_INIT(pokemini);
-	TIMER_CALLBACK_MEMBER(pokemini_seconds_timer_callback);
-	TIMER_CALLBACK_MEMBER(pokemini_256hz_timer_callback);
-	TIMER_CALLBACK_MEMBER(pokemini_timer1_callback);
-	TIMER_CALLBACK_MEMBER(pokemini_timer1_hi_callback);
-	TIMER_CALLBACK_MEMBER(pokemini_timer2_callback);
-	TIMER_CALLBACK_MEMBER(pokemini_timer2_hi_callback);
-	TIMER_CALLBACK_MEMBER(pokemini_timer3_callback);
-	TIMER_CALLBACK_MEMBER(pokemini_timer3_hi_callback);
-	TIMER_CALLBACK_MEMBER(pokemini_prc_counter_callback);
-	DECLARE_WRITE8_MEMBER(pokemini_hwreg_w);
-	DECLARE_READ8_MEMBER(pokemini_hwreg_r);
+	DECLARE_WRITE8_MEMBER(hwreg_w);
+	DECLARE_READ8_MEMBER(hwreg_r);
+	DECLARE_READ8_MEMBER(rom_r);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(pokemini_cart);
 
 protected:
@@ -96,30 +89,39 @@ protected:
 
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
+	required_device<cpu_device> m_maincpu;
+	required_shared_ptr<UINT8> m_p_ram;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<i2cmem_device> m_i2cmem;
+	required_device<generic_slot_device> m_cart;
 	required_ioport m_inputs;
 
-	void pokemini_check_irqs();
-	void pokemini_update_sound();
-	void pokemini_seconds_timer_callback();
-	void pokemini_256hz_timer_callback();
-	void pokemini_timer1_callback();
-	void pokemini_timer1_hi_callback();
-	void pokemini_timer2_callback();
-	void pokemini_timer2_hi_callback();
-	void pokemini_timer3_callback();
-	void pokemini_timer3_hi_callback();
-	void pokemini_prc_counter_callback();
+	void check_irqs();
+	void update_sound();
+	void seconds_timer_callback();
+	void timer_256hz_callback();
+	void timer1_callback();
+	void timer1_hi_callback();
+	void timer2_callback();
+	void timer2_hi_callback();
+	void timer3_callback();
+	void timer3_hi_callback();
+	void prc_counter_callback();
 
 };
 
 
+READ8_MEMBER( pokemini_state::rom_r )
+{
+	offset += 0x2100;
+	return m_cart->read_rom(space, offset & 0x1fffff);
+}
+
 static ADDRESS_MAP_START( pokemini_mem_map, AS_PROGRAM, 8, pokemini_state )
-	AM_RANGE( 0x000000, 0x000FFF )  AM_ROM                          /* bios */
-	AM_RANGE( 0x001000, 0x001FFF )  AM_RAM AM_SHARE("p_ram")                /* VRAM/RAM */
-	AM_RANGE( 0x002000, 0x0020FF )  AM_READWRITE(pokemini_hwreg_r, pokemini_hwreg_w )   /* hardware registers */
-	AM_RANGE( 0x002100, 0x1FFFFF )  AM_ROM                          /* cartridge area */
+	AM_RANGE( 0x000000, 0x000fff )  AM_ROM                            /* bios */
+	AM_RANGE( 0x001000, 0x001fff )  AM_RAM AM_SHARE("p_ram")          /* VRAM/RAM */
+	AM_RANGE( 0x002000, 0x0020ff )  AM_READWRITE(hwreg_r, hwreg_w)    /* hardware registers */
+	AM_RANGE( 0x002100, 0x1fffff )  AM_READ(rom_r)                    /* cartridge area */
 ADDRESS_MAP_END
 
 
@@ -145,7 +147,7 @@ PALETTE_INIT_MEMBER(pokemini_state, pokemini)
 }
 
 
-void pokemini_state::pokemini_check_irqs()
+void pokemini_state::check_irqs()
 {
 	int irq_set[4] = { 1, 0, 0, 0 };
 	int prio, vector;
@@ -298,7 +300,7 @@ void pokemini_state::pokemini_check_irqs()
 }
 
 
-void pokemini_state::pokemini_update_sound()
+void pokemini_state::update_sound()
 {
 	/* Check if sound should be muted */
 	if ( m_pm_reg[0x70] & 0x03 )
@@ -321,7 +323,7 @@ void pokemini_state::pokemini_update_sound()
 }
 
 
-void pokemini_state::pokemini_seconds_timer_callback()
+void pokemini_state::seconds_timer_callback()
 {
 	if ( m_pm_reg[0x08] & 0x01 )
 	{
@@ -338,7 +340,7 @@ void pokemini_state::pokemini_seconds_timer_callback()
 }
 
 
-void pokemini_state::pokemini_256hz_timer_callback()
+void pokemini_state::timer_256hz_callback()
 {
 	if ( m_pm_reg[0x40] & 0x01 )
 	{
@@ -366,13 +368,13 @@ void pokemini_state::pokemini_256hz_timer_callback()
 				}
 			}
 
-			pokemini_check_irqs();
+			check_irqs();
 		}
 	}
 }
 
 
-void pokemini_state::pokemini_timer1_callback()
+void pokemini_state::timer1_callback()
 {
 	m_pm_reg[0x36] -= 1;
 	/* Check for underflow of timer */
@@ -385,7 +387,7 @@ void pokemini_state::pokemini_timer1_callback()
 			if ( m_pm_reg[0x37] == 0xFF )
 			{
 				m_pm_reg[0x27] |= 0x08;
-				pokemini_check_irqs();
+				check_irqs();
 				m_pm_reg[0x36] = m_pm_reg[0x32];
 				m_pm_reg[0x37] = m_pm_reg[0x33];
 			}
@@ -393,27 +395,27 @@ void pokemini_state::pokemini_timer1_callback()
 		else
 		{
 			m_pm_reg[0x27] |= 0x04;
-			pokemini_check_irqs();
+			check_irqs();
 			m_pm_reg[0x36] = m_pm_reg[0x32];
 		}
 	}
 }
 
 
-void pokemini_state::pokemini_timer1_hi_callback()
+void pokemini_state::timer1_hi_callback()
 {
 	m_pm_reg[0x37] -= 1;
 	/* Check for underflow of timer */
 	if ( m_pm_reg[0x37] == 0xFF )
 	{
 		m_pm_reg[0x27] |= 0x08;
-		pokemini_check_irqs();
+		check_irqs();
 		m_pm_reg[0x37] = m_pm_reg[0x33];
 	}
 }
 
 
-void pokemini_state::pokemini_timer2_callback()
+void pokemini_state::timer2_callback()
 {
 	m_pm_reg[0x3E] -= 1;
 	/* Check for underflow of timer */
@@ -426,7 +428,7 @@ void pokemini_state::pokemini_timer2_callback()
 			if ( m_pm_reg[0x3F] == 0xFF )
 			{
 				m_pm_reg[0x27] |= 0x20;
-				pokemini_check_irqs();
+				check_irqs();
 				m_pm_reg[0x3E] = m_pm_reg[0x3A];
 				m_pm_reg[0x3F] = m_pm_reg[0x3B];
 			}
@@ -434,27 +436,27 @@ void pokemini_state::pokemini_timer2_callback()
 		else
 		{
 			m_pm_reg[0x27] |= 0x10;
-			pokemini_check_irqs();
+			check_irqs();
 			m_pm_reg[0x3E] = m_pm_reg[0x3A];
 		}
 	}
 }
 
 
-void pokemini_state::pokemini_timer2_hi_callback()
+void pokemini_state::timer2_hi_callback()
 {
 	m_pm_reg[0x3F] -= 1;
 	/* Check for underfow of timer */
 	if ( m_pm_reg[0x3F] == 0xFF )
 	{
 		m_pm_reg[0x27] |= 0x20;
-		pokemini_check_irqs();
+		check_irqs();
 		m_pm_reg[0x3F] = m_pm_reg[0x3B];
 	}
 }
 
 
-void pokemini_state::pokemini_timer3_callback()
+void pokemini_state::timer3_callback()
 {
 	m_pm_reg[0x4E] -= 1;
 	/* Check for underflow of timer */
@@ -467,7 +469,7 @@ void pokemini_state::pokemini_timer3_callback()
 			if ( m_pm_reg[0x4F] == 0xFF )
 			{
 				m_pm_reg[0x27] |= 0x02;
-				pokemini_check_irqs();
+				check_irqs();
 				m_pm_reg[0x4E] = m_pm_reg[0x4A];
 				m_pm_reg[0x4F] = m_pm_reg[0x4B];
 			}
@@ -483,21 +485,21 @@ void pokemini_state::pokemini_timer3_callback()
 		if (  ( m_pm_reg[0x4E] == m_pm_reg[0x4C] ) && ( m_pm_reg[0x4F] == m_pm_reg[0x4D] ) )
 		{
 			m_pm_reg[0x27] |= 0x01;
-			pokemini_check_irqs();
+			check_irqs();
 		}
-		pokemini_update_sound();
+		update_sound();
 	}
 }
 
 
-void pokemini_state::pokemini_timer3_hi_callback()
+void pokemini_state::timer3_hi_callback()
 {
 	m_pm_reg[0x4F] -= 1;
 	/* Check for underflow of timer */
 	if ( m_pm_reg[0x4F] == 0xFF )
 	{
 		m_pm_reg[0x27] |= 0x02;
-		pokemini_check_irqs();
+		check_irqs();
 		m_pm_reg[0x4F] = m_pm_reg[0x4B];
 	}
 
@@ -506,14 +508,14 @@ void pokemini_state::pokemini_timer3_hi_callback()
 		if( m_pm_reg[0x4F] == m_pm_reg[0x4D] )
 		{
 			m_pm_reg[0x27] |= 0x01;
-			pokemini_check_irqs();
+			check_irqs();
 		}
-		pokemini_update_sound();
+		update_sound();
 	}
 }
 
 
-WRITE8_MEMBER(pokemini_state::pokemini_hwreg_w)
+WRITE8_MEMBER(pokemini_state::hwreg_w)
 {
 	static const int timer_to_cycles_fast[8] = { 2, 8, 32, 64, 128, 256, 1024, 4096 };
 	static const int timer_to_cycles_slow[8] = { 128, 256, 512, 1024, 2048, 4096, 8192, 16384 };
@@ -902,7 +904,7 @@ WRITE8_MEMBER(pokemini_state::pokemini_hwreg_w)
                Bit 6-7 R/W VDraw/VBlank trigger Interrupt #1-#2
             */
 		m_pm_reg[0x20] = data;
-		pokemini_check_irqs();
+		check_irqs();
 		break;
 	case 0x21:  /* Event #15-#22 priority
                Bit 0-1 R/W Unknown
@@ -910,14 +912,14 @@ WRITE8_MEMBER(pokemini_state::pokemini_hwreg_w)
                Bit 4-7 R/W Unknown
             */
 		m_pm_reg[0x21] = data;
-		pokemini_check_irqs();
+		check_irqs();
 		break;
 	case 0x22:  /* Event #9-#14 priority
                Bit 0-1 R/W All #9 - #14 events - Interrupt #9-#14
                Bit 2-7     Unused
             */
 		m_pm_reg[0x22] = data;
-		pokemini_check_irqs();
+		check_irqs();
 		break;
 	case 0x23:  /* Event #1-#8 enable
                Bit 0   R/W Timer 3 overflow (mirror) - Enable Interrupt #8
@@ -930,14 +932,14 @@ WRITE8_MEMBER(pokemini_state::pokemini_hwreg_w)
                Bit 7   R/W V-Blank trigger - Enable Interrupt #1
             */
 		m_pm_reg[0x23] = data;
-		pokemini_check_irqs();
+		check_irqs();
 		break;
 	case 0x24:  /* Event #9-#12 enable
                Bit 0-5 R/W Unknown
                Bit 6-7     Unused
             */
 		m_pm_reg[0x24] = data;
-		pokemini_check_irqs();
+		check_irqs();
 		break;
 	case 0x25:  /* Event #15-#22 enable
                Bit 0   R/W Press key "A" event - Enable interrupt #22
@@ -950,7 +952,7 @@ WRITE8_MEMBER(pokemini_state::pokemini_hwreg_w)
                Bit 7   R/W Press power button event - Enable interrupt #15
             */
 		m_pm_reg[0x25] = data;
-		pokemini_check_irqs();
+		check_irqs();
 		break;
 	case 0x26:  /* Event #13-#14 enable
                Bit 0-2 R/W Unknown
@@ -960,7 +962,7 @@ WRITE8_MEMBER(pokemini_state::pokemini_hwreg_w)
                Bit 7   R/W IR receiver - low to high trigger - Enable interrupt #13
             */
 		m_pm_reg[0x26] = data;
-		pokemini_check_irqs();
+		check_irqs();
 		break;
 	case 0x27:  /* Interrupt active flag #1-#8
                Bit 0       Timer 3 overflow (mirror) / Clear interrupt #8
@@ -973,7 +975,7 @@ WRITE8_MEMBER(pokemini_state::pokemini_hwreg_w)
                Bit 7       VBlank trigger / Clear interrupt #1
             */
 		m_pm_reg[0x27] &= ~data;
-		pokemini_check_irqs();
+		check_irqs();
 		return;
 	case 0x28:  /* Interrupt active flag #9-#12
                Bit 0-1     Unknown
@@ -984,7 +986,7 @@ WRITE8_MEMBER(pokemini_state::pokemini_hwreg_w)
                Bit 6-7     Unknown
             */
 		m_pm_reg[0x28] &= ~data;
-		pokemini_check_irqs();
+		check_irqs();
 		return;
 	case 0x29:  /* Interrupt active flag #15-#22
                Bit 0       Press key "A" event / Clear interrupt #22
@@ -997,7 +999,7 @@ WRITE8_MEMBER(pokemini_state::pokemini_hwreg_w)
                Bit 7       Press power button event / Clear interrupt #15
             */
 		m_pm_reg[0x29] &= ~data;
-		pokemini_check_irqs();
+		check_irqs();
 		return;
 	case 0x2A:  /* Interrupt active flag #13-#14
                Bit 0-5     Unknown
@@ -1005,7 +1007,7 @@ WRITE8_MEMBER(pokemini_state::pokemini_hwreg_w)
                Bit 7       Unknown / Clear interrupt #13
             */
 		m_pm_reg[0x2A] &= ~data;
-		pokemini_check_irqs();
+		check_irqs();
 		return;
 	case 0x30:  /* Timer 1 control 1
                Bit 0   R/W Unknown
@@ -1218,7 +1220,7 @@ WRITE8_MEMBER(pokemini_state::pokemini_hwreg_w)
 			m_timers.timer3_hi->enable( 0 );
 		}
 		m_pm_reg[0x48] = data;
-		pokemini_update_sound();
+		update_sound();
 		break;
 	case 0x49:  /* Timer 3 control 2
                Bit 0   R/W Unknown
@@ -1244,25 +1246,25 @@ WRITE8_MEMBER(pokemini_state::pokemini_hwreg_w)
 			m_timers.timer3_hi->enable( 0 );
 		}
 		m_pm_reg[0x49] = data;
-		pokemini_update_sound();
+		update_sound();
 		break;
 	case 0x4A:  /* Timer 3 preset value (low)
                Bit 0-7 R/W Timer 3 preset value bit 0-7
             */
 		m_pm_reg[0x4A] = data;
-		pokemini_update_sound();
+		update_sound();
 		break;
 	case 0x4B:  /* Timer 3 preset value (high)
                Bit 0-7 R/W Timer 3 preset value bit 8-15
             */
 		m_pm_reg[0x4B] = data;
-		pokemini_update_sound();
+		update_sound();
 		break;
 	case 0x4C:  /* Timer 3 sound-pivot (low)
                Bit 0-7 R/W Timer 3 sound-pivot value bit 0-7
             */
 		m_pm_reg[0x4C] = data;
-		pokemini_update_sound();
+		update_sound();
 		break;
 	case 0x4D:  /* Timer 3 sound-pivot (high)
                Bit 0-7 R/W Timer 3 sound-pivot value bit 8-15
@@ -1273,7 +1275,7 @@ WRITE8_MEMBER(pokemini_state::pokemini_hwreg_w)
                Pulse-Width of 100% = Same as preset-value
             */
 		m_pm_reg[0x4D] = data;
-		pokemini_update_sound();
+		update_sound();
 		break;
 	case 0x4E:  /* Timer 3 counter (low), read only
                Bit 0-7 R/W Timer 3 counter value bit 0-7
@@ -1323,7 +1325,7 @@ WRITE8_MEMBER(pokemini_state::pokemini_hwreg_w)
 		break;
 	case 0x70:  /* Sound related */
 		m_pm_reg[0x70] = data;
-		pokemini_update_sound();
+		update_sound();
 		break;
 	case 0x71:  /* Sound volume
                Bit 0-1 R/W Sound volume
@@ -1335,7 +1337,7 @@ WRITE8_MEMBER(pokemini_state::pokemini_hwreg_w)
                Bit 3-7     Unused
             */
 		m_pm_reg[0x71] = data;
-		pokemini_update_sound();
+		update_sound();
 		break;
 	case 0x80:  /* LCD control
                Bit 0   R/W Invert colors; 0 - normal, 1 - inverted
@@ -1470,7 +1472,7 @@ WRITE8_MEMBER(pokemini_state::pokemini_hwreg_w)
 	m_pm_reg[offset] = data;
 }
 
-READ8_MEMBER(pokemini_state::pokemini_hwreg_r)
+READ8_MEMBER(pokemini_state::hwreg_r)
 {
 	UINT8 data = m_pm_reg[offset];
 
@@ -1496,46 +1498,30 @@ READ8_MEMBER(pokemini_state::pokemini_hwreg_r)
 
 DEVICE_IMAGE_LOAD_MEMBER( pokemini_state, pokemini_cart )
 {
-	if (image.software_entry() == NULL)
+	UINT32 size = m_cart->common_get_size("rom");
+
+	/* Verify that the image is big enough */
+	if (size <= 0x2100)
 	{
-		int size = image.length();
-
-		/* Verify that the image is big enough */
-		if (size <= 0x2100)
-		{
-			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Invalid ROM image: ROM image is too small");
-			return IMAGE_INIT_FAIL;
-		}
-
-		/* Verify that the image is not too big */
-		if (size > 0x1FFFFF)
-		{
-			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Invalid ROM image: ROM image is too big");
-			return IMAGE_INIT_FAIL;
-		}
-
-		/* Skip the first 0x2100 bytes */
-		image.fseek(0x2100, SEEK_SET);
-		size -= 0x2100;
-
-		if (size != image.fread( memregion("maincpu")->base() + 0x2100, size))
-		{
-			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Error occurred while reading ROM image");
-			return IMAGE_INIT_FAIL;
-		}
+		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Invalid ROM image: ROM image is too small");
+		return IMAGE_INIT_FAIL;
 	}
-	else
+	
+	/* Verify that the image is not too big */
+	if (size > 0x1fffff)
 	{
-		UINT8 *cart_rom = image.get_software_region("rom");
-		UINT32 cart_rom_size = image.get_software_region_length("rom");
-		memcpy(memregion("maincpu")->base() + 0x2100, cart_rom + 0x2100, cart_rom_size - 0x2100);
+		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Invalid ROM image: ROM image is too big");
+		return IMAGE_INIT_FAIL;
 	}
+
+	m_cart->rom_alloc(size, 1);
+	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");			
 
 	return IMAGE_INIT_PASS;
 }
 
 
-void pokemini_state::pokemini_prc_counter_callback()
+void pokemini_state::prc_counter_callback()
 {
 	address_space &space = m_maincpu->space( AS_PROGRAM );
 	m_prc.count++;
@@ -1643,7 +1629,7 @@ void pokemini_state::pokemini_prc_counter_callback()
 
 			/* Set PRC Render interrupt */
 			m_pm_reg[0x27] |= 0x40;
-			pokemini_check_irqs();
+			check_irqs();
 
 			/* Check if the rendered data should be copied to the LCD */
 			if ( m_prc.copy_enabled )
@@ -1667,7 +1653,7 @@ void pokemini_state::pokemini_prc_counter_callback()
 
 				/* Set PRC Copy interrupt */
 				m_pm_reg[0x27] |= 0x80;
-				pokemini_check_irqs();
+				check_irqs();
 			}
 		}
 
@@ -1686,10 +1672,10 @@ void pokemini_state::machine_start()
 
 	/* Set up timers */
 	m_timers.seconds_timer = timer_alloc(TIMER_SECONDS);
-	m_timers.seconds_timer->adjust( attotime::zero, 0, attotime::from_seconds( 1 ) );
+	m_timers.seconds_timer->adjust(attotime::zero, 0, attotime::from_seconds(1));
 
 	m_timers.hz256_timer = timer_alloc(TIMER_256HZ);
-	m_timers.hz256_timer->adjust( attotime::zero, 0, attotime::from_hz( 256 ) );
+	m_timers.hz256_timer->adjust(attotime::zero, 0, attotime::from_hz(256));
 
 	m_timers.timer1 = timer_alloc(TIMER_1);
 	m_timers.timer1_hi = timer_alloc(TIMER_1_HI);
@@ -1707,42 +1693,42 @@ void pokemini_state::machine_start()
 
 void pokemini_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	switch ( id )
+	switch (id)
 	{
 		case TIMER_SECONDS:
-			pokemini_seconds_timer_callback();
+			seconds_timer_callback();
 			break;
 
 		case TIMER_256HZ:
-			pokemini_256hz_timer_callback();
+			timer_256hz_callback();
 			break;
 
 		case TIMER_1:
-			pokemini_timer1_callback();
+			timer1_callback();
 			break;
 
 		case TIMER_1_HI:
-			pokemini_timer1_hi_callback();
+			timer1_hi_callback();
 			break;
 
 		case TIMER_2:
-			pokemini_timer2_callback();
+			timer2_callback();
 			break;
 
 		case TIMER_2_HI:
-			pokemini_timer2_hi_callback();
+			timer2_hi_callback();
 			break;
 
 		case TIMER_3:
-			pokemini_timer3_callback();
+			timer3_callback();
 			break;
 
 		case TIMER_3_HI:
-			pokemini_timer3_hi_callback();
+			timer3_hi_callback();
 			break;
 
 		case TIMER_PRC:
-			pokemini_prc_counter_callback();
+			prc_counter_callback();
 			break;
 	}
 }
@@ -1765,8 +1751,8 @@ UINT32 pokemini_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 
 static MACHINE_CONFIG_START( pokemini, pokemini_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD( "maincpu", MINX, 4000000 )
-	MCFG_CPU_PROGRAM_MAP( pokemini_mem_map)
+	MCFG_CPU_ADD("maincpu", MINX, 4000000)
+	MCFG_CPU_PROGRAM_MAP(pokemini_mem_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
@@ -1783,7 +1769,7 @@ static MACHINE_CONFIG_START( pokemini, pokemini_state )
 
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 
-	MCFG_PALETTE_ADD( "palette", 4 )
+	MCFG_PALETTE_ADD("palette", 4)
 	MCFG_PALETTE_INIT_OWNER(pokemini_state, pokemini)
 
 	/* sound hardware */
@@ -1793,14 +1779,12 @@ static MACHINE_CONFIG_START( pokemini, pokemini_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* cartridge */
-	MCFG_CARTSLOT_ADD("cart")
-	MCFG_CARTSLOT_EXTENSION_LIST("min,bin")
-	MCFG_CARTSLOT_NOT_MANDATORY
-	MCFG_CARTSLOT_INTERFACE("pokemini_cart")
-	MCFG_CARTSLOT_LOAD(pokemini_state,pokemini_cart)
+	MCFG_GENERIC_CARTSLOT_ADD("cartslot", GENERIC_ROM8_WIDTH, generic_plain_slot, "pokemini_cart")
+	MCFG_GENERIC_EXTENSIONS("bin,min")
+	MCFG_GENERIC_LOAD(pokemini_state, pokemini_cart)
 
 	/* Software lists */
-	MCFG_SOFTWARE_LIST_ADD("cart_list","pokemini")
+	MCFG_SOFTWARE_LIST_ADD("cart_list", "pokemini")
 MACHINE_CONFIG_END
 
 ROM_START( pokemini )

@@ -7,7 +7,6 @@
 
 #include "emu.h"
 #include "cpu/i86/i86.h"
-#include "imagedev/cartslot.h"
 #include "bus/centronics/ctronics.h"
 #include "machine/i8255.h"
 #include "machine/ins8250.h"
@@ -15,6 +14,9 @@
 #include "machine/ram.h"
 #include "sound/speaker.h"
 #include "video/hd61830.h"
+
+#include "bus/generic/slot.h"
+#include "bus/generic/carts.h"
 
 #define M80C88A_TAG     "u1"
 #define M82C55A_TAG     "hpc101_u1"

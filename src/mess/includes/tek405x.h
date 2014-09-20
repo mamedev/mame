@@ -7,7 +7,6 @@
 
 #include "emu.h"
 #include "cpu/m6800/m6800.h"
-#include "imagedev/cartslot.h"
 #include "machine/ram.h"
 #include "machine/6821pia.h"
 #include "machine/6850acia.h"
@@ -16,6 +15,8 @@
 #include "machine/ram.h"
 #include "sound/speaker.h"
 #include "video/vector.h"
+#include "bus/generic/slot.h"
+#include "bus/generic/carts.h"
 
 #define MC6800_TAG          "u61"
 #define MC6820_Y_TAG        "u561"

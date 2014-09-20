@@ -77,7 +77,8 @@
 #include "video/hd44780.h"
 #include "sound/dac.h"
 #include "machine/nvram.h"
-#include "imagedev/cartslot.h"
+#include "bus/generic/slot.h"
+#include "bus/generic/carts.h"
 
 #include "cc40.lh"
 
@@ -89,6 +90,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_dac(*this, "dac"),
+		m_cart(*this, "cartslot"),
+		m_key_matrix(*this, "IN"),
 		m_battery_inp(*this, "BATTERY")
 	{
 		m_sysram[0] = NULL;
@@ -97,10 +100,13 @@ public:
 
 	required_device<tms70c20_device> m_maincpu;
 	required_device<dac_device> m_dac;
+	required_device<generic_slot_device> m_cart;
+	required_ioport_array<8> m_key_matrix;
 	required_ioport m_battery_inp;
 
 	nvram_device *m_nvram[2];
-	ioport_port *m_key_matrix[8];
+
+	memory_region *m_cart_rom;
 
 	UINT8 m_bus_control;
 	UINT8 m_power;
@@ -150,13 +156,7 @@ public:
 
 DEVICE_IMAGE_LOAD_MEMBER(cc40_state, cc40_cartridge)
 {
-	UINT8* pos = memregion("user1")->base();
-	offs_t size;
-
-	if (image.software_entry() == NULL)
-		size = image.length();
-	else
-		size = image.get_software_region_length("rom");
+	UINT32 size = m_cart->common_get_size("rom");
 
 	// max size is 4*32KB
 	if (size > 0x20000)
@@ -165,16 +165,8 @@ DEVICE_IMAGE_LOAD_MEMBER(cc40_state, cc40_cartridge)
 		return IMAGE_INIT_FAIL;
 	}
 
-	if (image.software_entry() == NULL)
-	{
-		if (image.fread(pos, size) != size)
-		{
-			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unable to fully read file");
-			return IMAGE_INIT_FAIL;
-		}
-	}
-	else
-		memcpy(pos, image.get_software_region("rom"), size);
+	m_cart->rom_alloc(size, 0x20000);	// allocate a larger ROM region to have 4x32K banks
+	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");			
 
 	return IMAGE_INIT_PASS;
 }
@@ -319,7 +311,8 @@ WRITE8_MEMBER(cc40_state::bankswitch_w)
 	membank("sysbank")->set_entry(data & 3);
 
 	// d2-d3: cartridge 32KB page bankswitch
-	membank("cartbank")->set_entry(data >> 2 & 3);
+	if (m_cart_rom)
+		membank("cartbank")->set_entry(data >> 2 & 3);
 
 	m_banks = data & 0x0f;
 }
@@ -425,7 +418,7 @@ static INPUT_PORTS_START( cc40 )
 	// 8x8 keyboard matrix, RESET and ON buttons are not on it. Unused entries are not connected, but some might have a purpose for factory testing(?)
 	// The numpad number keys are shared with the ones on the main keyboard, also on the real machine.
 	// PORT_NAME lists functions under [SHIFT] as secondaries.
-	PORT_START("IN0")
+	PORT_START("IN.0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_1_PAD) PORT_CODE(KEYCODE_1) PORT_CHAR('1') PORT_CHAR('!')
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2_PAD) PORT_CODE(KEYCODE_2) PORT_CHAR('2') PORT_CHAR('"')
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_3_PAD) PORT_CODE(KEYCODE_3) PORT_CHAR('3') PORT_CHAR('#')
@@ -435,7 +428,7 @@ static INPUT_PORTS_START( cc40 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7_PAD) PORT_CODE(KEYCODE_7) PORT_CHAR('7') PORT_CHAR('&')
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8_PAD) PORT_CODE(KEYCODE_8) PORT_CHAR('8') PORT_CHAR('(')
 
-	PORT_START("IN1")
+	PORT_START("IN.1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Q) PORT_CHAR('q') PORT_CHAR('Q')
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_W) PORT_CHAR('w') PORT_CHAR('W')
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_E) PORT_CHAR('e') PORT_CHAR('E')
@@ -445,7 +438,7 @@ static INPUT_PORTS_START( cc40 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_U) PORT_CHAR('u') PORT_CHAR('U')
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_I) PORT_CHAR('i') PORT_CHAR('I')
 
-	PORT_START("IN2")
+	PORT_START("IN.2")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_A) PORT_CHAR('a') PORT_CHAR('A')
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_S) PORT_CHAR('s') PORT_CHAR('S')
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_D) PORT_CHAR('d') PORT_CHAR('D')
@@ -455,7 +448,7 @@ static INPUT_PORTS_START( cc40 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_J) PORT_CHAR('j') PORT_CHAR('J')
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_K) PORT_CHAR('k') PORT_CHAR('K')
 
-	PORT_START("IN3")
+	PORT_START("IN.3")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Z) PORT_CHAR('z') PORT_CHAR('Z')
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_X) PORT_CHAR('x') PORT_CHAR('X')
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_C) PORT_CHAR('c') PORT_CHAR('C')
@@ -465,7 +458,7 @@ static INPUT_PORTS_START( cc40 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_M) PORT_CHAR('m') PORT_CHAR('M')
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COMMA) PORT_CHAR(',') PORT_CHAR('<')
 
-	PORT_START("IN4")
+	PORT_START("IN.4")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SPACE) PORT_CHAR(' ') PORT_NAME("SPACE")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -475,7 +468,7 @@ static INPUT_PORTS_START( cc40 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_P) PORT_CHAR('p') PORT_CHAR('P')
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_O) PORT_CHAR('o') PORT_CHAR('O')
 
-	PORT_START("IN5")
+	PORT_START("IN.5")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD) PORT_CHAR('0') PORT_CHAR('\'')
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_DEL) PORT_CHAR(UCHAR_MAMEKEY(END)) PORT_NAME("CLR  UCL")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_LEFT) PORT_CHAR(UCHAR_MAMEKEY(LEFT)) PORT_CHAR(UCHAR_MAMEKEY(DEL)) PORT_NAME("LEFT  DEL")
@@ -485,7 +478,7 @@ static INPUT_PORTS_START( cc40 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_DOWN) PORT_CHAR(UCHAR_MAMEKEY(DOWN)) PORT_NAME("DOWN")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_CHAR('9') PORT_CHAR(')')
 
-	PORT_START("IN6")
+	PORT_START("IN.6")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_STOP) PORT_CODE(KEYCODE_DEL_PAD) PORT_CHAR('.') PORT_CHAR('>')
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PLUS_PAD) PORT_CHAR(UCHAR_MAMEKEY(PLUS_PAD)) PORT_NAME("+")
@@ -495,7 +488,7 @@ static INPUT_PORTS_START( cc40 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_ASTERISK) PORT_CHAR(UCHAR_MAMEKEY(ASTERISK)) PORT_NAME("*")
 
-	PORT_START("IN7")
+	PORT_START("IN.7")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_LCONTROL) PORT_CODE(KEYCODE_RCONTROL) PORT_CHAR(UCHAR_SHIFT_2) PORT_NAME("CTL")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_SHIFT_1) PORT_NAME("SHIFT")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_END) PORT_CHAR(UCHAR_MAMEKEY(PAUSE)) PORT_NAME("BREAK")
@@ -552,12 +545,14 @@ void cc40_state::postload()
 void cc40_state::machine_start()
 {
 	// init
-	static const char *const tags[] = { "IN0", "IN1", "IN2", "IN3", "IN4", "IN5", "IN6", "IN7" };
-	for (int i = 0; i < 8; i++)
-		m_key_matrix[i] = ioport(tags[i]);
+	astring region_tag;
+	m_cart_rom = memregion(region_tag.cpy(m_cart->tag()).cat(GENERIC_ROM_REGION_TAG));
 
 	membank("sysbank")->configure_entries(0, 4, memregion("system")->base(), 0x2000);
-	membank("cartbank")->configure_entries(0, 4, memregion("user1")->base(), 0x8000);
+	if (m_cart_rom)
+		membank("cartbank")->configure_entries(0, 4, m_cart_rom->base(), 0x8000);
+	else
+		membank("cartbank")->set_base(memregion("maincpu")->base() + 0x5000);
 
 	m_nvram[0] = machine().device<nvram_device>("sysram.1");
 	m_nvram[1] = machine().device<nvram_device>("sysram.2");
@@ -619,11 +614,10 @@ static MACHINE_CONFIG_START( cc40, cc40_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* cartridge */
-	MCFG_CARTSLOT_ADD("cart")
-	MCFG_CARTSLOT_EXTENSION_LIST("bin,rom,256")
-	MCFG_CARTSLOT_NOT_MANDATORY
-	MCFG_CARTSLOT_LOAD(cc40_state, cc40_cartridge)
-	MCFG_CARTSLOT_INTERFACE("cc40_cart")
+	MCFG_GENERIC_CARTSLOT_ADD("cartslot", GENERIC_ROM8_WIDTH, generic_plain_slot, "cc40_cart")
+	MCFG_GENERIC_EXTENSIONS("bin,rom,256")
+	MCFG_GENERIC_LOAD(cc40_state, cc40_cartridge)
+
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "cc40_cart")
 MACHINE_CONFIG_END
 
@@ -641,8 +635,6 @@ ROM_START( cc40 )
 
 	ROM_REGION( 0x8000, "system", 0 )
 	ROM_LOAD( "hn61256pc09.bin", 0x0000, 0x8000, CRC(f5322fab) SHA1(1b5c4052a53654363c458f75eac7a27f0752def6) ) // system rom, banked
-
-	ROM_REGION( 0x20000, "user1", ROMREGION_ERASEFF ) // cartridge area, max 4*32KB
 ROM_END
 
 

@@ -101,12 +101,13 @@ TODO:
 
 #include "emu.h"
 #include "cpu/nec/nec.h"
-#include "imagedev/cartslot.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
 #include "machine/am9517a.h"
-#include "sound/speaker.h"
 #include "machine/i8255.h"
+#include "sound/speaker.h"
+#include "bus/generic/slot.h"
+#include "bus/generic/carts.h"
 
 
 /*
@@ -156,6 +157,7 @@ public:
 		, m_dma8237(*this, "dma8237")
 		, m_pit8253(*this, "pit8254")
 		, m_speaker(*this, "speaker")
+		, m_cart(*this, "cartslot")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -163,6 +165,7 @@ public:
 	required_device<am9517a_device> m_dma8237;
 	required_device<pit8254_device> m_pit8253;
 	required_device<speaker_sound_device> m_speaker;
+	required_device<generic_slot_device> m_cart;
 
 	DECLARE_READ8_MEMBER(ems_r);
 	DECLARE_WRITE8_MEMBER(ems_w);
@@ -211,6 +214,9 @@ protected:
 	UINT8 m_dma_offset[4];
 	UINT8 m_pc_spkrdata;
 	UINT8 m_pit_out2;
+
+	memory_region *m_maincpu_rom;
+	memory_region *m_cart_rom;
 
 	int m_ppi_portc_switch_high;
 	int m_ppi_speaker;
@@ -507,7 +513,7 @@ WRITE8_MEMBER( pasogo_state::ems_w )
 		case 0: /*external*/
 		case 1: /*ram*/
 			sprintf(bank, "bank%d", m_ems.index + 1);
-			membank( bank )->set_base( memregion("maincpu")->base() + (m_ems.mapper[m_ems.index].address & 0xfffff) );
+			membank(bank)->set_base(m_maincpu_rom->base() + (m_ems.mapper[m_ems.index].address & 0xfffff));
 			break;
 		case 3: /* rom 1 */
 		case 4: /* pc card a */
@@ -516,7 +522,7 @@ WRITE8_MEMBER( pasogo_state::ems_w )
 			break;
 		case 2:
 			sprintf(bank, "bank%d", m_ems.index + 1);
-			membank( bank )->set_base( memregion("user1")->base() + (m_ems.mapper[m_ems.index].address & 0xfffff) );
+			membank(bank)->set_base(m_cart_rom->base() + (m_ems.mapper[m_ems.index].address & 0xfffff));
 			break;
 		}
 		break;
@@ -564,10 +570,10 @@ static ADDRESS_MAP_START(pasogo_io, AS_IO, 16, pasogo_state)
 //  ADDRESS_MAP_GLOBAL_MASK(0xfFFF)
 	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE8("dma8237", am9517a_device, read, write, 0xffff)
 	AM_RANGE(0x0020, 0x0021) AM_DEVREADWRITE8("pic8259", pic8259_device, read, write, 0xffff)
-	AM_RANGE(0x26, 0x27) AM_READWRITE8(vg230_io_r, vg230_io_w, 0xffff )
+	AM_RANGE(0x26, 0x27) AM_READWRITE8(vg230_io_r, vg230_io_w, 0xffff)
 	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE8("pit8254", pit8254_device, read, write, 0xffff)
 	AM_RANGE(0x0060, 0x0063) AM_DEVREADWRITE8("ppi8255", i8255_device, read, write, 0xffff)
-	AM_RANGE(0x6c, 0x6f) AM_READWRITE8(ems_r, ems_w, 0xffff )
+	AM_RANGE(0x6c, 0x6f) AM_READWRITE8(ems_r, ems_w, 0xffff)
 ADDRESS_MAP_END
 
 
@@ -610,7 +616,7 @@ PALETTE_INIT_MEMBER(pasogo_state, pasogo)
 UINT32 pasogo_state::screen_update_pasogo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	//static int width = -1, height = -1;
-	UINT8 *rom = memregion("maincpu")->base()+0xb8000;
+	UINT8 *rom = m_maincpu_rom->base() + 0xb8000;
 	static const UINT16 c[] = { 3, 0 };
 	int x,y;
 //  plot_box(bitmap, 0, 0, 64/*bitmap.width*/, bitmap.height, 0);
@@ -672,6 +678,13 @@ INTERRUPT_GEN_MEMBER(pasogo_state::pasogo_interrupt)
 
 void pasogo_state::machine_reset()
 {
+	astring region_tag;
+	m_cart_rom = memregion(region_tag.cpy(m_cart->tag()).cat(GENERIC_ROM_REGION_TAG));
+	m_maincpu_rom = memregion("maincpu");
+
+	membank("bank27")->set_base(m_cart_rom->base());
+	membank("bank28")->set_base(m_maincpu_rom->base() + 0xb8000/*?*/);
+
 	m_u73_q2 = 0;
 	m_out1 = 2; // initial state of pit output is undefined
 	m_pc_spkrdata = 0;
@@ -709,7 +722,7 @@ WRITE_LINE_MEMBER( pasogo_state::pit8253_out2_changed )
 
 READ8_MEMBER( pasogo_state::page_r )
 {
-	return 0xFF;
+	return 0xff;
 }
 
 
@@ -916,9 +929,9 @@ static MACHINE_CONFIG_START( pasogo, pasogo_state )
 	MCFG_PIT8253_CLK2(4772720/4) /* pio port c pin 4, and speaker polling enough */
 	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(pasogo_state, pit8253_out2_changed))
 
-	MCFG_PIC8259_ADD( "pic8259", INPUTLINE("maincpu", 0), VCC, NULL )
+	MCFG_PIC8259_ADD("pic8259", INPUTLINE("maincpu", 0), VCC, NULL)
 
-	MCFG_DEVICE_ADD( "dma8237", AM9517A, XTAL_14_31818MHz/3 )
+	MCFG_DEVICE_ADD("dma8237", AM9517A, XTAL_14_31818MHz/3)
 	MCFG_I8237_OUT_HREQ_CB(WRITELINE(pasogo_state, dma_hrq_changed))
 	MCFG_I8237_OUT_EOP_CB(WRITELINE(pasogo_state, dma8237_out_eop))
 	MCFG_I8237_IN_MEMR_CB(READ8(pasogo_state, dma_read_byte))
@@ -954,10 +967,9 @@ static MACHINE_CONFIG_START( pasogo, pasogo_state )
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MCFG_CARTSLOT_ADD("cart")
-	MCFG_CARTSLOT_EXTENSION_LIST("bin")
-	MCFG_CARTSLOT_MANDATORY
-	MCFG_CARTSLOT_INTERFACE("pasogo_cart")
+	MCFG_GENERIC_CARTSLOT_ADD("cartslot", GENERIC_ROM16_WIDTH, generic_plain_slot, "pasogo_cart")
+	MCFG_GENERIC_MANDATORY
+
 	MCFG_SOFTWARE_LIST_ADD("cart_list","pasogo")
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("vg230_timer", pasogo_state, vg230_timer, attotime::from_hz(1))
@@ -966,8 +978,6 @@ MACHINE_CONFIG_END
 
 ROM_START(pasogo)
 	ROM_REGION(0x100000,"maincpu", ROMREGION_ERASEFF) // 1 megabyte dram?
-	ROM_REGION(0x100000,"user1", ROMREGION_ERASEFF)
-	ROM_CART_LOAD("cart", 0, 0x100000, ROM_NOMIRROR)
 ROM_END
 
 
@@ -975,8 +985,6 @@ DRIVER_INIT_MEMBER(pasogo_state,pasogo)
 {
 	vg230_init();
 	memset(&m_ems, 0, sizeof(m_ems));
-	membank( "bank27" )->set_base( memregion("user1")->base() + 0x00000 );
-	membank( "bank28" )->set_base( memregion("maincpu")->base() + 0xb8000/*?*/ );
 }
 
 //    YEAR   NAME    PARENT  COMPAT    MACHINE   INPUT     INIT      COMPANY  FULLNAME          FLAGS
