@@ -120,7 +120,7 @@ void besta_state::machine_reset()
 	UINT8* user1 = memregion("user1")->base();
 
 	memcpy((UINT8*)m_p_ram.target(),user1,0x10000); // not really what happens but...
-	memset(m_mpcc_regs, sizeof(m_mpcc_regs), 0);    // should initialize to defined values
+	memset(m_mpcc_regs, 0, sizeof(m_mpcc_regs));    // should initialize to defined values
 	m_mpcc_regs[8] = 0x80;              // always ready to transmit
 
 	m_maincpu->reset();
