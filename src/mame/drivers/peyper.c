@@ -1,18 +1,23 @@
-#include "emu.h"
+/********************************************************************************************************
+
+  PINBALL
+  Peyper
+
+*********************************************************************************************************/
+
+#include "machine/genpin.h"
 #include "cpu/z80/z80.h"
+#include "sound/ay8910.h"
 #include "peyper.lh"
 
-class peyper_state : public driver_device
+class peyper_state : public genpin_class
 {
 public:
 	peyper_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu") { }
+		: genpin_class(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+	{ }
 
-	UINT8 irq_state;
-
-	UINT8 display_block;
-	UINT8 display[16];
 	DECLARE_READ8_MEMBER(sw_r);
 	DECLARE_WRITE8_MEMBER(col_w);
 	DECLARE_WRITE8_MEMBER(disp_w);
@@ -21,6 +26,10 @@ public:
 	DECLARE_WRITE8_MEMBER(sol_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(wolfman_replay_hs_r);
 	DECLARE_DRIVER_INIT(peyper);
+private:
+	UINT8 irq_state;
+	UINT8 display_block;
+	UINT8 display[16];
 	virtual void machine_reset();
 	required_device<cpu_device> m_maincpu;
 };
@@ -38,9 +47,9 @@ WRITE8_MEMBER(peyper_state::col_w)
 
 static const UINT8 hex_to_7seg[16] =
 	{0x3F, 0x06, 0x5B, 0x4F,
-		0x66, 0x6D, 0x7D, 0x07,
-		0x7F, 0x6F, 0x00, 0x00,
-		0x00, 0x00, 0x00, 0x00 };
+		0x66, 0x6D, 0x7c, 0x07,
+		0x7F, 0x67, 0x00, 0x00,
+		0x00, 0x00, 0x00, 0x00 }; // 4511
 
 /* seems to only work correctly for 'solarwap', 'poleposn' and 'sonstwar' (look at how high-scores are displayed for example) - or shall layout be changed ? */
 WRITE8_MEMBER(peyper_state::disp_w)
@@ -188,22 +197,20 @@ CUSTOM_INPUT_MEMBER(peyper_state::wolfman_replay_hs_r)
 
 
 static ADDRESS_MAP_START( peyper_map, AS_PROGRAM, 8, peyper_state )
-//  AM_RANGE(0x0000, 0xffff) AM_NOP
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x5FFF) AM_ROM
-	AM_RANGE(0x6000, 0x67FF) AM_RAM //AM_BASE_GENERIC(nvram)
+	AM_RANGE(0x6000, 0x67FF) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( peyper_io, AS_IO, 8, peyper_state )
-//  AM_RANGE(0x0000, 0xffff) AM_NOP
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READWRITE(sw_r,disp_w)
 	AM_RANGE(0x01, 0x01) AM_WRITE(col_w)
-//  AM_RANGE(0x04, 0x04) AM_DEVWRITE("ay8910_0", ay8910_device, address_w)
-//  AM_RANGE(0x06, 0x06) AM_DEVWRITE("ay8910_0", ay8910_device, data_w)
-//  AM_RANGE(0x08, 0x08) AM_DEVWRITE("ay8910_1", ay8910_device, address_w)
-//  AM_RANGE(0x0a, 0x0a) AM_DEVWRITE("ay8910_1", ay8910_device, data_w)
+	AM_RANGE(0x04, 0x04) AM_DEVWRITE("ay1", ay8910_device, address_w)
+	AM_RANGE(0x06, 0x06) AM_DEVWRITE("ay1", ay8910_device, data_w)
+	AM_RANGE(0x08, 0x08) AM_DEVWRITE("ay2", ay8910_device, address_w)
+	AM_RANGE(0x0a, 0x0a) AM_DEVWRITE("ay2", ay8910_device, data_w)
 	AM_RANGE(0x0c, 0x0c) AM_WRITE(sol_w)
 	AM_RANGE(0x10, 0x18) AM_WRITE(lamp_w)
 	AM_RANGE(0x20, 0x20) AM_READ_PORT("DSW0")
@@ -479,7 +486,7 @@ static INPUT_PORTS_START( wolfman )
 	PORT_DIPSETTING(    0x41, "1000k and 1400k and 8000k / 1610k" )   // manual says "1000k and 1400k / 1600k"
 	PORT_DIPSETTING(    0x42, "1200k and 1600k and 8000k / 1810k" )   // manual says "1200k and 1600k / 1800k"
 	PORT_DIPSETTING(    0x43, "1400k and 1800k and 8000k / 2010k" )   // manual says "1400k and 1800k / 2000k"
-	PORT_DIPSETTING(    0x00, "2400k and 2800k and 6800k / 3610k" )   // not mentionned in the manual where it is "conenecte" to DSW1-3 ("Clear RAM on Reset")
+	PORT_DIPSETTING(    0x00, "2400k and 2800k and 6800k / 3610k" )   // not mentioned in the manual where it is "conenecte" to DSW1-3 ("Clear RAM on Reset")
 INPUT_PORTS_END
 
 /* verified from Z80 code - NO manual found ! */
@@ -539,10 +546,22 @@ static MACHINE_CONFIG_START( peyper, peyper_state )
 	MCFG_CPU_PROGRAM_MAP(peyper_map)
 	MCFG_CPU_IO_MAP(peyper_io)
 	MCFG_CPU_PERIODIC_INT_DRIVER(peyper_state, irq0_line_hold,  1250 * 2)
-
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_peyper)
+
+	/* Sound */
+	MCFG_FRAGMENT_ADD( genpin_audio )
+	MCFG_SPEAKER_STANDARD_MONO("ayvol")
+	MCFG_SOUND_ADD("ay1", AY8910, 2500000)
+	//MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(peyper_state, p1a_w))
+	//MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(peyper_state, p1b_w))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "ayvol", 1.0)
+	MCFG_SOUND_ADD("ay2", AY8910, 2500000)
+	//MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(peyper_state, p2a_w))
+	//MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(peyper_state, p2b_w))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "ayvol", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -653,14 +672,14 @@ ROM_START(wolfman)
 ROM_END
 
 
-GAME( 1985, odin,     0, peyper,   odin_dlx, peyper_state, peyper,   ROT0, "Sonic",  "Odin",                  GAME_IS_SKELETON_MECHANICAL)
-GAME( 1985, odin_dlx, 0, peyper,   odin_dlx, peyper_state, peyper,   ROT0, "Sonic",  "Odin De Luxe",          GAME_IS_SKELETON_MECHANICAL)
-GAME( 1986, solarwap, 0, peyper,   solarwap, peyper_state, peyper,   ROT0, "Sonic",  "Solar Wars (Sonic)",    GAME_IS_SKELETON_MECHANICAL)
-GAME( 1986, gamatros, 0, peyper,   solarwap, peyper_state, peyper,   ROT0, "Sonic",  "Gamatron (Sonic)",    GAME_IS_SKELETON_MECHANICAL)
-GAME( 1987, poleposn, 0, peyper,   poleposn, peyper_state, peyper,   ROT0, "Sonic",  "Pole Position (Sonic)", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1987, sonstwar, 0, peyper,   sonstwar, peyper_state, peyper,   ROT0, "Sonic",  "Star Wars (Sonic)",     GAME_IS_SKELETON_MECHANICAL)
-GAME( 1987, sonstwr2, sonstwar, peyper,   sonstwar, peyper_state, peyper,   ROT0, "Sonic",  "Star Wars (Sonic, alternate set)",     GAME_IS_SKELETON_MECHANICAL)
+GAME( 1985, odin,     0,        peyper,   odin_dlx, peyper_state, peyper,   ROT0, "Sonic",  "Odin",                  GAME_IS_SKELETON_MECHANICAL)
+GAME( 1985, odin_dlx, 0,        peyper,   odin_dlx, peyper_state, peyper,   ROT0, "Sonic",  "Odin De Luxe",          GAME_IS_SKELETON_MECHANICAL)
+GAME( 1986, solarwap, 0,        peyper,   solarwap, peyper_state, peyper,   ROT0, "Sonic",  "Solar Wars (Sonic)",    GAME_IS_SKELETON_MECHANICAL)
+GAME( 1986, gamatros, 0,        peyper,   solarwap, peyper_state, peyper,   ROT0, "Sonic",  "Gamatron (Sonic)",    GAME_IS_SKELETON_MECHANICAL)
+GAME( 1987, poleposn, 0,        peyper,   poleposn, peyper_state, peyper,   ROT0, "Sonic",  "Pole Position (Sonic)", GAME_IS_SKELETON_MECHANICAL)
+GAME( 1987, sonstwar, 0,        peyper,   sonstwar, peyper_state, peyper,   ROT0, "Sonic",  "Star Wars (Sonic, set 1)", GAME_IS_SKELETON_MECHANICAL)
+GAME( 1987, sonstwr2, sonstwar, peyper,   sonstwar, peyper_state, peyper,   ROT0, "Sonic",  "Star Wars (Sonic, set 2)", GAME_IS_SKELETON_MECHANICAL)
 
-GAME( 1987, wolfman,  0, peyper,   wolfman, peyper_state,  peyper,   ROT0, "Peyper", "Wolf Man",              GAME_IS_SKELETON_MECHANICAL)
-GAME( 1986, nemesisp, 0, peyper,   wolfman, peyper_state,  peyper,   ROT0, "Peyper", "Nemesis",               GAME_IS_SKELETON_MECHANICAL)
-GAME( 1987, odisea,   0, peyper,   odisea, peyper_state,   peyper,   ROT0, "Peyper", "Odisea Paris-Dakar",    GAME_IS_SKELETON_MECHANICAL)
+GAME( 1987, wolfman,  0,        peyper,   wolfman,  peyper_state, peyper,   ROT0, "Peyper", "Wolf Man",              GAME_IS_SKELETON_MECHANICAL)
+GAME( 1986, nemesisp, 0,        peyper,   wolfman,  peyper_state, peyper,   ROT0, "Peyper", "Nemesis",               GAME_IS_SKELETON_MECHANICAL)
+GAME( 1987, odisea,   0,        peyper,   odisea,   peyper_state, peyper,   ROT0, "Peyper", "Odisea Paris-Dakar",    GAME_IS_SKELETON_MECHANICAL)
