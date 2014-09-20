@@ -87,6 +87,10 @@ protected:
 		UINT32 accel_bg_pattern_colour;
 		UINT8 accel_pattern[0x80];
 		bool accel_busy;
+		bool accel_memwrite_active;  // true when writing to VRAM will push data to an ongoing command (SRCMONO/PATMONO)
+		INT16 accel_mem_x;
+		INT16 accel_mem_y;
+		UINT32 accel_transfer;
 	} tri;
 private:
 	UINT8 trident_seq_reg_read(UINT8 index);
@@ -100,6 +104,7 @@ private:
 	void accel_command();
 	void accel_bitblt();
 	void accel_line();
+	void accel_data_write(UINT32 data);
 };
 
 
