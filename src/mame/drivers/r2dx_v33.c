@@ -70,6 +70,9 @@ public:
 	DECLARE_DRIVER_INIT(nzerotea);
 	DECLARE_DRIVER_INIT(zerotm2k);
 
+	DECLARE_WRITE16_MEMBER(r2dx_tilemapdma_w);
+	DECLARE_WRITE16_MEMBER(r2dx_paldma_w);
+
 	void r2dx_setbanking(void);
 
 	DECLARE_MACHINE_RESET(r2dx_v33);
@@ -279,11 +282,36 @@ WRITE16_MEMBER(r2dx_v33_state::r2dx_sdisth_w)
 	r2dx_i_sdist = (r2dx_i_sdist & (0x0000ffff | (UINT16(~mem_mask)) << 16)) | ((data & mem_mask) << 16);
 }
 
+// these DMA operations seem to use hardcoded addresses on this hardware
+WRITE16_MEMBER(r2dx_v33_state::r2dx_tilemapdma_w)
+{
+	int src = 0xd000;
+
+	for (int i = 0; i < 0x2800 / 2; i++)
+	{
+		UINT16 tileval = space.read_word(src);
+		src += 2;
+		m_videoram_private_w(space, i, tileval, 0xffff);
+	}
+}
+
+WRITE16_MEMBER(r2dx_v33_state::r2dx_paldma_w)
+{
+	int src = 0x1f000;
+
+	for (int i = 0; i < 0x1000 / 2; i++) 
+	{
+		UINT16 palval = space.read_word(src);
+		src += 2;
+		m_palette->set_pen_color(i, pal5bit(palval >> 0), pal5bit(palval >> 5), pal5bit(palval >> 10));
+	}
+}
+
 static ADDRESS_MAP_START( rdx_v33_map, AS_PROGRAM, 16, r2dx_v33_state )
 	AM_RANGE(0x00000, 0x003ff) AM_RAM // vectors copied here
 
-	AM_RANGE(0x00400, 0x00401) AM_WRITENOP // tilemaps to private buffer
-	AM_RANGE(0x00402, 0x00403) AM_WRITENOP // palettes to private buffer
+	AM_RANGE(0x00400, 0x00401) AM_WRITE(r2dx_tilemapdma_w) // tilemaps to private buffer
+	AM_RANGE(0x00402, 0x00403) AM_WRITE(r2dx_paldma_w)  // palettes to private buffer
 
 
 	AM_RANGE(0x00404, 0x00405) AM_WRITE(r2dx_rom_bank_w)
@@ -334,13 +362,13 @@ static ADDRESS_MAP_START( rdx_v33_map, AS_PROGRAM, 16, r2dx_v33_state )
 
 	AM_RANGE(0x0c000, 0x0c7ff) AM_RAM AM_SHARE("sprites")
 	AM_RANGE(0x0c800, 0x0cfff) AM_RAM
-	AM_RANGE(0x0d000, 0x0d7ff) AM_RAM_WRITE(raiden2_background_w) AM_SHARE("back_data")
-	AM_RANGE(0x0d800, 0x0dfff) AM_RAM_WRITE(raiden2_foreground_w) AM_SHARE("fore_data")
-	AM_RANGE(0x0e000, 0x0e7ff) AM_RAM_WRITE(raiden2_midground_w)  AM_SHARE("mid_data")
-	AM_RANGE(0x0e800, 0x0f7ff) AM_RAM_WRITE(raiden2_text_w) AM_SHARE("text_data")
+	AM_RANGE(0x0d000, 0x0d7ff) AM_RAM //_WRITE(raiden2_background_w) AM_SHARE("back_data")
+	AM_RANGE(0x0d800, 0x0dfff) AM_RAM //_WRITE(raiden2_foreground_w) AM_SHARE("fore_data")
+	AM_RANGE(0x0e000, 0x0e7ff) AM_RAM //_WRITE(raiden2_midground_w)  AM_SHARE("mid_data")
+	AM_RANGE(0x0e800, 0x0f7ff) AM_RAM //_WRITE(raiden2_text_w) AM_SHARE("text_data")
 	AM_RANGE(0x0f800, 0x0ffff) AM_RAM /* Stack area */
 	AM_RANGE(0x10000, 0x1efff) AM_RAM
-	AM_RANGE(0x1f000, 0x1ffff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x1f000, 0x1ffff) AM_RAM //_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 
 	AM_RANGE(0x20000, 0x2ffff) AM_ROM AM_ROMBANK("bank1") AM_WRITENOP
 	AM_RANGE(0x30000, 0x3ffff) AM_ROM AM_ROMBANK("bank2") AM_WRITENOP
@@ -351,8 +379,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( nzeroteam_base_map, AS_PROGRAM, 16, r2dx_v33_state )
 	AM_RANGE(0x00000, 0x003ff) AM_RAM //stack area
 
-	AM_RANGE(0x00400, 0x00401) AM_WRITENOP // tilemaps to private buffer
-	AM_RANGE(0x00402, 0x00403) AM_WRITENOP // palettes to private buffer
+	AM_RANGE(0x00400, 0x00401) AM_WRITE(r2dx_tilemapdma_w) // tilemaps to private buffer
+	AM_RANGE(0x00402, 0x00403) AM_WRITE(r2dx_paldma_w)  // palettes to private buffer
 	// 0x404 is bank on r2dx, this doesn't need it
 	// AM_RANGE(0x00406, 0x00407) AM_WRITE(tile_bank_w) // not the same?
 
@@ -389,13 +417,13 @@ static ADDRESS_MAP_START( nzeroteam_base_map, AS_PROGRAM, 16, r2dx_v33_state )
 
 	AM_RANGE(0x0c000, 0x0c7ff) AM_RAM AM_SHARE("sprites")
 	AM_RANGE(0x0c800, 0x0cfff) AM_RAM
-	AM_RANGE(0x0d000, 0x0d7ff) AM_RAM_WRITE(raiden2_background_w) AM_SHARE("back_data")
-	AM_RANGE(0x0d800, 0x0dfff) AM_RAM_WRITE(raiden2_foreground_w) AM_SHARE("fore_data")
-	AM_RANGE(0x0e000, 0x0e7ff) AM_RAM_WRITE(raiden2_midground_w)  AM_SHARE("mid_data")
-	AM_RANGE(0x0e800, 0x0f7ff) AM_RAM_WRITE(raiden2_text_w) AM_SHARE("text_data")
+	AM_RANGE(0x0d000, 0x0d7ff) AM_RAM //_WRITE(raiden2_background_w) AM_SHARE("back_data")
+	AM_RANGE(0x0d800, 0x0dfff) AM_RAM //_WRITE(raiden2_foreground_w) AM_SHARE("fore_data")
+	AM_RANGE(0x0e000, 0x0e7ff) AM_RAM //_WRITE(raiden2_midground_w)  AM_SHARE("mid_data")
+	AM_RANGE(0x0e800, 0x0f7ff) AM_RAM //_WRITE(raiden2_text_w) AM_SHARE("text_data")
 	AM_RANGE(0x0f800, 0x0ffff) AM_RAM /* Stack area */
 	AM_RANGE(0x10000, 0x1efff) AM_RAM
-	AM_RANGE(0x1f000, 0x1ffff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x1f000, 0x1ffff) AM_RAM //_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 
 	AM_RANGE(0x20000, 0xfffff) AM_ROM AM_REGION("mainprg", 0x20000 )
 ADDRESS_MAP_END
@@ -647,7 +675,7 @@ static MACHINE_CONFIG_START( rdx_v33, r2dx_v33_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", rdx_v33)
 	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	//MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	MCFG_VIDEO_START_OVERRIDE(raiden2_state,raiden2)
 
@@ -686,7 +714,7 @@ static MACHINE_CONFIG_START( nzerotea, r2dx_v33_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", rdx_v33)
 	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	//MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	MCFG_VIDEO_START_OVERRIDE(raiden2_state,raiden2)
 
