@@ -226,6 +226,7 @@ hash/pcecd.xml svneol=native#text/xml
 hash/pcw.xml svneol=native#text/xml
 hash/pcw16.xml svneol=native#text/xml
 hash/pecom_cass.xml svneol=native#text/xml
+hash/pencil2.xml svneol=native#text/xml
 hash/pentagon_cass.xml svneol=native#text/xml
 hash/pet_cass.xml svneol=native#text/xml
 hash/pet_flop.xml svneol=native#text/xml
