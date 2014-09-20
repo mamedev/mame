@@ -7,6 +7,7 @@
 
 #include "machine/genpin.h"
 #include "cpu/z80/z80.h"
+#include "machine/i8279.h"
 #include "sound/ay8910.h"
 #include "peyper.lh"
 
@@ -24,42 +25,45 @@ public:
 	DECLARE_WRITE8_MEMBER(lamp_w);
 	DECLARE_WRITE8_MEMBER(lamp7_w);
 	DECLARE_WRITE8_MEMBER(sol_w);
+	DECLARE_WRITE8_MEMBER(p1a_w) { }; // more lamps
+	DECLARE_WRITE8_MEMBER(p1b_w) { }; // more lamps
+	DECLARE_WRITE8_MEMBER(p2a_w) { }; // more lamps
+	DECLARE_WRITE8_MEMBER(p2b_w) { }; // more lamps
 	DECLARE_CUSTOM_INPUT_MEMBER(wolfman_replay_hs_r);
 	DECLARE_DRIVER_INIT(peyper);
 private:
+	UINT8 m_digit;
 	UINT8 irq_state;
-	UINT8 display_block;
-	UINT8 display[16];
 	virtual void machine_reset();
 	required_device<cpu_device> m_maincpu;
 };
 
-
-READ8_MEMBER(peyper_state::sw_r)
+WRITE8_MEMBER( peyper_state::col_w )
 {
-	return 0xff;
+	m_digit = data;
 }
 
-WRITE8_MEMBER(peyper_state::col_w)
+READ8_MEMBER( peyper_state::sw_r )
 {
-	if (data==0x90) display_block = 0;
-}
+	UINT8 data = 0xff;
 
-static const UINT8 hex_to_7seg[16] =
-	{0x3F, 0x06, 0x5B, 0x4F,
-		0x66, 0x6D, 0x7c, 0x07,
-		0x7F, 0x67, 0x00, 0x00,
-		0x00, 0x00, 0x00, 0x00 }; // 4511
+	if (m_digit < 4)
+	{
+		char kbdrow[6];
+		sprintf(kbdrow,"X%X",m_digit);
+		data = ioport(kbdrow)->read();
+	}
+	return data;
+}
 
 /* seems to only work correctly for 'solarwap', 'poleposn' and 'sonstwar' (look at how high-scores are displayed for example) - or shall layout be changed ? */
-WRITE8_MEMBER(peyper_state::disp_w)
+WRITE8_MEMBER( peyper_state::disp_w )
 {
-	display[display_block] = data;
-
+	static const UINT8 patterns[16] = { 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7c,0x07,0x7f,0x67,0x58,0x4c,0x62,0x69,0x78,0 }; // 7448
 	UINT8 a = data & 0x0f;
 	UINT8 b = data >> 4;
-	UINT8 hex_a = hex_to_7seg[a];
-	UINT8 hex_b = hex_to_7seg[b];
+	UINT8 hex_a = patterns[a];
+	UINT8 hex_b = patterns[b];
 /*
 0 -> XA0 DPL25,DPL27
 1 -> XA1 DPL26,DPL28
@@ -70,7 +74,7 @@ WRITE8_MEMBER(peyper_state::disp_w)
 6 -> DPL19,DPL1
 7 -> DPL30,DPL33
 */
-	switch(display_block) {
+	switch(m_digit) {
 		case 0 :
 				output_set_indexed_value("dpl_",25,hex_a);
 				output_set_indexed_value("dpl_",27,hex_b);
@@ -100,8 +104,8 @@ WRITE8_MEMBER(peyper_state::disp_w)
 				output_set_indexed_value("dpl_",1,hex_b);
 				break;
 		case 7 :
-				output_set_indexed_value("dpl_",30,hex_a);
-				output_set_indexed_value("dpl_",33,hex_b);
+				output_set_indexed_value("dpl_",33,hex_a);
+				output_set_indexed_value("dpl_",30,hex_b);
 				break;
 /*
 8 ->  XB0
@@ -115,51 +119,48 @@ WRITE8_MEMBER(peyper_state::disp_w)
 */
 		case 8 :
 				/*
-				if (BIT(a,3)) logerror("TILT\n");
-				if (BIT(a,2)) logerror("ONC\n");
-				if (BIT(a,1)) logerror("GAME OVER\n");
-				if (BIT(a,0)) logerror("BALL IN PLAY\n");
+				if (BIT(b,3)) logerror("TILT\n");
+				if (BIT(b,2)) logerror("ONC\n");
+				if (BIT(b,1)) logerror("GAME OVER\n");
+				if (BIT(b,0)) logerror("BALL IN PLAY\n");
 				*/
-				output_set_indexed_value("led_",1,BIT(b,0)); // PLAYER 1
-				output_set_indexed_value("led_",2,BIT(b,1)); // PLAYER 2
-				output_set_indexed_value("led_",3,BIT(b,2)); // PLAYER 3
-				output_set_indexed_value("led_",4,BIT(b,3)); // PLAYER 4
+				output_set_indexed_value("led_",1,BIT(a,0)); // PLAYER 1
+				output_set_indexed_value("led_",2,BIT(a,1)); // PLAYER 2
+				output_set_indexed_value("led_",3,BIT(a,2)); // PLAYER 3
+				output_set_indexed_value("led_",4,BIT(a,3)); // PLAYER 4
 				break;
 		case 9 :
-				if (!BIT(b,0)) output_set_indexed_value("dpl_",6,hex_to_7seg[0]);
-				if (!BIT(b,1)) output_set_indexed_value("dpl_",12,hex_to_7seg[0]);
-				if (!BIT(b,2)) output_set_indexed_value("dpl_",24,hex_to_7seg[0]);
-				if (!BIT(b,3)) output_set_indexed_value("dpl_",18,hex_to_7seg[0]);
-				output_set_indexed_value("dpl_",29,hex_a);
+				if (!BIT(a,0)) output_set_indexed_value("dpl_",6, 0x3f);
+				if (!BIT(a,1)) output_set_indexed_value("dpl_",12, 0x3f);
+				if (!BIT(a,2)) output_set_indexed_value("dpl_",24, 0x3f);
+				if (!BIT(a,3)) output_set_indexed_value("dpl_",18, 0x3f);
+				output_set_indexed_value("dpl_",29,hex_b);
 				break;
 		case 10 :
-				output_set_indexed_value("dpl_",11,hex_a);
-				output_set_indexed_value("dpl_",17,hex_b);
+				output_set_indexed_value("dpl_",17,hex_a);
+				output_set_indexed_value("dpl_",11,hex_b);
 				break;
 		case 11 :
-				output_set_indexed_value("dpl_",10,hex_a);
-				output_set_indexed_value("dpl_",16,hex_b);
+				output_set_indexed_value("dpl_",16,hex_a);
+				output_set_indexed_value("dpl_",10,hex_b);
 				break;
 		case 12 :
-				output_set_indexed_value("dpl_",9,hex_a);
-				output_set_indexed_value("dpl_",15,hex_b);
+				output_set_indexed_value("dpl_",15,hex_a);
+				output_set_indexed_value("dpl_",9,hex_b);
 				break;
 		case 13 :
-				output_set_indexed_value("dpl_",8,hex_a);
-				output_set_indexed_value("dpl_",14,hex_b);
+				output_set_indexed_value("dpl_",14,hex_a);
+				output_set_indexed_value("dpl_",8,hex_b);
 				break;
 		case 14 :
-				output_set_indexed_value("dpl_",7,hex_a);
-				output_set_indexed_value("dpl_",13,hex_b);
+				output_set_indexed_value("dpl_",13,hex_a);
+				output_set_indexed_value("dpl_",7,hex_b);
 				break;
 		case 15 :
-				output_set_indexed_value("dpl_",31,hex_a);
-				output_set_indexed_value("dpl_",32,hex_b);
+				output_set_indexed_value("dpl_",32,hex_a);
+				output_set_indexed_value("dpl_",31,hex_b);
 				break;
 	}
-
-	display_block++;
-	display_block&=0x0f;
 }
 
 WRITE8_MEMBER(peyper_state::lamp_w)
@@ -205,8 +206,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( peyper_io, AS_IO, 8, peyper_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READWRITE(sw_r,disp_w)
-	AM_RANGE(0x01, 0x01) AM_WRITE(col_w)
+	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE("i8279", i8279_device, data_r, data_w )
+	AM_RANGE(0x01, 0x01) AM_DEVREADWRITE("i8279", i8279_device, status_r, cmd_w)
 	AM_RANGE(0x04, 0x04) AM_DEVWRITE("ay1", ay8910_device, address_w)
 	AM_RANGE(0x06, 0x06) AM_DEVWRITE("ay1", ay8910_device, data_w)
 	AM_RANGE(0x08, 0x08) AM_DEVWRITE("ay2", ay8910_device, address_w)
@@ -253,6 +254,46 @@ static INPUT_PORTS_START( pbsonic_generic )
 	PORT_DIPSETTING(    0x01, "0k 0k and 0k / 0k" )
 	PORT_DIPSETTING(    0x02, "0k 0k and 0k / 0k" )
 	PORT_DIPSETTING(    0x03, "0k 0k and 0k / 0k" )
+
+	PORT_START("X0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_X) PORT_NAME("Outhole")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_W)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_E)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_R)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Y)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_U)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_I)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_O)
+
+	PORT_START("X1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_A)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_S)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_D)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_F)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_G)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_H)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_J)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_K)
+
+	PORT_START("X2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Z)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_C)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_V)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_B)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_N)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_M)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_COMMA)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_STOP)
+
+	PORT_START("X3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_L)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Q)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_EQUALS)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_BACKSPACE)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_OPENBRACE)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_CLOSEBRACE)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_BACKSLASH)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_COLON)
 INPUT_PORTS_END
 
 
@@ -555,13 +596,21 @@ static MACHINE_CONFIG_START( peyper, peyper_state )
 	MCFG_FRAGMENT_ADD( genpin_audio )
 	MCFG_SPEAKER_STANDARD_MONO("ayvol")
 	MCFG_SOUND_ADD("ay1", AY8910, 2500000)
-	//MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(peyper_state, p1a_w))
-	//MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(peyper_state, p1b_w))
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(peyper_state, p1a_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(peyper_state, p1b_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "ayvol", 1.0)
 	MCFG_SOUND_ADD("ay2", AY8910, 2500000)
-	//MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(peyper_state, p2a_w))
-	//MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(peyper_state, p2b_w))
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(peyper_state, p2a_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(peyper_state, p2b_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "ayvol", 1.0)
+
+	/* Devices */
+	MCFG_DEVICE_ADD("i8279", I8279, 2500000)
+	MCFG_I8279_OUT_SL_CB(WRITE8(peyper_state, col_w))             // scan SL lines
+	MCFG_I8279_OUT_DISP_CB(WRITE8(peyper_state, disp_w))          // display A&B
+	MCFG_I8279_IN_RL_CB(READ8(peyper_state, sw_r))                // kbd RL lines
+	MCFG_I8279_IN_SHIFT_CB(VCC)                                   // Shift key
+	MCFG_I8279_IN_CTRL_CB(VCC)
 MACHINE_CONFIG_END
 
 
@@ -671,6 +720,9 @@ ROM_START(wolfman)
 	ROM_LOAD("memoriac.bin", 0x4000, 0x2000, CRC(468f16f0) SHA1(66ce0464d82331cfc0ac1f6fbd871066e4e57262))
 ROM_END
 
+/*-------------------------------------------------------------------
+/ Sir Lancelot (1994)
+/-------------------------------------------------------------------*/
 
 GAME( 1985, odin,     0,        peyper,   odin_dlx, peyper_state, peyper,   ROT0, "Sonic",  "Odin",                  GAME_IS_SKELETON_MECHANICAL)
 GAME( 1985, odin_dlx, 0,        peyper,   odin_dlx, peyper_state, peyper,   ROT0, "Sonic",  "Odin De Luxe",          GAME_IS_SKELETON_MECHANICAL)

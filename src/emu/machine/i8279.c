@@ -310,7 +310,7 @@ void i8279_device::timer_mainloop()
 					break;
 				case 2:
 					{
-						UINT8 addr = m_scanner;
+						UINT8 addr = m_scanner &7;
 
 						if (decoded)
 							for (addr=0; !BIT(m_scanner, addr); addr++);
