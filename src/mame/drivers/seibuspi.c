@@ -3798,5 +3798,5 @@ GAME( 2000, rdft22kc,   rdft2,    sys386i, sys386i,     seibuspi_state, rdft2,  
 GAME( 2000, rfjet2kc,   rfjet,    sys386i, sys386i,     seibuspi_state, rfjet,    ROT270, "Seibu Kaihatsu", "Raiden Fighters Jet 2000 (China, SYS386I)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS )
 
 /* SYS386F */
-GAME( 1999, ejsakura,   0,        sys386f, sys386f,     seibuspi_state, sys386f,  ROT0,   "Seibu Kaihatsu", "E-Jan Sakurasou (Japan, SYS386F V2.0)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1999, ejsakura12, ejsakura, sys386f, sys386f,     seibuspi_state, sys386f,  ROT0,   "Seibu Kaihatsu", "E-Jan Sakurasou (Japan, SYS386F V1.2)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1999, ejsakura,   0,        sys386f, sys386f,     seibuspi_state, sys386f,  ROT0,   "Seibu Kaihatsu", "E-Jan Sakurasou (Japan, SYS386F V2.0)", GAME_SUPPORTS_SAVE )
+GAME( 1999, ejsakura12, ejsakura, sys386f, sys386f,     seibuspi_state, sys386f,  ROT0,   "Seibu Kaihatsu", "E-Jan Sakurasou (Japan, SYS386F V1.2)", GAME_SUPPORTS_SAVE )

@@ -139,7 +139,7 @@ TI-82 ports:
     2: Memory page
     3: ON status, LCD power
     4: Video buffer width, interrupt control (write only)
-    10: Controll port for the display controller
+    10: Control port for the display controller
     11: Data port for the display controller
 
 TI-83 ports:
@@ -148,7 +148,7 @@ TI-83 ports:
     2: Memory page
     3: ON status, LCD power
     4: Video buffer width, interrupt control (write only)
-    10: Controll port for the display controller
+    10: Control port for the display controller
     11: Data port for the display controller
     14: Battery Status
 
@@ -160,7 +160,7 @@ TI-83Plus ports:
     4: Interrupt status
     6: Memory page 1
     7: Memory page 2
-    10: Controll port for the display controller
+    10: Control port for the display controller
     11: Data port for the display controller
 
 TI-85 ports:
@@ -491,8 +491,6 @@ static MACHINE_CONFIG_START( ti81, ti85_state )
 	MCFG_CPU_ADD("maincpu", Z80, 2000000)        /* 2 MHz */
 	MCFG_CPU_PROGRAM_MAP(ti81_mem)
 	MCFG_CPU_IO_MAP(ti81_io)
-	MCFG_QUANTUM_TIME(attotime::from_hz(60))
-
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", LCD)
@@ -513,7 +511,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( ti85, ti81 )
 	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK( 6000000)        /* 6 MHz */
+	MCFG_CPU_CLOCK(6000000)        /* 6 MHz */
 	MCFG_CPU_IO_MAP(ti85_io)
 
 	MCFG_MACHINE_RESET_OVERRIDE(ti85_state, ti85 )
@@ -537,7 +535,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( ti82, ti81 )
 	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK( 6000000)        /* 6 MHz */
+	MCFG_CPU_CLOCK(6000000)        /* 6 MHz */
 	MCFG_CPU_IO_MAP(ti82_io)
 
 	MCFG_MACHINE_RESET_OVERRIDE(ti85_state, ti85 )
@@ -568,7 +566,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( ti83, ti81 )
 	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK( 6000000)        /* 6 MHz */
+	MCFG_CPU_CLOCK(6000000)        /* 6 MHz */
 	MCFG_CPU_IO_MAP(ti83_io)
 
 	MCFG_MACHINE_RESET_OVERRIDE(ti85_state, ti85 )
@@ -598,7 +596,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( ti83p, ti81 )
 	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK( 6000000)        /* 8 MHz running at 6 MHz */
+	MCFG_CPU_CLOCK(6000000)        /* 8 MHz running at 6 MHz */
 	MCFG_CPU_PROGRAM_MAP(ti86_mem)
 	MCFG_CPU_IO_MAP(ti83p_io)
 
