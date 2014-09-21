@@ -192,10 +192,8 @@ void raiden2_state::machine_start()
 	save_item(NAME(cop_spr_off));
 	save_item(NAME(cop_hit_status));
 	save_item(NAME(cop_hit_baseadr));
-	save_item(NAME(cop_hit_val_x));
-	save_item(NAME(	cop_hit_val_y));
-	save_item(NAME(cop_hit_val_z));
-	save_item(NAME(cop_hit_val_unk));
+	save_item(NAME(cop_hit_val));
+	save_item(NAME(cop_hit_val_stat));
 	save_item(NAME(cop_sort_ram_addr));
 	save_item(NAME(cop_sort_lookup));
 	save_item(NAME(cop_sort_param));
@@ -209,33 +207,19 @@ void raiden2_state::machine_start()
 	save_item(NAME(cop_program));
 	save_item(NAME(sprite_prot_src_addr));
 
-//	save_pointer(NAME(cop_collision_info), sizeof(colinfo)*2); // this is illegal
-	save_item(NAME(cop_collision_info[0].x));
-	save_item(NAME(cop_collision_info[0].y));
-	save_item(NAME(cop_collision_info[0].z));
+	save_item(NAME(cop_collision_info[0].pos));
+	save_item(NAME(cop_collision_info[0].dx));
+	save_item(NAME(cop_collision_info[0].size));
+	save_item(NAME(cop_collision_info[0].spradr));
+	save_item(NAME(cop_collision_info[0].allow_swap));
+	save_item(NAME(cop_collision_info[0].flags_swap));
 
-	save_item(NAME(cop_collision_info[0].min_x));
-	save_item(NAME(cop_collision_info[0].min_y));
-	save_item(NAME(cop_collision_info[0].min_z));
-
-	save_item(NAME(cop_collision_info[0].max_x));
-	save_item(NAME(cop_collision_info[0].max_y));
-	save_item(NAME(cop_collision_info[0].max_z));
-
-	save_item(NAME(cop_collision_info[1].x));
-	save_item(NAME(cop_collision_info[1].y));
-	save_item(NAME(cop_collision_info[1].z));
-
-	save_item(NAME(cop_collision_info[1].min_x));
-	save_item(NAME(cop_collision_info[1].min_y));
-	save_item(NAME(cop_collision_info[1].min_z));
-
-	save_item(NAME(cop_collision_info[1].max_x));
-	save_item(NAME(cop_collision_info[1].max_y));
-	save_item(NAME(cop_collision_info[1].max_z));
-
-//	save_item(NAME(tile_buffer));
-//	save_item(NAME(sprite_buffer));
+	save_item(NAME(cop_collision_info[1].pos));
+	save_item(NAME(cop_collision_info[1].dx));
+	save_item(NAME(cop_collision_info[1].size));
+	save_item(NAME(cop_collision_info[1].spradr));
+	save_item(NAME(cop_collision_info[1].allow_swap));
+	save_item(NAME(cop_collision_info[1].flags_swap));
 }
 
 UINT16 raiden2_state::rps()
@@ -352,9 +336,6 @@ WRITE16_MEMBER(raiden2_state::cop_pgm_trigger_w)
 	assert(ACCESSING_BITS_0_7 && ACCESSING_BITS_8_15);
 	cop_latch_trigger = data;
 }
-
-
-
 
 WRITE16_MEMBER(raiden2_state::m_videoram_private_w)
 {
@@ -474,49 +455,42 @@ WRITE16_MEMBER(raiden2_state::cop_hitbox_baseadr_w)
 	COMBINE_DATA(&cop_hit_baseadr);
 }
 
-void raiden2_state::cop_collision_read_xy(address_space &space, int slot, UINT32 spradr)
+void raiden2_state::cop_collision_read_pos(address_space &space, int slot, UINT32 spradr, bool allow_swap)
 {
-	cop_collision_info[slot].x = space.read_dword(spradr+4);
-	cop_collision_info[slot].y = space.read_dword(spradr+8);
-	cop_collision_info[slot].z = space.read_dword(spradr+12);
+	cop_collision_info[slot].allow_swap = allow_swap;
+	cop_collision_info[slot].flags_swap = space.read_word(spradr+2);
+	cop_collision_info[slot].spradr = spradr;
+	for(int i=0; i<3; i++)
+		cop_collision_info[slot].pos[i] = space.read_word(spradr+6+4*i);
 }
 
 void raiden2_state::cop_collision_update_hitbox(address_space &space, int slot, UINT32 hitadr)
 {
 	UINT32 hitadr2 = space.read_word(hitadr) | (cop_hit_baseadr << 16);
 
-	INT8 hx = space.read_byte(hitadr2++);
-	UINT8 hw = space.read_byte(hitadr2++);
-	INT8 hy = space.read_byte(hitadr2++);
-	UINT8 hh = space.read_byte(hitadr2++);
-	INT8 hz = space.read_byte(hitadr2++);
-	UINT8 hd = space.read_byte(hitadr2++);
-
-	cop_collision_info[slot].min_x = (cop_collision_info[slot].x >> 16) + hx;
-	cop_collision_info[slot].min_y = (cop_collision_info[slot].y >> 16) + hy;
-	cop_collision_info[slot].min_z = (cop_collision_info[slot].z >> 16) + hz;
-	cop_collision_info[slot].max_x = cop_collision_info[slot].min_x + hw;
-	cop_collision_info[slot].max_y = cop_collision_info[slot].min_y + hh;
-	cop_collision_info[slot].max_z = cop_collision_info[slot].min_z + hd;
+	for(int i=0; i<3; i++) {
+		cop_collision_info[slot].dx[i] = space.read_byte(hitadr2++);
+		cop_collision_info[slot].size[i] = space.read_byte(hitadr2++);
+	}
 
 	cop_hit_status = 7;
 
-	/* outbound X check */
-	if(cop_collision_info[0].max_x >= cop_collision_info[1].min_x && cop_collision_info[0].min_x <= cop_collision_info[1].max_x)
-		cop_hit_status &= ~1;
+	for(int i=0; i<3; i++) {
+		int min[2], max[2];
+		for(int j=0; j<2; j++) {
+			min[j] = cop_collision_info[j].pos[i];
+			if(cop_collision_info[j].allow_swap && (cop_collision_info[j].flags_swap & (1 << i)))
+				min[j] -= cop_collision_info[j].dx[i];
+			else
+				min[j] += cop_collision_info[j].dx[i];
+			max[j] = min[j] + cop_collision_info[j].size[i];
+		}
+		if(max[0] >= min[1] && min[0] <= max[1])
+			cop_hit_status &= ~(1 << i);
+		cop_hit_val[i] = cop_collision_info[0].pos[i] - cop_collision_info[1].pos[i];
+	}
 
-	/* outbound Y check */
-	if(cop_collision_info[0].max_y >= cop_collision_info[1].min_y && cop_collision_info[0].min_y <= cop_collision_info[1].max_y)
-		cop_hit_status &= ~2;
-
-	/* outbound Z check */
-	if(cop_collision_info[0].max_z >= cop_collision_info[1].min_z && cop_collision_info[0].min_z <= cop_collision_info[1].max_z)
-		cop_hit_status &= ~4;
-
-	cop_hit_val_x = (cop_collision_info[0].x - cop_collision_info[1].x) >> 16;
-	cop_hit_val_y = (cop_collision_info[0].y - cop_collision_info[1].y) >> 16;
-	cop_hit_val_z = (cop_collision_info[0].z - cop_collision_info[1].z) >> 16;
-	cop_hit_val_unk = cop_hit_status; // TODO: there's also bit 2 and 3 triggered in the tests, no known meaning
+	cop_hit_val_stat = cop_hit_status ? 0xffff : 0x0000;
 }
 
 WRITE16_MEMBER(raiden2_state::cop_cmd_w)
@@ -708,21 +682,23 @@ WRITE16_MEMBER(raiden2_state::cop_cmd_w)
 
 	case 0xa100:
 	case 0xa180:
-		cop_collision_read_xy(space, 0, cop_regs[0]);
+		cop_collision_read_pos(space, 0, cop_regs[0], data & 0x0080);
 		break;
 
 	case 0xa900:
 	case 0xa980:
-		cop_collision_read_xy(space, 1, cop_regs[1]);
+		cop_collision_read_pos(space, 1, cop_regs[1], data & 0x0080);
 		break;
 
-	case 0xb100:
+	case 0xb100: {
 		cop_collision_update_hitbox(space, 0, cop_regs[2]);
 		break;
+	}
 
-	case 0xb900:
+	case 0xb900: {
 		cop_collision_update_hitbox(space, 1, cop_regs[3]);
 		break;
+	}
 
 	default:
 		logerror("pcall %04x (%04x:%04x) [%x %x %x %x]\n", data, rps(), rpc(), cop_regs[0], cop_regs[1], cop_regs[2], cop_regs[3]);
@@ -1377,24 +1353,14 @@ WRITE16_MEMBER(raiden2_state::sprite_prot_off_w)
 	cop_spr_off = data;
 }
 
-READ16_MEMBER(raiden2_state::cop_collision_status_y_r)
+READ16_MEMBER(raiden2_state::cop_collision_status_val_r)
 {
-	return cop_hit_val_y;
+	return cop_hit_val[offset];
 }
 
-READ16_MEMBER(raiden2_state::cop_collision_status_x_r)
+READ16_MEMBER(raiden2_state::cop_collision_status_stat_r)
 {
-	return cop_hit_val_x;
-}
-
-READ16_MEMBER(raiden2_state::cop_collision_status_z_r)
-{
-	return cop_hit_val_z;
-}
-
-READ16_MEMBER(raiden2_state::cop_collision_status_unk_r)
-{
-	return cop_hit_val_unk;
+	return cop_hit_val_stat;
 }
 
 WRITE16_MEMBER(raiden2_state::cop_sort_lookup_hi_w)
@@ -1503,10 +1469,8 @@ static ADDRESS_MAP_START( raiden2_cop_mem, AS_PROGRAM, 16, raiden2_state )
 	AM_RANGE(0x004c0, 0x004c9) AM_READWRITE(cop_reg_low_r, cop_reg_low_w)
 	AM_RANGE(0x00500, 0x00505) AM_WRITE(cop_cmd_w)
 	AM_RANGE(0x00580, 0x00581) AM_READ(cop_collision_status_r)
-	AM_RANGE(0x00582, 0x00583) AM_READ(cop_collision_status_y_r)
-	AM_RANGE(0x00584, 0x00585) AM_READ(cop_collision_status_x_r)
-	AM_RANGE(0x00586, 0x00587) AM_READ(cop_collision_status_z_r)
-	AM_RANGE(0x00588, 0x00589) AM_READ(cop_collision_status_unk_r)
+	AM_RANGE(0x00582, 0x00587) AM_READ(cop_collision_status_val_r)
+	AM_RANGE(0x00588, 0x00589) AM_READ(cop_collision_status_stat_r)
 	AM_RANGE(0x00590, 0x00599) AM_READ(cop_itoa_digits_r)
 	AM_RANGE(0x005b0, 0x005b1) AM_READ(cop_status_r)
 	AM_RANGE(0x005b2, 0x005b3) AM_READ(cop_dist_r)

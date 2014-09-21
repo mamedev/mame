@@ -45,10 +45,6 @@ public:
 		  cop_spr_off(0),
 		  cop_hit_status(0),
 		  cop_hit_baseadr(0),
-		  cop_hit_val_x(0),
-		  cop_hit_val_y(0),
-		  cop_hit_val_z(0),
-		  cop_hit_val_unk(0),
 		  cop_sort_ram_addr(0),
 		  cop_sort_lookup(0),
 		  cop_sort_param(0),
@@ -94,10 +90,8 @@ public:
 	DECLARE_WRITE16_MEMBER( cop_cmd_w );
 	DECLARE_READ16_MEMBER ( cop_itoa_digits_r );
 	DECLARE_READ16_MEMBER ( cop_collision_status_r );
-	DECLARE_READ16_MEMBER (cop_collision_status_y_r);
-	DECLARE_READ16_MEMBER (cop_collision_status_x_r);
-	DECLARE_READ16_MEMBER (cop_collision_status_z_r);
-	DECLARE_READ16_MEMBER (cop_collision_status_unk_r);
+	DECLARE_READ16_MEMBER (cop_collision_status_val_r);
+	DECLARE_READ16_MEMBER (cop_collision_status_stat_r);
 
 	DECLARE_READ16_MEMBER ( cop_status_r );
 	DECLARE_READ16_MEMBER ( cop_dist_r );
@@ -170,7 +164,7 @@ public:
 	DECLARE_WRITE16_MEMBER( sprite_prot_src_seg_w );
 	DECLARE_WRITE16_MEMBER( sprite_prot_src_w );
 	DECLARE_READ16_MEMBER( sprite_prot_src_seg_r );
-	DECLARE_READ16_MEMBER ( sprite_prot_dst1_r );
+	DECLARE_READ16_MEMBER( sprite_prot_dst1_r );
 	DECLARE_READ16_MEMBER( sprite_prot_maxx_r );
 	DECLARE_READ16_MEMBER( sprite_prot_off_r );
 	DECLARE_WRITE16_MEMBER( sprite_prot_dst1_w );
@@ -181,18 +175,23 @@ public:
 	UINT16 sprite_prot_src_addr[2];
 
 	struct colinfo {
-		int x, y, z;
-		int min_x, min_y, min_z, max_x, max_y, max_z;
+		INT16 pos[3];
+		INT8 dx[3];
+		UINT8 size[3];
+		bool allow_swap;
+		UINT16 flags_swap;
+		UINT32 spradr;
 	};
 
 	colinfo cop_collision_info[2];
 
 	UINT16 cop_hit_status, cop_hit_baseadr;
-	INT16 cop_hit_val_x, cop_hit_val_y, cop_hit_val_z, cop_hit_val_unk;
+	INT16 cop_hit_val[3];
+	UINT16 cop_hit_val_stat;
 
 	void draw_sprites(const rectangle &cliprect);
 
-	void cop_collision_read_xy(address_space &space, int slot, UINT32 spradr);
+	void cop_collision_read_pos(address_space &space, int slot, UINT32 spradr, bool allow_swap);
 	void cop_collision_update_hitbox(address_space &space, int slot, UINT32 hitadr);
 
 	DECLARE_WRITE16_MEMBER(cop_hitbox_baseadr_w);
