@@ -313,7 +313,7 @@ WRITE8_MEMBER( ins8250_uart_device::ins8250_w )
 			  bits 5 - 0, you could cause an interrupt if the appropriate IER bit
 			  is set.
 			*/
-			m_regs.lsr = data;
+			m_regs.lsr = (m_regs.lsr & 0x40) | (data & ~0x40);
 
 			tmp = 0;
 			tmp |= ( m_regs.lsr & 0x01 ) ? COM_INT_PENDING_RECEIVED_DATA_AVAILABLE : 0;
