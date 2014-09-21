@@ -222,6 +222,11 @@ TIMER_DEVICE_CALLBACK_MEMBER(coleco_state::paddle_update_callback)
 	}
 }
 
+READ8_MEMBER( coleco_state::cart_r )
+{
+	return m_cart->bd_r(space, offset & 0x7fff, 0, 0, 0, 0, 0);
+}
+
 void coleco_state::machine_start()
 {
 	memset(m_ram, 0xff, m_ram.bytes()); // initialize RAM
@@ -237,6 +242,9 @@ void coleco_state::machine_start()
 		m_joy_d7_state[port] = 0;
 		m_joy_analog_state[port] = 0;
 	}
+
+	if (m_cart->exists())
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0x8000, 0xffff, read8_delegate(FUNC(coleco_state::cart_r),this));
 
 	save_item(NAME(m_joy_mode));
 	save_item(NAME(m_last_nmi_state));
@@ -264,25 +272,6 @@ void coleco_state::machine_reset()
 //  return retval;
 //}
 
-DEVICE_IMAGE_LOAD_MEMBER( coleco_state,czz50_cart )
-{
-	UINT8 *ptr = memregion("maincpu")->base() + 0x8000;
-	UINT32 size;
-
-	if (image.software_entry() == NULL)
-	{
-		size = image.length();
-		if (image.fread(ptr, size) != size)
-			return IMAGE_INIT_FAIL;
-		return IMAGE_INIT_PASS;
-	}
-	else
-	{
-		memcpy(ptr, image.get_software_region("rom"), image.get_software_region_length("rom"));
-		return IMAGE_INIT_PASS;
-	}
-}
-
 
 /* Machine Drivers */
 
@@ -306,10 +295,7 @@ static MACHINE_CONFIG_START( coleco, coleco_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* cartridge */
-	MCFG_CARTSLOT_ADD("cart")
-	MCFG_CARTSLOT_EXTENSION_LIST("rom,col,bin")
-	MCFG_CARTSLOT_NOT_MANDATORY
-	MCFG_CARTSLOT_INTERFACE("coleco_cart")
+	MCFG_COLECOVISION_CARTRIDGE_SLOT_ADD(COLECOVISION_CARTRIDGE_SLOT_TAG, colecovision_cartridges, NULL)
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("cart_list","coleco")
@@ -335,10 +321,6 @@ static MACHINE_CONFIG_DERIVED( czz50, coleco )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu") // note: cpu speed unverified, assume it's the same as ColecoVision
 	MCFG_CPU_PROGRAM_MAP(czz50_map)
-
-	/* cartridge */
-	MCFG_CARTSLOT_MODIFY("cart")
-	MCFG_CARTSLOT_LOAD(coleco_state, czz50_cart)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( dina, czz50 )
@@ -364,7 +346,6 @@ ROM_START (coleco)
 	ROM_SYSTEM_BIOS( 1, "thick", "Thick characters" )
 	// differences to 0x3aa93ef3 modified characters, added a pad 2 related fix
 	ROMX_LOAD( "colecoa.rom", 0x0000, 0x2000, CRC(39bb16fc) SHA1(99ba9be24ada3e86e5c17aeecb7a2d68c5edfe59), ROM_BIOS(2) )
-	ROM_CART_LOAD("cart", 0x8000, 0x8000, ROM_NOMIRROR | ROM_OPTIONAL)
 ROM_END
 
 /*  PAL Colecovision BIOS
@@ -384,13 +365,11 @@ R72114A
 ROM_START (colecop)
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "r72114a_8317.u2", 0x0000, 0x2000, CRC(d393c0cc) SHA1(160077afb139943725c634d6539898db59f33657) )
-	ROM_CART_LOAD("cart", 0x8000, 0x8000, ROM_NOMIRROR | ROM_OPTIONAL)
 ROM_END
 
 ROM_START (svi603)
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "svi603.rom", 0x0000, 0x2000, CRC(19e91b82) SHA1(8a30abe5ffef810b0f99b86db38b1b3c9d259b78) )
-	ROM_CART_LOAD("cart", 0x8000, 0x8000, ROM_NOMIRROR | ROM_OPTIONAL)
 ROM_END
 
 ROM_START( czz50 )

@@ -41,7 +41,7 @@
 //  CONSTANTS
 //**************************************************************************
 
-#define COLECOVISION_CARTRIDGE_SLOT_TAG      "cart"
+#define COLECOVISION_CARTRIDGE_SLOT_TAG      "cartslot"
 
 
 
