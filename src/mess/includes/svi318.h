@@ -74,17 +74,9 @@ public:
 		m_ins8250_0(*this, "ins8250_0"),
 		m_ins8250_1(*this, "ins8250_1"),
 		m_cart(*this, "cartslot"),
-		m_line0(*this, "LINE0"),
-		m_line1(*this, "LINE1"),
-		m_line2(*this, "LINE2"),
-		m_line3(*this, "LINE3"),
-		m_line4(*this, "LINE4"),
-		m_line5(*this, "LINE5"),
-		m_line6(*this, "LINE6"),
-		m_line7(*this, "LINE7"),
-		m_line8(*this, "LINE8"),
-		m_line9(*this, "LINE9"),
-		m_line10(*this, "LINE10"),
+		m_fd1793(*this, "wd179x"),
+		m_crtc(*this, "crtc"),
+		m_line(*this, "LINE"),
 		m_joysticks(*this, "JOYSTICKS"),
 		m_buttons(*this, "BUTTONS"),
 		m_palette(*this, "palette")  { }
@@ -92,19 +84,19 @@ public:
 	SVI_318 m_svi;
 	int m_centronics_busy;
 	SVI318_FDC_STRUCT m_fdc;
-	DECLARE_WRITE8_MEMBER(svi318_ppi_w);
-	DECLARE_READ8_MEMBER(svi318_psg_port_a_r);
-	DECLARE_WRITE8_MEMBER(svi318_psg_port_b_w);
-	DECLARE_WRITE8_MEMBER(svi318_fdc_drive_motor_w);
-	DECLARE_WRITE8_MEMBER(svi318_fdc_density_side_w);
-	DECLARE_READ8_MEMBER(svi318_fdc_irqdrq_r);
+	DECLARE_WRITE8_MEMBER(ppi_w);
+	DECLARE_READ8_MEMBER(psg_port_a_r);
+	DECLARE_WRITE8_MEMBER(psg_port_b_w);
+	DECLARE_WRITE8_MEMBER(fdc_drive_motor_w);
+	DECLARE_WRITE8_MEMBER(fdc_density_side_w);
+	DECLARE_READ8_MEMBER(fdc_irqdrq_r);
 	DECLARE_WRITE8_MEMBER(svi806_ram_enable_w);
-	DECLARE_WRITE8_MEMBER(svi318_writemem1);
-	DECLARE_WRITE8_MEMBER(svi318_writemem2);
-	DECLARE_WRITE8_MEMBER(svi318_writemem3);
-	DECLARE_WRITE8_MEMBER(svi318_writemem4);
-	DECLARE_READ8_MEMBER(svi318_io_ext_r);
-	DECLARE_WRITE8_MEMBER(svi318_io_ext_w);
+	DECLARE_WRITE8_MEMBER(writemem1);
+	DECLARE_WRITE8_MEMBER(writemem2);
+	DECLARE_WRITE8_MEMBER(writemem3);
+	DECLARE_WRITE8_MEMBER(writemem4);
+	DECLARE_READ8_MEMBER(io_ext_r);
+	DECLARE_WRITE8_MEMBER(io_ext_w);
 	DECLARE_DRIVER_INIT(svi318);
 	DECLARE_MACHINE_START(svi318_pal);
 	DECLARE_MACHINE_RESET(svi318);
@@ -112,12 +104,12 @@ public:
 	DECLARE_VIDEO_START(svi328_806);
 	DECLARE_MACHINE_START(svi318_ntsc);
 	DECLARE_WRITE_LINE_MEMBER(vdp_interrupt);
-	DECLARE_WRITE_LINE_MEMBER(svi318_ins8250_interrupt);
-	DECLARE_READ8_MEMBER(svi318_ppi_port_a_r);
-	DECLARE_READ8_MEMBER(svi318_ppi_port_b_r);
-	DECLARE_WRITE8_MEMBER(svi318_ppi_port_c_w);
-	DECLARE_WRITE_LINE_MEMBER(svi_fdc_intrq_w);
-	DECLARE_WRITE_LINE_MEMBER(svi_fdc_drq_w);
+	DECLARE_WRITE_LINE_MEMBER(ins8250_interrupt);
+	DECLARE_READ8_MEMBER(ppi_port_a_r);
+	DECLARE_READ8_MEMBER(ppi_port_b_r);
+	DECLARE_WRITE8_MEMBER(ppi_port_c_w);
+	DECLARE_WRITE_LINE_MEMBER(fdc_intrq_w);
+	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
 	bool cart_verify(UINT8 *ROM);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(svi318_cart);
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
@@ -136,17 +128,9 @@ protected:
 	required_device<ins8250_device> m_ins8250_0;
 	required_device<ins8250_device> m_ins8250_1;
 	required_device<generic_slot_device> m_cart;
-	required_ioport m_line0;
-	required_ioport m_line1;
-	required_ioport m_line2;
-	required_ioport m_line3;
-	required_ioport m_line4;
-	required_ioport m_line5;
-	required_ioport m_line6;
-	required_ioport m_line7;
-	required_ioport m_line8;
-	required_ioport m_line9;
-	required_ioport m_line10;
+	required_device<fd1793_device> m_fd1793;
+	optional_device<mc6845_device> m_crtc;
+	required_ioport_array<11> m_line;
 	required_ioport m_joysticks;
 	required_ioport m_buttons;
 public:
