@@ -197,7 +197,7 @@ void generic_slot_device::get_default_card_software(astring &result)
 UINT32 generic_slot_device::common_get_size(const char *region)
 {
 	// if we are loading from softlist, you have to specify a region
-	assert((software_entry() != NULL) && !region);
+	assert((software_entry() == NULL) || (region != NULL));
 
 	return (software_entry() == NULL) ? length() : get_software_region_length(region);
 }
