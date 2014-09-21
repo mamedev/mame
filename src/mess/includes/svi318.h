@@ -26,39 +26,6 @@
 #include "bus/generic/carts.h"
 
 
-struct SVI_318
-{
-	/* general */
-	UINT8   svi318;     /* Are we dealing with an SVI-318 or a SVI-328 model. 0 = 328, 1 = 318 */
-	/* memory */
-	UINT8   *empty_bank;
-	UINT8   bank_switch;
-	UINT8   bankLow;
-	UINT8   bankHigh1;
-	UINT8   *bankLow_ptr;
-	UINT8   bankLow_read_only;
-	UINT8   *bankHigh1_ptr;
-	UINT8   bankHigh1_read_only;
-	UINT8   *bankHigh2_ptr;
-	UINT8   bankHigh2_read_only;
-	/* keyboard */
-	UINT8   keyboard_row;
-	/* SVI-806 80 column card */
-	UINT8   svi806_present;
-	UINT8   svi806_ram_enabled;
-	memory_region   *svi806_ram;
-	UINT8   *svi806_gfx;
-};
-
-struct SVI318_FDC_STRUCT
-{
-	UINT8 driveselect;
-	int drq;
-	int irq;
-	UINT8 heads[2];
-};
-
-
 class svi318_state : public driver_device
 {
 public:
@@ -79,11 +46,19 @@ public:
 		m_line(*this, "LINE"),
 		m_joysticks(*this, "JOYSTICKS"),
 		m_buttons(*this, "BUTTONS"),
-		m_palette(*this, "palette")  { }
+		m_palette(*this, "palette"),
+		m_bank1(*this, "bank1"),
+		m_bank2(*this, "bank2"),
+		m_bank3(*this, "bank3"),
+		m_bank4(*this, "bank4")
+	{ }
+	
+	// FDC
+	UINT8 m_driveselect;
+	int m_drq;
+	int m_irq;
+	UINT8 m_heads[2];
 
-	SVI_318 m_svi;
-	int m_centronics_busy;
-	SVI318_FDC_STRUCT m_fdc;
 	DECLARE_WRITE8_MEMBER(ppi_w);
 	DECLARE_READ8_MEMBER(psg_port_a_r);
 	DECLARE_WRITE8_MEMBER(psg_port_b_w);
@@ -116,9 +91,10 @@ public:
 
 	MC6845_UPDATE_ROW(crtc_update_row);
 	memory_region *m_cart_rom;
+	memory_region *m_bios_rom;
 	
-	required_device<z80_device> m_maincpu;
 protected:
+	required_device<z80_device> m_maincpu;
 	required_device<cassette_image_device> m_cassette;
 	required_device<dac_device> m_dac;
 	required_device<i8255_device> m_ppi;
@@ -133,12 +109,45 @@ protected:
 	required_ioport_array<11> m_line;
 	required_ioport m_joysticks;
 	required_ioport m_buttons;
-public:
 	optional_device<palette_device> m_palette;
+
 protected:
 	void svi318_set_banks();
 	void svi318_80col_init();
 	void svi318_vdp_interrupt(int i);
+
+private:
+	
+	// memory banking
+	UINT8   m_bank_switch;
+	UINT8   m_bank_low;
+	UINT8   m_bank_high;
+	
+	UINT8   m_bank_low_read_only;
+	UINT8   m_bank_high1_read_only;
+	UINT8   m_bank_high2_read_only;
+	
+	UINT8   *m_empty_bank;
+	UINT8   *m_bank_low_ptr;
+	UINT8   *m_bank_high1_ptr;
+	UINT8   *m_bank_high2_ptr;
+	
+	// keyboard
+	UINT8   m_keyboard_row;
+	
+	// centronics
+	int m_centronics_busy;
+	
+	// SVI-806 80 column card
+	UINT8   m_svi806_present;
+	UINT8   m_svi806_ram_enabled;
+	memory_region   *m_svi806_ram;
+	UINT8   *m_svi806_gfx;
+
+	required_memory_bank m_bank1;
+	required_memory_bank m_bank2;
+	required_memory_bank m_bank3;
+	optional_memory_bank m_bank4;
 };
 
 #endif /* SVI318_H_ */
