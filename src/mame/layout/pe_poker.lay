@@ -134,7 +134,7 @@
 			<bounds left="0" top="0" right="340" bottom="310" />
 		</bezel>
 		<!-- specific bezels to a kind of machine -->
-		<bezel name="pe_bnkb3" element="hold" inputtag="IN_BANK1" inputmask="0x04">
+		<bezel name="pe_bnkb0" element="hold" inputtag="IN_BANK1" inputmask="0x04">
 			<bounds x="12" y="250" width="60" height="20" />
 		</bezel>
 		<bezel name="pe_bnkb0" element="hold" inputtag="IN_BANK1" inputmask="0x08">
@@ -146,7 +146,7 @@
 		<bezel name="pe_bnkb0" element="hold" inputtag="IN_BANK1" inputmask="0x20">
 			<bounds x="204" y="250" width="60" height="20" />
 		</bezel>
-		<bezel name="pe_bnkb7" element="hold" inputtag="IN_BANK1" inputmask="0x40">
+		<bezel name="pe_bnkb0" element="hold" inputtag="IN_BANK1" inputmask="0x40">
 			<bounds x="268" y="250" width="60" height="20" />
 		</bezel>
 		<!-- shared bezels by all kinds of machine -->

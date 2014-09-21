@@ -1411,6 +1411,28 @@ ROM_START( peset038 ) /* Normal board : Set Chip (Set038) */
 	ROM_LOAD( "cap740.u50", 0x0000, 0x0100, CRC(6fe619c4) SHA1(49e43dafd010ce0fe9b2a63b96a4ddedcb933c6d) ) /* BPROM type DM74LS471 (compatible with N82S135N) verified */
 ROM_END
 
+ROM_START( pepk1024 ) /* Normal (non-plus) board : Aces and Faces (PK1024) */
+/*
+                                      2-10 J-A
+PayTable   Js+  2PR  3K   STR  FL  FH  4K  4K  SF  RF  (Bonus)
+--------------------------------------------------------------
+  ????      1    2    3    4    5   8  25  50  50 250    800
+     Programs Available: PK1024
+*/
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "pk1024-pc095.u58",   0x00000, 0x8000, CRC(c0b6d093) SHA1(80f7dbd9dff52cd4e31a5243026814aa9edb98df) ) /* Game Version: PC095 */
+	ROM_RELOAD(                     0x08000, 0x8000) /* 32K version build for the original PE boards (non-plus) */
+
+	ROM_REGION( 0x020000, "gfx1", 0 )
+	ROM_LOAD( "mr0-cg745.u52",   0x00000, 0x4000, CRC(f8aee592) SHA1(fc5fb03698df24ebcf41ccfbce3a8fdd03ac9368) )
+	ROM_LOAD( "mg0-cg745.u53",   0x08000, 0x4000, CRC(cdf88a59) SHA1(9ab32b7b8bbdf35ee5a45cd58d9a341555b03ee0) )
+	ROM_LOAD( "mb0-cg745.u54",   0x10000, 0x4000, CRC(3fad0bc0) SHA1(3c8409c004bb40d7be6e5cbdd02b3fa3b5800342) )
+	ROM_LOAD( "mx0-cg745.u55",   0x18000, 0x4000, CRC(a8cf2a59) SHA1(de623a95237f28827710a86ae86c52106b55b349) )
+
+	ROM_REGION( 0x100, "proms", 0 )
+	ROM_LOAD( "cap740.u37", 0x0000, 0x0100, CRC(6fe619c4) SHA1(49e43dafd010ce0fe9b2a63b96a4ddedcb933c6d) ) /* BPROM type DM74LS471 (compatible with N82S135N) verified */
+ROM_END
+
 ROM_START( pepp0002 ) /* Normal board : Standard Draw Poker (PP0002) */
 /*
 PayTable   Js+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
@@ -8651,6 +8673,9 @@ ROM_END
 /* Set chips */
 GAMEL(1987, peset001, 0,      peplus,  peplus_schip, peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (Set001) Set Chip",                      0,   layout_pe_schip )
 GAMEL(1987, peset038, 0,      peplus,  peplus_schip, peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (Set038) Set Chip",                      0,   layout_pe_schip )
+
+/* Normal (non-plus) board : Poker */
+GAMEL(1987, pepk1024,  0,        peplus,  peplus_poker, peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge (PK1024) Aces and Faces Poker",              0, layout_pe_poker )
 
 /* Normal board : Poker */
 GAMEL(1987, pepp0002,  0,        peplus,  peplus_poker, peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PP0002) Standard Draw Poker",           0, layout_pe_poker )
