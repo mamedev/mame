@@ -1376,7 +1376,8 @@ public:
 		m_p2(*this, "P2"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
-		m_generic_paletteram_32(*this, "paletteram")
+		m_generic_paletteram_32(*this, "paletteram"),
+		m_adc_inp(*this, "ADC")
 	{ }
 
 	required_device<mips3_device> m_maincpu;
@@ -1401,6 +1402,7 @@ public:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	required_shared_ptr<UINT32> m_generic_paletteram_32;
+	optional_ioport_array<4> m_adc_inp;
 
 	c404_t m_c404;
 	c361_t m_c361;
@@ -2960,8 +2962,7 @@ WRITE16_MEMBER(namcos23_state::iob_p6_w)
 
 READ16_MEMBER(namcos23_state::iob_analog_r)
 {
-	static const char *const portnames[] = { "ADC0", "ADC1", "ADC2", "ADC3" };
-	return ioport(portnames[offset >> 1 & 3])->read_safe(0);
+	return m_adc_inp[offset & 3]->read_safe(0);
 }
 
 
@@ -3106,13 +3107,13 @@ static INPUT_PORTS_START( rapidrvrp )
 	PORT_SERVICE_DIPLOC(0x80, IP_ACTIVE_LOW, "DIP:1" ) PORT_NAME("User Service Mode")
 
 #if 0 // need to hook these up properly
-	PORT_START("ADC0")
+	PORT_START("ADC.0")
 	PORT_BIT( 0xffff, 0x8000, IPT_PADDLE ) PORT_SENSITIVITY(100) PORT_KEYDELTA(100) PORT_NAME("ADC0") // rear r
-	PORT_START("ADC1")
+	PORT_START("ADC.1")
 	PORT_BIT( 0xffff, 0x8000, IPT_PADDLE ) PORT_SENSITIVITY(100) PORT_KEYDELTA(100) PORT_NAME("ADC1") // rear l
-	PORT_START("ADC2")
+	PORT_START("ADC.2")
 	PORT_BIT( 0xffff, 0x8000, IPT_PADDLE ) PORT_SENSITIVITY(100) PORT_KEYDELTA(100) PORT_NAME("ADC2") // front r
-	PORT_START("ADC3")
+	PORT_START("ADC.3")
 	PORT_BIT( 0xffff, 0x8000, IPT_PADDLE ) PORT_SENSITIVITY(100) PORT_KEYDELTA(100) PORT_NAME("ADC3") // front l
 #endif
 INPUT_PORTS_END
@@ -3126,13 +3127,13 @@ static INPUT_PORTS_START( finfurl )
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
 
 #if 0 // need to hook these up properly
-	PORT_START("ADC0")
+	PORT_START("ADC.0")
 	PORT_BIT( 0xffff, 0x8000, IPT_PADDLE ) PORT_SENSITIVITY(100) PORT_KEYDELTA(100) PORT_NAME("ADC0")
-	PORT_START("ADC1")
+	PORT_START("ADC.1")
 	PORT_BIT( 0xffff, 0x8000, IPT_PADDLE ) PORT_SENSITIVITY(100) PORT_KEYDELTA(100) PORT_NAME("ADC1")
-	PORT_START("ADC2")
+	PORT_START("ADC.2")
 	PORT_BIT( 0xffff, 0x8000, IPT_PADDLE ) PORT_SENSITIVITY(100) PORT_KEYDELTA(100) PORT_NAME("ADC2")
-	PORT_START("ADC3")
+	PORT_START("ADC.3")
 	PORT_BIT( 0xffff, 0x8000, IPT_PADDLE ) PORT_SENSITIVITY(100) PORT_KEYDELTA(100) PORT_NAME("ADC3")
 #endif
 INPUT_PORTS_END
