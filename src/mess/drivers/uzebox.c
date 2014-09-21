@@ -297,19 +297,14 @@ DEVICE_IMAGE_LOAD_MEMBER(uzebox_state, uzebox_cart)
 * Machine definition                                 *
 \****************************************************/
 
-const avr8_config atmega644_config =
-{
-	"eeprom"
-};
-
 static MACHINE_CONFIG_START( uzebox, uzebox_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", ATMEGA644, MASTER_CLOCK)
-	MCFG_CPU_AVR8_CONFIG(atmega644_config)
 	MCFG_CPU_PROGRAM_MAP(uzebox_prg_map)
 	MCFG_CPU_DATA_MAP(uzebox_data_map)
 	MCFG_CPU_IO_MAP(uzebox_io_map)
+	MCFG_CPU_AVR8_EEPROM("eeprom")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

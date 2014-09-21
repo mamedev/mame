@@ -604,11 +604,6 @@ void replicator_state::machine_reset()
 	m_port_l = 0;
 }
 
-const avr8_config atmega1280_config =
-{
-	"eeprom"
-};
-
 PALETTE_INIT_MEMBER(replicator_state, replicator)
 {
 //These colors were picked with the color picker in Inkscape, based on a photo of the LCD used in the Replicator 1 3d printer:
@@ -634,11 +629,11 @@ GFXDECODE_END
 static MACHINE_CONFIG_START( replicator, replicator_state )
 
 	MCFG_CPU_ADD("maincpu", ATMEGA1280, MASTER_CLOCK)
-	MCFG_CPU_AVR8_CONFIG(atmega1280_config)
 	MCFG_CPU_PROGRAM_MAP(replicator_prg_map)
 	MCFG_CPU_DATA_MAP(replicator_data_map)
 	MCFG_CPU_IO_MAP(replicator_io_map)
 
+	MCFG_CPU_AVR8_EEPROM("eeprom")
 	MCFG_CPU_AVR8_LFUSE(0xFF)
 	MCFG_CPU_AVR8_HFUSE(0xDA)
 	MCFG_CPU_AVR8_EFUSE(0xF4)

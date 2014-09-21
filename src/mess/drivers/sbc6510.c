@@ -260,11 +260,6 @@ WRITE8_MEMBER( sbc6510_state::key_w )
 	m_key_row = data;
 }
 
-const avr8_config atmega88_config =
-{
-	"eeprom"
-};
-
 static const gfx_layout charset_8x16 =
 {
 	8, 9,
@@ -289,10 +284,10 @@ static MACHINE_CONFIG_START( sbc6510, sbc6510_state )
 
 	MCFG_CPU_ADD("videocpu",ATMEGA88, XTAL_16MHz)
 //  MCFG_DEVICE_DISABLE() // trips SLEEP opcode, needs to be emulated
-	MCFG_CPU_AVR8_CONFIG(atmega88_config)
 	MCFG_CPU_PROGRAM_MAP(sbc6510_video_mem)
 	MCFG_CPU_DATA_MAP(sbc6510_video_data)
 	MCFG_CPU_IO_MAP(sbc6510_video_io)
+	MCFG_CPU_AVR8_EEPROM("eeprom")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", TERMINAL_TAG":palette", sbc6510)
 

@@ -40,12 +40,6 @@
 #ifndef __AVR8_H__
 #define __AVR8_H__
 
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_CPU_AVR8_CONFIG(_config) \
-	avr8_device::static_set_config(*device, _config);
 
 //**************************************************************************
 //  FUSE BITS CONFIGURATION MACROS
@@ -64,31 +58,30 @@
 	((avr8_device*) device)->set_lock_bits(byte);
 
 //**************************************************************************
+//  INTERFACE CONFIGURATION MACROS
+//**************************************************************************
+
+#define MCFG_CPU_AVR8_EEPROM(_tag) \
+	avr8_device::set_eeprom_tag(*device, _tag);
+
+
+//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
 class avr8_device;
 
-// ======================> avr8_config
-
-struct avr8_config
-{
-	const char *eeprom_region;
-};
-
-
 // ======================> avr8_device
 
 // Used by core CPU interface
-class avr8_device : public cpu_device,
-					public avr8_config
+class avr8_device : public cpu_device
 {
 public:
 	// construction/destruction
 	avr8_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock, const device_type type, UINT32 address_mask);
 
 	// inline configuration helpers
-	static void static_set_config(device_t &device, const avr8_config &config);
+	static void set_eeprom_tag(device_t &device, const char *tag) { downcast<avr8_device &>(device).m_eeprom_tag = tag; }
 
 	// fuse configs
 	void set_low_fuses(UINT8 byte);
@@ -145,6 +138,7 @@ protected:
 	const address_space_config m_program_config;
 	const address_space_config m_data_config;
 	const address_space_config m_io_config;
+	const char *m_eeprom_tag;
 	UINT8 *m_eeprom;
 
 	// bootloader

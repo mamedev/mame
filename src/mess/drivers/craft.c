@@ -234,19 +234,14 @@ void craft_state::machine_reset()
 	m_last_cycles = 0;
 }
 
-const avr8_config atmega88_config =
-{
-	"eeprom"
-};
-
 static MACHINE_CONFIG_START( craft, craft_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", ATMEGA88, MASTER_CLOCK)
-	MCFG_CPU_AVR8_CONFIG(atmega88_config)
 	MCFG_CPU_PROGRAM_MAP(craft_prg_map)
 	MCFG_CPU_DATA_MAP(craft_data_map)
 	MCFG_CPU_IO_MAP(craft_io_map)
+	MCFG_CPU_AVR8_EEPROM("eeprom")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
