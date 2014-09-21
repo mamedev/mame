@@ -29,6 +29,7 @@ public:
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read_rom);
 	virtual DECLARE_READ16_MEMBER(read16_rom);
+	virtual DECLARE_READ32_MEMBER(read32_rom);
 };
 
 
@@ -43,6 +44,7 @@ public:
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read_rom);
 	virtual DECLARE_READ16_MEMBER(read16_rom);
+	virtual DECLARE_READ32_MEMBER(read32_rom);
 };
 
 

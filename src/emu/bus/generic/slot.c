@@ -246,6 +246,18 @@ READ16_MEMBER(generic_slot_device::read16_rom)
 }
 
 /*-------------------------------------------------
+ read32_rom
+ -------------------------------------------------*/
+
+READ32_MEMBER(generic_slot_device::read32_rom)
+{
+	if (m_cart)
+		return m_cart->read32_rom(space, offset, mem_mask);
+	else
+		return 0xffffffff;
+}
+
+/*-------------------------------------------------
  read_ram
  -------------------------------------------------*/
 

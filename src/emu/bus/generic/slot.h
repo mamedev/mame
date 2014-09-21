@@ -18,6 +18,7 @@ public:
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read_rom) { return 0xff; }
 	virtual DECLARE_READ16_MEMBER(read16_rom) { return 0xffff; }
+	virtual DECLARE_READ32_MEMBER(read32_rom) { return 0xffffffff; }
 
 	virtual DECLARE_READ8_MEMBER(read_ram) { return 0xff; }
 	virtual DECLARE_WRITE8_MEMBER(write_ram) {};
@@ -41,7 +42,8 @@ public:
 enum
 {
 	GENERIC_ROM8_WIDTH = 1,
-	GENERIC_ROM16_WIDTH
+	GENERIC_ROM16_WIDTH = 2,
+	GENERIC_ROM32_WIDTH = 4
 };
 
 #define GENERIC_ROM_REGION_TAG ":cart:rom"
@@ -120,6 +122,7 @@ public:
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read_rom);
 	virtual DECLARE_READ16_MEMBER(read16_rom);
+	virtual DECLARE_READ32_MEMBER(read32_rom);
 
 	virtual DECLARE_READ8_MEMBER(read_ram);
 	virtual DECLARE_WRITE8_MEMBER(write_ram);

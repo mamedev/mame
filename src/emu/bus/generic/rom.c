@@ -10,7 +10,6 @@
 
  TODO:
    - possibly support linear mapping when non-power of 2 ROMs are mapped
-   - add support for 32bit ROM access
  
  ***********************************************************************************************************/
 
@@ -64,6 +63,15 @@ READ16_MEMBER(generic_rom_plain_device::read16_rom)
 		return 0xffff;
 }
 
+READ32_MEMBER(generic_rom_plain_device::read32_rom)
+{
+	UINT32 *ROM = (UINT32 *)m_rom;
+	if (offset < m_rom_size/4)
+		return ROM[offset];
+	else
+		return 0xffffffff;
+}
+
 
 READ8_MEMBER(generic_rom_linear_device::read_rom)
 {
@@ -74,5 +82,11 @@ READ16_MEMBER(generic_rom_linear_device::read16_rom)
 {
 	UINT16 *ROM = (UINT16 *)m_rom;
 	return ROM[offset % (m_rom_size/2)];
+}
+
+READ32_MEMBER(generic_rom_linear_device::read32_rom)
+{
+	UINT32 *ROM = (UINT32 *)m_rom;
+	return ROM[offset % (m_rom_size/4)];
 }
 

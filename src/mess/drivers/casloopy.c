@@ -150,7 +150,8 @@ PCB 'Z545-1 A240570-1'
 #include "emu.h"
 #include "cpu/sh2/sh2.h"
 //#include "cpu/v60/v60.h"
-#include "imagedev/cartslot.h"
+#include "bus/generic/slot.h"
+#include "bus/generic/carts.h"
 
 
 class casloopy_state : public driver_device
@@ -161,11 +162,17 @@ public:
 		m_bios_rom(*this, "bios_rom"),
 		m_vregs(*this, "vregs"),
 		m_maincpu(*this, "maincpu"),
+		m_cart(*this, "cartslot"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette")  { }
 
 	required_shared_ptr<UINT32> m_bios_rom;
 	required_shared_ptr<UINT32> m_vregs;
+	required_device<cpu_device> m_maincpu;
+	required_device<generic_slot_device> m_cart;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+
 	UINT16 *m_paletteram;
 	UINT8 *m_vram;
 	UINT8 *m_bitmap_vram;
@@ -176,19 +183,18 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	UINT32 screen_update_casloopy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_READ16_MEMBER(casloopy_vregs_r);
-	DECLARE_WRITE16_MEMBER(casloopy_vregs_w);
-	DECLARE_READ16_MEMBER(casloopy_pal_r);
-	DECLARE_WRITE16_MEMBER(casloopy_pal_w);
-	DECLARE_READ8_MEMBER(casloopy_vram_r);
-	DECLARE_WRITE8_MEMBER(casloopy_vram_w);
+	DECLARE_READ16_MEMBER(vregs_r);
+	DECLARE_WRITE16_MEMBER(vregs_w);
+	DECLARE_READ16_MEMBER(pal_r);
+	DECLARE_WRITE16_MEMBER(pal_w);
+	DECLARE_READ8_MEMBER(vram_r);
+	DECLARE_WRITE8_MEMBER(vram_w);
+	DECLARE_READ32_MEMBER(cart_r);
 	DECLARE_READ16_MEMBER(sh7021_r);
 	DECLARE_WRITE16_MEMBER(sh7021_w);
-	DECLARE_READ8_MEMBER(casloopy_bitmap_r);
-	DECLARE_WRITE8_MEMBER(casloopy_bitmap_w);
-	required_device<cpu_device> m_maincpu;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
+	DECLARE_READ8_MEMBER(bitmap_r);
+	DECLARE_WRITE8_MEMBER(bitmap_w);
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(loopy_cart);
 };
 
 
@@ -292,7 +298,7 @@ UINT32 casloopy_state::screen_update_casloopy(screen_device &screen, bitmap_ind1
 	return 0;
 }
 
-READ16_MEMBER(casloopy_state::casloopy_vregs_r)
+READ16_MEMBER(casloopy_state::vregs_r)
 {
 	if(offset == 4/2)
 	{
@@ -310,18 +316,18 @@ READ16_MEMBER(casloopy_state::casloopy_vregs_r)
 	return 0xffff;
 }
 
-WRITE16_MEMBER(casloopy_state::casloopy_vregs_w)
+WRITE16_MEMBER(casloopy_state::vregs_w)
 {
 	if(offset != 6/2)
 		printf("%08x %08x\n",offset*2,data);
 }
 
-READ16_MEMBER(casloopy_state::casloopy_pal_r)
+READ16_MEMBER(casloopy_state::pal_r)
 {
 	return m_paletteram[offset];
 }
 
-WRITE16_MEMBER(casloopy_state::casloopy_pal_w)
+WRITE16_MEMBER(casloopy_state::pal_w)
 {
 	int r,g,b;
 	COMBINE_DATA(&m_paletteram[offset]);
@@ -333,12 +339,12 @@ WRITE16_MEMBER(casloopy_state::casloopy_pal_w)
 	m_palette->set_pen_color(offset, pal5bit(r), pal5bit(g), pal5bit(b));
 }
 
-READ8_MEMBER(casloopy_state::casloopy_vram_r)
+READ8_MEMBER(casloopy_state::vram_r)
 {
 	return m_vram[offset];
 }
 
-WRITE8_MEMBER(casloopy_state::casloopy_vram_w)
+WRITE8_MEMBER(casloopy_state::vram_w)
 {
 	m_vram[offset] = data;
 
@@ -387,31 +393,37 @@ WRITE16_MEMBER(casloopy_state::sh7021_w)
 //  printf("%08x %04x\n",sh7021_regs[offset],0x05ffff00+offset*2);
 }
 
-READ8_MEMBER(casloopy_state::casloopy_bitmap_r)
+READ8_MEMBER(casloopy_state::bitmap_r)
 {
 	return m_bitmap_vram[offset];
 }
 
-WRITE8_MEMBER(casloopy_state::casloopy_bitmap_w)
+WRITE8_MEMBER(casloopy_state::bitmap_w)
 {
 	m_bitmap_vram[offset] = data;
 }
 
+READ32_MEMBER(casloopy_state::cart_r)
+{
+	return m_cart->read32_rom(space, offset, mem_mask);
+}
+
+
 static ADDRESS_MAP_START( casloopy_map, AS_PROGRAM, 32, casloopy_state )
 	AM_RANGE(0x00000000, 0x00007fff) AM_RAM AM_SHARE("bios_rom")
 	AM_RANGE(0x01000000, 0x0107ffff) AM_RAM AM_SHARE("wram")// stack pointer points here
-	AM_RANGE(0x04000000, 0x0401ffff) AM_READWRITE8(casloopy_bitmap_r,casloopy_bitmap_w,0xffffffff)
-	AM_RANGE(0x04040000, 0x0404ffff) AM_READWRITE8(casloopy_vram_r,casloopy_vram_w,0xffffffff) // tilemap + PCG
+	AM_RANGE(0x04000000, 0x0401ffff) AM_READWRITE8(bitmap_r, bitmap_w, 0xffffffff)
+	AM_RANGE(0x04040000, 0x0404ffff) AM_READWRITE8(vram_r, vram_w, 0xffffffff) // tilemap + PCG
 	AM_RANGE(0x04050000, 0x040503ff) AM_RAM // ???
-	AM_RANGE(0x04051000, 0x040511ff) AM_READWRITE16(casloopy_pal_r,casloopy_pal_w,0xffffffff)
-	AM_RANGE(0x04058000, 0x04058007) AM_READWRITE16(casloopy_vregs_r,casloopy_vregs_w,0xffffffff)
+	AM_RANGE(0x04051000, 0x040511ff) AM_READWRITE16(pal_r, pal_w, 0xffffffff)
+	AM_RANGE(0x04058000, 0x04058007) AM_READWRITE16(vregs_r, vregs_w, 0xffffffff)
 	AM_RANGE(0x0405b000, 0x0405b00f) AM_RAM AM_SHARE("vregs") // RGB555 brightness control plus scrolling
-	AM_RANGE(0x05ffff00, 0x05ffffff) AM_READWRITE16(sh7021_r,sh7021_w,0xffffffff)
+	AM_RANGE(0x05ffff00, 0x05ffffff) AM_READWRITE16(sh7021_r, sh7021_w, 0xffffffff)
 //  AM_RANGE(0x05ffff00, 0x05ffffff) - SH7021 internal i/o
-	AM_RANGE(0x06000000, 0x061fffff) AM_ROM AM_REGION("rom_cart",0)
+	AM_RANGE(0x06000000, 0x061fffff) AM_READ(cart_r)
 	AM_RANGE(0x07000000, 0x070003ff) AM_RAM AM_SHARE("oram")// on-chip RAM, actually at 0xf000000 (1 kb)
 	AM_RANGE(0x09000000, 0x0907ffff) AM_RAM AM_SHARE("wram")
-	AM_RANGE(0x0e000000, 0x0e1fffff) AM_ROM AM_REGION("rom_cart",0)
+	AM_RANGE(0x0e000000, 0x0e1fffff) AM_READ(cart_r)
 	AM_RANGE(0x0f000000, 0x0f0003ff) AM_RAM AM_SHARE("oram")
 ADDRESS_MAP_END
 
@@ -424,22 +436,8 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( casloopy )
 INPUT_PORTS_END
 
-/* TODO: move this into DEVICE_IMAGE_LOAD_MEMBER */
 void casloopy_state::machine_start()
 {
-	UINT8 *SRC = memregion("cart")->base();
-	UINT8 *DST = memregion("rom_cart")->base();
-
-	// fix endianness
-	for (int i=0;i<0x200000;i+=4)
-	{
-		UINT8 tempa = SRC[i+0];
-		UINT8 tempb = SRC[i+1];
-		DST[i+0] = SRC[i+2];
-		DST[i+1] = SRC[i+3];
-		DST[i+2] = tempa;
-		DST[i+3] = tempb;
-	}
 }
 
 void casloopy_state::machine_reset()
@@ -474,7 +472,32 @@ static const gfx_layout casloopy_8bpp_layoutROM =
 #endif
 
 
+DEVICE_IMAGE_LOAD_MEMBER( casloopy_state, loopy_cart )
+{
+	UINT32 size = m_cart->common_get_size("rom");
+	UINT8 *SRC, *DST;
+	dynamic_buffer temp;
+	temp.resize(0x200000);
+	
+	m_cart->rom_alloc(size, GENERIC_ROM32_WIDTH);
 
+	SRC = temp;
+	DST = m_cart->get_rom_base();
+	m_cart->common_load_rom(temp, size, "rom");			
+	
+	// fix endianness
+	for (int i = 0; i < 0x200000; i += 4)
+	{
+		UINT8 tempa = SRC[i + 0];
+		UINT8 tempb = SRC[i + 1];
+		DST[i + 0] = SRC[i + 2];
+		DST[i + 1] = SRC[i + 3];
+		DST[i + 2] = tempa;
+		DST[i + 3] = tempb;
+	}
+	
+	return IMAGE_INIT_PASS;
+}
 
 static MACHINE_CONFIG_START( casloopy, casloopy_state )
 
@@ -500,10 +523,10 @@ static MACHINE_CONFIG_START( casloopy, casloopy_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
 
-	MCFG_CARTSLOT_ADD("cart")
-	MCFG_CARTSLOT_EXTENSION_LIST("ic1,bin")
-	MCFG_CARTSLOT_MANDATORY
-	MCFG_CARTSLOT_INTERFACE("loopy_cart")
+	MCFG_GENERIC_CARTSLOT_ADD("cartslot", GENERIC_ROM32_WIDTH, generic_plain_slot, "loopy_cart")
+	MCFG_GENERIC_EXTENSIONS("bin,ic1")
+	MCFG_GENERIC_MANDATORY
+	MCFG_GENERIC_LOAD(casloopy_state, loopy_cart)
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("cart_list","casloopy")
@@ -524,11 +547,6 @@ ROM_START( casloopy )
 
 	ROM_REGION( 0x80000, "subcpu", 0) //NEC CDT-109
 	ROM_LOAD( "bios2.lsi352", 0x0000, 0x80000, CRC(8f51fa17) SHA1(99f50be06b083fdb07e08f30b0b26d9037afc869) )
-
-	ROM_REGION( 0x200000, "cart", 0 )
-	ROM_CART_LOAD("cart",    0x00000, 0x200000, ROM_NOMIRROR)
-
-	ROM_REGION( 0x200000, "rom_cart", ROMREGION_ERASE00 )
 ROM_END
 
 DRIVER_INIT_MEMBER(casloopy_state,casloopy)
