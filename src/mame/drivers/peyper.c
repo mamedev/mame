@@ -1,7 +1,43 @@
+// license:MAME
+// copyright-holders:Stephh, Robbbert
 /********************************************************************************************************
 
   PINBALL
-  Peyper
+  Peyper/Sonic
+
+  Odin (Peyper)
+  Odin Deluxe (Sonic)
+  Solar Wars (Sonic)
+  Gammatron (Sonic)
+  Pole Position (Sonic)
+  Star Wars (Sonic)
+  Wolf Man (Peyper)
+  Nemesis (Peyper)
+  Odisea Paris-Dakar (Peyper)
+
+  Others not emulated:
+  Hang-On (Sonic)
+  Night Fever (Sonic)
+  Storm (Sonic)
+
+  Sir Lancelot (Peyper, 1994)
+  - CPU is a B409 (could be a higher-speed Z80)
+  - Audio CPU is a TMP91P640F-10. Other audio chips are YMF262 and YAC512.
+
+  Most games require a ball in the outhole before starting a game (hold down X and press 1).
+
+
+Status:
+- Solar Wars: works
+- Pole Position: works.
+- Gamatron: can only enter coins.
+- Star Wars: works
+- Odin: works
+- Odin Deluxe: works
+- Wolf Man: works
+- Nemesis: works
+- Odisea: works
+
 
 *********************************************************************************************************/
 
@@ -31,9 +67,11 @@ public:
 	DECLARE_WRITE8_MEMBER(p2b_w) { }; // more lamps
 	DECLARE_CUSTOM_INPUT_MEMBER(wolfman_replay_hs_r);
 	DECLARE_DRIVER_INIT(peyper);
+	DECLARE_DRIVER_INIT(odin);
+	DECLARE_DRIVER_INIT(wolfman);
 private:
 	UINT8 m_digit;
-	UINT8 irq_state;
+	UINT8 m_disp_layout[36];
 	virtual void machine_reset();
 	required_device<cpu_device> m_maincpu;
 };
@@ -56,14 +94,9 @@ READ8_MEMBER( peyper_state::sw_r )
 	return data;
 }
 
-/* seems to only work correctly for 'solarwap', 'poleposn' and 'sonstwar' (look at how high-scores are displayed for example) - or shall layout be changed ? */
 WRITE8_MEMBER( peyper_state::disp_w )
 {
 	static const UINT8 patterns[16] = { 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7c,0x07,0x7f,0x67,0x58,0x4c,0x62,0x69,0x78,0 }; // 7448
-	UINT8 a = data & 0x0f;
-	UINT8 b = data >> 4;
-	UINT8 hex_a = patterns[a];
-	UINT8 hex_b = patterns[b];
 /*
 0 -> XA0 DPL25,DPL27
 1 -> XA1 DPL26,DPL28
@@ -73,41 +106,6 @@ WRITE8_MEMBER( peyper_state::disp_w )
 5 -> DPL20,DPL2
 6 -> DPL19,DPL1
 7 -> DPL30,DPL33
-*/
-	switch(m_digit) {
-		case 0 :
-				output_set_indexed_value("dpl_",25,hex_a);
-				output_set_indexed_value("dpl_",27,hex_b);
-				break;
-		case 1 :
-				output_set_indexed_value("dpl_",26,hex_a);
-				output_set_indexed_value("dpl_",28,hex_b);
-				break;
-		case 2 :
-				output_set_indexed_value("dpl_",23,hex_a);
-				output_set_indexed_value("dpl_",5,hex_b);
-				break;
-		case 3 :
-				output_set_indexed_value("dpl_",22,hex_a);
-				output_set_indexed_value("dpl_",4,hex_b);
-				break;
-		case 4 :
-				output_set_indexed_value("dpl_",21,hex_a);
-				output_set_indexed_value("dpl_",3,hex_b);
-				break;
-		case 5 :
-				output_set_indexed_value("dpl_",20,hex_a);
-				output_set_indexed_value("dpl_",2,hex_b);
-				break;
-		case 6 :
-				output_set_indexed_value("dpl_",19,hex_a);
-				output_set_indexed_value("dpl_",1,hex_b);
-				break;
-		case 7 :
-				output_set_indexed_value("dpl_",33,hex_a);
-				output_set_indexed_value("dpl_",30,hex_b);
-				break;
-/*
 8 ->  XB0
 9 ->  XB1
 10 -> DPL11,DPL17
@@ -117,49 +115,55 @@ WRITE8_MEMBER( peyper_state::disp_w )
 14 -> DPL07,DPL13
 15 -> DPL31,DPL32
 */
-		case 8 :
-				/*
-				if (BIT(b,3)) logerror("TILT\n");
-				if (BIT(b,2)) logerror("ONC\n");
-				if (BIT(b,1)) logerror("GAME OVER\n");
-				if (BIT(b,0)) logerror("BALL IN PLAY\n");
-				*/
+
+	UINT8 i,q,hex_a,a;
+	UINT8 p = m_digit << 1;
+
+	for (i = 0; i < 2; i++)
+	{
+		q = m_disp_layout[p++]; // get control code or digit
+		a = data & 15; // get bcd
+		data >>= 4; // rotate for next iteration
+		hex_a = patterns[a]; // get segments
+
+		// special codes
+		switch (q)
+		{
+			case 34: // player indicator lights (7-digit only)
 				output_set_indexed_value("led_",1,BIT(a,0)); // PLAYER 1
 				output_set_indexed_value("led_",2,BIT(a,1)); // PLAYER 2
 				output_set_indexed_value("led_",3,BIT(a,2)); // PLAYER 3
 				output_set_indexed_value("led_",4,BIT(a,3)); // PLAYER 4
 				break;
-		case 9 :
-				if (!BIT(a,0)) output_set_indexed_value("dpl_",6, 0x3f);
-				if (!BIT(a,1)) output_set_indexed_value("dpl_",12, 0x3f);
-				if (!BIT(a,2)) output_set_indexed_value("dpl_",24, 0x3f);
-				if (!BIT(a,3)) output_set_indexed_value("dpl_",18, 0x3f);
-				output_set_indexed_value("dpl_",29,hex_b);
+
+			case 35: // units digits show 0
+				if (!BIT(a,0)) output_set_indexed_value("dpl_",m_disp_layout[32], 0x3f);
+				if (!BIT(a,1)) output_set_indexed_value("dpl_",m_disp_layout[33], 0x3f);
+				if (!BIT(a,2)) output_set_indexed_value("dpl_",m_disp_layout[34], 0x3f);
+				if (!BIT(a,3)) output_set_indexed_value("dpl_",m_disp_layout[35], 0x3f);
 				break;
-		case 10 :
-				output_set_indexed_value("dpl_",17,hex_a);
-				output_set_indexed_value("dpl_",11,hex_b);
+
+			case 36: // game status indicators
+				/*
+				if (BIT(a,3)) logerror("TILT\n");
+				if (BIT(a,2)) logerror("ONC\n");
+				if (BIT(a,1)) logerror("GAME OVER\n");
+				if (BIT(a,0)) logerror("BALL IN PLAY\n");
+				*/
 				break;
-		case 11 :
-				output_set_indexed_value("dpl_",16,hex_a);
-				output_set_indexed_value("dpl_",10,hex_b);
+
+			case 37: // player 1 indicators (6-digit only)
+			case 38: // player 2 indicators (6-digit only)
+			case 39: // player 3 indicators (6-digit only)
+			case 40: // player 4 indicators (6-digit only)
+				output_set_indexed_value("led_",q-36,BIT(a,1)); // player indicator
+				output_set_indexed_value("dpl_",q-7,BIT(a,2) ? 6:0); // million led (we show blank or 1 in millions digit)
+				// bit 3, looks like it turns on all the decimal points, reason unknown
 				break;
-		case 12 :
-				output_set_indexed_value("dpl_",15,hex_a);
-				output_set_indexed_value("dpl_",9,hex_b);
-				break;
-		case 13 :
-				output_set_indexed_value("dpl_",14,hex_a);
-				output_set_indexed_value("dpl_",8,hex_b);
-				break;
-		case 14 :
-				output_set_indexed_value("dpl_",13,hex_a);
-				output_set_indexed_value("dpl_",7,hex_b);
-				break;
-		case 15 :
-				output_set_indexed_value("dpl_",32,hex_a);
-				output_set_indexed_value("dpl_",31,hex_b);
-				break;
+
+			default: // display a digit
+				output_set_indexed_value("dpl_",q,hex_a);
+		}
 	}
 }
 
@@ -578,7 +582,6 @@ INPUT_PORTS_END
 
 void peyper_state::machine_reset()
 {
-	irq_state = 0;
 }
 
 static MACHINE_CONFIG_START( peyper, peyper_state )
@@ -586,7 +589,7 @@ static MACHINE_CONFIG_START( peyper, peyper_state )
 	MCFG_CPU_ADD("maincpu", Z80, 2500000)
 	MCFG_CPU_PROGRAM_MAP(peyper_map)
 	MCFG_CPU_IO_MAP(peyper_io)
-	MCFG_CPU_PERIODIC_INT_DRIVER(peyper_state, irq0_line_hold,  1250 * 2)
+	MCFG_CPU_PERIODIC_INT_DRIVER(peyper_state, irq0_line_hold,  1250)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
@@ -613,9 +616,125 @@ static MACHINE_CONFIG_START( peyper, peyper_state )
 	MCFG_I8279_IN_CTRL_CB(VCC)
 MACHINE_CONFIG_END
 
-
-DRIVER_INIT_MEMBER(peyper_state,peyper)
+// Not allowed to set up an array all at once, so we have this mess
+DRIVER_INIT_MEMBER( peyper_state, peyper )
 {
+	m_disp_layout[0] = 25;
+	m_disp_layout[1] = 27;
+	m_disp_layout[2] = 26;
+	m_disp_layout[3] = 28;
+	m_disp_layout[4] = 23;
+	m_disp_layout[5] = 5;
+	m_disp_layout[6] = 22;
+	m_disp_layout[7] = 4;
+	m_disp_layout[8] = 21;
+	m_disp_layout[9] = 3;
+	m_disp_layout[10] = 20;
+	m_disp_layout[11] = 2;
+	m_disp_layout[12] = 19;
+	m_disp_layout[13] = 1;
+	m_disp_layout[14] = 33;
+	m_disp_layout[15] = 30;
+	m_disp_layout[16] = 34;
+	m_disp_layout[17] = 36;
+	m_disp_layout[18] = 35;
+	m_disp_layout[19] = 29;
+	m_disp_layout[20] = 17;
+	m_disp_layout[21] = 11;
+	m_disp_layout[22] = 16;
+	m_disp_layout[23] = 10;
+	m_disp_layout[24] = 15;
+	m_disp_layout[25] = 9;
+	m_disp_layout[26] = 14;
+	m_disp_layout[27] = 8;
+	m_disp_layout[28] = 13;
+	m_disp_layout[29] = 7;
+	m_disp_layout[30] = 32;
+	m_disp_layout[31] = 31;
+	m_disp_layout[32] = 6;
+	m_disp_layout[33] = 12;
+	m_disp_layout[34] = 18;
+	m_disp_layout[35] = 24;
+}
+
+DRIVER_INIT_MEMBER( peyper_state, odin )
+{
+	m_disp_layout[0] = 25;
+	m_disp_layout[1] = 27;
+	m_disp_layout[2] = 26;
+	m_disp_layout[3] = 28;
+	m_disp_layout[4] = 40;
+	m_disp_layout[5] = 37;
+	m_disp_layout[6] = 23;
+	m_disp_layout[7] = 5;
+	m_disp_layout[8] = 22;
+	m_disp_layout[9] = 4;
+	m_disp_layout[10] = 21;
+	m_disp_layout[11] = 3;
+	m_disp_layout[12] = 20;
+	m_disp_layout[13] = 2;
+	m_disp_layout[14] = 19;
+	m_disp_layout[15] = 1;
+	m_disp_layout[16] = 0; // does nothing?
+	m_disp_layout[17] = 36;
+	m_disp_layout[18] = 35;
+	m_disp_layout[19] = 29;
+	m_disp_layout[20] = 39;
+	m_disp_layout[21] = 38;
+	m_disp_layout[22] = 17;
+	m_disp_layout[23] = 11;
+	m_disp_layout[24] = 16;
+	m_disp_layout[25] = 10;
+	m_disp_layout[26] = 15;
+	m_disp_layout[27] = 9;
+	m_disp_layout[28] = 14;
+	m_disp_layout[29] = 8;
+	m_disp_layout[30] = 13;
+	m_disp_layout[31] = 7;
+	m_disp_layout[32] = 6;
+	m_disp_layout[33] = 12;
+	m_disp_layout[34] = 18;
+	m_disp_layout[35] = 24;
+}
+
+DRIVER_INIT_MEMBER( peyper_state, wolfman )
+{
+	m_disp_layout[0] = 25;
+	m_disp_layout[1] = 27;
+	m_disp_layout[2] = 26;
+	m_disp_layout[3] = 28;
+	m_disp_layout[4] = 40;
+	m_disp_layout[5] = 37;
+	m_disp_layout[6] = 19;
+	m_disp_layout[7] = 1;
+	m_disp_layout[8] = 23;
+	m_disp_layout[9] = 5;
+	m_disp_layout[10] = 22;
+	m_disp_layout[11] = 4;
+	m_disp_layout[12] = 21;
+	m_disp_layout[13] = 3;
+	m_disp_layout[14] = 20;
+	m_disp_layout[15] = 2;
+	m_disp_layout[16] = 0; // does nothing?
+	m_disp_layout[17] = 36;
+	m_disp_layout[18] = 35;
+	m_disp_layout[19] = 29;
+	m_disp_layout[20] = 39;
+	m_disp_layout[21] = 38;
+	m_disp_layout[22] = 13;
+	m_disp_layout[23] = 7;
+	m_disp_layout[24] = 17;
+	m_disp_layout[25] = 11;
+	m_disp_layout[26] = 16;
+	m_disp_layout[27] = 10;
+	m_disp_layout[28] = 15;
+	m_disp_layout[29] = 9;
+	m_disp_layout[30] = 14;
+	m_disp_layout[31] = 8;
+	m_disp_layout[32] = 6;
+	m_disp_layout[33] = 12;
+	m_disp_layout[34] = 18;
+	m_disp_layout[35] = 24;
 }
 
 
@@ -627,7 +746,7 @@ DRIVER_INIT_MEMBER(peyper_state,peyper)
 / Odin (1985)
 /-------------------------------------------------------------------*/
 ROM_START(odin)
-	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_REGION(0x6000, "maincpu", 0)
 	ROM_LOAD("odin_a.bin", 0x0000, 0x2000, CRC(ac3a7770) SHA1(2409629d3adbae0d7e6e5f9fe6f137c1e5a1bb86))
 	ROM_LOAD("odin_b.bin", 0x2000, 0x2000, CRC(46744695) SHA1(fdbd8a93b3e4a9697e77e7d381759829b86fe28b))
 ROM_END
@@ -636,7 +755,7 @@ ROM_END
 / Odin De Luxe (1985)
 /-------------------------------------------------------------------*/
 ROM_START(odin_dlx)
-	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_REGION(0x6000, "maincpu", 0)
 	ROM_LOAD("1a.bin", 0x0000, 0x2000, CRC(4fca9bfc) SHA1(05dce75919375d01a306aef385bcaac042243695))
 	ROM_LOAD("2a.bin", 0x2000, 0x2000, CRC(46744695) SHA1(fdbd8a93b3e4a9697e77e7d381759829b86fe28b))
 ROM_END
@@ -645,7 +764,7 @@ ROM_END
 / Solar Wars (1986)
 /-------------------------------------------------------------------*/
 ROM_START(solarwap)
-	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_REGION(0x6000, "maincpu", 0)
 	ROM_LOAD("solarw1c.bin", 0x0000, 0x2000, CRC(aa6bf0cd) SHA1(7332a4b1679841283d846f3e4f1792cb8e9529bf))
 	ROM_LOAD("solarw2.bin",  0x2000, 0x2000, CRC(95e2cbb1) SHA1(f9ab3222ca0b9e0796030a7a618847a4e8f77957))
 ROM_END
@@ -654,7 +773,7 @@ ROM_END
 / Gamatron (1986)
 /-------------------------------------------------------------------*/
 ROM_START(gamatros)
-	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_REGION(0x6000, "maincpu", 0)
 	ROM_LOAD("gama_a.bin", 0x0000, 0x2000, CRC(1dc2841c) SHA1(27c6a07b1f8bd5e73b425e7dbdcfb1d5233c18b2))
 	ROM_LOAD("gama_b.bin", 0x2000, 0x2000, CRC(56125890) SHA1(8b30a2282df264d798df1b031ecade999d135f81))
 ROM_END
@@ -663,7 +782,7 @@ ROM_END
 / Pole Position (1987)
 /-------------------------------------------------------------------*/
 ROM_START(poleposn)
-	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_REGION(0x6000, "maincpu", 0)
 	ROM_LOAD("1.bin", 0x0000, 0x2000, CRC(fdd37f6d) SHA1(863fef32ab9b5f3aca51788b6be9373a01fa0698))
 	ROM_LOAD("2.bin", 0x2000, 0x2000, CRC(967cb72b) SHA1(adef17018e2caf65b64bbfef72fe159b9704c409))
 	ROM_LOAD("3.bin", 0x4000, 0x2000, CRC(461fe9ca) SHA1(01bf35550e2c55995f167293746f355cfd484af1))
@@ -673,14 +792,14 @@ ROM_END
 / Star Wars (1987)
 /-------------------------------------------------------------------*/
 ROM_START(sonstwar)
-	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_REGION(0x6000, "maincpu", 0)
 	ROM_LOAD("sw1.bin", 0x0000, 0x2000, CRC(a2555d92) SHA1(5c82be85bf097e94953d11c0d902763420d64de4))
 	ROM_LOAD("sw2.bin", 0x2000, 0x2000, CRC(c2ae34a7) SHA1(0f59242e3aec5da7111e670c4d7cf830d0030597))
 	ROM_LOAD("sw3.bin", 0x4000, 0x2000, CRC(aee516d9) SHA1(b50e54d4d5db59e3fb71fb000f9bc5e34ff7de9c))
 ROM_END
 
 ROM_START(sonstwr2)
-	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_REGION(0x6000, "maincpu", 0)
 	ROM_LOAD("stw1i.bin", 0x0000, 0x2000, CRC(416e2a0c) SHA1(74ca550ee9eb83d9762ffab0f085dffae569d4a9))
 	ROM_LOAD("stw2i.bin", 0x2000, 0x2000, CRC(ccbbec46) SHA1(4fd0e48916e8761a7e70300d3ede166f5f04f8ae))
 	ROM_LOAD("sw3.bin",   0x4000, 0x2000, CRC(aee516d9) SHA1(b50e54d4d5db59e3fb71fb000f9bc5e34ff7de9c))
@@ -694,7 +813,7 @@ ROM_END
 / Odisea Paris-Dakar (1987)
 /-------------------------------------------------------------------*/
 ROM_START(odisea)
-	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_REGION(0x6000, "maincpu", 0)
 	ROM_LOAD("odiseaa.bin", 0x0000, 0x2000, CRC(29a40242) SHA1(321e8665df424b75112589fc630a438dc6f2f459))
 	ROM_LOAD("odiseab.bin", 0x2000, 0x2000, CRC(8bdf7c17) SHA1(7202b4770646fce5b2ba9e3b8ca097a993123b14))
 	ROM_LOAD("odiseac.bin", 0x4000, 0x2000, CRC(832dee5e) SHA1(9b87ffd768ab2610f2352adcf22c4a7880de47ab))
@@ -704,7 +823,7 @@ ROM_END
 / Nemesis (1986)
 /-------------------------------------------------------------------*/
 ROM_START(nemesisp)
-	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_REGION(0x6000, "maincpu", 0)
 	ROM_LOAD("nemesisa.bin", 0x0000, 0x2000, CRC(56f13350) SHA1(30907c362f88b48d634e8aaa1e1161852886645c))
 	ROM_LOAD("nemesisb.bin", 0x2000, 0x2000, CRC(a8f3e6c7) SHA1(c25b2271c4de6f4b57c3c850d28a0878ea081c26))
 	ROM_LOAD("memoriac.bin", 0x4000, 0x2000, CRC(468f16f0) SHA1(66ce0464d82331cfc0ac1f6fbd871066e4e57262))
@@ -714,24 +833,20 @@ ROM_END
 / Wolf Man (1987)
 /-------------------------------------------------------------------*/
 ROM_START(wolfman)
-	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_REGION(0x6000, "maincpu", 0)
 	ROM_LOAD("memoriaa.bin", 0x0000, 0x2000, CRC(1fec83fe) SHA1(5dc887d0fa00129ae31451c03bfe442f87dd2f54))
 	ROM_LOAD("memoriab.bin", 0x2000, 0x2000, CRC(62a1e3ec) SHA1(dc472c7c9d223820f8f1031c92e36890c1fcba7d))
 	ROM_LOAD("memoriac.bin", 0x4000, 0x2000, CRC(468f16f0) SHA1(66ce0464d82331cfc0ac1f6fbd871066e4e57262))
 ROM_END
 
-/*-------------------------------------------------------------------
-/ Sir Lancelot (1994)
-/-------------------------------------------------------------------*/
 
-GAME( 1985, odin,     0,        peyper,   odin_dlx, peyper_state, peyper,   ROT0, "Sonic",  "Odin",                  GAME_IS_SKELETON_MECHANICAL)
-GAME( 1985, odin_dlx, 0,        peyper,   odin_dlx, peyper_state, peyper,   ROT0, "Sonic",  "Odin De Luxe",          GAME_IS_SKELETON_MECHANICAL)
-GAME( 1986, solarwap, 0,        peyper,   solarwap, peyper_state, peyper,   ROT0, "Sonic",  "Solar Wars (Sonic)",    GAME_IS_SKELETON_MECHANICAL)
+GAME( 1985, odin,     0,        peyper,   odin_dlx, peyper_state, odin,     ROT0, "Peyper", "Odin", GAME_MECHANICAL)
+GAME( 1985, odin_dlx, 0,        peyper,   odin_dlx, peyper_state, odin,     ROT0, "Sonic",  "Odin De Luxe", GAME_MECHANICAL)
+GAME( 1986, solarwap, 0,        peyper,   solarwap, peyper_state, peyper,   ROT0, "Sonic",  "Solar Wars (Sonic)", GAME_MECHANICAL)
 GAME( 1986, gamatros, 0,        peyper,   solarwap, peyper_state, peyper,   ROT0, "Sonic",  "Gamatron (Sonic)",    GAME_IS_SKELETON_MECHANICAL)
-GAME( 1987, poleposn, 0,        peyper,   poleposn, peyper_state, peyper,   ROT0, "Sonic",  "Pole Position (Sonic)", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1987, sonstwar, 0,        peyper,   sonstwar, peyper_state, peyper,   ROT0, "Sonic",  "Star Wars (Sonic, set 1)", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1987, sonstwr2, sonstwar, peyper,   sonstwar, peyper_state, peyper,   ROT0, "Sonic",  "Star Wars (Sonic, set 2)", GAME_IS_SKELETON_MECHANICAL)
-
-GAME( 1987, wolfman,  0,        peyper,   wolfman,  peyper_state, peyper,   ROT0, "Peyper", "Wolf Man",              GAME_IS_SKELETON_MECHANICAL)
-GAME( 1986, nemesisp, 0,        peyper,   wolfman,  peyper_state, peyper,   ROT0, "Peyper", "Nemesis",               GAME_IS_SKELETON_MECHANICAL)
-GAME( 1987, odisea,   0,        peyper,   odisea,   peyper_state, peyper,   ROT0, "Peyper", "Odisea Paris-Dakar",    GAME_IS_SKELETON_MECHANICAL)
+GAME( 1987, poleposn, 0,        peyper,   poleposn, peyper_state, peyper,   ROT0, "Sonic",  "Pole Position (Sonic)", GAME_MECHANICAL)
+GAME( 1987, sonstwar, 0,        peyper,   sonstwar, peyper_state, peyper,   ROT0, "Sonic",  "Star Wars (Sonic, set 1)", GAME_MECHANICAL)
+GAME( 1987, sonstwr2, sonstwar, peyper,   sonstwar, peyper_state, peyper,   ROT0, "Sonic",  "Star Wars (Sonic, set 2)", GAME_MECHANICAL)
+GAME( 1987, wolfman,  0,        peyper,   wolfman,  peyper_state, wolfman,  ROT0, "Peyper", "Wolf Man", GAME_MECHANICAL)
+GAME( 1986, nemesisp, 0,        peyper,   wolfman,  peyper_state, wolfman,  ROT0, "Peyper", "Nemesis", GAME_MECHANICAL)
+GAME( 1987, odisea,   0,        peyper,   odisea,   peyper_state, wolfman,  ROT0, "Peyper", "Odisea Paris-Dakar", GAME_MECHANICAL)
