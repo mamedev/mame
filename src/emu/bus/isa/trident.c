@@ -14,10 +14,6 @@ const device_type TRIDENT_VGA = &device_creator<trident_vga_device>;
 
 #define CRTC_PORT_ADDR ((vga.miscellaneous_output&1)?0x3d0:0x3b0)
 
-#define READPIXEL8(x,y) (vga.memory[((y & 0xfff)*offset() + (x & 0xfff)) % vga.svga_intf.vram_size])
-#define WRITEPIXEL8(x,y,c) if((x & 0xfff)<tri.accel_dest_x_clip && (y & 0xfff)<tri.accel_dest_y_clip) \
-	(vga.memory[((y & 0xfff)*offset() + (x & 0xfff)) % vga.svga_intf.vram_size] = c)
-
 #define LOG (1)
 #define LOG_ACCEL (0)
 
@@ -25,6 +21,92 @@ trident_vga_device::trident_vga_device(const machine_config &mconfig, const char
 	: svga_device(mconfig, TRIDENT_VGA, "Trident TGUI9680", tag, owner, clock, "trident_vga", __FILE__)
 {
 }
+
+UINT8 trident_vga_device::READPIXEL8(INT16 x, INT16 y)
+{
+	return (vga.memory[((y & 0xfff)*offset() + (x & 0xfff)) % vga.svga_intf.vram_size]);
+}
+
+UINT16 trident_vga_device::READPIXEL15(INT16 x, INT16 y)
+{
+	return (vga.memory[((y & 0xfff)*offset() + (x & 0xfff)*2) % vga.svga_intf.vram_size] |
+           (vga.memory[((y & 0xfff)*offset() + ((x & 0xfff)*2)+1) % vga.svga_intf.vram_size] << 8));
+}
+
+UINT16 trident_vga_device::READPIXEL16(INT16 x, INT16 y)
+{
+	return (vga.memory[((y & 0xfff)*offset() + (x & 0xfff)*2) % vga.svga_intf.vram_size] |
+           (vga.memory[((y & 0xfff)*offset() + ((x & 0xfff)*2)+1) % vga.svga_intf.vram_size] << 8));
+}
+
+UINT32 trident_vga_device::READPIXEL32(INT16 x, INT16 y)
+{
+	return (vga.memory[((y & 0xfff)*offset() + (x & 0xfff)*4) % vga.svga_intf.vram_size] |
+		   (vga.memory[((y & 0xfff)*offset() + ((x & 0xfff)*4)+1) % vga.svga_intf.vram_size] << 8) |
+		   (vga.memory[((y & 0xfff)*offset() + ((x & 0xfff)*4)+2) % vga.svga_intf.vram_size] << 16) |
+		   (vga.memory[((y & 0xfff)*offset() + ((x & 0xfff)*4)+3) % vga.svga_intf.vram_size] << 24));
+}
+
+void trident_vga_device::WRITEPIXEL8(INT16 x, INT16 y, UINT8 data)
+{
+	if((x & 0xfff)<tri.accel_dest_x_clip && (y & 0xfff)<tri.accel_dest_y_clip)
+		vga.memory[((y & 0xfff)*offset() + (x & 0xfff)) % vga.svga_intf.vram_size] = data;
+}
+
+void trident_vga_device::WRITEPIXEL15(INT16 x, INT16 y, UINT16 data)
+{
+	if((x & 0xfff)<tri.accel_dest_x_clip && (y & 0xfff)<tri.accel_dest_y_clip)
+	{
+		vga.memory[((y & 0xfff)*offset() + (x & 0xfff)*2) % vga.svga_intf.vram_size] = data & 0x00ff;
+		vga.memory[((y & 0xfff)*offset() + ((x & 0xfff)*2)+1) % vga.svga_intf.vram_size] = (data & 0x7f00) >> 8;
+	}
+}
+
+void trident_vga_device::WRITEPIXEL16(INT16 x, INT16 y, UINT16 data)
+{
+	if((x & 0xfff)<tri.accel_dest_x_clip && (y & 0xfff)<tri.accel_dest_y_clip)
+	{
+		vga.memory[((y & 0xfff)*offset() + (x & 0xfff)*2) % vga.svga_intf.vram_size] = data & 0x00ff;
+		vga.memory[((y & 0xfff)*offset() + ((x & 0xfff)*2)+1) % vga.svga_intf.vram_size] = (data & 0xff00) >> 8;
+	}
+}
+
+void trident_vga_device::WRITEPIXEL32(INT16 x, INT16 y, UINT32 data)
+{
+	if((x & 0xfff)<tri.accel_dest_x_clip && (y & 0xfff)<tri.accel_dest_y_clip)
+	{
+		vga.memory[((y & 0xfff)*offset() + (x & 0xfff)*4) % vga.svga_intf.vram_size] = data & 0x000000ff;
+		vga.memory[((y & 0xfff)*offset() + ((x & 0xfff)*4)+1) % vga.svga_intf.vram_size] = (data & 0x0000ff00) >> 8;
+		vga.memory[((y & 0xfff)*offset() + ((x & 0xfff)*4)+2) % vga.svga_intf.vram_size] = (data & 0x00ff0000) >> 16;
+		vga.memory[((y & 0xfff)*offset() + ((x & 0xfff)*4)+3) % vga.svga_intf.vram_size] = (data & 0xff000000) >> 24;
+	}
+}
+
+UINT32 trident_vga_device::READPIXEL(INT16 x,INT16 y)
+{
+	if(svga.rgb8_en)
+		return READPIXEL8(x,y) & 0xff;
+	if(svga.rgb15_en)
+		return READPIXEL15(x,y) & 0x7fff;
+	if(svga.rgb16_en)
+		return READPIXEL16(x,y) & 0xffff;
+	if(svga.rgb32_en)
+		return READPIXEL32(x,y);
+	return 0;  // should never reach here
+}
+
+void trident_vga_device::WRITEPIXEL(INT16 x,INT16 y, UINT32 data)
+{
+	if(svga.rgb8_en)
+		WRITEPIXEL8(x,y,data & 0xff);
+	if(svga.rgb15_en)
+		WRITEPIXEL15(x,y,data & 0x7fff);
+	if(svga.rgb16_en)
+		WRITEPIXEL16(x,y,data & 0xffff);
+	if(svga.rgb32_en)
+		WRITEPIXEL32(x,y,data);
+}
+
 
 void trident_vga_device::device_start()
 {
@@ -1034,11 +1116,11 @@ void trident_vga_device::accel_bitblt()
 		{
 			if(tri.accel_drawflags & 0x4000)  // Solid fill
 			{
-				WRITEPIXEL8(x,y,tri.accel_fgcolour);
+				WRITEPIXEL(x,y,tri.accel_fgcolour);
 			}
 			else
 			{
-				WRITEPIXEL8(x,y,READPIXEL8(sx,sy));
+				WRITEPIXEL(x,y,READPIXEL(sx,sy));
 			}
 		}
 	}
@@ -1067,7 +1149,7 @@ void trident_vga_device::accel_line()
 	}
 	for(;;)
 	{
-		WRITEPIXEL8(tri.accel_dest_x,tri.accel_dest_y,col);
+		WRITEPIXEL(tri.accel_dest_x,tri.accel_dest_y,col);
 		if (count > tri.accel_dim_y) break;
 		count++;
 		if((err*2) > -dy)
@@ -1089,7 +1171,7 @@ void trident_vga_device::accel_data_write(UINT32 data)
 	for(int x=31;x>=0;x--)
 	{
 		if(((data >> x) & 0x01) != 0)
-			WRITEPIXEL8(tri.accel_mem_x,tri.accel_mem_y,tri.accel_fgcolour);
+			WRITEPIXEL(tri.accel_mem_x,tri.accel_mem_y,tri.accel_fgcolour);
 		tri.accel_mem_x++;
 	}
 	if(tri.accel_mem_x > tri.accel_dest_x+tri.accel_dim_x)

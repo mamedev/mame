@@ -105,6 +105,16 @@ private:
 	void accel_bitblt();
 	void accel_line();
 	void accel_data_write(UINT32 data);
+	UINT8 READPIXEL8(INT16 x, INT16 y);
+	UINT16 READPIXEL15(INT16 x, INT16 y);
+	UINT16 READPIXEL16(INT16 x, INT16 y);
+	UINT32 READPIXEL32(INT16 x, INT16 y);
+	void WRITEPIXEL8(INT16 x, INT16 y, UINT8 data);
+	void WRITEPIXEL15(INT16 x, INT16 y, UINT16 data);
+	void WRITEPIXEL16(INT16 x, INT16 y, UINT16 data);
+	void WRITEPIXEL32(INT16 x, INT16 y, UINT32 data);
+	UINT32 READPIXEL(INT16 x,INT16 y);
+	void WRITEPIXEL(INT16 x,INT16 y, UINT32 data);
 };
 
 
