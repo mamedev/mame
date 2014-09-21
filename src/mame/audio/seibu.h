@@ -138,13 +138,23 @@ extern const device_type SEIBU_ADPCM;
 	PORT_START("COIN")                                              \
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(4)     \
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_IMPULSE(4)     \
-	PORT_BIT( 0xfc, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )                    \
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )                    \
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )                    \
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )                    \
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )                    \
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 #define SEIBU_COIN_INPUTS_INVERT                                    \
 	PORT_START("COIN")                                              \
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(4)      \
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(4)      \
-	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )                    \
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )                    \
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )                    \
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )                    \
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )                    \
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 
 #define SEIBU_SOUND_SYSTEM_CPU(freq)                                \
