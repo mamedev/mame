@@ -123,7 +123,7 @@ void nes_disksys_device::device_start()
 	m_disk->floppy_install_unload_proc(nes_disksys_device::unload_proc);
 
 	irq_timer = timer_alloc(TIMER_IRQ);
-	irq_timer->adjust(attotime::zero, 0, m_maincpu->cycles_to_attotime(1));
+	irq_timer->adjust(attotime::zero, 0, machine().device<cpu_device>("maincpu")->cycles_to_attotime(1));
 	
 	save_item(NAME(m_fds_motor_on));
 	save_item(NAME(m_fds_door_closed));

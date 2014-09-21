@@ -79,7 +79,7 @@ void nes_ffe4_device::device_start()
 {
 	common_start();
 	irq_timer = timer_alloc(TIMER_IRQ);
-	irq_timer->adjust(attotime::zero, 0, m_maincpu->cycles_to_attotime(1));
+	irq_timer->adjust(attotime::zero, 0, machine().device<cpu_device>("maincpu")->cycles_to_attotime(1));
 
 	save_item(NAME(m_exram));
 	save_item(NAME(m_exram_enabled));

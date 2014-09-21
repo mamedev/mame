@@ -76,7 +76,7 @@ void nes_jy_typea_device::device_start()
 	common_start();
 	irq_timer = timer_alloc(TIMER_IRQ);
 	irq_timer->reset();
-	timer_freq = m_maincpu->cycles_to_attotime(1);
+	timer_freq = machine().device<cpu_device>("maincpu")->cycles_to_attotime(1);
 
 	save_item(NAME(m_mul));
 	save_item(NAME(m_latch));

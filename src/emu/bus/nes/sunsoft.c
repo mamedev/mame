@@ -123,7 +123,7 @@ void nes_sunsoft_3_device::device_start()
 {
 	common_start();
 	irq_timer = timer_alloc(TIMER_IRQ);
-	irq_timer->adjust(attotime::zero, 0, m_maincpu->cycles_to_attotime(1));
+	irq_timer->adjust(attotime::zero, 0, machine().device<cpu_device>("maincpu")->cycles_to_attotime(1));
 
 	save_item(NAME(m_irq_enable));
 	save_item(NAME(m_irq_toggle));
@@ -169,7 +169,7 @@ void nes_sunsoft_fme7_device::device_start()
 	irq_timer = timer_alloc(TIMER_IRQ);
 	// this has to be hardcoded because some some scanline code only suits NTSC... it will be fixed with PPU rewrite
 	irq_timer->adjust(attotime::zero, 0, attotime::from_hz((21477272.724 / 12)));
-//  irq_timer->adjust(attotime::zero, 0, m_maincpu->cycles_to_attotime(1));
+//  irq_timer->adjust(attotime::zero, 0, machine().device<cpu_device>("maincpu")->cycles_to_attotime(1));
 
 	save_item(NAME(m_wram_bank));
 	save_item(NAME(m_latch));

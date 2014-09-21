@@ -208,7 +208,7 @@ void nes_mbaby_device::device_start()
 	common_start();
 	irq_timer = timer_alloc(TIMER_IRQ);
 	irq_timer->reset();
-	timer_freq = m_maincpu->cycles_to_attotime(24576);
+	timer_freq = machine().device<cpu_device>("maincpu")->cycles_to_attotime(24576);
 
 	save_item(NAME(m_irq_enable));
 	save_item(NAME(m_latch));
@@ -243,7 +243,7 @@ void nes_smb3p_device::device_start()
 {
 	common_start();
 	irq_timer = timer_alloc(TIMER_IRQ);
-	irq_timer->adjust(attotime::zero, 0, m_maincpu->cycles_to_attotime(1));
+	irq_timer->adjust(attotime::zero, 0, machine().device<cpu_device>("maincpu")->cycles_to_attotime(1));
 
 	save_item(NAME(m_irq_enable));
 	save_item(NAME(m_irq_count));
@@ -297,7 +297,7 @@ void nes_smb2j_device::device_start()
 {
 	common_start();
 	irq_timer = timer_alloc(TIMER_IRQ);
-	irq_timer->adjust(attotime::zero, 0, m_maincpu->cycles_to_attotime(1));
+	irq_timer->adjust(attotime::zero, 0, machine().device<cpu_device>("maincpu")->cycles_to_attotime(1));
 
 	save_item(NAME(m_irq_enable));
 	save_item(NAME(m_irq_count));
@@ -320,7 +320,7 @@ void nes_smb2ja_device::device_start()
 {
 	common_start();
 	irq_timer = timer_alloc(TIMER_IRQ);
-	irq_timer->adjust(attotime::zero, 0, m_maincpu->cycles_to_attotime(1));
+	irq_timer->adjust(attotime::zero, 0, machine().device<cpu_device>("maincpu")->cycles_to_attotime(1));
 
 	save_item(NAME(m_irq_enable));
 	save_item(NAME(m_irq_count));
@@ -343,7 +343,7 @@ void nes_smb2jb_device::device_start()
 {
 	common_start();
 	irq_timer = timer_alloc(TIMER_IRQ);
-	irq_timer->adjust(attotime::zero, 0, m_maincpu->cycles_to_attotime(1));
+	irq_timer->adjust(attotime::zero, 0, machine().device<cpu_device>("maincpu")->cycles_to_attotime(1));
 
 	save_item(NAME(m_irq_enable));
 	save_item(NAME(m_irq_count));
@@ -429,7 +429,7 @@ void nes_lh53_device::device_start()
 {
 	common_start();
 	irq_timer = timer_alloc(TIMER_IRQ);
-	irq_timer->adjust(attotime::zero, 0, m_maincpu->cycles_to_attotime(1));
+	irq_timer->adjust(attotime::zero, 0, machine().device<cpu_device>("maincpu")->cycles_to_attotime(1));
 
 	save_item(NAME(m_irq_enable));
 	save_item(NAME(m_irq_count));
@@ -510,7 +510,7 @@ void nes_shuiguan_device::device_start()
 	common_start();
 	irq_timer = timer_alloc(TIMER_IRQ);
 	// always running and checking for IRQ every 114 cycles? or resetting every frame?
-	irq_timer->adjust(attotime::zero, 0, m_maincpu->cycles_to_attotime(114));
+	irq_timer->adjust(attotime::zero, 0, machine().device<cpu_device>("maincpu")->cycles_to_attotime(114));
 
 	save_item(NAME(m_irq_enable));
 	save_item(NAME(m_irq_count));
