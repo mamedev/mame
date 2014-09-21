@@ -199,7 +199,8 @@ public:
 		m_pc_pedal_interrupt(*this, "pc_p_int"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette")
+		m_palette(*this, "palette"),
+		m_adc_inp(*this, "ADC")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -228,6 +229,7 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	optional_ioport_array<8> m_adc_inp;
 
 
 	UINT8 m_syscontrol[0x20];
@@ -479,10 +481,8 @@ public:
 	TILE_GET_INFO_MEMBER(get_text_tile_info);
 	virtual void machine_reset();
 	virtual void machine_start();
+	virtual void video_start();
 	DECLARE_MACHINE_START(adillor);
-	DECLARE_VIDEO_START(namcos22s);
-	DECLARE_VIDEO_START(namcos22);
-	DECLARE_VIDEO_START(common);
 	UINT32 screen_update_namcos22s(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_namcos22(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(namcos22s_interrupt);

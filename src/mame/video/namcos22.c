@@ -2462,8 +2462,9 @@ void namcos22_state::init_tables()
 }
 
 
-VIDEO_START_MEMBER(namcos22_state,common)
+void namcos22_state::video_start()
 {
+	m_is_ss22 = (m_iomcu == NULL);
 	init_tables();
 
 	m_mix_bitmap = auto_bitmap_ind16_alloc(machine(), 640, 480);
@@ -2473,18 +2474,4 @@ VIDEO_START_MEMBER(namcos22_state,common)
 	m_gfxdecode->gfx(0)->set_source((UINT8 *)m_cgram.target());
 
 	m_poly = auto_alloc(machine(), namcos22_renderer(*this));
-}
-
-VIDEO_START_MEMBER(namcos22_state,namcos22)
-{
-	m_is_ss22 = 0;
-
-	VIDEO_START_CALL_MEMBER(common);
-}
-
-VIDEO_START_MEMBER(namcos22_state,namcos22s)
-{
-	m_is_ss22 = 1;
-
-	VIDEO_START_CALL_MEMBER(common);
 }

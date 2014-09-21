@@ -738,10 +738,7 @@ WRITE8_MEMBER(taitojc_state::hc11_output_w)
 
 READ8_MEMBER(taitojc_state::hc11_analog_r)
 {
-	static const char *const portnames[] = { "ANALOG1", "ANALOG2", "ANALOG3", "ANALOG4",
-										"ANALOG5", "ANALOG6", "ANALOG7", "ANALOG8" };
-
-	return ioport(portnames[offset])->read_safe(0);
+	return m_analog_inp[offset]->read_safe(0);
 }
 
 
@@ -1000,7 +997,7 @@ static INPUT_PORTS_START( dendego )
 	PORT_BIT( 0x77, 0x00, IPT_POSITIONAL_V ) PORT_POSITIONS(6) PORT_REMAP_TABLE(dendego_mascon_table) PORT_SENSITIVITY(10) PORT_KEYDELTA(1) PORT_CENTERDELTA(0) PORT_NAME("Throttle Lever")
 	PORT_BIT( 0x88, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("ANALOG1")   // Brake Lever at right, rotate handle right (anti clockwise) to increase pressure, 11 positions but not at constant intervals like the throttle lever
+	PORT_START("AN.0")   // Brake Lever at right, rotate handle right (anti clockwise) to increase pressure, 11 positions but not at constant intervals like the throttle lever
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x00, 0xef) PORT_SENSITIVITY(35) PORT_KEYDELTA(10) PORT_CENTERDELTA(0) PORT_NAME("Brake Lever")
 INPUT_PORTS_END
 
@@ -1010,13 +1007,13 @@ static INPUT_PORTS_START( landgear )
 	PORT_MODIFY("UNUSED")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("View Switch")
 
-	PORT_START("ANALOG1")       // Lever X
+	PORT_START("AN.0")       // Lever X
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5) PORT_REVERSE
 
-	PORT_START("ANALOG2")       // Lever Y
+	PORT_START("AN.1")       // Lever Y
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y )  PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5)
 
-	PORT_START("ANALOG3")       // Throttle
+	PORT_START("AN.2")       // Throttle
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL )  PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5) PORT_REVERSE
 INPUT_PORTS_END
 
@@ -1033,13 +1030,13 @@ static INPUT_PORTS_START( sidebs )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_NAME("Shift Up")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_UP   ) PORT_NAME("Shift Down")
 
-	PORT_START("ANALOG1")       // Steering
+	PORT_START("AN.0")       // Steering
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(35) PORT_KEYDELTA(10) PORT_NAME("Steering Wheel")
 
-	PORT_START("ANALOG2")       // Acceleration
+	PORT_START("AN.1")       // Acceleration
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL )  PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(100) PORT_KEYDELTA(25) PORT_NAME("Gas Pedal")
 
-	PORT_START("ANALOG3")       // Brake
+	PORT_START("AN.2")       // Brake
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(100) PORT_KEYDELTA(25) PORT_NAME("Brake Pedal")
 INPUT_PORTS_END
 
@@ -1057,13 +1054,13 @@ static INPUT_PORTS_START( dangcurv )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_NAME("Shift Up")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_UP   ) PORT_NAME("Shift Down")
 
-	PORT_START("ANALOG1")       // Steering
+	PORT_START("AN.0")       // Steering
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(35) PORT_KEYDELTA(10) PORT_REVERSE PORT_NAME("Steering Wheel")
 
-	PORT_START("ANALOG2")       // Acceleration
+	PORT_START("AN.1")       // Acceleration
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL )  PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(100) PORT_KEYDELTA(25) PORT_REVERSE PORT_NAME("Gas Pedal")
 
-	PORT_START("ANALOG3")       // Brake
+	PORT_START("AN.2")       // Brake
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(100) PORT_KEYDELTA(25) PORT_REVERSE PORT_NAME("Brake Pedal")
 INPUT_PORTS_END
 
