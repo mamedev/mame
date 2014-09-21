@@ -112,6 +112,7 @@ void concept_state::concept_set_interrupt(int level, int state)
 
 inline void concept_state::post_in_KeyQueue(int keycode)
 {
+//	printf("Post %x (%d) in keyqueue\n", keycode, keycode);
 	m_KeyQueue[(m_KeyQueueHead+m_KeyQueueLen) % KeyQueueSize] = keycode;
 	m_KeyQueueLen++;
 }
@@ -213,7 +214,7 @@ WRITE8_MEMBER(concept_state::via_out_b)
 */
 WRITE_LINE_MEMBER(concept_state::via_out_cb2)
 {
-	LOG(("via_out_cb2: Sound control written: data=0x%2.2x\n", state));
+//	LOG(("via_out_cb2: Sound control written: data=0x%2.2x\n", state));
 }
 
 /*
@@ -294,8 +295,7 @@ READ16_MEMBER(concept_state::concept_io_r)
 
 			case 1:
 				/* always tell transmit is empty */
-				reply = m_KeyQueueLen ? 0x98 : 0x10;
-				break;
+				return m_KeyQueueLen ? 0x98 : 0x10;
 			}
 			break;
 
