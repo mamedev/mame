@@ -9,6 +9,9 @@
 #include "dmvbus.h"
 #include "cpu/i86/i86.h"
 
+// K234
+#include "cpu/m68000/m68000.h"
+
 // K235
 #include "cpu/nec/nec.h"
 #include "machine/pic8259.h"
@@ -46,13 +49,16 @@ protected:
 
 	// dmvcart_interface overrides
 	virtual void hold_w(int state);
+	virtual void switch16_w(int state);
 	virtual bool av16bit();
 
-private:
+protected:
 	required_device<cpu_device> m_maincpu;
-	required_memory_region      m_rom;
+	optional_memory_region      m_rom;
 	dmvcart_slot_device *       m_bus;
 	address_space *             m_io;
+	int                         m_switch16;
+	int                         m_hold;
 };
 
 
@@ -67,6 +73,36 @@ public:
 
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const;
+};
+
+
+// ======================> dmv_k234_device
+
+class dmv_k234_device :
+		public dmv_k230_device
+{
+public:
+	// construction/destruction
+	dmv_k234_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	DECLARE_READ8_MEMBER(snr_r);
+	DECLARE_WRITE8_MEMBER(snr_w);
+
+protected:
+	// optional information overrides
+	virtual const rom_entry *device_rom_region() const;
+	virtual machine_config_constructor device_mconfig_additions() const;
+
+	// device-level overrides
+	virtual void device_start();
+	virtual void device_reset();
+
+	// dmvcart_interface overrides
+	virtual void hold_w(int state);
+	virtual void switch16_w(int state);
+
+private:
+	int                         m_snr;
 };
 
 
@@ -100,6 +136,7 @@ private:
 // device type definition
 extern const device_type DMV_K230;
 extern const device_type DMV_K231;
+extern const device_type DMV_K234;
 extern const device_type DMV_K235;
 
 #endif  /* __DMV_K230_H__ */

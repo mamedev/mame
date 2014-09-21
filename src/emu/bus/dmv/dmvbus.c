@@ -199,7 +199,8 @@ dmvcart_slot_device::dmvcart_slot_device(const machine_config &mconfig, const ch
 		device_slot_interface(mconfig, *this),
 		m_prog_read_cb(*this),
 		m_prog_write_cb(*this),
-		m_out_irq_cb(*this)
+		m_out_irq_cb(*this),
+		m_out_thold_cb(*this)
 {
 }
 
@@ -224,6 +225,7 @@ void dmvcart_slot_device::device_start()
 	m_prog_read_cb.resolve_safe(0);
 	m_prog_write_cb.resolve_safe();
 	m_out_irq_cb.resolve_safe();
+	m_out_thold_cb.resolve_safe();
 }
 
 /*-------------------------------------------------
@@ -308,6 +310,12 @@ void dmvcart_slot_device::hold_w(int state)
 {
 	if (m_cart)
 		m_cart->hold_w(state);
+}
+
+void dmvcart_slot_device::switch16_w(int state)
+{
+	if (m_cart)
+		m_cart->switch16_w(state);
 }
 
 void dmvcart_slot_device::irq0_w(int state)
