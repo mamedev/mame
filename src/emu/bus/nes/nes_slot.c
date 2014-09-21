@@ -665,7 +665,8 @@ WRITE8_MEMBER(device_nes_cart_interface::write_h)
 
 void device_nes_cart_interface::pcb_start(running_machine &machine, UINT8 *ciram_ptr, bool cart_mounted)
 {
-
+	// HACK: to reduce tagmap lookups for PPU-related IRQs, we add a hook to the
+	// main NES CPU here, even if it does not belong to this device.
 	m_maincpu = machine.device<cpu_device>("maincpu");
 
 	if (cart_mounted)		// disksys expansion can arrive here without the memory banks!

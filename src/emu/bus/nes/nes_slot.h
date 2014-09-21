@@ -232,6 +232,9 @@ protected:
 	dynamic_buffer m_vram;
 	dynamic_buffer m_battery;
 	UINT8 *m_ciram;
+
+	// HACK: to reduce tagmap lookups for PPU-related IRQs, we add a hook to the
+	// main NES CPU here, even if it does not belong to this device.
 	cpu_device *m_maincpu;
 
 	// these are specific of some boards but must be accessible from the driver
