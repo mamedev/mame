@@ -574,6 +574,7 @@ void ins8250_uart_device::device_reset()
 	update_msr();
 	m_regs.msr &= 0xf0;
 	m_int_pending = 0;
+	update_interrupt();
 	receive_register_reset();
 	transmit_register_reset();
 	m_txd = 1;
