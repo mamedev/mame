@@ -478,14 +478,15 @@ void raiden2_state::cop_collision_update_hitbox(address_space &space, int slot, 
 	for(int i=0; i<3; i++) {
 		int min[2], max[2];
 		for(int j=0; j<2; j++) {
-			min[j] = cop_collision_info[j].pos[i];
-			if(cop_collision_info[j].allow_swap && (cop_collision_info[j].flags_swap & (1 << i)))
-				min[j] -= cop_collision_info[j].dx[i];
-			else
-				min[j] += cop_collision_info[j].dx[i];
-			max[j] = min[j] + cop_collision_info[j].size[i];
+			if(cop_collision_info[j].allow_swap && (cop_collision_info[j].flags_swap & (1 << i))) {
+				max[j] = cop_collision_info[j].pos[i] - cop_collision_info[j].dx[i];
+				min[j] = max[j] - cop_collision_info[j].size[i];
+			} else {
+				min[j] = cop_collision_info[j].pos[i] + cop_collision_info[j].dx[i];
+				max[j] = min[j] + cop_collision_info[j].size[i];
+			}
 		}
-		if(max[0] >= min[1] && min[0] <= max[1])
+		if(max[0] > min[1] && min[0] < max[1])
 			cop_hit_status &= ~(1 << i);
 		cop_hit_val[i] = cop_collision_info[0].pos[i] - cop_collision_info[1].pos[i];
 	}
