@@ -43,29 +43,14 @@ void concept_state::machine_start()
 	/* initialize clock interface */
 	m_clock_enable = FALSE /*TRUE*/;
 
-	/* clear keyboard interface state */
-	m_KeyQueueHead = m_KeyQueueLen = 0;
-	memset(m_KeyStateSave, 0, sizeof(m_KeyStateSave));
-
 	m_exp[0] = machine().device<concept_exp_port_device>("exp1");
 	m_exp[1] = machine().device<concept_exp_port_device>("exp2");
 	m_exp[2] = machine().device<concept_exp_port_device>("exp3");
 	m_exp[3] = machine().device<concept_exp_port_device>("exp4");
 
-	for (int i = 0; i < 6; i++)
-	{
-		char str[5];
-		sprintf(str, "KEY%i", i);
-		m_key[i] = ioport(str);
-	}
-
 	save_item(NAME(m_pending_interrupts));
 	save_item(NAME(m_clock_enable));
 	save_item(NAME(m_clock_address));
-	save_item(NAME(m_KeyQueue));
-	save_item(NAME(m_KeyQueueHead));
-	save_item(NAME(m_KeyQueueLen));
-	save_item(NAME(m_KeyStateSave));
 }
 
 
@@ -108,55 +93,6 @@ void concept_state::concept_set_interrupt(int level, int state)
 	else
 		/* clear all interrupts */
 		m_maincpu->set_input_line_and_vector(M68K_IRQ_1, CLEAR_LINE, M68K_INT_ACK_AUTOVECTOR);
-}
-
-inline void concept_state::post_in_KeyQueue(int keycode)
-{
-//	printf("Post %x (%d) in keyqueue\n", keycode, keycode);
-	m_KeyQueue[(m_KeyQueueHead+m_KeyQueueLen) % KeyQueueSize] = keycode;
-	m_KeyQueueLen++;
-}
-
-void concept_state::poll_keyboard()
-{
-	UINT32 keystate;
-	UINT32 key_transitions;
-	int i, j;
-	int keycode;
-
-	for(i = 0; (i < /*4*/3) && (m_KeyQueueLen <= (KeyQueueSize-MaxKeyMessageLen)); i++)
-	{
-		keystate = m_key[2 * i]->read() | (m_key[2 * i + 1]->read() << 16);
-		key_transitions = keystate ^ m_KeyStateSave[i];
-		if(key_transitions)
-		{
-			for(j = 0; (j < 32) && (m_KeyQueueLen <= (KeyQueueSize-MaxKeyMessageLen)); j++)
-			{
-				if((key_transitions >> j) & 1)
-				{
-					keycode = (i << 5) | j;
-
-					if (((keystate >> j) & 1))
-					{
-						/* key is pressed */
-						m_KeyStateSave[i] |= (1 << j);
-						keycode |= 0x80;
-					}
-					else
-						/* key is released */
-						m_KeyStateSave[i] &= ~ (1 << j);
-
-					post_in_KeyQueue(keycode);
-					concept_set_interrupt(KEYINT_level, 1);
-				}
-			}
-		}
-	}
-}
-
-INTERRUPT_GEN_MEMBER(concept_state::concept_interrupt)
-{
-	poll_keyboard();
 }
 
 /*
@@ -212,9 +148,11 @@ WRITE8_MEMBER(concept_state::via_out_b)
 /*
     VIA CB2: used as sound output
 */
+
 WRITE_LINE_MEMBER(concept_state::via_out_cb2)
 {
 //	LOG(("via_out_cb2: Sound control written: data=0x%2.2x\n", state));
+	m_speaker->level_w(state);
 }
 
 /*
@@ -273,31 +211,7 @@ READ16_MEMBER(concept_state::concept_io_r)
 		{
 		case 0:
 			/* NKBP keyboard */
-			switch (offset & 0xf)
-			{
-				int reply;
-
-			case 0:
-				/* data */
-				reply = 0;
-
-				if (m_KeyQueueLen)
-				{
-					reply = m_KeyQueue[m_KeyQueueHead];
-					m_KeyQueueHead = (m_KeyQueueHead + 1) % KeyQueueSize;
-					m_KeyQueueLen--;
-				}
-
-				if (!m_KeyQueueLen)
-					concept_set_interrupt(KEYINT_level, 0);
-
-				return reply;
-
-			case 1:
-				/* always tell transmit is empty */
-				return m_KeyQueueLen ? 0x98 : 0x10;
-			}
-			break;
+			return m_kbdacia->read(space, (offset & 3));
 
 		case 1:
 			/* NSR0 data comm port 0 */
@@ -392,6 +306,7 @@ WRITE16_MEMBER(concept_state::concept_io_w)
 		{
 		case 0:
 			/* NKBP keyboard */
+			m_kbdacia->write(space, (offset & 3), data);
 			break;
 
 		case 1:

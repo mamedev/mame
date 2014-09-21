@@ -201,7 +201,6 @@ static MACHINE_CONFIG_START( concept, concept_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 8182000)        /* 16.364 MHz / 2 */
 	MCFG_CPU_PROGRAM_MAP(concept_memmap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", concept_state,  concept_interrupt)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
@@ -217,7 +216,10 @@ static MACHINE_CONFIG_START( concept, concept_state )
 
 	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 
-	/* no sound? */
+	/* sound */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD(SPEAKER_TAG, SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* rtc */
 	MCFG_DEVICE_ADD("mm58274c", MM58274C, 0)
@@ -237,6 +239,8 @@ static MACHINE_CONFIG_START( concept, concept_state )
 	MCFG_DEVICE_ADD(ACIA_0_TAG, MOS6551, 0)
 	MCFG_MOS6551_XTAL(XTAL_1_8432MHz)
 	MCFG_DEVICE_ADD(ACIA_1_TAG, MOS6551, 0)
+	MCFG_MOS6551_XTAL(XTAL_1_8432MHz)
+	MCFG_DEVICE_ADD(KBD_ACIA_TAG, MOS6551, 0)
 	MCFG_MOS6551_XTAL(XTAL_1_8432MHz)
 
 	MCFG_CONCEPT_EXP_PORT_ADD("exp1", concept_exp_devices, NULL)
