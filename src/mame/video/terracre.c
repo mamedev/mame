@@ -15,15 +15,14 @@ TILE_GET_INFO_MEMBER(terracre_state::get_bg_tile_info)
 	/* xxxx.----.----.----
 	 * ----.xx--.----.----
 	 * ----.--xx.xxxx.xxxx */
-	unsigned data = m_amazon_videoram[tile_index];
+	unsigned data = m_bg_videoram[tile_index];
 	unsigned color = data>>11;
 	SET_TILE_INFO_MEMBER(1,data&0x3ff,color,0 );
 }
 
 TILE_GET_INFO_MEMBER(terracre_state::get_fg_tile_info)
 {
-	UINT16 *videoram = m_videoram;
-	int data = videoram[tile_index];
+	unsigned data = m_fg_videoram[tile_index];
 	SET_TILE_INFO_MEMBER(0,data&0xff,0,0 );
 }
 
@@ -31,8 +30,8 @@ void terracre_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 {
 	const UINT8 *spritepalettebank = memregion("user1")->base();
 	gfx_element *pGfx = m_gfxdecode->gfx(2);
-	const UINT16 *pSource = m_spriteram;
-	int i;
+	const UINT16 *pSource = m_spriteram->buffer();
+	int flip = flip_screen();
 	int transparent_pen;
 
 	if( pGfx->elements() > 0x200 )
@@ -43,7 +42,7 @@ void terracre_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 	{
 		transparent_pen = 0x0;
 	}
-	for( i=0; i<0x200; i+=8 )
+	for( int i=0; i<0x200; i+=8 )
 	{
 		int tile = pSource[1]&0xff;
 		int attrs = pSource[2];
@@ -73,7 +72,7 @@ void terracre_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 			color += 16 * (spritepalettebank[(tile>>1)&0xff] & 0x0f);
 		}
 
-		if (flip_screen())
+		if (flip)
 		{
 				sx=240-sx;
 				sy=240-sy;
@@ -146,14 +145,13 @@ PALETTE_INIT_MEMBER(terracre_state, terracre)
 
 WRITE16_MEMBER(terracre_state::amazon_background_w)
 {
-	COMBINE_DATA( &m_amazon_videoram[offset] );
+	COMBINE_DATA( &m_bg_videoram[offset] );
 	m_background->mark_tile_dirty(offset );
 }
 
 WRITE16_MEMBER(terracre_state::amazon_foreground_w)
 {
-	UINT16 *videoram = m_videoram;
-	COMBINE_DATA( &videoram[offset] );
+	COMBINE_DATA( &m_fg_videoram[offset] );
 	m_foreground->mark_tile_dirty(offset );
 }
 
