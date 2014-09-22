@@ -38,6 +38,9 @@
     - Dies on ARTIC check;
     - Presumably one ROM is undumped?
 
+	TODO: (PC-9821AP)
+	- No way to exit the initial loop. Code looks broken/bad dump?
+	
     floppy issues TODO (certain fail)
     - Unsupported disk types: *.nfd, *.fdd, *.nhd
     - 46 Okunen Monogatari - The Shinkaron
@@ -549,7 +552,8 @@ public:
 	UINT8 m_joy_sel;
 	UINT8 m_ext2_ff;
 	UINT8 m_sys_type;
-
+	UINT8 m_is_nec_bank;
+	
 	DECLARE_WRITE_LINE_MEMBER( keyboard_irq );
 	DECLARE_WRITE_LINE_MEMBER( write_uart_clock );
 	DECLARE_READ8_MEMBER(pc9801_xx_r);
@@ -701,7 +705,8 @@ public:
 	DECLARE_MACHINE_START(pc9801rs);
 	DECLARE_MACHINE_START(pc9801bx2);
 	DECLARE_MACHINE_START(pc9821);
-
+	DECLARE_MACHINE_START(pc9821ap2);
+	
 	DECLARE_MACHINE_RESET(pc9801_common);
 	DECLARE_MACHINE_RESET(pc9801f);
 	DECLARE_MACHINE_RESET(pc9801rs);
@@ -1901,6 +1906,14 @@ WRITE8_MEMBER(pc9801_state::pc9801rs_bank_w)
 {
 	if(offset == 1)
 	{
+		#if 0
+		if(m_is_nec_bank)
+		{
+			m_rom_bank = 1;
+			return;
+		}
+		#endif
+	
 		if((data & 0xf0) == 0x00 || (data & 0xf0) == 0x10)
 		{
 			if((data & 0xed) == 0x00)
@@ -3376,9 +3389,17 @@ MACHINE_START_MEMBER(pc9801_state,pc9821)
 	m_ide_ram = auto_alloc_array(machine(), UINT8, 0x2000);
 	m_ext_gvram = auto_alloc_array(machine(), UINT8, 0xa0000);
 
+	m_is_nec_bank = 0;
 	save_pointer(NAME(m_sdip), 24);
 	save_pointer(NAME(m_ide_ram), 0x2000);
 	save_pointer(NAME(m_ext_gvram), 0xa0000);
+}
+
+MACHINE_START_MEMBER(pc9801_state,pc9821ap2)
+{
+	MACHINE_START_CALL_MEMBER(pc9821);
+	
+	m_is_nec_bank = 1;
 }
 
 MACHINE_RESET_MEMBER(pc9801_state,pc9801_common)
@@ -3874,6 +3895,16 @@ static MACHINE_CONFIG_START( pc9821, pc9801_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.15)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( pc9821ap2, pc9821)
+	MCFG_CPU_REPLACE("maincpu", I486, 66666667) // unknown clock
+	MCFG_CPU_PROGRAM_MAP(pc9821_map)
+	MCFG_CPU_IO_MAP(pc9821_io)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", pc9801_state, pc9801_vrtc_irq)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259_master", pic8259_device, inta_cb)
+
+	MCFG_MACHINE_START_OVERRIDE(pc9801_state,pc9821ap2)
+MACHINE_CONFIG_END
+
 static MACHINE_CONFIG_DERIVED( pc9821v20, pc9821 )
 	MCFG_CPU_REPLACE("maincpu",PENTIUM,32000000) /* TODO: clock */
 	MCFG_CPU_PROGRAM_MAP(pc9821_map)
@@ -4115,8 +4146,12 @@ Graphics controller S3 86C928
 */
 
 ROM_START( pc9821ap2 )
-	ROM_REGION( 0x90000, "ipl", ROMREGION_ERASEFF )
-	ROM_LOAD( "phd0102.rom",     0x08000, 0x80000, CRC(3036774c) SHA1(59856a348f156adf5eca06326f967aca54ff871c) )
+	ROM_REGION( 0x80000, "biosrom", ROMREGION_ERASEFF )
+	ROM_LOAD( "phd0102.rom",     0x000000, 0x80000, CRC(3036774c) SHA1(59856a348f156adf5eca06326f967aca54ff871c) )
+
+	ROM_REGION( 0x60000, "ipl", ROMREGION_ERASEFF ) // TODO: identify ROM banks
+	ROM_COPY( "biosrom", 0x60000, 0x00000, 0x20000 )
+	ROM_COPY( "biosrom", 0x20000, 0x20000, 0x20000 )
 
 	ROM_REGION( 0x10000, "sound_bios", 0 )
 	ROM_LOAD( "sound.rom", 0x0000, 0x4000, CRC(a21ef796) SHA1(34137c287c39c44300b04ee97c1e6459bb826b60) )
@@ -4316,7 +4351,7 @@ COMP( 1988, pc9801rx,  pc9801rs,0,     pc9801ux, pc9801rs, pc9801_state, pc9801_
 COMP( 1993, pc9801bx2, pc9801rs,0,     pc9801bx2,pc9801rs, pc9801_state, pc9801_kanji, "Nippon Electronic Company",   "PC-9801BX2/U2", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND)
 COMP( 1994, pc9821,    0,       0,     pc9821,   pc9821,   pc9801_state, pc9801_kanji, "Nippon Electronic Company",   "PC-9821 (98MATE)",  GAME_NOT_WORKING | GAME_IMPERFECT_SOUND) //TODO: not sure about the exact model
 COMP( 1993, pc9821as,  pc9821,  0,     pc9821,   pc9821,   pc9801_state, pc9801_kanji, "Nippon Electronic Company",   "PC-9821 (98MATE A)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND)
-COMP( 1993, pc9821ap2, pc9821,  0,     pc9821,   pc9821,   pc9801_state, pc9801_kanji, "Nippon Electronic Company",   "PC-9821AP2/U8W (98MATE A)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND)
+COMP( 1993, pc9821ap2, pc9821,  0,     pc9821ap2,pc9821,   pc9801_state, pc9801_kanji, "Nippon Electronic Company",   "PC-9821AP2/U8W (98MATE A)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND)
 COMP( 1994, pc9821xs,  pc9821,  0,     pc9821,   pc9821,   pc9801_state, pc9801_kanji, "Nippon Electronic Company",   "PC-9821 (98MATE Xs)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND)
 COMP( 1994, pc9821ce2, pc9821,  0,     pc9821,   pc9821,   pc9801_state, pc9801_kanji, "Nippon Electronic Company",   "PC-9821 (98MULTi Ce2)",  GAME_NOT_WORKING | GAME_IMPERFECT_SOUND)
 COMP( 1994, pc9821ne,  pc9821,  0,     pc9821,   pc9821,   pc9801_state, pc9801_kanji, "Nippon Electronic Company",   "PC-9821 (98NOTE)",  GAME_NOT_WORKING | GAME_IMPERFECT_SOUND)
