@@ -4106,6 +4106,12 @@ ROM_END
 
 /*
 PC-9821AP2/U8W
+80486DX2 66MHz
+DOS 5.0, Windows 3.1
+5.6MB RAM, up to 73.6MB
+340MB HD
+Expansion slot C-BUS4 (4)
+Graphics controller S3 86C928
 */
 
 ROM_START( pc9821ap2 )
