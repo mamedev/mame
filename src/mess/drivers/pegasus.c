@@ -437,7 +437,7 @@ int pegasus_state::load_cart(device_image_interface &image, generic_slot_device 
 		}
 	}
 
-	slot->rom_alloc(0x1000, 1);	// we alloc 0x1000 also for smaller roms!
+	slot->rom_alloc(0x1000, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);	// we alloc 0x1000 also for smaller roms!
 	slot->common_load_rom(slot->get_rom_base(), size, any_socket ? "rom" : reg_tag);
 	
 	// raw images have to be decrypted
@@ -450,15 +450,15 @@ void pegasus_state::machine_start()
 {
 	m_p_pcgram = memregion("pcg")->base();
 
-	if (m_exp_00->cart_mounted())
+	if (m_exp_00->exists())
 		m_maincpu->space(AS_PROGRAM).install_read_handler(0x0000, 0x0fff, read8_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_exp_00));
-	if (m_exp_01->cart_mounted())
+	if (m_exp_01->exists())
 		m_maincpu->space(AS_PROGRAM).install_read_handler(0x1000, 0x1fff, read8_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_exp_01));
-	if (m_exp_02->cart_mounted())
+	if (m_exp_02->exists())
 		m_maincpu->space(AS_PROGRAM).install_read_handler(0x2000, 0x2fff, read8_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_exp_02));
-	if (m_exp_0c->cart_mounted())
+	if (m_exp_0c->exists())
 		m_maincpu->space(AS_PROGRAM).install_read_handler(0xc000, 0xcfff, read8_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_exp_0c));
-	if (m_exp_0d->cart_mounted())
+	if (m_exp_0d->exists())
 		m_maincpu->space(AS_PROGRAM).install_read_handler(0xd000, 0xdfff, read8_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_exp_0d));
 }
 
@@ -515,19 +515,19 @@ static MACHINE_CONFIG_START( pegasus, pegasus_state )
 	MCFG_PIA_IRQA_HANDLER(DEVWRITELINE("maincpu", m6809e_device, irq_line))
 	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE("maincpu", m6809e_device, irq_line))
 
-	MCFG_GENERIC_SOCKET_ADD("exp00", GENERIC_ROM8_WIDTH, generic_plain_slot, "pegasus_cart")
+	MCFG_GENERIC_SOCKET_ADD("exp00", generic_plain_slot, "pegasus_cart")
 	MCFG_GENERIC_LOAD(pegasus_state, exp00_load)
 
-	MCFG_GENERIC_SOCKET_ADD("exp01", GENERIC_ROM8_WIDTH, generic_plain_slot, "pegasus_cart")
+	MCFG_GENERIC_SOCKET_ADD("exp01", generic_plain_slot, "pegasus_cart")
 	MCFG_GENERIC_LOAD(pegasus_state, exp01_load)
 
-	MCFG_GENERIC_SOCKET_ADD("exp02", GENERIC_ROM8_WIDTH, generic_plain_slot, "pegasus_cart")
+	MCFG_GENERIC_SOCKET_ADD("exp02", generic_plain_slot, "pegasus_cart")
 	MCFG_GENERIC_LOAD(pegasus_state, exp02_load)
 
-	MCFG_GENERIC_SOCKET_ADD("exp0c", GENERIC_ROM8_WIDTH, generic_plain_slot, "pegasus_cart")
+	MCFG_GENERIC_SOCKET_ADD("exp0c", generic_plain_slot, "pegasus_cart")
 	MCFG_GENERIC_LOAD(pegasus_state, exp0c_load)
 
-	MCFG_GENERIC_SOCKET_ADD("exp0d", GENERIC_ROM8_WIDTH, generic_plain_slot, "pegasus_cart")
+	MCFG_GENERIC_SOCKET_ADD("exp0d", generic_plain_slot, "pegasus_cart")
 	MCFG_GENERIC_LOAD(pegasus_state, exp0d_load)
 
 	MCFG_CASSETTE_ADD("cassette")

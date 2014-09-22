@@ -873,7 +873,7 @@ static MACHINE_CONFIG_START( portfolio, portfolio_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard", portfolio_state, keyboard_tick, attotime::from_usec(2500))
 
 	/* cartridge */
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", GENERIC_ROM8_WIDTH, generic_plain_slot, "portfolio_cart")
+	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "portfolio_cart")
 	MCFG_GENERIC_LOAD(portfolio_state, portfolio_cart)
 
 	/* memory card */

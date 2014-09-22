@@ -172,7 +172,7 @@ WRITE8_MEMBER(aquarius_state::scrambler_w)
 READ8_MEMBER(aquarius_state::cartridge_r)
 {
 	UINT8 data = 0;
-	if (m_cart->cart_mounted())
+	if (m_cart->exists())
 		data = m_cart->read_rom(space, offset);
 
 	return data ^ m_scrambler;
@@ -376,7 +376,7 @@ static MACHINE_CONFIG_START( aquarius, aquarius_state )
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED)
 
 	/* cartridge */
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", GENERIC_ROM8_WIDTH, generic_linear_slot, "aquarius_cart")
+	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_linear_slot, "aquarius_cart")
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

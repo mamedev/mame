@@ -132,7 +132,7 @@ DEVICE_IMAGE_LOAD_MEMBER(ti74_state, ti74_cartridge)
 		return IMAGE_INIT_FAIL;
 	}
 	
-	m_cart->rom_alloc(size, 1);
+	m_cart->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
 	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");			
 	
 	return IMAGE_INIT_PASS;
@@ -492,7 +492,7 @@ void ti74_state::machine_reset()
 
 void ti74_state::machine_start()
 {
-	if (m_cart->cart_mounted())
+	if (m_cart->exists())
 		m_maincpu->space(AS_PROGRAM).install_read_handler(0x4000, 0xbfff, read8_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_cart));
 
 	membank("sysbank")->configure_entries(0, 4, memregion("system")->base(), 0x2000);
@@ -534,7 +534,7 @@ static MACHINE_CONFIG_START( ti74, ti74_state )
 	MCFG_HD44780_PIXEL_UPDATE_CB(ti74_pixel_update)
 
 	/* cartridge */
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", GENERIC_ROM8_WIDTH, generic_plain_slot, "ti74_cart")
+	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "ti74_cart")
 	MCFG_GENERIC_EXTENSIONS("bin,rom,256")
 	MCFG_GENERIC_LOAD(ti74_state, ti74_cartridge)
 
@@ -568,7 +568,7 @@ static MACHINE_CONFIG_START( ti95, ti74_state )
 	MCFG_HD44780_PIXEL_UPDATE_CB(ti95_pixel_update)
 
 	/* cartridge */
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", GENERIC_ROM8_WIDTH, generic_plain_slot, "ti95_cart")
+	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "ti95_cart")
 	MCFG_GENERIC_EXTENSIONS("bin,rom,256")
 	MCFG_GENERIC_LOAD(ti74_state, ti74_cartridge)
 

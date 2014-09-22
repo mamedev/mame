@@ -1761,7 +1761,7 @@ DEVICE_IMAGE_LOAD_MEMBER( supracan_state, supracan_cart )
 		return IMAGE_INIT_FAIL;
 	}
 
-	m_cart->rom_alloc(size, 2);
+	m_cart->rom_alloc(size, GENERIC_ROM16_WIDTH, ENDIANNESS_BIG);
 	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");			
 	
 	return IMAGE_INIT_PASS;
@@ -1775,7 +1775,7 @@ void supracan_state::machine_start()
 	m_line_on_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(supracan_state::supracan_line_on_callback),this));
 	m_line_off_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(supracan_state::supracan_line_off_callback),this));
 
-	if (m_cart->cart_mounted())
+	if (m_cart->exists())
 		m_maincpu->space(AS_PROGRAM).install_read_handler(0x000000, 0x3fffff, read16_delegate(FUNC(generic_slot_device::read16_rom),(generic_slot_device*)m_cart));
 }
 
@@ -1921,7 +1921,9 @@ static MACHINE_CONFIG_START( supracan, supracan_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", supracan)
 
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", GENERIC_ROM16_WIDTH, generic_plain_slot, "supracan_cart")
+	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "supracan_cart")
+	MCFG_GENERIC_WIDTH(GENERIC_ROM16_WIDTH)
+	MCFG_GENERIC_ENDIAN(ENDIANNESS_BIG)
 	MCFG_GENERIC_LOAD(supracan_state, supracan_cart)
 
 	MCFG_SOFTWARE_LIST_ADD("cart_list","supracan")

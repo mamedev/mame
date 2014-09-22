@@ -65,7 +65,7 @@ static MACHINE_CONFIG_START( gamepock, gamepock_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* cartridge */
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", GENERIC_ROM8_WIDTH, generic_plain_slot, "gamepock_cart")
+	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "gamepock_cart")
 
 	/* Software lists */
 	MCFG_SOFTWARE_LIST_ADD("cart_list","gamepock")

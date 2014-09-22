@@ -479,7 +479,7 @@ DEVICE_IMAGE_LOAD_MEMBER( casloopy_state, loopy_cart )
 	dynamic_buffer temp;
 	temp.resize(0x200000);
 	
-	m_cart->rom_alloc(size, GENERIC_ROM32_WIDTH);
+	m_cart->rom_alloc(size, GENERIC_ROM32_WIDTH, ENDIANNESS_LITTLE);
 
 	SRC = temp;
 	DST = m_cart->get_rom_base();
@@ -523,8 +523,10 @@ static MACHINE_CONFIG_START( casloopy, casloopy_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
 
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", GENERIC_ROM32_WIDTH, generic_plain_slot, "loopy_cart")
+	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "loopy_cart")
 	MCFG_GENERIC_EXTENSIONS("bin,ic1")
+	MCFG_GENERIC_WIDTH(GENERIC_ROM32_WIDTH)
+	MCFG_GENERIC_ENDIAN(ENDIANNESS_LITTLE)
 	MCFG_GENERIC_MANDATORY
 	MCFG_GENERIC_LOAD(casloopy_state, loopy_cart)
 

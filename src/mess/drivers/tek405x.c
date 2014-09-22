@@ -1091,8 +1091,8 @@ static MACHINE_CONFIG_START( tek4051, tek4051_state )
 	MCFG_RAM_EXTRA_OPTIONS("16K,24K,32K")
 
 	// cartridge
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot1", GENERIC_ROM8_WIDTH, generic_plain_slot, "tek4050_cart")
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot2", GENERIC_ROM8_WIDTH, generic_plain_slot, "tek4050_cart")
+	MCFG_GENERIC_CARTSLOT_ADD("cartslot1", generic_plain_slot, "tek4050_cart")
+	MCFG_GENERIC_CARTSLOT_ADD("cartslot2", generic_plain_slot, "tek4050_cart")
 MACHINE_CONFIG_END
 
 
@@ -1127,8 +1127,8 @@ static MACHINE_CONFIG_START( tek4052, tek4052_state )
 	MCFG_RAM_EXTRA_OPTIONS("64K")
 
 	// cartridge
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot1", GENERIC_ROM8_WIDTH, generic_plain_slot, "tek4050_cart")
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot2", GENERIC_ROM8_WIDTH, generic_plain_slot, "tek4050_cart")
+	MCFG_GENERIC_CARTSLOT_ADD("cartslot1", generic_plain_slot, "tek4050_cart")
+	MCFG_GENERIC_CARTSLOT_ADD("cartslot2", generic_plain_slot, "tek4050_cart")
 
 	// software lists
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "tek4052_cart")

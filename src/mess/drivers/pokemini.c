@@ -1514,7 +1514,7 @@ DEVICE_IMAGE_LOAD_MEMBER( pokemini_state, pokemini_cart )
 		return IMAGE_INIT_FAIL;
 	}
 
-	m_cart->rom_alloc(size, 1);
+	m_cart->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
 	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");			
 
 	return IMAGE_INIT_PASS;
@@ -1779,7 +1779,7 @@ static MACHINE_CONFIG_START( pokemini, pokemini_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* cartridge */
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", GENERIC_ROM8_WIDTH, generic_plain_slot, "pokemini_cart")
+	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "pokemini_cart")
 	MCFG_GENERIC_EXTENSIONS("bin,min")
 	MCFG_GENERIC_LOAD(pokemini_state, pokemini_cart)
 

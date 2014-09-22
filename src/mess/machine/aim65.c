@@ -143,11 +143,11 @@ void aim65_state::machine_start()
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
 	// Init ROM sockets
-	if (m_z24->cart_mounted())
+	if (m_z24->exists())
 		space.install_read_handler(0xd000, 0xdfff, read8_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_z24));
-	if (m_z25->cart_mounted())
+	if (m_z25->exists())
 		space.install_read_handler(0xc000, 0xcfff, read8_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_z25));
-	if (m_z26->cart_mounted())
+	if (m_z26->exists())
 		space.install_read_handler(0xb000, 0xbfff, read8_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_z26));
 	
 	// Init RAM

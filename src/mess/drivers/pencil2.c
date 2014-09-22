@@ -274,7 +274,7 @@ INPUT_PORTS_END
 
 void pencil2_state::machine_start()
 {
-	if (m_cart->cart_mounted())
+	if (m_cart->exists())
 		m_maincpu->space(AS_PROGRAM).install_read_handler(0x8000, 0xffff, read8_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_cart));
 }
 
@@ -301,7 +301,7 @@ static MACHINE_CONFIG_START( pencil2, pencil2_state )
 	MCFG_CASSETTE_ADD( "cassette" )
 
 	/* cartridge */
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", GENERIC_ROM8_WIDTH, generic_plain_slot, "pencil2_cart")
+	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "pencil2_cart")
 
 	/* printer */
 	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "printer")

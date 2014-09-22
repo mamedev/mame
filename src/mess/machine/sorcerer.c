@@ -373,7 +373,7 @@ void sorcerer_state::machine_start()
 		break;
 	}
 
-	if (m_cart->cart_mounted())
+	if (m_cart->exists())
 		space.install_read_handler(0xc000, 0xdfff, read8_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_cart));
 }
 

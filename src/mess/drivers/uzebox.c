@@ -67,7 +67,7 @@ void uzebox_state::machine_start()
 {
 	machine().first_screen()->register_screen_bitmap(m_bitmap);
 
-	if (m_cart->cart_mounted())
+	if (m_cart->exists())
 		m_maincpu->space(AS_PROGRAM).install_read_handler(0x0000, 0xffff, read8_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_cart));
 }
 
@@ -274,7 +274,7 @@ DEVICE_IMAGE_LOAD_MEMBER(uzebox_state, uzebox_cart)
 {
 	UINT32 size = m_cart->common_get_size("rom");
 	
-	m_cart->rom_alloc(size, 1);
+	m_cart->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
 
 	if (image.software_entry() == NULL)
 	{
@@ -319,7 +319,7 @@ static MACHINE_CONFIG_START( uzebox, uzebox_state )
 	MCFG_SOUND_ADD("dac", DAC, 0)
 	MCFG_SOUND_ROUTE(0, "avr8", 1.00)
 
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", GENERIC_ROM8_WIDTH, generic_plain_slot, "uzebox")
+	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "uzebox")
 	MCFG_GENERIC_EXTENSIONS("bin,uze")
 	MCFG_GENERIC_MANDATORY
 	MCFG_GENERIC_LOAD(uzebox_state, uzebox_cart)

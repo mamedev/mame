@@ -163,7 +163,7 @@ int aim65_state::load_cart(device_image_interface &image, generic_slot_device *s
 		return IMAGE_INIT_FAIL;
 	}
 
-	slot->rom_alloc(size, 1);
+	slot->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
 	slot->common_load_rom(slot->get_rom_base(), size, slot_tag);
 
 	return IMAGE_INIT_PASS;
@@ -225,15 +225,15 @@ static MACHINE_CONFIG_START( aim65, aim65_state )
 	MCFG_CASSETTE_ADD( "cassette2" )
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_RECORD | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED)
 
-	MCFG_GENERIC_SOCKET_ADD("z26", GENERIC_ROM8_WIDTH, generic_plain_slot, "aim65_cart")
+	MCFG_GENERIC_SOCKET_ADD("z26", generic_plain_slot, "aim65_cart")
 	MCFG_GENERIC_EXTENSIONS("z26")
 	MCFG_GENERIC_LOAD(aim65_state, z26_load)
 
-	MCFG_GENERIC_SOCKET_ADD("z25", GENERIC_ROM8_WIDTH, generic_plain_slot, "aim65_cart")
+	MCFG_GENERIC_SOCKET_ADD("z25", generic_plain_slot, "aim65_cart")
 	MCFG_GENERIC_EXTENSIONS("z25")
 	MCFG_GENERIC_LOAD(aim65_state, z25_load)
 
-	MCFG_GENERIC_SOCKET_ADD("z24", GENERIC_ROM8_WIDTH, generic_plain_slot, "aim65_cart")
+	MCFG_GENERIC_SOCKET_ADD("z24", generic_plain_slot, "aim65_cart")
 	MCFG_GENERIC_EXTENSIONS("z24")
 	MCFG_GENERIC_LOAD(aim65_state, z24_load)
 

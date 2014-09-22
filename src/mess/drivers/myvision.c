@@ -128,7 +128,7 @@ INPUT_PORTS_END
 
 void myvision_state::machine_start()
 {
-	if (m_cart->cart_mounted())
+	if (m_cart->exists())
 		m_maincpu->space(AS_PROGRAM).install_read_handler(0x0000, 0x5fff, read8_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_cart));
 
 	save_item(NAME(m_column));
@@ -151,7 +151,7 @@ DEVICE_IMAGE_LOAD_MEMBER( myvision_state, cart )
 		return IMAGE_INIT_FAIL;
 	}
 	
-	m_cart->rom_alloc(size, 1);
+	m_cart->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
 	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");			
 
 	return IMAGE_INIT_PASS;
@@ -231,7 +231,7 @@ static MACHINE_CONFIG_START( myvision, myvision_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* cartridge */
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", GENERIC_ROM8_WIDTH, generic_plain_slot, "myvision_cart")
+	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "myvision_cart")
 	MCFG_GENERIC_LOAD(myvision_state, cart)
 	//MCFG_GENERIC_MANDATORY
 

@@ -190,7 +190,7 @@ UINT8 c128_state::read_memory(address_space &space, offs_t offset, offs_t vma, i
 	{
 		data = m_vic->read(space, offset & 0x3f);
 	}
-	if (!BIT(plaout, PLA_OUT_FROM1) && m_from->cart_mounted())
+	if (!BIT(plaout, PLA_OUT_FROM1) && m_from->exists())
 	{
 		data = m_from->read_rom(space, offset & 0x7fff);
 	}
@@ -1549,7 +1549,7 @@ static MACHINE_CONFIG_START( ntsc, c128_state )
 	MCFG_SOFTWARE_LIST_FILTER("from_list", "NTSC")
 
 	// function ROM
-	MCFG_GENERIC_SOCKET_ADD("from", GENERIC_ROM8_WIDTH, generic_plain_slot, "c128_rom")
+	MCFG_GENERIC_SOCKET_ADD("from", generic_plain_slot, "c128_rom")
 	MCFG_GENERIC_EXTENSIONS("bin,rom")
 
 	// internal ram
@@ -1723,7 +1723,7 @@ static MACHINE_CONFIG_START( pal, c128_state )
 	MCFG_SOFTWARE_LIST_FILTER("from_list", "PAL")
 
 	// function ROM
-	MCFG_GENERIC_SOCKET_ADD("from", GENERIC_ROM8_WIDTH, generic_plain_slot, "c128_rom")
+	MCFG_GENERIC_SOCKET_ADD("from", generic_plain_slot, "c128_rom")
 	MCFG_GENERIC_EXTENSIONS("bin,rom")
 
 	// internal ram

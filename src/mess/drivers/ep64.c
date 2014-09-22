@@ -470,7 +470,7 @@ INPUT_PORTS_END
 
 void ep64_state::machine_start()
 {
-	if (m_cart->cart_mounted())
+	if (m_cart->exists())
 		m_dave->space(AS_PROGRAM).install_read_handler(0x010000, 0x01ffff, read8_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_cart));
 
 	// state saving
@@ -541,7 +541,7 @@ static MACHINE_CONFIG_START( ep64, ep64_state )
 	MCFG_RAM_DEFAULT_SIZE("64K")
 
 	// cartridge
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", GENERIC_ROM8_WIDTH, generic_linear_slot, "ep64_cart")
+	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_linear_slot, "ep64_cart")
 	MCFG_GENERIC_EXTENSIONS("bin,rom")
 
 	// software lists

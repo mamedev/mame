@@ -1937,7 +1937,7 @@ void st_state::machine_start()
 	// configure RAM banking
 	configure_memory();
 
-	if (m_cart->cart_mounted())
+	if (m_cart->exists())
 		m_maincpu->space(AS_PROGRAM).install_read_handler(0xfa0000, 0xfbffff, read16_delegate(FUNC(generic_slot_device::read16_rom),(generic_slot_device*)m_cart));
 
 	// allocate timers
@@ -1998,7 +1998,7 @@ void ste_state::machine_start()
 	/* configure RAM banking */
 	configure_memory();
 
-	if (m_cart->cart_mounted())
+	if (m_cart->exists())
 		m_maincpu->space(AS_PROGRAM).install_read_handler(0xfa0000, 0xfbffff, read16_delegate(FUNC(generic_slot_device::read16_rom),(generic_slot_device*)m_cart));
 
 	/* allocate timers */
@@ -2043,7 +2043,7 @@ void stbook_state::machine_start()
 		break;
 	}
 
-	if (m_cart->cart_mounted())
+	if (m_cart->exists())
 		m_maincpu->space(AS_PROGRAM).install_read_handler(0xfa0000, 0xfbffff, read16_delegate(FUNC(generic_slot_device::read16_rom),(generic_slot_device*)m_cart));
 
 	/* register for state saving */
@@ -2142,8 +2142,9 @@ static MACHINE_CONFIG_START( st, st_state )
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(st_state, write_acia_clock))
 
 	// cartridge
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", GENERIC_ROM16_WIDTH, generic_linear_slot, "st_cart")
+	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_linear_slot, "st_cart")
 	MCFG_GENERIC_EXTENSIONS("bin,rom")
+	MCFG_GENERIC_WIDTH(GENERIC_ROM16_WIDTH)
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "st_cart")
 
 	// internal ram
@@ -2231,8 +2232,9 @@ static MACHINE_CONFIG_START( megast, megast_state )
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(st_state, write_acia_clock))
 
 	// cartridge
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", GENERIC_ROM16_WIDTH, generic_linear_slot, "st_cart")
+	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_linear_slot, "st_cart")
 	MCFG_GENERIC_EXTENSIONS("bin,rom")
+	MCFG_GENERIC_WIDTH(GENERIC_ROM16_WIDTH)
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "st_cart")
 
 	// internal ram
@@ -2327,8 +2329,9 @@ static MACHINE_CONFIG_START( ste, ste_state )
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(st_state, write_acia_clock))
 
 	// cartridge
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", GENERIC_ROM16_WIDTH, generic_linear_slot, "st_cart")
+	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_linear_slot, "st_cart")
 	MCFG_GENERIC_EXTENSIONS("bin,rom")
+	MCFG_GENERIC_WIDTH(GENERIC_ROM16_WIDTH)
 //  MCFG_SOFTWARE_LIST_ADD("cart_list", "ste_cart")
 
 	// internal ram
@@ -2431,8 +2434,9 @@ static MACHINE_CONFIG_START( stbook, stbook_state )
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(st_state, write_acia_clock))
 
 	// cartridge
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", GENERIC_ROM16_WIDTH, generic_linear_slot, "st_cart")
+	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_linear_slot, "st_cart")
 	MCFG_GENERIC_EXTENSIONS("bin,rom")
+	MCFG_GENERIC_WIDTH(GENERIC_ROM16_WIDTH)
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "st_cart")
 
 	/* internal ram */

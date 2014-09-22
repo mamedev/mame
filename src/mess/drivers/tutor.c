@@ -728,7 +728,7 @@ static MACHINE_CONFIG_START( tutor, tutor_state )
 	MCFG_CASSETTE_ADD( "cassette" )
 
 	/* cartridge */
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", GENERIC_ROM8_WIDTH, generic_linear_slot, "tutor_cart")
+	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_linear_slot, "tutor_cart")
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("cart_list","tutor")

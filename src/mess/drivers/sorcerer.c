@@ -450,7 +450,7 @@ static MACHINE_CONFIG_START( sorcerer, sorcerer_state )
 	MCFG_CASSETTE_INTERFACE("sorcerer_cass")
 
 	/* cartridge */
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", GENERIC_ROM8_WIDTH, generic_plain_slot, "sorcerer_cart")
+	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "sorcerer_cart")
 	MCFG_GENERIC_EXTENSIONS("bin,rom")
 
 	/* software lists */

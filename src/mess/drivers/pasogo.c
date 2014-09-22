@@ -967,7 +967,8 @@ static MACHINE_CONFIG_START( pasogo, pasogo_state )
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", GENERIC_ROM16_WIDTH, generic_plain_slot, "pasogo_cart")
+	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "pasogo_cart")
+	MCFG_GENERIC_WIDTH(GENERIC_ROM16_WIDTH)
 	MCFG_GENERIC_MANDATORY
 
 	MCFG_SOFTWARE_LIST_ADD("cart_list","pasogo")

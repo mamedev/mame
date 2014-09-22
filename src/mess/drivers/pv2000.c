@@ -344,7 +344,7 @@ WRITE_LINE_MEMBER( pv2000_state::pv2000_vdp_interrupt )
 
 void pv2000_state::machine_start()
 {
-	if (m_cart->cart_mounted())
+	if (m_cart->exists())
 		m_maincpu->space(AS_PROGRAM).install_read_handler(0xc000, 0xffff, read8_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_cart));
 }
 
@@ -368,7 +368,7 @@ DEVICE_IMAGE_LOAD_MEMBER( pv2000_state, pv2000_cart )
 		return IMAGE_INIT_FAIL;
 	}
 	
-	m_cart->rom_alloc(size, 1);
+	m_cart->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
 	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");			
 	
 	return IMAGE_INIT_PASS;
@@ -403,7 +403,7 @@ static MACHINE_CONFIG_START( pv2000, pv2000_state )
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED)
 
 	/* cartridge */
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", GENERIC_ROM8_WIDTH, generic_plain_slot, "pv2000_cart")
+	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "pv2000_cart")
 	MCFG_GENERIC_EXTENSIONS("bin,rom,col")
 	MCFG_GENERIC_LOAD(pv2000_state, pv2000_cart)
 

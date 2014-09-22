@@ -410,7 +410,7 @@ INPUT_PORTS_END
 void rx78_state::machine_reset()
 {
 	address_space &prg = m_maincpu->space(AS_PROGRAM);	
-	if (m_cart->cart_mounted())
+	if (m_cart->exists())
 		prg.install_read_handler(0x2000, 0x5fff, read8_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_cart));
 }
 
@@ -424,7 +424,7 @@ DEVICE_IMAGE_LOAD_MEMBER( rx78_state, rx78_cart )
 		return IMAGE_INIT_FAIL;
 	}
 	
-	m_cart->rom_alloc(size, 1);
+	m_cart->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
 	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");			
 	
 	return IMAGE_INIT_PASS;
@@ -468,7 +468,7 @@ static MACHINE_CONFIG_START( rx78, rx78_state )
 	MCFG_PALETTE_ADD("palette", 16+1) //+1 for the background color
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", rx78)
 
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", GENERIC_ROM8_WIDTH, generic_plain_slot, "rx78_cart")
+	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "rx78_cart")
 	MCFG_GENERIC_EXTENSIONS("bin,rom")
 	MCFG_GENERIC_LOAD(rx78_state, rx78_cart)
 

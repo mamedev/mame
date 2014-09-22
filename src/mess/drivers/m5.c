@@ -547,7 +547,7 @@ void m5_state::machine_start()
 		break;
 	}
 
-	if (m_cart->cart_mounted())
+	if (m_cart->exists())
 		program.install_read_handler(0x2000, 0x6fff, read8_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_cart));
 
 	// register for state saving
@@ -616,7 +616,7 @@ static MACHINE_CONFIG_START( m5, m5_state )
 	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":0", m5_floppies, "525dd", m5_state::floppy_formats)
 
 	// cartridge
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", GENERIC_ROM8_WIDTH, generic_plain_slot, "m5_cart")
+	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "m5_cart")
 	MCFG_GENERIC_EXTENSIONS("bin,rom")
 	//MCFG_GENERIC_MANDATORY
 

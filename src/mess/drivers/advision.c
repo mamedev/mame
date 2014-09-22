@@ -94,7 +94,7 @@ static MACHINE_CONFIG_START( advision, advision_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	/* cartridge */
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", GENERIC_ROM8_WIDTH, generic_plain_slot, "advision_cart")
+	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "advision_cart")
 	MCFG_GENERIC_MANDATORY
 
 	/* Software lists */

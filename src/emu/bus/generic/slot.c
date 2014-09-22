@@ -41,13 +41,13 @@ device_generic_cart_interface::~device_generic_cart_interface()
 //  rom_alloc - alloc the space for the cart
 //-------------------------------------------------
 
-void device_generic_cart_interface::rom_alloc(size_t size, int width, const char *tag)
+void device_generic_cart_interface::rom_alloc(size_t size, int width, endianness_t endian, const char *tag)
 {
 	if (m_rom == NULL)
 	{
 		astring tempstring(tag);
 		tempstring.cat(GENERIC_ROM_REGION_TAG);
-		m_rom = device().machine().memory().region_alloc(tempstring, size, width, ENDIANNESS_LITTLE)->base();
+		m_rom = device().machine().memory().region_alloc(tempstring, size, width, endian)->base();
 		m_rom_size = size;
 	}
 }
@@ -84,7 +84,7 @@ generic_slot_device::generic_slot_device(const machine_config &mconfig, const ch
 						m_extensions("bin"),
 						m_must_be_loaded(FALSE),
 						m_width(GENERIC_ROM8_WIDTH),
-						m_empty(TRUE)
+						m_endianness(ENDIANNESS_LITTLE)
 {
 }
 
@@ -128,18 +128,13 @@ bool generic_slot_device::call_load()
 	if (m_cart)
 	{		
 		if (!m_device_image_load.isnull())
-		{
-			int result = m_device_image_load(*this);
-			m_empty = (result == IMAGE_INIT_PASS) ? FALSE : TRUE;
-			return result;
-		}
+			return m_device_image_load(*this);
 		else
 		{
 			UINT32 len = common_get_size("rom");
 			
-			rom_alloc(len, m_width);
+			rom_alloc(len, m_width, m_endianness);
 			common_load_rom(get_rom_base(), len, "rom");			
-			m_empty = FALSE;
 
 			return IMAGE_INIT_PASS;
 		}

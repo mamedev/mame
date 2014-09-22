@@ -251,7 +251,7 @@ static const floppy_interface svi318_floppy_interface =
 };
 
 static MACHINE_CONFIG_FRAGMENT( svi318_cartslot )
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", GENERIC_ROM8_WIDTH, generic_plain_slot, "svi318_cart")
+	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "svi318_cart")
 	MCFG_GENERIC_EXTENSIONS("bin,rom")
 	MCFG_GENERIC_LOAD(svi318_state, svi318_cart)
 

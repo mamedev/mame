@@ -365,7 +365,7 @@ WRITE8_MEMBER(exelv_state::tms7041_portd_w)
 */
 READ8_MEMBER(exelv_state::rom_r)
 {
-	if (m_cart && m_cart->cart_mounted())
+	if (m_cart && m_cart->exists())
 		return m_cart->read_rom(space, offset + 0x200);
 
 	return 0;
@@ -535,7 +535,7 @@ static MACHINE_CONFIG_START( exl100, exelv_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* cartridge */
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", GENERIC_ROM8_WIDTH, generic_linear_slot, "exelvision_cart")
+	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_linear_slot, "exelvision_cart")
 	MCFG_GENERIC_EXTENSIONS("bin,rom")
 
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "exl100_cart")

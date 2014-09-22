@@ -961,7 +961,7 @@ WRITE8_MEMBER( x1_state::x1_sub_io_w )
 READ8_MEMBER( x1_state::x1_rom_r )
 {
 //  printf("%06x\n",m_rom_index[0]<<16|m_rom_index[1]<<8|m_rom_index[2]<<0);
-	if (m_cart->cart_mounted())
+	if (m_cart->exists())
 		return m_cart->read_rom(space, (m_rom_index[0] << 16) | (m_rom_index[1] << 8) | (m_rom_index[2] << 0));
 	else
 		return 0;
@@ -2478,7 +2478,7 @@ static MACHINE_CONFIG_START( x1, x1_state )
 	MCFG_DEVICE_ADD("fdc", MB8877, 0)
 	MCFG_WD17XX_DEFAULT_DRIVE4_TAGS
 
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", GENERIC_ROM8_WIDTH, generic_plain_slot, "x1_cart")
+	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "x1_cart")
 	MCFG_GENERIC_EXTENSIONS("bin,rom")
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

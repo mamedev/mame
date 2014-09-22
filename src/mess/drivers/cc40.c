@@ -165,7 +165,7 @@ DEVICE_IMAGE_LOAD_MEMBER(cc40_state, cc40_cartridge)
 		return IMAGE_INIT_FAIL;
 	}
 
-	m_cart->rom_alloc(size, 0x20000);	// allocate a larger ROM region to have 4x32K banks
+	m_cart->rom_alloc(0x20000, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);	// allocate a larger ROM region to have 4x32K banks
 	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");			
 
 	return IMAGE_INIT_PASS;
@@ -614,7 +614,7 @@ static MACHINE_CONFIG_START( cc40, cc40_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* cartridge */
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", GENERIC_ROM8_WIDTH, generic_plain_slot, "cc40_cart")
+	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "cc40_cart")
 	MCFG_GENERIC_EXTENSIONS("bin,rom,256")
 	MCFG_GENERIC_LOAD(cc40_state, cc40_cartridge)
 

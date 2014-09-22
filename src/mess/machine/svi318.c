@@ -59,7 +59,7 @@ DEVICE_IMAGE_LOAD_MEMBER( svi318_state, svi318_cart )
 		return IMAGE_INIT_FAIL;
 	}
 
-	m_cart->rom_alloc(size, 1);
+	m_cart->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
 	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");			
 
 	if (image.software_entry() == NULL && !cart_verify(m_cart->get_rom_base()))

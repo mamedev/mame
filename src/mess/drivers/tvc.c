@@ -794,7 +794,7 @@ static MACHINE_CONFIG_START( tvc, tvc_state )
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
 	/* cartridge */
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", GENERIC_ROM8_WIDTH, generic_plain_slot, "tvc_cart")
+	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "tvc_cart")
 	MCFG_GENERIC_EXTENSIONS("bin,rom,crt")
 
 	/* expansion interface */

@@ -118,7 +118,7 @@ static const z80_daisy_config bbcbc_daisy_chain[] =
 
 void bbcbc_state::machine_start()
 {
-	if (m_cart->cart_mounted())
+	if (m_cart->exists())
 		m_maincpu->space(AS_PROGRAM).install_read_handler(0x4000, 0xbfff, read8_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_cart));
 }
 
@@ -141,7 +141,7 @@ static MACHINE_CONFIG_START( bbcbc, bbcbc_state )
 	MCFG_TMS9928A_SCREEN_ADD_PAL( "screen" )
 	MCFG_SCREEN_UPDATE_DEVICE( "tms9129", tms9928a_device, screen_update )
 
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", GENERIC_ROM8_WIDTH, generic_plain_slot, "bbcbc_cart")
+	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "bbcbc_cart")
 
 	/* Software lists */
 	MCFG_SOFTWARE_LIST_ADD("cart_list","bbcbc")

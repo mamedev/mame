@@ -474,7 +474,7 @@ static MACHINE_CONFIG_START( x1twin, x1twin_state )
 	MCFG_DEVICE_ADD("fdc", MB8877, 0)
 	MCFG_WD17XX_DEFAULT_DRIVE4_TAGS
 
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", GENERIC_ROM8_WIDTH, generic_plain_slot, "x1_cart")
+	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "x1_cart")
 	MCFG_GENERIC_EXTENSIONS("bin,rom")
 
 	MCFG_SPEAKER_ADD("x1_l",-0.2, 0.0, 1.0)

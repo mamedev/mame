@@ -464,7 +464,7 @@ void fc100_state::machine_start()
 	m_intext = 0;
 	m_inv = 0;
 
-	if (m_cart->cart_mounted())
+	if (m_cart->exists())
 		m_maincpu->space(AS_PROGRAM).install_read_handler(0x6000, 0x6fff, read8_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_cart));
 
 	save_item(NAME(m_ag));
@@ -550,7 +550,7 @@ static MACHINE_CONFIG_START( fc100, fc100_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_p", fc100_state, timer_p, attotime::from_hz(40000)) // cass read
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_k", fc100_state, timer_k, attotime::from_hz(300)) // keyb scan
 
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", GENERIC_ROM8_WIDTH, generic_plain_slot, "fc100_cart")
+	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "fc100_cart")
 
 	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "printer")
 	MCFG_CENTRONICS_ACK_HANDLER(DEVWRITELINE("cent_status_in", input_buffer_device, write_bit4))

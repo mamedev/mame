@@ -263,7 +263,7 @@ UINT32 gmaster_state::screen_update_gmaster(screen_device &screen, bitmap_ind16 
 
 void gmaster_state::machine_start()
 {
-	if (m_cart->cart_mounted())
+	if (m_cart->exists())
 		m_maincpu->space(AS_PROGRAM).install_read_handler(0x8000, 0xfeff, read8_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_cart));
 
 	save_item(NAME(m_video.data));
@@ -303,7 +303,7 @@ static MACHINE_CONFIG_START( gmaster, gmaster_state )
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
 
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", GENERIC_ROM8_WIDTH, generic_linear_slot, "gmaster_cart")
+	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_linear_slot, "gmaster_cart")
 	MCFG_GENERIC_MANDATORY
 
 	MCFG_SOFTWARE_LIST_ADD("cart_list","gmaster")
