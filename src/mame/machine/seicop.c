@@ -2209,9 +2209,6 @@ WRITE16_MEMBER( seibu_cop_legacy_device::generic_cop_w )
 			*/
 			break;
 
-		// ram fill
-		case (0x028 / 2) : m_raiden2cop->cop_dma_v1_w(space, offset, data, mem_mask); break;
-		case (0x02a / 2) : m_raiden2cop->cop_dma_v2_w(space, offset, data, mem_mask); break;
 
 			
 			
@@ -2219,12 +2216,6 @@ WRITE16_MEMBER( seibu_cop_legacy_device::generic_cop_w )
 		/* max possible value returned by the RNG at 0x5a*, trusted */
 		case (0x02c/2): m_cop_rng_max_value = m_cop_mcu_ram[0x2c/2] & 0xff; break;
 
-		/* Command tables for 0x500 / 0x502 commands */
-		case (0x032/2): { m_raiden2cop->cop_pgm_data_w(space,0,data,mem_mask); break; }
-		case (0x034/2): { m_raiden2cop->cop_pgm_addr_w(space,0,data,mem_mask); break; }
-		case (0x038/2): { m_raiden2cop->cop_pgm_value_w(space,0,data,mem_mask); break; }
-		case (0x03a/2): { m_raiden2cop->cop_pgm_mask_w(space,0,data,mem_mask); break; }
-		case (0x03c/2): { m_raiden2cop->cop_pgm_trigger_w(space,0,data,mem_mask); break; }
 		case (0x03e/2):
 			/*
 			0 in all 68k based games
@@ -2239,9 +2230,6 @@ WRITE16_MEMBER( seibu_cop_legacy_device::generic_cop_w )
 		case (0x048/2): { m_cop_rom_addr_lo = data & 0xffff; break; }
 		case (0x04a/2): { m_cop_rom_addr_hi = data & 0xffff; break; }
 
-		/* brightness control */
-		case (0x05a / 2) : m_raiden2cop->cop_pal_brightness_val_w(space, offset, data, mem_mask); break;
-		case (0x05c / 2) : m_raiden2cop->cop_pal_brightness_mode_w(space, offset, data, mem_mask); break;
 	
 		/* DMA / layer clearing section */
 		case (0x074/2):
@@ -2257,11 +2245,6 @@ WRITE16_MEMBER( seibu_cop_legacy_device::generic_cop_w )
 			break;
 
 		
-		case (0x076 / 2) : m_raiden2cop->cop_dma_adr_rel_w(space, offset, data, mem_mask); break; /* used in palette DMAs, for fading effects */
-		case (0x078 / 2) : m_raiden2cop->cop_dma_src_w(space, offset, data, mem_mask); break; /* DMA source address */
-		case (0x07a / 2) : m_raiden2cop->cop_dma_size_w(space, offset, data, mem_mask); break;/* DMA length */
-		case (0x07c/2): m_raiden2cop->cop_dma_dst_w(space, offset, data, mem_mask); break; /* DMA destination */
-		case (0x07e/2): m_raiden2cop->cop_dma_mode_w(space, offset, data, mem_mask); break; /* DMA parameter */
 
 
 
