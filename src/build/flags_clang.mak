@@ -18,6 +18,8 @@ ifeq ($(findstring 3.5,$(TEST_CLANG)),3.5)
 CCOMFLAGS += -Wno-inline-new-delete -Wno-absolute-value -Wno-dynamic-class-memaccess
 # XCode 6.0.1 is built on a pre-release SVN version of clang 3.5, that doesn't support -Wno-absolute-value yet - so ignore that warning for now
 CCOMFLAGS += -Wno-unknown-warning-option
+# XCode 6.0.1 gives this when using SDL2 in /Library/Frameworks/SDL2.framework/Headers/SDL_syswm.h:150 included from src/osd/sdl/sdlinc.h
+CCOMFLAGS += -Wno-extern-c-compat
 endif
 
 ifeq ($(TARGETOS),emscripten)
