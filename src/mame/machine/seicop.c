@@ -1630,7 +1630,6 @@ seibu_cop_legacy_device::seibu_cop_legacy_device(const machine_config &mconfig, 
 	m_cop_sprite_dma_param(0),
 	m_raiden2cop(*this, ":raiden2cop")
 {
-	memset(m_seibu_vregs, 0, sizeof(UINT16)*0x50/2);
 
 	for (int i = 0; i < 8; i++)
 	{
@@ -1684,7 +1683,6 @@ void seibu_cop_legacy_device::device_start()
 	save_item(NAME(m_cop_sprite_dma_abs_y));
 	save_item(NAME(m_cop_sprite_dma_size));
 	save_item(NAME(m_cop_sprite_dma_param));
-	save_item(NAME(m_seibu_vregs));
 }
 
 //-------------------------------------------------
@@ -1695,24 +1693,6 @@ void seibu_cop_legacy_device::device_reset()
 {
 }
 
-WRITE16_MEMBER( seibu_cop_legacy_device::seibu_common_video_regs_w )
-{
-	legionna_state *state = space.machine().driver_data<legionna_state>();
-	COMBINE_DATA(&m_seibu_vregs[offset]);
-
-	switch(offset)
-	{
-		case (0x01a/2): { state->flip_screen_set(m_seibu_vregs[offset] & 0x01); break; }
-		case (0x01c/2): { state->m_layer_disable =  m_seibu_vregs[offset]; break; }
-		case (0x020/2): { state->m_scrollram16[0] = m_seibu_vregs[offset]; break; }
-		case (0x022/2): { state->m_scrollram16[1] = m_seibu_vregs[offset]; break; }
-		case (0x024/2): { state->m_scrollram16[2] = m_seibu_vregs[offset]; break; }
-		case (0x026/2): { state->m_scrollram16[3] = m_seibu_vregs[offset]; break; }
-		case (0x028/2): { state->m_scrollram16[4] = m_seibu_vregs[offset]; break; }
-		case (0x02a/2): { state->m_scrollram16[5] = m_seibu_vregs[offset]; break; }
-		default: { logerror("seibu_common_video_regs_w unhandled offset %02x %04x\n",offset*2,data); break; }
-	}
-}
 
 
 /*
@@ -2949,11 +2929,7 @@ WRITE16_MEMBER( seibu_cop_legacy_device::heatbrl_mcu_w )
 	if(offset == 0x200/2) //irq ack / sprite buffering?
 		return;
 
-	if(offset >= 0x240/2 && offset <= 0x28f/2)
-	{
-		seibu_common_video_regs_w(space,offset-0x240/2,m_cop_mcu_ram[offset],mem_mask);
-		return;
-	}
+
 
 	if(offset >= 0x3c0/2 && offset <= 0x3df/2)
 	{
@@ -2997,12 +2973,6 @@ WRITE16_MEMBER( seibu_cop_legacy_device::cupsoc_mcu_w )
 	if(offset == 0x280/2) //irq ack / sprite buffering?
 		return;
 
-	if(offset >= 0x200/2 && offset <= 0x24f/2)
-	{
-		seibu_common_video_regs_w(space,offset-0x200/2,m_cop_mcu_ram[offset],mem_mask);
-		return;
-	}
-
 	if(offset >= 0x300/2 && offset <= 0x31f/2)
 	{
 		space.machine().device<seibu_sound_device>("seibu_sound")->main_word_w(space,(offset >> 1) & 7,m_cop_mcu_ram[offset],0x00ff);
@@ -3039,17 +3009,7 @@ WRITE16_MEMBER( seibu_cop_legacy_device::cupsocs_mcu_w )
 	if(offset == 0x280/2) //irq ack / sprite buffering?
 		return;
 
-	if(offset >= 0x240/2 && offset <= 0x27f/2)
-	{
-		seibu_common_video_regs_w(space,offset-0x240/2,m_cop_mcu_ram[offset],mem_mask);
-		return;
-	}
 
-	if(offset >= 0x200/2 && offset <= 0x20f/2)
-	{
-		seibu_common_video_regs_w(space,(offset-0x200/2)+(0x40/2),m_cop_mcu_ram[offset],mem_mask);
-		return;
-	}
 
 	if(offset >= 0x340/2 && offset <= 0x35f/2)
 	{
@@ -3092,11 +3052,6 @@ WRITE16_MEMBER( seibu_cop_legacy_device::godzilla_mcu_w )
 	if(offset == 0x280/2) //irq ack / sprite buffering?
 		return;
 
-	if(offset >= 0x200/2 && offset <= 0x24f/2)
-	{
-		seibu_common_video_regs_w(space,offset-0x200/2,m_cop_mcu_ram[offset],mem_mask);
-		return;
-	}
 
 	if(offset >= 0x300/2 && offset <= 0x31f/2)
 	{
@@ -3144,11 +3099,6 @@ WRITE16_MEMBER( seibu_cop_legacy_device::denjinmk_mcu_w )
 		return;
 	}
 
-	if(offset >= 0x200/2 && offset <= 0x24f/2)
-	{
-		seibu_common_video_regs_w(space,offset-0x200/2,m_cop_mcu_ram[offset],mem_mask);
-		return;
-	}
 
 	if(offset >= 0x300/2 && offset <= 0x31f/2)
 	{
@@ -3191,11 +3141,6 @@ WRITE16_MEMBER( seibu_cop_legacy_device::grainbow_mcu_w )
 	if(offset == 0x280/2) //irq ack / sprite buffering?
 		return;
 
-	if(offset >= 0x200/2 && offset <= 0x24f/2)
-	{
-		seibu_common_video_regs_w(space,offset-0x200/2,m_cop_mcu_ram[offset],mem_mask);
-		return;
-	}
 
 	if(offset >= 0x300/2 && offset <= 0x31f/2)
 	{
@@ -3236,11 +3181,6 @@ WRITE16_MEMBER( seibu_cop_legacy_device::legionna_mcu_w )
 	if(offset == 0x280/2) //irq ack / sprite buffering?
 		return;
 
-	if(offset >= 0x200/2 && offset <= 0x24f/2)
-	{
-		seibu_common_video_regs_w(space,offset-0x200/2,m_cop_mcu_ram[offset],mem_mask);
-		return;
-	}
 
 	if(offset >= 0x300/2 && offset <= 0x31f/2)
 	{

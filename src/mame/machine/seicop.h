@@ -58,7 +58,6 @@ private:
 	UINT8 m_cop_rng_max_value;
 	UINT16 m_copd2_offs;
 	UINT32 m_cop_register[8];
-	UINT16 m_seibu_vregs[0x50/2];
 	UINT16 m_cop_status,m_cop_dist,m_cop_angle;
 	UINT16 m_cop_hit_status;
 	INT16 m_cop_hit_val_x,m_cop_hit_val_y,m_cop_hit_val_z,m_cop_hit_val_unk;
@@ -75,7 +74,6 @@ private:
 
 	void copd2_set_tableoffset(UINT16 data);
 	void copd2_set_tabledata(UINT16 data);
-	DECLARE_WRITE16_MEMBER( seibu_common_video_regs_w );
 	void cop_take_hit_box_params(UINT8 offs);
 	UINT8 cop_calculate_collsion_detection();
 	DECLARE_READ16_MEMBER( generic_cop_r );

@@ -1,6 +1,6 @@
 #include "sound/okim6295.h"
 #include "machine/raiden2cop.h"
-
+#include "video/seibu_crtc.h"
 
 class legionna_state : public driver_device
 {
@@ -18,7 +18,9 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_wordswapram(*this, "wordswapram")
-	{ }
+	{ 
+		memset(scrollvals, 0, sizeof(UINT16)*6);
+	}
 
 	required_shared_ptr<UINT16> m_spriteram;
 	UINT16* m_back_data;
@@ -38,7 +40,9 @@ public:
 	UINT16 m_back_gfx_bank;
 	UINT16 m_fore_gfx_bank;
 	UINT16 m_mid_gfx_bank;
-
+	UINT16 scrollvals[6];
+	DECLARE_WRITE16_MEMBER(tilemap_enable_w);
+	DECLARE_WRITE16_MEMBER(tile_scroll_w);
 	DECLARE_WRITE16_MEMBER(videowrite_cb_w);
 	DECLARE_WRITE16_MEMBER(wordswapram_w);
 	DECLARE_WRITE16_MEMBER(legionna_background_w);
