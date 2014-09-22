@@ -29,6 +29,12 @@
     never was a support from the DSR (firmware), so this feature was eliminated
     in later releases.
 
+    DIP switches
+    - Settings for step rate and track count for each floppy drive (DSK1-DSK4)
+    - CRU base address. Note that only on all other addresses than 1100, the
+      floppy drives are labeled DSK5-DSK8 by the card software.
+
+
     Components
 
     HDC 9234      - Universal Disk Controller
@@ -43,16 +49,12 @@
     Author: Michael Zapf
     September 2014: Rewritten for modern floppy implementation
 
+    References:
+    [1] Myarc Inc.: Hard and Floppy Disk Controller / Users Manual
+
     WORK IN PROGRESS
 
 *****************************************************************************/
-
-/*
-    FIXME: HFDC does not work at CRU addresses other than 1100
-    (test shows
-        hfdc: reado 41f5 (00): 00
-        hfdc: reado 41f4 (00): 00 -> wrong rom page? (should be (02)))
-*/
 
 #include "emu.h"
 #include "peribox.h"
@@ -181,7 +183,7 @@ void myarc_hfdc_device::debug_write(offs_t offset, UINT8 data)
     0x4fd0 - 0x4fdf HDC 9234 ports
     0x4fe0 - 0x4fff RTC chip ports
 
-    0x5000 - 0x53ff static RAM page 0x10
+    0x5000 - 0x53ff static RAM page 0x08
     0x5400 - 0x57ff static RAM page any of 32 pages
     0x5800 - 0x5bff static RAM page any of 32 pages
     0x5c00 - 0x5fff static RAM page any of 32 pages
@@ -320,15 +322,26 @@ WRITE8_MEMBER( myarc_hfdc_device::write )
 
     m_see_switches == true:
 
-       7     6     5     4     3     2     1     0
+       7     6     5     4     3     2     1     0      CRU bit
     +-----+-----+-----+-----+-----+-----+-----+-----+
-    |DIP1*|DIP2*|DIP3*|DIP4*|DIP5*|DIP6*|DIP7*|DIP8*|
+    |DIP5*|DIP6*|DIP7*|DIP8*|DIP1*|DIP2*|DIP3*|DIP4*|
+    +-----+-----+-----+-----+-----+-----+-----+-----+
+    |   DSK3    |   DSK4    |   DSK1    |   DSK2    |
     +-----+-----+-----+-----+-----+-----+-----+-----+
 
-    MZ: The setting 00 (all switches on) is a valid setting according to the
-        HFDC manual and indicates 36 sectors/track, 80 tracks; however, this
-        setting is intended "for possible future expansion" and cannot fall
-        back to lower formats, hence, single density disks cannot be read.
+    Settings for DSKn: (n=1..4)
+
+    DIP(2n-1) DIP(2n)   Tracks     Step(ms)    Sectors (256 byte)
+    off       off        40        16          18/16/9
+    on        off        40        8           18/16/9
+    off       on         80/40     2           18/16/9
+    on        on         80        2           36
+
+    Inverted logic: switch=on means a 0 bit, off is a 1 bit when read by the CRU
+
+    Caution: The last setting is declared as "future expansion" and is
+    locked to a 1.44 MiB capacity. No lower formats can be used.
+
     ---
 
     m_see_switches == false:
@@ -353,12 +366,6 @@ READ8Z_MEMBER(myarc_hfdc_device::crureadz)
 		{
 			if (m_see_switches)
 			{
-				// DIP switches.  Logic levels are inverted (on->0, off->1).  CRU
-				// bit order is the reverse of DIP-switch order, too (dip 1 -> bit 7,
-				// dip 8 -> bit 0).
-				// MZ: 00 should not be used since there is a bug in the
-				// DSR of the HFDC which causes problems with SD disks
-				// (controller tries DD and then fails to fall back to SD) */
 				reply = ~(ioport("HFDCDIP")->read());
 			}
 			else
@@ -384,7 +391,7 @@ READ8Z_MEMBER(myarc_hfdc_device::crureadz)
 
        7     6     5     4     3     2     1     0
     +-----+-----+-----+-----+-----+-----+-----+-----+
-    |  0  | MON | DIP | ROM1| ROM0| MON | RES*| SEL |
+    |  -  |  -  |  -  | ROM1| ROM0| MON | RES*| SEL |
     |     |     |     | CSEL| CD1 | CD0 |     |     |
     +-----+-----+-----+-----+-----+-----+-----+-----+
 
@@ -449,11 +456,14 @@ WRITE8_MEMBER(myarc_hfdc_device::cruwrite)
 
 			// Activate motor
 			// When 1, let motor run continuously. When 0, a simple monoflop circuit keeps the line active for another 4 sec
-			// We keep triggering the monoflop for data==1
 			if (data==1)
 			{
-				if (TRACE_CRU) logerror("%s: trigger motor\n", tag());
+				m_motor_on_timer->reset();
 				set_floppy_motors_running(true);
+			}
+			else
+			{
+				m_motor_on_timer->adjust(attotime::from_msec(4230));
 			}
 			m_lastval = data;
 			break;
@@ -667,7 +677,10 @@ void myarc_hfdc_device::connect_floppy_unit(int index)
 			// READY is asserted when DSKx = 1
 			// The controller fetches the state with the auxbus access
 			if (TRACE_LINES) logerror("%s: Connect index callback DSK%d\n", tag(), index+1);
-			m_current_floppy->setup_index_pulse_cb(floppy_image_device::index_pulse_cb(FUNC(myarc_hfdc_device::floppy_index_callback), this));
+			if (m_current_floppy != NULL)
+				m_current_floppy->setup_index_pulse_cb(floppy_image_device::index_pulse_cb(FUNC(myarc_hfdc_device::floppy_index_callback), this));
+			else
+				logerror("%s: Connection to DSK%d failed because no drive is connected\n", tag(), index+1);
 			m_hdc9234->connect_floppy_drive(m_floppy_unit[index]);
 		}
 	}
@@ -704,7 +717,6 @@ void myarc_hfdc_device::set_floppy_motors_running(bool run)
 		if (TRACE_MOTOR)
 			if (m_MOTOR_ON==CLEAR_LINE) logerror("%s: Motor START\n", tag());
 		m_MOTOR_ON = ASSERT_LINE;
-		m_motor_on_timer->adjust(attotime::from_msec(4230));
 	}
 	else
 	{
@@ -759,6 +771,7 @@ WRITE_LINE_MEMBER( myarc_hfdc_device::dip_w )
 READ8_MEMBER( myarc_hfdc_device::read_buffer )
 {
 	if (TRACE_DMA) logerror("%s: Read access to onboard SRAM at %04x\n", tag(), m_dma_address);
+	if (m_dma_address > 0x8000) logerror("%s: Read access beyond RAM size: %06x\n", tag(), m_dma_address);
 	UINT8 value = m_buffer_ram[m_dma_address & 0x7fff];
 	m_dma_address = (m_dma_address+1) & 0x7fff;
 	return value;
@@ -770,6 +783,7 @@ READ8_MEMBER( myarc_hfdc_device::read_buffer )
 WRITE8_MEMBER( myarc_hfdc_device::write_buffer )
 {
 	if (TRACE_DMA) logerror("%s: Write access to onboard SRAM at %04x: %02x\n", tag(), m_dma_address, data);
+	if (m_dma_address > 0x8000) logerror("%s: Write access beyond RAM size: %06x\n", tag(), m_dma_address);
 	m_buffer_ram[m_dma_address & 0x7fff] = data;
 	m_dma_address = (m_dma_address+1) & 0x7fff;
 }
@@ -845,6 +859,11 @@ void myarc_hfdc_device::device_config_complete()
 	if (subdevice("3")!=NULL) m_floppy_unit[3] = static_cast<floppy_image_device*>(subdevice("3")->first_subdevice());
 }
 
+/*
+    The HFDC controller can be configured for different CRU base addresses,
+    but DSK1-DSK4 are only available for CRU 1100. For all other addresses,
+    the drives 1 to 4 are renamed to DSK5-DSK8 (see [1] p. 7).
+*/
 INPUT_PORTS_START( ti99_hfdc )
 	PORT_START( "CRUHFDC" )
 	PORT_DIPNAME( 0x1f00, 0x1100, "HFDC CRU base" )
@@ -866,11 +885,26 @@ INPUT_PORTS_START( ti99_hfdc )
 		PORT_DIPSETTING( 0x1f00, "1F00" )
 
 	PORT_START( "HFDCDIP" )
-	PORT_DIPNAME( 0xff, 0x00, "HFDC drive config" )
+	PORT_DIPNAME( 0x0c, 0x00, "HFDC drive 1 config" )
 		PORT_DIPSETTING( 0x00, "40 track, 16 ms")
-		PORT_DIPSETTING( 0xaa, "40 track, 8 ms")
-		PORT_DIPSETTING( 0x55, "80 track, 2 ms")
-		PORT_DIPSETTING( 0xff, "80 track HD, 2 ms")
+		PORT_DIPSETTING( 0x08, "40 track, 8 ms")
+		PORT_DIPSETTING( 0x04, "80 track, 2 ms")
+		PORT_DIPSETTING( 0x0c, "80 track HD, 2 ms")
+	PORT_DIPNAME( 0x03, 0x00, "HFDC drive 2 config" )
+		PORT_DIPSETTING( 0x00, "40 track, 16 ms")
+		PORT_DIPSETTING( 0x02, "40 track, 8 ms")
+		PORT_DIPSETTING( 0x01, "80 track, 2 ms")
+		PORT_DIPSETTING( 0x03, "80 track HD, 2 ms")
+	PORT_DIPNAME( 0xc0, 0x00, "HFDC drive 3 config" )
+		PORT_DIPSETTING( 0x00, "40 track, 16 ms")
+		PORT_DIPSETTING( 0x80, "40 track, 8 ms")
+		PORT_DIPSETTING( 0x40, "80 track, 2 ms")
+		PORT_DIPSETTING( 0xc0, "80 track HD, 2 ms")
+	PORT_DIPNAME( 0x30, 0x00, "HFDC drive 4 config" )
+		PORT_DIPSETTING( 0x00, "40 track, 16 ms")
+		PORT_DIPSETTING( 0x20, "40 track, 8 ms")
+		PORT_DIPSETTING( 0x10, "80 track, 2 ms")
+		PORT_DIPSETTING( 0x30, "80 track HD, 2 ms")
 INPUT_PORTS_END
 
 FLOPPY_FORMATS_MEMBER(myarc_hfdc_device::floppy_formats)

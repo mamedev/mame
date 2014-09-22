@@ -138,7 +138,7 @@ private:
 	void auxbus_out();
 
 	// Write the DMA address to the external latches
-	void dma_address_out();
+	void dma_address_out(UINT8 addrub, UINT8 addrhb, UINT8 addrlb);
 
 	// Intermediate storage for register
 	UINT8 m_regvalue;
@@ -165,10 +165,10 @@ private:
 	void index_callback(int level);
 	void seek_complete_callback(int level);
 
-	// Wait for some time to pass or for a line to be raised
+	// Wait for some time to pass or for a line to change level
 	void wait_time(emu_timer *tm, int microsec, int next_substate);
 	void wait_time(emu_timer *tm, attotime delay, int param);
-	void wait_line(int substate);
+	void wait_line(int line, line_state level, int substate, bool stopwrite);
 
 	// Converts attotime to a string
 	astring tts(const attotime &t);
@@ -179,6 +179,11 @@ private:
 	// Utility routine to set or reset bits
 	void set_bits(UINT8& byte, int mask, bool set);
 
+	// Event handling
+	line_state m_line_level;
+	int m_event_line;
+	int m_state_after_line;
+
 	// ==============================================
 	//   Live state machine
 	// ==============================================
@@ -187,6 +192,7 @@ private:
 	{
 		attotime time;
 		UINT16 shift_reg;
+		UINT16 shift_reg_save;
 		UINT16 crc;
 		int bit_counter;
 		int bit_count_total;    // used for timeout handling
@@ -196,6 +202,8 @@ private:
 		UINT8 data_reg;
 		int state;
 		int next_state;
+		int repeat; // for formatting
+		int return_state; // for formatting
 	};
 
 	live_info m_live_state, m_checkpoint_state;
@@ -213,8 +221,12 @@ private:
 	// Control functions for syncing the track analyser with the machine time
 	void wait_for_realtime(int state);
 	void live_sync();
+	void live_abort();
 	void rollback();
 	void checkpoint();
+
+	// Delivers the data bits from the given encoding
+	UINT8 get_data_from_encoding(UINT16 raw);
 
 	// ==============================================
 	//    PLL functions and interface to floppy
@@ -234,18 +246,29 @@ private:
 	// shift_reg, and last_data_bit
 	void encode_raw(UINT16 word);
 
+	// Encodes a byte in FM or MFM. Called by encode_byte.
+	UINT16 encode(UINT8 byte);
+
+	// Encode the latest byte again
+	void encode_again();
+
 	// Reads from the current position on the track
 	bool read_one_bit(const attotime &limit);
 
 	// Writes to the current position on the track
 	bool write_one_bit(const attotime &limit);
 
+	// Writes to the current position on the track
+	void write_on_track(UINT16 raw, int count, int next_state);
+
+	// Skips bytes on the track
+	void skip_on_track(int count, int next_state);
+
 	// ==============================================
 	//   Command state machine
 	// ==============================================
 
 	int m_substate;
-	int m_state_after_line;
 
 	typedef void (hdc9234_device::*cmdfunc)(void);
 
@@ -311,6 +334,18 @@ private:
 	// Used in RESTORE to find out when to give up
 	int m_seek_count;
 
+	// Signals to abort writing
+	bool m_stopwrite;
+
+	// Used for formatting
+	int m_sector_count;
+	int m_sector_size;
+	int m_gap0_size;
+	int m_gap1_size;
+	int m_gap2_size;
+	int m_gap3_size;
+	int m_sync_size;
+
 	// Are we in FM mode?
 	bool fm_mode();
 
@@ -363,13 +398,18 @@ private:
 	// ===================================================
 
 	void reset_controller();
-	void drive_select();
 	void drive_deselect();
 	void restore_drive();
 	void step_drive();
+	void tape_backup();
+	void poll_drives();
+	void drive_select();
 	void set_register_pointer();
+	void seek_read_id();
 	void read_sectors();
-	void write_sector_logical();
+	void read_track();
+	void format_track();
+	void write_sectors();
 };
 
 #endif
