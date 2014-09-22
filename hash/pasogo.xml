@@ -7,7 +7,7 @@
 		<year>1996</year>
 		<publisher>Koei</publisher>
 		<part name="cart" interface="pasogo_cart">
-			<dataarea name="rom" size="1048576">
+			<dataarea name="rom" width="16" endianness="little" size="1048576">
 				<rom name="ks-1010.ic4" size="1048576" crc="b6a3f97c" sha1="2de63b05ec93a4ba3ea55ba131c0706927a5bf39" offset="00000000" />
 			</dataarea>
 		</part>
@@ -19,7 +19,7 @@
 		<year>1996</year>
 		<publisher>Koei</publisher>
 		<part name="cart" interface="pasogo_cart">
-			<dataarea name="rom" size="524288">
+			<dataarea name="rom" width="16" endianness="little" size="524288">
 				<rom name="yrm0442m-184s" size="524288" crc="32f9c38a" sha1="1be82afcdf5e2d1a0e873fda4161e663d7a53a85" offset="00000000" />
 			</dataarea>
 		</part>
@@ -31,7 +31,7 @@
 		<year>1996</year>
 		<publisher>Koei</publisher>
 		<part name="cart" interface="pasogo_cart">
-			<dataarea name="rom" size="524288">
+			<dataarea name="rom" width="16" endianness="little" size="524288">
 				<rom name="ks-1009.ic4" size="524288" crc="3e70fca6" sha1="c46cdc9e01f2f5c66b2523e1d30355e51c839f27" offset="00000000" />
 			</dataarea>
 		</part>
