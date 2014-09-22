@@ -2145,6 +2145,7 @@ static MACHINE_CONFIG_START( st, st_state )
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_linear_slot, "st_cart")
 	MCFG_GENERIC_EXTENSIONS("bin,rom")
 	MCFG_GENERIC_WIDTH(GENERIC_ROM16_WIDTH)
+	MCFG_GENERIC_ENDIAN(ENDIANNESS_BIG)
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "st_cart")
 
 	// internal ram
@@ -2235,6 +2236,7 @@ static MACHINE_CONFIG_START( megast, megast_state )
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_linear_slot, "st_cart")
 	MCFG_GENERIC_EXTENSIONS("bin,rom")
 	MCFG_GENERIC_WIDTH(GENERIC_ROM16_WIDTH)
+	MCFG_GENERIC_ENDIAN(ENDIANNESS_BIG)
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "st_cart")
 
 	// internal ram
@@ -2332,6 +2334,7 @@ static MACHINE_CONFIG_START( ste, ste_state )
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_linear_slot, "st_cart")
 	MCFG_GENERIC_EXTENSIONS("bin,rom")
 	MCFG_GENERIC_WIDTH(GENERIC_ROM16_WIDTH)
+	MCFG_GENERIC_ENDIAN(ENDIANNESS_BIG)
 //  MCFG_SOFTWARE_LIST_ADD("cart_list", "ste_cart")
 
 	// internal ram
@@ -2437,6 +2440,7 @@ static MACHINE_CONFIG_START( stbook, stbook_state )
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_linear_slot, "st_cart")
 	MCFG_GENERIC_EXTENSIONS("bin,rom")
 	MCFG_GENERIC_WIDTH(GENERIC_ROM16_WIDTH)
+	MCFG_GENERIC_ENDIAN(ENDIANNESS_BIG)
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "st_cart")
 
 	/* internal ram */
