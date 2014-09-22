@@ -15,7 +15,7 @@
   Nemesis (Peyper)
   Odisea Paris-Dakar (Peyper)
 
-  Others not emulated:
+  Others not emulated (need roms):
   Hang-On (Sonic)
   Night Fever (Sonic)
   Storm (Sonic)
@@ -26,18 +26,9 @@
 
   Most games require a ball in the outhole before starting a game (hold down X and press 1).
 
-
-Status:
-- Solar Wars: works
-- Pole Position: works.
-- Gamatron: can only enter coins.
-- Star Wars: works
-- Odin: works
-- Odin Deluxe: works
-- Wolf Man: works
-- Nemesis: works
-- Odisea: works
-
+ToDo:
+- Gammatron: unable to start a game
+- Mechanical sounds
 
 *********************************************************************************************************/
 
