@@ -4104,6 +4104,24 @@ ROM_START( pc9821as )
 	LOAD_IDE_ROM
 ROM_END
 
+/*
+PC-9821AP2/U8W
+*/
+
+ROM_START( pc9821ap2 )
+	ROM_REGION( 0x90000, "ipl", ROMREGION_ERASEFF )
+	ROM_LOAD( "phd0102.rom",     0x08000, 0x80000, CRC(3036774c) SHA1(59856a348f156adf5eca06326f967aca54ff871c) )
+
+	ROM_REGION( 0x10000, "sound_bios", 0 )
+	ROM_LOAD( "sound.rom", 0x0000, 0x4000, CRC(a21ef796) SHA1(34137c287c39c44300b04ee97c1e6459bb826b60) )
+
+	ROM_REGION( 0x80000, "chargen", 0 )
+	ROM_LOAD( "font.rom", 0x00000, 0x46800, BAD_DUMP CRC(a61c0649) SHA1(554b87377d176830d21bd03964dc71f8e98676b1) )
+
+	LOAD_KANJI_ROMS
+	LOAD_IDE_ROM
+ROM_END
+
 
 /*
 98NOTE - i486SX 33
@@ -4292,6 +4310,7 @@ COMP( 1988, pc9801rx,  pc9801rs,0,     pc9801ux, pc9801rs, pc9801_state, pc9801_
 COMP( 1993, pc9801bx2, pc9801rs,0,     pc9801bx2,pc9801rs, pc9801_state, pc9801_kanji, "Nippon Electronic Company",   "PC-9801BX2/U2", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND)
 COMP( 1994, pc9821,    0,       0,     pc9821,   pc9821,   pc9801_state, pc9801_kanji, "Nippon Electronic Company",   "PC-9821 (98MATE)",  GAME_NOT_WORKING | GAME_IMPERFECT_SOUND) //TODO: not sure about the exact model
 COMP( 1993, pc9821as,  pc9821,  0,     pc9821,   pc9821,   pc9801_state, pc9801_kanji, "Nippon Electronic Company",   "PC-9821 (98MATE A)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND)
+COMP( 1993, pc9821ap2, pc9821,  0,     pc9821,   pc9821,   pc9801_state, pc9801_kanji, "Nippon Electronic Company",   "PC-9821AP2/U8W (98MATE A)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND)
 COMP( 1994, pc9821xs,  pc9821,  0,     pc9821,   pc9821,   pc9801_state, pc9801_kanji, "Nippon Electronic Company",   "PC-9821 (98MATE Xs)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND)
 COMP( 1994, pc9821ce2, pc9821,  0,     pc9821,   pc9821,   pc9801_state, pc9801_kanji, "Nippon Electronic Company",   "PC-9821 (98MULTi Ce2)",  GAME_NOT_WORKING | GAME_IMPERFECT_SOUND)
 COMP( 1994, pc9821ne,  pc9821,  0,     pc9821,   pc9821,   pc9801_state, pc9801_kanji, "Nippon Electronic Company",   "PC-9821 (98NOTE)",  GAME_NOT_WORKING | GAME_IMPERFECT_SOUND)
