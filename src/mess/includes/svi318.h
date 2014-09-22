@@ -73,11 +73,7 @@ public:
 	DECLARE_READ8_MEMBER(io_ext_r);
 	DECLARE_WRITE8_MEMBER(io_ext_w);
 	DECLARE_DRIVER_INIT(svi318);
-	DECLARE_MACHINE_START(svi318_pal);
-	DECLARE_MACHINE_RESET(svi318);
-	DECLARE_MACHINE_RESET(svi328_806);
-	DECLARE_VIDEO_START(svi328_806);
-	DECLARE_MACHINE_START(svi318_ntsc);
+	DECLARE_DRIVER_INIT(svi328_806);
 	DECLARE_WRITE_LINE_MEMBER(vdp_interrupt);
 	DECLARE_WRITE_LINE_MEMBER(ins8250_interrupt);
 	DECLARE_READ8_MEMBER(ppi_port_a_r);
@@ -88,6 +84,9 @@ public:
 	bool cart_verify(UINT8 *ROM);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(svi318_cart);
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
+
+	virtual void machine_start();
+	virtual void machine_reset();
 
 	MC6845_UPDATE_ROW(crtc_update_row);
 	memory_region *m_cart_rom;
@@ -111,12 +110,10 @@ protected:
 	required_ioport m_buttons;
 	optional_device<palette_device> m_palette;
 
-protected:
-	void svi318_set_banks();
-	void svi318_80col_init();
-	void svi318_vdp_interrupt(int i);
-
 private:
+	
+	void set_banks();
+	void postload();
 	
 	// memory banking
 	UINT8   m_bank_switch;
@@ -141,7 +138,7 @@ private:
 	// SVI-806 80 column card
 	UINT8   m_svi806_present;
 	UINT8   m_svi806_ram_enabled;
-	memory_region   *m_svi806_ram;
+	dynamic_buffer m_svi806_ram;
 	UINT8   *m_svi806_gfx;
 
 	required_memory_bank m_bank1;

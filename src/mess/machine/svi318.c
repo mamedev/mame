@@ -204,7 +204,7 @@ WRITE8_MEMBER(svi318_state::psg_port_b_w)
 		set_led_status(machine(), 0, !(data & 0x20));
 
 	m_bank_switch = data;
-	svi318_set_banks();
+	set_banks();
 }
 
 /* Disk drives  */
@@ -256,11 +256,11 @@ MC6845_UPDATE_ROW( svi318_state::crtc_update_row )
 
 	for (int i = 0; i < x_count; i++)
 	{
-		UINT8 data = m_svi806_gfx[m_svi806_ram->u8((ma + i) & 0x7ff) * 16 + ra];
+		UINT8 data = m_svi806_gfx[m_svi806_ram[(ma + i) & 0x7ff] * 16 + ra];
 
 		if (i == cursor_x)
 		{
-			data = 0xFF;
+			data = 0xff;
 		}
 
 		for (int j = 0; j < 8; j++)
@@ -272,48 +272,14 @@ MC6845_UPDATE_ROW( svi318_state::crtc_update_row )
 }
 
 
-/* 80 column card init */
-void svi318_state::svi318_80col_init()
-{
-	/* 2K RAM, but allocating 4KB to make banking easier */
-	/* The upper 2KB will be set to FFs and will never be written to */
-	m_svi806_ram = machine().memory().region_alloc("gfx2", 0x1000, 1, ENDIANNESS_LITTLE);
-	memset(m_svi806_ram->base(), 0x00, 0x800);
-	memset(m_svi806_ram->base() + 0x800, 0xff, 0x800);
-	m_svi806_gfx = memregion("gfx1")->base();
-}
-
-
 WRITE8_MEMBER(svi318_state::svi806_ram_enable_w)
 {
 	m_svi806_ram_enabled = (data & 0x01);
-	svi318_set_banks();
+	set_banks();
 }
 
-VIDEO_START_MEMBER(svi318_state, svi328_806)
-{
-}
-
-MACHINE_RESET_MEMBER(svi318_state, svi328_806)
-{
-	MACHINE_RESET_CALL_MEMBER(svi318);
-
-	svi318_80col_init();
-	m_svi806_present = 1;
-	svi318_set_banks();
-
-	/* Set SVI-806 80 column card palette */
-	m_palette->set_pen_color(TMS9928A_PALETTE_SIZE, 0, 0, 0);     /* Monochrome black */
-	m_palette->set_pen_color(TMS9928A_PALETTE_SIZE+1, 0, 224, 0); /* Monochrome green */
-}
 
 /* Init functions */
-
-void svi318_state::svi318_vdp_interrupt(int i)
-{
-	m_maincpu->set_input_line(0, (i ? HOLD_LINE : CLEAR_LINE));
-}
-
 
 static const UINT8 cc_op[0x100] = {
 	4+1,10+1, 7+1, 6+1, 4+1, 4+1, 7+1, 4+1, 4+1,11+1, 7+1, 6+1, 4+1, 4+1, 7+1, 4+1,
@@ -444,23 +410,59 @@ DRIVER_INIT_MEMBER(svi318_state, svi318)
 	
 	m_bank_low_ptr = m_empty_bank;
 	m_bank_high1_ptr = m_empty_bank;
-	m_bank_high2_ptr = m_empty_bank;
+	m_bank_high2_ptr = m_empty_bank;	
+}
+
+DRIVER_INIT_MEMBER(svi318_state, svi328_806)
+{
+	DRIVER_INIT_CALL(svi318);
+	m_svi806_present = 1;
+}
+
+void svi318_state::machine_start()
+{
+	astring region_tag;
+	m_cart_rom = memregion(region_tag.cpy(m_cart->tag()).cat(GENERIC_ROM_REGION_TAG));
+	m_bios_rom = memregion("maincpu");
+
+	// 80 column card start
+	if (m_svi806_present)
+	{
+		// 2K RAM, but allocating 4KB to make banking easier
+		// The upper 2KB will be set to FFs and will never be written to
+		m_svi806_ram.resize(0x1000);
+		save_item(NAME(m_svi806_ram));
+		memset(m_svi806_ram, 0x00, 0x800);
+		memset(m_svi806_ram + 0x800, 0xff, 0x800);
+		
+		m_svi806_gfx = memregion("gfx1")->base();
+		
+		// Set SVI-806 80 column card palette
+		m_palette->set_pen_color(TMS9928A_PALETTE_SIZE, 0, 0, 0);     /* Monochrome black */
+		m_palette->set_pen_color(TMS9928A_PALETTE_SIZE+1, 0, 224, 0); /* Monochrome green */
+	}
+
+	// register for savestates
+	save_item(NAME(m_driveselect));
+	save_item(NAME(m_drq));
+	save_item(NAME(m_irq));
+	save_item(NAME(m_heads));
+
+	save_item(NAME(m_bank_switch));
+	save_item(NAME(m_bank_low));
+	save_item(NAME(m_bank_high));
+	save_item(NAME(m_bank_low_read_only));
+	save_item(NAME(m_bank_high1_read_only));
+	save_item(NAME(m_bank_high2_read_only));
+	save_item(NAME(m_keyboard_row));
+	save_item(NAME(m_centronics_busy));
+
+	save_item(NAME(m_svi806_present));
+	save_item(NAME(m_svi806_ram_enabled));
 	
+	machine().save().register_postload(save_prepost_delegate(FUNC(svi318_state::postload), this));
 }
 
-MACHINE_START_MEMBER(svi318_state, svi318_ntsc)
-{
-	astring region_tag;
-	m_cart_rom = memregion(region_tag.cpy(m_cart->tag()).cat(GENERIC_ROM_REGION_TAG));
-	m_bios_rom = memregion("maincpu");
-}
-
-MACHINE_START_MEMBER(svi318_state, svi318_pal)
-{
-	astring region_tag;
-	m_cart_rom = memregion(region_tag.cpy(m_cart->tag()).cat(GENERIC_ROM_REGION_TAG));
-	m_bios_rom = memregion("maincpu");
-}
 
 static void svi318_load_proc(device_image_interface &image)
 {
@@ -482,7 +484,7 @@ static void svi318_load_proc(device_image_interface &image)
 	}
 }
 
-MACHINE_RESET_MEMBER(svi318_state, svi318)
+void svi318_state::machine_reset()
 {	
 	m_keyboard_row = 0;
 	m_centronics_busy = 0;
@@ -499,7 +501,7 @@ MACHINE_RESET_MEMBER(svi318_state, svi318)
 	m_bank_high2_read_only = 0;
 
 	m_bank_switch = 0xff;
-	svi318_set_banks();
+	set_banks();
 
 	for (int drive = 0; drive < 2; drive++)
 		floppy_get_device(machine(), drive)->floppy_install_load_proc(svi318_load_proc);
@@ -536,7 +538,7 @@ WRITE8_MEMBER(svi318_state::writemem4)
 	if (m_svi806_ram_enabled)
 	{
 		if (offset < 0x800)
-			m_svi806_ram->u8(offset) = data;
+			m_svi806_ram[offset] = data;
 	}
 	else
 	{
@@ -547,7 +549,7 @@ WRITE8_MEMBER(svi318_state::writemem4)
 	}
 }
 
-void svi318_state::svi318_set_banks()
+void svi318_state::set_banks()
 {
 	const UINT8 v = m_bank_switch;
 	UINT8 *ram = m_ram->pointer();
@@ -652,6 +654,12 @@ void svi318_state::svi318_set_banks()
 			m_bank4->set_base(m_bank_high2_ptr + 0x3000);
 	}
 }
+
+void svi318_state::postload()
+{
+	set_banks();
+}
+
 
 /* External I/O */
 

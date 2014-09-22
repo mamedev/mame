@@ -266,9 +266,6 @@ static MACHINE_CONFIG_START( svi318, svi318_state )
 	MCFG_CPU_IO_MAP(svi318_io)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
-	MCFG_MACHINE_START_OVERRIDE(svi318_state, svi318_pal)
-	MCFG_MACHINE_RESET_OVERRIDE(svi318_state, svi318)
-
 	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
 	MCFG_I8255_IN_PORTA_CB(READ8(svi318_state, ppi_port_a_r))
 	MCFG_I8255_IN_PORTB_CB(READ8(svi318_state, ppi_port_b_r))
@@ -336,9 +333,6 @@ static MACHINE_CONFIG_DERIVED( svi318n, svi318 )
 	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(svi318_state, vdp_interrupt))
 	MCFG_TMS9928A_SCREEN_ADD_NTSC("screen")
 	MCFG_SCREEN_UPDATE_DEVICE("tms9928a", tms9928a_device, screen_update)
-
-	MCFG_MACHINE_START_OVERRIDE(svi318_state, svi318_ntsc)
-	MCFG_MACHINE_RESET_OVERRIDE(svi318_state, svi318)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( svi328, svi318 )
@@ -383,9 +377,6 @@ static MACHINE_CONFIG_START( svi328_806, svi318_state )
 	MCFG_CPU_IO_MAP(svi328_806_io)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
-	MCFG_MACHINE_START_OVERRIDE(svi318_state, svi318_pal)
-	MCFG_MACHINE_RESET_OVERRIDE(svi318_state, svi328_806)
-
 	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
 	MCFG_I8255_IN_PORTA_CB(READ8(svi318_state, ppi_port_a_r))
 	MCFG_I8255_IN_PORTB_CB(READ8(svi318_state, ppi_port_b_r))
@@ -421,8 +412,6 @@ static MACHINE_CONFIG_START( svi328_806, svi318_state )
 	MCFG_MC6845_CHAR_WIDTH(8)   /* ? */
 	MCFG_MC6845_UPDATE_ROW_CB(svi318_state, crtc_update_row)
 
-	MCFG_VIDEO_START_OVERRIDE(svi318_state, svi328_806)
-
 	/* Sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("dac", DAC, 0)
@@ -452,6 +441,10 @@ static MACHINE_CONFIG_START( svi328_806, svi318_state )
 
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(svi318_floppy_interface)
 
+	/* Software lists */
+	MCFG_SOFTWARE_LIST_ADD("cass_list", "svi318_flop")
+	MCFG_SOFTWARE_LIST_ADD("disk_list", "svi318_cass")
+
 	MCFG_FRAGMENT_ADD(svi318_cartslot)
 
 	/* internal ram */
@@ -461,8 +454,6 @@ static MACHINE_CONFIG_START( svi328_806, svi318_state )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( svi328n_806, svi328_806 )
-
-	MCFG_MACHINE_START_OVERRIDE(svi318_state, svi318_ntsc)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -537,10 +528,10 @@ ROM_START( sv328n80 )
 ROM_END
 
 
-/*    YEAR  NAME        PARENT  COMPAT  MACHINE        INPUT   INIT     COMPANY         FULLNAME                    FLAGS */
-COMP( 1983, svi318,     0,      0,      svi318,        svi318, svi318_state, svi318,  "Spectravideo", "SVI-318 (PAL)",            0 )
-COMP( 1983, svi318n,    svi318, 0,      svi318n,       svi318, svi318_state, svi318,  "Spectravideo", "SVI-318 (NTSC)",           0 )
-COMP( 1983, svi328,     svi318, 0,      svi328,        svi328, svi318_state, svi318,  "Spectravideo", "SVI-328 (PAL)",            0 )
-COMP( 1983, svi328n,    svi318, 0,      svi328n,       svi328, svi318_state, svi318,  "Spectravideo", "SVI-328 (NTSC)",           0 )
-COMP( 1983, sv328p80,   svi318, 0,      svi328_806,    svi328, svi318_state, svi318,  "Spectravideo", "SVI-328 (PAL) + SVI-806 80 column card", 0 )
-COMP( 1983, sv328n80,   svi318, 0,      svi328n_806,   svi328, svi318_state, svi318,  "Spectravideo", "SVI-328 (NTSC) + SVI-806 80 column card", 0 )
+/*    YEAR  NAME        PARENT  COMPAT  MACHINE        INPUT   INIT                       COMPANY         FULLNAME                    FLAGS */
+COMP( 1983, svi318,     0,      0,      svi318,        svi318, svi318_state, svi318,      "Spectravideo", "SVI-318 (PAL)",   GAME_SUPPORTS_SAVE )
+COMP( 1983, svi318n,    svi318, 0,      svi318n,       svi318, svi318_state, svi318,      "Spectravideo", "SVI-318 (NTSC)",  GAME_SUPPORTS_SAVE )
+COMP( 1983, svi328,     svi318, 0,      svi328,        svi328, svi318_state, svi318,      "Spectravideo", "SVI-328 (PAL)",   GAME_SUPPORTS_SAVE )
+COMP( 1983, svi328n,    svi318, 0,      svi328n,       svi328, svi318_state, svi318,      "Spectravideo", "SVI-328 (NTSC)",  GAME_SUPPORTS_SAVE )
+COMP( 1983, sv328p80,   svi318, 0,      svi328_806,    svi328, svi318_state, svi328_806,  "Spectravideo", "SVI-328 (PAL) + SVI-806 80 column card",  GAME_SUPPORTS_SAVE )
+COMP( 1983, sv328n80,   svi318, 0,      svi328n_806,   svi328, svi318_state, svi328_806,  "Spectravideo", "SVI-328 (NTSC) + SVI-806 80 column card", GAME_SUPPORTS_SAVE )
