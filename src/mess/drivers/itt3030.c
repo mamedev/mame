@@ -198,7 +198,6 @@ Beeper Circuit, all ICs shown:
 #include "sound/beep.h"
 #include "cpu/mcs48/mcs48.h"        //Keyboard MCU ... talks to the 8278 on the keyboard circuit
 
-
 #define MAIN_CLOCK XTAL_4.194MHz
 
 class itt3030_state : public driver_device
@@ -265,7 +264,8 @@ protected:
 public:
 
 	DECLARE_READ8_MEMBER(vsync_r);
-	DECLARE_READ8_MEMBER(unk2_r);
+	DECLARE_READ8_MEMBER(i8078_r);
+	DECLARE_WRITE8_MEMBER(i8078_w);
 	DECLARE_WRITE8_MEMBER( beep_w );
 	DECLARE_WRITE8_MEMBER(bank_w);
 	DECLARE_READ8_MEMBER(bankl_r);
@@ -275,13 +275,24 @@ public:
 	DECLARE_READ8_MEMBER(kbd_fifo_r);
 	DECLARE_READ8_MEMBER(kbd_matrix_r);
 	DECLARE_WRITE8_MEMBER(kbd_matrix_w);
+	DECLARE_READ8_MEMBER(fdc_stat_r);
+	DECLARE_WRITE8_MEMBER(fdc_cmd_w);
 	DECLARE_FLOPPY_FORMATS(itt3030_floppy_formats);
+
+	DECLARE_WRITE_LINE_MEMBER(fdcirq_w);
+	DECLARE_WRITE_LINE_MEMBER(fdcdrq_w);
+	DECLARE_WRITE_LINE_MEMBER(fdchld_w);
+
 private:
 	UINT8 m_unk;
 	UINT8 m_bank;
 	UINT8 m_kbdrow, m_kbdcol, m_kbdclk, m_kbdread;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	floppy_image_device *m_curfloppy;
+	bool m_fdc_irq, m_fdc_drq, m_fdc_hld;
+	floppy_connector *m_con1, *m_con2, *m_con3;
+	bool m_keyskip;
 };
 
 void itt3030_state::video_start()
@@ -306,9 +317,42 @@ READ8_MEMBER(itt3030_state::vsync_r)
 	return ret;
 }
 
-READ8_MEMBER(itt3030_state::unk2_r)
+// TODO: make this a correct device once we figure out how everything goes together in this system
+READ8_MEMBER(itt3030_state::i8078_r)
 {
-	return 0x40;
+	if (offset)
+	{
+//		printf("Read 8078 status\n");
+		if (!m_keyskip)
+		{
+			return 0x10; 
+		}
+	}
+	else
+	{
+//		printf("Read 8078 data\n");
+		if (!m_keyskip)
+		{
+			m_keyskip = true;	// don't keep reporting the 'b' key, just the once to trick the boot ROM
+			return 0x0c;
+		}
+	}
+
+	return 0;
+}
+
+WRITE8_MEMBER(itt3030_state::i8078_w)
+{
+	#if 0
+	if (offset)
+	{
+		printf("%02x to 8078 command\n", data);
+	}
+	else
+	{
+		printf("%02x to 8078 data\n", data);
+	}
+	#endif
 }
 
 WRITE8_MEMBER( itt3030_state::beep_w )
@@ -369,6 +413,95 @@ UINT32 itt3030_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap
 	return 0;
 }
 
+WRITE_LINE_MEMBER(itt3030_state::fdcirq_w)
+{
+	m_fdc_irq = state;
+}
+
+WRITE_LINE_MEMBER(itt3030_state::fdcdrq_w)
+{
+	m_fdc_drq = state;
+}
+
+WRITE_LINE_MEMBER(itt3030_state::fdchld_w)
+{
+	m_fdc_hld = state;
+}
+
+/*
+	7 Data Request (IRQ - inverted 1791-Signal)
+	6 Interrupt Request (INTRQ - 1791-Signal)
+	5 Head Load (HLD - inverted 1791-Signal)
+	4 Ready 3 (Drive 3 ready)
+	3 Ready 2 (Drive 2 ready)
+	2 Ready l (Drive 1 ready)
+	1 Write protect (the disk in the selected drive is write protected)
+	0 HLT (Halt signal during head load and track change)
+*/
+READ8_MEMBER(itt3030_state::fdc_stat_r)
+{
+	UINT8 res = 0;
+	floppy_image_device *floppy1 = m_con1 ? m_con1->get_device() : 0; 
+	floppy_image_device *floppy2 = m_con2 ? m_con2->get_device() : 0; 
+	floppy_image_device *floppy3 = m_con3 ? m_con3->get_device() : 0; 
+
+	res = m_fdc_drq ? 0x00 : 0x80;
+	res = m_fdc_irq ? 0x40 : 0x00;
+	res = m_fdc_hld ? 0x00 : 0x20;
+	if (floppy3) res |= floppy3->ready_r() ? 0x10 : 0;
+	if (floppy2) res |= floppy2->ready_r() ? 0x08 : 0;
+	if (floppy1) res |= floppy1->ready_r() ? 0x04 : 0;
+	if (m_curfloppy) res |= m_curfloppy->wpt_r() ? 0x02 : 0;
+
+	return res;
+}
+
+/*
+	7 SEL1 - Select drive 1
+	6 SEL2 - Select drive 2
+	5 SEL3 - Select drive 3
+	4 MOTOR - Motor on
+	3 DOOR - Drive door lock drives 1 + 2 (not possible with all drives)
+	2 SIDESEL - Select disk side
+	1 KOMP - write comp on/off
+	0 RG J - Change separator stage to read
+*/
+WRITE8_MEMBER(itt3030_state::fdc_cmd_w)
+{
+	floppy_image_device *floppy = NULL;
+
+	logerror("%02x to fdc_cmd_w: motor %d side %d\n", data, (data & 0x10)>>4, (data & 4)>>2);
+
+	// select drive
+	if (data & 0x80)
+	{
+		floppy = m_con1 ? m_con1->get_device() : 0;
+	}
+	else if (data & 0x40)
+	{
+		floppy = m_con2 ? m_con2->get_device() : 0;
+	}
+	else if (data & 0x20)
+	{
+		floppy = m_con3 ? m_con3->get_device() : 0;
+	}
+
+	// selecting a new drive?
+	if (floppy != m_curfloppy)
+	{
+		m_fdc->set_floppy(floppy);
+		m_curfloppy = floppy;
+	}
+
+	if (floppy != NULL)
+	{
+		// side select
+		floppy->ss_w((data & 4) ? 1 : 0);
+
+		// motor control (active low)
+		floppy->mon_w((data & 0x10) ? 0 : 1);
+	}
+}
 
 // The lower 48K is switchable among the first 48K of each of 8 64K banks numbered 0-7 or "bank 8" which is the internal ROM and VRAM
 // The upper 16K is always the top 16K of the selected bank 0-7, which allows bank/bank copies and such
@@ -390,11 +523,12 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( itt3030_io, AS_IO, 8, itt3030_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x20, 0x26) AM_DEVREADWRITE("crt5027", crt5027_device, read, write)
-	AM_RANGE(0x31, 0x31) AM_READ(unk2_r)
+	AM_RANGE(0x30, 0x31) AM_READWRITE(i8078_r, i8078_w)
 	AM_RANGE(0x32, 0x32) AM_WRITE(beep_w)
 	AM_RANGE(0x35, 0x35) AM_READ(vsync_r)
 	AM_RANGE(0x40, 0x40) AM_READ(kbd_fifo_r)
-	AM_RANGE(0x50, 0x55) AM_DEVREADWRITE("fdc", fd1791_t, read, write)
+	AM_RANGE(0x50, 0x53) AM_DEVREADWRITE("fdc", fd1791_t, read, write)
+	AM_RANGE(0x54, 0x54) AM_READWRITE(fdc_stat_r, fdc_cmd_w)
 	AM_RANGE(0xf6, 0xf6) AM_WRITE(bank_w)
 ADDRESS_MAP_END
 
@@ -577,6 +711,14 @@ void itt3030_state::machine_reset()
 	m_kbdread = 1;
 	m_kbdrow = m_kbdcol = 0;
 	m_kbdclk = 1;
+	m_fdc_irq = m_fdc_drq = m_fdc_hld = 0;
+	m_curfloppy = NULL;
+	m_keyskip = false;
+
+	// look up floppies in advance
+	m_con1 = machine().device<floppy_connector>("fdc:0");
+	m_con2 = machine().device<floppy_connector>("fdc:1");
+	m_con3 = machine().device<floppy_connector>("fdc:2");
 }
 
 FLOPPY_FORMATS_MEMBER( itt3030_state::itt3030_floppy_formats )
@@ -619,9 +761,12 @@ static MACHINE_CONFIG_START( itt3030, itt3030_state )
 	MCFG_TMS9927_CHAR_WIDTH(16)
 
 	MCFG_FD1791x_ADD("fdc", XTAL_20MHz / 20)
-	MCFG_WD_FDC_FORCE_READY
+	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(itt3030_state, fdcirq_w))
+	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(itt3030_state, fdcdrq_w))
+	MCFG_WD_FDC_HLD_CALLBACK(WRITELINE(itt3030_state, fdchld_w))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", itt3030_floppies, "525dd", itt3030_state::itt3030_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", itt3030_floppies, "525dd", itt3030_state::itt3030_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:2", itt3030_floppies, "525dd", itt3030_state::itt3030_floppy_formats)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", itt3030)
 
