@@ -1596,17 +1596,12 @@ raw angle|angle compare|angle mod value| res |
 #include "includes/raiden2.h"
 #include "machine/seicop.h"
 
-#define seibu_cop_log logerror
-#define LOG_CMDS 1
 
 const device_type SEIBU_COP_LEGACY = &device_creator<seibu_cop_legacy_device>;
 
 seibu_cop_legacy_device::seibu_cop_legacy_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, SEIBU_COP_LEGACY, "Seibu COP Legacy", tag, owner, clock, "seibu_cop_legacy", __FILE__),
 	m_cop_mcu_ram(NULL),
-	m_cop_438(0),
-	m_cop_43a(0),
-	m_cop_43c(0),
 	m_cop_scale(0),
 	m_cop_rng_max_value(0),
 	m_copd2_offs(0),
@@ -1628,8 +1623,6 @@ seibu_cop_legacy_device::seibu_cop_legacy_device(const machine_config &mconfig, 
 	m_cop_rom_addr_lo(0),
 	m_cop_rom_addr_hi(0),
 	m_cop_rom_addr_unk(0),
-	m_u1(0),
-	m_u2(0),
 	m_cop_sprite_dma_src(0),
 	m_cop_sprite_dma_abs_x(0),
 	m_cop_sprite_dma_abs_y(0),
@@ -1637,10 +1630,6 @@ seibu_cop_legacy_device::seibu_cop_legacy_device(const machine_config &mconfig, 
 	m_cop_sprite_dma_param(0),
 	m_raiden2cop(*this, ":raiden2cop")
 {
-	memset(m_copd2_table, 0, sizeof(UINT16)*0x100);
-	memset(m_copd2_table_2, 0, sizeof(UINT16)*0x100/8);
-	memset(m_copd2_table_3, 0, sizeof(UINT16)*0x100/8);
-	memset(m_copd2_table_4, 0, sizeof(UINT16)*0x100/8);
 	memset(m_seibu_vregs, 0, sizeof(UINT16)*0x50/2);
 
 	for (int i = 0; i < 8; i++)
@@ -1648,6 +1637,8 @@ seibu_cop_legacy_device::seibu_cop_legacy_device(const machine_config &mconfig, 
 		m_cop_register[i] = 0;
 	}
 }
+
+#define seibu_cop_log logerror
 
 //-------------------------------------------------
 //  device_config_complete - perform any
@@ -1667,11 +1658,6 @@ void seibu_cop_legacy_device::device_start()
 {
 	m_cop_mcu_ram = reinterpret_cast<UINT16 *>(machine().root_device().memshare("cop_mcu_ram")->ptr());
 
-	save_item(NAME(m_cop_438));
-	save_item(NAME(m_cop_43a));
-	save_item(NAME(m_cop_43c));
-	//save_item(NAME(m_cop_dma_fade_table));
-	//save_item(NAME(m_cop_dma_trigger));
 	save_item(NAME(m_cop_scale));
 	save_item(NAME(m_cop_rng_max_value));
 	save_item(NAME(m_copd2_offs));
@@ -1693,23 +1679,11 @@ void seibu_cop_legacy_device::device_start()
 	save_item(NAME(m_cop_rom_addr_lo));
 	save_item(NAME(m_cop_rom_addr_hi));
 	save_item(NAME(m_cop_rom_addr_unk));
-	save_item(NAME(m_u1));
-	save_item(NAME(m_u2));
-//	save_item(NAME(m_fill_val));
-//	save_item(NAME(m_pal_brightness_val));
-//	save_item(NAME(m_pal_brightness_mode));
 	save_item(NAME(m_cop_sprite_dma_src));
 	save_item(NAME(m_cop_sprite_dma_abs_x));
 	save_item(NAME(m_cop_sprite_dma_abs_y));
 	save_item(NAME(m_cop_sprite_dma_size));
 	save_item(NAME(m_cop_sprite_dma_param));
-	save_item(NAME(m_copd2_table));
-	save_item(NAME(m_copd2_table_2));
-	save_item(NAME(m_copd2_table_3));
-	save_item(NAME(m_copd2_table_4));
-//	save_item(NAME(m_cop_dma_src));
-//	save_item(NAME(m_cop_dma_size));
-//	save_item(NAME(m_cop_dma_dst));
 	save_item(NAME(m_seibu_vregs));
 }
 
@@ -1719,165 +1693,6 @@ void seibu_cop_legacy_device::device_start()
 
 void seibu_cop_legacy_device::device_reset()
 {
-}
-
-void seibu_cop_legacy_device::copd2_set_tableoffset(UINT16 data)
-{
-	//logerror("mcu_offs %04x\n", data);
-	m_copd2_offs = data;
-	if (m_copd2_offs>0xff)
-	{
-		logerror("copd2 offs > 0x100\n");
-	}
-
-	m_copd2_table_2[m_copd2_offs/8] = m_cop_438;
-	m_copd2_table_3[m_copd2_offs/8] = m_cop_43a;
-	m_copd2_table_4[m_copd2_offs/8] = m_cop_43c;
-#if 0
-
-	{
-		FILE *fp;
-		char filename[256];
-		sprintf(filename,"copdat_%s.table2", machine.system().name);
-		fp=fopen(filename, "w+b");
-		if (fp)
-		{
-			fwrite(m_copd2_table_2, 0x200/8, 1, fp);
-			fclose(fp);
-		}
-	}
-	{
-		FILE *fp;
-		char filename[256];
-		sprintf(filename,"copdat_%s.table3", machine.system().name);
-		fp=fopen(filename, "w+b");
-		if (fp)
-		{
-			fwrite(m_copd2_table_3, 0x200/8, 1, fp);
-			fclose(fp);
-		}
-	}
-	{
-		FILE *fp;
-		char filename[256];
-		sprintf(filename,"copdat_%s.table4", machine.system().name);
-		fp=fopen(filename, "w+b");
-		if (fp)
-		{
-			fwrite(m_copd2_table_4, 0x200/8, 1, fp);
-			fclose(fp);
-		}
-	}
-
-	{
-		int i;
-
-		printf("start\n");
-
-		for (i=0;i<0x20;i++)
-		{
-			int ii;
-			printf("%02x | %01x | %04x | %04x | ", i, m_copd2_table_2[i], m_copd2_table_3[i], m_copd2_table_4[i]);
-
-
-			for (ii=0;ii<0x8;ii++)
-			{
-				printf("%03x ", m_copd2_table[i*8 + ii]);
-
-			}
-			printf("\n");
-		}
-
-	}
-#endif
-
-}
-
-void seibu_cop_legacy_device::copd2_set_tabledata(UINT16 data)
-{
-	m_copd2_table[m_copd2_offs] = data;
-
-	if(data) {
-		int off = data & 31;
-		int reg = (data >> 5) & 3;
-		int op = (data >> 7) & 31;
-
-		logerror("COPDIS: %04x s=%02x f1=%x l=%x f2=%02x %x %04x %02x %03x %02x.%x.%02x ", m_cop_43c,  (m_cop_43c >> 11) << 3, (m_cop_43c >> 10) & 1, ((m_cop_43c >> 7) & 7)+1, m_cop_43c & 0x7f, m_cop_438, m_cop_43a, m_copd2_offs, data, op, reg, off);
-
-		off *= 2;
-
-		// COPDIS: 0205 s=00 f1=0 l=5 f2=05 6 ffeb 00 188 03.0.08 read32 10(m_r0)
-		// COPDIS: 0205 s=00 f1=0 l=5 f2=05 6 ffeb 01 282 05.0.02 add32 4(m_r0)
-		// COPDIS: 0205 s=00 f1=0 l=5 f2=05 6 ffeb 02 082 01.0.02 write32 4(m_r0)
-		// COPDIS: 0205 s=00 f1=0 l=5 f2=05 6 ffeb 03 b8e 17.0.0e add16h 1c(m_r0)
-		// COPDIS: 0205 s=00 f1=0 l=5 f2=05 6 ffeb 04 98e 13.0.0e write16h 1c(m_r0)
-
-		// 188 182 082 b8e 98e -> 04  = 04+04    1ch = 1c+04
-		// 188 188 082 b8e 98e -> 04  = 04+10    1ch = 1c+10
-		// 188 18e 082 b8e 98e -> 04  = 04+1c    1ch = 1c+1c
-		// 188 282 082 b8e 98e -> 04  = 04+10    1ch = 1c+10
-		// 188 288 082 b8e 98e -> 04  = 10+10    1ch = 1c+10
-		// 188 28e 082 b8e 98e -> 04  = 1c+10    1ch = 1c+10
-		// 188 282 282 282 082 -> 04  = 04+04+10 10h = 04+10
-		// 188 188 188 188 082 -> 04h = 04+10    04l = 04+10+10
-		// 188 188 188 188 082 -> 04  = 04+10    04l = 04+10+10  10h = 04+10 (same, but trigger = 020b)
-
-		switch(op) {
-		case 0x01:
-			if(off)
-				logerror("addmem32 %x(r%x)\n", off, reg);
-			else
-				logerror("addmem32 (r%x)\n", reg);
-			break;
-		case 0x03:
-			if(off)
-				logerror("read32 %x(r%x)\n", off, reg);
-			else
-				logerror("read32 (r%x)\n", reg);
-			break;
-		case 0x05:
-			if(off)
-				logerror("add32 %x(r%x)\n", off, reg);
-			else
-				logerror("add32 (r%x)\n", reg);
-			break;
-		case 0x13:
-			if(off)
-				logerror("write16h %x(r%x)\n", off, reg);
-			else
-				logerror("write16h (r%x)\n", reg);
-			break;
-		case 0x15:
-			if(off)
-				logerror("sub32 %x(r%x)\n", off, reg);
-			else
-				logerror("sub32 (r%x)\n", reg);
-			break;
-		case 0x17:
-			if(off)
-				logerror("addmem16 %x(r%x)\n", off, reg);
-			else
-				logerror("addmem16 (r%x)\n", reg);
-			break;
-		default:
-			logerror("? %x(r%x)\n",off, reg);
-			break;
-		}
-	}
-	//logerror("mcu_data %04x\n", data);
-#if 0
-	{
-		FILE *fp;
-		char filename[256];
-		sprintf(filename,"copdat_%s.data", machine.system().name);
-		fp=fopen(filename, "w+b");
-		if (fp)
-		{
-			fwrite(m_copd2_table, 0x200, 1, fp);
-			fclose(fp);
-		}
-	}
-#endif
 }
 
 WRITE16_MEMBER( seibu_cop_legacy_device::seibu_common_video_regs_w )
@@ -2207,21 +2022,13 @@ WRITE16_MEMBER( seibu_cop_legacy_device::copdxbl_0_w )
      which seems common to all the games
 */
 
-#if 0
-/* RE from Seibu Cup Soccer bootleg */
-static const UINT8 fade_table(int v)
-{
-	int low  = v & 0x001f;
-	int high = v & 0x03e0;
 
-	return (low * (high | (high >> 5)) + 0x210) >> 10;
-}
-#endif
 
-#define COP_CMD(_1_,_2_,_3_,_4_,_5_,_6_,_7_,_8_,_m_u1_,_m_u2_) \
-	(m_copd2_table[command+0] == _1_ && m_copd2_table[command+1] == _2_ && m_copd2_table[command+2] == _3_ && m_copd2_table[command+3] == _4_ && \
-	m_copd2_table[command+4] == _5_ && m_copd2_table[command+5] == _6_ && m_copd2_table[command+6] == _7_ && m_copd2_table[command+7] == _8_ && \
-	m_u1 == _m_u1_ && m_u2 == _m_u2_)
+
+
+/*
+_
+*/
 
 /*
 Godzilla 0x12c0 X = 0x21ed Y = 0x57da
@@ -2433,11 +2240,11 @@ WRITE16_MEMBER( seibu_cop_legacy_device::generic_cop_w )
 		case (0x02c/2): m_cop_rng_max_value = m_cop_mcu_ram[0x2c/2] & 0xff; break;
 
 		/* Command tables for 0x500 / 0x502 commands */
-		case (0x032/2): { copd2_set_tabledata(data); break; }
-		case (0x034/2): { copd2_set_tableoffset(data); break; }
-		case (0x038/2): { m_cop_438 = data; break; }
-		case (0x03a/2): { m_cop_43a = data; break; }
-		case (0x03c/2): { m_cop_43c = data; break; }
+		case (0x032/2): { m_raiden2cop->cop_pgm_data_w(space,0,data,mem_mask); break; }
+		case (0x034/2): { m_raiden2cop->cop_pgm_addr_w(space,0,data,mem_mask); break; }
+		case (0x038/2): { m_raiden2cop->cop_pgm_value_w(space,0,data,mem_mask); break; }
+		case (0x03a/2): { m_raiden2cop->cop_pgm_mask_w(space,0,data,mem_mask); break; }
+		case (0x03c/2): { m_raiden2cop->cop_pgm_trigger_w(space,0,data,mem_mask); break; }
 		case (0x03e/2):
 			/*
 			0 in all 68k based games
@@ -2513,54 +2320,24 @@ WRITE16_MEMBER( seibu_cop_legacy_device::generic_cop_w )
 		case (0x102/2):
 		case (0x104/2):
 		{
-			int i;
 			int command;
 
-			#if LOG_CMDS
-			seibu_cop_log("%06x: COPX execute table macro command %04x %04x | regs %08x %08x %08x %08x %08x\n", space.device().safe_pc(), data, m_cop_mcu_ram[offset], m_cop_register[0], m_cop_register[1], m_cop_register[2], m_cop_register[3], m_cop_register[4]);
-			#endif
 
-			command = -1;
-			/* search the uploaded 'trigger' table for a matching trigger*/
-			/* note, I don't know what the 'mask' or 'value' tables are... probably important, might determine what actually gets executed! */
-			/* note: Zero Team triggers macro 0x904 instead of 0x905, Seibu Cup Soccer triggers 0xe30e instead of 0xe38e. I highly doubt that AT LEAST
-			   it isn't supposed to do anything, especially in the former case (it definitely NEEDS that sprites have an arc movement when they are knocked down). */
-			for (i=0;i<32;i++)
-			{
-				if ((m_cop_mcu_ram[offset] & 0xff00) == (m_copd2_table_4[i] & 0xff00))
-				{
-					#if LOG_CMDS
-					seibu_cop_log("    Cop Command %04x found in slot %02x with other params %04x %04x\n", m_cop_mcu_ram[offset], i, m_copd2_table_2[i], m_copd2_table_3[i]);
-					#endif
+			logerror("%06x: COPX execute table macro command %04x %04x | regs %08x %08x %08x %08x %08x\n", space.device().safe_pc(), data, m_cop_mcu_ram[offset], m_cop_register[0], m_cop_register[1], m_cop_register[2], m_cop_register[3], m_cop_register[4]);
 
-					m_u1 = m_copd2_table_2[i] & 0x000f;
-					m_u2 = m_copd2_table_3[i] & 0xffff;
-					command = i;
-				}
-			}
+
+			command = m_raiden2cop->find_trigger_match(m_cop_mcu_ram[offset], 0xff00);
+
 
 			if (command==-1)
 			{
-				seibu_cop_log("    Cop Command %04x NOT IN TABLE!\n", m_cop_mcu_ram[offset]);
-				break;
+				return;
 			}
-			else
-			{
-				command*=0x8;
-				#if LOG_CMDS
-				{
-					int j;
-					seibu_cop_log("     Sequence: ");
-					for (j=0;j<0x8;j++)
-					{
-						seibu_cop_log("%04x ", m_copd2_table[command+j]);
-					}
-					seibu_cop_log("\n");
-				}
-				#endif
-			}
-
-			//printf("%04x %04x %04x\n",m_cop_mcu_ram[offset],m_u1,m_u2);
+			UINT16 funcval,funcmask;
+			// this is pointless.. all we use it for is comparing against the same value
+			funcval = m_raiden2cop->get_func_value(command);
+			funcmask = m_raiden2cop->get_func_mask(command);
+			//printf("%04x %04x %04x\n",m_cop_mcu_ram[offset],funcval,funcmask);
 
 			/*
 			Macro notes:
@@ -2577,9 +2354,12 @@ WRITE16_MEMBER( seibu_cop_legacy_device::generic_cop_w )
 			  Surprisingly atan maths are nowhere to be found from the roms.
 			*/
 
+			int executed = 0;
+
 			/* "automatic" movement, 0205 */
-			if(COP_CMD(0x188,0x282,0x082,0xb8e,0x98e,0x000,0x000,0x000,6,0xffeb))
+			if(m_raiden2cop->check_command_matches(command, 0x188,0x282,0x082,0xb8e,0x98e,0x000,0x000,0x000,6,0xffeb))
 			{
+				executed = 1;
 				UINT8 offs;
 
 				offs = (offset & 3) * 4;
@@ -2593,8 +2373,9 @@ WRITE16_MEMBER( seibu_cop_legacy_device::generic_cop_w )
 			}
 
 			/* "automatic" movement, for arcs in Legionnaire / Zero Team (expression adjustment) 0905 */
-			if(COP_CMD(0x194,0x288,0x088,0x000,0x000,0x000,0x000,0x000,6,0xfbfb))
+			if(m_raiden2cop->check_command_matches(command, 0x194,0x288,0x088,0x000,0x000,0x000,0x000,0x000,6,0xfbfb))
 			{
+				executed = 1;
 				UINT8 offs;
 
 				offs = (offset & 3) * 4;
@@ -2619,8 +2400,9 @@ WRITE16_MEMBER( seibu_cop_legacy_device::generic_cop_w )
 			       if(s == 192)
 			         val = -2*amp
 			*/
-			if(COP_CMD(0xb9a,0xb88,0x888,0x000,0x000,0x000,0x000,0x000,7,0xfdfb))
+			if(m_raiden2cop->check_command_matches(command, 0xb9a,0xb88,0x888,0x000,0x000,0x000,0x000,0x000,7,0xfdfb))
 			{
+				executed = 1;
 				int raw_angle = (space.read_word(m_cop_register[0]+(0x34^2)) & 0xff);
 				double angle = raw_angle * M_PI / 128;
 				double amp = (65536 >> 5)*(space.read_word(m_cop_register[0]+(0x36^2)) & 0xff);
@@ -2648,8 +2430,9 @@ WRITE16_MEMBER( seibu_cop_legacy_device::generic_cop_w )
 			   if(s == 128)
 			     val = -2*amp
 			*/
-			if(COP_CMD(0xb9a,0xb8a,0x88a,0x000,0x000,0x000,0x000,0x000,7,0xfdfb))
+			if(m_raiden2cop->check_command_matches(command, 0xb9a,0xb8a,0x88a,0x000,0x000,0x000,0x000,0x000,7,0xfdfb))
 			{
+				executed = 1;
 				int raw_angle = (space.read_word(m_cop_register[0]+(0x34^2)) & 0xff);
 				double angle = raw_angle * M_PI / 128;
 				double amp = (65536 >> 5)*(space.read_word(m_cop_register[0]+(0x36^2)) & 0xff);
@@ -2666,8 +2449,9 @@ WRITE16_MEMBER( seibu_cop_legacy_device::generic_cop_w )
 			}
 
 			/* 0x130e / 0x138e */
-			if(COP_CMD(0x984,0xaa4,0xd82,0xaa2,0x39b,0xb9a,0xb9a,0xa9a,5,0xbf7f))
+			if(m_raiden2cop->check_command_matches(command, 0x984,0xaa4,0xd82,0xaa2,0x39b,0xb9a,0xb9a,0xa9a,5,0xbf7f))
 			{
+				executed = 1;
 				int dy = space.read_dword(m_cop_register[1]+4) - space.read_dword(m_cop_register[0]+4);
 				int dx = space.read_dword(m_cop_register[1]+8) - space.read_dword(m_cop_register[0]+8);
 
@@ -2693,8 +2477,9 @@ WRITE16_MEMBER( seibu_cop_legacy_device::generic_cop_w )
 
 			/* Pythagorean theorem, hypotenuse direction - 130e / 138e */
 			//(heatbrl)  | 5 | bf7f | 138e | 984 aa4 d82 aa2 39b b9a b9a b9a
-			if(COP_CMD(0x984,0xaa4,0xd82,0xaa2,0x39b,0xb9a,0xb9a,0xb9a,5,0xbf7f))
+			if(m_raiden2cop->check_command_matches(command, 0x984,0xaa4,0xd82,0xaa2,0x39b,0xb9a,0xb9a,0xb9a,5,0xbf7f))
 			{
+				executed = 1;
 				int dy = space.read_dword(m_cop_register[1]+4) - space.read_dword(m_cop_register[0]+4);
 				int dx = space.read_dword(m_cop_register[1]+8) - space.read_dword(m_cop_register[0]+8);
 
@@ -2725,8 +2510,9 @@ WRITE16_MEMBER( seibu_cop_legacy_device::generic_cop_w )
 			   v2 = (x & 255)*32767/255
 			   val = sqrt(v1*v1+v2*v2) (unsigned)
 			*/
-			if(COP_CMD(0xf9c,0xb9c,0xb9c,0xb9c,0xb9c,0xb9c,0xb9c,0x99c,4,0x007f))
+			if(m_raiden2cop->check_command_matches(command, 0xf9c,0xb9c,0xb9c,0xb9c,0xb9c,0xb9c,0xb9c,0x99c,4,0x007f))
 			{
+				executed = 1;
 				int dy = m_r0;
 				int dx = m_r1;
 
@@ -2750,8 +2536,9 @@ WRITE16_MEMBER( seibu_cop_legacy_device::generic_cop_w )
 			   v2 = (x & 1023)*32
 			   val = !v1 ? 32767 : trunc(v2/v1+0.5)
 			*/
-			if(COP_CMD(0xf9a,0xb9a,0xb9c,0xb9c,0xb9c,0x29c,0x000,0x000,5,0xfcdd))
+			if(m_raiden2cop->check_command_matches(command, 0xf9a,0xb9a,0xb9c,0xb9c,0xb9c,0x29c,0x000,0x000,5,0xfcdd))
 			{
+				executed = 1;
 				int dy = m_r0;
 				int dx = m_r1;
 				int div = space.read_word(m_cop_register[0]+(0x36^2));
@@ -2792,19 +2579,21 @@ WRITE16_MEMBER( seibu_cop_legacy_device::generic_cop_w )
 			    int hitbox_param1 = space.read_dword(m_cop_register[2]);
 			    int hitbox_param2 = space.read_dword(m_cop_register[3]);
 
-			    TODO: we are ignoring the m_u1 / m_u2 params for now
+			    TODO: we are ignoring the funcval / funcmask params for now
 			*/
 
-			if(COP_CMD(0xb80,0xb82,0xb84,0xb86,0x000,0x000,0x000,0x000,m_u1,m_u2))
+			if(m_raiden2cop->check_command_matches(command, 0xb80,0xb82,0xb84,0xb86,0x000,0x000,0x000,0x000,funcval,funcmask))
 			{
+				executed = 1;
 				m_cop_collision_info[0].y = (space.read_dword(m_cop_register[0]+4));
 				m_cop_collision_info[0].x = (space.read_dword(m_cop_register[0]+8));
 				return;
 			}
 
 			//(heatbrl)  | 9 | ffff | b080 | b40 bc0 bc2
-			if(COP_CMD(0xb40,0xbc0,0xbc2,0x000,0x000,0x000,0x000,0x000,m_u1,m_u2))
+			if(m_raiden2cop->check_command_matches(command, 0xb40,0xbc0,0xbc2,0x000,0x000,0x000,0x000,0x000,funcval,funcmask))
 			{
+				executed = 1;
 				m_cop_collision_info[0].hitbox = space.read_word(m_cop_register[2]);
 				m_cop_collision_info[0].hitbox_y = space.read_word((m_cop_register[2]&0xffff0000)|(m_cop_collision_info[0].hitbox));
 				m_cop_collision_info[0].hitbox_x = space.read_word(((m_cop_register[2]&0xffff0000)|(m_cop_collision_info[0].hitbox))+2);
@@ -2816,16 +2605,18 @@ WRITE16_MEMBER( seibu_cop_legacy_device::generic_cop_w )
 				return;
 			}
 
-			if(COP_CMD(0xba0,0xba2,0xba4,0xba6,0x000,0x000,0x000,0x000,m_u1,m_u2))
+			if(m_raiden2cop->check_command_matches(command, 0xba0,0xba2,0xba4,0xba6,0x000,0x000,0x000,0x000,funcval,funcmask))
 			{
+				executed = 1;
 				m_cop_collision_info[1].y = (space.read_dword(m_cop_register[1]+4));
 				m_cop_collision_info[1].x = (space.read_dword(m_cop_register[1]+8));
 				return;
 			}
 
 			//(heatbrl)  | 6 | ffff | b880 | b60 be0 be2
-			if(COP_CMD(0xb60,0xbe0,0xbe2,0x000,0x000,0x000,0x000,0x000,m_u1,m_u2))
+			if(m_raiden2cop->check_command_matches(command, 0xb60,0xbe0,0xbe2,0x000,0x000,0x000,0x000,0x000,funcval,funcmask))
 			{
+				executed = 1;
 				m_cop_collision_info[1].hitbox = space.read_word(m_cop_register[3]);
 				m_cop_collision_info[1].hitbox_y = space.read_word((m_cop_register[3]&0xffff0000)|(m_cop_collision_info[1].hitbox));
 				m_cop_collision_info[1].hitbox_x = space.read_word(((m_cop_register[3]&0xffff0000)|(m_cop_collision_info[1].hitbox))+2);
@@ -2837,8 +2628,9 @@ WRITE16_MEMBER( seibu_cop_legacy_device::generic_cop_w )
 			}
 
 			// grainbow 0d | a | fff3 | 6980 | b80 ba0
-			if(COP_CMD(0xb80,0xba0,0x000,0x000,0x000,0x000,0x000,0x000,10,0xfff3))
+			if(m_raiden2cop->check_command_matches(command, 0xb80,0xba0,0x000,0x000,0x000,0x000,0x000,0x000,10,0xfff3))
 			{
+				executed = 1;
 				UINT8 offs;
 				int abs_x,abs_y,rel_xy;
 
@@ -2862,8 +2654,9 @@ WRITE16_MEMBER( seibu_cop_legacy_device::generic_cop_w )
 			}
 
 			// grainbow 18 | a | ff00 | c480 | 080 882
-			if(COP_CMD(0x080,0x882,0x000,0x000,0x000,0x000,0x000,0x000,10,0xff00))
+			if(m_raiden2cop->check_command_matches(command, 0x080,0x882,0x000,0x000,0x000,0x000,0x000,0x000,10,0xff00))
 			{
+				executed = 1;
 				UINT8 offs;
 
 				offs = (offset & 3) * 4;
@@ -2877,8 +2670,9 @@ WRITE16_MEMBER( seibu_cop_legacy_device::generic_cop_w )
 			/* radar x/y positions */
 			/* FIXME: x/ys are offsetted */
 			/* FIXME: uses 0x10044a for something */
-			if(COP_CMD(0xf80,0xaa2,0x984,0x0c2,0x000,0x000,0x000,0x000,5,0x7ff7))
+			if(m_raiden2cop->check_command_matches(command, 0xf80,0xaa2,0x984,0x0c2,0x000,0x000,0x000,0x000,5,0x7ff7))
 			{
+				executed = 1;
 				UINT8 offs;
 				int div;
 				INT16 dir_offset;
@@ -2914,8 +2708,9 @@ WRITE16_MEMBER( seibu_cop_legacy_device::generic_cop_w )
 			}
 
 			//(cupsoc)   | 8 | f3e7 | 6200 | 3a0 3a6 380 aa0 2a6
-			if(COP_CMD(0x3a0,0x3a6,0x380,0xaa0,0x2a6,0x000,0x000,0x000,8,0xf3e7))
+			if(m_raiden2cop->check_command_matches(command, 0x3a0,0x3a6,0x380,0xaa0,0x2a6,0x000,0x000,0x000,8,0xf3e7))
 			{
+				executed = 1;
 				UINT8 cur_angle;
 				UINT16 flags;
 				
@@ -2967,8 +2762,9 @@ WRITE16_MEMBER( seibu_cop_legacy_device::generic_cop_w )
 			//(grainbow) | 8 | f3e7 | 6200 | 380 39a 380 a80 29a
 			/* search direction, used on SD Gundam homing weapon */
 			/* FIXME: still doesn't work ... */
-			if(COP_CMD(0x380,0x39a,0x380,0xa80,0x29a,0x000,0x000,0x000,8,0xf3e7))
+			if(m_raiden2cop->check_command_matches(command, 0x380,0x39a,0x380,0xa80,0x29a,0x000,0x000,0x000,8,0xf3e7))
 			{
+				executed = 1;
 				UINT8 cur_angle;
 				UINT16 flags;
 				
@@ -3012,8 +2808,9 @@ WRITE16_MEMBER( seibu_cop_legacy_device::generic_cop_w )
 			}
 
 			//(cupsoc) 1c | 5 | b07f | e38e | 984 ac4 d82 ac2 39b b9a b9a a9a
-			if(COP_CMD(0x984,0xac4,0xd82,0xac2,0x39b,0xb9a,0xb9a,0xa9a,5,0xb07f))
+			if(m_raiden2cop->check_command_matches(command, 0x984,0xac4,0xd82,0xac2,0x39b,0xb9a,0xb9a,0xa9a,5,0xb07f))
 			{
+				executed = 1;
 				int dy = space.read_dword(m_cop_register[2]+4) - space.read_dword(m_cop_register[0]+4);
 				int dx = space.read_dword(m_cop_register[2]+8) - space.read_dword(m_cop_register[0]+8);
 
@@ -3039,8 +2836,9 @@ WRITE16_MEMBER( seibu_cop_legacy_device::generic_cop_w )
 
 			//(cupsoc) 1a | 5 | fffb | d104 | ac2 9e0 0a2
 			/* controls player vs. player collision detection, 0xf105 controls player vs. ball */
-			if(COP_CMD(0xac2,0x9e0,0x0a2,0x000,0x000,0x000,0x000,0x000,5,0xfffb))
+			if(m_raiden2cop->check_command_matches(command, 0xac2,0x9e0,0x0a2,0x000,0x000,0x000,0x000,0x000,5,0xfffb))
 			{
+				executed = 1;
 				UINT8 *ROM = space.machine().root_device().memregion("maincpu")->base();
 				UINT32 rom_addr = (m_cop_rom_addr_hi << 16 | m_cop_rom_addr_lo) & ~1;
 				UINT16 rom_data = (ROM[rom_addr + 0]) | (ROM[rom_addr + 1]<<8);
@@ -3052,7 +2850,7 @@ WRITE16_MEMBER( seibu_cop_legacy_device::generic_cop_w )
 				return;
 			}
 
-			printf("%04x\n",m_cop_mcu_ram[offset]);
+			if (executed==0) printf("did not execute %04x\n",m_cop_mcu_ram[offset]);
 			break;
 		}
 

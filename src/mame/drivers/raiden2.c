@@ -179,10 +179,7 @@ void raiden2_state::machine_start()
 	save_item(NAME(cop_itoa_digit_count));
 	save_item(NAME(cop_angle));
 	save_item(NAME(cop_dist));
-	save_item(NAME(cop_latch_addr));
-	save_item(NAME(cop_latch_trigger));
-	save_item(NAME(cop_latch_value));
-	save_item(NAME(cop_latch_mask));
+
 	save_item(NAME(cop_angle_target));
 	save_item(NAME(cop_angle_step));
 	save_item(NAME(sprite_prot_x));
@@ -201,10 +198,7 @@ void raiden2_state::machine_start()
 	save_item(NAME(scrollvals));
 	save_item(NAME(cop_regs));
 	save_item(NAME(cop_itoa_digits));
-	save_item(NAME(cop_func_trigger));
-	save_item(NAME(cop_func_value));
-	save_item(NAME(cop_func_mask));
-	save_item(NAME(cop_program));
+
 	save_item(NAME(sprite_prot_src_addr));
 
 	save_item(NAME(cop_collision_info[0].pos));
@@ -234,108 +228,6 @@ UINT16 raiden2_state::rpc()
 
 int cnt=0, ccol = -1;
 
-WRITE16_MEMBER(raiden2_state::cop_pgm_data_w)
-{
-	assert(ACCESSING_BITS_0_7 && ACCESSING_BITS_8_15);
-	cop_program[cop_latch_addr] = data;
-	int idx = cop_latch_addr >> 3;
-	cop_func_trigger[idx] = cop_latch_trigger;
-	cop_func_value[idx]   = cop_latch_value;
-	cop_func_mask[idx]    = cop_latch_mask;
-
-	if(data) {
-		int off = data & 31;
-		int reg = (data >> 5) & 3;
-		int op = (data >> 7) & 31;
-
-		logerror("COPDIS: %04x s=%02x f1=%x l=%x f2=%02x %x %04x %02x %03x %02x.%x.%02x ", cop_latch_trigger,  (cop_latch_trigger >> 11) << 3, (cop_latch_trigger >> 10) & 1, ((cop_latch_trigger >> 7) & 7)+1, cop_latch_trigger & 0x7f, cop_latch_value, cop_latch_mask, cop_latch_addr, data, op, reg, off);
-
-		off *= 2;
-
-		// COPDIS: 0205 s=00 f1=0 l=5 f2=05 6 ffeb 00 188 03.0.08 read32 10(r0)
-		// COPDIS: 0205 s=00 f1=0 l=5 f2=05 6 ffeb 01 282 05.0.02 add32 4(r0)
-		// COPDIS: 0205 s=00 f1=0 l=5 f2=05 6 ffeb 02 082 01.0.02 write32 4(r0)
-		// COPDIS: 0205 s=00 f1=0 l=5 f2=05 6 ffeb 03 b8e 17.0.0e add16h 1c(r0)
-		// COPDIS: 0205 s=00 f1=0 l=5 f2=05 6 ffeb 04 98e 13.0.0e write16h 1c(r0)
-
-		// 188 182 082 b8e 98e -> 04  = 04+04    1ch = 1c+04
-		// 188 188 082 b8e 98e -> 04  = 04+10    1ch = 1c+10
-		// 188 18e 082 b8e 98e -> 04  = 04+1c    1ch = 1c+1c
-		// 188 282 082 b8e 98e -> 04  = 04+10    1ch = 1c+10
-		// 188 288 082 b8e 98e -> 04  = 10+10    1ch = 1c+10
-		// 188 28e 082 b8e 98e -> 04  = 1c+10    1ch = 1c+10
-		// 188 282 282 282 082 -> 04  = 04+04+10 10h = 04+10
-		// 188 188 188 188 082 -> 04h = 04+10    04l = 04+10+10
-		// 188 188 188 188 082 -> 04  = 04+10    04l = 04+10+10  10h = 04+10 (same, but trigger = 020b)
-
-		switch(op) {
-		case 0x01:
-			if(off)
-				logerror("addmem32 %x(r%x)\n", off, reg);
-			else
-				logerror("addmem32 (r%x)\n", reg);
-			break;
-		case 0x03:
-			if(off)
-				logerror("read32 %x(r%x)\n", off, reg);
-			else
-				logerror("read32 (r%x)\n", reg);
-			break;
-		case 0x05:
-			if(off)
-				logerror("add32 %x(r%x)\n", off, reg);
-			else
-				logerror("add32 (r%x)\n", reg);
-			break;
-		case 0x13:
-			if(off)
-				logerror("write16h %x(r%x)\n", off, reg);
-			else
-				logerror("write16h (r%x)\n", reg);
-			break;
-		case 0x15:
-			if(off)
-				logerror("sub32 %x(r%x)\n", off, reg);
-			else
-				logerror("sub32 (r%x)\n", reg);
-			break;
-		case 0x17:
-			if(off)
-				logerror("addmem16 %x(r%x)\n", off, reg);
-			else
-				logerror("addmem16 (r%x)\n", reg);
-			break;
-		default:
-			logerror("?\n");
-			break;
-		}
-	}
-}
-
-WRITE16_MEMBER(raiden2_state::cop_pgm_addr_w)
-{
-	assert(ACCESSING_BITS_0_7 && ACCESSING_BITS_8_15);
-	assert(data < 0x100);
-	cop_latch_addr = data;
-}
-
-WRITE16_MEMBER(raiden2_state::cop_pgm_value_w)
-{
-	assert(ACCESSING_BITS_0_7 && ACCESSING_BITS_8_15);
-	cop_latch_value = data;
-}
-
-WRITE16_MEMBER(raiden2_state::cop_pgm_mask_w)
-{
-	assert(ACCESSING_BITS_0_7 && ACCESSING_BITS_8_15);
-	cop_latch_mask = data;
-}
-
-WRITE16_MEMBER(raiden2_state::cop_pgm_trigger_w)
-{
-	assert(ACCESSING_BITS_0_7 && ACCESSING_BITS_8_15);
-	cop_latch_trigger = data;
-}
 
 WRITE16_MEMBER(raiden2_state::m_videoram_private_w)
 {
@@ -1445,12 +1337,12 @@ static ADDRESS_MAP_START( raiden2_cop_mem, AS_PROGRAM, 16, raiden2_state )
 	AM_RANGE(0x00424, 0x00425) AM_WRITE(cop_itoa_digit_count_w)
 	AM_RANGE(0x00428, 0x00429) AM_DEVWRITE("raiden2cop", raiden2cop_device, cop_dma_v1_w)
 	AM_RANGE(0x0042a, 0x0042b) AM_DEVWRITE("raiden2cop", raiden2cop_device, cop_dma_v2_w)
-	AM_RANGE(0x00432, 0x00433) AM_WRITE(cop_pgm_data_w)
-	AM_RANGE(0x00434, 0x00435) AM_WRITE(cop_pgm_addr_w)
+	AM_RANGE(0x00432, 0x00433) AM_DEVWRITE("raiden2cop", raiden2cop_device, cop_pgm_data_w)
+	AM_RANGE(0x00434, 0x00435) AM_DEVWRITE("raiden2cop", raiden2cop_device, cop_pgm_addr_w)
 	AM_RANGE(0x00436, 0x00437) AM_WRITE(cop_hitbox_baseadr_w)
-	AM_RANGE(0x00438, 0x00439) AM_WRITE(cop_pgm_value_w)
-	AM_RANGE(0x0043a, 0x0043b) AM_WRITE(cop_pgm_mask_w)
-	AM_RANGE(0x0043c, 0x0043d) AM_WRITE(cop_pgm_trigger_w)
+	AM_RANGE(0x00438, 0x00439) AM_DEVWRITE("raiden2cop", raiden2cop_device, cop_pgm_value_w)
+	AM_RANGE(0x0043a, 0x0043b) AM_DEVWRITE("raiden2cop", raiden2cop_device, cop_pgm_mask_w)
+	AM_RANGE(0x0043c, 0x0043d) AM_DEVWRITE("raiden2cop", raiden2cop_device, cop_pgm_trigger_w)
 	AM_RANGE(0x00444, 0x00445) AM_WRITE(cop_scale_w)
 	AM_RANGE(0x00450, 0x00451) AM_WRITE(cop_sort_ram_addr_hi_w)
 	AM_RANGE(0x00452, 0x00453) AM_WRITE(cop_sort_ram_addr_lo_w)

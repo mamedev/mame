@@ -32,10 +32,7 @@ public:
 		  cop_itoa_digit_count(0),
 		  cop_angle(0),
 		  cop_dist(0),
-		  cop_latch_addr(0),
-		  cop_latch_trigger(0),
-		  cop_latch_value(0),
-		  cop_latch_mask(0),
+
 		  cop_angle_target(0),
 		  cop_angle_step(0),
 		  sprite_prot_x(0),
@@ -56,10 +53,6 @@ public:
 		  memset(cop_regs, 0, sizeof(UINT32)*8);
 		  memset(cop_itoa_digits, 0, sizeof(UINT8)*10);
 
-		  memset(cop_func_trigger, 0, sizeof(UINT16)*(0x100/8));
-		  memset(cop_func_value, 0, sizeof(UINT16)*(0x100/8));
-		  memset(cop_func_mask, 0, sizeof(UINT16)*(0x100/8));
-		  memset(cop_program, 0, sizeof(UINT16)*(0x100));
 		  memset(sprite_prot_src_addr, 0, sizeof(UINT16)*2);
 		  memset(cop_collision_info, 0, sizeof(colinfo)*2);
 	}
@@ -82,11 +75,7 @@ public:
 	DECLARE_WRITE16_MEMBER( cop_reg_high_w );
 	DECLARE_READ16_MEMBER ( cop_reg_low_r );
 	DECLARE_WRITE16_MEMBER( cop_reg_low_w );
-	DECLARE_WRITE16_MEMBER( cop_pgm_data_w );
-	DECLARE_WRITE16_MEMBER( cop_pgm_addr_w );
-	DECLARE_WRITE16_MEMBER( cop_pgm_value_w );
-	DECLARE_WRITE16_MEMBER( cop_pgm_mask_w );
-	DECLARE_WRITE16_MEMBER( cop_pgm_trigger_w );
+
 	DECLARE_WRITE16_MEMBER( cop_cmd_w );
 	DECLARE_READ16_MEMBER ( cop_itoa_digits_r );
 	DECLARE_READ16_MEMBER ( cop_collision_status_r );
@@ -150,11 +139,6 @@ public:
 	UINT16 cop_status, cop_scale, cop_itoa_digit_count, cop_angle, cop_dist;
 	UINT8 cop_itoa_digits[10];
 
-	UINT16 cop_func_trigger[0x100/8];       /* function trigger */
-	UINT16 cop_func_value[0x100/8];         /* function value (?) */
-	UINT16 cop_func_mask[0x100/8];          /* function mask (?) */
-	UINT16 cop_program[0x100];              /* program "code" */
-	UINT16 cop_latch_addr, cop_latch_trigger, cop_latch_value, cop_latch_mask;
 	UINT16 cop_angle_target;
 	UINT16 cop_angle_step;
 

@@ -52,13 +52,7 @@ protected:
 
 private:
 	UINT16 *m_cop_mcu_ram;
-	UINT16 m_copd2_table[0x100];
-	UINT16 m_copd2_table_2[0x100/8];
-	UINT16 m_copd2_table_3[0x100/8];
-	UINT16 m_copd2_table_4[0x100/8];
-	UINT16 m_cop_438;
-	UINT16 m_cop_43a;
-	UINT16 m_cop_43c;
+
 
 	UINT16 m_cop_scale;
 	UINT8 m_cop_rng_max_value;
@@ -74,7 +68,6 @@ private:
 	struct collision_info m_cop_collision_info[2];
 	int m_r0, m_r1;
 	UINT16 m_cop_rom_addr_lo,m_cop_rom_addr_hi,m_cop_rom_addr_unk;
-	UINT16 m_u1,m_u2;
 
 	UINT32 m_cop_sprite_dma_src;
 	int m_cop_sprite_dma_abs_x,m_cop_sprite_dma_abs_y,m_cop_sprite_dma_size;

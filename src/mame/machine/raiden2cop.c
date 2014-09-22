@@ -12,6 +12,10 @@ const device_type RAIDEN2COP = &device_creator<raiden2cop_device>;
 
 raiden2cop_device::raiden2cop_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, RAIDEN2COP, "RAIDEN2COP", tag, owner, clock, "raiden2cop", __FILE__),
+	cop_latch_addr(0),
+	cop_latch_trigger(0),
+	cop_latch_value(0),
+	cop_latch_mask(0),		
 	cop_dma_v1(0),
 	cop_dma_v2(0),
 	cop_dma_mode(0),
@@ -21,9 +25,14 @@ raiden2cop_device::raiden2cop_device(const machine_config &mconfig, const char *
 	m_videoramout_cb(*this),
 	m_palette(*this, ":palette")
 {
-	  memset(cop_dma_src, 0, sizeof(UINT16)*(0x200));
-	  memset(cop_dma_dst, 0, sizeof(UINT16)*(0x200));
-	  memset(cop_dma_size, 0, sizeof(UINT16)*(0x200));
+	memset(cop_func_trigger, 0, sizeof(UINT16)*(0x100/8));
+	memset(cop_func_value, 0, sizeof(UINT16)*(0x100/8));
+	memset(cop_func_mask, 0, sizeof(UINT16)*(0x100/8));
+	memset(cop_program, 0, sizeof(UINT16)*(0x100));
+	
+	memset(cop_dma_src, 0, sizeof(UINT16)*(0x200));
+	memset(cop_dma_dst, 0, sizeof(UINT16)*(0x200));
+	memset(cop_dma_size, 0, sizeof(UINT16)*(0x200));
 }
 
 
@@ -32,6 +41,16 @@ raiden2cop_device::raiden2cop_device(const machine_config &mconfig, const char *
 //-------------------------------------------------
 void raiden2cop_device::device_start()
 {
+	save_item(NAME(cop_func_trigger));
+	save_item(NAME(cop_func_value));
+	save_item(NAME(cop_func_mask));
+	save_item(NAME(cop_program));
+
+	save_item(NAME(cop_latch_addr));
+	save_item(NAME(cop_latch_trigger));
+	save_item(NAME(cop_latch_value));
+	save_item(NAME(cop_latch_mask));
+
 	save_item(NAME(cop_dma_v1));
 	save_item(NAME(cop_dma_v2));
 	save_item(NAME(cop_dma_mode));
@@ -46,6 +65,177 @@ void raiden2cop_device::device_start()
 	m_videoramout_cb.resolve_safe();
 }
 
+/*** Command Table uploads ***/
+
+
+WRITE16_MEMBER(raiden2cop_device::cop_pgm_data_w)
+{
+	assert(ACCESSING_BITS_0_7 && ACCESSING_BITS_8_15);
+	cop_program[cop_latch_addr] = data;
+	int idx = cop_latch_addr >> 3;
+	cop_func_trigger[idx] = cop_latch_trigger;
+	cop_func_value[idx]   = cop_latch_value;
+	cop_func_mask[idx]    = cop_latch_mask;
+
+	if(data) {
+		int off = data & 31;
+		int reg = (data >> 5) & 3;
+		int op = (data >> 7) & 31;
+
+		logerror("COPDIS: %04x s=%02x f1=%x l=%x f2=%02x %x %04x %02x %03x %02x.%x.%02x ", cop_latch_trigger,  (cop_latch_trigger >> 11) << 3, (cop_latch_trigger >> 10) & 1, ((cop_latch_trigger >> 7) & 7)+1, cop_latch_trigger & 0x7f, cop_latch_value, cop_latch_mask, cop_latch_addr, data, op, reg, off);
+
+		off *= 2;
+
+		// COPDIS: 0205 s=00 f1=0 l=5 f2=05 6 ffeb 00 188 03.0.08 read32 10(r0)
+		// COPDIS: 0205 s=00 f1=0 l=5 f2=05 6 ffeb 01 282 05.0.02 add32 4(r0)
+		// COPDIS: 0205 s=00 f1=0 l=5 f2=05 6 ffeb 02 082 01.0.02 write32 4(r0)
+		// COPDIS: 0205 s=00 f1=0 l=5 f2=05 6 ffeb 03 b8e 17.0.0e add16h 1c(r0)
+		// COPDIS: 0205 s=00 f1=0 l=5 f2=05 6 ffeb 04 98e 13.0.0e write16h 1c(r0)
+
+		// 188 182 082 b8e 98e -> 04  = 04+04    1ch = 1c+04
+		// 188 188 082 b8e 98e -> 04  = 04+10    1ch = 1c+10
+		// 188 18e 082 b8e 98e -> 04  = 04+1c    1ch = 1c+1c
+		// 188 282 082 b8e 98e -> 04  = 04+10    1ch = 1c+10
+		// 188 288 082 b8e 98e -> 04  = 10+10    1ch = 1c+10
+		// 188 28e 082 b8e 98e -> 04  = 1c+10    1ch = 1c+10
+		// 188 282 282 282 082 -> 04  = 04+04+10 10h = 04+10
+		// 188 188 188 188 082 -> 04h = 04+10    04l = 04+10+10
+		// 188 188 188 188 082 -> 04  = 04+10    04l = 04+10+10  10h = 04+10 (same, but trigger = 020b)
+
+		switch(op) {
+		case 0x01:
+			if(off)
+				logerror("addmem32 %x(r%x)\n", off, reg);
+			else
+				logerror("addmem32 (r%x)\n", reg);
+			break;
+		case 0x03:
+			if(off)
+				logerror("read32 %x(r%x)\n", off, reg);
+			else
+				logerror("read32 (r%x)\n", reg);
+			break;
+		case 0x05:
+			if(off)
+				logerror("add32 %x(r%x)\n", off, reg);
+			else
+				logerror("add32 (r%x)\n", reg);
+			break;
+		case 0x13:
+			if(off)
+				logerror("write16h %x(r%x)\n", off, reg);
+			else
+				logerror("write16h (r%x)\n", reg);
+			break;
+		case 0x15:
+			if(off)
+				logerror("sub32 %x(r%x)\n", off, reg);
+			else
+				logerror("sub32 (r%x)\n", reg);
+			break;
+		case 0x17:
+			if(off)
+				logerror("addmem16 %x(r%x)\n", off, reg);
+			else
+				logerror("addmem16 (r%x)\n", reg);
+			break;
+		default:
+			logerror("?\n");
+			break;
+		}
+	}
+}
+
+WRITE16_MEMBER(raiden2cop_device::cop_pgm_addr_w)
+{
+	assert(ACCESSING_BITS_0_7 && ACCESSING_BITS_8_15);
+	assert(data < 0x100);
+	cop_latch_addr = data;
+}
+
+WRITE16_MEMBER(raiden2cop_device::cop_pgm_value_w)
+{
+	assert(ACCESSING_BITS_0_7 && ACCESSING_BITS_8_15);
+	cop_latch_value = data;
+}
+
+WRITE16_MEMBER(raiden2cop_device::cop_pgm_mask_w)
+{
+	assert(ACCESSING_BITS_0_7 && ACCESSING_BITS_8_15);
+	cop_latch_mask = data;
+}
+
+WRITE16_MEMBER(raiden2cop_device::cop_pgm_trigger_w)
+{
+	assert(ACCESSING_BITS_0_7 && ACCESSING_BITS_8_15);
+	cop_latch_trigger = data;
+}
+
+#define seibu_cop_log logerror
+#define LOG_CMDS 1
+
+// currently only used by legionna.c implementation
+int raiden2cop_device::find_trigger_match(UINT16 triggerval, UINT16 mask)
+{
+	/* search the uploaded 'trigger' table for a matching trigger*/
+	/* note, I don't know what the 'mask' or 'value' tables are... probably important, might determine what actually gets executed! */
+	/* note: Zero Team triggers macro 0x904 instead of 0x905, Seibu Cup Soccer triggers 0xe30e instead of 0xe38e. I highly doubt that AT LEAST
+		it isn't supposed to do anything, especially in the former case (it definitely NEEDS that sprites have an arc movement when they are knocked down). */
+	// we currently pass in mask 0xff00 to look at only match the top bits, but this is wrong, only specific bits are ignored (maybe depends on the 'mask' value uploaded with each trigger?)
+	int matched = 0;
+	int command = -1;
+
+	for (int i = 0; i < 32; i++)
+	{
+		if ((triggerval & mask) == (cop_func_trigger[i] & mask))
+		{
+#if LOG_CMDS
+			seibu_cop_log("    Cop Command %04x found in slot %02x with other params %04x %04x\n", triggerval, i, cop_func_value[i], cop_func_mask[i]);
+#endif
+			command = i;
+			matched++;
+		}
+	}
+
+	if (matched == 1)
+	{
+
+		int j;
+		seibu_cop_log("     Sequence: ");
+		for (j=0;j<0x8;j++)
+		{
+			seibu_cop_log("%04x ", cop_program[command*8+j]);
+		}
+		seibu_cop_log("\n");
+
+		return command;
+	}
+	else if (matched == 0)
+	{
+		seibu_cop_log("    Cop Command %04x NOT IN TABLE!\n", triggerval);
+		return -1;
+	}
+
+	printf("multiple matches found with mask passed in! (bad!)\n");
+	return -1;
+
+}
+
+//  only used by legionna.c implementation
+int raiden2cop_device::check_command_matches(int command, UINT16 seq0, UINT16 seq1, UINT16 seq2, UINT16 seq3, UINT16 seq4, UINT16 seq5, UINT16 seq6, UINT16 seq7, UINT16 _funcval_, UINT16 _funcmask_)
+{
+	command *= 8;
+
+	if (cop_program[command+0] == seq0 && cop_program[command+1] == seq1 && cop_program[command+2] == seq2 && cop_program[command+3] == seq3 &&
+	    cop_program[command+4] == seq4 && cop_program[command+5] == seq5 && cop_program[command+6] == seq6 && cop_program[command+7] == seq7 &&
+	    cop_func_value[command/8] == _funcval_ &&
+	    cop_func_mask[command/8] == _funcmask_)
+		return 1;
+	else
+		return 0;
+}
+
+/*** Regular DMA ***/
 
 WRITE16_MEMBER(raiden2cop_device::cop_dma_adr_rel_w)
 {
