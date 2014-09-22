@@ -367,7 +367,7 @@ WRITE8_MEMBER(itt3030_state::bank_w)
 	int bank = 0;
 	m_bank = data>>4;
 
-	if (m_bank & 1) // bank 8
+	if (!(m_bank & 1)) // bank 8
 	{
 		bank = 8;
 	}
@@ -721,7 +721,7 @@ void itt3030_state::machine_start()
 
 void itt3030_state::machine_reset()
 {
-	m_bank = 1;
+	m_bank = 9;
 	m_48kbank->set_bank(8);
 	m_kbdread = 1;
 	m_kbdrow = m_kbdcol = 0;
