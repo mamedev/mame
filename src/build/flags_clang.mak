@@ -16,6 +16,8 @@ endif
 
 ifeq ($(findstring 3.5,$(TEST_CLANG)),3.5)
 CCOMFLAGS += -Wno-inline-new-delete -Wno-absolute-value -Wno-dynamic-class-memaccess
+# XCode 6.0.1 is built on a pre-release SVN version of clang 3.5, that doesn't support -Wno-absolute-value yet - so ignore that warning for now
+CCOMFLAGS += -Wno-unknown-warning-option
 endif
 
 ifeq ($(TARGETOS),emscripten)
