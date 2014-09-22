@@ -31,41 +31,52 @@ void advision_state::machine_start()
 	m_cart_rom = memregion(region_tag.cpy(m_cart->tag()).cat(GENERIC_ROM_REGION_TAG));
 
 	/* configure EA banking */
-	membank("bank1")->configure_entry(0, memregion(I8048_TAG)->base());
-	membank("bank1")->configure_entry(1, m_cart_rom->base());
+	m_bank1->configure_entry(0, memregion(I8048_TAG)->base());
+	m_bank1->configure_entry(1, m_cart_rom->base());
 	m_maincpu->space(AS_PROGRAM).install_readwrite_bank(0x0000, 0x03ff, "bank1");
-	membank("bank1")->set_entry(0);
+	m_bank1->set_entry(0);
 
 	/* allocate external RAM */
-	m_ext_ram = auto_alloc_array(machine(), UINT8, 0x400);
+	m_ext_ram.resize(0x400);
+	save_item(NAME(m_ext_ram));
+
+	save_item(NAME(m_ea_bank));
+	save_item(NAME(m_rambank));
+	save_item(NAME(m_frame_count));
+	save_item(NAME(m_frame_start));
+	save_item(NAME(m_video_enable));
+	save_item(NAME(m_video_bank));
+	save_item(NAME(m_led_latch));
+	save_item(NAME(m_sound_cmd));
+	save_item(NAME(m_sound_d));
+	save_item(NAME(m_sound_g));
 }
 
 void advision_state::machine_reset()
 {
-	/* enable internal ROM */
-	m_maincpu->set_input_line(MCS48_INPUT_EA, CLEAR_LINE);
-	membank("bank1")->set_entry(0);
-
-	/* reset sound CPU */
-	m_soundcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-
+	m_ea_bank = 0;
 	m_rambank = 0x300;
 	m_frame_start = 0;
 	m_video_enable = 0;
 	m_sound_cmd = 0;
+
+	/* enable internal ROM */
+	m_maincpu->set_input_line(MCS48_INPUT_EA, CLEAR_LINE);
+	m_bank1->set_entry(m_ea_bank);
+
+	/* reset sound CPU */
+	m_soundcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 /* Bank Switching */
 
 WRITE8_MEMBER( advision_state::bankswitch_w )
 {
-	int ea = BIT(data, 2);
-
-	m_maincpu->set_input_line(MCS48_INPUT_EA, ea ? ASSERT_LINE : CLEAR_LINE);
-
-	membank("bank1")->set_entry(ea);
-
+	m_ea_bank = BIT(data, 2);
 	m_rambank = (data & 0x03) << 8;
+
+	m_maincpu->set_input_line(MCS48_INPUT_EA, m_ea_bank ? ASSERT_LINE : CLEAR_LINE);
+	m_bank1->set_entry(m_ea_bank);
 }
 
 /* External RAM */
@@ -166,7 +177,7 @@ READ8_MEMBER( advision_state::vsync_r )
 READ8_MEMBER( advision_state::controller_r )
 {
 	// Get joystick switches
-	UINT8 in = ioport("joystick")->read();
+	UINT8 in = m_joy->read();
 	UINT8 data = in | 0x0f;
 
 	// Get buttons

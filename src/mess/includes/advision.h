@@ -24,6 +24,8 @@ public:
 			m_soundcpu(*this, COP411_TAG),
 			m_dac(*this, "dac"),
 			m_cart(*this, "cartslot"),
+			m_bank1(*this, "bank1"),
+			m_joy(*this, "joystick"),
 			m_palette(*this, "palette")
 	{ }
 
@@ -31,6 +33,8 @@ public:
 	required_device<cpu_device> m_soundcpu;
 	required_device<dac_device> m_dac;
 	required_device<generic_slot_device> m_cart;
+	required_memory_bank m_bank1;
+	required_ioport m_joy;
 	required_device<palette_device> m_palette;
 
 	virtual void machine_start();
@@ -56,8 +60,10 @@ public:
 
 	memory_region *m_cart_rom;
 
+	int m_ea_bank;
+
 	/* external RAM state */
-	UINT8 *m_ext_ram;
+	dynamic_buffer m_ext_ram;
 	int m_rambank;
 
 	/* video state */
@@ -67,7 +73,7 @@ public:
 	int m_video_bank;
 	int m_video_hpos;
 	UINT8 m_led_latch[8];
-	UINT8 *m_display;
+	dynamic_buffer m_display;
 
 	/* sound state */
 	int m_sound_cmd;
