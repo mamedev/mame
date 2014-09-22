@@ -766,7 +766,7 @@ static MACHINE_CONFIG_START( nzerotea, r2dx_v33_state )
 	MCFG_SCREEN_REFRESH_RATE(55.47)    /* verified on pcb */
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(500) /* not accurate */)
 	MCFG_SCREEN_SIZE(44*8, 34*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0, 30*8-1)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(raiden2_state, screen_update_raiden2)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", rdx_v33)
