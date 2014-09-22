@@ -29,6 +29,9 @@
 #define MCFG_AMIGA_KEYBOARD_KDAT_CALLBACK(_write) \
 	devcb = &amigakbd_device::set_kdat_wr_callback(*device, DEVCB_##_write);
 
+#define MCFG_AMIGA_KEYBOARD_KRST_CALLBACK(_write) \
+	devcb = &amigakbd_device::set_krst_wr_callback(*device, DEVCB_##_write);
+
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -46,6 +49,8 @@ public:
 		{ return downcast<amigakbd_device &>(device).m_write_kclk.set_callback(object); }
 	template<class _Object> static devcb_base &set_kdat_wr_callback(device_t &device, _Object object)
 		{ return downcast<amigakbd_device &>(device).m_write_kdat.set_callback(object); }
+	template<class _Object> static devcb_base &set_krst_wr_callback(device_t &device, _Object object)
+		{ return downcast<amigakbd_device &>(device).m_write_krst.set_callback(object); }
 
 	DECLARE_WRITE_LINE_MEMBER( kdat_w );
 
@@ -63,6 +68,8 @@ public:
 	DECLARE_WRITE8_MEMBER( clear_pa1_detect );
 	DECLARE_READ8_MEMBER( control_r );
 	DECLARE_WRITE8_MEMBER( control_w );
+
+	DECLARE_INPUT_CHANGED_MEMBER( check_reset );
 
 protected:
 	// device-level overrides
@@ -97,9 +104,11 @@ private:
 
 	devcb_write_line m_write_kclk;
 	devcb_write_line m_write_kdat;
+	devcb_write_line m_write_krst;
 
 	required_device<m6502_device> m_mpu;
 
+	required_ioport m_special;
 	required_ioport m_row_d6;
 	required_ioport m_row_d5;
 	required_ioport m_row_d4;
@@ -118,6 +127,7 @@ private:
 
 	emu_timer *m_timer;
 	emu_timer *m_watchdog;
+	emu_timer *m_reset;
 
 	int m_kdat;
 	int m_kclk;

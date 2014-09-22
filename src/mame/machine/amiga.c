@@ -268,6 +268,17 @@ void amiga_state::machine_reset()
 	m_overlay->set_bank(1);
 }
 
+WRITE_LINE_MEMBER( amiga_state::kbreset_w )
+{
+	// this is connected to the gary chip, gary then resets the 68k, agnus, paula and the cias
+	if (!state)
+	{
+		m_sound->reset();
+		machine_reset();
+		m_maincpu->reset();
+	}
+}
+
 // simple mirror of region 0xf80000 to 0xfbffff
 READ16_MEMBER( amiga_state::rom_mirror_r )
 {

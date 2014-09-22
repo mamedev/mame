@@ -437,6 +437,7 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER( floppy_drive_status );
 
 	DECLARE_WRITE_LINE_MEMBER( m68k_reset );
+	DECLARE_WRITE_LINE_MEMBER( kbreset_w );
 
 	DECLARE_READ16_MEMBER( cia_r );
 	DECLARE_WRITE16_MEMBER( cia_w );

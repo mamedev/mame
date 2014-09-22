@@ -18,6 +18,7 @@
 ***************************************************************************/
 
 #include "amigakbd.h"
+#include "machine/rescap.h"
 
 
 //**************************************************************************
@@ -79,11 +80,11 @@ const rom_entry *amigakbd_device::device_rom_region() const
 static INPUT_PORTS_START( a500_us_keyboard )
 	PORT_START("special")
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LWIN)      PORT_CHAR(UCHAR_MAMEKEY(LWIN))      PORT_NAME("Left Amiga")
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LWIN)      PORT_CHAR(UCHAR_MAMEKEY(LWIN))      PORT_NAME("Left Amiga")  PORT_CHANGED_MEMBER(DEVICE_SELF, amigakbd_device, check_reset, NULL)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LALT)      PORT_CHAR(UCHAR_MAMEKEY(LALT))
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LSHIFT)    PORT_CHAR(UCHAR_SHIFT_1)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LCONTROL)  PORT_CHAR(UCHAR_SHIFT_2)            PORT_NAME("Ctrl")
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_RWIN)      PORT_CHAR(UCHAR_MAMEKEY(RWIN))      PORT_NAME("Right Amiga")
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LCONTROL)  PORT_CHAR(UCHAR_SHIFT_2)            PORT_NAME("Ctrl")        PORT_CHANGED_MEMBER(DEVICE_SELF, amigakbd_device, check_reset, NULL)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_RWIN)      PORT_CHAR(UCHAR_MAMEKEY(RWIN))      PORT_NAME("Right Amiga") PORT_CHANGED_MEMBER(DEVICE_SELF, amigakbd_device, check_reset, NULL)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_RALT)      PORT_CHAR(UCHAR_MAMEKEY(RALT))
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_RSHIFT)    PORT_CHAR(UCHAR_SHIFT_1)
 
@@ -256,7 +257,9 @@ amigakbd_device::amigakbd_device(const machine_config &mconfig, const char *tag,
 	: device_t(mconfig, AMIGAKBD, "Amiga 500 Keyboard with 6570-036 MPU", tag, owner, clock, "amigakbd", __FILE__),
 	m_write_kclk(*this),
 	m_write_kdat(*this),
+	m_write_krst(*this),
 	m_mpu(*this, "mos6570_036"),
+	m_special(*this, "special"),
 	m_row_d6(*this, "row_d6"),
 	m_row_d5(*this, "row_d5"),
 	m_row_d4(*this, "row_d4"),
@@ -274,6 +277,7 @@ amigakbd_device::amigakbd_device(const machine_config &mconfig, const char *tag,
 	m_row_c0(*this, "row_c0"),
 	m_timer(NULL),
 	m_watchdog(NULL),
+	m_reset(NULL),
 	m_kdat(1),
 	m_kclk(1),
 	m_port_c(0xff),
@@ -292,8 +296,10 @@ void amigakbd_device::device_start()
 {
 	m_write_kclk.resolve_safe();
 	m_write_kdat.resolve_safe();
+	m_write_krst.resolve_safe();
 	m_timer = timer_alloc(0, NULL);
 	m_watchdog = timer_alloc(1, NULL);
+	m_reset = timer_alloc(2, NULL);
 }
 
 //-------------------------------------------------
@@ -321,6 +327,7 @@ void amigakbd_device::device_timer(emu_timer &timer, device_timer_id tid, int pa
 {
 	switch (tid)
 	{
+	// 6500/1 internal timer
 	case 0:
 		switch (m_control & 0x03)
 		{
@@ -348,9 +355,15 @@ void amigakbd_device::device_timer(emu_timer &timer, device_timer_id tid, int pa
 		}
 		break;
 
+	// watchdog
 	case 1:
 		m_mpu->reset();
 		m_watchdog->adjust(attotime::from_msec(54));
+		break;
+
+	// keyboard reset timer
+	case 2:
+		m_write_krst(1);
 		break;
 	}
 }
@@ -359,6 +372,18 @@ void amigakbd_device::device_timer(emu_timer &timer, device_timer_id tid, int pa
 //**************************************************************************
 //  IMPLEMENTATION
 //**************************************************************************
+
+INPUT_CHANGED_MEMBER( amigakbd_device::check_reset )
+{
+	UINT8 keys = m_special->read();
+
+	// ctrl-amiga-amiga pressed?
+	if (!BIT(keys, 6) && !BIT(keys, 3) && !BIT(keys, 2))
+	{
+		m_write_krst(0);
+		m_reset->adjust(PERIOD_OF_555_MONOSTABLE(RES_K(47), CAP_U(10)));
+	}
+}
 
 void amigakbd_device::update_irqs()
 {

@@ -1293,6 +1293,7 @@ static MACHINE_CONFIG_START( amiga_base, amiga_state )
 	MCFG_DEVICE_ADD("kbd", AMIGAKBD, 0)
 	MCFG_AMIGA_KEYBOARD_KCLK_CALLBACK(DEVWRITELINE("cia_0", mos8520_device, cnt_w))
 	MCFG_AMIGA_KEYBOARD_KDAT_CALLBACK(DEVWRITELINE("cia_0", mos8520_device, sp_w))
+	MCFG_AMIGA_KEYBOARD_KRST_CALLBACK(WRITELINE(amiga_state, kbreset_w))
 
 	// software
 	MCFG_SOFTWARE_LIST_ADD("wb_list", "amiga_workbench")
