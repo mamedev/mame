@@ -275,6 +275,8 @@ public:
 	DECLARE_READ8_MEMBER(kbd_fifo_r);
 	DECLARE_READ8_MEMBER(kbd_matrix_r);
 	DECLARE_WRITE8_MEMBER(kbd_matrix_w);
+	DECLARE_READ8_MEMBER(fdc_r);
+	DECLARE_WRITE8_MEMBER(fdc_w);
 	DECLARE_READ8_MEMBER(fdc_stat_r);
 	DECLARE_WRITE8_MEMBER(fdc_cmd_w);
 	DECLARE_FLOPPY_FORMATS(itt3030_floppy_formats);
@@ -418,6 +420,8 @@ WRITE_LINE_MEMBER(itt3030_state::fdcirq_w)
 	m_fdc_irq = state;
 }
 
+#include "debugger.h"
+
 WRITE_LINE_MEMBER(itt3030_state::fdcdrq_w)
 {
 	m_fdc_drq = state;
@@ -429,7 +433,7 @@ WRITE_LINE_MEMBER(itt3030_state::fdchld_w)
 }
 
 /*
-	7 Data Request (IRQ - inverted 1791-Signal)
+	7 Data Request (DRQ - inverted 1791-Signal)
 	6 Interrupt Request (INTRQ - 1791-Signal)
 	5 Head Load (HLD - inverted 1791-Signal)
 	4 Ready 3 (Drive 3 ready)
@@ -445,15 +449,26 @@ READ8_MEMBER(itt3030_state::fdc_stat_r)
 	floppy_image_device *floppy2 = m_con2 ? m_con2->get_device() : 0; 
 	floppy_image_device *floppy3 = m_con3 ? m_con3->get_device() : 0; 
 
-	res = m_fdc_drq ? 0x00 : 0x80;
-	res = m_fdc_irq ? 0x40 : 0x00;
-	res = m_fdc_hld ? 0x00 : 0x20;
+	res = m_fdc_drq ? 0x80 : 0x00;
+	res |= m_fdc_irq ? 0x40 : 0x00;
+	res |= m_fdc_hld ? 0x00 : 0x20;
 	if (floppy3) res |= floppy3->ready_r() ? 0x10 : 0;
 	if (floppy2) res |= floppy2->ready_r() ? 0x08 : 0;
 	if (floppy1) res |= floppy1->ready_r() ? 0x04 : 0;
 	if (m_curfloppy) res |= m_curfloppy->wpt_r() ? 0x02 : 0;
 
 	return res;
+}
+
+/* As far as we can tell, the mess of ttl de-inverts the bus */
+READ8_MEMBER(itt3030_state::fdc_r)
+{
+	return m_fdc->gen_r(offset) ^ 0xff;
+}
+
+WRITE8_MEMBER(itt3030_state::fdc_w)
+{
+	m_fdc->gen_w(offset, data ^ 0xff);
 }
 
 /*
@@ -527,7 +542,7 @@ static ADDRESS_MAP_START( itt3030_io, AS_IO, 8, itt3030_state )
 	AM_RANGE(0x32, 0x32) AM_WRITE(beep_w)
 	AM_RANGE(0x35, 0x35) AM_READ(vsync_r)
 	AM_RANGE(0x40, 0x40) AM_READ(kbd_fifo_r)
-	AM_RANGE(0x50, 0x53) AM_DEVREADWRITE("fdc", fd1791_t, read, write)
+	AM_RANGE(0x50, 0x53) AM_READWRITE(fdc_r, fdc_w)
 	AM_RANGE(0x54, 0x54) AM_READWRITE(fdc_stat_r, fdc_cmd_w)
 	AM_RANGE(0xf6, 0xf6) AM_WRITE(bank_w)
 ADDRESS_MAP_END
