@@ -98,7 +98,7 @@ UINT32 trident_vga_device::READPIXEL(INT16 x,INT16 y)
 void trident_vga_device::WRITEPIXEL(INT16 x,INT16 y, UINT32 data)
 {
 	if(svga.rgb8_en)
-		WRITEPIXEL8(x,y,data & 0xff);
+		WRITEPIXEL8(x,y,(((data >> 16) & 0xff) | ((data >> 8) & 0xff) | (data & 0xff)));  // XFree86 3.3 sets bits 0-7 to 0 when using mono patterns, does it OR each byte?
 	if(svga.rgb15_en)
 		WRITEPIXEL15(x,y,data & 0x7fff);
 	if(svga.rgb16_en)
@@ -1170,8 +1170,13 @@ void trident_vga_device::accel_data_write(UINT32 data)
 {
 	for(int x=31;x>=0;x--)
 	{
-		if(((data >> x) & 0x01) != 0)
-			WRITEPIXEL(tri.accel_mem_x,tri.accel_mem_y,tri.accel_fgcolour);
+		if(tri.accel_mem_x <= tri.accel_dest_x+tri.accel_dim_x)
+		{
+			if(((data >> x) & 0x01) != 0)
+				WRITEPIXEL(tri.accel_mem_x,tri.accel_mem_y,tri.accel_fgcolour);
+			else
+				WRITEPIXEL(tri.accel_mem_x,tri.accel_mem_y,tri.accel_bgcolour);
+		}
 		tri.accel_mem_x++;
 	}
 	if(tri.accel_mem_x > tri.accel_dest_x+tri.accel_dim_x)
