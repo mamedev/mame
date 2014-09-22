@@ -6,7 +6,6 @@
 
 #include "emu.h"
 #include "includes/concept.h"
-#include "cpu/m68000/m68000.h"
 
 
 #define VERBOSE 1
@@ -42,11 +41,6 @@ void concept_state::machine_start()
 
 	/* initialize clock interface */
 	m_clock_enable = FALSE /*TRUE*/;
-
-	m_exp[0] = machine().device<concept_exp_port_device>("exp1");
-	m_exp[1] = machine().device<concept_exp_port_device>("exp2");
-	m_exp[2] = machine().device<concept_exp_port_device>("exp3");
-	m_exp[3] = machine().device<concept_exp_port_device>("exp4");
 
 	save_item(NAME(m_pending_interrupts));
 	save_item(NAME(m_clock_enable));
@@ -178,11 +172,22 @@ READ16_MEMBER(concept_state::concept_io_r)
 			case 2: // IO2 registers
 			case 3: // IO3 registers
 			case 4: // IO4 registers
-				return m_exp[((offset >> 4) & 7) - 1]->reg_r(space, offset & 0x0f);
+				{
+					int slot = ((offset >> 4) & 7);
+					device_a2bus_card_interface *card = m_a2bus->get_a2bus_card(slot);
+
+					if (card)
+					{
+						return card->read_c0nx(space, offset & 0x0f);
+					}
+
+					return 0xff;
+				}
+				break;
 
 			default: // ???
 				logerror("concept_io_r: Slot I/O memory accessed for unknown purpose at address 0x03%4.4x\n", offset << 1);
-			break;
+				break;
 		}
 		break;
 
@@ -190,8 +195,16 @@ READ16_MEMBER(concept_state::concept_io_r)
 	case 2: // IO2 ROM
 	case 3: // IO3 ROM
 	case 4: // IO4 ROM
-		LOG(("concept_io_r: Slot ROM memory accessed for slot %d at address 0x03%4.4x\n", ((offset >> 8) & 7) - 1, offset << 1));
-		return m_exp[((offset >> 8) & 7) - 1]->rom_r(space, offset & 0xff);
+		{
+			int slot = (offset >> 8) & 7;
+			device_a2bus_card_interface *card = m_a2bus->get_a2bus_card(slot);
+
+			if (card)
+			{
+				return card->read_cnxx(space, offset & 0xff); 
+			}
+		}
+		break;
 
 	case 5:
 		/* slot status */
@@ -273,7 +286,16 @@ WRITE16_MEMBER(concept_state::concept_io_w)
 			case 2: // IO2 registers
 			case 3: // IO3 registers
 			case 4: // IO4 registers
-				return m_exp[((offset >> 4) & 7) - 1]->reg_w(space, offset & 0x0f, data);
+				{
+					int slot = (offset >> 4) & 7;
+					device_a2bus_card_interface *card = m_a2bus->get_a2bus_card(slot);
+
+					if (card)
+					{
+						return card->write_c0nx(space, offset & 0x0f, data); 
+					}
+				}
+				break;
 
 			default:    // ???
 				logerror("concept_io_w: Slot I/O memory written for unknown purpose at address 0x03%4.4x, data: 0x%4.4x\n", offset << 1, data);
@@ -285,8 +307,16 @@ WRITE16_MEMBER(concept_state::concept_io_w)
 	case 2: // IO2 ROM
 	case 3: // IO3 ROM
 	case 4: // IO4 ROM
-		LOG(("concept_io_w: Slot ROM memory written to for slot %d at address 0x03%4.4x, data: 0x%4.4x\n", ((offset >> 8) & 7) - 1, offset << 1, data));
-		return m_exp[((offset >> 8) & 7) - 1]->rom_w(space, offset & 0xff, data);
+		{
+			int slot = (offset >> 8) & 7;
+			device_a2bus_card_interface *card = m_a2bus->get_a2bus_card(slot);
+
+			if (card)
+			{
+				return card->write_cnxx(space, offset & 0xff, data);
+			}
+		}
+		break;
 
 	case 5:
 		/* slot status */

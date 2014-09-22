@@ -31,6 +31,8 @@
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "includes/concept.h"
+#include "bus/a2bus/a2corvus.h"
+#include "bus/rs232/rs232.h"
 
 static ADDRESS_MAP_START(concept_memmap, AS_PROGRAM, 16, concept_state )
 	AM_RANGE(0x000000, 0x000007) AM_ROM AM_REGION("maincpu", 0x010000)  /* boot ROM mirror */
@@ -190,9 +192,8 @@ INPUT_PORTS_END
 /* init with simple, fixed, B/W palette */
 /* Is the palette black on white or white on black??? */
 
-SLOT_INTERFACE_START( concept_exp_devices )
-	SLOT_INTERFACE("fdc", CONCEPT_FDC)
-	SLOT_INTERFACE("hdc", CONCEPT_HDC)
+SLOT_INTERFACE_START( concept_a2_cards )
+	SLOT_INTERFACE("fchdd", A2BUS_CORVUS)  /* Corvus flat-cable HDD interface (see notes in a2corvus.c) */
 SLOT_INTERFACE_END
 
 
@@ -238,17 +239,35 @@ static MACHINE_CONFIG_START( concept, concept_state )
 	/* ACIAs */
 	MCFG_DEVICE_ADD(ACIA_0_TAG, MOS6551, 0)
 	MCFG_MOS6551_XTAL(XTAL_1_8432MHz)
+	MCFG_MOS6551_TXD_HANDLER(DEVWRITELINE("rs232a", rs232_port_device, write_txd))
+
 	MCFG_DEVICE_ADD(ACIA_1_TAG, MOS6551, 0)
 	MCFG_MOS6551_XTAL(XTAL_1_8432MHz)
+	MCFG_MOS6551_TXD_HANDLER(DEVWRITELINE("rs232b", rs232_port_device, write_txd))
+
 	MCFG_DEVICE_ADD(KBD_ACIA_TAG, MOS6551, 0)
 	MCFG_MOS6551_XTAL(XTAL_1_8432MHz)
 
-	MCFG_CONCEPT_EXP_PORT_ADD("exp1", concept_exp_devices, NULL)
-	MCFG_CONCEPT_EXP_PORT_ADD("exp2", concept_exp_devices, "fdc")   // Flat cable Hard Disk Controller in Slot 2
-	MCFG_CONCEPT_EXP_PORT_ADD("exp3", concept_exp_devices, "hdc")   // Floppy Disk Controller in Slot 3
-	MCFG_CONCEPT_EXP_PORT_ADD("exp4", concept_exp_devices, NULL)
+	/* Apple II bus */
+	MCFG_DEVICE_ADD(A2BUS_TAG, A2BUS, 0)
+	MCFG_A2BUS_CPU("maincpu")
+	MCFG_A2BUS_SLOT_ADD(A2BUS_TAG, "sl1", concept_a2_cards, NULL)
+	MCFG_A2BUS_SLOT_ADD(A2BUS_TAG, "sl2", concept_a2_cards, NULL)
+	MCFG_A2BUS_SLOT_ADD(A2BUS_TAG, "sl3", concept_a2_cards, NULL)
+	MCFG_A2BUS_SLOT_ADD(A2BUS_TAG, "sl4", concept_a2_cards, "fchdd")
 
-	// 2x RS232 ports!
+	/* 2x RS232 ports */
+	MCFG_RS232_PORT_ADD("rs232a", default_rs232_devices, NULL)
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(ACIA_0_TAG, mos6551_device, write_rxd))
+	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(ACIA_0_TAG, mos6551_device, write_dcd))
+	MCFG_RS232_DSR_HANDLER(DEVWRITELINE(ACIA_0_TAG, mos6551_device, write_dsr))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(ACIA_0_TAG, mos6551_device, write_cts))
+
+	MCFG_RS232_PORT_ADD("rs232b", default_rs232_devices, NULL)
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(ACIA_1_TAG, mos6551_device, write_rxd))
+	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(ACIA_1_TAG, mos6551_device, write_dcd))
+	MCFG_RS232_DSR_HANDLER(DEVWRITELINE(ACIA_1_TAG, mos6551_device, write_dsr))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(ACIA_1_TAG, mos6551_device, write_cts))
 MACHINE_CONFIG_END
 
 
