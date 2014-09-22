@@ -96,11 +96,11 @@ UINT32 mcs96_device::execute_input_lines() const
 
 void mcs96_device::recompute_bcount(UINT64 event_time)
 {
-	if(!event_time || event_time >= total_cycles()+icount) {
+	if(!event_time || event_time >= total_cycles() + icount) {
 		bcount = 0;
 		return;
 	}
-	bcount = total_cycles() - event_time;
+	bcount = total_cycles() + icount - event_time;
 }
 
 void mcs96_device::check_irq()

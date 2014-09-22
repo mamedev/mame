@@ -166,7 +166,7 @@ void h8_device::recompute_bcount(UINT64 event_time)
 		bcount = 0;
 		return;
 	}
-	bcount = total_cycles() - event_time;
+	bcount = total_cycles() + icount - event_time;
 }
 
 void h8_device::execute_run()
