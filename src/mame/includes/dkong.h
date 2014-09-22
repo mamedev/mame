@@ -1,3 +1,9 @@
+/***************************************************************************
+
+  Nintendo Donkey Kong hardware
+
+***************************************************************************/
+
 #include "sound/discrete.h"
 #include "machine/eepromser.h"
 #include "machine/tms6100.h"
@@ -269,7 +275,6 @@ public:
 	void drakton_decrypt_rom(UINT8 mod, int offs, int *bs);
 	DECLARE_READ8_MEMBER(memory_read_byte);
 	DECLARE_WRITE8_MEMBER(memory_write_byte);
-	void dkong_init_device_driver_data(  );
 	double CD4049(double x);
 
 private:

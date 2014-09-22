@@ -1,5 +1,9 @@
 /***************************************************************************
 
+  Nintendo Donkey Kong hardware
+
+****************************************************************************
+
 TODO:
 
 - write a shootgal palette_init
@@ -101,12 +105,13 @@ Done:
   For both of these boards [dkong, dkongjr], only the jump sound
   is distinguishable. I don't hear the pound of walk sound.
 
+****************************************************************************
+
 Donkey Kong and Donkey Kong Jr. memory map (preliminary) (DKong 3 follows)
 
 0000-3fff ROM (Donkey Kong Jr.and Donkey Kong 3: 0000-5fff)
 6000-6fff RAM
-6900-6a7f sprites
-7000-73ff ?
+7000-73ff sprites
 7400-77ff Video RAM
 8000-9fff ROM (DK3 only)
 
@@ -375,21 +380,8 @@ INTERRUPT_GEN_MEMBER(dkong_state::s2650_interrupt)
  *
  *************************************/
 
-void dkong_state::dkong_init_device_driver_data(  )
-{
-#if 0
-	dkong_state *state = machine.driver_data<dkong_state>();
-
-	state->m_dev_n2a03a = machine.device("n2a03a");
-	state->m_dev_n2a03b = machine.device("n2a03b");
-	state->m_dev_6h = machine.device("ls259.6h");
-	state->m_dev_vp2 = machine.device("virtual_p2");
-#endif
-}
-
 MACHINE_START_MEMBER(dkong_state,dkong2b)
 {
-	dkong_init_device_driver_data();
 	m_hardware_type = HARDWARE_TKG04;
 
 	m_snd_rom = memregion("soundcpu")->base();
@@ -447,7 +439,6 @@ MACHINE_START_MEMBER(dkong_state,radarscp1)
 
 MACHINE_START_MEMBER(dkong_state,dkong3)
 {
-	dkong_init_device_driver_data();
 	m_hardware_type = HARDWARE_TKG04;
 }
 
@@ -1007,9 +998,10 @@ static INPUT_PORTS_START( dkongf )
 	PORT_DIPSETTING(    0x60, DEF_STR( 1C_4C ) )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( dkongx )  /* Supposedly the physical DIPS are read as defaults for the NVRAM when it's initially created.
-                                           The settings here match those from the default DSW0 settings.  Beyond the initial NVRAM
-                                           creation, DIPS (other than CABINET) can only be adjusted from the Service Mode */
+static INPUT_PORTS_START( dkongx )
+	/* Supposedly the physical DIPS are read as defaults for the NVRAM when it's initially created.
+		The settings here match those from the default DSW0 settings.  Beyond the initial NVRAM
+		creation, DIPS (other than CABINET) can only be adjusted from the Service Mode */
 	PORT_INCLUDE( dkong )
 
 	PORT_MODIFY("DSW0")
@@ -1616,7 +1608,7 @@ INTERRUPT_GEN_MEMBER(dkong_state::vblank_irq)
 
 WRITE_LINE_MEMBER(dkong_state::busreq_w )
 {
-// since our Z80 has no support for BUSACK, we assume it is granted immediately
+	// since our Z80 has no support for BUSACK, we assume it is granted immediately
 	m_maincpu->set_input_line(Z80_INPUT_LINE_BUSRQ, state);
 	m_maincpu->set_input_line(INPUT_LINE_HALT, state); // do we need this?
 	if(m_z80dma)
@@ -2095,6 +2087,35 @@ ROM_START( dkongf ) /* Donkey Kong Foundry (hack) from Jeff's Romhack */
 	ROM_LOAD( "l_4n_b.bin",   0x0800, 0x0800, CRC(672e4714) SHA1(92e5d379f4838ac1fa44d448ce7d142dae42102f) )
 	ROM_LOAD( "l_4r_b.bin",   0x1000, 0x0800, CRC(feaa59ee) SHA1(ecf95db5a20098804fc8bd59232c66e2e0ed3db4) )
 	ROM_LOAD( "l_4s_b.bin",   0x1800, 0x0800, CRC(20f2ef7e) SHA1(3bc482a38bf579033f50082748ee95205b0f673d) )
+
+	ROM_REGION( 0x0300, "proms", 0 )
+	ROM_LOAD( "c-2k.bpr",     0x0000, 0x0100, CRC(e273ede5) SHA1(b50ec9e1837c00c20fb2a4369ec7dd0358321127) ) /* palette low 4 bits (inverted) */
+	ROM_LOAD( "c-2j.bpr",     0x0100, 0x0100, CRC(d6412358) SHA1(f9c872da2fe8e800574ae3bf483fb3ccacc92eb3) ) /* palette high 4 bits (inverted) */
+	ROM_LOAD( "v-5e.bpr",     0x0200, 0x0100, CRC(b869b8f5) SHA1(c2bdccbf2654b64ea55cd589fd21323a9178a660) ) /* character color codes on a per-column basis */
+ROM_END
+
+ROM_START( dkongpe ) // "Pauline Edition" hack, by Clay Cowgill based on Mike Mika's NES version
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "c_5et_g.bin",  0x0000, 0x1000, CRC(ba70b88b) SHA1(d76ebecfea1af098d843ee7e578e480cd658ac1a) )
+	ROM_LOAD( "c_5ct_g.bin",  0x1000, 0x1000, CRC(45af403e) SHA1(6030a4af7df98bfdf5b35a9a42541566f7d12901) )
+	ROM_LOAD( "c_5bt_g.bin",  0x2000, 0x1000, CRC(3a9783b7) SHA1(e98d757c048f2180ba22c774e0e425ddc661ba8c) )
+	ROM_LOAD( "c_5at_g.bin",  0x3000, 0x1000, CRC(32bc20ff) SHA1(ef141f437912923625722b83a33ea182eaa31427) )
+	/* space for diagnostic ROM */
+
+	ROM_REGION( 0x1800, "soundcpu", 0 ) /* sound */
+	ROM_LOAD( "s_3i_b.bin",   0x0000, 0x0800, CRC(45a4ed06) SHA1(144d24464c1f9f01894eb12f846952290e6e32ef) )
+	ROM_RELOAD(               0x0800, 0x0800 )
+	ROM_LOAD( "s_3j_b.bin",   0x1000, 0x0800, CRC(4743fe92) SHA1(6c82b57637c0212a580591397e6a5a1718f19fd2) )
+
+	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_LOAD( "v_5h_b.bin",   0x0000, 0x0800, CRC(007aa348) SHA1(ff2ae583fef6da9d260fda8f4a896dd0414c3388) )
+	ROM_LOAD( "v_3pt.bin",    0x0800, 0x0800, CRC(a967aff0) SHA1(7bcfdbeb0a5cdfec604eb8450664bc4b789526be) )
+
+	ROM_REGION( 0x2000, "gfx2", 0 )
+	ROM_LOAD( "l_4m_b.bin",   0x0000, 0x0800, CRC(766ae006) SHA1(0ec53798aa2c30b2c5c8b2f99b811a187faa2549) )
+	ROM_LOAD( "l_4n_b.bin",   0x0800, 0x0800, CRC(39e7ca4b) SHA1(b77ddd39608d08013fa8bb764c8e5aa4e03181dc) )
+	ROM_LOAD( "l_4r_b.bin",   0x1000, 0x0800, CRC(012f2f25) SHA1(836709192a249b00ded783be542ee844eb930c7a) )
+	ROM_LOAD( "l_4s_b.bin",   0x1800, 0x0800, CRC(84eb5bfb) SHA1(c1f38efb8670f1a489275eb8ff576a95d140cfb9) )
 
 	ROM_REGION( 0x0300, "proms", 0 )
 	ROM_LOAD( "c-2k.bpr",     0x0000, 0x0100, CRC(e273ede5) SHA1(b50ec9e1837c00c20fb2a4369ec7dd0358321127) ) /* palette low 4 bits (inverted) */
@@ -3237,9 +3258,11 @@ GAME( 1981, dkongo,    dkong,    dkong2b,   dkong,    driver_device, 0,        R
 GAME( 1981, dkongj,    dkong,    dkong2b,   dkong,    driver_device, 0,        ROT90,  "Nintendo", "Donkey Kong (Japan set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1981, dkongjo,   dkong,    dkong2b,   dkong,    driver_device, 0,        ROT90,  "Nintendo", "Donkey Kong (Japan set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1981, dkongjo1,  dkong,    dkong2b,   dkong,    driver_device, 0,        ROT90,  "Nintendo", "Donkey Kong (Japan set 3)", GAME_SUPPORTS_SAVE )
+
 GAME( 2004, dkongf,    dkong,    dkong2b,   dkongf,   driver_device, 0,        ROT90,  "hack (Jeff Kulczycki)", "Donkey Kong Foundry (hack)", GAME_SUPPORTS_SAVE ) /* from Jeff's Romhack */
-GAME( 2006, dkongx,    dkong,    braze,     dkongx,   dkong_state,   dkongx,   ROT90,  "hack (Braze Technologies)", "Donkey Kong II - Jumpman Returns (V1.2) (hack)", GAME_SUPPORTS_SAVE )
-GAME( 2006, dkongx11,  dkong,    braze,     dkongx,   dkong_state,   dkongx,   ROT90,  "hack (Braze Technologies)", "Donkey Kong II - Jumpman Returns (V1.1) (hack)", GAME_SUPPORTS_SAVE )
+GAME( 2013, dkongpe,   dkong,    dkong2b,   dkongf,   driver_device, 0,        ROT90,  "hack (Clay Cowgill)", "Donkey Kong: Pauline Edition (hack, rev 5)", GAME_SUPPORTS_SAVE ) // rev 5, 4-22-2013 (free)
+GAME( 2006, dkongx,    dkong,    braze,     dkongx,   dkong_state,   dkongx,   ROT90,  "hack (Braze Technologies)", "Donkey Kong II: Jumpman Returns (hack, V1.2)", GAME_SUPPORTS_SAVE )
+GAME( 2006, dkongx11,  dkong,    braze,     dkongx,   dkong_state,   dkongx,   ROT90,  "hack (Braze Technologies)", "Donkey Kong II: Jumpman Returns (hack, V1.1)", GAME_SUPPORTS_SAVE )
 
 GAME( 1982, dkongjr,   0,        dkongjr,   dkongjr,  driver_device, 0,        ROT90,  "Nintendo of America", "Donkey Kong Junior (US set F-2)", GAME_SUPPORTS_SAVE )
 GAME( 1982, dkongjrj,  dkongjr,  dkongjr,   dkongjr,  driver_device, 0,        ROT90,  "Nintendo", "Donkey Kong Jr. (Japan)", GAME_SUPPORTS_SAVE )
