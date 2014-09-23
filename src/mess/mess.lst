@@ -386,6 +386,10 @@ a3020     // 1988 Acorn Archimedes 3020
 a7000     // 1995 Acorn Archimedes 7000
 a7000p    // 1997 Acorn Archimedes 7000+
 a6809
+rpc600
+rpc700
+sarpc
+sarpc_j233
 
 // ACT
 apricot // 1983 ACT

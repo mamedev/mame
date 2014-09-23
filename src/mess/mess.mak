@@ -910,7 +910,6 @@ $(MESSOBJ)/shared.a: \
 $(MESSOBJ)/acorn.a:             \
 	$(MESS_DRIVERS)/a310.o      \
 	$(MESS_DRIVERS)/a6809.o     \
-	$(MESS_DRIVERS)/a7000.o     \
 	$(MESS_DRIVERS)/acrnsys1.o  \
 	$(MESS_DRIVERS)/atom.o      \
 	$(MESS_VIDEO)/bbc.o         \
@@ -920,6 +919,7 @@ $(MESSOBJ)/acorn.a:             \
 	$(MESS_VIDEO)/electron.o    \
 	$(MESS_MACHINE)/electron.o  \
 	$(MESS_DRIVERS)/electron.o  \
+	$(MESS_DRIVERS)/riscpc.o    \
 	$(MESS_DRIVERS)/z88.o       \
 	$(MESS_VIDEO)/z88.o         \
 	$(MESS_MACHINE)/upd65031.o  \

@@ -21,10 +21,10 @@
 #include "cpu/arm7/arm7core.h"
 
 
-class a7000_state : public driver_device
+class riscpc_state : public driver_device
 {
 public:
-	a7000_state(const machine_config &mconfig, device_type type, const char *tag)
+	riscpc_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_palette(*this, "palette")
@@ -157,7 +157,7 @@ static const char *const vidc20_vert_regnames[] =
 #define VCSR 6
 #define VCER 7
 
-void a7000_state::vidc20_dynamic_screen_change()
+void riscpc_state::vidc20_dynamic_screen_change()
 {
 	/* sanity checks - first pass */
 	/*
@@ -195,7 +195,7 @@ void a7000_state::vidc20_dynamic_screen_change()
 	}
 }
 
-WRITE32_MEMBER( a7000_state::a7000_vidc20_w )
+WRITE32_MEMBER( riscpc_state::a7000_vidc20_w )
 {
 	int r,g,b,cursor_index,horz_reg,vert_reg,reg = data >> 28;
 
@@ -272,7 +272,7 @@ WRITE32_MEMBER( a7000_state::a7000_vidc20_w )
 	}
 }
 
-UINT32 a7000_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+UINT32 riscpc_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int x_size,y_size,x_start,y_start;
 	int x,y,xi;
@@ -571,7 +571,7 @@ static const char *const iomd_regnames[] =
 
 
 
-void a7000_state::fire_iomd_timer(int timer)
+void riscpc_state::fire_iomd_timer(int timer)
 {
 	int timer_count = m_timer_counter[timer];
 	int val = timer_count / 2; // correct?
@@ -582,7 +582,7 @@ void a7000_state::fire_iomd_timer(int timer)
 		m_IOMD_timer[timer]->adjust(attotime::from_usec(val), 0, attotime::from_usec(val));
 }
 
-TIMER_CALLBACK_MEMBER(a7000_state::IOMD_timer0_callback)
+TIMER_CALLBACK_MEMBER(riscpc_state::IOMD_timer0_callback)
 {
 	m_IRQ_status_A|=0x20;
 	if(m_IRQ_mask_A&0x20)
@@ -591,7 +591,7 @@ TIMER_CALLBACK_MEMBER(a7000_state::IOMD_timer0_callback)
 	}
 }
 
-TIMER_CALLBACK_MEMBER(a7000_state::IOMD_timer1_callback)
+TIMER_CALLBACK_MEMBER(riscpc_state::IOMD_timer1_callback)
 {
 	m_IRQ_status_A|=0x40;
 	if(m_IRQ_mask_A&0x40)
@@ -600,7 +600,7 @@ TIMER_CALLBACK_MEMBER(a7000_state::IOMD_timer1_callback)
 	}
 }
 
-TIMER_CALLBACK_MEMBER(a7000_state::flyback_timer_callback)
+TIMER_CALLBACK_MEMBER(riscpc_state::flyback_timer_callback)
 {
 	m_IRQ_status_A|=0x08;
 	if(m_IRQ_mask_A&0x08)
@@ -611,7 +611,7 @@ TIMER_CALLBACK_MEMBER(a7000_state::flyback_timer_callback)
 	m_flyback_timer->adjust(machine().first_screen()->time_until_pos(m_vidc20_vert_reg[VDER]));
 }
 
-void a7000_state::viddma_transfer_start()
+void riscpc_state::viddma_transfer_start()
 {
 	address_space &mem = m_maincpu->space(AS_PROGRAM);
 	UINT32 src = m_viddma_addr_start;
@@ -630,7 +630,7 @@ void a7000_state::viddma_transfer_start()
 	}
 }
 
-READ32_MEMBER( a7000_state::a7000_iomd_r )
+READ32_MEMBER( riscpc_state::a7000_iomd_r )
 {
 //  if(offset != IOMD_KBDCR)
 //      logerror("IOMD: %s Register (%04x) read\n",iomd_regnames[offset & (0x1ff >> 2)],offset*4);
@@ -684,7 +684,7 @@ READ32_MEMBER( a7000_state::a7000_iomd_r )
 	return 0;
 }
 
-WRITE32_MEMBER( a7000_state::a7000_iomd_w )
+WRITE32_MEMBER( riscpc_state::a7000_iomd_w )
 {
 //  logerror("IOMD: %s Register (%04x) write = %08x\n",iomd_regnames[offset & (0x1ff >> 2)],offset*4,data);
 
@@ -749,7 +749,7 @@ WRITE32_MEMBER( a7000_state::a7000_iomd_w )
 	}
 }
 
-static ADDRESS_MAP_START( a7000_mem, AS_PROGRAM, 32, a7000_state)
+static ADDRESS_MAP_START( a7000_mem, AS_PROGRAM, 32, riscpc_state)
 	AM_RANGE(0x00000000, 0x003fffff) AM_MIRROR(0x00800000) AM_ROM AM_REGION("user1", 0)
 //  AM_RANGE(0x01000000, 0x01ffffff) AM_NOP //expansion ROM
 //  AM_RANGE(0x02000000, 0x02ffffff) AM_RAM //VRAM
@@ -775,16 +775,16 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( a7000 )
 INPUT_PORTS_END
 
-void a7000_state::machine_start()
+void riscpc_state::machine_start()
 {
-	m_IOMD_timer[0] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(a7000_state::IOMD_timer0_callback),this));
-	m_IOMD_timer[1] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(a7000_state::IOMD_timer1_callback),this));
-	m_flyback_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(a7000_state::flyback_timer_callback),this));
+	m_IOMD_timer[0] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(riscpc_state::IOMD_timer0_callback),this));
+	m_IOMD_timer[1] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(riscpc_state::IOMD_timer1_callback),this));
+	m_flyback_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(riscpc_state::flyback_timer_callback),this));
 
 	m_io_id = 0xd4e7;
 }
 
-void a7000_state::machine_reset()
+void riscpc_state::machine_reset()
 {
 	m_IOMD_IO_ctrl = 0x0b | 0x34; //bit 0,1 and 3 set high on reset plus 2,4,5 always high
 //  m_IRQ_status_A = 0x10; // set POR bit ON
@@ -797,9 +797,9 @@ void a7000_state::machine_reset()
 	m_flyback_timer->adjust( attotime::never);
 }
 
-static MACHINE_CONFIG_START( a7000, a7000_state )
+static MACHINE_CONFIG_START( rpc600, riscpc_state )
 	/* Basic machine hardware */
-	MCFG_CPU_ADD( "maincpu", ARM7, XTAL_32MHz )
+	MCFG_CPU_ADD( "maincpu", ARM7, XTAL_30MHz ) // ARM610
 	MCFG_CPU_PROGRAM_MAP(a7000_mem)
 
 	/* video hardware */
@@ -808,14 +808,92 @@ static MACHINE_CONFIG_START( a7000, a7000_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(1900, 1080) //max available size
 	MCFG_SCREEN_VISIBLE_AREA(0, 1900-1, 0, 1080-1)
-	MCFG_SCREEN_UPDATE_DRIVER(a7000_state, screen_update)
+	MCFG_SCREEN_UPDATE_DRIVER(riscpc_state, screen_update)
+	MCFG_PALETTE_ADD("palette", 0x200)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_START( rpc700, riscpc_state )
+	/* Basic machine hardware */
+	MCFG_CPU_ADD( "maincpu", ARM7, XTAL_40MHz ) // ARM710
+	MCFG_CPU_PROGRAM_MAP(a7000_mem)
+
+	/* video hardware */
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_SIZE(1900, 1080) //max available size
+	MCFG_SCREEN_VISIBLE_AREA(0, 1900-1, 0, 1080-1)
+	MCFG_SCREEN_UPDATE_DRIVER(riscpc_state, screen_update)
+	MCFG_PALETTE_ADD("palette", 0x200)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_START( a7000, riscpc_state )
+	/* Basic machine hardware */
+	MCFG_CPU_ADD( "maincpu", ARM7, XTAL_32MHz ) // ARM7500
+	MCFG_CPU_PROGRAM_MAP(a7000_mem)
+
+	/* video hardware */
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_SIZE(1900, 1080) //max available size
+	MCFG_SCREEN_VISIBLE_AREA(0, 1900-1, 0, 1080-1)
+	MCFG_SCREEN_UPDATE_DRIVER(riscpc_state, screen_update)
 	MCFG_PALETTE_ADD("palette", 0x200)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( a7000p, a7000 )
-	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_MODIFY("maincpu") // ARM7500FE
 	MCFG_CPU_CLOCK(XTAL_48MHz)
 MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_START( sarpc, riscpc_state )
+	/* Basic machine hardware */
+	MCFG_CPU_ADD( "maincpu", ARM7, 202000000 ) // StrongARM
+	MCFG_CPU_PROGRAM_MAP(a7000_mem)
+
+	/* video hardware */
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_SIZE(1900, 1080) //max available size
+	MCFG_SCREEN_VISIBLE_AREA(0, 1900-1, 0, 1080-1)
+	MCFG_SCREEN_UPDATE_DRIVER(riscpc_state, screen_update)
+	MCFG_PALETTE_ADD("palette", 0x200)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_START( sarpc_j233, riscpc_state )
+	/* Basic machine hardware */
+	MCFG_CPU_ADD( "maincpu", ARM7, 233000000 ) // StrongARM
+	MCFG_CPU_PROGRAM_MAP(a7000_mem)
+
+	/* video hardware */
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_SIZE(1900, 1080) //max available size
+	MCFG_SCREEN_VISIBLE_AREA(0, 1900-1, 0, 1080-1)
+	MCFG_SCREEN_UPDATE_DRIVER(riscpc_state, screen_update)
+	MCFG_PALETTE_ADD("palette", 0x200)
+MACHINE_CONFIG_END
+
+ROM_START(rpc600)
+	ROM_REGION( 0x800000, "user1", ROMREGION_ERASEFF )
+	// Version 3.50
+	ROM_SYSTEM_BIOS( 0, "350", "RiscOS 3.50" )
+	ROMX_LOAD( "0277,521-01.bin", 0x000000, 0x100000, CRC(8ba4444e) SHA1(1b31d7a6e924bef0e0056c3a00a3fed95e55b175), ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(1))
+	ROMX_LOAD( "0277,522-01.bin", 0x000002, 0x100000, CRC(2bc95c9f) SHA1(f8c6e2a1deb4fda48aac2e9fa21b9e01955331cf), ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(1))
+	ROM_REGION( 0x800000, "vram", ROMREGION_ERASE00 )
+ROM_END
+
+ROM_START(rpc700)
+	ROM_REGION( 0x800000, "user1", ROMREGION_ERASEFF )
+	// Version 3.60
+	ROM_SYSTEM_BIOS( 0, "360", "RiscOS 3.60" )
+	ROMX_LOAD( "1203,101-01.bin", 0x000000, 0x200000, CRC(2eeded56) SHA1(7217f942cdac55033b9a8eec4a89faa2dd63cd68), ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(1))
+	ROMX_LOAD( "1203,102-01.bin", 0x000002, 0x200000, CRC(6db87d21) SHA1(428403ed31682041f1e3d114ea02a688d24b7d94), ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(1))
+	ROM_REGION( 0x800000, "vram", ROMREGION_ERASE00 )
+ROM_END
 
 ROM_START(a7000)
 	ROM_REGION( 0x800000, "user1", ROMREGION_ERASEFF )
@@ -843,6 +921,22 @@ ROM_START(a7000p)
 	ROM_REGION( 0x800000, "vram", ROMREGION_ERASE00 )
 ROM_END
 
+ROM_START(sarpc)
+	ROM_REGION( 0x800000, "user1", ROMREGION_ERASEFF )
+	// Version 3.70
+	ROM_SYSTEM_BIOS( 0, "370", "RiscOS 3.70" )
+	ROMX_LOAD( "1203,191-01.bin", 0x000000, 0x200000, NO_DUMP, ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(1))
+	ROMX_LOAD( "1203,192-01.bin", 0x000002, 0x200000, NO_DUMP, ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(1))
+ROM_END
+
+ROM_START(sarpc_j233)
+	ROM_REGION( 0x800000, "user1", ROMREGION_ERASEFF )
+	// Version 3.71
+	ROM_SYSTEM_BIOS( 0, "371", "RiscOS 3.71" )
+	ROMX_LOAD( "1203,261-01.bin", 0x000000, 0x200000, CRC(8e3c570a) SHA1(ffccb52fa8e165d3f64545caae1c349c604386e9), ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(1))
+	ROMX_LOAD( "1203,262-01.bin", 0x000002, 0x200000, CRC(cf4615b4) SHA1(c340f29aeda3557ebd34419fcb28559fc9b620f8), ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(1))
+ROM_END
+
 /***************************************************************************
 
   Game driver(s)
@@ -850,5 +944,9 @@ ROM_END
 ***************************************************************************/
 
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT   INIT    COMPANY FULLNAME        FLAGS */
-COMP( 1995, a7000,      0,      0,      a7000,      a7000, driver_device,   0,      "Acorn",  "Archimedes A7000",   GAME_NOT_WORKING | GAME_NO_SOUND )
-COMP( 1997, a7000p,     a7000,  0,      a7000p,     a7000, driver_device,   0,      "Acorn",  "Archimedes A7000+",  GAME_NOT_WORKING | GAME_NO_SOUND )
+COMP( 1994, rpc600,     0,      0,      rpc600,     a7000, driver_device,   0,      "Acorn",  "Risc PC 600",        GAME_NOT_WORKING | GAME_NO_SOUND )
+COMP( 1994, rpc700,     rpc600, 0,      rpc700,     a7000, driver_device,   0,      "Acorn",  "Risc PC 700",        GAME_NOT_WORKING | GAME_NO_SOUND )
+COMP( 1995, a7000,      rpc600, 0,      a7000,      a7000, driver_device,   0,      "Acorn",  "Archimedes A7000",   GAME_NOT_WORKING | GAME_NO_SOUND )
+COMP( 1997, a7000p,     rpc600, 0,      a7000p,     a7000, driver_device,   0,      "Acorn",  "Archimedes A7000+",  GAME_NOT_WORKING | GAME_NO_SOUND )
+COMP( 1997, sarpc,      rpc600, 0,      sarpc,      a7000, driver_device,   0,      "Acorn",  "StrongARM Risc PC",  GAME_NOT_WORKING | GAME_NO_SOUND )
+COMP( 1997, sarpc_j233, rpc600, 0,      sarpc_j233, a7000, driver_device,   0,      "Acorn",  "J233 StrongARM Risc PC",  GAME_NOT_WORKING | GAME_NO_SOUND )
