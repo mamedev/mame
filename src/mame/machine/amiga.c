@@ -398,19 +398,37 @@ void amiga_state::set_interrupt(int interrupt)
 	custom_chip_w(m_maincpu->space(AS_PROGRAM), REG_INTREQ, interrupt, 0xffff);
 }
 
+bool amiga_state::int2_pending()
+{
+	return m_cia_0_irq;
+}
+
+bool amiga_state::int6_pending()
+{
+	return m_cia_1_irq;
+}
+
 void amiga_state::update_int2()
 {
-	set_interrupt((m_cia_0_irq ? INTENA_SETCLR : 0x0000) | INTENA_PORTS);
+	set_interrupt((int2_pending() ? INTENA_SETCLR : 0x0000) | INTENA_PORTS);
 }
 
 void amiga_state::update_int6()
 {
-	set_interrupt((m_cia_1_irq ? INTENA_SETCLR : 0x0000) | INTENA_EXTER);
+	set_interrupt((int6_pending() ? INTENA_SETCLR : 0x0000) | INTENA_EXTER);
 }
 
 void amiga_state::update_irqs()
 {
 	amiga_state *state = this;
+
+	// if the external interrupt line is still active, set the interrupt request bit
+	if (int2_pending())
+		CUSTOM_REG(REG_INTREQ) |= INTENA_PORTS;
+
+	if (int6_pending())
+		CUSTOM_REG(REG_INTREQ) |= INTENA_EXTER;
+
 	int ints = CUSTOM_REG(REG_INTENA) & CUSTOM_REG(REG_INTREQ);
 
 	// master interrupt switch
@@ -1429,7 +1447,7 @@ WRITE16_MEMBER( amiga_state::custom_chip_w )
 			CUSTOM_REG(REG_BLTSIZH) = data & 0x3f;
 			if ( CUSTOM_REG(REG_BLTSIZV) == 0 ) CUSTOM_REG(REG_BLTSIZV) = 0x400;
 			if ( CUSTOM_REG(REG_BLTSIZH) == 0 ) CUSTOM_REG(REG_BLTSIZH) = 0x40;
-			blitter_setup(space);
+			blitter_setup(m_maincpu->space(AS_PROGRAM));
 			break;
 
 		case REG_BLTSIZV:
@@ -1445,7 +1463,7 @@ WRITE16_MEMBER( amiga_state::custom_chip_w )
 			{
 				CUSTOM_REG(REG_BLTSIZH) = data & 0x7ff;
 				if ( CUSTOM_REG(REG_BLTSIZH) == 0 ) CUSTOM_REG(REG_BLTSIZH) = 0x800;
-				blitter_setup(space);
+				blitter_setup(m_maincpu->space(AS_PROGRAM));
 			}
 			break;
 
@@ -1479,7 +1497,8 @@ WRITE16_MEMBER( amiga_state::custom_chip_w )
 			amiga_sprite_enable_comparitor(space.machine(), (offset - REG_SPR0DATA) / 4, TRUE);
 			break;
 
-		case REG_COP1LCH:   case REG_COP2LCH:
+		case REG_COP1LCH:
+		case REG_COP2LCH:
 			data &= ( state->m_chip_ram_mask >> 16 );
 			break;
 

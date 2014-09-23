@@ -75,8 +75,8 @@ public:
 
 protected:
 	// amiga_state overrides
-	virtual void update_int2();
-	virtual void update_int6();
+	virtual bool int2_pending();
+	virtual bool int6_pending();
 
 private:
 	// devices
@@ -140,8 +140,8 @@ protected:
 	virtual void machine_start();
 
 	// amiga_state overrides
-	virtual void update_int2();
-	virtual void update_int6();
+	virtual bool int2_pending();
+	virtual bool int6_pending();
 
 private:
 	// devices
@@ -218,7 +218,7 @@ public:
 	static const UINT8 GAYLE_ID = 0xd0;
 
 protected:
-	virtual void update_int2();
+	virtual bool int2_pending();
 
 private:
 	int m_gayle_int2;
@@ -240,7 +240,7 @@ public:
 	static const UINT8 GAYLE_ID = 0xd1;
 
 protected:
-	virtual void update_int2();
+	virtual bool int2_pending();
 
 private:
 	int m_gayle_int2;
@@ -569,16 +569,14 @@ WRITE_LINE_MEMBER( a2000_state::zorro2_int6_w )
 	update_int6();
 }
 
-void a2000_state::update_int2()
+bool a2000_state::int2_pending()
 {
-	int state = (m_cia_0_irq || m_zorro2_int2);
-	set_interrupt((state ? INTENA_SETCLR : 0x0000) | INTENA_PORTS);
+	return m_cia_0_irq || m_zorro2_int2;
 }
 
-void a2000_state::update_int6()
+bool a2000_state::int6_pending()
 {
-	int state = (m_cia_1_irq || m_zorro2_int6);
-	set_interrupt((state ? INTENA_SETCLR : 0x0000) | INTENA_EXTER);
+	return m_cia_1_irq || m_zorro2_int6;
 }
 
 void cdtv_state::machine_start()
@@ -591,16 +589,14 @@ void cdtv_state::machine_start()
 	m_dmac->ramsz_w(0);
 }
 
-void cdtv_state::update_int2()
+bool cdtv_state::int2_pending()
 {
-	int state = (m_cia_0_irq || m_dmac_irq || m_tpi_irq);
-	set_interrupt((state ? INTENA_SETCLR : 0x0000) | INTENA_PORTS);
+	return m_cia_0_irq || m_dmac_irq || m_tpi_irq;
 }
 
-void cdtv_state::update_int6()
+bool cdtv_state::int6_pending()
 {
-	int state = (m_cia_1_irq);
-	set_interrupt((state ? INTENA_SETCLR : 0x0000) | INTENA_EXTER);
+	return m_cia_1_irq;
 }
 
 READ32_MEMBER( a3000_state::scsi_r )
@@ -627,10 +623,9 @@ WRITE32_MEMBER( a3000_state::motherboard_w )
 	logerror("motherboard_w(%06x): %08x & %08x\n", offset, data, mem_mask);
 }
 
-void a600_state::update_int2()
+bool a600_state::int2_pending()
 {
-	int state = (m_cia_0_irq || m_gayle_int2);
-	set_interrupt((state ? INTENA_SETCLR : 0x0000) | INTENA_PORTS);
+	return m_cia_0_irq || m_gayle_int2;
 }
 
 WRITE_LINE_MEMBER( a600_state::gayle_int2_w )
@@ -639,10 +634,9 @@ WRITE_LINE_MEMBER( a600_state::gayle_int2_w )
 	update_int2();
 }
 
-void a1200_state::update_int2()
+bool a1200_state::int2_pending()
 {
-	int state = (m_cia_0_irq || m_gayle_int2);
-	set_interrupt((state ? INTENA_SETCLR : 0x0000) | INTENA_PORTS);
+	return m_cia_0_irq || m_gayle_int2;
 }
 
 WRITE_LINE_MEMBER( a1200_state::gayle_int2_w )

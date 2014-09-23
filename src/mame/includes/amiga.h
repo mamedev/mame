@@ -535,8 +535,10 @@ protected:
 
 	// interrupts
 	void set_interrupt(int interrupt);
-	virtual void update_int2();
-	virtual void update_int6();
+	virtual bool int2_pending();
+	virtual bool int6_pending();
+	void update_int2();
+	void update_int6();
 
 	virtual void vblank();
 
