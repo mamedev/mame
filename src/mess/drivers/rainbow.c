@@ -1003,7 +1003,7 @@ READ8_MEMBER(rainbow_state::z80_diskstatus_r)
 
 	// AND 00111011 - return what was WRITTEN to D5-D3, D1, D0 previously
 	//                (except D7,D6,D2)
-	int data = m_z80_diskcontrol && 0x3b;
+	int data = m_z80_diskcontrol & 0x3b;
 
 	// D7: DRQ: reflects status of DATA REQUEST signal from FDC.
 	// '1' indicates that FDC has read data OR requires new write data.
