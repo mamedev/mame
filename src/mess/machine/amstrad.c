@@ -1173,7 +1173,7 @@ void amstrad_state::amstrad_setLowerRom()
 			if ( m_asic.enabled )
 			{
 //              logerror("L-ROM: Lower ROM enabled, cart bank %i\n", m_asic.rmr2 & 0x07 );
-				bank_base = &m_region_maincpu->base()[0x4000 * ( m_asic.rmr2 & 0x07 )];
+				bank_base = &m_region_cart->base()[0x4000 * (m_asic.rmr2 & 0x07)];
 				switch( m_asic.rmr2 & 0x18 )
 				{
 				case 0x00:
@@ -1200,8 +1200,8 @@ void amstrad_state::amstrad_setLowerRom()
 			}
 			else
 			{
-				m_bank1->set_base( m_region_maincpu->base() );
-				m_bank2->set_base( m_region_maincpu->base() + 0x2000 );
+				m_bank1->set_base(m_region_cart->base());
+				m_bank2->set_base(m_region_cart->base() + 0x2000);
 			}
 		}
 	}
@@ -1495,21 +1495,9 @@ READ8_MEMBER(amstrad_state::amstrad_plus_asic_6000_r)
 	if ( m_asic.enabled && ( m_asic.rmr2 & 0x18 ) == 0x18 )
 	{
 		// Analogue ports
-		if(offset == 0x0808)
+		if(offset >= 0x0808 && offset < 0x080c)
 		{
-			return (m_io_analog1->read() & 0x3f);
-		}
-		if(offset == 0x0809)
-		{
-			return (m_io_analog2->read() & 0x3f);
-		}
-		if(offset == 0x080a)
-		{
-			return (m_io_analog3->read() & 0x3f);
-		}
-		if(offset == 0x080b)
-		{
-			return (m_io_analog4->read() & 0x3f);
+			return (m_io_analog[offset & 3]->read() & 0x3f);
 		}
 		if(offset == 0x080c || offset == 0x080e)
 		{
@@ -2634,12 +2622,6 @@ READ8_MEMBER(amstrad_state::amstrad_psg_porta_read)
 	If keyboard matrix line 11-15 are selected, the byte is always &ff.
 	After testing on a real CPC, it is found that these never change, they always return &FF. */
 
-	ioport_port *keyrow[] = {
-		m_io_keyboard_row_0, m_io_keyboard_row_1, m_io_keyboard_row_2, m_io_keyboard_row_3, m_io_keyboard_row_4,
-		m_io_keyboard_row_5, m_io_keyboard_row_6, m_io_keyboard_row_7, m_io_keyboard_row_8, m_io_keyboard_row_9,
-		m_io_keyboard_row_10
-	};
-
 	if ( ( m_ppi_port_outputs[amstrad_ppi_PortC] & 0x0F ) > 10)
 	{
 		return 0xFF;
@@ -2649,7 +2631,7 @@ READ8_MEMBER(amstrad_state::amstrad_psg_porta_read)
 		if(m_aleste_mode == 0x08 && ( m_ppi_port_outputs[amstrad_ppi_PortC] & 0x0F ) == 10)
 			return 0xff;
 
-		if (keyrow[m_ppi_port_outputs[amstrad_ppi_PortC] & 0x0F])
+		if (m_io_kbrow[m_ppi_port_outputs[amstrad_ppi_PortC] & 0x0F])
 		{
 			if(m_system_type != SYSTEM_GX4000)
 			{
@@ -2659,11 +2641,11 @@ READ8_MEMBER(amstrad_state::amstrad_psg_porta_read)
 				}
 				if((m_io_ctrltype->read_safe(0) == 2) && (m_ppi_port_outputs[amstrad_ppi_PortC] & 0x0F) == 9)
 				{
-					return (keyrow[m_ppi_port_outputs[amstrad_ppi_PortC] & 0x0F]->read_safe(0) & 0x80) | 0x7f;
+					return (m_io_kbrow[m_ppi_port_outputs[amstrad_ppi_PortC] & 0x0F]->read_safe(0) & 0x80) | 0x7f;
 				}
 			}
 
-			return keyrow[m_ppi_port_outputs[amstrad_ppi_PortC] & 0x0F]->read_safe(0) & 0xFF;
+			return m_io_kbrow[m_ppi_port_outputs[amstrad_ppi_PortC] & 0x0F]->read_safe(0) & 0xFF;
 		}
 		return 0xFF;
 	}
@@ -2719,7 +2701,7 @@ IRQ_CALLBACK_MEMBER(amstrad_state::amstrad_cpu_acknowledge_int)
 				prev_x = data_x;
 				prev_y = data_y;
 
-				m_amx_mouse_data |= (m_io_keyboard_row_9->read_safe(0) & 0x80);  // DEL key
+				m_amx_mouse_data |= (m_io_kbrow[9]->read_safe(0) & 0x80);  // DEL key
 			}
 		}
 	return 0xFF;
@@ -2862,12 +2844,15 @@ void amstrad_state::enumerate_roms()
 
 	if(m_system_type == SYSTEM_PLUS || m_system_type == SYSTEM_GX4000)
 	{
+		UINT8 *crt = m_region_cart->base();
+		int bank_mask = (m_cart->get_rom_size() / 0x4000) - 1;
+
 		/* ROMs are stored on the inserted cartridge in the Plus/GX4000 */
 		for(i=0; i<128; i++)  // fill ROM table
-			m_Amstrad_ROM_Table[i] = &rom[0x4000];
+			m_Amstrad_ROM_Table[i] = &crt[0x4000];
 		for(i=128;i<160;i++)
-			m_Amstrad_ROM_Table[i] = &rom[(i-128)*0x4000];
-		m_Amstrad_ROM_Table[7] = &rom[0xc000];
+			m_Amstrad_ROM_Table[i] = &crt[((i - 128) & bank_mask) * 0x4000];
+		m_Amstrad_ROM_Table[7] = &crt[0xc000];
 		slot7 = true;
 	}
 	else
@@ -3046,6 +3031,9 @@ MACHINE_START_MEMBER(amstrad_state,plus)
 	m_asic.ram = m_region_user1->base();  // 16kB RAM for ASIC, memory-mapped registers.
 	m_system_type = SYSTEM_PLUS;
 	m_centronics->write_data7(0);
+	
+	astring region_tag;
+	m_region_cart = memregion(region_tag.cpy(m_cart->tag()).cat(GENERIC_ROM_REGION_TAG));
 }
 
 
@@ -3085,6 +3073,9 @@ MACHINE_START_MEMBER(amstrad_state,gx4000)
 {
 	m_asic.ram = m_region_user1->base();  // 16kB RAM for ASIC, memory-mapped registers.
 	m_system_type = SYSTEM_GX4000;
+	
+	astring region_tag;
+	m_region_cart = memregion(region_tag.cpy(m_cart->tag()).cat(GENERIC_ROM_REGION_TAG));
 }
 
 MACHINE_RESET_MEMBER(amstrad_state,gx4000)
@@ -3188,69 +3179,74 @@ SNAPSHOT_LOAD_MEMBER( amstrad_state,amstrad)
 
 DEVICE_IMAGE_LOAD_MEMBER(amstrad_state, amstrad_plus_cartridge)
 {
-	// load CPC Plus / GX4000 cartridge image
-	// Format is RIFF: RIFF header chunk contains "AMS!"
-	// Chunks should be 16k, but may vary
-	// Chunks labeled 'cb00' represent Cartridge block 0, and is loaded to &0000-&3fff
-	//                'cb01' represent Cartridge block 1, and is loaded to &4000-&7fff
-	//                ... and so on.
+	UINT32 size = m_cart->common_get_size("rom");
+	unsigned char header[12];
+	bool is_cpr = FALSE;
+	logerror("IMG: loading CPC+ cartridge file\n");
 
-	UINT32 size, offset = 0;
-	dynamic_buffer temp_copy;
-	unsigned char header[12];     // RIFF chunk
-	char chunkid[4];              // chunk ID (4 character code - cb00, cb01, cb02... upto cb31 (max 512kB), other chunks are ignored)
-	char chunklen[4];             // chunk length (always little-endian)
-	int chunksize;                // chunk length, calcaulated from the above
-	int ramblock;                 // 16k RAM block chunk is to be loaded in to
-	unsigned int bytes_to_read;   // total bytes to read, as mame_feof doesn't react to EOF without trying to go past it.
-	unsigned char* mem = m_region_maincpu->base();
-
+	// check for .CPR header
 	if (image.software_entry() == NULL)
 	{
-		size = image.length();
-		temp_copy.resize(size);
-		if (image.fread(temp_copy, size) != size)
+		image.fread(header, 12);	
+		if (strncmp((char *)header, "RIFF", 4) != 0)
 		{
-			logerror("IMG: failed to read from cart image\n");
+			// not a CPR file, so rewind the image at start
+			image.fseek(0, SEEK_SET);
+		}
+		else
+		{
+			is_cpr = TRUE;
+			size -= 12;
+		}
+	}
+
+	// alloc ROM
+	m_cart->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
+
+	// actually load the cart into ROM
+	if (image.software_entry() != NULL)
+	{
+		logerror("IMG: raw CPC+ cartridge from softlist\n");
+		memcpy(m_cart->get_rom_base(), image.get_software_region("rom"), size);
+	}
+	else if (!is_cpr)
+	{
+		// not an RIFF format file, assume raw binary (*.bin)
+		logerror("IMG: raw CPC+ cartridge file\n");
+		if (size % 0x4000)
+		{
+			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Attempt to load a raw binary with some block smaller than 16kB in size");
 			return IMAGE_INIT_FAIL;
 		}
+		else
+			image.fread(m_cart->get_rom_base(), size);	
 	}
 	else
 	{
-		size= image.get_software_region_length("rom");
+		// load CPC Plus / GX4000 cartridge image
+		// Format is RIFF: RIFF header chunk contains "AMS!"
+		// Chunks should be 16k, but may vary
+		// Chunks labeled 'cb00' represent Cartridge block 0, and is loaded to &0000-&3fff
+		//                'cb01' represent Cartridge block 1, and is loaded to &4000-&7fff
+		//                ... and so on.
+		
+		UINT32 offset = 0;
+		UINT8 *crt = m_cart->get_rom_base();
+		dynamic_buffer temp_copy;
 		temp_copy.resize(size);
-		memcpy(temp_copy, image.get_software_region("rom"), size);
-	}
+		image.fread(temp_copy, size);
 
-	logerror("IMG: loading CPC+ cartridge file\n");
-	// load RIFF chunk
-	memcpy(header, temp_copy, 12);
-	offset += 12;
+		// RIFF chunk bits
+		char chunkid[4];              // chunk ID (4 character code - cb00, cb01, cb02... upto cb31 (max 512kB), other chunks are ignored)
+		char chunklen[4];             // chunk length (always little-endian)
+		int chunksize;                // chunk length, calcaulated from the above
+		int ramblock;                 // 16k RAM block chunk is to be loaded into
+		unsigned int bytes_to_read;   // total bytes to read, as mame_feof doesn't react to EOF without trying to go past it.		
 
-	if (strncmp((char *)header, "RIFF", 4) != 0)
-	{
-		logerror("IMG: raw CPC+ cartridge file\n");
-		offset -= 12;   // no header, so we go back to the start of the file
-
-		// not an RIFF format file, assume raw binary (*.bin)
-		while (offset < size)
-		{
-			memcpy(mem + offset, temp_copy + offset, 0x4000);
-
-			if ((size - offset) < 0x4000)
-			{
-				logerror("BIN: block %i loaded is smaller than 16kB in size\n", offset / 0x4000);
-				return IMAGE_INIT_FAIL;
-			}
-			offset += 0x4000;
-		}
-	}
-	else if (image.software_entry() == NULL)    // we have no CPR carts in our gx4000 softlist
-	{
 		// Is RIFF format (*.cpr)
 		if (strncmp((char*)(header + 8), "AMS!", 4) != 0)
 		{
-			logerror("CPR: not an Amstrad CPC cartridge image\n");
+			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Not an Amstrad CPC cartridge image (despite RIFF header)");
 			return IMAGE_INIT_FAIL;
 		}
 
@@ -3279,16 +3275,13 @@ DEVICE_IMAGE_LOAD_MEMBER(amstrad_state, amstrad_plus_cartridge)
 				ramblock += chunkid[3] - 0x30;
 				logerror("CPR: Loading chunk into RAM block %i ['%4s']\n", ramblock, chunkid);
 
-				if(ramblock >= 0 && ramblock < 32)
+				// load block into ROM area (max 512K)
+				if (ramblock >= 0 && ramblock < 32)
 				{
-					// clear RAM block
-					memset(mem + 0x4000 * ramblock, 0, 0x4000);
+					if (chunksize > 0x4000)
+						chunksize = 0x4000;
 
-					// load block into ROM area
-					if (chunksize > 16384)
-						chunksize = 16384;
-
-					memcpy(mem + 0x4000 * ramblock, temp_copy + offset, chunksize);
+					memcpy(crt + 0x4000 * ramblock, temp_copy + offset, chunksize);
 					bytes_to_read -= chunksize;
 					offset += chunksize;
 					logerror("CPR: Loaded %i-byte chunk into RAM block %i\n", chunksize, ramblock);
@@ -3304,11 +3297,6 @@ DEVICE_IMAGE_LOAD_MEMBER(amstrad_state, amstrad_plus_cartridge)
 				}
 			}
 		}
-	}
-	else    // CPR carts in our softlist
-	{
-		logerror("Gamelist cart in RIFF format\n");
-		return IMAGE_INIT_FAIL;
 	}
 
 	return IMAGE_INIT_PASS;

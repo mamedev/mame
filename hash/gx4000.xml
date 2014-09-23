@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
-<softwarelist name="gx4000" description="Amstrad GX4000 cartridges">
+<softwarelist name="gx4000" description="Amstrad CPC Plus &amp; GX4000 cartridges">
 	<software name="barb2">
 		<description>Barbarian II</description>
 		<year>1989</year>
@@ -285,6 +285,88 @@
 		<part name="cart" interface="gx4000_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="wrldsprt.bin" size="131072" crc="5cecc439" sha1="6bc5271370eb1ee92f809874f7ef346c2117f9cd" offset="00000" />
+			</dataarea>
+		</part>
+	</software>
+
+
+<!-- CPC+ System Carts -->
+	<software name="sysuk">
+		<description>Burnin' Rubber + Locomotive BASIC</description>
+		<year>1990</year>
+		<publisher>Amstrad</publisher>
+		<part name="cart" interface="gx4000_cart">
+			<dataarea name="rom" size="131072">
+				<rom name="plus_en.bin" size="131072" crc="91d35678" sha1="e73416091449a9e9b3bce19263a54d0bb62235f7" offset="00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sysukpd" cloneof="sysuk">
+		<description>Locomotive BASIC + ParaDOS</description>
+		<year>1990</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<part name="cart" interface="gx4000_cart">
+			<dataarea name="rom" size="131072">
+				<rom name="engpados.bin" size="131072" crc="e9c5e30e" sha1="596bf4d4dedafca71fadffb6e5fa8634c3cd843f" offset="00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- These need French keyboard to fully work -->
+	<software name="sysfr" supported="partial">
+		<description>Burnin' Rubber + Locomotive BASIC (Fra)</description>
+		<year>1990</year>
+		<publisher>Amstrad</publisher>
+		<part name="cart" interface="gx4000_cart">
+			<dataarea name="rom" size="131072">
+				<rom name="plus_fr.bin" size="131072" crc="26ebc1fe" sha1="8f8031e24440d2f1174d21faabb3b0134266daf2" offset="00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- This was released in France  to address the Plus range incompatibilities with some software designed for the classic CPC range. -->
+	<software name="sysfrv3" cloneof="sysfr" supported="partial">
+		<description>BASIC Cartouche (Fra, with OS v3)</description>
+		<year>1990</year>
+		<publisher>Amstrad</publisher>
+		<part name="cart" interface="gx4000_cart">
+			<dataarea name="rom" size="65536">
+				<rom name="basic (f) (white label).bin" size="65536" crc="37e17647" sha1="c977841fdf09151394b49035a53ee5d049b38891" offset="00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sysfrpd" cloneof="sysfr" supported="partial">
+		<description>Locomotive BASIC + ParaDOS (Fra)</description>
+		<year>1990</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<part name="cart" interface="gx4000_cart">
+			<dataarea name="rom" size="131072">
+				<rom name="frpados.bin" size="131072" crc="5efd7488" sha1="d618e925f326c03be4b1b018f2cc218384eb88c7" offset="00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- These need Spanish keyboard to fully work -->
+	<software name="syses" supported="partial">
+		<description>Burnin' Rubber + Locomotive BASIC (Spa)</description>
+		<year>1990</year>
+		<publisher>Amstrad</publisher>
+		<part name="cart" interface="gx4000_cart">
+			<dataarea name="rom" size="131072">
+				<rom name="plus_es.bin" size="131072" crc="5d336a70" sha1="d9f93ed0f4790a078317f7bde8ec6bf838c965e1" offset="00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sysespd" cloneof="syses" supported="partial">
+		<description>Locomotive BASIC + ParaDOS (Spa)</description>
+		<year>1990</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<part name="cart" interface="gx4000_cart">
+			<dataarea name="rom" size="131072">
+				<rom name="spapados.bin" size="131072" crc="57ecd6ed" sha1="2a68079bf90dbacf9e921b54874ad3e5408a75bd" offset="00000" />
 			</dataarea>
 		</part>
 	</software>

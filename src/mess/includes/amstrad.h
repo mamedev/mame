@@ -30,6 +30,8 @@
 #include "bus/centronics/epson_lx800.h"
 #include "bus/centronics/printer.h"
 #include "bus/centronics/digiblst.h"
+#include "bus/generic/slot.h"
+#include "bus/generic/carts.h"
 
 
 /****************************
@@ -119,6 +121,7 @@ public:
 		m_ppi(*this, "ppi8255"),
 		m_centronics(*this, "centronics"),
 		m_cassette(*this, "cassette"),
+		m_cart(*this, "cartslot"),
 		m_ram(*this, RAM_TAG),
 		m_exp(*this, "exp"),
 		m_rtc(*this, "rtc"),
@@ -140,27 +143,14 @@ public:
 		m_bank14(*this, "bank14"),
 		m_bank15(*this, "bank15"),
 		m_bank16(*this, "bank16"),
-		m_io_keyboard_row_0(*this, "keyboard_row_0"),
-		m_io_keyboard_row_1(*this, "keyboard_row_1"),
-		m_io_keyboard_row_2(*this, "keyboard_row_2"),
-		m_io_keyboard_row_3(*this, "keyboard_row_3"),
-		m_io_keyboard_row_4(*this, "keyboard_row_4"),
-		m_io_keyboard_row_5(*this, "keyboard_row_5"),
-		m_io_keyboard_row_6(*this, "keyboard_row_6"),
-		m_io_keyboard_row_7(*this, "keyboard_row_7"),
-		m_io_keyboard_row_8(*this, "keyboard_row_8"),
-		m_io_keyboard_row_9(*this, "keyboard_row_9"),
-		m_io_keyboard_row_10(*this, "keyboard_row_10"),
-		m_io_solder_links(*this, "solder_links"),
-		m_io_green_display(*this, "green_display"),
-		m_io_ctrltype(*this,"controller_type"),
+		m_io_kbrow(*this, "kbrow"),
+		m_io_analog(*this, "analog"),
 		m_io_mouse1(*this,"mouse_input1"),
 		m_io_mouse2(*this,"mouse_input2"),
 		m_io_mouse3(*this,"mouse_input3"),
-		m_io_analog1(*this, "analog1"),
-		m_io_analog2(*this, "analog2"),
-		m_io_analog3(*this, "analog3"),
-		m_io_analog4(*this, "analog4"),
+		m_io_solder_links(*this, "solder_links"),
+		m_io_green_display(*this, "green_display"),
+		m_io_ctrltype(*this,"controller_type"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette") { }
 
@@ -171,6 +161,7 @@ public:
 	required_device<i8255_device> m_ppi;
 	optional_device<centronics_device> m_centronics;  // not on a GX4000
 	optional_device<cassette_image_device> m_cassette; // not on a GX4000, (or technically, the 6128+)
+	optional_device<generic_slot_device> m_cart;  // only on 664+, 6128+ and GX4000
 	required_device<ram_device> m_ram;
 	optional_device<cpc_expansion_slot_device> m_exp; // not on a GX4000
 	optional_device<mc146818_device> m_rtc;  // Aleste 520EX only
@@ -274,29 +265,18 @@ protected:
 	required_memory_bank m_bank14;
 	required_memory_bank m_bank15;
 	required_memory_bank m_bank16;
-	required_ioport m_io_keyboard_row_0;
-	required_ioport m_io_keyboard_row_1;
-	required_ioport m_io_keyboard_row_2;
-	required_ioport m_io_keyboard_row_3;
-	required_ioport m_io_keyboard_row_4;
-	required_ioport m_io_keyboard_row_5;
-	required_ioport m_io_keyboard_row_6;
-	required_ioport m_io_keyboard_row_7;
-	required_ioport m_io_keyboard_row_8;
-	required_ioport m_io_keyboard_row_9;
-	optional_ioport m_io_keyboard_row_10;
-	required_ioport m_io_solder_links;
-	required_ioport m_io_green_display;
-	optional_ioport m_io_ctrltype;
+	optional_ioport_array<11> m_io_kbrow;
+	optional_ioport_array<4> m_io_analog;
 	optional_ioport m_io_mouse1;
 	optional_ioport m_io_mouse2;
 	optional_ioport m_io_mouse3;
-	optional_ioport m_io_analog1;
-	optional_ioport m_io_analog2;
-	optional_ioport m_io_analog3;
-	optional_ioport m_io_analog4;
+	required_ioport m_io_solder_links;
+	required_ioport m_io_green_display;
+	optional_ioport m_io_ctrltype;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+
+	memory_region *m_region_cart;
 
 	void amstrad_init_lookups();
 	void amstrad_vh_update_mode();
