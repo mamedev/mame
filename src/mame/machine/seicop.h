@@ -44,7 +44,6 @@ private:
 	UINT16 m_cop_scale;
 	UINT8 m_cop_rng_max_value;
 	UINT16 m_copd2_offs;
-	UINT32 m_cop_register[8];
 	UINT16 m_cop_hit_status;
 	INT16 m_cop_hit_val_x,m_cop_hit_val_y,m_cop_hit_val_z,m_cop_hit_val_unk;
 	UINT32 m_cop_sort_lookup,m_cop_sort_ram_addr,m_cop_sort_param;
