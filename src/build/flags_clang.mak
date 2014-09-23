@@ -1,7 +1,6 @@
 CCOMFLAGS += \
 	-Wno-cast-align \
 	-Wno-tautological-compare \
-	-Wno-constant-logical-operand \
 	-Wno-format-security
 
 # caused by obj/sdl64d/emu/cpu/tms57002/tms57002.inc
@@ -9,6 +8,9 @@ CCOMFLAGS += -Wno-self-assign-field
 
 # caused by src/emu/cpu/tms34010/34010gfx.c
 CCOMFLAGS += -Wno-shift-count-overflow
+
+# caused by src/emu/cpu/h8/h8_timer16.c, src/mame/video/jagblit.inc, src/emu/video/stvvdp2.c
+CCOMFLAGS += -Wno-constant-logical-operand
 
 # TODO: needs to use $(CC)
 TEST_CLANG := $(shell clang --version)
@@ -18,7 +20,11 @@ CCOMFLAGS += -Wno-inline-new-delete
 endif
 
 ifeq ($(findstring 3.5,$(TEST_CLANG)),3.5)
-CCOMFLAGS += -Wno-inline-new-delete -Wno-absolute-value -Wno-dynamic-class-memaccess
+CCOMFLAGS += -Wno-inline-new-delete
+# caused by src/mess/drivers/x07.c, src/osd/sdl/window.c, src/emu/sound/disc_mth.inc
+CCOMFLAGS += -Wno-absolute-value
+# caused by src/emu/bus/isa/s3virge.c, src/emu/cpu/drcfe.c, src/emu/video/pc_vga.c
+CCOMFLAGS +=-Wno-dynamic-class-memaccess
 # these were disabled because of bugs in older clang versions
 CCOMFLAGS += -Wformat-security
 # these show up when compiling as c++11
