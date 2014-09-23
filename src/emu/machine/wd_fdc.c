@@ -38,7 +38,7 @@ const device_type WD1773x = &device_creator<wd1773_t>;
 #define TRACE_COMP 0
 
 // Shows command invocation
-#define TRACE_COMMAND 1
+#define TRACE_COMMAND 0
 
 // Shows sync actions
 #define TRACE_SYNC 0
@@ -203,7 +203,7 @@ astring wd_fdc_t::ttsn()
 
 void wd_fdc_t::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	if (TRACE_EVENT) logerror("%s: Event fired for timer %d\n", tag(), (int)id);
+	if (TRACE_EVENT) logerror("%s: Event fired for timer %s\n", tag(), (id==TM_GEN)? "TM_GEN" : (id==TM_CMD)? "TM_CMD" : (id==TM_TRACK)? "TM_TRACK" : "TM_SECTOR");
 	live_sync();
 
 	switch(id) {
@@ -273,7 +273,6 @@ void wd_fdc_t::seek_continue()
 			}
 
 			if(main_state == SEEK && track == data) {
-				logerror("track=%d data=%d\n", track, data);
 				sub_state = SEEK_DONE;
 			}
 
@@ -304,7 +303,7 @@ void wd_fdc_t::seek_continue()
 			return;
 
 		case SEEK_WAIT_STEP_TIME_DONE: {
-			if (TRACE_STATE) logerror("%s: SEEK_WAIT_STEP_TIME\n", tag());
+			if (TRACE_STATE) logerror("%s: SEEK_WAIT_STEP_TIME_DONE\n", tag());
 			bool done = false;
 			switch(main_state) {
 			case RESTORE:
@@ -392,7 +391,7 @@ void wd_fdc_t::seek_continue()
 bool wd_fdc_t::sector_matches() const
 {
 	if(TRACE_MATCH)
-		logerror("%s: matching %02x %02x %02x %02x - %02x %02x\n", tag(),
+		logerror("%s: matching read T=%02x H=%02x S=%02x L=%02x - searched T=%02x S=%02x\n", tag(),
 					cur_live.idbuf[0], cur_live.idbuf[1], cur_live.idbuf[2], cur_live.idbuf[3],
 					track, sector);
 
@@ -1490,7 +1489,6 @@ void wd_fdc_t::live_run(attotime limit)
 	for(;;) {
 		switch(cur_live.state) {
 		case SEARCH_ADDRESS_MARK_HEADER:
-			if (TRACE_STATE) logerror("%s: SEARCH_ADDRESS_MARK_HEADER\n", tag());
 			if(read_one_bit(limit))
 				return;
 
@@ -1524,8 +1522,6 @@ void wd_fdc_t::live_run(attotime limit)
 			break;
 
 		case READ_HEADER_BLOCK_HEADER: {
-			if (TRACE_STATE) logerror("%s: READ_HEADER_BLOCK_HEADER\n", tag());
-
 			if(read_one_bit(limit))
 				return;
 
@@ -1566,7 +1562,6 @@ void wd_fdc_t::live_run(attotime limit)
 		}
 
 		case READ_ID_BLOCK_TO_LOCAL: {
-			if (TRACE_STATE) logerror("%s: READ_ID_BLOCK_TO_LOCAL\n", tag());
 			if(read_one_bit(limit))
 				return;
 			if(cur_live.bit_counter & 15)
@@ -1582,7 +1577,6 @@ void wd_fdc_t::live_run(attotime limit)
 		}
 
 		case READ_ID_BLOCK_TO_DMA:
-			if (TRACE_STATE) logerror("%s: READ_ID_BLOCK_TO_DMA\n", tag());
 			if(read_one_bit(limit))
 				return;
 			if(cur_live.bit_counter & 15)
@@ -1591,7 +1585,6 @@ void wd_fdc_t::live_run(attotime limit)
 			return;
 
 		case READ_ID_BLOCK_TO_DMA_BYTE:
-			if (TRACE_STATE) logerror("%s: READ_ID_BLOCK_TO_DMA_BYTE\n", tag());
 			data = cur_live.data_reg;
 			if(cur_live.bit_counter == 16)
 				sector = data;
@@ -1612,7 +1605,6 @@ void wd_fdc_t::live_run(attotime limit)
 			break;
 
 		case SEARCH_ADDRESS_MARK_DATA:
-			if (TRACE_STATE) logerror("%s: SEARCH_ADDRESS_MARK_DATA\n", tag());
 			if(read_one_bit(limit))
 				return;
 
@@ -1660,7 +1652,6 @@ void wd_fdc_t::live_run(attotime limit)
 			break;
 
 		case READ_DATA_BLOCK_HEADER: {
-			if (TRACE_STATE) logerror("%s: READ_DATA_BLOCK_HEADER\n", tag());
 			if(read_one_bit(limit))
 				return;
 
@@ -1698,13 +1689,11 @@ void wd_fdc_t::live_run(attotime limit)
 		}
 
 		case SEARCH_ADDRESS_MARK_DATA_FAILED:
-			if (TRACE_STATE) logerror("%s: SEARCH_ADDRESS_MARK_DATA_FAILED\n", tag());
 			status |= S_RNF;
 			cur_live.state = IDLE;
 			return;
 
 		case READ_SECTOR_DATA: {
-			if (TRACE_STATE) logerror("%s: READ_SECTOR_DATA\n", tag());
 			if(read_one_bit(limit))
 				return;
 			if(cur_live.bit_counter & 15)
@@ -1726,7 +1715,6 @@ void wd_fdc_t::live_run(attotime limit)
 		}
 
 		case READ_SECTOR_DATA_BYTE:
-			if (TRACE_STATE) logerror("%s: READ_SECTOR_DATA_BYTE\n", tag());
 			data = cur_live.data_reg;
 			set_drq();
 			cur_live.state = READ_SECTOR_DATA;
@@ -1734,7 +1722,6 @@ void wd_fdc_t::live_run(attotime limit)
 			break;
 
 		case READ_TRACK_DATA: {
-			if (TRACE_STATE) logerror("%s: READ_TRACK_DATA\n", tag());
 			if(read_one_bit(limit))
 				return;
 			if(cur_live.bit_counter != 16
@@ -1764,7 +1751,6 @@ void wd_fdc_t::live_run(attotime limit)
 		}
 
 		case READ_TRACK_DATA_BYTE:
-			if (TRACE_STATE) logerror("%s: READ_TRACK_DATA_BYTE\n", tag());
 			data = cur_live.data_reg;
 			set_drq();
 			cur_live.state = READ_TRACK_DATA;
@@ -1772,7 +1758,6 @@ void wd_fdc_t::live_run(attotime limit)
 			break;
 
 		case WRITE_TRACK_DATA:
-			if (TRACE_STATE) logerror("%s: WRITE_TRACK_DATA\n", tag());
 			if(drq) {
 				status |= S_LOST;
 				data = 0;
@@ -1823,7 +1808,7 @@ void wd_fdc_t::live_run(attotime limit)
 					cur_live.previous_type = live_info::PT_NONE;
 					break;
 				case 0xfc:
-					live_write_raw(0xcf63);
+					live_write_raw(0xf77a);
 					cur_live.previous_type = live_info::PT_NONE;
 					break;
 				case 0xfe:
@@ -1870,7 +1855,6 @@ void wd_fdc_t::live_run(attotime limit)
 			break;
 
 		case WRITE_BYTE:
-			if (TRACE_STATE) logerror("%s: WRITE_BYTE\n", tag());
 			if(write_one_bit(limit))
 				return;
 			if(cur_live.bit_counter == 0) {
@@ -1882,7 +1866,6 @@ void wd_fdc_t::live_run(attotime limit)
 		case WRITE_BYTE_DONE:
 			switch(sub_state) {
 			case TRACK_DONE:
-				if (TRACE_STATE) logerror("%s: WRITE_BYTE_DONE / TRACK_DONE\n", tag());
 				if(cur_live.previous_type == live_info::PT_CRC_1) {
 					cur_live.previous_type = live_info::PT_CRC_2;
 					if(dden)
@@ -1897,7 +1880,6 @@ void wd_fdc_t::live_run(attotime limit)
 				break;
 
 			case SECTOR_WRITE:
-				if (TRACE_STATE) logerror("%s: WRITE_BYTE_DONE / SECTOR_WRITE\n", tag());
 				cur_live.state = WRITE_BYTE;
 				cur_live.bit_counter = 16;
 				cur_live.byte_counter++;
@@ -1976,7 +1958,6 @@ void wd_fdc_t::live_run(attotime limit)
 			break;
 
 		case WRITE_SECTOR_PRE:
-			if (TRACE_STATE) logerror("%s: WRITE_SECTOR_PRE\n", tag());
 			if(read_one_bit(limit))
 				return;
 			if(cur_live.bit_counter != 16)
@@ -1985,7 +1966,6 @@ void wd_fdc_t::live_run(attotime limit)
 			return;
 
 		case WRITE_SECTOR_PRE_BYTE:
-			if (TRACE_STATE) logerror("%s: WRITE_SECTOR_PRE_BYTE\n", tag());
 			cur_live.state = WRITE_SECTOR_PRE;
 			cur_live.byte_counter++;
 			cur_live.bit_counter = 0;
@@ -1995,16 +1975,9 @@ void wd_fdc_t::live_run(attotime limit)
 				checkpoint();
 				break;
 
-			// MZ: There is an inconsistency in the wd177x specs.
-			// The flow chart of wd177x for sector writing (page 1-12)
-			// says that after the sector header there is a 11 byte delay
-			// before the DR check and another 1 byte delay to the start of
-			// writing 0x00 (for FM). For MFM we have an additional 11 byte
-			// delay before the 0x00 sequence.
-			// However, the text of the section "Write sector" (1-9) and
-			// pages 1-17 and 1-18 imply that in Gap 2, the 0x00 sequence
-			// starts 11 bytes after the CRC field in FM and 22 bytes after
-			// the CRC field in MFM.
+			// MZ: There is an inconsistency in the wd177x specs; compare
+			// the flow chart and the text of the section "Write sector" (1-9) and
+			// pages 1-17 and 1-18.
 			//
 			// I suppose the sum of the delays in the flow chart should be
 			// 11 and 22, so we shorten the 9-byte delay to 8 bytes.
