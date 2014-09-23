@@ -26,34 +26,20 @@ public:
 		  raiden2_tilemap_enable(0),
 		  prg_bank(0),
 		  cop_bank(0),
-		  cop_status(0),
-		  cop_scale(0),
 
-		  cop_angle(0),
-		  cop_dist(0),
-
-		  cop_angle_target(0),
-		  cop_angle_step(0),
 		  sprite_prot_x(0),
 		  sprite_prot_y(0),
 		  dst1(0),
 		  cop_spr_maxx(0),
 		  cop_spr_off(0),
-		  cop_hit_status(0),
-		  cop_hit_baseadr(0),
-		  cop_sort_ram_addr(0),
-		  cop_sort_lookup(0),
-		  cop_sort_param(0),
+	
 		  tile_buffer(320, 256),
 		  sprite_buffer(320, 256),
 		  m_raiden2cop(*this, "raiden2cop")
 	{
-		  memset(scrollvals, 0, sizeof(UINT16)*6);
-		  memset(cop_regs, 0, sizeof(UINT32)*8);
+		memset(scrollvals, 0, sizeof(UINT16)*6);
+		memset(sprite_prot_src_addr, 0, sizeof(UINT16)*2);
 
-
-		  memset(sprite_prot_src_addr, 0, sizeof(UINT16)*2);
-		  memset(cop_collision_info, 0, sizeof(colinfo)*2);
 	}
 
 	UINT16 *back_data, *fore_data, *mid_data, *text_data; // private buffers, allocated in init
@@ -64,25 +50,7 @@ public:
 	required_device<palette_device> m_palette;
 
 
-	DECLARE_WRITE16_MEMBER( cop_scale_w );
-	DECLARE_WRITE16_MEMBER( cop_angle_target_w );
-	DECLARE_WRITE16_MEMBER( cop_angle_step_w );
 
-	DECLARE_READ16_MEMBER ( cop_reg_high_r );
-	DECLARE_WRITE16_MEMBER( cop_reg_high_w );
-	DECLARE_READ16_MEMBER ( cop_reg_low_r );
-	DECLARE_WRITE16_MEMBER( cop_reg_low_w );
-
-	DECLARE_WRITE16_MEMBER( cop_cmd_w );
-	DECLARE_READ16_MEMBER ( cop_collision_status_r );
-	DECLARE_READ16_MEMBER (cop_collision_status_val_r);
-	DECLARE_READ16_MEMBER (cop_collision_status_stat_r);
-
-	DECLARE_READ16_MEMBER ( cop_status_r );
-	DECLARE_READ16_MEMBER ( cop_dist_r );
-	DECLARE_READ16_MEMBER ( cop_angle_r );
-	DECLARE_WRITE16_MEMBER( cop_angle_compare_w );
-	DECLARE_WRITE16_MEMBER( cop_angle_mod_val_w );
 
 	DECLARE_WRITE16_MEMBER ( raiden2_bank_w );
 	DECLARE_READ16_MEMBER ( cop_tile_bank_2_r );
@@ -107,10 +75,6 @@ public:
 	DECLARE_WRITE16_MEMBER( sprcpt_flags_1_w );
 	DECLARE_WRITE16_MEMBER( sprcpt_flags_2_w );
 
-	DECLARE_WRITE16_MEMBER( mcu_prog_w );
-	DECLARE_WRITE16_MEMBER( mcu_prog_w2 );
-	DECLARE_WRITE16_MEMBER( mcu_prog_offs_w );
-
 	DECLARE_READ16_MEMBER( raiden2_sound_comms_r );
 	DECLARE_WRITE16_MEMBER( raiden2_sound_comms_w );
 
@@ -131,12 +95,6 @@ public:
 	UINT16 cop_bank;
 
 	UINT16 scrollvals[6];
-	UINT32 cop_regs[8];
-	UINT16 cop_status, cop_scale, cop_angle, cop_dist;
-	
-
-	UINT16 cop_angle_target;
-	UINT16 cop_angle_step;
 
 
 
@@ -156,36 +114,12 @@ public:
 	UINT16 sprite_prot_x,sprite_prot_y,dst1,cop_spr_maxx,cop_spr_off;
 	UINT16 sprite_prot_src_addr[2];
 
-	struct colinfo {
-		INT16 pos[3];
-		INT8 dx[3];
-		UINT8 size[3];
-		bool allow_swap;
-		UINT16 flags_swap;
-		UINT32 spradr;
-	};
 
-	colinfo cop_collision_info[2];
-
-	UINT16 cop_hit_status, cop_hit_baseadr;
-	INT16 cop_hit_val[3];
-	UINT16 cop_hit_val_stat;
 
 	void draw_sprites(const rectangle &cliprect);
 
-	void cop_collision_read_pos(address_space &space, int slot, UINT32 spradr, bool allow_swap);
-	void cop_collision_update_hitbox(address_space &space, int slot, UINT32 hitadr);
 
-	DECLARE_WRITE16_MEMBER(cop_hitbox_baseadr_w);
-	DECLARE_WRITE16_MEMBER(cop_sort_lookup_hi_w);
-	DECLARE_WRITE16_MEMBER(cop_sort_lookup_lo_w);
-	DECLARE_WRITE16_MEMBER(cop_sort_ram_addr_hi_w);
-	DECLARE_WRITE16_MEMBER(cop_sort_ram_addr_lo_w);
-	DECLARE_WRITE16_MEMBER(cop_sort_param_w);
-	DECLARE_WRITE16_MEMBER(cop_sort_dma_trig_w);
 
-	UINT32 cop_sort_ram_addr, cop_sort_lookup;
-	UINT16 cop_sort_param;
 	const int *cur_spri; // cfg
 
 	DECLARE_DRIVER_INIT(raidendx);

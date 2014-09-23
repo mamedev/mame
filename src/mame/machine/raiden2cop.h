@@ -84,6 +84,66 @@ public:
 	UINT8 m_cop_itoa_unused_digit_value;
 
 	static void set_itoa_unused_digit_value(device_t &device, int value) { downcast<raiden2cop_device &>(device).m_cop_itoa_unused_digit_value = value; }
+
+	// Main COP functionality
+
+	DECLARE_WRITE16_MEMBER( cop_scale_w );
+	DECLARE_WRITE16_MEMBER( cop_angle_target_w );
+	DECLARE_WRITE16_MEMBER( cop_angle_step_w );
+
+	DECLARE_READ16_MEMBER ( cop_reg_high_r );
+	DECLARE_WRITE16_MEMBER( cop_reg_high_w );
+	DECLARE_READ16_MEMBER ( cop_reg_low_r );
+	DECLARE_WRITE16_MEMBER( cop_reg_low_w );
+
+	DECLARE_WRITE16_MEMBER( cop_cmd_w );
+	DECLARE_READ16_MEMBER ( cop_collision_status_r );
+	DECLARE_READ16_MEMBER (cop_collision_status_val_r);
+	DECLARE_READ16_MEMBER (cop_collision_status_stat_r);
+
+	DECLARE_READ16_MEMBER ( cop_status_r );
+	DECLARE_READ16_MEMBER ( cop_dist_r );
+	DECLARE_READ16_MEMBER ( cop_angle_r );
+	DECLARE_WRITE16_MEMBER( cop_angle_compare_w );
+	DECLARE_WRITE16_MEMBER( cop_angle_mod_val_w );
+
+	DECLARE_WRITE16_MEMBER(cop_hitbox_baseadr_w);
+	DECLARE_WRITE16_MEMBER(cop_sort_lookup_hi_w);
+	DECLARE_WRITE16_MEMBER(cop_sort_lookup_lo_w);
+	DECLARE_WRITE16_MEMBER(cop_sort_ram_addr_hi_w);
+	DECLARE_WRITE16_MEMBER(cop_sort_ram_addr_lo_w);
+	DECLARE_WRITE16_MEMBER(cop_sort_param_w);
+	DECLARE_WRITE16_MEMBER(cop_sort_dma_trig_w);
+
+	UINT32 cop_regs[8];
+	UINT16 cop_status, cop_scale, cop_angle, cop_dist;
+	
+
+	UINT16 cop_angle_target;
+	UINT16 cop_angle_step;
+
+
+	struct colinfo {
+		INT16 pos[3];
+		INT8 dx[3];
+		UINT8 size[3];
+		bool allow_swap;
+		UINT16 flags_swap;
+		UINT32 spradr;
+	};
+
+	colinfo cop_collision_info[2];
+
+	UINT16 cop_hit_status, cop_hit_baseadr;
+	INT16 cop_hit_val[3];
+	UINT16 cop_hit_val_stat;
+
+	void cop_collision_read_pos(address_space &space, int slot, UINT32 spradr, bool allow_swap);
+	void cop_collision_update_hitbox(address_space &space, int slot, UINT32 hitadr);
+
+	UINT32 cop_sort_ram_addr, cop_sort_lookup;
+	UINT16 cop_sort_param;
+
 protected:
 	// device-level overrides
 	virtual void device_start();
