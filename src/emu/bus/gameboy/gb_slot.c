@@ -57,8 +57,7 @@ device_gb_cart_interface::~device_gb_cart_interface()
 
 void device_gb_cart_interface::rom_alloc(UINT32 size)
 {
-	if (m_rom == NULL)
-		m_rom.resize(size);
+	m_rom.resize(size);
 }
 
 
@@ -68,11 +67,8 @@ void device_gb_cart_interface::rom_alloc(UINT32 size)
 
 void device_gb_cart_interface::ram_alloc(UINT32 size)
 {
-	if (m_ram == NULL)
-	{
-		m_ram.resize(size);
-		device().save_item(NAME(m_ram));
-	}
+	m_ram.resize(size);
+	device().save_item(NAME(m_ram));
 }
 
 
@@ -447,7 +443,7 @@ void base_gb_cart_slot_device::setup_ram(UINT8 banks)
 
 bool base_gb_cart_slot_device::call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry)
 {
-	load_software_part_region(*this, swlist, swname, start_entry );
+	load_software_part_region(*this, swlist, swname, start_entry);
 	return true;
 }
 

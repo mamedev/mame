@@ -72,14 +72,11 @@ device_sega8_cart_interface::~device_sega8_cart_interface()
 
 void device_sega8_cart_interface::rom_alloc(UINT32 size)
 {
-	if (m_rom == NULL)
-	{
-		m_rom.resize(size);
-		m_rom_page_count = size / 0x4000;
-		if (!m_rom_page_count)
-			m_rom_page_count = 1;   // we compute rom pages through (XXX % m_rom_page_count)!
-		late_bank_setup();
-	}
+	m_rom.resize(size);
+	m_rom_page_count = size / 0x4000;
+	if (!m_rom_page_count)
+		m_rom_page_count = 1;   // we compute rom pages through (XXX % m_rom_page_count)!
+	late_bank_setup();
 }
 
 
@@ -89,11 +86,8 @@ void device_sega8_cart_interface::rom_alloc(UINT32 size)
 
 void device_sega8_cart_interface::ram_alloc(UINT32 size)
 {
-	if (m_ram == NULL)
-	{
-		m_ram.resize(size);
-		device().save_item(NAME(m_ram));
-	}
+	m_ram.resize(size);
+	device().save_item(NAME(m_ram));
 }
 
 

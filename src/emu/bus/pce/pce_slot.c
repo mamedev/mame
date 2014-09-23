@@ -44,8 +44,7 @@ device_pce_cart_interface::~device_pce_cart_interface()
 
 void device_pce_cart_interface::rom_alloc(UINT32 size)
 {
-	if (m_rom == NULL)
-		m_rom.resize(size);
+	m_rom.resize(size);
 }
 
 
@@ -55,11 +54,8 @@ void device_pce_cart_interface::rom_alloc(UINT32 size)
 
 void device_pce_cart_interface::ram_alloc(UINT32 size)
 {
-	if (m_ram == NULL)
-	{
-		m_ram.resize(size);
-		device().save_item(NAME(m_ram));
-	}
+	m_ram.resize(size);
+	device().save_item(NAME(m_ram));
 }
 
 //-------------------------------------------------
@@ -69,8 +65,6 @@ void device_pce_cart_interface::ram_alloc(UINT32 size)
 
 void device_pce_cart_interface::rom_map_setup(UINT32 size)
 {
-	int i;
-
 	if (size == 0x60000)
 	{
 		// HuCard 384K are mapped with mirrored pieces
@@ -85,6 +79,8 @@ void device_pce_cart_interface::rom_map_setup(UINT32 size)
 	}
 	else
 	{
+		int i;
+
 		// setup the rom_bank_map array to faster ROM read
 		for (i = 0; i < size / 0x20000 && i < 8; i++)
 			rom_bank_map[i] = i;
@@ -281,7 +277,7 @@ void pce_cart_slot_device::call_unload()
 
 bool pce_cart_slot_device::call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry)
 {
-	load_software_part_region(*this, swlist, swname, start_entry );
+	load_software_part_region(*this, swlist, swname, start_entry);
 	return TRUE;
 }
 

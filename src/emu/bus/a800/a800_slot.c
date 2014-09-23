@@ -59,13 +59,10 @@ device_a800_cart_interface::~device_a800_cart_interface ()
 
 void device_a800_cart_interface::rom_alloc(UINT32 size)
 {
-	if (m_rom == NULL)
-	{
-		m_rom.resize(size);
-		
-		// setup other helpers
-		m_bank_mask = (size / 0x2000) - 1;	// code for XEGS carts makes use of this to simplify banking
-	}
+	m_rom.resize(size);
+	
+	// setup other helpers
+	m_bank_mask = (size / 0x2000) - 1;	// code for XEGS carts makes use of this to simplify banking
 }
 
 //-------------------------------------------------
@@ -74,11 +71,8 @@ void device_a800_cart_interface::rom_alloc(UINT32 size)
 
 void device_a800_cart_interface::ram_alloc(UINT32 size)
 {
-	if (m_ram == NULL)
-	{
-		m_ram.resize(size);
-		device().save_item(NAME(m_ram));
-	}
+	m_ram.resize(size);
+	device().save_item(NAME(m_ram));
 }
 
 
@@ -88,11 +82,8 @@ void device_a800_cart_interface::ram_alloc(UINT32 size)
 
 void device_a800_cart_interface::nvram_alloc(UINT32 size)
 {
-	if (m_nvram == NULL)
-	{
-		m_nvram.resize(size);
-		device().save_item(NAME(m_nvram));
-	}
+	m_nvram.resize(size);
+	device().save_item(NAME(m_nvram));
 }
 
 
@@ -109,7 +100,6 @@ a800_cart_slot_device::a800_cart_slot_device(const machine_config &mconfig, devi
 						device_image_interface(mconfig, *this),
 						device_slot_interface(mconfig, *this)
 {
-	m_type = A800_NOCART;
 }
 
 a800_cart_slot_device::a800_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
@@ -117,7 +107,6 @@ a800_cart_slot_device::a800_cart_slot_device(const machine_config &mconfig, cons
 						device_image_interface(mconfig, *this),
 						device_slot_interface(mconfig, *this)
 {
-	m_type = A800_NOCART;
 }
 
 
@@ -215,8 +204,7 @@ static const a800_slot slot_list[] =
 	{ A5200_32K,      "a5200" },
 	{ A5200_16K_2CHIPS, "a5200_2chips" },
 	{ A5200_32K,      "a5200" },
-	{ A5200_BBSB,     "a5200_bbsb" },
-	{ A800_NOCART,    "empty" },
+	{ A5200_BBSB,     "a5200_bbsb" }
 };
 
 
@@ -314,7 +302,7 @@ void a800_cart_slot_device::call_unload()
 
 bool a800_cart_slot_device::call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry)
 {
-	load_software_part_region(*this, swlist, swname, start_entry );
+	load_software_part_region(*this, swlist, swname, start_entry);
 	return TRUE;
 }
 

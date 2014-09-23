@@ -62,21 +62,18 @@ device_a78_cart_interface::~device_a78_cart_interface ()
 
 void device_a78_cart_interface::rom_alloc(UINT32 size)
 {
-	if (m_rom == NULL)
-	{
-		m_rom.resize(size);
-		
-		// setup other helpers
-		if ((size / 0x4000) & 1) // compensate for SuperGame carts with 9 x 16K banks (to my knowledge no other cart has m_bank_mask != power of 2)
-			m_bank_mask = (size / 0x4000) - 2;
-		else
-			m_bank_mask = (size / 0x4000) - 1;
-		
-		// the rom is mapped to the top of the memory area
-		// so we store the starting point of data to simplify 
-		// the access handling
-		m_base_rom = 0x10000 - size;
-	}
+	m_rom.resize(size);
+	
+	// setup other helpers
+	if ((size / 0x4000) & 1) // compensate for SuperGame carts with 9 x 16K banks (to my knowledge no other cart has m_bank_mask != power of 2)
+		m_bank_mask = (size / 0x4000) - 2;
+	else
+		m_bank_mask = (size / 0x4000) - 1;
+	
+	// the rom is mapped to the top of the memory area
+	// so we store the starting point of data to simplify 
+	// the access handling
+	m_base_rom = 0x10000 - size;
 }
 
 //-------------------------------------------------
@@ -85,11 +82,8 @@ void device_a78_cart_interface::rom_alloc(UINT32 size)
 
 void device_a78_cart_interface::ram_alloc(UINT32 size)
 {
-	if (m_ram == NULL)
-	{
-		m_ram.resize(size);
-		device().save_item(NAME(m_ram));
-	}
+	m_ram.resize(size);
+	device().save_item(NAME(m_ram));
 }
 
 
@@ -99,11 +93,8 @@ void device_a78_cart_interface::ram_alloc(UINT32 size)
 
 void device_a78_cart_interface::nvram_alloc(UINT32 size)
 {
-	if (m_nvram == NULL)
-	{
-		m_nvram.resize(size);
-		device().save_item(NAME(m_nvram));
-	}
+	m_nvram.resize(size);
+	device().save_item(NAME(m_nvram));
 }
 
 
@@ -120,7 +111,6 @@ a78_cart_slot_device::a78_cart_slot_device(const machine_config &mconfig, const 
 						device_image_interface(mconfig, *this),
 						device_slot_interface(mconfig, *this)
 {
-	m_type = A78_NOCART;
 }
 
 
@@ -321,8 +311,7 @@ static const a78_slot slot_list[] =
 	{ A78_TYPE1_POK450, "a78_p450_t1" },
 	{ A78_TYPE6_POK450, "a78_p450_t6" },
 	{ A78_TYPEA_POK450, "a78_p450_ta" },
-	{ A78_VERSA_POK450, "a78_p450_vb" },
-	{ A78_NOCART,     "empty" },	// the code should never get here, of course...
+	{ A78_VERSA_POK450, "a78_p450_vb" }
 };
 
 static int a78_get_pcb_id(const char *slot)
@@ -508,7 +497,7 @@ void a78_cart_slot_device::call_unload()
 
 bool a78_cart_slot_device::call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry)
 {
-	load_software_part_region(*this, swlist, swname, start_entry );
+	load_software_part_region(*this, swlist, swname, start_entry);
 	return TRUE;
 }
 

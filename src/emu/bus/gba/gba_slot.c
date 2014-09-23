@@ -46,11 +46,8 @@ device_gba_cart_interface::~device_gba_cart_interface()
 
 void device_gba_cart_interface::nvram_alloc(UINT32 size)
 {
-	if (m_nvram == NULL)
-	{
-		m_nvram.resize(size/sizeof(UINT32));
-		device().save_item(NAME(m_nvram));
-	}
+	m_nvram.resize(size/sizeof(UINT32));
+	device().save_item(NAME(m_nvram));
 }
 
 
@@ -239,7 +236,7 @@ void gba_cart_slot_device::call_unload()
 
 bool gba_cart_slot_device::call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry)
 {
-	load_software_part_region(*this, swlist, swname, start_entry );
+	load_software_part_region(*this, swlist, swname, start_entry);
 	return TRUE;
 }
 

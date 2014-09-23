@@ -86,8 +86,7 @@ device_sns_cart_interface::~device_sns_cart_interface()
 
 void device_sns_cart_interface::rom_alloc(UINT32 size)
 {
-	if (m_rom == NULL)
-		m_rom.resize(size);
+	m_rom.resize(size);
 }
 
 
@@ -97,11 +96,8 @@ void device_sns_cart_interface::rom_alloc(UINT32 size)
 
 void device_sns_cart_interface::nvram_alloc(UINT32 size)
 {
-	if (m_nvram == NULL)
-	{
-		m_nvram.resize(size);
-		device().save_item(NAME(m_nvram));
-	}
+	m_nvram.resize(size);
+	device().save_item(NAME(m_nvram));
 }
 
 
@@ -114,11 +110,8 @@ void device_sns_cart_interface::nvram_alloc(UINT32 size)
 
 void device_sns_cart_interface::rtc_ram_alloc(UINT32 size)
 {
-	if (m_rtc_ram == NULL)
-	{
-		m_rtc_ram.resize(size);
-		device().save_item(NAME(m_rtc_ram));
-	}
+	m_rtc_ram.resize(size);
+	device().save_item(NAME(m_rtc_ram));
 }
 
 
@@ -129,8 +122,7 @@ void device_sns_cart_interface::rtc_ram_alloc(UINT32 size)
 
 void device_sns_cart_interface::addon_bios_alloc(UINT32 size)
 {
-	if (m_bios == NULL)
-		m_bios.resize(size);
+	m_bios.resize(size);
 }
 
 

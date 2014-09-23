@@ -78,13 +78,6 @@ enum
 };
 
 
-// ======================> md_cart_interface
-
-struct md_cart_interface
-{
-};
-
-
 // ======================> device_md_cart_interface
 
 class device_md_cart_interface : public device_slot_card_interface
@@ -138,7 +131,6 @@ public:
 // ======================> base_md_cart_slot_device
 
 class base_md_cart_slot_device : public device_t,
-								public md_cart_interface,
 								public device_image_interface,
 								public device_slot_interface
 {
