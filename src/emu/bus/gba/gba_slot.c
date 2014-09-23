@@ -47,7 +47,6 @@ device_gba_cart_interface::~device_gba_cart_interface()
 void device_gba_cart_interface::nvram_alloc(UINT32 size)
 {
 	m_nvram.resize(size/sizeof(UINT32));
-	device().save_item(NAME(m_nvram));
 }
 
 

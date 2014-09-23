@@ -2121,6 +2121,9 @@ void gba_state::machine_start()
 	// install the cart ROM into the address map, if present
 	m_cartslot->install_rom();
 
+	// add nvram to save state
+	m_cartslot->save_nvram();
+
 	// install the cart NVRAM handlers if necessary
 	if (m_cartslot->get_type() == GBA_SRAM)
 	{

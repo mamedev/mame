@@ -97,7 +97,6 @@ void device_sns_cart_interface::rom_alloc(UINT32 size)
 void device_sns_cart_interface::nvram_alloc(UINT32 size)
 {
 	m_nvram.resize(size);
-	device().save_item(NAME(m_nvram));
 }
 
 
@@ -111,7 +110,6 @@ void device_sns_cart_interface::nvram_alloc(UINT32 size)
 void device_sns_cart_interface::rtc_ram_alloc(UINT32 size)
 {
 	m_rtc_ram.resize(size);
-	device().save_item(NAME(m_rtc_ram));
 }
 
 

@@ -41,6 +41,8 @@ public:
 	UINT32 get_nvram_size() { return m_nvram.bytes(); }
 	void set_rom_size(UINT32 val) { m_rom_size = val; }
 
+	void save_nvram()	{ device().save_item(NAME(m_nvram)); }
+
 	// internal state
 	UINT32 *m_rom;  // this points to the cart rom region
 	dynamic_array<UINT32> m_nvram;
@@ -75,6 +77,8 @@ public:
 
 	void setup_ram(UINT8 banks);
 	void internal_header_logging(UINT8 *ROM, UINT32 len);
+
+	void save_nvram()	{ if (m_cart && m_cart->get_nvram_size()) m_cart->save_nvram(); }
 
 	virtual iodevice_t image_type() const { return IO_CARTSLOT; }
 	virtual bool is_readable()  const { return 1; }

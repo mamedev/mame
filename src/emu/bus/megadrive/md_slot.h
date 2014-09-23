@@ -108,6 +108,8 @@ public:
 	virtual UINT32 get_nvram_size() { return m_nvram.bytes(); };
 	virtual void set_bank_to_rom(const char *banktag, UINT32 offset) {};
 
+	void save_nvram() { device().save_item(NAME(m_nvram)); }
+
 	void rom_map_setup(UINT32 size);
 	UINT32 get_padded_size(UINT32 size);
 
@@ -169,6 +171,8 @@ public:
 	void setup_nvram();
 	void set_must_be_loaded(bool _must_be_loaded) { m_must_be_loaded = _must_be_loaded; }
 	void file_logging(UINT8 *ROM, UINT32 rom_len, UINT32 nvram_len);
+
+	void save_nvram() { if (m_cart && m_cart->get_nvram_size()) m_cart->save_nvram(); }
 
 	// reading and writing
 	virtual DECLARE_READ16_MEMBER(read);

@@ -265,6 +265,9 @@ MACHINE_START_MEMBER(md_cons_state, md_common)
 		m_io_timeout[i] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(md_base_state::io_timeout_timer_callback),this), (void*)(FPTR)i);
 
 	m_vdp->stop_timers();
+
+	if (m_slotcart)
+		m_slotcart->save_nvram();
 }
 
 MACHINE_START_MEMBER(md_cons_state, ms_megadriv)

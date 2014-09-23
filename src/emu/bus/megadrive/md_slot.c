@@ -99,7 +99,6 @@ void device_md_cart_interface::rom_alloc(size_t size, const char *tag)
 void device_md_cart_interface::nvram_alloc(size_t size)
 {
 	m_nvram.resize(size/sizeof(UINT16));
-	device().save_item(NAME(m_nvram));
 }
 
 //-------------------------------------------------

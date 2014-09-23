@@ -125,6 +125,8 @@ public:
 	UINT32 get_rtc_ram_size() { return m_rtc_ram.count(); };
 
 	void rom_map_setup(UINT32 size);
+	void save_nvram()	{ device().save_item(NAME(m_nvram)); }
+	void save_rtc_ram()	{ device().save_item(NAME(m_rtc_ram)); }
 
 	// internal state
 	dynamic_buffer m_rom;
@@ -162,6 +164,9 @@ public:
 
 	void setup_nvram();
 	void internal_header_logging(UINT8 *ROM, UINT32 len);
+
+	void save_ram()	{ if (m_cart && m_cart->get_nvram_size()) m_cart->save_nvram(); 
+					if (m_cart && m_cart->get_rtc_ram_size()) m_cart->save_rtc_ram(); }
 
 	virtual iodevice_t image_type() const { return IO_CARTSLOT; }
 	virtual bool is_readable()  const { return 1; }

@@ -831,6 +831,9 @@ MACHINE_START_MEMBER(sms_state,sms)
 			m_cards[i] = machine().device<sega8_card_slot_device>(str);
 		}
 	}
+
+	if (m_cartslot)
+		m_cartslot->save_ram();
 }
 
 MACHINE_RESET_MEMBER(sms_state,sms)

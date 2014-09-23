@@ -1932,6 +1932,9 @@ void snes_console_state::machine_start()
 		save_item(NAME(m_scope[i].fire_lock), i);
 		save_item(NAME(m_scope[i].offscreen), i);
 	}
+
+	if (m_cartslot)
+		m_cartslot->save_ram();
 }
 
 void snes_console_state::machine_reset()
