@@ -738,7 +738,7 @@ WRITE8_MEMBER(taitojc_state::hc11_output_w)
 
 READ8_MEMBER(taitojc_state::hc11_analog_r)
 {
-	return m_analog_ports[offset]->read_safe(0);
+	return m_analog_inp[offset]->read_safe(0);
 }
 
 

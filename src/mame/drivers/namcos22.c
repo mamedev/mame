@@ -2796,7 +2796,7 @@ READ8_MEMBER(namcos22_state::mcu_port7_r)
 
 READ8_MEMBER(namcos22_state::namcos22s_mcu_adc_r)
 {
-	UINT16 adc = m_adc_ports[offset >> 1 & 7]->read_safe(0) << 2;
+	UINT16 adc = m_adc_inp[offset >> 1 & 7]->read_safe(0) << 2;
 	return (offset & 1) ? adc >> 8 : adc;
 }
 

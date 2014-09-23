@@ -1377,7 +1377,7 @@ public:
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_generic_paletteram_32(*this, "paletteram"),
-		m_adc_ports(*this, "ADC")
+		m_adc_inp(*this, "ADC")
 	{ }
 
 	required_device<mips3_device> m_maincpu;
@@ -1402,7 +1402,7 @@ public:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	required_shared_ptr<UINT32> m_generic_paletteram_32;
-	optional_ioport_array<4> m_adc_ports;
+	optional_ioport_array<4> m_adc_inp;
 
 	c404_t m_c404;
 	c361_t m_c361;
@@ -2962,7 +2962,7 @@ WRITE16_MEMBER(namcos23_state::iob_p6_w)
 
 READ16_MEMBER(namcos23_state::iob_analog_r)
 {
-	return m_adc_ports[offset & 3]->read_safe(0);
+	return m_adc_inp[offset & 3]->read_safe(0);
 }
 
 
