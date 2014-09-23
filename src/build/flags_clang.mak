@@ -9,7 +9,7 @@ CCOMFLAGS += -Wno-self-assign-field
 # caused by src/emu/cpu/tms34010/34010gfx.c
 CCOMFLAGS += -Wno-shift-count-overflow
 
-# caused by src/emu/cpu/h8/h8_timer16.c, src/emu/video/stvvdp2.c
+# caused by src/emu/video/stvvdp2.c
 CCOMFLAGS += -Wno-constant-logical-operand
 
 # TODO: needs to use $(CC)

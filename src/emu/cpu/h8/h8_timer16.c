@@ -1,6 +1,8 @@
 #include "emu.h"
 #include "h8_timer16.h"
 
+#define LOG_EVENT_TIME 0
+
 const device_type H8_TIMER16          = &device_creator<h8_timer16_device>;
 const device_type H8_TIMER16_CHANNEL  = &device_creator<h8_timer16_channel_device>;
 const device_type H8H_TIMER16_CHANNEL = &device_creator<h8h_timer16_channel_device>;
@@ -296,7 +298,7 @@ void h8_timer16_channel_device::recalc_event(UINT64 cur_time)
 		else
 			event_time = 0;
 
-		if(event_time && 0)
+		if(LOG_EVENT_TIME && event_time)
 			logerror("%s: next event in %d cycles (%ld)\n", tag(), int(event_time - cpu->total_cycles()), long(event_time));
 
 	} else {
