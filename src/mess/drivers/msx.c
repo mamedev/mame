@@ -51,17 +51,14 @@
 ** - fsa1st: Add Turbo-R support
 ** - canonv20e/f/g/s: Investigate different keyboard layouts
 ** - canonv30: Mapper RAM size unknown
-** - canonv30/canonv30f: Fix floppy
 ** - mx101: External antenna not emulated
 ** - pv7: Add support for KB-7 (8KB ram + 2 cartslots)
 ** - cpc50a/cpc50b: Remove keyboard; and add an external keyboard??
 ** - cpc51/cpc61: Remove keyboard and add a keyboard connector
 ** - cpc50a/cpc50b/cpc51: Boot to a black screen, is this correct?
 ** - mbh2: speed controller not implemented
-** - mbh70: Floppy support broken
 ** - mbh70: Verify firmware operation
 ** - kmc5000: Floppy supprt broken
-** - mlg3: Floppy support broken
 ** - mlg3: rs232c not emulated
 ** - perfect1: Firmware broken
 ** - mpc2500f: Fix keyboard layout?
@@ -70,7 +67,6 @@
 ** - mpc27: Light pen not emulated
 ** - phc77: firmware not emulated
 ** - phc77: printer not emulated
-** - hb701fd: Floppy support broken
 ** - hx21, hx22: Hook up kanji rom
 ** - hx21, hx22: Does not start firmware
 ** - hx34, hx34i: Floppy support broken
@@ -3436,7 +3432,7 @@ ROM_END
 
 static MACHINE_CONFIG_DERIVED( hb701fd, msx_ntsc )
 	// YM2149 (in S-1985)
-	// FDC: ??, 1 3.5" SSDD? drive
+	// FDC: WD2793?, 1 3.5" SSDD drive
 	// 2 Cartridge slots
 	// S-1985 MSX Engine
 
@@ -3444,6 +3440,11 @@ static MACHINE_CONFIG_DERIVED( hb701fd, msx_ntsc )
 	MCFG_MSX_LAYOUT_CARTRIDGE("cartslot1", 1, 0)
 	MCFG_MSX_LAYOUT_CARTRIDGE("cartslot2", 2, 0)
 	MCFG_MSX_LAYOUT_RAM("ram", 3, 0, 0, 4)  /* 64KB RAM */
+	MCFG_MSX_LAYOUT_DISK1("disk", 3, 1, 1, 1, "maincpu", 0x8000) // Is this correct??
+
+	MCFG_FRAGMENT_ADD( msx_wd2793_force_ready )
+	MCFG_FRAGMENT_ADD( msx_1_35_ssdd_drive )
+	MCFG_FRAGMENT_ADD( msx1_floplist )
 
 	MCFG_FRAGMENT_ADD( msx1_cartlist )
 MACHINE_CONFIG_END
@@ -4487,7 +4488,7 @@ static MACHINE_CONFIG_DERIVED( canonv30, msx2 )
 
 	MCFG_MSX_S1985_ADD("s1985")
 
-	MCFG_FRAGMENT_ADD( msx_wd2793_force_ready )
+	MCFG_FRAGMENT_ADD( msx_wd2793 )
 	MCFG_FRAGMENT_ADD( msx_2_35_dd_drive )
 	MCFG_FRAGMENT_ADD( msx2_floplist )
 
@@ -4518,7 +4519,7 @@ static MACHINE_CONFIG_DERIVED( canonv30f, msx2 )
 
 	MCFG_MSX_S1985_ADD("s1985")
 
-	MCFG_FRAGMENT_ADD( msx_wd2793_force_ready )
+	MCFG_FRAGMENT_ADD( msx_wd2793 )
 	MCFG_FRAGMENT_ADD( msx_2_35_dd_drive )
 	MCFG_FRAGMENT_ADD( msx2_floplist )
 
@@ -4837,12 +4838,12 @@ static MACHINE_CONFIG_DERIVED( mbh70, msx2 )
 	MCFG_MSX_LAYOUT_CARTRIDGE("cartslot1", 1, 0)
 	MCFG_MSX_LAYOUT_CARTRIDGE("cartslot2", 2, 0)
 	MCFG_MSX_LAYOUT_ROM("ext", 3, 0, 0, 1, "maincpu", 0x8000)
-	MCFG_MSX_LAYOUT_DISK1("disk", 3, 0, 2, 1, "maincpu", 0xc000)
+	MCFG_MSX_LAYOUT_DISK1("disk", 3, 0, 1, 1, "maincpu", 0xc000)
 	MCFG_MSX_LAYOUT_RAM_MM("ram_mm", 3, 2, 0x20000) // 128KB Mapper RAM
 
 	MCFG_MSX_S1985_ADD("s1985")
 
-	MCFG_FRAGMENT_ADD( msx_wd2793_force_ready )
+	MCFG_FRAGMENT_ADD( msx_wd2793 )
 	MCFG_FRAGMENT_ADD( msx_1_35_dd_drive )
 	MCFG_FRAGMENT_ADD( msx2_floplist )
 
@@ -4938,7 +4939,7 @@ static MACHINE_CONFIG_DERIVED( mlg3, msx2_pal )
 
 	MCFG_MSX_S1985_ADD("s1985")
 
-	MCFG_FRAGMENT_ADD( msx_wd2793_force_ready )
+	MCFG_FRAGMENT_ADD( msx_wd2793 )
 	MCFG_FRAGMENT_ADD( msx_1_35_dd_drive )
 	MCFG_FRAGMENT_ADD( msx2_floplist )
 
@@ -7051,7 +7052,7 @@ static MACHINE_CONFIG_DERIVED( hx34, msx2 )
 	MCFG_MSX_LAYOUT_RAM_MM("ram_mm", 3, 0, 0x10000) // 64KB Mapper RAM
 	MCFG_MSX_LAYOUT_ROM("ext", 3, 1, 0, 1, "maincpu", 0x8000)
 	MCFG_MSX_LAYOUT_DISK1("disk", 3, 2, 1, 1, "maincpu", 0xc000)
-	MCFG_MSX_LAYOUT_ROM("firm", 3, 2, 1, 2, "maincpu", 0x10000)
+	MCFG_MSX_LAYOUT_ROM("firm", 3, 3, 1, 2, "maincpu", 0x10000)
 
 	MCFG_MSX_S1985_ADD("s1985")
 
@@ -7143,15 +7144,14 @@ static MACHINE_CONFIG_DERIVED( victhc90, msx2 )
 	// FDC: wd2793?, 1 3.5" DSDD drive
 	// RS232C builtin
 	// 2nd CPU HD-64B180 @ 6.144 MHz
-	// 2 Cartridge slots?
+	// 1 Cartridge slot (slot 1 or 2?)
 	// S-1985 MSX Engine
 
 	MCFG_MSX_LAYOUT_ROM("bios", 0, 0, 0, 2, "maincpu", 0x0000)
 	MCFG_MSX_LAYOUT_ROM("ext", 0, 1, 0, 1, "maincpu", 0x8000)
 	MCFG_MSX_LAYOUT_ROM("firm", 0, 1, 1, 1, "maincpu", 0x10000)
 	MCFG_MSX_LAYOUT_RAM_MM("ram_mm", 0, 2, 0x10000) // 64KB Mapper RAM
-	MCFG_MSX_LAYOUT_CARTRIDGE("cartslot1", 1, 0)
-	MCFG_MSX_LAYOUT_CARTRIDGE("cartslot2", 2, 0)
+	MCFG_MSX_LAYOUT_CARTRIDGE("cartslot", 1, 0)
 	MCFG_MSX_LAYOUT_DISK1("disk", 3, 0, 1, 1, "maincpu", 0xc000)
 
 	MCFG_MSX_S1985_ADD("s1985")
@@ -7181,15 +7181,14 @@ static MACHINE_CONFIG_DERIVED( victhc95, msx2 )
 	// FDC: wd2793?, 2 3.5" DSDD drive
 	// RS232C builtin
 	// 2nd CPU HD-64B180 @ 6.144 MHz
-	// 2 Cartridge slots?
+	// 1 Cartridge slot (slot 1 or 2?)
 	// S-1985 MSX Engine
 
 	MCFG_MSX_LAYOUT_ROM("bios", 0, 0, 0, 2, "maincpu", 0x0000)
 	MCFG_MSX_LAYOUT_ROM("ext", 0, 1, 0, 1, "maincpu", 0x8000)
 	MCFG_MSX_LAYOUT_ROM("firm", 0, 1, 1, 1, "maincpu", 0x10000)
 	MCFG_MSX_LAYOUT_RAM_MM("ram_mm", 0, 2, 0x10000) // 64KB Mapper RAM
-	MCFG_MSX_LAYOUT_CARTRIDGE("cartslot1", 1, 0)
-	MCFG_MSX_LAYOUT_CARTRIDGE("cartslot2", 2, 0)
+	MCFG_MSX_LAYOUT_CARTRIDGE("cartslot", 1, 0)
 	MCFG_MSX_LAYOUT_DISK1("disk", 3, 0, 1, 1, "maincpu", 0xc000)
 
 	MCFG_MSX_S1985_ADD("s1985")
@@ -7219,7 +7218,7 @@ static MACHINE_CONFIG_DERIVED( victhc95a, msx2 )
 	// FDC: wd2793?, 2 3.5" DSDD drive
 	// RS232C builtin
 	// 2nd CPU HD-64B180 @ 6.144 MHz
-	// 2 Cartridge slots?
+	// 1 Cartridge slot (slot 1 or 2?)
 	// S-1985 MSX Engine
 	// V9958 VDP
     
@@ -7227,8 +7226,7 @@ static MACHINE_CONFIG_DERIVED( victhc95a, msx2 )
 	MCFG_MSX_LAYOUT_ROM("ext", 0, 1, 0, 1, "maincpu", 0x8000)
 	MCFG_MSX_LAYOUT_ROM("firm", 0, 1, 1, 1, "maincpu", 0x10000)
 	MCFG_MSX_LAYOUT_RAM_MM("ram_mm", 0, 2, 0x40000) // 256KB Mapper RAM
-	MCFG_MSX_LAYOUT_CARTRIDGE("cartslot1", 1, 0)
-	MCFG_MSX_LAYOUT_CARTRIDGE("cartslot2", 2, 0)
+	MCFG_MSX_LAYOUT_CARTRIDGE("cartslot", 1, 0)
 	MCFG_MSX_LAYOUT_DISK1("disk", 3, 0, 1, 1, "maincpu", 0xc000)
 
 	MCFG_MSX_S1985_ADD("s1985")
@@ -8276,7 +8274,7 @@ COMP(1984, hb501p,    0,        0,      hb501p,   msx, msx_state,      msx,     
 COMP(198?, hb55,      hb55p,    0,      hb55,     msxjp, msx_state,    msx,     "Sony", "HB-55 (MSX1)", 0)
 COMP(1983, hb55d,     hb55p,    0,      hb55d,    msx, msx_state,      msx,     "Sony", "HB-55D (Germany) (MSX1)", 0)
 COMP(1983, hb55p,     0,        0,      hb55p,    msx, msx_state,      msx,     "Sony", "HB-55P (MSX1)", 0)
-COMP(198?, hb701fd,   0,        0,      hb701fd,  msxjp, msx_state,    msx,     "Sony", "HB-701FD (MSX1)", GAME_NOT_WORKING) // Floppy not working
+COMP(198?, hb701fd,   0,        0,      hb701fd,  msxjp, msx_state,    msx,     "Sony", "HB-701FD (MSX1)", 0)
 COMP(1983, hb75d,     hb75p,    0,      hb75d,    msx, msx_state,      msx,     "Sony", "HB-75D (Germany) (MSX1)", 0)
 COMP(1983, hb75p,     0,        0,      hb75p,    msx, msx_state,      msx,     "Sony", "HB-75P (MSX1)", 0)
 COMP(1985, svi728,    0,        0,      svi728,   msx, msx_state,      msx,     "Spectravideo", "SVI-728 (MSX1)", 0)
@@ -8323,8 +8321,8 @@ COMP(1984, mx64,      0,        0,      mx64,     msxkr, msx_state,    msx,     
 COMP(1986, ax350,     0,        0,      ax350,    msx2, msx_state,     msx,     "Al Alamiah", "AX-350 (MSX2)", 0)
 COMP(1986, ax370,     0,        0,      ax370,    msx2, msx_state,     msx,     "Al Alamiah", "AX-370 (MSX2)", 0)
 COMP(198?, canonv25,  0,        0,      canonv25, msx2, msx_state,     msx,     "Canon", "V-25 (MSX2)", 0)
-COMP(198?, canonv30,  0,        0,      canonv30, msx2, msx_state,     msx,     "Canon", "V-30 (MSX2)", GAME_NOT_WORKING) // Floppy not working yet
-COMP(198?, canonv30f, canonv30, 0,      canonv30f, msx2, msx_state,    msx,     "Canon", "V-30F (MSX2)", GAME_NOT_WORKING) // Floppy not working yet
+COMP(198?, canonv30,  0,        0,      canonv30, msx2, msx_state,     msx,     "Canon", "V-30 (MSX2)", 0)
+COMP(198?, canonv30f, canonv30, 0,      canonv30f, msx2, msx_state,    msx,     "Canon", "V-30F (MSX2)", 0)
 COMP(1986, cpc300,    0,        0,      cpc300,   msx2kr, msx_state,   msx,     "Daewoo", "IQ-2000 CPC-300 (Korea) (MSX2)", 0)
 COMP(1986, cpc300e,   0,        0,      cpc300e,  msx2kr, msx_state,   msx,     "Daewoo", "IQ-2000 CPC-300E (Korea) (MSX2)", 0)
 COMP(198?, cpc330k,   0,        0,      cpc330k,  msx2kr, msx_state,   msx,     "Daewoo", "CPC-330K KOBO (Korea) (MSX2)", 0)
@@ -8334,10 +8332,10 @@ COMP(198?, cpc61,     0,        0,      cpc61,    msx2kr, msx_state,   msx,     
 COMP(198?, cpg120,    0,        0,      cpg120,   msx2kr, msx_state,   msx,     "Daewoo", "Zemmix CPG-120 (Korea) (MSX2)", GAME_NOT_WORKING) // v9958 not added
 COMP(198?, fpc900,    0,        0,      fpc900,   msx2, msx_state,     msx,     "Fenner", "FPC-900 (MSX2)", 0)
 COMP(1986, expert20,  0,        0,      expert20, msx2, msx_state,     msx,     "Gradiente", "Expert 2.0 (Brazil) (MSX2)", 0)
-COMP(198?, mbh70,     0,        0,      mbh70,    msx2jp, msx_state,   msx,     "Hitachi", "MB-H70 (MSX2)", 0)
+COMP(198?, mbh70,     0,        0,      mbh70,    msx2jp, msx_state,   msx,     "Hitachi", "MB-H70 (MSX2)", GAME_NOT_WORKING) // Firmware not working
 COMP(198?, kmc5000,   0,        0,      kmc5000,  msx2jp, msx_state,   msx,     "Kawai", "KMC-5000 (MSX2)", 0)
 COMP(198?, mlg1,      0,        0,      mlg1,     msx2, msx_state,     msx,     "Mitsubishi", "ML-G1 (MSX2)", 0)
-COMP(198?, mlg3,      0,        0,      mlg3,     msx2, msx_state,     msx,     "Mitsubishi", "ML-G3 (MSX2)", GAME_NOT_WORKING) // Floppy not working
+COMP(198?, mlg3,      0,        0,      mlg3,     msx2, msx_state,     msx,     "Mitsubishi", "ML-G3 (MSX2)", 0)
 COMP(198?, mlg10,     0,        0,      mlg10,    msx2jp, msx_state,   msx,     "Mitsubishi", "ML-G10 (MSX2)", 0)
 COMP(1983, mlg30,     0,        0,      mlg30,    msx2, msx_state,     msx,     "Mitsubishi", "ML-G30 (MSX2)", 0)
 COMP(1985, fs5500f1,  fs5500f2, 0,      fs5500f1, msx2jp, msx_state,   msx,     "National / Matsushita", "FS-5500F1 (Japan) (MSX2)", 0)
