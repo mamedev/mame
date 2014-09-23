@@ -4,7 +4,7 @@
 <!-- This list contains the system software specific to the Amiga 3000: -->
 <!-- SuperKickstart disks, SCSI installation disks and AMIX -->
 
-<softwarelist name="amiga_a3000" description="Amiga 3000 System disks">
+<softwarelist name="amiga_a3000" description="Commodore Amiga 3000 System disks">
 
 	<!-- SuperKickstart -->
 
