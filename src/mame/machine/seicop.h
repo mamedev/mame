@@ -45,12 +45,11 @@ private:
 	UINT8 m_cop_rng_max_value;
 	UINT16 m_copd2_offs;
 	UINT32 m_cop_register[8];
-	UINT16 m_cop_status,m_cop_dist,m_cop_angle;
 	UINT16 m_cop_hit_status;
 	INT16 m_cop_hit_val_x,m_cop_hit_val_y,m_cop_hit_val_z,m_cop_hit_val_unk;
 	UINT32 m_cop_sort_lookup,m_cop_sort_ram_addr,m_cop_sort_param;
-	INT8 m_cop_angle_compare;
-	INT8 m_cop_angle_mod_val;
+	INT8 m_legacycop_angle_compare;
+	INT8 m_legacycop_angle_mod_val;
 	struct collision_info m_cop_collision_info[2];
 	int m_r0, m_r1;
 	UINT16 m_cop_rom_addr_lo,m_cop_rom_addr_hi,m_cop_rom_addr_unk;

@@ -1604,9 +1604,6 @@ seibu_cop_legacy_device::seibu_cop_legacy_device(const machine_config &mconfig, 
 	m_cop_scale(0),
 	m_cop_rng_max_value(0),
 	m_copd2_offs(0),
-	m_cop_status(0),
-	m_cop_dist(0),
-	m_cop_angle(0),
 	m_cop_hit_status(0),
 	m_cop_hit_val_x(0),
 	m_cop_hit_val_y(0),
@@ -1615,8 +1612,8 @@ seibu_cop_legacy_device::seibu_cop_legacy_device(const machine_config &mconfig, 
 	m_cop_sort_lookup(0),
 	m_cop_sort_ram_addr(0),
 	m_cop_sort_param(0),
-	m_cop_angle_compare(0),
-	m_cop_angle_mod_val(0),
+	m_legacycop_angle_compare(0),
+	m_legacycop_angle_mod_val(0),
 	m_r0(0),
 	m_r1(0),
 	m_cop_rom_addr_lo(0),
@@ -1659,9 +1656,6 @@ void seibu_cop_legacy_device::device_start()
 	save_item(NAME(m_cop_scale));
 	save_item(NAME(m_cop_rng_max_value));
 	save_item(NAME(m_copd2_offs));
-	save_item(NAME(m_cop_status));
-	save_item(NAME(m_cop_dist));
-	save_item(NAME(m_cop_angle));
 	save_item(NAME(m_cop_hit_status));
 	save_item(NAME(m_cop_hit_val_x));
 	save_item(NAME(m_cop_hit_val_y));
@@ -1670,8 +1664,8 @@ void seibu_cop_legacy_device::device_start()
 	save_item(NAME(m_cop_sort_lookup));
 	save_item(NAME(m_cop_sort_ram_addr));
 	save_item(NAME(m_cop_sort_param));
-	save_item(NAME(m_cop_angle_compare));
-	save_item(NAME(m_cop_angle_mod_val));
+	save_item(NAME(m_legacycop_angle_compare));
+	save_item(NAME(m_legacycop_angle_mod_val));
 	save_item(NAME(m_r0));
 	save_item(NAME(m_r1));
 	save_item(NAME(m_cop_rom_addr_lo));
@@ -1824,14 +1818,8 @@ READ16_MEMBER( seibu_cop_legacy_device::copdxbl_0_r )
 			return retvalue;
 		}
 
-		case 0x5b0/2:
-			return m_cop_status;
 
-		case 0x5b2/2:
-			return m_cop_dist;
 
-		case 0x5b4/2:
-			return m_cop_angle;
 		//case (0x47e/2):
 		//case (0x5b0/2):
 		//case (0x5b4/2):
@@ -1938,21 +1926,21 @@ WRITE16_MEMBER( seibu_cop_legacy_device::copdxbl_0_w )
 					int dy = space.read_dword(m_cop_register[1]+4) - space.read_dword(m_cop_register[0]+4);
 					int dx = space.read_dword(m_cop_register[1]+8) - space.read_dword(m_cop_register[0]+8);
 
-					m_cop_status = 7;
+					m_raiden2cop->cop_status = 7;
 					if(!dx) {
-						m_cop_status |= 0x8000;
-						m_cop_angle = 0;
+						m_raiden2cop->cop_status |= 0x8000;
+						m_raiden2cop->cop_angle = 0;
 					} else {
-						m_cop_angle = atan(double(dy)/double(dx)) * 128.0 / M_PI;
+						m_raiden2cop->cop_angle = atan(double(dy)/double(dx)) * 128.0 / M_PI;
 						if(dx<0)
-							m_cop_angle += 0x80;
+							m_raiden2cop->cop_angle += 0x80;
 					}
 
 					m_r0 = dy;
 					m_r1 = dx;
 
 					if(m_cop_mcu_ram[offset] & 0x80)
-						space.write_word(m_cop_register[0]+(0x34^2), m_cop_angle);
+						space.write_word(m_cop_register[0]+(0x34^2), m_raiden2cop->cop_angle);
 
 					break;
 				}
@@ -1964,10 +1952,10 @@ WRITE16_MEMBER( seibu_cop_legacy_device::copdxbl_0_w )
 
 					dx >>= 16;
 					dy >>= 16;
-					m_cop_dist = sqrt((double)(dx*dx+dy*dy));
+					m_raiden2cop->cop_dist = sqrt((double)(dx*dx+dy*dy));
 
 					if(m_cop_mcu_ram[offset] & 0x80)
-						space.write_word(m_cop_register[0]+(0x38), m_cop_dist);
+						space.write_word(m_cop_register[0]+(0x38), m_raiden2cop->cop_dist);
 
 					break;
 				}
@@ -2121,14 +2109,6 @@ READ16_MEMBER( seibu_cop_legacy_device::generic_cop_r )
 		case 0x1a6/2:
 			return space.machine().firstcpu->total_cycles() % (m_cop_rng_max_value+1);
 
-		case 0x1b0/2:
-			return m_cop_status;
-
-		case 0x1b2/2:
-			return m_cop_dist;
-
-		case 0x1b4/2:
-			return m_cop_angle;
 
 		default:
 			seibu_cop_log("%06x: COPX unhandled read returning %04x from offset %04x\n", space.device().safe_pc(), retvalue, offset*2);
@@ -2167,9 +2147,9 @@ WRITE16_MEMBER( seibu_cop_legacy_device::generic_cop_w )
 				m_cop_sprite_dma_size--;
 
 				if(m_cop_sprite_dma_size > 0)
-					m_cop_status &= ~2;
+					m_raiden2cop->cop_status &= ~2;
 				else
-					m_cop_status |= 2;
+					m_raiden2cop->cop_status |= 2;
 			}
 			break;
 		}
@@ -2180,8 +2160,8 @@ WRITE16_MEMBER( seibu_cop_legacy_device::generic_cop_w )
 			break;
 
 		/* triggered before 0x6200 in Seibu Cup, looks like an angle value ... */
-		case (0x01c/2): m_cop_angle_compare = UINT16(m_cop_mcu_ram[0x1c/2]);  break;
-		case (0x01e/2): m_cop_angle_mod_val = UINT16(m_cop_mcu_ram[0x1e/2]); break;
+		case (0x01c/2): m_legacycop_angle_compare = UINT16(m_cop_mcu_ram[0x1c/2]);  break;
+		case (0x01e/2): m_legacycop_angle_mod_val = UINT16(m_cop_mcu_ram[0x1e/2]); break;
 
 
 
@@ -2394,23 +2374,23 @@ WRITE16_MEMBER( seibu_cop_legacy_device::generic_cop_w )
 				int dy = space.read_dword(m_cop_register[1]+4) - space.read_dword(m_cop_register[0]+4);
 				int dx = space.read_dword(m_cop_register[1]+8) - space.read_dword(m_cop_register[0]+8);
 
-				m_cop_status = 7;
+				m_raiden2cop->cop_status = 7;
 				if(!dx) {
-					m_cop_status |= 0x8000;
-					m_cop_angle = 0;
+					m_raiden2cop->cop_status |= 0x8000;
+					m_raiden2cop->cop_angle = 0;
 				} else {
-					m_cop_angle = atan(double(dy)/double(dx)) * 128.0 / M_PI;
+					m_raiden2cop->cop_angle = atan(double(dy)/double(dx)) * 128.0 / M_PI;
 					if(dx<0)
-						m_cop_angle += 0x80;
+						m_raiden2cop->cop_angle += 0x80;
 				}
 
 				m_r0 = dy;
 				m_r1 = dx;
 
-				//printf("%d %d %f %04x\n",dx,dy,atan(double(dy)/double(dx)) * 128 / M_PI,m_cop_angle);
+				//printf("%d %d %f %04x\n",dx,dy,atan(double(dy)/double(dx)) * 128 / M_PI,m_raiden2cop->cop_angle);
 
 				if(m_cop_mcu_ram[offset] & 0x80)
-					space.write_word(m_cop_register[0]+(0x34^2), m_cop_angle);
+					space.write_word(m_cop_register[0]+(0x34^2), m_raiden2cop->cop_angle);
 				return;
 			}
 
@@ -2422,22 +2402,22 @@ WRITE16_MEMBER( seibu_cop_legacy_device::generic_cop_w )
 				int dy = space.read_dword(m_cop_register[1]+4) - space.read_dword(m_cop_register[0]+4);
 				int dx = space.read_dword(m_cop_register[1]+8) - space.read_dword(m_cop_register[0]+8);
 
-				m_cop_status = 7;
+				m_raiden2cop->cop_status = 7;
 				if(!dx) {
-					m_cop_status |= 0x8000;
-					m_cop_angle = 0;
+					m_raiden2cop->cop_status |= 0x8000;
+					m_raiden2cop->cop_angle = 0;
 				} else {
-					m_cop_angle = atan(double(dy)/double(dx)) * 128.0 / M_PI;
+					m_raiden2cop->cop_angle = atan(double(dy)/double(dx)) * 128.0 / M_PI;
 					if(dx<0)
-						m_cop_angle += 0x80;
+						m_raiden2cop->cop_angle += 0x80;
 				}
 
-				m_cop_angle-=0x80;
+				m_raiden2cop->cop_angle-=0x80;
 				m_r0 = dy;
 				m_r1 = dx;
 
 				if(m_cop_mcu_ram[offset] & 0x80)
-					space.write_word(m_cop_register[0]+(0x34^2), m_cop_angle);
+					space.write_word(m_cop_register[0]+(0x34^2), m_raiden2cop->cop_angle);
 				return;
 			}
 
@@ -2457,10 +2437,10 @@ WRITE16_MEMBER( seibu_cop_legacy_device::generic_cop_w )
 
 				dx >>= 16;
 				dy >>= 16;
-				m_cop_dist = sqrt((double)(dx*dx+dy*dy));
+				m_raiden2cop->cop_dist = sqrt((double)(dx*dx+dy*dy));
 
 				if(m_cop_mcu_ram[offset] & 0x80)
-					space.write_word(m_cop_register[0]+(0x38), m_cop_dist);
+					space.write_word(m_cop_register[0]+(0x38), m_raiden2cop->cop_dist);
 				return;
 			}
 
@@ -2482,7 +2462,7 @@ WRITE16_MEMBER( seibu_cop_legacy_device::generic_cop_w )
 				int dx = m_r1;
 				int div = space.read_word(m_cop_register[0]+(0x36^2));
 				int res;
-				int m_cop_dist_raw;
+				int cop_dist_raw;
 
 				if(!div)
 				{
@@ -2494,15 +2474,15 @@ WRITE16_MEMBER( seibu_cop_legacy_device::generic_cop_w )
 				/* TODO: recheck if m_cop_scale still masks at 3 with this command */
 				dx >>= 11 + m_cop_scale;
 				dy >>= 11 + m_cop_scale;
-				m_cop_dist_raw = sqrt((double)(dx*dx+dy*dy));
+				cop_dist_raw = sqrt((double)(dx*dx+dy*dy));
 
-				res = m_cop_dist_raw;
+				res = cop_dist_raw;
 				res /= div;
 
-				m_cop_dist = (1 << (5 - m_cop_scale)) / div;
+				m_raiden2cop->cop_dist = (1 << (5 - m_cop_scale)) / div;
 
 				/* TODO: bits 5-6-15 */
-				m_cop_status = 7;
+				m_raiden2cop->cop_status = 7;
 
 				space.write_word(m_cop_register[0]+(0x38^2), res);
 				return;
@@ -2663,34 +2643,34 @@ WRITE16_MEMBER( seibu_cop_legacy_device::generic_cop_w )
 				flags = space.read_word(m_cop_register[1]);
 				//space.write_byte(m_cop_register[1] + (0^3),space.read_byte(m_cop_register[1] + (0^3)) & 0xfb); //correct?
 
-				m_cop_angle_compare &= 0xff;
-				m_cop_angle_mod_val &= 0xff;
+				m_legacycop_angle_compare &= 0xff;
+				m_legacycop_angle_mod_val &= 0xff;
 				flags &= ~0x0004;
 				
-				int delta = cur_angle - m_cop_angle_compare;
+				int delta = cur_angle - m_legacycop_angle_compare;
 				if(delta >= 128)
 					delta -= 256;
 				else if(delta < -128)
 					delta += 256;
 				if(delta < 0)
 				{
-					if(delta >= -m_cop_angle_mod_val)
+					if(delta >= -m_legacycop_angle_mod_val)
 					{
-						cur_angle = m_cop_angle_compare;
+						cur_angle = m_legacycop_angle_compare;
 						flags |= 0x0004;
 					} 
 					else
-						cur_angle += m_cop_angle_mod_val;
+						cur_angle += m_legacycop_angle_mod_val;
 				} 
 				else
 				{
-					if(delta <= m_cop_angle_mod_val)
+					if(delta <= m_legacycop_angle_mod_val)
 					{
-						cur_angle = m_cop_angle_compare;
+						cur_angle = m_legacycop_angle_compare;
 						flags |= 0x0004;
 					} 
 					else
-						cur_angle -= m_cop_angle_mod_val;
+						cur_angle -= m_legacycop_angle_mod_val;
 				}
 
 				space.write_byte(m_cop_register[1] + (0 ^ 2),flags);
@@ -2711,34 +2691,34 @@ WRITE16_MEMBER( seibu_cop_legacy_device::generic_cop_w )
 				flags = space.read_word(m_cop_register[0] + (0 ^ 2));
 				//space.write_byte(m_cop_register[1] + (0^3),space.read_byte(m_cop_register[1] + (0^3)) & 0xfb); //correct?
 
-				m_cop_angle_compare &= 0xff;
-				m_cop_angle_mod_val &= 0xff;
+				m_legacycop_angle_compare &= 0xff;
+				m_legacycop_angle_mod_val &= 0xff;
 				flags &= ~0x0004;
 				
-				int delta = cur_angle - m_cop_angle_compare;
+				int delta = cur_angle - m_legacycop_angle_compare;
 				if(delta >= 128)
 					delta -= 256;
 				else if(delta < -128)
 					delta += 256;
 				if(delta < 0)
 				{
-					if(delta >= -m_cop_angle_mod_val)
+					if(delta >= -m_legacycop_angle_mod_val)
 					{
-						cur_angle = m_cop_angle_compare;
+						cur_angle = m_legacycop_angle_compare;
 						flags |= 0x0004;
 					} 
 					else
-						cur_angle += m_cop_angle_mod_val;
+						cur_angle += m_legacycop_angle_mod_val;
 				} 
 				else
 				{
-					if(delta <= m_cop_angle_mod_val)
+					if(delta <= m_legacycop_angle_mod_val)
 					{
-						cur_angle = m_cop_angle_compare;
+						cur_angle = m_legacycop_angle_compare;
 						flags |= 0x0004;
 					} 
 					else
-						cur_angle -= m_cop_angle_mod_val;
+						cur_angle -= m_legacycop_angle_mod_val;
 				}
 
 				space.write_byte(m_cop_register[0] + (0 ^ 3),flags);
@@ -2753,23 +2733,23 @@ WRITE16_MEMBER( seibu_cop_legacy_device::generic_cop_w )
 				int dy = space.read_dword(m_cop_register[2]+4) - space.read_dword(m_cop_register[0]+4);
 				int dx = space.read_dword(m_cop_register[2]+8) - space.read_dword(m_cop_register[0]+8);
 
-				m_cop_status = 7;
+				m_raiden2cop->cop_status = 7;
 				if(!dx) {
-					m_cop_status |= 0x8000;
-					m_cop_angle = 0;
+					m_raiden2cop->cop_status |= 0x8000;
+					m_raiden2cop->cop_angle = 0;
 				} else {
-					m_cop_angle = atan(double(dy)/double(dx)) * 128.0 / M_PI;
+					m_raiden2cop->cop_angle = atan(double(dy)/double(dx)) * 128.0 / M_PI;
 					if(dx<0)
-						m_cop_angle += 0x80;
+						m_raiden2cop->cop_angle += 0x80;
 				}
 
 				m_r0 = dy;
 				m_r1 = dx;
 
-				//printf("%d %d %f %04x\n",dx,dy,atan(double(dy)/double(dx)) * 128 / M_PI,m_cop_angle);
+				//printf("%d %d %f %04x\n",dx,dy,atan(double(dy)/double(dx)) * 128 / M_PI,m_raiden2cop->cop_angle);
 
 				if(m_cop_mcu_ram[offset] & 0x80)
-					space.write_word(m_cop_register[0]+(0x34^2), m_cop_angle);
+					space.write_word(m_cop_register[0]+(0x34^2), m_raiden2cop->cop_angle);
 				return;
 			}
 

@@ -125,9 +125,9 @@ static ADDRESS_MAP_START( legionna_cop_mem, AS_PROGRAM, 16, legionna_state )
 //	AM_RANGE(0x100582, 0x100587) AM_READ(cop_collision_status_val_r)
 //	AM_RANGE(0x100588, 0x100589) AM_READ(cop_collision_status_stat_r)
 	AM_RANGE(0x100590, 0x100599) AM_DEVREAD("raiden2cop", raiden2cop_device, cop_itoa_digits_r)
-//	AM_RANGE(0x1005b0, 0x1005b1) AM_READ(cop_status_r)
-//	AM_RANGE(0x1005b2, 0x1005b3) AM_READ(cop_dist_r)
-//	AM_RANGE(0x1005b4, 0x1005b5) AM_READ(cop_angle_r)
+	AM_RANGE(0x1005b0, 0x1005b1) AM_DEVREAD("raiden2cop", raiden2cop_device, cop_status_r)
+	AM_RANGE(0x1005b2, 0x1005b3) AM_DEVREAD("raiden2cop", raiden2cop_device, cop_dist_r)
+	AM_RANGE(0x1005b4, 0x1005b5) AM_DEVREAD("raiden2cop", raiden2cop_device, cop_angle_r)
 
 	AM_RANGE(0x1006fc, 0x1006fd) AM_DEVWRITE("raiden2cop", raiden2cop_device,cop_dma_trigger_w)
 //	AM_RANGE(0x1006fe, 0x1006ff) AM_WRITE(cop_sort_dma_trig_w) // sort-DMA trigger
