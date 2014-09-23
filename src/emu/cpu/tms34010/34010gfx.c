@@ -1428,10 +1428,10 @@ if ((daddr & (BITS_PER_PIXEL - 1)) != 0) osd_printf_debug("PIXBLT_R%d with odd d
 						dstword = (dstword & ~dstmask) | pixel;
 
 					/* update the source */
-					srcmask >>= BITS_PER_PIXEL;
+					srcmask = srcmask >> BITS_PER_PIXEL;
 
 					/* update the destination */
-					dstmask >>= BITS_PER_PIXEL;
+					dstmask = dstmask >> BITS_PER_PIXEL;
 				}
 
 				/* write the result */
@@ -1470,10 +1470,10 @@ if ((daddr & (BITS_PER_PIXEL - 1)) != 0) osd_printf_debug("PIXBLT_R%d with odd d
 						dstword = (dstword & ~dstmask) | pixel;
 
 					/* update the source */
-					srcmask >>= BITS_PER_PIXEL;
+					srcmask = srcmask >> BITS_PER_PIXEL;
 
 					/* update the destination */
-					dstmask >>= BITS_PER_PIXEL;
+					dstmask = dstmask >> BITS_PER_PIXEL;
 				}
 
 				/* write the result */
@@ -1508,10 +1508,10 @@ if ((daddr & (BITS_PER_PIXEL - 1)) != 0) osd_printf_debug("PIXBLT_R%d with odd d
 						dstword = (dstword & ~dstmask) | pixel;
 
 					/* update the source */
-					srcmask >>= BITS_PER_PIXEL;
+					srcmask = srcmask >> BITS_PER_PIXEL;
 
 					/* update the destination */
-					dstmask >>= BITS_PER_PIXEL;
+					dstmask = dstmask >> BITS_PER_PIXEL;
 				}
 
 				/* write the result */
@@ -1669,7 +1669,7 @@ void FUNCTION_NAME(tms340x0_device::pixblt_b)(int dst_is_linear)
 					}
 
 					/* update the destination */
-					dstmask <<= BITS_PER_PIXEL;
+					dstmask = dstmask << BITS_PER_PIXEL;
 				}
 
 				/* write the result */
@@ -1705,7 +1705,7 @@ void FUNCTION_NAME(tms340x0_device::pixblt_b)(int dst_is_linear)
 					}
 
 					/* update the destination */
-					dstmask <<= BITS_PER_PIXEL;
+					dstmask = dstmask << BITS_PER_PIXEL;
 				}
 
 				/* write the result */
@@ -1738,7 +1738,7 @@ void FUNCTION_NAME(tms340x0_device::pixblt_b)(int dst_is_linear)
 					}
 
 					/* update the destination */
-					dstmask <<= BITS_PER_PIXEL;
+					dstmask = dstmask << BITS_PER_PIXEL;
 				}
 
 				/* write the result */
@@ -1869,7 +1869,7 @@ void FUNCTION_NAME(tms340x0_device::fill)(int dst_is_linear)
 						dstword = (dstword & ~dstmask) | pixel;
 
 					/* update the destination */
-					dstmask <<= BITS_PER_PIXEL;
+					dstmask = dstmask << BITS_PER_PIXEL;
 				}
 
 				/* write the result */
@@ -1896,7 +1896,7 @@ void FUNCTION_NAME(tms340x0_device::fill)(int dst_is_linear)
 						dstword = (dstword & ~dstmask) | pixel;
 
 					/* update the destination */
-					dstmask <<= BITS_PER_PIXEL;
+					dstmask = dstmask << BITS_PER_PIXEL;
 				}
 
 				/* write the result */
@@ -1920,7 +1920,7 @@ void FUNCTION_NAME(tms340x0_device::fill)(int dst_is_linear)
 						dstword = (dstword & ~dstmask) | pixel;
 
 					/* update the destination */
-					dstmask <<= BITS_PER_PIXEL;
+					dstmask = dstmask << BITS_PER_PIXEL;
 				}
 
 				/* write the result */
