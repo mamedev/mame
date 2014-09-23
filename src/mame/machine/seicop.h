@@ -29,21 +29,8 @@ seibu_cop_legacy_device(const machine_config &mconfig, const char *tag, device_t
 	DECLARE_READ16_MEMBER( copdxbl_0_r );
 	DECLARE_WRITE16_MEMBER( copdxbl_0_w );
 
-	DECLARE_READ16_MEMBER( heatbrl_mcu_r );
-	DECLARE_WRITE16_MEMBER( heatbrl_mcu_w );
-	DECLARE_READ16_MEMBER( cupsoc_mcu_r );
-	DECLARE_WRITE16_MEMBER( cupsoc_mcu_w );
-	DECLARE_READ16_MEMBER( cupsocs_mcu_r );
-	DECLARE_WRITE16_MEMBER( cupsocs_mcu_w );
-	DECLARE_READ16_MEMBER( godzilla_mcu_r );
-	DECLARE_WRITE16_MEMBER( godzilla_mcu_w );
-	DECLARE_READ16_MEMBER( denjinmk_mcu_r );
-	DECLARE_WRITE16_MEMBER( denjinmk_mcu_w );
-	DECLARE_READ16_MEMBER( grainbow_mcu_r );
-	DECLARE_WRITE16_MEMBER( grainbow_mcu_w );
-	DECLARE_READ16_MEMBER( legionna_mcu_r );
-	DECLARE_WRITE16_MEMBER( legionna_mcu_w );
-
+	DECLARE_READ16_MEMBER( generic_cop_r );
+	DECLARE_WRITE16_MEMBER( generic_cop_w );
 protected:
 	// device-level overrides
 	virtual void device_config_complete();
@@ -76,8 +63,7 @@ private:
 	void copd2_set_tabledata(UINT16 data);
 	void cop_take_hit_box_params(UINT8 offs);
 	UINT8 cop_calculate_collsion_detection();
-	DECLARE_READ16_MEMBER( generic_cop_r );
-	DECLARE_WRITE16_MEMBER( generic_cop_w );
+
 
 	required_device<raiden2cop_device> m_raiden2cop;
 

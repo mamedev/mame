@@ -43,24 +43,22 @@ WRITE16_MEMBER(legionna_state::tile_scroll_w)
 		tm->set_scrollx(0, data);
 }
 
-void heatbrl_setgfxbank(running_machine &machine, UINT16 data)
+WRITE16_MEMBER(legionna_state::heatbrl_setgfxbank)
 {
-	legionna_state *state = machine.driver_data<legionna_state>();
-	state->m_back_gfx_bank = (data &0x4000) >> 2;
+	m_back_gfx_bank = (data &0x4000) >> 2;
 }
 
 /*xxx- --- ---- ---- banking*/
-void denjinmk_setgfxbank(running_machine &machine, UINT16 data)
+WRITE16_MEMBER(legionna_state::denjinmk_setgfxbank)
 {
-	legionna_state *state = machine.driver_data<legionna_state>();
-	state->m_fore_gfx_bank = (data &0x2000) >> 1;//???
-	state->m_back_gfx_bank = (data &0x4000) >> 2;
-	state->m_mid_gfx_bank  = (data &0x8000) >> 3;//???
+	m_fore_gfx_bank = (data &0x2000) >> 1;//???
+	m_back_gfx_bank = (data &0x4000) >> 2;
+	m_mid_gfx_bank  = (data &0x8000) >> 3;//???
 
-	state->m_background_layer->mark_all_dirty();
-	state->m_foreground_layer->mark_all_dirty();
-	state->m_midground_layer->mark_all_dirty();
-	state->m_text_layer->mark_all_dirty();
+	m_background_layer->mark_all_dirty();
+	m_foreground_layer->mark_all_dirty();
+	m_midground_layer->mark_all_dirty();
+	m_text_layer->mark_all_dirty();
 }
 
 WRITE16_MEMBER(legionna_state::videowrite_cb_w)

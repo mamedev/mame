@@ -54,6 +54,9 @@ public:
 	DECLARE_WRITE8_MEMBER(okim_rombank_w);
 	DECLARE_READ16_MEMBER(sound_comms_r);
 	DECLARE_WRITE16_MEMBER(sound_comms_w);
+	DECLARE_WRITE16_MEMBER(denjinmk_setgfxbank);
+	DECLARE_WRITE16_MEMBER(heatbrl_setgfxbank);
+
 	DECLARE_DRIVER_INIT(legiongfx);
 	DECLARE_DRIVER_INIT(cupsoc_debug);
 	DECLARE_DRIVER_INIT(cupsoc);
@@ -87,6 +90,4 @@ public:
 
 };
 
-/*----------- defined in video/legionna.c -----------*/
-void heatbrl_setgfxbank(running_machine &machine, UINT16 data);
-void denjinmk_setgfxbank(running_machine &machine, UINT16 data);
+
