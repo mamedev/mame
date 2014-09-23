@@ -173,10 +173,9 @@ void raiden2_state::machine_start()
 	save_item(NAME(raiden2_tilemap_enable));
 	save_item(NAME(prg_bank));
 	save_item(NAME(cop_bank));
-	save_item(NAME(cop_itoa));
 	save_item(NAME(cop_status));
 	save_item(NAME(cop_scale));
-	save_item(NAME(cop_itoa_digit_count));
+
 	save_item(NAME(cop_angle));
 	save_item(NAME(cop_dist));
 
@@ -197,7 +196,8 @@ void raiden2_state::machine_start()
 	
 	save_item(NAME(scrollvals));
 	save_item(NAME(cop_regs));
-	save_item(NAME(cop_itoa_digits));
+
+
 
 	save_item(NAME(sprite_prot_src_addr));
 
@@ -257,39 +257,6 @@ WRITE16_MEMBER(raiden2_state::m_videoram_private_w)
 	}
 }
 
-WRITE16_MEMBER(raiden2_state::cop_itoa_low_w)
-{
-	cop_itoa = (cop_itoa & ~UINT32(mem_mask)) | (data & mem_mask);
-
-	int digits = 1 << cop_itoa_digit_count*2;
-	UINT32 val = cop_itoa;
-
-	if(digits > 9)
-		digits = 9;
-	for(int i=0; i<digits; i++)
-		if(!val && i)
-			cop_itoa_digits[i] = 0x20;
-		else {
-			cop_itoa_digits[i] = 0x30 | (val % 10);
-			val = val / 10;
-		}
-	cop_itoa_digits[9] = 0;
-}
-
-WRITE16_MEMBER(raiden2_state::cop_itoa_high_w)
-{
-	cop_itoa = (cop_itoa & ~(mem_mask << 16)) | ((data & mem_mask) << 16);
-}
-
-WRITE16_MEMBER(raiden2_state::cop_itoa_digit_count_w)
-{
-	COMBINE_DATA(&cop_itoa_digit_count);
-}
-
-READ16_MEMBER(raiden2_state::cop_itoa_digits_r)
-{
-	return cop_itoa_digits[offset*2] | (cop_itoa_digits[offset*2+1] << 8);
-}
 
 READ16_MEMBER(raiden2_state::cop_status_r)
 {
@@ -1084,7 +1051,6 @@ void raiden2_state::common_reset()
 	fg_bank=6;
 	mid_bank=1;
 	tx_bank = 0;
-	cop_itoa_digit_count = 4; //TODO: Raiden 2 never inits the BCD register, value here is a guess (8 digits, as WR is 10.000.000 + a)
 }
 
 MACHINE_RESET_MEMBER(raiden2_state,raiden2)
@@ -1332,9 +1298,9 @@ WRITE16_MEMBER(raiden2_state::cop_sort_dma_trig_w)
 static ADDRESS_MAP_START( raiden2_cop_mem, AS_PROGRAM, 16, raiden2_state )
 	AM_RANGE(0x0041c, 0x0041d) AM_WRITE(cop_angle_target_w) // angle target (for 0x6200 COP macro)
 	AM_RANGE(0x0041e, 0x0041f) AM_WRITE(cop_angle_step_w)   // angle step   (for 0x6200 COP macro)
-	AM_RANGE(0x00420, 0x00421) AM_WRITE(cop_itoa_low_w)
-	AM_RANGE(0x00422, 0x00423) AM_WRITE(cop_itoa_high_w)
-	AM_RANGE(0x00424, 0x00425) AM_WRITE(cop_itoa_digit_count_w)
+	AM_RANGE(0x00420, 0x00421) AM_DEVWRITE("raiden2cop", raiden2cop_device, cop_itoa_low_w)
+	AM_RANGE(0x00422, 0x00423) AM_DEVWRITE("raiden2cop", raiden2cop_device, cop_itoa_high_w)
+	AM_RANGE(0x00424, 0x00425) AM_DEVWRITE("raiden2cop", raiden2cop_device, cop_itoa_digit_count_w)
 	AM_RANGE(0x00428, 0x00429) AM_DEVWRITE("raiden2cop", raiden2cop_device, cop_dma_v1_w)
 	AM_RANGE(0x0042a, 0x0042b) AM_DEVWRITE("raiden2cop", raiden2cop_device, cop_dma_v2_w)
 	AM_RANGE(0x00432, 0x00433) AM_DEVWRITE("raiden2cop", raiden2cop_device, cop_pgm_data_w)
@@ -1364,7 +1330,7 @@ static ADDRESS_MAP_START( raiden2_cop_mem, AS_PROGRAM, 16, raiden2_state )
 	AM_RANGE(0x00580, 0x00581) AM_READ(cop_collision_status_r)
 	AM_RANGE(0x00582, 0x00587) AM_READ(cop_collision_status_val_r)
 	AM_RANGE(0x00588, 0x00589) AM_READ(cop_collision_status_stat_r)
-	AM_RANGE(0x00590, 0x00599) AM_READ(cop_itoa_digits_r)
+	AM_RANGE(0x00590, 0x00599) AM_DEVREAD("raiden2cop", raiden2cop_device, cop_itoa_digits_r)
 	AM_RANGE(0x005b0, 0x005b1) AM_READ(cop_status_r)
 	AM_RANGE(0x005b2, 0x005b3) AM_READ(cop_dist_r)
 	AM_RANGE(0x005b4, 0x005b5) AM_READ(cop_angle_r)
@@ -1833,6 +1799,7 @@ static MACHINE_CONFIG_START( raiden2, raiden2_state )
 
 	MCFG_RAIDEN2COP_ADD("raiden2cop")
 	MCFG_RAIDEN2COP_VIDEORAM_OUT_CB(WRITE16(raiden2_state, m_videoram_private_w))
+	MCFG_ITOA_UNUSED_DIGIT_VALUE(0x20)
 
 	MCFG_VIDEO_START_OVERRIDE(raiden2_state,raiden2)
 
@@ -1893,6 +1860,7 @@ static MACHINE_CONFIG_START( zeroteam, raiden2_state )
 
 	MCFG_RAIDEN2COP_ADD("raiden2cop")
 	MCFG_RAIDEN2COP_VIDEORAM_OUT_CB(WRITE16(raiden2_state, m_videoram_private_w))
+	MCFG_ITOA_UNUSED_DIGIT_VALUE(0x20)
 
 	MCFG_VIDEO_START_OVERRIDE(raiden2_state,raiden2)
 

@@ -15,6 +15,9 @@
 #define MCFG_RAIDEN2COP_VIDEORAM_OUT_CB(_devcb) \
 	devcb = &raiden2cop_device::set_m_videoramout_cb(*device, DEVCB_##_devcb);
 
+#define MCFG_ITOA_UNUSED_DIGIT_VALUE(value) \
+	raiden2cop_device::set_itoa_unused_digit_value(*device, value);
+
 
 class raiden2cop_device : public device_t
 {
@@ -67,6 +70,20 @@ public:
 	const UINT8 fade_table(int v);
 
 	template<class _Object> static devcb_base &set_m_videoramout_cb(device_t &device, _Object object) { return downcast<raiden2cop_device &>(device).m_videoramout_cb.set_callback(object); }
+
+	// Number Conversion
+
+	DECLARE_WRITE16_MEMBER( cop_itoa_low_w );
+	DECLARE_WRITE16_MEMBER( cop_itoa_high_w );
+	DECLARE_WRITE16_MEMBER( cop_itoa_digit_count_w );
+	DECLARE_READ16_MEMBER ( cop_itoa_digits_r );
+	
+	UINT32 cop_itoa;
+	UINT16 cop_itoa_digit_count;
+	UINT8 cop_itoa_digits[10];
+	UINT8 m_cop_itoa_unused_digit_value;
+
+	static void set_itoa_unused_digit_value(device_t &device, int value) { downcast<raiden2cop_device &>(device).m_cop_itoa_unused_digit_value = value; }
 protected:
 	// device-level overrides
 	virtual void device_start();

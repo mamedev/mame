@@ -22,6 +22,9 @@ raiden2cop_device::raiden2cop_device(const machine_config &mconfig, const char *
 	cop_dma_adr_rel(0),
 	pal_brightness_val(0),
 	pal_brightness_mode(0),
+	cop_itoa(0),
+	cop_itoa_digit_count(0),
+	m_cop_itoa_unused_digit_value(0x30),
 	m_videoramout_cb(*this),
 	m_palette(*this, ":palette")
 {
@@ -33,6 +36,8 @@ raiden2cop_device::raiden2cop_device(const machine_config &mconfig, const char *
 	memset(cop_dma_src, 0, sizeof(UINT16)*(0x200));
 	memset(cop_dma_dst, 0, sizeof(UINT16)*(0x200));
 	memset(cop_dma_size, 0, sizeof(UINT16)*(0x200));
+
+	memset(cop_itoa_digits, 0, sizeof(UINT8)*10);
 }
 
 
@@ -62,7 +67,14 @@ void raiden2cop_device::device_start()
 	save_item(NAME(cop_dma_dst));
 	save_item(NAME(cop_dma_size));
 
+	save_item(NAME(cop_itoa));
+	save_item(NAME(cop_itoa_digit_count));
+	save_item(NAME(cop_itoa_digits));
+
 	m_videoramout_cb.resolve_safe();
+
+	cop_itoa_digit_count = 4; //TODO: Raiden 2 never inits the BCD register, value here is a guess (8 digits, as WR is 10.000.000 + a)
+
 }
 
 /*** Command Table uploads ***/
@@ -546,4 +558,50 @@ WRITE16_MEMBER(raiden2cop_device::cop_dma_trigger_w)
 
 	}
 
+}
+
+/* Number Conversion */
+
+// according to score display in  https://www.youtube.com/watch?v=T1M8sxYgt9A 
+// we should return 0x30 for unused digits? according to Raiden 2 and Zero
+// Team the value should be 0x20, can this be configured?
+WRITE16_MEMBER(raiden2cop_device::cop_itoa_low_w)
+{
+	cop_itoa = (cop_itoa & ~UINT32(mem_mask)) | (data & mem_mask);
+
+	int digits = 1 << cop_itoa_digit_count*2;
+	UINT32 val = cop_itoa;
+
+	if(digits > 9)
+		digits = 9;
+	
+	for (int i = 0; i < digits; i++)
+	{
+		if (!val && i)
+		{
+			cop_itoa_digits[i] = m_cop_itoa_unused_digit_value;
+		}
+		else
+		{
+			cop_itoa_digits[i] = 0x30 | (val % 10);
+			val = val / 10;
+		}
+	}
+	
+	cop_itoa_digits[9] = 0;
+}
+
+WRITE16_MEMBER(raiden2cop_device::cop_itoa_high_w)
+{
+	cop_itoa = (cop_itoa & ~(mem_mask << 16)) | ((data & mem_mask) << 16);
+}
+
+WRITE16_MEMBER(raiden2cop_device::cop_itoa_digit_count_w)
+{
+	COMBINE_DATA(&cop_itoa_digit_count);
+}
+
+READ16_MEMBER(raiden2cop_device::cop_itoa_digits_r)
+{
+	return cop_itoa_digits[offset*2] | (cop_itoa_digits[offset*2+1] << 8);
 }

@@ -26,10 +26,9 @@ public:
 		  raiden2_tilemap_enable(0),
 		  prg_bank(0),
 		  cop_bank(0),
-		  cop_itoa(0),
 		  cop_status(0),
 		  cop_scale(0),
-		  cop_itoa_digit_count(0),
+
 		  cop_angle(0),
 		  cop_dist(0),
 
@@ -51,7 +50,7 @@ public:
 	{
 		  memset(scrollvals, 0, sizeof(UINT16)*6);
 		  memset(cop_regs, 0, sizeof(UINT32)*8);
-		  memset(cop_itoa_digits, 0, sizeof(UINT8)*10);
+
 
 		  memset(sprite_prot_src_addr, 0, sizeof(UINT16)*2);
 		  memset(cop_collision_info, 0, sizeof(colinfo)*2);
@@ -64,9 +63,7 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	DECLARE_WRITE16_MEMBER( cop_itoa_low_w );
-	DECLARE_WRITE16_MEMBER( cop_itoa_high_w );
-	DECLARE_WRITE16_MEMBER( cop_itoa_digit_count_w );
+
 	DECLARE_WRITE16_MEMBER( cop_scale_w );
 	DECLARE_WRITE16_MEMBER( cop_angle_target_w );
 	DECLARE_WRITE16_MEMBER( cop_angle_step_w );
@@ -77,7 +74,6 @@ public:
 	DECLARE_WRITE16_MEMBER( cop_reg_low_w );
 
 	DECLARE_WRITE16_MEMBER( cop_cmd_w );
-	DECLARE_READ16_MEMBER ( cop_itoa_digits_r );
 	DECLARE_READ16_MEMBER ( cop_collision_status_r );
 	DECLARE_READ16_MEMBER (cop_collision_status_val_r);
 	DECLARE_READ16_MEMBER (cop_collision_status_stat_r);
@@ -135,12 +131,14 @@ public:
 	UINT16 cop_bank;
 
 	UINT16 scrollvals[6];
-	UINT32 cop_regs[8], cop_itoa;
-	UINT16 cop_status, cop_scale, cop_itoa_digit_count, cop_angle, cop_dist;
-	UINT8 cop_itoa_digits[10];
+	UINT32 cop_regs[8];
+	UINT16 cop_status, cop_scale, cop_angle, cop_dist;
+	
 
 	UINT16 cop_angle_target;
 	UINT16 cop_angle_step;
+
+
 
 
 	DECLARE_WRITE16_MEMBER( sprite_prot_x_w );

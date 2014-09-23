@@ -1685,7 +1685,8 @@ void seibu_cop_legacy_device::device_start()
 }
 
 //-------------------------------------------------
-//  device_reset - device-specific startup
+//  device_
+//  device-specific startup
 //-------------------------------------------------
 
 void seibu_cop_legacy_device::device_reset()
@@ -2112,13 +2113,6 @@ READ16_MEMBER( seibu_cop_legacy_device::generic_cop_r )
 		case 0x188/2:
 			return m_cop_hit_val_unk;
 
-		/* BCD */
-		case 0x190/2:
-		case 0x192/2:
-		case 0x194/2:
-		case 0x196/2:
-		case 0x198/2:
-			return retvalue;
 
 		/* RNG, trusted */
 		case 0x1a0/2:
@@ -2144,7 +2138,6 @@ READ16_MEMBER( seibu_cop_legacy_device::generic_cop_r )
 
 WRITE16_MEMBER( seibu_cop_legacy_device::generic_cop_w )
 {
-	UINT32 temp32;
 
 	switch (offset)
 	{
@@ -2189,24 +2182,7 @@ WRITE16_MEMBER( seibu_cop_legacy_device::generic_cop_w )
 		case (0x01c/2): m_cop_angle_compare = UINT16(m_cop_mcu_ram[0x1c/2]);  break;
 		case (0x01e/2): m_cop_angle_mod_val = UINT16(m_cop_mcu_ram[0x1e/2]); break;
 
-		/* BCD Protection */
-		case (0x020/2):
-		case (0x022/2):
-			temp32 = (m_cop_mcu_ram[0x020/2]) | (m_cop_mcu_ram[0x022/2] << 16);
-			m_cop_mcu_ram[0x190/2] = (((temp32 / 1) % 10) + (((temp32 / 10) % 10) << 8) + 0x3030);
-			m_cop_mcu_ram[0x192/2] = (((temp32 / 100) % 10) + (((temp32 / 1000) % 10) << 8) + 0x3030);
-			m_cop_mcu_ram[0x194/2] = (((temp32 / 10000) % 10) + (((temp32 / 100000) % 10) << 8) + 0x3030);
-			m_cop_mcu_ram[0x196/2] = (((temp32 / 1000000) % 10) + (((temp32 / 10000000) % 10) << 8) + 0x3030);
-			m_cop_mcu_ram[0x198/2] = (((temp32 / 100000000) % 10) + (((temp32 / 1000000000) % 10) << 8) + 0x3030);
-			break;
-		case (0x024/2):
-			/*
-			This looks like a register for the BCD...
-			Godzilla and Heated Barrel sets 3
-			Denjin Makai sets 3 at start-up and toggles between 2 and 3 during gameplay on the BCD subroutine
-			SD Gundam sets 0
-			*/
-			break;
+
 
 
 			
