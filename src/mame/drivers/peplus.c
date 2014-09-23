@@ -168,9 +168,6 @@ NOTE:  The Door Open cycling is currently not fully understood. Non Plus program
        expect the Door Open bit to cycle. Later versions, Superboard & Wingboards require the Door Open cycling but
        at different rates. It's currently not know what if any universal value will work for all sets.
 
-NOTE:  Some of the earlier 32K versions currently error out with a Coin-In Timeout error. These sets include:
-       PP0008, PP0014, PP0023, PP0057, PP0059, PP0063 & PP0064
-
 ***********************************************************************************/
 
 #include "emu.h"
@@ -875,7 +872,7 @@ READ8_MEMBER(peplus_state::peplus_input_bank_a_r)
 		m_last_cycles = m_maincpu->total_cycles();
 	} else {
 		/* Process Next Coin Optic State */
-		if (curr_cycles - m_last_cycles > 600000/6 && m_coin_state != 0) {
+		if (curr_cycles - m_last_cycles > 10000 && m_coin_state != 0) { // Must be below 100ms (833.3 x 100 cycles) or "Coin-in Timeout" error
 			m_coin_state++;
 			if (m_coin_state > 5)
 				m_coin_state = 0;
@@ -918,7 +915,7 @@ READ8_MEMBER(peplus_state::peplus_input_bank_a_r)
 		m_last_door = m_maincpu->total_cycles();
 	}
 
-	if (curr_cycles - m_last_coin_out > 600000/12 && m_coin_out_state != 0) { // Guessing with 600000
+	if (curr_cycles - m_last_coin_out > 600000/12 && m_coin_out_state != 0) { // Must be below 700ms or it will time out
 		if (m_coin_out_state != 2) {
 			m_coin_out_state = 2; // Coin-Out Off
 		} else {
