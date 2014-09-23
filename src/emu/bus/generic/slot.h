@@ -135,6 +135,7 @@ public:
 
 	UINT8* get_rom_base()  { if (m_cart) return m_cart->get_rom_base(); return NULL; }
 	UINT8* get_ram_base() { if (m_cart) return m_cart->get_ram_base(); return NULL; }
+	UINT32 get_rom_size() { if (m_cart) return m_cart->get_rom_size(); return 0; }
 	
 protected:
 
