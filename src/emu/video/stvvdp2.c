@@ -2,6 +2,7 @@
 
 #define DEBUG_MODE 0
 #define TEST_FUNCTIONS 0
+#define POPMESSAGE_DEBUG 0
 
 /*
 
@@ -4431,13 +4432,13 @@ void saturn_state::stv_vdp2_check_tilemap(bitmap_rgb32 &bitmap, const rectangle 
 		//  popmessage("Sprite Window enabled");
 
 		/* Capcom Collection Dai 2 - Choh Makaimura (Duh!) */
-		if(STV_VDP2_MZCTL & 0x1f && 0)
+		if(STV_VDP2_MZCTL & 0x1f && POPMESSAGE_DEBUG)
 			popmessage("Mosaic control enabled = %04x\n",STV_VDP2_MZCTL);
 
 		/* Bio Hazard bit 1 */
 		/* Airs Adventure 0x3e */
 		/* Bakuretsu Hunter */
-		if(STV_VDP2_LNCLEN & ~2 && 0)
+		if(STV_VDP2_LNCLEN & ~2 && POPMESSAGE_DEBUG)
 			popmessage("Line Colour screen enabled %04x %08x, contact MAMEdev",STV_VDP2_LNCLEN,STV_VDP2_LCTAU<<16|STV_VDP2_LCTAL);
 
 		/* Bio Hazard 0x400 = extended color calculation enabled */
@@ -4448,7 +4449,7 @@ void saturn_state::stv_vdp2_check_tilemap(bitmap_rgb32 &bitmap, const rectangle 
 			popmessage("Gradation enabled %04x, contact MAMEdev",STV_VDP2_CCCR);
 
 		/* Advanced VG, Shining Force III */
-		if(STV_VDP2_SFCCMD && 0)
+		if(STV_VDP2_SFCCMD && POPMESSAGE_DEBUG)
 			popmessage("Special Color Calculation enable %04x, contact MAMEdev",STV_VDP2_SFCCMD);
 
 		/* Cleopatra Fortune Transparent Shadow */
@@ -4470,7 +4471,7 @@ void saturn_state::stv_vdp2_check_tilemap(bitmap_rgb32 &bitmap, const rectangle 
 			popmessage("Reduction enable %04x, contact MAMEdev",STV_VDP2_ZMCTL);
 
 		/* Burning Rangers and friends FMV, J.League Pro Soccer Club Wo Tsukurou!! backgrounds */
-		if(STV_VDP2_SCRCTL & 0x0101 && 0)
+		if(STV_VDP2_SCRCTL & 0x0101 && POPMESSAGE_DEBUG)
 			popmessage("Vertical cell scroll enable %04x, contact MAMEdev",STV_VDP2_SCRCTL);
 
 		/* Magical Drop III 0x200 -> color calculation window */

@@ -298,7 +298,7 @@ void h8_timer16_channel_device::recalc_event(UINT64 cur_time)
 		else
 			event_time = 0;
 
-		if(LOG_EVENT_TIME && event_time)
+		if(event_time && LOG_EVENT_TIME)
 			logerror("%s: next event in %d cycles (%ld)\n", tag(), int(event_time - cpu->total_cycles()), long(event_time));
 
 	} else {
