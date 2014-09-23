@@ -7,8 +7,7 @@
 
 #include "emu.h"
 #include "cpu/ssem/ssem.h"
-#include "imagedev/cartslot.h"
-#include <stdarg.h>
+#include "imagedev/snapquik.h"
 
 class ssem_state : public driver_device
 {
@@ -24,10 +23,11 @@ public:
 	required_device<screen_device> m_screen;
 
 	UINT8 m_store_line;
+	virtual void machine_start();
 	virtual void machine_reset();
 	UINT32 screen_update_ssem(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_INPUT_CHANGED_MEMBER(panel_check);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(ssem_store);
+	DECLARE_QUICKLOAD_LOAD_MEMBER(ssem_store);
 	inline UINT32 reverse(UINT32 v);
 	void glyph_print(bitmap_rgb32 &bitmap, INT32 x, INT32 y, const char *msg, ...) ATTR_PRINTF(5,6);
 	void strlower(char *buf);
@@ -45,7 +45,7 @@ public:
 // un-reversed before being used.
 inline UINT32 ssem_state::reverse(UINT32 v)
 {
-	// Taken from http://www-graphics.stanford.edu/~seander/bithacks.html#ReverseParallel
+	// Taken from http://www.graphics.stanford.edu/~seander/bithacks.html#ReverseParallel
 	// swap odd and even bits
 	v = ((v >> 1) & 0x55555555) | ((v & 0x55555555) << 1);
 	// swap consecutive pairs
@@ -518,25 +518,19 @@ void ssem_state::strlower(char *buf)
 * Image loading                                      *
 \****************************************************/
 
-DEVICE_IMAGE_LOAD_MEMBER(ssem_state,ssem_store)
+QUICKLOAD_LOAD_MEMBER(ssem_state, ssem_store)
 {
-	const char* image_name = image.filename();
-	char image_ext[5] = { 0 };
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 	char image_line[100] = { 0 };
 	char token_buf[100] = { 0 };
 	int num_lines = 0;
-	int i = 0;
-
-	// Isolate file extension and convert to lower-case
-	memcpy(image_ext, image_name + (strlen(image_name) - 4), 5);
-	strlower(image_ext);
 
 	image.fgets(image_line, 99);
 	sscanf(image_line, "%d", &num_lines);
 
-	if(num_lines)
+	if (num_lines)
 	{
-		for(i = 0; i < num_lines; i++)
+		for (int i = 0; i < num_lines; i++)
 		{
 			UINT32 line = 0;
 			image.fgets(image_line, 99);
@@ -546,26 +540,23 @@ DEVICE_IMAGE_LOAD_MEMBER(ssem_state,ssem_store)
 			token_buf[4] = '\0';
 			sscanf(token_buf, "%04d", &line);
 
-			if(strcmp(image_ext, ".snp") == 0)
+			if (!core_stricmp(image.filetype(), "snp"))
 			{
 				UINT32 word = 0;
-				int b = 0;
 
 				// Parse a line such as: 0000:00000110101001000100000100000100
-				for(b = 0; b < 32; b++)
+				for (int b = 0; b < 32; b++)
 				{
-					if(image_line[5 + b] == '1')
-					{
+					if (image_line[5 + b] == '1')
 						word |= 1 << (31 - b);
-					}
 				}
 
-				m_store[(line << 2) + 0] = (word >> 24) & 0x000000ff;
-				m_store[(line << 2) + 1] = (word >> 16) & 0x000000ff;
-				m_store[(line << 2) + 2] = (word >>  8) & 0x000000ff;
-				m_store[(line << 2) + 3] = (word >>  0) & 0x000000ff;
+				space.write_byte((line << 2) + 0, (word >> 24) & 0x000000ff);
+				space.write_byte((line << 2) + 1, (word >> 16) & 0x000000ff);
+				space.write_byte((line << 2) + 2, (word >>  8) & 0x000000ff);
+				space.write_byte((line << 2) + 3, (word >>  0) & 0x000000ff);
 			}
-			else if(strcmp(image_ext, ".asm") == 0)
+			else if (!core_stricmp(image.filetype(), "asm"))
 			{
 				char op_buf[4] = { 0 };
 				INT32 value = 0;
@@ -581,43 +572,27 @@ DEVICE_IMAGE_LOAD_MEMBER(ssem_state,ssem_store)
 				sscanf(image_line + 9, "%d", &value);
 				unsigned_value = reverse((UINT32)value);
 
-				if(strcmp(op_buf, "num") == 0)
-				{
+				if (!core_stricmp(op_buf, "num"))
 					word = unsigned_value;
-				}
-				else if(strcmp(op_buf, "jmp") == 0)
-				{
+				else if (!core_stricmp(op_buf, "jmp"))
 					word = 0x00000000 | unsigned_value ;
-				}
-				else if(strcmp(op_buf, "jrp") == 0)
-				{
+				else if (!core_stricmp(op_buf, "jrp"))
 					word = 0x00040000 | unsigned_value;
-				}
-				else if(strcmp(op_buf, "ldn") == 0)
-				{
+				else if (!core_stricmp(op_buf, "ldn"))
 					word = 0x00020000 | unsigned_value;
-				}
-				else if(strcmp(op_buf, "sto") == 0)
-				{
+				else if (!core_stricmp(op_buf, "sto"))
 					word = 0x00060000 | unsigned_value;
-				}
-				else if(strcmp(op_buf, "sub") == 0)
-				{
+				else if (!core_stricmp(op_buf, "sub"))
 					word = 0x00010000 | unsigned_value;
-				}
-				else if(strcmp(op_buf, "cmp") == 0)
-				{
+				else if (!core_stricmp(op_buf, "cmp"))
 					word = 0x00030000 | unsigned_value;
-				}
-				else if(strcmp(op_buf, "stp") == 0)
-				{
+				else if (!core_stricmp(op_buf, "stp"))
 					word = 0x00070000 | unsigned_value;
-				}
 
-				m_store[(line << 2) + 0] = (word >> 24) & 0x000000ff;
-				m_store[(line << 2) + 1] = (word >> 16) & 0x000000ff;
-				m_store[(line << 2) + 2] = (word >>  8) & 0x000000ff;
-				m_store[(line << 2) + 3] = (word >>  0) & 0x000000ff;
+				space.write_byte((line << 2) + 0, (word >> 24) & 0x000000ff);
+				space.write_byte((line << 2) + 1, (word >> 16) & 0x000000ff);
+				space.write_byte((line << 2) + 2, (word >>  8) & 0x000000ff);
+				space.write_byte((line << 2) + 3, (word >>  0) & 0x000000ff);
 			}
 		}
 	}
@@ -629,6 +604,11 @@ DEVICE_IMAGE_LOAD_MEMBER(ssem_state,ssem_store)
 * Machine definition                                 *
 \****************************************************/
 
+void ssem_state::machine_start()
+{
+	save_item(NAME(m_store_line));
+}
+
 void ssem_state::machine_reset()
 {
 	m_store_line = 0;
@@ -639,7 +619,6 @@ static MACHINE_CONFIG_START( ssem, ssem_state )
 	MCFG_CPU_ADD("maincpu", SSEMCPU, 700)
 	MCFG_CPU_PROGRAM_MAP(ssem_map)
 
-
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
@@ -649,15 +628,15 @@ static MACHINE_CONFIG_START( ssem, ssem_state )
 	MCFG_SCREEN_UPDATE_DRIVER(ssem_state, screen_update_ssem)
 	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 
-	/* cartridge */
-	MCFG_CARTSLOT_ADD("cart")
-	MCFG_CARTSLOT_EXTENSION_LIST("snp,asm")
-	MCFG_CARTSLOT_LOAD(ssem_state,ssem_store)
+	/* quickload */
+	MCFG_QUICKLOAD_ADD("quickload", ssem_state, ssem_store, "snp,asm", 1)
 MACHINE_CONFIG_END
+
 
 ROM_START( ssem )
 	ROM_REGION( 0x80, "maincpu", ROMREGION_ERASE00 )  /* Main Store */
 ROM_END
 
+
 /*   YEAR  NAME     PARENT    COMPAT   MACHINE  INPUT  INIT        COMPANY                       FULLNAME */
-COMP(1948, ssem,    0,        0,       ssem,    ssem, driver_device,  0,   "Manchester University", "Small-Scale Experimental Machine (SSEM), 'Baby'", GAME_NO_SOUND_HW )
+COMP(1948, ssem,    0,        0,       ssem,    ssem, driver_device,  0,   "Manchester University", "Small-Scale Experimental Machine (SSEM), 'Baby'", GAME_NO_SOUND_HW | GAME_SUPPORTS_SAVE )
