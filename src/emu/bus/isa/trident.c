@@ -50,13 +50,17 @@ UINT32 trident_vga_device::READPIXEL32(INT16 x, INT16 y)
 void trident_vga_device::WRITEPIXEL8(INT16 x, INT16 y, UINT8 data)
 {
 	if((x & 0xfff)<tri.accel_dest_x_clip && (y & 0xfff)<tri.accel_dest_y_clip)
+	{
+		data = handle_rop(data,READPIXEL8(x,y)) & 0xff;
 		vga.memory[((y & 0xfff)*offset() + (x & 0xfff)) % vga.svga_intf.vram_size] = data;
+	}
 }
 
 void trident_vga_device::WRITEPIXEL15(INT16 x, INT16 y, UINT16 data)
 {
 	if((x & 0xfff)<tri.accel_dest_x_clip && (y & 0xfff)<tri.accel_dest_y_clip)
 	{
+		data = handle_rop(data,READPIXEL8(x,y)) & 0x7fff;
 		vga.memory[((y & 0xfff)*offset() + (x & 0xfff)*2) % vga.svga_intf.vram_size] = data & 0x00ff;
 		vga.memory[((y & 0xfff)*offset() + ((x & 0xfff)*2)+1) % vga.svga_intf.vram_size] = (data & 0x7f00) >> 8;
 	}
@@ -66,6 +70,7 @@ void trident_vga_device::WRITEPIXEL16(INT16 x, INT16 y, UINT16 data)
 {
 	if((x & 0xfff)<tri.accel_dest_x_clip && (y & 0xfff)<tri.accel_dest_y_clip)
 	{
+		data = handle_rop(data,READPIXEL8(x,y)) & 0xffff;
 		vga.memory[((y & 0xfff)*offset() + (x & 0xfff)*2) % vga.svga_intf.vram_size] = data & 0x00ff;
 		vga.memory[((y & 0xfff)*offset() + ((x & 0xfff)*2)+1) % vga.svga_intf.vram_size] = (data & 0xff00) >> 8;
 	}
@@ -75,11 +80,33 @@ void trident_vga_device::WRITEPIXEL32(INT16 x, INT16 y, UINT32 data)
 {
 	if((x & 0xfff)<tri.accel_dest_x_clip && (y & 0xfff)<tri.accel_dest_y_clip)
 	{
+		data = handle_rop(data,READPIXEL8(x,y));
 		vga.memory[((y & 0xfff)*offset() + (x & 0xfff)*4) % vga.svga_intf.vram_size] = data & 0x000000ff;
 		vga.memory[((y & 0xfff)*offset() + ((x & 0xfff)*4)+1) % vga.svga_intf.vram_size] = (data & 0x0000ff00) >> 8;
 		vga.memory[((y & 0xfff)*offset() + ((x & 0xfff)*4)+2) % vga.svga_intf.vram_size] = (data & 0x00ff0000) >> 16;
 		vga.memory[((y & 0xfff)*offset() + ((x & 0xfff)*4)+3) % vga.svga_intf.vram_size] = (data & 0xff000000) >> 24;
 	}
+}
+
+UINT32 trident_vga_device::handle_rop(UINT32 src, UINT32 dst)
+{
+	switch(tri.accel_fmix)  // TODO: better understand this register
+	{
+	case 0xf0:  // PAT
+	case 0xcc:  // SRC
+		break;  // pass data through
+	case 0x00:  // 0
+		src = 0;
+		break;
+	case 0xff:  // 1
+		src = 0xffffffff;
+		break;
+	case 0x66:  // XOR
+	case 0x5a:  // XOR PAT
+		src = dst ^ src;
+		break;
+	}
+	return src;
 }
 
 UINT32 trident_vga_device::READPIXEL(INT16 x,INT16 y)
@@ -1168,22 +1195,29 @@ void trident_vga_device::accel_line()
 // feed data written to VRAM to an active BitBLT command
 void trident_vga_device::accel_data_write(UINT32 data)
 {
+	int xdir = 1,ydir = 1;
+
+	if(tri.accel_drawflags & 0x0200)  // XNEG
+		xdir = -1;
+	if(tri.accel_drawflags & 0x0100)  // YNEG
+		ydir = -1;
+
 	for(int x=31;x>=0;x--)
 	{
-		if(tri.accel_mem_x <= tri.accel_dest_x+tri.accel_dim_x)
+		if(tri.accel_mem_x <= tri.accel_dest_x+tri.accel_dim_x && tri.accel_mem_x >= tri.accel_dest_x-tri.accel_dim_x)
 		{
 			if(((data >> x) & 0x01) != 0)
 				WRITEPIXEL(tri.accel_mem_x,tri.accel_mem_y,tri.accel_fgcolour);
 			else
 				WRITEPIXEL(tri.accel_mem_x,tri.accel_mem_y,tri.accel_bgcolour);
 		}
-		tri.accel_mem_x++;
+		tri.accel_mem_x+=xdir;
 	}
-	if(tri.accel_mem_x > tri.accel_dest_x+tri.accel_dim_x)
+	if(tri.accel_mem_x > tri.accel_dest_x+tri.accel_dim_x || tri.accel_mem_x < tri.accel_dest_x-tri.accel_dim_x)
 	{
 		tri.accel_mem_x = tri.accel_dest_x;
-		tri.accel_mem_y++;
-		if(tri.accel_mem_y > tri.accel_dest_y+tri.accel_dim_y)
+		tri.accel_mem_y+=ydir;
+		if(tri.accel_mem_y > tri.accel_dest_y+tri.accel_dim_y || tri.accel_mem_y < tri.accel_dest_y-tri.accel_dim_y)
 			tri.accel_memwrite_active = false;  // completed
 	}
 }

@@ -115,6 +115,7 @@ private:
 	void WRITEPIXEL32(INT16 x, INT16 y, UINT32 data);
 	UINT32 READPIXEL(INT16 x,INT16 y);
 	void WRITEPIXEL(INT16 x,INT16 y, UINT32 data);
+	UINT32 handle_rop(UINT32 src, UINT32 dst);
 };
 
 
