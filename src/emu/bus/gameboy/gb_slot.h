@@ -41,13 +41,6 @@ enum
 };
 
 
-// ======================> gb_cart_interface
-
-struct gb_cart_interface
-{
-};
-
-
 // ======================> device_gb_cart_interface
 
 class device_gb_cart_interface : public device_slot_card_interface
@@ -78,6 +71,8 @@ public:
 	void set_has_battery(bool val) { has_battery = val; }
 	bool get_has_battery() { return has_battery; }
 
+	void save_ram()	{ device().save_item(NAME(m_ram)); }
+		
 	// internal state
 	dynamic_buffer m_rom;
 	dynamic_buffer m_ram;
@@ -101,7 +96,6 @@ public:
 // ======================> base_gb_cart_slot_device
 
 class base_gb_cart_slot_device : public device_t,
-								public gb_cart_interface,
 								public device_image_interface,
 								public device_slot_interface
 {
@@ -127,7 +121,8 @@ public:
 
 	void setup_ram(UINT8 banks);
 	void internal_header_logging(UINT8 *ROM, UINT32 len);
-
+	void save_ram()	{ if (m_cart && m_cart->get_ram_size()) m_cart->save_ram(); }
+	
 	virtual iodevice_t image_type() const { return IO_CARTSLOT; }
 	virtual bool is_readable()  const { return 1; }
 	virtual bool is_writeable() const { return 0; }

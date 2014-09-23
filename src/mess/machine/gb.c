@@ -122,6 +122,8 @@ void gb_state::save_gb_base()
 	save_item(NAME(m_reloading));
 	save_item(NAME(m_sio_count));
 	save_item(NAME(m_bios_disable));
+	if (m_cartslot)
+		m_cartslot->save_ram();
 }
 
 void gb_state::save_gbc_only()
