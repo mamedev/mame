@@ -688,16 +688,10 @@ READ16_MEMBER( segaorun_state::outrun_custom_io_r )
 			return m_i8255->read(space, offset & 3);
 
 		case 0x10/2:
-		{
-			static const char *const sysports[] = { "SERVICE", "UNKNOWN", "COINAGE", "DSW" };
-			return ioport(sysports[offset & 3])->read();
-		}
+			return m_in_ports[offset & 3]->read();
 
 		case 0x30/2:
-		{
-			static const char *const ports[] = { "ADC0", "ADC1", "ADC2", "ADC3", "ADC4", "ADC5", "ADC6", "ADC7" };
-			return ioport(ports[m_adc_select])->read_safe(0x0010);
-		}
+			return m_adc_ports[m_adc_select]->read_safe(0x0010);
 
 		case 0x60/2:
 			return watchdog_reset_r(space, 0);
@@ -776,16 +770,10 @@ READ16_MEMBER( segaorun_state::shangon_custom_io_r )
 		case 0x1002/2:
 		case 0x1004/2:
 		case 0x1006/2:
-		{
-			static const char *const sysports[] = { "SERVICE", "UNKNOWN", "COINAGE", "DSW" };
-			return ioport(sysports[offset & 3])->read();
-		}
+			return m_in_ports[offset & 3]->read();
 
 		case 0x3020/2:
-		{
-			static const char *const ports[] = { "ADC0", "ADC1", "ADC2", "ADC3" };
-			return ioport(ports[m_adc_select])->read_safe(0x0010);
-		}
+			return m_adc_ports[m_adc_select]->read_safe(0x0010);
 
 		default:
 			break;
@@ -947,7 +935,7 @@ CUSTOM_INPUT_MEMBER(segaorun_state::bankmotor_pos_r)
 
 
 static INPUT_PORTS_START( outrun_generic )
-	PORT_START("SERVICE")
+	PORT_START("IN.0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_SERVICE_NO_TOGGLE( 0x02, IP_ACTIVE_LOW )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
@@ -957,13 +945,13 @@ static INPUT_PORTS_START( outrun_generic )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 )
 
-	PORT_START("UNKNOWN")
+	PORT_START("IN.1")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("COINAGE")
+	PORT_START("IN.2")
 	SEGA_COINAGE_LOC(SWA)
 
-	PORT_START("DSW")
+	PORT_START("IN.3")
 	PORT_DIPUNUSED_DIPLOC( 0x01, IP_ACTIVE_LOW, "SWB:1" )
 	PORT_DIPUNUSED_DIPLOC( 0x02, IP_ACTIVE_LOW, "SWB:2" )
 	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SWB:3")
@@ -981,16 +969,16 @@ static INPUT_PORTS_START( outrun_generic )
 	PORT_DIPSETTING(    0x40, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
 
-	PORT_START("ADC0")  // steering
+	PORT_START("ADC.0")  // steering
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x20,0xe0) PORT_SENSITIVITY(100) PORT_KEYDELTA(4)
 
-	PORT_START("ADC1")  // gas pedal
+	PORT_START("ADC.1")  // gas pedal
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(20)
 
-	PORT_START("ADC2")  // brake
+	PORT_START("ADC.2")  // brake
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_SENSITIVITY(100) PORT_KEYDELTA(40)
 
-	PORT_START("ADC3")
+	PORT_START("ADC.3")
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, segaorun_state, bankmotor_pos_r, NULL)
 INPUT_PORTS_END
 
@@ -1003,7 +991,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( outrun )
 	PORT_INCLUDE( outrun_generic )
 
-	PORT_MODIFY("DSW")
+	PORT_MODIFY("IN.3")
 	PORT_DIPNAME( 0x03, 0x01, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SWB:1,2")
 	PORT_DIPSETTING(    0x03, "Moving" )
 	PORT_DIPSETTING(    0x02, "Up Cockpit" )
@@ -1015,7 +1003,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( outrundx )
 	PORT_INCLUDE( outrun_generic )
 
-	PORT_MODIFY("DSW")
+	PORT_MODIFY("IN.3")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SWB:1")
 	PORT_DIPSETTING(    0x00, "Not Moving" )
 	PORT_DIPSETTING(    0x01, "Moving" )
@@ -1032,10 +1020,10 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( toutrun )
 	PORT_INCLUDE( outrun_generic )
 
-	PORT_MODIFY("SERVICE")
+	PORT_MODIFY("IN.0")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Turbo")
 
-	PORT_MODIFY("DSW")
+	PORT_MODIFY("IN.3")
 	PORT_DIPNAME( 0x03, 0x01, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SWB:1,2")
 	PORT_DIPSETTING(    0x03, "Moving" )
 	PORT_DIPSETTING(    0x02, "Cockpit Conversion" )
@@ -1058,7 +1046,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( toutrunm )
 	PORT_INCLUDE( toutrun )
 
-	PORT_MODIFY("DSW")
+	PORT_MODIFY("IN.3")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SWB:1,2")
 	PORT_DIPSETTING(    0x03, "Moving" )
 //  PORT_DIPSETTING(    0x02, DEF_STR( Unused ) )
@@ -1075,7 +1063,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( toutrunc )
 	PORT_INCLUDE( toutrun )
 
-	PORT_MODIFY("DSW")
+	PORT_MODIFY("IN.3")
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SWB:1,2")
 //  PORT_DIPSETTING(    0x03, DEF_STR( Unused ) )
 //  PORT_DIPSETTING(    0x02, DEF_STR( Unused ) )
@@ -1090,10 +1078,10 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( shangon )
 	PORT_INCLUDE( outrun_generic )
 
-	PORT_MODIFY("SERVICE")
+	PORT_MODIFY("IN.0")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_MODIFY("UNKNOWN")
+	PORT_MODIFY("IN.1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW )
@@ -1103,7 +1091,7 @@ static INPUT_PORTS_START( shangon )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_MODIFY("DSW")
+	PORT_MODIFY("IN.3")
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SWB:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -1121,10 +1109,10 @@ static INPUT_PORTS_START( shangon )
 	PORT_DIPUNUSED_DIPLOC( 0x40, IP_ACTIVE_LOW, "SWB:7" )
 	PORT_DIPUNUSED_DIPLOC( 0x80, IP_ACTIVE_LOW, "SWB:8" )
 
-	PORT_MODIFY("ADC0") // steering
+	PORT_MODIFY("ADC.0") // steering
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x20,0xe0) PORT_SENSITIVITY(100) PORT_KEYDELTA(4) PORT_REVERSE
 
-	PORT_MODIFY("ADC3")
+	PORT_MODIFY("ADC.3")
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 

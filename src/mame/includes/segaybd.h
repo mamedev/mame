@@ -21,20 +21,22 @@ public:
 	// construction/destruction
 	segaybd_state(const machine_config &mconfig, device_type type, const char *tag)
 		: sega_16bit_common_base(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_subx(*this, "subx"),
-			m_suby(*this, "suby"),
-			m_soundcpu(*this, "soundcpu"),
-			m_linkcpu(*this, "linkcpu"),
-			m_bsprites(*this, "bsprites"),
-			m_ysprites(*this, "ysprites"),
-			m_segaic16vid(*this, "segaic16vid"),
-			m_pdrift_bank(0),
-			m_scanline_timer(NULL),
-			m_irq2_scanline(0),
-			m_timer_irq_state(0),
-			m_vblank_irq_state(0),
-			m_tmp_bitmap(512, 512)
+		m_maincpu(*this, "maincpu"),
+		m_subx(*this, "subx"),
+		m_suby(*this, "suby"),
+		m_soundcpu(*this, "soundcpu"),
+		m_linkcpu(*this, "linkcpu"),
+		m_bsprites(*this, "bsprites"),
+		m_ysprites(*this, "ysprites"),
+		m_segaic16vid(*this, "segaic16vid"),
+		m_in_ports(*this, "IN"),
+		m_adc_ports(*this, "ADC"),
+		m_pdrift_bank(0),
+		m_scanline_timer(NULL),
+		m_irq2_scanline(0),
+		m_timer_irq_state(0),
+		m_vblank_irq_state(0),
+		m_tmp_bitmap(512, 512)
 	{
 		memset(m_analog_data, 0, sizeof(m_analog_data));
 		memset(m_misc_io_data, 0, sizeof(m_misc_io_data));
@@ -109,6 +111,10 @@ protected:
 	required_device<sega_sys16b_sprite_device> m_bsprites;
 	required_device<sega_yboard_sprite_device> m_ysprites;
 	required_device<segaic16_video_device> m_segaic16vid;
+
+	// input ports
+	required_ioport_array<8> m_in_ports;
+	optional_ioport_array<6> m_adc_ports;
 
 	// configuration
 	output_delegate m_output_cb1;

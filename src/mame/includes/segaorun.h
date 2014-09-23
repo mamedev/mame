@@ -35,6 +35,8 @@ public:
 		m_segaic16road(*this, "segaic16road"),
 		m_bankmotor_timer(*this, "bankmotor"),
 		m_workram(*this, "workram"),
+		m_in_ports(*this, "IN"),
+		m_adc_ports(*this, "ADC"),
 		m_custom_map(NULL),
 		m_shangon_video(false),
 		m_scanline_timer(NULL),
@@ -124,6 +126,10 @@ protected:
 
 	// memory
 	required_shared_ptr<UINT16> m_workram;
+
+	// input ports
+	required_ioport_array<4> m_in_ports;
+	optional_ioport_array<8> m_adc_ports;
 
 	// configuration
 	read16_delegate     m_custom_io_r;
