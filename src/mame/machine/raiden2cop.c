@@ -41,6 +41,8 @@ raiden2cop_device::raiden2cop_device(const machine_config &mconfig, const char *
 	cop_sort_lookup(0),
 	cop_sort_param(0),
 
+	m_cop_rng_max_value(0),
+
 	m_videoramout_cb(*this),
 	m_palette(*this, ":palette")
 {
@@ -124,6 +126,9 @@ void raiden2cop_device::device_start()
 	save_item(NAME(cop_collision_info[1].spradr));
 	save_item(NAME(cop_collision_info[1].allow_swap));
 	save_item(NAME(cop_collision_info[1].flags_swap));
+
+	save_item(NAME(m_cop_rng_max_value));
+
 
 	m_videoramout_cb.resolve_safe();
 
@@ -1058,4 +1063,20 @@ WRITE16_MEMBER( raiden2cop_device::cop_sort_dma_trig_w)
 	}
 }
 
+/* Random number generators (only verified on 68k games) */
 
+READ16_MEMBER(raiden2cop_device::cop_prng_r)
+{
+	return space.machine().firstcpu->total_cycles() % (m_cop_rng_max_value + 1);
+}
+
+/* max possible value returned by the RNG at 0x5a*, trusted */
+WRITE16_MEMBER(raiden2cop_device::cop_prng_maxvalue_w)
+{
+	COMBINE_DATA(&m_cop_rng_max_value);
+}
+
+READ16_MEMBER(raiden2cop_device::cop_prng_maxvalue_r)
+{
+	return m_cop_rng_max_value;
+}

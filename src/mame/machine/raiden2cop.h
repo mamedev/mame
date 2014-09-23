@@ -144,6 +144,13 @@ public:
 	UINT32 cop_sort_ram_addr, cop_sort_lookup;
 	UINT16 cop_sort_param;
 
+	// RNG
+	UINT16 m_cop_rng_max_value;
+	DECLARE_READ16_MEMBER(cop_prng_r);
+	DECLARE_WRITE16_MEMBER(cop_prng_maxvalue_w);
+	DECLARE_READ16_MEMBER(cop_prng_maxvalue_r);
+
+
 protected:
 	// device-level overrides
 	virtual void device_start();

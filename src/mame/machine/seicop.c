@@ -1601,17 +1601,11 @@ const device_type SEIBU_COP_LEGACY = &device_creator<seibu_cop_legacy_device>;
 seibu_cop_legacy_device::seibu_cop_legacy_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, SEIBU_COP_LEGACY, "Seibu COP Legacy", tag, owner, clock, "seibu_cop_legacy", __FILE__),
 	m_cop_mcu_ram(NULL),
-	m_cop_scale(0),
-	m_cop_rng_max_value(0),
 	m_copd2_offs(0),
-	m_cop_hit_status(0),
 	m_cop_hit_val_x(0),
 	m_cop_hit_val_y(0),
 	m_cop_hit_val_z(0),
 	m_cop_hit_val_unk(0),
-	m_cop_sort_lookup(0),
-	m_cop_sort_ram_addr(0),
-	m_cop_sort_param(0),
 	m_legacycop_angle_compare(0),
 	m_legacycop_angle_mod_val(0),
 	m_r0(0),
@@ -1650,17 +1644,12 @@ void seibu_cop_legacy_device::device_start()
 {
 	m_cop_mcu_ram = reinterpret_cast<UINT16 *>(machine().root_device().memshare("cop_mcu_ram")->ptr());
 
-	save_item(NAME(m_cop_scale));
-	save_item(NAME(m_cop_rng_max_value));
+
 	save_item(NAME(m_copd2_offs));
-	save_item(NAME(m_cop_hit_status));
 	save_item(NAME(m_cop_hit_val_x));
 	save_item(NAME(m_cop_hit_val_y));
 	save_item(NAME(m_cop_hit_val_z));
 	save_item(NAME(m_cop_hit_val_unk));
-	save_item(NAME(m_cop_sort_lookup));
-	save_item(NAME(m_cop_sort_ram_addr));
-	save_item(NAME(m_cop_sort_param));
 	save_item(NAME(m_legacycop_angle_compare));
 	save_item(NAME(m_legacycop_angle_mod_val));
 	save_item(NAME(m_r0));
@@ -1860,7 +1849,7 @@ WRITE16_MEMBER( seibu_cop_legacy_device::copdxbl_0_w )
 					if(raw_angle == 0xc0)
 						amp*=2;
 
-					res = int(amp*sin(angle)) << m_cop_scale;
+					res = int(amp*sin(angle)) << m_raiden2cop->cop_scale;
 
 					space.write_dword(m_raiden2cop->cop_regs[0] + 0x10, res);
 
@@ -1877,7 +1866,7 @@ WRITE16_MEMBER( seibu_cop_legacy_device::copdxbl_0_w )
 					if(raw_angle == 0x80)
 						amp*=2;
 
-					res = int(amp*cos(angle)) << m_cop_scale;
+					res = int(amp*cos(angle)) << m_raiden2cop->cop_scale;
 
 					space.write_dword(m_raiden2cop->cop_regs[0] + 20, res);
 
@@ -2053,16 +2042,6 @@ READ16_MEMBER( seibu_cop_legacy_device::generic_cop_r )
 
 	switch (offset)
 	{
-		/* RNG max value readback, trusted */
-		case 0x02c/2:
-			return retvalue;
-
-		/* DMA mode register readback, trusted */
-		case 0x07e/2:
-			return retvalue;
-
-		case 0x180/2:
-			return m_cop_hit_status;
 
 		/* these two controls facing direction in Godzilla opponents (only vs.) - x value compare? */
 		case 0x182/2:
@@ -2079,12 +2058,6 @@ READ16_MEMBER( seibu_cop_legacy_device::generic_cop_r )
 			return m_cop_hit_val_unk;
 
 
-		/* RNG, trusted */
-		case 0x1a0/2:
-		case 0x1a2/2:
-		case 0x1a4/2:
-		case 0x1a6/2:
-			return space.machine().firstcpu->total_cycles() % (m_cop_rng_max_value+1);
 
 
 		default:
@@ -2146,9 +2119,7 @@ WRITE16_MEMBER( seibu_cop_legacy_device::generic_cop_w )
 			
 			
 
-		/* max possible value returned by the RNG at 0x5a*, trusted */
-		case (0x02c/2): m_cop_rng_max_value = m_cop_mcu_ram[0x2c/2] & 0xff; break;
-
+		
 		case (0x03e/2):
 			/*
 			0 in all 68k based games
@@ -2158,7 +2129,6 @@ WRITE16_MEMBER( seibu_cop_legacy_device::generic_cop_w )
 			*/
 			break;
 
-		case (0x044/2): { m_cop_scale = data & 3; break; }
 		case (0x046/2): { m_cop_rom_addr_unk = data & 0xffff; break; }
 		case (0x048/2): { m_cop_rom_addr_lo = data & 0xffff; break; }
 		case (0x04a/2): { m_cop_rom_addr_hi = data & 0xffff; break; }
@@ -2287,7 +2257,7 @@ WRITE16_MEMBER( seibu_cop_legacy_device::generic_cop_w )
 				if(raw_angle == 0xc0)
 					amp*=2;
 
-				res = int(amp*sin(angle)) << m_cop_scale;
+				res = int(amp*sin(angle)) << m_raiden2cop->cop_scale;
 
 				space.write_dword(m_raiden2cop->cop_regs[0] + 0x10, res);
 				return;
@@ -2317,7 +2287,7 @@ WRITE16_MEMBER( seibu_cop_legacy_device::generic_cop_w )
 				if(raw_angle == 0x80)
 					amp*=2;
 
-				res = int(amp*cos(angle)) << m_cop_scale;
+				res = int(amp*cos(angle)) << m_raiden2cop->cop_scale;
 
 				space.write_dword(m_raiden2cop->cop_regs[0] + 20, res);
 				return;
@@ -2427,15 +2397,15 @@ WRITE16_MEMBER( seibu_cop_legacy_device::generic_cop_w )
 				}
 
 				/* TODO: calculation of this one should occur at 0x3b30/0x3bb0 I *think* */
-				/* TODO: recheck if m_cop_scale still masks at 3 with this command */
-				dx >>= 11 + m_cop_scale;
-				dy >>= 11 + m_cop_scale;
+				/* TODO: recheck if m_raiden2cop->cop_scale still masks at 3 with this command */
+				dx >>= 11 + m_raiden2cop->cop_scale;
+				dy >>= 11 + m_raiden2cop->cop_scale;
 				cop_dist_raw = sqrt((double)(dx*dx+dy*dy));
 
 				res = cop_dist_raw;
 				res /= div;
 
-				m_raiden2cop->cop_dist = (1 << (5 - m_cop_scale)) / div;
+				m_raiden2cop->cop_dist = (1 << (5 - m_raiden2cop->cop_scale)) / div;
 
 				/* TODO: bits 5-6-15 */
 				m_raiden2cop->cop_status = 7;
@@ -2475,7 +2445,7 @@ WRITE16_MEMBER( seibu_cop_legacy_device::generic_cop_w )
 
 				/* do the math */
 				cop_take_hit_box_params(0);
-				m_cop_hit_status = cop_calculate_collsion_detection();
+				m_raiden2cop->cop_hit_status = cop_calculate_collsion_detection();
 
 				return;
 			}
@@ -2498,7 +2468,7 @@ WRITE16_MEMBER( seibu_cop_legacy_device::generic_cop_w )
 
 				/* do the math */
 				cop_take_hit_box_params(1);
-				m_cop_hit_status = cop_calculate_collsion_detection();
+				m_raiden2cop->cop_hit_status = cop_calculate_collsion_detection();
 				return;
 			}
 
@@ -2729,64 +2699,9 @@ WRITE16_MEMBER( seibu_cop_legacy_device::generic_cop_w )
 			break;
 		}
 
-		/* DMA go register */
-		case (0x2fc/2):	m_raiden2cop->cop_dma_trigger_w(space, offset, data, mem_mask);	break;
 
 
-		/* sort-DMA, oh my ... */
-		case (0x054/2): { m_cop_sort_lookup = (m_cop_sort_lookup&0x0000ffff)|(m_cop_mcu_ram[offset]<<16); break; }
-		case (0x056/2): { m_cop_sort_lookup = (m_cop_sort_lookup&0xffff0000)|(m_cop_mcu_ram[offset]<<0);  break; }
-		case (0x050/2): { m_cop_sort_ram_addr = (m_cop_sort_ram_addr&0x0000ffff)|(m_cop_mcu_ram[offset]<<16); break; }
-		case (0x052/2): { m_cop_sort_ram_addr = (m_cop_sort_ram_addr&0xffff0000)|(m_cop_mcu_ram[offset]<<0);  break; }
-		case (0x058/2): { m_cop_sort_param = m_cop_mcu_ram[offset]; break; }
 
-		case (0x2fe/2):
-		{
-			UINT16 sort_size;
 
-			sort_size = m_cop_mcu_ram[offset];
-
-			{
-				int i,j;
-				UINT8 xchg_flag;
-				UINT32 addri,addrj;
-				UINT16 vali,valj;
-
-				/* TODO: use a better algorithm than bubble sort! */
-				for(i=2;i<sort_size;i+=2)
-				{
-					for(j=i-2;j<sort_size;j+=2)
-					{
-						addri = m_cop_sort_ram_addr+space.read_word(m_cop_sort_lookup+i);
-						addrj = m_cop_sort_ram_addr+space.read_word(m_cop_sort_lookup+j);
-
-						vali = space.read_word(addri);
-						valj = space.read_word(addrj);
-
-						//printf("%08x %08x %04x %04x\n",addri,addrj,vali,valj);
-
-						switch(m_cop_sort_param)
-						{
-							case 2: xchg_flag = (vali > valj); break;
-							case 1: xchg_flag = (vali < valj); break;
-							case 0: xchg_flag = 0; break; /* ??? */
-							default: xchg_flag = 0; printf("Warning: sort-DMA used with param %02x\n",m_cop_sort_param); break;
-						}
-
-						if(xchg_flag)
-						{
-							UINT16 xch_val;
-
-							xch_val = space.read_word(m_cop_sort_lookup+i);
-							space.write_word(m_cop_sort_lookup+i,space.read_word(m_cop_sort_lookup+j));
-							space.write_word(m_cop_sort_lookup+j,xch_val);
-						}
-					}
-				}
-			}
-			//else
-
-			break;
-		}
 	}
 }

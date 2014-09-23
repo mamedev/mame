@@ -41,12 +41,9 @@ private:
 	UINT16 *m_cop_mcu_ram;
 
 
-	UINT16 m_cop_scale;
-	UINT8 m_cop_rng_max_value;
+
 	UINT16 m_copd2_offs;
-	UINT16 m_cop_hit_status;
 	INT16 m_cop_hit_val_x,m_cop_hit_val_y,m_cop_hit_val_z,m_cop_hit_val_unk;
-	UINT32 m_cop_sort_lookup,m_cop_sort_ram_addr,m_cop_sort_param;
 	INT8 m_legacycop_angle_compare;
 	INT8 m_legacycop_angle_mod_val;
 	struct collision_info m_cop_collision_info[2];
@@ -57,8 +54,7 @@ private:
 	int m_cop_sprite_dma_abs_x,m_cop_sprite_dma_abs_y,m_cop_sprite_dma_size;
 	UINT32 m_cop_sprite_dma_param;
 
-	void copd2_set_tableoffset(UINT16 data);
-	void copd2_set_tabledata(UINT16 data);
+
 	void cop_take_hit_box_params(UINT8 offs);
 	UINT8 cop_calculate_collsion_detection();
 
