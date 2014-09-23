@@ -1678,14 +1678,16 @@ void wd_fdc_t::live_run(attotime limit)
 				}
 				break;
 			}
-			if((cur_live.data_reg & 0xfe) != 0xfa && (cur_live.data_reg & 0xfe) != 0xfc) {
+			if((cur_live.data_reg & 0xfe) != 0xfa && (cur_live.data_reg & 0xfe) != 0xf8) {
 				live_delay(SEARCH_ADDRESS_MARK_DATA_FAILED);
 				return;
 			}
 
 			cur_live.bit_counter = 0;
-			cur_live.state = READ_SECTOR_DATA;
-			break;
+			if((cur_live.data_reg & 0xfe) != 0xf8)
+				status |= S_DDM;
+			live_delay(READ_SECTOR_DATA);
+			return;
 		}
 
 		case SEARCH_ADDRESS_MARK_DATA_FAILED:
