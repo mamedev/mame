@@ -1735,7 +1735,8 @@ READ8_MEMBER(a400_state::read_d5xx)
 
 WRITE8_MEMBER(a400_state::disable_cart)
 {
-	switch (m_cartslot->exists() && m_cartslot->get_cart_type())
+	if (m_cartslot->exists())
+	switch (m_cartslot->get_cart_type())
 	{
 		case A800_PHOENIX:
 		case A800_BLIZZARD:
@@ -1834,7 +1835,8 @@ void a400_state::setup_cart(a800_cart_slot_device *slot)
 	m_cart_disabled = 0;
 	m_last_offs = -1;
 
-	switch (slot->exists() && slot->get_cart_type())
+	if (slot->exists())
+	switch (slot->get_cart_type())
 	{
 		case A800_8K:
 			m_maincpu->space(AS_PROGRAM).install_read_handler(0xa000, 0xbfff, read8_delegate(FUNC(a800_cart_slot_device::read_80xx),(a800_cart_slot_device*)slot));

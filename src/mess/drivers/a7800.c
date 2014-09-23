@@ -1315,7 +1315,8 @@ void a7800_state::machine_start()
 	save_item(NAME(m_maria_flag));
 	
 	// install additional handlers, if needed
-	switch (m_cartslot->exists() && m_cartslot->get_cart_type())
+	if (m_cartslot->exists())
+	switch (m_cartslot->get_cart_type())
 	{
 		case A78_HSC:
 			// ROM+NVRAM accesses for HiScore
