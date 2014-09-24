@@ -1209,7 +1209,7 @@ static MACHINE_CONFIG_START( legionna, legionna_state )
 
 	SEIBU_SOUND_SYSTEM_CPU(14318180/4)
 
-	MCFG_RAIDEN2COP_ADD("raiden2cop")
+	MCFG_LEGIONNACOP_ADD("raiden2cop")
 	MCFG_RAIDEN2COP_VIDEORAM_OUT_CB(WRITE16(legionna_state, videowrite_cb_w))
 
 	/* video hardware */
@@ -1245,7 +1245,7 @@ static MACHINE_CONFIG_START( heatbrl, legionna_state )
 
 	SEIBU_SOUND_SYSTEM_CPU(14318180/4)
 
-	MCFG_RAIDEN2COP_ADD("raiden2cop")
+	MCFG_LEGIONNACOP_ADD("raiden2cop")
 	MCFG_RAIDEN2COP_VIDEORAM_OUT_CB(WRITE16(legionna_state, videowrite_cb_w))
 
 	/* video hardware */
@@ -1282,7 +1282,7 @@ static MACHINE_CONFIG_START( godzilla, legionna_state )
 
 	SEIBU2_SOUND_SYSTEM_CPU(14318180/4)
 
-	MCFG_RAIDEN2COP_ADD("raiden2cop")
+	MCFG_LEGIONNACOP_ADD("raiden2cop")
 	MCFG_RAIDEN2COP_VIDEORAM_OUT_CB(WRITE16(legionna_state, videowrite_cb_w))
 
 	/* video hardware */
@@ -1320,7 +1320,7 @@ static MACHINE_CONFIG_START( denjinmk, legionna_state )
 
 	SEIBU2_SOUND_SYSTEM_CPU(14318180/4)
 
-	MCFG_RAIDEN2COP_ADD("raiden2cop")
+	MCFG_LEGIONNACOP_ADD("raiden2cop")
 	MCFG_RAIDEN2COP_VIDEORAM_OUT_CB(WRITE16(legionna_state, videowrite_cb_w))
 
 	/* video hardware */
@@ -1357,7 +1357,7 @@ static MACHINE_CONFIG_START( grainbow, legionna_state )
 
 	SEIBU2_SOUND_SYSTEM_CPU(14318180/4)
 
-	MCFG_RAIDEN2COP_ADD("raiden2cop")
+	MCFG_LEGIONNACOP_ADD("raiden2cop")
 	MCFG_RAIDEN2COP_VIDEORAM_OUT_CB(WRITE16(legionna_state, videowrite_cb_w))
 
 	/* video hardware */
@@ -1395,7 +1395,7 @@ static MACHINE_CONFIG_START( cupsoc, legionna_state )
 
 	SEIBU_SOUND_SYSTEM_CPU(14318180/4)
 
-	MCFG_RAIDEN2COP_ADD("raiden2cop")
+	MCFG_LEGIONNACOP_ADD("raiden2cop")
 	MCFG_RAIDEN2COP_VIDEORAM_OUT_CB(WRITE16(legionna_state, videowrite_cb_w))
 
 	/* video hardware */
@@ -1436,7 +1436,7 @@ static MACHINE_CONFIG_START( cupsocbl, legionna_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", legionna_state,  irq4_line_hold) /* VBL */
 
 	MCFG_SEIBU_COP_ADD("seibucop_boot")
-	MCFG_RAIDEN2COP_ADD("raiden2cop")
+	MCFG_LEGIONNACOP_ADD("raiden2cop")
 	MCFG_RAIDEN2COP_VIDEORAM_OUT_CB(WRITE16(legionna_state, videowrite_cb_w))
 
 

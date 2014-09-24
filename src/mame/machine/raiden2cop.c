@@ -62,6 +62,8 @@ raiden2cop_device::raiden2cop_device(const machine_config &mconfig, const char *
 	m_LEGACY_r0(0),
 	m_LEGACY_r1(0),
 
+	m_cpu_is_68k(0),
+
 	m_videoramout_cb(*this),
 	m_palette(*this, ":palette")
 {
@@ -170,7 +172,14 @@ void raiden2cop_device::device_start()
 
 }
 
+UINT16 raiden2cop_device::cop_read_word(address_space &space, int address)
+{
+	if (m_cpu_is_68k) return space.read_word(address ^ 2);
+	else return space.read_word(address);
+}
+
 /*** Command Table uploads ***/
+
 
 
 WRITE16_MEMBER(raiden2cop_device::cop_pgm_data_w)
@@ -789,11 +798,42 @@ READ16_MEMBER(raiden2cop_device::cop_itoa_digits_r)
 
 0f - 7905 (7905  ) :  (1a2, 2c2, 0a2, 000, 000, 000, 000, 000)  6     fffb   (cupsoc, grainbow)
 0f - 7e05 (7e05  ) :  (180, 282, 080, 180, 282, 000, 000, 000)  6     fffb   (raidendx)
+*/
 
+/*
 10 - 8100 (8100  ) :  (b9a, b88, 888, 000, 000, 000, 000, 000)  7     fdfb   (heatbrl, legionna, cupsoc, godzilla, grainbow, denjinmk, raiden2, raidendx, zeroteam, xsedae)
+*/
 
+void raiden2cop_device::execute_8100(address_space &space, int offset, UINT16 data)
+{
+	int raw_angle = (cop_read_word(space, cop_regs[0] + (0x34)) & 0xff);
+	double angle = raw_angle * M_PI / 128;
+	double amp = (65536 >> 5)*(cop_read_word(space, cop_regs[0] + (0x36)) & 0xff);
+	int res;
+	/* TODO: up direction needs double, why? */
+	if (raw_angle == 0xc0)
+		amp *= 2;
+	res = int(amp*sin(angle)) << cop_scale;
+	space.write_dword(cop_regs[0] + 16, res);
+}
+
+/*
 11 - 8900 (8900  ) :  (b9a, b8a, 88a, 000, 000, 000, 000, 000)  7     fdfb   (heatbrl, legionna, cupsoc, godzilla, grainbow, denjinmk, raiden2, raidendx, zeroteam, xsedae)
+*/
+void raiden2cop_device::execute_8900(address_space &space, int offset, UINT16 data)
+{
+	int raw_angle = (cop_read_word(space, cop_regs[0] + (0x34)) & 0xff);
+	double angle = raw_angle * M_PI / 128;
+	double amp = (65536 >> 5)*(cop_read_word(space, cop_regs[0] + (0x36)) & 0xff);
+	int res;
+	/* TODO: up direction needs double, why? */
+	if (raw_angle == 0x80)
+		amp *= 2;
+	res = int(amp*cos(angle)) << cop_scale;
+	space.write_dword(cop_regs[0] + 20, res);
+}
 
+/*
 12 - 9180 (9100  ) :  (b80, b94, b94, 894, 000, 000, 000, 000)  7     f8f7   (heatbrl, legionna, cupsoc, godzilla, grainbow, denjinmk)
 12 - 9100 (9100  ) :  (b80, b94, 894, 000, 000, 000, 000, 000)  7     fefb   (raiden2, raidendx)
 12 - 9100 (9100  ) :  (b80, b94, b94, 894, 000, 000, 000, 000)  7     f8f7   (zeroteam, xsedae)
@@ -1081,28 +1121,12 @@ WRITE16_MEMBER( raiden2cop_device::cop_cmd_w)
 	}
 
 	case 0x8100: { // 8100 0007 fdfb 0080 - 0b9a 0b88 0888 0000 0000 0000 0000 0000
-		int raw_angle = (space.read_word(cop_regs[0]+(0x34)) & 0xff);
-		double angle = raw_angle * M_PI / 128;
-		double amp = (65536 >> 5)*(space.read_word(cop_regs[0]+(0x36)) & 0xff);
-		int res;
-		/* TODO: up direction, why? (check machine/seicop.c) */
-		if(raw_angle == 0xc0)
-			amp*=2;
-		res = int(amp*sin(angle)) << cop_scale;
-		space.write_dword(cop_regs[0] + 16, res);
+		execute_8100(space, offset, data); // SIN
 		break;
 	}
 
 	case 0x8900: { // 8900 0007 fdfb 0088 - 0b9a 0b8a 088a 0000 0000 0000 0000 0000
-		int raw_angle = (space.read_word(cop_regs[0]+(0x34)) & 0xff);
-		double angle = raw_angle * M_PI / 128;
-		double amp = (65536 >> 5)*(space.read_word(cop_regs[0]+(0x36)) & 0xff);
-		int res;
-		/* TODO: left direction, why? (check machine/seicop.c) */
-		if(raw_angle == 0x80)
-			amp*=2;
-		res = int(amp*cos(angle)) << cop_scale;
-		space.write_dword(cop_regs[0] + 20, res);
+		execute_8900(space, offset, data); // COS
 		break;
 	}
 
@@ -1499,18 +1523,7 @@ WRITE16_MEMBER(raiden2cop_device::LEGACY_cop_cmd_w)
 	if (check_command_matches(command, 0xb9a, 0xb88, 0x888, 0x000, 0x000, 0x000, 0x000, 0x000, 7, 0xfdfb))
 	{
 		executed = 1;
-		int raw_angle = (space.read_word(cop_regs[0] + (0x34 ^ 2)) & 0xff);
-		double angle = raw_angle * M_PI / 128;
-		double amp = (65536 >> 5)*(space.read_word(cop_regs[0] + (0x36 ^ 2)) & 0xff);
-		int res;
-
-		/* TODO: up direction, why? */
-		if (raw_angle == 0xc0)
-			amp *= 2;
-
-		res = int(amp*sin(angle)) << cop_scale;
-
-		space.write_dword(cop_regs[0] + 0x10, res);
+		execute_8100(space, offset, data); // SIN
 		return;
 	}
 
@@ -1529,18 +1542,7 @@ WRITE16_MEMBER(raiden2cop_device::LEGACY_cop_cmd_w)
 	if (check_command_matches(command, 0xb9a, 0xb8a, 0x88a, 0x000, 0x000, 0x000, 0x000, 0x000, 7, 0xfdfb))
 	{
 		executed = 1;
-		int raw_angle = (space.read_word(cop_regs[0] + (0x34 ^ 2)) & 0xff);
-		double angle = raw_angle * M_PI / 128;
-		double amp = (65536 >> 5)*(space.read_word(cop_regs[0] + (0x36 ^ 2)) & 0xff);
-		int res;
-
-		/* TODO: left direction, why? */
-		if (raw_angle == 0x80)
-			amp *= 2;
-
-		res = int(amp*cos(angle)) << cop_scale;
-
-		space.write_dword(cop_regs[0] + 20, res);
+		execute_8900(space, offset, data); // COS
 		return;
 	}
 

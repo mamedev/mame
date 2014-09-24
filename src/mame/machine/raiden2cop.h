@@ -9,14 +9,24 @@
 #define RAIDEN2COP_H
 
 
-#define MCFG_RAIDEN2COP_ADD(_tag ) \
-	MCFG_DEVICE_ADD(_tag, RAIDEN2COP, 0)
+
 
 #define MCFG_RAIDEN2COP_VIDEORAM_OUT_CB(_devcb) \
 	devcb = &raiden2cop_device::set_m_videoramout_cb(*device, DEVCB_##_devcb);
 
 #define MCFG_ITOA_UNUSED_DIGIT_VALUE(value) \
 	raiden2cop_device::set_itoa_unused_digit_value(*device, value);
+
+#define MCFG_CPU_IS_68K(value) \
+	raiden2cop_device::set_cpu_is_68k(*device, value);
+
+#define MCFG_RAIDEN2COP_ADD(_tag ) \
+	MCFG_DEVICE_ADD(_tag, RAIDEN2COP, 0) \
+	MCFG_CPU_IS_68K(0)
+
+#define MCFG_LEGIONNACOP_ADD(_tag ) \
+	MCFG_DEVICE_ADD(_tag, RAIDEN2COP, 0) \
+	MCFG_CPU_IS_68K(1)
 
 
 class raiden2cop_device : public device_t
@@ -136,6 +146,9 @@ public:
 	void cop_collision_read_pos(address_space &space, int slot, UINT32 spradr, bool allow_swap);
 	void cop_collision_update_hitbox(address_space &space, int slot, UINT32 hitadr);
 
+	void execute_8100(address_space &space, int offset, UINT16 data);
+	void execute_8900(address_space &space, int offset, UINT16 data);
+
 	// Sort DMA (zeroteam, cupsoc)
 
 	UINT32 cop_sort_ram_addr, cop_sort_lookup;
@@ -203,7 +216,10 @@ public:
 	void LEGACY_cop_take_hit_box_params(UINT8 offs);
 	UINT8 LEGACY_cop_calculate_collsion_detection();
 
-
+	// endian stuff?
+	int m_cpu_is_68k;
+	static void set_cpu_is_68k(device_t &device, int value) { downcast<raiden2cop_device &>(device).m_cpu_is_68k = value; }
+	UINT16 cop_read_word(address_space &space, int address);
 
 	// DEBUG
 	void dump_table();
