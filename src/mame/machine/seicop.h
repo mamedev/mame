@@ -42,8 +42,7 @@ private:
 
 
 
-	UINT16 m_copd2_offs;
-	INT16 m_cop_hit_val_x,m_cop_hit_val_y,m_cop_hit_val_z,m_cop_hit_val_unk;
+	INT16 m_cop_hit_val_x,m_cop_hit_val_y,m_cop_hit_val_z;
 	INT8 m_legacycop_angle_compare;
 	INT8 m_legacycop_angle_mod_val;
 	struct collision_info m_cop_collision_info[2];

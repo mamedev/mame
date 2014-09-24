@@ -1601,11 +1601,9 @@ const device_type SEIBU_COP_LEGACY = &device_creator<seibu_cop_legacy_device>;
 seibu_cop_legacy_device::seibu_cop_legacy_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, SEIBU_COP_LEGACY, "Seibu COP Legacy", tag, owner, clock, "seibu_cop_legacy", __FILE__),
 	m_cop_mcu_ram(NULL),
-	m_copd2_offs(0),
 	m_cop_hit_val_x(0),
 	m_cop_hit_val_y(0),
 	m_cop_hit_val_z(0),
-	m_cop_hit_val_unk(0),
 	m_legacycop_angle_compare(0),
 	m_legacycop_angle_mod_val(0),
 	m_r0(0),
@@ -1645,11 +1643,9 @@ void seibu_cop_legacy_device::device_start()
 	m_cop_mcu_ram = reinterpret_cast<UINT16 *>(machine().root_device().memshare("cop_mcu_ram")->ptr());
 
 
-	save_item(NAME(m_copd2_offs));
 	save_item(NAME(m_cop_hit_val_x));
 	save_item(NAME(m_cop_hit_val_y));
 	save_item(NAME(m_cop_hit_val_z));
-	save_item(NAME(m_cop_hit_val_unk));
 	save_item(NAME(m_legacycop_angle_compare));
 	save_item(NAME(m_legacycop_angle_mod_val));
 	save_item(NAME(m_r0));
@@ -2022,7 +2018,7 @@ UINT8 seibu_cop_legacy_device::cop_calculate_collsion_detection()
 	m_cop_hit_val_x = (m_cop_collision_info[0].x - m_cop_collision_info[1].x) >> 16;
 	m_cop_hit_val_y = (m_cop_collision_info[0].y - m_cop_collision_info[1].y) >> 16;
 	m_cop_hit_val_z = 1;
-	m_cop_hit_val_unk = res; // TODO: there's also bit 2 and 3 triggered in the tests, no known meaning
+	m_raiden2cop->cop_hit_val_stat = res; // TODO: there's also bit 2 and 3 triggered in the tests, no known meaning
 
 	//popmessage("%d %d %04x %04x %04x %04x",m_cop_hit_val_x,m_cop_hit_val_y,m_cop_collision_info[0].hitbox_x,m_cop_collision_info[0].hitbox_y,m_cop_collision_info[1].hitbox_x,m_cop_collision_info[1].hitbox_y);
 
@@ -2054,8 +2050,6 @@ READ16_MEMBER( seibu_cop_legacy_device::generic_cop_r )
 		case 0x186/2:
 			return (m_cop_hit_val_z);
 
-		case 0x188/2:
-			return m_cop_hit_val_unk;
 
 
 

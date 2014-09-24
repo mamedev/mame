@@ -624,6 +624,7 @@ WRITE16_MEMBER(raiden2cop_device::cop_dma_trigger_w)
 // according to score display in  https://www.youtube.com/watch?v=T1M8sxYgt9A 
 // we should return 0x30 for unused digits? according to Raiden 2 and Zero
 // Team the value should be 0x20, can this be configured?
+// grainbow doesn't like this implementation at all (21 credits, 2 digit high scores etc.)
 WRITE16_MEMBER(raiden2cop_device::cop_itoa_low_w)
 {
 	cop_itoa = (cop_itoa & ~UINT32(mem_mask)) | (data & mem_mask);
