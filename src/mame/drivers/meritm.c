@@ -699,7 +699,7 @@ static INPUT_PORTS_START(americna)
 
 	PORT_MODIFY("DSW")
 	PORT_DIPNAME( 0x10, 0x10, "Points Per Coin" ) PORT_DIPLOCATION("SW1:5")
-	PORT_DIPSETTING(    0x10, "1 Points / Coin" )
+	PORT_DIPSETTING(    0x10, "1 Point / Coin" )
 	PORT_DIPSETTING(    0x00, "5 Points / Coin" )
 	PORT_DIPNAME( 0xc0, 0xc0, "Max Play" )       PORT_DIPLOCATION("SW1:7,8")
 	PORT_DIPSETTING(    0x40, "10" )
