@@ -146,8 +146,7 @@ static ADDRESS_MAP_START( legionna_cop_mem, AS_PROGRAM, 16, legionna_state )
 	AM_RANGE(0x100500, 0x100505) AM_DEVWRITE("raiden2cop", raiden2cop_device,LEGACY_cop_cmd_w) // REMOVE ME
 
 	AM_RANGE(0x100580, 0x100581) AM_DEVREAD("raiden2cop", raiden2cop_device, cop_collision_status_r)
-//	AM_RANGE(0x100582, 0x100587) AM_READ(cop_collision_status_val_r) // ADD ME
-	AM_RANGE(0x100582, 0x100587) AM_DEVREAD("raiden2cop", raiden2cop_device, LEGACY_cop_collision_status_val_r) // REMOVE ME
+	AM_RANGE(0x100582, 0x100587) AM_DEVREAD("raiden2cop", raiden2cop_device, cop_collision_status_val_r)
 
 
 	AM_RANGE(0x100588, 0x100589) AM_DEVREAD("raiden2cop", raiden2cop_device, cop_collision_status_stat_r)

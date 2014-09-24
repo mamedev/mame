@@ -177,9 +177,7 @@ public:
 	DECLARE_WRITE16_MEMBER(cop_sprite_dma_abs_x_w);
 
 	// legacy code, to be removed / refactored into above
-	INT16 m_LEGACY_cop_hit_val_x,m_LEGACY_cop_hit_val_y,m_LEGACY_m_cop_hit_val_z;
 	int m_LEGACY_r0, m_LEGACY_r1;
-	DECLARE_READ16_MEMBER(LEGACY_cop_collision_status_val_r);
 	DECLARE_WRITE16_MEMBER(LEGACY_cop_cmd_w);
 
 	struct LEGACY_collision_info

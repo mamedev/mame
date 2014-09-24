@@ -56,9 +56,6 @@ raiden2cop_device::raiden2cop_device(const machine_config &mconfig, const char *
 	m_cop_sprite_dma_abs_x(0),
 	m_cop_sprite_dma_abs_y(0),
 
-	m_LEGACY_cop_hit_val_x(0),
-	m_LEGACY_cop_hit_val_y(0),
-	m_LEGACY_m_cop_hit_val_z(0),
 	m_LEGACY_r0(0),
 	m_LEGACY_r1(0),
 
@@ -161,9 +158,6 @@ void raiden2cop_device::device_start()
 	save_item(NAME(m_cop_sprite_dma_abs_y));
 
 	// legacy
-	save_item(NAME(m_LEGACY_cop_hit_val_x));
-	save_item(NAME(m_LEGACY_cop_hit_val_y));
-	save_item(NAME(m_LEGACY_m_cop_hit_val_z));
 	save_item(NAME(m_LEGACY_r0));
 	save_item(NAME(m_LEGACY_r1));
 
@@ -1203,13 +1197,6 @@ WRITE16_MEMBER(raiden2cop_device::cop_sprite_dma_abs_x_w)
 
 
 
-READ16_MEMBER( raiden2cop_device::LEGACY_cop_collision_status_val_r)
-{
-	/* these two controls facing direction in Godzilla opponents (only vs.) - x value compare? */
-	if (offset==0) return (m_LEGACY_cop_hit_val_y);
-	else if (offset==1) return (m_LEGACY_cop_hit_val_x);
-	else return (m_LEGACY_m_cop_hit_val_z);
-}
 
 
 /*
@@ -1267,12 +1254,12 @@ UINT8 raiden2cop_device::LEGACY_cop_calculate_collsion_detection()
 	if(m_LEGACY_cop_collision_info[1].max_y >= m_LEGACY_cop_collision_info[0].min_y && m_LEGACY_cop_collision_info[1].min_y <= m_LEGACY_cop_collision_info[0].max_y)
 		res &= ~1;
 
-	m_LEGACY_cop_hit_val_x = (m_LEGACY_cop_collision_info[0].x - m_LEGACY_cop_collision_info[1].x) >> 16;
-	m_LEGACY_cop_hit_val_y = (m_LEGACY_cop_collision_info[0].y - m_LEGACY_cop_collision_info[1].y) >> 16;
-	m_LEGACY_m_cop_hit_val_z = 1;
+	cop_hit_val[1] = (m_LEGACY_cop_collision_info[0].x - m_LEGACY_cop_collision_info[1].x) >> 16;
+	cop_hit_val[0] = (m_LEGACY_cop_collision_info[0].y - m_LEGACY_cop_collision_info[1].y) >> 16;
+	cop_hit_val[2] = 1;
 	cop_hit_val_stat = res; // TODO: there's also bit 2 and 3 triggered in the tests, no known meaning
 
-	//popmessage("%d %d %04x %04x %04x %04x",m_LEGACY_cop_hit_val_x,m_LEGACY_cop_hit_val_y,m_LEGACY_cop_collision_info[0].hitbox_x,m_LEGACY_cop_collision_info[0].hitbox_y,m_LEGACY_cop_collision_info[1].hitbox_x,m_LEGACY_cop_collision_info[1].hitbox_y);
+	//popmessage("%d %d %04x %04x %04x %04x",cop_hit_val[1],cop_hit_val[0],m_LEGACY_cop_collision_info[0].hitbox_x,m_LEGACY_cop_collision_info[0].hitbox_y,m_LEGACY_cop_collision_info[1].hitbox_x,m_LEGACY_cop_collision_info[1].hitbox_y);
 
 	//if(res == 0)
 	//popmessage("0:%08x %08x %08x 1:%08x %08x %08x\n",m_LEGACY_cop_collision_info[0].x,m_LEGACY_cop_collision_info[0].y,m_LEGACY_cop_collision_info[0].hitbox,m_LEGACY_cop_collision_info[1].x,m_LEGACY_cop_collision_info[1].y,m_LEGACY_cop_collision_info[1].hitbox);
