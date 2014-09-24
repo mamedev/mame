@@ -171,6 +171,23 @@ public:
 	void execute_b100(address_space &space, int offset, UINT16 data);
 	void execute_b900(address_space &space, int offset, UINT16 data);
 
+	void LEGACY_execute_130e(address_space &space, int offset, UINT16 data);
+	void LEGACY_execute_130e_cupsoc(address_space &space, int offset, UINT16 data);
+	void LEGACY_execute_3b30(address_space &space, int offset, UINT16 data);
+	void LEGACY_execute_a100(address_space &space, int offset, UINT16 data);
+	void LEGACY_execute_b100(address_space &space, int offset, UINT16 data);
+	void LEGACY_execute_a900(address_space &space, int offset, UINT16 data);
+	void LEGACY_execute_b900(address_space &space, int offset, UINT16 data);
+	void LEGACY_execute_0205(address_space &space, int offset, UINT16 data);
+	void LEGACY_execute_42c2(address_space &space, int offset, UINT16 data);
+	void LEGACY_execute_0905(address_space &space, int offset, UINT16 data);
+	void LEGACY_execute_e30e(address_space &space, int offset, UINT16 data);
+	void LEGACY_execute_6200(address_space &space, int offset, UINT16 data);
+	void LEGACY_execute_6200_grainbow(address_space &space, int offset, UINT16 data);
+	void LEGACY_execute_dde5(address_space &space, int offset, UINT16 data);
+	void LEGACY_execute_d104(address_space &space, int offset, UINT16 data);
+	void LEGACY_execute_6980(address_space &space, int offset, UINT16 data);
+	void LEGACY_execute_c480(address_space &space, int offset, UINT16 data);
 
 	// Sort DMA (zeroteam, cupsoc)
 

@@ -749,7 +749,7 @@ READ16_MEMBER(raiden2cop_device::cop_itoa_digits_r)
 /* Main COP functionality */
 
 /*
-(masked) just assumes 0x0080 masked out, actual masking / command selection is more complex, sometimes needs 0x2000 masked out too, but that would cause clashes in some tables
+(masked) just assumes 0x0080 masked out, actual masking / command selection is more complex, it seems bit 0x0001 is masked too (used for sign in 0904 / 0905) and more
 
 ## - trig (masked) :  (sq0, sq1, sq2, sq3, sq4, sq5, sq6, sq7)  valu  mask
 00 - 0205 (0205  ) :  (188, 282, 082, b8e, 98e, 000, 000, 000)  6     ffeb   (heatbrl, legionna, cupsoc, godzilla, grainbow, denjinmk, raiden2, raidendx, zeroteam, xsedae)
@@ -762,6 +762,19 @@ void raiden2cop_device::execute_0205(address_space &space, int offset, UINT16 da
 	int delta = (npos >> 16) - (ppos >> 16);
 	space.write_dword(cop_regs[0] + 4 + offset * 4, npos);
 	space.write_word(cop_regs[0] + 0x1e + offset * 4, space.read_word(cop_regs[0] + 0x1e + offset * 4) + delta);
+}
+
+void raiden2cop_device::LEGACY_execute_0205(address_space &space, int offset, UINT16 data)
+{
+	UINT8 offs;
+
+	offs = (offset & 3) * 4;
+	int ppos = space.read_dword(cop_regs[0] + 4 + offs);
+	int npos = ppos + space.read_dword(cop_regs[0] + 0x10 + offs);
+	int delta = (npos >> 16) - (ppos >> 16);
+
+	space.write_dword(cop_regs[0] + 4 + offs, npos);
+	space.write_word(cop_regs[0] + 0x1c + offs, space.read_word(cop_regs[0] + 0x1c + offs) + delta);
 }
 
 /*
@@ -781,6 +794,19 @@ void raiden2cop_device::execute_0905(address_space &space, int offset, UINT16 da
 	space.write_dword(cop_regs[0] + 16 + offset * 4, space.read_dword(cop_regs[0] + 16 + offset * 4) + space.read_dword(cop_regs[0] + 0x28 + offset * 4));
 }
 
+void raiden2cop_device::LEGACY_execute_0905(address_space &space, int offset, UINT16 data)
+{
+	UINT8 offs;
+
+	offs = (offset & 3) * 4;
+
+	/* read 0x28 + offs */
+	/* add 0x10 + offs */
+	/* write 0x10 + offs */
+
+	space.write_dword(cop_regs[0] + 0x10 + offs, space.read_dword(cop_regs[0] + 0x10 + offs) + space.read_dword(cop_regs[0] + 0x28 + offs));
+
+}
 
 /*
 02 - 138e (130e  ) :  (984, aa4, d82, aa2, 39b, b9a, b9a, b9a)  5     bf7f   (heatbrl, legionna)
@@ -793,6 +819,55 @@ void raiden2cop_device::execute_130e(address_space &space, int offset, UINT16 da
 {
 	// this can't be right
 	execute_338e(space, offset, data);
+}
+
+void raiden2cop_device::LEGACY_execute_130e(address_space &space, int offset, UINT16 data)
+{
+	int dy = space.read_dword(cop_regs[1] + 4) - space.read_dword(cop_regs[0] + 4);
+	int dx = space.read_dword(cop_regs[1] + 8) - space.read_dword(cop_regs[0] + 8);
+
+	cop_status = 7;
+	if (!dx) {
+		cop_status |= 0x8000;
+		cop_angle = 0;
+	}
+	else {
+		cop_angle = atan(double(dy) / double(dx)) * 128.0 / M_PI;
+		if (dx < 0)
+			cop_angle += 0x80;
+	}
+
+	cop_angle -= 0x80;
+	m_LEGACY_r0 = dy;
+	m_LEGACY_r1 = dx;
+
+	if (data & 0x80)
+		space.write_word(cop_regs[0] + (0x34 ^ 2), cop_angle);
+}
+
+void raiden2cop_device::LEGACY_execute_130e_cupsoc(address_space &space, int offset, UINT16 data)
+{
+	int dy = space.read_dword(cop_regs[1] + 4) - space.read_dword(cop_regs[0] + 4);
+	int dx = space.read_dword(cop_regs[1] + 8) - space.read_dword(cop_regs[0] + 8);
+
+	cop_status = 7;
+	if (!dx) {
+		cop_status |= 0x8000;
+		cop_angle = 0;
+	}
+	else {
+		cop_angle = atan(double(dy) / double(dx)) * 128.0 / M_PI;
+		if (dx < 0)
+			cop_angle += 0x80;
+	}
+
+	m_LEGACY_r0 = dy;
+	m_LEGACY_r1 = dx;
+
+	//printf("%d %d %f %04x\n",dx,dy,atan(double(dy)/double(dx)) * 128 / M_PI,cop_angle);
+
+	if (data & 0x80)
+		space.write_word(cop_regs[0] + (0x34 ^ 2), cop_angle);
 }
 
 /*
@@ -885,6 +960,18 @@ void raiden2cop_device::execute_3b30(address_space &space, int offset, UINT16 da
 		space.write_word(cop_regs[0] + (data & 0x200 ? 0x3a : 0x38), cop_dist);
 }
 
+void raiden2cop_device::LEGACY_execute_3b30(address_space &space, int offset, UINT16 data)
+{
+	int dy = m_LEGACY_r0;
+	int dx = m_LEGACY_r1;
+
+	dx >>= 16;
+	dy >>= 16;
+	cop_dist = sqrt((double)(dx*dx + dy*dy));
+
+	if (data & 0x80)
+		space.write_word(cop_regs[0] + (0x38), cop_dist);
+}
 
 /*
 08 - 42c2 (4242  ) :  (f9a, b9a, b9c, b9c, b9c, 29c, 000, 000)  5     fcdd   (heatbrl, legionna, cupsoc, godzilla, grainbow, denjinmk, raiden2, raidendx, zeroteam, xsedae)
@@ -901,6 +988,37 @@ void raiden2cop_device::execute_42c2(address_space &space, int offset, UINT16 da
 	space.write_word(cop_regs[0] + (0x38), (cop_dist << (5 - cop_scale)) / div);
 }
 
+void raiden2cop_device::LEGACY_execute_42c2(address_space &space, int offset, UINT16 data)
+{
+	int dy = m_LEGACY_r0;
+	int dx = m_LEGACY_r1;
+	int div = space.read_word(cop_regs[0] + (0x36 ^ 2));
+	int res;
+	int cop_dist_raw;
+
+	if (!div)
+	{
+		printf("divide by zero?\n");
+		div = 1;
+	}
+
+	/* TODO: calculation of this one should occur at 0x3b30/0x3bb0 I *think* */
+	/* TODO: recheck if cop_scale still masks at 3 with this command */
+	dx >>= 11 + cop_scale;
+	dy >>= 11 + cop_scale;
+	cop_dist_raw = sqrt((double)(dx*dx + dy*dy));
+
+	res = cop_dist_raw;
+	res /= div;
+
+	cop_dist = (1 << (5 - cop_scale)) / div;
+
+	/* TODO: bits 5-6-15 */
+	cop_status = 7;
+
+	space.write_word(cop_regs[0] + (0x38 ^ 2), res);
+
+}
 
 /*
 09 - 4aa0 (4a20  ) :  (f9a, b9a, b9c, b9c, b9c, 99b, 000, 000)  5     fcdd   (heatbrl, legionna, cupsoc, godzilla, grainbow, denjinmk, raiden2, raidendx, zeroteam, xsedae)
@@ -973,10 +1091,142 @@ void raiden2cop_device::execute_6200(address_space &space, int offset, UINT16 da
 	space.write_byte(cop_regs[0] + 0x34, angle);
 }
 
+void raiden2cop_device::LEGACY_execute_6200(address_space &space, int offset, UINT16 data)
+{
+	UINT8 cur_angle;
+	UINT16 flags;
+
+	/* 0 [1] */
+	/* 0xc [1] */
+	/* 0 [0] */
+	/* 0 [1] */
+	/* 0xc [1] */
+
+	cur_angle = space.read_byte(cop_regs[1] + (0xc ^ 3));
+	flags = space.read_word(cop_regs[1]);
+	//space.write_byte(cop_regs[1] + (0^3),space.read_byte(cop_regs[1] + (0^3)) & 0xfb); //correct?
+
+	INT8 tempangle_compare = (INT8)cop_angle_target;
+	INT8 tempangle_mod_val = (INT8)cop_angle_step;
+
+	tempangle_compare &= 0xff;
+	tempangle_mod_val &= 0xff;
+
+	cop_angle_target = tempangle_compare;
+	cop_angle_step = tempangle_mod_val;
+
+	flags &= ~0x0004;
+
+	int delta = cur_angle - tempangle_compare;
+	if (delta >= 128)
+		delta -= 256;
+	else if (delta < -128)
+		delta += 256;
+	if (delta < 0)
+	{
+		if (delta >= -tempangle_mod_val)
+		{
+			cur_angle = tempangle_compare;
+			flags |= 0x0004;
+		}
+		else
+			cur_angle += tempangle_mod_val;
+	}
+	else
+	{
+		if (delta <= tempangle_mod_val)
+		{
+			cur_angle = tempangle_compare;
+			flags |= 0x0004;
+		}
+		else
+			cur_angle -= tempangle_mod_val;
+	}
+
+	space.write_byte(cop_regs[1] + (0 ^ 2), flags);
+	space.write_byte(cop_regs[1] + (0xc ^ 3), cur_angle);
+}
+
+void raiden2cop_device::LEGACY_execute_6200_grainbow(address_space &space, int offset, UINT16 data)
+{
+	UINT8 cur_angle;
+	UINT16 flags;
+
+	cur_angle = space.read_byte(cop_regs[0] + (0x34 ^ 3));
+	flags = space.read_word(cop_regs[0] + (0 ^ 2));
+	//space.write_byte(cop_regs[1] + (0^3),space.read_byte(cop_regs[1] + (0^3)) & 0xfb); //correct?
+
+	INT8 tempangle_compare = (INT8)cop_angle_target;
+	INT8 tempangle_mod_val = (INT8)cop_angle_step;
+
+	tempangle_compare &= 0xff;
+	tempangle_mod_val &= 0xff;
+
+	cop_angle_target = tempangle_compare;
+	cop_angle_step = tempangle_mod_val;
+
+
+	flags &= ~0x0004;
+
+	int delta = cur_angle - tempangle_compare;
+	if (delta >= 128)
+		delta -= 256;
+	else if (delta < -128)
+		delta += 256;
+	if (delta < 0)
+	{
+		if (delta >= -tempangle_mod_val)
+		{
+			cur_angle = tempangle_compare;
+			flags |= 0x0004;
+		}
+		else
+			cur_angle += tempangle_mod_val;
+	}
+	else
+	{
+		if (delta <= tempangle_mod_val)
+		{
+			cur_angle = tempangle_compare;
+			flags |= 0x0004;
+		}
+		else
+			cur_angle -= tempangle_mod_val;
+	}
+
+	space.write_byte(cop_regs[0] + (0 ^ 3), flags);
+	space.write_word(cop_regs[0] + (0x34 ^ 3), cur_angle);
+}
+
 /*
 
 0d - 6880 (6800  ) :  (b80, ba0, 000, 000, 000, 000, 000, 000)  a     fff3   (heatbrl, legionna, cupsoc, godzilla, denjinmk)
 0d - 6980 (6900  ) :  (b80, ba0, 000, 000, 000, 000, 000, 000)  a     fff3   (grainbow, zeroteam, xsedae)
+*/
+void raiden2cop_device::LEGACY_execute_6980(address_space &space, int offset, UINT16 data)
+{
+	UINT8 offs;
+	int abs_x, abs_y, rel_xy;
+
+	offs = (offset & 3) * 4;
+
+	/* TODO: I really suspect that following two are actually taken from the 0xa180 macro command then internally loaded */
+	abs_x = space.read_word(cop_regs[0] + 8) - m_cop_sprite_dma_abs_x;
+	abs_y = space.read_word(cop_regs[0] + 4) - m_cop_sprite_dma_abs_y;
+	rel_xy = space.read_word(m_cop_sprite_dma_src + 4 + offs);
+
+	//if(rel_xy & 0x0706)
+	//  printf("sprite rel_xy = %04x\n",rel_xy);
+
+	if (rel_xy & 1)
+		space.write_word(cop_regs[4] + offs + 4, 0xc0 + abs_x - (rel_xy & 0xf8));
+	else
+		space.write_word(cop_regs[4] + offs + 4, (((rel_xy & 0x78) + (abs_x)-((rel_xy & 0x80) ? 0x80 : 0))));
+
+	space.write_word(cop_regs[4] + offs + 6, (((rel_xy & 0x7800) >> 8) + (abs_y)-((rel_xy & 0x8000) ? 0x80 : 0)));
+}
+
+/*
 
 0e - 7100 (7100  ) :  (b80, a80, b80, 000, 000, 000, 000, 000)  8     fdfd   (zeroteam, xsedae)
 
@@ -1046,6 +1296,13 @@ void raiden2cop_device::execute_a100(address_space &space, int offset, UINT16 da
 {
 	cop_collision_read_pos(space, 0, cop_regs[0], data & 0x0080);
 }
+
+void raiden2cop_device::LEGACY_execute_a100(address_space &space, int offset, UINT16 data)
+{
+	m_LEGACY_cop_collision_info[0].y = (space.read_dword(cop_regs[0] + 4));
+	m_LEGACY_cop_collision_info[0].x = (space.read_dword(cop_regs[0] + 8));
+}
+
 /*
 15 - a900 (a900  ) :  (ba0, ba2, ba4, ba6, 000, 000, 000, 000)  f     ffff   (heatbrl, zeroteam, xsedae)
 15 - a980 (a900  ) :  (ba0, ba2, ba4, ba6, 000, 000, 000, 000)  f     ffff   (legionna, cupsoc, godzilla, denjinmk)
@@ -1056,6 +1313,13 @@ void raiden2cop_device::execute_a900(address_space &space, int offset, UINT16 da
 {
 	cop_collision_read_pos(space, 1, cop_regs[1], data & 0x0080);
 }
+
+void raiden2cop_device::LEGACY_execute_a900(address_space &space, int offset, UINT16 data)
+{
+	m_LEGACY_cop_collision_info[1].y = (space.read_dword(cop_regs[1] + 4));
+	m_LEGACY_cop_collision_info[1].x = (space.read_dword(cop_regs[1] + 8));
+}
+
 /*
 16 - b080 (b000  ) :  (b40, bc0, bc2, 000, 000, 000, 000, 000)  9     ffff   (heatbrl)
 16 - b100 (b100  ) :  (b40, bc0, bc2, 000, 000, 000, 000, 000)  9     ffff   (legionna, cupsoc, godzilla, grainbow, denjinmk, raiden2, raidendx, zeroteam, xsedae)
@@ -1064,6 +1328,18 @@ void raiden2cop_device::execute_b100(address_space &space, int offset, UINT16 da
 {
 	cop_collision_update_hitbox(space, 0, cop_regs[2]);
 }
+
+void raiden2cop_device::LEGACY_execute_b100(address_space &space, int offset, UINT16 data)
+{
+	m_LEGACY_cop_collision_info[0].hitbox = space.read_word(cop_regs[2]);
+	m_LEGACY_cop_collision_info[0].hitbox_y = space.read_word((cop_regs[2] & 0xffff0000) | (m_LEGACY_cop_collision_info[0].hitbox));
+	m_LEGACY_cop_collision_info[0].hitbox_x = space.read_word(((cop_regs[2] & 0xffff0000) | (m_LEGACY_cop_collision_info[0].hitbox)) + 2);
+
+	/* do the math */
+	LEGACY_cop_take_hit_box_params(0);
+	cop_hit_status = LEGACY_cop_calculate_collsion_detection();
+}
+
 /*
 17 - b880 (b800  ) :  (b60, be0, be2, 000, 000, 000, 000, 000)  6     ffff   (heatbrl)
 17 - b900 (b900  ) :  (b60, be0, be2, 000, 000, 000, 000, 000)  6     ffff   (legionna, cupsoc, godzilla, grainbow, denjinmk, raiden2, raidendx, zeroteam, xsedae)
@@ -1073,19 +1349,119 @@ void raiden2cop_device::execute_b900(address_space &space, int offset, UINT16 da
 	cop_collision_update_hitbox(space, 1, cop_regs[3]);
 }
 
+void raiden2cop_device::LEGACY_execute_b900(address_space &space, int offset, UINT16 data)
+{
+	m_LEGACY_cop_collision_info[1].hitbox = space.read_word(cop_regs[3]);
+	m_LEGACY_cop_collision_info[1].hitbox_y = space.read_word((cop_regs[3] & 0xffff0000) | (m_LEGACY_cop_collision_info[1].hitbox));
+	m_LEGACY_cop_collision_info[1].hitbox_x = space.read_word(((cop_regs[3] & 0xffff0000) | (m_LEGACY_cop_collision_info[1].hitbox)) + 2);
+
+	/* do the math */
+	LEGACY_cop_take_hit_box_params(1);
+	cop_hit_status = LEGACY_cop_calculate_collsion_detection();
+}
+
 /*
 18 - c480 (c400  ) :  (080, 882, 000, 000, 000, 000, 000, 000)  a     ff00   (heatbrl, legionna, cupsoc, godzilla, grainbow, denjinmk)
 18 - 7c80 (7c00  ) :  (080, 882, 000, 000, 000, 000, 000, 000)  a     ff00   (zeroteam, xsedae)
+*/
 
+void raiden2cop_device::LEGACY_execute_c480(address_space &space, int offset, UINT16 data)
+{
+	UINT8 offs;
+
+	offs = (offset & 3) * 4;
+
+	space.write_word(cop_regs[4] + offs + 0, space.read_word(m_cop_sprite_dma_src + offs) + (m_cop_sprite_dma_param & 0x3f));
+	//space.write_word(cop_regs[4] + offs + 2,space.read_word(m_cop_sprite_dma_src+2 + offs));
+
+}
+
+/*
 19 - cb8f (cb0f  ) :  (984, aa4, d82, aa2, 39b, b9a, b9a, a9f)  5     bf7f   (cupsoc, grainbow)
 
 1a - d104 (d104  ) :  (ac2, 9e0, 0a2, 000, 000, 000, 000, 000)  5     fffb   (cupsoc, grainbow)
+*/
+void raiden2cop_device::LEGACY_execute_d104(address_space &space, int offset, UINT16 data)
+{
+	UINT8 *ROM = space.machine().root_device().memregion("maincpu")->base();
+	UINT32 rom_addr = (m_cop_rom_addr_hi << 16 | m_cop_rom_addr_lo) & ~1;
+	UINT16 rom_data = (ROM[rom_addr + 0]) | (ROM[rom_addr + 1] << 8);
 
+	/* writes to some unemulated COP registers, then puts the result in here, adding a parameter taken from ROM */
+	//space.write_word(cop_regs[0]+(0x44 + offset * 4), rom_data);
+
+	logerror("%04x%04x %04x %04x\n", m_cop_rom_addr_hi, m_cop_rom_addr_lo, m_cop_rom_addr_unk, rom_data);
+}
+/*
 1b - dde5 (dd65  ) :  (f80, aa2, 984, 0c2, 000, 000, 000, 000)  5     7ff7   (cupsoc, grainbow)
+*/
 
+void raiden2cop_device::LEGACY_execute_dde5(address_space &space, int offset, UINT16 data)
+{
+	UINT8 offs;
+	int div;
+	INT16 dir_offset;
+	//              INT16 offs_val;
+
+	/* TODO: [4-7] could be mirrors of [0-3] (this is the only command so far that uses 4-7 actually)*/
+	/* ? 0 + [4] */
+	/* sub32 4 + [5] */
+	/* write16h 8 + [4] */
+	/* addmem16 4 + [6] */
+
+	// these two are obvious ...
+	// 0xf x 16 = 240
+	// 0x14 x 16 = 320
+	// what are these two instead? scale factor? offsets? (edit: offsets to apply from the initial sprite data)
+	// 0xfc69 ?
+	// 0x7f4 ?
+	//printf("%08x %08x %08x %08x %08x %08x %08x\n",cop_regs[0],cop_regs[1],cop_regs[2],cop_regs[3],cop_regs[4],cop_regs[5],cop_regs[6]);
+
+	offs = (offset & 3) * 4;
+
+	div = space.read_word(cop_regs[4] + offs);
+	dir_offset = space.read_word(cop_regs[4] + offs + 8);
+	//              offs_val = space.read_word(cop_regs[3] + offs);
+	//420 / 180 = 500 : 400 = 30 / 50 = 98 / 18
+
+	/* TODO: this probably trips a cop status flag */
+	if (div == 0) { div = 1; }
+
+
+	space.write_word((cop_regs[6] + offs + 4), ((space.read_word(cop_regs[5] + offs + 4) + dir_offset) / div));
+}
+
+/*
 1c - e38e (e30e  ) :  (984, ac4, d82, ac2, 39b, b9a, b9a, a9a)  5     b07f   (cupsoc, grainbow)
 1c - e105 (e105  ) :  (a88, 994, 088, 000, 000, 000, 000, 000)  5     06fb   (zeroteam, xsedae)
+*/
 
+void raiden2cop_device::LEGACY_execute_e30e(address_space &space, int offset, UINT16 data)
+{
+	int dy = space.read_dword(cop_regs[2] + 4) - space.read_dword(cop_regs[0] + 4);
+	int dx = space.read_dword(cop_regs[2] + 8) - space.read_dword(cop_regs[0] + 8);
+
+	cop_status = 7;
+	if (!dx) {
+		cop_status |= 0x8000;
+		cop_angle = 0;
+	}
+	else {
+		cop_angle = atan(double(dy) / double(dx)) * 128.0 / M_PI;
+		if (dx < 0)
+			cop_angle += 0x80;
+	}
+
+	m_LEGACY_r0 = dy;
+	m_LEGACY_r1 = dx;
+
+	//printf("%d %d %f %04x\n",dx,dy,atan(double(dy)/double(dx)) * 128 / M_PI,cop_angle);
+
+	if (data & 0x80)
+		space.write_word(cop_regs[0] + (0x34 ^ 2), cop_angle);
+}
+
+/*
 1d - eb8e (eb0e  ) :  (984, ac4, d82, ac2, 39b, b9a, b9a, a9f)  5     b07f   (cupsoc, grainbow)
 1d - ede5 (ed65  ) :  (f88, a84, 986, 08a, 000, 000, 000, 000)  5     05f7   (zeroteam, xsedae)
 
@@ -1606,7 +1982,7 @@ WRITE16_MEMBER(raiden2cop_device::LEGACY_cop_cmd_w)
 	dword ^= 0
 	word ^= 2
 	byte ^= 3
-	- some macro commands here have a commented algorithm, it's how Seibu Cup Bootleg version handles maths inside the 14/15 roms.
+	- some macro commands here have a commented algorithm, it's how Seibu Cup **BOOTLEG** version handles maths inside the 14/15 roms.
 	The ROMs map tables in the following arrangement:
 	0x00000 - 0x1ffff Sine math results
 	0x20000 - 0x3ffff Cosine math results
@@ -1621,15 +1997,7 @@ WRITE16_MEMBER(raiden2cop_device::LEGACY_cop_cmd_w)
 	if (check_command_matches(command, 0x188, 0x282, 0x082, 0xb8e, 0x98e, 0x000, 0x000, 0x000, 6, 0xffeb))
 	{
 		executed = 1;
-		UINT8 offs;
-
-		offs = (offset & 3) * 4;
-		int ppos = space.read_dword(cop_regs[0] + 4 + offs);
-		int npos = ppos + space.read_dword(cop_regs[0] + 0x10 + offs);
-		int delta = (npos >> 16) - (ppos >> 16);
-
-		space.write_dword(cop_regs[0] + 4 + offs, npos);
-		space.write_word(cop_regs[0] + 0x1c + offs, space.read_word(cop_regs[0] + 0x1c + offs) + delta);
+		LEGACY_execute_0205(space, offset, data);
 		return;
 	}
 
@@ -1637,15 +2005,7 @@ WRITE16_MEMBER(raiden2cop_device::LEGACY_cop_cmd_w)
 	if (check_command_matches(command, 0x194, 0x288, 0x088, 0x000, 0x000, 0x000, 0x000, 0x000, 6, 0xfbfb))
 	{
 		executed = 1;
-		UINT8 offs;
-
-		offs = (offset & 3) * 4;
-
-		/* read 0x28 + offs */
-		/* add 0x10 + offs */
-		/* write 0x10 + offs */
-
-		space.write_dword(cop_regs[0] + 0x10 + offs, space.read_dword(cop_regs[0] + 0x10 + offs) + space.read_dword(cop_regs[0] + 0x28 + offs));
+		LEGACY_execute_0905(space, offset, data);
 		return;
 	}
 
@@ -1691,27 +2051,7 @@ WRITE16_MEMBER(raiden2cop_device::LEGACY_cop_cmd_w)
 	if (check_command_matches(command, 0x984, 0xaa4, 0xd82, 0xaa2, 0x39b, 0xb9a, 0xb9a, 0xa9a, 5, 0xbf7f))
 	{
 		executed = 1;
-		int dy = space.read_dword(cop_regs[1] + 4) - space.read_dword(cop_regs[0] + 4);
-		int dx = space.read_dword(cop_regs[1] + 8) - space.read_dword(cop_regs[0] + 8);
-
-		cop_status = 7;
-		if (!dx) {
-			cop_status |= 0x8000;
-			cop_angle = 0;
-		}
-		else {
-			cop_angle = atan(double(dy) / double(dx)) * 128.0 / M_PI;
-			if (dx < 0)
-				cop_angle += 0x80;
-		}
-
-		m_LEGACY_r0 = dy;
-		m_LEGACY_r1 = dx;
-
-		//printf("%d %d %f %04x\n",dx,dy,atan(double(dy)/double(dx)) * 128 / M_PI,cop_angle);
-
-		if (data & 0x80)
-			space.write_word(cop_regs[0] + (0x34 ^ 2), cop_angle);
+		LEGACY_execute_130e_cupsoc(space, offset, data);
 		return;
 	}
 
@@ -1720,26 +2060,7 @@ WRITE16_MEMBER(raiden2cop_device::LEGACY_cop_cmd_w)
 	if (check_command_matches(command, 0x984, 0xaa4, 0xd82, 0xaa2, 0x39b, 0xb9a, 0xb9a, 0xb9a, 5, 0xbf7f))
 	{
 		executed = 1;
-		int dy = space.read_dword(cop_regs[1] + 4) - space.read_dword(cop_regs[0] + 4);
-		int dx = space.read_dword(cop_regs[1] + 8) - space.read_dword(cop_regs[0] + 8);
-
-		cop_status = 7;
-		if (!dx) {
-			cop_status |= 0x8000;
-			cop_angle = 0;
-		}
-		else {
-			cop_angle = atan(double(dy) / double(dx)) * 128.0 / M_PI;
-			if (dx < 0)
-				cop_angle += 0x80;
-		}
-
-		cop_angle -= 0x80;
-		m_LEGACY_r0 = dy;
-		m_LEGACY_r1 = dx;
-
-		if (data & 0x80)
-			space.write_word(cop_regs[0] + (0x34 ^ 2), cop_angle);
+		LEGACY_execute_130e(space, offset, data);
 		return;
 	}
 
@@ -1754,15 +2075,7 @@ WRITE16_MEMBER(raiden2cop_device::LEGACY_cop_cmd_w)
 	if (check_command_matches(command, 0xf9c, 0xb9c, 0xb9c, 0xb9c, 0xb9c, 0xb9c, 0xb9c, 0x99c, 4, 0x007f))
 	{
 		executed = 1;
-		int dy = m_LEGACY_r0;
-		int dx = m_LEGACY_r1;
-
-		dx >>= 16;
-		dy >>= 16;
-		cop_dist = sqrt((double)(dx*dx + dy*dy));
-
-		if (data & 0x80)
-			space.write_word(cop_regs[0] + (0x38), cop_dist);
+		LEGACY_execute_3b30(space, offset, data);
 		return;
 	}
 
@@ -1780,33 +2093,7 @@ WRITE16_MEMBER(raiden2cop_device::LEGACY_cop_cmd_w)
 	if (check_command_matches(command, 0xf9a, 0xb9a, 0xb9c, 0xb9c, 0xb9c, 0x29c, 0x000, 0x000, 5, 0xfcdd))
 	{
 		executed = 1;
-		int dy = m_LEGACY_r0;
-		int dx = m_LEGACY_r1;
-		int div = space.read_word(cop_regs[0] + (0x36 ^ 2));
-		int res;
-		int cop_dist_raw;
-
-		if (!div)
-		{
-			printf("divide by zero?\n");
-			div = 1;
-		}
-
-		/* TODO: calculation of this one should occur at 0x3b30/0x3bb0 I *think* */
-		/* TODO: recheck if cop_scale still masks at 3 with this command */
-		dx >>= 11 + cop_scale;
-		dy >>= 11 + cop_scale;
-		cop_dist_raw = sqrt((double)(dx*dx + dy*dy));
-
-		res = cop_dist_raw;
-		res /= div;
-
-		cop_dist = (1 << (5 - cop_scale)) / div;
-
-		/* TODO: bits 5-6-15 */
-		cop_status = 7;
-
-		space.write_word(cop_regs[0] + (0x38 ^ 2), res);
+		LEGACY_execute_42c2(space, offset, data);
 		return;
 	}
 
@@ -1825,9 +2112,8 @@ WRITE16_MEMBER(raiden2cop_device::LEGACY_cop_cmd_w)
 
 	if (check_command_matches(command, 0xb80, 0xb82, 0xb84, 0xb86, 0x000, 0x000, 0x000, 0x000, funcval, funcmask))
 	{
+		LEGACY_execute_a100(space, offset, data);
 		executed = 1;
-		m_LEGACY_cop_collision_info[0].y = (space.read_dword(cop_regs[0] + 4));
-		m_LEGACY_cop_collision_info[0].x = (space.read_dword(cop_regs[0] + 8));
 		return;
 	}
 
@@ -1835,22 +2121,14 @@ WRITE16_MEMBER(raiden2cop_device::LEGACY_cop_cmd_w)
 	if (check_command_matches(command, 0xb40, 0xbc0, 0xbc2, 0x000, 0x000, 0x000, 0x000, 0x000, funcval, funcmask))
 	{
 		executed = 1;
-		m_LEGACY_cop_collision_info[0].hitbox = space.read_word(cop_regs[2]);
-		m_LEGACY_cop_collision_info[0].hitbox_y = space.read_word((cop_regs[2] & 0xffff0000) | (m_LEGACY_cop_collision_info[0].hitbox));
-		m_LEGACY_cop_collision_info[0].hitbox_x = space.read_word(((cop_regs[2] & 0xffff0000) | (m_LEGACY_cop_collision_info[0].hitbox)) + 2);
-
-		/* do the math */
-		LEGACY_cop_take_hit_box_params(0);
-		cop_hit_status = LEGACY_cop_calculate_collsion_detection();
-
+		LEGACY_execute_b100(space, offset, data);
 		return;
 	}
 
 	if (check_command_matches(command, 0xba0, 0xba2, 0xba4, 0xba6, 0x000, 0x000, 0x000, 0x000, funcval, funcmask))
 	{
 		executed = 1;
-		m_LEGACY_cop_collision_info[1].y = (space.read_dword(cop_regs[1] + 4));
-		m_LEGACY_cop_collision_info[1].x = (space.read_dword(cop_regs[1] + 8));
+		LEGACY_execute_a900(space, offset, data);
 		return;
 	}
 
@@ -1858,13 +2136,7 @@ WRITE16_MEMBER(raiden2cop_device::LEGACY_cop_cmd_w)
 	if (check_command_matches(command, 0xb60, 0xbe0, 0xbe2, 0x000, 0x000, 0x000, 0x000, 0x000, funcval, funcmask))
 	{
 		executed = 1;
-		m_LEGACY_cop_collision_info[1].hitbox = space.read_word(cop_regs[3]);
-		m_LEGACY_cop_collision_info[1].hitbox_y = space.read_word((cop_regs[3] & 0xffff0000) | (m_LEGACY_cop_collision_info[1].hitbox));
-		m_LEGACY_cop_collision_info[1].hitbox_x = space.read_word(((cop_regs[3] & 0xffff0000) | (m_LEGACY_cop_collision_info[1].hitbox)) + 2);
-
-		/* do the math */
-		LEGACY_cop_take_hit_box_params(1);
-		cop_hit_status = LEGACY_cop_calculate_collsion_detection();
+		LEGACY_execute_b900(space, offset, data);
 		return;
 	}
 
@@ -1872,25 +2144,7 @@ WRITE16_MEMBER(raiden2cop_device::LEGACY_cop_cmd_w)
 	if (check_command_matches(command, 0xb80, 0xba0, 0x000, 0x000, 0x000, 0x000, 0x000, 0x000, 10, 0xfff3))
 	{
 		executed = 1;
-		UINT8 offs;
-		int abs_x, abs_y, rel_xy;
-
-		offs = (offset & 3) * 4;
-
-		/* TODO: I really suspect that following two are actually taken from the 0xa180 macro command then internally loaded */
-		abs_x = space.read_word(cop_regs[0] + 8) - m_cop_sprite_dma_abs_x;
-		abs_y = space.read_word(cop_regs[0] + 4) - m_cop_sprite_dma_abs_y;
-		rel_xy = space.read_word(m_cop_sprite_dma_src + 4 + offs);
-
-		//if(rel_xy & 0x0706)
-		//  printf("sprite rel_xy = %04x\n",rel_xy);
-
-		if (rel_xy & 1)
-			space.write_word(cop_regs[4] + offs + 4, 0xc0 + abs_x - (rel_xy & 0xf8));
-		else
-			space.write_word(cop_regs[4] + offs + 4, (((rel_xy & 0x78) + (abs_x)-((rel_xy & 0x80) ? 0x80 : 0))));
-
-		space.write_word(cop_regs[4] + offs + 6, (((rel_xy & 0x7800) >> 8) + (abs_y)-((rel_xy & 0x8000) ? 0x80 : 0)));
+		LEGACY_execute_6980(space, offset, data);
 		return;
 	}
 
@@ -1898,12 +2152,7 @@ WRITE16_MEMBER(raiden2cop_device::LEGACY_cop_cmd_w)
 	if (check_command_matches(command, 0x080, 0x882, 0x000, 0x000, 0x000, 0x000, 0x000, 0x000, 10, 0xff00))
 	{
 		executed = 1;
-		UINT8 offs;
-
-		offs = (offset & 3) * 4;
-
-		space.write_word(cop_regs[4] + offs + 0, space.read_word(m_cop_sprite_dma_src + offs) + (m_cop_sprite_dma_param & 0x3f));
-		//space.write_word(cop_regs[4] + offs + 2,space.read_word(m_cop_sprite_dma_src+2 + offs));
+		LEGACY_execute_c480(space, offset, data);
 		return;
 	}
 
@@ -1914,37 +2163,7 @@ WRITE16_MEMBER(raiden2cop_device::LEGACY_cop_cmd_w)
 	if (check_command_matches(command, 0xf80, 0xaa2, 0x984, 0x0c2, 0x000, 0x000, 0x000, 0x000, 5, 0x7ff7))
 	{
 		executed = 1;
-		UINT8 offs;
-		int div;
-		INT16 dir_offset;
-		//              INT16 offs_val;
-
-		/* TODO: [4-7] could be mirrors of [0-3] (this is the only command so far that uses 4-7 actually)*/
-		/* ? 0 + [4] */
-		/* sub32 4 + [5] */
-		/* write16h 8 + [4] */
-		/* addmem16 4 + [6] */
-
-		// these two are obvious ...
-		// 0xf x 16 = 240
-		// 0x14 x 16 = 320
-		// what are these two instead? scale factor? offsets? (edit: offsets to apply from the initial sprite data)
-		// 0xfc69 ?
-		// 0x7f4 ?
-		//printf("%08x %08x %08x %08x %08x %08x %08x\n",cop_regs[0],cop_regs[1],cop_regs[2],cop_regs[3],cop_regs[4],cop_regs[5],cop_regs[6]);
-
-		offs = (offset & 3) * 4;
-
-		div = space.read_word(cop_regs[4] + offs);
-		dir_offset = space.read_word(cop_regs[4] + offs + 8);
-		//              offs_val = space.read_word(cop_regs[3] + offs);
-		//420 / 180 = 500 : 400 = 30 / 50 = 98 / 18
-
-		/* TODO: this probably trips a cop status flag */
-		if (div == 0) { div = 1; }
-
-
-		space.write_word((cop_regs[6] + offs + 4), ((space.read_word(cop_regs[5] + offs + 4) + dir_offset) / div));
+		LEGACY_execute_dde5(space, offset, data);
 		return;
 	}
 
@@ -1952,58 +2171,7 @@ WRITE16_MEMBER(raiden2cop_device::LEGACY_cop_cmd_w)
 	if (check_command_matches(command, 0x3a0, 0x3a6, 0x380, 0xaa0, 0x2a6, 0x000, 0x000, 0x000, 8, 0xf3e7))
 	{
 		executed = 1;
-		UINT8 cur_angle;
-		UINT16 flags;
-
-		/* 0 [1] */
-		/* 0xc [1] */
-		/* 0 [0] */
-		/* 0 [1] */
-		/* 0xc [1] */
-
-		cur_angle = space.read_byte(cop_regs[1] + (0xc ^ 3));
-		flags = space.read_word(cop_regs[1]);
-		//space.write_byte(cop_regs[1] + (0^3),space.read_byte(cop_regs[1] + (0^3)) & 0xfb); //correct?
-
-		INT8 tempangle_compare = (INT8)cop_angle_target;
-		INT8 tempangle_mod_val = (INT8)cop_angle_step;
-
-		tempangle_compare &= 0xff;
-		tempangle_mod_val &= 0xff;
-
-		cop_angle_target = tempangle_compare;
-		cop_angle_step = tempangle_mod_val;
-
-		flags &= ~0x0004;
-
-		int delta = cur_angle - tempangle_compare;
-		if (delta >= 128)
-			delta -= 256;
-		else if (delta < -128)
-			delta += 256;
-		if (delta < 0)
-		{
-			if (delta >= -tempangle_mod_val)
-			{
-				cur_angle = tempangle_compare;
-				flags |= 0x0004;
-			}
-			else
-				cur_angle += tempangle_mod_val;
-		}
-		else
-		{
-			if (delta <= tempangle_mod_val)
-			{
-				cur_angle = tempangle_compare;
-				flags |= 0x0004;
-			}
-			else
-				cur_angle -= tempangle_mod_val;
-		}
-
-		space.write_byte(cop_regs[1] + (0 ^ 2), flags);
-		space.write_byte(cop_regs[1] + (0xc ^ 3), cur_angle);
+		LEGACY_execute_6200(space, offset, data);
 		return;
 	}
 
@@ -2013,53 +2181,7 @@ WRITE16_MEMBER(raiden2cop_device::LEGACY_cop_cmd_w)
 	if (check_command_matches(command, 0x380, 0x39a, 0x380, 0xa80, 0x29a, 0x000, 0x000, 0x000, 8, 0xf3e7))
 	{
 		executed = 1;
-		UINT8 cur_angle;
-		UINT16 flags;
-
-		cur_angle = space.read_byte(cop_regs[0] + (0x34 ^ 3));
-		flags = space.read_word(cop_regs[0] + (0 ^ 2));
-		//space.write_byte(cop_regs[1] + (0^3),space.read_byte(cop_regs[1] + (0^3)) & 0xfb); //correct?
-
-		INT8 tempangle_compare = (INT8)cop_angle_target;
-		INT8 tempangle_mod_val = (INT8)cop_angle_step;
-
-		tempangle_compare &= 0xff;
-		tempangle_mod_val &= 0xff;
-
-		cop_angle_target = tempangle_compare;
-		cop_angle_step = tempangle_mod_val;
-
-
-		flags &= ~0x0004;
-
-		int delta = cur_angle - tempangle_compare;
-		if (delta >= 128)
-			delta -= 256;
-		else if (delta < -128)
-			delta += 256;
-		if (delta < 0)
-		{
-			if (delta >= -tempangle_mod_val)
-			{
-				cur_angle = tempangle_compare;
-				flags |= 0x0004;
-			}
-			else
-				cur_angle += tempangle_mod_val;
-		}
-		else
-		{
-			if (delta <= tempangle_mod_val)
-			{
-				cur_angle = tempangle_compare;
-				flags |= 0x0004;
-			}
-			else
-				cur_angle -= tempangle_mod_val;
-		}
-
-		space.write_byte(cop_regs[0] + (0 ^ 3), flags);
-		space.write_word(cop_regs[0] + (0x34 ^ 3), cur_angle);
+		LEGACY_execute_6200_grainbow(space, offset, data);	
 		return;
 	}
 
@@ -2067,27 +2189,7 @@ WRITE16_MEMBER(raiden2cop_device::LEGACY_cop_cmd_w)
 	if (check_command_matches(command, 0x984, 0xac4, 0xd82, 0xac2, 0x39b, 0xb9a, 0xb9a, 0xa9a, 5, 0xb07f))
 	{
 		executed = 1;
-		int dy = space.read_dword(cop_regs[2] + 4) - space.read_dword(cop_regs[0] + 4);
-		int dx = space.read_dword(cop_regs[2] + 8) - space.read_dword(cop_regs[0] + 8);
-
-		cop_status = 7;
-		if (!dx) {
-			cop_status |= 0x8000;
-			cop_angle = 0;
-		}
-		else {
-			cop_angle = atan(double(dy) / double(dx)) * 128.0 / M_PI;
-			if (dx < 0)
-				cop_angle += 0x80;
-		}
-
-		m_LEGACY_r0 = dy;
-		m_LEGACY_r1 = dx;
-
-		//printf("%d %d %f %04x\n",dx,dy,atan(double(dy)/double(dx)) * 128 / M_PI,cop_angle);
-
-		if (data & 0x80)
-			space.write_word(cop_regs[0] + (0x34 ^ 2), cop_angle);
+		LEGACY_execute_e30e(space, offset, data);
 		return;
 	}
 
@@ -2096,18 +2198,12 @@ WRITE16_MEMBER(raiden2cop_device::LEGACY_cop_cmd_w)
 	if (check_command_matches(command, 0xac2, 0x9e0, 0x0a2, 0x000, 0x000, 0x000, 0x000, 0x000, 5, 0xfffb))
 	{
 		executed = 1;
-		UINT8 *ROM = space.machine().root_device().memregion("maincpu")->base();
-		UINT32 rom_addr = (m_cop_rom_addr_hi << 16 | m_cop_rom_addr_lo) & ~1;
-		UINT16 rom_data = (ROM[rom_addr + 0]) | (ROM[rom_addr + 1] << 8);
-
-		/* writes to some unemulated COP registers, then puts the result in here, adding a parameter taken from ROM */
-		//space.write_word(cop_regs[0]+(0x44 + offset * 4), rom_data);
-
-		printf("%04x%04x %04x %04x\n", m_cop_rom_addr_hi, m_cop_rom_addr_lo, m_cop_rom_addr_unk, rom_data);
+		LEGACY_execute_d104(space, offset, data);
 		return;
 	}
 
-	if (executed == 0) printf("did not execute %04x\n", data);
+	if (executed == 0)
+		if (data!=0xf105) printf("did not execute %04x\n", data); // cup soccer triggers this a lot (and others)
 }
 
 
