@@ -684,6 +684,28 @@ Titles, serial #s, publishers and release dates taken from:
 		</part>
 	</software>
 
+	<!-- No sound on the FM-7, FM sound only?  -->
+	<software name="psychic">
+		<description>Psychic War - Cosmic Soldier 2</description>
+		<year>1988</year>
+		<publisher>KGD Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="psychic_a.d77" size="348848" crc="c540a5d8" sha1="61fb045687cf3f320d6b21554f5d36da1c5e6cda" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="psychic_b.d77" size="348848" crc="f311eb81" sha1="d7afe05b1e1f37df3f951a274af6c57a88bf6d84" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="psychic_u.d77" size="348848" crc="8ca45d1e" sha1="a3a0be9f4be3db485b9a7400c3103f3ab0b31277" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="pquest">
 		<description>Princess Quest</description>
 		<year>1986</year>

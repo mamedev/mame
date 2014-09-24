@@ -211,6 +211,18 @@ Titles, serial #s, publishers and release dates taken from:
 		</part>
 	</software>
 
+	<software name="fireball">
+		<description>Fireball</description>
+		<year>1987</year>
+		<publisher>ハミングバードソフト (Humming Bird Soft)</publisher>
+		<info name="serial" value="12130"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="fireball.d77" size="348848" crc="40562d43" sha1="1bf32a4ec4600ce9ba9ebdc8233311ed08dc8f52" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="hotdog">
 		<description>Hotdog</description>
 		<year>1986</year>
@@ -664,6 +676,23 @@ Titles, serial #s, publishers and release dates taken from:
 		<part name="flop5" interface="floppy_5_25">
 			<dataarea name="flop" size="392368">
 				<rom name="psy-o-blade_d.d77" size="392368" crc="487c163c" sha1="1d763245b4a3d784a5b2abdffc86b459abea39be" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ruin">
+		<description>Ruin</description>
+		<year>1987</year>
+		<publisher>ウインキーソフト (Winky Soft)</publisher>
+		<info name="serial" value="KO-1028(FUWS19001)"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="ruin_a.d77" size="348848" crc="67ce97b8" sha1="0034e0a4999b92f548abc52607cd1b75bcc4f6c9" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="ruin_b.d77" size="348848" crc="45bdccc2" sha1="86baec6e7febc31d99ce1b71193a1b6dae21b0c8" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
