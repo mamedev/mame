@@ -78,8 +78,8 @@ TODO
 #include "machine/6850acia.h"
 #include "machine/clock.h"
 #include "imagedev/cassette.h"
+#include "imagedev/snapquik.h"
 #include "sound/wave.h"
-#include "imagedev/cartslot.h"
 #include "mekd2.lh"
 
 #define XTAL_MEKD2 1228800
@@ -106,7 +106,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(mekd2_nmi_w);
 	DECLARE_WRITE8_MEMBER(mekd2_digit_w);
 	DECLARE_WRITE8_MEMBER(mekd2_segment_w);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(mekd2_cart);
+	DECLARE_QUICKLOAD_LOAD_MEMBER(mekd2_quik);
 	DECLARE_WRITE_LINE_MEMBER(cass_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(mekd2_c);
 	TIMER_DEVICE_CALLBACK_MEMBER(mekd2_p);
@@ -301,27 +301,27 @@ WRITE_LINE_MEMBER( mekd2_state::cass_w )
 	m_cass_state = state;
 }
 
-DEVICE_IMAGE_LOAD_MEMBER( mekd2_state,mekd2_cart )
+QUICKLOAD_LOAD_MEMBER( mekd2_state, mekd2_quik )
 {
 	static const char magic[] = "MEK6800D2";
 	char buff[9];
 	UINT16 addr, size;
 	UINT8 ident, *RAM = memregion("maincpu")->base();
 
-	image.fread( buff, sizeof (buff));
+	image.fread(buff, sizeof (buff));
 	if (memcmp(buff, magic, sizeof (buff)))
 	{
-		logerror( "mekd2_rom_load: magic '%s' not found\n", magic);
+		logerror("mekd2 rom load: magic '%s' not found\n", magic);
 		return IMAGE_INIT_FAIL;
 	}
-	image.fread( &addr, 2);
+	image.fread(&addr, 2);
 	addr = LITTLE_ENDIANIZE_INT16(addr);
-	image.fread( &size, 2);
+	image.fread(&size, 2);
 	size = LITTLE_ENDIANIZE_INT16(size);
-	image.fread( &ident, 1);
-	logerror("mekd2_rom_load: $%04X $%04X $%02X\n", addr, size, ident);
+	image.fread(&ident, 1);
+	logerror("mekd2 rom load: $%04X $%04X $%02X\n", addr, size, ident);
 	while (size-- > 0)
-		image.fread( &RAM[addr++], 1);
+		image.fread(&RAM[addr++], 1);
 
 	return IMAGE_INIT_PASS;
 }
@@ -374,13 +374,7 @@ static MACHINE_CONFIG_START( mekd2, mekd2_state )
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_CASSETTE_ADD( "cassette" )
-
-	/* Cartslot ?? does not come with one.. */
-	MCFG_CARTSLOT_ADD("cart")
-	MCFG_CARTSLOT_EXTENSION_LIST("d2")
-	MCFG_CARTSLOT_NOT_MANDATORY
-	MCFG_CARTSLOT_LOAD(mekd2_state,mekd2_cart)
+	MCFG_CASSETTE_ADD("cassette")
 
 	/* Devices */
 	MCFG_DEVICE_ADD("pia_s", PIA6821, 0)
@@ -407,6 +401,8 @@ static MACHINE_CONFIG_START( mekd2, mekd2_state )
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("mekd2_c", mekd2_state, mekd2_c, attotime::from_hz(4800))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("mekd2_p", mekd2_state, mekd2_p, attotime::from_hz(40000))
+
+	MCFG_QUICKLOAD_ADD("quickload", mekd2_state, mekd2_quik, "d2", 1)
 MACHINE_CONFIG_END
 
 /***********************************************************
