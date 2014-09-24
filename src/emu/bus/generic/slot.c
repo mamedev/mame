@@ -59,11 +59,7 @@ void device_generic_cart_interface::rom_alloc(size_t size, int width, endianness
 
 void device_generic_cart_interface::ram_alloc(UINT32 size)
 {
-	if (m_ram == NULL)
-	{
-		m_ram.resize(size);
-		device().save_item(NAME(m_ram));
-	}
+	m_ram.resize(size);
 }
 
 

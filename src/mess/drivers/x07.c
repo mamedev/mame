@@ -1037,33 +1037,24 @@ inline void x07_state::draw_udk()
 
 DEVICE_IMAGE_LOAD_MEMBER( x07_state, x07_card )
 {
-	address_space &space = m_maincpu->space( AS_PROGRAM );
-	UINT16 ram_size = m_ram->size();
-
-	if (image.software_entry() == NULL)
-	{
-		UINT8 *rom = machine().memory().region_alloc( "card", image.length(), 1, ENDIANNESS_LITTLE )->base();
-		image.fread(rom, image.length());
-
-		space.install_ram(ram_size, ram_size + 0xfff);
-		space.install_rom(0x6000, 0x7fff, rom);
-	}
-	else
+	UINT32 size = m_card->common_get_size("rom");
+	
+	// check card type
+	if (image.software_entry() != NULL)
 	{
 		const char *card_type = image.get_feature("card_type");
-
-		if (!strcmp(card_type, "xp140"))
+		
+		if (strcmp(card_type, "xp140"))
 		{
-			// 0x4000 - 0x4fff   4KB RAM
-			// 0x6000 - 0x7fff   8KB ROM
-			space.install_ram(ram_size, ram_size + 0xfff);
-			space.install_rom(0x6000, 0x7fff, image.get_software_region("rom"));
-		}
-		else
-		{
+			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported card type");
 			return IMAGE_INIT_FAIL;
 		}
 	}
+
+	m_card->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_BIG);
+	m_card->common_load_rom(m_card->get_rom_base(), size, "rom");			
+
+	m_card->ram_alloc(0x1000);
 
 	return IMAGE_INIT_PASS;
 }
@@ -1368,6 +1359,7 @@ GFXDECODE_END
 
 void x07_state::machine_start()
 {
+	UINT32 ram_size = m_ram->size();
 	m_rsta_clear = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(x07_state::rsta_clear),this));
 	m_rstb_clear = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(x07_state::rstb_clear),this));
 	m_beep_stop = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(x07_state::beep_stop),this));
@@ -1375,7 +1367,7 @@ void x07_state::machine_start()
 	m_cass_tick = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(x07_state::cassette_tick),this));
 
 	m_nvram1->set_base(&m_t6834_ram, 0x800);
-	m_nvram2->set_base(m_ram->pointer(), m_ram->size());
+	m_nvram2->set_base(m_ram->pointer(), ram_size);
 
 	/* Save State */
 	save_item(NAME(m_sleep));
@@ -1418,9 +1410,21 @@ void x07_state::machine_start()
 	save_item(NAME(m_cursor.y));
 	save_item(NAME(m_cursor.on));
 
-	/* install RAM */
+	// install RAM
 	address_space &program = m_maincpu->space(AS_PROGRAM);
-	program.install_ram(0x0000, m_ram->size() - 1, m_ram->pointer());
+	program.install_ram(0x0000, ram_size - 1, m_ram->pointer());
+
+	// card
+	if (m_card->exists())
+	{
+		// 0x4000 - 0x4fff   4KB RAM
+		// 0x6000 - 0x7fff   8KB ROM
+		program.install_read_handler(ram_size, ram_size + 0xfff, read8_delegate(FUNC(generic_slot_device::read_ram),(generic_slot_device*)m_card));
+		program.install_write_handler(ram_size, ram_size + 0xfff, write8_delegate(FUNC(generic_slot_device::write_ram),(generic_slot_device*)m_card));
+		program.install_read_handler(0x6000, 0x7fff, read8_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_card));
+
+		m_card->save_ram();
+	}
 }
 
 void x07_state::machine_reset()
@@ -1504,11 +1508,9 @@ static MACHINE_CONFIG_START( x07, x07_state )
 	MCFG_RAM_EXTRA_OPTIONS("8K,12K,20K,24k")
 
 	/* Memory Card */
-	MCFG_CARTSLOT_ADD("card")
-	MCFG_CARTSLOT_EXTENSION_LIST("rom,bin")
-	MCFG_CARTSLOT_NOT_MANDATORY
-	MCFG_CARTSLOT_LOAD(x07_state,x07_card)
-	MCFG_CARTSLOT_INTERFACE("x07_card")
+	MCFG_GENERIC_CARTSLOT_ADD("cardslot", generic_romram_plain_slot, "x07_card")
+	MCFG_GENERIC_EXTENSIONS("rom,bin")
+	MCFG_GENERIC_LOAD(x07_state, x07_card)
 
 	/* cassette */
 	MCFG_CASSETTE_ADD( "cassette" )

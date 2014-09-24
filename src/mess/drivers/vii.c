@@ -70,9 +70,11 @@ Detailed list of bugs:
 
 #include "emu.h"
 #include "cpu/unsp/unsp.h"
-#include "imagedev/cartslot.h"
 #include "machine/i2cmem.h"
-#include "formats/imageutl.h"
+
+#include "bus/generic/slot.h"
+#include "bus/generic/carts.h"
+
 
 #define PAGE_ENABLE_MASK        0x0008
 
@@ -91,35 +93,38 @@ public:
 	vii_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_cart(*this, "cartslot"),
 		m_p_ram(*this, "p_ram"),
 		m_p_rowscroll(*this, "p_rowscroll"),
 		m_p_palette(*this, "p_palette"),
 		m_p_spriteram(*this, "p_spriteram"),
-		m_p_cart(*this, "p_cart"),
-		m_region_cpu(*this, "maincpu"),
-		m_region_cart(*this, "cart"),
+		m_bios_rom(*this, "bios"),
 		m_io_p1(*this, "P1")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	DECLARE_READ16_MEMBER(vii_video_r);
-	DECLARE_WRITE16_MEMBER(vii_video_w);
-	DECLARE_READ16_MEMBER(vii_audio_r);
-	DECLARE_WRITE16_MEMBER(vii_audio_w);
-	DECLARE_READ16_MEMBER(vii_io_r);
-	DECLARE_WRITE16_MEMBER(vii_io_w);
-	DECLARE_WRITE16_MEMBER(vii_rowscroll_w);
-	DECLARE_WRITE16_MEMBER(vii_spriteram_w);
+	optional_device<generic_slot_device> m_cart;
+	DECLARE_READ16_MEMBER(video_r);
+	DECLARE_WRITE16_MEMBER(video_w);
+	DECLARE_READ16_MEMBER(audio_r);
+	DECLARE_WRITE16_MEMBER(audio_w);
+	DECLARE_READ16_MEMBER(io_r);
+	DECLARE_WRITE16_MEMBER(io_w);
+	DECLARE_WRITE16_MEMBER(rowscroll_w);
+	DECLARE_WRITE16_MEMBER(spriteram_w);
+	DECLARE_READ16_MEMBER(rom_r);
 	required_shared_ptr<UINT16> m_p_ram;
 	required_shared_ptr<UINT16> m_p_rowscroll;
 	required_shared_ptr<UINT16> m_p_palette;
 	required_shared_ptr<UINT16> m_p_spriteram;
-	required_shared_ptr<UINT16> m_p_cart;
+
+	dynamic_array<UINT16> m_p_cart;
 
 	UINT32 m_current_bank;
 
 	UINT16 m_video_regs[0x100];
 	UINT32 m_centered_coordinates;
+	void test_centered(UINT8 *ROM);
 
 	struct
 	{
@@ -134,10 +139,10 @@ public:
 
 	emu_timer *m_tmb1;
 	emu_timer *m_tmb2;
-	void vii_do_dma(UINT32 len);
-	void vii_do_gpio(UINT32 offset);
-	void vii_switch_bank(UINT32 bank);
-	void vii_do_i2c();
+	void do_dma(UINT32 len);
+	void do_gpio(UINT32 offset);
+	void switch_bank(UINT32 bank);
+	void do_i2c();
 	void spg_do_dma(UINT32 len);
 	DECLARE_DRIVER_INIT(vsmile);
 	DECLARE_DRIVER_INIT(walle);
@@ -154,19 +159,20 @@ public:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(vsmile_cart);
 
 protected:
-	required_memory_region m_region_cpu;
-	optional_memory_region m_region_cart;
+	optional_memory_region m_bios_rom;
 	required_ioport m_io_p1;
 
-	void vii_blit(bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT32 xoff, UINT32 yoff, UINT32 attr, UINT32 ctrl, UINT32 bitmap_addr, UINT16 tile);
-	void vii_blit_page(bitmap_rgb32 &bitmap, const rectangle &cliprect, int depth, UINT32 bitmap_addr, UINT16 *regs);
-	void vii_blit_sprite(bitmap_rgb32 &bitmap, const rectangle &cliprect, int depth, UINT32 base_addr);
-	void vii_blit_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect, int depth);
+	memory_region *m_cart_rom;
+
+	void blit(bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT32 xoff, UINT32 yoff, UINT32 attr, UINT32 ctrl, UINT32 bitmap_addr, UINT16 tile);
+	void blit_page(bitmap_rgb32 &bitmap, const rectangle &cliprect, int depth, UINT32 bitmap_addr, UINT16 *regs);
+	void blit_sprite(bitmap_rgb32 &bitmap, const rectangle &cliprect, int depth, UINT32 base_addr);
+	void blit_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect, int depth);
 	inline void verboselog(int n_level, const char *s_fmt, ...) ATTR_PRINTF(3,4);
 	inline UINT8 expand_rgb5_to_rgb8(UINT8 val);
-	inline UINT8 vii_mix_channel(UINT8 a, UINT8 b);
-	void vii_mix_pixel(UINT32 offset, UINT16 rgb);
-	void vii_set_pixel(UINT32 offset, UINT16 rgb);
+	inline UINT8 mix_channel(UINT8 a, UINT8 b);
+	void mix_pixel(UINT32 offset, UINT16 rgb);
+	void set_pixel(UINT32 offset, UINT16 rgb);
 };
 
 enum
@@ -217,27 +223,27 @@ inline UINT8 vii_state::expand_rgb5_to_rgb8(UINT8 val)
 }
 
 // Perform a lerp between a and b
-inline UINT8 vii_state::vii_mix_channel(UINT8 a, UINT8 b)
+inline UINT8 vii_state::mix_channel(UINT8 a, UINT8 b)
 {
 	UINT8 alpha = m_video_regs[0x1c] & 0x00ff;
 	return ((64 - alpha) * a + alpha * b) / 64;
 }
 
-void vii_state::vii_mix_pixel(UINT32 offset, UINT16 rgb)
+void vii_state::mix_pixel(UINT32 offset, UINT16 rgb)
 {
-	m_screenram[offset].r = vii_mix_channel(m_screenram[offset].r, expand_rgb5_to_rgb8(rgb >> 10));
-	m_screenram[offset].g = vii_mix_channel(m_screenram[offset].g, expand_rgb5_to_rgb8(rgb >> 5));
-	m_screenram[offset].b = vii_mix_channel(m_screenram[offset].b, expand_rgb5_to_rgb8(rgb));
+	m_screenram[offset].r = mix_channel(m_screenram[offset].r, expand_rgb5_to_rgb8(rgb >> 10));
+	m_screenram[offset].g = mix_channel(m_screenram[offset].g, expand_rgb5_to_rgb8(rgb >> 5));
+	m_screenram[offset].b = mix_channel(m_screenram[offset].b, expand_rgb5_to_rgb8(rgb));
 }
 
-void vii_state::vii_set_pixel(UINT32 offset, UINT16 rgb)
+void vii_state::set_pixel(UINT32 offset, UINT16 rgb)
 {
 	m_screenram[offset].r = expand_rgb5_to_rgb8(rgb >> 10);
 	m_screenram[offset].g = expand_rgb5_to_rgb8(rgb >> 5);
 	m_screenram[offset].b = expand_rgb5_to_rgb8(rgb);
 }
 
-void vii_state::vii_blit(bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT32 xoff, UINT32 yoff, UINT32 attr, UINT32 ctrl, UINT32 bitmap_addr, UINT16 tile)
+void vii_state::blit(bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT32 xoff, UINT32 yoff, UINT32 attr, UINT32 ctrl, UINT32 bitmap_addr, UINT16 tile)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
@@ -293,11 +299,11 @@ void vii_state::vii_blit(bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT32
 				{
 					if (attr & 0x4000)
 					{
-						vii_mix_pixel(xx + 320*yy, rgb);
+						mix_pixel(xx + 320*yy, rgb);
 					}
 					else
 					{
-						vii_set_pixel(xx + 320*yy, rgb);
+						set_pixel(xx + 320*yy, rgb);
 					}
 				}
 			}
@@ -305,7 +311,7 @@ void vii_state::vii_blit(bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT32
 	}
 }
 
-void vii_state::vii_blit_page(bitmap_rgb32 &bitmap, const rectangle &cliprect, int depth, UINT32 bitmap_addr, UINT16 *regs)
+void vii_state::blit_page(bitmap_rgb32 &bitmap, const rectangle &cliprect, int depth, UINT32 bitmap_addr, UINT16 *regs)
 {
 	UINT32 x0, y0;
 	UINT32 xscroll = regs[0];
@@ -369,12 +375,12 @@ void vii_state::vii_blit_page(bitmap_rgb32 &bitmap, const rectangle &cliprect, i
 			yy = ((h*y0 - yscroll + 0x10) & 0xff) - 0x10;
 			xx = (w*x0 - xscroll) & 0x1ff;
 
-			vii_blit(bitmap, cliprect, xx, yy, tileattr, tilectrl, bitmap_addr, tile);
+			blit(bitmap, cliprect, xx, yy, tileattr, tilectrl, bitmap_addr, tile);
 		}
 	}
 }
 
-void vii_state::vii_blit_sprite(bitmap_rgb32 &bitmap, const rectangle &cliprect, int depth, UINT32 base_addr)
+void vii_state::blit_sprite(bitmap_rgb32 &bitmap, const rectangle &cliprect, int depth, UINT32 base_addr)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	UINT16 tile, attr;
@@ -412,10 +418,10 @@ void vii_state::vii_blit_sprite(bitmap_rgb32 &bitmap, const rectangle &cliprect,
 	x &= 0x01ff;
 	y &= 0x01ff;
 
-	vii_blit(bitmap, cliprect, x, y, attr, 0, bitmap_addr, tile);
+	blit(bitmap, cliprect, x, y, attr, 0, bitmap_addr, tile);
 }
 
-void vii_state::vii_blit_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect, int depth)
+void vii_state::blit_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect, int depth)
 {
 	UINT32 n;
 
@@ -428,7 +434,7 @@ void vii_state::vii_blit_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect
 	{
 		//if(space.read_word((0x2c00 + 4*n) << 1))
 		{
-			vii_blit_sprite(bitmap, cliprect, depth, 0x2c00 + 4*n);
+			blit_sprite(bitmap, cliprect, depth, 0x2c00 + 4*n);
 		}
 	}
 }
@@ -443,9 +449,9 @@ UINT32 vii_state::screen_update_vii(screen_device &screen, bitmap_rgb32 &bitmap,
 
 	for(i = 0; i < 4; i++)
 	{
-		vii_blit_page(bitmap, cliprect, i, 0x40 * m_video_regs[0x20], m_video_regs + 0x10);
-		vii_blit_page(bitmap, cliprect, i, 0x40 * m_video_regs[0x21], m_video_regs + 0x16);
-		vii_blit_sprites(bitmap, cliprect, i);
+		blit_page(bitmap, cliprect, i, 0x40 * m_video_regs[0x20], m_video_regs + 0x10);
+		blit_page(bitmap, cliprect, i, 0x40 * m_video_regs[0x21], m_video_regs + 0x16);
+		blit_sprites(bitmap, cliprect, i);
 	}
 
 	for(y = 0; y < 240; y++)
@@ -463,7 +469,7 @@ UINT32 vii_state::screen_update_vii(screen_device &screen, bitmap_rgb32 &bitmap,
 *    Machine Hardware    *
 *************************/
 
-void vii_state::vii_do_dma(UINT32 len)
+void vii_state::do_dma(UINT32 len)
 {
 	address_space &mem = m_maincpu->space(AS_PROGRAM);
 	UINT32 src = m_video_regs[0x70];
@@ -479,26 +485,26 @@ void vii_state::vii_do_dma(UINT32 len)
 	m_video_regs[0x63] |= 4;
 }
 
-READ16_MEMBER( vii_state::vii_video_r )
+READ16_MEMBER( vii_state::video_r )
 {
 	switch(offset)
 	{
 		case 0x62: // Video IRQ Enable
-			verboselog(0, "vii_video_r: Video IRQ Enable: %04x\n", VII_VIDEO_IRQ_ENABLE);
+			verboselog(0, "video_r: Video IRQ Enable: %04x\n", VII_VIDEO_IRQ_ENABLE);
 			return VII_VIDEO_IRQ_ENABLE;
 
 		case 0x63: // Video IRQ Status
-			verboselog(0, "vii_video_r: Video IRQ Status: %04x\n", VII_VIDEO_IRQ_STATUS);
+			verboselog(0, "video_r: Video IRQ Status: %04x\n", VII_VIDEO_IRQ_STATUS);
 			return VII_VIDEO_IRQ_STATUS;
 
 		default:
-			verboselog(0, "vii_video_r: Unknown register %04x = %04x\n", 0x2800 + offset, m_video_regs[offset]);
+			verboselog(0, "video_r: Unknown register %04x = %04x\n", 0x2800 + offset, m_video_regs[offset]);
 			break;
 	}
 	return m_video_regs[offset];
 }
 
-WRITE16_MEMBER( vii_state::vii_video_w )
+WRITE16_MEMBER( vii_state::video_w )
 {
 	switch(offset)
 	{
@@ -517,12 +523,12 @@ WRITE16_MEMBER( vii_state::vii_video_w )
 			COMBINE_DATA(&m_video_regs[offset]);
 			break;
 		case 0x62: // Video IRQ Enable
-			verboselog(0, "vii_video_w: Video IRQ Enable = %04x (%04x)\n", data, mem_mask);
+			verboselog(0, "video_w: Video IRQ Enable = %04x (%04x)\n", data, mem_mask);
 			COMBINE_DATA(&VII_VIDEO_IRQ_ENABLE);
 			break;
 
 		case 0x63: // Video IRQ Acknowledge
-			verboselog(0, "vii_video_w: Video IRQ Acknowledge = %04x (%04x)\n", data, mem_mask);
+			verboselog(0, "video_w: Video IRQ Acknowledge = %04x (%04x)\n", data, mem_mask);
 			VII_VIDEO_IRQ_STATUS &= ~data;
 			if(!VII_VIDEO_IRQ_STATUS)
 			{
@@ -531,61 +537,61 @@ WRITE16_MEMBER( vii_state::vii_video_w )
 			break;
 
 		case 0x70: // Video DMA Source
-			verboselog(0, "vii_video_w: Video DMA Source = %04x (%04x)\n", data, mem_mask);
+			verboselog(0, "video_w: Video DMA Source = %04x (%04x)\n", data, mem_mask);
 			COMBINE_DATA(&m_video_regs[offset]);
 			break;
 
 		case 0x71: // Video DMA Dest
-			verboselog(0, "vii_video_w: Video DMA Dest = %04x (%04x)\n", data, mem_mask);
+			verboselog(0, "video_w: Video DMA Dest = %04x (%04x)\n", data, mem_mask);
 			COMBINE_DATA(&m_video_regs[offset]);
 			break;
 
 		case 0x72: // Video DMA Length
-			verboselog(0, "vii_video_w: Video DMA Length = %04x (%04x)\n", data, mem_mask);
-			vii_do_dma(data);
+			verboselog(0, "video_w: Video DMA Length = %04x (%04x)\n", data, mem_mask);
+			do_dma(data);
 			break;
 
 		default:
-			verboselog(0, "vii_video_w: Unknown register %04x = %04x (%04x)\n", 0x2800 + offset, data, mem_mask);
+			verboselog(0, "video_w: Unknown register %04x = %04x (%04x)\n", 0x2800 + offset, data, mem_mask);
 			COMBINE_DATA(&m_video_regs[offset]);
 			break;
 	}
 }
 
-READ16_MEMBER( vii_state::vii_audio_r )
+READ16_MEMBER( vii_state::audio_r )
 {
 	switch(offset)
 	{
 		default:
-			verboselog(4, "vii_audio_r: Unknown register %04x\n", 0x3000 + offset);
+			verboselog(4, "audio_r: Unknown register %04x\n", 0x3000 + offset);
 			break;
 	}
 	return 0;
 }
 
-WRITE16_MEMBER( vii_state::vii_audio_w )
+WRITE16_MEMBER( vii_state::audio_w )
 {
 	switch(offset)
 	{
 		default:
-			verboselog(4, "vii_audio_w: Unknown register %04x = %04x (%04x)\n", 0x3000 + offset, data, mem_mask);
+			verboselog(4, "audio_w: Unknown register %04x = %04x (%04x)\n", 0x3000 + offset, data, mem_mask);
 			break;
 	}
 }
 
-void vii_state::vii_switch_bank(UINT32 bank)
+void vii_state::switch_bank(UINT32 bank)
 {
-	UINT8 *cart = m_region_cart->base();
-
-	if(bank != m_current_bank)
+	if (bank != m_current_bank)
 	{
 		m_current_bank = bank;
-
-		memcpy(m_p_cart, cart + 0x400000 * bank * 2 + 0x4000*2, (0x400000 - 0x4000) * 2);
+		if (m_cart_rom)
+			memcpy(m_p_cart, m_cart_rom->base() + 0x400000 * bank * 2, 0x400000 * 2);
+		else
+			memcpy(m_p_cart, m_bios_rom->base() + 0x400000 * bank * 2, 0x400000 * 2);
 	}
 }
 
-void vii_state::vii_do_gpio(UINT32 offset)
+void vii_state::do_gpio(UINT32 offset)
 {
 	UINT32 index  = (offset - 1) / 5;
 	UINT16 buffer = m_io_regs[5*index + 2];
@@ -604,7 +610,7 @@ void vii_state::vii_do_gpio(UINT32 offset)
 		if(index == 1)
 		{
 			UINT32 bank = ((what & 0x80) >> 7) | ((what & 0x20) >> 4);
-			vii_switch_bank(bank);
+			switch_bank(bank);
 		}
 	}
 	else if (m_spg243_mode == SPG243_BATMAN)
@@ -626,11 +632,15 @@ void vii_state::vii_do_gpio(UINT32 offset)
 		{
 		}
 	}
+	else if (m_spg243_mode == SPG243_VSMILE)
+	{
+		// TODO: find out how vsmile accesses these GPIO regs!
+	}
 
 	m_io_regs[5*index + 1] = what;
 }
 
-void vii_state::vii_do_i2c()
+void vii_state::do_i2c()
 {
 }
 
@@ -648,7 +658,7 @@ void vii_state::spg_do_dma(UINT32 len)
 	m_io_regs[0x102] = 0;
 }
 
-READ16_MEMBER( vii_state::vii_io_r )
+READ16_MEMBER( vii_state::io_r )
 {
 	static const char *const gpioregs[] = { "GPIO Data Port", "GPIO Buffer Port", "GPIO Direction Port", "GPIO Attribute Port", "GPIO IRQ/Latch Port" };
 	static const char gpioports[] = { 'A', 'B', 'C' };
@@ -660,68 +670,68 @@ READ16_MEMBER( vii_state::vii_io_r )
 	switch(offset)
 	{
 		case 0x01: case 0x06: case 0x0b: // GPIO Data Port A/B/C
-			vii_do_gpio(offset);
-			verboselog(3, "vii_io_r: %s %c = %04x (%04x)\n", gpioregs[(offset - 1) % 5], gpioports[(offset - 1) / 5], m_io_regs[offset], mem_mask);
+			do_gpio(offset);
+			verboselog(3, "io_r: %s %c = %04x (%04x)\n", gpioregs[(offset - 1) % 5], gpioports[(offset - 1) / 5], m_io_regs[offset], mem_mask);
 			val = m_io_regs[offset];
 			break;
 
 		case 0x02: case 0x03: case 0x04: case 0x05:
 		case 0x07: case 0x08: case 0x09: case 0x0a:
 		case 0x0c: case 0x0d: case 0x0e: case 0x0f: // Other GPIO regs
-			verboselog(3, "vii_io_r: %s %c = %04x (%04x)\n", gpioregs[(offset - 1) % 5], gpioports[(offset - 1) / 5], m_io_regs[offset], mem_mask);
+			verboselog(3, "io_r: %s %c = %04x (%04x)\n", gpioregs[(offset - 1) % 5], gpioports[(offset - 1) / 5], m_io_regs[offset], mem_mask);
 			break;
 
 		case 0x1c: // Random
 			val = machine().rand() & 0x00ff;
-			verboselog(3, "vii_io_r: Random = %04x (%04x)\n", val, mem_mask);
+			verboselog(3, "io_r: Random = %04x (%04x)\n", val, mem_mask);
 			break;
 
 		case 0x21: // IRQ Control
-			verboselog(3, "vii_io_r: Controller IRQ Control = %04x (%04x)\n", val, mem_mask);
+			verboselog(3, "io_r: Controller IRQ Control = %04x (%04x)\n", val, mem_mask);
 			break;
 
 		case 0x22: // IRQ Status
-			verboselog(3, "vii_io_r: Controller IRQ Status = %04x (%04x)\n", val, mem_mask);
+			verboselog(3, "io_r: Controller IRQ Status = %04x (%04x)\n", val, mem_mask);
 			break;
 
 		case 0x2c: case 0x2d: // Timers?
 			val = machine().rand() & 0x0000ffff;
-			verboselog(3, "vii_io_r: Unknown Timer %d Register = %04x (%04x)\n", offset - 0x2c, val, mem_mask);
+			verboselog(3, "io_r: Unknown Timer %d Register = %04x (%04x)\n", offset - 0x2c, val, mem_mask);
 			break;
 
 		case 0x2f: // Data Segment
 			val = m_maincpu->state_int(UNSP_SR) >> 10;
-			verboselog(3, "vii_io_r: Data Segment = %04x (%04x)\n", val, mem_mask);
+			verboselog(3, "io_r: Data Segment = %04x (%04x)\n", val, mem_mask);
 			break;
 
 		case 0x31: // Unknown, UART Status?
-			verboselog(3, "vii_io_r: Unknown (UART Status?) = %04x (%04x)\n", 3, mem_mask);
+			verboselog(3, "io_r: Unknown (UART Status?) = %04x (%04x)\n", 3, mem_mask);
 			val = 3;
 			break;
 
 		case 0x36: // UART RX Data
 			val = m_controller_input[m_uart_rx_count];
 			m_uart_rx_count = (m_uart_rx_count + 1) % 8;
-			verboselog(3, "vii_io_r: UART RX Data = %04x (%04x)\n", val, mem_mask);
+			verboselog(3, "io_r: UART RX Data = %04x (%04x)\n", val, mem_mask);
 			break;
 
 		case 0x59: // I2C Status
-			verboselog(3, "vii_io_r: I2C Status = %04x (%04x)\n", val, mem_mask);
+			verboselog(3, "io_r: I2C Status = %04x (%04x)\n", val, mem_mask);
 			break;
 
 		case 0x5e: // I2C Data In
-			verboselog(3, "vii_io_r: I2C Data In = %04x (%04x)\n", val, mem_mask);
+			verboselog(3, "io_r: I2C Data In = %04x (%04x)\n", val, mem_mask);
 			break;
 
 		default:
-			verboselog(3, "vii_io_r: Unknown register %04x\n", 0x3d00 + offset);
+			verboselog(3, "io_r: Unknown register %04x\n", 0x3d00 + offset);
 			break;
 	}
 
 	return val;
 }
 
-WRITE16_MEMBER( vii_state::vii_io_w )
+WRITE16_MEMBER( vii_state::io_w )
 {
 	static const char *const gpioregs[] = { "GPIO Data Port", "GPIO Buffer Port", "GPIO Direction Port", "GPIO Attribute Port", "GPIO IRQ/Latch Port" };
 	static const char gpioports[3] = { 'A', 'B', 'C' };
@@ -733,7 +743,7 @@ WRITE16_MEMBER( vii_state::vii_io_w )
 	switch(offset)
 	{
 		case 0x00: // GPIO special function select
-			verboselog(3, "vii_io_w: GPIO Function Select = %04x (%04x)\n", data, mem_mask);
+			verboselog(3, "io_w: GPIO Function Select = %04x (%04x)\n", data, mem_mask);
 			COMBINE_DATA(&m_io_regs[offset]);
 			break;
 
@@ -744,9 +754,9 @@ WRITE16_MEMBER( vii_state::vii_io_w )
 		case 0x02: case 0x03: case 0x04: case 0x05: // Port A
 		case 0x07: case 0x08: case 0x09: case 0x0a: // Port B
 		case 0x0c: case 0x0d: case 0x0e: case 0x0f: // Port C
-			verboselog(3, "vii_io_w: %s %c = %04x (%04x)\n", gpioregs[(offset - 1) % 5], gpioports[(offset - 1) / 5], data, mem_mask);
+			verboselog(3, "io_w: %s %c = %04x (%04x)\n", gpioregs[(offset - 1) % 5], gpioports[(offset - 1) / 5], data, mem_mask);
 			COMBINE_DATA(&m_io_regs[offset]);
-			vii_do_gpio(offset);
+			do_gpio(offset);
 			break;
 
 		case 0x10:      // timebase control
@@ -763,7 +773,7 @@ WRITE16_MEMBER( vii_state::vii_io_w )
 			COMBINE_DATA(&m_io_regs[offset]);
 			break;
 		case 0x21: // IRQ Enable
-			verboselog(3, "vii_io_w: Controller IRQ Control = %04x (%04x)\n", data, mem_mask);
+			verboselog(3, "io_w: Controller IRQ Control = %04x (%04x)\n", data, mem_mask);
 			COMBINE_DATA(&VII_CTLR_IRQ_ENABLE);
 			if(!VII_CTLR_IRQ_ENABLE)
 			{
@@ -772,7 +782,7 @@ WRITE16_MEMBER( vii_state::vii_io_w )
 			break;
 
 		case 0x22: // IRQ Acknowledge
-			verboselog(3, "vii_io_w: Controller IRQ Acknowledge = %04x (%04x)\n", data, mem_mask);
+			verboselog(3, "io_w: Controller IRQ Acknowledge = %04x (%04x)\n", data, mem_mask);
 			m_io_regs[0x22] &= ~data;
 			if(!m_io_regs[0x22])
 			{
@@ -783,66 +793,66 @@ WRITE16_MEMBER( vii_state::vii_io_w )
 		case 0x2f: // Data Segment
 			temp = m_maincpu->state_int(UNSP_SR);
 			m_maincpu->set_state_int(UNSP_SR, (temp & 0x03ff) | ((data & 0x3f) << 10));
-			verboselog(3, "vii_io_w: Data Segment = %04x (%04x)\n", data, mem_mask);
+			verboselog(3, "io_w: Data Segment = %04x (%04x)\n", data, mem_mask);
 			break;
 
 		case 0x31: // Unknown UART
-			verboselog(3, "vii_io_w: Unknown UART = %04x (%04x)\n", data, mem_mask);
+			verboselog(3, "io_w: Unknown UART = %04x (%04x)\n", data, mem_mask);
 			COMBINE_DATA(&m_io_regs[offset]);
 			break;
 
 		case 0x32: // UART Reset
-			verboselog(3, "vii_io_r: UART Reset\n");
+			verboselog(3, "io_w: UART Reset\n");
 			break;
 
 		case 0x33: // UART Baud Rate
-			verboselog(3, "vii_io_w: UART Baud Rate = %u\n", 27000000 / 16 / (0x10000 - (m_io_regs[0x34] << 8) - data));
+			verboselog(3, "io_w: UART Baud Rate = %u\n", 27000000 / 16 / (0x10000 - (m_io_regs[0x34] << 8) - data));
 			COMBINE_DATA(&m_io_regs[offset]);
 			break;
 
 		case 0x35: // UART TX Data
-			verboselog(3, "vii_io_w: UART Baud Rate = %u\n", 27000000 / 16 / (0x10000 - (data << 8) - m_io_regs[0x33]));
+			verboselog(3, "io_w: UART Baud Rate = %u\n", 27000000 / 16 / (0x10000 - (data << 8) - m_io_regs[0x33]));
 			COMBINE_DATA(&m_io_regs[offset]);
 			break;
 
 		case 0x5a: // I2C Access Mode
-			verboselog(3, "vii_io_w: I2C Access Mode = %04x (%04x)\n", data, mem_mask);
+			verboselog(3, "io_w: I2C Access Mode = %04x (%04x)\n", data, mem_mask);
 			COMBINE_DATA(&m_io_regs[offset]);
 			break;
 
 		case 0x5b: // I2C Device Address
-			verboselog(3, "vii_io_w: I2C Device Address = %04x (%04x)\n", data, mem_mask);
+			verboselog(3, "io_w: I2C Device Address = %04x (%04x)\n", data, mem_mask);
 			COMBINE_DATA(&m_io_regs[offset]);
 			break;
 
 		case 0x5c: // I2C Sub-Address
-			verboselog(3, "vii_io_w: I2C Sub-Address = %04x (%04x)\n", data, mem_mask);
+			verboselog(3, "io_w: I2C Sub-Address = %04x (%04x)\n", data, mem_mask);
 			COMBINE_DATA(&m_io_regs[offset]);
 			break;
 
 		case 0x5d: // I2C Data Out
-			verboselog(3, "vii_io_w: I2C Data Out = %04x (%04x)\n", data, mem_mask);
+			verboselog(3, "io_w: I2C Data Out = %04x (%04x)\n", data, mem_mask);
 			COMBINE_DATA(&m_io_regs[offset]);
 			break;
 
 		case 0x5e: // I2C Data In
-			verboselog(3, "vii_io_w: I2C Data In = %04x (%04x)\n", data, mem_mask);
+			verboselog(3, "io_w: I2C Data In = %04x (%04x)\n", data, mem_mask);
 			COMBINE_DATA(&m_io_regs[offset]);
 			break;
 
 		case 0x5f: // I2C Controller Mode
-			verboselog(3, "vii_io_w: I2C Controller Mode = %04x (%04x)\n", data, mem_mask);
+			verboselog(3, "io_w: I2C Controller Mode = %04x (%04x)\n", data, mem_mask);
 			COMBINE_DATA(&m_io_regs[offset]);
 			break;
 
 		case 0x58: // I2C Command
-			verboselog(3, "vii_io_w: I2C Command = %04x (%04x)\n", data, mem_mask);
+			verboselog(3, "io_w: I2C Command = %04x (%04x)\n", data, mem_mask);
 			COMBINE_DATA(&m_io_regs[offset]);
-			vii_do_i2c();
+			do_i2c();
 			break;
 
 		case 0x59: // I2C Status / IRQ Acknowledge(?)
-			verboselog(3, "vii_io_w: I2C Status / Ack = %04x (%04x)\n", data, mem_mask);
+			verboselog(3, "io_w: I2C Status / Ack = %04x (%04x)\n", data, mem_mask);
 			m_io_regs[offset] &= ~data;
 			break;
 
@@ -857,43 +867,48 @@ WRITE16_MEMBER( vii_state::vii_io_w )
 			break;
 
 		default:
-			verboselog(3, "vii_io_w: Unknown register %04x = %04x (%04x)\n", 0x3d00 + offset, data, mem_mask);
+			verboselog(3, "io_w: Unknown register %04x = %04x (%04x)\n", 0x3d00 + offset, data, mem_mask);
 			COMBINE_DATA(&m_io_regs[offset]);
 			break;
 	}
 }
 
 /*
-WRITE16_MEMBER( vii_state::vii_rowscroll_w )
+WRITE16_MEMBER( vii_state::rowscroll_w )
 {
     switch(offset)
     {
         default:
-            verboselog(0, "vii_rowscroll_w: %04x = %04x (%04x)\n", 0x2900 + offset, data, mem_mask);
+            verboselog(0, "rowscroll_w: %04x = %04x (%04x)\n", 0x2900 + offset, data, mem_mask);
             break;
     }
 }
 
-WRITE16_MEMBER( vii_state::vii_spriteram_w )
+WRITE16_MEMBER( vii_state::spriteram_w )
 {
     switch(offset)
     {
         default:
-            verboselog(0, "vii_spriteram_w: %04x = %04x (%04x)\n", 0x2c00 + offset, data, mem_mask);
+            verboselog(0, "spriteram_w: %04x = %04x (%04x)\n", 0x2c00 + offset, data, mem_mask);
             break;
     }
 }
 */
 
+READ16_MEMBER( vii_state::rom_r )
+{
+	return m_p_cart[offset + 0x4000];
+}
+
 static ADDRESS_MAP_START( vii_mem, AS_PROGRAM, 16, vii_state )
 	AM_RANGE( 0x000000, 0x004fff ) AM_RAM AM_SHARE("p_ram")
-	AM_RANGE( 0x005000, 0x0051ff ) AM_READWRITE(vii_video_r, vii_video_w)
+	AM_RANGE( 0x005000, 0x0051ff ) AM_READWRITE(video_r, video_w)
 	AM_RANGE( 0x005200, 0x0055ff ) AM_RAM AM_SHARE("p_rowscroll")
 	AM_RANGE( 0x005600, 0x0057ff ) AM_RAM AM_SHARE("p_palette")
 	AM_RANGE( 0x005800, 0x005fff ) AM_RAM AM_SHARE("p_spriteram")
-	AM_RANGE( 0x006000, 0x006fff ) AM_READWRITE(vii_audio_r, vii_audio_w)
-	AM_RANGE( 0x007000, 0x007fff ) AM_READWRITE(vii_io_r,    vii_io_w)
-	AM_RANGE( 0x008000, 0x7fffff ) AM_ROM AM_SHARE("p_cart")
+	AM_RANGE( 0x006000, 0x006fff ) AM_READWRITE(audio_r, audio_w)
+	AM_RANGE( 0x007000, 0x007fff ) AM_READWRITE(io_r,    io_w)
+	AM_RANGE( 0x008000, 0x7fffff ) AM_READ(rom_r)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( vii )
@@ -943,59 +958,46 @@ static INPUT_PORTS_START( walle )
 INPUT_PORTS_END
 
 
-DEVICE_IMAGE_LOAD_MEMBER( vii_state, vii_cart )
+void vii_state::test_centered(UINT8 *ROM)
 {
-	UINT8 *cart = m_region_cart->base();
-	if (image.software_entry() == NULL)
-	{
-		int size = image.length();
-
-		if( image.fread(cart, size ) != size )
-		{
-			image.seterror( IMAGE_ERROR_UNSPECIFIED, "Unable to fully read from file" );
-			return IMAGE_INIT_FAIL;
-		}
-	} else {
-		int filesize = image.get_software_region_length("rom");
-		memcpy(cart, image.get_software_region("rom"), filesize);
-	}
-
-	memcpy(m_p_cart, cart + 0x4000*2, (0x400000 - 0x4000) * 2);
-
-	if( cart[0x3cd808] == 0x99 &&
-		cart[0x3cd809] == 0x99 &&
-		cart[0x3cd80a] == 0x83 &&
-		cart[0x3cd80b] == 0x5e &&
-		cart[0x3cd80c] == 0x52 &&
-		cart[0x3cd80d] == 0x6b &&
-		cart[0x3cd80e] == 0x78 &&
-		cart[0x3cd80f] == 0x7f )
+	if (ROM[0x3cd808] == 0x99 &&
+	    ROM[0x3cd809] == 0x99 &&
+	    ROM[0x3cd80a] == 0x83 &&
+	    ROM[0x3cd80b] == 0x5e &&
+	    ROM[0x3cd80c] == 0x52 &&
+	    ROM[0x3cd80d] == 0x6b &&
+	    ROM[0x3cd80e] == 0x78 &&
+	    ROM[0x3cd80f] == 0x7f)
 	{
 		m_centered_coordinates = 0;
 	}
+}
+
+DEVICE_IMAGE_LOAD_MEMBER( vii_state, vii_cart )
+{
+	UINT32 size = m_cart->common_get_size("rom");
+
+	if (size < 0x800000)
+	{
+		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
+		return IMAGE_INIT_FAIL;
+	}
+	
+	m_cart->rom_alloc(size, GENERIC_ROM16_WIDTH, ENDIANNESS_LITTLE);
+	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");			
+	
+	test_centered(m_cart->get_rom_base());
+
 	return IMAGE_INIT_PASS;
 }
 
 DEVICE_IMAGE_LOAD_MEMBER( vii_state, vsmile_cart )
 {
-	UINT8 *CART = m_region_cart->base();
-	UINT16 *ROM = (UINT16 *) m_region_cpu->base();
-	if (image.software_entry() == NULL)
-	{
-		int size = image.length();
-		image.fread(CART, size);
-	}
-	else
-	{
-		int size = image.get_software_region_length("rom");
-		memcpy(CART, image.get_software_region("rom"), size);
-	}
-
-	// for whatever reason if we copy more than this, the CPU
-	// is not happy and VSmile won't show anything... bankswitch?
-	for (int i = 0; i < 0x800000; i += 2)
-		ROM[i / 2] = pick_integer_le(CART, i, 2);
-
+	UINT32 size = m_cart->common_get_size("rom");
+	
+	m_cart->rom_alloc(size, GENERIC_ROM16_WIDTH, ENDIANNESS_LITTLE);
+	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");			
+	
 	return IMAGE_INIT_PASS;
 }
 
@@ -1021,12 +1023,19 @@ void vii_state::machine_start()
 	m_controller_input[6] = 0xff;
 	m_controller_input[7] = 0;
 
-	if ( m_region_cart && m_spg243_mode == SPG243_VII)
-	{
-		UINT8 *rom = m_region_cart->base();
-		memcpy(m_p_cart, rom + 0x4000*2, (0x400000 - 0x4000) * 2);
-	}
+	m_p_cart.resize(0x400000);
 
+	if (m_cart && m_cart->exists())
+	{
+		astring region_tag;
+		m_cart_rom = memregion(region_tag.cpy(m_cart->tag()).cat(GENERIC_ROM_REGION_TAG));
+		memcpy(m_p_cart, m_cart_rom->base(), 0x400000 * 2);
+	}
+	else if (m_spg243_mode == SPG243_VII)	// Vii bios is banked
+		memcpy(m_p_cart, m_bios_rom->base(), 0x400000 * 2);
+	else
+		memcpy(m_p_cart, memregion("maincpu")->base(), 0x400000 * 2);
+	
 	m_video_regs[0x36] = 0xffff;
 	m_video_regs[0x37] = 0xffff;
 
@@ -1122,10 +1131,9 @@ static MACHINE_CONFIG_START( vii, vii_state )
 	MCFG_SCREEN_UPDATE_DRIVER(vii_state, screen_update_vii)
 	MCFG_PALETTE_ADD("palette", 32768)
 
-	MCFG_CARTSLOT_ADD( "cart" )
-	MCFG_CARTSLOT_EXTENSION_LIST( "bin" )
-	MCFG_CARTSLOT_LOAD( vii_state, vii_cart )
-	MCFG_CARTSLOT_INTERFACE("vii_cart")
+	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "vii_cart")
+	MCFG_GENERIC_WIDTH(GENERIC_ROM16_WIDTH)
+	MCFG_GENERIC_LOAD(vii_state, vii_cart)
 
 	MCFG_SOFTWARE_LIST_ADD("vii_cart","vii")
 MACHINE_CONFIG_END
@@ -1144,10 +1152,9 @@ static MACHINE_CONFIG_START( vsmile, vii_state )
 	MCFG_SCREEN_UPDATE_DRIVER(vii_state, screen_update_vii)
 	MCFG_PALETTE_ADD("palette", 32768)
 
-	MCFG_CARTSLOT_ADD( "cart" )
-	MCFG_CARTSLOT_EXTENSION_LIST( "bin" )
-	MCFG_CARTSLOT_LOAD( vii_state, vsmile_cart )
-	MCFG_CARTSLOT_INTERFACE("vsmile_cart")
+	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "vsmile_cart")
+	MCFG_GENERIC_WIDTH(GENERIC_ROM16_WIDTH)
+	MCFG_GENERIC_LOAD(vii_state, vsmile_cart)
 
 	MCFG_SOFTWARE_LIST_ADD("cart_list","vsmile_cart")
 MACHINE_CONFIG_END
@@ -1184,7 +1191,7 @@ DRIVER_INIT_MEMBER(vii_state,batman)
 
 DRIVER_INIT_MEMBER(vii_state,vsmile)
 {
-	m_spg243_mode = SPG243_BATMAN;//SPG243_VSMILE;
+	m_spg243_mode = SPG243_VSMILE;
 	m_centered_coordinates = 1;
 }
 
@@ -1197,9 +1204,8 @@ DRIVER_INIT_MEMBER(vii_state,walle)
 ROM_START( vii )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )      /* dummy region for u'nSP */
 
-	ROM_REGION( 0x2000000, "cart", ROMREGION_ERASE00 )
+	ROM_REGION( 0x2000000, "bios", 0 )
 	ROM_LOAD( "vii.bin", 0x0000, 0x2000000, CRC(04627639) SHA1(f883a92d31b53c9a5b0cdb112d07cd793c95fc43))
-	ROM_CART_LOAD("cart", 0x0000, 0x2000000, ROM_MIRROR)
 ROM_END
 
 ROM_START( batmantv )
@@ -1210,8 +1216,6 @@ ROM_END
 ROM_START( vsmile )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )      /* dummy region for u'nSP */
 	ROM_LOAD16_WORD_SWAP( "bios german.bin", 0x000000, 0x200000, CRC(205c5296) SHA1(7fbcf761b5885c8b1524607aabaf364b4559c8cc) )
-
-	ROM_REGION( 0x2000000, "cart", ROMREGION_ERASE00 )
 ROM_END
 
 ROM_START( walle )

@@ -17,5 +17,6 @@
 
 SLOT_INTERFACE_EXTERN( generic_plain_slot );
 SLOT_INTERFACE_EXTERN( generic_linear_slot );
+SLOT_INTERFACE_EXTERN( generic_romram_plain_slot );
 
 #endif

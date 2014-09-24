@@ -24,12 +24,27 @@ class generic_rom_plain_device : public generic_rom_device
 {
 public:
 	// construction/destruction
+	generic_rom_plain_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 	generic_rom_plain_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read_rom);
 	virtual DECLARE_READ16_MEMBER(read16_rom);
 	virtual DECLARE_READ32_MEMBER(read32_rom);
+};
+
+
+// ======================> generic_romram_plain_device
+
+class generic_romram_plain_device : public generic_rom_plain_device
+{
+public:
+	// construction/destruction
+	generic_romram_plain_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	
+	// reading and writing
+	virtual DECLARE_READ8_MEMBER(read_ram);
+	virtual DECLARE_WRITE8_MEMBER(write_ram);
 };
 
 
@@ -52,7 +67,7 @@ public:
 // device type definition
 extern const device_type GENERIC_ROM_PLAIN;
 extern const device_type GENERIC_ROM_LINEAR;
-
+extern const device_type GENERIC_ROMRAM_PLAIN;
 
 
 #endif

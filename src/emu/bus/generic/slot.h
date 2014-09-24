@@ -32,6 +32,8 @@ public:
 	UINT8* get_ram_base() { return m_ram; }
 	UINT32 get_ram_size() { return m_ram.count(); }
 
+	void save_ram()   { device().save_item(NAME(m_ram)); }
+
 	// internal state
 	UINT8  *m_rom;
 	UINT32  m_rom_size;
@@ -136,7 +138,9 @@ public:
 	UINT8* get_rom_base()  { if (m_cart) return m_cart->get_rom_base(); return NULL; }
 	UINT8* get_ram_base() { if (m_cart) return m_cart->get_ram_base(); return NULL; }
 	UINT32 get_rom_size() { if (m_cart) return m_cart->get_rom_size(); return 0; }
-	
+
+	void save_ram()   { if (m_cart && m_cart->get_ram_size()) m_cart->save_ram(); }
+
 protected:
 
 	const char *m_interface;

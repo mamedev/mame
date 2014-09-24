@@ -12,10 +12,11 @@
 #include "machine/nvram.h"
 #include "machine/ram.h"
 #include "sound/wave.h"
-#include "imagedev/cartslot.h"
 #include "imagedev/cassette.h"
 #include "imagedev/printer.h"
 #include "formats/x07_cas.h"
+#include "bus/generic/slot.h"
+#include "bus/generic/carts.h"
 #include "rendlay.h"
 
 //default value for user defined keys, taken for official documentation
@@ -168,6 +169,7 @@ public:
 			m_nvram1(*this, "nvram1"),
 			m_nvram2(*this, "nvram2"),
 			m_cassette(*this, "cassette"),
+			m_card(*this, "cardslot"),
 			m_warm_start(1)
 	{ }
 
@@ -178,6 +180,7 @@ public:
 	required_device<nvram_device> m_nvram1;
 	required_device<nvram_device> m_nvram2;
 	required_device<cassette_image_device> m_cassette;
+	required_device<generic_slot_device> m_card;
 
 	void machine_start();
 	void machine_reset();
