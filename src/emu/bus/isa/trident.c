@@ -1070,6 +1070,7 @@ void trident_vga_device::accel_command()
 		break;
 	case 0x04:
 		if(LOG) logerror("Trident: Command: Bresenham Line (Source %i,%i Dest %i,%i Size %i,%i)\n",tri.accel_source_x,tri.accel_source_y,tri.accel_dest_x,tri.accel_dest_y,tri.accel_dim_x,tri.accel_dim_y);
+		if(LOG) logerror("BLine: Drawflags = %08x FMIX = %02x\n",tri.accel_drawflags,tri.accel_fmix);
 		accel_line();
 		break;
 	case 0x05:
@@ -1133,9 +1134,6 @@ void trident_vga_device::accel_bitblt()
 	}
 	sy = tri.accel_source_y;
 
-//	printf("BitBLT: flags=%08x source %i, %i dest %i, %i size %i, %i dir %i,%i\n",
-//			tri.accel_drawflags,tri.accel_source_x,tri.accel_source_y,tri.accel_dest_x,tri.accel_dest_y,
-//			tri.accel_dim_x,tri.accel_dim_y,xdir,ydir);
 	for(y=ystart;y!=yend;y+=ydir,sy+=ydir)
 	{
 		sx = tri.accel_source_x;
@@ -1155,20 +1153,17 @@ void trident_vga_device::accel_bitblt()
 
 void trident_vga_device::accel_line()
 {
-	UINT8 col = tri.accel_fgcolour & 0xff;
+	UINT32 col = tri.accel_fgcolour;
 //    TGUI_SRC_XY(dmin-dmaj,dmin);
 //    TGUI_DEST_XY(x,y);
 //    TGUI_DIM_XY(dmin+e,len);
-	INT16 dx = abs(tri.accel_source_x);
+	INT16 dx = abs(tri.accel_source_x - tri.accel_source_y);
 	INT16 dy = abs(tri.accel_source_y);
-	INT16 err = tri.accel_dim_x - tri.accel_source_y;
+	INT16 err = (tri.accel_dim_x - tri.accel_source_y);
 	int sx = (tri.accel_drawflags & 0x0200) ? -1 : 1;
 	int sy = (tri.accel_drawflags & 0x0100) ? -1 : 1;
 	int count = 0;
 	INT16 temp;
-
-//	if(LOG_8514) logerror("8514/A: Command (%04x) - Line (Bresenham) - %i,%i  Axial %i, Diagonal %i, Error %i, Major Axis %i, Minor Axis %i\n",ibm8514.current_cmd,
-//		ibm8514.curr_x,ibm8514.curr_y,ibm8514.line_axial_step,ibm8514.line_diagonal_step,ibm8514.line_errorterm,ibm8514.rect_width,ibm8514.rect_height);
 
 	if(tri.accel_drawflags & 0x0400)
 	{
