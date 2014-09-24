@@ -44,17 +44,14 @@ public:
 	DECLARE_PALETTE_INIT(exterm);
 	TIMER_CALLBACK_MEMBER(sound_delayed_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(master_sound_nmi_callback);
+	TMS340X0_SCANLINE_IND16_CB_MEMBER(scanline_update);
+	TMS340X0_TO_SHIFTREG_CB_MEMBER(to_shiftreg_master);
+	TMS340X0_FROM_SHIFTREG_CB_MEMBER(from_shiftreg_master);
+	TMS340X0_TO_SHIFTREG_CB_MEMBER(to_shiftreg_slave);
+	TMS340X0_FROM_SHIFTREG_CB_MEMBER(from_shiftreg_slave);
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<cpu_device> m_audioslave;
 	required_device<tms34010_device> m_slave;
 	required_device<dac_device> m_dac;
 };
-
-/*----------- defined in video/exterm.c -----------*/
-void exterm_scanline_update(screen_device &screen, bitmap_ind16 &bitmap, int scanline, const tms34010_display_params *params);
-
-void exterm_to_shiftreg_master(address_space &space, UINT32 address, UINT16* shiftreg);
-void exterm_from_shiftreg_master(address_space &space, UINT32 address, UINT16* shiftreg);
-void exterm_to_shiftreg_slave(address_space &space, UINT32 address, UINT16* shiftreg);
-void exterm_from_shiftreg_slave(address_space &space, UINT32 address, UINT16* shiftreg);

@@ -215,16 +215,16 @@ UINT16 tms340x0_device::memory_r(address_space &space, offs_t offset)
 
 void tms340x0_device::shiftreg_w(address_space &space, offs_t offset,UINT16 data)
 {
-	if (m_config->from_shiftreg)
-		(*m_config->from_shiftreg)(space, (UINT32)(offset << 3) & ~15, &m_shiftreg[0]);
+	if (!m_from_shiftreg_cb.isnull())
+		m_from_shiftreg_cb(space, (UINT32)(offset << 3) & ~15, &m_shiftreg[0]);
 	else
 		logerror("From ShiftReg function not set. PC = %08X\n", m_pc);
 }
 
 UINT16 tms340x0_device::shiftreg_r(address_space &space, offs_t offset)
 {
-	if (m_config->to_shiftreg)
-		(*m_config->to_shiftreg)(space, (UINT32)(offset << 3) & ~15, &m_shiftreg[0]);
+	if (!m_to_shiftreg_cb.isnull())
+		m_to_shiftreg_cb(space, (UINT32)(offset << 3) & ~15, &m_shiftreg[0]);
 	else
 		logerror("To ShiftReg function not set. PC = %08X\n", m_pc);
 	return m_shiftreg[0];

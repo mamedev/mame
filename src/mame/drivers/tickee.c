@@ -42,22 +42,28 @@ public:
 
 	tickee_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_tlc34076(*this, "tlc34076"),
-		m_vram(*this, "vram"),
-		m_control(*this, "control"),
 		m_maincpu(*this, "maincpu"),
 		m_oki(*this, "oki"),
-		m_screen(*this, "screen") { }
+		m_screen(*this, "screen"),
+		m_tlc34076(*this, "tlc34076"),
+		m_vram(*this, "vram"),
+		m_control(*this, "control") { }
 
+	required_device<cpu_device> m_maincpu;
+	optional_device<okim6295_device> m_oki;
+	required_device<screen_device> m_screen;
 	required_device<tlc34076_device> m_tlc34076;
+	
 	required_shared_ptr<UINT16> m_vram;
 	optional_shared_ptr<UINT16> m_control;
+	
 	emu_timer *m_setup_gun_timer;
 	int m_beamxadd;
 	int m_beamyadd;
 	int m_palette_bank;
 	UINT8 m_gunx[2];
 	void get_crosshair_xy(int player, int &x, int &y);
+	
 	DECLARE_WRITE16_MEMBER(rapidfir_transparent_w);
 	DECLARE_READ16_MEMBER(rapidfir_transparent_r);
 	DECLARE_WRITE16_MEMBER(tickee_control_w);
@@ -74,9 +80,11 @@ public:
 	TIMER_CALLBACK_MEMBER(trigger_gun_interrupt);
 	TIMER_CALLBACK_MEMBER(clear_gun_interrupt);
 	TIMER_CALLBACK_MEMBER(setup_gun_interrupts);
-	required_device<cpu_device> m_maincpu;
-	optional_device<okim6295_device> m_oki;
-	required_device<screen_device> m_screen;
+	
+	TMS340X0_TO_SHIFTREG_CB_MEMBER(rapidfir_to_shiftreg);
+	TMS340X0_FROM_SHIFTREG_CB_MEMBER(rapidfir_from_shiftreg);
+	TMS340X0_SCANLINE_RGB32_CB_MEMBER(scanline_update);
+	TMS340X0_SCANLINE_RGB32_CB_MEMBER(rapidfir_scanline_update);
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
@@ -195,17 +203,16 @@ VIDEO_START_MEMBER(tickee_state,tickee)
  *
  *************************************/
 
-static void scanline_update(screen_device &screen, bitmap_rgb32 &bitmap, int scanline, const tms34010_display_params *params)
+TMS340X0_SCANLINE_RGB32_CB_MEMBER(tickee_state::scanline_update)
 {
-	tickee_state *state = screen.machine().driver_data<tickee_state>();
-	UINT16 *src = &state->m_vram[(params->rowaddr << 8) & 0x3ff00];
+	UINT16 *src = &m_vram[(params->rowaddr << 8) & 0x3ff00];
 	UINT32 *dest = &bitmap.pix32(scanline);
-	const rgb_t *pens = state->m_tlc34076->get_pens();
+	const rgb_t *pens = m_tlc34076->get_pens();
 	int coladdr = params->coladdr << 1;
 	int x;
 
 	/* blank palette: fill with pen 255 */
-	if (state->m_control[2])
+	if (m_control[2])
 	{
 		for (x = params->heblnk; x < params->hsblnk; x++)
 			dest[x] = pens[0xff];
@@ -221,16 +228,15 @@ static void scanline_update(screen_device &screen, bitmap_rgb32 &bitmap, int sca
 }
 
 
-static void rapidfir_scanline_update(screen_device &screen, bitmap_rgb32 &bitmap, int scanline, const tms34010_display_params *params)
+TMS340X0_SCANLINE_RGB32_CB_MEMBER(tickee_state::rapidfir_scanline_update)
 {
-	tickee_state *state = screen.machine().driver_data<tickee_state>();
-	UINT16 *src = &state->m_vram[(params->rowaddr << 8) & 0x3ff00];
+	UINT16 *src = &m_vram[(params->rowaddr << 8) & 0x3ff00];
 	UINT32 *dest = &bitmap.pix32(scanline);
-	const rgb_t *pens = state->m_tlc34076->get_pens();
+	const rgb_t *pens = m_tlc34076->get_pens();
 	int coladdr = params->coladdr << 1;
 	int x;
 
-	if (state->m_palette_bank)
+	if (m_palette_bank)
 	{
 		/* blank palette: fill with pen 255 */
 		for (x = params->heblnk; x < params->hsblnk; x += 2)
@@ -291,19 +297,17 @@ READ16_MEMBER(tickee_state::rapidfir_transparent_r)
 }
 
 
-static void rapidfir_to_shiftreg(address_space &space, UINT32 address, UINT16 *shiftreg)
+TMS340X0_TO_SHIFTREG_CB_MEMBER(tickee_state::rapidfir_to_shiftreg)
 {
-	tickee_state *state = space.machine().driver_data<tickee_state>();
 	if (address < 0x800000)
-		memcpy(shiftreg, &state->m_vram[TOWORD(address)], TOBYTE(0x2000));
+		memcpy(shiftreg, &m_vram[TOWORD(address)], TOBYTE(0x2000));
 }
 
 
-static void rapidfir_from_shiftreg(address_space &space, UINT32 address, UINT16 *shiftreg)
+TMS340X0_FROM_SHIFTREG_CB_MEMBER(tickee_state::rapidfir_from_shiftreg)
 {
-	tickee_state *state = space.machine().driver_data<tickee_state>();
 	if (address < 0x800000)
-		memcpy(&state->m_vram[TOWORD(address)], shiftreg, TOBYTE(0x2000));
+		memcpy(&m_vram[TOWORD(address)], shiftreg, TOBYTE(0x2000));
 }
 
 
@@ -731,41 +735,6 @@ INPUT_PORTS_END
 
 /*************************************
  *
- *  34010 configuration
- *
- *************************************/
-
-static const tms340x0_config tms_config =
-{
-	FALSE,                          /* halt on reset */
-	"screen",                       /* the screen operated on */
-	VIDEO_CLOCK/2,                  /* pixel clock */
-	1,                              /* pixels per clock */
-	NULL,                           /* scanline callback (indexed16) */
-	scanline_update,                /* scanline callback (rgb32) */
-	NULL,                           /* generate interrupt */
-	NULL,                           /* write to shiftreg function */
-	NULL                            /* read from shiftreg function */
-};
-
-
-static const tms340x0_config rapidfir_tms_config =
-{
-	FALSE,                          /* halt on reset */
-	"screen",                       /* the screen operated on */
-	VIDEO_CLOCK/2,                  /* pixel clock */
-	1,                              /* pixels per clock */
-	NULL,                           /* scanline callback (indexed16) */
-	rapidfir_scanline_update,       /* scanline callback (rgb32) */
-	NULL,                           /* generate interrupt */
-	rapidfir_to_shiftreg,           /* write to shiftreg function */
-	rapidfir_from_shiftreg          /* read from shiftreg function */
-};
-
-
-
-/*************************************
- *
  *  Machine drivers
  *
  *************************************/
@@ -774,8 +743,11 @@ static MACHINE_CONFIG_START( tickee, tickee_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS34010, XTAL_40MHz)
-	MCFG_TMS340X0_CONFIG(tms_config)
 	MCFG_CPU_PROGRAM_MAP(tickee_map)
+	MCFG_TMS340X0_HALT_ON_RESET(FALSE) /* halt on reset */
+	MCFG_TMS340X0_PIXEL_CLOCK(VIDEO_CLOCK/2) /* pixel clock */
+	MCFG_TMS340X0_PIXELS_PER_CLOCK(1) /* pixels per clock */	
+	MCFG_TMS340X0_SCANLINE_RGB32_CB(tickee_state, scanline_update) /* scanline callback (rgb32) */
 
 	MCFG_MACHINE_RESET_OVERRIDE(tickee_state,tickee)
 	MCFG_NVRAM_ADD_1FILL("nvram")
@@ -819,8 +791,13 @@ static MACHINE_CONFIG_START( rapidfir, tickee_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS34010, XTAL_50MHz)
-	MCFG_TMS340X0_CONFIG(rapidfir_tms_config)
-	MCFG_CPU_PROGRAM_MAP(rapidfir_map)
+	MCFG_CPU_PROGRAM_MAP(rapidfir_map)          
+	MCFG_TMS340X0_HALT_ON_RESET(FALSE) /* halt on reset */
+	MCFG_TMS340X0_PIXEL_CLOCK(VIDEO_CLOCK/2) /* pixel clock */
+	MCFG_TMS340X0_PIXELS_PER_CLOCK(1) /* pixels per clock */	
+	MCFG_TMS340X0_SCANLINE_RGB32_CB(tickee_state, rapidfir_scanline_update)       /* scanline callback (rgb32) */
+	MCFG_TMS340X0_TO_SHIFTREG_CB(tickee_state, rapidfir_to_shiftreg)           /* write to shiftreg function */
+	MCFG_TMS340X0_FROM_SHIFTREG_CB(tickee_state, rapidfir_from_shiftreg)          /* read from shiftreg function */
 
 	MCFG_MACHINE_RESET_OVERRIDE(tickee_state,rapidfir)
 	MCFG_NVRAM_ADD_1FILL("nvram")
@@ -846,8 +823,11 @@ static MACHINE_CONFIG_START( mouseatk, tickee_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS34010, XTAL_40MHz)
-	MCFG_TMS340X0_CONFIG(tms_config)
 	MCFG_CPU_PROGRAM_MAP(mouseatk_map)
+	MCFG_TMS340X0_HALT_ON_RESET(FALSE) /* halt on reset */
+	MCFG_TMS340X0_PIXEL_CLOCK(VIDEO_CLOCK/2) /* pixel clock */
+	MCFG_TMS340X0_PIXELS_PER_CLOCK(1) /* pixels per clock */	
+	MCFG_TMS340X0_SCANLINE_RGB32_CB(tickee_state, scanline_update) /* scanline callback (rgb32) */
 
 	MCFG_MACHINE_RESET_OVERRIDE(tickee_state,tickee)
 	MCFG_NVRAM_ADD_1FILL("nvram")

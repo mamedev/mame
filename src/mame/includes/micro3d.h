@@ -137,6 +137,8 @@ public:
 	DECLARE_READ8_MEMBER(duart_input_r);
 	DECLARE_WRITE8_MEMBER(duart_output_w);
 	DECLARE_WRITE_LINE_MEMBER(duart_txb);
+	DECLARE_WRITE_LINE_MEMBER(tms_interrupt);
+	TMS340X0_SCANLINE_IND16_CB_MEMBER(scanline_update);
 
 	required_device<cpu_device> m_maincpu;
 	required_device<i8051_device> m_audiocpu;
@@ -220,7 +222,3 @@ private:
 };
 
 extern const device_type MICRO3D;
-
-/*----------- defined in video/micro3d.c -----------*/
-void micro3d_tms_interrupt(device_t *device, int state);
-void micro3d_scanline_update(screen_device &screen, bitmap_ind16 &bitmap, int scanline, const tms34010_display_params *params);

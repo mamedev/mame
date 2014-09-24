@@ -393,41 +393,6 @@ static INPUT_PORTS_START( exterm )
 INPUT_PORTS_END
 
 
-
-/*************************************
- *
- *  34010 configurations
- *
- *************************************/
-
-static const tms340x0_config master_config =
-{
-	FALSE,                      /* halt on reset */
-	"screen",                   /* the screen operated on */
-	40000000/8,                 /* pixel clock */
-	1,                          /* pixels per clock */
-	exterm_scanline_update,     /* scanline updater (indexed16) */
-	NULL,                       /* scanline updater (rgb32) */
-	NULL,                       /* generate interrupt */
-	exterm_to_shiftreg_master,  /* write to shiftreg function */
-	exterm_from_shiftreg_master /* read from shiftreg function */
-};
-
-static const tms340x0_config slave_config =
-{
-	TRUE,                       /* halt on reset */
-	"screen",                   /* the screen operated on */
-	40000000/8,                 /* pixel clock */
-	1,                          /* pixels per clock */
-	NULL,                       /* scanline updater (indexed16) */
-	NULL,                       /* scanline updater (rgb32) */
-	NULL,                       /* generate interrupt */
-	exterm_to_shiftreg_slave,   /* write to shiftreg function */
-	exterm_from_shiftreg_slave  /* read from shiftreg function */
-};
-
-
-
 /*************************************
  *
  *  Machine drivers
@@ -438,12 +403,21 @@ static MACHINE_CONFIG_START( exterm, exterm_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS34010, 40000000)
-	MCFG_TMS340X0_CONFIG(master_config)
 	MCFG_CPU_PROGRAM_MAP(master_map)
+	MCFG_TMS340X0_HALT_ON_RESET(FALSE) /* halt on reset */
+	MCFG_TMS340X0_PIXEL_CLOCK(40000000/8) /* pixel clock */
+	MCFG_TMS340X0_PIXELS_PER_CLOCK(1) /* pixels per clock */
+	MCFG_TMS340X0_SCANLINE_IND16_CB(exterm_state, scanline_update)     /* scanline updater (indexed16) */
+	MCFG_TMS340X0_TO_SHIFTREG_CB(exterm_state, to_shiftreg_master)  /* write to shiftreg function */
+	MCFG_TMS340X0_FROM_SHIFTREG_CB(exterm_state, from_shiftreg_master) /* read from shiftreg function */
 
 	MCFG_CPU_ADD("slave", TMS34010, 40000000)
-	MCFG_TMS340X0_CONFIG(slave_config)
 	MCFG_CPU_PROGRAM_MAP(slave_map)
+	MCFG_TMS340X0_HALT_ON_RESET(TRUE) /* halt on reset */
+	MCFG_TMS340X0_PIXEL_CLOCK(40000000/8) /* pixel clock */
+	MCFG_TMS340X0_PIXELS_PER_CLOCK(1) /* pixels per clock */
+	MCFG_TMS340X0_TO_SHIFTREG_CB(exterm_state, to_shiftreg_slave)   /* write to shiftreg function */
+	MCFG_TMS340X0_FROM_SHIFTREG_CB(exterm_state, from_shiftreg_slave)  /* read from shiftreg function */
 
 	MCFG_CPU_ADD("audiocpu", M6502, 2000000)
 	MCFG_CPU_PROGRAM_MAP(sound_master_map)

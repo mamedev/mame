@@ -97,18 +97,16 @@ VIDEO_START_MEMBER(harddriv_state,harddriv)
  *
  *************************************/
 
-void hdgsp_write_to_shiftreg(address_space &space, UINT32 address, UINT16 *shiftreg)
+TMS340X0_TO_SHIFTREG_CB_MEMBER(harddriv_state::hdgsp_write_to_shiftreg)
 {
-	harddriv_state *state = space.machine().driver_data<harddriv_state>();
-
 	/* access to the 1bpp/2bpp area */
 	if (address >= 0x02000000 && address <= 0x020fffff)
 	{
 		address -= 0x02000000;
-		address >>= state->m_gsp_multisync;
-		address &= state->m_vram_mask;
-		address &= ~((512*8 >> state->m_gsp_multisync) - 1);
-		state->m_gsp_shiftreg_source = &state->m_gsp_vram[address];
+		address >>= m_gsp_multisync;
+		address &= m_vram_mask;
+		address &= ~((512*8 >> m_gsp_multisync) - 1);
+		m_gsp_shiftreg_source = &m_gsp_vram[address];
 	}
 
 	/* access to normal VRAM area */
@@ -116,30 +114,28 @@ void hdgsp_write_to_shiftreg(address_space &space, UINT32 address, UINT16 *shift
 	{
 		address -= 0xff800000;
 		address /= 8;
-		address &= state->m_vram_mask;
+		address &= m_vram_mask;
 		address &= ~511;
-		state->m_gsp_shiftreg_source = &state->m_gsp_vram[address];
+		m_gsp_shiftreg_source = &m_gsp_vram[address];
 	}
 	else
 		logerror("Unknown shiftreg write %08X\n", address);
 }
 
 
-void hdgsp_read_from_shiftreg(address_space &space, UINT32 address, UINT16 *shiftreg)
+TMS340X0_FROM_SHIFTREG_CB_MEMBER(harddriv_state::hdgsp_read_from_shiftreg)
 {
-	harddriv_state *state = space.machine().driver_data<harddriv_state>();
-
-	if (!state->m_shiftreg_enable)
+	if (!m_shiftreg_enable)
 		return;
 
 	/* access to the 1bpp/2bpp area */
 	if (address >= 0x02000000 && address <= 0x020fffff)
 	{
 		address -= 0x02000000;
-		address >>= state->m_gsp_multisync;
-		address &= state->m_vram_mask;
-		address &= ~((512*8 >> state->m_gsp_multisync) - 1);
-		memmove(&state->m_gsp_vram[address], state->m_gsp_shiftreg_source, 512*8 >> state->m_gsp_multisync);
+		address >>= m_gsp_multisync;
+		address &= m_vram_mask;
+		address &= ~((512*8 >> m_gsp_multisync) - 1);
+		memmove(&m_gsp_vram[address], m_gsp_shiftreg_source, 512*8 >> m_gsp_multisync);
 	}
 
 	/* access to normal VRAM area */
@@ -147,9 +143,9 @@ void hdgsp_read_from_shiftreg(address_space &space, UINT32 address, UINT16 *shif
 	{
 		address -= 0xff800000;
 		address /= 8;
-		address &= state->m_vram_mask;
+		address &= m_vram_mask;
 		address &= ~511;
-		memmove(&state->m_gsp_vram[address], state->m_gsp_shiftreg_source, 512);
+		memmove(&m_gsp_vram[address], m_gsp_shiftreg_source, 512);
 	}
 	else
 		logerror("Unknown shiftreg read %08X\n", address);
@@ -163,11 +159,10 @@ void hdgsp_read_from_shiftreg(address_space &space, UINT32 address, UINT16 *shif
  *
  *************************************/
 
-static void update_palette_bank(running_machine &machine, int newbank)
+void harddriv_state::update_palette_bank(int newbank)
 {
-	harddriv_state *state = machine.driver_data<harddriv_state>();
-	machine.first_screen()->update_partial(machine.first_screen()->vpos());
-	state->m_gfx_palettebank = newbank;
+	m_screen->update_partial(m_screen->vpos());
+	m_gfx_palettebank = newbank;
 }
 
 
@@ -233,16 +228,16 @@ WRITE16_MEMBER( harddriv_state::hdgsp_control_hi_w )
 			break;
 
 		case 0x02:
-			update_palette_bank(space.machine(), (m_gfx_palettebank & ~1) | val);
+			update_palette_bank((m_gfx_palettebank & ~1) | val);
 			break;
 
 		case 0x03:
-			update_palette_bank(space.machine(), (m_gfx_palettebank & ~2) | (val << 1));
+			update_palette_bank((m_gfx_palettebank & ~2) | (val << 1));
 			break;
 
 		case 0x04:
 			if (m_palette->entries() >= 256 * 8)
-				update_palette_bank(space.machine(), (m_gfx_palettebank & ~4) | (val << 2));
+				update_palette_bank((m_gfx_palettebank & ~4) | (val << 2));
 			break;
 
 		case 0x07:
@@ -410,32 +405,30 @@ static void display_speedups(void)
 }
 
 
-void harddriv_scanline_driver(screen_device &screen, bitmap_ind16 &bitmap, int scanline, const tms34010_display_params *params)
+TMS340X0_SCANLINE_IND16_CB_MEMBER(harddriv_state::scanline_driver)
 {
-	harddriv_state *state = screen.machine().driver_data<harddriv_state>();
-	UINT8 *vram_base = &state->m_gsp_vram[(params->rowaddr << 12) & state->m_vram_mask];
+	UINT8 *vram_base = &m_gsp_vram[(params->rowaddr << 12) & m_vram_mask];
 	UINT16 *dest = &bitmap.pix16(scanline);
-	int coladdr = (params->yoffset << 9) + ((params->coladdr & 0xff) << 4) - 15 + (state->m_gfx_finescroll & 0x0f);
+	int coladdr = (params->yoffset << 9) + ((params->coladdr & 0xff) << 4) - 15 + (m_gfx_finescroll & 0x0f);
 	int x;
 
 	for (x = params->heblnk; x < params->hsblnk; x++)
-		dest[x] = state->m_gfx_palettebank * 256 + vram_base[BYTE_XOR_LE(coladdr++ & 0xfff)];
+		dest[x] = m_gfx_palettebank * 256 + vram_base[BYTE_XOR_LE(coladdr++ & 0xfff)];
 
 	if (scanline == screen.visible_area().max_y)
 		display_speedups();
 }
 
 
-void harddriv_scanline_multisync(screen_device &screen, bitmap_ind16 &bitmap, int scanline, const tms34010_display_params *params)
+TMS340X0_SCANLINE_IND16_CB_MEMBER(harddriv_state::scanline_multisync)
 {
-	harddriv_state *state = screen.machine().driver_data<harddriv_state>();
-	UINT8 *vram_base = &state->m_gsp_vram[(params->rowaddr << 11) & state->m_vram_mask];
+	UINT8 *vram_base = &m_gsp_vram[(params->rowaddr << 11) & m_vram_mask];
 	UINT16 *dest = &bitmap.pix16(scanline);
-	int coladdr = (params->yoffset << 9) + ((params->coladdr & 0xff) << 3) - 7 + (state->m_gfx_finescroll & 0x07);
+	int coladdr = (params->yoffset << 9) + ((params->coladdr & 0xff) << 3) - 7 + (m_gfx_finescroll & 0x07);
 	int x;
 
 	for (x = params->heblnk; x < params->hsblnk; x++)
-		dest[x] = state->m_gfx_palettebank * 256 + vram_base[BYTE_XOR_LE(coladdr++ & 0x7ff)];
+		dest[x] = m_gfx_palettebank * 256 + vram_base[BYTE_XOR_LE(coladdr++ & 0x7ff)];
 
 	if (scanline == screen.visible_area().max_y)
 		display_speedups();

@@ -480,10 +480,9 @@ WRITE32_MEMBER(metalmx_state::host_vram_w)
 	COMBINE_DATA(m_gsp_vram + offset * 2);
 }
 
-static void tms_interrupt(device_t *device, int state)
+WRITE_LINE_MEMBER(metalmx_state::tms_interrupt)
 {
-	metalmx_state *drvstate = device->machine().driver_data<metalmx_state>();
-	drvstate->m_maincpu->set_input_line(4, state ? HOLD_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(4, state ? HOLD_LINE : CLEAR_LINE);
 }
 
 
@@ -684,23 +683,6 @@ INPUT_PORTS_END
 
 /*************************************
  *
- *  CPU configuration
- *
- *************************************/
-
-static const tms340x0_config gsp_config =
-{
-	TRUE,                   /* halt on reset */
-	"screen",               /* the screen operated on */
-	4000000,                /* pixel clock */
-	2,                      /* pixels per clock */
-	NULL,                   /* scanline callback (indexed16) */
-	NULL,                   /* scanline callback (rgb32) */
-	tms_interrupt,          /* generate interrupt */
-};
-
-/*************************************
- *
  *  Machine driver
  *
  *************************************/
@@ -715,8 +697,11 @@ static MACHINE_CONFIG_START( metalmx, metalmx_state )
 	MCFG_CPU_DATA_MAP(adsp_data_map)
 
 	MCFG_CPU_ADD("gsp", TMS34020, 40000000)         /* Unverified */
-	MCFG_TMS340X0_CONFIG(gsp_config)
 	MCFG_CPU_PROGRAM_MAP(gsp_map)
+	MCFG_TMS340X0_HALT_ON_RESET(TRUE) /* halt on reset */
+	MCFG_TMS340X0_PIXEL_CLOCK(4000000) /* pixel clock */
+	MCFG_TMS340X0_PIXELS_PER_CLOCK(2) /* pixels per clock */
+	MCFG_TMS340X0_OUTPUT_INT_CB(WRITELINE(metalmx_state, tms_interrupt))
 
 	MCFG_CPU_ADD("dsp32c_1", DSP32C, 40000000)      /* Unverified */
 	MCFG_CPU_PROGRAM_MAP(dsp32c_1_map)

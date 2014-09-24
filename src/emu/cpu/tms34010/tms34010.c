@@ -31,17 +31,14 @@ const device_type TMS34020 = &device_creator<tms34020_device>;
     GLOBAL VARIABLES
 ***************************************************************************/
 
-/* default configuration */
-static const tms340x0_config default_config =
-{
-	0
-};
-
-
 tms340x0_device::tms340x0_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname)
 	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, __FILE__)
+	, device_video_interface(mconfig, *this)
 	, m_program_config("program", ENDIANNESS_LITTLE, 16, 32, 3)
-	, m_config(&default_config)
+	, m_reset_deferred(FALSE)
+	, m_pixclock(0)
+	, m_pixperclock(0)     
+	, m_output_int_cb(*this)
 {
 }
 
@@ -271,8 +268,8 @@ UINT32 tms340x0_device::read_pixel_32(offs_t offset)
 /* Shift register read */
 UINT32 tms340x0_device::read_pixel_shiftreg(offs_t offset)
 {
-	if (m_config->to_shiftreg)
-		m_config->to_shiftreg(*m_program, offset, &m_shiftreg[0]);
+	if (!m_to_shiftreg_cb.isnull())
+		m_to_shiftreg_cb(*m_program, offset, &m_shiftreg[0]);
 	else
 		fatalerror("To ShiftReg function not set. PC = %08X\n", m_pc);
 	return m_shiftreg[0];
@@ -413,8 +410,8 @@ void tms340x0_device::write_pixel_r_t_32(offs_t offset, UINT32 data)
 /* Shift register write */
 void tms340x0_device::write_pixel_shiftreg(offs_t offset, UINT32 data)
 {
-	if (m_config->from_shiftreg)
-		m_config->from_shiftreg(*m_program, offset, &m_shiftreg[0]);
+	if (!m_from_shiftreg_cb.isnull())
+		m_from_shiftreg_cb(*m_program, offset, &m_shiftreg[0]);
 	else
 		fatalerror("From ShiftReg function not set. PC = %08X\n", m_pc);
 }
@@ -572,11 +569,16 @@ void tms340x0_device::check_interrupt()
 
 void tms340x0_device::device_start()
 {
+	m_scanline_ind16_cb.bind_relative_to(*owner());
+	m_scanline_rgb32_cb.bind_relative_to(*owner());
+	m_output_int_cb.resolve();
+	m_to_shiftreg_cb.bind_relative_to(*owner());
+	m_from_shiftreg_cb.bind_relative_to(*owner());
+	
 	m_external_host_access = FALSE;
 
 	m_program = &space(AS_PROGRAM);
 	m_direct = &m_program->direct();
-	m_screen = downcast<screen_device *>(machine().device(m_config->screen_tag));
 
 	/* set up the state table */
 	{
@@ -646,8 +648,7 @@ void tms340x0_device::device_reset()
 
 	/* HALT the CPU if requested, and remember to re-read the starting PC */
 	/* the first time we are run */
-	m_reset_deferred = m_config->halt_on_reset;
-	if (m_config->halt_on_reset)
+	if (m_reset_deferred)
 	{
 		io_register_w(*m_program, REG_HSTCTLH, 0x8000, 0xffff);
 	}
@@ -883,19 +884,19 @@ TIMER_CALLBACK_MEMBER( tms340x0_device::scanline_callback )
 	{
 		/* only do this if we have an incoming pixel clock */
 		/* also, only do it if the HEBLNK/HSBLNK values are stable */
-		if (master && (m_config->scanline_callback_ind16 != NULL || m_config->scanline_callback_rgb32 != NULL))
+		if (master && (!m_scanline_ind16_cb.isnull() || !m_scanline_rgb32_cb.isnull()))
 		{
 			int htotal = SMART_IOREG(HTOTAL);
 			if (htotal > 0 && vtotal > 0)
 			{
-				attoseconds_t refresh = HZ_TO_ATTOSECONDS(m_config->pixclock) * (htotal + 1) * (vtotal + 1);
-				int width = (htotal + 1) * m_config->pixperclock;
+				attoseconds_t refresh = HZ_TO_ATTOSECONDS(m_pixclock) * (htotal + 1) * (vtotal + 1);
+				int width = (htotal + 1) * m_pixperclock;
 				int height = vtotal + 1;
 				rectangle visarea;
 
 				/* extract the visible area */
-				visarea.min_x = SMART_IOREG(HEBLNK) * m_config->pixperclock;
-				visarea.max_x = SMART_IOREG(HSBLNK) * m_config->pixperclock - 1;
+				visarea.min_x = SMART_IOREG(HEBLNK) * m_pixperclock;
+				visarea.max_x = SMART_IOREG(HSBLNK) * m_pixperclock - 1;
 				visarea.min_y = veblnk;
 				visarea.max_y = vsblnk - 1;
 
@@ -927,7 +928,7 @@ TIMER_CALLBACK_MEMBER( tms340x0_device::scanline_callback )
 	}
 
 	/* force a partial update within the visible area */
-	if (vcount >= current_visarea.min_y && vcount <= current_visarea.max_y && (m_config->scanline_callback_ind16 != NULL || m_config->scanline_callback_rgb32 != NULL))
+	if (vcount >= current_visarea.min_y && vcount <= current_visarea.max_y && (!m_scanline_ind16_cb.isnull() || !m_scanline_rgb32_cb.isnull()))
 		m_screen->update_partial(vcount);
 
 	/* if we are in the visible area, increment DPYADR by DUDATE */
@@ -974,8 +975,8 @@ void tms340x0_device::get_display_params(tms34010_display_params *params)
 	params->vcount = SMART_IOREG(VCOUNT);
 	params->veblnk = SMART_IOREG(VEBLNK);
 	params->vsblnk = SMART_IOREG(VSBLNK);
-	params->heblnk = SMART_IOREG(HEBLNK) * m_config->pixperclock;
-	params->hsblnk = SMART_IOREG(HSBLNK) * m_config->pixperclock;
+	params->heblnk = SMART_IOREG(HEBLNK) * m_pixperclock;
+	params->hsblnk = SMART_IOREG(HSBLNK) * m_pixperclock;
 
 	/* 34010 gets its address from DPYADR and DPYTAP */
 	if (!m_is_34020)
@@ -1013,7 +1014,7 @@ UINT32 tms340x0_device::tms340x0_ind16(screen_device &screen, bitmap_ind16 &bitm
 	{
 		/* call through to the callback */
 		LOG(("  Update: scan=%3d ROW=%04X COL=%04X\n", cliprect.min_y, params.rowaddr, params.coladdr));
-		(*m_config->scanline_callback_ind16)(screen, bitmap, cliprect.min_y, &params);
+		m_scanline_ind16_cb(screen, bitmap, cliprect.min_y, &params);
 	}
 
 	/* otherwise, just blank the current scanline */
@@ -1044,7 +1045,7 @@ UINT32 tms340x0_device::tms340x0_rgb32(screen_device &screen, bitmap_rgb32 &bitm
 	{
 		/* call through to the callback */
 		LOG(("  Update: scan=%3d ROW=%04X COL=%04X\n", cliprect.min_y, params.rowaddr, params.coladdr));
-		(*m_config->scanline_callback_rgb32)(screen, bitmap, cliprect.min_y, &params);
+		m_scanline_rgb32_cb(screen, bitmap, cliprect.min_y, &params);
 	}
 
 	/* otherwise, just blank the current scanline */
@@ -1155,13 +1156,13 @@ WRITE16_MEMBER( tms34010_device::io_register_w )
 				/* the TMS34010 can set output interrupt? */
 				if (!(oldreg & 0x0080) && (newreg & 0x0080))
 				{
-					if (m_config->output_int)
-						(*m_config->output_int)(&space.device(), 1);
+					if (!m_output_int_cb.isnull())
+						m_output_int_cb(1);
 				}
 				else if ((oldreg & 0x0080) && !(newreg & 0x0080))
 				{
-					if (m_config->output_int)
-						(*m_config->output_int)(&space.device(), 0);
+					if (!m_output_int_cb.isnull())
+						m_output_int_cb(0);
 				}
 
 				/* input interrupt? (should really be state-based, but the functions don't exist!) */
@@ -1308,13 +1309,13 @@ WRITE16_MEMBER( tms34020_device::io_register_w )
 			/* the TMS34010 can set output interrupt? */
 			if (!(oldreg & 0x0080) && (newreg & 0x0080))
 			{
-				if (m_config->output_int)
-					(*m_config->output_int)(&space.device(), 1);
+				if (!m_output_int_cb.isnull())
+					m_output_int_cb(1);
 			}
 			else if ((oldreg & 0x0080) && !(newreg & 0x0080))
 			{
-				if (m_config->output_int)
-					(*m_config->output_int)(&space.device(), 0);
+				if (!m_output_int_cb.isnull())
+					m_output_int_cb(0);
 			}
 
 			/* input interrupt? (should really be state-based, but the functions don't exist!) */

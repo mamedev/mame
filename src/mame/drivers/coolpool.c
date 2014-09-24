@@ -57,11 +57,9 @@ static const UINT16 nvram_unlock_seq[] =
  *
  *************************************/
 
-static void amerdart_scanline(screen_device &screen, bitmap_rgb32 &bitmap, int scanline, const tms34010_display_params *params)
+TMS340X0_SCANLINE_RGB32_CB_MEMBER(coolpool_state::amerdart_scanline)
 {
-	coolpool_state *state = screen.machine().driver_data<coolpool_state>();
-
-	UINT16 *vram = &state->m_vram_base[(params->rowaddr << 8) & 0xff00];
+	UINT16 *vram = &m_vram_base[(params->rowaddr << 8) & 0xff00];
 	UINT32 *dest = &bitmap.pix32(scanline);
 	rgb_t pens[16];
 	int coladdr = params->coladdr;
@@ -71,7 +69,7 @@ static void amerdart_scanline(screen_device &screen, bitmap_rgb32 &bitmap, int s
 	if (scanline < 256)
 		for (x = 0; x < 16; x++)
 		{
-			UINT16 pal = state->m_vram_base[x];
+			UINT16 pal = m_vram_base[x];
 			pens[x] = rgb_t(pal4bit(pal >> 4), pal4bit(pal >> 8), pal4bit(pal >> 12));
 		}
 
@@ -86,13 +84,11 @@ static void amerdart_scanline(screen_device &screen, bitmap_rgb32 &bitmap, int s
 }
 
 
-static void coolpool_scanline(screen_device &screen, bitmap_rgb32 &bitmap, int scanline, const tms34010_display_params *params)
+TMS340X0_SCANLINE_RGB32_CB_MEMBER(coolpool_state::coolpool_scanline)
 {
-	coolpool_state *state = screen.machine().driver_data<coolpool_state>();
-
-	UINT16 *vram = &state->m_vram_base[(params->rowaddr << 8) & 0x1ff00];
+	UINT16 *vram = &m_vram_base[(params->rowaddr << 8) & 0x1ff00];
 	UINT32 *dest = &bitmap.pix32(scanline);
-	const rgb_t *pens = state->m_tlc34076->get_pens();
+	const rgb_t *pens = m_tlc34076->get_pens();
 	int coladdr = params->coladdr;
 	int x;
 
@@ -112,19 +108,15 @@ static void coolpool_scanline(screen_device &screen, bitmap_rgb32 &bitmap, int s
  *
  *************************************/
 
-static void coolpool_to_shiftreg(address_space &space, UINT32 address, UINT16 *shiftreg)
+TMS340X0_TO_SHIFTREG_CB_MEMBER(coolpool_state::to_shiftreg)
 {
-	coolpool_state *state = space.machine().driver_data<coolpool_state>();
-
-	memcpy(shiftreg, &state->m_vram_base[TOWORD(address) & ~TOWORD(0xfff)], TOBYTE(0x1000));
+	memcpy(shiftreg, &m_vram_base[TOWORD(address) & ~TOWORD(0xfff)], TOBYTE(0x1000));
 }
 
 
-static void coolpool_from_shiftreg(address_space &space, UINT32 address, UINT16 *shiftreg)
+TMS340X0_FROM_SHIFTREG_CB_MEMBER(coolpool_state::from_shiftreg)
 {
-	coolpool_state *state = space.machine().driver_data<coolpool_state>();
-
-	memcpy(&state->m_vram_base[TOWORD(address) & ~TOWORD(0xfff)], shiftreg, TOBYTE(0x1000));
+	memcpy(&m_vram_base[TOWORD(address) & ~TOWORD(0xfff)], shiftreg, TOBYTE(0x1000));
 }
 
 
@@ -790,42 +782,6 @@ static INPUT_PORTS_START( 9ballsht )
 INPUT_PORTS_END
 
 
-
-/*************************************
- *
- *  34010 configuration
- *
- *************************************/
-
-static const tms340x0_config tms_config_amerdart =
-{
-	FALSE,                          /* halt on reset */
-	"screen",                       /* the screen operated on */
-	XTAL_40MHz/12,                  /* pixel clock */
-	2,                              /* pixels per clock */
-	NULL,                           /* scanline callback (indexed16) */
-	amerdart_scanline,              /* scanline callback (rgb32) */
-	NULL,                           /* generate interrupt */
-	coolpool_to_shiftreg,           /* write to shiftreg function */
-	coolpool_from_shiftreg          /* read from shiftreg function */
-};
-
-
-static const tms340x0_config tms_config_coolpool =
-{
-	FALSE,                          /* halt on reset */
-	"screen",                       /* the screen operated on */
-	XTAL_40MHz/6,                   /* pixel clock */
-	1,                              /* pixels per clock */
-	NULL,                           /* scanline callback (indexed16) */
-	coolpool_scanline,              /* scanline callback (rgb32) */
-	NULL,                           /* generate interrupt */
-	coolpool_to_shiftreg,           /* write to shiftreg function */
-	coolpool_from_shiftreg          /* read from shiftreg function */
-};
-
-
-
 /*************************************
  *
  *  Machine drivers
@@ -836,8 +792,13 @@ static MACHINE_CONFIG_START( amerdart, coolpool_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS34010, XTAL_40MHz)
-	MCFG_TMS340X0_CONFIG(tms_config_amerdart)
 	MCFG_CPU_PROGRAM_MAP(amerdart_map)
+	MCFG_TMS340X0_HALT_ON_RESET(FALSE) /* halt on reset */
+	MCFG_TMS340X0_PIXEL_CLOCK(XTAL_40MHz/12) /* pixel clock */
+	MCFG_TMS340X0_PIXELS_PER_CLOCK(2) /* pixels per clock */
+	MCFG_TMS340X0_SCANLINE_RGB32_CB(coolpool_state, amerdart_scanline) /* scanline callback (rgb32) */
+	MCFG_TMS340X0_TO_SHIFTREG_CB(coolpool_state, to_shiftreg)  /* write to shiftreg function */
+	MCFG_TMS340X0_FROM_SHIFTREG_CB(coolpool_state, from_shiftreg) /* read from shiftreg function */
 
 	MCFG_CPU_ADD("dsp", TMS32015, XTAL_40MHz/2)
 	MCFG_CPU_PROGRAM_MAP(amerdart_dsp_pgm_map)
@@ -867,9 +828,14 @@ static MACHINE_CONFIG_START( coolpool, coolpool_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS34010, XTAL_40MHz)
-	MCFG_TMS340X0_CONFIG(tms_config_coolpool)
 	MCFG_CPU_PROGRAM_MAP(coolpool_map)
-
+	MCFG_TMS340X0_HALT_ON_RESET(FALSE) /* halt on reset */
+	MCFG_TMS340X0_PIXEL_CLOCK(XTAL_40MHz/6) /* pixel clock */
+	MCFG_TMS340X0_PIXELS_PER_CLOCK(1) /* pixels per clock */
+	MCFG_TMS340X0_SCANLINE_RGB32_CB(coolpool_state, coolpool_scanline) /* scanline callback (rgb32) */
+	MCFG_TMS340X0_TO_SHIFTREG_CB(coolpool_state, to_shiftreg)  /* write to shiftreg function */
+	MCFG_TMS340X0_FROM_SHIFTREG_CB(coolpool_state, from_shiftreg) /* read from shiftreg function */
+	
 	MCFG_CPU_ADD("dsp", TMS32026,XTAL_40MHz)
 	MCFG_CPU_PROGRAM_MAP(coolpool_dsp_pgm_map)
 	MCFG_CPU_IO_MAP(coolpool_dsp_io_map)

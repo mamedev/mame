@@ -33,14 +33,12 @@ static ADDRESS_MAP_START( megaphx_tms_map, AS_PROGRAM, 16, inder_vid_device )
 ADDRESS_MAP_END
 
 
-static void megaphx_scanline(screen_device &screen, bitmap_rgb32 &bitmap, int scanline, const tms34010_display_params *params)
+TMS340X0_SCANLINE_RGB32_CB_MEMBER(inder_vid_device::scanline)
 {
-	inder_vid_device *state = (inder_vid_device*)screen.machine().device("inder_vid");
-
-	UINT16 *vram = &state->m_vram[(params->rowaddr << 8) & 0x3ff00];
+	UINT16 *vram = &m_vram[(params->rowaddr << 8) & 0x3ff00];
 	UINT32 *dest = &bitmap.pix32(scanline);
 
-	const pen_t *paldata = state->m_palette->pens();
+	const pen_t *paldata = m_palette->pens();
 
 	int coladdr = params->coladdr;
 	int x;
@@ -55,53 +53,32 @@ static void megaphx_scanline(screen_device &screen, bitmap_rgb32 &bitmap, int sc
 }
 
 
-static void megaphx_to_shiftreg(address_space &space, UINT32 address, UINT16 *shiftreg)
+TMS340X0_TO_SHIFTREG_CB_MEMBER(inder_vid_device::to_shiftreg)
 {
-	inder_vid_device *state = (inder_vid_device*)space.machine().device("inder_vid");
-
-	if (state->m_shiftfull == 0)
+	if (m_shiftfull == 0)
 	{
 		//printf("read to shift regs address %08x (%08x)\n", address, TOWORD(address) * 2);
 
-		memcpy(shiftreg, &state->m_vram[TOWORD(address) & ~TOWORD(0x1fff)], TOBYTE(0x2000)); // & ~TOWORD(0x1fff) is needed for round 6
-		state->m_shiftfull = 1;
+		memcpy(shiftreg, &m_vram[TOWORD(address) & ~TOWORD(0x1fff)], TOBYTE(0x2000)); // & ~TOWORD(0x1fff) is needed for round 6
+		m_shiftfull = 1;
 	}
 }
 
-static void megaphx_from_shiftreg(address_space &space, UINT32 address, UINT16 *shiftreg)
+TMS340X0_FROM_SHIFTREG_CB_MEMBER(inder_vid_device::from_shiftreg)
 {
 //  printf("write from shift regs address %08x (%08x)\n", address, TOWORD(address) * 2);
 
-	inder_vid_device *state = (inder_vid_device*)space.machine().device("inder_vid");
+	memcpy(&m_vram[TOWORD(address) & ~TOWORD(0x1fff)], shiftreg, TOBYTE(0x2000));
 
-	memcpy(&state->m_vram[TOWORD(address) & ~TOWORD(0x1fff)], shiftreg, TOBYTE(0x2000));
-
-	state->m_shiftfull = 0;
+	m_shiftfull = 0;
 }
 
-
-
-static void m68k_gen_int(device_t *device, int state)
+WRITE_LINE_MEMBER(inder_vid_device::m68k_gen_int)
 {
-	cpu_device *maincpu = (cpu_device*)device->machine().device("maincpu");
+	cpu_device *maincpu = (cpu_device*)machine().device("maincpu");
 	if (state) maincpu->set_input_line(4, ASSERT_LINE);
 	else maincpu->set_input_line(4, CLEAR_LINE);
-
 }
-
-
-static const tms340x0_config tms_config_megaphx =
-{
-	TRUE,                          /* halt on reset */
-	"inder_vid:inder_screen",                       /* the screen operated on */
-	XTAL_40MHz/12,                   /* pixel clock */
-	2,                              /* pixels per clock */
-	NULL,                           /* scanline callback (indexed16) */
-	megaphx_scanline,              /* scanline callback (rgb32) */
-	m68k_gen_int,                   /* generate interrupt */
-	megaphx_to_shiftreg,           /* write to shiftreg function */
-	megaphx_from_shiftreg          /* read from shiftreg function */
-};
 
 
 static ADDRESS_MAP_START( ramdac_map, AS_0, 8, inder_vid_device )
@@ -110,8 +87,14 @@ ADDRESS_MAP_END
 
 static MACHINE_CONFIG_FRAGMENT( inder_vid )
 	MCFG_CPU_ADD("tms", TMS34010, XTAL_40MHz)
-	MCFG_TMS340X0_CONFIG(tms_config_megaphx)
 	MCFG_CPU_PROGRAM_MAP(megaphx_tms_map)
+	MCFG_TMS340X0_HALT_ON_RESET(TRUE) /* halt on reset */
+	MCFG_TMS340X0_PIXEL_CLOCK(XTAL_40MHz/12) /* pixel clock */
+	MCFG_TMS340X0_PIXELS_PER_CLOCK(2) /* pixels per clock */	
+	MCFG_TMS340X0_SCANLINE_RGB32_CB(inder_vid_device, scanline)     /* scanline updater (RGB32) */
+	MCFG_TMS340X0_OUTPUT_INT_CB(WRITELINE(inder_vid_device, m68k_gen_int))
+	MCFG_TMS340X0_TO_SHIFTREG_CB(inder_vid_device, to_shiftreg)  /* write to shiftreg function */
+	MCFG_TMS340X0_FROM_SHIFTREG_CB(inder_vid_device, from_shiftreg) /* read from shiftreg function */
 
 	MCFG_SCREEN_ADD("inder_screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_40MHz/12, 424, 0, 338-1, 262, 0, 246-1)

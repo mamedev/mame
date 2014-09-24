@@ -19,6 +19,8 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_screen(*this, "screen") { }
 
+	required_device<cpu_device> m_maincpu;
+	required_device<screen_device> m_screen;
 	UINT16 m_blitter_data[8];
 	UINT16 *m_screenram;
 	UINT8 m_vispage;
@@ -39,8 +41,7 @@ public:
 	DECLARE_DRIVER_INIT(cclownz);
 	virtual void video_start();
 	inline void get_crosshair_xy(int player, int *x, int *y);
-	required_device<cpu_device> m_maincpu;
-	required_device<screen_device> m_screen;
+	TMS340X0_SCANLINE_IND16_CB_MEMBER(scanline_update);
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);

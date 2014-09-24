@@ -99,6 +99,9 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(narc_talkback_data_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(adpcm_irq_state_r);
 	DECLARE_WRITE8_MEMBER(yawdim_oki_bank_w);
+	TMS340X0_TO_SHIFTREG_CB_MEMBER(to_shiftreg);
+	TMS340X0_FROM_SHIFTREG_CB_MEMBER(from_shiftreg);
+	TMS340X0_SCANLINE_IND16_CB_MEMBER(scanline_update);
 	DECLARE_DRIVER_INIT(smashtv);
 	DECLARE_DRIVER_INIT(strkforc);
 	DECLARE_DRIVER_INIT(narc);
@@ -129,8 +132,3 @@ public:
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };
-
-/*----------- defined in video/midyunit.c -----------*/
-void midyunit_to_shiftreg(address_space &space, UINT32 address, UINT16 *shiftreg);
-void midyunit_from_shiftreg(address_space &space, UINT32 address, UINT16 *shiftreg);
-void midyunit_scanline_update(screen_device &screen, bitmap_ind16 &bitmap, int scanline, const tms34010_display_params *params);

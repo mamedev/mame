@@ -611,27 +611,6 @@ INPUT_PORTS_END
 
 /*************************************
  *
- *  34010 configuration
- *
- *************************************/
-
-static const tms340x0_config tms_config =
-{
-	FALSE,                          /* halt on reset */
-	"screen",                       /* the screen operated on */
-	PIXEL_CLOCK,                    /* pixel clock */
-	1,                              /* pixels per clock */
-	midtunit_scanline_update,       /* scanline updater (indexed16) */
-	NULL,                           /* scanline updater (rgb32) */
-	NULL,                           /* generate interrupt */
-	midtunit_to_shiftreg,           /* write to shiftreg function */
-	midtunit_from_shiftreg          /* read from shiftreg function */
-};
-
-
-
-/*************************************
- *
  *  Machine drivers
  *
  *************************************/
@@ -639,8 +618,13 @@ static const tms340x0_config tms_config =
 static MACHINE_CONFIG_START( wunit, midwunit_state )
 
 	MCFG_CPU_ADD("maincpu", TMS34010, 50000000)
-	MCFG_TMS340X0_CONFIG(tms_config)
 	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_TMS340X0_HALT_ON_RESET(FALSE) /* halt on reset */
+	MCFG_TMS340X0_PIXEL_CLOCK(PIXEL_CLOCK) /* pixel clock */
+	MCFG_TMS340X0_PIXELS_PER_CLOCK(1) /* pixels per clock */	
+	MCFG_TMS340X0_SCANLINE_IND16_CB(midtunit_state, scanline_update)       /* scanline updater (indexed16) */
+	MCFG_TMS340X0_TO_SHIFTREG_CB(midtunit_state, to_shiftreg)           /* write to shiftreg function */
+	MCFG_TMS340X0_FROM_SHIFTREG_CB(midtunit_state, from_shiftreg)          /* read from shiftreg function */
 
 	MCFG_MACHINE_RESET_OVERRIDE(midwunit_state,midwunit)
 	MCFG_NVRAM_ADD_0FILL("nvram")

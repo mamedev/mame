@@ -118,19 +118,17 @@ WRITE16_MEMBER( harddriv_state::hd68k_irq_ack_w )
 }
 
 
-void hdgsp_irq_gen(device_t *device, int irqstate)
+WRITE_LINE_MEMBER(harddriv_state::hdgsp_irq_gen)
 {
-	harddriv_state *state = device->machine().driver_data<harddriv_state>();
-	state->m_gsp_irq_state = irqstate;
-	state->update_interrupts();
+	m_gsp_irq_state = state;
+	update_interrupts();
 }
 
 
-void hdmsp_irq_gen(device_t *device, int irqstate)
+WRITE_LINE_MEMBER(harddriv_state::hdmsp_irq_gen)
 {
-	harddriv_state *state = device->machine().driver_data<harddriv_state>();
-	state->m_msp_irq_state = irqstate;
-	state->update_interrupts();
+	m_msp_irq_state = state;
+	update_interrupts();
 }
 
 

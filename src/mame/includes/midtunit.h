@@ -66,6 +66,9 @@ public:
 	DECLARE_READ16_MEMBER(midxunit_paletteram_r);
 	DECLARE_READ16_MEMBER(midtunit_dma_r);
 	DECLARE_WRITE16_MEMBER(midtunit_dma_w);
+	TMS340X0_TO_SHIFTREG_CB_MEMBER(to_shiftreg);
+	TMS340X0_FROM_SHIFTREG_CB_MEMBER(from_shiftreg);
+	TMS340X0_SCANLINE_IND16_CB_MEMBER(scanline_update);
 	DECLARE_DRIVER_INIT(mktunit);
 	DECLARE_DRIVER_INIT(mkturbo);
 	DECLARE_DRIVER_INIT(nbajamte);
@@ -101,17 +104,9 @@ public:
 	const UINT8 *jdredd_prot_table;
 	UINT8    jdredd_prot_index;
 	UINT8    jdredd_prot_max;
+	
+	UINT8 m_gfx_rom_large;
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };
-
-
-/*----------- defined in video/midtunit.c -----------*/
-extern UINT8 midtunit_gfx_rom_large;
-
-void midtunit_to_shiftreg(address_space &space, UINT32 address, UINT16 *shiftreg);
-void midtunit_from_shiftreg(address_space &space, UINT32 address, UINT16 *shiftreg);
-
-void midtunit_scanline_update(screen_device &screen, bitmap_ind16 &bitmap, int scanline, const tms34010_display_params *params);
-void midxunit_scanline_update(screen_device &screen, bitmap_ind16 &bitmap, int scanline, const tms34010_display_params *params);

@@ -333,68 +333,6 @@ Notes:
 
 /*************************************
  *
- *  CPU configs
- *
- *************************************/
-
-/* used on the medium-resolution driver boards */
-static const tms340x0_config gsp_config_driver =
-{
-	TRUE,                           /* halt on reset */
-	"screen",                       /* the screen operated on */
-	4000000,                        /* pixel clock */
-	4,                              /* pixels per clock */
-	harddriv_scanline_driver,       /* scanline callback (indexed16) */
-	NULL,                           /* scanline callback (rgb32) */
-	hdgsp_irq_gen,                  /* generate interrupt */
-	hdgsp_write_to_shiftreg,        /* write to shiftreg function */
-	hdgsp_read_from_shiftreg        /* read from shiftreg function */
-};
-
-
-/* used on the low-resolution multisync boards for harddrivc, racedrivc, steeltal */
-static const tms340x0_config gsp_config_multisync =
-{
-	TRUE,                           /* halt on reset */
-	"screen",                       /* the screen operated on */
-	6000000,                        /* pixel clock */
-	2,                              /* pixels per clock */
-	harddriv_scanline_multisync,    /* scanline callback (indexed16) */
-	NULL,                           /* scanline callback (rgb32 */
-	hdgsp_irq_gen,                  /* generate interrupt */
-	hdgsp_write_to_shiftreg,        /* write to shiftreg function */
-	hdgsp_read_from_shiftreg        /* read from shiftreg function */
-};
-
-
-/* used on the low-resolution multisync board for stunrun */
-static const tms340x0_config gsp_config_multisync_stunrun =
-{
-	TRUE,                           /* halt on reset */
-	"screen",                       /* the screen operated on */
-	5000000,                        /* pixel clock */
-	2,                              /* pixels per clock */
-	harddriv_scanline_multisync,    /* scanline callback (indexed16) */
-	NULL,                           /* scanline callback (rgb32 */
-	hdgsp_irq_gen,                  /* generate interrupt */
-	hdgsp_write_to_shiftreg,        /* write to shiftreg function */
-	hdgsp_read_from_shiftreg        /* read from shiftreg function */
-};
-
-
-static const tms340x0_config msp_config =
-{
-	TRUE,                           /* halt on reset */
-	"screen",                       /* the screen operated on */
-	5000000,                        /* pixel clock */
-	2,                              /* pixels per clock */
-	NULL,                           /* scanline callback (indexed16) */
-	NULL,                           /* scanline callback (rgb32 */
-	hdmsp_irq_gen                   /* generate interrupt */
-};
-
-/*************************************
- *
  *  Driver board memory maps
  *
  *************************************/
@@ -1296,7 +1234,13 @@ static MACHINE_CONFIG_START( driver_nomsp, harddriv_state )
 
 	MCFG_CPU_ADD("gsp", TMS34010, HARDDRIV_GSP_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(driver_gsp_map)
-	MCFG_TMS340X0_CONFIG(gsp_config_driver)
+	MCFG_TMS340X0_HALT_ON_RESET(TRUE) /* halt on reset */
+	MCFG_TMS340X0_PIXEL_CLOCK(4000000) /* pixel clock */
+	MCFG_TMS340X0_PIXELS_PER_CLOCK(4) /* pixels per clock */
+	MCFG_TMS340X0_SCANLINE_IND16_CB(harddriv_state, scanline_driver) /* scanline callback (indexed16) */
+	MCFG_TMS340X0_OUTPUT_INT_CB(WRITELINE(harddriv_state, hdgsp_irq_gen))
+	MCFG_TMS340X0_TO_SHIFTREG_CB(harddriv_state, hdgsp_write_to_shiftreg)
+	MCFG_TMS340X0_FROM_SHIFTREG_CB(harddriv_state, hdgsp_read_from_shiftreg)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(30000))
 
@@ -1328,7 +1272,10 @@ static MACHINE_CONFIG_DERIVED( driver_msp, driver_nomsp )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("msp", TMS34010, XTAL_50MHz)
 	MCFG_CPU_PROGRAM_MAP(driver_msp_map)
-	MCFG_TMS340X0_CONFIG(msp_config)
+	MCFG_TMS340X0_HALT_ON_RESET(TRUE) /* halt on reset */
+	MCFG_TMS340X0_PIXEL_CLOCK(5000000) /* pixel clock */
+	MCFG_TMS340X0_PIXELS_PER_CLOCK(2) /* pixels per clock */
+	MCFG_TMS340X0_OUTPUT_INT_CB(WRITELINE(harddriv_state, hdmsp_irq_gen))
 MACHINE_CONFIG_END
 
 
@@ -1340,8 +1287,10 @@ static MACHINE_CONFIG_DERIVED( multisync_nomsp, driver_nomsp )
 	MCFG_CPU_PROGRAM_MAP(multisync_68k_map)
 
 	MCFG_CPU_MODIFY("gsp")
-	MCFG_TMS340X0_CONFIG(gsp_config_multisync)
 	MCFG_CPU_PROGRAM_MAP(multisync_gsp_map)
+	MCFG_TMS340X0_PIXEL_CLOCK(6000000) /* pixel clock */
+	MCFG_TMS340X0_PIXELS_PER_CLOCK(2) /* pixels per clock */
+	MCFG_TMS340X0_SCANLINE_IND16_CB(harddriv_state, scanline_multisync) /* scanline callback (indexed16) */
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -1355,7 +1304,10 @@ static MACHINE_CONFIG_DERIVED( multisync_msp, multisync_nomsp )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("msp", TMS34010, XTAL_50MHz)
 	MCFG_CPU_PROGRAM_MAP(driver_msp_map)
-	MCFG_TMS340X0_CONFIG(msp_config)
+	MCFG_TMS340X0_HALT_ON_RESET(TRUE) /* halt on reset */
+	MCFG_TMS340X0_PIXEL_CLOCK(5000000) /* pixel clock */
+	MCFG_TMS340X0_PIXELS_PER_CLOCK(2) /* pixels per clock */
+	MCFG_TMS340X0_OUTPUT_INT_CB(WRITELINE(harddriv_state, hdmsp_irq_gen))
 MACHINE_CONFIG_END
 
 
@@ -1530,7 +1482,7 @@ static MACHINE_CONFIG_DERIVED( stunrun, multisync_nomsp )
 
 	/* basic machine hardware */        /* multisync board without MSP */
 	MCFG_CPU_MODIFY("gsp")
-	MCFG_TMS340X0_CONFIG(gsp_config_multisync_stunrun)
+	MCFG_TMS340X0_PIXEL_CLOCK(5000000)  /* pixel clock */
 	MCFG_FRAGMENT_ADD( adsp )           /* ADSP board */
 
 	/* video hardware */

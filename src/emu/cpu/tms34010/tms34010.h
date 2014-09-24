@@ -188,31 +188,66 @@ struct tms34010_display_params
 };
 
 
-struct tms340x0_config
-{
-	UINT8   halt_on_reset;                      /* /HCS pin, which determines HALT state after reset */
-	const char *screen_tag;                     /* the screen operated on */
-	UINT32  pixclock;                           /* the pixel clock (0 means don't adjust screen size) */
-	int     pixperclock;                        /* pixels per clock */
-	void    (*scanline_callback_ind16)(screen_device &screen, bitmap_ind16 &bitmap, int scanline, const tms34010_display_params *params);
-	void    (*scanline_callback_rgb32)(screen_device &screen, bitmap_rgb32 &bitmap, int scanline, const tms34010_display_params *params);
-	void    (*output_int)(device_t *device, int state);         /* output interrupt callback */
-	void    (*to_shiftreg)(address_space &space, offs_t, UINT16 *); /* shift register write */
-	void    (*from_shiftreg)(address_space &space, offs_t, UINT16 *);   /* shift register read */
-};
+#define MCFG_TMS340X0_HALT_ON_RESET(_value) \
+	tms340x0_device::set_halt_on_reset(*device, _value);
+	
+#define MCFG_TMS340X0_PIXEL_CLOCK(_value) \
+	tms340x0_device::set_pixel_clock(*device, _value);
+	
+#define MCFG_TMS340X0_PIXELS_PER_CLOCK(_value) \
+	tms340x0_device::set_pixels_per_clock(*device, _value);
+	
+typedef device_delegate<void (screen_device &screen, bitmap_ind16 &bitmap, int scanline, const tms34010_display_params *params)> scanline_ind16_cb_delegate;
+
+#define TMS340X0_SCANLINE_IND16_CB_MEMBER(_name) void _name(screen_device &screen, bitmap_ind16 &bitmap, int scanline, const tms34010_display_params *params)
+	
+#define MCFG_TMS340X0_SCANLINE_IND16_CB(_class, _method) \
+	 tms340x0_device::set_scanline_ind16_callback(*device, scanline_ind16_cb_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+	 
+
+typedef device_delegate<void (screen_device &screen, bitmap_rgb32 &bitmap, int scanline, const tms34010_display_params *params)> scanline_rgb32_cb_delegate;
+
+#define TMS340X0_SCANLINE_RGB32_CB_MEMBER(_name) void _name(screen_device &screen, bitmap_rgb32 &bitmap, int scanline, const tms34010_display_params *params)
+
+#define MCFG_TMS340X0_SCANLINE_RGB32_CB(_class, _method) \
+	 tms340x0_device::set_scanline_rgb32_callback(*device, scanline_rgb32_cb_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+
+	 
+#define MCFG_TMS340X0_OUTPUT_INT_CB(_devcb) \
+	devcb = &tms340x0_device::set_output_int_callback(*device, DEVCB_##_devcb);
 
 
-#define MCFG_TMS340X0_CONFIG(_config) \
-	tms340x0_device::set_tms340x0_config(*device, &_config);
+typedef device_delegate<void (address_space &space, offs_t address, UINT16 *shiftreg)> to_shiftreg_cb_delegate;
 
+#define TMS340X0_TO_SHIFTREG_CB_MEMBER(_name) void _name(address_space &space, offs_t address, UINT16 *shiftreg)
+	
+#define MCFG_TMS340X0_TO_SHIFTREG_CB(_class, _method) \
+	 tms340x0_device::set_to_shiftreg_callback(*device, to_shiftreg_cb_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+	 
 
-class tms340x0_device : public cpu_device
+typedef device_delegate<void (address_space &space, offs_t address, UINT16 *shiftreg)> from_shiftreg_cb_delegate;
+
+#define TMS340X0_FROM_SHIFTREG_CB_MEMBER(_name) void _name(address_space &space, offs_t address, UINT16 *shiftreg)
+
+#define MCFG_TMS340X0_FROM_SHIFTREG_CB(_class, _method) \
+	 tms340x0_device::set_from_shiftreg_callback(*device, from_shiftreg_cb_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+
+	
+class tms340x0_device : public cpu_device,
+						public device_video_interface			
 {
 public:
 	// construction/destruction
 	tms340x0_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname);
 
-	static void set_tms340x0_config(device_t &device, const tms340x0_config *config) { downcast<tms340x0_device &>(device).m_config = config; }
+	static void set_halt_on_reset(device_t &device, bool reset_deferred) { downcast<tms340x0_device &>(device).m_reset_deferred = reset_deferred; }
+	static void set_pixel_clock(device_t &device, UINT32 pixclock) { downcast<tms340x0_device &>(device).m_pixclock = pixclock; }
+	static void set_pixels_per_clock(device_t &device, int pixperclock) { downcast<tms340x0_device &>(device).m_pixperclock = pixperclock; }
+	static void set_scanline_ind16_callback(device_t &device, scanline_ind16_cb_delegate callback) { downcast<tms340x0_device &>(device).m_scanline_ind16_cb = callback; }
+	static void set_scanline_rgb32_callback(device_t &device, scanline_rgb32_cb_delegate callback) { downcast<tms340x0_device &>(device).m_scanline_rgb32_cb = callback; }
+	template<class _Object> static devcb_base &set_output_int_callback(device_t &device, _Object object) { return downcast<tms340x0_device &>(device).m_output_int_cb.set_callback(object); }
+	static void set_to_shiftreg_callback(device_t &device, to_shiftreg_cb_delegate callback) { downcast<tms340x0_device &>(device).m_to_shiftreg_cb = callback; }
+	static void set_from_shiftreg_callback(device_t &device, from_shiftreg_cb_delegate callback) { downcast<tms340x0_device &>(device).m_from_shiftreg_cb = callback; }
 
 	void get_display_params(tms34010_display_params *params);
 	void tms34010_state_postload();
@@ -292,16 +327,22 @@ protected:
 	INT32            m_gfxcycles;
 	UINT8            m_pixelshift;
 	UINT8            m_is_34020;
-	UINT8            m_reset_deferred;
+	bool             m_reset_deferred; /* /HCS pin, which determines HALT state after reset */
 	UINT8            m_hblank_stable;
 	UINT8            m_external_host_access;
 	UINT8            m_executing;
 	address_space *m_program;
 	direct_read_data *m_direct;
-	const tms340x0_config *m_config;
-	screen_device *m_screen;
+	UINT32  m_pixclock;                           /* the pixel clock (0 means don't adjust screen size) */
+	int     m_pixperclock;                        /* pixels per clock */
 	emu_timer *m_scantimer;
 	int m_icount;
+	
+	scanline_ind16_cb_delegate m_scanline_ind16_cb; 
+	scanline_rgb32_cb_delegate m_scanline_rgb32_cb; 
+	devcb_write_line m_output_int_cb; /* output interrupt callback */
+	to_shiftreg_cb_delegate m_to_shiftreg_cb;  /* shift register write */
+	from_shiftreg_cb_delegate m_from_shiftreg_cb; /* shift register read */
 
 	struct XY
 	{

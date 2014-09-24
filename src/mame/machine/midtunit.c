@@ -396,7 +396,7 @@ void midtunit_state::init_tunit_generic(int sound)
 
 
 	/* default graphics functionality */
-	midtunit_gfx_rom_large = 0;
+	m_gfx_rom_large = 0;
 }
 
 
@@ -500,7 +500,7 @@ DRIVER_INIT_MEMBER(midtunit_state,mk2)
 {
 	/* common init */
 	init_tunit_generic(SOUND_DCS);
-	midtunit_gfx_rom_large = 1;
+	m_gfx_rom_large = 1;
 
 	/* protection */
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x00f20c60, 0x00f20c7f, write16_delegate(FUNC(midtunit_state::mk2_prot_w),this));

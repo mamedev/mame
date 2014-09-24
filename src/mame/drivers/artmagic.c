@@ -44,19 +44,17 @@
  *
  *************************************/
 
-static void update_irq_state(running_machine &machine)
+void artmagic_state::update_irq_state()
 {
-	artmagic_state *state = machine.driver_data<artmagic_state>();
-	state->m_maincpu->set_input_line(4, state->m_tms_irq  ? ASSERT_LINE : CLEAR_LINE);
-	state->m_maincpu->set_input_line(5, state->m_hack_irq ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(4, m_tms_irq  ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(5, m_hack_irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
-static void m68k_gen_int(device_t *device, int state)
+WRITE_LINE_MEMBER(artmagic_state::m68k_gen_int)
 {
-	artmagic_state *drvstate = device->machine().driver_data<artmagic_state>();
-	drvstate->m_tms_irq = state;
-	update_irq_state(device->machine());
+	m_tms_irq = state;
+	update_irq_state();
 }
 
 
@@ -83,7 +81,7 @@ void artmagic_state::machine_start()
 void artmagic_state::machine_reset()
 {
 	m_tms_irq = m_hack_irq = 0;
-	update_irq_state(machine());
+	update_irq_state();
 }
 
 
@@ -121,7 +119,7 @@ void artmagic_state::device_timer(emu_timer &timer, device_timer_id id, int para
 	{
 	case TIMER_IRQ_OFF:
 		m_hack_irq = 0;
-		update_irq_state(machine());
+		update_irq_state();
 		break;
 	default:
 		assert_always(FALSE, "Unknown id in artmagic_state::device_timer");
@@ -136,7 +134,7 @@ READ16_MEMBER(artmagic_state::ultennis_hack_r)
 	if (pc == 0x18c2 || pc == 0x18e4)
 	{
 		m_hack_irq = 1;
-		update_irq_state(machine());
+		update_irq_state();
 		timer_set(attotime::from_usec(1), TIMER_IRQ_OFF);
 	}
 	return ioport("300000")->read();
@@ -474,20 +472,6 @@ ADDRESS_MAP_END
  *  Slave CPU memory handlers
  *
  *************************************/
-
-static const tms340x0_config tms_config =
-{
-	TRUE,                           /* halt on reset */
-	"screen",                       /* the screen operated on */
-	MASTER_CLOCK_40MHz/6,           /* pixel clock */
-	1,                              /* pixels per clock */
-	NULL,                           /* scanline update (indexed16) */
-	artmagic_scanline,              /* scanline update (rgb32) */
-	m68k_gen_int,                   /* generate interrupt */
-	artmagic_to_shiftreg,           /* write to shiftreg function */
-	artmagic_from_shiftreg          /* read from shiftreg function */
-};
-
 
 static ADDRESS_MAP_START( tms_map, AS_PROGRAM, 16, artmagic_state )
 	AM_RANGE(0x00000000, 0x001fffff) AM_RAM AM_SHARE("vram0")
@@ -827,8 +811,14 @@ static MACHINE_CONFIG_START( artmagic, artmagic_state )
 	MCFG_CPU_PROGRAM_MAP(main_map)
 
 	MCFG_CPU_ADD("tms", TMS34010, MASTER_CLOCK_40MHz)
-	MCFG_TMS340X0_CONFIG(tms_config)
 	MCFG_CPU_PROGRAM_MAP(tms_map)
+	MCFG_TMS340X0_HALT_ON_RESET(TRUE) /* halt on reset */
+	MCFG_TMS340X0_PIXEL_CLOCK(MASTER_CLOCK_40MHz/6) /* pixel clock */
+	MCFG_TMS340X0_PIXELS_PER_CLOCK(1) /* pixels per clock */
+	MCFG_TMS340X0_SCANLINE_RGB32_CB(artmagic_state, scanline)              /* scanline update (rgb32) */
+	MCFG_TMS340X0_OUTPUT_INT_CB(WRITELINE(artmagic_state, m68k_gen_int))
+	MCFG_TMS340X0_TO_SHIFTREG_CB(artmagic_state, to_shiftreg)           /* write to shiftreg function */
+	MCFG_TMS340X0_FROM_SHIFTREG_CB(artmagic_state, from_shiftreg)          /* read from shiftreg function */
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 	MCFG_NVRAM_ADD_1FILL("nvram")

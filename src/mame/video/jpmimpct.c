@@ -86,16 +86,14 @@ READ16_MEMBER(jpmimpct_state::jpmimpct_bt477_r)
  *
  *************************************/
 
-void jpmimpct_to_shiftreg(address_space &space, UINT32 address, UINT16 *shiftreg)
+TMS340X0_TO_SHIFTREG_CB_MEMBER(jpmimpct_state::to_shiftreg)
 {
-	jpmimpct_state *state = space.machine().driver_data<jpmimpct_state>();
-	memcpy(shiftreg, &state->m_vram[TOWORD(address)], 512 * sizeof(UINT16));
+	memcpy(shiftreg, &m_vram[TOWORD(address)], 512 * sizeof(UINT16));
 }
 
-void jpmimpct_from_shiftreg(address_space &space, UINT32 address, UINT16 *shiftreg)
+TMS340X0_FROM_SHIFTREG_CB_MEMBER(jpmimpct_state::from_shiftreg)
 {
-	jpmimpct_state *state = space.machine().driver_data<jpmimpct_state>();
-	memcpy(&state->m_vram[TOWORD(address)], shiftreg, 512 * sizeof(UINT16));
+	memcpy(&m_vram[TOWORD(address)], shiftreg, 512 * sizeof(UINT16));
 }
 
 
@@ -105,10 +103,9 @@ void jpmimpct_from_shiftreg(address_space &space, UINT32 address, UINT16 *shiftr
  *
  *************************************/
 
-void jpmimpct_scanline_update(screen_device &screen, bitmap_rgb32 &bitmap, int scanline, const tms34010_display_params *params)
+TMS340X0_SCANLINE_RGB32_CB_MEMBER(jpmimpct_state::scanline_update)
 {
-	jpmimpct_state *state = screen.machine().driver_data<jpmimpct_state>();
-	UINT16 *vram = &state->m_vram[(params->rowaddr << 8) & 0x3ff00];
+	UINT16 *vram = &m_vram[(params->rowaddr << 8) & 0x3ff00];
 	UINT32 *dest = &bitmap.pix32(scanline);
 	int coladdr = params->coladdr;
 	int x;
@@ -116,8 +113,8 @@ void jpmimpct_scanline_update(screen_device &screen, bitmap_rgb32 &bitmap, int s
 	for (x = params->heblnk; x < params->hsblnk; x += 2)
 	{
 		UINT16 pixels = vram[coladdr++ & 0xff];
-		dest[x + 0] = state->m_palette->pen(pixels & 0xff);
-		dest[x + 1] = state->m_palette->pen(pixels >> 8);
+		dest[x + 0] = m_palette->pen(pixels & 0xff);
+		dest[x + 1] = m_palette->pen(pixels >> 8);
 	}
 }
 

@@ -259,7 +259,7 @@ void btoads_state::render_sprite_row(UINT16 *sprite_source, UINT32 address)
  *
  *************************************/
 
-void btoads_state::to_shiftreg(address_space &space, UINT32 address, UINT16 *shiftreg)
+TMS340X0_TO_SHIFTREG_CB_MEMBER(btoads_state::to_shiftreg)
 {
 	address &= ~0x40000000;
 
@@ -286,7 +286,7 @@ void btoads_state::to_shiftreg(address_space &space, UINT32 address, UINT16 *shi
 }
 
 
-void btoads_state::from_shiftreg(address_space &space, UINT32 address, UINT16 *shiftreg)
+TMS340X0_FROM_SHIFTREG_CB_MEMBER(btoads_state::from_shiftreg)
 {
 	address &= ~0x40000000;
 
@@ -318,7 +318,7 @@ void btoads_state::from_shiftreg(address_space &space, UINT32 address, UINT16 *s
  *
  *************************************/
 
-void btoads_state::scanline_update(screen_device &screen, bitmap_rgb32 &bitmap, int scanline, const tms34010_display_params *params)
+TMS340X0_SCANLINE_RGB32_CB_MEMBER(btoads_state::scanline_update)
 {
 	UINT32 fulladdr = ((params->rowaddr << 16) | params->coladdr) >> 4;
 	UINT16 *bg0_base = &m_vram_bg0[(fulladdr + (m_yscroll0 << 10)) & 0x3fc00];

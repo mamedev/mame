@@ -331,6 +331,9 @@ public:
 	DECLARE_WRITE16_MEMBER( hdgsp_io_w );
 
 	DECLARE_WRITE16_MEMBER( hdgsp_protection_w );
+	
+	DECLARE_WRITE_LINE_MEMBER( hdgsp_irq_gen );
+	DECLARE_WRITE_LINE_MEMBER( hdmsp_irq_gen );
 
 	/* ADSP board */
 	DECLARE_READ16_MEMBER( hd68k_adsp_program_r );
@@ -436,6 +439,11 @@ public:
 	DECLARE_READ32_MEMBER(hdds3xdsp_serial_rx_callback);
 
 	/*----------- defined in video/harddriv.c -----------*/
+	TMS340X0_TO_SHIFTREG_CB_MEMBER(hdgsp_write_to_shiftreg);
+	TMS340X0_FROM_SHIFTREG_CB_MEMBER(hdgsp_read_from_shiftreg);
+	
+	void update_palette_bank(int newbank);
+	
 	DECLARE_READ16_MEMBER( hdgsp_control_lo_r );
 	DECLARE_WRITE16_MEMBER( hdgsp_control_lo_w );
 	DECLARE_READ16_MEMBER( hdgsp_control_hi_r );
@@ -456,22 +464,7 @@ public:
 	/* DS III/IV board */
 	TIMER_DEVICE_CALLBACK_MEMBER( ds3sdsp_internal_timer_callback );
 	TIMER_DEVICE_CALLBACK_MEMBER( ds3xdsp_internal_timer_callback );
-
+	
+	TMS340X0_SCANLINE_IND16_CB_MEMBER(scanline_driver);
+	TMS340X0_SCANLINE_IND16_CB_MEMBER(scanline_multisync);
 };
-
-
-/*----------- defined in machine/harddriv.c -----------*/
-
-/* Driver/Multisync board */
-void hdgsp_irq_gen(device_t *device, int state);
-void hdmsp_irq_gen(device_t *device, int state);
-
-
-
-/*----------- defined in video/harddriv.c -----------*/
-
-void hdgsp_write_to_shiftreg(address_space &space, UINT32 address, UINT16 *shiftreg);
-void hdgsp_read_from_shiftreg(address_space &space, UINT32 address, UINT16 *shiftreg);
-
-void harddriv_scanline_driver(screen_device &screen, bitmap_ind16 &bitmap, int scanline, const tms34010_display_params *params);
-void harddriv_scanline_multisync(screen_device &screen, bitmap_ind16 &bitmap, int scanline, const tms34010_display_params *params);

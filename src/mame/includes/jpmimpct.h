@@ -106,7 +106,12 @@ public:
 	DECLARE_READ8_MEMBER(hopper_c_r);
 	DECLARE_WRITE8_MEMBER(payen_a_w);
 	DECLARE_WRITE8_MEMBER(display_c_w);
-
+	
+	DECLARE_WRITE_LINE_MEMBER(tms_irq);
+	TMS340X0_TO_SHIFTREG_CB_MEMBER(to_shiftreg);
+	TMS340X0_FROM_SHIFTREG_CB_MEMBER(from_shiftreg);
+	TMS340X0_SCANLINE_RGB32_CB_MEMBER(scanline_update);
+	
 	DECLARE_MACHINE_START(jpmimpct);
 	DECLARE_MACHINE_RESET(jpmimpct);
 	DECLARE_VIDEO_START(jpmimpct);
@@ -119,9 +124,3 @@ public:
 	optional_device<palette_device> m_palette;
 	optional_device<tms34010_device> m_dsp;
 };
-
-
-/*----------- defined in video/jpmimpct.c -----------*/
-void jpmimpct_to_shiftreg(address_space &space, UINT32 address, UINT16 *shiftreg);
-void jpmimpct_from_shiftreg(address_space &space, UINT32 address, UINT16 *shiftreg);
-void jpmimpct_scanline_update(screen_device &screen, bitmap_rgb32 &bitmap, int scanline, const tms34010_display_params *params);

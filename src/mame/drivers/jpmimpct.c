@@ -819,25 +819,11 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static void jpmimpct_tms_irq(device_t *device, int state)
+WRITE_LINE_MEMBER(jpmimpct_state::tms_irq)
 {
-	jpmimpct_state *drvstate = device->machine().driver_data<jpmimpct_state>();
-	drvstate->m_tms_irq = state;
-	drvstate->update_irqs();
+	m_tms_irq = state;
+	update_irqs();
 }
-
-static const tms340x0_config tms_config =
-{
-	TRUE,                       /* halt on reset */
-	"screen",                   /* the screen operated on */
-	40000000/16,                /* pixel clock */
-	4,                          /* pixels per clock */
-	NULL,                       /* scanline updater (indexed16) */
-	jpmimpct_scanline_update,   /* scanline updater (rgb32) */
-	jpmimpct_tms_irq,           /* generate interrupt */
-	jpmimpct_to_shiftreg,       /* write to shiftreg function */
-	jpmimpct_from_shiftreg      /* read from shiftreg function */
-};
 
 
 /*************************************
@@ -851,8 +837,14 @@ static MACHINE_CONFIG_START( jpmimpct, jpmimpct_state )
 	MCFG_CPU_PROGRAM_MAP(m68k_program_map)
 
 	MCFG_CPU_ADD("dsp", TMS34010, 40000000)
-	MCFG_TMS340X0_CONFIG(tms_config)
 	MCFG_CPU_PROGRAM_MAP(tms_program_map)
+	MCFG_TMS340X0_HALT_ON_RESET(TRUE) /* halt on reset */
+	MCFG_TMS340X0_PIXEL_CLOCK(40000000/16) /* pixel clock */
+	MCFG_TMS340X0_PIXELS_PER_CLOCK(4) /* pixels per clock */
+	MCFG_TMS340X0_SCANLINE_RGB32_CB(jpmimpct_state, scanline_update)   /* scanline updater (rgb32) */
+	MCFG_TMS340X0_OUTPUT_INT_CB(WRITELINE(jpmimpct_state, tms_irq))
+	MCFG_TMS340X0_TO_SHIFTREG_CB(jpmimpct_state, to_shiftreg)       /* write to shiftreg function */
+	MCFG_TMS340X0_FROM_SHIFTREG_CB(jpmimpct_state, from_shiftreg)      /* read from shiftreg function */
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(30000))
 	MCFG_MACHINE_START_OVERRIDE(jpmimpct_state,jpmimpct)

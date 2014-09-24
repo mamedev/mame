@@ -41,7 +41,6 @@ enum
 
 
 /* graphics-related variables */
-		UINT8   midtunit_gfx_rom_large;
 static UINT16   midtunit_control;
 
 /* videoram-related variables */
@@ -111,14 +110,14 @@ VIDEO_START_MEMBER(midtunit_state,midtunit)
 VIDEO_START_MEMBER(midwunit_state,midwunit)
 {
 	VIDEO_START_CALL_MEMBER(midtunit);
-	midtunit_gfx_rom_large = 1;
+	m_gfx_rom_large = 1;
 }
 
 
 VIDEO_START_MEMBER(midxunit_state,midxunit)
 {
 	VIDEO_START_CALL_MEMBER(midtunit);
-	midtunit_gfx_rom_large = 1;
+	m_gfx_rom_large = 1;
 	videobank_select = 1;
 }
 
@@ -224,13 +223,13 @@ READ16_MEMBER(midtunit_state::midtunit_vram_color_r)
  *
  *************************************/
 
-void midtunit_to_shiftreg(address_space &space, UINT32 address, UINT16 *shiftreg)
+TMS340X0_TO_SHIFTREG_CB_MEMBER(midtunit_state::to_shiftreg)
 {
 	memcpy(shiftreg, &local_videoram[address >> 3], 2 * 512 * sizeof(UINT16));
 }
 
 
-void midtunit_from_shiftreg(address_space &space, UINT32 address, UINT16 *shiftreg)
+TMS340X0_FROM_SHIFTREG_CB_MEMBER(midtunit_state::from_shiftreg)
 {
 	memcpy(&local_videoram[address >> 3], shiftreg, 2 * 512 * sizeof(UINT16));
 }
@@ -254,7 +253,7 @@ WRITE16_MEMBER(midtunit_state::midtunit_control_w)
 	COMBINE_DATA(&midtunit_control);
 
 	/* gfx bank select is bit 7 */
-	if (!(midtunit_control & 0x0080) || !midtunit_gfx_rom_large)
+	if (!(midtunit_control & 0x0080) || !m_gfx_rom_large)
 		gfxbank_offset[0] = 0x000000;
 	else
 		gfxbank_offset[0] = 0x800000;
@@ -745,7 +744,7 @@ if (LOG_DMA)
 		gfxoffset = 0;
 
 	/* determine the location */
-	if (!midtunit_gfx_rom_large && gfxoffset >= 0x2000000)
+	if (!m_gfx_rom_large && gfxoffset >= 0x2000000)
 		gfxoffset -= 0x2000000;
 	if (gfxoffset >= 0xf8000000)
 		gfxoffset -= 0xf8000000;
@@ -811,7 +810,7 @@ skipdma:
  *
  *************************************/
 
-void midtunit_scanline_update(screen_device &screen, bitmap_ind16 &bitmap, int scanline, const tms34010_display_params *params)
+TMS340X0_SCANLINE_IND16_CB_MEMBER(midtunit_state::scanline_update)
 {
 	UINT16 *src = &local_videoram[(params->rowaddr << 9) & 0x3fe00];
 	UINT16 *dest = &bitmap.pix16(scanline);
@@ -823,7 +822,7 @@ void midtunit_scanline_update(screen_device &screen, bitmap_ind16 &bitmap, int s
 		dest[x] = src[coladdr++ & 0x1ff] & 0x7fff;
 }
 
-void midxunit_scanline_update(screen_device &screen, bitmap_ind16 &bitmap, int scanline, const tms34010_display_params *params)
+TMS340X0_SCANLINE_IND16_CB_MEMBER(midxunit_state::scanline_update)
 {
 	UINT32 fulladdr = ((params->rowaddr << 16) | params->coladdr) >> 3;
 	UINT16 *src = &local_videoram[fulladdr & 0x3fe00];

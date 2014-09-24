@@ -21,13 +21,14 @@ class xtheball_state : public driver_device
 public:
 	xtheball_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
+			m_maincpu(*this, "maincpu"),
 			m_tlc34076(*this, "tlc34076"),
 			m_vram_bg(*this, "vrabg"),
 			m_vram_fg(*this, "vrafg"),
 			m_analog_x(*this, "ANALOGX"),
-			m_analog_y(*this, "ANALOGY"),
-			m_maincpu(*this, "maincpu") { }
+			m_analog_y(*this, "ANALOGY") { }
 
+	required_device<cpu_device> m_maincpu;
 	required_device<tlc34076_device> m_tlc34076;
 	required_shared_ptr<UINT16> m_vram_bg;
 	required_shared_ptr<UINT16> m_vram_fg;
@@ -37,7 +38,9 @@ public:
 	DECLARE_WRITE16_MEMBER(bit_controls_w);
 	DECLARE_READ16_MEMBER(analogx_r);
 	DECLARE_READ16_MEMBER(analogy_watchdog_r);
-	required_device<cpu_device> m_maincpu;
+	TMS340X0_TO_SHIFTREG_CB_MEMBER(to_shiftreg);
+	TMS340X0_FROM_SHIFTREG_CB_MEMBER(from_shiftreg);
+	TMS340X0_SCANLINE_RGB32_CB_MEMBER(scanline_update);
 };
 
 
@@ -49,20 +52,19 @@ public:
  *
  *************************************/
 
-static void xtheball_scanline_update(screen_device &screen, bitmap_rgb32 &bitmap, int scanline, const tms34010_display_params *params)
+TMS340X0_SCANLINE_RGB32_CB_MEMBER(xtheball_state::scanline_update)
 {
-	xtheball_state *state = screen.machine().driver_data<xtheball_state>();
-	UINT16 *srcbg = &state->m_vram_bg[(params->rowaddr << 8) & 0xff00];
+	UINT16 *srcbg = &m_vram_bg[(params->rowaddr << 8) & 0xff00];
 	UINT32 *dest = &bitmap.pix32(scanline);
-	const rgb_t *pens = state->m_tlc34076->get_pens();
+	const rgb_t *pens = m_tlc34076->get_pens();
 	int coladdr = params->coladdr;
 	int x;
 
 	/* bit value 0x13 controls which foreground mode to use */
-	if (!state->m_bitvals[0x13])
+	if (!m_bitvals[0x13])
 	{
 		/* mode 0: foreground is the same as background */
-		UINT16 *srcfg = &state->m_vram_fg[(params->rowaddr << 8) & 0xff00];
+		UINT16 *srcfg = &m_vram_fg[(params->rowaddr << 8) & 0xff00];
 
 		for (x = params->heblnk; x < params->hsblnk; x += 2, coladdr++)
 		{
@@ -77,7 +79,7 @@ static void xtheball_scanline_update(screen_device &screen, bitmap_rgb32 &bitmap
 	{
 		/* mode 1: foreground is half background resolution in */
 		/* X and supports two pages */
-		UINT16 *srcfg = &state->m_vram_fg[(params->rowaddr << 7) & 0xff00];
+		UINT16 *srcfg = &m_vram_fg[(params->rowaddr << 7) & 0xff00];
 
 		for (x = params->heblnk; x < params->hsblnk; x += 2, coladdr++)
 		{
@@ -99,25 +101,23 @@ static void xtheball_scanline_update(screen_device &screen, bitmap_rgb32 &bitmap
  *
  *************************************/
 
-static void xtheball_to_shiftreg(address_space &space, UINT32 address, UINT16 *shiftreg)
+TMS340X0_TO_SHIFTREG_CB_MEMBER(xtheball_state::to_shiftreg)
 {
-	xtheball_state *state = space.machine().driver_data<xtheball_state>();
 	if (address >= 0x01000000 && address <= 0x010fffff)
-		memcpy(shiftreg, &state->m_vram_bg[TOWORD(address & 0xff000)], TOBYTE(0x1000));
+		memcpy(shiftreg, &m_vram_bg[TOWORD(address & 0xff000)], TOBYTE(0x1000));
 	else if (address >= 0x02000000 && address <= 0x020fffff)
-		memcpy(shiftreg, &state->m_vram_fg[TOWORD(address & 0xff000)], TOBYTE(0x1000));
+		memcpy(shiftreg, &m_vram_fg[TOWORD(address & 0xff000)], TOBYTE(0x1000));
 	else
 		logerror("%s:xtheball_to_shiftreg(%08X)\n", space.machine().describe_context(), address);
 }
 
 
-static void xtheball_from_shiftreg(address_space &space, UINT32 address, UINT16 *shiftreg)
+TMS340X0_FROM_SHIFTREG_CB_MEMBER(xtheball_state::from_shiftreg)
 {
-	xtheball_state *state = space.machine().driver_data<xtheball_state>();
 	if (address >= 0x01000000 && address <= 0x010fffff)
-		memcpy(&state->m_vram_bg[TOWORD(address & 0xff000)], shiftreg, TOBYTE(0x1000));
+		memcpy(&m_vram_bg[TOWORD(address & 0xff000)], shiftreg, TOBYTE(0x1000));
 	else if (address >= 0x02000000 && address <= 0x020fffff)
-		memcpy(&state->m_vram_fg[TOWORD(address & 0xff000)], shiftreg, TOBYTE(0x1000));
+		memcpy(&m_vram_fg[TOWORD(address & 0xff000)], shiftreg, TOBYTE(0x1000));
 	else
 		logerror("%s:xtheball_from_shiftreg(%08X)\n", space.machine().describe_context(), address);
 }
@@ -315,28 +315,6 @@ static INPUT_PORTS_START( xtheball )
 INPUT_PORTS_END
 
 
-
-/*************************************
- *
- *  34010 configuration
- *
- *************************************/
-
-static const tms340x0_config tms_config =
-{
-	FALSE,                          /* halt on reset */
-	"screen",                       /* the screen operated on */
-	10000000,                       /* pixel clock */
-	1,                              /* pixels per clock */
-	NULL,                           /* scanline callback (indexed16) */
-	xtheball_scanline_update,       /* scanline callback (rgb32) */
-	NULL,                           /* generate interrupt */
-	xtheball_to_shiftreg,           /* write to shiftreg function */
-	xtheball_from_shiftreg          /* read from shiftreg function */
-};
-
-
-
 /*************************************
  *
  *  Machine drivers
@@ -346,8 +324,13 @@ static const tms340x0_config tms_config =
 static MACHINE_CONFIG_START( xtheball, xtheball_state )
 
 	MCFG_CPU_ADD("maincpu", TMS34010, 40000000)
-	MCFG_TMS340X0_CONFIG(tms_config)
 	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_TMS340X0_HALT_ON_RESET(FALSE) /* halt on reset */
+	MCFG_TMS340X0_PIXEL_CLOCK(10000000) /* pixel clock */
+	MCFG_TMS340X0_PIXELS_PER_CLOCK(1) /* pixels per clock */	
+	MCFG_TMS340X0_SCANLINE_RGB32_CB(xtheball_state, scanline_update)     /* scanline updater (rgb32) */
+	MCFG_TMS340X0_TO_SHIFTREG_CB(xtheball_state, to_shiftreg)  /* write to shiftreg function */
+	MCFG_TMS340X0_FROM_SHIFTREG_CB(xtheball_state, from_shiftreg) /* read from shiftreg function */
 	MCFG_CPU_PERIODIC_INT_DRIVER(xtheball_state, irq1_line_hold,  15000)
 
 	MCFG_NVRAM_ADD_1FILL("nvram")

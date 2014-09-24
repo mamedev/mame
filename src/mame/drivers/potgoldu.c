@@ -27,9 +27,13 @@ public:
 	potgold_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu") { }
+	
+		required_device<cpu_device> m_maincpu;
+	
 	virtual void machine_reset();
 	virtual void video_start();
-	required_device<cpu_device> m_maincpu;
+	
+	TMS340X0_SCANLINE_RGB32_CB_MEMBER(scanline_update);
 };
 
 
@@ -45,7 +49,7 @@ void potgold_state::video_start()
 {
 }
 
-static void scanline_update(screen_device &screen, bitmap_rgb32 &bitmap, int scanline, const tms34010_display_params *params)
+TMS340X0_SCANLINE_RGB32_CB_MEMBER(potgold_state::scanline_update)
 {
 }
 
@@ -64,28 +68,15 @@ static INPUT_PORTS_START( potgold )
 INPUT_PORTS_END
 
 
-static const tms340x0_config tms_config =
-{
-	FALSE,                          /* halt on reset */
-	"screen",                       /* the screen operated on */
-	VIDEO_CLOCK/2,                  /* pixel clock */
-	1,                              /* pixels per clock */
-	NULL,                           /* scanline callback (indexed16) */
-	scanline_update,                /* scanline callback (rgb32) */
-	NULL,                           /* generate interrupt */
-	NULL,                           /* write to shiftreg function */
-	NULL                            /* read from shiftreg function */
-};
-
-
 static MACHINE_CONFIG_START( potgold, potgold_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS34010, XTAL_40MHz)
-	MCFG_TMS340X0_CONFIG(tms_config)
 	MCFG_CPU_PROGRAM_MAP(potgold_map)
-
-
+	MCFG_TMS340X0_HALT_ON_RESET(FALSE) /* halt on reset */
+	MCFG_TMS340X0_PIXEL_CLOCK(VIDEO_CLOCK/2) /* pixel clock */
+	MCFG_TMS340X0_PIXELS_PER_CLOCK(1) /* pixels per clock */
+	MCFG_TMS340X0_SCANLINE_RGB32_CB(potgold_state, scanline_update)  /* scanline callback (rgb32) */
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(VIDEO_CLOCK/2, 444, 0, 320, 233, 0, 200)

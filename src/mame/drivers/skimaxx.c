@@ -45,16 +45,21 @@ class skimaxx_state : public driver_device
 public:
 	skimaxx_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_blitter_regs(*this, "blitter_regs"),
-		m_fpga_ctrl(*this, "fpga_ctrl"),
-		m_fg_buffer(*this, "fg_buffer"),
 		m_maincpu(*this, "maincpu"),
 		m_subcpu(*this, "subcpu"),
-		m_tms(*this, "tms") { }
+		m_tms(*this, "tms"),
+		m_blitter_regs(*this, "blitter_regs"),
+		m_fpga_ctrl(*this, "fpga_ctrl"),
+		m_fg_buffer(*this, "fg_buffer") { }
 
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_subcpu;
+	required_device<tms34010_device> m_tms;
+	
 	required_shared_ptr<UINT32> m_blitter_regs;
 	required_shared_ptr<UINT32> m_fpga_ctrl;
 	required_shared_ptr<UINT16> m_fg_buffer;
+	
 	UINT32 *m_bg_buffer;
 	UINT32 *m_bg_buffer_front;
 	UINT32 *m_bg_buffer_back;
@@ -64,6 +69,7 @@ public:
 	UINT32 m_blitter_src_dx;
 	UINT32 m_blitter_src_y;
 	UINT32 m_blitter_src_dy;
+	
 	DECLARE_WRITE32_MEMBER(skimaxx_blitter_w);
 	DECLARE_READ32_MEMBER(skimaxx_blitter_r);
 	DECLARE_WRITE32_MEMBER(skimaxx_fpga_ctrl_w);
@@ -72,11 +78,14 @@ public:
 	DECLARE_WRITE32_MEMBER(skimaxx_unk1_w);
 	DECLARE_WRITE32_MEMBER(skimaxx_sub_ctrl_w);
 	DECLARE_READ32_MEMBER(skimaxx_analog_r);
+	DECLARE_WRITE_LINE_MEMBER(tms_irq);
+	
+	TMS340X0_TO_SHIFTREG_CB_MEMBER(to_shiftreg);
+	TMS340X0_FROM_SHIFTREG_CB_MEMBER(from_shiftreg);
+	TMS340X0_SCANLINE_IND16_CB_MEMBER(scanline_update);
+	
 	virtual void machine_reset();
 	virtual void video_start();
-	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_subcpu;
-	required_device<tms34010_device> m_tms;
 };
 
 
@@ -160,16 +169,14 @@ void skimaxx_state::video_start()
  *************************************/
 
 // TODO: Might not be used
-static void skimaxx_to_shiftreg(address_space &space, UINT32 address, UINT16 *shiftreg)
+TMS340X0_TO_SHIFTREG_CB_MEMBER(skimaxx_state::to_shiftreg)
 {
-	skimaxx_state *state = space.machine().driver_data<skimaxx_state>();
-	memcpy(shiftreg, &state->m_fg_buffer[TOWORD(address)], 512 * sizeof(UINT16));
+	memcpy(shiftreg, &m_fg_buffer[TOWORD(address)], 512 * sizeof(UINT16));
 }
 
-static void skimaxx_from_shiftreg(address_space &space, UINT32 address, UINT16 *shiftreg)
+TMS340X0_FROM_SHIFTREG_CB_MEMBER(skimaxx_state::from_shiftreg)
 {
-	skimaxx_state *state = space.machine().driver_data<skimaxx_state>();
-	memcpy(&state->m_fg_buffer[TOWORD(address)], shiftreg, 512 * sizeof(UINT16));
+	memcpy(&m_fg_buffer[TOWORD(address)], shiftreg, 512 * sizeof(UINT16));
 }
 
 
@@ -179,16 +186,15 @@ static void skimaxx_from_shiftreg(address_space &space, UINT32 address, UINT16 *
  *
  *************************************/
 
-static void skimaxx_scanline_update(screen_device &screen, bitmap_ind16 &bitmap, int scanline, const tms34010_display_params *params)
+TMS340X0_SCANLINE_IND16_CB_MEMBER(skimaxx_state::scanline_update)
 {
-	skimaxx_state *state = screen.machine().driver_data<skimaxx_state>();
 	// TODO: This isn't correct. I just hacked it together quickly so I could see something!
 
 	if (params->rowaddr >= 0x220)
 	{
 		UINT32 rowaddr = (params->rowaddr - 0x220);
-		UINT16 *fg = &state->m_fg_buffer[rowaddr << 8];
-		UINT32 *bg = &state->m_bg_buffer_front[rowaddr/2 * 1024/2];
+		UINT16 *fg = &m_fg_buffer[rowaddr << 8];
+		UINT32 *bg = &m_bg_buffer_front[rowaddr/2 * 1024/2];
 		UINT16 *dest = &bitmap.pix16(scanline);
 		//int coladdr = params->coladdr;
 		int x;
@@ -462,24 +468,10 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static void skimaxx_tms_irq(device_t *device, int state)
+WRITE_LINE_MEMBER(skimaxx_state::tms_irq)
 {
 	// TODO
 }
-
-static const tms340x0_config tms_config =
-{
-	FALSE,                     /* halt on reset */
-	"screen",                  /* the screen operated on */
-	50000000/8,                /* pixel clock */
-	2,                         /* pixels per clock */
-	skimaxx_scanline_update,   /* scanline updater (indexed16) */
-	NULL,                      /* scanline updater (rgb32) */
-	skimaxx_tms_irq,           /* generate interrupt */
-	skimaxx_to_shiftreg,       /* write to shiftreg function */
-	skimaxx_from_shiftreg      /* read from shiftreg function */
-};
-
 
 /*************************************
  *
@@ -508,8 +500,14 @@ static MACHINE_CONFIG_START( skimaxx, skimaxx_state )
 
 	/* video hardware */
 	MCFG_CPU_ADD("tms", TMS34010, XTAL_50MHz)
-	MCFG_TMS340X0_CONFIG(tms_config)
 	MCFG_CPU_PROGRAM_MAP(tms_program_map)
+	MCFG_TMS340X0_HALT_ON_RESET(FALSE) /* halt on reset */
+	MCFG_TMS340X0_PIXEL_CLOCK(50000000/8) /* pixel clock */
+	MCFG_TMS340X0_PIXELS_PER_CLOCK(2) /* pixels per clock */
+	MCFG_TMS340X0_SCANLINE_IND16_CB(skimaxx_state, scanline_update)     /* scanline updater (indexed16) */
+	MCFG_TMS340X0_OUTPUT_INT_CB(WRITELINE(skimaxx_state, tms_irq))
+	MCFG_TMS340X0_TO_SHIFTREG_CB(skimaxx_state, to_shiftreg)  /* write to shiftreg function */
+	MCFG_TMS340X0_FROM_SHIFTREG_CB(skimaxx_state, from_shiftreg) /* read from shiftreg function */
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 //  MCFG_SCREEN_RAW_PARAMS(40000000/4, 156*4, 0, 100*4, 328, 0, 300) // TODO - Wrong but TMS overrides it anyway

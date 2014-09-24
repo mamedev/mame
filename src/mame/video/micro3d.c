@@ -60,20 +60,18 @@ void micro3d_state::video_reset()
  *
  *************************************/
 
-void micro3d_scanline_update(screen_device &screen, bitmap_ind16 &bitmap, int scanline, const tms34010_display_params *params)
+TMS340X0_SCANLINE_IND16_CB_MEMBER(micro3d_state::scanline_update)
 {
-	micro3d_state *state = screen.machine().driver_data<micro3d_state>();
-
-	UINT16 *src = &state->m_micro3d_sprite_vram[(params->rowaddr << 8) & 0x7fe00];
+	UINT16 *src = &m_micro3d_sprite_vram[(params->rowaddr << 8) & 0x7fe00];
 	UINT16 *dest = &bitmap.pix16(scanline);
 	int coladdr = params->coladdr;
-	int sd_11_7 = (state->m_creg & 0x1f) << 7;
+	int sd_11_7 = (m_creg & 0x1f) << 7;
 	int x;
 
 	UINT16 *frame_src;
 
 	scanline = MAX((scanline - params->veblnk), 0);
-	frame_src = state->m_frame_buffers[state->m_display_buffer] + (scanline << 10);
+	frame_src = m_frame_buffers[m_display_buffer] + (scanline << 10);
 
 	/* TODO: XFER3DK - X/Y offsets for 3D */
 
@@ -125,7 +123,7 @@ WRITE16_MEMBER(micro3d_state::micro3d_xfer3dk_w)
 	m_xfer3dk = data;
 }
 
-void micro3d_tms_interrupt(device_t *device, int state)
+WRITE_LINE_MEMBER(micro3d_state::tms_interrupt)
 {
 //  mc68901_int_gen(device->machine(), GPIP4);
 }

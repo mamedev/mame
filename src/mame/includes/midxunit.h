@@ -45,4 +45,5 @@ public:
 	DECLARE_MACHINE_RESET(midxunit);
 	DECLARE_VIDEO_START(midxunit);
 	void register_state_saving();
+	TMS340X0_SCANLINE_IND16_CB_MEMBER(scanline_update);
 };

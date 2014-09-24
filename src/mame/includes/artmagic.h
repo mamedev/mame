@@ -58,6 +58,10 @@ public:
 	DECLARE_READ16_MEMBER(unk_r);
 	DECLARE_READ16_MEMBER(artmagic_blitter_r);
 	DECLARE_WRITE16_MEMBER(artmagic_blitter_w);
+	DECLARE_WRITE_LINE_MEMBER(m68k_gen_int);
+	TMS340X0_TO_SHIFTREG_CB_MEMBER(to_shiftreg);
+	TMS340X0_FROM_SHIFTREG_CB_MEMBER(from_shiftreg);
+	TMS340X0_SCANLINE_RGB32_CB_MEMBER(scanline);
 	DECLARE_CUSTOM_INPUT_MEMBER(prot_r);
 	DECLARE_DRIVER_INIT(shtstar);
 	DECLARE_DRIVER_INIT(cheesech);
@@ -69,14 +73,9 @@ public:
 	void decrypt_cheesech();
 	void decrypt_ultennis();
 	void execute_blit();
+	void update_irq_state();
 	inline UINT16 *address_to_vram(offs_t *address);
 	
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };
-
-
-/*----------- defined in video/artmagic.c -----------*/
-void artmagic_to_shiftreg(address_space &space, offs_t address, UINT16 *data);
-void artmagic_from_shiftreg(address_space &space, offs_t address, UINT16 *data);
-void artmagic_scanline(screen_device &screen, bitmap_rgb32 &bitmap, int scanline, const tms34010_display_params *params);

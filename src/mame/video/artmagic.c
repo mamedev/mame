@@ -59,21 +59,19 @@ void artmagic_state::video_start()
  *
  *************************************/
 
-void artmagic_to_shiftreg(address_space &space, offs_t address, UINT16 *data)
+TMS340X0_TO_SHIFTREG_CB_MEMBER(artmagic_state::to_shiftreg)
 {
-	artmagic_state *state = space.machine().driver_data<artmagic_state>();
-	UINT16 *vram = state->address_to_vram(&address);
+	UINT16 *vram = address_to_vram(&address);
 	if (vram)
-		memcpy(data, &vram[address], TOBYTE(0x2000));
+		memcpy(shiftreg, &vram[address], TOBYTE(0x2000));
 }
 
 
-void artmagic_from_shiftreg(address_space &space, offs_t address, UINT16 *data)
+TMS340X0_FROM_SHIFTREG_CB_MEMBER(artmagic_state::from_shiftreg)
 {
-	artmagic_state *state = space.machine().driver_data<artmagic_state>();
-	UINT16 *vram = state->address_to_vram(&address);
+	UINT16 *vram = address_to_vram(&address);
 	if (vram)
-		memcpy(&vram[address], data, TOBYTE(0x2000));
+		memcpy(&vram[address], shiftreg, TOBYTE(0x2000));
 }
 
 
@@ -336,13 +334,12 @@ WRITE16_MEMBER(artmagic_state::artmagic_blitter_w)
  *
  *************************************/
 
-void artmagic_scanline(screen_device &screen, bitmap_rgb32 &bitmap, int scanline, const tms34010_display_params *params)
+TMS340X0_SCANLINE_RGB32_CB_MEMBER(artmagic_state::scanline)
 {
-	artmagic_state *state = screen.machine().driver_data<artmagic_state>();
 	offs_t offset = (params->rowaddr << 12) & 0x7ff000;
-	UINT16 *vram = state->address_to_vram(&offset);
+	UINT16 *vram = address_to_vram(&offset);
 	UINT32 *dest = &bitmap.pix32(scanline);
-	const rgb_t *pens = state->m_tlc34076->get_pens();
+	const rgb_t *pens = m_tlc34076->get_pens();
 	int coladdr = params->coladdr << 1;
 	int x;
 
