@@ -678,7 +678,34 @@ static INPUT_PORTS_START(dodgecty)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 ) PORT_NAME( "Hold 5 / Double Up / Hi" )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_BET )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_MODIFY("PIO1_PORTB")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(2)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START(americna)
+	PORT_INCLUDE(meritm_crt250)
+
+	PORT_MODIFY("PIO1_PORTA")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD1 ) PORT_NAME( "Hold 1 / Take / Lo" )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 ) PORT_NAME( "Hold 5 / Double Up / Hi" )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_BET ) PORT_NAME("Bet / Raise")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_STAND ) PORT_NAME( "Hi-Score" )
+
+	PORT_MODIFY("PIO1_PORTB")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(2)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_S) PORT_NAME("Setup / Test")
+
+	PORT_MODIFY("DSW")
+	PORT_DIPNAME( 0x10, 0x10, "Points Per Coin" ) PORT_DIPLOCATION("SW1:5")
+	PORT_DIPSETTING(    0x10, "1 Points / Coin" )
+	PORT_DIPSETTING(    0x00, "5 Points / Coin" )
+	PORT_DIPNAME( 0xc0, 0xc0, "Max Play" )       PORT_DIPLOCATION("SW1:7,8")
+	PORT_DIPSETTING(    0x40, "10" )
+	PORT_DIPSETTING(    0xc0, "20" )
+	PORT_DIPSETTING(    0x80, "50" )
+	PORT_DIPSETTING(    0x00, "50 Raise Yes / 99 Raise No" )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START(realbrod)
@@ -1129,6 +1156,28 @@ static MACHINE_CONFIG_DERIVED( meritm_crt260, meritm_crt250 )
 MACHINE_CONFIG_END
 
 
+/*
+
+Americana - Standard 5 card draw Joker Poker.
+
+Pressing Service Mode "F2" brings up a Coins in for Coin1 & Coin2 plus total coins.
+
+Entering the Setup menu "S":
+ Hold3 switches selection choice.
+ Hold5 advances through the list.
+ Hi-Score will clear the High Scores
+
+Is the "Stand" & "Hi-Score" keys the same? Without a sperate Stand key, you cannot set up the "TWIN" bonus feature
+
+*/
+
+ROM_START( americna ) /* Uses a small daughter card CRT-251 & Dallas DS1225Y NV SRAM */
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "9131-00_u9-2.u9",   0x00000, 0x10000, CRC(8a741fb6) SHA1(2d77c67e5a0bdaf6199c31c4055df214672db3e1) ) /* 9131-00 U9-2  888020 */
+	ROM_LOAD( "9131-00_u10-0.u10", 0x10000, 0x10000, CRC(d6f72934) SHA1(4f3d6a5227a3b0fc298533a03cc0a32f8e2f3840) )
+	ROM_LOAD( "9131-00_u11-0.u11", 0x20000, 0x10000, CRC(f2db6f5d) SHA1(3f734a7e8c72c14bf4a3e6f595819311739394d3) )
+ROM_END
+
 ROM_START( dodgecty ) /* Uses a small daughter card CRT-255 & Dallas DS1225Y NV SRAM */
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "9131-02_u9-2t.u9",  0x00000, 0x10000, CRC(22e73039) SHA1(368f03b31f7c3cb81a95b20d1cb954e8557d2017) ) /* 9131-02 U9-2T  880111 */
@@ -1392,7 +1441,7 @@ In the rom there is text for:
   Hi-Score             Yes / No
 
 It's unknown if the above is used for regional versions of the game or left over from previous
- versions of the game such as Dodge City which also contains many of the same text strings.
+ versions of games such as Americana or Dodge City which also contains many of the same text strings.
 It's currently unknown how to access / enable those features or if it's possible to do so.
 
 */
@@ -2187,6 +2236,7 @@ DRIVER_INIT_MEMBER(meritm_state,megat3te)
 };
 
 /* CRT 250 */
+GAME( 1987, americna,  0,        meritm_crt250, americna, driver_device, 0,        ROT0, "Merit", "Americana (9131-00)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1988, dodgecty,  0,        meritm_crt250, dodgecty, driver_device, 0,        ROT0, "Merit", "Dodge City (9131-02)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1988, pitboss2,  0,        meritm_crt250, pitboss2, driver_device, 0,        ROT0, "Merit", "Pit Boss II (9221-01C)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1988, spitboss,  0,        meritm_crt250, spitboss, driver_device, 0,        ROT0, "Merit", "Super Pit Boss (9221-02A)", GAME_IMPERFECT_GRAPHICS )

@@ -54,11 +54,11 @@ Notes: it's important that "user1" is 0xa0000 bytes with empty space filled
 
 Merit Riviera Notes - There are several known versions:
   Riviera Hi-Score
-  Riviera Americana (not dumped)
   Riviera Super Star (not dumped)
   Riviera Montana Version (with journal printer, not dumped)
   Riviera Tennessee Draw (not dumped)
   Michigan Superstar Draw Poker (not dumped)
+  Americana
 
   There are several law suites over the Riviera games. Riviera Distributors Inc. bought earlier versions
   of the various video poker games from Merit. RDI then licensed the games to Michigan Coin Op-Vending
