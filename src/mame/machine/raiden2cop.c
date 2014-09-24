@@ -178,6 +178,13 @@ UINT16 raiden2cop_device::cop_read_word(address_space &space, int address)
 	else return space.read_word(address);
 }
 
+UINT8 raiden2cop_device::cop_read_byte(address_space &space, int address)
+{
+	if (m_cpu_is_68k) return space.read_byte(address ^ 3);
+	else return space.read_byte(address);
+}
+
+
 /*** Command Table uploads ***/
 
 
@@ -783,30 +790,17 @@ void raiden2cop_device::LEGACY_execute_0205(address_space &space, int offset, UI
 */
 
 // triggered with 0904 0905
-/* X Se Dae and Zero Team uses this variant */
+
 void raiden2cop_device::execute_0904(address_space &space, int offset, UINT16 data)
 {
-	space.write_dword(cop_regs[0] + 16 + offset * 4, space.read_dword(cop_regs[0] + 16 + offset * 4) - space.read_dword(cop_regs[0] + 0x28 + offset * 4));
+	if (data&0x0001)
+		space.write_dword(cop_regs[0] + 16 + offset * 4, space.read_dword(cop_regs[0] + 16 + offset * 4) + space.read_dword(cop_regs[0] + 0x28 + offset * 4));
+	else /* X Se Dae and Zero Team uses this variant */
+		space.write_dword(cop_regs[0] + 16 + offset * 4, space.read_dword(cop_regs[0] + 16 + offset * 4) - space.read_dword(cop_regs[0] + 0x28 + offset * 4));
 }
 
-void raiden2cop_device::execute_0905(address_space &space, int offset, UINT16 data)
-{
-	space.write_dword(cop_regs[0] + 16 + offset * 4, space.read_dword(cop_regs[0] + 16 + offset * 4) + space.read_dword(cop_regs[0] + 0x28 + offset * 4));
-}
 
-void raiden2cop_device::LEGACY_execute_0905(address_space &space, int offset, UINT16 data)
-{
-	UINT8 offs;
 
-	offs = (offset & 3) * 4;
-
-	/* read 0x28 + offs */
-	/* add 0x10 + offs */
-	/* write 0x10 + offs */
-
-	space.write_dword(cop_regs[0] + 0x10 + offs, space.read_dword(cop_regs[0] + 0x10 + offs) + space.read_dword(cop_regs[0] + 0x28 + offs));
-
-}
 
 /*
 02 - 138e (130e  ) :  (984, aa4, d82, aa2, 39b, b9a, b9a, b9a)  5     bf7f   (heatbrl, legionna)
@@ -1060,8 +1054,8 @@ void raiden2cop_device::execute_5a05(address_space &space, int offset, UINT16 da
 */
 void raiden2cop_device::execute_6200(address_space &space, int offset, UINT16 data)
 {
-	UINT8 angle = space.read_byte(cop_regs[0] + 0x34);
-	UINT16 flags = space.read_word(cop_regs[0]);
+	UINT8 angle = cop_read_byte(space, cop_regs[0] + 0x34);
+	UINT16 flags = cop_read_word(space, cop_regs[0]);
 	cop_angle_target &= 0xff;
 	cop_angle_step &= 0xff;
 	flags &= ~0x0004;
@@ -1090,7 +1084,60 @@ void raiden2cop_device::execute_6200(address_space &space, int offset, UINT16 da
 	space.write_byte(cop_regs[0] + 0x34, angle);
 }
 
-void raiden2cop_device::LEGACY_execute_6200(address_space &space, int offset, UINT16 data)
+
+void raiden2cop_device::LEGACY_execute_6200_grainbow(address_space &space, int offset, UINT16 data)
+{
+	UINT8 cur_angle;
+	UINT16 flags;
+
+	cur_angle = cop_read_byte(space,cop_regs[0] + 0x34);
+	flags = cop_read_word(space, cop_regs[0]);
+	//space.write_byte(cop_regs[1] + (0^3),space.read_byte(cop_regs[1] + (0^3)) & 0xfb); //correct?
+
+	INT8 tempangle_compare = (INT8)cop_angle_target;
+	INT8 tempangle_mod_val = (INT8)cop_angle_step;
+
+	tempangle_compare &= 0xff;
+	tempangle_mod_val &= 0xff;
+
+	cop_angle_target = tempangle_compare;
+	cop_angle_step = tempangle_mod_val;
+
+
+	flags &= ~0x0004;
+
+	int delta = cur_angle - tempangle_compare;
+	if (delta >= 128)
+		delta -= 256;
+	else if (delta < -128)
+		delta += 256;
+	if (delta < 0)
+	{
+		if (delta >= -tempangle_mod_val)
+		{
+			cur_angle = tempangle_compare;
+			flags |= 0x0004;
+		}
+		else
+			cur_angle += tempangle_mod_val;
+	}
+	else
+	{
+		if (delta <= tempangle_mod_val)
+		{
+			cur_angle = tempangle_compare;
+			flags |= 0x0004;
+		}
+		else
+			cur_angle -= tempangle_mod_val;
+	}
+
+	space.write_byte(cop_regs[0] + (0 ^ 3), flags); // this is a word in the avoce
+	space.write_word(cop_regs[0] + (0x34 ^ 3), cur_angle); // why ^3 on a word? should it be a byte, it is in the above
+}
+
+
+void raiden2cop_device::LEGACY_execute_6200(address_space &space, int offset, UINT16 data) // this is for cupsoc, different sequence, works on different registers
 {
 	UINT8 cur_angle;
 	UINT16 flags;
@@ -1144,57 +1191,6 @@ void raiden2cop_device::LEGACY_execute_6200(address_space &space, int offset, UI
 
 	space.write_byte(cop_regs[1] + (0 ^ 2), flags);
 	space.write_byte(cop_regs[1] + (0xc ^ 3), cur_angle);
-}
-
-void raiden2cop_device::LEGACY_execute_6200_grainbow(address_space &space, int offset, UINT16 data)
-{
-	UINT8 cur_angle;
-	UINT16 flags;
-
-	cur_angle = space.read_byte(cop_regs[0] + (0x34 ^ 3));
-	flags = space.read_word(cop_regs[0] + (0 ^ 2));
-	//space.write_byte(cop_regs[1] + (0^3),space.read_byte(cop_regs[1] + (0^3)) & 0xfb); //correct?
-
-	INT8 tempangle_compare = (INT8)cop_angle_target;
-	INT8 tempangle_mod_val = (INT8)cop_angle_step;
-
-	tempangle_compare &= 0xff;
-	tempangle_mod_val &= 0xff;
-
-	cop_angle_target = tempangle_compare;
-	cop_angle_step = tempangle_mod_val;
-
-
-	flags &= ~0x0004;
-
-	int delta = cur_angle - tempangle_compare;
-	if (delta >= 128)
-		delta -= 256;
-	else if (delta < -128)
-		delta += 256;
-	if (delta < 0)
-	{
-		if (delta >= -tempangle_mod_val)
-		{
-			cur_angle = tempangle_compare;
-			flags |= 0x0004;
-		}
-		else
-			cur_angle += tempangle_mod_val;
-	}
-	else
-	{
-		if (delta <= tempangle_mod_val)
-		{
-			cur_angle = tempangle_compare;
-			flags |= 0x0004;
-		}
-		else
-			cur_angle -= tempangle_mod_val;
-	}
-
-	space.write_byte(cop_regs[0] + (0 ^ 3), flags);
-	space.write_word(cop_regs[0] + (0x34 ^ 3), cur_angle);
 }
 
 /*
@@ -1584,11 +1580,8 @@ WRITE16_MEMBER( raiden2cop_device::cop_cmd_w)
 	}
 
 	case 0x0904: /* X Se Dae and Zero Team uses this variant */
-		execute_0904(space, offset, data);
-		break;
-	
 	case 0x0905: //  0905 0006 fbfb 0008 - 0194 0288 0088 0000 0000 0000 0000 0000
-		execute_0905(space, offset, data);
+		execute_0904(space, offset, data);
 		break;
 
 	case 0x130e:   // 130e 0005 bf7f 0010 - 0984 0aa4 0d82 0aa2 039b 0b9a 0b9a 0a9a
@@ -2004,7 +1997,7 @@ WRITE16_MEMBER(raiden2cop_device::LEGACY_cop_cmd_w)
 	if (check_command_matches(command, 0x194, 0x288, 0x088, 0x000, 0x000, 0x000, 0x000, 0x000, 6, 0xfbfb))
 	{
 		executed = 1;
-		LEGACY_execute_0905(space, offset, data);
+		execute_0904(space, offset, data);
 		return;
 	}
 

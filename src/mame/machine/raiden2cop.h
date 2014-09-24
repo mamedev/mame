@@ -159,7 +159,6 @@ public:
 	void execute_3b30(address_space &space, int offset, UINT16 data);
 	void execute_130e(address_space &space, int offset, UINT16 data);
 	void execute_0904(address_space &space, int offset, UINT16 data);
-	void execute_0905(address_space &space, int offset, UINT16 data);
 	void execute_2a05(address_space &space, int offset, UINT16 data);
 	void execute_7e05(address_space &space, int offset, UINT16 data);
 	void execute_5205(address_space &space, int offset, UINT16 data);
@@ -180,7 +179,6 @@ public:
 	void LEGACY_execute_b900(address_space &space, int offset, UINT16 data);
 	void LEGACY_execute_0205(address_space &space, int offset, UINT16 data);
 	void LEGACY_execute_42c2(address_space &space, int offset, UINT16 data);
-	void LEGACY_execute_0905(address_space &space, int offset, UINT16 data);
 	void LEGACY_execute_e30e(address_space &space, int offset, UINT16 data);
 	void LEGACY_execute_6200(address_space &space, int offset, UINT16 data);
 	void LEGACY_execute_6200_grainbow(address_space &space, int offset, UINT16 data);
@@ -260,6 +258,7 @@ public:
 	int m_cpu_is_68k;
 	static void set_cpu_is_68k(device_t &device, int value) { downcast<raiden2cop_device &>(device).m_cpu_is_68k = value; }
 	UINT16 cop_read_word(address_space &space, int address);
+	UINT8 cop_read_byte(address_space &space, int address);
 
 	// DEBUG
 	void dump_table();
