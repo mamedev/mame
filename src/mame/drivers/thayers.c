@@ -43,9 +43,10 @@ public:
 
 	thayers_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-			m_pr7820(*this, "laserdisc"),
-			m_ldv1000(*this, "ldv1000") ,
-		m_maincpu(*this, "maincpu") { }
+		m_pr7820(*this, "laserdisc"),
+		m_ldv1000(*this, "ldv1000"),
+		m_maincpu(*this, "maincpu"),
+		m_row(*this, "ROW") { }
 
 	optional_device<pioneer_pr7820_device> m_pr7820;
 	optional_device<pioneer_ldv1000_device> m_ldv1000;
@@ -91,6 +92,7 @@ public:
 	virtual void machine_reset();
 	void check_interrupt();
 	required_device<cpu_device> m_maincpu;
+	required_ioport_array<10> m_row;
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
@@ -318,16 +320,7 @@ READ8_MEMBER(thayers_state::cop_si_r)
 	case 6:
 	case 7:
 	case 8:
-		{
-			UINT8 data;
-			char port[4];
-
-			sprintf(port, "R%d", m_keylatch);
-
-			data = BIT(ioport(port)->read(), m_rx_bit - 5);
-
-			return data;
-		}
+		return BIT(m_row[m_keylatch]->read(), m_rx_bit - 5);
 
 	default:
 		return 0;
@@ -693,61 +686,61 @@ static INPUT_PORTS_START( thayers )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, thayers_state,laserdisc_enter_r, NULL)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, thayers_state,laserdisc_ready_r, NULL)
 
-	PORT_START("R0")
+	PORT_START("ROW.0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME( "2" ) PORT_CODE( KEYCODE_F2 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME( "1 - Clear" ) PORT_CODE( KEYCODE_BACKSPACE )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME( "Q" ) PORT_CODE( KEYCODE_Q )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME( DEF_STR( Yes ) ) PORT_CODE( KEYCODE_0_PAD )
 
-	PORT_START("R1")
+	PORT_START("ROW.1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME( "Z - Spell of Release" ) PORT_CODE( KEYCODE_Z )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME( "A" ) PORT_CODE( KEYCODE_A )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME( "W - Amulet" ) PORT_CODE( KEYCODE_W )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME( "Items" ) PORT_CODE( KEYCODE_1_PAD )
 
-	PORT_START("R2")
+	PORT_START("ROW.2")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME( "X - Scepter" ) PORT_CODE( KEYCODE_X )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME( "S - Dagger" ) PORT_CODE( KEYCODE_S )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME( "E - Black Mace" ) PORT_CODE( KEYCODE_E )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME( "Drop Item" ) PORT_CODE( KEYCODE_2_PAD )
 
-	PORT_START("R3")
+	PORT_START("ROW.3")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME( "C - Spell of Seeing" ) PORT_CODE( KEYCODE_C )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME( "D - Great Circlet" ) PORT_CODE( KEYCODE_D )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME( "R - Blood Sword" ) PORT_CODE( KEYCODE_R )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME( "Give Score" ) PORT_CODE( KEYCODE_3_PAD )
 
-	PORT_START("R4")
+	PORT_START("ROW.4")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME( "V - Shield" ) PORT_CODE( KEYCODE_V )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME( "F - Hunting Horn" ) PORT_CODE( KEYCODE_F )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME( "T - Chalice" ) PORT_CODE( KEYCODE_T )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME( "Replay" ) PORT_CODE( KEYCODE_4_PAD )
 
-	PORT_START("R5")
+	PORT_START("ROW.5")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME( "B - Silver Wheat" ) PORT_CODE( KEYCODE_B )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME( "G - Long Bow" ) PORT_CODE( KEYCODE_G )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME( "Y - Coins" ) PORT_CODE( KEYCODE_Y )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME( "Combine Action" ) PORT_CODE( KEYCODE_6_PAD )
 
-	PORT_START("R6")
+	PORT_START("ROW.6")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME( "N - Staff" ) PORT_CODE( KEYCODE_N )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME( "H - Medallion" ) PORT_CODE( KEYCODE_H )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME( "U - Cold Fire" ) PORT_CODE( KEYCODE_U )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME( "Save Game" ) PORT_CODE( KEYCODE_7_PAD )
 
-	PORT_START("R7")
+	PORT_START("ROW.7")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME( "M - Spell of Understanding" ) PORT_CODE( KEYCODE_M )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME( "J - Onyx Seal" ) PORT_CODE( KEYCODE_J )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME( "I - Crown" ) PORT_CODE( KEYCODE_I )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME( "Update" ) PORT_CODE( KEYCODE_8_PAD )
 
-	PORT_START("R8")
+	PORT_START("ROW.8")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME( "3 - Enter" ) PORT_CODE( KEYCODE_ENTER )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME( "K - Orb of Quoid" ) PORT_CODE( KEYCODE_K )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME( "O - Crystal" ) PORT_CODE( KEYCODE_O )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME( "Hint" ) PORT_CODE( KEYCODE_9_PAD )
 
-	PORT_START("R9")
+	PORT_START("ROW.9")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME( "4 - Space" ) PORT_CODE( KEYCODE_SPACE )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME( "L" ) PORT_CODE( KEYCODE_L )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME( "P" ) PORT_CODE( KEYCODE_P )

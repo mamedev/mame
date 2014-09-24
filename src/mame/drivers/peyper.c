@@ -44,6 +44,7 @@ public:
 	peyper_state(const machine_config &mconfig, device_type type, const char *tag)
 		: genpin_class(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_switch(*this, "SWITCH")
 	{ }
 
 	DECLARE_READ8_MEMBER(sw_r);
@@ -65,6 +66,7 @@ private:
 	UINT8 m_disp_layout[36];
 	virtual void machine_reset();
 	required_device<cpu_device> m_maincpu;
+	required_ioport_array<4> m_switch;
 };
 
 WRITE8_MEMBER( peyper_state::col_w )
@@ -74,15 +76,10 @@ WRITE8_MEMBER( peyper_state::col_w )
 
 READ8_MEMBER( peyper_state::sw_r )
 {
-	UINT8 data = 0xff;
-
 	if (m_digit < 4)
-	{
-		char kbdrow[6];
-		sprintf(kbdrow,"X%X",m_digit);
-		data = ioport(kbdrow)->read();
-	}
-	return data;
+		return m_switch[m_digit]->read();
+
+	return 0xff;
 }
 
 WRITE8_MEMBER( peyper_state::disp_w )
@@ -250,7 +247,7 @@ static INPUT_PORTS_START( pbsonic_generic )
 	PORT_DIPSETTING(    0x02, "0k 0k and 0k / 0k" )
 	PORT_DIPSETTING(    0x03, "0k 0k and 0k / 0k" )
 
-	PORT_START("X0")
+	PORT_START("SWITCH.0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_X) PORT_NAME("Outhole")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_W)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_E)
@@ -260,7 +257,7 @@ static INPUT_PORTS_START( pbsonic_generic )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_I)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_O)
 
-	PORT_START("X1")
+	PORT_START("SWITCH.1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_A)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_S)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_D)
@@ -270,7 +267,7 @@ static INPUT_PORTS_START( pbsonic_generic )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_J)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_K)
 
-	PORT_START("X2")
+	PORT_START("SWITCH.2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Z)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_C)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_V)
@@ -280,7 +277,7 @@ static INPUT_PORTS_START( pbsonic_generic )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_COMMA)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_STOP)
 
-	PORT_START("X3")
+	PORT_START("SWITCH.3")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_L)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Q)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_EQUALS)

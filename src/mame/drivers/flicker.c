@@ -29,6 +29,9 @@ public:
 	flicker_state(const machine_config &mconfig, device_type type, const char *tag)
 		: genpin_class(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_testport(*this, "TEST")
+		, m_coinport(*this, "COIN")
+		, m_switch(*this, "SWITCH")
 	{ }
 
 	DECLARE_WRITE8_MEMBER(port00_w);
@@ -38,6 +41,9 @@ public:
 private:
 	UINT8 m_out_data;
 	required_device<i4004_cpu_device> m_maincpu;
+	required_ioport m_testport;
+	required_ioport m_coinport;
+	required_ioport_array<7> m_switch;
 };
 
 
@@ -74,33 +80,33 @@ static INPUT_PORTS_START( flicker )
 	PORT_DIPSETTING(      0x0200, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(      0x0400, DEF_STR( 1C_6C ) )
 
-	PORT_START("B0")
+	PORT_START("SWITCH.0")
 	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Left Lane Target") PORT_CODE(KEYCODE_W)
 	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("/B Target") PORT_CODE(KEYCODE_E)
 	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Left Lane 1000") PORT_CODE(KEYCODE_R)
 	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("/A Target") PORT_CODE(KEYCODE_Y)
-	PORT_START("B1")
+	PORT_START("SWITCH.1")
 	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Right Lane Target") PORT_CODE(KEYCODE_U)
 	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("/C Target") PORT_CODE(KEYCODE_I)
 	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Right Lane 1000") PORT_CODE(KEYCODE_O)
 	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("/D Target") PORT_CODE(KEYCODE_A)
-	PORT_START("B2")
+	PORT_START("SWITCH.2")
 	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Spinner") PORT_CODE(KEYCODE_S)
-	PORT_START("B3")
+	PORT_START("SWITCH.3")
 	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("10's Target") PORT_CODE(KEYCODE_D)
 	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("100's Target") PORT_CODE(KEYCODE_F)
 	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Pot Bumper") PORT_CODE(KEYCODE_G)
 	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("3000 Hole") PORT_CODE(KEYCODE_H)
-	PORT_START("B4")
+	PORT_START("SWITCH.4")
 	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("1000 Bonus") PORT_CODE(KEYCODE_J)
 	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("500 Target") PORT_CODE(KEYCODE_K)
 	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Out Hole") PORT_CODE(KEYCODE_X)
-	PORT_START("B5")
+	PORT_START("SWITCH.5")
 	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Left 500 Out") PORT_CODE(KEYCODE_L)
 	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Left Bumper") PORT_CODE(KEYCODE_Z)
 	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Right 500 Out") PORT_CODE(KEYCODE_C)
 	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Right Bumper") PORT_CODE(KEYCODE_V)
-	PORT_START("B6")
+	PORT_START("SWITCH.6")
 	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("A Target") PORT_CODE(KEYCODE_B)
 	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("B target") PORT_CODE(KEYCODE_N)
 	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("C target") PORT_CODE(KEYCODE_M)
@@ -112,11 +118,8 @@ READ8_MEMBER( flicker_state::port02_r )
 	offset = m_maincpu->state_int(I4004_RAM) & 0x0f; // we need the full address
 
 	if (offset < 7)
-	{
-		char kbdrow[6];
-		sprintf(kbdrow,"B%X",offset);
-		return ioport(kbdrow)->read();
-	}
+		return m_switch[offset]->read();
+
 	return 0;
 }
 
@@ -132,10 +135,10 @@ WRITE8_MEMBER( flicker_state::port01_w )
 // The output lines operate the various lamps (44 of them)
 	offset = m_maincpu->state_int(I4004_RAM) & 0x0f; // we need the full address
 
-	UINT16 test_port = ioport("TEST")->read() & 0xf81e;
-	UINT16 coin_port = ioport("COIN")->read() & 0x07e0;
+	UINT16 test_port = m_testport->read() & 0xf81e;
+	UINT16 coin_port = m_coinport->read() & 0x07e0;
 
-	if (BIT(ioport("COIN")->read(), 0) )
+	if (BIT(m_coinport->read(), 0) )
 		test_port |= coin_port;
 
 	m_maincpu->set_test(BIT(test_port, offset));

@@ -18,7 +18,8 @@ public:
 	zac_2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 	m_maincpu(*this, "maincpu"),
-	m_p_ram(*this, "ram")
+	m_p_ram(*this, "ram"),
+	m_row(*this, "ROW")
 	{ }
 
 	DECLARE_READ8_MEMBER(ctrl_r);
@@ -31,6 +32,7 @@ public:
 	UINT8 m_out_offs;
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<UINT8> m_p_ram;
+	required_ioport_array<6> m_row;
 	TIMER_DEVICE_CALLBACK_MEMBER(zac_2_inttimer);
 	TIMER_DEVICE_CALLBACK_MEMBER(zac_2_outtimer);
 protected:
@@ -78,7 +80,7 @@ static INPUT_PORTS_START( zac_2 )
 	PORT_DIPSETTING(    0x08, DEF_STR(Off))
 	PORT_DIPSETTING(    0x00, DEF_STR(On))
 
-	PORT_START("ROW0")
+	PORT_START("ROW.0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Advance Test")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Return Test")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_TILT )
@@ -88,14 +90,14 @@ static INPUT_PORTS_START( zac_2 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN3 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Printer")
 
-	PORT_START("ROW1")
+	PORT_START("ROW.1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("RAM Reset")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_TILT )
 	PORT_BIT( 0x3c, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_TILT )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Burn Test")
 	// from here is not correct
-	PORT_START("ROW2")
+	PORT_START("ROW.2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Outhole") PORT_CODE(KEYCODE_X)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("LH Flap") PORT_CODE(KEYCODE_Q)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("RH Flap") PORT_CODE(KEYCODE_W)
@@ -105,7 +107,7 @@ static INPUT_PORTS_START( zac_2 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Bottom Inside LH Canal") PORT_CODE(KEYCODE_U)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("LH Top Hole") PORT_CODE(KEYCODE_I)
 
-	PORT_START("ROW3")
+	PORT_START("ROW.3")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("RH Bumper") PORT_CODE(KEYCODE_O)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("LH Top Canal") PORT_CODE(KEYCODE_A)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Top Centre Canal") PORT_CODE(KEYCODE_S)
@@ -115,7 +117,7 @@ static INPUT_PORTS_START( zac_2 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("LH Bumper") PORT_CODE(KEYCODE_H)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("RH Top Hole") PORT_CODE(KEYCODE_J)
 
-	PORT_START("ROW4")
+	PORT_START("ROW.4")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Bottom Bumper") PORT_CODE(KEYCODE_K)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("LH Top Contact") PORT_CODE(KEYCODE_L)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("RH Top Contact") PORT_CODE(KEYCODE_Z)
@@ -125,7 +127,7 @@ static INPUT_PORTS_START( zac_2 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Bank Contacts") PORT_CODE(KEYCODE_B)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Moving Target") PORT_CODE(KEYCODE_N)
 
-	PORT_START("ROW5")
+	PORT_START("ROW.5")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("LH Bank Target 1") PORT_CODE(KEYCODE_M)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("LH Bank Target 2") PORT_CODE(KEYCODE_MINUS)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("LH Bank Target 3") PORT_CODE(KEYCODE_EQUALS)
@@ -139,11 +141,7 @@ INPUT_PORTS_END
 READ8_MEMBER( zac_2_state::ctrl_r )
 {
 	if (m_input_line < 6)
-	{
-		char kbdrow[8];
-		sprintf(kbdrow,"ROW%X",offset);
-		return ioport(kbdrow)->read();
-	}
+		return m_row[m_input_line]->read();
 
 	return 0xff;
 }

@@ -50,6 +50,7 @@ public:
 		: genpin_class(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_snsnd(*this, "snsnd")
+		, m_switch(*this, "SWITCH")
 		, m_p_ram(*this, "nvram")
 	{ }
 
@@ -67,6 +68,7 @@ private:
 	virtual void machine_reset();
 	required_device<cpu_device> m_maincpu;
 	required_device<sn76477_device> m_snsnd;
+	required_ioport_array<4> m_switch;
 	required_shared_ptr<UINT8> m_p_ram;
 };
 
@@ -81,7 +83,7 @@ static ADDRESS_MAP_START( spectra_map, AS_PROGRAM, 8, spectra_state )
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( spectra )
-	PORT_START("X0")
+	PORT_START("SWITCH.0")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Outhole") PORT_CODE(KEYCODE_X)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("L Outlane 1") PORT_CODE(KEYCODE_W)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("CR Hole") PORT_CODE(KEYCODE_E)
@@ -90,7 +92,7 @@ static INPUT_PORTS_START( spectra )
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("C Bumper") PORT_CODE(KEYCODE_U)
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("L Bumper") PORT_CODE(KEYCODE_I)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("R Sling") PORT_CODE(KEYCODE_O)
-	PORT_START("X1")
+	PORT_START("SWITCH.1")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("L Sling") PORT_CODE(KEYCODE_A)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("R Outlane") PORT_CODE(KEYCODE_S)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("R Rollover") PORT_CODE(KEYCODE_D)
@@ -99,7 +101,7 @@ static INPUT_PORTS_START( spectra )
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("C Inside Target") PORT_CODE(KEYCODE_H)
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("R Inside Target") PORT_CODE(KEYCODE_J)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("CL Target") PORT_CODE(KEYCODE_K)
-	PORT_START("X2")
+	PORT_START("SWITCH.2")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("CL Button") PORT_CODE(KEYCODE_Z)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("TL Button") PORT_CODE(KEYCODE_Q)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("TL Target") PORT_CODE(KEYCODE_C)
@@ -108,7 +110,7 @@ static INPUT_PORTS_START( spectra )
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("R Pentagon") PORT_CODE(KEYCODE_N)
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("L Pentagon") PORT_CODE(KEYCODE_M)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("TL Area") PORT_CODE(KEYCODE_COMMA)
-	PORT_START("X3")
+	PORT_START("SWITCH.3")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("L Area") PORT_CODE(KEYCODE_STOP)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("R Area") PORT_CODE(KEYCODE_SLASH)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Inlane Button") PORT_CODE(KEYCODE_L)
@@ -128,11 +130,9 @@ void spectra_state::machine_reset()
 
 READ8_MEMBER( spectra_state::porta_r )
 {
-	char kbdrow[6];
-	UINT8 key=0, ret=0;
-	sprintf(kbdrow,"X%X",(m_porta & 0x18) >> 3);
-	key = ioport(kbdrow)->read();
-	ret = ((BIT(key, m_porta & 7)) ? 0x40 : 0) | (m_porta & 0xbf);
+	UINT8 row = (m_porta & 0x18) >> 3;
+	UINT8 key = m_switch[row]->read();
+	UINT8 ret = ((BIT(key, m_porta & 7)) ? 0x40 : 0) | (m_porta & 0xbf);
 
 	if (ret == 0x1b && m_p_ram[0x7b] < 0x1E)
 		m_samples->start(3, 8); // coin
