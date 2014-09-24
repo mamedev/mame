@@ -52,17 +52,14 @@ WRITE8_MEMBER(sidearms_state::sidearms_bankswitch_w)
 }
 
 
-
-
 /* Turtle Ship input ports are rotated 90 degrees */
+IOPORT_ARRAY_MEMBER(sidearms_state::ports) { "SYSTEM", "P1", "P2", "DSW0", "DSW1" };
+
 READ8_MEMBER(sidearms_state::turtship_ports_r)
 {
-	int i,res;
-	static const char *const portnames[] = { "SYSTEM", "P1", "P2", "DSW0", "DSW1", "NOT_PRESENT", "NOT_PRESENT", "NOT_PRESENT" };   // only inputs 0-4 are present
-
-	res = 0;
-	for (i = 0;i < 8;i++)
-		res |= ((ioport(portnames[i])->read_safe(0) >> offset) & 1) << i;
+	int res = 0;
+	for (int i = 0; i < 5;i++)
+		res |= ((m_ports[i]->read_safe(0) >> offset) & 1) << i;
 
 	return res;
 }
