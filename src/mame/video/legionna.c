@@ -490,6 +490,8 @@ UINT32 legionna_state::screen_update_legionna(screen_device &screen, bitmap_ind1
 
 	draw_sprites(screen,bitmap,cliprect);
 
+	if (machine().input().code_pressed_once(KEYCODE_Z))
+		if (m_raiden2cop) m_raiden2cop->dump_table();
 
 	return 0;
 }
@@ -509,6 +511,10 @@ UINT32 legionna_state::screen_update_godzilla(screen_device &screen, bitmap_ind1
 	if (!(m_layer_disable&0x0008)) m_text_layer->draw(screen, bitmap, cliprect, 0,2);
 
 	draw_sprites(screen,bitmap,cliprect);
+
+	if (machine().input().code_pressed_once(KEYCODE_Z))
+		if (m_raiden2cop) m_raiden2cop->dump_table();
+
 
 	return 0;
 }
@@ -533,6 +539,9 @@ UINT32 legionna_state::screen_update_grainbow(screen_device &screen, bitmap_ind1
 		m_text_layer->draw(screen, bitmap, cliprect, 0,8);
 
 	draw_sprites(screen,bitmap,cliprect);
+
+	if (machine().input().code_pressed_once(KEYCODE_Z))
+		if (m_raiden2cop) m_raiden2cop->dump_table();
 
 	return 0;
 }

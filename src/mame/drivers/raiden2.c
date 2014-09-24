@@ -584,6 +584,8 @@ UINT32 raiden2_state::screen_update_raiden2(screen_device &screen, bitmap_rgb32 
 	if (!(raiden2_tilemap_enable & 16))
 		blend_layer(bitmap, cliprect, sprite_buffer, cur_spri[4]);
 
+	if (machine().input().code_pressed_once(KEYCODE_Z))
+		if (m_raiden2cop) m_raiden2cop->dump_table();
 
 	return 0;
 }

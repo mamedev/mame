@@ -10,6 +10,9 @@
 #include "emu.h"
 #include "raiden2cop.h"
 
+// use Z to dump out table info
+//#define TABLE_DUMPER
+
 const device_type RAIDEN2COP = &device_creator<raiden2cop_device>;
 
 raiden2cop_device::raiden2cop_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
@@ -246,6 +249,43 @@ WRITE16_MEMBER(raiden2cop_device::cop_pgm_data_w)
 			break;
 		}
 	}
+}
+
+void raiden2cop_device::dump_table()
+{
+#ifdef TABLE_DUMPER
+	printf("table dump\n");
+
+	int command;
+
+	printf("## - trig (masked) :  (sq0, sq1, sq2, sq3, sq4, sq5, sq6, sq7)  valu  mask\n");
+
+	for (command = 0; command < 0x20; command++)
+	{
+		if (cop_func_trigger[command] != 0x0000)
+		{
+			int maskout = 0x0080;
+
+			printf("%02x - %04x (%04x  ) :  ", command, cop_func_trigger[command], cop_func_trigger[command] & ~maskout);
+
+			printf("(");
+			int seqpos;
+			for (seqpos = 0; seqpos < 8; seqpos++)
+			{
+				printf("%03x", cop_program[command * 8 + seqpos]);
+				if (seqpos < 7)
+					printf(", ");
+			}
+			printf(")  ");
+
+			printf("%01x     ", cop_func_value[command]);
+			printf("%04x ", cop_func_mask[command]);
+
+
+			printf("\n");
+		}
+	}
+#endif
 }
 
 WRITE16_MEMBER(raiden2cop_device::cop_pgm_addr_w)

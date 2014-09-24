@@ -19,7 +19,8 @@ public:
 		m_oki(*this, "oki"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
-		m_wordswapram(*this, "wordswapram")
+		m_wordswapram(*this, "wordswapram"),
+		m_raiden2cop(*this, "raiden2cop")
 	{ 
 		memset(scrollvals, 0, sizeof(UINT16)*6);
 	}
@@ -87,6 +88,7 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	optional_shared_ptr<UINT16> m_wordswapram;
+	optional_device<raiden2cop_device> m_raiden2cop;
 
 };
 

@@ -204,6 +204,10 @@ public:
 	UINT8 LEGACY_cop_calculate_collsion_detection();
 
 
+
+	// DEBUG
+	void dump_table();
+
 protected:
 	// device-level overrides
 	virtual void device_start();
