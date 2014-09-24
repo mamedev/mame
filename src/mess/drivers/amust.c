@@ -74,6 +74,7 @@ B = Boot from floppy
 ToDo:
 - Everything
 - Need software
+- Keyboard controller needs to be emulated
 - If booting straight to CP/M, the load message should be in the middle of the screen.
 
 
@@ -452,7 +453,7 @@ ROM_START( amust )
 	ROM_LOAD( "cg4.rom", 0x000, 0x800, CRC(52e7b9d8) SHA1(cc6d457634eb688ccef471f72bddf0424e64b045) )
 
 	ROM_REGION( 0x800, "keyboard", 0 )
-	ROM_LOAD( "kbd_3.rom", 0x000, 0x800, NO_DUMP )
+	ROM_LOAD( "kbd_3.rom", 0x000, 0x800, CRC(d9441b35) SHA1(ce250ab1e892a13fd75182703f259855388c6bf4) )
 
 	ROM_REGION( 0x800, "videoram", ROMREGION_ERASE00 )
 ROM_END
