@@ -1684,7 +1684,7 @@ void wd_fdc_t::live_run(attotime limit)
 			}
 
 			cur_live.bit_counter = 0;
-			if((cur_live.data_reg & 0xfe) != 0xf8)
+			if((cur_live.data_reg & 0xfe) == 0xf8)
 				status |= S_DDM;
 			live_delay(READ_SECTOR_DATA);
 			return;
