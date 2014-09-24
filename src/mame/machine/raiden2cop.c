@@ -44,6 +44,7 @@ raiden2cop_device::raiden2cop_device(const machine_config &mconfig, const char *
 	m_cop_rng_max_value(0),
 
 	m_cop_sprite_dma_param(0),
+	m_cop_sprite_dma_src(0),
 	m_cop_sprite_dma_size(0),
 
 
@@ -136,6 +137,7 @@ void raiden2cop_device::device_start()
 	save_item(NAME(m_cop_sprite_dma_param));
 
 	save_item(NAME(m_cop_sprite_dma_size));
+	save_item(NAME(m_cop_sprite_dma_src));
 
 
 	m_videoramout_cb.resolve_safe();
@@ -1105,4 +1107,35 @@ WRITE16_MEMBER( raiden2cop_device::cop_sprite_dma_param_lo_w)
 WRITE16_MEMBER(raiden2cop_device::cop_sprite_dma_size_w)
 {
 	m_cop_sprite_dma_size = data;
+}
+
+
+WRITE16_MEMBER( raiden2cop_device::cop_sprite_dma_src_hi_w)
+{
+	m_cop_sprite_dma_src = (m_cop_sprite_dma_src&0x0000ffff)|(data<<16);
+}
+
+WRITE16_MEMBER( raiden2cop_device::cop_sprite_dma_src_lo_w)
+{
+	m_cop_sprite_dma_src = (m_cop_sprite_dma_src&0xffff0000)|(data&0xffff);
+}
+
+// guess
+WRITE16_MEMBER(raiden2cop_device::cop_sprite_dma_inc_w)
+{
+	if (data)
+		printf("Warning: COP RAM 0x410 used with %04x\n", data);
+	else
+	{
+		/* guess */
+		cop_regs[4] += 8;
+		m_cop_sprite_dma_src += 6;
+
+		m_cop_sprite_dma_size--;
+
+		if (m_cop_sprite_dma_size > 0)
+			cop_status &= ~2;
+		else
+			cop_status |= 2;
+	}
 }

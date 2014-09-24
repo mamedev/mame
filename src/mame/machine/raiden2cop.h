@@ -156,9 +156,14 @@ public:
 
 	// misc 68k (grainbow)
 	UINT32 m_cop_sprite_dma_param;
+	UINT32 m_cop_sprite_dma_src;
+
 	DECLARE_WRITE16_MEMBER(cop_sprite_dma_param_hi_w);
 	DECLARE_WRITE16_MEMBER(cop_sprite_dma_param_lo_w);
 	DECLARE_WRITE16_MEMBER(cop_sprite_dma_size_w);
+	DECLARE_WRITE16_MEMBER(cop_sprite_dma_src_hi_w);
+	DECLARE_WRITE16_MEMBER(cop_sprite_dma_src_lo_w);
+	DECLARE_WRITE16_MEMBER(cop_sprite_dma_inc_w);
 	int m_cop_sprite_dma_size;
 
 protected:

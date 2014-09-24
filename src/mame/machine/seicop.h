@@ -49,7 +49,6 @@ private:
 	int m_r0, m_r1;
 	UINT16 m_cop_rom_addr_lo,m_cop_rom_addr_hi,m_cop_rom_addr_unk;
 
-	UINT32 m_cop_sprite_dma_src;
 	int m_cop_sprite_dma_abs_x,m_cop_sprite_dma_abs_y;
 
 

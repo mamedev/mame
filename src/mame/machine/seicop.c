@@ -1611,7 +1611,6 @@ seibu_cop_legacy_device::seibu_cop_legacy_device(const machine_config &mconfig, 
 	m_cop_rom_addr_lo(0),
 	m_cop_rom_addr_hi(0),
 	m_cop_rom_addr_unk(0),
-	m_cop_sprite_dma_src(0),
 	m_cop_sprite_dma_abs_x(0),
 	m_cop_sprite_dma_abs_y(0),
 	m_raiden2cop(*this, ":raiden2cop")
@@ -1651,7 +1650,6 @@ void seibu_cop_legacy_device::device_start()
 	save_item(NAME(m_cop_rom_addr_lo));
 	save_item(NAME(m_cop_rom_addr_hi));
 	save_item(NAME(m_cop_rom_addr_unk));
-	save_item(NAME(m_cop_sprite_dma_src));
 	save_item(NAME(m_cop_sprite_dma_abs_x));
 	save_item(NAME(m_cop_sprite_dma_abs_y));
 }
@@ -2070,30 +2068,7 @@ WRITE16_MEMBER( seibu_cop_legacy_device::generic_cop_w )
 
 	
 
-		case (0x010/2):
-		{
-			if(data)
-				printf("Warning: COP RAM 0x410 used with %04x\n",data);
-			else
-			{
-				/* guess */
-				m_raiden2cop->cop_regs[4]+=8;
-				m_cop_sprite_dma_src+=6;
 
-				m_raiden2cop->m_cop_sprite_dma_size--;
-
-				if(m_raiden2cop->m_cop_sprite_dma_size > 0)
-					m_raiden2cop->cop_status &= ~2;
-				else
-					m_raiden2cop->cop_status |= 2;
-			}
-			break;
-		}
-
-		case (0x012/2):
-		case (0x014/2):
-			m_cop_sprite_dma_src = (m_cop_mcu_ram[0x014/2]) | (m_cop_mcu_ram[0x012/2] << 16);
-			break;
 
 		/* triggered before 0x6200 in Seibu Cup, looks like an angle value ... */
 		case (0x01c/2): m_legacycop_angle_compare = UINT16(m_cop_mcu_ram[0x1c/2]);  break;
@@ -2470,7 +2445,7 @@ WRITE16_MEMBER( seibu_cop_legacy_device::generic_cop_w )
 				/* TODO: I really suspect that following two are actually taken from the 0xa180 macro command then internally loaded */
 				abs_x = space.read_word(m_raiden2cop->cop_regs[0] + 8) - m_cop_sprite_dma_abs_x;
 				abs_y = space.read_word(m_raiden2cop->cop_regs[0] + 4) - m_cop_sprite_dma_abs_y;
-				rel_xy = space.read_word(m_cop_sprite_dma_src + 4 + offs);
+				rel_xy = space.read_word(m_raiden2cop->m_cop_sprite_dma_src + 4 + offs);
 
 				//if(rel_xy & 0x0706)
 				//  printf("sprite rel_xy = %04x\n",rel_xy);
@@ -2492,8 +2467,8 @@ WRITE16_MEMBER( seibu_cop_legacy_device::generic_cop_w )
 
 				offs = (offset & 3) * 4;
 
-				space.write_word(m_raiden2cop->cop_regs[4] + offs + 0,space.read_word(m_cop_sprite_dma_src + offs) + (m_raiden2cop->m_cop_sprite_dma_param & 0x3f));
-				//space.write_word(m_raiden2cop->cop_regs[4] + offs + 2,space.read_word(m_cop_sprite_dma_src+2 + offs));
+				space.write_word(m_raiden2cop->cop_regs[4] + offs + 0,space.read_word(m_raiden2cop->m_cop_sprite_dma_src + offs) + (m_raiden2cop->m_cop_sprite_dma_param & 0x3f));
+				//space.write_word(m_raiden2cop->cop_regs[4] + offs + 2,space.read_word(m_raiden2cop->m_cop_sprite_dma_src+2 + offs));
 				return;
 			}
 
