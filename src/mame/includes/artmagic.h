@@ -32,6 +32,8 @@ public:
 	required_device<tlc34076_device> m_tlc34076;
 	
 	required_shared_ptr<UINT16> m_control;
+	required_shared_ptr<UINT16> m_vram0;
+	required_shared_ptr<UINT16> m_vram1;
 	
 	UINT8 m_tms_irq;
 	UINT8 m_hack_irq;
@@ -42,9 +44,12 @@ public:
 	UINT8 m_prot_output_bit;
 	UINT8 m_prot_bit_index;
 	UINT16 m_prot_save;
-	void (*m_protection_handler)(running_machine &);
-	required_shared_ptr<UINT16> m_vram0;
-	required_shared_ptr<UINT16> m_vram1;
+	typedef void (artmagic_state::*prot_func)();
+	prot_func m_protection_handler;
+	void ultennis_protection();
+	void cheesech_protection();
+	void stonebal_protection();
+	
 	int m_xor[16];
 	int m_is_stoneball;
 	UINT16 *m_blitter_base;

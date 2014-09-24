@@ -148,36 +148,35 @@ READ16_MEMBER(artmagic_state::ultennis_hack_r)
  *
  *************************************/
 
-static void ultennis_protection(running_machine &machine)
+void artmagic_state::ultennis_protection()
 {
-	artmagic_state *state = machine.driver_data<artmagic_state>();
 	/* check the command byte */
-	switch (state->m_prot_input[0])
+	switch (m_prot_input[0])
 	{
 		case 0x00:  /* reset */
-			state->m_prot_input_index = state->m_prot_output_index = 0;
-			state->m_prot_output[0] = machine.rand();
+			m_prot_input_index = m_prot_output_index = 0;
+			m_prot_output[0] = machine().rand();
 			break;
 
 		case 0x01:  /* 01 aaaa bbbb cccc dddd (xxxx) */
-			if (state->m_prot_input_index == 9)
+			if (m_prot_input_index == 9)
 			{
-				UINT16 a = state->m_prot_input[1] | (state->m_prot_input[2] << 8);
-				UINT16 b = state->m_prot_input[3] | (state->m_prot_input[4] << 8);
-				UINT16 c = state->m_prot_input[5] | (state->m_prot_input[6] << 8);
-				UINT16 d = state->m_prot_input[7] | (state->m_prot_input[8] << 8);
+				UINT16 a = m_prot_input[1] | (m_prot_input[2] << 8);
+				UINT16 b = m_prot_input[3] | (m_prot_input[4] << 8);
+				UINT16 c = m_prot_input[5] | (m_prot_input[6] << 8);
+				UINT16 d = m_prot_input[7] | (m_prot_input[8] << 8);
 				UINT16 x = a - b;
 				if ((INT16)x >= 0)
 					x = (x * c) >> 16;
 				else
 					x = -(((UINT16)-x * c) >> 16);
 				x += d;
-				state->m_prot_output[0] = x;
-				state->m_prot_output[1] = x >> 8;
-				state->m_prot_output_index = 0;
+				m_prot_output[0] = x;
+				m_prot_output[1] = x >> 8;
+				m_prot_output_index = 0;
 			}
-			else if (state->m_prot_input_index >= 11)
-				state->m_prot_input_index = 0;
+			else if (m_prot_input_index >= 11)
+				m_prot_input_index = 0;
 			break;
 
 		case 0x02:  /* 02 aaaa bbbb cccc (xxxxxxxx) */
@@ -194,67 +193,66 @@ static void ultennis_protection(running_machine &machine)
 
 			    question is: what is the 3rd value doing there?
 			*/
-			if (state->m_prot_input_index == 7)
+			if (m_prot_input_index == 7)
 			{
-				UINT16 a = (INT16)(state->m_prot_input[1] | (state->m_prot_input[2] << 8));
-				UINT16 b = (INT16)(state->m_prot_input[3] | (state->m_prot_input[4] << 8));
-				/*UINT16 c = (INT16)(state->m_prot_input[5] | (state->m_prot_input[6] << 8));*/
+				UINT16 a = (INT16)(m_prot_input[1] | (m_prot_input[2] << 8));
+				UINT16 b = (INT16)(m_prot_input[3] | (m_prot_input[4] << 8));
+				/*UINT16 c = (INT16)(m_prot_input[5] | (m_prot_input[6] << 8));*/
 				UINT32 x = a * a * (b/2);
-				state->m_prot_output[0] = x;
-				state->m_prot_output[1] = x >> 8;
-				state->m_prot_output[2] = x >> 16;
-				state->m_prot_output[3] = x >> 24;
-				state->m_prot_output_index = 0;
+				m_prot_output[0] = x;
+				m_prot_output[1] = x >> 8;
+				m_prot_output[2] = x >> 16;
+				m_prot_output[3] = x >> 24;
+				m_prot_output_index = 0;
 			}
-			else if (state->m_prot_input_index >= 11)
-				state->m_prot_input_index = 0;
+			else if (m_prot_input_index >= 11)
+				m_prot_input_index = 0;
 			break;
 
 		case 0x03:  /* 03 (xxxx) */
-			if (state->m_prot_input_index == 1)
+			if (m_prot_input_index == 1)
 			{
-				UINT16 x = state->m_prot_save;
-				state->m_prot_output[0] = x;
-				state->m_prot_output[1] = x >> 8;
-				state->m_prot_output_index = 0;
+				UINT16 x = m_prot_save;
+				m_prot_output[0] = x;
+				m_prot_output[1] = x >> 8;
+				m_prot_output_index = 0;
 			}
-			else if (state->m_prot_input_index >= 3)
-				state->m_prot_input_index = 0;
+			else if (m_prot_input_index >= 3)
+				m_prot_input_index = 0;
 			break;
 
 		case 0x04:  /* 04 aaaa */
-			if (state->m_prot_input_index == 3)
+			if (m_prot_input_index == 3)
 			{
-				UINT16 a = state->m_prot_input[1] | (state->m_prot_input[2] << 8);
-				state->m_prot_save = a;
-				state->m_prot_input_index = state->m_prot_output_index = 0;
+				UINT16 a = m_prot_input[1] | (m_prot_input[2] << 8);
+				m_prot_save = a;
+				m_prot_input_index = m_prot_output_index = 0;
 			}
 			break;
 
 		default:
-			logerror("protection command %02X: unknown\n", state->m_prot_input[0]);
-			state->m_prot_input_index = state->m_prot_output_index = 0;
+			logerror("protection command %02X: unknown\n", m_prot_input[0]);
+			m_prot_input_index = m_prot_output_index = 0;
 			break;
 	}
 }
 
 
-static void cheesech_protection(running_machine &machine)
+void artmagic_state::cheesech_protection()
 {
-	artmagic_state *state = machine.driver_data<artmagic_state>();
 	/* check the command byte */
-	switch (state->m_prot_input[0])
+	switch (m_prot_input[0])
 	{
 		case 0x00:  /* reset */
-			state->m_prot_input_index = state->m_prot_output_index = 0;
-			state->m_prot_output[0] = machine.rand();
+			m_prot_input_index = m_prot_output_index = 0;
+			m_prot_output[0] = machine().rand();
 			break;
 
 		case 0x01:  /* 01 aaaa bbbb (xxxx) */
-			if (state->m_prot_input_index == 5)
+			if (m_prot_input_index == 5)
 			{
-				UINT16 a = state->m_prot_input[1] | (state->m_prot_input[2] << 8);
-				UINT16 b = state->m_prot_input[3] | (state->m_prot_input[4] << 8);
+				UINT16 a = m_prot_input[1] | (m_prot_input[2] << 8);
+				UINT16 b = m_prot_input[3] | (m_prot_input[4] << 8);
 				UINT16 c = 0x4000;      /* seems to be hard-coded */
 				UINT16 d = 0x00a0;      /* seems to be hard-coded */
 				UINT16 x = a - b;
@@ -263,106 +261,105 @@ static void cheesech_protection(running_machine &machine)
 				else
 					x = -(((UINT16)-x * c) >> 16);
 				x += d;
-				state->m_prot_output[0] = x;
-				state->m_prot_output[1] = x >> 8;
-				state->m_prot_output_index = 0;
+				m_prot_output[0] = x;
+				m_prot_output[1] = x >> 8;
+				m_prot_output_index = 0;
 			}
-			else if (state->m_prot_input_index >= 7)
-				state->m_prot_input_index = 0;
+			else if (m_prot_input_index >= 7)
+				m_prot_input_index = 0;
 			break;
 
 		case 0x03:  /* 03 (xxxx) */
-			if (state->m_prot_input_index == 1)
+			if (m_prot_input_index == 1)
 			{
-				UINT16 x = state->m_prot_save;
-				state->m_prot_output[0] = x;
-				state->m_prot_output[1] = x >> 8;
-				state->m_prot_output_index = 0;
+				UINT16 x = m_prot_save;
+				m_prot_output[0] = x;
+				m_prot_output[1] = x >> 8;
+				m_prot_output_index = 0;
 			}
-			else if (state->m_prot_input_index >= 3)
-				state->m_prot_input_index = 0;
+			else if (m_prot_input_index >= 3)
+				m_prot_input_index = 0;
 			break;
 
 		case 0x04:  /* 04 aaaa */
-			if (state->m_prot_input_index == 3)
+			if (m_prot_input_index == 3)
 			{
-				UINT16 a = state->m_prot_input[1] | (state->m_prot_input[2] << 8);
-				state->m_prot_save = a;
-				state->m_prot_input_index = state->m_prot_output_index = 0;
+				UINT16 a = m_prot_input[1] | (m_prot_input[2] << 8);
+				m_prot_save = a;
+				m_prot_input_index = m_prot_output_index = 0;
 			}
 			break;
 
 		default:
-			logerror("protection command %02X: unknown\n", state->m_prot_input[0]);
-			state->m_prot_input_index = state->m_prot_output_index = 0;
+			logerror("protection command %02X: unknown\n", m_prot_input[0]);
+			m_prot_input_index = m_prot_output_index = 0;
 			break;
 	}
 }
 
 
-static void stonebal_protection(running_machine &machine)
+void artmagic_state::stonebal_protection()
 {
-	artmagic_state *state = machine.driver_data<artmagic_state>();
 	/* check the command byte */
-	switch (state->m_prot_input[0])
+	switch (m_prot_input[0])
 	{
 		case 0x01:  /* 01 aaaa bbbb cccc dddd (xxxx) */
-			if (state->m_prot_input_index == 9)
+			if (m_prot_input_index == 9)
 			{
-				UINT16 a = state->m_prot_input[1] | (state->m_prot_input[2] << 8);
-				UINT16 b = state->m_prot_input[3] | (state->m_prot_input[4] << 8);
-				UINT16 c = state->m_prot_input[5] | (state->m_prot_input[6] << 8);
-				UINT16 d = state->m_prot_input[7] | (state->m_prot_input[8] << 8);
+				UINT16 a = m_prot_input[1] | (m_prot_input[2] << 8);
+				UINT16 b = m_prot_input[3] | (m_prot_input[4] << 8);
+				UINT16 c = m_prot_input[5] | (m_prot_input[6] << 8);
+				UINT16 d = m_prot_input[7] | (m_prot_input[8] << 8);
 				UINT16 x = a - b;
 				if ((INT16)x >= 0)
 					x = (x * d) >> 16;
 				else
 					x = -(((UINT16)-x * d) >> 16);
 				x += c;
-				state->m_prot_output[0] = x;
-				state->m_prot_output[1] = x >> 8;
-				state->m_prot_output_index = 0;
+				m_prot_output[0] = x;
+				m_prot_output[1] = x >> 8;
+				m_prot_output_index = 0;
 			}
-			else if (state->m_prot_input_index >= 11)
-				state->m_prot_input_index = 0;
+			else if (m_prot_input_index >= 11)
+				m_prot_input_index = 0;
 			break;
 
 		case 0x02:  /* 02 aaaa (xx) */
-			if (state->m_prot_input_index == 3)
+			if (m_prot_input_index == 3)
 			{
-				/*UINT16 a = state->m_prot_input[1] | (state->m_prot_input[2] << 8);*/
+				/*UINT16 a = m_prot_input[1] | (m_prot_input[2] << 8);*/
 				UINT8 x = 0xa5;
-				state->m_prot_output[0] = x;
-				state->m_prot_output_index = 0;
+				m_prot_output[0] = x;
+				m_prot_output_index = 0;
 			}
-			else if (state->m_prot_input_index >= 4)
-				state->m_prot_input_index = 0;
+			else if (m_prot_input_index >= 4)
+				m_prot_input_index = 0;
 			break;
 
 		case 0x03:  /* 03 (xxxx) */
-			if (state->m_prot_input_index == 1)
+			if (m_prot_input_index == 1)
 			{
-				UINT16 x = state->m_prot_save;
-				state->m_prot_output[0] = x;
-				state->m_prot_output[1] = x >> 8;
-				state->m_prot_output_index = 0;
+				UINT16 x = m_prot_save;
+				m_prot_output[0] = x;
+				m_prot_output[1] = x >> 8;
+				m_prot_output_index = 0;
 			}
-			else if (state->m_prot_input_index >= 3)
-				state->m_prot_input_index = 0;
+			else if (m_prot_input_index >= 3)
+				m_prot_input_index = 0;
 			break;
 
 		case 0x04:  /* 04 aaaa */
-			if (state->m_prot_input_index == 3)
+			if (m_prot_input_index == 3)
 			{
-				UINT16 a = state->m_prot_input[1] | (state->m_prot_input[2] << 8);
-				state->m_prot_save = a;
-				state->m_prot_input_index = state->m_prot_output_index = 0;
+				UINT16 a = m_prot_input[1] | (m_prot_input[2] << 8);
+				m_prot_save = a;
+				m_prot_input_index = m_prot_output_index = 0;
 			}
 			break;
 
 		default:
-			logerror("protection command %02X: unknown\n", state->m_prot_input[0]);
-			state->m_prot_input_index = state->m_prot_output_index = 0;
+			logerror("protection command %02X: unknown\n", m_prot_input[0]);
+			m_prot_input_index = m_prot_output_index = 0;
 			break;
 	}
 }
@@ -393,7 +390,7 @@ WRITE16_MEMBER(artmagic_state::protection_bit_w)
 		m_prot_bit_index = 0;
 
 		/* update the protection state */
-		(*m_protection_handler)(machine());
+		(this->*m_protection_handler)();
 	}
 }
 
