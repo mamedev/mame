@@ -1167,6 +1167,20 @@ Titles, serial #s, publishers and release dates taken from:
 		</part>
 	</software>
 
+	<!-- requires FM sound (audio and joystick port, listed as FM-7, so FM sound and joystick was available as an add-on? -->
+	<software name="magus">
+		<description>Magus</description>
+		<year>1985</year>
+		<publisher>ソフトプロ (Soft Pro)</publisher>
+		<info name="serial" value="FUG181"/>
+		<info name="alt_title" value="The Magus - Mysterious Pinball"/>
+		<part name="cass1" interface="fm7_cass">
+			<dataarea name="cass" size="4615868">
+				<rom name="magus.t77" size="4615868" crc="261f3f41" sha1="a30fd1386ee3c657537342e9496fc38501a5a686" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mappy">
 		<description>Mappy</description>
 		<year>1986</year>
