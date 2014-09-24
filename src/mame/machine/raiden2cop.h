@@ -108,12 +108,7 @@ public:
 	DECLARE_WRITE16_MEMBER( cop_angle_mod_val_w );
 
 	DECLARE_WRITE16_MEMBER(cop_hitbox_baseadr_w);
-	DECLARE_WRITE16_MEMBER(cop_sort_lookup_hi_w);
-	DECLARE_WRITE16_MEMBER(cop_sort_lookup_lo_w);
-	DECLARE_WRITE16_MEMBER(cop_sort_ram_addr_hi_w);
-	DECLARE_WRITE16_MEMBER(cop_sort_ram_addr_lo_w);
-	DECLARE_WRITE16_MEMBER(cop_sort_param_w);
-	DECLARE_WRITE16_MEMBER(cop_sort_dma_trig_w);
+
 
 	UINT32 cop_regs[8];
 	UINT16 cop_status, cop_scale, cop_angle, cop_dist;
@@ -141,15 +136,30 @@ public:
 	void cop_collision_read_pos(address_space &space, int slot, UINT32 spradr, bool allow_swap);
 	void cop_collision_update_hitbox(address_space &space, int slot, UINT32 hitadr);
 
+	// Sort DMA (zeroteam, cupsoc)
+
 	UINT32 cop_sort_ram_addr, cop_sort_lookup;
 	UINT16 cop_sort_param;
 
-	// RNG
+	DECLARE_WRITE16_MEMBER(cop_sort_lookup_hi_w);
+	DECLARE_WRITE16_MEMBER(cop_sort_lookup_lo_w);
+	DECLARE_WRITE16_MEMBER(cop_sort_ram_addr_hi_w);
+	DECLARE_WRITE16_MEMBER(cop_sort_ram_addr_lo_w);
+	DECLARE_WRITE16_MEMBER(cop_sort_param_w);
+	DECLARE_WRITE16_MEMBER(cop_sort_dma_trig_w);
+
+	// RNG (cupsoc)
 	UINT16 m_cop_rng_max_value;
 	DECLARE_READ16_MEMBER(cop_prng_r);
 	DECLARE_WRITE16_MEMBER(cop_prng_maxvalue_w);
 	DECLARE_READ16_MEMBER(cop_prng_maxvalue_r);
 
+	// misc 68k (grainbow)
+	UINT32 m_cop_sprite_dma_param;
+	DECLARE_WRITE16_MEMBER(cop_sprite_dma_param_hi_w);
+	DECLARE_WRITE16_MEMBER(cop_sprite_dma_param_lo_w);
+	DECLARE_WRITE16_MEMBER(cop_sprite_dma_size_w);
+	int m_cop_sprite_dma_size;
 
 protected:
 	// device-level overrides

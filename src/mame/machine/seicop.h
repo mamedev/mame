@@ -50,8 +50,7 @@ private:
 	UINT16 m_cop_rom_addr_lo,m_cop_rom_addr_hi,m_cop_rom_addr_unk;
 
 	UINT32 m_cop_sprite_dma_src;
-	int m_cop_sprite_dma_abs_x,m_cop_sprite_dma_abs_y,m_cop_sprite_dma_size;
-	UINT32 m_cop_sprite_dma_param;
+	int m_cop_sprite_dma_abs_x,m_cop_sprite_dma_abs_y;
 
 
 	void cop_take_hit_box_params(UINT8 offs);

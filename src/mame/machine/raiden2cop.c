@@ -43,6 +43,10 @@ raiden2cop_device::raiden2cop_device(const machine_config &mconfig, const char *
 
 	m_cop_rng_max_value(0),
 
+	m_cop_sprite_dma_param(0),
+	m_cop_sprite_dma_size(0),
+
+
 	m_videoramout_cb(*this),
 	m_palette(*this, ":palette")
 {
@@ -128,6 +132,10 @@ void raiden2cop_device::device_start()
 	save_item(NAME(cop_collision_info[1].flags_swap));
 
 	save_item(NAME(m_cop_rng_max_value));
+
+	save_item(NAME(m_cop_sprite_dma_param));
+
+	save_item(NAME(m_cop_sprite_dma_size));
 
 
 	m_videoramout_cb.resolve_safe();
@@ -1080,4 +1088,21 @@ WRITE16_MEMBER(raiden2cop_device::cop_prng_maxvalue_w)
 READ16_MEMBER(raiden2cop_device::cop_prng_maxvalue_r)
 {
 	return m_cop_rng_max_value;
+}
+
+// misc used by 68k games (mostly grainbow?)
+
+WRITE16_MEMBER( raiden2cop_device::cop_sprite_dma_param_hi_w)
+{
+	m_cop_sprite_dma_param = (m_cop_sprite_dma_param&0x0000ffff)|(data<<16);
+}
+
+WRITE16_MEMBER( raiden2cop_device::cop_sprite_dma_param_lo_w)
+{
+	m_cop_sprite_dma_param = (m_cop_sprite_dma_param&0xffff0000)|(data&0xffff);
+}
+
+WRITE16_MEMBER(raiden2cop_device::cop_sprite_dma_size_w)
+{
+	m_cop_sprite_dma_size = data;
 }

@@ -1614,8 +1614,6 @@ seibu_cop_legacy_device::seibu_cop_legacy_device(const machine_config &mconfig, 
 	m_cop_sprite_dma_src(0),
 	m_cop_sprite_dma_abs_x(0),
 	m_cop_sprite_dma_abs_y(0),
-	m_cop_sprite_dma_size(0),
-	m_cop_sprite_dma_param(0),
 	m_raiden2cop(*this, ":raiden2cop")
 {
 
@@ -1656,8 +1654,6 @@ void seibu_cop_legacy_device::device_start()
 	save_item(NAME(m_cop_sprite_dma_src));
 	save_item(NAME(m_cop_sprite_dma_abs_x));
 	save_item(NAME(m_cop_sprite_dma_abs_y));
-	save_item(NAME(m_cop_sprite_dma_size));
-	save_item(NAME(m_cop_sprite_dma_param));
 }
 
 //-------------------------------------------------
@@ -2070,14 +2066,10 @@ WRITE16_MEMBER( seibu_cop_legacy_device::generic_cop_w )
 			seibu_cop_log("%06x: COPX unhandled write data %04x at offset %04x\n", space.device().safe_pc(), data, offset*2);
 			break;
 
-		/* Sprite DMA */
-		case (0x000/2):
-		case (0x002/2):
-			m_cop_sprite_dma_param = (m_cop_mcu_ram[0x000/2]) | (m_cop_mcu_ram[0x002/2] << 16);
-			//popmessage("%08x",m_cop_sprite_dma_param & 0xffffffc0);
-			break;
 
-		case (0x00c/2): { m_cop_sprite_dma_size = m_cop_mcu_ram[offset]; break; }
+
+	
+
 		case (0x010/2):
 		{
 			if(data)
@@ -2088,9 +2080,9 @@ WRITE16_MEMBER( seibu_cop_legacy_device::generic_cop_w )
 				m_raiden2cop->cop_regs[4]+=8;
 				m_cop_sprite_dma_src+=6;
 
-				m_cop_sprite_dma_size--;
+				m_raiden2cop->m_cop_sprite_dma_size--;
 
-				if(m_cop_sprite_dma_size > 0)
+				if(m_raiden2cop->m_cop_sprite_dma_size > 0)
 					m_raiden2cop->cop_status &= ~2;
 				else
 					m_raiden2cop->cop_status |= 2;
@@ -2500,7 +2492,7 @@ WRITE16_MEMBER( seibu_cop_legacy_device::generic_cop_w )
 
 				offs = (offset & 3) * 4;
 
-				space.write_word(m_raiden2cop->cop_regs[4] + offs + 0,space.read_word(m_cop_sprite_dma_src + offs) + (m_cop_sprite_dma_param & 0x3f));
+				space.write_word(m_raiden2cop->cop_regs[4] + offs + 0,space.read_word(m_cop_sprite_dma_src + offs) + (m_raiden2cop->m_cop_sprite_dma_param & 0x3f));
 				//space.write_word(m_raiden2cop->cop_regs[4] + offs + 2,space.read_word(m_cop_sprite_dma_src+2 + offs));
 				return;
 			}
