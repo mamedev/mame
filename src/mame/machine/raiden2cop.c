@@ -184,6 +184,12 @@ UINT8 raiden2cop_device::cop_read_byte(address_space &space, int address)
 	else return space.read_byte(address);
 }
 
+void raiden2cop_device::cop_write_word(address_space &space, int address, UINT16 data)
+{
+	if (m_cpu_is_68k) space.write_word(address ^ 2, data);
+	else space.write_word(address, data);
+}
+
 
 /*** Command Table uploads ***/
 
@@ -768,20 +774,7 @@ void raiden2cop_device::execute_0205(address_space &space, int offset, UINT16 da
 	int npos = ppos + space.read_dword(cop_regs[0] + 0x10 + offset * 4);
 	int delta = (npos >> 16) - (ppos >> 16);
 	space.write_dword(cop_regs[0] + 4 + offset * 4, npos);
-	space.write_word(cop_regs[0] + 0x1e + offset * 4, space.read_word(cop_regs[0] + 0x1e + offset * 4) + delta);
-}
-
-void raiden2cop_device::LEGACY_execute_0205(address_space &space, int offset, UINT16 data)
-{
-	UINT8 offs;
-
-	offs = (offset & 3) * 4;
-	int ppos = space.read_dword(cop_regs[0] + 4 + offs);
-	int npos = ppos + space.read_dword(cop_regs[0] + 0x10 + offs);
-	int delta = (npos >> 16) - (ppos >> 16);
-
-	space.write_dword(cop_regs[0] + 4 + offs, npos);
-	space.write_word(cop_regs[0] + 0x1c + offs, space.read_word(cop_regs[0] + 0x1c + offs) + delta);
+	cop_write_word(space,cop_regs[0] + 0x1e + offset * 4, cop_read_word(space, cop_regs[0] + 0x1e + offset * 4) + delta);
 }
 
 /*
@@ -1989,7 +1982,7 @@ WRITE16_MEMBER(raiden2cop_device::LEGACY_cop_cmd_w)
 	if (check_command_matches(command, 0x188, 0x282, 0x082, 0xb8e, 0x98e, 0x000, 0x000, 0x000, 6, 0xffeb))
 	{
 		executed = 1;
-		LEGACY_execute_0205(space, offset, data);
+		execute_0205(space, offset, data);
 		return;
 	}
 
