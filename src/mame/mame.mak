@@ -2690,6 +2690,8 @@ $(DRIVERS)/maxaflex.o:  $(LAYOUT)/maxaflex.lh
 
 $(DRIVERS)/maygay1b.o:  $(LAYOUT)/maygay1b.lh
 
+$(DRIVERS)/micropin.o:  $(LAYOUT)/micropin.lh
+
 $(DRIVERS)/mcr.o:       $(LAYOUT)/dpoker.lh
 
 $(DRIVERS)/mcr3.o:      $(LAYOUT)/spyhunt.lh \
