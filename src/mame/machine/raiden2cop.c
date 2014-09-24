@@ -837,7 +837,6 @@ void raiden2cop_device::LEGACY_execute_130e(address_space &space, int offset, UI
 			cop_angle += 0x80;
 	}
 
-	cop_angle -= 0x80;
 	m_LEGACY_r0 = dy;
 	m_LEGACY_r1 = dx;
 
