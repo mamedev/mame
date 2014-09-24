@@ -282,7 +282,7 @@ void raiden2cop_device::dump_table()
 			printf("%04x ", cop_func_mask[command]);
 
 
-			printf("\n");
+			printf("  (%s)\n", machine().system().name);
 		}
 	}
 #endif
@@ -739,6 +739,110 @@ READ16_MEMBER(raiden2cop_device::cop_itoa_digits_r)
 
 /* Main COP functionality */
 
+/*
+(masked) just assumes 0x0080 masked out, actual masking / command selection is more complex, sometimes needs 0x2000 masked out too, but that would cause clashes in some tables
+
+## - trig (masked) :  (sq0, sq1, sq2, sq3, sq4, sq5, sq6, sq7)  valu  mask
+00 - 0205 (0205  ) :  (188, 282, 082, b8e, 98e, 000, 000, 000)  6     ffeb   (heatbrl, legionna, cupsoc, godzilla, grainbow, denjinmk, raiden2, raidendx, zeroteam, xsedae)
+00 - 0105 (0105  ) :  (180, 2e0, 0a0, 000, 000, 000, 000, 000)  6     fffb   (zeroteamsr)
+
+01 - 0905 (0905  ) :  (194, 288, 088, 000, 000, 000, 000, 000)  6     fbfb   (heatbrl, legionna, cupsoc, godzilla, grainbow, denjinmk, raiden2, raidendx, zeroteam, xsedae)
+01 - 0b05 (0b05  ) :  (180, 2e0, 0a0, 182, 2e0, 0c0, 000, 000)  6     ffdb   (zeroteamsr)
+
+02 - 138e (130e  ) :  (984, aa4, d82, aa2, 39b, b9a, b9a, b9a)  5     bf7f   (heatbrl, legionna)
+02 - 138e (130e  ) :  (984, aa4, d82, aa2, 39b, b9a, b9a, a9a)  5     bf7f   (cupsoc, godzilla, grainbow, denjinmk)
+02 - 130e (130e  ) :  (984, aa4, d82, aa2, 39b, b9a, b9a, a9a)  5     bf7f   (raiden2, raidendx, zeroteam, xsedae)
+
+03 - 1905 (1905  ) :  (994, a88, 088, 000, 000, 000, 000, 000)  6     fbfb   (heatbrl, legionna, cupsoc, godzilla, grainbow, denjinmk, raiden2, raidendx, zeroteam, xsedae)
+
+04 - 2288 (2208  ) :  (f8a, b8a, 388, b9c, b9a, a9a, 000, 000)  5     f5df   (heatbrl, legionna)
+04 - 2288 (2208  ) :  (f8a, b8a, 388, b9a, b9a, a9a, 000, 000)  5     f5df   (cupsoc, godzilla, grainbow, denjinmk)
+04 - 2208 (2208  ) :  (f8a, b8a, 388, b9a, b9a, a9a, 000, 000)  5     f5df   (raiden2, raidendx, zeroteam, xsedae)
+
+05 - 2a05 (2a05  ) :  (9af, a82, 082, a8f, 18e, 000, 000, 000)  6     ebeb   (heatbrl, legionna, cupsoc, godzilla, grainbow, denjinmk, raiden2, raidendx, zeroteam, xsedae)
+
+06 - 338e (330e  ) :  (984, aa4, d82, aa2, 39c, b9c, b9c, a9a)  5     bf7f   (heatbrl, legionna, cupsoc, godzilla, grainbow, denjinmk, raiden2, raidendx)
+06 - 330e (330e  ) :  (984, aa4, d82, aa2, 39c, b9c, b9c, a9a)  5     bf7f   (zeroteam, xsedae)
+
+07 - 3bb0 (3b30  ) :  (f9c, b9c, b9c, b9c, b9c, b9c, b9c, 99c)  4     007f   (heatbrl, legionna, cupsoc, godzilla, grainbow, denjinmk, raiden2, raidendx)
+07 - 3b30 (3b30  ) :  (f9c, b9c, b9c, b9c, b9c, b9c, b9c, 99c)  4     007f   (zeroteam, xsedae)
+
+08 - 42c2 (4242  ) :  (f9a, b9a, b9c, b9c, b9c, 29c, 000, 000)  5     fcdd   (heatbrl, legionna, cupsoc, godzilla, grainbow, denjinmk, raiden2, raidendx, zeroteam, xsedae)
+
+09 - 4aa0 (4a20  ) :  (f9a, b9a, b9c, b9c, b9c, 99b, 000, 000)  5     fcdd   (heatbrl, legionna, cupsoc, godzilla, grainbow, denjinmk, raiden2, raidendx, zeroteam, xsedae)
+
+0a - 5105 (5105  ) :  (a80, 984, 082, 000, 000, 000, 000, 000)  5     fefb   (cupsoc, grainbow)
+0a - 5205 (5205  ) :  (180, 2e0, 3a0, 0a0, 3a0, 000, 000, 000)  6     fff7   (raiden2, raidendx)
+0a - 5105 (5105  ) :  (180, 2e0, 0a0, 000, 000, 000, 000, 000)  6     fffb   (zeroteam, xsedae)
+
+0b - 5905 (5905  ) :  (9c8, a84, 0a2, 000, 000, 000, 000, 000)  5     fffb   (cupsoc, grainbow)
+0b - 5a05 (5a05  ) :  (180, 2e0, 3a0, 0a0, 3a0, 000, 000, 000)  6     fff7   (raiden2, raidendx)
+0b - 5a85 (5a05  ) :  (180, 2e0, 0a0, 182, 2e0, 0c0, 3c0, 3c0)  6     ffdb   (zeroteam, xsedae)
+
+0c - 6200 (6200  ) :  (380, 39a, 380, a80, 29a, 000, 000, 000)  8     f3e7   (heatbrl, legionna, godzilla, grainbow, denjinmk, raiden2, raidendx, zeroteam, xsedae)
+0c - 6200 (6200  ) :  (3a0, 3a6, 380, aa0, 2a6, 000, 000, 000)  8     f3e7   (cupsoc)
+
+0d - 6880 (6800  ) :  (b80, ba0, 000, 000, 000, 000, 000, 000)  a     fff3   (heatbrl, legionna, cupsoc, godzilla, denjinmk)
+0d - 6980 (6900  ) :  (b80, ba0, 000, 000, 000, 000, 000, 000)  a     fff3   (grainbow, zeroteam, xsedae)
+
+0e - 7100 (7100  ) :  (b80, a80, b80, 000, 000, 000, 000, 000)  8     fdfd   (zeroteam, xsedae)
+
+0f - 7905 (7905  ) :  (1a2, 2c2, 0a2, 000, 000, 000, 000, 000)  6     fffb   (cupsoc, grainbow)
+0f - 7e05 (7e05  ) :  (180, 282, 080, 180, 282, 000, 000, 000)  6     fffb   (raidendx)
+
+10 - 8100 (8100  ) :  (b9a, b88, 888, 000, 000, 000, 000, 000)  7     fdfb   (heatbrl, legionna, cupsoc, godzilla, grainbow, denjinmk, raiden2, raidendx, zeroteam, xsedae)
+
+11 - 8900 (8900  ) :  (b9a, b8a, 88a, 000, 000, 000, 000, 000)  7     fdfb   (heatbrl, legionna, cupsoc, godzilla, grainbow, denjinmk, raiden2, raidendx, zeroteam, xsedae)
+
+12 - 9180 (9100  ) :  (b80, b94, b94, 894, 000, 000, 000, 000)  7     f8f7   (heatbrl, legionna, cupsoc, godzilla, grainbow, denjinmk)
+12 - 9100 (9100  ) :  (b80, b94, 894, 000, 000, 000, 000, 000)  7     fefb   (raiden2, raidendx)
+12 - 9100 (9100  ) :  (b80, b94, b94, 894, 000, 000, 000, 000)  7     f8f7   (zeroteam, xsedae)
+
+13 - 9980 (9900  ) :  (b80, b96, b96, 896, 000, 000, 000, 000)  7     f8f7   (heatbrl, legionna)
+13 - 9980 (9900  ) :  (b80, b94, b94, 896, 000, 000, 000, 000)  7     f8f7   (cupsoc, godzilla, grainbow, denjinmk)
+13 - 9900 (9900  ) :  (b80, b94, 896, 000, 000, 000, 000, 000)  7     fefb   (raiden2, raidendx)
+13 - 9900 (9900  ) :  (b80, b94, b94, 896, 000, 000, 000, 000)  7     f8f7   (zeroteam, xsedae)
+
+// x
+
+14 - a100 (a100  ) :  (b80, b82, b84, b86, 000, 000, 000, 000)  0     ffff   (heatbrl, zeroteam, xsedae)
+14 - a180 (a100  ) :  (b80, b82, b84, b86, 000, 000, 000, 000)  0     ffff   (legionna, cupsoc, godzilla, denjinmk)
+14 - a180 (a100  ) :  (b80, b82, b84, b86, 000, 000, 000, 000)  0     02ff   (grainbow)
+14 - a100 (a100  ) :  (b80, b82, b84, b86, 000, 000, 000, 000)  0     00ff   (raiden2, raidendx)
+
+15 - a900 (a900  ) :  (ba0, ba2, ba4, ba6, 000, 000, 000, 000)  f     ffff   (heatbrl, zeroteam, xsedae)
+15 - a980 (a900  ) :  (ba0, ba2, ba4, ba6, 000, 000, 000, 000)  f     ffff   (legionna, cupsoc, godzilla, denjinmk)
+15 - a980 (a900  ) :  (ba0, ba2, ba4, ba6, 000, 000, 000, 000)  f     02ff   (grainbow)
+15 - a900 (a900  ) :  (ba0, ba2, ba4, ba6, 000, 000, 000, 000)  f     00ff   (raiden2, raidendx)
+
+16 - b080 (b000  ) :  (b40, bc0, bc2, 000, 000, 000, 000, 000)  9     ffff   (heatbrl)
+16 - b100 (b100  ) :  (b40, bc0, bc2, 000, 000, 000, 000, 000)  9     ffff   (legionna, cupsoc, godzilla, grainbow, denjinmk, raiden2, raidendx, zeroteam, xsedae)
+
+17 - b880 (b800  ) :  (b60, be0, be2, 000, 000, 000, 000, 000)  6     ffff   (heatbrl)
+17 - b900 (b900  ) :  (b60, be0, be2, 000, 000, 000, 000, 000)  6     ffff   (legionna, cupsoc, godzilla, grainbow, denjinmk, raiden2, raidendx, zeroteam, xsedae)
+
+18 - c480 (c400  ) :  (080, 882, 000, 000, 000, 000, 000, 000)  a     ff00   (heatbrl, legionna, cupsoc, godzilla, grainbow, denjinmk)
+18 - 7c80 (7c00  ) :  (080, 882, 000, 000, 000, 000, 000, 000)  a     ff00   (zeroteam, xsedae)
+
+19 - cb8f (cb0f  ) :  (984, aa4, d82, aa2, 39b, b9a, b9a, a9f)  5     bf7f   (cupsoc, grainbow)
+
+1a - d104 (d104  ) :  (ac2, 9e0, 0a2, 000, 000, 000, 000, 000)  5     fffb   (cupsoc, grainbow)
+
+1b - dde5 (dd65  ) :  (f80, aa2, 984, 0c2, 000, 000, 000, 000)  5     7ff7   (cupsoc, grainbow)
+
+1c - e38e (e30e  ) :  (984, ac4, d82, ac2, 39b, b9a, b9a, a9a)  5     b07f   (cupsoc, grainbow)
+1c - e105 (e105  ) :  (a88, 994, 088, 000, 000, 000, 000, 000)  5     06fb   (zeroteam, xsedae)
+
+1d - eb8e (eb0e  ) :  (984, ac4, d82, ac2, 39b, b9a, b9a, a9f)  5     b07f   (cupsoc, grainbow)
+1d - ede5 (ed65  ) :  (f88, a84, 986, 08a, 000, 000, 000, 000)  5     05f7   (zeroteam, xsedae)
+
+1e - f105 (f105  ) :  (a88, 994, 088, 000, 000, 000, 000, 000)  5     fefb   (cupsoc, grainbow)
+1e - f205 (f205  ) :  (182, 2e0, 3c0, 0c0, 3c0, 000, 000, 000)  6     fff7   (raiden2, raidendx)
+1e - f790 (f710  ) :  (f80, b84, b84, b84, b84, b84, b84, b84)  4     00ff   (zeroteam, xsedae)
+
+1f - fc84 (fc04  ) :  (182, 280, 000, 000, 000, 000, 000, 000)  6     00ff   (zeroteam, xsedae)
+
+*/
 
 READ16_MEMBER( raiden2cop_device::cop_status_r)
 {
