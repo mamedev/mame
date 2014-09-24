@@ -20,6 +20,16 @@
 #define FINDER_DUMMY_TAG "finder_dummy_tag"
 
 //**************************************************************************
+//  IOPORT ARRAY MACROS
+//**************************************************************************
+
+// these macros can be used to initialize an ioport_array with
+// individual port names, instead of a base name + numeric suffix
+
+#define IOPORT_ARRAY_MEMBER(name) const char * const name[] =
+#define DECLARE_IOPORT_ARRAY(name) static const char * const name[]
+
+//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 

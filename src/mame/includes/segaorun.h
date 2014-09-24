@@ -34,6 +34,8 @@ public:
 		m_segaic16vid(*this, "segaic16vid"),
 		m_segaic16road(*this, "segaic16road"),
 		m_bankmotor_timer(*this, "bankmotor"),
+		m_digital_ports(*this, digital_ports),
+		m_adc_ports(*this, "ADC"),
 		m_workram(*this, "workram"),
 		m_custom_map(NULL),
 		m_shangon_video(false),
@@ -121,6 +123,11 @@ protected:
 	required_device<segaic16_video_device> m_segaic16vid;
 	required_device<segaic16_road_device> m_segaic16road;
 	optional_device<timer_device> m_bankmotor_timer;
+
+	// input ports
+	DECLARE_IOPORT_ARRAY(digital_ports);
+	required_ioport_array<4> m_digital_ports;
+	optional_ioport_array<8> m_adc_ports;
 
 	// memory
 	required_shared_ptr<UINT16> m_workram;

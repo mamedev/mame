@@ -108,9 +108,8 @@ READ16_MEMBER( segaybd_state::analog_r )
 
 WRITE16_MEMBER( segaybd_state::analog_w )
 {
-	static const char *const ports[] = { "ADC0", "ADC1", "ADC2", "ADC3", "ADC4", "ADC5", "ADC6" };
 	int selected = ((offset & 3) == 3) ? (3 + (m_misc_io_data[0x08/2] & 3)) : (offset & 3);
-	m_analog_data[offset & 3] = ioport(ports[selected])->read_safe(0xff);
+	m_analog_data[offset & 3] = m_adc_ports[selected]->read_safe(0xff);
 }
 
 
@@ -118,9 +117,11 @@ WRITE16_MEMBER( segaybd_state::analog_w )
 //  io_chip_r - handle reads from the I/O chip
 //-------------------------------------------------
 
+IOPORT_ARRAY_MEMBER( segaybd_state::digital_ports )
+{ "P1", "GENERAL", "PORTC", "PORTD", "PORTE", "DSW", "COINAGE", "PORTH" };
+
 READ16_MEMBER( segaybd_state::io_chip_r )
 {
-	static const char *const portnames[] = { "P1", "GENERAL", "PORTC", "PORTD", "PORTE", "DSW", "COINAGE", "PORTH" };
 	offset &= 0x1f/2;
 
 	switch (offset)
@@ -139,7 +140,7 @@ READ16_MEMBER( segaybd_state::io_chip_r )
 				return m_misc_io_data[offset];
 
 			// otherwise, return an input port
-			return ioport(portnames[offset])->read();
+			return m_digital_ports[offset]->read();
 
 		// 'SEGA' protection
 		case 0x10/2:
@@ -893,13 +894,13 @@ static INPUT_PORTS_START( gforce2 )
 	PORT_DIPSETTING(    0x40, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x00, "City" )
 
-	PORT_START("ADC0")  // stick X
+	PORT_START("ADC.0")  // stick X
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_MINMAX(0x01,0xff) PORT_SENSITIVITY(100) PORT_KEYDELTA(4)
 
-	PORT_START("ADC1")  // stick Y
+	PORT_START("ADC.1")  // stick Y
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_MINMAX(0x01,0xff) PORT_SENSITIVITY(100) PORT_KEYDELTA(4) PORT_REVERSE
 
-	PORT_START("ADC2")  // throttle
+	PORT_START("ADC.2")  // throttle
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Z ) PORT_MINMAX(0x01,0xff) PORT_SENSITIVITY(100) PORT_KEYDELTA(79)
 INPUT_PORTS_END
 
@@ -935,13 +936,13 @@ static INPUT_PORTS_START( gloc )
 	PORT_DIPSETTING(    0x80, "3 to Start, 2 to Continue" )
 	PORT_DIPSETTING(    0x00, "4 to Start, 3 to Continue" )
 
-	PORT_START("ADC3")  // stick Y
+	PORT_START("ADC.3")  // stick Y
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_MINMAX(0x40,0xc0) PORT_SENSITIVITY(100) PORT_KEYDELTA(4) PORT_REVERSE
 
-	PORT_START("ADC4")  // throttle
+	PORT_START("ADC.4")  // throttle
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Z ) PORT_SENSITIVITY(100) PORT_KEYDELTA(79)
 
-	PORT_START("ADC5")  // stick X
+	PORT_START("ADC.5")  // stick X
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_MINMAX(0x20,0xe0) PORT_SENSITIVITY(100) PORT_KEYDELTA(4)
 INPUT_PORTS_END
 
@@ -1020,16 +1021,16 @@ static INPUT_PORTS_START( glocr360 )
 	PORT_DIPSETTING(    0x80, DEF_STR( 1C_8C ) )
 	PORT_DIPSETTING(    0x00, "Free Play (if Coin A too) or 1/1" )
 
-	PORT_START("ADC0")  // moving pitch
+	PORT_START("ADC.0")  // moving pitch
 	PORT_BIT( 0xff, 0x7f, IPT_AD_STICK_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(4) PORT_PLAYER(2)
 
-	PORT_START("ADC2")  // moving roll
+	PORT_START("ADC.2")  // moving roll
 	PORT_BIT( 0xff, 0x7f, IPT_AD_STICK_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(4) PORT_PLAYER(3)
 
-	PORT_START("ADC3")  // stick Y
+	PORT_START("ADC.3")  // stick Y
 	PORT_BIT( 0xff, 0x7f, IPT_AD_STICK_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(4) PORT_REVERSE
 
-	PORT_START("ADC5")  // stick X
+	PORT_START("ADC.5")  // stick X
 	PORT_BIT( 0xff, 0x7f, IPT_AD_STICK_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(4)
 INPUT_PORTS_END
 
@@ -1063,13 +1064,13 @@ static INPUT_PORTS_START( pdrift )
 	PORT_DIPSETTING(    0x40, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
 
-	PORT_START("ADC3")  // brake
+	PORT_START("ADC.3")  // brake
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_SENSITIVITY(100) PORT_KEYDELTA(40)
 
-	PORT_START("ADC4")  // gas pedal
+	PORT_START("ADC.4")  // gas pedal
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(20)
 
-	PORT_START("ADC5")  // steering
+	PORT_START("ADC.5")  // steering
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x20,0xe0) PORT_SENSITIVITY(100) PORT_KEYDELTA(4)
 INPUT_PORTS_END
 
@@ -1268,16 +1269,16 @@ static INPUT_PORTS_START( rchase )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("ADC0")
+	PORT_START("ADC.0")
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_SENSITIVITY(50) PORT_KEYDELTA(5)
 
-	PORT_START("ADC1")
+	PORT_START("ADC.1")
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_SENSITIVITY(50) PORT_KEYDELTA(5)
 
-	PORT_START("ADC2")
+	PORT_START("ADC.2")
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_SENSITIVITY(50) PORT_KEYDELTA(5) PORT_PLAYER(2)
 
-	PORT_START("ADC3")
+	PORT_START("ADC.3")
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_SENSITIVITY(50) PORT_KEYDELTA(5) PORT_PLAYER(2)
 INPUT_PORTS_END
 

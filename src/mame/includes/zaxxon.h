@@ -10,13 +10,21 @@ class zaxxon_state : public driver_device
 public:
 	zaxxon_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_videoram(*this, "videoram"),
-		m_spriteram(*this, "spriteram"),
-		m_colorram(*this, "colorram"),
 		m_maincpu(*this, "maincpu"),
 		m_samples(*this, "samples"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette"),
+		m_dials(*this, "DIAL"),
+		m_videoram(*this, "videoram"),
+		m_spriteram(*this, "spriteram"),
+		m_colorram(*this, "colorram") { }
+
+	required_device<cpu_device> m_maincpu;
+	optional_device<samples_device> m_samples;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+
+	optional_ioport_array<2> m_dials;
 
 	required_shared_ptr<UINT8> m_videoram;
 	optional_shared_ptr<UINT8> m_spriteram;
@@ -89,10 +97,6 @@ public:
 	inline int find_minimum_x(UINT8 value, int flip);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, UINT16 flipxmask, UINT16 flipymask);
 	void zaxxonj_decode(const char *cputag);
-	required_device<cpu_device> m_maincpu;
-	optional_device<samples_device> m_samples;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
 };
 
 

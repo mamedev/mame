@@ -29,6 +29,8 @@ public:
 			m_bsprites(*this, "bsprites"),
 			m_ysprites(*this, "ysprites"),
 			m_segaic16vid(*this, "segaic16vid"),
+			m_digital_ports(*this, digital_ports),
+			m_adc_ports(*this, "ADC"),
 			m_pdrift_bank(0),
 			m_scanline_timer(NULL),
 			m_irq2_scanline(0),
@@ -109,6 +111,11 @@ protected:
 	required_device<sega_sys16b_sprite_device> m_bsprites;
 	required_device<sega_yboard_sprite_device> m_ysprites;
 	required_device<segaic16_video_device> m_segaic16vid;
+
+	// input ports
+	DECLARE_IOPORT_ARRAY(digital_ports);
+	required_ioport_array<8> m_digital_ports;
+	optional_ioport_array<6> m_adc_ports;
 
 	// configuration
 	output_delegate m_output_cb1;

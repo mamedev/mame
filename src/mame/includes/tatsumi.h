@@ -81,8 +81,6 @@ public:
 	DECLARE_WRITE16_MEMBER(bigfight_a20000_w);
 	DECLARE_WRITE16_MEMBER(bigfight_a40000_w);
 	DECLARE_WRITE16_MEMBER(bigfight_a60000_w);
-	DECLARE_READ16_MEMBER(cyclwarr_input_r);
-	DECLARE_READ16_MEMBER(cyclwarr_input2_r);
 	DECLARE_WRITE16_MEMBER(cyclwarr_sound_w);
 	DECLARE_READ16_MEMBER(apache3_bank_r);
 	DECLARE_WRITE16_MEMBER(apache3_bank_w);

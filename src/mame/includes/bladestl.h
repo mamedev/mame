@@ -11,7 +11,6 @@
 
 class bladestl_state : public driver_device
 {
-	static const char * const trackball_tags[];
 public:
 	bladestl_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
@@ -25,7 +24,7 @@ public:
 		m_filter2(*this, "filter2"),
 		m_filter3(*this, "filter3"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_trackball(*this, trackball_tags),
+		m_trackball(*this, "TRACKBALL"),
 		m_rombank(*this, "rombank") { }
 
 	required_device<cpu_device> m_maincpu;

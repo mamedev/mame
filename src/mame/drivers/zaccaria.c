@@ -53,15 +53,15 @@ WRITE8_MEMBER(zaccaria_state::zaccaria_dsw_sel_w)
 	switch (data & 0xf0)
 	{
 		case 0xe0:
-			m_dsw = 0;
+			m_dsw_sel = 0;
 			break;
 
 		case 0xd0:
-			m_dsw = 1;
+			m_dsw_sel = 1;
 			break;
 
 		case 0xb0:
-			m_dsw = 2;
+			m_dsw_sel = 2;
 			break;
 
 		default:
@@ -72,9 +72,7 @@ WRITE8_MEMBER(zaccaria_state::zaccaria_dsw_sel_w)
 
 READ8_MEMBER(zaccaria_state::zaccaria_dsw_r)
 {
-	static const char *const dswnames[] = { "IN0", "DSW0", "DSW1" };
-
-	return ioport(dswnames[m_dsw])->read();
+	return m_dsw_port[m_dsw_sel]->read();
 }
 
 
@@ -336,7 +334,7 @@ CUSTOM_INPUT_MEMBER(zaccaria_state::acs_r)
 }
 
 static INPUT_PORTS_START( monymony )
-	PORT_START("IN0")
+	PORT_START("DSW.0")
 	PORT_DIPNAME( 0x03, 0x01, DEF_STR( Lives ) )            PORT_DIPLOCATION("SW 5I:1,2")
 	PORT_DIPSETTING(    0x00, "2" )
 	PORT_DIPSETTING(    0x01, "3" )
@@ -361,7 +359,7 @@ static INPUT_PORTS_START( monymony )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("DSW0")
+	PORT_START("DSW.1")
 	PORT_DIPNAME( 0x03, 0x01, DEF_STR( Bonus_Life ) )       PORT_DIPLOCATION("SW 4I:1,2")
 	PORT_DIPSETTING(    0x01, "200000" )
 	PORT_DIPSETTING(    0x02, "300000" )
@@ -384,7 +382,7 @@ static INPUT_PORTS_START( monymony )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_SERVICE( 0x80, IP_ACTIVE_HIGH )                    PORT_DIPLOCATION("SW 4I:8")
 
-	PORT_START("DSW1")
+	PORT_START("DSW.2")
 	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Coin_A ) )           PORT_DIPLOCATION("SW 3I:1,2")
 	PORT_DIPSETTING(    0x03, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_1C ) )
@@ -447,12 +445,12 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( jackrabt )
 	PORT_INCLUDE( monymony )
 
-	PORT_MODIFY("IN0")
+	PORT_MODIFY("DSW.0")
 	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )          PORT_DIPLOCATION("SW 5I:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_MODIFY("DSW0")
+	PORT_MODIFY("DSW.1")
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Unknown ) )          PORT_DIPLOCATION("SW 4I:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -477,18 +475,6 @@ static INPUT_PORTS_START( jackrabt )
 INPUT_PORTS_END
 
 
-
-static const gfx_layout charlayout =
-{
-	8,8,
-	RGN_FRAC(1,3),
-	3,
-	{ RGN_FRAC(2,3), RGN_FRAC(1,3), RGN_FRAC(0,3) },
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8
-};
-
 static const gfx_layout spritelayout =
 {
 	16,16,
@@ -503,7 +489,7 @@ static const gfx_layout spritelayout =
 };
 
 static GFXDECODE_START( zaccaria )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,      0, 32 )
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x3_planar, 0, 32 )
 	GFXDECODE_ENTRY( "gfx1", 0, spritelayout, 32*8, 32 )
 GFXDECODE_END
 

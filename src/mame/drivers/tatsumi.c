@@ -180,18 +180,6 @@ WRITE16_MEMBER(tatsumi_state::bigfight_a60000_w)
 	COMBINE_DATA(&m_bigfight_a60000[offset]);
 }
 
-READ16_MEMBER(tatsumi_state::cyclwarr_input_r)
-{
-	static const char *const port[] = { "SERVICE", "P1", "P2", "DSW3" };
-	return ioport(port[offset])->read();
-}
-
-READ16_MEMBER(tatsumi_state::cyclwarr_input2_r)
-{
-	static const char *const port2[] = { "DSW1", "DSW2", "P3", "P4" };
-	return ioport(port2[offset])->read();
-}
-
 WRITE16_MEMBER(tatsumi_state::cyclwarr_sound_w)
 {
 	soundlatch_byte_w(space, 0, data >> 8);
@@ -297,8 +285,14 @@ static ADDRESS_MAP_START( cyclwarr_68000a_map, AS_PROGRAM, 16, tatsumi_state )
 	AM_RANGE(0x0a6000, 0x0a6001) AM_WRITE(bigfight_a60000_w)
 
 	AM_RANGE(0x0b8000, 0x0b8001) AM_WRITE(cyclwarr_sound_w)
-	AM_RANGE(0x0b9002, 0x0b9009) AM_READ(cyclwarr_input_r) /* Coins, P1 input, P2 input, dip 3 */
-	AM_RANGE(0x0ba000, 0x0ba007) AM_READ(cyclwarr_input2_r) /* Dip 1, Dip 2, P3 input, P4 input */
+	AM_RANGE(0x0b9002, 0x0b9003) AM_READ_PORT("SERVICE")
+	AM_RANGE(0x0b9004, 0x0b9005) AM_READ_PORT("P1")
+	AM_RANGE(0x0b9006, 0x0b9007) AM_READ_PORT("P2")
+	AM_RANGE(0x0b9008, 0x0b9009) AM_READ_PORT("DSW3")
+	AM_RANGE(0x0ba000, 0x0ba001) AM_READ_PORT("DSW1")
+	AM_RANGE(0x0ba002, 0x0ba003) AM_READ_PORT("DSW2")
+	AM_RANGE(0x0ba004, 0x0ba005) AM_READ_PORT("P3")
+	AM_RANGE(0x0ba006, 0x0ba007) AM_READ_PORT("P4")
 	AM_RANGE(0x0ba008, 0x0ba009) AM_READWRITE(cyclwarr_control_r, cyclwarr_control_w)
 	AM_RANGE(0x0c0000, 0x0c3fff) AM_READWRITE(cyclwarr_sprite_r, cyclwarr_sprite_w) AM_SHARE("spriteram")
 	AM_RANGE(0x0ca000, 0x0ca1ff) AM_WRITE(tatsumi_sprite_control_w) AM_SHARE("sprite_ctlram")
@@ -317,10 +311,15 @@ static ADDRESS_MAP_START( cyclwarr_68000b_map, AS_PROGRAM, 16, tatsumi_state )
 	AM_RANGE(0x0a4000, 0x0a4001) AM_WRITE(bigfight_a40000_w)
 	AM_RANGE(0x0a6000, 0x0a6001) AM_WRITE(bigfight_a60000_w)
 
-	AM_RANGE(0x0b9002, 0x0b9009) AM_READ(cyclwarr_input_r) /* Coins, P1 input, P2 input, dip 3 */
-	AM_RANGE(0x0ba000, 0x0ba007) AM_READ(cyclwarr_input2_r) /* Dip 1, Dip 2, P3 input, P4 input */
+	AM_RANGE(0x0b9002, 0x0b9003) AM_READ_PORT("SERVICE")
+	AM_RANGE(0x0b9004, 0x0b9005) AM_READ_PORT("P1")
+	AM_RANGE(0x0b9006, 0x0b9007) AM_READ_PORT("P2")
+	AM_RANGE(0x0b9008, 0x0b9009) AM_READ_PORT("DSW3")
+	AM_RANGE(0x0ba000, 0x0ba001) AM_READ_PORT("DSW1")
+	AM_RANGE(0x0ba002, 0x0ba003) AM_READ_PORT("DSW2")
+	AM_RANGE(0x0ba004, 0x0ba005) AM_READ_PORT("P3")
+	AM_RANGE(0x0ba006, 0x0ba007) AM_READ_PORT("P4")
 	AM_RANGE(0x0ba008, 0x0ba009) AM_READ(cyclwarr_control_r)
-
 	AM_RANGE(0x0c0000, 0x0c3fff) AM_READWRITE(cyclwarr_sprite_r, cyclwarr_sprite_w)
 	AM_RANGE(0x0ca000, 0x0ca1ff) AM_WRITE(tatsumi_sprite_control_w)
 	AM_RANGE(0x0d0000, 0x0d3fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
@@ -353,8 +352,14 @@ static ADDRESS_MAP_START( bigfight_68000a_map, AS_PROGRAM, 16, tatsumi_state )
 	AM_RANGE(0x0a6000, 0x0a6001) AM_WRITE(bigfight_a60000_w)
 
 	AM_RANGE(0x0b8000, 0x0b8001) AM_WRITE(cyclwarr_sound_w)
-	AM_RANGE(0x0b9002, 0x0b9009) AM_READ(cyclwarr_input_r) /* Coins, P1 input, P2 input, dip 3 */
-	AM_RANGE(0x0ba000, 0x0ba007) AM_READ(cyclwarr_input2_r) /* Dip 1, Dip 2, P3 input, P4 input */
+	AM_RANGE(0x0b9002, 0x0b9003) AM_READ_PORT("SERVICE")
+	AM_RANGE(0x0b9004, 0x0b9005) AM_READ_PORT("P1")
+	AM_RANGE(0x0b9006, 0x0b9007) AM_READ_PORT("P2")
+	AM_RANGE(0x0b9008, 0x0b9009) AM_READ_PORT("DSW3")
+	AM_RANGE(0x0ba000, 0x0ba001) AM_READ_PORT("DSW1")
+	AM_RANGE(0x0ba002, 0x0ba003) AM_READ_PORT("DSW2")
+	AM_RANGE(0x0ba004, 0x0ba005) AM_READ_PORT("P3")
+	AM_RANGE(0x0ba006, 0x0ba007) AM_READ_PORT("P4")
 	AM_RANGE(0x0ba008, 0x0ba009) AM_READWRITE(cyclwarr_control_r, cyclwarr_control_w)
 	AM_RANGE(0x0c0000, 0x0c3fff) AM_READWRITE(cyclwarr_sprite_r, cyclwarr_sprite_w) AM_SHARE("spriteram")
 	AM_RANGE(0x0ca000, 0x0ca1ff) AM_WRITE(tatsumi_sprite_control_w) AM_SHARE("sprite_ctlram")
@@ -371,10 +376,15 @@ static ADDRESS_MAP_START( bigfight_68000b_map, AS_PROGRAM, 16, tatsumi_state )
 	AM_RANGE(0x0a4000, 0x0a4001) AM_WRITE(bigfight_a40000_w)
 	AM_RANGE(0x0a6000, 0x0a6001) AM_WRITE(bigfight_a60000_w)
 
-	AM_RANGE(0x0b9002, 0x0b9009) AM_READ(cyclwarr_input_r) /* Coins, P1 input, P2 input, dip 3 */
-	AM_RANGE(0x0ba000, 0x0ba007) AM_READ(cyclwarr_input2_r) /* Dip 1, Dip 2, P3 input, P4 input */
+	AM_RANGE(0x0b9002, 0x0b9003) AM_READ_PORT("SERVICE")
+	AM_RANGE(0x0b9004, 0x0b9005) AM_READ_PORT("P1")
+	AM_RANGE(0x0b9006, 0x0b9007) AM_READ_PORT("P2")
+	AM_RANGE(0x0b9008, 0x0b9009) AM_READ_PORT("DSW3")
+	AM_RANGE(0x0ba000, 0x0ba001) AM_READ_PORT("DSW1")
+	AM_RANGE(0x0ba002, 0x0ba003) AM_READ_PORT("DSW2")
+	AM_RANGE(0x0ba004, 0x0ba005) AM_READ_PORT("P3")
+	AM_RANGE(0x0ba006, 0x0ba007) AM_READ_PORT("P4")
 	AM_RANGE(0x0ba008, 0x0ba009) AM_READ(cyclwarr_control_r)
-
 	AM_RANGE(0x0c0000, 0x0c3fff) AM_READWRITE(cyclwarr_sprite_r, cyclwarr_sprite_w)
 	AM_RANGE(0x0ca000, 0x0ca1ff) AM_WRITE(tatsumi_sprite_control_w)
 	AM_RANGE(0x0d0000, 0x0d3fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
@@ -791,26 +801,15 @@ INPUT_PORTS_END
 
 /******************************************************************************/
 
-static const gfx_layout roundup5_charlayout =
+static const gfx_layout spritelayout =
 {
-	8,8,    /* 16*16 sprites */
-	RGN_FRAC(1,1),  /* 4096 sprites */
-	4,  /* 4 bits per pixel */
+	8,8,
+	RGN_FRAC(1,1),
+	4,
 	{ 0, 1, 2, 3 },
 	{ 8,12,0,4, 24,28, 16,20},
 	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32},
-	32*8    /* every sprite takes 32 consecutive bytes */
-};
-
-static const gfx_layout cyclwarr_charlayout =
-{
-	8,8,
-	RGN_FRAC(1,3),
-	3,
-	{ RGN_FRAC(2,3), RGN_FRAC(1,3), RGN_FRAC(0,3)},
-	{ 0, 1, 2, 3, 4, 5, 6, 7},
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8},
-	8*8
+	32*8
 };
 
 static const gfx_layout roundup5_vramlayout =
@@ -825,18 +824,18 @@ static const gfx_layout roundup5_vramlayout =
 };
 
 static GFXDECODE_START( apache3 )
-	GFXDECODE_ENTRY( "gfx1", 0, roundup5_charlayout, 1024, 128)
-	GFXDECODE_ENTRY( "gfx4", 0, cyclwarr_charlayout, 768, 16)
+	GFXDECODE_ENTRY( "gfx1", 0, spritelayout, 1024, 128)
+	GFXDECODE_ENTRY( "gfx4", 0, gfx_8x8x3_planar, 768, 16)
 GFXDECODE_END
 
 static GFXDECODE_START( roundup5 )
-	GFXDECODE_ENTRY( "gfx1", 0, roundup5_charlayout, 1024, 256)
+	GFXDECODE_ENTRY( "gfx1", 0, spritelayout, 1024, 256)
 	GFXDECODE_ENTRY( NULL, 0, roundup5_vramlayout, 0, 16)
 GFXDECODE_END
 
 static GFXDECODE_START( cyclwarr )
-	GFXDECODE_ENTRY( "gfx1", 0, roundup5_charlayout, 8192, 512)
-	GFXDECODE_ENTRY( "gfx5", 0, cyclwarr_charlayout, 0, 512)
+	GFXDECODE_ENTRY( "gfx1", 0, spritelayout, 8192, 512)
+	GFXDECODE_ENTRY( "gfx5", 0, gfx_8x8x3_planar, 0, 512)
 GFXDECODE_END
 
 /******************************************************************************/

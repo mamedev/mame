@@ -660,12 +660,12 @@ WRITE8_MEMBER(namcona1_state::port6_w)
 	m_mcu_port6 = data;
 }
 
-const char * const namcona1_state::ioport_tags[] = { "P4", "DSW", "P1", "P2" };
+IOPORT_ARRAY_MEMBER(namcona1_state::muxed_inputs) { "P4", "DSW", "P1", "P2" };
 
 READ8_MEMBER(namcona1_state::port7_r)
 {
 	if ((m_mcu_port6 & 0x80) == 0)
-		return m_ioport[m_mcu_port6 >> 5]->read();
+		return m_muxed_inputs[m_mcu_port6 >> 5]->read();
 	else
 		return 0xff;
 }

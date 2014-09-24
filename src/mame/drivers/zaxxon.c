@@ -347,11 +347,10 @@ READ8_MEMBER(zaxxon_state::razmataz_counter_r)
 
 CUSTOM_INPUT_MEMBER(zaxxon_state::razmataz_dial_r)
 {
-	static const char *const dialname[2] = { "DIAL0", "DIAL1" };
 	int num = (FPTR)param;
-	int delta, res;
+	int res;
 
-	delta = ioport(dialname[num])->read();
+	int delta = m_dials[num]->read();
 
 	if (delta < 0x80)
 	{
@@ -689,7 +688,7 @@ static INPUT_PORTS_START( razmataz )
 	PORT_START("SW00")
 	PORT_BIT( 0xff, 0x00, IPT_SPECIAL) PORT_CUSTOM_MEMBER(DEVICE_SELF, zaxxon_state,razmataz_dial_r, (void *)0)
 
-	PORT_START("DIAL0")
+	PORT_START("DIAL.0")
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(30) PORT_KEYDELTA(15) PORT_RESET PORT_PLAYER(1)
 
 	PORT_START("SW01")
@@ -704,7 +703,7 @@ static INPUT_PORTS_START( razmataz )
 	PORT_START("SW08")
 	PORT_BIT( 0xff, 0x00, IPT_SPECIAL) PORT_CUSTOM_MEMBER(DEVICE_SELF, zaxxon_state,razmataz_dial_r, (void *)1)
 
-	PORT_START("DIAL1")
+	PORT_START("DIAL.1")
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(30) PORT_KEYDELTA(15) PORT_RESET PORT_PLAYER(2)
 
 	PORT_START("SW0C")
@@ -782,7 +781,7 @@ static INPUT_PORTS_START( ixion )
 	PORT_MODIFY("SW00")
 	PORT_BIT( 0xff, 0x00, IPT_SPECIAL) PORT_CUSTOM_MEMBER(DEVICE_SELF, zaxxon_state,razmataz_dial_r, (void *)0)
 
-	PORT_START("DIAL0")
+	PORT_START("DIAL.0")
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(30) PORT_KEYDELTA(15) PORT_CODE_DEC(KEYCODE_Z) PORT_CODE_INC(KEYCODE_X) PORT_RESET
 
 	PORT_MODIFY("SW01")
