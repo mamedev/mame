@@ -754,42 +754,226 @@ READ16_MEMBER(raiden2cop_device::cop_itoa_digits_r)
 ## - trig (masked) :  (sq0, sq1, sq2, sq3, sq4, sq5, sq6, sq7)  valu  mask
 00 - 0205 (0205  ) :  (188, 282, 082, b8e, 98e, 000, 000, 000)  6     ffeb   (heatbrl, legionna, cupsoc, godzilla, grainbow, denjinmk, raiden2, raidendx, zeroteam, xsedae)
 00 - 0105 (0105  ) :  (180, 2e0, 0a0, 000, 000, 000, 000, 000)  6     fffb   (zeroteamsr)
+*/
+void raiden2cop_device::execute_0205(address_space &space, int offset, UINT16 data)
+{
+	int ppos = space.read_dword(cop_regs[0] + 4 + offset * 4);
+	int npos = ppos + space.read_dword(cop_regs[0] + 0x10 + offset * 4);
+	int delta = (npos >> 16) - (ppos >> 16);
+	space.write_dword(cop_regs[0] + 4 + offset * 4, npos);
+	space.write_word(cop_regs[0] + 0x1e + offset * 4, space.read_word(cop_regs[0] + 0x1e + offset * 4) + delta);
+}
 
+/*
 01 - 0905 (0905  ) :  (194, 288, 088, 000, 000, 000, 000, 000)  6     fbfb   (heatbrl, legionna, cupsoc, godzilla, grainbow, denjinmk, raiden2, raidendx, zeroteam, xsedae)
 01 - 0b05 (0b05  ) :  (180, 2e0, 0a0, 182, 2e0, 0c0, 000, 000)  6     ffdb   (zeroteamsr)
+*/
 
+// triggered with 0904 0905
+/* X Se Dae and Zero Team uses this variant */
+void raiden2cop_device::execute_0904(address_space &space, int offset, UINT16 data)
+{
+	space.write_dword(cop_regs[0] + 16 + offset * 4, space.read_dword(cop_regs[0] + 16 + offset * 4) - space.read_dword(cop_regs[0] + 0x28 + offset * 4));
+}
+
+void raiden2cop_device::execute_0905(address_space &space, int offset, UINT16 data)
+{
+	space.write_dword(cop_regs[0] + 16 + offset * 4, space.read_dword(cop_regs[0] + 16 + offset * 4) + space.read_dword(cop_regs[0] + 0x28 + offset * 4));
+}
+
+
+/*
 02 - 138e (130e  ) :  (984, aa4, d82, aa2, 39b, b9a, b9a, b9a)  5     bf7f   (heatbrl, legionna)
 02 - 138e (130e  ) :  (984, aa4, d82, aa2, 39b, b9a, b9a, a9a)  5     bf7f   (cupsoc, godzilla, grainbow, denjinmk)
 02 - 130e (130e  ) :  (984, aa4, d82, aa2, 39b, b9a, b9a, a9a)  5     bf7f   (raiden2, raidendx, zeroteam, xsedae)
+*/
 
+// triggered with 130e, 138e
+void raiden2cop_device::execute_130e(address_space &space, int offset, UINT16 data)
+{
+	// this can't be right
+	execute_338e(space, offset, data);
+}
+
+/*
 03 - 1905 (1905  ) :  (994, a88, 088, 000, 000, 000, 000, 000)  6     fbfb   (heatbrl, legionna, cupsoc, godzilla, grainbow, denjinmk, raiden2, raidendx, zeroteam, xsedae)
+*/
 
+/*
 04 - 2288 (2208  ) :  (f8a, b8a, 388, b9c, b9a, a9a, 000, 000)  5     f5df   (heatbrl, legionna)
 04 - 2288 (2208  ) :  (f8a, b8a, 388, b9a, b9a, a9a, 000, 000)  5     f5df   (cupsoc, godzilla, grainbow, denjinmk)
 04 - 2208 (2208  ) :  (f8a, b8a, 388, b9a, b9a, a9a, 000, 000)  5     f5df   (raiden2, raidendx, zeroteam, xsedae)
+*/
 
+// also triggered with 0x2208
+void raiden2cop_device::execute_2288(address_space &space, int offset, UINT16 data)
+{
+	int dx = space.read_word(cop_regs[0] + 0x12);
+	int dy = space.read_word(cop_regs[0] + 0x16);
+
+	if (!dy) {
+		cop_status |= 0x8000;
+		cop_angle = 0;
+	}
+	else {
+		cop_angle = atan(double(dx) / double(dy)) * 128 / M_PI;
+		if (dy < 0)
+			cop_angle += 0x80;
+	}
+
+	if (data & 0x0080) {
+		space.write_byte(cop_regs[0] + 0x34, cop_angle);
+	}
+}
+
+/*
 05 - 2a05 (2a05  ) :  (9af, a82, 082, a8f, 18e, 000, 000, 000)  6     ebeb   (heatbrl, legionna, cupsoc, godzilla, grainbow, denjinmk, raiden2, raidendx, zeroteam, xsedae)
+*/
 
+void raiden2cop_device::execute_2a05(address_space &space, int offset, UINT16 data)
+{
+	int delta = space.read_word(cop_regs[1] + 0x1e + offset * 4);
+	space.write_dword(cop_regs[0] + 4 + 2 + offset * 4, space.read_word(cop_regs[0] + 4 + 2 + offset * 4) + delta);
+	space.write_dword(cop_regs[0] + 0x1e + offset * 4, space.read_word(cop_regs[0] + 0x1e + offset * 4) + delta);
+}
+
+
+/*
 06 - 338e (330e  ) :  (984, aa4, d82, aa2, 39c, b9c, b9c, a9a)  5     bf7f   (heatbrl, legionna, cupsoc, godzilla, grainbow, denjinmk, raiden2, raidendx)
 06 - 330e (330e  ) :  (984, aa4, d82, aa2, 39c, b9c, b9c, a9a)  5     bf7f   (zeroteam, xsedae)
+*/
+void raiden2cop_device::execute_338e(address_space &space, int offset, UINT16 data)
+{
+	int dx = space.read_dword(cop_regs[1] + 4) - space.read_dword(cop_regs[0] + 4);
+	int dy = space.read_dword(cop_regs[1] + 8) - space.read_dword(cop_regs[0] + 8);
 
+	if (!dy) {
+		cop_status |= 0x8000;
+		cop_angle = 0;
+	}
+	else {
+		cop_angle = atan(double(dx) / double(dy)) * 128 / M_PI;
+		if (dy < 0)
+			cop_angle += 0x80;
+	}
+
+	if (data & 0x0080) {
+		space.write_byte(cop_regs[0] + 0x34, cop_angle);
+	}
+}
+
+/*
 07 - 3bb0 (3b30  ) :  (f9c, b9c, b9c, b9c, b9c, b9c, b9c, 99c)  4     007f   (heatbrl, legionna, cupsoc, godzilla, grainbow, denjinmk, raiden2, raidendx)
 07 - 3b30 (3b30  ) :  (f9c, b9c, b9c, b9c, b9c, b9c, b9c, 99c)  4     007f   (zeroteam, xsedae)
+*/
 
+// triggered with 0x39b0, 0x3b30, 0x3bb0
+
+void raiden2cop_device::execute_3b30(address_space &space, int offset, UINT16 data)
+{
+	/* TODO: these are actually internally loaded via 0x130e command */
+	int dx, dy;
+
+	dx = space.read_dword(cop_regs[1] + 4) - space.read_dword(cop_regs[0] + 4);
+	dy = space.read_dword(cop_regs[1] + 8) - space.read_dword(cop_regs[0] + 8);
+
+	dx = dx >> 16;
+	dy = dy >> 16;
+	cop_dist = sqrt((double)(dx*dx + dy*dy));
+
+	if (data & 0x0080)
+		space.write_word(cop_regs[0] + (data & 0x200 ? 0x3a : 0x38), cop_dist);
+}
+
+
+/*
 08 - 42c2 (4242  ) :  (f9a, b9a, b9c, b9c, b9c, 29c, 000, 000)  5     fcdd   (heatbrl, legionna, cupsoc, godzilla, grainbow, denjinmk, raiden2, raidendx, zeroteam, xsedae)
+*/
+void raiden2cop_device::execute_42c2(address_space &space, int offset, UINT16 data)
+{
+	int div = space.read_word(cop_regs[0] + (0x36));
+	if (!div)
+		div = 1;
 
+	/* TODO: bits 5-6-15 */
+	cop_status = 7;
+
+	space.write_word(cop_regs[0] + (0x38), (cop_dist << (5 - cop_scale)) / div);
+}
+
+
+/*
 09 - 4aa0 (4a20  ) :  (f9a, b9a, b9c, b9c, b9c, 99b, 000, 000)  5     fcdd   (heatbrl, legionna, cupsoc, godzilla, grainbow, denjinmk, raiden2, raidendx, zeroteam, xsedae)
+*/
+void raiden2cop_device::execute_4aa0(address_space &space, int offset, UINT16 data)
+{
+	int div = space.read_word(cop_regs[0] + (0x38));
+	if (!div)
+		div = 1;
 
+	/* TODO: bits 5-6-15 */
+	cop_status = 7;
+
+	space.write_word(cop_regs[0] + (0x36), (cop_dist << (5 - cop_scale)) / div);
+}
+
+/*
 0a - 5105 (5105  ) :  (a80, 984, 082, 000, 000, 000, 000, 000)  5     fefb   (cupsoc, grainbow)
 0a - 5205 (5205  ) :  (180, 2e0, 3a0, 0a0, 3a0, 000, 000, 000)  6     fff7   (raiden2, raidendx)
 0a - 5105 (5105  ) :  (180, 2e0, 0a0, 000, 000, 000, 000, 000)  6     fffb   (zeroteam, xsedae)
-
+*/
+void raiden2cop_device::execute_5205(address_space &space, int offset, UINT16 data)
+{
+	space.write_dword(cop_regs[1], space.read_dword(cop_regs[0]));
+}
+/*
 0b - 5905 (5905  ) :  (9c8, a84, 0a2, 000, 000, 000, 000, 000)  5     fffb   (cupsoc, grainbow)
 0b - 5a05 (5a05  ) :  (180, 2e0, 3a0, 0a0, 3a0, 000, 000, 000)  6     fff7   (raiden2, raidendx)
 0b - 5a85 (5a05  ) :  (180, 2e0, 0a0, 182, 2e0, 0c0, 3c0, 3c0)  6     ffdb   (zeroteam, xsedae)
+*/
+void raiden2cop_device::execute_5a05(address_space &space, int offset, UINT16 data)
+{
+	space.write_dword(cop_regs[1], space.read_dword(cop_regs[0]));
+}
 
+/*
 0c - 6200 (6200  ) :  (380, 39a, 380, a80, 29a, 000, 000, 000)  8     f3e7   (heatbrl, legionna, godzilla, grainbow, denjinmk, raiden2, raidendx, zeroteam, xsedae)
 0c - 6200 (6200  ) :  (3a0, 3a6, 380, aa0, 2a6, 000, 000, 000)  8     f3e7   (cupsoc)
+
+*/
+void raiden2cop_device::execute_6200(address_space &space, int offset, UINT16 data)
+{
+	UINT8 angle = space.read_byte(cop_regs[0] + 0x34);
+	UINT16 flags = space.read_word(cop_regs[0]);
+	cop_angle_target &= 0xff;
+	cop_angle_step &= 0xff;
+	flags &= ~0x0004;
+	int delta = angle - cop_angle_target;
+	if (delta >= 128)
+		delta -= 256;
+	else if (delta < -128)
+		delta += 256;
+	if (delta < 0) {
+		if (delta >= -cop_angle_step) {
+			angle = cop_angle_target;
+			flags |= 0x0004;
+		}
+		else
+			angle += cop_angle_step;
+	}
+	else {
+		if (delta <= cop_angle_step) {
+			angle = cop_angle_target;
+			flags |= 0x0004;
+		}
+		else
+			angle -= cop_angle_step;
+	}
+	space.write_word(cop_regs[0], flags);
+	space.write_byte(cop_regs[0] + 0x34, angle);
+}
+
+/*
 
 0d - 6880 (6800  ) :  (b80, ba0, 000, 000, 000, 000, 000, 000)  a     fff3   (heatbrl, legionna, cupsoc, godzilla, denjinmk)
 0d - 6980 (6900  ) :  (b80, ba0, 000, 000, 000, 000, 000, 000)  a     fff3   (grainbow, zeroteam, xsedae)
@@ -799,6 +983,11 @@ READ16_MEMBER(raiden2cop_device::cop_itoa_digits_r)
 0f - 7905 (7905  ) :  (1a2, 2c2, 0a2, 000, 000, 000, 000, 000)  6     fffb   (cupsoc, grainbow)
 0f - 7e05 (7e05  ) :  (180, 282, 080, 180, 282, 000, 000, 000)  6     fffb   (raidendx)
 */
+
+void raiden2cop_device::execute_7e05(address_space &space, int offset, UINT16 data) // raidendx
+{
+	space.write_byte(0x470, space.read_byte(cop_regs[4]));
+}
 
 /*
 10 - 8100 (8100  ) :  (b9a, b88, 888, 000, 000, 000, 000, 000)  7     fdfb   (heatbrl, legionna, cupsoc, godzilla, grainbow, denjinmk, raiden2, raidendx, zeroteam, xsedae)
@@ -845,22 +1034,46 @@ void raiden2cop_device::execute_8900(address_space &space, int offset, UINT16 da
 
 // x
 
+*/
+
+/*
 14 - a100 (a100  ) :  (b80, b82, b84, b86, 000, 000, 000, 000)  0     ffff   (heatbrl, zeroteam, xsedae)
 14 - a180 (a100  ) :  (b80, b82, b84, b86, 000, 000, 000, 000)  0     ffff   (legionna, cupsoc, godzilla, denjinmk)
 14 - a180 (a100  ) :  (b80, b82, b84, b86, 000, 000, 000, 000)  0     02ff   (grainbow)
 14 - a100 (a100  ) :  (b80, b82, b84, b86, 000, 000, 000, 000)  0     00ff   (raiden2, raidendx)
-
+*/
+void raiden2cop_device::execute_a100(address_space &space, int offset, UINT16 data)
+{
+	cop_collision_read_pos(space, 0, cop_regs[0], data & 0x0080);
+}
+/*
 15 - a900 (a900  ) :  (ba0, ba2, ba4, ba6, 000, 000, 000, 000)  f     ffff   (heatbrl, zeroteam, xsedae)
 15 - a980 (a900  ) :  (ba0, ba2, ba4, ba6, 000, 000, 000, 000)  f     ffff   (legionna, cupsoc, godzilla, denjinmk)
 15 - a980 (a900  ) :  (ba0, ba2, ba4, ba6, 000, 000, 000, 000)  f     02ff   (grainbow)
 15 - a900 (a900  ) :  (ba0, ba2, ba4, ba6, 000, 000, 000, 000)  f     00ff   (raiden2, raidendx)
-
+*/
+void raiden2cop_device::execute_a900(address_space &space, int offset, UINT16 data)
+{
+	cop_collision_read_pos(space, 1, cop_regs[1], data & 0x0080);
+}
+/*
 16 - b080 (b000  ) :  (b40, bc0, bc2, 000, 000, 000, 000, 000)  9     ffff   (heatbrl)
 16 - b100 (b100  ) :  (b40, bc0, bc2, 000, 000, 000, 000, 000)  9     ffff   (legionna, cupsoc, godzilla, grainbow, denjinmk, raiden2, raidendx, zeroteam, xsedae)
-
+*/
+void raiden2cop_device::execute_b100(address_space &space, int offset, UINT16 data)
+{
+	cop_collision_update_hitbox(space, 0, cop_regs[2]);
+}
+/*
 17 - b880 (b800  ) :  (b60, be0, be2, 000, 000, 000, 000, 000)  6     ffff   (heatbrl)
 17 - b900 (b900  ) :  (b60, be0, be2, 000, 000, 000, 000, 000)  6     ffff   (legionna, cupsoc, godzilla, grainbow, denjinmk, raiden2, raidendx, zeroteam, xsedae)
+*/
+void raiden2cop_device::execute_b900(address_space &space, int offset, UINT16 data)
+{
+	cop_collision_update_hitbox(space, 1, cop_regs[3]);
+}
 
+/*
 18 - c480 (c400  ) :  (080, 882, 000, 000, 000, 000, 000, 000)  a     ff00   (heatbrl, legionna, cupsoc, godzilla, grainbow, denjinmk)
 18 - 7c80 (7c00  ) :  (080, 882, 000, 000, 000, 000, 000, 000)  a     ff00   (zeroteam, xsedae)
 
@@ -879,9 +1092,15 @@ void raiden2cop_device::execute_8900(address_space &space, int offset, UINT16 da
 1e - f105 (f105  ) :  (a88, 994, 088, 000, 000, 000, 000, 000)  5     fefb   (cupsoc, grainbow)
 1e - f205 (f205  ) :  (182, 2e0, 3c0, 0c0, 3c0, 000, 000, 000)  6     fff7   (raiden2, raidendx)
 1e - f790 (f710  ) :  (f80, b84, b84, b84, b84, b84, b84, b84)  4     00ff   (zeroteam, xsedae)
+*/
 
+void raiden2cop_device::execute_f205(address_space &space, int offset, UINT16 data)
+{
+	space.write_dword(cop_regs[2], space.read_dword(cop_regs[0]+4));
+}
+
+/*
 1f - fc84 (fc04  ) :  (182, 280, 000, 000, 000, 000, 000, 000)  6     00ff   (zeroteam, xsedae)
-
 */
 
 READ16_MEMBER( raiden2cop_device::cop_status_r)
@@ -985,138 +1204,59 @@ WRITE16_MEMBER( raiden2cop_device::cop_cmd_w)
 
 	switch(data) {
 	case 0x0205: {  // 0205 0006 ffeb 0000 - 0188 0282 0082 0b8e 098e 0000 0000 0000
-		int ppos = space.read_dword(cop_regs[0] + 4 + offset*4);
-		int npos = ppos + space.read_dword(cop_regs[0] + 0x10 + offset*4);
-		int delta = (npos >> 16) - (ppos >> 16);
-		space.write_dword(cop_regs[0] + 4 + offset*4, npos);
-		space.write_word(cop_regs[0] + 0x1e + offset*4, space.read_word(cop_regs[0] + 0x1e + offset*4) + delta);
+		execute_0205(space, offset, data); // angle from dx/dy
 		break;
 	}
 
-	case 0x0904: { /* X Se Dae and Zero Team uses this variant */
-		space.write_dword(cop_regs[0] + 16 + offset*4, space.read_dword(cop_regs[0] + 16 + offset*4) - space.read_dword(cop_regs[0] + 0x28 + offset*4));
+	case 0x0904: /* X Se Dae and Zero Team uses this variant */
+		execute_0904(space, offset, data);
 		break;
-	}
+	
 	case 0x0905: //  0905 0006 fbfb 0008 - 0194 0288 0088 0000 0000 0000 0000 0000
-		space.write_dword(cop_regs[0] + 16 + offset*4, space.read_dword(cop_regs[0] + 16 + offset*4) + space.read_dword(cop_regs[0] + 0x28 + offset*4));
+		execute_0905(space, offset, data);
 		break;
 
 	case 0x130e:   // 130e 0005 bf7f 0010 - 0984 0aa4 0d82 0aa2 039b 0b9a 0b9a 0a9a
 	case 0x138e:
+		execute_130e(space, offset, data); // angle from dx/dy
+		break;
+
 	case 0x338e: { // 338e 0005 bf7f 0030 - 0984 0aa4 0d82 0aa2 039c 0b9c 0b9c 0a9a
-		int dx = space.read_dword(cop_regs[1]+4) - space.read_dword(cop_regs[0]+4);
-		int dy = space.read_dword(cop_regs[1]+8) - space.read_dword(cop_regs[0]+8);
-
-		if(!dy) {
-			cop_status |= 0x8000;
-			cop_angle = 0;
-		} else {
-			cop_angle = atan(double(dx)/double(dy)) * 128 / M_PI;
-			if(dy<0)
-				cop_angle += 0x80;
-		}
-
-		if(data & 0x0080) {
-			space.write_byte(cop_regs[0]+0x34, cop_angle);
-		}
+		execute_338e(space, offset, data); // angle from dx/dy
 		break;
 	}
 
 	case 0x2208:
 	case 0x2288: { // 2208 0005 f5df 0020 - 0f8a 0b8a 0388 0b9a 0b9a 0a9a 0000 0000
-		int dx = space.read_word(cop_regs[0]+0x12);
-		int dy = space.read_word(cop_regs[0]+0x16);
-
-		if(!dy) {
-			cop_status |= 0x8000;
-			cop_angle = 0;
-		} else {
-			cop_angle = atan(double(dx)/double(dy)) * 128 / M_PI;
-			if(dy<0)
-				cop_angle += 0x80;
-		}
-
-		if(data & 0x0080) {
-			space.write_byte(cop_regs[0]+0x34, cop_angle);
-		}
+		execute_2288(space, offset, data); // angle from dx/dy
 		break;
 	}
 
 	case 0x2a05: { // 2a05 0006 ebeb 0028 - 09af 0a82 0082 0a8f 018e 0000 0000 0000
-		int delta = space.read_word(cop_regs[1] + 0x1e + offset*4);
-		space.write_dword(cop_regs[0] + 4+2  + offset*4, space.read_word(cop_regs[0] + 4+2  + offset*4) + delta);
-		space.write_dword(cop_regs[0] + 0x1e + offset*4, space.read_word(cop_regs[0] + 0x1e + offset*4) + delta);
+		execute_2a05(space, offset, data);
 		break;
 	}
 
 	case 0x39b0:
 	case 0x3b30:
 	case 0x3bb0: { // 3bb0 0004 007f 0038 - 0f9c 0b9c 0b9c 0b9c 0b9c 0b9c 0b9c 099c
-		/* TODO: these are actually internally loaded via 0x130e command */
-		int dx,dy;
+		execute_3b30(space, offset, data); 
 
-		dx = space.read_dword(cop_regs[1]+4) - space.read_dword(cop_regs[0]+4);
-		dy = space.read_dword(cop_regs[1]+8) - space.read_dword(cop_regs[0]+8);
-		
-		dx = dx >> 16;
-		dy = dy >> 16;
-		cop_dist = sqrt((double)(dx*dx+dy*dy));
-		
-		if(data & 0x0080)
-			space.write_word(cop_regs[0]+(data & 0x200 ? 0x3a : 0x38), cop_dist);
 		break;
 	}
 
 	case 0x42c2: { // 42c2 0005 fcdd 0040 - 0f9a 0b9a 0b9c 0b9c 0b9c 029c 0000 0000
-		int div = space.read_word(cop_regs[0]+(0x36));
-		if(!div)
-			div = 1;
-
-		/* TODO: bits 5-6-15 */
-		cop_status = 7;
-
-		space.write_word(cop_regs[0]+(0x38), (cop_dist << (5 - cop_scale)) / div);
+		execute_42c2(space, offset, data); // DIVIDE
 		break;
 	}
 
 	case 0x4aa0: { // 4aa0 0005 fcdd 0048 - 0f9a 0b9a 0b9c 0b9c 0b9c 099b 0000 0000
-		int div = space.read_word(cop_regs[0]+(0x38));
-		if(!div)
-			div = 1;
-
-		/* TODO: bits 5-6-15 */
-		cop_status = 7;
-
-		space.write_word(cop_regs[0]+(0x36), (cop_dist << (5 - cop_scale)) / div);
+		execute_4aa0(space, offset, data); // DIVIDE
 		break;
 	}
 
 	case 0x6200: {
-		UINT8 angle = space.read_byte(cop_regs[0]+0x34);
-		UINT16 flags = space.read_word(cop_regs[0]);
-		cop_angle_target &= 0xff;
-		cop_angle_step &= 0xff;
-		flags &= ~0x0004;
-		int delta = angle - cop_angle_target;
-		if(delta >= 128)
-			delta -= 256;
-		else if(delta < -128)
-			delta += 256;
-		if(delta < 0) {
-			if(delta >= -cop_angle_step) {
-				angle = cop_angle_target;
-				flags |= 0x0004;
-			} else
-				angle += cop_angle_step;
-		} else {
-			if(delta <= cop_angle_step) {
-				angle = cop_angle_target;
-				flags |= 0x0004;
-			} else
-				angle -= cop_angle_step;
-		}
-		space.write_word(cop_regs[0], flags);
-		space.write_byte(cop_regs[0]+0x34, angle);
+		execute_6200(space, offset, data); // Target Angle calcs
 		break;
 	}
 
@@ -1132,41 +1272,42 @@ WRITE16_MEMBER( raiden2cop_device::cop_cmd_w)
 
 	case 0x5205:   // 5205 0006 fff7 0050 - 0180 02e0 03a0 00a0 03a0 0000 0000 0000
 		//      fprintf(stderr, "sprcpt 5205 %04x %04x %04x %08x %08x\n", cop_regs[0], cop_regs[1], cop_regs[3], space.read_dword(cop_regs[0]), space.read_dword(cop_regs[3]));
-		space.write_dword(cop_regs[1], space.read_dword(cop_regs[0]));
+		execute_5205(space, offset, data);
 		break;
 
 	case 0x5a05:   // 5a05 0006 fff7 0058 - 0180 02e0 03a0 00a0 03a0 0000 0000 0000
 		//      fprintf(stderr, "sprcpt 5a05 %04x %04x %04x %08x %08x\n", cop_regs[0], cop_regs[1], cop_regs[3], space.read_dword(cop_regs[0]), space.read_dword(cop_regs[3]));
-		space.write_dword(cop_regs[1], space.read_dword(cop_regs[0]));
+		execute_5a05(space, offset, data);
+	
 		break;
 
 	case 0xf205:   // f205 0006 fff7 00f0 - 0182 02e0 03c0 00c0 03c0 0000 0000 0000
 		//      fprintf(stderr, "sprcpt f205 %04x %04x %04x %08x %08x\n", cop_regs[0]+4, cop_regs[1], cop_regs[3], space.read_dword(cop_regs[0]+4), space.read_dword(cop_regs[3]));
-		space.write_dword(cop_regs[2], space.read_dword(cop_regs[0]+4));
+		execute_f205(space, offset, data);
 		break;
 
 		// raidendx only
 	case 0x7e05:
-		space.write_byte(0x470, space.read_byte(cop_regs[4]));
+		execute_7e05(space, offset, data);
 		break;
 
 	case 0xa100:
 	case 0xa180:
-		cop_collision_read_pos(space, 0, cop_regs[0], data & 0x0080);
+		execute_a100(space, offset, data); // collisions
 		break;
 
 	case 0xa900:
 	case 0xa980:
-		cop_collision_read_pos(space, 1, cop_regs[1], data & 0x0080);
+		execute_a900(space, offset, data); // collisions
 		break;
 
 	case 0xb100: {
-		cop_collision_update_hitbox(space, 0, cop_regs[2]);
+		execute_b100(space, offset, data); // collisions
 		break;
 	}
 
 	case 0xb900: {
-		cop_collision_update_hitbox(space, 1, cop_regs[3]);
+		execute_b900(space, offset, data); // collisions
 		break;
 	}
 

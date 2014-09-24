@@ -149,6 +149,29 @@ public:
 	void execute_8100(address_space &space, int offset, UINT16 data);
 	void execute_8900(address_space &space, int offset, UINT16 data);
 
+	void execute_42c2(address_space &space, int offset, UINT16 data);
+	void execute_4aa0(address_space &space, int offset, UINT16 data);
+	void execute_6200(address_space &space, int offset, UINT16 data);
+
+	void execute_338e(address_space &space, int offset, UINT16 data);
+	void execute_2288(address_space &space, int offset, UINT16 data);
+	void execute_0205(address_space &space, int offset, UINT16 data);
+	void execute_3b30(address_space &space, int offset, UINT16 data);
+	void execute_130e(address_space &space, int offset, UINT16 data);
+	void execute_0904(address_space &space, int offset, UINT16 data);
+	void execute_0905(address_space &space, int offset, UINT16 data);
+	void execute_2a05(address_space &space, int offset, UINT16 data);
+	void execute_7e05(address_space &space, int offset, UINT16 data);
+	void execute_5205(address_space &space, int offset, UINT16 data);
+	void execute_5a05(address_space &space, int offset, UINT16 data);
+
+	void execute_f205(address_space &space, int offset, UINT16 data);
+	void execute_a100(address_space &space, int offset, UINT16 data);
+	void execute_a900(address_space &space, int offset, UINT16 data);
+	void execute_b100(address_space &space, int offset, UINT16 data);
+	void execute_b900(address_space &space, int offset, UINT16 data);
+
+
 	// Sort DMA (zeroteam, cupsoc)
 
 	UINT32 cop_sort_ram_addr, cop_sort_lookup;
