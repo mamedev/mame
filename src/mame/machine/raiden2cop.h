@@ -166,6 +166,50 @@ public:
 	DECLARE_WRITE16_MEMBER(cop_sprite_dma_inc_w);
 	int m_cop_sprite_dma_size;
 
+	// misc 68k
+	UINT16 m_cop_rom_addr_lo,m_cop_rom_addr_hi,m_cop_rom_addr_unk;
+	DECLARE_WRITE16_MEMBER(cop_rom_addr_unk_w);
+	DECLARE_WRITE16_MEMBER(cop_rom_addr_lo_w);
+	DECLARE_WRITE16_MEMBER(cop_rom_addr_hi_w);
+
+	int m_cop_sprite_dma_abs_x,m_cop_sprite_dma_abs_y;
+	DECLARE_WRITE16_MEMBER(cop_sprite_dma_abs_y_w);
+	DECLARE_WRITE16_MEMBER(cop_sprite_dma_abs_x_w);
+
+	// legacy code, to be removed / refactored into above
+	INT8 m_LEGACY_cop_angle_compare;
+	INT8 m_LEGACY_cop_angle_mod_val;
+	DECLARE_WRITE16_MEMBER(LEGACY_cop_angle_compare_w);
+	DECLARE_WRITE16_MEMBER(LEGACY_cop_angle_mod_val_w);
+	INT16 m_LEGACY_cop_hit_val_x,m_LEGACY_cop_hit_val_y,m_LEGACY_m_cop_hit_val_z;
+	int m_LEGACY_r0, m_LEGACY_r1;
+	DECLARE_READ16_MEMBER(LEGACY_cop_collision_status_val_r);
+	DECLARE_WRITE16_MEMBER(LEGACY_cop_cmd_w);
+
+	struct LEGACY_collision_info
+	{
+		LEGACY_collision_info():
+		x(0),
+		y(0),
+		min_x(0),
+		min_y(0),
+		max_x(0),
+		max_y(0),
+		hitbox(0),
+		hitbox_x(0),
+		hitbox_y(0) {}
+
+		int x,y;
+		INT16 min_x,min_y,max_x,max_y;
+		UINT16 hitbox;
+		UINT16 hitbox_x,hitbox_y;
+	};
+
+	struct LEGACY_collision_info m_LEGACY_cop_collision_info[2];
+	void LEGACY_cop_take_hit_box_params(UINT8 offs);
+	UINT8 LEGACY_cop_calculate_collsion_detection();
+
+
 protected:
 	// device-level overrides
 	virtual void device_start();

@@ -3,6 +3,8 @@
  Seibu Cop (Co-Processor) emulation
   (new implementation, based on Raiden 2 code)
 
+  (should write new notes to replace those that were in seicop.c)
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -47,6 +49,20 @@ raiden2cop_device::raiden2cop_device(const machine_config &mconfig, const char *
 	m_cop_sprite_dma_src(0),
 	m_cop_sprite_dma_size(0),
 
+	m_cop_rom_addr_lo(0),
+	m_cop_rom_addr_hi(0),
+	m_cop_rom_addr_unk(0),
+
+	m_cop_sprite_dma_abs_x(0),
+	m_cop_sprite_dma_abs_y(0),
+
+	m_LEGACY_cop_angle_compare(0),
+	m_LEGACY_cop_angle_mod_val(0),
+	m_LEGACY_cop_hit_val_x(0),
+	m_LEGACY_cop_hit_val_y(0),
+	m_LEGACY_m_cop_hit_val_z(0),
+	m_LEGACY_r0(0),
+	m_LEGACY_r1(0),
 
 	m_videoramout_cb(*this),
 	m_palette(*this, ":palette")
@@ -139,6 +155,21 @@ void raiden2cop_device::device_start()
 	save_item(NAME(m_cop_sprite_dma_size));
 	save_item(NAME(m_cop_sprite_dma_src));
 
+	save_item(NAME(m_cop_rom_addr_lo));
+	save_item(NAME(m_cop_rom_addr_hi));
+	save_item(NAME(m_cop_rom_addr_unk));
+
+	save_item(NAME(m_cop_sprite_dma_abs_x));
+	save_item(NAME(m_cop_sprite_dma_abs_y));
+
+	// legacy
+	save_item(NAME(m_LEGACY_cop_angle_compare));
+	save_item(NAME(m_LEGACY_cop_angle_mod_val));
+	save_item(NAME(m_LEGACY_cop_hit_val_x));
+	save_item(NAME(m_LEGACY_cop_hit_val_y));
+	save_item(NAME(m_LEGACY_m_cop_hit_val_z));
+	save_item(NAME(m_LEGACY_r0));
+	save_item(NAME(m_LEGACY_r1));
 
 	m_videoramout_cb.resolve_safe();
 
@@ -1139,3 +1170,670 @@ WRITE16_MEMBER(raiden2cop_device::cop_sprite_dma_inc_w)
 			cop_status |= 2;
 	}
 }
+
+// more misc
+
+WRITE16_MEMBER( raiden2cop_device::cop_rom_addr_unk_w)
+{
+	COMBINE_DATA(&m_cop_rom_addr_unk);
+}
+
+WRITE16_MEMBER( raiden2cop_device::cop_rom_addr_lo_w)
+{
+	COMBINE_DATA(&m_cop_rom_addr_lo);
+}
+
+WRITE16_MEMBER( raiden2cop_device::cop_rom_addr_hi_w)
+{
+	COMBINE_DATA(&m_cop_rom_addr_hi);
+}
+
+WRITE16_MEMBER(raiden2cop_device::cop_sprite_dma_abs_y_w)
+{
+	m_cop_sprite_dma_abs_y = data;
+}
+
+WRITE16_MEMBER(raiden2cop_device::cop_sprite_dma_abs_x_w)
+{
+	m_cop_sprite_dma_abs_x = data;
+}
+
+/*------------------------------------------------------------------------------------------------------------------------------------------------*/
+/* LEGACY CODE -----------------------------------------------------------------------------------------------------------------------------------*/
+/* this is all old code that hasn't been refactored yet, it will go away                                                                          */
+/*------------------------------------------------------------------------------------------------------------------------------------------------*/
+/*------------------------------------------------------------------------------------------------------------------------------------------------*/
+/*------------------------------------------------------------------------------------------------------------------------------------------------*/
+
+
+WRITE16_MEMBER(raiden2cop_device::LEGACY_cop_angle_compare_w)
+{
+	m_LEGACY_cop_angle_compare = UINT16(data);
+}
+
+WRITE16_MEMBER(raiden2cop_device::LEGACY_cop_angle_mod_val_w)
+{
+	m_LEGACY_cop_angle_mod_val = UINT16(data);
+}
+
+READ16_MEMBER( raiden2cop_device::LEGACY_cop_collision_status_val_r)
+{
+	/* these two controls facing direction in Godzilla opponents (only vs.) - x value compare? */
+	if (offset==0) return (m_LEGACY_cop_hit_val_y);
+	else if (offset==1) return (m_LEGACY_cop_hit_val_x);
+	else return (m_LEGACY_m_cop_hit_val_z);
+}
+
+
+/*
+Godzilla 0x12c0 X = 0x21ed Y = 0x57da
+Megaron  0x12d0 X = 0x1ef1 Y = 0x55db
+King Ghidorah 0x12c8 X = 0x26eb Y = 0x55dc
+Mecha Ghidorah 0x12dc X = 0x24ec Y = 0x55dc
+Mecha Godzilla 0x12d4 X = 0x1cf1 Y = 0x52dc
+Gigan 0x12cc X = 0x23e8 Y = 0x55db
+
+(DC.W $1020, $F0C0, $0000, $0000)
+X = collides at the same spot
+Y = collides between 0xd0 and 0x20
+0x588 bits 2 & 3 = 0
+(DC.W $F0C0, $1020, $0000, $0000)
+X = collides between 0xb0 and 0x50 (inclusive)
+Y = collides between 0xd0 and 0x30 (not inclusive)
+0x588 bits 2 & 3 = 0x580 bits 0 & 1
+*/
+void raiden2cop_device::LEGACY_cop_take_hit_box_params(UINT8 offs)
+{
+	INT16 start_x,start_y,height,width;
+
+	{
+		height = UINT8(m_LEGACY_cop_collision_info[offs].hitbox_y >> 8);
+		start_y = INT8(m_LEGACY_cop_collision_info[offs].hitbox_y);
+		width = UINT8(m_LEGACY_cop_collision_info[offs].hitbox_x >> 8);
+		start_x = INT8(m_LEGACY_cop_collision_info[offs].hitbox_x);
+	}
+
+	m_LEGACY_cop_collision_info[offs].min_x = (m_LEGACY_cop_collision_info[offs].x >> 16) + start_x;
+	m_LEGACY_cop_collision_info[offs].max_x = m_LEGACY_cop_collision_info[offs].min_x + width;
+	m_LEGACY_cop_collision_info[offs].min_y = (m_LEGACY_cop_collision_info[offs].y >> 16) + start_y;
+	m_LEGACY_cop_collision_info[offs].max_y = m_LEGACY_cop_collision_info[offs].min_y + height;
+}
+
+
+UINT8 raiden2cop_device::LEGACY_cop_calculate_collsion_detection()
+{
+	static UINT8 res;
+
+	res = 3;
+
+	/* outbound X check */
+	if(m_LEGACY_cop_collision_info[0].max_x >= m_LEGACY_cop_collision_info[1].min_x && m_LEGACY_cop_collision_info[0].min_x <= m_LEGACY_cop_collision_info[1].max_x)
+		res &= ~2;
+
+	if(m_LEGACY_cop_collision_info[1].max_x >= m_LEGACY_cop_collision_info[0].min_x && m_LEGACY_cop_collision_info[1].min_x <= m_LEGACY_cop_collision_info[0].max_x)
+		res &= ~2;
+
+	/* outbound Y check */
+	if(m_LEGACY_cop_collision_info[0].max_y >= m_LEGACY_cop_collision_info[1].min_y && m_LEGACY_cop_collision_info[0].min_y <= m_LEGACY_cop_collision_info[1].max_y)
+		res &= ~1;
+
+	if(m_LEGACY_cop_collision_info[1].max_y >= m_LEGACY_cop_collision_info[0].min_y && m_LEGACY_cop_collision_info[1].min_y <= m_LEGACY_cop_collision_info[0].max_y)
+		res &= ~1;
+
+	m_LEGACY_cop_hit_val_x = (m_LEGACY_cop_collision_info[0].x - m_LEGACY_cop_collision_info[1].x) >> 16;
+	m_LEGACY_cop_hit_val_y = (m_LEGACY_cop_collision_info[0].y - m_LEGACY_cop_collision_info[1].y) >> 16;
+	m_LEGACY_m_cop_hit_val_z = 1;
+	cop_hit_val_stat = res; // TODO: there's also bit 2 and 3 triggered in the tests, no known meaning
+
+	//popmessage("%d %d %04x %04x %04x %04x",m_LEGACY_cop_hit_val_x,m_LEGACY_cop_hit_val_y,m_LEGACY_cop_collision_info[0].hitbox_x,m_LEGACY_cop_collision_info[0].hitbox_y,m_LEGACY_cop_collision_info[1].hitbox_x,m_LEGACY_cop_collision_info[1].hitbox_y);
+
+	//if(res == 0)
+	//popmessage("0:%08x %08x %08x 1:%08x %08x %08x\n",m_LEGACY_cop_collision_info[0].x,m_LEGACY_cop_collision_info[0].y,m_LEGACY_cop_collision_info[0].hitbox,m_LEGACY_cop_collision_info[1].x,m_LEGACY_cop_collision_info[1].y,m_LEGACY_cop_collision_info[1].hitbox);
+//  popmessage("0:%08x %08x %08x %08x 1:%08x %08x %08x %08x\n",m_LEGACY_cop_collision_info[0].min_x,m_LEGACY_cop_collision_info[0].max_x,m_LEGACY_cop_collision_info[0].min_y, m_LEGACY_cop_collision_info[0].max_y,
+//                                                   m_LEGACY_cop_collision_info[1].min_x,m_LEGACY_cop_collision_info[1].max_x,m_LEGACY_cop_collision_info[1].min_y, m_LEGACY_cop_collision_info[1].max_y);
+
+	return res;
+}
+
+
+WRITE16_MEMBER(raiden2cop_device::LEGACY_cop_cmd_w)
+{
+	int command;
+
+
+	logerror("%06x: COPX execute table macro command %04x | regs %08x %08x %08x %08x %08x\n", space.device().safe_pc(), data,  cop_regs[0], cop_regs[1], cop_regs[2], cop_regs[3], cop_regs[4]);
+
+
+	command = find_trigger_match(data, 0xff00);
+
+
+	if (command == -1)
+	{
+		return;
+	}
+	UINT16 funcval, funcmask;
+	// this is pointless.. all we use it for is comparing against the same value
+	funcval = get_func_value(command);
+	funcmask = get_func_mask(command);
+	//printf("%04x %04x %04x\n",m_cop_mcu_ram[offset],funcval,funcmask);
+
+	/*
+	Macro notes:
+	- endianess changes from/to Raiden 2:
+	dword ^= 0
+	word ^= 2
+	byte ^= 3
+	- some macro commands here have a commented algorithm, it's how Seibu Cup Bootleg version handles maths inside the 14/15 roms.
+	The ROMs map tables in the following arrangement:
+	0x00000 - 0x1ffff Sine math results
+	0x20000 - 0x3ffff Cosine math results
+	0x40000 - 0x7ffff Division math results
+	0x80000 - 0xfffff Pythagorean theorem, hypotenuse length math results
+	Surprisingly atan maths are nowhere to be found from the roms.
+	*/
+
+	int executed = 0;
+
+	/* "automatic" movement, 0205 */
+	if (check_command_matches(command, 0x188, 0x282, 0x082, 0xb8e, 0x98e, 0x000, 0x000, 0x000, 6, 0xffeb))
+	{
+		executed = 1;
+		UINT8 offs;
+
+		offs = (offset & 3) * 4;
+		int ppos = space.read_dword(cop_regs[0] + 4 + offs);
+		int npos = ppos + space.read_dword(cop_regs[0] + 0x10 + offs);
+		int delta = (npos >> 16) - (ppos >> 16);
+
+		space.write_dword(cop_regs[0] + 4 + offs, npos);
+		space.write_word(cop_regs[0] + 0x1c + offs, space.read_word(cop_regs[0] + 0x1c + offs) + delta);
+		return;
+	}
+
+	/* "automatic" movement, for arcs in Legionnaire / Zero Team (expression adjustment) 0905 */
+	if (check_command_matches(command, 0x194, 0x288, 0x088, 0x000, 0x000, 0x000, 0x000, 0x000, 6, 0xfbfb))
+	{
+		executed = 1;
+		UINT8 offs;
+
+		offs = (offset & 3) * 4;
+
+		/* read 0x28 + offs */
+		/* add 0x10 + offs */
+		/* write 0x10 + offs */
+
+		space.write_dword(cop_regs[0] + 0x10 + offs, space.read_dword(cop_regs[0] + 0x10 + offs) + space.read_dword(cop_regs[0] + 0x28 + offs));
+		return;
+	}
+
+	/* SINE math - 0x8100 */
+	/*
+			00000-0ffff:
+			amp = x/256
+			ang = x & 255
+			s = sin(ang*2*pi/256)
+			val = trunc(s*amp)
+			if(s<0)
+			val--
+			if(s == 192)
+			val = -2*amp
+			*/
+	if (check_command_matches(command, 0xb9a, 0xb88, 0x888, 0x000, 0x000, 0x000, 0x000, 0x000, 7, 0xfdfb))
+	{
+		executed = 1;
+		int raw_angle = (space.read_word(cop_regs[0] + (0x34 ^ 2)) & 0xff);
+		double angle = raw_angle * M_PI / 128;
+		double amp = (65536 >> 5)*(space.read_word(cop_regs[0] + (0x36 ^ 2)) & 0xff);
+		int res;
+
+		/* TODO: up direction, why? */
+		if (raw_angle == 0xc0)
+			amp *= 2;
+
+		res = int(amp*sin(angle)) << cop_scale;
+
+		space.write_dword(cop_regs[0] + 0x10, res);
+		return;
+	}
+
+	/* COSINE math - 0x8900 */
+	/*
+		10000-1ffff:
+		amp = x/256
+		ang = x & 255
+		s = cos(ang*2*pi/256)
+		val = trunc(s*amp)
+		if(s<0)
+		val--
+		if(s == 128)
+		val = -2*amp
+		*/
+	if (check_command_matches(command, 0xb9a, 0xb8a, 0x88a, 0x000, 0x000, 0x000, 0x000, 0x000, 7, 0xfdfb))
+	{
+		executed = 1;
+		int raw_angle = (space.read_word(cop_regs[0] + (0x34 ^ 2)) & 0xff);
+		double angle = raw_angle * M_PI / 128;
+		double amp = (65536 >> 5)*(space.read_word(cop_regs[0] + (0x36 ^ 2)) & 0xff);
+		int res;
+
+		/* TODO: left direction, why? */
+		if (raw_angle == 0x80)
+			amp *= 2;
+
+		res = int(amp*cos(angle)) << cop_scale;
+
+		space.write_dword(cop_regs[0] + 20, res);
+		return;
+	}
+
+	/* 0x130e / 0x138e */
+	if (check_command_matches(command, 0x984, 0xaa4, 0xd82, 0xaa2, 0x39b, 0xb9a, 0xb9a, 0xa9a, 5, 0xbf7f))
+	{
+		executed = 1;
+		int dy = space.read_dword(cop_regs[1] + 4) - space.read_dword(cop_regs[0] + 4);
+		int dx = space.read_dword(cop_regs[1] + 8) - space.read_dword(cop_regs[0] + 8);
+
+		cop_status = 7;
+		if (!dx) {
+			cop_status |= 0x8000;
+			cop_angle = 0;
+		}
+		else {
+			cop_angle = atan(double(dy) / double(dx)) * 128.0 / M_PI;
+			if (dx < 0)
+				cop_angle += 0x80;
+		}
+
+		m_LEGACY_r0 = dy;
+		m_LEGACY_r1 = dx;
+
+		//printf("%d %d %f %04x\n",dx,dy,atan(double(dy)/double(dx)) * 128 / M_PI,cop_angle);
+
+		if (data & 0x80)
+			space.write_word(cop_regs[0] + (0x34 ^ 2), cop_angle);
+		return;
+	}
+
+	/* Pythagorean theorem, hypotenuse direction - 130e / 138e */
+	//(heatbrl)  | 5 | bf7f | 138e | 984 aa4 d82 aa2 39b b9a b9a b9a
+	if (check_command_matches(command, 0x984, 0xaa4, 0xd82, 0xaa2, 0x39b, 0xb9a, 0xb9a, 0xb9a, 5, 0xbf7f))
+	{
+		executed = 1;
+		int dy = space.read_dword(cop_regs[1] + 4) - space.read_dword(cop_regs[0] + 4);
+		int dx = space.read_dword(cop_regs[1] + 8) - space.read_dword(cop_regs[0] + 8);
+
+		cop_status = 7;
+		if (!dx) {
+			cop_status |= 0x8000;
+			cop_angle = 0;
+		}
+		else {
+			cop_angle = atan(double(dy) / double(dx)) * 128.0 / M_PI;
+			if (dx < 0)
+				cop_angle += 0x80;
+		}
+
+		cop_angle -= 0x80;
+		m_LEGACY_r0 = dy;
+		m_LEGACY_r1 = dx;
+
+		if (data & 0x80)
+			space.write_word(cop_regs[0] + (0x34 ^ 2), cop_angle);
+		return;
+	}
+
+	/* Pythagorean theorem, hypotenuse length - 0x3bb0 */
+	//(grainbow) | 4 | 007f | 3bb0 | f9c b9c b9c b9c b9c b9c b9c 99c
+	/*
+		40000-7ffff:
+		v1 = (x / 32768)*64
+		v2 = (x & 255)*32767/255
+		val = sqrt(v1*v1+v2*v2) (unsigned)
+		*/
+	if (check_command_matches(command, 0xf9c, 0xb9c, 0xb9c, 0xb9c, 0xb9c, 0xb9c, 0xb9c, 0x99c, 4, 0x007f))
+	{
+		executed = 1;
+		int dy = m_LEGACY_r0;
+		int dx = m_LEGACY_r1;
+
+		dx >>= 16;
+		dy >>= 16;
+		cop_dist = sqrt((double)(dx*dx + dy*dy));
+
+		if (data & 0x80)
+			space.write_word(cop_regs[0] + (0x38), cop_dist);
+		return;
+	}
+
+	/* Division - 0x42c2 */
+	/*
+		20000-2ffff:
+		v1 = x / 1024
+		v2 = x & 1023
+		val = !v1 ? 32767 : trunc(v2/v1+0.5)
+		30000-3ffff:
+		v1 = x / 1024
+		v2 = (x & 1023)*32
+		val = !v1 ? 32767 : trunc(v2/v1+0.5)
+		*/
+	if (check_command_matches(command, 0xf9a, 0xb9a, 0xb9c, 0xb9c, 0xb9c, 0x29c, 0x000, 0x000, 5, 0xfcdd))
+	{
+		executed = 1;
+		int dy = m_LEGACY_r0;
+		int dx = m_LEGACY_r1;
+		int div = space.read_word(cop_regs[0] + (0x36 ^ 2));
+		int res;
+		int cop_dist_raw;
+
+		if (!div)
+		{
+			printf("divide by zero?\n");
+			div = 1;
+		}
+
+		/* TODO: calculation of this one should occur at 0x3b30/0x3bb0 I *think* */
+		/* TODO: recheck if cop_scale still masks at 3 with this command */
+		dx >>= 11 + cop_scale;
+		dy >>= 11 + cop_scale;
+		cop_dist_raw = sqrt((double)(dx*dx + dy*dy));
+
+		res = cop_dist_raw;
+		res /= div;
+
+		cop_dist = (1 << (5 - cop_scale)) / div;
+
+		/* TODO: bits 5-6-15 */
+		cop_status = 7;
+
+		space.write_word(cop_regs[0] + (0x38 ^ 2), res);
+		return;
+	}
+
+	/*
+		collision detection:
+
+		int dy_0 = space.read_dword(cop_regs[0]+4);
+		int dx_0 = space.read_dword(cop_regs[0]+8);
+		int dy_1 = space.read_dword(cop_regs[1]+4);
+		int dx_1 = space.read_dword(cop_regs[1]+8);
+		int hitbox_param1 = space.read_dword(cop_regs[2]);
+		int hitbox_param2 = space.read_dword(cop_regs[3]);
+
+		TODO: we are ignoring the funcval / funcmask params for now
+		*/
+
+	if (check_command_matches(command, 0xb80, 0xb82, 0xb84, 0xb86, 0x000, 0x000, 0x000, 0x000, funcval, funcmask))
+	{
+		executed = 1;
+		m_LEGACY_cop_collision_info[0].y = (space.read_dword(cop_regs[0] + 4));
+		m_LEGACY_cop_collision_info[0].x = (space.read_dword(cop_regs[0] + 8));
+		return;
+	}
+
+	//(heatbrl)  | 9 | ffff | b080 | b40 bc0 bc2
+	if (check_command_matches(command, 0xb40, 0xbc0, 0xbc2, 0x000, 0x000, 0x000, 0x000, 0x000, funcval, funcmask))
+	{
+		executed = 1;
+		m_LEGACY_cop_collision_info[0].hitbox = space.read_word(cop_regs[2]);
+		m_LEGACY_cop_collision_info[0].hitbox_y = space.read_word((cop_regs[2] & 0xffff0000) | (m_LEGACY_cop_collision_info[0].hitbox));
+		m_LEGACY_cop_collision_info[0].hitbox_x = space.read_word(((cop_regs[2] & 0xffff0000) | (m_LEGACY_cop_collision_info[0].hitbox)) + 2);
+
+		/* do the math */
+		LEGACY_cop_take_hit_box_params(0);
+		cop_hit_status = LEGACY_cop_calculate_collsion_detection();
+
+		return;
+	}
+
+	if (check_command_matches(command, 0xba0, 0xba2, 0xba4, 0xba6, 0x000, 0x000, 0x000, 0x000, funcval, funcmask))
+	{
+		executed = 1;
+		m_LEGACY_cop_collision_info[1].y = (space.read_dword(cop_regs[1] + 4));
+		m_LEGACY_cop_collision_info[1].x = (space.read_dword(cop_regs[1] + 8));
+		return;
+	}
+
+	//(heatbrl)  | 6 | ffff | b880 | b60 be0 be2
+	if (check_command_matches(command, 0xb60, 0xbe0, 0xbe2, 0x000, 0x000, 0x000, 0x000, 0x000, funcval, funcmask))
+	{
+		executed = 1;
+		m_LEGACY_cop_collision_info[1].hitbox = space.read_word(cop_regs[3]);
+		m_LEGACY_cop_collision_info[1].hitbox_y = space.read_word((cop_regs[3] & 0xffff0000) | (m_LEGACY_cop_collision_info[1].hitbox));
+		m_LEGACY_cop_collision_info[1].hitbox_x = space.read_word(((cop_regs[3] & 0xffff0000) | (m_LEGACY_cop_collision_info[1].hitbox)) + 2);
+
+		/* do the math */
+		LEGACY_cop_take_hit_box_params(1);
+		cop_hit_status = LEGACY_cop_calculate_collsion_detection();
+		return;
+	}
+
+	// grainbow 0d | a | fff3 | 6980 | b80 ba0
+	if (check_command_matches(command, 0xb80, 0xba0, 0x000, 0x000, 0x000, 0x000, 0x000, 0x000, 10, 0xfff3))
+	{
+		executed = 1;
+		UINT8 offs;
+		int abs_x, abs_y, rel_xy;
+
+		offs = (offset & 3) * 4;
+
+		/* TODO: I really suspect that following two are actually taken from the 0xa180 macro command then internally loaded */
+		abs_x = space.read_word(cop_regs[0] + 8) - m_cop_sprite_dma_abs_x;
+		abs_y = space.read_word(cop_regs[0] + 4) - m_cop_sprite_dma_abs_y;
+		rel_xy = space.read_word(m_cop_sprite_dma_src + 4 + offs);
+
+		//if(rel_xy & 0x0706)
+		//  printf("sprite rel_xy = %04x\n",rel_xy);
+
+		if (rel_xy & 1)
+			space.write_word(cop_regs[4] + offs + 4, 0xc0 + abs_x - (rel_xy & 0xf8));
+		else
+			space.write_word(cop_regs[4] + offs + 4, (((rel_xy & 0x78) + (abs_x)-((rel_xy & 0x80) ? 0x80 : 0))));
+
+		space.write_word(cop_regs[4] + offs + 6, (((rel_xy & 0x7800) >> 8) + (abs_y)-((rel_xy & 0x8000) ? 0x80 : 0)));
+		return;
+	}
+
+	// grainbow 18 | a | ff00 | c480 | 080 882
+	if (check_command_matches(command, 0x080, 0x882, 0x000, 0x000, 0x000, 0x000, 0x000, 0x000, 10, 0xff00))
+	{
+		executed = 1;
+		UINT8 offs;
+
+		offs = (offset & 3) * 4;
+
+		space.write_word(cop_regs[4] + offs + 0, space.read_word(m_cop_sprite_dma_src + offs) + (m_cop_sprite_dma_param & 0x3f));
+		//space.write_word(cop_regs[4] + offs + 2,space.read_word(m_cop_sprite_dma_src+2 + offs));
+		return;
+	}
+
+	// cupsoc 1b | 5 | 7ff7 | dde5 | f80 aa2 984 0c2
+	/* radar x/y positions */
+	/* FIXME: x/ys are offsetted */
+	/* FIXME: uses 0x10044a for something */
+	if (check_command_matches(command, 0xf80, 0xaa2, 0x984, 0x0c2, 0x000, 0x000, 0x000, 0x000, 5, 0x7ff7))
+	{
+		executed = 1;
+		UINT8 offs;
+		int div;
+		INT16 dir_offset;
+		//              INT16 offs_val;
+
+		/* TODO: [4-7] could be mirrors of [0-3] (this is the only command so far that uses 4-7 actually)*/
+		/* ? 0 + [4] */
+		/* sub32 4 + [5] */
+		/* write16h 8 + [4] */
+		/* addmem16 4 + [6] */
+
+		// these two are obvious ...
+		// 0xf x 16 = 240
+		// 0x14 x 16 = 320
+		// what are these two instead? scale factor? offsets? (edit: offsets to apply from the initial sprite data)
+		// 0xfc69 ?
+		// 0x7f4 ?
+		//printf("%08x %08x %08x %08x %08x %08x %08x\n",cop_regs[0],cop_regs[1],cop_regs[2],cop_regs[3],cop_regs[4],cop_regs[5],cop_regs[6]);
+
+		offs = (offset & 3) * 4;
+
+		div = space.read_word(cop_regs[4] + offs);
+		dir_offset = space.read_word(cop_regs[4] + offs + 8);
+		//              offs_val = space.read_word(cop_regs[3] + offs);
+		//420 / 180 = 500 : 400 = 30 / 50 = 98 / 18
+
+		/* TODO: this probably trips a cop status flag */
+		if (div == 0) { div = 1; }
+
+
+		space.write_word((cop_regs[6] + offs + 4), ((space.read_word(cop_regs[5] + offs + 4) + dir_offset) / div));
+		return;
+	}
+
+	//(cupsoc)   | 8 | f3e7 | 6200 | 3a0 3a6 380 aa0 2a6
+	if (check_command_matches(command, 0x3a0, 0x3a6, 0x380, 0xaa0, 0x2a6, 0x000, 0x000, 0x000, 8, 0xf3e7))
+	{
+		executed = 1;
+		UINT8 cur_angle;
+		UINT16 flags;
+
+		/* 0 [1] */
+		/* 0xc [1] */
+		/* 0 [0] */
+		/* 0 [1] */
+		/* 0xc [1] */
+
+		cur_angle = space.read_byte(cop_regs[1] + (0xc ^ 3));
+		flags = space.read_word(cop_regs[1]);
+		//space.write_byte(cop_regs[1] + (0^3),space.read_byte(cop_regs[1] + (0^3)) & 0xfb); //correct?
+
+		m_LEGACY_cop_angle_compare &= 0xff;
+		m_LEGACY_cop_angle_mod_val &= 0xff;
+		flags &= ~0x0004;
+
+		int delta = cur_angle - m_LEGACY_cop_angle_compare;
+		if (delta >= 128)
+			delta -= 256;
+		else if (delta < -128)
+			delta += 256;
+		if (delta < 0)
+		{
+			if (delta >= -m_LEGACY_cop_angle_mod_val)
+			{
+				cur_angle = m_LEGACY_cop_angle_compare;
+				flags |= 0x0004;
+			}
+			else
+				cur_angle += m_LEGACY_cop_angle_mod_val;
+		}
+		else
+		{
+			if (delta <= m_LEGACY_cop_angle_mod_val)
+			{
+				cur_angle = m_LEGACY_cop_angle_compare;
+				flags |= 0x0004;
+			}
+			else
+				cur_angle -= m_LEGACY_cop_angle_mod_val;
+		}
+
+		space.write_byte(cop_regs[1] + (0 ^ 2), flags);
+		space.write_byte(cop_regs[1] + (0xc ^ 3), cur_angle);
+		return;
+	}
+
+	//(grainbow) | 8 | f3e7 | 6200 | 380 39a 380 a80 29a
+	/* search direction, used on SD Gundam homing weapon */
+	/* FIXME: still doesn't work ... */
+	if (check_command_matches(command, 0x380, 0x39a, 0x380, 0xa80, 0x29a, 0x000, 0x000, 0x000, 8, 0xf3e7))
+	{
+		executed = 1;
+		UINT8 cur_angle;
+		UINT16 flags;
+
+		cur_angle = space.read_byte(cop_regs[0] + (0x34 ^ 3));
+		flags = space.read_word(cop_regs[0] + (0 ^ 2));
+		//space.write_byte(cop_regs[1] + (0^3),space.read_byte(cop_regs[1] + (0^3)) & 0xfb); //correct?
+
+		m_LEGACY_cop_angle_compare &= 0xff;
+		m_LEGACY_cop_angle_mod_val &= 0xff;
+		flags &= ~0x0004;
+
+		int delta = cur_angle - m_LEGACY_cop_angle_compare;
+		if (delta >= 128)
+			delta -= 256;
+		else if (delta < -128)
+			delta += 256;
+		if (delta < 0)
+		{
+			if (delta >= -m_LEGACY_cop_angle_mod_val)
+			{
+				cur_angle = m_LEGACY_cop_angle_compare;
+				flags |= 0x0004;
+			}
+			else
+				cur_angle += m_LEGACY_cop_angle_mod_val;
+		}
+		else
+		{
+			if (delta <= m_LEGACY_cop_angle_mod_val)
+			{
+				cur_angle = m_LEGACY_cop_angle_compare;
+				flags |= 0x0004;
+			}
+			else
+				cur_angle -= m_LEGACY_cop_angle_mod_val;
+		}
+
+		space.write_byte(cop_regs[0] + (0 ^ 3), flags);
+		space.write_word(cop_regs[0] + (0x34 ^ 3), cur_angle);
+		return;
+	}
+
+	//(cupsoc) 1c | 5 | b07f | e38e | 984 ac4 d82 ac2 39b b9a b9a a9a
+	if (check_command_matches(command, 0x984, 0xac4, 0xd82, 0xac2, 0x39b, 0xb9a, 0xb9a, 0xa9a, 5, 0xb07f))
+	{
+		executed = 1;
+		int dy = space.read_dword(cop_regs[2] + 4) - space.read_dword(cop_regs[0] + 4);
+		int dx = space.read_dword(cop_regs[2] + 8) - space.read_dword(cop_regs[0] + 8);
+
+		cop_status = 7;
+		if (!dx) {
+			cop_status |= 0x8000;
+			cop_angle = 0;
+		}
+		else {
+			cop_angle = atan(double(dy) / double(dx)) * 128.0 / M_PI;
+			if (dx < 0)
+				cop_angle += 0x80;
+		}
+
+		m_LEGACY_r0 = dy;
+		m_LEGACY_r1 = dx;
+
+		//printf("%d %d %f %04x\n",dx,dy,atan(double(dy)/double(dx)) * 128 / M_PI,cop_angle);
+
+		if (data & 0x80)
+			space.write_word(cop_regs[0] + (0x34 ^ 2), cop_angle);
+		return;
+	}
+
+	//(cupsoc) 1a | 5 | fffb | d104 | ac2 9e0 0a2
+	/* controls player vs. player collision detection, 0xf105 controls player vs. ball */
+	if (check_command_matches(command, 0xac2, 0x9e0, 0x0a2, 0x000, 0x000, 0x000, 0x000, 0x000, 5, 0xfffb))
+	{
+		executed = 1;
+		UINT8 *ROM = space.machine().root_device().memregion("maincpu")->base();
+		UINT32 rom_addr = (m_cop_rom_addr_hi << 16 | m_cop_rom_addr_lo) & ~1;
+		UINT16 rom_data = (ROM[rom_addr + 0]) | (ROM[rom_addr + 1] << 8);
+
+		/* writes to some unemulated COP registers, then puts the result in here, adding a parameter taken from ROM */
+		//space.write_word(cop_regs[0]+(0x44 + offset * 4), rom_data);
+
+		printf("%04x%04x %04x %04x\n", m_cop_rom_addr_hi, m_cop_rom_addr_lo, m_cop_rom_addr_unk, rom_data);
+		return;
+	}
+
+	if (executed == 0) printf("did not execute %04x\n", data);
+}
+
+
+
+
