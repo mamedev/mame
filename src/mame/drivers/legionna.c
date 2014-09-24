@@ -97,10 +97,8 @@ static ADDRESS_MAP_START( legionna_cop_mem, AS_PROGRAM, 16, legionna_state )
 	AM_RANGE(0x100412, 0x100413) AM_DEVWRITE("raiden2cop", raiden2cop_device, cop_sprite_dma_src_hi_w) // grainbow
 	AM_RANGE(0x100414, 0x100415) AM_DEVWRITE("raiden2cop", raiden2cop_device, cop_sprite_dma_src_lo_w) // grainbow
 
-//	AM_RANGE(0x10041c, 0x10041d) AM_WRITE(cop_angle_target_w) // angle target (for 0x6200 COP macro) // ADD ME
-//	AM_RANGE(0x10041e, 0x10041f) AM_WRITE(cop_angle_step_w)   // angle step   (for 0x6200 COP macro) // ADD ME
-	AM_RANGE(0x10041c, 0x10041d) AM_DEVWRITE("raiden2cop", raiden2cop_device, LEGACY_cop_angle_compare_w) // angle target (for 0x6200 COP macro) // REMOVE ME
-	AM_RANGE(0x10041e, 0x10041f) AM_DEVWRITE("raiden2cop", raiden2cop_device, LEGACY_cop_angle_mod_val_w)   // angle step   (for 0x6200 COP macro) // REMOVE ME
+	AM_RANGE(0x10041c, 0x10041d) AM_DEVWRITE("raiden2cop", raiden2cop_device, cop_angle_target_w) // angle target (for 0x6200 COP macro)
+	AM_RANGE(0x10041e, 0x10041f) AM_DEVWRITE("raiden2cop", raiden2cop_device, cop_angle_step_w)   // angle step   (for 0x6200 COP macro)
 
 	AM_RANGE(0x100420, 0x100421) AM_DEVWRITE("raiden2cop", raiden2cop_device, cop_itoa_low_w)
 	AM_RANGE(0x100422, 0x100423) AM_DEVWRITE("raiden2cop", raiden2cop_device, cop_itoa_high_w)

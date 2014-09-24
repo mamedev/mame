@@ -56,8 +56,6 @@ raiden2cop_device::raiden2cop_device(const machine_config &mconfig, const char *
 	m_cop_sprite_dma_abs_x(0),
 	m_cop_sprite_dma_abs_y(0),
 
-	m_LEGACY_cop_angle_compare(0),
-	m_LEGACY_cop_angle_mod_val(0),
 	m_LEGACY_cop_hit_val_x(0),
 	m_LEGACY_cop_hit_val_y(0),
 	m_LEGACY_m_cop_hit_val_z(0),
@@ -163,8 +161,6 @@ void raiden2cop_device::device_start()
 	save_item(NAME(m_cop_sprite_dma_abs_y));
 
 	// legacy
-	save_item(NAME(m_LEGACY_cop_angle_compare));
-	save_item(NAME(m_LEGACY_cop_angle_mod_val));
 	save_item(NAME(m_LEGACY_cop_hit_val_x));
 	save_item(NAME(m_LEGACY_cop_hit_val_y));
 	save_item(NAME(m_LEGACY_m_cop_hit_val_z));
@@ -1206,15 +1202,6 @@ WRITE16_MEMBER(raiden2cop_device::cop_sprite_dma_abs_x_w)
 /*------------------------------------------------------------------------------------------------------------------------------------------------*/
 
 
-WRITE16_MEMBER(raiden2cop_device::LEGACY_cop_angle_compare_w)
-{
-	m_LEGACY_cop_angle_compare = UINT16(data);
-}
-
-WRITE16_MEMBER(raiden2cop_device::LEGACY_cop_angle_mod_val_w)
-{
-	m_LEGACY_cop_angle_mod_val = UINT16(data);
-}
 
 READ16_MEMBER( raiden2cop_device::LEGACY_cop_collision_status_val_r)
 {
@@ -1704,34 +1691,41 @@ WRITE16_MEMBER(raiden2cop_device::LEGACY_cop_cmd_w)
 		flags = space.read_word(cop_regs[1]);
 		//space.write_byte(cop_regs[1] + (0^3),space.read_byte(cop_regs[1] + (0^3)) & 0xfb); //correct?
 
-		m_LEGACY_cop_angle_compare &= 0xff;
-		m_LEGACY_cop_angle_mod_val &= 0xff;
+		INT8 tempangle_compare = (INT8)cop_angle_target;
+		INT8 tempangle_mod_val = (INT8)cop_angle_step;
+
+		tempangle_compare &= 0xff;
+		tempangle_mod_val &= 0xff;
+
+		cop_angle_target = tempangle_compare;
+		cop_angle_step = tempangle_mod_val;
+
 		flags &= ~0x0004;
 
-		int delta = cur_angle - m_LEGACY_cop_angle_compare;
+		int delta = cur_angle - tempangle_compare;
 		if (delta >= 128)
 			delta -= 256;
 		else if (delta < -128)
 			delta += 256;
 		if (delta < 0)
 		{
-			if (delta >= -m_LEGACY_cop_angle_mod_val)
+			if (delta >= -tempangle_mod_val)
 			{
-				cur_angle = m_LEGACY_cop_angle_compare;
+				cur_angle = tempangle_compare;
 				flags |= 0x0004;
 			}
 			else
-				cur_angle += m_LEGACY_cop_angle_mod_val;
+				cur_angle += tempangle_mod_val;
 		}
 		else
 		{
-			if (delta <= m_LEGACY_cop_angle_mod_val)
+			if (delta <= tempangle_mod_val)
 			{
-				cur_angle = m_LEGACY_cop_angle_compare;
+				cur_angle = tempangle_compare;
 				flags |= 0x0004;
 			}
 			else
-				cur_angle -= m_LEGACY_cop_angle_mod_val;
+				cur_angle -= tempangle_mod_val;
 		}
 
 		space.write_byte(cop_regs[1] + (0 ^ 2), flags);
@@ -1752,34 +1746,42 @@ WRITE16_MEMBER(raiden2cop_device::LEGACY_cop_cmd_w)
 		flags = space.read_word(cop_regs[0] + (0 ^ 2));
 		//space.write_byte(cop_regs[1] + (0^3),space.read_byte(cop_regs[1] + (0^3)) & 0xfb); //correct?
 
-		m_LEGACY_cop_angle_compare &= 0xff;
-		m_LEGACY_cop_angle_mod_val &= 0xff;
+		INT8 tempangle_compare = (INT8)cop_angle_target;
+		INT8 tempangle_mod_val = (INT8)cop_angle_step;
+
+		tempangle_compare &= 0xff;
+		tempangle_mod_val &= 0xff;
+
+		cop_angle_target = tempangle_compare;
+		cop_angle_step = tempangle_mod_val;
+
+
 		flags &= ~0x0004;
 
-		int delta = cur_angle - m_LEGACY_cop_angle_compare;
+		int delta = cur_angle - tempangle_compare;
 		if (delta >= 128)
 			delta -= 256;
 		else if (delta < -128)
 			delta += 256;
 		if (delta < 0)
 		{
-			if (delta >= -m_LEGACY_cop_angle_mod_val)
+			if (delta >= -tempangle_mod_val)
 			{
-				cur_angle = m_LEGACY_cop_angle_compare;
+				cur_angle = tempangle_compare;
 				flags |= 0x0004;
 			}
 			else
-				cur_angle += m_LEGACY_cop_angle_mod_val;
+				cur_angle += tempangle_mod_val;
 		}
 		else
 		{
-			if (delta <= m_LEGACY_cop_angle_mod_val)
+			if (delta <= tempangle_mod_val)
 			{
-				cur_angle = m_LEGACY_cop_angle_compare;
+				cur_angle = tempangle_compare;
 				flags |= 0x0004;
 			}
 			else
-				cur_angle -= m_LEGACY_cop_angle_mod_val;
+				cur_angle -= tempangle_mod_val;
 		}
 
 		space.write_byte(cop_regs[0] + (0 ^ 3), flags);

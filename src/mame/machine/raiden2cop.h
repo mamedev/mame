@@ -177,10 +177,6 @@ public:
 	DECLARE_WRITE16_MEMBER(cop_sprite_dma_abs_x_w);
 
 	// legacy code, to be removed / refactored into above
-	INT8 m_LEGACY_cop_angle_compare;
-	INT8 m_LEGACY_cop_angle_mod_val;
-	DECLARE_WRITE16_MEMBER(LEGACY_cop_angle_compare_w);
-	DECLARE_WRITE16_MEMBER(LEGACY_cop_angle_mod_val_w);
 	INT16 m_LEGACY_cop_hit_val_x,m_LEGACY_cop_hit_val_y,m_LEGACY_m_cop_hit_val_z;
 	int m_LEGACY_r0, m_LEGACY_r1;
 	DECLARE_READ16_MEMBER(LEGACY_cop_collision_status_val_r);
