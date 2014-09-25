@@ -10,18 +10,22 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "includes/astrocde.h"
-#include "sound/astrocde.h"
-#include "imagedev/cartslot.h"
 #include "machine/ram.h"
+#include "sound/astrocde.h"
+#include "bus/generic/slot.h"
+#include "bus/generic/carts.h"
 
 class astrocde_mess_state : public astrocde_state
 {
 public:
 	astrocde_mess_state(const machine_config &mconfig, device_type type, const char *tag)
-		: astrocde_state(mconfig, type, tag)
+		: astrocde_state(mconfig, type, tag),
+		m_cart(*this, "cartslot")
 		{ }
 
+	required_device<generic_slot_device> m_cart;
 	void get_ram_expansion_settings(int &ram_expansion_installed, int &write_protect_on, int &expansion_ram_start, int &expansion_ram_end, int &shadow_ram_end);
+	DECLARE_MACHINE_START(astrocde);
 	DECLARE_MACHINE_RESET(astrocde);
 	DECLARE_INPUT_CHANGED_MEMBER(set_write_protect);
 };
@@ -117,7 +121,7 @@ INPUT_CHANGED_MEMBER(astrocde_mess_state::set_write_protect)  // run when RAM ex
 		{
 			space.nop_write(expansion_ram_start, expansion_ram_end);
 		}
-		}
+	}
 }
 
 /*************************************
@@ -253,6 +257,7 @@ static MACHINE_CONFIG_START( astrocde, astrocde_mess_state )
 	MCFG_CPU_PROGRAM_MAP(astrocade_mem)
 	MCFG_CPU_IO_MAP(astrocade_io)
 
+	MCFG_MACHINE_START_OVERRIDE(astrocde_mess_state, astrocde)
 	MCFG_MACHINE_RESET_OVERRIDE(astrocde_mess_state, astrocde)
 
 	/* video hardware */
@@ -274,9 +279,7 @@ static MACHINE_CONFIG_START( astrocde, astrocde_mess_state )
 	MCFG_RAM_DEFAULT_SIZE("32k")
 
 	/* cartridge */
-	MCFG_CARTSLOT_ADD("cart")
-	MCFG_CARTSLOT_EXTENSION_LIST("bin")
-	MCFG_CARTSLOT_INTERFACE("astrocde_cart")
+	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "astrocde_cart")
 
 	/* Software lists */
 	MCFG_SOFTWARE_LIST_ADD("cart_list","astrocde")
@@ -292,19 +295,16 @@ MACHINE_CONFIG_END
 ROM_START( astrocde )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "astro.bin",  0x0000, 0x2000, CRC(ebc77f3a) SHA1(b902c941997c9d150a560435bf517c6a28137ecc) )
-	ROM_CART_LOAD( "cart", 0x2000, 0x8000, 0 )
 ROM_END
 
 ROM_START( astrocdl )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ballyhlc.bin",  0x0000, 0x2000, CRC(d7c517ba) SHA1(6b2bef5d970e54ed204549f58ba6d197a8bfd3cc) )
-	ROM_CART_LOAD( "cart", 0x2000, 0x8000, 0 )
 ROM_END
 
 ROM_START( astrocdw )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "bioswhit.bin",  0x0000, 0x2000, CRC(6eb53e79) SHA1(d84341feec1a0a0e8aa6151b649bc3cf6ef69fbf) )
-	ROM_CART_LOAD( "cart", 0x2000, 0x8000, 0 )
 ROM_END
 
 /*************************************
@@ -316,6 +316,12 @@ ROM_END
 DRIVER_INIT_MEMBER(astrocde_state,astrocde)
 {
 	m_video_config = AC_SOUND_PRESENT | AC_LIGHTPEN_INTS;
+}
+
+MACHINE_START_MEMBER(astrocde_mess_state, astrocde)
+{
+	if (m_cart->exists())
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0x2000, 0x3fff, read8_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_cart));
 }
 
 MACHINE_RESET_MEMBER(astrocde_mess_state, astrocde)
@@ -339,7 +345,7 @@ MACHINE_RESET_MEMBER(astrocde_mess_state, astrocde)
 		{
 			space.nop_write(expansion_ram_start, expansion_ram_end);
 		}
-		}
+	}
 }
 
 void astrocde_mess_state::get_ram_expansion_settings(int &ram_expansion_installed, int &write_protect_on, int &expansion_ram_start, int &expansion_ram_end, int &shadow_ram_end)

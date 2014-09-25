@@ -8,8 +8,9 @@
 #define LYNX_H_
 
 #include "audio/lynx.h"
-#include "imagedev/cartslot.h"
 #include "imagedev/snapquik.h"
+#include "bus/generic/slot.h"
+#include "bus/generic/carts.h"
 
 #define LYNX_CART       0
 #define LYNX_QUICKLOAD  1
@@ -112,6 +113,7 @@ public:
 		m_mem_fffa(*this, "mem_fffa"),
 		m_maincpu(*this, "maincpu"),
 		m_sound(*this, "custom"),
+		m_cart(*this, "cartslot"),
 		m_palette(*this, "palette")  { }
 
 	virtual void video_start();
@@ -125,6 +127,7 @@ public:
 	required_shared_ptr<UINT8> m_mem_fffa;
 	required_device<cpu_device> m_maincpu;
 	required_device<lynx_sound_device> m_sound;
+	required_device<generic_slot_device> m_cart;
 	required_device<palette_device> m_palette;
 	UINT16 m_granularity;
 	int m_sign_AB;
@@ -183,10 +186,6 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };
 
-
-/*----------- defined in machine/lynx.c -----------*/
-
-MACHINE_CONFIG_EXTERN( lynx_cartslot );
 
 /*---------- suzy registers ------------- */
 #define TMPADRL 0x00    // Temporary address (not sure what this is used for)

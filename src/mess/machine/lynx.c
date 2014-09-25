@@ -1018,7 +1018,10 @@ READ8_MEMBER(lynx_state::suzy_read)
 			value = ioport("PAUSE")->read();
 			break;
 		case RCART:
-			value = *(memregion("user1")->base() + (m_suzy.high * m_granularity) + m_suzy.low);
+			if (m_cart->exists())
+				value = m_cart->read_rom(space, (m_suzy.high * m_granularity) + m_suzy.low);
+			else 
+				value = 0;
 			m_suzy.low = (m_suzy.low + 1) & (m_granularity - 1);
 			break;
 		//case RCART_BANK1: /* we need bank 1 emulation!!! */
@@ -2026,15 +2029,6 @@ void lynx_state::machine_start()
 
 ****************************************/
 
-
-static void lynx_partialhash(hash_collection &dest, const unsigned char *data,
-	unsigned long length, const char *functions)
-{
-	if (length <= 64)
-		return;
-	dest.compute(&data[64], length - 64, functions);
-}
-
 int lynx_state::lynx_verify_cart (char *header, int kind)
 {
 	if (kind)
@@ -2047,7 +2041,7 @@ int lynx_state::lynx_verify_cart (char *header, int kind)
 	}
 	else
 	{
-		if (strncmp("LYNX",&header[0],4))
+		if (strncmp("LYNX", &header[0], 4))
 		{
 			if (!strncmp("BS93", &header[6], 4))
 			{
@@ -2068,45 +2062,48 @@ DEVICE_IMAGE_LOAD_MEMBER( lynx_state, lynx_cart )
 	/* Lynx carts have 19 address lines, the upper 8 used for bank select. The lower
 	11 bits are used to address data within the selected bank. Valid bank sizes are 256,
 	512, 1024 or 2048 bytes. Commercial roms use all 256 banks.*/
-
-	UINT8 *rom = memregion("user1")->base();
-	UINT32 size;
-	UINT8 header[0x40];
+	UINT32 size = m_cart->common_get_size("rom");
+	UINT16 gran = 0;
 
 	if (image.software_entry() == NULL)
 	{
-		const char *filetype;
-		size = image.length();
-/* 64 byte header
-   LYNX
-   intelword lower counter size
-   0 0 1 0
-   32 chars name
-   22 chars manufacturer
-*/
-
-		filetype = image.filetype();
-
-		if (!core_stricmp (filetype, "lnx"))
+		// check for lnx header
+		const char *filetype = image.filetype();
+		if (!core_stricmp(filetype, "lnx"))
 		{
-			if (image.fread( header, 0x40) != 0x40)
-				return IMAGE_INIT_FAIL;
-
-			/* Check the image */
+			// 64 byte header
+			// LYNX
+			// intelword lower counter size
+			// 0 0 1 0
+			// 32 chars name
+			// 22 chars manufacturer
+			UINT8 header[0x40];
+			image.fread(header, 0x40);
+			
+			// Check the image
 			if (lynx_verify_cart((char*)header, LYNX_CART) == IMAGE_VERIFY_FAIL)
 				return IMAGE_INIT_FAIL;
-
+			
 			/* 2008-10 FP: According to Handy source these should be page_size_bank0. Are we using
-			it correctly in MESS? Moreover, the next two values should be page_size_bank1. We should
-			implement this as well */
-			m_granularity = header[4] | (header[5] << 8);
-
-			logerror ("%s %dkb cartridge with %dbyte granularity from %s\n",
-					header + 10, size / 1024, m_granularity, header + 42);
-
+			 it correctly in MESS? Moreover, the next two values should be page_size_bank1. We should
+			 implement this as well */
+			gran = header[4] | (header[5] << 8);
+			
+			logerror ("%s %dkb cartridge with %dbyte granularity from %s\n", header + 10, size / 1024, gran, header + 42);
 			size -= 0x40;
 		}
-		else if (!core_stricmp (filetype, "lyx"))
+	}	
+
+	m_cart->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
+	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");			
+
+	// set-up granularity
+	if (image.software_entry() == NULL)
+	{
+		const char *filetype = image.filetype();
+		if (!core_stricmp(filetype, "lnx"))		// from header
+			m_granularity = gran;
+		else if (!core_stricmp(filetype, "lyx"))
 		{
 			/* 2008-10 FP: FIXME: .lyx file don't have an header, hence they miss "lynx_granularity"
 			(see above). What if bank 0 has to be loaded elsewhere? And what about bank 1?
@@ -2118,30 +2115,26 @@ DEVICE_IMAGE_LOAD_MEMBER( lynx_state, lynx_cart )
 			else
 				m_granularity = 0x0400;
 		}
-
-		if (image.fread( rom, size) != size)
-			return IMAGE_INIT_FAIL;
 	}
 	else
 	{
-		size = image.get_software_region_length("rom");
 		if (size > 0xffff) // 64,128,256,512k cartridges
-		m_granularity = size >> 8;
+			m_granularity = size >> 8;
 		else
-		m_granularity = 0x400; // Homebrew roms not using all 256 banks (T-Tris) (none currently in softlist)
-
-		memcpy(rom, image.get_software_region("rom"), size);
-
+			m_granularity = 0x400; // Homebrew roms not using all 256 banks (T-Tris) (none currently in softlist)
+	}
+	
+	// set-up rotation from softlist
+	if (image.software_entry() != NULL)
+	{
 		const char *rotate = image.get_feature("rotation");
 		m_rotate = 0;
 		if (rotate)
 		{
-			if(strcmp(rotate, "RIGHT") == 0) {
+			if (!core_stricmp(rotate, "RIGHT"))
 				m_rotate = 1;
-			}
-			else if (strcmp(rotate, "LEFT") == 0) {
+			else if (!core_stricmp(rotate, "LEFT"))
 				m_rotate = 2;
-			}
 		}
 
 	}
@@ -2149,14 +2142,3 @@ DEVICE_IMAGE_LOAD_MEMBER( lynx_state, lynx_cart )
 	return IMAGE_INIT_PASS;
 }
 
-MACHINE_CONFIG_FRAGMENT(lynx_cartslot)
-	MCFG_CARTSLOT_ADD("cart")
-	MCFG_CARTSLOT_EXTENSION_LIST("lnx,lyx")
-	MCFG_CARTSLOT_MANDATORY
-	MCFG_CARTSLOT_INTERFACE("lynx_cart")
-	MCFG_CARTSLOT_LOAD(lynx_state, lynx_cart)
-	MCFG_CARTSLOT_PARTIALHASH(lynx_partialhash)
-
-	/* Software lists */
-	MCFG_SOFTWARE_LIST_ADD("cart_list","lynx")
-MACHINE_CONFIG_END

@@ -71,7 +71,11 @@ DRIVER_INIT_MEMBER(vtech2_state,laser)
 
 	m_laser_latch = -1;
 	m_mem = memregion("maincpu")->base();
-
+	
+	// check ROM expansion
+	astring region_tag;
+	m_cart_rom = memregion(region_tag.cpy(m_cart->tag()).cat(GENERIC_ROM_REGION_TAG));
+	
 	for (i = 0; i < ARRAY_LENGTH(m_laser_bank); i++)
 		m_laser_bank[i] = -1;
 }
@@ -80,33 +84,31 @@ DRIVER_INIT_MEMBER(vtech2_state,laser)
 
 void vtech2_state::laser_machine_init(int bank_mask, int video_mask)
 {
-	int i;
-
 	m_laser_bank_mask = bank_mask;
 	m_laser_video_bank = video_mask;
 	m_videoram = m_mem + m_laser_video_bank * 0x04000;
 	logerror("laser_machine_init(): bank mask $%04X, video %d [$%05X]\n", m_laser_bank_mask, m_laser_video_bank, m_laser_video_bank * 0x04000);
-
-	for (i = 0; i < ARRAY_LENGTH(m_laser_bank); i++)
+	
+	for (int i = 0; i < ARRAY_LENGTH(m_laser_bank); i++)
 		laser_bank_select_w(m_maincpu->space(AS_PROGRAM), i, 0);
 }
 
 void vtech2_state::machine_reset()
 {
 	/* banks 0 to 3 only, optional ROM extension */
-	laser_machine_init(0xf00f, 3);
+	laser_machine_init(0x00f, 3);
 }
 
 MACHINE_RESET_MEMBER(vtech2_state,laser500)
 {
-	/* banks 0 to 2, and 4-7 only , optional ROM extension */
-	laser_machine_init(0xf0f7, 7);
+	/* banks 0 to 2, and 4-7 only, optional ROM extension */
+	laser_machine_init(0x0f7, 7);
 }
 
 MACHINE_RESET_MEMBER(vtech2_state,laser700)
 {
 	/* all banks except #3 */
-	laser_machine_init(0xfff7, 7);
+	laser_machine_init(0xff7, 7);
 }
 
 
@@ -150,26 +152,30 @@ WRITE8_MEMBER(vtech2_state::laser_bank_select_w)
 		}
 		else
 		{
-			sprintf(bank,"bank%d",offset+1);
-			membank(bank)->set_base(&m_mem[0x4000*m_laser_bank[offset]]);
-			if( m_laser_bank_mask & (1 << data) )
+			sprintf(bank, "bank%d", offset + 1);
+			if (data >= 12 && m_cart_rom && (m_cart_rom->bytes() > (data % 12) * 0x4000))	// Expansion ROM banks
 			{
-				/* video RAM bank selected? */
-				if( data == m_laser_video_bank )
-				{
-					logerror("select bank #%d VIDEO!\n", offset+1);
-				}
+				membank(bank)->set_base(m_cart_rom->base()+ (data % 12) * 0x4000);
 				m_maincpu->space(AS_PROGRAM).install_read_bank(offset * 0x4000, offset * 0x4000 + 0x3fff, mra_bank_hard[offset]);
 				m_maincpu->space(AS_PROGRAM).install_write_bank(offset * 0x4000, offset * 0x4000 + 0x3fff, mwa_bank_hard[offset]);
+			}
+			else if (data < 12 && (m_laser_bank_mask & (1 << data)))	// ROM/RAM banks
+			{
+				// video RAM bank selected?
+				if (data == m_laser_video_bank)
+					logerror("select bank #%d VIDEO!\n", offset + 1);
 
+				membank(bank)->set_base(&m_mem[0x4000 * m_laser_bank[offset]]);
+				m_maincpu->space(AS_PROGRAM).install_read_bank(offset * 0x4000, offset * 0x4000 + 0x3fff, mra_bank_hard[offset]);
+				m_maincpu->space(AS_PROGRAM).install_write_bank(offset * 0x4000, offset * 0x4000 + 0x3fff, mwa_bank_hard[offset]);
 			}
 			else
 			{
-				logerror("select bank #%d MASKED!\n", offset+1);
+				logerror("select bank #%d MASKED!\n", offset + 1);
 				m_maincpu->space(AS_PROGRAM).nop_readwrite(offset * 0x4000, offset * 0x4000 + 0x3fff);
-
 			}
 		}
+		
 	}
 }
 
@@ -300,30 +306,6 @@ void vtech2_state::mwa_bank(int bank, int offs, int data)
 	}
 }
 
-DEVICE_IMAGE_LOAD_MEMBER( vtech2_state, laser_cart )
-{
-	int size = 0;
-
-	size = image.fread(&m_mem[0x30000], 0x10000);
-	m_laser_bank_mask &= ~0xf000;
-	if( size > 0 )
-		m_laser_bank_mask |= 0x1000;
-	if( size > 0x4000 )
-		m_laser_bank_mask |= 0x2000;
-	if( size > 0x8000 )
-		m_laser_bank_mask |= 0x4000;
-	if( size > 0xc000 )
-		m_laser_bank_mask |= 0x8000;
-
-	return size > 0 ? IMAGE_INIT_PASS : IMAGE_INIT_FAIL;
-}
-
-DEVICE_IMAGE_UNLOAD_MEMBER( vtech2_state, laser_cart )
-{
-	m_laser_bank_mask &= ~0xf000;
-	/* wipe out the memory contents to be 100% sure */
-	memset(&m_mem[0x30000], 0xff, 0x10000);
-}
 
 device_t *vtech2_state::laser_file()
 {

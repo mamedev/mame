@@ -68,7 +68,6 @@
 #include "sound/speaker.h"
 #include "sound/wave.h"
 #include "includes/vtech2.h"
-#include "imagedev/cartslot.h"
 #include "imagedev/cassette.h"
 #include "imagedev/flopdrv.h"
 #include "formats/vt_cas.h"
@@ -416,7 +415,6 @@ static MACHINE_CONFIG_START( laser350, vtech2_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", vtech2_state,  vtech2_interrupt)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
-
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
@@ -431,7 +429,6 @@ static MACHINE_CONFIG_START( laser350, vtech2_state )
 	MCFG_PALETTE_INDIRECT_ENTRIES(16)
 	MCFG_PALETTE_INIT_OWNER(vtech2_state, vtech2)
 
-
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
@@ -444,11 +441,8 @@ static MACHINE_CONFIG_START( laser350, vtech2_state )
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY)
 
 	/* cartridge */
-	MCFG_CARTSLOT_ADD("cart")
-	MCFG_CARTSLOT_EXTENSION_LIST("rom")
-	MCFG_CARTSLOT_NOT_MANDATORY
-	MCFG_CARTSLOT_LOAD(vtech2_state,laser_cart)
-	MCFG_CARTSLOT_UNLOAD(vtech2_state,laser_cart)
+	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "vtech_cart")
+	MCFG_GENERIC_EXTENSIONS("rom,bin")
 
 	/* 5.25" Floppy drive */
 	MCFG_LEGACY_FLOPPY_DRIVE_ADD( FLOPPY_0, vtech2_floppy_interface )
