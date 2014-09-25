@@ -113,42 +113,42 @@
 		</bezel>
 
 		<!-- Player 1 Score -->
-		<bezel name="digit5" element="digit">
+		<bezel name="digit11" element="digit">
 			<bounds x="620" y="45" width="35" height="40" />
 		</bezel>
-		<bezel name="digit4" element="digit">
+		<bezel name="digit10" element="digit">
 			<bounds x="664" y="45" width="35" height="40" />
 		</bezel>
-		<bezel name="digit3" element="digit">
+		<bezel name="digit9" element="digit">
 			<bounds x="708" y="45" width="35" height="40" />
 		</bezel>
-		<bezel name="digit2" element="digit">
+		<bezel name="digit8" element="digit">
 			<bounds x="752" y="45" width="35" height="40" />
 		</bezel>
-		<bezel name="digit1" element="digit">
+		<bezel name="digit7" element="digit">
 			<bounds x="796" y="45" width="35" height="40" />
 		</bezel>
-		<bezel name="digit0" element="digit">
+		<bezel name="digit6" element="digit">
 			<bounds x="840" y="45" width="35" height="40" />
 		</bezel>
 
 		<!-- Player 2 Score -->
-		<bezel name="digit25" element="digit">
+		<bezel name="digit5" element="digit">
 			<bounds x="940" y="45" width="35" height="40" />
 		</bezel>
-		<bezel name="digit24" element="digit">
+		<bezel name="digit4" element="digit">
 			<bounds x="984" y="45" width="35" height="40" />
 		</bezel>
-		<bezel name="digit23" element="digit">
+		<bezel name="digit3" element="digit">
 			<bounds x="1028" y="45" width="35" height="40" />
 		</bezel>
-		<bezel name="digit22" element="digit">
+		<bezel name="digit2" element="digit">
 			<bounds x="1072" y="45" width="35" height="40" />
 		</bezel>
-		<bezel name="digit21" element="digit">
+		<bezel name="digit1" element="digit">
 			<bounds x="1116" y="45" width="35" height="40" />
 		</bezel>
-		<bezel name="digit20" element="digit">
+		<bezel name="digit0" element="digit">
 			<bounds x="1160" y="45" width="35" height="40" />
 		</bezel>
 
@@ -176,42 +176,42 @@
 		</bezel>
 
 		<!-- Player 3 Score -->
-		<bezel name="digit11" element="digit">
+		<bezel name="digit31" element="digit">
 			<bounds x="620" y="130" width="35" height="40" />
 		</bezel>
-		<bezel name="digit10" element="digit">
+		<bezel name="digit30" element="digit">
 			<bounds x="664" y="130" width="35" height="40" />
 		</bezel>
-		<bezel name="digit9" element="digit">
+		<bezel name="digit29" element="digit">
 			<bounds x="708" y="130" width="35" height="40" />
 		</bezel>
-		<bezel name="digit8" element="digit">
+		<bezel name="digit28" element="digit">
 			<bounds x="752" y="130" width="35" height="40" />
 		</bezel>
-		<bezel name="digit7" element="digit">
+		<bezel name="digit27" element="digit">
 			<bounds x="796" y="130" width="35" height="40" />
 		</bezel>
-		<bezel name="digit6" element="digit">
+		<bezel name="digit26" element="digit">
 			<bounds x="840" y="130" width="35" height="40" />
 		</bezel>
 
 		<!-- Player 4 Score -->
-		<bezel name="digit31" element="digit">
+		<bezel name="digit25" element="digit">
 			<bounds x="940" y="130" width="35" height="40" />
 		</bezel>
-		<bezel name="digit30" element="digit">
+		<bezel name="digit24" element="digit">
 			<bounds x="984" y="130" width="35" height="40" />
 		</bezel>
-		<bezel name="digit29" element="digit">
+		<bezel name="digit23" element="digit">
 			<bounds x="1028" y="130" width="35" height="40" />
 		</bezel>
-		<bezel name="digit28" element="digit">
+		<bezel name="digit22" element="digit">
 			<bounds x="1072" y="130" width="35" height="40" />
 		</bezel>
-		<bezel name="digit27" element="digit">
+		<bezel name="digit21" element="digit">
 			<bounds x="1116" y="130" width="35" height="40" />
 		</bezel>
-		<bezel name="digit26" element="digit">
+		<bezel name="digit20" element="digit">
 			<bounds x="1160" y="130" width="35" height="40" />
 		</bezel>
 
