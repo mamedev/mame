@@ -1308,15 +1308,10 @@ void raiden2cop_device::execute_b100(address_space &space, int offset, UINT16 da
 	cop_collision_update_hitbox(space, 0, cop_regs[2]);
 }
 
+
 void raiden2cop_device::LEGACY_execute_b100(address_space &space, int offset, UINT16 data)
 {
-	m_LEGACY_cop_collision_info[0].hitbox = space.read_word(cop_regs[2]);
-	m_LEGACY_cop_collision_info[0].hitbox_y = space.read_word((cop_regs[2] & 0xffff0000) | (m_LEGACY_cop_collision_info[0].hitbox));
-	m_LEGACY_cop_collision_info[0].hitbox_x = space.read_word(((cop_regs[2] & 0xffff0000) | (m_LEGACY_cop_collision_info[0].hitbox)) + 2);
-
-	/* do the math */
-	LEGACY_cop_take_hit_box_params(0);
-	cop_hit_status = LEGACY_cop_calculate_collsion_detection();
+	LEGACY_cop_collision_update_hitbox(space, 0, cop_regs[2]);
 }
 
 /*
@@ -1330,13 +1325,7 @@ void raiden2cop_device::execute_b900(address_space &space, int offset, UINT16 da
 
 void raiden2cop_device::LEGACY_execute_b900(address_space &space, int offset, UINT16 data)
 {
-	m_LEGACY_cop_collision_info[1].hitbox = space.read_word(cop_regs[3]);
-	m_LEGACY_cop_collision_info[1].hitbox_y = space.read_word((cop_regs[3] & 0xffff0000) | (m_LEGACY_cop_collision_info[1].hitbox));
-	m_LEGACY_cop_collision_info[1].hitbox_x = space.read_word(((cop_regs[3] & 0xffff0000) | (m_LEGACY_cop_collision_info[1].hitbox)) + 2);
-
-	/* do the math */
-	LEGACY_cop_take_hit_box_params(1);
-	cop_hit_status = LEGACY_cop_calculate_collsion_detection();
+	LEGACY_cop_collision_update_hitbox(space, 1, cop_regs[3]);
 }
 
 /*
@@ -1552,6 +1541,73 @@ void  raiden2cop_device::cop_collision_update_hitbox(address_space &space, int s
 
 	cop_hit_val_stat = cop_hit_status ? 0xffff : 0x0000;
 }
+
+/*
+Godzilla 0x12c0 X = 0x21ed Y = 0x57da
+Megaron  0x12d0 X = 0x1ef1 Y = 0x55db
+King Ghidorah 0x12c8 X = 0x26eb Y = 0x55dc
+Mecha Ghidorah 0x12dc X = 0x24ec Y = 0x55dc
+Mecha Godzilla 0x12d4 X = 0x1cf1 Y = 0x52dc
+Gigan 0x12cc X = 0x23e8 Y = 0x55db
+
+(DC.W $1020, $F0C0, $0000, $0000)
+X = collides at the same spot
+Y = collides between 0xd0 and 0x20
+0x588 bits 2 & 3 = 0
+(DC.W $F0C0, $1020, $0000, $0000)
+X = collides between 0xb0 and 0x50 (inclusive)
+Y = collides between 0xd0 and 0x30 (not inclusive)
+0x588 bits 2 & 3 = 0x580 bits 0 & 1
+*/
+
+void  raiden2cop_device::LEGACY_cop_collision_update_hitbox(address_space &space, int slot, UINT32 hitadr)
+{
+	UINT16 hitboxaddr = space.read_word(hitadr);
+	UINT16 hithoxy = space.read_word((hitadr & 0xffff0000) | (hitboxaddr));
+	UINT16 hitboxx = space.read_word(((hitadr & 0xffff0000) | (hitboxaddr)) + 2);
+
+	INT16 start_x,start_y,height,width;
+
+	{
+		height = UINT8(hithoxy >> 8);
+		start_y = INT8(hithoxy);
+		width = UINT8(hitboxx >> 8);
+		start_x = INT8(hitboxx);
+	}
+
+
+	m_LEGACY_cop_collision_info[slot].min_x = (cop_collision_info[slot].pos[1]) + start_x;
+	m_LEGACY_cop_collision_info[slot].max_x = m_LEGACY_cop_collision_info[slot].min_x + width;
+	m_LEGACY_cop_collision_info[slot].min_y = (cop_collision_info[slot].pos[0]) + start_y;
+	m_LEGACY_cop_collision_info[slot].max_y = m_LEGACY_cop_collision_info[slot].min_y + height;
+
+	static UINT8 res;
+
+	res = 3;
+
+	/* outbound X check */
+	if(m_LEGACY_cop_collision_info[0].max_x >= m_LEGACY_cop_collision_info[1].min_x && m_LEGACY_cop_collision_info[0].min_x <= m_LEGACY_cop_collision_info[1].max_x)
+		res &= ~2;
+
+	if(m_LEGACY_cop_collision_info[1].max_x >= m_LEGACY_cop_collision_info[0].min_x && m_LEGACY_cop_collision_info[1].min_x <= m_LEGACY_cop_collision_info[0].max_x)
+		res &= ~2;
+
+	/* outbound Y check */
+	if(m_LEGACY_cop_collision_info[0].max_y >= m_LEGACY_cop_collision_info[1].min_y && m_LEGACY_cop_collision_info[0].min_y <= m_LEGACY_cop_collision_info[1].max_y)
+		res &= ~1;
+
+	if(m_LEGACY_cop_collision_info[1].max_y >= m_LEGACY_cop_collision_info[0].min_y && m_LEGACY_cop_collision_info[1].min_y <= m_LEGACY_cop_collision_info[0].max_y)
+		res &= ~1;
+
+	cop_hit_val[1] = (cop_collision_info[0].pos[1] - cop_collision_info[1].pos[1]);
+	cop_hit_val[0] = (cop_collision_info[0].pos[0] - cop_collision_info[1].pos[0]);
+	cop_hit_val[2] = 1;
+	cop_hit_val_stat = res; // TODO: there's also bit 2 and 3 triggered in the tests, no known meaning
+
+
+	cop_hit_status = res;
+}
+
 
 WRITE16_MEMBER( raiden2cop_device::cop_cmd_w)
 {
@@ -1860,75 +1916,6 @@ WRITE16_MEMBER(raiden2cop_device::cop_sprite_dma_abs_x_w)
 
 
 
-/*
-Godzilla 0x12c0 X = 0x21ed Y = 0x57da
-Megaron  0x12d0 X = 0x1ef1 Y = 0x55db
-King Ghidorah 0x12c8 X = 0x26eb Y = 0x55dc
-Mecha Ghidorah 0x12dc X = 0x24ec Y = 0x55dc
-Mecha Godzilla 0x12d4 X = 0x1cf1 Y = 0x52dc
-Gigan 0x12cc X = 0x23e8 Y = 0x55db
-
-(DC.W $1020, $F0C0, $0000, $0000)
-X = collides at the same spot
-Y = collides between 0xd0 and 0x20
-0x588 bits 2 & 3 = 0
-(DC.W $F0C0, $1020, $0000, $0000)
-X = collides between 0xb0 and 0x50 (inclusive)
-Y = collides between 0xd0 and 0x30 (not inclusive)
-0x588 bits 2 & 3 = 0x580 bits 0 & 1
-*/
-void raiden2cop_device::LEGACY_cop_take_hit_box_params(UINT8 offs)
-{
-	INT16 start_x,start_y,height,width;
-
-	{
-		height = UINT8(m_LEGACY_cop_collision_info[offs].hitbox_y >> 8);
-		start_y = INT8(m_LEGACY_cop_collision_info[offs].hitbox_y);
-		width = UINT8(m_LEGACY_cop_collision_info[offs].hitbox_x >> 8);
-		start_x = INT8(m_LEGACY_cop_collision_info[offs].hitbox_x);
-	}
-
-	m_LEGACY_cop_collision_info[offs].min_x = (cop_collision_info[offs].pos[1]) + start_x;
-	m_LEGACY_cop_collision_info[offs].max_x = m_LEGACY_cop_collision_info[offs].min_x + width;
-	m_LEGACY_cop_collision_info[offs].min_y = (cop_collision_info[offs].pos[0]) + start_y;
-	m_LEGACY_cop_collision_info[offs].max_y = m_LEGACY_cop_collision_info[offs].min_y + height;
-}
-
-
-UINT8 raiden2cop_device::LEGACY_cop_calculate_collsion_detection()
-{
-	static UINT8 res;
-
-	res = 3;
-
-	/* outbound X check */
-	if(m_LEGACY_cop_collision_info[0].max_x >= m_LEGACY_cop_collision_info[1].min_x && m_LEGACY_cop_collision_info[0].min_x <= m_LEGACY_cop_collision_info[1].max_x)
-		res &= ~2;
-
-	if(m_LEGACY_cop_collision_info[1].max_x >= m_LEGACY_cop_collision_info[0].min_x && m_LEGACY_cop_collision_info[1].min_x <= m_LEGACY_cop_collision_info[0].max_x)
-		res &= ~2;
-
-	/* outbound Y check */
-	if(m_LEGACY_cop_collision_info[0].max_y >= m_LEGACY_cop_collision_info[1].min_y && m_LEGACY_cop_collision_info[0].min_y <= m_LEGACY_cop_collision_info[1].max_y)
-		res &= ~1;
-
-	if(m_LEGACY_cop_collision_info[1].max_y >= m_LEGACY_cop_collision_info[0].min_y && m_LEGACY_cop_collision_info[1].min_y <= m_LEGACY_cop_collision_info[0].max_y)
-		res &= ~1;
-
-	cop_hit_val[1] = (cop_collision_info[0].pos[1] - cop_collision_info[1].pos[1]);
-	cop_hit_val[0] = (cop_collision_info[0].pos[0] - cop_collision_info[1].pos[0]);
-	cop_hit_val[2] = 1;
-	cop_hit_val_stat = res; // TODO: there's also bit 2 and 3 triggered in the tests, no known meaning
-
-	//popmessage("%d %d %04x %04x %04x %04x",cop_hit_val[1],cop_hit_val[0],m_LEGACY_cop_collision_info[0].hitbox_x,m_LEGACY_cop_collision_info[0].hitbox_y,m_LEGACY_cop_collision_info[1].hitbox_x,m_LEGACY_cop_collision_info[1].hitbox_y);
-
-	//if(res == 0)
-	//popmessage("0:%08x %08x %08x 1:%08x %08x %08x\n",cop_collision_info[0].pos[1],cop_collision_info[0].pos[0],m_LEGACY_cop_collision_info[0].hitbox,cop_collision_info[1].pos[1],cop_collision_info[1].pos[0],m_LEGACY_cop_collision_info[1].hitbox);
-//  popmessage("0:%08x %08x %08x %08x 1:%08x %08x %08x %08x\n",m_LEGACY_cop_collision_info[0].min_x,m_LEGACY_cop_collision_info[0].max_x,m_LEGACY_cop_collision_info[0].min_y, m_LEGACY_cop_collision_info[0].max_y,
-//                                                   m_LEGACY_cop_collision_info[1].min_x,m_LEGACY_cop_collision_info[1].max_x,m_LEGACY_cop_collision_info[1].min_y, m_LEGACY_cop_collision_info[1].max_y);
-
-	return res;
-}
 
 
 WRITE16_MEMBER(raiden2cop_device::LEGACY_cop_cmd_w)
