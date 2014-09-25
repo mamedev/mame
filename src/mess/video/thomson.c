@@ -405,6 +405,31 @@ UPDATE_LOW( mo5 )
 END_UPDATE
 
 
+/* as mo5, but with pastel bit switched */
+
+UPDATE_HI( mo5alt )
+{
+	int i;
+	pen_t c[2];
+	c[0] = pal[ (ramb & 15) ^ 8 ];
+        c[1] = pal[ (ramb >> 4) ^ 8 ];
+	for ( i = 0; i < 16; i += 2, rama >>= 1 )
+		dst[ 15 - i ] = dst[ 14 - i ] = c[ rama & 1 ];
+}
+END_UPDATE
+
+UPDATE_LOW( mo5alt )
+{
+	int i;
+	pen_t c[2];
+	c[0] = pal[ (ramb & 15) ^ 8 ];
+	c[1] = pal[ (ramb >> 4) ^ 8 ];
+	for ( i = 0; i < 8; i++, rama >>= 1 )
+		dst[ 7 - i ] = c[ rama & 1 ];
+}
+END_UPDATE
+
+
 
 /* as to770, but with pastel color bit unswitched */
 
@@ -654,7 +679,7 @@ END_UPDATE
 
 
 
-/* 320x200, 2-colors, two overlaid pages (untested) */
+/* 320x200, 2-colors, two overlaid pages */
 
 UPDATE_HI( overlay )
 {
@@ -681,8 +706,40 @@ UPDATE_LOW( overlay )
 END_UPDATE
 
 
+/* 160x200 undocumented variant of the above (2-colors, two overlaid pages) */
 
-/* 160x200, 4-colors, four overlaid pages (untested) */
+UPDATE_HI( overlayhalf )
+{
+	int i;
+	pen_t c[2][2];
+	c[0][0] = pal[ 0 ];
+	c[0][1] = c[1][1] = pal[ 1 ];
+	c[1][0] = pal[ 2 ];
+        rama >>= 4; 
+        ramb >>= 4;
+	for ( i = 0; i < 16; i += 4, rama >>= 1, ramb >>= 1 )
+		dst[ 15 - i ] =  dst[ 14 - i ] = dst[ 13 - i ] =  dst[ 12 - i ] = 
+                        c[ ramb & 1 ] [ rama & 1 ];
+}
+END_UPDATE
+
+UPDATE_LOW( overlayhalf )
+{
+	int i;
+	pen_t c[2][2];
+	c[0][0] = pal[ 0 ];
+	c[0][1] = c[1][1] = pal[ 1 ];
+	c[1][0] = pal[ 2 ];
+        rama >>= 4; 
+        ramb >>= 4;
+	for ( i = 0; i < 8; i += 2, rama >>= 1, ramb >>= 1 )
+		dst[ 7 - i ] = dst[ 6 - i ] = c[ ramb & 1 ] [ rama & 1 ];
+}
+END_UPDATE
+
+
+
+/* 160x200, 4-colors, four overlaid pages */
 
 UPDATE_HI( overlay3 )
 {
@@ -725,7 +782,7 @@ static const thom_scandraw thom_scandraw_funcs[THOM_VMODE_NB][2] =
 	FUN(to770),    FUN(mo5),    FUN(bitmap4), FUN(bitmap4alt),  FUN(mode80),
 	FUN(bitmap16), FUN(page1),  FUN(page2),   FUN(overlay),     FUN(overlay3),
 	FUN(to9), FUN(mode80_to9),
-        FUN(bitmap4althalf),
+        FUN(bitmap4althalf), FUN(mo5alt), FUN(overlayhalf),
 };
 
 

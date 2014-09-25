@@ -256,6 +256,7 @@ public:
 	TIMER_CALLBACK_MEMBER( thom_set_init );
 	void to770_scandraw_16( UINT8* vram, UINT16* dst, UINT16* pal, int org, int len );
 	void mo5_scandraw_16( UINT8* vram, UINT16* dst, UINT16* pal, int org, int len );
+	void mo5alt_scandraw_16( UINT8* vram, UINT16* dst, UINT16* pal, int org, int len );
 	void to9_scandraw_16( UINT8* vram, UINT16* dst, UINT16* pal, int org, int len );
 	void bitmap4_scandraw_16( UINT8* vram, UINT16* dst, UINT16* pal, int org, int len );
 	void bitmap4alt_scandraw_16( UINT8* vram, UINT16* dst, UINT16* pal, int org, int len );
@@ -266,9 +267,11 @@ public:
 	void page1_scandraw_16( UINT8* vram, UINT16* dst, UINT16* pal, int org, int len );
 	void page2_scandraw_16( UINT8* vram, UINT16* dst, UINT16* pal, int org, int len );
 	void overlay_scandraw_16( UINT8* vram, UINT16* dst, UINT16* pal, int org, int len );
+	void overlayhalf_scandraw_16( UINT8* vram, UINT16* dst, UINT16* pal, int org, int len );
 	void overlay3_scandraw_16( UINT8* vram, UINT16* dst, UINT16* pal, int org, int len );
 	void to770_scandraw_8( UINT8* vram, UINT16* dst, UINT16* pal, int org, int len );
 	void mo5_scandraw_8( UINT8* vram, UINT16* dst, UINT16* pal, int org, int len );
+	void mo5alt_scandraw_8( UINT8* vram, UINT16* dst, UINT16* pal, int org, int len );
 	void to9_scandraw_8( UINT8* vram, UINT16* dst, UINT16* pal, int org, int len );
 	void bitmap4_scandraw_8( UINT8* vram, UINT16* dst, UINT16* pal, int org, int len );
 	void bitmap4alt_scandraw_8( UINT8* vram, UINT16* dst, UINT16* pal, int org, int len );
@@ -279,6 +282,7 @@ public:
 	void page1_scandraw_8( UINT8* vram, UINT16* dst, UINT16* pal, int org, int len );
 	void page2_scandraw_8( UINT8* vram, UINT16* dst, UINT16* pal, int org, int len );
 	void overlay_scandraw_8( UINT8* vram, UINT16* dst, UINT16* pal, int org, int len );
+	void overlayhalf_scandraw_8( UINT8* vram, UINT16* dst, UINT16* pal, int org, int len );
 	void overlay3_scandraw_8( UINT8* vram, UINT16* dst, UINT16* pal, int org, int len );
 	void thom_vblank( screen_device &screen, bool state );
 	DECLARE_VIDEO_START( thom );
@@ -607,7 +611,9 @@ protected:
 #define THOM_VMODE_TO9        10
 #define THOM_VMODE_80_TO9     11
 #define THOM_VMODE_BITMAP4_ALT_HALF 12
-#define THOM_VMODE_NB         13
+#define THOM_VMODE_MO5_ALT    13
+#define THOM_VMODE_OVERLAY_HALF     14
+#define THOM_VMODE_NB         15
 
 
 class to7_io_line_device : public device_t
