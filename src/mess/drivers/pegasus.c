@@ -94,7 +94,7 @@ public:
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_DRIVER_INIT(pegasus);
 	TIMER_DEVICE_CALLBACK_MEMBER(pegasus_firq);
-	void pegasus_decrypt_rom(UINT8 *ROM);
+	void pegasus_decrypt_rom(UINT8 *ROM, bool force_decrypt);
 	
 	int load_cart(device_image_interface &image, generic_slot_device *slot, const char *reg_tag);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(exp00_load) { return load_cart(image, m_exp_00, "0000"); }
@@ -389,14 +389,14 @@ GFXDECODE_END
 
 /* An encrypted single rom starts with 02, decrypted with 20. Not sure what
     multipart roms will have. */
-void pegasus_state::pegasus_decrypt_rom(UINT8 *ROM)
+void pegasus_state::pegasus_decrypt_rom(UINT8 *ROM, bool force_decrypt)
 {
 	UINT8 b;
 	UINT16 j;
 	dynamic_buffer temp_copy;
 	temp_copy.resize(0x1000);
 
-	if (ROM[0] == 0x02)
+	if (ROM[0] == 0x02 || force_decrypt)
 	{
 		for (int i = 0; i < 0x1000; i++)
 		{
@@ -424,7 +424,6 @@ int pegasus_state::load_cart(device_image_interface &image, generic_slot_device 
 	{
 		// we might be loading a cart compatible with all sockets!
 		// so try to get region "rom"
-		printf("universal\n");		
 		size = slot->common_get_size("rom");
 		any_socket = true;
 
@@ -440,8 +439,8 @@ int pegasus_state::load_cart(device_image_interface &image, generic_slot_device 
 	slot->rom_alloc(0x1000, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);	// we alloc 0x1000 also for smaller roms!
 	slot->common_load_rom(slot->get_rom_base(), size, any_socket ? "rom" : reg_tag);
 	
-	// raw images have to be decrypted
-	pegasus_decrypt_rom(slot->get_rom_base());
+	// raw images have to be decrypted (in particular the ones from softlist)
+	pegasus_decrypt_rom(slot->get_rom_base(), image.software_entry() != NULL);
 	
 	return IMAGE_INIT_PASS;
 }
@@ -473,7 +472,7 @@ DRIVER_INIT_MEMBER(pegasus_state, pegasus)
 {
 	// decrypt monitor
 	UINT8 *base = memregion("maincpu")->base() + 0xf000;
-	pegasus_decrypt_rom(base);
+	pegasus_decrypt_rom(base, FALSE);
 }
 
 static MACHINE_CONFIG_START( pegasus, pegasus_state )
