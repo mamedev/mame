@@ -1562,9 +1562,9 @@ Y = collides between 0xd0 and 0x30 (not inclusive)
 
 void  raiden2cop_device::LEGACY_cop_collision_update_hitbox(address_space &space, int slot, UINT32 hitadr)
 {
-	UINT16 hitboxaddr = space.read_word(hitadr);
-	UINT16 hithoxy = space.read_word((hitadr & 0xffff0000) | (hitboxaddr));
-	UINT16 hitboxx = space.read_word(((hitadr & 0xffff0000) | (hitboxaddr)) + 2);
+	UINT32 hitadr2 = space.read_word(hitadr) | (cop_hit_baseadr << 16); // DON'T use cop_read_word here, doesn't need endian fixing?!
+	UINT16 hithoxy = space.read_word(hitadr2);
+	UINT16 hitboxx = space.read_word(hitadr2 + 2);
 
 	INT16 start_x,start_y,height,width;
 
