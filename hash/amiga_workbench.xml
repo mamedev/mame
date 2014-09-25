@@ -149,7 +149,7 @@
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Workbench 1.3.2 (De)" />
 			<dataarea name="flop" size="901120">
-				<rom name="317791-03_workbench.adf" size="901120" status="nodump" offset="0"/>
+				<rom name="317791-03_workbench.adf" size="901120" crc="e0a29775" sha="3e2a5e064d8efb4feb64b85b7b26bfaa4f07aa0a" offset="0"/>
 			</dataarea>
 		</part>	
 		<part name="flop2" interface="floppy_3_5">
