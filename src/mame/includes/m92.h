@@ -102,6 +102,3 @@ public:
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };
-
-/*----------- defined in drivers/m92.c -----------*/
-extern void m92_sprite_interrupt(running_machine &machine);

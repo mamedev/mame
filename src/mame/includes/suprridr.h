@@ -55,6 +55,3 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 };
-
-/*----------- defined in video/suprridr.c -----------*/
-int suprridr_is_screen_flipped(running_machine &machine);

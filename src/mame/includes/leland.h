@@ -198,18 +198,11 @@ public:
 };
 
 
-/*----------- defined in machine/leland.c -----------*/
-
 #define SERIAL_TYPE_NONE        0
 #define SERIAL_TYPE_ADD         1
 #define SERIAL_TYPE_ADD_XOR     2
 #define SERIAL_TYPE_ENCRYPT     3
 #define SERIAL_TYPE_ENCRYPT_XOR 4
-
-void leland_init_eeprom(running_machine &machine, UINT8 default_val, const UINT16 *data, UINT8 serial_offset, UINT8 serial_type);
-void ataxx_init_eeprom(running_machine &machine, const UINT16 *data);
-
-void leland_rotate_memory(running_machine &machine, const char *cpuname);
 
 
 /*----------- defined in audio/leland.c -----------*/

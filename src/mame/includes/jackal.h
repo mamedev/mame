@@ -54,6 +54,3 @@ public:
 	void draw_sprites_region( bitmap_ind16 &bitmap, const rectangle &cliprect, const UINT8 *sram, int length, int bank );
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 };
-
-/*----------- defined in video/jackal.c -----------*/
-void jackal_mark_tile_dirty(running_machine &machine, int offset);

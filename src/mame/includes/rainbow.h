@@ -67,6 +67,3 @@ public:
 	void request_goalin_data(  );
 	void rbisland_cchip_init( int version );
 };
-
-/*----------- defined in machine/rainbow.c -----------*/
-void rbisland_cchip_init(running_machine &machine, int version);

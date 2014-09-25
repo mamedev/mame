@@ -177,11 +177,3 @@ public:
 
 	required_device<toaplan_scu_device> m_spritegen;
 };
-
-
-
-
-/*----------- defined in machine/toaplan1.c -----------*/
-void toaplan1_driver_savestate(running_machine &machine);
-void demonwld_driver_savestate(running_machine &machine);
-void vimana_driver_savestate(running_machine &machine);
