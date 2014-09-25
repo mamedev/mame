@@ -863,14 +863,14 @@ MACHINE_CONFIG_END
 
 void mw8080bw_state::maze_update_discrete()
 {
-	maze_write_discrete(m_discrete, m_maze_tone_timing_state);
+	maze_write_discrete(m_maze_tone_timing_state);
 }
 
 
 TIMER_CALLBACK_MEMBER(mw8080bw_state::maze_tone_timing_timer_callback)
 {
 	m_maze_tone_timing_state = !m_maze_tone_timing_state;
-	maze_write_discrete(m_discrete, m_maze_tone_timing_state);
+	maze_write_discrete(m_maze_tone_timing_state);
 }
 
 

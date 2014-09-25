@@ -557,23 +557,23 @@ MACHINE_CONFIG_FRAGMENT( maze_audio )
 MACHINE_CONFIG_END
 
 
-void maze_write_discrete(discrete_device *device, UINT8 maze_tone_timing_state)
+void mw8080bw_state::maze_write_discrete(UINT8 maze_tone_timing_state)
 {
 	/* controls need to be active low */
-	int controls = ~device->machine().root_device().ioport("IN0")->read() & 0xff;
+	int controls = ~ioport("IN0")->read() & 0xff;
 
-	address_space &space = device->machine().driver_data()->generic_space();
-	device->write(space, MAZE_TONE_TIMING, maze_tone_timing_state);
-	device->write(space, MAZE_P1_DATA, controls & 0x0f);
-	device->write(space, MAZE_P2_DATA, (controls >> 4) & 0x0f);
-	device->write(space, MAZE_JOYSTICK_IN_USE, controls != 0xff);
+	address_space &space = machine().driver_data()->generic_space();
+	m_discrete->write(space, MAZE_TONE_TIMING, maze_tone_timing_state);
+	m_discrete->write(space, MAZE_P1_DATA, controls & 0x0f);
+	m_discrete->write(space, MAZE_P2_DATA, (controls >> 4) & 0x0f);
+	m_discrete->write(space, MAZE_JOYSTICK_IN_USE, controls != 0xff);
 
 	/* The coin line is connected directly to the discrete circuit. */
 	/* We can't really do that, so updating it with the tone timing is close enough. */
 	/* A better option might be to update it at vblank or set a timer to do it. */
 	/* The only noticeable difference doing it here, is that the controls don't */
 	/* immediately start making tones if pressed right after the coin is inserted. */
-	device->write(space, MAZE_COIN, (~device->machine().root_device().ioport("IN1")->read() >> 3) & 0x01);
+	m_discrete->write(space, MAZE_COIN, (~ioport("IN1")->read() >> 3) & 0x01);
 }
 
 

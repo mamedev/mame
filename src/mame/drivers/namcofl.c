@@ -788,24 +788,23 @@ ROM_START( finalaprj )
 	ROM_LOAD("finalapr.nv",   0x000000, 0x2000, CRC(d51d65fe) SHA1(8a0a523cb6ba2880951e41ca04db23584f0a108c) )
 ROM_END
 
-static void namcofl_common_init(running_machine &machine)
+void namcofl_state::common_init()
 {
-	namcofl_state *state = machine.driver_data<namcofl_state>();
-	state->m_workram = auto_alloc_array(machine, UINT32, 0x100000/4);
+	m_workram = auto_alloc_array(machine(), UINT32, 0x100000/4);
 
-	state->membank("bank1")->set_base(state->memregion("maincpu")->base() );
-	state->membank("bank2")->set_base(state->m_workram );
+	membank("bank1")->set_base(memregion("maincpu")->base() );
+	membank("bank2")->set_base(m_workram );
 }
 
 DRIVER_INIT_MEMBER(namcofl_state,speedrcr)
 {
-	namcofl_common_init(machine());
+	common_init();
 	m_gametype = NAMCOFL_SPEED_RACER;
 }
 
 DRIVER_INIT_MEMBER(namcofl_state,finalapr)
 {
-	namcofl_common_init(machine());
+	common_init();
 	m_gametype = NAMCOFL_FINAL_LAP_R;
 }
 

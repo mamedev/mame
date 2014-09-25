@@ -281,6 +281,5 @@ extern UINT32 *rsp_imem;
 extern UINT32 *rsp_dmem;
 
 extern void dp_full_sync(running_machine &machine);
-extern void signal_rcp_interrupt(running_machine &machine, int interrupt);
 
 #endif

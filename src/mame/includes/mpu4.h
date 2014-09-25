@@ -308,10 +308,6 @@ protected:
 	optional_device<palette_device> m_palette;
 };
 
-/* mpu4.c, used by mpu4vid.c */
-extern void mpu4_config_common(running_machine &machine);
-extern void mpu4_stepper_reset(mpu4_state *state);
-
 MACHINE_CONFIG_EXTERN( mpu4_common );
 MACHINE_CONFIG_EXTERN( mpu4_common2 );
 

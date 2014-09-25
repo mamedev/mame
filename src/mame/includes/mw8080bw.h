@@ -187,6 +187,7 @@ public:
 	DECLARE_WRITE8_MEMBER(invad2ct_audio_3_w);
 	DECLARE_WRITE8_MEMBER(invad2ct_audio_4_w);
 	void maze_update_discrete();
+	void maze_write_discrete(UINT8 maze_tone_timing_state);
 	UINT8 vpos_to_vysnc_chain_counter( int vpos );
 	int vysnc_chain_counter_to_vpos( UINT8 counter, int vblank );
 	void mw8080bw_create_interrupt_timer(  );
@@ -244,10 +245,6 @@ MACHINE_CONFIG_EXTERN( mw8080bw_root );
 MACHINE_CONFIG_EXTERN( invaders );
 extern const char layout_invaders[];
 
-UINT8 tornbase_get_cabinet_type(running_machine &machine);
-
-int invaders_is_cabinet_cocktail(running_machine &machine);
-
 /*----------- defined in audio/mw8080bw.c -----------*/
 
 
@@ -260,7 +257,6 @@ MACHINE_CONFIG_EXTERN( tornbase_audio );
 MACHINE_CONFIG_EXTERN( zzzap_audio );
 
 MACHINE_CONFIG_EXTERN( maze_audio );
-void maze_write_discrete(discrete_device *device, UINT8 maze_tone_timing_state);
 
 MACHINE_CONFIG_EXTERN( boothill_audio );
 
