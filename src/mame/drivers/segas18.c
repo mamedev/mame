@@ -906,6 +906,24 @@ static INPUT_PORTS_START( ddcrew2p )
 
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( ddcrew3p )
+	PORT_INCLUDE( ddcrew2p )
+	
+	PORT_MODIFY("PORTC")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(3)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(3)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START3 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(3)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(3)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(3)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(3)
+
+	PORT_MODIFY("SERVICE")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN3 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
+
+INPUT_PORTS_END
 
 static INPUT_PORTS_START( desertbr )
 	PORT_INCLUDE( system18_generic )
@@ -2313,7 +2331,7 @@ GAME( 1991, cltchitr,  0,        system18_fd1094,      cltchitr, segas18_state,g
 GAME( 1991, cltchitrj, cltchitr, system18_fd1094,      cltchitr, segas18_state,generic_5987, ROT0,   "Sega", "Clutch Hitter (Japan, FD1094 317-0175)", 0 )
 GAME( 1992, desertbr,  0,        system18_fd1094,      desertbr, segas18_state,generic_5987, ROT270, "Sega", "Desert Breaker (World, FD1094 317-0196)", 0 )
 GAME( 1992, desertbrj, desertbr, system18_fd1094,      desertbr, segas18_state,generic_5987, ROT270, "Sega", "Desert Breaker (Japan, FD1094 317-0194)", 0 )
-GAME( 1991, ddcrew,    0,        system18_fd1094,      ddcrew,   segas18_state,ddcrew,       ROT0,   "Sega", "D. D. Crew (World, 3 Players, FD1094 317-0190)", 0 )
+GAME( 1991, ddcrew,    0,        system18_fd1094,      ddcrew3p, segas18_state,ddcrew,       ROT0,   "Sega", "D. D. Crew (World, 3 Players, FD1094 317-0190)", 0 )
 GAME( 1991, ddcrewu,   ddcrew,   system18_fd1094,      ddcrew,   segas18_state,ddcrew,       ROT0,   "Sega", "D. D. Crew (US, 4 Players, FD1094 317-0186)", 0 )
 GAME( 1991, ddcrew2,   ddcrew,   system18_fd1094,      ddcrew2p, segas18_state,ddcrew,       ROT0,   "Sega", "D. D. Crew (World, 2 Players, FD1094 317-0184)", 0 )
 GAME( 1991, ddcrew1,   ddcrew,   system18_fd1094,      ddcrew,   segas18_state,ddcrew,       ROT0,   "Sega", "D. D. Crew (World, 4 Players, FD1094 317-0187)", 0 )
