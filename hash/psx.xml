@@ -731,7 +731,7 @@ A few comments on these:
 		</part>
 	</software>
  
-   <software name="raidenpr" supported="yes">
+  <software name="raidenpr" supported="yes">
 		<description>Raiden Project (USA)</description>
 		<year>199?</year>
 		<publisher>Seibu</publisher>
@@ -744,7 +744,7 @@ A few comments on these:
 	</software>  
   
   <!-- this image doesn't boot, some kind of copy protection? could be bad -->
-  <software name="raidenprj" cloneof="raidenpr" supported="no">
+	<software name="raidenprj" cloneof="raidenpr" supported="no">
 		<description>Raiden Project (Japan)</description>
 		<year>199?</year>
 		<publisher>Seibu</publisher>

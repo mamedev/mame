@@ -20,7 +20,6 @@ Undumped cartridges:
 		<description>Atari ST Diagnostic Cartridge v4.4</description>
 		<year>198?</year>
 		<publisher>Atari</publisher>
-
 		<part name="cart" interface="st_cart">
 			<dataarea name="rom" width="16" endianness="big" size="0x10000">
 				<rom name="st 4.4 hi.bin" size="0x8000" crc="9ece1359" sha1="58fb686e1f15048105b56502251c0f5a0084d3bb" offset="0x0000" loadflag="load16_byte" />
@@ -33,7 +32,6 @@ Undumped cartridges:
 		<description>Atari STe Diagnostic Cartridge v1.9</description>
 		<year>198?</year>
 		<publisher>Atari</publisher>
-
 		<part name="cart" interface="st_cart">
 			<dataarea name="rom" width="16" endianness="big" size="0x10000">
 				<rom name="ste 1.9 hi.bin" size="0x8000" crc="6cebdbd5" sha1="660cf0dd7d3c8cb484c6327473fb3916d9e3095a" offset="0x0000" loadflag="load16_byte" />
@@ -46,7 +44,6 @@ Undumped cartridges:
 		<description>Atari MEGA STe Diagnostic Cartridge v1.5</description>
 		<year>198?</year>
 		<publisher>Atari</publisher>
-
 		<part name="cart" interface="st_cart">
 			<dataarea name="rom" width="16" endianness="big" size="0x10000">
 				<rom name="megaste 1.5 hi.bin" size="0x8000" crc="4d1f118e" sha1="7b1c282db728e3702496e5d5f5b89b94a80d28fd" offset="0x0000" loadflag="load16_byte" />
@@ -59,7 +56,6 @@ Undumped cartridges:
 		<description>Atari TT Diagnostic Cartridge v1.4</description>
 		<year>198?</year>
 		<publisher>Atari</publisher>
-
 		<part name="cart" interface="st_cart">
 			<dataarea name="rom" width="16" endianness="big" size="0x10000">
 				<rom name="tt 1.4 hi.bin" size="0x8000" crc="62c433d8" sha1="82d43792282e1eeda3469519a4356b7f9fa9c29f" offset="0x0000" loadflag="load16_byte" />
@@ -72,11 +68,10 @@ Undumped cartridges:
 		<description>The Ultimate Ripper v1.2</description>
 		<year>1991</year>
 		<publisher>Atari</publisher>
-
 		<part name="cart" interface="st_cart">
 			<dataarea name="rom" width="16" endianness="big" size="0x10000">
-			<rom name="ultrip 1.2 hi.bin" size="0x8000" crc="cf54b340" sha1="223823009e5d503cdef6e56ac26f8ea0d0a5bf1b" offset="0x0000" loadflag="load16_byte" />
-			<rom name="ultrip 1.2 lo.bin" size="0x8000" crc="84fe083f" sha1="1db972ccdb116638d112c0986633c0c2aa6a94cf" offset="0x0001" loadflag="load16_byte" />
+				<rom name="ultrip 1.2 hi.bin" size="0x8000" crc="cf54b340" sha1="223823009e5d503cdef6e56ac26f8ea0d0a5bf1b" offset="0x0000" loadflag="load16_byte" />
+				<rom name="ultrip 1.2 lo.bin" size="0x8000" crc="84fe083f" sha1="1db972ccdb116638d112c0986633c0c2aa6a94cf" offset="0x0001" loadflag="load16_byte" />
 			</dataarea>
 		</part>
 	</software>
