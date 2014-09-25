@@ -1280,15 +1280,11 @@ void raiden2cop_device::execute_8900(address_space &space, int offset, UINT16 da
 14 - a180 (a100  ) :  (b80, b82, b84, b86, 000, 000, 000, 000)  0     02ff   (grainbow)
 14 - a100 (a100  ) :  (b80, b82, b84, b86, 000, 000, 000, 000)  0     00ff   (raiden2, raidendx)
 */
+
+// the last value (ffff / 02ff / 00ff depending on game) might be important here as they've been intentionally changed for the different games
 void raiden2cop_device::execute_a100(address_space &space, int offset, UINT16 data)
 {
 	cop_collision_read_pos(space, 0, cop_regs[0], data & 0x0080);
-}
-
-void raiden2cop_device::LEGACY_execute_a100(address_space &space, int offset, UINT16 data)
-{
-	m_LEGACY_cop_collision_info[0].y = (space.read_dword(cop_regs[0] + 4));
-	m_LEGACY_cop_collision_info[0].x = (space.read_dword(cop_regs[0] + 8));
 }
 
 /*
@@ -1302,11 +1298,6 @@ void raiden2cop_device::execute_a900(address_space &space, int offset, UINT16 da
 	cop_collision_read_pos(space, 1, cop_regs[1], data & 0x0080);
 }
 
-void raiden2cop_device::LEGACY_execute_a900(address_space &space, int offset, UINT16 data)
-{
-	m_LEGACY_cop_collision_info[1].y = (space.read_dword(cop_regs[1] + 4));
-	m_LEGACY_cop_collision_info[1].x = (space.read_dword(cop_regs[1] + 8));
-}
 
 /*
 16 - b080 (b000  ) :  (b40, bc0, bc2, 000, 000, 000, 000, 000)  9     ffff   (heatbrl)
@@ -1526,10 +1517,10 @@ WRITE16_MEMBER( raiden2cop_device::cop_hitbox_baseadr_w)
 void  raiden2cop_device::cop_collision_read_pos(address_space &space, int slot, UINT32 spradr, bool allow_swap)
 {
 	cop_collision_info[slot].allow_swap = allow_swap;
-	cop_collision_info[slot].flags_swap = space.read_word(spradr+2);
+	cop_collision_info[slot].flags_swap = cop_read_word(space, spradr+2);
 	cop_collision_info[slot].spradr = spradr;
 	for(int i=0; i<3; i++)
-		cop_collision_info[slot].pos[i] = space.read_word(spradr+6+4*i);
+		cop_collision_info[slot].pos[i] = cop_read_word(space, spradr+6+4*i);
 }
 
 void  raiden2cop_device::cop_collision_update_hitbox(address_space &space, int slot, UINT32 hitadr)
@@ -1897,9 +1888,9 @@ void raiden2cop_device::LEGACY_cop_take_hit_box_params(UINT8 offs)
 		start_x = INT8(m_LEGACY_cop_collision_info[offs].hitbox_x);
 	}
 
-	m_LEGACY_cop_collision_info[offs].min_x = (m_LEGACY_cop_collision_info[offs].x >> 16) + start_x;
+	m_LEGACY_cop_collision_info[offs].min_x = (cop_collision_info[offs].pos[1]) + start_x;
 	m_LEGACY_cop_collision_info[offs].max_x = m_LEGACY_cop_collision_info[offs].min_x + width;
-	m_LEGACY_cop_collision_info[offs].min_y = (m_LEGACY_cop_collision_info[offs].y >> 16) + start_y;
+	m_LEGACY_cop_collision_info[offs].min_y = (cop_collision_info[offs].pos[0]) + start_y;
 	m_LEGACY_cop_collision_info[offs].max_y = m_LEGACY_cop_collision_info[offs].min_y + height;
 }
 
@@ -1924,15 +1915,15 @@ UINT8 raiden2cop_device::LEGACY_cop_calculate_collsion_detection()
 	if(m_LEGACY_cop_collision_info[1].max_y >= m_LEGACY_cop_collision_info[0].min_y && m_LEGACY_cop_collision_info[1].min_y <= m_LEGACY_cop_collision_info[0].max_y)
 		res &= ~1;
 
-	cop_hit_val[1] = (m_LEGACY_cop_collision_info[0].x - m_LEGACY_cop_collision_info[1].x) >> 16;
-	cop_hit_val[0] = (m_LEGACY_cop_collision_info[0].y - m_LEGACY_cop_collision_info[1].y) >> 16;
+	cop_hit_val[1] = (cop_collision_info[0].pos[1] - cop_collision_info[1].pos[1]);
+	cop_hit_val[0] = (cop_collision_info[0].pos[0] - cop_collision_info[1].pos[0]);
 	cop_hit_val[2] = 1;
 	cop_hit_val_stat = res; // TODO: there's also bit 2 and 3 triggered in the tests, no known meaning
 
 	//popmessage("%d %d %04x %04x %04x %04x",cop_hit_val[1],cop_hit_val[0],m_LEGACY_cop_collision_info[0].hitbox_x,m_LEGACY_cop_collision_info[0].hitbox_y,m_LEGACY_cop_collision_info[1].hitbox_x,m_LEGACY_cop_collision_info[1].hitbox_y);
 
 	//if(res == 0)
-	//popmessage("0:%08x %08x %08x 1:%08x %08x %08x\n",m_LEGACY_cop_collision_info[0].x,m_LEGACY_cop_collision_info[0].y,m_LEGACY_cop_collision_info[0].hitbox,m_LEGACY_cop_collision_info[1].x,m_LEGACY_cop_collision_info[1].y,m_LEGACY_cop_collision_info[1].hitbox);
+	//popmessage("0:%08x %08x %08x 1:%08x %08x %08x\n",cop_collision_info[0].pos[1],cop_collision_info[0].pos[0],m_LEGACY_cop_collision_info[0].hitbox,cop_collision_info[1].pos[1],cop_collision_info[1].pos[0],m_LEGACY_cop_collision_info[1].hitbox);
 //  popmessage("0:%08x %08x %08x %08x 1:%08x %08x %08x %08x\n",m_LEGACY_cop_collision_info[0].min_x,m_LEGACY_cop_collision_info[0].max_x,m_LEGACY_cop_collision_info[0].min_y, m_LEGACY_cop_collision_info[0].max_y,
 //                                                   m_LEGACY_cop_collision_info[1].min_x,m_LEGACY_cop_collision_info[1].max_x,m_LEGACY_cop_collision_info[1].min_y, m_LEGACY_cop_collision_info[1].max_y);
 
@@ -2097,7 +2088,7 @@ WRITE16_MEMBER(raiden2cop_device::LEGACY_cop_cmd_w)
 
 	if (check_command_matches(command, 0xb80, 0xb82, 0xb84, 0xb86, 0x000, 0x000, 0x000, 0x000, funcval, funcmask))
 	{
-		LEGACY_execute_a100(space, offset, data);
+		execute_a100(space, offset, data);
 		executed = 1;
 		return;
 	}
@@ -2113,7 +2104,7 @@ WRITE16_MEMBER(raiden2cop_device::LEGACY_cop_cmd_w)
 	if (check_command_matches(command, 0xba0, 0xba2, 0xba4, 0xba6, 0x000, 0x000, 0x000, 0x000, funcval, funcmask))
 	{
 		executed = 1;
-		LEGACY_execute_a900(space, offset, data);
+		execute_a900(space, offset, data);
 		return;
 	}
 
