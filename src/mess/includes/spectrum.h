@@ -7,12 +7,13 @@
 #ifndef __SPECTRUM_H__
 #define __SPECTRUM_H__
 
-#include "imagedev/snapquik.h"
-#include "imagedev/cartslot.h"
 #include "machine/upd765.h"
-#include "imagedev/cassette.h"
 #include "sound/speaker.h"
 #include "machine/ram.h"
+#include "imagedev/snapquik.h"
+#include "imagedev/cassette.h"
+#include "bus/generic/slot.h"
+#include "bus/generic/carts.h"
 
 /* Spectrum crystals */
 
@@ -79,6 +80,7 @@ public:
 		m_cassette(*this, "cassette"),
 		m_ram(*this, RAM_TAG),
 		m_speaker(*this, "speaker"),
+		m_cart(*this, "cartslot"),
 		m_upd765(*this, "upd765"),
 		m_upd765_0(*this, "upd765:0"),
 		m_upd765_1(*this, "upd765:1"),
@@ -189,6 +191,7 @@ protected:
 	required_device<cassette_image_device> m_cassette;
 	required_device<ram_device> m_ram;
 	required_device<speaker_sound_device> m_speaker;
+	optional_device<generic_slot_device> m_cart;
 	optional_device<upd765a_device> m_upd765;
 	optional_device<floppy_connector> m_upd765_0;
 	optional_device<floppy_connector> m_upd765_1;

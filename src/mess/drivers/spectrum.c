@@ -622,6 +622,9 @@ MACHINE_RESET_MEMBER(spectrum_state,spectrum)
 {
 	m_port_7ffd_data = -1;
 	m_port_1ffd_data = -1;
+
+	if (m_cart && m_cart->exists())
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0x0000, 0x3fff, read8_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_cart));
 }
 
 /* F4 Character Displayer */
@@ -648,31 +651,19 @@ INTERRUPT_GEN_MEMBER(spectrum_state::spec_interrupt)
 	device.execute().set_input_line(0, HOLD_LINE);
 }
 
-DEVICE_IMAGE_LOAD_MEMBER( spectrum_state,spectrum_cart )
+DEVICE_IMAGE_LOAD_MEMBER(spectrum_state, spectrum_cart)
 {
-	UINT32 filesize;
-
-	if (image.software_entry() == NULL)
+	UINT32 size = m_cart->common_get_size("rom");
+	
+	if (size != 0x4000)
 	{
-		filesize = image.length();
-
-		if (filesize != 0x4000 )
-		{
-			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Incorrect or not support cartridge size");
-			return IMAGE_INIT_FAIL;
-		}
-
-		if (image.fread(memregion("maincpu")->base(), filesize) != filesize)
-		{
-			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Error loading file");
-			return IMAGE_INIT_FAIL;
-		}
+		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
+		return IMAGE_INIT_FAIL;
 	}
-	else
-	{
-		filesize = image.get_software_region_length("rom");
-		memcpy(memregion("maincpu")->base(), image.get_software_region("rom"), filesize);
-	}
+	
+	m_cart->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
+	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");			
+	
 	return IMAGE_INIT_PASS;
 }
 
@@ -720,11 +711,10 @@ MACHINE_CONFIG_START( spectrum_common, spectrum_state )
 	MCFG_SOFTWARE_LIST_ADD("cass_list","spectrum_cass")
 
 	/* cartridge */
-	MCFG_CARTSLOT_ADD("cart")
-	MCFG_CARTSLOT_EXTENSION_LIST("rom")
-	MCFG_CARTSLOT_NOT_MANDATORY
-	MCFG_CARTSLOT_LOAD(spectrum_state,spectrum_cart)
-	MCFG_CARTSLOT_INTERFACE("spectrum_cart")
+	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "spectrum_cart")
+	MCFG_GENERIC_EXTENSIONS("bin,rom")
+	MCFG_GENERIC_LOAD(spectrum_state, spectrum_cart)
+
 	MCFG_SOFTWARE_LIST_ADD("cart_list","spectrum")
 MACHINE_CONFIG_END
 
@@ -783,80 +773,67 @@ ROM_START(spectrum)
 	ROMX_LOAD("isomoje.rom",0x0000,0x4000, CRC(62ab3640) SHA1(04adbdb1380d6ccd4ab26ddd61b9ccbba462a60f), ROM_BIOS(18))
 	ROM_SYSTEM_BIOS(18, "iso8", "ISO ROM 8")
 	ROMX_LOAD("iso8bm.rom",0x0000,0x4000, CRC(43e9c2fd) SHA1(5752e6f789769475711b91e0a75911fa5232c767), ROM_BIOS(19))
-	ROM_CART_LOAD("cart", 0x0000, 0x4000, ROM_NOCLEAR | ROM_NOMIRROR | ROM_OPTIONAL)
 ROM_END
 
 ROM_START(specide)
 	ROM_REGION(0x10000,"maincpu",0)
 	ROM_LOAD("zxide.rom", 0x0000, 0x4000, CRC(bd48db54) SHA1(54c2aa958902b5395c260770a0b25c7ba5685de9))
-	ROM_CART_LOAD("cart", 0x0000, 0x4000, ROM_NOCLEAR | ROM_NOMIRROR | ROM_OPTIONAL)
 ROM_END
 
 ROM_START(spec80k)
 	ROM_REGION(0x10000,"maincpu",0)
 	ROM_LOAD("80-lec.rom", 0x0000, 0x4000, CRC(5b5c92b1) SHA1(bb7a77d66e95d2e28ebb610e543c065e0d428619))
-	ROM_CART_LOAD("cart", 0x0000, 0x4000, ROM_NOCLEAR | ROM_NOMIRROR | ROM_OPTIONAL)
 ROM_END
 
 ROM_START(tk90x)
 	ROM_REGION(0x10000,"maincpu",0)
 	ROM_LOAD("tk90x.rom",0x0000,0x4000, CRC(3e785f6f) SHA1(9a943a008be13194fb006bddffa7d22d2277813f))
-	ROM_CART_LOAD("cart", 0x0000, 0x4000, ROM_NOCLEAR | ROM_NOMIRROR | ROM_OPTIONAL)
 ROM_END
 
 ROM_START(tk95)
 	ROM_REGION(0x10000,"maincpu",0)
 	ROM_LOAD("tk95.rom",0x0000,0x4000, CRC(17368e07) SHA1(94edc401d43b0e9a9cdc1d35de4b6462dc414ab3))
-	ROM_CART_LOAD("cart", 0x0000, 0x4000, ROM_NOCLEAR | ROM_NOMIRROR | ROM_OPTIONAL)
 ROM_END
 
 ROM_START(inves)
 	ROM_REGION(0x10000,"maincpu",0)
 	ROM_LOAD("inves.rom",0x0000,0x4000, CRC(8ff7a4d1) SHA1(d020440638aff4d39467128413ef795677be9c23))
-	ROM_CART_LOAD("cart", 0x0000, 0x4000, ROM_NOCLEAR | ROM_NOMIRROR | ROM_OPTIONAL)
 ROM_END
 
 /* Romanian clones */
 ROM_START(hc85)
 	ROM_REGION(0x10000,"maincpu",0)
 	ROM_LOAD("hc85.rom",0x0000,0x4000, CRC(3ab60fb5) SHA1(a4189db0bcdf8b39ed782b398828efb408fc4817))
-	ROM_CART_LOAD("cart", 0x0000, 0x4000, ROM_NOCLEAR | ROM_NOMIRROR | ROM_OPTIONAL)
 ROM_END
 
 ROM_START( hc88 )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "hc88.bin", 0x0000, 0x0800, CRC(33be5134) SHA1(b15a6e7085710de8b818e42d329707cb737627e3))
-	ROM_CART_LOAD("cart", 0x0000, 0x4000, ROM_NOCLEAR | ROM_NOMIRROR | ROM_OPTIONAL)
 ROM_END
 
 ROM_START(hc90)
 	ROM_REGION(0x10000,"maincpu",0)
 	ROM_LOAD("hc90.rom",0x0000,0x4000, CRC(78c14d9a) SHA1(25ef81905bed90497a749770170c24632efb2039))
-	ROM_CART_LOAD("cart", 0x0000, 0x4000, ROM_NOCLEAR | ROM_NOMIRROR | ROM_OPTIONAL)
 ROM_END
 
 ROM_START(hc91)
 	ROM_REGION(0x10000,"maincpu",0)
 	ROM_LOAD("hc91.rom",0x0000,0x4000, CRC(8bf53761) SHA1(967d5179ba2823e9c8dd9ddfb0430465aaddb554))
-	ROM_CART_LOAD("cart", 0x0000, 0x4000, ROM_NOCLEAR | ROM_NOMIRROR | ROM_OPTIONAL)
 ROM_END
 
 ROM_START(cip03)
 	ROM_REGION(0x10000,"maincpu",0)
 	ROM_LOAD("cip03.rom",0x0000,0x4000, CRC(c7d0cd3c) SHA1(811055b44fc74076137e2bf8db206b2a70287cc2))
-	ROM_CART_LOAD("cart", 0x0000, 0x4000, ROM_NOCLEAR | ROM_NOMIRROR | ROM_OPTIONAL)
 ROM_END
 
 ROM_START(cip01)
 	ROM_REGION(0x10000,"maincpu",0)
 	ROM_LOAD("cip01.rom",0x0000,0x4000, CRC(0516a329) SHA1(4e3e0c5719a64d3b4fb224db499b4bef7d146917))
-	ROM_CART_LOAD("cart", 0x0000, 0x4000, ROM_NOCLEAR | ROM_NOMIRROR | ROM_OPTIONAL)
 ROM_END
 
 ROM_START(jet)
 	ROM_REGION(0x10000,"maincpu",0)
 	ROM_LOAD("jet.rom",0x0000,0x4000, CRC(e56a7d11) SHA1(e76be9ee71bae6aa1c2ff969276fb599ed68cb50))
-	ROM_CART_LOAD("cart", 0x0000, 0x4000, ROM_NOCLEAR | ROM_NOMIRROR | ROM_OPTIONAL)
 ROM_END
 
 ROM_START( cobrasp )
@@ -865,7 +842,6 @@ ROM_START( cobrasp )
 	ROMX_LOAD( "boot64k_v1.bin", 0x0000, 0x0800, CRC(a54aae6d) SHA1(8f5134ce24aea59065ed166ad79e864e17ce812f), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS(1, "v2", "V2")
 	ROMX_LOAD( "boot64k_v2.bin", 0x0000, 0x0800, CRC(ee91cc89) SHA1(37dea7fe0734068adf99b91fdcbf3119095c350d), ROM_BIOS(2))
-	ROM_CART_LOAD("cart", 0x0000, 0x4000, ROM_NOCLEAR | ROM_NOMIRROR | ROM_OPTIONAL)
 ROM_END
 
 ROM_START( cobra80 )
@@ -876,7 +852,6 @@ ROM_START( cobra80 )
 	ROMX_LOAD( "boot80k_v2.bin", 0x0000, 0x0800, CRC(df6bd954) SHA1(5b858b59e697d0368ea631ead14f5b2aa7954ccd), ROM_BIOS(2))
 	ROM_SYSTEM_BIOS(2, "v3", "V3")
 	ROMX_LOAD( "boot80k_v3.bin", 0x0000, 0x0800, CRC(8580494c) SHA1(91af3f3fa50f2071f8ff081536bdf7e21e9823d9), ROM_BIOS(3))
-	ROM_CART_LOAD("cart", 0x0000, 0x4000, ROM_NOCLEAR | ROM_NOMIRROR | ROM_OPTIONAL)
 ROM_END
 
 /* Czechoslovakian clones*/
@@ -886,13 +861,11 @@ ROM_END
 ROM_START(dgama87)
 	ROM_REGION(0x10000,"maincpu",0)
 	ROM_LOAD("dgama87.rom",0x0000,0x4000, CRC(43104909) SHA1(f62d1f3f35fda467cae468e890995614f6ec2357))
-	ROM_CART_LOAD("cart", 0x0000, 0x4000, ROM_NOCLEAR | ROM_NOMIRROR | ROM_OPTIONAL)
 ROM_END
 
 ROM_START(dgama88)
 	ROM_REGION(0x10000,"maincpu",0)
 	ROM_LOAD("dgama88.rom",0x0000,0x4000, CRC(4ec7e078) SHA1(09a91f85e82efa7f974d1b88c69636a02063d563))
-	ROM_CART_LOAD("cart", 0x0000, 0x4000, ROM_NOCLEAR | ROM_NOMIRROR | ROM_OPTIONAL)
 ROM_END
 
 ROM_START(dgama89)
@@ -905,43 +878,36 @@ ROM_START(dgama89)
 	ROMX_LOAD("iso.rom",0x0000,0x4000, CRC(2ee3a992) SHA1(2e39995dd032036d33a6dd88a38b750057bca19d), ROM_BIOS(3))
 	ROM_SYSTEM_BIOS(3, "isopolak", "ISO Polak")
 	ROMX_LOAD("isopolak.rom",0x0000,0x4000, CRC(5e3f1f66) SHA1(61713117c944fc6afcb96c647bdba5ad36fd6a4b), ROM_BIOS(4))
-	ROM_CART_LOAD("cart", 0x0000, 0x4000, ROM_NOCLEAR | ROM_NOMIRROR | ROM_OPTIONAL)
 ROM_END
 
 ROM_START(didakt90)
 	ROM_REGION(0x10000,"maincpu",0)
 	ROM_LOAD("didakt90.rom",0x0000,0x4000, CRC(76f2db1e) SHA1(daee355a8ee58bc406873c1dd81eecb6161dd4bd))
-	ROM_CART_LOAD("cart", 0x0000, 0x4000, ROM_NOCLEAR | ROM_NOMIRROR | ROM_OPTIONAL)
 ROM_END
 
 ROM_START(didakm91)
 	ROM_REGION(0x10000,"maincpu",0)
 	ROM_LOAD("didakm91.rom",0x0000,0x4000, CRC(beab69b8) SHA1(71d4d1a05fb936f616bcb05c3a276f79343ecd4d))
-	ROM_CART_LOAD("cart", 0x0000, 0x4000, ROM_NOCLEAR | ROM_NOMIRROR | ROM_OPTIONAL)
 ROM_END
 
 ROM_START(didakm92)
 	ROM_REGION(0x10000,"maincpu",0)
 	ROM_LOAD("didakm92.bin",0x0000,0x4000, CRC(57264d4f) SHA1(23644fe949cbf527747959d07b72db01de378c4c))
-	ROM_CART_LOAD("cart", 0x0000, 0x4000, ROM_NOCLEAR | ROM_NOMIRROR | ROM_OPTIONAL)
 ROM_END
 
 ROM_START(didaktk)
 	ROM_REGION(0x10000,"maincpu",0)
 	ROM_LOAD("didaktk.rom",0x0000,0x4000, CRC(8ec8a625) SHA1(cba35517d33a5c97e3d9110f12a417c6c5cdeca8))
-	ROM_CART_LOAD("cart", 0x0000, 0x4000, ROM_NOCLEAR | ROM_NOMIRROR | ROM_OPTIONAL)
 ROM_END
 
 ROM_START(didakm93)
 	ROM_REGION(0x10000,"maincpu",0)
 	ROM_LOAD("didakm93.rom",0x0000,0x4000, CRC(ec274b1b) SHA1(a3470d8d1a996ee2a1ffff8bd8044da6e907e07e))
-	ROM_CART_LOAD("cart", 0x0000, 0x4000, ROM_NOCLEAR | ROM_NOMIRROR | ROM_OPTIONAL)
 ROM_END
 
 ROM_START(mistrum)
 	ROM_REGION(0x10000,"maincpu",0)
 	ROM_LOAD("mistrum.rom",0x0000,0x4000, CRC(d496103e) SHA1(cca1c5b059dc3a29ca4282e8621e34a65efaa1a3))
-	ROM_CART_LOAD("cart", 0x0000, 0x4000, ROM_NOCLEAR | ROM_NOMIRROR | ROM_OPTIONAL)
 ROM_END
 
 /* Russian clones */
@@ -949,50 +915,42 @@ ROM_END
 ROM_START(blitzs)
 	ROM_REGION(0x10000,"maincpu",0)
 	ROM_LOAD("blitz.rom",0x0000,0x4000, CRC(91e535a8) SHA1(14f09d45dc3803cbdb05c33adb28eb12dbad9dd0))
-	ROM_CART_LOAD("cart", 0x0000, 0x4000, ROM_NOCLEAR | ROM_NOMIRROR | ROM_OPTIONAL)
 ROM_END
 
 ROM_START(byte)
 	ROM_REGION(0x10000,"maincpu",0)
 	ROM_LOAD("byte.rom",0x0000,0x4000, CRC(c13ba473) SHA1(99f40727185abbb2413f218d69df021ae2e99e45))
-	ROM_CART_LOAD("cart", 0x0000, 0x4000, ROM_NOCLEAR | ROM_NOMIRROR | ROM_OPTIONAL)
 ROM_END
 
 ROM_START(orizon)
 	ROM_REGION(0x10000,"maincpu",0)
 	ROM_LOAD("orizon.rom",0x0000,0x4000, CRC(ed4d9787) SHA1(3e8b29862e06be03344393c320a64a109fd9aff5))
-	ROM_CART_LOAD("cart", 0x0000, 0x4000, ROM_NOCLEAR | ROM_NOMIRROR | ROM_OPTIONAL)
 ROM_END
 
 ROM_START(quorum48)
 	ROM_REGION(0x10000,"maincpu",0)
 	ROM_LOAD("quorum48.rom",0x0000,0x4000, CRC(48085b0e) SHA1(8e01581643f7bdfa773f68207a6437911b631e53))
-	ROM_CART_LOAD("cart", 0x0000, 0x4000, ROM_NOCLEAR | ROM_NOMIRROR | ROM_OPTIONAL)
 ROM_END
 
 ROM_START(magic6)
 	ROM_REGION(0x10000,"maincpu",0)
 	ROM_LOAD("magic6.rom",0x0000,0x4000, CRC(cb63ae06) SHA1(533ad1f50534e6bdeec50eb5a9a4976c3d010dc7))
-	ROM_CART_LOAD("cart", 0x0000, 0x4000, ROM_NOCLEAR | ROM_NOMIRROR | ROM_OPTIONAL)
 ROM_END
 
 ROM_START(compani1)
 	ROM_REGION(0x10000,"maincpu",0)
 	ROM_LOAD("compani1.rom",0x0000,0x4000, CRC(bcfa6068) SHA1(40074b55c91a947698598e9d6ac5b8495e8cc840))
-	ROM_CART_LOAD("cart", 0x0000, 0x4000, ROM_NOCLEAR | ROM_NOMIRROR | ROM_OPTIONAL)
 ROM_END
 
 ROM_START(spektrbk)
 	ROM_REGION(0x10000,"maincpu",0)
 	ROM_LOAD("spektr-bk001.rom", 0x0000, 0x4000, CRC(c011eecc) SHA1(35fdc8cd083e50452655997a997873627b131520))
-	ROM_CART_LOAD("cart", 0x0000, 0x4000, ROM_NOCLEAR | ROM_NOMIRROR | ROM_OPTIONAL)
 ROM_END
 
 ROM_START(zvezda)
 	ROM_REGION(0x10000,"maincpu",0)
 	ROM_LOAD( "2764-near-cpu_red.bin", 0x0000, 0x2000, CRC(a4ae4938) SHA1(ea1763b9dee29381ddcf882fbc4e404ba5366942))
 	ROM_LOAD( "2764-far-cpu_blue.bin", 0x2000, 0x2000, CRC(ebab64bc) SHA1(8c98a8b6e927b02cf602c20a1b50838e60f7785b))
-	ROM_CART_LOAD("cart", 0x0000, 0x4000, ROM_NOCLEAR | ROM_NOMIRROR | ROM_OPTIONAL)
 ROM_END
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE     INPUT       INIT    COMPANY     FULLNAME */

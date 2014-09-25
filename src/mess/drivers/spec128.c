@@ -183,37 +183,27 @@ WRITE8_MEMBER(spectrum_state::spectrum_128_port_7ffd_w)
 void spectrum_state::spectrum_128_update_memory()
 {
 	UINT8 *messram = m_ram->pointer();
-	unsigned char *ChosenROM;
-	int ROMSelection;
-
-	if (m_port_7ffd_data & 8)
-	{
-		m_screen_location = messram + (7<<14);
-	}
-	else
-	{
-		m_screen_location = messram + (5<<14);
-	}
 
 	/* select ram at 0x0c000-0x0ffff */
+	int ram_page = m_port_7ffd_data & 0x07;
+	unsigned char *ram_data = messram + (ram_page<<14);
+	membank("bank4")->set_base(ram_data);
+
+	if (BIT(m_port_7ffd_data, 3))
+		m_screen_location = messram + (7<<14);
+	else
+		m_screen_location = messram + (5<<14);
+
+	if (!m_cart->exists())
 	{
-		int ram_page;
-		unsigned char *ram_data;
+		/* ROM switching */
+		int ROMSelection = BIT(m_port_7ffd_data, 4);
 
-		ram_page = m_port_7ffd_data & 0x07;
-		ram_data = messram + (ram_page<<14);
+		/* rom 0 is 128K rom, rom 1 is 48 BASIC */
+		unsigned char *ChosenROM = memregion("maincpu")->base() + 0x010000 + (ROMSelection << 14);
 
-		membank("bank4")->set_base(ram_data);
+		membank("bank1")->set_base(ChosenROM);
 	}
-
-	/* ROM switching */
-	ROMSelection = ((m_port_7ffd_data>>4) & 0x01);
-
-	/* rom 0 is 128K rom, rom 1 is 48 BASIC */
-
-	ChosenROM = memregion("maincpu")->base() + 0x010000 + (ROMSelection<<14);
-
-	membank("bank1")->set_base(ChosenROM);
 }
 
 READ8_MEMBER( spectrum_state::spectrum_128_ula_r )
@@ -291,7 +281,6 @@ MACHINE_CONFIG_DERIVED( spectrum_128, spectrum )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", spectrum_state,  spec_interrupt)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
-
 	MCFG_MACHINE_RESET_OVERRIDE(spectrum_state, spectrum_128 )
 
 	/* video hardware */
@@ -328,7 +317,6 @@ ROM_START(spec128)
 	ROM_SYSTEM_BIOS( 1, "sp", "Spanish" )
 	ROMX_LOAD("zx128s0.rom",0x10000,0x4000, CRC(453d86b2) SHA1(968937b1c750f0ef6205f01c6db4148da4cca4e3), ROM_BIOS(2))
 	ROMX_LOAD("zx128s1.rom",0x14000,0x4000, CRC(6010e796) SHA1(bea3f397cc705eafee995ea629f4a82550562f90), ROM_BIOS(2))
-	ROM_CART_LOAD("cart", 0x10000, 0x4000, ROM_NOCLEAR | ROM_NOMIRROR | ROM_OPTIONAL)
 ROM_END
 
 ROM_START(specpls2)
@@ -347,14 +335,12 @@ ROM_START(specpls2)
 	ROMX_LOAD("plus2c-1.rom",0x14000,0x4000, CRC(fd8552b6) SHA1(5ffcf79f2154ba2cf42cc1d9cb4be93cb5043e73), ROM_BIOS(4))
 	ROM_SYSTEM_BIOS( 4, "namco", "ZX Spectrum +2c (Namco)" )
 	ROMX_LOAD("pl2namco.rom",0x10000,0x8000, CRC(72a54e75) SHA1(311400157df689450dadc3620f4c4afa960b05ad), ROM_BIOS(5))
-	ROM_CART_LOAD("cart", 0x10000, 0x4000, ROM_NOCLEAR | ROM_NOMIRROR | ROM_OPTIONAL)
 ROM_END
 
 ROM_START(hc128)
 	ROM_REGION(0x18000,"maincpu",0)
 	ROM_LOAD("zx128_0.rom",0x10000,0x4000, CRC(e76799d2) SHA1(4f4b11ec22326280bdb96e3baf9db4b4cb1d02c5))
 	ROM_LOAD("hc128.rom",  0x14000,0x4000, CRC(0241e960) SHA1(cea0d14391b9e571460a816088a1c00ecb24afa3))
-	ROM_CART_LOAD("cart", 0x10000, 0x4000, ROM_NOCLEAR | ROM_NOMIRROR | ROM_OPTIONAL)
 ROM_END
 
 ROM_START(hc2000)
@@ -365,7 +351,6 @@ ROM_START(hc2000)
 	ROM_SYSTEM_BIOS( 1, "v2", "Version 2" )
 	ROMX_LOAD("zx128_0.rom",0x10000,0x4000, CRC(e76799d2) SHA1(4f4b11ec22326280bdb96e3baf9db4b4cb1d02c5), ROM_BIOS(2))
 	ROMX_LOAD("hc2000.v2",  0x14000,0x4000, CRC(65d90464) SHA1(5e2096e6460ff2120c8ada97579fdf82c1199c09), ROM_BIOS(2))
-	ROM_CART_LOAD("cart", 0x10000, 0x4000, ROM_NOCLEAR | ROM_NOMIRROR | ROM_OPTIONAL)
 ROM_END
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE     INPUT       INIT    COMPANY     FULLNAME */

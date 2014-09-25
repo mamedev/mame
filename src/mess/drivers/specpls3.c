@@ -214,68 +214,55 @@ void spectrum_state::spectrum_plus3_update_memory()
 
 	if ((m_port_1ffd_data & 0x01) == 0)
 	{
-			int ram_page;
-			unsigned char *ram_data;
+		/* select ram at 0x0c000-0x0ffff */
+		int ram_page = m_port_7ffd_data & 0x07;
+		unsigned char *ram_data = messram + (ram_page<<14);
+		membank("bank4")->set_base(ram_data);
+		
+		logerror("RAM at 0xc000: %02x\n", ram_page);
+		
+		/* Reset memory between 0x4000 - 0xbfff in case extended paging was being used */
+		/* Bank 5 in 0x4000 - 0x7fff */
+		membank("bank2")->set_base(messram + (5 << 14));
+		
+		/* Bank 2 in 0x8000 - 0xbfff */
+		membank("bank3")->set_base(messram + (2 << 14));
 
+		if (!m_cart->exists())
+		{
 			/* ROM switching */
-			unsigned char *ChosenROM;
-			int ROMSelection;
-
-			/* select ram at 0x0c000-0x0ffff */
-			ram_page = m_port_7ffd_data & 0x07;
-			ram_data = messram + (ram_page<<14);
-
-			membank("bank4")->set_base(ram_data);
-
-			logerror("RAM at 0xc000: %02x\n", ram_page);
-
-			/* Reset memory between 0x4000 - 0xbfff in case extended paging was being used */
-			/* Bank 5 in 0x4000 - 0x7fff */
-			membank("bank2")->set_base(messram + (5 << 14));
-
-			/* Bank 2 in 0x8000 - 0xbfff */
-			membank("bank3")->set_base(messram + (2 << 14));
-
-
-			ROMSelection = ((m_port_7ffd_data >> 4) & 0x01) |
-				((m_port_1ffd_data >> 1) & 0x02);
-
+			int ROMSelection = BIT(m_port_7ffd_data, 4) | ((m_port_1ffd_data >> 1) & 0x02);
+			
 			/* rom 0 is editor, rom 1 is syntax, rom 2 is DOS, rom 3 is 48 BASIC */
-
-			ChosenROM = memregion("maincpu")->base() + 0x010000 + (ROMSelection << 14);
-
+			unsigned char *ChosenROM = memregion("maincpu")->base() + 0x010000 + (ROMSelection << 14);
+			
 			membank("bank1")->set_base(ChosenROM);
 			space.unmap_write(0x0000, 0x3fff);
-
+			
 			logerror("rom switch: %02x\n", ROMSelection);
+		}
 	}
 	else
 	{
-			/* Extended memory paging */
-
-			const int *memory_selection;
-			int MemorySelection;
-			unsigned char *ram_data;
-
-			MemorySelection = (m_port_1ffd_data >> 1) & 0x03;
-
-			memory_selection = &spectrum_plus3_memory_selections[(MemorySelection << 2)];
-
-			ram_data = messram + (memory_selection[0] << 14);
-			membank("bank1")->set_base(ram_data);
-			/* allow writes to 0x0000-0x03fff */
-			space.install_write_bank(0x0000, 0x3fff, "bank1");
-
-			ram_data = messram + (memory_selection[1] << 14);
-			membank("bank2")->set_base(ram_data);
-
-			ram_data = messram + (memory_selection[2] << 14);
-			membank("bank3")->set_base(ram_data);
-
-			ram_data = messram + (memory_selection[3] << 14);
-			membank("bank4")->set_base(ram_data);
-
-			logerror("extended memory paging: %02x\n", MemorySelection);
+		/* Extended memory paging */
+		int MemorySelection = (m_port_1ffd_data >> 1) & 0x03;
+		const int *memory_selection = &spectrum_plus3_memory_selections[(MemorySelection << 2)];
+		unsigned char *ram_data = messram + (memory_selection[0] << 14);
+		
+		membank("bank1")->set_base(ram_data);
+		/* allow writes to 0x0000-0x03fff */
+		space.install_write_bank(0x0000, 0x3fff, "bank1");
+		
+		ram_data = messram + (memory_selection[1] << 14);
+		membank("bank2")->set_base(ram_data);
+		
+		ram_data = messram + (memory_selection[2] << 14);
+		membank("bank3")->set_base(ram_data);
+		
+		ram_data = messram + (memory_selection[3] << 14);
+		membank("bank4")->set_base(ram_data);
+		
+		logerror("extended memory paging: %02x\n", MemorySelection);
 	}
 }
 
@@ -314,8 +301,8 @@ WRITE8_MEMBER( spectrum_state::spectrum_plus3_port_1ffd_w )
 	/* disable paging? */
 	if ((m_port_7ffd_data & 0x20)==0)
 	{
-			/* no */
-			spectrum_plus3_update_memory();
+		/* no */
+		spectrum_plus3_update_memory();
 	}
 }
 
@@ -411,7 +398,6 @@ ROM_START(specpl2a)
 	ROM_LOAD("p2a41_1.rom",0x14000,0x4000, CRC(a7916b3f) SHA1(1a7812c383a3701e90e88d1da086efb0c033ac72))
 	ROM_LOAD("p2a41_2.rom",0x18000,0x4000, CRC(c9a0b748) SHA1(8df145d10ff78f98138682ea15ebccb2874bf759))
 	ROM_LOAD("p2a41_3.rom",0x1c000,0x4000, CRC(b88fd6e3) SHA1(be365f331942ec7ec35456b641dac56a0dbfe1f0))
-	ROM_CART_LOAD("cart", 0x10000, 0x4000, ROM_NOCLEAR | ROM_NOMIRROR | ROM_OPTIONAL)
 ROM_END
 
 ROM_START(specpls3)
@@ -434,7 +420,6 @@ ROM_START(specpls3)
 	ROM_SYSTEM_BIOS( 4, "12ms", "Customize 3.5\" 12ms" )
 	ROMX_LOAD("p3_01_cm.rom",0x10000,0x8000, CRC(ad99380a) SHA1(4e5d114b72d464cefdde0566457f52a3c0c1cae2), ROM_BIOS(5))
 	ROMX_LOAD("p3_23_cm.rom",0x18000,0x8000, CRC(61f2b50c) SHA1(d062765ceb1f3cd2c94ea51cb737cac7ad6151b4), ROM_BIOS(5))
-	ROM_CART_LOAD("cart", 0x10000, 0x4000, ROM_NOCLEAR | ROM_NOMIRROR | ROM_OPTIONAL)
 ROM_END
 
 ROM_START(specpl3e)
@@ -445,7 +430,6 @@ ROM_START(specpl3e)
 	ROM_SYSTEM_BIOS( 1, "sp", "Spanish" )
 	ROMX_LOAD("roma-es.rom",0x10000,0x8000, CRC(ba694b4b) SHA1(d15d9e43950483cffc79f1cfa89ecb114a88f6c2), ROM_BIOS(2))
 	ROMX_LOAD("romb-es.rom",0x18000,0x8000, CRC(61ed94db) SHA1(935b14c13db75d872de8ad0d591aade0adbbc355), ROM_BIOS(2))
-	ROM_CART_LOAD("cart", 0x10000, 0x4000, ROM_NOCLEAR | ROM_NOMIRROR | ROM_OPTIONAL)
 ROM_END
 
 ROM_START(sp3e8bit)
@@ -454,7 +438,6 @@ ROM_START(sp3e8bit)
 	ROMX_LOAD("3e8biten.rom",0x10000,0x10000, CRC(beee3bf6) SHA1(364ec903916282d5401901c5fb0cb93a142038b3), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS( 1, "sp", "Spanish" )
 	ROMX_LOAD("3e8bites.rom",0x10000,0x10000, CRC(cafe4c35) SHA1(8331d273d29d3e37ec1324053bb050874d2c1434), ROM_BIOS(2))
-	ROM_CART_LOAD("cart", 0x10000, 0x4000, ROM_NOCLEAR | ROM_NOMIRROR | ROM_OPTIONAL)
 ROM_END
 
 ROM_START(sp3ezcf)
@@ -463,7 +446,6 @@ ROM_START(sp3ezcf)
 	ROMX_LOAD("3ezcfen.rom",0x10000,0x10000, CRC(43993f11) SHA1(27cbfbe8b5ef9eec6056026fa0b84fe158ba2f45), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS( 1, "sp", "Spanish" )
 	ROMX_LOAD("3ezcfes.rom",0x10000,0x10000, CRC(1325a0d7) SHA1(521cf47e10f46c8a621c8889ef1f008454c7e10b), ROM_BIOS(2))
-	ROM_CART_LOAD("cart", 0x10000, 0x4000, ROM_NOCLEAR | ROM_NOMIRROR | ROM_OPTIONAL)
 ROM_END
 
 ROM_START(sp3eata)
@@ -472,7 +454,6 @@ ROM_START(sp3eata)
 	ROMX_LOAD("3ezxaen.rom",0x10000,0x10000, CRC(dfb676dc) SHA1(37618bc66ae33dbf686be8a92867e4a9144b65dc), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS( 1, "sp", "Spanish" )
 	ROMX_LOAD("3ezxaes.rom",0x10000,0x10000, CRC(8f0ae91a) SHA1(71693e18b30c90914be58cba26682ca025c924ea), ROM_BIOS(2))
-	ROM_CART_LOAD("cart", 0x10000, 0x4000, ROM_NOCLEAR | ROM_NOMIRROR | ROM_OPTIONAL)
 ROM_END
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE         INPUT       INIT    COMPANY     FULLNAME */
