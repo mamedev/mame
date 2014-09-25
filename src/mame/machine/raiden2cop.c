@@ -280,15 +280,15 @@ void raiden2cop_device::dump_table()
 
 	int command;
 
-	printf("## - trig (masked) :  (sq0, sq1, sq2, sq3, sq4, sq5, sq6, sq7)  valu  mask\n");
+	printf("## - trig (up5) (low11) :  (sq0, sq1, sq2, sq3, sq4, sq5, sq6, sq7)  valu  mask\n");
 
 	for (command = 0; command < 0x20; command++)
 	{
 		if (cop_func_trigger[command] != 0x0000)
 		{
-			int maskout = 0x0080;
+			int maskout = 0x07ff;
 
-			printf("%02x - %04x (%04x  ) :  ", command, cop_func_trigger[command], cop_func_trigger[command] & ~maskout);
+			printf("%02x - %04x ( %02x) (  %03x) :  ", command, cop_func_trigger[command], (cop_func_trigger[command] & ~maskout)>>11, (cop_func_trigger[command] & maskout));
 
 			printf("(");
 			int seqpos;
@@ -309,6 +309,7 @@ void raiden2cop_device::dump_table()
 	}
 #endif
 }
+
 
 WRITE16_MEMBER(raiden2cop_device::cop_pgm_addr_w)
 {
@@ -761,12 +762,23 @@ READ16_MEMBER(raiden2cop_device::cop_itoa_digits_r)
 
 /* Main COP functionality */
 
-/*
-(masked) just assumes 0x0080 masked out, actual masking / command selection is more complex, it seems bit 0x0001 is masked too (used for sign in 0904 / 0905) and more
+// notes about tables:
+// in all but one case the upload table position (5-bits) is the SAME as the upper 5-bits of the 'trigger value'
+// the exception to this rule is program 0x18 uploads on zeroteam
+//  in this case you can see that the 'trigger' value upper bits are 0x0f, this makes it a potentially interesting case (if it gets used)
+//  18 - c480 ( 18) (  480) :  (080, 882, 000, 000, 000, 000, 000, 000)  a     ff00   (legionna, heatbrl, cupsoc, grainbow, godzilla, denjinmk)
+//  18 - 7c80 ( 0f) (  480) :  (080, 882, 000, 000, 000, 000, 000, 000)  a     ff00   (zeroteam, xsedae)
 
-## - trig (masked) :  (sq0, sq1, sq2, sq3, sq4, sq5, sq6, sq7)  valu  mask
-00 - 0205 (0205  ) :  (188, 282, 082, b8e, 98e, 000, 000, 000)  6     ffeb   (heatbrl, legionna, cupsoc, godzilla, grainbow, denjinmk, raiden2, raidendx, zeroteam, xsedae)
-00 - 0105 (0105  ) :  (180, 2e0, 0a0, 000, 000, 000, 000, 000)  6     fffb   (zeroteamsr)
+// It is unknown if the lower 11 bits uploaded as part of the 'trigger' value to the table are used during execution.
+// When the actual trigger is written these bits can be different to the upload and for the written value we know they give extended
+// meanings to the commands (eg. signs swapped in operations - for program 0x01 (0905) Zero Team writes 0904 (lowest bit different to uploaded
+// value) to negate the logic
+
+/*
+
+## - trig (up5) (low11) :  (sq0, sq1, sq2, sq3, sq4, sq5, sq6, sq7)  valu  mask
+00 - 0205 ( 00) (  205) :  (188, 282, 082, b8e, 98e, 000, 000, 000)  6     ffeb   (legionna, heatbrl, cupsoc, grainbow, godzilla, denjinmk, raiden2, raidendx, zeroteam, xsedae)
+00 - 0105 ( 00) (  105) :  (180, 2e0, 0a0, 000, 000, 000, 000, 000)  6     fffb   (zeroteamsr)
 */
 void raiden2cop_device::execute_0205(address_space &space, int offset, UINT16 data)
 {
@@ -778,8 +790,9 @@ void raiden2cop_device::execute_0205(address_space &space, int offset, UINT16 da
 }
 
 /*
-01 - 0905 (0905  ) :  (194, 288, 088, 000, 000, 000, 000, 000)  6     fbfb   (heatbrl, legionna, cupsoc, godzilla, grainbow, denjinmk, raiden2, raidendx, zeroteam, xsedae)
-01 - 0b05 (0b05  ) :  (180, 2e0, 0a0, 182, 2e0, 0c0, 000, 000)  6     ffdb   (zeroteamsr)
+## - trig (up5) (low11) :  (sq0, sq1, sq2, sq3, sq4, sq5, sq6, sq7)  valu  mask
+01 - 0905 ( 01) (  105) :  (194, 288, 088, 000, 000, 000, 000, 000)  6     fbfb   (legionna, heatbrl, cupsoc, grainbow, godzilla, denjinmk, raiden2, raidendx, zeroteam, xsedae)
+01 - 0b05 ( 01) (  305) :  (180, 2e0, 0a0, 182, 2e0, 0c0, 000, 000)  6     ffdb   (zeroteamsr)
 */
 
 // triggered with 0904 0905
@@ -796,9 +809,10 @@ void raiden2cop_device::execute_0904(address_space &space, int offset, UINT16 da
 
 
 /*
-02 - 138e (130e  ) :  (984, aa4, d82, aa2, 39b, b9a, b9a, b9a)  5     bf7f   (heatbrl, legionna)
-02 - 138e (130e  ) :  (984, aa4, d82, aa2, 39b, b9a, b9a, a9a)  5     bf7f   (cupsoc, godzilla, grainbow, denjinmk)
-02 - 130e (130e  ) :  (984, aa4, d82, aa2, 39b, b9a, b9a, a9a)  5     bf7f   (raiden2, raidendx, zeroteam, xsedae)
+## - trig (up5) (low11) :  (sq0, sq1, sq2, sq3, sq4, sq5, sq6, sq7)  valu  mask
+02 - 138e ( 02) (  38e) :  (984, aa4, d82, aa2, 39b, b9a, b9a, b9a)  5     bf7f   (legionna, heatbrl)
+02 - 138e ( 02) (  38e) :  (984, aa4, d82, aa2, 39b, b9a, b9a, a9a)  5     bf7f   (cupsoc, grainbow, godzilla, denjinmk)
+02 - 130e ( 02) (  30e) :  (984, aa4, d82, aa2, 39b, b9a, b9a, a9a)  5     bf7f   (raiden2, raidendx, zeroteam, xsedae)
 */
 
 // triggered with 130e, 138e
@@ -857,13 +871,15 @@ void raiden2cop_device::LEGACY_execute_130e_cupsoc(address_space &space, int off
 }
 
 /*
-03 - 1905 (1905  ) :  (994, a88, 088, 000, 000, 000, 000, 000)  6     fbfb   (heatbrl, legionna, cupsoc, godzilla, grainbow, denjinmk, raiden2, raidendx, zeroteam, xsedae)
+## - trig (up5) (low11) :  (sq0, sq1, sq2, sq3, sq4, sq5, sq6, sq7)  valu  mask
+03 - 1905 ( 03) (  105) :  (994, a88, 088, 000, 000, 000, 000, 000)  6     fbfb   (legionna, heatbrl, cupsoc, grainbow, godzilla, denjinmk, raiden2, raidendx, zeroteam, xsedae)
 */
 
 /*
-04 - 2288 (2208  ) :  (f8a, b8a, 388, b9c, b9a, a9a, 000, 000)  5     f5df   (heatbrl, legionna)
-04 - 2288 (2208  ) :  (f8a, b8a, 388, b9a, b9a, a9a, 000, 000)  5     f5df   (cupsoc, godzilla, grainbow, denjinmk)
-04 - 2208 (2208  ) :  (f8a, b8a, 388, b9a, b9a, a9a, 000, 000)  5     f5df   (raiden2, raidendx, zeroteam, xsedae)
+## - trig (up5) (low11) :  (sq0, sq1, sq2, sq3, sq4, sq5, sq6, sq7)  valu  mask
+04 - 2288 ( 04) (  288) :  (f8a, b8a, 388, b9c, b9a, a9a, 000, 000)  5     f5df   (legionna, heatbrl)
+04 - 2288 ( 04) (  288) :  (f8a, b8a, 388, b9a, b9a, a9a, 000, 000)  5     f5df   (cupsoc, grainbow, godzilla, denjinmk)
+04 - 2208 ( 04) (  208) :  (f8a, b8a, 388, b9a, b9a, a9a, 000, 000)  5     f5df   (raiden2, raidendx, zeroteam, xsedae)
 */
 
 // also triggered with 0x2208
@@ -888,7 +904,8 @@ void raiden2cop_device::execute_2288(address_space &space, int offset, UINT16 da
 }
 
 /*
-05 - 2a05 (2a05  ) :  (9af, a82, 082, a8f, 18e, 000, 000, 000)  6     ebeb   (heatbrl, legionna, cupsoc, godzilla, grainbow, denjinmk, raiden2, raidendx, zeroteam, xsedae)
+## - trig (up5) (low11) :  (sq0, sq1, sq2, sq3, sq4, sq5, sq6, sq7)  valu  mask
+05 - 2a05 ( 05) (  205) :  (9af, a82, 082, a8f, 18e, 000, 000, 000)  6     ebeb   (legionna, heatbrl, cupsoc, grainbow, godzilla, denjinmk, raiden2, raidendx, zeroteam, xsedae)
 */
 
 void raiden2cop_device::execute_2a05(address_space &space, int offset, UINT16 data)
@@ -900,8 +917,9 @@ void raiden2cop_device::execute_2a05(address_space &space, int offset, UINT16 da
 
 
 /*
-06 - 338e (330e  ) :  (984, aa4, d82, aa2, 39c, b9c, b9c, a9a)  5     bf7f   (heatbrl, legionna, cupsoc, godzilla, grainbow, denjinmk, raiden2, raidendx)
-06 - 330e (330e  ) :  (984, aa4, d82, aa2, 39c, b9c, b9c, a9a)  5     bf7f   (zeroteam, xsedae)
+## - trig (up5) (low11) :  (sq0, sq1, sq2, sq3, sq4, sq5, sq6, sq7)  valu  mask
+06 - 338e ( 06) (  38e) :  (984, aa4, d82, aa2, 39c, b9c, b9c, a9a)  5     bf7f   (legionna, heatbrl, cupsoc, grainbow, godzilla, denjinmk, raiden2, raidendx)
+06 - 330e ( 06) (  30e) :  (984, aa4, d82, aa2, 39c, b9c, b9c, a9a)  5     bf7f   (zeroteam, xsedae)
 */
 void raiden2cop_device::execute_338e(address_space &space, int offset, UINT16 data)
 {
@@ -924,8 +942,9 @@ void raiden2cop_device::execute_338e(address_space &space, int offset, UINT16 da
 }
 
 /*
-07 - 3bb0 (3b30  ) :  (f9c, b9c, b9c, b9c, b9c, b9c, b9c, 99c)  4     007f   (heatbrl, legionna, cupsoc, godzilla, grainbow, denjinmk, raiden2, raidendx)
-07 - 3b30 (3b30  ) :  (f9c, b9c, b9c, b9c, b9c, b9c, b9c, 99c)  4     007f   (zeroteam, xsedae)
+## - trig (up5) (low11) :  (sq0, sq1, sq2, sq3, sq4, sq5, sq6, sq7)  valu  mask
+07 - 3bb0 ( 07) (  3b0) :  (f9c, b9c, b9c, b9c, b9c, b9c, b9c, 99c)  4     007f   (legionna, heatbrl, cupsoc, grainbow, godzilla, denjinmk, raiden2, raidendx, 
+07 - 3b30 ( 07) (  330) :  (f9c, b9c, b9c, b9c, b9c, b9c, b9c, 99c)  4     007f   (zeroteam, xsedae)
 */
 
 // triggered with 0x39b0, 0x3b30, 0x3bb0
@@ -960,7 +979,8 @@ void raiden2cop_device::LEGACY_execute_3b30(address_space &space, int offset, UI
 }
 
 /*
-08 - 42c2 (4242  ) :  (f9a, b9a, b9c, b9c, b9c, 29c, 000, 000)  5     fcdd   (heatbrl, legionna, cupsoc, godzilla, grainbow, denjinmk, raiden2, raidendx, zeroteam, xsedae)
+## - trig (up5) (low11) :  (sq0, sq1, sq2, sq3, sq4, sq5, sq6, sq7)  valu  mask
+08 - 42c2 ( 08) (  2c2) :  (f9a, b9a, b9c, b9c, b9c, 29c, 000, 000)  5     fcdd   (legionna, heatbrl, cupsoc, grainbow, godzilla, denjinmk, raiden2, raidendx, zeroteam, xsedae)
 */
 void raiden2cop_device::execute_42c2(address_space &space, int offset, UINT16 data)
 {
@@ -1007,7 +1027,8 @@ void raiden2cop_device::LEGACY_execute_42c2(address_space &space, int offset, UI
 }
 
 /*
-09 - 4aa0 (4a20  ) :  (f9a, b9a, b9c, b9c, b9c, 99b, 000, 000)  5     fcdd   (heatbrl, legionna, cupsoc, godzilla, grainbow, denjinmk, raiden2, raidendx, zeroteam, xsedae)
+## - trig (up5) (low11) :  (sq0, sq1, sq2, sq3, sq4, sq5, sq6, sq7)  valu  mask
+09 - 4aa0 ( 09) (  2a0) :  (f9a, b9a, b9c, b9c, b9c, 99b, 000, 000)  5     fcdd   (legionna, heatbrl, cupsoc, grainbow, godzilla, denjinmk, raiden2, raidendx, zeroteam, xsedae)
 */
 void raiden2cop_device::execute_4aa0(address_space &space, int offset, UINT16 data)
 {
@@ -1022,18 +1043,20 @@ void raiden2cop_device::execute_4aa0(address_space &space, int offset, UINT16 da
 }
 
 /*
-0a - 5105 (5105  ) :  (a80, 984, 082, 000, 000, 000, 000, 000)  5     fefb   (cupsoc, grainbow)
-0a - 5205 (5205  ) :  (180, 2e0, 3a0, 0a0, 3a0, 000, 000, 000)  6     fff7   (raiden2, raidendx)
-0a - 5105 (5105  ) :  (180, 2e0, 0a0, 000, 000, 000, 000, 000)  6     fffb   (zeroteam, xsedae)
+## - trig (up5) (low11) :  (sq0, sq1, sq2, sq3, sq4, sq5, sq6, sq7)  valu  mask
+0a - 5105 ( 0a) (  105) :  (a80, 984, 082, 000, 000, 000, 000, 000)  5     fefb   (cupsoc, grainbow)
+0a - 5205 ( 0a) (  205) :  (180, 2e0, 3a0, 0a0, 3a0, 000, 000, 000)  6     fff7   (raiden2, raidendx)
+0a - 5105 ( 0a) (  105) :  (180, 2e0, 0a0, 000, 000, 000, 000, 000)  6     fffb   (zeroteam, xsedae)
 */
 void raiden2cop_device::execute_5205(address_space &space, int offset, UINT16 data)
 {
 	space.write_dword(cop_regs[1], space.read_dword(cop_regs[0]));
 }
 /*
-0b - 5905 (5905  ) :  (9c8, a84, 0a2, 000, 000, 000, 000, 000)  5     fffb   (cupsoc, grainbow)
-0b - 5a05 (5a05  ) :  (180, 2e0, 3a0, 0a0, 3a0, 000, 000, 000)  6     fff7   (raiden2, raidendx)
-0b - 5a85 (5a05  ) :  (180, 2e0, 0a0, 182, 2e0, 0c0, 3c0, 3c0)  6     ffdb   (zeroteam, xsedae)
+## - trig (up5) (low11) :  (sq0, sq1, sq2, sq3, sq4, sq5, sq6, sq7)  valu  mask
+0b - 5905 ( 0b) (  105) :  (9c8, a84, 0a2, 000, 000, 000, 000, 000)  5     fffb   (cupsoc, grainbow)
+0b - 5a05 ( 0b) (  205) :  (180, 2e0, 3a0, 0a0, 3a0, 000, 000, 000)  6     fff7   (raiden2, raidendx)
+0b - 5a85 ( 0b) (  285) :  (180, 2e0, 0a0, 182, 2e0, 0c0, 3c0, 3c0)  6     ffdb   (zeroteam, xsedae)
 */
 void raiden2cop_device::execute_5a05(address_space &space, int offset, UINT16 data)
 {
@@ -1041,9 +1064,9 @@ void raiden2cop_device::execute_5a05(address_space &space, int offset, UINT16 da
 }
 
 /*
-0c - 6200 (6200  ) :  (380, 39a, 380, a80, 29a, 000, 000, 000)  8     f3e7   (heatbrl, legionna, godzilla, grainbow, denjinmk, raiden2, raidendx, zeroteam, xsedae)
-0c - 6200 (6200  ) :  (3a0, 3a6, 380, aa0, 2a6, 000, 000, 000)  8     f3e7   (cupsoc)
-
+## - trig (up5) (low11) :  (sq0, sq1, sq2, sq3, sq4, sq5, sq6, sq7)  valu  mask
+0c - 6200 ( 0c) (  200) :  (380, 39a, 380, a80, 29a, 000, 000, 000)  8     f3e7   (legionn, heatbrla, grainbow, godzilla, denjinmk, raiden2, raidendx, zeroteam, xsedae)
+0c - 6200 ( 0c) (  200) :  (3a0, 3a6, 380, aa0, 2a6, 000, 000, 000)  8     f3e7   (cupsoc)
 */
 void raiden2cop_device::execute_6200(address_space &space, int offset, UINT16 data)
 {
@@ -1187,9 +1210,9 @@ void raiden2cop_device::LEGACY_execute_6200(address_space &space, int offset, UI
 }
 
 /*
-
-0d - 6880 (6800  ) :  (b80, ba0, 000, 000, 000, 000, 000, 000)  a     fff3   (heatbrl, legionna, cupsoc, godzilla, denjinmk)
-0d - 6980 (6900  ) :  (b80, ba0, 000, 000, 000, 000, 000, 000)  a     fff3   (grainbow, zeroteam, xsedae)
+## - trig (up5) (low11) :  (sq0, sq1, sq2, sq3, sq4, sq5, sq6, sq7)  valu  mask
+0d - 6880 ( 0d) (  080) :  (b80, ba0, 000, 000, 000, 000, 000, 000)  a     fff3   (legionna, heatbrl, cupsoc, godzilla, denjinmk)
+0d - 6980 ( 0d) (  180) :  (b80, ba0, 000, 000, 000, 000, 000, 000)  a     fff3   (grainbow, zeroteam, xsedae)
 */
 void raiden2cop_device::LEGACY_execute_6980(address_space &space, int offset, UINT16 data)
 {
@@ -1215,11 +1238,14 @@ void raiden2cop_device::LEGACY_execute_6980(address_space &space, int offset, UI
 }
 
 /*
+## - trig (up5) (low11) :  (sq0, sq1, sq2, sq3, sq4, sq5, sq6, sq7)  valu  mask
+0e - 7100 ( 0e) (  100) :  (b80, a80, b80, 000, 000, 000, 000, 000)  8     fdfd   (zeroteam, xsedae)
+*/
 
-0e - 7100 (7100  ) :  (b80, a80, b80, 000, 000, 000, 000, 000)  8     fdfd   (zeroteam, xsedae)
-
-0f - 7905 (7905  ) :  (1a2, 2c2, 0a2, 000, 000, 000, 000, 000)  6     fffb   (cupsoc, grainbow)
-0f - 7e05 (7e05  ) :  (180, 282, 080, 180, 282, 000, 000, 000)  6     fffb   (raidendx)
+/*
+## - trig (up5) (low11) :  (sq0, sq1, sq2, sq3, sq4, sq5, sq6, sq7)  valu  mask
+0f - 7905 ( 0f) (  105) :  (1a2, 2c2, 0a2, 000, 000, 000, 000, 000)  6     fffb   (cupsoc, grainbow)
+0f - 7e05 ( 0f) (  605) :  (180, 282, 080, 180, 282, 000, 000, 000)  6     fffb   (raidendx)
 */
 
 void raiden2cop_device::execute_7e05(address_space &space, int offset, UINT16 data) // raidendx
@@ -1228,7 +1254,8 @@ void raiden2cop_device::execute_7e05(address_space &space, int offset, UINT16 da
 }
 
 /*
-10 - 8100 (8100  ) :  (b9a, b88, 888, 000, 000, 000, 000, 000)  7     fdfb   (heatbrl, legionna, cupsoc, godzilla, grainbow, denjinmk, raiden2, raidendx, zeroteam, xsedae)
+## - trig (up5) (low11) :  (sq0, sq1, sq2, sq3, sq4, sq5, sq6, sq7)  valu  mask
+10 - 8100 ( 10) (  100) :  (b9a, b88, 888, 000, 000, 000, 000, 000)  7     fdfb   (legionna, heatbrl, cupsoc, grainbow, godzilla, denjinmk, raiden2, raidendx, zeroteam, xsedae)
 */
 
 void raiden2cop_device::execute_8100(address_space &space, int offset, UINT16 data)
@@ -1245,7 +1272,8 @@ void raiden2cop_device::execute_8100(address_space &space, int offset, UINT16 da
 }
 
 /*
-11 - 8900 (8900  ) :  (b9a, b8a, 88a, 000, 000, 000, 000, 000)  7     fdfb   (heatbrl, legionna, cupsoc, godzilla, grainbow, denjinmk, raiden2, raidendx, zeroteam, xsedae)
+## - trig (up5) (low11) :  (sq0, sq1, sq2, sq3, sq4, sq5, sq6, sq7)  valu  mask
+11 - 8900 ( 11) (  100) :  (b9a, b8a, 88a, 000, 000, 000, 000, 000)  7     fdfb   (legionna, heatbrl, cupsoc, grainbow, godzilla, denjinmk, raiden2, raidendx, zeroteam, xsedae)
 */
 void raiden2cop_device::execute_8900(address_space &space, int offset, UINT16 data)
 {
@@ -1261,24 +1289,26 @@ void raiden2cop_device::execute_8900(address_space &space, int offset, UINT16 da
 }
 
 /*
-12 - 9180 (9100  ) :  (b80, b94, b94, 894, 000, 000, 000, 000)  7     f8f7   (heatbrl, legionna, cupsoc, godzilla, grainbow, denjinmk)
-12 - 9100 (9100  ) :  (b80, b94, 894, 000, 000, 000, 000, 000)  7     fefb   (raiden2, raidendx)
-12 - 9100 (9100  ) :  (b80, b94, b94, 894, 000, 000, 000, 000)  7     f8f7   (zeroteam, xsedae)
-
-13 - 9980 (9900  ) :  (b80, b96, b96, 896, 000, 000, 000, 000)  7     f8f7   (heatbrl, legionna)
-13 - 9980 (9900  ) :  (b80, b94, b94, 896, 000, 000, 000, 000)  7     f8f7   (cupsoc, godzilla, grainbow, denjinmk)
-13 - 9900 (9900  ) :  (b80, b94, 896, 000, 000, 000, 000, 000)  7     fefb   (raiden2, raidendx)
-13 - 9900 (9900  ) :  (b80, b94, b94, 896, 000, 000, 000, 000)  7     f8f7   (zeroteam, xsedae)
-
-// x
-
+## - trig (up5) (low11) :  (sq0, sq1, sq2, sq3, sq4, sq5, sq6, sq7)  valu  mask
+12 - 9180 ( 12) (  180) :  (b80, b94, b94, 894, 000, 000, 000, 000)  7     f8f7   (legionna, heatbrl, cupsoc, grainbow, godzilla, denjinmk)
+12 - 9100 ( 12) (  100) :  (b80, b94, 894, 000, 000, 000, 000, 000)  7     fefb   (raiden2, raidendx)
+12 - 9100 ( 12) (  100) :  (b80, b94, b94, 894, 000, 000, 000, 000)  7     f8f7   (zeroteam, xsedae)
 */
 
 /*
-14 - a100 (a100  ) :  (b80, b82, b84, b86, 000, 000, 000, 000)  0     ffff   (heatbrl, zeroteam, xsedae)
-14 - a180 (a100  ) :  (b80, b82, b84, b86, 000, 000, 000, 000)  0     ffff   (legionna, cupsoc, godzilla, denjinmk)
-14 - a180 (a100  ) :  (b80, b82, b84, b86, 000, 000, 000, 000)  0     02ff   (grainbow)
-14 - a100 (a100  ) :  (b80, b82, b84, b86, 000, 000, 000, 000)  0     00ff   (raiden2, raidendx)
+## - trig (up5) (low11) :  (sq0, sq1, sq2, sq3, sq4, sq5, sq6, sq7)  valu  mask
+13 - 9980 ( 13) (  180) :  (b80, b96, b96, 896, 000, 000, 000, 000)  7     f8f7   (legionna, heatbrl)
+13 - 9980 ( 13) (  180) :  (b80, b94, b94, 896, 000, 000, 000, 000)  7     f8f7   (cupsoc, grainbow, godzilla, denjinmk)
+13 - 9900 ( 13) (  100) :  (b80, b94, 896, 000, 000, 000, 000, 000)  7     fefb   (raiden2, raidendx)
+13 - 9900 ( 13) (  100) :  (b80, b94, b94, 896, 000, 000, 000, 000)  7     f8f7   (zeroteam, xsedae)
+*/
+
+/*
+## - trig (up5) (low11) :  (sq0, sq1, sq2, sq3, sq4, sq5, sq6, sq7)  valu  mask
+14 - a180 ( 14) (  180) :  (b80, b82, b84, b86, 000, 000, 000, 000)  0     ffff   (legionna, cupsoc, godzilla, denjinmk)
+14 - a100 ( 14) (  100) :  (b80, b82, b84, b86, 000, 000, 000, 000)  0     ffff   (heatbrl, zeroteam, xsedae)
+14 - a180 ( 14) (  180) :  (b80, b82, b84, b86, 000, 000, 000, 000)  0     02ff   (grainbow)
+14 - a100 ( 14) (  100) :  (b80, b82, b84, b86, 000, 000, 000, 000)  0     00ff   (raiden2, raidendx)
 */
 
 // the last value (ffff / 02ff / 00ff depending on game) might be important here as they've been intentionally changed for the different games
@@ -1288,11 +1318,11 @@ void raiden2cop_device::execute_a100(address_space &space, int offset, UINT16 da
 }
 
 /*
-15 - a900 (a900  ) :  (ba0, ba2, ba4, ba6, 000, 000, 000, 000)  f     ffff   (heatbrl, zeroteam, xsedae)
-15 - a980 (a900  ) :  (ba0, ba2, ba4, ba6, 000, 000, 000, 000)  f     ffff   (legionna, cupsoc, godzilla, denjinmk)
-15 - a980 (a900  ) :  (ba0, ba2, ba4, ba6, 000, 000, 000, 000)  f     02ff   (grainbow)
-15 - a900 (a900  ) :  (ba0, ba2, ba4, ba6, 000, 000, 000, 000)  f     00ff   (raiden2, raidendx)
-*/
+## - trig (up5) (low11) :  (sq0, sq1, sq2, sq3, sq4, sq5, sq6, sq7)  valu  mask
+15 - a980 ( 15) (  180) :  (ba0, ba2, ba4, ba6, 000, 000, 000, 000)  f     ffff   (legionna, cupsoc, godzilla, denjinmk)
+15 - a900 ( 15) (  100) :  (ba0, ba2, ba4, ba6, 000, 000, 000, 000)  f     ffff   (heatbrl, zeroteam), xsedae
+15 - a980 ( 15) (  180) :  (ba0, ba2, ba4, ba6, 000, 000, 000, 000)  f     02ff   (grainbow)
+15 - a900 ( 15) (  100) :  (ba0, ba2, ba4, ba6, 000, 000, 000, 000)  f     00ff   (raiden2, raidendx)*/
 void raiden2cop_device::execute_a900(address_space &space, int offset, UINT16 data)
 {
 	cop_collision_read_pos(space, 1, cop_regs[1], data & 0x0080);
@@ -1300,8 +1330,9 @@ void raiden2cop_device::execute_a900(address_space &space, int offset, UINT16 da
 
 
 /*
-16 - b080 (b000  ) :  (b40, bc0, bc2, 000, 000, 000, 000, 000)  9     ffff   (heatbrl)
-16 - b100 (b100  ) :  (b40, bc0, bc2, 000, 000, 000, 000, 000)  9     ffff   (legionna, cupsoc, godzilla, grainbow, denjinmk, raiden2, raidendx, zeroteam, xsedae)
+## - trig (up5) (low11) :  (sq0, sq1, sq2, sq3, sq4, sq5, sq6, sq7)  valu  mask
+16 - b100 ( 16) (  100) :  (b40, bc0, bc2, 000, 000, 000, 000, 000)  9     ffff   (legionna, cupsoc, grainbow, godzilla, denjinmk, raiden2, raidendx, zeroteam, xsedae)
+16 - b080 ( 16) (  080) :  (b40, bc0, bc2, 000, 000, 000, 000, 000)  9     ffff   (heatbrl)
 */
 void raiden2cop_device::execute_b100(address_space &space, int offset, UINT16 data)
 {
@@ -1315,8 +1346,9 @@ void raiden2cop_device::LEGACY_execute_b100(address_space &space, int offset, UI
 }
 
 /*
-17 - b880 (b800  ) :  (b60, be0, be2, 000, 000, 000, 000, 000)  6     ffff   (heatbrl)
-17 - b900 (b900  ) :  (b60, be0, be2, 000, 000, 000, 000, 000)  6     ffff   (legionna, cupsoc, godzilla, grainbow, denjinmk, raiden2, raidendx, zeroteam, xsedae)
+## - trig (up5) (low11) :  (sq0, sq1, sq2, sq3, sq4, sq5, sq6, sq7)  valu  mask
+17 - b900 ( 17) (  100) :  (b60, be0, be2, 000, 000, 000, 000, 000)  6     ffff   (legionna, cupsoc, grainbow, godzilla, denjinmk, raiden2, raidendx, zeroteam, xsedae)
+17 - b880 ( 17) (  080) :  (b60, be0, be2, 000, 000, 000, 000, 000)  6     ffff   (heatbrl)
 */
 void raiden2cop_device::execute_b900(address_space &space, int offset, UINT16 data)
 {
@@ -1329,8 +1361,9 @@ void raiden2cop_device::LEGACY_execute_b900(address_space &space, int offset, UI
 }
 
 /*
-18 - c480 (c400  ) :  (080, 882, 000, 000, 000, 000, 000, 000)  a     ff00   (heatbrl, legionna, cupsoc, godzilla, grainbow, denjinmk)
-18 - 7c80 (7c00  ) :  (080, 882, 000, 000, 000, 000, 000, 000)  a     ff00   (zeroteam, xsedae)
+## - trig (up5) (low11) :  (sq0, sq1, sq2, sq3, sq4, sq5, sq6, sq7)  valu  mask
+18 - c480 ( 18) (  480) :  (080, 882, 000, 000, 000, 000, 000, 000)  a     ff00   (legionna, heatbrl, cupsoc, grainbow, godzilla, denjinmk)
+18 - 7c80 ( 0f) (  480) :  (080, 882, 000, 000, 000, 000, 000, 000)  a     ff00   (zeroteam, xsedae)
 */
 
 void raiden2cop_device::LEGACY_execute_c480(address_space &space, int offset, UINT16 data)
@@ -1345,9 +1378,13 @@ void raiden2cop_device::LEGACY_execute_c480(address_space &space, int offset, UI
 }
 
 /*
-19 - cb8f (cb0f  ) :  (984, aa4, d82, aa2, 39b, b9a, b9a, a9f)  5     bf7f   (cupsoc, grainbow)
+## - trig (up5) (low11) :  (sq0, sq1, sq2, sq3, sq4, sq5, sq6, sq7)  valu  mask
+19 - cb8f ( 19) (  38f) :  (984, aa4, d82, aa2, 39b, b9a, b9a, a9f)  5     bf7f   (cupsoc, grainbow)
+*/
 
-1a - d104 (d104  ) :  (ac2, 9e0, 0a2, 000, 000, 000, 000, 000)  5     fffb   (cupsoc, grainbow)
+/*
+## - trig (up5) (low11) :  (sq0, sq1, sq2, sq3, sq4, sq5, sq6, sq7)  valu  mask
+1a - d104 ( 1a) (  104) :  (ac2, 9e0, 0a2, 000, 000, 000, 000, 000)  5     fffb   (cupsoc, grainbow)
 */
 void raiden2cop_device::LEGACY_execute_d104(address_space &space, int offset, UINT16 data)
 {
@@ -1361,7 +1398,8 @@ void raiden2cop_device::LEGACY_execute_d104(address_space &space, int offset, UI
 	logerror("%04x%04x %04x %04x\n", m_cop_rom_addr_hi, m_cop_rom_addr_lo, m_cop_rom_addr_unk, rom_data);
 }
 /*
-1b - dde5 (dd65  ) :  (f80, aa2, 984, 0c2, 000, 000, 000, 000)  5     7ff7   (cupsoc, grainbow)
+## - trig (up5) (low11) :  (sq0, sq1, sq2, sq3, sq4, sq5, sq6, sq7)  valu  mask
+1b - dde5 ( 1b) (  5e5) :  (f80, aa2, 984, 0c2, 000, 000, 000, 000)  5     7ff7   (cupsoc, grainbow)
 */
 
 void raiden2cop_device::LEGACY_execute_dde5(address_space &space, int offset, UINT16 data)
@@ -1400,8 +1438,9 @@ void raiden2cop_device::LEGACY_execute_dde5(address_space &space, int offset, UI
 }
 
 /*
-1c - e38e (e30e  ) :  (984, ac4, d82, ac2, 39b, b9a, b9a, a9a)  5     b07f   (cupsoc, grainbow)
-1c - e105 (e105  ) :  (a88, 994, 088, 000, 000, 000, 000, 000)  5     06fb   (zeroteam, xsedae)
+## - trig (up5) (low11) :  (sq0, sq1, sq2, sq3, sq4, sq5, sq6, sq7)  valu  mask
+1c - e38e ( 1c) (  38e) :  (984, ac4, d82, ac2, 39b, b9a, b9a, a9a)  5     b07f   (cupsoc, grainbow)
+1c - e105 ( 1c) (  105) :  (a88, 994, 088, 000, 000, 000, 000, 000)  5     06fb   (zeroteam, xsedae)
 */
 
 void raiden2cop_device::LEGACY_execute_e30e(address_space &space, int offset, UINT16 data)
@@ -1430,12 +1469,16 @@ void raiden2cop_device::LEGACY_execute_e30e(address_space &space, int offset, UI
 }
 
 /*
-1d - eb8e (eb0e  ) :  (984, ac4, d82, ac2, 39b, b9a, b9a, a9f)  5     b07f   (cupsoc, grainbow)
-1d - ede5 (ed65  ) :  (f88, a84, 986, 08a, 000, 000, 000, 000)  5     05f7   (zeroteam, xsedae)
+## - trig (up5) (low11) :  (sq0, sq1, sq2, sq3, sq4, sq5, sq6, sq7)  valu  mask
+1d - eb8e ( 1d) (  38e) :  (984, ac4, d82, ac2, 39b, b9a, b9a, a9f)  5     b07f   (cupsoc, grainbow)
+1d - ede5 ( 1d) (  5e5) :  (f88, a84, 986, 08a, 000, 000, 000, 000)  5     05f7   (zeroteam, xsedae)
+*/
 
-1e - f105 (f105  ) :  (a88, 994, 088, 000, 000, 000, 000, 000)  5     fefb   (cupsoc, grainbow)
-1e - f205 (f205  ) :  (182, 2e0, 3c0, 0c0, 3c0, 000, 000, 000)  6     fff7   (raiden2, raidendx)
-1e - f790 (f710  ) :  (f80, b84, b84, b84, b84, b84, b84, b84)  4     00ff   (zeroteam, xsedae)
+/*
+## - trig (up5) (low11) :  (sq0, sq1, sq2, sq3, sq4, sq5, sq6, sq7)  valu  mask
+1e - f105 ( 1e) (  105) :  (a88, 994, 088, 000, 000, 000, 000, 000)  5     fefb   (cupsoc, grainbow)
+1e - f205 ( 1e) (  205) :  (182, 2e0, 3c0, 0c0, 3c0, 000, 000, 000)  6     fff7   (raiden2, raidendx)
+1e - f790 ( 1e) (  790) :  (f80, b84, b84, b84, b84, b84, b84, b84)  4     00ff   (zeroteam, xsedae)
 */
 
 void raiden2cop_device::execute_f205(address_space &space, int offset, UINT16 data)
@@ -1444,8 +1487,17 @@ void raiden2cop_device::execute_f205(address_space &space, int offset, UINT16 da
 }
 
 /*
-1f - fc84 (fc04  ) :  (182, 280, 000, 000, 000, 000, 000, 000)  6     00ff   (zeroteam, xsedae)
+## - trig (up5) (low11) :  (sq0, sq1, sq2, sq3, sq4, sq5, sq6, sq7)  valu  mask
+1f - fc84 ( 1f) (  484) :  (182, 280, 000, 000, 000, 000, 000, 000)  6     00ff   (zeroteam, xsedae)
 */
+
+
+
+
+
+
+
+
 
 READ16_MEMBER( raiden2cop_device::cop_status_r)
 {
