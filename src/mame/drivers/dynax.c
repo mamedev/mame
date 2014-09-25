@@ -98,35 +98,34 @@ TODO:
 
 
 /* It runs in IM 0, thus needs an opcode on the data bus */
-void sprtmtch_update_irq( running_machine &machine )
+void dynax_state::sprtmtch_update_irq()
 {
-	dynax_state *state = machine.driver_data<dynax_state>();
-	int irq = (state->m_sound_irq ? 0x08 : 0) | ((state->m_vblank_irq) ? 0x10 : 0) | ((state->m_blitter_irq) ? 0x20 : 0) ;
-	state->m_maincpu->set_input_line_and_vector(0, irq ? ASSERT_LINE : CLEAR_LINE, 0xc7 | irq); /* rst $xx */
+	int irq = (m_sound_irq ? 0x08 : 0) | ((m_vblank_irq) ? 0x10 : 0) | ((m_blitter_irq) ? 0x20 : 0) ;
+	m_maincpu->set_input_line_and_vector(0, irq ? ASSERT_LINE : CLEAR_LINE, 0xc7 | irq); /* rst $xx */
 }
 
 WRITE8_MEMBER(dynax_state::dynax_vblank_ack_w)
 {
 	m_vblank_irq = 0;
-	sprtmtch_update_irq(machine());
+	sprtmtch_update_irq();
 }
 
 WRITE8_MEMBER(dynax_state::dynax_blitter_ack_w)
 {
 	m_blitter_irq = 0;
-	sprtmtch_update_irq(machine());
+	sprtmtch_update_irq();
 }
 
 INTERRUPT_GEN_MEMBER(dynax_state::sprtmtch_vblank_interrupt)
 {
 	m_vblank_irq = 1;
-	sprtmtch_update_irq(machine());
+	sprtmtch_update_irq();
 }
 
 WRITE_LINE_MEMBER(dynax_state::sprtmtch_sound_callback)
 {
 	m_sound_irq = state;
-	sprtmtch_update_irq(machine());
+	sprtmtch_update_irq();
 }
 
 
@@ -135,35 +134,34 @@ WRITE_LINE_MEMBER(dynax_state::sprtmtch_sound_callback)
 ***************************************************************************/
 
 /* It runs in IM 0, thus needs an opcode on the data bus */
-void jantouki_update_irq(running_machine &machine)
+void dynax_state::jantouki_update_irq()
 {
-	dynax_state *state = machine.driver_data<dynax_state>();
-	int irq = ((state->m_blitter_irq) ? 0x08 : 0) | ((state->m_blitter2_irq) ? 0x10 : 0) | ((state->m_vblank_irq) ? 0x20 : 0) ;
-	state->m_maincpu->set_input_line_and_vector(0, irq ? ASSERT_LINE : CLEAR_LINE, 0xc7 | irq); /* rst $xx */
+	int irq = ((m_blitter_irq) ? 0x08 : 0) | ((m_blitter2_irq) ? 0x10 : 0) | ((m_vblank_irq) ? 0x20 : 0) ;
+	m_maincpu->set_input_line_and_vector(0, irq ? ASSERT_LINE : CLEAR_LINE, 0xc7 | irq); /* rst $xx */
 }
 
 WRITE8_MEMBER(dynax_state::jantouki_vblank_ack_w)
 {
 	m_vblank_irq = 0;
-	jantouki_update_irq(machine());
+	jantouki_update_irq();
 }
 
 WRITE8_MEMBER(dynax_state::jantouki_blitter_ack_w)
 {
 	m_blitter_irq = data;
-	jantouki_update_irq(machine());
+	jantouki_update_irq();
 }
 
 WRITE8_MEMBER(dynax_state::jantouki_blitter2_ack_w)
 {
 	m_blitter2_irq = data;
-	jantouki_update_irq(machine());
+	jantouki_update_irq();
 }
 
 INTERRUPT_GEN_MEMBER(dynax_state::jantouki_vblank_interrupt)
 {
 	m_vblank_irq = 1;
-	jantouki_update_irq(machine());
+	jantouki_update_irq();
 }
 
 
@@ -171,29 +169,28 @@ INTERRUPT_GEN_MEMBER(dynax_state::jantouki_vblank_interrupt)
                             Jantouki - Sound CPU
 ***************************************************************************/
 
-static void jantouki_sound_update_irq(running_machine &machine)
+void dynax_state::jantouki_sound_update_irq()
 {
-	dynax_state *state = machine.driver_data<dynax_state>();
-	int irq = ((state->m_sound_irq) ? 0x08 : 0) | ((state->m_soundlatch_irq) ? 0x10 : 0) | ((state->m_sound_vblank_irq) ? 0x20 : 0) ;
-	state->m_soundcpu->set_input_line_and_vector(0, irq ? ASSERT_LINE : CLEAR_LINE, 0xc7 | irq); /* rst $xx */
+	int irq = ((m_sound_irq) ? 0x08 : 0) | ((m_soundlatch_irq) ? 0x10 : 0) | ((m_sound_vblank_irq) ? 0x20 : 0) ;
+	m_soundcpu->set_input_line_and_vector(0, irq ? ASSERT_LINE : CLEAR_LINE, 0xc7 | irq); /* rst $xx */
 }
 
 INTERRUPT_GEN_MEMBER(dynax_state::jantouki_sound_vblank_interrupt)
 {
 	m_sound_vblank_irq = 1;
-	jantouki_sound_update_irq(machine());
+	jantouki_sound_update_irq();
 }
 
 WRITE8_MEMBER(dynax_state::jantouki_sound_vblank_ack_w)
 {
 	m_sound_vblank_irq = 0;
-	jantouki_sound_update_irq(machine());
+	jantouki_sound_update_irq();
 }
 
 WRITE_LINE_MEMBER(dynax_state::jantouki_sound_callback)
 {
 	m_sound_irq = state;
-	jantouki_sound_update_irq(machine());
+	jantouki_sound_update_irq();
 }
 
 
@@ -943,7 +940,7 @@ WRITE8_MEMBER(dynax_state::jantouki_soundlatch_w)
 	m_soundlatch_full = 1;
 	m_soundlatch_irq = 1;
 	m_latch = data;
-	jantouki_sound_update_irq(machine());
+	jantouki_sound_update_irq();
 }
 
 READ8_MEMBER(dynax_state::jantouki_blitter_busy_r)
@@ -998,7 +995,7 @@ WRITE8_MEMBER(dynax_state::jantouki_soundlatch_ack_w)
 {
 	m_soundlatch_ack = data;
 	m_soundlatch_irq = 0;
-	jantouki_sound_update_irq(machine());
+	jantouki_sound_update_irq();
 }
 
 READ8_MEMBER(dynax_state::jantouki_soundlatch_r)
@@ -1297,22 +1294,21 @@ WRITE8_MEMBER(dynax_state::tenkai_8000_w)
 	logerror("%04x: unmapped offset %04X=%02X written with rombank=%02X\n", space.device().safe_pc(), offset, data, m_rombank);
 }
 
-static void tenkai_show_6c( running_machine &machine )
+void dynax_state::tenkai_show_6c()
 {
-//    dynax_state *state = machine.driver_data<dynax_state>();
-//    popmessage("%02x %02x", state->m_tenkai_6c, state->m_tenkai_70);
+//    popmessage("%02x %02x", m_tenkai_6c, m_tenkai_70);
 }
 
 WRITE8_MEMBER(dynax_state::tenkai_6c_w)
 {
 	m_tenkai_6c = data;
-	tenkai_show_6c(machine());
+	tenkai_show_6c();
 }
 
 WRITE8_MEMBER(dynax_state::tenkai_70_w)
 {
 	m_tenkai_70 = data;
-	tenkai_show_6c(machine());
+	tenkai_show_6c();
 }
 
 WRITE8_MEMBER(dynax_state::tenkai_blit_romregion_w)
@@ -1403,17 +1399,16 @@ WRITE8_MEMBER(dynax_state::gekisha_hopper_w)
 //  popmessage("%02x %02x", gekisha_val[0], gekisha_val[1]);
 }
 
-static void gekisha_set_rombank( running_machine &machine, UINT8 data )
+void dynax_state::gekisha_set_rombank( UINT8 data )
 {
-	dynax_state *state = machine.driver_data<dynax_state>();
-	state->m_rombank = data;
-	state->m_romptr = state->memregion("maincpu")->base() + 0x8000 + state->m_rombank * 0x8000;
+	m_rombank = data;
+	m_romptr = memregion("maincpu")->base() + 0x8000 + m_rombank * 0x8000;
 }
 
 WRITE8_MEMBER(dynax_state::gekisha_p4_w)
 {
 	m_gekisha_rom_enable = !BIT(data, 3);
-	gekisha_set_rombank(machine(), BIT(data, 2));
+	gekisha_set_rombank(BIT(data, 2));
 }
 
 READ8_MEMBER(dynax_state::gekisha_8000_r)
@@ -4313,7 +4308,7 @@ INTERRUPT_GEN_MEMBER(dynax_state::yarunara_clock_interrupt)
 	else
 		m_sound_irq = 1;
 
-	sprtmtch_update_irq(machine());
+	sprtmtch_update_irq();
 }
 
 static MACHINE_CONFIG_DERIVED( yarunara, hnoridur )
@@ -4455,11 +4450,10 @@ MACHINE_CONFIG_END
 /*  It runs in IM 2, thus needs a vector on the data bus:
     0xfa and 0xfc are very similar, they should be triggered by the blitter
     0xf8 is vblank  */
-void mjelctrn_update_irq( running_machine &machine )
+void dynax_state::mjelctrn_update_irq()
 {
-	dynax_state *state = machine.driver_data<dynax_state>();
-	state->m_blitter_irq = 1;
-	state->m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xfa);
+	m_blitter_irq = 1;
+	m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xfa);
 }
 
 INTERRUPT_GEN_MEMBER(dynax_state::mjelctrn_vblank_interrupt)
@@ -4488,11 +4482,10 @@ MACHINE_CONFIG_END
     0x42 and 0x44 are very similar, they should be triggered by the blitter
     0x40 is vblank
     0x46 is a periodic irq? */
-void neruton_update_irq( running_machine &machine )
+void dynax_state::neruton_update_irq()
 {
-	dynax_state *state = machine.driver_data<dynax_state>();
-	state->m_blitter_irq = 1;
-	state->m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0x42);
+	m_blitter_irq = 1;
+	m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0x42);
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(dynax_state::neruton_irq_scanline)
@@ -4627,7 +4620,7 @@ MACHINE_CONFIG_END
 
 void dynax_state::gekisha_bank_postload()
 {
-	gekisha_set_rombank(machine(), m_rombank);
+	gekisha_set_rombank(m_rombank);
 }
 
 MACHINE_START_MEMBER(dynax_state,gekisha)
@@ -4641,7 +4634,7 @@ MACHINE_RESET_MEMBER(dynax_state,gekisha)
 {
 	MACHINE_RESET_CALL_MEMBER(dynax);
 
-	gekisha_set_rombank(machine(), 0);
+	gekisha_set_rombank(0);
 }
 
 static MACHINE_CONFIG_START( gekisha, dynax_state )

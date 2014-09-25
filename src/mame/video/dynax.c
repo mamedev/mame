@@ -546,7 +546,7 @@ void dynax_state::dynax_blitter_start(int flags )
 	if (m_update_irq_func)
 	{
 		m_blitter_irq = 1;
-		m_update_irq_func(machine());
+		(this->*m_update_irq_func)();
 	}
 }
 
@@ -573,7 +573,7 @@ void dynax_state::jantouki_blitter_start( int flags )
 	if (m_update_irq_func)
 	{
 		m_blitter_irq = 1;
-		m_update_irq_func(machine());
+		(this->*m_update_irq_func)();
 	}
 }
 
@@ -600,7 +600,7 @@ void dynax_state::jantouki_blitter2_start( int flags )
 	if (m_update_irq_func)
 	{
 		m_blitter2_irq = 1;
-		m_update_irq_func(machine());
+		(this->*m_update_irq_func)();
 	}
 }
 
@@ -751,7 +751,7 @@ void dynax_state::dynax_common_reset()
 
 	m_hnoridur_layer_half2 = 0;
 
-	m_update_irq_func = sprtmtch_update_irq;
+	m_update_irq_func = &dynax_state::sprtmtch_update_irq;
 
 	m_blit_scroll_x = 0;
 	m_blit2_scroll_x = 0;
@@ -899,7 +899,7 @@ VIDEO_START_MEMBER(dynax_state,jantouki)
 
 	dynax_common_reset();
 	m_layer_layout = LAYOUT_JANTOUKI;
-	m_update_irq_func = jantouki_update_irq;
+	m_update_irq_func = &dynax_state::jantouki_update_irq;
 
 	save_pointer(NAME(m_pixmap[0][0]), 256 * 256);
 	save_pointer(NAME(m_pixmap[0][1]), 256 * 256);
@@ -937,7 +937,7 @@ VIDEO_START_MEMBER(dynax_state,mjelctrn)
 	VIDEO_START_CALL_MEMBER(hnoridur);
 
 	m_priority_table = priority_mjelctrn;
-	m_update_irq_func = mjelctrn_update_irq;
+	m_update_irq_func = &dynax_state::mjelctrn_update_irq;
 }
 
 VIDEO_START_MEMBER(dynax_state,neruton)
@@ -945,7 +945,7 @@ VIDEO_START_MEMBER(dynax_state,neruton)
 	VIDEO_START_CALL_MEMBER(hnoridur);
 
 //  m_priority_table = priority_mjelctrn;
-	m_update_irq_func = neruton_update_irq;
+	m_update_irq_func = &dynax_state::neruton_update_irq;
 }
 
 /***************************************************************************

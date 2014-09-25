@@ -29,7 +29,8 @@ public:
 	UINT8 *  m_ddenlovr_pixmap[8];
 
 	/* irq */
-	void (*m_update_irq_func)(running_machine &machine);    // some games trigger IRQ at blitter end, some don't
+	typedef void (dynax_state::*irq_func)();    // some games trigger IRQ at blitter end, some don't
+	irq_func m_update_irq_func;
 	UINT8 m_sound_irq;
 	UINT8 m_vblank_irq;
 	UINT8 m_blitter_irq;
@@ -334,10 +335,11 @@ public:
 	int debug_mask();
 	int debug_viewer( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void dynax_common_reset();
+	void sprtmtch_update_irq();
+	void jantouki_update_irq();
+	void mjelctrn_update_irq();
+	void neruton_update_irq();
+	void jantouki_sound_update_irq();
+	void tenkai_show_6c();
+	void gekisha_set_rombank( UINT8 data );
 };
-
-//----------- defined in drivers/dynax.c -----------
-void sprtmtch_update_irq(running_machine &machine);
-void jantouki_update_irq(running_machine &machine);
-void mjelctrn_update_irq(running_machine &machine);
-void neruton_update_irq(running_machine &machine);
