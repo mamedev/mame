@@ -15,11 +15,13 @@
 #include "machine/ram.h"
 #include "bus/epson_sio/epson_sio.h"
 #include "bus/centronics/ctronics.h"
-#include "imagedev/cartslot.h"
 #include "imagedev/cassette.h"
 #include "machine/ram.h"
 #include "machine/nvram.h"
 #include "sound/speaker.h"
+
+#include "bus/generic/slot.h"
+#include "bus/generic/carts.h"
 #include "px4.lh"
 
 
@@ -80,6 +82,9 @@ public:
 	m_speaker(*this, "speaker"),
 	m_sio(*this, "sio"),
 	m_rs232(*this, "rs232"),
+	m_caps1(*this, "capsule1"),
+	m_caps2(*this, "capsule2"),
+	m_rdsocket(*this, "ramdisk_socket"),
 	m_isr(0), m_ier(0), m_str(0), m_sior(0xbf),
 	m_artdir(0xff), m_artdor(0xff), m_artsr(0), m_artcr(0),
 	m_swr(0),
@@ -97,6 +102,12 @@ public:
 	required_device<speaker_sound_device> m_speaker;
 	required_device<epson_sio_device> m_sio;
 	required_device<rs232_port_device> m_rs232;
+	required_device<generic_slot_device> m_caps1;
+	required_device<generic_slot_device> m_caps2;
+	optional_device<generic_slot_device> m_rdsocket;
+
+	memory_region *m_caps1_rom;
+	memory_region *m_caps2_rom;
 
 	// gapnit register
 	UINT8 m_ctrl1;
@@ -143,7 +154,7 @@ public:
 	// external cassette/barcode reader
 	int m_ear_last_state;
 
-	void install_rom_capsule(address_space &space, int size, const char *region);
+	void install_rom_capsule(address_space &space, int size, memory_region *mem);
 
 	// device_serial_interface overrides
 	virtual void tra_callback();
@@ -200,6 +211,7 @@ public:
 	DECLARE_READ8_MEMBER(px4_ramdisk_control_r);
 	DECLARE_DRIVER_INIT(px4);
 	DECLARE_DRIVER_INIT(px4p);
+	virtual void machine_start();
 	virtual void machine_reset();
 	DECLARE_PALETTE_INIT(px4);
 	DECLARE_MACHINE_START(px4_ramdisk);
@@ -437,19 +449,18 @@ READ8_MEMBER( px4_state::px4_str_r )
 }
 
 // helper function to map rom capsules
-void px4_state::install_rom_capsule(address_space &space, int size, const char *region)
+void px4_state::install_rom_capsule(address_space &space, int size, memory_region *mem)
 {
 	// ram, part 1
 	space.install_ram(0x0000, 0xdfff - size, 0, 0, m_ram->pointer());
 
 	// actual rom data, part 1
-	space.install_rom(0xe000 - size, 0xffff, 0, 0, memregion(region)->base() + (size - 0x2000));
+	if (mem)
+		space.install_rom(0xe000 - size, 0xffff, 0, 0, mem->base() + (size - 0x2000));
 
 	// rom data, part 2
-	if (size != 0x2000)
-	{
-		space.install_rom(0x10000 - size, 0xdfff, 0, 0, memregion(region)->base());
-	}
+	if (mem && size != 0x2000)
+		space.install_rom(0x10000 - size, 0xdfff, 0, 0, mem->base());
 
 	// ram, continued
 	space.install_ram(0xe000, 0xffff, 0, 0, m_ram->pointer() + 0xe000);
@@ -479,12 +490,12 @@ WRITE8_MEMBER( px4_state::px4_bankr_w )
 		space_program.install_ram(0x0000, 0xffff, 0, 0, m_ram->pointer());
 		break;
 
-	case 0x08: install_rom_capsule(space_program, 0x2000, "capsule1"); break;
-	case 0x09: install_rom_capsule(space_program, 0x4000, "capsule1"); break;
-	case 0x0a: install_rom_capsule(space_program, 0x8000, "capsule1"); break;
-	case 0x0c: install_rom_capsule(space_program, 0x2000, "capsule2"); break;
-	case 0x0d: install_rom_capsule(space_program, 0x4000, "capsule2"); break;
-	case 0x0e: install_rom_capsule(space_program, 0x8000, "capsule2"); break;
+	case 0x08: install_rom_capsule(space_program, 0x2000, m_caps1_rom); break;
+	case 0x09: install_rom_capsule(space_program, 0x4000, m_caps1_rom); break;
+	case 0x0a: install_rom_capsule(space_program, 0x8000, m_caps1_rom); break;
+	case 0x0c: install_rom_capsule(space_program, 0x2000, m_caps2_rom); break;
+	case 0x0d: install_rom_capsule(space_program, 0x4000, m_caps2_rom); break;
+	case 0x0e: install_rom_capsule(space_program, 0x8000, m_caps2_rom); break;
 
 	default:
 		if (VERBOSE)
@@ -1036,7 +1047,7 @@ READ8_MEMBER( px4_state::px4_ramdisk_data_r )
 	else if (m_ramdisk_address < 0x40000)
 	{
 		// read from rom
-		ret = memregion("ramdisk")->base()[m_ramdisk_address];
+		ret = m_rdsocket->read_rom(space, m_ramdisk_address);
 	}
 
 	m_ramdisk_address = (m_ramdisk_address & 0xffff00) | ((m_ramdisk_address & 0xff) + 1);
@@ -1124,6 +1135,13 @@ DRIVER_INIT_MEMBER( px4_state, px4p )
 	m_ramdisk = auto_alloc_array(machine(), UINT8, 0x20000);
 }
 
+void px4_state::machine_start()
+{
+	astring region_tag;
+	m_caps1_rom = memregion(region_tag.cpy(m_caps1->tag()).cat(GENERIC_ROM_REGION_TAG));
+	m_caps2_rom = memregion(region_tag.cpy(m_caps2->tag()).cat(GENERIC_ROM_REGION_TAG));
+}
+
 void px4_state::machine_reset()
 {
 	m_artsr = ART_TXRDY | ART_TXEMPTY;
@@ -1133,6 +1151,7 @@ void px4_state::machine_reset()
 
 MACHINE_START_MEMBER( px4_state, px4_ramdisk )
 {
+	px4_state::machine_start();
 	machine().device<nvram_device>("nvram")->set_base(m_ramdisk, 0x20000);
 }
 
@@ -1416,15 +1435,8 @@ static MACHINE_CONFIG_START( px4, px4_state )
 	MCFG_RS232_CTS_HANDLER(WRITELINE(px4_state, rs232_cts_w))
 
 	// rom capsules
-	MCFG_CARTSLOT_ADD("capsule1")
-	MCFG_CARTSLOT_EXTENSION_LIST("bin")
-	MCFG_CARTSLOT_INTERFACE("px4_cart")
-	MCFG_CARTSLOT_NOT_MANDATORY
-
-	MCFG_CARTSLOT_ADD("capsule2")
-	MCFG_CARTSLOT_EXTENSION_LIST("bin")
-	MCFG_CARTSLOT_INTERFACE("px4_cart")
-	MCFG_CARTSLOT_NOT_MANDATORY
+	MCFG_GENERIC_CARTSLOT_ADD("capsule1", generic_plain_slot, "px4_cart")
+	MCFG_GENERIC_CARTSLOT_ADD("capsule2", generic_plain_slot, "px4_cart")
 
 	// software list
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "px4_cart")
@@ -1440,8 +1452,7 @@ static MACHINE_CONFIG_DERIVED( px4p, px4 )
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_INIT_OWNER(px4_state, px4p)
 
-	MCFG_CARTSLOT_ADD("ramdisk")
-	MCFG_CARTSLOT_NOT_MANDATORY
+	MCFG_GENERIC_CARTSLOT_ADD("ramdisk_socket", generic_plain_slot, "px4_cart")
 MACHINE_CONFIG_END
 
 
@@ -1457,12 +1468,6 @@ ROM_START( px4 )
 
 	ROM_REGION(0x1000, "slave", 0)
 	ROM_LOAD("upd7508.bin", 0x0000, 0x1000, NO_DUMP)
-
-	ROM_REGION(0x8000, "capsule1", 0)
-	ROM_CART_LOAD("capsule1", 0x0000, 0x8000, ROM_OPTIONAL)
-
-	ROM_REGION(0x8000, "capsule2", 0)
-	ROM_CART_LOAD("capsule2", 0x0000, 0x8000, ROM_OPTIONAL)
 ROM_END
 
 ROM_START( px4p )
@@ -1471,15 +1476,6 @@ ROM_START( px4p )
 
 	ROM_REGION(0x1000, "slave", 0)
 	ROM_LOAD("upd7508.bin", 0x0000, 0x1000, NO_DUMP)
-
-	ROM_REGION(0x8000, "capsule1", 0)
-	ROM_CART_LOAD("capsule1", 0x0000, 0x8000, ROM_OPTIONAL)
-
-	ROM_REGION(0x8000, "capsule2", 0)
-	ROM_CART_LOAD("capsule2", 0x0000, 0x8000, ROM_OPTIONAL)
-
-	ROM_REGION(0x20000, "ramdisk", 0)
-	ROM_CART_LOAD("ramdisk", 0x0000, 0x20000, ROM_OPTIONAL | ROM_MIRROR)
 ROM_END
 
 

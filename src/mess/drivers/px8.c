@@ -786,11 +786,11 @@ static MACHINE_CONFIG_START( px8, px8_state )
 	MCFG_SOUND_ROUTE(0, "mono", 0.25)
 
 	/* cartridge */
-	MCFG_CARTSLOT_ADD("capsule1")
-	MCFG_CARTSLOT_EXTENSION_LIST("bin,rom")
+	MCFG_GENERIC_CARTSLOT_ADD("capsule1", generic_plain_slot, NULL)
+	MCFG_GENERIC_EXTENSIONS("bin,rom")
 
-	MCFG_CARTSLOT_ADD("capsule2")
-	MCFG_CARTSLOT_EXTENSION_LIST("bin,rom")
+	MCFG_GENERIC_CARTSLOT_ADD("capsule2", generic_plain_slot, NULL)
+	MCFG_GENERIC_EXTENSIONS("bin,rom")
 
 	/* devices */
 	MCFG_DEVICE_ADD(I8251_TAG, I8251, 0)
@@ -817,10 +817,6 @@ ROM_START( px8 )
 
 	ROM_REGION( 0x0800, SED1320_TAG, 0 )
 	ROM_LOAD( "font.rom", 0x0000, 0x0800, CRC(5b52edbd) SHA1(38197edf301bb2843bea040536af545f76b3d44f) )
-
-	ROM_REGION( 0x10000, "capsule", 0 )
-	ROM_CART_LOAD( "capsule2", 0x0000, 0x8000, ROM_NOMIRROR )
-	ROM_CART_LOAD( "capsule1", 0x8000, 0x8000, ROM_NOMIRROR )
 
 	ROM_REGION( 0x1000, HD6303_TAG, 0 )
 	ROM_LOAD( "hd6303 slave cpu internal rom.13d", 0x0000, 0x1000, NO_DUMP )

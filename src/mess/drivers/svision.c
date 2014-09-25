@@ -5,10 +5,9 @@
 ******************************************************************************/
 
 #include "emu.h"
-#include "cpu/m6502/m65c02.h"
 
 #include "includes/svision.h"
-#include "imagedev/cartslot.h"
+
 #include "svision.lh"
 
 #define MAKE8_RGB32(red3, green3, blue2) ( ( (red3)<<(16+5)) | ( (green3)<<(8+5)) | ( (blue2)<<(0+6)) )
@@ -129,8 +128,7 @@ READ8_MEMBER(svision_state::svision_r)
 
 WRITE8_MEMBER(svision_state::svision_w)
 {
-	int value;
-	int delay;
+	int value, delay, bank;
 
 	m_reg[offset] = data;
 
@@ -141,8 +139,9 @@ WRITE8_MEMBER(svision_state::svision_w)
 			break;
 
 		case 0x26: /* bits 5,6 memory management for a000? */
-			logerror("%.6f svision write %04x %02x\n", machine().time().as_double(),offset,data);
-			m_bank1->set_base(m_user1->base() + ((m_reg[0x26] & 0xe0) << 9));
+			logerror("%.6f svision write %04x %02x\n", machine().time().as_double(), offset, data);
+			bank = ((m_reg[0x26] & 0xe0) >> 5) % (m_cart_rom->bytes() / 0x4000);
+			m_bank1->set_base(m_cart_rom->base() + (bank * 0x4000));
 			svision_irq();
 			break;
 
@@ -451,10 +450,6 @@ DRIVER_INIT_MEMBER(svision_state,svision)
 	m_sound = machine().device<svision_sound_device>("custom");
 	m_dma_finished = m_sound->dma_finished();
 	m_pet.on = FALSE;
-	m_user1 = memregion("user1");
-	m_bank1 = membank("bank1");
-	m_bank2 = membank("bank2");
-	m_bank2->set_base(m_user1->base() + 0x1c000);
 }
 
 DRIVER_INIT_MEMBER(svision_state,svisions)
@@ -462,68 +457,51 @@ DRIVER_INIT_MEMBER(svision_state,svisions)
 	m_svision.timer1 = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(svision_state::svision_timer),this));
 	m_sound = machine().device<svision_sound_device>("custom");
 	m_dma_finished = m_sound->dma_finished();
-	m_user1 = memregion("user1");
-	m_bank1 = membank("bank1");
-	m_bank2 = membank("bank2");
-	m_bank2->set_base(m_user1->base() + 0x1c000);
 	m_pet.on = TRUE;
 	m_pet.timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(svision_state::svision_pet_timer),this));
 }
 
 DEVICE_IMAGE_LOAD_MEMBER( svision_state, svision_cart )
 {
-	UINT32 size;
-	dynamic_buffer temp_copy;
-	int mirror, i;
-
-	if (image.software_entry() == NULL)
+	UINT32 size = m_cart->common_get_size("rom");
+	
+	if (size > 0x20000)
 	{
-		size = image.length();
-
-		if (size > memregion("user1")->bytes())
-		{
-			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
-			return IMAGE_INIT_FAIL;
-		}
-
-		temp_copy.resize(size);
-		if (image.fread( temp_copy, size) != size)
-		{
-			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unable to fully read from file");
-			return IMAGE_INIT_FAIL;
-		}
+		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
+		return IMAGE_INIT_FAIL;
 	}
-	else
-	{
-		size = image.get_software_region_length("rom");
-		temp_copy.resize(size);
-		memcpy(temp_copy, image.get_software_region("rom"), size);
-	}
-
-	mirror = memregion("user1")->bytes() / size;
-
-	/* With the following, we mirror the cart in the whole "user1" memory region */
-	for (i = 0; i < mirror; i++)
-	{
-		memcpy(memregion("user1")->base() + i * size, temp_copy, size);
-	}
-
+	
+	m_cart->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
+	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");			
+	
 	return IMAGE_INIT_PASS;
+}
+
+void svision_state::machine_start()
+{
+	int num_banks;
+	astring region_tag;
+	m_cart_rom = memregion(region_tag.cpy(m_cart->tag()).cat(GENERIC_ROM_REGION_TAG));
+	num_banks = m_cart_rom->bytes() / 0x4000;
+
+	m_bank1 = membank("bank1");
+	m_bank2 = membank("bank2");
+	// bank1 is set to the first bank
+	m_bank1->set_base(m_cart_rom->base());
+	// bank2 is set to the last bank
+	m_bank2->set_base(m_cart_rom->base() + (num_banks - 1) * 0x4000);
 }
 
 void svision_state::machine_reset()
 {
 	m_svision.timer_shot = FALSE;
 	*m_dma_finished = FALSE;
-	m_bank1->set_base(m_user1->base());
 }
 
 
 MACHINE_RESET_MEMBER(svision_state,tvlink)
 {
-	m_svision.timer_shot = FALSE;
-	*m_dma_finished = FALSE;
-	m_bank1->set_base(m_user1->base());
+	svision_state::machine_reset();
 	m_tvlink.palette_on = FALSE;
 
 	memset(m_reg + 0x800, 0xff, 0x40); // normally done from m_tvlink microcontroller
@@ -540,7 +518,6 @@ static MACHINE_CONFIG_START( svision, svision_state )
 	MCFG_CPU_ADD("maincpu", M65C02, 4000000)        /* ? stz used! speed? */
 	MCFG_CPU_PROGRAM_MAP(svision_mem)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", svision_state,  svision_frame_int)
-
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", LCD)
@@ -562,11 +539,10 @@ static MACHINE_CONFIG_START( svision, svision_state )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 
 	/* cartridge */
-	MCFG_CARTSLOT_ADD("cart")
-	MCFG_CARTSLOT_EXTENSION_LIST("bin,ws,sv")
-	MCFG_CARTSLOT_MANDATORY
-	MCFG_CARTSLOT_INTERFACE("svision_cart")
-	MCFG_CARTSLOT_LOAD(svision_state, svision_cart)
+	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "svision_cart")
+	MCFG_GENERIC_EXTENSIONS("bin,ws,sv")
+	MCFG_GENERIC_MANDATORY
+	MCFG_GENERIC_LOAD(svision_state, svision_cart)
 
 	/* Software lists */
 	MCFG_SOFTWARE_LIST_ADD("cart_list","svision")
@@ -607,7 +583,7 @@ static MACHINE_CONFIG_DERIVED( tvlinkp, svisionp )
 MACHINE_CONFIG_END
 
 ROM_START(svision)
-	ROM_REGION(0x20000, "user1", ROMREGION_ERASE00)
+	ROM_REGION(0x20000, "maincpu", ROMREGION_ERASE00)
 ROM_END
 
 

@@ -7,6 +7,10 @@
 #ifndef SVISION_H_
 #define SVISION_H_
 
+#include "cpu/m6502/m65c02.h"
+#include "bus/generic/slot.h"
+#include "bus/generic/carts.h"
+
 struct svision_t
 {
 	emu_timer *timer1;
@@ -35,6 +39,7 @@ public:
 	svision_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_cart(*this, "cartslot"),
 		m_reg(*this, "reg"),
 		m_videoram(*this, "videoram"),
 		m_joy(*this, "JOY"),
@@ -53,6 +58,7 @@ public:
 	DECLARE_WRITE8_MEMBER(tvlink_w);
 	DECLARE_DRIVER_INIT(svisions);
 	DECLARE_DRIVER_INIT(svision);
+	virtual void machine_start();
 	virtual void machine_reset();
 	DECLARE_PALETTE_INIT(svision);
 	DECLARE_PALETTE_INIT(svisionp);
@@ -69,13 +75,14 @@ public:
 
 protected:
 	required_device<cpu_device> m_maincpu;
+	required_device<generic_slot_device> m_cart;
 	required_shared_ptr<UINT8> m_reg;
 	required_shared_ptr<UINT8> m_videoram;
 	required_ioport m_joy;
 	optional_ioport m_joy2;
 	required_device<palette_device> m_palette;
 
-	memory_region *m_user1;
+	memory_region *m_cart_rom;
 	memory_bank *m_bank1;
 	memory_bank *m_bank2;
 };

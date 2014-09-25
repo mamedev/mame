@@ -7,12 +7,14 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m6800/m6800.h"
-#include "imagedev/cartslot.h"
 #include "imagedev/cassette.h"
 #include "machine/ram.h"
 #include "machine/i8251.h"
 #include "bus/epson_sio/pf10.h"
 #include "sound/wave.h"
+
+#include "bus/generic/slot.h"
+#include "bus/generic/carts.h"
 
 #define UPD70008_TAG    "4a"
 #define UPD7508_TAG     "2e"
