@@ -6,8 +6,15 @@
   Micropin : Pentacup
   First version used a 6800, but a later revision used a 8085A.
 
+Rev.2:
+- Gets stuck waiting for 21a6 to become zero (twice).
+- Possible interrupts are RST55 (0x2c) and RST65 (0x34), however
+  neither of them fixes the 21a6 problem.
+- No manuals or schematics available, ports connected as per Pinmame.
+- Uses a different layout, not coded.
+
 ToDo:
-- Rev.2 no work done as yet; no manuals or schematics available
+- Rev.2 not working
 - Rev.1 can insert coin and start a game, but no inputs
 - Rev.1 check sound; pinmame sound is higher pitched
 - Mechanical sounds
@@ -81,9 +88,14 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pentacup2_io, AS_IO, 8, micropin_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	//AM_RANGE(0x00, 0x0e) AM_WRITE
-	//AM_RANGE(0x0f, 0x0f) AM_WRITE
-	//AM_WRITE(0x00, 0x05) AM_READ
+	AM_RANGE(0x00, 0x0e) AM_WRITE(sw_w)
+	AM_RANGE(0x0f, 0x0f) AM_WRITE(lamp_w)
+	AM_RANGE(0x00, 0x00) AM_READ_PORT("X0")
+	AM_RANGE(0x01, 0x01) AM_READ_PORT("X1")
+	AM_RANGE(0x02, 0x02) AM_READ_PORT("X2")
+	AM_RANGE(0x03, 0x03) AM_READ_PORT("X3")
+	AM_RANGE(0x04, 0x04) AM_READ_PORT("X4")
+	AM_RANGE(0x05, 0x05) AM_READ_PORT("X5")
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( micropin )
@@ -308,6 +320,7 @@ static MACHINE_CONFIG_START( pentacup2, micropin_state )
 	MCFG_CPU_ADD("v2cpu", I8085A, 2000000)
 	MCFG_CPU_PROGRAM_MAP(pentacup2_map)
 	MCFG_CPU_IO_MAP(pentacup2_io)
+	//MCFG_CPU_PERIODIC_INT_DRIVER(micropin_state, irq2_line_hold, 50)
 
 	//MCFG_NVRAM_ADD_0FILL("nvram")
 
