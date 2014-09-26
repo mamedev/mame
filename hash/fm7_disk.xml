@@ -1576,6 +1576,23 @@ Titles, serial #s, publishers and release dates taken from:
 		</part>
 	</software>
 
+	<!-- Must enable DOS mode via DIP switches -->
+	<software name="os9l1">
+		<description>OS-9 L1 v1.0</description>
+		<year>19??</year>
+		<publisher>&lt;Unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="365984">
+				<rom name="os-9_l1_disk_1.d77" size="365984" crc="5cadc709" sha1="56c4257dca21b7f08cc055ba1637928f34c6993a" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="357280">
+				<rom name="os-9_l1_disk_2.d77" size="357280" crc="dd45c2f3" sha1="6c0381f040c596dd0f3b48e7101ef4de6aed3494" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="jushorok">
 		<description>Super Kanji Jyusyoroku</description>
 		<year>19??</year>
@@ -1617,6 +1634,217 @@ Titles, serial #s, publishers and release dates taken from:
 			</dataarea>
 		</part>
 	</software>
+
+	<!-- M-DOS7 Games compilations -->
+	<software name="mdos7_06">
+		<description>M-DOS7 Volume 6</description>
+		<year>19??</year>
+		<publisher>&lt;Unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="mdos7_06.d77" size="348848" crc="7a37cb9c" sha1="3dc51d943a9c037d56d1e8448c266b41f97f75b6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mdos7_08">
+		<description>M-DOS7 Volume 8</description>
+		<year>19??</year>
+		<publisher>&lt;Unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="mdos7_08.d77" size="348848" crc="6d951eca" sha1="dc136c8b8eb1e2a8d47c411b2b0c32efbd7c0dd6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="mdos7_09">
+		<description>M-DOS7 Volume 9</description>
+		<year>19??</year>
+		<publisher>&lt;Unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="mdos7_09.d77" size="348848" crc="694615d6" sha1="921ab9fd92bff8d9af4189c9c7a9e065f27f9a5b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mdos7_11">
+		<description>M-DOS7 Volume 11</description>
+		<year>19??</year>
+		<publisher>&lt;Unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="mdos7_11.d77" size="348848" crc="b5d920ea" sha1="4763bb1db1aef305faf571aaa0bfdc67d8eef7a4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mdos7_13">
+		<description>M-DOS7 Volume 13</description>
+		<year>19??</year>
+		<publisher>&lt;Unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="mdos7_13.d77" size="348848" crc="cd902d29" sha1="f1e16f49d03b9c752411972140deb984e3603840" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mdos7_15">
+		<description>M-DOS7 Volume 15</description>
+		<year>19??</year>
+		<publisher>&lt;Unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="mdos7_15.d77" size="348848" crc="f15d01f0" sha1="0aa5a79e52c26b0e48dbdff7af4acbe5f368d416" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mdos7_17">
+		<description>M-DOS7 Volume 17</description>
+		<year>19??</year>
+		<publisher>&lt;Unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="mdos7_17.d77" size="348848" crc="e44bcc55" sha1="181fea277c335e0661219e2af277b4a36d9012b4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mdos7_18">
+		<description>M-DOS7 Volume 18</description>
+		<year>19??</year>
+		<publisher>&lt;Unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="mdos7_18.d77" size="348848" crc="81e42d9d" sha1="79ff2c84870fa56e5017290a99539f4aa9ee82e7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mdos7_19">
+		<description>M-DOS7 Volume 19</description>
+		<year>19??</year>
+		<publisher>&lt;Unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="mdos7_19.d77" size="348848" crc="61536d61" sha1="c3088124081be41f790f11ce73ed76dec5c24089" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mdos7_20">
+		<description>M-DOS7 Volume 20</description>
+		<year>19??</year>
+		<publisher>&lt;Unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="mdos7_20.d77" size="348848" crc="137f5a96" sha1="ca79c8dfb1b8f8848fd94d4a645b2bf910f93e50" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mdos7_23">
+		<description>M-DOS7 Volume 23</description>
+		<year>19??</year>
+		<publisher>&lt;Unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="mdos7_23.d77" size="348848" crc="f5e583d0" sha1="4aac96816aef60ffe9630d20107ca1c1876228aa" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mdos7_24">
+		<description>M-DOS7 Volume 24</description>
+		<year>19??</year>
+		<publisher>&lt;Unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="mdos7_24.d77" size="348848" crc="41869890" sha1="0f5ba3e7ef256c1e6ceeac93dac717df11320227" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mdos7_27">
+		<description>M-DOS7 Volume 27</description>
+		<year>19??</year>
+		<publisher>&lt;Unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="mdos7_27.d77" size="348848" crc="a0353c7c" sha1="44458d948acdde42a1e4d1c4f3461ad25b2dc863" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mdos7_28">
+		<description>M-DOS7 Volume 28</description>
+		<year>19??</year>
+		<publisher>&lt;Unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="mdos7_28.d77" size="348848" crc="831732f8" sha1="3c798b4f4edeb4decc4e9e9408bc264c6cf683e1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mdos7_29">
+		<description>M-DOS7 Volume 29</description>
+		<year>19??</year>
+		<publisher>&lt;Unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="mdos7_29.d77" size="348848" crc="72717568" sha1="3147ad7b53a31b5c10a34daddefd52f57ed8f921" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mdos7_31">
+		<description>M-DOS7 Volume 31</description>
+		<year>19??</year>
+		<publisher>&lt;Unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="mdos7_31.d77" size="348848" crc="04437b91" sha1="2035386ac61ae34dd2d8051046090a430751c0a5" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mdos7_32">
+		<description>M-DOS7 Volume 32</description>
+		<year>19??</year>
+		<publisher>&lt;Unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="mdos7_32.d77" size="348848" crc="ab1e3b20" sha1="c1d0c08730a94f44e38ec2ec60baa1cceb47fe64" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mdos7_34">
+		<description>M-DOS7 Volume 34</description>
+		<year>19??</year>
+		<publisher>&lt;Unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="mdos7_34.d77" size="348848" crc="539cea4d" sha1="e0e0b9835f9b56a2ab78ace7be943c9bd4d693f4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mdos7_36">
+		<description>M-DOS7 Volume 36</description>
+		<year>19??</year>
+		<publisher>&lt;Unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="mdos7_36.d77" size="348848" crc="732ade26" sha1="0c23fcedb400b3a1441bd58905214834e4410e14" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 
 <!-- To Sort -->
 <!--
