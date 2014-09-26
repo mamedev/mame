@@ -405,6 +405,37 @@ int raiden2cop_device::find_trigger_match(UINT16 triggerval, UINT16 mask)
 					triggerval == 0xa100 || triggerval == 0xa900 || triggerval == 0xb080 || triggerval == 0xb880) /* collisions */
 					otherlog = 0;
 			}
+			else if (!strcmp(machine().system().name, "godzilla"))
+			{
+				// only uses collisions? - possible this one already 'works' apart from prio problems, haven't managed to test beyond 1 level tho
+
+				if (triggerval == 0xa180 || triggerval == 0xa980 || triggerval == 0xb100 || triggerval == 0xb900) /* collisions */
+					otherlog = 0;
+			}
+			else if (!strcmp(machine().system().name, "grainbow"))
+			{
+				// path 3 (caves) midboss has wrong tiles
+				// doesn't like our BCD / Number conversion - not command related
+				// stage 4 (after 3 selectable stages) has sprite glitches bottom left
+				// fade logic is wrong (palettes for some layers shouldn't fade) - DMA operation related, not command related
+
+
+				if (triggerval == 0x0205 ||
+					triggerval == 0x8100 || triggerval == 0x8900 || /* sin / cos */
+					triggerval == 0x138e ||
+					triggerval == 0x3bb0 ||
+
+					triggerval == 0xa180 || triggerval == 0xa980 || triggerval == 0xb100 || triggerval == 0xb900 || /* collisions */
+					triggerval == 0xc480 ||
+					triggerval == 0x6200 ||
+					triggerval == 0x6980)
+					otherlog = 0;
+
+			}
+			else if (!strcmp(machine().system().name, "denjinmk"))
+			{
+				// never calls any programs
+			}
 			else
 			{
 				otherlog = 0;
