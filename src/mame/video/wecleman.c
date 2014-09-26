@@ -789,7 +789,7 @@ void wecleman_state::hotchase_draw_road(bitmap_ind16 &bitmap, const rectangle &c
 #define YSIZE 512
 
 	int sx, sy;
-	const rectangle &visarea = machine().first_screen()->visible_area();
+	const rectangle &visarea = m_screen->visible_area();
 
 	/* Let's draw from the top to the bottom of the visible screen */
 	for (sy = visarea.min_y;sy <= visarea.max_y;sy++)

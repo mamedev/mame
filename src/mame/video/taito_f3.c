@@ -271,8 +271,6 @@ struct tempsprite
 	int pri;
 };
 
-static void get_sprite_info(running_machine &machine, const UINT16 *spriteram16_ptr);
-
 struct f3_playfield_line_inf
 {
 	int alpha_mode[256];
@@ -511,7 +509,7 @@ void taito_f3_state::screen_eof_f3(screen_device &screen, bool state)
 		{
 			if (machine().video().skip_this_frame() == 0)
 			{
-				get_sprite_info(machine(), m_spriteram16_buffered);
+				get_sprite_info(m_spriteram16_buffered);
 			}
 			memcpy(m_spriteram16_buffered,m_spriteram,0x10000);
 		}
@@ -519,7 +517,7 @@ void taito_f3_state::screen_eof_f3(screen_device &screen, bool state)
 		{
 			if (machine().video().skip_this_frame() == 0)
 			{
-				get_sprite_info(machine(), m_spriteram);
+				get_sprite_info(m_spriteram);
 			}
 		}
 	}
@@ -2832,10 +2830,9 @@ inline void taito_f3_state::f3_drawgfxzoom(bitmap_rgb32 &dest_bmp,const rectangl
 	/*zoom##p = p##_addition << 12;*/                           \
 }
 
-static void get_sprite_info(running_machine &machine, const UINT16 *spriteram16_ptr)
+void taito_f3_state::get_sprite_info(const UINT16 *spriteram16_ptr)
 {
-	taito_f3_state *state = machine.driver_data<taito_f3_state>();
-	const rectangle &visarea = machine.first_screen()->visible_area();
+	const rectangle &visarea = m_screen->visible_area();
 	const int min_x=visarea.min_x,max_x=visarea.max_x;
 	const int min_y=visarea.min_y,max_y=visarea.max_y;
 	int offs,spritecont,flipx,flipy,/*old_x,*/color,x,y;
@@ -2849,7 +2846,7 @@ static void get_sprite_info(running_machine &machine, const UINT16 *spriteram16_
 
 	int x_addition_left = 8, y_addition_left = 8;
 
-	struct tempsprite *sprite_ptr = state->m_spritelist;
+	struct tempsprite *sprite_ptr = m_spritelist;
 
 	int total_sprites=0;
 
@@ -2876,15 +2873,15 @@ static void get_sprite_info(running_machine &machine, const UINT16 *spriteram16_
 		/* Check if special command bit is set */
 		if (spriteram16_ptr[current_offs+2+1] & 0x8000) {
 			UINT32 cntrl=(spriteram16_ptr[current_offs+4+1])&0xffff;
-			state->m_flipscreen=cntrl&0x2000;
+			m_flipscreen=cntrl&0x2000;
 
 			/*  cntrl&0x1000 = disabled?  (From F2 driver, doesn't seem used anywhere)
 			    cntrl&0x0010 = ???
 			    cntrl&0x0020 = ???
 			*/
 
-			state->m_sprite_extra_planes = (cntrl & 0x0300) >> 8;   // 0 = 4bpp, 1 = 5bpp, 2 = unused?, 3 = 6bpp
-			state->m_sprite_pen_mask = (state->m_sprite_extra_planes << 4) | 0x0f;
+			m_sprite_extra_planes = (cntrl & 0x0300) >> 8;   // 0 = 4bpp, 1 = 5bpp, 2 = unused?, 3 = 6bpp
+			m_sprite_pen_mask = (m_sprite_extra_planes << 4) | 0x0f;
 
 			/* Sprite bank select */
 			if (cntrl&1) {
@@ -2925,7 +2922,7 @@ static void get_sprite_info(running_machine &machine, const UINT16 *spriteram16_
 /* These games either don't set the XY control bits properly (68020 bug?), or
     have some different mode from the others */
 #ifdef DARIUSG_KLUDGE
-		if (state->m_f3_game==DARIUSG || state->m_f3_game==GEKIRIDO || state->m_f3_game==CLEOPATR || state->m_f3_game==RECALH)
+		if (m_f3_game==DARIUSG || m_f3_game==GEKIRIDO || m_f3_game==CLEOPATR || m_f3_game==RECALH)
 			multi=spritecont&0xf0;
 #endif
 
@@ -2936,7 +2933,7 @@ static void get_sprite_info(running_machine &machine, const UINT16 *spriteram16_
 			else color=(spriteram16_ptr[current_offs+4+0])&0xff;
 
 #ifdef DARIUSG_KLUDGE
-			if (state->m_f3_game==DARIUSG || state->m_f3_game==GEKIRIDO || state->m_f3_game==CLEOPATR || state->m_f3_game==RECALH) {
+			if (m_f3_game==DARIUSG || m_f3_game==GEKIRIDO || m_f3_game==CLEOPATR || m_f3_game==RECALH) {
 				/* Adjust X Position */
 				if ((spritecont & 0x40) == 0) {
 					if (spritecont & 0x4) {
@@ -3064,7 +3061,7 @@ static void get_sprite_info(running_machine &machine, const UINT16 *spriteram16_
 		if (!sprite) continue;
 		if (!x_addition || !y_addition) continue;
 
-		if (state->m_flipscreen)
+		if (m_flipscreen)
 		{
 			int tx,ty;
 
@@ -3095,7 +3092,7 @@ static void get_sprite_info(running_machine &machine, const UINT16 *spriteram16_
 		sprite_ptr++;
 		total_sprites++;
 	}
-	state->m_sprite_end = sprite_ptr;
+	m_sprite_end = sprite_ptr;
 }
 #undef CALC_ZOOM
 
@@ -3183,7 +3180,7 @@ UINT32 taito_f3_state::screen_update_f3(screen_device &screen, bitmap_rgb32 &bit
 
 	/* sprites */
 	if (m_sprite_lag==0)
-		get_sprite_info(machine(), m_spriteram);
+		get_sprite_info(m_spriteram);
 
 	/* Update sprite buffer */
 	draw_sprites(bitmap,cliprect);

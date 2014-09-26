@@ -183,7 +183,6 @@ void vertigo_state::vertigo_vproc_reset()
 	memset(&m_vs, 0, sizeof(m_vs));
 	memset(&m_bsp, 0, sizeof(m_bsp));
 	memset(&m_vgen, 0, sizeof(m_vgen));
-	m_vgen.set_machine(machine());
 }
 
 
