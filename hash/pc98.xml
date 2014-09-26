@@ -16642,9 +16642,10 @@ Same as Police Quest 2 - Quest for Glory stand-alone disks
 		</part>
 	</software>
 
-		<software name="turbocpp">
+	<!-- Requires DOS -->
+	<software name="turbocpp">
 		<description>Turbo C++</description>
-		<year>19??</year>
+		<year>1990</year>
 		<publisher>Borland;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1281968">
