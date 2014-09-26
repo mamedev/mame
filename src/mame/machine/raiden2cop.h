@@ -241,7 +241,7 @@ public:
 	};
 
 	struct LEGACY_collision_info m_LEGACY_cop_collision_info[2];
-	void  LEGACY_cop_collision_update_hitbox(address_space &space, int slot, UINT32 hitadr);
+	void  LEGACY_cop_collision_update_hitbox(address_space &space, UINT16 data, int slot, UINT32 hitadr);
 
 	// endian stuff?
 	int m_cpu_is_68k;

@@ -1345,7 +1345,7 @@ void raiden2cop_device::execute_b100(address_space &space, int offset, UINT16 da
 
 void raiden2cop_device::LEGACY_execute_b100(address_space &space, int offset, UINT16 data)
 {
-	LEGACY_cop_collision_update_hitbox(space, 0, cop_regs[2]);
+	LEGACY_cop_collision_update_hitbox(space, data, 0, cop_regs[2]);
 }
 
 /*
@@ -1360,7 +1360,7 @@ void raiden2cop_device::execute_b900(address_space &space, int offset, UINT16 da
 
 void raiden2cop_device::LEGACY_execute_b900(address_space &space, int offset, UINT16 data)
 {
-	LEGACY_cop_collision_update_hitbox(space, 1, cop_regs[3]);
+	LEGACY_cop_collision_update_hitbox(space, data, 1, cop_regs[3]);
 }
 
 /*
@@ -1615,31 +1615,44 @@ Y = collides between 0xd0 and 0x30 (not inclusive)
 0x588 bits 2 & 3 = 0x580 bits 0 & 1
 */
 
-void  raiden2cop_device::LEGACY_cop_collision_update_hitbox(address_space &space, int slot, UINT32 hitadr)
+void  raiden2cop_device::LEGACY_cop_collision_update_hitbox(address_space &space, UINT16 data, int slot, UINT32 hitadr)
 {
 	UINT32 hitadr2 = space.read_word(hitadr) | (cop_hit_baseadr << 16); // DON'T use cop_read_word here, doesn't need endian fixing?!
-	UINT16 hithoxy = space.read_word(hitadr2);
-	UINT16 hitboxx = space.read_word(hitadr2 + 2);
+	int num_axis = 2;
+
+	// guess, heatbrl doesn't have this set and clearly only wants 2 axis to be checked (otherwise it reads bad params into the 3rd)
+	// everything else has it set, and legionna clearly wants 3 axis for jumping attacks to work
+	if (data & 0x0100) num_axis = 3;
+
+	int i;
+
+	for(i=0; i<3; i++) {
+		cop_collision_info[slot].dx[i] = 0;
+		cop_collision_info[slot].size[i] = 0;
+	}
+
+	for(i=0; i<num_axis; i++) {
+		cop_collision_info[slot].dx[i] = space.read_byte(1^ (hitadr2++));
+		cop_collision_info[slot].size[i] = space.read_byte(1^ (hitadr2++));
+	}
 
 	INT16 dx[3],size[3];
 
-
-	size[0] = UINT8(hithoxy >> 8);
-	dx[0] = INT8(hithoxy);
-	size[1] = UINT8(hitboxx >> 8);
-	dx[1] = INT8(hitboxx);
-	size[2] = 0;
-	dx[2] = 0;
+	for (i = 0; i < num_axis; i++)
+	{
+		size[i] = UINT8(cop_collision_info[slot].size[i]);
+		dx[i] = INT8(cop_collision_info[slot].dx[i]);
+	}
 
 	int j = slot;
-	int i;
 	
 	UINT8 res;
 
-	res = 7;
+	if (num_axis==3) res = 7;
+	else res = 3;
 
 	//for (j = 0; j < 2; j++)
-	for (i = 0; i < 3;i++)
+	for (i = 0; i < num_axis;i++)
 	{
 		if (cop_collision_info[j].allow_swap && (cop_collision_info[j].flags_swap & (1 << i)))
 		{
