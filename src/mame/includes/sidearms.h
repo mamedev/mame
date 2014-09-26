@@ -30,7 +30,7 @@ public:
 	required_shared_ptr<UINT8> m_colorram;
 
 	DECLARE_IOPORT_ARRAY(ports);
-	required_ioport_array<5> m_ports;
+	optional_ioport_array<5> m_ports;
 
 	UINT8 *m_tilerom;
 	tilemap_t *m_bg_tilemap;
