@@ -352,7 +352,9 @@ int raiden2cop_device::find_trigger_match(UINT16 triggerval, UINT16 mask)
 
 	for (int i = 0; i < 32; i++)
 	{
-		if ((triggerval & mask) == (cop_func_trigger[i] & mask))
+		// technically 'command' could equal cop_func_trigger[i] >> 11, but there is that odd entry in zero team where that doesn't appear to be true (search 'TABLENOTE1')
+
+		if ((triggerval & mask) == (cop_func_trigger[i] & mask) && cop_func_trigger[i] != 0) /* cop_func_trigger[i] != 0 is just being used to prevent matching against empty / unused slots */
 		{
 #if LOG_CMDS
 			seibu_cop_log("    Cop Command %04x found in slot %02x with other params %04x %04x\n", triggerval, i, cop_func_value[i], cop_func_mask[i]);
@@ -381,7 +383,7 @@ int raiden2cop_device::find_trigger_match(UINT16 triggerval, UINT16 mask)
 		return -1;
 	}
 
-	printf("multiple matches found with mask passed in! (bad!)\n");
+	printf("multiple matches found with mask passed in! (bad!) (%04x %04x)\n", triggerval, mask);
 	return -1;
 
 }
@@ -763,6 +765,7 @@ READ16_MEMBER(raiden2cop_device::cop_itoa_digits_r)
 /* Main COP functionality */
 
 // notes about tables:
+// (TABLENOTE1)
 // in all but one case the upload table position (5-bits) is the SAME as the upper 5-bits of the 'trigger value'
 // the exception to this rule is program 0x18 uploads on zeroteam
 //  in this case you can see that the 'trigger' value upper bits are 0x0f, this makes it a potentially interesting case (if it gets used)
@@ -1993,12 +1996,12 @@ WRITE16_MEMBER(raiden2cop_device::cop_sprite_dma_abs_x_w)
 WRITE16_MEMBER(raiden2cop_device::LEGACY_cop_cmd_w)
 {
 	int command;
-
+	
 
 	logerror("%06x: COPX execute table macro command %04x | regs %08x %08x %08x %08x %08x\n", space.device().safe_pc(), data,  cop_regs[0], cop_regs[1], cop_regs[2], cop_regs[3], cop_regs[4]);
 
 
-	command = find_trigger_match(data, 0xff00);
+	command = find_trigger_match(data, 0xf800);
 
 
 	if (command == -1)
@@ -2238,7 +2241,7 @@ WRITE16_MEMBER(raiden2cop_device::LEGACY_cop_cmd_w)
 	}
 
 	if (executed == 0)
-		if (data!=0xf105) printf("did not execute %04x\n", data); // cup soccer triggers this a lot (and others)
+		printf("did not execute %04x\n", data); // cup soccer triggers this a lot (and others)
 }
 
 
