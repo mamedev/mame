@@ -16642,6 +16642,27 @@ Same as Police Quest 2 - Quest for Glory stand-alone disks
 		</part>
 	</software>
 
+		<software name="turbocpp">
+		<description>Turbo C++</description>
+		<year>19??</year>
+		<publisher>Borland;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1281968">
+				<rom name="Turbo C++ - DISK1.D88" size="1281968" crc="0184f1fd" sha1="1" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1281968">
+				<rom name="Turbo C++ - DISK2.D88" size="1281968" crc="198f91df" sha1="1" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="1281968">
+				<rom name="Turbo C++ - DISK3.D88" size="1281968" crc="c50c2381" sha1="1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 
 </softwarelist>
 
