@@ -320,10 +320,10 @@ int web_engine::begin_request_handler(struct mg_connection *conn)
 	}
 	else if (!strncmp(conn->uri, "/keyupload",8))
 	{
-		const char *upload_data;
+		char *upload_data;
 		int data_length, ofs = 0;
 		char var_name[100], file_name[255];
-		while ((ofs = mg_parse_multipart(conn->content + ofs, conn->content_len - ofs, var_name, sizeof(var_name), file_name, sizeof(file_name), 	&upload_data, &data_length)) > 0) {
+		while ((ofs = mg_parse_multipart(conn->content + ofs, conn->content_len - ofs, var_name, sizeof(var_name), file_name, sizeof(file_name), (const char **)&upload_data, &data_length)) > 0) {
 				mg_printf_data(conn, "File: %s, size: %d bytes", file_name, data_length);
 		}
 		
@@ -332,10 +332,11 @@ int web_engine::begin_request_handler(struct mg_connection *conn)
 		
 		if ((&data_length > 0) && (sizeof(file_name) > 0))
 		{
-			char paste_data[data_length];
-			strncpy (paste_data, upload_data, data_length);
+			// MSVC doesn't yet support variable-length arrays, so chop the string the old-fashioned way
+			upload_data[data_length] = '\0';
+
 			// Now paste the stripped down paste_data..
-			machine().ioport().natkeyboard().post_utf8(paste_data);
+			machine().ioport().natkeyboard().post_utf8(upload_data);
 		}
 		return MG_TRUE;
 	}
