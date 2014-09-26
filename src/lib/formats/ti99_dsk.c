@@ -513,7 +513,6 @@ int ti99_floppy_format::decode_bitstream(const UINT8 *bitstream, UINT8 *trackdat
 	int tpos = 0;
 	int pos = 0;
 	int state;
-	bool good = false;
 	int marks = 0;
 	int current_sector = 0;
 
@@ -909,7 +908,6 @@ void ti99_sdf_format::load_track(io_generic *io, UINT8 *trackdata, int head, int
 	int skew = fm? 6 : 0;
 
 	int secsize = fm? 334 : 340;
-	int secoff = fm? 33 : 58;
 	int position = 0;
 	int count = 0;
 
