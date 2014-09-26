@@ -79,7 +79,7 @@
 		updateStatusBar('<b style="color: red;">Disconnected</b>','Exited','No Driver');
 	}
   }
-
+  
   function executeHardReset()
   {
     executeCommands("hardreset");
@@ -202,6 +202,25 @@
   window.onload = function() {
 	startWebSocket();
   };
+
+$(document).ready(function() {  
+  $( '#pasteTextForm' ).submit(function( event )
+  {
+    $.ajax({
+        url: "/keypost",
+        type:'POST',
+        data:
+        {
+            val: pasteText.value
+        },
+        success: function(msg)
+        {
+        }               
+    });
+  event.preventDefault();
+  });
+});
+
 </script>
 
 <!-- This begins the MAIN MENU page ------------------------------------------------------------------->
@@ -326,6 +345,11 @@
 		<div class="ui-grid-a">
 			<div class="ui-block-a"><a href="#savestatepanel" data-transition="fade" data-role="button">Save State</a></div>
 			<div class="ui-block-b"><a href="#loadstatepanel" data-transition="fade" data-role="button">Load State</a></div>
+		</div>
+		<h2>Paste/Upload Text</h2>
+		<div class="ui-grid-a">
+			<div class="ui-block-a"><a href="#pastepanel" data-transition="fade" data-role="button">Paste Text</a></div>
+			<div class="ui-block-b"><a href="#uploadpastepanel" data-transition="fade" data-role="button">Upload Text</a></div>
 		</div>
 		<h2>Execution Control</h2>
 		<a href="javascript:executeCommands('togglepause');" data-role="button">Toggle Pause</a>
@@ -464,7 +488,39 @@
 			<!-- This is here to prevent webkit from trying to put the last row of states under the bottom menu on small screens like phone-->
 			<br><br><br><br><br>
 		</div>
-		
+
+		<!-- This begins the Paste Text panel -------------------------------------------------------->
+		<div data-role="panel" id="pastepanel" data-position="left" data-display="overlay" data-theme="a">
+			<h4>Paste Text to Keyboard</h4>
+
+			<form id="pasteTextForm" action="#pastepanel" method="post">
+				<div data-role="controlgroup" data-type="horizontal">
+					<a href="" data-rel="close" data-role="button">Exit</a>
+					<input type="submit" value="Send">
+					<input type="reset" value="Clear">
+				</div>
+				<br>
+				<textarea id="pasteText" name="val"></textarea>
+			</form>
+			<!-- This is here to prevent webkit from trying to put the last row of states under the bottom menu on small screens like phone-->
+			<br><br><br><br><br>
+		</div>
+
+		<!-- This begins the Upload Text panel -------------------------------------------------------->
+		<div data-role="panel" id="uploadpastepanel" data-position="left" data-display="overlay" data-theme="a">
+			<h4>Upload Text to Keyboard</h4>
+
+			<form method="post" action="/keyupload" enctype="multipart/form-data" target="uploadpastelog" data-ajax="false">
+				<!-- note that we can't do file uploads via Ajax -->
+				<div data-role="controlgroup" data-type="horizontal">
+					<a href="" data-rel="close" data-role="button">Exit</a>
+					<input type="submit" value="Upload" />
+				</div>
+				<input type="file" name="file" /> <br/>
+			</form>
+			<!-- This is here to prevent webkit from trying to put the last row of states under the bottom menu on small screens like phone-->
+			<br><br><br><br><br>
+		</div>
     </div>
     <div data-theme="a" data-role="footer" data-position="fixed">
 		<div  data-role="navbar" data-iconpos="top">
@@ -795,7 +851,9 @@
             </ul>
         </div>
     </div>
-    <div data-role="content" id="logsmenucontent">	
+    <div data-role="content" id="logsmenucontent">
+		<p>Paste Upload Log</p> <!-- Yeah, this'll need reworking later. -->
+		<iframe name="uploadpastelog" width="250" height="250"></iframe>
     </div>
     <div data-theme="a" data-role="footer" data-position="fixed">
 		<div  data-role="navbar" data-iconpos="top">

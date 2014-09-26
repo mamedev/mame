@@ -292,6 +292,53 @@ int web_engine::begin_request_handler(struct mg_connection *conn)
 			return json_slider_handler(conn);
 		}
 	}
+	else if (!strncmp(conn->uri, "/keypost",8))
+	{
+		// Is there any sane way to determine the length of the buffer before getting it?
+		// A request for a way was previously filed with the mongoose devs, 
+		// but it looks like it was never implemented.
+		
+		// For now, we'll allow a paste buffer of 32k. 
+		// To-do: Send an error if the paste is too big?
+		char cmd_val[32768];
+					
+		int pastelength = mg_get_var(conn, "val", cmd_val, sizeof(cmd_val));
+		if (pastelength > 0) {
+			machine().ioport().natkeyboard().post_utf8(cmd_val);
+		}
+		// Send HTTP reply to the client
+		mg_printf(conn,
+			"HTTP/1.1 200 OK\r\n"
+			"Content-Type: text/plain\r\n"
+			"Content-Length: 2\r\n"        // Always set Content-Length
+			"\r\n"
+			"OK");
+
+		// Returning non-zero tells mongoose that our function has replied to
+		// the client, and mongoose should not send client any more data.
+		return MG_TRUE;
+	}
+	else if (!strncmp(conn->uri, "/keyupload",8))
+	{
+		const char *upload_data;
+		int data_length, ofs = 0;
+		char var_name[100], file_name[255];
+		while ((ofs = mg_parse_multipart(conn->content + ofs, conn->content_len - ofs, var_name, sizeof(var_name), file_name, sizeof(file_name), 	&upload_data, &data_length)) > 0) {
+				mg_printf_data(conn, "File: %s, size: %d bytes", file_name, data_length);
+		}
+		
+		// That upload_data contains more than we need. It also has the headers.
+		// We'll need to strip it down to just what we want.
+		
+		if ((&data_length > 0) && (sizeof(file_name) > 0))
+		{
+			char paste_data[data_length];
+			strncpy (paste_data, upload_data, data_length);
+			// Now paste the stripped down paste_data..
+			machine().ioport().natkeyboard().post_utf8(paste_data);
+		}
+		return MG_TRUE;
+	}
 	else if (!strncmp(conn->uri, "/cmd",4))
 	{
 		char cmd_name[64];
