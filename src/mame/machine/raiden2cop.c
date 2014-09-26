@@ -13,6 +13,13 @@
 // use Z to dump out table info
 //#define TABLE_DUMPER
 
+
+#define LOG_CMDS 0
+
+#define seibu_cop_log \
+	if (LOG_CMDS) logerror
+
+
 const device_type RAIDEN2COP = &device_creator<raiden2cop_device>;
 
 raiden2cop_device::raiden2cop_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
@@ -336,8 +343,8 @@ WRITE16_MEMBER(raiden2cop_device::cop_pgm_trigger_w)
 	cop_latch_trigger = data;
 }
 
-#define seibu_cop_log logerror
-#define LOG_CMDS 1
+
+
 
 // currently only used by legionna.c implementation
 int raiden2cop_device::find_trigger_match(UINT16 triggerval, UINT16 mask)
@@ -356,9 +363,28 @@ int raiden2cop_device::find_trigger_match(UINT16 triggerval, UINT16 mask)
 
 		if ((triggerval & mask) == (cop_func_trigger[i] & mask) && cop_func_trigger[i] != 0) /* cop_func_trigger[i] != 0 is just being used to prevent matching against empty / unused slots */
 		{
-#if LOG_CMDS
+			int otherlog = 1;
+			
+			// just some per-game debug code so that we have a record of exactly which triggers each game is known to use
+			if (!strcmp(machine().system().name, "legionna"))
+			{
+				if (triggerval == 0x0205 || triggerval == 0x0905 || 
+					triggerval == 0x8100 || triggerval == 0x8900 || /* sin / cos */
+					triggerval == 0x138e || // atan?
+					triggerval == 0x3bb0 || // distance?
+					triggerval == 0x42c2 || // distance?
+					triggerval == 0xa180 || triggerval == 0xa980 || triggerval == 0xb100 || triggerval == 0xb900) /* collisions */
+					otherlog = 0;
+			}
+			else
+			{
+				otherlog = 0;
+			}
+
 			seibu_cop_log("    Cop Command %04x found in slot %02x with other params %04x %04x\n", triggerval, i, cop_func_value[i], cop_func_mask[i]);
-#endif
+
+			if (otherlog == 1) printf("used command %04x\n", triggerval);
+
 			command = i;
 			matched++;
 		}
@@ -380,10 +406,11 @@ int raiden2cop_device::find_trigger_match(UINT16 triggerval, UINT16 mask)
 	else if (matched == 0)
 	{
 		seibu_cop_log("    Cop Command %04x NOT IN TABLE!\n", triggerval);
+		printf("Command Not Found!\n");
 		return -1;
 	}
 
-	printf("multiple matches found with mask passed in! (bad!) (%04x %04x)\n", triggerval, mask);
+	printf("multiple matches found with mask passed in! (bad!) (%04x %04x)\n", triggerval, mask); // this should never happen with the uploaded tables
 	return -1;
 
 }
@@ -1644,6 +1671,8 @@ void  raiden2cop_device::LEGACY_cop_collision_update_hitbox(address_space &space
 		dx[i] = INT8(cop_collision_info[slot].dx[i]);
 	}
 
+	//printf("%02x %02x %02x %02x %02x %02x\n", (UINT8)size[i], (UINT8)dx[i], (UINT8)size[1], (UINT8)dx[1], (UINT8)size[2], (UINT8)dx[2]);
+
 	int j = slot;
 	
 	UINT8 res;
@@ -1993,7 +2022,7 @@ WRITE16_MEMBER(raiden2cop_device::LEGACY_cop_cmd_w)
 	int command;
 	
 
-	logerror("%06x: COPX execute table macro command %04x | regs %08x %08x %08x %08x %08x\n", space.device().safe_pc(), data,  cop_regs[0], cop_regs[1], cop_regs[2], cop_regs[3], cop_regs[4]);
+	seibu_cop_log("%06x: COPX execute table macro command %04x | regs %08x %08x %08x %08x %08x\n", space.device().safe_pc(), data,  cop_regs[0], cop_regs[1], cop_regs[2], cop_regs[3], cop_regs[4]);
 
 
 	command = find_trigger_match(data, 0xf800);
