@@ -155,11 +155,17 @@ public:
 
 	INT8 *m_shared_ram;
 	UINT8 m_cnt;
+	INT8 *m_shared_ram2;
 	DECLARE_READ8_MEMBER(sharedram_r);
 	DECLARE_WRITE8_MEMBER(sharedram_w);
 	DECLARE_READ8_MEMBER(sb2b_75bd37_r);
 	DECLARE_READ8_MEMBER(sb2b_6a6xxx_r);
 	DECLARE_READ8_MEMBER(sb2b_7xxx_r);
+	DECLARE_READ8_MEMBER(endless_580xxx_r);
+	DECLARE_READ8_MEMBER(endless_624b7f_r);
+	DECLARE_READ8_MEMBER(endless_800b_r);
+	DECLARE_READ8_MEMBER(sharedram2_r);
+	DECLARE_WRITE8_MEMBER(sharedram2_w);
 	DECLARE_READ8_MEMBER(snesb_dsw1_r);
 	DECLARE_READ8_MEMBER(snesb_dsw2_r);
 	DECLARE_READ8_MEMBER(snesb_coin_r);
@@ -216,6 +222,50 @@ READ8_MEMBER(snesb_state::sb2b_7xxx_r)
 	return space.read_byte(0xc07000 + offset);
 }
 
+
+/* Endless Duel */
+READ8_MEMBER(snesb_state::endless_580xxx_r)
+{
+	/* protection checks */
+	switch(offset)
+	{
+		case 0x2bc: return 0xb4;
+		case 0x36a: return 0x8a;
+		case 0x7c1: return 0xd9;
+		case 0x956: return 0xa5;
+		case 0xe83: return 0x6b;
+	}
+
+	logerror("Unknown protection read read %x @ %x\n",offset, space.device().safe_pc());
+
+	return 0;
+}
+
+READ8_MEMBER(snesb_state::endless_624b7f_r)
+{
+	/* protection check */
+	return ++m_cnt;
+}
+
+READ8_MEMBER(snesb_state::endless_800b_r)
+{
+	if (!offset)
+	{
+		return 0x50;
+	}
+
+	return 0xe8;
+}
+
+READ8_MEMBER(snesb_state::sharedram2_r)
+{
+	return m_shared_ram2[offset];
+}
+
+WRITE8_MEMBER(snesb_state::sharedram2_w)
+{
+	m_shared_ram2[offset]=data;
+}
 
 /* Generic read handlers for Dip Switches and coins inputs */
 READ8_MEMBER(snesb_state::snesb_dsw1_r)
@@ -891,6 +941,22 @@ DRIVER_INIT_MEMBER(snesb_state,endless)
 			dst[i] = BITSWAP8(dst[i],0,4,2,3,5,6,7,1) ^ 0xff;
 		}
 	}
+
+	/*  boot vector */
+	dst[0x7ffc] = 0x00;
+	dst[0x7ffd] = 0x80;
+
+	/* protection checks */
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x580000, 0x580fff, read8_delegate(FUNC(snesb_state::endless_580xxx_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x624b7f, 0x624b7f, read8_delegate(FUNC(snesb_state::endless_624b7f_r),this));
+
+	/* work around missing content */
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x800b, 0x800c, read8_delegate(FUNC(snesb_state::endless_800b_r),this));
+
+	m_shared_ram = auto_alloc_array(machine(), INT8, 0x22);
+	m_shared_ram2 = auto_alloc_array(machine(), INT8, 0x22);
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x781000, 0x781021, read8_delegate(FUNC(snesb_state::sharedram_r),this), write8_delegate(FUNC(snesb_state::sharedram_w),this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x781200, 0x781221, read8_delegate(FUNC(snesb_state::sharedram2_r),this), write8_delegate(FUNC(snesb_state::sharedram2_w),this));
 
 	DRIVER_INIT_CALL(snes);
 }
