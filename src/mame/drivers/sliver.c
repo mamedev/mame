@@ -67,7 +67,7 @@ Notes:
 #include "sound/okim6295.h"
 #include "cpu/mcs51/mcs51.h"
 #include "video/ramdac.h"
-#include "../../lib/libjpeg/jpeglib.h"
+#include "libjpeg/jpeglib.h"
 
 
 #define FIFO_SIZE 1024
