@@ -157,28 +157,6 @@ http://www.z88forever.org.uk/zxplus3e/
 #include "machine/beta.h"
 #include "machine/ram.h"
 
-enum
-{
-	TIMEX_CART_NONE,
-	TIMEX_CART_DOCK,
-	TIMEX_CART_EXROM,
-	TIMEX_CART_HOME
-};
-
-struct timex_cart_t
-{
-	int type;
-	UINT8 chunks;
-	UINT8 *data;
-};
-
-static timex_cart_t timex_cart;
-
-const timex_cart_t *timex_cart_data(void)
-{
-	return &timex_cart;
-}
-
 /****************************************************************************************************/
 /* TS2048 specific functions */
 
@@ -234,13 +212,9 @@ void spectrum_state::ts2068_update_memory()
 {
 	UINT8 *messram = m_ram->pointer();
 	address_space &space = m_maincpu->space(AS_PROGRAM);
-	unsigned char *ChosenROM, *ExROM;
-	const timex_cart_t *timex_cart = timex_cart_data();
-	int timex_cart_type = timex_cart->type;
-	UINT8 timex_cart_chunks = timex_cart->chunks;
-	UINT8 *DOCK = timex_cart->data;
-
-	ExROM = memregion("maincpu")->base() + 0x014000;
+	UINT8 *DOCK = m_dock_crt->base();
+	UINT8 *ExROM = memregion("maincpu")->base() + 0x014000;
+	UINT8 *ChosenROM;
 
 	if (m_port_f4_data & 0x01)
 	{
@@ -253,11 +227,11 @@ void spectrum_state::ts2068_update_memory()
 		}
 		else
 		{
-			if (timex_cart_type == TIMEX_CART_DOCK)
+			if (m_dock_cart_type == TIMEX_CART_DOCK)
 			{
 				membank("bank1")->set_base(DOCK);
 				space.install_read_bank(0x0000, 0x1fff, "bank1");
-				if (timex_cart_chunks&0x01)
+				if (m_ram_chunks & 0x01)
 					space.install_write_bank(0x0000, 0x1fff, "bank9");
 				else
 					space.unmap_write(0x0000, 0x1fff);
@@ -292,11 +266,11 @@ void spectrum_state::ts2068_update_memory()
 		}
 		else
 		{
-			if (timex_cart_type == TIMEX_CART_DOCK)
+			if (m_dock_cart_type == TIMEX_CART_DOCK)
 			{
 				membank("bank2")->set_base(DOCK+0x2000);
 				space.install_read_bank(0x2000, 0x3fff, "bank2");
-				if (timex_cart_chunks&0x02)
+				if (m_ram_chunks & 0x02)
 					space.install_write_bank(0x2000, 0x3fff, "bank10");
 				else
 					space.unmap_write(0x2000, 0x3fff);
@@ -330,11 +304,11 @@ void spectrum_state::ts2068_update_memory()
 		}
 		else
 		{
-			if (timex_cart_type == TIMEX_CART_DOCK)
+			if (m_dock_cart_type == TIMEX_CART_DOCK)
 			{
 				membank("bank3")->set_base(DOCK+0x4000);
 				space.install_read_bank(0x4000, 0x5fff, "bank3");
-				if (timex_cart_chunks&0x04)
+				if (m_ram_chunks & 0x04)
 					space.install_write_bank(0x4000, 0x5fff, "bank11");
 				else
 					space.unmap_write(0x4000, 0x5fff);
@@ -367,11 +341,11 @@ void spectrum_state::ts2068_update_memory()
 		}
 		else
 		{
-				if (timex_cart_type == TIMEX_CART_DOCK)
+				if (m_dock_cart_type == TIMEX_CART_DOCK)
 				{
 					membank("bank4")->set_base(DOCK+0x6000);
 					space.install_read_bank(0x6000, 0x7fff, "bank4");
-					if (timex_cart_chunks&0x08)
+					if (m_ram_chunks & 0x08)
 						space.install_write_bank(0x6000, 0x7fff, "bank12");
 					else
 						space.unmap_write(0x6000, 0x7fff);
@@ -404,11 +378,11 @@ void spectrum_state::ts2068_update_memory()
 		}
 		else
 		{
-			if (timex_cart_type == TIMEX_CART_DOCK)
+			if (m_dock_cart_type == TIMEX_CART_DOCK)
 			{
 				membank("bank5")->set_base(DOCK+0x8000);
 				space.install_read_bank(0x8000, 0x9fff,"bank5");
-				if (timex_cart_chunks&0x10)
+				if (m_ram_chunks & 0x10)
 					space.install_write_bank(0x8000, 0x9fff,"bank13");
 				else
 					space.unmap_write(0x8000, 0x9fff);
@@ -441,11 +415,11 @@ void spectrum_state::ts2068_update_memory()
 		}
 		else
 		{
-			if (timex_cart_type == TIMEX_CART_DOCK)
+			if (m_dock_cart_type == TIMEX_CART_DOCK)
 			{
 				membank("bank6")->set_base(DOCK+0xa000);
 				space.install_read_bank(0xa000, 0xbfff, "bank6");
-				if (timex_cart_chunks&0x20)
+				if (m_ram_chunks & 0x20)
 					space.install_write_bank(0xa000, 0xbfff, "bank14");
 				else
 					space.unmap_write(0xa000, 0xbfff);
@@ -479,11 +453,11 @@ void spectrum_state::ts2068_update_memory()
 		}
 		else
 		{
-			if (timex_cart_type == TIMEX_CART_DOCK)
+			if (m_dock_cart_type == TIMEX_CART_DOCK)
 			{
 				membank("bank7")->set_base(DOCK+0xc000);
 				space.install_read_bank(0xc000, 0xdfff, "bank7");
-				if (timex_cart_chunks&0x40)
+				if (m_ram_chunks & 0x40)
 					space.install_write_bank(0xc000, 0xdfff, "bank15");
 				else
 					space.unmap_write(0xc000, 0xdfff);
@@ -516,11 +490,11 @@ void spectrum_state::ts2068_update_memory()
 		}
 		else
 		{
-			if (timex_cart_type == TIMEX_CART_DOCK)
+			if (m_dock_cart_type == TIMEX_CART_DOCK)
 			{
 				membank("bank8")->set_base(DOCK+0xe000);
 				space.install_read_bank(0xe000, 0xffff, "bank8");
-				if (timex_cart_chunks&0x80)
+				if (m_ram_chunks & 0x80)
 					space.install_write_bank(0xe000, 0xffff, "bank16");
 				else
 					space.unmap_write(0xe000, 0xffff);
@@ -570,9 +544,13 @@ MACHINE_RESET_MEMBER(spectrum_state,ts2068)
 {
 	m_port_ff_data = 0;
 	m_port_f4_data = 0;
+
+	astring region_tag;
+	m_dock_crt = memregion(region_tag.cpy(m_dock->tag()).cat(GENERIC_ROM_REGION_TAG));
+	m_dock_cart_type = (m_dock->exists()) ? TIMEX_CART_DOCK : TIMEX_CART_NONE;
+
 	ts2068_update_memory();
 	MACHINE_RESET_CALL_MEMBER(spectrum);
-
 }
 
 
@@ -613,85 +591,65 @@ MACHINE_RESET_MEMBER(spectrum_state,tc2048)
 
 DEVICE_IMAGE_LOAD_MEMBER( spectrum_state, timex_cart )
 {
-	int file_size;
-	dynamic_buffer file_data;
-
+	UINT32 size = m_dock->common_get_size("rom");
+	UINT8 *DOCK;
 	int chunks_in_file = 0;
+	dynamic_buffer header;
+	header.resize(9);
 
-	int i;
-
-	logerror ("Trying to load cart\n");
-
-	file_size = image.length();
-
-	if (file_size < 0x09)
+	if (size % 0x2000 != 9)
 	{
-		logerror ("Bad file size\n");
+		image.seterror(IMAGE_ERROR_UNSPECIFIED, "File corrupted");
 		return IMAGE_INIT_FAIL;
 	}
-
-	file_data.resize(file_size);
-
-	image.fread(file_data, file_size);
-
-	for (i=0; i<8; i++)
-		if(file_data[i+1]&0x02) chunks_in_file++;
-
-	if (chunks_in_file*0x2000+0x09 != file_size)
+	if (image.software_entry() != NULL)
 	{
-		logerror ("File corrupted\n");
+		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Loading from softlist is not supported yet");
 		return IMAGE_INIT_FAIL;
 	}
+	
+	m_dock->rom_alloc(0x10000, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
+	DOCK = m_dock->get_rom_base();
 
-	switch (file_data[0x00])
+	// check header
+	image.fread(header, 9);
+	
+	for (int i = 0; i < 8; i++)
+		if (header[i + 1] & 0x02) chunks_in_file++;
+	
+	if (chunks_in_file * 0x2000 + 0x09 != size)
+	{
+		image.seterror(IMAGE_ERROR_UNSPECIFIED, "File corrupted");
+		return IMAGE_INIT_FAIL;
+	}
+	
+	switch (header[0])
 	{
 		case 0x00:  logerror ("DOCK cart\n");
-				timex_cart.type = TIMEX_CART_DOCK;
-				timex_cart.data = global_alloc_array(UINT8, 0x10000);
-				if (!timex_cart.data)
+			m_ram_chunks = 0;
+			for (int i = 0; i < 8; i++)
+			{
+				m_ram_chunks = m_ram_chunks | ((header[i + 1] & 0x01) << i);
+				if (header[i + 1] & 0x02)
+					image.fread(DOCK + i * 0x2000, 0x2000);
+				else
 				{
-					logerror ("Memory allocate error\n");
-					return IMAGE_INIT_FAIL;
-				}
-				chunks_in_file = 0;
-				for (i=0; i<8; i++)
-				{
-					timex_cart.chunks = timex_cart.chunks | ((file_data[i+1]&0x01)<<i);
-					if (file_data[i+1]&0x02)
-					{
-						memcpy (timex_cart.data+i*0x2000, file_data+0x09+chunks_in_file*0x2000, 0x2000);
-						chunks_in_file++;
-					}
+					if (header[i + 1] & 0x01)
+						memset(DOCK + i * 0x2000, 0x00, 0x2000);
 					else
-					{
-						if (file_data[i+1]&0x01)
-							memset (timex_cart.data+i*0x2000, 0x00, 0x2000);
-						else
-							memset (timex_cart.data+i*0x2000, 0xff, 0x2000);
-					}
+						memset(DOCK + i * 0x2000, 0xff, 0x2000);
 				}
-				break;
-
-		default:    logerror ("Cart type not supported\n");
-				timex_cart.type = TIMEX_CART_NONE;
-				return IMAGE_INIT_FAIL;
+			}
+			break;
+			
+		default:
+			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Cart type not supported");
+			return IMAGE_INIT_FAIL;
 	}
+	
+	logerror ("Cart loaded [Chunks %02x]\n", m_ram_chunks);
 
-	logerror ("Cart loaded\n");
-	logerror ("Chunks %02x\n", timex_cart.chunks);
 	return IMAGE_INIT_PASS;
-}
-
-
-DEVICE_IMAGE_UNLOAD_MEMBER( spectrum_state, timex_cart )
-{
-	if (timex_cart.data)
-	{
-		global_free_array(timex_cart.data);
-		timex_cart.data = NULL;
-	}
-	timex_cart.type = TIMEX_CART_NONE;
-	timex_cart.chunks = 0x00;
 }
 
 
@@ -737,12 +695,9 @@ static MACHINE_CONFIG_DERIVED( ts2068, spectrum_128 )
 
 	/* cartridge */
 	MCFG_DEVICE_REMOVE("cartslot")
-
-	MCFG_CARTSLOT_ADD("cart")
-	MCFG_CARTSLOT_EXTENSION_LIST("dck")
-	MCFG_CARTSLOT_NOT_MANDATORY
-	MCFG_CARTSLOT_LOAD(spectrum_state,timex_cart)
-	MCFG_CARTSLOT_UNLOAD(spectrum_state,timex_cart)
+	MCFG_GENERIC_CARTSLOT_ADD("dockslot", generic_plain_slot, NULL)
+	MCFG_GENERIC_EXTENSIONS("dck")
+	MCFG_GENERIC_LOAD(spectrum_state, timex_cart)
 
 	/* internal ram */
 	MCFG_RAM_MODIFY(RAM_TAG)
@@ -788,7 +743,6 @@ MACHINE_CONFIG_END
 ROM_START(tc2048)
 	ROM_REGION(0x10000,"maincpu",0)
 	ROM_LOAD("tc2048.rom",0x0000,0x4000, CRC(f1b5fa67) SHA1(febb2d495b6eda7cdcb4074935d6e9d9f328972d))
-	ROM_CART_LOAD("cart", 0x0000, 0x4000, ROM_NOCLEAR | ROM_NOMIRROR | ROM_OPTIONAL)
 ROM_END
 
 ROM_START(ts2068)

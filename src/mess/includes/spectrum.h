@@ -70,6 +70,15 @@ struct EVENT_LIST_ITEM
 };
 
 
+enum
+{
+	TIMEX_CART_NONE,
+	TIMEX_CART_DOCK,
+	TIMEX_CART_EXROM,
+	TIMEX_CART_HOME
+};
+
+
 class spectrum_state : public driver_device
 {
 public:
@@ -81,6 +90,7 @@ public:
 		m_ram(*this, RAM_TAG),
 		m_speaker(*this, "speaker"),
 		m_cart(*this, "cartslot"),
+		m_dock(*this, "dockslot"),
 		m_upd765(*this, "upd765"),
 		m_upd765_0(*this, "upd765:0"),
 		m_upd765_1(*this, "upd765:1"),
@@ -171,8 +181,11 @@ public:
 	void screen_eof_spectrum(screen_device &screen, bool state);
 	INTERRUPT_GEN_MEMBER(spec_interrupt);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( spectrum_cart );
+
+	// for timex cart only
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( timex_cart );
-	DECLARE_DEVICE_IMAGE_UNLOAD_MEMBER( timex_cart );
+	int m_dock_cart_type, m_ram_chunks;
+	memory_region *m_dock_crt;
 
 	unsigned int m_previous_border_x, m_previous_border_y;
 	bitmap_ind16 m_border_bitmap;
@@ -192,6 +205,7 @@ protected:
 	required_device<ram_device> m_ram;
 	required_device<speaker_sound_device> m_speaker;
 	optional_device<generic_slot_device> m_cart;
+	optional_device<generic_slot_device> m_dock;
 	optional_device<upd765a_device> m_upd765;
 	optional_device<floppy_connector> m_upd765_0;
 	optional_device<floppy_connector> m_upd765_1;

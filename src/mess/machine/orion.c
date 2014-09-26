@@ -22,8 +22,11 @@
 
 READ8_MEMBER(orion_state::orion_romdisk_porta_r)
 {
-	UINT8 *romdisk = m_region_maincpu->base() + 0x10000;
-	return romdisk[m_romdisk_msb*256+m_romdisk_lsb];
+	UINT16 addr = (m_romdisk_msb << 8) | m_romdisk_lsb;
+	if (m_cart->exists() && addr < m_cart->get_rom_size())
+		return m_cart->read_rom(space, addr);
+	else
+		return 0xff;
 }
 
 WRITE8_MEMBER(orion_state::orion_romdisk_portb_w)

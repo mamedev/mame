@@ -488,6 +488,25 @@ static const floppy_interface cgenie_floppy_interface =
 	NULL
 };
 
+
+// TODO: investigate this! I think it is some sort of expansion of the DOS cart...
+DEVICE_IMAGE_LOAD_MEMBER( cgenie_state, cgenie_cart )
+{
+	UINT32 size = m_cart->common_get_size("rom");
+	
+	if (size > 0x1000)
+	{
+		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
+		return IMAGE_INIT_FAIL;
+	}
+	
+	m_cart->rom_alloc(0x1000, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
+	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");			
+	
+	return IMAGE_INIT_PASS;
+}
+
+
 static MACHINE_CONFIG_START( cgenie_common, cgenie_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_17_73447MHz/8)        /* 2,2168 MHz */
@@ -535,9 +554,11 @@ static MACHINE_CONFIG_START( cgenie_common, cgenie_state )
 	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(cgenie_floppy_interface)
 
 	/* cartridge */
-	MCFG_CARTSLOT_ADD("cart")
-	MCFG_CARTSLOT_EXTENSION_LIST("rom")
-	MCFG_CARTSLOT_NOT_MANDATORY
+	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "cgenie_cart")
+	MCFG_GENERIC_EXTENSIONS("bin,rom")
+	MCFG_GENERIC_LOAD(cgenie_state, cgenie_cart)
+
+	MCFG_SOFTWARE_LIST_ADD("cart_list", "cgenie_cart")
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -565,7 +586,6 @@ ROM_START (cgenie)
 	ROM_REGION(0x13000,"maincpu",0)
 	ROM_LOAD ("cgenie.rom",  0x00000, 0x4000, CRC(d359ead7) SHA1(d8c2fc389ad38c45fba0ed556a7d91abac5463f4))
 	ROM_LOAD ("cgdos.rom",   0x10000, 0x2000, CRC(2a96cf74) SHA1(6dcac110f87897e1ee7521aefbb3d77a14815893))
-	ROM_CART_LOAD("cart", 0x12000, 0x1000, ROM_NOMIRROR | ROM_OPTIONAL)
 
 	ROM_REGION(0x0c00,"gfx1",0)
 	ROM_LOAD ("cgenie1.fnt", 0x0000, 0x0800, CRC(4fed774a) SHA1(d53df8212b521892cc56be690db0bb474627d2ff))
@@ -582,7 +602,6 @@ ROM_START (cgenienz)
 	ROM_SYSTEM_BIOS(1, "new", "New ROM")
 	ROMX_LOAD( "cgromv2.rom",   0x0000, 0x4000, CRC(cfb84e09) SHA1(e199e4429bab6f9fca2bb05e71324538928a693a), ROM_BIOS(2) )
 	ROM_LOAD ("cgdos.rom",   0x10000, 0x2000, CRC(2a96cf74) SHA1(6dcac110f87897e1ee7521aefbb3d77a14815893))
-	ROM_CART_LOAD("cart", 0x12000, 0x1000, ROM_NOMIRROR | ROM_OPTIONAL)
 
 	ROM_REGION(0x0c00,"gfx1",0)
 	ROM_LOAD ("cgenie1.fnt", 0x0000, 0x0800, CRC(4fed774a) SHA1(d53df8212b521892cc56be690db0bb474627d2ff))

@@ -11,6 +11,8 @@
 #include "machine/i8257.h"
 #include "video/i8275.h"
 #include "imagedev/cassette.h"
+#include "bus/generic/slot.h"
+#include "bus/generic/carts.h"
 
 
 class radio86_state : public driver_device
@@ -25,6 +27,7 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_cassette(*this, "cassette"),
+		m_cart(*this, "cartslot"),
 		m_dma8257(*this, "dma8257"),
 		m_ppi8255_1(*this, "ppi8255_1"),
 		m_ppi8255_2(*this, "ppi8255_2"),
@@ -73,7 +76,8 @@ public:
 	DECLARE_WRITE8_MEMBER(radio86_8255_portc_w2);
 	DECLARE_READ8_MEMBER(rk7007_8255_portc_r);
 	DECLARE_WRITE_LINE_MEMBER(hrq_w);
-	DECLARE_READ8_MEMBER(radio86_romdisk_porta_r);
+	DECLARE_READ8_MEMBER(radio86rom_romdisk_porta_r);
+	DECLARE_READ8_MEMBER(radio86ram_romdisk_porta_r);
 	DECLARE_WRITE8_MEMBER(radio86_romdisk_portb_w);
 	DECLARE_WRITE8_MEMBER(radio86_romdisk_portc_w);
 	DECLARE_WRITE8_MEMBER(mikrosha_8255_font_page_w);
@@ -84,6 +88,7 @@ public:
 
 protected:
 	required_device<cassette_image_device> m_cassette;
+	optional_device<generic_slot_device> m_cart;	// for ROMDisk - only Radio86K & Orion?
 	optional_device<i8257_device> m_dma8257;
 	required_device<i8255_device> m_ppi8255_1;
 	optional_device<i8255_device> m_ppi8255_2;

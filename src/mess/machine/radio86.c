@@ -155,7 +155,16 @@ WRITE8_MEMBER(radio86_state::radio86_pagesel)
 	m_disk_sel = data;
 }
 
-READ8_MEMBER(radio86_state::radio86_romdisk_porta_r)
+READ8_MEMBER(radio86_state::radio86rom_romdisk_porta_r)
+{
+	UINT16 addr = (m_romdisk_msb << 8) | m_romdisk_lsb;
+	if (m_cart->exists() && addr < m_cart->get_rom_size())
+		return m_cart->read_rom(space, addr);
+	else
+		return 0xff;
+}
+
+READ8_MEMBER(radio86_state::radio86ram_romdisk_porta_r)
 {
 	UINT8 *romdisk = m_region_maincpu->base() + 0x10000;
 	if ((m_disk_sel & 0x0f) ==0) {

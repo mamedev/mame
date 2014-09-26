@@ -6,7 +6,8 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "imagedev/cartslot.h"
+#include "bus/generic/slot.h"
+#include "bus/generic/carts.h"
 
 // PV-1000 Sound device
 
@@ -143,15 +144,16 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_sound(*this, "pv1000_sound"),
+		m_cart(*this, "cartslot"),
 		m_p_videoram(*this, "p_videoram"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette")
 		{ }
 
-	DECLARE_WRITE8_MEMBER(pv1000_io_w);
-	DECLARE_READ8_MEMBER(pv1000_io_r);
-	DECLARE_WRITE8_MEMBER(pv1000_gfxram_w);
+	DECLARE_WRITE8_MEMBER(io_w);
+	DECLARE_READ8_MEMBER(io_r);
+	DECLARE_WRITE8_MEMBER(gfxram_w);
 	UINT8   m_io_regs[8];
 	UINT8   m_fd_data;
 
@@ -167,6 +169,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<pv1000_sound_device> m_sound;
+	required_device<generic_slot_device> m_cart;
 	required_shared_ptr<UINT8> m_p_videoram;
 	virtual void machine_start();
 	virtual void machine_reset();
@@ -182,19 +185,19 @@ public:
 
 
 static ADDRESS_MAP_START( pv1000, AS_PROGRAM, 8, pv1000_state )
-	AM_RANGE( 0x0000, 0x3fff ) AM_MIRROR( 0x4000 ) AM_ROM AM_REGION( "cart", 0 )
-	AM_RANGE( 0xb800, 0xbbff ) AM_RAM AM_SHARE("p_videoram")
-	AM_RANGE( 0xbc00, 0xbfff ) AM_RAM_WRITE( pv1000_gfxram_w ) AM_REGION( "gfxram", 0 )
+	//AM_RANGE(0x0000, 0x7fff)		// mapped by the cartslot
+	AM_RANGE(0xb800, 0xbbff) AM_RAM AM_SHARE("p_videoram")
+	AM_RANGE(0xbc00, 0xbfff) AM_RAM_WRITE(gfxram_w) AM_REGION("gfxram", 0)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( pv1000_io, AS_IO, 8, pv1000_state )
-	ADDRESS_MAP_GLOBAL_MASK( 0xff )
-	AM_RANGE( 0xf8, 0xff ) AM_READWRITE( pv1000_io_r, pv1000_io_w )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0xf8, 0xff) AM_READWRITE(io_r, io_w)
 ADDRESS_MAP_END
 
 
-WRITE8_MEMBER( pv1000_state::pv1000_gfxram_w )
+WRITE8_MEMBER( pv1000_state::gfxram_w )
 {
 	UINT8 *gfxram = memregion( "gfxram" )->base();
 
@@ -203,14 +206,14 @@ WRITE8_MEMBER( pv1000_state::pv1000_gfxram_w )
 }
 
 
-WRITE8_MEMBER( pv1000_state::pv1000_io_w )
+WRITE8_MEMBER( pv1000_state::io_w )
 {
 	switch (offset)
 	{
 	case 0x00:
 	case 0x01:
 	case 0x02:
-		//logerror("pv1000_io_w offset=%02x, data=%02x (%03d)\n", offset, data , data);
+		//logerror("io_w offset=%02x, data=%02x (%03d)\n", offset, data , data);
 		m_sound->voice_w(space, offset, data);
 	break;
 
@@ -234,11 +237,11 @@ WRITE8_MEMBER( pv1000_state::pv1000_io_w )
 }
 
 
-READ8_MEMBER( pv1000_state::pv1000_io_r )
+READ8_MEMBER( pv1000_state::io_r )
 {
 	UINT8 data = m_io_regs[offset];
 
-//  logerror("pv1000_io_r offset=%02x\n", offset );
+//  logerror("io_r offset=%02x\n", offset );
 
 	switch ( offset )
 	{
@@ -308,37 +311,17 @@ PALETTE_INIT_MEMBER(pv1000_state, pv1000)
 
 DEVICE_IMAGE_LOAD_MEMBER( pv1000_state, pv1000_cart )
 {
-	UINT8 *cart = memregion("cart")->base();
-	UINT32 size;
-
-	if (image.software_entry() == NULL)
-		size = image.length();
-	else
-		size = image.get_software_region_length("rom");
-
-
+	UINT32 size = m_cart->common_get_size("rom");
+	
 	if (size != 0x2000 && size != 0x4000)
 	{
 		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
 		return IMAGE_INIT_FAIL;
 	}
-
-	if (image.software_entry() == NULL)
-	{
-		if (image.fread( cart, size) != size)
-		{
-			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unable to fully read from file");
-			return IMAGE_INIT_FAIL;
-		}
-	}
-	else
-		memcpy(cart, image.get_software_region("rom"), size);
-
-
-	/* Mirror 8KB rom */
-	if (size == 0x2000)
-		memcpy(cart + 0x2000, cart, 0x2000);
-
+	
+	m_cart->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
+	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");			
+	
 	return IMAGE_INIT_PASS;
 }
 
@@ -406,7 +389,7 @@ void pv1000_state::pv1000_postload()
 {
 	// restore GFX ram
 	for (int i = 0; i < 0x400; i++)
-		pv1000_gfxram_w(m_maincpu->space(AS_PROGRAM), i, m_gfxram[i]);
+		gfxram_w(m_maincpu->space(AS_PROGRAM), i, m_gfxram[i]);
 }
 
 void pv1000_state::machine_start()
@@ -416,6 +399,15 @@ void pv1000_state::machine_start()
 
 	m_gfxram = memregion("gfxram")->base();
 	save_pointer(NAME(m_gfxram), 0x400);
+
+	if (m_cart->exists())
+	{
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0x0000, 0x7fff, read8_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_cart));
+
+		// FIXME: this is needed for gfx decoding, but there is probably a cleaner solution!
+		astring region_tag;
+		memcpy(memregion("gfxrom")->base(), memregion(region_tag.cpy(m_cart->tag()).cat(GENERIC_ROM_REGION_TAG))->base(), m_cart->get_rom_size());
+	}		
 
 	save_item(NAME(m_io_regs));
 	save_item(NAME(m_fd_data));
@@ -450,7 +442,7 @@ static const gfx_layout pv1000_3bpp_gfx =
 
 
 static GFXDECODE_START( pv1000 )
-	GFXDECODE_ENTRY( "cart", 8, pv1000_3bpp_gfx, 0, 8 )
+	GFXDECODE_ENTRY( "gfxrom", 8, pv1000_3bpp_gfx, 0, 8 )
 	GFXDECODE_ENTRY( "gfxram", 8, pv1000_3bpp_gfx, 0, 8 )
 GFXDECODE_END
 
@@ -478,11 +470,9 @@ static MACHINE_CONFIG_START( pv1000, pv1000_state )
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
 
 	/* Cartridge slot */
-	MCFG_CARTSLOT_ADD("cart")
-	MCFG_CARTSLOT_EXTENSION_LIST("bin")
-	MCFG_CARTSLOT_MANDATORY
-	MCFG_CARTSLOT_INTERFACE("pv1000_cart")
-	MCFG_CARTSLOT_LOAD(pv1000_state,pv1000_cart)
+	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_linear_slot, "pv1000_cart")
+	MCFG_GENERIC_MANDATORY
+	MCFG_GENERIC_LOAD(pv1000_state, pv1000_cart)
 
 	/* Software lists */
 	MCFG_SOFTWARE_LIST_ADD("cart_list","pv1000")
@@ -490,7 +480,7 @@ MACHINE_CONFIG_END
 
 
 ROM_START( pv1000 )
-	ROM_REGION( 0x4000, "cart", ROMREGION_ERASE00 )
+	ROM_REGION( 0x4000, "gfxrom", ROMREGION_ERASE00 )
 	ROM_REGION( 0x400, "gfxram", ROMREGION_ERASE00 )
 ROM_END
 

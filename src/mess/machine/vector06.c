@@ -66,9 +66,11 @@ WRITE8_MEMBER( vector06_state::vector06_color_set )
 
 READ8_MEMBER( vector06_state::vector06_romdisk_portb_r )
 {
-	UINT8 *romdisk = memregion("maincpu")->base() + 0x18000;
-	UINT16 addr = (m_romdisk_msb | m_romdisk_lsb) & 0x7fff;
-	return romdisk[addr];
+	UINT16 addr = (m_romdisk_msb << 8) | m_romdisk_lsb;
+	if (m_cart->exists() && addr < m_cart->get_rom_size())
+		return m_cart->read_rom(space, addr);
+	else
+		return 0xff;
 }
 
 WRITE8_MEMBER( vector06_state::vector06_romdisk_porta_w )
@@ -78,7 +80,7 @@ WRITE8_MEMBER( vector06_state::vector06_romdisk_porta_w )
 
 WRITE8_MEMBER( vector06_state::vector06_romdisk_portc_w )
 {
-	m_romdisk_msb = data << 8;
+	m_romdisk_msb = data;
 }
 
 READ8_MEMBER( vector06_state::vector06_8255_1_r )

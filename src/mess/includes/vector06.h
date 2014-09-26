@@ -15,9 +15,10 @@
 #include "machine/ram.h"
 #include "machine/wd17xx.h"
 #include "imagedev/cassette.h"
-#include "imagedev/cartslot.h"
 #include "imagedev/flopdrv.h"
 #include "formats/basicdsk.h"
+#include "bus/generic/slot.h"
+#include "bus/generic/carts.h"
 
 
 class vector06_state : public driver_device
@@ -27,6 +28,7 @@ public:
 		: driver_device(mconfig, type, tag),
 	m_maincpu(*this, "maincpu"),
 	m_cassette(*this, "cassette"),
+	m_cart(*this, "cartslot"),
 	m_fdc(*this, "wd1793"),
 	m_ppi(*this, "ppi8255"),
 	m_ppi2(*this, "ppi8255_2"),
@@ -36,6 +38,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cassette;
+	required_device<generic_slot_device> m_cart;
 	required_device<fd1793_device> m_fdc;
 	required_device<i8255_device> m_ppi;
 	required_device<i8255_device> m_ppi2;
@@ -57,7 +60,7 @@ public:
 	UINT8 m_keyboard_mask;
 	UINT8 m_color_index;
 	UINT8 m_video_mode;
-	UINT16 m_romdisk_msb;
+	UINT8 m_romdisk_msb;
 	UINT8 m_romdisk_lsb;
 	UINT8 m_vblank_state;
 	void vector06_set_video_mode(int width);

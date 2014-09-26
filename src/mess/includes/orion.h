@@ -9,11 +9,14 @@
 
 #include "machine/wd_fdc.h"
 #include "includes/radio86.h"
+#include "cpu/z80/z80.h"
+#include "cpu/i8085/i8085.h"
 #include "machine/i8255.h"
 #include "machine/ram.h"
 #include "machine/mc146818.h"
 #include "sound/speaker.h"
 #include "sound/ay8910.h"
+#include "sound/wave.h"
 
 
 class orion_state : public radio86_state

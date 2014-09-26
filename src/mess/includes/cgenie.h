@@ -11,6 +11,8 @@
 #include "imagedev/cassette.h"
 #include "machine/ram.h"
 #include "sound/ay8910.h"
+#include "bus/generic/slot.h"
+#include "bus/generic/carts.h"
 
 // CRTC 6845
 struct CRTC6845
@@ -46,6 +48,7 @@ public:
 		m_fontram(*this, "fontram"),
 		m_maincpu(*this, "maincpu"),
 		m_cassette(*this, "cassette"),
+		m_cart(*this, "cartslot"),
 		m_ram(*this, RAM_TAG),
 		m_ay8910(*this, "ay8910"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -91,6 +94,7 @@ public:
 	DECLARE_WRITE8_MEMBER(cgenie_sh_control_port_w);
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cassette;
+	required_device<generic_slot_device> m_cart;
 	required_device<ram_device> m_ram;
 	required_device<ay8910_device> m_ay8910;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -143,6 +147,7 @@ public:
 	DECLARE_WRITE8_MEMBER( cgenie_index_w );
 	DECLARE_WRITE8_MEMBER( cgenie_register_w );
 
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cgenie_cart);
 };
 
 #endif /* CGENIE_H_ */
