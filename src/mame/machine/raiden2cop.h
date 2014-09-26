@@ -230,14 +230,14 @@ public:
 
 	struct LEGACY_collision_info
 	{
-		LEGACY_collision_info():
-		min_x(0),
-		min_y(0),
-		max_x(0),
-		max_y(0)
-		 {}
+		LEGACY_collision_info()
+		{
+			min[0] = min[1] = min[2] = 0;
+			max[0] = max[1] = max[2] = 0;
+		
+		}
 
-		INT16 min_x,min_y,max_x,max_y;
+		INT16 min[3], max[3];
 	};
 
 	struct LEGACY_collision_info m_LEGACY_cop_collision_info[2];
