@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<softwarelist name="cgenie_cart" description="EACA Colour Genie cartridges">
+
+<!-- Where was this plugged exactly?!? -->
+
+	<software name="cdosintf">
+		<description>Colour DOS Interface</description>
+		<year>19??</year>
+		<publisher>&lt;homebrew?&gt;</publisher>
+		<part name="cart" interface="cgenie_cart">
+			<dataarea name="rom" size="2772">
+				<rom name="newe000.bin" size="2772" crc="953491a7" sha1="8d6a739a9058b3834897a15bcda5348b94008f5a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+
+</softwarelist>
