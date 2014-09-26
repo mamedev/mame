@@ -52,10 +52,6 @@ protected:
 	UINT16  ST;     // Status register
 
 private:
-	// Max address
-	//UINT16  m_prgaddr_mask;
-	//UINT16  m_cruaddr_mask;
-
 	UINT16  m_state_any;
 };
 

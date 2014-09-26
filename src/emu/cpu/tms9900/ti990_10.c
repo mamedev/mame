@@ -47,8 +47,6 @@ ti990_10_device::ti990_10_device(const machine_config &mconfig, const char *tag,
 		m_io_config("cru", ENDIANNESS_BIG, 8, 12),
 		m_prgspace(NULL),
 		m_cru(NULL)
-		//m_prgaddr_mask((1<<16)-1),
-		//m_cruaddr_mask((1<<12)-1)
 {
 }
 

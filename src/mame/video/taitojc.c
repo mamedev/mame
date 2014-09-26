@@ -364,7 +364,7 @@ UINT32 taitojc_state::screen_update_dendego(screen_device &screen, bitmap_ind16 
 	if (level != output_get_value("counter0"))
 		output_set_value("counter0", level);
 
-	btn = m_analog_inp[0]->read_safe(0) & 0xff;
+	btn = m_analog_ports[0]->read() & 0xff;
 	for (level = 10; level > 0; level--)
 		if (btn >= dendego_brake_table[level]) break;
 

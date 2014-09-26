@@ -101,8 +101,6 @@ Other references can be found on spies.com:
 
 */
 
-//#include "tms9900l.h"
-
 
 #if (TMS99XX_MODEL == TI990_10_ID)
 

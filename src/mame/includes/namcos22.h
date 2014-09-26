@@ -200,7 +200,7 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
-		m_adc_inp(*this, "ADC")
+		m_adc_ports(*this, "ADC")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -229,7 +229,7 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-	optional_ioport_array<8> m_adc_inp;
+	optional_ioport_array<8> m_adc_ports;
 
 
 	UINT8 m_syscontrol[0x20];
