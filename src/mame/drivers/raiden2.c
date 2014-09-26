@@ -2288,6 +2288,42 @@ ROM_START( raidendxnl )
 	ROM_LOAD( "pcm.u1018", 0x00000, 0x40000, CRC(8cf0d17e) SHA1(0fbe0b1e1ca5360c7c8329331408e3d799b4714c) ) /* Shared with original Raiden 2 */
 ROM_END
 
+
+ROM_START( raidendxj )
+	ROM_REGION( 0x200000, "mainprg", 0 ) /* v30 main cpu */
+	ROM_LOAD32_BYTE("rdxj_1.u1211", 0x000000, 0x80000, CRC(5af382e1) SHA1(a11fc181da322f484815f55a510ce7e6c7df2d60) )
+	ROM_LOAD32_BYTE("rdxj_2.u0212", 0x000001, 0x80000, CRC(899966fc) SHA1(0f91c2b05a44afb4c4b74e115a8fa530fb6d6414) )
+	ROM_LOAD32_BYTE("rdxj_3.u129",  0x000002, 0x80000, CRC(e7f08013) SHA1(1f99672d8fdbda847c6552da210c417b21ca78ac) )
+	ROM_LOAD32_BYTE("rdxj_4.u1212", 0x000003, 0x80000, CRC(78037e1f) SHA1(8d9c4188ca808e670e330e70e906bb1d27e36492) )
+
+	ROM_REGION( 0x40000, "user2", 0 )   /* COPX */
+	ROM_LOAD( "copx-d2.u0313", 0x00000, 0x40000, CRC(a6732ff9) SHA1(c4856ec77869d9098da24b1bb3d7d58bb74b4cda) ) /* Shared with original Raiden 2 */
+
+	ROM_REGION( 0x20000, "audiocpu", ROMREGION_ERASEFF ) /* 64k code for sound Z80 */
+	ROM_LOAD( "rdxj_5.u1110", 0x000000, 0x08000, CRC(8c46857a) SHA1(8b269cb20adf960ba4eb594d8add7739dbc9a837) )
+	ROM_CONTINUE(0x10000,0x8000)
+	ROM_COPY( "audiocpu", 0, 0x018000, 0x08000 )
+
+	ROM_REGION( 0x020000, "gfx1", 0 ) /* chars */
+	ROM_LOAD( "rdxj_7.u0724", 0x000000, 0x020000, CRC(ec31fa10) SHA1(e39c9d95699dbeb21e3661d863eee503c9011bbc) )
+
+	ROM_REGION( 0x400000, "gfx2", 0 ) /* background gfx */
+	ROM_LOAD( "dx_back-1.u075",  0x000000, 0x200000, CRC(90970355) SHA1(d71d57cd550a800f583550365102adb7b1b779fc) )
+	ROM_LOAD( "dx_back-2.u0714", 0x200000, 0x200000, CRC(5799af3e) SHA1(85d6532abd769da77bcba70bd2e77915af40f987) )
+
+	ROM_REGION( 0x800000, "gfx3", 0 ) /* sprite gfx (encrypted) */
+	ROM_LOAD32_WORD( "raiden_2_seibu_obj-1.u0811", 0x000000, 0x200000, CRC(ff08ef0b) SHA1(a1858430e8171ca8bab785457ef60e151b5e5cf1) ) /* Shared with original Raiden 2 */
+	ROM_LOAD32_WORD( "raiden_2_seibu_obj-2.u082",  0x000002, 0x200000, CRC(638eb771) SHA1(9774cc070e71668d7d1d20795502dccd21ca557b) ) /* Shared with original Raiden 2 */
+	ROM_LOAD32_WORD( "dx_obj-3.u0837", 0x400000, 0x200000, CRC(ba381227) SHA1(dfc4d659aca1722a981fa56a31afabe66f444d5d) )
+	ROM_LOAD32_WORD( "dx_obj-4.u0836", 0x400002, 0x200000, CRC(65e50d19) SHA1(c46147b4132abce7314b46bf419ce4773e024b05) )
+
+	ROM_REGION( 0x100000, "oki1", 0 )   /* ADPCM samples */
+	ROM_LOAD( "rdxj_6.u1017", 0x00000, 0x40000, CRC(9a9196da) SHA1(3d1ee67fb0d40a231ce04d10718f07ffb76db455) )
+
+	ROM_REGION( 0x100000, "oki2", 0 )   /* ADPCM samples */
+	ROM_LOAD( "pcm.u1018", 0x00000, 0x40000, CRC(8cf0d17e) SHA1(0fbe0b1e1ca5360c7c8329331408e3d799b4714c) ) /* Shared with original Raiden 2 */
+ROM_END
+
 /* Zero Team sets */
 /* Zero team is slightly older hardware (early 93 instead of late 93) but
 almost identical to raiden 2 with a few key differences:
@@ -2861,6 +2897,7 @@ GAME( 1994, raidendxk,  raidendx, raidendx, raidendx, raiden2_state, raidendx, R
 GAME( 1994, raidendxu,  raidendx, raidendx, raidendx, raiden2_state, raidendx, ROT270, "Seibu Kaihatsu (Fabtek license)", "Raiden DX (US)", GAME_SUPPORTS_SAVE )
 GAME( 1994, raidendxg,  raidendx, raidendx, raidendx, raiden2_state, raidendx, ROT270, "Seibu Kaihatsu (Tuning license)", "Raiden DX (Germany)", GAME_SUPPORTS_SAVE )
 GAME( 1994, raidendxnl, raidendx, raidendx, raidendx, raiden2_state, raidendx, ROT270, "Seibu Kaihatsu", "Raiden DX (Holland)", GAME_SUPPORTS_SAVE )
+GAME( 1994, raidendxj,  raidendx, raidendx, raidendx, raiden2_state, raidendx, ROT270, "Seibu Kaihatsu", "Raiden DX (Japan)", GAME_SUPPORTS_SAVE )
 
 GAME( 1993, zeroteam,   0,        zeroteam, zeroteam, raiden2_state, zeroteam, ROT0,   "Seibu Kaihatsu (Fabtek license)", "Zero Team USA (US)", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
 GAME( 1993, zeroteama,  zeroteam, zeroteam, zeroteam, raiden2_state, zeroteam, ROT0,   "Seibu Kaihatsu", "Zero Team (Japan?, earlier?)", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
