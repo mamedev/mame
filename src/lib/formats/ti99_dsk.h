@@ -4,7 +4,7 @@
 
     TI99 and Geneve disk images
 
-    Michael Zapf, Feb 2014
+    Michael Zapf, Sept 2014
 
 *********************************************************************/
 
@@ -14,31 +14,57 @@
 #include "flopimg.h"
 #include "wd177x_dsk.h"
 
+class ti99_floppy_format : public floppy_image_format_t
+{
+public:
+	bool supports_save() const { return true; }
+	bool load(io_generic *io, UINT32 form_factor, floppy_image *image);
+	bool save(io_generic *io, floppy_image *image);
+
+protected:
+	int decode_bitstream(const UINT8 *bitstream, UINT8 *trackdata, int *sector, int cell_count, int encoding, UINT8 gapbytes, int track_size);
+	UINT8 get_data_from_encoding(UINT16 raw);
+
+	virtual int min_heads() =0;
+
+	virtual void determine_sizes(io_generic *io, int& cell_size, int& sector_count, int& heads) =0;
+	virtual int get_track_size(int cell_size, int sector_count) =0;
+	virtual void load_track(io_generic *io, UINT8 *trackdata, int head, int track, int sectorcount, int trackcount, int cellsize) =0;
+	virtual void write_track(io_generic *io, UINT8 *trackdata, int *sector, int track, int head, int maxsect, int maxtrack, int numbytes) =0;
+
+	int get_encoding(int cell_size);
+	int get_track_size(int cell_size);
+
+	void generate_track_fm(int track, int head, int cell_size, UINT8* trackdata, floppy_image *image);
+	void generate_track_mfm(int track, int head, int cell_size, UINT8* trackdata, floppy_image *image);
+
+	bool check_for_address_marks(UINT8* trackdata, int encoding);
+
+	// Debugging
+	void showtrack(UINT8* trackdata, int length);
+};
+
 /*
     Modern implementation of the sector dump format.
 */
-class ti99_sdf_format : public wd177x_format
+class ti99_sdf_format : public ti99_floppy_format
 {
 public:
-	ti99_sdf_format(): wd177x_format(formats) { }
-
 	int identify(io_generic *io, UINT32 form_factor);
-
 	const char *name() const;
 	const char *description() const;
 	const char *extensions() const;
-	bool supports_save() const;
 
 private:
-	static const format formats[];
-	floppy_image_format_t::desc_e* get_desc_fm(const format &f, int &current_size, int &end_gap_index);
-	floppy_image_format_t::desc_e* get_desc_mfm(const format &f, int &current_size, int &end_gap_index);
+	void determine_sizes(io_generic *io, int& cell_size, int& sector_count, int& heads);
+	int get_track_size(int cell_size, int sector_count);
+	void write_track(io_generic *io, UINT8 *trackdata, int *sector, int track, int head, int maxsect, int maxtrack, int numbytes);
+	void load_track(io_generic *io, UINT8 *trackdata, int head, int track, int sectorcount, int trackcount, int cellsize);
 
-	int get_format_param(io_generic *io);
-	int get_image_offset(const format &f, int head, int track);
-	int find_size(io_generic *io, UINT32 form_factor);
+	// This format supports single-sided images
+	int min_heads() { return 1; }
 
-	typedef struct ti99_vib
+	struct ti99vib
 	{
 		char    name[10];       // volume name (10 characters, pad with spaces)
 		UINT8   totsecsMSB;     // disk length in sectors (big-endian) (usually 360, 720 or 1440)
@@ -52,7 +78,7 @@ private:
 		UINT8   res[36];        // Empty for traditional disks, or up to 3 directory pointers
 		UINT8   abm[200];       // allocation bitmap: a 1 for each sector in use (sector 0 is LSBit of byte 0,
 								// sector 7 is MSBit of byte 0, sector 8 is LSBit of byte 1, etc.)
-	} vib_t;
+	};
 };
 
 extern const floppy_format_type FLOPPY_TI99_SDF_FORMAT;
@@ -60,47 +86,22 @@ extern const floppy_format_type FLOPPY_TI99_SDF_FORMAT;
 /*
     Modern implementation of the track dump format.
 */
-class ti99_tdf_format : public floppy_image_format_t
+class ti99_tdf_format : public ti99_floppy_format
 {
 public:
-
 	int identify(io_generic *io, UINT32 form_factor);
-
-	bool load(io_generic *io, UINT32 form_factor, floppy_image *image);
-	bool save(io_generic *io, floppy_image *image);
-
 	const char *name() const;
 	const char *description() const;
 	const char *extensions() const;
-	bool supports_save() const;
 
 private:
+	void determine_sizes(io_generic *io, int& cell_size, int& sector_count, int& heads);
+	void load_track(io_generic *io, UINT8 *trackdata, int head, int track, int sectorcount, int trackcount, int cellsize);
+	void write_track(io_generic *io, UINT8 *trackdata, int *sector, int track, int head, int maxsect, int maxtrack, int numbytes);
+	int get_track_size(int cell_size, int sector_count);
 
-	struct format {
-		UINT32 form_factor;      // See floppy_image for possible values
-		UINT32 variant;          // See floppy_image for possible values
-		UINT32 encoding;         // See floppy_image for possible values
-		int cell_size;           // See floppy_image_format_t for details
-		int sector_count;
-		int track_count;
-		int head_count;
-		int track_size;
-		UINT8 gapbytes;
-	};
-
-	static const format formats[];
-
-	int get_format_param(io_generic *io);
-	int get_image_offset(const format &f, int head, int track);
-	int find_size(io_generic *io, UINT32 form_factor);
-
-	void generate_track_fm(int track, int head, int cell_size, UINT8* trackdata, floppy_image *image);
-	void generate_track_mfm(int track, int head, int cell_size, UINT8* trackdata, floppy_image *image);
-
-	int find_start(UINT8* trackdata, int track_size, int encoding);
-	bool has_byteseq(UINT8* trackdata, int track_size, UINT8 byte, int pos, int count);
-
-	void extract_track_from_bitstream(const UINT8 *bitstream, int track_size, UINT8 *trackdata);
+	// This format only supports double-sided images
+	int min_heads() { return 2; }
 };
 
 extern const floppy_format_type FLOPPY_TI99_TDF_FORMAT;

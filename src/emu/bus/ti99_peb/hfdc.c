@@ -452,7 +452,7 @@ WRITE8_MEMBER(myarc_hfdc_device::cruwrite)
 			break;
 
 		case 2:
-			m_CD = (data != 0)? (m_CD | 1) : (m_CD & 0xfe);
+			m_hdc9234->set_clock_divider(0, data);
 
 			// Activate motor
 			// When 1, let motor run continuously. When 0, a simple monoflop circuit keeps the line active for another 4 sec
@@ -469,9 +469,9 @@ WRITE8_MEMBER(myarc_hfdc_device::cruwrite)
 			break;
 
 		case 3:
-			m_CD = (data != 0)? (m_CD | 2) : (m_CD & 0xfd);
+			m_hdc9234->set_clock_divider(1, data);
 			m_rom_page = (data != 0)? (m_rom_page | 2) : (m_rom_page & 0xfd);
-			if (TRACE_CRU) logerror("%s: ROM page = %d, CD = %d\n", tag(), m_rom_page, m_CD);
+			if (TRACE_CRU) logerror("%s: ROM page = %d\n", tag(), m_rom_page);
 			break;
 
 		case 4:
@@ -828,7 +828,6 @@ void myarc_hfdc_device::device_reset()
 
 	m_dip = m_irq = CLEAR_LINE;
 	m_see_switches = false;
-	m_CD = 0;
 	m_motor_running = false;
 	m_selected = false;
 	m_lastval = 0;
@@ -916,6 +915,7 @@ static SLOT_INTERFACE_START( hfdc_floppies )
 	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )        // 40 tracks
 	SLOT_INTERFACE( "525qd", FLOPPY_525_QD )        // 80 tracks
 	SLOT_INTERFACE( "35dd", FLOPPY_35_DD )          // 80 tracks
+	SLOT_INTERFACE( "35hd", FLOPPY_35_HD )          // 80 tracks 1.4 MiB
 SLOT_INTERFACE_END
 
 MACHINE_CONFIG_FRAGMENT( ti99_hfdc )

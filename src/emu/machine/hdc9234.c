@@ -226,8 +226,7 @@ enum
 	TYPE_AT = 0x00,
 	TYPE_HD = 0x01,
 	TYPE_FLOPPY8 = 0x02,
-	TYPE_FLOPPY5 = 0x03,
-	DRIVE_TYPE = 0x03
+	TYPE_FLOPPY5 = 0x03
 };
 
 /*
@@ -1243,7 +1242,7 @@ void hdc9234_device::read_sectors()
 		if (TRACE_READ) logerror("%s: READ SECTORS %s command %02x, CHS=(%d,%d,%d)\n", tag(), logical? "LOGICAL": "PHYSICAL", current_command(), desired_cylinder(), desired_head(), desired_sector());
 		m_retry_save = m_register_w[RETRY_COUNT];
 		m_multi_sector = (m_register_w[SECTOR_COUNT] != 1);
-
+		m_write = false;
 		m_substate = READ_ID;
 	}
 
@@ -1262,7 +1261,6 @@ void hdc9234_device::read_sectors()
 			verify(cont, logical);  // for physical, only verify the first sector
 			break;
 		case DATA_TRANSFER:
-			m_write = false;
 			data_transfer(cont);
 			break;
 		default:
@@ -1344,6 +1342,7 @@ void hdc9234_device::format_track()
 		m_deleted = (current_command() & 0x10)==0;
 		m_reduced_write_current = (current_command() & 0x08)!=0;
 		m_precompensation = (current_command() & 0x07);
+		m_write = true;
 
 		m_gap0_size = -m_register_w[DMA7_0] & 0xff;
 		m_gap1_size = -m_register_w[DMA15_8] & 0xff;
@@ -1439,9 +1438,9 @@ void hdc9234_device::write_sectors()
 		m_precompensation = (current_command() & 0x07);
 		// Important for DATA TRANSFER
 		m_transfer_enabled = true;
-		m_write = true;
 		m_sync_size = fm_mode()? 6 : 12;
 		m_gap2_size = fm_mode()? 11 : 22;
+		m_write = false; // until we're writing
 	}
 
 	int cont = NEXT;
@@ -1459,6 +1458,7 @@ void hdc9234_device::write_sectors()
 			verify(cont, logical);
 			break;
 		case DATA_TRANSFER:
+			m_write = true;
 			data_transfer(cont);
 			break;
 		default:
@@ -1518,10 +1518,10 @@ int hdc9234_device::step_time()
 	int time = 0;
 	int index = m_register_w[MODE] & MO_STEPRATE;
 	// Get seek time.
-	if ((m_selected_drive_type & DRIVE_TYPE) == TYPE_FLOPPY8)
+	if (m_selected_drive_type == TYPE_FLOPPY8)
 		time = step_flop8[index] - pulse_flop8;
 
-	else if ((m_selected_drive_type & DRIVE_TYPE) == TYPE_FLOPPY5)
+	else if (m_selected_drive_type == TYPE_FLOPPY5)
 		time = step_flop5[index] - pulse_flop5;
 	else
 		time = step_hd[index] - pulse_hd;
@@ -1537,10 +1537,10 @@ int hdc9234_device::pulse_width()
 {
 	int time = 0;
 	// Get seek time.
-	if ((m_selected_drive_type & DRIVE_TYPE) == TYPE_FLOPPY8)
+	if (m_selected_drive_type == TYPE_FLOPPY8)
 		time = pulse_flop8;
 
-	else if ((m_selected_drive_type & DRIVE_TYPE) == TYPE_FLOPPY5)
+	else if (m_selected_drive_type == TYPE_FLOPPY5)
 		time = pulse_flop5;
 	else
 		time = pulse_hd;
@@ -1606,7 +1606,7 @@ void hdc9234_device::live_start(int state)
 	m_live_state.data_reg = 0;
 	m_live_state.last_data_bit = false;
 
-	pll_reset(m_live_state.time);
+	pll_reset(m_live_state.time, m_write);
 	m_checkpoint_state = m_live_state;
 
 	// Save checkpoint
@@ -2116,14 +2116,15 @@ void hdc9234_device::live_run_until(attotime limit)
 				write_on_track(encode((m_live_state.crc >> 8) & 0xff), 1, WRITE_DATA_CRC);
 			}
 			else
-				m_live_state.state = WRITE_DONE;
+				// Write a filler byte so that the last CRC bit is saved correctly
+				write_on_track(encode(0xff), 1, WRITE_DONE);
 
 			break;
 
 		case WRITE_DONE:
 			if (m_substate == DATA_TRANSFER_WRITE)
 			{
-				if (TRACE_WRITE) logerror("%s: Write sector complete\n", tag());
+				if (TRACE_WRITE && TRACE_DETAIL) logerror("%s: Write sector complete\n", tag());
 				m_pll.stop_writing(m_floppy, m_live_state.time);
 				m_live_state.state = IDLE;
 				return;
@@ -2605,11 +2606,27 @@ void hdc9234_device::encode_raw(UINT16 raw)
 	checkpoint();
 }
 
-void hdc9234_device::pll_reset(const attotime &when)
+/*
+    Reset the PLL. For reading, data must pass through a dedicated data
+    separator. The clock rate is delivered from
+    m_clock_divider with values 1-3, where 1 is FM (4000), 2 is MFM (2000),
+    and 3 is MFM (1000).
+    When writing, the controller generates the proper output bitstream, so we
+    have to set it from its own state (fm/mfm and device type).
+*/
+void hdc9234_device::pll_reset(const attotime &when, bool output)
 {
 	m_pll.reset(when);
-	// In FM mode, cells are 4 usec long; in MFM they are 2 usec long.
-	m_pll.set_clock(attotime::from_usec(fm_mode()? 4 : 2));
+
+	if (output)
+	{
+		if (fm_mode())
+			m_pll.set_clock(attotime::from_nsec(4000));
+		else
+			m_pll.set_clock(attotime::from_nsec((m_selected_drive_type==TYPE_FLOPPY5)? 2000 : 1000));
+	}
+	else
+		m_pll.set_clock(attotime::from_nsec(8000 >> (~m_clock_divider & 0x03)));
 }
 
 void hdc9234_device::checkpoint()
@@ -2999,6 +3016,17 @@ WRITE_LINE_MEMBER( hdc9234_device::dmaack )
 }
 
 /*
+    Clock divider. This input line actually belongs to the data separator which
+    is a separate circuit. Maybe we will take it out of this implementation
+    at some time and make it a device of its own.
+    line: CD0 (0) and CD1(1), value 0 or 1
+*/
+void hdc9234_device::set_clock_divider(int line, int value)
+{
+	set_bits(m_clock_divider, (line==0)? 1 : 2, value&1);
+}
+
+/*
     Reset the controller. Negative logic, but we use ASSERT_LINE.
 */
 WRITE_LINE_MEMBER( hdc9234_device::reset )
@@ -3029,6 +3057,7 @@ void hdc9234_device::device_start()
 
 void hdc9234_device::device_reset()
 {
+	m_clock_divider = 0;
 	m_deleted = false;
 	m_executing = false;
 	m_event_line = UNDEF;

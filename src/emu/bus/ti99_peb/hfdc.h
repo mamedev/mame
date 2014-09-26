@@ -153,9 +153,6 @@ private:
 	// Output 2 latch (STB3)
 	UINT8   m_output2_latch;
 
-	// Clock divider bits 0 and 1. Unused in this emulation. */
-	int     m_CD;
-
 	// Needed for triggering the motor monoflop
 	UINT8 m_lastval;
 

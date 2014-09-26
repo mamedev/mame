@@ -98,6 +98,12 @@ public:
 	// we implement it as a push call
 	void auxbus_in( UINT8 data );
 
+	// We pretend that the data separator is part of this controller. It is
+	// in fact a separate circuit. The clock divider must be properly set
+	// for MFM (CD0=1, CD1=0) or FM (CD0=0, CD1=1).
+	// This is not set by the controller itself!
+	void set_clock_divider(int pin, int value);
+
 	// Used to reconfigure the drive connections. Floppy drive selection is done
 	// using the user-programmable outputs. Hence, the connection
 	// is changed outside of the controller, and by this way we let it know.
@@ -235,8 +241,11 @@ private:
 	// Phase-locked loops
 	fdc_pll_t m_pll, m_checkpoint_pll;
 
+	// Clock divider value
+	UINT8 m_clock_divider;
+
 	// Resets the PLL to the given time
-	void pll_reset(const attotime &when);
+	void pll_reset(const attotime &when, bool write);
 
 	// Encodes the byte using FM or MFM. Changes the m_live_state members
 	// shift_reg, data_reg, and last_data_bit
