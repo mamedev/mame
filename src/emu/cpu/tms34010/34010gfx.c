@@ -1427,16 +1427,16 @@ if ((daddr & (BITS_PER_PIXEL - 1)) != 0) osd_printf_debug("PIXBLT_R%d with odd d
 					if (!TRANSPARENCY || pixel != 0)
 						dstword = (dstword & ~dstmask) | pixel;
 
-					#if (BITS_PER_PIXEL<16)
+#if (BITS_PER_PIXEL<16)
 					/* update the source */
-					srcmask = srcmask >> BITS_PER_PIXEL;
+					srcmask >>= BITS_PER_PIXEL;
 
 					/* update the destination */
-					dstmask = dstmask >> BITS_PER_PIXEL;
-					#else
+					dstmask >>= BITS_PER_PIXEL;
+#else
 					srcmask = 0;
 					dstmask = 0;
-					#endif
+#endif
 				}
 
 				/* write the result */
@@ -1474,16 +1474,16 @@ if ((daddr & (BITS_PER_PIXEL - 1)) != 0) osd_printf_debug("PIXBLT_R%d with odd d
 					if (!TRANSPARENCY || pixel != 0)
 						dstword = (dstword & ~dstmask) | pixel;
 
-					#if (BITS_PER_PIXEL<16)
+#if (BITS_PER_PIXEL<16)
 					/* update the source */
-					srcmask = srcmask >> BITS_PER_PIXEL;
+					srcmask >>= BITS_PER_PIXEL;
 
 					/* update the destination */
-					dstmask = dstmask >> BITS_PER_PIXEL;
-					#else
+					dstmask >>= BITS_PER_PIXEL;
+#else
 					srcmask = 0;
 					dstmask = 0;
-					#endif
+#endif
 				}
 
 				/* write the result */
@@ -1517,16 +1517,16 @@ if ((daddr & (BITS_PER_PIXEL - 1)) != 0) osd_printf_debug("PIXBLT_R%d with odd d
 					if (!TRANSPARENCY || pixel != 0)
 						dstword = (dstword & ~dstmask) | pixel;
 
-					#if (BITS_PER_PIXEL<16)
+#if (BITS_PER_PIXEL<16)
 					/* update the source */
-					srcmask = srcmask >> BITS_PER_PIXEL;
+					srcmask >>= BITS_PER_PIXEL;
 
 					/* update the destination */
-					dstmask = dstmask >> BITS_PER_PIXEL;
-					#else
+					dstmask >>= BITS_PER_PIXEL;
+#else
 					srcmask = 0;
 					dstmask = 0;
-					#endif
+#endif
 				}
 
 				/* write the result */
