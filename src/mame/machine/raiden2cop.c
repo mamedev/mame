@@ -376,6 +376,35 @@ int raiden2cop_device::find_trigger_match(UINT16 triggerval, UINT16 mask)
 					triggerval == 0xa180 || triggerval == 0xa980 || triggerval == 0xb100 || triggerval == 0xb900) /* collisions */
 					otherlog = 0;
 			}
+			else if (!strcmp(machine().system().name, "cupsoc"))
+			{
+				if (triggerval == 0x0204 || triggerval == 0x0205 || triggerval == 0x0905 ||
+					triggerval == 0x130e || triggerval == 0x138e || triggerval == 0x118e ||
+					triggerval == 0x3bb0 ||
+					triggerval == 0x42c2 ||
+					triggerval == 0x5105 || triggerval == 0x5905 ||
+					triggerval == 0x6200 ||
+					triggerval == 0xd104 ||
+					triggerval == 0xdde5 ||
+					triggerval == 0xe30e || triggerval == 0xe18e ||
+					triggerval == 0xf105 ||
+					triggerval == 0x8100 || triggerval == 0x8900) /* sin / cos */
+					otherlog = 0;
+			}
+			else if (!strcmp(machine().system().name, "heatbrl"))
+			{
+				// note, stage 2 end boss (fire breather) will sometimes glitch, also shows 'divide by zero' from MAME when it fires (and homing missile stg3 - they don't home in properly either?)
+				// stage 2+3 priority of boaters is wrong
+				// game eventually crashes with address error (happened in stage 4 for me)
+
+				if (triggerval == 0x0205 ||
+					triggerval == 0x8100 || triggerval == 0x8900 || /* sin / cos */
+					triggerval == 0x138e || 
+					triggerval == 0x3bb0 ||
+					triggerval == 0x42c2 ||
+					triggerval == 0xa100 || triggerval == 0xa900 || triggerval == 0xb080 || triggerval == 0xb880) /* collisions */
+					otherlog = 0;
+			}
 			else
 			{
 				otherlog = 0;
