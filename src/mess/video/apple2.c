@@ -361,6 +361,7 @@ void apple2_state::apple2_hires_draw(bitmap_ind16 &bitmap, const rectangle &clip
 							break;
 
 						case 1:
+							w >>= 7;
 							for (b = 0; b < 7; b++) 
 							{
 								v = (w & 1);
@@ -371,6 +372,7 @@ void apple2_state::apple2_hires_draw(bitmap_ind16 &bitmap, const rectangle &clip
 							break;
 
 						case 2:
+							w >>= 7;
 							for (b = 0; b < 7; b++) 
 							{
 								v = (w & 1);
@@ -381,6 +383,7 @@ void apple2_state::apple2_hires_draw(bitmap_ind16 &bitmap, const rectangle &clip
 							break;
 
 						case 3:
+							w >>= 7;
 							for (b = 0; b < 7; b++) 
 							{
 								v = (w & 1);
@@ -395,6 +398,7 @@ void apple2_state::apple2_hires_draw(bitmap_ind16 &bitmap, const rectangle &clip
 				case 80:
 					if (m_monochrome_dhr)
 					{
+						w >>= 7;
 						for (b = 0; b < 7; b++)
 						{
 							v = (w & 1);
@@ -415,6 +419,7 @@ void apple2_state::apple2_hires_draw(bitmap_ind16 &bitmap, const rectangle &clip
 								break;
 
 							case 1:
+								w >>= 7;
 								for (b = 0; b < 7; b++)
 								{
 									v = (w & 1);
@@ -424,6 +429,7 @@ void apple2_state::apple2_hires_draw(bitmap_ind16 &bitmap, const rectangle &clip
 								break;
 
 							case 2:
+								w >>= 7;
 								for (b = 0; b < 7; b++)
 								{
 									v = (w & 1);
@@ -433,6 +439,7 @@ void apple2_state::apple2_hires_draw(bitmap_ind16 &bitmap, const rectangle &clip
 								break;
 
 							case 3:
+								w >>= 7;
 								for (b = 0; b < 7; b++)
 								{
 									v = (w & 1);
