@@ -547,7 +547,7 @@ MACHINE_RESET_MEMBER(spectrum_state,ts2068)
 
 	astring region_tag;
 	m_dock_crt = memregion(region_tag.cpy(m_dock->tag()).cat(GENERIC_ROM_REGION_TAG));
-	m_dock_cart_type = (m_dock->exists()) ? TIMEX_CART_DOCK : TIMEX_CART_NONE;
+	m_dock_cart_type = m_dock_crt ? TIMEX_CART_DOCK : TIMEX_CART_NONE;
 
 	ts2068_update_memory();
 	MACHINE_RESET_CALL_MEMBER(spectrum);
@@ -592,62 +592,71 @@ MACHINE_RESET_MEMBER(spectrum_state,tc2048)
 DEVICE_IMAGE_LOAD_MEMBER( spectrum_state, timex_cart )
 {
 	UINT32 size = m_dock->common_get_size("rom");
-	UINT8 *DOCK;
-	int chunks_in_file = 0;
-	dynamic_buffer header;
-	header.resize(9);
 
-	if (size % 0x2000 != 9)
+	if (image.software_entry() == NULL)
 	{
-		image.seterror(IMAGE_ERROR_UNSPECIFIED, "File corrupted");
-		return IMAGE_INIT_FAIL;
-	}
-	if (image.software_entry() != NULL)
-	{
-		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Loading from softlist is not supported yet");
-		return IMAGE_INIT_FAIL;
-	}
-	
-	m_dock->rom_alloc(0x10000, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
-	DOCK = m_dock->get_rom_base();
-
-	// check header
-	image.fread(header, 9);
-	
-	for (int i = 0; i < 8; i++)
-		if (header[i + 1] & 0x02) chunks_in_file++;
-	
-	if (chunks_in_file * 0x2000 + 0x09 != size)
-	{
-		image.seterror(IMAGE_ERROR_UNSPECIFIED, "File corrupted");
-		return IMAGE_INIT_FAIL;
-	}
-	
-	switch (header[0])
-	{
-		case 0x00:  logerror ("DOCK cart\n");
-			m_ram_chunks = 0;
-			for (int i = 0; i < 8; i++)
-			{
-				m_ram_chunks = m_ram_chunks | ((header[i + 1] & 0x01) << i);
-				if (header[i + 1] & 0x02)
-					image.fread(DOCK + i * 0x2000, 0x2000);
-				else
-				{
-					if (header[i + 1] & 0x01)
-						memset(DOCK + i * 0x2000, 0x00, 0x2000);
-					else
-						memset(DOCK + i * 0x2000, 0xff, 0x2000);
-				}
-			}
-			break;
-			
-		default:
-			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Cart type not supported");
+		UINT8 *DOCK;
+		int chunks_in_file = 0;
+		dynamic_buffer header;
+		header.resize(9);
+		
+		if (size % 0x2000 != 9)
+		{
+			image.seterror(IMAGE_ERROR_UNSPECIFIED, "File corrupted");
 			return IMAGE_INIT_FAIL;
+		}
+		if (image.software_entry() != NULL)
+		{
+			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Loading from softlist is not supported yet");
+			return IMAGE_INIT_FAIL;
+		}
+		
+		m_dock->rom_alloc(0x10000, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
+		DOCK = m_dock->get_rom_base();
+		
+		// check header
+		image.fread(header, 9);
+		
+		for (int i = 0; i < 8; i++)
+			if (header[i + 1] & 0x02) chunks_in_file++;
+		
+		if (chunks_in_file * 0x2000 + 0x09 != size)
+		{
+			image.seterror(IMAGE_ERROR_UNSPECIFIED, "File corrupted");
+			return IMAGE_INIT_FAIL;
+		}
+		
+		switch (header[0])
+		{
+			case 0x00:  logerror ("DOCK cart\n");
+				m_ram_chunks = 0;
+				for (int i = 0; i < 8; i++)
+				{
+					m_ram_chunks = m_ram_chunks | ((header[i + 1] & 0x01) << i);
+					if (header[i + 1] & 0x02)
+						image.fread(DOCK + i * 0x2000, 0x2000);
+					else
+					{
+						if (header[i + 1] & 0x01)
+							memset(DOCK + i * 0x2000, 0x00, 0x2000);
+						else
+							memset(DOCK + i * 0x2000, 0xff, 0x2000);
+					}
+				}
+				break;
+				
+			default:
+				image.seterror(IMAGE_ERROR_UNSPECIFIED, "Cart type not supported");
+				return IMAGE_INIT_FAIL;
+		}
+
+		logerror ("Cart loaded [Chunks %02x]\n", m_ram_chunks);
 	}
-	
-	logerror ("Cart loaded [Chunks %02x]\n", m_ram_chunks);
+	else
+	{
+		m_dock->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
+		memcpy(m_dock->get_rom_base(), image.get_software_region("rom"), size);
+	}
 
 	return IMAGE_INIT_PASS;
 }
@@ -695,9 +704,13 @@ static MACHINE_CONFIG_DERIVED( ts2068, spectrum_128 )
 
 	/* cartridge */
 	MCFG_DEVICE_REMOVE("cartslot")
-	MCFG_GENERIC_CARTSLOT_ADD("dockslot", generic_plain_slot, NULL)
-	MCFG_GENERIC_EXTENSIONS("dck")
+	MCFG_GENERIC_CARTSLOT_ADD("dockslot", generic_plain_slot, "timex_cart")
+	MCFG_GENERIC_EXTENSIONS("dck,bin")
 	MCFG_GENERIC_LOAD(spectrum_state, timex_cart)
+
+	/* Software lists */
+	MCFG_DEVICE_REMOVE("cart_list")
+	MCFG_SOFTWARE_LIST_ADD("cart_list", "timex_dock")
 
 	/* internal ram */
 	MCFG_RAM_MODIFY(RAM_TAG)
