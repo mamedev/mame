@@ -443,6 +443,7 @@ int raiden2cop_device::find_trigger_match(UINT16 triggerval, UINT16 mask)
 				// sprite priority is wrong (not command related - sort DMA)
 				// 3rd stage mid-boss does not enter properly (have to use special attack to trigger them into motion)
 				// 5th stage, does not punch door for speedboat section
+				// bats all fly in a single straight line during ending (maybe PRNG, it isn't hooked up on R2 driver?)
 
 				if (triggerval == 0x0205 || triggerval == 0x0904 ||
 					triggerval == 0x8100 || triggerval == 0x8900 || /* sin / cos */
