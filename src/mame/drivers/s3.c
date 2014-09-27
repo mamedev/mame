@@ -20,15 +20,15 @@
 Each game has its own switches, you need to know the outhole and slam-tilt ones.
 Note that T is also a tilt, but it may take 3 hits to activate it.
 
-Game          Tilt    Outhole
------------------------------
-Hot Tip       S       A
-Lucky Seven   =       M
-World Cup     J       H
-Contact       ,       V
-Disco         Enter   N
-Phoenix       M       Left
-Pokerino      ,       X
+Game          Outhole   Tilt
+------------------------------------
+Hot Tip       A         S
+Lucky Seven   M         =
+World Cup     H         J
+Contact       V         ,
+Disco         N         Enter - =
+Phoenix       Left      M
+Pokerino      X         ,
 
 
 ToDo:
@@ -73,7 +73,6 @@ public:
 	DECLARE_WRITE8_MEMBER(switch_w);
 	DECLARE_READ_LINE_MEMBER(pia28_ca1_r);
 	DECLARE_READ_LINE_MEMBER(pia28_cb1_r);
-	DECLARE_READ_LINE_MEMBER(pias_cb1_r);
 	DECLARE_WRITE_LINE_MEMBER(pia22_ca2_w) { }; //ST5
 	DECLARE_WRITE_LINE_MEMBER(pia22_cb2_w) { }; //ST-solenoids enable
 	DECLARE_WRITE_LINE_MEMBER(pia24_ca2_w) { }; //ST2
@@ -92,7 +91,6 @@ private:
 	UINT8 m_sound_data;
 	UINT8 m_strobe;
 	UINT8 m_kbdrow;
-	bool m_cb1;
 	bool m_data_ok;
 	bool m_chimes;
 	required_device<cpu_device> m_maincpu;
@@ -307,26 +305,28 @@ WRITE8_MEMBER( s3_state::sol1_w )
 	}
 	else
 	{
-		m_sound_data = ioport("SND")->read(); // 0xff or 0xbf
+		UINT8 sound_data = ioport("SND")->read(); // 0xff or 0xbf
 		if (BIT(data, 0))
-			m_sound_data &= 0xfe;
+			sound_data &= 0xfe;
 
 		if (BIT(data, 1))
-			m_sound_data &= 0xfd;
+			sound_data &= 0xfd;
 
 		if (BIT(data, 2))
-			m_sound_data &= 0xfb;
+			sound_data &= 0xfb;
 
 		if (BIT(data, 3))
-			m_sound_data &= 0xf7;
+			sound_data &= 0xf7;
 
 		if (BIT(data, 4))
-			m_sound_data &= 0x7f;
+			sound_data &= 0xef;
 
+		bool cb1 = ((sound_data & 0xbf) != 0xbf);
 
-		m_cb1 = ((m_sound_data & 0x9f) != 0x9f);
+		if (cb1)
+			m_sound_data = sound_data;
 
-		m_pias->cb1_w(m_cb1);
+		m_pias->cb1_w(cb1);
 	}
 
 	if (BIT(data, 5))
@@ -375,8 +375,8 @@ WRITE8_MEMBER( s3_state::dig0_w )
 {
 	m_strobe = data & 15;
 	m_data_ok = true;
-	output_set_value("led0", BIT(data, 4));
-	output_set_value("led1", BIT(data, 5));
+	output_set_value("led0", !BIT(data, 4));
+	output_set_value("led1", !BIT(data, 5));
 }
 
 WRITE8_MEMBER( s3_state::dig1_w )
@@ -402,11 +402,6 @@ WRITE8_MEMBER( s3_state::switch_w )
 	m_kbdrow = data;
 }
 
-READ_LINE_MEMBER( s3_state::pias_cb1_r )
-{
-	return m_cb1;
-}
-
 READ8_MEMBER( s3_state::dac_r )
 {
 	return m_sound_data;
@@ -417,7 +412,7 @@ WRITE8_MEMBER( s3_state::dac_w )
 	m_dac->write_unsigned8(data);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER( s3_state::irq)
+TIMER_DEVICE_CALLBACK_MEMBER( s3_state::irq )
 {
 	if (m_t_c > 0x70)
 		m_maincpu->set_input_line(M6800_IRQ_LINE, ASSERT_LINE);
@@ -488,7 +483,6 @@ static MACHINE_CONFIG_DERIVED( s3a, s3 )
 
 	MCFG_DEVICE_ADD("pias", PIA6821, 0)
 	MCFG_PIA_READPB_HANDLER(READ8(s3_state, dac_r))
-	MCFG_PIA_READCB1_HANDLER(READLINE(s3_state, pias_cb1_r))
 	MCFG_PIA_WRITEPA_HANDLER(WRITE8(s3_state, dac_w))
 	MCFG_PIA_IRQA_HANDLER(DEVWRITELINE("audiocpu", m6800_cpu_device, irq_line))
 	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE("audiocpu", m6800_cpu_device, irq_line))
