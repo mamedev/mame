@@ -174,7 +174,7 @@ static const gba_chip_fix_conflict_item gba_chip_fix_conflict_list[] =
 	{ "BR4J", GBA_CHIP_FLASH      }, // 1586 - Rockman EXE 4.5 - Real Operation (JPN)
 	{ "BG8J", GBA_CHIP_EEPROM_64K }, // 1853 - Ganbare! Dodge Fighters (JPN)
 	{ "AROP", GBA_CHIP_EEPROM_4K  }, // 1862 - Rocky (EUR)
-	{ "A2YE", GBA_CHIP_SRAM       }, // 1906 - Top Gun - Combat Zones (USA)
+//	"A2YE" - 1906 - Top Gun - Combat Zones (USA) - multiple NVRAM chips detected, but none present (protection against emu?)
 	{ "BKMJ", GBA_CHIP_EEPROM_4K  }, // 2039 - Kim Possible (JPN)
 	{ "BKEJ", GBA_CHIP_EEPROM_64K }, // 2047 - Konjiki no Gashbell - The Card Battle for GBA (JPN)
 	{ "BKMP", GBA_CHIP_EEPROM_4K  }, // 2297 - Kim Possible 2 - Drakken's Demise (EUR)
