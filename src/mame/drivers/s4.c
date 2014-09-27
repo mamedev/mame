@@ -16,12 +16,21 @@
     Since the maximum score is 300, the displays have 4 digits and 6 can play. They
     are Williams System 5 and should be moved to a separate driver.
 
-    Stellar Wars - it works, but the music is half-missing.
-    Flash - coins and start works, but not much else.
+
+Each game has its own switches, you need to know the outhole and slam-tilt ones.
+Note that T is also a tilt, but it may take 3 hits to activate it.
+
+Game          Outhole   Tilt
+------------------------------------
+Flash         O         I
+Stellar Wars  X
+TriZone       X         ]
+Time Warp     X         E
+
 
 ToDo:
-- Almost Everything
-
+- Scorpion: start button not working
+- Shuffle games: need a layout, and don't work.
 
 
 ************************************************************************************/
@@ -37,15 +46,15 @@ class s4_state : public genpin_class
 {
 public:
 	s4_state(const machine_config &mconfig, device_type type, const char *tag)
-		: genpin_class(mconfig, type, tag),
-	m_maincpu(*this, "maincpu"),
-	m_audiocpu(*this, "audiocpu"),
-	m_dac(*this, "dac"),
-	m_pia22(*this, "pia22"),
-	m_pia24(*this, "pia24"),
-	m_pia28(*this, "pia28"),
-	m_pia30(*this, "pia30"),
-	m_pias(*this, "pias")
+		: genpin_class(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_audiocpu(*this, "audiocpu")
+		, m_dac(*this, "dac")
+		, m_pia22(*this, "pia22")
+		, m_pia24(*this, "pia24")
+		, m_pia28(*this, "pia28")
+		, m_pia30(*this, "pia30")
+		, m_pias(*this, "pias")
 	{ }
 
 	DECLARE_READ8_MEMBER(dac_r);
@@ -61,7 +70,6 @@ public:
 	DECLARE_WRITE8_MEMBER(switch_w);
 	DECLARE_READ_LINE_MEMBER(pia28_ca1_r);
 	DECLARE_READ_LINE_MEMBER(pia28_cb1_r);
-	DECLARE_READ_LINE_MEMBER(pias_cb1_r);
 	DECLARE_WRITE_LINE_MEMBER(pia22_ca2_w) { }; //ST5
 	DECLARE_WRITE_LINE_MEMBER(pia22_cb2_w) { }; //ST-solenoids enable
 	DECLARE_WRITE_LINE_MEMBER(pia24_ca2_w) { }; //ST2
@@ -75,9 +83,13 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(audio_nmi);
 	DECLARE_MACHINE_RESET(s4);
 	DECLARE_MACHINE_RESET(s4a);
-protected:
-
-	// devices
+private:
+	UINT8 m_t_c;
+	UINT8 m_sound_data;
+	UINT8 m_strobe;
+	UINT8 m_kbdrow;
+	bool m_data_ok;
+	bool m_chimes;
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
 	optional_device<dac_device> m_dac;
@@ -86,14 +98,6 @@ protected:
 	required_device<pia6821_device> m_pia28;
 	required_device<pia6821_device> m_pia30;
 	optional_device<pia6821_device> m_pias;
-private:
-	UINT8 m_t_c;
-	UINT8 m_sound_data;
-	UINT8 m_strobe;
-	UINT8 m_kbdrow;
-	bool m_cb1;
-	bool m_data_ok;
-	bool m_chimes;
 };
 
 static ADDRESS_MAP_START( s4_main_map, AS_PROGRAM, 8, s4_state )
@@ -129,7 +133,7 @@ static INPUT_PORTS_START( s4 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER )
 
 	PORT_START("X2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_A)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_X)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_S)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_D)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_F)
@@ -153,7 +157,7 @@ static INPUT_PORTS_START( s4 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_SLASH)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_COLON)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_QUOTE)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_X)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_A)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_MINUS)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_EQUALS)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_BACKSPACE)
@@ -299,25 +303,28 @@ WRITE8_MEMBER( s4_state::sol1_w )
 	}
 	else
 	{
-		m_sound_data = ioport("SND")->read();
+		UINT8 sound_data = ioport("SND")->read();
 		if (BIT(data, 0))
-			m_sound_data &= 0xfe;
+			sound_data &= 0xfe;
 
 		if (BIT(data, 1))
-			m_sound_data &= 0xfd;
+			sound_data &= 0xfd;
 
 		if (BIT(data, 2))
-			m_sound_data &= 0xfb;
+			sound_data &= 0xfb;
 
 		if (BIT(data, 3))
-			m_sound_data &= 0xf7;
+			sound_data &= 0xf7;
 
 		if (BIT(data, 4))
-			m_sound_data &= 0x7f;
+			sound_data &= 0xef;
 
-		m_cb1 = ((m_sound_data & 0x9f) != 0x9f);
+		bool cb1 = ((sound_data & 0x9f) != 0x9f);
 
-		m_pias->cb1_w(m_cb1);
+		if (cb1)
+			m_sound_data = sound_data;
+
+		m_pias->cb1_w(cb1);
 	}
 
 	if (BIT(data, 5))
@@ -366,8 +373,8 @@ WRITE8_MEMBER( s4_state::dig0_w )
 {
 	m_strobe = data & 15;
 	m_data_ok = true;
-	output_set_value("led0", BIT(data, 4));
-	output_set_value("led1", BIT(data, 5));
+	output_set_value("led0", !BIT(data, 4));
+	output_set_value("led1", !BIT(data, 5));
 }
 
 WRITE8_MEMBER( s4_state::dig1_w )
@@ -393,11 +400,6 @@ WRITE8_MEMBER( s4_state::switch_w )
 	m_kbdrow = data;
 }
 
-READ_LINE_MEMBER( s4_state::pias_cb1_r )
-{
-	return m_cb1;
-}
-
 READ8_MEMBER( s4_state::dac_r )
 {
 	return m_sound_data;
@@ -408,7 +410,7 @@ WRITE8_MEMBER( s4_state::dac_w )
 	m_dac->write_unsigned8(data);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER( s4_state::irq)
+TIMER_DEVICE_CALLBACK_MEMBER( s4_state::irq )
 {
 	if (m_t_c > 0x70)
 		m_maincpu->set_input_line(M6800_IRQ_LINE, ASSERT_LINE);
@@ -479,7 +481,6 @@ static MACHINE_CONFIG_DERIVED( s4a, s4 )
 
 	MCFG_DEVICE_ADD("pias", PIA6821, 0)
 	MCFG_PIA_READPB_HANDLER(READ8(s4_state, dac_r))
-	MCFG_PIA_READCB1_HANDLER(READLINE(s4_state, pias_cb1_r))
 	MCFG_PIA_WRITEPA_HANDLER(WRITE8(s4_state, dac_w))
 	MCFG_PIA_IRQA_HANDLER(DEVWRITELINE("audiocpu", m6808_cpu_device, irq_line))
 	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE("audiocpu", m6808_cpu_device, irq_line))
@@ -702,14 +703,14 @@ ROM_START(tstrk_l1)
 ROM_END
 
 
-GAME( 1979, flash_l2, 0,        s4a, s4, driver_device, 0, ROT0, "Williams", "Flash (L-2)", GAME_MECHANICAL | GAME_NO_SOUND)
-GAME( 1979, flash_l1, flash_l2, s4a, s4, driver_device, 0, ROT0, "Williams", "Flash (L-1)", GAME_MECHANICAL | GAME_NO_SOUND)
-GAME( 1979, flash_t1, flash_l2, s4a, s4, driver_device, 0, ROT0, "Williams", "Flash (T-1) Ted Estes", GAME_MECHANICAL | GAME_NO_SOUND)
-GAME( 1978, trizn_l1, 0,        s4a, s4, driver_device, 0, ROT0, "Williams", "Tri Zone (L-1)", GAME_MECHANICAL | GAME_NO_SOUND)
-GAME( 1978, trizn_t1, trizn_l1, s4a, s4, driver_device, 0, ROT0, "Williams", "Tri Zone (T-1)", GAME_MECHANICAL | GAME_NO_SOUND)
-GAME( 1979, tmwrp_l2, 0,        s4a, s4, driver_device, 0, ROT0, "Williams", "Time Warp (L-2)", GAME_MECHANICAL | GAME_NO_SOUND)
-GAME( 1979, tmwrp_t2, tmwrp_l2, s4a, s4, driver_device, 0, ROT0, "Williams", "Time Warp (T-2)", GAME_MECHANICAL | GAME_NO_SOUND)
-GAME( 1979, stlwr_l2, 0,        s4a, s4, driver_device, 0, ROT0, "Williams", "Stellar Wars (L-2)", GAME_MECHANICAL | GAME_NO_SOUND)
+GAME( 1979, flash_l2, 0,        s4a, s4, driver_device, 0, ROT0, "Williams", "Flash (L-2)", GAME_MECHANICAL )
+GAME( 1979, flash_l1, flash_l2, s4a, s4, driver_device, 0, ROT0, "Williams", "Flash (L-1)", GAME_MECHANICAL )
+GAME( 1979, flash_t1, flash_l2, s4a, s4, driver_device, 0, ROT0, "Williams", "Flash (T-1) Ted Estes", GAME_MECHANICAL )
+GAME( 1978, trizn_l1, 0,        s4a, s4, driver_device, 0, ROT0, "Williams", "Tri Zone (L-1)", GAME_MECHANICAL )
+GAME( 1978, trizn_t1, trizn_l1, s4a, s4, driver_device, 0, ROT0, "Williams", "Tri Zone (T-1)", GAME_MECHANICAL )
+GAME( 1979, tmwrp_l2, 0,        s4a, s4, driver_device, 0, ROT0, "Williams", "Time Warp (L-2)", GAME_MECHANICAL )
+GAME( 1979, tmwrp_t2, tmwrp_l2, s4a, s4, driver_device, 0, ROT0, "Williams", "Time Warp (T-2)", GAME_MECHANICAL )
+GAME( 1979, stlwr_l2, 0,        s4a, s4, driver_device, 0, ROT0, "Williams", "Stellar Wars (L-2)", GAME_MECHANICAL )
 GAME( 1980, scrpn_l1, 0,        s4a, s4, driver_device, 0, ROT0, "Williams", "Scorpion (L-1)", GAME_MECHANICAL | GAME_NOT_WORKING | GAME_NO_SOUND)
 GAME( 1980, scrpn_t1, scrpn_l1, s4a, s4, driver_device, 0, ROT0, "Williams", "Scorpion (T-1)", GAME_MECHANICAL | GAME_NOT_WORKING | GAME_NO_SOUND)
 GAME( 1978, pomp_l1,  0,        s4a, s4, driver_device, 0, ROT0, "Williams", "Pompeii (Shuffle) (L-1)", GAME_MECHANICAL | GAME_NOT_WORKING)
