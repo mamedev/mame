@@ -852,7 +852,7 @@ void upd7220_device::draw_pixel(int x, int y, UINT8 tile_data)
 	int dad = x & 0x7;
 	UINT8 data = readbyte(addr);
 	UINT8 new_pixel = (tile_data) & (0x80 >> (dad));
-
+	
 	switch(m_bitmap_mod)
 	{
 		case 0: //replace
@@ -985,6 +985,7 @@ void upd7220_device::draw_char(int x, int y)
 
 	/* snippet for character checking */
 	#if 0
+	if((m_figs.m_dir & 7) == 3)
 	for(yi=0;yi<8;yi++)
 	{
 		for(xi=0;xi<8;xi++)
@@ -1000,27 +1001,42 @@ void upd7220_device::draw_char(int x, int y)
 	ysize = ((m_figs.m_d & 0x400) + m_figs.m_dc) + 1;
 
 	/* TODO: internal direction, zooming, size stuff bigger than 8, rewrite using draw_pixel function */
-	for(yi=0;yi<ysize;yi++)
-	{
-		switch(m_figs.m_dir & 7)
+	if((m_figs.m_dir & 7) == 0)
+	{	
+		for(yi=0;yi<8;yi++)
 		{
-			case 0: tile_data = BITSWAP8(m_ra[((yi) & 7) | 8],0,1,2,3,4,5,6,7); break; // TODO
-			case 2: tile_data = BITSWAP8(m_ra[((yi) & 7) | 8],0,1,2,3,4,5,6,7); break;
-			case 6: tile_data = BITSWAP8(m_ra[((ysize-1-yi) & 7) | 8],7,6,5,4,3,2,1,0); break;
-			default: tile_data = BITSWAP8(m_ra[((yi) & 7) | 8],7,6,5,4,3,2,1,0);
-						logerror("%d %d %d\n",m_figs.m_dir,xsize,ysize);
-						break;
-		}
-
-		for(xi=0;xi<xsize;xi++)
-		{
-			UINT32 addr = ((y+yi) * m_pitch * 2) + ((x+xi) >> 3);
-
-			writebyte(addr & 0x3ffff, readbyte(addr & 0x3ffff) & ~(1 << (xi & 7)));
-			writebyte(addr & 0x3ffff, readbyte(addr & 0x3ffff) | ((tile_data) & (1 << (xi & 7))));
+			for(xi=0;xi<8;xi++)
+			{
+				UINT8 dot = (m_ra[((7-xi) & 7) | 8]);
+				dot >>= yi;
+				dot &= 1;
+				dot*=0xff;
+				draw_pixel(x+xi,y+yi,dot);
+			}
 		}
 	}
+	else
+	{
+		for(yi=0;yi<ysize;yi++)
+		{
+			switch(m_figs.m_dir & 7)
+			{
+				case 2: tile_data = BITSWAP8(m_ra[((yi) & 7) | 8],0,1,2,3,4,5,6,7); break;
+				case 6: tile_data = BITSWAP8(m_ra[((ysize-1-yi) & 7) | 8],7,6,5,4,3,2,1,0); break;
+				default: tile_data = BITSWAP8(m_ra[((yi) & 7) | 8],7,6,5,4,3,2,1,0);
+						logerror("upd7220 draw char: %d %d %d\n",m_figs.m_dir,xsize,ysize);
+						break;
+			}
 
+			for(xi=0;xi<xsize;xi++)
+			{
+				UINT32 addr = ((y+yi) * m_pitch * 2) + ((x+xi) >> 3);
+
+				writebyte(addr & 0x3ffff, readbyte(addr & 0x3ffff) & ~(1 << (xi & 7)));
+				writebyte(addr & 0x3ffff, readbyte(addr & 0x3ffff) | ((tile_data) & (1 << (xi & 7))));
+			}
+		}
+	}
 	m_ead = ((x+8*x_dir_dot[m_figs.m_dir]) >> 4) + ((y+8*y_dir_dot[m_figs.m_dir]) * m_pitch);
 	m_dad = ((x+8*x_dir_dot[m_figs.m_dir]) & 0xf);
 }
@@ -1343,7 +1359,7 @@ void upd7220_device::process_fifo()
 		break;
 
 	case COMMAND_FIGD: /* figure draw start */
-		if(m_figs.m_figure_type == 0)
+		if(m_figs.m_figure_type == 0 || m_figs.m_figure_type == 4)
 		{
 			UINT16 line_pattern = check_pattern((m_ra[8]) | (m_ra[9]<<8));
 			UINT8 dot = ((line_pattern >> (0 & 0xf)) & 1) << 7;

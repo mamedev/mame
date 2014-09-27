@@ -271,7 +271,7 @@ UPD7220_DISPLAY_PIXELS_MEMBER( dmv_state::hgdc_display_pixels )
 		const rgb_t *palette = m_palette->palette()->entry_list_raw();
 
 		// 32KB videoram
-		UINT8 gfx = m_video_ram[address & 0x7fff];
+		UINT8 gfx = m_video_ram[address & 0xffff];
 
 		for(int xi=0;xi<8;xi++)
 		{

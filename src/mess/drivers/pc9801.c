@@ -552,7 +552,6 @@ public:
 	UINT8 m_joy_sel;
 	UINT8 m_ext2_ff;
 	UINT8 m_sys_type;
-	UINT8 m_is_nec_bank;
 	
 	DECLARE_WRITE_LINE_MEMBER( keyboard_irq );
 	DECLARE_WRITE_LINE_MEMBER( write_uart_clock );
@@ -1905,15 +1904,7 @@ WRITE8_MEMBER(pc9801_state::pc9801rs_knjram_w)
 WRITE8_MEMBER(pc9801_state::pc9801rs_bank_w)
 {
 	if(offset == 1)
-	{
-		#if 0
-		if(m_is_nec_bank)
-		{
-			m_rom_bank = 1;
-			return;
-		}
-		#endif
-	
+	{	
 		if((data & 0xf0) == 0x00 || (data & 0xf0) == 0x10)
 		{
 			if((data & 0xed) == 0x00)
@@ -3389,7 +3380,6 @@ MACHINE_START_MEMBER(pc9801_state,pc9821)
 	m_ide_ram = auto_alloc_array(machine(), UINT8, 0x2000);
 	m_ext_gvram = auto_alloc_array(machine(), UINT8, 0xa0000);
 
-	m_is_nec_bank = 0;
 	save_pointer(NAME(m_sdip), 24);
 	save_pointer(NAME(m_ide_ram), 0x2000);
 	save_pointer(NAME(m_ext_gvram), 0xa0000);
@@ -3399,7 +3389,7 @@ MACHINE_START_MEMBER(pc9801_state,pc9821ap2)
 {
 	MACHINE_START_CALL_MEMBER(pc9821);
 	
-	m_is_nec_bank = 1;
+	// ...
 }
 
 MACHINE_RESET_MEMBER(pc9801_state,pc9801_common)
@@ -3901,7 +3891,7 @@ static MACHINE_CONFIG_DERIVED( pc9821ap2, pc9821)
 	MCFG_CPU_IO_MAP(pc9821_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", pc9801_state, pc9801_vrtc_irq)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259_master", pic8259_device, inta_cb)
-
+	
 	MCFG_MACHINE_START_OVERRIDE(pc9801_state,pc9821ap2)
 MACHINE_CONFIG_END
 
