@@ -2,16 +2,25 @@
 // copyright-holders:Robbbert
 /***********************************************************************************
 
-    PINBALL
-    Williams System 6a
+  PINBALL
+  Williams System 6a
+  The only difference to System 6 is that the display is 7 digits instead of 6.
 
-    Sound is working fully via the sound test (F1) key.
-    Algar - mostly works, has sound issues
-    Alien Poker - Can insert coin and start, but no response after that.
+Each game has its own switches, you need to know the outhole and slam-tilt ones.
+Note that T is also a tilt, but it may take 3 hits to activate it.
+
+
+Game          Outhole   Tilt
+------------------------------------
+Algar         X
+Alien Poker   X         =
+
+Alien Poker: wait for the background sound before attempting to score.
 
 ToDo:
-- Inputs
-- Interface to soundcard is problematic
+- Speech not working in-game (works with test button)
+- Diagnostic mode freezes
+- Mechanical sounds
 
 
 ************************************************************************************/
@@ -29,20 +38,19 @@ class s6a_state : public genpin_class
 {
 public:
 	s6a_state(const machine_config &mconfig, device_type type, const char *tag)
-		: genpin_class(mconfig, type, tag),
-	m_maincpu(*this, "maincpu"),
-	m_audiocpu(*this, "audiocpu"),
-	m_dac(*this, "dac"),
-	m_hc55516(*this, "hc55516"),
-	m_pias(*this, "pias"),
-	m_pia22(*this, "pia22"),
-	m_pia24(*this, "pia24"),
-	m_pia28(*this, "pia28"),
-	m_pia30(*this, "pia30")
+		: genpin_class(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_audiocpu(*this, "audiocpu")
+		, m_dac(*this, "dac")
+		, m_hc55516(*this, "hc55516")
+		, m_pias(*this, "pias")
+		, m_pia22(*this, "pia22")
+		, m_pia24(*this, "pia24")
+		, m_pia28(*this, "pia28")
+		, m_pia30(*this, "pia30")
 	{ }
 
 	DECLARE_READ8_MEMBER(dac_r);
-	DECLARE_WRITE8_MEMBER(dac_w);
 	DECLARE_WRITE8_MEMBER(dig0_w);
 	DECLARE_WRITE8_MEMBER(dig1_w);
 	DECLARE_WRITE8_MEMBER(lamp0_w);
@@ -54,9 +62,6 @@ public:
 	DECLARE_WRITE8_MEMBER(switch_w);
 	DECLARE_READ_LINE_MEMBER(pia28_ca1_r);
 	DECLARE_READ_LINE_MEMBER(pia28_cb1_r);
-	DECLARE_READ_LINE_MEMBER(pias_cb1_r);
-	DECLARE_WRITE_LINE_MEMBER(pias_ca2_w);
-	DECLARE_WRITE_LINE_MEMBER(pias_cb2_w);
 	DECLARE_WRITE_LINE_MEMBER(pia22_ca2_w) { }; //ST5
 	DECLARE_WRITE_LINE_MEMBER(pia22_cb2_w) { }; //ST-solenoids enable
 	DECLARE_WRITE_LINE_MEMBER(pia24_ca2_w) { }; //ST2
@@ -69,9 +74,13 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(main_nmi);
 	DECLARE_INPUT_CHANGED_MEMBER(audio_nmi);
 	DECLARE_MACHINE_RESET(s6a);
-protected:
-
-	// devices
+private:
+	UINT8 m_t_c;
+	UINT8 m_sound_data;
+	UINT8 m_strobe;
+	UINT8 m_kbdrow;
+	bool m_cb1;
+	bool m_data_ok;
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<dac_device> m_dac;
@@ -81,13 +90,6 @@ protected:
 	required_device<pia6821_device> m_pia24;
 	required_device<pia6821_device> m_pia28;
 	required_device<pia6821_device> m_pia30;
-private:
-	UINT8 m_t_c;
-	UINT8 m_sound_data;
-	UINT8 m_strobe;
-	UINT8 m_kbdrow;
-	bool m_cb1;
-	bool m_data_ok;
 };
 
 static ADDRESS_MAP_START( s6a_main_map, AS_PROGRAM, 8, s6a_state )
@@ -98,13 +100,13 @@ static ADDRESS_MAP_START( s6a_main_map, AS_PROGRAM, 8, s6a_state )
 	AM_RANGE(0x2400, 0x2403) AM_DEVREADWRITE("pia24", pia6821_device, read, write) // lamps
 	AM_RANGE(0x2800, 0x2803) AM_DEVREADWRITE("pia28", pia6821_device, read, write) // display
 	AM_RANGE(0x3000, 0x3003) AM_DEVREADWRITE("pia30", pia6821_device, read, write) // inputs
-	AM_RANGE(0x6000, 0x7fff) AM_ROM
+	AM_RANGE(0x6000, 0x7fff) AM_ROM AM_REGION("roms", 0)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( s6a_audio_map, AS_PROGRAM, 8, s6a_state )
 	AM_RANGE(0x0000, 0x00ff) AM_RAM
 	AM_RANGE(0x0400, 0x0403) AM_MIRROR(0x8000) AM_DEVREADWRITE("pias", pia6821_device, read, write)
-	AM_RANGE(0xA000, 0xffff) AM_ROM
+	AM_RANGE(0xb000, 0xffff) AM_ROM AM_REGION("audioroms", 0)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( s6a )
@@ -122,7 +124,7 @@ static INPUT_PORTS_START( s6a )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER )
 
 	PORT_START("X2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_A)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_X)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_S)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_D)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_F)
@@ -146,7 +148,7 @@ static INPUT_PORTS_START( s6a )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_SLASH)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_COLON)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_QUOTE)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_X)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_A)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_MINUS)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_EQUALS)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_BACKSPACE)
@@ -179,8 +181,8 @@ static INPUT_PORTS_START( s6a )
 
 	PORT_START("SND")
 	PORT_BIT( 0x9f, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Music1") PORT_CODE(KEYCODE_3) PORT_TOGGLE
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Music2") PORT_CODE(KEYCODE_4) PORT_TOGGLE
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Speech") PORT_CODE(KEYCODE_3) PORT_TOGGLE
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Music") PORT_CODE(KEYCODE_4) PORT_TOGGLE
 
 	PORT_START("DIAGS")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Audio Diag") PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, s6a_state, audio_nmi, 1)
@@ -269,25 +271,28 @@ WRITE8_MEMBER( s6a_state::sol0_w )
 
 WRITE8_MEMBER( s6a_state::sol1_w )
 {
-	m_sound_data = ioport("SND")->read();
+	UINT8 sound_data = ioport("SND")->read();
 	if (BIT(data, 0))
-		m_sound_data &= 0xfe;
+		sound_data &= 0xfe;
 
 	if (BIT(data, 1))
-		m_sound_data &= 0xfd;
+		sound_data &= 0xfd;
 
 	if (BIT(data, 2))
-		m_sound_data &= 0xfb;
+		sound_data &= 0xfb;
 
 	if (BIT(data, 3))
-		m_sound_data &= 0xf7;
+		sound_data &= 0xf7;
 
 	if (BIT(data, 4))
-		m_sound_data &= 0x7f;
+		sound_data &= 0xef;
 
-	m_cb1 = ((m_sound_data & 0x9f) != 0x9f);
+	bool cb1 = ((sound_data & 0x9f) != 0x9f);
 
-	m_pias->cb1_w(m_cb1);
+	if (cb1)
+		m_sound_data = sound_data;
+
+	m_pias->cb1_w(cb1);
 
 //  if (BIT(data, 5))
 //      m_samples->start(0, 6); // knocker
@@ -335,8 +340,8 @@ WRITE8_MEMBER( s6a_state::dig0_w )
 {
 	m_strobe = data & 15;
 	m_data_ok = true;
-	output_set_value("led0", BIT(data, 4));
-	output_set_value("led1", BIT(data, 5));
+	output_set_value("led0", !BIT(data, 4));
+	output_set_value("led1", !BIT(data, 5));
 }
 
 WRITE8_MEMBER( s6a_state::dig1_w )
@@ -362,31 +367,9 @@ WRITE8_MEMBER( s6a_state::switch_w )
 	m_kbdrow = data;
 }
 
-READ_LINE_MEMBER( s6a_state::pias_cb1_r )
-{
-	return m_cb1;
-}
-
-WRITE_LINE_MEMBER( s6a_state::pias_cb2_w )
-{
-// speech clock
-	m_hc55516->clock_w(state);
-}
-
-WRITE_LINE_MEMBER( s6a_state::pias_ca2_w )
-{
-// speech data
-	m_hc55516->digit_w(state);
-}
-
 READ8_MEMBER( s6a_state::dac_r )
 {
 	return m_sound_data;
-}
-
-WRITE8_MEMBER( s6a_state::dac_w )
-{
-	m_dac->write_unsigned8(data);
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER( s6a_state::irq)
@@ -460,10 +443,9 @@ static MACHINE_CONFIG_START( s6a, s6a_state )
 
 	MCFG_DEVICE_ADD("pias", PIA6821, 0)
 	MCFG_PIA_READPB_HANDLER(READ8(s6a_state, dac_r))
-	MCFG_PIA_READCB1_HANDLER(READLINE(s6a_state, pias_cb1_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(s6a_state, dac_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(s6a_state, pias_ca2_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(s6a_state, pias_cb2_w))
+	MCFG_PIA_WRITEPA_HANDLER(DEVWRITE8("dac", dac_device, write_unsigned8))
+	MCFG_PIA_CA2_HANDLER(DEVWRITELINE("hc55516", hc55516_device, digit_w))
+	MCFG_PIA_CB2_HANDLER(DEVWRITELINE("hc55516", hc55516_device, clock_w))
 	MCFG_PIA_IRQA_HANDLER(DEVWRITELINE("audiocpu", m6802_cpu_device, irq_line))
 	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE("audiocpu", m6802_cpu_device, irq_line))
 MACHINE_CONFIG_END
@@ -473,60 +455,60 @@ MACHINE_CONFIG_END
 / Algar - Sys.6 (Game #499)
 /-------------------------*/
 ROM_START(algar_l1)
-	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD("gamerom.716", 0x6000, 0x0800, CRC(6711da23) SHA1(80a46f5a2630977bc1c6e17466e8865083eb9a18))
-	ROM_LOAD("green1.716", 0x7000, 0x0800, CRC(2145f8ab) SHA1(ddf63208559a3a08d4e88327c55426b0eed27654))
-	ROM_LOAD("green2.716", 0x7800, 0x0800, CRC(1c978a4a) SHA1(1959184764643d58f1740c54bb74c2aad7d667d2))
+	ROM_REGION(0x2000, "roms", 0)
+	ROM_LOAD("gamerom.716", 0x0000, 0x0800, CRC(6711da23) SHA1(80a46f5a2630977bc1c6e17466e8865083eb9a18))
+	ROM_LOAD("green1.716",  0x1000, 0x0800, CRC(2145f8ab) SHA1(ddf63208559a3a08d4e88327c55426b0eed27654))
+	ROM_LOAD("green2.716",  0x1800, 0x0800, CRC(1c978a4a) SHA1(1959184764643d58f1740c54bb74c2aad7d667d2))
 
-	ROM_REGION(0x10000, "audiocpu", 0)
-	ROM_LOAD("sound4.716", 0xf800, 0x0800, CRC(67ea12e7) SHA1(f81e97183442736d5766a7e5e074bc6539e8ced0))
+	ROM_REGION(0x5000, "audioroms", 0)
+	ROM_LOAD("sound4.716",  0x4800, 0x0800, CRC(67ea12e7) SHA1(f81e97183442736d5766a7e5e074bc6539e8ced0))
 ROM_END
 
 /*-------------------------------
 / Alien Poker - Sys.6 (Game #501)
 /-------------------------------*/
 ROM_START(alpok_l6)
-	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD("gamerom6.716", 0x6000, 0x0800, CRC(20538a4a) SHA1(6cdd6b7ded76b3cbd954d371e126e1bbd95a6219))
-	ROM_LOAD("green1.716", 0x7000, 0x0800, CRC(2145f8ab) SHA1(ddf63208559a3a08d4e88327c55426b0eed27654))
-	ROM_LOAD("green2.716", 0x7800, 0x0800, CRC(1c978a4a) SHA1(1959184764643d58f1740c54bb74c2aad7d667d2))
+	ROM_REGION(0x2000, "roms", 0)
+	ROM_LOAD("gamerom6.716", 0x0000, 0x0800, CRC(20538a4a) SHA1(6cdd6b7ded76b3cbd954d371e126e1bbd95a6219))
+	ROM_LOAD("green1.716",   0x1000, 0x0800, CRC(2145f8ab) SHA1(ddf63208559a3a08d4e88327c55426b0eed27654))
+	ROM_LOAD("green2.716",   0x1800, 0x0800, CRC(1c978a4a) SHA1(1959184764643d58f1740c54bb74c2aad7d667d2))
 
-	ROM_REGION(0x10000, "audiocpu", 0)
-	ROM_LOAD("v_ic7.532", 0xb000, 0x1000, CRC(a66c7ca6) SHA1(6e90081f853fcf66bfeac0a8ee1c762b3760b90b))
-	ROM_LOAD("v_ic5.532", 0xc000, 0x1000, CRC(f16a237a) SHA1(a904138fad5cbc19946bcf0de824e27537dcd621))
-	ROM_LOAD("v_ic6.532", 0xd000, 0x1000, CRC(15a3cc85) SHA1(86002ac78189415ae912e8bc23c92b3b67610d87))
-	ROM_LOAD("sound3.716", 0xf800, 0x0800, CRC(55a10d13) SHA1(521d4cdfb0ed8178b3594cedceae93b772a951a4))
+	ROM_REGION(0x5000, "audioroms", 0)
+	ROM_LOAD("v_ic7.532",    0x0000, 0x1000, CRC(a66c7ca6) SHA1(6e90081f853fcf66bfeac0a8ee1c762b3760b90b))
+	ROM_LOAD("v_ic5.532",    0x1000, 0x1000, CRC(f16a237a) SHA1(a904138fad5cbc19946bcf0de824e27537dcd621))
+	ROM_LOAD("v_ic6.532",    0x2000, 0x1000, CRC(15a3cc85) SHA1(86002ac78189415ae912e8bc23c92b3b67610d87))
+	ROM_LOAD("sound3.716",   0x4800, 0x0800, CRC(55a10d13) SHA1(521d4cdfb0ed8178b3594cedceae93b772a951a4))
 ROM_END
 
 ROM_START(alpok_l2)
-	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD("gamerom.716", 0x6000, 0x0800, CRC(79c07603) SHA1(526a45b139394e475fc052636e98d880a8908168))
-	ROM_LOAD("green1.716", 0x7000, 0x0800, CRC(2145f8ab) SHA1(ddf63208559a3a08d4e88327c55426b0eed27654))
-	ROM_LOAD("green2.716", 0x7800, 0x0800, CRC(1c978a4a) SHA1(1959184764643d58f1740c54bb74c2aad7d667d2))
+	ROM_REGION(0x2000, "roms", 0)
+	ROM_LOAD("gamerom.716",  0x0000, 0x0800, CRC(79c07603) SHA1(526a45b139394e475fc052636e98d880a8908168))
+	ROM_LOAD("green1.716",   0x1000, 0x0800, CRC(2145f8ab) SHA1(ddf63208559a3a08d4e88327c55426b0eed27654))
+	ROM_LOAD("green2.716",   0x1800, 0x0800, CRC(1c978a4a) SHA1(1959184764643d58f1740c54bb74c2aad7d667d2))
 
-	ROM_REGION(0x10000, "audiocpu", 0)
-	ROM_LOAD("v_ic7.532", 0xb000, 0x1000, CRC(a66c7ca6) SHA1(6e90081f853fcf66bfeac0a8ee1c762b3760b90b))
-	ROM_LOAD("v_ic5.532", 0xc000, 0x1000, CRC(f16a237a) SHA1(a904138fad5cbc19946bcf0de824e27537dcd621))
-	ROM_LOAD("v_ic6.532", 0xd000, 0x1000, CRC(15a3cc85) SHA1(86002ac78189415ae912e8bc23c92b3b67610d87))
-	ROM_LOAD("sound3.716", 0xf800, 0x0800, CRC(55a10d13) SHA1(521d4cdfb0ed8178b3594cedceae93b772a951a4))
+	ROM_REGION(0x5000, "audioroms", 0)
+	ROM_LOAD("v_ic7.532",    0x0000, 0x1000, CRC(a66c7ca6) SHA1(6e90081f853fcf66bfeac0a8ee1c762b3760b90b))
+	ROM_LOAD("v_ic5.532",    0x1000, 0x1000, CRC(f16a237a) SHA1(a904138fad5cbc19946bcf0de824e27537dcd621))
+	ROM_LOAD("v_ic6.532",    0x2000, 0x1000, CRC(15a3cc85) SHA1(86002ac78189415ae912e8bc23c92b3b67610d87))
+	ROM_LOAD("sound3.716",   0x4800, 0x0800, CRC(55a10d13) SHA1(521d4cdfb0ed8178b3594cedceae93b772a951a4))
 ROM_END
 
 ROM_START(alpok_f6)
-	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD("gamerom6.716", 0x6000, 0x0800, CRC(20538a4a) SHA1(6cdd6b7ded76b3cbd954d371e126e1bbd95a6219))
-	ROM_LOAD("green1.716", 0x7000, 0x0800, CRC(2145f8ab) SHA1(ddf63208559a3a08d4e88327c55426b0eed27654))
-	ROM_LOAD("green2.716", 0x7800, 0x0800, CRC(1c978a4a) SHA1(1959184764643d58f1740c54bb74c2aad7d667d2))
+	ROM_REGION(0x2000, "roms", 0)
+	ROM_LOAD("gamerom6.716", 0x0000, 0x0800, CRC(20538a4a) SHA1(6cdd6b7ded76b3cbd954d371e126e1bbd95a6219))
+	ROM_LOAD("green1.716",   0x1000, 0x0800, CRC(2145f8ab) SHA1(ddf63208559a3a08d4e88327c55426b0eed27654))
+	ROM_LOAD("green2.716",   0x1800, 0x0800, CRC(1c978a4a) SHA1(1959184764643d58f1740c54bb74c2aad7d667d2))
 
-	ROM_REGION(0x10000, "audiocpu", 0)
-	ROM_LOAD("5t5014fr.dat", 0xb000, 0x1000, CRC(1d961517) SHA1(c71ee324becfc8cdbecabd1e64b11b5a39ff2483))
-	ROM_LOAD("5t5015fr.dat", 0xc000, 0x1000, CRC(8d065f80) SHA1(0ab22c9b20ab6fe41abab620435ad03652db7a8e))
-	ROM_LOAD("5t5016fr.dat", 0xd000, 0x1000, CRC(0ddf91e9) SHA1(48f5fdfc0c5a66dd318fecb7c90e5f5a684a3876))
-	ROM_LOAD("5t5017fr.dat", 0xe000, 0x1000, CRC(7e546dc1) SHA1(58f8286403978b0d929987189089881d754a9a83))
-	ROM_LOAD("sound3.716", 0xf800, 0x0800, CRC(55a10d13) SHA1(521d4cdfb0ed8178b3594cedceae93b772a951a4))
+	ROM_REGION(0x5000, "audioroms", 0)
+	ROM_LOAD("5t5014fr.dat", 0x0000, 0x1000, CRC(1d961517) SHA1(c71ee324becfc8cdbecabd1e64b11b5a39ff2483))
+	ROM_LOAD("5t5015fr.dat", 0x1000, 0x1000, CRC(8d065f80) SHA1(0ab22c9b20ab6fe41abab620435ad03652db7a8e))
+	ROM_LOAD("5t5016fr.dat", 0x2000, 0x1000, CRC(0ddf91e9) SHA1(48f5fdfc0c5a66dd318fecb7c90e5f5a684a3876))
+	ROM_LOAD("5t5017fr.dat", 0x3000, 0x1000, CRC(7e546dc1) SHA1(58f8286403978b0d929987189089881d754a9a83))
+	ROM_LOAD("sound3.716",   0x4800, 0x0800, CRC(55a10d13) SHA1(521d4cdfb0ed8178b3594cedceae93b772a951a4))
 ROM_END
 
 
-GAME(1980,algar_l1, 0,       s6a, s6a, driver_device, 0, ROT0, "Williams", "Algar (L-1)", GAME_MECHANICAL | GAME_NO_SOUND)
-GAME(1980,alpok_l6, 0,       s6a, s6a, driver_device, 0, ROT0, "Williams", "Alien Poker (L-6)", GAME_MECHANICAL | GAME_NO_SOUND)
-GAME(1980,alpok_l2, alpok_l6,s6a, s6a, driver_device, 0, ROT0, "Williams", "Alien Poker (L-2)", GAME_MECHANICAL | GAME_NO_SOUND)
-GAME(1980,alpok_f6, alpok_l6,s6a, s6a, driver_device, 0, ROT0, "Williams", "Alien Poker (L-6 French speech)", GAME_MECHANICAL | GAME_NO_SOUND)
+GAME(1980,algar_l1, 0,       s6a, s6a, driver_device, 0, ROT0, "Williams", "Algar (L-1)", GAME_MECHANICAL )
+GAME(1980,alpok_l6, 0,       s6a, s6a, driver_device, 0, ROT0, "Williams", "Alien Poker (L-6)", GAME_MECHANICAL )
+GAME(1980,alpok_l2, alpok_l6,s6a, s6a, driver_device, 0, ROT0, "Williams", "Alien Poker (L-2)", GAME_MECHANICAL )
+GAME(1980,alpok_f6, alpok_l6,s6a, s6a, driver_device, 0, ROT0, "Williams", "Alien Poker (L-6 French speech)", GAME_MECHANICAL )
