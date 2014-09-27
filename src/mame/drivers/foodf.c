@@ -411,6 +411,9 @@ ROM_START( foodf )
 
 	ROM_REGION( 0x100, "proms", 0 )
 	ROM_LOAD( "136020-112.2p",   0x000000, 0x000100, CRC(0aa962d6) SHA1(efb51e4c95efb1b85206c416c1d6d35c6f4ff35c) )
+	
+	ROM_REGION( 0x100, "nvram", 0 ) // default initialized nvram
+	ROM_LOAD( "foodf.nv", 0x000000, 0x000100, CRC(a4186b13) SHA1(7633ceb6f61403a46e36cc2172839e6c3f31bac2) )
 ROM_END
 
 
@@ -434,6 +437,9 @@ ROM_START( foodf2 )
 
 	ROM_REGION( 0x100, "proms", 0 )
 	ROM_LOAD( "136020-112.2p",   0x000000, 0x000100, CRC(0aa962d6) SHA1(efb51e4c95efb1b85206c416c1d6d35c6f4ff35c) )
+	
+	ROM_REGION( 0x100, "nvram", 0 ) // default initialized nvram
+	ROM_LOAD( "foodf.nv", 0x000000, 0x000100, CRC(a4186b13) SHA1(7633ceb6f61403a46e36cc2172839e6c3f31bac2) )
 ROM_END
 
 
@@ -457,6 +463,9 @@ ROM_START( foodf1 )
 
 	ROM_REGION( 0x100, "proms", 0 )
 	ROM_LOAD( "136020-112.2p",   0x000000, 0x000100, CRC(0aa962d6) SHA1(efb51e4c95efb1b85206c416c1d6d35c6f4ff35c) )
+	
+	ROM_REGION( 0x100, "nvram", 0 ) // default initialized nvram
+	ROM_LOAD( "foodf.nv", 0x000000, 0x000100, CRC(a4186b13) SHA1(7633ceb6f61403a46e36cc2172839e6c3f31bac2) )
 ROM_END
 
 
@@ -480,6 +489,9 @@ ROM_START( foodfc )
 
 	ROM_REGION( 0x100, "proms", 0 )
 	ROM_LOAD( "136020-112.2p",   0x000000, 0x000100, CRC(0aa962d6) SHA1(efb51e4c95efb1b85206c416c1d6d35c6f4ff35c) )
+	
+	ROM_REGION( 0x100, "nvram", 0 ) // default initialized nvram, differs from the other sets
+	ROM_LOAD( "foodfc.nv", 0x000000, 0x000100, CRC(c1385dab) SHA1(52f4dc772e5da0f7c9bcef6c6ef3a655dcd3d59d) )
 ROM_END
 
 
