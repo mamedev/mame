@@ -2360,7 +2360,29 @@ almost nothing like the prototype.
 			<feature name="pcb_type" value="TYPE-6" />
 			<feature name="slot" value="a78_sg_ram" />
 			<dataarea name="rom" size="131072">
-				<rom name="wntrgame.bin" size="131072" crc="8981b531" sha1="b3725d6f0834c68ac62ce13eb9eb0d01d1124e5e" offset="0" />
+				<rom name="wingames.bin" size="131072" crc="8981b531" sha1="b3725d6f0834c68ac62ce13eb9eb0d01d1124e5e" offset="0" />
+			</dataarea>
+			<dataarea name="ram" size="16384">
+			</dataarea>
+		</part>
+	</software>
+
+<!-- This version features a lot *LESS* sounds than the newer version:
+     e.g. no sound in bobsled ans ski jump games!
+     Dump is confirmed from multiple carts, and it was probably used in 
+     some erlier production run, until they found out the mistake and
+     replaced it with the complete version  -->
+	<software name="wingameso" cloneof="wingames">
+		<description>Winter Games (NTSC, Older?)</description>
+		<year>1987</year>
+		<publisher>Atari / Epyx</publisher>
+		<info name="serial" value="CX7831"/>
+		<sharedfeat name="compatibility" value="NTSC"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="pcb_type" value="TYPE-6" />
+			<feature name="slot" value="a78_sg_ram" />
+			<dataarea name="rom" size="131072">
+				<rom name="wingameso.bin" size="131072" crc="cf648e88" sha1="361501982f4795c2d79fb6519e5c56452ebc5774" offset="0" />
 			</dataarea>
 			<dataarea name="ram" size="16384">
 			</dataarea>
