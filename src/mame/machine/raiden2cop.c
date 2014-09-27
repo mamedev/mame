@@ -436,6 +436,33 @@ int raiden2cop_device::find_trigger_match(UINT16 triggerval, UINT16 mask)
 			{
 				// never calls any programs
 			}
+			else if (!strcmp(machine().system().name, "zeroteam"))
+			{
+				// got stuck in lying in corner with tiny bit of health left on first boss (couldn't do anything, had to let 2nd player join)
+				// birdman boss is wrong (unemulated commands) (final boss behavior is similar)
+				// sprite priority is wrong (not command related - sort DMA)
+				// 3rd stage mid-boss does not enter properly (have to use special attack to trigger them into motion)
+				// 5th stage, does not punch door for speedboat section
+
+				if (triggerval == 0x0205 || triggerval == 0x0904 ||
+					triggerval == 0x8100 || triggerval == 0x8900 || /* sin / cos */
+					triggerval == 0x130e || triggerval == 0x138e ||
+					triggerval == 0x3b30 ||
+					triggerval == 0x42c2 || // throwing
+					triggerval == 0x6200 || // emeny throwing crates to the left?
+					triggerval == 0xa180 || triggerval == 0xa980 || triggerval == 0xb100 || triggerval == 0xb900 || /* collisions */
+
+					// 2nd level 'bird man' boss uses these
+					triggerval == 0xfc84 ||
+					triggerval == 0xf790 ||
+					triggerval == 0xede5 ||
+					triggerval == 0x330e ||
+					triggerval == 0x4aa0)
+
+					otherlog = 0;
+
+
+			}
 			else
 			{
 				otherlog = 0;
@@ -1770,6 +1797,8 @@ void  raiden2cop_device::LEGACY_cop_collision_update_hitbox(address_space &space
 
 WRITE16_MEMBER( raiden2cop_device::cop_cmd_w)
 {
+	find_trigger_match(data, 0xf800);
+
 	cop_status &= 0x7fff;
 
 	switch(data) {
