@@ -2,11 +2,8 @@
 // copyright-holders:Robbbert
 /***********************************************************************************
 
-    PINBALL
-    Williams System 6
-
-    After starting a game, nothing much works.
-
+  PINBALL
+  Williams System 6
 
 Each game has its own switches, you need to know the outhole and slam-tilt ones.
 Note that T is also a tilt, but it may take 3 hits to activate it.
@@ -24,10 +21,10 @@ Scorpion      X S
 Blackout      X         Backspace
 Firepower     unknown
 
-
+Blackout: wait for the background sound before attempting to score.
 
 ToDo:
-- Speech not working in-game (works with test button)
+- Diagnostic mode freezes
 - Mechanical sounds
 - Blackout: slow response at times
 - Firepower: unable to start / unknown key combo?
@@ -73,8 +70,6 @@ public:
 	DECLARE_WRITE8_MEMBER(pias_pb_w) { }; // dummy to stop log filling up
 	DECLARE_READ_LINE_MEMBER(pia28_ca1_r);
 	DECLARE_READ_LINE_MEMBER(pia28_cb1_r);
-	DECLARE_WRITE_LINE_MEMBER(pias_ca2_w);
-	DECLARE_WRITE_LINE_MEMBER(pias_cb2_w);
 	DECLARE_WRITE_LINE_MEMBER(pia22_ca2_w) { }; //ST5
 	DECLARE_WRITE_LINE_MEMBER(pia22_cb2_w) { }; //ST-solenoids enable
 	DECLARE_WRITE_LINE_MEMBER(pia24_ca2_w) { }; //ST2
@@ -193,7 +188,8 @@ static INPUT_PORTS_START( s6 )
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("SND")
-	PORT_BIT( 0xbf, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x9f, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Speech") PORT_CODE(KEYCODE_3) PORT_TOGGLE
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Music") PORT_CODE(KEYCODE_4) PORT_TOGGLE
 
 	PORT_START("DIAGS")
@@ -299,7 +295,7 @@ WRITE8_MEMBER( s6_state::sol1_w )
 	if (BIT(data, 4))
 		sound_data &= 0xef;
 
-	bool cb1 = ((sound_data & 0xbf) != 0xbf);
+	bool cb1 = ((sound_data & 0x9f) != 0x9f);
 
 	if (cb1)
 		m_sound_data = sound_data;
@@ -377,18 +373,6 @@ READ8_MEMBER( s6_state::switch_r )
 WRITE8_MEMBER( s6_state::switch_w )
 {
 	m_kbdrow = data;
-}
-
-WRITE_LINE_MEMBER( s6_state::pias_cb2_w )
-{
-// speech clock
-	m_hc55516->clock_w(state);
-}
-
-WRITE_LINE_MEMBER( s6_state::pias_ca2_w )
-{
-// speech data
-	m_hc55516->digit_w(state);
 }
 
 READ8_MEMBER( s6_state::dac_r )
@@ -469,8 +453,8 @@ static MACHINE_CONFIG_START( s6, s6_state )
 	MCFG_PIA_READPB_HANDLER(READ8(s6_state, dac_r))
 	MCFG_PIA_WRITEPA_HANDLER(DEVWRITE8("dac", dac_device, write_unsigned8))
 	MCFG_PIA_WRITEPB_HANDLER(WRITE8(s6_state, pias_pb_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(s6_state, pias_ca2_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(s6_state, pias_cb2_w))
+	MCFG_PIA_CA2_HANDLER(DEVWRITELINE("hc55516", hc55516_device, digit_w))
+	MCFG_PIA_CB2_HANDLER(DEVWRITELINE("hc55516", hc55516_device, clock_w))
 	MCFG_PIA_IRQA_HANDLER(DEVWRITELINE("audioroms", m6802_cpu_device, irq_line))
 	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE("audioroms", m6802_cpu_device, irq_line))
 MACHINE_CONFIG_END
@@ -652,11 +636,11 @@ GAME( 1979, lzbal_l2, 0,        s6, s6, driver_device, 0, ROT0, "Williams", "Las
 GAME( 1980, lzbal_t2, lzbal_l2, s6, s6, driver_device, 0, ROT0, "Williams", "Laser Ball (T-2)", GAME_MECHANICAL )
 GAME( 1980, scrpn_l1, 0,        s6, s6, driver_device, 0, ROT0, "Williams", "Scorpion (L-1)", GAME_MECHANICAL )
 GAME( 1980, scrpn_t1, scrpn_l1, s6, s6, driver_device, 0, ROT0, "Williams", "Scorpion (T-1)", GAME_MECHANICAL )
-GAME( 1979, blkou_l1, 0,        s6, s6, driver_device, 0, ROT0, "Williams", "Blackout (L-1)", GAME_MECHANICAL | GAME_IMPERFECT_SOUND)
-GAME( 1979, blkou_t1, blkou_l1, s6, s6, driver_device, 0, ROT0, "Williams", "Blackout (T-1)", GAME_MECHANICAL | GAME_IMPERFECT_SOUND)
-GAME( 1979, blkou_f1, blkou_l1, s6, s6, driver_device, 0, ROT0, "Williams", "Blackout (L-1, French Speech)", GAME_MECHANICAL | GAME_IMPERFECT_SOUND)
-GAME( 1979, grgar_l1, 0,        s6, s6, driver_device, 0, ROT0, "Williams", "Gorgar (L-1)", GAME_MECHANICAL | GAME_IMPERFECT_SOUND)
-GAME( 1979, grgar_t1, grgar_l1, s6, s6, driver_device, 0, ROT0, "Williams", "Gorgar (T-1)", GAME_MECHANICAL | GAME_IMPERFECT_SOUND)
+GAME( 1979, blkou_l1, 0,        s6, s6, driver_device, 0, ROT0, "Williams", "Blackout (L-1)", GAME_MECHANICAL )
+GAME( 1979, blkou_t1, blkou_l1, s6, s6, driver_device, 0, ROT0, "Williams", "Blackout (T-1)", GAME_MECHANICAL )
+GAME( 1979, blkou_f1, blkou_l1, s6, s6, driver_device, 0, ROT0, "Williams", "Blackout (L-1, French Speech)", GAME_MECHANICAL )
+GAME( 1979, grgar_l1, 0,        s6, s6, driver_device, 0, ROT0, "Williams", "Gorgar (L-1)", GAME_MECHANICAL )
+GAME( 1979, grgar_t1, grgar_l1, s6, s6, driver_device, 0, ROT0, "Williams", "Gorgar (T-1)", GAME_MECHANICAL )
 GAME( 1980, frpwr_l6, 0,        s6, s6, driver_device, 0, ROT0, "Williams", "Firepower (L-6)", GAME_MECHANICAL | GAME_NOT_WORKING | GAME_NO_SOUND)
 GAME( 1980, frpwr_t6, frpwr_l6, s6, s6, driver_device, 0, ROT0, "Williams", "Firepower (T-6)", GAME_MECHANICAL | GAME_NOT_WORKING | GAME_NO_SOUND)
 GAME( 1980, frpwr_l2, frpwr_l6, s6, s6, driver_device, 0, ROT0, "Williams", "Firepower (L-2)", GAME_MECHANICAL | GAME_NOT_WORKING | GAME_NO_SOUND)
