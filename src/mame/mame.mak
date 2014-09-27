@@ -1976,7 +1976,7 @@ $(MAMEOBJ)/technos.a: \
 	$(DRIVERS)/ddragon.o $(VIDEO)/ddragon.o \
 	$(DRIVERS)/ddragon3.o $(VIDEO)/ddragon3.o \
 	$(DRIVERS)/dogfgt.o $(VIDEO)/dogfgt.o \
-	$(DRIVERS)/matmania.o $(MACHINE)/maniach.o $(VIDEO)/matmania.o \
+	$(DRIVERS)/matmania.o $(VIDEO)/matmania.o \
 	$(DRIVERS)/mystston.o $(VIDEO)/mystston.o \
 	$(DRIVERS)/renegade.o $(VIDEO)/renegade.o \
 	$(DRIVERS)/scregg.o \

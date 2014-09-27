@@ -41,12 +41,12 @@
   bit 0 -- 2.2kohm resistor  -- BLUE
 
 ***************************************************************************/
+
 PALETTE_INIT_MEMBER(matmania_state, matmania)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
-	int i;
 
-	for (i = 0; i < 64; i++)
+	for (int i = 0; i < 64; i++)
 	{
 		int bit0, bit1, bit2, bit3, r, g, b;
 
@@ -77,33 +77,32 @@ WRITE8_MEMBER(matmania_state::matmania_paletteram_w)
 {
 	int bit0, bit1, bit2, bit3, val;
 	int r, g, b;
-	int offs2;
 
 	m_paletteram[offset] = data;
-	offs2 = offset & 0x0f;
+	offset &= 0x0f;
 
-	val = m_paletteram[offs2];
+	val = m_paletteram[offset];
 	bit0 = BIT(val, 0);
 	bit1 = BIT(val, 1);
 	bit2 = BIT(val, 2);
 	bit3 = BIT(val, 3);
 	r = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-	val = m_paletteram[offs2 | 0x10];
+	val = m_paletteram[offset | 0x10];
 	bit0 = BIT(val, 0);
 	bit1 = BIT(val, 1);
 	bit2 = BIT(val, 2);
 	bit3 = BIT(val, 3);
 	g = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-	val = m_paletteram[offs2 | 0x20];
+	val = m_paletteram[offset | 0x20];
 	bit0 = BIT(val, 0);
 	bit1 = BIT(val, 1);
 	bit2 = BIT(val, 2);
 	bit3 = BIT(val, 3);
 	b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-	m_palette->set_pen_color(offs2 + 64,rgb_t(r,g,b));
+	m_palette->set_pen_color(offset + 64, rgb_t(r,g,b));
 }
 
 

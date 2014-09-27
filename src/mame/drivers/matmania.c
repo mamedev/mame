@@ -38,9 +38,133 @@ The driver has been updated accordingly.
 #include "sound/3526intf.h"
 #include "includes/matmania.h"
 
+
 /*************************************
  *
- *  Memory handlers
+ *  Mania Challenge 68705 protection interface
+ *
+ *  The following is ENTIRELY GUESSWORK!!!
+ *
+ *************************************/
+
+READ8_MEMBER(matmania_state::maniach_68705_port_a_r)
+{
+	//logerror("%04x: 68705 port A read %02x\n", space.device().safe_pc(), m_port_a_in);
+	return (m_port_a_out & m_ddr_a) | (m_port_a_in & ~m_ddr_a);
+}
+
+WRITE8_MEMBER(matmania_state::maniach_68705_port_a_w)
+{
+	//logerror("%04x: 68705 port A write %02x\n", space.device().safe_pc(), data);
+	m_port_a_out = data;
+}
+
+WRITE8_MEMBER(matmania_state::maniach_68705_ddr_a_w)
+{
+	m_ddr_a = data;
+}
+
+
+/*
+ *  Port B connections:
+ *
+ *  all bits are logical 1 when read (+5V pullup)
+ *
+ *  1   W  when 1->0, enables latch which brings the command from main CPU (read from port A)
+ *  2   W  when 0->1, copies port A to the latch for the main CPU
+ */
+
+READ8_MEMBER(matmania_state::maniach_68705_port_b_r)
+{
+	return (m_port_b_out & m_ddr_b) | (m_port_b_in & ~m_ddr_b);
+}
+
+WRITE8_MEMBER(matmania_state::maniach_68705_port_b_w)
+{
+	//logerror("%04x: 68705 port B write %02x\n", space.device().safe_pc(), data);
+
+	if (BIT(m_ddr_b, 1) && BIT(~data, 1) && BIT(m_port_b_out, 1))
+	{
+		m_port_a_in = m_from_main;
+		m_main_sent = 0;
+		//logerror("read command %02x from main cpu\n", m_port_a_in);
+	}
+	if (BIT(m_ddr_b, 2) && BIT(data, 2) && BIT(~m_port_b_out, 2))
+	{
+		//logerror("send command %02x to main cpu\n", m_port_a_out);
+		m_from_mcu = m_port_a_out;
+		m_mcu_sent = 1;
+	}
+
+	m_port_b_out = data;
+}
+
+WRITE8_MEMBER(matmania_state::maniach_68705_ddr_b_w)
+{
+	m_ddr_b = data;
+}
+
+
+READ8_MEMBER(matmania_state::maniach_68705_port_c_r)
+{
+	m_port_c_in = 0;
+
+	if (m_main_sent)
+		m_port_c_in |= 0x01;
+
+	if (!m_mcu_sent)
+		m_port_c_in |= 0x02;
+
+	//logerror("%04x: 68705 port C read %02x\n",m_space->device().safe_pc(), m_port_c_in);
+
+	return (m_port_c_out & m_ddr_c) | (m_port_c_in & ~m_ddr_c);
+}
+
+WRITE8_MEMBER(matmania_state::maniach_68705_port_c_w)
+{
+	//logerror("%04x: 68705 port C write %02x\n", space.device().safe_pc(), data);
+	m_port_c_out = data;
+}
+
+WRITE8_MEMBER(matmania_state::maniach_68705_ddr_c_w)
+{
+	m_ddr_c = data;
+}
+
+
+WRITE8_MEMBER(matmania_state::maniach_mcu_w)
+{
+	//logerror("%04x: 3040_w %02x\n", space.device().safe_pc(), data);
+	m_from_main = data;
+	m_main_sent = 1;
+}
+
+READ8_MEMBER(matmania_state::maniach_mcu_r)
+{
+	//logerror("%04x: 3040_r %02x\n", space.device().safe_pc(), m_from_mcu);
+	m_mcu_sent = 0;
+	return m_from_mcu;
+}
+
+READ8_MEMBER(matmania_state::maniach_mcu_status_r)
+{
+	int res = 0;
+
+	/* bit 0 = when 0, mcu has sent data to the main cpu */
+	/* bit 1 = when 1, mcu is ready to receive data from main cpu */
+	//logerror("%04x: 3041_r\n", space.device().safe_pc());
+	if (!m_mcu_sent)
+		res |= 0x01;
+	if (!m_main_sent)
+		res |= 0x02;
+
+	return res;
+}
+
+
+/*************************************
+ *
+ *  Misc Memory handlers
  *
  *************************************/
 
@@ -296,10 +420,6 @@ GFXDECODE_END
  *
  *************************************/
 
-MACHINE_START_MEMBER(matmania_state,matmania)
-{
-}
-
 static MACHINE_CONFIG_START( matmania, matmania_state )
 
 	/* basic machine hardware */
@@ -310,10 +430,8 @@ static MACHINE_CONFIG_START( matmania, matmania_state )
 	MCFG_CPU_ADD("audiocpu", M6502, 1200000)    /* 1.2 MHz ???? */
 	MCFG_CPU_PROGRAM_MAP(matmania_sound_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(matmania_state, nmi_line_pulse, 15*60) /* ???? */
-								/* IRQs are caused by the main CPU */
-	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
-	MCFG_MACHINE_START_OVERRIDE(matmania_state,matmania)
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -344,8 +462,6 @@ MACHINE_CONFIG_END
 
 MACHINE_START_MEMBER(matmania_state,maniach)
 {
-	MACHINE_START_CALL_MEMBER(matmania);
-
 	save_item(NAME(m_port_a_in));
 	save_item(NAME(m_port_a_out));
 	save_item(NAME(m_ddr_a));
@@ -387,7 +503,6 @@ static MACHINE_CONFIG_START( maniach, matmania_state )
 
 	MCFG_CPU_ADD("audiocpu", M6809, 1500000)    /* 1.5 MHz ???? */
 	MCFG_CPU_PROGRAM_MAP(maniach_sound_map)
-								/* IRQs are caused by the main CPU */
 
 	MCFG_CPU_ADD("mcu", M68705, 1500000*2)  /* (don't know really how fast, but it doesn't need to even be this fast) */
 	MCFG_CPU_PROGRAM_MAP(maniach_mcu_map)
@@ -420,6 +535,7 @@ static MACHINE_CONFIG_START( maniach, matmania_state )
 	MCFG_DAC_ADD("dac")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 MACHINE_CONFIG_END
+
 
 /*************************************
  *
@@ -656,6 +772,6 @@ ROM_END
  *************************************/
 
 GAME( 1985, matmania, 0,        matmania, matmania, driver_device, 0, ROT270, "Technos Japan (Taito America license)", "Mat Mania", GAME_SUPPORTS_SAVE )
-GAME( 1985, excthour, matmania, matmania, maniach, driver_device,  0, ROT270, "Technos Japan (Taito license)", "Exciting Hour", GAME_SUPPORTS_SAVE )
-GAME( 1986, maniach,  0,        maniach,  maniach, driver_device,  0, ROT270, "Technos Japan (Taito America license)", "Mania Challenge (set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1986, maniach2, maniach,  maniach,  maniach, driver_device,  0, ROT270, "Technos Japan (Taito America license)", "Mania Challenge (set 2)", GAME_SUPPORTS_SAVE )  /* earlier version? */
+GAME( 1985, excthour, matmania, matmania, maniach,  driver_device, 0, ROT270, "Technos Japan (Taito license)", "Exciting Hour", GAME_SUPPORTS_SAVE )
+GAME( 1986, maniach,  0,        maniach,  maniach,  driver_device, 0, ROT270, "Technos Japan (Taito America license)", "Mania Challenge (set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1986, maniach2, maniach,  maniach,  maniach,  driver_device, 0, ROT270, "Technos Japan (Taito America license)", "Mania Challenge (set 2)", GAME_SUPPORTS_SAVE ) /* earlier version? */

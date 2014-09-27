@@ -19,7 +19,8 @@ public:
 		m_mcu(*this, "mcu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette")
+	{ }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_videoram;
@@ -33,26 +34,6 @@ public:
 	required_shared_ptr<UINT8> m_spriteram;
 	required_shared_ptr<UINT8> m_paletteram;
 
-	/* video-related */
-	bitmap_ind16        *m_tmpbitmap;
-	bitmap_ind16        *m_tmpbitmap2;
-
-	/* mcu */
-	/* maniach 68705 protection */
-	UINT8           m_port_a_in;
-	UINT8           m_port_a_out;
-	UINT8           m_ddr_a;
-	UINT8           m_port_b_in;
-	UINT8           m_port_b_out;
-	UINT8           m_ddr_b;
-	UINT8           m_port_c_in;
-	UINT8           m_port_c_out;
-	UINT8           m_ddr_c;
-	UINT8           m_from_main;
-	UINT8           m_from_mcu;
-	int             m_mcu_sent;
-	int             m_main_sent;
-
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
@@ -61,27 +42,45 @@ public:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 
+	/* video-related */
+	bitmap_ind16 *m_tmpbitmap;
+	bitmap_ind16 *m_tmpbitmap2;
+
+	/* maniach 68705 protection */
+	UINT8 m_port_a_in;
+	UINT8 m_port_a_out;
+	UINT8 m_ddr_a;
+	UINT8 m_port_b_in;
+	UINT8 m_port_b_out;
+	UINT8 m_ddr_b;
+	UINT8 m_port_c_in;
+	UINT8 m_port_c_out;
+	UINT8 m_ddr_c;
+	UINT8 m_from_main;
+	UINT8 m_from_mcu;
+	int m_mcu_sent;
+	int m_main_sent;
+
+	DECLARE_READ8_MEMBER(maniach_68705_port_a_r);
+	DECLARE_WRITE8_MEMBER(maniach_68705_port_a_w);
+	DECLARE_READ8_MEMBER(maniach_68705_port_b_r);
+	DECLARE_WRITE8_MEMBER(maniach_68705_port_b_w);
+	DECLARE_READ8_MEMBER(maniach_68705_port_c_r);
+	DECLARE_WRITE8_MEMBER(maniach_68705_port_c_w);
+	DECLARE_WRITE8_MEMBER(maniach_68705_ddr_a_w);
+	DECLARE_WRITE8_MEMBER(maniach_68705_ddr_b_w);
+	DECLARE_WRITE8_MEMBER(maniach_68705_ddr_c_w);
+	DECLARE_WRITE8_MEMBER(maniach_mcu_w);
+	DECLARE_READ8_MEMBER(maniach_mcu_r);
+	DECLARE_READ8_MEMBER(maniach_mcu_status_r);
+
 	DECLARE_WRITE8_MEMBER(matmania_sh_command_w);
 	DECLARE_WRITE8_MEMBER(maniach_sh_command_w);
 	DECLARE_WRITE8_MEMBER(matmania_paletteram_w);
 	virtual void video_start();
 	DECLARE_PALETTE_INIT(matmania);
-	DECLARE_MACHINE_START(matmania);
 	DECLARE_MACHINE_START(maniach);
 	DECLARE_MACHINE_RESET(maniach);
 	UINT32 screen_update_matmania(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_maniach(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	/*----------- defined in machine/maniach.c -----------*/
-	DECLARE_READ8_MEMBER( maniach_68705_port_a_r );
-	DECLARE_WRITE8_MEMBER( maniach_68705_port_a_w );
-	DECLARE_READ8_MEMBER( maniach_68705_port_b_r );
-	DECLARE_WRITE8_MEMBER( maniach_68705_port_b_w );
-	DECLARE_READ8_MEMBER( maniach_68705_port_c_r );
-	DECLARE_WRITE8_MEMBER( maniach_68705_port_c_w );
-	DECLARE_WRITE8_MEMBER( maniach_68705_ddr_a_w );
-	DECLARE_WRITE8_MEMBER( maniach_68705_ddr_b_w );
-	DECLARE_WRITE8_MEMBER( maniach_68705_ddr_c_w );
-	DECLARE_WRITE8_MEMBER( maniach_mcu_w );
-	DECLARE_READ8_MEMBER( maniach_mcu_r );
-	DECLARE_READ8_MEMBER( maniach_mcu_status_r );
 };
