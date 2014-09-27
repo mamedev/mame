@@ -134,7 +134,8 @@ irq vector 0x26:                                                                
 #include "sound/wave.h"
 
 #include "imagedev/cassette.h"
-#include "imagedev/cartslot.h"
+#include "bus/generic/slot.h"
+#include "bus/generic/carts.h"
 #include "formats/p6001_cas.h"
 
 
@@ -147,10 +148,10 @@ public:
 		m_ram(*this, "ram"),
 		m_maincpu(*this, "maincpu"),
 		m_cassette(*this, "cassette"),
+		m_cas_hack(*this, "cas_hack"),
+		m_cart(*this, "cartslot"),
 		m_region_maincpu(*this, "maincpu"),
 		m_region_gfx1(*this, "gfx1"),
-		m_region_cas(*this, "cas"),
-		m_region_cart_img(*this, "cart_img"),
 		m_io_mode4_dsw(*this, "MODE4_DSW"),
 		m_io_p1(*this, "P1"),
 		m_io_p2(*this, "P2"),
@@ -266,15 +267,14 @@ public:
 	DECLARE_WRITE8_MEMBER(pc6001_8255_portb_w);
 	DECLARE_WRITE8_MEMBER(pc6001_8255_portc_w);
 	DECLARE_READ8_MEMBER(pc6001_8255_portc_r);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(pc6001_cass);
 	IRQ_CALLBACK_MEMBER(pc6001_irq_callback);
 protected:
 	required_device<cpu_device> m_maincpu;
-	required_device<device_t> m_cassette;
+	optional_device<cassette_image_device> m_cassette;
+	optional_device<generic_slot_device> m_cas_hack;
+	required_device<generic_slot_device> m_cart;
 	required_memory_region m_region_maincpu;
 	required_memory_region m_region_gfx1;
-	required_memory_region m_region_cas;
-	required_memory_region m_region_cart_img;
 	required_ioport m_io_mode4_dsw;
 	required_ioport m_io_p1;
 	required_ioport m_io_p2;
@@ -291,6 +291,8 @@ protected:
 	optional_memory_bank m_bank7;
 	optional_memory_bank m_bank8;
 	required_device<palette_device> m_palette;
+
+	memory_region *m_cart_rom;
 
 	void draw_gfx_mode4(bitmap_ind16 &bitmap,const rectangle &cliprect,int attr);
 	void draw_bitmap_2bpp(bitmap_ind16 &bitmap,const rectangle &cliprect, int attr);
@@ -906,15 +908,12 @@ WRITE8_MEMBER(pc6001_state::nec_ppi8255_w)
 		m_port_c_8255 |= 0xa8;
 
 		{
-			UINT8 *gfx_data = m_region_gfx1->base();
-			UINT8 *ext_rom = m_region_cart_img->base();
-
 			//printf("%02x\n",data);
 
-			if((data & 0x0f) == 0x05)
-				m_bank1->set_base(&ext_rom[0x2000]);
-			if((data & 0x0f) == 0x04)
-				m_bank1->set_base(&gfx_data[0]);
+			if ((data & 0x0f) == 0x05 && m_cart_rom)
+				m_bank1->set_base(m_cart_rom->base() + 0x2000);
+			if ((data & 0x0f) == 0x04)
+				m_bank1->set_base(m_region_gfx1->base());
 		}
 	}
 	m_ppi->write(space,offset,data);
@@ -923,7 +922,7 @@ WRITE8_MEMBER(pc6001_state::nec_ppi8255_w)
 static ADDRESS_MAP_START(pc6001_map, AS_PROGRAM, 8, pc6001_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x3fff) AM_ROM AM_WRITENOP
-	AM_RANGE(0x4000, 0x5fff) AM_ROM AM_REGION("cart_img",0)
+	//AM_RANGE(0x4000, 0x5fff)		// mapped by the cartslot
 	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0xffff) AM_RAM AM_SHARE("ram")
 ADDRESS_MAP_END
@@ -1639,15 +1638,12 @@ WRITE8_MEMBER(pc6001_state::necsr_ppi8255_w)
 
 		if(0)
 		{
-			UINT8 *gfx_data = m_region_gfx1->base();
-			UINT8 *ext_rom = m_region_cart_img->base();
-
 			//printf("%02x\n",data);
-
-			if((data & 0x0f) == 0x05)
-				m_bank1->set_base(&ext_rom[0x2000]);
-			if((data & 0x0f) == 0x04)
-				m_bank1->set_base(&gfx_data[0]);
+			
+			if ((data & 0x0f) == 0x05 && m_cart_rom)
+				m_bank1->set_base(m_cart_rom->base() + 0x2000);
+			if ((data & 0x0f) == 0x04)
+				m_bank1->set_base(m_region_gfx1->base());
 		}
 	}
 	m_ppi->write(space,offset,data);
@@ -1994,27 +1990,26 @@ TIMER_DEVICE_CALLBACK_MEMBER(pc6001_state::cassette_callback)
 	if(m_cas_switch == 1)
 	{
 		#if 0
-		static UINT8 cas_data_i = 0x80,cas_data_poll;
-		//m_cur_keycode = gfx_data[m_cas_offset++];
-		if(m_cassette->input() > 0.03)
-			cas_data_poll|= cas_data_i;
-		else
-			cas_data_poll&=~cas_data_i;
-		if(cas_data_i == 1)
-		{
-			m_cur_keycode = cas_data_poll;
-			cas_data_i = 0x80;
-			/* data ready, poll irq */
-			m_irq_vector = 0x08;
-			m_maincpu->set_input_line(0, ASSERT_LINE);
-		}
-		else
-			cas_data_i>>=1;
+			static UINT8 cas_data_i = 0x80,cas_data_poll;
+			//m_cur_keycode = gfx_data[m_cas_offset++];
+			if(m_cassette->input() > 0.03)
+				cas_data_poll|= cas_data_i;
+			else
+				cas_data_poll&=~cas_data_i;
+			if(cas_data_i == 1)
+			{
+				m_cur_keycode = cas_data_poll;
+				cas_data_i = 0x80;
+				/* data ready, poll irq */
+				m_irq_vector = 0x08;
+				m_maincpu->set_input_line(0, ASSERT_LINE);
+			}
+			else
+				cas_data_i>>=1;
 		#else
-			UINT8 *cas_data = m_region_cas->base();
-
-			m_cur_keycode = cas_data[m_cas_offset++];
-			popmessage("%04x %04x",m_cas_offset,m_cas_maxsize);
+			address_space &space = m_maincpu->space(AS_PROGRAM);
+			m_cur_keycode = m_cas_hack->read_rom(space, m_cas_offset++);
+			popmessage("%04x %04x", m_cas_offset, m_cas_maxsize);
 			if(m_cas_offset > m_cas_maxsize)
 			{
 				m_cas_offset = 0;
@@ -2078,14 +2073,19 @@ void pc6001_state::machine_start()
 
 void pc6001_state::machine_reset()
 {
-	UINT8 *work_ram = m_region_maincpu->base();
+	m_video_ram = m_region_maincpu->base() + 0xc000;
+	
+	if (m_cart->exists())
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0x4000, 0x5fff, read8_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_cart));
 
-	m_video_ram =  work_ram + 0xc000;
-
+	astring region_tag;
+	m_cart_rom = memregion(region_tag.cpy(m_cart->tag()).cat(GENERIC_ROM_REGION_TAG));
+	
 	m_port_c_8255=0;
 
 	m_cas_switch = 0;
 	m_cas_offset = 0;
+	m_cas_maxsize = (m_cas_hack->exists()) ? m_cas_hack->get_rom_size() : 0;
 	m_timer_irq_mask = 1;
 	m_timer_irq_mask2 = 1;
 	m_timer_irq_vector = 0x06; // actually vector is fixed in plain PC-6001
@@ -2094,14 +2094,19 @@ void pc6001_state::machine_reset()
 
 MACHINE_RESET_MEMBER(pc6001_state,pc6001m2)
 {
-	UINT8 *work_ram = m_region_maincpu->base();
-
-	m_video_ram = work_ram + 0xc000 + 0x28000;
-
+	m_video_ram = m_region_maincpu->base() + 0xc000 + 0x28000;
+	
+	astring region_tag;
+	m_cart_rom = memregion(region_tag.cpy(m_cart->tag()).cat(GENERIC_ROM_REGION_TAG));
+	// hackish way to simplify bankswitch handling
+	if (m_cart_rom)
+		memcpy(m_region_maincpu->base() + 0x48000, m_cart_rom->base(), 0x4000);
+	
 	m_port_c_8255=0;
 
 	m_cas_switch = 0;
 	m_cas_offset = 0;
+	m_cas_maxsize = (m_cas_hack->exists()) ? m_cas_hack->get_rom_size() : 0;
 
 	/* set default bankswitch */
 	{
@@ -2128,14 +2133,17 @@ MACHINE_RESET_MEMBER(pc6001_state,pc6001m2)
 
 MACHINE_RESET_MEMBER(pc6001_state,pc6001sr)
 {
-	UINT8 *work_ram = m_region_maincpu->base();
-
-	m_video_ram = work_ram + 0x70000;
-
+	m_video_ram = m_region_maincpu->base() + 0x70000;
+	
+	astring region_tag;
+	m_cart_rom = memregion(region_tag.cpy(m_cart->tag()).cat(GENERIC_ROM_REGION_TAG));
+	// should this be mirrored into the EXROM regions? hard to tell without an actual cart dump...
+	
 	m_port_c_8255=0;
 
 	m_cas_switch = 0;
 	m_cas_offset = 0;
+	m_cas_maxsize = (m_cas_hack->exists()) ? m_cas_hack->get_rom_size() : 0;
 
 	/* set default bankswitch */
 	{
@@ -2235,23 +2243,6 @@ static const cassette_interface pc6001_cassette_interface =
 };
 #endif
 
-DEVICE_IMAGE_LOAD_MEMBER( pc6001_state,pc6001_cass )
-{
-	UINT8 *cas = m_region_cas->base();
-	UINT32 size;
-
-	size = image.length();
-	if (image.fread( cas, size) != size)
-	{
-		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unable to fully read from file");
-		return IMAGE_INIT_FAIL;
-	}
-
-	m_cas_maxsize = size;
-
-	return IMAGE_INIT_PASS;
-}
-
 static const gfx_layout char_layout =
 {
 	8, 16,
@@ -2318,16 +2309,11 @@ static MACHINE_CONFIG_START( pc6001, pc6001_state )
 	/* uart */
 	MCFG_DEVICE_ADD("uart", I8251, 0)
 
-	MCFG_CARTSLOT_ADD("cart")
-	MCFG_CARTSLOT_EXTENSION_LIST("bin")
-	MCFG_CARTSLOT_NOT_MANDATORY
+	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "pc6001_cart")
 
-//  MCFG_CASSETTE_ADD("cassette",pc6001_cassette_interface)
-	MCFG_CARTSLOT_ADD("cassette")
-	MCFG_CARTSLOT_EXTENSION_LIST("cas,p6")
-	MCFG_CARTSLOT_NOT_MANDATORY
-	MCFG_CARTSLOT_INTERFACE("pc6001_cass")
-	MCFG_CARTSLOT_LOAD(pc6001_state,pc6001_cass)
+//  MCFG_CASSETTE_ADD("cassette", pc6001_cassette_interface)
+	MCFG_GENERIC_CARTSLOT_ADD("cas_hack", generic_plain_slot, "pc6001_cass")
+	MCFG_GENERIC_EXTENSIONS("cas,p6")
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("ay8910", AY8910, PC6001_MAIN_CLOCK/4)
@@ -2405,11 +2391,6 @@ ROM_START( pc6001 )
 	ROM_RELOAD(             0x1000, 0x1000 )
 
 	ROM_REGION( 0x8000, "gfx2", ROMREGION_ERASEFF )
-
-	ROM_REGION( 0x20000, "cas", ROMREGION_ERASEFF )
-
-	ROM_REGION( 0x4000, "cart_img", ROMREGION_ERASE00 )
-	ROM_CART_LOAD("cart", 0x0000, 0x4000, ROM_OPTIONAL | ROM_MIRROR)
 ROM_END
 
 ROM_START( pc6001a )
@@ -2423,11 +2404,6 @@ ROM_START( pc6001a )
 	ROM_LOAD( "cgrom60.60a", 0x0000, 0x1000, CRC(49c21d08) SHA1(9454d6e2066abcbd051bad9a29a5ca27b12ec897) )
 
 	ROM_REGION( 0x8000, "gfx2", ROMREGION_ERASEFF )
-
-	ROM_REGION( 0x20000, "cas", ROMREGION_ERASEFF )
-
-	ROM_REGION( 0x4000, "cart_img", ROMREGION_ERASE00 )
-	ROM_CART_LOAD("cart", 0x0000, 0x4000, ROM_OPTIONAL | ROM_MIRROR)
 ROM_END
 
 ROM_START( pc6001mk2 )
@@ -2439,7 +2415,7 @@ ROM_START( pc6001mk2 )
 	ROM_LOAD( "kanjirom.62", 0x20000, 0x8000, CRC(20c8f3eb) SHA1(4c9f30f0a2ebbe70aa8e697f94eac74d8241cadd) )
 	// work ram              0x28000,0x10000
 	// extended work ram     0x38000,0x10000
-	ROM_CART_LOAD("cart",    0x48000, 0x4000, ROM_OPTIONAL | ROM_MIRROR)
+	// exrom                 0x48000, 0x4000
 	// <invalid>             0x4c000, 0x4000
 
 	ROM_REGION( 0x1000, "mcu", ROMREGION_ERASEFF )
@@ -2450,11 +2426,6 @@ ROM_START( pc6001mk2 )
 
 	ROM_REGION( 0x8000, "gfx2", 0 )
 	ROM_COPY( "maincpu", 0x20000, 0x00000, 0x8000 )
-
-	ROM_REGION( 0x20000, "cas", ROMREGION_ERASEFF )
-
-	ROM_REGION( 0x4000, "cart_img", ROMREGION_ERASE00 )
-	ROM_COPY( "maincpu", 0x48000, 0x0000, 0x4000 )
 ROM_END
 
 ROM_START( pc6601 ) /* Variant of pc6001m2 */
@@ -2464,7 +2435,7 @@ ROM_START( pc6601 ) /* Variant of pc6001m2 */
 	ROM_LOAD( "cgrom60.66",  0x1c000, 0x2000, CRC(d2434f29) SHA1(a56d76f5cbdbcdb8759abe601eab68f01b0a8fe8) )
 	ROM_LOAD( "cgrom66.66",  0x1e000, 0x2000, CRC(3ce48c33) SHA1(f3b6c63e83a17d80dde63c6e4d86adbc26f84f79) )
 	ROM_LOAD( "kanjirom.66", 0x20000, 0x8000, CRC(20c8f3eb) SHA1(4c9f30f0a2ebbe70aa8e697f94eac74d8241cadd) )
-	ROM_CART_LOAD("cart",    0x48000, 0x4000, ROM_OPTIONAL | ROM_MIRROR)
+	// exrom                 0x48000, 0x4000
 
 	ROM_REGION( 0x1000, "mcu", ROMREGION_ERASEFF )
 	ROM_LOAD( "i8049", 0x0000, 0x1000, NO_DUMP )
@@ -2474,11 +2445,6 @@ ROM_START( pc6601 ) /* Variant of pc6001m2 */
 
 	ROM_REGION( 0x8000, "gfx2", 0 )
 	ROM_COPY( "maincpu", 0x20000, 0x00000, 0x8000 )
-
-	ROM_REGION( 0x20000, "cas", ROMREGION_ERASEFF )
-
-	ROM_REGION( 0x4000, "cart_img", ROMREGION_ERASE00 )
-	ROM_COPY( "maincpu", 0x48000, 0x0000, 0x4000 )
 ROM_END
 
 ROM_START( pc6001sr )
@@ -2500,11 +2466,6 @@ ROM_START( pc6001sr )
 
 	ROM_REGION( 0x8000, "gfx2", 0 )
 	ROM_COPY( "maincpu", 0x28000, 0x00000, 0x8000 )
-
-	ROM_REGION( 0x20000, "cas", ROMREGION_ERASEFF )
-
-	ROM_REGION( 0x4000, "cart_img", ROMREGION_ERASE00 )
-	ROM_COPY( "maincpu", 0x48000, 0x0000, 0x4000 )
 ROM_END
 
 /*    YEAR  NAME      PARENT   COMPAT MACHINE   INPUT     INIT    COMPANY  FULLNAME          FLAGS */

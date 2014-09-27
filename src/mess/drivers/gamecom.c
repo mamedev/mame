@@ -103,9 +103,7 @@ static MACHINE_CONFIG_START( gamecom, gamecom_state )
 
 	//MCFG_NVRAM_ADD_0FILL("nvram")
 
-
 	/* video hardware */
-
 	MCFG_SCREEN_ADD("screen", LCD)
 	MCFG_SCREEN_REFRESH_RATE( 59.732155 )
 	MCFG_SCREEN_VBLANK_TIME(500)
@@ -126,15 +124,15 @@ static MACHINE_CONFIG_START( gamecom, gamecom_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.00)
 
 	/* cartridge */
-	MCFG_CARTSLOT_ADD("cart1")
-	MCFG_CARTSLOT_EXTENSION_LIST("bin,tgc")
-	MCFG_CARTSLOT_INTERFACE("gamecom_cart")
-	MCFG_CARTSLOT_LOAD(gamecom_state,gamecom_cart1)
+	MCFG_GENERIC_CARTSLOT_ADD("cartslot1", generic_linear_slot, "gamecom_cart")
+	MCFG_GENERIC_EXTENSIONS("bin,tgc")
+	MCFG_GENERIC_LOAD(gamecom_state, gamecom_cart1)
+
+	MCFG_GENERIC_CARTSLOT_ADD("cartslot2", generic_linear_slot, "gamecom_cart")
+	MCFG_GENERIC_EXTENSIONS("bin,tgc")
+	MCFG_GENERIC_LOAD(gamecom_state, gamecom_cart2)
+
 	MCFG_SOFTWARE_LIST_ADD("cart_list","gamecom")
-	MCFG_CARTSLOT_ADD("cart2")
-	MCFG_CARTSLOT_EXTENSION_LIST("bin,tgc")
-	MCFG_CARTSLOT_INTERFACE("gamecom_cart")
-	MCFG_CARTSLOT_LOAD(gamecom_state,gamecom_cart2)
 MACHINE_CONFIG_END
 
 ROM_START( gamecom )
@@ -143,9 +141,6 @@ ROM_START( gamecom )
 
 	ROM_REGION( 0x40000, "kernel", 0 )
 	ROM_LOAD( "external.bin", 0x00000, 0x40000, CRC(e235a589) SHA1(97f782e72d738f4d7b861363266bf46b438d9b50) )
-
-	ROM_REGION( 0x200000, "cart1", ROMREGION_ERASEFF )
-	ROM_REGION( 0x200000, "cart2", ROMREGION_ERASEFF )
 ROM_END
 
 /*    YEAR  NAME     PARENT COMPAT MACHINE  INPUT    INIT    COMPANY  FULLNAME */

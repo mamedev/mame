@@ -8,13 +8,15 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "imagedev/cartslot.h"
 #include "machine/i8255.h"
 #include "machine/i8251.h"
 #include "machine/ram.h"
 #include "machine/upd1990a.h"
 #include "video/mc6845.h"
 #include "video/sed1330.h"
+
+#include "bus/generic/slot.h"
+#include "bus/generic/carts.h"
 
 #define SCREEN_TAG      "screen"
 #define CRT_SCREEN_TAG  "screen2"
@@ -40,20 +42,12 @@ public:
 			m_lcdc(*this, SED1330_TAG),
 			m_crtc(*this, MC6845_TAG),
 			m_screen_lcd(*this, SCREEN_TAG),
+			m_cart(*this, "cartslot"),
+			m_io_cart(*this, "io_cart"),
 			m_ram(*this, RAM_TAG),
 			m_rom(*this, Z80_TAG),
-			m_io_rom(*this, "iorom"),
 			m_crt_ram(*this, "crt_ram"),
-			m_y0(*this, "Y0"),
-			m_y1(*this, "Y1"),
-			m_y2(*this, "Y2"),
-			m_y3(*this, "Y3"),
-			m_y4(*this, "Y4"),
-			m_y5(*this, "Y5"),
-			m_y6(*this, "Y6"),
-			m_y7(*this, "Y7"),
-			m_y8(*this, "Y8"),
-			m_y9(*this, "Y9")
+			m_io_y(*this, "Y")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -61,23 +55,16 @@ public:
 	required_device<sed1330_device> m_lcdc;
 	optional_device<mc6845_device> m_crtc;
 	required_device<screen_device> m_screen_lcd;
+	required_device<generic_slot_device> m_cart;
+	required_device<generic_slot_device> m_io_cart;
 	required_device<ram_device> m_ram;
 	required_memory_region m_rom;
-	required_memory_region m_io_rom;
 	optional_shared_ptr<UINT8> m_crt_ram;
-	required_ioport m_y0;
-	required_ioport m_y1;
-	required_ioport m_y2;
-	required_ioport m_y3;
-	required_ioport m_y4;
-	required_ioport m_y5;
-	required_ioport m_y6;
-	required_ioport m_y7;
-	required_ioport m_y8;
-	required_ioport m_y9;
+	required_ioport_array<10> m_io_y;
+
+	memory_region *m_cart_rom;
 
 	virtual void machine_start();
-
 	virtual void video_start();
 
 	DECLARE_WRITE8_MEMBER( mmr_w );

@@ -106,8 +106,8 @@ TODO:
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "audio/socrates.h"
-#include "imagedev/cartslot.h"
-
+#include "bus/generic/slot.h"
+#include "bus/generic/carts.h"
 
 class socrates_state : public driver_device
 {
@@ -122,19 +122,26 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_sound(*this, "soc_snd"),
-		m_screen(*this, "screen")
+		m_screen(*this, "screen"),
+		m_cart(*this, "cartslot"),
+		m_bios_reg(*this, "maincpu"),
+		m_vram_reg(*this, "vram")
 		{ }
 	required_device<cpu_device> m_maincpu;
 	required_device<socrates_snd_device> m_sound;
 	required_device<screen_device> m_screen;
+	required_device<generic_slot_device> m_cart;
 
 	rgb_t m_palette_val[256];
+
+	required_memory_region m_bios_reg;
+	required_memory_region m_vram_reg;
+	memory_region *m_cart_reg;
 
 	UINT8 m_data[8];
 	UINT8 m_rom_bank;
 	UINT8 m_ram_bank;
 	UINT16 m_scroll_offset;
-	UINT8* m_videoram;
 	UINT8 m_kb_latch_low[2];
 	UINT8 m_kb_latch_high[2];
 	UINT8 m_kb_latch_mouse;
@@ -235,15 +242,21 @@ private:
 
 /* Devices */
 
-void socrates_state::socrates_set_rom_bank(  )
+void socrates_state::socrates_set_rom_bank()
 {
-	membank( "bank1" )->set_base( memregion("maincpu")->base() + ( m_rom_bank * 0x4000 ));
+	if (m_cart_reg && m_rom_bank >= 0x10)
+	{
+		int bank =  m_rom_bank % (m_cart->get_rom_size() / 0x4000);
+		membank("bank1")->set_base(m_cart_reg->base() + (bank * 0x4000));
+	}
+	else
+		membank("bank1")->set_base(m_bios_reg->base() + (m_rom_bank * 0x4000));
 }
 
-void socrates_state::socrates_set_ram_bank(  )
+void socrates_state::socrates_set_ram_bank()
 {
-	membank( "bank2" )->set_base( memregion("vram")->base() + ( (m_ram_bank&0x3) * 0x4000 )); // window 0
-	membank( "bank3" )->set_base( memregion("vram")->base() + ( ((m_ram_bank&0xC)>>2) * 0x4000 )); // window 1
+	membank("bank2")->set_base(m_vram_reg->base() + ( (m_ram_bank & 0x3) * 0x4000)); // window 0
+	membank("bank3")->set_base(m_vram_reg->base() + (((m_ram_bank & 0xc) >> 2) * 0x4000)); // window 1
 }
 
 void socrates_state::socrates_update_kb(  )
@@ -304,6 +317,9 @@ void socrates_state::socrates_check_kb_latch(  ) // if kb[1] is full and kb[0] i
 
 void socrates_state::machine_reset()
 {
+	astring region_tag;
+	m_cart_reg = memregion(region_tag.cpy(m_cart->tag()).cat(GENERIC_ROM_REGION_TAG));
+	
 	m_rom_bank = 0xF3; // actually set semi-randomly on real console but we need to initialize it somewhere...
 	socrates_set_rom_bank();
 	m_ram_bank = 0;  // the actual console sets it semi randomly on power up, and the bios cleans it up.
@@ -343,9 +359,9 @@ void socrates_state::device_timer(emu_timer &timer, device_timer_id id, int para
 DRIVER_INIT_MEMBER(socrates_state,socrates)
 {
 	UINT8 *gfx = memregion("vram")->base();
-	int i;
+
 	/* fill vram with its init powerup bit pattern, so startup has the checkerboard screen */
-	for (i = 0; i < 0x10000; i++)
+	for (int i = 0; i < 0x10000; i++)
 		gfx[i] = (((i&0x1)?0x00:0xFF)^((i&0x100)?0x00:0xff));
 // init sound channels to both be on lowest pitch and max volume
 	m_maincpu->set_clock_scale(0.45f); /* RAM access waitstates etc. aren't emulated - slow the CPU to compensate */
@@ -714,7 +730,6 @@ PALETTE_INIT_MEMBER(socrates_state, socrates)
 
 void socrates_state::video_start()
 {
-	m_videoram = memregion("vram")->base();
 	m_scroll_offset = 0;
 }
 
@@ -724,6 +739,7 @@ UINT32 socrates_state::screen_update_socrates(screen_device &screen, bitmap_ind1
 	{
 	0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0xF7
 	};
+	UINT8 *videoram = m_vram_reg->base();
 	int x, y, colidx, color;
 	int lineoffset = 0; // if display ever tries to display data at 0xfxxx, offset line displayed by 0x1000
 	for (y = 0; y < 228; y++)
@@ -733,19 +749,19 @@ UINT32 socrates_state::screen_update_socrates(screen_device &screen, bitmap_ind1
 		{
 			if (x < 256)
 			{
-				colidx = m_videoram[(((y+m_scroll_offset)*128)+(x>>1)+lineoffset)&0xffff];
+				colidx =videoram[(((y+m_scroll_offset)*128)+(x>>1)+lineoffset)&0xffff];
 				if (x&1) colidx >>=4;
 				colidx &= 0xF;
-				if (colidx > 7) color=m_videoram[0xF000+(colidx<<8)+((y+m_scroll_offset)&0xFF)];
+				if (colidx > 7) color=videoram[0xF000+(colidx<<8)+((y+m_scroll_offset)&0xFF)];
 				else color=fixedcolors[colidx];
 				bitmap.pix16(y, x) = color;
 			}
 			else
 			{
-				colidx = m_videoram[(((y+m_scroll_offset)*128)+(127)+lineoffset)&0xffff];
+				colidx = videoram[(((y+m_scroll_offset)*128)+(127)+lineoffset)&0xffff];
 				colidx >>=4;
 				colidx &= 0xF;
-				if (colidx > 7) color=m_videoram[0xF000+(colidx<<8)+((y+m_scroll_offset)&0xFF)];
+				if (colidx > 7) color=videoram[0xF000+(colidx<<8)+((y+m_scroll_offset)&0xFF)];
 				else color=fixedcolors[colidx];
 				bitmap.pix16(y, x) = color;
 			}
@@ -791,18 +807,20 @@ int iqunlim_state::get_color(int index, int y)
 	if (index < 8)
 		return m_colors[index];
 	else
-		return m_videoram[0xf000 + ((index & 0x0f) << 8) + ((m_scroll_offset + y + 1) & 0xff)];
+		return m_vram_reg->u8(0xf000 + ((index & 0x0f) << 8) + ((m_scroll_offset + y + 1) & 0xff));
 }
 
 UINT32 iqunlim_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	UINT8 *videoram = m_vram_reg->base();
+
 	// bitmap layer
 	for (int y=0; y<224; y++)
 	{
 		if (y >= m_video_regs[0x03])    break;
 		for (int x=0; x<128; x++)
 		{
-			UINT8 data = m_videoram[(m_scroll_offset + y) * 0x80 + x];
+			UINT8 data = videoram[(m_scroll_offset + y) * 0x80 + x];
 
 			for(int b=0; b<2; b++)
 			{
@@ -819,8 +837,8 @@ UINT32 iqunlim_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 	{
 		for (int x=0; x<line_len; x++)
 		{
-			UINT8 c = m_videoram[0x8400 + (y - 1) * (mode_80 ? 0x80 : 0x40) + x];
-			UINT8 *gfx = &m_videoram[0x8000 + (c & 0x7f) * 8];
+			UINT8 c = videoram[0x8400 + (y - 1) * (mode_80 ? 0x80 : 0x40) + x];
+			UINT8 *gfx = &videoram[0x8000 + (c & 0x7f) * 8];
 
 			for (int cy=0; cy<8; cy++)
 			{
@@ -878,18 +896,22 @@ WRITE8_MEMBER( iqunlim_state::video_regs_w )
 
 void iqunlim_state::machine_start()
 {
-	UINT8 *bios = memregion("bios")->base();
-	UINT8 *cart = memregion("cart")->base();
-	UINT8 *ram  = memregion("vram")->base();
+	astring region_tag;
+	m_cart_reg = memregion(region_tag.cpy(m_cart->tag()).cat(GENERIC_ROM_REGION_TAG));
+	
+	UINT8 *bios = m_bios_reg->base();
+	UINT8 *cart = m_cart_reg ? m_cart_reg->base() : m_bios_reg->base();
+	UINT8 *ram  = m_vram_reg->base();
+
 	m_bank1->configure_entries(0x00, 0x10, bios, 0x4000);
 	m_bank1->configure_entries(0x10, 0x10, cart , 0x4000);
 	m_bank1->configure_entries(0x20, 0x10, bios + 0x40000, 0x4000);
-	m_bank1->configure_entries(0x30, 0x10, cart + 0x40000 , 0x4000);
+	m_bank1->configure_entries(0x30, 0x10, cart + 0x40000, 0x4000);
 
 	m_bank2->configure_entries(0x00, 0x10, bios, 0x4000);
 	m_bank2->configure_entries(0x10, 0x10, cart , 0x4000);
 	m_bank2->configure_entries(0x20, 0x10, bios + 0x40000, 0x4000);
-	m_bank2->configure_entries(0x30, 0x10, cart + 0x40000 , 0x4000);
+	m_bank2->configure_entries(0x30, 0x10, cart + 0x40000, 0x4000);
 
 	m_bank3->configure_entries(0x00, 0x08, ram, 0x4000);
 	m_bank4->configure_entries(0x00, 0x08, ram, 0x4000);
@@ -998,7 +1020,7 @@ static ADDRESS_MAP_START(z80_io, AS_IO, 8, socrates_state )
 	AM_RANGE(0x00, 0x00) AM_READWRITE(socrates_rom_bank_r, socrates_rom_bank_w) AM_MIRROR(0x7) /* rom bank select - RW - 8 bits */
 	AM_RANGE(0x08, 0x08) AM_READWRITE(socrates_ram_bank_r, socrates_ram_bank_w) AM_MIRROR(0x7) /* ram banks select - RW - 4 low bits; Format: 0b****HHLL where LL controls whether window 0 points at ram area: 0b00: 0x0000-0x3fff; 0b01: 0x4000-0x7fff; 0b10: 0x8000-0xbfff; 0b11: 0xc000-0xffff. HH controls the same thing for window 1 */
 	AM_RANGE(0x10, 0x17) AM_READWRITE(read_f3, socrates_sound_w) AM_MIRROR (0x8) /* sound section:
-        0x10 - W - frequency control for channel 1 (louder channel) - 01=high pitch, ff=low; time between 1->0/0->1 transitions = (XTAL_21_4772MHz/(512+256) / (freq_reg+1)) (note that this is double the actual frequency since each full low and high squarewave pulse is two transitions)
+    0x10 - W - frequency control for channel 1 (louder channel) - 01=high pitch, ff=low; time between 1->0/0->1 transitions = (XTAL_21_4772MHz/(512+256) / (freq_reg+1)) (note that this is double the actual frequency since each full low and high squarewave pulse is two transitions)
     0x11 - W - frequency control for channel 2 (softer channel) - 01=high pitch, ff=low; same equation as above
     0x12 - W - 0b***EVVVV enable, volume control for channel 1
     0x13 - W - 0b***EVVVV enable, volume control for channel 2
@@ -1386,10 +1408,7 @@ static MACHINE_CONFIG_START( socrates, socrates_state )
 	MCFG_SOUND_ADD("soc_snd", SOCRATES_SOUND, XTAL_21_4772MHz/(512+256)) // this is correct, as strange as it sounds.
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_CARTSLOT_ADD("cart")
-	MCFG_CARTSLOT_EXTENSION_LIST("bin")
-	MCFG_CARTSLOT_NOT_MANDATORY
-	MCFG_CARTSLOT_INTERFACE("socrates_cart")
+	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "socrates_cart")
 
 	/* Software lists */
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "socrates")
@@ -1421,10 +1440,7 @@ static MACHINE_CONFIG_START( socrates_pal, socrates_state )
 	MCFG_SOUND_ADD("soc_snd", SOCRATES_SOUND, XTAL_26_601712MHz/(512+256)) // TODO: verify divider for pal mode
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_CARTSLOT_ADD("cart")
-	MCFG_CARTSLOT_EXTENSION_LIST("bin")
-	MCFG_CARTSLOT_NOT_MANDATORY
-	MCFG_CARTSLOT_INTERFACE("socrates_cart")
+	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "socrates_cart")
 
 	/* Software lists */
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "socrates")
@@ -1468,9 +1484,7 @@ static MACHINE_CONFIG_START( iqunlimz, iqunlim_state )
 	MCFG_SOUND_ADD("soc_snd", SOCRATES_SOUND, XTAL_21_4772MHz/(512+256))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_CARTSLOT_ADD("cart")
-	MCFG_CARTSLOT_EXTENSION_LIST("bin")
-	MCFG_CARTSLOT_NOT_MANDATORY
+	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, NULL)
 MACHINE_CONFIG_END
 
 /******************************************************************************
@@ -1514,7 +1528,6 @@ ROM_START(socrates)
 	if all tests passed, jump to 0x4000 (0x0000 in cart rom)
 	*/
 	ROM_LOAD("27-00817-000-000.u1", 0x00000, 0x40000, CRC(80f5aa20) SHA1(4fd1ff7f78b5dd2582d5de6f30633e4e4f34ca8f)) // Label: "(Vtech) 27-00817-000-000 // (C)1987 VIDEO TECHNOLOGY // 8811 D"
-	ROM_CART_LOAD( "cart", 0x40000, 0x20000, 0 )
 
 	ROM_REGION(0x10000, "vram", ROMREGION_ERASEFF) /* fill with ff, driver_init changes this to the 'correct' startup pattern */
 
@@ -1536,7 +1549,6 @@ ROM_START(socratfc)
 	ROM_REGION(0x80000, "maincpu", ROMREGION_ERASEVAL(0xF3))
 	/* Socrates SAITOUT (French Canadian) NTSC */
 	ROM_LOAD("27-00884-001-000.u1", 0x00000, 0x40000, CRC(042d9d21) SHA1(9ffc67b2721683b2536727d0592798fbc4d061cb)) // Label: "(Vtech) 27-00884-001-000 // (C)1988 VIDEO TECHNOLOGY // 8911 D"
-	ROM_CART_LOAD( "cart", 0x40000, 0x20000, 0 )
 
 	ROM_REGION(0x10000, "vram", ROMREGION_ERASEFF) /* fill with ff, driver_init changes this to the 'correct' startup pattern */
 
@@ -1560,7 +1572,6 @@ ROM_START(profweis)
 	ROMX_LOAD("lh53216d.u1", 0x00000, 0x40000, CRC(6e801762) SHA1(b80574a3abacf18133dacb9d3a8d9e2916730423), ROM_BIOS(1)) // Label: "(Vtech) LH53216D // (C)1989 VIDEO TECHNOLOGY // 9119 D"
 	ROM_SYSTEM_BIOS(1, "88", "1988")
 	ROMX_LOAD("27-00885-001-000.u1", 0x00000, 0x40000, CRC(fcaf8850) SHA1(a99011ee6a1ef63461c00d062278951252f117db), ROM_BIOS(2)) // Label: "(Vtech) 27-00884-001-000 // (C)1988 VIDEO TECHNOLOGY // 8911 D"
-	ROM_CART_LOAD( "cart", 0x40000, 0x20000, 0 )
 
 	ROM_REGION(0x10000, "vram", ROMREGION_ERASEFF) /* fill with ff, driver_init changes this to the 'correct' startup pattern */
 
@@ -1576,11 +1587,8 @@ ROM_START(profweis)
 ROM_END
 
 ROM_START( iqunlimz )
-	ROM_REGION( 0x80000, "bios", 0 )
+	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "vtech.bin", 0x000000, 0x080000, CRC(f100c8a7) SHA1(6ad2a8accae2dd5c5c46ae953eef33cdd1ea3cf9) )
-
-	ROM_REGION( 0x80000, "cart", ROMREGION_ERASEFF )
-	ROM_CART_LOAD( "cart", 0, 0x80000, 0 )
 
 	ROM_REGION( 0x20000, "vram", ROMREGION_ERASE )
 ROM_END

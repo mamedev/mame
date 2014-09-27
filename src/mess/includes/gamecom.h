@@ -13,9 +13,11 @@
 
 #include "emu.h"
 #include "cpu/sm8500/sm8500.h"
-#include "imagedev/cartslot.h"
-#include "rendlay.h"
 #include "sound/dac.h"
+#include "bus/generic/slot.h"
+#include "bus/generic/carts.h"
+
+#include "rendlay.h"
 
 /* SM8521 register addresses */
 enum
@@ -213,6 +215,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_dac(*this, "dac"),
+		m_cart1(*this, "cartslot1"),
+		m_cart2(*this, "cartslot2"),
 		m_p_nvram(*this,"p_nvram"),
 		m_p_videoram(*this,"p_videoram"),
 		m_bank1(*this, "bank1"),
@@ -230,6 +234,8 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<dac_device> m_dac;
+	required_device<generic_slot_device> m_cart1;
+	required_device<generic_slot_device> m_cart2;
 	DECLARE_READ8_MEMBER( gamecom_internal_r );
 	DECLARE_READ8_MEMBER( gamecom_pio_r );
 	DECLARE_WRITE8_MEMBER( gamecom_internal_w );
@@ -237,9 +243,9 @@ public:
 	required_shared_ptr<UINT8> m_p_nvram;
 	UINT8 *m_p_ram;
 	required_shared_ptr<UINT8> m_p_videoram;
-	UINT8 *m_cartridge1;
-	UINT8 *m_cartridge2;
-	UINT8 *m_cartridge;
+	UINT8 *m_cart_ptr;
+	memory_region *m_cart1_rom;
+	memory_region *m_cart2_rom;
 	emu_timer *m_clock_timer;
 	emu_timer *m_scanline_timer;
 	GAMECOM_DMA m_dma;
@@ -268,6 +274,7 @@ public:
 	TIMER_CALLBACK_MEMBER(gamecom_scanline);
 	DECLARE_WRITE8_MEMBER( gamecom_handle_dma );
 	DECLARE_WRITE8_MEMBER( gamecom_update_timers );
+	int common_load(device_image_interface &image, generic_slot_device *slot);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( gamecom_cart1 );
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( gamecom_cart2 );
 

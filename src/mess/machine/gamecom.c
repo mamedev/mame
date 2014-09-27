@@ -16,41 +16,45 @@ TIMER_CALLBACK_MEMBER(gamecom_state::gamecom_clock_timer_callback)
 void gamecom_state::machine_reset()
 {
 	UINT8 *rom = m_region_kernel->base();
-	m_bank1->set_base( rom );
-	m_bank2->set_base( rom );
-	m_bank3->set_base( rom );
-	m_bank4->set_base( rom );
+	m_bank1->set_base(rom);
+	m_bank2->set_base(rom);
+	m_bank3->set_base(rom);
+	m_bank4->set_base(rom);
 
-	m_cartridge = NULL;
+	m_cart_ptr = NULL;
 	m_lch_reg = 0x07;
 	m_lcv_reg = 0x27;
 	m_lcdc_reg = 0xb0;
+
+	astring region_tag;
+	m_cart1_rom = memregion(region_tag.cpy(m_cart1->tag()).cat(GENERIC_ROM_REGION_TAG));
+	m_cart2_rom = memregion(region_tag.cpy(m_cart2->tag()).cat(GENERIC_ROM_REGION_TAG));
 }
 
-void gamecom_state::gamecom_set_mmu(UINT8 mmu, UINT8 data )
+void gamecom_state::gamecom_set_mmu(UINT8 mmu, UINT8 data)
 {
 	if (data < 0x20)
 	{
 		/* select internal ROM bank */
-		switch ( mmu )
+		switch (mmu)
 		{
-			case 1: m_bank1->set_base( m_region_kernel->base() + (data << 13) ); break;
-			case 2: m_bank2->set_base( m_region_kernel->base() + (data << 13) ); break;
-			case 3: m_bank3->set_base( m_region_kernel->base() + (data << 13) ); break;
-			case 4: m_bank4->set_base( m_region_kernel->base() + (data << 13) ); break;
+			case 1: m_bank1->set_base(m_region_kernel->base() + (data << 13)); break;
+			case 2: m_bank2->set_base(m_region_kernel->base() + (data << 13)); break;
+			case 3: m_bank3->set_base(m_region_kernel->base() + (data << 13)); break;
+			case 4: m_bank4->set_base(m_region_kernel->base() + (data << 13)); break;
 		}
 	}
 	else
 	{
 		/* select cartridge bank */
-		if ( m_cartridge )
+		if (m_cart_ptr)
 		{
-			switch ( mmu )
+			switch (mmu)
 			{
-				case 1: m_bank1->set_base( m_cartridge + ( data << 13 ) ); break;
-				case 2: m_bank2->set_base( m_cartridge + ( data << 13 ) ); break;
-				case 3: m_bank3->set_base( m_cartridge + ( data << 13 ) ); break;
-				case 4: m_bank4->set_base( m_cartridge + ( data << 13 ) ); break;
+				case 1: m_bank1->set_base(m_cart_ptr + (data << 13)); break;
+				case 2: m_bank2->set_base(m_cart_ptr + (data << 13)); break;
+				case 3: m_bank3->set_base(m_cart_ptr + (data << 13)); break;
+				case 4: m_bank4->set_base(m_cart_ptr + (data << 13)); break;
 			}
 		}
 	}
@@ -175,7 +179,7 @@ WRITE8_MEMBER( gamecom_state::gamecom_pio_w )
 {
 	offset += 0x14;
 	m_p_ram[offset] = data;
-	switch( offset )
+	switch (offset)
 	{
 		case SM8521_P1:
 		case SM8521_P2:
@@ -184,11 +188,11 @@ WRITE8_MEMBER( gamecom_state::gamecom_pio_w )
 		case SM8521_P3:
 				/* P3 bit7 clear, bit6 set -> enable cartridge port #0? */
 				/* P3 bit6 clear, bit7 set -> enable cartridge port #1? */
-				switch( data & 0xc0 )
+				switch (data & 0xc0)
 				{
-				case 0x40: m_cartridge = m_cartridge1; break;
-				case 0x80: m_cartridge = m_cartridge2; break;
-				default:   m_cartridge = NULL;       break;
+				case 0x40: m_cart_ptr = m_cart1_rom->base(); break;
+				case 0x80: m_cart_ptr = m_cart2_rom->base(); break;
+				default:   m_cart_ptr = NULL;       break;
 				}
 				return;
 	}
@@ -481,17 +485,10 @@ WRITE8_MEMBER( gamecom_state::gamecom_handle_dma )
 //      logerror( "DMA DMBR = %X\n", RAM[SM8521_DMBR] );
 		m_dma.source_width = 64;
 		m_dma.source_mask = 0x3FFF;
-		if ( RAM[SM8521_DMBR] < 16 )
-		{
+		if (RAM[SM8521_DMBR] < 16)
 			m_dma.source_bank = m_region_kernel->base() + (RAM[SM8521_DMBR] << 14);
-		}
-		else
-		{
-			if (m_cartridge)
-			{
-				m_dma.source_bank = m_cartridge + (RAM[SM8521_DMBR] << 14);
-			}
-		}
+		else if (m_cart_ptr)
+			m_dma.source_bank = m_cart_ptr + (RAM[SM8521_DMBR] << 14);
 
 		m_dma.dest_bank = &m_p_videoram[(RAM[SM8521_DMVP] & 0x02) ? 0x2000 : 0x0000];
 		break;
@@ -637,94 +634,43 @@ DRIVER_INIT_MEMBER(gamecom_state,gamecom)
 	m_p_ram = m_region_maincpu->base(); // required here because pio_w gets called before machine_reset
 }
 
-DEVICE_IMAGE_LOAD_MEMBER( gamecom_state, gamecom_cart1 )
+int gamecom_state::common_load(device_image_interface &image, generic_slot_device *slot)
 {
-	UINT32 filesize;
+	UINT32 size = slot->common_get_size("rom");
 	UINT32 load_offset = 0;
 
-	m_cartridge1 = memregion("cart1")->base();
-
-	if (image.software_entry() == NULL)
-		filesize = image.length();
-	else
-		filesize = image.get_software_region_length("rom");
-
-	switch(filesize)
+	if (size != 0x008000 && size != 0x040000 && size != 0x080000
+		 && size != 0x100000 && size != 0x1c0000 && size != 0x200000)
 	{
-		case 0x008000: load_offset = 0;        break;  /* 32 KB */
-		case 0x040000: load_offset = 0;        break;  /* 256KB */
-		case 0x080000: load_offset = 0;        break;  /* 512KB */
-		case 0x100000: load_offset = 0;        break;  /* 1  MB */
-		case 0x1c0000: load_offset = 0x040000; break;  /* 1.8MB */
-		case 0x200000: load_offset = 0;        break;  /* 2  MB */
-		default:                                       /* otherwise */
-			logerror("Error loading cartridge: Invalid file size 0x%X\n", filesize);
-			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unhandled cart size");
-			return IMAGE_INIT_FAIL;
+		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
+		return IMAGE_INIT_FAIL;
 	}
-
-	if (image.software_entry() == NULL)
-	{
-		if (image.fread( m_cartridge1 + load_offset, filesize) != filesize)
-		{
-			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unable to load all of the cart");
-			return IMAGE_INIT_FAIL;
-		}
-	}
-	else
-		memcpy(m_cartridge1 + load_offset, image.get_software_region("rom"), filesize);
-
-	if (filesize < 0x010000) { memcpy(m_cartridge1 + 0x008000, m_cartridge1, 0x008000); } /* ->64KB */
-	if (filesize < 0x020000) { memcpy(m_cartridge1 + 0x010000, m_cartridge1, 0x010000); } /* ->128KB */
-	if (filesize < 0x040000) { memcpy(m_cartridge1 + 0x020000, m_cartridge1, 0x020000); } /* ->256KB */
-	if (filesize < 0x080000) { memcpy(m_cartridge1 + 0x040000, m_cartridge1, 0x040000); } /* ->512KB */
-	if (filesize < 0x100000) { memcpy(m_cartridge1 + 0x080000, m_cartridge1, 0x080000); } /* ->1MB */
-	if (filesize < 0x1c0000) { memcpy(m_cartridge1 + 0x100000, m_cartridge1, 0x100000); } /* -> >=1.8MB */
+	
+	if (size == 0x1c0000)
+		load_offset = 0x40000;
+	
+	// in order to simplify banked access from the driver, we always allocate 0x200000,
+	slot->rom_alloc(0x200000, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
+	// we load what we have
+	slot->common_load_rom(slot->get_rom_base() + load_offset, size, "rom");
+	// and then we mirror the content, instead of masking out larger accesses
+	UINT8 *crt = slot->get_rom_base();
+	if (size < 0x010000) { memcpy(crt + 0x008000, crt, 0x008000); } /* ->64KB */
+	if (size < 0x020000) { memcpy(crt + 0x010000, crt, 0x010000); } /* ->128KB */
+	if (size < 0x040000) { memcpy(crt + 0x020000, crt, 0x020000); } /* ->256KB */
+	if (size < 0x080000) { memcpy(crt + 0x040000, crt, 0x040000); } /* ->512KB */
+	if (size < 0x100000) { memcpy(crt + 0x080000, crt, 0x080000); } /* ->1MB */
+	if (size < 0x1c0000) { memcpy(crt + 0x100000, crt, 0x100000); } /* -> >=1.8MB */
+	
 	return IMAGE_INIT_PASS;
+}
+
+DEVICE_IMAGE_LOAD_MEMBER( gamecom_state, gamecom_cart1 )
+{
+	return common_load(image, m_cart1);
 }
 
 DEVICE_IMAGE_LOAD_MEMBER( gamecom_state, gamecom_cart2 )
 {
-	UINT32 filesize;
-	UINT32 load_offset = 0;
-
-	m_cartridge2 = memregion("cart2")->base();
-
-//  if (image.software_entry() == NULL)
-		filesize = image.length();
-//  else
-//      filesize = image.get_software_region_length("rom");
-
-	switch(filesize)
-	{
-		case 0x008000: load_offset = 0;        break;  /* 32 KB */
-		case 0x040000: load_offset = 0;        break;  /* 256KB */
-		case 0x080000: load_offset = 0;        break;  /* 512KB */
-		case 0x100000: load_offset = 0;        break;  /* 1  MB */
-		case 0x1c0000: load_offset = 0x040000; break;  /* 1.8MB */
-		case 0x200000: load_offset = 0;        break;  /* 2  MB */
-		default:                                       /* otherwise */
-			logerror("Error loading cartridge: Invalid file size 0x%X\n", filesize);
-			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unhandled cart size");
-			return IMAGE_INIT_FAIL;
-	}
-
-//  if (image.software_entry() == NULL)
-	{
-		if (image.fread( m_cartridge2 + load_offset, filesize) != filesize)
-		{
-			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unable to load all of the cart");
-			return IMAGE_INIT_FAIL;
-		}
-	}
-//  else
-//      memcpy(state->m_cartridge2 + load_offset, image.get_software_region("rom"), filesize);
-
-	if (filesize < 0x010000) { memcpy(m_cartridge2 + 0x008000, m_cartridge2, 0x008000); } /* ->64KB */
-	if (filesize < 0x020000) { memcpy(m_cartridge2 + 0x010000, m_cartridge2, 0x010000); } /* ->128KB */
-	if (filesize < 0x040000) { memcpy(m_cartridge2 + 0x020000, m_cartridge2, 0x020000); } /* ->256KB */
-	if (filesize < 0x080000) { memcpy(m_cartridge2 + 0x040000, m_cartridge2, 0x040000); } /* ->512KB */
-	if (filesize < 0x100000) { memcpy(m_cartridge2 + 0x080000, m_cartridge2, 0x080000); } /* ->1MB */
-	if (filesize < 0x1c0000) { memcpy(m_cartridge2 + 0x100000, m_cartridge2, 0x100000); } /* -> >=1.8MB */
-	return IMAGE_INIT_PASS;
+	return common_load(image, m_cart2);
 }
