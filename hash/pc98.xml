@@ -16649,17 +16649,17 @@ Same as Police Quest 2 - Quest for Glory stand-alone disks
 		<publisher>Borland;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1281968">
-				<rom name="Turbo C++ - DISK1.D88" size="1281968" crc="0184f1fd" sha1="4d6be96da46329c92c1d8f93543f08ee30a8ba54" offset="0" />
+				<rom name="turbo c++ - disk1.d88" size="1281968" crc="0184f1fd" sha1="4d6be96da46329c92c1d8f93543f08ee30a8ba54" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1281968">
-				<rom name="Turbo C++ - DISK2.D88" size="1281968" crc="198f91df" sha1="3341ec2b11f92a5ea4256ba91a23994fd950ee53" offset="0" />
+				<rom name="turbo c++ - disk2.d88" size="1281968" crc="198f91df" sha1="3341ec2b11f92a5ea4256ba91a23994fd950ee53" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="1281968">
-				<rom name="Turbo C++ - DISK3.D88" size="1281968" crc="c50c2381" sha1="edf77dd4924b7227ec75857e9a61f84de5b8c76a" offset="0" />
+				<rom name="turbo c++ - disk3.d88" size="1281968" crc="c50c2381" sha1="edf77dd4924b7227ec75857e9a61f84de5b8c76a" offset="0" />
 			</dataarea>
 		</part>
 	</software>
