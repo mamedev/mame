@@ -1085,4 +1085,4 @@ GAME( 1996, ffight2b,     0,     ffight2b,       ffight2b, snesb_state,  ffight2
 GAME( 1996, iron,         0,     kinstb,         iron, snesb_state,      iron,         ROT0, "bootleg",  "Iron (SNES bootleg)",                            GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 GAME( 1996, denseib,      0,     kinstb,         denseib, snesb_state,   denseib,      ROT0, "bootleg",  "Ghost Chaser Densei (SNES bootleg)",             GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 GAME( 1997, sblast2b,     0,     kinstb,         sblast2b, snesb_state,  sblast2b,     ROT0, "bootleg",  "Sonic Blast Man 2 Special Turbo (SNES bootleg)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS)
-GAME( 1996, endless,      0,     kinstb,         endless, snesb_state,   endless,      ROT0, "bootleg",  "Gundam Wing: Endless Duel (SNES bootleg)",       GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+GAME( 1996, endless,      0,     kinstb,         endless, snesb_state,   endless,      ROT0, "bootleg",  "Gundam Wing: Endless Duel (SNES bootleg)",       GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
