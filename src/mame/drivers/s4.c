@@ -5,16 +5,13 @@
     PINBALL
     Williams System 4
 
-    No schematics have been located as yet.
-
     Phoenix and Pokerino are listed as System 4 systems, but use System 3 roms.
     They have been moved to s3.c, and are working there.
 
-    Only Flash and Stellar Wars are pinball machines. The remainder are so-called
-    "Shuffle", which is a flat board with an air-driven puck and 10 bowling pins.
-    You must push the puck as if it was a bowling ball, and score strikes and spares.
-    Since the maximum score is 300, the displays have 4 digits and 6 can play. They
-    are Williams System 5 and should be moved to a separate driver.
+    The "Shuffle" games consist of a flat board with an air-driven puck and 10
+    bowling pins. You must push the puck as if it was a bowling ball, and score
+    strikes and spares. Since the maximum score is 300, the displays have 4 digits
+    and 6 can play. They will most likely be split off to a separate driver.
 
 
 Each game has its own switches, you need to know the outhole and slam-tilt ones.
@@ -29,7 +26,6 @@ Time Warp     X         E
 
 
 ToDo:
-- Scorpion: start button not working
 - Shuffle games: need a layout, and don't work.
 
 
@@ -58,7 +54,6 @@ public:
 	{ }
 
 	DECLARE_READ8_MEMBER(dac_r);
-	DECLARE_WRITE8_MEMBER(dac_w);
 	DECLARE_WRITE8_MEMBER(dig0_w);
 	DECLARE_WRITE8_MEMBER(dig1_w);
 	DECLARE_WRITE8_MEMBER(lamp0_w);
@@ -108,14 +103,14 @@ static ADDRESS_MAP_START( s4_main_map, AS_PROGRAM, 8, s4_state )
 	AM_RANGE(0x2400, 0x2403) AM_DEVREADWRITE("pia24", pia6821_device, read, write) // lamps
 	AM_RANGE(0x2800, 0x2803) AM_DEVREADWRITE("pia28", pia6821_device, read, write) // display
 	AM_RANGE(0x3000, 0x3003) AM_DEVREADWRITE("pia30", pia6821_device, read, write) // inputs
-	AM_RANGE(0x6000, 0x7fff) AM_ROM
+	AM_RANGE(0x6000, 0x7fff) AM_ROM AM_REGION("roms", 0)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( s4_audio_map, AS_PROGRAM, 8, s4_state )
-	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
+	ADDRESS_MAP_GLOBAL_MASK(0x0fff)
 	AM_RANGE(0x0000, 0x00ff) AM_RAM
 	AM_RANGE(0x0400, 0x0403) AM_DEVREADWRITE("pias", pia6821_device, read, write) // sounds
-	AM_RANGE(0x7800, 0x7fff) AM_ROM
+	AM_RANGE(0x0800, 0x0fff) AM_ROM AM_REGION("audioroms", 0)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( s4 )
@@ -189,8 +184,7 @@ static INPUT_PORTS_START( s4 )
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("SND")
-	PORT_BIT( 0x9f, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Music1") PORT_CODE(KEYCODE_3) PORT_TOGGLE
+	PORT_BIT( 0xbf, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Music2") PORT_CODE(KEYCODE_4) PORT_TOGGLE
 
 	PORT_START("DIAGS")
@@ -319,7 +313,7 @@ WRITE8_MEMBER( s4_state::sol1_w )
 		if (BIT(data, 4))
 			sound_data &= 0xef;
 
-		bool cb1 = ((sound_data & 0x9f) != 0x9f);
+		bool cb1 = ((sound_data & 0xbf) != 0xbf);
 
 		if (cb1)
 			m_sound_data = sound_data;
@@ -405,11 +399,6 @@ READ8_MEMBER( s4_state::dac_r )
 	return m_sound_data;
 }
 
-WRITE8_MEMBER( s4_state::dac_w )
-{
-	m_dac->write_unsigned8(data);
-}
-
 TIMER_DEVICE_CALLBACK_MEMBER( s4_state::irq )
 {
 	if (m_t_c > 0x70)
@@ -481,7 +470,7 @@ static MACHINE_CONFIG_DERIVED( s4a, s4 )
 
 	MCFG_DEVICE_ADD("pias", PIA6821, 0)
 	MCFG_PIA_READPB_HANDLER(READ8(s4_state, dac_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(s4_state, dac_w))
+	MCFG_PIA_WRITEPA_HANDLER(DEVWRITE8("dac", dac_device, write_unsigned8))
 	MCFG_PIA_IRQA_HANDLER(DEVWRITELINE("audiocpu", m6808_cpu_device, irq_line))
 	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE("audiocpu", m6808_cpu_device, irq_line))
 MACHINE_CONFIG_END
@@ -491,116 +480,95 @@ MACHINE_CONFIG_END
 / Flash - Sys.4 (Game #486)
 /-------------------------------*/
 ROM_START(flash_l1)
-	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD("gamerom.716", 0x6000, 0x0800, CRC(287f12d6) SHA1(ede0c5b0ea2586d8bdf71ecadbd9cc8552bd6934))
-	ROM_LOAD("green1.716", 0x7000, 0x0800, CRC(2145f8ab) SHA1(ddf63208559a3a08d4e88327c55426b0eed27654))
-	ROM_LOAD("green2.716", 0x7800, 0x0800, CRC(1c978a4a) SHA1(1959184764643d58f1740c54bb74c2aad7d667d2))
+	ROM_REGION(0x2000, "roms", 0)
+	ROM_LOAD("gamerom.716",  0x0000, 0x0800, CRC(287f12d6) SHA1(ede0c5b0ea2586d8bdf71ecadbd9cc8552bd6934))
+	ROM_LOAD("green1.716",   0x1000, 0x0800, CRC(2145f8ab) SHA1(ddf63208559a3a08d4e88327c55426b0eed27654))
+	ROM_LOAD("green2.716",   0x1800, 0x0800, CRC(1c978a4a) SHA1(1959184764643d58f1740c54bb74c2aad7d667d2))
 
-	ROM_REGION(0x10000, "audiocpu", 0)
-	ROM_LOAD("sound1.716", 0x7800, 0x0800, CRC(f4190ca3) SHA1(ee234fb5c894fca5876ee6dc7ea8e89e7e0aec9c))
+	ROM_REGION(0x0800, "audioroms", 0)
+	ROM_LOAD("sound1.716",   0x0000, 0x0800, CRC(f4190ca3) SHA1(ee234fb5c894fca5876ee6dc7ea8e89e7e0aec9c))
 ROM_END
 
 ROM_START(flash_l2)
-	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD("gamerom2.716", 0x6000, 0x0800, CRC(b7c2e4c7) SHA1(00ea34900af679b1b7e2698f4aa2fc9703d54cf2))
-	ROM_LOAD("yellow1.716", 0x7000, 0x0800, CRC(d251738c) SHA1(65ddbf5c36e429243331a4c5d2339df87a8a7f64))
-	ROM_LOAD("yellow2.716", 0x7800, 0x0800, CRC(5049326d) SHA1(3b2f4ea054962bf4ba41d46663b7d3d9a77590ef))
+	ROM_REGION(0x2000, "roms", 0)
+	ROM_LOAD("gamerom2.716", 0x0000, 0x0800, CRC(b7c2e4c7) SHA1(00ea34900af679b1b7e2698f4aa2fc9703d54cf2))
+	ROM_LOAD("yellow1.716",  0x1000, 0x0800, CRC(d251738c) SHA1(65ddbf5c36e429243331a4c5d2339df87a8a7f64))
+	ROM_LOAD("yellow2.716",  0x1800, 0x0800, CRC(5049326d) SHA1(3b2f4ea054962bf4ba41d46663b7d3d9a77590ef))
 
-	ROM_REGION(0x10000, "audiocpu", 0)
-	ROM_LOAD("sound1.716", 0x7800, 0x0800, CRC(f4190ca3) SHA1(ee234fb5c894fca5876ee6dc7ea8e89e7e0aec9c))
+	ROM_REGION(0x0800, "audioroms", 0)
+	ROM_LOAD("sound1.716",   0x0000, 0x0800, CRC(f4190ca3) SHA1(ee234fb5c894fca5876ee6dc7ea8e89e7e0aec9c))
 ROM_END
 
 ROM_START(flash_t1)
-	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD("gamerom.716", 0x6000, 0x0800, CRC(287f12d6) SHA1(ede0c5b0ea2586d8bdf71ecadbd9cc8552bd6934))
-	ROM_LOAD("green1.716", 0x7000, 0x0800, CRC(2145f8ab) SHA1(ddf63208559a3a08d4e88327c55426b0eed27654))
-	ROM_LOAD("green2a.716", 0x7800, 0x0800, CRC(16621eec) SHA1(14e1cf5f7227860a3219b2b79fa66dcf252dce98))
+	ROM_REGION(0x2000, "roms", 0)
+	ROM_LOAD("gamerom.716",  0x0000, 0x0800, CRC(287f12d6) SHA1(ede0c5b0ea2586d8bdf71ecadbd9cc8552bd6934))
+	ROM_LOAD("green1.716",   0x1000, 0x0800, CRC(2145f8ab) SHA1(ddf63208559a3a08d4e88327c55426b0eed27654))
+	ROM_LOAD("green2a.716",  0x1800, 0x0800, CRC(16621eec) SHA1(14e1cf5f7227860a3219b2b79fa66dcf252dce98))
 
-	ROM_REGION(0x10000, "audiocpu", 0)
-	ROM_LOAD("sound1.716", 0x7800, 0x0800, CRC(f4190ca3) SHA1(ee234fb5c894fca5876ee6dc7ea8e89e7e0aec9c))
+	ROM_REGION(0x0800, "audioroms", 0)
+	ROM_LOAD("sound1.716",   0x0000, 0x0800, CRC(f4190ca3) SHA1(ee234fb5c894fca5876ee6dc7ea8e89e7e0aec9c))
 ROM_END
 
 /*--------------------------------
 / Tri Zone - Sys.4 (Game #487)
 /-------------------------------*/
 ROM_START(trizn_l1)
-	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD("gamerom.716", 0x6000, 0x0800, CRC(757091c5) SHA1(00dac6c19b08d2528ea293619c4a39499a1a02c2))
-	ROM_LOAD("green1.716", 0x7000, 0x0800, CRC(2145f8ab) SHA1(ddf63208559a3a08d4e88327c55426b0eed27654))
-	ROM_LOAD("green2.716", 0x7800, 0x0800, CRC(1c978a4a) SHA1(1959184764643d58f1740c54bb74c2aad7d667d2))
+	ROM_REGION(0x2000, "roms", 0)
+	ROM_LOAD("gamerom.716",  0x0000, 0x0800, CRC(757091c5) SHA1(00dac6c19b08d2528ea293619c4a39499a1a02c2))
+	ROM_LOAD("green1.716",   0x1000, 0x0800, CRC(2145f8ab) SHA1(ddf63208559a3a08d4e88327c55426b0eed27654))
+	ROM_LOAD("green2.716",   0x1800, 0x0800, CRC(1c978a4a) SHA1(1959184764643d58f1740c54bb74c2aad7d667d2))
 
-	ROM_REGION(0x10000, "audiocpu", 0)
-	ROM_LOAD("sound1.716", 0x7800, 0x0800, CRC(f4190ca3) SHA1(ee234fb5c894fca5876ee6dc7ea8e89e7e0aec9c))
+	ROM_REGION(0x0800, "audioroms", 0)
+	ROM_LOAD("sound1.716",   0x0000, 0x0800, CRC(f4190ca3) SHA1(ee234fb5c894fca5876ee6dc7ea8e89e7e0aec9c))
 ROM_END
 
 ROM_START(trizn_t1)
-	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD("gamerom.716", 0x6000, 0x0800, CRC(757091c5) SHA1(00dac6c19b08d2528ea293619c4a39499a1a02c2))
-	ROM_LOAD("green1.716", 0x7000, 0x0800, CRC(2145f8ab) SHA1(ddf63208559a3a08d4e88327c55426b0eed27654))
-	ROM_LOAD("green2a.716", 0x7800, 0x0800, CRC(16621eec) SHA1(14e1cf5f7227860a3219b2b79fa66dcf252dce98))
+	ROM_REGION(0x2000, "roms", 0)
+	ROM_LOAD("gamerom.716",  0x0000, 0x0800, CRC(757091c5) SHA1(00dac6c19b08d2528ea293619c4a39499a1a02c2))
+	ROM_LOAD("green1.716",   0x1000, 0x0800, CRC(2145f8ab) SHA1(ddf63208559a3a08d4e88327c55426b0eed27654))
+	ROM_LOAD("green2a.716",  0x1800, 0x0800, CRC(16621eec) SHA1(14e1cf5f7227860a3219b2b79fa66dcf252dce98))
 
-	ROM_REGION(0x10000, "audiocpu", 0)
-	ROM_LOAD("sound1.716", 0x7800, 0x0800, CRC(f4190ca3) SHA1(ee234fb5c894fca5876ee6dc7ea8e89e7e0aec9c))
+	ROM_REGION(0x0800, "audioroms", 0)
+	ROM_LOAD("sound1.716",   0x0000, 0x0800, CRC(f4190ca3) SHA1(ee234fb5c894fca5876ee6dc7ea8e89e7e0aec9c))
 ROM_END
 
 /*--------------------------------
 / Time Warp - Sys.4 (Game #489)
 /-------------------------------*/
 ROM_START(tmwrp_l2)
-	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD("gamerom.716", 0x6000, 0x0800, CRC(b168df09) SHA1(d4c97714636ce51be2e5f8cc5af89e10a2f82ac7))
-	ROM_LOAD("green1.716", 0x7000, 0x0800, CRC(2145f8ab) SHA1(ddf63208559a3a08d4e88327c55426b0eed27654))
-	ROM_LOAD("green2.716", 0x7800, 0x0800, CRC(1c978a4a) SHA1(1959184764643d58f1740c54bb74c2aad7d667d2))
+	ROM_REGION(0x2000, "roms", 0)
+	ROM_LOAD("gamerom.716",  0x0000, 0x0800, CRC(b168df09) SHA1(d4c97714636ce51be2e5f8cc5af89e10a2f82ac7))
+	ROM_LOAD("green1.716",   0x1000, 0x0800, CRC(2145f8ab) SHA1(ddf63208559a3a08d4e88327c55426b0eed27654))
+	ROM_LOAD("green2.716",   0x1800, 0x0800, CRC(1c978a4a) SHA1(1959184764643d58f1740c54bb74c2aad7d667d2))
 
-	ROM_REGION(0x10000, "audiocpu", 0)
-	ROM_LOAD("sound1.716", 0x7800, 0x0800, CRC(f4190ca3) SHA1(ee234fb5c894fca5876ee6dc7ea8e89e7e0aec9c))
+	ROM_REGION(0x0800, "audioroms", 0)
+	ROM_LOAD("sound1.716",   0x0000, 0x0800, CRC(f4190ca3) SHA1(ee234fb5c894fca5876ee6dc7ea8e89e7e0aec9c))
 ROM_END
 
 ROM_START(tmwrp_t2)
-	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD("gamerom.716", 0x6000, 0x0800, CRC(b168df09) SHA1(d4c97714636ce51be2e5f8cc5af89e10a2f82ac7))
-	ROM_LOAD("green1.716", 0x7000, 0x0800, CRC(2145f8ab) SHA1(ddf63208559a3a08d4e88327c55426b0eed27654))
-	ROM_LOAD("green2a.716", 0x7800, 0x0800, CRC(16621eec) SHA1(14e1cf5f7227860a3219b2b79fa66dcf252dce98))
+	ROM_REGION(0x2000, "roms", 0)
+	ROM_LOAD("gamerom.716",  0x0000, 0x0800, CRC(b168df09) SHA1(d4c97714636ce51be2e5f8cc5af89e10a2f82ac7))
+	ROM_LOAD("green1.716",   0x1000, 0x0800, CRC(2145f8ab) SHA1(ddf63208559a3a08d4e88327c55426b0eed27654))
+	ROM_LOAD("green2a.716",  0x1800, 0x0800, CRC(16621eec) SHA1(14e1cf5f7227860a3219b2b79fa66dcf252dce98))
 
-	ROM_REGION(0x10000, "audiocpu", 0)
-	ROM_LOAD("sound1.716", 0x7800, 0x0800, CRC(f4190ca3) SHA1(ee234fb5c894fca5876ee6dc7ea8e89e7e0aec9c))
+	ROM_REGION(0x0800, "audioroms", 0)
+	ROM_LOAD("sound1.716",   0x0000, 0x0800, CRC(f4190ca3) SHA1(ee234fb5c894fca5876ee6dc7ea8e89e7e0aec9c))
 ROM_END
 
 /*--------------------------------
 / Stellar Wars - Sys.4 (Game #490)
 /-------------------------------*/
 ROM_START(stlwr_l2)
-	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD("gamerom.716", 0x6000, 0x0800, CRC(874e7ef7) SHA1(271aeac2a0e61cb195811ae2e8d908cb1ab45874))
-	ROM_LOAD("yellow1.716", 0x7000, 0x0800, CRC(d251738c) SHA1(65ddbf5c36e429243331a4c5d2339df87a8a7f64))
-	ROM_LOAD("yellow2.716", 0x7800, 0x0800, CRC(5049326d) SHA1(3b2f4ea054962bf4ba41d46663b7d3d9a77590ef))
+	ROM_REGION(0x2000, "roms", 0)
+	ROM_LOAD("gamerom.716",  0x0000, 0x0800, CRC(874e7ef7) SHA1(271aeac2a0e61cb195811ae2e8d908cb1ab45874))
+	ROM_LOAD("yellow1.716",  0x1000, 0x0800, CRC(d251738c) SHA1(65ddbf5c36e429243331a4c5d2339df87a8a7f64))
+	ROM_LOAD("yellow2.716",  0x1800, 0x0800, CRC(5049326d) SHA1(3b2f4ea054962bf4ba41d46663b7d3d9a77590ef))
 
-	ROM_REGION(0x10000, "audiocpu", 0)
-	ROM_LOAD("sound1.716", 0x7800, 0x0800, CRC(f4190ca3) SHA1(ee234fb5c894fca5876ee6dc7ea8e89e7e0aec9c))
+	ROM_REGION(0x0800, "audioroms", 0)
+	ROM_LOAD("sound1.716",   0x0000, 0x0800, CRC(f4190ca3) SHA1(ee234fb5c894fca5876ee6dc7ea8e89e7e0aec9c))
 ROM_END
 
-/*-----------------------------
-/ Scorpion - Sys.6 (Game #494)
-/----------------------------*/
-ROM_START(scrpn_l1)
-	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD("gamerom.716", 0x6000, 0x0800, CRC(881109a9) SHA1(53d4275c76b47b68a74209fe660d943a51e90eca))
-	ROM_LOAD("green1.716", 0x7000, 0x0800, CRC(2145f8ab) SHA1(ddf63208559a3a08d4e88327c55426b0eed27654))
-	ROM_LOAD("green2.716", 0x7800, 0x0800, CRC(1c978a4a) SHA1(1959184764643d58f1740c54bb74c2aad7d667d2))
 
-	ROM_REGION(0x10000, "audiocpu", 0)
-	ROM_LOAD("sound1.716", 0x7800, 0x0800, CRC(f4190ca3) SHA1(ee234fb5c894fca5876ee6dc7ea8e89e7e0aec9c))
-ROM_END
-
-ROM_START(scrpn_t1)
-	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD("gamerom.716", 0x6000, 0x0800, CRC(881109a9) SHA1(53d4275c76b47b68a74209fe660d943a51e90eca))
-	ROM_LOAD("green1.716", 0x7000, 0x0800, CRC(2145f8ab) SHA1(ddf63208559a3a08d4e88327c55426b0eed27654))
-	ROM_LOAD("green2a.716", 0x7800, 0x0800, CRC(16621eec) SHA1(14e1cf5f7227860a3219b2b79fa66dcf252dce98))
-
-	ROM_REGION(0x10000, "audiocpu", 0)
-	ROM_LOAD("sound1.716", 0x7800, 0x0800, CRC(f4190ca3) SHA1(ee234fb5c894fca5876ee6dc7ea8e89e7e0aec9c))
-ROM_END
 
 /* From here, are NOT pinball machines */
 
@@ -608,98 +576,98 @@ ROM_END
 / Pompeii (Shuffle)
 /----------------------------*/
 ROM_START(pomp_l1)
-	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD("gamerom.716", 0x6000, 0x0800, CRC(0f069ac2) SHA1(d651d49cdb50cf444e420241a1f9ed48c878feee))
-	ROM_LOAD("b_ic20.716", 0x7000, 0x0800, CRC(c6f8e3b1) SHA1(cb78d42e1265162132a1ab2320148b6857106b0e))
-	ROM_LOAD("b_ic17.716", 0x7800, 0x0800, CRC(cfc2518a) SHA1(5e99e40dcb7e178137db8d7d7d6da82ba87130fa))
+	ROM_REGION(0x2000, "roms", 0)
+	ROM_LOAD("gamerom.716",  0x0000, 0x0800, CRC(0f069ac2) SHA1(d651d49cdb50cf444e420241a1f9ed48c878feee))
+	ROM_LOAD("b_ic20.716",   0x1000, 0x0800, CRC(c6f8e3b1) SHA1(cb78d42e1265162132a1ab2320148b6857106b0e))
+	ROM_LOAD("b_ic17.716",   0x1800, 0x0800, CRC(cfc2518a) SHA1(5e99e40dcb7e178137db8d7d7d6da82ba87130fa))
 
-	ROM_REGION(0x10000, "audiocpu", 0)
-	ROM_LOAD("soundx.716", 0x7800, 0x0800, CRC(539d64fb) SHA1(ff0d09c8d7c65e1072691b5b9e4fcaa3f38d67e8))
+	ROM_REGION(0x0800, "audioroms", 0)
+	ROM_LOAD("soundx.716",   0x0000, 0x0800, CRC(539d64fb) SHA1(ff0d09c8d7c65e1072691b5b9e4fcaa3f38d67e8))
 ROM_END
 
 /*----------------------------
 / Aristocrat (Shuffle) same roms as Pompeii
 /----------------------------*/
 ROM_START(arist_l1)
-	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD("gamerom.716", 0x6000, 0x0800, CRC(0f069ac2) SHA1(d651d49cdb50cf444e420241a1f9ed48c878feee))
-	ROM_LOAD("b_ic20.716", 0x7000, 0x0800, CRC(c6f8e3b1) SHA1(cb78d42e1265162132a1ab2320148b6857106b0e))
-	ROM_LOAD("b_ic17.716", 0x7800, 0x0800, CRC(cfc2518a) SHA1(5e99e40dcb7e178137db8d7d7d6da82ba87130fa))
+	ROM_REGION(0x2000, "roms", 0)
+	ROM_LOAD("gamerom.716",  0x0000, 0x0800, CRC(0f069ac2) SHA1(d651d49cdb50cf444e420241a1f9ed48c878feee))
+	ROM_LOAD("b_ic20.716",   0x1000, 0x0800, CRC(c6f8e3b1) SHA1(cb78d42e1265162132a1ab2320148b6857106b0e))
+	ROM_LOAD("b_ic17.716",   0x1800, 0x0800, CRC(cfc2518a) SHA1(5e99e40dcb7e178137db8d7d7d6da82ba87130fa))
 
-	ROM_REGION(0x10000, "audiocpu", 0)
-	ROM_LOAD("soundx.716", 0x7800, 0x0800, CRC(539d64fb) SHA1(ff0d09c8d7c65e1072691b5b9e4fcaa3f38d67e8))
+	ROM_REGION(0x0800, "audioroms", 0)
+	ROM_LOAD("soundx.716",   0x0000, 0x0800, CRC(539d64fb) SHA1(ff0d09c8d7c65e1072691b5b9e4fcaa3f38d67e8))
 ROM_END
 
 /*----------------------------
 / Topaz (Shuffle)
 /----------------------------*/
 ROM_START(topaz_l1)
-	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD("gamerom.716", 0x6000, 0x0800, CRC(cb287b10) SHA1(7fb6b6a26237cf85d5e02cf35271231267f90fc1))
-	ROM_LOAD("b_ic20.716", 0x7000, 0x0800, CRC(c6f8e3b1) SHA1(cb78d42e1265162132a1ab2320148b6857106b0e))
-	ROM_LOAD("b_ic17.716", 0x7800, 0x0800, CRC(cfc2518a) SHA1(5e99e40dcb7e178137db8d7d7d6da82ba87130fa))
+	ROM_REGION(0x2000, "roms", 0)
+	ROM_LOAD("gamerom.716",  0x0000, 0x0800, CRC(cb287b10) SHA1(7fb6b6a26237cf85d5e02cf35271231267f90fc1))
+	ROM_LOAD("b_ic20.716",   0x1000, 0x0800, CRC(c6f8e3b1) SHA1(cb78d42e1265162132a1ab2320148b6857106b0e))
+	ROM_LOAD("b_ic17.716",   0x1800, 0x0800, CRC(cfc2518a) SHA1(5e99e40dcb7e178137db8d7d7d6da82ba87130fa))
 
-	ROM_REGION(0x10000, "audiocpu", 0)
-	ROM_LOAD("sound1.716", 0x7800, 0x0800, CRC(f4190ca3) SHA1(ee234fb5c894fca5876ee6dc7ea8e89e7e0aec9c))
+	ROM_REGION(0x0800, "audioroms", 0)
+	ROM_LOAD("sound1.716",   0x0000, 0x0800, CRC(f4190ca3) SHA1(ee234fb5c894fca5876ee6dc7ea8e89e7e0aec9c))
 ROM_END
 
 /*----------------------------
 / Taurus (Shuffle)
 /----------------------------*/
 ROM_START(taurs_l1)
-	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD("gamerom.716", 0x6000, 0x0800, CRC(3246e285) SHA1(4f76784ecb5063a49c24795ae61db043a51e2c89))
-	ROM_LOAD("b_ic20.716", 0x7000, 0x0800, CRC(c6f8e3b1) SHA1(cb78d42e1265162132a1ab2320148b6857106b0e))
-	ROM_LOAD("b_ic17.716", 0x7800, 0x0800, CRC(cfc2518a) SHA1(5e99e40dcb7e178137db8d7d7d6da82ba87130fa))
+	ROM_REGION(0x2000, "roms", 0)
+	ROM_LOAD("gamerom.716",  0x0000, 0x0800, CRC(3246e285) SHA1(4f76784ecb5063a49c24795ae61db043a51e2c89))
+	ROM_LOAD("b_ic20.716",   0x1000, 0x0800, CRC(c6f8e3b1) SHA1(cb78d42e1265162132a1ab2320148b6857106b0e))
+	ROM_LOAD("b_ic17.716",   0x1800, 0x0800, CRC(cfc2518a) SHA1(5e99e40dcb7e178137db8d7d7d6da82ba87130fa))
 
-	ROM_REGION(0x10000, "audiocpu", 0)
-	ROM_LOAD("soundx.716", 0x7800, 0x0800, CRC(539d64fb) SHA1(ff0d09c8d7c65e1072691b5b9e4fcaa3f38d67e8))
+	ROM_REGION(0x0800, "audioroms", 0)
+	ROM_LOAD("soundx.716",   0x0000, 0x0800, CRC(539d64fb) SHA1(ff0d09c8d7c65e1072691b5b9e4fcaa3f38d67e8))
 ROM_END
 
 /*----------------------------
 / King Tut
 /----------------------------*/
 ROM_START(kingt_l1)
-	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD("gamerom.716", 0x6000, 0x0800, CRC(54d3280a) SHA1(ca74636e35d2c3e0b3133f89b1ff1233d5d72a5c))
-	ROM_LOAD("b_ic20.716", 0x7000, 0x0800, CRC(c6f8e3b1) SHA1(cb78d42e1265162132a1ab2320148b6857106b0e))
-	ROM_LOAD("b_ic17.716", 0x7800, 0x0800, CRC(cfc2518a) SHA1(5e99e40dcb7e178137db8d7d7d6da82ba87130fa))
+	ROM_REGION(0x2000, "roms", 0)
+	ROM_LOAD("gamerom.716",  0x0000, 0x0800, CRC(54d3280a) SHA1(ca74636e35d2c3e0b3133f89b1ff1233d5d72a5c))
+	ROM_LOAD("b_ic20.716",   0x1000, 0x0800, CRC(c6f8e3b1) SHA1(cb78d42e1265162132a1ab2320148b6857106b0e))
+	ROM_LOAD("b_ic17.716",   0x1800, 0x0800, CRC(cfc2518a) SHA1(5e99e40dcb7e178137db8d7d7d6da82ba87130fa))
 
-	ROM_REGION(0x10000, "audiocpu", 0)
-	ROM_LOAD("soundx.716", 0x7800, 0x0800, CRC(539d64fb) SHA1(ff0d09c8d7c65e1072691b5b9e4fcaa3f38d67e8))
+	ROM_REGION(0x0800, "audioroms", 0)
+	ROM_LOAD("soundx.716",   0x0000, 0x0800, CRC(539d64fb) SHA1(ff0d09c8d7c65e1072691b5b9e4fcaa3f38d67e8))
 ROM_END
 
 /*----------------------------
 / Omni (Shuffle)
 /----------------------------*/
 ROM_START(omni_l1)
-	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD("omni-1a.u21", 0x6000, 0x0800, CRC(443bd170) SHA1(cc1ebd72d77ec2014cbd84534380e5ea1f12c022))
-	ROM_LOAD("b_ic20.716", 0x7000, 0x0800, CRC(c6f8e3b1) SHA1(cb78d42e1265162132a1ab2320148b6857106b0e))
-	ROM_LOAD("b_ic17.716", 0x7800, 0x0800, CRC(cfc2518a) SHA1(5e99e40dcb7e178137db8d7d7d6da82ba87130fa))
+	ROM_REGION(0x2000, "roms", 0)
+	ROM_LOAD("omni-1a.u21",  0x0000, 0x0800, CRC(443bd170) SHA1(cc1ebd72d77ec2014cbd84534380e5ea1f12c022))
+	ROM_LOAD("b_ic20.716",   0x1000, 0x0800, CRC(c6f8e3b1) SHA1(cb78d42e1265162132a1ab2320148b6857106b0e))
+	ROM_LOAD("b_ic17.716",   0x1800, 0x0800, CRC(cfc2518a) SHA1(5e99e40dcb7e178137db8d7d7d6da82ba87130fa))
 
-	ROM_REGION(0x10000, "audiocpu", 0)
-	ROM_LOAD("sound.716", 0x7800, 0x0800, CRC(db085cbb) SHA1(9a57abbad183ba16b3dba16d16923c3bfc46a0c3))
+	ROM_REGION(0x0800, "audioroms", 0)
+	ROM_LOAD("sound.716",    0x0000, 0x0800, CRC(db085cbb) SHA1(9a57abbad183ba16b3dba16d16923c3bfc46a0c3))
 ROM_END
 
 /*----------------------------
 / Big Strike (Shuffle)
 /----------------------------*/
 ROM_START(bstrk_l1)
-	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD("gamerom.716", 0x6000, 0x0800, CRC(323dbcde) SHA1(a75cbb5de97cb9afc1d36e9b6ff593bb482fcf8b))
-	ROM_LOAD("b_ic20.716", 0x7000, 0x0800, CRC(c6f8e3b1) SHA1(cb78d42e1265162132a1ab2320148b6857106b0e))
-	ROM_LOAD("b_ic17.716", 0x7800, 0x0800, CRC(cfc2518a) SHA1(5e99e40dcb7e178137db8d7d7d6da82ba87130fa))
+	ROM_REGION(0x2000, "roms", 0)
+	ROM_LOAD("gamerom.716",  0x0000, 0x0800, CRC(323dbcde) SHA1(a75cbb5de97cb9afc1d36e9b6ff593bb482fcf8b))
+	ROM_LOAD("b_ic20.716",   0x1000, 0x0800, CRC(c6f8e3b1) SHA1(cb78d42e1265162132a1ab2320148b6857106b0e))
+	ROM_LOAD("b_ic17.716",   0x1800, 0x0800, CRC(cfc2518a) SHA1(5e99e40dcb7e178137db8d7d7d6da82ba87130fa))
 ROM_END
 
 /*----------------------------
 / Triple Strike (Shuffle)
 /----------------------------*/
 ROM_START(tstrk_l1)
-	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD("gamerom.716", 0x6000, 0x0800, CRC(b034c059) SHA1(76b3926b87b3c137fcaf33021a586827e3c030af))
-	ROM_LOAD("ic20.716", 0x7000, 0x0800, CRC(f163fc88) SHA1(988b60626f3d4dc8f4a1dbd0c99282418bc53aae))
-	ROM_LOAD("b_ic17.716", 0x7800, 0x0800, CRC(cfc2518a) SHA1(5e99e40dcb7e178137db8d7d7d6da82ba87130fa))
+	ROM_REGION(0x2000, "roms", 0)
+	ROM_LOAD("gamerom.716",  0x0000, 0x0800, CRC(b034c059) SHA1(76b3926b87b3c137fcaf33021a586827e3c030af))
+	ROM_LOAD("ic20.716",     0x1000, 0x0800, CRC(f163fc88) SHA1(988b60626f3d4dc8f4a1dbd0c99282418bc53aae))
+	ROM_LOAD("b_ic17.716",   0x1800, 0x0800, CRC(cfc2518a) SHA1(5e99e40dcb7e178137db8d7d7d6da82ba87130fa))
 ROM_END
 
 
@@ -711,8 +679,7 @@ GAME( 1978, trizn_t1, trizn_l1, s4a, s4, driver_device, 0, ROT0, "Williams", "Tr
 GAME( 1979, tmwrp_l2, 0,        s4a, s4, driver_device, 0, ROT0, "Williams", "Time Warp (L-2)", GAME_MECHANICAL )
 GAME( 1979, tmwrp_t2, tmwrp_l2, s4a, s4, driver_device, 0, ROT0, "Williams", "Time Warp (T-2)", GAME_MECHANICAL )
 GAME( 1979, stlwr_l2, 0,        s4a, s4, driver_device, 0, ROT0, "Williams", "Stellar Wars (L-2)", GAME_MECHANICAL )
-GAME( 1980, scrpn_l1, 0,        s4a, s4, driver_device, 0, ROT0, "Williams", "Scorpion (L-1)", GAME_MECHANICAL | GAME_NOT_WORKING | GAME_NO_SOUND)
-GAME( 1980, scrpn_t1, scrpn_l1, s4a, s4, driver_device, 0, ROT0, "Williams", "Scorpion (T-1)", GAME_MECHANICAL | GAME_NOT_WORKING | GAME_NO_SOUND)
+
 GAME( 1978, pomp_l1,  0,        s4a, s4, driver_device, 0, ROT0, "Williams", "Pompeii (Shuffle) (L-1)", GAME_MECHANICAL | GAME_NOT_WORKING)
 GAME( 1978, arist_l1, 0,        s4a, s4, driver_device, 0, ROT0, "Williams", "Aristocrat (Shuffle) (L-1)", GAME_MECHANICAL | GAME_NOT_WORKING)
 GAME( 1978, topaz_l1, 0,        s4a, s4, driver_device, 0, ROT0, "Williams", "Topaz (Shuffle) (L-1)", GAME_MECHANICAL | GAME_NOT_WORKING)
