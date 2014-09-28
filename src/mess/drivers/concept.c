@@ -32,6 +32,8 @@
 #include "cpu/m68000/m68000.h"
 #include "includes/concept.h"
 #include "bus/a2bus/a2corvus.h"
+#include "bus/a2bus/corvfdc01.h"
+#include "bus/a2bus/corvfdc02.h"
 #include "bus/rs232/rs232.h"
 
 static ADDRESS_MAP_START(concept_memmap, AS_PROGRAM, 16, concept_state )
@@ -194,6 +196,8 @@ INPUT_PORTS_END
 
 SLOT_INTERFACE_START( concept_a2_cards )
 	SLOT_INTERFACE("fchdd", A2BUS_CORVUS)  /* Corvus flat-cable HDD interface (see notes in a2corvus.c) */
+	SLOT_INTERFACE("fdc01", A2BUS_CORVFDC01)	/* Corvus WD1793 floppy controller */
+	SLOT_INTERFACE("fdc02", A2BUS_CORVFDC02)	/* Corvus NEC765 buffered floppy controller */
 SLOT_INTERFACE_END
 
 
@@ -254,7 +258,7 @@ static MACHINE_CONFIG_START( concept, concept_state )
 	MCFG_A2BUS_SLOT_ADD(A2BUS_TAG, "sl1", concept_a2_cards, NULL)
 	MCFG_A2BUS_SLOT_ADD(A2BUS_TAG, "sl2", concept_a2_cards, NULL)
 	MCFG_A2BUS_SLOT_ADD(A2BUS_TAG, "sl3", concept_a2_cards, NULL)
-	MCFG_A2BUS_SLOT_ADD(A2BUS_TAG, "sl4", concept_a2_cards, "fchdd")
+	MCFG_A2BUS_SLOT_ADD(A2BUS_TAG, "sl4", concept_a2_cards, "fdc02")
 
 	/* 2x RS232 ports */
 	MCFG_RS232_PORT_ADD("rs232a", default_rs232_devices, NULL)
