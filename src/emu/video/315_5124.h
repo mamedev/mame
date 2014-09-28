@@ -59,7 +59,7 @@ class sega315_5124_device : public device_t,
 public:
 	// construction/destruction
 	sega315_5124_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	sega315_5124_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT8 cram_size, UINT8 palette_offset, bool supports_224_240, const char *shortname, const char *source);
+	sega315_5124_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT8 cram_size, UINT8 palette_offset, bool supports_224_240, const char *shortname, const char *source, int xscroll_hpos = X_SCROLL_HPOS_5124);
 
 	static void set_signal_type(device_t &device, bool is_pal) { downcast<sega315_5124_device &>(device).m_is_pal = is_pal; }
 	template<class _Object> static devcb_base &set_int_callback(device_t &device, _Object object) { return downcast<sega315_5124_device &>(device).m_int_cb.set_callback(object); }
@@ -87,6 +87,9 @@ public:
 	virtual void set_sega315_5124_compatibility_mode( bool sega315_5124_compatibility_mode ) { };
 
 protected:
+	static const int X_SCROLL_HPOS_5124 = 21;
+	static const int X_SCROLL_HPOS_5378 = 35;  // Not verified
+
 	void set_display_settings();
 	virtual void update_palette();
 	virtual void cram_write(UINT8 data);
@@ -114,7 +117,6 @@ protected:
 	UINT8            m_reg[16];                  /* All the registers */
 	UINT8            m_status;                   /* Status register */
 	UINT8            m_pending_status;           /* Pending status flags */
-	UINT8            m_reg6copy;                 /* Internal copy of register 6 (Sprite Patterns) */
 	UINT8            m_reg8copy;                 /* Internal copy of register 8 (X-Scroll) */
 	UINT8            m_reg9copy;                 /* Internal copy of register 9 (Y-Scroll) */
 	UINT8            m_addrmode;                 /* Type of VDP action */
@@ -136,12 +138,14 @@ protected:
 	const UINT8      *m_frame_timing;
 	bitmap_rgb32     m_tmpbitmap;
 	bitmap_ind8      m_y1_bitmap;
-	UINT8            m_collision_buffer[SEGA315_5124_WIDTH];
 	UINT8            m_palette_offset;
 	bool             m_supports_224_240;
 	bool             m_display_disabled;
 	UINT16           m_sprite_base;
-	int              m_selected_sprite[8];
+	UINT16           m_sprite_pattern_line[8];
+	int              m_sprite_tile_selected[8];
+	int              m_sprite_x[8];
+	UINT8            m_sprite_flags[8];
 	int              m_sprite_count;
 	int              m_sprite_height;
 	int              m_sprite_zoom;
@@ -151,9 +155,9 @@ protected:
 	   sms compatibility mode. */
 	int              *m_line_buffer;
 	int              m_current_palette[32];
-	bool               m_is_pal;             /* false = NTSC, true = PAL */
-	devcb_write_line  m_int_cb;       /* Interrupt callback function */
-	devcb_write_line  m_pause_cb;     /* Pause callback function */
+	bool             m_is_pal;             /* false = NTSC, true = PAL */
+	devcb_write_line m_int_cb;       /* Interrupt callback function */
+	devcb_write_line m_pause_cb;     /* Pause callback function */
 	emu_timer        *m_display_timer;
 	emu_timer        *m_hint_timer;
 	emu_timer        *m_vint_timer;
@@ -176,6 +180,7 @@ protected:
 	static const device_timer_id TIMER_FLAGS = 7;
 
 	required_device<palette_device> m_palette;
+	const int        m_xscroll_hpos;
 };
 
 
