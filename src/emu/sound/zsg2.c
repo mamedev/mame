@@ -49,7 +49,10 @@ TODO:
 - volume/panning is linear? volume slides are too steep
 - most music sounds tinny, probably due to missing DSP?
 - what is reg 0xa/0xc? seems related to volume
+- chip should running at 31khz (divider of 768 instead of 192)
 - identify sample flags
+  * bassdrum in shikigam level 1 music is a good hint: it should be one octave
+    lower, indicating possible stereo sample, or base octave(like in ymf278)
 - memory reads out of range sometimes
 
 */
@@ -133,6 +136,21 @@ void zsg2_device::device_reset()
 	for (int ch = 0; ch < 48; ch++)
 		for (int reg = 0; reg < 0x10; reg++)
 			chan_w(ch, reg, 0);
+
+#if 0
+	for (int i = 0; i < m_mem_blocks; i++)
+		prepare_samples(i);
+
+	FILE* f;
+	
+	f = fopen("zoom_samples.bin","wb");
+	fwrite(m_mem_copy,1,m_mem_blocks*4,f);
+	fclose(f);
+
+	f = fopen("zoom_samples.raw","wb");
+	fwrite(m_full_samples,2,m_mem_blocks*4,f);
+	fclose(f);
+#endif
 }
 
 
