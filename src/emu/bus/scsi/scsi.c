@@ -122,6 +122,16 @@ void SCSI_PORT_DEVICE::device_start()
 	m_data5_handler(0);
 	m_data6_handler(0);
 	m_data7_handler(0);
+
+	m_bsy_handler(0);
+	m_sel_handler(0);
+	m_cd_handler(0);
+	m_io_handler(0);
+	m_msg_handler(0);
+	m_req_handler(0);
+	m_ack_handler(0);
+	m_atn_handler(0);
+	m_rst_handler(0);
 }
 
 void SCSI_PORT_DEVICE::update_bsy()

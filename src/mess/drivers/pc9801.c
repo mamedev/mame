@@ -402,7 +402,7 @@ Keyboard TX commands:
 #include "machine/upd1990a.h"
 #include "machine/i8251.h"
 
-#include "bus/scsi/s1410.h"
+#include "bus/scsi/pc9801_sasi.h"
 #include "bus/scsi/scsi.h"
 #include "bus/scsi/scsihd.h"
 #include "machine/buffer.h"
@@ -600,7 +600,9 @@ public:
 	UINT32 pc9801_286_a20(bool state);
 
 	DECLARE_WRITE8_MEMBER(sasi_data_w);
+	DECLARE_READ8_MEMBER(sasi_data_r);
 	DECLARE_WRITE_LINE_MEMBER(write_sasi_io);
+	DECLARE_WRITE_LINE_MEMBER(write_sasi_req);
 	DECLARE_READ8_MEMBER(sasi_status_r);
 	DECLARE_WRITE8_MEMBER(sasi_ctrl_w);
 
@@ -1730,6 +1732,15 @@ WRITE8_MEMBER(pc9801_state::pc9801_mouse_w)
 	}
 }
 
+READ8_MEMBER( pc9801_state::sasi_data_r )
+{
+	UINT8 data = m_sasi_data_in->read();
+
+	if(m_sasi_ctrl_in->read() & 0x80)
+		m_sasibus->write_ack(1);
+	return data;
+}
+
 WRITE8_MEMBER( pc9801_state::sasi_data_w )
 {
 	m_sasi_data = data;
@@ -1737,6 +1748,8 @@ WRITE8_MEMBER( pc9801_state::sasi_data_w )
 	if (m_sasi_data_enable)
 	{
 		m_sasi_data_out->write(m_sasi_data);
+		if(m_sasi_ctrl_in->read() & 0x80)
+			m_sasibus->write_ack(1);
 	}
 }
 
@@ -1754,6 +1767,25 @@ WRITE_LINE_MEMBER( pc9801_state::write_sasi_io )
 	{
 		m_sasi_data_out->write(0);
 	}
+	if((m_sasi_ctrl_in->read() & 0x9C) == 0x8C)
+		m_pic2->ir1_w(m_sasi_ctrl & 1);
+	else
+		m_pic2->ir1_w(0);
+}
+
+WRITE_LINE_MEMBER( pc9801_state::write_sasi_req )
+{
+	m_sasi_ctrl_in->write_bit7(state);
+
+	if (!state)
+		m_sasibus->write_ack(0);
+
+	if((m_sasi_ctrl_in->read() & 0x9C) == 0x8C)
+		m_pic2->ir1_w(m_sasi_ctrl & 1);
+	else
+		m_pic2->ir1_w(0);
+
+	m_dmac->dreq0_w(!(state && !(m_sasi_ctrl_in->read() & 8) && (m_sasi_ctrl & 2)));
 }
 
 #include "debugger.h"
@@ -1765,7 +1797,7 @@ READ8_MEMBER( pc9801_state::sasi_status_r )
 	if(m_sasi_ctrl & 0x40) // read status
 	{
 	/*
-	    x--- -.-- REQ
+	    x--- ---- REQ
 	    -x-- ---- ACK
 	    --x- ---- BSY
 	    ---x ---- MSG
@@ -1782,10 +1814,9 @@ READ8_MEMBER( pc9801_state::sasi_status_r )
         --xx x--- SASI-1 media type
         ---- -xxx SASI-2 media type
 */
-		res |= 7 << 3; // read mediatype SASI-1
-		res |= 7;   // read mediatype SASI-2
+		//res |= 7 << 3; // read mediatype SASI-1
+		//res |= 7;   // read mediatype SASI-2
 	}
-
 	return res;
 }
 
@@ -1839,7 +1870,7 @@ static ADDRESS_MAP_START( pc9801_io, AS_IO, 16, pc9801_state )
 //  AM_RANGE(0x006c, 0x006f) border color / <undefined>
 	AM_RANGE(0x0070, 0x007b) AM_READWRITE8(pc9801_70_r,pc9801_70_w,0xffff) //display registers / i8253 pit
 //  AM_RANGE(0x0080, 0x0083) AM_READWRITE8(pc9801_sasi_r,pc9801_sasi_w,0xffff) //HDD SASI interface / <undefined>
-	AM_RANGE(0x0080, 0x0081) AM_DEVREAD8("sasi_data_in", input_buffer_device, read, 0x00ff) AM_WRITE8(sasi_data_w, 0x00ff)
+	AM_RANGE(0x0080, 0x0081) AM_READWRITE8(sasi_data_r, sasi_data_w, 0x00ff)
 	AM_RANGE(0x0082, 0x0083) AM_READWRITE8(sasi_status_r, sasi_ctrl_w,0x00ff)
 	AM_RANGE(0x0090, 0x0097) AM_READWRITE8(pc9801_fdc_2hd_r,pc9801_fdc_2hd_w,0xffff) //upd765a 2hd / cmt
 	AM_RANGE(0x00a0, 0x00af) AM_READWRITE8(pc9801_a0_r,pc9801_a0_w,0xffff) //upd7220 bitmap ports / display registers
@@ -3542,13 +3573,17 @@ static MACHINE_CONFIG_FRAGMENT( pc9801_sasi )
 	MCFG_SCSI_MSG_HANDLER(DEVWRITELINE("sasi_ctrl_in", input_buffer_device, write_bit4))
 	MCFG_SCSI_BSY_HANDLER(DEVWRITELINE("sasi_ctrl_in", input_buffer_device, write_bit5))
 	MCFG_SCSI_ACK_HANDLER(DEVWRITELINE("sasi_ctrl_in", input_buffer_device, write_bit6))
-	MCFG_SCSI_REQ_HANDLER(DEVWRITELINE("sasi_ctrl_in", input_buffer_device, write_bit7))
+	MCFG_SCSI_REQ_HANDLER(WRITELINE(pc9801_state, write_sasi_req))
 
-	MCFG_SCSIDEV_ADD(SASIBUS_TAG ":" SCSI_PORT_DEVICE1, "harddisk", S1410, SCSI_ID_0) // TODO: correct one, perhaps ttl
+	MCFG_SCSIDEV_ADD(SASIBUS_TAG ":" SCSI_PORT_DEVICE1, "harddisk", PC9801_SASI, SCSI_ID_0)
 
 	MCFG_SCSI_OUTPUT_LATCH_ADD("sasi_data_out", SASIBUS_TAG)
 	MCFG_DEVICE_ADD("sasi_data_in", INPUT_BUFFER, 0)
 	MCFG_DEVICE_ADD("sasi_ctrl_in", INPUT_BUFFER, 0)
+
+	MCFG_DEVICE_MODIFY("i8237")
+	MCFG_I8237_IN_IOR_0_CB(READ8(pc9801_state, sasi_data_r))
+	MCFG_I8237_OUT_IOW_0_CB(WRITE8(pc9801_state, sasi_data_w))
 MACHINE_CONFIG_END
 
 

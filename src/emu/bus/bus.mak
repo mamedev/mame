@@ -1218,6 +1218,7 @@ BUSOBJS += $(BUSOBJ)/scsi/acb4070.o
 BUSOBJS += $(BUSOBJ)/scsi/d9060hd.o
 BUSOBJS += $(BUSOBJ)/scsi/sa1403d.o
 BUSOBJS += $(BUSOBJ)/scsi/s1410.o
+BUSOBJS += $(BUSOBJ)/scsi/pc9801_sasi.o
 endif
 
 #-------------------------------------------------
