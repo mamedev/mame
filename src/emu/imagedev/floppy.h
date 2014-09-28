@@ -198,7 +198,6 @@ protected:
 
 	void do_load_create();
 	virtual void hook_load(astring filename, bool softlist);
-	astring try_file(astring location, astring name, bool has_crc, UINT32 crc);
 };
 
 

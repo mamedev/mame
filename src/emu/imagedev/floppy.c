@@ -871,49 +871,21 @@ void ui_menu_control_floppy_image::do_load_create()
 	}
 }
 
-astring ui_menu_control_floppy_image::try_file(astring location, astring name, bool has_crc, UINT32 crc)
-{
-	emu_file fd(machine().options().media_path(), OPEN_FLAG_READ);
-	file_error filerr;
-	if(has_crc)
-		filerr = fd.open(location.cstr(), PATH_SEPARATOR, name.cstr(), crc);
-	else
-		filerr = fd.open(location.cstr(), PATH_SEPARATOR, name.cstr());
-	if(filerr != FILERR_NONE)
-		return "";
-	return fd.fullpath();
-}
-
 void ui_menu_control_floppy_image::hook_load(astring filename, bool softlist)
 {
-	input_filename = filename;
 	if (softlist)
 	{
-		astring swlist_name, swinfo_name, swpart_name;
-		device_image_interface::software_name_split(filename.cstr(), swlist_name, swinfo_name, swpart_name);
-		software_list_device *swlistdev = software_list_device::find_by_name(machine().config(), swlist_name);
-		software_info *swinfo = swlistdev->find(swinfo_name);
-		software_part *swpart = swinfo->find_part(swpart_name);
-		const char *parentname = swinfo->parentname();
-		for(const rom_entry *region = swpart->romdata(); region; region = rom_next_region(region)) {
-			const rom_entry *romp = region + 1;
-			UINT32 crc = 0;
-			bool has_crc = hash_collection(ROM_GETHASHDATA(romp)).crc(crc);
-
-			filename = try_file(astring(swlistdev->list_name()) + PATH_SEPARATOR + astring(swinfo_name), ROM_GETNAME(romp), has_crc, crc);
-			if(filename == "" && parentname)
-				filename = try_file(astring(swlist_name) + PATH_SEPARATOR + astring(parentname), ROM_GETNAME(romp), has_crc, crc);
-			if(filename == "")
-				filename = try_file(swinfo_name, ROM_GETNAME(romp), has_crc, crc);
-			if(filename == "" && parentname)
-				filename = try_file(parentname, ROM_GETNAME(romp), has_crc, crc);
-			if(filename != "")
-				break;
-		}
+		popmessage("When loaded from software list, the disk is Read-only.\n");
+		image->load(filename);
+		ui_menu::stack_pop(machine());
+		return;
 	}
 
+	input_filename = filename;
 	input_format = static_cast<floppy_image_device *>(image)->identify(filename);
-	if(!input_format) {
+
+	if (!input_format) 
+	{
 		popmessage("Error: %s\n", image->error());
 		ui_menu::stack_pop(machine());
 		return;
