@@ -707,7 +707,8 @@ GFXDECODE_END
 
 WRITE_LINE_MEMBER( portfolio_state::i8250_intrpt_w )
 {
-	trigger_interrupt(INT_EXTERNAL);
+	if (state)
+		trigger_interrupt(INT_EXTERNAL);
 }
 
 //**************************************************************************
