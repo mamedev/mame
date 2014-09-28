@@ -79,7 +79,6 @@ private:
 	UINT8 m_sound_data;
 	UINT8 m_strobe;
 	UINT8 m_kbdrow;
-	bool m_cb1;
 	bool m_data_ok;
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
