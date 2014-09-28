@@ -3157,7 +3157,7 @@ int ppc_device::generate_instruction_1f(drcuml_block *block, compiler_state *com
 			UML_CMP(block, I0, I0);                                             // cmp     i0,i0
 			UML_GETFLGS(block, I0, FLAG_Z | FLAG_C | FLAG_S);                           // getflgs i0,zcs
 			UML_LOAD(block, I0, m_cmp_cr_table, I0, SIZE_BYTE, SCALE_x1);// load    i0,cmp_cr_table,i0,byte
-			UML_OR(block, CR32(G_CRFD(op)), I0, XERSO32);                               // or      [crn],i0,[xerso]
+			UML_OR(block, CR32(0), I0, XERSO32);                               // or      [cr0],i0,[xerso]
 
 			generate_compute_flags(block, desc, TRUE, 0, FALSE);                       // <update flags>
 			return TRUE;
