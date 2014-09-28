@@ -111,7 +111,7 @@ public:
 	virtual DECLARE_WRITE8_MEMBER(chip_write) {}
 	virtual void speedup_addon_bios_access() {};
 
-	void rom_alloc(UINT32 size);
+	void rom_alloc(UINT32 size, const char *tag);
 	void nvram_alloc(UINT32 size);
 	void rtc_ram_alloc(UINT32 size);
 	void addon_bios_alloc(UINT32 size);
@@ -119,7 +119,7 @@ public:
 	UINT8* get_nvram_base() { return m_nvram; };
 	UINT8* get_addon_bios_base() { return m_bios; };
 	UINT8* get_rtc_ram_base() { return m_rtc_ram; };
-	UINT32 get_rom_size() { return m_rom.count(); };
+	UINT32 get_rom_size() { return m_rom_size; };
 	UINT32 get_nvram_size() { return m_nvram.count(); };
 	UINT32 get_addon_bios_size() { return m_bios.count(); };
 	UINT32 get_rtc_ram_size() { return m_rtc_ram.count(); };
@@ -129,7 +129,8 @@ public:
 	void save_rtc_ram()	{ device().save_item(NAME(m_rtc_ram)); }
 
 	// internal state
-	dynamic_buffer m_rom;
+	UINT8 *m_rom;
+	UINT32 m_rom_size;
 	dynamic_buffer m_nvram;
 	dynamic_buffer m_bios;
 	dynamic_buffer m_rtc_ram;  // temp pointer to save RTC ram to nvram (will disappear when RTCs become devices)
@@ -251,6 +252,9 @@ extern const device_type SNS_BSX_CART_SLOT;
 /***************************************************************************
  DEVICE CONFIGURATION MACROS
  ***************************************************************************/
+
+#define SNSSLOT_ROM_REGION_TAG ":cart:rom"
+
 
 #define MCFG_SNS_CARTRIDGE_ADD(_tag,_slot_intf,_def_slot) \
 	MCFG_DEVICE_ADD(_tag, SNS_CART_SLOT, 0) \

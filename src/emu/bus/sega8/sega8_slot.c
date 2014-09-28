@@ -49,6 +49,8 @@ const device_type SEGA8_CARD_SLOT = &device_creator<sega8_card_slot_device>;
 
 device_sega8_cart_interface::device_sega8_cart_interface(const machine_config &mconfig, device_t &device)
 	: device_slot_card_interface(mconfig, device),
+		m_rom(NULL),
+		m_rom_size(0),
 		m_rom_page_count(0),
 		has_battery(FALSE),
 		m_late_battery_enable(FALSE),
@@ -70,13 +72,19 @@ device_sega8_cart_interface::~device_sega8_cart_interface()
 //  rom_alloc - alloc the space for the cart
 //-------------------------------------------------
 
-void device_sega8_cart_interface::rom_alloc(UINT32 size)
+void device_sega8_cart_interface::rom_alloc(UINT32 size, const char *tag)
 {
-	m_rom.resize(size);
-	m_rom_page_count = size / 0x4000;
-	if (!m_rom_page_count)
-		m_rom_page_count = 1;   // we compute rom pages through (XXX % m_rom_page_count)!
-	late_bank_setup();
+	if (m_rom == NULL)
+	{
+		astring tempstring(tag);
+		tempstring.cat(S8SLOT_ROM_REGION_TAG);
+		m_rom = device().machine().memory().region_alloc(tempstring, size, 1, ENDIANNESS_LITTLE)->base();
+		m_rom_size = size;
+		m_rom_page_count = size / 0x4000;
+		if (!m_rom_page_count)
+			m_rom_page_count = 1;   // we compute rom pages through (XXX % m_rom_page_count)!
+		late_bank_setup();
+	}
 }
 
 
@@ -353,7 +361,7 @@ bool sega8_cart_slot_device::call_load()
 		if (len & 0x3fff)
 			len = ((len >> 14) + 1) << 14;
 
-		m_cart->rom_alloc(len);
+		m_cart->rom_alloc(len, tag());
 		ROM = m_cart->get_rom_base();
 
 		if (software_entry() == NULL)

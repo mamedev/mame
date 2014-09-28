@@ -206,7 +206,7 @@ READ8_MEMBER(sms_state::sms_count_r)
  */
 WRITE_LINE_MEMBER(sms_state::sms_pause_callback)
 {
-	if (m_is_gamegear && m_cartslot->m_cart && !m_cartslot->m_cart->get_sms_mode())
+	if (m_is_gamegear && m_cartslot->exists() && !m_cartslot->m_cart->get_sms_mode())
 		return;
 
 	if ((m_is_gamegear && !(m_port_start->read() & 0x80)) || (!m_is_gamegear && !(m_port_pause->read() & 0x80)))
@@ -642,12 +642,12 @@ void sms_state::setup_enabled_slots()
 		// (/CART pin) that prioritizes the cartridge slot if it has media
 		// inserted. Japanese 3-D cartridges do not connect the /CART pin,
 		// to not disable the card adaptor used by the 3-D glasses.
-		if (m_cartslot && m_cartslot->m_cart)
+		if (m_cartslot && m_cartslot->exists())
 		{
 			m_mem_device_enabled |= ENABLE_CART;
 			logerror("Cartridge ROM/RAM enabled.\n");
 		}
-		else if (m_cardslot && m_cardslot->m_cart)
+		else if (m_cardslot && m_cardslot->exists())
 		{
 			m_mem_device_enabled |= ENABLE_CARD;
 			logerror("Card ROM port enabled.\n");
@@ -661,13 +661,13 @@ void sms_state::setup_enabled_slots()
 		logerror("Expansion port enabled.\n");
 	}
 
-	if (!(m_mem_ctrl_reg & IO_CARD) && m_cardslot && m_cardslot->m_cart)
+	if (!(m_mem_ctrl_reg & IO_CARD) && m_cardslot && m_cardslot->exists())
 	{
 		m_mem_device_enabled |= ENABLE_CARD;
 		logerror("Card ROM port enabled.\n");
 	}
 
-	if (!(m_mem_ctrl_reg & IO_CARTRIDGE) && m_cartslot && m_cartslot->m_cart)
+	if (!(m_mem_ctrl_reg & IO_CARTRIDGE) && m_cartslot && m_cartslot->exists())
 	{
 		m_mem_device_enabled |= ENABLE_CART;
 		logerror("Cartridge ROM/RAM enabled.\n");
@@ -852,7 +852,7 @@ MACHINE_RESET_MEMBER(sms_state,sms)
 
 	if (m_is_gamegear)
 	{
-		if (m_cartslot->m_cart && m_cartslot->m_cart->get_sms_mode())
+		if (m_cartslot->exists() && m_cartslot->m_cart->get_sms_mode())
 			m_vdp->set_sega315_5124_compatibility_mode(true);
 
 		/* Initialize SIO stuff for GG */

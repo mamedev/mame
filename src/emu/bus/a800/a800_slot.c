@@ -40,6 +40,8 @@ const device_type XEGS_CART_SLOT = &device_creator<xegs_cart_slot_device>;
 
 device_a800_cart_interface::device_a800_cart_interface (const machine_config &mconfig, device_t &device)
 	: device_slot_card_interface(mconfig, device),
+		m_rom(NULL),
+		m_rom_size(0),
 		m_bank_mask(0)
 {
 }
@@ -57,12 +59,18 @@ device_a800_cart_interface::~device_a800_cart_interface ()
 //  rom_alloc - alloc the space for the cart
 //-------------------------------------------------
 
-void device_a800_cart_interface::rom_alloc(UINT32 size)
+void device_a800_cart_interface::rom_alloc(UINT32 size, const char *tag)
 {
-	m_rom.resize(size);
-	
-	// setup other helpers
-	m_bank_mask = (size / 0x2000) - 1;	// code for XEGS carts makes use of this to simplify banking
+	if (m_rom == NULL)
+	{
+		astring tempstring(tag);
+		tempstring.cat(A800SLOT_ROM_REGION_TAG);
+		m_rom = device().machine().memory().region_alloc(tempstring, size, 1, ENDIANNESS_LITTLE)->base();
+		m_rom_size = size;
+		
+		// setup other helpers
+		m_bank_mask = (size / 0x2000) - 1;	// code for XEGS carts makes use of this to simplify banking
+	}
 }
 
 //-------------------------------------------------
@@ -234,7 +242,6 @@ bool a800_cart_slot_device::call_load()
 {
 	if (m_cart)
 	{
-		UINT8 *ROM;
 		UINT32 len;
 		
 		if (software_entry() != NULL)
@@ -242,9 +249,8 @@ bool a800_cart_slot_device::call_load()
 			const char *pcb_name;
 			len = get_software_region_length("rom");
 			
-			m_cart->rom_alloc(len);
-			ROM = m_cart->get_rom_base();
-			memcpy(ROM, get_software_region("rom"), len);
+			m_cart->rom_alloc(len, tag());
+			memcpy(m_cart->get_rom_base(), get_software_region("rom"), len);
 			
 			if ((pcb_name = get_feature("slot")) != NULL)
 				m_type = a800_get_pcb_id(pcb_name);
@@ -275,9 +281,8 @@ bool a800_cart_slot_device::call_load()
 					m_type = A5200_4K;
 			}
 
-			m_cart->rom_alloc(len);
-			ROM = m_cart->get_rom_base();
-			fread(ROM, len);
+			m_cart->rom_alloc(len, tag());
+			fread(m_cart->get_rom_base(), len);
 		}
 		if (m_type == A800_TELELINK2)
 			m_cart->nvram_alloc(0x100);

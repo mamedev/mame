@@ -41,6 +41,23 @@ device_gba_cart_interface::~device_gba_cart_interface()
 }
 
 //-------------------------------------------------
+//  rom_alloc - alloc the space for the cart
+//-------------------------------------------------
+
+void device_gba_cart_interface::rom_alloc(UINT32 size, const char *tag)
+{
+	if (m_rom == NULL)
+	{
+		astring tempstring(tag);
+		tempstring.cat(GBASLOT_ROM_REGION_TAG);
+		// we always alloc 32MB of rom region!
+		m_rom = (UINT32 *)device().machine().memory().region_alloc(tempstring, 0x2000000, 4, ENDIANNESS_LITTLE)->base();
+		m_rom_size = size;
+	}
+}
+
+
+//-------------------------------------------------
 //  nvram_alloc - alloc the space for the ram
 //-------------------------------------------------
 
@@ -150,34 +167,27 @@ bool gba_cart_slot_device::call_load()
 {
 	if (m_cart)
 	{
-		UINT8 *ROM = (UINT8 *)m_cart->get_rom_base();
-		UINT32 cart_size;
+		UINT8 *ROM;
+		UINT32 size = (software_entry() != NULL) ? get_software_region_length("rom") : length();
+		if (size > 0x2000000)
+		{
+			seterror(IMAGE_ERROR_UNSPECIFIED, "Attempted loading a cart larger than 32MB");
+			return IMAGE_INIT_FAIL;
+		}
+
+		m_cart->rom_alloc(size, tag());
+		ROM = (UINT8 *)m_cart->get_rom_base();
 
 		if (software_entry() == NULL)
 		{
-			cart_size = length();
-			if (cart_size > 0x2000000)
-			{
-				seterror(IMAGE_ERROR_UNSPECIFIED, "Attempted loading a cart larger than 32MB");
-				return IMAGE_INIT_FAIL;
-			}
-			fread(ROM, cart_size);
-			m_cart->set_rom_size(cart_size);    // we store the actual game size...
-
-			m_type = get_cart_type(ROM, cart_size);
+			fread(ROM, size);
+			m_type = get_cart_type(ROM, size);
 		}
 		else
 		{
 			const char *pcb_name = get_feature("slot");
 
-			cart_size = get_software_region_length("rom");
-			if (cart_size > 0x2000000)
-			{
-				seterror(IMAGE_ERROR_UNSPECIFIED, "Attempted loading a cart larger than 32MB");
-				return IMAGE_INIT_FAIL;
-			}
-			memcpy(ROM, get_software_region("rom"), cart_size);
-			m_cart->set_rom_size(cart_size);    // we store the actual game size...
+			memcpy(ROM, get_software_region("rom"), size);
 
 			if (pcb_name)
 				m_type = gba_get_pcb_id(pcb_name);
@@ -191,7 +201,7 @@ bool gba_cart_slot_device::call_load()
 			m_cart->nvram_alloc(0x10000);
 
 		// mirror the ROM
-		switch (cart_size)
+		switch (size)
 		{
 			case 2 * 1024 * 1024:
 				memcpy(ROM + 0x200000, ROM, 0x200000);
@@ -451,26 +461,4 @@ WRITE32_MEMBER(gba_cart_slot_device::write_ram)
 
 void gba_cart_slot_device::internal_header_logging(UINT8 *ROM, UINT32 len)
 {
-}
-
-
-/*-------------------------------------------------
- Install ROM - directly point system address map
- to the cart ROM region so to avoid the memory
- system additional load
- -------------------------------------------------*/
-
-void gba_cart_slot_device::install_rom()
-{
-	if (m_cart)
-	{
-		astring tempstring;
-		address_space &space = machine().device<cpu_device>("maincpu")->space(AS_PROGRAM);
-		space.install_read_bank(0x08000000, 0x09ffffff, 0, 0, "rom1");
-		space.install_read_bank(0x0a000000, 0x0bffffff, 0, 0, "rom2");
-		space.install_read_bank(0x0c000000, 0x0cffffff, 0, 0, "rom3");
-		machine().root_device().membank("rom1")->set_base(machine().root_device().memregion(m_cart->device().subtag(tempstring, "cartridge"))->base());
-		machine().root_device().membank("rom2")->set_base(machine().root_device().memregion(m_cart->device().subtag(tempstring, "cartridge"))->base());
-		machine().root_device().membank("rom3")->set_base(machine().root_device().memregion(m_cart->device().subtag(tempstring, "cartridge"))->base());
-	}
 }

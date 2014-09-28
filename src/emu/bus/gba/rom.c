@@ -68,27 +68,11 @@ gba_rom_flash1m_device::gba_rom_flash1m_device(const machine_config &mconfig, co
 
 
 //-------------------------------------------------
-//  ROM Region to allow faster access to cart data
-//-------------------------------------------------
-
-ROM_START( gba_cart )
-	// cartridge region - 32 MBytes (128 Mbit)
-	ROM_REGION( 0x2000000, "cartridge", ROMREGION_ERASEFF )
-ROM_END
-
-const rom_entry *gba_rom_device::device_rom_region() const
-{
-	return ROM_NAME( gba_cart );
-}
-
-//-------------------------------------------------
 //  mapper specific start/reset
 //-------------------------------------------------
 
 void gba_rom_device::device_start()
 {
-	astring tempstring;
-	m_rom = (UINT32 *)memregion(this->subtag(tempstring, "cartridge"))->base();
 }
 
 void gba_rom_device::device_reset()
@@ -108,9 +92,6 @@ void gba_rom_flash1m_device::device_reset()
 
 void gba_rom_eeprom_device::device_start()
 {
-	astring tempstring;
-	m_rom = (UINT32 *)memregion(this->subtag(tempstring, "cartridge"))->base();
-
 	// for the moment we use a custom eeprom implementation, so we alloc/save it as nvram
 	nvram_alloc(0x200);
 	m_eeprom.reset(global_alloc(gba_eeprom_device(machine(), (UINT8*)get_nvram_base(), get_nvram_size(), 6)));
@@ -118,9 +99,6 @@ void gba_rom_eeprom_device::device_start()
 
 void gba_rom_eeprom64_device::device_start()
 {
-	astring tempstring;
-	m_rom = (UINT32 *)memregion(this->subtag(tempstring, "cartridge"))->base();
-
 	// for the moment we use a custom eeprom implementation, so we alloc/save it as nvram
 	nvram_alloc(0x2000);
 	m_eeprom.reset(global_alloc(gba_eeprom_device(machine(), (UINT8*)get_nvram_base(), get_nvram_size(), 14)));

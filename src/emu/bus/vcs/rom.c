@@ -228,7 +228,7 @@ void a26_rom_3e_device::device_start()
 
 void a26_rom_3e_device::device_reset()
 {
-	m_num_bank = m_rom.count() / 0x800;
+	m_num_bank = m_rom_size / 0x800;
 	m_base_bank = m_num_bank - 1;
 	m_ram_bank = 0;
 	m_ram_enable = 0;
@@ -236,7 +236,7 @@ void a26_rom_3e_device::device_reset()
 
 void a26_rom_3f_device::device_reset()
 {
-	m_num_bank = m_rom.count() / 0x800;
+	m_num_bank = m_rom_size / 0x800;
 	m_base_bank = m_num_bank - 1;
 }
 
@@ -332,7 +332,7 @@ READ8_MEMBER(a26_rom_2k_device::read_rom)
 		return m_ram[offset & (m_ram.count() - 1)];
 	}
 
-	return m_rom[offset & (m_rom.count() - 1)];
+	return m_rom[offset & (m_rom_size - 1)];
 }
 
 /*-------------------------------------------------
@@ -845,7 +845,7 @@ WRITE8_MEMBER(a26_rom_e7_device::write_bank)
 
 READ8_MEMBER(a26_rom_ua_device::read_rom)
 {
-	return m_rom[(offset + (m_base_bank * 0x1000)) & (m_rom.count() - 1)];
+	return m_rom[(offset + (m_base_bank * 0x1000)) & (m_rom_size - 1)];
 }
 
 READ8_MEMBER(a26_rom_ua_device::read_bank)

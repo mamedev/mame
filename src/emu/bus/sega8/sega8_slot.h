@@ -49,7 +49,7 @@ public:
 	virtual DECLARE_READ8_MEMBER(read_ram) { return 0xff; }
 	virtual DECLARE_WRITE8_MEMBER(write_ram) {}
 
-	void rom_alloc(UINT32 size);
+	void rom_alloc(UINT32 size, const char *tag);
 	void ram_alloc(UINT32 size);
 
 	virtual void late_bank_setup() {}
@@ -66,7 +66,7 @@ public:
 //protected:
 	UINT8* get_rom_base() { return m_rom; }
 	UINT8* get_ram_base() { return m_ram; }
-	UINT32 get_rom_size() { return m_rom.count(); }
+	UINT32 get_rom_size() { return m_rom_size; }
 	UINT32 get_ram_size() { return m_ram.count(); }
 
 	void rom_map_setup(UINT32 size);
@@ -76,7 +76,8 @@ public:
 
 //private:
 	// internal state
-	dynamic_buffer m_rom;
+	UINT8 *m_rom;
+	UINT32 m_rom_size;
 	dynamic_buffer m_ram;
 	int m_rom_page_count;
 
@@ -170,6 +171,9 @@ public:
 /***************************************************************************
  DEVICE CONFIGURATION MACROS
  ***************************************************************************/
+
+#define S8SLOT_ROM_REGION_TAG ":cart:rom"
+
 
 #define MCFG_SG1000_CARTRIDGE_ADD(_tag,_slot_intf,_def_slot) \
 	MCFG_DEVICE_ADD(_tag, SEGA8_CART_SLOT, 0) \

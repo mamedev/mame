@@ -42,6 +42,8 @@ const device_type A78_CART_SLOT = &device_creator<a78_cart_slot_device>;
 
 device_a78_cart_interface::device_a78_cart_interface (const machine_config &mconfig, device_t &device)
 	: device_slot_card_interface(mconfig, device),
+		m_rom(NULL),
+		m_rom_size(0),
 		m_base_rom(0x8000),
 		m_bank_mask(0)
 {
@@ -60,20 +62,26 @@ device_a78_cart_interface::~device_a78_cart_interface ()
 //  rom_alloc - alloc the space for the cart
 //-------------------------------------------------
 
-void device_a78_cart_interface::rom_alloc(UINT32 size)
+void device_a78_cart_interface::rom_alloc(UINT32 size, const char *tag)
 {
-	m_rom.resize(size);
-	
-	// setup other helpers
-	if ((size / 0x4000) & 1) // compensate for SuperGame carts with 9 x 16K banks (to my knowledge no other cart has m_bank_mask != power of 2)
-		m_bank_mask = (size / 0x4000) - 2;
-	else
-		m_bank_mask = (size / 0x4000) - 1;
-	
-	// the rom is mapped to the top of the memory area
-	// so we store the starting point of data to simplify 
-	// the access handling
-	m_base_rom = 0x10000 - size;
+	if (m_rom == NULL)
+	{
+		astring tempstring(tag);
+		tempstring.cat(A78SLOT_ROM_REGION_TAG);
+		m_rom = device().machine().memory().region_alloc(tempstring, size, 1, ENDIANNESS_LITTLE)->base();
+		m_rom_size = size;
+		
+		// setup other helpers
+		if ((size / 0x4000) & 1) // compensate for SuperGame carts with 9 x 16K banks (to my knowledge no other cart has m_bank_mask != power of 2)
+			m_bank_mask = (size / 0x4000) - 2;
+		else
+			m_bank_mask = (size / 0x4000) - 1;
+		
+		// the rom is mapped to the top of the memory area
+		// so we store the starting point of data to simplify 
+		// the access handling
+		m_base_rom = 0x10000 - size;
+	}
 }
 
 //-------------------------------------------------
@@ -340,7 +348,6 @@ bool a78_cart_slot_device::call_load()
 {
 	if (m_cart)
 	{
-		UINT8 *ROM;
 		UINT32 len;
 		
 		if (software_entry() != NULL)
@@ -350,9 +357,8 @@ bool a78_cart_slot_device::call_load()
 			bool has_nvram = get_software_region("nvram") ? TRUE : FALSE;
 			len = get_software_region_length("rom");
 			
-			m_cart->rom_alloc(len);
-			ROM = m_cart->get_rom_base();
-			memcpy(ROM, get_software_region("rom"), len);
+			m_cart->rom_alloc(len, tag());
+			memcpy(m_cart->get_rom_base(), get_software_region("rom"), len);
 			
 			if ((pcb_name = get_feature("slot")) != NULL)
 				m_type = a78_get_pcb_id(pcb_name);
@@ -447,9 +453,8 @@ bool a78_cart_slot_device::call_load()
 
 			internal_header_logging((UINT8 *)head, length());
 			
-			m_cart->rom_alloc(len);
-			ROM = m_cart->get_rom_base();
-			fread(ROM, len);
+			m_cart->rom_alloc(len, tag());
+			fread(m_cart->get_rom_base(), len);
 			
 			if (m_type == A78_TYPE6)
 				m_cart->ram_alloc(0x4000);

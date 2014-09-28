@@ -91,8 +91,8 @@ READ8_MEMBER(md_cons_state::mess_md_io_read_data_port)
 	else
 	{
 		UINT8 svp_test = 0;
-		if (m_slotcart)
-			svp_test = m_slotcart->read_test();
+		if (m_cart)
+			svp_test = m_cart->read_test();
 
 		// handle test input for SVP test
 		if (portnum == 0 && svp_test)
@@ -266,8 +266,8 @@ MACHINE_START_MEMBER(md_cons_state, md_common)
 
 	m_vdp->stop_timers();
 
-	if (m_slotcart)
-		m_slotcart->save_nvram();
+	if (m_cart)
+		m_cart->save_nvram();
 }
 
 MACHINE_START_MEMBER(md_cons_state, ms_megadriv)
@@ -275,14 +275,14 @@ MACHINE_START_MEMBER(md_cons_state, ms_megadriv)
 	MACHINE_START_CALL_MEMBER( md_common );
 
 	// the SVP introduces some kind of DMA 'lag', which we have to compensate for, this is obvious even on gfx DMAd from ROM (the Speedometer)
-	if (m_slotcart->get_type() == SEGA_SVP)
+	if (m_cart->get_type() == SEGA_SVP)
 		m_vdp->set_dma_delay(2);
 
 	// for now m_cartslot is only in MD and not 32x and SegaCD
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x000000, 0x7fffff, read16_delegate(FUNC(base_md_cart_slot_device::read),(base_md_cart_slot_device*)m_slotcart), write16_delegate(FUNC(base_md_cart_slot_device::write),(base_md_cart_slot_device*)m_slotcart));
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa13000, 0xa130ff, read16_delegate(FUNC(base_md_cart_slot_device::read_a13),(base_md_cart_slot_device*)m_slotcart), write16_delegate(FUNC(base_md_cart_slot_device::write_a13),(base_md_cart_slot_device*)m_slotcart));
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa15000, 0xa150ff, read16_delegate(FUNC(base_md_cart_slot_device::read_a15),(base_md_cart_slot_device*)m_slotcart), write16_delegate(FUNC(base_md_cart_slot_device::write_a15),(base_md_cart_slot_device*)m_slotcart));
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0xa14000, 0xa14003, write16_delegate(FUNC(base_md_cart_slot_device::write_tmss_bank),(base_md_cart_slot_device*)m_slotcart));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x000000, 0x7fffff, read16_delegate(FUNC(base_md_cart_slot_device::read),(base_md_cart_slot_device*)m_cart), write16_delegate(FUNC(base_md_cart_slot_device::write),(base_md_cart_slot_device*)m_cart));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa13000, 0xa130ff, read16_delegate(FUNC(base_md_cart_slot_device::read_a13),(base_md_cart_slot_device*)m_cart), write16_delegate(FUNC(base_md_cart_slot_device::write_a13),(base_md_cart_slot_device*)m_cart));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa15000, 0xa150ff, read16_delegate(FUNC(base_md_cart_slot_device::read_a15),(base_md_cart_slot_device*)m_cart), write16_delegate(FUNC(base_md_cart_slot_device::write_a15),(base_md_cart_slot_device*)m_cart));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0xa14000, 0xa14003, write16_delegate(FUNC(base_md_cart_slot_device::write_tmss_bank),(base_md_cart_slot_device*)m_cart));
 }
 
 MACHINE_START_MEMBER(md_cons_state, ms_megacd)

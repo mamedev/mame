@@ -204,7 +204,7 @@ void a5200_rom_bbsb_device::device_reset()
 
 READ8_MEMBER(a800_rom_device::read_80xx)
 {
-	return m_rom[offset & (m_rom.bytes() - 1)];
+	return m_rom[offset & (m_rom_size - 1)];
 }
 
 

@@ -53,19 +53,20 @@ public:
 	virtual DECLARE_WRITE8_MEMBER(write_30xx) {}
 	virtual DECLARE_WRITE8_MEMBER(write_40xx) {}
 
-	void rom_alloc(UINT32 size);
+	void rom_alloc(UINT32 size, const char *tag);
 	void ram_alloc(UINT32 size);
 	void nvram_alloc(UINT32 size);
 	UINT8* get_rom_base() { return m_rom; }
 	UINT8* get_ram_base() { return m_ram; }
 	UINT8* get_nvram_base() { return m_nvram; }
-	UINT32 get_rom_size() { return m_rom.bytes(); }
+	UINT32 get_rom_size() { return m_rom_size; }
 	UINT32 get_ram_size() { return m_ram.bytes(); }
 	UINT32 get_nvram_size() { return m_nvram.bytes(); }
 
 protected:
 	// internal state
-	dynamic_buffer m_rom;
+	UINT8 *m_rom;
+	UINT32 m_rom_size;
 	dynamic_buffer m_ram;
 	dynamic_buffer m_nvram;	// HiScore cart can save scores!
 	// helpers
@@ -143,6 +144,8 @@ extern const device_type A78_CART_SLOT;
 /***************************************************************************
  DEVICE CONFIGURATION MACROS
  ***************************************************************************/
+
+#define A78SLOT_ROM_REGION_TAG ":cart:rom"
 
 #define MCFG_A78_CARTRIDGE_ADD(_tag,_slot_intf,_def_slot) \
 	MCFG_DEVICE_ADD(_tag, A78_CART_SLOT, 0)  \

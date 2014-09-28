@@ -422,7 +422,7 @@ READ8_MEMBER(sega8_othello_device::read_cart)
 	if (offset >= 0x8000 && offset < 0xa000)
 		return m_ram[offset & 0x7ff];
 
-	return m_rom[offset % m_rom.count()];
+	return m_rom[offset % m_rom_size];
 }
 
 WRITE8_MEMBER(sega8_othello_device::write_cart)
@@ -446,7 +446,7 @@ READ8_MEMBER(sega8_castle_device::read_cart)
 	if (offset >= 0x8000 && offset < 0xa000)
 		return m_ram[offset & 0x1fff];
 
-	return m_rom[offset % m_rom.count()];
+	return m_rom[offset % m_rom_size];
 }
 
 WRITE8_MEMBER(sega8_castle_device::write_cart)
@@ -470,7 +470,7 @@ READ8_MEMBER(sega8_basic_l3_device::read_cart)
 	if (offset >= 0x8000)
 		return m_ram[offset & 0x3fff];
 
-	return m_rom[offset % m_rom.count()];
+	return m_rom[offset % m_rom_size];
 }
 
 WRITE8_MEMBER(sega8_basic_l3_device::write_cart)
@@ -504,7 +504,7 @@ READ8_MEMBER(sega8_music_editor_device::read_cart)
 	if (offset >= 0x8000 && offset < 0xa000)
 		return m_ram[offset & 0x1fff];
 
-	return m_rom[offset % m_rom.count()];
+	return m_rom[offset % m_rom_size];
 }
 
 WRITE8_MEMBER(sega8_music_editor_device::write_cart)
@@ -623,7 +623,7 @@ READ8_MEMBER(sega8_dahjee_typea_device::read_cart)
 	if (offset >= 0x2000 && offset < 0x4000)
 		return m_ram[offset & 0x1fff];
 
-	return m_rom[offset % m_rom.count()];
+	return m_rom[offset % m_rom_size];
 }
 
 WRITE8_MEMBER(sega8_dahjee_typea_device::write_cart)
@@ -651,7 +651,7 @@ WRITE8_MEMBER(sega8_dahjee_typea_device::write_ram)
 // TYPE B
 READ8_MEMBER(sega8_dahjee_typeb_device::read_cart)
 {
-	return m_rom[offset % m_rom.count()];
+	return m_rom[offset % m_rom_size];
 }
 
 READ8_MEMBER(sega8_dahjee_typeb_device::read_ram)

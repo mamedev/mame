@@ -36,6 +36,8 @@ const device_type MEGADUCK_CART_SLOT = &device_creator<megaduck_cart_slot_device
 
 device_gb_cart_interface::device_gb_cart_interface(const machine_config &mconfig, device_t &device)
 	: device_slot_card_interface(mconfig, device),
+		m_rom(NULL),
+		m_rom_size(0),
 		has_rumble(false),
 		has_timer(false),
 		has_battery(false)
@@ -55,9 +57,15 @@ device_gb_cart_interface::~device_gb_cart_interface()
 //  rom_alloc - alloc the space for the cart
 //-------------------------------------------------
 
-void device_gb_cart_interface::rom_alloc(UINT32 size)
+void device_gb_cart_interface::rom_alloc(UINT32 size, const char *tag)
 {
-	m_rom.resize(size);
+	if (m_rom == NULL)
+	{
+		astring tempstring(tag);
+		tempstring.cat(GBSLOT_ROM_REGION_TAG);
+		m_rom = device().machine().memory().region_alloc(tempstring, size, 1, ENDIANNESS_LITTLE)->base();
+		m_rom_size = size;
+	}
 }
 
 
@@ -274,7 +282,7 @@ bool base_gb_cart_slot_device::call_load()
 			}
 		}
 
-		m_cart->rom_alloc(len);
+		m_cart->rom_alloc(len, tag());
 		ROM = m_cart->get_rom_base();
 
 		if (software_entry() == NULL)
@@ -397,15 +405,13 @@ bool megaduck_cart_slot_device::call_load()
 	if (m_cart)
 	{
 		UINT32 len = (software_entry() == NULL) ? length() : get_software_region_length("rom");
-		UINT8 *ROM;
 
-		m_cart->rom_alloc(len);
-		ROM = m_cart->get_rom_base();
+		m_cart->rom_alloc(len, tag());
 
 		if (software_entry() == NULL)
-			fread(ROM, len);
+			fread(m_cart->get_rom_base(), len);
 		else
-			memcpy(ROM, get_software_region("rom"), len);
+			memcpy(m_cart->get_rom_base(), get_software_region("rom"), len);
 
 		// setup rom bank map based on real length, not header value
 		m_cart->rom_map_setup(len);

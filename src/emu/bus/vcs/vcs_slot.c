@@ -28,7 +28,9 @@ const device_type VCS_CART_SLOT = &device_creator<vcs_cart_slot_device>;
 //-------------------------------------------------
 
 device_vcs_cart_interface::device_vcs_cart_interface(const machine_config &mconfig, device_t &device)
-	: device_slot_card_interface(mconfig, device)
+	: device_slot_card_interface(mconfig, device),
+		m_rom(NULL),
+		m_rom_size(0)
 {
 }
 
@@ -45,9 +47,15 @@ device_vcs_cart_interface::~device_vcs_cart_interface()
 //  rom_alloc - alloc the space for the cart
 //-------------------------------------------------
 
-void device_vcs_cart_interface::rom_alloc(UINT32 size)
+void device_vcs_cart_interface::rom_alloc(UINT32 size, const char *tag)
 {
-	m_rom.resize(size);
+	if (m_rom == NULL)
+	{
+		astring tempstring(tag);
+		tempstring.cat(A26SLOT_ROM_REGION_TAG);
+		m_rom = device().machine().memory().region_alloc(tempstring, size, 1, ENDIANNESS_LITTLE)->base();
+		m_rom_size = size;
+	}
 }
 
 //-------------------------------------------------
@@ -206,7 +214,7 @@ bool vcs_cart_slot_device::call_load()
 				return IMAGE_INIT_FAIL;
 		}
 		
-		m_cart->rom_alloc(len);
+		m_cart->rom_alloc(len, tag());
 		ROM = m_cart->get_rom_base();
 		
 		if (software_entry() != NULL)

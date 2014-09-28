@@ -119,7 +119,7 @@ public:
 	m_io_buttons(*this, "buttons"),
 	m_io_vblank(*this, "vblank"),
 	m_io_console_buttons(*this, "console_buttons"),
-	m_cartslot(*this, "cartslot"),
+	m_cart(*this, "cartslot"),
 	m_screen(*this, "screen") { }
 	
 	int m_lines;
@@ -160,7 +160,7 @@ protected:
 	required_ioport m_io_buttons;
 	required_ioport m_io_vblank;
 	required_ioport m_io_console_buttons;
-	required_device<a78_cart_slot_device> m_cartslot;
+	required_device<a78_cart_slot_device> m_cart;
 	required_device<screen_device> m_screen;
 };
 
@@ -272,7 +272,7 @@ READ8_MEMBER(a7800_state::bios_or_cart_r)
 	if (!(m_ctrl_reg & 0x04))
 		return m_bios[offset];
 	else
-		return m_cartslot->read_40xx(space, offset + 0x8000);
+		return m_cart->read_40xx(space, offset + 0x8000);
 }
 
 /***************************************************************************
@@ -1315,30 +1315,32 @@ void a7800_state::machine_start()
 	save_item(NAME(m_maria_flag));
 	
 	// install additional handlers, if needed
-	if (m_cartslot->exists())
-	switch (m_cartslot->get_cart_type())
+	if (m_cart->exists())
 	{
-		case A78_HSC:
-			// ROM+NVRAM accesses for HiScore
-			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x1000, 0x17ff, read8_delegate(FUNC(a78_cart_slot_device::read_10xx),(a78_cart_slot_device*)m_cartslot), write8_delegate(FUNC(a78_cart_slot_device::write_10xx),(a78_cart_slot_device*)m_cartslot));
-			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x3000, 0x3fff, read8_delegate(FUNC(a78_cart_slot_device::read_30xx),(a78_cart_slot_device*)m_cartslot), write8_delegate(FUNC(a78_cart_slot_device::write_30xx),(a78_cart_slot_device*)m_cartslot));
-			break;
-		case A78_XB_BOARD:
-		case A78_TYPE0_POK450:
-		case A78_TYPE1_POK450:
-		case A78_TYPE6_POK450:
-		case A78_TYPEA_POK450:
-		case A78_VERSA_POK450:
-			// POKEY and RAM regs at 0x400-0x47f
-			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x0400, 0x047f, read8_delegate(FUNC(a78_cart_slot_device::read_04xx),(a78_cart_slot_device*)m_cartslot), write8_delegate(FUNC(a78_cart_slot_device::write_04xx),(a78_cart_slot_device*)m_cartslot));
-			break;
-		case A78_XM_BOARD:
-			// POKEY and RAM and YM regs at 0x400-0x47f
-			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x0400, 0x047f, read8_delegate(FUNC(a78_cart_slot_device::read_04xx),(a78_cart_slot_device*)m_cartslot), write8_delegate(FUNC(a78_cart_slot_device::write_04xx),(a78_cart_slot_device*)m_cartslot));
-			// ROM+NVRAM accesses for HiScore
-			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x1000, 0x17ff, read8_delegate(FUNC(a78_cart_slot_device::read_10xx),(a78_cart_slot_device*)m_cartslot), write8_delegate(FUNC(a78_cart_slot_device::write_10xx),(a78_cart_slot_device*)m_cartslot));
-			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x3000, 0x3fff, read8_delegate(FUNC(a78_cart_slot_device::read_30xx),(a78_cart_slot_device*)m_cartslot), write8_delegate(FUNC(a78_cart_slot_device::write_30xx),(a78_cart_slot_device*)m_cartslot));
-			break;
+		switch (m_cart->get_cart_type())
+		{
+			case A78_HSC:
+				// ROM+NVRAM accesses for HiScore
+				m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x1000, 0x17ff, read8_delegate(FUNC(a78_cart_slot_device::read_10xx),(a78_cart_slot_device*)m_cart), write8_delegate(FUNC(a78_cart_slot_device::write_10xx),(a78_cart_slot_device*)m_cart));
+				m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x3000, 0x3fff, read8_delegate(FUNC(a78_cart_slot_device::read_30xx),(a78_cart_slot_device*)m_cart), write8_delegate(FUNC(a78_cart_slot_device::write_30xx),(a78_cart_slot_device*)m_cart));
+				break;
+			case A78_XB_BOARD:
+			case A78_TYPE0_POK450:
+			case A78_TYPE1_POK450:
+			case A78_TYPE6_POK450:
+			case A78_TYPEA_POK450:
+			case A78_VERSA_POK450:
+				// POKEY and RAM regs at 0x400-0x47f
+				m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x0400, 0x047f, read8_delegate(FUNC(a78_cart_slot_device::read_04xx),(a78_cart_slot_device*)m_cart), write8_delegate(FUNC(a78_cart_slot_device::write_04xx),(a78_cart_slot_device*)m_cart));
+				break;
+			case A78_XM_BOARD:
+				// POKEY and RAM and YM regs at 0x400-0x47f
+				m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x0400, 0x047f, read8_delegate(FUNC(a78_cart_slot_device::read_04xx),(a78_cart_slot_device*)m_cart), write8_delegate(FUNC(a78_cart_slot_device::write_04xx),(a78_cart_slot_device*)m_cart));
+				// ROM+NVRAM accesses for HiScore
+				m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x1000, 0x17ff, read8_delegate(FUNC(a78_cart_slot_device::read_10xx),(a78_cart_slot_device*)m_cart), write8_delegate(FUNC(a78_cart_slot_device::write_10xx),(a78_cart_slot_device*)m_cart));
+				m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x3000, 0x3fff, read8_delegate(FUNC(a78_cart_slot_device::read_30xx),(a78_cart_slot_device*)m_cart), write8_delegate(FUNC(a78_cart_slot_device::write_30xx),(a78_cart_slot_device*)m_cart));
+				break;
+		}
 	}
 }
 

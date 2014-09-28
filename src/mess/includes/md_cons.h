@@ -13,7 +13,7 @@ public:
 	: md_base_state(mconfig, type, tag),
 	m_32x(*this,"sega32x"),
 	m_segacd(*this,"segacd"),
-	m_slotcart(*this, "mdslot")
+	m_cart(*this, "mdslot")
 	{ }
 
 	ioport_port *m_io_ctrlr;
@@ -22,7 +22,7 @@ public:
 
 	optional_device<sega_32x_device> m_32x;
 	optional_device<sega_segacd_device> m_segacd;
-	optional_device<md_cart_slot_device> m_slotcart;
+	optional_device<md_cart_slot_device> m_cart;
 
 	DECLARE_DRIVER_INIT(mess_md_common);
 	DECLARE_DRIVER_INIT(genesis);

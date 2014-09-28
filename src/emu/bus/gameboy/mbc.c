@@ -677,7 +677,7 @@ WRITE8_MEMBER(gb_rom_mmm01_device::write_bank)
 	}
 	else if (offset < 0x4000)
 	{
-		m_reg = data & ((m_rom.count() / 0x4000) - 1);
+		m_reg = data & ((m_rom_size / 0x4000) - 1);
 		m_bank = m_reg & m_bank_mask;
 		if (m_bank == 0)
 			m_bank = 1;

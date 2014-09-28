@@ -30,15 +30,16 @@ public:
 	virtual DECLARE_READ8_MEMBER(read_cart) { return 0xff; }
 	virtual DECLARE_WRITE8_MEMBER(write_cart) {};
 
-	void rom_alloc(UINT32 size);
+	void rom_alloc(UINT32 size, const char *tag);
 	void ram_alloc(UINT32 size);
 	UINT8* get_rom_base() { return m_rom; }
 	UINT8* get_ram_base() { return m_ram; }
-	UINT32 get_rom_size() { return m_rom.count(); }
+	UINT32 get_rom_size() { return m_rom_size; }
 	UINT32 get_ram_size() { return m_ram.count(); }
 
 	// internal state
-	dynamic_buffer m_rom;
+	UINT8 *m_rom;
+	UINT32 m_rom_size;
 	dynamic_buffer m_ram;
 
 	void rom_map_setup(UINT32 size);
@@ -109,6 +110,8 @@ extern const device_type PCE_CART_SLOT;
 /***************************************************************************
  DEVICE CONFIGURATION MACROS
  ***************************************************************************/
+
+#define PCESLOT_ROM_REGION_TAG ":cart:rom"
 
 #define MCFG_PCE_CARTRIDGE_ADD(_tag,_slot_intf,_def_slot) \
 	MCFG_DEVICE_ADD(_tag, PCE_CART_SLOT, 0) \

@@ -86,6 +86,7 @@ void device_md_cart_interface::rom_alloc(size_t size, const char *tag)
 	if (m_rom == NULL)
 	{
 		astring tempstring(tag);
+		tempstring.cat(MDSLOT_ROM_REGION_TAG);
 		m_rom = (UINT16 *)device().machine().memory().region_alloc(tempstring, size, 2, ENDIANNESS_LITTLE)->base();
 		m_rom_size = size;
 	}
@@ -369,9 +370,7 @@ int base_md_cart_slot_device::load_list()
 	// if cart size is not (2^n * 64K), the system will see anyway that size so we need to alloc a bit more space
 	length = m_cart->get_padded_size(length);
 
-	astring cart_string(tag());
-	cart_string.cat(":cart:rom");
-	m_cart->rom_alloc(length, cart_string.cstr());
+	m_cart->rom_alloc(length, tag());
 	ROM = m_cart->get_rom_base();
 	memcpy((UINT8 *)ROM, get_software_region("rom"), get_software_region_length("rom"));
 
@@ -482,11 +481,9 @@ int base_md_cart_slot_device::load_nonlist()
 	// STEP 2: allocate space for the real copy of the game
 	// if cart size is not (2^n * 64K), the system will see anyway that size so we need to alloc a bit more space
 	len = m_cart->get_padded_size(tmplen - offset);
-	// this contains an hack for SSF2: its current bankswitch code needs larger rom space to work
-	astring cart_string(tag());
-	cart_string.cat(":cart:rom");
-	m_cart->rom_alloc((len == 0x500000) ? 0x900000 : len, cart_string.cstr());
 
+	// this contains an hack for SSF2: its current bankswitch code needs larger rom space to work
+	m_cart->rom_alloc((len == 0x500000) ? 0x900000 : len, tag());
 
 	// STEP 3: copy the game data in the appropriate way
 	ROM = (unsigned char *)m_cart->get_rom_base();

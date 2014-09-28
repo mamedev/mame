@@ -56,11 +56,11 @@ public:
 	virtual DECLARE_READ8_MEMBER(read_ram) { return 0xff; }
 	virtual DECLARE_WRITE8_MEMBER(write_ram) {}
 
-	void rom_alloc(UINT32 size);
+	void rom_alloc(UINT32 size, const char *tag);
 	void ram_alloc(UINT32 size);
 	UINT8* get_rom_base() { return m_rom; }
 	UINT8* get_ram_base() { return m_ram; }
-	UINT32 get_rom_size() { return m_rom.count(); }
+	UINT32 get_rom_size() { return m_rom_size; }
 	UINT32 get_ram_size() { return m_ram.count(); }
 
 	void rom_map_setup(UINT32 size);
@@ -74,7 +74,8 @@ public:
 	void save_ram()	{ device().save_item(NAME(m_ram)); }
 		
 	// internal state
-	dynamic_buffer m_rom;
+	UINT8 *m_rom;
+	UINT32 m_rom_size;
 	dynamic_buffer m_ram;
 
 	// bankswitch variables
@@ -189,6 +190,8 @@ extern const device_type MEGADUCK_CART_SLOT;
 /***************************************************************************
  DEVICE CONFIGURATION MACROS
  ***************************************************************************/
+
+#define GBSLOT_ROM_REGION_TAG ":cart:rom"
 
 #define MCFG_GB_CARTRIDGE_ADD(_tag,_slot_intf,_def_slot) \
 	MCFG_DEVICE_ADD(_tag, GB_CART_SLOT, 0) \

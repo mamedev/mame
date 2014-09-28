@@ -79,16 +79,16 @@ Notes:
 // for the moment let assume the latter!
 READ8_MEMBER( sg1000_state::omv_r )
 {
-	if (m_cartslot && m_cartslot->m_cart)
-		return m_cartslot->m_cart->read_cart(space, offset);
+	if (m_cart && m_cart->exists())
+		return m_cart->read_cart(space, offset);
 	else
 		return m_rom->base()[offset];
 }
 
 WRITE8_MEMBER( sg1000_state::omv_w )
 {
-	if (m_cartslot && m_cartslot->m_cart)
-		m_cartslot->m_cart->write_cart(space, offset, data);
+	if (m_cart && m_cart->exists())
+		m_cart->write_cart(space, offset, data);
 }
 
 /*-------------------------------------------------
@@ -633,14 +633,14 @@ SLOT_INTERFACE_END
 
 void sg1000_state::machine_start()
 {
-	if (m_cartslot->get_type() == SEGA8_DAHJEE_TYPEA || m_cartslot->get_type() == SEGA8_DAHJEE_TYPEB)
+	if (m_cart->get_type() == SEGA8_DAHJEE_TYPEA || m_cart->get_type() == SEGA8_DAHJEE_TYPEB)
 	{
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0xc000, 0xffff, 0, 0, read8_delegate(FUNC(sega8_cart_slot_device::read_ram),(sega8_cart_slot_device*)m_cartslot));
-		m_maincpu->space(AS_PROGRAM).install_write_handler(0xc000, 0xffff, 0, 0, write8_delegate(FUNC(sega8_cart_slot_device::write_ram),(sega8_cart_slot_device*)m_cartslot));
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0xc000, 0xffff, 0, 0, read8_delegate(FUNC(sega8_cart_slot_device::read_ram),(sega8_cart_slot_device*)m_cart));
+		m_maincpu->space(AS_PROGRAM).install_write_handler(0xc000, 0xffff, 0, 0, write8_delegate(FUNC(sega8_cart_slot_device::write_ram),(sega8_cart_slot_device*)m_cart));
 	}
 
-	if (m_cartslot)
-		m_cartslot->save_ram();
+	if (m_cart)
+		m_cart->save_ram();
 }
 
 /*-------------------------------------------------
@@ -673,15 +673,15 @@ void sc3000_state::machine_start()
 	/* register for state saving */
 	save_item(NAME(m_keylatch));
 
-	if (m_cartslot && (m_cartslot->get_type() == SEGA8_BASIC_L3 || m_cartslot->get_type() == SEGA8_MUSIC_EDITOR
-								|| m_cartslot->get_type() == SEGA8_DAHJEE_TYPEA || m_cartslot->get_type() == SEGA8_DAHJEE_TYPEB))
+	if (m_cart && m_cart->exists() && (m_cart->get_type() == SEGA8_BASIC_L3 || m_cart->get_type() == SEGA8_MUSIC_EDITOR
+								|| m_cart->get_type() == SEGA8_DAHJEE_TYPEA || m_cart->get_type() == SEGA8_DAHJEE_TYPEB))
 	{
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0xc000, 0xffff, 0, 0, read8_delegate(FUNC(sega8_cart_slot_device::read_ram),(sega8_cart_slot_device*)m_cartslot));
-		m_maincpu->space(AS_PROGRAM).install_write_handler(0xc000, 0xffff, 0, 0, write8_delegate(FUNC(sega8_cart_slot_device::write_ram),(sega8_cart_slot_device*)m_cartslot));
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0xc000, 0xffff, 0, 0, read8_delegate(FUNC(sega8_cart_slot_device::read_ram),(sega8_cart_slot_device*)m_cart));
+		m_maincpu->space(AS_PROGRAM).install_write_handler(0xc000, 0xffff, 0, 0, write8_delegate(FUNC(sega8_cart_slot_device::write_ram),(sega8_cart_slot_device*)m_cart));
 	}
 
-	if (m_cartslot)
-		m_cartslot->save_ram();
+	if (m_cart)
+		m_cart->save_ram();
 }
 
 

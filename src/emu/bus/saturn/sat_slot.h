@@ -29,12 +29,12 @@ public:
 	virtual int get_cart_type() { return m_cart_type; };
 
 
-	void rom_alloc(UINT32 size);
+	void rom_alloc(UINT32 size, const char *tag);
 	UINT32* get_rom_base() { return m_rom; }
 	UINT32* get_ext_dram0_base() { return m_ext_dram0; }
 	UINT32* get_ext_dram1_base() { return m_ext_dram1; }
 	UINT8*  get_ext_bram_base() { return m_ext_bram; }
-	UINT32  get_rom_size() { return m_rom.bytes(); }
+	UINT32  get_rom_size() { return m_rom_size; }
 	UINT32  get_ext_dram0_size() { return m_ext_dram0.bytes(); }
 	UINT32  get_ext_dram1_size() { return m_ext_dram1.bytes(); }
 	UINT32  get_ext_bram_size() { return m_ext_bram.bytes(); }
@@ -43,7 +43,8 @@ protected:
 	int m_cart_type;
 
 	// internal state
-	dynamic_array<UINT32> m_rom;
+	UINT32 *m_rom;
+	UINT32 m_rom_size;
 	dynamic_array<UINT32> m_ext_dram0;
 	dynamic_array<UINT32> m_ext_dram1;
 	dynamic_buffer m_ext_bram;
@@ -106,6 +107,8 @@ extern const device_type SATURN_CART_SLOT;
 /***************************************************************************
  DEVICE CONFIGURATION MACROS
  ***************************************************************************/
+
+#define SATSLOT_ROM_REGION_TAG ":cart:rom"
 
 #define MCFG_SATURN_CARTRIDGE_ADD(_tag,_slot_intf,_def_slot) \
 	MCFG_DEVICE_ADD(_tag, SATURN_CART_SLOT, 0)  \

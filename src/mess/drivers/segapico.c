@@ -156,7 +156,7 @@ public:
 	: pico_base_state(mconfig, type, tag),
 	m_picocart(*this, "picoslot") { }
 
-	optional_device<pico_cart_slot_device> m_picocart;
+	required_device<pico_cart_slot_device> m_picocart;
 	DECLARE_MACHINE_START(pico);
 };
 
@@ -519,7 +519,7 @@ public:
 	: pico_base_state(mconfig, type, tag),
 	m_picocart(*this, "coperaslot") { }
 
-	optional_device<copera_cart_slot_device> m_picocart;
+	required_device<copera_cart_slot_device> m_picocart;
 	DECLARE_MACHINE_START(copera);
 };
 

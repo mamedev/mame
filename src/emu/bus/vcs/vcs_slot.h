@@ -59,16 +59,17 @@ public:
 
 	virtual void setup_addon_ptr(UINT8 *ptr) {}
 
-	void rom_alloc(UINT32 size);
+	void rom_alloc(UINT32 size, const char *tag);
 	void ram_alloc(UINT32 size);
 	UINT8* get_rom_base() { return m_rom; }
 	UINT8*  get_ram_base() { return m_ram; }
-	UINT32  get_rom_size() { return m_rom.bytes(); }
+	UINT32  get_rom_size() { return m_rom_size; }
 	UINT32  get_ram_size() { return m_ram.bytes(); }
 
 protected:
 	// internal state
-	dynamic_buffer m_rom;
+	UINT8 *m_rom;
+	UINT32 m_rom_size;
 	dynamic_buffer m_ram;
 };
 
@@ -145,6 +146,9 @@ extern const device_type VCS_CART_SLOT;
 /***************************************************************************
  DEVICE CONFIGURATION MACROS
  ***************************************************************************/
+
+#define A26SLOT_ROM_REGION_TAG ":cart:rom"
+
 
 #define MCFG_VCS_CARTRIDGE_ADD(_tag,_slot_intf,_def_slot) \
 	MCFG_DEVICE_ADD(_tag, VCS_CART_SLOT, 0)  \

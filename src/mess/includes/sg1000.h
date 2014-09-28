@@ -49,13 +49,13 @@ public:
 			m_maincpu(*this, Z80_TAG),
 			m_ram(*this, RAM_TAG),
 			m_rom(*this, Z80_TAG),
-			m_cartslot(*this, CARTSLOT_TAG)
+			m_cart(*this, CARTSLOT_TAG)
 	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
 	required_memory_region m_rom;
-	optional_device<sega8_cart_slot_device> m_cartslot;
+	optional_device<sega8_cart_slot_device> m_cart;
 
 	virtual void machine_start();
 

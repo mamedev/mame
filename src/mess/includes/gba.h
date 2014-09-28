@@ -138,7 +138,7 @@ public:
 		m_lbdac(*this, "direct_b_left"),
 		m_rbdac(*this, "direct_b_right"),
 		m_gbsound(*this, "custom"),
-		m_cartslot(*this, "cartslot"),
+		m_cart(*this, "cartslot"),
 		m_region_maincpu(*this, "maincpu"),
 		m_io_in0(*this, "IN0")
 	{ }
@@ -152,7 +152,7 @@ public:
 	required_device<dac_device> m_lbdac;
 	required_device<dac_device> m_rbdac;
 	required_device<gameboy_sound_device> m_gbsound;
-	required_device<gba_cart_slot_device> m_cartslot;
+	required_device<gba_cart_slot_device> m_cart;
 
 	void request_irq(UINT32 int_type);
 	void dma_exec(FPTR ch);

@@ -67,7 +67,9 @@ const device_type SNS_BSX_CART_SLOT = &device_creator<sns_bsx_cart_slot_device>;
 //-------------------------------------------------
 
 device_sns_cart_interface::device_sns_cart_interface(const machine_config &mconfig, device_t &device)
-	: device_slot_card_interface(mconfig, device)
+	: device_slot_card_interface(mconfig, device),
+		m_rom(NULL),
+		m_rom_size(0)
 {
 }
 
@@ -84,9 +86,15 @@ device_sns_cart_interface::~device_sns_cart_interface()
 //  rom_alloc - alloc the space for the cart
 //-------------------------------------------------
 
-void device_sns_cart_interface::rom_alloc(UINT32 size)
+void device_sns_cart_interface::rom_alloc(UINT32 size, const char *tag)
 {
-	m_rom.resize(size);
+	if (m_rom == NULL)
+	{
+		astring tempstring(tag);
+		tempstring.cat(SNSSLOT_ROM_REGION_TAG);
+		m_rom = device().machine().memory().region_alloc(tempstring, size, 1, ENDIANNESS_LITTLE)->base();
+		m_rom_size = size;
+	}
 }
 
 
@@ -612,7 +620,7 @@ bool base_sns_cart_slot_device::call_load()
 
 		len = (software_entry() == NULL) ? (length() - offset) : get_software_region_length("rom");
 
-		m_cart->rom_alloc(len);
+		m_cart->rom_alloc(len, tag());
 		ROM = m_cart->get_rom_base();
 		if (software_entry() == NULL)
 			fread(ROM, len);
@@ -651,7 +659,6 @@ bool base_sns_cart_slot_device::call_load()
 		// in carts with an add-on CPU having internal dump, this speeds up access to the internal rom
 		// by installing read_bank in address space and mapping m_bios there
 		m_cart->speedup_addon_bios_access();
-
 
 		setup_nvram();
 
