@@ -6,9 +6,6 @@
 
 **********************************************************************/
 
-#ifdef CHARDEV
-#include "devices/chardev.h"
-#endif
 #include "sound/dac.h"
 /* model */
 typedef enum {
@@ -77,9 +74,6 @@ public:
 	UINT16 m_crc;
 	UINT8 m_timer1;
 	UINT32 m_timer2;
-#ifdef CHARDEV
-	chardev* m_chardev;
-#endif
 	UINT8 m_screens[ HP48_NB_SCREENS ][ 64 ][ 144 ];
 	int m_cur_screen;
 	UINT8* m_rom;

@@ -58,9 +58,6 @@ static const UINT8 hp48_module_addr_id[6] = { 0x19, 0xf4, 0xf6, 0xf8, 0xf2, 0x00
 
 
 
-#ifdef CHARDEV
-#include "devices/chardev.h"
-#endif
 
 
 /***************************************************************************
@@ -135,9 +132,6 @@ TIMER_CALLBACK_MEMBER(hp48_state::hp48_rs232_byte_sent_cb)
 	/* protocol action */
 	//if ( xmodem && xmodem->exists() ) xmodem_receive_byte( &xmodem->device(), param );
 	//else if ( kermit && kermit->exists() ) kermit_receive_byte( &kermit->device(), param );
-//#ifdef CHARDEV
-//  else chardev_out( m_chardev, param );
-//#endif
 }
 
 /* CPU initiates a send event */
@@ -156,61 +150,6 @@ void hp48_state::hp48_rs232_send_byte(  )
 }
 
 
-#ifdef CHARDEV
-
-TIMER_CALLBACK_MEMBER(hp48_state::hp48_chardev_byte_recv_cb)
-{
-	UINT8 data = chardev_in( m_chardev );
-
-	LOG_SERIAL(( "%f hp48_chardev_byte_recv_cb: end of receive, data=%02x\n",
-				machine().time().as_double(), data ));
-
-	m_io[0x14] = data & 0xf; /* receive zone */
-	m_io[0x15] = data >> 4;
-	m_io[0x11] &= ~2; /* clear byte receiving */
-	m_io[0x11] |= 1;  /* set byte received */
-
-	/* interrupt */
-	if ( m_io[0x10] & 2 )
-	{
-		hp48_pulse_irq( SATURN_IRQ_LINE );
-	}
-}
-
-void hp48_state::hp48_chardev_start_recv_byte( chardev_err status )
-{
-	if ( status != CHARDEV_OK ) return;
-
-	LOG_SERIAL(( "%f hp48_chardev_start_recv_byte: start receiving\n",
-				machine().time().as_double() ));
-
-	m_io[0x11] |= 2;  /* set byte receiving */
-
-	/* interrupt */
-	if ( m_io[0x10] & 1 )
-	{
-		hp48_pulse_irq( SATURN_IRQ_LINE );
-	}
-
-	/* schedule end of reception */
-	machine().scheduler().timer_set( RS232_DELAY, timer_expired_delegate(FUNC(hp48_state::hp48_chardev_byte_recv_cb),this));
-}
-
-void hp48_state::hp48_chardev_ready_to_send(  )
-{
-	m_io[0x12] &= ~3;
-
-	/* interrupt */
-	if ( m_io[0x10] & 4 )
-	{
-		hp48_pulse_irq( SATURN_IRQ_LINE );
-	}
-}
-
-static const chardev_interface hp48_chardev_iface =
-{ hp48_chardev_start_recv_byte, hp48_chardev_ready_to_send };
-
-#endif
 
 
 /* ------ Saturn's IN / OUT registers ---------- */
@@ -1199,10 +1138,6 @@ void hp48_state::hp48_machine_start( hp48_models model )
 	machine().save().register_postload( save_prepost_delegate(FUNC(hp48_state::hp48_update_annunciators), this ));
 	machine().save().register_postload( save_prepost_delegate(FUNC(hp48_state::hp48_apply_modules), this ));
 
-#ifdef CHARDEV
-	/* direct I/O */
-	m_chardev = chardev_open_pty( machine(), &hp48_chardev_iface );
-#endif
 }
 
 

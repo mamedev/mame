@@ -196,9 +196,6 @@ W17 pulls J1 serial  port pin 1 to GND when set (chassis to logical GND).
 // WORKAROUNDS:
 // (1) FORCE LOGO: - not valid for 100-A ROM -
 //#define FORCE_RAINBOW_B_LOGO
-// (2) KEYBOARD_WORKAROUND : also requires FORCE...LOGO !
-//#define KEYBOARD_WORKAROUND
-//#define KBD_DELAY 8500
 
 // ----------------------------------------------------------------------------------------------
 #include "emu.h"
@@ -226,9 +223,6 @@ class rainbow_state : public driver_device
 public:
 	rainbow_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
-#ifdef KEYBOARD_WORKAROUND
-	#include "m_kbd1.c" // KEYBOARD_WORKAROUND
-#endif
 		m_inp1(*this, "W13"),
 		m_inp2(*this, "W14"),
 		m_inp3(*this, "W15"),
@@ -291,9 +285,6 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER(irq_hi_w);
 
-#ifdef KEYBOARD_WORKAROUND
-	#include "port9x_Ax.c" // KEYBOARD_WORKAROUND
-#endif
 	UINT32 screen_update_rainbow(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 	DECLARE_WRITE_LINE_MEMBER(write_keyboard_clock);
@@ -317,9 +308,6 @@ private:
 		IRQ_8088_MAX
 	};
 
-#ifdef KEYBOARD_WORKAROUND
-	#include "m_kbd2.c" // KEYBOARD_WORKAROUND
-#endif
 	required_ioport m_inp1;
 	required_ioport m_inp2;
 	required_ioport m_inp3;
@@ -430,9 +418,6 @@ void rainbow_state::machine_start()
 		rom[0xf437b] = 0xeb;
 #endif
 
-#ifdef KEYBOARD_WORKAROUND
-	#include "rainbow_keyboard0.c"
-#endif
 }
 
 static ADDRESS_MAP_START( rainbow8088_map, AS_PROGRAM, 8, rainbow_state)
@@ -534,9 +519,6 @@ static ADDRESS_MAP_START( rainbow8088_io , AS_IO, 8, rainbow_state)
 	// ===========================================================
 	// 0x70 -> 0x7f ***** EXTENDED COMM. OPTION / Option Select 4.
 	// ===========================================================
-#ifdef KEYBOARD_WORKAROUND
-	#include "am_range_9x_Ax.c" // KEYBOARD_WORKAROUND
-#endif
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(rainbowz80_mem, AS_PROGRAM, 8, rainbow_state)
@@ -559,9 +541,6 @@ ADDRESS_MAP_END
 /* DIP switches */
 static INPUT_PORTS_START( rainbow100b_in )
 
-#ifdef KEYBOARD_WORKAROUND
-	#include "rainbow_ipt.c"
-#endif
 		PORT_START("MONITOR TYPE")
 		PORT_DIPNAME( 0x03, 0x03, "MONOCHROME MONITOR")
 PORT_DIPSETTING(0x01, "WHITE")
@@ -695,9 +674,6 @@ void rainbow_state::machine_reset()
 
 }
 
-#ifdef KEYBOARD_WORKAROUND
-	#include "rainbow_keyboard2.c"
-#endif
 
 UINT32 rainbow_state::screen_update_rainbow(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
