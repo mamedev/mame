@@ -104,6 +104,7 @@ ins8250_uart_device::ins8250_uart_device(const machine_config &mconfig, device_t
 			m_ri(1),
 			m_cts(1)
 {
+	m_regs.ier = 0;
 }
 
 ins8250_device::ins8250_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
