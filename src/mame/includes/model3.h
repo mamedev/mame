@@ -170,6 +170,7 @@ public:
 	DECLARE_READ64_MEMBER(model3_rtc_r);
 	DECLARE_WRITE64_MEMBER(model3_rtc_w);
 	DECLARE_READ64_MEMBER(real3d_status_r);
+	DECLARE_READ8_MEMBER(model3_sound_r);
 	DECLARE_WRITE8_MEMBER(model3_sound_w);
 	DECLARE_READ64_MEMBER(network_r);
 	DECLARE_WRITE64_MEMBER(network_w);

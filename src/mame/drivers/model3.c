@@ -1591,6 +1591,21 @@ READ64_MEMBER(model3_state::real3d_status_r)
 }
 
 /* SCSP interface */
+READ8_MEMBER(model3_state::model3_sound_r)
+{
+	switch (offset)
+	{
+		case 4:
+		{
+			UINT8 res = 0;
+			res |= 1;
+			res |= 0x2;		// magtruck country check
+			return res;
+		}
+	}
+	return 0;
+}
+
 WRITE8_MEMBER(model3_state::model3_sound_w)
 {
 	switch (offset)
@@ -1785,7 +1800,7 @@ READ64_MEMBER(model3_state::model3_security_r)
 			}
 			else
 			{
-				return U64(0xffffffffffffffff);
+				return 0;
 			}
 		}
 	}
@@ -1812,7 +1827,7 @@ static ADDRESS_MAP_START( model3_mem, AS_PROGRAM, 64, model3_state )
 	AM_RANGE(0x98000000, 0x980fffff) AM_WRITE(real3d_polygon_ram_w )
 
 	AM_RANGE(0xf0040000, 0xf004003f) AM_MIRROR(0x0e000000) AM_READWRITE(model3_ctrl_r, model3_ctrl_w )
-	AM_RANGE(0xf0080000, 0xf008ffff) AM_MIRROR(0x0e000000) AM_WRITE8(model3_sound_w, U64(0xffffffffffffffff) )
+	AM_RANGE(0xf0080000, 0xf008ffff) AM_MIRROR(0x0e000000) AM_READWRITE8(model3_sound_r, model3_sound_w, U64(0xffffffffffffffff) )
 	AM_RANGE(0xf00c0000, 0xf00dffff) AM_MIRROR(0x0e000000) AM_RAM AM_SHARE("backup")    /* backup SRAM */
 	AM_RANGE(0xf0100000, 0xf010003f) AM_MIRROR(0x0e000000) AM_READWRITE(model3_sys_r, model3_sys_w )
 	AM_RANGE(0xf0140000, 0xf014003f) AM_MIRROR(0x0e000000) AM_READWRITE(model3_rtc_r, model3_rtc_w )
@@ -5971,9 +5986,9 @@ DRIVER_INIT_MEMBER(model3_state,eca)
 	UINT32 *rom = (UINT32*)memregion("user1")->base();
 	DRIVER_INIT_CALL(model3_20);
 
-	rom[(0x535580^4)/4] = 0x60000000;
-	rom[(0x5023b4^4)/4] = 0x60000000;
-	rom[(0x5023d4^4)/4] = 0x60000000;
+	
+	rom[(0x535560^4)/4] = 0x60000000;
+	rom[(0x535580^4)/4] = 0x60000000;	
 }
 
 DRIVER_INIT_MEMBER(model3_state,skichamp)
