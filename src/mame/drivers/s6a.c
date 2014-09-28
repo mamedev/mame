@@ -18,7 +18,6 @@ Alien Poker   X         =
 Alien Poker: wait for the background sound before attempting to score.
 
 ToDo:
-- Speech not working in-game (works with test button)
 - Diagnostic mode freezes
 - Mechanical sounds
 
@@ -264,8 +263,8 @@ INPUT_CHANGED_MEMBER( s6a_state::audio_nmi )
 
 WRITE8_MEMBER( s6a_state::sol0_w )
 {
-//  if (BIT(data, 4))
-//      m_samples->start(2, 5); // outhole
+	if (BIT(data, 4))
+		m_samples->start(2, 5); // outhole
 }
 
 WRITE8_MEMBER( s6a_state::sol1_w )
@@ -293,8 +292,8 @@ WRITE8_MEMBER( s6a_state::sol1_w )
 
 	m_pias->cb1_w(cb1);
 
-//  if (BIT(data, 5))
-//      m_samples->start(0, 6); // knocker
+	if (BIT(data, 5))
+		m_samples->start(0, 6); // knocker
 }
 
 WRITE8_MEMBER( s6a_state::lamp0_w )
