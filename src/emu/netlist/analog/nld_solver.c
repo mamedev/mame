@@ -36,7 +36,7 @@
 #include "../nl_lists.h"
 
 #if HAS_OPENMP
-#include "omp.h"
+#include <omp.h>
 #endif
 
 vector_ops_t *vector_ops_t::create_ops(const int size)

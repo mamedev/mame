@@ -15,7 +15,7 @@
 #include "imagedev/chd_cd.h"
 #include "sound/spu.h"
 #include "debugger.h"
-#include "zlib.h"
+#include <zlib.h>
 #include "machine/psxcd.h"
 #include "machine/psxcport.h"
 

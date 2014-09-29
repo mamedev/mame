@@ -6,9 +6,8 @@
 //
 //============================================================
 
-#include "windows.h"
-#include "commctrl.h"
-#include "messvers.rc"
+#include <windows.h>
+#include <commctrl.h>
 
 1                       24      MOVEABLE PURE   "mess.man"
 
