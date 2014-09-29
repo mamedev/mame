@@ -23656,6 +23656,10 @@ These were produced between 2000 and 2001 by Rocket Games, run by Datel Design
   * CBA085 Shu Ma Bao Bei - Huojian Bingtuan 数码宝贝-火箭兵团
   * CBA086 Shu Ma Bao Bei - Chao Mengmeng Fanji Zhan 数码宝贝-超梦梦反击战
   * CBA087 Shu Ma Bao Bei - Hai Zhi Shen 数码宝贝-海之神
+  * CBA089 Mo Jie 3 - Bu Wanme De Shijie 魔戒3-不完美的世界
+  * CBA091 Luoke Ren DX6 洛克人DX6
+  * CBA097 Shuma Baobei DX6 数码宝贝DX6
+  * CBA147 Shi Mian Maifu - Fengyun Pian 十面埋伏-风云篇
 
 -->
 
@@ -23920,6 +23924,75 @@ These were produced between 2000 and 2001 by Rocket Games, run by Datel Design
 			<!-- cartridge ram -->
 			<dataarea name="rom" size="524288">
 				<rom name="shuma baobei - hai zhi shen (unlicensed, chinese) (cba087) [raw dump].bin" size="524288" crc="c3cedaed" sha1="4e7b7b361302e5e400047c9e668f23cbc885a9e0" offset="0" />
+			</dataarea>
+			<dataarea name="nvram" size="32768"> <!-- Unconfirmed size -->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mojie3">
+		<description>Mo Jie 3 - Bu Wanme De Shijie (Chi)</description>
+		<year>200?</year>
+		<publisher>Li Cheng</publisher>
+		<info name="serial" value="CBA089"/>
+		<info name="alt_title" value="魔戒3-不完美的世界"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_licheng" />
+			<!-- cartridge ram -->
+			<dataarea name="rom" size="524288">
+				<rom name="mo jie 3 - bu wanme de shijie (unlicensed, chinese) (cba089) [raw dump].bin" size="524288" crc="d91e3f98" sha1="556913f2687a49034e1229ef1e375f6036ec5719" offset="0" />
+			</dataarea>
+			<dataarea name="nvram" size="32768"> <!-- Unconfirmed size -->
+			</dataarea>
+		</part>
+	</software>
+
+<!-- This is a clone of the most famous (and still undumped) game by Vast Fame: Zook Hero Z ! -->
+	<software name="lkrdx6">
+		<description>Luo Ke Ren DX6 (Chi)</description>
+		<year>200?</year>
+		<publisher>Li Cheng</publisher>
+		<info name="serial" value="CBA091"/>
+		<info name="alt_title" value="洛克人DX6"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_licheng" />
+			<!-- cartridge ram -->
+			<dataarea name="rom" size="1048576">
+				<rom name="luoke ren dx6 (unlicensed, japanese) (cba091) [raw dump].bin" size="1048576" crc="154f885b" sha1="222e8362da7a7eb999150c367a305271c60661b6" offset="0" />
+			</dataarea>
+			<dataarea name="nvram" size="32768"> <!-- Unconfirmed size -->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="smbbdx6">
+		<description>Shu Ma Bao Bei - DX6 (Chi)</description>
+		<year>200?</year>
+		<publisher>Li Cheng</publisher>
+		<info name="serial" value="CBA097"/>
+		<info name="alt_title" value="数码宝贝DX6"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_licheng" />
+			<!-- cartridge ram -->
+			<dataarea name="rom" size="2097152">
+				<rom name="shuma baobei dx6 (unlicensed, chinese) (cba097) [raw dump].bin" size="2097152" crc="23c19a4d" sha1="f08a5470667be1bb232866b4cb4dfa974752e1a0" offset="0" />
+			</dataarea>
+			<dataarea name="nvram" size="32768"> <!-- Unconfirmed size -->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="shimianm">
+		<description>Shi Mian Maifu - Feng Yun Pian (Chi)</description>
+		<year>200?</year>
+		<publisher>Li Cheng</publisher>
+		<info name="serial" value="CBA147"/>
+		<info name="alt_title" value="十面埋伏-风云篇"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_licheng" />
+			<!-- cartridge ram -->
+			<dataarea name="rom" size="1048576">
+				<rom name="shi mian maifu - fengyun pian (unlicensed, chinese) (cba147) [raw dump].bin" size="1048576" crc="a5f686c3" sha1="68798ac090df9f5fb1ea9c409adf3dc639bc9842" offset="0" />
 			</dataarea>
 			<dataarea name="nvram" size="32768"> <!-- Unconfirmed size -->
 			</dataarea>
