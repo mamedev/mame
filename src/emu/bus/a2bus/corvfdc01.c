@@ -29,17 +29,17 @@ FLOPPY_FORMATS_MEMBER( a2bus_corvfdc01_device::corv_floppy_formats )
 FLOPPY_FORMATS_END
 
 static SLOT_INTERFACE_START( corv_floppies )
-	SLOT_INTERFACE( "8dssd", FLOPPY_8_DSSD )
+	SLOT_INTERFACE( "8sssd", FLOPPY_8_SSSD )
 SLOT_INTERFACE_END
 
 MACHINE_CONFIG_FRAGMENT( fdc01 )
 	MCFG_FD1793x_ADD(FDC01_FDC_TAG, XTAL_16MHz / 8)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(a2bus_corvfdc01_device, intrq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(a2bus_corvfdc01_device, drq_w))
-	MCFG_FLOPPY_DRIVE_ADD(FDC01_FDC_TAG":0", corv_floppies, "8dssd", a2bus_corvfdc01_device::corv_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(FDC01_FDC_TAG":1", corv_floppies, "8dssd", a2bus_corvfdc01_device::corv_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(FDC01_FDC_TAG":2", corv_floppies, "8dssd", a2bus_corvfdc01_device::corv_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(FDC01_FDC_TAG":3", corv_floppies, "8dssd", a2bus_corvfdc01_device::corv_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(FDC01_FDC_TAG":0", corv_floppies, "8sssd", a2bus_corvfdc01_device::corv_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(FDC01_FDC_TAG":1", corv_floppies, "8sssd", a2bus_corvfdc01_device::corv_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(FDC01_FDC_TAG":2", corv_floppies, "8sssd", a2bus_corvfdc01_device::corv_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(FDC01_FDC_TAG":3", corv_floppies, "8sssd", a2bus_corvfdc01_device::corv_floppy_formats)
 MACHINE_CONFIG_END
 
 ROM_START( fdc01 )
@@ -167,7 +167,7 @@ UINT8 a2bus_corvfdc01_device::read_c0nx(address_space &space, UINT8 offset)
 				m_fdc_local_status &= ~LS_DSKCHG_mask;
 				m_fdc_local_status |= m_curfloppy->dskchg_r() ? LS_DSKCHG_mask : 0;
 			}
-			return m_fdc_local_status;
+			return m_fdc_local_status | LS_8IN_mask;
 
 		case  8:	// WD1793 at 8-11
 			return m_wdfdc->status_r(space, offset);

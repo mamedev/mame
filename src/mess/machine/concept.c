@@ -48,6 +48,13 @@ void concept_state::machine_start()
 }
 
 
+void concept_state::machine_reset()
+{
+	// OS will not boot if TDRE is clear on ACIA 0; this fixes that
+	m_acia0->write_cts(CLEAR_LINE);
+	m_acia1->write_cts(CLEAR_LINE);
+}
+
 void concept_state::video_start()
 {
 }
@@ -63,7 +70,7 @@ UINT32 concept_state::screen_update_concept(screen_device &screen, bitmap_ind16 
 	{
 		line = &bitmap.pix16(560-1-y);
 		for (x = 0; x < 720; x++)
-			line[720-1-x] = (videoram[(x+48+y*768)>>4] & (0x8000 >> ((x+48+y*768) & 0xf))) ? 0 : 1;
+			line[720-1-x] = (videoram[(x+48+y*768)>>4] & (0x8000 >> ((x+48+y*768) & 0xf))) ? 1 : 0;
 	}
 	return 0;
 }
@@ -85,8 +92,10 @@ void concept_state::concept_set_interrupt(int level, int state)
 		/* assert interrupt */
 		m_maincpu->set_input_line_and_vector(M68K_IRQ_1 + final_level - 1, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
 	else
+	{
 		/* clear all interrupts */
-		m_maincpu->set_input_line_and_vector(M68K_IRQ_1, CLEAR_LINE, M68K_INT_ACK_AUTOVECTOR);
+		m_maincpu->set_input_line_and_vector(M68K_IRQ_1 + level - 1, CLEAR_LINE, M68K_INT_ACK_AUTOVECTOR);
+	}
 }
 
 /*
@@ -236,7 +245,7 @@ READ16_MEMBER(concept_state::concept_io_r)
 
 		case 3:
 			/* NVIA versatile system interface */
-			LOG(("concept_io_r: VIA read at address 0x03%4.4x\n", offset << 1));
+//	LOG(("concept_io_r: VIA read at address 0x03%4.4x\n", offset << 1));
 			{
 				via6522_device *via_0 = machine().device<via6522_device>("via6522_0");
 				return via_0->read(space, offset & 0xf);

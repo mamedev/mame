@@ -53,6 +53,7 @@ public:
 	DECLARE_READ16_MEMBER(concept_io_r);
 	DECLARE_WRITE16_MEMBER(concept_io_w);
 	virtual void machine_start();
+	virtual void machine_reset();
 	virtual void video_start();
 	UINT32 screen_update_concept(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 

@@ -258,7 +258,7 @@ static MACHINE_CONFIG_START( concept, concept_state )
 	MCFG_A2BUS_SLOT_ADD(A2BUS_TAG, "sl1", concept_a2_cards, NULL)
 	MCFG_A2BUS_SLOT_ADD(A2BUS_TAG, "sl2", concept_a2_cards, NULL)
 	MCFG_A2BUS_SLOT_ADD(A2BUS_TAG, "sl3", concept_a2_cards, NULL)
-	MCFG_A2BUS_SLOT_ADD(A2BUS_TAG, "sl4", concept_a2_cards, "fdc02")
+	MCFG_A2BUS_SLOT_ADD(A2BUS_TAG, "sl4", concept_a2_cards, "fdc01")
 
 	/* 2x RS232 ports */
 	MCFG_RS232_PORT_ADD("rs232a", default_rs232_devices, NULL)
@@ -315,4 +315,4 @@ ROM_START( concept )
 ROM_END
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT    INIT  COMPANY           FULLNAME */
-COMP( 1982, concept,  0,    0,  concept,  concept, driver_device, 0,    "Corvus Systems", "Concept" , GAME_NO_SOUND)
+COMP( 1982, concept,  0,    0,  concept,  concept, driver_device, 0,    "Corvus Systems", "Concept" , 0 )
