@@ -57,6 +57,7 @@ private:
 	UINT16 m_bufptr;
 	UINT8 m_buffer[2048];	// 1x6116 SRAM
 	floppy_image_device *m_curfloppy;
+	bool m_in_drq;
 };
 
 // device type definition

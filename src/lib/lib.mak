@@ -126,6 +126,7 @@ FORMATSOBJS = \
 	$(LIBOBJ)/formats/coco_cas.o    \
 	$(LIBOBJ)/formats/coco_dsk.o    \
 	$(LIBOBJ)/formats/comx35_dsk.o  \
+	$(LIBOBJ)/formats/concept_dsk.o \
 	$(LIBOBJ)/formats/coupedsk.o    \
 	$(LIBOBJ)/formats/cpis_dsk.o    \
 	$(LIBOBJ)/formats/cqm_dsk.o     \

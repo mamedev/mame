@@ -5,11 +5,13 @@
     Implemention of the Corvus Systems CORVUS02 floppy controller
     aka the "Buffered Floppy Controller"
  
-    Boot PROM 0.8 says 8" DSDD or 5.25" DSDD
+    Boot PROM 0.8 says 8" SSDD or 5.25" DSDD; we stick with 5.25" here
+    and let the FDC01 handle 8".
  
 *********************************************************************/
 
 #include "corvfdc02.h"
+#include "formats/concept_dsk.h"
 
 /***************************************************************************
     PARAMETERS
@@ -25,11 +27,11 @@ const device_type A2BUS_CORVFDC02 = &device_creator<a2bus_corvfdc02_device>;
 #define FDC02_FDC_TAG		"fdc02_fdc"
 
 FLOPPY_FORMATS_MEMBER( a2bus_corvfdc02_device::corv_floppy_formats )
+	FLOPPY_CONCEPT_525DSDD_FORMAT,
 	FLOPPY_IMD_FORMAT
 FLOPPY_FORMATS_END
 
 static SLOT_INTERFACE_START( corv_floppies )
-	SLOT_INTERFACE( "8dsdd", FLOPPY_8_DSDD )
 	SLOT_INTERFACE( "525dsqd", FLOPPY_525_QD )
 SLOT_INTERFACE_END
 
@@ -121,6 +123,7 @@ void a2bus_corvfdc02_device::device_reset()
 	m_fdc_local_status = 2;
 	m_fdc_local_command = 0;
 	m_curfloppy = NULL;
+	m_in_drq = false;
 }
 
 /*-------------------------------------------------
@@ -142,7 +145,7 @@ UINT8 a2bus_corvfdc02_device::read_c0nx(address_space &space, UINT8 offset)
 
 		case 3: 
 //			printf("Read buffer @ %x = %02x\n", m_bufptr, m_buffer[m_bufptr]);
-			return m_buffer[m_bufptr];
+			return m_buffer[m_bufptr--];
 
 		case 4:	// local status
 			if (m_curfloppy)
@@ -182,7 +185,7 @@ void a2bus_corvfdc02_device::write_c0nx(address_space &space, UINT8 offset, UINT
 			break;
 
 		case 3:	// buffer write
-//			printf("%02x to buffer @ %x\n", data, m_bufptr);
+//			printf("%02x to buffer[%x]\n", data, m_bufptr);
 			m_buffer[m_bufptr--] = data;
 			break;
 
@@ -261,6 +264,21 @@ WRITE_LINE_MEMBER(a2bus_corvfdc02_device::intrq_w)
 
 WRITE_LINE_MEMBER(a2bus_corvfdc02_device::drq_w)
 {
-//	printf("DRQ: %d\n", state);
+	if (state)
+	{
+		// pseudo-DMA direction?
+		if (m_fdc_local_command & 0x40)
+		{
+			m_buffer[m_bufptr] = m_fdc->dma_r(); 
+//			printf("DMA %02x to buffer[%x]\n", m_buffer[m_bufptr], m_bufptr);
+			m_bufptr--;
+			m_bufptr &= 0x1ff;
+		}
+		else
+		{
+			m_fdc->dma_w(m_buffer[m_bufptr++]);
+			m_bufptr &= 0x1ff;
+		}
+	}
 }
 
