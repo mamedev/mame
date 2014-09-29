@@ -376,8 +376,12 @@ int raiden2cop_device::find_trigger_match(UINT16 triggerval, UINT16 mask)
 			int otherlog = 1;
 			
 			// just some per-game debug code so that we have a record of exactly which triggers each game is known to use
+
+
 			if (!strcmp(machine().system().name, "legionna"))
 			{
+				// enemies often walk on the spot, bosses often walk above / below playable game area (the >>16 in the sqrt commands seems responsible)
+				// player doesn't walk off screen after end of level (walks on spot, different cause?)
 				if (triggerval == 0x0205 || triggerval == 0x0905 || 
 					triggerval == 0x8100 || triggerval == 0x8900 || /* sin / cos */
 					triggerval == 0x138e || // atan?
@@ -474,6 +478,37 @@ int raiden2cop_device::find_trigger_match(UINT16 triggerval, UINT16 mask)
 
 
 			}
+			else if (!strcmp(machine().system().name, "xsedae"))
+			{
+				// not really sure what's right / wrong with this one..
+				if (triggerval == 0x0205 || triggerval == 0x0904 ||
+					triggerval == 0x8100 || triggerval == 0x8900 || /* sin / cos */
+					triggerval == 0x5a85 ||
+					triggerval == 0x5105 ||
+					triggerval == 0x130e ||
+					triggerval == 0x3b30
+					)
+					otherlog = 0;
+			}
+			else if (!strcmp(machine().system().name, "raiden2"))
+			{
+				if (triggerval == 0x0205 || triggerval == 0x0905 ||
+					triggerval == 0x8100 || triggerval == 0x8900 || /* sin / cos */
+					triggerval == 0x130e ||	triggerval == 0x138e ||
+					triggerval == 0x2a05 ||
+					triggerval == 0x2208 ||	triggerval == 0x2288 ||	
+					triggerval == 0x338e ||
+					triggerval == 0x39b0 || triggerval == 0x3bb0 ||	
+					triggerval == 0x4aa0 ||	
+					triggerval == 0x42c2 ||	
+					triggerval == 0x5205 ||
+					triggerval == 0x5a05 ||
+					triggerval == 0x6200 ||
+					triggerval == 0xf205 ||
+					triggerval == 0xa100 || triggerval == 0xa900 || triggerval == 0xb100 || triggerval == 0xb900 /* collisions */
+					)
+					otherlog = 0;
+			}		
 			else
 			{
 				otherlog = 0;
