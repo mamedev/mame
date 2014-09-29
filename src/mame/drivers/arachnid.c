@@ -52,6 +52,8 @@
     - Dip Switches (Controls credits per coin), Currently 2 coins per credit
     - Test Mode Won't Activate
     - Layout with Lamps
+    - Default monitor is yellow/amber, no colour (board does have an extra
+      composite-out connector though, allowing a standard tv)
 */
 
 #include "emu.h"
