@@ -18,9 +18,9 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_spriteram(*this, "spriteram"),
+		m_maincpu(*this, "maincpu"),
 		m_samples(*this, "samples"),
 		m_dac(*this, "dac"),
-		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette") { }
@@ -30,7 +30,8 @@ public:
 	optional_shared_ptr<UINT8> m_spriteram;
 
 	/* video-related */
-	pen_t          (*m_map_color)(running_machine &machine, UINT8 x, UINT8 y);
+	typedef pen_t (cosmic_state::*color_func)(UINT8 x, UINT8 y);
+	color_func 	   m_map_color;
 	int            m_color_registers[3];
 	int            m_background_enable;
 	int            m_magspot_pen_mask;
@@ -47,8 +48,13 @@ public:
 	DECLARE_READ8_MEMBER( interrupt_level );
 
 	/* devices */
+	required_device<cpu_device> m_maincpu;
 	optional_device<samples_device> m_samples;
 	required_device<dac_device> m_dac;
+	optional_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
+	
 	DECLARE_WRITE8_MEMBER(panic_sound_output_w);
 	DECLARE_WRITE8_MEMBER(panic_sound_output2_w);
 	DECLARE_WRITE8_MEMBER(cosmicg_output_w);
@@ -85,13 +91,13 @@ public:
 	UINT32 screen_update_devzone(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_nomnlnd(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(panic_scanline);
-	void draw_bitmap( bitmap_ind16 &bitmap, const rectangle &cliprect );
-	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int color_mask, int extra_sprites );
-	void cosmica_draw_starfield( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect );
-	void devzone_draw_grid( bitmap_ind16 &bitmap, const rectangle &cliprect );
-	void nomnlnd_draw_background( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect );
-	required_device<cpu_device> m_maincpu;
-	optional_device<gfxdecode_device> m_gfxdecode;
-	required_device<screen_device> m_screen;
-	required_device<palette_device> m_palette;
+	void draw_bitmap(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int color_mask, int extra_sprites);
+	void cosmica_draw_starfield(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void devzone_draw_grid(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void nomnlnd_draw_background(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	pen_t panic_map_color(UINT8 x, UINT8 y);
+	pen_t cosmica_map_color(UINT8 x, UINT8 y);
+	pen_t cosmicg_map_color(UINT8 x, UINT8 y);
+	pen_t magspot_map_color(UINT8 x, UINT8 y);
 };

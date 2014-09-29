@@ -531,16 +531,6 @@ orunners:  Interleaved with the dj and << >> buttons is the data the drives the 
 
 /*************************************
  *
- *  Prototypes
- *
- *************************************/
-
-static void signal_sound_irq(running_machine &machine, int which);
-
-
-
-/*************************************
- *
  *  Machine init
  *
  *************************************/
@@ -659,7 +649,7 @@ void segas32_state::int_control_w(address_space &space, int offset, UINT8 data)
 		case 13:
 		case 14:
 		case 15:        /* signal IRQ to sound CPU */
-			signal_sound_irq(machine(),SOUND_IRQ_V60);
+			signal_sound_irq(SOUND_IRQ_V60);
 			break;
 	}
 }
@@ -1216,27 +1206,22 @@ void segas32_state::update_sound_irq_state()
 }
 
 
-static void signal_sound_irq(running_machine &machine, int which)
+void segas32_state::signal_sound_irq(int which)
 {
-	segas32_state *state = machine.driver_data<segas32_state>();
-	int i;
-
 	/* see if this interrupt input is mapped to any vectors; if so, mark them */
-	for (i = 0; i < 3; i++)
-		if (state->m_sound_irq_control[i] == which)
-			state->m_sound_irq_input |= 1 << i;
-	state->update_sound_irq_state();
+	for (int i = 0; i < 3; i++)
+		if (m_sound_irq_control[i] == which)
+			m_sound_irq_input |= 1 << i;
+	update_sound_irq_state();
 }
 
 
-static void clear_sound_irq(running_machine &machine, int which)
+void segas32_state::clear_sound_irq(int which)
 {
-	segas32_state *state = machine.driver_data<segas32_state>();
-	int i;
-	for (i = 0; i < 3; i++)
-		if (state->m_sound_irq_control[i] == which)
-			state->m_sound_irq_input &= ~(1 << i);
-	state->update_sound_irq_state();
+	for (int i = 0; i < 3; i++)
+		if (m_sound_irq_control[i] == which)
+			m_sound_irq_input &= ~(1 << i);
+	update_sound_irq_state();
 }
 
 
@@ -1265,9 +1250,9 @@ WRITE8_MEMBER(segas32_state::sound_int_control_hi_w)
 WRITE_LINE_MEMBER(segas32_state::ym3438_irq_handler)
 {
 	if (state)
-		signal_sound_irq(machine(), SOUND_IRQ_YM3438);
+		signal_sound_irq(SOUND_IRQ_YM3438);
 	else
-		clear_sound_irq(machine(), SOUND_IRQ_YM3438);
+		clear_sound_irq(SOUND_IRQ_YM3438);
 }
 
 

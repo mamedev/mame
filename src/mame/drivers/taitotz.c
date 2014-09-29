@@ -608,11 +608,11 @@ public:
 	DECLARE_READ16_MEMBER(tlcs_ide1_r);
 	DECLARE_WRITE_LINE_MEMBER(ide_interrupt);
 	void taitotz_exit();
-	void draw_tile(taitotz_state *state, UINT32 pos, UINT32 tile);
-	UINT32 video_mem_r(taitotz_state *state, UINT32 address);
-	void video_mem_w(taitotz_state *state, UINT32 address, UINT32 data);
-	UINT32 video_reg_r(taitotz_state *state, UINT32 reg);
-	void video_reg_w(taitotz_state *state, UINT32 reg, UINT32 data);
+	void draw_tile(UINT32 pos, UINT32 tile);
+	UINT32 video_mem_r(UINT32 address);
+	void video_mem_w(UINT32 address, UINT32 data);
+	UINT32 video_reg_r(UINT32 reg);
+	void video_reg_w(UINT32 reg, UINT32 data);
 	void init_taitotz_152();
 	void init_taitotz_111a();
 };
@@ -634,8 +634,8 @@ public:
 	}
 
 	void set_fb(bitmap_rgb32 *fb) { m_fb = fb; }
-	void render_displaylist(running_machine &machine, const rectangle &cliprect);
-	void draw_object(running_machine &machine, UINT32 address, float scale, UINT8 alpha);
+	void render_displaylist(const rectangle &cliprect);
+	void draw_object(UINT32 address, float scale, UINT8 alpha);
 	float line_plane_intersection(const vertex_t *v1, const vertex_t *v2, PLANE cp);
 	int clip_polygon(const vertex_t *v, int num_vertices, PLANE cp, vertex_t *vout);
 	void setup_viewport(int x, int y, int width, int height, int center_x, int center_y);
@@ -1152,7 +1152,7 @@ int taitotz_renderer::clip_polygon(const vertex_t *v, int num_vertices, PLANE cp
 	return clip_verts;
 }
 
-void taitotz_renderer::draw_object(running_machine &machine, UINT32 address, float scale, UINT8 alpha)
+void taitotz_renderer::draw_object(UINT32 address, float scale, UINT8 alpha)
 {
 	const rectangle& visarea = m_state.m_screen->visible_area();
 
@@ -1336,7 +1336,7 @@ void taitotz_renderer::setup_viewport(int x, int y, int width, int height, int c
 	m_clip_plane[4].d = 0.1f;
 }
 
-void taitotz_renderer::render_displaylist(running_machine &machine, const rectangle &cliprect)
+void taitotz_renderer::render_displaylist(const rectangle &cliprect)
 {
 	float zvalue = 0;//ZBUFFER_MAX;
 	m_zbuffer->fill(*(int*)&zvalue, cliprect);
@@ -1405,7 +1405,7 @@ void taitotz_renderer::render_displaylist(running_machine &machine, const rectan
 
 			UINT32 alpha = w[2];
 
-			draw_object(machine, w[0] & 0x1fffff, scale, alpha);
+			draw_object(w[0] & 0x1fffff, scale, alpha);
 
 #if LOG_DISPLAY_LIST
 			printf("0xffff0011:   %08X, %08X, %08X, %08X\n", w[0], w[1], w[2], w[3]);
@@ -1594,7 +1594,7 @@ UINT32 taitotz_state::screen_update_taitotz(screen_device &screen, bitmap_rgb32 
 {
 	bitmap.fill(0x000000, cliprect);
 	m_renderer->set_fb(&bitmap);
-	m_renderer->render_displaylist(machine(), cliprect);
+	m_renderer->render_displaylist(cliprect);
 
 
 	UINT16 *screen_src = (UINT16*)&m_screen_ram[m_scr_base];
@@ -1618,7 +1618,7 @@ UINT32 taitotz_state::screen_update_taitotz(screen_device &screen, bitmap_rgb32 
 	return 0;
 }
 
-void taitotz_state::draw_tile(taitotz_state *state, UINT32 pos, UINT32 tile)
+void taitotz_state::draw_tile(UINT32 pos, UINT32 tile)
 {
 	int tileu = (tile & 0x1f) * 16;
 	int tilev = ((tile >> 5)) * 16;
@@ -1660,7 +1660,7 @@ void taitotz_state::draw_tile(taitotz_state *state, UINT32 pos, UINT32 tile)
     batlgr2 into 0x9e0000
 */
 
-UINT32 taitotz_state::video_mem_r(taitotz_state *state, UINT32 address)
+UINT32 taitotz_state::video_mem_r(UINT32 address)
 {
 	if (address >= 0x800000 && address < 0x1000000)
 	{
@@ -1681,7 +1681,7 @@ UINT32 taitotz_state::video_mem_r(taitotz_state *state, UINT32 address)
 	}
 }
 
-void taitotz_state::video_mem_w(taitotz_state *state, UINT32 address, UINT32 data)
+void taitotz_state::video_mem_w(UINT32 address, UINT32 data)
 {
 	if (address >= 0x800000 && address < 0x1000000)
 	{
@@ -1701,7 +1701,7 @@ void taitotz_state::video_mem_w(taitotz_state *state, UINT32 address, UINT32 dat
 	}
 }
 
-UINT32 taitotz_state::video_reg_r(taitotz_state *state, UINT32 reg)
+UINT32 taitotz_state::video_reg_r(UINT32 reg)
 {
 	switch ((reg >> 28) & 0xf)
 	{
@@ -1731,7 +1731,7 @@ UINT32 taitotz_state::video_reg_r(taitotz_state *state, UINT32 reg)
 		}
 		case 0xb:
 		{
-			return video_mem_r(state, reg & 0xfffffff);
+			return video_mem_r(reg & 0xfffffff);
 		}
 		default:
 		{
@@ -1764,7 +1764,7 @@ video_reg_w: r: 20000003 d: 019501AA
 video_reg_w: r: 20000004 d: 00000000
 */
 
-void taitotz_state::video_reg_w(taitotz_state *state, UINT32 reg, UINT32 data)
+void taitotz_state::video_reg_w(UINT32 reg, UINT32 data)
 {
 	switch ((reg >> 28) & 0xf)
 	{
@@ -1794,12 +1794,12 @@ void taitotz_state::video_reg_w(taitotz_state *state, UINT32 reg, UINT32 data)
 		{
 			UINT32 pos = (data >> 12) & 0xfff;
 			UINT32 tile = data & 0xfff;
-			draw_tile(state, pos, tile);
+			draw_tile(pos, tile);
 			break;
 		}
 	case 0xb:       // RAM write?
 		{
-			video_mem_w(state, m_video_ram_ptr, data);
+			video_mem_w(m_video_ram_ptr, data);
 			m_video_ram_ptr++;
 			break;
 		}
@@ -1839,7 +1839,7 @@ READ64_MEMBER(taitotz_state::video_chip_r)
 		{
 			case 0x0:
 				{
-					r |= (UINT64)(video_reg_r(this, m_video_reg)) << 32;
+					r |= (UINT64)(video_reg_r(m_video_reg)) << 32;
 					break;
 				}
 
@@ -1885,7 +1885,7 @@ WRITE64_MEMBER(taitotz_state::video_chip_w)
 		{
 			case 0:
 			{
-				video_reg_w(this, m_video_reg, regdata);
+				video_reg_w(m_video_reg, regdata);
 				break;
 			}
 			case 0x8:
@@ -1940,12 +1940,12 @@ READ64_MEMBER(taitotz_state::video_fifo_r)
 	UINT64 r = 0;
 	if (ACCESSING_BITS_32_63)
 	{
-		r |= (UINT64)(video_mem_r(this, m_video_ram_ptr)) << 32;
+		r |= (UINT64)(video_mem_r(m_video_ram_ptr)) << 32;
 		m_video_ram_ptr++;
 	}
 	if (ACCESSING_BITS_0_31)
 	{
-		r |= (UINT64)(video_mem_r(this, m_video_ram_ptr));
+		r |= (UINT64)(video_mem_r(m_video_ram_ptr));
 		m_video_ram_ptr++;
 	}
 
@@ -1963,7 +1963,7 @@ WRITE64_MEMBER(taitotz_state::video_fifo_w)
 		{
 			if (m_video_fifo_ptr >= 8)
 			{
-				video_mem_w(this, m_video_ram_ptr, (UINT32)(data >> 32));
+				video_mem_w(m_video_ram_ptr, (UINT32)(data >> 32));
 				m_video_ram_ptr++;
 			}
 			m_video_fifo_ptr++;
@@ -1972,7 +1972,7 @@ WRITE64_MEMBER(taitotz_state::video_fifo_w)
 		{
 			if (m_video_fifo_ptr >= 8)
 			{
-				video_mem_w(this, m_video_ram_ptr, (UINT32)(data));
+				video_mem_w(m_video_ram_ptr, (UINT32)(data));
 				m_video_ram_ptr++;
 			}
 			m_video_fifo_ptr++;

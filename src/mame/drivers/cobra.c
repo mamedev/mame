@@ -387,13 +387,13 @@ public:
 	void draw_line(const rectangle &visarea, vertex_t &v1, vertex_t &v2);
 
 	void gfx_init();
-	void gfx_exit(running_machine &machine);
-	void gfx_reset(running_machine &machine);
-	void gfx_fifo_exec(running_machine &machine);
+	void gfx_exit();
+	void gfx_reset();
+	void gfx_fifo_exec();
 	UINT32 gfx_read_gram(UINT32 address);
 	void gfx_write_gram(UINT32 address, UINT32 mask, UINT32 data);
-	UINT64 gfx_read_reg(running_machine &machine);
-	void gfx_write_reg(running_machine &machine, UINT64 data);
+	UINT64 gfx_read_reg();
+	void gfx_write_reg(UINT64 data);
 
 	void display(bitmap_rgb32 *bitmap, const rectangle &cliprect);
 	inline rgb_t texture_fetch(UINT32 *texture, int u, int v, int width, int format);
@@ -998,7 +998,7 @@ void cobra_renderer::draw_line(const rectangle &visarea, vertex_t &v1, vertex_t 
 
 void cobra_state::cobra_video_exit()
 {
-	m_renderer->gfx_exit(machine());
+	m_renderer->gfx_exit();
 }
 
 void cobra_state::video_start()
@@ -2032,7 +2032,7 @@ void cobra_renderer::gfx_init()
 	m_zbuffer->fill(*(int*)&zvalue, visarea);
 }
 
-void cobra_renderer::gfx_exit(running_machine &machine)
+void cobra_renderer::gfx_exit()
 {
 	/*
 	FILE *file;
@@ -2048,9 +2048,9 @@ void cobra_renderer::gfx_exit(running_machine &machine)
 	*/
 }
 
-void cobra_renderer::gfx_reset(running_machine &machine)
+void cobra_renderer::gfx_reset()
 {
-	cobra_state *cobra = machine.driver_data<cobra_state>();
+	cobra_state *cobra = machine().driver_data<cobra_state>();
 
 	cobra->m_gfx_re_status = RE_STATUS_IDLE;
 }
@@ -2125,12 +2125,12 @@ void cobra_renderer::gfx_write_gram(UINT32 address, UINT32 mask, UINT32 data)
 	m_gfx_gram[address/4] |= data & mask;
 }
 
-UINT64 cobra_renderer::gfx_read_reg(running_machine &machine)
+UINT64 cobra_renderer::gfx_read_reg()
 {
 	return m_gfx_register[m_gfx_register_select];
 }
 
-void cobra_renderer::gfx_write_reg(running_machine &machine, UINT64 data)
+void cobra_renderer::gfx_write_reg(UINT64 data)
 {
 	switch (m_gfx_register_select)
 	{
@@ -2150,9 +2150,9 @@ void cobra_renderer::gfx_write_reg(running_machine &machine, UINT64 data)
 	m_gfx_register[m_gfx_register_select] = data;
 }
 
-void cobra_renderer::gfx_fifo_exec(running_machine &machine)
+void cobra_renderer::gfx_fifo_exec()
 {
-	cobra_state *cobra = machine.driver_data<cobra_state>();
+	cobra_state *cobra = machine().driver_data<cobra_state>();
 
 	if (cobra->m_gfx_fifo_loopback != 0)
 		return;
@@ -2230,7 +2230,7 @@ void cobra_renderer::gfx_fifo_exec(running_machine &machine)
 					// 64-bit registers, top 32-bits in word 2, low 32-bit in word 3
 					printf("GFX: register write %08X: %08X %08X\n", m_gfx_register_select, w[2], w[3]);
 
-					gfx_write_reg(machine, ((UINT64)(w[2]) << 32) | w[3]);
+					gfx_write_reg(((UINT64)(w[2]) << 32) | w[3]);
 				}
 				else if (w2 == 0x10521000)
 				{
@@ -2832,7 +2832,7 @@ READ64_MEMBER(cobra_state::gfx_fifo_r)
 {
 	UINT64 r = 0;
 
-	m_renderer->gfx_fifo_exec(space.machine());
+	m_renderer->gfx_fifo_exec();
 
 	if (ACCESSING_BITS_32_63)
 	{
@@ -2958,7 +2958,7 @@ WRITE64_MEMBER(cobra_state::gfx_buf_w)
 
 //  printf("prc_read %08X%08X at %08X\n", (UINT32)(data >> 32), (UINT32)(data), activecpu_get_pc());
 
-	m_renderer->gfx_fifo_exec(space.machine());
+	m_renderer->gfx_fifo_exec();
 
 	if (data == U64(0x00a0000110500018))
 	{
@@ -2966,7 +2966,7 @@ WRITE64_MEMBER(cobra_state::gfx_buf_w)
 
 		// reads back the register selected by gfx register select
 
-		UINT64 regdata = m_renderer->gfx_read_reg(space.machine());
+		UINT64 regdata = m_renderer->gfx_read_reg();
 
 		m_gfxfifo_out->push(&space.device(), (UINT32)(regdata >> 32));
 		m_gfxfifo_out->push(&space.device(), (UINT32)(regdata));
@@ -3012,7 +3012,7 @@ static void gfx_cpu_dc_store(device_t *device, UINT32 address)
 		fifo_in->push(device, (UINT32)(cobra->m_gfx_fifo_mem[a+3] >> 32) | i);
 		fifo_in->push(device, (UINT32)(cobra->m_gfx_fifo_mem[a+3] >>  0) | i);
 
-		cobra->m_renderer->gfx_fifo_exec(device->machine());
+		cobra->m_renderer->gfx_fifo_exec();
 	}
 	else
 	{
@@ -3150,7 +3150,7 @@ void cobra_state::machine_reset()
 	identify_device[51] = 0x0200;        /* 51: PIO data transfer cycle timing mode */
 	identify_device[67] = 0x01e0;        /* 67: minimum PIO transfer cycle time without flow control */
 
-	m_renderer->gfx_reset(machine());
+	m_renderer->gfx_reset();
 
 	m_sound_dma_ptr = 0;
 

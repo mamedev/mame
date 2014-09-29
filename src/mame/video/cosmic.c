@@ -16,50 +16,46 @@ WRITE8_MEMBER(cosmic_state::cosmic_color_register_w)
 }
 
 
-static pen_t panic_map_color( running_machine &machine, UINT8 x, UINT8 y )
+pen_t cosmic_state::panic_map_color( UINT8 x, UINT8 y )
 {
-	cosmic_state *state = machine.driver_data<cosmic_state>();
-	offs_t offs = (state->m_color_registers[0] << 9) | (state->m_color_registers[2] << 10) | ((x >> 4) << 5) | (y >> 3);
-	pen_t pen = state->memregion("user1")->base()[offs];
+	offs_t offs = (m_color_registers[0] << 9) | (m_color_registers[2] << 10) | ((x >> 4) << 5) | (y >> 3);
+	pen_t pen = memregion("user1")->base()[offs];
 
-	if (state->m_color_registers[1])
+	if (m_color_registers[1])
 		pen >>= 4;
 
 	return pen & 0x0f;
 }
 
-static pen_t cosmica_map_color( running_machine &machine, UINT8 x, UINT8 y )
+pen_t cosmic_state::cosmica_map_color( UINT8 x, UINT8 y )
 {
-	cosmic_state *state = machine.driver_data<cosmic_state>();
-	offs_t offs = (state->m_color_registers[0] << 9) | ((x >> 4) << 5) | (y >> 3);
-	pen_t pen = state->memregion("user1")->base()[offs];
+	offs_t offs = (m_color_registers[0] << 9) | ((x >> 4) << 5) | (y >> 3);
+	pen_t pen = memregion("user1")->base()[offs];
 
-	if (state->m_color_registers[1]) // 0 according to the schematics, but that breaks alien formation colors
+	if (m_color_registers[1]) // 0 according to the schematics, but that breaks alien formation colors
 		pen >>= 4;
 
 	return pen & 0x07;
 }
 
-static pen_t cosmicg_map_color( running_machine &machine, UINT8 x, UINT8 y )
+pen_t cosmic_state::cosmicg_map_color( UINT8 x, UINT8 y )
 {
-	cosmic_state *state = machine.driver_data<cosmic_state>();
-	offs_t offs = (state->m_color_registers[0] << 8) | (state->m_color_registers[1] << 9) | ((y >> 4) << 4) | (x >> 4);
-	pen_t pen = state->memregion("user1")->base()[offs];
+	offs_t offs = (m_color_registers[0] << 8) | (m_color_registers[1] << 9) | ((y >> 4) << 4) | (x >> 4);
+	pen_t pen = memregion("user1")->base()[offs];
 
 	/* the upper 4 bits are for cocktail mode support */
 	return pen & 0x0f;
 }
 
-static pen_t magspot_map_color( running_machine &machine, UINT8 x, UINT8 y )
+pen_t cosmic_state::magspot_map_color( UINT8 x, UINT8 y )
 {
-	cosmic_state *state = machine.driver_data<cosmic_state>();
-	offs_t offs = (state->m_color_registers[0] << 9) | ((x >> 3) << 4) | (y >> 4);
-	pen_t pen = state->memregion("user1")->base()[offs];
+	offs_t offs = (m_color_registers[0] << 9) | ((x >> 3) << 4) | (y >> 4);
+	pen_t pen = memregion("user1")->base()[offs];
 
-	if (state->m_color_registers[1])
+	if (m_color_registers[1])
 		pen >>= 4;
 
-	return pen & state->m_magspot_pen_mask;
+	return pen & m_magspot_pen_mask;
 }
 
 
@@ -101,7 +97,7 @@ PALETTE_INIT_MEMBER(cosmic_state,panic)
 		palette.set_pen_indirect(i, ctabentry);
 	}
 
-	m_map_color = panic_map_color;
+	m_map_color = &cosmic_state::panic_map_color;
 }
 
 
@@ -141,7 +137,7 @@ PALETTE_INIT_MEMBER(cosmic_state,cosmica)
 		palette.set_pen_indirect(i + 0x20, ctabentry);
 	}
 
-	m_map_color = cosmica_map_color;
+	m_map_color = &cosmic_state::cosmica_map_color;
 }
 
 
@@ -167,7 +163,7 @@ PALETTE_INIT_MEMBER(cosmic_state,cosmicg)
 		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
 
-	m_map_color = cosmicg_map_color;
+	m_map_color = &cosmic_state::cosmicg_map_color;
 }
 
 
@@ -197,7 +193,7 @@ PALETTE_INIT_MEMBER(cosmic_state,magspot)
 		palette.set_pen_indirect(i, ctabentry);
 	}
 
-	m_map_color = magspot_map_color;
+	m_map_color = &cosmic_state::magspot_map_color;
 	m_magspot_pen_mask = 0x0f;
 }
 
@@ -225,7 +221,7 @@ PALETTE_INIT_MEMBER(cosmic_state,nomnlnd)
 		palette.set_pen_indirect(i, ctabentry);
 	}
 
-	m_map_color = magspot_map_color;
+	m_map_color = &cosmic_state::magspot_map_color;
 	m_magspot_pen_mask = 0x07;
 }
 
@@ -248,7 +244,7 @@ void cosmic_state::draw_bitmap( bitmap_ind16 &bitmap, const rectangle &cliprect 
 		UINT8 x = offs << 3;
 		UINT8 y = offs >> 5;
 
-		pen_t pen = m_map_color(machine(), x, y);
+		pen_t pen = (this->*m_map_color)(x, y);
 
 		for (i = 0; i < 8; i++)
 		{

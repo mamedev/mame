@@ -83,6 +83,7 @@ private:
 
 	void log_fifo_command(const UINT32 *data, int numwords, const char *suffix);
 	void log_waveram(UINT32 length_and_base);
+	void update_gun_irq();
 };
 
 

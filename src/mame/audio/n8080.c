@@ -213,9 +213,9 @@ void n8080_state::helifire_sound_pins_changed()
 {
 	UINT16 changes = ~m_curr_sound_pins & m_prev_sound_pins;
 
-	/* ((state->m_curr_sound_pins >> 0xa) & 1) not emulated */
-	/* ((state->m_curr_sound_pins >> 0xb) & 1) not emulated */
-	/* ((state->m_curr_sound_pins >> 0xc) & 1) not emulated */
+	/* ((m_curr_sound_pins >> 0xa) & 1) not emulated */
+	/* ((m_curr_sound_pins >> 0xb) & 1) not emulated */
+	/* ((m_curr_sound_pins >> 0xc) & 1) not emulated */
 
 	if (changes & (1 << 6))
 	{

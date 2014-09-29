@@ -127,6 +127,10 @@ public:
 	required_device<timer_device> m_int_timer;
 	optional_device<timer_device> m_int_timer_left;
 	optional_device<timer_device> m_int_timer_right;
+	optional_device<eeprom_serial_93cxx_device> m_eeprom;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
 	int m_rasflag;
 	int m_old_rasflag;
 	DECLARE_READ16_MEMBER(cave_irq_cause_r);
@@ -237,20 +241,18 @@ public:
 	void sailormn_tilebank_w(int bank);
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 	DECLARE_WRITE_LINE_MEMBER(sound_irq_gen);
-	optional_device<eeprom_serial_93cxx_device> m_eeprom;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<screen_device> m_screen;
-	required_device<palette_device> m_palette;
 	void update_irq_state();
 	void unpack_sprites(const char *region);
 	void ddonpach_unpack_sprites(const char *region);
 	void esprade_unpack_sprites(const char *region);
+	void sailormn_unpack_tiles(const char *region);
 
 private:
 	inline void get_tile_info( tile_data &tileinfo, int tile_index, int GFX );
 	inline void tilemap_draw( int chip, screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT32 flags, UINT32 priority, UINT32 priority2, int GFX );
 	inline void vram_w( address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT16 data, ATTR_UNUSED UINT16 mem_mask, int GFX );
 	inline void vram_8x8_w( address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT16 data, ATTR_UNUSED UINT16 mem_mask, int GFX );
+	inline void vctrl_w( address_space &space, offs_t offset, UINT16 data, UINT16 mem_mask, int GFX );
 	void set_pens(int chip);
 	void cave_vh_start( int num );
 	void get_sprite_info_cave(int chip);
@@ -265,4 +267,6 @@ private:
 	void sprite_draw_cave_zbuf( int chip, int priority );
 	void sprite_draw_donpachi( int chip, int priority );
 	void sprite_draw_donpachi_zbuf( int chip, int priority );
+	void init_cave();
+	void show_leds();
 };

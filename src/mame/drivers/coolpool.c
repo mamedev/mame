@@ -1106,19 +1106,17 @@ ROM_END
  *
  *************************************/
 
-static void register_state_save(running_machine &machine)
+void coolpool_state::register_state_save()
 {
-	coolpool_state *state = machine.driver_data<coolpool_state>();
+	save_item(NAME(m_oldx));
+	save_item(NAME(m_oldy));
+	save_item(NAME(m_result));
+	save_item(NAME(m_lastresult));
 
-	state->save_item(NAME(state->m_oldx));
-	state->save_item(NAME(state->m_oldy));
-	state->save_item(NAME(state->m_result));
-	state->save_item(NAME(state->m_lastresult));
-
-	state->save_item(NAME(state->m_cmd_pending));
-	state->save_item(NAME(state->m_iop_cmd));
-	state->save_item(NAME(state->m_iop_answer));
-	state->save_item(NAME(state->m_iop_romaddr));
+	save_item(NAME(m_cmd_pending));
+	save_item(NAME(m_iop_cmd));
+	save_item(NAME(m_iop_answer));
+	save_item(NAME(m_iop_romaddr));
 }
 
 
@@ -1127,14 +1125,14 @@ DRIVER_INIT_MEMBER(coolpool_state,amerdart)
 {
 	m_lastresult = 0xffff;
 
-	register_state_save(machine());
+	register_state_save();
 }
 
 DRIVER_INIT_MEMBER(coolpool_state,coolpool)
 {
 	m_dsp->space(AS_IO).install_read_handler(0x07, 0x07, read16_delegate(FUNC(coolpool_state::coolpool_input_r),this));
 
-	register_state_save(machine());
+	register_state_save();
 }
 
 
@@ -1178,7 +1176,7 @@ DRIVER_INIT_MEMBER(coolpool_state,9ballsht)
 		rom[a+1] = tmp;
 	}
 
-	register_state_save(machine());
+	register_state_save();
 }
 
 

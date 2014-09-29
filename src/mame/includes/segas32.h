@@ -267,6 +267,8 @@ public:
 	void update_bitmap(screen_device &screen, struct layer_info *layer, const rectangle &cliprect);
 	void update_background(struct layer_info *layer, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(ym3438_irq_handler);
+	void signal_sound_irq(int which);
+	void clear_sound_irq(int which);
 };
 
 /*----------- defined in machine/segas32.c -----------*/

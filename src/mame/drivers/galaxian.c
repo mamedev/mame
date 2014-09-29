@@ -446,7 +446,7 @@ INTERRUPT_GEN_MEMBER(galaxian_state::fakechange_interrupt_gen)
 	{
 		m_tenspot_current_game++;
 		m_tenspot_current_game%=10;
-		tenspot_set_game_bank(machine(), m_tenspot_current_game, 1);
+		tenspot_set_game_bank(m_tenspot_current_game, 1);
 		m_maincpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
 	}
 }
@@ -5972,7 +5972,7 @@ READ8_MEMBER(galaxian_state::tenspot_dsw_read)
 }
 
 
-void galaxian_state::tenspot_set_game_bank(running_machine& machine, int bank, int from_game)
+void galaxian_state::tenspot_set_game_bank(int bank, int from_game)
 {
 	char tmp[64];
 	UINT8* srcregion;
@@ -5980,15 +5980,15 @@ void galaxian_state::tenspot_set_game_bank(running_machine& machine, int bank, i
 	int x;
 
 	sprintf(tmp,"game_%d_cpu", bank);
-	srcregion = machine.root_device().memregion(tmp)->base();
-	dstregion = machine.root_device().memregion("maincpu")->base();
+	srcregion = memregion(tmp)->base();
+	dstregion = memregion("maincpu")->base();
 	memcpy(dstregion, srcregion, 0x4000);
 
 	sprintf(tmp,"game_%d_temp", bank);
-	srcregion = machine.root_device().memregion(tmp)->base();
-	dstregion = machine.root_device().memregion("gfx1")->base();
+	srcregion = memregion(tmp)->base();
+	dstregion = memregion("gfx1")->base();
 	memcpy(dstregion, srcregion, 0x2000);
-	dstregion = machine.root_device().memregion("gfx2")->base();
+	dstregion = memregion("gfx2")->base();
 	memcpy(dstregion, srcregion, 0x2000);
 
 	if (from_game)
@@ -6005,8 +6005,8 @@ void galaxian_state::tenspot_set_game_bank(running_machine& machine, int bank, i
 	}
 
 	sprintf(tmp,"game_%d_prom", bank);
-	srcregion = machine.root_device().memregion(tmp)->base();
-	dstregion = machine.root_device().memregion("proms")->base();
+	srcregion = memregion(tmp)->base();
+	dstregion = memregion("proms")->base();
 	memcpy(dstregion, srcregion, 0x20);
 
 	PALETTE_INIT_NAME(galaxian)(m_palette);
@@ -6032,7 +6032,7 @@ DRIVER_INIT_MEMBER(galaxian_state,tenspot)
 
 	m_tenspot_current_game = 0;
 
-	tenspot_set_game_bank(machine(), m_tenspot_current_game, 0);
+	tenspot_set_game_bank(m_tenspot_current_game, 0);
 
 	space.install_read_handler(0x7000, 0x7000, read8_delegate(FUNC(galaxian_state::tenspot_dsw_read),this));
 }

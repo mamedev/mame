@@ -452,22 +452,22 @@ public:
 	INTERRUPT_GEN_MEMBER(avt_vblank_irq);
 };
 
-#define mc6845_h_char_total     (state->m_crtc_vreg[0])
+#define mc6845_h_char_total     (m_crtc_vreg[0])
 #define mc6845_h_display        (m_crtc_vreg[1])
-#define mc6845_h_sync_pos       (state->m_crtc_vreg[2])
-#define mc6845_sync_width       (state->m_crtc_vreg[3])
-#define mc6845_v_char_total     (state->m_crtc_vreg[4])
-#define mc6845_v_total_adj      (state->m_crtc_vreg[5])
+#define mc6845_h_sync_pos       (m_crtc_vreg[2])
+#define mc6845_sync_width       (m_crtc_vreg[3])
+#define mc6845_v_char_total     (m_crtc_vreg[4])
+#define mc6845_v_total_adj      (m_crtc_vreg[5])
 #define mc6845_v_display        (m_crtc_vreg[6])
-#define mc6845_v_sync_pos       (state->m_crtc_vreg[7])
-#define mc6845_mode_ctrl        (state->m_crtc_vreg[8])
-#define mc6845_tile_height      (state->m_crtc_vreg[9]+1)
-#define mc6845_cursor_y_start   (state->m_crtc_vreg[0x0a])
-#define mc6845_cursor_y_end     (state->m_crtc_vreg[0x0b])
-#define mc6845_start_addr       (((state->m_crtc_vreg[0x0c]<<8) & 0x3f00) | (state->m_crtc_vreg[0x0d] & 0xff))
-#define mc6845_cursor_addr      (((state->m_crtc_vreg[0x0e]<<8) & 0x3f00) | (state->m_crtc_vreg[0x0f] & 0xff))
-#define mc6845_light_pen_addr   (((state->m_crtc_vreg[0x10]<<8) & 0x3f00) | (state->m_crtc_vreg[0x11] & 0xff))
-#define mc6845_update_addr      (((state->m_crtc_vreg[0x12]<<8) & 0x3f00) | (state->m_crtc_vreg[0x13] & 0xff))
+#define mc6845_v_sync_pos       (m_crtc_vreg[7])
+#define mc6845_mode_ctrl        (m_crtc_vreg[8])
+#define mc6845_tile_height      (m_crtc_vreg[9]+1)
+#define mc6845_cursor_y_start   (m_crtc_vreg[0x0a])
+#define mc6845_cursor_y_end     (m_crtc_vreg[0x0b])
+#define mc6845_start_addr       (((m_crtc_vreg[0x0c]<<8) & 0x3f00) | (m_crtc_vreg[0x0d] & 0xff))
+#define mc6845_cursor_addr      (((m_crtc_vreg[0x0e]<<8) & 0x3f00) | (m_crtc_vreg[0x0f] & 0xff))
+#define mc6845_light_pen_addr   (((m_crtc_vreg[0x10]<<8) & 0x3f00) | (m_crtc_vreg[0x11] & 0xff))
+#define mc6845_update_addr      (((m_crtc_vreg[0x12]<<8) & 0x3f00) | (m_crtc_vreg[0x13] & 0xff))
 
 
 /*********************************************
