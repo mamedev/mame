@@ -211,6 +211,7 @@ public:
 	DECLARE_DRIVER_INIT(oceanhun);
 	DECLARE_DRIVER_INIT(dayto2pe);
 	DECLARE_DRIVER_INIT(spikeout);
+	DECLARE_DRIVER_INIT(magtruck);
 	DECLARE_DRIVER_INIT(model3_15);
 	virtual void video_start();
 	DECLARE_MACHINE_START(model3_10);

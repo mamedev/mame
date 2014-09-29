@@ -5391,7 +5391,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(model3_state::model3_interrupt)
 
 	if (scanline == 384)
 		set_irq_line(0x02, ASSERT_LINE);
-	else if(scanline == 0)
+	else
 		set_irq_line(0x0d, ASSERT_LINE);
 }
 
@@ -6010,6 +6010,11 @@ DRIVER_INIT_MEMBER(model3_state,oceanhun)
 	rom[(0x57995c^4)/4] = 0x60000000;   // decrementer
 }
 
+DRIVER_INIT_MEMBER(model3_state,magtruck)
+{
+	DRIVER_INIT_CALL(model3_20);
+}
+
 
 /* Model 3 Step 1.0 */
 GAME( 1996, vf3,            0, model3_10, model3, model3_state,        vf3, ROT0, "Sega", "Virtua Fighter 3 (Revision C)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
@@ -6058,7 +6063,7 @@ GAME( 1998, swtrilgy,         0, model3_21, swtrilgy, model3_state, swtrilgy, RO
 GAME( 1998, swtrilgya, swtrilgy, model3_21, swtrilgy, model3_state, swtrilga, ROT0, "Sega / LucasArts", "Star Wars Trilogy", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1998, spikeout,         0, model3_21, model3, model3_state,   spikeout, ROT0, "Sega", "Spikeout (Revision C)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1998, spikeofe,         0, model3_21, model3, model3_state,   spikeofe, ROT0, "Sega", "Spikeout Final Edition", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1998, magtruck,         0, model3_21, model3, model3_state,        eca, ROT0, "Sega", "Magical Truck Adventure", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1998, magtruck,         0, model3_21, eca, model3_state,      magtruck, ROT0, "Sega", "Magical Truck Adventure", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1999, eca,              0, model3_21, eca, model3_state,           eca, ROT0, "Sega", "Emergency Call Ambulance", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1999, ecax,           eca, model3_21, eca, model3_state,           eca, ROT0, "Sega", "Emergency Call Ambulance (Export)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1999, ecap,           eca, model3_21, eca, model3_state,           eca, ROT0, "Sega", "Emergency Call Ambulance (US location test?)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )

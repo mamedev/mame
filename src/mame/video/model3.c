@@ -749,18 +749,22 @@ void model3_state::real3d_display_list2_dma(UINT32 src, UINT32 dst, int length, 
 
 void model3_state::real3d_vrom_texture_dma(UINT32 src, UINT32 dst, int length, int byteswap)
 {
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-	if((dst & 0xff) == 0) {
-		UINT32 address, header;
+	address_space &space = m_maincpu->space(AS_PROGRAM);	
+	if ((dst & 0xff) == 0)
+	{
+		for (int i=0; i < length; i+=12)
+		{
+			UINT32 address, header;
 
-		if (byteswap) {
-			address = BYTE_REVERSE32(space.read_dword((src+0)));
-			header = BYTE_REVERSE32(space.read_dword((src+4)));
-		} else {
-			address = space.read_dword((src+0));
-			header = space.read_dword((src+4));
+			if (byteswap) {
+				address = BYTE_REVERSE32(space.read_dword((src+i+0)));
+				header = BYTE_REVERSE32(space.read_dword((src+i+4)));
+			} else {
+				address = space.read_dword((src+i+0));
+				header = space.read_dword((src+i+4));
+			}
+			real3d_upload_texture(header, (UINT32*)&m_vrom[address]);
 		}
-		real3d_upload_texture(header, (UINT32*)&m_vrom[address]);
 	}
 }
 
