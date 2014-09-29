@@ -380,19 +380,19 @@ inline UINT8 nes_exrom_device::base_chr_r(int bank, UINT32 offset)
 			break;
 	}
 
-	return m_vrom[helper & (m_vrom.bytes() - 1)];
+	return m_vrom[helper & (m_vrom_size - 1)];
 }
 
 inline UINT8 nes_exrom_device::split_chr_r(UINT32 offset)
 {
 	UINT32 helper = (m_split_bank * 0x1000) + (offset & 0x3f8) + (m_split_yst & 7);
-	return m_vrom[helper & (m_vrom.bytes() - 1)];
+	return m_vrom[helper & (m_vrom_size - 1)];
 }
 
 inline UINT8 nes_exrom_device::bg_ex1_chr_r(UINT32 offset)
 {
 	UINT32 helper = (m_ex1_bank * 0x1000) + (offset & 0xfff);
-	return m_vrom[helper & (m_vrom.bytes() - 1)];
+	return m_vrom[helper & (m_vrom_size - 1)];
 }
 
 READ8_MEMBER(nes_exrom_device::chr_r)

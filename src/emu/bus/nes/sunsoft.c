@@ -555,7 +555,7 @@ READ8_MEMBER(nes_sunsoft_fme7_device::read_m)
 	LOG_MMC(("Sunsoft FME7 read_m, offset: %04x\n", offset));
 
 	if (!(m_wram_bank & 0x40))  // is PRG ROM
-		return m_prg[((bank * 0x2000) + offset) & (m_prg.count() - 1)];
+		return m_prg[((bank * 0x2000) + offset) & (m_prg_size - 1)];
 	else if (m_wram_bank & 0x80)    // is PRG RAM
 	{
 		if (m_battery)

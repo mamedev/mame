@@ -556,11 +556,11 @@ void nes_cart_slot_device::call_load_pcb()
 	logerror("-- PRG WRAM: %d\n",  prgram_size);
 
 	// SETUP steps 5/6: allocate pointers for PRG/VROM and load the data!
-	m_cart->prg_alloc(prg_size);
+	m_cart->prg_alloc(prg_size, tag());
 	memcpy(m_cart->get_prg_base(), get_software_region("prg"), prg_size);
 	if (vrom_size)
 	{
-		m_cart->vrom_alloc(vrom_size);
+		m_cart->vrom_alloc(vrom_size, tag());
 		memcpy(m_cart->get_vrom_base(), get_software_region("chr"), vrom_size);
 	}
 

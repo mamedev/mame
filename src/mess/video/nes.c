@@ -39,7 +39,7 @@ UINT32 nes_state::screen_update_nes(screen_device &screen, bitmap_ind16 &bitmap,
 	// if this is a disk system game, check for the flip-disk key
 	if (m_cartslot && 
 		 (m_cartslot->get_pcb_id() == STD_DISKSYS	// first scenario = disksys in m_cartslot (= famicom)
-			|| !m_cartslot->cart_mounted()))	// second scenario = disk via fixed internal option (= fds)
+			|| !m_cartslot->exists()))	// second scenario = disk via fixed internal option (= fds)
 	{
 		// latch this input so it doesn't go at warp speed
 		if ((m_io_disksel->read_safe(0) & 0x01) && (!m_last_frame_flip))
@@ -60,7 +60,7 @@ UINT32 nes_state::screen_update_famitwin(screen_device &screen, bitmap_ind16 &bi
 	// render the ppu
 	m_ppu->render(bitmap, 0, 0, 0, 0);
 
-	if (m_cartslot2 && !m_cartslot2->cart_mounted())
+	if (m_cartslot2 && !m_cartslot2->exists())
 	{
 		// latch this input so it doesn't go at warp speed
 		if ((m_io_disksel->read_safe(0) & 0x01) && (!m_last_frame_flip))

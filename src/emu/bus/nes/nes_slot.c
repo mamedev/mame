@@ -104,7 +104,11 @@ const device_type NES_CART_SLOT = &device_creator<nes_cart_slot_device>;
 
 device_nes_cart_interface::device_nes_cart_interface(const machine_config &mconfig, device_t &device)
 						: device_slot_card_interface(mconfig, device),
+						m_prg(NULL),
+						m_vrom(NULL),
 						m_ciram(NULL),
+						m_prg_size(0),
+						m_vrom_size(0),
 						m_mapper_sram(NULL),
 						m_mapper_sram_size(0),
 						m_ce_mask(0),
@@ -140,78 +144,90 @@ device_nes_cart_interface::~device_nes_cart_interface()
 //  pointer allocators
 //-------------------------------------------------
 
-void device_nes_cart_interface::prg_alloc(size_t size)
+void device_nes_cart_interface::prg_alloc(size_t size, const char *tag)
 {
-	m_prg.resize(size);
-	m_prg_chunks = size / 0x4000;
-	if (size % 0x2000)
+	if (m_prg == NULL)
 	{
-		// A few pirate carts have PRG made of 32K + 2K or some weird similar config
-		// in this case we treat the banking as if this 'extra' PRG is not present and
-		// the pcb code has to handle it by accessing directly m_prg!
-		printf("Warning! The loaded PRG has size not a multiple of 8KB (0x%X)\n", (UINT32)size);
-		m_prg_chunks--;
-	}
-	
-	m_prg_mask = ((m_prg_chunks << 1) - 1);
-	
+		astring tempstring(tag);
+		tempstring.cat(NESSLOT_PRGROM_REGION_TAG);
+		m_prg = device().machine().memory().region_alloc(tempstring, size, 1, ENDIANNESS_LITTLE)->base();
+		m_prg_size = size;
+		m_prg_chunks = size / 0x4000;
+		if (size % 0x2000)
+		{
+			// A few pirate carts have PRG made of 32K + 2K or some weird similar config
+			// in this case we treat the banking as if this 'extra' PRG is not present and
+			// the pcb code has to handle it by accessing directly m_prg!
+			printf("Warning! The loaded PRG has size not a multiple of 8KB (0x%X)\n", (UINT32)size);
+			m_prg_chunks--;
+		}
+		
+		m_prg_mask = ((m_prg_chunks << 1) - 1);
+		
 //      printf("first mask %x!\n", m_prg_mask);
-	if ((m_prg_chunks << 1) & m_prg_mask)
-	{
-		int mask_bits = 0, temp = (m_prg_chunks << 1), mapsize;
-		// contrary to what happens with later systems, like e.g. SNES or MD,
-		// only half a dozen of NES carts have PRG which is not a power of 2
-		// so we use this bank_map only as an exception
+		if ((m_prg_chunks << 1) & m_prg_mask)
+		{
+			int mask_bits = 0, temp = (m_prg_chunks << 1), mapsize;
+			// contrary to what happens with later systems, like e.g. SNES or MD,
+			// only half a dozen of NES carts have PRG which is not a power of 2
+			// so we use this bank_map only as an exception
 //          printf("uneven rom!\n");
-		
-		// 1. redefine mask as (next power of 2)-1
-		for (; temp; )
-		{
-			mask_bits++;
-			temp >>= 1;
-		}
-		m_prg_mask = (1 << mask_bits) - 1;
+			
+			// 1. redefine mask as (next power of 2)-1
+			for (; temp; )
+			{
+				mask_bits++;
+				temp >>= 1;
+			}
+			m_prg_mask = (1 << mask_bits) - 1;
 //          printf("new mask %x!\n", m_prg_mask);
-		mapsize = (1 << mask_bits)/2;
-		
-		// 2. create a bank_map for banks in the range mask/2 -> mask
-		m_prg_bank_map.resize(mapsize);
-		
-		// 3. fill the bank_map accounting for mirrors
-		int j;
-		for (j = mapsize; j < (m_prg_chunks << 1); j++)
-			m_prg_bank_map[j - mapsize] = j;
-		
-		while (j % mapsize)
-		{
-			int k = 0, repeat_banks;
-			while ((j % (mapsize >> k)) && k < mask_bits)
-				k++;
-			repeat_banks = j % (mapsize >> (k - 1));
-			for (int l = 0; l < repeat_banks; l++)
-				m_prg_bank_map[(j - mapsize) + l] = m_prg_bank_map[(j - mapsize) + l - repeat_banks];
-			j += repeat_banks;
-		}
-		
-// check bank map!
+			mapsize = (1 << mask_bits)/2;
+			
+			// 2. create a bank_map for banks in the range mask/2 -> mask
+			m_prg_bank_map.resize(mapsize);
+			
+			// 3. fill the bank_map accounting for mirrors
+			int j;
+			for (j = mapsize; j < (m_prg_chunks << 1); j++)
+				m_prg_bank_map[j - mapsize] = j;
+			
+			while (j % mapsize)
+			{
+				int k = 0, repeat_banks;
+				while ((j % (mapsize >> k)) && k < mask_bits)
+					k++;
+				repeat_banks = j % (mapsize >> (k - 1));
+				for (int l = 0; l < repeat_banks; l++)
+					m_prg_bank_map[(j - mapsize) + l] = m_prg_bank_map[(j - mapsize) + l - repeat_banks];
+				j += repeat_banks;
+			}
+			
+			// check bank map!
 //          for (int i = 0; i < mapsize; i++)
 //          {
 //              printf("bank %3d = %3d\t", i, m_prg_bank_map[i]);
 //              if ((i%8) == 7)
 //                  printf("\n");
 //          }
+		}
+	}
+}
+
+void device_nes_cart_interface::vrom_alloc(size_t size, const char *tag)
+{
+	if (m_vrom == NULL)
+	{
+		astring tempstring(tag);
+		tempstring.cat(NESSLOT_CHRROM_REGION_TAG);
+		m_vrom = device().machine().memory().region_alloc(tempstring, size, 1, ENDIANNESS_LITTLE)->base();
+		m_vrom_size = size;
+		m_vrom_chunks = size / 0x2000;
 	}
 }
 
 void device_nes_cart_interface::prgram_alloc(size_t size)
 {
 	m_prgram.resize(size);
-}
-
-void device_nes_cart_interface::vrom_alloc(size_t size)
-{
-	m_vrom.resize(size);
-	m_vrom_chunks = size / 0x2000;
 }
 
 void device_nes_cart_interface::vram_alloc(size_t size)
@@ -669,7 +685,7 @@ void device_nes_cart_interface::pcb_start(running_machine &machine, UINT8 *ciram
 		{
 			if (m_prg_bank_mem[i])
 			{
-				m_prg_bank_mem[i]->configure_entries(0, m_prg.count() / 0x2000, m_prg, 0x2000);
+				m_prg_bank_mem[i]->configure_entries(0, m_prg_size / 0x2000, m_prg, 0x2000);
 				m_prg_bank_mem[i]->set_entry(i);
 				m_prg_bank[i] = i;
 			}
@@ -732,8 +748,7 @@ nes_cart_slot_device::nes_cart_slot_device(const machine_config &mconfig, const 
 						device_slot_interface(mconfig, *this),
 						m_crc_hack(0),
 						m_pcb_id(NO_BOARD),
-						m_must_be_loaded(1),
-						m_empty(TRUE)
+						m_must_be_loaded(1)
 {
 }
 
@@ -770,7 +785,7 @@ void nes_cart_slot_device::device_config_complete()
 void nes_cart_slot_device::pcb_start(UINT8 *ciram_ptr)
 {
 	if (m_cart)
-		m_cart->pcb_start(machine(), ciram_ptr, cart_mounted());
+		m_cart->pcb_start(machine(), ciram_ptr, exists());
 }
 
 void nes_cart_slot_device::pcb_reset()
@@ -835,7 +850,6 @@ bool nes_cart_slot_device::call_load()
 				}
 
 				call_load_ines();
-				m_empty = FALSE;
 			}
 			else if ((magic[0] == 'U') && (magic[1] == 'N') && (magic[2] == 'I') && (magic[3] == 'F')) /* If header starts with 'UNIF' it is UNIF */
 			{
@@ -846,7 +860,6 @@ bool nes_cart_slot_device::call_load()
 				}
 
 				call_load_unif();
-				m_empty = FALSE;
 			}
 			else
 			{
@@ -855,10 +868,7 @@ bool nes_cart_slot_device::call_load()
 			}
 		}
 		else
-		{
 			call_load_pcb();
-			m_empty = FALSE;
-		}
 	}
 
 	return IMAGE_INIT_PASS;

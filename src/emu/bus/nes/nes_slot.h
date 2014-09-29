@@ -176,9 +176,9 @@ public:
 	// hack until disk system is made modern!
 	virtual void disk_flip_side() { }
 
-	void prg_alloc(size_t size);
+	void prg_alloc(size_t size, const char *tag);
+	void vrom_alloc(size_t size, const char *tag);
 	void prgram_alloc(size_t size);
-	void vrom_alloc(size_t size);
 	void vram_alloc(size_t size);
 	void battery_alloc(size_t size);
 
@@ -204,9 +204,9 @@ public:
 	UINT8* get_battery_base() { return m_battery; }
 	UINT8* get_mapper_sram_base() { return m_mapper_sram; }
 
-	UINT32 get_prg_size() { return m_prg.bytes(); }
+	UINT32 get_prg_size() { return m_prg_size; }
 	UINT32 get_prgram_size() { return m_prgram.bytes(); }
-	UINT32 get_vrom_size() { return m_vrom.bytes(); }
+	UINT32 get_vrom_size() { return m_vrom_size; }
 	UINT32 get_vram_size() { return m_vram.bytes(); }
 	UINT32 get_battery_size() { return m_battery.bytes(); }
 	UINT32 get_mapper_sram_size() { return m_mapper_sram_size; }
@@ -226,12 +226,14 @@ public:
 protected:
 
 	// internal state
-	dynamic_buffer m_prg;
+	UINT8 *m_prg;
+	UINT8 *m_vrom;
+	UINT8 *m_ciram;
 	dynamic_buffer m_prgram;
-	dynamic_buffer m_vrom;
 	dynamic_buffer m_vram;
 	dynamic_buffer m_battery;
-	UINT8 *m_ciram;
+	UINT32 m_prg_size;
+	UINT32 m_vrom_size;
 
 	// HACK: to reduce tagmap lookups for PPU-related IRQs, we add a hook to the
 	// main NES CPU here, even if it does not belong to this device.
@@ -364,7 +366,6 @@ public:
 	const char * get_default_card_unif(UINT8 *ROM, UINT32 len);
 	const char * nes_get_slot(int pcb_id);
 	int nes_get_pcb_id(const char *slot);
-	bool cart_mounted() { return !m_empty; }
 
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read_l);
@@ -396,7 +397,6 @@ public:
 	device_nes_cart_interface*      m_cart;
 	int m_pcb_id;
 	bool                            m_must_be_loaded;
-	bool                            m_empty;
 };
 
 // device type definition
@@ -407,12 +407,17 @@ extern const device_type NES_CART_SLOT;
  DEVICE CONFIGURATION MACROS
  ***************************************************************************/
 
+#define NESSLOT_PRGROM_REGION_TAG ":cart:prg_rom"
+#define NESSLOT_CHRROM_REGION_TAG ":cart:chr_rom"
+
+
 #define MCFG_NES_CARTRIDGE_ADD(_tag, _slot_intf, _def_slot) \
 	MCFG_DEVICE_ADD(_tag, NES_CART_SLOT, 0) \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
 
 #define MCFG_NES_CARTRIDGE_NOT_MANDATORY                                     \
 	static_cast<nes_cart_slot_device *>(device)->set_must_be_loaded(FALSE);
+
 
 // Hacky configuration to add a slot with fixed disksys interface
 #define MCFG_DISKSYS_ADD(_tag, _slot_intf, _def_slot) \
