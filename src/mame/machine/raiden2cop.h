@@ -129,12 +129,30 @@ public:
 
 
 	struct colinfo {
+
+		colinfo()
+		{
+			pos[0] = pos[1] = pos[2] = 0;
+			dx[0] = dx[1] = dx[2] = 0;
+			size[0] = size[1] = size[2] = 0;
+			allow_swap = false;
+			flags_swap = 0;
+			spradr = 0;
+			min[0] = min[1] = min[2] = 0;
+			max[0] = max[1] = max[2] = 0;
+		
+		}
+
+
 		INT16 pos[3];
 		INT8 dx[3];
 		UINT8 size[3];
 		bool allow_swap;
 		UINT16 flags_swap;
 		UINT32 spradr;
+		INT16 min[3], max[3];
+
+
 	};
 
 	colinfo cop_collision_info[2];
@@ -144,7 +162,6 @@ public:
 	UINT16 cop_hit_val_stat;
 
 	void cop_collision_read_pos(address_space &space, int slot, UINT32 spradr, bool allow_swap);
-	void cop_collision_update_hitbox(address_space &space, int slot, UINT32 hitadr);
 
 	void execute_8100(address_space &space, int offset, UINT16 data);
 	void execute_8900(address_space &space, int offset, UINT16 data);
@@ -173,8 +190,6 @@ public:
 	void LEGACY_execute_130e(address_space &space, int offset, UINT16 data);
 	void LEGACY_execute_130e_cupsoc(address_space &space, int offset, UINT16 data);
 	void LEGACY_execute_3b30(address_space &space, int offset, UINT16 data);
-	void LEGACY_execute_b100(address_space &space, int offset, UINT16 data);
-	void LEGACY_execute_b900(address_space &space, int offset, UINT16 data);
 	void LEGACY_execute_42c2(address_space &space, int offset, UINT16 data);
 	void LEGACY_execute_e30e(address_space &space, int offset, UINT16 data);
 	void LEGACY_execute_6200(address_space &space, int offset, UINT16 data);
@@ -228,20 +243,8 @@ public:
 	int m_LEGACY_r0, m_LEGACY_r1;
 	DECLARE_WRITE16_MEMBER(LEGACY_cop_cmd_w);
 
-	struct LEGACY_collision_info
-	{
-		LEGACY_collision_info()
-		{
-			min[0] = min[1] = min[2] = 0;
-			max[0] = max[1] = max[2] = 0;
-		
-		}
 
-		INT16 min[3], max[3];
-	};
-
-	struct LEGACY_collision_info m_LEGACY_cop_collision_info[2];
-	void  LEGACY_cop_collision_update_hitbox(address_space &space, UINT16 data, int slot, UINT32 hitadr);
+	void  cop_collision_update_hitbox(address_space &space, UINT16 data, int slot, UINT32 hitadr);
 
 	// endian stuff?
 	int m_cpu_is_68k;
