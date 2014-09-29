@@ -66,6 +66,33 @@ void device_sat_cart_interface::rom_alloc(UINT32 size, const char *tag)
 }
 
 
+//-------------------------------------------------
+//  bram_alloc - alloc the space for the Backup RAM
+//-------------------------------------------------
+
+void device_sat_cart_interface::bram_alloc(UINT32 size)
+{
+	m_ext_bram.resize(size);
+	device().save_item(NAME(m_ext_bram));
+}
+
+
+//-------------------------------------------------
+//  dram*_alloc - alloc the space for the DRAM
+//-------------------------------------------------
+
+void device_sat_cart_interface::dram0_alloc(UINT32 size)
+{
+	m_ext_dram0.resize(size/sizeof(UINT32));
+	device().save_item(NAME(m_ext_dram0));
+}
+
+void device_sat_cart_interface::dram1_alloc(UINT32 size)
+{
+	m_ext_dram1.resize(size/sizeof(UINT32));
+	device().save_item(NAME(m_ext_dram1));
+}
+
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -122,32 +149,44 @@ bool sat_cart_slot_device::call_load()
 {
 	if (m_cart)
 	{
-		UINT32 *ROM;
-		UINT32 len;
+		bool is_rom = ((software_entry() == NULL) || ((software_entry() != NULL) && get_software_region("rom")));
 
-		if (software_entry() != NULL)
-			len = get_software_region_length("cart");
+		if (is_rom)
+		{
+			// from fullpath, only ROM carts
+			UINT32 len = (software_entry() != NULL) ? get_software_region_length("rom") : length();
+			UINT32 *ROM;
+			
+			m_cart->rom_alloc(len, tag());
+			ROM = m_cart->get_rom_base();
+			
+			if (software_entry() != NULL)
+				memcpy(ROM, get_software_region("rom"), len);
+			else
+				fread(ROM, len);
+			
+			// fix endianness....
+			for (int i = 0; i < len/4; i ++)
+				ROM[i] = BITSWAP32(ROM[i],7,6,5,4,3,2,1,0,15,14,13,12,11,10,9,8,23,22,21,20,19,18,17,16,31,30,29,28,27,26,25,24);
+//          {
+//              UINT8 tempa = ROM[i+0];
+//              UINT8 tempb = ROM[i+1];
+//              ROM[i+1] = ROM[i+2];
+//              ROM[i+0] = ROM[i+3];
+//              ROM[i+3] = tempa;
+//              ROM[i+2] = tempb;
+//          }
+		}
 		else
-			len = length();
-
-		m_cart->rom_alloc(len, tag());
-		ROM = m_cart->get_rom_base();
-
-		if (software_entry() != NULL)
-			memcpy(ROM, get_software_region("cart"), len);
-		else
-			fread(ROM, len);
-
-		// fix endianness....
-		for (int i = 0; i < len/4; i ++)
-			ROM[i] = BITSWAP32(ROM[i],7,6,5,4,3,2,1,0,15,14,13,12,11,10,9,8,23,22,21,20,19,18,17,16,31,30,29,28,27,26,25,24);
-//          UINT8 tempa = ROM[i+0];
-//          UINT8 tempb = ROM[i+1];
-//          ROM[i+1] = ROM[i+2];
-//          ROM[i+0] = ROM[i+3];
-//          ROM[i+3] = tempa;
-//          ROM[i+2] = tempb;
-//      }
+		{
+			// DRAM or BRAM carts from softlist
+			if (get_software_region("bram"))
+				m_cart->bram_alloc(get_software_region_length("bram"));
+			if (get_software_region("dram0"))
+				m_cart->dram0_alloc(get_software_region_length("dram0"));
+			if (get_software_region("dram1"))
+				m_cart->dram1_alloc(get_software_region_length("dram1"));
+		}
 		return IMAGE_INIT_PASS;
 	}
 

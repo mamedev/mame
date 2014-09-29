@@ -30,6 +30,9 @@ public:
 
 
 	void rom_alloc(UINT32 size, const char *tag);
+	void bram_alloc(UINT32 size);
+	void dram0_alloc(UINT32 size);
+	void dram1_alloc(UINT32 size);
 	UINT32* get_rom_base() { return m_rom; }
 	UINT32* get_ext_dram0_base() { return m_ext_dram0; }
 	UINT32* get_ext_dram1_base() { return m_ext_dram1; }

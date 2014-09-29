@@ -12,7 +12,7 @@ class saturn_bram_device : public device_t,
 {
 public:
 	// construction/destruction
-	saturn_bram_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 size, const char *shortname, const char *source);
+	saturn_bram_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 	// device-level overrides
 	virtual void device_start();
@@ -26,8 +26,6 @@ public:
 	// reading and writing
 	virtual DECLARE_READ32_MEMBER(read_ext_bram);
 	virtual DECLARE_WRITE32_MEMBER(write_ext_bram);
-
-	UINT32 m_size;  // this is the size of Battery RAM in bytes
 };
 
 class saturn_bram4mb_device : public saturn_bram_device
