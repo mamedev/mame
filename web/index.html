@@ -217,7 +217,7 @@ $(document).ready(function() {
         {
         }               
     });
-  event.preventDefault();
+  event.preventDefault(); // This prevents it trying to load a /keypost page after doing the Ajax post.
   });
 });
 
@@ -247,10 +247,10 @@ $(document).ready(function() {
             </ul>
         </div>
     </div>
-    <div data-role="content" id ="mainmenucontent">	
+    <div data-role="content" id="mainmenucontent">	
 		<table style="tablelayout: auto; width: 100%" border="0">
 				<tr>
-					<td style="padding: 0px; vertical-align:top; width: 1px"><div id="screenshot"><a href="#screenshotpopup" data-rel="popup"><img height="240" width="320" src="/screenshot.png"></a></div></td>
+					<td style="padding: 0px; vertical-align:top; width: 1px"><div id="screenshot"><img height="240" width="320" src="/screenshot.png"></div></td>
 					<td style="padding: 0px; vertical-align:top">
 						<table border="0"><div id="drivertext"></div>
 							<tr>
@@ -302,9 +302,9 @@ $(document).ready(function() {
 		<h3>
 			<table style="tablelayout: fixed; width: 100%; height: 10px; border-collapse:collapse;" border="0">
 				<tr>
-					<td style="width: 10%; padding: 0px;" id="main_statusbar_connectionstatus"></div></td>
-					<td style="width: 10%; padding: 0px;" id="main_statusbar_ispaused"></div></td>
-					<td style="width: 80%; padding: 0px;" id="main_statusbar_runningdriver"></div></td>
+					<td style="width: 10%; padding: 0px;" id="main_statusbar_connectionstatus"></td>
+					<td style="width: 10%; padding: 0px;" id="main_statusbar_ispaused"></td>
+					<td style="width: 80%; padding: 0px;" id="main_statusbar_runningdriver"></td>
 				</tr>
 			</table> 
 		</h3>
@@ -335,12 +335,7 @@ $(document).ready(function() {
             </ul>
         </div>
     </div>
-    <div data-role="content" id ="menu_commandmenu">	
-		<h2>Reset Control</h2>
-		<div class="ui-grid-a">
-			<div class="ui-block-a"><a href="confirmsoftreset.html" data-rel="dialog" data-role="button">Soft reset</a></div>
-			<div class="ui-block-b"><a href="confirmhardreset.html" data-rel="dialog" data-role="button">Hard reset</a></div>
-		</div>
+    <div data-role="content" id="menu_commandmenu">
 		<h2>Savestate Control</h2>
 		<div class="ui-grid-a">
 			<div class="ui-block-a"><a href="#savestatepanel" data-transition="fade" data-role="button">Save State</a></div>
@@ -352,178 +347,17 @@ $(document).ready(function() {
 			<div class="ui-block-b"><a href="#uploadpastepanel" data-transition="fade" data-role="button">Upload Text</a></div>
 		</div>
 		<h2>Execution Control</h2>
-		<a href="javascript:executeCommands('togglepause');" data-role="button">Toggle Pause</a>
-		<a href="confirmexit.html" data-rel="dialog" data-role="button">Exit</a>
-
-		<!-- This begins the Save State panel -------------------------------------------------------->
-		<div data-role="panel" id="savestatepanel" data-position="left" data-display="overlay" data-theme="a">
-			<h3>Select position to save to</h3>
-
-			<!-- Yes, it's a little ugly. I could redo this more cleanly with a little javascript, but not right now. -->
-			<div data-role="controlgroup" data-type="horizontal">
-				<a href="" data-rel="close" data-role="button">Cancel</a>
-				<a href="javascript:executeCommands('savestate&val=auto');" data-role="button">Autosave Slot</a>
-			</div>
-			<div data-role="controlgroup" data-type="horizontal">
-				<a href="javascript:executeCommands('savestate&val=0');" data-role="button">0</a>
-				<a href="javascript:executeCommands('savestate&val=1');" data-role="button">1</a>
-				<a href="javascript:executeCommands('savestate&val=2');" data-role="button">2</a>
-				<a href="javascript:executeCommands('savestate&val=3');" data-role="button">3</a>
-			</div>
-			<div data-role="controlgroup" data-type="horizontal">
-				<a href="javascript:executeCommands('savestate&val=4');" data-role="button">4</a>   
-				<a href="javascript:executeCommands('savestate&val=5');" data-role="button">5</a>
-				<a href="javascript:executeCommands('savestate&val=6');" data-role="button">6</a>
-				<a href="javascript:executeCommands('savestate&val=7');" data-role="button">7</a>
-			</div>
-			<div data-role="controlgroup" data-type="horizontal">
-				<a href="javascript:executeCommands('savestate&val=8');" data-role="button">8</a>
-				<a href="javascript:executeCommands('savestate&val=9');" data-role="button">9</a>
-				<a href="javascript:executeCommands('savestate&val=a');" data-role="button">A</a>
-				<a href="javascript:executeCommands('savestate&val=b');" data-role="button">B</a>
-			</div>
-			<div data-role="controlgroup" data-type="horizontal">
-				<a href="javascript:executeCommands('savestate&val=c');" data-role="button">C</a>
-				<a href="javascript:executeCommands('savestate&val=d');" data-role="button">D</a>
-				<a href="javascript:executeCommands('savestate&val=e');" data-role="button">E</a>
-				<a href="javascript:executeCommands('savestate&val=f');" data-role="button">F</a>
-			</div>
-			<div data-role="controlgroup" data-type="horizontal">
-				<a href="javascript:executeCommands('savestate&val=g');" data-role="button">G</a>
-				<a href="javascript:executeCommands('savestate&val=h');" data-role="button">H</a>
-				<a href="javascript:executeCommands('savestate&val=i');" data-role="button">I</a>
-				<a href="javascript:executeCommands('savestate&val=j');" data-role="button">J</a>
-			</div>
-			<div data-role="controlgroup" data-type="horizontal">
-				<a href="javascript:executeCommands('savestate&val=k');" data-role="button">K</a>
-				<a href="javascript:executeCommands('savestate&val=l');" data-role="button">L</a>
-				<a href="javascript:executeCommands('savestate&val=m');" data-role="button">M</a>
-				<a href="javascript:executeCommands('savestate&val=n');" data-role="button">N</a>
-			</div>
-			<div data-role="controlgroup" data-type="horizontal">
-				<a href="javascript:executeCommands('savestate&val=o');" data-role="button">O</a>
-				<a href="javascript:executeCommands('savestate&val=p');" data-role="button">P</a>
-				<a href="javascript:executeCommands('savestate&val=q');" data-role="button">Q</a>
-				<a href="javascript:executeCommands('savestate&val=r');" data-role="button">R</a>
-			</div>
-			<div data-role="controlgroup" data-type="horizontal">
-				<a href="javascript:executeCommands('savestate&val=s');" data-role="button">S</a>
-				<a href="javascript:executeCommands('savestate&val=t');" data-role="button">T</a>
-				<a href="javascript:executeCommands('savestate&val=u');" data-role="button">U</a>
-				<a href="javascript:executeCommands('savestate&val=v');" data-role="button">V</a>
-			</div>
-			<div data-role="controlgroup" data-type="horizontal">
-				<a href="javascript:executeCommands('savestate&val=w');" data-role="button">W</a>
-				<a href="javascript:executeCommands('savestate&val=x');" data-role="button">X</a>
-				<a href="javascript:executeCommands('savestate&val=y');" data-role="button">Y</a>
-				<a href="javascript:executeCommands('savestate&val=z');" data-role="button">Z</a>
-			</div>
-			<!-- This is here to prevent webkit from trying to put the last row of states under the bottom menu on small screens like phone-->
-			<br><br><br><br><br>
+		<div class="ui-grid-a">
+			<div class="ui-block-a"><a href="#dialogConfirmSoftReset" data-rel="dialog" data-role="button">Soft reset</a></div>
+			<div class="ui-block-b"><a href="#dialogConfirmHardReset" data-rel="dialog" data-role="button">Hard reset</a></div>
 		</div>
-
-		<!-- This begins the Load State panel -------------------------------------------------------->
-		<div data-role="panel" id="loadstatepanel" data-position="left" data-display="overlay" data-theme="a">
-			<h3>Select position to load from</h3>
-
-			<!-- Yes, it's a little ugly. I could redo this more cleanly with a little javascript, but not right now. -->
-			<div data-role="controlgroup" data-type="horizontal">
-				<a href="" data-rel="close" data-role="button">Cancel</a>
-				<a href="javascript:executeCommands('loadstate&val=auto');" data-role="button">Autoload Slot</a>
-			</div>
-			<div data-role="controlgroup" data-type="horizontal">
-				<a href="javascript:executeCommands('loadstate&val=0');" data-role="button">0</a>
-				<a href="javascript:executeCommands('loadstate&val=1');" data-role="button">1</a>
-				<a href="javascript:executeCommands('loadstate&val=2');" data-role="button">2</a>
-				<a href="javascript:executeCommands('loadstate&val=3');" data-role="button">3</a>
-			</div>
-			<div data-role="controlgroup" data-type="horizontal">
-				<a href="javascript:executeCommands('loadstate&val=4');" data-role="button">4</a>   
-				<a href="javascript:executeCommands('loadstate&val=5');" data-role="button">5</a>
-				<a href="javascript:executeCommands('loadstate&val=6');" data-role="button">6</a>
-				<a href="javascript:executeCommands('loadstate&val=7');" data-role="button">7</a>
-			</div>
-			<div data-role="controlgroup" data-type="horizontal">
-				<a href="javascript:executeCommands('loadstate&val=8');" data-role="button">8</a>
-				<a href="javascript:executeCommands('loadstate&val=9');" data-role="button">9</a>
-				<a href="javascript:executeCommands('loadstate&val=a');" data-role="button">A</a>
-				<a href="javascript:executeCommands('loadstate&val=b');" data-role="button">B</a>
-			</div>
-			<div data-role="controlgroup" data-type="horizontal">
-				<a href="javascript:executeCommands('loadstate&val=c');" data-role="button">C</a>
-				<a href="javascript:executeCommands('loadstate&val=d');" data-role="button">D</a>
-				<a href="javascript:executeCommands('loadstate&val=e');" data-role="button">E</a>
-				<a href="javascript:executeCommands('loadstate&val=f');" data-role="button">F</a>
-			</div>
-			<div data-role="controlgroup" data-type="horizontal">
-				<a href="javascript:executeCommands('loadstate&val=g');" data-role="button">G</a>
-				<a href="javascript:executeCommands('loadstate&val=h');" data-role="button">H</a>
-				<a href="javascript:executeCommands('loadstate&val=i');" data-role="button">I</a>
-				<a href="javascript:executeCommands('loadstate&val=j');" data-role="button">J</a>
-			</div>
-			<div data-role="controlgroup" data-type="horizontal">
-				<a href="javascript:executeCommands('loadstate&val=k');" data-role="button">K</a>
-				<a href="javascript:executeCommands('loadstate&val=l');" data-role="button">L</a>
-				<a href="javascript:executeCommands('loadstate&val=m');" data-role="button">M</a>
-				<a href="javascript:executeCommands('loadstate&val=n');" data-role="button">N</a>
-			</div>
-			<div data-role="controlgroup" data-type="horizontal">
-				<a href="javascript:executeCommands('loadstate&val=o');" data-role="button">O</a>
-				<a href="javascript:executeCommands('loadstate&val=p');" data-role="button">P</a>
-				<a href="javascript:executeCommands('loadstate&val=q');" data-role="button">Q</a>
-				<a href="javascript:executeCommands('loadstate&val=r');" data-role="button">R</a>
-			</div>
-			<div data-role="controlgroup" data-type="horizontal">
-				<a href="javascript:executeCommands('loadstate&val=s');" data-role="button">S</a>
-				<a href="javascript:executeCommands('loadstate&val=t');" data-role="button">T</a>
-				<a href="javascript:executeCommands('loadstate&val=u');" data-role="button">U</a>
-				<a href="javascript:executeCommands('loadstate&val=v');" data-role="button">V</a>
-			</div>
-			<div data-role="controlgroup" data-type="horizontal">
-				<a href="javascript:executeCommands('loadstate&val=w');" data-role="button">W</a>
-				<a href="javascript:executeCommands('loadstate&val=x');" data-role="button">X</a>
-				<a href="javascript:executeCommands('loadstate&val=y');" data-role="button">Y</a>
-				<a href="javascript:executeCommands('loadstate&val=z');" data-role="button">Z</a>
-			</div>
-			<!-- This is here to prevent webkit from trying to put the last row of states under the bottom menu on small screens like phone-->
-			<br><br><br><br><br>
-		</div>
-
-		<!-- This begins the Paste Text panel -------------------------------------------------------->
-		<div data-role="panel" id="pastepanel" data-position="left" data-display="overlay" data-theme="a">
-			<h4>Paste Text to Keyboard</h4>
-
-			<form id="pasteTextForm" action="#pastepanel" method="post">
-				<div data-role="controlgroup" data-type="horizontal">
-					<a href="" data-rel="close" data-role="button">Exit</a>
-					<input type="submit" value="Send">
-					<input type="reset" value="Clear">
-				</div>
-				<br>
-				<textarea id="pasteText" name="val"></textarea>
-			</form>
-			<!-- This is here to prevent webkit from trying to put the last row of states under the bottom menu on small screens like phone-->
-			<br><br><br><br><br>
-		</div>
-
-		<!-- This begins the Upload Text panel -------------------------------------------------------->
-		<div data-role="panel" id="uploadpastepanel" data-position="left" data-display="overlay" data-theme="a">
-			<h4>Upload Text to Keyboard</h4>
-
-			<form method="post" action="/keyupload" enctype="multipart/form-data" target="uploadpastelog" data-ajax="false">
-				<!-- note that we can't do file uploads via Ajax -->
-				<div data-role="controlgroup" data-type="horizontal">
-					<a href="" data-rel="close" data-role="button">Exit</a>
-					<input type="submit" value="Upload" />
-				</div>
-				<input type="file" name="file" /> <br/>
-			</form>
-			<!-- This is here to prevent webkit from trying to put the last row of states under the bottom menu on small screens like phone-->
-			<br><br><br><br><br>
+		<div class="ui-grid-a">
+			<div class="ui-block-b"><a href="javascript:executeCommands('togglepause');" data-role="button">Toggle Pause</a></div>
+			<div class="ui-block-b"><a href="#dialogConfirmExit" data-rel="dialog" data-role="button">Exit</a></div>
 		</div>
     </div>
     <div data-theme="a" data-role="footer" data-position="fixed">
-		<div  data-role="navbar" data-iconpos="top">
+		<div data-role="navbar" data-iconpos="top">
 			<ul>
 				<li>
 					<a href="#infomenu" data-transition="fade" data-icon="info">Info</a>
@@ -542,13 +376,180 @@ $(document).ready(function() {
 		<h3>
 			<table style="tablelayout: fixed; width: 100%; height: 10px; border-collapse:collapse;" border="0">
 				<tr>
-					<td style="width: 10%; padding: 0px;" id="command_statusbar_connectionstatus"></div></td>
-					<td style="width: 10%; padding: 0px;" id="command_statusbar_ispaused"></div></td>
-					<td style="width: 80%; padding: 0px;" id="command_statusbar_runningdriver"></div></td>
+					<td style="width: 10%; padding: 0px;" id="command_statusbar_connectionstatus"></td>
+					<td style="width: 10%; padding: 0px;" id="command_statusbar_ispaused"></td>
+					<td style="width: 80%; padding: 0px;" id="command_statusbar_runningdriver"></td>
 				</tr>
 			</table> 
 		</h3>
     </div>
+
+	<!-- This begins the Save State panel -------------------------------------------------------->
+	<div data-role="panel" id="savestatepanel" data-position="left" data-display="overlay" data-theme="a">
+		<h3>Select position to save to</h3><br>
+
+		<!-- Yes, it's a little ugly. I could redo this more cleanly with a little javascript, but not right now. -->
+		<div data-role="controlgroup" data-type="horizontal">
+			<a href="" data-rel="close" data-role="button">Cancel</a>
+			<a href="javascript:executeCommands('savestate&val=auto');" data-role="button">Auto Slot</a>
+		</div>
+		<div data-role="controlgroup" data-type="horizontal">
+			<a href="javascript:executeCommands('savestate&val=0');" data-role="button">0</a>
+			<a href="javascript:executeCommands('savestate&val=1');" data-role="button">1</a>
+			<a href="javascript:executeCommands('savestate&val=2');" data-role="button">2</a>
+			<a href="javascript:executeCommands('savestate&val=3');" data-role="button">3</a>
+		</div>
+		<div data-role="controlgroup" data-type="horizontal">
+			<a href="javascript:executeCommands('savestate&val=4');" data-role="button">4</a>   
+			<a href="javascript:executeCommands('savestate&val=5');" data-role="button">5</a>
+			<a href="javascript:executeCommands('savestate&val=6');" data-role="button">6</a>
+			<a href="javascript:executeCommands('savestate&val=7');" data-role="button">7</a>
+		</div>
+		<div data-role="controlgroup" data-type="horizontal">
+			<a href="javascript:executeCommands('savestate&val=8');" data-role="button">8</a>
+			<a href="javascript:executeCommands('savestate&val=9');" data-role="button">9</a>
+			<a href="javascript:executeCommands('savestate&val=a');" data-role="button">A</a>
+			<a href="javascript:executeCommands('savestate&val=b');" data-role="button">B</a>
+		</div>
+		<div data-role="controlgroup" data-type="horizontal">
+			<a href="javascript:executeCommands('savestate&val=c');" data-role="button">C</a>
+			<a href="javascript:executeCommands('savestate&val=d');" data-role="button">D</a>
+			<a href="javascript:executeCommands('savestate&val=e');" data-role="button">E</a>
+			<a href="javascript:executeCommands('savestate&val=f');" data-role="button">F</a>
+		</div>
+		<div data-role="controlgroup" data-type="horizontal">
+			<a href="javascript:executeCommands('savestate&val=g');" data-role="button">G</a>
+			<a href="javascript:executeCommands('savestate&val=h');" data-role="button">H</a>
+			<a href="javascript:executeCommands('savestate&val=i');" data-role="button">I</a>
+			<a href="javascript:executeCommands('savestate&val=j');" data-role="button">J</a>
+		</div>
+		<div data-role="controlgroup" data-type="horizontal">
+			<a href="javascript:executeCommands('savestate&val=k');" data-role="button">K</a>
+			<a href="javascript:executeCommands('savestate&val=l');" data-role="button">L</a>
+			<a href="javascript:executeCommands('savestate&val=m');" data-role="button">M</a>
+			<a href="javascript:executeCommands('savestate&val=n');" data-role="button">N</a>
+		</div>
+		<div data-role="controlgroup" data-type="horizontal">
+			<a href="javascript:executeCommands('savestate&val=o');" data-role="button">O</a>
+			<a href="javascript:executeCommands('savestate&val=p');" data-role="button">P</a>
+			<a href="javascript:executeCommands('savestate&val=q');" data-role="button">Q</a>
+			<a href="javascript:executeCommands('savestate&val=r');" data-role="button">R</a>
+		</div>
+		<div data-role="controlgroup" data-type="horizontal">
+			<a href="javascript:executeCommands('savestate&val=s');" data-role="button">S</a>
+			<a href="javascript:executeCommands('savestate&val=t');" data-role="button">T</a>
+			<a href="javascript:executeCommands('savestate&val=u');" data-role="button">U</a>
+			<a href="javascript:executeCommands('savestate&val=v');" data-role="button">V</a>
+		</div>
+		<div data-role="controlgroup" data-type="horizontal">
+			<a href="javascript:executeCommands('savestate&val=w');" data-role="button">W</a>
+			<a href="javascript:executeCommands('savestate&val=x');" data-role="button">X</a>
+			<a href="javascript:executeCommands('savestate&val=y');" data-role="button">Y</a>
+			<a href="javascript:executeCommands('savestate&val=z');" data-role="button">Z</a>
+		</div>
+		<!-- This is here to prevent webkit from trying to put the last row of states under the bottom menu on small screens like phone-->
+		<br><br><br><br><br>
+	</div>
+
+	<!-- This begins the Load State panel -------------------------------------------------------->
+	<div data-role="panel" id="loadstatepanel" data-position="left" data-display="overlay" data-theme="a">
+		<h3>Select position to load from</h3><br>
+	
+		<!-- Yes, it's a little ugly. I could redo this more cleanly with a little javascript, but not right now. -->
+		<div data-role="controlgroup" data-type="horizontal">
+			<a href="" data-rel="close" data-role="button">Cancel</a>
+			<a href="javascript:executeCommands('loadstate&val=auto');" data-role="button">Auto Slot</a>
+		</div>
+		<div data-role="controlgroup" data-type="horizontal">
+			<a href="javascript:executeCommands('loadstate&val=0');" data-role="button">0</a>
+			<a href="javascript:executeCommands('loadstate&val=1');" data-role="button">1</a>
+			<a href="javascript:executeCommands('loadstate&val=2');" data-role="button">2</a>
+			<a href="javascript:executeCommands('loadstate&val=3');" data-role="button">3</a>
+		</div>
+		<div data-role="controlgroup" data-type="horizontal">
+			<a href="javascript:executeCommands('loadstate&val=4');" data-role="button">4</a>   
+			<a href="javascript:executeCommands('loadstate&val=5');" data-role="button">5</a>
+			<a href="javascript:executeCommands('loadstate&val=6');" data-role="button">6</a>
+			<a href="javascript:executeCommands('loadstate&val=7');" data-role="button">7</a>
+		</div>
+		<div data-role="controlgroup" data-type="horizontal">
+			<a href="javascript:executeCommands('loadstate&val=8');" data-role="button">8</a>
+			<a href="javascript:executeCommands('loadstate&val=9');" data-role="button">9</a>
+			<a href="javascript:executeCommands('loadstate&val=a');" data-role="button">A</a>
+			<a href="javascript:executeCommands('loadstate&val=b');" data-role="button">B</a>
+		</div>
+		<div data-role="controlgroup" data-type="horizontal">
+			<a href="javascript:executeCommands('loadstate&val=c');" data-role="button">C</a>
+			<a href="javascript:executeCommands('loadstate&val=d');" data-role="button">D</a>
+			<a href="javascript:executeCommands('loadstate&val=e');" data-role="button">E</a>
+			<a href="javascript:executeCommands('loadstate&val=f');" data-role="button">F</a>
+		</div>
+		<div data-role="controlgroup" data-type="horizontal">
+			<a href="javascript:executeCommands('loadstate&val=g');" data-role="button">G</a>
+			<a href="javascript:executeCommands('loadstate&val=h');" data-role="button">H</a>
+			<a href="javascript:executeCommands('loadstate&val=i');" data-role="button">I</a>
+			<a href="javascript:executeCommands('loadstate&val=j');" data-role="button">J</a>
+		</div>
+		<div data-role="controlgroup" data-type="horizontal">
+			<a href="javascript:executeCommands('loadstate&val=k');" data-role="button">K</a>
+			<a href="javascript:executeCommands('loadstate&val=l');" data-role="button">L</a>
+			<a href="javascript:executeCommands('loadstate&val=m');" data-role="button">M</a>
+			<a href="javascript:executeCommands('loadstate&val=n');" data-role="button">N</a>
+		</div>
+		<div data-role="controlgroup" data-type="horizontal">
+			<a href="javascript:executeCommands('loadstate&val=o');" data-role="button">O</a>
+			<a href="javascript:executeCommands('loadstate&val=p');" data-role="button">P</a>
+			<a href="javascript:executeCommands('loadstate&val=q');" data-role="button">Q</a>
+			<a href="javascript:executeCommands('loadstate&val=r');" data-role="button">R</a>
+		</div>
+		<div data-role="controlgroup" data-type="horizontal">
+			<a href="javascript:executeCommands('loadstate&val=s');" data-role="button">S</a>
+			<a href="javascript:executeCommands('loadstate&val=t');" data-role="button">T</a>
+			<a href="javascript:executeCommands('loadstate&val=u');" data-role="button">U</a>
+			<a href="javascript:executeCommands('loadstate&val=v');" data-role="button">V</a>
+		</div>
+		<div data-role="controlgroup" data-type="horizontal">
+			<a href="javascript:executeCommands('loadstate&val=w');" data-role="button">W</a>
+			<a href="javascript:executeCommands('loadstate&val=x');" data-role="button">X</a>
+			<a href="javascript:executeCommands('loadstate&val=y');" data-role="button">Y</a>
+			<a href="javascript:executeCommands('loadstate&val=z');" data-role="button">Z</a>
+		</div>
+		<!-- This is here to prevent webkit from trying to put the last row of states under the bottom menu on small screens like phone-->
+		<br><br><br><br><br>
+	</div>
+
+	<!-- This begins the Paste Text panel -------------------------------------------------------->
+	<div data-role="panel" id="pastepanel" data-position="left" data-display="overlay" data-theme="a">
+		<h4>Paste Text to Keyboard</h4>
+
+		<form id="pasteTextForm" action="#pastepanel" method="post">
+			<div data-role="controlgroup" data-type="horizontal">
+				<a href="" data-rel="close" data-role="button">Exit</a>
+				<input type="submit" value="Send">
+				<input type="reset" value="Clear">
+			</div>
+			<br>
+			<textarea id="pasteText" name="val"></textarea>
+		</form>
+		<!-- This is here to prevent webkit from trying to put the last row of states under the bottom menu on small screens like phone-->
+		<br><br><br><br><br>
+	</div>
+
+	<!-- This begins the Upload Text panel -------------------------------------------------------->
+	<div data-role="panel" id="uploadpastepanel" data-position="left" data-display="overlay" data-theme="a">
+		<h4>Upload Text to Keyboard</h4>
+
+		<form method="post" action="/keyupload" enctype="multipart/form-data" target="uploadpastelog" data-ajax="false">
+			<!-- note that we can't do file uploads via Ajax -->
+			<div data-role="controlgroup" data-type="horizontal">
+				<a href="" data-rel="close" data-role="button">Exit</a>
+				<input type="submit" value="Upload" />
+			</div>
+			<input type="file" name="file" /> <br/>
+		</form>
+		<!-- This is here to prevent webkit from trying to put the last row of states under the bottom menu on small screens like phone-->
+		<br><br><br><br><br>
+	</div>
 </div>
 
 <!-- This begins the SLIDERS page ------------------------------------------------------------------->
@@ -575,7 +576,7 @@ $(document).ready(function() {
             </ul>
         </div>
     </div>
-    <div data-role="content" id ="sliders">	
+    <div data-role="content" id="sliders">
     </div>
     <div data-theme="a" data-role="footer" data-position="fixed">
 		<div  data-role="navbar" data-iconpos="top">
@@ -597,9 +598,9 @@ $(document).ready(function() {
 		<h3>
 			<table style="tablelayout: fixed; width: 100%; height: 10px; border-collapse:collapse;" border="0">
 				<tr>
-					<td style="width: 10%; padding: 0px;" id="option_statusbar_connectionstatus"></div></td>
-					<td style="width: 10%; padding: 0px;" id="option_statusbar_ispaused"></div></td>
-					<td style="width: 80%; padding: 0px;" id="option_statusbar_runningdriver"></div></td>
+					<td style="width: 10%; padding: 0px;" id="option_statusbar_connectionstatus"></td>
+					<td style="width: 10%; padding: 0px;" id="option_statusbar_ispaused"></td>
+					<td style="width: 80%; padding: 0px;" id="option_statusbar_runningdriver"></td>
 				</tr>
 			</table> 
 		</h3>
@@ -630,7 +631,7 @@ $(document).ready(function() {
             </ul>
         </div>
     </div>
-    <div data-role="content" id ="menu_optionmenu">	
+    <div data-role="content" id="menu_optionmenu">
 		<a href="javascript:executeSlider();" data-role="button">Sliders</a>
     </div>
     <div data-theme="a" data-role="footer" data-position="fixed">
@@ -653,9 +654,9 @@ $(document).ready(function() {
 		<h3>
 			<table style="tablelayout: fixed; width: 100%; height: 10px; border-collapse:collapse;" border="0">
 				<tr>
-					<td style="width: 10%; padding: 0px;" id="slider_statusbar_connectionstatus"></div></td>
-					<td style="width: 10%; padding: 0px;" id="slider_statusbar_ispaused"></div></td>
-					<td style="width: 80%; padding: 0px;" id="slider_statusbar_runningdriver"></div></td>
+					<td style="width: 10%; padding: 0px;" id="slider_statusbar_connectionstatus"></td>
+					<td style="width: 10%; padding: 0px;" id="slider_statusbar_ispaused"></td>
+					<td style="width: 80%; padding: 0px;" id="slider_statusbar_runningdriver"></td>
 				</tr>
 			</table> 
 		</h3>
@@ -708,9 +709,9 @@ $(document).ready(function() {
 		<h3>
 			<table style="tablelayout: fixed; width: 100%; height: 10px; border-collapse:collapse;" border="0">
 				<tr>
-					<td style="width: 10%; padding: 0px;" id="driver_statusbar_connectionstatus"></div></td>
-					<td style="width: 10%; padding: 0px;" id="driver_statusbar_ispaused"></div></td>
-					<td style="width: 80%; padding: 0px;" id="driver_statusbar_runningdriver"></div></td>
+					<td style="width: 10%; padding: 0px;" id="driver_statusbar_connectionstatus"></td>
+					<td style="width: 10%; padding: 0px;" id="driver_statusbar_ispaused"></td>
+					<td style="width: 80%; padding: 0px;" id="driver_statusbar_runningdriver"></td>
 				</tr>
 			</table> 
 		</h3>
@@ -763,9 +764,9 @@ $(document).ready(function() {
 		<h3>
 			<table style="tablelayout: fixed; width: 100%; height: 10px; border-collapse:collapse;" border="0">
 				<tr>
-					<td style="width: 10%; padding: 0px;" id="image_statusbar_connectionstatus"></div></td>
-					<td style="width: 10%; padding: 0px;" id="image_statusbar_ispaused"></div></td>
-					<td style="width: 80%; padding: 0px;" id="image_statusbar_runningdriver"></div></td>
+					<td style="width: 10%; padding: 0px;" id="image_statusbar_connectionstatus"></td>
+					<td style="width: 10%; padding: 0px;" id="image_statusbar_ispaused"></td>
+					<td style="width: 80%; padding: 0px;" id="image_statusbar_runningdriver"></td>
 				</tr>
 			</table> 
 		</h3>
@@ -818,9 +819,9 @@ $(document).ready(function() {
 		<h3>
 			<table style="tablelayout: fixed; width: 100%; height: 10px; border-collapse:collapse;" border="0">
 				<tr>
-					<td style="width: 10%; padding: 0px;" id="info_statusbar_connectionstatus"></div></td>
-					<td style="width: 10%; padding: 0px;" id="info_statusbar_ispaused"></div></td>
-					<td style="width: 80%; padding: 0px;" id="info_statusbar_runningdriver"></div></td>
+					<td style="width: 10%; padding: 0px;" id="info_statusbar_connectionstatus"></td>
+					<td style="width: 10%; padding: 0px;" id="info_statusbar_ispaused"></td>
+					<td style="width: 80%; padding: 0px;" id="info_statusbar_runningdriver"></td>
 				</tr>
 			</table> 
 		</h3>
@@ -852,7 +853,7 @@ $(document).ready(function() {
         </div>
     </div>
     <div data-role="content" id="logsmenucontent">
-		<p>Paste Upload Log</p> <!-- Yeah, this'll need reworking later. -->
+		<p>Paste Upload Log</p> <!-- Yeah, this'll need reworking later. Still considering how this will work in the end. -->
 		<iframe name="uploadpastelog" width="250" height="250"></iframe>
     </div>
     <div data-theme="a" data-role="footer" data-position="fixed">
@@ -875,13 +876,40 @@ $(document).ready(function() {
 		<h3>
 			<table style="tablelayout: fixed; width: 100%; height: 10px; border-collapse:collapse;" border="0">
 				<tr>
-					<td style="width: 10%; padding: 0px;" id="logs_statusbar_connectionstatus"></div></td>
-					<td style="width: 10%; padding: 0px;" id="logs_statusbar_ispaused"></div></td>
-					<td style="width: 80%; padding: 0px;" id="logs_statusbar_runningdriver"></div></td>
+					<td style="width: 10%; padding: 0px;" id="logs_statusbar_connectionstatus"></td>
+					<td style="width: 10%; padding: 0px;" id="logs_statusbar_ispaused"></td>
+					<td style="width: 80%; padding: 0px;" id="logs_statusbar_runningdriver"></td>
 				</tr>
 			</table> 
 		</h3>
 	</div>
+</div>
+
+<!-- This begins the EXIT dialog ---------------------------------------------------------------------->
+<div data-role="dialog" id="dialogConfirmExit">
+	<div data-role="header">
+		<h1>Confirm: Exit emulator?</h1>
+	</div>
+	<a href="javascript:executeExit();" data-theme="a" data-role="button">Yes</a>
+	<a href="javascript:$('.ui-dialog').dialog('close');" data-role="button">Cancel</a>
+</div>
+
+<!-- This begins the HARD RESET dialog ---------------------------------------------------------------->
+<div data-role="page" data-close-btn="none" id="dialogConfirmHardReset">
+	<div data-role="header">
+		<h1>Confirm: Hard Reset?</h1>
+	</div>
+	<a href="javascript:executeHardReset();" data-theme="a" data-role="button">Yes</a>
+	<a href="javascript:$('.ui-dialog').dialog('close');" data-role="button">Cancel</a>
+</div>
+
+<!-- This begins the SOFT RESET dialog ---------------------------------------------------------------->
+<div data-role="page" data-close-btn="none" id="dialogConfirmSoftReset">
+	<div data-role="header">
+		<h1>Confirm: Soft Reset?</h1>
+	</div>
+	<a href="javascript:executeSoftReset();" data-theme="a" data-role="button">Yes</a>
+	<a href="javascript:$('.ui-dialog').dialog('close');" data-role="button">Cancel</a>
 </div>
 
 </body>
