@@ -201,6 +201,12 @@ void raiden2cop_device::cop_write_word(address_space &space, int address, UINT16
 	else space.write_word(address, data);
 }
 
+void raiden2cop_device::cop_write_byte(address_space &space, int address, UINT8 data)
+{
+	if (m_cpu_is_68k) space.write_byte(address ^ 3, data);
+	else space.write_byte(address, data);
+}
+
 
 /*** Command Table uploads ***/
 
@@ -1192,8 +1198,11 @@ void raiden2cop_device::execute_5a05(address_space &space, int offset, UINT16 da
 */
 void raiden2cop_device::execute_6200(address_space &space, int offset, UINT16 data)
 {
-	UINT8 angle = cop_read_byte(space, cop_regs[0] + 0x34);
-	UINT16 flags = cop_read_word(space, cop_regs[0]);
+	int primary_reg = 0;
+	int primary_offset = 0x34;
+
+	UINT8 angle = cop_read_byte(space, cop_regs[primary_reg] + primary_offset);
+	UINT16 flags = cop_read_word(space, cop_regs[primary_reg]);
 	cop_angle_target &= 0xff;
 	cop_angle_step &= 0xff;
 	flags &= ~0x0004;
@@ -1218,117 +1227,55 @@ void raiden2cop_device::execute_6200(address_space &space, int offset, UINT16 da
 		else
 			angle -= cop_angle_step;
 	}
-	space.write_word(cop_regs[0], flags);
-	space.write_byte(cop_regs[0] + 0x34, angle);
-}
+	
+	cop_write_word(space, cop_regs[primary_reg], flags);
 
+	if (!m_cpu_is_68k)
+		cop_write_byte(space, cop_regs[primary_reg] + primary_offset, angle);
+	else // angle is a byte, but grainbow (cave mid-boss) is only happy with write-word, could be more endian weirdness, or it always writes a word?
+		cop_write_word(space, cop_regs[primary_reg] + primary_offset, angle);
 
-void raiden2cop_device::LEGACY_execute_6200_grainbow(address_space &space, int offset, UINT16 data)
-{
-	UINT8 cur_angle;
-	UINT16 flags;
-
-	cur_angle = cop_read_byte(space,cop_regs[0] + 0x34);
-	flags = cop_read_word(space, cop_regs[0]);
-	//space.write_byte(cop_regs[1] + (0^3),space.read_byte(cop_regs[1] + (0^3)) & 0xfb); //correct?
-
-	INT8 tempangle_compare = (INT8)cop_angle_target;
-	INT8 tempangle_mod_val = (INT8)cop_angle_step;
-
-	tempangle_compare &= 0xff;
-	tempangle_mod_val &= 0xff;
-
-	cop_angle_target = tempangle_compare;
-	cop_angle_step = tempangle_mod_val;
-
-
-	flags &= ~0x0004;
-
-	int delta = cur_angle - tempangle_compare;
-	if (delta >= 128)
-		delta -= 256;
-	else if (delta < -128)
-		delta += 256;
-	if (delta < 0)
-	{
-		if (delta >= -tempangle_mod_val)
-		{
-			cur_angle = tempangle_compare;
-			flags |= 0x0004;
-		}
-		else
-			cur_angle += tempangle_mod_val;
-	}
-	else
-	{
-		if (delta <= tempangle_mod_val)
-		{
-			cur_angle = tempangle_compare;
-			flags |= 0x0004;
-		}
-		else
-			cur_angle -= tempangle_mod_val;
-	}
-
-	space.write_byte(cop_regs[0] + (0 ^ 3), flags); // this is a word in the avoce
-	space.write_word(cop_regs[0] + (0x34 ^ 3), cur_angle); // why ^3 on a word? should it be a byte, it is in the above
 }
 
 
 void raiden2cop_device::LEGACY_execute_6200(address_space &space, int offset, UINT16 data) // this is for cupsoc, different sequence, works on different registers
 {
-	UINT8 cur_angle;
-	UINT16 flags;
+	int primary_reg = 1;
+	int primary_offset = 0xc;
 
-	/* 0 [1] */
-	/* 0xc [1] */
-	/* 0 [0] */
-	/* 0 [1] */
-	/* 0xc [1] */
-
-	cur_angle = space.read_byte(cop_regs[1] + (0xc ^ 3));
-	flags = space.read_word(cop_regs[1]);
-	//space.write_byte(cop_regs[1] + (0^3),space.read_byte(cop_regs[1] + (0^3)) & 0xfb); //correct?
-
-	INT8 tempangle_compare = (INT8)cop_angle_target;
-	INT8 tempangle_mod_val = (INT8)cop_angle_step;
-
-	tempangle_compare &= 0xff;
-	tempangle_mod_val &= 0xff;
-
-	cop_angle_target = tempangle_compare;
-	cop_angle_step = tempangle_mod_val;
-
+	UINT8 angle = cop_read_byte(space, cop_regs[primary_reg] + primary_offset);
+	UINT16 flags = cop_read_word(space, cop_regs[primary_reg]);
+	cop_angle_target &= 0xff;
+	cop_angle_step &= 0xff;
 	flags &= ~0x0004;
-
-	int delta = cur_angle - tempangle_compare;
+	int delta = angle - cop_angle_target;
 	if (delta >= 128)
 		delta -= 256;
 	else if (delta < -128)
 		delta += 256;
-	if (delta < 0)
-	{
-		if (delta >= -tempangle_mod_val)
-		{
-			cur_angle = tempangle_compare;
+	if (delta < 0) {
+		if (delta >= -cop_angle_step) {
+			angle = cop_angle_target;
 			flags |= 0x0004;
 		}
 		else
-			cur_angle += tempangle_mod_val;
+			angle += cop_angle_step;
 	}
-	else
-	{
-		if (delta <= tempangle_mod_val)
-		{
-			cur_angle = tempangle_compare;
+	else {
+		if (delta <= cop_angle_step) {
+			angle = cop_angle_target;
 			flags |= 0x0004;
 		}
 		else
-			cur_angle -= tempangle_mod_val;
+			angle -= cop_angle_step;
 	}
+	
+	cop_write_word(space, cop_regs[primary_reg], flags);
 
-	space.write_byte(cop_regs[1] + (0 ^ 2), flags);
-	space.write_byte(cop_regs[1] + (0xc ^ 3), cur_angle);
+	if (!m_cpu_is_68k)
+		cop_write_byte(space, cop_regs[primary_reg] + primary_offset, angle);
+	else // angle is a byte, but grainbow (cave mid-boss) is only happy with write-word, could be more endian weirdness, or it always writes a word?
+		cop_write_word(space, cop_regs[primary_reg] + primary_offset, angle);
 }
 
 /*
@@ -2305,7 +2252,7 @@ WRITE16_MEMBER(raiden2cop_device::LEGACY_cop_cmd_w)
 	if (check_command_matches(command, 0x380, 0x39a, 0x380, 0xa80, 0x29a, 0x000, 0x000, 0x000, 8, 0xf3e7))
 	{
 		executed = 1;
-		LEGACY_execute_6200_grainbow(space, offset, data);	
+		execute_6200(space, offset, data);	
 		return;
 	}
 

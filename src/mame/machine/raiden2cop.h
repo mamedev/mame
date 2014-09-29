@@ -193,7 +193,6 @@ public:
 	void LEGACY_execute_42c2(address_space &space, int offset, UINT16 data);
 	void LEGACY_execute_e30e(address_space &space, int offset, UINT16 data);
 	void LEGACY_execute_6200(address_space &space, int offset, UINT16 data);
-	void LEGACY_execute_6200_grainbow(address_space &space, int offset, UINT16 data);
 	void LEGACY_execute_dde5(address_space &space, int offset, UINT16 data);
 	void LEGACY_execute_d104(address_space &space, int offset, UINT16 data);
 	void LEGACY_execute_6980(address_space &space, int offset, UINT16 data);
@@ -252,6 +251,7 @@ public:
 	UINT16 cop_read_word(address_space &space, int address);
 	UINT8 cop_read_byte(address_space &space, int address);
 	void cop_write_word(address_space &space, int address, UINT16 data);
+	void cop_write_byte(address_space &space, int address, UINT8 data);
 
 	// DEBUG
 	void dump_table();
