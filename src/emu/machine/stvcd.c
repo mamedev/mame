@@ -2278,7 +2278,9 @@ void saturn_state::cd_readTOC(void)
 	{
 		if (cdrom)
 		{
-			tocbuf[tocptr] = sega_cdrom_get_adr_control(cdrom, i);
+			//tocbuf[tocptr] = sega_cdrom_get_adr_control(cdrom, i);
+			//HACK: ddsom does not enter ingame with the line above!
+			tocbuf[tocptr] = cdrom_get_adr_control(cdrom, i)<<4 | 0x01;
 		}
 		else
 		{
