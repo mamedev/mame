@@ -193,7 +193,7 @@ UINT8 a2bus_corvfdc01_device::read_c0nx(address_space &space, UINT8 offset)
 void a2bus_corvfdc01_device::write_c0nx(address_space &space, UINT8 offset, UINT8 data)
 {
 	int current_drive;
-	floppy_image_device *floppy;
+	floppy_image_device *floppy = 0;
 
 	switch (offset)
 	{
