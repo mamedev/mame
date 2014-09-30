@@ -958,6 +958,16 @@ endif
 
 #-------------------------------------------------
 #
+#@src/emu/bus/vboy/slot.h,BUSES += VBOY
+#-------------------------------------------------
+ifneq ($(filter VBOY,$(BUSES)),)
+OBJDIRS += $(BUSOBJ)/vboy
+BUSOBJS += $(BUSOBJ)/vboy/slot.o
+BUSOBJS += $(BUSOBJ)/vboy/rom.o
+endif
+
+#-------------------------------------------------
+#
 #@src/emu/bus/megadrive/md_slot.h,BUSES += MEGADRIVE
 #-------------------------------------------------
 
@@ -1171,6 +1181,16 @@ ifneq ($(filter PCE,$(BUSES)),)
 OBJDIRS += $(BUSOBJ)/pce
 BUSOBJS += $(BUSOBJ)/pce/pce_slot.o
 BUSOBJS += $(BUSOBJ)/pce/pce_rom.o
+endif
+
+#-------------------------------------------------
+#
+#@src/emu/bus/scv/slot.h,BUSES += SCV
+#-------------------------------------------------
+ifneq ($(filter SCV,$(BUSES)),)
+OBJDIRS += $(BUSOBJ)/scv
+BUSOBJS += $(BUSOBJ)/scv/slot.o
+BUSOBJS += $(BUSOBJ)/scv/rom.o
 endif
 
 #-------------------------------------------------

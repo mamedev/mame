@@ -28,8 +28,9 @@
 
 #include "emu.h"
 #include "cpu/v810/v810.h"
-#include "imagedev/cartslot.h"
 #include "audio/vboy.h"
+#include "bus/vboy/slot.h"
+#include "bus/vboy/rom.h"
 #include "vboy.lh"
 
 #define READ_BGMAP(bgoffs) m_bgmap[(bgoffs) & 0xffff]
@@ -104,9 +105,10 @@ class vboy_state : public driver_device
 public:
 	vboy_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-			m_maintimer(*this, "timer_main"),
 			m_maincpu(*this, "maincpu"),
-		m_palette(*this, "palette")
+			m_cart(*this, "cartslot"),
+			m_maintimer(*this, "timer_main"),
+			m_palette(*this, "palette")
 	{
 		m_vip_regs.INTPND = 0;
 		m_vip_regs.INTENB = 0;
@@ -151,32 +153,33 @@ public:
 		m_vboy_timer.latch = 0;
 	}
 
-	required_device<timer_device> m_maintimer;
 	required_device<cpu_device> m_maincpu;
+	required_device<vboy_cart_slot_device> m_cart;
+	required_device<timer_device> m_maintimer;
 	required_device<palette_device> m_palette;
 
 	DECLARE_READ32_MEMBER(io_r);
 	DECLARE_WRITE32_MEMBER(io_w);
 	DECLARE_READ16_MEMBER(vip_r);
 	DECLARE_WRITE16_MEMBER(vip_w);
-	DECLARE_WRITE16_MEMBER(vboy_font0_w);
-	DECLARE_WRITE16_MEMBER(vboy_font1_w);
-	DECLARE_WRITE16_MEMBER(vboy_font2_w);
-	DECLARE_WRITE16_MEMBER(vboy_font3_w);
-	DECLARE_READ16_MEMBER(vboy_font0_r);
-	DECLARE_READ16_MEMBER(vboy_font1_r);
-	DECLARE_READ16_MEMBER(vboy_font2_r);
-	DECLARE_READ16_MEMBER(vboy_font3_r);
+	DECLARE_WRITE16_MEMBER(font0_w);
+	DECLARE_WRITE16_MEMBER(font1_w);
+	DECLARE_WRITE16_MEMBER(font2_w);
+	DECLARE_WRITE16_MEMBER(font3_w);
+	DECLARE_READ16_MEMBER(font0_r);
+	DECLARE_READ16_MEMBER(font1_r);
+	DECLARE_READ16_MEMBER(font2_r);
+	DECLARE_READ16_MEMBER(font3_r);
 	DECLARE_WRITE16_MEMBER(vboy_bgmap_w);
 	DECLARE_READ16_MEMBER(vboy_bgmap_r);
-	DECLARE_READ8_MEMBER(vboy_lfb0_r);
-	DECLARE_READ8_MEMBER(vboy_lfb1_r);
-	DECLARE_READ8_MEMBER(vboy_rfb0_r);
-	DECLARE_READ8_MEMBER(vboy_rfb1_r);
-	DECLARE_WRITE8_MEMBER(vboy_lfb0_w);
-	DECLARE_WRITE8_MEMBER(vboy_lfb1_w);
-	DECLARE_WRITE8_MEMBER(vboy_rfb0_w);
-	DECLARE_WRITE8_MEMBER(vboy_rfb1_w);
+	DECLARE_READ8_MEMBER(lfb0_r);
+	DECLARE_READ8_MEMBER(lfb1_r);
+	DECLARE_READ8_MEMBER(rfb0_r);
+	DECLARE_READ8_MEMBER(rfb1_r);
+	DECLARE_WRITE8_MEMBER(lfb0_w);
+	DECLARE_WRITE8_MEMBER(lfb1_w);
+	DECLARE_WRITE8_MEMBER(rfb0_w);
+	DECLARE_WRITE8_MEMBER(rfb1_w);
 	UINT16 *m_font;
 	UINT16 *m_bgmap;
 	UINT8 *m_l_frame_0;
@@ -195,11 +198,6 @@ public:
 	void m_timer_tick(void);
 	void m_scanline_tick(int scanline, UINT8 screen_type);
 	void m_set_irq(UINT16 irq_vector);
-	UINT8 *m_nvptr;
-	UINT32 m_vboy_sram[0x10000/4];
-	device_t *m_nvimage;
-	DECLARE_READ32_MEMBER(sram_r);
-	DECLARE_WRITE32_MEMBER(sram_w);
 
 	void put_obj(bitmap_ind16 &bitmap, const rectangle &cliprect, int x, int y, UINT16 code, UINT8 pal);
 	void fill_ovr_char(UINT16 code, UINT8 pal);
@@ -220,15 +218,11 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_pad_tick);
 	TIMER_DEVICE_CALLBACK_MEMBER(vboy_scanlineL);
 	TIMER_DEVICE_CALLBACK_MEMBER(vboy_scanlineR);
-	void vboy_machine_stop();
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(vboy_cart);
 };
 
 
 void vboy_state::video_start()
 {
-	//int i;
-
 	// Allocate memory for temporary screens
 	m_ovr_tempdraw_map = auto_alloc_array_clear(machine(), INT32, 0x40);
 
@@ -1031,42 +1025,42 @@ WRITE16_MEMBER( vboy_state::vip_w )
 
 
 
-WRITE16_MEMBER( vboy_state::vboy_font0_w )
+WRITE16_MEMBER( vboy_state::font0_w )
 {
 	WRITE_FONT(offset);
 }
 
-WRITE16_MEMBER( vboy_state::vboy_font1_w )
+WRITE16_MEMBER( vboy_state::font1_w )
 {
 	WRITE_FONT(offset+0x1000);
 }
 
-WRITE16_MEMBER( vboy_state::vboy_font2_w )
+WRITE16_MEMBER( vboy_state::font2_w )
 {
 	WRITE_FONT(offset+0x2000);
 }
 
-WRITE16_MEMBER( vboy_state::vboy_font3_w )
+WRITE16_MEMBER( vboy_state::font3_w )
 {
 	WRITE_FONT(offset+0x3000);
 }
 
-READ16_MEMBER( vboy_state::vboy_font0_r )
+READ16_MEMBER( vboy_state::font0_r )
 {
 	return READ_FONT(offset);
 }
 
-READ16_MEMBER( vboy_state::vboy_font1_r )
+READ16_MEMBER( vboy_state::font1_r )
 {
 	return READ_FONT(offset + 0x1000);
 }
 
-READ16_MEMBER( vboy_state::vboy_font2_r )
+READ16_MEMBER( vboy_state::font2_r )
 {
 	return READ_FONT(offset + 0x2000);
 }
 
-READ16_MEMBER( vboy_state::vboy_font3_r )
+READ16_MEMBER( vboy_state::font3_r )
 {
 	return READ_FONT(offset + 0x3000);
 }
@@ -1081,72 +1075,72 @@ READ16_MEMBER( vboy_state::vboy_bgmap_r )
 	return m_bgmap[offset];
 }
 
-READ8_MEMBER( vboy_state::vboy_lfb0_r ) { return m_l_frame_0[offset]; }
-READ8_MEMBER( vboy_state::vboy_lfb1_r ) { return m_l_frame_1[offset]; }
-READ8_MEMBER( vboy_state::vboy_rfb0_r ) { return m_r_frame_0[offset]; }
-READ8_MEMBER( vboy_state::vboy_rfb1_r ) { return m_r_frame_1[offset]; }
-WRITE8_MEMBER( vboy_state::vboy_lfb0_w ) { m_l_frame_0[offset] = data; }
-WRITE8_MEMBER( vboy_state::vboy_lfb1_w ) { m_l_frame_1[offset] = data; }
-WRITE8_MEMBER( vboy_state::vboy_rfb0_w ) { m_r_frame_0[offset] = data; }
-WRITE8_MEMBER( vboy_state::vboy_rfb1_w ) { m_r_frame_1[offset] = data; }
+READ8_MEMBER( vboy_state::lfb0_r ) { return m_l_frame_0[offset]; }
+READ8_MEMBER( vboy_state::lfb1_r ) { return m_l_frame_1[offset]; }
+READ8_MEMBER( vboy_state::rfb0_r ) { return m_r_frame_0[offset]; }
+READ8_MEMBER( vboy_state::rfb1_r ) { return m_r_frame_1[offset]; }
+WRITE8_MEMBER( vboy_state::lfb0_w ) { m_l_frame_0[offset] = data; }
+WRITE8_MEMBER( vboy_state::lfb1_w ) { m_l_frame_1[offset] = data; }
+WRITE8_MEMBER( vboy_state::rfb0_w ) { m_r_frame_0[offset] = data; }
+WRITE8_MEMBER( vboy_state::rfb1_w ) { m_r_frame_1[offset] = data; }
 
 
 static ADDRESS_MAP_START( vboy_mem, AS_PROGRAM, 32, vboy_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x07ffffff)
-	AM_RANGE( 0x00000000, 0x00005fff ) AM_READWRITE8(vboy_lfb0_r,vboy_lfb0_w,0xffffffff) // L frame buffer 0
-	AM_RANGE( 0x00006000, 0x00007fff ) AM_READWRITE16(vboy_font0_r, vboy_font0_w, 0xffffffff) // Font 0-511
-	AM_RANGE( 0x00008000, 0x0000dfff ) AM_READWRITE8(vboy_lfb1_r,vboy_lfb1_w,0xffffffff) // L frame buffer 1
-	AM_RANGE( 0x0000e000, 0x0000ffff ) AM_READWRITE16(vboy_font1_r, vboy_font1_w, 0xffffffff) // Font 512-1023
-	AM_RANGE( 0x00010000, 0x00015fff ) AM_READWRITE8(vboy_rfb0_r,vboy_rfb0_w,0xffffffff)  // R frame buffer 0
-	AM_RANGE( 0x00016000, 0x00017fff ) AM_READWRITE16(vboy_font2_r, vboy_font2_w, 0xffffffff) // Font 1024-1535
-	AM_RANGE( 0x00018000, 0x0001dfff ) AM_READWRITE8(vboy_rfb1_r,vboy_rfb1_w,0xffffffff)  // R frame buffer 1
-	AM_RANGE( 0x0001e000, 0x0001ffff ) AM_READWRITE16(vboy_font3_r, vboy_font3_w, 0xffffffff) // Font 1536-2047
+	AM_RANGE( 0x00000000, 0x00005fff ) AM_READWRITE8(lfb0_r, lfb0_w,0xffffffff) // L frame buffer 0
+	AM_RANGE( 0x00006000, 0x00007fff ) AM_READWRITE16(font0_r, font0_w, 0xffffffff) // Font 0-511
+	AM_RANGE( 0x00008000, 0x0000dfff ) AM_READWRITE8(lfb1_r, lfb1_w,0xffffffff) // L frame buffer 1
+	AM_RANGE( 0x0000e000, 0x0000ffff ) AM_READWRITE16(font1_r, font1_w, 0xffffffff) // Font 512-1023
+	AM_RANGE( 0x00010000, 0x00015fff ) AM_READWRITE8(rfb0_r, rfb0_w,0xffffffff)  // R frame buffer 0
+	AM_RANGE( 0x00016000, 0x00017fff ) AM_READWRITE16(font2_r, font2_w, 0xffffffff) // Font 1024-1535
+	AM_RANGE( 0x00018000, 0x0001dfff ) AM_READWRITE8(rfb1_r, rfb1_w,0xffffffff)  // R frame buffer 1
+	AM_RANGE( 0x0001e000, 0x0001ffff ) AM_READWRITE16(font3_r, font3_w, 0xffffffff) // Font 1536-2047
 
 	AM_RANGE( 0x00020000, 0x0003ffff ) AM_READWRITE16(vboy_bgmap_r,vboy_bgmap_w, 0xffffffff) // VIPC memory
 
 	//AM_RANGE( 0x00040000, 0x0005ffff ) AM_RAM // VIPC
 	AM_RANGE( 0x0005f800, 0x0005f87f ) AM_READWRITE16(vip_r, vip_w, 0xffffffff)
 
-	AM_RANGE( 0x00078000, 0x00079fff ) AM_READWRITE16(vboy_font0_r, vboy_font0_w, 0xffffffff) // Font 0-511 mirror
-	AM_RANGE( 0x0007a000, 0x0007bfff ) AM_READWRITE16(vboy_font1_r, vboy_font1_w, 0xffffffff) // Font 512-1023 mirror
-	AM_RANGE( 0x0007c000, 0x0007dfff ) AM_READWRITE16(vboy_font2_r, vboy_font2_w, 0xffffffff) // Font 1024-1535 mirror
-	AM_RANGE( 0x0007e000, 0x0007ffff ) AM_READWRITE16(vboy_font3_r, vboy_font3_w, 0xffffffff) // Font 1536-2047 mirror
+	AM_RANGE( 0x00078000, 0x00079fff ) AM_READWRITE16(font0_r, font0_w, 0xffffffff) // Font 0-511 mirror
+	AM_RANGE( 0x0007a000, 0x0007bfff ) AM_READWRITE16(font1_r, font1_w, 0xffffffff) // Font 512-1023 mirror
+	AM_RANGE( 0x0007c000, 0x0007dfff ) AM_READWRITE16(font2_r, font2_w, 0xffffffff) // Font 1024-1535 mirror
+	AM_RANGE( 0x0007e000, 0x0007ffff ) AM_READWRITE16(font3_r, font3_w, 0xffffffff) // Font 1536-2047 mirror
 
 	AM_RANGE( 0x01000000, 0x010005ff ) AM_DEVREADWRITE8("vbsnd", vboysnd_device, read, write, 0xffffffff)
 	AM_RANGE( 0x02000000, 0x0200002b ) AM_MIRROR(0x0ffff00) AM_READWRITE(io_r, io_w) // Hardware control registers mask 0xff
 	//AM_RANGE( 0x04000000, 0x04ffffff ) // Expansion area
 	AM_RANGE( 0x05000000, 0x0500ffff ) AM_MIRROR(0x0ff0000) AM_RAM AM_SHARE("wram")// Main RAM - 64K mask 0xffff
-//  AM_RANGE( 0x06000000, 0x06003fff ) AM_RAM AM_SHARE("nvram") // Cart RAM - 8K NVRAM
-	AM_RANGE( 0x07000000, 0x071fffff ) AM_MIRROR(0x0e00000) AM_ROM AM_REGION("cartridge", 0) /* ROM */
+	AM_RANGE( 0x06000000, 0x06003fff ) AM_DEVREADWRITE("cartslot", vboy_cart_slot_device, read_eeprom, write_eeprom) // Cart RAM - 8K NVRAM
+	AM_RANGE( 0x07000000, 0x071fffff ) AM_MIRROR(0x0e00000) AM_DEVREAD("cartslot", vboy_cart_slot_device, read_cart) /* ROM */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( vboy_io, AS_IO, 32, vboy_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x07ffffff)
 	AM_RANGE( 0x00000000, 0x00005fff ) AM_RAM AM_SHARE("l_frame_0") // L frame buffer 0
-	AM_RANGE( 0x00006000, 0x00007fff ) AM_READWRITE16(vboy_font0_r, vboy_font0_w, 0xffffffff) // Font 0-511
+	AM_RANGE( 0x00006000, 0x00007fff ) AM_READWRITE16(font0_r, font0_w, 0xffffffff) // Font 0-511
 	AM_RANGE( 0x00008000, 0x0000dfff ) AM_RAM AM_SHARE("l_frame_1") // L frame buffer 1
-	AM_RANGE( 0x0000e000, 0x0000ffff ) AM_READWRITE16(vboy_font1_r, vboy_font1_w, 0xffffffff) // Font 512-1023
+	AM_RANGE( 0x0000e000, 0x0000ffff ) AM_READWRITE16(font1_r, font1_w, 0xffffffff) // Font 512-1023
 	AM_RANGE( 0x00010000, 0x00015fff ) AM_RAM AM_SHARE("r_frame_0") // R frame buffer 0
-	AM_RANGE( 0x00016000, 0x00017fff ) AM_READWRITE16(vboy_font2_r, vboy_font2_w, 0xffffffff) // Font 1024-1535
+	AM_RANGE( 0x00016000, 0x00017fff ) AM_READWRITE16(font2_r, font2_w, 0xffffffff) // Font 1024-1535
 	AM_RANGE( 0x00018000, 0x0001dfff ) AM_RAM AM_SHARE("r_frame_1") // R frame buffer 1
-	AM_RANGE( 0x0001e000, 0x0001ffff ) AM_READWRITE16(vboy_font3_r, vboy_font3_w, 0xffffffff) // Font 1536-2047
+	AM_RANGE( 0x0001e000, 0x0001ffff ) AM_READWRITE16(font3_r, font3_w, 0xffffffff) // Font 1536-2047
 
 	AM_RANGE( 0x00020000, 0x0003ffff ) AM_READWRITE16(vboy_bgmap_r,vboy_bgmap_w, 0xffffffff) // VIPC memory
 
 	//AM_RANGE( 0x00040000, 0x0005ffff ) AM_RAM // VIPC
 	AM_RANGE( 0x0005f800, 0x0005f87f ) AM_READWRITE16(vip_r, vip_w, 0xffffffff)
 
-	AM_RANGE( 0x00078000, 0x00079fff ) AM_READWRITE16(vboy_font0_r, vboy_font0_w, 0xffffffff) // Font 0-511 mirror
-	AM_RANGE( 0x0007a000, 0x0007bfff ) AM_READWRITE16(vboy_font1_r, vboy_font1_w, 0xffffffff) // Font 512-1023 mirror
-	AM_RANGE( 0x0007c000, 0x0007dfff ) AM_READWRITE16(vboy_font2_r, vboy_font2_w, 0xffffffff) // Font 1024-1535 mirror
-	AM_RANGE( 0x0007e000, 0x0007ffff ) AM_READWRITE16(vboy_font3_r, vboy_font3_w, 0xffffffff) // Font 1536-2047 mirror
+	AM_RANGE( 0x00078000, 0x00079fff ) AM_READWRITE16(font0_r, font0_w, 0xffffffff) // Font 0-511 mirror
+	AM_RANGE( 0x0007a000, 0x0007bfff ) AM_READWRITE16(font1_r, font1_w, 0xffffffff) // Font 512-1023 mirror
+	AM_RANGE( 0x0007c000, 0x0007dfff ) AM_READWRITE16(font2_r, font2_w, 0xffffffff) // Font 1024-1535 mirror
+	AM_RANGE( 0x0007e000, 0x0007ffff ) AM_READWRITE16(font3_r, font3_w, 0xffffffff) // Font 1536-2047 mirror
 
 	AM_RANGE( 0x01000000, 0x010005ff ) AM_DEVREADWRITE8("vbsnd", vboysnd_device, read, write, 0xffffffff)
 	AM_RANGE( 0x02000000, 0x0200002b ) AM_MIRROR(0x0ffff00) AM_READWRITE(io_r, io_w) // Hardware control registers mask 0xff
 //  AM_RANGE( 0x04000000, 0x04ffffff ) // Expansion area
 	AM_RANGE( 0x05000000, 0x0500ffff ) AM_MIRROR(0x0ff0000) AM_RAM AM_SHARE("wram") // Main RAM - 64K mask 0xffff
-	AM_RANGE( 0x06000000, 0x06003fff ) AM_RAM AM_SHARE("nvram") // Cart RAM - 8K NVRAM
-	AM_RANGE( 0x07000000, 0x071fffff ) AM_MIRROR(0x0e00000) AM_ROM AM_REGION("cartridge", 0) /* ROM */
+	AM_RANGE( 0x06000000, 0x06003fff ) AM_NOP // Cart RAM - 8K NVRAM ?
+	AM_RANGE( 0x07000000, 0x071fffff ) AM_MIRROR(0x0e00000) AM_DEVREAD("cartslot", vboy_cart_slot_device, read_cart) /* ROM */
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -1170,22 +1164,11 @@ static INPUT_PORTS_START( vboy )
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_UNUSED ) // Battery low
 INPUT_PORTS_END
 
-void vboy_state::vboy_machine_stop()
-{
-	// only do this if the cart loader detected some form of backup
-	if (m_nvptr != NULL)
-	{
-		device_image_interface *image = dynamic_cast<device_image_interface *>(m_nvimage);
-		image->battery_save(m_nvptr, 0x10000);
-	}
-}
 
 void vboy_state::machine_start()
 {
-	/* add a hook for battery save */
-	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(vboy_state::vboy_machine_stop),this));
-
-//  m_vboy_sram = auto_alloc_array(machine(), UINT32, 0x10000/4);
+	if (m_cart->exists())
+		m_cart->save_eeprom();
 }
 
 void vboy_state::machine_reset()
@@ -1339,80 +1322,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(vboy_state::vboy_scanlineR)
 #endif
 
 
-
-READ32_MEMBER(vboy_state::sram_r)
-{
-	return m_vboy_sram[offset];
-}
-
-WRITE32_MEMBER(vboy_state::sram_w)
-{
-	COMBINE_DATA(&m_vboy_sram[offset]);
-}
-
-
-DEVICE_IMAGE_LOAD_MEMBER( vboy_state, vboy_cart )
-{
-	UINT32 chip = 0;
-	UINT8 *ROM = memregion("cartridge")->base();
-	UINT32 cart_size;
-
-	m_nvptr = (UINT8 *)NULL;
-	if (image.software_entry() == NULL)
-	{
-		cart_size = image.length();
-		image.fread(ROM, cart_size);
-		switch (cart_size)
-		{
-			case 0x001000:
-				memcpy(ROM + 0x001000, ROM, 0x001000);
-			case 0x002000:
-				memcpy(ROM + 0x002000, ROM, 0x002000);
-			case 0x004000:
-				memcpy(ROM + 0x004000, ROM, 0x004000);
-			case 0x008000:
-				memcpy(ROM + 0x008000, ROM, 0x008000);
-			case 0x010000:
-				memcpy(ROM + 0x010000, ROM, 0x010000);
-			case 0x020000:
-				memcpy(ROM + 0x020000, ROM, 0x020000);
-			case 0x040000:
-				memcpy(ROM + 0x040000, ROM, 0x040000);
-			case 0x080000:
-				memcpy(ROM + 0x080000, ROM, 0x080000);
-			case 0x100000:
-				memcpy(ROM + 0x100000, ROM, 0x100000);
-			default:
-				break;
-		}
-	}
-	else
-	{
-		cart_size = image.get_software_region_length("rom");
-		memcpy(ROM, image.get_software_region("rom"), cart_size);
-
-		UINT8 *tmp_eeprom = image.get_software_region("eeprom");
-		if (tmp_eeprom)
-			chip = 1;
-	}
-
-	if (chip)
-	{
-		m_nvptr = (UINT8 *)&m_vboy_sram;
-
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0x06000000, 0x0600ffff, read32_delegate(FUNC(vboy_state::sram_r),this));
-		m_maincpu->space(AS_PROGRAM).install_write_handler(0x06000000, 0x0600ffff, write32_delegate(FUNC(vboy_state::sram_w),this));
-
-		image.battery_load(m_nvptr, 0x10000, 0x00);
-		m_nvimage = image;
-	}
-	else
-	{
-		m_nvimage = NULL;
-	}
-
-	return IMAGE_INIT_PASS;
-}
+static SLOT_INTERFACE_START(vboy_cart)
+	SLOT_INTERFACE_INTERNAL("vb_rom",    VBOY_ROM_STD)
+	SLOT_INTERFACE_INTERNAL("vb_eeprom", VBOY_ROM_EEPROM)
+SLOT_INTERFACE_END
 
 static MACHINE_CONFIG_START( vboy, vboy_state )
 
@@ -1422,7 +1335,6 @@ static MACHINE_CONFIG_START( vboy, vboy_state )
 	MCFG_CPU_IO_MAP(vboy_io)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer_l", vboy_state, vboy_scanlineL, "3dleft", 0, 1)
 	//MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer_r", vboy_state, vboy_scanlineR, "3dright", 0, 1)
-
 
 	// programmable timer
 	MCFG_TIMER_DRIVER_ADD("timer_main", vboy_state, timer_main_tick)
@@ -1448,11 +1360,7 @@ static MACHINE_CONFIG_START( vboy, vboy_state )
 	MCFG_SCREEN_PALETTE("palette")
 
 	/* cartridge */
-	MCFG_CARTSLOT_ADD("cart")
-	MCFG_CARTSLOT_EXTENSION_LIST("vb,bin")
-	MCFG_CARTSLOT_MANDATORY
-	MCFG_CARTSLOT_INTERFACE("vboy_cart")
-	MCFG_CARTSLOT_LOAD(vboy_state, vboy_cart)
+	MCFG_VBOY_CARTRIDGE_ADD("cartslot", vboy_cart, NULL)
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("cart_list","vboy")
@@ -1466,7 +1374,7 @@ MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( vboy )
-	ROM_REGION( 0x2000000, "cartridge", ROMREGION_ERASEFF )
+	ROM_REGION( 0x2000000, "maincpu", ROMREGION_ERASEFF )
 ROM_END
 
 /* Driver */

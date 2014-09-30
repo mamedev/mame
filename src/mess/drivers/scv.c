@@ -2,13 +2,13 @@
 
     Driver for Epoch Super Cassette Vision
 
-
 ***************************************************************************/
 
 #include "emu.h"
 #include "cpu/upd7810/upd7810.h"
-#include "imagedev/cartslot.h"
 #include "audio/upd1771.h"
+#include "bus/scv/slot.h"
+#include "bus/scv/rom.h"
 
 
 class scv_state : public driver_device
@@ -17,41 +17,26 @@ public:
 	scv_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_videoram(*this,"videoram"),
-		m_cart_rom_size(0),
-		m_cart_ram(NULL),
-		m_cart_ram_size(0),
 		m_maincpu(*this, "maincpu"),
 		m_upd1771c(*this, "upd1771c"),
+		m_cart(*this, "cartslot"),
+		m_pa(*this, "PA"),
 		m_pc0(*this, "PC0"),
-		m_bank0(*this, "bank0"),
-		m_bank1(*this, "bank1"),
-		m_bank2(*this, "bank2"),
-		m_bank3(*this, "bank3"),
-		m_bank4(*this, "bank4"),
 		m_charrom(*this, "charrom") { }
 
-	DECLARE_WRITE8_MEMBER(scv_porta_w);
-	DECLARE_READ8_MEMBER(scv_portb_r);
-	DECLARE_READ8_MEMBER(scv_portc_r);
-	DECLARE_WRITE8_MEMBER(scv_portc_w);
-	DECLARE_WRITE8_MEMBER(scv_cart_ram_w);
-	DECLARE_WRITE8_MEMBER(scv_cart_ram2_w);
-	DECLARE_WRITE_LINE_MEMBER(scv_upd1771_ack_w);
+	DECLARE_WRITE8_MEMBER(porta_w);
+	DECLARE_READ8_MEMBER(portb_r);
+	DECLARE_READ8_MEMBER(portc_r);
+	DECLARE_WRITE8_MEMBER(portc_w);
+	DECLARE_WRITE_LINE_MEMBER(upd1771_ack_w);
 	required_shared_ptr<UINT8> m_videoram;
 	UINT8 m_porta;
 	UINT8 m_portc;
 	emu_timer *m_vb_timer;
-	UINT8 *m_cart_rom;
-	UINT32 m_cart_rom_size;
-	UINT8 *m_cart_ram;
-	UINT32 m_cart_ram_size;
-	bool m_cart_ram_enabled;
 	virtual void machine_start();
 	virtual void machine_reset();
 	DECLARE_PALETTE_INIT(scv);
-	void scv_postload();
 	UINT32 screen_update_scv(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( scv_cart );
 
 protected:
 	enum
@@ -61,12 +46,9 @@ protected:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<upd1771c_device> m_upd1771c;
+	required_device<scv_cart_slot_device> m_cart;
+	required_ioport_array<8> m_pa;
 	required_ioport m_pc0;
-	required_memory_bank m_bank0;
-	required_memory_bank m_bank1;
-	required_memory_bank m_bank2;
-	required_memory_bank m_bank3;
-	required_memory_bank m_bank4;
 	required_memory_region m_charrom;
 
 	ioport_port *m_key[8];
@@ -82,30 +64,25 @@ protected:
 
 
 static ADDRESS_MAP_START( scv_mem, AS_PROGRAM, 8, scv_state )
-	AM_RANGE( 0x0000, 0x0fff ) AM_ROM       /* BIOS */
+	AM_RANGE( 0x0000, 0x0fff ) AM_ROM	// BIOS
 
-	AM_RANGE( 0x2000, 0x3403 ) AM_RAM AM_SHARE("videoram")  /* VRAM + 4 registers */
-
+	AM_RANGE( 0x2000, 0x3403 ) AM_RAM AM_SHARE("videoram")  // VRAM + 4 registers
 	AM_RANGE( 0x3600, 0x3600 ) AM_DEVWRITE("upd1771c", upd1771c_device, write)
 
-	AM_RANGE( 0x8000, 0x9fff ) AM_ROMBANK("bank0")
-	AM_RANGE( 0xa000, 0xbfff ) AM_ROMBANK("bank1")
-	AM_RANGE( 0xc000, 0xdfff ) AM_ROMBANK("bank2")
-	AM_RANGE( 0xe000, 0xefff ) AM_READ_BANK("bank3")    AM_WRITE( scv_cart_ram_w )
-	AM_RANGE( 0xf000, 0xff7f ) AM_READ_BANK("bank4")    AM_WRITE( scv_cart_ram2_w )
-	AM_RANGE( 0xff80, 0xffff ) AM_RAM       /* upd7801 internal RAM */
+	AM_RANGE( 0x8000, 0xff7f ) AM_DEVREADWRITE("cartslot", scv_cart_slot_device, read_cart, write_cart)	// cartridge
+	AM_RANGE( 0xff80, 0xffff ) AM_RAM	// upd7801 internal RAM
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( scv_io, AS_IO, 8, scv_state )
-	AM_RANGE( 0x00, 0x00 ) AM_WRITE( scv_porta_w )
-	AM_RANGE( 0x01, 0x01 ) AM_READ( scv_portb_r )
-	AM_RANGE( 0x02, 0x02 ) AM_READWRITE( scv_portc_r, scv_portc_w )
+	AM_RANGE( 0x00, 0x00 ) AM_WRITE(porta_w)
+	AM_RANGE( 0x01, 0x01 ) AM_READ(portb_r)
+	AM_RANGE( 0x02, 0x02 ) AM_READWRITE(portc_r, portc_w)
 ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( scv )
-	PORT_START( "PA0" )
+	PORT_START( "PA.0" )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1) PORT_8WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1) PORT_8WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
@@ -115,7 +92,7 @@ static INPUT_PORTS_START( scv )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START( "PA1" )
+	PORT_START( "PA.1" )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1) PORT_8WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1) PORT_8WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
@@ -125,7 +102,7 @@ static INPUT_PORTS_START( scv )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START( "PA2" )
+	PORT_START( "PA.2" )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -135,7 +112,7 @@ static INPUT_PORTS_START( scv )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("0") PORT_CODE(KEYCODE_0_PAD)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("1") PORT_CODE(KEYCODE_1_PAD)
 
-	PORT_START( "PA3" )
+	PORT_START( "PA.3" )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -145,7 +122,7 @@ static INPUT_PORTS_START( scv )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("2") PORT_CODE(KEYCODE_2_PAD)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("3") PORT_CODE(KEYCODE_3_PAD)
 
-	PORT_START( "PA4" )
+	PORT_START( "PA.4" )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -155,7 +132,7 @@ static INPUT_PORTS_START( scv )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("4") PORT_CODE(KEYCODE_4_PAD)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("5") PORT_CODE(KEYCODE_5_PAD)
 
-	PORT_START( "PA5" )
+	PORT_START( "PA.5" )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -165,7 +142,7 @@ static INPUT_PORTS_START( scv )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("6") PORT_CODE(KEYCODE_6_PAD)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("7") PORT_CODE(KEYCODE_7_PAD)
 
-	PORT_START( "PA6" )
+	PORT_START( "PA.6" )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -175,7 +152,7 @@ static INPUT_PORTS_START( scv )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("8") PORT_CODE(KEYCODE_8_PAD)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("9") PORT_CODE(KEYCODE_9_PAD)
 
-	PORT_START( "PA7" )
+	PORT_START( "PA.7" )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -190,52 +167,27 @@ static INPUT_PORTS_START( scv )
 INPUT_PORTS_END
 
 
-WRITE8_MEMBER( scv_state::scv_cart_ram_w )
-{
-	/* Check if cartridge ram is enabled */
-	if ( m_cart_ram_enabled )
-	{
-		m_cart_ram[offset] = data;
-	}
-}
-
-
-WRITE8_MEMBER( scv_state::scv_cart_ram2_w )
-{
-	/* Check if cartridge ram is enabled */
-	if ( m_cart_ram_enabled )
-	{
-		if ( m_cart_ram_size > 0x1000 )
-		{
-			offset += 0x1000;
-		}
-
-		m_cart_ram[offset] = data;
-	}
-}
-
-
-WRITE8_MEMBER( scv_state::scv_porta_w )
+WRITE8_MEMBER( scv_state::porta_w )
 {
 	m_porta = data;
 }
 
 
-READ8_MEMBER( scv_state::scv_portb_r )
+READ8_MEMBER( scv_state::portb_r )
 {
 	UINT8 data = 0xff;
 
 	for (int i = 0; i < 8; i++)
 	{
 		if (!BIT(m_porta, i))
-			data &= m_key[i]->read();
+			data &= m_pa[i]->read();
 	}
 
 	return data;
 }
 
 
-READ8_MEMBER( scv_state::scv_portc_r )
+READ8_MEMBER( scv_state::portc_r )
 {
 	UINT8 data = m_portc;
 
@@ -245,120 +197,12 @@ READ8_MEMBER( scv_state::scv_portc_r )
 }
 
 
-void scv_state::scv_set_banks()
-{
-	m_cart_ram_enabled = false;
-
-	switch( m_cart_rom_size )
-	{
-	case 0:
-	case 0x2000:
-		m_bank0->set_base( m_cart_rom );
-		m_bank1->set_base( m_cart_rom );
-		m_bank2->set_base( m_cart_rom );
-		m_bank3->set_base( m_cart_rom );
-		m_bank4->set_base( m_cart_rom + 0x1000 );
-		break;
-	case 0x4000:
-		m_bank0->set_base( m_cart_rom );
-		m_bank1->set_base( m_cart_rom + 0x2000 );
-		m_bank2->set_base( m_cart_rom );
-		m_bank3->set_base( m_cart_rom + 0x2000 );
-		m_bank4->set_base( m_cart_rom + 0x3000 );
-		break;
-	case 0x8000:
-		m_bank0->set_base( m_cart_rom );
-		m_bank1->set_base( m_cart_rom + 0x2000 );
-		m_bank2->set_base( m_cart_rom + 0x4000 );
-		m_bank3->set_base( m_cart_rom + 0x6000 );
-		m_bank4->set_base( m_cart_rom + 0x7000 );
-		break;
-	case 0x10000:
-		m_bank0->set_base( m_cart_rom + ( ( m_portc & 0x20 ) ? 0x8000 : 0 ) );
-		m_bank1->set_base( m_cart_rom + ( ( m_portc & 0x20 ) ? 0xa000 : 0x2000 ) );
-		m_bank2->set_base( m_cart_rom + ( ( m_portc & 0x20 ) ? 0xc000 : 0x4000 ) );
-		m_bank3->set_base( m_cart_rom + ( ( m_portc & 0x20 ) ? 0xe000 : 0x6000 ) );
-		m_bank4->set_base( m_cart_rom + ( ( m_portc & 0x20 ) ? 0xf000 : 0x7000 ) );
-		break;
-	case 0x20000:   /* Pole Position 2 */
-		int base = ( ( m_portc >> 5 ) & 0x03 ) * 0x8000 ;
-		m_bank0->set_base( m_cart_rom + base + 0 );
-		m_bank1->set_base( m_cart_rom + base + 0x2000 );
-		m_bank2->set_base( m_cart_rom + base + 0x4000 );
-		m_bank3->set_base( m_cart_rom + base + 0x6000 );
-		m_bank4->set_base( m_cart_rom + base + 0x7000 );
-		/* On-cart RAM is enabled when PC6 is high */
-		if ( m_cart_ram && m_portc & 0x40 )
-		{
-			m_cart_ram_enabled = true;
-			m_bank4->set_base( m_cart_ram );
-		}
-		break;
-	}
-
-	/* Check if cartridge RAM is available and should be enabled */
-	if ( m_cart_rom_size < 0x20000 && m_cart_ram && m_cart_ram_size && ( m_portc & 0x20 ) )
-	{
-		if ( m_cart_ram_size == 0x1000 )
-		{
-			m_bank4->set_base( m_cart_ram );
-		}
-		else
-		{
-			m_bank3->set_base( m_cart_ram );
-			m_bank4->set_base( m_cart_ram + 0x1000 );
-		}
-		m_cart_ram_enabled = true;
-	}
-
-}
-
-
-WRITE8_MEMBER( scv_state::scv_portc_w )
+WRITE8_MEMBER( scv_state::portc_w )
 {
 	//logerror("%04x: scv_portc_w: data = 0x%02x\n", m_maincpu->pc(), data );
 	m_portc = data;
-
-	scv_set_banks();
+	m_cart->write_bank(space, 0, m_portc);
 	m_upd1771c->pcm_write(m_portc & 0x08);
-}
-
-
-DEVICE_IMAGE_LOAD_MEMBER( scv_state, scv_cart )
-{
-	UINT8 *cart = memregion( "cart" )->base();
-
-	if ( image.software_entry() == NULL )
-	{
-		int size = image.length();
-
-		if ( size > memregion( "cart" )->bytes() )
-		{
-			image.seterror( IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size" );
-			return IMAGE_INIT_FAIL;
-		}
-
-		if ( image.fread( cart, size ) != size )
-		{
-			image.seterror( IMAGE_ERROR_UNSPECIFIED, "Unable to fully read from file" );
-			return IMAGE_INIT_FAIL;
-		}
-
-		m_cart_rom_size = size;
-	}
-	else
-	{
-		m_cart_rom_size = image.get_software_region_length( "rom" );
-		memcpy( cart, image.get_software_region( "rom" ), m_cart_rom_size );
-		m_cart_ram_size = image.get_software_region_length( "ram" );
-		if ( m_cart_ram_size > 0 )
-		{
-			m_cart_ram = auto_alloc_array_clear( machine(), UINT8, m_cart_ram_size );
-			save_pointer(NAME(m_cart_ram), m_cart_ram_size);
-		}
-	}
-
-	return IMAGE_INIT_PASS;
 }
 
 
@@ -758,41 +602,26 @@ UINT32 scv_state::screen_update_scv(screen_device &screen, bitmap_ind16 &bitmap,
 }
 
 
-WRITE_LINE_MEMBER( scv_state::scv_upd1771_ack_w )
+WRITE_LINE_MEMBER( scv_state::upd1771_ack_w )
 {
 	m_maincpu->set_input_line(UPD7810_INTF1, (state) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-void scv_state::scv_postload()
-{
-	scv_set_banks();
-}
-
-
 void scv_state::machine_start()
 {
-	m_cart_rom = memregion( "cart" )->base();
 	m_vb_timer = timer_alloc(TIMER_VB);
-
-	for (int i = 0; i < 8; i++)
-	{
-		char str[4];
-		sprintf(str, "PA%i", i);
-		m_key[i] = ioport(str);
-	}
 
 	save_item(NAME(m_porta));
 	save_item(NAME(m_portc));
-	save_item(NAME(m_cart_ram_enabled));
+	if (m_cart->exists())
+		m_cart->save_ram();
 
-	machine().save().register_postload(save_prepost_delegate(FUNC(scv_state::scv_postload), this));
 }
 
 
 void scv_state::machine_reset()
 {
 	m_vb_timer->adjust(machine().first_screen()->time_until_pos(0, 0));
-	scv_set_banks();
 }
 
 
@@ -815,12 +644,21 @@ static GFXDECODE_START( scv )
 GFXDECODE_END
 
 
+static SLOT_INTERFACE_START(scv_cart)
+	SLOT_INTERFACE_INTERNAL("rom8k",       SCV_ROM8K)
+	SLOT_INTERFACE_INTERNAL("rom16k",      SCV_ROM16K)
+	SLOT_INTERFACE_INTERNAL("rom32k",      SCV_ROM32K)
+	SLOT_INTERFACE_INTERNAL("rom32k_ram",  SCV_ROM32K_RAM8K)
+	SLOT_INTERFACE_INTERNAL("rom64k",      SCV_ROM64K)
+	SLOT_INTERFACE_INTERNAL("rom128k",     SCV_ROM128K)
+	SLOT_INTERFACE_INTERNAL("rom128k_ram", SCV_ROM128K_RAM4K)
+SLOT_INTERFACE_END
+
 static MACHINE_CONFIG_START( scv, scv_state )
 
 	MCFG_CPU_ADD( "maincpu", UPD7801, XTAL_4MHz )
 	MCFG_CPU_PROGRAM_MAP( scv_mem )
 	MCFG_CPU_IO_MAP( scv_io )
-
 
 	/* Video chip is EPOCH TV-1 */
 	MCFG_SCREEN_ADD( "screen", RASTER )
@@ -835,14 +673,10 @@ static MACHINE_CONFIG_START( scv, scv_state )
 	/* Sound is generated by UPD1771C clocked at XTAL_6MHz */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD( "upd1771c", UPD1771C, XTAL_6MHz )
-	MCFG_UPD1771_ACK_HANDLER(WRITELINE(scv_state, scv_upd1771_ack_w))
+	MCFG_UPD1771_ACK_HANDLER(WRITELINE(scv_state, upd1771_ack_w))
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
 
-	MCFG_CARTSLOT_ADD( "cart" )
-	MCFG_CARTSLOT_EXTENSION_LIST( "bin" )
-	MCFG_CARTSLOT_NOT_MANDATORY
-	MCFG_CARTSLOT_INTERFACE("scv_cart")
-	MCFG_CARTSLOT_LOAD( scv_state, scv_cart )
+	MCFG_SCV_CARTRIDGE_ADD("cartslot", scv_cart, NULL)
 
 	/* Software lists */
 	MCFG_SOFTWARE_LIST_ADD("cart_list","scv")
@@ -850,7 +684,6 @@ MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( scv_pal, scv )
-
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_CLOCK( 3780000 )
 
@@ -864,20 +697,18 @@ MACHINE_CONFIG_END
 ROM_START( scv )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "upd7801g.s01", 0, 0x1000, CRC(7ac06182) SHA1(6e89d1227581c76441a53d605f9e324185f1da33) )
+
 	ROM_REGION( 0x400, "charrom", 0 )
 	ROM_LOAD( "epochtv.chr", 0, 0x400, BAD_DUMP CRC(db521533) SHA1(40b4e44838c35191f115437a14f200f052e71509) )
-
-	ROM_REGION( 0x20000, "cart", ROMREGION_ERASEFF )
 ROM_END
 
 
 ROM_START( scv_pal )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "upd7801g.s01", 0, 0x1000, CRC(7ac06182) SHA1(6e89d1227581c76441a53d605f9e324185f1da33) )
+
 	ROM_REGION( 0x400, "charrom", 0 )
 	ROM_LOAD( "epochtv.chr", 0, 0x400, BAD_DUMP CRC(db521533) SHA1(40b4e44838c35191f115437a14f200f052e71509) )
-
-	ROM_REGION( 0x20000, "cart", ROMREGION_ERASEFF )
 ROM_END
 
 
