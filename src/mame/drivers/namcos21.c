@@ -309,10 +309,9 @@ CPU68 PCB:
 #define ENABLE_LOGGING      0
 
 
-static INT32
-ReadPointROMData( running_machine &machine, unsigned offset )
+INT32 namcos21_state::read_pointrom_data(unsigned offset)
 {
-	const INT32 *pPointData = (INT32 *)machine.root_device().memregion( "user2" )->base();
+	const INT32 *pPointData = (INT32 *)memregion( "user2" )->base();
 	INT32 result = pPointData[offset];
 	return result;
 }
@@ -378,25 +377,22 @@ READ16_MEMBER(namcos21_state::dspcuskey_r)
 	return result;
 }
 
-static void
-TransmitWordToSlave( namcos21_state *state, UINT16 data )
+void namcos21_state::transmit_word_to_slave(UINT16 data)
 {
-	unsigned offs = state->m_mpDspState->slaveInputStart+state->m_mpDspState->slaveBytesAvailable++;
-	state->m_mpDspState->slaveInputBuffer[offs%DSP_BUF_MAX] = data;
-	if (ENABLE_LOGGING) logerror( "+%04x(#%04x)\n", data, state->m_mpDspState->slaveBytesAvailable );
-	state->m_mpDspState->slaveActive = 1;
-	if( state->m_mpDspState->slaveBytesAvailable >= DSP_BUF_MAX )
+	unsigned offs = m_mpDspState->slaveInputStart+m_mpDspState->slaveBytesAvailable++;
+	m_mpDspState->slaveInputBuffer[offs%DSP_BUF_MAX] = data;
+	if (ENABLE_LOGGING) logerror( "+%04x(#%04x)\n", data, m_mpDspState->slaveBytesAvailable );
+	m_mpDspState->slaveActive = 1;
+	if( m_mpDspState->slaveBytesAvailable >= DSP_BUF_MAX )
 	{
 		logerror( "IDC overflow\n" );
 		exit(1);
 	}
-} /* TransmitWordToSlave */
+}
 
-static void
-TransferDspData( running_machine &machine )
+void namcos21_state::transfer_dsp_data()
 {
-	namcos21_state *state = machine.driver_data<namcos21_state>();
-	UINT16 addr = state->m_mpDspState->masterSourceAddr;
+	UINT16 addr = m_mpDspState->masterSourceAddr;
 	int mode = addr&0x8000;
 	addr&=0x7fff;
 	if( addr )
@@ -405,13 +401,13 @@ TransferDspData( running_machine &machine )
 		{
 			int i;
 			UINT16 old = addr;
-			UINT16 code = state->m_dspram16[addr++];
+			UINT16 code = m_dspram16[addr++];
 			if( code == 0xffff )
 			{
 				if( mode )
 				{
-					addr = state->m_dspram16[addr];
-					state->m_mpDspState->masterSourceAddr = addr;
+					addr = m_dspram16[addr];
+					m_mpDspState->masterSourceAddr = addr;
 					if (ENABLE_LOGGING) logerror( "LOOP:0x%04x\n", addr );
 					addr&=0x7fff;
 					if( old==addr )
@@ -421,59 +417,59 @@ TransferDspData( running_machine &machine )
 				}
 				else
 				{
-					state->m_mpDspState->masterSourceAddr = 0;
+					m_mpDspState->masterSourceAddr = 0;
 					return;
 				}
 			}
 			else if( mode==0 )
 			{ /* direct data transfer */
 				if (ENABLE_LOGGING) logerror( "DATA TFR(0x%x)\n", code );
-				TransmitWordToSlave( state, code );
+				transmit_word_to_slave(code);
 				for( i=0; i<code; i++ )
 				{
-					UINT16 data = state->m_dspram16[addr++];
-					TransmitWordToSlave( state, data );
+					UINT16 data = m_dspram16[addr++];
+					transmit_word_to_slave(data);
 				}
 			}
 			else if( code==0x18 || code==0x1a )
 			{
 				if (ENABLE_LOGGING) logerror( "HEADER TFR(0x%x)\n", code );
-				TransmitWordToSlave( state, code+1 );
+				transmit_word_to_slave(code+1);
 				for( i=0; i<code; i++ )
 				{
-					UINT16 data = state->m_dspram16[addr++];
-					TransmitWordToSlave( state, data );
+					UINT16 data = m_dspram16[addr++];
+					transmit_word_to_slave(data);
 				}
 			}
 			else
 			{
-				INT32 masterAddr = ReadPointROMData(machine, code);
+				INT32 masterAddr = read_pointrom_data(code);
 				if (ENABLE_LOGGING) logerror( "OBJ TFR(0x%x)\n", code );
 				{
-					UINT16 len = state->m_dspram16[addr++];
+					UINT16 len = m_dspram16[addr++];
 					for(;;)
 					{
-						int subAddr = ReadPointROMData(machine, masterAddr++);
+						int subAddr = read_pointrom_data(masterAddr++);
 						if( subAddr==0xffffff )
 						{
 							break;
 						}
 						else
 						{
-							int primWords = (UINT16)ReadPointROMData(machine, subAddr++);
+							int primWords = (UINT16)read_pointrom_data(subAddr++);
 							if( primWords>2 )
 							{
-								TransmitWordToSlave( state, 0 ); /* pad1 */
-								TransmitWordToSlave( state, len+1 );
+								transmit_word_to_slave(0); /* pad1 */
+								transmit_word_to_slave(len+1);
 								for( i=0; i<len; i++ )
 								{ /* transform */
-									TransmitWordToSlave( state, state->m_dspram16[addr+i] );
+									transmit_word_to_slave(m_dspram16[addr+i]);
 								}
-								TransmitWordToSlave( state, 0 ); /* pad2 */
-								TransmitWordToSlave( state, primWords+1 );
+								transmit_word_to_slave(0); /* pad2 */
+								transmit_word_to_slave(primWords+1);
 								for( i=0; i<primWords; i++ )
 								{
-									TransmitWordToSlave( state, (UINT16)ReadPointROMData(machine, subAddr+i) );
+									transmit_word_to_slave((UINT16)read_pointrom_data(subAddr+i));
 								}
 							}
 							else
@@ -487,34 +483,34 @@ TransferDspData( running_machine &machine )
 			}
 		} /* for(;;) */
 	}
-} /* TransferDspData */
+}
 
 
 
-void
-namcos21_kickstart( running_machine &machine, int internal )
+void namcos21_kickstart(running_machine &machine, int internal)
 {
 	namcos21_state *state = machine.driver_data<namcos21_state>();
+	
 	/* patch dsp watchdog */
 	switch( state->m_gametype )
 	{
-	case NAMCOS21_AIRCOMBAT:
-		state->m_master_dsp_code[0x008e] = 0x808f;
-		break;
-	case NAMCOS21_SOLVALOU:
-		state->m_master_dsp_code[0x008b] = 0x808c;
-		break;
-	default:
-		break;
+		case NAMCOS21_AIRCOMBAT:
+			state->m_master_dsp_code[0x008e] = 0x808f;
+			break;
+		case NAMCOS21_SOLVALOU:
+			state->m_master_dsp_code[0x008b] = 0x808c;
+			break;
+		default:
+			break;
 	}
 	if( internal )
 	{
 		if( state->m_mbNeedsKickstart==0 ) return;
-		state->m_mbNeedsKickstart--;
+			state->m_mbNeedsKickstart--;
 		if( state->m_mbNeedsKickstart ) return;
 	}
 
-	namcos21_ClearPolyFrameBuffer(machine);
+	state->clear_poly_framebuffer();
 	state->m_mpDspState->masterSourceAddr = 0;
 	state->m_mpDspState->slaveOutputSize = 0;
 	state->m_mpDspState->masterFinished = 0;
@@ -523,44 +519,40 @@ namcos21_kickstart( running_machine &machine, int internal )
 	state->m_dspslave->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
 }
 
-static UINT16
-ReadWordFromSlaveInput( address_space &space )
+UINT16 namcos21_state::read_word_from_slave_input()
 {
-	namcos21_state *state = space.machine().driver_data<namcos21_state>();
 	UINT16 data = 0;
-	if( state->m_mpDspState->slaveBytesAvailable>0 )
+	if( m_mpDspState->slaveBytesAvailable>0 )
 	{
-		data = state->m_mpDspState->slaveInputBuffer[state->m_mpDspState->slaveInputStart++];
-		state->m_mpDspState->slaveInputStart %= DSP_BUF_MAX;
-		state->m_mpDspState->slaveBytesAvailable--;
-		if( state->m_mpDspState->slaveBytesAdvertised>0 )
+		data = m_mpDspState->slaveInputBuffer[m_mpDspState->slaveInputStart++];
+		m_mpDspState->slaveInputStart %= DSP_BUF_MAX;
+		m_mpDspState->slaveBytesAvailable--;
+		if( m_mpDspState->slaveBytesAdvertised>0 )
 		{
-			state->m_mpDspState->slaveBytesAdvertised--;
+			m_mpDspState->slaveBytesAdvertised--;
 		}
-		if (ENABLE_LOGGING) logerror( "%s:-%04x(0x%04x)\n", space.machine().describe_context(), data, state->m_mpDspState->slaveBytesAvailable );
+		if (ENABLE_LOGGING) logerror( "%s:-%04x(0x%04x)\n", machine().describe_context(), data, m_mpDspState->slaveBytesAvailable );
 	}
 	return data;
-} /* ReadWordFromSlaveInput */
+}
 
-static size_t
-GetInputBytesAdvertisedForSlave( running_machine &machine )
+size_t namcos21_state::get_input_bytes_advertised_for_slave()
 {
-	namcos21_state *state = machine.driver_data<namcos21_state>();
-	if( state->m_mpDspState->slaveBytesAdvertised < state->m_mpDspState->slaveBytesAvailable )
+	if( m_mpDspState->slaveBytesAdvertised < m_mpDspState->slaveBytesAvailable )
 	{
-		state->m_mpDspState->slaveBytesAdvertised++;
+		m_mpDspState->slaveBytesAdvertised++;
 	}
-	else if( state->m_mpDspState->slaveActive && state->m_mpDspState->masterFinished && state->m_mpDspState->masterSourceAddr )
+	else if( m_mpDspState->slaveActive && m_mpDspState->masterFinished && m_mpDspState->masterSourceAddr )
 	{
-		namcos21_kickstart(machine, 0);
+		namcos21_kickstart(machine(), 0);
 	}
-	return state->m_mpDspState->slaveBytesAdvertised;
-} /* GetInputBytesAdvertisedForSlave */
+	return m_mpDspState->slaveBytesAdvertised;
+}
 
 READ16_MEMBER(namcos21_state::dspram16_r)
 {
 	return m_dspram16[offset];
-} /* dspram16_r */
+}
 
 WRITE16_MEMBER(namcos21_state::dspram16_w)
 {
@@ -572,7 +564,7 @@ WRITE16_MEMBER(namcos21_state::dspram16_w)
 			offset == 1+(m_mpDspState->masterSourceAddr&0x7fff) )
 		{
 			if (ENABLE_LOGGING) logerror( "IDC-CONTINUE\n" );
-			TransferDspData(machine());
+			transfer_dsp_data();
 		}
 		else if (m_gametype == NAMCOS21_SOLVALOU &&
 					offset == 0x103 &&
@@ -581,15 +573,13 @@ WRITE16_MEMBER(namcos21_state::dspram16_w)
 			space.device().execute().yield();
 		}
 	}
-} /* dspram16_w */
+}
 
 /************************************************************************************/
 
-static int
-InitDSP( running_machine &machine )
+int namcos21_state::init_dsp()
 {
-	namcos21_state *state = machine.driver_data<namcos21_state>();
-	UINT16 *pMem = (UINT16 *)state->memregion("dspmaster")->base();
+	UINT16 *pMem = (UINT16 *)memregion("dspmaster")->base();
 	/**
 	 * DSP BIOS tests "CPU ID" on startup
 	 * "JAPAN (C)1990 NAMCO LTD. by H.F "
@@ -598,7 +588,7 @@ InitDSP( running_machine &machine )
 	pMem[0x8000] = 0xFF80;
 	pMem[0x8001] = 0x0000;
 
-	state->m_mpDspState = auto_alloc_clear(machine, dsp_state);
+	m_mpDspState = auto_alloc_clear(machine(), dsp_state);
 
 	return 0;
 }
@@ -609,16 +599,16 @@ InitDSP( running_machine &machine )
 
 READ16_MEMBER(namcos21_state::dsp_port0_r)
 {
-	INT32 data = ReadPointROMData(machine(), m_pointrom_idx++);
+	INT32 data = read_pointrom_data(m_pointrom_idx++);
 	m_mPointRomMSB = (UINT8)(data>>16);
 	m_mbPointRomDataAvailable = 1;
 	return (UINT16)data;
-} /* dsp_port0_r */
+}
 
 WRITE16_MEMBER(namcos21_state::dsp_port0_w)
 { /* unused? */
 	if (ENABLE_LOGGING) logerror( "PTRAM_LO(0x%04x)\n", data );
-} /* dsp_port0_w */
+}
 
 READ16_MEMBER(namcos21_state::dsp_port1_r)
 {
@@ -628,44 +618,44 @@ READ16_MEMBER(namcos21_state::dsp_port1_r)
 		return m_mPointRomMSB;
 	}
 	return 0x8000; /* IDC ack? */
-} /* dsp_port1_r */
+}
 
 WRITE16_MEMBER(namcos21_state::dsp_port1_w)
 { /* unused? */
 	if (ENABLE_LOGGING) logerror( "PTRAM_HI(0x%04x)\n", data );
-} /* dsp_port1_w */
+}
 
 READ16_MEMBER(namcos21_state::dsp_port2_r)
 { /* IDC TRANSMIT ENABLE? */
 	return 0;
-} /* dsp_port2_r */
+}
 
 WRITE16_MEMBER(namcos21_state::dsp_port2_w)
 {
 	if (ENABLE_LOGGING) logerror( "IDC ADDR INIT(0x%04x)\n", data );
 	m_mpDspState->masterSourceAddr = data;
-	TransferDspData(machine());
-} /* dsp_port2_w */
+	transfer_dsp_data();
+}
 
 READ16_MEMBER(namcos21_state::dsp_port3_idc_rcv_enable_r)
 { /* IDC RECEIVE ENABLE? */
 	return 0;
-} /* dsp_port3_idc_rcv_enable_r */
+}
 
 WRITE16_MEMBER(namcos21_state::dsp_port3_w)
 {
 	m_pointrom_idx<<=16;
 	m_pointrom_idx|=data;
-} /* dsp_port3_w */
+}
 
 WRITE16_MEMBER(namcos21_state::dsp_port4_w)
 { /* receives $0B<<4 prior to IDC setup */
-} /* dsp_port4_w */
+}
 
 READ16_MEMBER(namcos21_state::dsp_port8_r)
 { /* SMU status */
 	return 1;
-} /* dsp_port8_r */
+}
 
 
 WRITE16_MEMBER(namcos21_state::dsp_port8_w)
@@ -676,17 +666,17 @@ WRITE16_MEMBER(namcos21_state::dsp_port8_w)
 		m_mpDspState->masterFinished = 1;
 	}
 	m_irq_enable = data;
-} /* dsp_port8_w */
+}
 
 READ16_MEMBER(namcos21_state::dsp_port9_r)
 { /* render-device-busy; used for direct-draw */
 	return 0;
-} /* dsp_port9_r */
+}
 
 READ16_MEMBER(namcos21_state::dsp_porta_r)
 { /* config */
 	return 0;
-} /* dsp_porta_r */
+}
 
 WRITE16_MEMBER(namcos21_state::dsp_porta_w)
 {
@@ -696,12 +686,12 @@ WRITE16_MEMBER(namcos21_state::dsp_porta_w)
 	/* direct-draw begin: 0 */
 	/* INT1 begin: 1 */
 //  if (ENABLE_LOGGING) logerror( "dsp_porta_w(0x%04x)\n", data );
-} /* dsp_porta_w */
+}
 
 READ16_MEMBER(namcos21_state::dsp_portb_r)
 { /* config */
 	return 1;
-} /* dsp_portb_r */
+}
 
 WRITE16_MEMBER(namcos21_state::dsp_portb_w)
 {
@@ -722,7 +712,7 @@ WRITE16_MEMBER(namcos21_state::dsp_portb_w)
 		}
 		if( color&0x8000 )
 		{
-			namcos21_DrawQuad( machine(), sx, sy, zcode, color );
+			draw_quad(sx, sy, zcode, color);
 		}
 		else
 		{
@@ -734,7 +724,7 @@ WRITE16_MEMBER(namcos21_state::dsp_portb_w)
 		logerror( "unexpected masterDirectDrawSize=%d!\n",m_mpDspState->masterDirectDrawSize );
 	}
 	m_mpDspState->masterDirectDrawSize = 0;
-} /* dsp_portb_w */
+}
 
 WRITE16_MEMBER(namcos21_state::dsp_portc_w)
 {
@@ -746,12 +736,12 @@ WRITE16_MEMBER(namcos21_state::dsp_portc_w)
 	{
 		logerror( "portc overflow\n" );
 	}
-} /* dsp_portc_w */
+}
 
 READ16_MEMBER(namcos21_state::dsp_portf_r)
 { /* informs BIOS that this is Master DSP */
 	return 0;
-} /* dsp_portf_r */
+}
 
 WRITE16_MEMBER(namcos21_state::dsp_xf_w)
 {
@@ -787,22 +777,20 @@ ADDRESS_MAP_END
 
 /************************************************************************************/
 
-static void
-RenderSlaveOutput( running_machine &machine, UINT16 data )
+void namcos21_state::render_slave_output(UINT16 data)
 {
-	namcos21_state *state = machine.driver_data<namcos21_state>();
-	if( state->m_mpDspState->slaveOutputSize >= 4096 )
+	if( m_mpDspState->slaveOutputSize >= 4096 )
 	{
-		fatalerror( "FATAL ERROR: SLAVE OVERFLOW (0x%x)\n",state->m_mpDspState->slaveOutputBuffer[0]  );
+		fatalerror( "FATAL ERROR: SLAVE OVERFLOW (0x%x)\n",m_mpDspState->slaveOutputBuffer[0]  );
 	}
 
 	/* append word to slave output buffer */
-	state->m_mpDspState->slaveOutputBuffer[state->m_mpDspState->slaveOutputSize++] = data;
+	m_mpDspState->slaveOutputBuffer[m_mpDspState->slaveOutputSize++] = data;
 
 	{
-		UINT16 *pSource = state->m_mpDspState->slaveOutputBuffer;
+		UINT16 *pSource = m_mpDspState->slaveOutputBuffer;
 		UINT16 count = *pSource++;
-		if( count && state->m_mpDspState->slaveOutputSize > count )
+		if( count && m_mpDspState->slaveOutputSize > count )
 		{
 			UINT16 color = *pSource++;
 			int sx[4], sy[4],zcode[4];
@@ -816,30 +804,30 @@ RenderSlaveOutput( running_machine &machine, UINT16 data )
 					sy[j] = NAMCOS21_POLY_FRAME_HEIGHT/2 + (INT16)pSource[3*j+1];
 					zcode[j] = pSource[3*j+2];
 				}
-				namcos21_DrawQuad( machine, sx, sy, zcode, color&0x7fff );
+				draw_quad(sx, sy, zcode, color&0x7fff);
 			}
 			else
 			{
 				int quad_idx = color*6;
 				for(;;)
 				{
-					UINT8 code = state->m_pointram[quad_idx++];
-					color = state->m_pointram[quad_idx++]|(code<<8);
+					UINT8 code = m_pointram[quad_idx++];
+					color = m_pointram[quad_idx++]|(code<<8);
 					for( j=0; j<4; j++ )
 					{
-						UINT8 vi = state->m_pointram[quad_idx++];
+						UINT8 vi = m_pointram[quad_idx++];
 						sx[j] = NAMCOS21_POLY_FRAME_WIDTH/2  + (INT16)pSource[vi*3+0];
 						sy[j] = NAMCOS21_POLY_FRAME_HEIGHT/2 + (INT16)pSource[vi*3+1];
 						zcode[j] = pSource[vi*3+2];
 					}
-					namcos21_DrawQuad( machine, sx, sy, zcode, color&0x7fff );
+					draw_quad(sx, sy, zcode, color&0x7fff);
 					if( code&0x80 )
 					{ /* end-of-quadlist marker */
 						break;
 					}
 				}
 			}
-			state->m_mpDspState->slaveOutputSize = 0;
+			m_mpDspState->slaveOutputSize = 0;
 		}
 		else if( count==0 )
 		{
@@ -847,22 +835,22 @@ RenderSlaveOutput( running_machine &machine, UINT16 data )
 			exit(1);
 		}
 	}
-} /* RenderSlaveOutput */
+}
 
 READ16_MEMBER(namcos21_state::slave_port0_r)
 {
-	return ReadWordFromSlaveInput(space);
-} /* slave_port0_r */
+	return read_word_from_slave_input();
+}
 
 WRITE16_MEMBER(namcos21_state::slave_port0_w)
 {
-	RenderSlaveOutput( machine(), data );
+	render_slave_output(data);
 }
 
 READ16_MEMBER(namcos21_state::slave_port2_r)
 {
-	return GetInputBytesAdvertisedForSlave(machine());
-} /* slave_port2_r */
+	return get_input_bytes_advertised_for_slave();
+}
 
 READ16_MEMBER(namcos21_state::slave_port3_r)
 { /* render-device queue size */
@@ -874,12 +862,12 @@ READ16_MEMBER(namcos21_state::slave_port3_r)
 
 WRITE16_MEMBER(namcos21_state::slave_port3_w)
 { /* 0=busy, 1=ready? */
-} /* slave_port3_w */
+}
 
 WRITE16_MEMBER(namcos21_state::slave_XF_output_w)
 {
 	if (ENABLE_LOGGING) logerror( "0x%x:slaveXF(%d)\n", space.device().safe_pc(), data );
-} /* slave_XF_output_w */
+}
 
 READ16_MEMBER(namcos21_state::slave_portf_r)
 { /* informs BIOS that this is Slave DSP */
@@ -957,12 +945,12 @@ WRITE16_MEMBER(namcos21_state::pointram_control_w)
 	logerror( "\n" );
 #endif
 	m_pointram_idx = 0; /* HACK */
-} /* pointram_control_w */
+}
 
 READ16_MEMBER(namcos21_state::pointram_data_r)
 {
 	return m_pointram[m_pointram_idx];
-} /* pointram_data_r */
+}
 
 WRITE16_MEMBER(namcos21_state::pointram_data_w)
 {
@@ -973,7 +961,7 @@ WRITE16_MEMBER(namcos21_state::pointram_data_w)
 		m_pointram[m_pointram_idx++] = data;
 		m_pointram_idx &= (PTRAM_SIZE-1);
 	}
-} /* pointram_data_w */
+}
 
 
 READ16_MEMBER(namcos21_state::namcos21_depthcue_r)
@@ -1123,19 +1111,17 @@ READ16_MEMBER(namcos21_state::winrun_cuskey_r)
 		break;
 	}
 	return 0;
-} /* winrun_cuskey_r */
+}
 
 WRITE16_MEMBER(namcos21_state::winrun_cuskey_w)
 {
-} /* winrun_cuskey_w */
+}
 
-static void
-winrun_flushpoly( running_machine &machine )
+void namcos21_state::winrun_flush_poly()
 {
-	namcos21_state *state = machine.driver_data<namcos21_state>();
-	if( state->m_winrun_poly_index>0 )
+	if( m_winrun_poly_index>0 )
 	{
-		const UINT16 *pSource = state->m_winrun_poly_buf;
+		const UINT16 *pSource = m_winrun_poly_buf;
 		UINT16 color;
 		int sx[4], sy[4], zcode[4];
 		int j;
@@ -1148,36 +1134,36 @@ winrun_flushpoly( running_machine &machine )
 				sy[j] = NAMCOS21_POLY_FRAME_HEIGHT/2 + (INT16)*pSource++;
 				zcode[j] = *pSource++;
 			}
-			namcos21_DrawQuad( machine, sx, sy, zcode, color&0x7fff );
+			draw_quad(sx, sy, zcode, color&0x7fff);
 		}
 		else
 		{
 			int quad_idx = color*6;
 			for(;;)
 			{
-				UINT8 code = state->m_pointram[quad_idx++];
-				color = state->m_pointram[quad_idx++];
+				UINT8 code = m_pointram[quad_idx++];
+				color = m_pointram[quad_idx++];
 				for( j=0; j<4; j++ )
 				{
-					UINT8 vi = state->m_pointram[quad_idx++];
+					UINT8 vi = m_pointram[quad_idx++];
 					sx[j] = NAMCOS21_POLY_FRAME_WIDTH/2  + (INT16)pSource[vi*3+0];
 					sy[j] = NAMCOS21_POLY_FRAME_HEIGHT/2 + (INT16)pSource[vi*3+1];
 					zcode[j] = pSource[vi*3+2];
 				}
-				namcos21_DrawQuad( machine, sx, sy, zcode, color&0x7fff );
+				draw_quad(sx, sy, zcode, color&0x7fff);
 				if( code&0x80 )
 				{ /* end-of-quadlist marker */
 					break;
 				}
 			}
 		}
-		state->m_winrun_poly_index = 0;
+		m_winrun_poly_index = 0;
 	}
 } /* winrun_flushpoly */
 
 READ16_MEMBER(namcos21_state::winrun_poly_reset_r)
 {
-	winrun_flushpoly(machine());
+	winrun_flush_poly();
 	return 0;
 }
 
@@ -1191,7 +1177,7 @@ WRITE16_MEMBER(namcos21_state::winrun_dsp_render_w)
 	{
 		logerror( "WINRUN_POLY_OVERFLOW\n" );
 	}
-} /* winrun_dsp_render_w */
+}
 
 WRITE16_MEMBER(namcos21_state::winrun_dsp_pointrom_addr_w)
 {
@@ -1209,15 +1195,15 @@ READ16_MEMBER(namcos21_state::winrun_dsp_pointrom_data_r)
 {
 	UINT16 *ptrom = (UINT16 *)memregion("user2")->base();
 	return ptrom[m_winrun_pointrom_addr++];
-} /* winrun_dsp_pointrom_data_r */
+}
 
 WRITE16_MEMBER(namcos21_state::winrun_dsp_complete_w)
 {
 	if( data )
 	{
-		winrun_flushpoly(machine());
+		winrun_flush_poly();
 		m_dsp->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
-		namcos21_ClearPolyFrameBuffer(machine());
+		clear_poly_framebuffer();
 	}
 }
 
@@ -1271,7 +1257,7 @@ WRITE16_MEMBER(namcos21_state::winrun_dspbios_w)
 		memcpy( mem, m_winrun_dspbios, 0x2000 );
 		m_winrun_dsp_alive = 1;
 	}
-} /* winrun_dspbios_w */
+}
 
 //380000 : read : dsp status? 1 = busy
 //380000 : write(0x01) - done before dsp comram init
@@ -2254,19 +2240,18 @@ ROM_START( winrun91 )
 	ROM_LOAD("r911-avo3.11e", 0x180000, 0x80000,CRC(76e22f92) SHA1(0e1b8d35a5b9c20cc3192d935f0c9da1e69679d2) )
 ROM_END
 
-static void namcos21_init( running_machine &machine, int game_type )
+void namcos21_state::init(int game_type)
 {
-	namcos21_state *state = machine.driver_data<namcos21_state>();
-	state->m_gametype = game_type;
-	state->m_pointram = auto_alloc_array(machine, UINT8, PTRAM_SIZE);
-	state->m_mpDataROM = (UINT16 *)state->memregion( "user1" )->base();
-	InitDSP(machine);
-	state->m_mbNeedsKickstart = 20;
+	m_gametype = game_type;
+	m_pointram = auto_alloc_array(machine(), UINT8, PTRAM_SIZE);
+	m_mpDataROM = (UINT16 *)memregion( "user1" )->base();
+	init_dsp();
+	m_mbNeedsKickstart = 20;
 	if( game_type==NAMCOS21_CYBERSLED )
 	{
-		state->m_mbNeedsKickstart = 200;
+		m_mbNeedsKickstart = 200;
 	}
-} /* namcos21_init */
+}
 
 DRIVER_INIT_MEMBER(namcos21_state,winrun)
 {
@@ -2286,18 +2271,18 @@ DRIVER_INIT_MEMBER(namcos21_state,winrun)
 
 DRIVER_INIT_MEMBER(namcos21_state,aircomb)
 {
-	namcos21_init( machine(), NAMCOS21_AIRCOMBAT );
+	init(NAMCOS21_AIRCOMBAT);
 }
 
 DRIVER_INIT_MEMBER(namcos21_state,starblad)
 {
-	namcos21_init( machine(), NAMCOS21_STARBLADE );
+	init(NAMCOS21_STARBLADE);
 }
 
 
 DRIVER_INIT_MEMBER(namcos21_state,cybsled)
 {
-	namcos21_init( machine(), NAMCOS21_CYBERSLED );
+	init(NAMCOS21_CYBERSLED);
 }
 
 DRIVER_INIT_MEMBER(namcos21_state,solvalou)
@@ -2308,7 +2293,7 @@ DRIVER_INIT_MEMBER(namcos21_state,solvalou)
 	mem[0x20cf4/2+1] = 0x4e71;
 	mem[0x20cf4/2+2] = 0x4e71;
 
-	namcos21_init( machine(), NAMCOS21_SOLVALOU );
+	init(NAMCOS21_SOLVALOU );
 }
 
 DRIVER_INIT_MEMBER(namcos21_state,driveyes)
