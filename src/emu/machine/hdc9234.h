@@ -135,10 +135,10 @@ private:
 	floppy_image_device* m_floppy;
 
 	// internal register OUTPUT1
-	UINT8 m_output1;
+	UINT8 m_output1, m_output1_old;
 
 	// internal register OUTPUT2
-	UINT8 m_output2;
+	UINT8 m_output2, m_output2_old;
 
 	// Write the output registers to the latches
 	void auxbus_out();
@@ -391,16 +391,16 @@ private:
 	// Are we on track 0?
 	bool on_track00();
 
+	// Are we using rapid steps (needed to decide to wait for seek complete)
+	bool rapid_steps();
+
+	// Is the currently selected drive a floppy drive?
+	bool using_floppy();
+
 	// Common subprograms READ ID, VERIFY, and DATA TRANSFER
-	void read_id(int& cont, bool implied_seek);
+	void read_id(int& cont, bool implied_seek, bool wait_seek_complete);
 	void verify(int& cont, bool verify_all);
 	void data_transfer(int& cont);
-
-	// Activates the step line
-	void step_on(bool towards00, int next);
-
-	// Clears the step line (after the pulse length time)
-	void step_off(int next);
 
 	// ===================================================
 	//   Commands

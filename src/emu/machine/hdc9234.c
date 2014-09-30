@@ -34,6 +34,7 @@
 #define TRACE_SETREG 0
 #define TRACE_SETPTR 0
 #define TRACE_FORMAT 0
+#define TRACE_READTRACK 0
 
 // Common states
 #define TRACE_READID 0
@@ -59,23 +60,26 @@
 
 #define UNRELIABLE_MEDIA 0
 
-// Not implemented:
-// Poll drives
-// Seek/Read ID
-// Read track
-// Write long (variant of the write operation, selectable by MODE register)
-// Tape operations
+/*
+   === Not implemented ===
+   ECC
+   Write long (see MODE register; only useful with ECC)
+   Tape operations
+   Hard disk operation
 
-// Untested:
-// Multi-sector read/write
-// Seek complete
-// Read/write sectors physical
-
-// TDF
+   === Implemented but untested ===
+   Burst mode
+   Restore
+   Poll drives
+   Seek/Read ID
+   Multi-sector read/write
+   Usage of seek complete
+   Read/write sectors physical
+   Read track
+*/
 
 /*
-    Register names of the HDC. The left part is the set of write registers,
-    while the right part are the read registers.
+    Some registers of the HDC.
 
             +------+------+------+------+------+------+------+------+
     DHEAD:  |   0  | Sector size |  0   |   Desired head  (OUTPUT2) |  AT mode
@@ -299,19 +303,23 @@ enum
 
 	STEP_ON,
 	STEP_OFF,
-	RESTORE_CHECK1,
-	RESTORE_CHECK2,
+	RESTORE_CHECK,
+	WAIT_SEEK_COMPLETE,
 	SEEK_COMPLETE,
 	HEAD_DELAY,
 	WAITINDEX0,
 	WAITINDEX1,
 	TRACKSTART,
 	TRACKDONE,
+	POLL1,
+	POLL2,
+	POLL3,
 
 	READ_ID = 0x40,
 	READ_ID1,
 	READ_ID_STEPON,
 	READ_ID_STEPOFF,
+	READ_ID_SEEK_COMPLETE,
 
 	VERIFY = 0x50,
 	VERIFY1,
@@ -366,6 +374,10 @@ enum
 	WRITE_DATA_CRC,
 	WRITE_DONE,
 	WRITE_HEADER_CRC,
+
+	READ_TRACK,
+	READ_TRACK_ID,
+	READ_TRACK_ID_DONE,
 
 	NO_DMA_ACK
 };
@@ -476,6 +488,7 @@ int hdc9234_device::current_head()
 
 int hdc9234_device::current_cylinder()
 {
+	int abc = 0;
 	return (m_register_r[CURRENT_CYLINDER] & 0xff) | (m_register_r[CURRENT_HEAD] & 0x70);
 }
 
@@ -489,66 +502,67 @@ UINT8 hdc9234_device::current_command()
 	return m_register_w[COMMAND];
 }
 
-/*
-    Set/clear INT
-
-    Interupts are generated in the following occasions:
-    - when the DONE bit is set to 1 in the ISR and ST_DONE is set to 1
-    - when the READY_CHANGE bit is set to 1 in the ISR and ST_RDYCHNG is set to 1
-    (ready change: 1->0 or 0->1)
-*/
-void hdc9234_device::set_interrupt(line_state intr)
+bool hdc9234_device::using_floppy()
 {
-	if (intr == ASSERT_LINE)
-	{
-		// Only if there is not already a pending interrupt
-		if ((m_register_r[INT_STATUS] & ST_INTPEND) == 0)
-		{
-			m_register_r[INT_STATUS] |= ST_INTPEND;
-			m_out_intrq(intr);
-		}
-	}
+	return (m_selected_drive_type == TYPE_FLOPPY5 || m_selected_drive_type == TYPE_FLOPPY8);
+}
+
+/*
+    Delivers the step time (in microseconds) minus the pulse width
+*/
+int hdc9234_device::step_time()
+{
+	int time = 0;
+	int index = m_register_w[MODE] & MO_STEPRATE;
+	// Get seek time.
+	if (m_selected_drive_type == TYPE_FLOPPY8)
+		time = step_flop8[index] - pulse_flop8;
+
+	else if (m_selected_drive_type == TYPE_FLOPPY5)
+		time = step_flop5[index] - pulse_flop5;
 	else
-	{
-		// if there is a pending interrupt
-		if ((m_register_r[INT_STATUS] & ST_INTPEND) != 0)
-			m_out_intrq(intr);
-	}
+		time = step_hd[index] - pulse_hd;
+
+	if (fm_mode()) time = time * 2;
+	return time;
 }
 
 /*
-    Assert Command Done status bit, triggering interrupts as needed
+    Delivers the pulse width time (in microseconds)
 */
-void hdc9234_device::set_command_done(int flags)
+int hdc9234_device::pulse_width()
 {
-	set_bits(m_register_r[INT_STATUS], ST_DONE, true);
+	int time = 0;
+	// Get seek time.
+	if (m_selected_drive_type == TYPE_FLOPPY8)
+		time = pulse_flop8;
 
-	if (flags != -1)
-	{
-		set_bits(m_register_r[INT_STATUS], ST_TERMCOD, false); // clear the previously set flags
-		m_register_r[INT_STATUS] |= flags;
-		if (TRACE_DONE) logerror("%s: command %02x done, flags=%02x\n", tag(), current_command(), flags);
-	}
+	else if (m_selected_drive_type == TYPE_FLOPPY5)
+		time = pulse_flop5;
 	else
-	{
-		if (TRACE_DONE) logerror("%s: command %02x done\n", tag(), current_command());
-	}
+		time = pulse_hd;
 
-	// [1], p. 6
-	if (TRACE_INT) logerror("%s: Raise interrupt DONE\n", tag());
-	set_interrupt(ASSERT_LINE);
+	if (fm_mode()) time = time * 2;
+	return time;
+}
 
-	m_substate = UNDEF;
-	m_executing = false;
+bool hdc9234_device::rapid_steps()
+{
+	return (m_register_w[MODE] & MO_STEPRATE) == 0;
 }
 
 /*
-    Preserve previously set termination code
+    Delivers the sector size
 */
-void hdc9234_device::set_command_done()
+int hdc9234_device::calc_sector_size()
 {
-	set_command_done(-1);
+	return 128 << (m_register_r[CURRENT_SIZE] & 3);
 }
+
+// ===========================================================================
+//    Wait handling
+//    We can wait for a given time period or for a line to be set or cleared
+// ===========================================================================
 
 void hdc9234_device::wait_time(emu_timer *tm, int microsec, int next_substate)
 {
@@ -562,6 +576,17 @@ void hdc9234_device::wait_time(emu_timer *tm, attotime delay, int param)
 	if (TRACE_DELAY) logerror("%s: [%s] Delaying by %4.2f microsecs\n", tag(), ttsn().cstr(), delay.as_double()*1000000);
 	tm->adjust(delay);
 	m_substate = param;
+}
+
+/*
+    Set the hook for line level handling
+*/
+void hdc9234_device::wait_line(int line, line_state level, int substate, bool stopwrite)
+{
+	m_event_line = line;
+	m_line_level = level;
+	m_state_after_line = substate;
+	m_stopwrite = stopwrite;
 }
 
 // ==================================================================
@@ -578,7 +603,7 @@ void hdc9234_device::wait_time(emu_timer *tm, attotime delay, int param)
     (must have saved that value before!)
     - steps to that location during OUTPUT2 times
 */
-void hdc9234_device::read_id(int& cont, bool implied_seek)
+void hdc9234_device::read_id(int& cont, bool implied_seek, bool wait_seek_complete)
 {
 	cont = CONTINUE;
 
@@ -590,12 +615,13 @@ void hdc9234_device::read_id(int& cont, bool implied_seek)
 			// Implied seek: Enter the READ_ID subprogram.
 			if (TRACE_READID && TRACE_SUBSTATES) logerror("%s: substate READ_ID\n", tag());
 
-			m_substate = implied_seek? READ_ID1 : VERIFY;
-
 			// First step: Search the next IDAM, and if found, read the
 			// ID values into the registers
-			// Depending on the implied seek flag, continue with the read_id,
+
+			// Depending on the implied seek flag, continue with read_id,
 			// else switch to verify.
+			m_substate = implied_seek? READ_ID1 : VERIFY;
+
 			m_live_state.bit_count_total = 0;
 			live_start(SEARCH_IDAM);
 			cont = WAIT;
@@ -638,8 +664,18 @@ void hdc9234_device::read_id(int& cont, bool implied_seek)
 			// Any more steps left?
 			if (m_track_delta == 0)
 			{
-				m_substate = VERIFY;
-				cont = NEXT;
+				if (wait_seek_complete)
+				{
+					// We have to wait for SEEK COMPLETE
+					wait_line(SEEKCOMP_LINE, ASSERT_LINE, READ_ID_SEEK_COMPLETE, false);
+					cont = WAIT;
+				}
+				else
+				{
+					// We do not wait for SEEK COMPLETE
+					m_substate = VERIFY;
+					cont = NEXT;
+				}
 				break;
 			}
 
@@ -647,7 +683,6 @@ void hdc9234_device::read_id(int& cont, bool implied_seek)
 			// STEPDIR = 0 -> towards TRK00
 			set_bits(m_output2, OUT2_STEPDIR, (m_track_delta>0));
 			set_bits(m_output2, OUT2_STEPPULSE, true);
-			auxbus_out();
 			wait_time(m_timer, pulse_width(), READ_ID_STEPOFF);
 			cont = WAIT;
 			break;
@@ -655,11 +690,15 @@ void hdc9234_device::read_id(int& cont, bool implied_seek)
 		case READ_ID_STEPOFF:
 			if (TRACE_READID && TRACE_SUBSTATES) logerror("%s: substate STEP_OFF\n", tag());
 			set_bits(m_output2, OUT2_STEPPULSE, false);
-			auxbus_out();
 			m_track_delta += (m_track_delta<0)? 1 : -1;
 			// Return to STEP_ON, check whether there are more steps
 			wait_time(m_timer, step_time(), READ_ID_STEPON);
 			cont = WAIT;
+			break;
+
+		case READ_ID_SEEK_COMPLETE:
+			m_substate = VERIFY;
+			cont = NEXT;
 			break;
 
 		default:
@@ -958,69 +997,73 @@ void hdc9234_device::data_transfer(int& cont)
 
 /*
     RESET
+    Reset the controller. This has the same effect as asserting the RST* input line.
+
+    Command word
+
+       7     6     5     4     3     2     1     0
+    +-----+-----+-----+-----+-----+-----+-----+-----+
+    |  0  |  0  |  0  |  0  |  0  |  0  |  0  |  0  |
+    +-----+-----+-----+-----+-----+-----+-----+-----+
+
 */
 void hdc9234_device::reset_controller()
 {
 	logerror("%s: RESET command\n", tag());
 	device_reset();
 }
+
 /*
     DESELECT DRIVE
+    Deselect all drives.
+
+    Command word
+
+       7     6     5     4     3     2     1     0
+    +-----+-----+-----+-----+-----+-----+-----+-----+
+    |  0  |  0  |  0  |  0  |  0  |  0  |  0  |  1  |
+    +-----+-----+-----+-----+-----+-----+-----+-----+
 */
 void hdc9234_device::drive_deselect()
 {
 	if (TRACE_SELECT) logerror("%s: DESELECT command\n", tag());
 	m_selected_drive_number = NODRIVE;
-	auxbus_out();
 	set_command_done(TC_SUCCESS);
 }
 
 /*
-    // RESTORE DRIVE
-    // bit 0:
-    // 0 -> command ends after last seek pulse,
-    // 1 -> command ends when the drive asserts the seek complete pin
+    RESTORE DRIVE
+    Moves the heads to cylinder 0. If skcom is set, the command terminates
+    after the SEEK COMPLETE line is set.
+
+    Command word
+
+       7     6     5     4     3     2     1     0
+    +-----+-----+-----+-----+-----+-----+-----+-----+
+    |  0  |  0  |  0  |  0  |  0  |  0  |  1  |skcom|
+    +-----+-----+-----+-----+-----+-----+-----+-----+
 */
 void hdc9234_device::restore_drive()
 {
 	int cont = CONTINUE;
+	bool buffered_step = current_command() & 1;
 
 	// The substate is set to UNDEF when the command is started;
-	// when we return here after a pause, the substate is set to some other value
+	// when we reenter the command processing after a pause, the substate is set to some other value
 	// In wd_fdc this is solved using two methods <command>_start and <command>_continue
+
 	if (m_substate == UNDEF)
 	{
 		if (TRACE_RESTORE) logerror("%s: RESTORE command %02x\n", tag(), current_command());
 		m_seek_count = 0;
-		m_substate = RESTORE_CHECK1;
+		m_substate = RESTORE_CHECK;
 	}
 
 	while (cont==CONTINUE)
 	{
 		switch (m_substate)
 		{
-		case RESTORE_CHECK1:
-			if (TRACE_RESTORE && TRACE_SUBSTATES) logerror("%s: substate RESTORE_CHECK; seek count = %d\n", tag(), m_seek_count);
-			// If the drive is on track 0 or not ready (no drive), terminate the command
-			if (on_track00())
-			{
-				if (TRACE_RESTORE) logerror("%s: restore command TRK00 reached\n", tag());
-				if (current_command() & 1)
-				{
-					// Buffered seek; wait for SEEK_COMPLETE
-					wait_line(SEEKCOMP_LINE, ASSERT_LINE, SEEK_COMPLETE, false);
-					cont = WAIT;
-				}
-				else
-				{
-					cont = SUCCESS;
-				}
-				break;
-			}
-			m_substate = RESTORE_CHECK2;
-			break;
-
-		case RESTORE_CHECK2:
+		case RESTORE_CHECK:
 			// Track 0 has not been reached yet
 			if ((m_register_r[DRIVE_STATUS] & HDC_DS_READY)==0)
 			{
@@ -1031,27 +1074,59 @@ void hdc9234_device::restore_drive()
 				break;
 			}
 
+			// Are we done?
+			if (m_seek_count>=4096 || on_track00())
+			{
+				if (buffered_step)
+				{
+					// When we have buffered steps, the seek limit will be reached
+					// before TRK00 is asserted. In that case we have to wait for
+					// SEEK_COMPLETE. We also wait as soon as TRK00 is asserted.
+					wait_line(SEEKCOMP_LINE, ASSERT_LINE, SEEK_COMPLETE, false);
+					cont = WAIT;
+				}
+				else
+				{
+					// No buffered seek. If the seek limit has been reached
+					// and TRK00 is not true, we failed. This will be decided below.
+					m_substate = SEEK_COMPLETE;
+				}
+			}
+			else m_substate = STEP_ON;
+			break;
+
+		case STEP_ON:
+			if (TRACE_RESTORE && TRACE_SUBSTATES) logerror("%s: substate STEP_ON\n", tag());
+
 			// Increase step count
 			m_seek_count++;
-			if (m_seek_count>=4096)
-			{
-				if (TRACE_FAIL) logerror("%s: restore command: failed to reach track 00\n", tag());
-				set_command_done(TC_VRFYERR);
-				cont = ERROR;
-				break;
-			}
 
-			step_on(true, STEP_OFF);
+			// STEPDIR = 0 -> towards TRK00
+			set_bits(m_output2, OUT2_STEPDIR, false);
+
+			// Raising edge (note that all signals must be inverted before leading them to the drive)
+			set_bits(m_output2, OUT2_STEPPULSE, true);
+			wait_time(m_timer, pulse_width(), STEP_OFF);
 			cont = WAIT;
 			break;
 
 		case STEP_OFF:
-			step_off(RESTORE_CHECK1);
+			if (TRACE_RESTORE && TRACE_SUBSTATES) logerror("%s: substate STEP_OFF\n", tag());
+			set_bits(m_output2, OUT2_STEPPULSE, false);
+			wait_time(m_timer, step_time(), RESTORE_CHECK);
 			cont = WAIT;
 			break;
 
 		case SEEK_COMPLETE:
-			cont = SUCCESS;
+			// If TRK00 is not set, the drive failed to reach it.
+			if (!on_track00())
+			{
+				if (TRACE_FAIL) logerror("%s: restore command: failed to reach track 00\n", tag());
+				set_command_done(TC_VRFYERR);
+				cont = ERROR;
+			}
+			else
+				cont = SUCCESS;
 			break;
 		}
 	}
@@ -1060,6 +1135,16 @@ void hdc9234_device::restore_drive()
 
 /*
     STEP IN / OUT 1 CYLINDER
+    Move the heads 1 step towards the center (in) or towards the outermost
+    track (out).
+
+    Command word
+
+         7     6     5     4     3     2     1     0
+      +-----+-----+-----+-----+-----+-----+-----+-----+
+      |  0  |  0  |  0  |  0  |  0  |  1  | out |skcom|
+      +-----+-----+-----+-----+-----+-----+-----+-----+
+
 */
 void hdc9234_device::step_drive()
 {
@@ -1076,13 +1161,29 @@ void hdc9234_device::step_drive()
 		switch (m_substate)
 		{
 		case STEP_ON:
-			step_on((current_command() & 0x02)!=0, STEP_OFF);
+			if (TRACE_STEP && TRACE_SUBSTATES) logerror("%s: substate STEP_ON\n", tag());
+
+			// STEPDIR = 0 -> towards TRK00
+			set_bits(m_output2, OUT2_STEPDIR, (current_command() & 0x02)==0);
+
+			// Raising edge (note that all signals must be inverted before leading them to the drive)
+			set_bits(m_output2, OUT2_STEPPULSE, true);
+			wait_time(m_timer, pulse_width(), STEP_OFF);
 			cont = WAIT;
 			break;
+
 		case STEP_OFF:
-			step_off(DONE);
+			if (TRACE_STEP && TRACE_SUBSTATES) logerror("%s: substate STEP_OFF\n", tag());
+			set_bits(m_output2, OUT2_STEPPULSE, false);
+			wait_time(m_timer, step_time(), ((current_command() & 0x01)!=0)? WAIT_SEEK_COMPLETE : DONE);
 			cont = WAIT;
 			break;
+
+		case WAIT_SEEK_COMPLETE:
+			wait_line(SEEKCOMP_LINE, ASSERT_LINE, DONE, false);
+			cont = WAIT;
+			break;
+
 		case DONE:
 			cont = SUCCESS;
 			break;
@@ -1103,29 +1204,102 @@ void hdc9234_device::tape_backup()
 
 /*
     POLL DRIVES
-    Not implemented
-*/
-void hdc9234_device::poll_drives()
-{
-	logerror("%s: POLL DRIVES command %02x not implemented\n", tag(), current_command());
-	set_command_done(TC_SUCCESS);
-}
-
-/*
-    DRIVE SELECT
+    Repeat
+     - i = i+1 % 4
+     - select drive if its bit is set in the command word
+    until seek_complete is true.
 
     Command word
 
             7     6     5     4     3     2     1     0
          +-----+-----+-----+-----+-----+-----+-----+-----+
-         |  0  |  0  |  1  |Delay|    Type   |   Drive   |
+         |  0  |  0  |  0  |  1  | Drv3| Drv2| Drv1| Drv0|
          +-----+-----+-----+-----+-----+-----+-----+-----+
 
-     [1] p.5: lower 4 bits of RETRY COUNT register (user programmable output) is put on OUTPUT1
+    This command only sets the select lines but does not process parameters
+    like head load times or drive types.
+*/
+void hdc9234_device::poll_drives()
+{
+	UINT8 drivebit = 0;
+	if (m_substate == UNDEF)
+	{
+		logerror("%s: POLL DRIVES command %02x\n", tag(), current_command());
+		m_substate = POLL1;
+		m_selected_drive_number = 0;
+		// If there is no selection, do not enter the loop
+		if ((current_command() & 0x0f)==0) m_substate = DONE;
+	}
 
-     The HFDC controller board uses the user programmable output to
-     select one of four floppy disk drives with Drive set to 00.
-     Drive codes 01, 10, and 11 remain for three hard disk drives.
+	int cont = CONTINUE;
+
+	while (cont==CONTINUE)
+	{
+		switch (m_substate)
+		{
+		case POLL1:
+			drivebit = (1 << m_selected_drive_number) & 0x0f;
+
+			if ((current_command() & drivebit) != 0)
+			{
+				// Test this drive
+				m_register_r[CHIP_STATUS] = (m_register_r[CHIP_STATUS] & 0xfc) | m_selected_drive_number;
+
+				m_output1 = (drivebit << 4) | (m_register_w[RETRY_COUNT]&0x0f);
+				if (TRACE_AUXBUS) logerror("%s: Setting OUTPUT1 to %02x\n", tag(), m_output1);
+				wait_time(m_timer, 1, POLL2);   // Wait for 1 usec
+				cont = WAIT;
+			}
+			else
+				m_substate = POLL3;
+
+			break;
+
+		case POLL2:
+			if ((m_register_r[DRIVE_STATUS] & HDC_DS_SKCOM)!=0)
+			{
+				// Seek complete has been set
+				m_substate = DONE;
+				// Selected drive is still found in the chip status register
+			}
+			else m_substate = POLL3;
+			break;
+
+		case POLL3:
+			m_selected_drive_number = (m_selected_drive_number + 1) & 0x03;
+			m_substate = POLL1;
+			break;
+
+		case DONE:
+			cont = SUCCESS;
+			break;
+		}
+	}
+
+	if (cont==SUCCESS) set_command_done(TC_SUCCESS);
+}
+
+/*
+    DRIVE SELECT
+    Selects a drive. With this command, parameters for the drive are also
+    defined, like the type of drive (Floppy 8" or 5", AT Hard disk, or generic
+    Hard disk), the drive number, and the head load delay.
+
+    On the next OUTPUT1 time, the number of the drive (one of four lines)
+    is set on the higher four bits of the auxiliary bus. Also, the lower
+    4 bits of the RETRY COUNT register are put on the lower 4 bits of the bus
+    (user-programmable output, [1] p. 5).
+
+    The HFDC controller board uses the user-programmable output to
+    select one of four floppy disk drives with Drive set to 00.
+    Drive codes 01, 10, and 11 remain for three hard disk drives.
+
+     Command word
+
+            7     6     5     4     3     2     1     0
+         +-----+-----+-----+-----+-----+-----+-----+-----+
+         |  0  |  0  |  1  |Delay|    Type   |   Drive   |
+         +-----+-----+-----+-----+-----+-----+-----+-----+
 */
 
 void hdc9234_device::drive_select()
@@ -1162,9 +1336,6 @@ void hdc9234_device::drive_select()
 		m_output1 = (m_selected_drive_number != NODRIVE)? (0x10 << m_selected_drive_number) : 0;
 		m_output1 |= (m_register_w[RETRY_COUNT]&0x0f);
 		if (TRACE_AUXBUS) logerror("%s: Setting OUTPUT1 to %02x\n", tag(), m_output1);
-
-		auxbus_out();
-
 		m_substate = (head_load_delay>0)? HEAD_DELAY : DONE;
 	}
 
@@ -1208,12 +1379,57 @@ void hdc9234_device::set_register_pointer()
 
 /*
     SEEK / READ ID
-    Not implemented
+    This command is used to move the head to the desired cylinder.
+    Depending on the Verify setting, the target sector is sought on the
+    track, else the command terminates after the step pulses have been issued.
+
+    Command word
+
+            7     6     5     4     3     2     1     0
+         +-----+-----+-----+-----+-----+-----+-----+-----+
+         |  0  |  1  |  0  |  1  |  0  | Step| Seek| Verf|
+         +-----+-----+-----+-----+-----+-----+-----+-----+
+
+    All combinations of flags are legal ([1], p.12).
 */
 void hdc9234_device::seek_read_id()
 {
-	logerror("%s: SEEK / READ ID command %02x not implemented\n", tag(), current_command());
-	set_command_done(TC_SUCCESS);
+	if (m_substate == UNDEF)
+	{
+		// Command init
+		if (TRACE_READ) logerror("%s: SEEK / READ ID command %02x, CHS=(%d,%d,%d)\n", tag(), current_command(), desired_cylinder(), desired_head(), desired_sector());
+		m_substate = READ_ID;
+	}
+
+	int cont = NEXT;
+	bool step_enable = (current_command() & 0x04)==1;
+	bool wait_seek_comp = ((current_command() & 0x02)==1) || rapid_steps();
+	bool do_verify = (current_command() & 0x01)==1;
+
+	while (cont == NEXT)
+	{
+		switch (m_substate & 0xf0)
+		{
+		case READ_ID:
+			read_id(cont, step_enable, wait_seek_comp);
+			break;
+		case VERIFY:
+			if (!do_verify)
+				cont = SUCCESS;
+			else
+				verify(cont, true);
+			break;
+		case DATA_TRANSFER:
+			// No data transfer here. Just exit.
+			cont = SUCCESS;
+			break;
+		default:
+			logerror("%s: unknown substate %d in seek_read_id\n", tag(), m_substate);
+			cont = ERROR;
+		}
+	}
+
+	if (cont==SUCCESS) set_command_done(TC_SUCCESS);
 }
 
 /*
@@ -1229,8 +1445,13 @@ void hdc9234_device::seek_read_id()
     Logical:
     For multiple sectors, read the sectors in ascending order of their sector field (sector n, n+1, n+2 ...).
 
-    Command flags
-       [ 0 ]  [ 1 ]  [ 0 ]  [ 1 ]   [ 1 ] [ Logical ] [ NoImplSeek ] [ Transfer ]
+    Command word
+
+       7     6     5     4     3      2       1       0
+    +-----+-----+-----+-----+-----+--------+------+------+
+    |  0  |  1  |  0  |  1  |  1  | Logical|NoSeek| Trans|
+    +-----+-----+-----+-----+-----+--------+------+------+
+
 */
 void hdc9234_device::read_sectors()
 {
@@ -1255,7 +1476,7 @@ void hdc9234_device::read_sectors()
 		switch (m_substate & 0xf0)
 		{
 		case READ_ID:
-			read_id(cont, implied_seek);
+			read_id(cont, implied_seek, rapid_steps());
 			break;
 		case VERIFY:
 			verify(cont, logical);  // for physical, only verify the first sector
@@ -1272,12 +1493,64 @@ void hdc9234_device::read_sectors()
 
 /*
     READ TRACK
-    Not implemented
+    Read all ID and data fields as they appear on the track. Command 5A only
+    transmits the ID fields via DMA, which 5B transmits all ID and data fields.
+    Note that the specifications do not mention any gaps to be transmitted as
+    well.
+
+    Command word
+
+       7     6     5     4     3     2     1      0
+    +-----+-----+-----+-----+-----+-----+-----+------+
+    |  0  |  1  |  0  |  1  |  1  |  0  |  1  |  All |
+    +-----+-----+-----+-----+-----+-----+-----+------+
+
 */
 void hdc9234_device::read_track()
 {
-	logerror("%s: READ TRACK command %02x not implemented\n", tag(), current_command());
-	set_command_done(TC_SUCCESS);
+	if (m_substate == UNDEF)
+	{
+		if (TRACE_READTRACK) logerror("%s: READ TRACK command %02x, head = %d\n", tag(), current_command(), desired_head());
+		dma_address_out(m_register_w[DMA23_16], m_register_w[DMA15_8], m_register_w[DMA7_0]);
+		m_transfer_enabled = (current_command() & 1)!=0;
+	}
+
+	int cont = NEXT;
+	while (cont == NEXT)
+	{
+		switch (m_substate)
+		{
+		case WAITINDEX0:
+			// Do we happen to have an index hole right now?
+			if ((m_register_r[DRIVE_STATUS] & HDC_DS_INDEX)==0)
+			{
+				m_substate = WAITINDEX1;
+			}
+			else
+			{
+				// Waiting for the index line going down
+				wait_line(INDEX_LINE, ASSERT_LINE, WAITINDEX1, false);
+				cont = WAIT;
+			}
+			break;
+		case WAITINDEX1:
+			// Waiting for the next rising edge
+			wait_line(INDEX_LINE, ASSERT_LINE, TRACKSTART, false);
+			cont = WAIT;
+			break;
+		case TRACKSTART:
+			live_start(READ_TRACK);
+			wait_line(INDEX_LINE, ASSERT_LINE, TRACKDONE, true);
+			cont = WAIT;
+			break;
+		case TRACKDONE:
+			if (TRACE_READTRACK && TRACE_SUBSTATES) logerror("%s: Track reading done\n", tag());
+			cont = SUCCESS;
+			break;
+		}
+	}
+
+	if (cont==SUCCESS) set_command_done(TC_SUCCESS);
 }
 
 /*
@@ -1330,8 +1603,12 @@ void hdc9234_device::read_track()
     7 and 8 must be repeated. If the DESIRED_HEAD register must be updated,
     the complete setup process must be done.
 
-    Command flags
-    [  0  ] [  1  ] [  1  ] [ NormalData ] [ ReducedWC ] [ PreC2, PreC1, PreC0 ]
+    Command word
+
+       7     6     5     4      3     2     1      0
+    +-----+-----+-----+------+-----+-----+-----+------+
+    |  0  |  1  |  1  |Normal|RedWC|  Precompensation |
+    +-----+-----+-----+------+-----+-----+-----+------+
 */
 void hdc9234_device::format_track()
 {
@@ -1419,8 +1696,12 @@ void hdc9234_device::format_track()
     For multiple sectors, write the sectors in ascending order of their
     sector field (sector n, n+1, n+2 ...).
 
-    Command flags
-       [  1  ] [ NoImplSeek ] [  Logical  ]  [ NormalData ]  [ ReducedWC ]  [ PreC2, PreC1, PreC0 ]
+    Command word
+
+       7      6      5      4      3     2     1      0
+    +-----+------+-------+------+-----+-----+-----+------+
+    |  1  |NoSeek|Logical|Normal|RedWC|  Precompensation |
+    +-----+------+-------+------+-----+-----+-----+------+
 
 */
 void hdc9234_device::write_sectors()
@@ -1452,7 +1733,7 @@ void hdc9234_device::write_sectors()
 		switch (m_substate & 0xf0)
 		{
 		case READ_ID:
-			read_id(cont, implied_seek);
+			read_id(cont, implied_seek, rapid_steps());
 			break;
 		case VERIFY:
 			verify(cont, logical);
@@ -1466,95 +1747,6 @@ void hdc9234_device::write_sectors()
 			cont = ERROR;
 		}
 	}
-}
-
-void hdc9234_device::reenter_command_processing()
-{
-	// Do we have a live run on the track?
-	if (m_live_state.state != IDLE)
-	{
-		// Continue with it
-		live_run();
-		if (m_live_state.state != IDLE)  return;
-	}
-
-	// We're here when there is no live_run anymore
-	// Where were we last time?
-	// Take care not to restart commands because of the index callback
-	if (m_executing && m_substate != UNDEF) (this->*m_command)();
-}
-
-// ===========================================================================
-
-/*
-    Step on / off; used by RESTORE and STEP IN/OUT
-*/
-void hdc9234_device::step_on(bool towards00, int next)
-{
-	if ((TRACE_RESTORE | TRACE_STEP) && TRACE_SUBSTATES) logerror("%s: substate STEP_ON\n", tag());
-
-	// STEPDIR = 0 -> towards TRK00
-	set_bits(m_output2, OUT2_STEPDIR, !towards00);
-
-	// Raising edge (note that all signals must be inverted before leading them to the drive)
-	set_bits(m_output2, OUT2_STEPPULSE, true);
-	auxbus_out();
-	wait_time(m_timer, pulse_width(), next);
-}
-
-void hdc9234_device::step_off(int next)
-{
-	if ((TRACE_RESTORE | TRACE_STEP) && TRACE_SUBSTATES) logerror("%s: substate STEP_OFF\n", tag());
-	set_bits(m_output2, OUT2_STEPPULSE, false);
-	auxbus_out();
-	wait_time(m_timer, step_time(), next);
-}
-
-/*
-    Delivers the step time (in microseconds) minus the pulse width
-*/
-int hdc9234_device::step_time()
-{
-	int time = 0;
-	int index = m_register_w[MODE] & MO_STEPRATE;
-	// Get seek time.
-	if (m_selected_drive_type == TYPE_FLOPPY8)
-		time = step_flop8[index] - pulse_flop8;
-
-	else if (m_selected_drive_type == TYPE_FLOPPY5)
-		time = step_flop5[index] - pulse_flop5;
-	else
-		time = step_hd[index] - pulse_hd;
-
-	if (fm_mode()) time = time * 2;
-	return time;
-}
-
-/*
-    Delivers the pulse width time (in microseconds)
-*/
-int hdc9234_device::pulse_width()
-{
-	int time = 0;
-	// Get seek time.
-	if (m_selected_drive_type == TYPE_FLOPPY8)
-		time = pulse_flop8;
-
-	else if (m_selected_drive_type == TYPE_FLOPPY5)
-		time = pulse_flop5;
-	else
-		time = pulse_hd;
-
-	if (fm_mode()) time = time * 2;
-	return time;
-}
-
-/*
-    Delivers the sector size
-*/
-int hdc9234_device::calc_sector_size()
-{
-	return 128 << (m_register_r[CURRENT_SIZE] & 3);
 }
 
 /*
@@ -1667,7 +1859,7 @@ void hdc9234_device::live_run_until(attotime limit)
 			// We're doing this complicated logerror check to avoid
 			// repeated logging in the same state. This can be found for the
 			// other live states as well. m_last_live_state is only used to
-			// control this loggind.
+			// control this logging.
 
 			if (TRACE_LIVE && m_last_live_state != SEARCH_IDAM)
 			{
@@ -1807,9 +1999,14 @@ void hdc9234_device::live_run_until(attotime limit)
 			if(slot > 4)
 			{
 				// We successfully read the ID fields; let's wait for the machine time to catch up.
-				// Live run is done here; it is the main state machine's turn again.
 				m_live_state.bit_count_total = 0;
-				wait_for_realtime(IDLE);
+
+				if ((current_command() & 0xfe) == 0x5a)
+					// Continue if we're reading a complete track
+					wait_for_realtime(READ_TRACK_ID_DONE);
+				else
+					// Live run is done here; it is the main state machine's turn again.
+					wait_for_realtime(IDLE);
 				return;
 			}
 			break;
@@ -1949,8 +2146,13 @@ void hdc9234_device::live_run_until(attotime limit)
 			{
 				if ((m_live_state.bit_counter & 15)== 1)
 				{
-					set_bits(m_register_r[INT_STATUS], ST_OVRUN, true);
-					m_out_dmarq(ASSERT_LINE);
+					// For floppies, request DMA for each byte. For hard disk, get it
+					// only for the first byte and then keep the bus until the last byte.
+					if (using_floppy() || m_live_state.bit_counter < 16)
+					{
+						set_bits(m_register_r[INT_STATUS], ST_OVRUN, true);
+						m_out_dmarq(ASSERT_LINE);
+					}
 				}
 			}
 
@@ -1971,8 +2173,16 @@ void hdc9234_device::live_run_until(attotime limit)
 				// CRC
 				if (slot == calc_sector_size()+1)
 				{
-					if (TRACE_LIVE) logerror("%s: [%s] Sector read completed\n", tag(),tts(m_live_state.time).cstr());
-					wait_for_realtime(IDLE);
+					if ((current_command() & 0xfe)==0x5a)
+					{
+						// Reading a track? Continue with next ID.
+						wait_for_realtime(READ_TRACK_ID);
+					}
+					else
+					{
+						if (TRACE_LIVE) logerror("%s: [%s] Sector read completed\n", tag(),tts(m_live_state.time).cstr());
+						wait_for_realtime(IDLE);
+					}
 					return;
 				}
 			}
@@ -1998,11 +2208,18 @@ void hdc9234_device::live_run_until(attotime limit)
 			if (m_transfer_enabled)
 			{
 				m_register_r[DATA] = m_register_w[DATA] = m_live_state.data_reg;
-				m_out_dip(ASSERT_LINE);
-				m_out_dma(0, m_register_r[DATA], 0xff);
-				m_out_dip(CLEAR_LINE);
+				// See above: For floppy, do it for each byte; for hard disk, only for the first byte,
+				if (using_floppy() || m_live_state.bit_counter == 16)
+					m_out_dip(ASSERT_LINE);
 
-				m_out_dmarq(CLEAR_LINE);
+				m_out_dma(0, m_register_r[DATA], 0xff);
+
+				// And again, for floppies, clear line after writing each byte, for hard disk, only after the last byte
+				if (using_floppy() || (m_live_state.bit_counter >> 4)==calc_sector_size()-1)
+				{
+					m_out_dip(CLEAR_LINE);
+					m_out_dmarq(CLEAR_LINE);
+				}
 			}
 
 			m_live_state.state = READ_SECTOR_DATA;
@@ -2078,16 +2295,23 @@ void hdc9234_device::live_run_until(attotime limit)
 				}
 				else
 				{
-					m_out_dip(ASSERT_LINE);
+					// For floppies, set this for each byte; for hard disk, set it only at the beginning
+					if (using_floppy() || m_live_state.byte_counter == calc_sector_size())
+						m_out_dip(ASSERT_LINE);
+
 					m_register_r[DATA] = m_register_w[DATA] = m_in_dma(0, 0xff);
-					m_out_dip(CLEAR_LINE);
-					m_out_dmarq(CLEAR_LINE);
+
+					if (using_floppy() || m_live_state.byte_counter == 0)
+					{
+						m_out_dip(CLEAR_LINE);
+						m_out_dmarq(CLEAR_LINE);
+					}
 
 					if (m_live_state.byte_counter > 0)
 					{
 						m_live_state.byte_counter--;
 						write_on_track(encode(m_register_r[DATA]), 1, WRITE_SECDATA);
-						m_out_dmarq(ASSERT_LINE);
+						if (using_floppy()) m_out_dmarq(ASSERT_LINE);
 					}
 					else
 					{
@@ -2231,9 +2455,14 @@ void hdc9234_device::live_run_until(attotime limit)
 				m_out_dip(ASSERT_LINE);
 				m_live_state.byte_counter--;
 				UINT8 headbyte = m_in_dma(0, 0xff);
+
 				write_on_track(encode(headbyte), 1, (m_live_state.byte_counter>0)? WRITE_HEADER : WRITE_HEADER_CRC);
-				m_out_dip(CLEAR_LINE);
-				m_out_dmarq(CLEAR_LINE);
+
+				if (using_floppy() || m_live_state.byte_counter==0)
+				{
+					m_out_dip(CLEAR_LINE);
+					m_out_dmarq(CLEAR_LINE);
+				}
 				// Writing will occur after the break; set the DMARQ again
 				if (m_live_state.byte_counter>0)
 					m_out_dmarq(ASSERT_LINE);
@@ -2276,6 +2505,48 @@ void hdc9234_device::live_run_until(attotime limit)
 			}
 			// Write a single byte; when the index hole shows up, the live run will be aborted
 			write_on_track(encode(fm_mode()? 0xff : 0x4e), 1, WRITE_GAP4);
+			break;
+// --------------------------------------------------------
+
+		// ==================================================
+		// Live states for track reading
+		// ==================================================
+
+		// Quite simple. Read the next ID fields, then the sector contents.
+		// Continue until the next index hole shows up (live_abort).
+		case READ_TRACK:
+			if (TRACE_LIVE) logerror("%s: READ_TRACK\n", tag());
+			m_live_state.state = READ_TRACK_ID;
+			break;
+
+		case READ_TRACK_ID:
+			m_live_state.state = SEARCH_IDAM;
+			// Ask for access to bus
+			set_bits(m_register_r[INT_STATUS], ST_OVRUN, true);
+			m_out_dmarq(ASSERT_LINE);
+			break;
+
+		case READ_TRACK_ID_DONE:
+			if ((m_register_r[INT_STATUS] & ST_OVRUN)!=0)
+			{
+				if (TRACE_FAIL) logerror("%s: No DMA ACK - buffer overrun\n", tag());
+				set_bits(m_register_r[INT_STATUS], TC_DATAERR, true);
+				m_live_state.state = IDLE;
+				return;
+			}
+			if (TRACE_LIVE) logerror("%s: READ_TRACK1\n", tag());
+
+			m_out_dip(ASSERT_LINE);
+
+			// Write the header via DMA
+			for (int slot = 0; slot < 6; slot++)
+				m_out_dma(0, m_register_r[id_field[slot]], 0xff);
+
+			m_out_dip(CLEAR_LINE);
+			m_out_dmarq(CLEAR_LINE);
+
+			// Continue with reading the sector data
+			m_live_state.state = SEARCH_DAM;
 			break;
 
 //  =================================================================
@@ -2640,15 +2911,6 @@ void hdc9234_device::checkpoint()
 // ===========================================================================
 
 /*
-    This is pretty simple here, compared to wd17xx, because index and ready
-    callbacks have to be tied to the controller board outside the chip.
-*/
-void hdc9234_device::connect_floppy_drive(floppy_image_device* floppy)
-{
-	m_floppy = floppy;
-}
-
-/*
     Read a byte of data from the controller
     The address (offset) encodes the C/D* line (command and /data)
 */
@@ -2727,10 +2989,6 @@ void hdc9234_device::process_command()
 		}
 		m_register_w[m_register_pointer] = m_regvalue;
 
-		// Changes to these registers must be output via the auxbus
-		if (m_register_pointer == DESIRED_HEAD || m_register_pointer == RETRY_COUNT)
-			auxbus_out();
-
 		// The DMA registers and the sector register for read and
 		// write are identical, so in that case we copy the contents
 		if (m_register_pointer < DESIRED_HEAD) m_register_r[m_register_pointer] = m_regvalue;
@@ -2773,6 +3031,61 @@ void hdc9234_device::process_command()
 			logerror("%s: Command %02x not defined\n", tag(), m_register_w[COMMAND]);
 		}
 	}
+	auxbus_out();
+}
+
+void hdc9234_device::reenter_command_processing()
+{
+	// Do we have a live run on the track?
+	if (m_live_state.state != IDLE)
+	{
+		// Continue with it
+		live_run();
+		if (m_live_state.state != IDLE)  return;
+	}
+
+	// We're here when there is no live_run anymore
+	// Where were we last time?
+	// Take care not to restart commands because of the index callback
+	if (m_executing && m_substate != UNDEF) (this->*m_command)();
+	auxbus_out();
+}
+
+/*
+    Assert Command Done status bit, triggering interrupts as needed
+*/
+void hdc9234_device::set_command_done(int flags)
+{
+	// Do another output, then set the flag
+	auxbus_out();
+
+	set_bits(m_register_r[INT_STATUS], ST_DONE, true);
+
+	if (flags != -1)
+	{
+		set_bits(m_register_r[INT_STATUS], ST_TERMCOD, false); // clear the previously set flags
+		m_register_r[INT_STATUS] |= flags;
+		if (TRACE_DONE) logerror("%s: command %02x done, flags=%02x\n", tag(), current_command(), flags);
+	}
+	else
+	{
+		if (TRACE_DONE) logerror("%s: command %02x done\n", tag(), current_command());
+	}
+
+	// [1], p. 6
+	if (TRACE_INT) logerror("%s: Raise interrupt DONE\n", tag());
+	set_interrupt(ASSERT_LINE);
+
+	m_substate = UNDEF;
+	m_executing = false;
+}
+
+/*
+    Preserve previously set termination code
+*/
+void hdc9234_device::set_command_done()
+{
+	set_command_done(-1);
 }
 
 /*
@@ -2924,17 +3237,6 @@ void hdc9234_device::seek_complete_callback(int level)
 }
 
 /*
-    Set the hook for line level handling
-*/
-void hdc9234_device::wait_line(int line, line_state level, int substate, bool stopwrite)
-{
-	m_event_line = line;
-	m_line_level = level;
-	m_state_after_line = substate;
-	m_stopwrite = stopwrite;
-}
-
-/*
     Push the output registers over the auxiliary bus. It is expected that
     the PCB contains latches to store the values.
 
@@ -2962,8 +3264,6 @@ void hdc9234_device::wait_line(int line, line_state level, int substate, bool st
 */
 void hdc9234_device::auxbus_out()
 {
-	m_out_auxbus((offs_t)HDC_OUTPUT_1, m_output1);
-
 	// prepare output2
 	set_bits(m_output2, OUT2_DRVSEL3I, (m_output1 & OUT1_DRVSEL3)==0);
 
@@ -2971,7 +3271,15 @@ void hdc9234_device::auxbus_out()
 	if (m_reduced_write_current) m_output2 |= OUT2_REDWRT;
 
 	if (TRACE_AUXBUS) logerror("%s: Setting OUTPUT2 to %02x\n", tag(), m_output2);
-	m_out_auxbus((offs_t)HDC_OUTPUT_2, m_output2);
+
+	if (m_output1 != m_output1_old || m_output2 != m_output2_old)
+	{
+		// Only propagate changes
+		m_out_auxbus((offs_t)HDC_OUTPUT_1, m_output1);
+		m_out_auxbus((offs_t)HDC_OUTPUT_2, m_output2);
+		m_output1_old = m_output1;
+		m_output2_old = m_output2;
+	}
 }
 
 void hdc9234_device::dma_address_out(UINT8 addrub, UINT8 addrhb, UINT8 addrlb)
@@ -2980,6 +3288,65 @@ void hdc9234_device::dma_address_out(UINT8 addrub, UINT8 addrhb, UINT8 addrlb)
 	m_out_auxbus((offs_t)HDC_OUTPUT_DMA_ADDR, addrub);
 	m_out_auxbus((offs_t)HDC_OUTPUT_DMA_ADDR, addrhb);
 	m_out_auxbus((offs_t)HDC_OUTPUT_DMA_ADDR, addrlb);
+}
+
+/*
+    Set/clear INT
+
+    Interupts are generated in the following occasions:
+    - when the DONE bit is set to 1 in the ISR and ST_DONE is set to 1
+    - when the READY_CHANGE bit is set to 1 in the ISR and ST_RDYCHNG is set to 1
+    (ready change: 1->0 or 0->1)
+*/
+void hdc9234_device::set_interrupt(line_state intr)
+{
+	if (intr == ASSERT_LINE)
+	{
+		// Only if there is not already a pending interrupt
+		if ((m_register_r[INT_STATUS] & ST_INTPEND) == 0)
+		{
+			m_register_r[INT_STATUS] |= ST_INTPEND;
+			m_out_intrq(intr);
+		}
+	}
+	else
+	{
+		// if there is a pending interrupt
+		if ((m_register_r[INT_STATUS] & ST_INTPEND) != 0)
+			m_out_intrq(intr);
+	}
+}
+
+/*
+    DMA acknowledge line.
+*/
+WRITE_LINE_MEMBER( hdc9234_device::dmaack )
+{
+	if (state==ASSERT_LINE)
+	{
+		if (TRACE_DMA) logerror("%s: [%s] DMA acknowledged\n", tag(), ttsn().cstr());
+		set_bits(m_register_r[INT_STATUS], ST_OVRUN, false);
+	}
+}
+
+/*
+    This is pretty simple here, compared to wd17xx, because index and ready
+    callbacks have to be tied to the controller board outside the chip.
+*/
+void hdc9234_device::connect_floppy_drive(floppy_image_device* floppy)
+{
+	m_floppy = floppy;
+}
+
+/*
+    Clock divider. This input line actually belongs to the data separator which
+    is a separate circuit. Maybe we will take it out of this implementation
+    at some time and make it a device of its own.
+    line: CD0 (0) and CD1(1), value 0 or 1
+*/
+void hdc9234_device::set_clock_divider(int line, int value)
+{
+	set_bits(m_clock_divider, (line==0)? 1 : 2, value&1);
 }
 
 /*
@@ -3001,29 +3368,6 @@ void hdc9234_device::device_timer(emu_timer &timer, device_timer_id id, int para
 		live_run();
 		break;
 	}
-}
-
-/*
-    DMA acknowledge line.
-*/
-WRITE_LINE_MEMBER( hdc9234_device::dmaack )
-{
-	if (state==ASSERT_LINE)
-	{
-		if (TRACE_DMA) logerror("%s: [%s] DMA acknowledged\n", tag(), ttsn().cstr());
-		set_bits(m_register_r[INT_STATUS], ST_OVRUN, false);
-	}
-}
-
-/*
-    Clock divider. This input line actually belongs to the data separator which
-    is a separate circuit. Maybe we will take it out of this implementation
-    at some time and make it a device of its own.
-    line: CD0 (0) and CD1(1), value 0 or 1
-*/
-void hdc9234_device::set_clock_divider(int line, int value)
-{
-	set_bits(m_clock_divider, (line==0)? 1 : 2, value&1);
 }
 
 /*
@@ -3068,6 +3412,8 @@ void hdc9234_device::device_reset()
 	m_multi_sector = false;
 	m_output1 = 0;
 	m_output2 = 0x80;
+	m_output1_old = 1;      // force an initial output
+	m_output2_old = 0x81;
 	m_precompensation = 0;
 	m_reduced_write_current = false;
 	m_regvalue = 0;
