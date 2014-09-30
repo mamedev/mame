@@ -458,6 +458,39 @@ ROM_START( zerohoura ) /* Earlier version? */
 	ROM_LOAD( "z3.u6",  0x0040, 0x0020, CRC(27fa3a50) SHA1(7cf59b7a37c156640d6ea91554d1c4276c1780e0) ) /* MM6330, Unknown purpose */
 ROM_END
 
+// k7, k5 and c4 did not give consistent reads, k7/k5 are graphics and clearly meant to be the same
+//
+// c4 was more damaged (lots of bytes replaced with 0x00) possibly UV exposed.
+// I'm not sure where this rom is used by the game (wp 2000,800,r and bp 2000,800 catch nothing) for now I'm assuming it was meant to match.
+// the game seems to be based off the 'zerohour' set but like many Inder sets it has some code inserted at the end of the last rom that is called by the game (bp 2fe0)
+// Inder boards with the regular Universal code have also been seen.
+ROM_START( zerohouri )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "zhi.c8", 0x0000, 0x0800, CRC(0dff4b48) SHA1(4911255f953851d0e5c2b66090b95254ac59ac9e) )
+	ROM_LOAD( "zhi.c7", 0x0800, 0x0800, CRC(dcfefb4c) SHA1(9d8f57f5f09368225bae06a64971b82a848b1a7e) )
+	ROM_LOAD( "zhi.c6", 0x1000, 0x0800, CRC(ddc66d36) SHA1(1cbf6e27e7b2ccd39199c1a26783d53d6d90d195) )
+	ROM_LOAD( "zhi.c5", 0x1800, 0x0800, CRC(25c5872d) SHA1(df008db607b72a92c4284d6a8127eafec2432ca4) ) // == ze4_4.c5
+//	ROM_LOAD( "zhi.c4", 0x2000, 0x0800, CRC(9b70464b) SHA1(ccd173e12630ba044fe659915dfce21f2b5e0e39) ) // corrupt
+	ROM_LOAD( "zhi.c4", 0x2000, 0x0800, CRC(d7ce3add) SHA1(d8dd7ad98e7a0a4f35de181549b2e88a9e0a73d6) ) // use rom from above sets instead
+	ROM_LOAD( "zhi.c3", 0x2800, 0x0800, CRC(29dee5e4) SHA1(13c1778d427a11f5c24ce8116fe55d60e98e3d83) )
+
+	ROM_REGION( 0x0800, "gfx1", 0 )
+	ROM_LOAD( "zhi.k7", 0x0000, 0x0800, CRC(17ae6f13) SHA1(ce7a02f4e1aa2e5292d3807a0cfed6d92752fc7a) ) /* Same as above set */
+
+	ROM_REGION( 0x1000, "gfx2", 0 )
+	ROM_LOAD( "zhi.k4", 0x0000, 0x0800, CRC(4c12f59d) SHA1(b99a21415bff0e59b6130df60182f05b1a5d0811) ) /* Same as above set */
+	ROM_LOAD( "zhi.k5", 0x0800, 0x0800, CRC(6b9a6b6e) SHA1(f80d893b1b26c75c297e1da1c20db04e7129c92a) ) /* Same as above set */
+
+	ROM_REGION( 0x1000, "gfx3", ROMREGION_ERASE00 )
+	/* gfx data will be rearranged here for 8x8 sprites */
+
+	ROM_REGION( 0x0600, "proms", 0 )
+	ROM_LOAD( "z1.ic2", 0x0000, 0x0020, CRC(b55aee56) SHA1(33e4767c8afbb7b3af67517ea1dfd69bf692cac7) ) /* 82S123, palette */
+	ROM_LOAD( "z2.n2",  0x0020, 0x0020, CRC(9adabf46) SHA1(f3538fdbc4280b6be46a4d7ebb4c34bd1a1ce2b7) ) /* MM6330, sprite color lookup table */
+	ROM_LOAD( "z3.u6",  0x0040, 0x0020, CRC(27fa3a50) SHA1(7cf59b7a37c156640d6ea91554d1c4276c1780e0) ) /* MM6330, Unknown purpose */
+ROM_END
+
+
 ROM_START( redclash )
 	ROM_REGION(0x10000, "maincpu", 0 )
 	ROM_LOAD( "11.11c",       0x0000, 0x1000, CRC(695e070e) SHA1(8d0451a05572f62e0f282ab96bdd26d08b77a6c9) )
@@ -551,6 +584,7 @@ DRIVER_INIT_MEMBER(ladybug_state,redclash)
 
 GAME( 1980, zerohour,  0,        zerohour, zerohour, ladybug_state, redclash, ROT270, "Universal", "Zero Hour (set 1)",  GAME_NO_SOUND | GAME_WRONG_COLORS | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
 GAME( 1980, zerohoura, zerohour, zerohour, zerohour, ladybug_state, redclash, ROT270, "Universal", "Zero Hour (set 2)",  GAME_NO_SOUND | GAME_WRONG_COLORS | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1980, zerohouri, zerohour, zerohour, zerohour, ladybug_state, redclash, ROT270, "bootleg (Inder SA)", "Zero Hour (Inder)",  GAME_NO_SOUND | GAME_WRONG_COLORS | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
 GAME( 1981, redclash,  0,        redclash, redclash, ladybug_state, redclash, ROT270, "Tehkan",    "Red Clash (set 1)",  GAME_NO_SOUND | GAME_WRONG_COLORS | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
 GAME( 1981, redclasha, redclash, redclash, redclash, ladybug_state, redclash, ROT270, "Tehkan",    "Red Clash (set 2)",  GAME_NO_SOUND | GAME_WRONG_COLORS | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
 GAME( 1981, redclashk, redclash, redclash, redclash, ladybug_state, redclash, ROT270, "Tehkan (Kaneko license)", "Red Clash (Kaneko)", GAME_NO_SOUND | GAME_WRONG_COLORS | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
