@@ -43,12 +43,11 @@ WRITE32_MEMBER(seibuspi_state::spi_layer_bank_w)
 	// r000f000 0010100a 00000000 00000000
 	// r: rowscroll enable
 	// f: fore layer d13
-	// a: global alpha blending enable (0 in ejanhs, 1 in all other games)
+	// a: ? (0 in ejanhs and rdft22kc, 1 in all other games)
 	UINT32 prev = m_layer_bank;
 	COMBINE_DATA(&m_layer_bank);
 
 	m_rowscroll_enable = m_layer_bank >> 31 & 1;
-	m_alpha_enable = m_layer_bank >> 16 & 1;
 	set_layer_offsets();
 
 	if ((prev ^ m_layer_bank) & 0x08000000)
@@ -319,7 +318,7 @@ void seibuspi_state::drawgfx_blend(bitmap_rgb32 &bitmap, const rectangle &clipre
 			{
 				pri[x] |= primask;
 				int global_pen = pen + (color << m_sprite_bpp);
-				if (m_alpha_enable && m_alpha_table[global_pen])
+				if (m_alpha_table[global_pen])
 					dest[x] = alpha_blend_r32(dest[x], pens[global_pen], 0x7f);
 				else
 					dest[x] = pens[global_pen];
@@ -447,7 +446,7 @@ void seibuspi_state::combine_tilemap(bitmap_rgb32 &bitmap, const rectangle &clip
 			if (opaque || (flags[x & xscroll_mask] & (TILEMAP_PIXEL_LAYER0 | TILEMAP_PIXEL_LAYER1)))
 			{
 				UINT16 pen = src[x & xscroll_mask];
-				if (m_alpha_enable && m_alpha_table[pen])
+				if (m_alpha_table[pen])
 					*dest = alpha_blend_r32(*dest, m_palette->pen(pen), 0x7f);
 				else
 					*dest = m_palette->pen(pen);
@@ -585,7 +584,6 @@ void seibuspi_state::video_start()
 	m_layer_enable = 0;
 	m_layer_bank = 0;
 	m_rf2_layer_bank = 0;
-	m_alpha_enable = 0;
 	m_rowscroll_enable = 0;
 	set_layer_offsets();
 
@@ -643,6 +641,13 @@ void seibuspi_state::video_start()
 	register_video_state();
 }
 
+VIDEO_START_MEMBER(seibuspi_state,ejanhs)
+{
+	video_start();
+
+	memset(m_alpha_table, 0, 0x2000); // no alpha blending
+}
+
 VIDEO_START_MEMBER(seibuspi_state,sys386f)
 {
 	m_video_dma_length = 0;
@@ -650,7 +655,6 @@ VIDEO_START_MEMBER(seibuspi_state,sys386f)
 	m_layer_enable = 0;
 	m_layer_bank = 0;
 	m_rf2_layer_bank = 0;
-	m_alpha_enable = 0;
 	m_rowscroll_enable = 0;
 	set_layer_offsets();
 	
@@ -663,7 +667,7 @@ VIDEO_START_MEMBER(seibuspi_state,sys386f)
 	m_palette_ram = auto_alloc_array_clear(machine(), UINT32, m_palette_ram_size/4);
 	m_sprite_ram = auto_alloc_array_clear(machine(), UINT32, m_sprite_ram_size/4);
 
-	memset(m_alpha_table, 0, 0x2000);
+	memset(m_alpha_table, 0, 0x2000); // no alpha blending
 
 	register_video_state();
 }
@@ -675,7 +679,6 @@ void seibuspi_state::register_video_state()
 	save_item(NAME(m_layer_enable));
 	save_item(NAME(m_layer_bank));
 	save_item(NAME(m_rf2_layer_bank));
-	save_item(NAME(m_alpha_enable));
 	save_item(NAME(m_rowscroll_enable));
 
 	save_item(NAME(m_midl_layer_offset));

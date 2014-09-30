@@ -58,7 +58,6 @@ public:
 	UINT32 m_layer_enable;
 	UINT32 m_layer_bank;
 	UINT8 m_rf2_layer_bank;
-	int m_alpha_enable;
 	int m_rowscroll_enable;
 	int m_midl_layer_offset;
 	int m_fore_layer_offset;
@@ -131,6 +130,7 @@ public:
 	virtual void video_start();
 	DECLARE_MACHINE_RESET(spi);
 	DECLARE_MACHINE_RESET(sxx2e);
+	DECLARE_VIDEO_START(ejanhs);
 	DECLARE_VIDEO_START(sys386f);
 	TILE_GET_INFO_MEMBER(get_text_tile_info);
 	TILE_GET_INFO_MEMBER(get_back_tile_info);
