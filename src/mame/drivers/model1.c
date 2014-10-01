@@ -747,7 +747,7 @@ MACHINE_RESET_MEMBER(model1_state,model1)
 {
 	membank("bank1")->set_base(memregion("maincpu")->base() + 0x1000000);
 	irq_init();
-	model1_tgp_reset(machine(), !strcmp(machine().system().name, "swa") || !strcmp(machine().system().name, "wingwar") || !strcmp(machine().system().name, "wingwaru") || !strcmp(machine().system().name, "wingwarj"));
+	tgp_reset(!strcmp(machine().system().name, "swa") || !strcmp(machine().system().name, "wingwar") || !strcmp(machine().system().name, "wingwaru") || !strcmp(machine().system().name, "wingwarj"));
 	if (!strcmp(machine().system().name, "swa"))
 	{
 		m_sound_irq = 0;
@@ -762,7 +762,7 @@ MACHINE_RESET_MEMBER(model1_state,model1_vr)
 {
 	membank("bank1")->set_base(memregion("maincpu")->base() + 0x1000000);
 	irq_init();
-	model1_vr_tgp_reset(machine());
+	vr_tgp_reset();
 	m_sound_irq = 3;
 }
 
