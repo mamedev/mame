@@ -4062,7 +4062,7 @@ static MACHINE_CONFIG_DERIVED( cx5f1, msx_ntsc )
 
 	MCFG_MSX_LAYOUT_ROM("bios", 0, 0, 0, 2, "maincpu", 0x0000)
 	MCFG_MSX_LAYOUT_RAM("ram", 0, 0, 2, 2) // 32KB RAM
-	MCFG_MSX_LAYOUT_CARTRIDGE("cartslot1", 1, 0)
+	MCFG_MSX_LAYOUT_CARTRIDGE("cartslot", 1, 0)
 	MCFG_MSX_LAYOUT_YAMAHA_EXPANSION("expansion", 2, 0, "sfg01")
 
 	MCFG_FRAGMENT_ADD( msx1_cartlist )
@@ -4480,8 +4480,8 @@ static MACHINE_CONFIG_DERIVED( canonv30, msx2 )
 	// S-1985 MSX Engine
 
 	MCFG_MSX_LAYOUT_ROM("bios", 0, 0, 0, 2, "maincpu", 0x0000) // BIOS
-	MCFG_MSX_LAYOUT_CARTRIDGE("cartridge1", 1, 0)
-	MCFG_MSX_LAYOUT_CARTRIDGE("cartridge2", 2, 0)
+	MCFG_MSX_LAYOUT_CARTRIDGE("cartslot1", 1, 0)
+	MCFG_MSX_LAYOUT_CARTRIDGE("cartslot2", 2, 0)
 	MCFG_MSX_LAYOUT_ROM("ext", 3, 0, 0, 1, "maincpu", 0x8000) // EXT
 	MCFG_MSX_LAYOUT_DISK1("disk", 3, 1, 1, 1, "maincpu", 0xc000) // DISK
 	MCFG_MSX_LAYOUT_RAM_MM("ram_mm", 3, 2, 0x10000) // 64KB?? Mapper RAM

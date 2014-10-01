@@ -76,6 +76,9 @@ public:
 	msx_slot_yamaha_expansion_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	virtual void device_start();
+	virtual void device_config_complete() { update_names(MSX_SLOT_YAMAHA_EXPANSION, "cartridge60pin", "cart60p"); }
+
+	virtual const char *image_interface() const { return "msx_yamaha_60pin"; }
 };
 
 
