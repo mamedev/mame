@@ -722,7 +722,7 @@ INTERRUPT_GEN_MEMBER(segas32_state::start_of_vblank_int)
 	system32_set_vblank(1);
 	machine().scheduler().timer_set(m_screen->time_until_pos(0), timer_expired_delegate(FUNC(segas32_state::end_of_vblank_int),this));
 	if (m_system32_prot_vblank)
-		(*m_system32_prot_vblank)(&device);
+		(this->*m_system32_prot_vblank)();
 }
 
 
@@ -4690,7 +4690,7 @@ DRIVER_INIT_MEMBER(segas32_state,darkedge)
 
 	/* install protection handlers */
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa00000, 0xa7ffff, read16_delegate(FUNC(segas32_state::darkedge_protection_r),this), write16_delegate(FUNC(segas32_state::darkedge_protection_w),this));
-	m_system32_prot_vblank = darkedge_fd1149_vblank;
+	m_system32_prot_vblank = &segas32_state::darkedge_fd1149_vblank;
 }
 
 DRIVER_INIT_MEMBER(segas32_state,dbzvrvs)
@@ -4735,7 +4735,7 @@ DRIVER_INIT_MEMBER(segas32_state,f1lap)
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x801000, 0x801003, read16_delegate(FUNC(segas32_state::dual_pcb_masterslave),this));
 
 //  m_maincpu->space(AS_PROGRAM).install_write_handler(0x800048, 0x800049, write16_delegate(FUNC(segas32_state::f1en_comms_echo_w),this));
-	m_system32_prot_vblank = f1lap_fd1149_vblank;
+	m_system32_prot_vblank = &segas32_state::f1lap_fd1149_vblank;
 
 	m_sw1_output = &segas32_state::f1lap_sw1_output;
 }

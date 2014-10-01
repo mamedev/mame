@@ -203,9 +203,9 @@ WRITE16_MEMBER(segas32_state::brival_protection_w)
  ******************************************************************************
  ******************************************************************************/
 
-void darkedge_fd1149_vblank(device_t *device)
+void segas32_state::darkedge_fd1149_vblank()
 {
-	address_space &space = device->memory().space(AS_PROGRAM);
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 
 	space.write_word(0x20f072, 0);
 	space.write_word(0x20f082, 0);
@@ -239,9 +239,9 @@ READ16_MEMBER(segas32_state::darkedge_protection_r)
  ******************************************************************************
  ******************************************************************************/
 
-void f1lap_fd1149_vblank(device_t *device)
+void segas32_state::f1lap_fd1149_vblank()
 {
-	address_space &space = device->memory().space(AS_PROGRAM);
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 
 	space.write_byte(0x20F7C6, 0);
 

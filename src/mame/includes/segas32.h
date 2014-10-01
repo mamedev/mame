@@ -97,7 +97,8 @@ public:
 	UINT8 m_sprite_control_latched[8];
 	UINT8 m_sprite_control[8];
 	UINT32 *m_spriteram_32bit;
-	void (*m_system32_prot_vblank)(device_t *device);
+	typedef void (segas32_state::*prot_vblank_func)();
+	prot_vblank_func m_system32_prot_vblank;
 	int m_print_count;
 	DECLARE_WRITE16_MEMBER(ga2_dpram_w);
 	DECLARE_READ16_MEMBER(ga2_dpram_r);
@@ -269,9 +270,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(ym3438_irq_handler);
 	void signal_sound_irq(int which);
 	void clear_sound_irq(int which);
+	void darkedge_fd1149_vblank();
+	void f1lap_fd1149_vblank();
 };
 
 /*----------- defined in machine/segas32.c -----------*/
-void darkedge_fd1149_vblank(device_t *device);
-void f1lap_fd1149_vblank(device_t *device);
 extern const UINT8 ga2_v25_opcode_table[];

@@ -61,7 +61,7 @@
 
 
 
-UINT8 sc4_state::read_input_matrix(running_machine &machine, int row)
+UINT8 sc4_state::read_input_matrix(int row)
 {
 	ioport_port* portnames[16] = { m_io1, m_io2, m_io3, m_io4, m_io5, m_io6, m_io7, m_io8, m_io9, m_io10, m_io11, m_io12 };
 	UINT8 value;
@@ -170,7 +170,7 @@ READ16_MEMBER(sc4_state::sc4_mem_r)
 
 					if (mem_mask&0x00ff)
 					{
-						retvalue = read_input_matrix(machine(), (addr & 0x00f0)>>4);
+						retvalue = read_input_matrix((addr & 0x00f0)>>4);
 					}
 					return retvalue;
 				}

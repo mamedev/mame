@@ -141,7 +141,7 @@ public:
 
 	UINT16 m_mainram[0x10000/2];
 
-	UINT8 read_input_matrix(running_machine &machine, int row);
+	UINT8 read_input_matrix(int row);
 
 
 	DECLARE_WRITE_LINE_MEMBER(bfmdm01_busy);
