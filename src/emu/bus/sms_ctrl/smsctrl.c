@@ -8,6 +8,14 @@
 **********************************************************************/
 
 #include "smsctrl.h"
+// slot devices
+#include "joypad.h"
+#include "lphaser.h"
+#include "paddle.h"
+#include "sports.h"
+#include "sportsjp.h"
+#include "rfu.h"
+#include "multitap.h"
 
 
 

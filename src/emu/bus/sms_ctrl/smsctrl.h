@@ -113,15 +113,6 @@ protected:
 extern const device_type SMS_CONTROL_PORT;
 
 
-// slot devices
-#include "joypad.h"
-#include "lphaser.h"
-#include "paddle.h"
-#include "sports.h"
-#include "sportsjp.h"
-#include "rfu.h"
-#include "multitap.h"
-
 SLOT_INTERFACE_EXTERN( sms_control_port_devices );
 
 
