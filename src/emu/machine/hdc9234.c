@@ -473,7 +473,7 @@ int hdc9234_device::desired_head()
 
 int hdc9234_device::desired_cylinder()
 {
-	return (m_register_w[DESIRED_CYLINDER] & 0xff) | (m_register_w[DESIRED_HEAD] & 0x70);
+	return (m_register_w[DESIRED_CYLINDER] & 0xff) | ((m_register_w[DESIRED_HEAD] & 0x70) << 4);
 }
 
 int hdc9234_device::desired_sector()
@@ -488,7 +488,7 @@ int hdc9234_device::current_head()
 
 int hdc9234_device::current_cylinder()
 {
-	return (m_register_r[CURRENT_CYLINDER] & 0xff) | (m_register_r[CURRENT_HEAD] & 0x70);
+	return (m_register_r[CURRENT_CYLINDER] & 0xff) | ((m_register_r[CURRENT_HEAD] & 0x70) << 4);
 }
 
 int hdc9234_device::current_sector()
