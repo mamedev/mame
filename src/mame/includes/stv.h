@@ -6,6 +6,9 @@
 #include "cpu/scudsp/scudsp.h"
 #include "cpu/sh2/sh2.h"
 
+#include "bus/generic/slot.h"
+#include "bus/generic/carts.h"
+
 #define MAX_FILTERS (24)
 #define MAX_BLOCKS  (200)
 #define MAX_DIR_SIZE    (256*1024)
@@ -25,8 +28,12 @@ public:
 			m_audiocpu(*this, "audiocpu"),
 			m_scudsp(*this, "scudsp"),
 			m_eeprom(*this, "eeprom"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")
+			m_cart1(*this, "stv_slot1"),
+			m_cart2(*this, "stv_slot2"),
+			m_cart3(*this, "stv_slot3"),
+			m_cart4(*this, "stv_slot4"),
+			m_gfxdecode(*this, "gfxdecode"),
+			m_palette(*this, "palette")
 	{
 	}
 
@@ -36,6 +43,7 @@ public:
 	required_shared_ptr<UINT16> m_sound_ram;
 	optional_ioport m_fake_comms;
 
+	memory_region *m_cart_reg[4];
 	UINT8     *m_backupram;
 	UINT32    *m_scu_regs;
 	UINT16    *m_scsp_regs;
@@ -152,6 +160,10 @@ public:
 	required_device<m68000_base_device> m_audiocpu;
 	required_device<scudsp_cpu_device> m_scudsp;
 	optional_device<eeprom_serial_93cxx_device> m_eeprom;
+	optional_device<generic_slot_device> m_cart1;
+	optional_device<generic_slot_device> m_cart2;
+	optional_device<generic_slot_device> m_cart3;
+	optional_device<generic_slot_device> m_cart4;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
@@ -649,7 +661,6 @@ public:
 	DECLARE_WRITE16_MEMBER(scudsp_dma_w);
 
 	// FROM smpc.c
-	TIMER_CALLBACK_MEMBER( stv_bankswitch_state );
 	void stv_select_game(int gameno);
 	void smpc_master_on();
 	TIMER_CALLBACK_MEMBER( smpc_slave_enable );
@@ -750,8 +761,12 @@ public:
 	DECLARE_READ32_MEMBER(magzun_hef_hack_r);
 	DECLARE_READ32_MEMBER(magzun_rx_hack_r);
 
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( stv_cart );
-
+	int load_cart(device_image_interface &image, generic_slot_device *slot);
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( stv_cart1 ) { return load_cart(image, m_cart1); }
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( stv_cart2 ) { return load_cart(image, m_cart2); }
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( stv_cart3 ) { return load_cart(image, m_cart3); }
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( stv_cart4 ) { return load_cart(image, m_cart4); }
+	
 	void install_stvbios_speedups( void );
 
 	DECLARE_MACHINE_START(stv);

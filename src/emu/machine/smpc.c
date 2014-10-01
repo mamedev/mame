@@ -164,27 +164,17 @@ TODO:
  *
  *******************************************/
 
-TIMER_CALLBACK_MEMBER( saturn_state::stv_bankswitch_state )
-{
-	static const char *const banknames[] = { "game0", "game1", "game2", "game3" };
-	UINT8* game_region;
-
-	if(m_prev_bankswitch != param)
-	{
-		game_region = memregion(banknames[param])->base();
-
-		if (game_region)
-			memcpy(memregion("abus")->base(), game_region, 0x3000000);
-		else
-			memset(memregion("abus")->base(), 0x00, 0x3000000);
-
-		m_prev_bankswitch = param;
-	}
-}
-
 void saturn_state::stv_select_game(int gameno)
 {
-	machine().scheduler().timer_set(attotime::zero, timer_expired_delegate(FUNC(saturn_state::stv_bankswitch_state),this), gameno);
+	if (m_prev_bankswitch != gameno)
+	{
+		if (m_cart_reg[gameno] && m_cart_reg[gameno]->base())
+			memcpy(memregion("abus")->base(), m_cart_reg[gameno]->base(), 0x3000000);
+		else
+			memset(memregion("abus")->base(), 0x00, 0x3000000);
+		
+		m_prev_bankswitch = gameno;
+	}
 }
 
 /********************************************
