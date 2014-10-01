@@ -128,16 +128,17 @@ INLINE int limit( int val, int max, int min )
 
 void k053260_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
-	static const long dpcmcnv[] = { 0,1,2,4,8,16,32,64, -128, -64, -32, -16, -8, -4, -2, -1};
+	static const INT8 dpcmcnv[] = { 0,1,2,4,8,16,32,64, -128, -64, -32, -16, -8, -4, -2, -1};
 
-	int i, j, lvol[4], rvol[4], play[4], loop[4], ppcm_data[4], ppcm[4];
-	unsigned char *rom[4];
+	int lvol[4], rvol[4], play[4], loop[4], ppcm[4];
+	UINT8 *rom[4];
 	UINT32 delta[4], end[4], pos[4];
+	INT8 ppcm_data[4];
 	int dataL, dataR;
-	signed char d;
+	INT8 d;
 
 	/* precache some values */
-	for ( i = 0; i < 4; i++ ) {
+	for ( int i = 0; i < 4; i++ ) {
 		rom[i]= &m_rom[m_channels[i].start + ( m_channels[i].bank << 16 )];
 		delta[i] = m_delta_table[m_channels[i].rate];
 		lvol[i] = m_channels[i].volume * m_channels[i].pan;
@@ -152,10 +153,10 @@ void k053260_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 			delta[i] /= 2;
 	}
 
-		for ( j = 0; j < samples; j++ ) {
+		for ( int j = 0; j < samples; j++ ) {
 			dataL = dataR = 0;
 
-			for ( i = 0; i < 4; i++ ) {
+			for ( int i = 0; i < 4; i++ ) {
 				/* see if the voice is on */
 				if ( play[i] ) {
 					/* see if we're done */
@@ -183,13 +184,7 @@ void k053260_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 								newdata = ( ( rom[i][pos[i] >> BASE_SHIFT] ) ) & 0x0f; /*low nybble*/
 							}
 
-							ppcm_data[i] = (( ( ppcm_data[i] * 62 ) >> 6 ) + dpcmcnv[newdata]);
-
-							if ( ppcm_data[i] > 127 )
-								ppcm_data[i] = 127;
-							else
-								if ( ppcm_data[i] < -128 )
-									ppcm_data[i] = -128;
+							ppcm_data[i] += dpcmcnv[newdata];
 						}
 
 
@@ -215,7 +210,7 @@ void k053260_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 		}
 
 	/* update the regs now */
-	for ( i = 0; i < 4; i++ ) {
+	for ( int i = 0; i < 4; i++ ) {
 		m_channels[i].pos = pos[i];
 		m_channels[i].play = play[i];
 		m_channels[i].ppcm_data = ppcm_data[i];
