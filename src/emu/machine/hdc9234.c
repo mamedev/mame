@@ -488,7 +488,7 @@ int hdc9234_device::current_head()
 
 int hdc9234_device::current_cylinder()
 {
-	int abc = 0;
+//	int abc = 0;
 	return (m_register_r[CURRENT_CYLINDER] & 0xff) | (m_register_r[CURRENT_HEAD] & 0x70);
 }
 
