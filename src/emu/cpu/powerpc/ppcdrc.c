@@ -1297,6 +1297,7 @@ void ppc_device::static_generate_memory_accessor(int mode, int size, int iswrite
 				UML_MOV(block, mem(&m_core->tempaddr), I0);                      // mov     [tempaddr],i0
 				UML_DMOV(block, mem(&m_core->tempdata.d), I1);                   // dmov    [tempdata],i1
 				UML_DSHR(block, I1, I1, 32);                                            // dshr    i1,i1,32
+				UML_AND(block, I0, I0, ~7);                                             // and     i0,i0,~7
 				UML_DMOV(block, I2, U64(0x00000000ffffffff));                           // dmov    i2,0x00000000ffffffff
 				UML_CALLH(block, *masked);                                              // callh   masked
 				UML_ADD(block, I0, mem(&m_core->tempaddr), 4);                   // add     i0,[tempaddr],4
@@ -1308,6 +1309,7 @@ void ppc_device::static_generate_memory_accessor(int mode, int size, int iswrite
 			{
 				UML_MOV(block, mem(&m_core->tempaddr), I0);                      // mov     [tempaddr],i0
 				UML_DMOV(block, I2, U64(0x00000000ffffffff));                           // mov     i2,0x00000000ffffffff
+				UML_AND(block, I0, I0, ~7);                                             // and     i0,i0,~7
 				UML_CALLH(block, *masked);                                              // callh   masked
 				UML_DSHL(block, mem(&m_core->tempdata.d), I0, 32);               // dshl    [tempdata],i0,32
 				UML_ADD(block, I0, mem(&m_core->tempaddr), 4);                   // add     i0,[tempaddr],4
