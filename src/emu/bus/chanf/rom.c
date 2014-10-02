@@ -141,7 +141,7 @@ UINT8 chanf_rom_device::common_read_2102(UINT32 offset)
 		{
 			m_addr = m_addr_latch;
 			m_data0 = m_ram[m_addr] & 1;
-			return (m_latch[0] & 0x7f | (m_data0 << 7));
+			return (m_latch[0] & 0x7f) | (m_data0 << 7);
 		}
 		
 		return m_latch[0];
