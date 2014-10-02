@@ -1358,6 +1358,7 @@ static MACHINE_CONFIG_START( amiga_base, amiga_state )
 
 	// software
 	MCFG_SOFTWARE_LIST_ADD("wb_list", "amiga_workbench")
+	MCFG_SOFTWARE_LIST_ADD("hardware_list", "amiga_hardware")
 	MCFG_SOFTWARE_LIST_ADD("apps_list", "amiga_apps")
 MACHINE_CONFIG_END
 

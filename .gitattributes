@@ -40,6 +40,7 @@ hash/amiga_a1000.xml svneol=native#text/xml
 hash/amiga_a3000.xml svneol=native#text/xml
 hash/amiga_apps.xml svneol=native#text/xml
 hash/amiga_flop.xml svneol=native#text/xml
+hash/amiga_hardware.xml svneol=native#text/xml
 hash/amiga_workbench.xml svneol=native#text/xml
 hash/amigaaga_flop.xml svneol=native#text/xml
 hash/amigaecs_flop.xml svneol=native#text/xml
