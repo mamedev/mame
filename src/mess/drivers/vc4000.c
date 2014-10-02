@@ -45,8 +45,6 @@ It consisted of a 2K ROM and 2K RAM which are most likely mapped as follows (nee
 The Cartridge is called Hobby Module and the Rom is probably the same as used in
 elektor TV Game Computer which is a kind of developer machine for the VC4000.
 
-Go to the bottom to see the game list and emulation status of each.
-
 ******************************************************************************
 
 Elektor TV Games Computer
@@ -360,54 +358,165 @@ PALETTE_INIT_MEMBER(vc4000_state, vc4000)
 	palette.set_pen_colors(0, vc4000_palette, ARRAY_LENGTH(vc4000_palette));
 }
 
-DEVICE_IMAGE_LOAD_MEMBER( vc4000_state, vc4000_cart )
+
+void vc4000_state::machine_start()
 {
-	address_space &memspace = m_maincpu->space(AS_PROGRAM);
-	UINT32 size;
-
-	if (image.software_entry() == NULL)
-		size = image.length();
-	else
-		size = image.get_software_region_length("rom");
-
-	if (size > 0x1600)
-		size = 0x1600;
-
-	if (size > 0x1000)  /* 6k rom + 1k ram - Chess2 only */
+	if (m_cart->exists())
 	{
-		memspace.install_read_bank(0x0800, 0x15ff, "bank1");    /* extra rom */
-		membank("bank1")->set_base(memregion("maincpu")->base() + 0x1000);
-
-		memspace.install_readwrite_bank(0x1800, 0x1bff, "bank2");   /* ram */
-		membank("bank2")->set_base(memregion("maincpu")->base() + 0x1800);
-	}
-	else if (size > 0x0800) /* some 4k roms have 1k of mirrored ram */
-	{
-		memspace.install_read_bank(0x0800, 0x0fff, "bank1");    /* extra rom */
-		membank("bank1")->set_base(memregion("maincpu")->base() + 0x0800);
-
-		memspace.install_readwrite_bank(0x1000, 0x15ff, 0, 0x800, "bank2"); /* ram */
-		membank("bank2")->set_base(memregion("maincpu")->base() + 0x1000);
-	}
-	else if (size == 0x0800)    /* 2k roms + 2k ram - Hobby Module(Radofin) and elektor TVGC*/
-	{
-		memspace.install_readwrite_bank(0x0800, 0x0fff, "bank1"); /* ram */
-		membank("bank1")->set_base(memregion("maincpu")->base() + 0x0800);
-	}
-
-	if (size > 0)
-	{
-		if (image.software_entry() == NULL)
+		// extra handler
+		switch (m_cart->get_type())
 		{
-			if (image.fread(memregion("maincpu")->base(), size) != size)
-				return IMAGE_INIT_FAIL;
+			case VC4000_STD:
+				m_maincpu->space(AS_PROGRAM).install_read_handler(0x0000, 0x07ff, read8_delegate(FUNC(vc4000_cart_slot_device::read_rom),(vc4000_cart_slot_device*)m_cart));
+				break;
+			case VC4000_RAM1K:
+				m_maincpu->space(AS_PROGRAM).install_read_handler(0x0000, 0x0fff, read8_delegate(FUNC(vc4000_cart_slot_device::read_rom),(vc4000_cart_slot_device*)m_cart));
+				m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x1000, 0x15ff, read8_delegate(FUNC(vc4000_cart_slot_device::read_ram),(vc4000_cart_slot_device*)m_cart), write8_delegate(FUNC(vc4000_cart_slot_device::write_ram),(vc4000_cart_slot_device*)m_cart));
+				break;
+			case VC4000_CHESS2:
+				m_maincpu->space(AS_PROGRAM).install_read_handler(0x0000, 0x15ff, read8_delegate(FUNC(vc4000_cart_slot_device::read_rom),(vc4000_cart_slot_device*)m_cart));
+				m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x1800, 0x1bff, read8_delegate(FUNC(vc4000_cart_slot_device::read_ram),(vc4000_cart_slot_device*)m_cart), write8_delegate(FUNC(vc4000_cart_slot_device::write_ram),(vc4000_cart_slot_device*)m_cart));
+				break;
+			// undumped Radofin Hobby Module
+//			case VC4000_HOBBY:
+//				m_maincpu->space(AS_PROGRAM).install_read_handler(0x0000, 0x07ff, read8_delegate(FUNC(vc4000_cart_slot_device::read_rom),(vc4000_cart_slot_device*)m_cart));
+//				m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x0800, 0x0fff, read8_delegate(FUNC(vc4000_cart_slot_device::read_ram),(vc4000_cart_slot_device*)m_cart), write8_delegate(FUNC(vc4000_cart_slot_device::write_ram),(vc4000_cart_slot_device*)m_cart));
+//				break;
+		}
+		
+		m_cart->save_ram();
+	}
+}
+
+
+QUICKLOAD_LOAD_MEMBER( vc4000_state,vc4000)
+{
+	address_space &space = m_maincpu->space(AS_PROGRAM);
+	int i;
+	int exec_addr;
+	int quick_length;
+	dynamic_buffer quick_data;
+	int read_;
+	int result = IMAGE_INIT_FAIL;
+	
+	quick_length = image.length();
+	quick_data.resize(quick_length);
+	read_ = image.fread( quick_data, quick_length);
+	if (read_ != quick_length)
+	{
+		image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Cannot read the file");
+		image.message(" Cannot read the file");
+	}
+	else
+	{
+		if (core_stricmp(image.filetype(), "tvc")==0)
+		{
+			if (quick_data[0] != 2)
+			{
+				image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Invalid header");
+				image.message(" Invalid header");
+			}
+			else
+			{
+				int quick_addr = quick_data[1] * 256 + quick_data[2];
+				exec_addr = quick_data[3] * 256 + quick_data[4];
+				
+				if (quick_length < 0x5)
+				{
+					image.seterror(IMAGE_ERROR_INVALIDIMAGE, "File too short");
+					image.message(" File too short");
+				}
+				else
+					if ((quick_length + quick_addr - 5) > 0x1600)
+					{
+						image.seterror(IMAGE_ERROR_INVALIDIMAGE, "File too long");
+						image.message(" File too long");
+					}
+					else
+					{
+						space.write_byte(0x08be, quick_data[3]);
+						space.write_byte(0x08bf, quick_data[4]);
+						
+						for (i = 5; i < quick_length; i++)
+							space.write_byte(i - 5 + quick_addr, quick_data[i]);
+						
+						/* display a message about the loaded quickload */
+						image.message(" Quickload: size=%04X : start=%04X : end=%04X : exec=%04X",quick_length-5,quick_addr,quick_addr+quick_length-5,exec_addr);
+						
+						// Start the quickload
+						m_maincpu->set_state_int(S2650_PC, exec_addr);
+						result = IMAGE_INIT_PASS;
+					}
+			}
 		}
 		else
-			memcpy(memregion("maincpu")->base(), image.get_software_region("rom"), size);
+			if (core_stricmp(image.filetype(), "pgm")==0)
+			{
+				if (quick_data[0] != 0)
+				{
+					image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Invalid header");
+					image.message(" Invalid header");
+				}
+				else
+				{
+					exec_addr = quick_data[1] * 256 + quick_data[2];
+					
+					if (exec_addr >= quick_length)
+					{
+						image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Exec address beyond end of file");
+						image.message(" Exec address beyond end of file");
+					}
+					else
+						if (quick_length < 0x904)
+						{
+							image.seterror(IMAGE_ERROR_INVALIDIMAGE, "File too short");
+							image.message(" File too short");
+						}
+						else
+							if (quick_length > 0x2000)
+							{
+								image.seterror(IMAGE_ERROR_INVALIDIMAGE, "File too long");
+								image.message(" File too long");
+							}
+							else
+							{
+								space.write_byte(0x08be, quick_data[1]);
+								space.write_byte(0x08bf, quick_data[2]);
+								
+								// load to 08C0-15FF (standard ram + extra)
+								int read_ = 0x1600;
+								if (quick_length < 0x1600)
+									read_ = quick_length;
+								for (i = 0x8c0; i < read_; i++)
+									space.write_byte(i, quick_data[i]);
+								
+								// load to 1F50-1FAF (PVI regs)
+								read_ = 0x1FB0;
+								if (quick_length < 0x1FB0)
+									read_ = quick_length;
+								if (quick_length > 0x1FC0)
+									for (i = 0x1F50; i < read_; i++)
+										vc4000_video_w(space, i-0x1f00, quick_data[i]);
+								
+								/* display a message about the loaded quickload */
+								image.message(" Quickload: size=%04X : exec=%04X",quick_length,exec_addr);
+								
+								// Start the quickload
+								m_maincpu->set_state_int(S2650_PC, exec_addr);
+								result = IMAGE_INIT_PASS;
+							}
+				}
+			}
 	}
-
-	return IMAGE_INIT_PASS;
+	return result;
 }
+
+static SLOT_INTERFACE_START(vc4000_cart)
+	SLOT_INTERFACE_INTERNAL("std",      VC4000_ROM_STD)
+	SLOT_INTERFACE_INTERNAL("ram1k",    VC4000_ROM_RAM1K)
+	SLOT_INTERFACE_INTERNAL("chess2",   VC4000_ROM_CHESS2)
+SLOT_INTERFACE_END
+
 
 static MACHINE_CONFIG_START( vc4000, vc4000_state )
 	/* basic machine hardware */
@@ -437,11 +546,7 @@ static MACHINE_CONFIG_START( vc4000, vc4000_state )
 	MCFG_QUICKLOAD_ADD("quickload", vc4000_state, vc4000, "pgm,tvc", 0)
 
 	/* cartridge */
-	MCFG_CARTSLOT_ADD("cart")
-	MCFG_CARTSLOT_EXTENSION_LIST("rom,bin")
-	MCFG_CARTSLOT_NOT_MANDATORY
-	MCFG_CARTSLOT_INTERFACE("vc4000_cart")
-	MCFG_CARTSLOT_LOAD(vc4000_state,vc4000_cart)
+	MCFG_VC4000_CARTRIDGE_ADD("cartslot", vc4000_cart, NULL)
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("cart_list","vc4000")
@@ -552,131 +657,10 @@ ROM_START( elektor )
 	ROM_LOAD( "elektor.rom", 0x0000, 0x0800, CRC(e6ef1ee1) SHA1(6823b5a22582344016415f2a37f9f3a2dc75d2a7))
 ROM_END
 
-QUICKLOAD_LOAD_MEMBER( vc4000_state,vc4000)
-{
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-	int i;
-	int exec_addr;
-	int quick_length;
-	dynamic_buffer quick_data;
-	int read_;
-	int result = IMAGE_INIT_FAIL;
-
-	quick_length = image.length();
-	quick_data.resize(quick_length);
-	read_ = image.fread( quick_data, quick_length);
-	if (read_ != quick_length)
-	{
-		image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Cannot read the file");
-		image.message(" Cannot read the file");
-	}
-	else
-	{
-		if (core_stricmp(image.filetype(), "tvc")==0)
-		{
-			if (quick_data[0] != 2)
-			{
-				image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Invalid header");
-				image.message(" Invalid header");
-			}
-			else
-			{
-				int quick_addr = quick_data[1] * 256 + quick_data[2];
-				exec_addr = quick_data[3] * 256 + quick_data[4];
-
-				if (quick_length < 0x5)
-				{
-					image.seterror(IMAGE_ERROR_INVALIDIMAGE, "File too short");
-					image.message(" File too short");
-				}
-				else
-				if ((quick_length + quick_addr - 5) > 0x1600)
-				{
-					image.seterror(IMAGE_ERROR_INVALIDIMAGE, "File too long");
-					image.message(" File too long");
-				}
-				else
-				{
-					space.write_byte(0x08be, quick_data[3]);
-					space.write_byte(0x08bf, quick_data[4]);
-
-					for (i = 5; i < quick_length; i++)
-						space.write_byte(i - 5 + quick_addr, quick_data[i]);
-
-					/* display a message about the loaded quickload */
-					image.message(" Quickload: size=%04X : start=%04X : end=%04X : exec=%04X",quick_length-5,quick_addr,quick_addr+quick_length-5,exec_addr);
-
-					// Start the quickload
-					m_maincpu->set_state_int(S2650_PC, exec_addr);
-					result = IMAGE_INIT_PASS;
-				}
-			}
-		}
-		else
-		if (core_stricmp(image.filetype(), "pgm")==0)
-		{
-			if (quick_data[0] != 0)
-			{
-				image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Invalid header");
-				image.message(" Invalid header");
-			}
-			else
-			{
-				exec_addr = quick_data[1] * 256 + quick_data[2];
-
-				if (exec_addr >= quick_length)
-				{
-					image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Exec address beyond end of file");
-					image.message(" Exec address beyond end of file");
-				}
-				else
-				if (quick_length < 0x904)
-				{
-					image.seterror(IMAGE_ERROR_INVALIDIMAGE, "File too short");
-					image.message(" File too short");
-				}
-				else
-				if (quick_length > 0x2000)
-				{
-					image.seterror(IMAGE_ERROR_INVALIDIMAGE, "File too long");
-					image.message(" File too long");
-				}
-				else
-				{
-					space.write_byte(0x08be, quick_data[1]);
-					space.write_byte(0x08bf, quick_data[2]);
-
-					// load to 08C0-15FF (standard ram + extra)
-					int read_ = 0x1600;
-					if (quick_length < 0x1600)
-						read_ = quick_length;
-					for (i = 0x8c0; i < read_; i++)
-						space.write_byte(i, quick_data[i]);
-
-					// load to 1F50-1FAF (PVI regs)
-					read_ = 0x1FB0;
-					if (quick_length < 0x1FB0)
-						read_ = quick_length;
-					if (quick_length > 0x1FC0)
-						for (i = 0x1F50; i < read_; i++)
-							vc4000_video_w(space, i-0x1f00, quick_data[i]);
-
-					/* display a message about the loaded quickload */
-					image.message(" Quickload: size=%04X : exec=%04X",quick_length,exec_addr);
-
-					// Start the quickload
-					m_maincpu->set_state_int(S2650_PC, exec_addr);
-					result = IMAGE_INIT_PASS;
-				}
-			}
-		}
-	}
-	return result;
-}
 
 
 /*   YEAR  NAME      PARENT     COMPAT    MACHINE    INPUT        INIT      COMPANY             FULLNAME */
-CONS(1978, vc4000,   0,         0,        vc4000,    vc4000, driver_device,      0,        "Interton",         "Intertion Electronic VC 4000", GAME_IMPERFECT_GRAPHICS )          /* Germany, Austria, UK, Australia */
+CONS(1978, vc4000,   0,         0,        vc4000,    vc4000, driver_device,      0,        "Interton",         "Interton Electronic VC 4000", GAME_IMPERFECT_GRAPHICS )          /* Germany, Austria, UK, Australia */
 CONS(1979, spc4000,  vc4000,    0,        vc4000,    vc4000, driver_device,      0,        "Grundig",          "Super Play Computer 4000", GAME_IMPERFECT_GRAPHICS )  /* Germany, Austria */
 CONS(1979, cx3000tc, vc4000,    0,        vc4000,    vc4000, driver_device,      0,        "Palson",           "CX 3000 Tele Computer", GAME_IMPERFECT_GRAPHICS )     /* Spain */
 CONS(1979, tvc4000,  vc4000,    0,        vc4000,    vc4000, driver_device,      0,        "Koerting",         "TVC-4000",         GAME_IMPERFECT_GRAPHICS )          /* Argentina */
@@ -700,176 +684,3 @@ CONS(1979, krvnjvtv, 0,         vc4000,   vc4000,    vc4000, driver_device,     
 CONS(1979, oc2000,   krvnjvtv,  0,        vc4000,    vc4000, driver_device,      0,        "SOE",              "OC-2000",          GAME_IMPERFECT_GRAPHICS )          /* France */
 CONS(1980, mpt05,    0,         vc4000,   vc4000,    vc4000, driver_device,      0,        "ITMC",             "MPT-05",           GAME_IMPERFECT_GRAPHICS )          /* France */
 CONS(1979, elektor,  0,         0,        elektor,   elektor, driver_device,     0,        "Elektor",          "Elektor TV Games Computer", GAME_IMPERFECT_GRAPHICS )
-
-/*  Game List and Emulation Status
-
-When you load a game it will normally appear to be unresponsive. Most carts contain a number of variants
-of each game (e.g. Difficulty, Player1 vs Player2 or Player1 vs Computer, etc).
-
-Press F2 (if needed) to select which game variant you would like to play. The variant number will increment
-on-screen. When you've made your choice, press F1 to start. The main keys are unlabelled, because an overlay
-is provided with each cart. See below for a guide. You need to read the instructions that come with each game.
-
-In some games, the joystick is used like 4 buttons, and other games like a paddle. The two modes are
-incompatible when using a keyboard. Therefore (in the emulation) a config dipswitch is used. The preferred
-setting is listed below.
-
-(AC = Auto-centre, NAC = no auto-centre, 90 = turn controller 90 degrees).
-
-The list is rather incomplete, information will be added as it becomes available.
-
-The game names and numbers were obtained from the Amigan Software site.
-
-Cart Num    Name
-----------------------------------------------
-1.      Grand Prix / Car Races / Autosport / Motor Racing / Road Race
-Config: Paddle, NAC
-Status: Working
-Controls: Left-Right: Steer; Up: Accelerate
-
-2.      Black Jack
-Status: Not working (some digits missing; indicator missing; dealer's cards missing)
-Controls: set bet with S and D; A to deal; 1 to hit, 2 to stay; Q accept insurance, E to decline; double-up (unknown key)
-Indicator: E make a bet then deal; I choose insurance; - you lost; + you won; X hit or stay
-
-3.      Olympics / Paddle Games / Bat & Ball / Pro Sport 60 / Sportsworld
-Config: Paddle, NAC
-Status: Working
-
-4.      Tank Battle / Combat
-Config: Button, 90
-Status: Working
-Controls: Left-Right: Steer; Up: Accelerate; Fire: Shoot
-
-5.      Maths 1
-Status: Working
-Controls: Z difficulty; X = addition or subtraction; C ask question; A=1;S=2;D=3;Q=4;W=5;E=6;1=7;2=8;3=9;0=0; C enter
-
-6.      Maths 2
-Status: Not working
-Controls: Same as above.
-
-7.      Air Sea Attack / Air Sea Battle
-Config: Button, 90
-Status: Working
-Controls: Left-Right: Move; Fire: Shoot
-
-8.      Treasure Hunt / Capture the Flag / Concentration / Memory Match
-Config: Buttons
-Status: Working
-
-9.      Labyrinth / Maze / Intelligence 1
-Config: Buttons
-Status: Working
-
-10.     Winter Sports
-Notes: Background colours should be Cyan and White instead of Red and Black
-
-11.     Hippodrome / Horse Race
-
-12.     Hunting / Shooting Gallery
-
-13.     Chess 1
-Status: Can't see what you're typing, wrong colours
-
-14.     Moto-cros
-
-15.     Four in a row / Intelligence 2
-Config: Buttons
-Status: Working
-Notes: Seems the unused squares should be black. The screen jumps about while the computer is "thinking".
-
-16.     Code Breaker / Master Mind / Intelligence 3 / Challenge
-
-17.     Circus
-STatus: severe gfx issues
-
-18.     Boxing / Prize Fight
-
-19.     Outer Space / Spacewar / Space Attack / Outer Space Combat
-
-20.     Melody Simon / Musical Memory / Follow the Leader / Musical Games / Electronic Music / Face the Music
-
-21.     Capture / Othello / Reversi / Attack / Intelligence 4
-Config: Buttons
-Status: Working
-Notes: Seems the unused squares should be black
-
-22.     Chess 2
-Status: Can't see what you're typing, wrong colours
-
-23.     Pinball / Flipper / Arcade
-Status: gfx issues
-
-24.     Soccer
-
-25.     Bowling / NinePins
-Config: Paddle, rotated 90 degrees, up/down autocentre, left-right does not
-Status: Working
-
-26.     Draughts
-
-27.     Golf
-Status: gfx issues
-
-28.     Cockpit
-Status: gfx issues
-
-29.     Metropolis / Hangman
-Status: gfx issues
-
-30.     Solitaire
-
-31.     Casino
-Status: gfx issues, items missing and unplayable
-Controls: 1 or 3=START; q=GO; E=STOP; D=$; Z=^; X=tens; C=units
-
-32.     Invaders / Alien Invasion / Earth Invasion
-Status: Works
-Config: Buttons
-
-33.     Super Invaders
-Status: Stars are missing, colours are wrong
-Config: Buttons (90)
-
-36.     BackGammon
-Status: Not all counters are visible, Dice & game number not visible.
-Controls: Fire=Exec; 1=D+; 3=D-; Q,W,E=4,5,6; A,S,D=1,2,3; Z=CL; X=STOP; C=SET
-
-37.     Monster Man / Spider's Web
-Status: Works
-Config: Buttons
-
-38.     Hyperspace
-Status: Works
-Config: Buttons (90)
-Controls: 3 - status button; Q,W,E,A,S,D,Z,X,C selects which galaxy to visit
-
-
-40.     Super Space
-Status: Works, some small gfx issues near the bottom
-Config: Buttons
-
-
-
-Acetronic: (dumps are compatible)
-------------
-
-* Shooting Gallery
-Status: works but screen flickers
-Config: Buttons
-
-* Planet Defender
-Status: Works
-Config: Paddle (NAC)
-
-* Laser Attack
-Status: Works
-Config: Buttons
-
-
-
-Public Domain: (written for emulators, may not work on real hardware)
----------------
-* Picture (no controls) - works
-* Wincadia Stub (no controls) - works, small graphic error */

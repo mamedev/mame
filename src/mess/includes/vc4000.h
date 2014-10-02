@@ -9,10 +9,12 @@
 
 #include "emu.h"
 #include "cpu/s2650/s2650.h"
-#include "imagedev/cartslot.h"
 #include "imagedev/snapquik.h"
 #include "imagedev/cassette.h"
 #include "sound/wave.h"
+
+#include "bus/vc4000/slot.h"
+#include "bus/vc4000/rom.h"
 
 // define this to use digital inputs instead of the slow
 // autocentering analog mame joys
@@ -73,9 +75,10 @@ class vc4000_state : public driver_device
 public:
 	vc4000_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_cassette(*this, "cassette"),
 		m_maincpu(*this, "maincpu"),
 		m_screen(*this, "screen"),
+		m_cassette(*this, "cassette"),
+		m_cart(*this, "cartslot"),
 		m_keypad1_1(*this, "KEYPAD1_1"),
 		m_keypad1_2(*this, "KEYPAD1_2"),
 		m_keypad1_3(*this, "KEYPAD1_3"),
@@ -110,17 +113,18 @@ public:
 	UINT8 m_objects[512];
 	UINT8 m_irq_pause;
 	bitmap_ind16 *m_bitmap;
-	optional_device<cassette_image_device> m_cassette;
+	virtual void machine_start();
 	virtual void video_start();
 	DECLARE_PALETTE_INIT(vc4000);
 	UINT32 screen_update_vc4000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vc4000_video_line);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(vc4000_cart);
 	DECLARE_QUICKLOAD_LOAD_MEMBER(vc4000);
 
 protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
+	optional_device<cassette_image_device> m_cassette;
+	required_device<vc4000_cart_slot_device> m_cart;
 	required_ioport m_keypad1_1;
 	required_ioport m_keypad1_2;
 	required_ioport m_keypad1_3;

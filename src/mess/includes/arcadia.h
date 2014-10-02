@@ -9,9 +9,10 @@
 
 #include "emu.h"
 #include "cpu/s2650/s2650.h"
-#include "imagedev/cartslot.h"
 #include "audio/arcadia.h"
 
+#include "bus/arcadia/slot.h"
+#include "bus/arcadia/rom.h"
 
 // space vultures sprites above
 // combat below and invisible
@@ -40,13 +41,14 @@ public:
 		m_controller2_extra(*this, "controller2_extra"),
 		m_joysticks(*this, "joysticks") ,
 		m_maincpu(*this, "maincpu"),
+		m_cart(*this, "cartslot"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_screen(*this, "screen")  { }
 
-	DECLARE_READ8_MEMBER(arcadia_vsync_r);
-	DECLARE_READ8_MEMBER(arcadia_video_r);
-	DECLARE_WRITE8_MEMBER(arcadia_video_w);
+	DECLARE_READ8_MEMBER(vsync_r);
+	DECLARE_READ8_MEMBER(video_r);
+	DECLARE_WRITE8_MEMBER(video_w);
 	int m_line;
 	int m_charline;
 	int m_shift;
@@ -92,11 +94,11 @@ public:
 	} m_reg;
 	bitmap_ind16 *m_bitmap;
 	DECLARE_DRIVER_INIT(arcadia);
+	virtual void machine_start();
 	virtual void video_start();
 	DECLARE_PALETTE_INIT(arcadia);
 	UINT32 screen_update_arcadia(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(arcadia_video_line);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( arcadia_cart );
+	INTERRUPT_GEN_MEMBER(video_line);
 
 protected:
 	required_device<arcadia_sound_device> m_custom;
@@ -111,11 +113,12 @@ protected:
 	required_ioport m_controller2_extra;
 	required_ioport m_joysticks;
 
-	void arcadia_draw_char(UINT8 *ch, int charcode, int y, int x);
-	void arcadia_vh_draw_line(int y, UINT8 chars1[16]);
-	int arcadia_sprite_collision(int n1, int n2);
-	void arcadia_draw_sprites();
+	void draw_char(UINT8 *ch, int charcode, int y, int x);
+	void vh_draw_line(int y, UINT8 chars1[16]);
+	int sprite_collision(int n1, int n2);
+	void draw_sprites();
 	required_device<cpu_device> m_maincpu;
+	required_device<arcadia_cart_slot_device> m_cart;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;

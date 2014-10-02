@@ -120,13 +120,12 @@ anything in hardware. No cartridge has been found which uses them.
 #include "includes/arcadia.h"
 
 static ADDRESS_MAP_START( arcadia_mem, AS_PROGRAM, 8, arcadia_state )
-	AM_RANGE( 0x0000, 0x0fff) AM_ROM
-	AM_RANGE( 0x1800, 0x1aff) AM_READWRITE( arcadia_video_r, arcadia_video_w )
-	AM_RANGE( 0x2000, 0x2fff) AM_ROM
+	AM_RANGE( 0x0000, 0x0fff) AM_DEVREAD("cartslot", arcadia_cart_slot_device, read_rom)
+	AM_RANGE( 0x1800, 0x1aff) AM_READWRITE(video_r, video_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( arcadia_io, AS_IO, 8, arcadia_state )
-	AM_RANGE( S2650_SENSE_PORT,S2650_SENSE_PORT) AM_READ( arcadia_vsync_r)
+	AM_RANGE( S2650_SENSE_PORT,S2650_SENSE_PORT) AM_READ(vsync_r)
 ADDRESS_MAP_END
 
 /* The Emerson Arcadia 2001 controllers have 2 fire buttons on the side,
@@ -440,95 +439,41 @@ static const unsigned short arcadia_palette[128+8] =  /* bgnd, fgnd */
 
 PALETTE_INIT_MEMBER(arcadia_state, arcadia)
 {
-	int i;
-
-	for (i = 0; i < 8; i++)
+	for (int i = 0; i < 8; i++)
 		palette.set_indirect_color(i, arcadia_colors[i]);
 
-	for (i = 0; i < 128+8; i++)
+	for (int i = 0; i < 128+8; i++)
 		palette.set_pen_indirect(i, arcadia_palette[i]);
 }
 
-DEVICE_IMAGE_LOAD_MEMBER( arcadia_state, arcadia_cart )
+void arcadia_state::machine_start()
 {
-	UINT8 *rom = memregion("maincpu")->base();
-	int size;
-
-	memset(rom, 0, 0x8000);
-	if (image.software_entry() == NULL)
+	if (m_cart->exists())
 	{
-		size = image.length();
-
-		if (size > memregion("maincpu")->bytes())
-			size = memregion("maincpu")->bytes();
-
-		if (image.fread(rom, size) != size)
-			return IMAGE_INIT_FAIL;
+		switch (m_cart->get_type())
+		{
+			case ARCADIA_STD:
+				m_maincpu->space(AS_PROGRAM).install_read_handler(0x2000, 0xffff, read8_delegate(FUNC(arcadia_cart_slot_device::extra_rom),(arcadia_cart_slot_device*)m_cart));
+				break;
+			case ARCADIA_GOLF:
+				m_maincpu->space(AS_PROGRAM).install_read_handler(0x4000, 0x4fff, read8_delegate(FUNC(arcadia_cart_slot_device::extra_rom),(arcadia_cart_slot_device*)m_cart));
+				break;
+		}
 	}
-	else
-	{
-		size = image.get_software_region_length("rom");
-		memcpy(rom, image.get_software_region("rom"), size);
-	}
-
-	if (size > 0x1000)
-		memmove(rom + 0x2000, rom + 0x1000, size - 0x1000);
-
-	if (size > 0x2000)
-		memmove(rom + 0x4000, rom + 0x3000, size - 0x2000);
-
-#if 1
-	// golf cartridge support
-	// 4kbyte at 0x0000
-	// 2kbyte at 0x4000
-	if (size <= 0x2000)
-		memcpy(rom + 0x4000, rom + 0x2000, 0x1000);
-#else
-	/* this is a testpatch for the golf cartridge
-	   so it could be burned in a arcadia 2001 cartridge
-	   activate it and use debugger to save patched version */
-	// not enough yet (some pointers stored as data?)
-	int i;
-	static const struct { UINT16 address; UINT8 old; UINT8 new; }
-	patch[]= {
-		{ 0x0077,0x40,0x20 },
-		{ 0x011e,0x40,0x20 },
-		{ 0x0348,0x40,0x20 },
-		{ 0x03be,0x40,0x20 },
-		{ 0x04ce,0x40,0x20 },
-		{ 0x04da,0x40,0x20 },
-		{ 0x0562,0x42,0x22 },
-		{ 0x0617,0x40,0x20 },
-		{ 0x0822,0x40,0x20 },
-		{ 0x095e,0x42,0x22 },
-		{ 0x09d3,0x42,0x22 },
-		{ 0x0bb0,0x42,0x22 },
-		{ 0x0efb,0x40,0x20 },
-		{ 0x0ec1,0x43,0x23 },
-		{ 0x0f00,0x40,0x20 },
-		{ 0x0f12,0x40,0x20 },
-		{ 0x0ff5,0x43,0x23 },
-		{ 0x0ff7,0x41,0x21 },
-		{ 0x0ff9,0x40,0x20 },
-		{ 0x0ffb,0x41,0x21 },
-		{ 0x20ec,0x42,0x22 }
-	};
-
-	for (i = 0; i < ARRAY_LENGTH(patch); i++)
-	{
-		assert(rom[patch[i].address] == patch[i].old);
-		rom[patch[i].address] = patch[i].new;
-	}
-#endif
-	return IMAGE_INIT_PASS;
 }
+
+static SLOT_INTERFACE_START(arcadia_cart)
+	SLOT_INTERFACE_INTERNAL("std",      ARCADIA_ROM_STD)
+	SLOT_INTERFACE_INTERNAL("golf",     ARCADIA_ROM_GOLF)
+SLOT_INTERFACE_END
+
 
 static MACHINE_CONFIG_START( arcadia, arcadia_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", S2650, 3580000/4)        /* 0.895 MHz */
 	MCFG_CPU_PROGRAM_MAP(arcadia_mem)
 	MCFG_CPU_IO_MAP(arcadia_io)
-	MCFG_CPU_PERIODIC_INT_DRIVER(arcadia_state, arcadia_video_line,  262*60)
+	MCFG_CPU_PERIODIC_INT_DRIVER(arcadia_state, video_line,  262*60)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	/* video hardware */
@@ -545,22 +490,18 @@ static MACHINE_CONFIG_START( arcadia, arcadia_state )
 	MCFG_PALETTE_INDIRECT_ENTRIES(8)
 	MCFG_PALETTE_INIT_OWNER(arcadia_state, arcadia)
 
-
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_ARCADIA_SOUND_ADD("custom")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* cartridge */
-	MCFG_CARTSLOT_ADD("cart")
-	MCFG_CARTSLOT_EXTENSION_LIST("bin")
-	MCFG_CARTSLOT_NOT_MANDATORY
-	MCFG_CARTSLOT_INTERFACE("arcadia_cart")
-	MCFG_CARTSLOT_LOAD(arcadia_state,arcadia_cart)
+	MCFG_ARCADIA_CARTRIDGE_ADD("cartslot", arcadia_cart, NULL)
 
 	/* Software lists */
 	MCFG_SOFTWARE_LIST_ADD("cart_list","arcadia")
 MACHINE_CONFIG_END
+
 
 ROM_START(advsnha)
 	ROM_REGION(0x8000,"maincpu", ROMREGION_ERASEFF)

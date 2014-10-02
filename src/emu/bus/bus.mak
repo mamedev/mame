@@ -110,6 +110,18 @@ endif
 
 #-------------------------------------------------
 #
+#@src/emu/bus/arcadia/slot.h,BUSES += ARCADIA
+#-------------------------------------------------
+
+ifneq ($(filter ARCADIA,$(BUSES)),)
+OBJDIRS += $(BUSOBJ)/arcadia
+BUSOBJS += $(BUSOBJ)/arcadia/slot.o
+BUSOBJS += $(BUSOBJ)/arcadia/rom.o
+endif
+
+
+#-------------------------------------------------
+#
 #@src/emu/bus/bw2/exp.h,BUSES += BW2
 #-------------------------------------------------
 
@@ -627,6 +639,18 @@ ifneq ($(filter TVC,$(BUSES)),)
 OBJDIRS += $(BUSOBJ)/tvc
 BUSOBJS += $(BUSOBJ)/tvc/tvc.o
 BUSOBJS += $(BUSOBJ)/tvc/hbf.o
+endif
+
+
+#-------------------------------------------------
+#
+#@src/emu/bus/vc4000/slot.h,BUSES += VC4000
+#-------------------------------------------------
+
+ifneq ($(filter VC4000,$(BUSES)),)
+OBJDIRS += $(BUSOBJ)/vc4000
+BUSOBJS += $(BUSOBJ)/vc4000/slot.o
+BUSOBJS += $(BUSOBJ)/vc4000/rom.o
 endif
 
 

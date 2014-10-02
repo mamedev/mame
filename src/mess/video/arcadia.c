@@ -308,7 +308,7 @@ void arcadia_state::video_start()
 	}
 }
 
-READ8_MEMBER( arcadia_state::arcadia_video_r )
+READ8_MEMBER( arcadia_state::video_r )
 {
 	UINT8 data=0;
 	switch (offset)
@@ -370,7 +370,7 @@ READ8_MEMBER( arcadia_state::arcadia_video_r )
 	return data;
 }
 
-WRITE8_MEMBER( arcadia_state::arcadia_video_w )
+WRITE8_MEMBER( arcadia_state::video_w )
 {
 	m_reg.data[offset]=data;
 	switch (offset)
@@ -419,7 +419,7 @@ WRITE8_MEMBER( arcadia_state::arcadia_video_w )
 	}
 }
 
-void arcadia_state::arcadia_draw_char(UINT8 *ch, int charcode, int y, int x)
+void arcadia_state::draw_char(UINT8 *ch, int charcode, int y, int x)
 {
 	int k,b,cc,sc, colour;
 	if (m_multicolor)
@@ -472,7 +472,7 @@ void arcadia_state::arcadia_draw_char(UINT8 *ch, int charcode, int y, int x)
 }
 
 
-void arcadia_state::arcadia_vh_draw_line(int y, UINT8 chars1[16])
+void arcadia_state::vh_draw_line(int y, UINT8 chars1[16])
 {
 	int x, ch, j, h;
 	int graphics = m_graphics;
@@ -501,14 +501,14 @@ void arcadia_state::arcadia_vh_draw_line(int y, UINT8 chars1[16])
 			}
 		}
 		if (graphics)
-			arcadia_draw_char(m_rectangle[ch&0x3f], ch, y, x);
+			draw_char(m_rectangle[ch&0x3f], ch, y, x);
 		else
-			arcadia_draw_char(m_chars[ch&0x3f], ch, y, x);
+			draw_char(m_chars[ch&0x3f], ch, y, x);
 	}
 }
 
 
-int arcadia_state::arcadia_sprite_collision(int n1, int n2)
+int arcadia_state::sprite_collision(int n1, int n2)
 {
 	int k, b1, b2, x;
 	if (m_pos[n1].x+8<=m_pos[n2].x)
@@ -536,7 +536,7 @@ int arcadia_state::arcadia_sprite_collision(int n1, int n2)
 }
 
 
-void arcadia_state::arcadia_draw_sprites()
+void arcadia_state::draw_sprites()
 {
 	int i, k, x, y, color=0;
 	UINT8 b;
@@ -603,15 +603,15 @@ void arcadia_state::arcadia_draw_sprites()
 			}
 		}
 	}
-	if (arcadia_sprite_collision(0,1)) m_reg.d.collision_sprite&=~1;
-	if (arcadia_sprite_collision(0,2)) m_reg.d.collision_sprite&=~2;
-	if (arcadia_sprite_collision(0,3)) m_reg.d.collision_sprite&=~4;
-	if (arcadia_sprite_collision(1,2)) m_reg.d.collision_sprite&=~8;
-	if (arcadia_sprite_collision(1,3)) m_reg.d.collision_sprite&=~0x10; //guess
-	if (arcadia_sprite_collision(2,3)) m_reg.d.collision_sprite&=~0x20; //guess
+	if (sprite_collision(0,1)) m_reg.d.collision_sprite&=~1;
+	if (sprite_collision(0,2)) m_reg.d.collision_sprite&=~2;
+	if (sprite_collision(0,3)) m_reg.d.collision_sprite&=~4;
+	if (sprite_collision(1,2)) m_reg.d.collision_sprite&=~8;
+	if (sprite_collision(1,3)) m_reg.d.collision_sprite&=~0x10; //guess
+	if (sprite_collision(2,3)) m_reg.d.collision_sprite&=~0x20; //guess
 }
 
-INTERRUPT_GEN_MEMBER(arcadia_state::arcadia_video_line)
+INTERRUPT_GEN_MEMBER(arcadia_state::video_line)
 {
 	int width = m_screen->width();
 
@@ -639,7 +639,7 @@ INTERRUPT_GEN_MEMBER(arcadia_state::arcadia_video_line)
 		{
 			if (((m_line-m_ypos)&(h-1))==0)
 			{
-				arcadia_vh_draw_line(m_charline*h+m_ypos, m_reg.d.chars1[m_charline]);
+				vh_draw_line(m_charline*h+m_ypos, m_reg.d.chars1[m_charline]);
 			}
 		}
 		else
@@ -647,7 +647,7 @@ INTERRUPT_GEN_MEMBER(arcadia_state::arcadia_video_line)
 		{
 			if (((m_line-m_ypos)&(h-1))==0)
 			{
-				arcadia_vh_draw_line(m_charline*h+m_ypos, m_reg.d.chars2[m_charline-13]);
+				vh_draw_line(m_charline*h+m_ypos, m_reg.d.chars2[m_charline-13]);
 			}
 		m_charline-=13;
 		}
@@ -659,10 +659,10 @@ INTERRUPT_GEN_MEMBER(arcadia_state::arcadia_video_line)
 		}
 	}
 	if (m_line==261)
-		arcadia_draw_sprites();
+		draw_sprites();
 }
 
-READ8_MEMBER( arcadia_state::arcadia_vsync_r )
+READ8_MEMBER( arcadia_state::vsync_r )
 {
 	return m_line>=216 ? 0x80 : 0 ;
 }
