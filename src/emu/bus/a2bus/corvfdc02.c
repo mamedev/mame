@@ -269,8 +269,15 @@ WRITE_LINE_MEMBER(a2bus_corvfdc02_device::drq_w)
 		// pseudo-DMA direction?
 		if (m_fdc_local_command & 0x40)
 		{
-			m_buffer[m_bufptr] = m_fdc->dma_r(); 
+			m_buffer[m_bufptr] = m_fdc->dma_r();
 //			printf("DMA %02x to buffer[%x]\n", m_buffer[m_bufptr], m_bufptr);
+
+			if (!m_bufptr)
+			{
+				m_fdc->tc_w(true);
+				m_fdc->tc_w(false);
+			}
+
 			m_bufptr--;
 			m_bufptr &= 0x1ff;
 		}
