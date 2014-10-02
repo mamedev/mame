@@ -39,6 +39,7 @@ public:
 protected:
 	virtual void device_start();
 	virtual void device_reset();
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
 	// overrides of standard a2bus slot functions
 	virtual UINT8 read_c0nx(address_space &space, UINT8 offset);
@@ -58,6 +59,7 @@ private:
 	UINT8 m_buffer[2048];	// 1x6116 SRAM
 	floppy_image_device *m_curfloppy;
 	bool m_in_drq;
+	emu_timer *m_timer;
 };
 
 // device type definition
