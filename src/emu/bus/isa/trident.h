@@ -22,8 +22,10 @@ public:
 	virtual WRITE8_MEMBER(port_03d0_w);
 	DECLARE_READ8_MEMBER(port_83c6_r);
 	DECLARE_WRITE8_MEMBER(port_83c6_w);
-	DECLARE_READ8_MEMBER(vram_r) { if (svga.rgb8_en || svga.rgb15_en || svga.rgb16_en || svga.rgb32_en) return vga.memory[offset % vga.svga_intf.vram_size]; else return 0xff; }
-	DECLARE_WRITE8_MEMBER(vram_w) { if (svga.rgb8_en || svga.rgb15_en || svga.rgb16_en || svga.rgb32_en) vga.memory[offset % vga.svga_intf.vram_size] = data; }
+	DECLARE_READ8_MEMBER(port_43c6_r);
+	DECLARE_WRITE8_MEMBER(port_43c6_w);
+	DECLARE_READ8_MEMBER(vram_r) { if (tri.linear_active) return vga.memory[offset % vga.svga_intf.vram_size]; else return 0xff; }
+	DECLARE_WRITE8_MEMBER(vram_w) { if (tri.linear_active) vga.memory[offset % vga.svga_intf.vram_size] = data; }
 	virtual READ8_MEMBER(mem_r);
 	virtual WRITE8_MEMBER(mem_w);
 	virtual UINT16 offset();
@@ -31,9 +33,12 @@ public:
 	DECLARE_READ8_MEMBER(accel_r);
 	DECLARE_WRITE8_MEMBER(accel_w);
 
+	virtual UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
 protected:
 	virtual void device_start();
 	virtual void device_reset();
+
 	struct
 	{
 		UINT8 sr0c;
@@ -50,7 +55,6 @@ protected:
 		UINT8 cr21;
 		UINT8 cr29;
 		UINT8 cr39;
-		UINT8 cr50;
 		UINT8 dac;
 		bool new_mode;
 		bool port_3c3;
@@ -62,6 +66,17 @@ protected:
 		UINT32 linear_address;
 		bool linear_active;
 		bool mmio_active;
+		// TGUI9440 only?
+		UINT16 mem_clock;  // I/O 0x43c6
+		UINT16 vid_clock;  // I/O 0x43c8
+		UINT16 cursor_x;
+		UINT16 cursor_y;
+		UINT16 cursor_loc;
+		UINT8 cursor_x_off;
+		UINT8 cursor_y_off;
+		UINT32 cursor_fg;  // colour
+		UINT32 cursor_bg;  // colour
+		UINT8 cursor_ctrl;
 
 		// 2D acceleration
 		UINT16 accel_opermode;
