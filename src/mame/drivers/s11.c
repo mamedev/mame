@@ -246,7 +246,7 @@ WRITE8_MEMBER( s11_state::dig1_w )
 	}
 }
 
-READ8_MEMBER( s11_state::pia28_w7_r)
+READ8_MEMBER( s11_state::pia28_w7_r )
 {
 	UINT8 ret = 0x80;
 
@@ -357,7 +357,7 @@ WRITE8_MEMBER( s11_state::pia40_pa_w )
 		m_dac1->write_unsigned8(data);
 }
 
-WRITE_LINE_MEMBER( s11_state::ym2151_irq_w)
+WRITE_LINE_MEMBER( s11_state::ym2151_irq_w )
 {
 	if(m_pia40)
 	{
@@ -368,7 +368,7 @@ WRITE_LINE_MEMBER( s11_state::ym2151_irq_w)
 	}
 }
 
-WRITE_LINE_MEMBER( s11_state::pia40_cb2_w)
+WRITE_LINE_MEMBER( s11_state::pia40_cb2_w )
 {
 	m_pia34->cb1_w(state);  // To Widget MCB1 through CPU Data interface
 }
@@ -448,7 +448,7 @@ static MACHINE_CONFIG_START( s11, s11_state )
 	MCFG_PIA_IRQA_HANDLER(WRITELINE(s11_state, pia_irq))
 	MCFG_PIA_IRQB_HANDLER(WRITELINE(s11_state, pia_irq))
 
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* Add the soundcard */
 	MCFG_CPU_ADD("audiocpu", M6808, XTAL_4MHz)
@@ -456,11 +456,11 @@ static MACHINE_CONFIG_START( s11, s11_state )
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MCFG_SPEAKER_STANDARD_MONO("speech")
 	MCFG_SOUND_ADD("hc55516", HC55516, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speech", 0.50)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speech", 1.00)
 
 	MCFG_DEVICE_ADD("pias", PIA6821, 0)
 	MCFG_PIA_READPA_HANDLER(READ8(s11_state, dac_r))
@@ -681,6 +681,7 @@ GAME( 1986, rdkng_l4, 0,        s11, s11, s11_state, s11, ROT0, "Williams", "Roa
 GAME( 1986, rdkng_l1, rdkng_l4, s11, s11, s11_state, s11, ROT0, "Williams", "Road Kings (L-1)", GAME_MECHANICAL | GAME_NOT_WORKING)
 GAME( 1986, rdkng_l2, rdkng_l4, s11, s11, s11_state, s11, ROT0, "Williams", "Road Kings (L-2)", GAME_MECHANICAL | GAME_NOT_WORKING)
 GAME( 1986, rdkng_l3, rdkng_l4, s11, s11, s11_state, s11, ROT0, "Williams", "Road Kings (L-3)", GAME_MECHANICAL | GAME_NOT_WORKING)
+
 GAME( 1986, tts_l2,   0,        s11, s11, s11_state, s11, ROT0, "Williams", "Tic-Tac-Strike (Shuffle) (L-2)", GAME_MECHANICAL | GAME_NOT_WORKING | GAME_NO_SOUND)
 GAME( 1986, tts_l1,   tts_l2,   s11, s11, s11_state, s11, ROT0, "Williams", "Tic-Tac-Strike (Shuffle) (L-1)", GAME_MECHANICAL | GAME_NOT_WORKING | GAME_NO_SOUND)
 GAME( 1987, gmine_l2, 0,        s11, s11, s11_state, s11, ROT0, "Williams", "Gold Mine (Shuffle) (L-2)", GAME_MECHANICAL | GAME_NOT_WORKING)
