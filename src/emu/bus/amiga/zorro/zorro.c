@@ -156,6 +156,7 @@ void exp_slot_device::device_start()
 void exp_slot_device::add_card(device_zorro_card_interface *card)
 {
 	m_dev = downcast<device_exp_card_interface *>(card);
+	card->set_zorro_bus(this);
 }
 
 // from slot device
