@@ -15,6 +15,14 @@
 	      - Add support for more keyboard controllers (pending on them
 	        getting dumped)
 
+	Amiga 1000 keyboard part numbers (manufactured by Mitsumi):
+
+	- 327063-01  R56-2144  English
+	- 327063-02            British
+	- 327063-03  R56-2153  German
+	- 327063-04  R56-2152  French
+	- 327063-05  R56-2154  Italian
+
 ***************************************************************************/
 
 #include "amigakbd.h"
@@ -294,12 +302,24 @@ amigakbd_device::amigakbd_device(const machine_config &mconfig, const char *tag,
 
 void amigakbd_device::device_start()
 {
+	// resolve callbacks
 	m_write_kclk.resolve_safe();
 	m_write_kdat.resolve_safe();
 	m_write_krst.resolve_safe();
+
+	// allocate timers
 	m_timer = timer_alloc(0, NULL);
 	m_watchdog = timer_alloc(1, NULL);
 	m_reset = timer_alloc(2, NULL);
+
+	// register for save states
+	save_item(NAME(m_kdat));
+	save_item(NAME(m_kclk));
+	save_item(NAME(m_port_c));
+	save_item(NAME(m_port_d));
+	save_item(NAME(m_latch));
+	save_item(NAME(m_counter));
+	save_item(NAME(m_control));
 }
 
 //-------------------------------------------------
