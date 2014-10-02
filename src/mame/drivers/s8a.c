@@ -5,23 +5,19 @@
   PINBALL
   Williams System 8: Still Crazy
 
-  The very first time run, the display will show the model number (526 or 543).
-  Press F3 to clear this, then follow instructions below.
+The first time run, the display will show the model number (543).
+Press F3 to clear this.
 
-  A novelty game where the playfield is completely vertical. It has
-  4 flippers and the idea is to get the ball up to the alcohol 'still' before
-  the 'revenuers' do. The idea didn't catch on, and the game was not officially
-  released. 1 player. The display shows Score and Batch. There is no credit
-  display.
+A novelty game where the playfield is completely vertical. It has 4 flippers and the
+  idea is to get the ball up to the alcohol 'still' before the 'revenuers' do. The
+  idea didn't catch on, and the game was not officially released. 1 player.
+  The display shows Score and Batch. There is no credit display.
+  If the number of batches exceeds 9, the 'hidden digit' will show the tens.
+  You cannot get more than 99 batches.
+  The score only has 5 digits, but the game stores the 100,000 digit internally.
 
 ToDo:
-- Make Still Crazy layout.
-- Get Still Crazy coin-in to register.
-  Workaround:
-  - Start in debug mode, g to run the game, go to memory view and enter credits
-    into location 0x738. (example: 90 gives 90 credits). Quit.
-  - Start in non-debug mode. Press 1 to start, it works fine, apart from the
-    knocker making a lot of noise. Keys to use: A then any key on that row.
+- Diagnostic buttons not working
 
 ************************************************************************************/
 
@@ -49,7 +45,6 @@ public:
 	{ }
 
 	DECLARE_READ8_MEMBER(dac_r);
-	DECLARE_WRITE8_MEMBER(dac_w);
 	DECLARE_WRITE8_MEMBER(dig0_w);
 	DECLARE_WRITE8_MEMBER(dig1_w);
 	DECLARE_WRITE8_MEMBER(lamp0_w);
@@ -63,8 +58,6 @@ public:
 	DECLARE_READ_LINE_MEMBER(pia21_ca1_r);
 	DECLARE_READ_LINE_MEMBER(pia28_ca1_r);
 	DECLARE_READ_LINE_MEMBER(pia28_cb1_r);
-	DECLARE_WRITE_LINE_MEMBER(pias_ca2_w);
-	DECLARE_WRITE_LINE_MEMBER(pias_cb2_w);
 	DECLARE_WRITE_LINE_MEMBER(pia21_ca2_w);
 	DECLARE_WRITE_LINE_MEMBER(pia21_cb2_w) { }; // enable solenoids
 	DECLARE_WRITE_LINE_MEMBER(pia24_cb2_w) { }; // dummy to stop error log filling up
@@ -73,7 +66,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(irq);
 	DECLARE_INPUT_CHANGED_MEMBER(main_nmi);
 	DECLARE_INPUT_CHANGED_MEMBER(audio_nmi);
-	DECLARE_MACHINE_RESET(s8);
+	DECLARE_MACHINE_RESET(s8a);
 private:
 	UINT8 m_t_c;
 	UINT8 m_sound_data;
@@ -98,13 +91,13 @@ static ADDRESS_MAP_START( s8_main_map, AS_PROGRAM, 8, s8a_state )
 	AM_RANGE(0x2400, 0x2403) AM_DEVREADWRITE("pia24", pia6821_device, read, write) // lamps
 	AM_RANGE(0x2800, 0x2803) AM_DEVREADWRITE("pia28", pia6821_device, read, write) // display
 	AM_RANGE(0x3000, 0x3003) AM_DEVREADWRITE("pia30", pia6821_device, read, write) // inputs
-	AM_RANGE(0x5000, 0x7fff) AM_ROM
+	AM_RANGE(0x6000, 0x7fff) AM_ROM AM_REGION("roms", 0)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( s8_audio_map, AS_PROGRAM, 8, s8a_state )
 	AM_RANGE(0x0000, 0x00ff) AM_RAM
 	AM_RANGE(0x2000, 0x2003) AM_DEVREADWRITE("pias", pia6821_device, read, write)
-	AM_RANGE(0x8000, 0xffff) AM_ROM
+	AM_RANGE(0xc000, 0xffff) AM_ROM AM_REGION("audioroms", 0)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( s8 )
@@ -113,13 +106,13 @@ static INPUT_PORTS_START( s8 )
 
 	PORT_START("X1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_TILT )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN3 )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_V)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_B)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_N)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_M)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_L)
 
 	PORT_START("X2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_A)
@@ -132,44 +125,16 @@ static INPUT_PORTS_START( s8 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_K)
 
 	PORT_START("X4")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_L)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Z)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_C)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_V)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_B)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_N)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_M)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_COMMA)
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("X8")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_STOP)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_SLASH)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_COLON)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_QUOTE)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_X)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_MINUS)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_EQUALS)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_BACKSPACE)
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("X10")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_OPENBRACE)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_CLOSEBRACE)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_BACKSLASH)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_ENTER)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_LEFT)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_RIGHT)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_UP)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_DOWN)
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("X20")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Q)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_W)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_E)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_R)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Y)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_U)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_I)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_O)
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("X40")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -184,7 +149,7 @@ static INPUT_PORTS_START( s8 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Up/Down") PORT_CODE(KEYCODE_9)
 INPUT_PORTS_END
 
-MACHINE_RESET_MEMBER( s8a_state, s8 )
+MACHINE_RESET_MEMBER( s8a_state, s8a )
 {
 	m_t_c = 0;
 }
@@ -205,8 +170,8 @@ INPUT_CHANGED_MEMBER( s8a_state::audio_nmi )
 
 WRITE8_MEMBER( s8a_state::sol3_w )
 {
-	if (BIT(data, 1))
-		m_samples->start(0, 6); // knocker
+	if (data==0x0a)
+		m_samples->start(0, 7); // mechanical drum when you have 2 or more batches
 }
 
 WRITE8_MEMBER( s8a_state::sound_w )
@@ -252,7 +217,7 @@ WRITE8_MEMBER( s8a_state::dig0_w )
 
 WRITE8_MEMBER( s8a_state::dig1_w )
 {
-	static const UINT8 patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0, 0, 0, 0, 0, 0 }; // MC14558
+	static const UINT8 patterns[16] = { 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7d,0x07,0x7f,0x6f,0,0,0,0,0,0 }; // MC14543
 	if (m_data_ok)
 	{
 		output_set_digit_value(m_strobe+16, patterns[data&15]);
@@ -265,7 +230,7 @@ READ8_MEMBER( s8a_state::switch_r )
 {
 	char kbdrow[8];
 	sprintf(kbdrow,"X%X",m_kbdrow);
-	return ~ioport(kbdrow)->read();
+	return ioport(kbdrow)->read() ^ 0xff;
 }
 
 WRITE8_MEMBER( s8a_state::switch_w )
@@ -278,12 +243,7 @@ READ8_MEMBER( s8a_state::dac_r )
 	return m_sound_data;
 }
 
-WRITE8_MEMBER( s8a_state::dac_w )
-{
-	m_dac->write_unsigned8(data);
-}
-
-TIMER_DEVICE_CALLBACK_MEMBER( s8a_state::irq)
+TIMER_DEVICE_CALLBACK_MEMBER( s8a_state::irq )
 {
 	if (m_t_c > 0x70)
 		m_maincpu->set_input_line(M6800_IRQ_LINE, ASSERT_LINE);
@@ -293,10 +253,10 @@ TIMER_DEVICE_CALLBACK_MEMBER( s8a_state::irq)
 
 static MACHINE_CONFIG_START( s8, s8a_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6802, 4000000)
+	MCFG_CPU_ADD("maincpu", M6802, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(s8_main_map)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq", s8a_state, irq, attotime::from_hz(250))
-	MCFG_MACHINE_RESET_OVERRIDE(s8a_state, s8)
+	MCFG_MACHINE_RESET_OVERRIDE(s8a_state, s8a)
 
 	/* Video */
 	MCFG_DEFAULT_LAYOUT(layout_s8a)
@@ -341,18 +301,15 @@ static MACHINE_CONFIG_START( s8, s8a_state )
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	/* Add the soundcard */
-	MCFG_CPU_ADD("audiocpu", M6808, 4000000)
+	MCFG_CPU_ADD("audiocpu", M6808, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(s8_audio_map)
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("dac", DAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MCFG_DEVICE_ADD("pias", PIA6821, 0)
 	MCFG_PIA_READPA_HANDLER(READ8(s8a_state, dac_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(s8a_state, sound_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(s8a_state, dac_w))
-	MCFG_PIA_CA2_HANDLER(NULL)
-	MCFG_PIA_CB2_HANDLER(NULL)
+	MCFG_PIA_WRITEPB_HANDLER(DEVWRITE8("dac", dac_device, write_unsigned8))
 	MCFG_PIA_IRQA_HANDLER(DEVWRITELINE("audiocpu", m6808_cpu_device, irq_line))
 	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE("audiocpu", m6808_cpu_device, irq_line))
 MACHINE_CONFIG_END
@@ -362,11 +319,12 @@ MACHINE_CONFIG_END
 / Still Crazy (#543) 06/1984
 /-----------------------------*/
 ROM_START(scrzy_l1)
-	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD("ic20.bin", 0x6000, 0x2000, CRC(b0df42e6) SHA1(bb10268d7b820d1de0c20e1b79aba558badd072b) )
+	ROM_REGION(0x2000, "roms", 0)
+	ROM_LOAD("ic20.bin", 0x0000, 0x2000, CRC(b0df42e6) SHA1(bb10268d7b820d1de0c20e1b79aba558badd072b) )
 
-	ROM_REGION(0x10000, "audiocpu", 0)
-	ROM_LOAD("ic49.bin", 0xc000, 0x4000, CRC(bcc8ccc4) SHA1(2312f9cc4f5a2dadfbfa61d13c31bb5838adf152) )
+	ROM_REGION(0x4000, "audioroms", 0)
+	// 1st and 2nd halves are identical
+	ROM_LOAD("ic49.bin", 0x0000, 0x4000, CRC(bcc8ccc4) SHA1(2312f9cc4f5a2dadfbfa61d13c31bb5838adf152) )
 ROM_END
 
-GAME(1984,scrzy_l1, 0,        s8, s8, driver_device, 0, ROT0, "Williams", "Still Crazy", GAME_MECHANICAL | GAME_NOT_WORKING)
+GAME(1984,scrzy_l1, 0, s8, s8, driver_device, 0, ROT0, "Williams", "Still Crazy", GAME_MECHANICAL )
