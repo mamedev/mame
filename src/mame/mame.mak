@@ -2161,6 +2161,7 @@ $(MAMEOBJ)/pinball.a: \
 	$(DRIVERS)/s6a.o \
 	$(DRIVERS)/s7.o \
 	$(DRIVERS)/s8.o \
+	$(DRIVERS)/s8a.o \
 	$(DRIVERS)/s9.o \
 	$(DRIVERS)/sam.o \
 	$(DRIVERS)/sleic.o \
@@ -2801,19 +2802,13 @@ $(DRIVERS)/roul.o:      $(LAYOUT)/roul.lh
 $(DRIVERS)/rowamet.o:   $(LAYOUT)/rowamet.lh
 
 $(DRIVERS)/s3.o:        $(LAYOUT)/s3.lh
-
 $(DRIVERS)/s4.o:        $(LAYOUT)/s4.lh
-
 $(DRIVERS)/s6.o:        $(LAYOUT)/s6.lh
-
 $(DRIVERS)/s6a.o:       $(LAYOUT)/s6a.lh
-
 $(DRIVERS)/s7.o:        $(LAYOUT)/s7.lh
-
 $(DRIVERS)/s8.o:        $(LAYOUT)/s8.lh
-
+$(DRIVERS)/s8a.o:       $(LAYOUT)/s8a.lh
 $(DRIVERS)/s9.o:        $(LAYOUT)/s9.lh
-
 $(DRIVERS)/s11.o:       $(LAYOUT)/s11.lh
 $(DRIVERS)/s11a.o:      $(LAYOUT)/s11a.lh
 $(DRIVERS)/s11b.o:      $(LAYOUT)/s11b.lh
