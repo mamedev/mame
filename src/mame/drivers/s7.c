@@ -18,12 +18,12 @@ is ineffective/unknown. All games can coin up.
 
 Game              Outhole   Tilt        Notes
 ----------------------------------------------------------------------------------
-Black Knight                            Cannot start
+Black Knight      L Z C     U           To start, hold down LZC and press 1.
 Firepower II                            Cannot start
 Defender                                Cannot start
-Pharoah                                 Cannot start
-Starlight                               Cannot start
-Cosmic Gunfight                         Freezes when 1 pressed
+Pharoah           Right Up              To start, hold down Right and Down, and press 1
+Starlight         S D                   To start, hold down SD and press 1.
+Cosmic Gunfight   ; '                   To start, press 1 then hold down quote and colon
 Thunderball                             Speech is mixed up
 Barracora                               No sound, cannot start
 Solar Fire                              No sound, cannot start
@@ -211,7 +211,11 @@ static INPUT_PORTS_START( s7 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_O)
 
 	PORT_START("X40")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_RSHIFT)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_SPACE)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_LALT)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_LSHIFT)
+	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("X80")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -853,13 +857,13 @@ ROM_END
 
 
 
-GAME( 1980, bk_l4,    0,        s7, s7, driver_device, 0, ROT0, "Williams", "Black Knight (L-4)", GAME_MECHANICAL | GAME_NOT_WORKING )
-GAME( 1980, bk_f4,    bk_l4,    s7, s7, driver_device, 0, ROT0, "Williams", "Black Knight (L-4, French speech)", GAME_MECHANICAL | GAME_NOT_WORKING )
-GAME( 1980, bk_l3,    bk_l4,    s7, s7, driver_device, 0, ROT0, "Williams", "Black Knight (L-3)", GAME_MECHANICAL | GAME_NOT_WORKING )
-GAME( 1980, csmic_l1, 0,        s7, s7, driver_device, 0, ROT0, "Williams", "Cosmic Gunfight (L-1)", GAME_MECHANICAL | GAME_NOT_WORKING )
+GAME( 1980, bk_l4,    0,        s7, s7, driver_device, 0, ROT0, "Williams", "Black Knight (L-4)", GAME_MECHANICAL )
+GAME( 1980, bk_f4,    bk_l4,    s7, s7, driver_device, 0, ROT0, "Williams", "Black Knight (L-4, French speech)", GAME_MECHANICAL )
+GAME( 1980, bk_l3,    bk_l4,    s7, s7, driver_device, 0, ROT0, "Williams", "Black Knight (L-3)", GAME_MECHANICAL )
+GAME( 1980, csmic_l1, 0,        s7, s7, driver_device, 0, ROT0, "Williams", "Cosmic Gunfight (L-1)", GAME_MECHANICAL )
 GAME( 1981, jngld_l2, 0,        s7, s7, driver_device, 0, ROT0, "Williams", "Jungle Lord (L-2)", GAME_MECHANICAL | GAME_NOT_WORKING )
 GAME( 1981, jngld_l1, jngld_l2, s7, s7, driver_device, 0, ROT0, "Williams", "Jungle Lord (L-1)", GAME_MECHANICAL | GAME_NOT_WORKING )
-GAME( 1981, pharo_l2, 0,        s7, s7, driver_device, 0, ROT0, "Williams", "Pharaoh (L-2)", GAME_MECHANICAL | GAME_NOT_WORKING )
+GAME( 1981, pharo_l2, 0,        s7, s7, driver_device, 0, ROT0, "Williams", "Pharaoh (L-2)", GAME_MECHANICAL )
 GAME( 1981, solar_l2, 0,        s7, s7, driver_device, 0, ROT0, "Williams", "Solar Fire (L-2)", GAME_MECHANICAL | GAME_NOT_WORKING | GAME_NO_SOUND)
 GAME( 1982, thund_p1, 0,        s7, s7, driver_device, 0, ROT0, "Williams", "Thunderball (P-1)", GAME_MECHANICAL | GAME_IMPERFECT_SOUND )
 GAME( 1982, thund_p2, thund_p1, s7, s7, driver_device, 0, ROT0, "Williams", "Thunderball (P-2)", GAME_MECHANICAL | GAME_IMPERFECT_SOUND )
@@ -875,4 +879,4 @@ GAME( 1983, jst_l2,   0,        s7, s7, driver_device, 0, ROT0, "Williams", "Jou
 GAME( 1983, jst_l1,   jst_l2,   s7, s7, driver_device, 0, ROT0, "Williams", "Joust (L-1)", GAME_MECHANICAL | GAME_NOT_WORKING )
 GAME( 1983, lsrcu_l2, 0,        s7, s7, driver_device, 0, ROT0, "Williams", "Laser Cue (L-2)", GAME_MECHANICAL )
 GAME( 1983, fpwr2_l2, 0,        s7, s7, driver_device, 0, ROT0, "Williams", "Firepower II (L-2)", GAME_MECHANICAL | GAME_NOT_WORKING )
-GAME( 1984, strlt_l1, 0,        s7, s7, driver_device, 0, ROT0, "Williams", "Star Light (L-1)", GAME_MECHANICAL | GAME_NOT_WORKING )
+GAME( 1984, strlt_l1, 0,        s7, s7, driver_device, 0, ROT0, "Williams", "Star Light (L-1)", GAME_MECHANICAL )
