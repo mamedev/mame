@@ -98,6 +98,18 @@ endif
 
 #-------------------------------------------------
 #
+#@src/emu/bus/apf/slot.h,BUSES += APF
+#-------------------------------------------------
+
+ifneq ($(filter APF,$(BUSES)),)
+OBJDIRS += $(BUSOBJ)/apf
+BUSOBJS += $(BUSOBJ)/apf/slot.o
+BUSOBJS += $(BUSOBJ)/apf/rom.o
+endif
+
+
+#-------------------------------------------------
+#
 #@src/emu/bus/bw2/exp.h,BUSES += BW2
 #-------------------------------------------------
 
@@ -223,6 +235,18 @@ BUSOBJS += $(BUSOBJ)/cbmiec/diag264_lb_iec.o
 BUSOBJS += $(BUSOBJ)/cbmiec/fd2000.o
 BUSOBJS += $(BUSOBJ)/cbmiec/interpod.o
 BUSOBJS += $(BUSOBJ)/cbmiec/serialbox.o
+endif
+
+
+#-------------------------------------------------
+#
+#@src/emu/bus/chanf/slot.h,BUSES += CHANNELF
+#-------------------------------------------------
+
+ifneq ($(filter CHANNELF,$(BUSES)),)
+OBJDIRS += $(BUSOBJ)/chanf
+BUSOBJS += $(BUSOBJ)/chanf/slot.o
+BUSOBJS += $(BUSOBJ)/chanf/rom.o
 endif
 
 

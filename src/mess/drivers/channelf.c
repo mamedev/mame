@@ -8,6 +8,7 @@
  *
  *  Fredric "e5frog" Blaoholtz, added support large cartridges
  *    also spanning from $3000 to $FFFF. Added clones
+ *  Fabio "etabeta" Priuli, moved carts to be slot devices
  *
  ******************************************************************/
 
@@ -46,12 +47,12 @@ UINT8 channelf_state::port_read_with_latch(UINT8 ext, UINT8 latch_state)
 	return (~ext | latch_state);
 }
 
-READ8_MEMBER( channelf_state::channelf_port_0_r )
+READ8_MEMBER( channelf_state::port_0_r )
 {
 	return port_read_with_latch(ioport("PANEL")->read(), m_latch[0]);
 }
 
-READ8_MEMBER( channelf_state::channelf_port_1_r )
+READ8_MEMBER( channelf_state::port_1_r )
 {
 	UINT8 ext_value;
 
@@ -63,7 +64,7 @@ READ8_MEMBER( channelf_state::channelf_port_1_r )
 	return port_read_with_latch(ext_value,m_latch[1]);
 }
 
-READ8_MEMBER( channelf_state::channelf_port_4_r )
+READ8_MEMBER( channelf_state::port_4_r )
 {
 	UINT8 ext_value;
 
@@ -75,37 +76,12 @@ READ8_MEMBER( channelf_state::channelf_port_4_r )
 	return port_read_with_latch(ext_value,m_latch[2]);
 }
 
-READ8_MEMBER( channelf_state::channelf_port_5_r )
+READ8_MEMBER( channelf_state::port_5_r )
 {
 	return port_read_with_latch(0xff, m_latch[3]);
 }
 
-READ8_MEMBER( channelf_state::channelf_2102A_r )    /* SKR */
-{
-	UINT8 pdata;
-
-	if (m_r2102.r_w==0)
-	{
-		m_r2102.addr=(m_r2102.a[0]&1)+((m_r2102.a[1]<<1)&2)+((m_r2102.a[2]<<2)&4)+((m_r2102.a[3]<<3)&8)+((m_r2102.a[4]<<4)&16)+((m_r2102.a[5]<<5)&32)+((m_r2102.a[6]<<6)&64)+((m_r2102.a[7]<<7)&128)+((m_r2102.a[8]<<8)&256)+((m_r2102.a[9]<<9)&512);
-		m_r2102.d=m_r2102.ram[m_r2102.addr]&1;
-		pdata=m_latch[4]&0x7f;
-		pdata|=(m_r2102.d<<7);
-		LOG(("rhA: addr=%d, d=%d, r_w=%d, ram[%d]=%d,  a[9]=%d, a[8]=%d, a[7]=%d, a[6]=%d, a[5]=%d, a[4]=%d, a[3]=%d, a[2]=%d, a[1]=%d, a[0]=%d\n",m_r2102.addr,m_r2102.d,m_r2102.r_w,m_r2102.addr,m_r2102.ram[m_r2102.addr],m_r2102.a[9],m_r2102.a[8],m_r2102.a[7],m_r2102.a[6],m_r2102.a[5],m_r2102.a[4],m_r2102.a[3],m_r2102.a[2],m_r2102.a[1],m_r2102.a[0]));
-		return port_read_with_latch(0xff,pdata);
-	}
-	else
-		LOG(("rhA: r_w=%d\n",m_r2102.r_w));
-
-	return port_read_with_latch(0xff, m_latch[4]);
-}
-
-READ8_MEMBER( channelf_state::channelf_2102B_r )  /* SKR */
-{
-	LOG(("rhB\n"));
-	return port_read_with_latch(0xff, m_latch[5]);
-}
-
-WRITE8_MEMBER( channelf_state::channelf_port_0_w )
+WRITE8_MEMBER( channelf_state::port_0_w )
 {
 	int offs;
 
@@ -118,140 +94,106 @@ WRITE8_MEMBER( channelf_state::channelf_port_0_w )
 	}
 }
 
-WRITE8_MEMBER( channelf_state::channelf_port_1_w )
+WRITE8_MEMBER( channelf_state::port_1_w )
 {
 	m_latch[1] = data;
 	m_val_reg = ((data ^ 0xff) >> 6) & 0x03;
 }
 
-WRITE8_MEMBER( channelf_state::channelf_port_4_w )
+WRITE8_MEMBER( channelf_state::port_4_w )
 {
 	m_latch[2] = data;
 	m_col_reg = (data | 0x80) ^ 0xff;
 }
 
-WRITE8_MEMBER( channelf_state::channelf_port_5_w )
+WRITE8_MEMBER( channelf_state::port_5_w )
 {
 	m_latch[3] = data;
 	m_custom->sound_w((data>>6)&3);
 	m_row_reg = (data | 0xc0) ^ 0xff;
 }
 
-WRITE8_MEMBER( channelf_state::channelf_2102A_w )  /* SKR */
-{
-	m_latch[4]=data;
-	m_r2102.a[2]=(data>>2)&1;
-	m_r2102.a[3]=(data>>1)&1;
-	m_r2102.r_w=data&1;
-	m_r2102.addr=(m_r2102.a[0]&1)+((m_r2102.a[1]<<1)&2)+((m_r2102.a[2]<<2)&4)+((m_r2102.a[3]<<3)&8)+((m_r2102.a[4]<<4)&16)+((m_r2102.a[5]<<5)&32)+((m_r2102.a[6]<<6)&64)+((m_r2102.a[7]<<7)&128)+((m_r2102.a[8]<<8)&256)+((m_r2102.a[9]<<9)&512);
-	m_r2102.d=(data>>3)&1;
-	if(m_r2102.r_w==1)
-		m_r2102.ram[m_r2102.addr]=m_r2102.d;
-	LOG(("whA: data=%d, addr=%d, d=%d, r_w=%d, ram[%d]=%d\n",data,m_r2102.addr,m_r2102.d,m_r2102.r_w,m_r2102.addr,m_r2102.ram[m_r2102.addr]));
-}
-
-WRITE8_MEMBER( channelf_state::channelf_2102B_w )  /* SKR */
-{
-	m_latch[5]=data;
-	m_r2102.a[9]=(data>>7)&1;
-	m_r2102.a[8]=(data>>6)&1;
-	m_r2102.a[7]=(data>>5)&1;
-	m_r2102.a[1]=(data>>4)&1;
-	m_r2102.a[6]=(data>>3)&1;
-	m_r2102.a[5]=(data>>2)&1;
-	m_r2102.a[4]=(data>>1)&1;
-	m_r2102.a[0]=data&1;
-	LOG(("whB: data=%d, a[9]=%d,a[8]=%d,a[0]=%d\n",data,m_r2102.a[9],m_r2102.a[8],m_r2102.a[0]));
-}
-
 static ADDRESS_MAP_START( channelf_map, AS_PROGRAM, 8, channelf_state )
 	AM_RANGE(0x0000, 0x07ff) AM_ROM
-	AM_RANGE(0x0800, 0x27ff) AM_ROM /* Cartridge Data */
-	AM_RANGE(0x2800, 0x2fff) AM_RAM /* Schach RAM */
-	AM_RANGE(0x3000, 0xffff) AM_ROM /* Cartridge Data continued */
+	AM_RANGE(0x0800, 0xffff) AM_DEVREAD("cartslot", channelf_cart_slot_device, read_rom)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( channelf_io, AS_IO, 8, channelf_state )
-	AM_RANGE(0x00, 0x00) AM_READWRITE(channelf_port_0_r, channelf_port_0_w) /* Front panel switches */
-	AM_RANGE(0x01, 0x01) AM_READWRITE(channelf_port_1_r, channelf_port_1_w) /* Right controller     */
-	AM_RANGE(0x04, 0x04) AM_READWRITE(channelf_port_4_r, channelf_port_4_w) /* Left controller      */
-	AM_RANGE(0x05, 0x05) AM_READWRITE(channelf_port_5_r, channelf_port_5_w)
-
-	AM_RANGE(0x20, 0x20) AM_READWRITE(channelf_2102A_r, channelf_2102A_w) /* SKR 2102 control and addr for cart 18 */
-	AM_RANGE(0x21, 0x21) AM_READWRITE(channelf_2102B_r, channelf_2102B_w) /* SKR 2102 addr */
-	AM_RANGE(0x24, 0x24) AM_READWRITE(channelf_2102A_r, channelf_2102A_w) /* SKR 2102 control and addr for cart 10 */
-	AM_RANGE(0x25, 0x25) AM_READWRITE(channelf_2102B_r, channelf_2102B_w) /* SKR 2102 addr */
+	AM_RANGE(0x00, 0x00) AM_READWRITE(port_0_r, port_0_w) /* Front panel switches */
+	AM_RANGE(0x01, 0x01) AM_READWRITE(port_1_r, port_1_w) /* Right controller     */
+	AM_RANGE(0x04, 0x04) AM_READWRITE(port_4_r, port_4_w) /* Left controller      */
+	AM_RANGE(0x05, 0x05) AM_READWRITE(port_5_r, port_5_w)
 ADDRESS_MAP_END
 
 
 
 static INPUT_PORTS_START( channelf )
-	PORT_START("PANEL") /* Front panel buttons */
-	PORT_BIT ( 0x01, IP_ACTIVE_HIGH, IPT_START )    /* TIME  (1) */
-	PORT_BIT ( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON5 )  /* HOLD  (2) */
-	PORT_BIT ( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON6 )  /* MODE  (3) */
-	PORT_BIT ( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON7 )  /* START (4) */
-	PORT_BIT ( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_START("PANEL")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("TIME (Button 1)") PORT_CODE(KEYCODE_1)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("HOLD (Button 2)") PORT_CODE(KEYCODE_2)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("MODE (Button 3)") PORT_CODE(KEYCODE_3)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("START (Button 4)") PORT_CODE(KEYCODE_4)
+	PORT_BIT(0xf0, IP_ACTIVE_LOW, IPT_UNUSED)
 
-	PORT_START("RIGHT_C") /* Right controller */
-	PORT_BIT ( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT) PORT_PLAYER(1)
-	PORT_BIT ( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT) PORT_PLAYER(1)
-	PORT_BIT ( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN) PORT_PLAYER(1)
-	PORT_BIT ( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP) PORT_PLAYER(1)
-	PORT_BIT ( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON4) /* C-CLOCKWISE */ PORT_PLAYER(1)
-	PORT_BIT ( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON3) /* CLOCKWISE   */ PORT_PLAYER(1)
-	PORT_BIT ( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON2) /* PULL UP     */ PORT_PLAYER(1)
-	PORT_BIT ( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON1) /* PUSH DOWN   */ PORT_PLAYER(1)
+	PORT_START("RIGHT_C")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT) PORT_PLAYER(1)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT) PORT_PLAYER(1)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN) PORT_PLAYER(1)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP) PORT_PLAYER(1)
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_BUTTON4) PORT_NAME("P1 Twist Counterclockwise") PORT_PLAYER(1)
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_BUTTON3) PORT_NAME("P1 Twist Clockwise")PORT_PLAYER(1)
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_NAME("P1 Pull Up") PORT_PLAYER(1)
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("P1 Push Down") PORT_PLAYER(1)
 
-	PORT_START("LEFT_C") /* Left controller */
-	PORT_BIT ( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT) PORT_PLAYER(2)
-	PORT_BIT ( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT) PORT_PLAYER(2)
-	PORT_BIT ( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN) PORT_PLAYER(2)
-	PORT_BIT ( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP) PORT_PLAYER(2)
-	PORT_BIT ( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON4) /* C-CLOCKWISE */ PORT_PLAYER(2)
-	PORT_BIT ( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON3) /* CLOCKWISE   */ PORT_PLAYER(2)
-	PORT_BIT ( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON2) /* PULL UP     */ PORT_PLAYER(2)
-	PORT_BIT ( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON1) /* PUSH DOWN   */ PORT_PLAYER(2)
+	PORT_START("LEFT_C")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT) PORT_PLAYER(2)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT) PORT_PLAYER(2)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN) PORT_PLAYER(2)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP) PORT_PLAYER(2)
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_BUTTON4) PORT_NAME("P2 Twist Counterclockwise") PORT_PLAYER(2)
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_BUTTON3) PORT_NAME("P2 Twist Clockwise")PORT_PLAYER(2)
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_NAME("P2 Pull Up") PORT_PLAYER(2)
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("P2 Push Down") PORT_PLAYER(2)
 INPUT_PORTS_END
 
 
-
-DEVICE_IMAGE_LOAD_MEMBER( channelf_state, channelf_cart )
+void channelf_state::machine_start()
 {
-	UINT32 size;
-
-	if (image.software_entry() == NULL)
+	if (m_cart->exists())
 	{
-		size = image.length();
-
-		if (size > 0xf800)
+		switch (m_cart->get_type())
 		{
-			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
-			return IMAGE_INIT_FAIL;
+			case CF_MAZE:
+				m_maincpu->space(AS_IO).install_readwrite_handler(0x24, 0x25, read8_delegate(FUNC(channelf_cart_slot_device::read_ram),(channelf_cart_slot_device*)m_cart), write8_delegate(FUNC(channelf_cart_slot_device::write_ram),(channelf_cart_slot_device*)m_cart));
+				break;
+			case CF_HANGMAN:
+				m_maincpu->space(AS_IO).install_readwrite_handler(0x20, 0x21, read8_delegate(FUNC(channelf_cart_slot_device::read_ram),(channelf_cart_slot_device*)m_cart), write8_delegate(FUNC(channelf_cart_slot_device::write_ram),(channelf_cart_slot_device*)m_cart));
+				break;
+			case CF_CHESS:
+				m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x2800, 0x2fff, read8_delegate(FUNC(channelf_cart_slot_device::read_ram),(channelf_cart_slot_device*)m_cart), write8_delegate(FUNC(channelf_cart_slot_device::write_ram),(channelf_cart_slot_device*)m_cart));
+				break;
+			case CF_MULTI:
+				m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x2800, 0x2fff, read8_delegate(FUNC(channelf_cart_slot_device::read_ram),(channelf_cart_slot_device*)m_cart), write8_delegate(FUNC(channelf_cart_slot_device::write_ram),(channelf_cart_slot_device*)m_cart));
+				m_maincpu->space(AS_PROGRAM).install_write_handler(0x3000, 0x3fff, write8_delegate(FUNC(channelf_cart_slot_device::write_bank),(channelf_cart_slot_device*)m_cart));
+				break;
 		}
-
-		if (image.fread( memregion("maincpu")->base() + 0x0800, size) != size)
-		{
-			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unable to fully read from file");
-			return IMAGE_INIT_FAIL;
-		}
-
+		
+		m_cart->save_ram();
 	}
-	else
-	{
-		size = image.get_software_region_length("rom");
-		memcpy(memregion("maincpu")->base() + 0x0800, image.get_software_region("rom"), size);
-	}
-
-	return IMAGE_INIT_PASS;
 }
+
+static SLOT_INTERFACE_START(cf_cart)
+	SLOT_INTERFACE_INTERNAL("std",      CHANF_ROM_STD)
+	SLOT_INTERFACE_INTERNAL("maze",     CHANF_ROM_MAZE)
+	SLOT_INTERFACE_INTERNAL("hangman",  CHANF_ROM_HANGMAN)
+	SLOT_INTERFACE_INTERNAL("chess",    CHANF_ROM_CHESS)
+	SLOT_INTERFACE_INTERNAL("multi",    CHANF_ROM_MULTI)
+SLOT_INTERFACE_END
+
 
 static MACHINE_CONFIG_FRAGMENT( channelf_cart )
 	/* cartridge */
-	MCFG_CARTSLOT_ADD("cart")
-	MCFG_CARTSLOT_EXTENSION_LIST("bin,chf")
-	MCFG_CARTSLOT_INTERFACE("channelf_cart")
-	MCFG_CARTSLOT_LOAD(channelf_state,channelf_cart)
+	MCFG_CHANNELF_CARTRIDGE_ADD("cartslot", cf_cart, NULL)
 
 	/* Software lists */
 	MCFG_SOFTWARE_LIST_ADD("cart_list","channelf")

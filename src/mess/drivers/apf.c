@@ -76,9 +76,11 @@ ToDo:
 #include "machine/6821pia.h"
 #include "machine/wd_fdc.h"
 #include "imagedev/cassette.h"
-#include "imagedev/cartslot.h"
 #include "formats/apf_apt.h"
 #include "machine/ram.h"
+
+#include "bus/apf/slot.h"
+#include "bus/apf/rom.h"
 
 
 class apf_state : public driver_device
@@ -87,7 +89,6 @@ public:
 	apf_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_has_cart_ram(false)
-		, m_p_videoram(*this, "videoram")
 		, m_maincpu(*this, "maincpu")
 		, m_ram(*this, RAM_TAG)
 		, m_crtc(*this, "mc6847")
@@ -95,9 +96,13 @@ public:
 		, m_pia0(*this, "pia0")
 		, m_pia1(*this, "pia1")
 		, m_cass(*this, "cassette")
+		, m_cart(*this, "cartslot")
 		, m_fdc(*this, "fdc")
 		, m_floppy0(*this, "fdc:0")
 		, m_floppy1(*this, "fdc:1")
+		, m_joy(*this, "joy")
+		, m_key(*this, "key")
+		, m_p_videoram(*this, "videoram")
 	{ }
 
 	DECLARE_READ8_MEMBER(videoram_r);
@@ -110,7 +115,7 @@ public:
 	DECLARE_WRITE8_MEMBER(apf_dischw_w);
 	DECLARE_READ8_MEMBER(serial_r);
 	DECLARE_WRITE8_MEMBER(serial_w);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(apf_cart);
+
 private:
 	UINT8 m_latch;
 	UINT8 m_keyboard_data;
@@ -118,8 +123,8 @@ private:
 	UINT8 m_portb;
 	bool m_ca2;
 	bool m_has_cart_ram;
+	virtual void machine_start();
 	virtual void machine_reset();
-	required_shared_ptr<UINT8> m_p_videoram;
 	required_device<m6800_cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
 	required_device<mc6847_base_device> m_crtc;
@@ -127,10 +132,13 @@ private:
 	required_device<pia6821_device> m_pia0;
 	optional_device<pia6821_device> m_pia1;
 	optional_device<cassette_image_device> m_cass;
+	required_device<apf_cart_slot_device> m_cart;
 	optional_device<fd1771_t> m_fdc;
 	optional_device<floppy_connector> m_floppy0;
 	optional_device<floppy_connector> m_floppy1;
-	dynamic_buffer m_cart_ram;
+	required_ioport_array<4> m_joy;
+	optional_ioport_array<8> m_key;
+	required_shared_ptr<UINT8> m_p_videoram;
 };
 
 
@@ -169,14 +177,9 @@ READ8_MEMBER( apf_state::pia0_porta_r )
 {
 	UINT8 data = 0xff;
 
-	if (!BIT(m_pad_data, 3))
-		data &= ioport("joy3")->read();
-	if (!BIT(m_pad_data, 2))
-		data &= ioport("joy2")->read();
-	if (!BIT(m_pad_data, 1))
-		data &= ioport("joy1")->read();
-	if (!BIT(m_pad_data, 0))
-		data &= ioport("joy0")->read();
+	for (int i = 3; i >= 0; i--)
+		if (!BIT(m_pad_data, i))
+			data &= m_joy[i]->read();
 
 	return data;
 }
@@ -198,8 +201,7 @@ WRITE_LINE_MEMBER( apf_state::pia0_ca2_w )
 
 READ8_MEMBER( apf_state::pia1_porta_r )
 {
-	static const char *const keynames[] = { "key0", "key1", "key2", "key3", "key4", "key5", "key6", "key7" };
-	return ioport(keynames[m_keyboard_data])->read();
+	return m_key[m_keyboard_data]->read();
 }
 
 READ8_MEMBER( apf_state::pia1_portb_r )
@@ -231,6 +233,28 @@ WRITE8_MEMBER( apf_state::pia1_portb_w )
 		m_cass->output(BIT(data, 6) ? -1.0 : 1.0);
 }
 
+
+void apf_state::machine_start()
+{
+	if (m_cart->exists())
+	{
+		switch (m_cart->get_type())
+		{
+			case APF_BASIC:
+				m_maincpu->space(AS_PROGRAM).install_read_handler(0x6800, 0x7fff, read8_delegate(FUNC(apf_cart_slot_device::extra_rom),(apf_cart_slot_device*)m_cart));
+				break;
+			case APF_SPACEDST:
+				m_maincpu->space(AS_PROGRAM).unmap_readwrite(0x9800, 0x9fff);
+				m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x9800, 0x9bff, read8_delegate(FUNC(apf_cart_slot_device::read_ram),(apf_cart_slot_device*)m_cart), write8_delegate(FUNC(apf_cart_slot_device::write_ram),(apf_cart_slot_device*)m_cart));
+				m_has_cart_ram = true;
+				break;
+		}
+		
+		m_cart->save_ram();
+	}
+}
+
+
 void apf_state::machine_reset()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
@@ -247,13 +271,6 @@ void apf_state::machine_reset()
 		// this is a hack to get 'columns' to work. It misbehaves if a000-a003 are all zero
 		else
 			space.write_byte(0xa002, 0xe5);
-	}
-
-	/* Space Destroyer has 1K of on-cart RAM */
-	if (m_has_cart_ram)
-	{
-		space.unmap_readwrite(0x9800, 0x9fff);
-		space.install_ram(0x9800, 0x9bff, m_cart_ram);
 	}
 }
 
@@ -290,23 +307,23 @@ WRITE8_MEMBER( apf_state::serial_w)
 }
 
 static ADDRESS_MAP_START( apfm1000_map, AS_PROGRAM, 8, apf_state )
-	AM_RANGE( 0x0000, 0x03ff) AM_MIRROR(0x1c00) AM_RAM AM_SHARE("videoram")
-	AM_RANGE( 0x2000, 0x3fff) AM_MIRROR(0x1ffc) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
-	AM_RANGE( 0x4000, 0x4fff) AM_MIRROR(0x1000) AM_ROM AM_REGION("roms", 0)
-	AM_RANGE( 0x6800, 0x7fff) AM_ROM AM_REGION("cart", 0x2000)
-	AM_RANGE( 0x8000, 0x9fff) AM_ROM AM_REGION("cart", 0)
-	AM_RANGE( 0xe000, 0xefff) AM_MIRROR(0x1000) AM_ROM AM_REGION("roms", 0)
+	AM_RANGE(0x0000, 0x03ff) AM_MIRROR(0x1c00) AM_RAM AM_SHARE("videoram")
+	AM_RANGE(0x2000, 0x3fff) AM_MIRROR(0x1ffc) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
+	AM_RANGE(0x4000, 0x4fff) AM_MIRROR(0x1000) AM_ROM AM_REGION("roms", 0)
+	AM_RANGE(0x6800, 0x7fff) AM_NOP	// BASIC accesses ROM here too, but this is installed at machine_start
+	AM_RANGE(0x8000, 0x9fff) AM_DEVREAD("cartslot", apf_cart_slot_device, read_rom)
+	AM_RANGE(0xe000, 0xefff) AM_MIRROR(0x1000) AM_ROM AM_REGION("roms", 0)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( apfimag_map, AS_PROGRAM, 8, apf_state )
 	AM_IMPORT_FROM(apfm1000_map)
-	AM_RANGE( 0x6000, 0x63ff) AM_MIRROR(0x03fc) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
+	AM_RANGE(0x6000, 0x63ff) AM_MIRROR(0x03fc) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
 	// These need to be confirmed, disk does not work
-	AM_RANGE( 0x6400, 0x64ff) AM_READWRITE(serial_r, serial_w)
-	AM_RANGE( 0x6500, 0x6503) AM_DEVREADWRITE("fdc", fd1771_t, read, write)
-	AM_RANGE( 0x6600, 0x6600) AM_WRITE(apf_dischw_w)
-	AM_RANGE( 0xa000, 0xbfff) AM_RAM // standard
-	AM_RANGE( 0xc000, 0xdfff) AM_RAM // expansion
+	AM_RANGE(0x6400, 0x64ff) AM_READWRITE(serial_r, serial_w)
+	AM_RANGE(0x6500, 0x6503) AM_DEVREADWRITE("fdc", fd1771_t, read, write)
+	AM_RANGE(0x6600, 0x6600) AM_WRITE(apf_dischw_w)
+	AM_RANGE(0xa000, 0xbfff) AM_RAM // standard
+	AM_RANGE(0xc000, 0xdfff) AM_RAM // expansion
 ADDRESS_MAP_END
 
 
@@ -352,8 +369,7 @@ static INPUT_PORTS_START( apfm1000 )
   ? player right is player 1
 */
 
-	/* line 0 */
-	PORT_START("joy0")
+	PORT_START("joy.0")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("PAD 1/RIGHT 1") PORT_CODE(KEYCODE_1) PORT_PLAYER(2)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("PAD 1/RIGHT 0") PORT_CODE(KEYCODE_0) PORT_PLAYER(2)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("PAD 1/RIGHT 4") PORT_CODE(KEYCODE_4) PORT_PLAYER(2)
@@ -363,8 +379,7 @@ static INPUT_PORTS_START( apfm1000 )
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("PAD 2/LEFT 4") PORT_CODE(KEYCODE_4_PAD) PORT_PLAYER(1)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("PAD 2/LEFT 7") PORT_CODE(KEYCODE_7_PAD) PORT_PLAYER(1)
 
-	/* line 1 */
-	PORT_START("joy1")
+	PORT_START("joy.1")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN) PORT_NAME("PAD 1/RIGHT down") PORT_PLAYER(2) PORT_8WAY
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_NAME("PAD 1/RIGHT right") PORT_PLAYER(2) PORT_8WAY
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP) PORT_NAME("PAD 1/RIGHT up") PORT_PLAYER(2) PORT_8WAY
@@ -374,8 +389,7 @@ static INPUT_PORTS_START( apfm1000 )
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_UP) PORT_NAME("PAD 2/LEFT up") PORT_PLAYER(1) PORT_8WAY
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT) PORT_NAME("PAD 2/LEFT left") PORT_PLAYER(1) PORT_8WAY
 
-	/* line 2 */
-	PORT_START("joy2")
+	PORT_START("joy.2")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("PAD 1/RIGHT 3") PORT_CODE(KEYCODE_3) PORT_PLAYER(2)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("PAD 1/RIGHT clear") PORT_CODE(KEYCODE_DEL) PORT_PLAYER(2)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("PAD 1/RIGHT 6") PORT_CODE(KEYCODE_6) PORT_PLAYER(2)
@@ -385,8 +399,7 @@ static INPUT_PORTS_START( apfm1000 )
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("PAD 2/LEFT 6") PORT_CODE(KEYCODE_6_PAD) PORT_PLAYER(1)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("PAD 2/LEFT 9") PORT_CODE(KEYCODE_9_PAD) PORT_PLAYER(1)
 
-	/* line 3 */
-	PORT_START("joy3")
+	PORT_START("joy.3")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("PAD 1/RIGHT 2") PORT_CODE(KEYCODE_2) PORT_PLAYER(2)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("PAD 1/RIGHT enter/fire") PORT_CODE(KEYCODE_ENTER) PORT_PLAYER(2)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("PAD 1/RIGHT 5") PORT_CODE(KEYCODE_5) PORT_PLAYER(2)
@@ -404,8 +417,7 @@ static INPUT_PORTS_START( apfimag )
 
 	/* Reference: http://www.nausicaa.net/~lgreenf/apfpage2.htm */
 
-	/* keyboard line 0 */
-	PORT_START("key0")
+	PORT_START("key.0")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("X")               PORT_CODE(KEYCODE_X)          PORT_CHAR('X')
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Z")               PORT_CODE(KEYCODE_Z)          PORT_CHAR('Z')
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Q       IF")      PORT_CODE(KEYCODE_Q)          PORT_CHAR('Q')
@@ -415,8 +427,7 @@ static INPUT_PORTS_START( apfimag )
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("W       STEP")    PORT_CODE(KEYCODE_W)          PORT_CHAR('W')
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("S")               PORT_CODE(KEYCODE_S)          PORT_CHAR('S')
 
-	/* keyboard line 1 */
-	PORT_START("key1")
+	PORT_START("key.1")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("C")               PORT_CODE(KEYCODE_C)          PORT_CHAR('C')
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("V")               PORT_CODE(KEYCODE_V)          PORT_CHAR('V')
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("R       READ")    PORT_CODE(KEYCODE_R)          PORT_CHAR('R')
@@ -426,8 +437,7 @@ static INPUT_PORTS_START( apfimag )
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("E       STOP")    PORT_CODE(KEYCODE_E)          PORT_CHAR('E')
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("D")               PORT_CODE(KEYCODE_D)          PORT_CHAR('D')
 
-	/* keyboard line 2 */
-	PORT_START("key2")
+	PORT_START("key.2")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("N   ^")           PORT_CODE(KEYCODE_N)          PORT_CHAR('N') PORT_CHAR('^')
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("B")               PORT_CODE(KEYCODE_B)          PORT_CHAR('B')
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("T       NEXT")    PORT_CODE(KEYCODE_T)          PORT_CHAR('T')
@@ -437,8 +447,7 @@ static INPUT_PORTS_START( apfimag )
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Y       PRINT")   PORT_CODE(KEYCODE_Y)          PORT_CHAR('Y')
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("H")               PORT_CODE(KEYCODE_H)          PORT_CHAR('H')
 
-	/* keyboard line 3 */
-	PORT_START("key3")
+	PORT_START("key.3")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("M   ]")           PORT_CODE(KEYCODE_M)          PORT_CHAR('M') PORT_CHAR(']')
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(",   <")           PORT_CODE(KEYCODE_COMMA)      PORT_CHAR(',') PORT_CHAR('<')
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("I       LIST")    PORT_CODE(KEYCODE_I)          PORT_CHAR('I')
@@ -448,8 +457,7 @@ static INPUT_PORTS_START( apfimag )
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("U       END")     PORT_CODE(KEYCODE_U)          PORT_CHAR('U')
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("J")               PORT_CODE(KEYCODE_J)          PORT_CHAR('J')
 
-	/* keyboard line 4 */
-	PORT_START("key4")
+	PORT_START("key.4")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("/   ?")           PORT_CODE(KEYCODE_SLASH)      PORT_CHAR('/') PORT_CHAR('?')
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(".   >")           PORT_CODE(KEYCODE_STOP)       PORT_CHAR('.') PORT_CHAR('>')
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("O   _   REM")     PORT_CODE(KEYCODE_O)          PORT_CHAR('O') PORT_CHAR('_')
@@ -459,8 +467,7 @@ static INPUT_PORTS_START( apfimag )
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("P   @   USING")   PORT_CODE(KEYCODE_P)          PORT_CHAR('P') PORT_CHAR('@')
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(";   +")           PORT_CODE(KEYCODE_COLON)      PORT_CHAR(';') PORT_CHAR('+')
 
-	/* keyboard line 5 */
-	PORT_START("key5")
+	PORT_START("key.5")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Space")           PORT_CODE(KEYCODE_SPACE)      PORT_CHAR(32)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(":   *")           PORT_CODE(KEYCODE_MINUS)      PORT_CHAR(':') PORT_CHAR('*')
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Return")          PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR(13)
@@ -470,8 +477,7 @@ static INPUT_PORTS_START( apfimag )
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Line Feed")       PORT_CODE(KEYCODE_OPENBRACE)  PORT_CHAR(10)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Rubout")          PORT_CODE(KEYCODE_QUOTE)      PORT_CHAR(8)
 
-	/* line 6 */
-	PORT_START("key6")
+	PORT_START("key.6")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Shift")     PORT_CODE(KEYCODE_RSHIFT) PORT_CODE(KEYCODE_LSHIFT)     PORT_CHAR(UCHAR_SHIFT_1)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Esc")             PORT_CODE(KEYCODE_TAB)        PORT_CHAR(27)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Ctrl")            PORT_CODE(KEYCODE_LCONTROL)   PORT_CHAR(UCHAR_SHIFT_2)
@@ -481,55 +487,10 @@ static INPUT_PORTS_START( apfimag )
 	PORT_BIT(0x40, 0x40, IPT_UNUSED) // another X
 	PORT_BIT(0x80, 0x80, IPT_UNUSED) // another Z
 
-	/* line 7 */
-	PORT_START("key7")
+	PORT_START("key.7")
 	PORT_BIT(0xff, 0xff, IPT_UNUSED)
 INPUT_PORTS_END
 
-
-DEVICE_IMAGE_LOAD_MEMBER( apf_state, apf_cart )
-{
-	UINT8 *ROM = memregion("cart")->base();
-	UINT32 cart_size;
-
-	if (image.software_entry() == NULL)
-	{
-		cart_size = image.length();
-		if (cart_size > 0x3800)
-		{
-			logerror("%s extends beyond the expected size for an APF cart.\n", image.filename());
-			return IMAGE_INIT_FAIL;
-		}
-
-		image.fread(ROM, cart_size);
-
-		// attempt to identify Space Destroyer, which needs 1K of additional RAM
-		if (cart_size == 0x1800)
-		{
-			m_has_cart_ram = true;
-			m_cart_ram.resize(0x400);
-		}
-	}
-	else
-	{
-		cart_size = image.get_software_region_length("rom");
-		if (cart_size > 0x3800)
-		{
-			logerror("%s extends beyond the expected size for an APF cart.\n", image.filename());
-			return IMAGE_INIT_FAIL;
-		}
-
-		memcpy(ROM, image.get_software_region("rom"), cart_size);
-
-		if (image.get_software_region("ram"))
-		{
-			m_has_cart_ram = true;
-			m_cart_ram.resize(image.get_software_region_length("ram"));
-		}
-	}
-
-	return IMAGE_INIT_PASS;
-}
 
 static SLOT_INTERFACE_START( apf_floppies )
 	SLOT_INTERFACE( "525dd", FLOPPY_525_SSDD )
@@ -552,6 +513,13 @@ static const floppy_interface apfimag_floppy_interface =
 	NULL
 };
 #endif
+
+static SLOT_INTERFACE_START(apf_cart)
+	SLOT_INTERFACE_INTERNAL("std",       APF_ROM_STD)
+	SLOT_INTERFACE_INTERNAL("basic",     APF_ROM_BASIC)
+	SLOT_INTERFACE_INTERNAL("spacedst",  APF_ROM_SPACEDST)
+SLOT_INTERFACE_END
+
 
 static MACHINE_CONFIG_START( apfm1000, apf_state )
 
@@ -588,9 +556,7 @@ static MACHINE_CONFIG_START( apfm1000, apf_state )
 	MCFG_RAM_DEFAULT_SIZE("8K")
 	MCFG_RAM_EXTRA_OPTIONS("16K")
 
-	MCFG_CARTSLOT_ADD("cart")
-	MCFG_CARTSLOT_INTERFACE("apfm1000_cart")
-	MCFG_CARTSLOT_LOAD(apf_state, apf_cart)
+	MCFG_APF_CARTRIDGE_ADD("cartslot", apf_cart, NULL)
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("cart_list","apfm1000")
@@ -635,8 +601,6 @@ ROM_START(apfm1000)
 
 	ROM_SYSTEM_BIOS( 2, "mod", "Mod Bios" ) // (c) 1982 W.Lunquist - In Basic, CALL 18450 to get a machine-language monitor
 	ROMX_LOAD("mod_bios.bin", 0x0000, 0x1000, CRC(f320aba6) SHA1(9442349fca8b001a5765e2fe8b84db4ece7886c1), ROM_BIOS(3) )
-
-	ROM_REGION(0x3800,"cart", ROMREGION_ERASEFF)
 ROM_END
 
 #define rom_apfimag rom_apfm1000
