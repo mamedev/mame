@@ -30,8 +30,8 @@ TILE_GET_INFO_MEMBER(blktiger_state::get_bg_tile_info)
 	   was not derived from a PROM so it could be wrong. */
 	static const UINT8 split_table[16] =
 	{
-		3,3,0,0,
-		0,0,0,0,
+		3,3,2,2,
+		1,1,0,0,
 		0,0,0,0,
 		0,0,0,0
 	};
