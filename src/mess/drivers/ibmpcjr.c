@@ -16,7 +16,9 @@
 #include "bus/pc_joy/pc_joy.h"
 #include "bus/isa/fdc.h"
 #include "imagedev/cassette.h"
-#include "imagedev/cartslot.h"
+
+#include "bus/generic/slot.h"
+#include "bus/generic/carts.h"
 
 class pcjr_state : public driver_device
 {
@@ -28,6 +30,8 @@ public:
 		m_pit8253(*this, "pit8253"),
 		m_speaker(*this, "speaker"),
 		m_cassette(*this, "cassette"),
+		m_cart1(*this, "cartslot1"),
+		m_cart2(*this, "cartslot2"),
 		m_ram(*this, RAM_TAG),
 		m_fdc(*this, "fdc"),
 		m_keyboard(*this, "pc_keyboard")
@@ -38,6 +42,8 @@ public:
 	required_device<pit8253_device> m_pit8253;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<cassette_image_device> m_cassette;
+	required_device<generic_slot_device> m_cart1;
+	required_device<generic_slot_device> m_cart2;
 	required_device<ram_device> m_ram;
 	required_device<upd765a_device> m_fdc;
 	required_device<pc_keyboard_device> m_keyboard;
@@ -57,7 +63,9 @@ public:
 	DECLARE_WRITE8_MEMBER(pcjx_port_1ff_w);
 	void pcjx_set_bank(int unk1, int unk2, int unk3);
 
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( pcjr_cartridge );
+	int load_cart(device_image_interface &image, generic_slot_device *slot);
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(pcjr_cart1) { return load_cart(image, m_cart1); }
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(pcjr_cart2) { return load_cart(image, m_cart2); }
 	void pc_speaker_set_spkrdata(UINT8 data);
 
 	UINT8 m_pc_spkrdata;
@@ -424,88 +432,60 @@ READ8_MEMBER(pcjr_state::pcjx_port_1ff_r)
 	return 0x60; // expansion?
 }
 
-DEVICE_IMAGE_LOAD_MEMBER( pcjr_state, pcjr_cartridge )
+int pcjr_state::load_cart(device_image_interface &image, generic_slot_device *slot)
 {
-	UINT32  address;
-	UINT32  size;
+	UINT32 size = slot->common_get_size("rom");
+	bool imagic_hack = false;
 
-	address = (!strcmp(":cart2", image.device().tag())) ? 0xd0000 : 0xe0000;
-
-	if ( image.software_entry() )
+	if (image.software_entry() == NULL)
 	{
-		UINT8 *cart = image.get_software_region( "rom" );
+		int header_size = 0;
 
-		size = image.get_software_region_length("rom" );
-
-		memcpy( memregion("maincpu")->base() + address, cart, size );
-	}
-	else
-	{
-		UINT8   header[0x200];
-
-		unsigned header_size = 0;
-		unsigned image_size = image.length();
-		bool imagic_hack = false;
-
-		/* Check for supported header sizes */
-		switch( image_size & 0x3ff )
+		// Check for supported header sizes
+		switch (size & 0x3ff)
 		{
-		case 0x80:
-			header_size = 0x80;
-			break;
-		case 0x200:
-			header_size = 0x200;
-			break;
-		default:
-			image.seterror(IMAGE_ERROR_UNSUPPORTED, "Invalid header size" );
-			return IMAGE_INIT_FAIL;
+			case 0x80:
+				header_size = 0x80;
+				break;
+			case 0x200:
+				header_size = 0x200;
+				break;
+			default:
+				image.seterror(IMAGE_ERROR_UNSUPPORTED, "Invalid header size" );
+				return IMAGE_INIT_FAIL;
 		}
-
-		/* Check for supported image sizes */
-		switch( image_size - header_size )
+		if (size - header_size == 0xa000)
 		{
-		case 0xa000:
+			// alloc 64K for the imagic carts, so to handle the necessary mirroring
+			size += 0x6000;
 			imagic_hack = true;
-		case 0x2000:
-		case 0x4000:
-		case 0x8000:
-		case 0x10000:
-			break;
-		default:
-			image.seterror(IMAGE_ERROR_UNSUPPORTED, "Invalid rom file size" );
-			return IMAGE_INIT_FAIL;
 		}
 
-		/* Read and verify the header */
-		if ( header_size != image.fread( header, header_size ) )
-		{
-			image.seterror(IMAGE_ERROR_UNSUPPORTED, "Unable to read header" );
-			return IMAGE_INIT_FAIL;
-		}
-
-		/* Read the cartridge contents */
-		if ( ( image_size - header_size ) != image.fread(memregion("maincpu")->base() + address, image_size - header_size ) )
-		{
-			image.seterror(IMAGE_ERROR_UNSUPPORTED, "Unable to read cartridge contents" );
-			return IMAGE_INIT_FAIL;
-		}
-
-		if (imagic_hack)
-		{
-			UINT8 *cart_area = memregion("maincpu")->base() + address;
-
-			memcpy( cart_area + 0xe000, cart_area + 0x2000, 0x2000 );
-			memcpy( cart_area + 0xc000, cart_area + 0x2000, 0x2000 );
-			memcpy( cart_area + 0xa000, cart_area + 0x2000, 0x2000 );
-			memcpy( cart_area + 0x8000, cart_area + 0x2000, 0x2000 );
-			memcpy( cart_area + 0x6000, cart_area, 0x2000 );
-			memcpy( cart_area + 0x4000, cart_area, 0x2000 );
-			memcpy( cart_area + 0x2000, cart_area, 0x2000 );
-		}
+		size -= header_size;
+		image.fseek(header_size, SEEK_SET);
 	}
+	
+	slot->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
+	slot->common_load_rom(slot->get_rom_base(), size, "rom");
 
+	if (imagic_hack)
+	{
+		// in this case the image consists of 2x8K chunks
+		// the first chunk is unique, the second is repeated 4 times up to 0xa000 size
+
+		// mirroring
+		UINT8 *ROM = slot->get_rom_base();
+		memcpy(ROM + 0xe000, ROM + 0x2000, 0x2000);
+		memcpy(ROM + 0xc000, ROM + 0x2000, 0x2000);
+		memcpy(ROM + 0xa000, ROM + 0x2000, 0x2000);
+		memcpy(ROM + 0x8000, ROM + 0x2000, 0x2000);
+		memcpy(ROM + 0x6000, ROM, 0x2000);
+		memcpy(ROM + 0x4000, ROM, 0x2000);
+		memcpy(ROM + 0x2000, ROM, 0x2000);
+	}
 	return IMAGE_INIT_PASS;
 }
+
 
 static SLOT_INTERFACE_START( pcjr_floppies )
 	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
@@ -556,8 +536,8 @@ static ADDRESS_MAP_START(ibmpcjr_map, AS_PROGRAM, 8, pcjr_state)
 	AM_RANGE(0xc0000, 0xc7fff) AM_NOP
 	AM_RANGE(0xc8000, 0xc9fff) AM_ROM
 	AM_RANGE(0xca000, 0xcffff) AM_NOP
-	AM_RANGE(0xd0000, 0xdffff) AM_ROM
-	AM_RANGE(0xe0000, 0xeffff) AM_ROM
+	AM_RANGE(0xd0000, 0xdffff) AM_DEVREAD("cartslot2", generic_slot_device, read_rom)
+	AM_RANGE(0xe0000, 0xeffff) AM_DEVREAD("cartslot1", generic_slot_device, read_rom)
 	AM_RANGE(0xf0000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -655,16 +635,13 @@ static MACHINE_CONFIG_START( ibmpcjr, pcjr_state)
 	MCFG_PC_KEYB_ADD("pc_keyboard", WRITELINE(pcjr_state, keyb_interrupt))
 
 	/* cartridge */
-	MCFG_CARTSLOT_ADD("cart1")
-	MCFG_CARTSLOT_INTERFACE("ibmpcjr_cart")
-	MCFG_CARTSLOT_EXTENSION_LIST("jrc")
-	MCFG_CARTSLOT_NOT_MANDATORY
-	MCFG_CARTSLOT_LOAD(pcjr_state,pcjr_cartridge)
-	MCFG_CARTSLOT_ADD("cart2")
-	MCFG_CARTSLOT_INTERFACE("ibmpcjr_cart")
-	MCFG_CARTSLOT_EXTENSION_LIST("jrc")
-	MCFG_CARTSLOT_NOT_MANDATORY
-	MCFG_CARTSLOT_LOAD(pcjr_state,pcjr_cartridge)
+	MCFG_GENERIC_CARTSLOT_ADD("cartslot1", generic_plain_slot, "ibmpcjr_cart")
+	MCFG_GENERIC_EXTENSIONS("bin,jrc")
+	MCFG_GENERIC_LOAD(pcjr_state, pcjr_cart1)
+
+	MCFG_GENERIC_CARTSLOT_ADD("cartslot2", generic_plain_slot, "ibmpcjr_cart")
+	MCFG_GENERIC_EXTENSIONS("bin,jrc")
+	MCFG_GENERIC_LOAD(pcjr_state, pcjr_cart2)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

@@ -193,6 +193,7 @@ MG-213  Gun Fight/Moon Ship                             yes
 		<year>1978</year>
 		<publisher>Hanimex</publisher>
 		<info name="serial" value="MG-200" />
+		<info name="usage" value="Works only on the MPT-02" />
 
 		<part name="cart" interface="studio2_cart">
 			<dataarea name="rom_400" size="0x400">

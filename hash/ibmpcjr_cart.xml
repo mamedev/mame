@@ -71,6 +71,24 @@ Fraction Fever (Spinaker)
 		</part>
 	</software>
 
+	<software name="demonatk" supported="no">
+		<description>Demon Attack</description>
+		<year>1983</year>
+		<publisher>Imagic</publisher>
+		<part name="cart" interface="ibmpcjr_cart">
+			<dataarea name="rom" size="65536">
+				<rom name="demon01.bin" size="8192" crc="9aa1599b" sha1="0ff6309d8c6fc6163ac08f028d83805b0dcd2a67" offset="0x0000" />
+				<rom size="8192" offset="0x2000" loadflag="reload" />
+				<rom size="8192" offset="0x4000" loadflag="reload" />
+				<rom size="8192" offset="0x6000" loadflag="reload" />
+				<rom name="demon02.bin" size="8192" crc="85c373c3" sha1="a786a43815b72bc20ce95392235ca02d4f0ee3f6" offset="0x8000" />
+				<rom size="8192" offset="0xa000" loadflag="reload" />
+				<rom size="8192" offset="0xc000" loadflag="reload" />
+				<rom size="8192" offset="0xe000" loadflag="reload" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="lotus123">
 		<description>Lotus 123jr</description>
 		<year>1984</year>
@@ -85,6 +103,24 @@ Fraction Fever (Spinaker)
 		<part name="cart2" interface="ibmpcjr_cart">
 			<dataarea name="rom" size="65536">
 				<rom name="lotus123.a" size="65536" crc="d8f642fd" sha1="a2fcc7e50ed156b3e2cb085329523c7a79696dbe" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msurg" supported="no">
+		<description>Microsurgeon</description>
+		<year>1983</year>
+		<publisher>Imagic</publisher>
+		<part name="cart" interface="ibmpcjr_cart">
+			<dataarea name="rom" size="65536">
+				<rom name="msurg01.bin" size="8192" crc="b05cd784" sha1="f354b7ce9471324dab944cc499203e027b88dd85" offset="0x0000" />
+				<rom size="8192" offset="0x2000" loadflag="reload" />
+				<rom size="8192" offset="0x4000" loadflag="reload" />
+				<rom size="8192" offset="0x6000" loadflag="reload" />
+				<rom name="msurg02.bin" size="8192" crc="c541759c" sha1="5add9d325550f2018304931a40f132aa6ba90ef3" offset="0x8000" />
+				<rom size="8192" offset="0xa000" loadflag="reload" />
+				<rom size="8192" offset="0xc000" loadflag="reload" />
+				<rom size="8192" offset="0xe000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
