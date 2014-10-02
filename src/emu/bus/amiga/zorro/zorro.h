@@ -318,6 +318,7 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start();
+	virtual void device_reset();
 
 private:
 	devcb_write8 m_ipl_handler;
@@ -348,9 +349,6 @@ public:
 	template<class _Object> static devcb_base &set_eint7_handler(device_t &device, _Object object)
 		{ return downcast<zorro2_device &>(device).m_eint7_handler.set_callback(object); }
 
-	// device-level overrides
-	virtual void device_reset();
-
 	// the zorro2 bus supports multiple cards
 	virtual void add_card(device_zorro_card_interface *card);
 
@@ -368,6 +366,7 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start();
+	virtual void device_reset();
 
 private:
 	devcb_write_line m_eint1_handler;

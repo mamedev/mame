@@ -150,6 +150,17 @@ void exp_slot_device::device_start()
 }
 
 //-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void exp_slot_device::device_reset()
+{
+	// if we have a device, start the autoconfig chain
+	if (m_dev)
+		m_dev->cfgin_w(0);
+}
+
+//-------------------------------------------------
 //  add_card - add new card to our bus
 //-------------------------------------------------
 
