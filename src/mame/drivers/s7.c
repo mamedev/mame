@@ -2,15 +2,44 @@
 // copyright-holders:Robbbert
 /****************************************************************************************
 
-    PINBALL
-    Williams System 7
+  PINBALL
+  Williams System 7
 
-    Status of games:
-    - Inputs don't work so unable to play.
-    - Display works.
-    - Sound test works.
+When first started, it shows the game number and stops. Press F3 to initialise the
+nvram. In theory you can then press the diagnostic buttons; or you then enter coins
+and start playing.
+
+Each game has its own switches, you need to know the outhole and slam-tilt ones.
+Note that T is also a tilt, but it may take 3 hits to activate it.
+
+A number of games are multiball therefore they either cannot start or the outhole
+is ineffective/unknown. All games can coin up.
+
+
+Game              Outhole   Tilt        Notes
+----------------------------------------------------------------------------------
+Black Knight                            Cannot start
+Firepower II                            Cannot start
+Defender                                Cannot start
+Pharoah                                 Cannot start
+Starlight                               Cannot start
+Cosmic Gunfight                         Freezes when 1 pressed
+Thunderball                             Speech is mixed up
+Barracora                               No sound, cannot start
+Solar Fire                              No sound, cannot start
+Warlok            X                     Works
+Laser Cue         X                     Works
+Time Fantasy      Up        Q           Works
+Varkon                                  Mostly works
+Jungle Lord                 Q           Mostly works
+Joust                                   Does something? Not a normal pinball
+Hyperball                               Does something? Not a normal pinball
+
 
 ToDo:
+- Diagnostic buttons do not work
+- Some games have an additional alphanumeric display; not emulated as yet.
+
 
 *****************************************************************************************/
 
@@ -54,6 +83,8 @@ public:
 	DECLARE_READ8_MEMBER(dips_r);
 	DECLARE_READ8_MEMBER(switch_r);
 	DECLARE_WRITE8_MEMBER(switch_w);
+	DECLARE_READ8_MEMBER(nvram_r);
+	DECLARE_WRITE8_MEMBER(nvram_w);
 	DECLARE_READ_LINE_MEMBER(pia21_ca1_r);
 	DECLARE_READ_LINE_MEMBER(pia28_ca1_r);
 	DECLARE_READ_LINE_MEMBER(pia28_cb1_r);
@@ -72,13 +103,17 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(audio_nmi);
 	DECLARE_INPUT_CHANGED_MEMBER(diag_ca1);
 	DECLARE_INPUT_CHANGED_MEMBER(diag_cb1);
+	DECLARE_INPUT_CHANGED_MEMBER(diag_coin);
 	DECLARE_MACHINE_RESET(s7);
 private:
 	UINT8 m_t_c;
 	UINT8 m_sound_data;
 	UINT8 m_strobe;
 	UINT8 m_kbdrow;
+	UINT8 m_nvram[0x100];
 	bool m_data_ok;
+	bool m_memprotect;
+	virtual void machine_start();
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<dac_device> m_dac;
@@ -93,8 +128,10 @@ private:
 
 static ADDRESS_MAP_START( s7_main_map, AS_PROGRAM, 8, s7_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
-	AM_RANGE(0x0000, 0x01ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x0200, 0x13ff) AM_RAM
+	AM_RANGE(0x0000, 0x00ff) AM_RAM AM_MIRROR(0x1000)
+	AM_RANGE(0x0100, 0x01ff) AM_READWRITE(nvram_r,nvram_w)
+	AM_RANGE(0x0200, 0x03ff) AM_RAM AM_MIRROR(0x1000)
+	AM_RANGE(0x1100, 0x11ff) AM_RAM
 	AM_RANGE(0x2100, 0x2103) AM_DEVREADWRITE("pia21", pia6821_device, read, write) // sound+solenoids
 	AM_RANGE(0x2200, 0x2203) AM_DEVREADWRITE("pia22", pia6821_device, read, write) // solenoids
 	AM_RANGE(0x2400, 0x2403) AM_DEVREADWRITE("pia24", pia6821_device, read, write) // lamps
@@ -114,17 +151,17 @@ static INPUT_PORTS_START( s7 )
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("X1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_TILT )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_TILT ) // pendulum tilt
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 ) // 2-player start
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START ) // 1-player start
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN3 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_TILT ) // slam tilt
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_8) // high score reset
 
 	PORT_START("X2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_A)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_X)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_S)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_D)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_F)
@@ -148,7 +185,7 @@ static INPUT_PORTS_START( s7 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_SLASH)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_COLON)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_QUOTE)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_X)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_A)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_MINUS)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_EQUALS)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_BACKSPACE)
@@ -187,8 +224,9 @@ static INPUT_PORTS_START( s7 )
 	PORT_START("DIAGS")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Audio Diag") PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, s7_state, audio_nmi, 1)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Main Diag") PORT_CODE(KEYCODE_F2) PORT_CHANGED_MEMBER(DEVICE_SELF, s7_state, main_nmi, 1)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Advance") PORT_CODE(KEYCODE_0) PORT_CHANGED_MEMBER(DEVICE_SELF, s7_state, diag_ca1, 1)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Up/Down") PORT_CODE(KEYCODE_9) PORT_CHANGED_MEMBER(DEVICE_SELF, s7_state, diag_cb1, 1)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Advance") PORT_CODE(KEYCODE_0) PORT_CHANGED_MEMBER(DEVICE_SELF, s7_state, diag_ca1, 0)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Up/Down") PORT_CODE(KEYCODE_9) PORT_CHANGED_MEMBER(DEVICE_SELF, s7_state, diag_cb1, 0) PORT_TOGGLE
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Coin Door") PORT_CODE(KEYCODE_8) PORT_CHANGED_MEMBER(DEVICE_SELF, s7_state, diag_coin, 1) PORT_TOGGLE
 
 	PORT_START("DSW0")
 	PORT_DIPNAME( 0x01, 0x01, "SW01" )
@@ -243,11 +281,6 @@ static INPUT_PORTS_START( s7 )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 INPUT_PORTS_END
 
-MACHINE_RESET_MEMBER( s7_state, s7 )
-{
-	m_t_c = 0;
-}
-
 INPUT_CHANGED_MEMBER( s7_state::main_nmi )
 {
 	// Diagnostic button sends a pulse to NMI pin
@@ -264,14 +297,17 @@ INPUT_CHANGED_MEMBER( s7_state::audio_nmi )
 
 INPUT_CHANGED_MEMBER( s7_state::diag_ca1 )
 {
-//	if (newval==CLEAR_LINE)
-		m_pia28->ca1_w(!newval);
+	m_pia28->ca1_w(oldval); // newval inverted by ic5, so use oldval
 }
 
 INPUT_CHANGED_MEMBER( s7_state::diag_cb1 )
 {
-//	if (newval==CLEAR_LINE)
-		m_pia28->cb1_w(!newval);
+	m_pia28->cb1_w(oldval); // newval inverted by ic5, so use oldval
+}
+
+INPUT_CHANGED_MEMBER( s7_state::diag_coin )
+{
+	m_memprotect = newval;
 }
 
 WRITE8_MEMBER( s7_state::sol2_w )
@@ -287,21 +323,7 @@ WRITE8_MEMBER( s7_state::sol3_w )
 
 WRITE8_MEMBER( s7_state::sound_w )
 {
-	UINT8 sound_data = ioport("SND")->read();
-	if (BIT(data, 0))
-		sound_data &= 0xfe;
-
-	if (BIT(data, 1))
-		sound_data &= 0xfd;
-
-	if (BIT(data, 2))
-		sound_data &= 0xfb;
-
-	if (BIT(data, 3))
-		sound_data &= 0xf7;
-
-	if (BIT(data, 4))
-		sound_data &= 0xef;
+	UINT8 sound_data = (ioport("SND")->read() & 0xe0) | (data & 0x1f);
 
 	bool cb1 = ((sound_data & 0x9f) != 0x9f);
 
@@ -368,7 +390,7 @@ READ8_MEMBER( s7_state::switch_r )
 {
 	char kbdrow[8];
 	sprintf(kbdrow,"X%X",m_kbdrow);
-	return ioport(kbdrow)->read();
+	return ioport(kbdrow)->read() ^ 0xff; // comes in through inverter buffers
 }
 
 WRITE8_MEMBER( s7_state::switch_w )
@@ -376,12 +398,25 @@ WRITE8_MEMBER( s7_state::switch_w )
 	m_kbdrow = data;
 }
 
+READ8_MEMBER( s7_state::nvram_r )
+{
+	return m_nvram[offset] | 0xf0;
+}
+
+WRITE8_MEMBER( s7_state::nvram_w )
+{
+	if ((m_memprotect) && (offset > 0x7f))
+	{}
+	else
+		m_nvram[offset] = data;
+}
+
 READ8_MEMBER( s7_state::dac_r )
 {
 	return m_sound_data;
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER( s7_state::irq)
+TIMER_DEVICE_CALLBACK_MEMBER( s7_state::irq )
 {
 	if (m_t_c > 0x70)
 		m_maincpu->set_input_line(M6800_IRQ_LINE, ASSERT_LINE);
@@ -389,9 +424,21 @@ TIMER_DEVICE_CALLBACK_MEMBER( s7_state::irq)
 		m_t_c++;
 }
 
+void s7_state::machine_start()
+{
+	m_memprotect = 0;
+	save_item(NAME(m_nvram));
+	machine().device<nvram_device>("nvram")->set_base(m_nvram, sizeof(m_nvram));
+}
+
+MACHINE_RESET_MEMBER( s7_state, s7 )
+{
+	m_t_c = 0;
+}
+
 static MACHINE_CONFIG_START( s7, s7_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6808, 4000000)
+	MCFG_CPU_ADD("maincpu", M6808, 3580000)
 	MCFG_CPU_PROGRAM_MAP(s7_main_map)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq", s7_state, irq, attotime::from_hz(250))
 	MCFG_MACHINE_RESET_OVERRIDE(s7_state, s7)
@@ -404,7 +451,8 @@ static MACHINE_CONFIG_START( s7, s7_state )
 
 	/* Devices */
 	MCFG_DEVICE_ADD("pia21", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(s7_state, dac_r))
+	MCFG_PIA_READPA_HANDLER(CONSTANT(0xff))
+	MCFG_PIA_READPB_HANDLER(CONSTANT(0x3f))
 	MCFG_PIA_WRITEPA_HANDLER(WRITE8(s7_state, sound_w))
 	MCFG_PIA_WRITEPB_HANDLER(WRITE8(s7_state, sol2_w))
 	MCFG_PIA_CA2_HANDLER(WRITELINE(s7_state, pia21_ca2_w))
@@ -450,7 +498,7 @@ static MACHINE_CONFIG_START( s7, s7_state )
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* Add the soundcard */
-	MCFG_CPU_ADD("audiocpu", M6808, 4000000)
+	MCFG_CPU_ADD("audiocpu", M6808, 3580000)
 	MCFG_CPU_PROGRAM_MAP(s7_audio_map)
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("dac", DAC, 0)
@@ -462,6 +510,8 @@ static MACHINE_CONFIG_START( s7, s7_state )
 	MCFG_DEVICE_ADD("pias", PIA6821, 0)
 	MCFG_PIA_READPB_HANDLER(READ8(s7_state, dac_r))
 	MCFG_PIA_WRITEPA_HANDLER(DEVWRITE8("dac", dac_device, write_unsigned8))
+	MCFG_PIA_WRITEPB_HANDLER(NULL)
+	MCFG_PIA_READCA1_HANDLER(VCC)
 	MCFG_PIA_CA2_HANDLER(DEVWRITELINE("hc55516", hc55516_device, digit_w))
 	MCFG_PIA_CB2_HANDLER(DEVWRITELINE("hc55516", hc55516_device, clock_w))
 	MCFG_PIA_IRQA_HANDLER(DEVWRITELINE("audiocpu", m6808_cpu_device, irq_line))
@@ -803,26 +853,26 @@ ROM_END
 
 
 
-GAME( 1980, bk_l4,    0,        s7, s7, driver_device, 0, ROT0, "Williams", "Black Knight (L-4)", GAME_MECHANICAL | GAME_NOT_WORKING | GAME_NO_SOUND)
-GAME( 1980, bk_f4,    bk_l4,    s7, s7, driver_device, 0, ROT0, "Williams", "Black Knight (L-4, French speech)", GAME_MECHANICAL | GAME_NOT_WORKING | GAME_NO_SOUND)
-GAME( 1980, bk_l3,    bk_l4,    s7, s7, driver_device, 0, ROT0, "Williams", "Black Knight (L-3)", GAME_MECHANICAL | GAME_NOT_WORKING | GAME_NO_SOUND)
-GAME( 1980, csmic_l1, 0,        s7, s7, driver_device, 0, ROT0, "Williams", "Cosmic Gunfight (L-1)", GAME_MECHANICAL | GAME_NOT_WORKING | GAME_NO_SOUND)
-GAME( 1981, jngld_l2, 0,        s7, s7, driver_device, 0, ROT0, "Williams", "Jungle Lord (L-2)", GAME_MECHANICAL | GAME_NOT_WORKING | GAME_NO_SOUND)
-GAME( 1981, jngld_l1, jngld_l2, s7, s7, driver_device, 0, ROT0, "Williams", "Jungle Lord (L-1)", GAME_MECHANICAL | GAME_NOT_WORKING | GAME_NO_SOUND)
-GAME( 1981, pharo_l2, 0,        s7, s7, driver_device, 0, ROT0, "Williams", "Pharaoh (L-2)", GAME_MECHANICAL | GAME_NOT_WORKING | GAME_NO_SOUND)
+GAME( 1980, bk_l4,    0,        s7, s7, driver_device, 0, ROT0, "Williams", "Black Knight (L-4)", GAME_MECHANICAL | GAME_NOT_WORKING )
+GAME( 1980, bk_f4,    bk_l4,    s7, s7, driver_device, 0, ROT0, "Williams", "Black Knight (L-4, French speech)", GAME_MECHANICAL | GAME_NOT_WORKING )
+GAME( 1980, bk_l3,    bk_l4,    s7, s7, driver_device, 0, ROT0, "Williams", "Black Knight (L-3)", GAME_MECHANICAL | GAME_NOT_WORKING )
+GAME( 1980, csmic_l1, 0,        s7, s7, driver_device, 0, ROT0, "Williams", "Cosmic Gunfight (L-1)", GAME_MECHANICAL | GAME_NOT_WORKING )
+GAME( 1981, jngld_l2, 0,        s7, s7, driver_device, 0, ROT0, "Williams", "Jungle Lord (L-2)", GAME_MECHANICAL | GAME_NOT_WORKING )
+GAME( 1981, jngld_l1, jngld_l2, s7, s7, driver_device, 0, ROT0, "Williams", "Jungle Lord (L-1)", GAME_MECHANICAL | GAME_NOT_WORKING )
+GAME( 1981, pharo_l2, 0,        s7, s7, driver_device, 0, ROT0, "Williams", "Pharaoh (L-2)", GAME_MECHANICAL | GAME_NOT_WORKING )
 GAME( 1981, solar_l2, 0,        s7, s7, driver_device, 0, ROT0, "Williams", "Solar Fire (L-2)", GAME_MECHANICAL | GAME_NOT_WORKING | GAME_NO_SOUND)
-GAME( 1982, thund_p1, 0,        s7, s7, driver_device, 0, ROT0, "Williams", "Thunderball (P-1)", GAME_MECHANICAL | GAME_NOT_WORKING | GAME_NO_SOUND)
-GAME( 1982, thund_p2, thund_p1, s7, s7, driver_device, 0, ROT0, "Williams", "Thunderball (P-2)", GAME_MECHANICAL | GAME_NOT_WORKING | GAME_NO_SOUND)
-GAME( 1982, thund_p3, thund_p1, s7, s7, driver_device, 0, ROT0, "Williams", "Thunderball (P-3)", GAME_MECHANICAL | GAME_NOT_WORKING | GAME_NO_SOUND)
-GAME( 1981, hypbl_l4, 0,        s7, s7, driver_device, 0, ROT0, "Williams", "HyperBall (L-4)", GAME_MECHANICAL | GAME_NOT_WORKING | GAME_NO_SOUND)
-GAME( 1981, hypbl_l2, hypbl_l4, s7, s7, driver_device, 0, ROT0, "Williams", "HyperBall (L-2)", GAME_MECHANICAL | GAME_NOT_WORKING | GAME_NO_SOUND)
+GAME( 1982, thund_p1, 0,        s7, s7, driver_device, 0, ROT0, "Williams", "Thunderball (P-1)", GAME_MECHANICAL | GAME_IMPERFECT_SOUND )
+GAME( 1982, thund_p2, thund_p1, s7, s7, driver_device, 0, ROT0, "Williams", "Thunderball (P-2)", GAME_MECHANICAL | GAME_IMPERFECT_SOUND )
+GAME( 1982, thund_p3, thund_p1, s7, s7, driver_device, 0, ROT0, "Williams", "Thunderball (P-3)", GAME_MECHANICAL | GAME_IMPERFECT_SOUND )
+GAME( 1981, hypbl_l4, 0,        s7, s7, driver_device, 0, ROT0, "Williams", "HyperBall (L-4)", GAME_MECHANICAL | GAME_NOT_WORKING )
+GAME( 1981, hypbl_l2, hypbl_l4, s7, s7, driver_device, 0, ROT0, "Williams", "HyperBall (L-2)", GAME_MECHANICAL | GAME_NOT_WORKING )
 GAME( 1981, barra_l1, 0,        s7, s7, driver_device, 0, ROT0, "Williams", "Barracora (L-1)", GAME_MECHANICAL | GAME_NOT_WORKING | GAME_NO_SOUND)
-GAME( 1982, vrkon_l1, 0,        s7, s7, driver_device, 0, ROT0, "Williams", "Varkon (L-1)", GAME_MECHANICAL | GAME_NOT_WORKING | GAME_NO_SOUND)
-GAME( 1982, tmfnt_l5, 0,        s7, s7, driver_device, 0, ROT0, "Williams", "Time Fantasy (L-5)", GAME_MECHANICAL | GAME_NOT_WORKING | GAME_NO_SOUND)
-GAME( 1982, wrlok_l3, 0,        s7, s7, driver_device, 0, ROT0, "Williams", "Warlok (L-3)", GAME_MECHANICAL | GAME_NOT_WORKING | GAME_NO_SOUND)
-GAME( 1982, dfndr_l4, 0,        s7, s7, driver_device, 0, ROT0, "Williams", "Defender (L-4)", GAME_MECHANICAL | GAME_NOT_WORKING | GAME_NO_SOUND)
-GAME( 1983, jst_l2,   0,        s7, s7, driver_device, 0, ROT0, "Williams", "Joust (L-2)", GAME_MECHANICAL | GAME_NOT_WORKING | GAME_NO_SOUND)
-GAME( 1983, jst_l1,   jst_l2,   s7, s7, driver_device, 0, ROT0, "Williams", "Joust (L-1)", GAME_MECHANICAL | GAME_NOT_WORKING | GAME_NO_SOUND)
-GAME( 1983, lsrcu_l2, 0,        s7, s7, driver_device, 0, ROT0, "Williams", "Laser Cue (L-2)", GAME_MECHANICAL | GAME_NOT_WORKING | GAME_NO_SOUND)
-GAME( 1983, fpwr2_l2, 0,        s7, s7, driver_device, 0, ROT0, "Williams", "Firepower II (L-2)", GAME_MECHANICAL | GAME_NOT_WORKING | GAME_NO_SOUND)
-GAME( 1984, strlt_l1, 0,        s7, s7, driver_device, 0, ROT0, "Williams", "Star Light (L-1)", GAME_MECHANICAL | GAME_NOT_WORKING | GAME_NO_SOUND)
+GAME( 1982, vrkon_l1, 0,        s7, s7, driver_device, 0, ROT0, "Williams", "Varkon (L-1)", GAME_MECHANICAL | GAME_NOT_WORKING )
+GAME( 1982, tmfnt_l5, 0,        s7, s7, driver_device, 0, ROT0, "Williams", "Time Fantasy (L-5)", GAME_MECHANICAL )
+GAME( 1982, wrlok_l3, 0,        s7, s7, driver_device, 0, ROT0, "Williams", "Warlok (L-3)", GAME_MECHANICAL )
+GAME( 1982, dfndr_l4, 0,        s7, s7, driver_device, 0, ROT0, "Williams", "Defender (L-4)", GAME_MECHANICAL | GAME_NOT_WORKING )
+GAME( 1983, jst_l2,   0,        s7, s7, driver_device, 0, ROT0, "Williams", "Joust (L-2)", GAME_MECHANICAL | GAME_NOT_WORKING )
+GAME( 1983, jst_l1,   jst_l2,   s7, s7, driver_device, 0, ROT0, "Williams", "Joust (L-1)", GAME_MECHANICAL | GAME_NOT_WORKING )
+GAME( 1983, lsrcu_l2, 0,        s7, s7, driver_device, 0, ROT0, "Williams", "Laser Cue (L-2)", GAME_MECHANICAL )
+GAME( 1983, fpwr2_l2, 0,        s7, s7, driver_device, 0, ROT0, "Williams", "Firepower II (L-2)", GAME_MECHANICAL | GAME_NOT_WORKING )
+GAME( 1984, strlt_l1, 0,        s7, s7, driver_device, 0, ROT0, "Williams", "Star Light (L-1)", GAME_MECHANICAL | GAME_NOT_WORKING )
