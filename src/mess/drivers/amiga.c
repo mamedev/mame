@@ -60,6 +60,7 @@ public:
 	a2000_state(const machine_config &mconfig, device_type type, const char *tag) :
 	amiga_state(mconfig, type, tag),
 	m_rtc(*this, "u65"),
+	m_zorro(*this, ZORROBUS_TAG),
 	m_zorro2_int2(0),
 	m_zorro2_int6(0)
 	{ }
@@ -74,6 +75,8 @@ public:
 	DECLARE_WRITE16_MEMBER( clock_w );
 
 protected:
+	virtual void machine_reset();
+
 	// amiga_state overrides
 	virtual bool int2_pending();
 	virtual bool int6_pending();
@@ -81,6 +84,7 @@ protected:
 private:
 	// devices
 	required_device<msm6242_device> m_rtc;
+	required_device<zorro2_device> m_zorro;
 
 	// internal state
 	int m_zorro2_int2;
@@ -91,20 +95,29 @@ class a500_state : public amiga_state
 {
 public:
 	a500_state(const machine_config &mconfig, device_type type, const char *tag) :
-	amiga_state(mconfig, type, tag)
-	//m_side_int2(0),
-	//m_side_int6(0)
+	amiga_state(mconfig, type, tag),
+	m_side(*this, EXP_SLOT_TAG),
+	m_side_int2(0),
+	m_side_int6(0)
 	{ }
 
 	DECLARE_DRIVER_INIT( pal );
 	DECLARE_DRIVER_INIT( ntsc );
 
 protected:
+	virtual void machine_reset();
+
+	// amiga_state overrides
+	virtual bool int2_pending();
+	virtual bool int6_pending();
 
 private:
+	// devices
+	required_device<exp_slot_device> m_side;
+
 	// internal state
-	//int m_side_int2;
-	//int m_side_int6;
+	int m_side_int2;
+	int m_side_int6;
 };
 
 class cdtv_state : public amiga_state
@@ -180,9 +193,10 @@ class a500p_state : public amiga_state
 public:
 	a500p_state(const machine_config &mconfig, device_type type, const char *tag) :
 	amiga_state(mconfig, type, tag),
-	m_rtc(*this, "u9")
-	//m_side_int2(0),
-	//m_side_int6(0)
+	m_rtc(*this, "u9"),
+	m_side(*this, EXP_SLOT_TAG),
+	m_side_int2(0),
+	m_side_int6(0)
 	{ }
 
 	DECLARE_READ16_MEMBER( clock_r );
@@ -192,14 +206,20 @@ public:
 	DECLARE_DRIVER_INIT( ntsc );
 
 protected:
+	virtual void machine_reset();
+
+	// amiga_state overrides
+	virtual bool int2_pending();
+	virtual bool int6_pending();
 
 private:
 	// devices
 	required_device<msm6242_device> m_rtc;
+	required_device<exp_slot_device> m_side;
 
 	// internal state
-	//int m_side_int2;
-	//int m_side_int6;
+	int m_side_int2;
+	int m_side_int6;
 };
 
 class a600_state : public amiga_state
@@ -557,6 +577,15 @@ WRITE16_MEMBER( a1000_state::write_protect_w )
 	m_maincpu->space(AS_PROGRAM).nop_write(0xfc0000, 0xffffff);
 }
 
+void a2000_state::machine_reset()
+{
+	// base reset
+	amiga_state::machine_reset();
+
+	// reset zorro devices
+	m_zorro->reset();
+}
+
 WRITE_LINE_MEMBER( a2000_state::zorro2_int2_w )
 {
 	m_zorro2_int2 = state;
@@ -577,6 +606,25 @@ bool a2000_state::int2_pending()
 bool a2000_state::int6_pending()
 {
 	return m_cia_1_irq || m_zorro2_int6;
+}
+
+void a500_state::machine_reset()
+{
+	// base reset
+	amiga_state::machine_reset();
+
+	// reset side expansion slot device
+	m_side->reset();
+}
+
+bool a500_state::int2_pending()
+{
+	return m_cia_0_irq || m_side_int2;
+}
+
+bool a500_state::int6_pending()
+{
+	return m_cia_1_irq || m_side_int6;
 }
 
 void cdtv_state::machine_start()
@@ -621,6 +669,25 @@ READ32_MEMBER( a3000_state::motherboard_r )
 WRITE32_MEMBER( a3000_state::motherboard_w )
 {
 	logerror("motherboard_w(%06x): %08x & %08x\n", offset, data, mem_mask);
+}
+
+void a500p_state::machine_reset()
+{
+	// base reset
+	amiga_state::machine_reset();
+
+	// reset side expansion slot device
+	m_side->reset();
+}
+
+bool a500p_state::int2_pending()
+{
+	return m_cia_0_irq || m_side_int2;
+}
+
+bool a500p_state::int6_pending()
+{
+	return m_cia_1_irq || m_side_int6;
 }
 
 bool a600_state::int2_pending()
