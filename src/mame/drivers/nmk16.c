@@ -273,7 +273,12 @@ READ16_MEMBER(nmk16_state::tharrier_mcu_r)
 		return res << 8;
 	}
 	else
+	{
+		// the above statement appears to be incorrect, it should also read DSW1 from here, almost certainly
+		// through the MCU.  The weird 0x080202 address where we read IN2 is also probably just a mirror of 0x080002 (here)
+
 		return ~ioport("IN1")->read();
+	}
 }
 
 WRITE16_MEMBER(nmk16_state::macross2_sound_reset_w)
