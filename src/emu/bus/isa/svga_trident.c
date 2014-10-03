@@ -60,7 +60,7 @@ const rom_entry *isa8_svga_tgui9680_device::device_rom_region() const
 //-------------------------------------------------
 
 isa8_svga_tgui9680_device::isa8_svga_tgui9680_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-		device_t(mconfig, ISA8_SVGA_TGUI9680, "Trident TGUI9680 Graphics Card", tag, owner, clock, "tgui9680", __FILE__),
+		device_t(mconfig, ISA8_SVGA_TGUI9680, "Trident TGUI9680 Graphics Card (BIOS X5.5 (02) 02/13/96)", tag, owner, clock, "tgui9680", __FILE__),
 		device_isa8_card_interface(mconfig, *this)
 {
 }
@@ -88,6 +88,9 @@ void isa8_svga_tgui9680_device::device_start()
 
 	// uncomment to test Windows 3.1 TGUI9440AGi driver
 //	m_isa->install_memory(0x4400000, 0x45fffff, 0, 0, read8_delegate(FUNC(trident_vga_device::vram_r),m_vga), write8_delegate(FUNC(trident_vga_device::vram_w),m_vga));
+
+	// win95 drivers
+	m_isa->install_memory(0x4000000, 0x41fffff, 0, 0, read8_delegate(FUNC(trident_vga_device::vram_r),m_vga), write8_delegate(FUNC(trident_vga_device::vram_w),m_vga));
 
 	// acceleration ports
 	m_isa->install_device(0x2120, 0x21ff, 0, 0, read8_delegate(FUNC(trident_vga_device::accel_r),m_vga), write8_delegate(FUNC(trident_vga_device::accel_w),m_vga));

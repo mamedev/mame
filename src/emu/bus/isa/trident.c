@@ -346,7 +346,6 @@ void trident_vga_device::trident_define_video_mode()
 	case 3:   xtal = xtal / 1.5; break;
 	}
 
-	// TODO: determine when 8 bit modes are selected
 	svga.rgb8_en = svga.rgb15_en = svga.rgb16_en = svga.rgb32_en = 0;
 	switch((tri.pixel_depth & 0x0c) >> 2)
 	{
@@ -377,7 +376,6 @@ UINT8 trident_vga_device::trident_seq_reg_read(UINT8 index)
 			case 0x0b:
 				res = svga.id;
 				tri.new_mode = true;
-				//debugger_break(machine());
 				break;
 			case 0x0c:  // Power Up Mode register 1
 				res = tri.sr0c & 0xef;
@@ -932,18 +930,20 @@ WRITE8_MEMBER(trident_vga_device::port_43c6_w)
 	}
 }
 
+// Trident refers to these registers as a LUTDAC
+// Not much else is known.  XFree86 uses register 4 for something related to DPMS
 READ8_MEMBER(trident_vga_device::port_83c6_r)
 {
 	UINT8 res = 0xff;
 	switch(offset)
 	{
 	case 2:
-		res = port_03c0_r(space,5,mem_mask);
-		if(LOG) logerror("Trident: 83c6 read %02x\n",res);
+		res = tri.lutdac_reg[tri.lutdac_index];
+		if(LOG) logerror("Trident: LUTDAC reg read %02x\n",res);
 		break;
 	case 4:
-		res = vga.sequencer.index;
-		if(LOG) logerror("Trident: 83c8 seq read %02x\n",res);
+		res = tri.lutdac_index;
+		if(LOG) logerror("Trident: LUTDAC index read %02x\n",res);
 		break;
 	}
 	return res;
@@ -954,12 +954,12 @@ WRITE8_MEMBER(trident_vga_device::port_83c6_w)
 	switch(offset)
 	{
 	case 2:
-		if(LOG) logerror("Trident: 83c6 seq write %02x\n",data);
-		port_03c0_w(space,5,data,mem_mask);
+		if(LOG) logerror("Trident: LUTDAC reg write %02x\n",data);
+		tri.lutdac_reg[tri.lutdac_index] = data;
 		break;
 	case 4:
-		if(LOG) logerror("Trident: 83c8 seq index write %02x\n",data);
-		vga.sequencer.index = data;
+		if(LOG) logerror("Trident: LUTDAC index write %02x\n",data);
+		tri.lutdac_index = data;
 		break;
 	}
 }

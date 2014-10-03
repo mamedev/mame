@@ -56,6 +56,8 @@ protected:
 		UINT8 cr29;
 		UINT8 cr39;
 		UINT8 dac;
+		UINT8 lutdac_reg[0x100];
+		UINT8 lutdac_index;
 		bool new_mode;
 		bool port_3c3;
 		UINT8 clock;
