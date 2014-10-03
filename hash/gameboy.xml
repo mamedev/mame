@@ -17257,6 +17257,20 @@
 		</part>
 	</software>
 
+<!-- does this fails the internal BIOS check? -->
+	<software name="rockmanp" cloneof="megaman" supported="no">
+		<description>Rockman World (Jpn, Prototype)</description>
+		<year>1991</year>
+		<publisher>Capcom</publisher>
+		<info name="alt_title" value="ロックマンワールド"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc1" />
+			<dataarea name="rom" size="262144">
+				<rom name="rockman world (proto).bin" size="262144" crc="d7356a4f" sha1="60c5c997b4b2c47d852520817228d2b8efc2a33f" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="rockman2" cloneof="megaman2">
 		<!-- Notes: Also released by NP in 2001-03 -->
 		<description>Rockman World 2 (Jpn)</description>

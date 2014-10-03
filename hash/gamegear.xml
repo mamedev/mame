@@ -756,10 +756,10 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 	</software>
 
 	<software name="beavis">
-		<description>Beavis and Butt-head (Euro)</description>
-		<year>1995</year>
+		<description>Beavis and Butt-head (Euro, USA)</description>
+		<year>1994</year>
 		<publisher>Viacom New Media</publisher>
-		<info name="serial" value="T-139018-50"/>
+		<info name="serial" value="T-139018, T-139018-50"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="beavis and butt-head (europe).bin" size="524288" crc="a6bf865e" sha1="dd2ea76c05d933b91f1b03140f6a04bf02f746d1" offset="000000" />
@@ -767,11 +767,15 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="beavisu" cloneof="beavis">
-		<description>Beavis and Butt-head (USA)</description>
+<!-- some disassembling performed by Paul Baker suggests that this version is a prototype
+e.g.  the mapper control register at $fffc gets set to $80, you cannot switch characters 
+on the pause screen, some messages are not displayed ("Sorry boys, no tickets, no show!" 
+to explain why it is not possible to progress beyond a certain point in the game without 
+a certain item) -->
+	<software name="beavisp" cloneof="beavis">
+		<description>Beavis and Butt-head (Prototype?)</description>
 		<year>1994</year>
 		<publisher>Viacom New Media</publisher>
-		<info name="serial" value="T-139018"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="beavis and butt-head (usa).bin" size="524288" crc="3858f14f" sha1="ef47d449f65cfe129368a77cc0a4679a0d55ee63" offset="000000" />
