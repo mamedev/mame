@@ -521,6 +521,7 @@ PCB Layouts missing
 #include "includes/msx.h"
 #include "bus/centronics/covox.h"
 #include "formats/dsk_dsk.h"
+#include "formats/dmk_dsk.h"
 #include "machine/msx_matsushita.h"
 #include "machine/msx_s1985.h"
 #include "machine/msx_systemflags.h"
@@ -1258,7 +1259,8 @@ static MACHINE_CONFIG_FRAGMENT( msx2_floplist )
 MACHINE_CONFIG_END
 
 FLOPPY_FORMATS_MEMBER( msx_state::floppy_formats )
-	FLOPPY_MSX_FORMAT
+	FLOPPY_MSX_FORMAT,
+	FLOPPY_DMK_FORMAT
 FLOPPY_FORMATS_END
 
 static SLOT_INTERFACE_START( msx_floppies )
@@ -8187,32 +8189,32 @@ MACHINE_CONFIG_END
 /* MSX1 */
 COMP(1986, ax150,     0,        0,      ax150,    msx, msx_state,      msx,     "Al Alamiah", "AX-150 (MSX1)", 0)
 COMP(1986, ax170,     0,        0,      ax170,    msx, msx_state,      msx,     "Al Alamiah", "AX-170 (MSX1)", 0)
-COMP(198?, canonv8,   0,        0,      canonv8,  msx, msx_state,      msx,     "Canon", "V-8 (MSX1)", 0)
+COMP(1983, canonv8,   0,        0,      canonv8,  msx, msx_state,      msx,     "Canon", "V-8 (MSX1)", 0)
 COMP(1983, canonv10,  canonv20, 0,      canonv10, msx, msx_state,      msx,     "Canon", "V-10 (MSX1)", 0)
 COMP(1983, canonv20,  0,        0,      canonv20, msx, msx_state,      msx,     "Canon", "V-20 (MSX1)", 0)
-COMP(198?, canonv20e, canonv20, 0,      canonv20, msx, msx_state,      msx,     "Canon", "V-20E (MSX1)", 0) // Different euro keyboard layout?
-COMP(198?, canonv20f, canonv20, 0,      canonv20, msx, msx_state,      msx,     "Canon", "V-20F (MSX1)", 0) // Different french keyboard layout?
-COMP(198?, canonv20g, canonv20, 0,      canonv20, msx, msx_state,      msx,     "Canon", "V-20G (MSX1)", 0) // Different german keyboard layout?
-COMP(198?, canonv20s, canonv20, 0,      canonv20, msx, msx_state,      msx,     "Canon", "V-20S (MSX1)", 0) // Different spanish keyboard layout?
+COMP(1983, canonv20e, canonv20, 0,      canonv20, msx, msx_state,      msx,     "Canon", "V-20E (MSX1)", 0) // Different euro keyboard layout?
+COMP(1983, canonv20f, canonv20, 0,      canonv20, msx, msx_state,      msx,     "Canon", "V-20F (MSX1)", 0) // Different french keyboard layout?
+COMP(1983, canonv20g, canonv20, 0,      canonv20, msx, msx_state,      msx,     "Canon", "V-20G (MSX1)", 0) // Different german keyboard layout?
+COMP(1983, canonv20s, canonv20, 0,      canonv20, msx, msx_state,      msx,     "Canon", "V-20S (MSX1)", 0) // Different spanish keyboard layout?
 COMP(198?, mx10,      0,        0,      mx10,     msx, msx_state,      msx,     "Casio", "MX-10 (MSX1)", 0)
 COMP(198?, mx101,     mx10,     0,      mx101,    msx, msx_state,      msx,     "Casio", "MX-101 (MSX1)", 0)
 COMP(198?, mx15,      mx10,     0,      mx15,     msx, msx_state,      msx,     "Casio", "MX-15 (MSX1)", 0)
-COMP(198?, pv7,       0,        0,      pv7,      msx, msx_state,      msx,     "Casio", "PV-7 (MSX1)", 0)
+COMP(1984, pv7,       0,        0,      pv7,      msx, msx_state,      msx,     "Casio", "PV-7 (MSX1)", 0)
 COMP(1984, pv16,      0,        0,      pv16,     msx, msx_state,      msx,     "Casio", "PV-16 (MSX1)", 0)
 COMP(198?, cpc88,     0,        0,      cpc88,    msxkr, msx_state,    msx,     "Daewoo", "CPC-88 (Korea) (MSX1)", 0)
 COMP(1984, dpc100,    dpc200,   0,      dpc100,   msxkr, msx_state,    msx,     "Daewoo", "IQ-1000 DPC-100 (Korea) (MSX1)", 0)
 COMP(1984, dpc180,    dpc200,   0,      dpc180,   msxkr, msx_state,    msx,     "Daewoo", "IQ-1000 DPC-180 (Korea) (MSX1)", 0)
 COMP(1984, dpc200,    0,        0,      dpc200,   msxkr, msx_state,    msx,     "Daewoo", "IQ-1000 DPC-200 (Korea) (MSX1)", 0)
-COMP(198?, dpc200e,   0,        0,      dpc200e,  msx, msx_state,      msx,     "Daewoo", "DPC-200E (MSX1)", 0)
-COMP(198?, cpc50a,    cpc51,    0,      cpc50a,   msxkr, msx_state,    msx,     "Daewoo", "Zemmix CPC-50A (Korea) (MSX1)", 0)
-COMP(198?, cpc50b,    cpc51,    0,      cpc50b,   msxkr, msx_state,    msx,     "Daewoo", "Zemmix CPC-50B (Korea) (MSX1)", 0)
-COMP(198?, cpc51,     0,        0,      cpc51,    msxkr, msx_state,    msx,     "Daewoo", "Zemmix CPC-51 (Korea) (MSX1)", 0)
-COMP(198?, fdpc200,   0,        0,      fdpc200,  msx, msx_state,      msx,     "Fenner", "DPC-200 (MSX1) ", 0)
-COMP(198?, fpc500,    0,        0,      fpc500,   msx, msx_state,      msx,     "Fenner", "FPC-500 (MSX1)", 0)
-COMP(198?, fspc800,   0,        0,      fspc800,  msx, msx_state,      msx,     "Fenner", "SPC-800 (MSX1) ", 0)
+COMP(1985, dpc200e,   0,        0,      dpc200e,  msx, msx_state,      msx,     "Daewoo", "DPC-200E (MSX1)", 0)
+COMP(1983, cpc50a,    cpc51,    0,      cpc50a,   msxkr, msx_state,    msx,     "Daewoo", "Zemmix CPC-50A (Korea) (MSX1)", 0)
+COMP(1983, cpc50b,    cpc51,    0,      cpc50b,   msxkr, msx_state,    msx,     "Daewoo", "Zemmix CPC-50B (Korea) (MSX1)", 0)
+COMP(1986, cpc51,     0,        0,      cpc51,    msxkr, msx_state,    msx,     "Daewoo", "Zemmix CPC-51 (Korea) (MSX1)", 0)
+COMP(1983, fdpc200,   0,        0,      fdpc200,  msx, msx_state,      msx,     "Fenner", "DPC-200 (MSX1) ", 0)
+COMP(1984, fpc500,    0,        0,      fpc500,   msx, msx_state,      msx,     "Fenner", "FPC-500 (MSX1)", 0)
+COMP(1986, fspc800,   0,        0,      fspc800,  msx, msx_state,      msx,     "Fenner", "SPC-800 (MSX1) ", 0)
 COMP(1984, bruc100,   0,        0,      bruc100,  msx, msx_state,      msx,     "Frael", "Bruc 100-1 (MSX1)", 0)
-COMP(198?, fmx,       0,        0,      fmx,      msxjp, msx_state,    msx,     "Fujitsu", "FM-X (MSX1)", 0)
-COMP(198?, gsfc80u,   0,        0,      gsfc80u,  msxkr, msx_state,    msx,     "Goldstar", "FC-80U (MSX1)", 0)
+COMP(1983, fmx,       0,        0,      fmx,      msxjp, msx_state,    msx,     "Fujitsu", "FM-X (MSX1)", 0)
+COMP(1984, gsfc80u,   0,        0,      gsfc80u,  msxkr, msx_state,    msx,     "Goldstar", "FC-80U (MSX1)", 0)
 COMP(1983, gsfc200,   0,        0,      gsfc200,  msx, msx_state,      msx,     "Goldstar", "FC-200 (MSX1)", 0)
 COMP(198?, gfc1080,   0,        0,      gfc1080,  msxkr, msx_state,    msx,     "Goldstar", "GFC-1080 (MSX1)", 0)
 COMP(198?, gfc1080a,  0,        0,      gfc1080a, msxkr, msx_state,    msx,     "Goldstar", "GFC-1080A (MSX1)", 0)
@@ -8266,15 +8268,15 @@ COMP(1985, hotbi13b,  hotbi13p, 0,      hotbi13b, hotbit, msx_state,   msx,     
 COMP(1985, hotbi13p,  0,        0,      hotbi13p, hotbit, msx_state,   msx,     "Sharp / Epcom", "HB-8000 Hotbit 1.3p (MSX1)", 0)
 COMP(198?, hb10,      hb10p,    0,      hb10,     msxjp, msx_state,    msx,     "Sony", "HB-10 (MSX1)", 0)
 COMP(1985, hb10p,     0,        0,      hb10p,    msx, msx_state,      msx,     "Sony", "HB-10P (MSX1)", 0)
-COMP(198?, hb101p,    0,        0,      hb101p,   msx, msx_state,      msx,     "Sony", "HB-101P (MSX1)", 0)
+COMP(1984, hb101p,    0,        0,      hb101p,   msx, msx_state,      msx,     "Sony", "HB-101P (MSX1)", 0)
 COMP(1985, hb20p,     0,        0,      hb20p,    msx, msx_state,      msx,     "Sony", "HB-20P (Spanish) (MSX1)", 0)
 COMP(1985, hb201,     hb201p,   0,      hb201,    msxjp, msx_state,    msx,     "Sony", "HB-201 (Japan) (MSX1)", 0)
 COMP(1985, hb201p,    0,        0,      hb201p,   msx, msx_state,      msx,     "Sony", "HB-201P (MSX1)", 0)
 COMP(1984, hb501p,    0,        0,      hb501p,   msx, msx_state,      msx,     "Sony", "HB-501P (MSX1)", 0)
-COMP(198?, hb55,      hb55p,    0,      hb55,     msxjp, msx_state,    msx,     "Sony", "HB-55 (MSX1)", 0)
+COMP(1983, hb55,      hb55p,    0,      hb55,     msxjp, msx_state,    msx,     "Sony", "HB-55 (MSX1)", 0)
 COMP(1983, hb55d,     hb55p,    0,      hb55d,    msx, msx_state,      msx,     "Sony", "HB-55D (Germany) (MSX1)", 0)
 COMP(1983, hb55p,     0,        0,      hb55p,    msx, msx_state,      msx,     "Sony", "HB-55P (MSX1)", 0)
-COMP(198?, hb701fd,   0,        0,      hb701fd,  msxjp, msx_state,    msx,     "Sony", "HB-701FD (MSX1)", 0)
+COMP(1984, hb701fd,   0,        0,      hb701fd,  msxjp, msx_state,    msx,     "Sony", "HB-701FD (MSX1)", 0)
 COMP(1983, hb75d,     hb75p,    0,      hb75d,    msx, msx_state,      msx,     "Sony", "HB-75D (Germany) (MSX1)", 0)
 COMP(1983, hb75p,     0,        0,      hb75p,    msx, msx_state,      msx,     "Sony", "HB-75P (MSX1)", 0)
 COMP(1985, svi728,    0,        0,      svi728,   msx, msx_state,      msx,     "Spectravideo", "SVI-728 (MSX1)", 0)
@@ -8302,8 +8304,8 @@ COMP(198?, hx22i,     hx22,     0,      hx22i,    msx, msx_state,      msx,     
 COMP(198?, hc5,       hc7,      0,      hc5,      msxjp, msx_state,    msx,     "Victor", "HC-5 (MSX1)", 0)
 COMP(198?, hc6,       hc7,      0,      hc6,      msxjp, msx_state,    msx,     "Victor", "HC-6 (MSX1)", 0)
 COMP(198?, hc7,       0,        0,      hc7,      msxjp, msx_state,    msx,     "Victor", "HC-7 (MSX1)", 0)
-COMP(198?, cx5f1,     cx5f,     0,      cx5f1,    msxjp, msx_state,    msx,     "Yamaha", "CX5F (w/SFG01) (MSX1)", 0)
-COMP(198?, cx5f,      0,        0,      cx5f,     msxjp, msx_state,    msx,     "Yamaha", "CX5F (w/SFG05) (MSX1)", 0)
+COMP(1984, cx5f1,     cx5f,     0,      cx5f1,    msxjp, msx_state,    msx,     "Yamaha", "CX5F (w/SFG01) (MSX1)", 0)
+COMP(1984, cx5f,      0,        0,      cx5f,     msxjp, msx_state,    msx,     "Yamaha", "CX5F (w/SFG05) (MSX1)", 0)
 COMP(1984, cx5m,      cx5m128,  0,      cx5m,     msx, msx_state,      msx,     "Yamaha", "CX5M (MSX1)", 0)
 COMP(1984, cx5m128,   0,        0,      cx5m128,  msx, msx_state,      msx,     "Yamaha", "CX5M-128 (MSX1)", 0)
 COMP(1984, cx5m2,     cx5m128,  0,      cx5m2,    msx, msx_state,      msx,     "Yamaha", "CX5MII (MSX1)", 0)
@@ -8320,16 +8322,16 @@ COMP(1984, mx64,      0,        0,      mx64,     msxkr, msx_state,    msx,     
 /* MSX2 */
 COMP(1986, ax350,     0,        0,      ax350,    msx2, msx_state,     msx,     "Al Alamiah", "AX-350 (MSX2)", 0)
 COMP(1986, ax370,     0,        0,      ax370,    msx2, msx_state,     msx,     "Al Alamiah", "AX-370 (MSX2)", 0)
-COMP(198?, canonv25,  0,        0,      canonv25, msx2, msx_state,     msx,     "Canon", "V-25 (MSX2)", 0)
-COMP(198?, canonv30,  0,        0,      canonv30, msx2, msx_state,     msx,     "Canon", "V-30 (MSX2)", 0)
-COMP(198?, canonv30f, canonv30, 0,      canonv30f, msx2, msx_state,    msx,     "Canon", "V-30F (MSX2)", 0)
+COMP(1985, canonv25,  0,        0,      canonv25, msx2, msx_state,     msx,     "Canon", "V-25 (MSX2)", 0)
+COMP(1985, canonv30,  0,        0,      canonv30, msx2, msx_state,     msx,     "Canon", "V-30 (MSX2)", 0)
+COMP(1985, canonv30f, canonv30, 0,      canonv30f, msx2, msx_state,    msx,     "Canon", "V-30F (MSX2)", 0)
 COMP(1986, cpc300,    0,        0,      cpc300,   msx2kr, msx_state,   msx,     "Daewoo", "IQ-2000 CPC-300 (Korea) (MSX2)", 0)
 COMP(1986, cpc300e,   0,        0,      cpc300e,  msx2kr, msx_state,   msx,     "Daewoo", "IQ-2000 CPC-300E (Korea) (MSX2)", 0)
-COMP(198?, cpc330k,   0,        0,      cpc330k,  msx2kr, msx_state,   msx,     "Daewoo", "CPC-330K KOBO (Korea) (MSX2)", 0)
+COMP(1985, cpc330k,   0,        0,      cpc330k,  msx2kr, msx_state,   msx,     "Daewoo", "CPC-330K KOBO (Korea) (MSX2)", 0)
 COMP(1988, cpc400,    0,        0,      cpc400,   msx2kr, msx_state,   msx,     "Daewoo", "X-II CPC-400 (Korea) (MSX2)", 0)
 COMP(1988, cpc400s,   0,        0,      cpc400s,  msx2kr, msx_state,   msx,     "Daewoo", "X-II CPC-400S (Korea) (MSX2)", 0)
-COMP(198?, cpc61,     0,        0,      cpc61,    msx2kr, msx_state,   msx,     "Daewoo", "Zemmix CPC-61 (Korea) (MSX2)", 0)
-COMP(198?, cpg120,    0,        0,      cpg120,   msx2kr, msx_state,   msx,     "Daewoo", "Zemmix CPG-120 (Korea) (MSX2)", GAME_NOT_WORKING) // v9958 not added
+COMP(1990, cpc61,     0,        0,      cpc61,    msx2kr, msx_state,   msx,     "Daewoo", "Zemmix CPC-61 (Korea) (MSX2)", 0)
+COMP(1991, cpg120,    0,        0,      cpg120,   msx2kr, msx_state,   msx,     "Daewoo", "Zemmix CPG-120 Normal (Korea) (MSX2)", GAME_NOT_WORKING) // v9958 not added
 COMP(198?, fpc900,    0,        0,      fpc900,   msx2, msx_state,     msx,     "Fenner", "FPC-900 (MSX2)", 0)
 COMP(1986, expert20,  0,        0,      expert20, msx2, msx_state,     msx,     "Gradiente", "Expert 2.0 (Brazil) (MSX2)", 0)
 COMP(198?, mbh70,     0,        0,      mbh70,    msx2jp, msx_state,   msx,     "Hitachi", "MB-H70 (MSX2)", GAME_NOT_WORKING) // Firmware not working
@@ -8404,7 +8406,7 @@ COMP(190?, hx23i,     0,        0,      hx23i,    msx2, msx_state,     msx,     
 COMP(198?, hx33,      0,        0,      hx33,     msx2jp, msx_state,   msx,     "Toshiba", "HX-33 (MSX2)", 0)
 COMP(198?, hx34,      hx34i,    0,      hx34,     msx2jp, msx_state,   msx,     "Toshiba", "HX-34 (MSX2)", GAME_NOT_WORKING) // Floppy support broken
 COMP(198?, hx34i,     0,        0,      hx34i,    msx, msx_state,      msx,     "Toshiba", "HX-34I (MSX2)", GAME_NOT_WORKING) // Floppy support broken
-COMP(198?, fstm1,     0,        0,      fstm1,    msx, msx_state,      msx,     "Toshiba", "FS-TM1 (MSX2)", 0)
+COMP(1985, fstm1,     0,        0,      fstm1,    msx, msx_state,      msx,     "Toshiba", "FS-TM1 (MSX2)", 0)
 COMP(198?, victhc90,  victhc95, 0,      victhc90, msxjp, msx_state,    msx,     "Victor", "HC-90 (MSX2)", GAME_NOT_WORKING) // 2nd cpu/turbo not emulated, firmware won't start
 COMP(198?, victhc95,  0,        0,      victhc95, msxjp, msx_state,    msx,     "Victor", "HC-95 (MSX2)", GAME_NOT_WORKING) // 2nd cpu/turbo not emulated, firmware won't start
 COMP(198?, victhc95a, victhc95, 0,      victhc95a, msxjp, msx_state,   msx,     "Victor", "HC-95A (MSX2)", GAME_NOT_WORKING) // 2nd cpu/turbo not emulated, firmware won't start
