@@ -19,8 +19,8 @@ is ineffective/unknown. All games can coin up.
 Game              Outhole   Tilt        Notes
 ----------------------------------------------------------------------------------
 Black Knight      L Z C     U           To start, hold down LZC and press 1.
-Firepower II                            Cannot start
-Defender                                Cannot start
+Firepower II      S D                   To start, hold down SD and press 1.
+Defender          rs I O                To start, hold down IO and Right-Shift, then press 1.
 Pharoah           Right Up              To start, hold down Right and Down, and press 1
 Starlight         S D                   To start, hold down SD and press 1.
 Cosmic Gunfight   ; '                   To start, press 1 then hold down quote and colon
@@ -30,8 +30,8 @@ Solar Fire                              No sound, cannot start
 Warlok            X                     Works
 Laser Cue         X                     Works
 Time Fantasy      Up        Q           Works
-Varkon                                  Mostly works
-Jungle Lord                 Q           Mostly works
+Varkon            S \                   X is 2-player start
+Jungle Lord       X S       Q           May need to also press W to get outhole to work
 Joust                                   Does something? Not a normal pinball
 Hyperball                               Does something? Not a normal pinball
 
@@ -861,8 +861,8 @@ GAME( 1980, bk_l4,    0,        s7, s7, driver_device, 0, ROT0, "Williams", "Bla
 GAME( 1980, bk_f4,    bk_l4,    s7, s7, driver_device, 0, ROT0, "Williams", "Black Knight (L-4, French speech)", GAME_MECHANICAL )
 GAME( 1980, bk_l3,    bk_l4,    s7, s7, driver_device, 0, ROT0, "Williams", "Black Knight (L-3)", GAME_MECHANICAL )
 GAME( 1980, csmic_l1, 0,        s7, s7, driver_device, 0, ROT0, "Williams", "Cosmic Gunfight (L-1)", GAME_MECHANICAL )
-GAME( 1981, jngld_l2, 0,        s7, s7, driver_device, 0, ROT0, "Williams", "Jungle Lord (L-2)", GAME_MECHANICAL | GAME_NOT_WORKING )
-GAME( 1981, jngld_l1, jngld_l2, s7, s7, driver_device, 0, ROT0, "Williams", "Jungle Lord (L-1)", GAME_MECHANICAL | GAME_NOT_WORKING )
+GAME( 1981, jngld_l2, 0,        s7, s7, driver_device, 0, ROT0, "Williams", "Jungle Lord (L-2)", GAME_MECHANICAL )
+GAME( 1981, jngld_l1, jngld_l2, s7, s7, driver_device, 0, ROT0, "Williams", "Jungle Lord (L-1)", GAME_MECHANICAL )
 GAME( 1981, pharo_l2, 0,        s7, s7, driver_device, 0, ROT0, "Williams", "Pharaoh (L-2)", GAME_MECHANICAL )
 GAME( 1981, solar_l2, 0,        s7, s7, driver_device, 0, ROT0, "Williams", "Solar Fire (L-2)", GAME_MECHANICAL | GAME_NOT_WORKING | GAME_NO_SOUND)
 GAME( 1982, thund_p1, 0,        s7, s7, driver_device, 0, ROT0, "Williams", "Thunderball (P-1)", GAME_MECHANICAL | GAME_IMPERFECT_SOUND )
@@ -871,12 +871,12 @@ GAME( 1982, thund_p3, thund_p1, s7, s7, driver_device, 0, ROT0, "Williams", "Thu
 GAME( 1981, hypbl_l4, 0,        s7, s7, driver_device, 0, ROT0, "Williams", "HyperBall (L-4)", GAME_MECHANICAL | GAME_NOT_WORKING )
 GAME( 1981, hypbl_l2, hypbl_l4, s7, s7, driver_device, 0, ROT0, "Williams", "HyperBall (L-2)", GAME_MECHANICAL | GAME_NOT_WORKING )
 GAME( 1981, barra_l1, 0,        s7, s7, driver_device, 0, ROT0, "Williams", "Barracora (L-1)", GAME_MECHANICAL | GAME_NOT_WORKING | GAME_NO_SOUND)
-GAME( 1982, vrkon_l1, 0,        s7, s7, driver_device, 0, ROT0, "Williams", "Varkon (L-1)", GAME_MECHANICAL | GAME_NOT_WORKING )
+GAME( 1982, vrkon_l1, 0,        s7, s7, driver_device, 0, ROT0, "Williams", "Varkon (L-1)", GAME_MECHANICAL )
 GAME( 1982, tmfnt_l5, 0,        s7, s7, driver_device, 0, ROT0, "Williams", "Time Fantasy (L-5)", GAME_MECHANICAL )
 GAME( 1982, wrlok_l3, 0,        s7, s7, driver_device, 0, ROT0, "Williams", "Warlok (L-3)", GAME_MECHANICAL )
-GAME( 1982, dfndr_l4, 0,        s7, s7, driver_device, 0, ROT0, "Williams", "Defender (L-4)", GAME_MECHANICAL | GAME_NOT_WORKING )
+GAME( 1982, dfndr_l4, 0,        s7, s7, driver_device, 0, ROT0, "Williams", "Defender (L-4)", GAME_MECHANICAL )
 GAME( 1983, jst_l2,   0,        s7, s7, driver_device, 0, ROT0, "Williams", "Joust (L-2)", GAME_MECHANICAL | GAME_NOT_WORKING )
 GAME( 1983, jst_l1,   jst_l2,   s7, s7, driver_device, 0, ROT0, "Williams", "Joust (L-1)", GAME_MECHANICAL | GAME_NOT_WORKING )
 GAME( 1983, lsrcu_l2, 0,        s7, s7, driver_device, 0, ROT0, "Williams", "Laser Cue (L-2)", GAME_MECHANICAL )
-GAME( 1983, fpwr2_l2, 0,        s7, s7, driver_device, 0, ROT0, "Williams", "Firepower II (L-2)", GAME_MECHANICAL | GAME_NOT_WORKING )
+GAME( 1983, fpwr2_l2, 0,        s7, s7, driver_device, 0, ROT0, "Williams", "Firepower II (L-2)", GAME_MECHANICAL )
 GAME( 1984, strlt_l1, 0,        s7, s7, driver_device, 0, ROT0, "Williams", "Star Light (L-1)", GAME_MECHANICAL )
