@@ -126,9 +126,11 @@
 		<year>19??</year>
 		<publisher>Interton</publisher>
 		<part name="cart" interface="vc4000_cart">
-			<feature name="slot" value="std" />
+			<feature name="slot" value="ram1k" />
 			<dataarea name="rom" size="4096">
 				<rom name="wintersp.bin" size="4096" crc="bdd652b7" sha1="aa3af1df1095aadf9d7428a59847fbef3505d93d" offset="0" />
+			</dataarea>
+			<dataarea name="ram" size="1024">
 			</dataarea>
 		</part>
 	</software>
@@ -165,7 +167,7 @@
 		<year>19??</year>
 		<publisher>Interton</publisher>
 		<part name="cart" interface="vc4000_cart">
-			<feature name="slot" value="ram1k" />
+			<feature name="slot" value="chess2" />
 			<dataarea name="rom" size="4096">
 				<rom name="chess.bin" size="4096" crc="e9c53288" sha1="468188fd58aefb9f8e17e72ea4494f4e8219338a" offset="0" />
 			</dataarea>
@@ -180,9 +182,11 @@
 		<year>19??</year>
 		<publisher>Interton</publisher>
 		<part name="cart" interface="vc4000_cart">
-			<feature name="slot" value="std" />
+			<feature name="slot" value="ram1k" />
 			<dataarea name="rom" size="4096">
 				<rom name="motocrss.bin" size="4096" crc="55011f0a" sha1="a461b66f6cff37e4038e80da0a205a816abe35d4" offset="0" />
+			</dataarea>
+			<dataarea name="ram" size="1024">
 			</dataarea>
 		</part>
 	</software>
@@ -232,9 +236,11 @@
 		<year>19??</year>
 		<publisher>Interton</publisher>
 		<part name="cart" interface="vc4000_cart">
-			<feature name="slot" value="std" />
+			<feature name="slot" value="ram1k" />
 			<dataarea name="rom" size="4096">
 				<rom name="boxing.bin" size="4096" crc="922c9f0d" sha1="b49a37dd6d0272f6c71d778ffada6bc7c90f8348" offset="0" />
+			</dataarea>
+			<dataarea name="ram" size="1024">
 			</dataarea>
 		</part>
 	</software>
@@ -354,9 +360,11 @@
 		<year>19??</year>
 		<publisher>Interton</publisher>
 		<part name="cart" interface="vc4000_cart">
-			<feature name="slot" value="std" />
+			<feature name="slot" value="ram1k" />
 			<dataarea name="rom" size="4096">
 				<rom name="golf.bin" size="4096" crc="d399ce07" sha1="41b6c7d3bc8ea2ef9777066dfd74ec2c5932ddb6" offset="0" />
+			</dataarea>
+			<dataarea name="ram" size="1024">
 			</dataarea>
 		</part>
 	</software>
@@ -367,9 +375,11 @@
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="vc4000_cart">
-			<feature name="slot" value="std" />
+			<feature name="slot" value="ram1k" />
 			<dataarea name="rom" size="4096">
 				<rom name="cockpit.bin" size="4096" crc="11dd7f0d" sha1="456e9c5d1d48877e8c5eb5e5499c911a73e30584" offset="0" />
+			</dataarea>
+			<dataarea name="ram" size="1024">
 			</dataarea>
 		</part>
 	</software>
@@ -491,9 +501,11 @@
 		<year>19??</year>
 		<publisher>Interton</publisher>
 		<part name="cart" interface="vc4000_cart">
-			<feature name="slot" value="std" />
+			<feature name="slot" value="ram1k" />
 			<dataarea name="rom" size="4096">
 				<rom name="suprspac.bin" size="4096" crc="306e37bb" sha1="b11e9fed7700d5192b05dfabeca7b23feca64540" offset="0" />
+			</dataarea>
+			<dataarea name="ram" size="1024">
 			</dataarea>
 		</part>
 	</software>

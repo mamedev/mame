@@ -197,7 +197,7 @@ bool apf_cart_slot_device::call_load()
 				m_cart->ram_alloc(get_software_region_length("ram"));
 		}
 
-		printf("Type: %s\n", apf_get_slot(m_type));
+		//printf("Type: %s\n", apf_get_slot(m_type));
 
 		return IMAGE_INIT_PASS;
 	}

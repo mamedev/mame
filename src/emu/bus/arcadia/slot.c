@@ -129,6 +129,7 @@ static int arcadia_get_pcb_id(const char *slot)
 	return 0;
 }
 
+#if 0
 static const char *arcadia_get_slot(int type)
 {
 	for (int i = 0; i < ARRAY_LENGTH(slot_list); i++)
@@ -139,7 +140,7 @@ static const char *arcadia_get_slot(int type)
 
 	return "std";
 }
-
+#endif
 
 /*-------------------------------------------------
  call load
@@ -204,7 +205,7 @@ bool arcadia_cart_slot_device::call_load()
 				m_type = arcadia_get_pcb_id(pcb_name);
 		}
 
-		printf("Type: %s\n", arcadia_get_slot(m_type));
+		//printf("Type: %s\n", arcadia_get_slot(m_type));
 
 		return IMAGE_INIT_PASS;
 	}
