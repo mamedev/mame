@@ -69,7 +69,7 @@ public:
 			m_ppu(*this, "ppu"),
 			m_sound(*this, "nessound"),
 			m_cartslot(*this, "nes_slot"),
-			m_cartslot2(*this, "disk_slot"),	// temp hack for famitwin
+			m_disk(*this, "disk"),
 			m_cassette(*this, "tape")
 		{ }
 
@@ -104,7 +104,7 @@ public:
 	required_device<ppu2c0x_device> m_ppu;
 	required_device<nesapu_device> m_sound;
 	optional_device<nes_cart_slot_device> m_cartslot;
-	optional_device<nes_cart_slot_device> m_cartslot2;
+	optional_device<nes_disksys_device> m_disk;
 	optional_device<cassette_image_device> m_cassette;
 
 	int nes_ppu_vidaccess(int address, int data);
@@ -124,7 +124,6 @@ public:
 	virtual void video_reset();
 	DECLARE_PALETTE_INIT(nes);
 	UINT32 screen_update_nes(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_famitwin(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_READ8_MEMBER(psg_4015_r);
 	DECLARE_WRITE8_MEMBER(psg_4015_w);
 	DECLARE_WRITE8_MEMBER(psg_4017_w);
@@ -136,8 +135,9 @@ public:
 	// these are needed until we modernize the FDS controller
 	DECLARE_MACHINE_START(fds);
 	DECLARE_MACHINE_START(famitwin);
+	DECLARE_MACHINE_RESET(fds);
 	DECLARE_MACHINE_RESET(famitwin);
-	void setup_disk(nes_cart_slot_device *slot);
+	void setup_disk(nes_disksys_device *slot);
 
 	// input related
 	UINT32 m_pad_latch[4];

@@ -737,32 +737,32 @@ static MACHINE_CONFIG_DERIVED( famicom, nes )
 	MCFG_SOFTWARE_LIST_ADD("cass_list", "famicom_cass")
 MACHINE_CONFIG_END
 
-void nes_state::setup_disk(nes_cart_slot_device *slot)
+void nes_state::setup_disk(nes_disksys_device *slot)
 {
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-
 	if (slot)
 	{
+		address_space &space = m_maincpu->space(AS_PROGRAM);
+
 		// Set up memory handlers
-		space.install_read_handler(0x4020, 0x40ff, read8_delegate(FUNC(nes_cart_slot_device::read_ex), (nes_cart_slot_device *)slot));
-		space.install_write_handler(0x4020, 0x40ff, write8_delegate(FUNC(nes_cart_slot_device::write_ex), (nes_cart_slot_device *)slot));
-		space.install_read_handler(0x4100, 0x5fff, read8_delegate(FUNC(nes_cart_slot_device::read_l), (nes_cart_slot_device *)slot));
-		space.install_write_handler(0x4100, 0x5fff, write8_delegate(FUNC(nes_cart_slot_device::write_l), (nes_cart_slot_device *)slot));
-		space.install_read_handler(0x6000, 0x7fff, read8_delegate(FUNC(nes_cart_slot_device::read_m), (nes_cart_slot_device *)slot));
-		space.install_write_handler(0x6000, 0x7fff, write8_delegate(FUNC(nes_cart_slot_device::write_m), (nes_cart_slot_device *)slot));
-		space.install_read_handler(0x8000, 0xffff, read8_delegate(FUNC(nes_cart_slot_device::read_h), (nes_cart_slot_device *)slot));
-		space.install_write_handler(0x8000, 0xffff, write8_delegate(FUNC(nes_cart_slot_device::write_h), (nes_cart_slot_device *)slot));
+		space.install_read_handler(0x4020, 0x40ff, read8_delegate(FUNC(nes_disksys_device::read_ex), (nes_disksys_device *)slot));
+		space.install_write_handler(0x4020, 0x40ff, write8_delegate(FUNC(nes_disksys_device::write_ex), (nes_disksys_device *)slot));
+		space.install_read_handler(0x4100, 0x5fff, read8_delegate(FUNC(device_nes_cart_interface::read_l), (device_nes_cart_interface *)slot));
+		space.install_write_handler(0x4100, 0x5fff, write8_delegate(FUNC(device_nes_cart_interface::write_l), (device_nes_cart_interface *)slot));
+		space.install_read_handler(0x6000, 0x7fff, read8_delegate(FUNC(nes_disksys_device::read_m), (nes_disksys_device *)slot));
+		space.install_write_handler(0x6000, 0x7fff, write8_delegate(FUNC(nes_disksys_device::write_m), (nes_disksys_device *)slot));
+		space.install_read_handler(0x8000, 0xffff, read8_delegate(FUNC(nes_disksys_device::read_h), (nes_disksys_device *)slot));
+		space.install_write_handler(0x8000, 0xffff, write8_delegate(FUNC(nes_disksys_device::write_h), (nes_disksys_device *)slot));
 		
-		slot->m_cart->vram_alloc(0x2000);
-		slot->m_cart->prgram_alloc(0x8000);
+		slot->vram_alloc(0x2000);
+		slot->prgram_alloc(0x8000);
 		
-		slot->pcb_start(m_ciram);
-		slot->m_cart->pcb_reg_postload(machine());
-		m_ppu->space(AS_PROGRAM).install_readwrite_handler(0, 0x1fff, read8_delegate(FUNC(device_nes_cart_interface::chr_r),slot->m_cart), write8_delegate(FUNC(device_nes_cart_interface::chr_w),slot->m_cart));
-		m_ppu->space(AS_PROGRAM).install_readwrite_handler(0x2000, 0x3eff, read8_delegate(FUNC(device_nes_cart_interface::nt_r),slot->m_cart), write8_delegate(FUNC(device_nes_cart_interface::nt_w),slot->m_cart));
-		m_ppu->set_scanline_callback(ppu2c0x_scanline_delegate(FUNC(device_nes_cart_interface::scanline_irq),slot->m_cart));
-		m_ppu->set_hblank_callback(ppu2c0x_hblank_delegate(FUNC(device_nes_cart_interface::hblank_irq),slot->m_cart));
-		m_ppu->set_latch(ppu2c0x_latch_delegate(FUNC(device_nes_cart_interface::ppu_latch),slot->m_cart));
+		slot->pcb_start(machine(), m_ciram, FALSE);
+		slot->pcb_reg_postload(machine());
+		m_ppu->space(AS_PROGRAM).install_readwrite_handler(0, 0x1fff, read8_delegate(FUNC(device_nes_cart_interface::chr_r),(device_nes_cart_interface *)slot), write8_delegate(FUNC(device_nes_cart_interface::chr_w),(device_nes_cart_interface *)slot));
+		m_ppu->space(AS_PROGRAM).install_readwrite_handler(0x2000, 0x3eff, read8_delegate(FUNC(device_nes_cart_interface::nt_r),(device_nes_cart_interface *)slot), write8_delegate(FUNC(device_nes_cart_interface::nt_w),(device_nes_cart_interface *)slot));
+		m_ppu->set_scanline_callback(ppu2c0x_scanline_delegate(FUNC(device_nes_cart_interface::scanline_irq),(device_nes_cart_interface *)slot));
+		m_ppu->set_hblank_callback(ppu2c0x_hblank_delegate(FUNC(nes_disksys_device::hblank_irq),(nes_disksys_device *)slot));
+		m_ppu->set_latch(ppu2c0x_latch_delegate(FUNC(device_nes_cart_interface::ppu_latch),(device_nes_cart_interface *)slot));
 	}
 }
 
@@ -771,16 +771,30 @@ MACHINE_START_MEMBER( nes_state, fds )
 {	
 	m_ciram = auto_alloc_array(machine(), UINT8, 0x800);
 	setup_ioports();
-	// setup the disk expansion instead
-	setup_disk(m_cartslot);
+	setup_disk(m_disk);
+}
+
+MACHINE_RESET_MEMBER( nes_state, fds )
+{
+	// Reset the mapper variables
+	m_disk->pcb_reset();
+	
+	// the rest is the same as for nes/famicom/dendy
+	m_maincpu->reset();
+	
+	memset(m_pad_latch, 0, sizeof(m_pad_latch));
+	memset(m_zapper_latch, 0, sizeof(m_zapper_latch));
+	m_paddle_latch = 0;
+	m_paddle_btn_latch = 0;	
 }
 
 static MACHINE_CONFIG_DERIVED( fds, famicom )
 	MCFG_MACHINE_START_OVERRIDE( nes_state, fds )
+	MCFG_MACHINE_RESET_OVERRIDE( nes_state, fds )
 	MCFG_DEVICE_REMOVE("tape")
 
 	MCFG_DEVICE_REMOVE("nes_slot")
-	MCFG_DISKSYS_ADD("nes_slot", disksys_only, "disksys")
+	MCFG_DEVICE_ADD("disk", NES_DISKSYS, 0)
 
 	MCFG_DEVICE_REMOVE("cart_list")
 	MCFG_DEVICE_REMOVE("cass_list")
@@ -793,9 +807,9 @@ MACHINE_START_MEMBER( nes_state, famitwin )
 	machine_start();
 
 	// if there is no cart inserted, setup the disk expansion instead
-	if (!m_cartslot->m_cart)
+	if (!m_cartslot->exists())
 	{
-		setup_disk(m_cartslot2);
+		setup_disk(m_disk);
 		
 		// replace the famicom disk ROM with the famicom twin one (until we modernize the floppy drive)
 		m_maincpu->space(AS_PROGRAM).install_read_bank(0xe000, 0xffff, "ftbios");
@@ -808,8 +822,8 @@ MACHINE_RESET_MEMBER( nes_state, famitwin )
 	// Reset the mapper variables. Will also mark the char-gen ram as dirty
 	m_cartslot->pcb_reset();
 	// if there is no cart inserted, initialize the disk expansion instead
-	if (!m_cartslot->m_cart)
-		m_cartslot2->pcb_reset();
+	if (!m_cartslot->exists())
+		m_disk->pcb_reset();
 	
 	// the rest is the same as for nes/famicom/dendy
 	m_maincpu->reset();
@@ -825,14 +839,10 @@ static MACHINE_CONFIG_DERIVED( famitwin, famicom )
 	MCFG_MACHINE_START_OVERRIDE( nes_state, famitwin )
 	MCFG_MACHINE_RESET_OVERRIDE( nes_state, famitwin )
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(nes_state, screen_update_famitwin)
-
-	MCFG_DEVICE_REMOVE("nes_slot")
-	MCFG_NES_CARTRIDGE_ADD("nes_slot", nes_cart, NULL)
+	MCFG_DEVICE_MODIFY("nes_slot")
 	MCFG_NES_CARTRIDGE_NOT_MANDATORY
 
-	MCFG_DISKSYS_ADD("disk_slot", disksys_only, "disksys")
+	MCFG_DEVICE_ADD("disk", NES_DISKSYS, 0)
 MACHINE_CONFIG_END
 
 

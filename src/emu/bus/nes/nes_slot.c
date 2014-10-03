@@ -690,12 +690,12 @@ void device_nes_cart_interface::pcb_start(running_machine &machine, UINT8 *ciram
 				m_prg_bank[i] = i;
 			}
 		}
-		
-		// Setup CHR
-		m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
-		chr8(0, m_chr_source);
 	}
-
+	
+	// Setup CHR (VRAM can be present also without PRG rom)
+	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
+	chr8(0, m_chr_source);
+	
 	// Setup NT
 	m_ciram = ciram_ptr;
 
