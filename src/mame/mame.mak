@@ -1875,6 +1875,8 @@ $(MAMEOBJ)/taito.a: \
 	$(DRIVERS)/bking.o $(VIDEO)/bking.o \
 	$(DRIVERS)/bublbobl.o $(MACHINE)/bublbobl.o $(VIDEO)/bublbobl.o \
 	$(DRIVERS)/buggychl.o $(MACHINE)/buggychl.o $(VIDEO)/buggychl.o \
+	$(DRIVERS)/capr1.o \
+	$(DRIVERS)/caprcyc.o \
 	$(DRIVERS)/cchance.o \
 	$(DRIVERS)/chaknpop.o $(MACHINE)/chaknpop.o $(VIDEO)/chaknpop.o \
 	$(DRIVERS)/champbwl.o \
@@ -1946,6 +1948,7 @@ $(MAMEOBJ)/taito.a: \
 	$(DRIVERS)/wgp.o $(VIDEO)/wgp.o \
 	$(DRIVERS)/wyvernf0.o \
 	$(AUDIO)/taitosnd.o \
+	$(AUDIO)/taito_zm.o \
 	$(AUDIO)/t5182.o \
 	$(MACHINE)/taitoio.o \
 	$(VIDEO)/taito_helper.o \
@@ -1959,7 +1962,6 @@ $(MAMEOBJ)/taito.a: \
 	$(VIDEO)/tc0480scp.o \
 	$(VIDEO)/tc0110pcr.o \
 	$(VIDEO)/tc0180vcu.o \
-	$(AUDIO)/taito_zm.o \
 
 $(MAMEOBJ)/tatsumi.a: \
 	$(DRIVERS)/kingdrby.o \
