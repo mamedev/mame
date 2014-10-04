@@ -157,6 +157,7 @@ public:
 	required_device<vboy_cart_slot_device> m_cart;
 	required_device<timer_device> m_maintimer;
 	required_device<palette_device> m_palette;
+	memory_region *m_cart_rom;
 
 	DECLARE_READ32_MEMBER(io_r);
 	DECLARE_WRITE32_MEMBER(io_w);
@@ -1111,7 +1112,7 @@ static ADDRESS_MAP_START( vboy_mem, AS_PROGRAM, 32, vboy_state )
 	//AM_RANGE( 0x04000000, 0x04ffffff ) // Expansion area
 	AM_RANGE( 0x05000000, 0x0500ffff ) AM_MIRROR(0x0ff0000) AM_RAM AM_SHARE("wram")// Main RAM - 64K mask 0xffff
 	AM_RANGE( 0x06000000, 0x06003fff ) AM_DEVREADWRITE("cartslot", vboy_cart_slot_device, read_eeprom, write_eeprom) // Cart RAM - 8K NVRAM
-	AM_RANGE( 0x07000000, 0x071fffff ) AM_MIRROR(0x0e00000) AM_DEVREAD("cartslot", vboy_cart_slot_device, read_cart) /* ROM */
+//	AM_RANGE( 0x07000000, 0x071fffff ) AM_MIRROR(0x0e00000) AM_DEVREAD("cartslot", vboy_cart_slot_device, read_cart) /* ROM */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( vboy_io, AS_IO, 32, vboy_state )
@@ -1140,7 +1141,7 @@ static ADDRESS_MAP_START( vboy_io, AS_IO, 32, vboy_state )
 //  AM_RANGE( 0x04000000, 0x04ffffff ) // Expansion area
 	AM_RANGE( 0x05000000, 0x0500ffff ) AM_MIRROR(0x0ff0000) AM_RAM AM_SHARE("wram") // Main RAM - 64K mask 0xffff
 	AM_RANGE( 0x06000000, 0x06003fff ) AM_NOP // Cart RAM - 8K NVRAM ?
-	AM_RANGE( 0x07000000, 0x071fffff ) AM_MIRROR(0x0e00000) AM_DEVREAD("cartslot", vboy_cart_slot_device, read_cart) /* ROM */
+//	AM_RANGE( 0x07000000, 0x071fffff ) AM_MIRROR(0x0e00000) AM_DEVREAD("cartslot", vboy_cart_slot_device, read_cart) /* ROM */
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -1167,8 +1168,21 @@ INPUT_PORTS_END
 
 void vboy_state::machine_start()
 {
+	// install the cart ROM as a bank into the address map.
+	// this speeds up the rom access, by skipping the m_cart->read_rom
+	// trampoline (but forces us to alloc always a 0x200000-wide region)
 	if (m_cart->exists())
+	{
+		astring region_tag;
+		m_cart_rom = memregion(region_tag.cpy(m_cart->tag()).cat(VBOYSLOT_ROM_REGION_TAG));
+
+		m_maincpu->space(AS_PROGRAM).install_read_bank(0x07000000, 0x071fffff, 0, 0x0e00000, "prog_cart_bank");
+		m_maincpu->space(AS_IO).install_read_bank(0x07000000, 0x071fffff, 0, 0x0e00000, "io_cart_bank");
+		membank("prog_cart_bank")->set_base(m_cart_rom->base());
+		membank("io_cart_bank")->set_base(m_cart_rom->base());
+
 		m_cart->save_eeprom();
+	}
 }
 
 void vboy_state::machine_reset()
