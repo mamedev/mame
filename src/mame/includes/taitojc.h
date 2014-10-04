@@ -51,8 +51,7 @@ public:
 		m_palette_ram(*this, "palette_ram"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette"),
-		m_analog_ports(*this, "AN")
+		m_palette(*this, "palette")
 	{
 		m_mcu_output = 0;
 		m_speed_meter = 0;
@@ -75,8 +74,8 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-	optional_ioport_array<8> m_analog_ports;
 
+	ioport_port *m_analog_ports[8];
 	taitojc_renderer *m_renderer;
 
 	int m_texture_x;
