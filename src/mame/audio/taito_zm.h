@@ -1,3 +1,9 @@
+/***************************************************************************
+
+    Taito Zoom ZSG-2 sound board
+
+***************************************************************************/
+
 #include "cpu/mn10200/mn10200.h"
 #include "cpu/tms57002/tms57002.h"
 #include "sound/zsg2.h"
@@ -27,8 +33,7 @@ protected:
 	virtual void device_reset();
 
 private:
-
-	// devices/pointers
+	// inherited devices/pointers
 	required_device<mn10200_device> m_soundcpu;
 	required_device<zsg2_device> m_zsg2;
 
