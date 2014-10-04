@@ -1376,8 +1376,7 @@ public:
 		m_p2(*this, "P2"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
-		m_generic_paletteram_32(*this, "paletteram"),
-		m_adc_ports(*this, "ADC")
+		m_generic_paletteram_32(*this, "paletteram")
 	{ }
 
 	required_device<mips3_device> m_maincpu;
@@ -1402,7 +1401,6 @@ public:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	required_shared_ptr<UINT32> m_generic_paletteram_32;
-	optional_ioport_array<4> m_adc_ports;
 
 	c404_t m_c404;
 	c361_t m_c361;
@@ -1412,6 +1410,7 @@ public:
 	c422_t m_c422;
 	render_t m_render;
 
+	ioport_port *m_adc_ports[4];
 	tilemap_t *m_bgtilemap;
 	UINT8 m_jvssense;
 	INT32 m_has_jvsio;
@@ -3220,6 +3219,10 @@ INPUT_PORTS_END
 
 void namcos23_state::machine_start()
 {
+	static const char *const tags[] = { "ADC.0", "ADC.1", "ADC.2", "ADC.3" };
+	for (int i = 0; i < 4; i++)
+		m_adc_ports[i] = ioport(tags[i]);
+
 	m_c361.timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(namcos23_state::c361_timer_cb),this));
 	m_c361.timer->adjust(attotime::never);
 
