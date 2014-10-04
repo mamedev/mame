@@ -5,15 +5,7 @@
   PINBALL
   Williams System 9
 
-When first started, it shows the game number and stops. Press F3 to initialise the
-nvram. In theory you can then press the diagnostic buttons; or you then enter coins
-and start playing.
-
-Each game has its own switches, you need to know the outhole and slam-tilt ones.
-Note that T is also a tilt, but it may take 3 hits to activate it.
-
-A number of games are multiball therefore they either cannot start or the outhole
-is ineffective/unknown. All games can coin up.
+When first started, it shows the game number and stops. Press F3 to reboot, then it works.
 
 Rat Race is played in a one-player cocktail cabinet, the player uses a joystick
 to tilt the board, to coax the ball into following lit arrows in a maze. After
@@ -23,17 +15,19 @@ in its intended form. Probably would have been a nice game, but it never passed 
 prototype stage. Currently it runs but the player display flashes randoms ones while
 a sound is produced every couple of seconds.
 
+Each game has its own switches, you need to know the outhole and slam-tilt ones.
+Note that T is also a tilt, but it may take 3 hits to activate it.
 
-Game              Outhole   Tilt        Notes
-----------------------------------------------------------------------------------
-Sorcerer                                Cannot start
-Space Shuttle                           Cannot start
-Comet                                   Mostly works
-Rat Race                                Not working
+
+Game              Outhole   Tilt         Notes
+----------------------------------------------------------------------------------------
+Sorcerer          X -       Y            To start, hold down X and minus, then press 1.
+Space Shuttle     S D F     Right-shift  To start, hold down SDF, then press 1.
+Comet             Y         Right-shift
+Rat Race                                 Not working
 
 ToDo:
-- Diagnostic buttons do not work
-
+- Mechanical sounds
 
 *****************************************************************************************/
 
@@ -65,32 +59,33 @@ public:
 	DECLARE_READ8_MEMBER(dac_r);
 	DECLARE_WRITE8_MEMBER(dig0_w);
 	DECLARE_WRITE8_MEMBER(dig1_w);
-	DECLARE_WRITE8_MEMBER(lamp0_w);
+	DECLARE_WRITE8_MEMBER(lamp0_w) { };
 	DECLARE_WRITE8_MEMBER(lamp1_w) { };
 	DECLARE_WRITE8_MEMBER(sol2_w) { }; // solenoids 8-15
-	DECLARE_WRITE8_MEMBER(sol3_w); // solenoids 0-7
+	DECLARE_WRITE8_MEMBER(sol3_w) { }; // solenoids 0-7
 	DECLARE_WRITE8_MEMBER(sound_w);
 	DECLARE_READ8_MEMBER(dips_r);
 	DECLARE_READ8_MEMBER(switch_r);
 	DECLARE_WRITE8_MEMBER(switch_w);
 	DECLARE_READ_LINE_MEMBER(pia21_ca1_r);
-	DECLARE_READ_LINE_MEMBER(pia28_ca1_r);
-	DECLARE_READ_LINE_MEMBER(pia28_cb1_r);
 	DECLARE_WRITE_LINE_MEMBER(pia21_ca2_w);
 	DECLARE_WRITE_LINE_MEMBER(pia21_cb2_w) { }; // enable solenoids
 	DECLARE_WRITE_LINE_MEMBER(pia24_cb2_w) { }; // dummy to stop error log filling up
 	DECLARE_WRITE_LINE_MEMBER(pia28_ca2_w) { }; // comma3&4
 	DECLARE_WRITE_LINE_MEMBER(pia28_cb2_w) { }; // comma1&2
-	TIMER_DEVICE_CALLBACK_MEMBER(irq);
+	DECLARE_WRITE_LINE_MEMBER(pia_irq);
 	DECLARE_INPUT_CHANGED_MEMBER(main_nmi);
 	DECLARE_INPUT_CHANGED_MEMBER(audio_nmi);
 	DECLARE_MACHINE_RESET(s9);
+	DECLARE_DRIVER_INIT(s9);
 private:
-	UINT8 m_t_c;
 	UINT8 m_sound_data;
 	UINT8 m_strobe;
 	UINT8 m_kbdrow;
 	bool m_data_ok;
+	emu_timer* m_irq_timer;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	static const device_timer_id TIMER_IRQ = 0;
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<dac_device> m_dac;
@@ -121,7 +116,7 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( s9 )
 	PORT_START("X0")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("X1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_TILT )
@@ -184,7 +179,11 @@ static INPUT_PORTS_START( s9 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_O)
 
 	PORT_START("X40")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_RSHIFT)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_SPACE)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_LALT)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_LSHIFT)
+	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("X80")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -195,11 +194,6 @@ static INPUT_PORTS_START( s9 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Advance") PORT_CODE(KEYCODE_5_PAD)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Up/Down") PORT_CODE(KEYCODE_6_PAD) PORT_TOGGLE
 INPUT_PORTS_END
-
-MACHINE_RESET_MEMBER( s9_state, s9 )
-{
-	m_t_c = 0;
-}
 
 INPUT_CHANGED_MEMBER( s9_state::main_nmi )
 {
@@ -213,12 +207,6 @@ INPUT_CHANGED_MEMBER( s9_state::audio_nmi )
 	// Diagnostic button sends a pulse to NMI pin
 	if (newval==CLEAR_LINE)
 		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-}
-
-WRITE8_MEMBER( s9_state::sol3_w )
-{
-//  if (BIT(data, 1))
-//      m_samples->start(0, 6); // knocker
 }
 
 WRITE8_MEMBER( s9_state::sound_w )
@@ -236,21 +224,6 @@ WRITE_LINE_MEMBER( s9_state::pia21_ca2_w )
 {
 // sound ns
 	m_pias->ca1_w(state);
-}
-
-WRITE8_MEMBER( s9_state::lamp0_w )
-{
-	m_maincpu->set_input_line(M6800_IRQ_LINE, CLEAR_LINE);
-}
-
-READ_LINE_MEMBER( s9_state::pia28_ca1_r )
-{
-	return BIT(ioport("DIAGS")->read(), 2); // advance button
-}
-
-READ_LINE_MEMBER( s9_state::pia28_cb1_r )
-{
-	return BIT(ioport("DIAGS")->read(), 3); // up/down switch
 }
 
 WRITE8_MEMBER( s9_state::dig0_w )
@@ -290,19 +263,58 @@ READ8_MEMBER( s9_state::dac_r )
 	return m_sound_data;
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER( s9_state::irq )
+WRITE_LINE_MEMBER( s9_state::pia_irq )
 {
-	if (m_t_c > 0x70)
-		m_maincpu->set_input_line(M6800_IRQ_LINE, ASSERT_LINE);
+	if(state == CLEAR_LINE)
+	{
+		// restart IRQ timer
+		m_irq_timer->adjust(attotime::from_ticks(980,1e6),1);
+	}
 	else
-		m_t_c++;
+	{
+		// disable IRQ timer while other IRQs are being handled
+		// (counter is reset every 32 cycles while a PIA IRQ is handled)
+		m_irq_timer->adjust(attotime::zero);
+	}
+}
+
+void s9_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	switch(id)
+	{
+	case TIMER_IRQ:
+		if(param == 1)
+		{
+			m_maincpu->set_input_line(M6800_IRQ_LINE,ASSERT_LINE);
+			m_irq_timer->adjust(attotime::from_ticks(32,1e6),0);
+			m_pia28->ca1_w(BIT(ioport("DIAGS")->read(), 2));  // Advance
+			m_pia28->cb1_w(BIT(ioport("DIAGS")->read(), 3));  // Up/Down
+		}
+		else
+		{
+			m_maincpu->set_input_line(M6800_IRQ_LINE,CLEAR_LINE);
+			m_irq_timer->adjust(attotime::from_ticks(980,1e6),1);
+			m_pia28->ca1_w(1);
+			m_pia28->cb1_w(1);
+		}
+		break;
+	}
+}
+
+MACHINE_RESET_MEMBER( s9_state, s9 )
+{
+}
+
+DRIVER_INIT_MEMBER( s9_state, s9 )
+{
+	m_irq_timer = timer_alloc(TIMER_IRQ);
+	m_irq_timer->adjust(attotime::from_ticks(980,1e6),1);
 }
 
 static MACHINE_CONFIG_START( s9, s9_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6808, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(s9_main_map)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq", s9_state, irq, attotime::from_hz(250))
 	MCFG_MACHINE_RESET_OVERRIDE(s9_state, s9)
 
 	/* Video */
@@ -319,31 +331,29 @@ static MACHINE_CONFIG_START( s9, s9_state )
 	MCFG_PIA_WRITEPB_HANDLER(WRITE8(s9_state, sol2_w))
 	MCFG_PIA_CA2_HANDLER(WRITELINE(s9_state, pia21_ca2_w))
 	MCFG_PIA_CB2_HANDLER(WRITELINE(s9_state, pia21_cb2_w))
-	MCFG_PIA_IRQA_HANDLER(DEVWRITELINE("maincpu", m6808_cpu_device, irq_line))
-	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE("maincpu", m6808_cpu_device, irq_line))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(s9_state, pia_irq))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(s9_state, pia_irq))
 
 	MCFG_DEVICE_ADD("pia24", PIA6821, 0)
 	MCFG_PIA_WRITEPA_HANDLER(WRITE8(s9_state, lamp0_w))
 	MCFG_PIA_WRITEPB_HANDLER(WRITE8(s9_state, lamp1_w))
 	MCFG_PIA_CB2_HANDLER(WRITELINE(s9_state, pia24_cb2_w))
-	MCFG_PIA_IRQA_HANDLER(DEVWRITELINE("maincpu", m6808_cpu_device, irq_line))
-	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE("maincpu", m6808_cpu_device, irq_line))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(s9_state, pia_irq))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(s9_state, pia_irq))
 
 	MCFG_DEVICE_ADD("pia28", PIA6821, 0)
-	MCFG_PIA_READCA1_HANDLER(READLINE(s9_state, pia28_ca1_r))
-	MCFG_PIA_READCB1_HANDLER(READLINE(s9_state, pia28_cb1_r))
 	MCFG_PIA_WRITEPA_HANDLER(WRITE8(s9_state, dig0_w))
 	MCFG_PIA_WRITEPB_HANDLER(WRITE8(s9_state, dig1_w))
 	MCFG_PIA_CA2_HANDLER(WRITELINE(s9_state, pia28_ca2_w))
 	MCFG_PIA_CB2_HANDLER(WRITELINE(s9_state, pia28_cb2_w))
-	MCFG_PIA_IRQA_HANDLER(DEVWRITELINE("maincpu", m6808_cpu_device, irq_line))
-	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE("maincpu", m6808_cpu_device, irq_line))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(s9_state, pia_irq))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(s9_state, pia_irq))
 
 	MCFG_DEVICE_ADD("pia30", PIA6821, 0)
 	MCFG_PIA_READPA_HANDLER(READ8(s9_state, switch_r))
 	MCFG_PIA_WRITEPB_HANDLER(WRITE8(s9_state, switch_w))
-	MCFG_PIA_IRQA_HANDLER(DEVWRITELINE("maincpu", m6808_cpu_device, irq_line))
-	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE("maincpu", m6808_cpu_device, irq_line))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(s9_state, pia_irq))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(s9_state, pia_irq))
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -486,12 +496,12 @@ ROM_START(alcat_l7)
 ROM_END
 
 
-GAME( 1983, ratrc_l1, 0,        s9, s9, driver_device, 0, ROT0, "Williams", "Rat Race (L-1)", GAME_MECHANICAL | GAME_NOT_WORKING)
-GAME( 1985, sorcr_l1, sorcr_l2, s9, s9, driver_device, 0, ROT0, "Williams", "Sorcerer (L-1)", GAME_MECHANICAL | GAME_NOT_WORKING)
-GAME( 1985, sorcr_l2, 0,        s9, s9, driver_device, 0, ROT0, "Williams", "Sorcerer (L-2)", GAME_MECHANICAL | GAME_NOT_WORKING)
-GAME( 1984, sshtl_l7, 0,        s9, s9, driver_device, 0, ROT0, "Williams", "Space Shuttle (L-7)", GAME_MECHANICAL | GAME_NOT_WORKING)
-GAME( 1985, comet_l4, comet_l5, s9, s9, driver_device, 0, ROT0, "Williams", "Comet (L-4)", GAME_MECHANICAL)
-GAME( 1985, comet_l5, 0,        s9, s9, driver_device, 0, ROT0, "Williams", "Comet (L-5)", GAME_MECHANICAL)
-GAME( 1984, szone_l5, 0,        s9, s9, driver_device, 0, ROT0, "Williams", "Strike Zone (Shuffle) (L-5)", GAME_MECHANICAL | GAME_NOT_WORKING)
-GAME( 1984, szone_l2, szone_l5, s9, s9, driver_device, 0, ROT0, "Williams", "Strike Zone (Shuffle) (L-2)", GAME_MECHANICAL | GAME_NOT_WORKING)
-GAME( 1985, alcat_l7, 0,        s9, s9, driver_device, 0, ROT0, "Williams", "Alley Cats (Shuffle) (L-7)", GAME_MECHANICAL | GAME_NOT_WORKING | GAME_NO_SOUND)
+GAME( 1983, ratrc_l1, 0,        s9, s9, s9_state, s9, ROT0, "Williams", "Rat Race (L-1)", GAME_MECHANICAL | GAME_NOT_WORKING)
+GAME( 1985, sorcr_l1, sorcr_l2, s9, s9, s9_state, s9, ROT0, "Williams", "Sorcerer (L-1)", GAME_MECHANICAL )
+GAME( 1985, sorcr_l2, 0,        s9, s9, s9_state, s9, ROT0, "Williams", "Sorcerer (L-2)", GAME_MECHANICAL )
+GAME( 1984, sshtl_l7, 0,        s9, s9, s9_state, s9, ROT0, "Williams", "Space Shuttle (L-7)", GAME_MECHANICAL )
+GAME( 1985, comet_l4, comet_l5, s9, s9, s9_state, s9, ROT0, "Williams", "Comet (L-4)", GAME_MECHANICAL)
+GAME( 1985, comet_l5, 0,        s9, s9, s9_state, s9, ROT0, "Williams", "Comet (L-5)", GAME_MECHANICAL)
+GAME( 1984, szone_l5, 0,        s9, s9, s9_state, s9, ROT0, "Williams", "Strike Zone (Shuffle) (L-5)", GAME_MECHANICAL | GAME_NOT_WORKING)
+GAME( 1984, szone_l2, szone_l5, s9, s9, s9_state, s9, ROT0, "Williams", "Strike Zone (Shuffle) (L-2)", GAME_MECHANICAL | GAME_NOT_WORKING)
+GAME( 1985, alcat_l7, 0,        s9, s9, s9_state, s9, ROT0, "Williams", "Alley Cats (Shuffle) (L-7)", GAME_MECHANICAL | GAME_NOT_WORKING | GAME_NO_SOUND)
