@@ -8111,6 +8111,19 @@ ROM_START( initd )
 	ROM_LOAD("317-0331-jpn.pic", 0x00, 0x4000, CRC(0a3bf606) SHA1(7c0e22df4a43a440571ac55fd0a6575931e8f959) )
 ROM_END
 
+ROM_START( initdo )
+	NAOMI2_BIOS
+	NAOMI_DEFAULT_EEPROM
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gds-0020", 0, SHA1(e1766340da8191ab51a67477876d1806f2153a7e) )
+
+	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF)
+	//PIC16C622A (317-0331-JPN)
+	//(sticker 253-5508-0331J)
+	ROM_LOAD("317-0331-jpn.pic", 0x00, 0x4000, CRC(0a3bf606) SHA1(7c0e22df4a43a440571ac55fd0a6575931e8f959) )
+ROM_END
+
 ROM_START( vf4evo )
 	NAOMI2_BIOS
 	NAOMI_DEFAULT_EEPROM
@@ -8165,7 +8178,8 @@ ROM_START( initdv2j )
 	NAOMI_DEFAULT_EEPROM
 
 	DISK_REGION( "gdrom" )
-	DISK_IMAGE_READONLY( "gds-0026b", 0, BAD_DUMP  SHA1(8ddc3ccd32ab3416fbe2921f6d6617d6c9f23203) )
+	// disc is labeled "gds-0026a" but ring code and product number are gds-0026b.
+	DISK_IMAGE_READONLY( "gds-0026b", 0, SHA1(54cc643e1f850cfaea7d39f6778b662125cba111) )
 
 	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF)
 	//PIC16C622A (317-0345-JPN)
@@ -8934,7 +8948,7 @@ GAME( 2003, puyofevp, naomi, naomim1, naomi, naomi_state, naomi, ROT0, "Sega", "
 /* 0018  */ GAME( 2001, lupinsho, naomigd, naomigd,  hotd2,   naomi_state, naomigd, ROT0, "Sega / Eighting", "Lupin The Third - The Shooting (GDS-0018)", GAME_FLAGS )
 // 0018A Lupin The Third - The Shooting (Rev A)
 /* 0019  */ GAME( 2002, vathlete, naomigd, naomigd,  naomi,   naomi_state, naomigd, ROT0, "Sega", "Virtua Athletics / Virtua Athlete (GDS-0019)", GAME_FLAGS )
-// 0020  Initial D Arcade Stage
+/* 0020  */ GAME( 2002, initdo,   initd,   naomi2gd, naomi,   naomi_state, naomi2,  ROT0, "Sega", "Initial D Arcade Stage (Japan) (GDS-0020)", GAME_FLAGS ) 
 // 0020A Initial D Arcade Stage (Rev A)
 /* 0020B */ GAME( 2002, initd,    naomi2,  naomi2gd, naomi,   naomi_state, naomi2,  ROT0, "Sega", "Initial D Arcade Stage (Rev B) (Japan) (GDS-0020B)", GAME_FLAGS )
 // 0021  Lupin The Third - The Typing
