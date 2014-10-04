@@ -624,6 +624,10 @@ bool a2_16sect_format::load(io_generic *io, UINT32 form_factor, floppy_image *im
 			if (!memcmp("PRODOS", &sector_data[0x103], 6))
 			{
 				m_prodos_order = true;
+			}	// check for alternate version ProDOS boot block
+			if (!memcmp("PRODOS", &sector_data[0x121], 6))
+			{
+				m_prodos_order = true;
 			}   // check for ProDOS order SOS disk
 			else if (!memcmp(sos_block1, &sector_data[0x100], 4))
 			{
@@ -635,7 +639,6 @@ bool a2_16sect_format::load(io_generic *io, UINT32 form_factor, floppy_image *im
 			}   // check for PCPI Applicard software in ProDOS order
 			else if (!memcmp("COPYRIGHT (C) 1979, DIGITAL RESEARCH", &sector_data[0x118], 36))
 			{
-				printf("PCPI detected\n");
 				m_prodos_order = true;
 			}   // check Apple II Pascal
 			else if (!memcmp("SYSTEM.APPLE", &sector_data[0xd7], 12))
