@@ -380,7 +380,6 @@ Notes:
 #include "cpu/mc68hc11/mc68hc11.h"
 #include "sound/es5506.h"
 #include "sound/okim6295.h"
-#include "machine/mb8421.h"
 #include "machine/taitoio.h"
 #include "machine/eepromser.h"
 #include "audio/taito_en.h"
@@ -455,20 +454,33 @@ static const int dendego_pressure_table[0x100] =
 
 ***************************************************************************/
 
-// boob :( this is probably not the MB8421, need to change this
-WRITE_LINE_MEMBER(taitojc_state::mb8421_intl)
+// dsp common ram has similar interrupt capability as MB8421
+WRITE16_MEMBER(taitojc_state::dsp_to_main_7fe_w)
 {
+	COMBINE_DATA(&m_dsp_shared_ram[0x7fe]);
+
 	// shared ram interrupt request from dsp side
-	m_maincpu->set_input_line(6, state ? ASSERT_LINE : CLEAR_LINE);
+	if (ACCESSING_BITS_0_7)
+		m_maincpu->set_input_line(6, ASSERT_LINE);
 }
 
-WRITE_LINE_MEMBER(taitojc_state::mb8421_intr)
+READ16_MEMBER(taitojc_state::dsp_to_main_7fe_r)
 {
-	// shared ram interrupt request from maincpu side
-	// this is hacky, acquiring the internal dsp romdump should allow it to be cleaned up
-	if (state)
+	if (ACCESSING_BITS_0_7)
+		m_maincpu->set_input_line(6, CLEAR_LINE);
+
+	return m_dsp_shared_ram[0x7fe];
+}
+
+WRITE16_MEMBER(taitojc_state::main_to_dsp_7ff_w)
+{
+	COMBINE_DATA(&m_dsp_shared_ram[0x7ff]);
+
+	if (ACCESSING_BITS_0_7)
 	{
-		if (m_mb8421->peek(0x7ff) & 0x08)
+		// shared ram interrupt request from maincpu side
+		// this is hacky, acquiring the internal dsp romdump should allow it to be cleaned up(?)
+		if (data & 0x08)
 		{
 			m_dsp->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 		}
@@ -512,14 +524,14 @@ WRITE8_MEMBER(taitojc_state::jc_irq_unk_w)
 
 ***************************************************************************/
 
-READ8_MEMBER(taitojc_state::dsp_shared_r)
+READ16_MEMBER(taitojc_state::dsp_shared_r)
 {
-	return m_dsp_shared_ram_hi[offset];
+	return m_dsp_shared_ram[offset];
 }
 
-WRITE8_MEMBER(taitojc_state::dsp_shared_w)
+WRITE16_MEMBER(taitojc_state::dsp_shared_w)
 {
-	m_dsp_shared_ram_hi[offset] = data;
+	COMBINE_DATA(&m_dsp_shared_ram[offset]);
 }
 
 
@@ -634,8 +646,9 @@ static ADDRESS_MAP_START( taitojc_map, AS_PROGRAM, 32, taitojc_state )
 	AM_RANGE(0x06a00000, 0x06a01fff) AM_READWRITE(snd_share_r, snd_share_w) AM_SHARE("snd_shared")
 	AM_RANGE(0x06c00000, 0x06c0001f) AM_READWRITE8(jc_lan_r, jc_lan_w, 0x00ff0000)
 	AM_RANGE(0x08000000, 0x080fffff) AM_RAM AM_SHARE("main_ram")
-	AM_RANGE(0x10000000, 0x10001fff) AM_DEVREADWRITE8("mb8421", mb8421_device, left_r, left_w, 0x00ff0000)
-	AM_RANGE(0x10000000, 0x10001fff) AM_READWRITE8(dsp_shared_r, dsp_shared_w, 0xff000000) // which chip is this?
+	AM_RANGE(0x10001ff8, 0x10001ffb) AM_READ16(dsp_to_main_7fe_r, 0xffff0000)
+	AM_RANGE(0x10001ffc, 0x10001fff) AM_WRITE16(main_to_dsp_7ff_w, 0xffff0000)
+	AM_RANGE(0x10000000, 0x10001fff) AM_READWRITE16(dsp_shared_r, dsp_shared_w, 0xffff0000)
 ADDRESS_MAP_END
 
 
@@ -909,8 +922,8 @@ static ADDRESS_MAP_START( tms_data_map, AS_DATA, 16, taitojc_state )
 	AM_RANGE(0x701d, 0x701d) AM_READ(dsp_math_projection_y_r)
 	AM_RANGE(0x701f, 0x701f) AM_READ(dsp_math_projection_x_r)
 	AM_RANGE(0x7022, 0x7022) AM_READ(dsp_math_unk_r)
-	AM_RANGE(0x7800, 0x7fff) AM_DEVREADWRITE8("mb8421", mb8421_device, right_r, right_w, 0x00ff)
-	AM_RANGE(0x7800, 0x7fff) AM_READWRITE8(dsp_shared_r, dsp_shared_w, 0xff00) // which chip is this?
+	AM_RANGE(0x7ffe, 0x7ffe) AM_WRITE(dsp_to_main_7fe_w)
+	AM_RANGE(0x7800, 0x7fff) AM_RAM AM_SHARE("dsp_shared")
 	AM_RANGE(0x8000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -1090,7 +1103,6 @@ void taitojc_state::machine_reset()
 	m_dsp_tex_offset = 0;
 	m_polygon_fifo_ptr = 0;
 
-	memset(m_dsp_shared_ram_hi, 0, sizeof(m_dsp_shared_ram_hi));
 	memset(m_viewport_data, 0, sizeof(m_viewport_data));
 	memset(m_projection_data, 0, sizeof(m_projection_data));
 	memset(m_intersection_data, 0, sizeof(m_intersection_data));
@@ -1108,7 +1120,6 @@ void taitojc_state::machine_start()
 	save_item(NAME(m_dsp_tex_address));
 	save_item(NAME(m_dsp_tex_offset));
 	save_item(NAME(m_first_dsp_reset));
-	save_item(NAME(m_dsp_shared_ram_hi));
 	save_item(NAME(m_viewport_data));
 	save_item(NAME(m_projection_data));
 	save_item(NAME(m_intersection_data));
@@ -1145,10 +1156,6 @@ static MACHINE_CONFIG_START( taitojc, taitojc_state )
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
-
-	MCFG_DEVICE_ADD("mb8421", MB8421, 0)
-	MCFG_MB8421_INTL_HANDLER(WRITELINE(taitojc_state, mb8421_intl))
-	MCFG_MB8421_INTR_HANDLER(WRITELINE(taitojc_state, mb8421_intr))
 
 	MCFG_DEVICE_ADD("tc0640fio", TC0640FIO, 0)
 	MCFG_TC0640FIO_READ_0_CB(IOPORT("SERVICE"))
@@ -1201,7 +1208,7 @@ READ16_MEMBER(taitojc_state::taitojc_dsp_idle_skip_r)
 	if (space.device().safe_pc() == 0x404c)
 		space.device().execute().spin_until_time(attotime::from_usec(500));
 
-	return m_dsp_shared_ram_hi[0x7f0] << 8 | m_mb8421->peek(0x7f0);
+	return m_dsp_shared_ram[0x7f0];
 }
 
 READ16_MEMBER(taitojc_state::dendego2_dsp_idle_skip_r)
@@ -1209,7 +1216,7 @@ READ16_MEMBER(taitojc_state::dendego2_dsp_idle_skip_r)
 	if (space.device().safe_pc() == 0x402e)
 		space.device().execute().spin_until_time(attotime::from_usec(500));
 
-	return m_dsp_shared_ram_hi[0x7f0] << 8 | m_mb8421->peek(0x7f0);
+	return m_dsp_shared_ram[0x7f0];
 }
 
 
