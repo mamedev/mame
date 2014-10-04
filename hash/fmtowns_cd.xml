@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<softwarelist name="fmtowns" description="FM Towns CD-ROMs">
+<!-- skeleton test list -->
+  
+  <!-- works well on fmtmarty, keyboard seems to interfere with movements on fmtowns -->
+	<software name="raiden">
+		<description>Raiden Densetsu / Raiden Trad</description>
+		<year>1991</year>
+		<publisher>Kid Corp / Seibu</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="raiden densetsu (1991)(kid corp)(jp-en)" sha1="d7484fac0fa8d0fff06c70af341b25d8b4f21ab2" />
+			</diskarea>
+		</part>
+	</software>
+
+</softwarelist>
