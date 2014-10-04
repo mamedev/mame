@@ -15,6 +15,21 @@
 #define DRMATH_MONITOR_DISPLAY      0
 
 
+struct micro3d_vtx
+{
+	INT32 x, y, z;
+};
+
+enum planes
+{
+		CLIP_Z_MIN,
+		CLIP_Z_MAX,
+		CLIP_X_MIN,
+		CLIP_X_MAX,
+		CLIP_Y_MIN,
+		CLIP_Y_MAX,
+};
+
 class micro3d_state : public driver_device
 {
 public:
@@ -26,9 +41,6 @@ public:
 
 	micro3d_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_shared_ram(*this, "shared_ram"),
-		m_mac_sram(*this, "mac_sram"),
-		m_micro3d_sprite_vram(*this, "sprite_vram"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_upd7759(*this, "upd7759"),
@@ -36,7 +48,19 @@ public:
 		m_vgb(*this, "vgb"),
 		m_palette(*this, "palette"),
 		m_duart68681(*this, "duart68681"),
-		m_generic_paletteram_16(*this, "paletteram") { }
+		m_generic_paletteram_16(*this, "paletteram"),
+		m_shared_ram(*this, "shared_ram"),
+		m_mac_sram(*this, "mac_sram"),
+		m_sprite_vram(*this, "sprite_vram") { }
+		
+	required_device<cpu_device> m_maincpu;
+	required_device<i8051_device> m_audiocpu;
+	required_device<upd7759_device> m_upd7759;
+	required_device<cpu_device> m_drmath;
+	required_device<tms34010_device> m_vgb;
+	required_device<palette_device> m_palette;
+	required_device<mc68681_device> m_duart68681;
+	required_shared_ptr<UINT16> m_generic_paletteram_16;
 
 	required_shared_ptr<UINT16> m_shared_ram;
 	UINT8               m_m68681_tx0;
@@ -66,7 +90,7 @@ public:
 	UINT32              m_mac_inst;
 
 	/* 2D video */
-	required_shared_ptr<UINT16> m_micro3d_sprite_vram;
+	required_shared_ptr<UINT16> m_sprite_vram;
 	UINT16              m_creg;
 	UINT16              m_xfer3dk;
 
@@ -140,22 +164,18 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(tms_interrupt);
 	TMS340X0_SCANLINE_IND16_CB_MEMBER(scanline_update);
 
-	required_device<cpu_device> m_maincpu;
-	required_device<i8051_device> m_audiocpu;
-	required_device<upd7759_device> m_upd7759;
-	required_device<cpu_device> m_drmath;
-	required_device<tms34010_device> m_vgb;
-	required_device<palette_device> m_palette;
-	required_device<mc68681_device> m_duart68681;
-	required_shared_ptr<UINT16> m_generic_paletteram_16;
+	/* 3D graphics */
+	int inside(micro3d_vtx *v, enum planes plane);
+	micro3d_vtx intersect(micro3d_vtx *v1, micro3d_vtx *v2, enum planes plane);
+	inline void write_span(UINT32 y, UINT32 x);
+	void draw_line(UINT32 x1, UINT32 y1, UINT32 x2, UINT32 y2);
+	void rasterise_spans(UINT32 min_y, UINT32 max_y, UINT32 attr);
+	int clip_triangle(micro3d_vtx *v, micro3d_vtx *vout, int num_vertices, enum planes plane);
+	void draw_triangles(UINT32 attr);
+	
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
-};
-
-struct micro3d_vtx
-{
-	INT32 x, y, z;
 };
 
 /*----------- defined in audio/micro3d.c -----------*/

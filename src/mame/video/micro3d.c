@@ -62,7 +62,7 @@ void micro3d_state::video_reset()
 
 TMS340X0_SCANLINE_IND16_CB_MEMBER(micro3d_state::scanline_update)
 {
-	UINT16 *src = &m_micro3d_sprite_vram[(params->rowaddr << 8) & 0x7fe00];
+	UINT16 *src = &m_sprite_vram[(params->rowaddr << 8) & 0x7fe00];
 	UINT16 *dest = &bitmap.pix16(scanline);
 	int coladdr = params->coladdr;
 	int sd_11_7 = (m_creg & 0x1f) << 7;
@@ -135,33 +135,23 @@ WRITE_LINE_MEMBER(micro3d_state::tms_interrupt)
  *
  *************************************/
 
-enum planes
-{
-	CLIP_Z_MIN,
-	CLIP_Z_MAX,
-	CLIP_X_MIN,
-	CLIP_X_MAX,
-	CLIP_Y_MIN,
-	CLIP_Y_MAX,
-};
-
-static int inside(micro3d_state *state, micro3d_vtx *v, enum planes plane)
+int micro3d_state::inside(micro3d_vtx *v, enum planes plane)
 {
 	switch (plane)
 	{
-		case CLIP_Z_MIN: return v->z >= state->m_z_min;
-		case CLIP_Z_MAX: return v->z <= state->m_z_max;
-		case CLIP_X_MIN: return v->x >= state->m_x_min;
-		case CLIP_X_MAX: return v->x <= state->m_x_max;
-		case CLIP_Y_MIN: return v->y >= state->m_y_min;
-		case CLIP_Y_MAX: return v->y <= state->m_y_max;
+		case CLIP_Z_MIN: return v->z >= m_z_min;
+		case CLIP_Z_MAX: return v->z <= m_z_max;
+		case CLIP_X_MIN: return v->x >= m_x_min;
+		case CLIP_X_MAX: return v->x <= m_x_max;
+		case CLIP_Y_MIN: return v->y >= m_y_min;
+		case CLIP_Y_MAX: return v->y <= m_y_max;
 	}
 
 	return 0;
 }
 
 /* Calculate where two points intersect */
-static micro3d_vtx intersect(micro3d_state *state, micro3d_vtx *v1, micro3d_vtx *v2, enum planes plane)
+micro3d_vtx micro3d_state::intersect(micro3d_vtx *v1, micro3d_vtx *v2, enum planes plane)
 {
 	float m = 0.0;
 	micro3d_vtx vo = { 0, 0, 0 };
@@ -186,9 +176,9 @@ static micro3d_vtx intersect(micro3d_state *state, micro3d_vtx *v1, micro3d_vtx 
 				myz = 0.0;
 			}
 
-			vo.x = v2->x + (state->m_z_min - v2->z) * mxz;
-			vo.y = v2->y + (state->m_z_min - v2->z) * myz;
-			vo.z = state->m_z_min;
+			vo.x = v2->x + (m_z_min - v2->z) * mxz;
+			vo.y = v2->y + (m_z_min - v2->z) * myz;
+			vo.z = m_z_min;
 			break;
 		}
 		case CLIP_Z_MAX:
@@ -206,44 +196,44 @@ static micro3d_vtx intersect(micro3d_state *state, micro3d_vtx *v1, micro3d_vtx 
 				myz = 0.0;
 			}
 
-			vo.x = v2->x + (state->m_z_max - v2->z) * mxz;
-			vo.y = v2->y + (state->m_z_max - v2->z) * myz;
-			vo.z = state->m_z_max;
+			vo.x = v2->x + (m_z_max - v2->z) * mxz;
+			vo.y = v2->y + (m_z_max - v2->z) * myz;
+			vo.z = m_z_max;
 			break;
 		}
 		case CLIP_X_MIN:
 		{
-			vo.x = state->m_x_min;
-			vo.y = v2->y + (state->m_x_min - v2->x) * m;
+			vo.x = m_x_min;
+			vo.y = v2->y + (m_x_min - v2->x) * m;
 			vo.z = 0;
 			break;
 		}
 		case CLIP_X_MAX:
 		{
-			vo.x = state->m_x_max;
-			vo.y = v2->y + (state->m_x_max - v2->x) * m;
+			vo.x = m_x_max;
+			vo.y = v2->y + (m_x_max - v2->x) * m;
 			vo.z = 0;
 			break;
 		}
 		case CLIP_Y_MIN:
 		{
 			if (v1->x != v2->x)
-				vo.x = v2->x + (state->m_y_min - v2->y) / m;
+				vo.x = v2->x + (m_y_min - v2->y) / m;
 			else
 				vo.x = v2->x;
 
-			vo.y = state->m_y_min;
+			vo.y = m_y_min;
 			vo.z = 0;
 			break;
 		}
 		case CLIP_Y_MAX:
 		{
 			if (v1->x != v2->x)
-				vo.x = v2->x + (state->m_y_max - v2->y) / m;
+				vo.x = v2->x + (m_y_max - v2->y) / m;
 			else
 				vo.x = v2->x;
 
-			vo.y = state->m_y_max;
+			vo.y = m_y_max;
 			vo.z = 0;
 			break;
 		}
@@ -251,9 +241,9 @@ static micro3d_vtx intersect(micro3d_state *state, micro3d_vtx *v1, micro3d_vtx 
 	return vo;
 }
 
-INLINE void write_span(micro3d_state *state, UINT32 y, UINT32 x)
+inline void micro3d_state::write_span(UINT32 y, UINT32 x)
 {
-	UINT32 *draw_dpram = state->m_draw_dpram;
+	UINT32 *draw_dpram = m_draw_dpram;
 	int addr = y << 1;
 
 	if (draw_dpram[addr] == 0x3ff000)
@@ -263,7 +253,7 @@ INLINE void write_span(micro3d_state *state, UINT32 y, UINT32 x)
 	else
 	{
 		/* Check start */
-		if (x < (state->m_draw_dpram[addr] & 0x3ff))
+		if (x < (m_draw_dpram[addr] & 0x3ff))
 		{
 			draw_dpram[addr] &= ~0x3ff;
 			draw_dpram[addr] |= x;
@@ -278,7 +268,7 @@ INLINE void write_span(micro3d_state *state, UINT32 y, UINT32 x)
 }
 
 /* This is the same algorithm used in the 3D tests */
-static void draw_line(micro3d_state *state, UINT32 x1, UINT32 y1, UINT32 x2, UINT32 y2)
+void micro3d_state::draw_line(UINT32 x1, UINT32 y1, UINT32 x2, UINT32 y2)
 {
 	UINT32 tmp2;
 	UINT32 acc;
@@ -307,7 +297,7 @@ static void draw_line(micro3d_state *state, UINT32 x1, UINT32 y1, UINT32 x2, UIN
 	else
 		dy = y1 - y2;
 
-	write_span(state, y1, x1);
+	write_span(y1, x1);
 
 	if (dx == 0 && dy == 0)
 		return;
@@ -329,11 +319,11 @@ static void draw_line(micro3d_state *state, UINT32 x1, UINT32 y1, UINT32 x2, UIN
 			{
 				if (~acc & 0x80000000)
 				{
-					write_span(state, y1, x1);
+					write_span(y1, x1);
 					y1 += y_inc;
 					x1++;
 					acc += dy;
-					write_span(state, y1, x1);
+					write_span(y1, x1);
 				}
 				else
 				{
@@ -344,7 +334,7 @@ static void draw_line(micro3d_state *state, UINT32 x1, UINT32 y1, UINT32 x2, UIN
 		}
 
 		if (x2 != x1)
-			write_span(state, y1, x2);
+			write_span(y1, x2);
 
 	}
 	else
@@ -360,16 +350,16 @@ static void draw_line(micro3d_state *state, UINT32 x1, UINT32 y1, UINT32 x2, UIN
 				if (acc & 0x80000000)
 				{
 					acc += tmp2;
-					write_span(state, y1, x1);
+					write_span(y1, x1);
 					y1 += y_inc;
-					write_span(state, y1, x1);
+					write_span(y1, x1);
 				}
 				else
 				{
-					write_span(state, y1, x1);
+					write_span(y1, x1);
 					x1++;
 					y1 += y_inc;
-					write_span(state, y1, x1);
+					write_span(y1, x1);
 
 					acc += dy;
 				}
@@ -377,11 +367,11 @@ static void draw_line(micro3d_state *state, UINT32 x1, UINT32 y1, UINT32 x2, UIN
 		}
 
 		if (x2 != x1)
-			write_span(state, y1, x2);
+			write_span(y1, x2);
 	}
 }
 
-static void rasterise_spans(micro3d_state *state, UINT32 min_y, UINT32 max_y, UINT32 attr)
+void micro3d_state::rasterise_spans(UINT32 min_y, UINT32 max_y, UINT32 attr)
 {
 	int y;
 	int color = attr & 0xfff;
@@ -392,16 +382,16 @@ static void rasterise_spans(micro3d_state *state, UINT32 min_y, UINT32 max_y, UI
 		{
 			int x;
 			int addr = y << 1;
-			UINT16 *dest = &state->m_tmp_buffer[y * 1024];
+			UINT16 *dest = &m_tmp_buffer[y * 1024];
 
-			if (state->m_draw_dpram[addr] == 0x3ff000)
+			if (m_draw_dpram[addr] == 0x3ff000)
 			{
 				continue;
 			}
 			else
 			{
-				int start = state->m_draw_dpram[addr] & 0x3ff;
-				int end = (state->m_draw_dpram[addr] >> 12) & 0x3ff;
+				int start = m_draw_dpram[addr] & 0x3ff;
+				int end = (m_draw_dpram[addr] >> 12) & 0x3ff;
 
 				for (x = start; x <= end; ++x)
 					dest[x] = color;
@@ -433,16 +423,16 @@ static void rasterise_spans(micro3d_state *state, UINT32 min_y, UINT32 max_y, UI
 		{
 			int x;
 			int addr = y << 1;
-			UINT16 *dest = &state->m_tmp_buffer[y * 1024];
+			UINT16 *dest = &m_tmp_buffer[y * 1024];
 
-			if (state->m_draw_dpram[addr] == 0x3ff000)
+			if (m_draw_dpram[addr] == 0x3ff000)
 			{
 				continue;
 			}
 			else
 			{
-				int start = state->m_draw_dpram[addr] & 0x3ff;
-				int end = (state->m_draw_dpram[addr] >> 12) & 0x3ff;
+				int start = m_draw_dpram[addr] & 0x3ff;
+				int end = (m_draw_dpram[addr] >> 12) & 0x3ff;
 
 				for (x = start; x <= end; ++x)
 				{
@@ -459,7 +449,7 @@ static void rasterise_spans(micro3d_state *state, UINT32 min_y, UINT32 max_y, UI
 	}
 }
 
-static int clip_triangle(micro3d_state *state, micro3d_vtx *v, micro3d_vtx *vout, int num_vertices, enum planes plane)
+int micro3d_state::clip_triangle(micro3d_vtx *v, micro3d_vtx *vout, int num_vertices, enum planes plane)
 {
 	micro3d_vtx clip_out[10];
 
@@ -469,8 +459,8 @@ static int clip_triangle(micro3d_state *state, micro3d_vtx *v, micro3d_vtx *vout
 
 	for (i = 0; i < num_vertices; ++i)
 	{
-		int v1_in = inside(state, &v[i], plane);
-		int v2_in = inside(state, &v[prev_i], plane);
+		int v1_in = inside(&v[i], plane);
+		int v2_in = inside(&v[prev_i], plane);
 
 		/* Edge is inside */
 		if (v1_in && v2_in)
@@ -480,13 +470,13 @@ static int clip_triangle(micro3d_state *state, micro3d_vtx *v, micro3d_vtx *vout
 		/* Edge is leaving */
 		else if (v1_in && !v2_in)
 		{
-			clip_out[clip_verts++] = intersect(state, &v[i], &v[prev_i], plane);
+			clip_out[clip_verts++] = intersect(&v[i], &v[prev_i], plane);
 			clip_out[clip_verts++] = v[i];
 		}
 		/* Edge is entering */
 		else if (!v1_in && v2_in)
 		{
-			clip_out[clip_verts++] = intersect(state, &v[i], &v[prev_i], plane);
+			clip_out[clip_verts++] = intersect(&v[i], &v[prev_i], plane);
 		}
 
 		prev_i = i;
@@ -496,11 +486,11 @@ static int clip_triangle(micro3d_state *state, micro3d_vtx *v, micro3d_vtx *vout
 	return clip_verts;
 }
 
-static void draw_triangles(micro3d_state *state, UINT32 attr)
+void micro3d_state::draw_triangles(UINT32 attr)
 {
 	int i;
 	int triangles = 0;
-	int vertices = state->m_fifo_idx / 3;
+	int vertices = m_fifo_idx / 3;
 	int min_y = 0x3ff;
 	int max_y = 0;
 
@@ -508,10 +498,10 @@ static void draw_triangles(micro3d_state *state, UINT32 attr)
 	if (vertices == 0)
 	{
 		int y;
-		int val = ((state->m_x_mid + 16) << 12) | state->m_x_mid;
+		int val = ((m_x_mid + 16) << 12) | m_x_mid;
 
-		for (y = state->m_y_mid; y <= state->m_y_mid + 16; ++y)
-			state->m_draw_dpram[y << 1] = val;
+		for (y = m_y_mid; y <= m_y_mid + 16; ++y)
+			m_draw_dpram[y << 1] = val;
 
 		return;
 	}
@@ -525,39 +515,39 @@ static void draw_triangles(micro3d_state *state, UINT32 attr)
 		micro3d_vtx vo, vm, vn;
 		micro3d_vtx vclip_list[10];
 
-		vo.x = state->m_vtx_fifo[0];
-		vo.y = state->m_vtx_fifo[1];
-		vo.z = state->m_vtx_fifo[2];
+		vo.x = m_vtx_fifo[0];
+		vo.y = m_vtx_fifo[1];
+		vo.z = m_vtx_fifo[2];
 
-		vm.x = state->m_vtx_fifo[(i - 1) * 3 + 0];
-		vm.y = state->m_vtx_fifo[(i - 1) * 3 + 1];
-		vm.z = state->m_vtx_fifo[(i - 1) * 3 + 2];
+		vm.x = m_vtx_fifo[(i - 1) * 3 + 0];
+		vm.y = m_vtx_fifo[(i - 1) * 3 + 1];
+		vm.z = m_vtx_fifo[(i - 1) * 3 + 2];
 
-		vn.x = state->m_vtx_fifo[i * 3 + 0];
-		vn.y = state->m_vtx_fifo[i * 3 + 1];
-		vn.z = state->m_vtx_fifo[i * 3 + 2];
+		vn.x = m_vtx_fifo[i * 3 + 0];
+		vn.y = m_vtx_fifo[i * 3 + 1];
+		vn.z = m_vtx_fifo[i * 3 + 2];
 
 		vclip_list[0] = vo;
 		vclip_list[1] = vm;
 		vclip_list[2] = vn;
 
 		/* Clip against near Z and far Z planes */
-		clip_vertices = clip_triangle(state, vclip_list, vclip_list, clip_vertices, CLIP_Z_MIN);
-		clip_vertices = clip_triangle(state, vclip_list, vclip_list, clip_vertices, CLIP_Z_MAX);
+		clip_vertices = clip_triangle(vclip_list, vclip_list, clip_vertices, CLIP_Z_MIN);
+		clip_vertices = clip_triangle(vclip_list, vclip_list, clip_vertices, CLIP_Z_MAX);
 
 		/* Perform perspective divide */
 		for (k = 0; k < clip_vertices; ++k)
 		{
-			vclip_list[k].x = vclip_list[k].x * state->m_z_min / vclip_list[k].z;
-			vclip_list[k].y = vclip_list[k].y * state->m_z_min / vclip_list[k].z;
+			vclip_list[k].x = vclip_list[k].x * m_z_min / vclip_list[k].z;
+			vclip_list[k].y = vclip_list[k].y * m_z_min / vclip_list[k].z;
 			vclip_list[k].z = 0;
 		}
 
 		/* Perform screen-space clipping */
-		clip_vertices = clip_triangle(state, vclip_list, vclip_list, clip_vertices, CLIP_Y_MAX);
-		clip_vertices = clip_triangle(state, vclip_list, vclip_list, clip_vertices, CLIP_X_MIN);
-		clip_vertices = clip_triangle(state, vclip_list, vclip_list, clip_vertices, CLIP_X_MAX);
-		clip_vertices = clip_triangle(state, vclip_list, vclip_list, clip_vertices, CLIP_Y_MIN);
+		clip_vertices = clip_triangle(vclip_list, vclip_list, clip_vertices, CLIP_Y_MAX);
+		clip_vertices = clip_triangle(vclip_list, vclip_list, clip_vertices, CLIP_X_MIN);
+		clip_vertices = clip_triangle(vclip_list, vclip_list, clip_vertices, CLIP_X_MAX);
+		clip_vertices = clip_triangle(vclip_list, vclip_list, clip_vertices, CLIP_Y_MIN);
 
 		/* Rasterise */
 		if (clip_vertices >= 3)
@@ -567,11 +557,11 @@ static void draw_triangles(micro3d_state *state, UINT32 attr)
 
 			triangles = TRUE;
 
-			a.x += state->m_x_mid;
-			a.y += state->m_y_mid;
+			a.x += m_x_mid;
+			a.y += m_y_mid;
 
-			b.x += state->m_x_mid;
-			b.y += state->m_y_mid;
+			b.x += m_x_mid;
+			b.y += m_y_mid;
 
 			/* Keep track of the y-extents so we don't have to scan every line later */
 			if (a.y < min_y)
@@ -585,29 +575,29 @@ static void draw_triangles(micro3d_state *state, UINT32 attr)
 				max_y = b.y;
 
 			/* Draw the first line of the triangle/fan */
-			draw_line(state, a.x, a.y, b.x, b.y);
+			draw_line(a.x, a.y, b.x, b.y);
 
 			for (k = 2; k < clip_vertices; ++k)
 			{
 				micro3d_vtx c = vclip_list[k];
 
-				c.x += state->m_x_mid;
-				c.y += state->m_y_mid;
+				c.x += m_x_mid;
+				c.y += m_y_mid;
 
 				if (c.y < min_y)
 					min_y = c.y;
 				if (c.y > max_y)
 					max_y = c.y;
 
-				draw_line(state, b.x, b.y, c.x, c.y);
-				draw_line(state, a.x, a.y, c.x, c.y);
+				draw_line(b.x, b.y, c.x, c.y);
+				draw_line(a.x, a.y, c.x, c.y);
 				b = c;
 			}
 		}
 	}
 
 	if (triangles == TRUE)
-		rasterise_spans(state, min_y, max_y, attr);
+		rasterise_spans(min_y, max_y, attr);
 }
 
 
@@ -724,8 +714,7 @@ WRITE32_MEMBER(micro3d_state::micro3d_fifo_w)
 		{
 			if ((opcode == 0x85) || (opcode == 0x8a))
 			{
-				micro3d_state *state = machine().driver_data<micro3d_state>();
-				draw_triangles(state, data);
+				draw_triangles(data);
 				m_draw_state = STATE_DRAW_CMD;
 			}
 			else
