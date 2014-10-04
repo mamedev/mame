@@ -17,7 +17,6 @@ A novelty game where the playfield is completely vertical. It has 4 flippers and
   The score only has 5 digits, but the game stores the 100,000 digit internally.
 
 ToDo:
-- Diagnostic buttons not working
 
 ************************************************************************************/
 
@@ -56,23 +55,24 @@ public:
 	DECLARE_READ8_MEMBER(switch_r);
 	DECLARE_WRITE8_MEMBER(switch_w);
 	DECLARE_READ_LINE_MEMBER(pia21_ca1_r);
-	DECLARE_READ_LINE_MEMBER(pia28_ca1_r);
-	DECLARE_READ_LINE_MEMBER(pia28_cb1_r);
 	DECLARE_WRITE_LINE_MEMBER(pia21_ca2_w);
 	DECLARE_WRITE_LINE_MEMBER(pia21_cb2_w) { }; // enable solenoids
 	DECLARE_WRITE_LINE_MEMBER(pia24_cb2_w) { }; // dummy to stop error log filling up
 	DECLARE_WRITE_LINE_MEMBER(pia28_ca2_w) { }; // comma3&4
 	DECLARE_WRITE_LINE_MEMBER(pia28_cb2_w) { }; // comma1&2
-	TIMER_DEVICE_CALLBACK_MEMBER(irq);
+	DECLARE_WRITE_LINE_MEMBER(pia_irq);
 	DECLARE_INPUT_CHANGED_MEMBER(main_nmi);
 	DECLARE_INPUT_CHANGED_MEMBER(audio_nmi);
 	DECLARE_MACHINE_RESET(s8a);
+	DECLARE_DRIVER_INIT(s8a);
 private:
-	UINT8 m_t_c;
 	UINT8 m_sound_data;
 	UINT8 m_strobe;
 	UINT8 m_kbdrow;
 	bool m_data_ok;
+	emu_timer* m_irq_timer;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	static const device_timer_id TIMER_IRQ = 0;
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<dac_device> m_dac;
@@ -83,7 +83,7 @@ private:
 	required_device<pia6821_device> m_pia30;
 };
 
-static ADDRESS_MAP_START( s8_main_map, AS_PROGRAM, 8, s8a_state )
+static ADDRESS_MAP_START( s8a_main_map, AS_PROGRAM, 8, s8a_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x2100, 0x2103) AM_DEVREADWRITE("pia21", pia6821_device, read, write) // sound+solenoids
@@ -94,13 +94,13 @@ static ADDRESS_MAP_START( s8_main_map, AS_PROGRAM, 8, s8a_state )
 	AM_RANGE(0x6000, 0x7fff) AM_ROM AM_REGION("roms", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( s8_audio_map, AS_PROGRAM, 8, s8a_state )
+static ADDRESS_MAP_START( s8a_audio_map, AS_PROGRAM, 8, s8a_state )
 	AM_RANGE(0x0000, 0x00ff) AM_RAM
 	AM_RANGE(0x2000, 0x2003) AM_DEVREADWRITE("pias", pia6821_device, read, write)
 	AM_RANGE(0xc000, 0xffff) AM_ROM AM_REGION("audioroms", 0)
 ADDRESS_MAP_END
 
-static INPUT_PORTS_START( s8 )
+static INPUT_PORTS_START( s8a )
 	PORT_START("X0")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
@@ -149,11 +149,6 @@ static INPUT_PORTS_START( s8 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Up/Down") PORT_CODE(KEYCODE_6_PAD) PORT_TOGGLE
 INPUT_PORTS_END
 
-MACHINE_RESET_MEMBER( s8a_state, s8a )
-{
-	m_t_c = 0;
-}
-
 INPUT_CHANGED_MEMBER( s8a_state::main_nmi )
 {
 	// Diagnostic button sends a pulse to NMI pin
@@ -193,17 +188,6 @@ WRITE_LINE_MEMBER( s8a_state::pia21_ca2_w )
 
 WRITE8_MEMBER( s8a_state::lamp0_w )
 {
-	m_maincpu->set_input_line(M6800_IRQ_LINE, CLEAR_LINE);
-}
-
-READ_LINE_MEMBER( s8a_state::pia28_ca1_r )
-{
-	return BIT(ioport("DIAGS")->read(), 2); // advance button
-}
-
-READ_LINE_MEMBER( s8a_state::pia28_cb1_r )
-{
-	return BIT(ioport("DIAGS")->read(), 3); // up/down switch
 }
 
 WRITE8_MEMBER( s8a_state::dig0_w )
@@ -243,19 +227,58 @@ READ8_MEMBER( s8a_state::dac_r )
 	return m_sound_data;
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER( s8a_state::irq )
+WRITE_LINE_MEMBER( s8a_state::pia_irq )
 {
-	if (m_t_c > 0x70)
-		m_maincpu->set_input_line(M6800_IRQ_LINE, ASSERT_LINE);
+	if(state == CLEAR_LINE)
+	{
+		// restart IRQ timer
+		m_irq_timer->adjust(attotime::from_ticks(980,1e6),1);
+	}
 	else
-		m_t_c++;
+	{
+		// disable IRQ timer while other IRQs are being handled
+		// (counter is reset every 32 cycles while a PIA IRQ is handled)
+		m_irq_timer->adjust(attotime::zero);
+	}
 }
 
-static MACHINE_CONFIG_START( s8, s8a_state )
+void s8a_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	switch(id)
+	{
+	case TIMER_IRQ:
+		if(param == 1)
+		{
+			m_maincpu->set_input_line(M6800_IRQ_LINE,ASSERT_LINE);
+			m_irq_timer->adjust(attotime::from_ticks(32,1e6),0);
+			m_pia28->ca1_w(BIT(ioport("DIAGS")->read(), 2));  // Advance
+			m_pia28->cb1_w(BIT(ioport("DIAGS")->read(), 3));  // Up/Down
+		}
+		else
+		{
+			m_maincpu->set_input_line(M6800_IRQ_LINE,CLEAR_LINE);
+			m_irq_timer->adjust(attotime::from_ticks(980,1e6),1);
+			m_pia28->ca1_w(1);
+			m_pia28->cb1_w(1);
+		}
+		break;
+	}
+}
+
+MACHINE_RESET_MEMBER( s8a_state, s8a )
+{
+}
+
+DRIVER_INIT_MEMBER( s8a_state, s8a )
+{
+	m_irq_timer = timer_alloc(TIMER_IRQ);
+	m_irq_timer->adjust(attotime::from_ticks(980,1e6),1);
+}
+
+static MACHINE_CONFIG_START( s8a, s8a_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6802, XTAL_4MHz)
-	MCFG_CPU_PROGRAM_MAP(s8_main_map)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq", s8a_state, irq, attotime::from_hz(250))
+	MCFG_CPU_PROGRAM_MAP(s8a_main_map)
 	MCFG_MACHINE_RESET_OVERRIDE(s8a_state, s8a)
 
 	/* Video */
@@ -272,37 +295,35 @@ static MACHINE_CONFIG_START( s8, s8a_state )
 	MCFG_PIA_WRITEPB_HANDLER(WRITE8(s8a_state, sol2_w))
 	MCFG_PIA_CA2_HANDLER(WRITELINE(s8a_state, pia21_ca2_w))
 	MCFG_PIA_CB2_HANDLER(WRITELINE(s8a_state, pia21_cb2_w))
-	MCFG_PIA_IRQA_HANDLER(DEVWRITELINE("maincpu", m6802_cpu_device, irq_line))
-	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE("maincpu", m6802_cpu_device, irq_line))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(s8a_state, pia_irq))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(s8a_state, pia_irq))
 
 	MCFG_DEVICE_ADD("pia24", PIA6821, 0)
 	MCFG_PIA_WRITEPA_HANDLER(WRITE8(s8a_state, lamp0_w))
 	MCFG_PIA_WRITEPB_HANDLER(WRITE8(s8a_state, lamp1_w))
 	MCFG_PIA_CB2_HANDLER(WRITELINE(s8a_state, pia24_cb2_w))
-	MCFG_PIA_IRQA_HANDLER(DEVWRITELINE("maincpu", m6802_cpu_device, irq_line))
-	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE("maincpu", m6802_cpu_device, irq_line))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(s8a_state, pia_irq))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(s8a_state, pia_irq))
 
 	MCFG_DEVICE_ADD("pia28", PIA6821, 0)
-	MCFG_PIA_READCA1_HANDLER(READLINE(s8a_state, pia28_ca1_r))
-	MCFG_PIA_READCB1_HANDLER(READLINE(s8a_state, pia28_cb1_r))
 	MCFG_PIA_WRITEPA_HANDLER(WRITE8(s8a_state, dig0_w))
 	MCFG_PIA_WRITEPB_HANDLER(WRITE8(s8a_state, dig1_w))
 	MCFG_PIA_CA2_HANDLER(WRITELINE(s8a_state, pia28_ca2_w))
 	MCFG_PIA_CB2_HANDLER(WRITELINE(s8a_state, pia28_cb2_w))
-	MCFG_PIA_IRQA_HANDLER(DEVWRITELINE("maincpu", m6802_cpu_device, irq_line))
-	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE("maincpu", m6802_cpu_device, irq_line))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(s8a_state, pia_irq))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(s8a_state, pia_irq))
 
 	MCFG_DEVICE_ADD("pia30", PIA6821, 0)
 	MCFG_PIA_READPA_HANDLER(READ8(s8a_state, switch_r))
 	MCFG_PIA_WRITEPB_HANDLER(WRITE8(s8a_state, switch_w))
-	MCFG_PIA_IRQA_HANDLER(DEVWRITELINE("maincpu", m6802_cpu_device, irq_line))
-	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE("maincpu", m6802_cpu_device, irq_line))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(s8a_state, pia_irq))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(s8a_state, pia_irq))
 
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* Add the soundcard */
 	MCFG_CPU_ADD("audiocpu", M6808, XTAL_4MHz)
-	MCFG_CPU_PROGRAM_MAP(s8_audio_map)
+	MCFG_CPU_PROGRAM_MAP(s8a_audio_map)
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("dac", DAC, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
@@ -327,4 +348,4 @@ ROM_START(scrzy_l1)
 	ROM_LOAD("ic49.bin", 0x0000, 0x4000, CRC(bcc8ccc4) SHA1(2312f9cc4f5a2dadfbfa61d13c31bb5838adf152) )
 ROM_END
 
-GAME(1984,scrzy_l1, 0, s8, s8, driver_device, 0, ROT0, "Williams", "Still Crazy", GAME_MECHANICAL )
+GAME(1984,scrzy_l1, 0, s8a, s8a, s8a_state, s8a, ROT0, "Williams", "Still Crazy", GAME_MECHANICAL )
