@@ -1,6 +1,6 @@
 /***************************************************************************
 
-Atari Drag Race Driver
+    Atari Drag Race Driver
 
 ***************************************************************************/
 
@@ -14,18 +14,17 @@ Atari Drag Race Driver
 
 TIMER_DEVICE_CALLBACK_MEMBER(dragrace_state::dragrace_frame_callback)
 {
-	int i;
 	static const char *const portnames[] = { "P1", "P2" };
 
-	for (i = 0; i < 2; i++)
+	for (int i = 0; i < 2; i++)
 	{
 		switch (ioport(portnames[i])->read())
 		{
-		case 0x01: m_gear[i] = 1; break;
-		case 0x02: m_gear[i] = 2; break;
-		case 0x04: m_gear[i] = 3; break;
-		case 0x08: m_gear[i] = 4; break;
-		case 0x10: m_gear[i] = 0; break;
+			case 0x01: m_gear[i] = 1; break;
+			case 0x02: m_gear[i] = 2; break;
+			case 0x04: m_gear[i] = 3; break;
+			case 0x08: m_gear[i] = 4; break;
+			case 0x10: m_gear[i] = 0; break;
 		}
 	}
 
@@ -85,6 +84,10 @@ void dragrace_state::dragrace_update_misc_flags( address_space &space )
 	m_discrete->write(space, DRAGRACE_ATTRACT_EN, (m_misc_flags & 0x00001000) ? 1: 0); // Attract enable
 	m_discrete->write(space, DRAGRACE_LOTONE_EN, (m_misc_flags & 0x00002000) ? 1: 0);  // LoTone enable
 	m_discrete->write(space, DRAGRACE_HITONE_EN, (m_misc_flags & 0x20000000) ? 1: 0);  // HiTone enable
+	
+	// the tachometers are driven from the same frequency generator that creates the engine sound
+	output_set_value("tachometer", ~m_misc_flags & 0x0000001f);
+	output_set_value("tachometer2", (~m_misc_flags & 0x001f0000) >> 0x10);
 }
 
 WRITE8_MEMBER(dragrace_state::dragrace_misc_w)
@@ -116,9 +119,7 @@ READ8_MEMBER(dragrace_state::dragrace_input_r)
 	UINT8 maskA = 1 << (offset % 8);
 	UINT8 maskB = 1 << (offset / 8);
 
-	int i;
-
-	for (i = 0; i < 2; i++)
+	for (int i = 0; i < 2; i++)
 	{
 		int in = ioport(portnames[i])->read();
 
@@ -139,9 +140,7 @@ READ8_MEMBER(dragrace_state::dragrace_steering_r)
 	int bitB[2];
 	static const char *const dialnames[] = { "DIAL1", "DIAL2" };
 
-	int i;
-
-	for (i = 0; i < 2; i++)
+	for (int i = 0; i < 2; i++)
 	{
 		int dial = ioport(dialnames[i])->read();
 

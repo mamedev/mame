@@ -47,6 +47,10 @@ public:
 
 	/* devices */
 	required_device<discrete_device> m_discrete;
+	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
+
 	DECLARE_WRITE8_MEMBER(dragrace_misc_w);
 	DECLARE_WRITE8_MEMBER(dragrace_misc_clear_w);
 	DECLARE_READ8_MEMBER(dragrace_input_r);
@@ -60,9 +64,6 @@ public:
 	UINT32 screen_update_dragrace(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(dragrace_frame_callback);
 	void dragrace_update_misc_flags( address_space &space );
-	required_device<cpu_device> m_maincpu;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<screen_device> m_screen;
 };
 
 /*----------- defined in audio/dragrace.c -----------*/
