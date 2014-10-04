@@ -48,6 +48,9 @@ public:
 	DECLARE_WRITE8_MEMBER( write );
 	DECLARE_PALETTE_INIT(huc6260);
 
+	READ8_MEMBER(palette_direct_read);
+	WRITE8_MEMBER(palette_direct_write);
+
 protected:
 	// device-level overrides
 	virtual void device_start();

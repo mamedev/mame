@@ -13,8 +13,6 @@
     Twice as much VRAM.
 
     Todo:
-    - Convert this driver to use proper PC-Engine video.
-    - Priority is wrong for the submarine at the end of level 1.
     - There seems to be a bug with a stuck note from the YM2203 FM channel
       at the start of scene 3 and near the ending when your characters are
       flying over a forest in a helicopter.
@@ -65,19 +63,20 @@ READ8_MEMBER(battlera_state::control_data_r)
 
 static ADDRESS_MAP_START( battlera_map, AS_PROGRAM, 8, battlera_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x100000, 0x10ffff) AM_READWRITE(HuC6270_debug_r, HuC6270_debug_w) /* Cheat to edit vram data */
 	AM_RANGE(0x1e0800, 0x1e0801) AM_WRITE(battlera_sound_w)
-	AM_RANGE(0x1e1000, 0x1e13ff) AM_WRITE(battlera_palette_w) AM_SHARE("paletteram")
+	AM_RANGE(0x1e1000, 0x1e13ff) AM_DEVREADWRITE( "huc6260", huc6260_device, palette_direct_read, palette_direct_write) AM_SHARE("paletteram")
 	AM_RANGE(0x1f0000, 0x1f1fff) AM_RAMBANK("bank8") /* Main ram */
-	AM_RANGE(0x1fe000, 0x1fe001) AM_READWRITE(HuC6270_register_r, HuC6270_register_w)
-	AM_RANGE(0x1fe002, 0x1fe003) AM_WRITE(HuC6270_data_w)
 	AM_RANGE(0x1ff000, 0x1ff001) AM_READWRITE(control_data_r, control_data_w)
-	AM_RANGE(0x1ff400, 0x1ff403) AM_DEVWRITE("maincpu", h6280_device, irq_status_w)
+
+	AM_RANGE( 0x1FE000, 0x1FE3FF) AM_DEVREADWRITE( "huc6270", huc6270_device, read, write )
+	AM_RANGE( 0x1FE400, 0x1FE7FF) AM_DEVREADWRITE( "huc6260", huc6260_device, read, write )
+	AM_RANGE( 0x1FEC00, 0x1FEFFF) AM_DEVREADWRITE( "maincpu", h6280_device, timer_r, timer_w )
+	AM_RANGE( 0x1FF400, 0x1FF7FF) AM_DEVREADWRITE( "maincpu", h6280_device, irq_status_r, irq_status_w )
+	
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( battlera_portmap, AS_IO, 8, battlera_state )
-	AM_RANGE(0x00, 0x01) AM_WRITE(HuC6270_register_w)
-	AM_RANGE(0x02, 0x03) AM_WRITE(HuC6270_data_w)
+	AM_RANGE( 0x00, 0x03) AM_DEVREADWRITE( "huc6270", huc6270_device, read, write )
 ADDRESS_MAP_END
 
 /******************************************************************************/
@@ -179,38 +178,20 @@ static INPUT_PORTS_START( battlera )
 	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW2:8" )        /* Listed as "Unused" */
 INPUT_PORTS_END
 
-/******************************************************************************/
-
-static const gfx_layout tiles =
-{
-	8,8,
-	4096,
-	4,
-	{ 16*8, 16*8+8, 0, 8 },
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16 },
-	32*8
-};
-
-static const gfx_layout sprites =
-{
-	16,16,
-	1024,
-	4,
-	{ 96*8, 64*8, 32*8, 0 },
-	{ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 },
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16,
-			8*16, 9*16, 10*16, 11*16, 12*16, 13*16, 14*16, 15*16 },
-	128*8
-};
-
-static GFXDECODE_START( battlera )
-	GFXDECODE_ENTRY( NULL, 0, tiles,       0,  16 ) /* Dynamically modified */
-	GFXDECODE_ENTRY( NULL, 0, sprites,   256,  16 ) /* Dynamically modified */
-	GFXDECODE_ENTRY( NULL, 0, tiles  ,   256,  16 ) /* Blank tile */
-GFXDECODE_END
 
 /******************************************************************************/
+
+WRITE_LINE_MEMBER(battlera_state::pce_irq_changed)
+{
+	m_maincpu->set_input_line(0, state);
+}
+
+UINT32 battlera_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	m_huc6260->video_update( bitmap, cliprect );
+	return 0;
+}
+
 
 static MACHINE_CONFIG_START( battlera, battlera_state )
 
@@ -218,22 +199,25 @@ static MACHINE_CONFIG_START( battlera, battlera_state )
 	MCFG_CPU_ADD("maincpu", H6280,21477200/3)
 	MCFG_CPU_PROGRAM_MAP(battlera_map)
 	MCFG_CPU_IO_MAP(battlera_portmap)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", battlera_state, battlera_irq, "screen", 0, 1) /* 8 prelines, 232 lines, 16 vblank? */
 
 	MCFG_CPU_ADD("audiocpu", H6280,21477200/3)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(battlera_state, screen_update_battlera)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_RAW_PARAMS(MAIN_CLOCK, HUC6260_WPF, 64, 64 + 1024 + 64, HUC6260_LPF, 18, 18 + 242)
+	MCFG_SCREEN_UPDATE_DRIVER( battlera_state, screen_update )
+	MCFG_SCREEN_PALETTE("huc6260:palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", battlera)
-	MCFG_PALETTE_ADD("palette", 512)
+	MCFG_DEVICE_ADD( "huc6260", HUC6260, MAIN_CLOCK )
+	MCFG_HUC6260_NEXT_PIXEL_DATA_CB(DEVREAD16("huc6270", huc6270_device, next_pixel))
+	MCFG_HUC6260_TIME_TIL_NEXT_EVENT_CB(DEVREAD16("huc6270", huc6270_device, time_until_next_event))
+	MCFG_HUC6260_VSYNC_CHANGED_CB(DEVWRITELINE("huc6270", huc6270_device, vsync_changed))
+	MCFG_HUC6260_HSYNC_CHANGED_CB(DEVWRITELINE("huc6270", huc6270_device, hsync_changed))
+
+	MCFG_DEVICE_ADD( "huc6270", HUC6270, 0 )
+	MCFG_HUC6270_VRAM_SIZE(0x20000)
+	MCFG_HUC6270_IRQ_CHANGED_CB(WRITELINE(battlera_state, pce_irq_changed))
 
 
 	/* sound hardware */
