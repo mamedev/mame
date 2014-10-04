@@ -50,8 +50,9 @@ static ADDRESS_MAP_START(i80c31_prg, AS_PROGRAM, 8, tecnbras_state)
 	AM_RANGE(0x8000, 0xFFFF) AM_RAM
 ADDRESS_MAP_END
 
+#define DMD_OFFSET 24 //This is a guess. We should verify the real hardware behaviour
 static ADDRESS_MAP_START(i80c31_io, AS_IO, 8, tecnbras_state)
-	AM_RANGE(0x0100, 0x0145) AM_WRITE(set_x_position_w)
+	AM_RANGE(0x0100+DMD_OFFSET, 0x0145+DMD_OFFSET) AM_WRITE(set_x_position_w)
 	AM_RANGE(0x06B8, 0x06BC) AM_WRITE(print_column_w)
 	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_NOP /*buzzer ?*/
 ADDRESS_MAP_END
@@ -75,10 +76,11 @@ WRITE8_MEMBER(tecnbras_state::print_column_w)
 {
 	int x = m_xcoord + offset;
 	for (int i=0; i<7; i++){
-		assert((x/5) < ARRAY_LENGTH(m_digit));
-		m_digit[x/5][i] &= ~(1 << (x%5));
-		m_digit[x/5][i] |= BIT(data, 7-i) ? (1 << (x%5)) : 0;
-		output_set_indexed_value("dmd_", (x/5)*7 + i, 0x1F & m_digit[x/5][i]);
+		if((x/5) < ARRAY_LENGTH(m_digit)){
+			m_digit[x/5][i] &= ~(1 << (x%5));
+			m_digit[x/5][i] |= BIT(data, 7-i) ? (1 << (x%5)) : 0;
+			output_set_indexed_value("dmd_", (x/5)*7 + i, 0x1F & m_digit[x/5][i]);
+		}
 	}
 }
 
