@@ -1,0 +1,247 @@
+<!-- fireball.lay -->
+
+<!-- 2014-01-15: Initial version.  -->
+
+<mamelayout version="2">
+
+	<element name="red_led">
+		<rect>
+			<color red="1.0" green="0.0" blue="0.0" />
+		</rect>
+	</element>
+
+	<element name="background">
+		<rect>
+			<bounds left="0" top="0" right="1" bottom="1" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</rect>
+	</element>
+
+	<element name="P0"><text string="MR"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="P1"><text string="MC"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="P2"><text string="ML"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+
+	<element name="P3"><text string="CR"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="P4"><text string="CC"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="P5"><text string="CL"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+
+	<element name="P6"><text string="FR"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="P7"><text string="FC"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="P8"><text string="FL"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+
+	<element name="P9"><text string="PR"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="P10"><text string="PC"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="P11"><text string="PL"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+
+	<element name="P12"><text string="500"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="P13"><text string="300"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="P14"><text string="200"><color red="1.0" green="1.0" blue="1.0" /></text></element>	
+	<element name="P15"><text string="100"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	
+	<element name="P16"><text string="INSERT COIN"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="P17"><text string="NO CAMBIO"><color red="1.0" green="1.0" blue="1.0" /></text></element>	
+	<element name="P18"><text string="FUSE"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="P19"><text string="FALTA"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	
+	<element name="P20"><text string="MGA"><color red="1.0" green="1.0" blue="1.0" /></text></element>	
+	<element name="P21"><text string="50"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="P22"><text string="MGA"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="P23"><text string="25"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="P24"><text string="250"><color red="1.0" green="1.0" blue="1.0" /></text></element>	
+	<element name="P25"><text string="MGA"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="P26"><text string="100"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="P27"><text string="MGA"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="P28"><text string="25"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	
+	<element name="P29"><text string="Premio Sorpresa"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+
+	
+	<view name="Default Layout">
+
+		<!-- Background -->
+		<backdrop element="background">
+			<bounds left="0" top="0" right="480" bottom="500" />
+		</backdrop>
+
+		<!-- LEDs -->
+
+		<bezel name="ML" element="red_led">
+			<bounds x="280" y="50" width="5" height="5" />
+		</bezel>
+		<bezel name="MC" element="red_led">
+			<bounds x="320" y="50" width="5" height="5" />
+		</bezel>
+		<bezel name="MR" element="red_led">
+			<bounds x="360" y="50" width="5" height="5" />
+		</bezel>
+		
+		<bezel name="CL" element="red_led">
+			<bounds x="280" y="100" width="5" height="5" />
+		</bezel>
+		<bezel name="CC" element="red_led">
+			<bounds x="320" y="100" width="5" height="5" />
+		</bezel>
+		<bezel name="CR" element="red_led">
+			<bounds x="360" y="100" width="5" height="5" />
+		</bezel>
+
+		<bezel name="FL" element="red_led">
+			<bounds x="280" y="150" width="5" height="5" />
+		</bezel>
+		<bezel name="FC" element="red_led">
+			<bounds x="320" y="150" width="5" height="5" />
+		</bezel>
+		<bezel name="FR" element="red_led">
+			<bounds x="360" y="150" width="5" height="5" />
+		</bezel>
+
+		<bezel name="PL" element="red_led">
+			<bounds x="280" y="200" width="5" height="5" />
+		</bezel>
+		<bezel name="PC" element="red_led">
+			<bounds x="320" y="200" width="5" height="5" />
+		</bezel>
+		<bezel name="PR" element="red_led">
+			<bounds x="360" y="200" width="5" height="5" />
+		</bezel>		
+		
+		<bezel name="500" element="red_led">
+			<bounds x="410" y="50" width="5" height="5" />
+		</bezel>
+		<bezel name="300" element="red_led">
+			<bounds x="410" y="100" width="5" height="5" />
+		</bezel>
+		<bezel name="200" element="red_led">
+			<bounds x="410" y="150" width="5" height="5" />
+		</bezel>		
+		<bezel name="100" element="red_led">
+			<bounds x="410" y="200" width="5" height="5" />
+		</bezel>		
+		
+		<bezel name="INSERTCOIN" element="red_led">
+			<bounds x="270" y="250" width="5" height="5" />
+		</bezel>
+		<bezel name="NOCAMBIO" element="red_led">
+			<bounds x="310" y="250" width="5" height="5" />
+		</bezel>
+		<bezel name="FUSE" element="red_led">
+			<bounds x="350" y="250" width="5" height="5" />
+		</bezel>		
+		<bezel name="FALTA" element="red_led">
+			<bounds x="400" y="250" width="5" height="5" />
+		</bezel>
+
+		<bezel name="MGA4" element="red_led">
+			<bounds x="35" y="350" width="30" height="30" />
+		</bezel>
+		<bezel name="50" element="red_led">
+			<bounds x="80" y="350" width="30" height="30" />
+		</bezel>
+		<bezel name="MGA3" element="red_led">
+			<bounds x="125" y="350" width="30" height="30" />
+		</bezel>		
+		<bezel name="252" element="red_led">
+			<bounds x="170" y="350" width="30" height="30" />
+		</bezel>
+		<bezel name="250" element="red_led">
+			<bounds x="215" y="350" width="30" height="30" />
+		</bezel>
+		<bezel name="MGA2" element="red_led">
+			<bounds x="260" y="350" width="30" height="30" />
+		</bezel>
+		<bezel name="1002" element="red_led">
+			<bounds x="305" y="350" width="30" height="30" />
+		</bezel>		
+		<bezel name="MGA" element="red_led">
+			<bounds x="350" y="350" width="30" height="30" />
+		</bezel>
+		<bezel name="25" element="red_led">
+			<bounds x="395" y="350" width="30" height="30" />
+		</bezel>
+
+		
+		<bezel name="MGA4" element="red_led">
+			<bounds x="40" y="50" width="5" height="5" />
+		</bezel>
+		<bezel name="50" element="red_led">
+			<bounds x="60" y="100" width="5" height="5" />
+		</bezel>
+		<bezel name="MGA3" element="red_led">
+			<bounds x="80" y="150" width="5" height="5" />
+		</bezel>		
+		<bezel name="252" element="red_led">
+			<bounds x="100" y="200" width="5" height="5" />
+		</bezel>
+		<bezel name="250" element="red_led">
+			<bounds x="120" y="250" width="5" height="5" />
+		</bezel>
+		<bezel name="MGA2" element="red_led">
+			<bounds x="140" y="200" width="5" height="5" />
+		</bezel>
+		<bezel name="1002" element="red_led">
+			<bounds x="160" y="150" width="5" height="5" />
+		</bezel>		
+		<bezel name="MGA" element="red_led">
+			<bounds x="180" y="100" width="5" height="5" />
+		</bezel>
+		<bezel name="25" element="red_led">
+			<bounds x="200" y="50" width="5" height="5" />
+		</bezel>
+
+		<bezel name="PREMIOS" element="red_led">
+			<bounds x="220" y="150" width="10" height="10" />
+		</bezel>
+		
+			
+		
+		<bezel element="P0"><bounds left="350" right="370" top="20" bottom="40" /></bezel>
+		<bezel element="P1"><bounds left="310" right="330" top="20" bottom="40" /></bezel>
+		<bezel element="P2"><bounds left="270" right="290" top="20" bottom="40" /></bezel>
+
+		<bezel element="P3"><bounds left="350" right="370" top="70" bottom="90" /></bezel>
+		<bezel element="P4"><bounds left="310" right="330" top="70" bottom="90" /></bezel>
+		<bezel element="P5"><bounds left="270" right="290" top="70" bottom="90" /></bezel>
+
+		<bezel element="P6"><bounds left="350" right="370" top="120" bottom="140" /></bezel>
+		<bezel element="P7"><bounds left="310" right="330" top="120" bottom="140" /></bezel>
+		<bezel element="P8"><bounds left="270" right="290" top="120" bottom="140" /></bezel>
+
+		<bezel element="P9"><bounds left="350" right="370" top="170" bottom="190" /></bezel>
+		<bezel element="P10"><bounds left="310" right="330" top="170" bottom="190" /></bezel>
+		<bezel element="P11"><bounds left="270" right="290" top="170" bottom="190" /></bezel>
+
+		<bezel element="P12"><bounds left="400" right="420" top="20" bottom="40" /></bezel>
+		<bezel element="P13"><bounds left="400" right="420" top="70" bottom="90" /></bezel>
+		<bezel element="P14"><bounds left="400" right="420" top="120" bottom="140" /></bezel>
+		<bezel element="P15"><bounds left="400" right="420" top="170" bottom="190" /></bezel>
+
+		<bezel element="P16"><bounds left="270" right="290" top="220" bottom="240" /></bezel>
+		<bezel element="P17"><bounds left="310" right="330" top="220" bottom="240" /></bezel>
+		<bezel element="P18"><bounds left="350" right="370" top="220" bottom="240" /></bezel>
+		<bezel element="P19"><bounds left="400" right="420" top="220" bottom="240" /></bezel>
+		
+		<bezel element="P20"><bounds left="35" right="55" top="320" bottom="340" /></bezel>
+		<bezel element="P21"><bounds left="80" right="100" top="320" bottom="340" /></bezel>
+		<bezel element="P22"><bounds left="125" right="145" top="320" bottom="340" /></bezel>
+		<bezel element="P23"><bounds left="170" right="190" top="320" bottom="340" /></bezel>		
+		<bezel element="P24"><bounds left="215" right="235" top="320" bottom="340" /></bezel>
+		<bezel element="P25"><bounds left="260" right="280" top="320" bottom="340" /></bezel>
+		<bezel element="P26"><bounds left="305" right="325" top="320" bottom="340" /></bezel>
+		<bezel element="P27"><bounds left="350" right="370" top="320" bottom="340" /></bezel>	
+		<bezel element="P28"><bounds left="395" right="415" top="320" bottom="340" /></bezel>	
+
+
+		<bezel element="P20"><bounds left="40" right="60" top="35" bottom="45" /></bezel>
+		<bezel element="P21"><bounds left="60" right="80" top="85" bottom="95" /></bezel>
+		<bezel element="P22"><bounds left="80" right="100" top="135" bottom="145" /></bezel>
+		<bezel element="P23"><bounds left="100" right="120" top="185" bottom="195" /></bezel>		
+		<bezel element="P24"><bounds left="120" right="140" top="235" bottom="245" /></bezel>
+		<bezel element="P25"><bounds left="140" right="160" top="185" bottom="195" /></bezel>
+		<bezel element="P26"><bounds left="160" right="180" top="135" bottom="145" /></bezel>
+		<bezel element="P27"><bounds left="180" right="200" top="85" bottom="95" /></bezel>	
+		<bezel element="P28"><bounds left="200" right="220" top="35" bottom="45" /></bezel>			
+
+		<bezel element="P29"><bounds left="190" right="260" top="130" bottom="150" /></bezel>		
+		
+	</view>
+</mamelayout>

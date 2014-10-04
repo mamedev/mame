@@ -2350,6 +2350,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/malzak.o $(VIDEO)/malzak.o \
 	$(DRIVERS)/manohman.o \
 	$(DRIVERS)/mcatadv.o $(VIDEO)/mcatadv.o \
+	$(DRIVERS)/mgavegas.o \
 	$(DRIVERS)/meyc8080.o \
 	$(DRIVERS)/meyc8088.o \
 	$(DRIVERS)/micro3d.o $(MACHINE)/micro3d.o $(VIDEO)/micro3d.o $(AUDIO)/micro3d.o \
@@ -2713,6 +2714,8 @@ $(DRIVERS)/mcr3.o:      $(LAYOUT)/spyhunt.lh \
 			$(LAYOUT)/turbotag.lh
 
 $(DRIVERS)/mgames.o:    $(LAYOUT)/mgames.lh
+
+$(DRIVERS)/mgavegas.o:  $(LAYOUT)/mgavegas.lh
 
 $(DRIVERS)/mpu3.o:      $(LAYOUT)/mpu3.lh
 
