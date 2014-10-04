@@ -1113,10 +1113,6 @@ void taitojc_state::machine_reset()
 
 void taitojc_state::machine_start()
 {
-	static const char *const tags[] = { "AN.0", "AN.1", "AN.2", "AN.3", "AN.4", "AN.5", "AN.6", "AN.7" };
-	for (int i = 0; i < 8; i++)
-		m_analog_ports[i] = ioport(tags[i]);
-
 	// register for savestates
 	save_item(NAME(m_texture_x));
 	save_item(NAME(m_texture_y));

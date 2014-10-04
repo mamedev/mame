@@ -226,6 +226,9 @@ public:
 	// make reference use transparent as well
 	operator ioport_port &() { assert(object_finder_base<ioport_port>::m_target != NULL); return *object_finder_base<ioport_port>::m_target; }
 
+	// allow dereference even when target is NULL so read_safe() can be used
+	ioport_port *operator->() const { return object_finder_base<ioport_port>::m_target; }
+
 	// finder
 	virtual bool findit(bool isvalidation = false)
 	{

@@ -3732,10 +3732,6 @@ void namcos22_state::machine_reset()
 
 void namcos22_state::machine_start()
 {
-	static const char *const tags[] = { "ADC.0", "ADC.1", "ADC.2", "ADC.3", "ADC.4", "ADC.5", "ADC.6", "ADC.7" };
-	for (int i = 0; i < 8; i++)
-		m_adc_ports[i] = ioport(tags[i]);
-
 	m_slave_simulation_active = false;
 	m_portbits[0] = 0xffff;
 	m_portbits[1] = 0xffff;

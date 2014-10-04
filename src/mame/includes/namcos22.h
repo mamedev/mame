@@ -199,7 +199,8 @@ public:
 		m_pc_pedal_interrupt(*this, "pc_p_int"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette")
+		m_palette(*this, "palette"),
+		m_adc_ports(*this, "ADC")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -228,8 +229,9 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	optional_ioport_array<8> m_adc_ports;
 
-	ioport_port *m_adc_ports[8];
+
 	UINT8 m_syscontrol[0x20];
 	bool m_dsp_irq_enabled;
 	emu_timer *m_ar_tb_interrupt[2];
