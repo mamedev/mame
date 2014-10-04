@@ -173,6 +173,7 @@ void trident_vga_device::device_start()
 	save_pointer(vga.sequencer.data,"Sequencer Registers",0x100);
 	save_pointer(vga.attribute.data,"Attribute Registers", 0x15);
 	save_pointer(tri.accel_pattern,"Pattern Data", 0x80);
+	save_pointer(tri.lutdac_reg,"LUTDAC registers", 0x100);
 
 	m_vblank_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(vga_device::vblank_timer_cb),this));
 	vga.svga_intf.seq_regcount = 0x0f;
@@ -371,9 +372,14 @@ void trident_vga_device::trident_define_video_mode()
 	case 0:
 	default: xtal = XTAL_25_1748MHz; break;
 	case 1:  xtal = XTAL_28_63636MHz; break;
-	case 2:  xtal = calculate_clock(); break; // how to divide the clock?  Needed for higher refresh rates (75Hz+)
+	case 2:  xtal = calculate_clock(); break;
 	}
 
+	if(tri.gc0f & 0x08)  // 16 pixels per character clock
+		xtal = xtal / 2;
+
+	if(tri.port_3db & 0x20)
+		xtal = xtal / 2;  // correct?
 
 	svga.rgb8_en = svga.rgb15_en = svga.rgb16_en = svga.rgb32_en = 0;
 	switch((tri.pixel_depth & 0x0c) >> 2)
@@ -438,9 +444,9 @@ UINT8 trident_vga_device::trident_seq_reg_read(UINT8 index)
 
 void trident_vga_device::trident_seq_reg_write(UINT8 index, UINT8 data)
 {
+	vga.sequencer.data[vga.sequencer.index] = data;
 	if(index <= 0x04)
 	{
-		vga.sequencer.data[vga.sequencer.index] = data;
 		seq_reg_write(vga.sequencer.index,data);
 		recompute_params();
 	}
@@ -745,6 +751,7 @@ void trident_vga_device::trident_gc_reg_write(UINT8 index, UINT8 data)
 			break;
 		case 0x0f:
 			tri.gc0f = data;
+			trident_define_video_mode();
 			break;
 		case 0x2f:  // XFree86 refers to this register as "MiscIntContReg", setting bit 2, but gives no indication as to what it does
 			tri.gc2f = data;
@@ -855,6 +862,9 @@ READ8_MEMBER(trident_vga_device::port_03d0_r)
 				else
 					res = 0xff;
 				break;
+			case 11:
+				res = tri.port_3db;
+				break;
 			default:
 				res = vga_device::port_03d0_r(space,offset,mem_mask);
 				break;
@@ -895,6 +905,9 @@ WRITE8_MEMBER(trident_vga_device::port_03d0_w)
 						if(LOG) logerror("Trident: Read Bank set to %02x\n",data);
 					}
 				}
+				break;
+			case 11:
+				tri.port_3db = data;  // no info on this port?  Bit 5 appears to be a clock divider...
 				break;
 			default:
 				vga_device::port_03d0_w(space,offset,data,mem_mask);

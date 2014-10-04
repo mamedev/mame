@@ -60,6 +60,7 @@ protected:
 		UINT8 lutdac_index;
 		bool new_mode;
 		bool port_3c3;
+		UINT8 port_3db;
 		UINT8 clock;
 		UINT8 pixel_depth;
 		UINT8 revision;
