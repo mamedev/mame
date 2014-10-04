@@ -16,6 +16,7 @@
 #include "sportsjp.h"
 #include "rfu.h"
 #include "multitap.h"
+#include "graphic.h"
 
 
 
@@ -129,4 +130,5 @@ SLOT_INTERFACE_START( sms_control_port_devices )
 	SLOT_INTERFACE("sportspadjp", SMS_SPORTS_PAD_JP)
 	SLOT_INTERFACE("rapidfire", SMS_RAPID_FIRE)
 	SLOT_INTERFACE("multitap", SMS_MULTITAP)
+	SLOT_INTERFACE("graphic", SMS_GRAPHIC)
 SLOT_INTERFACE_END
