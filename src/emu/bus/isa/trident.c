@@ -311,11 +311,29 @@ UINT16 trident_vga_device::offset()
 		return off;
 }
 
+int trident_vga_device::calculate_clock()
+{
+	// Bits 0-6: M
+	// Bits 7-11: N
+	// Bit 12: K
+	// Later formula extends each variable by one extra bit (Providia 9685 and later)
+	double freq;
+	UINT8 m,n,k;
+
+	m = tri.vid_clock & 0x007f;
+	n = (tri.vid_clock & 0x0f80) >> 7;
+	k = (tri.vid_clock & 0x1000) >> 12;
+	freq = ((double)(m+8) / (double)((n+2)*(pow(2.0,k)))) * 14.31818f; // there is a 14.31818MHz clock on the board
+
+	return freq * 1000000;
+}
+
 void trident_vga_device::trident_define_video_mode()
 {
 	int divisor = 1;
 	int xtal;
 
+	/*  // clock select for TGUI9440CXi and earlier
 	switch(tri.clock)
 	{
 	case 0:
@@ -344,7 +362,18 @@ void trident_vga_device::trident_define_video_mode()
 	case 1:   xtal = xtal / 2; break;
 	case 2:   xtal = xtal / 4; break;
 	case 3:   xtal = xtal / 1.5; break;
+	}*/
+
+
+	// TGUI9440AGi/9660/9680/9682 programmable clock
+	switch(tri.clock)
+	{
+	case 0:
+	default: xtal = XTAL_25_1748MHz; break;
+	case 1:  xtal = XTAL_28_63636MHz; break;
+	case 2:  xtal = calculate_clock(); break; // how to divide the clock?  Needed for higher refresh rates (75Hz+)
 	}
+
 
 	svga.rgb8_en = svga.rgb15_en = svga.rgb16_en = svga.rgb32_en = 0;
 	switch((tri.pixel_depth & 0x0c) >> 2)
@@ -900,28 +929,28 @@ WRITE8_MEMBER(trident_vga_device::port_43c6_w)
 	switch(offset)
 	{
 	case 2:
-		if(tri.sr0e_new & 0x02 && tri.sr0e_new & 0x40)
+		if(!(tri.sr0e_new & 0x02) && (tri.sr0e_new & 0x80))
 		{
 			tri.mem_clock = (tri.mem_clock & 0xff00) | (data);
 			if(LOG) logerror("Trident: Memory clock write %04x\n",tri.mem_clock);
 		}
 		break;
 	case 3:
-		if(tri.sr0e_new & 0x02 && tri.sr0e_new & 0x40)
+		if(!(tri.sr0e_new & 0x02) && (tri.sr0e_new & 0x80))
 		{
 			tri.mem_clock = (tri.mem_clock & 0x00ff) | (data << 8);
 			if(LOG) logerror("Trident: Memory clock write %04x\n",tri.mem_clock);
 		}
 		break;
 	case 4:
-		if(tri.sr0e_new & 0x02 && tri.sr0e_new & 0x40)
+		if(!(tri.sr0e_new & 0x02) && (tri.sr0e_new & 0x80))
 		{
 			tri.vid_clock = (tri.vid_clock & 0xff00) | (data);
 			if(LOG) logerror("Trident: Video clock write %04x\n",tri.vid_clock);
 		}
 		break;
 	case 5:
-		if(tri.sr0e_new & 0x02 && tri.sr0e_new & 0x40)
+		if(!(tri.sr0e_new & 0x02) && (tri.sr0e_new & 0x80))
 		{
 			tri.vid_clock = (tri.vid_clock & 0x00ff) | (data << 8);
 			if(LOG) logerror("Trident: Video clock write %04x\n",tri.vid_clock);

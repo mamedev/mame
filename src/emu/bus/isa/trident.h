@@ -68,7 +68,6 @@ protected:
 		UINT32 linear_address;
 		bool linear_active;
 		bool mmio_active;
-		// TGUI9440 only?
 		UINT16 mem_clock;  // I/O 0x43c6
 		UINT16 vid_clock;  // I/O 0x43c8
 		UINT16 cursor_x;
@@ -117,6 +116,8 @@ private:
 	void trident_crtc_reg_write(UINT8 index, UINT8 data);
 	UINT8 trident_gc_reg_read(UINT8 index);
 	void trident_gc_reg_write(UINT8 index, UINT8 data);
+
+	int calculate_clock();
 
 	void accel_command();
 	void accel_bitblt();
