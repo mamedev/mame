@@ -291,52 +291,50 @@ static int amerdart_trackball_dec(int data)
 	return data;
 }
 
-static int amerdart_trackball_direction(address_space &space, int num, int data)
+int coolpool_state::amerdart_trackball_direction(int num, int data)
 {
-	coolpool_state *state = space.machine().driver_data<coolpool_state>();
-
 	UINT16 result_x = (data & 0x0c) >> 2;
 	UINT16 result_y = (data & 0x03) >> 0;
 
 
-	if ((state->m_dx[num] == 0) && (state->m_dy[num] < 0)) {        /* Up */
-		state->m_oldy[num]--;
+	if ((m_dx[num] == 0) && (m_dy[num] < 0)) {        /* Up */
+		m_oldy[num]--;
 		result_x = amerdart_trackball_inc(result_x);
 		result_y = amerdart_trackball_inc(result_y);
 	}
-	if ((state->m_dx[num] == 0) && (state->m_dy[num] > 0)) {        /* Down */
-		state->m_oldy[num]++;
+	if ((m_dx[num] == 0) && (m_dy[num] > 0)) {        /* Down */
+		m_oldy[num]++;
 		result_x = amerdart_trackball_dec(result_x);
 		result_y = amerdart_trackball_dec(result_y);
 	}
-	if ((state->m_dx[num] < 0) && (state->m_dy[num] == 0)) {        /* Left */
-		state->m_oldx[num]--;
+	if ((m_dx[num] < 0) && (m_dy[num] == 0)) {        /* Left */
+		m_oldx[num]--;
 		result_x = amerdart_trackball_inc(result_x);
 		result_y = amerdart_trackball_dec(result_y);
 	}
-	if ((state->m_dx[num] > 0) && (state->m_dy[num] == 0)) {        /* Right */
-		state->m_oldx[num]++;
+	if ((m_dx[num] > 0) && (m_dy[num] == 0)) {        /* Right */
+		m_oldx[num]++;
 		result_x = amerdart_trackball_dec(result_x);
 		result_y = amerdart_trackball_inc(result_y);
 	}
-	if ((state->m_dx[num] < 0) && (state->m_dy[num] < 0)) {         /* Left & Up */
-		state->m_oldx[num]--;
-		state->m_oldy[num]--;
+	if ((m_dx[num] < 0) && (m_dy[num] < 0)) {         /* Left & Up */
+		m_oldx[num]--;
+		m_oldy[num]--;
 		result_x = amerdart_trackball_inc(result_x);
 	}
-	if ((state->m_dx[num] < 0) && (state->m_dy[num] > 0)) {         /* Left & Down */
-		state->m_oldx[num]--;
-		state->m_oldy[num]++;
+	if ((m_dx[num] < 0) && (m_dy[num] > 0)) {         /* Left & Down */
+		m_oldx[num]--;
+		m_oldy[num]++;
 		result_y = amerdart_trackball_dec(result_y);
 	}
-	if ((state->m_dx[num] > 0) && (state->m_dy[num] < 0)) {         /* Right & Up */
-		state->m_oldx[num]++;
-		state->m_oldy[num]--;
+	if ((m_dx[num] > 0) && (m_dy[num] < 0)) {         /* Right & Up */
+		m_oldx[num]++;
+		m_oldy[num]--;
 		result_y = amerdart_trackball_inc(result_y);
 	}
-	if ((state->m_dx[num] > 0) && (state->m_dy[num] > 0)) {         /* Right & Down */
-		state->m_oldx[num]++;
-		state->m_oldy[num]++;
+	if ((m_dx[num] > 0) && (m_dy[num] > 0)) {         /* Right & Down */
+		m_oldx[num]++;
+		m_oldy[num]++;
 		result_x = amerdart_trackball_dec(result_x);
 	}
 
@@ -398,10 +396,10 @@ READ16_MEMBER(coolpool_state::amerdart_trackball_r)
 	m_dy[2] = (INT8)(m_newy[2] - m_oldy[2]);
 
 	/* Determine Trackball 1 direction state */
-	m_result = (m_result & 0xf0ff) | (amerdart_trackball_direction(space, 1, ((m_result >>  8) & 0xf)) <<  8);
+	m_result = (m_result & 0xf0ff) | (amerdart_trackball_direction(1, ((m_result >>  8) & 0xf)) <<  8);
 
 	/* Determine Trackball 2 direction state */
-	m_result = (m_result & 0x0fff) | (amerdart_trackball_direction(space, 2, ((m_result >> 12) & 0xf)) << 12);
+	m_result = (m_result & 0x0fff) | (amerdart_trackball_direction(2, ((m_result >> 12) & 0xf)) << 12);
 
 
 //  logerror("%08X:read port 6 (X=%02X Y=%02X oldX=%02X oldY=%02X oldRes=%04X Res=%04X)\n", space.device().safe_pc(), m_newx, m_newy, m_oldx, m_oldy, m_lastresult, m_result);

@@ -94,7 +94,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(bigrun_scanline);
 	TIMER_DEVICE_CALLBACK_MEMBER(scudhamm_scanline);
 	TIMER_DEVICE_CALLBACK_MEMBER(armchamp2_scanline);
-	void prepare_shadows(cischeat_state *state);
+	void prepare_shadows();
 	inline void scrollram_w(address_space &space, offs_t offset, UINT16 data, UINT16 mem_mask, int which);
 	void create_tilemaps();
 	void cischeat_draw_road(bitmap_ind16 &bitmap, const rectangle &cliprect, int road_num, int priority1, int priority2, int transparency);

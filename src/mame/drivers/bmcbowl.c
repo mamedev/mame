@@ -141,6 +141,7 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	UINT32 screen_update_bmcbowl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void init_stats(const UINT8 *table, int table_len, int address);
 };
 
 
@@ -285,11 +286,10 @@ static const UINT8 bmc_nv3[]=
 };
 
 
-static void init_stats(bmcbowl_state *state, const UINT8 *table, int table_len, int address)
+void bmcbowl_state::init_stats(const UINT8 *table, int table_len, int address)
 {
-	int i;
-	for (i=0; i<table_len; i++)
-		state->m_stats_ram[address+2*i]=table[i];
+	for (int i = 0; i < table_len; i++)
+		m_stats_ram[address+2*i]=table[i];
 }
 #endif
 
@@ -299,9 +299,9 @@ void bmcbowl_state::machine_reset()
 	for (int i = 0; i < m_stats_ram.bytes(); i++)
 		m_stats_ram[i] = 0xff;
 
-	init_stats(this,bmc_nv1,ARRAY_LENGTH(bmc_nv1),0);
-	init_stats(this,bmc_nv2,ARRAY_LENGTH(bmc_nv2),0x3b0);
-	init_stats(this,bmc_nv3,ARRAY_LENGTH(bmc_nv3),0xfe2);
+	init_stats(bmc_nv1,ARRAY_LENGTH(bmc_nv1),0);
+	init_stats(bmc_nv2,ARRAY_LENGTH(bmc_nv2),0x3b0);
+	init_stats(bmc_nv3,ARRAY_LENGTH(bmc_nv3),0xfe2);
 #endif
 }
 

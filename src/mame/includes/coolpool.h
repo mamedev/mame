@@ -76,4 +76,5 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(nvram_write_timeout);
 	TIMER_DEVICE_CALLBACK_MEMBER(amerdart_audio_int_gen);
 	void register_state_save();
+	int amerdart_trackball_direction(int num, int data);
 };

@@ -107,7 +107,7 @@ void grchamp_state::video_start()
 }
 
 #if 0
-int grchamp_state::collision_check(grchamp_state *state, bitmap_ind16 &bitmap, int which )
+int grchamp_state::collision_check(bitmap_ind16 &bitmap, int which )
 {
 	int bgcolor = m_palette->pen(0);
 	int sprite_transp = m_palette->pen(0x24);
@@ -157,7 +157,7 @@ int grchamp_state::collision_check(grchamp_state *state, bitmap_ind16 &bitmap, i
 	return result?(1<<which):0;
 }
 
-void grchamp_state::draw_fog(grchamp_state *state, bitmap_ind16 &bitmap, const rectangle &cliprect, int fog)
+void grchamp_state::draw_fog(bitmap_ind16 &bitmap, const rectangle &cliprect, int fog)
 {
 	int x,y,offs;
 
@@ -174,7 +174,7 @@ void grchamp_state::draw_fog(grchamp_state *state, bitmap_ind16 &bitmap, const r
 	}
 }
 
-void grchamp_state::draw_sprites(grchamp_state *state, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void grchamp_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	gfx_element *gfx = m_gfxdecode->gfx(5);
 	int bank = (m_cpu0_out[0] & 0x20) ? 0x40 : 0x00;

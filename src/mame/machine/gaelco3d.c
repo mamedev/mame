@@ -209,10 +209,6 @@ void gaelco_serial_device::device_start()
 	/* validate arguments */
 	assert(strlen(tag()) < 20);
 
-	/* clear out CIA structure, and copy the interface */
-	//memset(state, 0, sizeof(*state));
-	//m_device = device;
-
 	m_irq_handler.resolve_safe();
 	m_sync_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gaelco_serial_device::link_cb), this));
 

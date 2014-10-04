@@ -83,6 +83,9 @@ public:
 	INTERRUPT_GEN_MEMBER(grchamp_cpu1_interrupt);
 	TIMER_CALLBACK_MEMBER(main_to_sub_comm_sync_w);
 	void draw_objects(int y, UINT8 *objdata);
+	int collision_check(bitmap_ind16 &bitmap, int which );
+	void draw_fog(bitmap_ind16 &bitmap, const rectangle &cliprect, int fog);
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<cpu_device> m_subcpu;

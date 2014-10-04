@@ -91,15 +91,19 @@ class warpspeed_state : public driver_device
 public:
 	warpspeed_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_videoram(*this, "videoram"),
-		m_workram(*this, "workram"),
 		m_maincpu(*this, "maincpu"),
-		m_gfxdecode(*this, "gfxdecode") { }
+		m_gfxdecode(*this, "gfxdecode"),
+		m_videoram(*this, "videoram"),
+		m_workram(*this, "workram") { }
 
+	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	
 	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<UINT8> m_workram;
+	
 	tilemap_t   *m_text_tilemap;
 	tilemap_t   *m_starfield_tilemap;
-	required_shared_ptr<UINT8> m_workram;
 	UINT8       m_regs[0x28];
 	DECLARE_WRITE8_MEMBER(warpspeed_hardware_w);
 	DECLARE_WRITE8_MEMBER(warpspeed_vidram_w);
@@ -109,8 +113,7 @@ public:
 	virtual void video_start();
 	DECLARE_PALETTE_INIT(warpspeed);
 	UINT32 screen_update_warpspeed(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	required_device<cpu_device> m_maincpu;
-	required_device<gfxdecode_device> m_gfxdecode;
+	void draw_circles(bitmap_ind16 &bitmap);
 };
 
 WRITE8_MEMBER(warpspeed_state::warpspeed_hardware_w)
@@ -192,29 +195,29 @@ static void warpspeed_draw_circle(bitmap_ind16 &bitmap, INT16 cx, INT16 cy, UINT
 	}
 }
 
-static void warpspeed_draw_circles(bitmap_ind16 &bitmap, warpspeed_state *state)
+void warpspeed_state::draw_circles(bitmap_ind16 &bitmap)
 {
 	for (int i = 0; i < 4; i++)
 	{
-		UINT16 radius = state->m_regs[i*8] + state->m_regs[i*8 + 1]*256;
+		UINT16 radius = m_regs[i*8] + m_regs[i*8 + 1]*256;
 		radius = 0xffff - radius;
 		radius = sqrt((float)radius);
-		INT16 midx = state->m_regs[i*8 + 2] + state->m_regs[i*8 + 3]*256;
+		INT16 midx = m_regs[i*8 + 2] + m_regs[i*8 + 3]*256;
 		midx -= 0xe70;
-		INT16 midy = state->m_regs[i*8 + 4] + state->m_regs[i*8 + 5]*256;
+		INT16 midy = m_regs[i*8 + 4] + m_regs[i*8 + 5]*256;
 		midy -= 0xe70;
 		if ( radius == 0 || radius == 0xffff )
 		{
 			continue;
 		}
-		warpspeed_draw_circle(bitmap, midx + 128 + 16, midy + 128 + 16, radius, (state->m_regs[i*8 + 6] & 0x07) + 2);
+		warpspeed_draw_circle(bitmap, midx + 128 + 16, midy + 128 + 16, radius, (m_regs[i*8 + 6] & 0x07) + 2);
 	}
 }
 
 UINT32 warpspeed_state::screen_update_warpspeed(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_starfield_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-	warpspeed_draw_circles(bitmap, this);
+	draw_circles(bitmap);
 	m_text_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }

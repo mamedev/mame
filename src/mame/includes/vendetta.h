@@ -32,7 +32,6 @@ public:
 		m_palette(*this, "palette") { }
 
 	/* memory pointers */
-	UINT8 *    m_ram;
 	dynamic_array<UINT8> m_paletteram;
 
 	/* video-related */

@@ -160,6 +160,7 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	DECLARE_PALETTE_INIT(vega);
+	void draw_tilemap(screen_device& screen, bitmap_ind16& bitmap, const rectangle& cliprect);
 	UINT32 screen_update_vega(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
@@ -489,13 +490,13 @@ PALETTE_INIT_MEMBER(vega_state, vega)
 }
 
 
-static void draw_tilemap(vega_state *state, screen_device& screen, bitmap_ind16& bitmap, const rectangle& cliprect)
+void vega_state::draw_tilemap(screen_device& screen, bitmap_ind16& bitmap, const rectangle& cliprect)
 {
 	{
-	UINT8 *map_lookup = state->memregion("tilemaps")->base();
+	UINT8 *map_lookup = memregion("tilemaps")->base();
 
-	int offset_y=state->m_tilemap_offset_y;
-	int offset_x=state->m_tilemap_offset_x;
+	int offset_y=m_tilemap_offset_y;
+	int offset_x=m_tilemap_offset_x;
 
 	//logerror("%d  %d\n",offset_x, offset_y);
 
@@ -507,7 +508,7 @@ static void draw_tilemap(vega_state *state, screen_device& screen, bitmap_ind16&
 			int y0=yy*32;
 
 
-			int id=map_lookup[((yy+xx*8)+  ((state->m_tilemap_flags&2)?0x400:0) + (state->m_tilemap_top<<6 )  )  &0x7ff];
+			int id=map_lookup[((yy+xx*8)+  ((m_tilemap_flags&2)?0x400:0) + (m_tilemap_top<<6 )  )  &0x7ff];
 
 			int flip=BIT(id,5);
 
@@ -528,7 +529,7 @@ static void draw_tilemap(vega_state *state, screen_device& screen, bitmap_ind16&
 				{
 					//for(int x=0;x<4;++x)
 					{
-						state->m_gfxdecode->gfx(1)->transpen(bitmap,cliprect, num, 0, 1,flip?1:0,  x*4+x0-offset_x, (flip?(3-y):y)*8+y0-offset_y, 0);
+						m_gfxdecode->gfx(1)->transpen(bitmap,cliprect, num, 0, 1,flip?1:0,  x*4+x0-offset_x, (flip?(3-y):y)*8+y0-offset_y, 0);
 						++num;
 					}
 				}
@@ -550,7 +551,7 @@ UINT32 vega_state::screen_update_vega(screen_device &screen, bitmap_ind16 &bitma
 
 	bitmap.fill(0, cliprect);
 
-	draw_tilemap(this, screen, bitmap, cliprect);
+	draw_tilemap(screen, bitmap, cliprect);
 
 
 	{

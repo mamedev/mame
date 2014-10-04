@@ -65,7 +65,7 @@ bool compare_mbus(UINT16* rom)
 	return true;
 }
 
-void find_mbus(sc4_state *state, UINT16* rom)
+void sc4_state::find_mbus(UINT16* rom)
 {
 	for (int i=0;i<(0x100000-0x40)/2;i++)
 	{
@@ -74,7 +74,7 @@ void find_mbus(sc4_state *state, UINT16* rom)
 		if (found==true)
 		{
 			printf("x found at %08x\n", i*2);
-			state->m_chk41addr = i*2;
+			m_chk41addr = i*2;
 		}
 	}
 }
@@ -144,7 +144,7 @@ DRIVER_INIT_MEMBER(sc4_state,sc4mbus)
 {
 	DRIVER_INIT_CALL(sc4);
 	UINT16 *rom = (UINT16 *)memregion("maincpu")->base();
-	find_mbus(this, rom);
+	find_mbus(rom);
 }
 
 

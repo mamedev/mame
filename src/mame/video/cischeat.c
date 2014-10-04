@@ -111,7 +111,7 @@ Note:   if MAME_DEBUG is defined, pressing Z or X with:
 
 ***************************************************************************/
 
-void cischeat_state::prepare_shadows(cischeat_state *state)
+void cischeat_state::prepare_shadows()
 {
 	int i;
 	for (i = 0;i < 16;i++)
@@ -246,7 +246,7 @@ VIDEO_START_MEMBER(cischeat_state,cischeat)
 
 	m_bits_per_color_code = 5;
 
-	prepare_shadows(this);
+	prepare_shadows();
 }
 
 /**************************************************************************
