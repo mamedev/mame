@@ -367,7 +367,7 @@ void trident_vga_device::trident_define_video_mode()
 
 
 	// TGUI9440AGi/9660/9680/9682 programmable clock
-	switch(tri.clock)
+	switch((vga.miscellaneous_output & 0x0c) >> 2)
 	{
 	case 0:
 	default: xtal = XTAL_25_1748MHz; break;
