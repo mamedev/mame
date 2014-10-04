@@ -6,6 +6,22 @@
   Williams System 6a
   The only difference to System 6 is that the display is 7 digits instead of 6.
 
+Diagnostic actions:
+- You must be in game over mode. All buttons are in the number-pad. When you are
+  finished, you must reboot.
+
+- Setup: 6 must be in auto/up position. Press 5 to enter setup mode, press 6 to
+         change direction.
+
+- Tests: 6 must be in manual/down position. Press 5 twice and tests will begin.
+         Press 5 and 6 together to get from test 1 to test 2. Press 6 to switch
+         between auto/manual stepping.
+
+- Auto Diag Test: Set Dips to SW6. Press 4. Press 9. Press 5. Tests will begin.
+
+- Other: Set Dips to SW7 or SW8. Press 4. Press 9.
+
+
 Each game has its own switches, you need to know the outhole and slam-tilt ones.
 Note that T is also a tilt, but it may take 3 hits to activate it.
 
@@ -18,7 +34,6 @@ Alien Poker   X         =
 Alien Poker: wait for the background sound before attempting to score.
 
 ToDo:
-- Diagnostic mode freezes
 - Mechanical sounds
 
 
@@ -59,8 +74,6 @@ public:
 	DECLARE_READ8_MEMBER(dips_r);
 	DECLARE_READ8_MEMBER(switch_r);
 	DECLARE_WRITE8_MEMBER(switch_w);
-	DECLARE_READ_LINE_MEMBER(pia28_ca1_r);
-	DECLARE_READ_LINE_MEMBER(pia28_cb1_r);
 	DECLARE_WRITE_LINE_MEMBER(pia22_ca2_w) { }; //ST5
 	DECLARE_WRITE_LINE_MEMBER(pia22_cb2_w) { }; //ST-solenoids enable
 	DECLARE_WRITE_LINE_MEMBER(pia24_ca2_w) { }; //ST2
@@ -69,16 +82,19 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(pia28_cb2_w) { }; //ST6
 	DECLARE_WRITE_LINE_MEMBER(pia30_ca2_w) { }; //ST4
 	DECLARE_WRITE_LINE_MEMBER(pia30_cb2_w) { }; //ST3
-	TIMER_DEVICE_CALLBACK_MEMBER(irq);
+	DECLARE_WRITE_LINE_MEMBER(pia_irq);
 	DECLARE_INPUT_CHANGED_MEMBER(main_nmi);
 	DECLARE_INPUT_CHANGED_MEMBER(audio_nmi);
 	DECLARE_MACHINE_RESET(s6a);
+	DECLARE_DRIVER_INIT(s6a);
 private:
-	UINT8 m_t_c;
 	UINT8 m_sound_data;
 	UINT8 m_strobe;
 	UINT8 m_kbdrow;
 	bool m_data_ok;
+	emu_timer* m_irq_timer;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	static const device_timer_id TIMER_IRQ = 0;
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<dac_device> m_dac;
@@ -189,63 +205,17 @@ static INPUT_PORTS_START( s6a )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Manual/Auto") PORT_CODE(KEYCODE_6_PAD) PORT_TOGGLE
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Enter") PORT_CODE(KEYCODE_9_PAD)
 
-	PORT_START("DSW0")
-	PORT_DIPNAME( 0x01, 0x01, "SW01" )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPNAME( 0x02, 0x02, "SW02" )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPNAME( 0x04, 0x04, "SW03" )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPNAME( 0x08, 0x08, "SW04" )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPNAME( 0x10, 0x10, "SW05" )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPNAME( 0x20, 0x20, "SW06" )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPNAME( 0x40, 0x40, "SW07" )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPNAME( 0x80, 0x80, "SW08" )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_START("DS1") // DS1 only 3 switches do anything
+	PORT_DIPNAME( 0x70, 0x70, "Diagnostic" )
+	PORT_DIPSETTING(    0x70, "Off" )
+	PORT_DIPSETTING(    0x60, "SW8 - Zero Audit Tables" )
+	PORT_DIPSETTING(    0x50, "SW7 - Reset to Defaults" )
+	PORT_DIPSETTING(    0x30, "SW6 - Auto Diagnostic Test" )
+	PORT_BIT( 0x8f, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("DSW1")
-	PORT_DIPNAME( 0x01, 0x01, "SW11" )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPNAME( 0x02, 0x02, "SW12" )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPNAME( 0x04, 0x04, "SW13" )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPNAME( 0x08, 0x08, "SW14" )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPNAME( 0x10, 0x10, "SW15" )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPNAME( 0x20, 0x20, "SW16" )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPNAME( 0x40, 0x40, "SW17" )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPNAME( 0x80, 0x80, "SW18" )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_START("DS2") // DS2 switches exist but do nothing
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
-
-MACHINE_RESET_MEMBER( s6a_state, s6a )
-{
-	m_t_c = 0;
-}
 
 INPUT_CHANGED_MEMBER( s6a_state::main_nmi )
 {
@@ -298,21 +268,10 @@ WRITE8_MEMBER( s6a_state::sol1_w )
 
 WRITE8_MEMBER( s6a_state::lamp0_w )
 {
-	m_maincpu->set_input_line(M6800_IRQ_LINE, CLEAR_LINE);
 }
 
 WRITE8_MEMBER( s6a_state::lamp1_w )
 {
-}
-
-READ_LINE_MEMBER( s6a_state::pia28_ca1_r )
-{
-	return BIT(ioport("DIAGS")->read(), 2); // advance button
-}
-
-READ_LINE_MEMBER( s6a_state::pia28_cb1_r )
-{
-	return BIT(ioport("DIAGS")->read(), 3); // auto/manual switch
 }
 
 READ8_MEMBER( s6a_state::dips_r )
@@ -322,13 +281,13 @@ READ8_MEMBER( s6a_state::dips_r )
 		switch (m_strobe)
 		{
 		case 0:
-			return ioport("DSW0")->read() & 15;
+			return ioport("DS2")->read();
 		case 1:
-			return ioport("DSW0")->read() << 4;
+			return ioport("DS2")->read() << 4;
 		case 2:
-			return ioport("DSW1")->read() & 15;
+			return ioport("DS1")->read();
 		case 3:
-			return ioport("DSW1")->read() << 4;
+			return ioport("DS1")->read() << 4;
 		}
 	}
 	return 0xff;
@@ -357,7 +316,7 @@ READ8_MEMBER( s6a_state::switch_r )
 {
 	char kbdrow[8];
 	sprintf(kbdrow,"X%X",m_kbdrow);
-	return ~ioport(kbdrow)->read();
+	return ioport(kbdrow)->read() ^ 0xff;
 }
 
 WRITE8_MEMBER( s6a_state::switch_w )
@@ -370,19 +329,58 @@ READ8_MEMBER( s6a_state::dac_r )
 	return m_sound_data;
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER( s6a_state::irq)
+WRITE_LINE_MEMBER( s6a_state::pia_irq )
 {
-	if (m_t_c > 0x70)
-		m_maincpu->set_input_line(M6800_IRQ_LINE, ASSERT_LINE);
+	if(state == CLEAR_LINE)
+	{
+		// restart IRQ timer
+		m_irq_timer->adjust(attotime::from_ticks(980,3580000/4),1);
+	}
 	else
-		m_t_c++;
+	{
+		// disable IRQ timer while other IRQs are being handled
+		// (counter is reset every 32 cycles while a PIA IRQ is handled)
+		m_irq_timer->adjust(attotime::zero);
+	}
+}
+
+void s6a_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	switch(id)
+	{
+	case TIMER_IRQ:
+		if(param == 1)
+		{
+			m_maincpu->set_input_line(M6800_IRQ_LINE,ASSERT_LINE);
+			m_irq_timer->adjust(attotime::from_ticks(32,3580000/4),0);
+			m_pia28->ca1_w(BIT(ioport("DIAGS")->read(), 2));  // Advance
+			m_pia28->cb1_w(BIT(ioport("DIAGS")->read(), 3));  // Up/Down
+		}
+		else
+		{
+			m_maincpu->set_input_line(M6800_IRQ_LINE,CLEAR_LINE);
+			m_irq_timer->adjust(attotime::from_ticks(980,3580000/4),1);
+			m_pia28->ca1_w(1);
+			m_pia28->cb1_w(1);
+		}
+		break;
+	}
+}
+
+MACHINE_RESET_MEMBER( s6a_state, s6a )
+{
+}
+
+DRIVER_INIT_MEMBER( s6a_state, s6a )
+{
+	m_irq_timer = timer_alloc(TIMER_IRQ);
+	m_irq_timer->adjust(attotime::from_ticks(980,3580000/4),1);
 }
 
 static MACHINE_CONFIG_START( s6a, s6a_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6802, 3580000)
+	MCFG_CPU_ADD("maincpu", M6808, 3580000)
 	MCFG_CPU_PROGRAM_MAP(s6a_main_map)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq", s6a_state, irq, attotime::from_hz(250))
 	MCFG_MACHINE_RESET_OVERRIDE(s6a_state, s6a)
 
 	/* Video */
@@ -397,40 +395,38 @@ static MACHINE_CONFIG_START( s6a, s6a_state )
 	MCFG_PIA_WRITEPB_HANDLER(WRITE8(s6a_state, sol1_w))
 	MCFG_PIA_CA2_HANDLER(WRITELINE(s6a_state, pia22_ca2_w))
 	MCFG_PIA_CB2_HANDLER(WRITELINE(s6a_state, pia22_cb2_w))
-	MCFG_PIA_IRQA_HANDLER(DEVWRITELINE("maincpu", m6802_cpu_device, irq_line))
-	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE("maincpu", m6802_cpu_device, irq_line))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(s6a_state, pia_irq))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(s6a_state, pia_irq))
 
 	MCFG_DEVICE_ADD("pia24", PIA6821, 0)
 	MCFG_PIA_WRITEPA_HANDLER(WRITE8(s6a_state, lamp0_w))
 	MCFG_PIA_WRITEPB_HANDLER(WRITE8(s6a_state, lamp1_w))
 	MCFG_PIA_CA2_HANDLER(WRITELINE(s6a_state, pia24_ca2_w))
 	MCFG_PIA_CB2_HANDLER(WRITELINE(s6a_state, pia24_cb2_w))
-	MCFG_PIA_IRQA_HANDLER(DEVWRITELINE("maincpu", m6802_cpu_device, irq_line))
-	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE("maincpu", m6802_cpu_device, irq_line))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(s6a_state, pia_irq))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(s6a_state, pia_irq))
 
 	MCFG_DEVICE_ADD("pia28", PIA6821, 0)
 	MCFG_PIA_READPA_HANDLER(READ8(s6a_state, dips_r))
-	MCFG_PIA_READCA1_HANDLER(READLINE(s6a_state, pia28_ca1_r))
-	MCFG_PIA_READCB1_HANDLER(READLINE(s6a_state, pia28_cb1_r))
 	MCFG_PIA_WRITEPA_HANDLER(WRITE8(s6a_state, dig0_w))
 	MCFG_PIA_WRITEPB_HANDLER(WRITE8(s6a_state, dig1_w))
 	MCFG_PIA_CA2_HANDLER(WRITELINE(s6a_state, pia28_ca2_w))
 	MCFG_PIA_CB2_HANDLER(WRITELINE(s6a_state, pia28_cb2_w))
-	MCFG_PIA_IRQA_HANDLER(DEVWRITELINE("maincpu", m6802_cpu_device, irq_line))
-	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE("maincpu", m6802_cpu_device, irq_line))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(s6a_state, pia_irq))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(s6a_state, pia_irq))
 
 	MCFG_DEVICE_ADD("pia30", PIA6821, 0)
 	MCFG_PIA_READPA_HANDLER(READ8(s6a_state, switch_r))
 	MCFG_PIA_WRITEPB_HANDLER(WRITE8(s6a_state, switch_w))
 	MCFG_PIA_CA2_HANDLER(WRITELINE(s6a_state, pia30_ca2_w))
 	MCFG_PIA_CB2_HANDLER(WRITELINE(s6a_state, pia30_cb2_w))
-	MCFG_PIA_IRQA_HANDLER(DEVWRITELINE("maincpu", m6802_cpu_device, irq_line))
-	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE("maincpu", m6802_cpu_device, irq_line))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(s6a_state, pia_irq))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(s6a_state, pia_irq))
 
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* Add the soundcard */
-	MCFG_CPU_ADD("audiocpu", M6808, 3580000)
+	MCFG_CPU_ADD("audiocpu", M6802, 3580000)
 	MCFG_CPU_PROGRAM_MAP(s6a_audio_map)
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("dac", DAC, 0)
@@ -444,8 +440,8 @@ static MACHINE_CONFIG_START( s6a, s6a_state )
 	MCFG_PIA_WRITEPA_HANDLER(DEVWRITE8("dac", dac_device, write_unsigned8))
 	MCFG_PIA_CA2_HANDLER(DEVWRITELINE("hc55516", hc55516_device, digit_w))
 	MCFG_PIA_CB2_HANDLER(DEVWRITELINE("hc55516", hc55516_device, clock_w))
-	MCFG_PIA_IRQA_HANDLER(DEVWRITELINE("audiocpu", m6808_cpu_device, irq_line))
-	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE("audiocpu", m6808_cpu_device, irq_line))
+	MCFG_PIA_IRQA_HANDLER(DEVWRITELINE("audiocpu", m6802_cpu_device, irq_line))
+	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE("audiocpu", m6802_cpu_device, irq_line))
 MACHINE_CONFIG_END
 
 
@@ -506,7 +502,7 @@ ROM_START(alpok_f6)
 ROM_END
 
 
-GAME(1980,algar_l1, 0,       s6a, s6a, driver_device, 0, ROT0, "Williams", "Algar (L-1)", GAME_MECHANICAL )
-GAME(1980,alpok_l6, 0,       s6a, s6a, driver_device, 0, ROT0, "Williams", "Alien Poker (L-6)", GAME_MECHANICAL )
-GAME(1980,alpok_l2, alpok_l6,s6a, s6a, driver_device, 0, ROT0, "Williams", "Alien Poker (L-2)", GAME_MECHANICAL )
-GAME(1980,alpok_f6, alpok_l6,s6a, s6a, driver_device, 0, ROT0, "Williams", "Alien Poker (L-6 French speech)", GAME_MECHANICAL )
+GAME(1980,algar_l1, 0,       s6a, s6a, s6a_state, s6a, ROT0, "Williams", "Algar (L-1)", GAME_MECHANICAL )
+GAME(1980,alpok_l6, 0,       s6a, s6a, s6a_state, s6a, ROT0, "Williams", "Alien Poker (L-6)", GAME_MECHANICAL )
+GAME(1980,alpok_l2, alpok_l6,s6a, s6a, s6a_state, s6a, ROT0, "Williams", "Alien Poker (L-2)", GAME_MECHANICAL )
+GAME(1980,alpok_f6, alpok_l6,s6a, s6a, s6a_state, s6a, ROT0, "Williams", "Alien Poker (L-6 French speech)", GAME_MECHANICAL )
