@@ -631,9 +631,8 @@ READ16_MEMBER( namcos2_shared_state::namcos21_68k_gpu_C148_r )
 
 int namcos2_shared_state::get_posirq_scanline()
 {
-	namcos2_state *s2state = machine().driver_data<namcos2_state>();
 	if (is_system21()) return 0;
-	return s2state->get_pos_irq_scanline();
+	return downcast<namcos2_state *>(this)->get_pos_irq_scanline();
 }
 
 TIMER_CALLBACK_MEMBER(namcos2_shared_state::namcos2_posirq_tick)
