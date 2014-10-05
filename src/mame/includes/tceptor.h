@@ -1,4 +1,3 @@
-#include "namcos2.h"
 #include "sound/dac.h"
 #include "sound/namco.h"
 #include "video/c45.h"

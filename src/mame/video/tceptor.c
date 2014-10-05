@@ -4,7 +4,6 @@
  */
 
 #include "emu.h"
-#include "includes/namcoic.h"
 #include "includes/tceptor.h"
 
 
