@@ -62,6 +62,7 @@
 		<info name="alt_title" value="ビートマニア for ワンダースワン"/>
 		<part name="cart" interface="wswan_cart">
 			<feature name="slot" value="ws_sram" />
+			<feature name="rotated" value="yes" />
 			<dataarea name="rom" size="16777216">
 				<rom name="swj-knm001.bin" size="16777216" crc="324622c9" sha1="544e76133fa53fc0ae5e00e3465b9cf634f14fd0" offset="000000" />
 			</dataarea>
@@ -96,6 +97,7 @@
 		<info name="alt_title" value="クレイジー・クライマー"/>
 		<part name="cart" interface="wswan_cart">
 			<feature name="slot" value="ws_rom" />
+			<feature name="rotated" value="yes" />
 			<dataarea name="rom" size="524288">
 				<rom name="swj-nhb001.bin" size="524288" crc="c995274b" sha1="67a80b7fb00c3afe0ce9b0f8975c6d250a2cd49d" offset="000000" />
 			</dataarea>
@@ -361,6 +363,7 @@
 		<info name="alt_title" value="たねをまく鳥 / boxart: D'sGarage21公募ゲーム たねをまく鳥 (D's Garage 21 Koubo Game - Tane o Maku Tori)"/>
 		<part name="cart" interface="wswan_cart">
 			<feature name="slot" value="ws_eeprom" />
+			<feature name="rotated" value="yes" />
 			<dataarea name="rom" size="1048576">
 				<rom name="swj-ban01e.bin" size="1048576" crc="b1caec06" sha1="83e190af2e25fbb3e93b1d5835c52fe6f1d279ce" offset="000000" />
 			</dataarea>
@@ -429,6 +432,7 @@
 		<info name="alt_title" value="フィッシングフリークス バスライズ フォー ワンダースワン"/>
 		<part name="cart" interface="wswan_cart">
 			<feature name="slot" value="ws_sram" />
+			<feature name="rotated" value="yes" />
 			<dataarea name="rom" size="1048576">
 				<rom name="swj-bec004.bin" size="1048576" crc="a1fb16fc" sha1="f8f077da30f227f3793e97c7f1d656559f08b9d4" offset="000000" />
 			</dataarea>
@@ -544,6 +548,7 @@
 		<info name="alt_title" value="機動戦士ガンダム エムエスバーサス"/>
 		<part name="cart" interface="wswan_cart">
 			<feature name="slot" value="ws_sram" />
+			<feature name="rotated" value="yes" />
 			<dataarea name="rom" size="2097152">
 				<rom name="swj-ban015.bin" size="2097152" crc="53b9fef8" sha1="2688ca67ac31ce3d5c3523b0e11cad55e70fa257" offset="000000" />
 			</dataarea>
@@ -561,6 +566,7 @@
 		<info name="alt_title" value="グンペイ"/>
 		<part name="cart" interface="wswan_cart">
 			<feature name="slot" value="ws_eeprom" />
+			<feature name="rotated" value="yes" />
 			<dataarea name="rom" size="1048576">
 				<rom name="swj-ban010.bin" size="1048576" crc="a1656bbb" sha1="ee4b777f029bac9561e60c19407d08360e733822" offset="000000" />
 			</dataarea>
@@ -678,6 +684,7 @@
 		<info name="alt_title" value="競馬予想支援ソフト 予想進化論"/>
 		<part name="cart" interface="wswan_cart">
 			<feature name="slot" value="ws_sram" />
+			<feature name="rotated" value="yes" />
 			<dataarea name="rom" size="524288">
 				<rom name="swj-mde001.bin" size="524288" crc="945fc213" sha1="461f87e6e301b0dbb6324d908d4ca7efd7518e20" offset="000000" />
 			</dataarea>
@@ -831,6 +838,7 @@
 		<info name="alt_title" value="マジカルドロップ for ワンダースワン"/>
 		<part name="cart" interface="wswan_cart">
 			<feature name="slot" value="ws_rom" />
+			<feature name="rotated" value="yes" />
 			<dataarea name="rom" size="1048576">
 				<rom name="swj-dte002.bin" size="1048576" crc="637ada93" sha1="a25944969068ee495254f94c2c48dfffcb66ce8d" offset="000000" />
 			</dataarea>
@@ -948,6 +956,7 @@
 		<info name="alt_title" value="ミングルマグネット"/>
 		<part name="cart" interface="wswan_cart">
 			<feature name="slot" value="ws_rom" />
+			<feature name="rotated" value="yes" />
 			<dataarea name="rom" size="524288">
 				<rom name="swj-hal002.bin" size="524288" crc="9baac7bb" sha1="c7230ef709f6ceaef9a220541c8cdc05c0cd549f" offset="000000" />
 			</dataarea>
@@ -1147,6 +1156,7 @@
 		<info name="alt_title" value="パズルボブル"/>
 		<part name="cart" interface="wswan_cart">
 			<feature name="slot" value="ws_eeprom" />
+			<feature name="rotated" value="yes" />
 			<dataarea name="rom" size="524288">
 				<rom name="swj-sun003.bin" size="524288" crc="302499b9" sha1="5e7dabb66b0ca580481aa79ee8b8a5b0c6ce6592" offset="000000" />
 			</dataarea>
@@ -1196,6 +1206,7 @@
 		<info name="alt_title" value="レインボーアイランド パティーズ☆パーティ!"/>
 		<part name="cart" interface="wswan_cart">
 			<feature name="slot" value="ws_sram" />
+			<feature name="rotated" value="yes" />
 			<dataarea name="rom" size="2097152">
 				<rom name="swj-mgh003.bin" size="2097152" crc="8f8608ad" sha1="759deb79a3fc3befed705d7264e4b88adbadacc7" offset="000000" />
 			</dataarea>
@@ -1213,6 +1224,7 @@
 		<info name="alt_title" value="リング インフィニティ"/>
 		<part name="cart" interface="wswan_cart">
 			<feature name="slot" value="ws_eeprom" />
+			<feature name="rotated" value="yes" />
 			<dataarea name="rom" size="4194304">
 				<rom name="swj-kdk001.bin" size="4194304" crc="14adbd4b" sha1="9896d93c97381dc06b6f044de6c9bd112ca0c94b" offset="000000" />
 			</dataarea>
@@ -1453,6 +1465,7 @@
 		<info name="alt_title" value="線脳 ミレニアム"/>
 		<part name="cart" interface="wswan_cart">
 			<feature name="slot" value="ws_eeprom" />
+			<feature name="rotated" value="yes" />
 			<dataarea name="rom" size="1048576">
 				<rom name="swj-ban025.bin" size="1048576" crc="301436ac" sha1="708288e70b3186f6c0ef07acaef1b50fe6b7ab22" offset="000000" />
 			</dataarea>
@@ -1536,6 +1549,7 @@
 		<info name="alt_title" value="スリザーリンク"/>
 		<part name="cart" interface="wswan_cart">
 			<feature name="slot" value="ws_eeprom" />
+			<feature name="rotated" value="yes" />
 			<dataarea name="rom" size="524288">
 				<rom name="swj-ban029.bin" size="524288" crc="f00a0330" sha1="3e31beaca985ac5041c6e95e0d07f163168e190d" offset="000000" />
 			</dataarea>
@@ -1680,6 +1694,7 @@
 		<info name="alt_title" value="テラーズ"/>
 		<part name="cart" interface="wswan_cart">
 			<feature name="slot" value="ws_sram" />
+			<feature name="rotated" value="yes" />
 			<dataarea name="rom" size="4194304">
 				<rom name="swj-ban014.bin" size="4194304" crc="ef5b6b82" sha1="7148d750f12b5da9a0efd99f5a5a7ccadecbdf60" offset="000000" />
 			</dataarea>
@@ -1731,6 +1746,7 @@
 		<info name="alt_title" value="東京魔人学園 符咒封録"/>
 		<part name="cart" interface="wswan_cart">
 			<feature name="slot" value="ws_sram" />
+			<feature name="rotated" value="yes" />
 			<dataarea name="rom" size="8388608">
 				<rom name="swj-aae001.bin" size="8388608" crc="91117d1b" sha1="866c67737a4fbb5f09a0b13bbdb89397bcab1f55" offset="000000" />
 			</dataarea>
@@ -1748,6 +1764,7 @@
 		<info name="alt_title" value="たれぱんだのぐんぺい"/>
 		<part name="cart" interface="wswan_cart">
 			<feature name="slot" value="ws_eeprom" />
+			<feature name="rotated" value="yes" />
 			<dataarea name="rom" size="1048576">
 				<rom name="swj-ban01f.bin" size="1048576" crc="a5643aa3" sha1="9622c65c939f05a9dfae288919ec5bd15c348f14" offset="000000" />
 			</dataarea>
@@ -1839,6 +1856,7 @@
 		<info name="alt_title" value="うずまき ～電視怪奇篇～"/>
 		<part name="cart" interface="wswan_cart">
 			<feature name="slot" value="ws_eeprom" />
+			<feature name="rotated" value="yes" />
 			<dataarea name="rom" size="2097152">
 				<rom name="swj-omm001.bin" size="2097152" crc="812020ef" sha1="4c8166e0632bdb8c098d586a7b1522ed7b63b5f7" offset="000000" />
 			</dataarea>

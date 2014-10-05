@@ -220,7 +220,7 @@ bool ws_cart_slot_device::call_load()
 			battery_load(m_cart->get_nvram_base(), m_cart->get_nvram_size(), 0x00);
 		}
 
-		internal_header_logging(ROM, size);
+		internal_header_logging(ROM, ((size >> 16) - 1) << 16, size);
 	}
 
 	return IMAGE_INIT_PASS;
@@ -418,74 +418,40 @@ WRITE8_MEMBER(ws_cart_slot_device::write_io)
  Internal header logging
  -------------------------------------------------*/
 
-void ws_cart_slot_device::internal_header_logging(UINT8 *ROM, UINT32 len)
-{
-#if 0
-	enum enum_sram { SRAM_NONE=0, SRAM_64K, SRAM_256K, SRAM_512K, SRAM_1M, SRAM_2M, EEPROM_1K, EEPROM_16K, EEPROM_8K, SRAM_UNKNOWN };
-	static const char *const wswan_sram_str[] = { "none", "64Kbit SRAM", "256Kbit SRAM", "512Kbit SRAM", "1Mbit SRAM", "2Mbit SRAM", "1Kbit EEPROM", "16Kbit EEPROM", "8Kbit EEPROM", "Unknown" };
-	static const int wswan_sram_size[] = { 0, 64*1024/8, 256*1024/8, 512*1024/8, 1024*1024/8, 2*1024*1024/8,  1024/8, 16*1024/8, 8*1024/8, 0 };
-	
-	int sum = 0;
-	/* Spit out some info */
-	logerror("ROM DETAILS\n" );
-	logerror("\tDeveloper ID: %X\n", m_ROMMap[m_ROMBanks - 1][0xfff6]);
-	logerror("\tMinimum system: %s\n", m_ROMMap[m_ROMBanks - 1][0xfff7] ? "WonderSwan Color" : "WonderSwan");
-	logerror("\tCart ID: %X\n", m_ROMMap[m_ROMBanks - 1][0xfff8]);
-	logerror("\tROM size: %s\n", wswan_determine_romsize(m_ROMMap[m_ROMBanks - 1][0xfffa]));
-	logerror("\tSRAM size: %s\n", sram_str);
-	logerror("\tFeatures: %X\n", m_ROMMap[m_ROMBanks - 1][0xfffc]);
-	logerror("\tRTC: %s\n", m_ROMMap[m_ROMBanks - 1][0xfffd] ? "yes" : "no");
-	for (int i = 0; i < m_ROMBanks; i++)
-	{
-		int count;
-		for (count = 0; count < 0x10000; count++)
-		{
-			sum += m_ROMMap[i][count];
-		}
-	}
-	sum -= m_ROMMap[m_ROMBanks - 1][0xffff];
-	sum -= m_ROMMap[m_ROMBanks - 1][0xfffe];
-	sum &= 0xffff;
-	logerror("\tChecksum: %X%X (calculated: %04X)\n", m_ROMMap[m_ROMBanks - 1][0xffff], m_ROMMap[m_ROMBanks - 1][0xfffe], sum);
+static const char *const sram_str[] = { "none", "64Kbit SRAM", "256Kbit SRAM", "512Kbit SRAM", "1Mbit SRAM", "2Mbit SRAM" };
+static const char *const eeprom_str[] = { "none", "1Kbit EEPROM", "16Kbit EEPROM", "Unknown", "Unknown", "8Kbit EEPROM" };
+static const char *const romsize_str[] = { "Unknown", "Unknown", "4Mbit", "8Mbit", "16Mbit", "Unknown", "32Mbit", "Unknown", "64Mbit", "128Mbit" };
 
-	const char* wswan_state::wswan_determine_sram(UINT8 data )
+void ws_cart_slot_device::internal_header_logging(UINT8 *ROM, UINT32 offs, UINT32 len)
+{
+	int sum = 0, banks = len / 0x10000;
+	UINT8 romsize, ramtype, ramsize;
+	romsize = ROM[offs + 0xfffa];
+	ramtype = (ROM[offs + 0xfffb] & 0xf0) ? 1 : 0;	// 1 = EEPROM, 0 = SRAM
+	ramsize = ramtype ? ((ROM[offs + 0xfffb] & 0xf0) >> 4) : (ROM[offs + 0xfffb] & 0x0f);
+	
+
+	logerror( "ROM DETAILS\n" );
+	logerror( "===========\n\n" );
+	logerror("\tDeveloper ID: %X\n", ROM[offs + 0xfff6]);
+	logerror("\tMinimum system: %s\n", ROM[offs + 0xfff7] ? "WonderSwan Color" : "WonderSwan");
+	logerror("\tCart ID: %X\n", ROM[offs + 0xfff8]);
+	logerror("\tROM size: %s\n", romsize_str[romsize]);
+	if (ramtype)
+		logerror("\tEEPROM size: %s\n", (ramsize < 6) ? eeprom_str[ramsize] : "Unknown");
+	else
+		logerror("\tSRAM size: %s\n", (ramsize < 6) ? sram_str[ramsize] : "Unknown");
+	logerror("\tFeatures: %X\n", ROM[offs + 0xfffc]);
+	logerror("\tRTC: %s\n", ROM[offs + 0xfffd] ? "yes" : "no");
+	for (int i = 0; i < banks; i++)
 	{
-		m_eeprom.write_enabled = 0;
-		m_eeprom.mode = SRAM_UNKNOWN;
-		switch( data )
+		for (int count = 0; count < 0x10000; count++)
 		{
-			case 0x00: m_eeprom.mode = SRAM_NONE; break;
-			case 0x01: m_eeprom.mode = SRAM_64K; break;
-			case 0x02: m_eeprom.mode = SRAM_256K; break;
-			case 0x03: m_eeprom.mode = SRAM_1M; break;
-			case 0x04: m_eeprom.mode = SRAM_2M; break;
-			case 0x05: m_eeprom.mode = SRAM_512K; break;
-			case 0x10: m_eeprom.mode = EEPROM_1K; break;
-			case 0x20: m_eeprom.mode = EEPROM_16K; break;
-			case 0x50: m_eeprom.mode = EEPROM_8K; break;
+			sum += ROM[(i * 0x10000) + count];
 		}
-		m_eeprom.size = wswan_sram_size[ m_eeprom.mode ];
-		return wswan_sram_str[ m_eeprom.mode ];
 	}
-	
-	enum enum_romsize { ROM_4M=0, ROM_8M, ROM_16M, ROM_32M, ROM_64M, ROM_128M, ROM_UNKNOWN };
-	static const char *const wswan_romsize_str[] = {
-		"4Mbit", "8Mbit", "16Mbit", "32Mbit", "64Mbit", "128Mbit", "Unknown"
-	};
-	
-	const char* wswan_state::wswan_determine_romsize( UINT8 data )
-	{
-		switch( data )
-		{
-			case 0x02:  return wswan_romsize_str[ ROM_4M ];
-			case 0x03:  return wswan_romsize_str[ ROM_8M ];
-			case 0x04:  return wswan_romsize_str[ ROM_16M ];
-			case 0x06:  return wswan_romsize_str[ ROM_32M ];
-			case 0x08:  return wswan_romsize_str[ ROM_64M ];
-			case 0x09:  return wswan_romsize_str[ ROM_128M ];
-		}
-		return wswan_romsize_str[ ROM_UNKNOWN ];
-	}
-	
-#endif
+	sum -= ROM[offs + 0xffff];
+	sum -= ROM[offs + 0xfffe];
+	sum &= 0xffff;
+	logerror("\tChecksum: %.2X%.2X (calculated: %04X)\n", ROM[offs + 0xffff], ROM[offs + 0xfffe], sum);
 }

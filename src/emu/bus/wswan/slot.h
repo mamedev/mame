@@ -79,7 +79,7 @@ public:
 	int get_type() { return m_type; }
 	int get_is_rotated() { return m_cart->get_is_rotated(); }
 	int get_cart_type(UINT8 *ROM, UINT32 len, UINT32 &nvram_len);
-	void internal_header_logging(UINT8 *ROM, UINT32 len);
+	void internal_header_logging(UINT8 *ROM, UINT32 offs, UINT32 len);
 
 	void save_nvram()	{ if (m_cart && m_cart->get_nvram_size()) m_cart->save_nvram(); }
 

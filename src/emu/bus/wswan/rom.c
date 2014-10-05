@@ -82,7 +82,6 @@ void ws_rom_device::device_reset()
 	m_base20 = ((0xff & m_bank_mask) << 16) & (m_rom_size - 1);
 	m_base30 = ((0xff & m_bank_mask) << 16) & (m_rom_size - 1);
 	m_base40 = (((0xf0 & m_bank_mask) | 4) << 16) & (m_rom_size - 1);
-	printf("%x - %x - %x\n", m_base20, m_base30, m_base40);
 
 	memset(m_io_regs, 0, sizeof(m_io_regs));
 
