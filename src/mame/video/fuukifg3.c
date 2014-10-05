@@ -90,11 +90,10 @@ WRITE32_MEMBER(fuuki32_state::fuuki32_vram_3_w){ fuuki32_vram_w(offset, data, me
 
 void fuuki32_state::video_start()
 {
-	m_buf_spriteram = auto_alloc_array(machine(), UINT32, m_spriteram.bytes() / 4);
-	m_buf_spriteram2 = auto_alloc_array(machine(), UINT32, m_spriteram.bytes() / 4);
+//	m_buf_spriteram = auto_alloc_array(machine(), UINT32, m_spriteram.bytes() / 4);
+//	m_buf_spriteram2 = auto_alloc_array(machine(), UINT32, m_spriteram.bytes() / 4);
 
-	save_pointer(NAME(m_buf_spriteram), m_spriteram.bytes() / 4);
-	save_pointer(NAME(m_buf_spriteram2), m_spriteram.bytes() / 4);
+
 
 	m_tilemap[0] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(fuuki32_state::get_tile_info_0),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
 	m_tilemap[1] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(fuuki32_state::get_tile_info_1),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
@@ -110,144 +109,6 @@ void fuuki32_state::video_start()
 	//m_gfxdecode->gfx(2)->set_granularity(16);
 }
 
-
-/***************************************************************************
-
-
-                                Sprites Drawing
-
-    Offset:     Bits:                   Value:
-
-        0.w     fedc ---- ---- ----     Number Of Tiles Along X - 1
-                ---- b--- ---- ----     Flip X
-                ---- -a-- ---- ----     1 = Don't Draw This Sprite
-                ---- --98 7654 3210     X (Signed)
-
-        2.w     fedc ---- ---- ----     Number Of Tiles Along Y - 1
-                ---- b--- ---- ----     Flip Y
-                ---- -a-- ---- ----
-                ---- --98 7654 3210     Y (Signed)
-
-        4.w     fedc ---- ---- ----     Zoom X ($0 = Full Size, $F = Half Size)
-                ---- ba98 ---- ----     Zoom Y ""
-                ---- ---- 76-- ----     Priority
-                ---- ---- --54 3210     Color
-
-        6.w     fe-- ---- ---- ----     Tile Bank
-                --dc ba98 7654 3210     Tile Code
-
-
-***************************************************************************/
-
-void fuuki32_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
-{
-	int offs;
-	gfx_element *gfx = m_gfxdecode->gfx(0);
-	bitmap_ind8 &priority_bitmap = screen.priority();
-	const rectangle &visarea = screen.visible_area();
-	int max_x = visarea.max_x + 1;
-	int max_y = visarea.max_y + 1;
-
-	UINT32 *src = m_buf_spriteram2; /* Use spriteram buffered by 2 frames, need palette buffered by one frame? */
-
-	/* Draw them backwards, for pdrawgfx */
-	for (offs = (m_spriteram.bytes() - 8) / 4; offs >= 0; offs -= 8/4)
-	{
-		int x, y, xstart, ystart, xend, yend, xinc, yinc;
-		int xnum, ynum, xzoom, yzoom, flipx, flipy;
-		int pri_mask;
-
-		int sx = (src[offs + 0]& 0xffff0000) >> 16;
-		int sy = (src[offs + 0]& 0x0000ffff);
-		int attr = (src[offs + 1]& 0xffff0000) >> 16;
-		int code = (src[offs + 1]& 0x0000ffff);
-
-		int bank = (code & 0xc000) >> 14;
-		int bank_lookedup;
-
-		bank_lookedup = ((m_spr_buffered_tilebank[1] & 0xffff0000) >> (16 + bank * 4)) & 0xf;
-		code &= 0x3fff;
-		code += bank_lookedup * 0x4000;
-
-		if (sx & 0x400)
-			continue;
-
-		flipx = sx & 0x0800;
-		flipy = sy & 0x0800;
-
-		xnum = ((sx >> 12) & 0xf) + 1;
-		ynum = ((sy >> 12) & 0xf) + 1;
-
-		xzoom = 16 * 8 - (8 * ((attr >> 12) & 0xf)) / 2;
-		yzoom = 16 * 8 - (8 * ((attr >>  8) & 0xf)) / 2;
-
-		switch( (attr >> 6) & 3 )
-		{
-			case 3: pri_mask = 0xf0 | 0xcc | 0xaa;  break;  // behind all layers
-			case 2: pri_mask = 0xf0 | 0xcc;         break;  // behind fg + middle layer
-			case 1: pri_mask = 0xf0;                break;  // behind fg layer
-			case 0:
-			default:    pri_mask = 0;                       // above all
-		}
-
-		sx = (sx & 0x1ff) - (sx & 0x200);
-		sy = (sy & 0x1ff) - (sy & 0x200);
-
-		if (flip_screen())
-		{
-			flipx = !flipx;     sx = max_x - sx - xnum * 16;
-			flipy = !flipy;     sy = max_y - sy - ynum * 16;
-		}
-
-		if (flipx)  { xstart = xnum-1;  xend = -1;    xinc = -1; }
-		else        { xstart = 0;       xend = xnum;  xinc = +1; }
-
-		if (flipy)  { ystart = ynum-1;  yend = -1;    yinc = -1; }
-		else        { ystart = 0;       yend = ynum;  yinc = +1; }
-
-#if 0
-		if(!( (screen.machine().input().code_pressed(KEYCODE_V) && (((attr >> 6)&3) == 0))
-			|| (screen.machine().input().code_pressed(KEYCODE_B) && (((attr >> 6)&3) == 1))
-			|| (screen.machine().input().code_pressed(KEYCODE_N) && (((attr >> 6)&3) == 2))
-			|| (screen.machine().input().code_pressed(KEYCODE_M) && (((attr >> 6)&3) == 3))
-			))
-#endif
-
-		for (y = ystart; y != yend; y += yinc)
-		{
-			for (x = xstart; x != xend; x += xinc)
-			{
-				if (xzoom == (16*8) && yzoom == (16*8))
-					gfx->prio_transpen(bitmap,cliprect,
-									code++,
-									attr & 0x3f,
-									flipx, flipy,
-									sx + x * 16, sy + y * 16,
-									priority_bitmap,
-									pri_mask,15 );
-				else
-					gfx->prio_zoom_transpen(bitmap,cliprect,
-									code++,
-									attr & 0x3f,
-									flipx, flipy,
-									sx + (x * xzoom) / 8, sy + (y * yzoom) / 8,
-									(0x10000/0x10/8) * (xzoom + 8),(0x10000/0x10/8) * (yzoom + 8),  priority_bitmap,// nearest greater integer value to avoid holes
-									pri_mask,15 );
-			}
-		}
-
-#ifdef MAME_DEBUG
-#if 0
-if (screen.machine().input().code_pressed(KEYCODE_X))
-{   /* Display some info on each sprite */
-	char buf[40];
-	sprintf(buf, "%Xx%X %X",xnum,ynum,(attr>>6)&3);
-	ui_draw_text(buf, sx, sy);
-}
-#endif
-#endif
-	}
-}
 
 
 /***************************************************************************
@@ -356,7 +217,7 @@ UINT32 fuuki32_state::screen_update_fuuki32(screen_device &screen, bitmap_ind16 
 	fuuki32_draw_layer(screen, bitmap, cliprect, tm_middle, 0, 2);
 	fuuki32_draw_layer(screen, bitmap, cliprect, tm_front,  0, 4);
 
-	draw_sprites(screen, bitmap, cliprect);
+	m_fuukivid->draw_sprites(screen, bitmap, cliprect, flip_screen(), m_spr_buffered_tilebank);
 	return 0;
 }
 
@@ -368,7 +229,6 @@ void fuuki32_state::screen_eof_fuuki32(screen_device &screen, bool state)
 		/* Buffer sprites and tilebank by 2 frames */
 		m_spr_buffered_tilebank[1] = m_spr_buffered_tilebank[0];
 		m_spr_buffered_tilebank[0] = m_tilebank[0];
-		memcpy(m_buf_spriteram2, m_buf_spriteram, m_spriteram.bytes());
-		memcpy(m_buf_spriteram, m_spriteram, m_spriteram.bytes());
+		m_fuukivid->buffer_sprites();
 	}
 }

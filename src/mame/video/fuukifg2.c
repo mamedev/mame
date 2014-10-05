@@ -106,127 +106,6 @@ void fuuki16_state::video_start()
 }
 
 
-/***************************************************************************
-
-
-                                Sprites Drawing
-
-    Offset:     Bits:                   Value:
-
-        0.w     fedc ---- ---- ----     Number Of Tiles Along X - 1
-                ---- b--- ---- ----     Flip X
-                ---- -a-- ---- ----     1 = Don't Draw This Sprite
-                ---- --98 7654 3210     X (Signed)
-
-        2.w     fedc ---- ---- ----     Number Of Tiles Along Y - 1
-                ---- b--- ---- ----     Flip Y
-                ---- -a-- ---- ----
-                ---- --98 7654 3210     Y (Signed)
-
-        4.w     fedc ---- ---- ----     Zoom X ($0 = Full Size, $F = Half Size)
-                ---- ba98 ---- ----     Zoom Y ""
-                ---- ---- 76-- ----     Priority
-                ---- ---- --54 3210     Color
-
-        6.w                             Code
-
-
-***************************************************************************/
-
-void fuuki16_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
-{
-	int offs;
-	gfx_element *gfx = m_gfxdecode->gfx(0);
-	bitmap_ind8 &priority_bitmap = screen.priority();
-	const rectangle &visarea = screen.visible_area();
-	UINT16 *spriteram16 = m_spriteram;
-	int max_x = visarea.max_x + 1;
-	int max_y = visarea.max_y + 1;
-
-	/* Draw them backwards, for pdrawgfx */
-	for ( offs = (m_spriteram.bytes() - 8) / 2; offs >=0; offs -= 8 / 2 )
-	{
-		int x, y, xstart, ystart, xend, yend, xinc, yinc;
-		int xnum, ynum, xzoom, yzoom, flipx, flipy;
-		int pri_mask;
-
-		int sx = spriteram16[offs + 0];
-		int sy = spriteram16[offs + 1];
-		int attr = spriteram16[offs + 2];
-		int code = spriteram16[offs + 3];
-
-		if (sx & 0x400)
-			continue;
-
-		flipx = sx & 0x0800;
-		flipy = sy & 0x0800;
-
-		xnum = ((sx >> 12) & 0xf) + 1;
-		ynum = ((sy >> 12) & 0xf) + 1;
-
-		xzoom = 16 * 8 - (8 * ((attr >> 12) & 0xf)) / 2;
-		yzoom = 16 * 8 - (8 * ((attr >>  8) & 0xf)) / 2;
-
-		switch ((attr >> 6) & 3)
-		{
-			case 3: pri_mask = 0xf0 | 0xcc | 0xaa;  break;  // behind all layers
-			case 2: pri_mask = 0xf0 | 0xcc;         break;  // behind fg + middle layer
-			case 1: pri_mask = 0xf0;                break;  // behind fg layer
-			case 0:
-			default:    pri_mask = 0;                       // above all
-		}
-
-		sx = (sx & 0x1ff) - (sx & 0x200);
-		sy = (sy & 0x1ff) - (sy & 0x200);
-
-		if (flip_screen())
-		{
-			flipx = !flipx;     sx = max_x - sx - xnum * 16;
-			flipy = !flipy;     sy = max_y - sy - ynum * 16;
-		}
-
-		if (flipx)  { xstart = xnum-1;  xend = -1;    xinc = -1; }
-		else        { xstart = 0;       xend = xnum;  xinc = +1; }
-
-		if (flipy)  { ystart = ynum-1;  yend = -1;    yinc = -1; }
-		else        { ystart = 0;       yend = ynum;  yinc = +1; }
-
-		for (y = ystart; y != yend; y += yinc)
-		{
-			for (x = xstart; x != xend; x += xinc)
-			{
-				if (xzoom == (16*8) && yzoom == (16*8))
-					gfx->prio_transpen(bitmap,cliprect,
-									code++,
-									attr & 0x3f,
-									flipx, flipy,
-									sx + x * 16, sy + y * 16,
-									priority_bitmap,
-									pri_mask,15 );
-				else
-					gfx->prio_zoom_transpen(bitmap,cliprect,
-									code++,
-									attr & 0x3f,
-									flipx, flipy,
-									sx + (x * xzoom) / 8, sy + (y * yzoom) / 8,
-									(0x10000/0x10/8) * (xzoom + 8),(0x10000/0x10/8) * (yzoom + 8),  priority_bitmap,// nearest greater integer value to avoid holes
-									pri_mask,15 );
-			}
-		}
-
-#ifdef MAME_DEBUG
-#if 0
-if (machine().input().code_pressed(KEYCODE_X))
-{   /* Display some info on each sprite */
-	char buf[40];
-	sprintf(buf, "%Xx%X %X",xnum,ynum,(attr>>6)&3);
-	ui_draw_text(buf, sx, sy);
-}
-#endif
-#endif
-	}
-}
-
 
 /***************************************************************************
 
@@ -339,7 +218,7 @@ UINT32 fuuki16_state::screen_update_fuuki16(screen_device &screen, bitmap_ind16 
 	fuuki16_draw_layer(screen, bitmap, cliprect, tm_middle, 0, 2);
 	fuuki16_draw_layer(screen, bitmap, cliprect, tm_front,  0, 4);
 
-	draw_sprites(screen, bitmap, cliprect);
+	m_fuukivid->draw_sprites(screen, bitmap, cliprect, flip_screen(), 0);
 
 	return 0;
 }

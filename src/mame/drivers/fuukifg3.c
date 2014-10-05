@@ -215,7 +215,7 @@ static ADDRESS_MAP_START( fuuki32_map, AS_PROGRAM, 32, fuuki32_state )
 	AM_RANGE(0x504000, 0x505fff) AM_RAM_WRITE(fuuki32_vram_2_w) AM_SHARE("vram.2")  // Tilemap bg
 	AM_RANGE(0x506000, 0x507fff) AM_RAM_WRITE(fuuki32_vram_3_w) AM_SHARE("vram.3")  // Tilemap bg2
 	AM_RANGE(0x508000, 0x517fff) AM_RAM                                                                     // More tilemap, or linescroll? Seems to be empty all of the time
-	AM_RANGE(0x600000, 0x601fff) AM_RAM AM_SHARE("spriteram")   // Sprites
+	AM_RANGE(0x600000, 0x601fff) AM_RAM AM_DEVREADWRITE16("fuukivid", fuukivid_device, fuuki_sprram_r, fuuki_sprram_w, 0xffffffff) // Sprites
 	AM_RANGE(0x700000, 0x703fff) AM_RAM_DEVWRITE("palette",  palette_device, write) AM_SHARE("palette") // Palette
 
 	AM_RANGE(0x800000, 0x800003) AM_READ_PORT("800000") AM_WRITENOP                                         // Coin
@@ -545,7 +545,7 @@ WRITE_LINE_MEMBER(fuuki32_state::irqhandler)
 	m_soundcpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static MACHINE_CONFIG_START( fuuki32, fuuki32_state )
+static MACHINE_CONFIG_START(fuuki32, fuuki32_state)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68EC020, CPU_CLOCK) /* 20MHz verified */
@@ -555,19 +555,21 @@ static MACHINE_CONFIG_START( fuuki32, fuuki32_state )
 	MCFG_CPU_PROGRAM_MAP(fuuki32_sound_map)
 	MCFG_CPU_IO_MAP(fuuki32_sound_io_map)
 
-
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0, 40*8-1, 0, 30*8-1)
+	MCFG_SCREEN_SIZE(64 * 8, 32 * 8)
+	MCFG_SCREEN_VISIBLE_AREA(0, 40 * 8 - 1, 0, 30 * 8 - 1)
 	MCFG_SCREEN_UPDATE_DRIVER(fuuki32_state, screen_update_fuuki32)
 	MCFG_SCREEN_VBLANK_DRIVER(fuuki32_state, screen_eof_fuuki32)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", fuuki32)
-	MCFG_PALETTE_ADD("palette", 0x4000/2)
+	MCFG_PALETTE_ADD("palette", 0x4000 / 2)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+
+	MCFG_DEVICE_ADD("fuukivid", FUUKI_VIDEO, 0)
+	MCFG_FUUKI_VIDEO_GFXDECODE("gfxdecode")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

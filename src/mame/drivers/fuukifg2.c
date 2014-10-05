@@ -90,7 +90,7 @@ static ADDRESS_MAP_START( fuuki16_map, AS_PROGRAM, 16, fuuki16_state )
 	AM_RANGE(0x502000, 0x503fff) AM_RAM_WRITE(fuuki16_vram_1_w) AM_SHARE("vram.1")                  //
 	AM_RANGE(0x504000, 0x505fff) AM_RAM_WRITE(fuuki16_vram_2_w) AM_SHARE("vram.2")                  //
 	AM_RANGE(0x506000, 0x507fff) AM_RAM_WRITE(fuuki16_vram_3_w) AM_SHARE("vram.3")                  //
-	AM_RANGE(0x600000, 0x601fff) AM_MIRROR(0x008000) AM_RAM AM_SHARE("spriteram")   // Sprites, mirrored?
+	AM_RANGE(0x600000, 0x601fff) AM_MIRROR(0x008000) AM_DEVREADWRITE("fuukivid", fuukivid_device, fuuki_sprram_r, fuuki_sprram_w) AM_SHARE("spriteram")   // Sprites, mirrored?
 	AM_RANGE(0x700000, 0x703fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")    // Palette
 	AM_RANGE(0x800000, 0x800001) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x810000, 0x810001) AM_READ_PORT("P1_P2")
@@ -464,6 +464,8 @@ static MACHINE_CONFIG_START( fuuki16, fuuki16_state )
 	MCFG_PALETTE_ADD("palette", 0x800*4)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
+	MCFG_DEVICE_ADD("fuukivid", FUUKI_VIDEO, 0)
+	MCFG_FUUKI_VIDEO_GFXDECODE("gfxdecode")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

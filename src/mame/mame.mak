@@ -1148,6 +1148,7 @@ $(MAMEOBJ)/funworld.a: \
 $(MAMEOBJ)/fuuki.a: \
 	$(DRIVERS)/fuukifg2.o $(VIDEO)/fuukifg2.o \
 	$(DRIVERS)/fuukifg3.o $(VIDEO)/fuukifg3.o \
+	$(VIDEO)/fuukifg.o \
 
 $(MAMEOBJ)/gaelco.a: \
 	$(DRIVERS)/atvtrack.o \
