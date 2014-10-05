@@ -104,17 +104,25 @@ void a2bus_lang_device::langcard_touch(offs_t offset)
 
 UINT8 a2bus_lang_device::read_c0nx(address_space &space, UINT8 offset)
 {
+	apple2_state *state = machine().driver_data<apple2_state>();
+
 	// enforce "read twice" for c081/3/9/B
-	switch(offset & 0x03)
+	// but only on the II/II+ with a discrete language card.
+	// later machines' ASICs dropped the double-read requirement,
+	// likely to be interrupt-safe.
+	if (state->m_machinetype == APPLE_II)
 	{
-		case 1:
-		case 3:
-			if (offset != last_offset)
-			{
-				last_offset = offset;
-				return 0;
-			}
-			break;
+		switch (offset & 0x03) 
+		{
+			case 1:
+			case 3:
+				if (offset != last_offset)
+				{
+					last_offset = offset;
+					return 0;
+				}
+				break;
+		}
 	}
 
 	langcard_touch(offset);
