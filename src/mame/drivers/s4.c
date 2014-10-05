@@ -463,7 +463,7 @@ static MACHINE_CONFIG_START( s4, s4_state )
 	MCFG_PIA_IRQA_HANDLER(DEVWRITELINE("maincpu", m6800_cpu_device, irq_line))
 	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE("maincpu", m6800_cpu_device, irq_line))
 
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	MCFG_NVRAM_ADD_0FILL("nvram")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( s4a, s4 )

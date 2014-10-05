@@ -1,7 +1,7 @@
 <!-- s11a.lay -->
 
 <!-- 2012-11-04: Initial version.  [Robbbert]
-		2012-12-19: Rearranged layout, replaced diagnostic 7-digit LED with 3 single LEDs  [Barry Rodewald]-->
+     2012-12-19: Rearranged layout, replaced diagnostic 7-digit LED with 3 single LEDs  [Barry Rodewald]-->
 
 <mamelayout version="2">
 
@@ -37,7 +37,7 @@
 
 		<!-- Background -->
 		<backdrop element="background">
-			<bounds left="0" top="20" right="318" bottom="394" />
+			<bounds left="0" top="25" right="364" bottom="249" />
 		</backdrop>
 
 		<!-- LEDs -->
