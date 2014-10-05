@@ -1442,6 +1442,8 @@ static const struct CPS1config cps1_config_table[]=
 	{"sf2ed",       CPS_B_05,     mapper_STF29,  0x36 },
 	{"sf2ee",       CPS_B_18,     mapper_STF29,  0x3c },
 	{"sf2ebbl",     CPS_B_17,     mapper_STF29,  0x36, 0, 0, 1  },
+	{"sf2ebbl2",    CPS_B_17,     mapper_STF29,  0x36, 0, 0, 1  },
+	{"sf2ebbl3",     CPS_B_17,     mapper_STF29,  0x36, 0, 0, 1  },
 	{"sf2stt",      CPS_B_17,     mapper_STF29,  0x36, 0, 0, 1  },
 	{"sf2rk",       CPS_B_17,     mapper_STF29,  0x36, 0, 0, 1  },
 	{"sf2ua",       CPS_B_17,     mapper_STF29,  0x36 },
@@ -1516,12 +1518,14 @@ static const struct CPS1config cps1_config_table[]=
 	{"sf2m6",       CPS_B_21_DEF, mapper_S9263B, 0x36, 0, 0, 1 },
 	{"sf2m7",       CPS_B_21_DEF, mapper_S9263B, 0x36, 0, 0, 1 },
 	{"sf2m8",       HACK_B_1,     mapper_S9263B, 0,    0, 0, 2 },
+	{"sf2m9",       CPS_B_21_DEF, mapper_S9263B, 0x36 },
 	{"sf2dongb",    CPS_B_21_DEF, mapper_S9263B, 0x36 },
 	{"sf2yyc",      CPS_B_21_DEF, mapper_S9263B, 0x36, 0, 0, 1 },
 	{"sf2koryu",    CPS_B_21_DEF, mapper_S9263B, 0x36, 0, 0, 1 },
 	{"sf2mdt",      CPS_B_21_DEF, mapper_S9263B, 0x36, 0, 0, 1 },
 	{"sf2mdta",     CPS_B_21_DEF, mapper_S9263B, 0x36, 0, 0, 1 },
 	{"sf2mdtb",     CPS_B_21_DEF, mapper_S9263B, 0x36, 0, 0, 1 },
+	{"sf2mdtc",     CPS_B_21_DEF, mapper_S9263B, 0x36, 0, 0, 1 },
 	{"varth",       CPS_B_04,     mapper_VA63B },   /* CPSB test has been patched out (60=0008) register is also written to, possibly leftover from development */  // wrong, this set uses VA24B, dumped but equations still not added
 	{"varthr1",     CPS_B_04,     mapper_VA63B },   /* CPSB test has been patched out (60=0008) register is also written to, possibly leftover from development */  // wrong, this set uses VA24B, dumped but equations still not added
 	{"varthu",      CPS_B_04,     mapper_VA63B },   /* CPSB test has been patched out (60=0008) register is also written to, possibly leftover from development */

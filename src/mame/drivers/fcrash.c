@@ -2532,6 +2532,7 @@ DRIVER_INIT_MEMBER(cps_state, sf2m1)
 	mem16[0x64E/2] = 0x6046; // fix priorities
 
 	DRIVER_INIT_CALL(dinopic);
+	
 }
 
 
@@ -2601,7 +2602,7 @@ ROM_START( sf2mdta )
 	ROM_LOAD16_BYTE( "4.mdta", 0x100001, 0x20000, CRC(bd98ff15) SHA1(ed902d949b0b5c5beaaea78a4b418ffa6db9e1df) )
 
 	ROM_REGION( 0x600000, "gfx", 0 )
-	ROMX_LOAD( "pf4 sh058.ic89", 0x000000, 0x100000, BAD_DUMP CRC(40fdf624) SHA1(cb928602744bf36e6851527f00d90da29de751e6), ROM_GROUPWORD | ROM_SKIP(2) )
+	ROMX_LOAD( "pf4 sh058.ic89", 0x000000, 0x100000, CRC(16289710) SHA1(4f3236712b979a1eb2fa97740e32d7913cee0d0d), ROM_GROUPWORD | ROM_SKIP(2) )
 	ROMX_LOAD( "pf7 sh072.ic92", 0x000002, 0x100000, CRC(fb78022e) SHA1(b8974387056dd52db96b01cc4648edc814398c7e), ROM_GROUPWORD | ROM_SKIP(2) )
 	ROMX_LOAD( "pf5 sh036.ic90", 0x200000, 0x100000, CRC(0a6be48b) SHA1(b7e72c94d4e3eb4a6bba6608d9b9a093c8901ad9), ROM_GROUPWORD | ROM_SKIP(2) )
 	ROMX_LOAD( "pf8 sh074.ic93", 0x200002, 0x100000, CRC(6258c7cf) SHA1(4cd7519245c0aa816934a43e6743160f715d7dc2), ROM_GROUPWORD | ROM_SKIP(2) )
@@ -2639,6 +2640,71 @@ ROM_START( sf2mdtb )
 	ROM_RELOAD(            0x10000, 0x20000 )
 ROM_END
 
+ROM_START( sf2mdtc )
+	ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code */
+	ROM_LOAD16_WORD_SWAP( "pf1-2-sg076.bin",  0x000000, 0x100000, CRC(1d15bc7a) SHA1(834627545f191f39de6beb008c89623f2b88c13b) )
+
+	ROM_REGION( 0x600000, "gfx", 0 )
+	ROMX_LOAD( "pf4-sg072.bin", 0x000000, 0x100000, CRC(16289710) SHA1(4f3236712b979a1eb2fa97740e32d7913cee0d0d), ROM_GROUPWORD | ROM_SKIP(2) )
+	ROMX_LOAD( "pf7-sg103.bin", 0x000002, 0x100000, CRC(fb78022e) SHA1(b8974387056dd52db96b01cc4648edc814398c7e), ROM_GROUPWORD | ROM_SKIP(2) )
+	ROMX_LOAD( "pf5-sg095.bin", 0x200000, 0x100000, CRC(0a6be48b) SHA1(b7e72c94d4e3eb4a6bba6608d9b9a093c8901ad9), ROM_GROUPWORD | ROM_SKIP(2) )
+	ROMX_LOAD( "pf8-sg101.bin", 0x200002, 0x100000, CRC(6258c7cf) SHA1(4cd7519245c0aa816934a43e6743160f715d7dc2), ROM_GROUPWORD | ROM_SKIP(2) )
+	ROMX_LOAD( "pf6-sg068.bin", 0x400000, 0x100000, CRC(9b5b09d7) SHA1(698a6aab41e495bd0c37a19aee16a84f04d15797), ROM_GROUPWORD | ROM_SKIP(2) )
+	ROMX_LOAD( "pf9-sh001.bin", 0x400002, 0x100000, CRC(9f25090e) SHA1(12ff0431ef6550db446985c8914ac7d78eec6b6d), ROM_GROUPWORD | ROM_SKIP(2) )
+
+	ROM_REGION( 0x30000, "audiocpu", 0 ) /* Sound program + samples  */
+	ROM_LOAD( "3snd.ic28",    0x00000, 0x20000, CRC(d5bee9cc) SHA1(e638cb5ce7a22c18b60296a7defe8b03418da56c) )
+	ROM_RELOAD(            0x10000, 0x20000 )
+ROM_END
+
+
+ROM_START( sf2m9 )
+	ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code */
+	ROM_LOAD16_BYTE( "27040.6",              0x000000, 0x80000, CRC(16c6372e) SHA1(5d5a49392f2fb806e66e0ac137df00425ca52e7f) )
+	ROM_LOAD16_BYTE( "27040.5",              0x000001, 0x80000, CRC(137d5f2e) SHA1(835e9b767e6499f161c5c4fd9a31a9f54b3ee68f) )
+	ROM_LOAD16_BYTE( "27010.4",              0x100000, 0x20000, CRC(8226c11c) SHA1(9588bd64e338901394805aca8a234f880674dc60) )
+	ROM_LOAD16_BYTE( "27010.3",              0x100001, 0x20000, CRC(924c6ce2) SHA1(676a912652bd75da5087f0c7eae047b7681a993c) )
+	
+
+	ROM_REGION( 0x600000, "gfx", 0 )
+	ROMX_LOAD( "tat-01.bin",    0x000000, 0x40000, CRC(a887f7d4) SHA1(d7e0c46b3ab1c6352f45033cb9e610d9c34d51fb), ROM_SKIP(7) )
+	ROM_CONTINUE(          0x000004, 0x40000)
+	ROMX_LOAD( "tat-05.bin",    0x000001, 0x40000, CRC(9390ff23) SHA1(b234169615aa952e3b15c7b0dfb495e499ba49ef), ROM_SKIP(7) )
+	ROM_CONTINUE(          0x000005, 0x40000)
+	ROMX_LOAD( "tat-02.bin",    0x000002, 0x40000, CRC(afb3b589) SHA1(9721fa705d62814e416c38a6c3e698efb9385a98), ROM_SKIP(7) )
+	ROM_CONTINUE(          0x000006, 0x40000)
+	ROMX_LOAD( "tat-06.bin",    0x000003, 0x40000, CRC(90f2053e) SHA1(a78710421e702b410650c45c3dec21bf16799fb4), ROM_SKIP(7) )
+	ROM_CONTINUE(          0x000007, 0x40000)
+	
+	ROMX_LOAD( "tat-03.bin",    0x200000, 0x40000, CRC(79fa8bf0) SHA1(9f8f7b8dc54a75226beb017b9ca9fd62a9e42f6b), ROM_SKIP(7) )
+	ROM_CONTINUE(          0x200004, 0x40000)
+	ROMX_LOAD( "tat-07.bin",    0x200001, 0x40000, CRC(6a5f153c) SHA1(f3d82ad01e2e4bdb2039815747fa14399c69753a), ROM_SKIP(7) )
+	ROM_CONTINUE(          0x200005, 0x40000)
+	ROMX_LOAD( "tat-04.bin",    0x200002, 0x40000, CRC(32518120) SHA1(56ffa5fffb714cff8be8be5a3675b8a5fa29b2bc), ROM_SKIP(7) )
+	ROM_CONTINUE(          0x200006, 0x40000)
+	ROMX_LOAD( "tat-08.bin",    0x200003, 0x40000, CRC(c16579ae) SHA1(42c9d6df9f3b015f5d1ad4fa2b34ea90bb37bcae), ROM_SKIP(7) )
+	ROM_CONTINUE(          0x200007, 0x40000)
+
+	ROMX_LOAD( "tat-09.bin",    0x400000, 0x40000, CRC(169d85a6) SHA1(dd98c8807e80465858b2eac10825e598c37e1a93), ROM_SKIP(7) )
+	ROM_CONTINUE(          0x400004, 0x40000)
+	ROMX_LOAD( "tat-11.bin",    0x400001, 0x40000, CRC(32a3a841) SHA1(6f9a13b8828998d194dd3933b032c75efed9cab3), ROM_SKIP(7) )
+	ROM_CONTINUE(          0x400005, 0x40000)
+	ROMX_LOAD( "tat-10.bin",    0x400002, 0x40000, CRC(0c638630) SHA1(709d183d181a0509c7ed839c59214851468d2bb8), ROM_SKIP(7) )
+	ROM_CONTINUE(          0x400006, 0x40000)
+	ROMX_LOAD( "tat-12.bin",    0x400003, 0x40000, CRC(6ee19b94) SHA1(c45119d04879b6ca23a3f7749175c56b381b43f2), ROM_SKIP(7) )
+	ROM_CONTINUE(          0x400007, 0x40000)
+	
+	ROM_REGION( 0x18000, "audiocpu", 0 ) /* 64k for the audio CPU (+banks) */
+	ROM_LOAD( "27512.1",    0x00000, 0x08000, CRC(08f6b60e) SHA1(8258fcaca4ac419312531eec67079b97f471179c) )
+	ROM_CONTINUE(              0x10000, 0x08000 )
+
+	ROM_REGION( 0x40000, "oki", 0 ) /* Samples */
+	ROM_LOAD( "27020.2",    0x00000, 0x40000, CRC(6cfffb11) SHA1(995526183ffd35f92e9096500a3fe6237faaa2dd) )
+	
+	ROM_REGION( 0x00c8d, "pld", 0 ) /* pal/gal */
+	ROM_LOAD( "gal20v8.68kadd",    0x00000, 0x00c8d, CRC(27cdd376) SHA1(9fb5844b33002bec80fb92d3e5d1bbc779087300) )//68k address decoder
+	
+ROM_END
 
 DRIVER_INIT_MEMBER(cps_state, sf2mdt)
 {
@@ -2819,7 +2885,10 @@ GAME( 1993, punipic3,  punisher, punipic,   punisher, cps_state, punipic3, ROT0,
 GAME( 1992, sf2m1,     sf2ce,    sf2m1,     sf2,      cps_state, sf2m1,    ROT0,   "bootleg", "Street Fighter II': Champion Edition (M1, bootleg)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE ) // 920313 ETC
 GAME( 1992, sf2mdt,    sf2ce,    sf2mdt,    sf2mdt,   cps_state, sf2mdt,   ROT0,   "bootleg", "Street Fighter II': Magic Delta Turbo (bootleg, set 1)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )   // 920313 - based on (heavily modified) World version
 GAME( 1992, sf2mdta,   sf2ce,    sf2mdt,    sf2mdt,   cps_state, sf2mdta,  ROT0,   "bootleg", "Street Fighter II': Magic Delta Turbo (bootleg, set 2)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )   // 920313 - based on World version
-GAME( 1992, sf2mdtb,   sf2ce,    sf2mdt,    sf2mdtb,   cps_state, sf2mdtb,  ROT0,   "bootleg", "Street Fighter II': Magic Delta Turbo (bootleg, set 3)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )   // 920313 - based on World version
+GAME( 1992, sf2mdtb,   sf2ce,    sf2mdt,    sf2mdtb,  cps_state, sf2mdtb,  ROT0,   "bootleg", "Street Fighter II': Magic Delta Turbo (bootleg, set 3)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )   // 920313 - based on World version
+GAME( 1992, sf2mdtc,   sf2ce,    sf2mdt,    sf2mdt,   cps_state, sf2mdta,  ROT0,   "bootleg", "Street Fighter II': Magic Delta Turbo (bootleg, set 4)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+
+GAME( 1992, sf2m9,     sf2ce,    sf2m1,     sf2,      cps_state, dinopic,    ROT0,   "bootleg", "Street Fighter II': Champion Edition (M9, bootleg)",  GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE ) // 920313 ETC
 
 GAME( 1993, slampic,   slammast, slampic,   slammast, cps_state, dinopic,  ROT0,   "bootleg", "Saturday Night Slam Masters (bootleg with PIC16c57)", GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND | GAME_SUPPORTS_SAVE ) // 930713 ETC
 
