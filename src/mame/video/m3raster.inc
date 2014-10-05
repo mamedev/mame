@@ -2,8 +2,8 @@ static void draw_scanline_normal(void *dest, INT32 scanline, const poly_extent *
 {
 	const poly_extra_data *extra = (const poly_extra_data *)extradata;
 	const cached_texture *texture = extra->texture;
-	bitmap_ind16 *destmap = (bitmap_ind16 *)dest;
-	UINT16 *p = &destmap->pix16(scanline);
+	bitmap_rgb32 *destmap = (bitmap_rgb32 *)dest;
+	UINT32 *p = &destmap->pix32(scanline);
 	UINT32 *d = &extra->zbuffer->pix32(scanline);
 	float ooz = extent->param[0].start;
 	float uoz = extent->param[1].start;
@@ -34,10 +34,10 @@ static void draw_scanline_normal(void *dest, INT32 scanline, const poly_extent *
 			UINT32 pix10 = texture->data[(v2 << width) + u1];
 			UINT32 pix11 = texture->data[(v2 << width) + u2];
 			UINT32 texel = rgba_bilinear_filter(pix00, pix01, pix10, pix11, u, v);
-			UINT32 fr = ((texel & 0x00ff0000) * polyi) >> (8+9);
-			UINT32 fg = ((texel & 0x0000ff00) * polyi) >> (8+6);
-			UINT32 fb = ((texel & 0x000000ff) * polyi) >> (8+3);
-			p[x] = (fr & 0x7c00) | (fg & 0x3e0) | (fb & 0x1f);
+			UINT32 fr = ((texel & 0x00ff0000) * polyi) >> 8;
+			UINT32 fg = ((texel & 0x0000ff00) * polyi) >> 8;
+			UINT32 fb = ((texel & 0x000000ff) * polyi) >> 8;
+			p[x] = 0xff000000 | (fr & 0xff0000) | (fg & 0xff00) | (fb & 0xff);
 			d[x] = iz;
 		}
 
@@ -51,8 +51,8 @@ static void draw_scanline_trans(void *dest, INT32 scanline, const poly_extent *e
 {
 	const poly_extra_data *extra = (const poly_extra_data *)extradata;
 	const cached_texture *texture = extra->texture;
-	bitmap_ind16 *destmap = (bitmap_ind16 *)dest;
-	UINT16 *p = &destmap->pix16(scanline);
+	bitmap_rgb32 *destmap = (bitmap_rgb32 *)dest;
+	UINT32 *p = &destmap->pix32(scanline);
 	UINT32 *d = &extra->zbuffer->pix32(scanline);
 	float ooz = extent->param[0].start;
 	float uoz = extent->param[1].start;
@@ -84,14 +84,14 @@ static void draw_scanline_trans(void *dest, INT32 scanline, const poly_extent *e
 			UINT32 pix10 = texture->data[(v2 << width) + u1];
 			UINT32 pix11 = texture->data[(v2 << width) + u2];
 			UINT32 texel = rgba_bilinear_filter(pix00, pix01, pix10, pix11, u, v);
-			UINT32 fr = ((texel & 0x00ff0000) * polyi) >> (8+9);
-			UINT32 fg = ((texel & 0x0000ff00) * polyi) >> (8+6);
-			UINT32 fb = ((texel & 0x000000ff) * polyi) >> (8+3);
-			UINT16 orig = p[x];
-			fr += ((orig & 0x7c00) * desttrans) >> 5;
-			fg += ((orig & 0x03e0) * desttrans) >> 5;
-			fb += ((orig & 0x001f) * desttrans) >> 5;
-			p[x] = (fr & 0x7c00) | (fg & 0x3e0) | (fb & 0x1f);
+			UINT32 fr = ((texel & 0x00ff0000) * polyi) >> 8;
+			UINT32 fg = ((texel & 0x0000ff00) * polyi) >> 8;
+			UINT32 fb = ((texel & 0x000000ff) * polyi) >> 8;
+			UINT32 orig = p[x];
+			fr += ((orig & 0x00ff0000) * desttrans) >> 5;
+			fg += ((orig & 0x0000ff00) * desttrans) >> 5;
+			fb += ((orig & 0x000000ff) * desttrans) >> 5;
+			p[x] = 0xff000000 | (fr & 0xff0000) | (fg & 0xff00) | (fb & 0xff);
 			d[x] = iz;
 		}
 
@@ -106,8 +106,8 @@ static void draw_scanline_alpha(void *dest, INT32 scanline, const poly_extent *e
 {
 	const poly_extra_data *extra = (const poly_extra_data *)extradata;
 	const cached_texture *texture = extra->texture;
-	bitmap_ind16 *destmap = (bitmap_ind16 *)dest;
-	UINT16 *p = &destmap->pix16(scanline);
+	bitmap_rgb32 *destmap = (bitmap_rgb32 *)dest;
+	UINT32 *p = &destmap->pix32(scanline);
 	UINT32 *d = &extra->zbuffer->pix32(scanline);
 	float ooz = extent->param[0].start;
 	float uoz = extent->param[1].start;
@@ -146,12 +146,12 @@ static void draw_scanline_alpha(void *dest, INT32 scanline, const poly_extent *e
 				UINT32 fr = ((texel & 0x00ff0000) * combined) >> (8+9);
 				UINT32 fg = ((texel & 0x0000ff00) * combined) >> (8+6);
 				UINT32 fb = ((texel & 0x000000ff) * combined) >> (8+3);
-				UINT16 orig = p[x];
+				UINT32 orig = p[x];
 				combined = ((255 - fa) * desttrans) >> 5;
-				fr += ((orig & 0x7c00) * combined) >> 8;
-				fg += ((orig & 0x03e0) * combined) >> 8;
-				fb += ((orig & 0x001f) * combined) >> 8;
-				p[x] = (fr & 0x7c00) | (fg & 0x3e0) | (fb & 0x1f);
+				fr += ((orig & 0x00ff0000) * combined) >> 8;
+				fg += ((orig & 0x0000ff00) * combined) >> 8;
+				fb += ((orig & 0x000000ff) * combined) >> 8;
+				p[x] = 0xff000000 | (fr & 0xff0000) | (fg & 0xff00) | (fb & 0xff);
 				d[x] = iz;
 			}
 		}
@@ -167,8 +167,8 @@ static void draw_scanline_alpha_test(void *dest, INT32 scanline, const poly_exte
 {
 	const poly_extra_data *extra = (const poly_extra_data *)extradata;
 	const cached_texture *texture = extra->texture;
-	bitmap_ind16 *destmap = (bitmap_ind16 *)dest;
-	UINT16 *p = &destmap->pix16(scanline);
+	bitmap_rgb32 *destmap = (bitmap_rgb32 *)dest;
+	UINT32 *p = &destmap->pix32(scanline);
 	UINT32 *d = &extra->zbuffer->pix32(scanline);
 	float ooz = extent->param[0].start;
 	float uoz = extent->param[1].start;
@@ -207,12 +207,12 @@ static void draw_scanline_alpha_test(void *dest, INT32 scanline, const poly_exte
 				UINT32 fr = ((texel & 0x00ff0000) * combined) >> (8+9);
 				UINT32 fg = ((texel & 0x0000ff00) * combined) >> (8+6);
 				UINT32 fb = ((texel & 0x000000ff) * combined) >> (8+3);
-				UINT16 orig = p[x];
+				UINT32 orig = p[x];
 				combined = ((255 - fa) * desttrans) >> 8;
-				fr += ((orig & 0x7c00) * combined) >> 5;
-				fg += ((orig & 0x03e0) * combined) >> 5;
-				fb += ((orig & 0x001f) * combined) >> 5;
-				p[x] = (fr & 0x7c00) | (fg & 0x3e0) | (fb & 0x1f);
+				fr += ((orig & 0x00ff0000) * combined) >> 5;
+				fg += ((orig & 0x0000ff00) * combined) >> 5;
+				fb += ((orig & 0x000000ff) * combined) >> 5;
+				p[x] = 0xff000000 | (fr & 0xff0000) | (fg & 0xff00) | (fb & 0xff);
 				d[x] = iz;
 			}
 		}
@@ -226,14 +226,14 @@ static void draw_scanline_alpha_test(void *dest, INT32 scanline, const poly_exte
 static void draw_scanline_color(void *dest, INT32 scanline, const poly_extent *extent, const void *extradata, int threadid)
 {
 	const poly_extra_data *extra = (const poly_extra_data *)extradata;
-	bitmap_ind16 *destmap = (bitmap_ind16 *)dest;
-	UINT16 *p = &destmap->pix16(scanline);
+	bitmap_rgb32 *destmap = (bitmap_rgb32 *)dest;
+	UINT32 *p = &destmap->pix32(scanline);
 	UINT32 *d = &extra->zbuffer->pix32(scanline);
 	float ooz = extent->param[0].start;
 	float doozdx = extent->param[0].dpdx;
-	int fr = extra->color & 0x7c00;
-	int fg = extra->color & 0x03e0;
-	int fb = extra->color & 0x001f;
+	int fr = (extra->color & 0x7c00) << 9;
+	int fg = (extra->color & 0x03e0) << 6;
+	int fb = (extra->color & 0x001f) << 3;
 	int x;
 
 	// apply intensity
@@ -272,12 +272,12 @@ static void draw_scanline_color(void *dest, INT32 scanline, const poly_extent *e
 			UINT32 iz = ooz * 256.0f;
 			if (iz > d[x])
 			{
-				UINT16 orig = p[x];
-				int r = fr + (((orig & 0x7c00) * polytrans) >> 5);
-				int g = fg + (((orig & 0x03e0) * polytrans) >> 5);
-				int b = fb + (((orig & 0x001f) * polytrans) >> 5);
+				UINT32 orig = p[x];
+				int r = fr + (((orig & 0x00ff0000) * polytrans) >> 5);
+				int g = fg + (((orig & 0x0000ff00) * polytrans) >> 5);
+				int b = fb + (((orig & 0x000000ff) * polytrans) >> 5);
 
-				p[x] = (r & 0x7c00) | (g & 0x3e0) | (b & 0x1f);
+				p[x] = 0xff000000 | (r & 0xff0000) | (g & 0xff00) | (b & 0xff);
 				d[x] = iz;
 			}
 			ooz += doozdx;

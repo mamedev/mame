@@ -62,6 +62,63 @@ static const int num_bits[16] = { 0, 1, 1, 2, 1, 2, 2, 3, 1, 2, 2, 3, 2, 3, 3, 4
 
 void model3_state::model3_exit()
 {
+#if 0
+	FILE* file;
+	int i;
+	file = fopen("m3_texture_ram.bin","wb");
+    for (i=0; i < 0x200000; i++)
+    {
+        fputc((UINT8)(m_texture_ram[0][i] >> 8), file);
+        fputc((UINT8)(m_texture_ram[0][i] >> 0), file);
+    }
+	for (i=0; i < 0x200000; i++)
+    {
+        fputc((UINT8)(m_texture_ram[1][i] >> 8), file);
+        fputc((UINT8)(m_texture_ram[1][i] >> 0), file);
+    }
+    fclose(file);
+
+    file = fopen("m3_displist.bin","wb");
+    for (i=0; i < 0x40000; i++)
+    {
+        fputc((UINT8)(m_display_list_ram[i] >> 24), file);
+        fputc((UINT8)(m_display_list_ram[i] >> 16), file);
+        fputc((UINT8)(m_display_list_ram[i] >> 8), file);
+        fputc((UINT8)(m_display_list_ram[i] >> 0), file);
+    }
+    fclose(file);
+
+	file = fopen("m3_culling_ram.bin","wb");
+    for (i=0; i < 0x100000; i++)
+    {
+        fputc((UINT8)(m_culling_ram[i] >> 24), file);
+        fputc((UINT8)(m_culling_ram[i] >> 16), file);
+        fputc((UINT8)(m_culling_ram[i] >> 8), file);
+        fputc((UINT8)(m_culling_ram[i] >> 0), file);
+    }
+    fclose(file);
+
+	file = fopen("m3_polygon_ram.bin","wb");
+    for (i=0; i < 0x100000; i++)
+    {
+        fputc((UINT8)(m_polygon_ram[i] >> 24), file);
+        fputc((UINT8)(m_polygon_ram[i] >> 16), file);
+        fputc((UINT8)(m_polygon_ram[i] >> 8), file);
+        fputc((UINT8)(m_polygon_ram[i] >> 0), file);
+    }
+    fclose(file);
+
+	file = fopen("m3_vrom.bin","wb");
+    for (i=0; i < 0x1000000; i++)
+    {
+        fputc((UINT8)(m_vrom[i] >> 24), file);
+        fputc((UINT8)(m_vrom[i] >> 16), file);
+        fputc((UINT8)(m_vrom[i] >> 8), file);
+        fputc((UINT8)(m_vrom[i] >> 0), file);
+    }
+    fclose(file);
+#endif
+
 	invalidate_texture(0, 0, 0, 6, 5);
 	invalidate_texture(1, 0, 0, 6, 5);
 	poly_free(m_poly);
@@ -69,6 +126,28 @@ void model3_state::model3_exit()
 
 void model3_state::video_start()
 {
+	static const gfx_layout char4_layout =
+	{
+		8, 8,
+		30720,
+		4,
+		{ 0,1,2,3 },
+		{ 0*4, 1*4, 2*4, 3*4, 4*4, 5*4, 6*4, 7*4 },
+		{ 1*32, 0*32, 3*32, 2*32, 5*32, 4*32, 7*32, 6*32 },
+		4 * 8*8
+	};
+
+	static const gfx_layout char8_layout =
+	{
+		8, 8,
+		15360,
+		8,
+		{ 0,1,2,3,4,5,6,7 },
+		{ 4*8, 5*8, 6*8, 7*8, 0*8, 1*8, 2*8, 3*8 },
+		{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64 },
+		8 * 8*8
+	};
+
 	m_poly = poly_alloc(machine(), 4000, sizeof(poly_extra_data), 0);
 	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(model3_state::model3_exit), this));
 
@@ -77,8 +156,6 @@ void model3_state::video_start()
 
 	m_m3_char_ram = auto_alloc_array_clear(machine(), UINT64, 0x100000/8);
 	m_m3_tile_ram = auto_alloc_array_clear(machine(), UINT64, 0x8000/8);
-
-	m_pal_lookup = auto_alloc_array_clear(machine(), UINT16, 65536);
 
 	m_texture_fifo = auto_alloc_array_clear(machine(), UINT32, 0x100000/4);
 
@@ -103,74 +180,51 @@ void model3_state::video_start()
 	m_viewport_region_width = 496;
 	m_viewport_region_height = 384;
 
+	m_layer4[0] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(model3_state::tile_info_layer0_4bit), this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_layer8[0] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(model3_state::tile_info_layer0_8bit), this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_layer4[1] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(model3_state::tile_info_layer1_4bit), this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_layer8[1] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(model3_state::tile_info_layer1_8bit), this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_layer4[2] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(model3_state::tile_info_layer2_4bit), this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_layer8[2] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(model3_state::tile_info_layer2_8bit), this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_layer4[3] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(model3_state::tile_info_layer3_4bit), this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_layer8[3] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(model3_state::tile_info_layer3_8bit), this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+
+	// 4-bit tiles
+	m_gfxdecode->set_gfx(0, global_alloc(gfx_element(m_palette, char4_layout, (UINT8*)m_m3_char_ram, 0, m_palette->entries() / 16, 0)));
+
+	// 8-bit tiles
+	m_gfxdecode->set_gfx(1, global_alloc(gfx_element(m_palette, char8_layout, (UINT8*)m_m3_char_ram, 0, m_palette->entries() / 256, 0)));
+
 	init_matrix_stack();
 }
 
-void model3_state::draw_tile_4bit(bitmap_ind16 &bitmap, int tx, int ty, int tilenum)
-{
-	int x, y;
-	UINT8 *tile_base = (UINT8*)m_m3_char_ram;
-	UINT8 *tile;
+#define MODEL3_TILE_INFO4(address)	\
+do { \
+	UINT16 *tiles = (UINT16*)&m_m3_tile_ram[address + (tile_index / 4)];	\
+	UINT16 t = BYTE_REVERSE16(tiles[(tile_index & 3) ^ NATIVE_ENDIAN_VALUE_LE_BE(2,0)]); \
+	int tile = ((t << 1) & 0x7ffe) | ((t >> 15) & 0x1); \
+	int color = (t & 0x7ff0) >> 4; \
+	SET_TILE_INFO_MEMBER(0, tile, color, 0); \
+} while (0)
 
-	int data = (BYTE_REVERSE16(tilenum));
-	int c = data & 0x7ff0;
-	int tile_index = ((data << 1) & 0x7ffe) | ((data >> 15) & 0x1);
-	tile_index *= 32;
+#define MODEL3_TILE_INFO8(address)	\
+do { \
+	UINT16 *tiles = (UINT16*)&m_m3_tile_ram[address + (tile_index / 4)];	\
+	UINT16 t = BYTE_REVERSE16(tiles[(tile_index & 3) ^ NATIVE_ENDIAN_VALUE_LE_BE(2,0)]); \
+	int tile = ((t << 1) & 0x7ffe) | ((t >> 15) & 0x1); \
+	int color = (t & 0x7f00) >> 8; \
+	SET_TILE_INFO_MEMBER(1, tile >> 1, color, 0); \
+} while (0)
 
-	tile = &tile_base[tile_index];
+TILE_GET_INFO_MEMBER(model3_state::tile_info_layer0_4bit) { MODEL3_TILE_INFO4(0x000); }
+TILE_GET_INFO_MEMBER(model3_state::tile_info_layer0_8bit) { MODEL3_TILE_INFO8(0x000); }
+TILE_GET_INFO_MEMBER(model3_state::tile_info_layer1_4bit) { MODEL3_TILE_INFO4(0x400); }
+TILE_GET_INFO_MEMBER(model3_state::tile_info_layer1_8bit) { MODEL3_TILE_INFO8(0x400); }
+TILE_GET_INFO_MEMBER(model3_state::tile_info_layer2_4bit) { MODEL3_TILE_INFO4(0x800); }
+TILE_GET_INFO_MEMBER(model3_state::tile_info_layer2_8bit) { MODEL3_TILE_INFO8(0x800); }
+TILE_GET_INFO_MEMBER(model3_state::tile_info_layer3_4bit) { MODEL3_TILE_INFO4(0xc00); }
+TILE_GET_INFO_MEMBER(model3_state::tile_info_layer3_8bit) { MODEL3_TILE_INFO8(0xc00); }
 
-	for(y = ty; y < ty+8; y++) {
-		UINT16 *d = &bitmap.pix16(y^1);
-		for(x = tx; x < tx+8; x+=2) {
-			UINT8 tile0, tile1;
-			UINT16 pix0, pix1;
-			tile0 = *tile >> 4;
-			tile1 = *tile & 0xf;
-			pix0 = m_pal_lookup[c + tile0];
-			pix1 = m_pal_lookup[c + tile1];
-			if((pix0 & 0x8000) == 0)
-			{
-				d[x+0] = pix0;
-			}
-			if((pix1 & 0x8000) == 0)
-			{
-				d[x+1] = pix1;
-			}
-			++tile;
-		}
-	}
-}
-
-void model3_state::draw_tile_8bit(bitmap_ind16 &bitmap, int tx, int ty, int tilenum)
-{
-	int x, y;
-	UINT8 *tile_base = (UINT8*)m_m3_char_ram;
-	UINT8 *tile;
-
-	int data = (BYTE_REVERSE16(tilenum));
-	int c = data & 0x7f00;
-	int tile_index = ((data << 1) & 0x7ffe) | ((data >> 15) & 0x1);
-	tile_index *= 32;
-
-	tile = &tile_base[tile_index];
-
-	for(y = ty; y < ty+8; y++) {
-		UINT16 *d = &bitmap.pix16(y);
-		int xx = 0;
-		for(x = tx; x < tx+8; x++) {
-			UINT8 tile0;
-			UINT16 pix;
-			tile0 = tile[xx^4];
-			pix = m_pal_lookup[c + tile0];
-			if((pix & 0x8000) == 0)
-			{
-				d[x] = pix;
-			}
-			++xx;
-		}
-		tile += 8;
-	}
-}
 #ifdef UNUSED_FUNCTION
 void model3_state::draw_texture_sheet(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
@@ -190,100 +244,54 @@ void model3_state::draw_texture_sheet(bitmap_ind16 &bitmap, const rectangle &cli
 }
 #endif
 
-void model3_state::draw_layer(bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int bitdepth)
+void model3_state::draw_layer(bitmap_rgb32 &bitmap, const rectangle &cliprect, int layer, int bitdepth, int sx, int sy)
 {
-	int x, y;
-	int tile_index = 0;
-	UINT16 *tiles = (UINT16*)&m_m3_tile_ram[layer * 0x400];
+	tilemap_t *tmap = bitdepth ? m_layer4[layer] : m_layer8[layer];
+	bitmap_ind16 &pixmap = tmap->pixmap();
+	const pen_t *pens = m_palette->pens();
 
-	//logerror("Layer %d: X: %d, Y: %d\n", layer, x1, y1);
+	UINT32* palram = (UINT32*)&m_paletteram64[0];
 
-	if(layer > 1) {
-		int modr = (m_layer_modulate2 >> 8) & 0xff;
-		int modg = (m_layer_modulate2 >> 16) & 0xff;
-		int modb = (m_layer_modulate2 >> 24) & 0xff;
-		if(modr & 0x80) {
-			m_layer_modulate_r = -(0x7f - (modr & 0x7f)) << 10;
-		} else {
-			m_layer_modulate_r = (modr & 0x7f) << 10;
-		}
-		if(modg & 0x80) {
-			m_layer_modulate_g = -(0x7f - (modr & 0x7f)) << 5;
-		} else {
-			m_layer_modulate_g = (modr & 0x7f) << 5;
-		}
-		if(modb & 0x80) {
-			m_layer_modulate_b = -(0x7f - (modr & 0x7f));
-		} else {
-			m_layer_modulate_b = (modr & 0x7f);
-		}
-	} else {
-		int modr = (m_layer_modulate1 >> 8) & 0xff;
-		int modg = (m_layer_modulate1 >> 16) & 0xff;
-		int modb = (m_layer_modulate1 >> 24) & 0xff;
-		if(modr & 0x80) {
-			m_layer_modulate_r = -(0x7f - (modr & 0x7f)) << 10;
-		} else {
-			m_layer_modulate_r = (modr & 0x7f) << 10;
-		}
-		if(modg & 0x80) {
-			m_layer_modulate_g = -(0x7f - (modr & 0x7f)) << 5;
-		} else {
-			m_layer_modulate_g = (modr & 0x7f) << 5;
-		}
-		if(modb & 0x80) {
-			m_layer_modulate_b = -(0x7f - (modr & 0x7f));
-		} else {
-			m_layer_modulate_b = (modr & 0x7f);
-		}
+	int x1 = cliprect.min_x;
+	int y1 = cliprect.min_y;
+	int x2 = cliprect.max_x;
+	int y2 = cliprect.max_y;
+
+	int ix = sx;
+	int iy = sy;
+	if (ix < 0)
+	{
+		ix = 0 - ix;
+	}
+	if (iy < 0)
+	{
+		iy = 0 - iy;
 	}
 
-	if(bitdepth)        /* 4-bit */
+	for (int y = y1; y <= y2; y++)
 	{
-		for(y = cliprect.min_y; y <= cliprect.max_y; y+=8)
+		UINT32* dst = &bitmap.pix32(y);
+		UINT16* src = &pixmap.pix16(iy & 0x1ff);
+
+		int iix = ix;
+
+		for (int x = x1; x <= x2; x++)
 		{
-			tile_index = ((y/8) * 64);
-			for (x = cliprect.min_x; x <= cliprect.max_x; x+=8) {
-				UINT16 tile = tiles[tile_index ^ 0x2];
-				draw_tile_4bit(bitmap, x, y, tile);
-				++tile_index;
+			UINT16 p0 = src[iix & 0x1ff];
+			if ((palram[p0^NATIVE_ENDIAN_VALUE_LE_BE(1,0)] & NATIVE_ENDIAN_VALUE_LE_BE(0x00800000,0x00008000)) == 0)
+			{
+				*dst = pens[p0];
 			}
+			dst++;
+			iix++;
 		}
-	}
-	else                /* 8-bit */
-	{
-		for(y = cliprect.min_y; y <= cliprect.max_y; y+=8)
-		{
-			tile_index = ((y/8) * 64);
-			for (x = cliprect.min_x; x <= cliprect.max_x; x+=8) {
-				UINT16 tile = tiles[tile_index ^ 0x2];
-				draw_tile_8bit(bitmap, x, y, tile);
-				++tile_index;
-			}
-		}
+
+		iy++;
 	}
 }
 
-#ifdef UNUSED_FUNCTION
-static void copy_screen(bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 model3_state::screen_update_model3(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	int x,y;
-	for(y=cliprect.min_y; y <= cliprect.max_y; y++) {
-		UINT16 *d = &bitmap.pix16(y);
-		UINT16 *s = &m_bitmap3d.pix16(y);
-		for(x=cliprect.min_x; x <= cliprect.max_x; x++) {
-			UINT16 pix = s[x];
-			if(!(pix & 0x8000)) {
-				d[x] = pix;
-			}
-		}
-	}
-}
-#endif
-
-UINT32 model3_state::screen_update_model3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-#if 0
 	int layer_scroll_x[4], layer_scroll_y[4];
 	UINT32 layer_data[4];
 
@@ -291,65 +299,42 @@ UINT32 model3_state::screen_update_model3(screen_device &screen, bitmap_ind16 &b
 	layer_data[1] = BYTE_REVERSE32((UINT32)(m_layer_scroll[0] >> 0));
 	layer_data[2] = BYTE_REVERSE32((UINT32)(m_layer_scroll[1] >> 32));
 	layer_data[3] = BYTE_REVERSE32((UINT32)(m_layer_scroll[1] >> 0));
-	layer_scroll_x[0] = (layer_data[0] & 0x8000) ? (layer_data[0] & 0x1ff) : -(layer_data[0] & 0x1ff);
-	layer_scroll_y[0] = (layer_data[0] & 0x8000) ? (layer_data[0] & 0x1ff) : -(layer_data[0] & 0x1ff);
-	layer_scroll_x[1] = (layer_data[1] & 0x8000) ? (layer_data[1] & 0x1ff) : -(layer_data[1] & 0x1ff);
-	layer_scroll_y[1] = (layer_data[1] & 0x8000) ? (layer_data[1] & 0x1ff) : -(layer_data[1] & 0x1ff);
-	layer_scroll_x[2] = (layer_data[2] & 0x8000) ? (layer_data[2] & 0x1ff) : -(layer_data[2] & 0x1ff);
-	layer_scroll_y[2] = (layer_data[2] & 0x8000) ? (layer_data[2] & 0x1ff) : -(layer_data[2] & 0x1ff);
-	layer_scroll_x[3] = (layer_data[3] & 0x8000) ? (layer_data[3] & 0x1ff) : -(layer_data[3] & 0x1ff);
-	layer_scroll_y[3] = (layer_data[3] & 0x8000) ? (layer_data[3] & 0x1ff) : -(layer_data[3] & 0x1ff);
-#endif
+	layer_scroll_x[0] = layer_data[0] & 0x1ff;
+	layer_scroll_y[0] = (layer_data[0] >> 16) & 0x1ff;
+	layer_scroll_x[1] = layer_data[1] & 0x1ff;
+	layer_scroll_y[1] = (layer_data[1] >> 16) & 0x1ff;
+	layer_scroll_x[2] = layer_data[2] & 0x1ff;
+	layer_scroll_y[2] = (layer_data[2] >> 16) & 0x1ff;
+	layer_scroll_x[3] = layer_data[3] & 0x1ff;
+	layer_scroll_y[3] = (layer_data[3] >> 16) & 0x1ff;
+
 	m_screen_clip = (rectangle*)&cliprect;
-
 	m_clip3d = cliprect;
-
-	/* layer disable debug keys */
-	m_tick++;
-	if( m_tick >= 5 ) {
-		m_tick = 0;
-
-		if( machine().input().code_pressed(KEYCODE_Y) )
-			m_debug_layer_disable ^= 0x1;
-		if( machine().input().code_pressed(KEYCODE_U) )
-			m_debug_layer_disable ^= 0x2;
-		if( machine().input().code_pressed(KEYCODE_I) )
-			m_debug_layer_disable ^= 0x4;
-		if( machine().input().code_pressed(KEYCODE_O) )
-			m_debug_layer_disable ^= 0x8;
-		if( machine().input().code_pressed(KEYCODE_T) )
-			m_debug_layer_disable ^= 0x10;
-	}
 
 	bitmap.fill(0, cliprect);
 
-	if (!(m_debug_layer_disable & 0x8))
-		draw_layer(bitmap, cliprect, 3, (m_layer_enable >> 3) & 0x1);
+	// render enabled layers with priority 0
+	if ((layer_data[3] & 0x80000000) && (m_layer_priority & 0x8) == 0)
+		draw_layer(bitmap, cliprect, 3, m_layer_priority & 0x80, layer_scroll_x[3], layer_scroll_y[3]);
+	if ((layer_data[2] & 0x80000000) && (m_layer_priority & 0x4) == 0)
+		draw_layer(bitmap, cliprect, 2, m_layer_priority & 0x40, layer_scroll_x[2], layer_scroll_y[2]);
+	if ((layer_data[1] & 0x80000000) && (m_layer_priority & 0x2) == 0)
+		draw_layer(bitmap, cliprect, 1, m_layer_priority & 0x20, layer_scroll_x[1], layer_scroll_y[1]);
+	if ((layer_data[0] & 0x80000000) && (m_layer_priority & 0x1) == 0)
+		draw_layer(bitmap, cliprect, 0, m_layer_priority & 0x10, layer_scroll_x[0], layer_scroll_y[0]);
 
-	if (!(m_debug_layer_disable & 0x4))
-		draw_layer(bitmap, cliprect, 2, (m_layer_enable >> 2) & 0x1);
+	// render 3D
+	draw_3d_layer(bitmap, cliprect);
 
-	if( !(m_debug_layer_disable & 0x10) )
-	{
-#if 0
-		if(m_real3d_display_list) {
-			m_zbuffer.fill(0, cliprect);
-			m_bitmap3d.fill(0x8000, cliprect);
-			real3d_traverse_display_list();
-		}
-#endif
-		copybitmap_trans(bitmap, m_bitmap3d, 0, 0, 0, 0, cliprect, 0x8000);
-	}
-
-	if (!(m_debug_layer_disable & 0x2))
-		draw_layer(bitmap, cliprect, 1, (m_layer_enable >> 1) & 0x1);
-
-	if (!(m_debug_layer_disable & 0x1))
-		draw_layer(bitmap, cliprect, 0, (m_layer_enable >> 0) & 0x1);
-
-	//copy_screen(bitmap, cliprect);
-
-	//draw_texture_sheet(bitmap, cliprect);
+	// render enabled layers with priority 1
+	if ((layer_data[3] & 0x80000000) && (m_layer_priority & 0x8) != 0)
+		draw_layer(bitmap, cliprect, 3, m_layer_priority & 0x80, layer_scroll_x[3], layer_scroll_y[3]);
+	if ((layer_data[2] & 0x80000000) && (m_layer_priority & 0x4) != 0)
+		draw_layer(bitmap, cliprect, 2, m_layer_priority & 0x40, layer_scroll_x[2], layer_scroll_y[2]);
+	if ((layer_data[1] & 0x80000000) && (m_layer_priority & 0x2) != 0)
+		draw_layer(bitmap, cliprect, 1, m_layer_priority & 0x20, layer_scroll_x[1], layer_scroll_y[1]);
+	if ((layer_data[0] & 0x80000000) && (m_layer_priority & 0x1) != 0)
+		draw_layer(bitmap, cliprect, 0, m_layer_priority & 0x10, layer_scroll_x[0], layer_scroll_y[0]);
 
 	m_real3d_display_list = 0;
 	return 0;
@@ -365,6 +350,8 @@ READ64_MEMBER(model3_state::model3_char_r)
 WRITE64_MEMBER(model3_state::model3_char_w)
 {
 	COMBINE_DATA(&m_m3_char_ram[offset]);
+	m_gfxdecode->gfx(0)->mark_dirty(offset / 4);
+	m_gfxdecode->gfx(1)->mark_dirty(offset / 8);
 }
 
 READ64_MEMBER(model3_state::model3_tile_r)
@@ -375,7 +362,75 @@ READ64_MEMBER(model3_state::model3_tile_r)
 WRITE64_MEMBER(model3_state::model3_tile_w)
 {
 	COMBINE_DATA(&m_m3_tile_ram[offset]);
+
+	/*
+	m_layer4[0]->mark_all_dirty();
+	m_layer8[0]->mark_all_dirty();
+	m_layer4[1]->mark_all_dirty();
+	m_layer8[1]->mark_all_dirty();
+	m_layer4[2]->mark_all_dirty();
+	m_layer8[2]->mark_all_dirty();
+	m_layer4[3]->mark_all_dirty();
+	m_layer8[3]->mark_all_dirty();
+	*/
+
+	int layer = (offset >> 10) & 0x3;
+	int tile = (offset & 0x3ff) * 4;
+	m_layer4[layer]->mark_tile_dirty(tile+0);
+	m_layer4[layer]->mark_tile_dirty(tile+1);
+	m_layer4[layer]->mark_tile_dirty(tile+2);
+	m_layer4[layer]->mark_tile_dirty(tile+3);
+	m_layer8[layer]->mark_tile_dirty(tile+0);
+	m_layer8[layer]->mark_tile_dirty(tile+1);
+	m_layer8[layer]->mark_tile_dirty(tile+2);
+	m_layer8[layer]->mark_tile_dirty(tile+3);
 }
+
+/*
+	Video registers:
+
+	0xF1180000:			?
+	0xF1180004:			?
+	0xF1180008:			?
+
+	0xF1180010:												VBL IRQ acknowledge
+
+	0xF1180020:			-------- x------- -------- -------- Layer 3 bitdepth (0 = 8-bit, 1 = 4-bit)
+						-------- -x------ -------- -------- Layer 2 bitdepth (0 = 8-bit, 1 = 4-bit)
+						-------- --x----- -------- -------- Layer 1 bitdepth (0 = 8-bit, 1 = 4-bit)
+						-------- ---x---- -------- -------- Layer 0 bitdepth (0 = 8-bit, 1 = 4-bit)
+						-------- ----x--- -------- -------- Layer 3 priority (0 = below 3D, 1 = above 3D)
+						-------- -----x-- -------- -------- Layer 2 priority (0 = below 3D, 1 = above 3D)
+						-------- ------x- -------- -------- Layer 1 priority (0 = below 3D, 1 = above 3D)
+						-------- -------x -------- -------- Layer 0 priority (0 = below 3D, 1 = above 3D)
+
+	0xF1180040:												Foreground layer color modulation?
+						-------- xxxxxxxx -------- -------- Red component
+						-------- -------- xxxxxxxx -------- Green component
+						-------- -------- -------- xxxxxxxx Blue component
+
+	0xF1180044:												Background layer color modulation?
+						-------- xxxxxxxx -------- -------- Red component
+						-------- -------- xxxxxxxx -------- Green component
+						-------- -------- -------- xxxxxxxx Blue component
+
+	0xF1180060:			x------- -------- -------- -------- Layer 0 enable
+						-------x xxxxxxxx -------- -------- Layer 0 Y scroll position
+						-------- -------- -------x xxxxxxxx Layer 0 X scroll position
+
+	0xF1180064:			x------- -------- -------- -------- Layer 1 enable
+						-------x xxxxxxxx -------- -------- Layer 1 Y scroll position
+						-------- -------- -------x xxxxxxxx Layer 1 X scroll position
+
+	0xF1180068:			x------- -------- -------- -------- Layer 2 enable
+						-------x xxxxxxxx -------- -------- Layer 2 Y scroll position
+						-------- -------- -------x xxxxxxxx Layer 2 X scroll position
+
+	0xF118006C:			x------- -------- -------- -------- Layer 3 enable
+						-------x xxxxxxxx -------- -------- Layer 3 Y scroll position
+						-------- -------- -------x xxxxxxxx Layer 3 X scroll position
+*/
+
 
 READ64_MEMBER(model3_state::model3_vid_reg_r)
 {
@@ -383,7 +438,7 @@ READ64_MEMBER(model3_state::model3_vid_reg_r)
 	{
 		case 0x00/8:    return m_vid_reg0;
 		case 0x08/8:    return U64(0xffffffffffffffff);     /* ??? */
-		case 0x20/8:    return (UINT64)m_layer_enable << 52;
+		case 0x20/8:    return (UINT64)m_layer_priority << 48;
 		case 0x40/8:    return ((UINT64)m_layer_modulate1 << 32) | (UINT64)m_layer_modulate2;
 		default:        logerror("read reg %02X\n", offset);break;
 	}
@@ -398,7 +453,7 @@ WRITE64_MEMBER(model3_state::model3_vid_reg_w)
 		case 0x08/8:    break;      /* ??? */
 		case 0x10/8:    set_irq_line((data >> 56) & 0x0f, CLEAR_LINE); break;     /* VBL IRQ Ack */
 
-		case 0x20/8:    m_layer_enable = (data >> 52);  break;
+		case 0x20/8:    m_layer_priority = (data >> 48); break;
 
 		case 0x40/8:    m_layer_modulate1 = (UINT32)(data >> 32);
 						m_layer_modulate2 = (UINT32)(data);
@@ -411,22 +466,12 @@ WRITE64_MEMBER(model3_state::model3_vid_reg_w)
 
 WRITE64_MEMBER(model3_state::model3_palette_w)
 {
-	int r1,g1,b1,r2,g2,b2;
-	UINT32 data1,data2;
-
 	COMBINE_DATA(&m_paletteram64[offset]);
-	data1 = BYTE_REVERSE32((UINT32)(m_paletteram64[offset] >> 32));
-	data2 = BYTE_REVERSE32((UINT32)(m_paletteram64[offset] >> 0));
+	UINT32 data1 = BYTE_REVERSE32((UINT32)(m_paletteram64[offset] >> 32));
+	UINT32 data2 = BYTE_REVERSE32((UINT32)(m_paletteram64[offset] >> 0));
 
-	r1 = ((data1 >> 0) & 0x1f);
-	g1 = ((data1 >> 5) & 0x1f);
-	b1 = ((data1 >> 10) & 0x1f);
-	r2 = ((data2 >> 0) & 0x1f);
-	g2 = ((data2 >> 5) & 0x1f);
-	b2 = ((data2 >> 10) & 0x1f);
-
-	m_pal_lookup[(offset*2)+0] = (data1 & 0x8000) | (r1 << 10) | (g1 << 5) | b1;
-	m_pal_lookup[(offset*2)+1] = (data2 & 0x8000) | (r2 << 10) | (g2 << 5) | b2;
+	m_palette->set_pen_color((offset*2)+0, pal5bit(data1 >> 0), pal5bit(data1 >> 5), pal5bit(data1 >> 10));
+	m_palette->set_pen_color((offset*2)+1, pal5bit(data2 >> 0), pal5bit(data2 >> 5), pal5bit(data2 >> 10));
 }
 
 READ64_MEMBER(model3_state::model3_palette_r)
@@ -707,10 +752,11 @@ void model3_state::real3d_display_list_end()
 		};
 	}
 	m_texture_fifo_pos = 0;
+
 	m_zbuffer.fill(0);
-	m_bitmap3d.fill(0x8000);
-	real3d_traverse_display_list();
-	//m_real3d_display_list = 1;
+	m_bitmap3d.fill(0);
+	
+	real3d_traverse_display_list();	
 }
 
 void model3_state::real3d_display_list1_dma(UINT32 src, UINT32 dst, int length, int byteswap)
@@ -1419,12 +1465,10 @@ void model3_state::draw_viewport(int pri, UINT32 address)
 	float /*fov_x,*/ fov_y;
 
 	link_address = node[1];
-	if (link_address == 0)
-		return;
 
 	/* traverse to the link node before drawing this viewport */
 	/* check this is correct as this affects the rendering order */
-	if (link_address != 0x01000000)
+	if (link_address != 0x01000000 && link_address != 0)
 		draw_viewport(pri, link_address);
 
 	/* skip if this isn't the right priority */
@@ -1481,4 +1525,23 @@ void model3_state::real3d_traverse_display_list()
 		draw_viewport(pri, 0x800000);
 
 	poly_wait(m_poly, "real3d_traverse_display_list");
+}
+
+void model3_state::draw_3d_layer(bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	int i, j;
+
+	for (j = cliprect.min_y; j <= cliprect.max_y; ++j)
+	{
+		UINT32 *dst = &bitmap.pix32(j);
+		UINT32 *src = &m_bitmap3d.pix32(j);
+
+		for (i = cliprect.min_x; i <= cliprect.max_x; ++i)
+		{
+			if (src[i] & 0xff000000)
+			{
+				dst[i] = src[i];
+			}
+		}
+	}
 }

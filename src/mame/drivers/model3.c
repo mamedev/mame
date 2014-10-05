@@ -5418,9 +5418,9 @@ static MACHINE_CONFIG_START( model3_10, model3_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 495, 0, 383)
 	MCFG_SCREEN_SIZE(512, 400)
 	MCFG_SCREEN_UPDATE_DRIVER(model3_state, screen_update_model3)
-	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD_RRRRRGGGGGBBBBB("palette")
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
 
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -5463,9 +5463,9 @@ static MACHINE_CONFIG_START( model3_15, model3_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 495, 0, 383)
 	MCFG_SCREEN_SIZE(496, 400)
 	MCFG_SCREEN_UPDATE_DRIVER(model3_state, screen_update_model3)
-	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD_RRRRRGGGGGBBBBB("palette")
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
 
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -5514,9 +5514,9 @@ static MACHINE_CONFIG_START( model3_20, model3_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 495, 0, 383)
 	MCFG_SCREEN_SIZE(496, 400)
 	MCFG_SCREEN_UPDATE_DRIVER(model3_state, screen_update_model3)
-	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD_RRRRRGGGGGBBBBB("palette")
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
 
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -5552,10 +5552,9 @@ static MACHINE_CONFIG_START( model3_21, model3_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 495, 0, 383)
 	MCFG_SCREEN_SIZE(496, 400)
 	MCFG_SCREEN_UPDATE_DRIVER(model3_state, screen_update_model3)
-	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD_RRRRRGGGGGBBBBB("palette")
-
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MCFG_SOUND_ADD("scsp1", SCSP, 0)

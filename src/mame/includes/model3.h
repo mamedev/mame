@@ -29,7 +29,9 @@ public:
 		m_work_ram(*this, "work_ram"),
 		m_paletteram64(*this, "paletteram64"),
 		m_dsbz80(*this, DSBZ80_TAG),
-		m_soundram(*this, "soundram") { }
+		m_soundram(*this, "soundram"),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette") { }
 
 	struct TRIANGLE
 	{
@@ -53,6 +55,12 @@ public:
 	required_shared_ptr<UINT64> m_paletteram64;
 	optional_device<dsbz80_device> m_dsbz80;    // Z80-based MPEG Digital Sound Board
 	required_shared_ptr<UINT16> m_soundram;
+
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+
+	tilemap_t *m_layer4[4];
+	tilemap_t *m_layer8[4];
 
 	int m_sound_irq_enable;
 	emu_timer *m_sound_timer;
@@ -93,7 +101,7 @@ public:
 	UINT8 m_id_data[32];
 	INT32 m_id_size;
 	int m_tdo;
-	UINT8 m_layer_enable;
+	UINT8 m_layer_priority;
 	UINT32 m_layer_modulate_r;
 	UINT32 m_layer_modulate_g;
 	UINT32 m_layer_modulate_b;
@@ -108,9 +116,8 @@ public:
 	UINT32 *m_display_list_ram;
 	UINT32 *m_culling_ram;
 	UINT32 *m_polygon_ram;
-	UINT16 *m_pal_lookup;
 	int m_real3d_display_list;
-	bitmap_ind16 m_bitmap3d;
+	bitmap_rgb32 m_bitmap3d;
 	bitmap_ind32 m_zbuffer;
 	rectangle m_clip3d;
 	rectangle *m_screen_clip;
@@ -222,7 +229,7 @@ public:
 	DECLARE_MACHINE_RESET(model3_20);
 	DECLARE_MACHINE_START(model3_21);
 	DECLARE_MACHINE_RESET(model3_21);
-	UINT32 screen_update_model3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_model3(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(model3_sound_timer_tick);
 	TIMER_DEVICE_CALLBACK_MEMBER(model3_interrupt);
 	void model3_exit();
@@ -234,9 +241,17 @@ public:
 	void set_irq_line(UINT8 bit, int line);
 	void model3_init(int step);
 	// video
-	void draw_tile_4bit(bitmap_ind16 &bitmap, int tx, int ty, int tilenum);
-	void draw_tile_8bit(bitmap_ind16 &bitmap, int tx, int ty, int tilenum);
-	void draw_layer(bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int bitdepth);
+	TILE_GET_INFO_MEMBER(tile_info_layer0_4bit);
+	TILE_GET_INFO_MEMBER(tile_info_layer1_4bit);
+	TILE_GET_INFO_MEMBER(tile_info_layer2_4bit);
+	TILE_GET_INFO_MEMBER(tile_info_layer3_4bit);
+	TILE_GET_INFO_MEMBER(tile_info_layer0_8bit);
+	TILE_GET_INFO_MEMBER(tile_info_layer1_8bit);
+	TILE_GET_INFO_MEMBER(tile_info_layer2_8bit);
+	TILE_GET_INFO_MEMBER(tile_info_layer3_8bit);
+	void draw_layers(bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void draw_layer(bitmap_rgb32 &bitmap, const rectangle &cliprect, int layer, int bitdepth, int sx, int sy);
+	void draw_3d_layer(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void invalidate_texture(int page, int texx, int texy, int texwidth, int texheight);
 	cached_texture *get_texture(int page, int texx, int texy, int texwidth, int texheight, int format);
 	inline void write_texture16(int xpos, int ypos, int width, int height, int page, UINT16 *data);
