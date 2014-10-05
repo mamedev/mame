@@ -108,6 +108,7 @@ DEVICE_ADDRESS_MAP_START(submap, 16, aw_rom_board)
 	AM_RANGE(0x08, 0x09) AM_WRITE(mpr_first_file_index_w)
 	AM_RANGE(0x0a, 0x0b) AM_WRITE(mpr_file_offsetl_w)
 	AM_RANGE(0x0c, 0x0d) AM_WRITE(mpr_file_offseth_w)
+	AM_RANGE(0x40, 0x41) AM_READWRITE(adj_offset_r, adj_offset_w)
 ADDRESS_MAP_END
 
 aw_rom_board::aw_rom_board(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
@@ -238,6 +239,7 @@ void aw_rom_board::device_start()
 	save_item(NAME(mpr_file_offset));
 	save_item(NAME(dma_offset));
 	save_item(NAME(dma_limit));
+	save_item(NAME(adjust_off));
 }
 
 void aw_rom_board::device_reset()
@@ -247,9 +249,20 @@ void aw_rom_board::device_reset()
 	mpr_record_index = 0;
 	mpr_first_file_index = 0;
 	mpr_file_offset = 0;
+	adjust_off = 0;
 
 	dma_offset = 0;
 	dma_limit  = 0;
+}
+
+READ16_MEMBER(aw_rom_board::adj_offset_r)
+{
+	return adjust_off;
+}
+
+WRITE16_MEMBER(aw_rom_board::adj_offset_w)
+{
+	adjust_off = data;
 }
 
 WRITE16_MEMBER(aw_rom_board::epr_offsetl_w)
@@ -284,7 +297,8 @@ WRITE16_MEMBER(aw_rom_board::mpr_file_offsetl_w)
 
 WRITE16_MEMBER(aw_rom_board::mpr_file_offseth_w)
 {
-	mpr_file_offset = (mpr_file_offset & 0x0000ffff) | (data << 16);
+	mpr_file_offset = ((mpr_file_offset & 0x0000ffff) | ((data -(adjust_off*0x0100))<< 16));
+
 	recalc_dma_offset(MPR_FILE);
 }
 

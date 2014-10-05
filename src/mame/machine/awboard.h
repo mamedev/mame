@@ -22,6 +22,8 @@ public:
 	DECLARE_WRITE16_MEMBER(mpr_first_file_index_w); // 5f7010
 	DECLARE_WRITE16_MEMBER(mpr_file_offsetl_w);     // 5f7014
 	DECLARE_WRITE16_MEMBER(mpr_file_offseth_w);     // 5f7018
+	DECLARE_READ16_MEMBER(adj_offset_r);			// 5f7080
+	DECLARE_WRITE16_MEMBER(adj_offset_w);			// 5f7080
 
 protected:
 	virtual void device_start();
@@ -37,7 +39,7 @@ private:
 	bool region_is_decrypted;
 
 	UINT32 epr_offset, mpr_file_offset;
-	UINT16 mpr_record_index, mpr_first_file_index;
+	UINT16 mpr_record_index, mpr_first_file_index, adjust_off;
 
 	UINT32 dma_offset, dma_limit;
 
