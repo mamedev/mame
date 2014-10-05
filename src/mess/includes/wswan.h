@@ -17,35 +17,10 @@
 
 #include "emu.h"
 #include "cpu/v30mz/v30mz.h"
-#include "imagedev/cartslot.h"
 #include "machine/nvram.h"
+#include "bus/wswan/slot.h"
+#include "bus/wswan/rom.h"
 
-
-struct EEPROM
-{
-	UINT8   mode;       /* eeprom mode */
-	UINT16  address;    /* Read/write address */
-	UINT8   command;    /* Commands: 00, 01, 02, 03, 04, 08, 0C */
-	UINT8   start;      /* start bit */
-	UINT8   write_enabled;  /* write enabled yes/no */
-	int size;       /* size of eeprom/sram area */
-	UINT8   *data;      /* pointer to start of sram/eeprom data */
-	UINT8   *page;      /* pointer to current sram/eeprom page */
-};
-
-struct RTC
-{
-	UINT8   present;    /* Is an RTC present */
-	UINT8   setting;    /* Timer setting byte */
-	UINT8   year;       /* Year */
-	UINT8   month;      /* Month */
-	UINT8   day;        /* Day */
-	UINT8   day_of_week;    /* Day of the week */
-	UINT8   hour;       /* Hour, high bit = 0 => AM, high bit = 1 => PM */
-	UINT8   minute;     /* Minute */
-	UINT8   second;     /* Second */
-	UINT8   index;      /* index for reading/writing of current of alarm time */
-};
 
 struct SoundDMA
 {
@@ -110,6 +85,7 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_sound(*this, "custom"),
+		m_cart(*this, "cartslot"),
 		m_cursx(*this, "CURSX"),
 		m_cursy(*this, "CURSY"),
 		m_buttons(*this, "BUTTONS") { }
@@ -120,19 +96,15 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<wswan_sound_device> m_sound;
-	DECLARE_READ8_MEMBER(wswan_port_r);
-	DECLARE_WRITE8_MEMBER(wswan_port_w);
-	DECLARE_READ8_MEMBER(wswan_sram_r);
-	DECLARE_WRITE8_MEMBER(wswan_sram_w);
+	required_device<ws_cart_slot_device> m_cart;
+	DECLARE_READ8_MEMBER(bios_r);
+	DECLARE_READ8_MEMBER(port_r);
+	DECLARE_WRITE8_MEMBER(port_w);
 
 	VDP m_vdp;
 	UINT8 m_ws_portram[256];
-	UINT8 *m_ROMMap[256];
-	UINT32 m_ROMBanks;
 	UINT8 m_internal_eeprom[INTERNAL_EEPROM_SIZE];
 	UINT8 m_system_type;
-	EEPROM m_eeprom;
-	RTC m_rtc;
 	SoundDMA m_sound_dma;
 	UINT8 *m_ws_ram;
 	UINT8 *m_ws_bios_bank;
@@ -140,19 +112,15 @@ public:
 	int m_pal[16][16];
 	bitmap_ind16 m_bitmap;
 	UINT8 m_rotate;
-	UINT8 m_bank_base[14];
 
 	void wswan_clear_irq_line(int irq);
+	void common_start();
 	virtual void machine_start();
 	virtual void machine_reset();
 	DECLARE_PALETTE_INIT(wswan);
 	DECLARE_MACHINE_START(wscolor);
 	DECLARE_PALETTE_INIT(wscolor);
-	TIMER_CALLBACK_MEMBER(wswan_rtc_callback);
 	TIMER_CALLBACK_MEMBER(wswan_scanline_interrupt);
-	void wswan_machine_stop();
-	DECLARE_DRIVER_INIT( wswan );
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( wswan_cart );
 
 protected:
 	/* Interrupt flags */
@@ -178,10 +146,7 @@ protected:
 	required_ioport m_cursx;
 	required_ioport m_cursy;
 	required_ioport m_buttons;
-	memory_bank *m_rom_bank[14];
 
-	void wswan_setup_bios();
-	void wswan_setup_banks();
 	void wswan_register_save();
 	void wswan_postload();
 	void wswan_handle_irqs();
@@ -193,8 +158,6 @@ protected:
 	void wswan_draw_foreground_3();
 	void wswan_handle_sprites( int mask );
 	void wswan_refresh_scanline( );
-	const char* wswan_determine_sram( UINT8 data );
-	const char* wswan_determine_romsize( UINT8 data );
 };
 
 

@@ -1393,3 +1393,15 @@ BUSOBJS += $(BUSOBJ)/vtech/ioexp/carts.o
 BUSOBJS += $(BUSOBJ)/vtech/ioexp/joystick.o
 BUSOBJS += $(BUSOBJ)/vtech/ioexp/printer.o
 endif
+
+#-------------------------------------------------
+#
+#@src/emu/bus/wswan/slot.h,BUSES += WSWAN
+#-------------------------------------------------
+
+ifneq ($(filter WSWAN,$(BUSES)),)
+OBJDIRS += $(BUSOBJ)/wswan
+BUSOBJS += $(BUSOBJ)/wswan/slot.o
+BUSOBJS += $(BUSOBJ)/wswan/rom.o
+endif
+
