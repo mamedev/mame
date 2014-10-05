@@ -104,7 +104,7 @@
 		</part>
 	</software>
 
-	<software name="ccsakura" supported="no"> <!-- freezes -->
+	<software name="ccsakura" supported="partial"> <!-- freezes if you don't press Start immediately -->
 		<description>Cardcaptor Sakura - Sakura to Fushigi na Clow Card</description>
 		<year>1999</year>
 		<publisher>Bandai</publisher>
@@ -172,7 +172,7 @@
 		</part>
 	</software>
 
-	<software name="youfumak" supported="no"> <!-- freezes -->
+	<software name="youfumak"> <!-- needs initialized SRAM? -->
 		<description>Chou Denki Card Game - Youfu Makai - Kikuchi Shuukou</description>
 		<year>1999</year>
 		<publisher>Kobunsha</publisher>
@@ -189,7 +189,7 @@
 		</part>
 	</software>
 
-	<software name="clocktow" supported="no"> <!-- freezes -->
+	<software name="clocktow" supported="no"> <!-- freezes short after starting a game -->
 		<description>Clock Tower for WonderSwan</description>
 		<year>1999</year>
 		<publisher>Kaga Tech</publisher>

@@ -92,7 +92,6 @@ private:
 	UINT8   m_eeprom_command;    /* Commands: 00, 01, 02, 03, 04, 08, 0C */
 	UINT8   m_eeprom_start;      /* start bit */
 	UINT8   m_eeprom_write_enabled;  /* write enabled yes/no */
-	int     m_eeprom_size;       /* size of eeprom/sram area */
 };
 
 
