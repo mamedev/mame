@@ -140,7 +140,8 @@ public:
 		m_gbsound(*this, "custom"),
 		m_cart(*this, "cartslot"),
 		m_region_maincpu(*this, "maincpu"),
-		m_io_in0(*this, "IN0")
+		m_io_inputs(*this, "INPUTS"),
+		m_bios_hack(*this, "SKIP_CHECK")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -268,7 +269,8 @@ public:
 
 protected:
 	required_memory_region m_region_maincpu;
-	required_ioport m_io_in0;
+	required_ioport m_io_inputs;
+	required_ioport m_bios_hack;
 };
 
 

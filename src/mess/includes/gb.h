@@ -52,6 +52,7 @@ public:
 		m_region_maincpu(*this, "maincpu"),
 		m_rambank(*this, "cgb_ram"),
 		m_inputs(*this, "INPUTS"),
+		m_bios_hack(*this, "SKIP_CHECK"),
 		m_ram(*this, RAM_TAG),
 		m_lcd(*this, "lcd") { }
 
@@ -119,6 +120,7 @@ protected:
 	required_memory_region m_region_maincpu;
 	optional_memory_bank m_rambank;   // cgb
 	required_ioport m_inputs;
+	required_ioport m_bios_hack;
 	optional_device<ram_device> m_ram;
 	required_device<gb_lcd_device> m_lcd;
 

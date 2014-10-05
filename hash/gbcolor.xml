@@ -23273,11 +23273,12 @@ Rocket Games
 These were produced between 2000 and 2001 by Rocket Games, run by Datel Design
 -->
 
-	<software name="atvrackj" supported="no">
+	<software name="atvrackj" supported="partial">
 		<!-- Notes: GBC only -->
 		<description>ATV Racing &amp; Karate Joe (Euro)</description>
 		<year>200?</year>
 		<publisher>Rocket Games</publisher>
+		<info name="usage" value="Enable 'Skip BIOS check' configuration setting to boot"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_atvrac" />
 			<dataarea name="rom" size="524288">
@@ -23288,11 +23289,12 @@ These were produced between 2000 and 2001 by Rocket Games, run by Datel Design
 		</part>
 	</software>
 
-	<software name="atvrackja" cloneof="atvrackj" supported="no">
+	<software name="atvrackja" cloneof="atvrackj" supported="partial">
 		<!-- Notes: GBC only -->
 		<description>ATV Racing &amp; Karate Joe (Euro, Alt)</description>
 		<year>200?</year>
 		<publisher>Rocket Games</publisher>
+		<info name="usage" value="Enable 'Skip BIOS check' configuration setting to boot"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_atvrac" />
 			<dataarea name="rom" size="524288">
@@ -23303,10 +23305,11 @@ These were produced between 2000 and 2001 by Rocket Games, run by Datel Design
 		</part>
 	</software>
 
-	<software name="atvracin" supported="no">
+	<software name="atvracin">
 		<description>ATV Racing (Euro)</description>
 		<year>2001</year>
 		<publisher>Rocket Games</publisher>
+		<info name="usage" value="Enable 'Skip BIOS check' configuration setting to boot"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_atvrac" />
 			<dataarea name="rom" size="262144">
@@ -23317,11 +23320,12 @@ These were produced between 2000 and 2001 by Rocket Games, run by Datel Design
 		</part>
 	</software>
 
-	<software name="fullhang" supported="no">
+	<software name="fullhang" supported="partial">
 		<!-- Notes: GBC only -->
 		<description>Full Time Soccer &amp; Hang Time Basketball (Euro)</description>
 		<year>200?</year>
 		<publisher>Rocket Games</publisher>
+		<info name="usage" value="Enable 'Skip BIOS check' configuration setting to boot"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_atvrac" />
 			<dataarea name="rom" size="524288">
@@ -23332,10 +23336,11 @@ These were produced between 2000 and 2001 by Rocket Games, run by Datel Design
 		</part>
 	</software>
 
-	<software name="fulltime" supported="no">
+	<software name="fulltime">
 		<description>Full Time Soccer (Euro)</description>
 		<year>2000</year>
 		<publisher>Rocket Games</publisher>
+		<info name="usage" value="Enable 'Skip BIOS check' configuration setting to boot"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_atvrac" />
 			<dataarea name="rom" size="262144">
@@ -23346,24 +23351,12 @@ These were produced between 2000 and 2001 by Rocket Games, run by Datel Design
 		</part>
 	</software>
 
-<!-- This has been hacked to run on MBC01 mapper -->
-	<software name="fulltimeh" cloneof="fulltime">
-		<description>Full Time Soccer (Euro, Hacked)</description>
-		<year>2000</year>
-		<publisher>Rocket Games</publisher>
-		<part name="cart" interface="gameboy_cart">
-			<feature name="slot" value="rom_mbc1" />
-			<dataarea name="rom" size="262144">
-				<rom name="full time soccer (hacked) (unl).bin" size="262144" crc="655476f9" sha1="0d6c5f931223ea393a3f6bc1ecd1a18c1f889273" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="hangtime" supported="no">
+	<software name="hangtime">
 		<!-- Notes: GBC only -->
 		<description>Hang Time Basketball (Euro)</description>
 		<year>200?</year>
 		<publisher>Rocket Games</publisher>
+		<info name="usage" value="Enable 'Skip BIOS check' configuration setting to boot"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_atvrac" />
 			<dataarea name="rom" size="262144">
@@ -23374,11 +23367,12 @@ These were produced between 2000 and 2001 by Rocket Games, run by Datel Design
 		</part>
 	</software>
 
-	<software name="pocksmrt" supported="no">
+	<software name="pocksmrt" supported="partial">
 		<!-- Notes: GBC only -->
 		<description>Pocket Smash Out &amp; Race Time (Euro)</description>
 		<year>200?</year>
 		<publisher>Rocket Games</publisher>
+		<info name="usage" value="Enable 'Skip BIOS check' configuration setting to boot"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_atvrac" />
 			<dataarea name="rom" size="524288">
@@ -23392,6 +23386,7 @@ These were produced between 2000 and 2001 by Rocket Games, run by Datel Design
 		<description>Pocket Smash Out (Euro)</description>
 		<year>200?</year>
 		<publisher>Rocket Games</publisher>
+		<info name="usage" value="Enable 'Skip BIOS check' configuration setting to boot"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_atvrac" />
 			<dataarea name="rom" size="262144">
@@ -23402,11 +23397,12 @@ These were produced between 2000 and 2001 by Rocket Games, run by Datel Design
 		</part>
 	</software>
 
-	<software name="karatej" supported="no">
+	<software name="karatej" supported="partial">
 		<!-- Notes: GBC only -->
 		<description>Karate Joe (Euro)</description>
 		<year>200?</year>
 		<publisher>Rocket Games</publisher>
+		<info name="usage" value="Enable 'Skip BIOS check' configuration setting to boot"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_atvrac" />
 			<dataarea name="rom" size="262144">
@@ -23415,10 +23411,11 @@ These were produced between 2000 and 2001 by Rocket Games, run by Datel Design
 		</part>
 	</software>
 
-	<software name="painter" supported="no">
+	<software name="painter">
 		<description>Painter (Euro)</description>
 		<year>200?</year>
 		<publisher>Rocket Games</publisher>
+		<info name="usage" value="Enable 'Skip BIOS check' configuration setting to boot"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_atvrac" />
 			<dataarea name="rom" size="262144">
@@ -23427,11 +23424,12 @@ These were produced between 2000 and 2001 by Rocket Games, run by Datel Design
 		</part>
 	</software>
 
-	<software name="racetime" supported="no">
+	<software name="racetime">
 		<!-- Notes: GBC only -->
 		<description>Race Time (Euro)</description>
 		<year>200?</year>
 		<publisher>Rocket Games</publisher>
+		<info name="usage" value="Enable 'Skip BIOS check' configuration setting to boot"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_atvrac" />
 			<dataarea name="rom" size="262144">
@@ -23440,25 +23438,12 @@ These were produced between 2000 and 2001 by Rocket Games, run by Datel Design
 		</part>
 	</software>
 
-<!-- This has been hacked to run on MBC01 mapper -->
-	<software name="racetimeh" cloneof="racetime">
-		<!-- Notes: GBC only -->
-		<description>Race Time (Euro, Hacked)</description>
-		<year>200?</year>
-		<publisher>Rocket Games</publisher>
-		<part name="cart" interface="gameboy_cart">
-			<feature name="slot" value="rom_mbc1" />
-			<dataarea name="rom" size="262144">
-				<rom name="race time (hacked) (unl).bin" size="262144" crc="8a5fa98c" sha1="8d8d6c3f5545edbd50813a22fb666c106ceb140b" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="sinkj" supported="no">
+	<software name="sinkj" supported="partial">
 		<!-- Notes: GBC only -->
 		<description>Space Invasion &amp; Karate Joe (Euro)</description>
 		<year>200?</year>
 		<publisher>Rocket Games</publisher>
+		<info name="usage" value="Enable 'Skip BIOS check' configuration setting to boot"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_atvrac" />
 			<dataarea name="rom" size="524288">
@@ -23469,11 +23454,12 @@ These were produced between 2000 and 2001 by Rocket Games, run by Datel Design
 		</part>
 	</software>
 
-	<software name="sinpntr" supported="no">
+	<software name="sinpntr" supported="partial">
 		<!-- Notes: GBC only -->
 		<description>Space Invasion &amp; Painter (Euro)</description>
 		<year>200?</year>
 		<publisher>Rocket Games</publisher>
+		<info name="usage" value="Enable 'Skip BIOS check' configuration setting to boot"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_atvrac" />
 			<dataarea name="rom" size="524288">
@@ -23484,11 +23470,12 @@ These were produced between 2000 and 2001 by Rocket Games, run by Datel Design
 		</part>
 	</software>
 
-	<software name="sinvasn" supported="no">
+	<software name="sinvasn" supported="partial">
 		<!-- Notes: GBC only -->
 		<description>Space Invasion (Euro)</description>
 		<year>200?</year>
 		<publisher>Rocket Games</publisher>
+		<info name="usage" value="Enable 'Skip BIOS check' configuration setting to boot"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_atvrac" />
 			<dataarea name="rom" size="131072">
@@ -24058,10 +24045,11 @@ These were produced between 2000 and 2001 by Rocket Games, run by Datel Design
 		</part>
 	</software>
 
-	<software name="iceage2a" cloneof="iceage2" supported="no">
+	<software name="iceage2a" cloneof="iceage2">
 		<description>Ice Age II (Chi)</description>
 		<year>20??</year>
 		<publisher>Sintax</publisher>
+		<info name="usage" value="Enable 'Skip BIOS check' configuration setting to boot"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<!-- cartridge ram -->
@@ -25487,36 +25475,19 @@ These were produced between 2000 and 2001 by Rocket Games, run by Datel Design
 		</part>
 	</software>
 
-<!-- works on gbpocket -->
 	<software name="sqsd">
 		<!-- Alt. Title: 石器時代 精靈王誕生 (Stone Age - Birth of the Goblin King) -->
 		<description>Shi Qi Shi Dai - Jing Ling Wang Dan Sheng (Chi)</description>
 		<year>20??</year>
 		<publisher>GOWIN</publisher>
+		<info name="usage" value="Enable 'Skip BIOS check' configuration setting to boot"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_yong" />
 			<!-- cartridge ram -->
 			<dataarea name="rom" size="4194304">
 				<rom name="stone age (unl).bin" size="4194304" crc="e7d9d377" sha1="f88f605960c1573aa8bc5fafab19014b0d987729" offset="000000" />
 			</dataarea>
-			<dataarea name="nvram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
-<!-- works on gbpocket -->
-	<software name="sqsdh" cloneof="sqsd">
-		<!-- Alt. Title: 石器時代 精靈王誕生 (Stone Age - Birth of the Goblin King) -->
-		<description>Shi Qi Shi Dai - Jing Ling Wang Dan Sheng (Chi, Hacked?)</description>
-		<year>20??</year>
-		<publisher>GOWIN</publisher>
-		<part name="cart" interface="gameboy_cart">
-			<feature name="slot" value="rom_yong" />
-			<!-- cartridge ram -->
-			<dataarea name="rom" size="4194304">
-				<rom name="stone age (unl)(hacked).bin" size="4194304" crc="2ffe697c" sha1="b992f280b5dd2095c8f430282c5dba69c6a10eb4" offset="000000" />
-			</dataarea>
-			<dataarea name="nvram" size="65536">
+			<dataarea name="nvram" size="8192"> <!-- or 65536 ? -->
 			</dataarea>
 		</part>
 	</software>

@@ -436,6 +436,16 @@ READ8_MEMBER(gb_state::gb_cart_r)
 		if (offset < 0x100)
 		{
 			UINT8 *ROM = m_region_maincpu->base();
+			if (m_bios_hack->read())
+			{
+				// patch out logo and checksum checks
+				// (useful to run some pirate carts until we implement
+				// their complete functionalities + to test homebrew)
+				if (offset == 0xe9 || offset == 0xea)
+					return 0x00;
+				if (offset == 0xfa || offset == 0xfb)
+					return 0x00;
+			}
 			return ROM[offset];
 		}
 		else if (m_cartslot)
@@ -456,6 +466,16 @@ READ8_MEMBER(gb_state::gbc_cart_r)
 		if (offset < 0x100)
 		{
 			UINT8 *ROM = m_region_maincpu->base();
+			if (m_bios_hack->read())
+			{
+				// patch out logo and checksum checks
+				// (useful to run some pirate carts until we implement
+				// their complete functionalities + to test homebrew)
+				if (offset == 0xdb || offset == 0xdc)
+					return 0x00;
+				if (offset == 0xed || offset == 0xee)
+					return 0x00;
+			}
 			return ROM[offset];
 		}
 		else if (offset >= 0x200 && offset < 0x900)
@@ -607,6 +627,12 @@ static INPUT_PORTS_START( gameboy )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_NAME("Button B")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START) PORT_NAME("Start")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SELECT) PORT_NAME("Select")
+
+	PORT_START("SKIP_CHECK")
+	PORT_CONFNAME( 0x01, 0x00, "[HACK] Skip BIOS Logo check" )
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x01, DEF_STR( On ) )
+
 INPUT_PORTS_END
 
 static SLOT_INTERFACE_START(gb_cart)

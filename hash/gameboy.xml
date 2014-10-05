@@ -17257,12 +17257,12 @@
 		</part>
 	</software>
 
-<!-- does this fails the internal BIOS check? -->
-	<software name="rockmanp" cloneof="megaman" supported="no">
+	<software name="rockmanp" cloneof="megaman">
 		<description>Rockman World (Jpn, Prototype)</description>
 		<year>1991</year>
 		<publisher>Capcom</publisher>
 		<info name="alt_title" value="ロックマンワールド"/>
+		<info name="usage" value="Enable 'Skip BIOS check' configuration setting to boot"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">

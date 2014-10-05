@@ -894,7 +894,7 @@ READ32_MEMBER(gba_state::gba_io_r)
 		case 0x0130/4:
 			if( (mem_mask) & 0x0000ffff )   // KEYINPUT
 			{
-				retval = m_io_in0->read();
+				retval = m_io_inputs->read();
 			}
 			else if( (mem_mask) & 0xffff0000 )
 			{
@@ -1886,11 +1886,18 @@ WRITE32_MEMBER(gba_state::gba_oam_w)
 READ32_MEMBER(gba_state::gba_bios_r)
 {
 	UINT32 *rom = (UINT32 *)(*m_region_maincpu);
-	if (m_bios_protected != 0)
+	if (m_bios_hack->read())
 	{
-		offset = (m_bios_last_address + 8) / 4;
+		// partially patch out logo and checksum checks
+		// (useful to run some protos + to test homebrew)
+		if (ACCESSING_BITS_0_15 && (offset == 0x6fc/4))
+			return 0;
 	}
-	return rom[offset&0x3fff];
+
+	if (m_bios_protected != 0)
+		offset = (m_bios_last_address + 8) / 4;
+	
+	return rom[offset & 0x3fff];
 }
 
 READ32_MEMBER(gba_state::gba_10000000_r)
@@ -1925,7 +1932,7 @@ static ADDRESS_MAP_START( gba_map, AS_PROGRAM, 32, gba_state )
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( gbadv )
-	PORT_START("IN0")
+	PORT_START("INPUTS")
 	PORT_BIT( 0xfc00, IP_ACTIVE_HIGH, IPT_BUTTON5) PORT_UNUSED
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("P1 L") PORT_PLAYER(1) // L
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("P1 R") PORT_PLAYER(1) // R
@@ -1937,6 +1944,11 @@ static INPUT_PORTS_START( gbadv )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SELECT ) PORT_PLAYER(1)    // SELECT
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("B") PORT_PLAYER(1)    // B
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("A") PORT_PLAYER(1)    // A
+
+	PORT_START("SKIP_CHECK")
+	PORT_CONFNAME( 0x01, 0x00, "[HACK] Skip BIOS Logo check" )
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x01, DEF_STR( On ) )
 INPUT_PORTS_END
 
 
@@ -2121,10 +2133,9 @@ void gba_state::machine_start()
 	// install the cart ROM & SRAM into the address map, if present
 	if (m_cart->exists())
 	{
-		address_space &space = machine().device<cpu_device>("maincpu")->space(AS_PROGRAM);
-		space.install_read_bank(0x08000000, 0x09ffffff, 0, 0, "rom1");
-		space.install_read_bank(0x0a000000, 0x0bffffff, 0, 0, "rom2");
-		space.install_read_bank(0x0c000000, 0x0cffffff, 0, 0, "rom3");
+		m_maincpu->space(AS_PROGRAM).install_read_bank(0x08000000, 0x09ffffff, 0, 0, "rom1");
+		m_maincpu->space(AS_PROGRAM).install_read_bank(0x0a000000, 0x0bffffff, 0, 0, "rom2");
+		m_maincpu->space(AS_PROGRAM).install_read_bank(0x0c000000, 0x0cffffff, 0, 0, "rom3");
 
 		astring region_tag;
 		memory_region *cart_rom = memregion(region_tag.cpy(m_cart->tag()).cat(GBASLOT_ROM_REGION_TAG));

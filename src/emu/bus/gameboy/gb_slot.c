@@ -294,13 +294,11 @@ bool base_gb_cart_slot_device::call_load()
 		offset = 0;
 		if (get_mmm01_candidate(ROM, len))
 			offset = len - 0x8000;
-		int type;
 
 		if (software_entry() != NULL)
-			type = gb_get_pcb_id(get_feature("slot") ? get_feature("slot") : "rom");
+			m_type = gb_get_pcb_id(get_feature("slot") ? get_feature("slot") : "rom");
 		else
-			type = get_cart_type(ROM + offset, len - offset);
-
+			m_type = get_cart_type(ROM + offset, len - offset);
 
 		// setup RAM/NVRAM/RTC/RUMBLE
 		if (software_entry() != NULL)
@@ -371,7 +369,7 @@ bool base_gb_cart_slot_device::call_load()
 					break;
 			}
 
-			if (type == GB_MBC_MBC2 ||  type == GB_MBC_MBC7)
+			if (m_type == GB_MBC_MBC2 ||  m_type == GB_MBC_MBC7)
 				rambanks = 1;
 		}
 
@@ -384,7 +382,7 @@ bool base_gb_cart_slot_device::call_load()
 		if (m_cart->get_ram_size() && m_cart->get_has_battery())
 			battery_load(m_cart->get_ram_base(), m_cart->get_ram_size(), 0xff);
 
-		//printf("Type: %s\n", gb_get_slot(type));
+		//printf("Type: %s\n", gb_get_slot(m_type));
 
 		internal_header_logging(ROM + offset, len);
 
@@ -566,6 +564,7 @@ int base_gb_cart_slot_device::get_cart_type(UINT8 *ROM, UINT32 len)
 
 	return type;
 }
+
 /*-------------------------------------------------
  get default card software
  -------------------------------------------------*/

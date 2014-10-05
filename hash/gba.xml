@@ -35036,6 +35036,7 @@ The cart also contained a non-empty SRAM save which we currently include in the 
 		<year>2003</year>
 		<publisher>Empire Entertainment</publisher>
 		<part name="cart" interface="gba_cart">
+			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="4231928">
 				<rom name="starsky &amp; hutch (usa) (beta).bin" size="4231928" crc="ab142d2e" sha1="861066ddf8b52be194b30cbb70e959989f0a2f76" offset="000000" />
 			</dataarea>
@@ -38439,10 +38440,11 @@ The cart also contained a non-empty SRAM save which we currently include in the 
 		</part>
 	</software>
 
-	<software name="tyrian2k" supported="no">
+	<software name="tyrian2k">
 		<description>Tyrian 2000 (USA, Prototype)</description>
 		<year>19??</year>
 		<publisher>Stealth Productions</publisher>
+		<info name="usage" value="Enable 'Skip BIOS check' configuration setting to boot"/>
 		<part name="cart" interface="gba_cart">
 			<dataarea name="rom" size="2681544">
 				<rom name="tyrian 2000 (usa) (proto).bin" size="2681544" crc="e5acba28" sha1="5148f40a58bc3d4512aced0f052f64b8c883ba87" offset="000000" />
