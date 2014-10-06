@@ -4070,6 +4070,25 @@ ROM_START( mtkob2 )
 	ROM_LOAD( "mtkob2-key.bin", 0x000000, 0x000004, CRC(db088208) SHA1(14d65ad2555183a445abcd93907c85df4032b41d) )
 ROM_END
 
+ROM_START( mushi2k5 )
+	NAOMI_BIOS
+	NAOMI_DEFAULT_EEPROM
+
+	ROM_REGION( 0x7800000, "rom_board", ROMREGION_ERASEFF)
+	ROM_LOAD( "epr-24286.ic22", 0x0000000, 0x0400000, CRC(9d26e2fc) SHA1(74bcd7daf994a5c97c836b6f060c73d31a9c06d8) ) 
+	ROM_LOAD( "mpr-24276.ic1",  0x0800000, 0x1000000, CRC(35ac9283) SHA1(74af0e3f294fc76d44c8c6b54042186dec8b9f8a) ) 
+	ROM_LOAD( "mpr-24277.ic2",  0x1800000, 0x1000000, CRC(16111394) SHA1(7ca20de07cfa3fa248b472819bc893f00689e3a1) ) 
+	ROM_LOAD( "mpr-24278.ic3",  0x2800000, 0x1000000, CRC(bf0ec0bc) SHA1(7de72decf97999e74b510e9655a57ad6d1def1c8) ) 
+	ROM_LOAD( "mpr-24279.ic4",  0x3800000, 0x1000000, CRC(f7d0ab5b) SHA1(10188a22a1918b18008973135ef2e00dd26dd6cb) ) 
+	ROM_LOAD( "mpr-24280.ic5",  0x4800000, 0x1000000, CRC(61d5c470) SHA1(c2b3dc71706a5c8a237efc2fe5c35061abb99173) ) 
+	ROM_LOAD( "mpr-24281.ic6",  0x5800000, 0x1000000, CRC(39133c32) SHA1(09ea8c1a98ba0fac36e18ae14ed5302feaeb89ca) ) 
+	ROM_LOAD( "mpr-24282.ic7",  0x6800000, 0x1000000, CRC(9aa4ad5a) SHA1(2d81f99a579477c5db725f71c51f18afc15abce7) ) 
+
+	ROM_REGION( 4, "rom_key", ROMREGION_ERASE00 )
+
+	ROM_REGION( 4, "boardid", ROMREGION_ERASEVAL(0x02) )
+ROM_END
+
 ROM_START( crackndj )
 	NAOMI_BIOS
 	NAOMI_DEFAULT_EEPROM
@@ -8845,6 +8864,7 @@ ROM_END
 /* 0136 */ GAME( 2001, shootplm, naomi,    naomim1, naomi,   naomi_state, naomi,   ROT0, "Sega", "Shootout Pool Medal", GAME_FLAGS )
 /* 0140 */ GAME( 2004, kick4csh, naomi,    naomim1, naomi,   naomi_state, kick4csh,ROT0, "Sega", "Kick '4' Cash", GAME_FLAGS )
 /* 0150 */ GAME( 2003, mtkob2,   naomi,    naomim1, naomi,   naomi_state, naomi,   ROT0, "Sega", "Mushiking The King Of Beetle 2K3 2nd", GAME_FLAGS )
+/* 0158 */ GAME( 2005, mushi2k5, naomi,    naomim2, naomi,   naomi_state, naomi,   ROT0, "Sega", "Mushiking The King Of Beetle 2K5 1st", GAME_FLAGS )
 /* 0164 */ GAME( 2005, mushik2e, naomi,    naomim4, naomi,   naomi_state, naomi,   ROT0, "Sega", "MushiKing II - The King Of Beetle II ENG (Ver. 1.001)", GAME_FLAGS )
 /* 0164 */ GAME( 2005, mushi2ea, mushik2e, naomim4, naomi,   naomi_state, naomi,   ROT0, "Sega", "MushiKing II - The King Of Beetle II ENG (Ver. 2.001)", GAME_FLAGS )
 /* 0166 */ GAME( 2006, zunou,    naomi,    naomim4, naomi,   naomi_state, naomi,   ROT0, "Sega", "Touch De Zunou (Rev A)", GAME_FLAGS )
