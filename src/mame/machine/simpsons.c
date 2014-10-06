@@ -2,7 +2,6 @@
 
 #include "cpu/m6809/konami.h"
 #include "machine/eepromser.h"
-#include "sound/k053260.h"
 #include "includes/simpsons.h"
 
 /***************************************************************************
@@ -46,11 +45,6 @@ READ8_MEMBER(simpsons_state::simpsons_sound_interrupt_r)
 {
 	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff );
 	return 0x00;
-}
-
-READ8_MEMBER(simpsons_state::simpsons_sound_r)
-{
-	return m_k053260->k053260_r(space, 2 + offset);
 }
 
 

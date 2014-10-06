@@ -3,7 +3,6 @@
     Rollergames
 
 *************************************************************************/
-#include "sound/k053260.h"
 #include "machine/k053252.h"
 #include "video/k051316.h"
 #include "video/konami_helper.h"
@@ -21,14 +20,10 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
-		m_k053260(*this, "k053260"),
 		m_k053244(*this, "k053244"),
 		m_k051316(*this, "k051316"),
 		m_k053252(*this, "k053252")
 		{ }
-
-	/* memory pointers */
-//  UINT8 *    m_paletteram;    // currently this uses generic palette handling
 
 	/* video-related */
 	int        m_sprite_colorbase;
@@ -40,7 +35,6 @@ public:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
-	required_device<k053260_device> m_k053260;
 	required_device<k05324x_device> m_k053244;
 	required_device<k051316_device> m_k051316;
 	required_device<k053252_device> m_k053252;
@@ -49,7 +43,6 @@ public:
 	DECLARE_WRITE8_MEMBER(soundirq_w);
 	DECLARE_WRITE8_MEMBER(sound_arm_nmi_w);
 	DECLARE_READ8_MEMBER(pip_r);
-	DECLARE_READ8_MEMBER(rollerg_sound_r);
 	DECLARE_WRITE_LINE_MEMBER(rollerg_irq_ack_w);
 	virtual void machine_start();
 	virtual void machine_reset();

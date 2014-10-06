@@ -3,7 +3,6 @@
     Over Drive
 
 *************************************************************************/
-#include "sound/k053260.h"
 #include "machine/k053252.h"
 #include "video/k051316.h"
 #include "video/k053246_k053247_k055673.h"
@@ -18,8 +17,6 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_subcpu(*this, "sub"),
 		m_audiocpu(*this, "audiocpu"),
-		m_k053260_1(*this, "k053260_1"),
-		m_k053260_2(*this, "k053260_2"),
 		m_k051316_1(*this, "k051316_1"),
 		m_k051316_2(*this, "k051316_2"),
 		m_k053246(*this, "k053246"),
@@ -44,8 +41,6 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
 	required_device<cpu_device> m_audiocpu;
-	required_device<k053260_device> m_k053260_1;
-	required_device<k053260_device> m_k053260_2;
 	required_device<k051316_device> m_k051316_1;
 	required_device<k051316_device> m_k051316_2;
 	required_device<k053247_device> m_k053246;

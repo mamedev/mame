@@ -123,17 +123,6 @@ WRITE16_MEMBER(overdriv_state::cpuB_ctrl_w)
 	}
 }
 
-
-READ8_MEMBER(overdriv_state::overdriv_1_sound_r)
-{
-	return m_k053260_1->k053260_r(space, 2 + offset);
-}
-
-READ8_MEMBER(overdriv_state::overdriv_2_sound_r)
-{
-	return m_k053260_2->k053260_r(space, 2 + offset);
-}
-
 WRITE16_MEMBER(overdriv_state::overdriv_soundirq_w)
 {
 	m_audiocpu->set_input_line(M6809_IRQ_LINE, HOLD_LINE);
@@ -162,8 +151,8 @@ static ADDRESS_MAP_START( overdriv_master_map, AS_PROGRAM, 16, overdriv_state )
 	AM_RANGE(0x1c0000, 0x1c001f) AM_DEVWRITE8("k051316_1", k051316_device, ctrl_w, 0xff00)
 	AM_RANGE(0x1c8000, 0x1c801f) AM_DEVWRITE8("k051316_2", k051316_device, ctrl_w, 0xff00)
 	AM_RANGE(0x1d0000, 0x1d001f) AM_DEVWRITE("k053251", k053251_device, msb_w)
-	AM_RANGE(0x1d8000, 0x1d8003) AM_READ8(overdriv_1_sound_r, 0x00ff) AM_DEVWRITE8("k053260_1", k053260_device, k053260_w, 0x00ff)   /* K053260 */
-	AM_RANGE(0x1e0000, 0x1e0003) AM_READ8(overdriv_2_sound_r, 0x00ff) AM_DEVWRITE8("k053260_2", k053260_device, k053260_w, 0x00ff)   /* K053260 */
+	AM_RANGE(0x1d8000, 0x1d8003) AM_DEVREADWRITE8("k053260_1", k053260_device, main_read, main_write, 0x00ff)
+	AM_RANGE(0x1e0000, 0x1e0003) AM_DEVREADWRITE8("k053260_2", k053260_device, main_read, main_write, 0x00ff)
 	AM_RANGE(0x1e8000, 0x1e8001) AM_WRITE(overdriv_soundirq_w)
 	AM_RANGE(0x1f0000, 0x1f0001) AM_WRITE(cpuA_ctrl_w)  /* halt cpu B, coin counter, start lamp, other? */
 	AM_RANGE(0x1f8000, 0x1f8001) AM_WRITE(eeprom_w)
@@ -218,8 +207,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( overdriv_sound_map, AS_PROGRAM, 8, overdriv_state )
 	AM_RANGE(0x0200, 0x0201) AM_DEVREADWRITE("ymsnd", ym2151_device,read,write)
-	AM_RANGE(0x0400, 0x042f) AM_DEVREADWRITE("k053260_1", k053260_device, k053260_r, k053260_w)
-	AM_RANGE(0x0600, 0x062f) AM_DEVREADWRITE("k053260_2", k053260_device, k053260_r, k053260_w)
+	AM_RANGE(0x0400, 0x042f) AM_DEVREADWRITE("k053260_1", k053260_device, read, write)
+	AM_RANGE(0x0600, 0x062f) AM_DEVREADWRITE("k053260_2", k053260_device, read, write)
 	AM_RANGE(0x0800, 0x0fff) AM_RAM
 	AM_RANGE(0x1000, 0xffff) AM_ROM
 ADDRESS_MAP_END

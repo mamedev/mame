@@ -50,11 +50,6 @@ INTERRUPT_GEN_MEMBER(asterix_state::asterix_interrupt)
 	device.execute().set_input_line(5, HOLD_LINE); /* ??? All irqs have the same vector, and the mask used is 0 or 7 */
 }
 
-READ8_MEMBER(asterix_state::asterix_sound_r)
-{
-	return m_k053260->k053260_r(space, 2 + offset);
-}
-
 void asterix_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
 	switch (id)
@@ -170,7 +165,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, asterix_state )
 	AM_RANGE(0x380000, 0x380001) AM_READ_PORT("IN0")
 	AM_RANGE(0x380002, 0x380003) AM_READ_PORT("IN1")
 	AM_RANGE(0x380100, 0x380101) AM_WRITE(control2_w)
-	AM_RANGE(0x380200, 0x380203) AM_READ8(asterix_sound_r, 0x00ff) AM_DEVWRITE8("k053260", k053260_device, k053260_w, 0x00ff)
+	AM_RANGE(0x380200, 0x380203) AM_DEVREADWRITE8("k053260", k053260_device, main_read, main_write, 0x00ff)
 	AM_RANGE(0x380300, 0x380301) AM_WRITE(sound_irq_w)
 	AM_RANGE(0x380400, 0x380401) AM_WRITE(asterix_spritebank_w)
 	AM_RANGE(0x380500, 0x38051f) AM_DEVWRITE("k053251", k053251_device, lsb_w)
@@ -186,7 +181,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, asterix_state )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
 	AM_RANGE(0xf801, 0xf801) AM_DEVREADWRITE("ymsnd", ym2151_device, status_r, data_w)
-	AM_RANGE(0xfa00, 0xfa2f) AM_DEVREADWRITE("k053260", k053260_device, k053260_r, k053260_w)
+	AM_RANGE(0xfa00, 0xfa2f) AM_DEVREADWRITE("k053260", k053260_device, read, write)
 	AM_RANGE(0xfc00, 0xfc00) AM_WRITE(sound_arm_nmi_w)
 	AM_RANGE(0xfe00, 0xfe00) AM_DEVWRITE("ymsnd", ym2151_device, register_w)
 ADDRESS_MAP_END

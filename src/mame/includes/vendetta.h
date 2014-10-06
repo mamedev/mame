@@ -3,7 +3,6 @@
     Vendetta
 
 *************************************************************************/
-#include "sound/k053260.h"
 #include "machine/k053252.h"
 #include "video/k053246_k053247_k055673.h"
 #include "video/k054000.h"
@@ -23,7 +22,6 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
-		m_k053260(*this, "k053260"),
 		m_k052109(*this, "k052109"),
 		m_k053246(*this, "k053246"),
 		m_k053251(*this, "k053251"),
@@ -46,7 +44,6 @@ public:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
-	required_device<k053260_device> m_k053260;
 	required_device<k052109_device> m_k052109;
 	required_device<k053247_device> m_k053246;
 	required_device<k053251_device> m_k053251;
@@ -59,8 +56,7 @@ public:
 	DECLARE_WRITE8_MEMBER(vendetta_5fe0_w);
 	DECLARE_WRITE8_MEMBER(z80_arm_nmi_w);
 	DECLARE_WRITE8_MEMBER(z80_irq_w);
-	DECLARE_READ8_MEMBER(vendetta_sound_interrupt_r);
-	DECLARE_READ8_MEMBER(vendetta_sound_r);
+	DECLARE_READ8_MEMBER(z80_irq_r);
 	DECLARE_DRIVER_INIT(vendetta);
 	DECLARE_DRIVER_INIT(esckids);
 	virtual void machine_start();

@@ -1,6 +1,6 @@
 /*********************************************************
 
-    Konami 053260 PCM/ADPCM Sound Chip
+    Konami 053260 KDSC
 
 *********************************************************/
 
@@ -27,35 +27,6 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-struct k053260_channel
-{
-	k053260_channel() :
-		rate(0),
-		size(0),
-		start(0),
-		bank(0),
-		volume(0),
-		play(0),
-		pan(0),
-		pos(0),
-		loop(0),
-		ppcm(0),
-		ppcm_data(0) {}
-
-	UINT32      rate;
-	UINT32      size;
-	UINT32      start;
-	UINT32      bank;
-	UINT32      volume;
-	int         play;
-	UINT32      pan;
-	UINT32      pos;
-	int         loop;
-	int         ppcm; /* packed PCM ( 4 bit signed ) */
-	int         ppcm_data;
-};
-
-
 // ======================> k053260_device
 
 class k053260_device : public device_t,
@@ -67,6 +38,11 @@ public:
 
 	static void set_region_tag(device_t &device, const char *tag) { downcast<k053260_device &>(device).m_rgnoverride = tag; }
 
+	DECLARE_READ8_MEMBER( main_read );
+	DECLARE_WRITE8_MEMBER( main_write );
+	DECLARE_READ8_MEMBER( read );
+	DECLARE_WRITE8_MEMBER( write );
+
 protected:
 	// device-level overrides
 	virtual void device_start();
@@ -75,22 +51,59 @@ protected:
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
 
-public:
-	DECLARE_WRITE8_MEMBER( k053260_w );
-	DECLARE_READ8_MEMBER( k053260_r );
-
 private:
-	void InitDeltaTable( int rate, int clock );
-	void check_bounds( int channel );
+	// configuration
+	const char *    m_rgnoverride;
 
-	sound_stream *              m_channel;
-	int                         m_mode;
-	int                         m_regs[0x30];
-	UINT8                       *m_rom;
-	int                         m_rom_size;
-	UINT32                      *m_delta_table;
-	k053260_channel             m_channels[4];
-	const char                  *m_rgnoverride;
+	sound_stream *  m_stream;
+	UINT8 *         m_rom;
+	UINT32          m_rom_size;
+
+	// live state
+    UINT8           m_portdata[4];
+	UINT8           m_keyon;
+	UINT8           m_mode;
+
+	// per voice state
+	class KDSC_Voice
+	{
+	public:
+		inline void voice_start(k053260_device &device, int index);
+		inline void voice_reset();
+		inline void set_register(offs_t offset, UINT8 data);
+		inline void set_loop_kadpcm(UINT8 data);
+		inline void set_pan(UINT8 data);
+		inline void update_pan_volume();
+		inline void key_on();
+		inline void key_off();
+		inline void play(stream_sample_t *outputs);
+		inline bool playing() { return m_playing; }
+		inline UINT8 read_rom();
+
+	private:
+		// pointer to owning device
+		k053260_device *m_device;
+
+		// live state
+		UINT32 m_position;
+		UINT16 m_pan_volume[2];
+		UINT16 m_counter;
+		INT8   m_output;
+		bool   m_playing;
+
+		// per voice registers
+		UINT32 m_start;
+		UINT16 m_length;
+		UINT16 m_pitch;
+		UINT8  m_volume;
+
+		// bit packed registers
+		UINT8  m_pan;
+		bool   m_loop;
+		bool   m_kadpcm;
+	} m_voice[4];
+
+	friend class k053260_device::KDSC_Voice;
 };
 
 extern const device_type K053260;
