@@ -599,6 +599,7 @@ public:
 	DECLARE_WRITE8_MEMBER(pc9801ux_gvram0_w);
 	UINT32 pc9801_286_a20(bool state);
 
+	DECLARE_READ8_MEMBER(ide_hack_r);
 	DECLARE_WRITE8_MEMBER(sasi_data_w);
 	DECLARE_READ8_MEMBER(sasi_data_r);
 	DECLARE_WRITE_LINE_MEMBER(write_sasi_io);
@@ -1725,6 +1726,13 @@ WRITE8_MEMBER(pc9801_state::pc9801_mouse_w)
 	}
 }
 
+READ8_MEMBER(pc9801_state::ide_hack_r)
+{
+	// this makes the ide driver not do 512 to 256 byte sector translation, the 9821 looks for bit 6 of offset 0xac403 of the kanji ram to set this, the rs unknown
+	m_work_ram[0x457] |= 0xc0;
+	return 0xff;
+}
+
 READ8_MEMBER( pc9801_state::sasi_data_r )
 {
 	UINT8 data = m_sasi_data_in->read();
@@ -2327,6 +2335,7 @@ static ADDRESS_MAP_START( pc9801rs_io, AS_IO, 32, pc9801_state )
 //  AM_RANGE(0x00ec, 0x00ef) PC-9801-86 sound board
 	AM_RANGE(0x00f0, 0x00ff) AM_READWRITE8(pc9801rs_f0_r,      pc9801rs_f0_w,      0xffffffff)
 //  AM_RANGE(0x0188, 0x018f) AM_READWRITE8(pc9801_opn_r,       pc9801_opn_w,       0xffffffff) //ym2203 opn / <undefined>
+	AM_RANGE(0x0430, 0x0433) AM_READ8(ide_hack_r, 0x000000ff)
 
 	AM_RANGE(0x0438, 0x043b) AM_READWRITE8(pc9801rs_access_ctrl_r,pc9801rs_access_ctrl_w,0xffffffff)
 	AM_RANGE(0x043c, 0x043f) AM_WRITE8(pc9801rs_bank_w,    0xffffffff) //ROM/RAM bank
@@ -2696,6 +2705,7 @@ static ADDRESS_MAP_START( pc9821_io, AS_IO, 32, pc9801_state )
 	AM_RANGE(0x00f0, 0x00ff) AM_READWRITE8(pc9801rs_f0_r,      pc9801rs_f0_w,      0xffffffff)
 //  AM_RANGE(0x0188, 0x018f) AM_READWRITE8(pc9801_opn_r,       pc9801_opn_w,       0xffffffff) //ym2203 opn / <undefined>
 //  AM_RANGE(0x018c, 0x018f) YM2203 OPN extended ports / <undefined>
+	AM_RANGE(0x0430, 0x0433) AM_READ8(ide_hack_r, 0x000000ff)
 	AM_RANGE(0x0438, 0x043b) AM_READWRITE8(pc9801rs_access_ctrl_r,pc9801rs_access_ctrl_w,0xffffffff)
 //  AM_RANGE(0x043d, 0x043d) ROM/RAM bank (NEC)
 	AM_RANGE(0x043c, 0x043f) AM_WRITE8(pc9801rs_bank_w,    0xffffffff) //ROM/RAM bank (EPSON)
