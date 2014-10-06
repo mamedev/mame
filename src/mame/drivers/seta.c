@@ -1362,6 +1362,7 @@ Note: on screen copyright is (c)1998 Coinmaster.
 #include "machine/6821pia.h"
 #include "machine/6850acia.h"
 #include "machine/msm6242.h"
+#include "machine/pit8253.h"
 #include "sound/2203intf.h"
 #include "sound/2612intf.h"
 #include "sound/3812intf.h"
@@ -1370,6 +1371,7 @@ Note: on screen copyright is (c)1998 Coinmaster.
 #include "machine/nvram.h"
 
 #if __uPD71054_TIMER
+// this mess should be replaced with pit8254, see madshark
 
 #define USED_TIMER_NUM  1
 /*------------------------------
@@ -1488,6 +1490,19 @@ WRITE_LINE_MEMBER(seta_state::utoukond_ym3438_interrupt)
 
 
 ***************************************************************************/
+
+/*
+
+ uPD71054C Timer
+
+*/
+
+WRITE_LINE_MEMBER(seta_state::pit_out0)
+{
+	if (state)
+		m_maincpu->set_input_line(4, HOLD_LINE);
+}
+
 
 
 /*
@@ -2423,11 +2438,7 @@ static ADDRESS_MAP_START( madshark_map, AS_PROGRAM, 16, seta_state )
 	AM_RANGE(0xa00600, 0xa00607) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spritectrl_r16, spritectrl_w16)
 	AM_RANGE(0xa80000, 0xa80001) AM_RAM                             // ? $4000
 	AM_RANGE(0xb00000, 0xb03fff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spritecode_r16, spritecode_w16)     // Sprites Code + X + Attr
-#if __uPD71054_TIMER
-	AM_RANGE(0xc00000, 0xc00007) AM_WRITE(timer_regs_w)             // ?
-#else
-	AM_RANGE(0xc00000, 0xc00007) AM_WRITENOP                        // ?
-#endif
+	AM_RANGE(0xc00000, 0xc00007) AM_DEVREADWRITE8("pit", pit8254_device, read, write, 0x00ff)
 	AM_RANGE(0xd00000, 0xd03fff) AM_DEVREADWRITE("x1snd", x1_010_device, word_r, word_w)   // Sound
 ADDRESS_MAP_END
 
@@ -8614,9 +8625,9 @@ static MACHINE_CONFIG_START( madshark, seta_state )
 	MCFG_CPU_PROGRAM_MAP(madshark_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", seta_state,  wrofaero_interrupt)
 
-#if __uPD71054_TIMER
-	MCFG_MACHINE_START_OVERRIDE(seta_state, wrofaero )
-#endif  // __uPD71054_TIMER
+	MCFG_DEVICE_ADD("pit", PIT8254, 0) // uPD71054C
+	MCFG_PIT8253_CLK0(16000000/2/8)
+	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(seta_state, pit_out0))
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
