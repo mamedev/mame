@@ -100,4 +100,5 @@ public:
 	K055673_CB_MEMBER(metamrph_sprite_callback);
 	K055673_CB_MEMBER(gaiapols_sprite_callback);
 	K055673_CB_MEMBER(martchmp_sprite_callback);
+	void decode_tiles();
 };

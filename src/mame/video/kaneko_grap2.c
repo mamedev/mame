@@ -162,7 +162,7 @@ WRITE16_MEMBER(kaneko_grap2_device::galpani3_regs1_go_w)
 }
 
 
-void kaneko_grap2_device::set_color_555_gp3(running_machine &machine, pen_t color, int rshift, int gshift, int bshift, UINT16 data)
+void kaneko_grap2_device::set_color_555_gp3(pen_t color, int rshift, int gshift, int bshift, UINT16 data)
 {
 	m_palette->set_pen_color(color, pal5bit(data >> rshift), pal5bit(data >> gshift), pal5bit(data >> bshift));
 }
@@ -170,12 +170,12 @@ void kaneko_grap2_device::set_color_555_gp3(running_machine &machine, pen_t colo
 WRITE16_MEMBER(kaneko_grap2_device::galpani3_framebuffer1_palette_w)
 {
 	COMBINE_DATA(&m_framebuffer_palette[offset]);
-	set_color_555_gp3(machine(), offset+0x4000 + (m_chipnum * 0x100), 5, 10, 0, m_framebuffer_palette[offset]);
+	set_color_555_gp3(offset+0x4000 + (m_chipnum * 0x100), 5, 10, 0, m_framebuffer_palette[offset]);
 }
 
 /* definitely looks like a cycling bg colour used for the girls */
 WRITE16_MEMBER(kaneko_grap2_device::galpani3_framebuffer1_bgcol_w)
 {
 	COMBINE_DATA(&m_framebuffer_bgcol);
-	set_color_555_gp3(machine(), offset+0x4300 + (m_chipnum), 5, 10, 0, m_framebuffer_bgcol);
+	set_color_555_gp3(offset+0x4300 + (m_chipnum), 5, 10, 0, m_framebuffer_bgcol);
 }

@@ -64,7 +64,7 @@ public:
 	} curr_sprite;
 
 	void get_sprite_attributes(UINT16* ram);
-	void common_sprite_drawgfx(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap);
+	void common_sprite_drawgfx(bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap);
 
 	void draw_sprites(  UINT16* spriteram, int spriteram_bytes, screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int prihack_mask = -1, int prihack_val = -1 );
 	void set_pal_base(int pal_base);

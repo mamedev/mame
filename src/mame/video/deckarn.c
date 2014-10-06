@@ -38,7 +38,7 @@ void deco_karnovsprites_device::device_reset()
 {
 }
 
-void deco_karnovsprites_device::draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, UINT16* spriteram, int size, int priority )
+void deco_karnovsprites_device::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, UINT16* spriteram, int size, int priority )
 {
 	int offs;
 
@@ -81,7 +81,7 @@ void deco_karnovsprites_device::draw_sprites( running_machine &machine, bitmap_i
 		y = (y + 16) % 0x200;
 		x = 256 - x;
 		y = 256 - y;
-		if (machine.driver_data()->flip_screen())
+		if (machine().driver_data()->flip_screen())
 		{
 			y = 240 - y;
 			x = 240 - x;

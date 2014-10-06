@@ -897,7 +897,7 @@ WRITE16_MEMBER(taitojc_state::dsp_unk2_w)
 	if (offset == 0)
 	{
 		taitojc_clear_frame();
-		m_renderer->render_polygons(machine(), m_polygon_fifo, m_polygon_fifo_ptr);
+		m_renderer->render_polygons(m_polygon_fifo, m_polygon_fifo_ptr);
 
 		m_polygon_fifo_ptr = 0;
 	}

@@ -453,6 +453,8 @@ public:
 	DECLARE_WRITE16_MEMBER( hdgsp_vram_1bpp_w );
 	DECLARE_WRITE16_MEMBER( hdgsp_vram_2bpp_w );
 
+	inline void gsp_palette_change(int offset);
+	
 	DECLARE_READ16_MEMBER( hdgsp_paletteram_lo_r );
 	DECLARE_WRITE16_MEMBER( hdgsp_paletteram_lo_w );
 	DECLARE_READ16_MEMBER( hdgsp_paletteram_hi_r );

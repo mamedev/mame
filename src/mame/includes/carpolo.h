@@ -119,8 +119,8 @@ public:
 	void carpolo_generate_car_goal_interrupt(int car, int right_goal);
 	void carpolo_generate_car_ball_interrupt(int car, int car_x, int car_y);
 	void carpolo_generate_car_border_interrupt(int car, int horizontal_border);
-	void draw_sprite(bitmap_ind16 &bitmap, const rectangle &cliprect,
-						UINT8 x, UINT8 y, int bank, int code, int col);
+	void draw_alpha_line(bitmap_ind16 &bitmap, const rectangle &cliprect, int alpha_line, int video_line);
+	void draw_sprite(bitmap_ind16 &bitmap, const rectangle &cliprect, UINT8 x, UINT8 y, int bank, int code, int col);
 	int check_sprite_sprite_collision(int x1, int y1, int code1, int flipy1,
 										int x2, int y2, int code2, int flipy2,
 										int *col_x, int *col_y);

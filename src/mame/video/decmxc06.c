@@ -49,6 +49,7 @@ const device_type DECO_MXC06 = &device_creator<deco_mxc06_device>;
 
 deco_mxc06_device::deco_mxc06_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, DECO_MXC06, "DECO MXC06 Sprite", tag, owner, clock, "deco_mxc06", __FILE__),
+		device_video_interface(mconfig, *this),
 		m_gfxregion(0),
 		m_gfxdecode(*this),
 		m_palette(*this)
@@ -67,7 +68,7 @@ void deco_mxc06_device::static_set_gfxdecode_tag(device_t &device, const char *t
 
 
 /* this implementation was originally from Mad Motor */
-void deco_mxc06_device::draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, UINT16* spriteram, int pri_mask, int pri_val, int col_mask )
+void deco_mxc06_device::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, UINT16* spriteram, int pri_mask, int pri_val, int col_mask )
 {
 	int offs;
 
@@ -97,7 +98,7 @@ void deco_mxc06_device::draw_sprites( running_machine &machine, bitmap_ind16 &bi
 		sx = 240 - sx;
 		sy = 240 - sy;
 
-		if (machine.driver_data()->flip_screen())
+		if (machine().driver_data()->flip_screen())
 		{
 			sy = 240 - sy;
 			sx = 240 - sx;
@@ -128,7 +129,7 @@ void deco_mxc06_device::draw_sprites( running_machine &machine, bitmap_ind16 &bi
 				if (spriteram[offs] & 0x8000)
 				{
 					int draw = 0;
-					if (!flash || (machine.first_screen()->frame_number() & 1))
+					if (!flash || (m_screen->frame_number() & 1))
 					{
 						if (m_priority_type==0) // most cases
 						{
@@ -169,7 +170,7 @@ void deco_mxc06_device::draw_sprites( running_machine &machine, bitmap_ind16 &bi
 
 /* this is used by the automat bootleg, it seems to have greatly simplified sprites compared to the real chip */
 /* spriteram is twice the size tho! */
-void deco_mxc06_device::draw_sprites_bootleg( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, UINT16* spriteram, int pri_mask, int pri_val, int col_mask )
+void deco_mxc06_device::draw_sprites_bootleg( bitmap_ind16 &bitmap, const rectangle &cliprect, UINT16* spriteram, int pri_mask, int pri_val, int col_mask )
 {
 	int offs;
 

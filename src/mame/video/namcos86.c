@@ -333,20 +333,19 @@ static void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rect
 }
 
 
-static void set_scroll(running_machine &machine, int layer)
+void namcos86_state::set_scroll(int layer)
 {
-	namcos86_state *state = machine.driver_data<namcos86_state>();
 	int scrollx,scrolly;
 
-	scrollx = state->m_xscroll[layer];
-	scrolly = state->m_yscroll[layer];
-	if (state->flip_screen())
+	scrollx = m_xscroll[layer];
+	scrolly = m_yscroll[layer];
+	if (flip_screen())
 	{
 		scrollx = -scrollx;
 		scrolly = -scrolly;
 	}
-	state->m_bg_tilemap[layer]->set_scrollx(0, scrollx);
-	state->m_bg_tilemap[layer]->set_scrolly(0, scrolly);
+	m_bg_tilemap[layer]->set_scrollx(0, scrollx);
+	m_bg_tilemap[layer]->set_scrolly(0, scrolly);
 }
 
 
@@ -356,10 +355,10 @@ UINT32 namcos86_state::screen_update_namcos86(screen_device &screen, bitmap_ind1
 
 	/* flip screen is embedded in the sprite control registers */
 	flip_screen_set(m_spriteram[0x07f6] & 1);
-	set_scroll(machine(), 0);
-	set_scroll(machine(), 1);
-	set_scroll(machine(), 2);
-	set_scroll(machine(), 3);
+	set_scroll(0);
+	set_scroll(1);
+	set_scroll(2);
+	set_scroll(3);
 
 	screen.priority().fill(0, cliprect);
 

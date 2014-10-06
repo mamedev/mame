@@ -69,4 +69,5 @@ public:
 
 private:
 	inline void get_tile_info(tile_data &tileinfo,int tile_index,int layer,UINT8 *vram);
+	void set_scroll(int layer);
 };

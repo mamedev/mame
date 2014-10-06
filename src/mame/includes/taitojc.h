@@ -26,7 +26,7 @@ public:
 	void render_shade_scan(INT32 scanline, const extent_t &extent, const taitojc_polydata &extradata, int threadid);
 	void render_texture_scan(INT32 scanline, const extent_t &extent, const taitojc_polydata &extradata, int threadid);
 
-	void render_polygons(running_machine &machine, UINT16 *polygon_fifo, int length);
+	void render_polygons(UINT16 *polygon_fifo, int length);
 
 private:
 	bitmap_ind16 *m_framebuffer;

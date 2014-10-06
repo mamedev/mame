@@ -253,7 +253,7 @@ UINT32 expro02_state::screen_update_galsnew(screen_device &screen, bitmap_ind16 
 		m_view2_0->render_tilemap_chip(screen,bitmap,cliprect,i);
 	}
 
-	m_kaneko_spr->kaneko16_render_sprites(machine(),bitmap,cliprect, screen.priority(), m_spriteram, m_spriteram.bytes());
+	m_kaneko_spr->kaneko16_render_sprites(bitmap,cliprect, screen.priority(), m_spriteram, m_spriteram.bytes());
 	return 0;
 }
 

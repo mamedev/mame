@@ -61,7 +61,7 @@ void tms34061_device::device_start()
 	/* allocate memory for VRAM */
 	m_vram = auto_alloc_array_clear(machine(), UINT8, m_vramsize + 256 * 2);
 	/* not really a save state, just there for debugging purposes */
-	machine().save().save_pointer(NAME(m_vram), m_vramsize);
+	save_pointer(NAME(m_vram), m_vramsize);
 
 	/* allocate memory for latch RAM */
 	m_latchram = auto_alloc_array_clear(machine(), UINT8, m_vramsize + 256 * 2);

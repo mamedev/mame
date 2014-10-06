@@ -244,14 +244,13 @@ WRITE16_MEMBER(midyunit_state::midyunit_paletteram_w)
  *
  *************************************/
 
-static void dma_draw(running_machine &machine, UINT16 command)
+void midyunit_state::dma_draw(UINT16 command)
 {
-	midyunit_state *state = machine.driver_data<midyunit_state>();
-	struct dma_state_t &dma_state = state->m_dma_state;
+	struct dma_state_t &dma_state = m_dma_state;
 	int dx = (command & 0x10) ? -1 : 1;
 	int height = dma_state.height;
 	int width = dma_state.width;
-	UINT8 *base = state->m_gfx_rom;
+	UINT8 *base = m_gfx_rom;
 	UINT32 offset = dma_state.offset >> 3;
 	UINT16 pal = dma_state.palette;
 	UINT16 color = pal | dma_state.color;
@@ -273,7 +272,7 @@ static void dma_draw(running_machine &machine, UINT16 command)
 		offset += dma_state.rowbytes;
 
 		/* determine destination pointer */
-		dest = &state->m_local_videoram[ty * 512];
+		dest = &m_local_videoram[ty * 512];
 
 		/* check for overruns if they are relevant */
 		if (o >= 0x06000000 && command < 0x0c)
@@ -524,7 +523,7 @@ if (LOG_DMA)
 		gfxoffset += 0x02000000;
 	{
 		dma_state.offset = gfxoffset - 0x02000000;
-		dma_draw(machine(), command);
+		dma_draw(command);
 	}
 
 	/* signal we're done */

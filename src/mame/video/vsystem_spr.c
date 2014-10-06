@@ -221,7 +221,7 @@ void vsystem_spr_device::get_sprite_attributes(UINT16* ram)
 }
 
 
-void vsystem_spr_device::common_sprite_drawgfx( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap)
+void vsystem_spr_device::common_sprite_drawgfx(bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap)
 {
 	gfx_element *gfx = m_gfxdecode->gfx(m_gfx_region);
 	int priority_mask = 0x00;
@@ -329,11 +329,11 @@ void vsystem_spr_device::draw_sprites( UINT16* spriteram, int spriteram_bytes, s
 			if (prihack_mask != -1)
 			{
 				if ((curr_sprite.pri & prihack_mask) == prihack_val)
-					common_sprite_drawgfx(screen.machine(), bitmap, cliprect, screen.priority());
+					common_sprite_drawgfx(bitmap, cliprect, screen.priority());
 			}
 			else
 			{
-				common_sprite_drawgfx(screen.machine(), bitmap, cliprect, screen.priority());
+				common_sprite_drawgfx(bitmap, cliprect, screen.priority());
 			}
 		}
 

@@ -40,12 +40,12 @@ public:
 	// (legacy) used in the bitmap clear functions
 	virtual int get_sprite_type(void) =0;
 
-	void kaneko16_render_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap, UINT16* spriteram16, int spriteram16_bytes);
-	void kaneko16_render_sprites(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap, UINT16* spriteram16, int spriteram16_bytes);
+	void kaneko16_render_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap, UINT16* spriteram16, int spriteram16_bytes);
+	void kaneko16_render_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap, UINT16* spriteram16, int spriteram16_bytes);
 
 
 	template<class _BitmapClass>
-	void kaneko16_render_sprites_common(running_machine &machine, _BitmapClass &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap, UINT16* spriteram16, int spriteram16_bytes);
+	void kaneko16_render_sprites_common(_BitmapClass &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap, UINT16* spriteram16, int spriteram16_bytes);
 
 
 	DECLARE_READ16_MEMBER(kaneko16_sprites_regs_r);
@@ -83,7 +83,7 @@ private:
 
 
 	template<class _BitmapClass>
-	void kaneko16_draw_sprites(running_machine &machine, _BitmapClass &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap, UINT16* spriteram16, int spriteram16_bytes);
+	void kaneko16_draw_sprites(_BitmapClass &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap, UINT16* spriteram16, int spriteram16_bytes);
 
 
 	template<class _BitmapClass>
@@ -91,7 +91,7 @@ private:
 			UINT32 code,UINT32 color,int flipx,int flipy,int sx,int sy,
 			bitmap_ind8 &priority_bitmap, int priority);
 
-	int kaneko16_parse_sprite_type012(running_machine &machine, int i, struct tempsprite *s, UINT16* spriteram16, int spriteram16_bytes);
+	int kaneko16_parse_sprite_type012(int i, struct tempsprite *s, UINT16* spriteram16, int spriteram16_bytes);
 
 	void kaneko16_copybitmap(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void kaneko16_copybitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect);

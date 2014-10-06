@@ -480,10 +480,9 @@ void taitojc_renderer::render_texture_scan(INT32 scanline, const extent_t &exten
 	}
 }
 
-void taitojc_renderer::render_polygons(running_machine &machine, UINT16 *polygon_fifo, int length)
+void taitojc_renderer::render_polygons(UINT16 *polygon_fifo, int length)
 {
-//  taitojc_state *state = machine.driver_data<taitojc_state>();
-	const rectangle visarea = machine.first_screen()->visible_area();
+	const rectangle visarea = machine().first_screen()->visible_area();
 	vertex_t vert[4];
 	int i;
 	int ptr;

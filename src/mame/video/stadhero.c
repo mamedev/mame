@@ -26,7 +26,7 @@ UINT32 stadhero_state::screen_update_stadhero(screen_device &screen, bitmap_ind1
 
 	m_tilegen1->set_bppmultmask(0x8, 0x7);
 	m_tilegen1->deco_bac06_pf_draw(bitmap,cliprect,TILEMAP_DRAW_OPAQUE, 0x00, 0x00, 0x00, 0x00);
-	m_spritegen->draw_sprites(machine(), bitmap, cliprect, m_spriteram, 0x00, 0x00, 0x0f);
+	m_spritegen->draw_sprites(bitmap, cliprect, m_spriteram, 0x00, 0x00, 0x0f);
 	m_pf1_tilemap->draw(screen, bitmap, cliprect, 0,0);
 	return 0;
 }

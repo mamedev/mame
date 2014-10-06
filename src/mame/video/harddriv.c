@@ -319,13 +319,12 @@ WRITE16_MEMBER( harddriv_state::hdgsp_vram_2bpp_w )
  *
  *************************************/
 
-INLINE void gsp_palette_change(running_machine &machine, int offset)
+inline void harddriv_state::gsp_palette_change(int offset)
 {
-	harddriv_state *state = machine.driver_data<harddriv_state>();
-	int red = (state->m_gsp_paletteram_lo[offset] >> 8) & 0xff;
-	int green = state->m_gsp_paletteram_lo[offset] & 0xff;
-	int blue = state->m_gsp_paletteram_hi[offset] & 0xff;
-	state->m_palette->set_pen_color(offset, rgb_t(red, green, blue));
+	int red = (m_gsp_paletteram_lo[offset] >> 8) & 0xff;
+	int green = m_gsp_paletteram_lo[offset] & 0xff;
+	int blue = m_gsp_paletteram_hi[offset] & 0xff;
+	m_palette->set_pen_color(offset, rgb_t(red, green, blue));
 }
 
 
@@ -346,7 +345,7 @@ WRITE16_MEMBER( harddriv_state::hdgsp_paletteram_lo_w )
 	offset = m_gfx_palettebank * 0x100 + (offset & 0xff);
 
 	COMBINE_DATA(&m_gsp_paletteram_lo[offset]);
-	gsp_palette_change(space.machine(), offset);
+	gsp_palette_change(offset);
 }
 
 
@@ -374,7 +373,7 @@ WRITE16_MEMBER( harddriv_state::hdgsp_paletteram_hi_w )
 	offset = m_gfx_palettebank * 0x100 + (offset & 0xff);
 
 	COMBINE_DATA(&m_gsp_paletteram_hi[offset]);
-	gsp_palette_change(space.machine(), offset);
+	gsp_palette_change(offset);
 }
 
 

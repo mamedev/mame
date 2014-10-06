@@ -226,38 +226,32 @@ READ8_MEMBER(thepit_state::thepit_input_port_0_r)
  *
  *************************************/
 
-static void draw_sprites(running_machine &machine,
-							bitmap_ind16 &bitmap,
-							const rectangle &cliprect,
-							int priority_to_draw)
+void thepit_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority_to_draw)
 {
-	thepit_state *state = machine.driver_data<thepit_state>();
-	int offs;
-
-	for (offs = state->m_spriteram.bytes() - 4; offs >= 0; offs -= 4)
+	for (int offs = m_spriteram.bytes() - 4; offs >= 0; offs -= 4)
 	{
-		if (((state->m_spriteram[offs + 2] & 0x08) >> 3) == priority_to_draw)
+		if (((m_spriteram[offs + 2] & 0x08) >> 3) == priority_to_draw)
 		{
 			UINT8 y, x, flipx, flipy;
 
-			if ((state->m_spriteram[offs + 0] == 0) || (state->m_spriteram[offs + 3] == 0))
+			if ((m_spriteram[offs + 0] == 0) || (m_spriteram[offs + 3] == 0))
 			{
 				continue;
 			}
 
-			y = 240 - state->m_spriteram[offs];
-			x = state->m_spriteram[offs + 3] + 1;
+			y = 240 - m_spriteram[offs];
+			x = m_spriteram[offs + 3] + 1;
 
-			flipx = state->m_spriteram[offs + 1] & 0x40;
-			flipy = state->m_spriteram[offs + 1] & 0x80;
+			flipx = m_spriteram[offs + 1] & 0x40;
+			flipy = m_spriteram[offs + 1] & 0x80;
 
-			if (state->m_flip_screen_y)
+			if (m_flip_screen_y)
 			{
 				y = 240 - y;
 				flipy = !flipy;
 			}
 
-			if (state->m_flip_screen_x)
+			if (m_flip_screen_x)
 			{
 				x = 242 - x;
 				flipx = !flipx;
@@ -267,15 +261,15 @@ static void draw_sprites(running_machine &machine,
 			if (offs < 16) y++;
 
 
-					state->m_gfxdecode->gfx(2 * state->m_graphics_bank + 1)->transpen(bitmap,cliprect,
-					state->m_spriteram[offs + 1] & 0x3f,
-					state->m_spriteram[offs + 2],
+					m_gfxdecode->gfx(2 * m_graphics_bank + 1)->transpen(bitmap,cliprect,
+					m_spriteram[offs + 1] & 0x3f,
+					m_spriteram[offs + 2],
 					flipx, flipy, x, y, 0);
 
 
-					state->m_gfxdecode->gfx(2 * state->m_graphics_bank + 1)->transpen(bitmap,cliprect,
-					state->m_spriteram[offs + 1] & 0x3f,
-					state->m_spriteram[offs + 2],
+					m_gfxdecode->gfx(2 * m_graphics_bank + 1)->transpen(bitmap,cliprect,
+					m_spriteram[offs + 1] & 0x3f,
+					m_spriteram[offs + 2],
 					flipx, flipy, x-256, y, 0);
 
 		}
@@ -307,13 +301,13 @@ UINT32 thepit_state::screen_update_thepit(screen_device &screen, bitmap_ind16 &b
 	m_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	/* low priority sprites */
-	draw_sprites(machine(), bitmap, m_flip_screen_x ? spritevisibleareaflipx : spritevisiblearea, 0);
+	draw_sprites(bitmap, m_flip_screen_x ? spritevisibleareaflipx : spritevisiblearea, 0);
 
 	/* high priority tiles */
 	m_solid_tilemap->draw(screen, bitmap, cliprect, 1, 1);
 
 	/* high priority sprites */
-	draw_sprites(machine(), bitmap, m_flip_screen_x ? spritevisibleareaflipx : spritevisiblearea, 1);
+	draw_sprites(bitmap, m_flip_screen_x ? spritevisibleareaflipx : spritevisiblearea, 1);
 
 	return 0;
 }
@@ -343,7 +337,7 @@ UINT32 thepit_state::screen_update_desertdan(screen_device &screen, bitmap_ind16
 
 	/* low priority sprites */
 	m_graphics_bank = 1;
-	draw_sprites(machine(), bitmap, m_flip_screen_y ? spritevisibleareaflipx : spritevisiblearea, 0);
+	draw_sprites(bitmap, m_flip_screen_y ? spritevisibleareaflipx : spritevisiblearea, 0);
 
 	/* high priority tiles */ // not sure about this, draws a white block over the title logo sprite, looks like it should be behind?
 	m_graphics_bank = 0;
@@ -351,7 +345,7 @@ UINT32 thepit_state::screen_update_desertdan(screen_device &screen, bitmap_ind16
 
 	/* high priority sprites */
 	m_graphics_bank = 1;
-	draw_sprites(machine(), bitmap, m_flip_screen_y ? spritevisibleareaflipx : spritevisiblearea, 1);
+	draw_sprites(bitmap, m_flip_screen_y ? spritevisibleareaflipx : spritevisiblearea, 1);
 
 	return 0;
 }

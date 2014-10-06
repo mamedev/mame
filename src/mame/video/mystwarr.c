@@ -12,17 +12,16 @@
 
 // create a decoding buffer to hold decodable tiles so that the ROM test will pass by
 // reading the original raw data
-static void mystwarr_decode_tiles(running_machine &machine)
+void mystwarr_state::decode_tiles()
 {
-	mystwarr_state *state = machine.driver_data<mystwarr_state>();
-	UINT8 *s = machine.root_device().memregion("gfx1")->base();
-	int len = machine.root_device().memregion("gfx1")->bytes();
+	UINT8 *s = memregion("gfx1")->base();
+	int len = memregion("gfx1")->bytes();
 	UINT8 *pFinish = s+len-3;
 	UINT8 *d, *decoded;
 
-	int gfxnum = state->m_k056832->get_gfx_num();
+	int gfxnum = m_k056832->get_gfx_num();
 
-	decoded = auto_alloc_array(machine, UINT8, len);
+	decoded = auto_alloc_array(machine(), UINT8, len);
 	d = decoded;
 
 	// now convert the data into a drawable format so we can decode it
@@ -51,7 +50,7 @@ static void mystwarr_decode_tiles(running_machine &machine)
 		d += 5;
 	}
 
-	state->m_gfxdecode->gfx(gfxnum)->set_source(decoded);
+	m_gfxdecode->gfx(gfxnum)->set_source(decoded);
 }
 
 
@@ -151,7 +150,7 @@ VIDEO_START_MEMBER(mystwarr_state, gaiapols)
 {
 	m_gametype = 0;
 
-	mystwarr_decode_tiles(machine());
+	decode_tiles();
 
 	konamigx_mixer_init(*m_screen, 0);
 
@@ -184,7 +183,7 @@ VIDEO_START_MEMBER(mystwarr_state, dadandrn)
 {
 	m_gametype = 1;
 
-	mystwarr_decode_tiles(machine());
+	decode_tiles();
 
 	konamigx_mixer_init(*m_screen, 0);
 
@@ -206,7 +205,7 @@ VIDEO_START_MEMBER(mystwarr_state, mystwarr)
 {
 	m_gametype = 0;
 
-	mystwarr_decode_tiles(machine());
+	decode_tiles();
 
 	konamigx_mixer_init(*m_screen, 0);
 
@@ -222,7 +221,7 @@ VIDEO_START_MEMBER(mystwarr_state, metamrph)
 {
 	m_gametype = 0;
 
-	mystwarr_decode_tiles(machine());
+	decode_tiles();
 
 	konamigx_mixer_init(*m_screen, 0);
 
@@ -237,7 +236,7 @@ VIDEO_START_MEMBER(mystwarr_state, viostorm)
 {
 	m_gametype = 0;
 
-	mystwarr_decode_tiles(machine());
+	decode_tiles();
 
 	konamigx_mixer_init(*m_screen, 0);
 
@@ -251,7 +250,7 @@ VIDEO_START_MEMBER(mystwarr_state, martchmp)
 {
 	m_gametype = 0;
 
-	mystwarr_decode_tiles(machine());
+	decode_tiles();
 
 	konamigx_mixer_init(*m_screen, 0);
 

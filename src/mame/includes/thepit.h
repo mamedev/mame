@@ -3,21 +3,26 @@ class thepit_state : public driver_device
 public:
 	thepit_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette"),
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
 		m_attributesram(*this, "attributesram"),
-		m_spriteram(*this, "spriteram"),
-		m_maincpu(*this, "maincpu"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") { }
+		m_spriteram(*this, "spriteram") { }
 
-	int m_question_address;
-	int m_question_rom;
-	int m_remap_address[16];
+	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+	
 	required_shared_ptr<UINT8> m_videoram;
 	required_shared_ptr<UINT8> m_colorram;
 	required_shared_ptr<UINT8> m_attributesram;
 	required_shared_ptr<UINT8> m_spriteram;
+	
+	int m_question_address;
+	int m_question_rom;
+	int m_remap_address[16];
 	UINT8 m_graphics_bank;
 	UINT8 m_flip_screen_x;
 	UINT8 m_flip_screen_y;
@@ -44,7 +49,5 @@ public:
 	UINT32 screen_update_thepit(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_desertdan(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
-	required_device<cpu_device> m_maincpu;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority_to_draw);
 };

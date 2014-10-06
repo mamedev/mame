@@ -33,7 +33,7 @@ public:
 
 
 	void gp3_do_rle(UINT32 address, UINT16*framebuffer, UINT8* rledata);
-	void set_color_555_gp3(running_machine &machine, pen_t color, int rshift, int gshift, int bshift, UINT16 data);
+	void set_color_555_gp3(pen_t color, int rshift, int gshift, int bshift, UINT16 data);
 
 	UINT16 m_framebuffer_bgcol;
 	UINT16 m_framebuffer_scrolly;

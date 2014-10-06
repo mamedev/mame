@@ -165,20 +165,17 @@ void carpolo_state::video_start()
  *
  *************************************/
 
-static void draw_alpha_line(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect,
+void carpolo_state::draw_alpha_line(bitmap_ind16 &bitmap, const rectangle &cliprect,
 							int alpha_line, int video_line)
 {
-	carpolo_state *state = machine.driver_data<carpolo_state>();
-	int x;
-
-	for (x = 0; x < 32; x++)
+	for (int x = 0; x < 32; x++)
 	{
 		UINT8 code, col;
 
-		code = state->m_alpharam[alpha_line * 32 + x] >> 2;
-		col  = state->m_alpharam[alpha_line * 32 + x] & 0x03;
+		code = m_alpharam[alpha_line * 32 + x] >> 2;
+		col  = m_alpharam[alpha_line * 32 + x] & 0x03;
 
-		state->m_gfxdecode->gfx(2)->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(2)->transpen(bitmap,cliprect,
 				code,col,
 				0,0,
 				x*8,video_line*8,0);
@@ -292,14 +289,14 @@ UINT32 carpolo_state::screen_update_carpolo(screen_device &screen, bitmap_ind16 
 	   and bit 3 of the vertical timing PROM controls in
 	   which quadrant the line will actually appear */
 
-	draw_alpha_line(machine(), bitmap, cliprect, 0, (0*4+0)*2  );
-	draw_alpha_line(machine(), bitmap, cliprect, 1, (0*4+0)*2+1);
-	draw_alpha_line(machine(), bitmap, cliprect, 2, (3*4+1)*2  );
-	draw_alpha_line(machine(), bitmap, cliprect, 3, (3*4+1)*2+1);
-	draw_alpha_line(machine(), bitmap, cliprect, 4, (1*4+2)*2  );
-	draw_alpha_line(machine(), bitmap, cliprect, 5, (1*4+2)*2+1);
-	draw_alpha_line(machine(), bitmap, cliprect, 6, (0*4+3)*2  );
-	draw_alpha_line(machine(), bitmap, cliprect, 7, (0*4+3)*2+1);
+	draw_alpha_line(bitmap, cliprect, 0, (0*4+0)*2  );
+	draw_alpha_line(bitmap, cliprect, 1, (0*4+0)*2+1);
+	draw_alpha_line(bitmap, cliprect, 2, (3*4+1)*2  );
+	draw_alpha_line(bitmap, cliprect, 3, (3*4+1)*2+1);
+	draw_alpha_line(bitmap, cliprect, 4, (1*4+2)*2  );
+	draw_alpha_line(bitmap, cliprect, 5, (1*4+2)*2+1);
+	draw_alpha_line(bitmap, cliprect, 6, (0*4+3)*2  );
+	draw_alpha_line(bitmap, cliprect, 7, (0*4+3)*2+1);
 
 	return 0;
 }

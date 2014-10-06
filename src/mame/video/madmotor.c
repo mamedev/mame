@@ -28,7 +28,7 @@ UINT32 madmotor_state::screen_update_madmotor(screen_device &screen, bitmap_ind1
 
 	m_tilegen3->deco_bac06_pf_draw(bitmap,cliprect,TILEMAP_DRAW_OPAQUE, 0x00, 0x00, 0x00, 0x00);
 	m_tilegen2->deco_bac06_pf_draw(bitmap,cliprect,0, 0x00, 0x00, 0x00, 0x00);
-	m_spritegen->draw_sprites(machine(), bitmap, cliprect, m_spriteram, 0x00, 0x00, 0x0f);
+	m_spritegen->draw_sprites(bitmap, cliprect, m_spriteram, 0x00, 0x00, 0x0f);
 	m_tilegen1->deco_bac06_pf_draw(bitmap,cliprect,0, 0x00, 0x00, 0x00, 0x00);
 	return 0;
 }
