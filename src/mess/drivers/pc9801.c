@@ -426,6 +426,7 @@ Keyboard TX commands:
 #include "machine/pc9801_kbd.h"
 
 #include "machine/idectrl.h"
+#include "machine/idehd.h"
 
 
 #define UPD1990A_TAG "upd1990a"
@@ -753,6 +754,7 @@ public:
 
 	DECLARE_DRIVER_INIT(pc9801_kanji);
 	inline void set_dma_channel(int channel, int state);
+	virtual void device_reset_after_children();
 };
 
 
@@ -3455,6 +3457,14 @@ MACHINE_RESET_MEMBER(pc9801_state,pc9821)
 	MACHINE_RESET_CALL_MEMBER(pc9801rs);
 
 	m_pc9821_window_bank = 0x08;
+}
+
+void pc9801_state::device_reset_after_children()
+{
+	driver_device::device_reset_after_children();
+	ata_mass_storage_device *ide0 = machine().device<ata_mass_storage_device>("ide:0:hdd");
+	if(ide0)
+		ide0->identify_device_buffer()[47] = 0;
 }
 
 INTERRUPT_GEN_MEMBER(pc9801_state::pc9801_vrtc_irq)
