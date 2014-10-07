@@ -300,7 +300,7 @@ void gdrom_device::ReadData( UINT8 *data, int dataLength )
 			    should be fixed...
 			*/
 			printf("GDROM: READ TOC, format = %d time=%d\n", command[2]&0xf,(command[1]>>1)&1);
-			switch (command[1] & 0x0f)
+			switch (command[2] & 0x0f)
 			{
 				case 0:     // normal
 					{
