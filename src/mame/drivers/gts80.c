@@ -11,19 +11,27 @@ ToDO:
 ************************************************************************************************************/
 
 
-#include "emu.h"
+#include "machine/genpin.h"
 #include "cpu/m6502/m6502.h"
 #include "machine/6532riot.h"
+#include "gts80.lh"
 
-class gts80_state : public driver_device
+class gts80_state : public genpin_class
 {
 public:
 	gts80_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
+		: genpin_class(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 	{ }
 
 	DECLARE_DRIVER_INIT(gts80);
+	DECLARE_READ8_MEMBER(port1a_r);
+	DECLARE_READ8_MEMBER(port2a_r);
+	DECLARE_WRITE8_MEMBER(port1b_w);
+	DECLARE_WRITE8_MEMBER(port2a_w);
+	DECLARE_WRITE8_MEMBER(port2b_w);
+	DECLARE_WRITE8_MEMBER(port3a_w);
+	DECLARE_WRITE8_MEMBER(port3b_w);
 private:
 	virtual void machine_reset();
 	required_device<cpu_device> m_maincpu;
@@ -45,6 +53,38 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( gts80 )
 INPUT_PORTS_END
 
+READ8_MEMBER( gts80_state::port1a_r )
+{
+	return 0xff;
+}
+
+READ8_MEMBER( gts80_state::port2a_r )
+{
+	return 0xff;
+}
+
+WRITE8_MEMBER( gts80_state::port1b_w )
+{
+}
+
+WRITE8_MEMBER( gts80_state::port2a_w )
+{
+//printf("A:%X ",data);
+}
+
+WRITE8_MEMBER( gts80_state::port2b_w )
+{
+//printf("B:%X ",data);
+}
+
+WRITE8_MEMBER( gts80_state::port3a_w )
+{
+}
+
+WRITE8_MEMBER( gts80_state::port3b_w )
+{
+}
+
 void gts80_state::machine_reset()
 {
 }
@@ -58,24 +98,32 @@ static MACHINE_CONFIG_START( gts80_s, gts80_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, 850000) // xtal frequency not shown
 	MCFG_CPU_PROGRAM_MAP(gts80_map)
+
+	/* Video */
+	MCFG_DEFAULT_LAYOUT(layout_gts80)
+
+	/* Devices */
 	MCFG_DEVICE_ADD("riot1", RIOT6532, 850000)
-	//MCFG_RIOT6532_IN_PA_CB(READ8(gts80_state, port1a_r))
+	MCFG_RIOT6532_IN_PA_CB(READ8(gts80_state, port1a_r)) // sw_r
 	//MCFG_RIOT6532_OUT_PA_CB(WRITE8(gts80_state, port1a_w))
 	//MCFG_RIOT6532_IN_PB_CB(READ8(gts80_state, port1b_r))
-	//MCFG_RIOT6532_OUT_PB_CB(WRITE8(gts80_state, port1b_w))
+	MCFG_RIOT6532_OUT_PB_CB(WRITE8(gts80_state, port1b_w)) // sw_w
 	MCFG_RIOT6532_IRQ_CB(INPUTLINE("maincpu", M6502_IRQ_LINE))
 	MCFG_DEVICE_ADD("riot2", RIOT6532, 850000)
-	//MCFG_RIOT6532_IN_PA_CB(READ8(gts80_state, port2a_r))
-	//MCFG_RIOT6532_OUT_PA_CB(WRITE8(gts80_state, port2a_w))
+	MCFG_RIOT6532_IN_PA_CB(READ8(gts80_state, port2a_r)) // pa7 - slam tilt
+	MCFG_RIOT6532_OUT_PA_CB(WRITE8(gts80_state, port2a_w)) // digit select
 	//MCFG_RIOT6532_IN_PB_CB(READ8(gts80_state, port2b_r))
-	//MCFG_RIOT6532_OUT_PB_CB(WRITE8(gts80_state, port2b_w))
+	MCFG_RIOT6532_OUT_PB_CB(WRITE8(gts80_state, port2b_w)) // seg
 	MCFG_RIOT6532_IRQ_CB(INPUTLINE("maincpu", M6502_IRQ_LINE))
 	MCFG_DEVICE_ADD("riot3", RIOT6532, 850000)
 	//MCFG_RIOT6532_IN_PA_CB(READ8(gts80_state, port3a_r))
-	//MCFG_RIOT6532_OUT_PA_CB(WRITE8(gts80_state, port3a_w))
+	MCFG_RIOT6532_OUT_PA_CB(WRITE8(gts80_state, port3a_w)) // sol, snd
 	//MCFG_RIOT6532_IN_PB_CB(READ8(gts80_state, port3b_r))
-	//MCFG_RIOT6532_OUT_PB_CB(WRITE8(gts80_state, port3b_w))
+	MCFG_RIOT6532_OUT_PB_CB(WRITE8(gts80_state, port3b_w)) // lamps
 	MCFG_RIOT6532_IRQ_CB(INPUTLINE("maincpu", M6502_IRQ_LINE))
+
+	/* Sound */
+	MCFG_FRAGMENT_ADD( genpin_audio )
 
 	/* related to src/mame/audio/gottlieb.c */
 //  MCFG_IMPORT_FROM(gts80s_s)
