@@ -545,6 +545,20 @@ endif
 
 #-------------------------------------------------
 #
+#@src/emu/bus/odyssey2/slot.h,BUSES += O2
+#-------------------------------------------------
+
+ifneq ($(filter O2,$(BUSES)),)
+OBJDIRS += $(BUSOBJ)/odyssey2
+BUSOBJS += $(BUSOBJ)/odyssey2/slot.o
+BUSOBJS += $(BUSOBJ)/odyssey2/rom.o
+BUSOBJS += $(BUSOBJ)/odyssey2/chess.o
+BUSOBJS += $(BUSOBJ)/odyssey2/voice.o
+endif
+
+
+#-------------------------------------------------
+#
 #@src/emu/bus/pc_joy/pc_joy.h,BUSES += PC_JOY
 #-------------------------------------------------
 

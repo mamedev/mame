@@ -14,11 +14,11 @@
 
 #include "emu.h"
 #include "cpu/mcs48/mcs48.h"
-#include "imagedev/cartslot.h"
-#include "sound/sp0256.h"
 #include "video/i8244.h"
 #include "machine/i8243.h"
 #include "video/ef9340_1.h"
+
+#include "bus/odyssey2/slot.h"
 
 
 class odyssey2_state : public driver_device
@@ -28,24 +28,18 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_i8244(*this, "i8244"),
-		m_sp0256(*this, "sp0256_speech"),
-		m_user1(*this, "user1"),
-		m_bank1(*this, "bank1"),
-		m_bank2(*this, "bank2"),
+		m_cart(*this, "cartslot"),
 		m_keyboard(*this, "KEY"),
 		m_joysticks(*this, "JOY") { }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<i8244_device> m_i8244;
-	required_device<sp0256_device> m_sp0256;
+	required_device<o2_cart_slot_device> m_cart;
 
-	int m_the_voice_lrq_state;
 	UINT8 m_ram[256];
 	UINT8 m_p1;
 	UINT8 m_p2;
-	int m_cart_size;
 	UINT8 m_lum;
-	DECLARE_READ8_MEMBER(t0_read);
 	DECLARE_READ8_MEMBER(io_read);
 	DECLARE_WRITE8_MEMBER(io_write);
 	DECLARE_READ8_MEMBER(bus_read);
@@ -60,7 +54,6 @@ public:
 	virtual void machine_reset();
 	DECLARE_PALETTE_INIT(odyssey2);
 	UINT32 screen_update_odyssey2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(the_voice_lrq_callback);
 	DECLARE_WRITE_LINE_MEMBER(irq_callback);
 
 	DECLARE_WRITE16_MEMBER(scanline_postprocess);
@@ -76,15 +69,8 @@ protected:
 	static const UINT8 P1_VDC_COPY_MODE_ENABLE = 0x40;
 	static const UINT8 P2_KEYBOARD_SELECT_MASK = 0x07; /* select row to scan */
 
-	required_memory_region m_user1;
-
-	required_memory_bank m_bank1;
-	required_memory_bank m_bank2;
-
 	required_ioport_array<6> m_keyboard;
 	required_ioport_array<2> m_joysticks;
-
-	void switch_banks();
 };
 
 class g7400_state : public odyssey2_state
@@ -115,9 +101,9 @@ protected:
 
 
 static ADDRESS_MAP_START( odyssey2_mem , AS_PROGRAM, 8, odyssey2_state )
-	AM_RANGE(0x0000, 0x03FF) AM_ROM
-	AM_RANGE(0x0400, 0x0BFF) AM_RAMBANK("bank1")
-	AM_RANGE(0x0C00, 0x0FFF) AM_RAMBANK("bank2")
+	AM_RANGE(0x0000, 0x03ff) AM_ROM
+	AM_RANGE(0x0400, 0x0bff) AM_DEVREAD("cartslot", o2_cart_slot_device, read_rom04)
+	AM_RANGE(0x0c00, 0x0fff) AM_DEVREAD("cartslot", o2_cart_slot_device, read_rom0c)
 ADDRESS_MAP_END
 
 
@@ -126,7 +112,7 @@ static ADDRESS_MAP_START( odyssey2_io , AS_IO, 8, odyssey2_state )
 	AM_RANGE(MCS48_PORT_P1,  MCS48_PORT_P1)  AM_READWRITE(p1_read, p1_write)
 	AM_RANGE(MCS48_PORT_P2,  MCS48_PORT_P2)  AM_READWRITE(p2_read, p2_write)
 	AM_RANGE(MCS48_PORT_BUS, MCS48_PORT_BUS) AM_READWRITE(bus_read, bus_write)
-	AM_RANGE(MCS48_PORT_T0,  MCS48_PORT_T0)  AM_READ(t0_read)
+	AM_RANGE(MCS48_PORT_T0,  MCS48_PORT_T0)  AM_DEVREAD("cartslot", o2_cart_slot_device, t0_read)
 	AM_RANGE(MCS48_PORT_T1,  MCS48_PORT_T1)  AM_READ(t1_read)
 ADDRESS_MAP_END
 
@@ -136,7 +122,7 @@ static ADDRESS_MAP_START( g7400_io , AS_IO, 8, g7400_state )
 	AM_RANGE(MCS48_PORT_P1,   MCS48_PORT_P1)   AM_READWRITE(p1_read, p1_write)
 	AM_RANGE(MCS48_PORT_P2,   MCS48_PORT_P2)   AM_READWRITE(p2_read, p2_write)
 	AM_RANGE(MCS48_PORT_BUS,  MCS48_PORT_BUS)  AM_READWRITE(bus_read, bus_write)
-	AM_RANGE(MCS48_PORT_T0,   MCS48_PORT_T0)   AM_READ(t0_read)
+	AM_RANGE(MCS48_PORT_T0,   MCS48_PORT_T0)   AM_DEVREAD("cartslot", o2_cart_slot_device, t0_read)
 	AM_RANGE(MCS48_PORT_T1,   MCS48_PORT_T1)   AM_READ(t1_read)
 	AM_RANGE(MCS48_PORT_PROG, MCS48_PORT_PROG) AM_DEVWRITE("i8243", i8243_device, i8243_prog_w);
 ADDRESS_MAP_END
@@ -298,67 +284,15 @@ WRITE_LINE_MEMBER(odyssey2_state::irq_callback)
 }
 
 
-void odyssey2_state::switch_banks()
-{
-	switch ( m_cart_size )
-	{
-		case 12288:
-			/* 12KB cart support (for instance, KTAA as released) */
-			m_bank1->set_base( m_user1->base() + (m_p1 & 0x03) * 0xC00 );
-			m_bank2->set_base( m_user1->base() + (m_p1 & 0x03) * 0xC00 + 0x800 );
-			break;
-
-		case 16384:
-			/* 16KB cart support (for instance, full sized version KTAA) */
-			m_bank1->set_base( m_user1->base() + (m_p1 & 0x03) * 0x1000 + 0x400 );
-			m_bank2->set_base( m_user1->base() + (m_p1 & 0x03) * 0x1000 + 0xC00 );
-			break;
-
-		default:
-			m_bank1->set_base( m_user1->base() + (m_p1 & 0x03) * 0x800 );
-			m_bank2->set_base( m_user1->base() + (m_p1 & 0x03) * 0x800 );
-			break;
-	}
-}
-
-
-WRITE_LINE_MEMBER(odyssey2_state::the_voice_lrq_callback)
-{
-	m_the_voice_lrq_state = state;
-}
-
-
-READ8_MEMBER(odyssey2_state::t0_read)
-{
-	return m_sp0256->lrq_r() ? 0 : 1;
-}
-
-
 DRIVER_INIT_MEMBER(odyssey2_state,odyssey2)
 {
-	int i;
-	int size = 0;
 	UINT8 *gfx = memregion("gfx1")->base();
-	device_image_interface *image = dynamic_cast<device_image_interface *>(machine().device("cart"));
 
-	for (i = 0; i < 256; i++)
+	for (int i = 0; i < 256; i++)
 	{
 		gfx[i] = i;     /* TODO: Why i and not 0? */
 		m_ram[i] = 0;
 	}
-
-	if (image->exists())
-	{
-		if (image->software_entry() == NULL)
-		{
-			size = image->length();
-		}
-		else
-		{
-			size = image->get_software_region_length("rom");
-		}
-	}
-	m_cart_size = size;
 }
 
 
@@ -367,9 +301,7 @@ void odyssey2_state::machine_start()
 	save_pointer(NAME(m_ram),256);
 	save_item(NAME(m_p1));
 	save_item(NAME(m_p2));
-	save_item(NAME(m_cart_size));
 	save_item(NAME(m_lum));
-	save_item(NAME(m_the_voice_lrq_state));
 }
 
 
@@ -378,9 +310,9 @@ void odyssey2_state::machine_reset()
 	m_lum = 0;
 
 	/* jump to "last" bank, will work for all sizes due to being mirrored */
-	m_p1 = 0xFF;
-	m_p2 = 0xFF;
-	switch_banks();
+	m_p1 = 0xff;
+	m_p2 = 0xff;
+	m_cart->write_bank(m_p1);
 }
 
 
@@ -426,17 +358,10 @@ WRITE8_MEMBER(odyssey2_state::io_write)
 	if ((m_p1 & (P1_EXT_RAM_ENABLE | P1_VDC_COPY_MODE_ENABLE)) == 0x00)
 	{
 		m_ram[offset] = data;
-		if ( offset & 0x80 )
+		if (offset & 0x80)
 		{
-			if ( data & 0x20 )
-			{
-				logerror("voice write %02X, data = %02X (p1 = %02X)\n", offset, data, m_p1 );
-				m_sp0256->ald_w(space, 0, offset & 0x7f);
-			}
-			else
-			{
-				m_sp0256->reset();
-			}
+			logerror("voice write %02X, data = %02X (p1 = %02X)\n", offset, data, m_p1);
+			m_cart->io_write(space, offset, data);
 		}
 	}
 	else if (!(m_p1 & P1_VDC_ENABLE))
@@ -470,6 +395,11 @@ WRITE8_MEMBER(g7400_state::io_write)
 	if ((m_p1 & (P1_EXT_RAM_ENABLE | P1_VDC_COPY_MODE_ENABLE)) == 0x00)
 	{
 		m_ram[offset] = data;
+		if (offset & 0x80)
+		{
+			logerror("voice write %02X, data = %02X (p1 = %02X)\n", offset, data, m_p1);
+			m_cart->io_write(space, offset, data);
+		}
 	}
 	else if (!(m_p1 & P1_VDC_ENABLE))
 	{
@@ -567,8 +497,7 @@ WRITE8_MEMBER(odyssey2_state::p1_write)
 {
 	m_p1 = data;
 	m_lum = ( data & 0x80 ) >> 4;
-
-	switch_banks();
+	m_cart->write_bank(m_p1);
 }
 
 
@@ -735,11 +664,10 @@ static GFXDECODE_START( odyssey2 )
 GFXDECODE_END
 
 
+
 static MACHINE_CONFIG_FRAGMENT( odyssey2_cartslot )
-	MCFG_CARTSLOT_ADD("cart")
-	MCFG_CARTSLOT_EXTENSION_LIST("bin,rom")
-	MCFG_CARTSLOT_NOT_MANDATORY
-	MCFG_CARTSLOT_INTERFACE("odyssey_cart")
+	MCFG_O2_CARTRIDGE_ADD("cartslot", o2_cart, NULL)
+
 	MCFG_SOFTWARE_LIST_ADD("cart_list","odyssey2")
 MACHINE_CONFIG_END
 
@@ -766,11 +694,6 @@ static MACHINE_CONFIG_START( odyssey2, odyssey2_state )
 	MCFG_I8244_ADD( "i8244", XTAL_7_15909MHz/2 * 2, "screen", WRITELINE( odyssey2_state, irq_callback ), WRITE16( odyssey2_state, scanline_postprocess ) )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
-	MCFG_SOUND_ADD("sp0256_speech", SP0256, 3120000)
-	MCFG_SP0256_DATA_REQUEST_CB(WRITELINE(odyssey2_state, the_voice_lrq_callback))
-	/* The Voice uses a speaker with its own volume control so the relative volumes to use are subjective, these sound good */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-
 	MCFG_FRAGMENT_ADD(odyssey2_cartslot)
 MACHINE_CONFIG_END
 
@@ -796,10 +719,6 @@ static MACHINE_CONFIG_START( videopac, odyssey2_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_I8245_ADD( "i8244", XTAL_17_73447MHz/5 * 2, "screen", WRITELINE( odyssey2_state, irq_callback ), WRITE16( odyssey2_state, scanline_postprocess ) )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
-
-	MCFG_SOUND_ADD("sp0256_speech", SP0256, 3120000)
-	MCFG_SP0256_DATA_REQUEST_CB(WRITELINE(odyssey2_state, the_voice_lrq_callback))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MCFG_FRAGMENT_ADD(odyssey2_cartslot)
 MACHINE_CONFIG_END
@@ -829,10 +748,6 @@ static MACHINE_CONFIG_START( g7400, g7400_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_I8245_ADD( "i8244", 3540000 * 2, "screen", WRITELINE( odyssey2_state, irq_callback ), WRITE16( g7400_state, scanline_postprocess ) )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
-
-	MCFG_SOUND_ADD("sp0256_speech", SP0256, 3120000)
-	MCFG_SP0256_DATA_REQUEST_CB(WRITELINE(odyssey2_state, the_voice_lrq_callback))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MCFG_FRAGMENT_ADD(odyssey2_cartslot)
 	MCFG_DEVICE_REMOVE("cart_list")
@@ -866,10 +781,6 @@ static MACHINE_CONFIG_START( odyssey3, g7400_state )
 	MCFG_I8244_ADD( "i8244", 3540000 * 2, "screen", WRITELINE( odyssey2_state, irq_callback ), WRITE16( g7400_state, scanline_postprocess ) )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
-	MCFG_SOUND_ADD("sp0256_speech", SP0256, 3120000)
-	MCFG_SP0256_DATA_REQUEST_CB(WRITELINE(odyssey2_state, the_voice_lrq_callback))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-
 	MCFG_FRAGMENT_ADD(odyssey2_cartslot)
 	MCFG_DEVICE_REMOVE("cart_list")
 	MCFG_SOFTWARE_LIST_ADD("cart_list","g7400")
@@ -881,26 +792,6 @@ ROM_START (odyssey2)
 	ROM_REGION(0x10000,"maincpu",0)    /* safer for the memory handler/bankswitching??? */
 	ROM_LOAD ("o2bios.rom", 0x0000, 0x0400, CRC(8016a315) SHA1(b2e1955d957a475de2411770452eff4ea19f4cee))
 	ROM_REGION(0x100, "gfx1", ROMREGION_ERASEFF)
-
-	ROM_REGION(0x4000, "user1", 0)
-	ROM_CART_LOAD("cart", 0x0000, 0x4000, ROM_MIRROR)
-
-	ROM_REGION( 0x10000, "sp0256_speech", 0 )
-	/* SP0256B-019 Speech chip w/2KiB mask rom */
-	ROM_LOAD( "sp0256b-019.bin",   0x1000, 0x0800, CRC(4bb43724) SHA1(49f5326ad45392dc96c89d1d4e089a20bd21e609) )
-
-	/* A note about "The Voice": Two versions of "The Voice" exist:
-	   * An earlier version with eight 2KiB speech roms, spr016-??? through spr016-??? on a small daughterboard
-	   <note to self: fill in numbers later>
-	   * A later version with one 16KiB speech rom, spr128-003, mounted directly on the mainboard
-	   The rom contents of these two versions are EXACTLY the same.
-	   Both versions have an sp0256b-019 speech chip, which has 2KiB of its own internal speech data
-	   Thanks to kevtris for this info. - LN
-	*/
-	/* External 16KiB speech ROM (spr128-003) from "The Voice" */
-	ROM_LOAD( "spr128-003.bin",   0x4000, 0x4000, CRC(509367b5) SHA1(0f31f46bc02e9272885779a6dd7102c78b18895b) )
-	/* Additional External 16KiB ROM (spr128-004) from S.I.D. the Spellbinder */
-	ROM_LOAD( "spr128-004.bin",   0x8000, 0x4000, CRC(e79dfb75) SHA1(37f33d79ffd1739d7c2f226b010a1eac28d74ca0) )
 ROM_END
 
 
@@ -911,17 +802,6 @@ ROM_START (videopac)
 	ROM_SYSTEM_BIOS( 1, "c52", "c52" )
 	ROMX_LOAD ("c52.bin", 0x0000, 0x0400, CRC(a318e8d6) SHA1(a6120aed50831c9c0d95dbdf707820f601d9452e), ROM_BIOS(2))
 	ROM_REGION(0x100, "gfx1", ROMREGION_ERASEFF)
-
-	ROM_REGION(0x4000, "user1", 0)
-	ROM_CART_LOAD("cart", 0x0000, 0x4000, ROM_MIRROR)
-
-	ROM_REGION( 0x10000, "sp0256_speech", 0 )
-	/* SP0256B-019 Speech chip w/2KiB mask rom */
-	ROM_LOAD( "sp0256b-019.bin",   0x1000, 0x0800, CRC(4bb43724) SHA1(49f5326ad45392dc96c89d1d4e089a20bd21e609) )
-	/* External 16KiB speech ROM (spr128-003) from "The Voice" */
-	ROM_LOAD( "spr128-003.bin",   0x4000, 0x4000, CRC(509367b5) SHA1(0f31f46bc02e9272885779a6dd7102c78b18895b) )
-	/* Additional External 16KiB speech ROM (spr128-004) from S.I.D. the Spellbinder */
-	ROM_LOAD( "spr128-004.bin",   0x8000, 0x4000, CRC(e79dfb75) SHA1(37f33d79ffd1739d7c2f226b010a1eac28d74ca0) )
 ROM_END
 
 
@@ -929,9 +809,6 @@ ROM_START (g7400)
 	ROM_REGION(0x10000,"maincpu",0)    /* safer for the memory handler/bankswitching??? */
 	ROM_LOAD ("g7400.bin", 0x0000, 0x0400, CRC(e20a9f41) SHA1(5130243429b40b01a14e1304d0394b8459a6fbae))
 	ROM_REGION(0x100, "gfx1", ROMREGION_ERASEFF)
-
-	ROM_REGION(0x4000, "user1", 0)
-	ROM_CART_LOAD("cart", 0x0000, 0x4000, ROM_MIRROR)
 ROM_END
 
 
@@ -939,9 +816,6 @@ ROM_START (jopac)
 	ROM_REGION(0x10000,"maincpu",0)    /* safer for the memory handler/bankswitching??? */
 	ROM_LOAD ("jopac.bin", 0x0000, 0x0400, CRC(11647ca5) SHA1(54b8d2c1317628de51a85fc1c424423a986775e4))
 	ROM_REGION(0x100, "gfx1", ROMREGION_ERASEFF)
-
-	ROM_REGION(0x4000, "user1", 0)
-	ROM_CART_LOAD("cart", 0x0000, 0x4000, ROM_MIRROR)
 ROM_END
 
 
@@ -950,9 +824,6 @@ ROM_START (odyssey3)
 	ROM_LOAD ("odyssey3.bin", 0x0000, 0x0400, CRC(e2b23324) SHA1(0a38c5f2cea929d2fe0a23e5e1a60de9155815dc))
 
 	ROM_REGION(0x100, "gfx1", ROMREGION_ERASEFF)
-
-	ROM_REGION(0x4000, "user1", 0)
-	ROM_CART_LOAD("cart", 0x000, 0x4000, ROM_MIRROR)
 ROM_END
 
 /*     YEAR  NAME      PARENT   COMPAT  MACHINE   INPUT     INIT      COMPANY     FULLNAME     FLAGS */
