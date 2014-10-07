@@ -53,9 +53,9 @@ public:
 	UINT16 gp9001_gfxrom_bank[8];       /* Batrider object bank */
 
 
-	void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, const UINT8* primap );
-	void gp9001_draw_custom_tilemap(running_machine& machine, bitmap_ind16 &bitmap, tilemap_t* tilemap, const UINT8* priremap, const UINT8* pri_enable );
-	void gp9001_render_vdp(running_machine& machine, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, const UINT8* primap );
+	void gp9001_draw_custom_tilemap( bitmap_ind16 &bitmap, tilemap_t* tilemap, const UINT8* priremap, const UINT8* pri_enable );
+	void gp9001_render_vdp( bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void gp9001_screen_eof(void);
 	void create_tilemaps(void);
 	void init_scroll_regs(void);

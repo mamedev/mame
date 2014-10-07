@@ -975,7 +975,7 @@ UINT32 ssv_state::screen_update_gdfs(screen_device &screen, bitmap_ind16 &bitmap
 	screen_update_ssv(screen, bitmap, cliprect);
 
 	// draw zooming sprites
-	m_gdfs_st0020->st0020_draw_all(machine(), bitmap, cliprect);
+	m_gdfs_st0020->st0020_draw_all(bitmap, cliprect);
 
 	m_gdfs_tmap->set_scrollx(0, m_gdfs_tmapscroll[0x0c/2]);
 	m_gdfs_tmap->set_scrolly(0, m_gdfs_tmapscroll[0x10/2]);

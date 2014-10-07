@@ -136,7 +136,7 @@ public:
 	DECLARE_WRITE32_MEMBER(darkhors_tmapram2_w);
 	DECLARE_WRITE32_MEMBER(darkhors_input_sel_w);
 	DECLARE_READ32_MEMBER(darkhors_input_sel_r);
-DECLARE_READ32_MEMBER(p_4e0000);
+	DECLARE_READ32_MEMBER(p_4e0000);
 	DECLARE_READ32_MEMBER(p_580000);
 	DECLARE_READ32_MEMBER(p_580004);
 	DECLARE_READ32_MEMBER(p_580008);
@@ -996,7 +996,7 @@ VIDEO_START_MEMBER(darkhors_state,jclub2)
 UINT32 darkhors_state::screen_update_jclub2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	// this isn't an st0020..
-	m_gdfs_st0020->st0020_draw_all(machine(), bitmap, cliprect);
+	m_gdfs_st0020->st0020_draw_all(bitmap, cliprect);
 
 	return 0;
 }
@@ -1066,7 +1066,7 @@ VIDEO_START_MEMBER(darkhors_state,jclub2o)
 
 UINT32 darkhors_state::screen_update_jclub2o(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m_gdfs_st0020->st0020_draw_all(machine(), bitmap, cliprect);
+	m_gdfs_st0020->st0020_draw_all(bitmap, cliprect);
 	return 0;
 }
 

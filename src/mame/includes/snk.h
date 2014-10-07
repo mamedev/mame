@@ -9,16 +9,28 @@ class snk_state : public driver_device
 public:
 	snk_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_spriteram(*this, "spriteram"),
-		m_fg_videoram(*this, "fg_videoram"),
-		m_bg_videoram(*this, "bg_videoram"),
-		m_tx_videoram(*this, "tx_videoram"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_subcpu(*this, "sub"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette"),
+		m_spriteram(*this, "spriteram"),
+		m_fg_videoram(*this, "fg_videoram"),
+		m_bg_videoram(*this, "bg_videoram"),
+		m_tx_videoram(*this, "tx_videoram") { }
+
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
+	required_device<cpu_device> m_subcpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
+	
+	required_shared_ptr<UINT8> m_spriteram;
+	optional_shared_ptr<UINT8> m_fg_videoram;
+	required_shared_ptr<UINT8> m_bg_videoram;
+	required_shared_ptr<UINT8> m_tx_videoram;
 
 	int m_countryc_trackball;
 	int m_last_value[2];
@@ -27,12 +39,7 @@ public:
 	int m_marvins_sound_busy_flag;
 	// FIXME this should be initialised on machine reset
 	int m_sound_status;
-
-	required_shared_ptr<UINT8> m_spriteram;
-	optional_shared_ptr<UINT8> m_fg_videoram;
-	required_shared_ptr<UINT8> m_bg_videoram;
-	required_shared_ptr<UINT8> m_tx_videoram;
-
+	
 	tilemap_t *m_tx_tilemap;
 	tilemap_t *m_fg_tilemap;
 	tilemap_t *m_bg_tilemap;
@@ -174,20 +181,17 @@ public:
 	UINT32 screen_update_tnk3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_ikari(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_gwar(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_tdfever(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_tdfever(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);	
 	TIMER_CALLBACK_MEMBER(sgladiat_sndirq_update_callback);
 	TIMER_CALLBACK_MEMBER(sndirq_update_callback);
 	DECLARE_WRITE_LINE_MEMBER(ymirq_callback_2);
+	void marvins_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, const int scrollx, const int scrolly, const int from, const int to);
 	void tnk3_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, const int xscroll, const int yscroll);
+	void ikari_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, const int start, const int xscroll, const int yscroll, const UINT8 *source, const int gfxnum );
+	void tdfever_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect,	const int xscroll, const int yscroll, const UINT8 *source, const int gfxnum, const int hw_xflip, const int from, const int to);
 	int hardflags_check(int num);
 	int hardflags_check8(int num);
 	int turbofront_check(int small, int num);
 	int turbofront_check8(int small, int num);
 	DECLARE_WRITE_LINE_MEMBER(ymirq_callback_1);
-	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_audiocpu;
-	required_device<cpu_device> m_subcpu;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<screen_device> m_screen;
-	required_device<palette_device> m_palette;
 };

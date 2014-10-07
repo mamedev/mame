@@ -137,7 +137,7 @@ void vsystem_spr2_device::handle_xsize_map_inc(void)
 }
 
 template<class _BitmapClass>
-void vsystem_spr2_device::turbofrc_draw_sprites_common( UINT16* spriteram3,  int spriteram3_bytes, int spritepalettebank, running_machine &machine, _BitmapClass &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap, int pri_param )
+void vsystem_spr2_device::turbofrc_draw_sprites_common( UINT16* spriteram3,  int spriteram3_bytes, int spritepalettebank, _BitmapClass &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap, int pri_param )
 {
 	int attr_start, first;
 	first = 4 * spriteram3[0x1fe];
@@ -244,8 +244,8 @@ void vsystem_spr2_device::turbofrc_draw_sprites_common( UINT16* spriteram3,  int
 	}
 }
 
-void vsystem_spr2_device::turbofrc_draw_sprites( UINT16* spriteram3,  int spriteram3_bytes, int spritepalettebank, running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap, int pri_param )
-{ turbofrc_draw_sprites_common( spriteram3, spriteram3_bytes, spritepalettebank, machine, bitmap, cliprect, priority_bitmap, pri_param ); }
+void vsystem_spr2_device::turbofrc_draw_sprites( UINT16* spriteram3,  int spriteram3_bytes, int spritepalettebank, bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap, int pri_param )
+{ turbofrc_draw_sprites_common( spriteram3, spriteram3_bytes, spritepalettebank, bitmap, cliprect, priority_bitmap, pri_param ); }
 
-void vsystem_spr2_device::turbofrc_draw_sprites( UINT16* spriteram3,  int spriteram3_bytes, int spritepalettebank, running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap, int pri_param )
-{ turbofrc_draw_sprites_common( spriteram3, spriteram3_bytes, spritepalettebank, machine, bitmap, cliprect, priority_bitmap, pri_param ); }
+void vsystem_spr2_device::turbofrc_draw_sprites( UINT16* spriteram3,  int spriteram3_bytes, int spritepalettebank, bitmap_rgb32 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap, int pri_param )
+{ turbofrc_draw_sprites_common( spriteram3, spriteram3_bytes, spritepalettebank, bitmap, cliprect, priority_bitmap, pri_param ); }

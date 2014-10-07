@@ -285,9 +285,9 @@ int K055555GX_decode_osmixcolor(int layer, int *color) // (see p.63, p.49-50 and
 }
 #endif
 
-static void gx_wipezbuf(running_machine &machine, int noshadow)
+void konamigx_state::wipezbuf(int noshadow)
 {
-	const rectangle &visarea = machine.first_screen()->visible_area();
+	const rectangle &visarea = m_screen->visible_area();
 
 	int w = visarea.width();
 	int h = visarea.height();
@@ -427,7 +427,7 @@ void konamigx_state::konamigx_mixer(screen_device &screen, bitmap_rgb32 &bitmap,
 	if (mixerflags & GXMIX_NOZBUF)
 		mixerflags |= GXMIX_NOSHADOW;
 	else
-		gx_wipezbuf(machine(), mixerflags & GXMIX_NOSHADOW);
+		wipezbuf(mixerflags & GXMIX_NOSHADOW);
 
 	// cache global parameters
 	konamigx_precache_registers();

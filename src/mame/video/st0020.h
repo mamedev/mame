@@ -21,7 +21,7 @@ public:
 	// per-game hack
 	int m_is_jclub2;
 
-	void st0020_draw_all(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void st0020_draw_all(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECLARE_READ16_MEMBER(st0020_gfxram_r);
 	DECLARE_WRITE16_MEMBER(st0020_gfxram_w);
@@ -40,7 +40,7 @@ private:
 	UINT16* m_st0020_gfxram;
 	UINT16* m_st0020_spriteram;
 	UINT16* m_st0020_blitram;
-	void st0020_draw_zooming_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int priority);
+	void st0020_draw_zooming_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority);
 	DECLARE_READ16_MEMBER(st0020_blit_r);
 	DECLARE_WRITE16_MEMBER(st0020_blit_w);
 	required_device<gfxdecode_device> m_gfxdecode;

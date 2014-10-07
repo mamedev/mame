@@ -1360,7 +1360,7 @@ DRIVER_INIT_MEMBER(tatsumi_state,apache3)
 	m_rom_clut0 = memregion("gfx2")->base()+ 0x100000 - 0x800;
 	m_rom_clut1 = memregion("gfx3")->base()+ 0x100000 - 0x800;
 
-	tatsumi_reset(machine());
+	tatsumi_reset();
 
 	// TODO: ym2151_set_port_write_handler for CT1/CT2 outputs
 }
@@ -1387,7 +1387,7 @@ DRIVER_INIT_MEMBER(tatsumi_state,roundup5)
 	m_rom_clut0 = memregion("gfx2")->base()+ 0xc0000 - 0x800;
 	m_rom_clut1 = memregion("gfx3")->base()+ 0xc0000 - 0x800;
 
-	tatsumi_reset(machine());
+	tatsumi_reset();
 }
 
 DRIVER_INIT_MEMBER(tatsumi_state,cyclwarr)
@@ -1422,7 +1422,7 @@ DRIVER_INIT_MEMBER(tatsumi_state,cyclwarr)
 	m_rom_clut0 = memregion("gfx2")->base() + len1 - 0x1000;
 	m_rom_clut1 = memregion("gfx3")->base() + len2 - 0x1000;
 
-	tatsumi_reset(machine());
+	tatsumi_reset();
 }
 
 /***************************************************************************/

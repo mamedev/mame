@@ -2,20 +2,19 @@
 #include "includes/asterix.h"
 
 
-static void reset_spritebank( running_machine &machine )
+void asterix_state::reset_spritebank()
 {
-	asterix_state *state = machine.driver_data<asterix_state>();
-	state->m_k053244->bankselect(state->m_spritebank & 7);
-	state->m_spritebanks[0] = (state->m_spritebank << 12) & 0x7000;
-	state->m_spritebanks[1] = (state->m_spritebank <<  9) & 0x7000;
-	state->m_spritebanks[2] = (state->m_spritebank <<  6) & 0x7000;
-	state->m_spritebanks[3] = (state->m_spritebank <<  3) & 0x7000;
+	m_k053244->bankselect(m_spritebank & 7);
+	m_spritebanks[0] = (m_spritebank << 12) & 0x7000;
+	m_spritebanks[1] = (m_spritebank <<  9) & 0x7000;
+	m_spritebanks[2] = (m_spritebank <<  6) & 0x7000;
+	m_spritebanks[3] = (m_spritebank <<  3) & 0x7000;
 }
 
 WRITE16_MEMBER(asterix_state::asterix_spritebank_w)
 {
 	COMBINE_DATA(&m_spritebank);
-	reset_spritebank(machine());
+	reset_spritebank();
 }
 
 K05324X_CB_MEMBER(asterix_state::sprite_callback)

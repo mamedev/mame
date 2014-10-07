@@ -20,7 +20,8 @@ const device_type SKNS_SPRITE = &device_creator<sknsspr_device>;
 
 
 sknsspr_device::sknsspr_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, SKNS_SPRITE, "SKNS Sprite", tag, owner, clock, "sknsspr", __FILE__)
+	: device_t(mconfig, SKNS_SPRITE, "SKNS Sprite", tag, owner, clock, "sknsspr", __FILE__),
+		device_video_interface(mconfig, *this)
 {
 }
 
@@ -34,7 +35,7 @@ void sknsspr_device::device_reset()
 	//printf("sknsspr_device::device_reset()\n");
 }
 
-int sknsspr_device::skns_rle_decode ( running_machine &machine, int romoffset, int size, UINT8*gfx_source, size_t gfx_length )
+int sknsspr_device::skns_rle_decode ( int romoffset, int size, UINT8*gfx_source, size_t gfx_length )
 {
 	UINT8 *src = gfx_source;
 	size_t srcsize = gfx_length;
@@ -229,7 +230,7 @@ static void (*const blit_z[4])(bitmap_ind16 &bitmap, const rectangle &cliprect, 
 	blit_fxy_z,
 };
 
-void sknsspr_device::skns_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, UINT32* spriteram_source, size_t spriteram_size, UINT8* gfx_source, size_t gfx_length, UINT32* sprite_regs)
+void sknsspr_device::skns_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, UINT32* spriteram_source, size_t spriteram_size, UINT8* gfx_source, size_t gfx_length, UINT32* sprite_regs)
 {
 	/*- SPR RAM Format -**
 
@@ -395,12 +396,12 @@ void sknsspr_device::skns_draw_sprites(running_machine &machine, bitmap_ind16 &b
 			if (sprite_flip&2)
 			{
 				xflip ^= 1;
-				sx = machine.first_screen()->visible_area().max_x+1 - sx;
+				sx = m_screen->visible_area().max_x+1 - sx;
 			}
 			if (sprite_flip&1)
 			{
 				yflip ^= 1;
-				sy = machine.first_screen()->visible_area().max_y+1 - sy;
+				sy = m_screen->visible_area().max_y+1 - sy;
 			}
 
 			/* Palette linking */
@@ -446,7 +447,7 @@ void sknsspr_device::skns_draw_sprites(running_machine &machine, bitmap_ind16 &b
 
 			romoffset &= gfxlen-1;
 
-			endromoffs = skns_rle_decode ( machine, romoffset, size, gfx_source, gfx_length );
+			endromoffs = skns_rle_decode ( romoffset, size, gfx_source, gfx_length );
 
 			// in Cyvern
 

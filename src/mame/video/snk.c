@@ -658,15 +658,13 @@ WRITE8_MEMBER(snk_state::tdfever_spriteram_w)
 
 /**************************************************************************************/
 
-static void marvins_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect,
-		const int scrollx, const int scrolly, const int from, const int to)
+void snk_state::marvins_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, const int scrollx, const int scrolly, const int from, const int to)
 {
-	snk_state *state = machine.driver_data<snk_state>();
-	gfx_element *gfx = state->m_gfxdecode->gfx(3);
+	gfx_element *gfx = m_gfxdecode->gfx(3);
 	const UINT8 *source, *finish;
 
-	source = state->m_spriteram + from*4;
-	finish = state->m_spriteram + to*4;
+	source = m_spriteram + from*4;
+	finish = m_spriteram + to*4;
 
 	while( source<finish )
 	{
@@ -678,7 +676,7 @@ static void marvins_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,
 		int flipy = (attributes&0x20);
 		int flipx = 0;
 
-		if (state->flip_screen())
+		if (flip_screen())
 		{
 			sx = 89 - 16 - sx;
 			sy = 262 - 16 - sy;
@@ -696,7 +694,7 @@ static void marvins_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,
 			color,
 			flipx, flipy,
 			sx, sy,
-			state->m_drawmode_table);
+			m_drawmode_table);
 
 		source+=4;
 	}
@@ -767,11 +765,9 @@ void snk_state::tnk3_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 }
 
 
-static void ikari_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect,
-		const int start, const int xscroll, const int yscroll, const UINT8 *source, const int gfxnum )
+void snk_state::ikari_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, const int start, const int xscroll, const int yscroll, const UINT8 *source, const int gfxnum )
 {
-	snk_state *state = machine.driver_data<snk_state>();
-	gfx_element *gfx = state->m_gfxdecode->gfx(gfxnum);
+	gfx_element *gfx = m_gfxdecode->gfx(gfxnum);
 	const int size = gfx->width();
 	int tile_number, attributes, color, sx, sy;
 	int which, finish;
@@ -809,7 +805,7 @@ static void ikari_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, c
 				color,
 				0,0,
 				sx,sy,
-				state->m_drawmode_table);
+				m_drawmode_table);
 	}
 }
 
@@ -839,11 +835,10 @@ byte3: attributes
     -xx-x--- (bank number)
     x------- (x offset bit8)
 */
-static void tdfever_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect,
-		const int xscroll, const int yscroll, const UINT8 *source, const int gfxnum, const int hw_xflip, const int from, const int to )
+void snk_state::tdfever_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect,	const int xscroll, const int yscroll, const UINT8 *source, const int gfxnum, 
+										const int hw_xflip, const int from, const int to)
 {
-	snk_state *state = machine.driver_data<snk_state>();
-	gfx_element *gfx = state->m_gfxdecode->gfx(gfxnum);
+	gfx_element *gfx = m_gfxdecode->gfx(gfxnum);
 	const int size = gfx->width();
 	int tile_number, attributes, sx, sy, color;
 	int which;
@@ -879,7 +874,7 @@ static void tdfever_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,
 		if (hw_xflip)
 			sx = 495 - size - sx;
 
-		if (state->flip_screen())
+		if (flip_screen())
 		{
 			sx = 495 - size - sx;
 			sy = 258 - size - sy;
@@ -897,7 +892,7 @@ static void tdfever_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,
 				color,
 				flipx,flipy,
 				sx,sy,
-				state->m_drawmode_table);
+				m_drawmode_table);
 	}
 }
 
@@ -911,9 +906,9 @@ UINT32 snk_state::screen_update_marvins(screen_device &screen, bitmap_ind16 &bit
 	m_fg_tilemap->set_scrolly(0, m_fg_scrolly);
 
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-	marvins_draw_sprites(machine(), bitmap, cliprect, m_sp16_scrollx, m_sp16_scrolly, 0, m_sprite_split_point>>2);
+	marvins_draw_sprites(bitmap, cliprect, m_sp16_scrollx, m_sp16_scrolly, 0, m_sprite_split_point>>2);
 	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-	marvins_draw_sprites(machine(), bitmap, cliprect, m_sp16_scrollx, m_sp16_scrolly, m_sprite_split_point>>2, 25);
+	marvins_draw_sprites(bitmap, cliprect, m_sp16_scrollx, m_sp16_scrolly, m_sprite_split_point>>2, 25);
 	m_tx_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	return 0;
@@ -940,9 +935,9 @@ UINT32 snk_state::screen_update_ikari(screen_device &screen, bitmap_ind16 &bitma
 
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
-	ikari_draw_sprites(machine(), bitmap, cliprect,  0, m_sp16_scrollx, m_sp16_scrolly, m_spriteram + 0x800, 2 );
-	ikari_draw_sprites(machine(), bitmap, cliprect,  0, m_sp32_scrollx, m_sp32_scrolly, m_spriteram,         3 );
-	ikari_draw_sprites(machine(), bitmap, cliprect, 25, m_sp16_scrollx, m_sp16_scrolly, m_spriteram + 0x800, 2 );
+	ikari_draw_sprites(bitmap, cliprect,  0, m_sp16_scrollx, m_sp16_scrolly, m_spriteram + 0x800, 2 );
+	ikari_draw_sprites(bitmap, cliprect,  0, m_sp32_scrollx, m_sp32_scrolly, m_spriteram,         3 );
+	ikari_draw_sprites(bitmap, cliprect, 25, m_sp16_scrollx, m_sp16_scrolly, m_spriteram + 0x800, 2 );
 
 	m_tx_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
@@ -956,9 +951,9 @@ UINT32 snk_state::screen_update_gwar(screen_device &screen, bitmap_ind16 &bitmap
 
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
-	tdfever_draw_sprites(machine(), bitmap, cliprect, m_sp16_scrollx, m_sp16_scrolly, m_spriteram + 0x800, 2, 0, 0, m_sprite_split_point );
-	tdfever_draw_sprites(machine(), bitmap, cliprect, m_sp32_scrollx, m_sp32_scrolly, m_spriteram,         3, 0, 0, 32 );
-	tdfever_draw_sprites(machine(), bitmap, cliprect, m_sp16_scrollx, m_sp16_scrolly, m_spriteram + 0x800, 2, 0, m_sprite_split_point, 64 );
+	tdfever_draw_sprites(bitmap, cliprect, m_sp16_scrollx, m_sp16_scrolly, m_spriteram + 0x800, 2, 0, 0, m_sprite_split_point );
+	tdfever_draw_sprites(bitmap, cliprect, m_sp32_scrollx, m_sp32_scrolly, m_spriteram,         3, 0, 0, 32 );
+	tdfever_draw_sprites(bitmap, cliprect, m_sp16_scrollx, m_sp16_scrolly, m_spriteram + 0x800, 2, 0, m_sprite_split_point, 64 );
 
 	m_tx_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
@@ -973,7 +968,7 @@ UINT32 snk_state::screen_update_tdfever(screen_device &screen, bitmap_ind16 &bit
 
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
-	tdfever_draw_sprites(machine(), bitmap, cliprect, m_sp32_scrollx, m_sp32_scrolly, m_spriteram, 2, 1, 0, 32 );
+	tdfever_draw_sprites(bitmap, cliprect, m_sp32_scrollx, m_sp32_scrolly, m_spriteram, 2, 1, 0, 32 );
 
 	m_tx_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 

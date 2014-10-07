@@ -608,7 +608,7 @@ UINT32 skns_state::screen_update_skns(screen_device &screen, bitmap_rgb32 &bitma
 	m_sprite_bitmap.fill(0x0000, cliprect);
 
 	if (m_alt_enable_sprites)
-		m_spritegen->skns_draw_sprites(machine(), m_sprite_bitmap, cliprect, m_spriteram, m_spriteram.bytes(), memregion("gfx1")->base(), memregion ("gfx1")->bytes(), m_spc_regs );
+		m_spritegen->skns_draw_sprites(m_sprite_bitmap, cliprect, m_spriteram, m_spriteram.bytes(), memregion("gfx1")->base(), memregion ("gfx1")->bytes(), m_spc_regs );
 
 
 	return 0;

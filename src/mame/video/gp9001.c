@@ -669,7 +669,7 @@ WRITE16_MEMBER( gp9001vdp_device::pipibibi_bootleg_spriteram16_w )
     Sprite Handlers
 ***************************************************************************/
 
-void gp9001vdp_device::draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, const UINT8* primap )
+void gp9001vdp_device::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, const UINT8* primap )
 {
 	const UINT16 primask = (GP9001_PRIMASK << 8);
 
@@ -859,10 +859,10 @@ void gp9001vdp_device::draw_sprites( running_machine &machine, bitmap_ind16 &bit
     Draw the game screen in the given bitmap_ind16.
 ***************************************************************************/
 
-void gp9001vdp_device::gp9001_draw_custom_tilemap(running_machine& machine, bitmap_ind16 &bitmap, tilemap_t* tilemap, const UINT8* priremap, const UINT8* pri_enable )
+void gp9001vdp_device::gp9001_draw_custom_tilemap( bitmap_ind16 &bitmap, tilemap_t* tilemap, const UINT8* priremap, const UINT8* pri_enable )
 {
-	int width = machine.first_screen()->width();
-	int height = machine.first_screen()->height();
+	int width = m_screen->width();
+	int height = m_screen->height();
 	int y,x;
 	bitmap_ind16 &tmb = tilemap->pixmap();
 	UINT16* srcptr;
@@ -912,7 +912,7 @@ static const UINT8 gp9001_sprprimap1[16] =  { 0x00, 0x04, 0x08, 0x0c, 0x10, 0x14
 
 static const UINT8 batsugun_prienable0[16]={ 1,    1,    1,    1,    1,    1,    1,    1,    1,    1,    1,    1,    1,    1,    1,    1 };
 
-void gp9001vdp_device::gp9001_render_vdp(running_machine& machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void gp9001vdp_device::gp9001_render_vdp(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	if (gp9001_gfxrom_is_banked && gp9001_gfxrom_bank_dirty)
 	{
@@ -921,10 +921,10 @@ void gp9001vdp_device::gp9001_render_vdp(running_machine& machine, bitmap_ind16 
 		gp9001_gfxrom_bank_dirty = 0;
 	}
 
-	gp9001_draw_custom_tilemap( machine, bitmap, bg.tmap, gp9001_primap1, batsugun_prienable0);
-	gp9001_draw_custom_tilemap( machine, bitmap, fg.tmap, gp9001_primap1, batsugun_prienable0);
-	gp9001_draw_custom_tilemap( machine, bitmap, top.tmap, gp9001_primap1, batsugun_prienable0);
-	draw_sprites( machine,bitmap,cliprect, gp9001_sprprimap1);
+	gp9001_draw_custom_tilemap(bitmap, bg.tmap, gp9001_primap1, batsugun_prienable0);
+	gp9001_draw_custom_tilemap(bitmap, fg.tmap, gp9001_primap1, batsugun_prienable0);
+	gp9001_draw_custom_tilemap(bitmap, top.tmap, gp9001_primap1, batsugun_prienable0);
+	draw_sprites(bitmap,cliprect, gp9001_sprprimap1);
 }
 
 

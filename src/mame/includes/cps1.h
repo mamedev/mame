@@ -337,6 +337,7 @@ public:
 
 
 	/* cps video */
+	inline UINT16 *cps1_base( int offset, int boundary );
 	void cps1_get_video_base();
 	void unshuffle(UINT64 *buf, int len);
 	void cps2_gfx_decode();

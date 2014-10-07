@@ -351,7 +351,7 @@ UINT32 galpani3_state::screen_update_galpani3(screen_device &screen, bitmap_rgb3
 
 	m_sprite_bitmap_1.fill(0x0000, cliprect);
 
-	m_spritegen->skns_draw_sprites(machine(), m_sprite_bitmap_1, cliprect, &m_spriteram32[0], 0x4000, memregion("gfx1")->base(), memregion ("gfx1")->bytes(), m_spc_regs );
+	m_spritegen->skns_draw_sprites(m_sprite_bitmap_1, cliprect, &m_spriteram32[0], 0x4000, memregion("gfx1")->base(), memregion ("gfx1")->bytes(), m_spc_regs );
 
 	// ignoring priority bits for now..
 	for (y=0;y<240;y++)

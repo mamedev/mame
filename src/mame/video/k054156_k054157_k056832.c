@@ -1269,8 +1269,7 @@ int k056832_device::update_linemap( screen_device &screen, _BitmapClass &bitmap,
         */
 		{
 			bitmap_ind16 *pixmap;
-			running_machine &machine = device->machine();
-
+			
 			UINT8 code_transparent, code_opaque;
 			const pen_t *pal_ptr;
 			const UINT8  *src_ptr;
@@ -1292,7 +1291,7 @@ int k056832_device::update_linemap( screen_device &screen, _BitmapClass &bitmap,
 				{ xpr_ptr[count+N] = 0; }
 
 			pixmap  = m_pixmap[page];
-			pal_ptr = machine.pens;
+			pal_ptr = machine().pens;
 			src_gfx = m_gfxdecode->gfx(m_gfx_num];
 			src_pitch  = src_gfx->rowbytes();
 			src_modulo = src_gfx->char_modulo;
@@ -2229,7 +2228,7 @@ int k056832_device::altK056832_update_linemap(screen_device &screen, bitmap_rgb3
 				{ xpr_ptr[count+N] = 0; }
 
 			pixmap  = m_pixmap[page];
-			pal_ptr    = machine.pens;
+			pal_ptr    = machine().pens;
 			src_gfx    = m_gfxdecode->gfx(m_gfx_num];
 			src_pitch  = src_gfx->rowbytes();
 			src_modulo = src_gfx->char_modulo;

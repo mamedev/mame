@@ -6,17 +6,16 @@
 
 /******************************************************************************/
 
-void tatsumi_reset(running_machine &machine)
+void tatsumi_state::tatsumi_reset()
 {
-	tatsumi_state *state = machine.driver_data<tatsumi_state>();
-	state->m_last_control = 0;
-	state->m_control_word = 0;
-	state->m_apache3_adc = 0;
-	state->m_apache3_rot_idx = 0;
+	m_last_control = 0;
+	m_control_word = 0;
+	m_apache3_adc = 0;
+	m_apache3_rot_idx = 0;
 
-	state->save_item(NAME(state->m_last_control));
-	state->save_item(NAME(state->m_control_word));
-	state->save_item(NAME(state->m_apache3_adc));
+	save_item(NAME(m_last_control));
+	save_item(NAME(m_control_word));
+	save_item(NAME(m_apache3_adc));
 }
 
 /******************************************************************************/

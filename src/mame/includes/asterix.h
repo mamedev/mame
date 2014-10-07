@@ -58,6 +58,7 @@ public:
 	INTERRUPT_GEN_MEMBER(asterix_interrupt);
 	K05324X_CB_MEMBER(sprite_callback);
 	K056832_CB_MEMBER(tile_callback);
+	void reset_spritebank();
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
