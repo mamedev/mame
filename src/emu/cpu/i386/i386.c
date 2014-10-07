@@ -901,7 +901,7 @@ void i386_device::i386_trap(int irq, int irq_gate, int trap_level)
 				newESP = i386_get_stack_ptr(DPL);
 				if(type & 0x08) // 32-bit gate
 				{
-					if(newESP < (V8086_MODE?36:20))
+					if(((newESP < (V8086_MODE?36:20)) && !(stack.flags & 0x4)) || ((~stack.limit < (~(newESP - 1) + (V8086_MODE?36:20))) && (stack.flags & 0x4)))
 					{
 						logerror("IRQ: New stack has no space for return addresses.\n");
 						FAULT_EXP(FAULT_SS,0)
@@ -910,7 +910,7 @@ void i386_device::i386_trap(int irq, int irq_gate, int trap_level)
 				else // 16-bit gate
 				{
 					newESP &= 0xffff;
-					if(newESP < (V8086_MODE?18:10))
+					if(((newESP < (V8086_MODE?18:10)) && !(stack.flags & 0x4)) || ((~stack.limit < (~(newESP - 1) + (V8086_MODE?18:10))) && (stack.flags & 0x4)))
 					{
 						logerror("IRQ: New stack has no space for return addresses.\n");
 						FAULT_EXP(FAULT_SS,0)
