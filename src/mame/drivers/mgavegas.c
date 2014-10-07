@@ -488,7 +488,7 @@ void mgavegas_state::machine_reset()
 {
 
 	m_int=1;
-	m_custom_data=0xffffffffffffffffLL;
+	m_custom_data=U64(0xffffffffffffffff);
 	
 	m_old_ckmod=1;
 	m_old_emod=0;
