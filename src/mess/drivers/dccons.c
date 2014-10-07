@@ -315,7 +315,7 @@ READ64_MEMBER(dc_cons_state::dc_pdtra_r )
 {
 	UINT64 out = PCTRA<<32;
 
-	out |= PDTRA & ~0x0103;
+	out |= PDTRA & ~0x0303;
 
 	// if both bits are inputs
 	if (!(PCTRA & 0x5))
@@ -333,8 +333,8 @@ READ64_MEMBER(dc_cons_state::dc_pdtra_r )
 	}
 
 	/*
-	cable setting, (0-1) VGA, (2) TV RGB (3) TV VBS/Y + S/C.
-	Note: several games doesn't like VGA setting (i.e. Idol Janshi wo Tsukucchaou, Airforce Delta), so hard-wire it to most common setting for now.
+	cable setting, (0) VGA, (2) TV RGB (3) TV VBS/Y + S/C.
+	Note: several games doesn't like VGA setting (i.e. Idol Janshi wo Tsukucchaou, Airforce Delta), default to composite.
 	*/
 	out |= ioport("SCREEN_TYPE")->read() << 8;
 
@@ -569,9 +569,10 @@ static INPUT_PORTS_START( dc )
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
 
 	PORT_START("SCREEN_TYPE")
-	PORT_CONFNAME( 0x01, 0x01, "Screen Connection Type" )
+	PORT_CONFNAME( 0x03, 0x03, "Screen Connection Type" )
 	PORT_CONFSETTING(    0x00, "VGA" )
-	PORT_CONFSETTING(    0x01, "Composite" )
+	PORT_CONFSETTING(    0x02, "Composite" )
+	PORT_CONFSETTING(    0x03, "S-Video" )
 INPUT_PORTS_END
 
 MACHINE_RESET_MEMBER(dc_cons_state,dc_console)
