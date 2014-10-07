@@ -1178,6 +1178,16 @@ ROM_START( americna ) /* Uses a small daughter card CRT-251 & Dallas DS1225Y NV 
 	ROM_LOAD( "9131-00_u11-0.u11", 0x20000, 0x10000, CRC(f2db6f5d) SHA1(3f734a7e8c72c14bf4a3e6f595819311739394d3) )
 ROM_END
 
+ROM_START( americnaa ) /* Uses the CRT-258 touch controller board & Dallas DS1225Y NV SRAM */
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "9132-00-02_u9-r0.u9", 0x00000, 0x10000, CRC(4ec683b6) SHA1(7cff76ba1517deede3dfa2a419e11fd603dcf695) ) /* 9132-00-02 R0 46  940416 */
+	ROM_LOAD( "9132-00_u10-r0.u10",  0x10000, 0x10000, CRC(d6f72934) SHA1(4f3d6a5227a3b0fc298533a03cc0a32f8e2f3840) ) // == 9131-00_u10-0.u10 from americna
+	ROM_LOAD( "9132-00_u11-r0.u11",  0x20000, 0x10000, CRC(f2db6f5d) SHA1(3f734a7e8c72c14bf4a3e6f595819311739394d3) ) // == 9131-00_u11-0.u11 from americna
+
+	ROM_REGION( 0x000022, "ds1204", 0 ) /* Connected via small CRT-254 daughter card */
+	ROM_LOAD( "9132-00-r0-key", 0x000000, 0x000022, NO_DUMP )
+ROM_END
+
 ROM_START( dodgecty ) /* Uses a small daughter card CRT-255 & Dallas DS1225Y NV SRAM */
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "9131-02_u9-2t.u9",  0x00000, 0x10000, CRC(22e73039) SHA1(368f03b31f7c3cb81a95b20d1cb954e8557d2017) ) /* 9131-02 U9-2T  880111 */
@@ -2245,8 +2255,9 @@ GAME( 1990, pitbosssa, pitbosss, meritm_crt250, pitbosss, driver_device, 0,     
 GAME( 1992, pitbosssc, pitbosss, meritm_crt250, pitbosss, driver_device, 0,        ROT0, "Merit", "Pit Boss Superstar (9221-12-01)", GAME_IMPERFECT_GRAPHICS )
 
 /* CRT 250 + CRT 252 + CRT 256 + CRT 258 */
-GAME( 1994, pbst30,    0,      meritm_crt250_crt252_crt258, pbst30, driver_device, 0,        ROT0, "Merit", "Pit Boss Supertouch 30 (9234-10-01)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1993, pbst30b,   pbst30, meritm_crt250_crt252_crt258, pbst30, driver_device, 0,        ROT0, "Merit", "Pit Boss Supertouch 30 (9234-00-01)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1994, americnaa, americna, meritm_crt250_crt252_crt258, meritm_crt260, driver_device, 0,  ROT0, "Merit", "Americana (9132-00)", GAME_IMPERFECT_GRAPHICS|GAME_NOT_WORKING )
+GAME( 1994, pbst30,    0,        meritm_crt250_crt252_crt258, pbst30,        driver_device, 0,  ROT0, "Merit", "Pit Boss Supertouch 30 (9234-10-01)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1993, pbst30b,   pbst30,   meritm_crt250_crt252_crt258, pbst30,        driver_device, 0,  ROT0, "Merit", "Pit Boss Supertouch 30 (9234-00-01)", GAME_IMPERFECT_GRAPHICS )
 
 /* CRT 250 + CRT 254 + CRT 256 */
 GAME( 1993, pbss330,   0,        meritm_crt250_questions, pbss330,  driver_device, 0,        ROT0, "Merit", "Pit Boss Superstar III 30 (9233-00-01)", GAME_IMPERFECT_GRAPHICS )
