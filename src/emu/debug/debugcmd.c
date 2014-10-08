@@ -2074,7 +2074,10 @@ static void execute_cheatinit(running_machine &machine, int ref, int params, con
 					active_cheat++;
 				}
 
-	debug_console_printf(machine, "%u cheat initialized\n", active_cheat);
+	/* give a detailed init message to avoid searches being mistakingly carried out on the wrong CPU */
+	device_t *cpu = NULL;
+	debug_command_parameter_cpu(machine, cheat.cpu, &cpu);
+	debug_console_printf(machine, "%u cheat initialized for CPU index %s ( aka %s )\n", active_cheat, cheat.cpu, cpu->tag());
 }
 
 
