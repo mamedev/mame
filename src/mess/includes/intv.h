@@ -14,6 +14,10 @@
 #include "bus/intv/ecs.h"
 //#include "bus/intv/keycomp.h"
 
+#include "bus/generic/slot.h"
+#include "bus/generic/carts.h"
+
+
 class intv_state : public driver_device
 {
 public:
