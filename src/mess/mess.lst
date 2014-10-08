@@ -293,6 +293,7 @@ vectrex   // General Consumer Electric Vectrex - 1982-1984
 intv      // Mattel Intellivision - 1979 AKA INTV
 intv2     // Mattel Intellivision II- 1982?
 intvsrs   // Intellivision (Sears License) - 19??
+intvoice      // Mattel Intellivision + IntelliVoice expansion - 1982
 
 // Milton Bradley
 microvsn  // MicroVision - 1979
@@ -1637,7 +1638,7 @@ rs128    // 1984 Memotech RS 128
 // Mattel
 intvkbd   // 1981 - Mattel Intellivision Keyboard Component
 // (Test marketed, later recalled)
-intvecs   // 1983 - Mattel Intellivision ECS
+intvecs   // 1983 - Mattel Intellivision w/ECS and IntelliVoice expansions
 aquarius  // 1983 Aquarius
 //aquariu2  // 1984 Aquarius II
 juicebox

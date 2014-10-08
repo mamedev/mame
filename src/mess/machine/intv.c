@@ -2,10 +2,7 @@
 #include "video/stic.h"
 #include "includes/intv.h"
 #include "cpu/cp1610/cp1610.h"
-#include "hashfile.h"
 
-#define INTELLIVOICE_MASK   0x02
-#define ECS_MASK            0x01
 
 
 WRITE16_MEMBER( intv_state::intvkbd_dualport16_w )
@@ -288,25 +285,6 @@ WRITE16_MEMBER( intv_state::intv_ram8_w )
 	m_ram8[offset] = data&0xff;
 }
 
-READ16_MEMBER( intv_state::intv_ecs_ram8_r )
-{
-	return (int)m_ecs_ram8[offset];
-}
-
-WRITE16_MEMBER( intv_state::intv_ecs_ram8_w )
-{
-	m_ecs_ram8[offset] = data&0xff;
-}
-
-READ16_MEMBER( intv_state::intv_cart_ram8_r )
-{
-	return (int)m_cart_ram8[offset];
-}
-WRITE16_MEMBER( intv_state::intv_cart_ram8_w )
-{
-	m_cart_ram8[offset] = data&0xff;
-}
-
 READ16_MEMBER( intv_state::intv_ram16_r )
 {
 	//logerror("%x = ram16_r(%x)\n",state->m_ram16[offset],offset);
@@ -320,289 +298,16 @@ WRITE16_MEMBER( intv_state::intv_ram16_w )
 	m_ram16[offset] = data & 0xffff;
 }
 
-// ECS and Wsmlb bank switching register handlers
-WRITE16_MEMBER( intv_state::ecs_bank1_page_select )
+READ8_MEMBER( intv_state::intvkb_iocart_r )
 {
-	if (offset == 0xfff)
-	{
-		if (data == 0x2a50)
-		{
-			m_ecs_bank_src[0] = 0;
-			m_bank1->set_base(m_bank_base[m_ecs_bank_src[0]] + (0x2000 << 1));
-		}
-		else if (data == 0x2a51)
-		{
-			m_ecs_bank_src[0] = 1;
-			m_bank1->set_base(m_bank_base[m_ecs_bank_src[0]] + (0x2000 << 1));
-		}
-	}
-}
-
-WRITE16_MEMBER( intv_state::ecs_bank2_page_select )
-{
-	if (offset == 0xfff)
-	{
-		if (data == 0x7a50)
-		{
-			m_ecs_bank_src[1] = 1;
-			m_bank2->set_base(m_bank_base[m_ecs_bank_src[1]] + (0x7000 << 1));      // ECS ROM at 0x7000 is on page 1
-		}
-		else if (data == 0x7a51 )
-		{
-			m_ecs_bank_src[1] = 0;
-			m_bank2->set_base(m_bank_base[m_ecs_bank_src[1]] + (0x7000 << 1));
-		}
-	}
-}
-
-WRITE16_MEMBER( intv_state::ecs_bank3_page_select )
-{
-	if (offset == 0xfff)
-	{
-		if (data == 0xea50)
-		{
-			m_ecs_bank_src[2] = 0;
-			m_bank3->set_base(m_bank_base[m_ecs_bank_src[2]] + (0xe000 << 1));
-		}
-		else if (data == 0xea51)
-		{
-			m_ecs_bank_src[2] = 1;
-			m_bank3->set_base(m_bank_base[m_ecs_bank_src[2]] + (0xe000 << 1));
-		}
-	}
-}
-
-WRITE16_MEMBER( intv_state::wsmlb_bank_page_select )
-{
-	logerror("offset %x data %x\n", offset, data);
-	if (offset == 0xfff)
-	{
-		if (data == 0xfa50)
-		{
-			m_ecs_bank_src[3] = 0;
-			m_bank4->set_base(m_bank_base[m_ecs_bank_src[3]] + (0xf000 << 1));
-		}
-		else if (data == 0xfa51)
-		{
-			m_ecs_bank_src[3] = 1;
-			m_bank4->set_base(m_bank_base[m_ecs_bank_src[3]] + (0xf000 << 1));
-		}
-	}
-}
-
-int intv_state::intv_load_rom_file(device_image_interface &image)
-{
-	int i,j;
-
-	UINT8 temp;
-	UINT8 num_segments;
-	UINT8 start_seg;
-	UINT8 end_seg;
-
-	UINT32 current_address;
-	UINT32 end_address;
-
-	UINT8 high_byte;
-	UINT8 low_byte;
-
-	UINT8 *memory = m_region_maincpu->base();
-	address_space &program = m_maincpu->space(AS_PROGRAM);
-	const char *filetype = image.filetype();
-
-	/* if it is in .rom format, we enter here */
-	if (!core_stricmp (filetype, "rom"))
-	{
-		image.fread( &temp, 1);         /* header */
-		if (temp != 0xa8)
-		{
-			return IMAGE_INIT_FAIL;
-		}
-
-		image.fread( &num_segments, 1);
-
-		image.fread( &temp, 1);
-		if (temp != (num_segments ^ 0xff))
-		{
-			return IMAGE_INIT_FAIL;
-		}
-
-		for (i = 0; i < num_segments; i++)
-		{
-			image.fread( &start_seg, 1);
-			current_address = start_seg * 0x100;
-
-			image.fread( &end_seg, 1);
-			end_address = end_seg * 0x100 + 0xff;
-
-			while (current_address <= end_address)
-			{
-				image.fread( &low_byte, 1);
-				memory[(current_address << 1) + 1] = low_byte;
-				image.fread( &high_byte, 1);
-				memory[current_address << 1] = high_byte;
-				current_address++;
-			}
-
-			/* Here we should calculate and compare the CRC16... */
-			image.fread( &temp, 1);
-			image.fread( &temp, 1);
-		}
-
-		/* Access tables and fine address restriction tables are not supported ATM */
-		for (i = 0; i < (16 + 32 + 2); i++)
-		{
-			image.fread( &temp, 1);
-		}
-		return IMAGE_INIT_PASS;
-	}
-	/* otherwise, we load it as a .bin file, using extrainfo from intv.hsi in place of .cfg */
+	if (m_iocart1->exists())
+		return m_iocart1->read_rom(space, offset, mem_mask);
+	else if (m_iocart2->exists())
+		return m_iocart2->read_rom(space, offset, mem_mask);
 	else
-	{
-		/* This code is a blatant hack, due to impossibility to load a separate .cfg file in MESS. */
-		/* It shall be eventually replaced by the .xml loading */
-
-		/* extrainfo format */
-		// 1. mapper number (to deal with bankswitch). no bankswitch is mapper 0 (most games).
-		// 2.->5. current images have at most 4 chunks of data. we store here block size and location to load
-		//  (value & 0xf0) >> 4 is the location / 0x1000
-		//  (value & 0x0f) is the size / 0x800
-		// 6. some images have a ram chunk. as above we store location and size in 8 bits
-		// 7. extra = 1 ECS, 2 Intellivoice
-		int start, size;
-		int mapper, rom[5], ram, extra;
-		astring extrainfo;
-		if (!hashfile_extrainfo(image, extrainfo))
-		{
-			/* If no extrainfo, we assume a single 0x2000 chunk at 0x5000 */
-			for (i = 0; i < 0x2000; i++ )
-			{
-				image.fread( &low_byte, 1);
-				memory[((0x5000 + i) << 1) + 1] = low_byte;
-				image.fread( &high_byte, 1);
-				memory[(0x5000 + i) << 1] = high_byte;
-			}
-		}
-		else
-		{
-			sscanf(extrainfo.cstr() ,"%d %d %d %d %d %d %d", &mapper, &rom[0], &rom[1], &rom[2],
-																&rom[3], &ram, &extra);
-
-//          logerror("extrainfo: %d %d %d %d %d %d %d \n", mapper, rom[0], rom[1], rom[2],
-//                                                              rom[3], ram, extra);
-
-			if (mapper)
-			{
-				logerror("Bankswitch not yet implemented! \n");
-			}
-
-			if (ram)
-			{
-				start = (( ram & 0xf0 ) >> 4) * 0x1000;
-				size = ( ram & 0x0f ) * 0x800;
-
-				program.install_readwrite_handler(start, start + size,
-					read16_delegate( FUNC( intv_state::intv_cart_ram8_r ), this),
-					write16_delegate( FUNC( intv_state::intv_cart_ram8_w ), this));
-			}
-			/* For now intellivoice always active
-			if (extra & INTELLIVOICE_MASK)
-			{
-			    // tbd
-			}
-			*/
-
-			if (extra & ECS_MASK)
-			{
-				logerror("Requires ECS Module\n");
-			}
-
-			for (j = 0; j < 4; j++)
-			{
-				start = (( rom[j] & 0xf0 ) >> 4) * 0x1000;
-				size = ( rom[j] & 0x0f ) * 0x800;
-
-				/* some cart has to be loaded to 0x4800, but none goes to 0x4000. Hence, we use */
-				/* 0x04 << 4 in extrainfo (to reduce the stored values) and fix the value here. */
-				if (start == 0x4000) start += 0x800;
-
-//              logerror("step %d: %d %d \n", j, start / 0x1000, size / 0x1000);
-
-				for (i = 0; i < size; i++ )
-				{
-					image.fread( &low_byte, 1);
-					memory[((start + i) << 1) + 1] = low_byte;
-					image.fread( &high_byte, 1);
-					memory[(start + i) << 1] = high_byte;
-				}
-			}
-		}
-
-		return IMAGE_INIT_PASS;
-	}
+		return m_region_keyboard->u8(offset + 0xe000);
 }
 
-DEVICE_IMAGE_LOAD_MEMBER( intv_state, intv_cart )
-{
-	if (image.software_entry() == NULL)
-		return intv_load_rom_file(image);
-	else
-	{
-		UINT16 offset[] = {0x4800, 0x5000, 0x6000, 0x7000, 0x9000, 0xa000, 0xc000, 0xd000, 0xf000};
-		const char* region_name[] = {"4800", "5000", "6000", "7000", "9000", "A000", "C000", "D000", "F000"};
-		UINT8 *memory = m_region_maincpu->base();
-		address_space &program = m_maincpu->space(AS_PROGRAM);
-
-		UINT32 size=0;
-		UINT16 address = 0;
-		UINT8 *region;
-		for(int i = 0; i < 9; i++)
-		{
-			address = offset[i];
-			size = image.get_software_region_length(region_name[i]);
-			if (size)
-			{
-				region = image.get_software_region(region_name[i]);
-				for (int j = 0; j < (size>>1); j++)
-				{
-					memory[((address + j) << 1) + 1] = region[2*j];
-					memory[(address + j) << 1] = region[2*j+1];
-				}
-			}
-		}
-		// deal with wsmlb paged rom
-
-		size = image.get_software_region_length("F000_bank1");
-		if (size && m_region_ecs_rom) // only load if ecs is plugged in (should probably be done a different way)
-		{
-			UINT8 *ecs_rom_region = m_region_ecs_rom->base();
-
-			region = image.get_software_region("F000_bank1");
-			for (int j = 0; j < (size>>1); j++)
-			{
-				ecs_rom_region[((address + j) << 1) + 1] = region[2*j];
-				ecs_rom_region[(address + j) << 1] = region[2*j+1];
-			}
-		}
-
-		// Cartridge 8bit ram support
-		size = image.get_software_region_length("D000_RAM8");
-		if (size)
-		{
-			program.install_readwrite_handler(0xD000, 0xD000 + size,
-				read16_delegate( FUNC( intv_state::intv_cart_ram8_r ), this),
-				write16_delegate( FUNC( intv_state::intv_cart_ram8_w ), this));
-		}
-
-		size = image.get_software_region_length("8800_RAM8");
-		if (size)
-		{
-			program.install_readwrite_handler(0x8800, 0x8800 + size,
-				read16_delegate( FUNC( intv_state::intv_cart_ram8_r ), this),
-				write16_delegate( FUNC( intv_state::intv_cart_ram8_w ), this));
-		}
-		return IMAGE_INIT_PASS;
-	}
-}
 
 /* Set Reset and INTR/INTRM Vector */
 void intv_state::machine_reset()
@@ -615,21 +320,6 @@ void intv_state::machine_reset()
 
 	/* Set initial PC */
 	m_maincpu->set_state_int(CP1610_R7, 0x1000);
-
-	if (m_is_ecs)
-	{
-		// ECS can switch between the maincpu and the ecs roms
-		m_ecs_bank_src[0] = 0;  // CPU
-		m_ecs_bank_src[1] = 1;  // ECS
-		m_ecs_bank_src[2] = 0;  // CPU
-		m_ecs_bank_src[3] = 0;  // CPU
-		m_bank_base[0] = m_region_maincpu->base();
-		m_bank_base[1] = m_region_ecs_rom->base();
-		m_bank1->set_base(m_bank_base[m_ecs_bank_src[0]] + (0x2000 << 1));
-		m_bank2->set_base(m_bank_base[m_ecs_bank_src[1]] + (0x7000 << 1));
-		m_bank3->set_base(m_bank_base[m_ecs_bank_src[2]] + (0xe000 << 1));
-		m_bank4->set_base(m_bank_base[m_ecs_bank_src[3]] + (0xf000 << 1));
-	}
 }
 
 void intv_state::machine_start()
@@ -661,30 +351,7 @@ void intv_state::machine_start()
 	save_item(NAME(m_ram16));
 	save_item(NAME(m_sr1_int_pending));
 	save_item(NAME(m_ram8));
-	save_item(NAME(m_cart_ram8));
-
-	// ecs
-	if (m_is_ecs)
-	{
-		for (int i = 0; i < 7; i++)
-		{
-			char str[9];
-			sprintf(str, "ECS_ROW%i", i);
-			m_ecs_keyboard[i] = ioport(str);
-		}
-		for (int i = 0; i < 7; i++)
-		{
-			char str[15];
-			sprintf(str, "ECS_SYNTH_ROW%i", i);
-			m_ecs_synth[i] = ioport(str);
-		}
-
-		save_item(NAME(m_ecs_ram8));
-		save_item(NAME(m_ecs_psg_porta));
-		save_item(NAME(m_ecs_bank_src));
-		machine().save().register_postload(save_prepost_delegate(FUNC(intv_state::ecs_banks_restore), this));
-	}
-
+	
 	// intvkbd
 	if (m_is_keybd)
 	{
@@ -706,14 +373,47 @@ void intv_state::machine_start()
 		save_item(NAME(m_tms9927_cursor_row));
 		save_item(NAME(m_tms9927_last_row));
 	}
-}
 
-void intv_state::ecs_banks_restore()
-{
-	m_bank1->set_base(m_bank_base[m_ecs_bank_src[0]] + (0x2000 << 1));
-	m_bank2->set_base(m_bank_base[m_ecs_bank_src[1]] + (0x7000 << 1));
-	m_bank3->set_base(m_bank_base[m_ecs_bank_src[2]] + (0xe000 << 1));
-	m_bank4->set_base(m_bank_base[m_ecs_bank_src[3]] + (0xf000 << 1));
+	if (m_cart && m_cart->exists())
+	{
+		// RAM
+		switch (m_cart->get_type())
+		{
+			case INTV_RAM:
+				m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xd000, 0xd7ff, read16_delegate(FUNC(intv_cart_slot_device::read_ram),(intv_cart_slot_device*)m_cart), write16_delegate(FUNC(intv_cart_slot_device::write_ram),(intv_cart_slot_device*)m_cart));
+				break;
+			case INTV_GFACT:
+				m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x8800, 0x8fff, read16_delegate(FUNC(intv_cart_slot_device::read_ram),(intv_cart_slot_device*)m_cart), write16_delegate(FUNC(intv_cart_slot_device::write_ram),(intv_cart_slot_device*)m_cart));
+				break;
+			case INTV_VOICE:
+				m_cart->late_subslot_setup();
+				m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x0080, 0x0081, read16_delegate(FUNC(intv_cart_slot_device::read_speech),(intv_cart_slot_device*)m_cart), write16_delegate(FUNC(intv_cart_slot_device::write_speech),(intv_cart_slot_device*)m_cart));
+				
+				// passthru for RAM-equipped carts
+				m_maincpu->space(AS_PROGRAM).install_write_handler(0x8800, 0x8fff, write16_delegate(FUNC(intv_cart_slot_device::write_88),(intv_cart_slot_device*)m_cart));
+				m_maincpu->space(AS_PROGRAM).install_write_handler(0xd000, 0xd7ff, write16_delegate(FUNC(intv_cart_slot_device::write_d0),(intv_cart_slot_device*)m_cart));
+				break;
+			case INTV_ECS:
+				m_cart->late_subslot_setup();
+				m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x00f0, 0x00ff, read16_delegate(FUNC(intv_cart_slot_device::read_ay),(intv_cart_slot_device*)m_cart), write16_delegate(FUNC(intv_cart_slot_device::write_ay),(intv_cart_slot_device*)m_cart));
+				m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x4000, 0x47ff, read16_delegate(FUNC(intv_cart_slot_device::read_ram),(intv_cart_slot_device*)m_cart), write16_delegate(FUNC(intv_cart_slot_device::write_ram),(intv_cart_slot_device*)m_cart));
+
+				m_maincpu->space(AS_PROGRAM).install_write_handler(0x2000, 0x2fff, write16_delegate(FUNC(intv_cart_slot_device::write_rom20),(intv_cart_slot_device*)m_cart));
+				m_maincpu->space(AS_PROGRAM).install_write_handler(0x7000, 0x7fff, write16_delegate(FUNC(intv_cart_slot_device::write_rom70),(intv_cart_slot_device*)m_cart));
+				m_maincpu->space(AS_PROGRAM).install_write_handler(0xe000, 0xefff, write16_delegate(FUNC(intv_cart_slot_device::write_rome0),(intv_cart_slot_device*)m_cart));
+				m_maincpu->space(AS_PROGRAM).install_write_handler(0xf000, 0xffff, write16_delegate(FUNC(intv_cart_slot_device::write_romf0),(intv_cart_slot_device*)m_cart));
+				
+				// passthru for Intellivoice expansion
+				m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x0080, 0x0081, read16_delegate(FUNC(intv_cart_slot_device::read_speech),(intv_cart_slot_device*)m_cart), write16_delegate(FUNC(intv_cart_slot_device::write_speech),(intv_cart_slot_device*)m_cart));
+				
+				// passthru for RAM-equipped carts
+				m_maincpu->space(AS_PROGRAM).install_write_handler(0x8800, 0x8fff, write16_delegate(FUNC(intv_cart_slot_device::write_88),(intv_cart_slot_device*)m_cart));
+				m_maincpu->space(AS_PROGRAM).install_write_handler(0xd000, 0xd7ff, write16_delegate(FUNC(intv_cart_slot_device::write_d0),(intv_cart_slot_device*)m_cart));
+				break;
+		}
+
+		m_cart->save_ram();
+	}
 }
 
 
@@ -827,85 +527,4 @@ READ8_MEMBER( intv_state::intv_left_control_r )
 READ8_MEMBER( intv_state::intv_right_control_r )
 {
 	return intv_control_r(1);
-}
-
-READ8_MEMBER( intv_state::intv_ecs_porta_r )
-{
-	if (m_io_ecs_cntrlsel->read() == 0)
-		return intv_control_r(2);
-	else
-		return 0xff; // not sure what to return here, maybe it should be last output?
-}
-
-READ8_MEMBER( intv_state::intv_ecs_portb_r )
-{
-	switch (m_io_ecs_cntrlsel->read())
-	{
-		case 0x00: // hand controller
-		{
-			return intv_control_r(3);
-		}
-		case 0x01: // synthesizer keyboard
-		{
-			UINT8 rv = 0xff;
-			// return correct result if more than one bit of 0xFE is set
-			for (int i = 0; i < 7; i++)
-			{
-				if (BIT(m_ecs_psg_porta, i))
-					rv &= m_ecs_synth[i]->read();
-			}
-			return rv;
-		}
-		case 0x02: // ecs keyboard
-		{
-			UINT8 rv = 0xff;
-			// return correct result if more than one bit of 0xFE is set
-			for (int i = 0; i < 7; i++)
-			{
-				if (BIT(m_ecs_psg_porta, i))
-					rv &= m_ecs_keyboard[i]->read();
-			}
-			return rv;
-		}
-		default:
-			return 0xff;
-	}
-}
-
-WRITE8_MEMBER( intv_state::intv_ecs_porta_w )
-{
-	m_ecs_psg_porta = (~data) & 0xff;
-}
-
-/* Intellivision console + keyboard component */
-
-DEVICE_IMAGE_LOAD_MEMBER( intv_state,intvkbd_cart )
-{
-	if (strcmp(image.device().tag(),":cart1") == 0) /* Legacy cartridge slot */
-	{
-		/* First, initialize these as empty so that the intellivision
-		 * will think that the playcable is not attached */
-		UINT8 *memory = m_region_maincpu->base();
-
-		/* assume playcable is absent */
-		memory[0x4800 << 1] = 0xff;
-		memory[(0x4800 << 1) + 1] = 0xff;
-
-		if (image.software_entry() == NULL)
-		{
-			return intv_load_rom_file(image);
-		}
-		// Shouldn't we report failure here???
-	}
-
-	if (strcmp(image.device().tag(),":cart2") == 0) /* Keyboard component cartridge slot */
-	{
-		UINT8 *memory = m_region_keyboard->base();
-
-		/* Assume an 8K cart, like BASIC */
-		image.fread(&memory[0xe000], 0x2000);
-	}
-
-	return IMAGE_INIT_PASS;
-
 }

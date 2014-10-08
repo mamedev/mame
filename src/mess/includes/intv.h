@@ -8,8 +8,11 @@
 #define INTV_H_
 
 #include "sound/ay8910.h"
-#include "sound/sp0256.h"
 #include "video/stic.h"
+#include "bus/intv/slot.h"
+#include "bus/intv/voice.h"
+#include "bus/intv/ecs.h"
+#include "bus/intv/keycomp.h"
 
 class intv_state : public driver_device
 {
@@ -24,31 +27,26 @@ public:
 	intv_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_intellivoice(*this, "sp0256_speech"),
-		m_sound(*this, "ay8914.1"),
-		m_ecs_sound(*this, "ay8914.2"),
+		m_sound(*this, "ay8914"),
 		m_stic(*this, "stic"),
+		m_cart(*this, "cartslot"),
 		m_intvkbd_dualport_ram(*this, "dualport_ram"),
 		m_videoram(*this, "videoram"),
 		m_keyboard(*this, "keyboard"),
+		m_iocart1(*this, "ioslot1"),
+		m_iocart2(*this, "ioslot2"),
 		m_region_maincpu(*this, "maincpu"),
-		m_region_ecs_rom(*this, "ecs_rom"),
 		m_region_keyboard(*this, "keyboard"),
-		m_bank1(*this, "bank1"),
-		m_bank2(*this, "bank2"),
-		m_bank3(*this, "bank3"),
-		m_bank4(*this, "bank4"),
 		m_io_options(*this, "OPTIONS"),
-		m_io_ecs_cntrlsel(*this, "ECS_CNTRLSEL"),
 		m_io_test(*this, "TEST"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")  { }
+		m_palette(*this, "palette")  
+	{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<sp0256_device> m_intellivoice;
 	required_device<ay8914_device> m_sound;
-	optional_device<ay8914_device> m_ecs_sound;
 	required_device<stic_device> m_stic;
+	optional_device<intv_cart_slot_device> m_cart;
 	optional_shared_ptr<UINT16> m_intvkbd_dualport_ram;
 	optional_shared_ptr<UINT8> m_videoram;
 
@@ -60,35 +58,16 @@ public:
 	DECLARE_WRITE16_MEMBER(intv_ram8_w);
 	DECLARE_READ16_MEMBER(intv_ram16_r);
 	DECLARE_WRITE16_MEMBER(intv_ram16_w);
+	DECLARE_READ8_MEMBER(intvkb_iocart_r);
 
-	DECLARE_READ16_MEMBER(intv_cart_ram8_r);
-	DECLARE_WRITE16_MEMBER(intv_cart_ram8_w);
-
-	DECLARE_READ8_MEMBER( intv_right_control_r );
-	DECLARE_READ8_MEMBER( intv_left_control_r );
-
+	DECLARE_READ8_MEMBER(intv_right_control_r);
+	DECLARE_READ8_MEMBER(intv_left_control_r);
+	
 	UINT8 m_bus_copy_mode;
 	UINT8 m_backtab_row;
 	UINT16 m_ram16[0x160];
 	int m_sr1_int_pending;
 	UINT8 m_ram8[256];
-	UINT8 m_cart_ram8[2048];
-
-	// ecs
-	DECLARE_WRITE16_MEMBER(ecs_bank1_page_select);
-	DECLARE_WRITE16_MEMBER(ecs_bank2_page_select);
-	DECLARE_WRITE16_MEMBER(ecs_bank3_page_select);
-	DECLARE_WRITE16_MEMBER(wsmlb_bank_page_select);
-	DECLARE_READ16_MEMBER(intv_ecs_ram8_r);
-	DECLARE_WRITE16_MEMBER(intv_ecs_ram8_w);
-
-	DECLARE_READ8_MEMBER(intv_ecs_porta_r);
-	DECLARE_WRITE8_MEMBER(intv_ecs_porta_w);
-	DECLARE_READ8_MEMBER(intv_ecs_portb_r);
-
-	UINT8 m_ecs_ram8[2048];
-	UINT8 m_ecs_psg_porta;
-	int m_ecs_bank_src[4];
 
 	// Keyboard Component
 	DECLARE_READ8_MEMBER(intvkbd_tms9927_r);
@@ -125,22 +104,16 @@ public:
 	TIMER_CALLBACK_MEMBER(intv_interrupt2_complete);
 	TIMER_CALLBACK_MEMBER(intv_interrupt_complete);
 	TIMER_CALLBACK_MEMBER(intv_btb_fill);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(intv_cart);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(intvkbd_cart);
 
 protected:
-	int m_is_keybd, m_is_ecs;
+	int m_is_keybd;
 
 	optional_device<cpu_device> m_keyboard;
+	optional_device<generic_slot_device> m_iocart1;
+	optional_device<generic_slot_device> m_iocart2;
 	required_memory_region m_region_maincpu;
-	optional_memory_region m_region_ecs_rom;
 	optional_memory_region m_region_keyboard;
-	optional_memory_bank m_bank1;
-	optional_memory_bank m_bank2;
-	optional_memory_bank m_bank3;
-	optional_memory_bank m_bank4;
 	required_ioport m_io_options;
-	optional_ioport m_io_ecs_cntrlsel;
 	optional_ioport m_io_test;
 
 	optional_device<gfxdecode_device> m_gfxdecode;
@@ -151,9 +124,6 @@ protected:
 	ioport_port *m_discx[4];
 	ioport_port *m_discy[4];
 	ioport_port *m_intv_keyboard[10];
-	ioport_port *m_ecs_keyboard[7];
-	ioport_port *m_ecs_synth[7];
-	UINT8 *m_bank_base[2];
 
 	int intv_load_rom_file(device_image_interface &image);
 	UINT8 intv_control_r(int hand);

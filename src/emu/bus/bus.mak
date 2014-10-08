@@ -415,6 +415,20 @@ endif
 
 #-------------------------------------------------
 #
+#@src/emu/bus/intv/slot.h,BUSES += INTV
+#-------------------------------------------------
+
+ifneq ($(filter INTV,$(BUSES)),)
+OBJDIRS += $(BUSOBJ)/intv
+BUSOBJS += $(BUSOBJ)/intv/slot.o
+BUSOBJS += $(BUSOBJ)/intv/rom.o
+BUSOBJS += $(BUSOBJ)/intv/voice.o
+BUSOBJS += $(BUSOBJ)/intv/ecs.o
+endif
+
+
+#-------------------------------------------------
+#
 #@src/emu/bus/isa/isa.h,BUSES += ISA
 #-------------------------------------------------
 
