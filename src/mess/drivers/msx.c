@@ -521,6 +521,7 @@ PCB Layouts missing
 #include "includes/msx.h"
 #include "bus/centronics/covox.h"
 #include "formats/dsk_dsk.h"
+#include "formats/dmk_dsk.h"
 #include "machine/msx_matsushita.h"
 #include "machine/msx_s1985.h"
 #include "machine/msx_systemflags.h"
@@ -1258,7 +1259,8 @@ static MACHINE_CONFIG_FRAGMENT( msx2_floplist )
 MACHINE_CONFIG_END
 
 FLOPPY_FORMATS_MEMBER( msx_state::floppy_formats )
-	FLOPPY_MSX_FORMAT
+	FLOPPY_MSX_FORMAT,
+	FLOPPY_DMK_FORMAT
 FLOPPY_FORMATS_END
 
 static SLOT_INTERFACE_START( msx_floppies )
