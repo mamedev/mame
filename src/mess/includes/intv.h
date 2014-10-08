@@ -12,7 +12,7 @@
 #include "bus/intv/slot.h"
 #include "bus/intv/voice.h"
 #include "bus/intv/ecs.h"
-#include "bus/intv/keycomp.h"
+//#include "bus/intv/keycomp.h"
 
 class intv_state : public driver_device
 {
