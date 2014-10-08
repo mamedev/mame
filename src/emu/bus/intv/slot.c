@@ -470,7 +470,7 @@ void intv_cart_slot_device::get_default_card_software(astring &result)
 		
 		core_fread(m_file, rom, len);
 
-		if (rom[0] == 0xa8 && (rom[1] == rom[2] ^ 0xff ))
+		if (rom[0] == 0xa8 && (rom[1] == (rom[2] ^ 0xff)))
 		{
 			// it's .ROM file, so that we don't have currently any way to distinguish RAM-equipped carts
 		}
