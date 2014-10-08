@@ -81,8 +81,6 @@ public:
 	virtual void device_reset();
 	
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_ram);
-	virtual DECLARE_WRITE8_MEMBER(write_ram);
 	virtual DECLARE_READ8_MEMBER(read_io);
 	virtual DECLARE_WRITE8_MEMBER(write_io);
 

@@ -348,18 +348,6 @@ WRITE8_MEMBER(ws_rom_sram_device::write_io)
 			ws_rom_device::write_io(space, offset, data);
 			break;
 	}
-
-	m_io_regs[offset] = data;
-}
-
-READ8_MEMBER(ws_rom_eeprom_device::read_ram)
-{
-	return m_nvram[offset & (m_nvram.count() - 1)];
-}
-
-WRITE8_MEMBER(ws_rom_eeprom_device::write_ram)
-{
-	m_nvram[offset & (m_nvram.count() - 1)] = data;
 }
 
 

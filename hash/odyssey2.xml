@@ -224,10 +224,6 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 			<dataarea name="rom" size="4096">
 				<rom name="sid the spellbinder (usa).bin" size="4096" crc="1b9f2f16" sha1="dfed128d213d4192313f85fe2b8716579c2fc995" offset="0" />
 			</dataarea>
-			<!-- Additional Speech data for The Voice -->
-			<dataarea name="speech" size="16384">
-				<rom name="spr128-004.bin" size="16384" crc="e79dfb75" sha1="37f33d79ffd1739d7c2f226b010a1eac28d74ca0" offset="0" />
-			</dataarea>
 		</part>
 	</software>
 
@@ -543,7 +539,8 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 		<description>Chez Maxime (Fra)</description>
 		<year>198?</year>
 		<publisher>Radiola</publisher>
-		<part name="cart" interface="g7400_cart">
+		<part name="cart" interface="odyssey_cart">
+		<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="4096">
 				<rom name="chez maxime (france).bin" size="4096" crc="0f46cf66" sha1="cd58d267fe5bab82f5dab01dbb08d5adf0053108" offset="0" />
 			</dataarea>
@@ -1766,6 +1763,58 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 		<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="2048">
 				<rom name="war of nerves (usa, europe).bin" size="2048" crc="58fa6766" sha1="e56b674c832e5a7cad977cc76779548fdd2f338e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ktaa">
+		<description>Kill the Attacking Aliens</description>
+		<year>2003</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="programmer" value="Soeren Gust" />
+		<part name="cart" interface="odyssey_cart">
+		<feature name="slot" value="o2_rom12" />
+			<dataarea name="rom" size="12288">
+				<rom name="ktaa.bin" size="12288" crc="4e2cc6d3" sha1="42ad0c57bd16b7f24c242f60b5c0e9988d8dfba8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="plander">
+		<description>Planet Lander</description>
+		<year>2004</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="programmer" value="Ted Szczypiorski" />
+		<part name="cart" interface="odyssey_cart">
+		<feature name="slot" value="o2_rom" />
+			<dataarea name="rom" size="2048">
+				<rom name="plander.bin" size="2048" crc="6cb1de16" sha1="a878fec75b0b2e60fa81e1eda01a15f7ceebf659" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mrroboto">
+		<description>Mr. Roboto!</description>
+		<year>2006</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="programmer" value="Ted Szczypiorski" />
+		<part name="cart" interface="odyssey_cart">
+		<feature name="slot" value="o2_rom" />
+			<dataarea name="rom" size="8192">
+				<rom name="mrroboto.bin" size="8192" crc="a030b990" sha1="bcd2deeeed9283ff585d644993494961f0acc46d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ppp">
+		<description>Puzzle Piece Panic!</description>
+		<year>2007</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="programmer" value="Ted Szczypiorski" />
+		<part name="cart" interface="odyssey_cart">
+		<feature name="slot" value="o2_rom" />
+			<dataarea name="rom" size="8192">
+				<rom name="ppp.bin" size="8192" crc="72674adb" sha1="13d5af4dfb100724b8ca42d65cd1849e470784cd" offset="0" />
 			</dataarea>
 		</part>
 	</software>
