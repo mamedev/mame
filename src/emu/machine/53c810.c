@@ -412,6 +412,7 @@ UINT8 lsi53c810_device::lsi53c810_reg_r( int offset )
 		case 0x09:      /* SOCL */
 			return socl;
 		case 0x0c:      /* DSTAT */
+			istat &= ~1;
 			return dstat;
 		case 0x0d:      /* SSTAT0 */
 			return sstat0;
