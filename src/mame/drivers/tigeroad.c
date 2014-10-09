@@ -940,6 +940,40 @@ ROM_START( f1dreamb )
 	ROM_LOAD( "09e_tr.bin",   0x0000, 0x0100, CRC(ec80ae36) SHA1(397ec8fc1b106c8b8d4bf6798aa429e8768a101a) )    /* priority (not used) */
 ROM_END
 
+ROM_START( f1dreamba )
+	ROM_REGION( 0x40000, "maincpu", 0 ) /* 256K for 68000 code */
+	ROM_LOAD16_BYTE( "3.bin",   0x00000, 0x10000, CRC(bdfbbbec) SHA1(08e058f0e612463a2975c4283b7210a3247a90ad) )
+	ROM_LOAD16_BYTE( "5.bin",   0x00001, 0x10000, CRC(cc47cfb2) SHA1(2a6c66f4e7e81550af2d94e4a219a0c03173039e) )
+	ROM_LOAD16_BYTE( "2.bin",   0x20000, 0x10000, CRC(a34f63fb) SHA1(db1ce7ff3a2496649d8357c3999c1ea1a06ba043) )
+	ROM_LOAD16_BYTE( "4.bin",   0x20001, 0x10000, CRC(f98db083) SHA1(07e3e611eed1a77b7cd99c231e401c18465445ce) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* audio CPU */
+	ROM_LOAD( "12k_04.bin",   0x0000, 0x8000, CRC(4b9a7524) SHA1(19004958c19ac0af35f2c97790b0082ee2c15bc4) )
+
+	ROM_REGION( 0x008000, "text", 0 )
+	ROM_LOAD( "10d_01.bin",   0x00000, 0x08000, CRC(361caf00) SHA1(8a109e4e116d0c5eea86f9c57c05359754daa5b9) ) /* 8x8 text */
+
+	ROM_REGION( 0x060000, "tiles", 0 )
+	ROM_LOAD( "03f_12.bin",   0x00000, 0x10000, CRC(bc13e43c) SHA1(f9528839858d7a45395062a43b71d80400c73173) ) /* tiles */
+	ROM_LOAD( "01f_10.bin",   0x10000, 0x10000, CRC(f7617ad9) SHA1(746a0ec433d5246ac4dbae17d6498e3d154e2df1) )
+	ROM_LOAD( "03h_14.bin",   0x20000, 0x10000, CRC(e33cd438) SHA1(89a6faea19e8a01b38ba45413609603e559877e9) )
+	ROM_LOAD( "02f_11.bin",   0x30000, 0x10000, CRC(4aa49cd7) SHA1(b7052d51a3cb570299f4db1492a1293c4d8b067f) )
+	ROM_LOAD( "17f_09.bin",   0x40000, 0x10000, CRC(ca622155) SHA1(00ae4a8e9cad2c42a10b410b594b0e414ada6cfe) )
+	ROM_LOAD( "02h_13.bin",   0x50000, 0x10000, CRC(2a63961e) SHA1(a35e9bf0408716f460487a8d2ae336572a98d2fb) )
+
+	ROM_REGION( 0x040000, "sprites", 0 )
+	ROM_LOAD( "03b_06.bin",   0x00000, 0x10000, CRC(5e54e391) SHA1(475c968bfeb41b0448e621f59724c7b70d184d36) ) /* sprites */
+	ROM_LOAD( "02b_05.bin",   0x10000, 0x10000, CRC(cdd119fd) SHA1(e279ada53f5a1e2ada0195b93399731af213f518) )
+	ROM_LOAD( "03d_08.bin",   0x20000, 0x10000, CRC(811f2e22) SHA1(cca7e8cc43408c2c3067a731a98a8a6418a000aa) )
+	ROM_LOAD( "02d_07.bin",   0x30000, 0x10000, CRC(aa9a1233) SHA1(c2079ad81d67b54483ea5f69ac2edf276ad58ca9) )
+
+	ROM_REGION( 0x08000, "bgmap", 0 )    /* background tilemaps */
+	ROM_LOAD( "07l_15.bin",   0x0000, 0x8000, CRC(978758b7) SHA1(ebd415d70e2f1af3b1bd51f40e7d60f22369638c) )
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "09e_tr.bin",   0x0000, 0x0100, CRC(ec80ae36) SHA1(397ec8fc1b106c8b8d4bf6798aa429e8768a101a) )    /* priority (not used) */
+ROM_END
+
 
 ROM_START( pushman )
 	ROM_REGION( 0x40000, "maincpu", 0 )
@@ -1167,7 +1201,8 @@ GAME( 1987, tigeroadb,tigeroad, tigeroad, tigeroad, driver_device, 0, ROT0, "boo
 
 /* F1 Dream has an Intel 8751 microcontroller for protection */
 GAME( 1988, f1dream,  0,        tigeroad, f1dream, tigeroad_state, f1dream,  ROT0, "Capcom (Romstar license)", "F-1 Dream", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION ) // collisions are wrong
-GAME( 1988, f1dreamb, f1dream,  tigeroad, f1dream, driver_device,  0,        ROT0, "bootleg", "F-1 Dream (bootleg)", 0 )
+GAME( 1988, f1dreamb, f1dream,  tigeroad, f1dream, driver_device,  0,        ROT0, "bootleg", "F-1 Dream (bootleg, set 1)", 0 )
+GAME( 1988, f1dreamba,f1dream,  tigeroad, f1dream, driver_device,  0,        ROT0, "bootleg", "F-1 Dream (bootleg, set 2)", 0 )
 
 /* This Comad hardware is based around the F1 Dream design */
 GAME( 1990, pushman,  0,       pushman, pushman, tigeroad_state, pushman, ROT0, "Comad", "Pushman (Korea, set 1)", GAME_SUPPORTS_SAVE )

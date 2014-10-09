@@ -4176,6 +4176,9 @@ ROM_START( scross )
 	/* 1ST AND 2ND HALF IDENTICAL (all roms, are these OK?) */
 	ROM_LOAD("epr-15031.bin", 0x000000, 0x200000, CRC(663a7fd2) SHA1(b4393a687225b075db21960d19a6ddd7a9d7d086) )
 	ROM_LOAD("epr-15032.bin", 0x200000, 0x200000, CRC(cb709f3d) SHA1(3962c8b5907d1f8f611f58ddac693cc47364a79c) )
+
+	ROM_REGION( 0x20000, "user2", 0 ) /*  comms board? - might not belong to this game, just going based on epr number  */
+	ROM_LOAD( "epr-15033.ic17", 0x00000, 0x20000, CRC(dc19ac00) SHA1(16bbb5af034e5419673e637be30283b73ab7b290) )
 ROM_END
 
 /**************************************************************************************************************************
