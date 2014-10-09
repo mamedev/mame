@@ -20,6 +20,9 @@
 #include "sound/speaker.h"
 #include "video/mc6845.h"
 
+#include "bus/generic/slot.h"
+#include "bus/generic/carts.h"
+
 #define M6502_TAG       "f3"
 #define M6522_TAG       "a5"
 #define M6520_1_TAG     "g8"
@@ -47,6 +50,9 @@ public:
 		m_exp(*this, PET_EXPANSION_SLOT_TAG),
 		m_user(*this, PET_USER_PORT_TAG),
 		m_speaker(*this, "speaker"),
+		m_cart_9000(*this, "cart_9000"),
+		m_cart_a000(*this, "cart_a000"),
+		m_cart_b000(*this, "cart_b000"),
 		m_ram(*this, RAM_TAG),
 		m_rom(*this, M6502_TAG),
 		m_char_rom(*this, "charom"),
@@ -87,6 +93,9 @@ public:
 	required_device<pet_expansion_slot_device> m_exp;
 	required_device<pet_user_port_device> m_user;
 	optional_device<speaker_sound_device> m_speaker;
+	optional_device<generic_slot_device> m_cart_9000;
+	optional_device<generic_slot_device> m_cart_a000;
+	optional_device<generic_slot_device> m_cart_b000;
 	required_device<ram_device> m_ram;
 	required_memory_region m_rom;
 	required_memory_region m_char_rom;

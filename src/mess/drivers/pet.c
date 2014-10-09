@@ -151,7 +151,6 @@ ROM sockets:  UA3   2K or 4K character
 
 #include "includes/pet.h"
 #include "bus/ieee488/c2040.h"
-#include "imagedev/cartslot.h"
 #include "machine/cbm_snqk.h"
 
 
@@ -230,7 +229,37 @@ READ8_MEMBER( pet_state::read )
 		data = m_video_ram[offset & (m_video_ram_size - 1)];
 		break;
 
-	case SEL9: case SELA: case SELB: case SELC: case SELD: case SELF:
+	case SEL9:
+		if (norom)
+		{
+			if (m_cart_9000 && m_cart_9000->exists())
+				data = m_cart_9000->read_rom(space, offset & 0xfff);
+			else
+				data = m_rom->base()[offset - 0x9000];
+		}
+		break;
+
+	case SELA:
+		if (norom)
+		{
+			if (m_cart_a000 && m_cart_a000->exists())
+				data = m_cart_a000->read_rom(space, offset & 0xfff);
+			else
+				data = m_rom->base()[offset - 0x9000];
+		}
+		break;
+			
+	case SELB:
+		if (norom)
+		{
+			if (m_cart_b000 && m_cart_b000->exists())
+				data = m_cart_b000->read_rom(space, offset & 0xfff);
+			else
+				data = m_rom->base()[offset - 0x9000];
+		}
+		break;
+			
+	case SELC: case SELD: case SELF:
 		if (norom)
 		{
 			data = m_rom->base()[offset - 0x9000];
@@ -406,11 +435,17 @@ READ8_MEMBER( cbm8296_state::read )
 	}
 	if (!cs9)
 	{
-		data = m_rom->base()[offset & 0xfff];
+		if (m_cart_9000 && m_cart_9000->exists())
+			data = m_cart_9000->read_rom(space, offset & 0xfff);
+		else
+			data = m_rom->base()[offset & 0xfff];
 	}
 	if (!csa)
 	{
-		data = m_rom->base()[0x1000 | (offset & 0xfff)];
+		if (m_cart_a000 && m_cart_a000->exists())
+			data = m_cart_a000->read_rom(space, offset & 0xfff);
+		else
+			data = m_rom->base()[0x1000 | (offset & 0xfff)];
 	}
 	if (!cse)
 	{
@@ -1501,17 +1536,14 @@ MACHINE_CONFIG_END
 //-------------------------------------------------
 
 static MACHINE_CONFIG_DERIVED( pet2001n, pet )
-	MCFG_CARTSLOT_ADD("9000")
-	MCFG_CARTSLOT_EXTENSION_LIST("bin,rom")
-	MCFG_CARTSLOT_INTERFACE("pet_9000_rom")
+	MCFG_GENERIC_CARTSLOT_ADD("cart_9000", generic_linear_slot, "pet_9000_rom")
+	MCFG_GENERIC_EXTENSIONS("bin,rom")
 
-	MCFG_CARTSLOT_ADD("a000")
-	MCFG_CARTSLOT_EXTENSION_LIST("bin,rom")
-	MCFG_CARTSLOT_INTERFACE("pet_a000_rom")
+	MCFG_GENERIC_CARTSLOT_ADD("cart_a000", generic_linear_slot, "pet_a000_rom")
+	MCFG_GENERIC_EXTENSIONS("bin,rom")
 
-	MCFG_CARTSLOT_ADD("b000")
-	MCFG_CARTSLOT_EXTENSION_LIST("bin,rom")
-	MCFG_CARTSLOT_INTERFACE("pet_b000_rom")
+	MCFG_GENERIC_CARTSLOT_ADD("cart_b000", generic_linear_slot, "pet_b000_rom")
+	MCFG_GENERIC_EXTENSIONS("bin,rom")
 
 	MCFG_SOFTWARE_LIST_ADD("rom_list", "pet_rom")
 MACHINE_CONFIG_END
@@ -1649,7 +1681,7 @@ MACHINE_CONFIG_END
 //-------------------------------------------------
 
 static MACHINE_CONFIG_DERIVED( pet4000, pet2001n )
-	MCFG_DEVICE_REMOVE("b000")
+	MCFG_DEVICE_REMOVE("cart_b000")
 MACHINE_CONFIG_END
 
 
@@ -1721,7 +1753,7 @@ static MACHINE_CONFIG_DERIVED( cbm4000, pet2001n )
 	MCFG_DEVICE_REMOVE("sync_timer")
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("sync_timer", pet_state, sync_tick, attotime::from_hz(100))
 
-	MCFG_DEVICE_REMOVE("b000")
+	MCFG_DEVICE_REMOVE("cart_b000")
 MACHINE_CONFIG_END
 
 
@@ -1783,7 +1815,7 @@ MACHINE_CONFIG_END
 //-------------------------------------------------
 
 static MACHINE_CONFIG_DERIVED( pet4000b, pet2001b )
-	MCFG_DEVICE_REMOVE("b000")
+	MCFG_DEVICE_REMOVE("cart_b000")
 MACHINE_CONFIG_END
 
 
@@ -1811,7 +1843,7 @@ static MACHINE_CONFIG_DERIVED( cbm4000b, pet2001b )
 	MCFG_DEVICE_REMOVE("sync_timer")
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("sync_timer", pet_state, sync_tick, attotime::from_hz(100))
 
-	MCFG_DEVICE_REMOVE("b000")
+	MCFG_DEVICE_REMOVE("cart_b000")
 MACHINE_CONFIG_END
 
 
@@ -1908,13 +1940,11 @@ static MACHINE_CONFIG_START( pet80, pet80_state )
 
 	MCFG_QUICKLOAD_ADD("quickload", pet_state, cbm_pet, "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS)
 
-	MCFG_CARTSLOT_ADD("9000")
-	MCFG_CARTSLOT_EXTENSION_LIST("bin,rom")
-	MCFG_CARTSLOT_INTERFACE("pet_9000_rom")
+	MCFG_GENERIC_CARTSLOT_ADD("cart_9000", generic_linear_slot, "pet_9000_rom")
+	MCFG_GENERIC_EXTENSIONS("bin,rom")
 
-	MCFG_CARTSLOT_ADD("a000")
-	MCFG_CARTSLOT_EXTENSION_LIST("bin,rom")
-	MCFG_CARTSLOT_INTERFACE("pet_a000_rom")
+	MCFG_GENERIC_CARTSLOT_ADD("cart_a000", generic_linear_slot, "pet_a000_rom")
+	MCFG_GENERIC_EXTENSIONS("bin,rom")
 
 	// software lists
 	MCFG_SOFTWARE_LIST_ADD("cass_list", "pet_cass")
@@ -2039,9 +2069,6 @@ ROM_END
 
 ROM_START( pet2001n )
 	ROM_REGION( 0x7000, M6502_TAG, 0 )
-	ROM_CART_LOAD( "9000", 0x0000, 0x1000, ROM_MIRROR )
-	ROM_CART_LOAD( "a000", 0x1000, 0x1000, ROM_MIRROR )
-	ROM_CART_LOAD( "b000", 0x2000, 0x1000, ROM_MIRROR )
 	ROM_LOAD( "901465-01.ud6", 0x3000, 0x1000, CRC(63a7fe4a) SHA1(3622111f486d0e137022523657394befa92bde44) )   // BASIC 2
 	ROM_LOAD( "901465-02.ud7", 0x4000, 0x1000, CRC(ae4cb035) SHA1(1bc0ebf27c9bb62ad71bca40313e874234cab6ac) )   // BASIC 2
 	ROM_LOAD( "901447-24.ud8", 0x5000, 0x0800, CRC(e459ab32) SHA1(5e5502ce32f5a7e387d65efe058916282041e54b) )   // Screen Editor (40 columns, no CRTC, Normal Keyb)
@@ -2064,9 +2091,6 @@ ROM_END
 
 ROM_START( pet2001b )
 	ROM_REGION( 0x7000, M6502_TAG, 0 )
-	ROM_CART_LOAD( "9000", 0x0000, 0x1000, ROM_MIRROR )
-	ROM_CART_LOAD( "a000", 0x1000, 0x1000, ROM_MIRROR )
-	ROM_CART_LOAD( "b000", 0x2000, 0x1000, ROM_MIRROR )
 	ROM_LOAD( "901465-01.ud6", 0x3000, 0x1000, CRC(63a7fe4a) SHA1(3622111f486d0e137022523657394befa92bde44) )   // BASIC 2
 	ROM_LOAD( "901465-02.ud7", 0x4000, 0x1000, CRC(ae4cb035) SHA1(1bc0ebf27c9bb62ad71bca40313e874234cab6ac) )   // BASIC 2
 	ROM_LOAD( "901474-01.ud8", 0x5000, 0x0800, CRC(05db957e) SHA1(174ace3a8c0348cd21d39cc864e2adc58b0101a9) )   // Screen Editor (40 columns, no CRTC, Business Keyb)
@@ -2087,8 +2111,6 @@ ROM_END
 
 ROM_START( pet4016 )
 	ROM_REGION( 0x7000, M6502_TAG, 0 )
-	ROM_CART_LOAD( "9000", 0x0000, 0x1000, ROM_MIRROR )
-	ROM_CART_LOAD( "a000", 0x1000, 0x1000, ROM_MIRROR )
 	ROM_DEFAULT_BIOS( "basic4r" )
 	ROM_SYSTEM_BIOS( 0, "basic4", "Original" )
 	ROMX_LOAD( "901465-19.ud5", 0x2000, 0x1000, CRC(3a5f5721) SHA1(bc2b7c99495fea3eda950ee9e3d6cabe448a452b), ROM_BIOS(1) )
@@ -2112,8 +2134,6 @@ ROM_END
 
 ROM_START( pet4032f )
 	ROM_REGION( 0x7000, M6502_TAG, 0 )
-	ROM_CART_LOAD( "9000", 0x0000, 0x1000, ROM_MIRROR )
-	ROM_CART_LOAD( "a000", 0x1000, 0x1000, ROM_MIRROR )
 	ROM_DEFAULT_BIOS( "basic4r" )
 	ROM_SYSTEM_BIOS( 0, "basic4", "Original" )
 	ROMX_LOAD( "901465-19.ud5", 0x2000, 0x1000, CRC(3a5f5721) SHA1(bc2b7c99495fea3eda950ee9e3d6cabe448a452b), ROM_BIOS(1) )
@@ -2135,8 +2155,6 @@ ROM_END
 
 ROM_START( cbm4016 )
 	ROM_REGION( 0x7000, M6502_TAG, 0 )
-	ROM_CART_LOAD( "9000", 0x0000, 0x1000, ROM_MIRROR )
-	ROM_CART_LOAD( "a000", 0x1000, 0x1000, ROM_MIRROR )
 	ROM_DEFAULT_BIOS( "basic4r" )
 	ROM_SYSTEM_BIOS( 0, "basic4", "Original" )
 	ROMX_LOAD( "901465-19.ud5", 0x2000, 0x1000, CRC(3a5f5721) SHA1(bc2b7c99495fea3eda950ee9e3d6cabe448a452b), ROM_BIOS(1) )
@@ -2160,8 +2178,6 @@ ROM_END
 
 ROM_START( cbm4032f )
 	ROM_REGION( 0x7000, M6502_TAG, 0 )
-	ROM_CART_LOAD( "9000", 0x0000, 0x1000, ROM_MIRROR )
-	ROM_CART_LOAD( "a000", 0x1000, 0x1000, ROM_MIRROR )
 	ROM_DEFAULT_BIOS( "basic4r" )
 	ROM_SYSTEM_BIOS( 0, "basic4", "Original" )
 	ROMX_LOAD( "901465-19.ud5", 0x2000, 0x1000, CRC(3a5f5721) SHA1(bc2b7c99495fea3eda950ee9e3d6cabe448a452b), ROM_BIOS(1) )
@@ -2183,8 +2199,6 @@ ROM_END
 
 ROM_START( pet4032b )
 	ROM_REGION( 0x7000, M6502_TAG, 0 )
-	ROM_CART_LOAD( "9000", 0x0000, 0x1000, ROM_MIRROR )
-	ROM_CART_LOAD( "a000", 0x1000, 0x1000, ROM_MIRROR )
 	ROM_DEFAULT_BIOS( "basic4r" )
 	ROM_SYSTEM_BIOS( 0, "basic4", "Original" )
 	ROMX_LOAD( "901465-19.ud5", 0x2000, 0x1000, CRC(3a5f5721) SHA1(bc2b7c99495fea3eda950ee9e3d6cabe448a452b), ROM_BIOS(1) )
@@ -2208,8 +2222,6 @@ ROM_END
 
 ROM_START( pet8032 )
 	ROM_REGION( 0x7000, M6502_TAG, 0 )
-	ROM_CART_LOAD( "9000", 0x0000, 0x1000, ROM_MIRROR )
-	ROM_CART_LOAD( "a000", 0x1000, 0x1000, ROM_MIRROR )
 	ROM_LOAD( "901465-23.ud10", 0x2000, 0x1000, CRC(ae3deac0) SHA1(975ee25e28ff302879424587e5fb4ba19f403adc) )  // BASIC 4
 	ROM_LOAD( "901465-20.ud9", 0x3000, 0x1000, CRC(0fc17b9c) SHA1(242f98298931d21eaacb55fe635e44b7fc192b0a) )   // BASIC 4
 	ROM_LOAD( "901465-21.ud8", 0x4000, 0x1000, CRC(36d91855) SHA1(1bb236c72c726e8fb029c68f9bfa5ee803faf0a8) )   // BASIC 4
@@ -2227,8 +2239,6 @@ ROM_END
 
 ROM_START( cbm8032 )
 	ROM_REGION( 0x7000, M6502_TAG, 0 )
-	ROM_CART_LOAD( "9000", 0x0000, 0x1000, ROM_MIRROR )
-	ROM_CART_LOAD( "a000", 0x1000, 0x1000, ROM_MIRROR )
 	ROM_LOAD( "901465-23.ud10", 0x2000, 0x1000, CRC(ae3deac0) SHA1(975ee25e28ff302879424587e5fb4ba19f403adc) )  // BASIC 4
 	ROM_LOAD( "901465-20.ud9", 0x3000, 0x1000, CRC(0fc17b9c) SHA1(242f98298931d21eaacb55fe635e44b7fc192b0a) )   // BASIC 4
 	ROM_LOAD( "901465-21.ud8", 0x4000, 0x1000, CRC(36d91855) SHA1(1bb236c72c726e8fb029c68f9bfa5ee803faf0a8) )   // BASIC 4
@@ -2248,8 +2258,6 @@ ROM_END
 
 ROM_START( cbm8032_de )
 	ROM_REGION( 0x7000, M6502_TAG, 0 )
-	ROM_CART_LOAD( "9000", 0x0000, 0x1000, ROM_MIRROR )
-	ROM_CART_LOAD( "a000", 0x1000, 0x1000, ROM_MIRROR )
 	ROM_LOAD( "901465-23.ud10", 0x2000, 0x1000, CRC(ae3deac0) SHA1(975ee25e28ff302879424587e5fb4ba19f403adc) )  // BASIC 4
 	ROM_LOAD( "901465-20.ud9", 0x3000, 0x1000, CRC(0fc17b9c) SHA1(242f98298931d21eaacb55fe635e44b7fc192b0a) )   // BASIC 4
 	ROM_LOAD( "901465-21.ud8", 0x4000, 0x1000, CRC(36d91855) SHA1(1bb236c72c726e8fb029c68f9bfa5ee803faf0a8) )   // BASIC 4
@@ -2267,8 +2275,6 @@ ROM_END
 
 ROM_START( cbm8032_se )
 	ROM_REGION( 0x7000, M6502_TAG, 0 )
-	ROM_CART_LOAD( "9000", 0x0000, 0x1000, ROM_MIRROR )
-	ROM_CART_LOAD( "a000", 0x1000, 0x1000, ROM_MIRROR )
 	ROM_LOAD( "901465-23.ud10", 0x2000, 0x1000, CRC(ae3deac0) SHA1(975ee25e28ff302879424587e5fb4ba19f403adc) )  // BASIC 4
 	ROM_LOAD( "901465-20.ud9", 0x3000, 0x1000, CRC(0fc17b9c) SHA1(242f98298931d21eaacb55fe635e44b7fc192b0a) )   // BASIC 4
 	ROM_LOAD( "901465-21.ud8", 0x4000, 0x1000, CRC(36d91855) SHA1(1bb236c72c726e8fb029c68f9bfa5ee803faf0a8) )   // BASIC 4
@@ -2286,8 +2292,6 @@ ROM_END
 
 ROM_START( superpet )
 	ROM_REGION( 0x7000, M6502_TAG, 0 )
-	ROM_CART_LOAD( "9000", 0x0000, 0x1000, ROM_MIRROR )
-	ROM_CART_LOAD( "a000", 0x1000, 0x1000, ROM_MIRROR )
 	ROM_LOAD( "901465-23.ud10", 0x2000, 0x1000, CRC(ae3deac0) SHA1(975ee25e28ff302879424587e5fb4ba19f403adc) )  // BASIC 4
 	ROM_LOAD( "901465-20.ud9", 0x3000, 0x1000, CRC(0fc17b9c) SHA1(242f98298931d21eaacb55fe635e44b7fc192b0a) )   // BASIC 4
 	ROM_LOAD( "901465-21.ud8", 0x4000, 0x1000, CRC(36d91855) SHA1(1bb236c72c726e8fb029c68f9bfa5ee803faf0a8) )   // BASIC 4
@@ -2307,8 +2311,6 @@ ROM_END
 
 ROM_START( mmf9000_se )
 	ROM_REGION( 0x7000, M6502_TAG, 0 )
-	ROM_CART_LOAD( "9000", 0x0000, 0x1000, ROM_MIRROR )
-	ROM_CART_LOAD( "a000", 0x1000, 0x1000, ROM_MIRROR )
 	ROM_LOAD( "901465-23.ud10", 0x2000, 0x1000, CRC(ae3deac0) SHA1(975ee25e28ff302879424587e5fb4ba19f403adc) )  // BASIC 4
 	ROM_LOAD( "901465-20.ud9", 0x3000, 0x1000, CRC(0fc17b9c) SHA1(242f98298931d21eaacb55fe635e44b7fc192b0a) )   // BASIC 4
 	ROM_LOAD( "901465-21.ud8", 0x4000, 0x1000, CRC(36d91855) SHA1(1bb236c72c726e8fb029c68f9bfa5ee803faf0a8) )   // BASIC 4
@@ -2325,9 +2327,7 @@ ROM_END
 //-------------------------------------------------
 
 ROM_START( cbm8296 )
-	ROM_REGION( 0x2000, M6502_TAG, 0 )
-	ROM_CART_LOAD( "9000", 0x0000, 0x1000, ROM_MIRROR )
-	ROM_CART_LOAD( "a000", 0x1000, 0x1000, ROM_MIRROR )
+	ROM_REGION( 0x2000, M6502_TAG, ROMREGION_ERASE00 )
 
 	ROM_REGION( 0x4000, "basic", 0 )
 	ROM_LOAD( "324746-01.ue7", 0x0000, 0x4000, CRC(7935b528) SHA1(5ab17ee70467152bf2130e3f48a2aa81e9df93c9) )   // BASIC 4
@@ -2395,9 +2395,7 @@ ROM_END
 //-------------------------------------------------
 
 ROM_START( cbm8296d )
-	ROM_REGION( 0x2000, M6502_TAG, 0 )
-	ROM_CART_LOAD( "9000", 0x0000, 0x1000, ROM_MIRROR )
-	ROM_CART_LOAD( "a000", 0x1000, 0x1000, ROM_MIRROR )
+	ROM_REGION( 0x2000, M6502_TAG, ROMREGION_ERASE00 )
 
 	ROM_REGION( 0x4000, "basic", 0 )
 	ROM_LOAD( "324746-01.ue7", 0x0000, 0x4000, CRC(7935b528) SHA1(5ab17ee70467152bf2130e3f48a2aa81e9df93c9) )   // BASIC 4
@@ -2430,9 +2428,7 @@ ROM_END
 //-------------------------------------------------
 
 ROM_START( cbm8296d_de )
-	ROM_REGION( 0x2000, M6502_TAG, 0 )
-	ROM_CART_LOAD( "9000", 0x0000, 0x1000, ROM_MIRROR )
-	ROM_CART_LOAD( "a000", 0x1000, 0x1000, ROM_MIRROR )
+	ROM_REGION( 0x2000, M6502_TAG, ROMREGION_ERASE00 )
 
 	ROM_REGION( 0x4000, "basic", 0 )
 	ROM_LOAD( "324746-01.ue7", 0x0000, 0x4000, CRC(7935b528) SHA1(5ab17ee70467152bf2130e3f48a2aa81e9df93c9) )   // BASIC 4
