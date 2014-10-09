@@ -11,14 +11,15 @@
 
     arkanoid    The earlier revisions. They each differ in the country byte. These
     arkanoiduo    versions work fine with the current MCU rom which needs to be
-    arkanoidjo    verified against a genuine decapped A75-06.IC16 M68705 MCU.
+    arkanoidjb    verified against a genuine decapped A75-06.IC16 M68705 MCU.
     arkanoidu   USA version. A later revision, code has been inserted NOT patched.
                 The 68705 code for this one was not available; I made it up from
                 the current A75-06.IC16 changing the level data pointer table.
-    arkanoidj   Japanese version. A later revision with level selector.
+    arkanoidj   Japanese version.  Final revision, MCU code not dumped.
+	arkanoidja  Japanese version. A later revision with level selector.
                 The 68705 code for this one was not available; I made it up from
                 the current A75-06.IC16 changing the level data pointer table.
-    arkanoidjb  Bootleg of the early Japanese version. The only difference is
+    arkanoidjbl Bootleg of the early Japanese version. The only difference is
                 that the warning text has been replaced by "WAIT"
                 This version works fine with the current A75-06.IC16 MCU ROM
     arkatayt    Another bootleg of the early Japanese one, more heavily modified
@@ -432,7 +433,7 @@ Stephh's notes (based on the games Z80 code and some tests) :
       * affects ball speed at start of level (0x06 or 0x08)
       * affects level 2 (same as normal version or same as level 30)
   - You can select your starting level (between 1 and 30)
-    but they aren't displayed like in the original Japanese set we have ('arkanoidj').
+    but they aren't displayed like in the original Japanese set we have ('arkanoidja').
   - Level 30 differs from original Japanese version
   - There seems to be code to edit levels (check code at 0x8082), but the routines
     don't seem to be called anymore.
@@ -455,7 +456,7 @@ Stephh's notes (based on the games Z80 code and some tests) :
       * affects ball speed at start of level (0x04 or 0x06)
       * affects level 2 (same as normal version or same as level 30)
   - You can select your starting level (between 1 and 30)
-    but they aren't displayed like in the original Japanese set we have ('arkanoidj').
+    but they aren't displayed like in the original Japanese set we have ('arkanoidja').
     No "What round do you want to start from ?" message though.
   - Level 30 differs from original Japanese version (it also differs from 'arkangc')
   - The routine to handle the paddle is completely different as in 'arkangc'
@@ -486,11 +487,11 @@ Stephh's notes (based on the games Z80 code and some tests) :
   - "Continue" Dip Switch has been replaced by sort of "Debug" Dip Switch as in 'arkangc';
     however, this has no effect due to newly patched code at 0x06e9 !
   - You can select your starting level (between 1 and 30)
-    but they aren't displayed like in the original Japanese set we have ('arkanoidj').
+    but they aren't displayed like in the original Japanese set we have ('arkanoidja').
   - Levels 1, 2, 3, 4, 6, 7, 11, 14, 30, 31 and 32 differ from original Japanese version;
     level 1 starts at a different offset (0x90a8 instead of 0xbf15).
   - Complerely different initials on high-scores table, but scores and rounds
-    are the same as in the original Japanese set we have ('arkanoidj').
+    are the same as in the original Japanese set we have ('arkanoidja').
   - There seems to be code to edit levels (check code at 0x8082), but the routines
     don't seem to be called anymore.
   - Known bugs :
@@ -525,12 +526,12 @@ Stephh's notes (based on the games Z80 code and some tests) :
   - All reads from 0xf002 are patched.
   - Reads bit 5 from 0xd008.
   - You can select your starting level (between 1 and 30) but they aren't displayed
-    like in the original Japanese set we have ('arkanoidj').
+    like in the original Japanese set we have ('arkanoidja').
   - "Continue" Dip Switch has been replaced by sort of "Debug" Dip Switch :
       * affects ball speed at start of level (0x06 or 0x08)
       * affects level 2 (same as normal version or same as level 30)
   - You can select your starting level (between 1 and 30)
-    but they aren't displayed like in the original Japanese set we have ('arkanoidj').
+    but they aren't displayed like in the original Japanese set we have ('arkanoidja').
   - Level 30 differs from original Japanese version (same as the one from 'arkangc2')
   - Known bugs :
       * You can go from one side of the screen to the other through the walls
@@ -553,7 +554,7 @@ Stephh's notes (based on the games Z80 code and some tests) :
   - Different "Lives" Dip Switch (check table at 0x9a28)
   - Specific coinage (always 2C_1C)
   - If Dip Switch is set, you can select your starting level (between 1 and 30)
-    but they aren't displayed like in the original Japanese set we have ('arkanoidj').
+    but they aren't displayed like in the original Japanese set we have ('arkanoidja').
   - Same level 30 as original Japanese version
   - Known bugs :
       * You can go from one side of the screen to the other through the walls
@@ -581,7 +582,7 @@ Stephh's notes (based on the games Z80 code and some tests) :
       * "20K 60K 60K+"  or "20K" when you continue
   - Different "Lives" Dip Switch (check table at 0x9a28)
   - If Dip Switch is set, you can select your starting level (between 1 and 30)
-    but they aren't displayed like in the original Japanese set we have ('arkanoidj').
+    but they aren't displayed like in the original Japanese set we have ('arkanoidja').
   - Levels are based on the ones from "Arkanoid II".
   - Known bugs :
       * You can go from one side of the screen to the other through the walls
@@ -633,7 +634,7 @@ TO DO (2006.09.12) :
 
   - Check the following Taito sets (addresses, routines and Dip Switches) :
       * 'arkanoid' = 'arkanoiduo'
-      * 'arkanoidj'
+      * 'arkanoidja'
       * 'arkanoidu'
       * 'arkatour'
   - Add more notes about main addresses and routines in the Z80
@@ -750,7 +751,7 @@ Stephh's notes on 'tetrsark' (based on the game Z80 code and some tests) :
 ***************************************************************************
 
 DIP locations verified for:
-  - arkanoidj
+  - arkanoidja
   - arkanoid
 
 ***************************************************************************/
@@ -1356,6 +1357,25 @@ ROM_END
 
 ROM_START( arkanoidj )
 	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "a75_24.ic17",   0x0000, 0x8000, CRC(3f2b27e9) SHA1(656035f5292d6921448e74d3e1abab57b46e7d9e) )
+	ROM_LOAD( "a75_25.ic16",   0x8000, 0x8000, CRC(c13b2038) SHA1(0b8197b48e57ffe9ccad0ebbc24891d1da7c9880) )
+
+	ROM_REGION( 0x0800, "mcu", 0 )  /* 2k for the microcontroller */
+	ROM_LOAD( "a75-26.ic14",  0x0000, 0x0800, NO_DUMP )
+
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_LOAD( "a75-03.ic64",   0x00000, 0x8000, CRC(038b74ba) SHA1(ac053cc4908b4075f918748b89570e07a0ba5116) )
+	ROM_LOAD( "a75-04.ic63",   0x08000, 0x8000, CRC(71fae199) SHA1(5d253c46ccf4cd2976a5fb8b8713f0f345443d06) )
+	ROM_LOAD( "a75-05.ic62",   0x10000, 0x8000, CRC(c76374e2) SHA1(7520dd48de20db60a2038f134dcaa454988e7874) )
+
+	ROM_REGION( 0x0600, "proms", 0 ) /* BPROMs are silkscreened as 7621, actual BPROMs used are MMI 6306-1N */
+	ROM_LOAD( "a75-07.ic24",    0x0000, 0x0200, CRC(0af8b289) SHA1(6bc589e8a609b4cf450aebedc8ce02d5d45c970f) )  /* red component */
+	ROM_LOAD( "a75-08.ic23",    0x0200, 0x0200, CRC(abb002fb) SHA1(c14f56b8ef103600862e7930709d293b0aa97a73) )  /* green component */
+	ROM_LOAD( "a75-09.ic22",    0x0400, 0x0200, CRC(a7c6c277) SHA1(adaa003dcd981576ea1cc5f697d709b2d6b2ea29) )  /* blue component */
+ROM_END
+
+ROM_START( arkanoidja )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "a75-21.ic17",   0x0000, 0x8000, CRC(bf0455fc) SHA1(250522b84b9f491c3f4efc391bf6aa6124361369) )
 	ROM_LOAD( "a75-22.ic16",   0x8000, 0x8000, CRC(3a2688d3) SHA1(9633a661352def3d85f95ca830f6d761b0b5450e) )
 
@@ -1373,7 +1393,7 @@ ROM_START( arkanoidj )
 	ROM_LOAD( "a75-09.ic22",    0x0400, 0x0200, CRC(a7c6c277) SHA1(adaa003dcd981576ea1cc5f697d709b2d6b2ea29) )  /* blue component */
 ROM_END
 
-ROM_START( arkanoidjo )
+ROM_START( arkanoidjb )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "a75-01-1.ic17", 0x0000, 0x8000, CRC(5bcda3b0) SHA1(52cadd38b5f8e8856f007a9c602d6b508f30be65) )
 	ROM_LOAD( "a75-02.ic16",   0x8000, 0x8000, CRC(bbc33ceb) SHA1(e9b6fef98d0d20e77c7a1c25eff8e9a8c668a258) )
@@ -1392,12 +1412,6 @@ ROM_START( arkanoidjo )
 	ROM_LOAD( "a75-09.ic23",    0x0400, 0x0200, CRC(a7c6c277) SHA1(adaa003dcd981576ea1cc5f697d709b2d6b2ea29) )  /* blue component */
 ROM_END
 
-/* There is known to exist an undumped Arkanoid set that sits between the arkanoidj & arkatour sets rom number wise:
-
-   A75-24.IC17 - Program roms
-   A75-25.IC16 /
-   A75-26.IC14 - MCU
-*/
 
 ROM_START( arkatour )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -1418,7 +1432,7 @@ ROM_START( arkatour )
 	ROM_LOAD( "a75-35.ic22",    0x0400, 0x0200, CRC(38acfd3b) SHA1(2841e9db047aa039eff8567a518b6250b355507b) )  /* blue component */
 ROM_END
 
-ROM_START( arkanoidjb ) /* This set requires a MCU. The MCU code included doesn't seem to work??? See USER1 region below */
+ROM_START( arkanoidjbl ) /* This set requires a MCU. The MCU code included doesn't seem to work??? See USER1 region below */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "e1.6d",        0x0000, 0x8000, CRC(dd4f2b72) SHA1(399a8636030a702dafc1da926f115df6f045bef1) ) /* Hacked up Notice warning text */
 	ROM_LOAD( "e2.6f",        0x8000, 0x8000, CRC(bbc33ceb) SHA1(e9b6fef98d0d20e77c7a1c25eff8e9a8c668a258) ) /* == A75-02.IC16 */
@@ -1442,7 +1456,7 @@ ROM_START( arkanoidjb ) /* This set requires a MCU. The MCU code included doesn'
 	ROM_LOAD( "68705p3.6i",   0x0000, 0x0800, CRC(389a8cfb) SHA1(9530c051b61b5bdec7018c6fdc1ea91288a406bd) ) // this has the 1986 by Yasu copyright like some of the new decaps loaded in the parent set!
 ROM_END
 
-ROM_START( arkanoidjb2 )
+ROM_START( arkanoidjbl2 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "1.ic81", 0x0000, 0x8000, CRC(9ff93dc2) SHA1(eee0975b799a8e6717f646dd40716dc454476106) )
 	ROM_LOAD( "2.ic82", 0x8000, 0x8000, CRC(bbc33ceb) SHA1(e9b6fef98d0d20e77c7a1c25eff8e9a8c668a258) ) /* == A75-02.IC16 */
@@ -1884,13 +1898,16 @@ DRIVER_INIT_MEMBER(arkanoid_state,brixian)
 
 /* Game Drivers */
 
-GAME( 1986, arkanoid,   0,        arkanoid, arkanoid, driver_device, 0,        ROT90, "Taito Corporation Japan", "Arkanoid (World)", GAME_SUPPORTS_SAVE )
+// original sets of Arkanoid
+GAME( 1986, arkanoid,   0,        arkanoid, arkanoid, driver_device, 0,        ROT90, "Taito Corporation Japan", "Arkanoid (World, oldest rev)", GAME_SUPPORTS_SAVE )
 GAME( 1986, arkanoidu,  arkanoid, arkanoid, arkanoid, driver_device, 0,        ROT90, "Taito America Corporation (Romstar license)", "Arkanoid (US)", GAME_SUPPORTS_SAVE )
-GAME( 1986, arkanoiduo, arkanoid, arkanoid, arkanoid, driver_device, 0,        ROT90, "Taito America Corporation (Romstar license)", "Arkanoid (US, older)", GAME_SUPPORTS_SAVE )
+GAME( 1986, arkanoiduo, arkanoid, arkanoid, arkanoid, driver_device, 0,        ROT90, "Taito America Corporation (Romstar license)", "Arkanoid (US, oldest rev)", GAME_SUPPORTS_SAVE )
 GAME( 1986, arkanoidj,  arkanoid, arkanoid, arkanoidj, driver_device,0,        ROT90, "Taito Corporation", "Arkanoid (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1986, arkanoidjo, arkanoid, arkanoid, arkanoidj, driver_device,0,        ROT90, "Taito Corporation", "Arkanoid (Japan, older)", GAME_SUPPORTS_SAVE )
-GAME( 1986, arkanoidjb, arkanoid, arkanoid, arkanoidj, driver_device,0,        ROT90, "bootleg", "Arkanoid (bootleg with MCU, set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1986, arkanoidjb2,arkanoid, arkanoid, arkanoidj, driver_device,0,        ROT90, "bootleg (Beta)", "Arkanoid (bootleg with MCU, set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1986, arkanoidja, arkanoid, arkanoid, arkanoidj, driver_device,0,        ROT90, "Taito Corporation", "Arkanoid (Japan, older rev)", GAME_SUPPORTS_SAVE )
+GAME( 1986, arkanoidjb, arkanoid, arkanoid, arkanoidj, driver_device,0,        ROT90, "Taito Corporation", "Arkanoid (Japan, oldest rev)", GAME_SUPPORTS_SAVE )
+// bootlegs of Arkanoid
+GAME( 1986, arkanoidjbl, arkanoid, arkanoid, arkanoidj, driver_device,0,        ROT90, "bootleg", "Arkanoid (bootleg with MCU, set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1986, arkanoidjbl2,arkanoid, arkanoid, arkanoidj, driver_device,0,        ROT90, "bootleg (Beta)", "Arkanoid (bootleg with MCU, set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1986, ark1ball,   arkanoid, arkanoid, ark1ball, driver_device, 0,        ROT90, "bootleg", "Arkanoid (bootleg with MCU, harder)", GAME_SUPPORTS_SAVE )
 GAME( 1986, arkangc,    arkanoid, bootleg,  arkangc, arkanoid_state,  arkangc,  ROT90, "bootleg (Game Corporation)", "Arkanoid (Game Corporation bootleg, set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1986, arkangc2,   arkanoid, bootleg,  arkangc2, arkanoid_state, arkangc2, ROT90, "bootleg (Game Corporation)", "Arkanoid (Game Corporation bootleg, set 2)", GAME_SUPPORTS_SAVE )
@@ -1903,7 +1920,11 @@ GAME( 1986, arkgcbla,   arkanoid, bootleg,  arkgcbl, arkanoid_state,  arkgcbl,  
 GAME( 1988, paddle2,    arkanoid, bootleg,  paddle2, arkanoid_state,  paddle2,  ROT90, "bootleg", "Paddle 2 (bootleg on Block hardware)", GAME_SUPPORTS_SAVE )
 GAME( 1986, arkatayt,   arkanoid, bootleg,  arkatayt, driver_device, 0,        ROT90, "bootleg (Tayto)", "Arkanoid (Tayto bootleg)", GAME_SUPPORTS_SAVE )
 GAME( 1986, arktayt2,   arkanoid, bootleg,  arktayt2, driver_device, 0,        ROT90, "bootleg (Tayto)", "Arkanoid (Tayto bootleg, harder)", GAME_SUPPORTS_SAVE )
+// Other games
 GAME( 1987, arkatour,   0,        arkanoid, arkanoid, driver_device, 0,        ROT90, "Taito America Corporation (Romstar license)", "Tournament Arkanoid (US)", GAME_SUPPORTS_SAVE )
+
 GAME( 19??, tetrsark,   0,        bootleg,  tetrsark, arkanoid_state, tetrsark, ROT0,  "D.R. Korea", "Tetris (D.R. Korea)", GAME_SUPPORTS_SAVE )
+
 GAME( 199?, hexa,       0,        hexa,     hexa, arkanoid_state,     hexa,     ROT0,  "D.R. Korea", "Hexa", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+
 GAME( 1993, brixian,    0,        brixian,  brixian, arkanoid_state,  brixian,        ROT0,  "Cheil Computer System", "Brixian", GAME_SUPPORTS_SAVE )
