@@ -312,7 +312,7 @@ int intv_cart_slot_device::load_fullpath()
 		int mapper, rom[5], ram, extra;
 		astring extrainfo;
 
-		m_cart->rom_alloc(0x10000, tag());
+		m_cart->rom_alloc(0x20000, tag());
 		ROM = (UINT8 *)m_cart->get_rom_base();
 		
 		if (!hashfile_extrainfo(*this, extrainfo))
