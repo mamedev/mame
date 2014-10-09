@@ -247,16 +247,6 @@ receive clock and transmit clock inputs */
 
 
 
-/* this is not a real register, it is used to record card status */
-/* ==0, card not inserted, !=0 card is inserted */
-
-/* set pcmcia card present state */
-void nc_state::nc_set_card_present_state(int state)
-{
-	m_card_status = state;
-}
-
-
 /* latched interrupts are interrupts that cannot be cleared by writing to the irq
 mask. latched interrupts can only be cleared by accessing the interrupting
 device e.g. serial chip, fdc */
@@ -308,6 +298,7 @@ static const char *const nc_bankhandler_w[]={
 void nc_state::nc_refresh_memory_bank_config(int bank)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
+	UINT8 *ptr;
 	int mem_type;
 	int mem_bank;
 	char bank1[10];
@@ -326,13 +317,10 @@ void nc_state::nc_refresh_memory_bank_config(int bank)
 		case 3:
 		case 0:
 		{
-			unsigned char *addr;
+			mem_bank &= m_membank_rom_mask;
+			ptr = (memregion("maincpu")->base() + 0x010000) + (mem_bank << 14);
 
-			mem_bank = mem_bank & m_membank_rom_mask;
-
-			addr = (memregion("maincpu")->base()+0x010000) + (mem_bank<<14);
-
-			membank(bank1)->set_base(addr);
+			membank(bank1)->set_base(ptr);
 
 			space.nop_write((bank * 0x4000), (bank * 0x4000) + 0x3fff);
 			LOG(("BANK %d: ROM %d\n",bank,mem_bank));
@@ -342,14 +330,11 @@ void nc_state::nc_refresh_memory_bank_config(int bank)
 		/* internal RAM */
 		case 1:
 		{
-			unsigned char *addr;
+			mem_bank &= m_membank_internal_ram_mask;
+			ptr = m_ram->pointer() + (mem_bank << 14);
 
-			mem_bank = mem_bank & m_membank_internal_ram_mask;
-
-			addr = m_ram->pointer() + (mem_bank<<14);
-
-			membank(bank1)->set_base(addr);
-			membank(bank5)->set_base(addr);
+			membank(bank1)->set_base(ptr);
+			membank(bank5)->set_base(ptr);
 
 			space.install_write_bank((bank * 0x4000), (bank * 0x4000) + 0x3fff, nc_bankhandler_w[bank]);
 			LOG(("BANK %d: RAM\n",bank));
@@ -360,21 +345,18 @@ void nc_state::nc_refresh_memory_bank_config(int bank)
 		case 2:
 		{
 			/* card connected? */
-			if ((m_card_status) && (m_card_ram!=NULL))
+			if (m_card_status && m_card_ram)
 			{
-				unsigned char *addr;
+				mem_bank &= m_membank_card_ram_mask;
+				ptr = m_card_ram->base() + (mem_bank << 14);
 
-				mem_bank = mem_bank & m_membank_card_ram_mask;
-				addr = m_card_ram + (mem_bank<<14);
-
-				membank(bank1)->set_base(addr);
+				membank(bank1)->set_base(ptr);
 
 				/* write enabled? */
 				if (ioport("EXTRA")->read() & 0x02)
 				{
 					/* yes */
-					membank(bank5)->set_base(addr);
-
+					membank(bank5)->set_base(ptr);
 					space.install_write_bank((bank * 0x4000), (bank * 0x4000) + 0x3fff, nc_bankhandler_w[bank]);
 				}
 				else
@@ -814,6 +796,13 @@ void nc_state::machine_start()
 {
 	m_type = NC_TYPE_1xx;
 
+	astring region_tag;
+	m_card_ram = memregion(region_tag.cpy(m_card->tag()).cat(GENERIC_ROM_REGION_TAG));
+	if (m_card_ram)
+		m_card_size = m_card_ram->bytes();
+	else
+		m_card_size = 0;
+	
 	/* keyboard timer */
 	m_keyboard_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(nc_state::nc_keyboard_timer_callback),this));
 	m_keyboard_timer->adjust(attotime::from_msec(10));
@@ -1128,7 +1117,7 @@ void nc_state::nc200_floppy_drive_index_callback(int drive_id)
 }
 #endif
 
-MACHINE_RESET_MEMBER(nc_state,nc200)
+MACHINE_RESET_MEMBER(nc_state, nc200)
 {
 	/* 512k of rom */
 	m_membank_rom_mask = 0x1f;
@@ -1147,10 +1136,17 @@ MACHINE_RESET_MEMBER(nc_state,nc200)
 	nc200_video_set_backlight(0);
 }
 
-MACHINE_START_MEMBER(nc_state,nc200)
+MACHINE_START_MEMBER(nc_state, nc200)
 {
 	m_type = NC_TYPE_200;
-
+	
+	astring region_tag;
+	m_card_ram = memregion(region_tag.cpy(m_card->tag()).cat(GENERIC_ROM_REGION_TAG));
+	if (m_card_ram)
+		m_card_size = m_card_ram->bytes();
+	else
+		m_card_size = 0;
+	
 	/* keyboard timer */
 	m_keyboard_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(nc_state::nc_keyboard_timer_callback),this));
 	m_keyboard_timer->adjust(attotime::from_msec(10));
@@ -1447,11 +1443,9 @@ static MACHINE_CONFIG_START( nc100, nc_state )
 	MCFG_RP5C01_OUT_ALARM_CB(WRITELINE(nc_state, nc100_tc8521_alarm_callback))
 
 	/* cartridge */
-	MCFG_CARTSLOT_ADD("cart")
-	MCFG_CARTSLOT_EXTENSION_LIST("crd,card")
-	MCFG_CARTSLOT_NOT_MANDATORY
-	MCFG_CARTSLOT_LOAD(nc_state,nc_pcmcia_card)
-	MCFG_CARTSLOT_UNLOAD(nc_state,nc_pcmcia_card)
+	MCFG_GENERIC_CARTSLOT_ADD("cardslot", generic_plain_slot, NULL)
+	MCFG_GENERIC_LOAD(nc_state, nc_pcmcia_card)
+	MCFG_GENERIC_UNLOAD(nc_state, nc_pcmcia_card)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -1477,8 +1471,8 @@ static MACHINE_CONFIG_DERIVED( nc200, nc100 )
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_IO_MAP(nc200_io)
 
-	MCFG_MACHINE_START_OVERRIDE(nc_state, nc200 )
-	MCFG_MACHINE_RESET_OVERRIDE(nc_state, nc200 )
+	MCFG_MACHINE_START_OVERRIDE(nc_state, nc200)
+	MCFG_MACHINE_RESET_OVERRIDE(nc_state, nc200)
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")

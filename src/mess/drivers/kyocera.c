@@ -380,9 +380,7 @@ READ8_MEMBER( pc8201_state::romrd_r )
 	UINT8 data = 0xff;
 
 	if (m_rom_sel)
-	{
-		data = m_option->base()[m_rom_addr & 0x1ffff];
-	}
+		data = m_cas_cart->read_rom(space, m_rom_addr & 0x1ffff);
 
 	return data;
 }
@@ -1169,7 +1167,10 @@ WRITE_LINE_MEMBER( tandy200_state::i8155_to_w )
 void kc85_state::machine_start()
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
-
+	
+	astring region_tag;
+	m_opt_region = memregion(region_tag.cpy(m_opt_cart->tag()).cat(GENERIC_ROM_REGION_TAG));
+	
 	/* initialize RTC */
 	m_rtc->cs_w(1);
 	m_rtc->oe_w(1);
@@ -1178,7 +1179,7 @@ void kc85_state::machine_start()
 	program.install_read_bank(0x0000, 0x7fff, "bank1");
 	program.unmap_write(0x0000, 0x7fff);
 	membank("bank1")->configure_entry(0, m_rom->base());
-	membank("bank1")->configure_entry(1, m_option->base());
+	membank("bank1")->configure_entry(1, m_opt_region ? m_opt_region->base() : m_rom->base());
 	membank("bank1")->set_entry(0);
 
 	/* configure RAM banking */
@@ -1209,14 +1210,17 @@ void kc85_state::machine_start()
 void pc8201_state::machine_start()
 {
 	UINT8 *ram = m_ram->pointer();
-
+	
+	astring region_tag;
+	m_opt_region = memregion(region_tag.cpy(m_opt_cart->tag()).cat(GENERIC_ROM_REGION_TAG));
+	
 	/* initialize RTC */
 	m_rtc->cs_w(1);
 	m_rtc->oe_w(1);
 
 	/* configure ROM banking */
 	membank("bank1")->configure_entry(0, m_rom->base());
-	membank("bank1")->configure_entry(1, m_option->base());
+	membank("bank1")->configure_entry(1, m_opt_region ? m_opt_region->base() : m_rom->base());
 	membank("bank1")->configure_entries(2, 2, ram + 0x8000, 0x8000);
 	membank("bank1")->set_entry(0);
 
@@ -1240,7 +1244,10 @@ void pc8201_state::machine_start()
 void trsm100_state::machine_start()
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
-
+	
+	astring region_tag;
+	m_opt_region = memregion(region_tag.cpy(m_opt_cart->tag()).cat(GENERIC_ROM_REGION_TAG));
+	
 	/* initialize RTC */
 	m_rtc->cs_w(1);
 	m_rtc->oe_w(1);
@@ -1249,7 +1256,7 @@ void trsm100_state::machine_start()
 	program.install_read_bank(0x0000, 0x7fff, "bank1");
 	program.unmap_write(0x0000, 0x7fff);
 	membank("bank1")->configure_entry(0, m_rom->base());
-	membank("bank1")->configure_entry(1, m_option->base());
+	membank("bank1")->configure_entry(1, m_opt_region ? m_opt_region->base() : m_rom->base());
 	membank("bank1")->set_entry(0);
 
 	/* configure RAM banking */
@@ -1289,10 +1296,13 @@ void trsm100_state::machine_start()
 
 void tandy200_state::machine_start()
 {
+	astring region_tag;
+	m_opt_region = memregion(region_tag.cpy(m_opt_cart->tag()).cat(GENERIC_ROM_REGION_TAG));
+
 	/* configure ROM banking */
 	membank("bank1")->configure_entry(0, m_rom->base());
 	membank("bank1")->configure_entry(1, m_rom->base() + 0x10000);
-	membank("bank1")->configure_entry(2, m_option->base());
+	membank("bank1")->configure_entry(2, m_opt_region ? m_opt_region->base() : m_rom->base());
 	membank("bank1")->set_entry(0);
 
 	/* configure RAM banking */
@@ -1374,10 +1384,8 @@ static MACHINE_CONFIG_START( kc85, kc85_state )
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
 
 	/* option ROM cartridge */
-	MCFG_CARTSLOT_ADD("cart")
-	MCFG_CARTSLOT_EXTENSION_LIST("rom,bin")
-	MCFG_CARTSLOT_NOT_MANDATORY
-	MCFG_CARTSLOT_INTERFACE("trsm100_cart")
+	MCFG_GENERIC_CARTSLOT_ADD("opt_cartslot", generic_linear_slot, "trsm100_cart")
+	MCFG_GENERIC_EXTENSIONS("bin,rom")
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "trsm100")
@@ -1426,16 +1434,12 @@ static MACHINE_CONFIG_START( pc8201, pc8201_state )
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
 
 	/* option ROM cartridge */
-	MCFG_CARTSLOT_ADD("cart")
-	MCFG_CARTSLOT_EXTENSION_LIST("rom,bin")
-	MCFG_CARTSLOT_NOT_MANDATORY
-	MCFG_CARTSLOT_INTERFACE("pc8201_cart")
+	MCFG_GENERIC_CARTSLOT_ADD("opt_cartslot", generic_linear_slot, "pc8201_cart")
+	MCFG_GENERIC_EXTENSIONS("bin,rom")
 
 	/* 128KB ROM cassette */
-	MCFG_CARTSLOT_ADD("cart2")
-	MCFG_CARTSLOT_EXTENSION_LIST("rom,bin")
-	MCFG_CARTSLOT_NOT_MANDATORY
-	MCFG_CARTSLOT_INTERFACE("pc8201_cart2")
+	MCFG_GENERIC_CARTSLOT_ADD("cas_cartslot", generic_linear_slot, "pc8201_cart2")
+	MCFG_GENERIC_EXTENSIONS("bin,rom")
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "pc8201")
@@ -1489,10 +1493,8 @@ static MACHINE_CONFIG_START( trsm100, trsm100_state )
 //  MCFG_MC14412_ADD(MC14412_TAG, XTAL_1MHz)
 
 	/* option ROM cartridge */
-	MCFG_CARTSLOT_ADD("cart")
-	MCFG_CARTSLOT_EXTENSION_LIST("rom,bin")
-	MCFG_CARTSLOT_NOT_MANDATORY
-	MCFG_CARTSLOT_INTERFACE("trsm100_cart")
+	MCFG_GENERIC_CARTSLOT_ADD("opt_cartslot", generic_linear_slot, "trsm100_cart")
+	MCFG_GENERIC_EXTENSIONS("bin,rom")
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "trsm100")
@@ -1558,10 +1560,8 @@ static MACHINE_CONFIG_START( tandy200, tandy200_state )
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
 
 	/* option ROM cartridge */
-	MCFG_CARTSLOT_ADD("cart")
-	MCFG_CARTSLOT_EXTENSION_LIST("rom,bin")
-	MCFG_CARTSLOT_NOT_MANDATORY
-	MCFG_CARTSLOT_INTERFACE("tandy200_cart")
+	MCFG_GENERIC_CARTSLOT_ADD("opt_cartslot", generic_linear_slot, "tandy200_cart")
+	MCFG_GENERIC_EXTENSIONS("bin,rom")
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "tandy200")
@@ -1577,42 +1577,21 @@ MACHINE_CONFIG_END
 ROM_START( kc85 )
 	ROM_REGION( 0x8000, I8085_TAG, 0 )
 	ROM_LOAD( "kc85rom.bin", 0x0000, 0x8000, CRC(8a9ddd6b) SHA1(9d18cb525580c9e071e23bc3c472380aa46356c0) )
-
-	ROM_REGION( 0x8000, "option", ROMREGION_ERASEFF )
-	ROM_CART_LOAD("cart", 0x0000, 0x8000, ROM_MIRROR | ROM_OPTIONAL)
 ROM_END
 
 ROM_START( pc8201 )
 	ROM_REGION( 0x10000, I8085_TAG, 0 )
 	ROM_LOAD( "3256a41-3b1 n 82 basic.rom0", 0x0000, 0x8000, CRC(3dbaa484) SHA1(9886a973faa639ca9e0ba478790bab20e5163495) )
-
-	ROM_REGION( 0x8000, "option", ROMREGION_ERASEFF )
-	ROM_CART_LOAD("cart1", 0x0000, 0x8000, ROM_MIRROR | ROM_OPTIONAL)
-
-	ROM_REGION( 0x20000, "cassette", ROMREGION_ERASEFF )
-	ROM_CART_LOAD("cart2", 0x0000, 0x20000, ROM_MIRROR | ROM_OPTIONAL)
 ROM_END
 
 ROM_START( pc8201a )
 	ROM_REGION( 0x10000, I8085_TAG, 0 )
 	ROM_LOAD( "pc8201rom.rom", 0x0000, 0x8000, CRC(30555035) SHA1(96f33ff235db3028bf5296052acedbc94437c596) )
-
-	ROM_REGION( 0x8000, "option", ROMREGION_ERASEFF )
-	ROM_CART_LOAD("cart", 0x0000, 0x8000, ROM_MIRROR | ROM_OPTIONAL)
-
-	ROM_REGION( 0x20000, "cassette", ROMREGION_ERASEFF )
-	ROM_CART_LOAD("cart2", 0x0000, 0x20000, ROM_MIRROR | ROM_OPTIONAL)
 ROM_END
 
 ROM_START( npc8300 )
 	ROM_REGION( 0x10000, I8085_TAG, 0 )
 	ROM_LOAD( "831000-438_n83a_basic_1986_microsoft_8716_z01.bin", 0x0000, 0x8000, CRC(a3c15dcb) SHA1(f0322dfe3f2e951de043bf6d0973e6ffc2c87181))
-
-	ROM_REGION( 0x8000, "option", ROMREGION_ERASEFF )
-	ROM_CART_LOAD("cart1", 0x0000, 0x8000, ROM_MIRROR | ROM_OPTIONAL)
-
-	ROM_REGION( 0x20000, "cassette", ROMREGION_ERASEFF )
-	ROM_CART_LOAD("cart2", 0x0000, 0x20000, ROM_MIRROR | ROM_OPTIONAL)
 ROM_END
 
 ROM_START( trsm100 )
@@ -1625,27 +1604,17 @@ ROM_START( trsm100 )
 	*/
 	ROM_REGION( 0x8000, I8085_TAG, 0 )
 	ROM_LOAD( "m100rom.m12",  0x0000, 0x8000, CRC(730a3611) SHA1(094dbc4ac5a4ea5cdf51a1ac581a40a9622bb25d) )
-
-	// increased to 0x30000 to fully load 'Booster Pack', but its banking is still unknown
-	ROM_REGION( 0x30000, "option", ROMREGION_ERASEFF )
-	ROM_CART_LOAD("cart", 0x0000, 0x30000, ROM_MIRROR | ROM_OPTIONAL)
 ROM_END
 
 ROM_START( m10 )
 	// 3256C02-4B3/I        Italian
 	ROM_REGION( 0x8010, I8085_TAG, 0 )
 	ROM_LOAD( "m10rom.m12", 0x0000, 0x8000, CRC(f0e8447a) SHA1(d58867276213116a79f7074109b7d7ce02e8a3af) )
-
-	ROM_REGION( 0x8000, "option", ROMREGION_ERASEFF )
-	ROM_CART_LOAD("cart", 0x0000, 0x8000, ROM_MIRROR | ROM_OPTIONAL)
 ROM_END
 
 ROM_START( tandy102 )
 	ROM_REGION( 0x8000, I8085_TAG, 0 )
 	ROM_LOAD( "m102rom.m12", 0x0000, 0x8000, CRC(08e9f89c) SHA1(b6ede7735a361c80419f4c9c0e36e7d480c36d11) )
-
-	ROM_REGION( 0x8000, "option", ROMREGION_ERASEFF )
-	ROM_CART_LOAD("cart", 0x0000, 0x8000, ROM_MIRROR | ROM_OPTIONAL)
 ROM_END
 
 ROM_START( tandy200 )
@@ -1655,9 +1624,6 @@ ROM_START( tandy200 )
 	ROM_LOAD( "rom #2.m14",   0x10000, 0x8000, NO_DUMP )
 	ROM_LOAD( "t200rom.bin", 0x0000, 0xa000, BAD_DUMP CRC(e3358b38) SHA1(35d4e6a5fb8fc584419f57ec12b423f6021c0991) ) /* Y2K hacked */
 	ROM_CONTINUE(           0x10000, 0x8000 )
-
-	ROM_REGION( 0x8000, "option", ROMREGION_ERASEFF )
-	ROM_CART_LOAD("cart", 0x0000, 0x8000, ROM_NOMIRROR | ROM_OPTIONAL)
 ROM_END
 
 /* System Drivers */

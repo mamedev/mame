@@ -129,17 +129,12 @@ TIMER_CALLBACK_MEMBER(electron_state::electron_tape_timer_handler)
 READ8_MEMBER(electron_state::electron_read_keyboard)
 {
 	UINT8 data = 0;
-	int i;
-	static const char *const keynames[] = {
-		"LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6",
-		"LINE7", "LINE8", "LINE9", "LINE10", "LINE11", "LINE12", "LINE13"
-	};
 
 	//logerror( "PC=%04x: keyboard read from paged rom area, address: %04x", activecpu_get_pc(), offset );
-	for( i = 0; i < 14; i++ )
+	for (int i = 0; i < 14; i++)
 	{
-		if( !(offset & 1) )
-			data |= ioport(keynames[i])->read() & 0x0f;
+		if (!(offset & 1))
+			data |= m_keybd[i]->read() & 0x0f;
 
 		offset = offset >> 1;
 	}
@@ -349,8 +344,24 @@ void electron_state::machine_reset()
 }
 
 void electron_state::machine_start()
-{
-	membank("bank2")->configure_entries(0, 16, memregion("user1")->base(), 0x4000);
+{	
+	UINT8 *lo_rom, *up_rom;
+	astring region_tag;
+	memory_region *cart_rom = memregion(region_tag.cpy(m_cart->tag()).cat(GENERIC_ROM_REGION_TAG));
+
+	if (cart_rom)
+		up_rom = cart_rom->base();
+	else
+		up_rom = memregion("user1")->base() + 12 * 0x4000;
+	if (cart_rom && cart_rom->bytes() > 0x4000)
+		lo_rom = cart_rom->base() + 0x4000;
+	else
+		lo_rom = memregion("user1")->base();
+	
+	membank("bank2")->configure_entries(0,  1, lo_rom, 0x4000);
+	membank("bank2")->configure_entries(1, 11, memregion("user1")->base() + 0x04000, 0x4000);
+	membank("bank2")->configure_entries(12, 1, up_rom, 0x4000);
+	membank("bank2")->configure_entries(13, 3, memregion("user1")->base() + 0x34000, 0x4000);
 
 	m_ula.interrupt_status = 0x82;
 	m_ula.interrupt_control = 0x00;
@@ -360,51 +371,45 @@ void electron_state::machine_start()
 
 DEVICE_IMAGE_LOAD_MEMBER( electron_state, electron_cart )
 {
-	UINT8 *user1 = memregion("user1")->base() + 0x4000;
-
 	if (image.software_entry() == NULL)
 	{
 		UINT32 filesize = image.length();
 
-		if ( filesize != 16384 )
+		if (filesize != 16384)
 		{
-			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Invalid size. Only size 16384 is supported");
+			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Invalid size: Only size 16384 is supported");
 			return IMAGE_INIT_FAIL;
 		}
 
-		if (image.fread( user1 + 12 * 16384, filesize) != filesize)
+		m_cart->rom_alloc(filesize, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
+		image.fread(m_cart->get_rom_base(), filesize);
+		return IMAGE_INIT_PASS;
+	}
+	else
+	{
+		int upsize = image.get_software_region_length("uprom");
+		int losize = image.get_software_region_length("lorom");
+		
+		if (upsize != 16384 && upsize != 0)
 		{
-			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Error loading file");
+			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Invalid size for uprom");
 			return IMAGE_INIT_FAIL;
 		}
+		
+		if (losize != 16384 && losize != 0)
+		{
+			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Invalid size for lorom");
+			return IMAGE_INIT_FAIL;
+		}
+
+		m_cart->rom_alloc(upsize + losize, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
+
+		if (upsize)
+			memcpy(m_cart->get_rom_base(), image.get_software_region("uprom"), upsize);
+		
+		if (losize)
+			memcpy(m_cart->get_rom_base() + upsize, image.get_software_region("lorom"), losize);
 
 		return IMAGE_INIT_PASS;
 	}
-
-	int upsize = image.get_software_region_length("uprom");
-	int losize = image.get_software_region_length("lorom");
-
-	if ( upsize != 16384 && upsize != 0 )
-	{
-		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Invalid size for uprom");
-		return IMAGE_INIT_FAIL;
-	}
-
-	if ( losize != 16384 && losize != 0 )
-	{
-		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Invalid size for lorom");
-		return IMAGE_INIT_FAIL;
-	}
-
-	if ( upsize )
-	{
-		memcpy( user1 + 12 * 16384, image.get_software_region("uprom"), upsize );
-	}
-
-	if ( losize )
-	{
-		memcpy( user1 + 0 * 16384, image.get_software_region("lorom"), losize );
-	}
-
-	return IMAGE_INIT_PASS;
 }

@@ -21,7 +21,6 @@
 /* Devices */
 #include "imagedev/cassette.h"
 #include "imagedev/snapquik.h"
-#include "imagedev/cartslot.h"
 
 
 
@@ -50,11 +49,11 @@ void primo_state::primo_update_memory()
 	{
 		case 0x00:  /* Original ROM */
 			space.unmap_write(0x0000, 0x3fff);
-			membank("bank1")->set_base(memregion("maincpu")->base()+0x10000);
+			membank("bank1")->set_base(memregion("maincpu")->base() + 0x10000);
 			break;
 		case 0x01:  /* EPROM extension 1 */
 			space.unmap_write(0x0000, 0x3fff);
-			membank("bank1")->set_base(memregion("maincpu")->base()+0x14000);
+			membank("bank1")->set_base(m_cart2_rom->base());
 			break;
 		case 0x02:  /* RAM */
 			space.install_write_bank(0x0000, 0x3fff, "bank1");
@@ -62,7 +61,7 @@ void primo_state::primo_update_memory()
 			break;
 		case 0x03:  /* EPROM extension 2 */
 			space.unmap_write(0x0000, 0x3fff);
-			membank("bank1")->set_base(memregion("maincpu")->base()+0x18000);
+			membank("bank1")->set_base(m_cart1_rom->base());
 			break;
 	}
 	logerror ("Memory update: %02x\n", m_port_FD);
@@ -241,6 +240,13 @@ void primo_state::primo_common_machine_init ()
 	machine().device("maincpu")->set_clock_scale(ioport("CPU_CLOCK")->read() ? 1.5 : 1.0);
 }
 
+void primo_state::machine_start()
+{
+	astring region_tag;
+	m_cart1_rom = memregion(region_tag.cpy(m_cart1->tag()).cat(GENERIC_ROM_REGION_TAG));
+	m_cart2_rom = memregion(region_tag.cpy(m_cart2->tag()).cat(GENERIC_ROM_REGION_TAG));	
+}
+
 void primo_state::machine_reset()
 {
 	primo_common_machine_init();
@@ -262,10 +268,7 @@ MACHINE_RESET_MEMBER(primo_state,primob)
 
 void primo_state::primo_setup_pss (UINT8* snapshot_data, UINT32 snapshot_size)
 {
-	int i;
-
 	/* Z80 registers */
-
 	m_maincpu->set_state_int(Z80_BC, snapshot_data[4] + snapshot_data[5]*256);
 	m_maincpu->set_state_int(Z80_DE, snapshot_data[6] + snapshot_data[7]*256);
 	m_maincpu->set_state_int(Z80_HL, snapshot_data[8] + snapshot_data[9]*256);
@@ -292,9 +295,8 @@ void primo_state::primo_setup_pss (UINT8* snapshot_data, UINT32 snapshot_size)
 
 
 	/* memory */
-
-	for (i=0; i<0xc000; i++)
-		m_maincpu->space(AS_PROGRAM).write_byte( i+0x4000, snapshot_data[i+38]);
+	for (int i = 0; i < 0xc000; i++)
+		m_maincpu->space(AS_PROGRAM).write_byte(i + 0x4000, snapshot_data[i + 38]);
 }
 
 SNAPSHOT_LOAD_MEMBER( primo_state, primo )
@@ -323,17 +325,15 @@ SNAPSHOT_LOAD_MEMBER( primo_state, primo )
 *******************************************************************************/
 
 
-void primo_state::primo_setup_pp (UINT8* quickload_data, UINT32 quickload_size)
+void primo_state::primo_setup_pp(UINT8* quickload_data, UINT32 quickload_size)
 {
-	int i;
-
 	UINT16 load_addr;
 	UINT16 start_addr;
 
 	load_addr = quickload_data[0] + quickload_data[1]*256;
 	start_addr = quickload_data[2] + quickload_data[3]*256;
 
-	for (i=4; i<quickload_size; i++)
+	for (int i = 4; i < quickload_size; i++)
 		m_maincpu->space(AS_PROGRAM).write_byte(start_addr+i-4, quickload_data[i]);
 
 	m_maincpu->set_state_int(Z80_PC, start_addr);

@@ -8,21 +8,35 @@
 #define PRIMO_H_
 
 #include "imagedev/snapquik.h"
+#include "imagedev/cassette.h"
 #include "bus/cbmiec/cbmiec.h"
 #include "sound/speaker.h"
-#include "imagedev/cassette.h"
+
+#include "bus/generic/slot.h"
+#include "bus/generic/carts.h"
 
 class primo_state : public driver_device
 {
 public:
 	primo_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_iec(*this, CBM_IEC_TAG),
 		m_maincpu(*this, "maincpu"),
+		m_iec(*this, CBM_IEC_TAG),
 		m_speaker(*this, "speaker"),
-		m_cassette(*this, "cassette") { }
+		m_cassette(*this, "cassette"),
+		m_cart1(*this, "cartslot1"),
+		m_cart2(*this, "cartslot2")
+	{ }
 
+	required_device<cpu_device> m_maincpu;
 	required_device<cbm_iec_device> m_iec;
+	required_device<speaker_sound_device> m_speaker;
+	required_device<cassette_image_device> m_cassette;
+	required_device<generic_slot_device> m_cart1;
+	required_device<generic_slot_device> m_cart2;
+
+	memory_region *m_cart1_rom;
+	memory_region *m_cart2_rom;
 
 	UINT16 m_video_memory_base;
 	UINT8 m_port_FD;
@@ -36,12 +50,10 @@ public:
 	DECLARE_DRIVER_INIT(primo64);
 	DECLARE_DRIVER_INIT(primo32);
 	virtual void machine_reset();
+	virtual void machine_start();
 	DECLARE_MACHINE_RESET(primob);
 	UINT32 screen_update_primo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(primo_vblank_interrupt);
-	required_device<cpu_device> m_maincpu;
-	required_device<speaker_sound_device> m_speaker;
-	required_device<cassette_image_device> m_cassette;
 	void primo_draw_scanline(bitmap_ind16 &bitmap, int primo_scanline);
 	void primo_update_memory();
 	void primo_common_driver_init (primo_state *state);

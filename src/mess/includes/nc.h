@@ -14,6 +14,9 @@
 #include "machine/nvram.h"
 #include "sound/beep.h"
 
+#include "bus/generic/slot.h"
+#include "bus/generic/carts.h"
+
 #define NC_NUM_COLOURS 4
 
 #define NC_SCREEN_WIDTH        480
@@ -41,6 +44,7 @@ public:
 		m_beeper1(*this, "beep.1"),
 		m_beeper2(*this, "beep.2"),
 		m_centronics(*this, "centronics"),
+		m_card(*this, "cardslot"),
 		m_uart(*this, "uart"),
 		m_uart_clock(*this, "uart_clock"),
 		m_nvram(*this, "nvram")
@@ -96,10 +100,8 @@ protected:
 
 private:
 	void nc200_video_set_backlight(int state);
-	void nc_card_save(device_image_interface &image);
-	int nc_card_calculate_mask(int size);
-	int nc_card_load(device_image_interface &image, unsigned char **ptr);
-	void nc_set_card_present_state(int state);
+	int card_calculate_mask(int size);
+	void set_card_present_state(int state);
 	void nc_update_interrupts();
 	void nc_refresh_memory_bank_config(int bank);
 	void nc_refresh_memory_config();
@@ -115,6 +117,7 @@ public: // HACK FOR MC6845
 	required_device<beep_device> m_beeper1;
 	required_device<beep_device> m_beeper2;
 	required_device<centronics_device> m_centronics;
+	required_device<generic_slot_device> m_card;
 	required_device<i8251_device> m_uart;
 	required_device<clock_device> m_uart_clock;
 	required_device<nvram_device> m_nvram;
@@ -134,11 +137,11 @@ public: // HACK FOR MC6845
 	int m_previous_inputport_10_state;
 	int m_previous_alarm_state;
 	UINT8 m_nc200_uart_interrupt_irq;
-	unsigned char *m_card_ram;
+	memory_region *m_card_ram;
 	int m_membank_card_ram_mask;
+	int m_card_size;
 	unsigned long m_display_memory_start;
 	UINT8 m_type;
-	int m_card_size;
 	int m_nc200_backlight;
 
 	int m_centronics_ack;

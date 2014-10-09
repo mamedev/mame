@@ -22,10 +22,13 @@
 #include "emu.h"
 #include "cpu/hd61700/hd61700.h"
 #include "video/hd44352.h"
-#include "imagedev/cartslot.h"
 #include "machine/nvram.h"
 #include "sound/beep.h"
 #include "rendlay.h"
+
+#include "bus/generic/slot.h"
+#include "bus/generic/carts.h"
+
 
 class pb1000_state : public driver_device
 {
@@ -34,16 +37,24 @@ public:
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
 			m_beeper(*this, "beeper"),
-			m_hd44352(*this, "hd44352")
+			m_hd44352(*this, "hd44352"),
+			m_card1(*this, "cardslot1"),
+			m_card2(*this, "cardslot2")
 		{ }
 
 	required_device<hd61700_cpu_device> m_maincpu;
 	required_device<beep_device> m_beeper;
 	required_device<hd44352_device> m_hd44352;
+	optional_device<generic_slot_device> m_card1;
+	optional_device<generic_slot_device> m_card2;
 
 	emu_timer *m_kb_timer;
 	UINT8 m_kb_matrix;
 	UINT8 m_gatearray[2];
+
+	memory_region *m_rom_reg;
+	memory_region *m_card1_reg;
+	memory_region *m_card2_reg;
 
 	virtual void machine_start();
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -72,7 +83,7 @@ static ADDRESS_MAP_START(pb2000c_mem, AS_PROGRAM, 16, pb1000_state)
 	AM_RANGE( 0x00c10, 0x00c11 ) AM_WRITE(gatearray_w)
 	AM_RANGE( 0x00000, 0x0ffff ) AM_ROMBANK("bank1")
 	AM_RANGE( 0x10000, 0x1ffff ) AM_RAM                 AM_SHARE("nvram1")
-	AM_RANGE( 0x20000, 0x27fff ) AM_ROM                 AM_REGION("card1", 0)
+	AM_RANGE( 0x20000, 0x27fff ) AM_DEVREAD("cardslot1", generic_slot_device, read16_rom)
 	AM_RANGE( 0x28000, 0x2ffff ) AM_RAM                 AM_SHARE("nvram2")
 ADDRESS_MAP_END
 
@@ -306,12 +317,12 @@ WRITE16_MEMBER( pb1000_state::gatearray_w )
 {
 	m_gatearray[offset] = data&0xff;
 
-	if (m_gatearray[0])
-		membank("bank1")->set_base(memregion("card1")->base());
-	else if (m_gatearray[1])
-		membank("bank1")->set_base(memregion("card2")->base());
+	if (m_gatearray[0] && m_card1_reg)
+		membank("bank1")->set_base(m_card1_reg->base());
+	else if (m_gatearray[1] && m_card2_reg)
+		membank("bank1")->set_base(m_card2_reg->base());
 	else
-		membank("bank1")->set_base(memregion("rom")->base());
+		membank("bank1")->set_base(m_rom_reg->base());
 }
 
 static void lcd_control(hd61700_cpu_device &device, UINT8 data)
@@ -494,7 +505,12 @@ TIMER_CALLBACK_MEMBER(pb1000_state::keyboard_timer)
 
 void pb1000_state::machine_start()
 {
-	membank("bank1")->set_base(memregion("rom")->base());
+	astring region_tag;
+	m_card1_reg = memregion(region_tag.cpy(m_card1->tag()).cat(GENERIC_ROM_REGION_TAG));
+	m_card2_reg = memregion(region_tag.cpy(m_card2->tag()).cat(GENERIC_ROM_REGION_TAG));
+	m_rom_reg = memregion("rom");
+
+	membank("bank1")->set_base(m_rom_reg->base());
 
 	m_kb_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pb1000_state::keyboard_timer),this));
 	m_kb_timer->adjust(attotime::from_hz(192), 0, attotime::from_hz(192));
@@ -538,15 +554,8 @@ static MACHINE_CONFIG_DERIVED( pb2000c, pb1000 )
 	MCFG_CPU_PROGRAM_MAP(pb2000c_mem)
 	MCFG_HD61700_CONFIG(pb2000c_config)
 
-	MCFG_CARTSLOT_ADD("card1")
-	MCFG_CARTSLOT_EXTENSION_LIST("bin")
-	MCFG_CARTSLOT_NOT_MANDATORY
-	MCFG_CARTSLOT_INTERFACE("pb2000c_card")
-
-	MCFG_CARTSLOT_ADD("card2")
-	MCFG_CARTSLOT_EXTENSION_LIST("bin")
-	MCFG_CARTSLOT_NOT_MANDATORY
-	MCFG_CARTSLOT_INTERFACE("pb2000c_card")
+	MCFG_GENERIC_CARTSLOT_ADD("cardslot1", generic_plain_slot, "pb2000c_card")
+	MCFG_GENERIC_CARTSLOT_ADD("cardslot2", generic_plain_slot, "pb2000c_card")
 
 	/* Software lists */
 	MCFG_SOFTWARE_LIST_ADD("card_list", "pb2000c")
@@ -564,10 +573,10 @@ ROM_START( pb1000 )
 	ROM_SYSTEM_BIOS(1, "basicj", "BASIC Jap")
 	ROMX_LOAD( "pb1000j.bin", 0x0000, 0x8000, CRC(14a0df57) SHA1(ab47bb54eb2a24dcd9d2663462e9272d974fa7da), ROM_BIOS(2) | ROM_SKIP(1))
 
-
 	ROM_REGION( 0x0800, "hd44352", 0 )
 	ROM_LOAD( "charset.bin", 0x0000, 0x0800, CRC(7f144716) SHA1(a02f1ecc6dc0ac55b94f00931d8f5cb6b9ffb7b4))
 ROM_END
+
 
 ROM_START( pb2000c )
 	ROM_REGION( 0x1800, "maincpu", ROMREGION_ERASEFF )
@@ -578,13 +587,8 @@ ROM_START( pb2000c )
 
 	ROM_REGION( 0x0800, "hd44352", 0 )
 	ROM_LOAD( "charset.bin", 0x0000, 0x0800, CRC(7f144716) SHA1(a02f1ecc6dc0ac55b94f00931d8f5cb6b9ffb7b4))
-
-	ROM_REGION( 0x20000, "card1", ROMREGION_ERASEFF )
-	ROM_CART_LOAD( "card1", 0, 0x20000, 0 )
-
-	ROM_REGION( 0x20000, "card2", ROMREGION_ERASEFF )
-	ROM_CART_LOAD( "card2", 0, 0x20000, 0 )
 ROM_END
+
 
 ROM_START( ai1000 )
 	ROM_REGION( 0x1800, "maincpu", ROMREGION_ERASEFF )
@@ -595,12 +599,6 @@ ROM_START( ai1000 )
 
 	ROM_REGION( 0x0800, "hd44352", 0 )
 	ROM_LOAD( "charset.bin", 0x0000, 0x0800, CRC(7f144716) SHA1(a02f1ecc6dc0ac55b94f00931d8f5cb6b9ffb7b4))
-
-	ROM_REGION( 0x20000, "card1", ROMREGION_ERASEFF )
-	ROM_CART_LOAD( "card1", 0, 0x20000, 0 )
-
-	ROM_REGION( 0x20000, "card2", ROMREGION_ERASEFF )
-	ROM_CART_LOAD( "card2", 0, 0x20000, 0 )
 ROM_END
 
 /* Driver */
