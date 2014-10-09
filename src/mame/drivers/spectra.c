@@ -248,10 +248,10 @@ static const sn76477_interface sn76477_intf =
 
 static MACHINE_CONFIG_START( spectra, spectra_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, 3579545/4)  // actually a M6503
+	MCFG_CPU_ADD("maincpu", M6502, XTAL_3_579545MHz/4)  // actually a M6503
 	MCFG_CPU_PROGRAM_MAP(spectra_map)
 
-	MCFG_DEVICE_ADD("riot", RIOT6532, 3579545/4)
+	MCFG_DEVICE_ADD("riot", RIOT6532, XTAL_3_579545MHz/4)
 	MCFG_RIOT6532_IN_PA_CB(READ8(spectra_state, porta_r))
 	MCFG_RIOT6532_OUT_PA_CB(WRITE8(spectra_state, porta_w))
 	MCFG_RIOT6532_IN_PB_CB(READ8(spectra_state, portb_r))
