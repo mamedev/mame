@@ -19,9 +19,11 @@
 #include "video/hd44780.h"
 #include "video/sed1520.h"
 #include "sound/beep.h"
-#include "imagedev/cartslot.h"
 #include "rendlay.h"
 #include "gl3000s.lh"
+
+#include "bus/generic/slot.h"
+#include "bus/generic/carts.h"
 
 
 class pc2000_state : public driver_device
@@ -32,6 +34,7 @@ public:
 			m_maincpu(*this, "maincpu"),
 			m_lcdc(*this, "hd44780"),
 			m_beep(*this, "beeper"),
+			m_cart(*this, "cartslot"),
 			m_bank0(*this, "bank0"),
 			m_bank1(*this, "bank1"),
 			m_bank2(*this, "bank2")
@@ -40,6 +43,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	optional_device<hd44780_device> m_lcdc;
 	required_device<beep_device> m_beep;
+	required_device<generic_slot_device> m_cart;
 	optional_memory_bank m_bank0;
 	required_memory_bank m_bank1;
 	optional_memory_bank m_bank2;
@@ -58,6 +62,7 @@ public:
 	DECLARE_READ8_MEMBER( beep_r );
 	DECLARE_WRITE8_MEMBER( beep_w );
 	DECLARE_PALETTE_INIT(pc2000);
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(pc2000_cart);
 };
 
 class gl3000s_state : public pc2000_state
@@ -338,7 +343,7 @@ static ADDRESS_MAP_START(pc1000_mem, AS_PROGRAM, 8, pc1000_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x3fff) AM_ROM AM_REGION("bios", 0x00000)
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
-	AM_RANGE(0x8000, 0xbfff) AM_ROM AM_REGION("cart", 0x00000)    //0x8000 - 0xbfff tests a cartridge, header is 0x55 0xaa 0x33, if it succeeds a jump at 0x8010 occurs
+	AM_RANGE(0x8000, 0xbfff) AM_DEVREAD("cartslot", generic_slot_device, read_rom)    //0x8000 - 0xbfff tests a cartridge, header is 0x55 0xaa 0x33, if it succeeds a jump at 0x8010 occurs
 	AM_RANGE(0xc000, 0xffff) AM_ROMBANK("bank1")
 ADDRESS_MAP_END
 
@@ -735,8 +740,9 @@ INPUT_PORTS_END
 
 void pc2000_state::machine_start()
 {
+	astring region_tag;
+	UINT8 *cart = memregion(region_tag.cpy(m_cart->tag()).cat(GENERIC_ROM_REGION_TAG))->base();
 	UINT8 *bios = memregion("bios")->base();
-	UINT8 *cart = memregion("cart")->base();
 
 	m_bank0->configure_entries(0, 0x10, bios, 0x4000);
 	m_bank1->configure_entries(0, 0x10, bios, 0x4000);
@@ -746,8 +752,9 @@ void pc2000_state::machine_start()
 
 void gl4004_state::machine_start()
 {
+	astring region_tag;
+	UINT8 *cart = memregion(region_tag.cpy(m_cart->tag()).cat(GENERIC_ROM_REGION_TAG))->base();
 	UINT8 *bios = memregion("bios")->base();
-	UINT8 *cart = memregion("cart")->base();
 
 	m_bank0->configure_entries(0, 0x20, bios, 0x4000);
 	m_bank1->configure_entries(0, 0x20, bios, 0x4000);
@@ -796,6 +803,18 @@ static GFXDECODE_START( pc2000 )
 GFXDECODE_END
 
 
+DEVICE_IMAGE_LOAD_MEMBER( pc2000_state, pc2000_cart )
+{
+	UINT32 size = m_cart->common_get_size("rom");
+
+	// we always allocate a 0x40000 region, even if most carts span only 0x20000,
+	// because the bankswitch code accesses up to 16 x 16K banks...
+	m_cart->rom_alloc(0x40000, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
+	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");			
+	
+	return IMAGE_INIT_PASS;
+}
+
 static MACHINE_CONFIG_START( pc2000, pc2000_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz) /* probably not accurate */
@@ -825,10 +844,8 @@ static MACHINE_CONFIG_START( pc2000, pc2000_state )
 	MCFG_SOUND_ADD( "beeper", BEEP, 0 )
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
 
-	MCFG_CARTSLOT_ADD("cart")
-	MCFG_CARTSLOT_EXTENSION_LIST("bin")
-	MCFG_CARTSLOT_INTERFACE("genius_cart")
-	MCFG_CARTSLOT_NOT_MANDATORY
+	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "genius_cart")
+	MCFG_GENERIC_LOAD(pc2000_state, pc2000_cart)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( gl2000, pc2000 )
@@ -903,9 +920,6 @@ static MACHINE_CONFIG_DERIVED_CLASS( misterx, pc2000, pc1000_state )
 	MCFG_HD44780_LCD_SIZE(1, 20)
 	MCFG_HD44780_PIXEL_UPDATE_CB(pc1000_pixel_update)
 
-	MCFG_CARTSLOT_MODIFY("cart")
-	MCFG_CARTSLOT_INTERFACE("genius_cart")
-
 	/* Software lists */
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "misterx")
 MACHINE_CONFIG_END
@@ -914,129 +928,81 @@ MACHINE_CONFIG_END
 ROM_START( pc2000 )
 	ROM_REGION( 0x40000, "bios", 0 )
 	ROM_LOAD( "lh532hee_9344_d.u4", 0x000000, 0x040000, CRC(0b03bf33) SHA1(cb344b94b14975c685041d3e669f386e8a21909f))
-
-	ROM_REGION( 0x40000, "cart", ROMREGION_ERASEFF )
-	ROM_CART_LOAD( "cart", 0, 0x40000, 0 )
 ROM_END
 
 ROM_START( gl2000 )
 	ROM_REGION( 0x40000, "bios", 0 )
 	ROM_LOAD( "lh532hez_9416_d.bin", 0x000000, 0x040000, CRC(532f219e) SHA1(4044f0cf098087af4cc9d1b2a80c3c9ec06f154e))
-
-	ROM_REGION( 0x40000, "cart", ROMREGION_ERASEFF )
-	ROM_CART_LOAD( "cart", 0, 0x40000, 0 )
 ROM_END
 
 ROM_START( gl2000c )
 	ROM_REGION( 0x40000, "bios", 0 )
 	ROM_LOAD( "27-5491-00", 0x000000, 0x020000, CRC(cbb9fe90) SHA1(a2a7a8afb027fe764a5998e3b35e87f291c24df1))
-
-	ROM_REGION( 0x40000, "cart", ROMREGION_ERASEFF )
-	ROM_CART_LOAD( "cart", 0, 0x40000, 0 )
 ROM_END
 
 ROM_START( gl2000p )
 	ROM_REGION( 0x40000, "bios", 0 )
 	ROM_LOAD( "27-5615-00_9534_d.bin", 0x000000, 0x040000, CRC(481c1000) SHA1(da6f60e5bb25145ec5239310296bedaabeeaee28))
-
-	ROM_REGION( 0x40000, "cart", ROMREGION_ERASEFF )
-	ROM_CART_LOAD( "cart", 0, 0x40000, 0 )
 ROM_END
 
 ROM_START( gl3000s )
 	ROM_REGION(0x40000, "bios", 0)
 	ROM_LOAD( "27-5713-00", 0x000000, 0x040000, CRC(18b113e0) SHA1(27a12893c38068efa35a99fa97a260dbfbd497e3) )
-
-	ROM_REGION( 0x40000, "cart", ROMREGION_ERASEFF )
-	ROM_CART_LOAD( "cart", 0, 0x40000, 0 )
 ROM_END
 
 ROM_START( gl4000 )
 	ROM_REGION(0x80000, "bios", 0)
 	ROM_LOAD( "27-5480-00",   0x000000, 0x040000, CRC(8de047d3) SHA1(bb1d869954773bb7b8b51caa54531015d6b751ec) )
-
-	ROM_REGION( 0x40000, "cart", ROMREGION_ERASEFF )
-	ROM_CART_LOAD( "cart", 0, 0x40000, 0 )
 ROM_END
 
 ROM_START( gl4004 )
 	ROM_REGION(0x80000, "bios", 0)
 	ROM_LOAD( "27-5762-00.u2", 0x000000, 0x080000, CRC(fb242f0f) SHA1(aae1beeb94873e29920726ad35475641d9f1e94e) )
-
-	ROM_REGION( 0x40000, "cart", ROMREGION_ERASEFF )
-	ROM_CART_LOAD( "cart", 0, 0x40000, 0 )
 ROM_END
 
 ROM_START( gl5000 )
 	ROM_REGION(0x80000, "bios", 0)
 	ROM_LOAD( "27-5912-00.u1", 0x000000, 0x080000, CRC(9fe4c04a) SHA1(823d1d46e49e21f921260296874bc3ee5f718a5f) )
-
-	ROM_REGION( 0x40000, "cart", ROMREGION_ERASEFF )
-	ROM_CART_LOAD( "cart", 0, 0x40000, 0 )
 ROM_END
 
 ROM_START( gl5005x )
 	ROM_REGION(0x200000, "bios", 0)
 	ROM_LOAD( "27-6426-00.u1", 0x000000, 0x200000, CRC(adde3581) SHA1(80f2bde7c5c339534614f24a9ca6ea362ee2f816) )
-
-	ROM_REGION( 0x40000, "cart", ROMREGION_ERASEFF )
-	ROM_CART_LOAD( "cart", 0, 0x40000, 0 )
 ROM_END
 
 ROM_START( glpn )
 	ROM_REGION( 0x200000, "bios", 0 )
 	ROM_LOAD( "27-5755-01.u1", 0x00000, 0x80000, CRC(dc28346b) SHA1(148fe664bef5b2f68c6702c74462802b76900ca0) )
-
-	ROM_REGION( 0x80000, "cart", ROMREGION_ERASEFF )
-	ROM_CART_LOAD( "cart", 0, 0x80000, 0 )
 ROM_END
 
 ROM_START( gmtt )
 	ROM_REGION(0x100000, "bios", 0)
 	ROM_LOAD( "27-6154-00.u4", 0x000000, 0x100000, CRC(e908262d) SHA1(a7964c9f9d304b6b2cce61822e8c6151b50388be) )
-
-	ROM_REGION( 0x40000, "cart", ROMREGION_ERASEFF )
-	ROM_CART_LOAD( "cart", 0, 0x40000, 0 )
 ROM_END
 
 ROM_START( gbs5505x )
 	ROM_REGION(0x200000, "bios", 0)
 	ROM_LOAD( "27-7006-00.u5", 0x000000, 0x200000, CRC(28af3ca7) SHA1(5df7063c7327263c23d5ac2aac3aa66f7e0821c5) )
-
-	ROM_REGION( 0x40000, "cart", ROMREGION_ERASEFF )
-	ROM_CART_LOAD( "cart", 0, 0x40000, 0 )
 ROM_END
 
 ROM_START( gln ) // not Z80 code
 	ROM_REGION( 0x80000, "bios", 0 )
 	ROM_LOAD( "27-5308-00_9524_d.bin", 0x000000, 0x080000, CRC(d1b994ee) SHA1(b5cf0810df0676712e4f30e279cc46c19b4277dd))
-
-	ROM_REGION( 0x40000, "cart", ROMREGION_ERASEFF )
-	ROM_CART_LOAD( "cart", 0, 0x40000, 0 )
 ROM_END
 
 ROM_START( pc1000 )
 	ROM_REGION( 0x20000, "bios", 0 )
 	ROM_LOAD( "27-00780-002-002.u4", 0x000000, 0x020000, CRC(705170ae) SHA1(825ce0ff2c7d0a7b1e2577d1465a37f7e8da383b))
-
-	ROM_REGION( 0x40000, "cart", ROMREGION_ERASEFF )
-	ROM_CART_LOAD( "cart", 0, 0x40000, 0 )
 ROM_END
 
 ROM_START( misterx )
 	ROM_REGION( 0x20000, "bios", 0 )
 	ROM_LOAD( "27-00882-001.bin", 0x000000, 0x020000, CRC(30e0dc94) SHA1(2f4675746a41399b3d9e3e8001a9b4a0dcc5b620))
-
-	ROM_REGION( 0x40000, "cart", ROMREGION_ERASEFF )
-	ROM_CART_LOAD( "cart", 0, 0x40000, 0 )
 ROM_END
 
 ROM_START( lexipcm )
 	ROM_REGION( 0x200000, "bios", 0 )
 	ROM_LOAD( "epoxy.u3", 0x00000, 0x100000, CRC(0a410790) SHA1(be04d5f74208a2f3b200daed75e04e966f64b545) )
-
-	ROM_REGION( 0x40000, "cart", ROMREGION_ERASEFF )
-	ROM_CART_LOAD( "cart", 0, 0x40000, 0 )
 ROM_END
 
 
