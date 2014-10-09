@@ -1361,7 +1361,7 @@ ROM_START( arkanoidj )
 	ROM_LOAD( "a75_25.ic16",   0x8000, 0x8000, CRC(c13b2038) SHA1(0b8197b48e57ffe9ccad0ebbc24891d1da7c9880) )
 
 	ROM_REGION( 0x0800, "mcu", 0 )  /* 2k for the microcontroller */
-	ROM_LOAD( "a75-26.ic14",  0x0000, 0x0800, NO_DUMP )
+	ROM_LOAD( "a75-26.ic14",  0x0000, 0x0800, BAD_DUMP CRC(962960d4) SHA1(64b065a54b1658364db569ac06b717eb7bdd186e) )
 
 	ROM_REGION( 0x18000, "gfx1", 0 )
 	ROM_LOAD( "a75-03.ic64",   0x00000, 0x8000, CRC(038b74ba) SHA1(ac053cc4908b4075f918748b89570e07a0ba5116) )
@@ -1380,6 +1380,7 @@ ROM_START( arkanoidja )
 	ROM_LOAD( "a75-22.ic16",   0x8000, 0x8000, CRC(3a2688d3) SHA1(9633a661352def3d85f95ca830f6d761b0b5450e) )
 
 	ROM_REGION( 0x0800, "mcu", 0 )  /* 2k for the microcontroller */
+	// the handcrafted value at 0x351 (0x9ddb) seems incorrect compared to other sets?? 
 	ROM_LOAD( "a75-23.ic14",  0x0000, 0x0800, BAD_DUMP CRC(0a4abef6) SHA1(fdce0b7a2eab7fd4f1f4fc3b93120b1ebc16078e)  ) /* Hand crafted, need the decapped data here */
 
 	ROM_REGION( 0x18000, "gfx1", 0 )
