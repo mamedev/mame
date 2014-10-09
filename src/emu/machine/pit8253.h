@@ -1,8 +1,10 @@
 /***************************************************************************
 
     Intel 8253/8254
-
     Programmable Interval Timer
+
+    As uPD71054C (8MHz), uPD71054C-10 (10MHz) - it is a clone of Intel 82C54
+    also available in 28-pin QFP and 44-pin PLCC (many pins NC)
 
                             _____   _____
                     D7   1 |*    \_/     | 24  VCC
@@ -17,25 +19,6 @@
                   OUT0  10 |             | 15  CLK1
                  GATE0  11 |             | 14  GATE1
                    GND  12 |_____________| 13  OUT1
-
-
-**********************************************************************
-                            _____   _____
-                 D7 <->  1 |*    \_/     | 24 --- Vdd
-                 D6 <->  2 |             | 23 <-- _WR
-                 D5 <->  3 |             | 22 <-- _RD
-                 D4 <->  4 |             | 21 <-- _CS
-                 D3 <->  5 |             | 20 <-- A1
-                 D2 <->  6 |  uPD71054C  | 19 <-- A0
-                 D1 <->  7 |             | 18 <-- CLK2
-                 D0 <->  8 |             | 17 --> OUT2
-               CLK0 -->  9 |             | 16 <-- GATE2
-               OUT0 <-- 10 |             | 15 <-- CLK1
-              GATE0 --> 11 |             | 14 <-- GATE1
-                GND --- 12 |_____________| 13 --> OUT1
-
-    uPD71054C (8MHz), uPD71054C-10 (10MHz) - it is a clone of Intel 82C54
-    also available in 28-pin QFP and 44-pin PLCC (many pins NC)
 
 
 ***************************************************************************/
