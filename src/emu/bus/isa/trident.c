@@ -1487,32 +1487,36 @@ void trident_vga_device::accel_line()
 //    TGUI_SRC_XY(dmin-dmaj,dmin);
 //    TGUI_DEST_XY(x,y);
 //    TGUI_DIM_XY(dmin+e,len);
-	INT16 dx = abs(tri.accel_source_x - tri.accel_source_y);
-	INT16 dy = abs(tri.accel_source_y);
-	INT16 err = (tri.accel_dim_x - tri.accel_source_y);
+	INT16 dx = tri.accel_source_y - tri.accel_source_x;
+	INT16 dy = tri.accel_source_y;
+	INT16 err = tri.accel_dim_x + tri.accel_source_y;
 	int sx = (tri.accel_drawflags & 0x0200) ? -1 : 1;
 	int sy = (tri.accel_drawflags & 0x0100) ? -1 : 1;
-	int count = 0;
-	INT16 temp;
+	int x,y,z;
 
-	if(tri.accel_drawflags & 0x0400)
+	x = tri.accel_dest_x;
+	y = tri.accel_dest_y;
+
+	WRITEPIXEL(x,y,col);
+	for(z=0;z<tri.accel_dim_y;z++)
 	{
-		temp = dx; dx = dy; dy = temp;
-	}
-	for(;;)
-	{
-		WRITEPIXEL(tri.accel_dest_x,tri.accel_dest_y,col);
-		if (count > tri.accel_dim_y) break;
-		count++;
-		if((err*2) > -dy)
+		if(tri.accel_drawflags & 0x0400)
+			y += sy;
+		else
+			x += sx;
+		if(err > 0)
 		{
-			err -= dy;
-			tri.accel_dest_x += sx;
+			if(tri.accel_drawflags & 0x0400)
+				x += sx;
+			else
+				y += sy;
+			WRITEPIXEL(x,y,col);
+			err += (dy-dx);
 		}
-		if((err*2) < dx)
+		else
 		{
-			err += dx;
-			tri.accel_dest_y += sy;
+			WRITEPIXEL(x,y,col);
+			err += dy;
 		}
 	}
 }
