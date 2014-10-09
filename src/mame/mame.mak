@@ -1493,7 +1493,7 @@ $(MAMEOBJ)/namco.a: \
 	$(DRIVERS)/cswat.o \
 	$(DRIVERS)/dambustr.o \
 	$(DRIVERS)/gal3.o \
-	$(DRIVERS)/galaga.o $(AUDIO)/galaga.o $(VIDEO)/galaga.o \
+	$(DRIVERS)/galaga.o $(AUDIO)/galaga.o $(VIDEO)/galaga.o $(VIDEO)/bosco.o $(VIDEO)/digdug.o $(MACHINE)/xevious.o $(VIDEO)/xevious.o \
 	$(DRIVERS)/galaxian.o $(AUDIO)/galaxian.o $(VIDEO)/galaxian.o \
 	$(DRIVERS)/galaxold.o $(MACHINE)/galaxold.o $(VIDEO)/galaxold.o \
 	$(DRIVERS)/gaplus.o $(MACHINE)/gaplus.o $(VIDEO)/gaplus.o \
@@ -1535,9 +1535,6 @@ $(MAMEOBJ)/namco.a: \
 	$(AUDIO)/namco54.o \
 	$(VIDEO)/c116.o \
 	$(VIDEO)/c45.o \
-	$(VIDEO)/bosco.o \
-	$(VIDEO)/digdug.o \
-	$(MACHINE)/xevious.o $(VIDEO)/xevious.o \
 
 $(MAMEOBJ)/nasco.a: \
 	$(DRIVERS)/crgolf.o $(VIDEO)/crgolf.o \
@@ -1638,12 +1635,8 @@ $(MAMEOBJ)/pacific.a: \
 
 $(MAMEOBJ)/pacman.a: \
 	$(DRIVERS)/jrpacman.o \
-	$(DRIVERS)/pacman.o $(VIDEO)/pacman.o \
+	$(DRIVERS)/pacman.o $(VIDEO)/pacman.o $(MACHINE)/acitya.o $(MACHINE)/jumpshot.o $(MACHINE)/pacplus.o $(MACHINE)/theglobp.o \
 	$(DRIVERS)/pengo.o \
-	$(MACHINE)/acitya.o \
-	$(MACHINE)/jumpshot.o \
-	$(MACHINE)/pacplus.o \
-	$(MACHINE)/theglobp.o \
 
 $(MAMEOBJ)/pce.a: \
 	$(DRIVERS)/ggconnie.o \
