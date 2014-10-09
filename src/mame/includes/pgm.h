@@ -471,6 +471,7 @@ ADDRESS_MAP_EXTERN( pgm_base_mem, 16 );
 
 
 INPUT_PORTS_EXTERN( orlegend );
+INPUT_PORTS_EXTERN( orlegendt );
 INPUT_PORTS_EXTERN( orld105k );
 
 MACHINE_CONFIG_EXTERN( pgm_asic3 );

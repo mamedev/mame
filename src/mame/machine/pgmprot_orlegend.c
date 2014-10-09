@@ -21,7 +21,6 @@ void pgm_asic3_state::asic3_compute_hold(int y, int z)
 
 	m_asic3_hold ^= 0x2bad;
 	m_asic3_hold ^= BIT(z, y);
-	m_asic3_hold ^= BIT(m_asic3_x, 1) << 6;
 	m_asic3_hold ^= BIT(m_asic3_x, 2) << 10;
 	m_asic3_hold ^= BIT(old, 5);
 
@@ -29,19 +28,22 @@ void pgm_asic3_state::asic3_compute_hold(int y, int z)
 	{
 		case 0:
 		case 1:
-			m_asic3_hold ^= BIT(old, 10) ^ BIT(old, 8) ^ (BIT(m_asic3_x, 0) << 1) ^ (BIT(m_asic3_x, 3) << 14);
+			m_asic3_hold ^= BIT(old, 10) ^ BIT(old, 8) ^ (BIT(m_asic3_x, 0) << 1) ^ (BIT(m_asic3_x, 1) << 6) ^ (BIT(m_asic3_x, 3) << 14);
 		break;
 
 		case 2:
-			m_asic3_hold ^= BIT(old, 10) ^ BIT(old, 8) ^ (BIT(m_asic3_x, 0) << 4) ^ (BIT(m_asic3_x, 3) << 12);
+			m_asic3_hold ^= BIT(old, 10) ^ BIT(old, 8) ^ (BIT(m_asic3_x, 0) << 4) ^ (BIT(m_asic3_x, 1) << 6) ^ (BIT(m_asic3_x, 3) << 12);
 		break;
 
 		case 3:
-			m_asic3_hold ^= BIT(old,  7) ^ BIT(old, 6) ^ (BIT(m_asic3_x, 0) << 4) ^ (BIT(m_asic3_x, 3) << 12);
+			m_asic3_hold ^= BIT(old,  7) ^ BIT(old, 6) ^ (BIT(m_asic3_x, 0) << 4) ^ (BIT(m_asic3_x, 1) << 6) ^ (BIT(m_asic3_x, 3) << 12);
+		break;
+
+		case 4: // orlegend111t
+			m_asic3_hold ^= BIT(old,  7) ^ BIT(old, 6) ^ (BIT(m_asic3_x, 0) << 3) ^ (BIT(m_asic3_x, 1) << 8) ^ (BIT(m_asic3_x, 3) << 14);
 		break;
 	}
 }
-
 READ16_MEMBER(pgm_asic3_state::pgm_asic3_r)
 {
 	switch (m_asic3_reg)
@@ -187,6 +189,18 @@ INPUT_PORTS_START( orlegend )
 	PORT_CONFSETTING(      0x0001, "World (duplicate)" ) // again?
 	PORT_CONFSETTING(      0x0002, DEF_STR( Korea ) )
 	PORT_CONFSETTING(      0x0003, DEF_STR( China ) )
+INPUT_PORTS_END
+
+INPUT_PORTS_START( orlegendt )
+	PORT_INCLUDE ( pgm )
+
+	PORT_MODIFY("Region")
+	PORT_DIPNAME( 0x0007, 0x0004, DEF_STR( Region ) )
+	PORT_CONFSETTING(      0x0000, "Invalid 00?" )
+	PORT_CONFSETTING(      0x0001, "Invalid 01?" )
+	PORT_CONFSETTING(      0x0002, "Invalid 02?" )
+	PORT_CONFSETTING(      0x0003, "Invalid 03?" )
+	PORT_CONFSETTING(      0x0004, DEF_STR( Taiwan ) )
 INPUT_PORTS_END
 
 INPUT_PORTS_START( orld105k )
