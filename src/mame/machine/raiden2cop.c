@@ -1736,10 +1736,10 @@ void  raiden2cop_device::cop_collision_update_hitbox(address_space &space, UINT1
 			cop_collision_info[j].max[i] = cop_collision_info[j].min[i] + size[i];
 		}
 
-		if(cop_collision_info[0].max[i] >= cop_collision_info[1].min[i] && cop_collision_info[0].min[i] <= cop_collision_info[1].max[i])
+		if(cop_collision_info[0].max[i] > cop_collision_info[1].min[i] && cop_collision_info[0].min[i] < cop_collision_info[1].max[i])
 			res &= ~(1 << i);
 
-		if(cop_collision_info[1].max[i] >= cop_collision_info[0].min[i] && cop_collision_info[1].min[i] <= cop_collision_info[0].max[i])
+		if(cop_collision_info[1].max[i] > cop_collision_info[0].min[i] && cop_collision_info[1].min[i] < cop_collision_info[0].max[i])
 			res &= ~(1 << i);
 
 		cop_hit_val[i] = (cop_collision_info[0].pos[i] - cop_collision_info[1].pos[i]);
