@@ -18,6 +18,7 @@
 
 #include "emu.h"
 #include "cpu/tms9900/tms9980a.h"
+#include "jpmsru.lh"
 
 class jpmsru_state : public driver_device
 {

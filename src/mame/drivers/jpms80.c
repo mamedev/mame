@@ -25,6 +25,7 @@ System80 is based on the SRU platform, but with more outputs and finally a separ
 #include "cpu/tms9900/tms9995.h"
 #include "sound/ay8910.h"
 #include "machine/tms9902.h"
+#include "jpms80.lh"
 
 class jpms80_state : public driver_device
 {

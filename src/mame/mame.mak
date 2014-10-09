@@ -974,7 +974,7 @@ $(MAMEOBJ)/capcom.a: \
 	$(DRIVERS)/commando.o $(VIDEO)/commando.o \
 	$(DRIVERS)/cps1.o $(VIDEO)/cps1.o \
 	$(DRIVERS)/kenseim.o \
-	$(DRIVERS)/cps2.o \
+	$(DRIVERS)/cps2.o $(MACHINE)/cps2crpt.o \
 	$(DRIVERS)/cps3.o $(AUDIO)/cps3.o \
 	$(DRIVERS)/egghunt.o \
 	$(DRIVERS)/exedexes.o $(VIDEO)/exedexes.o \
@@ -989,10 +989,8 @@ $(MAMEOBJ)/capcom.a: \
 	$(DRIVERS)/sidearms.o $(VIDEO)/sidearms.o \
 	$(DRIVERS)/sonson.o $(VIDEO)/sonson.o \
 	$(DRIVERS)/srumbler.o $(VIDEO)/srumbler.o \
-	$(DRIVERS)/tigeroad.o $(VIDEO)/tigeroad.o \
-	$(MACHINE)/tigeroad.o \
+	$(DRIVERS)/tigeroad.o $(VIDEO)/tigeroad.o $(MACHINE)/tigeroad.o \
 	$(DRIVERS)/vulgus.o $(VIDEO)/vulgus.o \
-	$(MACHINE)/cps2crpt.o \
 	$(MACHINE)/kabuki.o \
 
 $(MAMEOBJ)/cinemat.a: \
@@ -1126,14 +1124,13 @@ $(MAMEOBJ)/excelent.a: \
 $(MAMEOBJ)/exidy.a: \
 	$(DRIVERS)/carpolo.o $(MACHINE)/carpolo.o $(VIDEO)/carpolo.o \
 	$(DRIVERS)/circus.o $(AUDIO)/circus.o $(VIDEO)/circus.o \
-	$(DRIVERS)/exidy.o $(AUDIO)/exidy.o $(VIDEO)/exidy.o \
+	$(DRIVERS)/exidy.o $(AUDIO)/exidy.o $(VIDEO)/exidy.o $(AUDIO)/targ.o \
 	$(DRIVERS)/exidy440.o $(AUDIO)/exidy440.o $(VIDEO)/exidy440.o \
 	$(DRIVERS)/exidyttl.o \
 	$(DRIVERS)/maxaflex.o $(MACHINE)/atari.o $(VIDEO)/atari.o $(VIDEO)/antic.o $(VIDEO)/gtia.o \
 	$(DRIVERS)/starfire.o $(VIDEO)/starfire.o \
 	$(DRIVERS)/vertigo.o $(MACHINE)/vertigo.o $(VIDEO)/vertigo.o \
 	$(DRIVERS)/victory.o $(VIDEO)/victory.o \
-	$(AUDIO)/targ.o \
 
 $(MAMEOBJ)/f32.a: \
 	$(DRIVERS)/crospang.o $(VIDEO)/crospang.o \
@@ -1203,18 +1200,11 @@ $(MAMEOBJ)/igs.a: \
 	$(DRIVERS)/igs_m036.o \
 	$(DRIVERS)/iqblock.o $(VIDEO)/iqblock.o \
 	$(DRIVERS)/lordgun.o $(VIDEO)/lordgun.o \
-	$(DRIVERS)/pgm.o $(VIDEO)/pgm.o \
+	$(DRIVERS)/pgm.o $(VIDEO)/pgm.o	$(MACHINE)/pgmprot_igs027a_type1.o $(MACHINE)/pgmprot_igs027a_type2.o $(MACHINE)/pgmprot_igs027a_type3.o $(MACHINE)/pgmprot_igs025_igs012.o $(MACHINE)/pgmprot_igs025_igs022.o $(MACHINE)/pgmprot_igs025_igs028.o $(MACHINE)/pgmprot_orlegend.o \
 	$(DRIVERS)/pgm2.o \
 	$(DRIVERS)/spoker.o \
 	$(MACHINE)/igs036crypt.o \
 	$(MACHINE)/pgmcrypt.o \
-	$(MACHINE)/pgmprot_orlegend.o \
-	$(MACHINE)/pgmprot_igs027a_type1.o \
-	$(MACHINE)/pgmprot_igs027a_type2.o \
-	$(MACHINE)/pgmprot_igs027a_type3.o \
-	$(MACHINE)/pgmprot_igs025_igs012.o \
-	$(MACHINE)/pgmprot_igs025_igs022.o \
-	$(MACHINE)/pgmprot_igs025_igs028.o \
 	$(MACHINE)/igs025.o \
 	$(MACHINE)/igs022.o \
 	$(MACHINE)/igs028.o \
@@ -1458,7 +1448,7 @@ $(MAMEOBJ)/midw8080.a: \
 	$(DRIVERS)/rotaryf.o \
 
 $(MAMEOBJ)/midway.a: \
-	$(DRIVERS)/astrocde.o $(VIDEO)/astrocde.o \
+	$(DRIVERS)/astrocde.o $(VIDEO)/astrocde.o $(AUDIO)/gorf.o $(AUDIO)/wow.o \
 	$(DRIVERS)/atlantis.o \
 	$(DRIVERS)/balsente.o $(MACHINE)/balsente.o $(VIDEO)/balsente.o \
 	$(DRIVERS)/gridlee.o $(AUDIO)/gridlee.o $(VIDEO)/gridlee.o \
@@ -1482,9 +1472,7 @@ $(MAMEOBJ)/midway.a: \
 	$(DRIVERS)/vegas.o $(DRIVERS)/wmg.o \
 	$(DRIVERS)/williams.o $(MACHINE)/williams.o $(AUDIO)/williams.o $(VIDEO)/williams.o \
 	$(MACHINE)/midwayic.o \
-	$(AUDIO)/gorf.o \
 	$(AUDIO)/midway.o \
-	$(AUDIO)/wow.o \
 
 $(MAMEOBJ)/namco.a: \
 	$(DRIVERS)/20pacgal.o $(VIDEO)/20pacgal.o \
@@ -1731,24 +1719,19 @@ $(MAMEOBJ)/sega.a: \
 	$(DRIVERS)/segaybd.o $(VIDEO)/segaybd.o \
 	$(DRIVERS)/sg1000a.o \
 	$(DRIVERS)/stactics.o $(VIDEO)/stactics.o \
-	$(DRIVERS)/stv.o $(MACHINE)/stvprot.o \
-	$(MACHINE)/decathlt.o \
+	$(DRIVERS)/stv.o $(MACHINE)/stvprot.o $(MACHINE)/decathlt.o \
 	$(DRIVERS)/suprloco.o $(VIDEO)/suprloco.o \
 	$(DRIVERS)/system1.o $(VIDEO)/system1.o \
 	$(DRIVERS)/system16.o $(VIDEO)/system16.o \
 	$(DRIVERS)/timetrv.o \
 	$(DRIVERS)/turbo.o $(AUDIO)/turbo.o $(VIDEO)/turbo.o \
-	$(DRIVERS)/vicdual.o $(AUDIO)/vicdual.o $(VIDEO)/vicdual.o \
+	$(DRIVERS)/vicdual.o $(AUDIO)/vicdual.o $(VIDEO)/vicdual.o $(AUDIO)/carnival.o $(AUDIO)/depthch.o $(AUDIO)/invinco.o $(AUDIO)/pulsar.o \
 	$(DRIVERS)/zaxxon.o $(AUDIO)/zaxxon.o $(VIDEO)/zaxxon.o \
 	$(MACHINE)/fd1089.o \
 	$(MACHINE)/fd1094.o \
 	$(MACHINE)/fddebug.o \
 	$(MACHINE)/mc8123.o \
 	$(MACHINE)/segaic16.o \
-	$(AUDIO)/carnival.o \
-	$(AUDIO)/depthch.o \
-	$(AUDIO)/invinco.o \
-	$(AUDIO)/pulsar.o \
 	$(AUDIO)/segasnd.o \
 	$(VIDEO)/segaic16.o \
 	$(VIDEO)/segaic16_road.o \
@@ -2029,8 +2012,7 @@ $(MAMEOBJ)/toaplan.a: \
 	$(VIDEO)/toaplan_scu.o \
 
 $(MAMEOBJ)/tong.a: \
-	$(DRIVERS)/beezer.o $(MACHINE)/beezer.o $(VIDEO)/beezer.o \
-	$(AUDIO)/beezer.o \
+	$(DRIVERS)/beezer.o $(MACHINE)/beezer.o $(VIDEO)/beezer.o $(AUDIO)/beezer.o \
 
 $(MAMEOBJ)/unico.a: \
 	$(DRIVERS)/drgnmst.o $(VIDEO)/drgnmst.o \
@@ -2673,6 +2655,10 @@ $(DRIVERS)/jp.o:        $(LAYOUT)/jp.lh
 $(DRIVERS)/jpmimpct.o:  $(LAYOUT)/jpmimpct.lh
 
 $(DRIVERS)/jpmmps.o:    $(LAYOUT)/jpmmps.lh
+
+$(DRIVERS)/jpms80.o:    $(LAYOUT)/jpms80.lh
+
+$(DRIVERS)/jpmsru.o:    $(LAYOUT)/jpmsru.lh
 
 $(DRIVERS)/jpmsys5.o:   $(LAYOUT)/jpmsys5.lh
 
