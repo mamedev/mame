@@ -70,6 +70,7 @@
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/nvram.h"
+#include "machine/315-5296.h"
 #include "sound/okim6295.h"
 #include "sound/sn76496.h"
 #include "sound/2612intf.h"
@@ -162,11 +163,13 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(vdp_lv6irqline_callback_c2);
 	DECLARE_WRITE_LINE_MEMBER(vdp_lv4irqline_callback_c2);
 
+	DECLARE_READ8_MEMBER(io_portc_r);
+	DECLARE_WRITE8_MEMBER(io_portd_w);
+	DECLARE_WRITE8_MEMBER(io_porth_w);
+
 	DECLARE_WRITE16_MEMBER( segac2_upd7759_w );
 	DECLARE_READ16_MEMBER( palette_r );
 	DECLARE_WRITE16_MEMBER( palette_w );
-	DECLARE_READ16_MEMBER( io_chip_r );
-	DECLARE_WRITE16_MEMBER( io_chip_w );
 	DECLARE_WRITE16_MEMBER( control_w );
 	DECLARE_READ16_MEMBER( prot_r );
 	DECLARE_WRITE16_MEMBER( prot_w );
@@ -201,7 +204,6 @@ public:
 	int prot_func_pclubjv2(int in);
 	int prot_func_pclubjv4(int in);
 	int prot_func_pclubjv5(int in);
-
 };
 
 
@@ -255,7 +257,6 @@ MACHINE_RESET_MEMBER(segac2_state,segac2)
 	m_sp_palbase = 0;
 
 	recompute_palette_tables();
-
 }
 
 
@@ -273,10 +274,10 @@ MACHINE_RESET_MEMBER(segac2_state,segac2)
 ******************************************************************************/
 
 /* handle writes to the UPD7759 */
-WRITE16_MEMBER(segac2_state::segac2_upd7759_w )
+WRITE16_MEMBER(segac2_state::segac2_upd7759_w)
 {
 	/* make sure we have a UPD chip */
-	if (!m_sound_banks)
+	if (m_upd7759 == NULL)
 		return;
 
 	/* only works if we're accessing the low byte */
@@ -307,7 +308,7 @@ WRITE16_MEMBER(segac2_state::segac2_upd7759_w )
 ******************************************************************************/
 
 /* handle reads from the paletteram */
-READ16_MEMBER(segac2_state::palette_r )
+READ16_MEMBER(segac2_state::palette_r)
 {
 	offset &= 0x1ff;
 	if (m_segac2_alt_palette_mode)
@@ -317,7 +318,7 @@ READ16_MEMBER(segac2_state::palette_r )
 }
 
 /* handle writes to the paletteram */
-WRITE16_MEMBER(segac2_state::palette_w )
+WRITE16_MEMBER(segac2_state::palette_w)
 {
 	int r, g, b, newword;
 	int tmpr, tmpg, tmpb;
@@ -403,143 +404,63 @@ void segac2_state::recompute_palette_tables()
 			m_segac2_sp_pal_lookup[i] = 0x200 * m_palbank + ((~sppal << 2) & 0x100) + ((sppal << 2) & 0x80) + ((~sppal >> 2) & 0x40) + ((sppal >> 2) & 0x20) + (sppal & 0x10);
 		}
 	}
-
 }
 
 
 /******************************************************************************
-    I/O Read & Write Handlers
-*******************************************************************************
-
-    Controls, and Poto Poto reads 'S' 'E' 'G' and 'A' (SEGA) from this area
-    as a form of protection.
-
-    Lots of unknown writes however offset 0E certainly seems to be banking,
-    both colours and sound sample banks.
-
+    Sega 315-5296 I/O chip
 ******************************************************************************/
 
-READ16_MEMBER(segac2_state::io_chip_r )
+READ8_MEMBER(segac2_state::io_portc_r)
 {
-	static const char *const portnames[] = { "P1", "P2", "PORTC", "PORTD", "SERVICE", "COINAGE", "DSW", "PORTH" };
-	offset &= 0x1f/2;
-
-	switch (offset)
-	{
-		/* I/O ports */
-		case 0x00/2:
-		case 0x02/2:
-		case 0x04/2:
-		case 0x06/2:
-		case 0x08/2:
-		case 0x0a/2:
-		case 0x0c/2:
-		case 0x0e/2:
-			/* if the port is configured as an output, return the last thing written */
-			if (m_misc_io_data[0x1e/2] & (1 << offset))
-				return m_misc_io_data[offset];
-
-			/* otherwise, return an input port */
-			if (offset == 0x04/2 && m_sound_banks)
-				return (ioport(portnames[offset])->read() & 0xbf) | (m_upd7759->busy_r() << 6);
-			return ioport(portnames[offset])->read();
-
-		/* 'SEGA' protection */
-		case 0x10/2:
-			return 'S';
-		case 0x12/2:
-			return 'E';
-		case 0x14/2:
-			return 'G';
-		case 0x16/2:
-			return 'A';
-
-		/* CNT register & mirror */
-		case 0x18/2:
-		case 0x1c/2:
-			return m_misc_io_data[0x1c/2];
-
-		/* port direction register & mirror */
-		case 0x1a/2:
-		case 0x1e/2:
-			return m_misc_io_data[0x1e/2];
-	}
-	return 0xffff;
+	// D7 : From MB3773P pin 1. (/RESET output)
+	// D6 : From uPD7759 pin 18. (/BUSY output)
+	int busy = (m_upd7759 != NULL) ? (m_upd7759->busy_r() << 6) : 0x40;
+	return 0xbf | busy;
+	
 }
 
-
-WRITE16_MEMBER(segac2_state::io_chip_w )
+WRITE8_MEMBER(segac2_state::io_portd_w)
 {
-	UINT8 newbank;
-//  UINT8 old;
+	/*
+	 D7 : To pin 3 of JP15. (Watchdog clock control)
+	 D6 : To MUTE input pin on TDA1518BQ amplifier.
+	 D5 : To CN2 pin 10. (Unknown purpose)
+	 D4 : To CN2 pin 11. (Unknown purpose)
+	 D3 : To CN1 pin K. (Coin lockout 2)
+	 D2 : To CN1 pin 9. (Coin lockout 1)
+	 D1 : To CN1 pin J. (Coin meter 2)
+	 D0 : To CN1 pin 8. (Coin meter 1)
+	*/
+	//coin_lockout_w(space.machine(), 1, data & 0x08);
+    //coin_lockout_w(space.machine(), 0, data & 0x04);
+	coin_counter_w(space.machine(), 1, data & 0x02);
+	coin_counter_w(space.machine(), 0, data & 0x01);
+}
 
-	/* generic implementation */
-	offset &= 0x1f/2;
-//  old = m_misc_io_data[offset];
-	m_misc_io_data[offset] = data;
-
-	switch (offset)
+WRITE8_MEMBER(segac2_state::io_porth_w)
+{
+	/*
+	 D7 : To pin A19 of CN4
+	 D6 : To pin B19 of CN4
+	 D5 : ?
+	 D4 : ?
+	 D3 : To pin 31 of uPD7759 sample ROM (A18 on a 27C040)
+	 D2 : To pin 30 of uPD7759 sample ROM (A17 on a 27C040)
+	 D1 : To A10 of color RAM
+	 D0 : To A9 of color RAM
+	*/
+	int newbank = data & 3;
+	if (newbank != m_palbank)
 	{
-		/* I/O ports */
-		case 0x00/2:
-		case 0x02/2:
-		case 0x04/2:
-		case 0x08/2:
-		case 0x0a/2:
-		case 0x0c/2:
-			break;
-
-		/* miscellaneous output */
-		case 0x06/2:
-			/*
-			 D7 : To pin 3 of JP15. (Watchdog clock control)
-			 D6 : To MUTE input pin on TDA1518BQ amplifier.
-			 D5 : To CN2 pin 10. (Unknown purpose)
-			 D4 : To CN2 pin 11. (Unknown purpose)
-			 D3 : To CN1 pin K. (Coin lockout 2)
-			 D2 : To CN1 pin 9. (Coin lockout 1)
-			 D1 : To CN1 pin J. (Coin meter 2)
-			 D0 : To CN1 pin 8. (Coin meter 1)
-			*/
-/*          coin_lockout_w(space.machine(), 1, data & 0x08);
-            coin_lockout_w(space.machine(), 0, data & 0x04); */
-			coin_counter_w(space.machine(), 1, data & 0x02);
-			coin_counter_w(space.machine(), 0, data & 0x01);
-			break;
-
-		/* banking */
-		case 0x0e/2:
-			/*
-			 D7 : To pin A19 of CN4
-			 D6 : To pin B19 of CN4
-			 D5 : ?
-			 D4 : ?
-			 D3 : To pin 31 of uPD7759 sample ROM (A18 on a 27C040)
-			 D2 : To pin 30 of uPD7759 sample ROM (A17 on a 27C040)
-			 D1 : To A10 of color RAM
-			 D0 : To A9 of color RAM
-			*/
-			newbank = data & 3;
-			if (newbank != m_palbank)
-			{
-				//m_screen->update_partial(m_screen->vpos() + 1);
-				m_palbank = newbank;
-				recompute_palette_tables();
-			}
-			if (m_sound_banks > 1)
-			{
-				newbank = (data >> 2) & (m_sound_banks - 1);
-				m_upd7759->set_bank_base(newbank * 0x20000);
-			}
-			break;
-
-		/* CNT register */
-		case 0x1c/2:
-			if (m_sound_banks > 1)
-			{
-				m_upd7759->reset_w((data >> 1) & 1);
-			}
-			break;
+		//m_screen->update_partial(m_screen->vpos() + 1);
+		m_palbank = newbank;
+		recompute_palette_tables();
+	}
+	if (m_sound_banks > 1)
+	{
+		newbank = (data >> 2) & (m_sound_banks - 1);
+		m_upd7759->set_bank_base(newbank * 0x20000);
 	}
 }
 
@@ -713,7 +634,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, segac2_state )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
 	AM_RANGE(0x800000, 0x800001) AM_MIRROR(0x13fdfe) AM_READWRITE(prot_r, prot_w)
 	AM_RANGE(0x800200, 0x800201) AM_MIRROR(0x13fdfe) AM_WRITE(control_w)
-	AM_RANGE(0x840000, 0x84001f) AM_MIRROR(0x13fee0) AM_READWRITE(io_chip_r, io_chip_w)
+	AM_RANGE(0x840000, 0x84001f) AM_MIRROR(0x13fee0) AM_DEVREADWRITE8("io", sega_315_5296_device, read, write, 0x00ff)
 	AM_RANGE(0x840100, 0x840107) AM_MIRROR(0x13fef8) AM_DEVREADWRITE8("ymsnd", ym3438_device, read, write, 0x00ff)
 	AM_RANGE(0x880100, 0x880101) AM_MIRROR(0x13fefe) AM_WRITE(counter_timer_w)
 	AM_RANGE(0x8c0000, 0x8c0fff) AM_MIRROR(0x13f000) AM_READWRITE(palette_r, palette_w) AM_SHARE("paletteram")
@@ -758,14 +679,6 @@ static INPUT_PORTS_START( systemc_generic )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
 
-	PORT_START("PORTC")
-	PORT_BIT( 0x3f, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SPECIAL )    /* From uPD7759 pin 18. (/BUSY output) */
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL )    /* From MB3773P pin 1. (/RESET output) */
-
-	PORT_START("PORTD")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-
 	PORT_START("SERVICE")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -788,9 +701,6 @@ static INPUT_PORTS_START( systemc_generic )
 	PORT_DIPUNUSED_DIPLOC( 0x20, IP_ACTIVE_LOW, "SW2:6" )
 	PORT_DIPUNUSED_DIPLOC( 0x40, IP_ACTIVE_LOW, "SW2:7" )
 	PORT_DIPUNUSED_DIPLOC( 0x80, IP_ACTIVE_LOW, "SW2:8" )
-
-	PORT_START("PORTH")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 
@@ -1465,6 +1375,17 @@ static MACHINE_CONFIG_START( segac, segac2_state )
 	MCFG_MACHINE_RESET_OVERRIDE(segac2_state,segac2)
 	MCFG_NVRAM_ADD_1FILL("nvram") // borencha requires 0xff fill or there is no sound (it lacks some of the init code of the borench set)
 
+	MCFG_DEVICE_ADD("io", SEGA_315_5296, 0)
+	MCFG_315_5296_IN_PORTA_CB(IOPORT("P1"))
+	MCFG_315_5296_IN_PORTB_CB(IOPORT("P2"))
+	MCFG_315_5296_IN_PORTC_CB(READ8(segac2_state, io_portc_r))
+	MCFG_315_5296_OUT_PORTD_CB(WRITE8(segac2_state, io_portd_w))
+	MCFG_315_5296_IN_PORTE_CB(IOPORT("SERVICE"))
+	MCFG_315_5296_IN_PORTF_CB(IOPORT("COINAGE"))
+	MCFG_315_5296_IN_PORTG_CB(IOPORT("DSW"))
+	MCFG_315_5296_OUT_PORTH_CB(WRITE8(segac2_state, io_porth_w))
+
+	/* video hardware */
 	MCFG_DEVICE_ADD("gen_vdp", SEGA315_5313, 0)
 	MCFG_SEGA315_5313_IS_PAL(false)
 	MCFG_SEGA315_5313_SND_IRQ_CALLBACK(WRITELINE(segac2_state, vdp_sndirqline_callback_c2));
@@ -1474,7 +1395,6 @@ static MACHINE_CONFIG_START( segac, segac2_state )
 	MCFG_VIDEO_SET_SCREEN("megadriv")
 
 	MCFG_TIMER_DEVICE_ADD_SCANLINE("scantimer", "gen_vdp", sega315_5313_device, megadriv_scanline_timer_callback_alt_timing, "megadriv", 0, 1)
-
 
 	MCFG_SCREEN_ADD("megadriv", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -1503,6 +1423,8 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( segac2, segac )
 
 	/* basic machine hardware */
+	MCFG_DEVICE_MODIFY("io")
+	MCFG_315_5296_OUT_CNT1_CB(DEVWRITELINE("upd", upd7759_device, reset_w))
 
 	/* sound hardware */
 	MCFG_SOUND_ADD("upd", UPD7759, XL1_CLOCK)

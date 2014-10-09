@@ -25,8 +25,8 @@ public:
 
 	void set_bank_base(offs_t base);
 
-	void reset_w(UINT8 data);
-	int busy_r();
+	DECLARE_WRITE_LINE_MEMBER( reset_w );
+	DECLARE_READ_LINE_MEMBER( busy_r );
 	DECLARE_WRITE8_MEMBER( port_w );
 	void postload();
 
@@ -93,9 +93,9 @@ public:
 	upd7759_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	enum
-		{
-			TIMER_SLAVE_UPDATE
-		};
+	{
+		TIMER_SLAVE_UPDATE
+	};
 
 	virtual void device_start();
 	virtual void device_reset();
@@ -104,7 +104,7 @@ public:
 
 	emu_timer *m_timer;                       /* timer */
 
-	void start_w(UINT8 data);
+	DECLARE_WRITE_LINE_MEMBER( start_w );
 };
 
 class upd7756_device : public upd775x_device
@@ -116,7 +116,7 @@ public:
 	virtual void device_reset();
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
 
-	void start_w(UINT8 data);
+	DECLARE_WRITE_LINE_MEMBER( start_w );
 };
 
 extern const device_type UPD7759;
