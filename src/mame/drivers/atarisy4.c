@@ -17,30 +17,65 @@
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/tms32010/tms32010.h"
-#include "video/polylgcy.h"
+#include "video/poly.h"
 
+
+struct atarisy4_polydata
+{
+	UINT16 color;
+	UINT16 *screen_ram;
+};
+
+class atarisy4_state;
+
+class atarisy4_renderer : public poly_manager<float, atarisy4_polydata, 2, 8192>
+{
+public:
+	atarisy4_renderer(atarisy4_state &state, screen_device &screen);
+	~atarisy4_renderer() {}
+	
+	void draw_scanline(INT32 scanline, const extent_t &extent, const atarisy4_polydata &extradata, int threadid);
+	void draw_polygon(UINT16 color);
+	
+	atarisy4_state &m_state;
+};
 
 class atarisy4_state : public driver_device
 {
 public:
 	atarisy4_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_m68k_ram(*this, "m68k_ram"),
-		m_screen_ram(*this, "screen_ram"),
 		m_maincpu(*this, "maincpu"),
 		m_dsp0(*this, "dsp0"),
 		m_dsp1(*this, "dsp1"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette"),
+		m_screen(*this, "screen"),
+		m_m68k_ram(*this, "m68k_ram"),
+		m_screen_ram(*this, "screen_ram"),
+		m_dsp0_bank1(*this, "dsp0_bank1"),
+		m_dsp1_bank1(*this, "dsp1_bank1") { }
+		
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_dsp0;
+	optional_device<cpu_device> m_dsp1;
+	required_device<palette_device> m_palette;
+	required_device<screen_device> m_screen;
+	
+	required_shared_ptr<UINT16> m_m68k_ram;
+	required_shared_ptr<UINT16> m_screen_ram;
+	
+	required_memory_bank m_dsp0_bank1;
+	optional_memory_bank m_dsp1_bank1;
 
+	atarisy4_renderer *m_renderer;
+	
 	UINT8 m_r_color_table[256];
 	UINT8 m_g_color_table[256];
 	UINT8 m_b_color_table[256];
 	UINT16 m_dsp_bank[2];
 	UINT8 m_csr[2];
-	required_shared_ptr<UINT16> m_m68k_ram;
 	UINT16 *m_shared_ram[2];
-	required_shared_ptr<UINT16> m_screen_ram;
-	legacy_poly_manager *m_poly;
+	
 	DECLARE_WRITE16_MEMBER(gpu_w);
 	DECLARE_READ16_MEMBER(gpu_r);
 	DECLARE_READ16_MEMBER(m68k_shared_0_r);
@@ -65,15 +100,10 @@ public:
 	UINT32 screen_update_atarisy4(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_int);
 	void image_mem_to_screen( bool clip);
-	void draw_polygon(UINT16 color);
 	void execute_gpu_command();
 	inline UINT8 hex_to_ascii(UINT8 in);
 	void load_ldafile(address_space &space, const UINT8 *file);
 	void load_hexfile(address_space &space, const UINT8 *file);
-	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_dsp0;
-	optional_device<cpu_device> m_dsp1;
-	required_device<palette_device> m_palette;
 };
 
 
@@ -135,35 +165,21 @@ struct gpu_
 } gpu;
 
 
-
-
-struct poly_extra_data
-{
-	UINT16 color;
-	UINT16 *screen_ram;
-};
-
-
-/*************************************
- *
- *  Forward declarations
- *
- *************************************/
-
-
-
-
-
-
 /*************************************
  *
  *  Video hardware
  *
  *************************************/
 
-void atarisy4_state::video_start()
+atarisy4_renderer::atarisy4_renderer(atarisy4_state &state, screen_device &screen)
+	: poly_manager<float, atarisy4_polydata, 2, 8192>(screen, POLYFLAG_NO_WORK_QUEUE),
+		m_state(state)
 {
-	m_poly = poly_alloc(machine(), 1024, sizeof(poly_extra_data), POLYFLAG_NO_WORK_QUEUE);
+}
+
+ void atarisy4_state::video_start()
+{
+	m_renderer = auto_alloc(machine(), atarisy4_renderer(*this, *m_screen));
 }
 
 void atarisy4_state::video_reset()
@@ -260,37 +276,36 @@ void atarisy4_state::image_mem_to_screen(bool clip)
 	}
 }
 
-static void draw_scanline(void *dest, INT32 scanline, const poly_extent *extent, const void *extradata, int threadid)
+void atarisy4_renderer::draw_scanline(INT32 scanline, const extent_t &extent, const atarisy4_polydata &extradata, int threadid)
 {
-	const poly_extra_data *extra = (const poly_extra_data *)extradata;
-	UINT16 color = extra->color;
+	UINT16 color = extradata.color;
 	int x;
 
-	for (x = extent->startx; x < extent->stopx; ++x)
+	for (x = extent.startx; x < extent.stopx; ++x)
 	{
 		UINT32 addr = xy_to_screen_addr(x, scanline);
-		UINT16 pix = extra->screen_ram[addr >> 1];
+		UINT16 pix = extradata.screen_ram[addr >> 1];
 
 		if (x & 1)
 			pix = (pix & (0x00ff)) | color << 8;
 		else
 			pix = (pix & (0xff00)) | color;
 
-		extra->screen_ram[addr >> 1] = pix;
+		extradata.screen_ram[addr >> 1] = pix;
 	}
 }
 
-void atarisy4_state::draw_polygon(UINT16 color)
+void atarisy4_renderer::draw_polygon(UINT16 color)
 {
-	int i;
 	rectangle clip;
-	poly_vertex v1, v2, v3;
-	poly_extra_data *extra = (poly_extra_data *)poly_get_extra_data(m_poly);
+	vertex_t v1, v2, v3;
+	atarisy4_polydata &extradata = object_data_alloc();
+	render_delegate rd_scan = render_delegate(FUNC(atarisy4_renderer::draw_scanline), this);
 
 	clip.set(0, 511, 0, 511);
 
-	extra->color = color;
-	extra->screen_ram = m_screen_ram;
+	extradata.color = color;
+	extradata.screen_ram = m_state.m_screen_ram;
 
 	v1.x = gpu.points[0].x;
 	v1.y = gpu.points[0].y;
@@ -299,12 +314,12 @@ void atarisy4_state::draw_polygon(UINT16 color)
 	v2.y = gpu.points[1].y;
 
 	/* Draw a triangle fan */
-	for (i = 2; i <= gpu.pt_idx; ++i)
+	for (int i = 2; i <= gpu.pt_idx; ++i)
 	{
 		v3.x = gpu.points[i].x;
 		v3.y = gpu.points[i].y;
 
-		poly_render_triangle(m_poly, 0, clip, draw_scanline, 1, &v1, &v2, &v3);
+		render_triangle(clip, rd_scan, 1, v1, v2, v3);
 		v2 = v3;
 	}
 }
@@ -452,8 +467,8 @@ void atarisy4_state::execute_gpu_command()
 		}
 		case 0x2c:
 		{
-			draw_polygon(gpu.gr[2]);
-			poly_wait(m_poly, "Normal");
+			m_renderer->draw_polygon(gpu.gr[2]);
+			m_renderer->wait();
 			break;
 		}
 		default:
@@ -601,7 +616,7 @@ WRITE16_MEMBER(atarisy4_state::dsp0_bank_w)
 	}
 
 	data &= 0x3800;
-	membank("dsp0_bank1")->set_base(&m_shared_ram[0][data]);
+	m_dsp0_bank1->set_base(&m_shared_ram[0][data]);
 	m_dsp_bank[0] = data;
 }
 
@@ -635,7 +650,7 @@ WRITE16_MEMBER(atarisy4_state::dsp1_bank_w)
 	}
 
 	data &= 0x3800;
-	membank("dsp1_bank1")->set_base(&m_shared_ram[1][data]);
+	m_dsp1_bank1->set_base(&m_shared_ram[1][data]);
 	m_dsp_bank[1] = data;
 }
 
@@ -988,7 +1003,7 @@ DRIVER_INIT_MEMBER(atarisy4_state,laststar)
 
 	/* Set up the DSP */
 	membank("dsp0_bank0")->set_base(m_shared_ram[0]);
-	membank("dsp0_bank1")->set_base(&m_shared_ram[0][0x800]);
+	m_dsp0_bank1->set_base(&m_shared_ram[0][0x800]);
 	load_ldafile(m_dsp0->space(AS_PROGRAM), memregion("dsp")->base());
 }
 
@@ -1003,12 +1018,12 @@ DRIVER_INIT_MEMBER(atarisy4_state,airrace)
 
 	/* Set up the first DSP */
 	membank("dsp0_bank0")->set_base(m_shared_ram[0]);
-	membank("dsp0_bank1")->set_base(&m_shared_ram[0][0x800]);
+	m_dsp0_bank1->set_base(&m_shared_ram[0][0x800]);
 	load_ldafile(m_dsp0->space(AS_PROGRAM), memregion("dsp")->base());
 
 	/* Set up the second DSP */
 	membank("dsp1_bank0")->set_base(m_shared_ram[1]);
-	membank("dsp1_bank1")->set_base(&m_shared_ram[1][0x800]);
+	m_dsp1_bank1->set_base(&m_shared_ram[1][0x800]);
 	load_ldafile(m_dsp1->space(AS_PROGRAM), memregion("dsp")->base());
 }
 
