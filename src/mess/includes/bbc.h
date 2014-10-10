@@ -26,6 +26,9 @@
 #include "sound/tms5220.h"
 #include "imagedev/cassette.h"
 
+#include "bus/generic/slot.h"
+#include "bus/generic/carts.h"
+
 #define RS232_TAG       "rs232"
 
 class bbc_state : public driver_device
@@ -48,13 +51,18 @@ public:
 		m_via6522_1(*this, "via6522_1"),
 		m_upd7002(*this, "upd7002"),
 		m_i8271(*this, "i8271"),
+		m_exp1(*this, "exp_rom1"),
+		m_exp2(*this, "exp_rom2"),
+		m_exp3(*this, "exp_rom3"),
+		m_exp4(*this, "exp_rom4"),
 		m_joy0(*this, "JOY0"),
 		m_joy1(*this, "JOY1"),
 		m_joy2(*this, "JOY2"),
 		m_joy3(*this, "JOY3"),
 		m_region_maincpu(*this, "maincpu"),
-		m_region_user1(*this, "user1"),
-		m_region_user2(*this, "user2"),
+		m_region_os(*this, "os"),
+		m_region_opt(*this, "option"),
+		m_region_dfs(*this, "dfs"),
 		m_bank1(*this, "bank1"),
 		m_bank2(*this, "bank2"),
 		m_bank3(*this, "bank3"),
@@ -68,8 +76,7 @@ public:
 		m_via_user_irq(CLEAR_LINE),
 		m_acia_irq(CLEAR_LINE),
 		m_palette(*this, "palette")
-	{
-	}
+	{ }
 
 	DECLARE_WRITE8_MEMBER(bbc_page_selecta_w);
 	DECLARE_WRITE8_MEMBER(bbc_memorya1_w);
@@ -161,9 +168,18 @@ public:
 	UPD7002_GET_ANALOGUE(BBC_get_analogue_input);
 	UPD7002_EOC(BBC_uPD7002_EOC);
 
-	int exp_rom_load(device_image_interface &image, int index);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( bbc_exp_rom );
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( bbcm_cart );
+	void bbc_setup_banks(memory_bank *membank, int banks, UINT32 shift, UINT32 size);
+	void bbcm_setup_banks(memory_bank *membank, int banks, UINT32 shift, UINT32 size);
+
+	int bbc_load_cart(device_image_interface &image, generic_slot_device *slot);
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(exp1_load) { return bbc_load_cart(image, m_exp1); }
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(exp2_load) { return bbc_load_cart(image, m_exp2); }
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(exp3_load) { return bbc_load_cart(image, m_exp3); }
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(exp4_load) { return bbc_load_cart(image, m_exp4); }
+
+	int bbcm_load_cart(device_image_interface &image, generic_slot_device *slot);
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(bbcm_exp1_load) { return bbcm_load_cart(image, m_exp1); }
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(bbcm_exp2_load) { return bbcm_load_cart(image, m_exp2); }
 
 	MC6845_UPDATE_ROW(crtc_update_row);
 
@@ -184,11 +200,16 @@ public: // HACK FOR MC6845
 	optional_device<via6522_device> m_via6522_1;
 	optional_device<upd7002_device> m_upd7002;
 	optional_device<i8271_device> m_i8271;
+	required_device<generic_slot_device> m_exp1;
+	required_device<generic_slot_device> m_exp2;
+	optional_device<generic_slot_device> m_exp3;
+	optional_device<generic_slot_device> m_exp4;
 	optional_ioport m_joy0, m_joy1, m_joy2, m_joy3;
 
 	required_memory_region m_region_maincpu;
-	required_memory_region m_region_user1;
-	optional_memory_region m_region_user2;
+	required_memory_region m_region_os;
+	required_memory_region m_region_opt;
+	optional_memory_region m_region_dfs;
 	required_memory_bank m_bank1; // bbca bbcb bbcbp bbcbp128 bbcm
 	optional_memory_bank m_bank2; //           bbcbp bbcbp128 bbcm
 	optional_memory_bank m_bank3; // bbca bbcb

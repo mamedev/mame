@@ -159,7 +159,7 @@ static ADDRESS_MAP_START( bbca_mem, AS_PROGRAM, 8, bbc_state )
 	AM_RANGE(0xfea0, 0xfebf) AM_READ(bbc_fe_r)                                                  /*    fea0-febf  68B54 ADLC     # ECONET controller             */
 	AM_RANGE(0xfec0, 0xfedf) AM_NOP                                                             /*    fec0-fedf  uPD7002        # Analogue to digital converter */
 	AM_RANGE(0xfee0, 0xfeff) AM_READ(bbc_fe_r)                                                  /*    fee0-feff  Tube ULA       # Tube system interface         */
-	AM_RANGE(0xff00, 0xffff) AM_ROM AM_REGION("user1", 0x13f00)                                 /*    ff00-ffff                 OS Rom (continued)              */
+	AM_RANGE(0xff00, 0xffff) AM_ROM AM_REGION("os", 0x3f00)                                 /*    ff00-ffff                 OS Rom (continued)              */
 ADDRESS_MAP_END
 
 
@@ -187,7 +187,7 @@ static ADDRESS_MAP_START( bbcb_mem, AS_PROGRAM, 8, bbc_state )
 	AM_RANGE(0xfea0, 0xfebf) AM_READ(bbc_fe_r)                                                  /*    fea0-febf  68B54 ADLC     ECONET controller               */
 	AM_RANGE(0xfec0, 0xfedf) AM_DEVREADWRITE("upd7002", upd7002_device, read, write)            /*    fec0-fedf  uPD7002        Analogue to digital converter   */
 	AM_RANGE(0xfee0, 0xfeff) AM_READ(bbc_fe_r)                                                  /*    fee0-feff  Tube ULA       Tube system interface           */
-	AM_RANGE(0xff00, 0xffff) AM_ROM AM_REGION("user1", 0x43f00)                                 /*    ff00-ffff                 OS Rom (continued)              */
+	AM_RANGE(0xff00, 0xffff) AM_ROM AM_REGION("os", 0x3f00)                                 /*    ff00-ffff                 OS Rom (continued)              */
 ADDRESS_MAP_END
 
 
@@ -216,7 +216,7 @@ static ADDRESS_MAP_START( bbcbp_mem, AS_PROGRAM, 8, bbc_state )
 	AM_RANGE(0xfea0, 0xfebf) AM_READ(bbc_fe_r)                                                  /*    fea0-febf  68B54 ADLC     ECONET controller               */
 	AM_RANGE(0xfec0, 0xfedf) AM_DEVREADWRITE("upd7002", upd7002_device, read, write)            /*    fec0-fedf  uPD7002        Analogue to digital converter   */
 	AM_RANGE(0xfee0, 0xfeff) AM_READ(bbc_fe_r)                                                  /*    fee0-feff  Tube ULA       Tube system interface           */
-	AM_RANGE(0xff00, 0xffff) AM_ROM AM_REGION("user1", 0x43f00)                                 /*    ff00-ffff                 OS Rom (continued)              */
+	AM_RANGE(0xff00, 0xffff) AM_ROM AM_REGION("os", 0x3f00)                                 /*    ff00-ffff                 OS Rom (continued)              */
 ADDRESS_MAP_END
 
 
@@ -246,7 +246,7 @@ static ADDRESS_MAP_START( bbcbp128_mem, AS_PROGRAM, 8, bbc_state )
 	AM_RANGE(0xfea0, 0xfebf) AM_READ(bbc_fe_r)                                                  /*    fea0-febf  68B54 ADLC     ECONET controller               */
 	AM_RANGE(0xfec0, 0xfedf) AM_DEVREADWRITE("upd7002", upd7002_device, read, write)            /*    fec0-fedf  uPD7002        Analogue to digital converter   */
 	AM_RANGE(0xfee0, 0xfeff) AM_READ(bbc_fe_r)                                                  /*    fee0-feff  Tube ULA       Tube system interface           */
-	AM_RANGE(0xff00, 0xffff) AM_ROM AM_REGION("user1", 0x43f00)                                 /*    ff00-ffff                 OS Rom (continued)              */
+	AM_RANGE(0xff00, 0xffff) AM_ROM AM_REGION("os", 0x3f00)                                 /*    ff00-ffff                 OS Rom (continued)              */
 ADDRESS_MAP_END
 
 
@@ -280,9 +280,9 @@ static ADDRESS_MAP_START(bbcm_mem, AS_PROGRAM, 8, bbc_state )
 	AM_RANGE(0x8000, 0x8fff) AM_READ_BANK("bank4") AM_WRITE(bbc_memorybm4_w)                    /*    8000-8fff                 Paged ROM/RAM or 4K of RAM ANDY */
 	AM_RANGE(0x9000, 0xbfff) AM_READ_BANK("bank5") AM_WRITE(bbc_memorybm5_w)                    /*    9000-bfff                 Rest of paged ROM/RAM area      */
 	AM_RANGE(0xc000, 0xdfff) AM_READ_BANK("bank7") AM_WRITE(bbc_memorybm7_w)                    /*    c000-dfff                 OS ROM or 8K of RAM       HAZEL */
-	AM_RANGE(0xe000, 0xfbff) AM_ROM AM_REGION("user1", 0x42000)                                 /*    e000-fbff                 OS ROM                          */
+	AM_RANGE(0xe000, 0xfbff) AM_ROM AM_REGION("os", 0x2000)                                 /*    e000-fbff                 OS ROM                          */
 	AM_RANGE(0xfc00, 0xfeff) AM_READ_BANK("bank8") AM_WRITE(bbcm_w)                             /*    this is now processed directly because it can be ROM or hardware */
-	AM_RANGE(0xff00, 0xffff) AM_ROM AM_REGION("user1", 0x43f00)                                 /*    ff00-ffff                 OS ROM (continued)              */
+	AM_RANGE(0xff00, 0xffff) AM_ROM AM_REGION("os", 0x3f00)                                 /*    ff00-ffff                 OS ROM (continued)              */
 ADDRESS_MAP_END
 
 
@@ -313,7 +313,7 @@ INPUT_CHANGED_MEMBER(bbc_state::trigger_reset)
 /*  Port                                        Key description                 Emulated key                    Natural key         Shift 1         Shift 2 (Ctrl) */
 
 static INPUT_PORTS_START(bbc_keyboard)
-	PORT_START("COL0")  /* KEYBOARD COLUMN 0 */
+	PORT_START("COL0")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("SHIFT")              PORT_CODE(KEYCODE_RSHIFT) PORT_CODE(KEYCODE_LSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Q")                  PORT_CODE(KEYCODE_Q)            PORT_CHAR('Q')
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F0")                 PORT_CODE(KEYCODE_F1)           PORT_CHAR(UCHAR_MAMEKEY(F1))
@@ -323,7 +323,7 @@ static INPUT_PORTS_START(bbc_keyboard)
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("TAB")                PORT_CODE(KEYCODE_TAB)          PORT_CHAR('\t')
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("ESCAPE")             PORT_CODE(KEYCODE_ESC)          PORT_CHAR(UCHAR_MAMEKEY(ESC))
 
-	PORT_START("COL1")  /* KEYBOARD COLUMN 1 */
+	PORT_START("COL1")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("CTRL")               PORT_CODE(KEYCODE_LCONTROL) PORT_CODE(KEYCODE_RCONTROL) PORT_CHAR(UCHAR_SHIFT_2)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("3 #")                PORT_CODE(KEYCODE_3)            PORT_CHAR('3')      PORT_CHAR('#')
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("W")                  PORT_CODE(KEYCODE_W)            PORT_CHAR('W')
@@ -333,7 +333,7 @@ static INPUT_PORTS_START(bbc_keyboard)
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Z")                  PORT_CODE(KEYCODE_Z)            PORT_CHAR('Z')
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F1")                 PORT_CODE(KEYCODE_F2)           PORT_CHAR(UCHAR_MAMEKEY(F2))
 
-	PORT_START("COL2")  /* KEYBOARD COLUMN 2 */
+	PORT_START("COL2")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("4")                  PORT_CODE(KEYCODE_4)            PORT_CHAR('4')      PORT_CHAR('$')
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("E")                  PORT_CODE(KEYCODE_E)            PORT_CHAR('E')
@@ -343,7 +343,7 @@ static INPUT_PORTS_START(bbc_keyboard)
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("SPACE")              PORT_CODE(KEYCODE_SPACE)        PORT_CHAR(' ')
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F2")                 PORT_CODE(KEYCODE_F3)           PORT_CHAR(UCHAR_MAMEKEY(F3))
 
-	PORT_START("COL3")  /* KEYBOARD COLUMN 3 */
+	PORT_START("COL3")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("5 %")                PORT_CODE(KEYCODE_5)            PORT_CHAR('5')      PORT_CHAR('%')
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("T")                  PORT_CODE(KEYCODE_T)            PORT_CHAR('T')
@@ -353,7 +353,7 @@ static INPUT_PORTS_START(bbc_keyboard)
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("V")                  PORT_CODE(KEYCODE_V)            PORT_CHAR('V')
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F3")                 PORT_CODE(KEYCODE_F4)           PORT_CHAR(UCHAR_MAMEKEY(F4))
 
-	PORT_START("COL4")  /* KEYBOARD COLUMN 4 */
+	PORT_START("COL4")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F4")                 PORT_CODE(KEYCODE_F5)           PORT_CHAR(UCHAR_MAMEKEY(F5))
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("7 \\")               PORT_CODE(KEYCODE_7)            PORT_CHAR('7')      PORT_CHAR('\'')
@@ -363,7 +363,7 @@ static INPUT_PORTS_START(bbc_keyboard)
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("B")                  PORT_CODE(KEYCODE_B)            PORT_CHAR('B')
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F5")                 PORT_CODE(KEYCODE_F6)           PORT_CHAR(UCHAR_MAMEKEY(F6))
 
-	PORT_START("COL5")  /* KEYBOARD COLUMN 5 */
+	PORT_START("COL5")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("8 (")                PORT_CODE(KEYCODE_8)            PORT_CHAR('8')      PORT_CHAR('(')
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("I")                  PORT_CODE(KEYCODE_I)            PORT_CHAR('I')
@@ -373,7 +373,7 @@ static INPUT_PORTS_START(bbc_keyboard)
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("M")                  PORT_CODE(KEYCODE_M)            PORT_CHAR('M')
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F6")                 PORT_CODE(KEYCODE_F7)           PORT_CHAR(UCHAR_MAMEKEY(F7))
 
-	PORT_START("COL6")  /* KEYBOARD COLUMN 6 */
+	PORT_START("COL6")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F7")                 PORT_CODE(KEYCODE_F8)           PORT_CHAR(UCHAR_MAMEKEY(F8))
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("9 )")                PORT_CODE(KEYCODE_9)            PORT_CHAR('9')      PORT_CHAR(')')
@@ -383,7 +383,7 @@ static INPUT_PORTS_START(bbc_keyboard)
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(", <")                PORT_CODE(KEYCODE_COMMA)        PORT_CHAR(',')      PORT_CHAR('<')
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F8")                 PORT_CODE(KEYCODE_F9)           PORT_CHAR(UCHAR_MAMEKEY(F9))
 
-	PORT_START("COL7")  /* KEYBOARD COLUMN 7 */
+	PORT_START("COL7")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("- =")                PORT_CODE(KEYCODE_MINUS)        PORT_CHAR('-')      PORT_CHAR('=')
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("0")                  PORT_CODE(KEYCODE_0)            PORT_CHAR('0')
@@ -393,7 +393,7 @@ static INPUT_PORTS_START(bbc_keyboard)
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(". >")                PORT_CODE(KEYCODE_STOP)         PORT_CHAR('.')      PORT_CHAR('>')
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F9")                 PORT_CODE(KEYCODE_F10)          PORT_CHAR(UCHAR_MAMEKEY(F10))
 
-	PORT_START("COL8")  /* KEYBOARD COLUMN 8 */
+	PORT_START("COL8")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("^ ~")                PORT_CODE(KEYCODE_EQUALS)       PORT_CHAR('^') PORT_CHAR('~')
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("_ \xC2\xA3")         PORT_CODE(KEYCODE_TILDE)        PORT_CHAR('_') PORT_CHAR('\xA3')
@@ -403,7 +403,7 @@ static INPUT_PORTS_START(bbc_keyboard)
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("/ ?")                PORT_CODE(KEYCODE_SLASH)        PORT_CHAR('/') PORT_CHAR('?')
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("\\ |")               PORT_CODE(KEYCODE_BACKSLASH2)   PORT_CHAR('\\') PORT_CHAR('|')
 
-	PORT_START("COL9")  /* KEYBOARD COLUMN 9 */
+	PORT_START("COL9")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("LEFT")               PORT_CODE(KEYCODE_LEFT)         PORT_CHAR(UCHAR_MAMEKEY(LEFT))
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("DOWN")               PORT_CODE(KEYCODE_DOWN)         PORT_CHAR(UCHAR_MAMEKEY(DOWN))
@@ -413,7 +413,7 @@ static INPUT_PORTS_START(bbc_keyboard)
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("COPY")               PORT_CODE(KEYCODE_END)          PORT_CHAR(UCHAR_MAMEKEY(END))
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("RIGHT")              PORT_CODE(KEYCODE_RIGHT)        PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
 
-	PORT_START("BRK")  /* BREAK */
+	PORT_START("BRK")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("BREAK")              PORT_CODE(KEYCODE_F12)          PORT_CHAR(UCHAR_MAMEKEY(F12)) PORT_CHANGED_MEMBER(DEVICE_SELF, bbc_state, trigger_reset, 0)
 
 	/* Keyboard columns 10 -> 12 are reserved for BBC Master */
@@ -428,7 +428,7 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START(bbc_keypad)
-	PORT_MODIFY("COL10")  /* KEYBOARD COLUMN 10 */
+	PORT_MODIFY("COL10")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Keypad 6")           PORT_CODE(KEYCODE_6_PAD)        PORT_CHAR(UCHAR_MAMEKEY(6_PAD))
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Keypad 8")           PORT_CODE(KEYCODE_8_PAD)        PORT_CHAR(UCHAR_MAMEKEY(8_PAD))
@@ -438,7 +438,7 @@ static INPUT_PORTS_START(bbc_keypad)
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Keypad 0")           PORT_CODE(KEYCODE_0_PAD)        PORT_CHAR(UCHAR_MAMEKEY(0_PAD))
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Keypad 4")           PORT_CODE(KEYCODE_4_PAD)        PORT_CHAR(UCHAR_MAMEKEY(4_PAD))
 
-	PORT_MODIFY("COL11")  /* KEYBOARD COLUMN 11 */
+	PORT_MODIFY("COL11")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Keypad 7")           PORT_CODE(KEYCODE_7_PAD)        PORT_CHAR(UCHAR_MAMEKEY(7_PAD))
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Keypad 9")           PORT_CODE(KEYCODE_9_PAD)        PORT_CHAR(UCHAR_MAMEKEY(9_PAD))
@@ -448,7 +448,7 @@ static INPUT_PORTS_START(bbc_keypad)
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Keypad 1")           PORT_CODE(KEYCODE_1_PAD)        PORT_CHAR(UCHAR_MAMEKEY(1_PAD))
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Keypad 5")           PORT_CODE(KEYCODE_5_PAD)        PORT_CHAR(UCHAR_MAMEKEY(5_PAD))
 
-	PORT_MODIFY("COL12")  /* KEYBOARD COLUMN 12 */
+	PORT_MODIFY("COL12")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNUSED)
@@ -461,42 +461,42 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START(bbc_dipswitch)
-	PORT_MODIFY("COL2")  /* KEYBOARD COLUMN 2 */
+	PORT_MODIFY("COL2")
 	PORT_DIPNAME(0x01, 0x01, "DIP 8 (Default File System)")
 	PORT_DIPSETTING(   0x00, "NFS" )
 	PORT_DIPSETTING(   0x01, "DFS" )
 
-	PORT_MODIFY("COL3")  /* KEYBOARD COLUMN 3 */
+	PORT_MODIFY("COL3")
 	PORT_DIPNAME(0x01, 0x01, "DIP 7 (Not Used)")
 	PORT_DIPSETTING(   0x00, DEF_STR( Off ))
 	PORT_DIPSETTING(   0x01, DEF_STR( On ))
 
-	PORT_MODIFY("COL4")  /* KEYBOARD COLUMN 4 */
+	PORT_MODIFY("COL4")
 	PORT_DIPNAME(0x01, 0x01, "DIP 6 (Disc Timings)")
 	PORT_DIPSETTING(   0x00, DEF_STR( Off ))
 	PORT_DIPSETTING(   0x01, DEF_STR( On ))
 
-	PORT_MODIFY("COL5")  /* KEYBOARD COLUMN 5 */
+	PORT_MODIFY("COL5")
 	PORT_DIPNAME(0x01, 0x01, "DIP 5 (Disc Timings)")
 	PORT_DIPSETTING(   0x00, DEF_STR( Off ))
 	PORT_DIPSETTING(   0x01, DEF_STR( On ))
 
-	PORT_MODIFY("COL6")  /* KEYBOARD COLUMN 6 */
+	PORT_MODIFY("COL6")
 	PORT_DIPNAME(0x01, 0x01, "DIP 4 (Boot)")
 	PORT_DIPSETTING(   0x00, "SHIFT" )
 	PORT_DIPSETTING(   0x01, "SHIFT-BREAK" )
 
-	PORT_MODIFY("COL7")  /* KEYBOARD COLUMN 7 */
+	PORT_MODIFY("COL7")
 	PORT_DIPNAME(0x01, 0x01, "DIP 3 (Screen Mode)")
 	PORT_DIPSETTING(   0x00, "+0" )
 	PORT_DIPSETTING(   0x01, "+4" )
 
-	PORT_MODIFY("COL8")  /* KEYBOARD COLUMN 8 */
+	PORT_MODIFY("COL8")
 	PORT_DIPNAME(0x01, 0x01, "DIP 2 (Screen Mode)")
 	PORT_DIPSETTING(   0x00, "+0" )
 	PORT_DIPSETTING(   0x01, "+2" )
 
-	PORT_MODIFY("COL9")  /* KEYBOARD COLUMN 9 */
+	PORT_MODIFY("COL9")
 	PORT_DIPNAME(0x01, 0x01, "DIP 1 (Screen Mode)")
 	PORT_DIPSETTING(   0x00, "+0" )
 	PORT_DIPSETTING(   0x01, "+1" )
@@ -614,30 +614,23 @@ WRITE_LINE_MEMBER(bbc_state::econet_clk_w)
 	m_adlc->txc_w(state);
 }
 
-static MACHINE_CONFIG_FRAGMENT( bbc_cartslot )
-	MCFG_CARTSLOT_ADD("exp_rom1")
-	MCFG_CARTSLOT_EXTENSION_LIST("rom")
-	MCFG_CARTSLOT_NOT_MANDATORY
-	MCFG_CARTSLOT_LOAD(bbc_state, bbc_exp_rom)
-	MCFG_CARTSLOT_INTERFACE("bbc_cart")
+// 4 x EPROM sockets (16K) in BBC-A, these should grow to 16 for BBC-B and later...
+static MACHINE_CONFIG_FRAGMENT( bbc_eprom_sockets )
+	MCFG_GENERIC_SOCKET_ADD("exp_rom1", generic_linear_slot, "bbc_cart")
+	MCFG_GENERIC_EXTENSIONS("bin,rom")
+	MCFG_GENERIC_LOAD(bbc_state, exp1_load)
 
-	MCFG_CARTSLOT_ADD("exp_rom2")
-	MCFG_CARTSLOT_EXTENSION_LIST("rom")
-	MCFG_CARTSLOT_NOT_MANDATORY
-	MCFG_CARTSLOT_LOAD(bbc_state, bbc_exp_rom)
-	MCFG_CARTSLOT_INTERFACE("bbc_cart")
+	MCFG_GENERIC_SOCKET_ADD("exp_rom2", generic_linear_slot, "bbc_cart")
+	MCFG_GENERIC_EXTENSIONS("bin,rom")
+	MCFG_GENERIC_LOAD(bbc_state, exp2_load)
 
-	MCFG_CARTSLOT_ADD("exp_rom3")
-	MCFG_CARTSLOT_EXTENSION_LIST("rom")
-	MCFG_CARTSLOT_NOT_MANDATORY
-	MCFG_CARTSLOT_LOAD(bbc_state, bbc_exp_rom)
-	MCFG_CARTSLOT_INTERFACE("bbc_cart")
+	MCFG_GENERIC_SOCKET_ADD("exp_rom3", generic_linear_slot, "bbc_cart")
+	MCFG_GENERIC_EXTENSIONS("bin,rom")
+	MCFG_GENERIC_LOAD(bbc_state, exp3_load)
 
-	MCFG_CARTSLOT_ADD("exp_rom4")
-	MCFG_CARTSLOT_EXTENSION_LIST("rom")
-	MCFG_CARTSLOT_NOT_MANDATORY
-	MCFG_CARTSLOT_LOAD(bbc_state, bbc_exp_rom)
-	MCFG_CARTSLOT_INTERFACE("bbc_cart")
+	MCFG_GENERIC_SOCKET_ADD("exp_rom4", generic_linear_slot, "bbc_cart")
+	MCFG_GENERIC_EXTENSIONS("bin,rom")
+	MCFG_GENERIC_LOAD(bbc_state, exp4_load)
 MACHINE_CONFIG_END
 
 
@@ -718,6 +711,9 @@ static MACHINE_CONFIG_START( bbca, bbc_state )
 	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(bbc_state, bbcb_via_system_write_porta))
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(bbc_state, bbcb_via_system_write_portb))
 	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(bbc_state, bbcb_via_system_irq_w))
+
+	/* EPROM sockets */
+	MCFG_FRAGMENT_ADD(bbc_eprom_sockets)
 MACHINE_CONFIG_END
 
 
@@ -769,9 +765,6 @@ static MACHINE_CONFIG_DERIVED( bbcb, bbca )
 	MCFG_WD17XX_DRQ_CALLBACK(WRITELINE(bbc_state, bbc_wd177x_drq_w))
 
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(bbc_floppy_interface)
-
-	/* cartridges */
-	MCFG_FRAGMENT_ADD(bbc_cartslot)
 
 	/* software lists */
 	MCFG_DEVICE_REMOVE("cass_ls_a")
@@ -834,9 +827,6 @@ static MACHINE_CONFIG_DERIVED( bbcb_us, bbca )
 	MCFG_WD17XX_DRQ_CALLBACK(WRITELINE(bbc_state, bbc_wd177x_drq_w))
 
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(bbc_floppy_interface)
-
-	/* cartridges */
-	MCFG_FRAGMENT_ADD(bbc_cartslot)
 
 	/* software lists */
 	MCFG_DEVICE_REMOVE("cass_ls_a")
@@ -941,17 +931,12 @@ static MACHINE_CONFIG_START( bbcm, bbc_state )
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY)
 	MCFG_CASSETTE_INTERFACE("bbc_cass")
 
-	/* cartridges */
-	MCFG_CARTSLOT_ADD("cart1")
-	MCFG_CARTSLOT_EXTENSION_LIST("bin")
-	MCFG_CARTSLOT_NOT_MANDATORY
-	MCFG_CARTSLOT_LOAD(bbc_state, bbcm_cart)
-	MCFG_CARTSLOT_INTERFACE("bbcm_cart")
-	MCFG_CARTSLOT_ADD("cart2")
-	MCFG_CARTSLOT_EXTENSION_LIST("bin")
-	MCFG_CARTSLOT_NOT_MANDATORY
-	MCFG_CARTSLOT_LOAD(bbc_state, bbcm_cart)
-	MCFG_CARTSLOT_INTERFACE("bbcm_cart")
+	// 2 x EPROM sockets (32K) in BBC-Master
+	MCFG_GENERIC_SOCKET_ADD("exp_rom1", generic_plain_slot, "bbcm_cart")
+	MCFG_GENERIC_LOAD(bbc_state, bbcm_exp1_load)
+
+	MCFG_GENERIC_SOCKET_ADD("exp_rom2", generic_plain_slot, "bbcm_cart")
+	MCFG_GENERIC_LOAD(bbc_state, bbcm_exp2_load)
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("cass_ls_m", "bbcm_cass")
@@ -1001,9 +986,6 @@ static MACHINE_CONFIG_START( bbcm, bbc_state )
 	MCFG_WD17XX_DRQ_CALLBACK(WRITELINE(bbc_state, bbc_wd177x_drq_w))
 
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(bbc_floppy_interface)
-
-	/* rom slots */
-	MCFG_FRAGMENT_ADD(bbc_cartslot)
 
 	/* econet */
 	MCFG_DEVICE_ADD("mc6854", MC6854, 0)
@@ -1103,7 +1085,7 @@ MACHINE_CONFIG_END
 ROM_START(bbca)
 	ROM_REGION(0x08000,"maincpu",ROMREGION_ERASEFF) /* RAM */
 
-	ROM_REGION(0x14000,"user1",0) /* ROM */
+	ROM_REGION(0x14000,"option",0) /* ROM */
 	/* rom page 0  00000 */
 	/* rom page 1  04000 */
 	/* rom page 2  08000 */
@@ -1133,19 +1115,22 @@ ROM_START(bbca)
 	ROMX_LOAD("basic1.rom", 0x04000, 0x4000, CRC(b3364108) SHA1(890f6e3e7fab3340f75b85e93ff29332bc9ecb2e), ROM_BIOS(6)) /* rom page 1  04000 */
 	ROMX_LOAD("basic1.rom", 0x08000, 0x4000, CRC(b3364108) SHA1(890f6e3e7fab3340f75b85e93ff29332bc9ecb2e), ROM_BIOS(6)) /* rom page 2  08000 */
 	ROMX_LOAD("basic1.rom", 0x0c000, 0x4000, CRC(b3364108) SHA1(890f6e3e7fab3340f75b85e93ff29332bc9ecb2e), ROM_BIOS(6)) /* rom page 3  0c000 */
+
+	ROM_REGION(0x4000, "os", 0)
+	ROM_COPY("option", 0x10000, 0, 0x4000)
 ROM_END
 
 
+
 /*  0000- 7fff  ram */
-/*  8000- bfff  not used, this area is mapped over with one of the roms at 10000 and above */
-/*  c000- ffff  OS rom and memory mapped hardware at fc00-feff */
-/* 10000-4ffff  16 paged rom banks mapped back into 8000-bfff by the page rom select */
+/*  8000- bfff  this area is mapped over with one of the roms from "option" region 0x00000-0x40000 */
+/*  c000- ffff  OS rom and memory mapped hardware at fc00-feff, from "option" region 0x40000-0x44000 */
 
 
 ROM_START(bbcb)
 	ROM_REGION(0x08000,"maincpu",ROMREGION_ERASEFF) /* RAM */
 
-	ROM_REGION(0x44000,"user1",0) /* ROM */
+	ROM_REGION(0x44000,"option",0) /* ROM */
 	/* rom page 0  00000 */
 	/* rom page 1  04000 */
 	/* rom page 2  08000 */
@@ -1176,7 +1161,10 @@ ROM_START(bbcb)
 	ROMX_LOAD("os10.rom",   0x40000, 0x4000, CRC(9679b8f8) SHA1(d35f6723132aabe3c4d00fc16fd9ecc6768df753), ROM_BIOS(4)) /* os */
 	ROMX_LOAD("basic1.rom", 0x3c000, 0x4000, CRC(b3364108) SHA1(890f6e3e7fab3340f75b85e93ff29332bc9ecb2e), ROM_BIOS(4)) /* rom page 15 3c000 */
 
-	ROM_REGION(0x20000,"user2",0) /* DFS ROMS */
+	ROM_REGION(0x4000, "os", 0)
+	ROM_COPY("option", 0x40000, 0, 0x4000)
+
+	ROM_REGION(0x20000,"dfs",0) /* DFS ROMS */
 	ROM_LOAD("dfs09.rom",    0x00000, 0x2000, CRC(3ce609cf) SHA1(5cc0f14b8f46855c70eaa653cca4ad079b458732))
 	ROM_RELOAD(              0x02000, 0x2000                )
 	ROM_LOAD("dnfs.rom",     0x04000, 0x4000, CRC(8ccd2157) SHA1(7e3c536baeae84d6498a14e8405319e01ee78232))
@@ -1199,7 +1187,7 @@ ROM_END
 ROM_START(bbcb_de)
 	ROM_REGION(0x08000,"maincpu",ROMREGION_ERASEFF) /* RAM */
 
-	ROM_REGION(0x44000,"user1",0) /* ROM */
+	ROM_REGION(0x44000,"option",0) /* ROM */
 	/* rom page 0  00000 */
 	/* rom page 1  04000 */
 	/* rom page 2  08000 */
@@ -1221,7 +1209,10 @@ ROM_START(bbcb_de)
 	ROMX_LOAD("os_de.rom",   0x40000, 0x4000, CRC(b7262caf) SHA1(aadf90338ee9d1c85dfa73beba50e930c2a38f10), ROM_BIOS(1))
 	ROMX_LOAD("basic2.rom",  0x3c000, 0x4000, CRC(79434781) SHA1(4a7393f3a45ea309f744441c16723e2ef447a281), ROM_BIOS(1)) /* rom page 15 3c000 */
 
-	ROM_REGION(0x20000,"user2",0) /* DFS ROMS */
+	ROM_REGION(0x4000, "os", 0)
+	ROM_COPY("option", 0x40000, 0, 0x4000)
+
+	ROM_REGION(0x20000,"dfs",0) /* DFS ROMS */
 	ROM_LOAD("dfs09.rom",    0x00000, 0x2000, CRC(3ce609cf) SHA1(5cc0f14b8f46855c70eaa653cca4ad079b458732))
 	ROM_RELOAD(              0x02000, 0x2000                )
 
@@ -1238,7 +1229,7 @@ ROM_END
 ROM_START(bbcb_us)
 	ROM_REGION(0x08000,"maincpu",ROMREGION_ERASEFF) /* RAM */
 
-	ROM_REGION(0x44000,"user1",0) /* ROM */
+	ROM_REGION(0x44000,"option",0) /* ROM */
 	/* rom page 0  00000 */
 	/* rom page 1  04000 */
 	/* rom page 2  08000 */
@@ -1260,7 +1251,10 @@ ROM_START(bbcb_us)
 	ROMX_LOAD("os10_us.rom", 0x40000, 0x4000, CRC(c8e946a9) SHA1(83d91d089dca092d2c8b7c3650ff8143c9069b89), ROM_BIOS(1))
 	ROMX_LOAD("basic3.rom",  0x3c000, 0x4000, CRC(161b9539) SHA1(b39014610a968789afd7695aa04d1277d874405c), ROM_BIOS(1)) /* rom page 15 3c000 */
 
-	ROM_REGION(0x20000,"user2",0) /* DFS ROMS */
+	ROM_REGION(0x4000, "os", 0)
+	ROM_COPY("option", 0x40000, 0, 0x4000)
+
+	ROM_REGION(0x20000,"dfs",0) /* DFS ROMS */
 	ROM_LOAD("dfs09.rom",    0x00000, 0x2000, CRC(3ce609cf) SHA1(5cc0f14b8f46855c70eaa653cca4ad079b458732))
 	ROM_RELOAD(              0x02000, 0x2000                )
 
@@ -1280,7 +1274,7 @@ ROM_END
 ROM_START(bbcbp)
 	ROM_REGION(0x10000,"maincpu",ROMREGION_ERASEFF) /* ROM MEMORY */
 
-	ROM_REGION(0x44000,"user1",0) /* ROM */
+	ROM_REGION(0x44000,"option",0) /* ROM */
 	ROM_DEFAULT_BIOS("os20")
 	ROM_SYSTEM_BIOS( 0, "os20", "OS 2.00" )
 	ROMX_LOAD("bpos2.ic71", 0x3c000, 0x4000, CRC(9f356396) SHA1(ea7d3a7e3ee1ecfaa1483af994048057362b01f2), ROM_BIOS(1)) /* rom page 15 3C000 BASIC */
@@ -1303,13 +1297,16 @@ ROM_START(bbcbp)
 	/* rom page 15 3C000  BASIC */
 	/* ddfs 2.23 this is acorns 1770 disc controller Double density disc filing system */
 	ROM_LOAD("ddfs223.rom", 0x1c000, 0x4000, CRC(7891f9b7) SHA1(0d7ed0b0b3852cb61970ada1993244f2896896aa))
+
+	ROM_REGION(0x4000, "os", 0)
+	ROM_COPY("option", 0x40000, 0, 0x4000)
 ROM_END
 
 
 ROM_START(bbcbp128)
 	ROM_REGION(0x10000,"maincpu",ROMREGION_ERASEFF) /* ROM MEMORY */
 
-	ROM_REGION(0x44000,"user1",0) /* ROM */
+	ROM_REGION(0x44000,"option",0) /* ROM */
 	ROM_DEFAULT_BIOS("os20")
 	ROM_SYSTEM_BIOS( 0, "os20", "OS 2.00" )
 	ROMX_LOAD("bpos2.ic71", 0x3c000, 0x4000, CRC(9f356396) SHA1(ea7d3a7e3ee1ecfaa1483af994048057362b01f2), ROM_BIOS(1)) /* rom page 15 3C000 BASIC */
@@ -1332,19 +1329,22 @@ ROM_START(bbcbp128)
 	/* rom page 15 3C000  BASIC */
 	/* ddfs 2.23 this is acorns 1770 disc controller Double density disc filing system */
 	ROM_LOAD("ddfs223.rom", 0x1c000, 0x4000, CRC(7891f9b7) SHA1(0d7ed0b0b3852cb61970ada1993244f2896896aa))
+
+	ROM_REGION(0x4000, "os", 0)
+	ROM_COPY("option", 0x40000, 0, 0x4000)
 ROM_END
 
 
 ROM_START(bbcm)
 	ROM_REGION(0x10000,"maincpu",ROMREGION_ERASEFF) /* ROM MEMORY */
 
-	ROM_REGION(0x44000,"user1",0) /* ROM */
+	ROM_REGION(0x44000,"option",0) /* ROM */
 	ROM_DEFAULT_BIOS("mos350")
 	ROM_SYSTEM_BIOS( 0, "mos350", "Enhanced MOS 3.50" )
 	ROMX_LOAD("mos350.ic24", 0x20000, 0x20000, CRC(141027b9) SHA1(85211b5bc7c7a269952d2b063b7ec0e1f0196803), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS( 1, "mos320", "Original MOS 3.20" )
 	ROMX_LOAD("mos320.ic24", 0x20000, 0x20000, CRC(0cfad2ce) SHA1(0275719aa7746dd3b627f95ccc4362b564063a5e), ROM_BIOS(2))
-	ROM_COPY("user1", 0x20000, 0x40000, 0x4000) /* Move loaded roms into place */
+	ROM_COPY("option", 0x20000, 0x40000, 0x4000) /* Move loaded roms into place */
 	ROM_FILL(0x20000, 0x4000, 0xFFFF)
 	/* 00000 rom 0   Rear Cartridge bottom 16K */
 	/* 04000 rom 1   Rear Cartridge top 16K */
@@ -1364,6 +1364,9 @@ ROM_START(bbcm)
 	/* 3c000 rom 15  Terminal + Tube host + CFS */
 //  ROM_LOAD("anfs424.rom", 0x20000, 0x4000, CRC(1b9f75fd) SHA1(875f71edd48f87c3a55371409d0cc2015d8b5853) ) // TODO where to load this?
 
+	ROM_REGION(0x4000, "os", 0)
+	ROM_COPY("option", 0x40000, 0, 0x4000)
+
 	ROM_REGION(0x40,"rtc",0) /* mc146818 */
 	/* Factory defaulted CMOS RAM, sets default language ROM, etc. */
 	ROMX_LOAD("mos350.cmos", 0x00, 0x40, CRC(e84c1854) SHA1(f3cb7f12b7432caba28d067f01af575779220aac), ROM_BIOS(1))
@@ -1374,13 +1377,13 @@ ROM_END
 ROM_START(bbcmt)
 	ROM_REGION(0x10000,"maincpu",ROMREGION_ERASEFF) /* ROM MEMORY */
 
-	ROM_REGION(0x44000,"user1",0) /* ROM */
+	ROM_REGION(0x44000,"option",0) /* ROM */
 	ROM_DEFAULT_BIOS("mos350")
 	ROM_SYSTEM_BIOS( 0, "mos350", "Enhanced MOS 3.50" )
 	ROMX_LOAD("mos350.ic24", 0x20000, 0x20000, CRC(141027b9) SHA1(85211b5bc7c7a269952d2b063b7ec0e1f0196803), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS( 1, "mos320", "Original MOS 3.20" )
 	ROMX_LOAD("mos320.ic24", 0x20000, 0x20000, CRC(0cfad2ce) SHA1(0275719aa7746dd3b627f95ccc4362b564063a5e), ROM_BIOS(2))
-	ROM_COPY("user1", 0x20000, 0x40000, 0x4000) /* Move loaded roms into place */
+	ROM_COPY("option", 0x20000, 0x40000, 0x4000) /* Move loaded roms into place */
 	ROM_FILL(0x20000, 0x4000, 0xFFFF)
 	/* 00000 rom 0   Rear Cartridge bottom 16K */
 	/* 04000 rom 1   Rear Cartridge top 16K */
@@ -1400,6 +1403,9 @@ ROM_START(bbcmt)
 	/* 3c000 rom 15  Terminal + Tube host + CFS */
 //  ROM_LOAD("anfs424.ic27", 0x20000, 0x4000, CRC(1b9f75fd) SHA1(875f71edd48f87c3a55371409d0cc2015d8b5853) ) // TODO where to load this?
 
+	ROM_REGION(0x4000, "os", 0)
+	ROM_COPY("option", 0x40000, 0, 0x4000)
+
 	ROM_REGION(0x40,"rtc",0) /* mc146818 */
 	/* Factory defaulted CMOS RAM, sets default language ROM, etc. */
 	ROMX_LOAD("mos350.cmos", 0x00, 0x40, CRC(e84c1854) SHA1(f3cb7f12b7432caba28d067f01af575779220aac), ROM_BIOS(1))
@@ -1410,11 +1416,11 @@ ROM_END
 ROM_START(bbcmaiv)
 	ROM_REGION(0x10000,"maincpu",ROMREGION_ERASEFF) /* ROM MEMORY */
 
-	ROM_REGION(0x44000,"user1",0) /* ROM */
+	ROM_REGION(0x44000,"option",0) /* ROM */
 	ROM_DEFAULT_BIOS("mos320")
 	ROM_SYSTEM_BIOS( 0, "mos320", "MOS 3.20" )
 	ROMX_LOAD("mos320.ic24", 0x20000, 0x20000, CRC(0cfad2ce) SHA1(0275719aa7746dd3b627f95ccc4362b564063a5e), ROM_BIOS(1))
-	ROM_COPY("user1", 0x20000, 0x40000, 0x4000) /* Move loaded roms into place */
+	ROM_COPY("option", 0x20000, 0x40000, 0x4000) /* Move loaded roms into place */
 	ROM_FILL(0x20000, 0x4000, 0xFFFF)
 	/* 00000 rom 0   Rear Cartridge bottom 16K */
 	/* 04000 rom 1   Rear Cartridge top 16K */
@@ -1434,6 +1440,9 @@ ROM_START(bbcmaiv)
 	/* 3c000 rom 15  Terminal + Tube host + CFS */
 	ROM_LOAD("vfs170.rom", 0x20000, 0x4000, CRC(b124a0bb) SHA1(ba31c757815cf470402d7829a70a0e1d3fb1355b) )
 
+	ROM_REGION(0x4000, "os", 0)
+	ROM_COPY("option", 0x40000, 0, 0x4000)
+
 	ROM_REGION(0x40,"rtc",0) /* mc146818 */
 	/* Factory defaulted CMOS RAM, sets default language ROM, etc. */
 	ROMX_LOAD("mos320aiv.cmos", 0x0E, 0x32, BAD_DUMP CRC(b9ae42a1) SHA1(abf3e94b013f24027ca36c96720963c3411e93f8), ROM_BIOS(1))
@@ -1443,12 +1452,12 @@ ROM_END
 ROM_START(bbcmet)
 	ROM_REGION(0x10000,"maincpu",ROMREGION_ERASEFF) /* ROM MEMORY */
 
-	ROM_REGION(0x44000,"user1",0) /* ROM */
+	ROM_REGION(0x44000,"option",0) /* ROM */
 	ROM_DEFAULT_BIOS("mos400")
 	ROM_SYSTEM_BIOS( 0, "mos400", "Econet MOS 4.00" )
 	ROMX_LOAD("mos400.ic24", 0x20000, 0x10000, BAD_DUMP CRC(81729034) SHA1(d4bc2c7f5e66b5298786138f395908e70c772971), ROM_BIOS(1)) /* Merged individual ROM bank dumps */
-	ROM_COPY("user1", 0x24000, 0x34000, 0xC000) /* Mirror */
-	ROM_COPY("user1", 0x20000, 0x40000, 0x4000) /* Move loaded roms into place */
+	ROM_COPY("option", 0x24000, 0x34000, 0xC000) /* Mirror */
+	ROM_COPY("option", 0x20000, 0x40000, 0x4000) /* Move loaded roms into place */
 	ROM_FILL(0x20000, 0x4000, 0xFFFF)
 	/* 00000 rom 0   Rear Cartridge bottom 16K */
 	/* 04000 rom 1   Rear Cartridge top 16K */
@@ -1467,6 +1476,9 @@ ROM_START(bbcmet)
 	/* 38000 rom 14  ANFS */
 	/* 3c000 rom 15  MOS code */
 
+	ROM_REGION(0x4000, "os", 0)
+	ROM_COPY("option", 0x40000, 0, 0x4000)
+
 	ROM_REGION(0x40,"rtc",0) /* mc146818 */
 	/* Factory defaulted CMOS RAM, sets default language ROM, etc. */
 	ROMX_LOAD("mos400.cmos", 0x0E, 0x32, BAD_DUMP CRC(fff41cc5) SHA1(3607568758f90b3bd6c7dc9533e2aa24f9806ff3), ROM_BIOS(1))
@@ -1476,13 +1488,13 @@ ROM_END
 ROM_START(bbcm512)
 	ROM_REGION(0x10000,"maincpu",ROMREGION_ERASEFF) /* ROM MEMORY */
 
-	ROM_REGION(0x44000,"user1",0) /* ROM */
+	ROM_REGION(0x44000,"option",0) /* ROM */
 	ROM_DEFAULT_BIOS("mos350")
 	ROM_SYSTEM_BIOS( 0, "mos350", "Enhanced MOS 3.50" )
 	ROMX_LOAD("mos350.ic24", 0x20000, 0x20000, CRC(141027b9) SHA1(85211b5bc7c7a269952d2b063b7ec0e1f0196803), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS( 1, "mos320", "Original MOS 3.20" )
 	ROMX_LOAD("mos320.ic24", 0x20000, 0x20000, CRC(0cfad2ce) SHA1(0275719aa7746dd3b627f95ccc4362b564063a5e), ROM_BIOS(2))
-	ROM_COPY("user1", 0x20000, 0x40000, 0x4000) /* Move loaded roms into place */
+	ROM_COPY("option", 0x20000, 0x40000, 0x4000) /* Move loaded roms into place */
 	ROM_FILL(0x20000, 0x4000, 0xFFFF)
 	/* 00000 rom 0   Rear Cartridge bottom 16K */
 	/* 04000 rom 1   Rear Cartridge top 16K */
@@ -1501,6 +1513,9 @@ ROM_START(bbcm512)
 	/* 38000 rom 14  View + MOS code */
 	/* 3c000 rom 15  Terminal + Tube host + CFS */
 //  ROM_LOAD("anfs424.ic27", 0x20000, 0x4000, CRC(1b9f75fd) SHA1(875f71edd48f87c3a55371409d0cc2015d8b5853) )
+
+	ROM_REGION(0x4000, "os", 0)
+	ROM_COPY("option", 0x40000, 0, 0x4000)
 
 	ROM_REGION(0x40,"rtc",0) /* mc146818 */
 	/* Factory defaulted CMOS RAM, sets default language ROM, etc. */
@@ -1512,11 +1527,11 @@ ROM_END
 ROM_START(bbcmarm)
 	ROM_REGION(0x10000,"maincpu",ROMREGION_ERASEFF) /* ROM MEMORY */
 
-	ROM_REGION(0x44000,"user1",0) /* ROM */
+	ROM_REGION(0x44000,"option",0) /* ROM */
 	ROM_DEFAULT_BIOS("mos320")
 	ROM_SYSTEM_BIOS( 0, "mos320", "Original MOS 3.20" )
 	ROMX_LOAD("mos320.ic24", 0x20000, 0x20000, CRC(0cfad2ce) SHA1(0275719aa7746dd3b627f95ccc4362b564063a5e), ROM_BIOS(1))
-	ROM_COPY("user1", 0x20000, 0x40000, 0x4000) /* Move loaded roms into place */
+	ROM_COPY("option", 0x20000, 0x40000, 0x4000) /* Move loaded roms into place */
 	ROM_FILL(0x20000, 0x4000, 0xFFFF)
 	/* 00000 rom 0   Rear Cartridge bottom 16K */
 	/* 04000 rom 1   Rear Cartridge top 16K */
@@ -1536,6 +1551,9 @@ ROM_START(bbcmarm)
 	/* 3c000 rom 15  Terminal + Tube host + CFS */
 //  ROM_LOAD("anfs424.ic27", 0x20000, 0x4000, CRC(1b9f75fd) SHA1(875f71edd48f87c3a55371409d0cc2015d8b5853) )
 
+	ROM_REGION(0x4000, "os", 0)
+	ROM_COPY("option", 0x40000, 0, 0x4000)
+
 	ROM_REGION(0x40,"rtc",0) /* mc146818 */
 	/* Factory defaulted CMOS RAM, sets default language ROM, etc. */
 	ROMX_LOAD("mos320arm.cmos", 0x00, 0x40, CRC(56117257) SHA1(ed98563bef18f9d2a0b2d941cd20823d760fb127), ROM_BIOS(1))
@@ -1545,14 +1563,13 @@ ROM_END
 ROM_START(bbcmc)
 	ROM_REGION(0x10000,"maincpu",ROMREGION_ERASEFF) /* ROM MEMORY */
 
-	ROM_REGION(0x44000,"user1",0) /* ROM */
+	ROM_REGION(0x44000,"option",0) /* ROM */
 	ROM_DEFAULT_BIOS("mos510")
 	ROM_SYSTEM_BIOS( 0, "mos510", "Enhanced MOS 5.10" )
 	ROMX_LOAD("mos510.ic49", 0x30000, 0x10000, BAD_DUMP CRC(9a2a6086) SHA1(094ab37b0b6437c4f1653eaa0602ef102737adb6), ROM_BIOS(1)) /* Merged individual ROM bank dumps */
 	ROM_SYSTEM_BIOS( 1, "mos500", "Original MOS 5.00" )
 	ROMX_LOAD("mos500.ic49", 0x30000, 0x10000, BAD_DUMP CRC(f6170023) SHA1(140d002d2d9cd34b47197a2ba823505af2a84633), ROM_BIOS(2)) /* Merged individual ROM bank dumps */
-
-	ROM_COPY("user1", 0x30000, 0x40000, 0x4000) /* Move loaded roms into place */
+	ROM_COPY("option", 0x30000, 0x40000, 0x4000) /* Move loaded roms into place */
 	ROM_FILL(0x30000, 0x4000, 0xFFFF)
 	/* 00000 rom 0   EXTERNAL */
 	/* 04000 rom 1   EXTERNAL */
@@ -1571,6 +1588,9 @@ ROM_START(bbcmc)
 	/* 38000 rom 14  BASIC */
 	/* 3c000 rom 15  Utils */
 
+	ROM_REGION(0x4000, "os", 0)
+	ROM_COPY("option", 0x40000, 0, 0x4000)
+
 //  ROM_REGION(0x80,"mc146818",0) /* mc146818 */
 	/* Factory defaulted CMOS RAM, sets default language ROM, etc. */
 //  ROM_LOAD("mos500.cmos", 0x00, 0x80, CRC(d8458039) SHA1(72c056d493e74ceca41f48936012b012b496a226))
@@ -1580,11 +1600,11 @@ ROM_END
 ROM_START(bbcmc_ar)
 	ROM_REGION(0x10000,"maincpu",ROMREGION_ERASEFF) /* ROM MEMORY */
 
-	ROM_REGION(0x44000,"user1",0) /* ROM */
+	ROM_REGION(0x44000,"option",0) /* ROM */
 	ROM_DEFAULT_BIOS("mos511i")
 	ROM_SYSTEM_BIOS( 0, "mos511i", "International MOS 5.11" )
 	ROMX_LOAD("mos511.ic49", 0x30000, 0x10000, BAD_DUMP CRC(8708803c) SHA1(d2170c8b9b536f3ad84a4a603a7fe712500cc751), ROM_BIOS(1)) /* Merged individual ROM bank dumps */
-	ROM_COPY("user1", 0x30000, 0x40000, 0x4000) /* Move loaded roms into place */
+	ROM_COPY("option", 0x30000, 0x40000, 0x4000) /* Move loaded roms into place */
 	ROM_FILL(0x30000, 0x4000, 0xFFFF)
 	/* 00000 rom 0   EXTERNAL */
 	/* 04000 rom 1   EXTERNAL */
@@ -1604,6 +1624,9 @@ ROM_START(bbcmc_ar)
 	/* 3c000 rom 15  Utils */
 	ROM_LOAD("international16.rom", 0x8000 , 0x4000, CRC(0ef527b1) SHA1(dc5149ccf588cd591a6ad47727474ef3313272ce) )
 	ROM_LOAD("arabian-c22.rom"    , 0x20000, 0x4000, CRC(4f3aadff) SHA1(2bbf61ba68264ce5845aab9c54e750b0efe219c8) )
+
+	ROM_REGION(0x4000, "os", 0)
+	ROM_COPY("option", 0x40000, 0, 0x4000)
 
 //  ROM_REGION(0x80,"mc146818",0) /* mc146818 */
 	/* Factory defaulted CMOS RAM, sets default language ROM, etc. */

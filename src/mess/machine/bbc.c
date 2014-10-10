@@ -35,7 +35,7 @@ Model A memory handling functions
 /* for the model A just address the 4 on board ROM sockets */
 WRITE8_MEMBER(bbc_state::bbc_page_selecta_w)
 {
-	m_bank4->set_base(m_region_user1->base()+((data&0x03)<<14));
+	m_bank4->set_entry(data & 0x03);
 }
 
 
@@ -52,14 +52,14 @@ Model B memory handling functions
 /* I have set bank 1 as a special case to load different DFS roms selectable from MESS's CONF settings var:bbc_DFSTypes */
 WRITE8_MEMBER(bbc_state::bbc_page_selectb_w)
 {
-	m_rombank=data&0x0f;
-	if (m_rombank!=1)
+	m_rombank = data & 0x0f;
+	if (m_rombank != 1)
 	{
-		m_bank4->set_base(m_region_user1->base() + (m_rombank << 14));
+		m_bank4->set_entry(m_rombank);
 	}
 	else
 	{
-		m_bank4->set_base(m_region_user2->base() + ((m_DFSType) << 14));
+		m_bank4->set_entry(m_DFSType);
 	}
 }
 
@@ -91,15 +91,15 @@ WRITE8_MEMBER(bbc_state::bbc_memoryb4_w)
 	if (m_rombank == 1)
 	{
 		// special DFS case for Acorn DFS E00 Hack that can write to the DFS RAM Bank;
-		if (m_DFSType == 3) m_region_user2->base()[((m_DFSType) << 14) + offset] = data;
+		if (m_DFSType == 3) m_region_dfs->base()[((m_DFSType) << 14) + offset] = data;
 	}
 	else
 	{
 		switch (m_SWRAMtype)
 		{
-			case 1: if (bbc_SWRAMtype1[m_userport]) m_region_user1->base()[(m_userport << 14) + offset] = data;
-			case 2: if (bbc_SWRAMtype2[m_rombank])  m_region_user1->base()[(m_rombank << 14) + offset] = data;
-			case 3: if (bbc_SWRAMtype3[m_rombank])  m_region_user1->base()[(m_rombank << 14) + offset] = data;
+			case 1: if (bbc_SWRAMtype1[m_userport]) m_region_opt->base()[(m_userport << 14) + offset] = data;
+			case 2: if (bbc_SWRAMtype2[m_rombank])  m_region_opt->base()[(m_rombank << 14) + offset] = data;
+			case 3: if (bbc_SWRAMtype3[m_rombank])  m_region_opt->base()[(m_rombank << 14) + offset] = data;
 		}
 	}
 }
@@ -135,12 +135,12 @@ WRITE8_MEMBER(bbc_state::bbc_page_selectbp_w)
 		if (m_pagedRAM)
 		{
 			/* if paged ram then set 8000 to afff to read from the ram 8000 to afff */
-			m_bank4->set_base(m_region_maincpu->base() + 0x8000);
+			m_bank4->set_entry(0x10);
 		}
 		else
 		{
 			/* if paged rom then set the rom to be read from 8000 to afff */
-			m_bank4->set_base(m_region_user1->base() + (m_rombank << 14));
+			m_bank4->set_entry(m_rombank);
 		};
 
 		/* set the rom to be read from b000 to bfff */
@@ -152,7 +152,7 @@ WRITE8_MEMBER(bbc_state::bbc_page_selectbp_w)
 		m_vdusel=(data>>7)&0x01;
 		bbcbp_setvideoshadow(m_vdusel);
 		//need to make the video display do a full screen refresh for the new memory area
-		m_bank2->set_base(m_region_maincpu->base()+0x3000);
+		m_bank2->set_base(m_region_maincpu->base() + 0x3000);
 	}
 }
 
@@ -258,7 +258,7 @@ WRITE8_MEMBER(bbc_state::bbc_memorybp4_128_w)
 	{
 		if (bbc_b_plus_sideways_ram_banks[m_rombank])
 		{
-			m_region_user1->base()[offset+(m_rombank<<14)]=data;
+			m_region_opt->base()[offset+(m_rombank<<14)]=data;
 		}
 	}
 }
@@ -267,7 +267,7 @@ WRITE8_MEMBER(bbc_state::bbc_memorybp6_128_w)
 {
 	if (bbc_b_plus_sideways_ram_banks[m_rombank])
 	{
-		m_region_user1->base()[offset+(m_rombank<<14)+0x3000]=data;
+		m_region_opt->base()[offset+(m_rombank<<14)+0x3000]=data;
 	}
 }
 
@@ -360,7 +360,7 @@ WRITE8_MEMBER(bbc_state::bbcm_ACCCON_write)
 	}
 	else
 	{
-		m_bank7->set_base(m_region_user1->base() + 0x40000);
+		m_bank7->set_base(m_region_os->base());
 	}
 
 	bbcbp_setvideoshadow(m_ACCCON_D);
@@ -368,11 +368,11 @@ WRITE8_MEMBER(bbc_state::bbcm_ACCCON_write)
 
 	if (m_ACCCON_X)
 	{
-		m_bank2->set_base(m_region_maincpu->base() + 0xb000 );
+		m_bank2->set_base(m_region_maincpu->base() + 0xb000);
 	}
 	else
 	{
-		m_bank2->set_base(m_region_maincpu->base() + 0x3000 );
+		m_bank2->set_base(m_region_maincpu->base() + 0x3000);
 	}
 
 	/* ACCCON_TST controls paging of rom reads in the 0xFC00-0xFEFF reigon */
@@ -380,12 +380,12 @@ WRITE8_MEMBER(bbc_state::bbcm_ACCCON_write)
 	/* if 1 the the ROM is paged in for reads but writes still go to I/O   */
 	if (m_ACCCON_TST)
 	{
-		m_bank8->set_base(m_region_user1->base()+0x43c00);
-		space.install_read_bank(0xFC00,0xFEFF,"bank8");
+		m_bank8->set_base(m_region_os->base() + 0x3c00);
+		space.install_read_bank(0xfc00, 0xfeff, "bank8");
 	}
 	else
 	{
-		space.install_read_handler(0xFC00,0xFEFF,read8_delegate(FUNC(bbc_state::bbcm_r),this));
+		space.install_read_handler(0xfc00, 0xfeff, read8_delegate(FUNC(bbc_state::bbcm_r),this));
 	}
 }
 
@@ -405,12 +405,12 @@ WRITE8_MEMBER(bbc_state::page_selectbm_w)
 
 	if (m_pagedRAM)
 	{
-		m_bank4->set_base(m_region_maincpu->base() + 0x8000);
+		m_bank4->set_entry(0x10);
 		m_bank5->set_entry(m_rombank);
 	}
 	else
 	{
-		m_bank4->set_base(m_region_user1->base() + ((m_rombank) << 14));
+		m_bank4->set_entry(m_rombank);
 		m_bank5->set_entry(m_rombank);
 	}
 }
@@ -427,17 +427,17 @@ DIRECT_UPDATE_MEMBER(bbc_state::bbcm_direct_handler)
 {
 	if (m_ACCCON_X)
 	{
-		m_bank2->set_base( m_region_maincpu->base() + 0xb000 );
+		m_bank2->set_base(m_region_maincpu->base() + 0xb000);
 	}
 	else
 	{
 		if (m_ACCCON_E && bbcm_vdudriverset())
 		{
-			m_bank2->set_base( m_region_maincpu->base() + 0xb000 );
+			m_bank2->set_base(m_region_maincpu->base() + 0xb000);
 		}
 		else
 		{
-			m_bank2->set_base( m_region_maincpu->base() + 0x3000 );
+			m_bank2->set_base(m_region_maincpu->base() + 0x3000);
 		}
 	}
 
@@ -482,7 +482,7 @@ WRITE8_MEMBER(bbc_state::bbc_memorybm4_w)
 	{
 		if (bbc_master_sideways_ram_banks[m_rombank])
 		{
-			m_region_user1->base()[offset+(m_rombank<<14)] = data;
+			m_region_opt->base()[offset+(m_rombank<<14)] = data;
 		}
 	}
 }
@@ -492,7 +492,7 @@ WRITE8_MEMBER(bbc_state::bbc_memorybm5_w)
 {
 	if (bbc_master_sideways_ram_banks[m_rombank])
 	{
-		m_region_user1->base()[offset+(m_rombank<<14)+0x1000] = data;
+		m_region_opt->base()[offset+(m_rombank<<14)+0x1000] = data;
 	}
 }
 
@@ -555,7 +555,7 @@ READ8_MEMBER(bbc_state::bbcm_r)
 	/* Now handled in bbcm_ACCCON_write PHS - 2008-10-11 */
 //  if ( m_ACCCON_TST )
 //  {
-//      return m_region_user1->base()[offset+0x43c00];
+//      return m_region_os->base()[offset + 0x3c00];
 //  };
 
 	if (offset<=0x0ff) /* FRED */
@@ -1938,103 +1938,58 @@ WRITE8_MEMBER(bbc_state::bbc_disc_w)
    BBC B Rom loading functions
 ***************************************/
 
-int bbc_state::exp_rom_load(device_image_interface &image, int index)
+int bbc_state::bbc_load_cart(device_image_interface &image, generic_slot_device *slot)
 {
-	UINT8 *RAM = m_region_user1->base();
-	int size, read_;
-	int addr = 0x8000 + (0x4000 * index);
-
-	if (image.software_entry() == NULL)
+	UINT32 size = slot->common_get_size("rom");
+	
+	if (size != 0x2000 && size != 0x4000)
 	{
-		size = image.length();
-		logerror("loading rom %s, at %.4x size:%.4x\n", image.filename(), addr, size);
-
-		switch (size)
-		{
-			case 0x2000:
-				read_ = image.fread(RAM + addr, size);
-				if (read_ != size)
-					return 1;
-				image.fseek(0, SEEK_SET);
-				read_ = image.fread(RAM + addr + 0x2000, size);
-				break;
-			case 0x4000:
-				read_ = image.fread(RAM + addr, size);
-				break;
-			default:
-				read_ = 0;
-				logerror("bad rom file size of %.4x\n", size);
-				break;
-		}
-
-		if (read_ != size)
-			return IMAGE_INIT_FAIL;
+		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
+		return IMAGE_INIT_FAIL;
 	}
+	
+	slot->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
+	slot->common_load_rom(slot->get_rom_base(), size, "rom");
+	
 	return IMAGE_INIT_PASS;
 }
-
-DEVICE_IMAGE_LOAD_MEMBER( bbc_state, bbc_exp_rom )
-{
-	if (strcmp(image.device().tag(),":exp_rom1") == 0)
-		return exp_rom_load(image, 0);
-
-	if (strcmp(image.device().tag(),":exp_rom2") == 0)
-		return exp_rom_load(image, 1);
-
-	if (strcmp(image.device().tag(),":exp_rom3") == 0)
-		return exp_rom_load(image, 2);
-
-	if (strcmp(image.device().tag(),":exp_rom4") == 0)
-		return exp_rom_load(image, 3);
-
-	return IMAGE_INIT_FAIL;
-}
-
 
 /**************************************
    BBC Master Rom loading functions
 ***************************************/
 
-DEVICE_IMAGE_LOAD_MEMBER( bbc_state, bbcm_cart )
+int bbc_state::bbcm_load_cart(device_image_interface &image, generic_slot_device *slot)
 {
-	UINT8 *RAM = m_region_user1->base();
-	int addr = 0, index = 0;
-
-	if (strcmp(image.device().tag(),":cart1") == 0)
-		index = 0;
-	if (strcmp(image.device().tag(),":cart2") == 0)
-		index = 1;
-	addr += index * 0x8000;
-
 	if (image.software_entry() == NULL)
 	{
-		UINT32 size = image.length();
-		logerror("loading rom %s, size:%.4x\n", image.filename(), size);
+		UINT32 filesize = image.length();
 
-		if (size != 0x8000)
+		if (filesize != 0x8000)
 		{
-			image.seterror(IMAGE_ERROR_UNSUPPORTED, "Invalid rom file size");
+			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
 			return IMAGE_INIT_FAIL;
 		}
-
-		image.fread(RAM + addr, size);
+		
+		slot->rom_alloc(filesize, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
+		image.fread(slot->get_rom_base(), filesize);
+		return IMAGE_INIT_PASS;
 	}
 	else
 	{
 		UINT32 size_lo = image.get_software_region_length("lorom");
 		UINT32 size_hi = image.get_software_region_length("uprom");
-		logerror("loading rom %s, size:%.4x\n", image.filename(), size_lo + size_hi);
-
+		
 		if (size_lo + size_hi != 0x8000)
 		{
-			image.seterror(IMAGE_ERROR_UNSUPPORTED, "Invalid rom file size");
+			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
 			return IMAGE_INIT_FAIL;
 		}
-
-		memcpy(RAM + addr + 0,       image.get_software_region("uprom"), size_hi);
-		memcpy(RAM + addr + size_hi, image.get_software_region("lorom"), size_lo);
+		
+		slot->rom_alloc(size_lo + size_hi, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
+		memcpy(slot->get_rom_base() + 0,       image.get_software_region("uprom"), size_hi);
+		memcpy(slot->get_rom_base() + size_hi, image.get_software_region("lorom"), size_lo);
 	}
-
+	
 	return IMAGE_INIT_PASS;
 }
 
@@ -2075,11 +2030,73 @@ DRIVER_INIT_MEMBER(bbc_state,bbcm)
 	m_via6522_0->write_cb2(1);
 }
 
-MACHINE_START_MEMBER(bbc_state,bbca)
+// setup pointers for optional EPROMs
+void bbc_state::bbc_setup_banks(memory_bank *membank, int banks, UINT32 shift, UINT32 size)
 {
+	astring region_tag;
+	memory_region *tmp_reg;
+	UINT8 *eprom[4];
+	if (m_exp1 && (tmp_reg = memregion(region_tag.cpy(m_exp1->tag()).cat(GENERIC_ROM_REGION_TAG))))
+		eprom[0] = tmp_reg->base() + shift;
+	else
+		eprom[0] = m_region_opt->base() + 0x0000 + shift;
+	if (m_exp2 && (tmp_reg = memregion(region_tag.cpy(m_exp2->tag()).cat(GENERIC_ROM_REGION_TAG))))
+		eprom[1] = tmp_reg->base() + shift;
+	else
+		eprom[1] = m_region_opt->base() + 0x4000 + shift;
+	if (m_exp3 && (tmp_reg = memregion(region_tag.cpy(m_exp3->tag()).cat(GENERIC_ROM_REGION_TAG))))
+		eprom[2] = tmp_reg->base() + shift;
+	else
+		eprom[2] = m_region_opt->base() + 0x8000 + shift;
+	if (m_exp4 && (tmp_reg = memregion(region_tag.cpy(m_exp4->tag()).cat(GENERIC_ROM_REGION_TAG))))
+		eprom[3] = tmp_reg->base() + shift;
+	else
+		eprom[3] = m_region_opt->base() + 0xc000 + shift;
+	
+	membank->configure_entries(0, 1,  eprom[0], size);
+	membank->configure_entries(1, 1,  eprom[1], size);
+	membank->configure_entries(2, 1,  eprom[2], size);
+	membank->configure_entries(3, 1,  eprom[3], size);
+
+	if (banks > 4)
+	{
+		for (int i = 0; i < banks - 4; i++)
+			membank->configure_entries(i + 4, 1,  m_region_opt->base() + 0x10000 + shift + i * 0x4000, size);
+	}
 }
 
-MACHINE_RESET_MEMBER(bbc_state,bbca)
+void bbc_state::bbcm_setup_banks(memory_bank *membank, int banks, UINT32 shift, UINT32 size)
+{
+	astring region_tag;
+	memory_region *tmp_reg;
+	UINT8 *eprom[2];
+	if (m_exp1 && (tmp_reg = memregion(region_tag.cpy(m_exp1->tag()).cat(GENERIC_ROM_REGION_TAG))))
+		eprom[0] = tmp_reg->base() + shift;
+	else
+		eprom[0] = m_region_opt->base() + 0x0000 + shift;
+	if (m_exp2 && (tmp_reg = memregion(region_tag.cpy(m_exp2->tag()).cat(GENERIC_ROM_REGION_TAG))))
+		eprom[1] = tmp_reg->base() + shift;
+	else
+		eprom[1] = m_region_opt->base() + 0x8000 + shift;
+	
+	membank->configure_entries(0, 1,  eprom[0], size);
+	membank->configure_entries(1, 1,  eprom[0] + 0x4000, size);
+	membank->configure_entries(2, 1,  eprom[1], size);
+	membank->configure_entries(3, 1,  eprom[1] + 0x4000, size);
+	
+	if (banks > 4)
+	{
+		for (int i = 0; i < banks - 4; i++)
+			membank->configure_entries(i + 4, 1,  m_region_opt->base() + 0x10000 + shift + i * 0x4000, size);
+	}
+}
+
+MACHINE_START_MEMBER(bbc_state, bbca)
+{
+	bbc_setup_banks(m_bank4, 4, 0, 0x4000);
+}
+
+MACHINE_RESET_MEMBER(bbc_state, bbca)
 {
 	UINT8 *RAM = m_region_maincpu->base();
 
@@ -2097,20 +2114,23 @@ MACHINE_RESET_MEMBER(bbc_state,bbca)
 		m_memorySize=16;
 	}
 
-	m_bank4->set_base(m_region_user1->base());          /* bank 4 is the paged ROMs     from 8000 to bfff */
-	m_bank7->set_base(m_region_user1->base()+0x10000);  /* bank 7 points at the OS rom  from c000 to ffff */
+	m_bank4->set_entry(0);
+	m_bank7->set_base(m_region_os->base());  /* bank 7 points at the OS rom  from c000 to ffff */
 
 	bbcb_IC32_initialise(this);
 }
 
-MACHINE_START_MEMBER(bbc_state,bbcb)
+MACHINE_START_MEMBER(bbc_state, bbcb)
 {
 	m_mc6850_clock = 0;
 	m_previous_i8271_int_state=0;
 	m_previous_wd177x_int_state=1;
+	bbc_setup_banks(m_bank4, 16, 0, 0x4000);
+	if (m_region_dfs)
+		m_bank4->configure_entries(16, 8, m_region_dfs->base(), 0x4000);	// additional bank for paged ram
 }
 
-MACHINE_RESET_MEMBER(bbc_state,bbcb)
+MACHINE_RESET_MEMBER(bbc_state, bbcb)
 {
 	UINT8 *RAM = m_region_maincpu->base();
 	m_DFSType=    (ioport("BBCCONFIG")->read() >> 0) & 0x07;
@@ -2119,8 +2139,8 @@ MACHINE_RESET_MEMBER(bbc_state,bbcb)
 	m_bank3->set_base(RAM + 0x4000);
 	m_memorySize=32;
 
-	m_bank4->set_base(m_region_user1->base());            /* bank 4 is the paged ROMs     from 8000 to bfff */
-	m_bank7->set_base(m_region_user1->base() + 0x40000);  /* bank 7 points at the OS rom  from c000 to ffff */
+	m_bank4->set_entry(0);
+	m_bank7->set_base(m_region_os->base());  /* bank 7 points at the OS rom  from c000 to ffff */
 
 	bbcb_IC32_initialise(this);
 
@@ -2128,23 +2148,24 @@ MACHINE_RESET_MEMBER(bbc_state,bbcb)
 }
 
 
-MACHINE_START_MEMBER(bbc_state,bbcbp)
+MACHINE_START_MEMBER(bbc_state, bbcbp)
 {
 	m_mc6850_clock = 0;
 
 	m_maincpu->space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(FUNC(bbc_state::bbcbp_direct_handler), this));
 
-	/* bank 6 is the paged ROMs     from b000 to bfff */
-	m_bank6->configure_entries(0, 16, m_region_user1->base()+0x3000, 1<<14);
+	bbc_setup_banks(m_bank4, 16, 0, 0x3000);
+	m_bank4->configure_entries(16, 1, m_region_maincpu->base() + 0x8000, 0x3000);	// additional bank for paged ram
+	bbc_setup_banks(m_bank6, 16, 0x3000, 0x1000);
 }
 
-MACHINE_RESET_MEMBER(bbc_state,bbcbp)
+MACHINE_RESET_MEMBER(bbc_state, bbcbp)
 {
 	m_bank1->set_base(m_region_maincpu->base());
-	m_bank2->set_base(m_region_maincpu->base()+0x03000);  /* bank 2 screen/shadow ram     from 3000 to 7fff */
-	m_bank4->set_base(m_region_user1->base());            /* bank 4 is paged ROM or RAM   from 8000 to afff */
+	m_bank2->set_base(m_region_maincpu->base() + 0x03000);  /* bank 2 screen/shadow ram     from 3000 to 7fff */
+	m_bank4->set_entry(0);
 	m_bank6->set_entry(0);
-	m_bank7->set_base(m_region_user1->base()+0x40000);    /* bank 7 points at the OS rom  from c000 to ffff */
+	m_bank7->set_base(m_region_os->base());    /* bank 7 points at the OS rom  from c000 to ffff */
 
 	bbcb_IC32_initialise(this);
 
@@ -2152,27 +2173,28 @@ MACHINE_RESET_MEMBER(bbc_state,bbcbp)
 }
 
 
-MACHINE_START_MEMBER(bbc_state,bbcm)
+MACHINE_START_MEMBER(bbc_state, bbcm)
 {
 	m_mc6850_clock = 0;
 
 	m_maincpu->space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(FUNC(bbc_state::bbcm_direct_handler), this));
 
-	/* bank 5 is the paged ROMs from 9000 to bfff */
-	m_bank5->configure_entries(0, 16, m_region_user1->base()+0x01000, 1<<14);
+	bbcm_setup_banks(m_bank4, 16, 0, 0x1000);
+	m_bank4->configure_entries(16, 1, m_region_maincpu->base() + 0x8000, 0x1000);	// additional bank for paged ram
+	bbcm_setup_banks(m_bank5, 16, 0x1000, 0x3000);
 
 	/* Set ROM/IO bank to point to rom */
-	m_bank8->set_base( m_region_user1->base()+0x43c00);
-	m_maincpu->space(AS_PROGRAM).install_read_bank(0xFC00, 0xFEFF, "bank8");
+	m_bank8->set_base(m_region_os->base() + 0x3c00);
+	m_maincpu->space(AS_PROGRAM).install_read_bank(0xfc00, 0xfeff, "bank8");
 }
 
-MACHINE_RESET_MEMBER(bbc_state,bbcm)
+MACHINE_RESET_MEMBER(bbc_state, bbcm)
 {
 	m_bank1->set_base(m_region_maincpu->base());           /* bank 1 regular lower ram     from 0000 to 2fff */
 	m_bank2->set_base(m_region_maincpu->base() + 0x3000);  /* bank 2 screen/shadow ram     from 3000 to 7fff */
-	m_bank4->set_base(m_region_user1->base());             /* bank 4 is paged ROM or RAM   from 8000 to 8fff */
+	m_bank4->set_entry(0);
 	m_bank5->set_entry(0);
-	m_bank7->set_base(m_region_user1->base() + 0x40000);   /* bank 6 OS rom of RAM         from c000 to dfff */
+	m_bank7->set_base(m_region_os->base());   /* bank 6 OS rom of RAM         from c000 to dfff */
 
 	bbcb_IC32_initialise(this);
 
