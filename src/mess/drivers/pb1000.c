@@ -317,9 +317,9 @@ WRITE16_MEMBER( pb1000_state::gatearray_w )
 {
 	m_gatearray[offset] = data&0xff;
 
-	if (m_gatearray[0] && m_card1_reg)
+	if (m_gatearray[0] && m_card1 && m_card1_reg)
 		membank("bank1")->set_base(m_card1_reg->base());
-	else if (m_gatearray[1] && m_card2_reg)
+	else if (m_gatearray[1] && m_card2 && m_card2_reg)
 		membank("bank1")->set_base(m_card2_reg->base());
 	else
 		membank("bank1")->set_base(m_rom_reg->base());
@@ -506,9 +506,11 @@ TIMER_CALLBACK_MEMBER(pb1000_state::keyboard_timer)
 void pb1000_state::machine_start()
 {
 	astring region_tag;
-	m_card1_reg = memregion(region_tag.cpy(m_card1->tag()).cat(GENERIC_ROM_REGION_TAG));
-	m_card2_reg = memregion(region_tag.cpy(m_card2->tag()).cat(GENERIC_ROM_REGION_TAG));
 	m_rom_reg = memregion("rom");
+	if (m_card1)
+		m_card1_reg = memregion(region_tag.cpy(m_card1->tag()).cat(GENERIC_ROM_REGION_TAG));
+	if (m_card2)
+		m_card2_reg = memregion(region_tag.cpy(m_card2->tag()).cat(GENERIC_ROM_REGION_TAG));
 
 	membank("bank1")->set_base(m_rom_reg->base());
 
