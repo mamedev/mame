@@ -265,17 +265,9 @@ ADDRESS_MAP_END
                         SOUND
 *****************************************************/
 
-void darius_state::reset_sound_region(  )
-{
-	membank("bank1")->set_entry(m_banknum);
-}
-
 WRITE8_MEMBER(darius_state::sound_bankswitch_w)
 {
-	m_banknum = data & 0x03;
-	reset_sound_region();
-//  banknum = data;
-//  reset_sound_region();
+	membank("bank1")->set_entry(data & 3);
 }
 
 WRITE8_MEMBER(darius_state::adpcm_command_w)
@@ -460,7 +452,8 @@ WRITE8_MEMBER(darius_state::darius_write_portB1)
 *****************************************************/
 
 static ADDRESS_MAP_START( darius_sound_map, AS_PROGRAM, 8, darius_state )
-	AM_RANGE(0x0000, 0x7fff) AM_ROMBANK("bank1")
+	AM_RANGE(0x0000, 0x3fff) AM_ROM
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
 	AM_RANGE(0x9000, 0x9001) AM_DEVREADWRITE("ym1", ym2203_device, read, write)
 	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE("ym2", ym2203_device, read, write)
@@ -766,19 +759,15 @@ WRITE_LINE_MEMBER(darius_state::irqhandler) /* assumes Z80 sandwiched between 68
 void darius_state::darius_postload()
 {
 	parse_control();
-	reset_sound_region();
 }
 
 void darius_state::machine_start()
 {
-	membank("bank1")->configure_entries(0, 4, memregion("audiocpu")->base() + 0x10000, 0x8000);
-	membank("bank1")->configure_entry(4, memregion("audiocpu")->base());
-	membank("bank1")->set_entry(4);
+	membank("bank1")->configure_entries(0, 4, memregion("audiocpu")->base(), 0x4000);
 
 	save_item(NAME(m_cpua_ctrl));
 	save_item(NAME(m_coin_word));
 
-	save_item(NAME(m_banknum));
 	save_item(NAME(m_adpcm_command));
 	save_item(NAME(m_nmi_enable));
 	save_item(NAME(m_vol));
@@ -789,23 +778,22 @@ void darius_state::machine_start()
 
 void darius_state::machine_reset()
 {
-	int  i;
+	membank("bank1")->set_entry(0);
 
 	m_cpua_ctrl = 0xff;
-	m_banknum = 0;
 	m_coin_word = 0;
 	m_adpcm_command = 0;
 	m_nmi_enable = 0;
 
 	machine().sound().system_enable(true);  /* mixer enabled */
 
-	for (i = 0; i < DARIUS_VOL_MAX; i++)
+	for (int i = 0; i < DARIUS_VOL_MAX; i++)
 		m_vol[i] = 0x00;    /* min volume */
 
-	for (i = 0; i < DARIUS_PAN_MAX; i++)
+	for (int i = 0; i < DARIUS_PAN_MAX; i++)
 		m_pan[i] = 0x80;    /* center */
 
-	for (i = 0; i < 0x10; i++)
+	for (int i = 0; i < 0x10; i++)
 	{
 		//logerror( "calc %d = %d\n", i, (int)(100.0f / (float)pow(10.0f, (32.0f - (i * (32.0f / (float)(0xf)))) / 20.0f)) );
 		m_def_vol[i] = (int)(100.0f / (float)pow(10.0f, (32.0f - (i * (32.0f / (float)(0xf)))) / 20.0f));
@@ -965,7 +953,7 @@ ROM_START( darius )
 	ROM_LOAD16_BYTE( "a96_31.187",  0x40000, 0x10000, CRC(e9bb5d89) SHA1(a5d08129c32b97e2cce84496945766fd32b6506e) )    /* 2 data roms */
 	ROM_LOAD16_BYTE( "a96_30.154",  0x40001, 0x10000, CRC(9eb5e127) SHA1(50e2fe5ec7f79ecf1fb5107298da13ef5ab37162) )
 
-	ROM_REGION( 0x30000, "audiocpu", 0 )    /* Z80 sound cpu */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* Z80 sound cpu */
 	ROM_LOAD( "a96_57.33",  0x00000, 0x10000, CRC(33ceb730) SHA1(05070ea503ac57ff8445145d6f97115f7aad90a5) )
 
 	ROM_REGION( 0x80000, "cpub", 0 )    /* 68000 code */
@@ -1023,7 +1011,7 @@ ROM_START( dariusj )
 	ROM_LOAD16_BYTE( "a96_31.187",   0x40000, 0x10000, CRC(e9bb5d89) SHA1(a5d08129c32b97e2cce84496945766fd32b6506e) )   /* 2 data roms */
 	ROM_LOAD16_BYTE( "a96_30.154",   0x40001, 0x10000, CRC(9eb5e127) SHA1(50e2fe5ec7f79ecf1fb5107298da13ef5ab37162) )
 
-	ROM_REGION( 0x30000, "audiocpu", 0 )    /* Z80 sound cpu */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* Z80 sound cpu */
 	ROM_LOAD( "a96_57.33",  0x00000, 0x10000, CRC(33ceb730) SHA1(05070ea503ac57ff8445145d6f97115f7aad90a5) )
 
 	ROM_REGION( 0x80000, "cpub", 0 )    /* 68000 code */
@@ -1078,7 +1066,7 @@ ROM_START( dariuso )
 	ROM_LOAD16_BYTE( "a96_31.187",   0x40000, 0x10000, CRC(e9bb5d89) SHA1(a5d08129c32b97e2cce84496945766fd32b6506e) )   /* 2 data roms */
 	ROM_LOAD16_BYTE( "a96_30.154",   0x40001, 0x10000, CRC(9eb5e127) SHA1(50e2fe5ec7f79ecf1fb5107298da13ef5ab37162) )
 
-	ROM_REGION( 0x30000, "audiocpu", 0 )    /* Z80 sound cpu */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* Z80 sound cpu */
 	ROM_LOAD( "a96_57.33",  0x00000, 0x10000, CRC(33ceb730) SHA1(05070ea503ac57ff8445145d6f97115f7aad90a5) )
 
 	ROM_REGION( 0x80000, "cpub", 0 )    /* 68000 code */
@@ -1133,7 +1121,7 @@ ROM_START( dariuse )
 	ROM_LOAD16_BYTE( "dae-70.bin",   0x40000, 0x10000, CRC(54590b31) SHA1(2b89846f14a5cb19b58ab4999bc5ae11671bbb5a) )   /* 2 data roms */
 	ROM_LOAD16_BYTE( "a96_30.154",   0x40001, 0x10000, CRC(9eb5e127) SHA1(50e2fe5ec7f79ecf1fb5107298da13ef5ab37162) )   // dae-69.bin
 
-	ROM_REGION( 0x30000, "audiocpu", 0 )    /* Z80 sound cpu */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* Z80 sound cpu */
 	ROM_LOAD( "a96_57.33",  0x00000, 0x10000, CRC(33ceb730) SHA1(05070ea503ac57ff8445145d6f97115f7aad90a5) )
 
 	ROM_REGION( 0x80000, "cpub", 0 )    /* 68000 code */
@@ -1180,21 +1168,7 @@ ROM_START( dariuse )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(darius_state,darius)
-{
-	/**** setup sound bank image ****/
-	UINT8 *RAM = memregion("audiocpu")->base();
-	int  i;
-
-	for (i = 3; i >= 0; i--)
-	{
-		memcpy(RAM + 0x8000 * i + 0x10000, RAM,              0x4000);
-		memcpy(RAM + 0x8000 * i + 0x14000, RAM + 0x4000 * i, 0x4000);
-	}
-}
-
-
-GAME( 1986, darius,   0,        darius,   darius, darius_state,   darius,   ROT0, "Taito Corporation Japan", "Darius (World)", GAME_SUPPORTS_SAVE )
-GAME( 1986, dariusj,  darius,   darius,   dariusj, darius_state,  darius,   ROT0, "Taito Corporation", "Darius (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1986, dariuso,  darius,   darius,   dariusj, darius_state,  darius,   ROT0, "Taito Corporation", "Darius (Japan old version)", GAME_SUPPORTS_SAVE )
-GAME( 1986, dariuse,  darius,   darius,   dariuse, darius_state,  darius,   ROT0, "Taito Corporation", "Darius (Extra) (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1986, darius,   0,        darius,   darius,  driver_device, 0, ROT0, "Taito Corporation Japan", "Darius (World)", GAME_SUPPORTS_SAVE )
+GAME( 1986, dariusj,  darius,   darius,   dariusj, driver_device, 0, ROT0, "Taito Corporation", "Darius (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1986, dariuso,  darius,   darius,   dariusj, driver_device, 0, ROT0, "Taito Corporation", "Darius (Japan old version)", GAME_SUPPORTS_SAVE )
+GAME( 1986, dariuse,  darius,   darius,   dariuse, driver_device, 0, ROT0, "Taito Corporation", "Darius (Extra) (Japan)", GAME_SUPPORTS_SAVE )

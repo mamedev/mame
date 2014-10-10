@@ -57,7 +57,6 @@ public:
 	/* misc */
 	UINT16     m_cpua_ctrl;
 	UINT16     m_coin_word;
-	INT32      m_banknum;
 	UINT8      m_adpcm_command;
 	UINT8      m_nmi_enable;
 	UINT32     m_def_vol[0x10];
@@ -117,7 +116,6 @@ public:
 	DECLARE_WRITE8_MEMBER(darius_write_portB0);
 	DECLARE_WRITE8_MEMBER(darius_write_portB1);
 	DECLARE_WRITE8_MEMBER(adpcm_data_w);
-	DECLARE_DRIVER_INIT(darius);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	virtual void machine_start();
 	virtual void machine_reset();
@@ -130,7 +128,6 @@ public:
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int primask, int x_offs, int y_offs );
 	UINT32 update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int xoffs);
 	void parse_control(  )   /* assumes Z80 sandwiched between 68Ks */;
-	void reset_sound_region(  );
 	void update_fm0(  );
 	void update_fm1(  );
 	void update_psg0( int port );

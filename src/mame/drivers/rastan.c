@@ -335,10 +335,7 @@ GFXDECODE_END
 
 void rastan_state::machine_start()
 {
-	UINT8 *ROM = memregion("audiocpu")->base();
-
-	membank("bank1")->configure_entry(0, &ROM[0x00000]);
-	membank("bank1")->configure_entries(1, 3, &ROM[0x10000], 0x4000);
+	membank("bank1")->configure_entries(0, 4, memregion("audiocpu")->base(), 0x4000);
 
 	save_item(NAME(m_sprite_ctrl));
 	save_item(NAME(m_sprites_flipscreen));
@@ -434,9 +431,8 @@ ROM_START( rastan )
 	ROM_LOAD16_BYTE( "b04-42.21",  0x40000, 0x10000, CRC(1857a7cb) SHA1(7d967d04ade648c6ddb19aad9e184b6e272856da) )
 	ROM_LOAD16_BYTE( "b04-43-1.9", 0x40001, 0x10000, CRC(ca4702ff) SHA1(0f8c2d7d332c4e35884c48d87ba9fd26924d1692) )
 
-	ROM_REGION( 0x1c000, "audiocpu", 0 )
-	ROM_LOAD( "b04-19.49", 0x00000, 0x4000, CRC(ee81fdd8) SHA1(fa59dac2583a7d2979550dffc6f9c6c2bd67bfd5) )
-	ROM_CONTINUE(          0x10000, 0xc000 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "b04-19.49", 0x00000, 0x10000, CRC(ee81fdd8) SHA1(fa59dac2583a7d2979550dffc6f9c6c2bd67bfd5) )
 
 	ROM_REGION( 0x080000, "gfx1", 0 )
 	ROM_LOAD( "b04-01.40", 0x00000, 0x20000, CRC(cd30de19) SHA1(f8d158d38cd07a24cb5ddefd4ce90beec706924d) )
@@ -463,9 +459,8 @@ ROM_START( rastana )
 	ROM_LOAD16_BYTE( "b04-42.21", 0x40000, 0x10000, CRC(1857a7cb) SHA1(7d967d04ade648c6ddb19aad9e184b6e272856da) )
 	ROM_LOAD16_BYTE( "b04-43.9",  0x40001, 0x10000, CRC(c34b9152) SHA1(6ed9247ad455bc3b71d78b541591b269969830cb) )
 
-	ROM_REGION( 0x1c000, "audiocpu", 0 )
-	ROM_LOAD( "b04-19.49", 0x00000, 0x4000, CRC(ee81fdd8) SHA1(fa59dac2583a7d2979550dffc6f9c6c2bd67bfd5) )
-	ROM_CONTINUE(          0x10000, 0xc000 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "b04-19.49", 0x00000, 0x10000, CRC(ee81fdd8) SHA1(fa59dac2583a7d2979550dffc6f9c6c2bd67bfd5) )
 
 	ROM_REGION( 0x080000, "gfx1", 0 )
 	ROM_LOAD( "b04-01.40", 0x00000, 0x20000, CRC(cd30de19) SHA1(f8d158d38cd07a24cb5ddefd4ce90beec706924d) )
@@ -499,9 +494,8 @@ ROM_START( rastanu ) /* This US set is based on newer code */
 	ROM_LOAD16_BYTE( "b04-42.21",  0x40000, 0x10000, CRC(1857a7cb) SHA1(7d967d04ade648c6ddb19aad9e184b6e272856da) )
 	ROM_LOAD16_BYTE( "b04-41-1.9", 0x40001, 0x10000, CRC(bd403269) SHA1(14aee828d5efb65370a5e453c8fd1c7b3e718074) )
 
-	ROM_REGION( 0x1c000, "audiocpu", 0 )
-	ROM_LOAD( "b04-19.49", 0x00000, 0x4000, CRC(ee81fdd8) SHA1(fa59dac2583a7d2979550dffc6f9c6c2bd67bfd5) )
-	ROM_CONTINUE(          0x10000, 0xc000 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "b04-19.49", 0x00000, 0x10000, CRC(ee81fdd8) SHA1(fa59dac2583a7d2979550dffc6f9c6c2bd67bfd5) )
 
 	ROM_REGION( 0x080000, "gfx1", 0 )
 	ROM_LOAD( "b04-01.40", 0x00000, 0x20000, CRC(cd30de19) SHA1(f8d158d38cd07a24cb5ddefd4ce90beec706924d) )
@@ -528,9 +522,8 @@ ROM_START( rastanua ) /* This US set is based on newer code */
 	ROM_LOAD16_BYTE( "b04-42.21", 0x40000, 0x10000, CRC(1857a7cb) SHA1(7d967d04ade648c6ddb19aad9e184b6e272856da) )
 	ROM_LOAD16_BYTE( "b04-41.9",  0x40001, 0x10000, CRC(b44ca1c4) SHA1(11f1ccc35b6b24aaf253c7994014f08007aba76b) )
 
-	ROM_REGION( 0x1c000, "audiocpu", 0 )
-	ROM_LOAD( "b04-19.49", 0x00000, 0x4000, CRC(ee81fdd8) SHA1(fa59dac2583a7d2979550dffc6f9c6c2bd67bfd5) )
-	ROM_CONTINUE(          0x10000, 0xc000 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "b04-19.49", 0x00000, 0x10000, CRC(ee81fdd8) SHA1(fa59dac2583a7d2979550dffc6f9c6c2bd67bfd5) )
 
 	ROM_REGION( 0x080000, "gfx1", 0 )
 	ROM_LOAD( "b04-01.40", 0x00000, 0x20000, CRC(cd30de19) SHA1(f8d158d38cd07a24cb5ddefd4ce90beec706924d) )
@@ -567,9 +560,8 @@ ROM_START( rastanub ) /* This US set is based on the earlier code */
 	ROM_LOAD16_BYTE( "b04-25.21", 0x40000, 0x10000, CRC(d1e5adee) SHA1(eafc275a0023aecb2efaff14cd890915fa162624) )
 	ROM_LOAD16_BYTE( "b04-24.9",  0x40001, 0x10000, CRC(a3dcc106) SHA1(3a8854530b08864a1f7f46c427e49ceec8297806) )
 
-	ROM_REGION( 0x1c000, "audiocpu", 0 )
-	ROM_LOAD( "b04-19.49", 0x00000, 0x4000, CRC(ee81fdd8) SHA1(fa59dac2583a7d2979550dffc6f9c6c2bd67bfd5) )
-	ROM_CONTINUE(          0x10000, 0xc000 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "b04-19.49", 0x00000, 0x10000, CRC(ee81fdd8) SHA1(fa59dac2583a7d2979550dffc6f9c6c2bd67bfd5) )
 
 	ROM_REGION( 0x080000, "gfx1", 0 )
 	ROM_LOAD( "b04-01.40", 0x00000, 0x20000, CRC(cd30de19) SHA1(f8d158d38cd07a24cb5ddefd4ce90beec706924d) )
@@ -596,9 +588,8 @@ ROM_START( rastsaga )
 	ROM_LOAD16_BYTE( "b04-18-1.21", 0x40000, 0x10000, CRC(b626c439) SHA1(976e820edc4ba107c5b579edaaee1e354e85fb67) )
 	ROM_LOAD16_BYTE( "b04-17-1.9",  0x40001, 0x10000, CRC(c928a516) SHA1(fe87fdf2d1b7ba93e1986460eb6af648b58f42e4) )
 
-	ROM_REGION( 0x1c000, "audiocpu", 0 )
-	ROM_LOAD( "b04-19.49", 0x00000, 0x4000, CRC(ee81fdd8) SHA1(fa59dac2583a7d2979550dffc6f9c6c2bd67bfd5) )
-	ROM_CONTINUE(          0x10000, 0xc000 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "b04-19.49", 0x00000, 0x10000, CRC(ee81fdd8) SHA1(fa59dac2583a7d2979550dffc6f9c6c2bd67bfd5) )
 
 	ROM_REGION( 0x080000, "gfx1", 0 )
 	ROM_LOAD( "b04-01.40", 0x00000, 0x20000, CRC(cd30de19) SHA1(f8d158d38cd07a24cb5ddefd4ce90beec706924d) )
@@ -625,9 +616,8 @@ ROM_START( rastsagaa )
 	ROM_LOAD16_BYTE( "b04-18-1.21", 0x40000, 0x10000, CRC(b626c439) SHA1(976e820edc4ba107c5b579edaaee1e354e85fb67) ) /* Dumped as "RS21_42.BIN", corrected to B04-18-1 */
 	ROM_LOAD16_BYTE( "b04-17-1.9",  0x40001, 0x10000, CRC(c928a516) SHA1(fe87fdf2d1b7ba93e1986460eb6af648b58f42e4) ) /* Dumped as "RS09_43.BIN", corrected to B04-17-1 */
 
-	ROM_REGION( 0x1c000, "audiocpu", 0 )
-	ROM_LOAD( "b04-19.49", 0x00000, 0x4000, CRC(ee81fdd8) SHA1(fa59dac2583a7d2979550dffc6f9c6c2bd67bfd5) )
-	ROM_CONTINUE(          0x10000, 0xc000 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "b04-19.49", 0x00000, 0x10000, CRC(ee81fdd8) SHA1(fa59dac2583a7d2979550dffc6f9c6c2bd67bfd5) )
 
 	ROM_REGION( 0x080000, "gfx1", 0 )
 	ROM_LOAD( "b04-01.40", 0x00000, 0x20000, CRC(cd30de19) SHA1(f8d158d38cd07a24cb5ddefd4ce90beec706924d) )
