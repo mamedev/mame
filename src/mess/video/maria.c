@@ -4,8 +4,17 @@
 
  
   - some history:
-    2014-10-03 Mike Saarna, Robert Tuccitto reorganized DMA penalties to 
-				support new rendering timeout code.
+    2014-10-05 Mike Saarna, Robert Tuccitto Last Line DMA value corrected 
+                to 6. GCC and Atari docs both show a difference between 
+                Other Line and Last Line as +6 at the lowest part of the 
+                range.
+                Blank scanlines are drawn when DMA is off, like real 
+                hardware.
+                If MARIA hits the DMA limit, the CPU doesn't run until 
+                the next scanline.
+
+    2014-09-03 Mike Saarna, Robert Tuccitto reorganized DMA penalties to 
+                support new rendering timeout code.
 
     2014-08-29 Mike Saarna Timeout rendering added.
  
@@ -165,103 +174,115 @@ void atari_maria_device::draw_scanline()
 	int d, c, pixel_cell, cells;
 	int maria_cycles;
 
-	// All lines in a zone have the same initial DMA startup time. We'll adjust
-	// cycles for the special last zone line later, as those penalties happen after
-	// MARIA is done rendering, or after its hit the maximum rendering time.
-	maria_cycles = 16; 
-
 	cells = 0;
 
-	/* Process this DLL entry */
-	dl = m_dl;
-
-	/* DMA */
-	/* Step through DL's while we're within maximum rendering time.   max render time = ( scanline length - DMA start ) */
-	/*                                                                   426          = (     454         -     28    ) */
-
-	while (((READ_MEM(dl + 1) & 0x5f) != 0) && (maria_cycles<426))
+	if(m_dmaon)
 	{
-		/* Extended header */
-		if (!(READ_MEM(dl + 1) & 0x1f))
-		{
-			graph_adr = (READ_MEM(dl + 2) << 8) | READ_MEM(dl);
-			width = ((READ_MEM(dl + 3) ^ 0xff) & 0x1f) + 1;
-			hpos = READ_MEM(dl + 4);
-			pal = READ_MEM(dl + 3) >> 5;
-			m_write_mode = (READ_MEM(dl + 1) & 0x80) >> 5;
-			ind = READ_MEM(dl + 1) & 0x20;
-			dl += 5;
-			maria_cycles += 10;
-		}
-		/* Normal header */
-		else
-		{
-			graph_adr = (READ_MEM(dl + 2) << 8) | READ_MEM(dl);
-			width = ((READ_MEM(dl + 1) ^ 0xff) & 0x1f) + 1;
-			hpos = READ_MEM(dl + 3);
-			pal = READ_MEM(dl + 1) >> 5;
-			ind = 0x00;
-			dl += 4;
-			maria_cycles += 8;
-		}
+		// All lines in a zone have the same initial DMA startup time. We'll adjust
+		// cycles for the special last zone line later, as those penalties happen after
+		// MARIA is done rendering, or after its hit the maximum rendering time.
+		maria_cycles = 16; 
 
-		/*logerror("%x DL: ADR=%x  width=%x  hpos=%x  pal=%x  mode=%x  ind=%x\n", m_screen->vpos(), graph_adr, width, hpos, pal, m_write_mode, ind);*/
 
-		for (int x = 0; x < width; x++)
+		/* Process this DLL entry */
+		dl = m_dl;
+
+		/* DMA */
+		/* Step through DL's while we're within maximum rendering time. */
+		/*  max render time = ( scanline length - DMA start ) */
+		/*     426          = (     454         -     28    ) */
+
+		while (((READ_MEM(dl + 1) & 0x5f) != 0) && (maria_cycles<426))
 		{
-			if (maria_cycles >= 426) // ensure we haven't overrun the maximum render time
-				break;
-
-			/* Do indirect mode */
-			if (ind)
+			/* Extended header */
+			if (!(READ_MEM(dl + 1) & 0x1f))
 			{
-				c = READ_MEM(graph_adr + x) & 0xff;
-				data_addr = (m_charbase | c) + (m_offset << 8);
-				if (is_holey(data_addr))
-					continue;
+				graph_adr = (READ_MEM(dl + 2) << 8) | READ_MEM(dl);
+				width = ((READ_MEM(dl + 3) ^ 0xff) & 0x1f) + 1;
+				hpos = READ_MEM(dl + 4);
+				pal = READ_MEM(dl + 3) >> 5;
+				m_write_mode = (READ_MEM(dl + 1) & 0x80) >> 5;
+				ind = READ_MEM(dl + 1) & 0x20;
+				dl += 5;
+				maria_cycles += 10;
+			}
+			/* Normal header */
+			else
+			{
+				graph_adr = (READ_MEM(dl + 2) << 8) | READ_MEM(dl);
+				width = ((READ_MEM(dl + 1) ^ 0xff) & 0x1f) + 1;
+				hpos = READ_MEM(dl + 3);
+				pal = READ_MEM(dl + 1) >> 5;
+				ind = 0x00;
+				dl += 4;
+				maria_cycles += 8;
+			}
+
+			/*logerror("%x DL: ADR=%x  width=%x  hpos=%x  pal=%x  mode=%x  ind=%x\n", m_screen->vpos(), graph_adr, width, hpos, pal, m_write_mode, ind);*/
+
+			for (int x = 0; x < width; x++)
+			{
+				if (maria_cycles >= 426) // ensure we haven't overrun the maximum render time
+					break;
+
+				/* Do indirect mode */
+				if (ind)
+				{
+					c = READ_MEM(graph_adr + x) & 0xff;
+					data_addr = (m_charbase | c) + (m_offset << 8);
+					if (is_holey(data_addr))
+						continue;
 				
-				maria_cycles += 3;
-				if (m_cwidth) // two data bytes per map byte
-				{
-					cells = write_line_ram(data_addr, hpos, pal);
-					hpos += cells;
-					cells = write_line_ram(data_addr+1, hpos, pal);
-					hpos += cells;
-					maria_cycles += 6;
+					maria_cycles += 3;
+					if (m_cwidth) // two data bytes per map byte
+					{
+						cells = write_line_ram(data_addr, hpos, pal);
+						hpos += cells;
+						cells = write_line_ram(data_addr+1, hpos, pal);
+						hpos += cells;
+						maria_cycles += 6;
+					}
+					else
+					{
+						cells = write_line_ram(data_addr, hpos, pal);
+						hpos += cells;
+						maria_cycles += 3;
+					}
 				}
-				else
+				else // direct mode
 				{
+					data_addr = graph_adr + x + (m_offset  << 8);
+					if (is_holey(data_addr))
+						continue;
 					cells = write_line_ram(data_addr, hpos, pal);
 					hpos += cells;
 					maria_cycles += 3;
 				}
 			}
-			else // direct mode
-			{
-				data_addr = graph_adr + x + (m_offset  << 8);
-				if (is_holey(data_addr))
-					continue;
-				cells = write_line_ram(data_addr, hpos, pal);
-				hpos += cells;
-				maria_cycles += 3;
-			}
 		}
-	}
 	
-	// Last Line post-render DMA cycle penalties...
-	if (m_offset == 0) 
-	{
-		maria_cycles += 3; // extra shutdown time
-		if (READ_MEM(m_dll + 3) & 0x80)
-			maria_cycles += 21; // interrupt overhead
-	}
+		// Last Line post-render DMA cycle penalties...
+		if (m_offset == 0) 
+		{
+			maria_cycles += 6; // extra shutdown time
+			if (READ_MEM(m_dll + 3) & 0x80)
+				maria_cycles += 17; // interrupt overhead
+		}
 
-	// Spin the CPU for Maria DMA, if it's not already spinning for WSYNC.
-	// MARIA generates the 6502 clock by dividing its own clock by 4. It needs to HALT and unHALT
-	// the 6502 on ths same clock phase, so MARIA will wait until its clock divides evenly by 4.
-	// To spin until an even divisor, we just round-up any would-be truncations by adding 3.
-	if (!m_wsync)
-		m_cpu->spin_until_time(m_cpu->cycles_to_attotime((maria_cycles+3)/4));
+		// If MARIA used up all of the DMA time then the CPU can't run until next line...
+		if (maria_cycles>=426)
+		{
+			m_cpu->spin_until_trigger(TRIGGER_HSYNC);
+			m_wsync = 1;
+		}
+
+		// Spin the CPU for Maria DMA, if it's not already spinning for WSYNC.
+		// MARIA generates the 6502 clock by dividing its own clock by 4. It needs to HALT and unHALT
+		// the 6502 on ths same clock phase, so MARIA will wait until its clock divides evenly by 4.
+		// To spin until an even divisor, we just round-up any would-be truncations by adding 3.
+		if (!m_wsync)
+			m_cpu->spin_until_time(m_cpu->cycles_to_attotime((maria_cycles+3)/4));
+	}
 
 	// draw line buffer to screen
 	m_active_buffer = !m_active_buffer; // switch buffers
@@ -335,13 +356,13 @@ void atari_maria_device::startdma(int lines)
 		m_holey = (READ_MEM(m_dll) & 0x60) >> 5;
 		m_nmi = READ_MEM(m_dll) & 0x80;
 		/*  logerror("DLL=%x\n",m_dll); */
-		draw_scanline();
 	}
 
+	if ((frame_scanline > 15) && (frame_scanline < (lines - 5)))
+		draw_scanline();
 
 	if ((frame_scanline > 16) && (frame_scanline < (lines - 5)) && m_dmaon)
 	{
-		draw_scanline();
 		if (m_offset == 0)
 		{
 			m_dll += 3;
