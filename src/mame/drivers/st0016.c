@@ -14,7 +14,7 @@ Dips verified for Neratte Chu (nratechu) from manual
 #include "cpu/z80/z80.h"
 #include "sound/st0016.h"
 #include "includes/st0016.h"
-
+#include "machine/st0016.h"
 
 
 UINT32 st0016_rom_bank;
@@ -32,7 +32,7 @@ static ADDRESS_MAP_START( st0016_mem, AS_PROGRAM, 8, st0016_state )
 	AM_RANGE(0xd000, 0xdfff) AM_READ(st0016_sprite2_ram_r) AM_WRITE(st0016_sprite2_ram_w)
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM
 	AM_RANGE(0xe800, 0xe87f) AM_RAM /* common ram */
-	AM_RANGE(0xe900, 0xe9ff) AM_DEVREADWRITE("stsnd", st0016_device, st0016_snd_r, st0016_snd_w) /* sound regs 8 x $20 bytes, see notes */
+	//AM_RANGE(0xe900, 0xe9ff) // sound - internal
 	AM_RANGE(0xea00, 0xebff) AM_READ(st0016_palette_ram_r) AM_WRITE(st0016_palette_ram_w)
 	AM_RANGE(0xec00, 0xec1f) AM_READ(st0016_character_ram_r) AM_WRITE(st0016_character_ram_w)
 	AM_RANGE(0xf000, 0xffff) AM_RAM /* work ram */
@@ -395,10 +395,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(st0016_state::st0016_int)
 			m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE );
 }
 
-static const st0016_interface st0016_config =
-{
-	&st0016_charram
-};
+
 
 
 /*************************************
@@ -409,7 +406,7 @@ static const st0016_interface st0016_config =
 
 static MACHINE_CONFIG_START( st0016, st0016_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80,8000000) /* 8 MHz ? */
+	MCFG_CPU_ADD("maincpu",ST0016_CPU,8000000) /* 8 MHz ? */
 	MCFG_CPU_PROGRAM_MAP(st0016_mem)
 	MCFG_CPU_IO_MAP(st0016_io)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", st0016_state, st0016_int, "screen", 0, 1)
@@ -428,12 +425,6 @@ static MACHINE_CONFIG_START( st0016, st0016_state )
 
 	MCFG_VIDEO_START_OVERRIDE(st0016_state,st0016)
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-
-	MCFG_ST0016_ADD("stsnd", 0)
-	MCFG_SOUND_CONFIG(st0016_config)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( mayjinsn, st0016 )

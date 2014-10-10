@@ -96,9 +96,8 @@ To do:
 #include "cpu/m68000/m68000.h"
 #include "machine/eepromser.h"
 #include "sound/okim6295.h"
-#include "sound/st0016.h"
 #include "includes/st0016.h"
-#include "cpu/z80/z80.h"
+#include "machine/st0016.h"
 #include "video/st0020.h"
 #include "machine/nvram.h"
 
@@ -1038,7 +1037,7 @@ MACHINE_CONFIG_END
 static ADDRESS_MAP_START( st0016_mem, AS_PROGRAM, 8, darkhors_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xe900, 0xe9ff) AM_DEVREADWRITE("stsnd", st0016_device, st0016_snd_r, st0016_snd_w)
+	//AM_RANGE(0xe900, 0xe9ff) // sound - internal
 	AM_RANGE(0xec00, 0xec1f) AM_READ(st0016_character_ram_r) AM_WRITE(st0016_character_ram_w)
 	AM_RANGE(0xe82f, 0xe830) AM_READNOP
 	AM_RANGE(0xf000, 0xffff) AM_RAM
@@ -1055,10 +1054,6 @@ static ADDRESS_MAP_START( st0016_io, AS_IO, 8, darkhors_state )
 	//AM_RANGE(0xf0, 0xf0) AM_READ(st0016_dma_r)
 ADDRESS_MAP_END
 
-static const st0016_interface st0016_config =
-{
-	&st0016_charram
-};
 
 VIDEO_START_MEMBER(darkhors_state,jclub2o)
 {
@@ -1075,7 +1070,7 @@ static MACHINE_CONFIG_START( jclub2o, darkhors_state )
 	MCFG_CPU_PROGRAM_MAP(jclub2o_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", darkhors_state, darkhors_irq, "screen", 0, 1)
 
-	MCFG_CPU_ADD("st0016",Z80,8000000)
+	MCFG_CPU_ADD("st0016",ST0016_CPU,8000000)
 	MCFG_CPU_PROGRAM_MAP(st0016_mem)
 	MCFG_CPU_IO_MAP(st0016_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", darkhors_state,  irq0_line_hold)
@@ -1104,12 +1099,6 @@ static MACHINE_CONFIG_START( jclub2o, darkhors_state )
 
 	MCFG_VIDEO_START_OVERRIDE(darkhors_state,jclub2o)
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-
-	MCFG_ST0016_ADD("stsnd", 0)
-	MCFG_SOUND_CONFIG(st0016_config)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 

@@ -35,9 +35,8 @@ This is not a bug (real machine behaves the same).
 
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
+#include "machine/st0016.h"
 #include "cpu/mips/r3000.h"
-#include "sound/st0016.h"
 #include "includes/st0016.h"
 
 #define DEBUG_CHAR
@@ -370,7 +369,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( st0016_mem, AS_PROGRAM, 8, srmp5_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xe900, 0xe9ff) AM_DEVREADWRITE("stsnd", st0016_device, st0016_snd_r, st0016_snd_w)
+	//AM_RANGE(0xe900, 0xe9ff) // sound - internal
 	AM_RANGE(0xec00, 0xec1f) AM_READ(st0016_character_ram_r) AM_WRITE(st0016_character_ram_w)
 	AM_RANGE(0xf000, 0xffff) AM_RAM
 ADDRESS_MAP_END
@@ -497,10 +496,6 @@ static INPUT_PORTS_START( srmp5 )
 
 INPUT_PORTS_END
 
-static const st0016_interface st0016_config =
-{
-	&st0016_charram
-};
 
 static const gfx_layout tile_16x8x8_layout =
 {
@@ -534,7 +529,7 @@ GFXDECODE_END
 static MACHINE_CONFIG_START( srmp5, srmp5_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80,8000000)
+	MCFG_CPU_ADD("maincpu",ST0016_CPU,8000000)
 	MCFG_CPU_PROGRAM_MAP(st0016_mem)
 	MCFG_CPU_IO_MAP(st0016_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", srmp5_state,  irq0_line_hold)
@@ -559,12 +554,6 @@ static MACHINE_CONFIG_START( srmp5, srmp5_state )
 #endif
 	MCFG_VIDEO_START_OVERRIDE(st0016_state,st0016)
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-
-	MCFG_ST0016_ADD("stsnd", 0)
-	MCFG_SOUND_CONFIG(st0016_config)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 ROM_START( srmp5 )
