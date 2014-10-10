@@ -613,6 +613,12 @@ WRITE8_MEMBER(wecleman_state::multiply_w)
 
 ** sample playing ends when a byte with bit 7 set is reached **/
 
+WRITE8_MEMBER(wecleman_state::wecleman_volume_callback)
+{
+	m_k007232->set_volume(0, (data >> 4) * 0x11, 0);
+	m_k007232->set_volume(1, 0, (data & 0x0f) * 0x11);
+}
+
 WRITE8_MEMBER(wecleman_state::wecleman_K00723216_bank_w)
 {
 	m_k007232->set_bank(0, ~data&1 );  //* (wecleman062gre)
@@ -1078,6 +1084,7 @@ static MACHINE_CONFIG_START( wecleman, wecleman_state )
 	MCFG_SOUND_ROUTE(1, "mono", 0.85)
 
 	MCFG_SOUND_ADD("k007232", K007232, 3579545)
+	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(wecleman_state, wecleman_volume_callback))
 	MCFG_SOUND_ROUTE(0, "mono", 0.20)
 	MCFG_SOUND_ROUTE(1, "mono", 0.20)
 MACHINE_CONFIG_END
@@ -1153,14 +1160,17 @@ static MACHINE_CONFIG_START( hotchase, wecleman_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("k007232_1", K007232, 3579545)
+	// SLEV not used, volume control is elsewhere
 	MCFG_SOUND_ROUTE(0, "mono", 0.20)
 	MCFG_SOUND_ROUTE(1, "mono", 0.20)
 
 	MCFG_SOUND_ADD("k007232_2", K007232, 3579545)
+	// SLEV not used, volume control is elsewhere
 	MCFG_SOUND_ROUTE(0, "mono", 0.20)
 	MCFG_SOUND_ROUTE(1, "mono", 0.20)
 
 	MCFG_SOUND_ADD("k007232_3", K007232, 3579545)
+	// SLEV not used, volume control is elsewhere
 	MCFG_SOUND_ROUTE(0, "mono", 0.20)
 	MCFG_SOUND_ROUTE(1, "mono", 0.20)
 MACHINE_CONFIG_END
