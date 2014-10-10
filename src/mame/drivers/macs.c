@@ -89,13 +89,13 @@ public:
 static ADDRESS_MAP_START( macs_mem, AS_PROGRAM, 8, macs_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROMBANK("bank4")
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xcfff) AM_READ(st0016_sprite_ram_r) AM_WRITE(st0016_sprite_ram_w)
-	AM_RANGE(0xd000, 0xdfff) AM_READ(st0016_sprite2_ram_r) AM_WRITE(st0016_sprite2_ram_w)
+	//AM_RANGE(0xc000, 0xcfff) AM_READ(st0016_sprite_ram_r) AM_WRITE(st0016_sprite_ram_w)
+	//AM_RANGE(0xd000, 0xdfff) AM_READ(st0016_sprite2_ram_r) AM_WRITE(st0016_sprite2_ram_w)
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM /* work ram ? */
 	AM_RANGE(0xe800, 0xe87f) AM_RAM AM_SHARE("ram2")
 	//AM_RANGE(0xe900, 0xe9ff) // sound - internal
-	AM_RANGE(0xea00, 0xebff) AM_READ(st0016_palette_ram_r) AM_WRITE(st0016_palette_ram_w)
-	AM_RANGE(0xec00, 0xec1f) AM_READ(st0016_character_ram_r) AM_WRITE(st0016_character_ram_w)
+	//AM_RANGE(0xea00, 0xebff) AM_READ(st0016_palette_ram_r) AM_WRITE(st0016_palette_ram_w)
+	//AM_RANGE(0xec00, 0xec1f) AM_READ(st0016_character_ram_r) AM_WRITE(st0016_character_ram_w)
 	AM_RANGE(0xf000, 0xf7ff) AM_RAMBANK("bank3") /* common /backup ram ?*/
 	AM_RANGE(0xf800, 0xffff) AM_RAMBANK("bank2") /* common /backup ram ?*/
 ADDRESS_MAP_END
@@ -178,16 +178,16 @@ WRITE8_MEMBER(macs_state::macs_output_w)
 
 static ADDRESS_MAP_START( macs_io, AS_IO, 8, macs_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0xbf) AM_READ(st0016_vregs_r) AM_WRITE(st0016_vregs_w) /* video/crt regs ? */
+	//AM_RANGE(0x00, 0xbf) AM_READ(st0016_vregs_r) AM_WRITE(st0016_vregs_w) /* video/crt regs ? */
 	AM_RANGE(0xc0, 0xc7) AM_READWRITE(macs_input_r,macs_output_w)
 	AM_RANGE(0xe0, 0xe0) AM_WRITENOP /* renju = $40, neratte = 0 */
 	AM_RANGE(0xe1, 0xe1) AM_WRITE(macs_rom_bank_w)
-	AM_RANGE(0xe2, 0xe2) AM_WRITE(st0016_sprite_bank_w)
-	AM_RANGE(0xe3, 0xe4) AM_WRITE(st0016_character_bank_w)
-	AM_RANGE(0xe5, 0xe5) AM_WRITE(st0016_palette_bank_w)
+	//AM_RANGE(0xe2, 0xe2) AM_WRITE(st0016_sprite_bank_w)
+	//AM_RANGE(0xe3, 0xe4) AM_WRITE(st0016_character_bank_w)
+	//AM_RANGE(0xe5, 0xe5) AM_WRITE(st0016_palette_bank_w)
 	AM_RANGE(0xe6, 0xe6) AM_WRITE(rambank_w) /* banking ? ram bank ? shared rambank ? */
 	AM_RANGE(0xe7, 0xe7) AM_WRITENOP /* watchdog */
-	AM_RANGE(0xf0, 0xf0) AM_READ(st0016_dma_r)
+	//AM_RANGE(0xf0, 0xf0) AM_READ(st0016_dma_r)
 ADDRESS_MAP_END
 
 static GFXDECODE_START( macs )
@@ -488,10 +488,7 @@ static MACHINE_CONFIG_START( macs, macs_state )
 	MCFG_SCREEN_SIZE(128*8, 128*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 128*8-1, 0*8, 128*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(st0016_state, screen_update_st0016)
-	MCFG_SCREEN_PALETTE("palette")
-
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", macs)
-	MCFG_PALETTE_ADD("palette", 16*16*4+1)
+	MCFG_SCREEN_PALETTE("maincpu:palette")
 
 	MCFG_VIDEO_START_OVERRIDE(st0016_state,st0016)
 MACHINE_CONFIG_END
@@ -711,28 +708,28 @@ MACHINE_RESET_MEMBER(macs_state,macs)
 DRIVER_INIT_MEMBER(macs_state,macs)
 {
 	m_ram1=auto_alloc_array(machine(), UINT8, 0x20000);
-	st0016_game=10|0x80;
+	m_maincpu->st0016_game=10|0x80;
 	m_rev = 1;
 }
 
 DRIVER_INIT_MEMBER(macs_state,macs2)
 {
 	m_ram1=auto_alloc_array(machine(), UINT8, 0x20000);
-	st0016_game=10|0x80;
+	m_maincpu->st0016_game=10|0x80;
 	m_rev = 2;
 }
 
 DRIVER_INIT_MEMBER(macs_state,kisekaeh)
 {
 	m_ram1=auto_alloc_array(machine(), UINT8, 0x20000);
-	st0016_game=11|0x180;
+	m_maincpu->st0016_game=11|0x180;
 	m_rev = 1;
 }
 
 DRIVER_INIT_MEMBER(macs_state,kisekaem)
 {
 	m_ram1=auto_alloc_array(machine(), UINT8, 0x20000);
-	st0016_game=10|0x180;
+	m_maincpu->st0016_game=10|0x180;
 	m_rev = 1;
 }
 

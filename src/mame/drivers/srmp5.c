@@ -34,6 +34,8 @@ This is not a bug (real machine behaves the same).
 */
 
 
+// this uploads a charset for the st0016, but never a palette, seems to be for sound only?
+
 #include "emu.h"
 #include "machine/st0016.h"
 #include "cpu/mips/r3000.h"
@@ -64,7 +66,11 @@ class srmp5_state : public st0016_state
 {
 public:
 	srmp5_state(const machine_config &mconfig, device_type type, const char *tag)
-		: st0016_state(mconfig, type, tag) { }
+		: st0016_state(mconfig, type, tag),
+		 m_gfxdecode(*this, "gfxdecode"),
+		 m_palette(*this, "palette")
+	
+	{ }
 
 	UINT32 m_databank;
 	UINT16 *m_tileram;
@@ -102,6 +108,8 @@ public:
 	DECLARE_READ8_MEMBER(cmd_stat8_r);
 	DECLARE_DRIVER_INIT(srmp5);
 	UINT32 screen_update_srmp5(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 };
 
 
@@ -370,7 +378,7 @@ static ADDRESS_MAP_START( st0016_mem, AS_PROGRAM, 8, srmp5_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	//AM_RANGE(0xe900, 0xe9ff) // sound - internal
-	AM_RANGE(0xec00, 0xec1f) AM_READ(st0016_character_ram_r) AM_WRITE(st0016_character_ram_w)
+	//AM_RANGE(0xec00, 0xec1f) AM_READ(st0016_character_ram_r) AM_WRITE(st0016_character_ram_w)
 	AM_RANGE(0xf000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -392,13 +400,13 @@ READ8_MEMBER(srmp5_state::cmd_stat8_r)
 
 static ADDRESS_MAP_START( st0016_io, AS_IO, 8, srmp5_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0xbf) AM_READ(st0016_vregs_r) AM_WRITE(st0016_vregs_w)
+	//AM_RANGE(0x00, 0xbf) AM_READ(st0016_vregs_r) AM_WRITE(st0016_vregs_w)
 	AM_RANGE(0xc0, 0xc0) AM_READ(cmd1_r)
 	AM_RANGE(0xc1, 0xc1) AM_READ(cmd2_r)
 	AM_RANGE(0xc2, 0xc2) AM_READ(cmd_stat8_r)
 	AM_RANGE(0xe1, 0xe1) AM_WRITE(st0016_rom_bank_w)
 	AM_RANGE(0xe7, 0xe7) AM_WRITE(st0016_rom_bank_w)
-	AM_RANGE(0xf0, 0xf0) AM_READ(st0016_dma_r)
+	//AM_RANGE(0xf0, 0xf0) AM_READ(st0016_dma_r)
 ADDRESS_MAP_END
 
 
@@ -583,7 +591,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(srmp5_state,srmp5)
 {
-	st0016_game = 9;
+	m_maincpu->st0016_game = 9;
 
 	m_tileram = auto_alloc_array(machine(), UINT16, 0x100000/2);
 	m_sprram  = auto_alloc_array(machine(), UINT16, 0x080000/2);
