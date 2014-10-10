@@ -225,3 +225,154 @@ FLOPPY_CONSTRUCT( cqm_dsk_construct )
 
 	return FLOPPY_ERROR_SUCCESS;
 }
+
+
+
+
+/*********************************************************************
+
+    formats/cqm_dsk.c
+
+    CopyQM disk images
+
+*********************************************************************/
+
+#include "cqm_dsk.h"
+
+cqm_format::cqm_format()
+{
+}
+
+const char *cqm_format::name() const
+{
+	return "cqm";
+}
+
+const char *cqm_format::description() const
+{
+	return "CopyQM disk image";
+}
+
+const char *cqm_format::extensions() const
+{
+	return "cqm,cqi,dsk";
+}
+
+int cqm_format::identify(io_generic *io, UINT32 form_factor)
+{
+	UINT8 h[3];
+	io_generic_read(io, h, 0, 3);
+
+	if (h[0] == 'C' && h[1] == 'Q' && h[2] == 0x14)
+		return 100;
+
+	return 0;
+}
+
+bool cqm_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
+{
+	const int max_size = 4*1024*1024; // 4MB ought to be large enough for any floppy
+	dynamic_buffer imagebuf(max_size);
+	UINT8 header[CQM_HEADER_SIZE];
+	io_generic_read(io, header, 0, CQM_HEADER_SIZE);
+
+	int sector_size      = (header[0x04] << 8) | header[0x03];
+	int sector_per_track = (header[0x11] << 8) | header[0x10];
+	int heads            = (header[0x13] << 8) | header[0x12];
+	int tracks           = header[0x5b];
+//  int blind            = header[0x58];    // 0=DOS, 1=blind, 2=HFS
+	int density          = header[0x59];    // 0=DD, 1=HD, 2=ED
+	int comment_size     = (header[0x70] << 8) | header[0x6f];
+	int sector_base      = header[0x71] + 1;
+//  int interleave       = header[0x74];    // TODO
+//  int skew             = header[0x75];    // TODO
+//  int drive            = header[0x76];    // source drive type: 1=5.25" 360KB, 2=5.25" 1.2MB, 3=3.5" 720KB, 4=3.5" 1.44MB, 6=3.5" 2.88MB, 8" is unknown (0 or 5?)
+
+	switch(density)
+	{
+		case 0:
+			if (form_factor == floppy_image::FF_525 && tracks > 50)
+				image->set_variant(heads == 1 ? floppy_image::SSQD : floppy_image::DSQD);
+			else
+				image->set_variant(heads == 1 ? floppy_image::SSDD : floppy_image::DSDD);
+			break;
+		case 1:
+			if (heads == 1)
+				return false; // single side HD ?
+			image->set_variant(floppy_image::DSHD);
+			break;
+		case 2:
+			if (heads == 1)
+				return false; // single side ED ?
+			image->set_variant(floppy_image::DSED);
+		default:
+			return false;
+	}
+
+	static const int rates[3] = { 250000, 300000, 500000 };
+	int rate = density >= 3 ? 500000 : rates[density];
+	int rpm = form_factor == floppy_image::FF_8 || (form_factor == floppy_image::FF_525 && rate >= 300000) ? 360 : 300;
+	int base_cell_count = rate*60/rpm;
+
+	int cqm_size = io_generic_size(io);
+	dynamic_buffer cqmbuf(cqm_size);
+	io_generic_read(io, cqmbuf, 0, cqm_size);
+
+	// decode the RLE data
+	for (int s = 0, pos = CQM_HEADER_SIZE + comment_size; pos < cqm_size; )
+	{
+		INT16 len = (cqmbuf[pos + 1] << 8) | cqmbuf[pos];
+		pos += 2;
+		if(len < 0)
+		{
+			len = -len;
+			memset(&imagebuf[s], cqmbuf[pos], len);
+			pos++;
+		}
+		else
+		{
+			memcpy(&imagebuf[s], &cqmbuf[pos], len);
+			pos += len;
+		}
+
+		s += len;
+	}
+
+	int ssize;
+	for(ssize=0; (128 << ssize) < sector_size; ssize++)
+		;
+
+	desc_pc_sector sects[256];
+	for(int track = 0, pos = 0; track < tracks; track++)
+		for(int head = 0; head < heads; head++)
+		{
+			for(int sector = 0; sector < sector_per_track; sector++)
+			{
+				sects[sector].track       = track;
+				sects[sector].head        = head;
+				sects[sector].sector      = sector_base + sector;
+				sects[sector].size        = ssize;
+				sects[sector].deleted     = false;
+				sects[sector].bad_crc     = false;
+				sects[sector].actual_size = sector_size;
+				sects[sector].data        = &imagebuf[pos];
+				pos += sector_size;
+			}
+
+			build_pc_track_mfm(track, head, image, base_cell_count*2, sector_per_track, sects, calc_default_pc_gap3_size(form_factor, sector_size));
+		}
+
+	return true;
+}
+
+bool cqm_format::save(io_generic *io, floppy_image *image)
+{
+	return false;
+}
+
+bool cqm_format::supports_save() const
+{
+	return false;
+}
+
+const floppy_format_type FLOPPY_CQM_FORMAT = &floppy_image_format_creator<cqm_format>;

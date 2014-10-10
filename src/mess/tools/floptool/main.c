@@ -35,6 +35,7 @@
 #include "formats/d88_dsk.h"
 #include "formats/imd_dsk.h"
 #include "formats/td0_dsk.h"
+#include "formats/cqm_dsk.h"
 #include "formats/pc_dsk.h"
 #include "formats/naslite_dsk.h"
 
@@ -62,6 +63,7 @@ static floppy_format_type floppy_formats[] = {
 	FLOPPY_D88_FORMAT,
 	FLOPPY_IMD_FORMAT,
 	FLOPPY_TD0_FORMAT,
+	FLOPPY_CQM_FORMAT,
 	FLOPPY_PC_FORMAT,
 	FLOPPY_NASLITE_FORMAT,
 

@@ -714,6 +714,8 @@ static MACHINE_CONFIG_START( dmv, dmv_state )
 	MCFG_DMVCART_SLOT_OUT_THOLD_CB(WRITELINE(dmv_state, thold7_w))
 	MCFG_DMVCART_SLOT_OUT_IRQ_CB(WRITELINE(dmv_state, busint_w))
 
+	MCFG_SOFTWARE_LIST_ADD("flop_list", "dmv")
+
 MACHINE_CONFIG_END
 
 /* ROM definition */
