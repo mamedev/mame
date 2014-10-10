@@ -1791,7 +1791,7 @@ $(MAMEOBJ)/seta.a: \
 	$(DRIVERS)/srmp6.o \
 	$(DRIVERS)/ssv.o $(VIDEO)/ssv.o \
 	$(VIDEO)/st0020.o \
-	$(MACHINE)/st0016.o $(DRIVERS)/st0016.o $(VIDEO)/st0016.o \
+	$(MACHINE)/st0016.o $(DRIVERS)/simple_st0016.o \
 	$(VIDEO)/seta001.o \
 
 $(MAMEOBJ)/sigma.a: \

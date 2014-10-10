@@ -106,18 +106,19 @@ Notes:
 #include "emu.h"
 #include "machine/st0016.h"
 #include "cpu/mips/r3000.h"
-#include "includes/st0016.h"
 
 
-class speglsht_state : public st0016_state
+class speglsht_state : public driver_device
 {
 public:
 	speglsht_state(const machine_config &mconfig, device_type type, const char *tag)
-		: st0016_state(mconfig, type, tag),
+		: driver_device(mconfig, type, tag),
 			m_shared(*this, "shared"),
 			m_framebuffer(*this, "framebuffer"),
 			m_cop_ram(*this, "cop_ram"),
-			m_palette(*this, "palette")
+			m_palette(*this, "palette"),
+			m_maincpu(*this,"maincpu"),
+			m_subcpu(*this, "sub")
 			{ }
 
 	required_shared_ptr<UINT8> m_shared;
@@ -136,7 +137,10 @@ public:
 	DECLARE_VIDEO_START(speglsht);
 	UINT32 screen_update_speglsht(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	required_device<palette_device> m_palette;
+	optional_device<st0016_cpu_device> m_maincpu;
+	optional_device<cpu_device> m_subcpu;
 
+	DECLARE_WRITE8_MEMBER(st0016_rom_bank_w);
 };
 
 
@@ -152,6 +156,13 @@ static ADDRESS_MAP_START( st0016_mem, AS_PROGRAM, 8, speglsht_state )
 	//AM_RANGE(0xec00, 0xec1f) AM_READ(st0016_character_ram_r) AM_WRITE(st0016_character_ram_w)
 	AM_RANGE(0xf000, 0xffff) AM_RAM AM_SHARE("shared")
 ADDRESS_MAP_END
+
+// common rombank? should go in machine/st0016 with larger address space exposed?
+WRITE8_MEMBER(speglsht_state::st0016_rom_bank_w)
+{
+	membank("bank1")->set_base(memregion("maincpu")->base() + (data* 0x4000));
+}
+
 
 static ADDRESS_MAP_START( st0016_io, AS_IO, 8, speglsht_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
@@ -333,7 +344,7 @@ MACHINE_RESET_MEMBER(speglsht_state,speglsht)
 VIDEO_START_MEMBER(speglsht_state,speglsht)
 {
 	m_bitmap = auto_bitmap_ind16_alloc(machine(), 512, 5122 );
-	VIDEO_START_CALL_MEMBER(st0016);
+//	VIDEO_START_CALL_MEMBER(st0016);
 }
 
 #define PLOT_PIXEL_RGB(x,y,r,g,b)   if(y>=0 && x>=0 && x<512 && y<512) \

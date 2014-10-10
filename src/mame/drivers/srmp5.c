@@ -39,7 +39,6 @@ This is not a bug (real machine behaves the same).
 #include "emu.h"
 #include "machine/st0016.h"
 #include "cpu/mips/r3000.h"
-#include "includes/st0016.h"
 
 #define DEBUG_CHAR
 
@@ -62,13 +61,15 @@ This is not a bug (real machine behaves the same).
 
 #define SPRITE_DATA_GRANULARITY 0x80
 
-class srmp5_state : public st0016_state
+class srmp5_state : public driver_device
 {
 public:
 	srmp5_state(const machine_config &mconfig, device_type type, const char *tag)
-		: st0016_state(mconfig, type, tag),
+		: driver_device(mconfig, type, tag),
 		 m_gfxdecode(*this, "gfxdecode"),
-		 m_palette(*this, "palette")
+		 m_palette(*this, "palette"),
+		m_maincpu(*this,"maincpu"),
+		 m_subcpu(*this, "sub")
 	
 	{ }
 
@@ -110,6 +111,10 @@ public:
 	UINT32 screen_update_srmp5(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	optional_device<st0016_cpu_device> m_maincpu;
+	optional_device<cpu_device> m_subcpu;
+
+	DECLARE_WRITE8_MEMBER(st0016_rom_bank_w);
 };
 
 
@@ -398,6 +403,13 @@ READ8_MEMBER(srmp5_state::cmd_stat8_r)
 	return m_cmd_stat;
 }
 
+// common rombank? should go in machine/st0016 with larger address space exposed?
+WRITE8_MEMBER(srmp5_state::st0016_rom_bank_w)
+{
+	membank("bank1")->set_base(memregion("maincpu")->base() + (data* 0x4000));
+}
+
+
 static ADDRESS_MAP_START( st0016_io, AS_IO, 8, srmp5_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	//AM_RANGE(0x00, 0xbf) AM_READ(st0016_vregs_r) AM_WRITE(st0016_vregs_w)
@@ -560,7 +572,7 @@ static MACHINE_CONFIG_START( srmp5, srmp5_state )
 #ifdef DEBUG_CHAR
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", srmp5 )
 #endif
-	MCFG_VIDEO_START_OVERRIDE(st0016_state,st0016)
+	//MCFG_VIDEO_START_OVERRIDE(st0016_state,st0016)
 
 MACHINE_CONFIG_END
 

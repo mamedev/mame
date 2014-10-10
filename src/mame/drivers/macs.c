@@ -57,15 +57,17 @@ KISEKAE -- info
 
 #include "emu.h"
 #include "machine/st0016.h"
-#include "includes/st0016.h"
 
 
-class macs_state : public st0016_state
+class macs_state : public driver_device
 {
 public:
 	macs_state(const machine_config &mconfig, device_type type, const char *tag)
-		: st0016_state(mconfig, type, tag),
-			m_ram2(*this, "ram2") { }
+		: driver_device(mconfig, type, tag),
+			m_ram2(*this, "ram2"),
+			m_maincpu(*this,"maincpu")
+
+			{ }
 
 	UINT8 m_mux_data;
 	UINT8 m_rev;
@@ -80,6 +82,11 @@ public:
 	DECLARE_DRIVER_INIT(kisekaem);
 	DECLARE_DRIVER_INIT(macs2);
 	DECLARE_MACHINE_RESET(macs);
+	
+	UINT32 screen_update_macs(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	optional_device<st0016_cpu_device> m_maincpu;
+
 };
 
 
@@ -142,7 +149,7 @@ WRITE8_MEMBER(macs_state::macs_rom_bank_w)
 {
 	membank("bank1")->set_base(memregion("maincpu")->base() + (data* 0x4000) + macs_cart_slot*0x400000 );
 
-	m_st0016_rom_bank=data;
+//	m_st0016_rom_bank=data;
 }
 
 WRITE8_MEMBER(macs_state::macs_output_w)
@@ -469,6 +476,10 @@ static INPUT_PORTS_START( macs_h )
 INPUT_PORTS_END
 
 
+UINT32 macs_state::screen_update_macs(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	return m_maincpu->update(screen,bitmap,cliprect);
+}
 
 
 static MACHINE_CONFIG_START( macs, macs_state )
@@ -487,10 +498,8 @@ static MACHINE_CONFIG_START( macs, macs_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(128*8, 128*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 128*8-1, 0*8, 128*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(st0016_state, screen_update_st0016)
+	MCFG_SCREEN_UPDATE_DRIVER(macs_state, screen_update_macs)
 	MCFG_SCREEN_PALETTE("maincpu:palette")
-
-	MCFG_VIDEO_START_OVERRIDE(st0016_state,st0016)
 MACHINE_CONFIG_END
 
 

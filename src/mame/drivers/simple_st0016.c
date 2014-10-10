@@ -1,6 +1,13 @@
 /*******************************************
+
   Seta custom ST-0016 chip based games.
     driver by Tomasz Slanina
+
+  this is for 'simple' games using the chip
+  where the chip is providing the maincpu
+  video, and sound functionality of the game
+  rather than acting as a sub-cpu
+
 ********************************************
 
 Todo:
@@ -13,11 +20,10 @@ Dips verified for Neratte Chu (nratechu) from manual
 #include "cpu/v810/v810.h"
 #include "cpu/z80/z80.h"
 #include "sound/st0016.h"
-#include "includes/st0016.h"
+#include "includes/simple_st0016.h"
 #include "machine/st0016.h"
 
 
-UINT32 st0016_rom_bank;
 
 /*************************************
  *
@@ -71,7 +77,7 @@ WRITE8_MEMBER(st0016_state::mux_select_w)
 WRITE8_MEMBER(st0016_state::st0016_rom_bank_w)
 {
 	membank("bank1")->set_base(memregion("maincpu")->base() + (data* 0x4000));
-	st0016_rom_bank=data;
+//	st0016_rom_bank=data;
 }
 
 static ADDRESS_MAP_START( st0016_io, AS_IO, 8, st0016_state )
@@ -389,6 +395,12 @@ TIMER_DEVICE_CALLBACK_MEMBER(st0016_state::st0016_int)
  *
  *************************************/
 
+UINT32 st0016_state::screen_update_st0016(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	return m_maincpu->update(screen,bitmap,cliprect);
+}
+
+
 static MACHINE_CONFIG_START( st0016, st0016_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",ST0016_CPU,8000000) /* 8 MHz ? */
@@ -406,7 +418,7 @@ static MACHINE_CONFIG_START( st0016, st0016_state )
 	MCFG_SCREEN_PALETTE("maincpu:palette")
 
 
-	MCFG_VIDEO_START_OVERRIDE(st0016_state,st0016)
+//	MCFG_VIDEO_START_OVERRIDE(st0016_state,st0016)
 
 MACHINE_CONFIG_END
 

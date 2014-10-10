@@ -12,7 +12,7 @@ public:
 	{ }
 
 	int mux_port;
-	UINT32 m_st0016_rom_bank;
+//	UINT32 m_st0016_rom_bank;
 
 	optional_device<st0016_cpu_device> m_maincpu;
 	DECLARE_READ8_MEMBER(mux_r);

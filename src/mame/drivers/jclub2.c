@@ -96,16 +96,15 @@ To do:
 #include "cpu/m68000/m68000.h"
 #include "machine/eepromser.h"
 #include "sound/okim6295.h"
-#include "includes/st0016.h"
 #include "machine/st0016.h"
 #include "video/st0020.h"
 #include "machine/nvram.h"
 
-class darkhors_state : public st0016_state
+class darkhors_state : public driver_device
 {
 public:
 	darkhors_state(const machine_config &mconfig, device_type type, const char *tag)
-		: st0016_state(mconfig, type, tag),
+		: driver_device(mconfig, type, tag),
 		m_tmapram(*this, "tmapram"),
 		m_tmapscroll(*this, "tmapscroll"),
 		m_tmapram2(*this, "tmapram2"),
@@ -158,6 +157,8 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(darkhors_irq);
 	void draw_sprites_darkhors(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<gfxdecode_device> m_gfxdecode;
+
+	WRITE8_MEMBER(st0016_rom_bank_w); // temp?
 };
 
 
@@ -1045,6 +1046,13 @@ static ADDRESS_MAP_START( st0016_mem, AS_PROGRAM, 8, darkhors_state )
 	AM_RANGE(0xe82f, 0xe830) AM_READNOP
 	AM_RANGE(0xf000, 0xffff) AM_RAM
 ADDRESS_MAP_END
+
+// common rombank? should go in machine/st0016 with larger address space exposed?
+WRITE8_MEMBER(darkhors_state::st0016_rom_bank_w)
+{
+	membank("bank1")->set_base(memregion("maincpu")->base() + (data* 0x4000));
+}
+
 
 static ADDRESS_MAP_START( st0016_io, AS_IO, 8, darkhors_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
