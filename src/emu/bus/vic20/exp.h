@@ -25,8 +25,8 @@
                   _RAM1      14      R       CA12
                   _RAM2      15      S       CA13
                   _RAM3      16      T       _I/O2
-                   VR/W      17      U       _I/O3
-                   CR/W      18      V       Sphi2
+                  VR/_W      17      U       _I/O3
+                  CR/_W      18      V       Sphi2
                    _IRQ      19      W       _NMI
                    N.C.      20      X       _RES
                     +5V      21      Y       N.C.

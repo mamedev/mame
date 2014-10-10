@@ -27,25 +27,30 @@
 //  MACROS/CONSTANTS
 //**************************************************************************
 
-#define AM29F040_TAG  "am29f040"
+#define AM29F040_TAG    "ic1"
+#define ATMEGA1284_TAG  "ic5"
+#define ATF1504AS_TAG   "ic4"
 
 #define REG1_BANK \
     ((m_reg1 & 0x7f) << 15)
 
-#define REG2_BLK0_VISIBLE \
-    (!(m_reg2 & REG2_BLK0))
+#define LORAM_HIDDEN \
+    (m_reg2 & REG2_BLK0)
 
-#define REG2_BLK1_VISIBLE \
-    (!(m_reg2 & REG2_BLK1))
+#define BLK1_HIDDEN \
+    (m_reg2 & REG2_BLK1)
 
-#define REG2_BLK2_VISIBLE \
-    (!(m_reg2 & REG2_BLK2))
+#define BLK2_HIDDEN \
+    (m_reg2 & REG2_BLK2)
 
-#define REG2_BLK3_VISIBLE \
-    (!(m_reg2 & REG2_BLK3))
+#define BLK3_HIDDEN \
+    (m_reg2 & REG2_BLK3)
 
-#define REG2_BLK5_VISIBLE \
-    (!(m_reg2 & REG2_BLK5))
+#define BLK5_HIDDEN \
+    (m_reg2 & REG2_BLK5)
+
+#define REGISTERS_HIDDEN \
+    ((m_lockbit && ((m_reg1 & REG1_MODE_MASK) == REG1_START)) || (m_reg2 & REG2_IO3))
 
 
 
@@ -62,7 +67,10 @@ const device_type VIC20_FE3 = &device_creator<vic20_final_expansion_3_t>;
 
 ROM_START( vic20_fe3 )
 	ROM_REGION( 0x80000, AM29F040_TAG, 0 )
-	ROM_LOAD( "fe3r022d.bin", 0x00000, 0x80000, CRC(f4ff4aee) SHA1(1a389120159dee09c0f03ecb8fcd51ea2a2d2306) )
+	ROM_LOAD( "fe3r022d.ic1", 0x00000, 0x80000, CRC(f4ff4aee) SHA1(1a389120159dee09c0f03ecb8fcd51ea2a2d2306) )
+
+	ROM_REGION( 0x10b6, ATF1504AS_TAG, 0 )
+	ROM_LOAD( "vc20final-v3-2.ic4", 0x000, 0x10b6, CRC(975b7197) SHA1(e64d69870b757a409abeb5f19e34866eef37ab18) )
 ROM_END
 
 
@@ -137,7 +145,6 @@ void vic20_final_expansion_3_t::device_reset()
 {
 	m_reg1 = 0;
 	m_reg2 = 0;
-	m_lockbit = true;
 }
 
 
@@ -155,11 +162,11 @@ UINT8 vic20_final_expansion_3_t::vic20_cd_r(address_space &space, offs_t offset,
 		{
 			data = m_flash_rom->read(get_address(0, 3, offset));
 
-			m_lockbit = true;
+			m_lockbit = 1;
 		}
 
 		// read from registers
-		if (!io3 && !m_lockbit && ((offset & 0x1c02) == 0x1c02))
+		if (!io3 && !REGISTERS_HIDDEN && BIT(offset, 1))
 		{
 			data = read_register(BIT(offset, 0));
 		}
@@ -167,31 +174,31 @@ UINT8 vic20_final_expansion_3_t::vic20_cd_r(address_space &space, offs_t offset,
 
 	case REG1_SUPER_ROM:
 		// read from RAM bank 0
-		if ((!ram1 || !ram2 || !ram3) && REG2_BLK0_VISIBLE)
+		if ((!ram1 || !ram2 || !ram3) && !LORAM_HIDDEN)
 		{
 			data = m_ram[get_address(0, 0, offset)];
 		}
 		
 		// read from ROM
-		if (!blk1 && REG2_BLK1_VISIBLE)
+		if (!blk1 && !BLK1_HIDDEN)
 		{
 			data = m_flash_rom->read(get_address(REG1_BANK, 0, offset));
 		}
-		if (!blk2 && REG2_BLK2_VISIBLE)
+		if (!blk2 && !BLK2_HIDDEN)
 		{
 			data = m_flash_rom->read(get_address(REG1_BANK, 1, offset));
 		}
-		if (!blk3 && REG2_BLK3_VISIBLE)
+		if (!blk3 && !BLK3_HIDDEN)
 		{
 			data = m_flash_rom->read(get_address(REG1_BANK, 2, offset));
 		}
-		if (!blk5 && REG2_BLK5_VISIBLE)
+		if (!blk5 && !BLK5_HIDDEN)
 		{
 			data = m_flash_rom->read(get_address(REG1_BANK, 3, offset));
 		}
 
 		// read from registers
-		if (!io3 && !(m_reg2 & REG2_IO3) && ((offset & 0x1c02) == 0x1c02))
+		if (!io3 && !REGISTERS_HIDDEN && BIT(offset, 1))
 		{
 			data = read_register(BIT(offset, 0));
 		}
@@ -199,31 +206,31 @@ UINT8 vic20_final_expansion_3_t::vic20_cd_r(address_space &space, offs_t offset,
 		
 	case REG1_RAM_1:
 		// read from RAM bank 0
-		if ((!ram1 || !ram2 || !ram3) && REG2_BLK0_VISIBLE)
+		if ((!ram1 || !ram2 || !ram3) && !LORAM_HIDDEN)
 		{
 			data = m_ram[get_address(0, 0, offset)];
 		}
 
 		// read from RAM bank 1
-		if (!blk1 && REG2_BLK1_VISIBLE)
+		if (!blk1 && !BLK1_HIDDEN)
 		{
 			data = m_ram[get_address(1, 0, offset)];
 		}
-		if (!blk2 && REG2_BLK2_VISIBLE)
+		if (!blk2 && !BLK2_HIDDEN)
 		{
 			data = m_ram[get_address(1, 1, offset)];
 		}
-		if (!blk3 && REG2_BLK3_VISIBLE)
+		if (!blk3 && !BLK3_HIDDEN)
 		{
 			data = m_ram[get_address(1, 2, offset)];
 		}
-		if (!blk5 && REG2_BLK5_VISIBLE)
+		if (!blk5 && !BLK5_HIDDEN)
 		{
 			data = m_ram[get_address(1, 3, offset)];
 		}
 
 		// read from registers
-		if (!io3 && !(m_reg2 & REG2_IO3) && ((offset & 0x1c02) == 0x1c02))
+		if (!io3 && !REGISTERS_HIDDEN && BIT(offset, 1))
 		{
 			data = read_register(BIT(offset, 0));
 		}
@@ -231,31 +238,31 @@ UINT8 vic20_final_expansion_3_t::vic20_cd_r(address_space &space, offs_t offset,
 		
 	case REG1_RAM_2:
 		// read from RAM bank 0
-		if ((!ram1 || !ram2 || !ram3) && REG2_BLK0_VISIBLE)
+		if ((!ram1 || !ram2 || !ram3) && !LORAM_HIDDEN)
 		{
 			data = m_ram[get_address(0, 0, offset)];
 		}
 
 		// read from RAM bank 1 or 2
-		if (!blk1 && REG2_BLK1_VISIBLE)
+		if (!blk1 && !BLK1_HIDDEN)
 		{
 			data = m_ram[get_address((m_reg1 & REG1_BLK1) ? 2 : 1, 0, offset)];
 		}
-		if (!blk2 && REG2_BLK2_VISIBLE)
+		if (!blk2 && !BLK2_HIDDEN)
 		{
 			data = m_ram[get_address((m_reg1 & REG1_BLK2) ? 2 : 1, 1, offset)];
 		}
-		if (!blk3 && REG2_BLK3_VISIBLE)
+		if (!blk3 && !BLK3_HIDDEN)
 		{
 			data = m_ram[get_address((m_reg1 & REG1_BLK3) ? 2 : 1, 2, offset)];
 		}
-		if (!blk5 && REG2_BLK5_VISIBLE)
+		if (!blk5 && !BLK5_HIDDEN)
 		{
 			data = m_ram[get_address((m_reg1 & REG1_BLK5) ? 2 : 1, 3, offset)];
 		}
 
 		// read from registers
-		if (!io3 && !(m_reg2 & REG2_IO3) && ((offset & 0x1c02) == 0x1c02))
+		if (!io3 && !REGISTERS_HIDDEN && BIT(offset, 1))
 		{
 			data = read_register(BIT(offset, 0));
 		}
@@ -263,31 +270,31 @@ UINT8 vic20_final_expansion_3_t::vic20_cd_r(address_space &space, offs_t offset,
 		
 	case REG1_SUPER_RAM:
 		// read from RAM bank 0
-		if ((!ram1 || !ram2 || !ram3) && REG2_BLK0_VISIBLE)
+		if ((!ram1 || !ram2 || !ram3) && !LORAM_HIDDEN)
 		{
 			data = m_ram[get_address(0, 0, offset)];
 		}
 
 		// read from any RAM bank
-		if (!blk1 && REG2_BLK1_VISIBLE)
+		if (!blk1 && !BLK1_HIDDEN)
 		{
 			data = m_ram[get_address(REG1_BANK, 0, offset)];
 		}
-		if (!blk2 && REG2_BLK2_VISIBLE)
+		if (!blk2 && !BLK2_HIDDEN)
 		{
 			data = m_ram[get_address(REG1_BANK, 1, offset)];
 		}
-		if (!blk3 && REG2_BLK3_VISIBLE)
+		if (!blk3 && !BLK3_HIDDEN)
 		{
 			data = m_ram[get_address(REG1_BANK, 2, offset)];
 		}
-		if (!blk5 && REG2_BLK5_VISIBLE)
+		if (!blk5 && !BLK5_HIDDEN)
 		{
 			data = m_ram[get_address(REG1_BANK, 3, offset)];
 		}
 
 		// read from registers
-		if (!io3 && !(m_reg2 & REG2_IO3) && ((offset & 0x1c02) == 0x1c02))
+		if (!io3 && !REGISTERS_HIDDEN && BIT(offset, 1))
 		{
 			data = read_register(BIT(offset, 0));
 		}
@@ -295,31 +302,31 @@ UINT8 vic20_final_expansion_3_t::vic20_cd_r(address_space &space, offs_t offset,
 		
 	case REG1_RAM_ROM:
 		// read from RAM bank 0
-		if ((!ram1 || !ram2 || !ram3) && REG2_BLK0_VISIBLE)
+		if ((!ram1 || !ram2 || !ram3) && !LORAM_HIDDEN)
 		{
 			data = m_ram[get_address(0, 0, offset)];
 		}
 		
 		// read from ROM bank 0 or RAM bank 1
-		if (!blk1 && REG2_BLK1_VISIBLE)
+		if (!blk1 && !BLK1_HIDDEN)
 		{
 			data = (m_reg1 & REG1_BLK1) ? m_flash_rom->read(get_address(0, 0, offset)) : m_ram[get_address(1, 0, offset)];
 		}
-		if (!blk2 && REG2_BLK2_VISIBLE)
+		if (!blk2 && !BLK2_HIDDEN)
 		{
 			data = (m_reg1 & REG1_BLK2) ? m_flash_rom->read(get_address(0, 1, offset)) : m_ram[get_address(1, 1, offset)];
 		}
-		if (!blk3 && REG2_BLK3_VISIBLE)
+		if (!blk3 && !BLK3_HIDDEN)
 		{
 			data = (m_reg1 & REG1_BLK3) ? m_flash_rom->read(get_address(0, 2, offset)) : m_ram[get_address(1, 2, offset)];
 		}
-		if (!blk5 && REG2_BLK5_VISIBLE)
+		if (!blk5 && !BLK5_HIDDEN)
 		{
 			data = (m_reg1 & REG1_BLK5) ? m_flash_rom->read(get_address(0, 3, offset)) : m_ram[get_address(1, 3, offset)];
 		}
 
 		// read from registers
-		if (!io3 && !(m_reg2 & REG2_IO3) && ((offset & 0x1c02) == 0x1c02))
+		if (!io3 && !REGISTERS_HIDDEN && BIT(offset, 1))
 		{
 			data = read_register(BIT(offset, 0));
 		}
@@ -327,31 +334,31 @@ UINT8 vic20_final_expansion_3_t::vic20_cd_r(address_space &space, offs_t offset,
 		
 	case REG1_FLASH:
 		// read from RAM bank 0
-		if ((!ram1 || !ram2 || !ram3) && REG2_BLK0_VISIBLE)
+		if ((!ram1 || !ram2 || !ram3) && !LORAM_HIDDEN)
 		{
 			data = m_ram[get_address(0, 0, offset)];
 		}
 
 		// read from ROM
-		if (!blk1 && REG2_BLK1_VISIBLE)
+		if (!blk1 && !BLK1_HIDDEN)
 		{
 			data = m_flash_rom->read(get_address(REG1_BANK, 0, offset));
 		}
-		if (!blk2 && REG2_BLK2_VISIBLE)
+		if (!blk2 && !BLK2_HIDDEN)
 		{
 			data = m_flash_rom->read(get_address(REG1_BANK, 1, offset));
 		}
-		if (!blk3 && REG2_BLK3_VISIBLE)
+		if (!blk3 && !BLK3_HIDDEN)
 		{
 			data = m_flash_rom->read(get_address(REG1_BANK, 2, offset));
 		}
-		if (!blk5 && REG2_BLK5_VISIBLE)
+		if (!blk5 && !BLK5_HIDDEN)
 		{
 			data = m_flash_rom->read(get_address(REG1_BANK, 3, offset));
 		}
 
 		// read from registers
-		if (!io3 && !(m_reg2 & REG2_IO3) && ((offset & 0x1c02) == 0x1c02))
+		if (!io3 && !REGISTERS_HIDDEN && BIT(offset, 1))
 		{
 			data = read_register(BIT(offset, 0));
 		}
@@ -376,11 +383,11 @@ void vic20_final_expansion_3_t::vic20_cd_w(address_space &space, offs_t offset, 
 		{
 			m_ram[get_address(1, 3, offset)] = data;
 
-			m_lockbit = false;
+			m_lockbit = 0;
 		}
 
 		// write to registers
-		if (!io3 && !m_lockbit && ((offset & 0x1c02) == 0x1c02))
+		if (!io3 && !REGISTERS_HIDDEN && BIT(offset, 1))
 		{
 			write_register(BIT(offset, 0), data);
 		}
@@ -388,31 +395,31 @@ void vic20_final_expansion_3_t::vic20_cd_w(address_space &space, offs_t offset, 
 		
 	case REG1_SUPER_ROM:
 		// write to RAM bank 0
-		if ((!ram1 || !ram2 || !ram3) && REG2_BLK0_VISIBLE)
+		if ((!ram1 || !ram2 || !ram3) && !LORAM_HIDDEN)
 		{
 			m_ram[get_address(0, 0, offset)] = data;
 		}
 
 		// write to RAM bank 1
-		if (!blk1 && REG2_BLK1_VISIBLE)
+		if (!blk1 && !BLK1_HIDDEN)
 		{
 			m_ram[get_address(1, 0, offset)] = data;
 		}
-		if (!blk2 && REG2_BLK2_VISIBLE)
+		if (!blk2 && !BLK2_HIDDEN)
 		{
 			m_ram[get_address(1, 1, offset)] = data;
 		}
-		if (!blk3 && REG2_BLK3_VISIBLE)
+		if (!blk3 && !BLK3_HIDDEN)
 		{
 			m_ram[get_address(1, 2, offset)] = data;
 		}
-		if (!blk5 && REG2_BLK5_VISIBLE)
+		if (!blk5 && !BLK5_HIDDEN)
 		{
 			m_ram[get_address(1, 3, offset)] = data;
 		}
 
 		// write to registers
-		if (!io3 && !(m_reg2 & REG2_IO3) && ((offset & 0x1c02) == 0x1c02))
+		if (!io3 && !REGISTERS_HIDDEN && BIT(offset, 1))
 		{
 			write_register(BIT(offset, 0), data);
 		}
@@ -420,31 +427,31 @@ void vic20_final_expansion_3_t::vic20_cd_w(address_space &space, offs_t offset, 
 		
 	case REG1_RAM_1:
 		// write to RAM bank 0
-		if ((!ram1 || !ram2 || !ram3) && REG2_BLK0_VISIBLE && REG1_BLK0)
+		if ((!ram1 || !ram2 || !ram3) && !LORAM_HIDDEN && REG1_BLK0)
 		{
 			m_ram[get_address(0, 0, offset)] = data;
 		}
 
 		// write to RAM bank 1 or 2
-		if (!blk1 && REG2_BLK1_VISIBLE)
+		if (!blk1 && !BLK1_HIDDEN)
 		{
 			m_ram[get_address((m_reg1 & REG1_BLK1) ? 2 : 1, 0, offset)] = data;
 		}
-		if (!blk2 && REG2_BLK2_VISIBLE)
+		if (!blk2 && !BLK2_HIDDEN)
 		{
 			m_ram[get_address((m_reg1 & REG1_BLK2) ? 2 : 1, 1, offset)] = data;
 		}
-		if (!blk3 && REG2_BLK3_VISIBLE)
+		if (!blk3 && !BLK3_HIDDEN)
 		{
 			m_ram[get_address((m_reg1 & REG1_BLK3) ? 2 : 1, 2, offset)] = data;
 		}
-		if (!blk5 && REG2_BLK5_VISIBLE)
+		if (!blk5 && !BLK5_HIDDEN)
 		{
 			m_ram[get_address((m_reg1 & REG1_BLK5) ? 2 : 1, 3, offset)] = data;
 		}
 
 		// write to registers
-		if (!io3 && !(m_reg2 & REG2_IO3) && ((offset & 0x1c02) == 0x1c02))
+		if (!io3 && !REGISTERS_HIDDEN && BIT(offset, 1))
 		{
 			write_register(BIT(offset, 0), data);
 		}
@@ -452,31 +459,31 @@ void vic20_final_expansion_3_t::vic20_cd_w(address_space &space, offs_t offset, 
 		
 	case REG1_RAM_2:
 		// write to RAM bank 0
-		if ((!ram1 || !ram2 || !ram3) && REG2_BLK0_VISIBLE && REG1_BLK0)
+		if ((!ram1 || !ram2 || !ram3) && !LORAM_HIDDEN && REG1_BLK0)
 		{
 			m_ram[get_address(0, 0, offset)] = data;
 		}
 
 		// write to RAM bank 1
-		if (!blk1 && REG2_BLK1_VISIBLE)
+		if (!blk1 && !BLK1_HIDDEN)
 		{
 			m_ram[get_address(1, 0, offset)] = data;
 		}
-		if (!blk2 && REG2_BLK2_VISIBLE)
+		if (!blk2 && !BLK2_HIDDEN)
 		{
 			m_ram[get_address(1, 1, offset)] = data;
 		}
-		if (!blk3 && REG2_BLK3_VISIBLE)
+		if (!blk3 && !BLK3_HIDDEN)
 		{
 			m_ram[get_address(1, 2, offset)] = data;
 		}
-		if (!blk5 && REG2_BLK5_VISIBLE)
+		if (!blk5 && !BLK5_HIDDEN)
 		{
 			m_ram[get_address(1, 3, offset)] = data;
 		}
 
 		// write to registers
-		if (!io3 && !(m_reg2 & REG2_IO3) && ((offset & 0x1c02) == 0x1c02))
+		if (!io3 && !REGISTERS_HIDDEN && BIT(offset, 1))
 		{
 			write_register(BIT(offset, 0), data);
 		}
@@ -484,31 +491,31 @@ void vic20_final_expansion_3_t::vic20_cd_w(address_space &space, offs_t offset, 
 		
 	case REG1_SUPER_RAM:
 		// write to RAM bank 0
-		if ((!ram1 || !ram2 || !ram3) && REG2_BLK0_VISIBLE)
+		if ((!ram1 || !ram2 || !ram3) && !LORAM_HIDDEN)
 		{
 			m_ram[get_address(0, 0, offset)] = data;
 		}
 
 		// write whole RAM
-		if (!blk1 && REG2_BLK1_VISIBLE)
+		if (!blk1 && !BLK1_HIDDEN)
 		{
 			m_ram[get_address(REG1_BANK, 0, offset)] = data;
 		}
-		if (!blk2 && REG2_BLK2_VISIBLE)
+		if (!blk2 && !BLK2_HIDDEN)
 		{
 			m_ram[get_address(REG1_BANK, 1, offset)] = data;
 		}
-		if (!blk3 && REG2_BLK3_VISIBLE)
+		if (!blk3 && !BLK3_HIDDEN)
 		{
 			m_ram[get_address(REG1_BANK, 2, offset)] = data;
 		}
-		if (!blk5 && REG2_BLK5_VISIBLE)
+		if (!blk5 && !BLK5_HIDDEN)
 		{
 			m_ram[get_address(REG1_BANK, 3, offset)] = data;
 		}
 
 		// write to registers
-		if (!io3 && !(m_reg2 & REG2_IO3) && ((offset & 0x1c02) == 0x1c02))
+		if (!io3 && !REGISTERS_HIDDEN && BIT(offset, 1))
 		{
 			write_register(BIT(offset, 0), data);
 		}
@@ -516,31 +523,31 @@ void vic20_final_expansion_3_t::vic20_cd_w(address_space &space, offs_t offset, 
 		
 	case REG1_RAM_ROM:
 		// write to RAM bank 0
-		if ((!ram1 || !ram2 || !ram3) && REG2_BLK0_VISIBLE && REG1_BLK0)
+		if ((!ram1 || !ram2 || !ram3) && !LORAM_HIDDEN && REG1_BLK0)
 		{
 			m_ram[get_address(0, 0, offset)] = data;
 		}
 
 		// write to RAM bank 1 or 2
-		if (!blk1 && REG2_BLK1_VISIBLE)
+		if (!blk1 && !BLK1_HIDDEN)
 		{
 			m_ram[get_address((m_reg1 & REG1_BLK1) ? 2 : 1, 0, offset)] = data;
 		}
-		if (!blk2 && REG2_BLK2_VISIBLE)
+		if (!blk2 && !BLK2_HIDDEN)
 		{
 			m_ram[get_address((m_reg1 & REG1_BLK2) ? 2 : 1, 1, offset)] = data;
 		}
-		if (!blk3 && REG2_BLK3_VISIBLE)
+		if (!blk3 && !BLK3_HIDDEN)
 		{
 			m_ram[get_address((m_reg1 & REG1_BLK3) ? 2 : 1, 2, offset)] = data;
 		}
-		if (!blk5 && REG2_BLK5_VISIBLE)
+		if (!blk5 && !BLK5_HIDDEN)
 		{
 			m_ram[get_address((m_reg1 & REG1_BLK5) ? 2 : 1, 3, offset)] = data;
 		}
 
 		// write to registers
-		if (!io3 && !(m_reg2 & REG2_IO3) && ((offset & 0x1c02) == 0x1c02))
+		if (!io3 && !REGISTERS_HIDDEN && BIT(offset, 1))
 		{
 			write_register(BIT(offset, 0), data);
 		}
@@ -548,31 +555,31 @@ void vic20_final_expansion_3_t::vic20_cd_w(address_space &space, offs_t offset, 
 		
 	case REG1_FLASH:
 		// write to RAM bank 0
-		if ((!ram1 || !ram2 || !ram3) && REG2_BLK0_VISIBLE)
+		if ((!ram1 || !ram2 || !ram3) && !LORAM_HIDDEN)
 		{
 			m_ram[get_address(0, 0, offset)] = data;
 		}
 
 		// write to ROM
-		if (!blk1 && REG2_BLK1_VISIBLE)
+		if (!blk1 && !BLK1_HIDDEN)
 		{
 			m_flash_rom->write(get_address(REG1_BANK, 0, offset), data);
 		}
-		if (!blk2 && REG2_BLK2_VISIBLE)
+		if (!blk2 && !BLK2_HIDDEN)
 		{
 			m_flash_rom->write(get_address(REG1_BANK, 1, offset), data);
 		}
-		if (!blk3 && REG2_BLK3_VISIBLE)
+		if (!blk3 && !BLK3_HIDDEN)
 		{
 			m_flash_rom->write(get_address(REG1_BANK, 2, offset), data);
 		}
-		if (!blk5 && REG2_BLK5_VISIBLE)
+		if (!blk5 && !BLK5_HIDDEN)
 		{
 			m_flash_rom->write(get_address(REG1_BANK, 3, offset), data);
 		}
 
 		// write to registers
-		if (!io3 && !(m_reg2 & REG2_IO3) && ((offset & 0x1c02) == 0x1c02))
+		if (!io3 && !REGISTERS_HIDDEN && BIT(offset, 1))
 		{
 			write_register(BIT(offset, 0), data);
 		}

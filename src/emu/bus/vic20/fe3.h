@@ -85,7 +85,7 @@ private:
 
 	UINT8 m_reg1;
 	UINT8 m_reg2;
-	bool m_lockbit;
+	int m_lockbit;
 };
 
 
