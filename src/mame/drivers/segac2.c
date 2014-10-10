@@ -417,7 +417,6 @@ READ8_MEMBER(segac2_state::io_portc_r)
 	// D6 : From uPD7759 pin 18. (/BUSY output)
 	int busy = (m_upd7759 != NULL) ? (m_upd7759->busy_r() << 6) : 0x40;
 	return 0xbf | busy;
-	
 }
 
 WRITE8_MEMBER(segac2_state::io_portd_w)
@@ -1375,7 +1374,7 @@ static MACHINE_CONFIG_START( segac, segac2_state )
 	MCFG_MACHINE_RESET_OVERRIDE(segac2_state,segac2)
 	MCFG_NVRAM_ADD_1FILL("nvram") // borencha requires 0xff fill or there is no sound (it lacks some of the init code of the borench set)
 
-	MCFG_DEVICE_ADD("io", SEGA_315_5296, 0)
+	MCFG_DEVICE_ADD("io", SEGA_315_5296, XL2_CLOCK/6) // clock divider guessed
 	MCFG_315_5296_IN_PORTA_CB(IOPORT("P1"))
 	MCFG_315_5296_IN_PORTB_CB(IOPORT("P2"))
 	MCFG_315_5296_IN_PORTC_CB(READ8(segac2_state, io_portc_r))

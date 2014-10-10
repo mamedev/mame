@@ -3,7 +3,20 @@
     Sega 315-5296 I/O chip
     
     Sega 100-pin QFP, with 8 bidirectional I/O ports, and 3 output pins.
+    It also has chip select(/FMCS) and clock(CKOT) for a peripheral device.
     Commonly used from the late 80s up until Sega Model 2.
+
+    The I/O chip has 64 addresses:
+    $00-0F : I/O ports, security, configuration registers
+    $10-1F : Unused (no effect when read or written)
+    $20-3F : Unused (enables /FMCS output, eg. to YM2151 /CS)
+
+    On System 16 derivatives, the unused locations return the 68000 prefetch
+    value off the bus when read.
+
+
+    TODO:
+    - complete emulation of CNT register
 
 **********************************************************************/
 
@@ -15,7 +28,6 @@ const device_type SEGA_315_5296 = &device_creator<sega_315_5296_device>;
 //-------------------------------------------------
 //  sega_315_5296_device - constructor
 //-------------------------------------------------
-
 
 sega_315_5296_device::sega_315_5296_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, SEGA_315_5296, "Sega 315-5296", tag, owner, clock, "315-5296", __FILE__),
@@ -100,7 +112,7 @@ void sega_315_5296_device::device_reset()
 
 READ8_MEMBER( sega_315_5296_device::read )
 {
-	offset &= 0xf;
+	offset &= 0x3f;
 	
 	switch (offset)
 	{
@@ -109,7 +121,7 @@ READ8_MEMBER( sega_315_5296_device::read )
 			// if the port is configured as an output, return the last thing written
 			if (m_dir & 1 << offset)
 				return m_output_latch[offset];
-
+			
 			// otherwise, return an input port
 			return (*m_in_port_cb[offset])(offset);
 		
@@ -130,6 +142,9 @@ READ8_MEMBER( sega_315_5296_device::read )
 		// port direction register & mirror
 		case 0xd: case 0xf:
 			return m_dir;
+		
+		default:
+			break;
 	}
 	
 	return 0xff;
@@ -138,7 +153,7 @@ READ8_MEMBER( sega_315_5296_device::read )
 
 WRITE8_MEMBER( sega_315_5296_device::write )
 {
-	offset &= 0xf;
+	offset &= 0x3f;
 
 	switch (offset)
 	{
@@ -153,10 +168,16 @@ WRITE8_MEMBER( sega_315_5296_device::write )
 		
 		// CNT register
 		case 0xe:
-			// d0-2: CNT0-2, other bits: ?
+			// d0-2: CNT0-2 output pins
+			// note: When CNT2 is configured as clock output, bit 2 of this register has
+			// no effect on the output level of CNT2.
 			for (int i = 0; i < 3; i++)
 				(*m_out_cnt_cb[i])(data >> i & 1);
 			
+			// d3: CNT2 output mode (1= Clock output, 0= Programmable output)
+			// d4,5: CNT2 clock divider (0= CLK/4, 1= CLK/8, 2= CLK/16, 3= CLK/2)
+			// d6,7: CKOT clock divider (0= CLK/4, 1= CLK/8, 2= CLK/16, 3= CLK/2)
+			// TODO..
 			m_cnt = data;
 			break;
 
