@@ -2624,6 +2624,8 @@ $(DRIVERS)/goldnpkr.o:  $(LAYOUT)/goldnpkr.lh \
 			$(LAYOUT)/upndown.lh
 
 $(DRIVERS)/gts80.o:     $(LAYOUT)/gts80.lh
+$(DRIVERS)/gts80a.o:    $(LAYOUT)/gts80a.lh
+$(DRIVERS)/gts80b.o:    $(LAYOUT)/gts80b.lh
 
 $(DRIVERS)/lbeach.o:    $(LAYOUT)/lbeach.lh
 
