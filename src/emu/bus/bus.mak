@@ -735,6 +735,7 @@ endif
 ifneq ($(filter VIC20,$(BUSES)),)
 OBJDIRS += $(BUSOBJ)/vic20
 BUSOBJS += $(BUSOBJ)/vic20/exp.o
+BUSOBJS += $(BUSOBJ)/vic20/fe3.o
 BUSOBJS += $(BUSOBJ)/vic20/megacart.o
 BUSOBJS += $(BUSOBJ)/vic20/std.o
 BUSOBJS += $(BUSOBJ)/vic20/vic1010.o
