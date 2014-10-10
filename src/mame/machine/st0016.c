@@ -337,201 +337,223 @@ void st0016_cpu_device::draw_sprites(bitmap_ind16 &bitmap, const rectangle &clip
 	/*
 	object ram :
 
-	 each entry is 8 bytes:
+	each entry is 8 bytes:
 
-	   76543210 (bit)
-	 0 llllllll
-	 1 ---1SSSl
-	 2 oooooooo
-	 3 fooooooo
-	 4 xxxxxxxx
-	 5 ------xx
-	 6 yyyyyyyy
-	 7 ------yy
+	76543210 (bit)
+	0 llllllll
+	1 ---gSSSl
+	2 oooooooo
+	3 fooooooo
+	4 xxxxxxxx
+	5 ----XXxx
+	6 yyyyyyyy
+	7 ----XYyy
 
-	   1 - always(?) set
-	   S - scroll index ? (ports $40-$60, X(word),Y(word) )
-	   l - sublist length (8 byte entries -1)
-	   o - sublist offset (*8 to get real offset)
-	   f - end of list  flag
-	   x,y - sprite coords
+	1 - always(?) set
+	S - scroll index ? (ports $40-$60, X(word),Y(word) )
+	l - sublist length (8 byte entries -1)
+	o - sublist offset (*8 to get real offset)
+	f - end of list  flag
+	x,y - sprite coords
+	
+	(complete guess)
+	g - use tile sizes specified in list (global / fixed ones if not set?) (gostop)
+	X = global X size?
+	Y = global Y size?
 
-	 sublist format (8 bytes/entry):
+	sublist format (8 bytes/entry):
 
-	   76543210
-	 0 cccccccc
-	 1 cccccccc
-	 2 --kkkkkk
-	 3 QW------
-	 4 xxxxxxxx
-	 5 -B---XXx
-	 6 yyyyyyyy
-	 7 -----YYy
+	76543210
+	0 cccccccc
+	1 cccccccc
+	2 --kkkkkk
+	3 QW------
+	4 xxxxxxxx
+	5 -B--XX-x
+	6 yyyyyyyy
+	7 ----YY-y
 
-	  c - character code
-	  k - palette
-	  QW - flips
-	  x,y - coords
-	  XX,YY - size (1<<size)
-	  B - merge pixel data with prevoius one (8bpp mode - neratte: seta logo and title screen)
+	c - character code
+	k - palette
+	QW - flips
+	x,y - coords
+	XX,YY - size (1<<size)
+	B - merge pixel data with prevoius one (8bpp mode - neratte: seta logo and title screen)
 
 	*/
 
 	gfx_element *gfx = m_gfxdecode->gfx(st0016_ramgfx);
-	int i,j,lx,ly,x,y,code,offset,length,sx,sy,color,flipx,flipy,scrollx,scrolly/*,plx,ply*/;
+	int i, j, lx, ly, x, y, code, offset, length, sx, sy, color, flipx, flipy, scrollx, scrolly/*,plx,ply*/;
 
 
-	for(i=0;i<ST0016_SPR_BANK_SIZE*ST0016_MAX_SPR_BANK;i+=8)
+	for (i = 0; i < ST0016_SPR_BANK_SIZE*ST0016_MAX_SPR_BANK; i += 8)
 	{
-		x=st0016_spriteram[i+4]+((st0016_spriteram[i+5]&3)<<8);
-	y=st0016_spriteram[i+6]+((st0016_spriteram[i+7]&3)<<8);
+		x = st0016_spriteram[i + 4] + ((st0016_spriteram[i + 5] & 3) << 8);
+		y = st0016_spriteram[i + 6] + ((st0016_spriteram[i + 7] & 3) << 8);
 
-	scrollx=(st0016_vregs[(((st0016_spriteram[i+1]&0x0f)>>1)<<2)+0x40]+256*st0016_vregs[(((st0016_spriteram[i+1]&0x0f)>>1)<<2)+1+0x40])&0x3ff;
-	scrolly=(st0016_vregs[(((st0016_spriteram[i+1]&0x0f)>>1)<<2)+2+0x40]+256*st0016_vregs[(((st0016_spriteram[i+1]&0x0f)>>1)<<2)+3+0x40])&0x3ff;
+		int use_sizes = (st0016_spriteram[i + 1] & 0x10);
+		int globalx = (st0016_spriteram[i + 5] & 0x0c)>>2;
+		int globaly = (st0016_spriteram[i + 7] & 0x0c)>>2;
 
-	if(!ISMACS)
-	{
-		if (x & 0x200) x-= 0x400; //sign
-		if (y & 0x200) y-= 0x400;
+		scrollx = (st0016_vregs[(((st0016_spriteram[i + 1] & 0x0f) >> 1) << 2) + 0x40] + 256 * st0016_vregs[(((st0016_spriteram[i + 1] & 0x0f) >> 1) << 2) + 1 + 0x40]) & 0x3ff;
+		scrolly = (st0016_vregs[(((st0016_spriteram[i + 1] & 0x0f) >> 1) << 2) + 2 + 0x40] + 256 * st0016_vregs[(((st0016_spriteram[i + 1] & 0x0f) >> 1) << 2) + 3 + 0x40]) & 0x3ff;
 
-		if (scrollx & 0x200) scrollx-= 0x400; //sign
-		if (scrolly & 0x200) scrolly-= 0x400;
-	}
+		if (!ISMACS)
+		{
+			if (x & 0x200) x -= 0x400; //sign
+			if (y & 0x200) y -= 0x400;
 
-	if(ISMACS1)
-	{
-		if (x & 0x200) x-= 0x400; //sign
-		if (y & 0x200) y-= 0x2b0;//0x400;
+			if (scrollx & 0x200) scrollx -= 0x400; //sign
+			if (scrolly & 0x200) scrolly -= 0x400;
+		}
 
-		if (scrollx & 0x200) scrollx-= 0x400; //sign
-		if (scrolly & 0x200) scrolly-= 0x400;
-	}
+		if (ISMACS1)
+		{
+			if (x & 0x200) x -= 0x400; //sign
+			if (y & 0x200) y -= 0x2b0;//0x400;
 
-	x+=scrollx;
-	y+=scrolly;
+			if (scrollx & 0x200) scrollx -= 0x400; //sign
+			if (scrolly & 0x200) scrolly -= 0x400;
+		}
 
-	if(ISMACS)
-	{
-		y+=0x20;
-	}
+		x += scrollx;
+		y += scrolly;
 
-	if( st0016_spriteram[i+3]&0x80) /* end of list */
-		break;
+		if (ISMACS)
+		{
+			y += 0x20;
+		}
 
-		offset=st0016_spriteram[i+2]+256*(st0016_spriteram[i+3]);
-		offset<<=3;
+		if (st0016_spriteram[i + 3] & 0x80) /* end of list */
+			break;
 
-		length=st0016_spriteram[i+0]+1+256*(st0016_spriteram[i+1]&1);
+		offset = st0016_spriteram[i + 2] + 256 * (st0016_spriteram[i + 3]);
+		offset <<= 3;
+
+		length = st0016_spriteram[i + 0] + 1 + 256 * (st0016_spriteram[i + 1] & 1);
 
 		//plx=(st0016_spriteram[i+5]>>2)&0x3;
 		//ply=(st0016_spriteram[i+7]>>2)&0x3;
 
-		if(offset<ST0016_SPR_BANK_SIZE*ST0016_MAX_SPR_BANK)
+		if (offset < ST0016_SPR_BANK_SIZE*ST0016_MAX_SPR_BANK)
 		{
-			for(j=0;j<length;j++)
+			for (j = 0; j < length; j++)
 			{
-				code=st0016_spriteram[offset]+256*st0016_spriteram[offset+1];
-				sx=st0016_spriteram[offset+4]+((st0016_spriteram[offset+5]&1)<<8);
-				sy=st0016_spriteram[offset+6]+((st0016_spriteram[offset+7]&1)<<8);
+				code = st0016_spriteram[offset] + 256 * st0016_spriteram[offset + 1];
+				sx = st0016_spriteram[offset + 4] + ((st0016_spriteram[offset + 5] & 1) << 8);
+				sy = st0016_spriteram[offset + 6] + ((st0016_spriteram[offset + 7] & 1) << 8);
 
-				if(ISMACS && !(ISMACS1))
+				if (ISMACS && !(ISMACS1))
 				{
-					if (sy & 0x100) sy-= 0x200; //yuka & yujan
+					if (sy & 0x100) sy -= 0x200; //yuka & yujan
 				}
 
-				if(ISMACS)
+				if (ISMACS)
 				{
-					sy=0xe0-sy;
+					sy = 0xe0 - sy;
 				}
 
-				sx+=x;
-				sy+=y;
-				color=st0016_spriteram[offset+2]&0x3f;
-				lx=(st0016_spriteram[offset+5]>>2)&3;
-				ly=(st0016_spriteram[offset+7]>>2)&3;
-			/*
-			    if(plx |ply) //parent
-			    {
-			        lx=plx;
-			        ly=ply;
-			    }
-			    */
+				sx += x;
+				sy += y;
+				color = st0016_spriteram[offset + 2] & 0x3f;
+				
+				if (use_sizes)
+				{
+					lx = (st0016_spriteram[offset + 5] >> 2) & 3;
+					ly = (st0016_spriteram[offset + 7] >> 2) & 3;
+				}
+				else
+				{
+					lx = globalx;
+					ly = globaly;
 
-				flipx=st0016_spriteram[offset+3]&0x80;
-				flipy=st0016_spriteram[offset+3]&0x40;
+				}
 
-				if(ISMACS)
-					sy-=(1<<ly)*8;
+				/*
+					if(plx |ply) //parent
+					{
+					lx=plx;
+					ly=ply;
+					}
+					*/
+
+				flipx = st0016_spriteram[offset + 3] & 0x80;
+				flipy = st0016_spriteram[offset + 3] & 0x40;
+
+				if (ISMACS)
+					sy -= (1 << ly) * 8;
 
 				{
-					int x0,y0,i0=0;
-					for(x0=(flipx?((1<<lx)-1):0);x0!=(flipx?-1:(1<<lx));x0+=(flipx?-1:1))
-						for(y0=(flipy?((1<<ly)-1):0);y0!=(flipy?-1:(1<<ly));y0+=(flipy?-1:1))
+					int x0, y0, i0 = 0;
+					for (x0 = (flipx ? ((1 << lx) - 1) : 0); x0 != (flipx ? -1 : (1 << lx)); x0 += (flipx ? -1 : 1))
+						for (y0 = (flipy ? ((1 << ly) - 1) : 0); y0 != (flipy ? -1 : (1 << ly)); y0 += (flipy ? -1 : 1))
 						{
-							/* custom draw */
-							UINT16 *destline;
-							int yloop,xloop;
-							int ypos, xpos;
-							int tileno;
-							const UINT8 *srcgfx;
-							int gfxoffs;
-							ypos = sy+y0*8+spr_dy;
-							xpos = sx+x0*8+spr_dx;
-							tileno = (code+i0++)&ST0016_CHAR_BANK_MASK ;
+						/* custom draw */
+						UINT16 *destline;
+						int yloop, xloop;
+						int ypos, xpos;
+						int tileno;
+						const UINT8 *srcgfx;
+						int gfxoffs;
+						ypos = sy + y0 * 8 + spr_dy;
+						xpos = sx + x0 * 8 + spr_dx;
+						tileno = (code + i0++)&ST0016_CHAR_BANK_MASK;
 
-							gfxoffs = 0;
-							srcgfx= gfx->get_data(tileno);
+						gfxoffs = 0;
+						srcgfx = gfx->get_data(tileno);
 
-							for (yloop=0; yloop<8; yloop++)
+						for (yloop = 0; yloop < 8; yloop++)
+						{
+							UINT16 drawypos;
+
+							if (!flipy) { drawypos = ypos + yloop; }
+							else { drawypos = (ypos + 8 - 1) - yloop; }
+							destline = &bitmap.pix16(drawypos);
+
+							for (xloop = 0; xloop<8; xloop++)
 							{
-								UINT16 drawypos;
+								UINT16 drawxpos;
+								int pixdata;
+								pixdata = srcgfx[gfxoffs];
 
-								if (!flipy) {drawypos = ypos+yloop;} else {drawypos = (ypos+8-1)-yloop;}
-								destline = &bitmap.pix16(drawypos);
+								if (!flipx) { drawxpos = xpos + xloop; }
+								else { drawxpos = (xpos + 8 - 1) - xloop; }
 
-								for (xloop=0; xloop<8; xloop++)
+								if (drawxpos > cliprect.max_x)
+									drawxpos -= 512; // wrap around
+
+								if (cliprect.contains(drawxpos, drawypos))
 								{
-									UINT16 drawxpos;
-									int pixdata;
-									pixdata = srcgfx[gfxoffs];
-
-									if (!flipx) { drawxpos = xpos+xloop; } else { drawxpos = (xpos+8-1)-xloop; }
-
-									if (drawxpos > cliprect.max_x)
-										drawxpos -= 512; // wrap around
-
-									if (cliprect.contains(drawxpos, drawypos))
+									if (st0016_spriteram[offset + 5] & 0x40)
 									{
-										if(st0016_spriteram[offset+5]&0x40)
+										destline[drawxpos] = (destline[drawxpos] | pixdata << 4) & 0x3ff;
+									}
+									else
+									{
+										if (ISMACS2)
 										{
-											destline[drawxpos] =(destline[drawxpos] | pixdata<<4)&0x3ff;
+											if (pixdata)//|| destline[drawxpos]==UNUSED_PEN)
+											{
+												destline[drawxpos] = pixdata + (color * 16);
+											}
 										}
 										else
 										{
-											if(ISMACS2)
+											if (pixdata || destline[drawxpos] == UNUSED_PEN)
 											{
-												if(pixdata )//|| destline[drawxpos]==UNUSED_PEN)
-												{
-													destline[drawxpos] = pixdata + (color*16);
-												}
-											}
-											else
-											{
-												if(pixdata || destline[drawxpos]==UNUSED_PEN)
-												{
-													destline[drawxpos] = pixdata + (color*16);
-												}
+												destline[drawxpos] = pixdata + (color * 16);
 											}
 										}
 									}
-
-									gfxoffs++;
 								}
+
+								gfxoffs++;
 							}
 						}
+						}
 				}
-				offset+=8;
-				if(offset>=ST0016_SPR_BANK_SIZE*ST0016_MAX_SPR_BANK)
+				offset += 8;
+				if (offset >= ST0016_SPR_BANK_SIZE*ST0016_MAX_SPR_BANK)
 					break;
 			}
 		}
@@ -582,95 +604,100 @@ void st0016_cpu_device::startup()
 }
 
 
-void st0016_cpu_device::draw_bgmap(bitmap_ind16 &bitmap,const rectangle &cliprect, int priority)
+void st0016_cpu_device::draw_bgmap(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority)
 {
 	gfx_element *gfx = m_gfxdecode->gfx(st0016_ramgfx);
 	int j;
 	//for(j=0x40-8;j>=0;j-=8)
-	for(j=0;j<0x40;j+=8)
+	for (j = 0; j < 0x40; j += 8)
 	{
-		if(st0016_vregs[j+1] && ((priority && (st0016_vregs[j+3]==0xff))||((!priority)&&(st0016_vregs[j+3]!=0xff))))
+		if (st0016_vregs[j + 1] && ((priority && (st0016_vregs[j + 3] == 0xff)) || ((!priority) && (st0016_vregs[j + 3] != 0xff))))
 		{
-			int x,y,code,color,flipx,flipy;
-			int i=st0016_vregs[j+1]*0x1000;
-			for(x=0;x<32*2;x++)
-				for(y=0;y<8*4;y++)
+			int x, y, code, color, flipx, flipy;
+			int i = st0016_vregs[j + 1] * 0x1000;
+
+			for (x = 0; x < 32 * 2; x++)
+			{
+				for (y = 0; y < 8 * 4; y++)
 				{
-					code=st0016_spriteram[i]+256*st0016_spriteram[i+1];
-					color=st0016_spriteram[i+2]&0x3f;
+					code = st0016_spriteram[i] + 256 * st0016_spriteram[i + 1];
+					color = st0016_spriteram[i + 2] & 0x3f;
 
-					flipx=st0016_spriteram[i+3]&0x80;
-					flipy=st0016_spriteram[i+3]&0x40;
+					flipx = st0016_spriteram[i + 3] & 0x80;
+					flipy = st0016_spriteram[i + 3] & 0x40;
 
-					if(priority)
+					if (priority)
 					{
-						gfx->transpen(bitmap,cliprect,
-										code,
-										color,
-										flipx,flipy,
-										x*8+spr_dx,y*8+spr_dy,0);
+						gfx->transpen(bitmap, cliprect,
+							code,
+							color,
+							flipx, flipy,
+							x * 8 + spr_dx, y * 8 + spr_dy, 0);
 					}
 					else
 					{
-							UINT16 *destline;
-							int yloop,xloop;
-							int ypos, xpos;
-							const UINT8 *srcgfx;
-							int gfxoffs;
-							ypos = y*8+spr_dy;//+((st0016_vregs[j+2]==0xaf)?0x50:0);//hack for mayjinsen title screen
-							xpos = x*8+spr_dx;
-							gfxoffs = 0;
-							srcgfx= gfx->get_data(code);
+						UINT16 *destline;
+						int yloop, xloop;
+						int ypos, xpos;
+						const UINT8 *srcgfx;
+						int gfxoffs;
+						ypos = y * 8 + spr_dy;//+((st0016_vregs[j+2]==0xaf)?0x50:0);//hack for mayjinsen title screen
+						xpos = x * 8 + spr_dx;
+						gfxoffs = 0;
+						srcgfx = gfx->get_data(code);
 
-							for (yloop=0; yloop<8; yloop++)
+						for (yloop = 0; yloop < 8; yloop++)
+						{
+							UINT16 drawypos;
+
+							if (!flipy) { drawypos = ypos + yloop; }
+							else { drawypos = (ypos + 8 - 1) - yloop; }
+							destline = &bitmap.pix16(drawypos);
+
+							for (xloop = 0; xloop<8; xloop++)
 							{
-								UINT16 drawypos;
+								UINT16 drawxpos;
+								int pixdata;
+								pixdata = srcgfx[gfxoffs];
 
-								if (!flipy) {drawypos = ypos+yloop;} else {drawypos = (ypos+8-1)-yloop;}
-								destline = &bitmap.pix16(drawypos);
+								if (!flipx) { drawxpos = xpos + xloop; }
+								else { drawxpos = (xpos + 8 - 1) - xloop; }
 
-								for (xloop=0; xloop<8; xloop++)
+								if (drawxpos > cliprect.max_x)
+									drawxpos -= 512; // wrap around
+
+								if (cliprect.contains(drawxpos, drawypos))
 								{
-									UINT16 drawxpos;
-									int pixdata;
-									pixdata = srcgfx[gfxoffs];
-
-									if (!flipx) { drawxpos = xpos+xloop; } else { drawxpos = (xpos+8-1)-xloop; }
-
-									if (drawxpos > cliprect.max_x)
-										drawxpos -= 512; // wrap around
-
-									if (cliprect.contains(drawxpos, drawypos))
+									if (st0016_vregs[j + 7] == 0x12)
+										destline[drawxpos] = (destline[drawxpos] | (pixdata << 4)) & 0x3ff;
+									else
 									{
-										if(st0016_vregs[j+7]==0x12)
-											destline[drawxpos] = (destline[drawxpos] | (pixdata<<4))&0x3ff;
+										if (ISMACS2)
+										{
+											if (pixdata)// || destline[drawxpos]==UNUSED_PEN)
+											{
+												destline[drawxpos] = pixdata + (color * 16);
+											}
+										}
 										else
 										{
-											if(ISMACS2)
+											if (pixdata || destline[drawxpos] == UNUSED_PEN)
 											{
-												if(pixdata)// || destline[drawxpos]==UNUSED_PEN)
-												{
-													destline[drawxpos] = pixdata + (color*16);
-												}
+												destline[drawxpos] = pixdata + (color * 16);
 											}
-											else
-											{
-												if(pixdata || destline[drawxpos]==UNUSED_PEN)
-												{
-													destline[drawxpos] = pixdata + (color*16);
-												}
-											}
-
 										}
+
 									}
-
-									gfxoffs++;
-
 								}
+
+								gfxoffs++;
+
 							}
+						}
 					}
-					i+=4;
+					i += 4;
 				}
+			}
 		}
 	}
 }
