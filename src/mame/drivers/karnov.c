@@ -82,6 +82,7 @@ Stephh's notes (based on the games M68000 code and some tests) :
 #include "sound/2203intf.h"
 #include "sound/3526intf.h"
 #include "includes/karnov.h"
+#include "cpu/mcs51/mcs51.h"
 
 /*************************************
  *
@@ -825,6 +826,25 @@ static MACHINE_CONFIG_START( karnov, karnov_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
+static ADDRESS_MAP_START( chelnovjbl_mcu_map, AS_PROGRAM, 8, karnov_state )
+	AM_RANGE(0x0000, 0x1fff) AM_ROM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( chelnovjbl_mcu_io_map, AS_IO, 8, karnov_state )
+	//internal port
+//	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_READWRITE(p1_r, p1_w)
+//	AM_RANGE(MCS51_PORT_P3, MCS51_PORT_P3) AM_READWRITE(p3_r, p3_w)
+ADDRESS_MAP_END
+
+
+static MACHINE_CONFIG_DERIVED( chelnovjbl, karnov )
+	MCFG_CPU_ADD("mcu", I8031, 2000000) // ??mhz
+	MCFG_CPU_PROGRAM_MAP(chelnovjbl_mcu_map)
+	MCFG_CPU_IO_MAP(chelnovjbl_mcu_io_map)
+
+MACHINE_CONFIG_END
+
+
 
 static MACHINE_CONFIG_START( wndrplnt, karnov_state )
 
@@ -1109,8 +1129,8 @@ ROM_START( chelnovj )
 	ROM_REGION( 0x60000, "maincpu", 0 ) /* 6*64k for 68000 code */
 	ROM_LOAD16_BYTE( "a-j15.bin",    0x00000, 0x10000, CRC(1978cb52) SHA1(833b8e80445ec2384e0479afb7430b32d6a14441) )
 	ROM_LOAD16_BYTE( "a-j20.bin",    0x00001, 0x10000, CRC(e0ed3d99) SHA1(f47aaec5c72ecc308c32cdcf117ef4965ac5ea61) )
-	ROM_LOAD16_BYTE( "a-j14.bin",    0x20000, 0x10000, CRC(51465486) SHA1(e165e754eb756db3abc1f8477171ab817d03a890) )
-	ROM_LOAD16_BYTE( "a-j18.bin",    0x20001, 0x10000, CRC(d09dda33) SHA1(1764215606eec61e4fe30c0fc82ea2faf17821dc) )
+	ROM_LOAD16_BYTE( "a-j14.bin",    0x20000, 0x10000, CRC(51465486) SHA1(e165e754eb756db3abc1f8477171ab817d03a890) ) // 1xxxxxxxxxxxxxxx = 0xFF
+	ROM_LOAD16_BYTE( "a-j18.bin",    0x20001, 0x10000, CRC(d09dda33) SHA1(1764215606eec61e4fe30c0fc82ea2faf17821dc) ) // 1xxxxxxxxxxxxxxx = 0xFF
 	ROM_LOAD16_BYTE( "a-j13.bin",    0x40000, 0x10000, CRC(cd991507) SHA1(9da858ea41bfbce78496c086e3b462ea9f3722e8) )
 	ROM_LOAD16_BYTE( "a-j17.bin",    0x40001, 0x10000, CRC(977f601c) SHA1(b40a37160b493dcb614922c2a9b4b5f140b62aca) )
 
@@ -1131,6 +1151,48 @@ ROM_START( chelnovj )
 
 	ROM_REGION( 0x80000, "gfx3", 0 )
 	ROM_LOAD( "ee12-.f8",     0x00000, 0x10000, CRC(9b1c53a5) SHA1(b0fdc89dc7fd0931fa4bca3bbc20fc88f637ec74) )  /* Sprites */
+	ROM_LOAD( "ee13-.f9",     0x20000, 0x10000, CRC(72b8ae3e) SHA1(535dfd70e6d13296342d96917a57d46bdb28a59e) )
+	ROM_LOAD( "ee14-.f13",    0x40000, 0x10000, CRC(d8f4bbde) SHA1(1f2d336dd97c9cc39e124c18cae634afb0ef3316) )
+	ROM_LOAD( "ee15-.f15",    0x60000, 0x10000, CRC(81e3e68b) SHA1(1059c70b8bfe09c212a19767cfe23efa22afc196) )
+
+	ROM_REGION( 0x0800, "proms", 0 )
+	ROM_LOAD( "a-k7.bin",     0x0000, 0x0400, CRC(309c49d8) SHA1(7220002f6ef97514b4e6f61706fc16061120dafa) )    /* different from the other set; */
+															/* might be bad */
+	ROM_LOAD( "ee20.l6",      0x0400, 0x0400, CRC(41816132) SHA1(89a1194bd8bf39f13419df685e489440bdb05676) )
+ROM_END
+
+// bootleg of chelnovj, only interesting because it uses a SCM8031HCCN40 instead of the usual 8051 for protection
+// matching roms had been stripped out so chip labels and locations unknown :-(
+ROM_START( chelnovjbl ) // code is the same as the regular chelnovj set
+	ROM_REGION( 0x60000, "maincpu", ROMREGION_ERASEFF ) /* 6*64k for 68000 code */
+	ROM_LOAD16_BYTE( "a-j15.bin",    0x00000, 0x10000, CRC(1978cb52) SHA1(833b8e80445ec2384e0479afb7430b32d6a14441) )
+	ROM_LOAD16_BYTE( "a-j20.bin",    0x00001, 0x10000, CRC(e0ed3d99) SHA1(f47aaec5c72ecc308c32cdcf117ef4965ac5ea61) )
+	ROM_LOAD16_BYTE( "12.bin",       0x20000, 0x08000, CRC(dcb65089) SHA1(1f63044073b429f5f750e170036d5d8763972051) ) // same content but without FF filled 2nd half
+	ROM_LOAD16_BYTE( "15.bin",       0x20001, 0x08000, CRC(2aed4c90) SHA1(74d2a03872f75c731c2472fc8cd497a17b2d590d) ) // ^^
+	ROM_LOAD16_BYTE( "a-j13.bin",    0x40000, 0x10000, CRC(cd991507) SHA1(9da858ea41bfbce78496c086e3b462ea9f3722e8) )
+	ROM_LOAD16_BYTE( "a-j17.bin",    0x40001, 0x10000, CRC(977f601c) SHA1(b40a37160b493dcb614922c2a9b4b5f140b62aca) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 6502 Sound CPU */
+	ROM_LOAD( "ee05-.f3",     0x8000, 0x8000, CRC(6a8936b4) SHA1(2b72cb749e6bddb67c2bd3d27b3a92511f9ef016) )
+
+	ROM_REGION( 0x2000, "mcu", 0 )    /* SCM8031HCCN40  */ // unique to this set
+	ROM_LOAD( "17o.bin", 0x0000, 0x2000, CRC(9af64150) SHA1(0f478d9f79baebd2ad90615c98c6bc2d73c0056a) )
+
+	ROM_REGION( 0x08000, "gfx1", 0 )
+	ROM_LOAD( "a-c5.bin",     0x00000, 0x08000, CRC(1abf2c6d) SHA1(86d625ae94cd9ea69e4e613895410640efb175b3) )  /* Characters */
+
+	ROM_REGION( 0x40000, "gfx2", 0 ) /* Backgrounds */ // same content split into more roms
+	ROM_LOAD( "8.bin",    0x00000, 0x08000, CRC(a78b174a) SHA1(e0d82b600a154b81d7e1a787f0e20eb1a341894f) )  
+	ROM_LOAD( "9.bin",    0x08000, 0x08000, CRC(97d2c146) SHA1(075bb9afc4f0623cd413883ec2bca574d7ff88d4) )
+	ROM_LOAD( "2.bin",    0x10000, 0x08000, CRC(8c45e7de) SHA1(d843b7dcc64ed3a5b8717af172a1f22c4c599480) )
+	ROM_LOAD( "3.bin",    0x18000, 0x08000, CRC(504cc95c) SHA1(97e5e9f8cd8ebf5e0c18f27f2988a45c4d3809b3) )
+	ROM_LOAD( "6.bin",    0x20000, 0x08000, CRC(8f146815) SHA1(c0330b0ced8d12234d71a9d4cdb8a73f4caa61af) )
+	ROM_LOAD( "7.bin",    0x28000, 0x08000, CRC(97bf8061) SHA1(16abb3f65bee2ab93b0adfc1558b5c4ceec726a4) )
+	ROM_LOAD( "4.bin",    0x30000, 0x08000, CRC(276a46de) SHA1(5b8932dec0e10be128f5ed41798a8928c0aa506b) )
+	ROM_LOAD( "5.bin",    0x38000, 0x08000, CRC(99cee6cd) SHA1(b2cd0a1aef04fd63ad27ac8a61d17a6bb4c8b600) )
+
+	ROM_REGION( 0x80000, "gfx3", 0 ) /* Sprites */
+	ROM_LOAD( "17.bin",       0x00000, 0x10000, CRC(47c857f8) SHA1(59f50365cee266c0e4075c989dc7fde50e43667a) ) // intentional, or bad? (1st half is 99.996948% match)
 	ROM_LOAD( "ee13-.f9",     0x20000, 0x10000, CRC(72b8ae3e) SHA1(535dfd70e6d13296342d96917a57d46bdb28a59e) )
 	ROM_LOAD( "ee14-.f13",    0x40000, 0x10000, CRC(d8f4bbde) SHA1(1f2d336dd97c9cc39e124c18cae634afb0ef3316) )
 	ROM_LOAD( "ee15-.f15",    0x60000, 0x10000, CRC(81e3e68b) SHA1(1059c70b8bfe09c212a19767cfe23efa22afc196) )
@@ -1210,3 +1272,4 @@ GAME( 1987, wndrplnt, 0,       wndrplnt, wndrplnt, karnov_state, wndrplnt, ROT27
 GAME( 1988, chelnov,  0,       karnov,   chelnov, karnov_state,  chelnov,  ROT0,   "Data East Corporation", "Chelnov - Atomic Runner (World)", GAME_SUPPORTS_SAVE )
 GAME( 1988, chelnovu, chelnov, karnov,   chelnovu, karnov_state, chelnovu, ROT0,   "Data East USA",         "Chelnov - Atomic Runner (US)", GAME_SUPPORTS_SAVE )
 GAME( 1988, chelnovj, chelnov, karnov,   chelnovj, karnov_state, chelnovj, ROT0,   "Data East Corporation", "Chelnov - Atomic Runner (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1988, chelnovjbl,chelnov,chelnovjbl,chelnovj,karnov_state, chelnovj, ROT0,   "bootleg",               "Chelnov - Atomic Runner (Japan, bootleg with SCM8031HCCN40)", GAME_SUPPORTS_SAVE ) // todo: hook up MCU instead of using simulation code
