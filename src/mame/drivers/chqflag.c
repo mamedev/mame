@@ -178,7 +178,8 @@ static ADDRESS_MAP_START( chqflag_sound_map, AS_PROGRAM, 8, chqflag_state )
 	AM_RANGE(0x8000, 0x87ff) AM_RAM /* RAM */
 	AM_RANGE(0x9000, 0x9000) AM_WRITE(k007232_bankswitch_w) /* 007232 bankswitch */
 	AM_RANGE(0xa000, 0xa00d) AM_DEVREADWRITE("k007232_1", k007232_device, read, write)  /* 007232 (chip 1) */
-	AM_RANGE(0xa01c, 0xa01c) AM_WRITE(k007232_extvolume_w)  /* extra volume, goes to the 007232 w/ A11 */
+	AM_RANGE(0xa01c, 0xa01c) AM_WRITE(k007232_extvolume_w)	/* extra volume, goes to the 007232 w/ A4 */
+															/* selecting a different latch for the external port */
 	AM_RANGE(0xb000, 0xb00d) AM_DEVREADWRITE("k007232_2", k007232_device, read, write)  /* 007232 (chip 2) */
 	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)   /* YM2151 */
 	AM_RANGE(0xd000, 0xd000) AM_READ(soundlatch_byte_r)         /* soundlatch_byte_r */
@@ -253,18 +254,22 @@ INPUT_PORTS_END
 
 WRITE8_MEMBER(chqflag_state::volume_callback0)
 {
-	m_k007232_1->set_volume(0, (data & 0x0f) * 0x11, 0);
-	m_k007232_1->set_volume(1, 0, (data >> 4) * 0x11);
+	// volume/pan for one of the channels on this chip
+	// which channel and which bits are left/right is a guess
+	m_k007232_1->set_volume(0, (data & 0x0f) * 0x11/2, (data >> 4) * 0x11/2);
 }
 
 WRITE8_MEMBER(chqflag_state::k007232_extvolume_w)
 {
-	m_k007232_2->set_volume(1, (data & 0x0f) * 0x11/2, (data >> 4) * 0x11/2);
+	// volume/pan for one of the channels on this chip
+	// which channel and which bits are left/right is a guess
+	m_k007232_1->set_volume(1, (data & 0x0f) * 0x11/2, (data >> 4) * 0x11/2);
 }
 
 WRITE8_MEMBER(chqflag_state::volume_callback1)
 {
-	m_k007232_2->set_volume(0, (data & 0x0f) * 0x11/2, (data >> 4) * 0x11/2);
+	m_k007232_2->set_volume(0, (data >> 4) * 0x11, 0);
+	m_k007232_2->set_volume(1, 0, (data & 0x0f) * 0x11);
 }
 
 void chqflag_state::machine_start()
@@ -343,19 +348,19 @@ static MACHINE_CONFIG_START( chqflag, chqflag_state )
 
 	MCFG_YM2151_ADD("ymsnd", XTAL_3_579545MHz) /* verified on pcb */
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.80)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.80)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
 
 	MCFG_SOUND_ADD("k007232_1", K007232, XTAL_3_579545MHz) /* verified on pcb */
 	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(chqflag_state, volume_callback0))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.20)
-	MCFG_SOUND_ROUTE(0, "rspeaker", 0.20)
-	MCFG_SOUND_ROUTE(1, "lspeaker", 0.20)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.20)
 
 	MCFG_SOUND_ADD("k007232_2", K007232, XTAL_3_579545MHz) /* verified on pcb */
 	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(chqflag_state, volume_callback1))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.20)
+	MCFG_SOUND_ROUTE(0, "rspeaker", 0.20)
+	MCFG_SOUND_ROUTE(1, "lspeaker", 0.20)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.20)
 MACHINE_CONFIG_END
 
