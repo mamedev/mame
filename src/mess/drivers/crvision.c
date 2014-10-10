@@ -699,6 +699,12 @@ void crvision_state::machine_start()
 	// state saving
 	save_item(NAME(m_keylatch));
 	save_item(NAME(m_joylatch));
+
+	if (m_cart->exists())
+	{
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0x4000, 0x7fff, read8_delegate(FUNC(crvision_cart_slot_device::read_rom40),(crvision_cart_slot_device*)m_cart));
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0x8000, 0xbfff, read8_delegate(FUNC(crvision_cart_slot_device::read_rom80),(crvision_cart_slot_device*)m_cart));
+	}
 }
 
 void crvision_pal_state::machine_start()
@@ -706,6 +712,12 @@ void crvision_pal_state::machine_start()
 	// state saving
 	save_item(NAME(m_keylatch));
 	save_item(NAME(m_joylatch));
+	
+	if (m_cart->exists())
+	{
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0x4000, 0x7fff, read8_delegate(FUNC(crvision_cart_slot_device::read_rom40),(crvision_cart_slot_device*)m_cart));
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0x8000, 0xbfff, read8_delegate(FUNC(crvision_cart_slot_device::read_rom80),(crvision_cart_slot_device*)m_cart));
+	}
 }
 
 /*-------------------------------------------------
@@ -717,121 +729,28 @@ void laser2001_state::machine_start()
 	// state saving
 	save_item(NAME(m_keylatch));
 	save_item(NAME(m_joylatch));
+	
+	if (m_cart->exists())
+	{
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0x4000, 0x7fff, read8_delegate(FUNC(crvision_cart_slot_device::read_rom40),(crvision_cart_slot_device*)m_cart));
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0x8000, 0xbfff, read8_delegate(FUNC(crvision_cart_slot_device::read_rom80),(crvision_cart_slot_device*)m_cart));
+	}
 }
 
-/***************************************************************************
-    CARTRIDGE
-***************************************************************************/
-
-DEVICE_IMAGE_LOAD_MEMBER( crvision_state, crvision_cart )
-{
-	UINT32 size;
-	dynamic_buffer temp_copy;
-	UINT8 *mem = memregion(M6502_TAG)->base();
-	address_space &program = m_maincpu->space(AS_PROGRAM);
-
-	if (image.software_entry() == NULL)
-	{
-		size = image.length();
-		temp_copy.resize(size);
-		image.fread( temp_copy, size);
-	}
-	else
-	{
-		size= image.get_software_region_length("rom");
-		temp_copy.resize(size);
-		memcpy(temp_copy, image.get_software_region("rom"), size);
-	}
-
-	switch (size)
-	{
-	case 0x1000: // 4K
-		memcpy(mem + 0x9000, temp_copy, 0x1000);            // load 4KB at 0x9000
-		memcpy(mem + 0xb000, mem + 0x9000, 0x1000);         // mirror 4KB at 0xb000
-		program.install_read_bank(0x8000, 0xbfff, 0, 0x2000, BANK_ROM1);
-		break;
-
-	case 0x1800: // 6K
-		memcpy(mem + 0x9000, temp_copy, 0x1000);            // load lower 4KB at 0x9000
-		memcpy(mem + 0xb000, mem + 0x9000, 0x1000);         // mirror lower 4KB at 0xb000
-		memcpy(mem + 0x8000, temp_copy + 0x1000, 0x0800);   // load higher 2KB at 0x8000
-		memcpy(mem + 0x8800, mem + 0x8000, 0x0800);         // mirror higher 2KB at 0x8800
-		memcpy(mem + 0xa000, mem + 0x8000, 0x0800);         // mirror higher 2KB at 0xa000
-		memcpy(mem + 0xa800, mem + 0x8000, 0x0800);         // mirror higher 2KB at 0xa800
-		program.install_read_bank(0x8000, 0xbfff, 0, 0x2000, BANK_ROM1);
-		break;
-
-	case 0x2000: // 8K
-		memcpy(mem + 0x8000, temp_copy, 0x2000);            // load 8KB at 0x8000
-		memcpy(mem + 0xa000, mem + 0x8000, 0x2000);         // mirror 8KB at 0xa000
-		program.install_read_bank(0x8000, 0xbfff, 0, 0x2000, BANK_ROM1);
-		break;
-
-	case 0x2800: // 10K
-		memcpy(mem + 0x8000, temp_copy, 0x2000);            // load lower 8KB at 0x8000
-		memcpy(mem + 0xa000, mem + 0x8000, 0x2000);         // mirror lower 8KB at 0xa000
-		memcpy(mem + 0x4000, temp_copy + 0x2000, 0x0800);   // load higher 2KB at 0x4000
-		memcpy(mem + 0x4800, mem + 0x4000, 0x0800);         // mirror higher 2KB at 0x4800
-		memcpy(mem + 0x5000, mem + 0x4000, 0x0800);         // mirror higher 2KB at 0x5000
-		memcpy(mem + 0x5800, mem + 0x4000, 0x0800);         // mirror higher 2KB at 0x5800
-		memcpy(mem + 0x6000, mem + 0x4000, 0x0800);         // mirror higher 2KB at 0x6000
-		memcpy(mem + 0x6800, mem + 0x4000, 0x0800);         // mirror higher 2KB at 0x6800
-		memcpy(mem + 0x7000, mem + 0x4000, 0x0800);         // mirror higher 2KB at 0x7000
-		memcpy(mem + 0x7800, mem + 0x4000, 0x0800);         // mirror higher 2KB at 0x7800
-		program.install_read_bank(0x8000, 0xbfff, BANK_ROM1);
-		program.install_read_bank(0x4000, 0x7fff, BANK_ROM2);
-		break;
-
-	case 0x3000: // 12K
-		memcpy(mem + 0x8000, temp_copy, 0x2000);            // load lower 8KB at 0x8000
-		memcpy(mem + 0xa000, mem + 0x8000, 0x2000);         // mirror lower 8KB at 0xa000
-		memcpy(mem + 0x4000, temp_copy + 0x2000, 0x1000);   // load higher 4KB at 0x4000
-		memcpy(mem + 0x5000, mem + 0x4000, 0x1000);         // mirror higher 4KB at 0x5000
-		memcpy(mem + 0x6000, mem + 0x4000, 0x1000);         // mirror higher 4KB at 0x6000
-		memcpy(mem + 0x7000, mem + 0x4000, 0x1000);         // mirror higher 4KB at 0x7000
-		program.install_read_bank(0x8000, 0xbfff, BANK_ROM1);
-		program.install_read_bank(0x4000, 0x7fff, BANK_ROM2);
-		break;
-
-	case 0x4000: // 16K
-		memcpy(mem + 0xa000, temp_copy, 0x2000);            // load lower 8KB at 0xa000
-		memcpy(mem + 0x8000, temp_copy + 0x2000, 0x2000);   // load higher 8KB at 0x8000
-		program.install_read_bank(0x8000, 0xbfff, BANK_ROM1);
-		program.install_read_bank(0x4000, 0x7fff, BANK_ROM2);
-		break;
-
-	case 0x4800: // 18K
-		memcpy(mem + 0xa000, temp_copy, 0x2000);            // load lower 8KB at 0xa000
-		memcpy(mem + 0x8000, temp_copy + 0x2000, 0x2000);   // load higher 8KB at 0x8000
-		memcpy(mem + 0x4000, temp_copy + 0x4000, 0x0800);   // load higher 2KB at 0x4000
-		memcpy(mem + 0x4800, mem + 0x4000, 0x0800);         // mirror higher 2KB at 0x4800
-		memcpy(mem + 0x5000, mem + 0x4000, 0x0800);         // mirror higher 2KB at 0x5000
-		memcpy(mem + 0x5800, mem + 0x4000, 0x0800);         // mirror higher 2KB at 0x5800
-		memcpy(mem + 0x6000, mem + 0x4000, 0x0800);         // mirror higher 2KB at 0x6000
-		memcpy(mem + 0x6800, mem + 0x4000, 0x0800);         // mirror higher 2KB at 0x6800
-		memcpy(mem + 0x7000, mem + 0x4000, 0x0800);         // mirror higher 2KB at 0x7000
-		memcpy(mem + 0x7800, mem + 0x4000, 0x0800);         // mirror higher 2KB at 0x7800
-		program.install_read_bank(0x8000, 0xbfff, BANK_ROM1);
-		program.install_read_bank(0x4000, 0x7fff, BANK_ROM2);
-		break;
-
-	default:
-		auto_free(machine(), temp_copy);
-		return IMAGE_INIT_FAIL;
-	}
-
-	membank(BANK_ROM1)->configure_entry(0, mem + 0x8000);
-	membank(BANK_ROM1)->set_entry(0);
-
-	membank(BANK_ROM2)->configure_entry(0, mem + 0x4000);
-	membank(BANK_ROM2)->set_entry(0);
-
-	return IMAGE_INIT_PASS;
-}
 
 /***************************************************************************
     MACHINE DRIVERS
 ***************************************************************************/
+
+static SLOT_INTERFACE_START(crvision_cart)
+	SLOT_INTERFACE_INTERNAL("crv_rom4k",  CRVISION_ROM_4K)
+	SLOT_INTERFACE_INTERNAL("crv_rom6k",  CRVISION_ROM_6K)
+	SLOT_INTERFACE_INTERNAL("crv_rom8k",  CRVISION_ROM_8K)
+	SLOT_INTERFACE_INTERNAL("crv_rom10k", CRVISION_ROM_10K)
+	SLOT_INTERFACE_INTERNAL("crv_rom12k", CRVISION_ROM_12K)
+	SLOT_INTERFACE_INTERNAL("crv_rom16k", CRVISION_ROM_16K)
+	SLOT_INTERFACE_INTERNAL("crv_rom18k", CRVISION_ROM_18K)
+SLOT_INTERFACE_END
 
 /*-------------------------------------------------
     MACHINE_CONFIG_START( creativision, crvision_state )
@@ -872,11 +791,7 @@ static MACHINE_CONFIG_START( creativision, crvision_state )
 	MCFG_SOUND_ROUTE(1, "mono", 0.25)
 
 	// cartridge
-	MCFG_CARTSLOT_ADD("cart")
-	MCFG_CARTSLOT_EXTENSION_LIST("bin,rom")
-	MCFG_CARTSLOT_MANDATORY
-	MCFG_CARTSLOT_INTERFACE("crvision_cart")
-	MCFG_CARTSLOT_LOAD(crvision_state, crvision_cart)
+	MCFG_CRVISION_CARTRIDGE_ADD("cartslot", crvision_cart, NULL)
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)
@@ -884,7 +799,7 @@ static MACHINE_CONFIG_START( creativision, crvision_state )
 	MCFG_RAM_EXTRA_OPTIONS("15K") // 16K expansion (lower 14K available only, upper 2K shared with BIOS ROM)
 
 	// software lists
-	MCFG_SOFTWARE_LIST_ADD("cart_list","crvision")
+	MCFG_SOFTWARE_LIST_ADD("cart_list", "crvision")
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------
@@ -958,10 +873,7 @@ static MACHINE_CONFIG_START( lasr2001, laser2001_state )
 	MCFG_SOUND_ROUTE(1, "mono", 0.25)
 
 	// cartridge
-	MCFG_CARTSLOT_ADD("cart")
-	MCFG_CARTSLOT_EXTENSION_LIST("bin,rom")
-	MCFG_CARTSLOT_INTERFACE("crvision_cart")
-	MCFG_CARTSLOT_LOAD(crvision_state, crvision_cart)
+	MCFG_CRVISION_CARTRIDGE_ADD("cartslot", crvision_cart, NULL)
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)

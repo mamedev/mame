@@ -13,17 +13,16 @@ Bruce Tomlin (hardware info)
 #include "video/vector.h"
 #include "machine/6522via.h"
 #include "includes/vectrex.h"
-#include "imagedev/cartslot.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
 #include "machine/nvram.h"
 
 
 static ADDRESS_MAP_START(vectrex_map, AS_PROGRAM, 8, vectrex_state )
-	AM_RANGE(0x0000, 0x7fff) AM_RAMBANK("bank1") AM_REGION("maincpu", 0)
+	AM_RANGE(0x0000, 0x7fff) AM_NOP	// cart area, handled at machine_start
 	AM_RANGE(0xc800, 0xcbff) AM_RAM AM_MIRROR(0x0400) AM_SHARE("gce_vectorram")
 	AM_RANGE(0xd000, 0xd7ff) AM_READWRITE(vectrex_via_r, vectrex_via_w)
-	AM_RANGE(0xe000, 0xffff) AM_ROM
+	AM_RANGE(0xe000, 0xffff) AM_ROM AM_REGION("maincpu", 0)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START(vectrex)
@@ -84,6 +83,12 @@ static INPUT_PORTS_START(vectrex)
 
 INPUT_PORTS_END
 
+static SLOT_INTERFACE_START(vectrex_cart)
+	SLOT_INTERFACE_INTERNAL("vec_rom",    VECTREX_ROM_STD)
+	SLOT_INTERFACE_INTERNAL("vec_rom64k", VECTREX_ROM_64K)
+	SLOT_INTERFACE_INTERNAL("vec_sram",   VECTREX_ROM_SRAM)
+SLOT_INTERFACE_END
+
 static MACHINE_CONFIG_START( vectrex, vectrex_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, XTAL_6MHz / 4)
@@ -96,7 +101,6 @@ static MACHINE_CONFIG_START( vectrex, vectrex_state )
 	MCFG_SCREEN_SIZE(400, 300)
 	MCFG_SCREEN_VISIBLE_AREA(0, 399, 0, 299)
 	MCFG_SCREEN_UPDATE_DRIVER(vectrex_state, screen_update_vectrex)
-
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -118,28 +122,24 @@ static MACHINE_CONFIG_START( vectrex, vectrex_state )
 	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(vectrex_state, vectrex_via_irq))
 
 	/* cartridge */
-	MCFG_CARTSLOT_ADD("cart")
-	MCFG_CARTSLOT_EXTENSION_LIST("bin,gam,vec")
-	MCFG_CARTSLOT_NOT_MANDATORY
-	MCFG_CARTSLOT_LOAD(vectrex_state,vectrex_cart)
-	MCFG_CARTSLOT_INTERFACE("vectrex_cart")
+	MCFG_VECTREX_CARTRIDGE_ADD("cartslot", vectrex_cart, NULL)
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("cart_list","vectrex")
 MACHINE_CONFIG_END
 
 ROM_START(vectrex)
-	ROM_REGION(0x18000,"maincpu", 0)
+	ROM_REGION(0x2000,"maincpu", 0)
 	ROM_SYSTEM_BIOS(0, "bios0", "exec rom")
-	ROMX_LOAD("exec_rom.bin", 0xe000, 0x2000, CRC(ba13fb57) SHA1(65d07426b520ddd3115d40f255511e0fd2e20ae7), ROM_BIOS(1) )
+	ROMX_LOAD("exec_rom.bin", 0x0000, 0x2000, CRC(ba13fb57) SHA1(65d07426b520ddd3115d40f255511e0fd2e20ae7), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS(1, "bios1", "exec rom intl 284001-1")
-	ROMX_LOAD("exec_rom_intl_284001-1.bin", 0xe000, 0x2000, CRC(6d2bd167) SHA1(77a220d5d98846b606dff608f7b5d00183ec3bab), ROM_BIOS(2) )
+	ROMX_LOAD("exec_rom_intl_284001-1.bin", 0x0000, 0x2000, CRC(6d2bd167) SHA1(77a220d5d98846b606dff608f7b5d00183ec3bab), ROM_BIOS(2) )
 
 //  The following fastboots are listed here for reference and documentation
 //  ROM_SYSTEM_BIOS(2, "bios2", "us-fastboot hack")
-//  ROMX_LOAD("us-fastboot.bin", 0xe000, 0x2000, CRa6e4dac4) SHA1(e0900be6d6858b985fd7f0999d864b2fceaf01a1), ROM_BIOS(3) )
+//  ROMX_LOAD("us-fastboot.bin", 0x0000, 0x2000, CRa6e4dac4) SHA1(e0900be6d6858b985fd7f0999d864b2fceaf01a1), ROM_BIOS(3) )
 //  ROM_SYSTEM_BIOS(3, "bios3", "intl-fastboot hack")
-//  ROMX_LOAD("intl-fastboot.bin", 0xe000, 0x2000, CRC(71dcf0f4) SHA1(2a257c5111f5cee841bd14acaa9df6496aaf3d8b), ROM_BIOS(4) )
+//  ROMX_LOAD("intl-fastboot.bin", 0x0000, 0x2000, CRC(71dcf0f4) SHA1(2a257c5111f5cee841bd14acaa9df6496aaf3d8b), ROM_BIOS(4) )
 
 ROM_END
 
@@ -218,7 +218,7 @@ static MACHINE_CONFIG_DERIVED( raaspec, vectrex )
 	MCFG_DEVICE_MODIFY("via6522_0")
 	MCFG_VIA6522_READPB_HANDLER(READ8(vectrex_state, vectrex_s1_via_pb_r))
 
-	MCFG_DEVICE_REMOVE("cart")
+	MCFG_DEVICE_REMOVE("cartslot")
 MACHINE_CONFIG_END
 
 ROM_START(raaspec)

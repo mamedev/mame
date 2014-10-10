@@ -298,6 +298,18 @@ endif
 
 #-------------------------------------------------
 #
+#@src/emu/bus/crvision/slot.h,BUSES += CRVISION
+#-------------------------------------------------
+
+ifneq ($(filter CRVISION,$(BUSES)),)
+OBJDIRS += $(BUSOBJ)/crvision
+BUSOBJS += $(BUSOBJ)/crvision/slot.o
+BUSOBJS += $(BUSOBJ)/crvision/rom.o
+endif
+
+
+#-------------------------------------------------
+#
 #@src/emu/bus/dmv/dmv.h,BUSES += DMV
 #-------------------------------------------------
 
@@ -711,6 +723,18 @@ BUSOBJS += $(BUSOBJ)/vcs_ctrl/keypad.o
 BUSOBJS += $(BUSOBJ)/vcs_ctrl/lightpen.o
 BUSOBJS += $(BUSOBJ)/vcs_ctrl/paddles.o
 BUSOBJS += $(BUSOBJ)/vcs_ctrl/wheel.o
+endif
+
+
+#-------------------------------------------------
+#
+#@src/emu/bus/vectrex/slot.h,BUSES += VECTREX
+#-------------------------------------------------
+
+ifneq ($(filter VECTREX,$(BUSES)),)
+OBJDIRS += $(BUSOBJ)/vectrex
+BUSOBJS += $(BUSOBJ)/vectrex/slot.o
+BUSOBJS += $(BUSOBJ)/vectrex/rom.o
 endif
 
 

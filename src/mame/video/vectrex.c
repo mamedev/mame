@@ -330,10 +330,8 @@ WRITE8_MEMBER(vectrex_state::v_via_pb_w)
 	}
 
 	/* Cartridge bank-switching */
-	if (m_64k_cart && ((data ^ m_via_out[PORTB]) & 0x40))
-	{
-		membank("bank1")->set_base(memregion("maincpu")->base() + ((data & 0x40) ? 0x10000 : 0x0000));
-	}
+	if (m_cart && ((data ^ m_via_out[PORTB]) & 0x40))
+		m_cart->write_bank(space, 0, data);
 
 	/* Sound */
 	if (data & 0x10)
