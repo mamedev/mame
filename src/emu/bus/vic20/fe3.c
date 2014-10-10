@@ -368,8 +368,6 @@ UINT8 vic20_final_expansion_3_t::vic20_cd_r(address_space &space, offs_t offset,
 
 void vic20_final_expansion_3_t::vic20_cd_w(address_space &space, offs_t offset, UINT8 data, int ram1, int ram2, int ram3, int blk1, int blk2, int blk3, int blk5, int io2, int io3)
 {
-	offs_t addr = 0;
-
 	switch (m_reg1 & REG1_MODE_MASK)
 	{
 	case REG1_START:
@@ -389,8 +387,6 @@ void vic20_final_expansion_3_t::vic20_cd_w(address_space &space, offs_t offset, 
 		break;
 		
 	case REG1_SUPER_ROM:
-		addr = 0x8000 | offset;
-
 		// write to RAM bank 0
 		if ((!ram1 || !ram2 || !ram3) && REG2_BLK0_VISIBLE)
 		{
