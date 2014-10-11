@@ -17,12 +17,14 @@ NOTE: 2014-09-13: added code from someone's modified MESS driver for floppy
                   disk. Since it is not to our coding standards, it is
                   commented out with #if 0/#endif and 3 slashes (///).
                   It is planned to be converted when time permits. The
-                  author is unknown.
+                  author is Meeso Kim.
 
                   Hardware details of the fdc: Intelligent device, Z80 CPU,
                   XTAL_8MHz, PPI 8255, FDC uPD765C, 2 RAM chips, 28 other
                   small ics. And of course, no schematic.
 
+
+2014-10-11: Replaced above code with MESS-compliant code [Meeso Kim]
 
 ****************************************************************************/
 
