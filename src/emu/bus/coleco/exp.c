@@ -31,11 +31,20 @@ const device_type COLECOVISION_CARTRIDGE_SLOT = &device_creator<colecovision_car
 
 device_colecovision_cartridge_interface::device_colecovision_cartridge_interface(const machine_config &mconfig, device_t &device) :
 	device_slot_card_interface(mconfig, device),
-	m_rom(*this, "rom")
+	m_rom(NULL),
+	m_rom_size(0)
 {
 	m_slot = dynamic_cast<colecovision_cartridge_slot_device *>(device.owner());
 }
 
+void device_colecovision_cartridge_interface::rom_alloc(size_t size)
+{
+	if (m_rom == NULL)
+	{
+		m_rom = device().machine().memory().region_alloc("coleco_cart:rom", size, 1, ENDIANNESS_LITTLE)->base();
+		m_rom_size = size;
+	}
+}
 
 
 //**************************************************************************
@@ -72,16 +81,17 @@ bool colecovision_cartridge_slot_device::call_load()
 {
 	if (m_card)
 	{
+		size_t size = (software_entry() == NULL) ? length() : get_software_region_length("rom");
+		m_card->rom_alloc(size);
+
 		if (software_entry() == NULL)
 		{
-			size_t size = length();
-			m_card->m_rom.allocate(size);
 			fread(m_card->m_rom, size);
 		}
 		else
 		{
 			// TODO 8000/a000/c000/e000
-			load_software_region("rom", m_card->m_rom);
+			memcpy(m_card->m_rom, get_software_region("rom"), size);
 		}
 	}
 

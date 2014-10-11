@@ -115,8 +115,11 @@ public:
 
 	virtual UINT8 bd_r(address_space &space, offs_t offset, UINT8 data, int _8000, int _a000, int _c000, int _e000) { return 0xff; }
 
+	void rom_alloc(size_t size);
+
 protected:
-	optional_shared_ptr<UINT8> m_rom;
+	UINT8 *m_rom;
+	size_t m_rom_size;
 
 	colecovision_cartridge_slot_device *m_slot;
 };

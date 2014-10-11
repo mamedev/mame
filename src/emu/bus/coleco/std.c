@@ -53,7 +53,7 @@ UINT8 colecovision_standard_cartridge_device::bd_r(address_space &space, offs_t 
 {
 	if (!_8000 || !_a000 || !_c000 || !_e000)
 	{
-		if (offset < m_rom.bytes())
+		if (offset < m_rom_size)
 			data = m_rom[offset];
 		else
 			data = 0xff;
