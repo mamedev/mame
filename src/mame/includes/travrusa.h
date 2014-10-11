@@ -20,8 +20,10 @@ public:
 	DECLARE_WRITE8_MEMBER(travrusa_scroll_x_low_w);
 	DECLARE_WRITE8_MEMBER(travrusa_scroll_x_high_w);
 	DECLARE_WRITE8_MEMBER(travrusa_flipscreen_w);
+	DECLARE_READ8_MEMBER(shtridrb_port11_r);
 	DECLARE_DRIVER_INIT(shtridra);
 	DECLARE_DRIVER_INIT(motorace);
+	DECLARE_DRIVER_INIT(shtridrb);
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	virtual void machine_reset();
 	virtual void video_start();
