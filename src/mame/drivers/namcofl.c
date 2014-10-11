@@ -204,9 +204,7 @@ WRITE8_MEMBER(namcofl_state::namcofl_c116_w)
 
 	if ((offset & 0x180e) == 0x180a)
 	{
-		UINT16 v = m_c116->get_reg(5);
-		UINT16 triggerscanline=(((v>>8)&0xff)|((v&0xff)<<8))-(32+1);
-
+		UINT16 triggerscanline=m_c116->get_reg(5)-(32+1);
 		m_raster_interrupt_timer->adjust(m_screen->time_until_pos(triggerscanline));
 	}
 }
