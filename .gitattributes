@@ -4462,6 +4462,7 @@ src/mame/audio/geebee.c svneol=native#text/plain
 src/mame/audio/gomoku.c svneol=native#text/plain
 src/mame/audio/gorf.c svneol=native#text/plain
 src/mame/audio/gottlieb.c svneol=native#text/plain
+src/mame/audio/gottlieb.h svneol=native#text/plain
 src/mame/audio/gotya.c svneol=native#text/plain
 src/mame/audio/grchamp.c svneol=native#text/plain
 src/mame/audio/gridlee.c svneol=native#text/plain

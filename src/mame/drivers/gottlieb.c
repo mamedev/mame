@@ -194,13 +194,8 @@ VBlank duration: 1/VSYNC * (16/256) = 1017.6 us
 
 ***************************************************************************/
 
-#include "emu.h"
-#include "machine/6532riot.h"
-#include "sound/ay8910.h"
-#include "sound/dac.h"
-#include "sound/samples.h"
-#include "machine/nvram.h"
 #include "includes/gottlieb.h"
+#include "machine/nvram.h"
 
 
 #define LOG_AUDIO_DECODE    (0)
@@ -639,6 +634,46 @@ void gottlieb_state::laserdisc_audio_process(laserdisc_device &device, int sampl
 	/* remember the last time */
 	m_laserdisc_last_time = curtime;
 }
+
+
+
+
+//**************************************************************************
+//  QBERT MECHANICAL KNOCKER
+//**************************************************************************
+
+//-------------------------------------------------
+//  qbert cabinets have a mechanical knocker near the floor,
+//  MAME simulates this with a sample.
+//  (like all MAME samples, it is optional. If you actually have
+//   a real kicker/knocker, hook it up via output "knocker0")
+//-------------------------------------------------
+
+void gottlieb_state::qbert_knocker(UINT8 knock)
+{
+	output_set_value("knocker0", knock);
+
+	// start sound on rising edge
+	if (knock & ~m_knocker_prev)
+		m_knocker_sample->start(0, 0);
+	m_knocker_prev = knock;
+}
+
+static const char *const qbert_knocker_names[] =
+{
+	"*qbert",
+	"knocker",
+	0   /* end of array */
+};
+
+MACHINE_CONFIG_FRAGMENT( qbert_knocker )
+	MCFG_SPEAKER_ADD("knocker", 0.0, 0.0, 1.0)
+
+	MCFG_SOUND_ADD("knocker_sam", SAMPLES, 0)
+	MCFG_SAMPLES_CHANNELS(1)
+	MCFG_SAMPLES_NAMES(qbert_knocker_names)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "knocker", 1.0)
+MACHINE_CONFIG_END
 
 
 
