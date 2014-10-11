@@ -69,7 +69,6 @@
 ** - phc77: printer not emulated
 ** - hx21, hx22: Hook up kanji rom
 ** - hx21, hx22: Does not start firmware
-** - hx34, hx34i: Floppy support broken
 ** - victhc90/95/95a: Turbo/2nd cpu not supported.
 ** - victhc90/95/95a: Firmware not working.
 ** - y503iiir/e: Fix keyboard support
@@ -7034,7 +7033,8 @@ ROM_START (hx34)
 ROM_REGION (0x18000, "maincpu", 0)
 	ROM_LOAD ("hx34bios.rom",  0x0000, 0x8000, CRC(3891e0f7) SHA1(7dfb18262d48e559fffb4199acbe29d9b4bee9db))
 	ROM_LOAD ("hx34ext.rom",   0x8000, 0x4000, CRC(4a48779c) SHA1(b8e30d604d319d511cbfbc61e5d8c38fbb9c5a33))
-	ROM_LOAD ("hx34disk.rom",  0xc000, 0x4000, CRC(b6203bc8) SHA1(d31236e8b2491bca678d905546b365e9d365b072))
+	// hx34disk.rom has contents of floppy registers at offset 3ff0-3ff7 and mirrored at 3ff8-3fff
+	ROM_LOAD ("hx34disk.rom",  0xc000, 0x4000, BAD_DUMP CRC(b6203bc8) SHA1(d31236e8b2491bca678d905546b365e9d365b072))
 	ROM_LOAD ("hx34firm.rom", 0x10000, 0x8000, CRC(d05b5ca6) SHA1(7eea205044af48cfde9b7fff277d961704c4d45c))
 
 	ROM_REGION (0x20000, "kanji", 0)
@@ -7053,12 +7053,12 @@ static MACHINE_CONFIG_DERIVED( hx34, msx2 )
 	MCFG_MSX_LAYOUT_CARTRIDGE("cartslot2", 2, 0)
 	MCFG_MSX_LAYOUT_RAM_MM("ram_mm", 3, 0, 0x10000) // 64KB Mapper RAM
 	MCFG_MSX_LAYOUT_ROM("ext", 3, 1, 0, 1, "maincpu", 0x8000)
-	MCFG_MSX_LAYOUT_DISK1("disk", 3, 2, 1, 1, "maincpu", 0xc000)
+	MCFG_MSX_LAYOUT_DISK6("disk", 3, 2, 1, 1, "maincpu", 0xc000)
 	MCFG_MSX_LAYOUT_ROM("firm", 3, 3, 1, 2, "maincpu", 0x10000)
 
 	MCFG_MSX_S1985_ADD("s1985")
 
-	MCFG_FRAGMENT_ADD( msx_wd2793_force_ready )
+	MCFG_FRAGMENT_ADD( msx_wd2793 )
 	MCFG_FRAGMENT_ADD( msx_1_35_dd_drive )
 	MCFG_FRAGMENT_ADD( msx2_floplist )
 
@@ -7071,7 +7071,8 @@ ROM_START (hx34i)
 	ROM_REGION (0x18000, "maincpu", 0)
 	ROM_LOAD ("hx34ibios.rom",  0x0000, 0x8000, CRC(6cdaf3a5) SHA1(6103b39f1e38d1aa2d84b1c3219c44f1abb5436e))
 	ROM_LOAD ("hx34iext.rom",   0x8000, 0x4000, CRC(06e4f5e6) SHA1(f5eb0a396097572589f2a6efeed045044e9425e4))
-	ROM_LOAD ("hx34idisk.rom",  0xc000, 0x4000, CRC(b6203bc8) SHA1(d31236e8b2491bca678d905546b365e9d365b072))
+	// hx34idisk.rom has contents of floppy registers at offset 3ff0-3ff7 and mirrored at 3ff8-3fff
+	ROM_LOAD ("hx34idisk.rom",  0xc000, 0x4000, BAD_DUMP CRC(b6203bc8) SHA1(d31236e8b2491bca678d905546b365e9d365b072))
 	ROM_LOAD ("hx34ifirm.rom", 0x10000, 0x8000, CRC(f9e29c66) SHA1(3289336b2c12161fd926a7e5ce865770ae7038af))
 ROM_END
 
@@ -7087,12 +7088,12 @@ static MACHINE_CONFIG_DERIVED( hx34i, msx2_pal )
 	MCFG_MSX_LAYOUT_CARTRIDGE("cartslot2", 2, 0)
 	MCFG_MSX_LAYOUT_RAM_MM("ram_mm", 3, 0, 0x10000) // 64KB Mapper RAM
 	MCFG_MSX_LAYOUT_ROM("ext", 3, 1, 0, 1, "maincpu", 0x8000)
-	MCFG_MSX_LAYOUT_DISK1("disk", 3, 2, 1, 1, "maincpu", 0xc000)
-	MCFG_MSX_LAYOUT_ROM("firm", 3, 2, 1, 2, "maincpu", 0x10000)
+	MCFG_MSX_LAYOUT_DISK6("disk", 3, 2, 1, 1, "maincpu", 0xc000)
+	MCFG_MSX_LAYOUT_ROM("firm", 3, 3, 1, 2, "maincpu", 0x10000)
 
 	MCFG_MSX_S1985_ADD("s1985")
 
-	MCFG_FRAGMENT_ADD( msx_wd2793_force_ready )
+	MCFG_FRAGMENT_ADD( msx_wd2793 )
 	MCFG_FRAGMENT_ADD( msx_1_35_dd_drive )
 	MCFG_FRAGMENT_ADD( msx2_floplist )
 
@@ -8404,8 +8405,8 @@ COMP(1986, hx23,      hx23i,    0,      hx23,     msx2, msx_state,     msx,     
 COMP(1986, hx23f,     hx23i,    0,      hx23f,    msx2, msx_state,     msx,     "Toshiba", "HX-23F (MSX2)", 0)
 COMP(190?, hx23i,     0,        0,      hx23i,    msx2, msx_state,     msx,     "Toshiba", "HX-23I (MSX2)", 0)
 COMP(198?, hx33,      0,        0,      hx33,     msx2jp, msx_state,   msx,     "Toshiba", "HX-33 (MSX2)", 0)
-COMP(198?, hx34,      hx34i,    0,      hx34,     msx2jp, msx_state,   msx,     "Toshiba", "HX-34 (MSX2)", GAME_NOT_WORKING) // Floppy support broken
-COMP(198?, hx34i,     0,        0,      hx34i,    msx, msx_state,      msx,     "Toshiba", "HX-34I (MSX2)", GAME_NOT_WORKING) // Floppy support broken
+COMP(198?, hx34,      hx34i,    0,      hx34,     msx2jp, msx_state,   msx,     "Toshiba", "HX-34 (MSX2)", 0)
+COMP(198?, hx34i,     0,        0,      hx34i,    msx, msx_state,      msx,     "Toshiba", "HX-34I (MSX2)", 0)
 COMP(1985, fstm1,     0,        0,      fstm1,    msx, msx_state,      msx,     "Toshiba", "FS-TM1 (MSX2)", 0)
 COMP(198?, victhc90,  victhc95, 0,      victhc90, msxjp, msx_state,    msx,     "Victor", "HC-90 (MSX2)", GAME_NOT_WORKING) // 2nd cpu/turbo not emulated, firmware won't start
 COMP(198?, victhc95,  0,        0,      victhc95, msxjp, msx_state,    msx,     "Victor", "HC-95 (MSX2)", GAME_NOT_WORKING) // 2nd cpu/turbo not emulated, firmware won't start

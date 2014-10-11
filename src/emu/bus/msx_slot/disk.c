@@ -38,6 +38,7 @@ const device_type MSX_SLOT_DISK2 = &device_creator<msx_slot_disk2_device>;
 const device_type MSX_SLOT_DISK3 = &device_creator<msx_slot_disk3_device>;
 const device_type MSX_SLOT_DISK4 = &device_creator<msx_slot_disk4_device>;
 const device_type MSX_SLOT_DISK5 = &device_creator<msx_slot_disk5_device>;
+const device_type MSX_SLOT_DISK6 = &device_creator<msx_slot_disk6_device>;
 
 
 msx_slot_disk_device::msx_slot_disk_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
@@ -638,3 +639,174 @@ WRITE8_MEMBER(msx_slot_disk5_device::io_write)
 			break;
 	}
 }
+
+
+
+msx_slot_disk6_device::msx_slot_disk6_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: msx_slot_wd_disk_device(mconfig, MSX_SLOT_DISK6, "MSX Internal floppy type 6", tag, owner, clock, "msx_slot_disk6", __FILE__)
+	, m_side_motor(0)
+	, m_drive_select0(0)
+	, m_drive_select1(0)
+{
+}
+
+
+void msx_slot_disk6_device::device_start()
+{
+	msx_slot_wd_disk_device::device_start();
+
+	save_item(NAME(m_side_motor));
+	save_item(NAME(m_drive_select0));
+	save_item(NAME(m_drive_select1));
+
+	machine().save().register_postload(save_prepost_delegate(FUNC(msx_slot_disk6_device::post_load), this));
+}
+
+
+void msx_slot_disk6_device::device_reset()
+{
+	m_fdc->dden_w(false);
+}
+
+
+void msx_slot_disk6_device::post_load()
+{
+	select_drive();
+}
+
+
+void msx_slot_disk6_device::select_drive()
+{
+	if (m_drive_select1)    
+	{
+		m_floppy = m_floppy1 ? m_floppy1->get_device() : NULL;
+		if (!m_floppy)
+		{
+			m_drive_select1 = 0;
+		}
+	}
+
+	if (m_drive_select0)
+	{
+		m_floppy = m_floppy0 ? m_floppy0->get_device() : NULL;
+		if (!m_floppy)
+		{
+			m_drive_select0 = 0;
+		}
+	}
+
+	m_fdc->set_floppy(m_floppy);
+
+	set_side_motor();
+}
+
+
+void msx_slot_disk6_device::set_side_motor()
+{
+	if (m_floppy)
+	{
+		m_floppy->mon_w((m_side_motor & 0x02) ? 0 : 1);
+		m_floppy->ss_w(m_side_motor & 0x01);
+	}
+}
+
+
+READ8_MEMBER(msx_slot_disk6_device::read)
+{
+	switch (offset)
+	{
+		case 0x7ff0:   // status?
+		case 0x7ff8:
+			return m_fdc->status_r();
+
+		case 0x7ff1:   // track?
+		case 0x7ff9:
+			return m_fdc->track_r();
+
+		case 0x7ff2:   // sector?
+		case 0x7ffa:
+			return m_fdc->sector_r();
+
+		case 0x7ff3:   // data?
+		case 0x7ffb:
+			return m_fdc->data_r();
+
+		case 0x7ff4:
+		case 0x7ffc:
+			// bit 0 = side control
+			// bit 1 = motor control
+			return 0xfc | m_side_motor;
+			break;
+
+		// This reads back a 1 in bit 0 if drive0 is present and selected
+		case 0x7ff5:
+		case 0x7ffd:
+			return 0xfe | m_drive_select0;
+
+		// This reads back a 1 in bit 0 if drive1 is present and selected
+		case 0x7ff6:
+		case 0x7ffe:
+			return 0xfe | m_drive_select1;
+
+		case 0x7ff7:
+		case 0x7fff:
+			return 0x3f | (m_fdc->intrq_r() ? 0 : 0x40) | (m_fdc->drq_r() ? 0 : 0x80);
+	}
+
+	return msx_slot_rom_device::read(space, offset);
+}
+
+
+WRITE8_MEMBER(msx_slot_disk6_device::write)
+{
+	switch (offset)
+	{
+		case 0x7ff0:   // cmd?
+		case 0x7ff8:
+			m_fdc->cmd_w(data);
+			break;
+
+		case 0x7ff1:   // track?
+		case 0x7ff9:
+			m_fdc->track_w(data);
+			break;
+
+		case 0x7ff2:   // sector?
+		case 0x7ffa:
+			m_fdc->sector_w(data);
+			break;
+
+		case 0x7ff3:   // data?
+		case 0x7ffb:
+			m_fdc->data_w(data);
+			break;
+
+		// Side and motort control
+		// bit 0 = side select
+		// bit 1 = motor on/off
+		case 0x7ff4:
+		case 0x7ffc:
+			m_side_motor = data;
+			set_side_motor();
+			break;
+
+		// bit 0 - select drive 0
+		case 0x7ff5:
+		case 0x7ffd:
+			m_drive_select0 = data;
+			select_drive();
+			break;
+
+		// bit 1 - select drive 1
+		case 0x7ff6:
+		case 0x7ffe:
+			m_drive_select1 = data;
+			select_drive();
+			break;
+
+		default:
+			logerror("msx_slot_disk6_device::write: Unmapped write writing %02x to %04x\n", data, offset);
+			break;
+	}
+}
+

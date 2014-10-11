@@ -19,6 +19,8 @@ extern const device_type MSX_SLOT_DISK3;
 extern const device_type MSX_SLOT_DISK4;
 /* WD FDC accessed through i/o ports 0xd0-0xd4 */
 extern const device_type MSX_SLOT_DISK5;
+/* WD FDC accessed through 7ff0-7ff? (used in Toshiba HX34) */
+extern const device_type MSX_SLOT_DISK6;
 
 
 #define MCFG_MSX_SLOT_DISK1_ADD(_tag, _startpage, _numpages, _region, _offset, _fdc_tag, _floppy0_tag, _floppy1_tag) \
@@ -57,6 +59,13 @@ extern const device_type MSX_SLOT_DISK5;
 	msx_slot_disk_device::set_floppy1_tag(*device, _floppy1_tag); \
 	msx_slot_disk_device::set_floppy2_tag(*device, _floppy2_tag); \
 	msx_slot_disk_device::set_floppy3_tag(*device, _floppy3_tag);
+
+#define MCFG_MSX_SLOT_DISK6_ADD(_tag, _startpage, _numpages, _region, _offset, _fdc_tag, _floppy0_tag, _floppy1_tag) \
+	MCFG_MSX_INTERNAL_SLOT_ADD(_tag, MSX_SLOT_DISK6, _startpage, _numpages) \
+	msx_slot_rom_device::set_rom_start(*device, _region, _offset); \
+	msx_slot_disk_device::set_fdc_tag(*device, _fdc_tag); \
+	msx_slot_disk_device::set_floppy0_tag(*device, _floppy0_tag); \
+	msx_slot_disk_device::set_floppy1_tag(*device, _floppy1_tag);
 
 
 class msx_slot_disk_device : public msx_slot_rom_device
@@ -191,6 +200,29 @@ private:
 	UINT8 m_control;
 
 	void set_control(UINT8 control);
+};
+
+
+class msx_slot_disk6_device : public msx_slot_wd_disk_device
+{
+public:
+	msx_slot_disk6_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	virtual void device_start();
+	virtual void device_reset();
+
+	virtual DECLARE_READ8_MEMBER(read);
+	virtual DECLARE_WRITE8_MEMBER(write);
+
+	void post_load();
+
+private:
+	UINT8 m_side_motor;
+	UINT8 m_drive_select0;
+	UINT8 m_drive_select1;
+
+	void set_side_motor();
+	void select_drive();
 };
 
 
