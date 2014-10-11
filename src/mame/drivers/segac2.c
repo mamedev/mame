@@ -70,7 +70,7 @@
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/nvram.h"
-#include "machine/315-5296.h"
+#include "machine/315_5296.h"
 #include "sound/okim6295.h"
 #include "sound/sn76496.h"
 #include "sound/2612intf.h"

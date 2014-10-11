@@ -1736,7 +1736,7 @@ $(MAMEOBJ)/sega.a: \
 	$(DRIVERS)/turbo.o $(AUDIO)/turbo.o $(VIDEO)/turbo.o \
 	$(DRIVERS)/vicdual.o $(AUDIO)/vicdual.o $(VIDEO)/vicdual.o $(AUDIO)/carnival.o $(AUDIO)/depthch.o $(AUDIO)/invinco.o $(AUDIO)/pulsar.o \
 	$(DRIVERS)/zaxxon.o $(AUDIO)/zaxxon.o $(VIDEO)/zaxxon.o \
-	$(MACHINE)/315-5296.o \
+	$(MACHINE)/315_5296.o \
 	$(MACHINE)/fd1089.o \
 	$(MACHINE)/fd1094.o \
 	$(MACHINE)/fddebug.o \

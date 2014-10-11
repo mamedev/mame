@@ -20,7 +20,7 @@
 
 **********************************************************************/
 
-#include "machine/315-5296.h"
+#include "machine/315_5296.h"
 
 
 const device_type SEGA_315_5296 = &device_creator<sega_315_5296_device>;
