@@ -26,7 +26,7 @@
 		</part>
 	</software>
 
-	<software name="c223_56" supported="no">>
+	<software name="c223_56" supported="no">
 		<description>LifeBoat CP/M 2.23 - 56k</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -38,7 +38,7 @@
 		</part>
 	</software>
 
-	<software name="c223a_24" supported="no">>
+	<software name="c223a_24" supported="no">
 		<description>n2212</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>

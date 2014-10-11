@@ -8049,7 +8049,7 @@
 		<part name="cart" interface="neo_cart">
 			<!-- encrypted code + protection, only z80 rom is different to kof98 -->
 			<!-- KOREAN VERSION -->
-			<feature name="slot" value="rom_kof98" />>
+			<feature name="slot" value="rom_kof98" />
 			<dataarea name="maincpu" width="16" endianness="big" size="0x600000">
 				<rom loadflag="load16_word_swap" name="242-p1.p1" offset="0x000000" size="0x200000" crc="8893df89" sha1="0452828785110601c65f667209fc2d2926cd3751" />
 				<!-- mask rom 16mbit -->
@@ -9691,7 +9691,7 @@
 			<!-- Original Version - Encrypted GFX -->
 			<!-- MVS VERSION -->
 			<feature name="slot" value="r_pc2_mslug4" />
-	These carts were manufactured by Mega Enterprise, not SNK. -->
+			<!-- These carts were manufactured by Mega Enterprise, not SNK. -->
 			<dataarea name="maincpu" width="16" endianness="big" size="0x500000">
 				<rom loadflag="load16_word_swap" name="263-p1.p1" offset="0x000000" size="0x100000" crc="27e4def3" sha1="a08785e8145981bb6b5332a3b2df7eb321253cca" />
 				<!-- mask rom TC538200 -->
@@ -10376,7 +10376,7 @@
 		<part name="cart" interface="neo_cart">
 			<!-- Encrypted Code + Sound + GFX Roms -->
 			<!-- AES VERSION -->
-			<feature name="slot" value="r_pv_kf2k3h" />>
+			<feature name="slot" value="r_pv_kf2k3h" />
 				<!-- All chip labels for this set are correct -->
 			<dataarea name="maincpu" width="16" endianness="big" size="0x900000">
 				<rom loadflag="load32_word_swap" name="271-p1k.p1" offset="0x000000" size="0x400000" crc="d0d0ae3e" sha1="538d054ac50c91694fbbfefcce548b063713e14e" />
@@ -11718,7 +11718,7 @@
 		<sharedfeat name="release" value="MVS" />
 		<sharedfeat name="compatibility" value="MVS" />
 		<part name="cart" interface="neo_cart">
-			<feature name="slot" value="r_svcplusa" />>
+			<feature name="slot" value="r_svcplusa" />
 			<dataarea name="maincpu" width="16" endianness="big" size="0x600000">
 				<rom loadflag="load16_word_swap" name="svc-p1pl.bin" offset="0x000000" size="0x200000" crc="16b44144" sha1="5eab530274b1b6f480a39a86c199da524cddfccc" />
 				<rom loadflag="load16_word_swap" name="svc-p2pl.bin" offset="0x200000" size="0x400000" crc="7231ace2" sha1="d2f13ddd5d3ee29b4b9824e8663f7ee0241f30cf" />
