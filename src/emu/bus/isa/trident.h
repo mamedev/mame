@@ -24,8 +24,8 @@ public:
 	DECLARE_WRITE8_MEMBER(port_83c6_w);
 	DECLARE_READ8_MEMBER(port_43c6_r);
 	DECLARE_WRITE8_MEMBER(port_43c6_w);
-	DECLARE_READ8_MEMBER(vram_r) { if (tri.linear_active) return vga.memory[offset % vga.svga_intf.vram_size]; else return 0xff; }
-	DECLARE_WRITE8_MEMBER(vram_w) { if (tri.linear_active) vga.memory[offset % vga.svga_intf.vram_size] = data; }
+	DECLARE_READ8_MEMBER(vram_r);
+	DECLARE_WRITE8_MEMBER(vram_w);
 	virtual READ8_MEMBER(mem_r);
 	virtual WRITE8_MEMBER(mem_w);
 	virtual UINT16 offset();
@@ -52,8 +52,10 @@ protected:
 		UINT8 gc2f;
 		UINT8 cr1e;
 		UINT8 cr1f;
+		UINT8 cr20;
 		UINT8 cr21;
 		UINT8 cr29;
+		UINT8 cr2a;
 		UINT8 cr39;
 		UINT8 dac;
 		UINT8 lutdac_reg[0x100];
@@ -120,6 +122,11 @@ private:
 
 	int calculate_clock();
 
+	// old style MMIO (0xBFF00)
+	void old_mmio_w(address_space& space, UINT32 offset, UINT8 data);
+	UINT8 old_mmio_r(address_space& space, UINT32 offset);
+
+	// 2D acceleration
 	void accel_command();
 	void accel_bitblt();
 	void accel_line();

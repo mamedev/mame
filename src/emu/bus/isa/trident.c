@@ -30,7 +30,7 @@ const device_type TRIDENT_VGA = &device_creator<trident_vga_device>;
 #define CRTC_PORT_ADDR ((vga.miscellaneous_output&1)?0x3d0:0x3b0)
 
 #define LOG (1)
-#define LOG_ACCEL (0)
+#define LOG_ACCEL (1)
 
 trident_vga_device::trident_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: svga_device(mconfig, TRIDENT_VGA, "Trident TGUI9680", tag, owner, clock, "trident_vga", __FILE__)
@@ -120,6 +120,9 @@ UINT32 trident_vga_device::handle_rop(UINT32 src, UINT32 dst)
 	case 0x5a:  // XOR PAT
 		src = dst ^ src;
 		break;
+	case 0xb8:  // PAT xor (SRC and (DST xor PAT)) (correct?)
+		src = src & (dst ^ src);
+		break;
 	}
 	return src;
 }
@@ -140,7 +143,7 @@ UINT32 trident_vga_device::READPIXEL(INT16 x,INT16 y)
 void trident_vga_device::WRITEPIXEL(INT16 x,INT16 y, UINT32 data)
 {
 	if(svga.rgb8_en)
-		WRITEPIXEL8(x,y,(((data >> 16) & 0xff) | ((data >> 8) & 0xff) | (data & 0xff)));  // XFree86 3.3 sets bits 0-7 to 0 when using mono patterns, does it OR each byte?
+		WRITEPIXEL8(x,y,(((data >> 8) & 0xff) | (data & 0xff)));  // XFree86 3.3 sets bits 0-7 to 0 when using mono patterns, does it OR each byte?
 	if(svga.rgb15_en)
 		WRITEPIXEL15(x,y,data & 0x7fff);
 	if(svga.rgb16_en)
@@ -184,14 +187,15 @@ void trident_vga_device::device_start()
 void trident_vga_device::device_reset()
 {
 	svga_device::device_reset();
-	svga.id = 0xd3;  // identifies at TGUI9660XGi (set to 0xe3 to identify at TGUI9440AGi)
+	svga.id = 0xd3;  // 0xd3 identifies at TGUI9660XGi (set to 0xe3 to identify at TGUI9440AGi)
 	tri.revision = 0x01;  // revision identifies as TGUI9680
 	tri.new_mode = false;  // start up in old mode
 	tri.dac_active = false;
 	tri.linear_active = false;
 	tri.mmio_active = false;
 	tri.sr0f = 0x6f;
-	tri.sr0c = 0x78;
+	tri.sr0c = 0x70;
+	tri.cr2a = 0x03;  // set ISA interface?
 	tri.mem_clock = 0x2c6;  // 50MHz default
 	tri.vid_clock = 0;
 	tri.port_3c3 = true;
@@ -517,6 +521,9 @@ UINT8 trident_vga_device::trident_crtc_reg_read(UINT8 index)
 		case 0x1f:
 			res = tri.cr1f;
 			break;
+		case 0x20:
+			res = tri.cr20;
+			break;
 		case 0x21:
 			res = tri.cr21;
 			break;
@@ -532,6 +539,9 @@ UINT8 trident_vga_device::trident_crtc_reg_read(UINT8 index)
 			break;
 		case 0x29:
 			res = tri.cr29;
+			break;
+		case 0x2a:
+			res = tri.cr2a;
 			break;
 		case 0x38:
 			res = tri.pixel_depth;
@@ -618,12 +628,15 @@ void trident_vga_device::trident_crtc_reg_write(UINT8 index, UINT8 data)
 		case 0x1f:
 			tri.cr1f = data;  // "Software Programming Register"  written to by the BIOS
 			break;
+		case 0x20:  // FIFO Control (old MMIO enable? no documentation of this register)
+			tri.cr20 = data;
+			break;
 		case 0x21:  // Linear aperture
 			tri.cr21 = data;
 			tri.linear_address = ((data & 0xc0)<<18) | ((data & 0x0f)<<20);
 			tri.linear_active = data & 0x20;
-			//if(tri.linear_active)
-				//popmessage("Trident: Linear Aperture active - %08x, %s",tri.linear_address,(tri.cr21 & 0x10) ? "2MB" : "1MB" );
+			if(tri.linear_active)
+				popmessage("Trident: Linear Aperture active - %08x, %s",tri.linear_address,(tri.cr21 & 0x10) ? "2MB" : "1MB" );
 			break;
 		case 0x27:
 			vga.crtc.start_addr = (vga.crtc.start_addr & 0xfff9ffff) | ((data & 0x03)<<17);
@@ -631,6 +644,9 @@ void trident_vga_device::trident_crtc_reg_write(UINT8 index, UINT8 data)
 		case 0x29:
 			tri.cr29 = data;
 			vga.crtc.offset = (vga.crtc.offset & 0xfeff) | ((data & 0x10)<<4);
+			break;
+		case 0x2a:
+			tri.cr2a = data;
 			break;
 		case 0x38:
 			// bit 0: 16 bit bus
@@ -1006,8 +1022,36 @@ WRITE8_MEMBER(trident_vga_device::port_83c6_w)
 	}
 }
 
+READ8_MEMBER(trident_vga_device::vram_r)
+{
+	if (tri.linear_active)
+		return vga.memory[offset % vga.svga_intf.vram_size];
+	else
+		return 0xff;
+}
+
+WRITE8_MEMBER(trident_vga_device::vram_w)
+{
+	if (tri.linear_active)
+	{
+		if(tri.accel_memwrite_active)
+		{
+			tri.accel_transfer = (tri.accel_transfer & (~(0x000000ff << (24-(8*(offset % 4)))))) | (data << (24-(8 * (offset % 4))));
+			if(offset % 4 == 3)
+				accel_data_write(tri.accel_transfer);
+			return;
+		}
+		vga.memory[offset % vga.svga_intf.vram_size] = data;
+	}
+}
+
 READ8_MEMBER(trident_vga_device::mem_r )
 {
+	if((tri.cr20 & 0x10) && (offset >= 0x1ff00)) // correct for old MMIO?
+	{
+		return old_mmio_r(space,offset-0x1ff00);
+	}
+
 	if (svga.rgb8_en || svga.rgb15_en || svga.rgb16_en || svga.rgb32_en)
 	{
 		int data;
@@ -1029,6 +1073,12 @@ READ8_MEMBER(trident_vga_device::mem_r )
 
 WRITE8_MEMBER(trident_vga_device::mem_w)
 {
+	if((tri.cr20 & 0x10) && (offset >= 0x1ff00)) // correct for old MMIO?
+	{
+		old_mmio_w(space,offset-0x1ff00,data);
+		return;
+	}
+
 	if(tri.accel_memwrite_active)
 	{
 		tri.accel_transfer = (tri.accel_transfer & (~(0x000000ff << (24-(8*(offset % 4)))))) | (data << (24-(8 * (offset % 4))));
@@ -1053,6 +1103,27 @@ WRITE8_MEMBER(trident_vga_device::mem_w)
 
 	vga_device::mem_w(space,offset,data,mem_mask);
 }
+
+// Old style MMIO (maps to 0xbff00)
+void trident_vga_device::old_mmio_w(address_space& space, UINT32 offset, UINT8 data)
+{
+	if(offset >= 0x20)
+		accel_w(space,offset-0x20,data);
+}
+
+UINT8 trident_vga_device::old_mmio_r(address_space& space, UINT32 offset)
+{
+	if(offset == 0x20)
+	{
+		if(tri.accel_busy)
+			return 0x20;
+	}
+	if(offset > 0x20)
+		return accel_r(space,offset-0x20);
+	else
+		return 0x00;
+}
+
 
 // 2D Acceleration functions (very WIP)
 
@@ -1131,6 +1202,8 @@ READ8_MEMBER(trident_vga_device::accel_r)
 		else
 			res = 0x00;
 		break;
+	// Operation mode:
+	// bit 8: disable clipping if set
 	case 0x02:  // Operation Mode
 		res = tri.accel_opermode & 0x00ff;
 		break;
