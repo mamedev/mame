@@ -168,6 +168,7 @@ public:
 	// static configuration helpers
 	static void install_slot_pages(device_t &owner, UINT8 prim, UINT8 sec, UINT8 page, UINT8 numpages, device_t *device);
 
+	virtual void driver_start();
 	virtual void machine_start();
 	virtual void machine_reset();
 
@@ -198,7 +199,6 @@ public:
 	DECLARE_READ8_MEMBER(msx_psg_port_b_r);
 	DECLARE_WRITE8_MEMBER(msx_psg_port_a_w);
 	DECLARE_WRITE8_MEMBER(msx_psg_port_b_w);
-	DECLARE_DRIVER_INIT(msx);
 	INTERRUPT_GEN_MEMBER(msx_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(msx2_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(msx2p_interrupt);

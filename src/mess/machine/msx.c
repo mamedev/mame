@@ -175,7 +175,7 @@ static const UINT8 cc_ex[0x100] = {
 };
 
 
-DRIVER_INIT_MEMBER(msx_state,msx)
+void msx_state::driver_start()
 {
 	m_maincpu->set_input_line_vector(0, 0xff);
 
