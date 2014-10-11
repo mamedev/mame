@@ -7,11 +7,11 @@
 
 ****************************************************************************/
 
-#include "includes/special.h"
+#include "specimx_snd.h"
 
 
 // device type definition
-const device_type SPECIMX = &device_creator<specimx_sound_device>;
+const device_type SPECIMX_SND = &device_creator<specimx_sound_device>;
 
 
 //**************************************************************************
@@ -23,7 +23,7 @@ const device_type SPECIMX = &device_creator<specimx_sound_device>;
 //-------------------------------------------------
 
 specimx_sound_device::specimx_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, SPECIMX, "Specialist MX Audio Custom", tag, owner, clock, "specimx_sound", __FILE__),
+	: device_t(mconfig, SPECIMX_SND, "Specialist MX Audio Custom", tag, owner, clock, "specimx_sound", __FILE__),
 		device_sound_interface(mconfig, *this),
 		m_mixer_channel(NULL)
 {

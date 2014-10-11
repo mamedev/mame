@@ -1123,7 +1123,7 @@ $(MESSOBJ)/cybiko.a:            \
 	$(MESS_DRIVERS)/cybiko.o $(MESS_MACHINE)/cybiko.o \
 
 $(MESSOBJ)/dai.a:               \
-	$(MESS_DRIVERS)/dai.o $(MESS_AUDIO)/dai.o $(MESS_MACHINE)/dai.o $(MESS_VIDEO)/dai.o \
+	$(MESS_DRIVERS)/dai.o $(MESS_AUDIO)/dai_snd.o $(MESS_MACHINE)/dai.o $(MESS_VIDEO)/dai.o \
 
 $(MESSOBJ)/ddr.a:               \
 	$(MESS_DRIVERS)/ac1.o $(MESS_MACHINE)/ac1.o $(MESS_VIDEO)/ac1.o \
@@ -1628,7 +1628,7 @@ $(MESSOBJ)/sord.a:              \
 	$(MESS_DRIVERS)/m5.o        \
 
 $(MESSOBJ)/special.a:           \
-	$(MESS_DRIVERS)/special.o $(MESS_AUDIO)/special.o $(MESS_MACHINE)/special.o $(MESS_VIDEO)/special.o \
+	$(MESS_DRIVERS)/special.o $(MESS_AUDIO)/specimx_snd.o $(MESS_MACHINE)/special.o $(MESS_VIDEO)/special.o \
 
 $(MESSOBJ)/sun.a:               \
 	$(MESS_DRIVERS)/sun1.o      \

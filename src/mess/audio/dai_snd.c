@@ -1,6 +1,6 @@
 /***************************************************************************
 
-  audio/dai.c
+  audio/dai_snd.c
 
   Functions to emulate sound hardware of DAI Personal Computer
 
@@ -9,7 +9,7 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "includes/dai.h"
+#include "dai_snd.h"
 
 // device type definition
 const device_type DAI_SOUND = &device_creator<dai_sound_device>;

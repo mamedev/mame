@@ -8,44 +8,13 @@
 #define DAI_H_
 
 #include "cpu/i8085/i8085.h"
+#include "audio/dai_snd.h"
 #include "machine/i8255.h"
 #include "machine/pit8253.h"
 #include "machine/ram.h"
 #include "machine/tms5501.h"
 #include "imagedev/cassette.h"
 #include "sound/wave.h"
-
-
-// ======================> dai_sound_device
-
-class dai_sound_device : public device_t,
-							public device_sound_interface
-{
-public:
-	// construction/destruction
-	dai_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-
-	DECLARE_WRITE_LINE_MEMBER(set_input_ch0);
-	DECLARE_WRITE_LINE_MEMBER(set_input_ch1);
-	DECLARE_WRITE_LINE_MEMBER(set_input_ch2);
-	DECLARE_WRITE8_MEMBER(set_volume);
-
-protected:
-	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
-
-private:
-	sound_stream *      m_mixer_channel;
-	int                 m_dai_input[3];
-	UINT8               m_osc_volume[3];
-	UINT8               m_noise_volume;
-
-	static const UINT16 s_osc_volume_table[];
-	static const UINT16 s_noise_volume_table[];
-};
-
 
 
 class dai_state : public driver_device
@@ -106,9 +75,5 @@ protected:
 
 extern const unsigned char dai_palette[16*3];
 
-
-/*----------- defined in audio/dai.c -----------*/
-
-extern const device_type DAI_SOUND;
 
 #endif /* DAI_H_ */

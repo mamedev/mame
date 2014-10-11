@@ -433,7 +433,7 @@ static MACHINE_CONFIG_DERIVED( specimx, special )
 	MCFG_PALETTE_INIT_OWNER(special_state, specimx )
 
 	/* audio hardware */
-	MCFG_SOUND_ADD("custom", SPECIMX, 0)
+	MCFG_SOUND_ADD("custom", SPECIMX_SND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* Devices */

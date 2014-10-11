@@ -10,6 +10,7 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/i8085/i8085.h"
+#include "audio/specimx_snd.h"
 #include "sound/dac.h"
 #include "sound/wave.h"
 #include "machine/i8255.h"
@@ -20,8 +21,6 @@
 #include "machine/wd_fdc.h"
 #include "machine/ram.h"
 
-
-class specimx_sound_device; // defined below
 
 class special_state : public driver_device
 {
@@ -153,32 +152,5 @@ protected:
 
 extern const rgb_t specimx_palette[16];
 
-
-/*----------- defined in audio/special.c -----------*/
-
-class specimx_sound_device : public device_t,
-								public device_sound_interface
-{
-public:
-	specimx_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	~specimx_sound_device() { }
-
-	DECLARE_WRITE_LINE_MEMBER(set_input_ch0);
-	DECLARE_WRITE_LINE_MEMBER(set_input_ch1);
-	DECLARE_WRITE_LINE_MEMBER(set_input_ch2);
-
-protected:
-	// device-level overrides
-	virtual void device_start();
-
-	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
-
-private:
-	sound_stream *m_mixer_channel;
-	int m_specimx_input[3];
-};
-
-extern const device_type SPECIMX;
 
 #endif /* SPECIAL_H_ */
