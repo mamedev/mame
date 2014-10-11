@@ -4,7 +4,9 @@
 #include "sound/sn76496.h"
 
 #include "imagedev/chd_cd.h"
-#include "imagedev/cartslot.h"
+
+#include "bus/generic/slot.h"
+#include "bus/generic/carts.h"
 
 #include "formats/imageutl.h"
 
@@ -465,8 +467,6 @@ DRIVER_INIT_MEMBER(md_cons_state, md_jpn)
 
 /****************************************** 32X emulation ****************************************/
 
-// FIXME: non-softlist loading should keep using ROM_CART_LOAD in the ROM definitions,
-// once we better integrate softlist with the old loading procedures
 DEVICE_IMAGE_LOAD_MEMBER( md_cons_state, _32x_cart )
 {
 	UINT32 length;
@@ -555,11 +555,10 @@ static MACHINE_CONFIG_START( genesis_32x, md_cons_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", (0.25)/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", (0.25)/2)
 
-	MCFG_CARTSLOT_ADD("cart")
-	MCFG_CARTSLOT_EXTENSION_LIST("32x,bin")
-	MCFG_CARTSLOT_MANDATORY
-	MCFG_CARTSLOT_INTERFACE("_32x_cart")
-	MCFG_CARTSLOT_LOAD(md_cons_state, _32x_cart)
+	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "_32x_cart")
+	MCFG_GENERIC_EXTENSIONS("32x,bin")
+	MCFG_GENERIC_MANDATORY
+	MCFG_GENERIC_LOAD(md_cons_state, _32x_cart)
 
 	MCFG_SOFTWARE_LIST_ADD("cart_list","32x")
 	MCFG_SOFTWARE_LIST_FILTER("cart_list","NTSC-U")
@@ -597,11 +596,10 @@ static MACHINE_CONFIG_START( mdj_32x, md_cons_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", (0.25)/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", (0.25)/2)
 
-	MCFG_CARTSLOT_ADD("cart")
-	MCFG_CARTSLOT_EXTENSION_LIST("32x,bin")
-	MCFG_CARTSLOT_MANDATORY
-	MCFG_CARTSLOT_INTERFACE("_32x_cart")
-	MCFG_CARTSLOT_LOAD(md_cons_state, _32x_cart)
+	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "_32x_cart")
+	MCFG_GENERIC_EXTENSIONS("32x,bin")
+	MCFG_GENERIC_MANDATORY
+	MCFG_GENERIC_LOAD(md_cons_state, _32x_cart)
 
 	MCFG_SOFTWARE_LIST_ADD("cart_list","32x")
 	MCFG_SOFTWARE_LIST_FILTER("cart_list","NTSC-J")
@@ -639,11 +637,10 @@ static MACHINE_CONFIG_START( md_32x, md_cons_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", (0.25)/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", (0.25)/2)
 
-	MCFG_CARTSLOT_ADD("cart")
-	MCFG_CARTSLOT_EXTENSION_LIST("32x,bin")
-	MCFG_CARTSLOT_MANDATORY
-	MCFG_CARTSLOT_INTERFACE("_32x_cart")
-	MCFG_CARTSLOT_LOAD(md_cons_state, _32x_cart)
+	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "_32x_cart")
+	MCFG_GENERIC_EXTENSIONS("32x,bin")
+	MCFG_GENERIC_MANDATORY
+	MCFG_GENERIC_LOAD(md_cons_state, _32x_cart)
 
 	MCFG_SOFTWARE_LIST_ADD("cart_list","32x")
 	MCFG_SOFTWARE_LIST_FILTER("cart_list","PAL")
@@ -748,8 +745,10 @@ static MACHINE_CONFIG_DERIVED( genesis_32x_scd, genesis_32x )
 
 	MCFG_MACHINE_START_OVERRIDE(md_cons_state, ms_megacd)
 
-	MCFG_DEVICE_MODIFY("cart")
-	MCFG_CARTSLOT_NOT_MANDATORY
+	MCFG_DEVICE_REMOVE("cartslot")
+	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "_32x_cart")
+	MCFG_GENERIC_EXTENSIONS("32x,bin")
+	MCFG_GENERIC_LOAD(md_cons_state, _32x_cart)
 
 	//MCFG_QUANTUM_PERFECT_CPU("32x_master_sh2")
 MACHINE_CONFIG_END

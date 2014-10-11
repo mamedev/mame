@@ -19,7 +19,6 @@
 #include "sound/dac.h"
 #include "audio/mea8000.h"
 #include "bus/centronics/ctronics.h"
-#include "imagedev/cartslot.h"
 #include "imagedev/cassette.h"
 #include "machine/mc6843.h"
 #include "machine/mc6846.h"
@@ -28,6 +27,9 @@
 #include "formats/thom_dsk.h"
 #include "machine/thomflop.h"
 #include "machine/ram.h"
+
+#include "bus/generic/slot.h"
+#include "bus/generic/carts.h"
 
 
 /* 6821 PIAs */

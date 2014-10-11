@@ -13,8 +13,9 @@
 #include "cpu/rsp/rsp.h"
 #include "cpu/mips/mips3.h"
 #include "sound/dmadac.h"
-#include "imagedev/cartslot.h"
 #include "includes/n64.h"
+#include "bus/generic/slot.h"
+#include "bus/generic/carts.h"
 
 class n64_mess_state : public n64_state
 {
@@ -185,7 +186,7 @@ DEVICE_IMAGE_LOAD_MEMBER(n64_mess_state,n64_cart)
 
 	if (image.software_entry() == NULL)
 	{
-		length = image.fread( cart, 0x4000000);
+		length = image.fread(cart, 0x4000000);
 	}
 	else
 	{
@@ -315,11 +316,10 @@ static MACHINE_CONFIG_START( n64, n64_mess_state )
 	MCFG_N64_PERIPHS_ADD("rcp");
 
 	/* cartridge */
-	MCFG_CARTSLOT_ADD("cart")
-	MCFG_CARTSLOT_EXTENSION_LIST("v64,z64,rom,n64,bin")
-	MCFG_CARTSLOT_MANDATORY
-	MCFG_CARTSLOT_INTERFACE("n64_cart")
-	MCFG_CARTSLOT_LOAD(n64_mess_state,n64_cart)
+	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "n64_cart")
+	MCFG_GENERIC_EXTENSIONS("v64,z64,rom,n64,bin")
+	MCFG_GENERIC_MANDATORY
+	MCFG_GENERIC_LOAD(n64_mess_state, n64_cart)
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("cart_list","n64")
@@ -331,8 +331,11 @@ static MACHINE_CONFIG_DERIVED( n64dd, n64 )
 
 	MCFG_MACHINE_START_OVERRIDE(n64_mess_state, n64dd)
 
-	MCFG_CARTSLOT_MODIFY("cart")
-	MCFG_CARTSLOT_NOT_MANDATORY
+	MCFG_DEVICE_REMOVE("cartslot")
+	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "n64_cart")
+	MCFG_GENERIC_EXTENSIONS("v64,z64,rom,n64,bin")
+	MCFG_GENERIC_LOAD(n64_mess_state, n64_cart)
+
 MACHINE_CONFIG_END
 
 ROM_START( n64 )

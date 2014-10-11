@@ -340,13 +340,14 @@ Notes:
 #include "sound/dac.h"
 #include "includes/jaguar.h"
 #include "emuopts.h"
-#include "imagedev/cartslot.h"
 #include "imagedev/snapquik.h"
 #include "sound/dac.h"
 #include "machine/eepromser.h"
 #include "sound/cdda.h"
 #include "cdrom.h"
 #include "imagedev/chd_cd.h"
+#include "bus/generic/slot.h"
+#include "bus/generic/carts.h"
 
 
 #define COJAG_CLOCK         XTAL_52MHz
@@ -1880,10 +1881,9 @@ static MACHINE_CONFIG_START( jaguar, jaguar_state )
 	MCFG_QUICKLOAD_ADD("quickload", jaguar_state, jaguar, "abs,bin,cof,jag,prg", 2)
 
 	/* cartridge */
-	MCFG_CARTSLOT_ADD("cart")
-	MCFG_CARTSLOT_EXTENSION_LIST("j64,rom")
-	MCFG_CARTSLOT_INTERFACE("jaguar_cart")
-	MCFG_CARTSLOT_LOAD(jaguar_state,jaguar_cart)
+	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "jaguar_cart")
+	MCFG_GENERIC_EXTENSIONS("j64,rom,bin")
+	MCFG_GENERIC_LOAD(jaguar_state, jaguar_cart)
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("cart_list","jaguar")
@@ -2045,15 +2045,10 @@ void jaguar_state::cart_start()
 {
 	/* Initialize for no cartridge present */
 	m_using_cart = false;
-	memset( m_cart_base, 0, memshare("cart")->bytes() );
+	memset(m_cart_base, 0, memshare("cart")->bytes());
 }
 
 DEVICE_IMAGE_LOAD_MEMBER( jaguar_state, jaguar_cart )
-{
-	return cart_load(image);
-}
-
-int jaguar_state::cart_load(device_image_interface &image)
 {
 	UINT32 size, load_offset = 0;
 
@@ -2064,12 +2059,12 @@ int jaguar_state::cart_load(device_image_interface &image)
 		/* .rom files load & run at 802000 */
 		if (!core_stricmp(image.filetype(), "rom"))
 		{
-			load_offset = 0x2000;       // fix load address
-			m_cart_base[0x101]=0x802000;    // fix exec address
+			load_offset = 0x2000;             // fix load address
+			m_cart_base[0x101] = 0x802000;    // fix exec address
 		}
 
 		/* Load cart into memory */
-		image.fread( &memregion("maincpu")->base()[0x800000+load_offset], size);
+		image.fread(&memregion("maincpu")->base()[0x800000 + load_offset], size);
 	}
 	else
 	{
@@ -2084,7 +2079,7 @@ int jaguar_state::cart_load(device_image_interface &image)
 
 	/* Skip the logo */
 	m_using_cart = true;
-//  m_cart_base[0x102] = 1;
+	//  m_cart_base[0x102] = 1;
 
 	/* Transfer control to the bios */
 	m_maincpu->set_pc(m_rom_base[1]);
@@ -2106,7 +2101,6 @@ int jaguar_state::cart_load(device_image_interface &image)
 ROM_START( jaguar )
 	ROM_REGION( 0x1000000, "maincpu", 0 )  /* 4MB for RAM at 0 */
 	ROM_LOAD16_WORD( "jagboot.rom", 0xe00000, 0x020000, CRC(fb731aaa) SHA1(f8991b0c385f4e5002fa2a7e2f5e61e8c5213356) )
-	ROM_CART_LOAD("cart", 0x800000, 0x600000, ROM_NOMIRROR)
 
 	ROM_REGION16_BE( 0x1000, "waverom", 0 )
 	ROM_LOAD16_WORD("jagwave.rom", 0x0000, 0x1000, CRC(7a25ee5b) SHA1(58117e11fd6478c521fbd3fdbe157f39567552f0) )
@@ -2115,7 +2109,7 @@ ROM_END
 ROM_START( jaguarcd )
 	ROM_REGION( 0x1000000, "maincpu", 0 )
 	ROM_LOAD16_WORD( "jagboot.rom", 0xe00000, 0x020000, CRC(fb731aaa) SHA1(f8991b0c385f4e5002fa2a7e2f5e61e8c5213356) )
-	ROM_CART_LOAD("cart", 0x800000, 0x600000, ROM_NOMIRROR) // TODO: needs to be removed (CD BIOS runs in the cart space)
+	// TODO: cart needs to be removed (CD BIOS runs in the cart space)
 
 	ROM_REGION(0x40000, "cdbios", 0 )
 	ROM_SYSTEM_BIOS( 0, "default", "Jaguar CD" )

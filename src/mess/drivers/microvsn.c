@@ -17,8 +17,10 @@ of the games were clocked at around 500KHz, 550KHz, or 300KHz.
 #include "cpu/mcs48/mcs48.h"
 #include "cpu/tms0980/tms0980.h"
 #include "sound/dac.h"
-#include "imagedev/cartslot.h"
 #include "rendlay.h"
+
+#include "bus/generic/slot.h"
+#include "bus/generic/carts.h"
 
 
 #define LOG 0
@@ -31,7 +33,9 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_dac( *this, "dac" ),
 		m_i8021( *this, "maincpu1" ),
-		m_tms1100( *this, "maincpu2" ) { }
+		m_tms1100( *this, "maincpu2" ),
+		m_cart(*this, "cartslot")
+	{ }
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -40,7 +44,7 @@ public:
 	DECLARE_MACHINE_RESET(microvision);
 
 	void screen_vblank(screen_device &screen, bool state);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( microvision_cart );
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( microvsn_cart );
 
 	// i8021 interface
 	DECLARE_WRITE8_MEMBER(i8021_p0_write);
@@ -86,6 +90,7 @@ protected:
 	required_device<dac_device> m_dac;
 	required_device<cpu_device> m_i8021;
 	required_device<cpu_device> m_tms1100;
+	required_device<generic_slot_device> m_cart;
 
 	// Timers
 	static const device_timer_id TIMER_PADDLE = 0;
@@ -507,21 +512,12 @@ static const UINT16 microvision_output_pla_1[0x20] =
 };
 
 
-DEVICE_IMAGE_LOAD_MEMBER(microvision_state,microvision_cart)
+DEVICE_IMAGE_LOAD_MEMBER(microvision_state, microvsn_cart)
 {
 	UINT8 *rom1 = memregion("maincpu1")->base();
 	UINT8 *rom2 = memregion("maincpu2")->base();
-	UINT32 file_size;
+	UINT32 file_size = m_cart->common_get_size("rom");
 	m_pla = 0;
-
-	if (image.software_entry() == NULL)
-	{
-		file_size = image.length();
-	}
-	else
-	{
-		file_size = image.get_software_region_length("rom");
-	}
 
 	if ( file_size != 1024 && file_size != 2048 )
 	{
@@ -532,7 +528,7 @@ DEVICE_IMAGE_LOAD_MEMBER(microvision_state,microvision_cart)
 	/* Read cartridge */
 	if (image.software_entry() == NULL)
 	{
-		if (image.fread( rom1, file_size) != file_size)
+		if (image.fread(rom1, file_size) != file_size)
 		{
 			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unable to fully read from file");
 			return IMAGE_INIT_FAIL;
@@ -546,12 +542,10 @@ DEVICE_IMAGE_LOAD_MEMBER(microvision_state,microvision_cart)
 		// Get PLA type
 		const char *pla = image.get_feature("pla");
 
-		if ( pla )
-		{
+		if (pla)
 			m_pla = 1;
-		}
 
-		tms1xxx_cpu_device::set_output_pla( m_tms1100, m_pla ? microvision_output_pla_1 : microvision_output_pla_0 );
+		tms1xxx_cpu_device::set_output_pla(m_tms1100, m_pla ? microvision_output_pla_1 : microvision_output_pla_0);
 
 		// Set default setting for PCB type and RC type
 		m_pcb_type = microvision_state::PCB_TYPE_UNKNOWN;
@@ -560,7 +554,7 @@ DEVICE_IMAGE_LOAD_MEMBER(microvision_state,microvision_cart)
 		// Detect settings for PCB type
 		const char *pcb = image.get_feature("pcb");
 
-		if ( pcb != NULL )
+		if (pcb)
 		{
 			static const struct { const char *pcb_name; microvision_state::pcb_type pcbtype; } pcb_types[] =
 				{
@@ -570,7 +564,7 @@ DEVICE_IMAGE_LOAD_MEMBER(microvision_state,microvision_cart)
 					{ "7924952D02", microvision_state::PCB_TYPE_7924952D02 }
 				};
 
-			for (int i = 0; i < ARRAY_LENGTH(pcb_types) && m_pcb_type == microvision_state::PCB_TYPE_UNKNOWN; i++ )
+			for (int i = 0; i < ARRAY_LENGTH(pcb_types) && m_pcb_type == microvision_state::PCB_TYPE_UNKNOWN; i++)
 			{
 				if (!core_stricmp(pcb, pcb_types[i].pcb_name))
 				{
@@ -582,7 +576,7 @@ DEVICE_IMAGE_LOAD_MEMBER(microvision_state,microvision_cart)
 		// Detect settings for RC types
 		const char *rc = image.get_feature("rc");
 
-		if ( rc != NULL )
+		if (rc)
 		{
 			static const struct { const char *rc_name; microvision_state::rc_type rctype; } rc_types[] =
 				{
@@ -591,7 +585,7 @@ DEVICE_IMAGE_LOAD_MEMBER(microvision_state,microvision_cart)
 					{ "100pf/39.4K", microvision_state::RC_TYPE_100PF_39_4K }
 				};
 
-			for ( int i = 0; i < ARRAY_LENGTH(rc_types) && m_rc_type == microvision_state::RC_TYPE_UNKNOWN; i++ )
+			for (int i = 0; i < ARRAY_LENGTH(rc_types) && m_rc_type == microvision_state::RC_TYPE_UNKNOWN; i++)
 			{
 				if (!core_stricmp(rc, rc_types[i].rc_name))
 				{
@@ -602,13 +596,13 @@ DEVICE_IMAGE_LOAD_MEMBER(microvision_state,microvision_cart)
 	}
 
 	// Mirror rom data to maincpu2 region
-	memcpy( rom2, rom1, file_size );
+	memcpy(rom2, rom1, file_size);
 
 	// Based on file size select cpu:
 	// - 1024 -> I8021
 	// - 2048 -> TI TMS1100
 
-	switch ( file_size )
+	switch (file_size)
 	{
 		case 1024:
 			m_cpu_type = microvision_state::CPU_TYPE_I8021;
@@ -689,11 +683,9 @@ static MACHINE_CONFIG_START( microvision, microvision_state )
 	MCFG_SOUND_ADD("dac", DAC, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_CARTSLOT_ADD("cart")
-	MCFG_CARTSLOT_EXTENSION_LIST("bin")
-	MCFG_CARTSLOT_MANDATORY
-	MCFG_CARTSLOT_INTERFACE("microvision_cart")
-	MCFG_CARTSLOT_LOAD(microvision_state,microvision_cart)
+	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "microvision_cart")
+	MCFG_GENERIC_MANDATORY
+	MCFG_GENERIC_LOAD(microvision_state, microvsn_cart)
 
 	/* Software lists */
 	MCFG_SOFTWARE_LIST_ADD("cart_list","microvision")
