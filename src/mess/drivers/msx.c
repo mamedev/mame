@@ -1332,9 +1332,6 @@ static MACHINE_CONFIG_START( msx, msx_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", msx_state,  msx_interrupt) /* Needed for mouse updates */
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
-	MCFG_MACHINE_START_OVERRIDE(msx_state, msx )
-	MCFG_MACHINE_RESET_OVERRIDE(msx_state, msx )
-
 	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
 	MCFG_I8255_OUT_PORTA_CB(WRITE8(msx_state, msx_ppi_port_a_w))
 	MCFG_I8255_IN_PORTB_CB(READ8(msx_state, msx_ppi_port_b_r))
@@ -1411,9 +1408,6 @@ static MACHINE_CONFIG_START( msx2, msx_state )
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", msx_state, msx2_interrupt, "screen", 0, 2)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
-	MCFG_MACHINE_START_OVERRIDE(msx_state, msx2 )
-	MCFG_MACHINE_RESET_OVERRIDE(msx_state, msx2 )
-
 	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
 	MCFG_I8255_OUT_PORTA_CB(WRITE8(msx_state, msx_ppi_port_a_w))
 	MCFG_I8255_IN_PORTB_CB(READ8(msx_state, msx_ppi_port_b_r))
@@ -1478,9 +1472,6 @@ static MACHINE_CONFIG_START( msx2p, msx_state )
 	MCFG_CPU_IO_MAP(msx2p_io_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", msx_state, msx2p_interrupt, "screen", 0, 2)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
-
-	MCFG_MACHINE_START_OVERRIDE(msx_state, msx2 )
-	MCFG_MACHINE_RESET_OVERRIDE(msx_state, msx2 )
 
 	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
 	MCFG_I8255_OUT_PORTA_CB(WRITE8(msx_state, msx_ppi_port_a_w))

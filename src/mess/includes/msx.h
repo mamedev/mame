@@ -168,6 +168,9 @@ public:
 	// static configuration helpers
 	static void install_slot_pages(device_t &owner, UINT8 prim, UINT8 sec, UINT8 page, UINT8 numpages, device_t *device);
 
+	virtual void machine_start();
+	virtual void machine_reset();
+
 	DECLARE_ADDRESS_MAP(switched_device_map, 8);
 	DECLARE_WRITE8_MEMBER(msx_sec_slot_w);
 	DECLARE_READ8_MEMBER(msx_sec_slot_r);
@@ -187,7 +190,6 @@ public:
 
 	void msx_memory_map_all();
 	void msx_memory_map_page(UINT8 page);
-	void msx_ch_reset_core();
 	void msx_memory_reset();
 
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
@@ -197,10 +199,6 @@ public:
 	DECLARE_WRITE8_MEMBER(msx_psg_port_a_w);
 	DECLARE_WRITE8_MEMBER(msx_psg_port_b_w);
 	DECLARE_DRIVER_INIT(msx);
-	DECLARE_MACHINE_START(msx);
-	DECLARE_MACHINE_RESET(msx);
-	DECLARE_MACHINE_START(msx2);
-	DECLARE_MACHINE_RESET(msx2);
 	INTERRUPT_GEN_MEMBER(msx_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(msx2_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(msx2p_interrupt);
