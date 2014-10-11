@@ -35,6 +35,8 @@ NOTE: 2014-09-13: added code from someone's modified MESS driver for floppy
 #include "imagedev/cassette.h"
 #include "machine/ram.h"
 #include "formats/spc1000_cas.h"
+#include "machine/i8255.h"
+#include "machine/upd765.h"
 
 
 class spc1000_state : public driver_device
@@ -45,6 +47,9 @@ public:
 		, m_p_videoram(*this, "videoram")
 		, m_vdg(*this, "mc6847")
 		, m_maincpu(*this, "maincpu")
+		, m_fdccpu(*this, "fdccpu")
+		, m_fdc(*this, "upd765")
+		, m_pio(*this, "d8255_master")
 		, m_ram(*this, RAM_TAG)
 		, m_cass(*this, "cassette")
 	{}
@@ -57,9 +62,13 @@ public:
 	DECLARE_READ8_MEMBER(porta_r);
 	DECLARE_READ8_MEMBER(mc6847_videoram_r);
 	DECLARE_WRITE8_MEMBER(cass_w);
-	///DECLARE_WRITE8_MEMBER(spc1000_sd725_w);
-	///DECLARE_READ8_MEMBER(spc1000_sd725_r);
-
+	DECLARE_WRITE8_MEMBER(spc1000_sd725_w);
+	DECLARE_READ8_MEMBER(spc1000_sd725_r);
+	DECLARE_WRITE8_MEMBER(fdc_8255_b_w);
+	DECLARE_READ8_MEMBER(fdc_8255_c_r);
+	DECLARE_WRITE8_MEMBER(fdc_8255_c_w);
+	DECLARE_READ8_MEMBER( upd765_tc_r );
+	DECLARE_WRITE8_MEMBER( fdc_control_w );	
 	MC6847_GET_CHARROM_MEMBER(get_char_rom)
 	{
 		return m_p_videoram[0x1000 + (ch & 0x7f) * 16 + line];
@@ -70,16 +79,32 @@ private:
 	UINT8 m_IPLK;
 	UINT8 m_GMODE;
 	UINT16 m_page;
+	UINT8 *m_work_ram;
 	virtual void machine_reset();
-	///FloppyDisk fdd;
-	///void initDisk(void);
 	required_device<mc6847_base_device> m_vdg;
 	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_fdccpu;	
+	required_device<upd765a_device> m_fdc;	
+	required_device<i8255_device> m_pio;
 	required_device<ram_device> m_ram;
 	required_device<cassette_image_device> m_cass;
+
+	floppy_image_device *m_fd0;
+	floppy_image_device *m_fd1;
+	
+	emu_timer *m_timer_tc;	
+	
+	UINT8 m_i8255_0_pc;
+	UINT8 m_i8255_1_pc;
+	UINT8 m_i8255_portb;
+	
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };
 
-
+void spc1000_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	m_fdc->tc_w(false);	
+}
 
 static ADDRESS_MAP_START(spc1000_mem, AS_PROGRAM, 8, spc1000_state )
 	ADDRESS_MAP_UNMAP_HIGH
@@ -139,6 +164,76 @@ READ8_MEMBER(spc1000_state::spc1000_gmode_r)
 	return m_GMODE;
 }
 
+READ8_MEMBER(spc1000_state::spc1000_sd725_r)
+{
+	UINT8 data = 0;
+	switch (offset)
+	{
+		case 1:
+			data = m_i8255_portb;
+			break;
+		case 2:
+			data = m_i8255_1_pc >> 4;
+			break;
+	}
+	return data;
+}
+
+WRITE8_MEMBER(spc1000_state::spc1000_sd725_w)
+{
+	switch (offset)
+	{
+		case 0:
+			m_pio->write(space, offset+1, data);
+			break;
+		case 2:
+			m_i8255_0_pc = data;
+			break;
+	}
+}
+
+READ8_MEMBER(spc1000_state::fdc_8255_c_r)
+{
+	return m_i8255_0_pc >> 4;
+}
+
+WRITE8_MEMBER(spc1000_state::fdc_8255_b_w)
+{
+	m_i8255_portb = data;
+}
+
+WRITE8_MEMBER(spc1000_state::fdc_8255_c_w)
+{
+	m_i8255_1_pc = data;
+}
+
+//-------------------------------------------------
+//  fdc interrupt
+//-------------------------------------------------
+
+READ8_MEMBER( spc1000_state::upd765_tc_r )
+{
+	logerror("%s: upd765_tc_r\n", space.machine().describe_context());
+
+	// toggle tc on read
+	m_fdc->tc_w(true);
+	m_timer_tc->adjust(attotime::zero);
+
+	return 0xff;
+}
+
+WRITE8_MEMBER( spc1000_state::fdc_control_w )
+{
+	logerror("%s: sd725_fdc_control_w(%02x)\n", space.machine().describe_context(), data);
+
+	// bit 0, motor on signal
+	if (m_fd0)
+		m_fd0->mon_w(!BIT(data, 0));
+	if (m_fd1)
+		m_fd1->mon_w(!BIT(data, 0));
+}
+
+
 static ADDRESS_MAP_START( spc1000_io , AS_IO, 8, spc1000_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_SHARE("videoram")
@@ -157,7 +252,8 @@ static ADDRESS_MAP_START( spc1000_io , AS_IO, 8, spc1000_state )
 	AM_RANGE(0x8008, 0x8008) AM_READ_PORT("LINE8")
 	AM_RANGE(0x8009, 0x8009) AM_READ_PORT("LINE9")
 	AM_RANGE(0xA000, 0xA000) AM_READWRITE(spc1000_iplk_r, spc1000_iplk_w)
-	///AM_RANGE(0xC000, 0xC002) AM_READWRITE(spc1000_sd725_r, spc1000_sd725_w)
+	AM_RANGE(0xC000, 0xC002) AM_READWRITE(spc1000_sd725_r, spc1000_sd725_w)
+//	AM_RANGE(0xC000, 0xC003) AM_DEVREADWRITE("d8255_master", i8255_device, read, write)
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -244,7 +340,7 @@ static INPUT_PORTS_START( spc1000 )
 		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("I") PORT_CODE(KEYCODE_I) PORT_CHAR('i') PORT_CHAR('I') PORT_CHAR(0x09)
 		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("8 (") PORT_CODE(KEYCODE_8) PORT_CHAR('8') PORT_CHAR('(')
 	PORT_START("LINE9")
-		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED) ///	PORT_NAME("IPL") PORT_CODE(KEYCODE_F6)
+		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_START)	PORT_NAME("IPL") PORT_CODE(KEYCODE_END)
 		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F5") PORT_CODE(KEYCODE_F5)
 		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("- =") PORT_CODE(KEYCODE_MINUS) PORT_CHAR('-') PORT_CHAR('=')
 		PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("0") PORT_CODE(KEYCODE_0) PORT_CHAR('0')
@@ -253,283 +349,6 @@ static INPUT_PORTS_START( spc1000 )
 		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("O") PORT_CODE(KEYCODE_O) PORT_CHAR('o') PORT_CHAR('O') PORT_CHAR(0x0e)
 		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("9 )") PORT_CODE(KEYCODE_9) PORT_CHAR('9') PORT_CHAR(')')
 INPUT_PORTS_END
-
-#if 0
-typedef union PC
-{
-    struct {
-        unsigned char rDAV : 1;
-        unsigned char rRFD : 1;
-        unsigned char rDAC : 1;
-        unsigned char rNON : 1;
-        unsigned char wDAV : 1;
-        unsigned char wRFD : 1;
-        unsigned char wDAC : 1;
-        unsigned char wATN : 1;
-    } bits;
-    unsigned char b;
-} pc_t;
-
-typedef char byte;
-
-typedef struct
-{
-    byte rdVal;
-    byte wrVal;
-    byte rSize;
-    UINT16 seq;
-    byte isCmd;
-    byte cmd;
-    UINT8 sdata[6];
-    pc_t PC;
-    char diskfile[1024];
-    char diskfile2[1024];
-    UINT8 diskdata[80*16*256]; // 80 tracks 16 sectors 256 byte
-    UINT8 diskdata2[80*16*256];
-    byte modified;
-    byte modified2;
-    byte write;
-    byte write2;
-    byte *buffer;
-    byte idx;
-    int datasize;
-    int dataidx;
-} FloppyDisk;
-
-void spc1000_state::initDisk(void)
-{
-    FILE *f;
-	strcpy(fdd.diskfile, "system.dsk");
-	strcpy(fdd.diskfile2, "disk.dsk");
-	printf("ddd\n");
-    if (strlen(fdd.diskfile) > 4)
-    {
-        f = fopen(fdd.diskfile, "rb");
-		if (f > 0) {
-        	fread(fdd.diskdata, 1, sizeof(fdd.diskdata), f);
-	        fclose(f);
-		}
-    }
-    if (strlen(fdd.diskfile2) > 4)
-    {
-        f = fopen(fdd.diskfile2, "rb");
-		if (f > 0) {
-        	fread(fdd.diskdata2, 1, sizeof(fdd.diskdata2), f);
-			printf("disk.dsk\n");
-	        fclose(f);
-		}
-    }
-}
-
-WRITE8_MEMBER(spc1000_state::spc1000_sd725_w)
-{
-	//printf("write 0x%04x=%d\n", (0xc000+offset), data);
-	if (offset == 0) {
-		fdd.wrVal = data;
-	} else if (offset == 2) {
-		if (data != 0)
-		{
-			fdd.PC.b = (data & 0xf0) | (fdd.PC.b & 0xf);
-		}
-		else
-		{
-			fdd.PC.b = fdd.PC.b & 0xf;
-		}
-		if (data & 0x10) // DAV=1
-		{
-			//printf("FDD Data Valid (c000 bit4 on)\n");
-			if (fdd.isCmd == 1) // command
-			{
-				fdd.isCmd = 0;
-				printf("FDD Command(Data) = 0h%02x\n", fdd.wrVal);
-				fdd.cmd = fdd.wrVal;
-				switch (fdd.wrVal)
-				{
-					case 0x00: // FDD Initialization
-						printf("*FDD Initialization\n");
-						break;
-					case 0x01: // FDD Write
-						printf("*FDD Write\n");
-						fdd.rSize = 4;
-						fdd.seq = 0;
-						break;
-					case 0x02: // FDD Read
-						printf("*FDD Read\n");
-//                            fdd.PC.bits.rRFD = 1;
-						fdd.rSize = 4;
-						fdd.seq = 0;
-						break;
-					case 0x03: // FDD Send Data
-						//printf("*FDD Send Data\n");
-						if (fdd.seq == 4)
-						{
-							printf("seq=%d,(%d,%d,%d,%d)\n", fdd.seq, fdd.sdata[0], fdd.sdata[1], fdd.sdata[2], fdd.sdata[3]);
-							fdd.buffer = (byte*)(fdd.sdata[1] != 0 ? fdd.diskdata2 : fdd.diskdata);
-							fdd.buffer += (fdd.sdata[2] * 16 + fdd.sdata[3]-1) * 256;
-							fdd.datasize = fdd.sdata[0] * 256;
-							fdd.dataidx = 0;
-
-						}
-						fdd.rdVal = 0;
-						break;
-					case 0x04: // FDD Copy
-						printf("*FDD Copy\n");
-						fdd.rSize = 7;
-						fdd.seq = 0;
-						break;
-					case 0x05: // FDD Format
-						printf("*FDD Format\n");
-						break;
-					case 0x06: // FDD Send Status
-						printf("*FDD Send Status\n");
-#define DATA_OK 0x40
-						fdd.rdVal = 0x80 & DATA_OK;
-						break;
-					case 0x07: // FDD Send Drive State
-						printf("*FDD Send Drive State\n");
-#define DRIVE0 0x10
-						fdd.rdVal = 0x0f | DRIVE0;
-						break;
-					case 0x08: // FDD RAM Test
-						printf("*FDD RAM Test\n");
-						fdd.rSize = 4;
-						fdd.seq = 0;
-						break;
-					case 0x09: // FDD Transmit 2
-						printf("*FDD Transmit 2\n");
-						fdd.rSize = 4;
-						fdd.seq = 0;
-						break;
-					case 0x0A: // FDD Action
-						printf("*FDD No Action\n");
-						break;
-					case 0x0B: // FDD Transmit 1
-						printf("*FDD Transmit 1\n");
-						fdd.rSize = 4;
-						fdd.seq = 0;
-						break;
-					case 0x0C: // FDD Receive
-						printf("*FDD Receive\n");
-						fdd.rSize = 4;
-						fdd.seq = 0;
-						break;
-					case 0x0D: // FDD Go
-						printf("*FDD Go\n");
-						fdd.rSize = 2;
-						fdd.seq = 0;
-						break;
-					case 0x0E: // FDD Load
-						printf("*FDD Load\n");
-						fdd.rSize = 6;
-						fdd.seq = 0;
-						break;
-					case 0x0F: // FDD Save
-						printf("FDD Save\n");
-						fdd.rSize = 6;
-						fdd.seq = 0;
-						break;
-					case 0x10: // FDD Load and Go
-						printf("*FDD Load and Go\n");
-						break;
-
-				}
-			}
-			else
-			{
-				if (fdd.rSize-- > 0)
-				{
-					fdd.sdata[fdd.seq++] = (char) fdd.wrVal;
-					printf("seq=%d, data = 0x%02x\n", fdd.seq-1, fdd.sdata[fdd.seq-1]);
-					// printf("cmd=%d\n", fdd.cmd);
-					if (fdd.rSize == 0)
-					{
-						printf("Fdd Command(%d) Fired\n", fdd.cmd);
-						if (fdd.cmd == 0x0e)
-						{
-							int offset = (int)((int)fdd.sdata[2] * 16 + (int)fdd.sdata[3]-1) * 256;
-							int size = fdd.sdata[0] * 256;
-							printf("load(%d,%d,%d,%d),offset=%d, size=%d\n", fdd.sdata[0], fdd.sdata[1], fdd.sdata[2], fdd.sdata[3], offset, size);
-							fdd.buffer = (byte*)(fdd.sdata[1] != 0 ? fdd.diskdata2 : fdd.diskdata);
-							//fdd.buffer += offset;
-							fdd.datasize = size;
-							unsigned short addr = ((unsigned short)fdd.sdata[4]) * 0x100 + (unsigned short)fdd.sdata[5];
-							printf("target addr=%04x, %02x, %02x, size=%d\n", addr, fdd.sdata[4], fdd.sdata[5], fdd.datasize);
-							UINT8 *mem = m_ram->pointer();
-							memcpy(&mem[addr], &fdd.buffer[offset], fdd.datasize);
-						}
-						else if (fdd.cmd == 0x0f)
-						{
-							int offset = (int)((int)fdd.sdata[2] * 16 + (int)fdd.sdata[3]-1) * 256;
-							int size = fdd.sdata[0] * 256;
-							printf("save(%d,%d,%d,%d),offset=%d, size=%d\n", fdd.sdata[0], fdd.sdata[1], fdd.sdata[2], fdd.sdata[3], offset, size);
-							fdd.buffer = (byte*)(fdd.sdata[1] != 0 ? fdd.diskdata2 : fdd.diskdata);
-							fdd.buffer += offset;
-							fdd.datasize = size;
-							unsigned short addr = ((unsigned short)fdd.sdata[4]) * 0x100 + (unsigned short)fdd.sdata[5];
-							printf("target addr=%04x, %02x, %02x, size=%d\n", addr, fdd.sdata[4], fdd.sdata[5], fdd.datasize);
-							UINT8 *mem = m_ram->pointer();
-							memcpy(fdd.buffer, &mem[addr], fdd.datasize);
-						}
-					}
-				}
-			}
-			fdd.PC.bits.rDAC = 1;
-
-		}
-		else if (fdd.PC.bits.rDAC == 1) // DAV=0
-		{
-			//printf("FDD Ouput Data Cleared (c000 bit4 off)\n");
-			fdd.wrVal = 0;
-//              printf("FDD_Read = 0h%02x (cleared)\n", fdd.wrVal);
-			fdd.PC.bits.rDAC = 0;
-		}
-		if (data & 0x20) // RFD=1
-		{
-//                printf("FDD Ready for Data Read (c000 bit5 on)\n");
-			fdd.PC.bits.rDAV = 1;
-		}
-		else if (fdd.PC.bits.rDAV == 1) // RFD=0
-		{
-			//fdd.rdVal = 0;
-			//printf("FDD Input Data = 0h%02x\n", fdd.rdVal);
-			fdd.PC.bits.rDAV = 0;
-		}
-		if (data & 0x40) // DAC=1
-		{
-//                printf("FDD Data accepted (c000 bit6 on)\n");
-		}
-		if (data & 0x80) // ATN=1
-		{
-//              printf("FDD Attention (c000 bit7 on)\n");
-			//printf("Command = 0x%02x\n", fdd.rdVal);
-			//printf("FDD Ready for Data\n", fdd.rdVal);
-			fdd.PC.bits.rRFD = 1;
-			fdd.isCmd = 1;
-		}		
-	}
-	return;
-}
-
-READ8_MEMBER(spc1000_state::spc1000_sd725_r)
-{
-	//printf("read %04x\n", (0xc000+offset));
-	if (offset == 1)
-	{
-		if (fdd.cmd == 3)
-		{
-			fdd.rdVal = *(fdd.buffer + fdd.dataidx++);
-		}
-		//printf("FDD_Data > 0h%02x\n", spcsys.fdd.rdVal);
-		return fdd.rdVal;
-	}
-	else if (offset == 2)
-	{
-		//printf("FDD_PC > 0h%02x\n", spcsys.fdd.PC.b);
-		return fdd.PC.b;
-	}
-	return 0;
-}
-#endif
 
 
 void spc1000_state::machine_reset()
@@ -548,9 +367,20 @@ void spc1000_state::machine_reset()
 	membank("bank2")->set_base(ram);
 	membank("bank3")->set_base(mem);
 	membank("bank4")->set_base(ram + 0x8000);
-	///initDisk();
+	
+	m_work_ram = auto_alloc_array_clear(machine(), UINT8, 0x10000);
+	m_fdccpu->set_input_line_vector(0, 0);
+	
+	m_fd0 = machine().device<floppy_connector>("upd765:0")->get_device();
+	m_fd1 = machine().device<floppy_connector>("upd765:1")->get_device();
 
-	m_IPLK = 1;
+	m_timer_tc = timer_alloc(1, NULL);	
+	m_timer_tc->adjust(attotime::never);
+
+	// enable rom
+	m_fdccpu->space(AS_PROGRAM).install_rom(0x0000, 0xfff, 0, 0x2000, memregion("rom")->base());	
+	
+	m_IPLK = 1; 
 }
 
 READ8_MEMBER(spc1000_state::mc6847_videoram_r)
@@ -588,12 +418,55 @@ WRITE_LINE_MEMBER( spc1000_state::irq_w )
 	m_maincpu->set_input_line(0, state ? CLEAR_LINE : HOLD_LINE);
 }
 
+static SLOT_INTERFACE_START( sd725_floppies )
+	SLOT_INTERFACE( "sd320", EPSON_SD_320 )
+SLOT_INTERFACE_END
+
+//-------------------------------------------------
+//  address maps
+//-------------------------------------------------
+
+static ADDRESS_MAP_START( sd725_mem, AS_PROGRAM, 8, spc1000_state )
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x0000, 0x1fff) AM_ROM
+	AM_RANGE(0x2000, 0xffff) AM_RAM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( sd725_io, AS_IO, 8, spc1000_state )
+	ADDRESS_MAP_UNMAP_HIGH
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0xf8, 0xf8) AM_READWRITE(upd765_tc_r,fdc_control_w) // (R) Terminal Count Port (W) Motor Control Port
+	AM_RANGE(0xfa, 0xfb) AM_DEVICE("upd765", upd765a_device, map )
+	AM_RANGE(0xfc, 0xff) AM_DEVREADWRITE("d8255_master", i8255_device, read, write)
+ADDRESS_MAP_END
+
 static MACHINE_CONFIG_START( spc1000, spc1000_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(spc1000_mem)
 	MCFG_CPU_IO_MAP(spc1000_io)
 
+	/* sub CPU(5 inch floppy drive) */
+	MCFG_CPU_ADD("fdccpu", Z80, XTAL_4MHz)       /* 4 MHz */
+	MCFG_CPU_PROGRAM_MAP(sd725_mem)
+	MCFG_CPU_IO_MAP(sd725_io)
+	
+	MCFG_DEVICE_ADD("d8255_master", I8255, 0)
+	MCFG_I8255_IN_PORTA_CB(DEVREAD8("d8255_master", i8255_device, pb_r))
+	MCFG_I8255_IN_PORTB_CB(DEVREAD8("d8255_master", i8255_device, pa_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(spc1000_state, fdc_8255_b_w))	
+	MCFG_I8255_IN_PORTC_CB(READ8(spc1000_state, fdc_8255_c_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(spc1000_state, fdc_8255_c_w))	
+
+	// floppy disk controller
+	MCFG_UPD765A_ADD("upd765", true, true)
+	MCFG_UPD765_INTRQ_CALLBACK(INPUTLINE("fdccpu", INPUT_LINE_IRQ0))	
+
+	// floppy drives
+	MCFG_FLOPPY_DRIVE_ADD("upd765:0", sd725_floppies, "sd320", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd765:1", sd725_floppies, "sd320", floppy_image_device::default_floppy_formats)	
+	//CFG_SOFTWARE_LIST_ADD("disk_list","spc1000_flop")
+	
 	/* video hardware */
 	MCFG_SCREEN_MC6847_NTSC_ADD("screen", "mc6847")
 
@@ -625,6 +498,9 @@ MACHINE_CONFIG_END
 ROM_START( spc1000 )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "spcall.rom", 0x0000, 0x8000, CRC(19638fc9) SHA1(489f1baa7aebf3c8c660325fb1fd790d84203284))
+
+ 	ROM_REGION( 0x10000, "fdccpu", 0)
+ 	ROM_LOAD("sd725a.bin", 0x0000, 0x1000, CRC(96ac2eb8) SHA1(8e9d8f63a7fb87af417e95603e71cf537a6e83f1))
 ROM_END
 
 #if 0
