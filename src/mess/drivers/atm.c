@@ -12,7 +12,6 @@ computer to boot up (with keyboard problems).
 #include "emu.h"
 #include "includes/spectrum.h"
 #include "imagedev/snapquik.h"
-#include "imagedev/cartslot.h"
 #include "imagedev/cassette.h"
 #include "sound/ay8910.h"
 #include "sound/speaker.h"

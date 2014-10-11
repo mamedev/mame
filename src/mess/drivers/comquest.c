@@ -42,7 +42,6 @@ icq3250a-d
 #include "emu.h"
 #include "cpu/m6805/m6805.h"
 #include "includes/comquest.h"
-#include "imagedev/cartslot.h"
 
 #ifdef UNUSED_FUNCTION
 READ8_MEMBER(comquest_state::comquest_read)

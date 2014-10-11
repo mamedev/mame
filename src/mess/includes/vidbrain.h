@@ -8,7 +8,6 @@
 #include "emu.h"
 #include "bus/vidbrain/exp.h"
 #include "cpu/f8/f8.h"
-#include "imagedev/cartslot.h"
 #include "machine/f3853.h"
 #include "machine/ram.h"
 #include "sound/dac.h"

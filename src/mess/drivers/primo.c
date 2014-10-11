@@ -111,7 +111,6 @@ Interrupts:
 #include "cpu/z80/z80.h"
 #include "imagedev/cassette.h"
 #include "imagedev/snapquik.h"
-#include "imagedev/cartslot.h"
 #include "formats/primoptp.h"
 #include "bus/cbmiec/cbmiec.h"
 

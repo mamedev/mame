@@ -16,7 +16,6 @@
 
 
 #include "emu.h"
-#include "imagedev/cartslot.h"
 #include "exp.h"
 
 

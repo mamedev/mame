@@ -178,7 +178,6 @@ EMUMACHINEOBJS = \
 
 EMUIMAGEDEVOBJS = \
 	$(EMUIMAGEDEV)/bitbngr.o    \
-	$(EMUIMAGEDEV)/cartslot.o   \
 	$(EMUIMAGEDEV)/cassette.o   \
 	$(EMUIMAGEDEV)/chd_cd.o     \
 	$(EMUIMAGEDEV)/diablo.o     \

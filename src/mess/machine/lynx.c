@@ -5,7 +5,6 @@
 #include "emu.h"
 #include "includes/lynx.h"
 #include "cpu/m6502/m65sc02.h"
-#include "imagedev/cartslot.h"
 
 
 #define PAD_UP      0x80

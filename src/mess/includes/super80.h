@@ -3,7 +3,6 @@
 #include "cpu/z80/z80daisy.h"
 #include "sound/wave.h"
 #include "imagedev/snapquik.h"
-#include "imagedev/cartslot.h"
 #include "imagedev/cassette.h"
 #include "sound/speaker.h"
 #include "machine/buffer.h"

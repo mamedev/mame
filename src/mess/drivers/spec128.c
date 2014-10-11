@@ -152,7 +152,6 @@ resulting mess can be seen in the F4 viewer display.
 #include "cpu/z80/z80.h"
 #include "includes/spectrum.h"
 #include "imagedev/snapquik.h"
-#include "imagedev/cartslot.h"
 #include "imagedev/cassette.h"
 #include "sound/ay8910.h"
 #include "sound/speaker.h"

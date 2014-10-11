@@ -231,7 +231,6 @@ DC00      - Selection buttons #2, 9-16 (R)
 #include "sound/sn76496.h"
 #include "sound/2413intf.h"
 #include "video/315_5124.h"
-#include "imagedev/cartslot.h"
 #include "includes/sms.h"
 #include "bus/sega8/rom.h"
 

@@ -9,7 +9,6 @@
 #include "emu.h"
 #include "coco_pak.h"
 #include "includes/coco.h"
-#include "imagedev/cartslot.h"
 
 #define CARTSLOT_TAG            "cart"
 
@@ -21,8 +20,8 @@ static MACHINE_CONFIG_FRAGMENT(coco_pak)
 MACHINE_CONFIG_END
 
 ROM_START( coco_pak )
-	ROM_REGION(0x8000,CARTSLOT_TAG,ROMREGION_ERASE00)
-	ROM_CART_LOAD(CARTSLOT_TAG, 0x0000, 0x8000, ROM_OPTIONAL | ROM_MIRROR)
+	ROM_REGION(0x8000, CARTSLOT_TAG, ROMREGION_ERASE00)
+	// this region is filled by cococart_slot_device::call_load()
 ROM_END
 
 //**************************************************************************

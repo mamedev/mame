@@ -7,7 +7,6 @@
 #include "cpu/z80/z80.h"
 #include "formats/sc3000_bit.h"
 #include "formats/sf7000_dsk.h"
-#include "imagedev/cartslot.h"
 #include "imagedev/cassette.h"
 #include "imagedev/printer.h"
 #include "bus/centronics/ctronics.h"

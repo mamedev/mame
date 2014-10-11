@@ -10,7 +10,6 @@
 #include "crsshair.h"
 #include "cpu/m6502/m6502.h"
 #include "includes/nes.h"
-#include "imagedev/cartslot.h"
 #include "imagedev/flopdrv.h"
 
 /***************************************************************************

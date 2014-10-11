@@ -9,7 +9,6 @@
 
 #include "machine/mos6526.h"
 #include "bus/cbmiec/cbmiec.h"
-#include "imagedev/cartslot.h"
 #include "imagedev/snapquik.h"
 #include "machine/ram.h"
 #include "sound/mos6581.h"

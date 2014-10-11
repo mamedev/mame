@@ -655,7 +655,6 @@ MACHINE_CONFIG_END
 	ROM_LOAD( "32x_g_bios.bin", 0x000000,  0x000100, CRC(5c12eae8) SHA1(dbebd76a448447cb6e524ac3cb0fd19fc065d944) ) \
 	ROM_REGION16_BE( 0x400000, "maincpu", ROMREGION_ERASE00 ) \
 	/* temp, rom should only be visible here when one of the regs is set, tempo needs it */ \
-	/* ROM_CART_LOAD("cart", 0x000000, 0x400000, ROM_NOMIRROR) */ \
 	ROM_COPY( "32x_68k_bios", 0x0, 0x0, 0x100) \
 	ROM_REGION32_BE( 0x400000, "master", 0 ) /* SH2 Code */ \
 	ROM_SYSTEM_BIOS( 0, "retail", "Mars Version 1.0 (retail)" ) \

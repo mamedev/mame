@@ -148,7 +148,6 @@ http://www.z88forever.org.uk/zxplus3e/
 #include "cpu/z80/z80.h"
 #include "includes/spectrum.h"
 #include "imagedev/snapquik.h"
-#include "imagedev/cartslot.h"
 #include "imagedev/cassette.h"
 #include "sound/speaker.h"
 #include "sound/ay8910.h"

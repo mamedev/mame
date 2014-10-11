@@ -31,7 +31,6 @@ NMI
 #include "includes/cgenie.h"
 #include "imagedev/flopdrv.h"
 #include "formats/basicdsk.h"
-#include "imagedev/cartslot.h"
 #include "imagedev/cassette.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"

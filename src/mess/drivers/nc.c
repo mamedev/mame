@@ -101,7 +101,6 @@
 #include "machine/rp5c01.h" /* for NC100 real time clock */
 #include "machine/upd765.h"     /* for NC200 disk drive interface */
 #include "formats/pc_dsk.h"     /* for NC200 disk image */
-#include "imagedev/cartslot.h"
 #include "sound/beep.h"
 #include "machine/ram.h"
 #include "rendlay.h"

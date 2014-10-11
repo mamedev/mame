@@ -11,7 +11,6 @@
 #include "cpu/i8085/i8085.h"
 #include "sound/wave.h"
 #include "includes/mikro80.h"
-#include "imagedev/cartslot.h"
 #include "formats/rk_cas.h"
 #include "sound/dac.h"
 

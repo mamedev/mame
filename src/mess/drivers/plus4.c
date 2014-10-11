@@ -13,7 +13,6 @@
 */
 
 #include "includes/plus4.h"
-#include "imagedev/cartslot.h"
 #include "machine/cbm_snqk.h"
 #include "sound/t6721a.h"
 
@@ -934,9 +933,8 @@ ROM_START( c264 )
 	ROM_LOAD( "basic-264.bin", 0x0000, 0x4000, CRC(6a2fc8e3) SHA1(473fce23afa07000cdca899fbcffd6961b36a8a0) )
 	ROM_LOAD( "kernal-264.bin", 0x4000, 0x4000, CRC(8f32abe7) SHA1(d481faf5fcbb331878dc7851c642d04f26a32873) )
 
-	ROM_REGION( 0x8000, "function", 0 )
-	ROM_CART_LOAD( "lo", 0x0000, 0x0000, ROM_NOMIRROR )
-	ROM_CART_LOAD( "hi", 0x4000, 0x0000, ROM_NOMIRROR )
+	ROM_REGION( 0x8000, "function", ROMREGION_ERASE00 )
+	// TODO: add cart slots to mount EPROMs here
 
 	ROM_REGION( 0xf5, PLA_TAG, 0 )
 	ROM_LOAD( "251641-02", 0x00, 0xf5, NO_DUMP )
@@ -952,9 +950,8 @@ ROM_START( c232 )
 	ROM_LOAD( "318006-01.u4", 0x0000, 0x4000, CRC(74eaae87) SHA1(161c96b4ad20f3a4f2321808e37a5ded26a135dd) )
 	ROM_LOAD( "318004-01.u5", 0x4000, 0x4000, CRC(dbdc3319) SHA1(3c77caf72914c1c0a0875b3a7f6935cd30c54201) )
 
-	ROM_REGION( 0x8000, "function", 0 )
-	ROM_CART_LOAD( "lo", 0x0000, 0x0000, ROM_NOMIRROR )
-	ROM_CART_LOAD( "hi", 0x4000, 0x0000, ROM_NOMIRROR )
+	ROM_REGION( 0x8000, "function", ROMREGION_ERASE00 )
+	// TODO: add cart slots to mount EPROMs here
 
 	ROM_REGION( 0xf5, PLA_TAG, 0 )
 	ROM_LOAD( "251641-02.u7", 0x00, 0xf5, NO_DUMP )

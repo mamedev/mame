@@ -56,7 +56,6 @@
 /* Devices */
 #include "imagedev/flopdrv.h"
 #include "formats/basicdsk.h"
-#include "imagedev/cartslot.h"
 #include "imagedev/cassette.h"
 #include "formats/uef_cas.h"
 #include "formats/csw_cas.h"

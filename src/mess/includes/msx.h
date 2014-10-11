@@ -20,7 +20,6 @@
 #include "video/v9938.h"
 #include "video/tms9928a.h"
 #include "imagedev/flopdrv.h"
-#include "imagedev/cartslot.h"
 #include "imagedev/cassette.h"
 #include "formats/basicdsk.h"
 #include "formats/fmsx_cas.h"
