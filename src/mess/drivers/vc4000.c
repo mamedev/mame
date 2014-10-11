@@ -539,7 +539,7 @@ static MACHINE_CONFIG_START( vc4000, vc4000_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("custom", VC4000, 0)
+	MCFG_SOUND_ADD("custom", VC4000_SND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* quickload */

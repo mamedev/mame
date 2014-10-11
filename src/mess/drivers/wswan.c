@@ -126,7 +126,7 @@ static MACHINE_CONFIG_START( wswan, wswan_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_SOUND_ADD("custom", WSWAN, 0)
+	MCFG_SOUND_ADD("custom", WSWAN_SND, 0)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 

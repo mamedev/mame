@@ -8,6 +8,7 @@
 #define VC4000_H_
 
 #include "emu.h"
+#include "audio/vc4000snd.h"
 #include "cpu/s2650/s2650.h"
 #include "imagedev/snapquik.h"
 #include "imagedev/cassette.h"
@@ -147,40 +148,5 @@ protected:
 	void vc4000_sprite_update(bitmap_ind16 &bitmap, UINT8 *collision, SPRITE *This);
 	inline void vc4000_draw_grid(UINT8 *collision);
 };
-
-/*----------- defined in audio/vc4000.c -----------*/
-
-//**************************************************************************
-//  TYPE DEFINITIONS
-//**************************************************************************
-
-// ======================> vc4000_sound_device
-
-class vc4000_sound_device : public device_t,
-							public device_sound_interface
-{
-public:
-	vc4000_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	~vc4000_sound_device() { }
-
-protected:
-	// device-level overrides
-	virtual void device_start();
-
-	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
-
-public:
-	void soundport_w(int mode, int data);
-
-private:
-	sound_stream *m_channel;
-	UINT8 m_reg[1];
-	int m_size;
-	int m_pos;
-	unsigned m_level;
-};
-
-extern const device_type VC4000;
 
 #endif /* VC4000_H_ */

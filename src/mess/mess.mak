@@ -1026,7 +1026,7 @@ $(MESSOBJ)/bally.a:             \
 $(MESSOBJ)/bandai.a:            \
 	$(MESS_DRIVERS)/sv8000.o    \
 	$(MESS_DRIVERS)/rx78.o      \
-	$(MESS_DRIVERS)/wswan.o $(MESS_AUDIO)/wswan.o $(MESS_MACHINE)/wswan.o $(MESS_VIDEO)/wswan.o \
+	$(MESS_DRIVERS)/wswan.o $(MESS_AUDIO)/wswan_snd.o $(MESS_MACHINE)/wswan.o $(MESS_VIDEO)/wswan.o \
 
 $(MESSOBJ)/be.a:                \
 	$(MESS_DRIVERS)/bebox.o	$(MESS_MACHINE)/bebox.o \
@@ -1308,7 +1308,7 @@ $(MESSOBJ)/imp.a:               \
 	$(MESS_DRIVERS)/tim100.o    \
 
 $(MESSOBJ)/interton.a:          \
-	$(MESS_DRIVERS)/vc4000.o $(MESS_AUDIO)/vc4000.o $(MESS_VIDEO)/vc4000.o \
+	$(MESS_DRIVERS)/vc4000.o $(MESS_AUDIO)/vc4000snd.o $(MESS_VIDEO)/vc4000.o \
 
 $(MESSOBJ)/intv.a:              \
 	$(MESS_DRIVERS)/intv.o $(MESS_MACHINE)/intv.o $(MESS_VIDEO)/intv.o $(MESS_VIDEO)/stic.o \
