@@ -4184,7 +4184,7 @@ ROM_END
 ROM_START( pengojpm )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "pengo5.bin",      0x0800, 0x0800, CRC(7458f816) SHA1(bc5d3a4f374d5b93aefa7378eae1492956cca6af) )
-	ROM_CONTINUE(0x000,0x800) // this contains z80 interrupt stuff? does it get banked in at 0?
+	ROM_CONTINUE(0x000,0x800)
 	ROM_LOAD( "pengo1.bin",      0x4000, 0x1000, CRC(1519d59b) SHA1(13b99780fcccac61b16201500e309c9b442406c8) )
 	ROM_LOAD( "pengo2.bin",      0x5000, 0x1000, CRC(1b90c32c) SHA1(1761add93d71d29840b1462b9747a3d463b7148d) )
 	ROM_LOAD( "pengo3.bin",      0x6000, 0x1000, CRC(aff4fba1) SHA1(8083352b3a2a4a70b2db778074826a55177e06ab) )
@@ -4201,6 +4201,29 @@ ROM_START( pengojpm )
 	ROM_REGION( 0x0420, "proms", 0 )
 	ROM_LOAD( "pr1633.78",    0x0000, 0x0020, CRC(3a5844ec) SHA1(680eab0e1204c9b74adc11588461651b474021bb) ) /* color palette */
 	ROM_LOAD( "pr1634.88",    0x0020, 0x0400, CRC(766b139b) SHA1(3fcd66610fcaee814953a115bf5e04788923181f) ) /* color lookup */
+
+	ROM_REGION( 0x0200, "namco", 0 )    /* sound PROMs */
+	ROM_LOAD( "82s126.1m",    0x0000, 0x0100, CRC(a9cc86bf) SHA1(bbcec0570aeceb582ff8238a4bc8546a23430081) )
+	ROM_LOAD( "82s126.3m",    0x0100, 0x0100, CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) )  /* timing - not used */
+ROM_END
+
+ROM_START( pengopac )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "pengopac.0",      0x0000, 0x0800, CRC(56f1718b) SHA1(016148f914117947b406bff8419390a1ffe92f7a) ) // 99.121094% to above set
+	ROM_LOAD( "pengopac.1",      0x0800, 0x0800, CRC(013d450e) SHA1(f17313c5a458de2a4cb491707c5ddeef0fa40ef3) )
+	ROM_LOAD( "pengopac.4",      0x4000, 0x1000, CRC(1519d59b) SHA1(13b99780fcccac61b16201500e309c9b442406c8) )
+	ROM_LOAD( "pengopac.5",      0x5000, 0x1000, CRC(1b90c32c) SHA1(1761add93d71d29840b1462b9747a3d463b7148d) )
+	ROM_LOAD( "pengopac.6",      0x6000, 0x2000, CRC(8d2994ee) SHA1(1f16b32c4574107a4a15d40113b966581b374a81) )
+	
+	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_LOAD( "pengopac.5e",      0x0000, 0x0800, CRC(ad88978a) SHA1(a568baf751753660223958b722980f031310eba1) )
+	ROM_LOAD( "pengopac.5f",      0x0800, 0x0800, CRC(cb208b9f) SHA1(63b64b52c9c3e18b2d2823e79095160fb1a71f00) )
+	ROM_LOAD( "pengopac.5h",      0x1000, 0x0800, CRC(bae319a3) SHA1(88f0562ba2501f16ddfaffb12c4d1c00315f4225) )
+	ROM_LOAD( "pengopac.5j",      0x1800, 0x0800, CRC(5a5190e8) SHA1(caf49a348c649fbf959e97c632832bdb5bc068be) )
+
+	ROM_REGION( 0x0420, "proms", 0 )
+	ROM_LOAD( "pr1633.78",    0x0000, 0x0020, CRC(3a5844ec) SHA1(680eab0e1204c9b74adc11588461651b474021bb) ) /* color palette */
+	ROM_LOAD( "pengopac.4a",    0x0020, 0x0100, CRC(ef283be2) SHA1(6d616348c06d08f3ffbe875a40036a2453cb45ad) ) /* color lookup */
 
 	ROM_REGION( 0x0200, "namco", 0 )    /* sound PROMs */
 	ROM_LOAD( "82s126.1m",    0x0000, 0x0100, CRC(a9cc86bf) SHA1(bbcec0570aeceb582ff8238a4bc8546a23430081) )
@@ -6735,4 +6758,5 @@ GAME( 198?, cannonbp, 0,        pacman,   cannonbp, pacman_state,  cannonbp, ROT
 GAME( 1999, superabc, 0,        superabc, superabc, pacman_state,  superabc, ROT90,  "hack (Two-Bit Score)", "Super ABC (Pac-Man multigame kit, Sep. 03 1999)", GAME_SUPPORTS_SAVE )
 GAME( 1999, superabco,superabc, superabc, superabc, pacman_state,  superabc, ROT90,  "hack (Two-Bit Score)", "Super ABC (Pac-Man multigame kit, Mar. 08 1999)", GAME_SUPPORTS_SAVE )
 
-GAME( 1981, pengojpm, pengo,    pengojpm, pengojpm, driver_device, 0,        ROT90,  "bootleg", "Pengo (bootleg on JPM Pac-Man hardware)", GAME_SUPPORTS_SAVE ) // conversion of pacmanjpm board with wire mods
+GAME( 1981, pengojpm, pengo,    pengojpm, pengojpm, driver_device, 0,        ROT90,  "bootleg", "Pengo (bootleg on Pac-Man hardware, set 1)", GAME_SUPPORTS_SAVE ) // conversion of pacmanjpm board with wire mods
+GAME( 1981, pengopac, pengo,    pengojpm, pengojpm, driver_device, 0,        ROT90,  "bootleg", "Pengo (bootleg on Pac-Man hardware, set 2)", GAME_SUPPORTS_SAVE ) // different conversion?
