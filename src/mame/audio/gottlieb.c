@@ -312,13 +312,13 @@ MACHINE_CONFIG_FRAGMENT( gottlieb_sound_r0 )
 	MCFG_CPU_PROGRAM_MAP(gottlieb_sound_r0_map)
 
 	// I/O configuration
-	MCFG_DEVICE_ADD("r6530", MOS6530, XTAL_3_579545MHz/4) // unknown - same as cpu
+	MCFG_DEVICE_ADD("r6530", MOS6530, SOUND1_CLOCK/4) // unknown - same as cpu
 	MCFG_MOS6530_OUT_PA_CB(DEVWRITE8("dac", dac_device, write_unsigned8))
 	MCFG_MOS6530_IN_PB_CB(READ8(gottlieb_sound_r0_device, r6530b_r))
 
 	// sound devices
 	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 1.00)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.50)
 MACHINE_CONFIG_END
 
 
