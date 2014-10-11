@@ -59,7 +59,7 @@ WRITE8_MEMBER(bbc_state::bbc_page_selectb_w)
 	}
 	else
 	{
-		m_bank4->set_entry(m_DFSType);
+		m_bank4->set_entry(0x10 + m_DFSType);
 	}
 }
 
