@@ -1317,6 +1317,35 @@ ADDRESS_MAP_END
 
 
 
+static ADDRESS_MAP_START( pengojpm_map, AS_PROGRAM, 8, pacman_state )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+
+	AM_RANGE(0x8000, 0x83ff) AM_RAM_WRITE(pacman_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0x8400, 0x87ff) AM_RAM_WRITE(pacman_colorram_w) AM_SHARE("colorram")
+	AM_RANGE(0x8800, 0x8bff) AM_READ(pacman_read_nop) AM_WRITENOP
+	AM_RANGE(0x8c00, 0x8fef) AM_RAM
+	AM_RANGE(0x8ff0, 0x8fff) AM_RAM AM_SHARE("spriteram")
+	AM_RANGE(0x9000, 0x9000) AM_WRITE(irq_mask_w)
+	AM_RANGE(0x9001, 0x9001) AM_DEVWRITE("namco", namco_device, pacman_sound_enable_w)
+	AM_RANGE(0x9002, 0x9002) AM_WRITENOP
+	AM_RANGE(0x9003, 0x9003) AM_WRITE(pacman_flipscreen_w)
+	AM_RANGE(0x9004, 0x9005) AM_WRITENOP // AM_WRITE(pacman_leds_w)
+	AM_RANGE(0x9006, 0x9006) AM_WRITENOP // AM_WRITE(pacman_coin_lockout_global_w)
+	AM_RANGE(0x9007, 0x9007) AM_WRITE(pacman_coin_counter_w)
+	AM_RANGE(0x9040, 0x905f) AM_DEVWRITE("namco", namco_device, pacman_sound_w)
+	AM_RANGE(0x9060, 0x906f) AM_WRITEONLY AM_SHARE("spriteram2")
+	AM_RANGE(0x9070, 0x907f) AM_WRITENOP
+	AM_RANGE(0x9080, 0x9080) AM_WRITENOP
+	AM_RANGE(0x90c0, 0x90c0) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0x9000, 0x9000) AM_READ_PORT("IN0")
+	AM_RANGE(0x9040, 0x9040) AM_READ_PORT("IN1")
+	AM_RANGE(0x9080, 0x9080) AM_READ_PORT("DSW1")
+	AM_RANGE(0x90c0, 0x90c0) AM_READ_PORT("DSW2")
+
+	AM_RANGE(0xf000, 0xffff) AM_RAM
+ADDRESS_MAP_END
+
+
 /*************************************
  *
  *  Main CPU port handlers
@@ -3354,6 +3383,12 @@ static MACHINE_CONFIG_START( pacman, pacman_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( pengojpm, pacman )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(pengojpm_map)
+MACHINE_CONFIG_END
+
+
 static MACHINE_CONFIG_DERIVED( birdiy, pacman )
 
 	/* basic machine hardware */
@@ -4058,6 +4093,36 @@ ROM_START( pacmanjpm )
 	ROM_LOAD( "jpm10",      0x1000, 0x0800, CRC(9e39323a) SHA1(be933e691df4dbe7d12123913c3b7b7b585b7a35) )
 	ROM_LOAD( "jpm12",      0x1800, 0x0800, CRC(1b1d9096) SHA1(53771c573051db43e7185b1d188533056290a620) )
 
+	ROM_REGION( 0x0120, "proms", 0 )
+	ROM_LOAD( "82s123.7f",    0x0000, 0x0020, CRC(2fc650bd) SHA1(8d0268dee78e47c712202b0ec4f1f51109b1f2a5) )
+	ROM_LOAD( "82s126.4a",    0x0020, 0x0100, CRC(3eb3a8e4) SHA1(19097b5f60d1030f8b82d9f1d3a241f93e5c75d6) )
+
+	ROM_REGION( 0x0200, "namco", 0 )    /* sound PROMs */
+	ROM_LOAD( "82s126.1m",    0x0000, 0x0100, CRC(a9cc86bf) SHA1(bbcec0570aeceb582ff8238a4bc8546a23430081) )
+	ROM_LOAD( "82s126.3m",    0x0100, 0x0100, CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) )  /* timing - not used */
+ROM_END
+
+ROM_START( pengojpm )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "pengo1.bin",      0x0000, 0x1000, CRC(1519d59b) SHA1(13b99780fcccac61b16201500e309c9b442406c8) )
+	ROM_RELOAD(0x4000,0x1000)
+	ROM_LOAD( "pengo2.bin",      0x1000, 0x1000, CRC(1b90c32c) SHA1(1761add93d71d29840b1462b9747a3d463b7148d) )
+	ROM_RELOAD(0x5000,0x1000)
+	ROM_LOAD( "pengo3.bin",      0x2000, 0x1000, CRC(aff4fba1) SHA1(8083352b3a2a4a70b2db778074826a55177e06ab) )
+	ROM_RELOAD(0x6000,0x1000)
+	ROM_LOAD( "pengo4.bin",      0x3000, 0x1000, CRC(1628eb6d) SHA1(44bd9d30828bb2440599fcd4a46f20fd798c24d5) )
+	ROM_RELOAD(0x7000,0x1000)
+
+	ROM_LOAD( "pengo5.bin",      0xd000, 0x0800, CRC(7458f816) SHA1(bc5d3a4f374d5b93aefa7378eae1492956cca6af) )
+	ROM_CONTINUE(0x000,0x800) // this contains z80 interrupt stuff? does it get banked in at 0?
+
+	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_LOAD( "pengoa.bin",      0x0000, 0x0800, CRC(ad88978a) SHA1(a568baf751753660223958b722980f031310eba1) )
+	ROM_LOAD( "pengob.bin",      0x0800, 0x0800, CRC(bae319a3) SHA1(88f0562ba2501f16ddfaffb12c4d1c00315f4225) )
+	ROM_LOAD( "pengoc.bin",      0x1000, 0x0800, CRC(cb208b9f) SHA1(63b64b52c9c3e18b2d2823e79095160fb1a71f00) )
+	ROM_LOAD( "pengod.bin",      0x1800, 0x0800, CRC(5a5190e8) SHA1(caf49a348c649fbf959e97c632832bdb5bc068be) )
+
+	// proms are unknown
 	ROM_REGION( 0x0120, "proms", 0 )
 	ROM_LOAD( "82s123.7f",    0x0000, 0x0020, CRC(2fc650bd) SHA1(8d0268dee78e47c712202b0ec4f1f51109b1f2a5) )
 	ROM_LOAD( "82s126.4a",    0x0020, 0x0100, CRC(3eb3a8e4) SHA1(19097b5f60d1030f8b82d9f1d3a241f93e5c75d6) )
@@ -6594,3 +6659,5 @@ GAME( 198?, cannonbp, 0,        pacman,   cannonbp, pacman_state,  cannonbp, ROT
 
 GAME( 1999, superabc, 0,        superabc, superabc, pacman_state,  superabc, ROT90,  "hack (Two-Bit Score)", "Super ABC (Pac-Man multigame kit, Sep. 03 1999)", GAME_SUPPORTS_SAVE )
 GAME( 1999, superabco,superabc, superabc, superabc, pacman_state,  superabc, ROT90,  "hack (Two-Bit Score)", "Super ABC (Pac-Man multigame kit, Mar. 08 1999)", GAME_SUPPORTS_SAVE )
+
+GAME( 1981, pengojpm, pengo,    pengojpm, pacman,   driver_device, 0,        ROT90,  "bootleg", "Pengo (bootleg on JPM Pac-Man hardware)", GAME_NOT_WORKING ) // conversion of pacmanjpm board with wire mods
