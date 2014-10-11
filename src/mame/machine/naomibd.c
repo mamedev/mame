@@ -24,7 +24,7 @@
 
     Cartridge protection info from Deunan Knute:
 
-    NAOMI cart can hold up to 256MB of data (well, 512 is possible too I guess), so the highest bits are used for other, dark and scary purposes.
+    NAOMI cart can hold up to 512MB of data, so the highest bits are used for other, dark and scary purposes.
     I call those bits "mode selector".
 
     First it's important to note that DMA and PIO seem to have separate address counters, as well as separate mode selector registers.
@@ -39,13 +39,13 @@
     PIO read will return all ones if DMA mode has this bit cleared, so it seems you can do either PIO or DMA but not both at the same time.
     In other words, disable DMA once before using PIO (most games using both access types do that when the DMA terminates).
     This bit is also used to reset the chip's internal protection mechanism on "Oh! My Goddess" to a known state.
+    "M4" type carts: ROM_OFFSET bit 30 enables data decryption, for both PIO and DMA.
 
     * bit 29 (mode bit 1) is "M1" compression bit on Actel carts, other functions on others
     It's actually the opposite, when set the addressing is following the chip layout and when cleared the protection chip will have it's fun
-    doing a decompression + XOR on the data for Actel carts.  Non-Actel carts may ignore this bit or remap the address space.
-
-    * bit 28 (mode bit 0) is unused (so far)
-    Or it could really be the last address bit to allow up to 512MB of data on a cart?
+    doing a decompression + XOR on the data for Actel carts.
+    "M2" type carts: ROM size/mapping select, 0 - 4MB ROM-mode, 1 - 8MB ROM mode. ROM_OFFSET bit 29 select cart mapping for both PIO and DMA, DMA_OFFSET bit 29 looks have no any effect.
+    "M4" type carts: no effect
 
     Normal address starts with 0xa0000000 to enable auto-advance and standard addressing mode.
 */
