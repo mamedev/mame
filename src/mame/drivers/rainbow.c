@@ -800,13 +800,15 @@ ROM_END
 
 ROM_START( jumping )
 	ROM_REGION( 0xa0000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "jb1_h4",        0x00000, 0x10000, CRC(3fab6b31) SHA1(57803478949cb62f7eab2ef9be08b13aa2237dbc) )
-	ROM_LOAD16_BYTE( "jb1_h8",        0x00001, 0x10000, CRC(8c878827) SHA1(4a54a217b7c442305c3ce9298aa36ae225382444) )
-	ROM_LOAD16_BYTE( "jb1_i4",        0x20000, 0x10000, CRC(443492cf) SHA1(fc3809d784d611df4fd446ca2443eebdf4f0bfd7) )
-	ROM_LOAD16_BYTE( "jb1_i8",        0x20001, 0x10000, CRC(ed33bae1) SHA1(24ade29f3fdd45aa772ccf9c046294baa6eae7a2) )
-	ROM_LOAD16_BYTE( "b22-03.23",     0x40000, 0x20000, CRC(3ebb0fb8) SHA1(1b41b305623d121255eb70cb992e4d9da13abd82) )
-	ROM_LOAD16_BYTE( "b22-04.24",     0x40001, 0x20000, CRC(91625e7f) SHA1(765afd973d9b82bb496b04beca284bf2769d6e6f) )
-	ROM_LOAD16_BYTE( "jb1_f89",       0x80001, 0x10000, CRC(0810d327) SHA1(fe91ac02e617bde413dc8a20b7cbcaf3e20aeb28) )  /* c-chip substitute */
+	ROM_LOAD16_BYTE( "6.h4",          0x00000, 0x10000, CRC(3fab6b31) SHA1(57803478949cb62f7eab2ef9be08b13aa2237dbc) )
+	ROM_LOAD16_BYTE( "10.h8",         0x00001, 0x10000, CRC(8c878827) SHA1(4a54a217b7c442305c3ce9298aa36ae225382444) )
+	ROM_LOAD16_BYTE( "5.i4",          0x20000, 0x10000, CRC(443492cf) SHA1(fc3809d784d611df4fd446ca2443eebdf4f0bfd7) )
+	ROM_LOAD16_BYTE( "9.i8",          0x20001, 0x10000, CRC(ed33bae1) SHA1(24ade29f3fdd45aa772ccf9c046294baa6eae7a2) )
+	ROM_LOAD16_BYTE( "4.bin",         0x40000, 0x10000, CRC(00bf8a91) SHA1(973868eef99b1bcfa60e1b22a18946aa3edefad3) ) // 4+3 == b22-03.23
+	ROM_LOAD16_BYTE( "8.bin",         0x40001, 0x10000, CRC(e3d7a844) SHA1(9559b38f2017de0c93ed82ca7dccfb046fff39f9) ) // 8+7 == b22-04.24
+	ROM_LOAD16_BYTE( "3.bin",         0x60000, 0x10000, CRC(a3ab61c6) SHA1(5cf82d1aa1f548fb3c243c625e4ff52c8714bacc) ) // ^
+	ROM_LOAD16_BYTE( "7.bin",         0x60001, 0x10000, CRC(c1c4c701) SHA1(4dd751418ee0f8ae766e2fe47f752d0758d7d682) ) // ^
+	ROM_LOAD16_BYTE( "2.f89",         0x80001, 0x10000, CRC(0810d327) SHA1(fe91ac02e617bde413dc8a20b7cbcaf3e20aeb28) ) /* c-chip substitute */
 
 	ROM_REGION( 0x14000, "audiocpu", 0 )
 	ROM_LOAD( "jb1_cd67",             0x00000, 0x8000, CRC(8527c00e) SHA1(86e3824caca39aca4ca4df63bb4474adacfc4c53) )
@@ -814,14 +816,14 @@ ROM_START( jumping )
 	ROM_CONTINUE(                     0x0c000, 0x4000 )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
-	ROM_LOAD( "jb2_ic8",              0x00000, 0x10000, CRC(65b76309) SHA1(1e345726e137f4c56d4bf239651c986fd53a16c3) )  /* tiles */
-	ROM_LOAD( "jb2_ic7",              0x10000, 0x10000, CRC(43a94283) SHA1(d6a05cbc7b996a8e7f1520563f6fada9a59021a4) )
-	ROM_LOAD( "jb2_ic10",             0x20000, 0x10000, CRC(e61933fb) SHA1(02bc0e1a7a3ce9e15fb83b28ce8fafb0b8d80ebd) )
-	ROM_LOAD( "jb2_ic9",              0x30000, 0x10000, CRC(ed031eb2) SHA1(905be4d890ff7bb8a4d8ad85b2a11483fb4d67eb) )
-	ROM_LOAD( "jb2_ic12",             0x40000, 0x10000, CRC(312700ca) SHA1(c79edc9c25f364d0afd79aaa21cfe2fe46044314) )
-	ROM_LOAD( "jb2_ic11",             0x50000, 0x10000, CRC(de3b0b88) SHA1(14b8871821e4c0abbb9967c5aa282cf4e67884fe) )
-	ROM_LOAD( "jb2_ic14",             0x60000, 0x10000, CRC(9fdc6c8e) SHA1(ff4e1a98dc982bce2f9d235cac62c7166f477f64) )
-	ROM_LOAD( "jb2_ic13",             0x70000, 0x10000, CRC(06226492) SHA1(834280ec49e61a0c9c6b6fe2033e1b20bd1bffbf) )
+	ROM_LOAD( "17.ic8",              0x00000, 0x10000, CRC(65b76309) SHA1(1e345726e137f4c56d4bf239651c986fd53a16c3) )  /* tiles */
+	ROM_LOAD( "18.ic7",              0x10000, 0x10000, CRC(43a94283) SHA1(d6a05cbc7b996a8e7f1520563f6fada9a59021a4) )
+	ROM_LOAD( "15.ic10",             0x20000, 0x10000, CRC(e61933fb) SHA1(02bc0e1a7a3ce9e15fb83b28ce8fafb0b8d80ebd) )
+	ROM_LOAD( "16.ic9",              0x30000, 0x10000, CRC(ed031eb2) SHA1(905be4d890ff7bb8a4d8ad85b2a11483fb4d67eb) )
+	ROM_LOAD( "13.ic12",             0x40000, 0x10000, CRC(312700ca) SHA1(c79edc9c25f364d0afd79aaa21cfe2fe46044314) )
+	ROM_LOAD( "14.ic11",             0x50000, 0x10000, CRC(de3b0b88) SHA1(14b8871821e4c0abbb9967c5aa282cf4e67884fe) )
+	ROM_LOAD( "11.ic14",             0x60000, 0x10000, CRC(9fdc6c8e) SHA1(ff4e1a98dc982bce2f9d235cac62c7166f477f64) )
+	ROM_LOAD( "12.ic13",             0x70000, 0x10000, CRC(06226492) SHA1(834280ec49e61a0c9c6b6fe2033e1b20bd1bffbf) )
 
 	ROM_REGION( 0xa0000, "gfx2", ROMREGION_INVERT )
 	ROM_LOAD( "jb2_ic62",             0x00000, 0x10000, CRC(8548db6c) SHA1(675cd301259d5ed16098a38ac58b27b5ccd91264) )  /* sprites */
@@ -836,7 +838,58 @@ ROM_START( jumping )
 	ROM_LOAD( "jb2_i121",             0x78000, 0x10000, CRC(93df1e4d) SHA1(b100d265b973254ec9cd44b6c32f62b4bac3b732) )
 	ROM_LOAD( "jb2_i120",             0x88000, 0x10000, CRC(7c4e893b) SHA1(eceecb38554157ee24d228a2c722dad750a6a07d) )
 	ROM_LOAD( "jb2_i119",             0x98000, 0x08000, CRC(7e1d58d8) SHA1(d586a018c3ec3e6e6a39992170d324361e03c68a) )
+
+	ROM_REGION( 0x200, "pals", 0 )
+	ROM_LOAD( "jumping-pal16r6.bin",             0x000, 0x104, CRC(12e9a7b8) SHA1(a0ce8b6083c9adfcb4bdbca87f63a01f292525f3) )
+	ROM_LOAD( "jumping-pal20l8.bin",             0x000, 0x144, CRC(76944f81) SHA1(ab78e4e157ffdc13aea5dc360268b2640e60d19c) )	
 ROM_END
+
+ROM_START( jumpinga )
+	ROM_REGION( 0xa0000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "6.h4",          0x00000, 0x10000, CRC(3fab6b31) SHA1(57803478949cb62f7eab2ef9be08b13aa2237dbc) )
+	ROM_LOAD16_BYTE( "10.h8",         0x00001, 0x10000, CRC(8c878827) SHA1(4a54a217b7c442305c3ce9298aa36ae225382444) )
+	ROM_LOAD16_BYTE( "seyutu_5.i4",   0x20000, 0x10000, CRC(25f19b71) SHA1(538f9a510cf73581b5ec01befdba7dfb02032c66) )
+	ROM_LOAD16_BYTE( "seyutu_9.i8",   0x20001, 0x10000, CRC(9c94f260) SHA1(aa963acacbf11480d0ddc3b99fc839414970c043) )
+	ROM_LOAD16_BYTE( "4.bin",         0x40000, 0x10000, CRC(00bf8a91) SHA1(973868eef99b1bcfa60e1b22a18946aa3edefad3) ) // 4+3 == b22-03.23
+	ROM_LOAD16_BYTE( "8.bin",         0x40001, 0x10000, CRC(e3d7a844) SHA1(9559b38f2017de0c93ed82ca7dccfb046fff39f9) ) // 8+7 == b22-04.24
+	ROM_LOAD16_BYTE( "3.bin",         0x60000, 0x10000, CRC(a3ab61c6) SHA1(5cf82d1aa1f548fb3c243c625e4ff52c8714bacc) ) // ^
+	ROM_LOAD16_BYTE( "7.bin",         0x60001, 0x10000, CRC(c1c4c701) SHA1(4dd751418ee0f8ae766e2fe47f752d0758d7d682) ) // ^
+	ROM_LOAD16_BYTE( "2.f89",         0x80001, 0x10000, CRC(0810d327) SHA1(fe91ac02e617bde413dc8a20b7cbcaf3e20aeb28) ) /* c-chip substitute */
+
+	ROM_REGION( 0x14000, "audiocpu", 0 )
+	ROM_LOAD( "jb1_cd67",             0x00000, 0x8000, CRC(8527c00e) SHA1(86e3824caca39aca4ca4df63bb4474adacfc4c53) )
+	ROM_CONTINUE(                     0x10000, 0x4000 )
+	ROM_CONTINUE(                     0x0c000, 0x4000 )
+
+	ROM_REGION( 0x80000, "gfx1", 0 )
+	ROM_LOAD( "17.ic8",              0x00000, 0x10000, CRC(65b76309) SHA1(1e345726e137f4c56d4bf239651c986fd53a16c3) )  /* tiles */
+	ROM_LOAD( "18.ic7",              0x10000, 0x10000, CRC(43a94283) SHA1(d6a05cbc7b996a8e7f1520563f6fada9a59021a4) )
+	ROM_LOAD( "15.ic10",             0x20000, 0x10000, CRC(e61933fb) SHA1(02bc0e1a7a3ce9e15fb83b28ce8fafb0b8d80ebd) )
+	ROM_LOAD( "16.ic9",              0x30000, 0x10000, CRC(ed031eb2) SHA1(905be4d890ff7bb8a4d8ad85b2a11483fb4d67eb) )
+	ROM_LOAD( "13.ic12",             0x40000, 0x10000, CRC(312700ca) SHA1(c79edc9c25f364d0afd79aaa21cfe2fe46044314) )
+	ROM_LOAD( "14.ic11",             0x50000, 0x10000, CRC(de3b0b88) SHA1(14b8871821e4c0abbb9967c5aa282cf4e67884fe) )
+	ROM_LOAD( "11.ic14",             0x60000, 0x10000, CRC(9fdc6c8e) SHA1(ff4e1a98dc982bce2f9d235cac62c7166f477f64) )
+	ROM_LOAD( "12.ic13",             0x70000, 0x10000, CRC(06226492) SHA1(834280ec49e61a0c9c6b6fe2033e1b20bd1bffbf) )
+
+	ROM_REGION( 0xa0000, "gfx2", ROMREGION_INVERT )
+	ROM_LOAD( "jb2_ic62",             0x00000, 0x10000, CRC(8548db6c) SHA1(675cd301259d5ed16098a38ac58b27b5ccd91264) )  /* sprites */
+	ROM_LOAD( "jb2_ic61",             0x10000, 0x10000, CRC(37c5923b) SHA1(c83ef45564c56ef62d7019aecbd79dccc671deee) )
+	ROM_LOAD( "jb2_ic60",             0x20000, 0x08000, CRC(662a2f1e) SHA1(1c5e8b1f0623e64faf9cd60f9653fc5957191a9b) )
+	ROM_LOAD( "jb2_ic78",             0x28000, 0x10000, CRC(925865e1) SHA1(457de50bc03e8b949ac7d46ae4188201e87574a8) )
+	ROM_LOAD( "jb2_ic77",             0x38000, 0x10000, CRC(b09695d1) SHA1(e6d315f9befb7b47f42668d573a1102e52d78aea) )
+	ROM_LOAD( "jb2_ic76",             0x48000, 0x08000, CRC(41937743) SHA1(890c832a7cf87e6fe749d4824b02d57e10872bdf) )
+	ROM_LOAD( "jb2_ic93",             0x50000, 0x10000, CRC(f644eeab) SHA1(9d45e9dfb08e8c90b4b10f5dc383fa4732161a81) )
+	ROM_LOAD( "jb2_ic92",             0x60000, 0x10000, CRC(3fbccd33) SHA1(137880a564573db1f9e6de5c730af6709ca301f3) )
+	ROM_LOAD( "jb2_ic91",             0x70000, 0x08000, CRC(d886c014) SHA1(9327c332c98a81451e9e0624344d2601ef06e490) )
+	ROM_LOAD( "jb2_i121",             0x78000, 0x10000, CRC(93df1e4d) SHA1(b100d265b973254ec9cd44b6c32f62b4bac3b732) )
+	ROM_LOAD( "jb2_i120",             0x88000, 0x10000, CRC(7c4e893b) SHA1(eceecb38554157ee24d228a2c722dad750a6a07d) )
+	ROM_LOAD( "jb2_i119",             0x98000, 0x08000, CRC(7e1d58d8) SHA1(d586a018c3ec3e6e6a39992170d324361e03c68a) )
+
+	ROM_REGION( 0x200, "pals", 0 )
+	ROM_LOAD( "jumping-pal16r6.bin",             0x000, 0x104, CRC(12e9a7b8) SHA1(a0ce8b6083c9adfcb4bdbca87f63a01f292525f3) )
+	ROM_LOAD( "jumping-pal20l8.bin",             0x000, 0x144, CRC(76944f81) SHA1(ab78e4e157ffdc13aea5dc360268b2640e60d19c) )	
+ROM_END
+
 
 
 DRIVER_INIT_MEMBER(rbisland_state,rbisland)
@@ -867,4 +920,5 @@ DRIVER_INIT_MEMBER(rbisland_state,jumping)
 GAME( 1987, rbisland,  0,        rbisland, rbisland, rbisland_state, rbisland,  ROT0, "Taito Corporation", "Rainbow Islands (new version)", GAME_SUPPORTS_SAVE )
 GAME( 1987, rbislando, rbisland, rbisland, rbisland, rbisland_state, rbisland,  ROT0, "Taito Corporation", "Rainbow Islands (old version)", GAME_SUPPORTS_SAVE )
 GAME( 1988, rbislande, rbisland, rbisland, rbisland, rbisland_state, rbislande, ROT0, "Taito Corporation", "Rainbow Islands (Extra)", GAME_SUPPORTS_SAVE )
-GAME( 1989, jumping,   rbisland, jumping,  jumping, rbisland_state,  jumping,   ROT0, "bootleg", "Jumping", GAME_SUPPORTS_SAVE )
+GAME( 1989, jumping,   rbisland, jumping,  jumping, rbisland_state,  jumping,   ROT0, "bootleg",          "Jumping (set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1989, jumpinga,  rbisland, jumping,  jumping, rbisland_state,  jumping,   ROT0, "bootleg (Seyutu)", "Jumping (set 2)", GAME_SUPPORTS_SAVE )
