@@ -807,6 +807,55 @@ static ADDRESS_MAP_START( hexa_map, AS_PROGRAM, 8, arkanoid_state )
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(arkanoid_videoram_w) AM_SHARE("videoram")
 ADDRESS_MAP_END
 
+READ8_MEMBER(arkanoid_state::hexaa_f000_r)
+{
+//	return hexaa_from_sub;
+	return rand();
+}
+
+WRITE8_MEMBER(arkanoid_state::hexaa_f000_w)
+{
+	hexaa_from_main = data;
+}
+
+static ADDRESS_MAP_START( hexaa_map, AS_PROGRAM, 8, arkanoid_state )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM
+	AM_RANGE(0xd001, 0xd001) AM_DEVREAD("aysnd", ay8910_device, data_r)
+	AM_RANGE(0xd000, 0xd001) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
+	AM_RANGE(0xd008, 0xd008) AM_WRITE(hexa_d008_w)
+	AM_RANGE(0xd010, 0xd010) AM_WRITE(watchdog_reset_w) /* or IRQ acknowledge, or both */
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(arkanoid_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0xe800, 0xefff) AM_RAM
+	AM_RANGE(0xf000, 0xf000) AM_READWRITE(hexaa_f000_r, hexaa_f000_w)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( hexaa_sub_map, AS_PROGRAM, 8, arkanoid_state )
+	AM_RANGE(0x0000, 0x0fff) AM_ROM
+ADDRESS_MAP_END
+
+
+WRITE8_MEMBER(arkanoid_state::hexaa_sub_80_w)
+{
+	hexaa_from_sub = data;
+}
+
+READ8_MEMBER(arkanoid_state::hexaa_sub_90_r)
+{
+	return hexaa_from_main;
+//	return rand();
+}
+
+static ADDRESS_MAP_START( hexaa_sub_iomap, AS_IO, 8, arkanoid_state )
+	ADDRESS_MAP_GLOBAL_MASK(0x0f)
+	AM_RANGE(0x00, 0x0f) AM_RAM // ?? could be communication with the other chip (protection?)
+	AM_RANGE(0x80, 0x80) AM_WRITE(hexaa_sub_80_w)
+	AM_RANGE(0x90, 0x90) AM_READ(hexaa_sub_90_r)
+ADDRESS_MAP_END
+	
+
+
 static ADDRESS_MAP_START( brixian_map, AS_PROGRAM, 8, arkanoid_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_SHARE("protram")
@@ -1238,6 +1287,16 @@ static MACHINE_CONFIG_START( hexa, arkanoid_state )
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("INPUTS"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( hexaa, hexa )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(hexaa_map)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", arkanoid_state,  irq0_line_hold)
+
+	MCFG_CPU_ADD("subcpu", Z80, XTAL_12MHz/2) // ?
+	MCFG_CPU_PROGRAM_MAP(hexaa_sub_map)
+	MCFG_CPU_IO_MAP(hexaa_sub_iomap)
 MACHINE_CONFIG_END
 
 
@@ -1749,6 +1808,45 @@ ROM_START( hexa )
 	ROM_LOAD( "hexa.002",     0x0200, 0x0100, CRC(ff15366c) SHA1(7feaf1c768bfe76432fb80991585e13d95960b34) )
 ROM_END
 
+/*
+
+Hexa (alt.)
+
+main hardware consists of.....
+
+sub board with Z80 x2, 2 ROMs and a scratched 18 pin chip (probably a PIC)
+
+main board has....
+12MHz xtal
+ay3-8910
+8 position DSW x1
+ROMs x4
+6116 SRAM x3
+82S123 PROMs x3
+
+*/
+
+
+ROM_START( hexaa )
+	ROM_REGION( 0x18000, "maincpu", 0 )     /* 64k for code + 32k for banked ROM */
+	ROM_LOAD( "sub1.bin",      0x00000, 0x8000, CRC(82c091fa) SHA1(e509ab4d9372f93d81df70772a4632100081ffd7) )
+	ROM_LOAD( "main4.bin",     0x10000, 0x8000, CRC(3d5d006c) SHA1(ad4eadab82024b122182eacb5a322cfd6e476a70) )
+
+	ROM_REGION( 0x18000, "subcpu", 0 )  
+	ROM_LOAD( "sub2.bin",      0x00000, 0x2000, CRC(c3bb9661) SHA1(e4bccb822d6eba77bb9cba75125cddb740775a2c)) // 1ST AND 2ND HALF IDENTICAL (contains just 0x55 bytes of code)
+
+
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_LOAD( "main1.bin",      0x00000, 0x8000, CRC(f6911dd6) SHA1(b12ea27ecddd60820a32d4346afab0cc9d06fa57) )
+	ROM_LOAD( "main2.bin",      0x08000, 0x8000, CRC(6e3d95d2) SHA1(6399b7b5d088ceda08fdea9cf650f6b405f038e7) )
+	ROM_LOAD( "main3.bin",      0x10000, 0x8000, CRC(ffe97a31) SHA1(f16b5d2b9ace09bcbbfe3dfb73db7fa377d1af7f) )
+
+	ROM_REGION( 0x0300, "proms", 0 )
+	ROM_LOAD( "hexa.001",     0x0000, 0x0100, CRC(88a055b4) SHA1(eee86a7930d0a251f3e5c2134532cd1dede2026c) )
+	ROM_LOAD( "hexa.003",     0x0100, 0x0100, CRC(3e9d4932) SHA1(9a336dba7134400312985b9902c77b4141105853) )
+	ROM_LOAD( "hexa.002",     0x0200, 0x0100, CRC(ff15366c) SHA1(7feaf1c768bfe76432fb80991585e13d95960b34) )
+ROM_END
+
 ROM_START( brixian )
 	ROM_REGION( 0x18000, "maincpu", 0 )
 	ROM_LOAD( "b1.bin",      0x00000, 0x8000, CRC(3d167d09) SHA1(1d5bd098b655b8d2f956cfcb718213915bee3e41) )
@@ -1927,5 +2025,6 @@ GAME( 1987, arkatour,   0,        arkanoid, arkanoid, driver_device, 0,        R
 GAME( 19??, tetrsark,   0,        bootleg,  tetrsark, arkanoid_state, tetrsark, ROT0,  "D.R. Korea", "Tetris (D.R. Korea)", GAME_SUPPORTS_SAVE )
 
 GAME( 199?, hexa,       0,        hexa,     hexa, arkanoid_state,     hexa,     ROT0,  "D.R. Korea", "Hexa", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 199?, hexaa,      hexa,     hexaa,    hexa, arkanoid_state,     hexa,     ROT0,  "D.R. Korea", "Hexa (with 2xZ80, protected)", GAME_NOT_WORKING )
 
 GAME( 1993, brixian,    0,        brixian,  brixian, arkanoid_state,  brixian,        ROT0,  "Cheil Computer System", "Brixian", GAME_SUPPORTS_SAVE )

@@ -49,6 +49,10 @@ public:
 	UINT8    m_ddr_c;
 	UINT8    m_bootleg_cmd;
 
+	/* hexaa */
+	UINT8 hexaa_from_main;
+	UINT8 hexaa_from_sub;
+
 	/* devices */
 	optional_device<cpu_device> m_mcu;
 	DECLARE_READ8_MEMBER(arkanoid_Z80_mcu_r);
@@ -69,6 +73,10 @@ public:
 	DECLARE_WRITE8_MEMBER(tetrsark_d008_w);
 	DECLARE_WRITE8_MEMBER(brixian_d008_w);
 	DECLARE_WRITE8_MEMBER(hexa_d008_w);
+	DECLARE_READ8_MEMBER(hexaa_f000_r);
+	DECLARE_WRITE8_MEMBER(hexaa_f000_w);
+	DECLARE_WRITE8_MEMBER(hexaa_sub_80_w);
+	DECLARE_READ8_MEMBER(hexaa_sub_90_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(arkanoid_68705_input_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(arkanoid_input_mux);
 	DECLARE_DRIVER_INIT(block2);
