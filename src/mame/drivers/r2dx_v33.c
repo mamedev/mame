@@ -39,6 +39,26 @@ Then it puts settings at 0x9e08 and 0x9e0a (bp 91acb)
 
 */
 
+/* Rom structure notes 
+
+ Raiden 2 New/DX (hardware can bank upper/lower half of rom to switch fixed areas)
+
+ 000000-02ffff : 0xff fill, inaccessible by hardware
+ 030000-0fffff : 'Fixed' ROM data for Raiden 2
+ 100000-1fffff : Banked ROM data for Raiden 2 (16x 0x10000 banks)
+
+ 200000-22ffff : 0xff fill, inaccessible by hardware
+ 230000-2fffff : 'Fixed' ROM data for Raiden DX
+ 300000-3fffff : Banked ROM data for Raiden DX (16x 0x10000 banks)
+
+ New Zero Team /Zero
+
+ 000000-01ffff : 0xff fill, inaccessible by hardware?
+ 020000-0fffff : Fixed ROM data for Zero Team
+ (no banking)
+
+*/
+
 #include "emu.h"
 #include "cpu/nec/nec.h"
 #include "cpu/z80/z80.h"
@@ -110,7 +130,23 @@ public:
 	UINT32 screen_update_rdx_v33(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(rdx_v33_interrupt);
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect,int pri);
+
+protected:
+	virtual void machine_start();
 };
+
+void r2dx_v33_state::machine_start()
+{
+	raiden2_state::machine_start();
+
+	save_item(NAME(m_r2dxbank));
+	save_item(NAME(m_r2dxgameselect));
+	save_item(NAME(m_r2dx_angle));
+	save_item(NAME(r2dx_i_dx));
+	save_item(NAME(r2dx_i_dy));
+	save_item(NAME(r2dx_i_angle));
+	save_item(NAME(r2dx_i_sdist));
+}
 
 WRITE16_MEMBER(r2dx_v33_state::tile_bank_w)
 {
@@ -139,7 +175,6 @@ WRITE16_MEMBER(r2dx_v33_state::tile_bank_w)
 void r2dx_v33_state::r2dx_setbanking(void)
 {
 	membank("bank1")->set_entry(m_r2dxgameselect*0x20 + m_r2dxbank + 16);
-	membank("bank2")->set_entry(m_r2dxgameselect*0x20 + 3);
 	membank("bank3")->set_entry(m_r2dxgameselect);
 }
 
@@ -251,7 +286,7 @@ WRITE16_MEMBER(r2dx_v33_state::mcu_table2_w)
 
 WRITE16_MEMBER(r2dx_v33_state::r2dx_rom_bank_w)
 {
-	printf("rom bank %04x %04x\n", data, mem_mask);
+	//printf("rom bank %04x %04x\n", data, mem_mask);
 	m_r2dxbank = data & 0xf;
 	r2dx_setbanking();
 
@@ -400,8 +435,7 @@ static ADDRESS_MAP_START( rdx_v33_map, AS_PROGRAM, 16, r2dx_v33_state )
 	AM_RANGE(0x1f000, 0x1ffff) AM_RAM //_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 
 	AM_RANGE(0x20000, 0x2ffff) AM_ROM AM_ROMBANK("bank1") AM_WRITENOP
-	AM_RANGE(0x30000, 0x3ffff) AM_ROM AM_ROMBANK("bank2") AM_WRITENOP
-	AM_RANGE(0x40000, 0xfffff) AM_ROM AM_ROMBANK("bank3") AM_WRITENOP
+	AM_RANGE(0x30000, 0xfffff) AM_ROM AM_ROMBANK("bank3") AM_WRITENOP
 ADDRESS_MAP_END
 
 
@@ -813,29 +847,20 @@ DRIVER_INIT_MEMBER(r2dx_v33_state,rdx_v33)
 	cur_spri = spri;
 
 	membank("bank1")->configure_entries(0, 0x40, memregion("mainprg")->base(), 0x10000);
-	membank("bank2")->configure_entries(0, 0x40, memregion("mainprg")->base(), 0x10000);
 
-	membank("bank3")->configure_entry(0, memregion("mainprg")->base()+0x040000); // 0x40000 - 0xfffff bank for Raiden 2
-	membank("bank3")->configure_entry(1, memregion("mainprg")->base()+0x240000); // 0x40000 - 0xfffff bank for Raiden DX
+	membank("bank3")->configure_entry(0, memregion("mainprg")->base()+0x030000); // 0x30000 - 0xfffff bank for Raiden 2
+	membank("bank3")->configure_entry(1, memregion("mainprg")->base()+0x230000); // 0x30000 - 0xfffff bank for Raiden DX
 
 
 	raiden2_decrypt_sprites(machine());
 
 //  sensible defaults if booting as R2
-	membank("bank1")->set_entry(2);
-	membank("bank2")->set_entry(3);
+	membank("bank1")->set_entry(0);
 	membank("bank3")->set_entry(0);
 
 
 	membank("okibank")->configure_entries(0, 4, memregion("oki")->base(), 0x40000);
 	membank("okibank")->set_entry(0);
-	//  sensible defaults if booting as RDX - we set now set this later..
-	//	membank("bank1")->set_entry(0x20+16);
-	//	membank("bank2")->set_entry(0x20+3);
-	//	membank("bank3")->set_entry(1);
-
-
-
 
 }
 
@@ -1053,11 +1078,16 @@ ROM_END
 
 // newer PCB, with V33 CPU and COPD3 protection, but weak sound hardware. - was marked as Raiden DX New in the rom dump, but boots as Raiden 2 New version, the rom contains both
 // is there a switching method? for now I've split it into 2 sets with different EEPROM, the game checks that on startup and runs different code depending on what it finds
-GAME( 1996, r2dx_v33,    0,          rdx_v33,  rdx_v33, r2dx_v33_state,  rdx_v33,   ROT270, "Seibu Kaihatsu", "Raiden II New / Raiden DX (newer V33 PCB) (Raiden DX EEPROM)", 0)
-GAME( 1996, r2dx_v33_r2, r2dx_v33,   rdx_v33,  rdx_v33, r2dx_v33_state,  rdx_v33,   ROT270, "Seibu Kaihatsu", "Raiden II New / Raiden DX (newer V33 PCB) (Raiden II EEPROM)", 0)
+GAME( 1996, r2dx_v33,    0,          rdx_v33,  rdx_v33, r2dx_v33_state,  rdx_v33,   ROT270, "Seibu Kaihatsu", "Raiden II New / Raiden DX (newer V33 PCB) (Raiden DX EEPROM)", GAME_SUPPORTS_SAVE)
+GAME( 1996, r2dx_v33_r2, r2dx_v33,   rdx_v33,  rdx_v33, r2dx_v33_state,  rdx_v33,   ROT270, "Seibu Kaihatsu", "Raiden II New / Raiden DX (newer V33 PCB) (Raiden II EEPROM)", GAME_SUPPORTS_SAVE)
 
 // 'V33 system type_b' - uses V33 CPU, COPX-D3 external protection rom, but still has the proper sound system, DSW for settings
-GAME( 1997, nzeroteam, zeroteam,  nzerotea, nzerotea, r2dx_v33_state, nzerotea,  ROT0,   "Seibu Kaihatsu", "New Zero Team", 0)
+GAME( 1997, nzeroteam, zeroteam,  nzerotea, nzerotea, r2dx_v33_state, nzerotea,  ROT0,   "Seibu Kaihatsu (Haoyunlai Trading Company license)", "New Zero Team (V33 SYSTEM TYPE_B hardware)", GAME_SUPPORTS_SAVE) // license text translated from title screen
+
+// 'V33 SYSTEM TYPE_C' - uses V33 CPU, basically the same board as TYPE_C VER2
+// there is a version of New Zero Team on "V33 SYSTEM TYPE_C" board with EEPROM rather than dipswitches like Zero Team 2000
 
 // 'V33 SYSTEM TYPE_C VER2' - uses V33 CPU, COPX-D3 external protection rom, but still has the proper sound system, unencrypted sprites, EEPROM for settings.  PCB also seen without 'VER2', looks the same
-GAME( 2000, zerotm2k,  zeroteam,  zerotm2k, zerotm2k, r2dx_v33_state, zerotm2k,  ROT0,   "Seibu Kaihatsu", "Zero Team 2000", 0)
+GAME( 2000, zerotm2k,  zeroteam,  zerotm2k, zerotm2k, r2dx_v33_state, zerotm2k,  ROT0,   "Seibu Kaihatsu", "Zero Team 2000", GAME_SUPPORTS_SAVE)
+
+// there is also a 'Raiden 2 2000' on unknown hardware.
