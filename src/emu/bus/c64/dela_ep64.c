@@ -21,35 +21,14 @@ const device_type C64_DELA_EP64 = &device_creator<c64_dela_ep64_cartridge_device
 
 
 //-------------------------------------------------
-//  ROM( c64_dela_ep64 )
-//-------------------------------------------------
-
-ROM_START( c64_dela_ep64 )
-	ROM_REGION( 0x10000, "eprom", 0 )
-	ROM_CART_LOAD( "rom1", 0x0000, 0x08000, ROM_MIRROR )
-	ROM_CART_LOAD( "rom2", 0x8000, 0x08000, ROM_MIRROR )
-ROM_END
-
-
-//-------------------------------------------------
-//  rom_region - device-specific ROM region
-//-------------------------------------------------
-
-const rom_entry *c64_dela_ep64_cartridge_device::device_rom_region() const
-{
-	return ROM_NAME( c64_dela_ep64 );
-}
-
-
-//-------------------------------------------------
 //  MACHINE_CONFIG_FRAGMENT( c64_dela_ep64 )
 //-------------------------------------------------
 
 static MACHINE_CONFIG_FRAGMENT( c64_dela_ep64 )
-	MCFG_CARTSLOT_ADD("rom1")
-	MCFG_CARTSLOT_EXTENSION_LIST("rom,bin")
-	MCFG_CARTSLOT_ADD("rom2")
-	MCFG_CARTSLOT_EXTENSION_LIST("rom,bin")
+	MCFG_GENERIC_SOCKET_ADD("eprom1", generic_linear_slot, NULL)
+	MCFG_GENERIC_EXTENSIONS("rom,bin")
+	MCFG_GENERIC_SOCKET_ADD("eprom2", generic_linear_slot, NULL)
+	MCFG_GENERIC_EXTENSIONS("rom,bin")
 MACHINE_CONFIG_END
 
 
@@ -75,7 +54,8 @@ machine_config_constructor c64_dela_ep64_cartridge_device::device_mconfig_additi
 c64_dela_ep64_cartridge_device::c64_dela_ep64_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, C64_DELA_EP64, "C64 Rex 64KB EPROM cartridge", tag, owner, clock, "c64_dela_ep64", __FILE__),
 	device_c64_expansion_card_interface(mconfig, *this),
-	m_eprom(*this, "eprom")
+	m_eprom1(*this, "eprom1"),
+	m_eprom2(*this, "eprom2")
 {
 }
 
@@ -124,8 +104,8 @@ UINT8 c64_dela_ep64_cartridge_device::c64_cd_r(address_space &space, offs_t offs
 			offs_t addr = (m_bank << 13) | (offset & 0x1fff);
 
 			if (!m_rom0_ce) data |= m_roml[offset & 0x1fff];
-			if (!m_rom1_ce) data |= m_eprom->base()[0x0000 + addr];
-			if (!m_rom2_ce) data |= m_eprom->base()[0x8000 + addr];
+			if (!m_rom1_ce) data |= m_eprom1->read_rom(space, addr);
+			if (!m_rom2_ce) data |= m_eprom2->read_rom(space, addr);
 		}
 	}
 

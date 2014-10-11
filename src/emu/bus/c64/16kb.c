@@ -21,38 +21,15 @@ const device_type C64_16KB = &device_creator<c64_16kb_cartridge_device>;
 
 
 //-------------------------------------------------
-//  ROM( c64_16kb )
-//-------------------------------------------------
-
-ROM_START( c64_16kb )
-	ROM_REGION( 0x2000, "roml", 0 )
-	ROM_CART_LOAD( "roml", 0x0000, 0x2000, ROM_MIRROR )
-
-	ROM_REGION( 0x2000, "romh", 0 )
-	ROM_CART_LOAD( "romh", 0x0000, 0x2000, ROM_MIRROR )
-ROM_END
-
-
-//-------------------------------------------------
-//  rom_region - device-specific ROM region
-//-------------------------------------------------
-
-const rom_entry *c64_16kb_cartridge_device::device_rom_region() const
-{
-	return ROM_NAME( c64_16kb );
-}
-
-
-//-------------------------------------------------
 //  MACHINE_CONFIG_FRAGMENT( c64_16kb )
 //-------------------------------------------------
 
 static MACHINE_CONFIG_FRAGMENT( c64_16kb )
-	MCFG_CARTSLOT_ADD("roml")
-	MCFG_CARTSLOT_EXTENSION_LIST("rom,bin,80")
+	MCFG_GENERIC_CARTSLOT_ADD("roml", generic_linear_slot, NULL)
+	MCFG_GENERIC_EXTENSIONS("rom,bin,80")
 
-	MCFG_CARTSLOT_ADD("romh")
-	MCFG_CARTSLOT_EXTENSION_LIST("rom,bin,a0,e0")
+	MCFG_GENERIC_CARTSLOT_ADD("romh", generic_linear_slot, NULL)
+	MCFG_GENERIC_EXTENSIONS("rom,bin,a0,e0")
 MACHINE_CONFIG_END
 
 
@@ -103,8 +80,8 @@ c64_16kb_cartridge_device::c64_16kb_cartridge_device(const machine_config &mconf
 	device_t(mconfig, C64_16KB, "C64 16KB EPROM cartridge", tag, owner, clock, "c64_16kb", __FILE__),
 	device_c64_expansion_card_interface(mconfig, *this),
 	m_sw1(*this, "SW1"),
-	m_rom_low(*this, "roml"),
-	m_rom_high(*this, "romh")
+	m_low(*this, "roml"),
+	m_high(*this, "romh")
 {
 }
 
@@ -139,11 +116,11 @@ UINT8 c64_16kb_cartridge_device::c64_cd_r(address_space &space, offs_t offset, U
 {
 	if (!roml)
 	{
-		data = m_rom_low->base()[offset & 0x1fff];
+		data = m_low->read_rom(space, offset & 0x1fff);
 	}
 	else if (!romh)
 	{
-		data = m_rom_high->base()[offset & 0x1fff];
+		data = m_high->read_rom(space, offset & 0x1fff);
 	}
 
 	return data;

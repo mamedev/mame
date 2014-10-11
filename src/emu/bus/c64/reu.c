@@ -20,7 +20,6 @@
 #define MOS8726R1_TAG   "u1"
 
 
-
 //**************************************************************************
 //  DEVICE DEFINITIONS
 //**************************************************************************
@@ -31,34 +30,14 @@ const device_type C64_REU1764 = &device_creator<c64_reu1764_cartridge_device>;
 
 
 //-------------------------------------------------
-//  ROM( c64_reu )
-//-------------------------------------------------
-
-ROM_START( c64_reu )
-	ROM_REGION( 0x8000, "roml", 0 )
-	ROM_CART_LOAD( "rom", 0x0000, 0x8000, ROM_MIRROR )
-ROM_END
-
-
-//-------------------------------------------------
-//  rom_region - device-specific ROM region
-//-------------------------------------------------
-
-const rom_entry *c64_reu_cartridge_device::device_rom_region() const
-{
-	return ROM_NAME( c64_reu );
-}
-
-
-//-------------------------------------------------
 //  MACHINE_CONFIG_FRAGMENT( c64_reu )
 //-------------------------------------------------
 
 static MACHINE_CONFIG_FRAGMENT( c64_reu )
 	MCFG_MOS8726_ADD(MOS8726R1_TAG)
 
-	MCFG_CARTSLOT_ADD("rom")
-	MCFG_CARTSLOT_EXTENSION_LIST("rom,bin")
+	MCFG_GENERIC_SOCKET_ADD("rom", generic_linear_slot, NULL)
+	MCFG_GENERIC_EXTENSIONS("bin,rom")
 MACHINE_CONFIG_END
 
 
@@ -86,7 +65,7 @@ c64_reu_cartridge_device::c64_reu_cartridge_device(const machine_config &mconfig
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	device_c64_expansion_card_interface(mconfig, *this),
 	m_dmac(*this, MOS8726R1_TAG),
-	m_rom(*this, "rom"),
+	m_eprom(*this, "rom"),
 	m_ram(*this, "ram"),
 	m_variant(variant),
 	m_jp1(jp1),
@@ -137,7 +116,7 @@ UINT8 c64_reu_cartridge_device::c64_cd_r(address_space &space, offs_t offset, UI
 {
 	if (!m_dmac->romsel_r(roml, romh))
 	{
-		data = m_roml[offset & 0x7fff];
+		data = m_eprom->read_rom(space, offset & 0x7fff);
 	}
 	else if (!io2)
 	{

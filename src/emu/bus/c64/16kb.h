@@ -16,7 +16,8 @@
 
 
 #include "emu.h"
-#include "imagedev/cartslot.h"
+#include "bus/generic/slot.h"
+#include "bus/generic/carts.h"
 #include "exp.h"
 
 
@@ -35,7 +36,6 @@ public:
 	c64_16kb_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
-	virtual const rom_entry *device_rom_region() const;
 	virtual machine_config_constructor device_mconfig_additions() const;
 	virtual ioport_constructor device_input_ports() const;
 
@@ -49,8 +49,8 @@ protected:
 
 private:
 	required_ioport m_sw1;
-	required_memory_region m_rom_low;
-	required_memory_region m_rom_high;
+	required_device<generic_slot_device> m_low;
+	required_device<generic_slot_device> m_high;
 };
 
 

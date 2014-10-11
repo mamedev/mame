@@ -16,7 +16,8 @@
 
 
 #include "emu.h"
-#include "imagedev/cartslot.h"
+#include "bus/generic/slot.h"
+#include "bus/generic/carts.h"
 #include "exp.h"
 #include "machine/mos8726.h"
 
@@ -36,7 +37,6 @@ public:
 	c64_reu_cartridge_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant, int jp1, size_t ram_size, const char *shortname, const char *source);
 
 	// optional information overrides
-	virtual const rom_entry *device_rom_region() const;
 	virtual machine_config_constructor device_mconfig_additions() const;
 
 protected:
@@ -56,7 +56,7 @@ protected:
 	virtual void c64_cd_w(address_space &space, offs_t offset, UINT8 data, int sphi2, int ba, int roml, int romh, int io1, int io2);
 
 	required_device<mos8726_device> m_dmac;
-	required_memory_region m_rom;
+	required_device<generic_slot_device> m_eprom;
 	optional_shared_ptr<UINT8> m_ram;
 
 	int m_variant;
