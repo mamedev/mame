@@ -8,6 +8,7 @@
 
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
+#include "machine/mos6530.h"
 #include "machine/6532riot.h"
 #include "sound/dac.h"
 #include "sound/ay8910.h"
@@ -24,6 +25,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
+extern const device_type GOTTLIEB_SOUND_REV0;
 extern const device_type GOTTLIEB_SOUND_REV1;
 extern const device_type GOTTLIEB_SOUND_REV1_WITH_VOTRAX;
 extern const device_type GOTTLIEB_SOUND_REV2;
@@ -33,6 +35,9 @@ extern const device_type GOTTLIEB_SOUND_REV2;
 //**************************************************************************
 //  DEVICE CONFIGURATION MACROS
 //**************************************************************************
+
+#define MCFG_GOTTLIEB_SOUND_R0_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, GOTTLIEB_SOUND_REV0, 0)
 
 #define MCFG_GOTTLIEB_SOUND_R1_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, GOTTLIEB_SOUND_REV1, 0)
@@ -49,6 +54,37 @@ extern const device_type GOTTLIEB_SOUND_REV2;
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
+
+// ======================> gottlieb_sound_r0_device
+
+// rev 0 sound board
+class gottlieb_sound_r0_device : public device_t, public device_mixer_interface
+{
+public:
+	// construction/destruction
+	gottlieb_sound_r0_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	// read/write
+	DECLARE_WRITE8_MEMBER( write );
+
+	// internal communications
+	DECLARE_READ8_MEMBER( r6530b_r );
+	DECLARE_INPUT_CHANGED_MEMBER(audio_nmi);
+
+protected:
+	// device-level overrides
+	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual ioport_constructor device_input_ports() const;
+	virtual void device_start();
+
+private:
+	// devices
+	required_device<m6502_device>       m_audiocpu;
+	required_device<mos6530_device>     m_r6530;
+	required_device<dac_device>         m_dac;
+
+	UINT8 m_sndcmd;
+};
 
 // ======================> gottlieb_sound_r1_device
 

@@ -121,16 +121,16 @@
 		</bezel>
 
 		<!-- Credits and Balls -->
-		<bezel name="digit56" element="digit7">
+		<bezel name="digit55" element="digit7">
 			<bounds left="30" top="345" right="64" bottom="384" />
 		</bezel>
-		<bezel name="digit55" element="digit7">
+		<bezel name="digit54" element="digit7">
 			<bounds left="69" top="345" right="103" bottom="384" />
 		</bezel>
-		<bezel name="digit54" element="digit7">
+		<bezel name="digit53" element="digit7">
 			<bounds left="171" top="345" right="205" bottom="384" />
 		</bezel>
-		<bezel name="digit53" element="digit7">
+		<bezel name="digit52" element="digit7">
 			<bounds left="210" top="345" right="244" bottom="384" />
 		</bezel>
 		<bezel element="P0"><bounds left="200" right="258" top="330" bottom="342" /></bezel>

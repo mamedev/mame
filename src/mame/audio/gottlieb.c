@@ -22,6 +22,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
+extern const device_type GOTTLIEB_SOUND_REV0 = &device_creator<gottlieb_sound_r0_device>;
 extern const device_type GOTTLIEB_SOUND_REV1 = &device_creator<gottlieb_sound_r1_device>;
 extern const device_type GOTTLIEB_SOUND_REV1_WITH_VOTRAX = &device_creator<gottlieb_sound_r1_with_votrax_device>;
 extern const device_type GOTTLIEB_SOUND_REV2 = &device_creator<gottlieb_sound_r2_device>;
@@ -244,6 +245,131 @@ MACHINE_CONFIG_FRAGMENT( qbert_samples )
 MACHINE_CONFIG_END
 
 #endif
+
+
+//**************************************************************************
+//  REV 0 SOUND BOARD: 6502 + 6530 + DAC
+//**************************************************************************
+
+//-------------------------------------------------
+//  gottlieb_sound_r0_device - constructors
+//-------------------------------------------------
+
+gottlieb_sound_r0_device::gottlieb_sound_r0_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, GOTTLIEB_SOUND_REV1, "Gottlieb Sound rev. 0", tag, owner, clock, "gotsndr0", __FILE__)
+	, device_mixer_interface(mconfig, *this)
+	, m_audiocpu(*this, "audiocpu")
+	, m_r6530(*this, "r6530")
+	, m_dac(*this, "dac")
+	, m_sndcmd(0)
+{
+}
+
+
+//-------------------------------------------------
+//  read port -
+//-------------------------------------------------
+
+READ8_MEMBER( gottlieb_sound_r0_device::r6530b_r )
+{
+	return m_sndcmd;
+}
+
+
+//-------------------------------------------------
+//  write - handle an external command write
+//-------------------------------------------------
+
+WRITE8_MEMBER( gottlieb_sound_r0_device::write )
+{
+	// write the command data to the low 4 bits
+	UINT8 pb0_3 = data ^ 15;
+	UINT8 pb4_7 = ioport("SB0")->read() & 0x90;
+	m_sndcmd = pb0_3 | pb4_7;
+	m_r6530->write(space, offset, m_sndcmd);
+}
+
+
+//-------------------------------------------------
+//  audio CPU map
+//-------------------------------------------------
+
+static ADDRESS_MAP_START( gottlieb_sound_r0_map, AS_PROGRAM, 8, gottlieb_sound_r0_device )
+	ADDRESS_MAP_GLOBAL_MASK(0x0fff)
+	AM_RANGE(0x0000, 0x003f) AM_RAM AM_MIRROR(0x1c0)
+	AM_RANGE(0x0200, 0x020f) AM_DEVREADWRITE("r6530", mos6530_device, read, write)
+	AM_RANGE(0x0400, 0x0fff) AM_ROM
+ADDRESS_MAP_END
+
+
+//-------------------------------------------------
+//  machine configuration
+//-------------------------------------------------
+
+MACHINE_CONFIG_FRAGMENT( gottlieb_sound_r0 )
+	// audio CPU
+	MCFG_CPU_ADD("audiocpu", M6502, SOUND1_CLOCK/4) // M6503 - clock is a gate, a resistor and a capacitor. Freq unknown.
+	MCFG_CPU_PROGRAM_MAP(gottlieb_sound_r0_map)
+
+	// I/O configuration
+	MCFG_DEVICE_ADD("r6530", MOS6530, XTAL_3_579545MHz/4) // unknown - same as cpu
+	MCFG_MOS6530_OUT_PA_CB(DEVWRITE8("dac", dac_device, write_unsigned8))
+	MCFG_MOS6530_IN_PB_CB(READ8(gottlieb_sound_r0_device, r6530b_r))
+
+	// sound devices
+	MCFG_DAC_ADD("dac")
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 1.00)
+MACHINE_CONFIG_END
+
+
+//-------------------------------------------------
+//  input ports
+//-------------------------------------------------
+
+INPUT_PORTS_START( gottlieb_sound_r0 )
+	PORT_START("SB0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Audio Diag") PORT_CODE(KEYCODE_0) PORT_CHANGED_MEMBER(DEVICE_SELF, gottlieb_sound_r0_device, audio_nmi, 1)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Attract") PORT_CODE(KEYCODE_F1) PORT_TOGGLE
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Music") PORT_CODE(KEYCODE_F2) PORT_TOGGLE
+INPUT_PORTS_END
+
+INPUT_CHANGED_MEMBER( gottlieb_sound_r0_device::audio_nmi )
+{
+	// Diagnostic button sends a pulse to NMI pin
+	if (newval==CLEAR_LINE)
+		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+}
+
+
+//-------------------------------------------------
+//  device_mconfig_additions - return a pointer to
+//  the device's machine fragment
+//-------------------------------------------------
+
+machine_config_constructor gottlieb_sound_r0_device::device_mconfig_additions() const
+{
+	return MACHINE_CONFIG_NAME( gottlieb_sound_r0 );
+}
+
+
+//-------------------------------------------------
+//  device_input_ports - return a pointer to
+//  the device's I/O ports
+//-------------------------------------------------
+
+ioport_constructor gottlieb_sound_r0_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME( gottlieb_sound_r0 );
+}
+
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void gottlieb_sound_r0_device::device_start()
+{
+}
 
 
 //**************************************************************************
