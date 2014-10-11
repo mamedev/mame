@@ -357,6 +357,9 @@ WRITE8_MEMBER( gottlieb_sound_r1_device::votrax_data_w )
 
 WRITE8_MEMBER( gottlieb_sound_r1_device::speech_clock_dac_w )
 {
+	// prevent negative clock values (and possible crash)
+	if (data < 0x65) data = 0x65;
+
 	if (m_votrax != NULL)
 	{
 		// nominal clock is 0xa0
@@ -425,7 +428,7 @@ MACHINE_CONFIG_FRAGMENT( gottlieb_sound_r1_with_votrax )
 
 	// add the VOTRAX
 	MCFG_DEVICE_ADD("votrax", VOTRAX_SC01, 720000)
-	MCFG_VOTRAX_SC01_REQUEST_CB(DEVWRITELINE(DEVICE_SELF_OWNER, gottlieb_sound_r1_device, votrax_request))
+	MCFG_VOTRAX_SC01_REQUEST_CB(DEVWRITELINE(DEVICE_SELF, gottlieb_sound_r1_device, votrax_request))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.50)
 MACHINE_CONFIG_END
 
