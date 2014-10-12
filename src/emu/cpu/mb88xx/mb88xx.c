@@ -19,6 +19,8 @@
 
 
 const device_type MB88 = &device_creator<mb88_cpu_device>;
+const device_type MB88201 = &device_creator<mb88201_cpu_device>;
+const device_type MB88202 = &device_creator<mb88202_cpu_device>;
 const device_type MB8841 = &device_creator<mb8841_cpu_device>;
 const device_type MB8842 = &device_creator<mb8842_cpu_device>;
 const device_type MB8843 = &device_creator<mb8843_cpu_device>;
@@ -76,12 +78,24 @@ const device_type MB8844 = &device_creator<mb8844_cpu_device>;
     ADDRESS MAPS
 ***************************************************************************/
 
+static ADDRESS_MAP_START(program_9bit, AS_PROGRAM, 8, mb88_cpu_device)
+	AM_RANGE(0x000, 0x1ff) AM_ROM
+ADDRESS_MAP_END
+
 static ADDRESS_MAP_START(program_10bit, AS_PROGRAM, 8, mb88_cpu_device)
 	AM_RANGE(0x000, 0x3ff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(program_11bit, AS_PROGRAM, 8, mb88_cpu_device)
 	AM_RANGE(0x000, 0x7ff) AM_ROM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START(data_4bit, AS_DATA, 8, mb88_cpu_device)
+	AM_RANGE(0x00, 0x0f) AM_RAM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START(data_5bit, AS_DATA, 8, mb88_cpu_device)
+	AM_RANGE(0x00, 0x1f) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(data_6bit, AS_DATA, 8, mb88_cpu_device)
@@ -105,10 +119,20 @@ mb88_cpu_device::mb88_cpu_device(const machine_config &mconfig, const char *tag,
 
 mb88_cpu_device::mb88_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, int program_width, int data_width)
 	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
-	, m_program_config("program", ENDIANNESS_BIG, 8, program_width, 0, ( (program_width == 10) ? ADDRESS_MAP_NAME(program_10bit) : ADDRESS_MAP_NAME(program_11bit) ) )
-	, m_data_config("data", ENDIANNESS_BIG, 8, data_width, 0, ( (data_width == 6) ? ADDRESS_MAP_NAME(data_6bit) : ADDRESS_MAP_NAME(data_7bit) ) )
+	, m_program_config("program", ENDIANNESS_BIG, 8, program_width, 0, ( (program_width == 9) ? ADDRESS_MAP_NAME(program_9bit) : (program_width == 10) ? ADDRESS_MAP_NAME(program_10bit) : ADDRESS_MAP_NAME(program_11bit) ) )
+	, m_data_config("data", ENDIANNESS_BIG, 8, data_width, 0, ( (data_width == 4) ? ADDRESS_MAP_NAME(data_4bit) : (data_width == 5) ? ADDRESS_MAP_NAME(data_5bit) : (data_width == 6) ? ADDRESS_MAP_NAME(data_6bit) : ADDRESS_MAP_NAME(data_7bit) ) )
 	, m_io_config("io", ENDIANNESS_BIG, 8, 3, 0)
 	, m_PLA(NULL)
+{
+}
+
+mb88201_cpu_device::mb88201_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: mb88_cpu_device(mconfig, MB88201, "MB88201", tag, owner, clock, "mb88201", __FILE__, 9, 4)
+{
+}
+
+mb88202_cpu_device::mb88202_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: mb88_cpu_device(mconfig, MB88202, "MB88202", tag, owner, clock, "mb88202", __FILE__, 10, 5)
 {
 }
 

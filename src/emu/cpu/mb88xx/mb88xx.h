@@ -155,6 +155,22 @@ private:
 };
 
 
+class mb88201_cpu_device : public mb88_cpu_device
+{
+public:
+	// construction/destruction
+	mb88201_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
+
+class mb88202_cpu_device : public mb88_cpu_device
+{
+public:
+	// construction/destruction
+	mb88202_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
+
 class mb8841_cpu_device : public mb88_cpu_device
 {
 public:
@@ -188,6 +204,8 @@ public:
 
 
 extern const device_type MB88;
+extern const device_type MB88201;
+extern const device_type MB88202;
 extern const device_type MB8841;
 extern const device_type MB8842;
 extern const device_type MB8843;
