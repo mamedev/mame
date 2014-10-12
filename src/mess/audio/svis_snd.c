@@ -5,11 +5,11 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/svision.h"
+#include "svis_snd.h"
 
 
 // device type definition
-const device_type SVISION = &device_creator<svision_sound_device>;
+const device_type SVISION_SND = &device_creator<svision_sound_device>;
 
 
 //**************************************************************************
@@ -21,7 +21,7 @@ const device_type SVISION = &device_creator<svision_sound_device>;
 //-------------------------------------------------
 
 svision_sound_device::svision_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, SVISION, "Super Vision Audio Custom", tag, owner, clock, "svision_sound", __FILE__),
+	: device_t(mconfig, SVISION_SND, "Super Vision Audio Custom", tag, owner, clock, "svision_sound", __FILE__),
 		device_sound_interface(mconfig, *this),
 		m_mixer_channel(NULL)
 {
@@ -34,6 +34,9 @@ svision_sound_device::svision_sound_device(const machine_config &mconfig, const 
 
 void svision_sound_device::device_start()
 {
+	// bind callbacks
+	m_irq_cb.bind_relative_to(*owner());
+
 	memset(&m_dma, 0, sizeof(m_dma));
 	memset(&m_noise, 0, sizeof(m_noise));
 	memset(m_channel, 0, sizeof(m_channel));
@@ -146,17 +149,16 @@ void svision_sound_device::sound_stream_update(sound_stream &stream, stream_samp
 			m_dma.pos += m_dma.step;
 			if (m_dma.pos >= m_dma.size)
 			{
-				svision_state *sv_state = machine().driver_data<svision_state>();
 				m_dma.finished = TRUE;
 				m_dma.on = FALSE;
-				sv_state->svision_irq();
+				m_irq_cb();
 			}
 		}
 	}
 }
 
 
-WRITE8_MEMBER( svision_sound_device::svision_sounddma_w )
+WRITE8_MEMBER( svision_sound_device::sounddma_w )
 {
 	logerror("%.6f svision snddma write %04x %02x\n", space.machine().time().as_double(),offset+0x18,data);
 	m_dma.reg[offset] = data;
@@ -186,7 +188,7 @@ WRITE8_MEMBER( svision_sound_device::svision_sounddma_w )
 }
 
 
-WRITE8_MEMBER( svision_sound_device::svision_noise_w )
+WRITE8_MEMBER( svision_sound_device::noise_w )
 {
 	//  logerror("%.6f svision noise write %04x %02x\n",machine.time(),offset+0x28,data);
 	m_noise.reg[offset]=data;

@@ -5,7 +5,6 @@
 ******************************************************************************/
 
 #include "emu.h"
-
 #include "includes/svision.h"
 
 #include "svision.lh"
@@ -172,11 +171,11 @@ WRITE8_MEMBER(svision_state::svision_w)
 			break;
 
 		case 0x18: case 0x19: case 0x1a: case 0x1b: case 0x1c:
-			m_sound->svision_sounddma_w(space, offset - 0x18, data);
+			m_sound->sounddma_w(space, offset - 0x18, data);
 			break;
 
 		case 0x28: case 0x29: case 0x2a:
-			m_sound->svision_noise_w(space, offset - 0x28, data);
+			m_sound->noise_w(space, offset - 0x28, data);
 			break;
 
 		default:
@@ -255,21 +254,21 @@ WRITE8_MEMBER(svision_state::tvlink_w)
 }
 
 static ADDRESS_MAP_START( svision_mem , AS_PROGRAM, 8, svision_state )
-	AM_RANGE( 0x0000, 0x1fff) AM_RAM
-	AM_RANGE( 0x2000, 0x3fff) AM_READWRITE(svision_r, svision_w) AM_SHARE("reg")
-	AM_RANGE( 0x4000, 0x5fff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE( 0x6000, 0x7fff) AM_NOP
-	AM_RANGE( 0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE( 0xc000, 0xffff) AM_ROMBANK("bank2")
+	AM_RANGE(0x0000, 0x1fff) AM_RAM
+	AM_RANGE(0x2000, 0x3fff) AM_READWRITE(svision_r, svision_w) AM_SHARE("reg")
+	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_SHARE("videoram")
+	AM_RANGE(0x6000, 0x7fff) AM_NOP
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
+	AM_RANGE(0xc000, 0xffff) AM_ROMBANK("bank2")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tvlink_mem , AS_PROGRAM, 8, svision_state )
-	AM_RANGE( 0x0000, 0x1fff) AM_RAM
-	AM_RANGE( 0x2000, 0x3fff) AM_READWRITE(tvlink_r, tvlink_w) AM_SHARE("reg")
-	AM_RANGE( 0x4000, 0x5fff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE( 0x6000, 0x7fff) AM_NOP
-	AM_RANGE( 0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE( 0xc000, 0xffff) AM_ROMBANK("bank2")
+	AM_RANGE(0x0000, 0x1fff) AM_RAM
+	AM_RANGE(0x2000, 0x3fff) AM_READWRITE(tvlink_r, tvlink_w) AM_SHARE("reg")
+	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_SHARE("videoram")
+	AM_RANGE(0x6000, 0x7fff) AM_NOP
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
+	AM_RANGE(0xc000, 0xffff) AM_ROMBANK("bank2")
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( svision )
@@ -351,27 +350,18 @@ static const unsigned char svisionn_palette[] =
 
 PALETTE_INIT_MEMBER(svision_state, svision)
 {
-	int i;
-
-	for( i = 0; i < sizeof(svision_palette) / 3; i++ ) {
-		palette.set_pen_color(i, svision_palette[i*3], svision_palette[i*3+1], svision_palette[i*3+2] );
-	}
+	for (int i = 0; i < sizeof(svision_palette) / 3; i++)
+		palette.set_pen_color(i, svision_palette[i*3], svision_palette[i*3+1], svision_palette[i*3+2]);
 }
 PALETTE_INIT_MEMBER(svision_state,svisionn)
 {
-	int i;
-
-	for ( i = 0; i < sizeof(svisionn_palette) / 3; i++ ) {
-		palette.set_pen_color(i, svisionn_palette[i*3], svisionn_palette[i*3+1], svisionn_palette[i*3+2] );
-	}
+	for (int i = 0; i < sizeof(svisionn_palette) / 3; i++)
+		palette.set_pen_color(i, svisionn_palette[i*3], svisionn_palette[i*3+1], svisionn_palette[i*3+2]);
 }
 PALETTE_INIT_MEMBER(svision_state,svisionp)
 {
-	int i;
-
-	for ( i = 0; i < sizeof(svisionn_palette) / 3; i++ ) {
-		palette.set_pen_color(i, svisionp_palette[i*3], svisionp_palette[i*3+1], svisionp_palette[i*3+2] );
-	}
+	for (int i = 0; i < sizeof(svisionn_palette) / 3; i++)
+		palette.set_pen_color(i, svisionp_palette[i*3], svisionp_palette[i*3+1], svisionp_palette[i*3+2]);
 }
 
 UINT32 svision_state::screen_update_svision(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -438,24 +428,22 @@ UINT32 svision_state::screen_update_tvlink(screen_device &screen, bitmap_rgb32 &
 
 INTERRUPT_GEN_MEMBER(svision_state::svision_frame_int)
 {
-	if (BANK&1)
+	if (BANK & 1)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 
 	m_sound->sound_decrement();
 }
 
-DRIVER_INIT_MEMBER(svision_state,svision)
+DRIVER_INIT_MEMBER(svision_state, svision)
 {
 	m_svision.timer1 = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(svision_state::svision_timer),this));
-	m_sound = machine().device<svision_sound_device>("custom");
 	m_dma_finished = m_sound->dma_finished();
 	m_pet.on = FALSE;
 }
 
-DRIVER_INIT_MEMBER(svision_state,svisions)
+DRIVER_INIT_MEMBER(svision_state, svisions)
 {
 	m_svision.timer1 = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(svision_state::svision_timer),this));
-	m_sound = machine().device<svision_sound_device>("custom");
 	m_dma_finished = m_sound->dma_finished();
 	m_pet.on = TRUE;
 	m_pet.timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(svision_state::svision_pet_timer),this));
@@ -534,9 +522,10 @@ static MACHINE_CONFIG_START( svision, svision_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_SOUND_ADD("custom", SVISION, 0)
+	MCFG_SOUND_ADD("custom", SVISION_SND, 0)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
+	SVISION_SND_IRQ_CB(svision_state, svision_irq)
 
 	/* cartridge */
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "svision_cart")
@@ -545,7 +534,7 @@ static MACHINE_CONFIG_START( svision, svision_state )
 	MCFG_GENERIC_LOAD(svision_state, svision_cart)
 
 	/* Software lists */
-	MCFG_SOFTWARE_LIST_ADD("cart_list","svision")
+	MCFG_SOFTWARE_LIST_ADD("cart_list", "svision")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( svisions, svision )
@@ -558,7 +547,7 @@ static MACHINE_CONFIG_DERIVED( svisionp, svision )
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_INIT_OWNER(svision_state, svisionp )
+	MCFG_PALETTE_INIT_OWNER(svision_state, svisionp)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( svisionn, svision )
@@ -567,14 +556,14 @@ static MACHINE_CONFIG_DERIVED( svisionn, svision )
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_INIT_OWNER(svision_state, svisionn )
+	MCFG_PALETTE_INIT_OWNER(svision_state, svisionn)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( tvlinkp, svisionp )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(tvlink_mem)
 
-	MCFG_MACHINE_RESET_OVERRIDE(svision_state, tvlink )
+	MCFG_MACHINE_RESET_OVERRIDE(svision_state, tvlink)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_NO_PALETTE

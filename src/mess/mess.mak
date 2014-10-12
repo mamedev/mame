@@ -1640,7 +1640,7 @@ $(MESSOBJ)/svi.a:               \
 	$(MESS_DRIVERS)/svi318.o $(MESS_MACHINE)/svi318.o \
 
 $(MESSOBJ)/svision.a:           \
-	$(MESS_DRIVERS)/svision.o $(MESS_AUDIO)/svision.o \
+	$(MESS_DRIVERS)/svision.o $(MESS_AUDIO)/svis_snd.o \
 
 $(MESSOBJ)/swtpc09.a:           \
 	$(MESS_DRIVERS)/swtpc09.o $(MESS_MACHINE)/swtpc09.o \
