@@ -8,6 +8,10 @@
 	Bad Boys by Inner Circle, so there is muscial accompaniment to areas 
 	where the laserdisc audio is muted.
 
+	NOTES: To boot up Revelations, turn the refill key (R) and press button A.
+    TODO: There are probably more ROMs for Revelations, the disc contains
+    full data for a picture based memory game called 'Vision Quest'.	
+
     TODO: There are probably more ROMs for Revelations, the disc contains
     full data for a picture based memory game called 'Vision Quest'.	
 	
@@ -28,8 +32,11 @@
 
 #include "cops.lh"
 
-#define LOG_CDROM   1
+#define LOG_CDROM   0
 #define LOG_DACIA   0
+
+#define CMP_REGISTER 0
+#define AUX_REGISTER 1
 
 #define MAIN_CLOCK XTAL_4MHz
 
@@ -65,6 +72,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(via1_irq);
 	DECLARE_WRITE_LINE_MEMBER(via2_irq);
 	void dacia_receive(UINT8 data);
+	void update_dacia_irq();
 	DECLARE_WRITE8_MEMBER(dacia_w);
 	DECLARE_READ8_MEMBER(dacia_r);
 	DECLARE_WRITE8_MEMBER(via1_b_w);
@@ -77,6 +85,24 @@ public:
 
 	UINT8 m_lcd_addr_l, m_lcd_addr_h;
 	UINT8 m_lcd_data_l, m_lcd_data_h;
+
+	UINT8 m_dacia_irq1_reg;
+	UINT8 m_dacia_rts1;
+	UINT8 m_dacia_dtr1;
+	UINT8 m_parity_1;
+	UINT8 m_parity_mode_1;
+	UINT8 m_bpc_1;
+	int m_dacia_ic_div_1;
+	UINT8 m_dacia_echo1;
+	UINT8 m_dacia_stp_1;
+	UINT8 m_dacia_reg1;
+	UINT8 m_dacia_fe1;
+	UINT8 m_dacia_cmp1;
+	UINT8 m_dacia_cmpval1;
+
+	UINT8 m_dacia_cts;
+	UINT8 m_dacia_dcd;
+	UINT8 m_dacia_trans;
 
 	UINT8 m_dacia_receiver_data;
 	UINT8 m_dacia_receiver_full;
@@ -106,9 +132,30 @@ public:
 		LD_INPUT_TEXT_GET_SET_WINDOW
 	} m_ld_input_state;
 
+	UINT8 generate_isr();
 	void laserdisc_w(UINT8 data);
 	void laserdisc_response_w(UINT8 data);
 	DECLARE_PALETTE_INIT( cops );
+};
+
+const int timer_divide_select[16] =
+{
+	73728,
+	33538,
+	27408,
+	24576,
+	12288,
+	6144,
+	3072,
+	2048,
+	1536,
+	1024,
+	768,
+	512,
+	384,
+	192,
+	96,
+	16
 };
 
 void cops_state::video_start()
@@ -155,6 +202,8 @@ READ8_MEMBER(cops_state::cdrom_data_r)
 
 TIMER_CALLBACK_MEMBER(cops_state::ld_timer_callback)
 {
+	m_dacia_receiver_full = 1;
+
 	if ( m_ld_command_current_byte < m_ld_command_total_bytes )
 	{
 		dacia_receive(m_ld_command_to_send[m_ld_command_current_byte]);
@@ -309,22 +358,80 @@ void cops_state::laserdisc_w(UINT8 data)
  *
  *************************************/
 
-void cops_state::dacia_receive(UINT8 data)
+ void cops_state::update_dacia_irq()
 {
-	m_dacia_receiver_data = data;
-	m_dacia_receiver_full = 1;
-	m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	UINT8 isr = generate_isr();
+	//remove bits
+	isr &= ~m_dacia_irq1_reg;
+	m_maincpu->set_input_line(INPUT_LINE_NMI, isr? ASSERT_LINE:CLEAR_LINE);
 }
 
+void cops_state::dacia_receive(UINT8 data)
+{
+	if (m_dacia_cmp1)
+	{
+		if (m_dacia_cmpval1 == data)
+		{
+			m_dacia_receiver_data = data;
+			m_dacia_receiver_full = 1;
+			update_dacia_irq();
+			m_dacia_cmp1 =0;
+			m_dacia_cts =1;
+			m_dacia_trans =1;
+		}
+	}
+	else
+	{
+		m_dacia_receiver_data = data;
+		m_dacia_receiver_full = 1;
+		update_dacia_irq();
+		m_dacia_cts =1;
+		m_dacia_trans =1;
+	}
+}
+
+UINT8 cops_state::generate_isr()
+{
+	UINT8 isr =0;
+	
+	isr |= m_dacia_receiver_full;
+	isr |= (m_dacia_cmp1 << 1);
+	isr |= (m_dacia_trans <<4); 
+			
+	if (isr)
+	{
+		isr |= 0x40;
+	}
+	return isr;
+}
 
 READ8_MEMBER(cops_state::dacia_r)
 {
 	switch(offset & 0x07)
 	{
 		case 0: /* ISR1: Interrupt Status Register */
-			return 0x40 | m_dacia_receiver_full; /* Bit 6: Transmit Data Register Empty (TDRE) */
+		{
+			UINT8 isr = generate_isr();
+			m_dacia_trans =0;
+			m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+			return isr;
+		}
+			
+		case 1: /* CSR1: Control Status Register */
+		{
+			UINT8 csr =0;
+			csr |= m_dacia_rts1;
+			csr |= (m_dacia_dtr1 << 1);
+			csr |= (m_dacia_cts <<4); 
+			csr |= (m_dacia_fe1 <<7); 
+			if (LOG_DACIA) logerror("CSR1 %02x\n",csr);
+			return csr;
+		}		
+
 		case 3: /* RDR1: Receive data register */
 			m_dacia_receiver_full = 0;
+			m_dacia_fe1=0;
+			if (LOG_DACIA) logerror("RDR1 %02x\n",m_dacia_receiver_data);
 			return m_dacia_receiver_data;
 		default:
 			if (LOG_DACIA) logerror("%s:dacia_r(%02x)\n", machine().describe_context(), offset);
@@ -336,8 +443,72 @@ WRITE8_MEMBER(cops_state::dacia_w)
 {
 	switch(offset & 0x07)
 	{
+		case 0: /* IRQ enable Register 1 */
+		{
+			m_dacia_irq1_reg &= ~0x80;
+
+			if (data & 0x80) //enable bits
+			{
+				m_dacia_irq1_reg |= (data & 0x7f);
+			}
+			else // disable bits
+			{
+				m_dacia_irq1_reg &= ~(data & 0x7f);
+			}
+			if (LOG_DACIA) logerror("DACIA IRQ 1 Register: %02x\n", m_dacia_irq1_reg);
+			update_dacia_irq();
+			break;
+		}
+
+		case 1: /* Control / Format Register 1 */
+		{
+			if (data & 0x80) //Format Register
+			{
+				m_dacia_rts1 = (data & 0x01);
+				m_dacia_dtr1 = (data & 0x02 ? 1:0);
+				m_parity_1 = (data & 0x04);				
+				m_parity_mode_1 = ((data & 0x18) >> 3);				
+				m_bpc_1 = ((data & 0x60) >> 5) +5;
+				if (LOG_DACIA) logerror("DACIA Format Register: %02x\n", data);
+			}
+			else // Control register
+			{
+				m_dacia_ic_div_1 = timer_divide_select[data & 0x15];
+				m_dacia_echo1 = (data & 0x10);
+				m_dacia_stp_1 = (data & 0x20 ? 2:1);
+				if (data & 0x40)
+				{
+					m_dacia_reg1 = AUX_REGISTER;
+				}
+				else
+				{
+					m_dacia_reg1 = CMP_REGISTER;				
+				}
+				if (LOG_DACIA) logerror("DACIA TIME %02d\n", XTAL_3_6864MHz / m_dacia_ic_div_1);
+				
+				m_ld_timer->adjust(attotime::from_hz(XTAL_3_6864MHz / m_dacia_ic_div_1), 0, attotime::from_hz(XTAL_3_6864MHz / m_dacia_ic_div_1));
+
+				if (LOG_DACIA) logerror("DACIA Ctrl Register: %02x\n", data);
+			
+			}
+			break;
+		}		
+		case 2: /* Compare / Aux Ctrl Register 1 */
+		{
+			if (m_dacia_reg1 == CMP_REGISTER)				
+			{
+				m_dacia_cmp1 =1;
+				m_dacia_cmpval1=data;
+				if (LOG_DACIA) logerror("DACIA Compare mode: %02x \n", data);				
+//				update_dacia_irq();
+			}
+			else
+			{
+				if (LOG_DACIA) logerror("DACIA Aux ctrl: %02x \n", data);			
+			}
+		}
 		case 3: /* Transmit Data Register 1 */
-			//logerror("DACIA Transmit: %02x %c\n", data, (char)data);
+			if (LOG_DACIA) logerror("DACIA Transmit: %02x %c\n", data, (char)data);
 			laserdisc_w(data);
 			break;
 		default:
@@ -589,9 +760,44 @@ static INPUT_PORTS_START( cops )
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10)
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( revlatns )
+	PORT_START("SW0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("A")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("C")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("COLLECT")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN5 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_IMPULSE(1)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN6 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Continue")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("B")
+
+	PORT_START("SW1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Refill Key") PORT_CODE(KEYCODE_R) PORT_TOGGLE
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_INTERLOCK) PORT_NAME("Cashbox Door") PORT_CODE(KEYCODE_Q) PORT_TOGGLE
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("20P LEVEL") PORT_CODE(KEYCODE_Q)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("*")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("100P LEVEL") PORT_CODE(KEYCODE_W)
+
+	PORT_START("SW2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_NAME("50p")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_NAME("20p")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_NAME("10p")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN4 ) PORT_NAME("100p")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SPECIAL )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SPECIAL )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SPECIAL )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL )
+
+INPUT_PORTS_END
+
 void cops_state::machine_start()
 {
 	m_ld_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(cops_state::ld_timer_callback),this));
+	m_dacia_ic_div_1 = timer_divide_select[0];
+
 	m_ld_timer->adjust(attotime::from_hz(167*5), 0, attotime::from_hz(167*5));
 }
 
@@ -601,7 +807,14 @@ void cops_state::machine_reset()
 	m_lcd_addr_l = m_lcd_addr_h = 0;
 	m_lcd_data_l = m_lcd_data_h = 0;
 
-	m_dacia_receiver_full = 0;
+	m_dacia_cts = 0;
+	m_dacia_dcd = 0;
+
+	m_dacia_irq1_reg = 0x80;
+	m_dacia_rts1 = 1;
+	m_dacia_dtr1 = 1;
+	m_dacia_fe1 = 1;
+	m_dacia_receiver_full = 1;
 	m_ld_input_state = LD_INPUT_GET_COMMAND;
 	m_ld_command_current_byte = m_ld_command_total_bytes = 0;
 	m_ld_frame_index = 0;
@@ -698,6 +911,6 @@ ROM_START( revlatns )
 ROM_END
 
 
-GAMEL( 1994, cops,  	0,   cops,  cops,  cops_state, cops,       ROT0, "Atari Games",      				"Cops (USA)",	GAME_NOT_WORKING | GAME_NO_SOUND, layout_cops )
-GAMEL( 1994, copsuk,  	cops,cops,  cops,  cops_state, cops,       ROT0, "Nova Productions / Deith Leisure","Cops (UK)",	GAME_NOT_WORKING | GAME_NO_SOUND, layout_cops )
-GAMEL( 1994, revlatns,  0,   cops,  cops,  cops_state, cops,       ROT0, "Nova Productions",      			"Revelations", 	GAME_NOT_WORKING | GAME_NO_SOUND, layout_cops )
+GAMEL( 1994, cops,  	0,   cops,  cops,  	   cops_state, cops,       ROT0, "Atari Games",      				"Cops (USA)",	GAME_NOT_WORKING | GAME_NO_SOUND, layout_cops )
+GAMEL( 1994, copsuk,  	cops,cops,  cops, 	   cops_state, cops,       ROT0, "Nova Productions / Deith Leisure","Cops (UK)",	GAME_NOT_WORKING | GAME_NO_SOUND, layout_cops )
+GAMEL( 1994, revlatns,  0,   cops,  revlatns,  cops_state, cops,       ROT0, "Nova Productions",      			"Revelations", 	GAME_NOT_WORKING | GAME_NO_SOUND, layout_cops )
