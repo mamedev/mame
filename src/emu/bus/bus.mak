@@ -945,6 +945,7 @@ BUSOBJS += $(BUSOBJ)/rs232/printer.o
 BUSOBJS += $(BUSOBJ)/rs232/rs232.o
 BUSOBJS += $(BUSOBJ)/rs232/ser_mouse.o
 BUSOBJS += $(BUSOBJ)/rs232/terminal.o
+BUSOBJS += $(BUSOBJ)/rs232/xvd701.o
 endif
 
 #-------------------------------------------------

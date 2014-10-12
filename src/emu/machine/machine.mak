@@ -1898,3 +1898,11 @@ ifneq ($(filter DIABLO_HD,$(MACHINES)),)
 MACHINEOBJS += $(MACHINEOBJ)/diablo_hd.o
 endif
 
+#-------------------------------------------------
+#
+#@src/emu/machine/fdc37c665gt.h,MACHINES += FDC37C665GT
+#-------------------------------------------------
+
+ifneq ($(filter FDC37C665GT,$(MACHINES)),)
+MACHINEOBJS += $(MACHINEOBJ)/fdc37c665gt.o
+endif
