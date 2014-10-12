@@ -495,7 +495,21 @@ WRITE8_MEMBER(sms_state::sms_mapper_w)
 
 UINT8 sms_state::read_bus(address_space &space, unsigned int page, UINT16 base_addr, UINT16 offset)
 {
-	if (m_mem_device_enabled != ENABLE_NONE)
+	if (m_is_gamegear)
+	{
+		// Game Gear BIOS behavior, according to Charles MacDonald: "it uses the first
+		// 1K. The rest of the space is mapped to the cartridge, regardless of the slot
+		// that's selected. This allows the BIOS to check for the 'TMR SEGA' string at
+		// 1FF0/3FF0/7FF0, but it can't do a checksum since the first 1K of ROM is
+		// unavailable. Anyway, once the BIOS decides to run the game, it disables
+		// itself, and the first 1K is assigned to the cartridge ROM like normal."
+
+		if ((m_mem_device_enabled & ENABLE_BIOS) && page == 3)
+			return m_BIOS[(m_bios_page[page] * 0x4000) + (offset & 0x3fff)];
+		if (m_mem_device_enabled & ENABLE_CART)
+			return m_cartslot->read_cart(space, base_addr + offset);
+	}
+	else if (m_mem_device_enabled != ENABLE_NONE)
 	{
 		UINT8 data = 0xff;
 
@@ -514,10 +528,7 @@ UINT8 sms_state::read_bus(address_space &space, unsigned int page, UINT16 base_a
 
 		return data;
 	}
-	else
-	{
-		return m_region_maincpu->base()[offset];
-	}
+	return m_region_maincpu->base()[offset];
 }
 
 
@@ -583,6 +594,9 @@ WRITE8_MEMBER(sms_state::sms_mem_control_w)
 
 WRITE8_MEMBER(sms_state::gg_sio_w)
 {
+	if (m_cartslot->exists() && m_cartslot->m_cart->get_sms_mode())
+		return;
+
 	logerror("*** write %02X to SIO register #%d\n", data, offset);
 
 	m_gg_sio[offset & 0x07] = data;
@@ -608,6 +622,9 @@ WRITE8_MEMBER(sms_state::gg_sio_w)
 
 READ8_MEMBER(sms_state::gg_sio_r)
 {
+	if (m_cartslot->exists() && m_cartslot->m_cart->get_sms_mode())
+		return 0xff;
+
 	logerror("*** read SIO register #%d\n", offset);
 
 	switch (offset & 7)
@@ -667,7 +684,7 @@ void sms_state::setup_enabled_slots()
 		logerror("Card ROM port enabled.\n");
 	}
 
-	if (!(m_mem_ctrl_reg & IO_CARTRIDGE) && m_cartslot && m_cartslot->exists())
+	if ((m_is_gamegear || !(m_mem_ctrl_reg & IO_CARTRIDGE)) && m_cartslot && m_cartslot->exists())
 	{
 		m_mem_device_enabled |= ENABLE_CART;
 		logerror("Cartridge ROM/RAM enabled.\n");

@@ -16,7 +16,6 @@
  - Gear to Gear Port SMS Controller Adaptor
  - Sega Demo Unit II (kiosk expansion device)
  - SMS Disk System (floppy disk drive expansion device) - unreleased
- - Sega Graphic Board (black version) - unreleased
  - Rapid button of Japanese Master System
  - Keyboard support for Sega Mark III (sg1000m3 driver)
  - Link between two Mark III's through keyboard, supported by F-16 Fighting Falcon

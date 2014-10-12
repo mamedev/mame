@@ -748,71 +748,48 @@ WRITE8_MEMBER( sega315_5124_device::register_write )
 }
 
 
-UINT16 sega315_5124_device::get_name_table_address()
+UINT16 sega315_5124_device::get_name_table_row(int row)
 {
-	UINT16 result;
-
-	if ( m_y_pixels != 192 )
-	{
-		result = ((m_reg[0x02] & 0x0c) << 10) | 0x0700;
-	}
-	else
-	{
-		result = (m_reg[0x02] << 10) & 0x3800;
-	}
-
-	return result & (((m_reg[0x02] & 0x01) << 10) | 0x3bff);
+	return ((row >> 3) << 6) & (((m_reg[0x02] & 0x01) << 10) | 0x3bff);
 }
 
 
-UINT16 sega315_5246_device::get_name_table_address()
+UINT16 sega315_5246_device::get_name_table_row(int row)
 {
-	UINT16 result;
-
-	if ( m_y_pixels != 192 )
-	{
-		result = ((m_reg[0x02] & 0x0c) << 10) | 0x0700;
-	}
-	else
-	{
-		result = (m_reg[0x02] << 10) & 0x3800;
-	}
-
-	return result;
+	return (row >> 3) << 6;
 }
 
 
-UINT16 sega315_5378_device::get_name_table_address()
+UINT16 sega315_5378_device::get_name_table_row(int row)
 {
-	UINT16 result;
-
-	if ( m_y_pixels != 192 )
-	{
-		result = ((m_reg[0x02] & 0x0c) << 10) | 0x0700;
-	}
-	else
-	{
-		result = (m_reg[0x02] << 10) & 0x3800;
-	}
-
-	return result;
+	return (row >> 3) << 6;
 }
 
 
 void sega315_5124_device::draw_scanline_mode4( int *line_buffer, int *priority_selected, int line )
 {
 	int tile_column;
-	int y_scroll;
+	int y_scroll, scroll_mod;
 	int pixel_x, pixel_plot_x;
 	int bit_plane_0, bit_plane_1, bit_plane_2, bit_plane_3;
-	const int scroll_mod = ( m_y_pixels != 192 ) ? 256 : 224;
-	const UINT16 name_table_address = get_name_table_address();
+	UINT16 name_table_address;
 
 	/* if top 2 rows of screen not affected by horizontal scrolling, then x_scroll = 0 */
 	/* else x_scroll = m_reg8copy                                                      */
 	const int x_scroll = (((m_reg[0x00] & 0x40) && (line < 16)) ? 0 : 0x0100 - m_reg8copy);
 
 	const int x_scroll_start_column = (x_scroll >> 3);             /* x starting column tile */
+
+	if ( m_y_pixels != 192 )
+	{
+		name_table_address = ((m_reg[0x02] & 0x0c) << 10) | 0x0700;
+		scroll_mod = 256;
+	}
+	else
+	{
+		name_table_address = (m_reg[0x02] << 10) & 0x3800;
+		scroll_mod = 224;
+	}
 
 	/* Draw background layer */
 	for (tile_column = 0; tile_column < 33; tile_column++)
@@ -825,8 +802,8 @@ void sega315_5124_device::draw_scanline_mode4( int *line_buffer, int *priority_s
 		/* vertical scrolling when bit 7 of reg[0x00] is set */
 		y_scroll = ((m_reg[0x00] & 0x80) && (tile_column > 23)) ? 0 : m_reg9copy;
 
-		tile_line = ((tile_column + x_scroll_start_column) & 0x1f) * 2;
-		tile_data = space().read_word(name_table_address + ((((line + y_scroll) % scroll_mod) >> 3) << 6) + tile_line);
+		tile_line = ((tile_column + x_scroll_start_column) & 0x1f) << 1;
+		tile_data = space().read_word(name_table_address + get_name_table_row((line + y_scroll) % scroll_mod) + tile_line);
 
 		tile_selected = (tile_data & 0x01ff);
 		priority_select = tile_data & PRIORITY_BIT;
@@ -891,7 +868,7 @@ void sega315_5124_device::select_sprites( int line )
 	/* Check if MAG is set */
 	m_sprite_zoom = (m_reg[0x01] & 0x01) ? 2 : 1;
 
-	if (m_sprite_zoom == 2)
+	if (m_sprite_zoom > 1)
 	{
 		/* Divide before use the value for comparison, same later with sprite_y, or
 		   else an off-by-one bug could occur, as seen with Tarzan, for Game Gear */
@@ -1041,9 +1018,14 @@ void sega315_5124_device::draw_sprites_mode4( int *line_buffer, int *priority_se
 	bool sprite_col_occurred = false;
 	int sprite_col_x = SEGA315_5124_WIDTH;
 	UINT8 collision_buffer[SEGA315_5124_WIDTH];
+	int plot_min_x = 0;
 
 	if (m_display_disabled || m_sprite_count == 0)
 		return;
+
+	/* Sprites aren't drawn and collisions don't occur on column 0 if it is disabled */
+	if (m_reg[0x00] & 0x20)
+		plot_min_x = 8;
 
 	memset(collision_buffer, 0, SEGA315_5124_WIDTH);
 
@@ -1078,7 +1060,7 @@ void sega315_5124_device::draw_sprites_mode4( int *line_buffer, int *priority_se
 				int pixel_plot_x = sprite_x + (pixel_x << 1);
 
 				/* check to prevent going outside of active display area */
-				if (pixel_plot_x < 0 || pixel_plot_x > 255)
+				if (pixel_plot_x < plot_min_x || pixel_plot_x > 255)
 				{
 					continue;
 				}
@@ -1127,7 +1109,7 @@ void sega315_5124_device::draw_sprites_mode4( int *line_buffer, int *priority_se
 				int pixel_plot_x = sprite_x + pixel_x;
 
 				/* check to prevent going outside of active display area */
-				if (pixel_plot_x < 0 || pixel_plot_x > 255)
+				if (pixel_plot_x < plot_min_x || pixel_plot_x > 255)
 				{
 					continue;
 				}
@@ -1256,7 +1238,7 @@ void sega315_5124_device::draw_sprites_tms9918_mode( int *line_buffer, int line 
 		{
 			sprite_tile_selected += 2;
 			pattern = space().read_byte( sprite_pattern_line + sprite_tile_selected * 8 );
-			sprite_x += (m_sprite_zoom == 2 ? 16 : 8);
+			sprite_x += (m_sprite_zoom > 1 ? 16 : 8);
 
 			for (int pixel_x = 0; pixel_x < 8; pixel_x++)
 			{

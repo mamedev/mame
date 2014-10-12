@@ -88,13 +88,13 @@ public:
 
 protected:
 	static const int X_SCROLL_HPOS_5124 = 21;
-	static const int X_SCROLL_HPOS_5378 = 35;  // Not verified
+	static const int X_SCROLL_HPOS_5378 = 41;  // Not verified, needed for Chicago Syndicate
 
 	void set_display_settings();
 	virtual void update_palette();
 	virtual void cram_write(UINT8 data);
 	virtual void draw_scanline( int pixel_offset_x, int pixel_plot_y, int line );
-	virtual UINT16 get_name_table_address();
+	virtual UINT16 get_name_table_row(int row);
 	void process_line_timer();
 	void draw_scanline_mode4( int *line_buffer, int *priority_selected, int line );
 	void draw_sprites_mode4( int *line_buffer, int *priority_selected, int line );
@@ -190,7 +190,7 @@ public:
 	sega315_5246_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
-	virtual UINT16 get_name_table_address();
+	virtual UINT16 get_name_table_row(int row);
 };
 
 
@@ -210,7 +210,7 @@ protected:
 	virtual void update_palette();
 	virtual void cram_write(UINT8 data);
 	virtual void draw_scanline( int pixel_offset_x, int pixel_plot_y, int line );
-	virtual UINT16 get_name_table_address();
+	virtual UINT16 get_name_table_row(int row);
 };
 
 
