@@ -476,6 +476,32 @@ ROM_START( friskyta )
 	ROM_LOAD( "ft.9b",        0x0020, 0x0020, CRC(6b364e69) SHA1(abfcab884e8a50f872f862a421b8e8c5e16ff62c) )
 ROM_END
 
+
+ROM_START( friskytb )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "1.3a",        0x0000, 0x1000, CRC(554bdb0f) SHA1(d56a421329c5191599983009e841cd84d5b7c710) )
+	ROM_LOAD( "2.3b",        0x1000, 0x1000, CRC(0658633a) SHA1(3bf09e0d77bd8fcb66563c82c849c0cc45d9cacf) )
+	ROM_LOAD( "3.3d",        0x2000, 0x1000, CRC(c8de15ff) SHA1(1bb2108700e9f8aa9c5416324a2d0bdd05e8ff25) )
+	ROM_LOAD( "4.3e",        0x3000, 0x1000, CRC(970e5d2b) SHA1(8b6f05aaef79dc5fccf1fed7014c99518f598674) )
+	ROM_LOAD( "5.3f",        0x4000, 0x1000, CRC(45c8bd32) SHA1(dca1d76a401995957e325d0d06607df3d4a511e9) )
+	ROM_LOAD( "6.3h",        0x5000, 0x1000, CRC(2c1b7ecc) SHA1(164855c2bc05154a24676313c1307e374b3f8dbe) )
+	ROM_LOAD( "7.3i",        0x6000, 0x1000, CRC(aa36a6b8) SHA1(bf8af71313459a775b07dcfdce455077c4f499bf) )
+	ROM_LOAD( "8.3j",        0x7000, 0x0800, CRC(10461a24) SHA1(c1f98316a4e90a2a6ef4953708b90c9546caaedd) )
+
+	ROM_REGION( 0x10000, "mcu", 0 ) /* 64k for the protection mcu */
+	ROM_COPY( "maincpu", 0x0000, 0x8000, 0x8000 )   /* shares the main program ROMs and RAM with the main CPU. */
+
+	ROM_REGION( 0x4000, "gfx1", 0 )
+	ROM_LOAD( "11.7l",        0x0000, 0x1000, CRC(caa93315) SHA1(af8fd135c0a9c0278705975c127a91f246341da1) ) // 99.707031%
+	ROM_LOAD( "12.7n",        0x1000, 0x1000, CRC(c028d3b8) SHA1(9e8768b9658f8b05ade4dd5fb2ecde4a52627bc1) )
+	ROM_LOAD( "9.7h",         0x2000, 0x1000, CRC(60642f25) SHA1(2d179a9ea99014065f578bbec4fbfbda5aead98b) )
+	ROM_LOAD( "10.7j",        0x3000, 0x1000, CRC(07b9dcfc) SHA1(0a573065b6b08745b91fb47ce477d76be7a01750) )
+
+	ROM_REGION( 0x0040, "proms", 0 )
+	ROM_LOAD( "ft.9c",        0x0000, 0x0020, CRC(0032167e) SHA1(9df3c7bbf6b700bfa51b8b82c45b60c10bdcd1a0) )
+	ROM_LOAD( "ft.9b",        0x0020, 0x0020, CRC(6b364e69) SHA1(abfcab884e8a50f872f862a421b8e8c5e16ff62c) )
+ROM_END
+
 ROM_START( radrad )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "1.3a",         0x0000, 0x1000, CRC(b1e958ca) SHA1(3ab5fc3314f202ba527470eacbb76d52fe969bca) )
@@ -560,10 +586,35 @@ ROM_START( sectrzon )
 	ROM_LOAD( "pal16h2.3b", 0x0000, 0x0044, CRC(e1a6a86d) SHA1(740a5c2ef8a992f6a794c0fc4c81eb50cfcedc32) )
 ROM_END
 
+DRIVER_INIT_MEMBER(seicross_state,friskytb)
+{
+	UINT8 *ROM = memregion("mcu")->base();
+	address_space &space = m_mcu->space(AS_PROGRAM);
+	// this code is in ROM 6.3h, maps to MCU at dxxx
+	// if you cheat and use the code from another set it works
+	for (int i = 0; i < 0x8000; i++)
+	{
+		ROM[i] = BITSWAP8(ROM[i + 0x8000], 6, 7, 5, 4, 3, 2, 1, 0);
+	
+		int data = ROM[i];
+		if (data == 0x4e) data = 0x4d;
+		//else if (data == 0x41) data = 0x45;
+		else if (data == 0x46) data = 0x45;
+		else if (data == 0x57) data = 0x57;
+		//else if (data == 0x76) data = 0x7e;
+		else if (data == 0xce) data = 0xcd;
+		else if (data == 0xdf) data = 0xdf;
+
+		ROM[i] = data;
+	}
+
+	space.set_decrypted_region(0x8000, 0xffff, ROM);
+}
 
 
-GAME( 1981, friskyt,  0,        nvram,    friskyt, driver_device,  0, ROT0,  "Nichibutsu", "Frisky Tom (set 1)", GAME_NO_COCKTAIL )
-GAME( 1981, friskyta, friskyt,  nvram,    friskyt, driver_device,  0, ROT0,  "Nichibutsu", "Frisky Tom (set 2)", GAME_NO_COCKTAIL )
-GAME( 1982, radrad,   0,        no_nvram, radrad, driver_device,   0, ROT0,  "Nichibutsu USA", "Radical Radial", GAME_NO_COCKTAIL )
-GAME( 1984, seicross, 0,        no_nvram, seicross, driver_device, 0, ROT90, "Nichibutsu / Alice", "Seicross", GAME_NO_COCKTAIL )
-GAME( 1984, sectrzon, seicross, no_nvram, seicross, driver_device, 0, ROT90, "Nichibutsu / Alice", "Sector Zone", GAME_NO_COCKTAIL )
+GAME( 1981, friskyt,  0,        nvram,    friskyt, driver_device,  0,        ROT0,  "Nichibutsu", "Frisky Tom (set 1)", GAME_NO_COCKTAIL )
+GAME( 1981, friskyta, friskyt,  nvram,    friskyt, driver_device,  0,        ROT0,  "Nichibutsu", "Frisky Tom (set 2)", GAME_NO_COCKTAIL )
+GAME( 1981, friskytb, friskyt,  nvram,    friskyt, seicross_state, friskytb, ROT0,  "Nichibutsu", "Frisky Tom (set 3, encrypted?)", GAME_NOT_WORKING ) // protection code seems to be encrypted?
+GAME( 1982, radrad,   0,        no_nvram, radrad, driver_device,   0,        ROT0,  "Nichibutsu USA", "Radical Radial", GAME_NO_COCKTAIL )
+GAME( 1984, seicross, 0,        no_nvram, seicross, driver_device, 0,        ROT90, "Nichibutsu / Alice", "Seicross", GAME_NO_COCKTAIL )
+GAME( 1984, sectrzon, seicross, no_nvram, seicross, driver_device, 0,        ROT90, "Nichibutsu / Alice", "Sector Zone", GAME_NO_COCKTAIL )

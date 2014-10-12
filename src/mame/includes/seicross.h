@@ -43,4 +43,6 @@ public:
 	optional_device<nvram_device> m_nvram;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+
+	DECLARE_DRIVER_INIT(friskytb);
 };
