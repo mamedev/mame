@@ -232,4 +232,10 @@ public:
 	static_cast<sega8_card_slot_device *>(device)->set_ext("bin,sg");
 
 
+// slot interfaces
+SLOT_INTERFACE_EXTERN( sg1000_cart );
+SLOT_INTERFACE_EXTERN( sg1000mk3_cart );
+SLOT_INTERFACE_EXTERN( sms_cart );
+SLOT_INTERFACE_EXTERN( gg_cart );
+
 #endif

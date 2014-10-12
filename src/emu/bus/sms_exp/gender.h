@@ -16,7 +16,6 @@
 #include "emu.h"
 #include "smsexp.h"
 #include "bus/sega8/sega8_slot.h"
-#include "bus/sega8/rom.h"
 
 
 
