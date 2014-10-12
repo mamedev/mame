@@ -41,6 +41,8 @@ sms_gender_adapter_device::sms_gender_adapter_device(const machine_config &mconf
 
 void sms_gender_adapter_device::device_start()
 {
+	if (m_subslot->m_cart)
+		m_subslot->m_cart->save_ram();
 }
 
 
