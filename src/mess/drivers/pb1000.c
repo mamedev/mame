@@ -59,9 +59,15 @@ public:
 	virtual void machine_start();
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE16_MEMBER( gatearray_w );
-	UINT16 pb2000c_kb_r();
-	UINT16 pb1000_kb_r();
-	void kb_matrix_w(UINT8 matrix);
+	DECLARE_WRITE8_MEMBER( lcd_control );
+	DECLARE_READ8_MEMBER( lcd_data_r );
+	DECLARE_WRITE8_MEMBER( lcd_data_w );
+	DECLARE_READ16_MEMBER( pb1000_kb_r );
+	DECLARE_READ16_MEMBER( pb2000c_kb_r );
+	DECLARE_WRITE8_MEMBER( kb_matrix_w );
+	DECLARE_READ8_MEMBER( pb1000_port_r );
+	DECLARE_READ8_MEMBER( pb2000c_port_r );
+	DECLARE_WRITE8_MEMBER( port_w );
 	UINT16 read_touchscreen(UINT8 line);
 	DECLARE_PALETTE_INIT(pb1000);
 	TIMER_CALLBACK_MEMBER(keyboard_timer);
@@ -325,27 +331,21 @@ WRITE16_MEMBER( pb1000_state::gatearray_w )
 		membank("bank1")->set_base(m_rom_reg->base());
 }
 
-static void lcd_control(hd61700_cpu_device &device, UINT8 data)
+WRITE8_MEMBER( pb1000_state::lcd_control )
 {
-	pb1000_state *state = device.machine().driver_data<pb1000_state>();
-
-	state->m_hd44352->control_write(data);
+	m_hd44352->control_write(data);
 }
 
 
-static UINT8 lcd_data_r(hd61700_cpu_device &device)
+READ8_MEMBER( pb1000_state::lcd_data_r )
 {
-	pb1000_state *state = device.machine().driver_data<pb1000_state>();
-
-	return state->m_hd44352->data_read();
+	return m_hd44352->data_read();
 }
 
 
-static void lcd_data_w(hd61700_cpu_device &device, UINT8 data)
+WRITE8_MEMBER( pb1000_state::lcd_data_w )
 {
-	pb1000_state *state = device.machine().driver_data<pb1000_state>();
-
-	state->m_hd44352->data_write(data);
+	m_hd44352->data_write(data);
 }
 
 
@@ -364,7 +364,7 @@ UINT16 pb1000_state::read_touchscreen(UINT8 line)
 }
 
 
-UINT16 pb1000_state::pb1000_kb_r()
+READ16_MEMBER( pb1000_state::pb1000_kb_r )
 {
 	static const char *const bitnames[] = {"NULL", "KO1", "KO2", "KO3", "KO4", "KO5", "KO6", "KO7", "KO8", "KO9", "KO10", "KO11", "KO12", "NULL", "NULL", "NULL"};
 	UINT16 data = 0;
@@ -388,7 +388,7 @@ UINT16 pb1000_state::pb1000_kb_r()
 	return data;
 }
 
-UINT16 pb1000_state::pb2000c_kb_r()
+READ16_MEMBER( pb1000_state::pb2000c_kb_r )
 {
 	static const char *const bitnames[] = {"NULL", "KO1", "KO2", "KO3", "KO4", "KO5", "KO6", "KO7", "KO8", "KO9", "KO10", "KO11", "KO12", "NULL", "NULL", "NULL"};
 	UINT16 data = 0;
@@ -410,92 +410,45 @@ UINT16 pb1000_state::pb2000c_kb_r()
 	return data;
 }
 
-void pb1000_state::kb_matrix_w(UINT8 matrix)
+WRITE8_MEMBER( pb1000_state::kb_matrix_w )
 {
-	if (matrix & 0x80)
+	if (data & 0x80)
 	{
-		if ((m_kb_matrix & 0x80) != (matrix & 0x80))
+		if ((m_kb_matrix & 0x80) != (data & 0x80))
 			m_kb_timer->adjust(attotime::never, 0, attotime::never);
 	}
 	else
 	{
-		if ((m_kb_matrix & 0x40) != (matrix & 0x40))
+		if ((m_kb_matrix & 0x40) != (data & 0x40))
 		{
-			if (matrix & 0x40)
+			if (data & 0x40)
 				m_kb_timer->adjust(attotime::from_hz(32), 0, attotime::from_hz(32));
 			else
 				m_kb_timer->adjust(attotime::from_hz(256), 0, attotime::from_hz(256));
 		}
 	}
 
-	m_kb_matrix = matrix;
+	m_kb_matrix = data;
 }
 
-//-------------------------------------------------
-//  HD61700 interface
-//-------------------------------------------------
-
-static void kb_matrix_w_call(hd61700_cpu_device &device, UINT8 matrix)
-{
-	pb1000_state *state = device.machine().driver_data<pb1000_state>();
-
-	state->kb_matrix_w(matrix);
-}
-
-static UINT8 pb1000_port_r(hd61700_cpu_device &device)
+READ8_MEMBER( pb1000_state::pb1000_port_r )
 {
 	//TODO
 	return 0x00;
 }
 
-static UINT8 pb2000c_port_r(hd61700_cpu_device &device)
+READ8_MEMBER( pb1000_state::pb2000c_port_r )
 {
 	//TODO
 	return 0xfc;
 }
 
-static void port_w(hd61700_cpu_device &device, UINT8 data)
+WRITE8_MEMBER( pb1000_state::port_w )
 {
-	pb1000_state *state = device.machine().driver_data<pb1000_state>();
-	state->m_beeper->set_state((BIT(data,7) ^ BIT(data,6)));
+	m_beeper->set_state((BIT(data,7) ^ BIT(data,6)));
 	//printf("%x\n", data);
 }
 
-static UINT16 pb1000_kb_r_call(hd61700_cpu_device &device)
-{
-	pb1000_state *state = device.machine().driver_data<pb1000_state>();
-
-	return state->pb1000_kb_r();
-}
-
-static UINT16 pb2000c_kb_r_call(hd61700_cpu_device &device)
-{
-	pb1000_state *state = device.machine().driver_data<pb1000_state>();
-
-	return state->pb2000c_kb_r();
-}
-
-static const hd61700_config pb1000_config =
-{
-	lcd_control,            //lcd control
-	lcd_data_r,             //lcd data read
-	lcd_data_w,             //lcd data write
-	pb1000_kb_r_call,       //keyboard matrix read
-	kb_matrix_w_call,       //keyboard matrix write
-	pb1000_port_r,          //8 bit port read
-	port_w                  //8 bit port  write
-};
-
-static const hd61700_config pb2000c_config =
-{
-	lcd_control,            //lcd control
-	lcd_data_r,             //lcd data read
-	lcd_data_w,             //lcd data write
-	pb2000c_kb_r_call,      //keyboard matrix read
-	kb_matrix_w_call,       //keyboard matrix write
-	pb2000c_port_r,         //8 bit port read
-	port_w                  //8 bit port  write
-};
 
 TIMER_CALLBACK_MEMBER(pb1000_state::keyboard_timer)
 {
@@ -522,7 +475,13 @@ static MACHINE_CONFIG_START( pb1000, pb1000_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD61700, 910000)
 	MCFG_CPU_PROGRAM_MAP(pb1000_mem)
-	MCFG_HD61700_CONFIG(pb1000_config)
+	MCFG_HD61700_LCD_CTRL_CB(WRITE8(pb1000_state, lcd_control))
+	MCFG_HD61700_LCD_READ_CB(READ8(pb1000_state, lcd_data_r))
+	MCFG_HD61700_LCD_WRITE_CB(WRITE8(pb1000_state, lcd_data_w))
+	MCFG_HD61700_KB_READ_CB(READ16(pb1000_state, pb1000_kb_r))
+	MCFG_HD61700_KB_WRITE_CB(WRITE8(pb1000_state, kb_matrix_w))
+	MCFG_HD61700_PORT_READ_CB(READ8(pb1000_state, pb1000_port_r))
+	MCFG_HD61700_PORT_WRITE_CB(WRITE8(pb1000_state, port_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", LCD)
@@ -554,7 +513,8 @@ static MACHINE_CONFIG_DERIVED( pb2000c, pb1000 )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(pb2000c_mem)
-	MCFG_HD61700_CONFIG(pb2000c_config)
+	MCFG_HD61700_KB_READ_CB(READ16(pb1000_state, pb2000c_kb_r))
+	MCFG_HD61700_PORT_READ_CB(READ8(pb1000_state, pb2000c_port_r))
 
 	MCFG_GENERIC_CARTSLOT_ADD("cardslot1", generic_plain_slot, "pb2000c_card")
 	MCFG_GENERIC_CARTSLOT_ADD("cardslot2", generic_plain_slot, "pb2000c_card")

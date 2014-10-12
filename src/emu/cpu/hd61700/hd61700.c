@@ -107,22 +107,18 @@ hd61700_cpu_device::hd61700_cpu_device(const machine_config &mconfig, const char
 		m_ppc(0x0000),
 		m_curpc(0x0000),
 		m_pc(0),
-		m_flags(0)
+		m_flags(0),
+		m_lcd_ctrl_cb(*this),
+		m_lcd_read_cb(*this),
+		m_lcd_write_cb(*this),
+		m_kb_read_cb(*this),
+		m_kb_write_cb(*this),
+		m_port_read_cb(*this),
+		m_port_write_cb(*this)
 {
 	// ...
 }
 
-
-//-------------------------------------------------
-//  static_set_config - set the configuration
-//  structure
-//-------------------------------------------------
-
-void hd61700_cpu_device::static_set_config(device_t &device, const hd61700_config &config)
-{
-	hd61700_cpu_device &conf = downcast<hd61700_cpu_device &>(device);
-	static_cast<hd61700_config &>(conf) = config;
-}
 
 //-------------------------------------------------
 //  device_start - start up the device
@@ -135,6 +131,14 @@ void hd61700_cpu_device::device_start()
 	m_sec_timer = timer_alloc(SEC_TIMER);
 	m_sec_timer->adjust(attotime::from_seconds(1), 0, attotime::from_seconds(1));
 
+	m_lcd_ctrl_cb.resolve_safe();
+	m_lcd_read_cb.resolve_safe(0xff);
+	m_lcd_write_cb.resolve_safe();
+	m_kb_read_cb.resolve_safe(0xff);
+	m_kb_write_cb.resolve_safe();
+	m_port_read_cb.resolve_safe(0xff);
+	m_port_write_cb.resolve_safe();
+	
 	// save state
 	save_item(NAME(m_ppc));
 	save_item(NAME(m_curpc));
@@ -464,9 +468,7 @@ void hd61700_cpu_device::execute_run()
 				case 0x12:  //stl
 					{
 						UINT8 arg = read_op();
-
-						if (m_lcd_data_w)
-							(*m_lcd_data_w)(*this, READ_REG(arg));
+						m_lcd_write_cb((offs_t)0, READ_REG(arg));
 
 						check_optional_jr(arg);
 						m_icount -= 11;
@@ -476,10 +478,7 @@ void hd61700_cpu_device::execute_run()
 				case 0x13:  //ldl
 					{
 						UINT8 arg = read_op();
-						UINT8 res = 0xff;
-
-						if (m_lcd_data_r)
-							res = (*m_lcd_data_r)(*this);
+						UINT8 res = m_lcd_read_cb(0);
 
 						WRITE_REG(arg, res);
 
@@ -498,8 +497,7 @@ void hd61700_cpu_device::execute_run()
 						}
 						else
 						{
-							if (m_lcd_control)
-								(*m_lcd_control)(*this, READ_REG(arg));
+							m_lcd_ctrl_cb((offs_t)0, READ_REG(arg));
 						}
 
 						check_optional_jr(arg);
@@ -529,8 +527,7 @@ void hd61700_cpu_device::execute_run()
 							case 0:     //PE
 							case 1:     //PD
 								WRITE_REG8(idx, src);
-								if (m_port_w)
-									(*m_port_w)(*this, REG_PD & REG_PE);
+								m_port_write_cb((offs_t)0, REG_PD & REG_PE);
 								break;
 							case 2:     //IB
 								REG_IB = (REG_IB & 0x1f) | (src & 0xe0);
@@ -539,8 +536,7 @@ void hd61700_cpu_device::execute_run()
 								WRITE_REG8(idx, src);
 								break;
 							case 4:     //IA
-								if (m_kb_w)
-									(*m_kb_w)(*this, src);
+								m_kb_write_cb((offs_t)0, src);
 								WRITE_REG8(idx, src);
 								break;
 							case 5:     //IE
@@ -673,9 +669,7 @@ void hd61700_cpu_device::execute_run()
 						}
 						else
 						{
-							if (m_port_r)
-								src = (*m_port_r)(*this);
-
+							src = m_port_read_cb(0);
 							src&=(~REG_PE);
 						}
 
@@ -1017,9 +1011,7 @@ void hd61700_cpu_device::execute_run()
 				case 0x52:  //stl
 					{
 						UINT8 arg = read_op();
-
-						if (m_lcd_data_w)
-							(*m_lcd_data_w)(*this, arg);
+						m_lcd_write_cb((offs_t)0, arg);
 
 						m_icount -= 12;
 					}
@@ -1036,8 +1028,7 @@ void hd61700_cpu_device::execute_run()
 						}
 						else
 						{
-							if (m_lcd_control)
-								(*m_lcd_control)(*this, src);
+							m_lcd_ctrl_cb((offs_t)0, src);
 						}
 
 						m_icount -= 3;
@@ -1065,8 +1056,7 @@ void hd61700_cpu_device::execute_run()
 							case 0:     //PE
 							case 1:     //PD
 								WRITE_REG8(idx, src);
-								if (m_port_w)
-									(*m_port_w)(*this, REG_PD & REG_PE);
+								m_port_write_cb((offs_t)0, REG_PD & REG_PE);
 								break;
 							case 2:     //IB
 								REG_IB = (REG_IB & 0x1f) | (src & 0xe0);
@@ -1075,8 +1065,7 @@ void hd61700_cpu_device::execute_run()
 								WRITE_REG8(idx, src);
 								break;
 							case 4:     //IA
-								if (m_kb_w)
-									(*m_kb_w)(*this, src);
+								m_kb_write_cb((offs_t)0, src);
 								WRITE_REG8(idx, src);
 								break;
 							case 5:     //IE
@@ -1449,11 +1438,8 @@ void hd61700_cpu_device::execute_run()
 					{
 						UINT8 arg = read_op();
 
-						if (m_lcd_data_w)
-						{
-							(*m_lcd_data_w)(*this, READ_REG(arg));
-							(*m_lcd_data_w)(*this, READ_REG(arg+1));
-						}
+						m_lcd_write_cb((offs_t)0, READ_REG(arg));
+						m_lcd_write_cb((offs_t)0, READ_REG(arg+1));
 
 						check_optional_jr(arg);
 						m_icount -= 19;
@@ -1465,13 +1451,8 @@ void hd61700_cpu_device::execute_run()
 						UINT8 arg = read_op();
 						UINT8 reg0, reg1;
 
-						if (m_lcd_data_r)
-						{
-							reg0 = (*m_lcd_data_r)(*this);
-							reg1 = (*m_lcd_data_r)(*this);
-						}
-						else
-							reg0 = reg1 = 0xff;
+						reg0 = m_lcd_read_cb(0);
+						reg1 = m_lcd_read_cb(0);
 
 						WRITE_REG(arg+0, reg0);
 						WRITE_REG(arg+1, reg1);
@@ -1633,13 +1614,8 @@ void hd61700_cpu_device::execute_run()
 						}
 						else
 						{
-							if (m_port_r)
-							{
-								reg0 = (*m_port_r)(*this);
-								reg1 = (*m_port_r)(*this);
-							}
-							else
-								reg0 = reg1 = 0xff;
+							reg0 = m_port_read_cb(0);
+							reg1 = m_port_read_cb(0);
 
 							reg0&=(~REG_PE);
 							reg1&=(~REG_PE);
@@ -1663,11 +1639,7 @@ void hd61700_cpu_device::execute_run()
 
 						if (idx >= 5)
 						{
-							UINT16 port = 0xff;
-
-							if (m_kb_r)
-								port = (*m_kb_r)(*this);
-
+							UINT16 port = m_kb_read_cb(0);
 							src = (REG_KY & 0x0f00) | (port & 0xf0ff);
 						}
 						else
@@ -2125,8 +2097,7 @@ void hd61700_cpu_device::execute_run()
 
 						for (int n=GET_IM3(arg1); n>0; n--)
 						{
-							if (m_lcd_data_w)
-								(*m_lcd_data_w)(*this, READ_REG(arg));
+							m_lcd_write_cb((offs_t)0, READ_REG(arg));
 
 							arg++;
 							m_icount -= 8;
@@ -2144,10 +2115,7 @@ void hd61700_cpu_device::execute_run()
 
 						for (int n=GET_IM3(arg1); n>0; n--)
 						{
-							if (m_lcd_data_r)
-								src = (*m_lcd_data_r)(*this);
-							else
-								src = 0xff;
+							src = m_lcd_read_cb(0);
 
 							WRITE_REG(arg, src++);
 
@@ -2641,11 +2609,8 @@ void hd61700_cpu_device::execute_run()
 						m_state |= CPU_SLP;
 
 						m_irq_status = 0;
-						if (m_lcd_control)
-							(*m_lcd_control)(*this, 0);
-
-						if (m_kb_w)
-							(*m_kb_w)(*this, 0);
+						m_lcd_ctrl_cb((offs_t)0, 0);
+						m_kb_write_cb((offs_t)0, 0);
 						m_icount -= 3;
 					}
 					break;
