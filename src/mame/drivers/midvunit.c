@@ -439,15 +439,14 @@ WRITE32_MEMBER(midvunit_state::midvplus_misc_w)
  *
  *************************************/
 
-static void midvplus_xf1_w(tms3203x_device &device, UINT8 val)
+WRITE8_MEMBER(midvunit_state::midvplus_xf1_w)
 {
-	midvunit_state *state = device.machine().driver_data<midvunit_state>();
-//  osd_printf_debug("xf1_w = %d\n", val);
+//  osd_printf_debug("xf1_w = %d\n", data);
 
-	if (state->m_lastval && !val)
-		memcpy(state->m_ram_base, state->m_fastram_base, 0x20000*4);
+	if (m_lastval && !data)
+		memcpy(m_ram_base, m_fastram_base, 0x20000*4);
 
-	state->m_lastval = val;
+	m_lastval = data;
 }
 
 
@@ -488,8 +487,6 @@ static ADDRESS_MAP_START( midvunit_map, AS_PROGRAM, 32, midvunit_state )
 	AM_RANGE(0xc00000, 0xffffff) AM_ROM AM_REGION("user1", 0)
 ADDRESS_MAP_END
 
-
-static const tms3203x_config midvplus_config = { false, NULL, midvplus_xf1_w };
 
 static ADDRESS_MAP_START( midvplus_map, AS_PROGRAM, 32, midvunit_state )
 	AM_RANGE(0x000000, 0x01ffff) AM_RAM AM_SHARE("ram_base")
@@ -1045,13 +1042,12 @@ static MACHINE_CONFIG_DERIVED( offroadc, midvunit )
 	MCFG_MIDWAY_SERIAL_PIC2_YEAR_OFFS(94)
 MACHINE_CONFIG_END
 
-
 static MACHINE_CONFIG_DERIVED( midvplus, midvcommon )
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
-	MCFG_TMS3203X_CONFIG(midvplus_config)
 	MCFG_CPU_PROGRAM_MAP(midvplus_map)
+	MCFG_TMS3203X_XF1_CB(WRITE8(midvunit_state, midvplus_xf1_w))
 
 	MCFG_MACHINE_RESET_OVERRIDE(midvunit_state,midvplus)
 	MCFG_DEVICE_REMOVE("nvram")

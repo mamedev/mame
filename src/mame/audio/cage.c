@@ -593,12 +593,6 @@ WRITE32_MEMBER( atari_cage_device::speedup_w )
  *
  *************************************/
 
-static const tms3203x_config cage_config =
-{
-	true
-};
-
-
 static ADDRESS_MAP_START( cage_map, AS_PROGRAM, 32, atari_cage_device )
 	AM_RANGE(0x000000, 0x00ffff) AM_RAM
 	AM_RANGE(0x200000, 0x200000) AM_WRITENOP
@@ -634,8 +628,8 @@ MACHINE_CONFIG_FRAGMENT( cage )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("cage", TMS32031, 33868800)
-	MCFG_TMS3203X_CONFIG(cage_config)
 	MCFG_CPU_PROGRAM_MAP(cage_map)
+	MCFG_TMS3203X_MCBL(true)
 
 	MCFG_TIMER_DEVICE_ADD("cage_dma_timer", DEVICE_SELF, atari_cage_device, dma_timer_callback)
 	MCFG_TIMER_DEVICE_ADD("cage_timer0", DEVICE_SELF, atari_cage_device, cage_timer_callback)

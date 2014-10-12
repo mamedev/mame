@@ -90,37 +90,26 @@ enum
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_TMS3203X_CONFIG(_config) \
-	tms3203x_device::static_set_config(*device, _config);
+#define MCFG_TMS3203X_MCBL(_mode) \
+	tms3203x_device::set_mcbl_mode(*device, _mode);
+
+#define MCFG_TMS3203X_XF0_CB(_devcb) \
+	devcb = &tms3203x_device::set_xf0_callback(*device, DEVCB_##_devcb);
+
+#define MCFG_TMS3203X_XF1_CB(_devcb) \
+	devcb = &tms3203x_device::set_xf1_callback(*device, DEVCB_##_devcb);
+
+#define MCFG_TMS3203X_IACK_CB(_devcb) \
+	devcb = &tms3203x_device::set_iack_callback(*device, DEVCB_##_devcb);
 
 
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-class tms3203x_device;
-
-// I/O callback types
-typedef void (*tms3203x_xf_func)(tms3203x_device &device, UINT8 val);
-typedef void (*tms3203x_iack_func)(tms3203x_device &device, UINT8 val, offs_t address);
-
-
-// ======================> tms3203x_config
-
-struct tms3203x_config
-{
-	bool                m_mcbl_mode;
-	tms3203x_xf_func    m_xf0_w;
-	tms3203x_xf_func    m_xf1_w;
-	tms3203x_iack_func  m_iack_w;
-};
-
-
-
 // ======================> tms3203x_device
 
-class tms3203x_device : public cpu_device,
-						public tms3203x_config
+class tms3203x_device : public cpu_device
 {
 	struct tmsreg
 	{
@@ -159,7 +148,10 @@ protected:
 
 public:
 	// inline configuration helpers
-	static void static_set_config(device_t &device, const tms3203x_config &config);
+	static void set_mcbl_mode(device_t &device, bool mode) { downcast<tms3203x_device &>(device).m_mcbl_mode = mode; }
+	template<class _Object> static devcb_base &set_xf0_callback(device_t &device, _Object object) { return downcast<tms3203x_device &>(device).m_xf0_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_xf1_callback(device_t &device, _Object object) { return downcast<tms3203x_device &>(device).m_xf1_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_iack_callback(device_t &device, _Object object) { return downcast<tms3203x_device &>(device).m_iack_cb.set_callback(object); }
 
 	// public interfaces
 	static float fp_to_float(UINT32 floatdata);
@@ -779,6 +771,11 @@ protected:
 	direct_read_data *  m_direct;
 	UINT32 *            m_bootrom;
 
+	bool                m_mcbl_mode;
+	devcb_write8        m_xf0_cb;
+	devcb_write8        m_xf1_cb;
+	devcb_write8        m_iack_cb;
+	
 	// tables
 	static void (tms3203x_device::*const s_tms32031ops[])(UINT32 op);
 	static UINT32 (tms3203x_device::*const s_indirect_d[0x20])(UINT32, UINT8);

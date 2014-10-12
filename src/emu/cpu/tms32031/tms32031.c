@@ -263,13 +263,12 @@ tms3203x_device::tms3203x_device(const machine_config &mconfig, device_type type
 		m_is_idling(false),
 		m_icount(0),
 		m_program(0),
-		m_direct(0)
+		m_direct(0),
+		m_mcbl_mode(false),
+		m_xf0_cb(*this),
+		m_xf1_cb(*this),
+		m_iack_cb(*this)
 {
-	m_mcbl_mode = false;
-	m_xf0_w = NULL;
-	m_xf1_w = NULL;
-	m_iack_w = NULL;
-
 	// initialize remaining state
 	memset(&m_r, 0, sizeof(m_r));
 
@@ -316,18 +315,6 @@ tms3203x_device::~tms3203x_device()
 		if (m_hits[i] != 0)
 			printf("%10d - %03X.%X\n", m_hits[i], i / 4, i % 4);
 #endif
-}
-
-
-//-------------------------------------------------
-//  static_set_config - set the configuration
-//  structure
-//-------------------------------------------------
-
-void tms3203x_device::static_set_config(device_t &device, const tms3203x_config &config)
-{
-	tms3203x_device &tms = downcast<tms3203x_device &>(device);
-	static_cast<tms3203x_config &>(tms) = config;
 }
 
 
@@ -388,6 +375,11 @@ void tms3203x_device::device_start()
 	// find address spaces
 	m_program = &space(AS_PROGRAM);
 	m_direct = &m_program->direct();
+
+	// resolve devcb handlers
+	m_xf0_cb.resolve_safe();
+	m_xf1_cb.resolve_safe();
+	m_iack_cb.resolve_safe();
 
 	// set up the internal boot loader ROM
 	m_bootrom = reinterpret_cast<UINT32*>(memregion(shortname())->base());

@@ -465,11 +465,11 @@ WRITE32_MEMBER(gaelco3d_state::tms_m68k_ram_w)
 }
 
 
-static void iack_w(tms3203x_device &device, UINT8 state, offs_t addr)
+WRITE8_MEMBER(gaelco3d_state::tms_iack_w)
 {
 	if (LOG)
-		logerror("iack_w(%d) - %06X\n", state, addr);
-	device.set_input_line(0, CLEAR_LINE);
+		logerror("iack_w(%d) - %06X\n", data, offset);
+	m_tms->set_input_line(0, CLEAR_LINE);
 }
 
 
@@ -949,15 +949,6 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static const tms3203x_config tms_config =
-{
-	true,
-	0,
-	0,
-	iack_w
-};
-
-
 static MACHINE_CONFIG_START( gaelco3d, gaelco3d_state )
 
 	/* basic machine hardware */
@@ -966,8 +957,9 @@ static MACHINE_CONFIG_START( gaelco3d, gaelco3d_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", gaelco3d_state,  vblank_gen)
 
 	MCFG_CPU_ADD("tms", TMS32031, 60000000)
-	MCFG_TMS3203X_CONFIG(tms_config)
 	MCFG_CPU_PROGRAM_MAP(tms_map)
+	MCFG_TMS3203X_MCBL(true)
+	MCFG_TMS3203X_IACK_CB(WRITE8(gaelco3d_state, tms_iack_w))
 
 	MCFG_CPU_ADD("adsp", ADSP2115, 16000000)
 	MCFG_ADSP21XX_SPORT_TX_CB(WRITE32(gaelco3d_state, adsp_tx_callback))

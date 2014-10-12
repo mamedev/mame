@@ -112,6 +112,7 @@ public:
 	DECLARE_WRITE16_MEMBER(analog_port_latch_w);
 	DECLARE_READ32_MEMBER(tms_m68k_ram_r);
 	DECLARE_WRITE32_MEMBER(tms_m68k_ram_w);
+	DECLARE_WRITE8_MEMBER(tms_iack_w);
 	DECLARE_WRITE16_MEMBER(tms_reset_w);
 	DECLARE_WRITE16_MEMBER(tms_irq_w);
 	DECLARE_WRITE16_MEMBER(tms_control3_w);

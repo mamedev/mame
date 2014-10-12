@@ -840,20 +840,6 @@ static SLOT_INTERFACE_START( rastersp_scsi_devices )
 SLOT_INTERFACE_END
 
 
-
-/*************************************
- *
- *  TMS32031
- *
- *************************************/
-
-static const tms3203x_config tms_config =
-{
-	true    // Boot-loader mode
-};
-
-
-
 /*************************************
  *
  *  Machine driver
@@ -868,8 +854,8 @@ static MACHINE_CONFIG_START( rastersp, rastersp_state )
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(rastersp_state,irq_callback)
 
 	MCFG_CPU_ADD("dsp", TMS32031, 33330000)
-	MCFG_TMS3203X_CONFIG(tms_config)
 	MCFG_CPU_PROGRAM_MAP(dsp_map)
+	MCFG_TMS3203X_MCBL(true)	// Boot-loader mode
 
 	/* Devices */
 	MCFG_TIMER_DRIVER_ADD("tms_timer1", rastersp_state, tms_timer1)
