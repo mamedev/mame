@@ -11,9 +11,6 @@
 	NOTES: To boot up Revelations, turn the refill key (R) and press button A.
     TODO: There are probably more ROMs for Revelations, the disc contains
     full data for a picture based memory game called 'Vision Quest'.	
-
-    TODO: There are probably more ROMs for Revelations, the disc contains
-    full data for a picture based memory game called 'Vision Quest'.	
 	
 	LaserMax memory map needs sorting out, Cops uses a subset of what's
 	actually available
