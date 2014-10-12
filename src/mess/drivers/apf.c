@@ -31,9 +31,6 @@ RAM switch
 - A very few games need 16K which requires hacking the pcb (-ram 16K)
 - Basic will work with 8K or 16K.
 
-- On the M1000, ram options (8K and 16K) are ignored.
-- On the IMAG, ram options (8K and 16K) work.
-
 
 Status of cart-based games
 --------------------------
@@ -126,7 +123,7 @@ private:
 	virtual void machine_start();
 	virtual void machine_reset();
 	required_device<m6800_cpu_device> m_maincpu;
-	required_device<ram_device> m_ram;
+	optional_device<ram_device> m_ram;
 	required_device<mc6847_base_device> m_crtc;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<pia6821_device> m_pia0;
@@ -261,10 +258,13 @@ void apf_state::machine_reset()
 	m_portb = 0;
 	m_ca2 = 0;
 
-	if (m_cass) // apfimag only
-	{
+	// apfimag only
+	if (m_cass)
 		m_cass->change_state(CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 
+	// apfimag only
+	if (m_ram)
+	{
 		/* if we specified 8K of RAM, delete the extended RAM */
 		if (m_ram->size() < 16*1024)
 			space.unmap_readwrite(0xc000, 0xdfff);
@@ -551,11 +551,6 @@ static MACHINE_CONFIG_START( apfm1000, apf_state )
 	MCFG_PIA_IRQA_HANDLER(DEVWRITELINE("maincpu", m6800_cpu_device, irq_line))
 	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE("maincpu", m6800_cpu_device, irq_line))
 
-	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("8K")
-	MCFG_RAM_EXTRA_OPTIONS("16K")
-
 	MCFG_APF_CARTRIDGE_ADD("cartslot", apf_cart, NULL)
 
 	/* software lists */
@@ -565,6 +560,11 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( apfimag, apfm1000 )
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP( apfimag_map)
+
+	/* internal ram */
+	MCFG_RAM_ADD(RAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("8K")
+	MCFG_RAM_EXTRA_OPTIONS("16K")
 
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
