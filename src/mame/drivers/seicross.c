@@ -591,21 +591,9 @@ DRIVER_INIT_MEMBER(seicross_state,friskytb)
 	UINT8 *ROM = memregion("mcu")->base();
 	address_space &space = m_mcu->space(AS_PROGRAM);
 	// this code is in ROM 6.3h, maps to MCU at dxxx
-	// if you cheat and use the code from another set it works
 	for (int i = 0; i < 0x8000; i++)
 	{
-		ROM[i] = BITSWAP8(ROM[i + 0x8000], 6, 7, 5, 4, 3, 2, 1, 0);
-	
-		int data = ROM[i];
-		if (data == 0x4e) data = 0x4d;
-		//else if (data == 0x41) data = 0x45;
-		else if (data == 0x46) data = 0x45;
-		else if (data == 0x57) data = 0x57;
-		//else if (data == 0x76) data = 0x7e;
-		else if (data == 0xce) data = 0xcd;
-		else if (data == 0xdf) data = 0xdf;
-
-		ROM[i] = data;
+		ROM[i] = BITSWAP8(ROM[i + 0x8000], 6, 7, 5, 4, 3, 2, 0, 1);
 	}
 
 	space.set_decrypted_region(0x8000, 0xffff, ROM);
@@ -614,7 +602,7 @@ DRIVER_INIT_MEMBER(seicross_state,friskytb)
 
 GAME( 1981, friskyt,  0,        nvram,    friskyt, driver_device,  0,        ROT0,  "Nichibutsu", "Frisky Tom (set 1)", GAME_NO_COCKTAIL )
 GAME( 1981, friskyta, friskyt,  nvram,    friskyt, driver_device,  0,        ROT0,  "Nichibutsu", "Frisky Tom (set 2)", GAME_NO_COCKTAIL )
-GAME( 1981, friskytb, friskyt,  nvram,    friskyt, seicross_state, friskytb, ROT0,  "Nichibutsu", "Frisky Tom (set 3, encrypted?)", GAME_NOT_WORKING ) // protection code seems to be encrypted?
+GAME( 1981, friskytb, friskyt,  nvram,    friskyt, seicross_state, friskytb, ROT0,  "Nichibutsu", "Frisky Tom (set 3, encrypted)", GAME_NOT_WORKING ) // protection mcu runs encrypted opcodes
 GAME( 1982, radrad,   0,        no_nvram, radrad, driver_device,   0,        ROT0,  "Nichibutsu USA", "Radical Radial", GAME_NO_COCKTAIL )
 GAME( 1984, seicross, 0,        no_nvram, seicross, driver_device, 0,        ROT90, "Nichibutsu / Alice", "Seicross", GAME_NO_COCKTAIL )
 GAME( 1984, sectrzon, seicross, no_nvram, seicross, driver_device, 0,        ROT90, "Nichibutsu / Alice", "Sector Zone", GAME_NO_COCKTAIL )
