@@ -13,34 +13,36 @@
     Step 2.1: 166 MHz PPC, same 3D engine as 2.0, differences unknown
 
     Game status:
-    vf3/vf3a/vf3tb - don't boot - stuck in poly_wait()
-    bass - boots and runs with 3D
+    vf3/vf3a/vf3tb - crashes
+    bass - works
     getbass - I/O board error (?)
 
-    scud/scuda - boots and runs with 3D (scuda says "for sale and use only in Japan" but is marked Export?)
-    scudj - boots but hangs up (no SCSI IRQs)
-    scudp - shows initial screen, apparently won't go into test mode or advance
-    lostwsga - SCSI IRQ stuck on (boots and runs with 3D if hacked)
-    vs215 - boots and runs with 3D
-    lemans24 - SCSI IRQ stuck on (boots if hacked)
-    vs29815 - write to unknown 53c810 SCSI register
+    scud/scuda - works (scuda says "for sale and use only in Japan" but is marked Export?)
+    scudj - works
+    scudplus - works
+    lostwsga - works
+    vs215 - works
+    lemans24 - works
+    vs29815 - massive memory trashing and page faults
 
-    vs2 - looks like it should boot but never displays anything
-    harley - boots and runs with 3D after a "NO DAUGHTER BOARD DETECTED" error
-    skichamp - "NO DAUGHTER BOARD DETECTED", doesn't advance (no SCSI IRQs occur)
-    srally2/sraly2dx - doesn't boot (no SCSI IRQs occur, other IRQs look fine)
-    von2/von254g - SCSI IRQ stuck on (boots and runs if SCSI ack is hacked)
-    fvipers2 - says "ONE PROCESSOR DETECTED" and hangs (no SCSI IRQs occur, others look fine)
-    vs298/vs299/vs2v991 - hangs (no SCSI IRQs occur, others look fine)
+    vs2 - waiting for decrementer (same code as eca)
+    harley - 
+    skichamp - waiting for decrementer
+    srally2/sraly2dx - works
+    von2/von254g - works
+    fvipers2 - waiting for decrementer (same code as eca)
+    vs298/vs299/vs2v991 - waiting for decrementer
+	oceanhun - same as daytona2
+	lamachin - works
 
     dayto2pe - bug in DRC MMU page-fault handling, causes infinite loop at PC:0x2270 (or debug assert)
     daytona2 - As above.
     spikeout/spikeofe - As above.
-    dirtdvls/dirtdvla - SCSI IRQ stuck on (boots partially if hacked)
-    swtrilgy - doesn't boot (no SCSI IRQs occur, other IRQs look fine)
-    swtrilga - SCSI IRQ stuck on
-    magtruck - SCSI IRQ stuck on (boots and fails country code check (!) if hacked)
-    eca/ecax - doesn't boot (a few SCSI IRQs occur but then cease, other IRQs look fine)
+    dirtdvls/dirtdvla - works
+    swtrilgy - 
+    swtrilga - 
+    magtruck - works
+    eca/ecax - waiting for decrementer	
 
 ===================================================================================
 
@@ -1242,10 +1244,9 @@ void model3_state::model3_init(int step)
 	m_m3_step = step; // step = BCD hardware rev.  0x10 for 1.0, 0x15 for 1.5, 0x20 for 2.0, etc.
 	tap_reset();
 
-	if (step < 0x20) {
-		if( core_stricmp(machine().system().name, "vs215") == 0 ||
-			core_stricmp(machine().system().name, "vs29815") == 0 ||
-			core_stricmp(machine().system().name, "bass") == 0 )
+	if (step < 0x20)
+	{
+		if (m_step15_with_mpc106)
 		{
 			mpc106_init(machine());
 		}
@@ -1255,12 +1256,12 @@ void model3_state::model3_init(int step)
 		}
 		m_real3d_device_id = 0x16c311db; /* PCI Vendor ID (11db = SEGA), Device ID (16c3 = 315-5827) */
 	}
-	else {
+	else
+	{
 		mpc106_init(machine());
 		// some step 2+ games need the older PCI ID (obvious symptom:
 		// vbl is enabled briefly then disabled so the game hangs)
-		if (core_stricmp(machine().system().name, "magtruck") == 0 ||
-			core_stricmp(machine().system().name, "von254g") == 0)
+		if (m_step20_with_old_real3d)
 		{
 			m_real3d_device_id = 0x16c311db; /* PCI Vendor ID (11db = SEGA), Device ID (16c3 = 315-5827) */
 		}
@@ -5646,84 +5647,51 @@ DRIVER_INIT_MEMBER(model3_state,lostwsga)
 
 DRIVER_INIT_MEMBER(model3_state,scud)
 {
-	UINT32 *rom = (UINT32*)memregion("user1")->base();
-
 	DRIVER_INIT_CALL(model3_15);
 	/* TODO: network device at 0xC0000000 - FF */
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf9000000, 0xf90000ff, read64_delegate(FUNC(model3_state::scsi_r),this), write64_delegate(FUNC(model3_state::scsi_w),this));
-
-	rom[(0x71275c^4)/4] = 0x60000000;
-	rom[(0x71277c^4)/4] = 0x60000000;
 }
 
 DRIVER_INIT_MEMBER(model3_state,scudplus)
 {
-	UINT32 *rom = (UINT32*)memregion("user1")->base();
-
 	DRIVER_INIT_CALL(model3_15);
 	/* TODO: network device at 0xC0000000 - FF */
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xc1000000, 0xc10000ff, read64_delegate(FUNC(model3_state::scsi_r),this), write64_delegate(FUNC(model3_state::scsi_w),this));
-
-	rom[(0x713724^4)/4] = 0x60000000;
-	rom[(0x713744^4)/4] = 0x60000000;
-
-	rom[(0x741f48^4)/4] = 0x60000000;
-
-	rom[(0x741f68^4)/4] = 0x60000000;
-	rom[(0x741efc^4)/4] = 0x60000000;
 }
 
 DRIVER_INIT_MEMBER(model3_state,scudplusa)
 {
-	//UINT32 *rom = (UINT32*)memregion("user1")->base();
-
 	DRIVER_INIT_CALL(model3_15);
 	/* TODO: network device at 0xC0000000 - FF */
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xc1000000, 0xc10000ff, read64_delegate(FUNC(model3_state::scsi_r),this), write64_delegate(FUNC(model3_state::scsi_w),this));
-
-	//rom[(0x713724^4)/4] = 0x60000000; // Fix ME!!!! Needs to corrected for the non REV A version!!!!
-	//rom[(0x713744^4)/4] = 0x60000000;
-
-	//rom[(0x741f48^4)/4] = 0x60000000;
-
-	//rom[(0x741f68^4)/4] = 0x60000000;
-	//rom[(0x741efc^4)/4] = 0x60000000;
 }
 
 DRIVER_INIT_MEMBER(model3_state,lemans24)
 {
-	UINT32 *rom = (UINT32*)memregion("user1")->base();
 	DRIVER_INIT_CALL(model3_15);
 
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xc1000000, 0xc10000ff, read64_delegate(FUNC(model3_state::scsi_r),this), write64_delegate(FUNC(model3_state::scsi_w),this));
-
-	rom[(0x73fe38^4)/4] = 0x38840004;       /* This seems to be an actual bug in the original code */
-
-	rom[(0x73eb5c^4)/4] = 0x60000000;
-	rom[(0x73edd0^4)/4] = 0x60000000;
-	rom[(0x73edc4^4)/4] = 0x60000000;
+	
+//	rom[(0x73fe38^4)/4] = 0x38840004;       /* This seems to be an actual bug in the original code */
 }
 
 DRIVER_INIT_MEMBER(model3_state,vf3)
 {
-	UINT32 *rom = (UINT32*)memregion("user1")->base();
+	//UINT32 *rom = (UINT32*)memregion("user1")->base();
 
 	DRIVER_INIT_CALL(model3_10);
 
+	/*
 	rom[(0x713c7c^4)/4] = 0x60000000;
 	rom[(0x713e54^4)/4] = 0x60000000;
 	rom[(0x7125b0^4)/4] = 0x60000000;
 	rom[(0x7125d0^4)/4] = 0x60000000;
-
+	*/
 }
 
 DRIVER_INIT_MEMBER(model3_state,vs215)
 {
-	UINT32 *rom = (UINT32*)memregion("user1")->base();
-
-	rom[(0x70dde0^4)/4] = 0x60000000;
-	rom[(0x70e6f0^4)/4] = 0x60000000;
-	rom[(0x70e710^4)/4] = 0x60000000;
+	m_step15_with_mpc106 = true;
 
 	interleave_vroms(machine());
 	m_maincpu->space(AS_PROGRAM).install_read_bank(0xff000000, 0xff7fffff, "bank1" );
@@ -5739,6 +5707,8 @@ DRIVER_INIT_MEMBER(model3_state,vs215)
 
 DRIVER_INIT_MEMBER(model3_state,vs29815)
 {
+	m_step15_with_mpc106 = true;
+
 	UINT32 *rom = (UINT32*)memregion("user1")->base();
 
 	rom[(0x6028ec^4)/4] = 0x60000000;
@@ -5758,10 +5728,7 @@ DRIVER_INIT_MEMBER(model3_state,vs29815)
 
 DRIVER_INIT_MEMBER(model3_state,bass)
 {
-	UINT32 *rom = (UINT32*)memregion("user1")->base();
-
-	rom[(0x7999a8^4)/4] = 0x60000000;
-	rom[(0x7999c8^4)/4] = 0x60000000;
+	m_step15_with_mpc106 = true;
 
 	interleave_vroms(machine());
 	m_maincpu->space(AS_PROGRAM).install_read_bank(0xff000000, 0xff7fffff, "bank1" );
@@ -5865,72 +5832,70 @@ DRIVER_INIT_MEMBER(model3_state,harley)
 
 DRIVER_INIT_MEMBER(model3_state,harleya)
 {
-	UINT32 *rom = (UINT32*)memregion("user1")->base();
+	//UINT32 *rom = (UINT32*)memregion("user1")->base();
 	DRIVER_INIT_CALL(model3_20);
 
 	m_network_ram = auto_alloc_array_clear(machine(), UINT64, 0x10000);
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xc0000000, 0xc00fffff, read64_delegate(FUNC(model3_state::network_r),this), write64_delegate(FUNC(model3_state::network_w),this));
 
+	/*
 	rom[(0x50e8d4^4)/4] = 0x60000000;
 	rom[(0x50e8f4^4)/4] = 0x60000000;
 	rom[(0x50fb84^4)/4] = 0x60000000;
 	rom[(0x4f736c^4)/4] = 0x60000000;
 	rom[(0x4f738c^4)/4] = 0x60000000;
+	*/
 }
 
 
 DRIVER_INIT_MEMBER(model3_state,srally2)
-{
-	UINT32 *rom = (UINT32*)memregion("user1")->base();
+{	
 	DRIVER_INIT_CALL(model3_20);
 
+
+	UINT32 *rom = (UINT32*)memregion("user1")->base();	
 	rom[(0x7c0c4^4)/4] = 0x60000000;
 	rom[(0x7c0c8^4)/4] = 0x60000000;
 	rom[(0x7c0cc^4)/4] = 0x60000000;
+	// Writes command 000023FFFFFFFFFE to JTAG, expects result 0x0040000000 (41 bits)
+	// Writes command 000003FFFFFFFFFE
+	// Writes command 00003FFFFFFFFFFE 248 times
+	// Writes command 000023FFFFFFFFFE, expects result 0x01000000000 (?? bits)
 }
 
 DRIVER_INIT_MEMBER(model3_state,swtrilgy)
 {
-	UINT32 *rom = (UINT32*)memregion("user1")->base();
+	//UINT32 *rom = (UINT32*)memregion("user1")->base();
 	DRIVER_INIT_CALL(model3_20);
 
+	/*
 	rom[(0xf0e48^4)/4] = 0x60000000;
 	rom[(0x043dc^4)/4] = 0x48000090;
 	rom[(0x029a0^4)/4] = 0x60000000;
 	rom[(0x02a0c^4)/4] = 0x60000000;
+	*/
 }
 
 DRIVER_INIT_MEMBER(model3_state,swtrilga)
 {
-	UINT32 *rom = (UINT32*)memregion("user1")->base();
+	//UINT32 *rom = (UINT32*)memregion("user1")->base();
 	DRIVER_INIT_CALL(model3_20);
 
-	rom[(0xf6dd0^4)/4] = 0x60000000;
+	//rom[(0xf6dd0^4)/4] = 0x60000000;
 }
 
 DRIVER_INIT_MEMBER(model3_state,von2)
 {
-	UINT32 *rom = (UINT32*)memregion("user1")->base();
+	m_step20_with_old_real3d = true;
+	
 	DRIVER_INIT_CALL(model3_20);
-
-	rom[(0x189168^4)/4] = 0x60000000;
-	rom[(0x1890ac^4)/4] = 0x60000000;
-	rom[(0x1890b8^4)/4] = 0x60000000;
-	rom[(0x1888a8^4)/4] = 0x60000000;
-	rom[(0x1891c8^4)/4] = 0x60000000;
 }
 
 DRIVER_INIT_MEMBER(model3_state,dirtdvls)
 {
-	UINT32 *rom = (UINT32*)memregion("user1")->base();
-	DRIVER_INIT_CALL(model3_20);
+	m_step20_with_old_real3d = true;
 
-	rom[(0x0600a0^4)/4] = 0x60000000;
-	rom[(0x0608a4^4)/4] = 0x60000000;
-	rom[(0x0608b0^4)/4] = 0x60000000;
-	rom[(0x060960^4)/4] = 0x60000000;
-	rom[(0x0609c0^4)/4] = 0x60000000;
-	rom[(0x001e24^4)/4] = 0x60000000;
+	DRIVER_INIT_CALL(model3_20);
 }
 
 DRIVER_INIT_MEMBER(model3_state,daytona2)
@@ -5982,23 +5947,26 @@ DRIVER_INIT_MEMBER(model3_state,spikeofe)
 
 DRIVER_INIT_MEMBER(model3_state,eca)
 {
-	UINT32 *rom = (UINT32*)memregion("user1")->base();
+//	UINT32 *rom = (UINT32*)memregion("user1")->base();
 	DRIVER_INIT_CALL(model3_20);
 
-	
+	/*
 	rom[(0x535560^4)/4] = 0x60000000;
 	rom[(0x535580^4)/4] = 0x60000000;	
+	*/
 }
 
 DRIVER_INIT_MEMBER(model3_state,skichamp)
 {
-	UINT32 *rom = (UINT32*)memregion("user1")->base();
+	//UINT32 *rom = (UINT32*)memregion("user1")->base();
 	DRIVER_INIT_CALL(model3_20);
 
+	/*
 	rom[(0x5263c8^4)/4] = 0x60000000;
 	rom[(0x5263e8^4)/4] = 0x60000000;
 	rom[(0x516bbc^4)/4] = 0x60000000;
 	rom[(0x516b9c^4)/4] = 0x60000000; // decrementer
+	*/
 }
 
 DRIVER_INIT_MEMBER(model3_state,oceanhun)
@@ -6011,6 +5979,15 @@ DRIVER_INIT_MEMBER(model3_state,oceanhun)
 
 DRIVER_INIT_MEMBER(model3_state,magtruck)
 {
+	m_step20_with_old_real3d = true;
+
+	DRIVER_INIT_CALL(model3_20);
+}
+
+DRIVER_INIT_MEMBER(model3_state,lamachin)
+{
+	m_step20_with_old_real3d = true;
+
 	DRIVER_INIT_CALL(model3_20);
 }
 
@@ -6039,13 +6016,13 @@ GAME( 1998, vs29815,    vs298, model3_15, model3, model3_state,    vs29815, ROT0
 GAME( 1997, vs2,            0, model3_20, model3, model3_state,        vs2, ROT0, "Sega", "Virtua Striker 2 (Step 2.0)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1997, harley,         0, model3_20, harley, model3_state,     harley, ROT0, "Sega", "Harley-Davidson and L.A. Riders (Revision B)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1997, harleya,   harley, model3_20, harley, model3_state,     harleya, ROT0, "Sega", "Harley-Davidson and L.A. Riders (Revision A)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1998, lamachin,       0, model3_20, model3, model3_state,  model3_20, ROT0, "Sega", "L.A. Machineguns", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1998, lamachin,       0, model3_20, model3, model3_state,   lamachin, ROT0, "Sega", "L.A. Machineguns", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1998, oceanhun,       0, model3_20, model3, model3_state,   oceanhun, ROT0, "Sega", "The Ocean Hunter", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1998, skichamp,       0, model3_20, skichamp, model3_state, skichamp, ROT0, "Sega", "Ski Champ", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1998, srally2,        0, model3_20, scud, model3_state,      srally2, ROT0, "Sega", "Sega Rally 2", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1998, srally2x,       0, model3_20, scud, model3_state,      srally2, ROT0, "Sega", "Sega Rally 2 DX", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1998, von2,           0, model3_20, model3, model3_state,       von2, ROT0, "Sega", "Virtual On 2: Oratorio Tangram (Revision B)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1998, von254g,     von2, model3_20, model3, model3_state,  model3_20, ROT0, "Sega", "Virtual On 2: Oratorio Tangram (ver 5.4g)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1998, von254g,     von2, model3_20, model3, model3_state,       von2, ROT0, "Sega", "Virtual On 2: Oratorio Tangram (ver 5.4g)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1998, fvipers2,       0, model3_20, model3, model3_state,  model3_20, ROT0, "Sega", "Fighting Vipers 2 (Revision A)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1998, vs298,          0, model3_20, model3, model3_state,      vs298, ROT0, "Sega", "Virtua Striker 2 '98 (Step 2.0)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1999, vs2v991,        0, model3_20, model3, model3_state,    vs2v991, ROT0, "Sega", "Virtua Striker 2 '99.1 (Revision B)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )

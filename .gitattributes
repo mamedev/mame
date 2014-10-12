@@ -7597,7 +7597,6 @@ src/mame/video/lvcards.c svneol=native#text/plain
 src/mame/video/lwings.c svneol=native#text/plain
 src/mame/video/m10.c svneol=native#text/plain
 src/mame/video/m107.c svneol=native#text/plain
-src/mame/video/m3raster.inc svneol=native#text/plain
 src/mame/video/m52.c svneol=native#text/plain
 src/mame/video/m57.c svneol=native#text/plain
 src/mame/video/m58.c svneol=native#text/plain
