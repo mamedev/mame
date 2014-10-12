@@ -492,7 +492,7 @@ ROM_START( friskytb )
 	ROM_COPY( "maincpu", 0x0000, 0x8000, 0x8000 )   /* shares the main program ROMs and RAM with the main CPU. */
 
 	ROM_REGION( 0x4000, "gfx1", 0 )
-	ROM_LOAD( "11.7l",        0x0000, 0x1000, CRC(caa93315) SHA1(af8fd135c0a9c0278705975c127a91f246341da1) ) // 99.707031%
+	ROM_LOAD( "11.7l",        0x0000, 0x1000, CRC(caa93315) SHA1(af8fd135c0a9c0278705975c127a91f246341da1) ) // 99.707031% - tile 0x69 is blank vs ft.11 (it's the symbol used for lives, instead this set shows lives to the left of the HIGH SCORE text using different gfx)
 	ROM_LOAD( "12.7n",        0x1000, 0x1000, CRC(c028d3b8) SHA1(9e8768b9658f8b05ade4dd5fb2ecde4a52627bc1) )
 	ROM_LOAD( "9.7h",         0x2000, 0x1000, CRC(60642f25) SHA1(2d179a9ea99014065f578bbec4fbfbda5aead98b) )
 	ROM_LOAD( "10.7j",        0x3000, 0x1000, CRC(07b9dcfc) SHA1(0a573065b6b08745b91fb47ce477d76be7a01750) )
