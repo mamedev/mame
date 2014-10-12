@@ -25,13 +25,14 @@
     lemans24 - works
     vs29815 - massive memory trashing and page faults
 
-    vs2 - waiting for decrementer (same code as eca)
-    harley - 
-    skichamp - waiting for decrementer
+    vs2 - works
+    harley - works, massive slowdown ingame
+    skichamp - boots after skipping the drive board errors, massive slowdowns
     srally2/sraly2dx - works
     von2/von254g - works
     fvipers2 - waiting for decrementer (same code as eca)
-    vs298/vs299/vs2v991 - waiting for decrementer
+    vs298 - works, hangs with an onscreen error code
+	vs299/vs2v991 - works
 	oceanhun - same as daytona2
 	lamachin - works
 
@@ -42,7 +43,7 @@
     swtrilgy - 
     swtrilga - 
     magtruck - works
-    eca/ecax - waiting for decrementer	
+    eca/ecax - cabinet network error
 
 ===================================================================================
 
@@ -1074,7 +1075,7 @@ READ64_MEMBER(model3_state::real3d_dma_r)
 	switch(offset)
 	{
 		case 1:
-			return (m_dma_irq << 24) | (m_dma_endian << 8);
+			return (m_dma_irq << 24) | (m_dma_endian << 8) | m_dma_busy;
 		case 2:
 			if(ACCESSING_BITS_0_31) {
 				return m_dma_data;
@@ -1139,6 +1140,8 @@ WRITE64_MEMBER(model3_state::real3d_dma_w)
 					m_dma_status ^= 0xffffffff;
 					m_dma_data = m_dma_status;
 				}
+				m_dma_busy = 0x80000000;
+				m_real3d_dma_timer->adjust(attotime::from_nsec(20000));
 				return;
 			}
 			if(ACCESSING_BITS_0_31) {       /* ??? */
@@ -1200,29 +1203,38 @@ TIMER_CALLBACK_MEMBER(model3_state::model3_sound_timer_tick)
 	}
 }
 
+TIMER_CALLBACK_MEMBER(model3_state::real3d_dma_timer_callback)
+{
+	m_dma_busy = 0;
+}
+
 MACHINE_START_MEMBER(model3_state,model3_10)
 {
 	configure_fast_ram(machine());
 
 	m_sound_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(model3_state::model3_sound_timer_tick),this));
+	m_real3d_dma_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(model3_state::real3d_dma_timer_callback),this));
 }
 MACHINE_START_MEMBER(model3_state,model3_15)
 {
 	configure_fast_ram(machine());
 
 	m_sound_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(model3_state::model3_sound_timer_tick),this));
+	m_real3d_dma_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(model3_state::real3d_dma_timer_callback),this));
 }
 MACHINE_START_MEMBER(model3_state,model3_20)
 {
 	configure_fast_ram(machine());
 
 	m_sound_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(model3_state::model3_sound_timer_tick),this));
+	m_real3d_dma_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(model3_state::real3d_dma_timer_callback),this));
 }
 MACHINE_START_MEMBER(model3_state,model3_21)
 {
 	configure_fast_ram(machine());
 
 	m_sound_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(model3_state::model3_sound_timer_tick),this));
+	m_real3d_dma_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(model3_state::real3d_dma_timer_callback),this));
 }
 
 void model3_state::model3_init(int step)
@@ -1231,6 +1243,9 @@ void model3_state::model3_init(int step)
 
 	m_sound_irq_enable = 0;
 	m_sound_timer->adjust(attotime::never);
+
+	m_dma_busy = 0;
+	m_real3d_dma_timer->adjust(attotime::never);
 
 	membank("bank1")->set_base(memregion( "user1" )->base() + 0x800000 ); /* banked CROM */
 

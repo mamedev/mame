@@ -104,6 +104,7 @@ public:
 
 	int m_sound_irq_enable;
 	emu_timer *m_sound_timer;
+	emu_timer *m_real3d_dma_timer;
 	UINT8 m_irq_enable;
 	UINT8 m_irq_state;
 	UINT8 m_scsi_irq_state;
@@ -126,6 +127,7 @@ public:
 	UINT32 m_dma_dest;
 	UINT32 m_dma_endian;
 	UINT32 m_dma_irq;
+	UINT32 m_dma_busy;
 	UINT64 m_controls_2;
 	UINT64 m_controls_3;
 	UINT8 m_serial_fifo1;
@@ -269,6 +271,7 @@ public:
 	DECLARE_MACHINE_START(model3_21);
 	DECLARE_MACHINE_RESET(model3_21);
 	TIMER_CALLBACK_MEMBER(model3_sound_timer_tick);
+	TIMER_CALLBACK_MEMBER(real3d_dma_timer_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(model3_interrupt);
 	void model3_exit();
 	DECLARE_WRITE8_MEMBER(scsp_irq);
