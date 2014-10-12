@@ -1656,8 +1656,11 @@ void model3_state::draw_block(UINT32 address)
 	pop_matrix_stack();
 
 	/* handle the second link */
-	link = node[8 - offset];
-	process_link(address, link);
+	if ((node[0] & 0x7) != 0x6)
+	{
+		link = node[8 - offset];
+		process_link(address, link);
+	}
 }
 
 void model3_state::draw_viewport(int pri, UINT32 address)
