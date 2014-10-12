@@ -9960,4 +9960,17 @@ a certain item) -->
 		</part>
 	</software>
 
+	<software name="mgear">
+		<description>Master Gear Adapter</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="gamegear_cart">
+			<feature name="slot" value="mgear" />
+			<feature name="pin_42" value="sms_mode" />
+			<dataarea name="rom" size="1">
+				<!-- this cartridge is just an adapted -->
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>

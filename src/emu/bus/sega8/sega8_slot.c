@@ -822,6 +822,8 @@ void sega8_cart_slot_device::internal_header_logging(UINT8 *ROM, UINT32 len, UIN
 
 // slot interfaces
 #include "rom.h"
+#include "ccatch.h"
+#include "mgear.h"
 
 SLOT_INTERFACE_START(sg1000_cart)
 	SLOT_INTERFACE_INTERNAL("rom",  SEGA8_ROM_STD)
@@ -869,5 +871,6 @@ SLOT_INTERFACE_START(gg_cart)
 	SLOT_INTERFACE_INTERNAL("rom",  SEGA8_ROM_STD)
 	SLOT_INTERFACE_INTERNAL("eeprom",  SEGA8_ROM_EEPROM)
 	SLOT_INTERFACE_INTERNAL("codemasters",  SEGA8_ROM_CODEMASTERS)
+	SLOT_INTERFACE_INTERNAL("mgear",  SEGA8_ROM_MGEAR)
 SLOT_INTERFACE_END
 

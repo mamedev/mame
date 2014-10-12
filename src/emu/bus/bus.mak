@@ -1143,6 +1143,8 @@ ifneq ($(filter SEGA8,$(BUSES)),)
 OBJDIRS += $(BUSOBJ)/sega8
 BUSOBJS += $(BUSOBJ)/sega8/sega8_slot.o
 BUSOBJS += $(BUSOBJ)/sega8/rom.o
+BUSOBJS += $(BUSOBJ)/sega8/ccatch.o
+BUSOBJS += $(BUSOBJ)/sega8/mgear.o
 endif
 
 #-------------------------------------------------
