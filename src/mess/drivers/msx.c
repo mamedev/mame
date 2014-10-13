@@ -8188,9 +8188,9 @@ COMP(1983, canonv20e,  canonv20, 0, canonv20,   msx,      driver_device, 0, "Can
 COMP(1983, canonv20f,  canonv20, 0, canonv20,   msx,      driver_device, 0, "Canon", "V-20F (MSX1)", 0) // Different french keyboard layout?
 COMP(1983, canonv20g,  canonv20, 0, canonv20,   msx,      driver_device, 0, "Canon", "V-20G (MSX1)", 0) // Different german keyboard layout?
 COMP(1983, canonv20s,  canonv20, 0, canonv20,   msx,      driver_device, 0, "Canon", "V-20S (MSX1)", 0) // Different spanish keyboard layout?
-COMP(198?, mx10,       0,        0, mx10,       msx,      driver_device, 0, "Casio", "MX-10 (MSX1)", 0)
-COMP(198?, mx101,      mx10,     0, mx101,      msx,      driver_device, 0, "Casio", "MX-101 (MSX1)", 0)
-COMP(198?, mx15,       mx10,     0, mx15,       msx,      driver_device, 0, "Casio", "MX-15 (MSX1)", 0)
+COMP(1984, mx10,       0,        0, mx10,       msx,      driver_device, 0, "Casio", "MX-10 (MSX1)", 0)
+COMP(1984, mx101,      mx10,     0, mx101,      msx,      driver_device, 0, "Casio", "MX-101 (MSX1)", 0)
+COMP(1984, mx15,       mx10,     0, mx15,       msx,      driver_device, 0, "Casio", "MX-15 (MSX1)", 0)
 COMP(1984, pv7,        0,        0, pv7,        msx,      driver_device, 0, "Casio", "PV-7 (MSX1)", 0)
 COMP(1984, pv16,       0,        0, pv16,       msx,      driver_device, 0, "Casio", "PV-16 (MSX1)", 0)
 COMP(198?, cpc88,      0,        0, cpc88,      msxkr,    driver_device, 0, "Daewoo", "CPC-88 (Korea) (MSX1)", 0)
@@ -8215,14 +8215,14 @@ COMP(1984, expert11,   expert13, 0, expert11,   expert11, driver_device, 0, "Gra
 COMP(1984, expert13,   0,        0, expert13,   expert11, driver_device, 0, "Gradiente", "Expert 1.3 (Brazil) (MSX1)", 0)
 COMP(1985, expertdp,   0,        0, expertdp,   expert11, driver_device, 0, "Gradiente", "Expert DDPlus (Brazil) (MSX1)", 0)
 COMP(1984, expertpl,   0,        0, expertpl,   expert11, driver_device, 0, "Gradiente", "Expert Plus (Brazil) (MSX1)", 0)
-COMP(198?, mbh2,       0,        0, mbh2,       msxjp,    driver_device, 0, "Hitachi", "MB-H2 (MSX1)", 0)
-COMP(198?, mbh25,      0,        0, mbh25,      msxjp,    driver_device, 0, "Hitachi", "MB-H25 (MSX1)", 0)
-COMP(198?, mbh50,      0,        0, mbh50,      msxjp,    driver_device, 0, "Hitachi", "MB-H50 (MSX1)", 0)
+COMP(1984, mbh2,       0,        0, mbh2,       msxjp,    driver_device, 0, "Hitachi", "MB-H2 (MSX1)", 0)
+COMP(1984, mbh25,      0,        0, mbh25,      msxjp,    driver_device, 0, "Hitachi", "MB-H25 (MSX1)", 0)
+COMP(1983, mbh50,      0,        0, mbh50,      msxjp,    driver_device, 0, "Hitachi", "MB-H50 (MSX1)", 0)
 COMP(1983, jvchc7gb,   0,        0, jvchc7gb,   msx,      driver_device, 0, "JVC", "HC-7GB (MSX1)", 0)
 COMP(198?, mlf48,      0,        0, mlf48,      msx,      driver_device, 0, "Mitsubishi", "ML-F48 (MSX1)", 0)
 COMP(1983, mlf80,      0,        0, mlf80,      msx,      driver_device, 0, "Mitsubishi", "ML-F80 (MSX1)", 0)
-COMP(198?, mlf110,     0,        0, mlf110,     msxjp,    driver_device, 0, "Mitsubishi", "ML-F110 (MSX1)", 0)
-COMP(198?, mlf120,     0,        0, mlf120,     msxjp,    driver_device, 0, "Mitsubishi", "ML-F120 (MSX1)", 0)
+COMP(1984, mlf110,     0,        0, mlf110,     msxjp,    driver_device, 0, "Mitsubishi", "ML-F110 (MSX1)", 0)
+COMP(1984, mlf120,     0,        0, mlf120,     msxjp,    driver_device, 0, "Mitsubishi", "ML-F120 (MSX1)", 0)
 COMP(1983, mlfx1,      0,        0, mlfx1,      msx,      driver_device, 0, "Mitsubishi", "ML-FX1 (MSX1)", 0)
 COMP(1984, cf1200,     0,        0, cf1200,     msxjp,    driver_device, 0, "National / Matsushita", "CF-1200 (Japan) (MSX1)", 0)
 COMP(1983, cf2000,     0,        0, cf2000,     msxjp,    driver_device, 0, "National / Matsushita", "CF-2000 (Japan) (MSX1)", 0)
@@ -8231,7 +8231,7 @@ COMP(1984, cf3000,     0,        0, cf3000,     msxjp,    driver_device, 0, "Nat
 COMP(1985, cf3300,     0,        0, cf3300,     msxjp,    driver_device, 0, "National / Matsushita", "CF-3300 (Japan) (MSX1)", 0)
 COMP(1985, fs1300,     0,        0, fs1300,     msxjp,    driver_device, 0, "National / Matsushita", "FS-1300 (Japan) (MSX1)", 0)
 COMP(1985, fs4000,     0,        0, fs4000,     msxjp,    driver_device, 0, "National / Matsushita", "FS-4000 (Japan) (MSX1)", 0)
-COMP(198?, fs4000a,    fs4000,   0, fs4000a,    msxjp,    driver_device, 0, "National / Matsushita", "FS-4000 (alt) (Japan) (MSX1)", 0)
+COMP(1985, fs4000a,    fs4000,   0, fs4000a,    msxjp,    driver_device, 0, "National / Matsushita", "FS-4000 (alt) (Japan) (MSX1)", 0)
 COMP(1983, phc2,       0,        0, phc2,       msx,      driver_device, 0, "Olympia", "PHC-2 (MSX1)" , 0)
 COMP(19??, phc28,      0,        0, phc28,      msx,      driver_device, 0, "Olympia", "PHC-28 (MSX1)", 0)
 COMP(1984, cf2700g,    0,        0, cf2700g,    msx,      driver_device, 0, "Panasonic", "CF-2700G (Germany) (MSX1)", 0)
@@ -8243,14 +8243,14 @@ COMP(1984, vg8010f,    vg8010,   0, vg8010f,    msx,      driver_device, 0, "Phi
 COMP(1985, vg802000,   vg802020, 0, vg802000,   msx,      driver_device, 0, "Philips", "VG-8020-00 (MSX1)", 0)
 COMP(1985, vg802020,   0,        0, vg802020,   msx,      driver_device, 0, "Philips", "VG-8020-20 (MSX1)", 0)
 COMP(19??, vg8020f,    vg802020, 0, vg8020f,    msx,      driver_device, 0, "Philips", "VG-8020F (MSX1)", 0)
-COMP(1985, piopx7,     0,        0, piopx7,     msx,      driver_device, 0, "Pioneer", "PX-07 (MSX1)", 0)
-COMP(198?, piopx7uk,   piopx7,   0, piopx7uk,   msx,      driver_device, 0, "Pioneer", "PX-07UK (MSX1)", 0)
-COMP(198?, piopxv60,   piopx7,   0, piopxv60,   msxjp,    driver_device, 0, "Pioneer", "PX-V60 (MSX1)", 0)
+COMP(1985, piopx7,     0,        0, piopx7,     msx,      driver_device, 0, "Pioneer", "PX-07 Palcom (MSX1)", 0)
+COMP(1985, piopx7uk,   piopx7,   0, piopx7uk,   msx,      driver_device, 0, "Pioneer", "PX-07UK Palcom (MSX1)", 0)
+COMP(1984, piopxv60,   piopx7,   0, piopxv60,   msxjp,    driver_device, 0, "Pioneer", "PX-V60 (MSX1)", 0)
 COMP(19??, spc800,     0,        0, spc800,     msx,      driver_device, 0, "Samsung", "SPC-800 (MSX1)", 0)
 COMP(1985, mpc64,      0,        0, mpc64,      msxjp,    driver_device, 0, "Sanyo", "MPC-64 (MSX1)", 0)
 COMP(1985, mpc100,     0,        0, mpc100,     msx,      driver_device, 0, "Sanyo", "MPC-100 (MSX1)", 0)
-COMP(198?, mpc200,     0,        0, mpc200,     msx,      driver_device, 0, "Sanyo", "MPC-200 (MSX1)", 0)
-COMP(198?, mpc200sp,   mpc200,   0, mpc200sp,   msx,      driver_device, 0, "Sanyo", "MPC-200SP (MSX1)", 0) // Spanish keyboard?
+COMP(1983, mpc200,     0,        0, mpc200,     msx,      driver_device, 0, "Sanyo", "MPC-200 (MSX1)", 0)
+COMP(1983, mpc200sp,   mpc200,   0, mpc200sp,   msx,      driver_device, 0, "Sanyo", "MPC-200SP (MSX1)", 0) // Spanish keyboard?
 COMP(1983, phc28l,     0,        0, phc28l,     msx,      driver_device, 0, "Sanyo", "PHC-28L (MSX1)", 0)
 COMP(1983, phc28s,     0,        0, phc28s,     msx,      driver_device, 0, "Sanyo", "PHC-28S (MSX1)", 0)
 COMP(19??, mpc10,      0,        0, mpc10,      msx,      driver_device, 0, "Sanyo", "Wavy MPC-10 (MSX1)", 0)
@@ -8273,26 +8273,26 @@ COMP(1983, hb75d,      hb75p,    0, hb75d,      msx,      driver_device, 0, "Son
 COMP(1983, hb75p,      0,        0, hb75p,      msx,      driver_device, 0, "Sony", "HB-75P (MSX1)", 0)
 COMP(1985, svi728,     0,        0, svi728,     msx,      driver_device, 0, "Spectravideo", "SVI-728 (MSX1)", 0)
 COMP(1985, svi738,     0,        0, svi738,     msx,      driver_device, 0, "Spectravideo", "SVI-738 (MSX1)", 0)
-COMP(198?, svi738ar,   svi738,   0, svi738ar,   msx,      driver_device, 0, "Spectravideo", "SVI-738 (Arabic) (MSX1)", 0)
-COMP(198?, svi738dk,   svi738,   0, svi738dk,   msx,      driver_device, 0, "Spectravideo", "SVI-738 (Denmark) (MSX1)", 0)
-COMP(198?, svi738sp,   svi738,   0, svi738sp,   msx,      driver_device, 0, "Spectravideo", "SVI-738 (Spain) (MSX1)", 0)
-COMP(1985, svi738sw,   svi738,   0, svi738sw,   msx,      driver_device, 0, "Spectravideo", "SVI-738 (Swedish) (MSX1)", 0)
-COMP(1985, svi738pl,   svi738,   0, svi738pl,   msx,      driver_device, 0, "Spectravideo", "SVI-738 (Poland) (MSX1)", 0)
+COMP(1983, svi738ar,   svi738,   0, svi738ar,   msx,      driver_device, 0, "Spectravideo", "SVI-738 (Arabic) (MSX1)", 0)
+COMP(1983, svi738dk,   svi738,   0, svi738dk,   msx,      driver_device, 0, "Spectravideo", "SVI-738 (Denmark) (MSX1)", 0)
+COMP(1983, svi738sp,   svi738,   0, svi738sp,   msx,      driver_device, 0, "Spectravideo", "SVI-738 (Spain) (MSX1)", 0)
+COMP(1983, svi738sw,   svi738,   0, svi738sw,   msx,      driver_device, 0, "Spectravideo", "SVI-738 (Swedish) (MSX1)", 0)
+COMP(1983, svi738pl,   svi738,   0, svi738pl,   msx,      driver_device, 0, "Spectravideo", "SVI-738 (Poland) (MSX1)", 0)
 COMP(1983, tadpc200,   dpc200,   0, tadpc200,   msx,      driver_device, 0, "Talent", "DPC-200 (MSX1)", 0)
 COMP(1983, tadpc20a,   dpc200,   0, tadpc20a,   msx,      driver_device, 0, "Talent", "DPC-200A (MSX1)", 0)
 COMP(1984, hx10,       0,        0, hx10,       msx,      driver_device, 0, "Toshiba", "HX-10 (MSX1)", 0)
-COMP(198?, hx10d,      hx10,     0, hx10d,      msxjp,    driver_device, 0, "Toshiba", "HX-10D (MSX1)", 0)
-COMP(198?, hx10dp,     hx10,     0, hx10dp,     msxjp,    driver_device, 0, "Toshiba", "HX-10DP (MSX1)", 0)
-COMP(198?, hx10e,      hx10,     0, hx10e,      msx,      driver_device, 0, "Toshiba", "HX-10E (MSX1)", 0)
-COMP(198?, hx10f,      hx10,     0, hx10f,      msx,      driver_device, 0, "Toshiba", "HX-10F (MSX1)", 0)
+COMP(1984, hx10d,      hx10,     0, hx10d,      msxjp,    driver_device, 0, "Toshiba", "HX-10D (MSX1)", 0)
+COMP(1984, hx10dp,     hx10,     0, hx10dp,     msxjp,    driver_device, 0, "Toshiba", "HX-10DP (MSX1)", 0)
+COMP(1984, hx10e,      hx10,     0, hx10e,      msx,      driver_device, 0, "Toshiba", "HX-10E (MSX1)", 0)
+COMP(1984, hx10f,      hx10,     0, hx10f,      msx,      driver_device, 0, "Toshiba", "HX-10F (MSX1)", 0)
 COMP(1984, hx10s,      hx10,     0, hx10s,      msx,      driver_device, 0, "Toshiba", "HX-10S (MSX1)", 0)
-COMP(198?, hx10sa,     hx10,     0, hx10sa,     msxjp,    driver_device, 0, "Toshiba", "HX-10SA (MSX1)", 0)
+COMP(1984, hx10sa,     hx10,     0, hx10sa,     msxjp,    driver_device, 0, "Toshiba", "HX-10SA (MSX1)", 0)
 COMP(1984, hx20,       0,        0, hx20,       msx,      driver_device, 0, "Toshiba", "HX-20 (MSX1)", 0)
-COMP(198?, hx20i,      hx20,     0, hx20i,      msx,      driver_device, 0, "Toshiba", "HX-20I (MSX1)", 0)
-COMP(198?, hx21,       0,        0, hx21,       msxjp,    driver_device, 0, "Toshiba", "HX-21 (MSX1)", GAME_NOT_WORKING) // Does not go into firmware
-COMP(198?, hx21i,      hx21,     0, hx21i,      msx,      driver_device, 0, "Toshiba", "HX-21I (MSX1)", 0)
-COMP(198?, hx22,       0,        0, hx22,       msxjp,    driver_device, 0, "Toshiba", "HX-22 (MSX1)", GAME_NOT_WORKING) // Does not go into firmware
-COMP(198?, hx22i,      hx22,     0, hx22i,      msx,      driver_device, 0, "Toshiba", "HX-22I (MSX1)", 0)
+COMP(1984, hx20i,      hx20,     0, hx20i,      msx,      driver_device, 0, "Toshiba", "HX-20I (MSX1)", 0)
+COMP(1984, hx21,       0,        0, hx21,       msxjp,    driver_device, 0, "Toshiba", "HX-21 (MSX1)", GAME_NOT_WORKING) // Does not go into firmware
+COMP(1984, hx21i,      hx21,     0, hx21i,      msx,      driver_device, 0, "Toshiba", "HX-21I (MSX1)", 0)
+COMP(1984, hx22,       0,        0, hx22,       msxjp,    driver_device, 0, "Toshiba", "HX-22 (MSX1)", GAME_NOT_WORKING) // Does not go into firmware
+COMP(1984, hx22i,      hx22,     0, hx22i,      msx,      driver_device, 0, "Toshiba", "HX-22I (MSX1)", 0)
 COMP(198?, hc5,        hc7,      0, hc5,        msxjp,    driver_device, 0, "Victor", "HC-5 (MSX1)", 0)
 COMP(198?, hc6,        hc7,      0, hc6,        msxjp,    driver_device, 0, "Victor", "HC-6 (MSX1)", 0)
 COMP(198?, hc7,        0,        0, hc7,        msxjp,    driver_device, 0, "Victor", "HC-7 (MSX1)", 0)
@@ -8327,10 +8327,10 @@ COMP(1991, cpg120,     0,        0, cpg120,     msx2kr,   driver_device, 0, "Dae
 COMP(198?, fpc900,     0,        0, fpc900,     msx2,     driver_device, 0, "Fenner", "FPC-900 (MSX2)", 0)
 COMP(1986, expert20,   0,        0, expert20,   msx2,     driver_device, 0, "Gradiente", "Expert 2.0 (Brazil) (MSX2)", 0)
 COMP(198?, mbh70,      0,        0, mbh70,      msx2jp,   driver_device, 0, "Hitachi", "MB-H70 (MSX2)", GAME_NOT_WORKING) // Firmware not working
-COMP(198?, kmc5000,    0,        0, kmc5000,    msx2jp,   driver_device, 0, "Kawai", "KMC-5000 (MSX2)", 0)
-COMP(198?, mlg1,       0,        0, mlg1,       msx2,     driver_device, 0, "Mitsubishi", "ML-G1 (MSX2)", 0)
+COMP(1987, kmc5000,    0,        0, kmc5000,    msx2jp,   driver_device, 0, "Kawai", "KMC-5000 (MSX2)", 0)
+COMP(1985, mlg1,       0,        0, mlg1,       msx2,     driver_device, 0, "Mitsubishi", "ML-G1 (MSX2)", 0)
 COMP(198?, mlg3,       0,        0, mlg3,       msx2,     driver_device, 0, "Mitsubishi", "ML-G3 (MSX2)", 0)
-COMP(198?, mlg10,      0,        0, mlg10,      msx2jp,   driver_device, 0, "Mitsubishi", "ML-G10 (MSX2)", 0)
+COMP(1985, mlg10,      0,        0, mlg10,      msx2jp,   driver_device, 0, "Mitsubishi", "ML-G10 (MSX2)", 0)
 COMP(1983, mlg30,      0,        0, mlg30,      msx2,     driver_device, 0, "Mitsubishi", "ML-G30 (MSX2)", 0)
 COMP(1985, fs5500f1,   fs5500f2, 0, fs5500f1,   msx2jp,   driver_device, 0, "National / Matsushita", "FS-5500F1 (Japan) (MSX2)", 0)
 COMP(1985, fs5500f2,   0,        0, fs5500f2,   msx2jp,   driver_device, 0, "National / Matsushita", "FS-5500F2 (Japan) (MSX2)", 0)
@@ -8353,14 +8353,14 @@ COMP(1986, vg8240,     0,        0, vg8240,     msx2,     driver_device, 0, "Phi
 COMP(1986, nms8245,    0,        0, nms8245,    msx2,     driver_device, 0, "Philips", "NMS-8245 (MSX2)", 0)
 COMP(1986, nms8245f,   nms8245,  0, nms8245f,   msx2,     driver_device, 0, "Philips", "NMS-8245F (MSX2)", 0)
 COMP(1986, nms8250,    nms8255,  0, nms8250,    msx2,     driver_device, 0, "Philips", "NMS-8250 (MSX2)", 0)
-COMP(198?, nms8250f,   nms8255,  0, nms8250f,   msx2,     driver_device, 0, "Philips", "NMS-8250F (MSX2)", 0) // French keyboard
+COMP(1986, nms8250f,   nms8255,  0, nms8250f,   msx2,     driver_device, 0, "Philips", "NMS-8250F (MSX2)", 0) // French keyboard
 COMP(19??, nms8250j,   nms8255,  0, nms8250j,   msx2jp,   driver_device, 0, "Philips", "NMS-8250J (MSX2)", 0)
 COMP(1986, nms8255,    0,        0, nms8255,    msx2,     driver_device, 0, "Philips", "NMS-8255 (MSX2)", 0)
-COMP(198?, nms8255f,   nms8255,  0, nms8255f,   msx2,     driver_device, 0, "Philips", "NMS-8255F (MSX2)", 0) // French keyboard
-COMP(198?, nms8260,    0,        0, nms8260,    msx2,     driver_device, 0, "Philips", "NMS-8260 (Prototype) (MSX2)", GAME_NOT_WORKING)
+COMP(1986, nms8255f,   nms8255,  0, nms8255f,   msx2,     driver_device, 0, "Philips", "NMS-8255F (MSX2)", 0) // French keyboard
+COMP(1986, nms8260,    0,        0, nms8260,    msx2,     driver_device, 0, "Philips", "NMS-8260 (Prototype) (MSX2)", GAME_NOT_WORKING)
 COMP(198?, nms8270,    0,        0, nms8270,    msx2,     driver_device, 0, "Philips", "NMS-8270 (Prototype) (MSX2)", GAME_NOT_WORKING)
 COMP(1986, nms8280,    0,        0, nms8280,    msx2,     driver_device, 0, "Philips", "NMS-8280 (MSX2)", 0)
-COMP(198?, nms8280f,   nms8280,  0, nms8280f,   msx2,     driver_device, 0, "Philips", "NMS-8280F (MSX2)", 0) // French keyboard
+COMP(1986, nms8280f,   nms8280,  0, nms8280f,   msx2,     driver_device, 0, "Philips", "NMS-8280F (MSX2)", 0) // French keyboard
 COMP(1986, nms8280g,   nms8280,  0, nms8280g,   msx2,     driver_device, 0, "Philips", "NMS-8280G (MSX2)", 0)
 COMP(19??, mpc2300,    0,        0, mpc2300,    msx2,     driver_device, 0, "Sanyo", "MPC-2300 (MSX2)", GAME_NOT_WORKING) // Keyboard responds differently
 COMP(198?, mpc2500f,   0,        0, mpc2500f,   msx2,     driver_device, 0, "Sanyo", "MPC-2500FD (MSX2)", GAME_NOT_WORKING) // Russian keyboard?
@@ -8395,19 +8395,19 @@ COMP(19??, tps312,     0,        0, tps312,     msx2,     driver_device, 0, "Tal
 COMP(1986, hx23,       hx23i,    0, hx23,       msx2,     driver_device, 0, "Toshiba", "HX-23 (MSX2)", 0)
 COMP(1986, hx23f,      hx23i,    0, hx23f,      msx2,     driver_device, 0, "Toshiba", "HX-23F (MSX2)", 0)
 COMP(190?, hx23i,      0,        0, hx23i,      msx2,     driver_device, 0, "Toshiba", "HX-23I (MSX2)", 0)
-COMP(198?, hx33,       0,        0, hx33,       msx2jp,   driver_device, 0, "Toshiba", "HX-33 (MSX2)", 0)
-COMP(198?, hx34,       hx34i,    0, hx34,       msx2jp,   driver_device, 0, "Toshiba", "HX-34 (MSX2)", 0)
-COMP(198?, hx34i,      0,        0, hx34i,      msx,      driver_device, 0, "Toshiba", "HX-34I (MSX2)", 0)
+COMP(1985, hx33,       0,        0, hx33,       msx2jp,   driver_device, 0, "Toshiba", "HX-33 (MSX2)", 0)
+COMP(1985, hx34,       hx34i,    0, hx34,       msx2jp,   driver_device, 0, "Toshiba", "HX-34 (MSX2)", 0)
+COMP(1985, hx34i,      0,        0, hx34i,      msx,      driver_device, 0, "Toshiba", "HX-34I (MSX2)", 0)
 COMP(1985, fstm1,      0,        0, fstm1,      msx,      driver_device, 0, "Toshiba", "FS-TM1 (MSX2)", 0)
 COMP(198?, victhc90,   victhc95, 0, victhc90,   msxjp,    driver_device, 0, "Victor", "HC-90 (MSX2)", GAME_NOT_WORKING) // 2nd cpu/turbo not emulated, firmware won't start
-COMP(198?, victhc95,   0,        0, victhc95,   msxjp,    driver_device, 0, "Victor", "HC-95 (MSX2)", GAME_NOT_WORKING) // 2nd cpu/turbo not emulated, firmware won't start
-COMP(198?, victhc95a,  victhc95, 0, victhc95a,  msxjp,    driver_device, 0, "Victor", "HC-95A (MSX2)", GAME_NOT_WORKING) // 2nd cpu/turbo not emulated, firmware won't start
+COMP(1986, victhc95,   0,        0, victhc95,   msxjp,    driver_device, 0, "Victor", "HC-95 (MSX2)", GAME_NOT_WORKING) // 2nd cpu/turbo not emulated, firmware won't start
+COMP(1986, victhc95a,  victhc95, 0, victhc95a,  msxjp,    driver_device, 0, "Victor", "HC-95A (MSX2)", GAME_NOT_WORKING) // 2nd cpu/turbo not emulated, firmware won't start
 COMP(1986, cx7m,       cx7m128,  0, cx7m,       msx2,     driver_device, 0, "Yamaha", "CX7M (MSX2)", 0)
 COMP(1986, cx7m128,    0,        0, cx7m128,    msx2,     driver_device, 0, "Yamaha", "CX7M/128 (MSX2)", 0)
 COMP(198?, y503iiir,   0,        0, y503iiir,   msx2,     driver_device, 0, "Yamaha", "YIS-503 III R (Russian) (MSX2)", GAME_NOT_WORKING) // Russian keyboard, floppy support broken
 COMP(198?, y503iiire,  y503iiir, 0, y503iiire,  msx2,     driver_device, 0, "Yamaha", "YIS-503 III R (Estonian) (MSX2)", GAME_NOT_WORKING) // Russian/Estonian keyboard, floppy support broken
-COMP(198?, yis60464,   yis604,   0, yis60464,   msx2jp,   driver_device, 0, "Yamaha", "YIS604 (64KB) (MSX2)", 0)
-COMP(198?, yis604,     0,        0, yis604,     msx2jp,   driver_device, 0, "Yamaha", "YIS604 (128KB) (MSX2)", 0)
+COMP(1985, yis60464,   yis604,   0, yis60464,   msx2jp,   driver_device, 0, "Yamaha", "YIS604 (64KB) (MSX2)", 0)
+COMP(1985, yis604,     0,        0, yis604,     msx2jp,   driver_device, 0, "Yamaha", "YIS604 (128KB) (MSX2)", 0)
 COMP(198?, y805128,    y805256,  0, y805128,    msx2jp,   driver_device, 0, "Yamaha", "YIS805/128 (Russian) (MSX2)", GAME_NOT_WORKING) // Floppy support broken
 COMP(198?, y805128r2,  y805256,  0, y805128r2,  msx2jp,   driver_device, 0, "Yamaha", "YIS805R2/128 (Russian) (MSX2)", GAME_NOT_WORKING) // Floppy support broken
 COMP(198?, y805128r2e, y805256,  0, y805128r2e, msx2jp,   driver_device, 0, "Yamaha", "YIS805R2/128 (Estonian) (MSX2)", GAME_NOT_WORKING) // Floppy support broken
