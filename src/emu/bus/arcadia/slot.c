@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:etabeta
 /***********************************************************************************************************
 
     Emerson Arcadia 2001 (and clones) cart emulation

@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:etabeta
 /**********************************************************************
 
     Generic ROM/RAM socket slots

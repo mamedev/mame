@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:etabeta
 #ifndef __VC4000_ROM_H
 #define __VC4000_ROM_H
 

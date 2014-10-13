@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:etabeta
 #ifndef __O2_VOICE_H
 #define __O2_VOICE_H
 

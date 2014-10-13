@@ -1,8 +1,22 @@
+// license:BSD-3-Clause
+// copyright-holders:etabeta
 /***********************************************************************************************************
 
    Generic ROM / RAM Socket and Cartslot device
  
    This device offers basic RAM / ROM allocation and access
+
+   The available handlers are suited for any situation where a system opens a
+   "window" over a ROM or RAM area and we want to access it during emulation.
+
+   This device is not suited whenever the system exposes additional lines to
+   the socket/slot: e.g. whenever input/output lines are present, whenever
+   there are lines controlling bankswitch / paging, and whenever different
+   cart configurations have to be supported (like some PCBs containing ROM 
+   only, and other containing both ROM and RAM)
+   In the latter situations, per-system slot devices have to be created (see
+   e.g. APF cart slot device for an example of a simple device with multiple
+   pcbs supported)
  
  ***********************************************************************************************************/
 

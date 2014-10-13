@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:etabeta
 #ifndef __GENERIC_RAM_H
 #define __GENERIC_RAM_H
 

@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:etabeta
 #ifndef __CRVISION_ROM_H
 #define __CRVISION_ROM_H
 

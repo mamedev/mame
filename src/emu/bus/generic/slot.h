@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:etabeta
 #ifndef __GENERIC_SLOT_H
 #define __GENERIC_SLOT_H
 

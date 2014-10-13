@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:etabeta
 #ifndef __APF_ROM_H
 #define __APF_ROM_H
 

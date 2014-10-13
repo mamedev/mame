@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:etabeta
 #ifndef __VBOY_SLOT_H
 #define __VBOY_SLOT_H
 
