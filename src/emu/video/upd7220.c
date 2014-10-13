@@ -825,7 +825,7 @@ void upd7220_device::draw_line(int x, int y)
 
 void upd7220_device::draw_arc(int x, int y)
 {
-	int len, xi = m_figs.m_d + 1, yi = 0, err = -m_figs.m_d;
+	int xi = m_figs.m_d + 1, yi = 0, err = -m_figs.m_d;
 	int x0, y0;
 	UINT16 pattern = (m_ra[8]) | (m_ra[9]<<8);
 	const int dot_dir[4] = {1, -1, -1, 1};
