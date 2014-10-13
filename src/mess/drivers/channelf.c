@@ -173,6 +173,7 @@ void channelf_state::machine_start()
 				m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x2800, 0x2fff, read8_delegate(FUNC(channelf_cart_slot_device::read_ram),(channelf_cart_slot_device*)m_cart), write8_delegate(FUNC(channelf_cart_slot_device::write_ram),(channelf_cart_slot_device*)m_cart));
 				break;
 			case CF_MULTI:
+			case CF_MULTI_OLD:
 				m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x2800, 0x2fff, read8_delegate(FUNC(channelf_cart_slot_device::read_ram),(channelf_cart_slot_device*)m_cart), write8_delegate(FUNC(channelf_cart_slot_device::write_ram),(channelf_cart_slot_device*)m_cart));
 				m_maincpu->space(AS_PROGRAM).install_write_handler(0x3000, 0x3fff, write8_delegate(FUNC(channelf_cart_slot_device::write_bank),(channelf_cart_slot_device*)m_cart));
 				break;
@@ -187,7 +188,8 @@ static SLOT_INTERFACE_START(cf_cart)
 	SLOT_INTERFACE_INTERNAL("maze",     CHANF_ROM_MAZE)
 	SLOT_INTERFACE_INTERNAL("hangman",  CHANF_ROM_HANGMAN)
 	SLOT_INTERFACE_INTERNAL("chess",    CHANF_ROM_CHESS)
-	SLOT_INTERFACE_INTERNAL("multi",    CHANF_ROM_MULTI)
+	SLOT_INTERFACE_INTERNAL("multi_old",CHANF_ROM_MULTI_OLD)
+	SLOT_INTERFACE_INTERNAL("multi",    CHANF_ROM_MULTI_FINAL)
 SLOT_INTERFACE_END
 
 

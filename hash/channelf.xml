@@ -530,14 +530,26 @@
 	</software>
 
 
-	<software name="multicrt">
-		<description>Channel F Multi-Cart</description>
+	<software name="multicrt" supported="partial">
+		<description>Channel F Multi-Cart (Final)</description>
 		<year>2004</year>
 		<publisher>&lt;homebrew&gt;</publisher>
 		<part name="cart" interface="channelf_cart">
 			<feature name="slot" value="multi" />
 			<dataarea name="rom" size="262144">
 				<rom name="multigame rom.bin" size="262144" crc="a1ecbd58" sha1="d8d266846a01db69c0bb436093634ada7558f37f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="multicrto" cloneof="multicrt" supported="partial">
+		<description>Channel F Multi-Cart (Older)</description>
+		<year>2004</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<part name="cart" interface="channelf_cart">
+			<feature name="slot" value="multi_old" />
+			<dataarea name="rom" size="262144">
+				<rom name="multigame older.bin" size="262144" crc="ad4ebe3f" sha1="6064489fd4ba0b95fa4effcd8ee971751504c63f" offset="0" />
 			</dataarea>
 		</part>
 	</software>

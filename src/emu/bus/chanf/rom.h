@@ -84,13 +84,13 @@ public:
 };
 
 
-// ======================> chanf_multi_device
+// ======================> chanf_multi_old_device
 
-class chanf_multi_device : public chanf_rom_device
+class chanf_multi_old_device : public chanf_rom_device
 {
 public:
 	// construction/destruction
-	chanf_multi_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	chanf_multi_old_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	
 	// device-level overrides
 	virtual void device_start();
@@ -107,13 +107,36 @@ private:
 };
 
 
+// ======================> chanf_multi_final_device
+
+class chanf_multi_final_device : public chanf_rom_device
+{
+public:
+	// construction/destruction
+	chanf_multi_final_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	
+	// device-level overrides
+	virtual void device_start();
+	virtual void device_reset();
+	
+	// reading and writing
+	virtual DECLARE_READ8_MEMBER(read_rom);
+	virtual DECLARE_READ8_MEMBER(read_ram) { return common_read_3853(offset); }
+	virtual DECLARE_WRITE8_MEMBER(write_ram) { common_write_3853(offset, data); }
+	virtual DECLARE_WRITE8_MEMBER(write_bank);
+	
+private:
+	int m_base_bank, m_half_bank;
+};
+
 
 // device type definition
 extern const device_type CHANF_ROM_STD;
 extern const device_type CHANF_ROM_MAZE;
 extern const device_type CHANF_ROM_HANGMAN;
 extern const device_type CHANF_ROM_CHESS;
-extern const device_type CHANF_ROM_MULTI;
+extern const device_type CHANF_ROM_MULTI_OLD;
+extern const device_type CHANF_ROM_MULTI_FINAL;
 
 
 #endif

@@ -13,6 +13,7 @@ enum
 	CF_MAZE,
 	CF_HANGMAN,
 	CF_CHESS,
+	CF_MULTI_OLD,
 	CF_MULTI
 };
 

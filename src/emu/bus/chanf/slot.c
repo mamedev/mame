@@ -124,11 +124,12 @@ struct chanf_slot
 // Here, we take the feature attribute from .xml (i.e. the PCB name) and we assign a unique ID to it
 static const chanf_slot slot_list[] =
 {
-	{ CF_STD,     "std" },
-	{ CF_MAZE,    "maze" },
-	{ CF_HANGMAN, "hangman" },
-	{ CF_CHESS,   "chess" },
-	{ CF_MULTI,   "multi" }
+	{ CF_STD,      "std" },
+	{ CF_MAZE,     "maze" },
+	{ CF_HANGMAN,  "hangman" },
+	{ CF_CHESS,    "chess" },
+	{ CF_MULTI_OLD,"multi_old" },
+	{ CF_MULTI,    "multi" }
 };
 
 static int chanf_get_pcb_id(const char *slot)
@@ -175,9 +176,9 @@ bool channelf_cart_slot_device::call_load()
 			// we default to "chess" slot because some homebrew programs have been written to run
 			// on PCBs with RAM at $2000-$2800 as Saba Schach!
 			if (len == 0x40000)
-				m_type = CF_MULTI;
+				m_type = CF_MULTI;	// TODO1: differentiate multicart final and earlier from fullpath
 			else
-				m_type = CF_CHESS;	// is there any way to detect Maze and Hangman from fullpath?
+				m_type = CF_CHESS;	// TODO2: is there any way to detect Maze and Hangman from fullpath?
 
 			m_cart->ram_alloc(0x800);
 		}
