@@ -21,18 +21,18 @@ Game Title                            Year     Program CD       6/7/8 use DVD   
 -----------------------------------------------------------------------------------------------------
 beatmania IIDX (English)              1999     GQ863 A01        GQ863 A04      *863 A02     ?
 beatmania IIDX (Japanese)             1999     GQ863-JA B01     GQ863 A04      *863 A02     ?
-beatmania IIDX + DDR Club Kit         1999     896 JA ABM       *?             *?           *?
-beatmania IIDX + DDR Club Kit(newer)  1999     896 JA BBM       *?             *?           *?
+beatmania IIDX + DDR Club Kit         1999     896 JA ABM       *?             *?           ?
+beatmania IIDX + DDR Club Kit(newer)  1999     896 JA BBM       *?             *?           ?
 beatmania IIDX Substream              1999     *?               GC983 A04      *?           ?
-beatmania IIDX Club Version 2         1999     GE984 A01(BM)    *?             *984 A02     *?
+beatmania IIDX Club Version 2         1999     GE984 A01(BM)    *?             *984 A02     ?
                                              + GE984 A01(DDR)
 beatmania IIDX 2nd Style              1999     GC985 A01        GC985 A04      *           *985 HDD A01
-beatmania IIDX 3rd Style              2000     GC992-JA A01     *GC992-JA A04  *           *992 HDD A01
-beatmania IIDX 3rd Style(newer)       2000     *GC992-JA C01    *GC992-JA A04  *           *992 HDD A01
+beatmania IIDX 3rd Style              2000     GC992-JA A01     GC992-JA A04   *           *992 HDD A01
+beatmania IIDX 3rd Style(newer)       2000     GC992-JA C01     GC992-JA A04   *           *992 HDD A01
 beatmania IIDX 4th Style              2000     A03 JA A01       A03 JA A02     *A03        A03 JA A03
 beatmania IIDX 5th Style              2001     A17 JA A01       A17 JA A02     *           *A17 JA A03
 beatmania IIDX 6th Style              2001     B4U JA A01       B4U JA A02     *           B4U JA A03
-beatmania IIDX 6th Style(newer)       2001     *B4U JA B01      B4U JA A02     *           B4U JA A03
+beatmania IIDX 6th Style(newer)       2001     B4U JA B01       B4U JA A02     *           B4U JA A03
 beatmania IIDX 7th Style              2002     B44 JA A01       B44 JA A02     *           B44 JA A03
 beatmania IIDX 8th Style              2002     C44 JA A01       C44 JA A02     *C44        C44 JA A03
 
@@ -708,11 +708,8 @@ WRITE8_MEMBER(twinkle_state::shared_psx_w)
 			{
 				strcpy((char *)&m_spu_hle[0x204], "GQ863JA_A");
 			}
-			else if (strcmp(machine().system().name, "bmiidxs") == 0)
-			{
-				strcpy((char *)&m_spu_hle[0x204], "GC983JA_A");
-			}
-			else if (strcmp(machine().system().name, "bmiidxc2") == 0)
+			else if (strcmp(machine().system().name, "bmiidxs") == 0 ||
+				strcmp(machine().system().name, "bmiidxc2") == 0)
 			{
 				strcpy((char *)&m_spu_hle[0x204], "GC983JA_R");
 			}
@@ -1219,10 +1216,10 @@ ROM_START( bmiidx3 )
 	ROM_LOAD( "992a02", 0x000000, 0x000100, BAD_DUMP CRC(51f24913) SHA1(574b555e3d0c234011198d218d7ae5e95091acb1) )
 
 	DISK_REGION( "scsi:" SCSI_PORT_DEVICE1 ":cdrom" )
-	DISK_IMAGE_READONLY( "gc992-jac01", 0, NO_DUMP )
+	DISK_IMAGE_READONLY( "gc992-jac01", 0, SHA1(c02d6e58439be678ec0d7171eae2dfd53a21acc7) )
 
 	DISK_REGION( "cdrom1" ) // video CD
-	DISK_IMAGE_READONLY( "gc992-jaa04", 0, NO_DUMP )
+	DISK_IMAGE_READONLY( "gc992-jaa04", 0, SHA1(66d0b9ac793ff3fdddd0aa2aa5f2809d0c295944) )
 
 	DISK_REGION( "ata:0:hdd:image" )
 	DISK_IMAGE_READONLY( "992hdda01", 0, NO_DUMP )
@@ -1238,7 +1235,7 @@ ROM_START( bmiidx3a )
 	DISK_IMAGE_READONLY( "gc992-jaa01", 0, BAD_DUMP SHA1(7e5389735dff379bb286ba3744edf59b7dfcc74b) )
 
 	DISK_REGION( "cdrom1" ) // video CD
-	DISK_IMAGE_READONLY( "gc992-jaa04", 0, NO_DUMP )
+	DISK_IMAGE_READONLY( "gc992-jaa04", 0, SHA1(66d0b9ac793ff3fdddd0aa2aa5f2809d0c295944) )
 
 	DISK_REGION( "ata:0:hdd:image" )
 	DISK_IMAGE_READONLY( "992hdda01", 0, NO_DUMP )
@@ -1251,7 +1248,7 @@ ROM_START( bmiidx4 )
 	ROM_LOAD( "a03", 0x000000, 0x000100, BAD_DUMP CRC(8860cfb6) SHA1(85a5b27f24d4baa7960e692b91c0cf3dc5388e72) )
 
 	DISK_REGION( "scsi:" SCSI_PORT_DEVICE1 ":cdrom" )
-	DISK_IMAGE_READONLY( "a03jaa01", 0, SHA1(f54fc778c2187ccd950402a159babef956b71492   ) )
+	DISK_IMAGE_READONLY( "a03jaa01", 0, SHA1(f54fc778c2187ccd950402a159babef956b71492) )
 
 	DISK_REGION( "cdrom1" ) // video CD
 	DISK_IMAGE_READONLY( "a03jaa02", 0, SHA1(d6f01d666e8de285a02215f7ef987073e2b25019) )
@@ -1267,10 +1264,10 @@ ROM_START( bmiidx5 )
 	ROM_LOAD( "a17", 0x000000, 0x000100, BAD_DUMP CRC(9428afb0) SHA1(ba907d3361256b022583d6a42fe223e90590e3c6) )
 
 	DISK_REGION( "scsi:" SCSI_PORT_DEVICE1 ":cdrom" )
-	DISK_IMAGE_READONLY( "a17jaa01", 0, BAD_DUMP SHA1(9f552eaa0acbdbddf93cabe99f8f829afbf29e02) )
+	DISK_IMAGE_READONLY( "a17jaa01", 0, SHA1(5ac46973b42b2c66ae63297d1a7fd69b33ef4d1d) )
 
 	DISK_REGION( "cdrom1" ) // video CD
-	DISK_IMAGE_READONLY( "a17jaa02", 0, BAD_DUMP SHA1(767554dcc879bfc87df0d86384d8c850bafefad2) )
+	DISK_IMAGE_READONLY( "a17jaa02", 0, SHA1(cc24a4c3f5e7c77dbeee7db94c0cc8a330e2b51b) )
 
 	DISK_REGION( "ata:0:hdd:image" )
 	DISK_IMAGE_READONLY( "a17jaa03", 0, NO_DUMP )
@@ -1283,7 +1280,7 @@ ROM_START( bmiidx6 )
 	ROM_LOAD( "b4u", 0x000000, 0x000100, BAD_DUMP CRC(0ab15633) SHA1(df004ff41f35b16089f69808ccf53a5e5cc13ac3) )
 
 	DISK_REGION( "scsi:" SCSI_PORT_DEVICE1 ":cdrom" )
-	DISK_IMAGE_READONLY( "b4ujab01", 0, NO_DUMP )
+	DISK_IMAGE_READONLY( "b4ujab01", 0, SHA1(aaae77f473c4a44ce6838da3ef6dab27e4afa0e4) )
 
 	DISK_REGION( "cdrom1" ) // DVD
 	DISK_IMAGE_READONLY( "b4ujaa02", 0, SHA1(70c85f6df6f21b96c02e4eefc224593edcaf9e63) )
@@ -1401,7 +1398,7 @@ ROM_START( bmiidxc2 )
 	DISK_IMAGE_READONLY( "ge984a04", 0, NO_DUMP )
 
 	DISK_REGION( "ata:0:hdd:image" )
-	DISK_IMAGE_READONLY( "984hdda01", 0, NO_DUMP )
+	DISK_IMAGE_READONLY( "983hdda01", 0, SHA1(bcbbf55acf8bebc5773ffc5769420a0129f4da57) )
 ROM_END
 
 GAME( 1999, gq863,    0,       twinkle,  twinkle,  driver_device, 0,        ROT0, "Konami", "Twinkle System", GAME_IS_BIOS_ROOT )
@@ -1411,7 +1408,7 @@ GAME( 1999, bmiidxa,  bmiidx,  twinklex, twinklex, driver_device, 0,        ROT0
 GAME( 1999, bmiidxc,  gq863,   twinklex, twinklex, driver_device, 0,        ROT0, "Konami", "beatmania IIDX with DDR 2nd Club Version (896 JAB)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )
 GAME( 1999, bmiidxca, bmiidxc, twinklex, twinklex, driver_device, 0,        ROT0, "Konami", "beatmania IIDX with DDR 2nd Club Version (896 JAA)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )
 GAME( 1999, bmiidxs,  gq863,   twinklex, twinklex, driver_device, 0,        ROT0, "Konami", "beatmania IIDX Substream (983 JAA)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )
-GAME( 1999, bmiidxc2, gq863,   twinklex, twinklex, driver_device, 0,        ROT0, "Konami", "Beatmania IIDX Substream with DDR 2nd Club Version 2 (984 A01 BM)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )
+GAME( 1999, bmiidxc2, gq863,   twinklex, twinklex, driver_device, 0,        ROT0, "Konami", "beatmania IIDX Substream with DDR 2nd Club Version 2 (984 A01 BM)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )
 GAME( 1999, bmiidx2,  gq863,   twinklei, twinklei, driver_device, 0,        ROT0, "Konami", "beatmania IIDX 2nd style (GC985 JAA)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )
 GAME( 2000, bmiidx3,  gq863,   twinklei, twinklei, driver_device, 0,        ROT0, "Konami", "beatmania IIDX 3rd style (GC992 JAC)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )
 GAME( 2000, bmiidx3a, bmiidx3, twinklei, twinklei, driver_device, 0,        ROT0, "Konami", "beatmania IIDX 3rd style (GC992 JAA)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )
