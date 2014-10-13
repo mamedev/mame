@@ -5771,95 +5771,49 @@ DRIVER_INIT_MEMBER(model3_state,getbass)
 
 DRIVER_INIT_MEMBER(model3_state,vs2)
 {
-	UINT32 *rom = (UINT32*)memregion("user1")->base();
-
 	DRIVER_INIT_CALL(model3_20);
-
-	rom[(0x705884^4)/4] = 0x60000000;
-	rom[(0x7058a4^4)/4] = 0x60000000;
 }
 
 DRIVER_INIT_MEMBER(model3_state,vs298)
 {
-	UINT32 *rom = (UINT32*)memregion("user1")->base();
-
 	DRIVER_INIT_CALL(model3_20);
-
-	rom[(0x603868^4)/4] = 0x60000000;
-	rom[(0x603888^4)/4] = 0x60000000;
 }
 
 
 DRIVER_INIT_MEMBER(model3_state,vs2v991)
 {
-	UINT32 *rom = (UINT32*)memregion("user1")->base();
-
 	DRIVER_INIT_CALL(model3_20);
-
-	rom[(0x603868^4)/4] = 0x60000000;
-	rom[(0x603888^4)/4] = 0x60000000;
 }
 
 DRIVER_INIT_MEMBER(model3_state,vs299b)
 {
-	UINT32 *rom = (UINT32*)memregion("user1")->base();
-
 	DRIVER_INIT_CALL(model3_20);
-
-	rom[(0x603868^4)/4] = 0x60000000;
-	rom[(0x603888^4)/4] = 0x60000000;
 }
 
 DRIVER_INIT_MEMBER(model3_state,vs299a)
 {
-	UINT32 *rom = (UINT32*)memregion("user1")->base();
-
 	DRIVER_INIT_CALL(model3_20);
-
-	rom[(0x603868^4)/4] = 0x60000000;
-	rom[(0x603888^4)/4] = 0x60000000;
 }
 
 DRIVER_INIT_MEMBER(model3_state,vs299)
 {
-	UINT32 *rom = (UINT32*)memregion("user1")->base();
-
 	DRIVER_INIT_CALL(model3_20);
-
-	rom[(0x603868^4)/4] = 0x60000000;
-	rom[(0x603888^4)/4] = 0x60000000;
 }
 
 DRIVER_INIT_MEMBER(model3_state,harley)
 {
-	UINT32 *rom = (UINT32*)memregion("user1")->base();
 	DRIVER_INIT_CALL(model3_20);
 
 	m_network_ram = auto_alloc_array_clear(machine(), UINT64, 0x10000);
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xc0000000, 0xc00fffff, read64_delegate(FUNC(model3_state::network_r),this), write64_delegate(FUNC(model3_state::network_w),this));
-
-	rom[(0x50ecb4^4)/4] = 0x60000000;
-	rom[(0x50ecd4^4)/4] = 0x60000000;
-	rom[(0x50ff64^4)/4] = 0x60000000;
-	//rom[(0x4f736c^4)/4] = 0x60000000; // Fix ME!! Needs to be updated for the REV B version!!
-	//rom[(0x4f738c^4)/4] = 0x60000000; // Fix ME!! Needs to be updated for the REV B version!!
 }
 
 DRIVER_INIT_MEMBER(model3_state,harleya)
 {
-	//UINT32 *rom = (UINT32*)memregion("user1")->base();
 	DRIVER_INIT_CALL(model3_20);
 
 	m_network_ram = auto_alloc_array_clear(machine(), UINT64, 0x10000);
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xc0000000, 0xc00fffff, read64_delegate(FUNC(model3_state::network_r),this), write64_delegate(FUNC(model3_state::network_w),this));
-
-	/*
-	rom[(0x50e8d4^4)/4] = 0x60000000;
-	rom[(0x50e8f4^4)/4] = 0x60000000;
-	rom[(0x50fb84^4)/4] = 0x60000000;
-	rom[(0x4f736c^4)/4] = 0x60000000;
-	rom[(0x4f738c^4)/4] = 0x60000000;
-	*/
 }
 
 
@@ -5962,13 +5916,7 @@ DRIVER_INIT_MEMBER(model3_state,spikeofe)
 
 DRIVER_INIT_MEMBER(model3_state,eca)
 {
-//	UINT32 *rom = (UINT32*)memregion("user1")->base();
 	DRIVER_INIT_CALL(model3_20);
-
-	/*
-	rom[(0x535560^4)/4] = 0x60000000;
-	rom[(0x535580^4)/4] = 0x60000000;	
-	*/
 }
 
 DRIVER_INIT_MEMBER(model3_state,skichamp)
