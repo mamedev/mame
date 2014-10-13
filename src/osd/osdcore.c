@@ -470,6 +470,13 @@ void osd_write_midi_channel(osd_midi_device *dev, UINT8 data)
 
 //  printf("write: %02x (%d)\n", data, dev->xmit_cnt);
 
+	// reject data bytes when no valid status exists
+	if ((dev->last_status == 0) && !(data & 0x80))
+	{
+		dev->xmit_cnt = 0;
+		return;
+	}
+
 	if (dev->xmit_cnt >= 4)
 	{
 		printf("MIDI out: packet assembly overflow, contact MAMEdev!\n");
