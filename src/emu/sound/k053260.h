@@ -100,7 +100,7 @@ private:
 		// bit packed registers
 		UINT8  m_pan;
 		bool   m_loop;
-		bool   m_kadpcm;
+		int    m_kadpcm;
 	} m_voice[4];
 
 	friend class k053260_device::KDSC_Voice;

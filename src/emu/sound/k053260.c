@@ -325,7 +325,7 @@ void k053260_device::KDSC_Voice::voice_reset()
 	m_volume = 0;
 	m_pan = 0;
 	m_loop = false;
-	m_kadpcm = false;
+	m_kadpcm = 0;
 	update_pan_volume();
 }
 
