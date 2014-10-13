@@ -4,7 +4,6 @@
 
 const device_type ST0016_CPU = &device_creator<st0016_cpu_device>;
 
-UINT8 *st0016_charram; // todo, get it in the device
 UINT8 macs_cart_slot;
 
 
@@ -103,10 +102,10 @@ void st0016_cpu_device::device_reset()
 	}
 }
 
-static const st0016_interface st0016_config =
+READ8_MEMBER(st0016_cpu_device::soundram_read)
 {
-	&st0016_charram
-};
+	return m_charram[offset];
+}
 
 static GFXDECODE_START( st0016 )
 GFXDECODE_END
@@ -118,8 +117,8 @@ static MACHINE_CONFIG_FRAGMENT( st0016_cpu )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", st0016)
 	MCFG_PALETTE_ADD("palette", 16*16*4+1)
 
-	MCFG_ST0016_ADD("stsnd", 0)
-	MCFG_SOUND_CONFIG(st0016_config)
+	MCFG_DEVICE_ADD("stsnd", ST0016, 0)
+	MCFG_ST0016_SOUNDRAM_READ_CB(READ8(st0016_cpu_device, soundram_read))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
@@ -223,12 +222,12 @@ WRITE8_MEMBER(st0016_cpu_device::st0016_palette_ram_w)
 
 READ8_MEMBER(st0016_cpu_device::st0016_character_ram_r)
 {
-	return st0016_charram[ST0016_CHAR_BANK_SIZE*st0016_char_bank+offset];
+	return m_charram[ST0016_CHAR_BANK_SIZE*st0016_char_bank+offset];
 }
 
 WRITE8_MEMBER(st0016_cpu_device::st0016_character_ram_w)
 {
-	st0016_charram[ST0016_CHAR_BANK_SIZE*st0016_char_bank+offset]=data;
+	m_charram[ST0016_CHAR_BANK_SIZE*st0016_char_bank+offset]=data;
 	m_gfxdecode->gfx(st0016_ramgfx)->mark_dirty(st0016_char_bank);
 }
 
@@ -569,7 +568,7 @@ void st0016_cpu_device::st0016_save_init()
 	save_item(NAME(st0016_char_bank));
 	//save_item(NAME(st0016_rom_bank));
 	save_item(NAME(st0016_vregs));
-	save_pointer(NAME(st0016_charram), ST0016_MAX_CHAR_BANK*ST0016_CHAR_BANK_SIZE);
+	save_pointer(NAME(m_charram), ST0016_MAX_CHAR_BANK*ST0016_CHAR_BANK_SIZE);
 	save_pointer(NAME(st0016_paletteram), ST0016_MAX_PAL_BANK*ST0016_PAL_BANK_SIZE);
 	save_pointer(NAME(st0016_spriteram), ST0016_MAX_SPR_BANK*ST0016_SPR_BANK_SIZE);
 }
@@ -580,7 +579,7 @@ void st0016_cpu_device::startup()
 	int gfx_index=0;
 
 	macs_cart_slot = 0;
-	st0016_charram=auto_alloc_array_clear(machine(), UINT8, ST0016_MAX_CHAR_BANK*ST0016_CHAR_BANK_SIZE);
+	m_charram=auto_alloc_array_clear(machine(), UINT8, ST0016_MAX_CHAR_BANK*ST0016_CHAR_BANK_SIZE);
 	st0016_spriteram=auto_alloc_array_clear(machine(), UINT8, ST0016_MAX_SPR_BANK*ST0016_SPR_BANK_SIZE);
 	st0016_paletteram=auto_alloc_array_clear(machine(), UINT8, ST0016_MAX_PAL_BANK*ST0016_PAL_BANK_SIZE);
 
@@ -592,7 +591,7 @@ void st0016_cpu_device::startup()
 	assert(gfx_index != MAX_GFX_ELEMENTS);
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
-	m_gfxdecode->set_gfx(gfx_index, global_alloc(gfx_element(m_palette, charlayout, (UINT8 *) st0016_charram, 0, 0x40, 0)));
+	m_gfxdecode->set_gfx(gfx_index, global_alloc(gfx_element(m_palette, charlayout, (UINT8 *) m_charram, 0, 0x40, 0)));
 	st0016_ramgfx = gfx_index;
 
 	spr_dx=0;

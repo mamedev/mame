@@ -51,6 +51,8 @@ public:
 	DECLARE_READ8_MEMBER(st0016_vregs_r);
 	DECLARE_READ8_MEMBER(st0016_dma_r);
 	DECLARE_WRITE8_MEMBER(st0016_vregs_w);
+	DECLARE_READ8_MEMBER(soundram_read);
+
 	
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void st0016_save_init();
@@ -70,7 +72,7 @@ public:
 
 	UINT8 st0016_vregs[0xc0];
 	int st0016_ramgfx;
-
+	UINT8 *m_charram;
 
 protected:
 	// device-level overrides

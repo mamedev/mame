@@ -26,7 +26,7 @@ st0016_device::st0016_device(const machine_config &mconfig, const char *tag, dev
 	: device_t(mconfig, ST0016, "ST0016 (Audio)", tag, owner, clock, "st0016_audio", __FILE__),
 		device_sound_interface(mconfig, *this),
 		m_stream(NULL),
-		m_sound_ram(NULL)
+		m_ram_read_cb(*this)
 {
 	memset(m_vpos, 0, sizeof(int)*8);
 	memset(m_frac, 0, sizeof(int)*8);
@@ -41,11 +41,8 @@ st0016_device::st0016_device(const machine_config &mconfig, const char *tag, dev
 
 void st0016_device::device_start()
 {
-	const st0016_interface *intf = (const st0016_interface *)static_config();
-
-	m_sound_ram = intf->p_soundram;
-
 	m_stream = stream_alloc(0, 2, 44100);
+	m_ram_read_cb.resolve_safe(0);
 }
 
 
@@ -55,7 +52,6 @@ void st0016_device::device_start()
 
 void st0016_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
-	UINT8 *sound_ram = *m_sound_ram;
 	int v, i, snum;
 	unsigned char *slot;
 	INT32 mix[48000*2];
@@ -81,7 +77,7 @@ void st0016_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 
 			for (snum = 0; snum < samples; snum++)
 			{
-				sample = sound_ram[(sptr + m_vpos[v])&0x1fffff]<<8;
+				sample = m_ram_read_cb((sptr + m_vpos[v]) & 0x1fffff) << 8;
 
 				*mixp++ += (sample * (char)slot[0x14]) >> 8;
 				*mixp++ += (sample * (char)slot[0x15]) >> 8;
