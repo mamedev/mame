@@ -80,10 +80,10 @@ hd44102_device::hd44102_device(const machine_config &mconfig, const char *tag, d
 
 
 //-------------------------------------------------
-//  static_set_config - configuration helper
+//  static_set_offsets - configuration helper
 //-------------------------------------------------
 
-void hd44102_device::static_set_config(device_t &device, int sx, int sy)
+void hd44102_device::static_set_offsets(device_t &device, int sx, int sy)
 {
 	hd44102_device &hd44102 = downcast<hd44102_device &>(device);
 

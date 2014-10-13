@@ -371,11 +371,11 @@ software_list_device::software_list_device(const machine_config &mconfig, const 
 
 
 //-------------------------------------------------
-//  static_set_interface - configuration helper
-//  to set the interface
+//  static_set_type - configuration helper
+//  to set the list type
 //-------------------------------------------------
 
-void software_list_device::static_set_config(device_t &device, const char *list, softlist_type list_type)
+void software_list_device::static_set_type(device_t &device, const char *list, softlist_type list_type)
 {
 	software_list_device &swlistdev = downcast<software_list_device &>(device);
 	swlistdev.m_list_name.cpy(list);

@@ -32,9 +32,6 @@ public:
 	// construction/destruction
 	msm6255_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	// inline configuration helpers
-	static void static_set_config(device_t &device, int char_clock);
-
 	virtual DECLARE_ADDRESS_MAP(map, 8);
 
 	DECLARE_READ8_MEMBER( ir_r );

@@ -60,10 +60,10 @@ cdp1863_device::cdp1863_device(const machine_config &mconfig, const char *tag, d
 
 
 //-------------------------------------------------
-//  static_set_config - configuration helper
+//  static_set_clock2 - configuration helper
 //-------------------------------------------------
 
-void cdp1863_device::static_set_config(device_t &device, int clock2)
+void cdp1863_device::static_set_clock2(device_t &device, int clock2)
 {
 	cdp1863_device &cdp1863 = downcast<cdp1863_device &>(device);
 

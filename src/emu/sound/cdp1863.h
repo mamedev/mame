@@ -35,7 +35,7 @@
 
 #define MCFG_CDP1863_ADD(_tag, _clock, _clock2) \
 	MCFG_DEVICE_ADD(_tag, CDP1863, _clock) \
-	cdp1863_device::static_set_config(*device, _clock2);
+	cdp1863_device::static_set_clock2(*device, _clock2);
 
 
 
@@ -53,7 +53,7 @@ public:
 	cdp1863_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// inline configuration helpers
-	static void static_set_config(device_t &device, int clock2);
+	static void static_set_clock2(device_t &device, int clock2);
 
 	DECLARE_WRITE8_MEMBER( str_w );
 	void str_w(UINT8 data);
