@@ -67,6 +67,8 @@ class naomi_state : public dc_state
 	int jvsboard_type;
 	UINT16 actel_id;
 
+	UINT8 aw_ctrl_type;
+
 	UINT8 asciihex_to_dec(UINT8 in);
 	void create_pic_from_retdat();
 

@@ -1780,7 +1780,10 @@ READ64_MEMBER(naomi_state::aw_modem_r )
 		}
 
 		return U64(0xffffffffffffffff);
-	}
+	} else
+		if (reg == 0x284/4)
+			return U64(0xffffffffffffff00) | aw_ctrl_type;
+	
 
 	osd_printf_verbose("MODEM:  Unmapped read %08x\n", 0x600000+reg*4);
 	return 0;
@@ -1794,6 +1797,19 @@ WRITE64_MEMBER(naomi_state::aw_modem_w )
 
 	reg = decode_reg32_64(offset, mem_mask, &shift);
 	dat = (UINT32)(data >> shift);
+	if (reg == 0x284/4)
+	{
+	/*
+		0x00600284 rw ddccbbaa
+	        aa/bb/cc/dd - set type of Maple devices at ports 0/1/2/3
+		0 - regular DC controller, but with 4 analogue channels (default)
+		1 - DC lightgun
+		2 - DC mouse/trackball
+		TODO: hook this then MAME have such devices emulated
+	*/
+		aw_ctrl_type = dat & 0xFF;
+	}
+
 	osd_printf_verbose("MODEM: [%08x=%x] write %" I64FMT "x to %x, mask %" I64FMT "x\n", 0x600000+reg*4, dat, data, offset, mem_mask);
 }
 
@@ -8346,7 +8362,7 @@ ROM_START( inidv3cy )
 	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF)
 	//PIC16C621A (317-0406-COM)
 	//(sticker 253-5508-0406)
-	ROM_LOAD("317-0406-com.pic", 0x00, 0x4000, NO_DUMP )
+	ROM_LOAD("317-0406-com.pic", 0x00, 0x4000, CRC(fe91a7af) SHA1(3562d8d454ac6e5b73a24d4dc8928ef24687cdf7) )
 ROM_END
 
 
@@ -8362,6 +8378,8 @@ DRIVER_INIT_MEMBER(naomi_state,atomiswave)
 
 	// patch out long startup delay
 	ROM[0x98e/8] = (ROM[0x98e/8] & U64(0xffffffffffff)) | (UINT64)0x0009<<48;
+
+	aw_ctrl_type = 0;
 }
 
 ROM_START( fotns )
