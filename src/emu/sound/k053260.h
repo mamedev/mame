@@ -89,7 +89,7 @@ private:
 		UINT16 m_pan_volume[2];
 		UINT16 m_counter;
 		INT8   m_output;
-		bool   m_playing;
+		UINT8  m_playing;
 
 		// per voice registers
 		UINT32 m_start;
@@ -99,8 +99,8 @@ private:
 
 		// bit packed registers
 		UINT8  m_pan;
-		bool   m_loop;
-		int    m_kadpcm;
+		UINT8  m_loop;
+		UINT8  m_kadpcm;
 	} m_voice[4];
 
 	friend class k053260_device::KDSC_Voice;
