@@ -136,16 +136,15 @@ private:
 	inline void update_blank_timer(int state);
 	inline void recompute_parameters();
 	inline void reset_figs_param();
-	inline void advance_ead();
 	inline void read_vram(UINT8 type, UINT8 mod);
 	inline void write_vram(UINT8 type, UINT8 mod);
-	inline UINT16 check_pattern(UINT16 pattern);
 	inline void get_text_partition(int index, UINT32 *sad, UINT16 *len, int *im, int *wd);
 	inline void get_graphics_partition(int index, UINT32 *sad, UINT16 *len, int *im, int *wd);
 
-	void draw_pixel(int x, int y, UINT8 tile_data);
+	void draw_pixel(int x, int y, int xi, UINT16 tile_data);
 	void draw_line(int x, int y);
 	void draw_rectangle(int x, int y);
+	void draw_arc(int x, int y);
 	void draw_char(int x, int y);
 	int translate_command(UINT8 data);
 	void process_fifo();
@@ -182,7 +181,6 @@ private:
 	int m_fifo_dir;                 // FIFO direction
 
 	UINT8 m_mode;                   // mode of operation
-	UINT8 m_draw_mode;              // mode of drawing
 
 	int m_de;                       // display enabled
 	int m_m;                        // 0 = accept external vertical sync (slave mode) / 1 = generate & output vertical sync (master mode)
