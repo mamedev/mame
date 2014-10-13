@@ -25,30 +25,6 @@
 
 /***************************************************************************
 
-    Static declarations
-
-***************************************************************************/
-
-//ModeLine "720x480@30i" 13.5 720 736 799 858 480 486 492 525 interlace -hsync -vsync
-fixedfreq_interface fixedfreq_mode_ntsc720 = {
-	13500000,
-	720,736,799,858,
-	480,486,492,525,
-	2,  /* interlaced */
-	0.3
-};
-
-//ModeLine "704x480@30i" 13.5 704 728 791 858 480 486 492 525
-fixedfreq_interface fixedfreq_mode_ntsc704 = {
-	13500000,
-	704,728,791,858,
-	480,486,492,525,
-	2,  /* interlaced */
-	0.3
-};
-
-/***************************************************************************
-
     Fixed frequency monitor
 
 ***************************************************************************/
@@ -57,31 +33,39 @@ const device_type FIXFREQ = &device_creator<fixedfreq_device>;
 
 fixedfreq_device::fixedfreq_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-		device_video_interface(mconfig, *this, false)
+		device_video_interface(mconfig, *this, false),
+		// default to NTSC "704x480@30i"
+		m_monitor_clock(13500000),
+		m_hvisible(704),
+		m_hfrontporch(728),
+		m_hsync(791),
+		m_hbackporch(858),
+		m_vvisible(480),
+		m_vfrontporch(486),
+		m_vsync(492),
+		m_vbackporch(525),
+		m_fieldcount(2),
+		m_sync_threshold(0.3)
 {
 }
 
 fixedfreq_device::fixedfreq_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, FIXFREQ, "Fixed Frequency Monochrome Monitor", tag, owner, clock, "fixfreq", __FILE__),
-		device_video_interface(mconfig, *this, false)
+		device_video_interface(mconfig, *this, false),
+		// default to NTSC "704x480@30i"
+		m_monitor_clock(13500000),
+		m_hvisible(704),
+		m_hfrontporch(728),
+		m_hsync(791),
+		m_hbackporch(858),
+		m_vvisible(480),
+		m_vfrontporch(486),
+		m_vsync(492),
+		m_vbackporch(525),
+		m_fieldcount(2),
+		m_sync_threshold(0.3)
 {
 }
-
-void fixedfreq_device::device_config_complete()
-{
-	const fixedfreq_interface *intf = reinterpret_cast<const fixedfreq_interface *>(static_config());
-
-	if ( intf != NULL )
-	{
-		*static_cast<fixedfreq_interface *>(this) = *intf;
-	}
-	else
-	{
-		*static_cast<fixedfreq_interface *>(this) = fixedfreq_mode_ntsc704;
-	}
-
-}
-
 
 void fixedfreq_device::device_start()
 {

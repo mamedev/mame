@@ -33,14 +33,6 @@
 #define VBEND                   (16)
 
 #define HRES_MULT                   (1)
-
-fixedfreq_interface fixedfreq_mode_sburners = {
-	MASTER_CLOCK,
-	H_TOTAL-67,H_TOTAL-40,H_TOTAL-8,H_TOTAL,
-	V_TOTAL-22,V_TOTAL-19,V_TOTAL-12,V_TOTAL,
-	1,  /* non-interlaced */
-	0.30
-};
 // end
 
 
@@ -105,7 +97,12 @@ static MACHINE_CONFIG_START( sburners, sburners_state )
 	MCFG_NETLIST_SETUP(sburners)
 
 	/* video hardware */
-	MCFG_FIXFREQ_ADD("fixfreq", "screen", fixedfreq_mode_sburners)
+	MCFG_FIXFREQ_ADD("fixfreq", "screen")
+	MCFG_FIXFREQ_MONITOR_CLOCK(MASTER_CLOCK)
+	MCFG_FIXFREQ_HORZ_PARAMS(H_TOTAL-67,H_TOTAL-40,H_TOTAL-8,H_TOTAL)
+	MCFG_FIXFREQ_VERT_PARAMS(V_TOTAL-22,V_TOTAL-19,V_TOTAL-12,V_TOTAL)
+	MCFG_FIXFREQ_FIELDCOUNT(1)
+	MCFG_FIXFREQ_SYNC_THRESHOLD(0.30)
 MACHINE_CONFIG_END
 
 

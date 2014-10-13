@@ -51,22 +51,7 @@ TODO: please see netlist include files
 #define VBSTART                 (V_TOTAL)
 #define VBEND                   (16)
 
-fixedfreq_interface fixedfreq_mode_pongd = {
-	MASTER_CLOCK,
-	H_TOTAL-67,H_TOTAL-52,H_TOTAL-8,H_TOTAL,
-	V_TOTAL-22,V_TOTAL-19,V_TOTAL-12,V_TOTAL,
-	1,  /* non-interlaced */
-	0.31
-};
-
-fixedfreq_interface fixedfreq_mode_pong = {
-	MASTER_CLOCK,
-	H_TOTAL-67,H_TOTAL-40,H_TOTAL-8,H_TOTAL,
-	V_TOTAL-22,V_TOTAL-19,V_TOTAL-12,V_TOTAL,
-	1,  /* non-interlaced */
-	0.31
-};
-
+#if 0
 fixedfreq_interface fixedfreq_mode_pongX2 = {
 	MASTER_CLOCK * 2,
 	(H_TOTAL-67) * 2, (H_TOTAL-40) * 2, (H_TOTAL-8) * 2, (H_TOTAL) * 2,
@@ -74,6 +59,7 @@ fixedfreq_interface fixedfreq_mode_pongX2 = {
 	1,  /* non-interlaced */
 	0.31
 };
+#endif
 
 enum input_changed_enum
 {
@@ -252,8 +238,12 @@ static MACHINE_CONFIG_START( pong, pong_state )
 	MCFG_NETLIST_ANALOG_OUTPUT("maincpu", "vid0", "videomix", fixedfreq_device, update_vid, "fixfreq")
 
 	/* video hardware */
-
-	MCFG_FIXFREQ_ADD("fixfreq", "screen", fixedfreq_mode_pong)
+	MCFG_FIXFREQ_ADD("fixfreq", "screen")
+	MCFG_FIXFREQ_MONITOR_CLOCK(MASTER_CLOCK)
+	MCFG_FIXFREQ_HORZ_PARAMS(H_TOTAL-67,H_TOTAL-40,H_TOTAL-8,H_TOTAL)
+	MCFG_FIXFREQ_VERT_PARAMS(V_TOTAL-22,V_TOTAL-19,V_TOTAL-12,V_TOTAL)
+	MCFG_FIXFREQ_FIELDCOUNT(1)
+	MCFG_FIXFREQ_SYNC_THRESHOLD(0.31)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -298,8 +288,12 @@ static MACHINE_CONFIG_START( pongd, pong_state )
 	MCFG_NETLIST_ANALOG_OUTPUT("maincpu", "vid0", "videomix", fixedfreq_device, update_vid, "fixfreq")
 
 	/* video hardware */
-
-	MCFG_FIXFREQ_ADD("fixfreq", "screen", fixedfreq_mode_pongd)
+	MCFG_FIXFREQ_ADD("fixfreq", "screen")
+	MCFG_FIXFREQ_MONITOR_CLOCK(MASTER_CLOCK)
+	MCFG_FIXFREQ_HORZ_PARAMS(H_TOTAL-67,H_TOTAL-52,H_TOTAL-8,H_TOTAL)
+	MCFG_FIXFREQ_VERT_PARAMS(V_TOTAL-22,V_TOTAL-19,V_TOTAL-12,V_TOTAL)
+	MCFG_FIXFREQ_FIELDCOUNT(1)
+	MCFG_FIXFREQ_SYNC_THRESHOLD(0.31)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -327,6 +321,6 @@ ROM_START( pongd ) /* dummy to satisfy game entry*/
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
 ROM_END
 
-GAME( 1972, pong,  0, pong, pong, driver_device,  0, ROT0, "Atari", "Pong (Rev E) external [TTL]", GAME_SUPPORTS_SAVE)
-GAME( 1972, pongf,  0, pongf, pong, driver_device,  0, ROT0, "Atari", "Pong (Rev E) [TTL]", GAME_SUPPORTS_SAVE )
+GAME( 1972, pong,   0, pong,  pong,  driver_device,  0, ROT0, "Atari", "Pong (Rev E) external [TTL]", GAME_SUPPORTS_SAVE)
+GAME( 1972, pongf,  0, pongf, pong,  driver_device,  0, ROT0, "Atari", "Pong (Rev E) [TTL]", GAME_SUPPORTS_SAVE )
 GAME( 1974, pongd,  0, pongd, pongd, driver_device,  0, ROT0, "Atari", "Pong Doubles [TTL]", GAME_SUPPORTS_SAVE )
