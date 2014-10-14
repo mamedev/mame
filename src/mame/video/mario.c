@@ -147,7 +147,7 @@ void mario_state::video_start()
  * confirmed on mametests.org as being present on real PCB as well.
  */
 
-void mario_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
+void mario_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int yaddr, int xaddr)
 {
 	/* TODO: draw_sprites should adopt the scanline logic from dkong.c
 	 * The schematics have the same logic for sprite buffering.
@@ -161,8 +161,8 @@ void mario_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 			int x, y;
 
 			// from schematics ....
-			y = (m_spriteram[offs] + (m_flip ? 0xF7 : 0xF9) + 1) & 0xFF;
-			x = m_spriteram[offs+3];
+			y = (m_spriteram[offs+yaddr] + (m_flip ? 0xF7 : 0xF9) + 1) & 0xFF;
+			x = m_spriteram[offs+xaddr];
 			// sprite will be drawn if (y + scanline) & 0xF0 = 0xF0
 			y = 240 - y; /* logical screen position */
 
@@ -193,7 +193,7 @@ void mario_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 	}
 }
 
-UINT32 mario_state::screen_update_mario(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 mario_state::screen_update_common(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int t;
 
@@ -207,7 +207,20 @@ UINT32 mario_state::screen_update_mario(screen_device &screen, bitmap_ind16 &bit
 	m_bg_tilemap->set_scrolly(0, m_gfx_scroll);
 
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-	draw_sprites(bitmap, cliprect);
 
+	return 0;
+}
+
+UINT32 mario_state::screen_update_mario(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	screen_update_common(screen, bitmap, cliprect);
+	draw_sprites(bitmap, cliprect, 0, 3);
+	return 0;
+}
+
+UINT32 mario_state::screen_update_mariobl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	screen_update_common(screen, bitmap, cliprect);
+	draw_sprites(bitmap, cliprect, 3, 0);
 	return 0;
 }

@@ -93,19 +93,21 @@ public:
 	virtual void sound_start();
 	virtual void sound_reset();
 	DECLARE_PALETTE_INIT(mario);
+	UINT32 screen_update_common(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_mario(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_mariobl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 	DECLARE_WRITE8_MEMBER(mario_sh_sound_w);
 	DECLARE_WRITE8_MEMBER(mario_sh1_w);
 	DECLARE_WRITE8_MEMBER(mario_sh2_w);
 	DECLARE_READ8_MEMBER(memory_read_byte);
 	DECLARE_WRITE8_MEMBER(memory_write_byte);
-	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int yaddr, int xaddr);
 	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_audiocpu;
+	optional_device<cpu_device> m_audiocpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	required_device<z80dma_device> m_z80dma;
+	optional_device<z80dma_device> m_z80dma;
 };
 
 /*----------- defined in audio/mario.c -----------*/

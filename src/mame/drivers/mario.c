@@ -92,6 +92,7 @@ write:
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/z80dma.h"
+#include "sound/ay8910.h"
 
 #include "includes/mario.h"
 
@@ -129,7 +130,7 @@ WRITE8_MEMBER(mario_state::nmi_mask_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( mario_map, AS_PROGRAM, 8, mario_state )
+static ADDRESS_MAP_START( mario_map, AS_PROGRAM, 8, mario_state)
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x6fff) AM_RAM
 	AM_RANGE(0x7000, 0x73ff) AM_RAM AM_SHARE("spriteram") /* physical sprite ram */
@@ -148,7 +149,7 @@ static ADDRESS_MAP_START( mario_map, AS_PROGRAM, 8, mario_state )
 	AM_RANGE(0xf000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( masao_map, AS_PROGRAM, 8, mario_state )
+static ADDRESS_MAP_START( masao_map, AS_PROGRAM, 8, mario_state)
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x6fff) AM_RAM
 	AM_RANGE(0x7000, 0x73ff) AM_RAM AM_SHARE("spriteram") /* physical sprite ram */
@@ -167,10 +168,30 @@ static ADDRESS_MAP_START( masao_map, AS_PROGRAM, 8, mario_state )
 	AM_RANGE(0xf000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mario_io_map, AS_IO, 8, mario_state )
+static ADDRESS_MAP_START( mario_io_map, AS_IO, 8, mario_state)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE("z80dma", z80dma_device, read, write)  /* dma controller */
 ADDRESS_MAP_END
+
+
+static ADDRESS_MAP_START( mariobl_map, AS_PROGRAM, 8, mario_state)
+	AM_RANGE(0x0000, 0x5fff) AM_ROM
+	AM_RANGE(0x6000, 0x6fff) AM_RAM
+	AM_RANGE(0x7000, 0x73ff) AM_RAM AM_SHARE("spriteram") /* physical sprite ram */
+	AM_RANGE(0x7400, 0x77ff) AM_RAM_WRITE(mario_videoram_w) AM_SHARE("videoram")
+	//AM_RANGE(0xa000, 0xa000) AM_READ_PORT("IN1")
+	AM_RANGE(0xa100, 0xa100) AM_READ_PORT("DSW")    /* DSW */
+	AM_RANGE(0xe000, 0xffff) AM_ROM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( mariobl_io_map, AS_IO, 8, mario_state )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE("ay1", ay8910_device, data_r, address_w)
+	AM_RANGE(0x01, 0x01) AM_DEVWRITE("ay1", ay8910_device, data_w)
+	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE("ay2", ay8910_device, data_r, address_w)
+	AM_RANGE(0x81, 0x81) AM_DEVWRITE("ay2", ay8910_device, data_w)
+ADDRESS_MAP_END
+
 
 /*************************************
  *
@@ -312,6 +333,23 @@ static GFXDECODE_START( mario )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout,     0, 32 )
 GFXDECODE_END
 
+static const gfx_layout spritelayout_bl =
+{
+	16,16,  /* 16*16 sprites */
+	RGN_FRAC(1,3),    /* 256 sprites */
+	3,  /* 3 bits per pixel */
+	{ RGN_FRAC(2,3),RGN_FRAC(1,3),RGN_FRAC(0,3) }, 
+	{ 0, 1, 2, 3, 4, 5, 6, 7,      
+			64,65,66,67,68,69,70,71 },
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
+			16*8, 17*8, 18*8, 19*8, 20*8, 21*8, 22*8, 23*8 },
+	16*16 
+};
+
+static GFXDECODE_START( mariobl )
+	GFXDECODE_ENTRY( "gfx1", 0, charlayout,      0, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0, spritelayout_bl,     0, 32 )
+GFXDECODE_END
 
 /*************************************
  *
@@ -371,6 +409,51 @@ static MACHINE_CONFIG_DERIVED( masao, mario_base )
 	MCFG_FRAGMENT_ADD(masao_audio)
 MACHINE_CONFIG_END
 
+/*
+Mario Bros japan bootleg on Ambush hardware 
+
+This romset (japanese version) comes from a faulty bootleg pcb.Game differences are none.
+Note:it runs on a modified (extended) Tecfri's Ambush hardware.
+Main cpu Z80
+Sound ic AY-3-8910 x2 -instead of AY-3-8912 x2 of Ambush
+Work ram 4Kb (6116 x2) -double of Ambush
+OSC: 18,432 Mhz
+Rom definition:
+mbjba-6, mbjba-7, mbjba-8 main program
+mbjba-1 to mbjba-5 gfx (chars,sprites)
+Eproms are 2732,2764,27128
+
+Dumped by tirino73
+*/
+
+static MACHINE_CONFIG_START( mariobl, mario_state )
+
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_18_432MHz/6)      /* XTAL confirmed, divisor guessed */
+	MCFG_CPU_PROGRAM_MAP(mariobl_map)
+	MCFG_CPU_IO_MAP(mariobl_io_map)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", mario_state,  irq0_line_hold)
+
+	/* video hardware */
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
+	MCFG_SCREEN_UPDATE_DRIVER(mario_state, screen_update_mariobl)
+	MCFG_SCREEN_PALETTE("palette")
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mariobl)
+	MCFG_PALETTE_ADD("palette", 512)
+	MCFG_PALETTE_INIT_OWNER(mario_state, mario)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	
+	MCFG_SOUND_ADD("ay1", AY8910, XTAL_18_432MHz/6/2)   /* XTAL confirmed, divisor guessed */
+//	MCFG_AY8910_PORT_A_READ_CB(IOPORT("SYSTEM"))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
+
+	MCFG_SOUND_ADD("ay2", AY8910, XTAL_18_432MHz/6/2)   /* XTAL confirmed, divisor guessed */
+//	MCFG_AY8910_PORT_A_READ_CB(IOPORT("INPUTS"))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
+
+MACHINE_CONFIG_END
 
 /*************************************
  *
@@ -540,6 +623,25 @@ ROM_START( masao )
 	ROM_LOAD( "tma1-c-4p.4p",     0x0000, 0x0200, CRC(afc9bd41) SHA1(90b739c4c7f24a88b6ac5ca29b06c032906a2801) )
 ROM_END
 
+ROM_START( mariobl )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "mbjba-8.7i",    0x0000, 0x4000, CRC(344c959d) SHA1(162e39c3a17e0dcde3b7eefebe224318c8884de2) )
+	ROM_LOAD( "mbjba-7.7g",    0x4000, 0x2000, CRC(06faf308) SHA1(8c213d9390c168034c1673f3dd97b99322b3485a) )
+	ROM_LOAD( "mbjba-6.7f",    0xe000, 0x2000, CRC(761dd670) SHA1(6d6e45ced8c535cdf56e0ed1bcedb342e9e10a55) )
+
+	ROM_REGION( 0x2000, "gfx1", ROMREGION_INVERT )
+	ROM_LOAD( "mbjba-4.4l",   0x1000, 0x1000, CRC(9379e836) SHA1(fcce66c1b2c5120441840b80723c7d209d42bc45) )
+	ROM_LOAD( "mbjba-5.4n",   0x0000, 0x1000, CRC(9bbcf9fb) SHA1(a917241a3bd94bff72f509d6b3ab8358b9c03eac) )
+
+	ROM_REGION( 0x6000, "gfx2", 0 )
+	ROM_LOAD( "mbjba-1.3l",   0x4000, 0x2000, CRC(c772cb8f) SHA1(7fd6dd9888928fad5c50d96b4ecff954ea8975ce) )
+	ROM_LOAD( "mbjba-2.3ls",  0x2000, 0x2000, CRC(7b58c92e) SHA1(25dfce7a4a93f661f495cc80378d445a2b064ba7) )
+	ROM_LOAD( "mbjba-3.3ns",  0x0000, 0x2000, CRC(3981adb2) SHA1(c12a0c2ae04de6969f4b2dae3bdefc4515d87c55) )
+
+	ROM_REGION( 0x0200, "proms", 0 ) // no prom was present in the dump, assuming to be the same
+	ROM_LOAD( "tma1-c-4p.4p",     0x0000, 0x0200, CRC(afc9bd41) SHA1(90b739c4c7f24a88b6ac5ca29b06c032906a2801) )
+ROM_END
+
 /*************************************
  *
  *  Game drivers
@@ -551,3 +653,4 @@ GAME( 1983, marioe,   mario,   mario,   mario, driver_device,   0, ROT0, "Ninten
 GAME( 1983, marioo,   mario,   mario,   marioo, driver_device,  0, ROT0, "Nintendo of America", "Mario Bros. (US, Unknown Rev)", GAME_SUPPORTS_SAVE )
 GAME( 1983, marioj,   mario,   mario,   marioj, driver_device,  0, ROT0, "Nintendo", "Mario Bros. (Japan)", GAME_SUPPORTS_SAVE )
 GAME( 1983, masao,    mario,   masao,   masao, driver_device,   0, ROT0, "bootleg", "Masao", GAME_SUPPORTS_SAVE )
+GAME( 1983, mariobl,  mario,   mariobl, marioj, driver_device,  0, ROT180, "bootleg", "Mario Bros. (Japan, bootleg)", GAME_SUPPORTS_SAVE ) // was listed as 'on extended Ambush hardware' but doesn't seem similar apart from the sound system?
