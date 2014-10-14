@@ -88,7 +88,7 @@ protected:
 private:
 	inline void execute_command(int addr, int data);
 
-	sound_stream *m_stream[4];
+	//sound_stream *m_stream[4];
 
 	int m_enable;                   // enable latch
 	int m_data;                     // data latch
