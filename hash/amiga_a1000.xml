@@ -16,7 +16,7 @@
 			<dataarea name="flop" size="901120">
 				<rom name="327244-01_kickstart.adf" size="901120" crc="fc1c4ce8" sha1="e2f7fd40b5f626f1719628e720bc4440cca7c961" offset="0"/>
 			</dataarea>
-		</part>	
+		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Workbench 1.0" />
 			<dataarea name="flop" size="901120">
@@ -53,11 +53,11 @@
 			<dataarea name="flop" size="901120">
 				<rom name="317483-01_kickstart.adf" size="901120" crc="fc1c4ce8" sha1="e2f7fd40b5f626f1719628e720bc4440cca7c961" offset="0"/>
 			</dataarea>
-		</part>	
+		</part>
 	</software>
-	
+
 	<!-- Version 1.1 -->
-	
+
 	<software name="wbenc11">
 		<description>Workbench 1.1</description>
 		<year>1986</year>
@@ -74,11 +74,11 @@
 			<dataarea name="flop" size="901120">
 				<rom name="327244-02_kickstart_pal.adf" size="901120" crc="70d0030a" sha1="0d79e2444421e5b66b5f295a5d3685d286208128" offset="0"/>
 			</dataarea>
-		</part>	
+		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<feature name="part_id" value="Workbench 1.1" />
 			<dataarea name="flop" size="901120">
-				<rom name="327245-02_workbench.adf" size="901120" crc="0be0603c" offset="0"/>
+				<rom name="327245-02_workbench.adf" size="901120" crc="0be0603c" status="nodump" offset="0"/>
 			</dataarea>
 		</part>
 		<!-- Kaleidoscope (316160-01, 317489-01)? -->
@@ -105,12 +105,12 @@
 			<dataarea name="flop" size="901120">
 				<rom name="317483-02_kickstart_ntsc.adf" size="901120" crc="73789bf8" sha1="68b667395be3a50be86fb6ad78155e1741255822" offset="0"/>
 			</dataarea>
-		</part>	
+		</part>
 		<!-- Kaleidoscope (316160-01, 317489-01)? -->
 	</software>
 
 	<!-- Version 1.2 -->
-	
+
 	<software name="wbenc12">
 		<description>Workbench 1.2</description>
 		<year>1986</year>
@@ -130,9 +130,9 @@
 		</part>
 		<!-- Extras 1.2? -->
 	</software>
-	
+
 	<!-- Version 1.3 -->
-	
+
 	<software name="wbenc13">
 		<description>Workbench 1.3</description>
 		<year>1988</year>
@@ -142,13 +142,13 @@
 			<dataarea name="flop" size="901120">
 				<rom name="317746-01_workbench.adf" size="901120" status="nodump" offset="0"/>
 			</dataarea>
-		</part>	
+		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Kickstart 1.3" />
 			<dataarea name="flop" size="901120">
 				<rom name="317747-01_kickstart.adf" size="901120" crc="5fd0ef3b" sha1="a80b001b98a997969bf709cecd07f8578f861148" offset="0"/>
 			</dataarea>
-		</part>	
+		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<feature name="part_id" value="Extras 1.3" />
 			<dataarea name="flop" size="901120">
@@ -156,7 +156,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<!-- EmuTOS -->
 
 	<software name="emutos93">
@@ -168,7 +168,7 @@
 			<dataarea name="flop" size="901120">
 				<rom name="emutos_093.adf" size="901120" crc="96f5cc88" sha1="fa3a3aa314d50e1131a5b65a048519c76c836bd2" offset="0"/>
 			</dataarea>
-		</part>	
-	</software>	
-	
+		</part>
+	</software>
+
 </softwarelist>
