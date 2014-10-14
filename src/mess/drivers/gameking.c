@@ -23,7 +23,7 @@ is very likely that they point to code in the internal bios.
 */
 
 #include "emu.h"
-#include "cpu/m6502/m65c02.h"
+#include "cpu/m6502/m65ce02.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 
@@ -131,7 +131,7 @@ void gameking_state::machine_start()
 	m_cart_rom->base()[0x3ffc] = 0x00;
 	m_cart_rom->base()[0x3ffd] = 0x40;
 
-	// Some fake code to get bios functions called logged
+	// Some fake code to get bios function calls logged
 	memory_region *maincpu_rom = memregion("maincpu");
 	maincpu_rom->base()[0x0f80] = 0x9d; // STA $0e00,X
 	maincpu_rom->base()[0x0f81] = 0x00;
@@ -151,7 +151,7 @@ void gameking_state::machine_reset()
 
 static MACHINE_CONFIG_START( gameking, gameking_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M65C02, 6000000)
+	MCFG_CPU_ADD("maincpu", M65CE02, 6000000)
 	MCFG_CPU_PROGRAM_MAP(gameking_mem)
 	//MCFG_CPU_VBLANK_INT_DRIVER("screen", gameking_state,  gameking_frame_int)
 
