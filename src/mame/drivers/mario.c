@@ -177,10 +177,13 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( mariobl_map, AS_PROGRAM, 8, mario_state)
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x6fff) AM_RAM
-	AM_RANGE(0x7000, 0x73ff) AM_RAM AM_SHARE("spriteram") /* physical sprite ram */
+	AM_RANGE(0x7000, 0x71ff) AM_RAM AM_SHARE("spriteram") /* physical sprite ram */
+	AM_RANGE(0x7200, 0x73ff) AM_RAM // attrram? 
 	AM_RANGE(0x7400, 0x77ff) AM_RAM_WRITE(mario_videoram_w) AM_SHARE("videoram")
 	//AM_RANGE(0xa000, 0xa000) AM_READ_PORT("IN1")
+	AM_RANGE(0xa000, 0xa000) AM_READNOP   /* watchdog? */
 	AM_RANGE(0xa100, 0xa100) AM_READ_PORT("DSW")    /* DSW */
+	AM_RANGE(0xa206, 0xa206) AM_WRITE(mario_gfxbank_w) 
 	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -501,10 +504,14 @@ static MACHINE_CONFIG_START( mariobl, mario_state )
 	
 	MCFG_SOUND_ADD("ay1", AY8910, XTAL_18_432MHz/6/2)   /* XTAL confirmed, divisor guessed */
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("SYSTEM"))
+//	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(mario_state, ay1_outputb_w))
+
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
 
 	MCFG_SOUND_ADD("ay2", AY8910, XTAL_18_432MHz/6/2)   /* XTAL confirmed, divisor guessed */
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("INPUTS"))
+//	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(mario_state, ay2_outputb_w))
+
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
 
 MACHINE_CONFIG_END

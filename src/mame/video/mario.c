@@ -147,7 +147,7 @@ void mario_state::video_start()
  * confirmed on mametests.org as being present on real PCB as well.
  */
 
-void mario_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int yaddr, int xaddr)
+void mario_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int yaddr, int xaddr, int dx, int dy)
 {
 	/* TODO: draw_sprites should adopt the scanline logic from dkong.c
 	 * The schematics have the same logic for sprite buffering.
@@ -177,7 +177,7 @@ void mario_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, 
 						m_spriteram[offs + 2],
 						(m_spriteram[offs + 1] & 0x0f) + 16 * m_palette_bank + 32 * m_monitor,
 						!(m_spriteram[offs + 1] & 0x80),!(m_spriteram[offs + 1] & 0x40),
-						x, y,0);
+						x+dx, y+dy,0);
 			}
 			else
 			{
@@ -187,7 +187,7 @@ void mario_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, 
 						m_spriteram[offs + 2],
 						(m_spriteram[offs + 1] & 0x0f) + 16 * m_palette_bank + 32 * m_monitor,
 						(m_spriteram[offs + 1] & 0x80),(m_spriteram[offs + 1] & 0x40),
-						x, y,0);
+						x+dx, y+dy,0);
 			}
 		}
 	}
@@ -214,13 +214,18 @@ UINT32 mario_state::screen_update_common(screen_device &screen, bitmap_ind16 &bi
 UINT32 mario_state::screen_update_mario(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	screen_update_common(screen, bitmap, cliprect);
-	draw_sprites(bitmap, cliprect, 0, 3);
+	draw_sprites(bitmap, cliprect, 0, 3, 0, 0);
 	return 0;
 }
 
 UINT32 mario_state::screen_update_mariobl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	// not sure
+	m_palette_bank = m_gfx_bank; // might be the 'attr' ram
+	machine().tilemap().mark_all_dirty();
+
+
 	screen_update_common(screen, bitmap, cliprect);
-	draw_sprites(bitmap, cliprect, 3, 0);
+	draw_sprites(bitmap, cliprect, 3, 0, 8, -8);
 	return 0;
 }
