@@ -1687,6 +1687,21 @@ static ADDRESS_MAP_START( tenspot_select_map, AS_PROGRAM, 8, galaxian_state )
 	AM_RANGE(0xe000, 0xe000) AM_WRITE(tenspot_unk_e000_w)
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( froggeram_map, AS_PROGRAM, 8, galaxian_state )
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x0000, 0x3fff) AM_ROM
+	AM_RANGE(0x8000, 0x87ff) AM_RAM
+	AM_RANGE(0x8800, 0x8800) AM_READ(watchdog_reset_r)
+	AM_RANGE(0xa800, 0xabff) AM_RAM_WRITE(galaxian_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0xb000, 0xb0ff) AM_RAM_WRITE(galaxian_objram_w) AM_SHARE("spriteram")
+	AM_RANGE(0xb801, 0xb801) AM_WRITE(irq_enable_w)
+	AM_RANGE(0xb806, 0xb806) AM_WRITE(galaxian_flip_screen_x_w)
+	AM_RANGE(0xb807, 0xb807) AM_WRITE(galaxian_flip_screen_y_w)
+//	AM_RANGE(0xb818, 0xb818) AM_WRITE(coin_count_0_w) /* IOPC7 */
+//	AM_RANGE(0xb81c, 0xb81c) AM_WRITE(coin_count_1_w) /* POUT1 */
+	// todo, map inputs properly for this version
+ADDRESS_MAP_END
+
 /*************************************
  *
  *  Sound CPU memory maps
@@ -5529,6 +5544,18 @@ static MACHINE_CONFIG_DERIVED( quaak, konami_base )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(scobra_map)
 MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( froggeram, konami_base )
+	MCFG_FRAGMENT_ADD(konami_sound_2x_ay8910)
+
+	MCFG_DEVICE_MODIFY("8910.0")
+	MCFG_AY8910_PORT_B_READ_CB(READ8(galaxian_state, frogger_sound_timer_r))
+
+	/* alternate memory map */
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(froggeram_map)
+MACHINE_CONFIG_END
+
 
 static MACHINE_CONFIG_DERIVED( anteater, scobra )
 
@@ -9403,6 +9430,29 @@ ROM_START( quaak )
 	ROM_LOAD( "n82s123.bin",     0x0000, 0x0020, CRC(a35ec965) SHA1(ea5851f3e0e54f043347c7ae9869db8f6711d031) )
 ROM_END
 
+ROM_START( froggeram )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "1.d2",   0x0000, 0x0800, CRC(b680e622) SHA1(233dbefa2aae6e85cb61acd60c49480bd4a3388d) )
+	ROM_LOAD( "2.e2",   0x0800, 0x0800, CRC(32c56a50) SHA1(4d215fff6ff002e23aa889292c9c5eb242975f5d) )
+	ROM_LOAD( "3.f2",   0x1000, 0x0800, CRC(4223a053) SHA1(c19555d2fee4172dff99d7cf65ebb44d1336c06e) )
+	ROM_LOAD( "4.h2",   0x1800, 0x0800, CRC(bcd02aa7) SHA1(987c35bf9af8bb1083ccbf4d9f912be8d74b3d1f) )
+	ROM_LOAD( "5.j2",   0x2000, 0x0800, CRC(b11b36f7) SHA1(d4e9342be7fa23f30565d7b75fa0fb8c6c82669d) )
+	ROM_LOAD( "6.l2",   0x2800, 0x0800, CRC(a239048a) SHA1(a8dcc0b4bdb51f6e391832d69ba3a8727be59ae7) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "top7.c5",  0x0000, 0x0800, CRC(b4c2180e) SHA1(25894481ef3b55b11a875ab08c665d5d541f1a06) ) // only this sound rom was present in the dump, it matches quaak above
+	ROM_LOAD( "b.bin",  0x0800, 0x0800, CRC(a1aae0bc) SHA1(1cb06b0cfde9fdd7f176f4a51de801d97785d279) ) // so let's assume the rest do too.
+	ROM_LOAD( "c.bin",  0x1000, 0x0800, CRC(9d88fd0a) SHA1(ecfb8ddf67cd7755cbdbc1cc5e7788e1b5b3c882) )
+
+	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_LOAD( "bl7h",  0x0000, 0x0800, CRC(05f7d883) SHA1(78831fd287da18928651a8adb7e578d291493eff) )
+	ROM_LOAD( "bl8h",  0x0800, 0x0800, CRC(658745f8) SHA1(e4e5c3e011c8a7233a36d29e10e08905873500aa) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "n82s123.bin",     0x0000, 0x0020, CRC(a35ec965) SHA1(ea5851f3e0e54f043347c7ae9869db8f6711d031) )
+ROM_END
+
+
 ROM_START( turtles )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "turt_vid.2c",  0x0000, 0x1000, CRC(ec5e61fb) SHA1(3ca89800fda7a7e61f54d71d5302908be2706def) )
@@ -10790,6 +10840,7 @@ GAME( 1981, frogf,       frogger,  frogf,      frogger,    galaxian_state, frogg
 GAME( 1981, frogg,       frogger,  galaxian,   frogg,      galaxian_state, frogg,      ROT90,  "bootleg", "Frog (Galaxian hardware)", GAME_SUPPORTS_SAVE )
 GAME( 1981, froggrs,     frogger,  froggers,   frogger,    galaxian_state, froggrs,    ROT90,  "bootleg (Coin Music)", "Frogger (Scramble hardware)", GAME_SUPPORTS_SAVE )
 GAME( 1981, quaak,       frogger,  quaak,      frogger,    galaxian_state, quaak,      ROT90,  "bootleg", "Quaak (bootleg of Frogger)", GAME_SUPPORTS_SAVE ) // closest to Super Cobra hardware, presumably a bootleg from Germany (Quaak is the German frog sound)
+GAME( 1981, froggeram,   frogger,  froggeram,  frogger,    galaxian_state, quaak,      ROT90,  "bootleg", "Frogger (bootleg on Amigo? hardware)", GAME_NOT_WORKING ) // meant to be Amigo hardware, but maybe a different bootleg than the one we have?
 
 
 /*
