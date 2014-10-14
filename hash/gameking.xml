@@ -126,7 +126,7 @@
 		</part>
 	</software> 
   
- 	<software name="smotor">
+	<software name="smotor">
 		<description>Supermotor</description>
 		<year>200?</year>
 		<publisher>TimeTop</publisher>
@@ -137,7 +137,7 @@
 		</part>
 	</software> 
 
- 	<software name="trojanl">
+	<software name="trojanl">
 		<description>Trojan Legend</description>
 		<year>200?</year>
 		<publisher>TimeTop</publisher>
