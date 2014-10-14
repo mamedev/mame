@@ -318,14 +318,14 @@ void k053260_device::KDSC_Voice::voice_reset()
 	m_position = 0;
 	m_counter = 0;
 	m_output = 0;
-	m_playing = 0;
+	m_playing = false;
 	m_start = 0;
 	m_length = 0;
 	m_pitch = 0;
 	m_volume = 0;
 	m_pan = 0;
-	m_loop = 0;
-	m_kadpcm = 0;
+	m_loop = false;
+	m_kadpcm = false;
 	update_pan_volume();
 }
 
@@ -389,10 +389,10 @@ void k053260_device::KDSC_Voice::key_on()
 
 	else
 	{
-		m_position = m_kadpcm; // for kadpcm low bit is nybble offset, so must start at 1 due to preincrement
+		m_position = m_kadpcm ? 1 : 0; // for kadpcm low bit is nybble offset, so must start at 1 due to preincrement
 		m_counter = 0x1000 - CLOCKS_PER_SAMPLE; // force update on next sound_stream_update
 		m_output = 0;
-		m_playing = 1;
+		m_playing = true;
 		if (LOG) logerror("K053260: start = %06x, length = %06x, pitch = %04x, vol = %02x, loop = %s, %s\n",
 						m_start, m_length, m_pitch, m_volume, m_loop ? "yes" : "no", m_kadpcm ? "KADPCM" : "PCM" );
 	}
@@ -402,7 +402,7 @@ void k053260_device::KDSC_Voice::key_off()
 {
 	m_position = 0;
 	m_output = 0;
-	m_playing = 0;
+	m_playing = false;
 }
 
 void k053260_device::KDSC_Voice::play(stream_sample_t *outputs)
@@ -413,7 +413,7 @@ void k053260_device::KDSC_Voice::play(stream_sample_t *outputs)
 	{
 		m_counter = m_counter - 0x1000 + m_pitch;
 
-		UINT32 bytepos = ++m_position >> m_kadpcm;
+		UINT32 bytepos = ++m_position >> ( m_kadpcm ? 1 : 0 );
 		/*
 		Yes, _pre_increment. Playback must start 1 byte position after the
 		start address written to the register, or else ADPCM sounds will
@@ -432,7 +432,7 @@ void k053260_device::KDSC_Voice::play(stream_sample_t *outputs)
 			}
 			else
 			{
-				m_playing = 0;
+				m_playing = false;
 				return;
 			}
 		}
