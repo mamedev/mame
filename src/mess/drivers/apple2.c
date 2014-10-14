@@ -1030,6 +1030,7 @@ static SLOT_INTERFACE_START(apple2_cards)
 	SLOT_INTERFACE("dx1", A2BUS_DX1)    /* Decillonix DX-1 sampler card */
 	SLOT_INTERFACE("tm2ho", A2BUS_TIMEMASTERHO)	/* Applied Engineering TimeMaster II H.O. */
 	SLOT_INTERFACE("mouse", A2BUS_MOUSE)	/* Apple II Mouse Card */
+//	SLOT_INTERFACE("magicmusician", A2BUS_MAGICMUSICIAN)	/* Magic Musician Card */
 SLOT_INTERFACE_END
 
 static SLOT_INTERFACE_START(apple2eaux_cards)
@@ -1092,7 +1093,7 @@ static MACHINE_CONFIG_START( apple2_common, apple2_state )
 	MCFG_A2BUS_SLOT_ADD("a2bus", "sl3", apple2_cards, NULL)
 	MCFG_A2BUS_SLOT_ADD("a2bus", "sl4", apple2_cards, "mockingboard")
 	MCFG_A2BUS_SLOT_ADD("a2bus", "sl5", apple2_cards, NULL)
-	MCFG_A2BUS_SLOT_ADD("a2bus", "sl6", apple2_cards, "diskiing")
+	MCFG_A2BUS_SLOT_ADD("a2bus", "sl6", apple2_cards, "diskii")
 	MCFG_A2BUS_SLOT_ADD("a2bus", "sl7", apple2_cards, NULL)
 
 	MCFG_SOFTWARE_LIST_ADD("flop525_list","apple2")
