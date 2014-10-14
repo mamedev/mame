@@ -297,6 +297,60 @@ static INPUT_PORTS_START( masao )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( mariobl )
+
+	PORT_START("SYSTEM")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
+
+	PORT_START("INPUTS")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_8WAY
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_8WAY
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_8WAY
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
+
+	PORT_START("DSW")
+	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW1:!1,!2")
+	PORT_DIPSETTING(    0x00, "3" )
+	PORT_DIPSETTING(    0x01, "4" )
+	PORT_DIPSETTING(    0x02, "5" )
+	PORT_DIPSETTING(    0x03, "6" )
+	PORT_DIPNAME( 0x1c, 0x00, DEF_STR( Coinage ) )      PORT_DIPLOCATION("SW1:!3,!4,!5")
+	PORT_DIPSETTING(    0x08, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x18, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(    0x14, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(    0x1c, DEF_STR( 1C_6C ) )
+	PORT_DIPNAME( 0x20, 0x20, "2 Players Game" )        PORT_DIPLOCATION("SW1:!6")
+	PORT_DIPSETTING(    0x00, "1 Credit" )
+	PORT_DIPSETTING(    0x20, "2 Credits" )
+	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("SW1:!7,!8")
+	PORT_DIPSETTING(    0x00, "20k 50k 30k+" )
+	PORT_DIPSETTING(    0x40, "30k 60k 30k+" )
+	PORT_DIPSETTING(    0x80, "40k 70k 30k+" )
+	PORT_DIPSETTING(    0xc0, DEF_STR( None ) )
+
+	PORT_START("MONITOR")
+	PORT_CONFNAME( 0x01, 0x00, "Monitor" )
+	PORT_CONFSETTING(    0x00, "Nintendo" )
+	PORT_CONFSETTING(    0x01, "Std 15.72Khz" )
+
+INPUT_PORTS_END
+
+
 /*************************************
  *
  *  Graphics definitions
@@ -446,11 +500,11 @@ static MACHINE_CONFIG_START( mariobl, mario_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	
 	MCFG_SOUND_ADD("ay1", AY8910, XTAL_18_432MHz/6/2)   /* XTAL confirmed, divisor guessed */
-//	MCFG_AY8910_PORT_A_READ_CB(IOPORT("SYSTEM"))
+	MCFG_AY8910_PORT_A_READ_CB(IOPORT("SYSTEM"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
 
 	MCFG_SOUND_ADD("ay2", AY8910, XTAL_18_432MHz/6/2)   /* XTAL confirmed, divisor guessed */
-//	MCFG_AY8910_PORT_A_READ_CB(IOPORT("INPUTS"))
+	MCFG_AY8910_PORT_A_READ_CB(IOPORT("INPUTS"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
 
 MACHINE_CONFIG_END
@@ -653,4 +707,4 @@ GAME( 1983, marioe,   mario,   mario,   mario, driver_device,   0, ROT0, "Ninten
 GAME( 1983, marioo,   mario,   mario,   marioo, driver_device,  0, ROT0, "Nintendo of America", "Mario Bros. (US, Unknown Rev)", GAME_SUPPORTS_SAVE )
 GAME( 1983, marioj,   mario,   mario,   marioj, driver_device,  0, ROT0, "Nintendo", "Mario Bros. (Japan)", GAME_SUPPORTS_SAVE )
 GAME( 1983, masao,    mario,   masao,   masao, driver_device,   0, ROT0, "bootleg", "Masao", GAME_SUPPORTS_SAVE )
-GAME( 1983, mariobl,  mario,   mariobl, marioj, driver_device,  0, ROT180, "bootleg", "Mario Bros. (Japan, bootleg)", GAME_SUPPORTS_SAVE ) // was listed as 'on extended Ambush hardware' but doesn't seem similar apart from the sound system?
+GAME( 1983, mariobl,  mario,   mariobl, mariobl,driver_device,  0, ROT180, "bootleg", "Mario Bros. (Japan, bootleg)", GAME_SUPPORTS_SAVE ) // was listed as 'on extended Ambush hardware' but doesn't seem similar apart from the sound system?
