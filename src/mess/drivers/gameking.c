@@ -2,6 +2,26 @@
 
 // these are meant to have a 3-in-1 internal ROM, not dumped
 
+/*
+The carridge dumps have something what looks like vectors/pointers to interesting pieces
+of code at offsets like $004c, $0050, $0054, $0060, $0064, $0068, and $0070 (some carts).
+
+At offset $004c there is usually $00 $40, $00, $01; this seems to point to bank #1/offset $4000,
+which should get banked in at address $4000. There is valid at offset $4000 in the cartridge
+dumps.
+
+There seem to be some RAM that starts at $1000 in the memomry map.
+
+A routine at $0f80 seems to be called a lot. It's probably some kind of entry into the
+bios to perform several functions. The function to perform seems to be passed through
+the A register with pointer to parameters stored at $0080-$0081 (multiple parameters/
+blocks?).
+
+The reset and irq vectors seem to be the same in most, if not all, cartridge dumps. It
+is very likely that they point to code in the internal bios.
+
+*/
+
 #include "emu.h"
 #include "cpu/m6502/m65c02.h"
 #include "bus/generic/slot.h"
@@ -33,11 +53,21 @@ protected:
 	required_device<palette_device> m_palette;
 
 	memory_region *m_cart_rom;
-	memory_bank *m_mainbank;
+	memory_bank *m_bank4000;
+	memory_bank *m_bank8000;
+	memory_bank *m_bankc000;
 };
 
 static ADDRESS_MAP_START( gameking_mem , AS_PROGRAM, 8, gameking_state )
-	AM_RANGE(0xc000, 0xffff) AM_ROMBANK("mainbank")
+	AM_RANGE(0x0000, 0x01ff) AM_RAM
+
+	AM_RANGE(0x0f00, 0x0fff) AM_ROM
+
+	AM_RANGE(0x1000, 0x1fff) AM_RAM    // sthero writes to $19xx
+
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank4000")
+	AM_RANGE(0x8000, 0xcfff) AM_ROMBANK("bank8000")
+	AM_RANGE(0xc000, 0xffff) AM_ROMBANK("bankc000")
 ADDRESS_MAP_END
 
 
@@ -93,8 +123,24 @@ void gameking_state::machine_start()
 
 	if (!m_cart_rom) printf("No Rom\n");
 
-	m_mainbank = membank("mainbank");
-	m_mainbank->set_base(m_cart_rom->base());
+	m_bank4000 = membank("bank4000");
+	m_bank8000 = membank("bank8000");
+	m_bankc000 = membank("bankc000");
+
+	// Minor hacking to get things going (should be removed when we have bios dump)
+	m_cart_rom->base()[0x3ffc] = 0x00;
+	m_cart_rom->base()[0x3ffd] = 0x40;
+
+	// Some fake code to get bios functions called logged
+	memory_region *maincpu_rom = memregion("maincpu");
+	maincpu_rom->base()[0x0f80] = 0x9d; // STA $0e00,X
+	maincpu_rom->base()[0x0f81] = 0x00;
+	maincpu_rom->base()[0x0f82] = 0x0e;
+	maincpu_rom->base()[0x0f83] = 0x60; // RTS
+
+	m_bank8000->set_base(m_cart_rom->base());
+	m_bankc000->set_base(m_cart_rom->base());
+	m_bank4000->set_base(m_cart_rom->base() + 0x4000);
 }
 
 void gameking_state::machine_reset()
@@ -133,6 +179,7 @@ static MACHINE_CONFIG_START( gameking, gameking_state )
 MACHINE_CONFIG_END
 
 ROM_START(gameking)
+	ROM_REGION(0x8000, "maincpu", ROMREGION_ERASE00)
 ROM_END
 
 
