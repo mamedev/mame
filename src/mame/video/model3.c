@@ -24,7 +24,7 @@ class model3_renderer : public poly_manager<float, model3_polydata, 6, 50000>
 {
 public:
 	model3_renderer(model3_state &state, int width, int height)
-		: poly_manager<float, model3_polydata, 6, 50000>(state.machine()), m_state(state)
+		: poly_manager<float, model3_polydata, 6, 50000>(state.machine())//, m_state(state)
 	{
 		m_fb = auto_bitmap_rgb32_alloc(state.machine(), width, height);
 		m_zb = auto_bitmap_ind32_alloc(state.machine(), width, height);		
@@ -40,7 +40,7 @@ public:
 	void draw_scanline_tex_alpha(INT32 scanline, const extent_t &extent, const model3_polydata &extradata, int threadid);
 
 private:
-	model3_state &m_state;
+	//model3_state &m_state;
 	bitmap_rgb32 *m_fb;
 	bitmap_ind32 *m_zb;
 };

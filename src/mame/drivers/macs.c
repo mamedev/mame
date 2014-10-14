@@ -197,9 +197,9 @@ static ADDRESS_MAP_START( macs_io, AS_IO, 8, macs_state )
 	//AM_RANGE(0xf0, 0xf0) AM_READ(st0016_dma_r)
 ADDRESS_MAP_END
 
-static GFXDECODE_START( macs )
+//static GFXDECODE_START( macs )
 //  GFXDECODE_ENTRY( NULL, 0, charlayout,      0, 16*4  )
-GFXDECODE_END
+//GFXDECODE_END
 
 static INPUT_PORTS_START( macs_base )
 	/*0*/
