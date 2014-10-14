@@ -178,7 +178,10 @@ static ADDRESS_MAP_START( mariobl_map, AS_PROGRAM, 8, mario_state)
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x6fff) AM_RAM
 	AM_RANGE(0x7000, 0x71ff) AM_RAM AM_SHARE("spriteram") /* physical sprite ram */
-	AM_RANGE(0x7200, 0x73ff) AM_RAM // attrram? 
+	AM_RANGE(0x7200, 0x72ff) AM_RAM // attrram? (only enough for sprites?)
+	AM_RANGE(0x7300, 0x737f) AM_RAM // probably x-scroll?
+	AM_RANGE(0x7380, 0x7380) AM_WRITE(mariobl_scroll_w)
+	AM_RANGE(0x7281, 0x73ff) AM_RAM // seems to have scroll vals for every column on this bl
 	AM_RANGE(0x7400, 0x77ff) AM_RAM_WRITE(mario_videoram_w) AM_SHARE("videoram")
 	//AM_RANGE(0xa000, 0xa000) AM_READ_PORT("IN1")
 	AM_RANGE(0xa000, 0xa000) AM_READNOP   /* watchdog? */

@@ -105,6 +105,11 @@ WRITE8_MEMBER(mario_state::mario_scroll_w)
 	m_gfx_scroll = data + 17;
 }
 
+WRITE8_MEMBER(mario_state::mariobl_scroll_w)
+{
+	m_gfx_scroll = data;
+}
+
 WRITE8_MEMBER(mario_state::mario_flip_w)
 {
 	if (m_flip != (data & 0x01))
