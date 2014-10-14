@@ -26,7 +26,7 @@
     vs29815 - massive memory trashing and page faults
 
     vs2 - works
-    harley - works, massive slowdown ingame
+    harley - works, wrong textures in many places, correct textures uploaded when the game ends
     skichamp - boots after skipping the drive board errors, massive slowdowns
     srally2/sraly2dx - works
     von2/von254g - works
@@ -42,7 +42,7 @@
     dirtdvls/dirtdvla - works
     swtrilgy - 
     swtrilga - 
-    magtruck - works
+    magtruck - works, broken FPU values in matrices during 2nd part of attract mode (cpu core bug?)
     eca/ecax - cabinet network error
 
 ===================================================================================
@@ -5400,15 +5400,23 @@ WRITE8_MEMBER(model3_state::scsp_irq)
     0x04: Video (unknown -- has callback hook in scud)
     0x02: Video (VBLANK start?)
     0x01: Video (unused?)
+
+	IRQ 0x08 and 0x04 directly affect the game speed in magtruck, once per scanline seems fast enough
+	Un-syncing the interrupts breaks the progress bar in magtruck
 */
 TIMER_DEVICE_CALLBACK_MEMBER(model3_state::model3_interrupt)
 {
 	int scanline = param;
 
 	if (scanline == 384)
+	{
 		set_irq_line(0x02, ASSERT_LINE);
+	}
 	else
-		set_irq_line(0x0d, ASSERT_LINE);
+	{
+		//if ((scanline & 0x1) == 0)
+			set_irq_line(0x0c, ASSERT_LINE);
+	}
 }
 
 static MACHINE_CONFIG_START( model3_10, model3_state )
@@ -5834,15 +5842,16 @@ DRIVER_INIT_MEMBER(model3_state,srally2)
 
 DRIVER_INIT_MEMBER(model3_state,swtrilgy)
 {
-	//UINT32 *rom = (UINT32*)memregion("user1")->base();
+	UINT32 *rom = (UINT32*)memregion("user1")->base();
 	DRIVER_INIT_CALL(model3_20);
 
-	/*
-	rom[(0xf0e48^4)/4] = 0x60000000;
-	rom[(0x043dc^4)/4] = 0x48000090;
-	rom[(0x029a0^4)/4] = 0x60000000;
-	rom[(0x02a0c^4)/4] = 0x60000000;
-	*/
+	// Unemulated JTAG stuff, see srally2
+	rom[(0xf776c^4)/4] = 0x60000000;
+	rom[(0xf7770^4)/4] = 0x60000000;
+	rom[(0xf7774^4)/4] = 0x60000000;
+
+	rom[(0x043dc^4)/4] = 0x48000090;		// skip force feedback setup
+	rom[(0xf6e44^4)/4] = 0x60000000;
 }
 
 DRIVER_INIT_MEMBER(model3_state,swtrilga)
