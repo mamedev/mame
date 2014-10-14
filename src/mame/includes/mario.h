@@ -102,7 +102,7 @@ public:
 	DECLARE_WRITE8_MEMBER(mario_sh2_w);
 	DECLARE_READ8_MEMBER(memory_read_byte);
 	DECLARE_WRITE8_MEMBER(memory_write_byte);
-	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int yaddr, int xaddr, int dx, int dy);
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int is_bootleg);
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
 	required_device<gfxdecode_device> m_gfxdecode;

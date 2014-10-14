@@ -147,49 +147,101 @@ void mario_state::video_start()
  * confirmed on mametests.org as being present on real PCB as well.
  */
 
-void mario_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int yaddr, int xaddr, int dx, int dy)
+void mario_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int is_bootleg)
 {
 	/* TODO: draw_sprites should adopt the scanline logic from dkong.c
 	 * The schematics have the same logic for sprite buffering.
 	 */
 	int offs;
 
-	for (offs = 0; offs < m_spriteram.bytes(); offs += 4)
+	int start, end, inc;
+
+	if (!is_bootleg)
 	{
-		if (m_spriteram[offs])
+		start = 0;
+		end = m_spriteram.bytes();
+		inc = 4;
+	}
+	else
+	{
+		start = m_spriteram.bytes()-4;
+		end = -4;
+		inc = -4;
+	}
+
+	offs = start;
+
+	while (offs != end)
+	{
+		if (is_bootleg || m_spriteram[offs])
 		{
 			int x, y;
+			int code, color, flipx, flipy;
 
-			// from schematics ....
-			y = (m_spriteram[offs+yaddr] + (m_flip ? 0xF7 : 0xF9) + 1) & 0xFF;
-			x = m_spriteram[offs+xaddr];
-			// sprite will be drawn if (y + scanline) & 0xF0 = 0xF0
-			y = 240 - y; /* logical screen position */
-
-			y = y ^ (m_flip ? 0xFF : 0x00); /* physical screen location */
-			x = x ^ (m_flip ? 0xFF : 0x00); /* physical screen location */
-
-			if (m_flip)
+			if (!is_bootleg)
 			{
-				y -= 14;
-				x -= 7;
-				m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
-						m_spriteram[offs + 2],
-						(m_spriteram[offs + 1] & 0x0f) + 16 * m_palette_bank + 32 * m_monitor,
-						!(m_spriteram[offs + 1] & 0x80),!(m_spriteram[offs + 1] & 0x40),
-						x+dx, y+dy,0);
+				// from schematics ....
+				y = (m_spriteram[offs + 0] + (m_flip ? 0xF7 : 0xF9) + 1) & 0xFF;
+				x = m_spriteram[offs + 3];
+				// sprite will be drawn if (y + scanline) & 0xF0 = 0xF0
+				y = 240 - y; /* logical screen position */
+
+				y = y ^ (m_flip ? 0xFF : 0x00); /* physical screen location */
+				x = x ^ (m_flip ? 0xFF : 0x00); /* physical screen location */
+				
+				code = m_spriteram[offs + 2];
+				color = (m_spriteram[offs + 1] & 0x0f) + 16 * m_palette_bank + 32 * m_monitor;
+				flipx = (m_spriteram[offs + 1] & 0x80);
+				flipy = (m_spriteram[offs + 1] & 0x40);
+
+				if (m_flip)
+				{
+					y -= 14;
+					x -= 7;
+				}
+				else
+				{
+					y += 1;
+					x -= 8;
+				}
 			}
 			else
 			{
-				y += 1;
-				x -= 8;
-				m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
-						m_spriteram[offs + 2],
-						(m_spriteram[offs + 1] & 0x0f) + 16 * m_palette_bank + 32 * m_monitor,
-						(m_spriteram[offs + 1] & 0x80),(m_spriteram[offs + 1] & 0x40),
-						x+dx, y+dy,0);
+				y = (m_spriteram[offs + 3] + (m_flip ? 0xF7 : 0xF9) + 1) & 0xFF;
+				x = m_spriteram[offs + 0];
+				y = 240 - y; /* logical screen position */
+
+			//	y = y ^ (m_flip ? 0xFF : 0x00); /* physical screen location */
+			//	x = x ^ (m_flip ? 0xFF : 0x00); /* physical screen location */
+
+				code = (m_spriteram[offs + 2] & 0x7f) | ((m_spriteram[offs + 1] & 0x40) << 1); // upper tile bit is where the flipy bit goes on mario
+				color = (m_spriteram[offs + 1] & 0x0f) + 16 * m_palette_bank + 32 * m_monitor;
+				flipx = (m_spriteram[offs + 1] & 0x80);
+				flipy = (m_spriteram[offs + 2] & 0x80); // and the flipy bit is where the upper tile bit is on mario
+
+				y += -7;
+			}
+
+			if (m_flip)
+			{
+				m_gfxdecode->gfx(1)->transpen(bitmap, cliprect,
+					code,
+					color,
+					!flipx, !flipy,
+					x, y, 0);
+			}
+			else
+			{
+
+				m_gfxdecode->gfx(1)->transpen(bitmap, cliprect,
+					code,
+					color,
+					flipx, flipy,
+					x, y, 0);
 			}
 		}
+
+		offs += inc;
 	}
 }
 
@@ -214,7 +266,7 @@ UINT32 mario_state::screen_update_common(screen_device &screen, bitmap_ind16 &bi
 UINT32 mario_state::screen_update_mario(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	screen_update_common(screen, bitmap, cliprect);
-	draw_sprites(bitmap, cliprect, 0, 3, 0, 0);
+	draw_sprites(bitmap, cliprect, 0);
 	return 0;
 }
 
@@ -226,6 +278,6 @@ UINT32 mario_state::screen_update_mariobl(screen_device &screen, bitmap_ind16 &b
 
 
 	screen_update_common(screen, bitmap, cliprect);
-	draw_sprites(bitmap, cliprect, 3, 0, 8, -8);
+	draw_sprites(bitmap, cliprect, 1);
 	return 0;
 }
