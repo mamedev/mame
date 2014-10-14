@@ -686,7 +686,7 @@ static ADDRESS_MAP_START( alpha68k_II_map, AS_PROGRAM, 16, alpha68k_state )
 	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE(alpha68k_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x200000, 0x207fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x300000, 0x3001ff) AM_READWRITE(alpha_II_trigger_r, alpha_microcontroller_w)
-	AM_RANGE(0x400000, 0x400fff) AM_RAM_WRITE(alpha68k_paletteram_w) AM_SHARE("paletteram")
+	AM_RANGE(0x400000, 0x400fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x800000, 0x83ffff) AM_ROMBANK("bank8")
 ADDRESS_MAP_END
 
@@ -704,7 +704,7 @@ static ADDRESS_MAP_START( alpha68k_V_map, AS_PROGRAM, 16, alpha68k_state )
 	AM_RANGE(0x300000, 0x303fff) AM_READ(alpha_V_trigger_r)
 	AM_RANGE(0x300000, 0x3001ff) AM_WRITE(alpha_microcontroller_w)
 	AM_RANGE(0x303e00, 0x303fff) AM_WRITE(alpha_microcontroller_w) /* Gang Wars mirror */
-	AM_RANGE(0x400000, 0x401fff) AM_RAM_WRITE(alpha68k_paletteram_w) AM_SHARE("paletteram")
+	AM_RANGE(0x400000, 0x401fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x800000, 0x83ffff) AM_ROMBANK("bank8")
 ADDRESS_MAP_END
 
@@ -1584,41 +1584,28 @@ INPUT_PORTS_END
 
 static const gfx_layout charlayout =
 {
-	8,8,    /* 8*8 chars */
-	2048,
-	4,      /* 4 bits per pixel  */
-	{ 0, 4, 0x8000*8, (0x8000*8)+4 },
-	{ 8*8+3, 8*8+2, 8*8+1, 8*8+0, 3, 2, 1, 0 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	16*8    /* every char takes 8 consecutive bytes */
+	8,8,    /* 8x8 */
+	RGN_FRAC(1,1),
+	4,      /* 4 bits per pixel */
+	{ 8,12,0,4 },
+	{ 8*16+3, 8*16+2, 8*16+1, 8*16+0, 3, 2, 1, 0 },
+	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16 },
+	32*8 /* every char takes 32 consecutive bytes */
 };
 
-/* You wouldn't believe how long it took me to figure this one out.. */
+/* Same format as neogeo fix layer tiles */
 static const gfx_layout charlayout_V =
 {
 	8,8,
-	2048,
+	RGN_FRAC(1,1),
 	4,  /* 4 bits per pixel */
 	{ 0,1,2,3 },
 	{ 16*8+4, 16*8+0, 24*8+4, 24*8+0, 4, 0, 8*8+4, 8*8+0 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	32*8    /* every sprite takes 16 consecutive bytes */
+	32*8    /* every char takes 32 consecutive bytes */
 };
 
 static const gfx_layout spritelayout =
-{
-	16,16,  /* 16*16 sprites */
-	4096*4,
-	4,      /* 4 bits per pixel */
-	{ 0, 0x80000*8, 0x100000*8, 0x180000*8 },
-	{ 16*8+7, 16*8+6, 16*8+5, 16*8+4, 16*8+3, 16*8+2, 16*8+1, 16*8+0,
-		7, 6, 5, 4, 3, 2, 1, 0 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
-		8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
-	8*32    /* every sprite takes 32 consecutive bytes */
-};
-
-static const gfx_layout spritelayout_V =
 {
 	16,16,  /* 16*16 sprites */
 	RGN_FRAC(1,4),
@@ -1629,28 +1616,6 @@ static const gfx_layout spritelayout_V =
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
 		8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
 	8*32    /* every sprite takes 32 consecutive bytes */
-};
-
-static const gfx_layout tnextspc_layout =
-{
-	8,8,    /* 8x8 */
-	RGN_FRAC(1,1),  /* Number of tiles */
-	4,      /* 4 bits per pixel */
-	{ 8,12,0,4 }, //AT: changed bit plane sequence
-	{ 8*16+3, 8*16+2, 8*16+1, 8*16+0, 3, 2, 1, 0 },
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16 },
-	32*8 /* every char takes 32 consecutive bytes */
-};
-
-static const gfx_layout paddle_layout =
-{
-	8,8,    /* 8*8 chars */
-	0x4000,
-	4,      /* 4 bits per pixel */
-	{ 0, 4, 0x40000*8, 0x40000*8+4 },
-	{ 8*8+3, 8*8+2, 8*8+1, 8*8+0, 3, 2, 1, 0 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	16*8    /* every char takes 16 consecutive bytes */
 };
 
 static const gfx_layout sting_layout1 =
@@ -1765,22 +1730,18 @@ static const gfx_layout jongbou_layout5 =
 
 /******************************************************************************/
 
+static GFXDECODE_START( alpha68k_I )
+	GFXDECODE_ENTRY( "gfx1", 0, charlayout,  0, 64 )
+GFXDECODE_END
+
 static GFXDECODE_START( alpha68k_II )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0,  16 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 0, 128 )
 GFXDECODE_END
 
 static GFXDECODE_START( alpha68k_V )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout_V,    0,  16 )
-	GFXDECODE_ENTRY( "gfx2", 0, spritelayout_V,  0, 256 )
-GFXDECODE_END
-
-static GFXDECODE_START( paddle )
-	GFXDECODE_ENTRY( "gfx1", 0, paddle_layout,  0, 64 )
-GFXDECODE_END
-
-static GFXDECODE_START( tnextspc )
-	GFXDECODE_ENTRY( "gfx1", 0, tnextspc_layout,  0, 64 )
+	GFXDECODE_ENTRY( "gfx1", 0, charlayout_V,  0,  16 )
+	GFXDECODE_ENTRY( "gfx2", 0, spritelayout,  0, 256 )
 GFXDECODE_END
 
 static GFXDECODE_START( sstingry )
@@ -2078,7 +2039,7 @@ static MACHINE_CONFIG_START( alpha68k_I, alpha68k_state )
 	MCFG_SCREEN_UPDATE_DRIVER(alpha68k_state, screen_update_alpha68k_I)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", paddle)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", alpha68k_I)
 
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_INDIRECT_ENTRIES(256)
@@ -2124,6 +2085,7 @@ static MACHINE_CONFIG_START( alpha68k_II, alpha68k_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", alpha68k_II)
 	MCFG_PALETTE_ADD("palette", 2048)
+	MCFG_PALETTE_FORMAT(xRGBRRRRGGGGBBBB)
 
 	MCFG_VIDEO_START_OVERRIDE(alpha68k_state,alpha68k)
 
@@ -2175,6 +2137,7 @@ static MACHINE_CONFIG_START( alpha68k_II_gm, alpha68k_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", alpha68k_II)
 	MCFG_PALETTE_ADD("palette", 2048)
+	MCFG_PALETTE_FORMAT(xRGBRRRRGGGGBBBB)
 
 	MCFG_VIDEO_START_OVERRIDE(alpha68k_state,alpha68k)
 
@@ -2220,6 +2183,7 @@ static MACHINE_CONFIG_START( alpha68k_V, alpha68k_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", alpha68k_V)
 	MCFG_PALETTE_ADD("palette", 4096)
+	MCFG_PALETTE_FORMAT(xRGBRRRRGGGGBBBB)
 
 	MCFG_VIDEO_START_OVERRIDE(alpha68k_state,alpha68k)
 
@@ -2264,6 +2228,7 @@ static MACHINE_CONFIG_START( alpha68k_V_sb, alpha68k_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", alpha68k_V)
 	MCFG_PALETTE_ADD("palette", 4096)
+	MCFG_PALETTE_FORMAT(xRGBRRRRGGGGBBBB)
 
 	MCFG_VIDEO_START_OVERRIDE(alpha68k_state,alpha68k)
 
@@ -2305,7 +2270,7 @@ static MACHINE_CONFIG_START( tnextspc, alpha68k_state )
 	MCFG_SCREEN_UPDATE_DRIVER(alpha68k_state, screen_update_alpha68k_I)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tnextspc)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", alpha68k_I)
 
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_INDIRECT_ENTRIES(256)
@@ -2539,14 +2504,14 @@ ROM_START( paddlema )
 	ROM_LOAD( "alpha.mcu", 0x000, 0x1000, NO_DUMP )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
-	ROM_LOAD( "padlem.16m",      0x00000, 0x10000, CRC(0984fb4d) SHA1(6bc529db93fad277f286e4a380812c40c7f42301) )
-	ROM_LOAD( "padlem.16n",      0x10000, 0x10000, CRC(4249e047) SHA1(9f35b316b5de65f8b1878fca283c9d534bb8ae25) )
-	ROM_LOAD( "padlem.13m",      0x20000, 0x10000, CRC(fd9dbc27) SHA1(c01f512afef7686c64cc0766c235084cc8e2f5fc) )
-	ROM_LOAD( "padlem.13n",      0x30000, 0x10000, CRC(1d460486) SHA1(4ade817a036447e7e6d4fe56fa2c5712f198c625) )
-	ROM_LOAD( "padlem.9m",       0x40000, 0x10000, CRC(4ee4970d) SHA1(d57d9178129236dfb3a18688e8544e5e555ce559) )
-	ROM_LOAD( "padlem.9n",       0x50000, 0x10000, CRC(a1756f15) SHA1(1220075e34c482e38eead9ea5e63b53b822e87de) )
-	ROM_LOAD( "padlem.6m",       0x60000, 0x10000, CRC(3f47910c) SHA1(429d425dc57fbd868bc39c3d799bbaebcf313cc0) )
-	ROM_LOAD( "padlem.6n",       0x70000, 0x10000, CRC(fe337655) SHA1(ac04124642b245d6a530c72d0dea1b1585b5cebd) )
+	ROM_LOAD16_BYTE( "padlem.9m",       0x00000, 0x10000, CRC(4ee4970d) SHA1(d57d9178129236dfb3a18688e8544e5e555ce559) )
+	ROM_LOAD16_BYTE( "padlem.16m",      0x00001, 0x10000, CRC(0984fb4d) SHA1(6bc529db93fad277f286e4a380812c40c7f42301) )
+	ROM_LOAD16_BYTE( "padlem.9n",       0x20000, 0x10000, CRC(a1756f15) SHA1(1220075e34c482e38eead9ea5e63b53b822e87de) )
+	ROM_LOAD16_BYTE( "padlem.16n",      0x20001, 0x10000, CRC(4249e047) SHA1(9f35b316b5de65f8b1878fca283c9d534bb8ae25) )
+	ROM_LOAD16_BYTE( "padlem.6m",       0x40000, 0x10000, CRC(3f47910c) SHA1(429d425dc57fbd868bc39c3d799bbaebcf313cc0) )
+	ROM_LOAD16_BYTE( "padlem.13m",      0x40001, 0x10000, CRC(fd9dbc27) SHA1(c01f512afef7686c64cc0766c235084cc8e2f5fc) )
+	ROM_LOAD16_BYTE( "padlem.6n",       0x60000, 0x10000, CRC(fe337655) SHA1(ac04124642b245d6a530c72d0dea1b1585b5cebd) )
+	ROM_LOAD16_BYTE( "padlem.13n",      0x60001, 0x10000, CRC(1d460486) SHA1(4ade817a036447e7e6d4fe56fa2c5712f198c625) )
 
 	ROM_REGION( 0x1000, "proms", 0 )
 	ROM_LOAD( "padlem.a",        0x0000,  0x0100,  CRC(cae6bcd6) SHA1(da3b3bdcdc7fefae80b0ef8365565bbe5ff0d5d2) ) /* R */
@@ -2576,8 +2541,8 @@ ROM_START( timesold )
 	ROM_LOAD( "alpha.mcu", 0x000, 0x1000, NO_DUMP )
 
 	ROM_REGION( 0x010000, "gfx1", 0 )  /* chars */
-	ROM_LOAD( "bf.5",            0x00000,  0x08000, CRC(3cec2f55) SHA1(e4fca0c8193680385c7dd4d6c599492c9e0dd4af) )
-	ROM_LOAD( "bf.6",            0x08000,  0x08000, CRC(086a364d) SHA1(b008d4b351ada4240dd6c82c45405a2489e36019) )
+	ROM_LOAD16_BYTE( "bf.6",     0x00000,  0x08000, CRC(086a364d) SHA1(b008d4b351ada4240dd6c82c45405a2489e36019) )
+	ROM_LOAD16_BYTE( "bf.5",     0x00001,  0x08000, CRC(3cec2f55) SHA1(e4fca0c8193680385c7dd4d6c599492c9e0dd4af) )
 
 	ROM_REGION( 0x200000, "gfx2", 0 )  /* sprites */
 	ROM_LOAD( "bf.10",           0x000000, 0x20000, CRC(613313ba) SHA1(4940ddc5f7f4e3165a830dbfa6a65ddb23a33e12) )
@@ -2611,8 +2576,8 @@ ROM_START( timesold1 )
 	ROM_LOAD( "alpha.mcu", 0x000, 0x1000, NO_DUMP )
 
 	ROM_REGION( 0x010000, "gfx1", 0 )  /* chars */
-	ROM_LOAD( "bf.5",            0x00000,  0x08000, CRC(3cec2f55) SHA1(e4fca0c8193680385c7dd4d6c599492c9e0dd4af) )
-	ROM_LOAD( "bf.6",            0x08000,  0x08000, CRC(086a364d) SHA1(b008d4b351ada4240dd6c82c45405a2489e36019) )
+	ROM_LOAD16_BYTE( "bf.6",     0x00000,  0x08000, CRC(086a364d) SHA1(b008d4b351ada4240dd6c82c45405a2489e36019) )
+	ROM_LOAD16_BYTE( "bf.5",     0x00001,  0x08000, CRC(3cec2f55) SHA1(e4fca0c8193680385c7dd4d6c599492c9e0dd4af) )
 
 	ROM_REGION( 0x200000, "gfx2", 0 )  /* sprites */
 	ROM_LOAD( "bf.10",           0x000000, 0x20000, CRC(613313ba) SHA1(4940ddc5f7f4e3165a830dbfa6a65ddb23a33e12) )
@@ -2643,8 +2608,8 @@ ROM_START( btlfield )
 	ROM_LOAD( "bf.9",            0x50000,  0x10000, CRC(1408416f) SHA1(d7a32de156791f923635d7fdddc8db97f66bfb2a) )
 
 	ROM_REGION( 0x010000, "gfx1", 0 )  /* chars */
-	ROM_LOAD( "bfv1_05.bin",     0x00000,  0x08000, CRC(be269dbf) SHA1(3240badbf65e076cc1f7caaec1081df9a4371d47) )
-	ROM_LOAD( "bfv1_06.bin",     0x08000,  0x08000, CRC(022b9de9) SHA1(5a736a4cfe05e7681c78ab816dfe04074fe0293d) )
+	ROM_LOAD16_BYTE( "bfv1_06.bin", 0x00000, 0x08000, CRC(022b9de9) SHA1(5a736a4cfe05e7681c78ab816dfe04074fe0293d) )
+	ROM_LOAD16_BYTE( "bfv1_05.bin", 0x00001, 0x08000, CRC(be269dbf) SHA1(3240badbf65e076cc1f7caaec1081df9a4371d47) )
 
 	ROM_REGION( 0x200000, "gfx2", 0 )  /* sprites */
 	ROM_LOAD( "bf.10",           0x000000, 0x20000, CRC(613313ba) SHA1(4940ddc5f7f4e3165a830dbfa6a65ddb23a33e12) )
@@ -2678,8 +2643,8 @@ ROM_START( btlfieldb )
 	ROM_LOAD( "alpha.mcu", 0x000, 0x1000, NO_DUMP )
 
 	ROM_REGION( 0x010000, "gfx1", 0 )  /* chars */
-	ROM_LOAD( "bfv1_05.bin",     0x00000,  0x08000, CRC(be269dbf) SHA1(3240badbf65e076cc1f7caaec1081df9a4371d47) )
-	ROM_LOAD( "bfv1_06.bin",     0x08000,  0x08000, CRC(022b9de9) SHA1(5a736a4cfe05e7681c78ab816dfe04074fe0293d) )
+	ROM_LOAD16_BYTE( "bfv1_06.bin", 0x00000, 0x08000, CRC(022b9de9) SHA1(5a736a4cfe05e7681c78ab816dfe04074fe0293d) )
+	ROM_LOAD16_BYTE( "bfv1_05.bin", 0x00001, 0x08000, CRC(be269dbf) SHA1(3240badbf65e076cc1f7caaec1081df9a4371d47) )
 
 	ROM_REGION( 0x200000, "gfx2", 0 )  /* sprites */
 	ROM_LOAD( "12.bin",          0x000000, 0x10000, CRC(8cab60f2) SHA1(92410d430cab112e87888a9cf50c304957f43be0) )
@@ -2729,8 +2694,8 @@ ROM_START( skysoldr )
 	ROM_LOAD( "alpha.mcu", 0x000, 0x1000, NO_DUMP )
 
 	ROM_REGION( 0x010000, "gfx1", 0 )  /* chars */
-	ROM_LOAD( "ss.5",            0x00000, 0x08000, CRC(928ba287) SHA1(c415c5b84b83ee0e5e0aa60eb33132145fcd7487) )
-	ROM_LOAD( "ss.6",            0x08000, 0x08000, CRC(93b30b55) SHA1(51cacc48f4a298131852d41da80126bda5988920) )
+	ROM_LOAD16_BYTE( "ss.6",     0x00000, 0x08000, CRC(93b30b55) SHA1(51cacc48f4a298131852d41da80126bda5988920) )
+	ROM_LOAD16_BYTE( "ss.5",     0x00001, 0x08000, CRC(928ba287) SHA1(c415c5b84b83ee0e5e0aa60eb33132145fcd7487) )
 
 	ROM_REGION( 0x200000, "gfx2", 0 )  /* sprites */
 	ROM_LOAD( "ss.10",          0x000000, 0x20000, CRC(e48c1623) SHA1(1181e16d0d36d246ce4401b5cdacb0780acf835c) )
@@ -2772,8 +2737,8 @@ ROM_START( skysoldrbl )
 	ROM_LOAD( "68705r3p.mcu", 0x000, 0x1000, NO_DUMP ) // the BOOTLEGs use a 68705, I think it's programmed to act the same way as the original MCU tho.
 
 	ROM_REGION( 0x010000, "gfx1", 0 )  /* chars */
-	ROM_LOAD( "xx.ic2",            0x00000, 0x08000, CRC(928ba287) SHA1(c415c5b84b83ee0e5e0aa60eb33132145fcd7487) )
-	ROM_LOAD( "xx.ic1",            0x08000, 0x08000, CRC(93b30b55) SHA1(51cacc48f4a298131852d41da80126bda5988920) )
+	ROM_LOAD16_BYTE( "xx.ic1",   0x00000, 0x08000, CRC(93b30b55) SHA1(51cacc48f4a298131852d41da80126bda5988920) )
+	ROM_LOAD16_BYTE( "xx.ic2",   0x00001, 0x08000, CRC(928ba287) SHA1(c415c5b84b83ee0e5e0aa60eb33132145fcd7487) )
 
 	ROM_REGION( 0x200000, "gfx2", 0 )  /* sprites */
 	ROM_LOAD( "26.ica9",         0x000000, 0x10000, CRC(2aad8c4d) SHA1(ff407b43cede6a0f2c199be82bad0c491975c2ad) )
@@ -2839,8 +2804,8 @@ ROM_START( goldmedl )
 	ROM_LOAD( "1.bin",           0x40000,  0x10000, BAD_DUMP CRC(1e78062c) SHA1(821c037edf32eb8b03e5c487d3bab0622337e80b) )
 //ZT
 	ROM_REGION( 0x010000, "gfx1", 0 )  /* chars */
-	ROM_LOAD( "gm.5",           0x000000, 0x08000, CRC(667f33f1) SHA1(6d05603b49927f09c9bb34e787b003eceaaf7062) )
-	ROM_LOAD( "gm.6",           0x008000, 0x08000, CRC(56020b13) SHA1(17e176a9c82ed0d6cb5c4014034ce4e16b8ef4fb) )
+	ROM_LOAD16_BYTE( "gm.6",     0x00000, 0x08000, CRC(56020b13) SHA1(17e176a9c82ed0d6cb5c4014034ce4e16b8ef4fb) )
+	ROM_LOAD16_BYTE( "gm.5",     0x00001, 0x08000, CRC(667f33f1) SHA1(6d05603b49927f09c9bb34e787b003eceaaf7062) )
 
 	ROM_REGION( 0x200000, "gfx2", 0 )  /* sprites */
 	ROM_LOAD( "goldchr3.c46",   0x000000, 0x80000, CRC(6faaa07a) SHA1(8c81ac35220835691d7620b334e83f1fb4f79a52) )
@@ -2868,8 +2833,8 @@ ROM_START( goldmedla )
 	ROM_LOAD( "alpha.mcu", 0x000, 0x1000, NO_DUMP )
 
 	ROM_REGION( 0x010000, "gfx1", 0 )  /* chars */
-	ROM_LOAD( "gm.5",           0x000000, 0x08000, CRC(667f33f1) SHA1(6d05603b49927f09c9bb34e787b003eceaaf7062) )
-	ROM_LOAD( "gm.6",           0x008000, 0x08000, CRC(56020b13) SHA1(17e176a9c82ed0d6cb5c4014034ce4e16b8ef4fb) )
+	ROM_LOAD16_BYTE( "gm.6",     0x00000, 0x08000, CRC(56020b13) SHA1(17e176a9c82ed0d6cb5c4014034ce4e16b8ef4fb) )
+	ROM_LOAD16_BYTE( "gm.5",     0x00001, 0x08000, CRC(667f33f1) SHA1(6d05603b49927f09c9bb34e787b003eceaaf7062) )
 
 	ROM_REGION( 0x200000, "gfx2", 0 )  /* sprites */
 	ROM_LOAD( "goldchr3.c46",   0x000000, 0x80000, CRC(6faaa07a) SHA1(8c81ac35220835691d7620b334e83f1fb4f79a52) )
@@ -2897,9 +2862,9 @@ ROM_START( goldmedlb )
 	ROM_LOAD( "1.bin",           0x40000,  0x10000, CRC(1e78062c) SHA1(821c037edf32eb8b03e5c487d3bab0622337e80b) )
 
 	ROM_REGION( 0x010000, "gfx1", 0 )  /* chars */
-	ROM_LOAD( "gm.5",           0x000000, 0x08000, CRC(667f33f1) SHA1(6d05603b49927f09c9bb34e787b003eceaaf7062) )
-	ROM_LOAD( "gm.6",           0x008000, 0x08000, CRC(56020b13) SHA1(17e176a9c82ed0d6cb5c4014034ce4e16b8ef4fb) )
-//  ROM_LOAD( "33.bin",         0x000000, 0x10000, CRC(05600b13) )
+	ROM_LOAD16_BYTE( "gm.6",     0x00000, 0x08000, CRC(56020b13) SHA1(17e176a9c82ed0d6cb5c4014034ce4e16b8ef4fb) )
+	ROM_LOAD16_BYTE( "gm.5",     0x00001, 0x08000, CRC(667f33f1) SHA1(6d05603b49927f09c9bb34e787b003eceaaf7062) )
+	//  ROM_LOAD( "33.bin",          0x00000, 0x10000, CRC(05600b13) )
 
 	/* I haven't yet verified if these are the same as the bootleg */
 
@@ -2928,7 +2893,7 @@ ROM_START( skyadvnt )
 	ROM_REGION( 0x10000, "mcu", 0 )
 	ROM_LOAD( "alpha.mcu", 0x000, 0x1000, NO_DUMP )
 
-	ROM_REGION( 0x020000, "gfx1", 0 )  /* chars */
+	ROM_REGION( 0x08000, "gfx1", 0 )  /* chars */
 	ROM_LOAD( "sa.7",           0x000000, 0x08000, CRC(ea26e9c5) SHA1(13cb5a5955c813cd48f98f62f045a4cbc61806a1) )
 
 	ROM_REGION( 0x280000, "gfx2", 0 )  /* sprites */
@@ -2953,7 +2918,7 @@ ROM_START( skyadvntu )
 	ROM_REGION( 0x10000, "mcu", 0 )
 	ROM_LOAD( "alpha.mcu", 0x000, 0x1000, NO_DUMP )
 
-	ROM_REGION( 0x020000, "gfx1", 0 )  /* chars */
+	ROM_REGION( 0x08000, "gfx1", 0 )  /* chars */
 	ROM_LOAD( "sa.7",           0x000000, 0x08000, CRC(ea26e9c5) SHA1(13cb5a5955c813cd48f98f62f045a4cbc61806a1) )
 
 	ROM_REGION( 0x280000, "gfx2", 0 )  /* sprites */
@@ -2978,7 +2943,7 @@ ROM_START( skyadvntj )
 	ROM_REGION( 0x10000, "mcu", 0 )
 	ROM_LOAD( "alpha.mcu", 0x000, 0x1000, NO_DUMP )
 
-	ROM_REGION( 0x020000, "gfx1", 0 )  /* chars */
+	ROM_REGION( 0x08000, "gfx1", 0 )  /* chars */
 	ROM_LOAD( "sa.7",           0x000000, 0x08000, CRC(ea26e9c5) SHA1(13cb5a5955c813cd48f98f62f045a4cbc61806a1) )
 
 	ROM_REGION( 0x280000, "gfx2", 0 )  /* sprites */
@@ -3007,7 +2972,7 @@ ROM_START( gangwars )
 	ROM_REGION( 0x10000, "mcu", 0 )
 	ROM_LOAD( "alpha.mcu", 0x000, 0x1000, NO_DUMP )
 
-	ROM_REGION( 0x020000, "gfx1", 0 )  /* chars */
+	ROM_REGION( 0x10000, "gfx1", 0 )  /* chars */
 	ROM_LOAD( "gw-13.4l",     0x000000, 0x10000, CRC(b75bf1d0) SHA1(c22c0049274c45701be0a7be2afc0517620a3a10) )
 
 	ROM_REGION( 0x400000, "gfx2", 0 )  /* sprites */
@@ -3042,7 +3007,7 @@ ROM_START( gangwarsb ) // this is a common bootleg, main code etc. matches the o
 	ROM_REGION( 0x10000, "mcu", 0 )
 	ROM_LOAD( "68705.mcu", 0x000, 0x1000, NO_DUMP )
 
-	ROM_REGION( 0x020000, "gfx1", 0 )  /* chars */
+	ROM_REGION( 0x10000, "gfx1", 0 )  /* chars */
 	ROM_LOAD( "gwb_ic.m19",     0x000000, 0x10000, CRC(b75bf1d0) SHA1(c22c0049274c45701be0a7be2afc0517620a3a10) )
 
 	ROM_REGION( 0x400000, "gfx2", 0 )  /* sprites */
@@ -3110,7 +3075,7 @@ ROM_START( gangwarsj )
 	ROM_REGION( 0x10000, "mcu", 0 )
 	ROM_LOAD( "alpha.mcu", 0x000, 0x1000, NO_DUMP )
 
-	ROM_REGION( 0x020000, "gfx1", 0 )  /* chars */
+	ROM_REGION( 0x10000, "gfx1", 0 )  /* chars */
 	ROM_LOAD( "gw-13.4l",     0x000000, 0x10000, CRC(b75bf1d0) SHA1(c22c0049274c45701be0a7be2afc0517620a3a10) )
 
 	ROM_REGION( 0x400000, "gfx2", 0 )  /* sprites */
@@ -3143,7 +3108,7 @@ ROM_START( gangwarsu )
 	ROM_REGION( 0x10000, "mcu", 0 )
 	ROM_LOAD( "alpha.mcu", 0x000, 0x1000, NO_DUMP )
 
-	ROM_REGION( 0x020000, "gfx1", 0 )  /* chars */
+	ROM_REGION( 0x10000, "gfx1", 0 )  /* chars */
 	ROM_LOAD( "gw-13.4l",     0x000000, 0x10000, CRC(b75bf1d0) SHA1(c22c0049274c45701be0a7be2afc0517620a3a10) )
 
 	ROM_REGION( 0x400000, "gfx2", 0 )  /* sprites */
@@ -3172,7 +3137,7 @@ ROM_START( sbasebal )
 	ROM_REGION( 0x10000, "mcu", 0 )
 	ROM_LOAD( "alpha.mcu", 0x000, 0x1000, NO_DUMP )
 
-	ROM_REGION( 0x020000, "gfx1", 0 )  /* chars */
+	ROM_REGION( 0x10000, "gfx1", 0 )  /* chars */
 	ROM_LOAD( "snksb7.bin",      0x000000, 0x10000, CRC(8f3c2e25) SHA1(a5b3880f3079cce607678fd4ea5971560ce9ed8d) )
 
 	ROM_REGION( 0x280000, "gfx2", 0 )  /* sprites */

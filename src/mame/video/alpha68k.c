@@ -18,21 +18,6 @@ void alpha68k_state::alpha68k_V_video_bank_w( int bank )
 	m_bank_base = bank & 0xf;
 }
 
-WRITE16_MEMBER(alpha68k_state::alpha68k_paletteram_w)
-{
-	int newword;
-	int r, g, b;
-
-	COMBINE_DATA(m_paletteram + offset);
-	newword = m_paletteram[offset];
-
-	r = ((newword >> 7) & 0x1e) | ((newword >> 14) & 0x01);
-	g = ((newword >> 3) & 0x1e) | ((newword >> 13) & 0x01);
-	b = ((newword << 1) & 0x1e) | ((newword >> 12) & 0x01);
-
-	m_palette->set_pen_color(offset, pal5bit(r), pal5bit(g), pal5bit(b));
-}
-
 /******************************************************************************/
 
 TILE_GET_INFO_MEMBER(alpha68k_state::get_tile_info)
@@ -47,14 +32,8 @@ TILE_GET_INFO_MEMBER(alpha68k_state::get_tile_info)
 
 WRITE16_MEMBER(alpha68k_state::alpha68k_videoram_w)
 {
-	/* Doh. */
-	if(ACCESSING_BITS_0_7)
-		if(ACCESSING_BITS_8_15)
-			m_videoram[offset] = data;
-		else
-			m_videoram[offset] = data & 0xff;
-	else
-		m_videoram[offset] = (data >> 8) & 0xff;
+	/* 8 bit RAM, upper & lower byte writes end up in the same place due to m68k byte smearing */
+	m_videoram[offset] = data & 0xff;
 
 	m_fix_tilemap->mark_tile_dirty(offset / 2);
 }

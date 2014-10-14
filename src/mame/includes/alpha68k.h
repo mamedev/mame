@@ -12,7 +12,6 @@ public:
 		m_shared_ram(*this, "shared_ram"),
 		m_spriteram(*this, "spriteram"),
 		m_videoram(*this, "videoram"),
-		m_paletteram(*this, "paletteram"),
 		m_audiocpu(*this, "audiocpu"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -22,7 +21,6 @@ public:
 	optional_shared_ptr<UINT16> m_shared_ram;
 	required_shared_ptr<UINT16> m_spriteram;
 	optional_shared_ptr<UINT16> m_videoram;
-	optional_shared_ptr<UINT16> m_paletteram;
 
 	/* video-related */
 	tilemap_t     *m_fix_tilemap;
@@ -71,7 +69,6 @@ public:
 	DECLARE_READ16_MEMBER(sound_cpu_r);
 	DECLARE_WRITE8_MEMBER(sound_bank_w);
 	DECLARE_WRITE8_MEMBER(porta_w);
-	DECLARE_WRITE16_MEMBER(alpha68k_paletteram_w);
 	DECLARE_WRITE16_MEMBER(alpha68k_videoram_w);
 	DECLARE_WRITE16_MEMBER(alpha68k_II_video_bank_w);
 	DECLARE_WRITE16_MEMBER(alpha68k_V_video_control_w);
