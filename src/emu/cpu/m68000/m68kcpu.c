@@ -993,6 +993,7 @@ void m68000_base_device::init_cpu_common(void)
 	save_item(NAME(pref_addr));
 	save_item(NAME(pref_data));
 	save_item(NAME(reset_cycles));
+	save_item(NAME(virq_state));
 	save_item(NAME(nmi_pending));
 	save_item(NAME(has_pmmu));
 	save_item(NAME(has_hmmu));
