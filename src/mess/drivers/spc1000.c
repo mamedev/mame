@@ -24,7 +24,7 @@ NOTE: 2014-09-13: added code from someone's modified MESS driver for floppy
                   small ics. And of course, no schematic.
 
 
-2014-10-11: Replaced above code with MESS-compliant code [Meeso Kim]
+2014-10-11: Replaced above code with MESS-compliant code [Meso Kim]
 
 ****************************************************************************/
 
