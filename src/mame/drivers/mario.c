@@ -187,6 +187,9 @@ static ADDRESS_MAP_START( mariobl_map, AS_PROGRAM, 8, mario_state)
 	AM_RANGE(0xa000, 0xa000) AM_READNOP   /* watchdog? */
 	AM_RANGE(0xa100, 0xa100) AM_READ_PORT("DSW")    /* DSW */
 	AM_RANGE(0xa206, 0xa206) AM_WRITE(mario_gfxbank_w) 
+
+	AM_RANGE(0x8000, 0x9fff) AM_ROM
+	AM_RANGE(0xb000, 0xbfff) AM_ROM
 	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -357,6 +360,62 @@ static INPUT_PORTS_START( mariobl )
 INPUT_PORTS_END
 
 
+
+static INPUT_PORTS_START( dkong3abl )
+
+	PORT_START("SYSTEM")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
+
+	PORT_START("INPUTS")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_8WAY
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_8WAY
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_8WAY
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
+
+	PORT_START("DSW")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("MONITOR")
+	PORT_CONFNAME( 0x01, 0x00, "Monitor" )
+	PORT_CONFSETTING(    0x00, "Nintendo" )
+	PORT_CONFSETTING(    0x01, "Std 15.72Khz" )
+
+INPUT_PORTS_END
+
 /*************************************
  *
  *  Graphics definitions
@@ -410,6 +469,25 @@ static GFXDECODE_START( mariobl )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,      0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout_bl,     0, 32 )
 GFXDECODE_END
+
+static const gfx_layout spritelayout_bl2 =
+{
+	16,16,  /* 16*16 sprites */
+	RGN_FRAC(1,2),    /* 256 sprites */
+	2,  /* 3 bits per pixel */
+	{ RGN_FRAC(1,2),RGN_FRAC(0,2) }, 
+	{ 0, 1, 2, 3, 4, 5, 6, 7,      
+			64,65,66,67,68,69,70,71 },
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
+			16*8, 17*8, 18*8, 19*8, 20*8, 21*8, 22*8, 23*8 },
+	16*16 
+};
+
+static GFXDECODE_START( dkong3abl )
+	GFXDECODE_ENTRY( "gfx1", 0, charlayout,      0, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0, spritelayout_bl2,     0, 32 )
+GFXDECODE_END
+
 
 /*************************************
  *
@@ -517,6 +595,26 @@ static MACHINE_CONFIG_START( mariobl, mario_state )
 
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
 
+MACHINE_CONFIG_END
+
+/*
+Donkey Kong 3 bootleg on Ambush hardware
+
+This romset comes from a faulty bootleg pcb.Game differences are none.
+Note:it runs on a modified (extended) Tecfri's Ambush hardware.
+Main cpu Z80
+Sound ic AY-3-8910 x2 -instead of AY-3-8912 x2 of Ambush
+Work ram 4Kb (6116 x2) -double of Ambush
+OSC: 18,432 Mhz
+Rom definition:
+dk3ba-5,dk3ba-6,dk3ba-7 main program
+dk3ba-1 to dk3ba-4 gfx (chars,sprites)
+Eproms are 2732,2764,27128
+
+Dumped by tirino73 >isolani1973@libero.it<
+*/
+static MACHINE_CONFIG_DERIVED( dkong3abl, mariobl )
+	MCFG_GFXDECODE_MODIFY("gfxdecode", dkong3abl)
 MACHINE_CONFIG_END
 
 /*************************************
@@ -706,6 +804,25 @@ ROM_START( mariobl )
 	ROM_LOAD( "tma1-c-4p.4p",     0x0000, 0x0200, CRC(afc9bd41) SHA1(90b739c4c7f24a88b6ac5ca29b06c032906a2801) )
 ROM_END
 
+ROM_START( dkong3abl )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "dk3ba-7.7i",    0x0000, 0x4000, CRC(a9263275) SHA1(c3867f6b0d379b70669b3b954e582533406db203) )
+	ROM_LOAD( "dk3ba-6.7g",    0x4000, 0x2000, CRC(31b8401d) SHA1(0e3dfea0c7fe99d48c5d984c47fa746caf0879f3) )
+	ROM_CONTINUE(0x8000,0x2000)
+	ROM_LOAD( "dk3ba-5.7f",    0xb000, 0x1000, CRC(07d3fd88) SHA1(721f401d077e3e051672513f9df5614eeb0f6466) )
+
+	ROM_REGION( 0x2000, "gfx1", ROMREGION_INVERT )
+	ROM_LOAD( "dk3ba-3.4l",   0x1000, 0x1000, CRC(67ac65d4) SHA1(d28bdb99310370513597ca80185ac6c56a11f63c) )
+	ROM_LOAD( "dk3ba-4.4n",   0x0000, 0x1000, CRC(84b319d6) SHA1(eaf160948f8cd4fecfdd909876de7cd16340885c) )
+
+	ROM_REGION( 0x4000, "gfx2", 0 )
+	ROM_LOAD( "dk3ba-1.3l",   0x0000, 0x2000, CRC(d4a88e04) SHA1(4f797c25d26c1022dcf026021979ef0fbab48baf) )
+	ROM_LOAD( "dk3ba-2.3m",   0x2000, 0x2000, CRC(f71185ee) SHA1(6652cf958d7afa8bb8dcfded997bb418a75223d8) )
+
+	ROM_REGION( 0x0200, "proms", 0 ) // no prom was present in the dump, probably need to use the original ones again
+	ROM_LOAD( "tma1-c-4p.4p",     0x0000, 0x0200, CRC(afc9bd41) SHA1(90b739c4c7f24a88b6ac5ca29b06c032906a2801) ) // this is from mario.. remove
+ROM_END
+
 /*************************************
  *
  *  Game drivers
@@ -717,4 +834,7 @@ GAME( 1983, marioe,   mario,   mario,   mario, driver_device,   0, ROT0, "Ninten
 GAME( 1983, marioo,   mario,   mario,   marioo, driver_device,  0, ROT0, "Nintendo of America", "Mario Bros. (US, Unknown Rev)", GAME_SUPPORTS_SAVE )
 GAME( 1983, marioj,   mario,   mario,   marioj, driver_device,  0, ROT0, "Nintendo", "Mario Bros. (Japan)", GAME_SUPPORTS_SAVE )
 GAME( 1983, masao,    mario,   masao,   masao, driver_device,   0, ROT0, "bootleg", "Masao", GAME_SUPPORTS_SAVE )
+
+// todo, these might have a better home than in here
 GAME( 1983, mariobl,  mario,   mariobl, mariobl,driver_device,  0, ROT180, "bootleg", "Mario Bros. (Japan, bootleg)", GAME_SUPPORTS_SAVE ) // was listed as 'on extended Ambush hardware' but doesn't seem similar apart from the sound system?
+GAME( 1983, dkong3abl,dkong3,  dkong3abl,dkong3abl,driver_device,0, ROT90,  "bootleg", "Donkey Kong 3 (bootleg with 2xAY8910)", GAME_NOT_WORKING ) //  likewise, put here because it's similar to mariobl
