@@ -751,6 +751,7 @@ static const struct game_keys keys_table[] =
 	// name                 key               upper                  watchdog
 	{ "dead",     { 0xffffffff,0xffffffff },  /*(1)*/ },    // ffff ffff ffff
 	{ "ssf2",     { 0x23456789,0xabcdef01 }, 0x400000 },    // 0838 0007 2000  btst    #7,$2000
+	{ "ssf2r1",   { 0x23456789,0xabcdef01 }, 0x400000 },    // 0838 0007 2000  btst    #7,$2000
 	{ "ssf2u",    { 0x12345678,0x9abcdef0 }, 0x400000 },    // 0838 0007 2000  btst    #7,$2000
 	{ "ssf2a",    { 0x3456789a,0xbcdef012 }, 0x400000 },    // 0838 0007 2000  btst    #7,$2000
 	{ "ssf2ar1",  { 0x3456789a,0xbcdef012 }, 0x400000 },    // 0838 0007 2000  btst    #7,$2000

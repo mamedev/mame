@@ -6817,6 +6817,39 @@ ROM_END
 
 ROM_START( ssf2 )
 	ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code */
+	ROM_LOAD16_WORD_SWAP( "ssfe-03b", 0x000000, 0x80000, CRC(af654792) SHA1(a8e84154a639c036413f1423aaf2312a5affa55a) )
+	ROM_LOAD16_WORD_SWAP( "ssfe.04",  0x080000, 0x80000, CRC(b082aa67) SHA1(ca26b4bb1947cb30eaf6b61f606b859d18da4c4c) )
+	ROM_LOAD16_WORD_SWAP( "ssfe.05",  0x100000, 0x80000, CRC(02b9c137) SHA1(ba624441e1b4bfb67c71f6a116fe43539eaa4a15) )
+	ROM_LOAD16_WORD_SWAP( "ssfe-06b", 0x180000, 0x80000, CRC(1c8e44a8) SHA1(8febd060cb782e09dc6216bcaee202ed84f35338) )
+	ROM_LOAD16_WORD_SWAP( "ssfe.07",  0x200000, 0x80000, CRC(2409001d) SHA1(f532ebb2efbb8f8ba311d10ff897490352c87f97) )
+
+	ROM_REGION( 0xc00000, "gfx", 0 )
+	ROMX_LOAD( "ssf.13m",   0x000000, 0x200000, CRC(cf94d275) SHA1(bf2a6d98a656d1cb5734da7836686242d3211137) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "ssf.15m",   0x000002, 0x200000, CRC(5eb703af) SHA1(4b302dbb66e8a5c2ad92798699391e981bada427) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "ssf.17m",   0x000004, 0x200000, CRC(ffa60e0f) SHA1(b21b1c749a8241440879bf8e7cb33968ccef97e5) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "ssf.19m",   0x000006, 0x200000, CRC(34e825c5) SHA1(4d320fc96d1ef0b9928a8ce801734245a4c097a5) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "ssf.14m",   0x800000, 0x100000, CRC(b7cc32e7) SHA1(0f4d26af338dab5dce5b7b34d32ad0c573434ace) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "ssf.16m",   0x800002, 0x100000, CRC(8376ad18) SHA1(f4456833fb396e6501f4174c0fe5fd63ea40a188) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "ssf.18m",   0x800004, 0x100000, CRC(f5b1b336) SHA1(4b060501e56b9d61294748da5387cdae5280ec4d) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "ssf.20m",   0x800006, 0x100000, CRC(459d5c6b) SHA1(32b11ba7a12004aff810d719bff7508204c7b7c0) , ROM_GROUPWORD | ROM_SKIP(6) )
+
+	ROM_REGION( QSOUND_SIZE, "audiocpu", 0 ) /* 64k for the audio CPU (+banks) */
+	ROM_LOAD( "ssf-01a",   0x00000, 0x08000, CRC(71fcdfc9) SHA1(c816f47ce10b8e85504638ada9117ec26ddaab77) )
+	ROM_CONTINUE(         0x10000, 0x18000 )
+
+	ROM_REGION( 0x400000, "qsound", 0 ) /* QSound samples */
+	ROM_LOAD( "ssf.q01",  0x000000, 0x080000, CRC(a6f9da5c) SHA1(6d19f83a01bd25b838d5c2871f7964529d926c98) )
+	ROM_LOAD( "ssf.q02",  0x080000, 0x080000, CRC(8c66ae26) SHA1(32a82aee6ed4480e5a990f9af161734c7c0a1403) )
+	ROM_LOAD( "ssf.q03",  0x100000, 0x080000, CRC(695cc2ca) SHA1(c2675f0233608b76de528d2a6ef19846d1348060) )
+	ROM_LOAD( "ssf.q04",  0x180000, 0x080000, CRC(9d9ebe32) SHA1(9b26329370041374f1a90b479a172d2bc2801c4d) )
+	ROM_LOAD( "ssf.q05",  0x200000, 0x080000, CRC(4770e7b7) SHA1(0e764f0befb9227b0b36508d8ca8ec9be31bcb05) )
+	ROM_LOAD( "ssf.q06",  0x280000, 0x080000, CRC(4e79c951) SHA1(1144781d7dc57ef8a6458d982f5c91548ff59e27) )
+	ROM_LOAD( "ssf.q07",  0x300000, 0x080000, CRC(cdd14313) SHA1(ebe767a9d4b51dba4282fa0a36a546a88620dd59) )
+	ROM_LOAD( "ssf.q08",  0x380000, 0x080000, CRC(6f5a088c) SHA1(6c0b4690479647a99d76335f174be8455b4ff118) )
+ROM_END
+
+ROM_START( ssf2r1 )
+	ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code */
 	ROM_LOAD16_WORD_SWAP( "ssfe.03",  0x000000, 0x80000, CRC(a597745d) SHA1(5b12e09c14f0ea93b668b97ca2d27a686c85f641) )
 	ROM_LOAD16_WORD_SWAP( "ssfe.04",  0x080000, 0x80000, CRC(b082aa67) SHA1(ca26b4bb1947cb30eaf6b61f606b859d18da4c4c) )
 	ROM_LOAD16_WORD_SWAP( "ssfe.05",  0x100000, 0x80000, CRC(02b9c137) SHA1(ba624441e1b4bfb67c71f6a116fe43539eaa4a15) )
@@ -8569,7 +8602,8 @@ DRIVER_INIT_MEMBER(cps_state,gigaman2)
  *
  *************************************/
 
-GAME( 1993, ssf2,       0,        cps2, cps2_2p6b, cps_state, cps2,     ROT0,   "Capcom", "Super Street Fighter II: The New Challengers (World 930911)", GAME_SUPPORTS_SAVE )
+GAME( 1993, ssf2,       0,        cps2, cps2_2p6b, cps_state, cps2,     ROT0,   "Capcom", "Super Street Fighter II: The New Challengers (World 931005)", GAME_SUPPORTS_SAVE )
+GAME( 1993, ssf2r1,     ssf2,     cps2, cps2_2p6b, cps_state, cps2,     ROT0,   "Capcom", "Super Street Fighter II: The New Challengers (World 930911)", GAME_SUPPORTS_SAVE )
 GAME( 1993, ssf2u,      ssf2,     cps2, cps2_2p6b, cps_state, cps2,     ROT0,   "Capcom", "Super Street Fighter II: The New Challengers (USA 930911)", GAME_SUPPORTS_SAVE )
 GAME( 1993, ssf2a,      ssf2,     cps2, cps2_2p6b, cps_state, cps2,     ROT0,   "Capcom", "Super Street Fighter II: The New Challengers (Asia 931005)", GAME_SUPPORTS_SAVE )
 GAME( 1993, ssf2ar1,    ssf2,     cps2, cps2_2p6b, cps_state, cps2,     ROT0,   "Capcom", "Super Street Fighter II: The New Challengers (Asia 930914)", GAME_SUPPORTS_SAVE )
