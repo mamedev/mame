@@ -818,10 +818,10 @@ static MACHINE_CONFIG_DERIVED( gbpocket, gameboy )
 	MCFG_GB_LCD_MGB_ADD("lcd")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( gbcolor, gameboy )
+static MACHINE_CONFIG_START( gbcolor, gb_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu") // todo XTAL_8_388MHz
+	MCFG_CPU_ADD("maincpu", LR35902, XTAL_4_194304Mhz) // todo XTAL_8_388MHz
 	MCFG_CPU_PROGRAM_MAP(gbc_map)
 	MCFG_LR35902_TIMER_CB( WRITE8(gb_state, gb_timer_callback ) )
 
@@ -829,19 +829,37 @@ static MACHINE_CONFIG_DERIVED( gbcolor, gameboy )
 	MCFG_MACHINE_RESET_OVERRIDE(gb_state,gbc)
 
 	/* video hardware */
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_ENTRIES(32768)
+	MCFG_SCREEN_ADD("screen", LCD)
+	MCFG_SCREEN_REFRESH_RATE(DMG_FRAMES_PER_SECOND)
+	MCFG_SCREEN_VBLANK_TIME(0)
+	MCFG_SCREEN_UPDATE_DEVICE("lcd", gb_lcd_device, screen_update)
+	MCFG_SCREEN_PALETTE("palette")
+
+	MCFG_DEFAULT_LAYOUT(layout_lcd)
+//  MCFG_SCREEN_SIZE(20*8, 18*8)
+	MCFG_SCREEN_SIZE( 458, 154 )
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 20*8-1, 0*8, 18*8-1)
+
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", gb)
+
+	MCFG_PALETTE_ADD("palette", 32768)
 	MCFG_PALETTE_INIT_OWNER(gb_state,gbc)
 
-	MCFG_DEVICE_REMOVE("lcd")
 	MCFG_GB_LCD_CGB_ADD("lcd")
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SOUND_ADD("custom", GAMEBOY, 0)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("48K") /* 2 pages of 8KB VRAM, 8 pages of 4KB RAM */
 
-	MCFG_DEVICE_REMOVE("cart_list")
-	MCFG_DEVICE_REMOVE("gbc_list")
+	/* cartslot */
+	MCFG_GB_CARTRIDGE_ADD("gbslot", gb_cart, NULL)
+
 	MCFG_SOFTWARE_LIST_ADD("cart_list","gbcolor")
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("gb_list","gameboy")
 MACHINE_CONFIG_END
