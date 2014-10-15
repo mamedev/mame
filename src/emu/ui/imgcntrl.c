@@ -132,7 +132,6 @@ void ui_menu_control_device_image::test_create(bool &can_create, bool &need_conf
 void ui_menu_control_device_image::load_software_part()
 {
 	astring temp_name(sld->list_name(), ":", swi->shortname(), ":", swp->name());
-	image->set_init_phase();
 	hook_load(temp_name, true);
 }
 
@@ -143,6 +142,7 @@ void ui_menu_control_device_image::load_software_part()
 
 void ui_menu_control_device_image::hook_load(astring name, bool softlist)
 {
+	if (image->is_reset_on_load()) image->set_init_phase();
 	image->load(name);
 	ui_menu::stack_pop(machine());
 }
@@ -205,15 +205,15 @@ void ui_menu_control_device_image::handle()
 	case SELECT_PARTLIST:
 		swi = sld->find(software_info_name);
 		if (!swi)
-			state = START_SOFTLIST;	
-		else if(swi->has_multiple_parts(image->image_interface())) 
+			state = START_SOFTLIST;
+		else if(swi->has_multiple_parts(image->image_interface()))
 		{
 			submenu_result = -1;
 			swp = 0;
 			ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_software_parts(machine(), container, swi, image->image_interface(), &swp, false, &submenu_result)));
 			state = SELECT_ONE_PART;
-		} 
-		else 
+		}
+		else
 		{
 			swp = swi->first_part();
 			load_software_part();
@@ -256,7 +256,7 @@ void ui_menu_control_device_image::handle()
 			state = START_SOFTLIST;
 			handle();
 			break;
-				
+
 		case -1: // return to system
 			ui_menu::stack_pop(machine());
 			break;
