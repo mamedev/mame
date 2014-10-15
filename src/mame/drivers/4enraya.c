@@ -65,7 +65,7 @@
 ***************************************************************************
 
   Unknown Pac-Man gambling game.
-  
+
   It's a basic Pac-Man front game, that has a gambling game hidden inside.
   The purpose of this "stealth" game, is just to be a "camouflage" for the
   real gambling game, for locations where the gambling games are forbidden.
@@ -89,7 +89,7 @@
   discard and press START to eliminate the number and place the representative
   ghost again in the original place outside the center.
 
-  Once done, just press UP (deal) again, and pacman will re-eat the new placed 
+  Once done, just press UP (deal) again, and pacman will re-eat the new placed
   ghosts, revealing the new numbers (as a new deal).
 
   If you have a winning hand, you can press DOWN (double-up) to get a Double-Up,
@@ -241,7 +241,7 @@ static ADDRESS_MAP_START( unkpacg_main_portmap, AS_IO, 8, _4enraya_state )
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("DSW1")
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1")
 	AM_RANGE(0x02, 0x02) AM_READ_PORT("IN2")
-//	AM_RANGE(0x03, 0x03) AM_WRITE("out_w")	// to investigate...
+//  AM_RANGE(0x03, 0x03) AM_WRITE("out_w")  // to investigate...
 	AM_RANGE(0x17, 0x17) AM_DEVWRITE("aysnd", ay8910_device, data_w)
 	AM_RANGE(0x27, 0x27) AM_DEVREAD("aysnd", ay8910_device, data_r)
 	AM_RANGE(0x37, 0x37) AM_DEVWRITE("aysnd", ay8910_device, address_w)
@@ -300,9 +300,9 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( unkpacg )
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_NAME("Front Game Coin A")		//  1 credits / initiate minigame
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_NAME("Gambling Game Coin In")	//  5 credits / initiate gambling
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_NAME("Front Game Coin B")		// 10 credits
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_NAME("Front Game Coin A")       //  1 credits / initiate minigame
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_NAME("Gambling Game Coin In")   //  5 credits / initiate gambling
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_NAME("Front Game Coin B")       // 10 credits
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -459,7 +459,7 @@ static MACHINE_CONFIG_DERIVED( unkpacg, 4enraya )
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* sound hardware */
-//	MCFG_SPEAKER_STANDARD_MONO("mono")
+//  MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_REPLACE("aysnd", AY8910, MAIN_CLOCK/4) /* guess */
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW2"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)

@@ -1251,18 +1251,18 @@ int stv_state::load_cart(device_image_interface &image, generic_slot_device *slo
 {
 	UINT8 *ROM;
 	UINT32 size = slot->common_get_size("rom");
-	
+
 	if (image.software_entry() == NULL)
 		return IMAGE_INIT_FAIL;
-	
+
 	slot->rom_alloc(size, GENERIC_ROM32_WIDTH, ENDIANNESS_BIG);
 	ROM = slot->get_rom_base();
 	memcpy(ROM, image.get_software_region("rom"), size);
-	
+
 	/* fix endianess */
 	{
 		UINT8 j[4];
-		
+
 		for (int i = 0; i < size; i += 4)
 		{
 			j[0] = ROM[i + 0];
@@ -1275,7 +1275,7 @@ int stv_state::load_cart(device_image_interface &image, generic_slot_device *slo
 			ROM[i + 3] = j[0];
 		}
 	}
-	
+
 	return IMAGE_INIT_PASS;
 }
 

@@ -1841,14 +1841,14 @@ void thomson_state::to9_set_video_mode( UINT8 data, int style )
 			thom_set_video_mode( THOM_VMODE_TO9 );
 		break;
 
-        // undocumented, but tested on a real TO8D
-        case 0x20: thom_set_video_mode( THOM_VMODE_MO5_ALT );     break;
+		// undocumented, but tested on a real TO8D
+		case 0x20: thom_set_video_mode( THOM_VMODE_MO5_ALT );     break;
 
 	case 0x21: thom_set_video_mode( THOM_VMODE_BITMAP4 );     break;
 
 	case 0x41: thom_set_video_mode( THOM_VMODE_BITMAP4_ALT ); break;
 
-        // also undocumented but tested
+		// also undocumented but tested
 	case 0x59: thom_set_video_mode( THOM_VMODE_BITMAP4_ALT_HALF ); break;
 
 	case 0x2a:
@@ -1866,7 +1866,7 @@ void thomson_state::to9_set_video_mode( UINT8 data, int style )
 
 	case 0x26: thom_set_video_mode( THOM_VMODE_OVERLAY );     break;
 
-        // undocumented 160x200 variant of overlay
+		// undocumented 160x200 variant of overlay
 	case 0x3e: thom_set_video_mode( THOM_VMODE_OVERLAY_HALF );     break;
 
 	case 0x3f: thom_set_video_mode( THOM_VMODE_OVERLAY3 );    break;

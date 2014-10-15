@@ -366,7 +366,7 @@ READ8_MEMBER(apple2_state::apple2_c080_r)
 				}
 			}
 		}
-		
+
 		if ((m_machinetype == APPLE_IICPLUS) && (slot == 6))
 		{
 			offset &= 0xf;
@@ -377,7 +377,7 @@ READ8_MEMBER(apple2_state::apple2_c080_r)
 		{
 			offset &= 0xf;
 			UINT8 retval = m_exp_regs[offset];
-							 
+
 			if (offset == 3)
 			{
 				retval = m_exp_ram[m_exp_liveptr&m_exp_addrmask];
@@ -2287,7 +2287,7 @@ MACHINE_START_MEMBER(apple2_state,apple2c)
 
 MACHINE_START_MEMBER(apple2_state,tk3000)
 {
-	m_machinetype = TK3000;	// enhanced IIe clone with Z80 keyboard scanner subcpu
+	m_machinetype = TK3000; // enhanced IIe clone with Z80 keyboard scanner subcpu
 
 	apple2eplus_init_common((void *)NULL);
 }
@@ -2335,7 +2335,7 @@ MACHINE_START_MEMBER(apple2_state,laser128)
 	apple2_init_common();
 
 	// 1 MB of expansion RAM in slot 5
-	m_exp_ram = auto_alloc_array(machine(), UINT8, 1024*1024); 
+	m_exp_ram = auto_alloc_array(machine(), UINT8, 1024*1024);
 	memset(m_exp_ram, 0xff, 1024*1024);
 
 	m_exp_bankhior = 0xf0;

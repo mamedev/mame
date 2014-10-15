@@ -677,7 +677,7 @@ void msx_slot_disk6_device::post_load()
 
 void msx_slot_disk6_device::select_drive()
 {
-	if (m_drive_select1)    
+	if (m_drive_select1)
 	{
 		m_floppy = m_floppy1 ? m_floppy1->get_device() : NULL;
 		if (!m_floppy)
@@ -809,4 +809,3 @@ WRITE8_MEMBER(msx_slot_disk6_device::write)
 			break;
 	}
 }
-

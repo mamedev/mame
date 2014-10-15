@@ -11,11 +11,11 @@
 
 /*
 
-	TODO:
+    TODO:
 
-	- fe3diag register error#2 hp=5592 (same error in VICE)
-	- SD card
-	- RTC
+    - fe3diag register error#2 hp=5592 (same error in VICE)
+    - SD card
+    - RTC
 
 */
 
@@ -32,25 +32,25 @@
 #define ATF1504AS_TAG   "ic4"
 
 #define REG1_BANK \
-    ((m_reg1 & 0x7f) << 15)
+	((m_reg1 & 0x7f) << 15)
 
 #define LORAM_HIDDEN \
-    (m_reg2 & REG2_BLK0)
+	(m_reg2 & REG2_BLK0)
 
 #define BLK1_HIDDEN \
-    (m_reg2 & REG2_BLK1)
+	(m_reg2 & REG2_BLK1)
 
 #define BLK2_HIDDEN \
-    (m_reg2 & REG2_BLK2)
+	(m_reg2 & REG2_BLK2)
 
 #define BLK3_HIDDEN \
-    (m_reg2 & REG2_BLK3)
+	(m_reg2 & REG2_BLK3)
 
 #define BLK5_HIDDEN \
-    (m_reg2 & REG2_BLK5)
+	(m_reg2 & REG2_BLK5)
 
 #define REGISTERS_HIDDEN \
-    ((m_lockbit && ((m_reg1 & REG1_MODE_MASK) == REG1_START)) || (m_reg2 & REG2_IO3))
+	((m_lockbit && ((m_reg1 & REG1_MODE_MASK) == REG1_START)) || (m_reg2 & REG2_IO3))
 
 
 
@@ -178,7 +178,7 @@ UINT8 vic20_final_expansion_3_t::vic20_cd_r(address_space &space, offs_t offset,
 		{
 			data = m_ram[get_address(0, 0, offset)];
 		}
-		
+
 		// read from ROM
 		if (!blk1 && !BLK1_HIDDEN)
 		{
@@ -203,7 +203,7 @@ UINT8 vic20_final_expansion_3_t::vic20_cd_r(address_space &space, offs_t offset,
 			data = read_register(BIT(offset, 0));
 		}
 		break;
-		
+
 	case REG1_RAM_1:
 		// read from RAM bank 0
 		if ((!ram1 || !ram2 || !ram3) && !LORAM_HIDDEN)
@@ -235,7 +235,7 @@ UINT8 vic20_final_expansion_3_t::vic20_cd_r(address_space &space, offs_t offset,
 			data = read_register(BIT(offset, 0));
 		}
 		break;
-		
+
 	case REG1_RAM_2:
 		// read from RAM bank 0
 		if ((!ram1 || !ram2 || !ram3) && !LORAM_HIDDEN)
@@ -267,7 +267,7 @@ UINT8 vic20_final_expansion_3_t::vic20_cd_r(address_space &space, offs_t offset,
 			data = read_register(BIT(offset, 0));
 		}
 		break;
-		
+
 	case REG1_SUPER_RAM:
 		// read from RAM bank 0
 		if ((!ram1 || !ram2 || !ram3) && !LORAM_HIDDEN)
@@ -299,14 +299,14 @@ UINT8 vic20_final_expansion_3_t::vic20_cd_r(address_space &space, offs_t offset,
 			data = read_register(BIT(offset, 0));
 		}
 		break;
-		
+
 	case REG1_RAM_ROM:
 		// read from RAM bank 0
 		if ((!ram1 || !ram2 || !ram3) && !LORAM_HIDDEN)
 		{
 			data = m_ram[get_address(0, 0, offset)];
 		}
-		
+
 		// read from ROM bank 0 or RAM bank 1
 		if (!blk1 && !BLK1_HIDDEN)
 		{
@@ -331,7 +331,7 @@ UINT8 vic20_final_expansion_3_t::vic20_cd_r(address_space &space, offs_t offset,
 			data = read_register(BIT(offset, 0));
 		}
 		break;
-		
+
 	case REG1_FLASH:
 		// read from RAM bank 0
 		if ((!ram1 || !ram2 || !ram3) && !LORAM_HIDDEN)
@@ -392,7 +392,7 @@ void vic20_final_expansion_3_t::vic20_cd_w(address_space &space, offs_t offset, 
 			write_register(BIT(offset, 0), data);
 		}
 		break;
-		
+
 	case REG1_SUPER_ROM:
 		// write to RAM bank 0
 		if ((!ram1 || !ram2 || !ram3) && !LORAM_HIDDEN)
@@ -424,7 +424,7 @@ void vic20_final_expansion_3_t::vic20_cd_w(address_space &space, offs_t offset, 
 			write_register(BIT(offset, 0), data);
 		}
 		break;
-		
+
 	case REG1_RAM_1:
 		// write to RAM bank 0
 		if ((!ram1 || !ram2 || !ram3) && !LORAM_HIDDEN && REG1_BLK0)
@@ -456,7 +456,7 @@ void vic20_final_expansion_3_t::vic20_cd_w(address_space &space, offs_t offset, 
 			write_register(BIT(offset, 0), data);
 		}
 		break;
-		
+
 	case REG1_RAM_2:
 		// write to RAM bank 0
 		if ((!ram1 || !ram2 || !ram3) && !LORAM_HIDDEN && REG1_BLK0)
@@ -488,7 +488,7 @@ void vic20_final_expansion_3_t::vic20_cd_w(address_space &space, offs_t offset, 
 			write_register(BIT(offset, 0), data);
 		}
 		break;
-		
+
 	case REG1_SUPER_RAM:
 		// write to RAM bank 0
 		if ((!ram1 || !ram2 || !ram3) && !LORAM_HIDDEN)
@@ -520,7 +520,7 @@ void vic20_final_expansion_3_t::vic20_cd_w(address_space &space, offs_t offset, 
 			write_register(BIT(offset, 0), data);
 		}
 		break;
-		
+
 	case REG1_RAM_ROM:
 		// write to RAM bank 0
 		if ((!ram1 || !ram2 || !ram3) && !LORAM_HIDDEN && REG1_BLK0)
@@ -552,7 +552,7 @@ void vic20_final_expansion_3_t::vic20_cd_w(address_space &space, offs_t offset, 
 			write_register(BIT(offset, 0), data);
 		}
 		break;
-		
+
 	case REG1_FLASH:
 		// write to RAM bank 0
 		if ((!ram1 || !ram2 || !ram3) && !LORAM_HIDDEN)

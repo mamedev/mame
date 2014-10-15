@@ -720,14 +720,14 @@ void igs017_state::mgcs_flip_sprites()
 
 void igs017_state::mgcs_patch_rom()
 {
-//	UINT16 *rom = (UINT16 *)memregion("maincpu")->base();
+//  UINT16 *rom = (UINT16 *)memregion("maincpu")->base();
 
-//	rom[0x20666/2] = 0x601e;    // 020666: 671E    beq $20686 (rom check)
+//  rom[0x20666/2] = 0x601e;    // 020666: 671E    beq $20686 (rom check)
 
 	// IGS029 send command
-//	rom[0x4dfce/2] = 0x6010;    // 04DFCE: 6610    bne $4dfe0
-//	rom[0x4e00e/2] = 0x4e75;
-//	rom[0x4e036/2] = 0x6006;	// 04E036: 6306    bls     $4e03e
+//  rom[0x4dfce/2] = 0x6010;    // 04DFCE: 6610    bne $4dfe0
+//  rom[0x4e00e/2] = 0x4e75;
+//  rom[0x4e036/2] = 0x6006;    // 04E036: 6306    bls     $4e03e
 }
 
 DRIVER_INIT_MEMBER(igs017_state,mgcs)
@@ -1457,7 +1457,7 @@ void igs017_state::mgcs_igs029_run()
 				coin_counter_w(machine(), 0, (~data) & 0x20);   // coin in
 				coin_counter_w(machine(), 1, (~data) & 0x40);   // coin out
 
-//				popmessage("PORT1 %02X", data);
+//              popmessage("PORT1 %02X", data);
 
 				if ( data & ~0x70 )
 					logerror("%s: warning, unknown bits written in port %02x = %02x\n", machine().describe_context(), port, data);
@@ -1467,7 +1467,7 @@ void igs017_state::mgcs_igs029_run()
 			case 0x03:
 				m_dsw_select = data;
 
-//				popmessage("PORT3 %02X", data);
+//              popmessage("PORT3 %02X", data);
 
 				if ( data & ~0x03 )
 					logerror("%s: warning, unknown bits written in port %02x = %02x\n", machine().describe_context(), port, data);
@@ -1501,8 +1501,8 @@ void igs017_state::mgcs_igs029_run()
 		logerror("READ DSW\n");
 
 		UINT8 ret;
-		if      (~m_dsw_select & 0x01)	ret = ioport("DSW1")->read();
-		else if (~m_dsw_select & 0x02)	ret = ioport("DSW2")->read();
+		if      (~m_dsw_select & 0x01)  ret = ioport("DSW1")->read();
+		else if (~m_dsw_select & 0x02)  ret = ioport("DSW2")->read();
 		else
 		{
 			logerror("%s: warning, reading dsw with dsw_select = %02x\n", machine().describe_context(), m_dsw_select);
@@ -1515,7 +1515,7 @@ void igs017_state::mgcs_igs029_run()
 	}
 	else if (m_igs029_send_buf[0] == 0x07 && m_igs029_send_buf[1] == 0x2c)
 	{
-		logerror("?? (2C)\n");	// ??
+		logerror("?? (2C)\n");  // ??
 
 		// 4 inputs. Returns 1 long
 
@@ -1525,7 +1525,7 @@ void igs017_state::mgcs_igs029_run()
 		m_igs029_recv_buf[m_igs029_recv_len++] = 0x00;
 		m_igs029_recv_buf[m_igs029_recv_len++] = 0x00;
 		m_igs029_recv_buf[m_igs029_recv_len++] = 0x00;
-		m_igs029_recv_buf[m_igs029_recv_len++] = 0x01;	// ??
+		m_igs029_recv_buf[m_igs029_recv_len++] = 0x01;  // ??
 		m_igs029_recv_buf[m_igs029_recv_len++] = 0x05;
 	}
 	else if (m_igs029_send_buf[0] == 0x07 && m_igs029_send_buf[1] == 0x15)
@@ -1571,7 +1571,7 @@ WRITE16_MEMBER(igs017_state::mgcs_magic_w)
 		case 0x00:
 			if (ACCESSING_BITS_0_7)
 			{
-				bool igs029_irq = !(m_input_select & 0x04) &&  (data & 0x04);	// 0->1
+				bool igs029_irq = !(m_input_select & 0x04) &&  (data & 0x04);   // 0->1
 
 				// 7654 3--- Keys
 				// ---- -2-- IRQ on IGS029
@@ -1623,7 +1623,7 @@ WRITE16_MEMBER(igs017_state::mgcs_magic_w)
 			if (ACCESSING_BITS_0_7)
 			{
 				m_scramble_data = data & 0xff;
-//				logerror("%s: writing %02x to igs_magic = %02x\n", machine().describe_context(), data & 0xff, m_igs_magic[0]);
+//              logerror("%s: writing %02x to igs_magic = %02x\n", machine().describe_context(), data & 0xff, m_igs_magic[0]);
 			}
 			break;
 
@@ -1633,7 +1633,7 @@ WRITE16_MEMBER(igs017_state::mgcs_magic_w)
 			if (ACCESSING_BITS_0_7)
 			{
 				m_igs029_send_data = data & 0xff;
-//				logerror("%s: writing %02x to igs_magic = %02x\n", machine().describe_context(), data & 0xff, m_igs_magic[0]);
+//              logerror("%s: writing %02x to igs_magic = %02x\n", machine().describe_context(), data & 0xff, m_igs_magic[0]);
 			}
 			break;
 
@@ -1666,7 +1666,7 @@ READ16_MEMBER(igs017_state::mgcs_magic_r)
 			return ret;
 		}
 
-//		case 0x05: ???
+//      case 0x05: ???
 
 		default:
 			logerror("%s: warning, reading with igs_magic = %02x\n", machine().describe_context(), m_igs_magic[0]);
@@ -2947,7 +2947,7 @@ static INPUT_PORTS_START( mgcs )
 
 	// DSWs are read through a protection device (IGS029). See code at 1CF16
 
-	PORT_START("DSW1")	// $3009e2
+	PORT_START("DSW1")  // $3009e2
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
@@ -2971,7 +2971,7 @@ static INPUT_PORTS_START( mgcs )
 	PORT_DIPSETTING(    0x80, "1000" )
 	PORT_DIPSETTING(    0x00, "2000" )
 
-	PORT_START("DSW2")	// $3009e3
+	PORT_START("DSW2")  // $3009e3
 	PORT_DIPNAME( 0x03, 0x03, "Min Bet" )
 	PORT_DIPSETTING(    0x03, "1" )
 	PORT_DIPSETTING(    0x02, "2" )

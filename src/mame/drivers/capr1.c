@@ -3,7 +3,7 @@
 /***************************************************************************
 
   Taito Capriccio Z80 crane hardware (let's call it 1st generation)
-  
+
   These are presumed to be on similar hardware:
   - Capriccio         1991
   - New Capriccio     1992
@@ -11,10 +11,10 @@
   - New Capriccio 2   1993
   - Capriccio Spin    1994
   - Capriccio Spin 2  1996
-  
+
   The next released game of this series is Capriccio Cyclone, see caprcyc.c
   More games were released after this.
-  
+
 TODO:
 - get cspin2 working a bit:
   * unknown reads and writes
@@ -56,12 +56,12 @@ public:
 static ADDRESS_MAP_START( cspin2_map, AS_PROGRAM, 8, capr1_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_RAM
-//	AM_RANGE(0xa000, 0xa01f) AM_RAM // wrong
+//  AM_RANGE(0xa000, 0xa01f) AM_RAM // wrong
 	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("ym", ym2203_device, read, write)
-//	AM_RANGE(0xc004, 0xc005) AM_WRITENOP
-//	AM_RANGE(0xc008, 0xc009) AM_WRITENOP
-//	AM_RANGE(0xc00c, 0xc00d) AM_WRITENOP
-//	AM_RANGE(0xc00d, 0xc00d) AM_DEVREADWRITE("oki", okim6295_device, read, write)
+//  AM_RANGE(0xc004, 0xc005) AM_WRITENOP
+//  AM_RANGE(0xc008, 0xc009) AM_WRITENOP
+//  AM_RANGE(0xc00c, 0xc00d) AM_WRITENOP
+//  AM_RANGE(0xc00d, 0xc00d) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 ADDRESS_MAP_END
 
 
@@ -83,7 +83,7 @@ static INPUT_PORTS_START( cspin2 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON4 )
-	
+
 	PORT_START("IN1")
 	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "SW1:1" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "SW1:2" )

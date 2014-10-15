@@ -139,7 +139,7 @@ void gamepock_state::machine_reset()
 
 	if (m_cart->exists())
 		m_maincpu->space(AS_PROGRAM).install_read_handler(0x4000,0xbfff, read8_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_cart));
-	
+
 }
 
 UINT32 gamepock_state::screen_update_gamepock(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

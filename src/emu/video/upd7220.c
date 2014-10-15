@@ -764,7 +764,7 @@ void upd7220_device::draw_pixel(int x, int y, int xi, UINT16 tile_data)
 	UINT8 data = readbyte(addr);
 	UINT8 new_pixel = (xi & 8 ? tile_data >> 8 : tile_data & 0xff) & (0x80 >> (xi & 7));
 	new_pixel = new_pixel ? (0xff & (0x80 >> (x & 7))) : 0;
-	
+
 	switch(m_bitmap_mod)
 	{
 		case 0: //replace

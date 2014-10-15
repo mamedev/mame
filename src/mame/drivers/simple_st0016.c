@@ -77,7 +77,7 @@ WRITE8_MEMBER(st0016_state::mux_select_w)
 WRITE8_MEMBER(st0016_state::st0016_rom_bank_w)
 {
 	membank("bank1")->set_base(memregion("maincpu")->base() + (data* 0x4000));
-//	st0016_rom_bank=data;
+//  st0016_rom_bank=data;
 }
 
 static ADDRESS_MAP_START( st0016_io, AS_IO, 8, st0016_state )
@@ -472,7 +472,7 @@ static MACHINE_CONFIG_START( st0016, st0016_state )
 	MCFG_SCREEN_PALETTE("maincpu:palette")
 
 
-//	MCFG_VIDEO_START_OVERRIDE(st0016_state,st0016)
+//  MCFG_VIDEO_START_OVERRIDE(st0016_state,st0016)
 
 MACHINE_CONFIG_END
 

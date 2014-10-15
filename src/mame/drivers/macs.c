@@ -82,7 +82,7 @@ public:
 	DECLARE_DRIVER_INIT(kisekaem);
 	DECLARE_DRIVER_INIT(macs2);
 	DECLARE_MACHINE_RESET(macs);
-	
+
 	UINT32 screen_update_macs(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	optional_device<st0016_cpu_device> m_maincpu;
@@ -149,7 +149,7 @@ WRITE8_MEMBER(macs_state::macs_rom_bank_w)
 {
 	membank("bank1")->set_base(memregion("maincpu")->base() + (data* 0x4000) + macs_cart_slot*0x400000 );
 
-//	m_st0016_rom_bank=data;
+//  m_st0016_rom_bank=data;
 }
 
 WRITE8_MEMBER(macs_state::macs_output_w)

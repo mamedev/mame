@@ -56,7 +56,7 @@ private:
 	UINT8 *m_rom;
 	UINT8 m_fdc_local_status, m_fdc_local_command;
 	UINT16 m_bufptr;
-	UINT8 m_buffer[2048];	// 1x6116 SRAM
+	UINT8 m_buffer[2048];   // 1x6116 SRAM
 	floppy_image_device *m_curfloppy;
 	bool m_in_drq;
 	emu_timer *m_timer;

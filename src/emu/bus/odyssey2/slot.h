@@ -92,7 +92,7 @@ public:
 	virtual DECLARE_WRITE8_MEMBER(io_write);
 	virtual DECLARE_READ8_MEMBER(t0_read) { if (m_cart) return m_cart->t0_read(space, offset); else return 0; }
 
-	virtual void write_bank(int bank) 	{ if (m_cart) m_cart->write_bank(bank); }
+	virtual void write_bank(int bank)   { if (m_cart) m_cart->write_bank(bank); }
 
 protected:
 
@@ -114,8 +114,7 @@ extern const device_type O2_CART_SLOT;
 
 #define MCFG_O2_CARTRIDGE_ADD(_tag,_slot_intf,_def_slot) \
 	MCFG_DEVICE_ADD(_tag, O2_CART_SLOT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false) \
-
+	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
 
 SLOT_INTERFACE_EXTERN(o2_cart);
 

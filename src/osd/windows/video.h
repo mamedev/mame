@@ -38,11 +38,11 @@ public:
 	void refresh();
 	float get_aspect();
 	void set_aspect(float a) { aspect = a; }
-	
+
 	win_monitor_info  * next;                   // pointer to next monitor in list
 	HMONITOR            handle;                 // handle to the monitor
-	MONITORINFOEX       info;                   // most recently retrieved info	
-private:	
+	MONITORINFOEX       info;                   // most recently retrieved info
+private:
 	float               aspect;                 // computed/configured aspect ratio of the physical device
 	int                 reqwidth;               // requested width for this monitor
 	int                 reqheight;              // requested height for this monitor

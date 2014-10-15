@@ -2,31 +2,31 @@
 
  Atari 2600 cart Starpath Supercharger (Cart + Tape drive!)
 
- 
- 
+
+
  From kevtris notes ( http://blog.kevtris.org/blogfiles/Atari%202600%20Mappers.txt ):
 
- 
+
  - Control register [0x1ff8]
- 
+
        7       0
        ---------
  1FF8: DDDB BBWE
- 
+
  D: write delay (see below)
  B: bankswitching mode (see below)
  W: RAM write enable (1 = enabled, 0 = disabled)
  E: ROM power enable (0 = enabled, 1 = turn off ROM)
- 
+
  - Audio input register [0x1ff9]
- 
+
         7       0
-		---------
+        ---------
  1FF9:  0000 000A
- 
+
  A: Supercharger audio data.  0 = low input, 1 = high input.
- 
- 
+
+
 ***************************************************************************/
 
 
@@ -83,8 +83,8 @@ static MACHINE_CONFIG_FRAGMENT( a26_ss )
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
 	MCFG_CASSETTE_INTERFACE("a2600_cass")
 
-//	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-//	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+//  MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
+//  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
 machine_config_constructor a26_rom_ss_device::device_mconfig_additions() const
@@ -109,17 +109,17 @@ READ8_MEMBER(a26_rom_ss_device::read_rom)
 	if (space.debugger_access())
 		return read_byte(offset);
 
-	// Bankswitch 
+	// Bankswitch
 	if (offset == 0xff8)
 	{
 		//logerror("%04X: Access to control register data = %02X\n", m_maincpu->pc(), m_modeSS_byte);
 		m_write_delay = m_reg >> 5;
 		m_ram_write_enabled = BIT(m_reg, 1);
 		m_rom_enabled = !BIT(m_reg, 0);
-		
+
 		// compensate time spent in this access to avoid spurious RAM write
 		m_byte_started -= 5;
-		
+
 		// handle bankswitch
 		switch (m_reg & 0x1c)
 		{
@@ -164,10 +164,10 @@ READ8_MEMBER(a26_rom_ss_device::read_rom)
 	{
 		//logerror("%04X: Cassette port read, tap_val = %f\n", m_maincpu->pc(), tap_val);
 		double tap_val = m_cassette->input();
-		
+
 		// compensate time spent in this access to avoid spurious RAM write
 		m_byte_started -= 5;
-		
+
 		if (tap_val < 0)
 			return 0x00;
 		else
@@ -181,7 +181,7 @@ READ8_MEMBER(a26_rom_ss_device::read_rom)
 			/* Check for dummy read from same address */
 			if (m_last_address == offset)
 				m_diff_adjust++;
-			
+
 			int diff = m_maincpu->total_cycles() - m_byte_started;
 			//logerror("%04X: offset = %04X, %d\n", m_maincpu->pc(), offset, diff);
 

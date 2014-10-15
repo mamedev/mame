@@ -9,21 +9,21 @@
     2014-01-03 Connect real DUARTs, FDC, and TimeKeeper.  Settings now save properly, floppies can be read.
     2014-01-19 ISA bus and compatible cards, PC keyboard support, speaker support
     2014-09-20 Add PT68K2, add save states, we have a working SK*DOS disk!
- 
+
 This has the appearance of a PC, including pc power supply, slots, etc
 on a conventional pc-like motherboard and case.
 
 Some pics: http://www.wormfood.net/old_computers/
- 
-Source code and manuals for the HUMBUG BIOS and SK*DOS are at: 
-http://www.users.cloud9.net/~stark/sources.html 
- 
-Usage: 
+
+Source code and manuals for the HUMBUG BIOS and SK*DOS are at:
+http://www.users.cloud9.net/~stark/sources.html
+
+Usage:
     Start up and press Enter as prompted.  Type he to see a command list, or fd to boot from the
     first floppy drive.
- 
+
     The stock NVRAM configures PT68k2 for 2 DSDD 5.25" drives, and PT68k4 for 2 DSHD 5.25" drives.
- 
+
 Chips:
     68230 Parallel Interface/Timer @ FE0081
     68681 DUART/Timer (x2) @ FE0001 and FE0041
@@ -48,9 +48,9 @@ IRQs:
     5: DUART1
     6: PC FDC IRQ
 
-TODO: 68230 device 
-	  This system and SK*DOS don't like our ISA WDXT-GEN emulation so HDD installs are not currently possible.
- 
+TODO: 68230 device
+      This system and SK*DOS don't like our ISA WDXT-GEN emulation so HDD installs are not currently possible.
+
 ****************************************************************************/
 
 #include "emu.h"
@@ -73,7 +73,7 @@ TODO: 68230 device
 #define ISABUS_TAG "isa"
 #define KBDC_TAG "pc_kbdc"
 #define SPEAKER_TAG "speaker"
-#define WDFDC_TAG	"wdfdc"
+#define WDFDC_TAG   "wdfdc"
 
 class pt68k4_state : public driver_device
 {
@@ -219,11 +219,11 @@ WRITE8_MEMBER(pt68k4_state::fdc_select_w)
 	switch (drive)
 	{
 		case 0:
-			floppy->ss_w((data & 0x40) ? 1 : 0); 
+			floppy->ss_w((data & 0x40) ? 1 : 0);
 			break;
 
 		case 1:
-			floppy2->ss_w((data & 0x40) ? 1 : 0); 
+			floppy2->ss_w((data & 0x40) ? 1 : 0);
 			break;
 
 		default:
@@ -381,7 +381,7 @@ SLOT_INTERFACE_END
 
 static MACHINE_CONFIG_START( pt68k2, pt68k4_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD(M68K_TAG, M68000, XTAL_16MHz/2)	// 68k2 came in 8, 10, and 12 MHz versions
+	MCFG_CPU_ADD(M68K_TAG, M68000, XTAL_16MHz/2)    // 68k2 came in 8, 10, and 12 MHz versions
 	MCFG_CPU_PROGRAM_MAP(pt68k2_mem)
 
 	MCFG_MC68681_ADD("duart1", XTAL_3_6864MHz)
@@ -459,8 +459,8 @@ MACHINE_CONFIG_END
 /* ROM definition */
 ROM_START( pt68k2 )
 	ROM_REGION16_BE( 0x10000, "roms", 0 )
-	ROM_LOAD16_BYTE( "hum_u20.bin",  0x000000, 0x008000, CRC(69db483a) SHA1(9dfea73e4d7deef7c66a27cca92eb7c9ff767215) ) 
-	ROM_LOAD16_BYTE( "hum_u27.bin",  0x000001, 0x008000, CRC(54441b06) SHA1(0e2d63b1cd01f88f37fc4859c11c252c4fea220b) ) 
+	ROM_LOAD16_BYTE( "hum_u20.bin",  0x000000, 0x008000, CRC(69db483a) SHA1(9dfea73e4d7deef7c66a27cca92eb7c9ff767215) )
+	ROM_LOAD16_BYTE( "hum_u27.bin",  0x000001, 0x008000, CRC(54441b06) SHA1(0e2d63b1cd01f88f37fc4859c11c252c4fea220b) )
 
 	ROM_REGION(0x800, TIMEKEEPER_TAG, 0)
 	ROM_LOAD( "u21_ds1220.bin", 0x000000, 0x000800, CRC(7a6b75ce) SHA1(07663860aa6cc21aed04a568ff9c05bc75d62e4f) )

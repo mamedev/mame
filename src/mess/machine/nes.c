@@ -97,7 +97,7 @@ void nes_state::setup_ioports()
 		sprintf(str, "FT_COL%i", i);
 		m_io_ftrainer[i] = ioport(str);
 	}
-	
+
 	m_io_ctrlsel        = ioport("CTRLSEL");
 	m_io_exp            = ioport("EXP");
 	m_io_paddle         = ioport("PADDLE");

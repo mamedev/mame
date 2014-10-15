@@ -235,7 +235,7 @@
 		</part>
 	</software>
 
-    <!-- TODO: add support for RAM in this cart (0xa000-0xffff) -->
+	<!-- TODO: add support for RAM in this cart (0xa000-0xffff) -->
 	<software name="rwp32" supported="no">
 		<description>rWP32</description>
 		<year>19??</year>

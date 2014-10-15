@@ -120,7 +120,7 @@ public:
 	// game type helpers
 	bool is_system21();
 	int m_gametype;
-	
+
 	emu_timer *m_posirq_timer;
 	int m_mcu_analog_ctrl;
 	int m_mcu_analog_data;

@@ -244,7 +244,7 @@ void primo_state::machine_start()
 {
 	astring region_tag;
 	m_cart1_rom = memregion(region_tag.cpy(m_cart1->tag()).cat(GENERIC_ROM_REGION_TAG));
-	m_cart2_rom = memregion(region_tag.cpy(m_cart2->tag()).cat(GENERIC_ROM_REGION_TAG));	
+	m_cart2_rom = memregion(region_tag.cpy(m_cart2->tag()).cat(GENERIC_ROM_REGION_TAG));
 }
 
 void primo_state::machine_reset()

@@ -166,7 +166,7 @@ bool o2_cart_slot_device::call_load()
 	{
 		UINT32 size = (software_entry() == NULL) ? length() : get_software_region_length("rom");
 		m_cart->rom_alloc(size, tag());
-			
+
 		if (software_entry() == NULL)
 			fread(m_cart->get_rom_base(), size);
 		else
@@ -223,7 +223,7 @@ void o2_cart_slot_device::get_default_card_software(astring &result)
 			type = O2_ROM12;
 		if (size == 16384)
 			type = O2_ROM16;
-		
+
 		slot_string = o2_get_slot(type);
 
 		//printf("type: %s\n", slot_string);
@@ -278,4 +278,3 @@ SLOT_INTERFACE_START(o2_cart)
 	SLOT_INTERFACE_INTERNAL("o2_chess",  O2_ROM_CHESS)
 	SLOT_INTERFACE_INTERNAL("o2_voice",  O2_ROM_VOICE)
 SLOT_INTERFACE_END
-

@@ -3031,7 +3031,7 @@ MACHINE_START_MEMBER(amstrad_state,plus)
 	m_asic.ram = m_region_user1->base();  // 16kB RAM for ASIC, memory-mapped registers.
 	m_system_type = SYSTEM_PLUS;
 	m_centronics->write_data7(0);
-	
+
 	astring region_tag;
 	m_region_cart = memregion(region_tag.cpy(m_cart->tag()).cat(GENERIC_ROM_REGION_TAG));
 }
@@ -3073,7 +3073,7 @@ MACHINE_START_MEMBER(amstrad_state,gx4000)
 {
 	m_asic.ram = m_region_user1->base();  // 16kB RAM for ASIC, memory-mapped registers.
 	m_system_type = SYSTEM_GX4000;
-	
+
 	astring region_tag;
 	m_region_cart = memregion(region_tag.cpy(m_cart->tag()).cat(GENERIC_ROM_REGION_TAG));
 }
@@ -3187,7 +3187,7 @@ DEVICE_IMAGE_LOAD_MEMBER(amstrad_state, amstrad_plus_cartridge)
 	// check for .CPR header
 	if (image.software_entry() == NULL)
 	{
-		image.fread(header, 12);	
+		image.fread(header, 12);
 		if (strncmp((char *)header, "RIFF", 4) != 0)
 		{
 			// not a CPR file, so rewind the image at start
@@ -3219,7 +3219,7 @@ DEVICE_IMAGE_LOAD_MEMBER(amstrad_state, amstrad_plus_cartridge)
 			return IMAGE_INIT_FAIL;
 		}
 		else
-			image.fread(m_cart->get_rom_base(), size);	
+			image.fread(m_cart->get_rom_base(), size);
 	}
 	else
 	{
@@ -3229,7 +3229,7 @@ DEVICE_IMAGE_LOAD_MEMBER(amstrad_state, amstrad_plus_cartridge)
 		// Chunks labeled 'cb00' represent Cartridge block 0, and is loaded to &0000-&3fff
 		//                'cb01' represent Cartridge block 1, and is loaded to &4000-&7fff
 		//                ... and so on.
-		
+
 		UINT32 offset = 0;
 		UINT8 *crt = m_cart->get_rom_base();
 		dynamic_buffer temp_copy;
@@ -3241,7 +3241,7 @@ DEVICE_IMAGE_LOAD_MEMBER(amstrad_state, amstrad_plus_cartridge)
 		char chunklen[4];             // chunk length (always little-endian)
 		int chunksize;                // chunk length, calcaulated from the above
 		int ramblock;                 // 16k RAM block chunk is to be loaded into
-		unsigned int bytes_to_read;   // total bytes to read, as mame_feof doesn't react to EOF without trying to go past it.		
+		unsigned int bytes_to_read;   // total bytes to read, as mame_feof doesn't react to EOF without trying to go past it.
 
 		// Is RIFF format (*.cpr)
 		if (strncmp((char*)(header + 8), "AMS!", 4) != 0)

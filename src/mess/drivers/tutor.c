@@ -196,7 +196,7 @@ public:
 	optional_device<cassette_image_device> m_cass;
 	optional_device<centronics_device> m_centronics;
 	optional_device<output_latch_device> m_cent_data_out;
-	required_memory_bank m_bank1;	
+	required_memory_bank m_bank1;
 	memory_region *m_cart_rom;
 
 	DECLARE_READ8_MEMBER(key_r);
@@ -223,9 +223,9 @@ void tutor_state::machine_start()
 {
 	astring region_tag;
 	m_cart_rom = memregion(region_tag.cpy(m_cart->tag()).cat(GENERIC_ROM_REGION_TAG));
-	
+
 	m_tape_interrupt_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tutor_state::tape_interrupt_handler),this));
-	
+
 	m_bank1->configure_entry(0, memregion("maincpu")->base() + 0x8000);
 	m_bank1->set_entry(0);
 

@@ -1123,7 +1123,7 @@ GAME( 1990, galpanica,galpanic, galpanica,galpanica, driver_device, 0, ROT90, "K
 
 GAME( 1994, supmodel, 0,        supmodel, fantasia,  driver_device, 0, ROT90, "Comad & New Japan System", "Super Model",GAME_NO_COCKTAIL )
 
-GAME( 1994, fantasian,fantasia, comad,    fantasia,  driver_device, 0, ROT90, "Comad & New Japan System", "Fantasia (940803 PCB)", GAME_NO_COCKTAIL ) 
+GAME( 1994, fantasian,fantasia, comad,    fantasia,  driver_device, 0, ROT90, "Comad & New Japan System", "Fantasia (940803 PCB)", GAME_NO_COCKTAIL )
 
 GAME( 1995, newfant,  0,        comad,    fantasia,  driver_device, 0, ROT90, "Comad & New Japan System", "New Fantasia (1995 copyright)", GAME_NO_COCKTAIL ) // the only difference between the two is the gfx rom containing the copyright
 GAME( 1994, newfanta, newfant,  comad,    fantasia,  driver_device, 0, ROT90, "Comad & New Japan System", "New Fantasia (1994 copyright)", GAME_NO_COCKTAIL )

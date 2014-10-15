@@ -1115,7 +1115,7 @@ static ADDRESS_MAP_START( shdancbla_map, AS_PROGRAM, 16, segas1x_bootleg_state )
 	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_SHARE("sprites")
 	AM_RANGE(0x840000, 0x840fff) AM_RAM_WRITE(paletteram_w) AM_SHARE("paletteram")
 
-	// moved from C4xxxx to E4xxxx 
+	// moved from C4xxxx to E4xxxx
 	AM_RANGE(0xe40000, 0xe40001) AM_READ_PORT("COINAGE")
 	AM_RANGE(0xe40002, 0xe40003) AM_READ_PORT("DSW1")
 	AM_RANGE(0xe40006, 0xe40007) AM_WRITE(sound_command_irq_w)
@@ -2521,7 +2521,7 @@ ROM_START( wb3bble )  /*  Appears to be a pre-system 16 bootleg with encryption 
 	ROM_LOAD16_BYTE( "epr12097.b8", 0x60000, 0x010000, CRC(e645902c) SHA1(497cfcf6c25cc2e042e16dbcb1963d2223def15a) ) // 16- ic103
 
 	ROM_REGION( 0x10000, "soundcpu", 0 ) /* sound CPU */
-	ROM_LOAD( "a-1 ic68", 0x0000, 0x8000, CRC(8321eb0b) SHA1(61cf95833c0aa38e35fc18db39d4ec74e4aaf01e) ) 
+	ROM_LOAD( "a-1 ic68", 0x0000, 0x8000, CRC(8321eb0b) SHA1(61cf95833c0aa38e35fc18db39d4ec74e4aaf01e) )
 
 	ROM_REGION( 0x1000, "mcu", 0 ) /* MCU code */
 	ROM_LOAD( "d8749h.mcu", 0x0000, 0x1000, NO_DUMP )

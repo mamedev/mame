@@ -31,7 +31,7 @@ public:
 
 	/* video-related */
 	typedef pen_t (cosmic_state::*color_func)(UINT8 x, UINT8 y);
-	color_func 	   m_map_color;
+	color_func     m_map_color;
 	int            m_color_registers[3];
 	int            m_background_enable;
 	int            m_magspot_pen_mask;
@@ -54,7 +54,7 @@ public:
 	optional_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-	
+
 	DECLARE_WRITE8_MEMBER(panic_sound_output_w);
 	DECLARE_WRITE8_MEMBER(panic_sound_output2_w);
 	DECLARE_WRITE8_MEMBER(cosmicg_output_w);

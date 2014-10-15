@@ -178,7 +178,7 @@ void channelf_state::machine_start()
 				m_maincpu->space(AS_PROGRAM).install_write_handler(0x3000, 0x3fff, write8_delegate(FUNC(channelf_cart_slot_device::write_bank),(channelf_cart_slot_device*)m_cart));
 				break;
 		}
-		
+
 		m_cart->save_ram();
 	}
 }

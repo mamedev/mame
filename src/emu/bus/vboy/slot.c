@@ -151,7 +151,7 @@ static const char *vboy_get_slot(int type)
 		if (slot_list[i].pcb_id == type)
 			return slot_list[i].slot_option;
 	}
-	
+
 	return "vb_rom";
 }
 #endif
@@ -179,7 +179,7 @@ bool vboy_cart_slot_device::call_load()
 		m_cart->rom_alloc(0x200000, tag());
 		if (has_eeprom)
 			m_cart->eeprom_alloc(get_software_region_length("eeprom"));
-			
+
 		ROM = (UINT8 *)m_cart->get_rom_base();
 
 		if (software_entry() == NULL)
@@ -190,7 +190,7 @@ bool vboy_cart_slot_device::call_load()
 		if (len < 0x080000) { memcpy(ROM + 0x040000, ROM, 0x040000); }
 		if (len < 0x100000) { memcpy(ROM + 0x080000, ROM, 0x080000); }
 		if (len < 0x200000) { memcpy(ROM + 0x100000, ROM, 0x100000); }
-		
+
 		if (software_entry() == NULL)
 			m_type = vboy_get_pcb_id("vb_rom");
 		else

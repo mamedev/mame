@@ -9,7 +9,7 @@
     2002/05/13 kubecj   added more banks for bankswitching
                         added PAL machine description
                         changed clock to be precise
-						improved cart emulation (in machine/)
+                        improved cart emulation (in machine/)
 
     2012/10/25 Robert Tuccitto  NTSC Color Generator utilized for
                 color palette with hue shift/start
@@ -88,10 +88,10 @@
 
     2014/05/06 Mike Saarna/Robert Tuccitto Brought initial Maria cycle counts
                inline from measurements taken with logic analyzer and tests.
- 
+
     2014/08/25 Fabio Priuli Converted carts to be slot devices and cleaned
                up the driver (removed the pokey, cleaned up rom regions, etc.)
- 
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -121,19 +121,19 @@ public:
 	m_io_console_buttons(*this, "console_buttons"),
 	m_cart(*this, "cartslot"),
 	m_screen(*this, "screen") { }
-	
+
 	int m_lines;
 	int m_ispal;
-	
+
 	int m_ctrl_lock;
 	int m_ctrl_reg;
 	int m_maria_flag;
 	int m_p1_one_button;
 	int m_p2_one_button;
 	int m_bios_enabled;
-	
+
 	UINT8 *m_bios;
-	
+
 	DECLARE_READ8_MEMBER(bios_or_cart_r);
 	DECLARE_WRITE8_MEMBER(ram0_w);
 	DECLARE_READ8_MEMBER(tia_r);
@@ -151,7 +151,7 @@ public:
 	DECLARE_READ8_MEMBER(riot_joystick_r);
 	DECLARE_READ8_MEMBER(riot_console_button_r);
 	DECLARE_WRITE8_MEMBER(riot_button_pullup_w);
-	
+
 protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<tia_device> m_tia;
@@ -223,7 +223,7 @@ READ8_MEMBER(a7800_state::tia_r)
 				return 0x80;
 		default:
 			logerror("undefined TIA read %x\n",offset);
-			
+
 	}
 	return 0xff;
 }
@@ -231,7 +231,7 @@ READ8_MEMBER(a7800_state::tia_r)
 // TIA
 WRITE8_MEMBER(a7800_state::tia_w)
 {
-	if (offset < 0x20) 
+	if (offset < 0x20)
 	{ //INPTCTRL covers TIA registers 0x00-0x1F until locked
 		if (data & 0x01)
 		{
@@ -291,12 +291,12 @@ static ADDRESS_MAP_START( a7800_mem, AS_PROGRAM, 8, a7800_state )
 	AM_RANGE(0x2040, 0x20ff) AM_RAMBANK("ram0")     // mirror (6116 block 0)
 	AM_RANGE(0x2140, 0x21ff) AM_RAMBANK("ram1")     // mirror (6116 block 1)
 
-	AM_RANGE(0x2800, 0x2fff) AM_RAMBANK("mirror")	// these should mirror "main_ram" (according to docs)
+	AM_RANGE(0x2800, 0x2fff) AM_RAMBANK("mirror")   // these should mirror "main_ram" (according to docs)
 	AM_RANGE(0x3000, 0x37ff) AM_RAMBANK("mirror")   // but system have issues in such case...
 	AM_RANGE(0x3800, 0x3fff) AM_RAMBANK("mirror")
 	AM_RANGE(0x4000, 0xffff) AM_DEVWRITE("cartslot", a78_cart_slot_device, write_40xx)
 	AM_RANGE(0x4000, 0xbfff) AM_DEVREAD("cartslot", a78_cart_slot_device, read_40xx)
-	AM_RANGE(0xc000, 0xffff) AM_READ(bios_or_cart_r)	// here also the BIOS can be accessed
+	AM_RANGE(0xc000, 0xffff) AM_READ(bios_or_cart_r)    // here also the BIOS can be accessed
 ADDRESS_MAP_END
 
 
@@ -1313,7 +1313,7 @@ void a7800_state::machine_start()
 	save_item(NAME(m_ctrl_lock));
 	save_item(NAME(m_ctrl_reg));
 	save_item(NAME(m_maria_flag));
-	
+
 	// install additional handlers, if needed
 	if (m_cart->exists())
 	{

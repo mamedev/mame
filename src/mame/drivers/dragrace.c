@@ -84,7 +84,7 @@ void dragrace_state::dragrace_update_misc_flags( address_space &space )
 	m_discrete->write(space, DRAGRACE_ATTRACT_EN, (m_misc_flags & 0x00001000) ? 1: 0); // Attract enable
 	m_discrete->write(space, DRAGRACE_LOTONE_EN, (m_misc_flags & 0x00002000) ? 1: 0);  // LoTone enable
 	m_discrete->write(space, DRAGRACE_HITONE_EN, (m_misc_flags & 0x20000000) ? 1: 0);  // HiTone enable
-	
+
 	// the tachometers are driven from the same frequency generator that creates the engine sound
 	output_set_value("tachometer", ~m_misc_flags & 0x0000001f);
 	output_set_value("tachometer2", (~m_misc_flags & 0x001f0000) >> 0x10);

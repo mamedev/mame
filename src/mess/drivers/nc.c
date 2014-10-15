@@ -801,7 +801,7 @@ void nc_state::machine_start()
 		m_card_size = m_card_ram->bytes();
 	else
 		m_card_size = 0;
-	
+
 	/* keyboard timer */
 	m_keyboard_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(nc_state::nc_keyboard_timer_callback),this));
 	m_keyboard_timer->adjust(attotime::from_msec(10));
@@ -1138,14 +1138,14 @@ MACHINE_RESET_MEMBER(nc_state, nc200)
 MACHINE_START_MEMBER(nc_state, nc200)
 {
 	m_type = NC_TYPE_200;
-	
+
 	astring region_tag;
 	m_card_ram = memregion(region_tag.cpy(m_card->tag()).cat(GENERIC_ROM_REGION_TAG));
 	if (m_card_ram)
 		m_card_size = m_card_ram->bytes();
 	else
 		m_card_size = 0;
-	
+
 	/* keyboard timer */
 	m_keyboard_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(nc_state::nc_keyboard_timer_callback),this));
 	m_keyboard_timer->adjust(attotime::from_msec(10));

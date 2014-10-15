@@ -25,7 +25,7 @@ WRITE8_MEMBER(nmk004_device::nmk004_port4_w)
 {
 	// bit 0x08 toggles frequently but is connected to nothing?
 
-  // bit 0x01 is set to reset the 68k
+	// bit 0x01 is set to reset the 68k
 	m_systemcpu->set_input_line(INPUT_LINE_RESET, (data & 1) ? ASSERT_LINE : CLEAR_LINE);
 }
 

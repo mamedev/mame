@@ -15,17 +15,17 @@ public:
 	// construction/destruction
 	o2_rom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 	o2_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
-	
+
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read_rom04);
 	virtual DECLARE_READ8_MEMBER(read_rom0c);
-	
+
 	virtual void write_bank(int bank);
-	
+
 protected:
 	int m_bank_base;
 };
@@ -37,7 +37,7 @@ class o2_rom12_device : public o2_rom_device
 public:
 	// construction/destruction
 	o2_rom12_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read_rom04);
 	virtual DECLARE_READ8_MEMBER(read_rom0c);
@@ -50,7 +50,7 @@ class o2_rom16_device : public o2_rom_device
 public:
 	// construction/destruction
 	o2_rom16_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read_rom04);
 	virtual DECLARE_READ8_MEMBER(read_rom0c);

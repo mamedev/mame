@@ -108,7 +108,7 @@ UINT8 a2bus_laser128_device::read_c800(address_space &space, UINT16 offset)
 			{
 				return m_slot7_ram[offset];
 			}
-			return m_rom[(offset & 0x3ff) + 0x6000 + m_slot7_bank]; 
+			return m_rom[(offset & 0x3ff) + 0x6000 + m_slot7_bank];
 	}
 
 	return 0xff;
@@ -124,12 +124,12 @@ void a2bus_laser128_device::write_c800(address_space &space, UINT16 offset, UINT
 	// UDCREG
 	if ((m_slot == 7) && (offset == 0x7f8))
 	{
-//		printf("%02x to UDCREG\n", data);
+//      printf("%02x to UDCREG\n", data);
 
 		m_slot7_ram_bank = (data & 0x8) ? 0x400 : 0;
 		m_slot7_bank = (((data >> 4) & 0x7) * 0x400);
 
-//		printf("\tRAM bank %x, ROM bank %x\n", m_slot7_ram_bank, m_slot7_bank);
+//      printf("\tRAM bank %x, ROM bank %x\n", m_slot7_ram_bank, m_slot7_bank);
 	}
 }
 

@@ -87,10 +87,10 @@ void isa8_svga_tgui9680_device::device_start()
 	m_isa->install_memory(0xa0000, 0xbffff, 0, 0, read8_delegate(FUNC(trident_vga_device::mem_r),m_vga), write8_delegate(FUNC(trident_vga_device::mem_w),m_vga));
 
 	// uncomment to test Windows 3.1 TGUI9440AGi driver
-//	m_isa->install_memory(0x4400000, 0x45fffff, 0, 0, read8_delegate(FUNC(trident_vga_device::vram_r),m_vga), write8_delegate(FUNC(trident_vga_device::vram_w),m_vga));
+//  m_isa->install_memory(0x4400000, 0x45fffff, 0, 0, read8_delegate(FUNC(trident_vga_device::vram_r),m_vga), write8_delegate(FUNC(trident_vga_device::vram_w),m_vga));
 
 	// win95 drivers
-//	m_isa->install_memory(0x4000000, 0x41fffff, 0, 0, read8_delegate(FUNC(trident_vga_device::vram_r),m_vga), write8_delegate(FUNC(trident_vga_device::vram_w),m_vga));
+//  m_isa->install_memory(0x4000000, 0x41fffff, 0, 0, read8_delegate(FUNC(trident_vga_device::vram_r),m_vga), write8_delegate(FUNC(trident_vga_device::vram_w),m_vga));
 
 	// acceleration ports
 	m_isa->install_device(0x2120, 0x21ff, 0, 0, read8_delegate(FUNC(trident_vga_device::accel_r),m_vga), write8_delegate(FUNC(trident_vga_device::accel_w),m_vga));

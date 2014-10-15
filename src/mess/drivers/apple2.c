@@ -177,14 +177,14 @@ UniDisk 3.5 drive!)
 The external drive port supports not only 5.25 drives but also UniDisk and
 Apple 3.5 drives, allowing via daisy-chaining any combination of UniDisk,
 Apple 3.5 and Apple 5.25 drives - up to three devices
- 
----------------------------------- 
- 
-TK3000 keyboard matrix 
- 
-Data bus D0-D7 is X0-X7 
-Address bus A0-A11 is Y0-Y11 
- 
+
+----------------------------------
+
+TK3000 keyboard matrix
+
+Data bus D0-D7 is X0-X7
+Address bus A0-A11 is Y0-Y11
+
 ***************************************************************************/
 
 
@@ -267,16 +267,16 @@ static ADDRESS_MAP_START( apple2_map, AS_PROGRAM, 8, apple2_state )
 ADDRESS_MAP_END
 
 /*
- 
+
     LS259 at H12
- 
+
     A8  = D
     A9  = A
     A10 = B
     A11 = C
- 
-	374/259 outputs to 65C02 c000/c010 selected by Z80 WR OR Z80 IORQ? (schematic is not super legible)
- 
+
+    374/259 outputs to 65C02 c000/c010 selected by Z80 WR OR Z80 IORQ? (schematic is not super legible)
+
 */
 
 // RAM and ROM alternate in 8K blocks: ROM at 0/4/8/c, RAM at 2/6/a/e (RAM is only 1k and further mirrors inside those locations)
@@ -1028,9 +1028,9 @@ static SLOT_INTERFACE_START(apple2_cards)
 	SLOT_INTERFACE("mcms1", A2BUS_MCMS1)  /* Mountain Computer Music System, card 1 of 2 */
 	SLOT_INTERFACE("mcms2", A2BUS_MCMS2)  /* Mountain Computer Music System, card 2 of 2.  must be in card 1's slot + 1! */
 	SLOT_INTERFACE("dx1", A2BUS_DX1)    /* Decillonix DX-1 sampler card */
-	SLOT_INTERFACE("tm2ho", A2BUS_TIMEMASTERHO)	/* Applied Engineering TimeMaster II H.O. */
-	SLOT_INTERFACE("mouse", A2BUS_MOUSE)	/* Apple II Mouse Card */
-//	SLOT_INTERFACE("magicmusician", A2BUS_MAGICMUSICIAN)	/* Magic Musician Card */
+	SLOT_INTERFACE("tm2ho", A2BUS_TIMEMASTERHO) /* Applied Engineering TimeMaster II H.O. */
+	SLOT_INTERFACE("mouse", A2BUS_MOUSE)    /* Apple II Mouse Card */
+//  SLOT_INTERFACE("magicmusician", A2BUS_MAGICMUSICIAN)    /* Magic Musician Card */
 SLOT_INTERFACE_END
 
 static SLOT_INTERFACE_START(apple2eaux_cards)
@@ -1197,7 +1197,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( tk3000, apple2e )
 	MCFG_CPU_REPLACE("maincpu", M65C02, 1021800)        /* close to actual CPU frequency of 1.020484 MHz */
 
-	MCFG_CPU_ADD("subcpu", Z80, 1021800)	// schematics are illegible on where the clock comes from, but it *seems* to be the same as the 65C02 clock
+	MCFG_CPU_ADD("subcpu", Z80, 1021800)    // schematics are illegible on where the clock comes from, but it *seems* to be the same as the 65C02 clock
 	MCFG_CPU_PROGRAM_MAP(tk3000_kbd_map)
 MACHINE_CONFIG_END
 
@@ -1330,7 +1330,7 @@ static MACHINE_CONFIG_DERIVED( laser128ex2, apple2c )
 	MCFG_A2BUS_ONBOARD_ADD("a2bus", "sl4", A2BUS_LASER128, NULL)
 	MCFG_A2BUS_ONBOARD_ADD("a2bus", "sl5", A2BUS_LASER128, NULL)
 	MCFG_A2BUS_ONBOARD_ADD("a2bus", "sl6", A2BUS_LASER128, NULL)
-    MCFG_A2BUS_ONBOARD_ADD("a2bus", "sl7", A2BUS_LASER128, NULL)
+	MCFG_A2BUS_ONBOARD_ADD("a2bus", "sl7", A2BUS_LASER128, NULL)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( space84, apple2p )
@@ -1672,7 +1672,7 @@ ROM_START(las128e2)
 	ROM_LOAD ( "341-0265-a.chr", 0x1000, 0x1000, BAD_DUMP CRC(2651014d) SHA1(b2b5d87f52693817fc747df087a4aa1ddcdb1f10)) // need to dump real laser rom
 
 	ROM_REGION(0x8000,"maincpu",0)
-	ROM_LOAD( "laser 128ex2 rom version 6.1.bin", 0x000000, 0x008000, CRC(7f911c90) SHA1(125754c1bd777d4c510f5239b96178c6f2e3236b) ) 
+	ROM_LOAD( "laser 128ex2 rom version 6.1.bin", 0x000000, 0x008000, CRC(7f911c90) SHA1(125754c1bd777d4c510f5239b96178c6f2e3236b) )
 
 	ROM_REGION( 0x800, "keyboard", ROMREGION_ERASE00 )
 	ROM_LOAD( "342-0132-c.e12", 0x000, 0x800, BAD_DUMP CRC(e47045f4) SHA1(12a2e718f5f4acd69b6c33a45a4a940b1440a481) ) // need to dump real laser rom

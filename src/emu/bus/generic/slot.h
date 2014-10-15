@@ -93,14 +93,14 @@ public:
 
 	static void static_set_device_load(device_t &device, device_image_load_delegate callback) { downcast<generic_slot_device &>(device).m_device_image_load = callback; }
 	static void static_set_device_unload(device_t &device, device_image_func_delegate callback) { downcast<generic_slot_device &>(device).m_device_image_unload = callback; }
-	
+
 	void set_interface(const char * interface) { m_interface = interface; }
 	void set_default_card(const char * def) { m_default_card = def; }
 	void set_extensions(const char * exts) { m_extensions = exts; }
 	void set_must_be_loaded(bool mandatory) { m_must_be_loaded = mandatory; }
 	void set_width(int width) { m_width = width; }
 	void set_endian(endianness_t end) { m_endianness = end; }
-	
+
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_config_complete();
@@ -168,11 +168,9 @@ extern const device_type GENERIC_SOCKET;
 #define MCFG_GENERIC_CARTSLOT_ADD(_tag, _slot_intf, _dev_intf) \
 	MCFG_DEVICE_ADD(_tag, GENERIC_SOCKET, 0) \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, NULL, false) \
-	MCFG_GENERIC_INTERFACE(_dev_intf) \
-
+	MCFG_GENERIC_INTERFACE(_dev_intf)
 #define MCFG_GENERIC_SOCKET_ADD(_tag, _slot_intf, _dev_intf) \
 	MCFG_DEVICE_ADD(_tag, GENERIC_SOCKET, 0) \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, NULL, false) \
-	MCFG_GENERIC_INTERFACE(_dev_intf) \
-
+	MCFG_GENERIC_INTERFACE(_dev_intf)
 #endif

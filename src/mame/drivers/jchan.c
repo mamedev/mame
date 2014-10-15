@@ -201,7 +201,7 @@ public:
 	required_device<sknsspr_device> m_spritegen1;
 	required_device<sknsspr_device> m_spritegen2;
 	required_device<kaneko_view2_tilemap_device> m_view2_0;
-	
+
 	required_shared_ptr<UINT16> m_spriteram_1;
 	required_shared_ptr<UINT16> m_sprregs_1;
 	required_shared_ptr<UINT16> m_spriteram_2;

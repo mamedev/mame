@@ -20,17 +20,17 @@
     |____________________________                        _|
                                  |                      |
                                  |______________________|
- 
- 
+
+
     DIPS: 1:SET  2:MODE 3:NMI 4:IRQ
     1 & 4 are on by default.
- 
+
     J1: 8 pins for X10 home control functions (top to bottom)
        1: ADJ  2: 5V  3: MODE  4: GND
        5: A    6: 5V  7: B     8: GND
- 
+
     X10 functions not supported.
- 
+
 *********************************************************************/
 
 #include "timemasterho.h"
@@ -45,9 +45,9 @@
 
 const device_type A2BUS_TIMEMASTERHO = &device_creator<a2bus_timemasterho_device>;
 
-#define TIMEMASTER_ROM_REGION	"timemst_rom"
-#define TIMEMASTER_PIA_TAG		"timemst_pia"
-#define TIMEMASTER_M5832_TAG	"timemst_msm"
+#define TIMEMASTER_ROM_REGION   "timemst_rom"
+#define TIMEMASTER_PIA_TAG      "timemst_pia"
+#define TIMEMASTER_M5832_TAG    "timemst_msm"
 
 MACHINE_CONFIG_FRAGMENT( timemaster )
 	MCFG_DEVICE_ADD(TIMEMASTER_PIA_TAG, PIA6821, 1021800)
@@ -61,26 +61,26 @@ MACHINE_CONFIG_END
 
 ROM_START( timemaster )
 	ROM_REGION(0x1000, TIMEMASTER_ROM_REGION, 0)
-	ROM_LOAD( "ae timemaster ii h.o. rom rev. 5.bin", 0x000000, 0x001000, CRC(ff5bd644) SHA1(ae0173da61581a06188c1bee89e95a0aa536c411) ) 
+	ROM_LOAD( "ae timemaster ii h.o. rom rev. 5.bin", 0x000000, 0x001000, CRC(ff5bd644) SHA1(ae0173da61581a06188c1bee89e95a0aa536c411) )
 ROM_END
 
 static INPUT_PORTS_START( tmho )
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x01, 0x01, "Set")
-	PORT_DIPSETTING(	0x00, "Apple can't set clock")
-	PORT_DIPSETTING(	0x01, "Apple can set clock")
+	PORT_DIPSETTING(    0x00, "Apple can't set clock")
+	PORT_DIPSETTING(    0x01, "Apple can set clock")
 
 	PORT_DIPNAME( 0x02, 0x00, "Mode")
-	PORT_DIPSETTING(	0x00, "TimeMaster")
-	PORT_DIPSETTING(	0x02, "Mountain AppleClock")
+	PORT_DIPSETTING(    0x00, "TimeMaster")
+	PORT_DIPSETTING(    0x02, "Mountain AppleClock")
 
 	PORT_DIPNAME( 0x04, 0x00, "NMI")
-	PORT_DIPSETTING(	0x00,  DEF_STR(Off))
-	PORT_DIPSETTING(	0x04,  DEF_STR(On))
+	PORT_DIPSETTING(    0x00,  DEF_STR(Off))
+	PORT_DIPSETTING(    0x04,  DEF_STR(On))
 
 	PORT_DIPNAME( 0x08, 0x08, "IRQ")
-	PORT_DIPSETTING(	0x00,  DEF_STR(Off))
-	PORT_DIPSETTING(	0x08,  DEF_STR(On))
+	PORT_DIPSETTING(    0x00,  DEF_STR(Off))
+	PORT_DIPSETTING(    0x08,  DEF_STR(On))
 INPUT_PORTS_END
 
 /***************************************************************************
@@ -154,7 +154,7 @@ void a2bus_timemasterho_device::device_start()
 
 void a2bus_timemasterho_device::device_reset()
 {
-	m_msm5832->cs_w(ASSERT_LINE);	// CS is tied to Vcc
+	m_msm5832->cs_w(ASSERT_LINE);   // CS is tied to Vcc
 	m_started = true;
 }
 
@@ -167,7 +167,7 @@ UINT8 a2bus_timemasterho_device::read_c0nx(address_space &space, UINT8 offset)
 {
 	if (offset <= 3)
 	{
-		return m_pia->read(space, offset); 
+		return m_pia->read(space, offset);
 	}
 
 	return 0xff;
@@ -194,7 +194,7 @@ UINT8 a2bus_timemasterho_device::read_cnxx(address_space &space, UINT8 offset)
 {
 	if (m_started)
 	{
-		if (!(m_dsw1->read() & 2))	// TimeMaster native
+		if (!(m_dsw1->read() & 2))  // TimeMaster native
 		{
 			return m_rom[offset+0xc00];
 		}
@@ -228,7 +228,7 @@ WRITE8_MEMBER(a2bus_timemasterho_device::pia_out_b)
 	{
 		if (m_dsw1->read() & 1)
 		{
-			m_msm5832->write_w((data >> 6) & 1 ? ASSERT_LINE : CLEAR_LINE); 
+			m_msm5832->write_w((data >> 6) & 1 ? ASSERT_LINE : CLEAR_LINE);
 		}
 	}
 
@@ -277,4 +277,3 @@ WRITE_LINE_MEMBER(a2bus_timemasterho_device::pia_irqb_w)
 	m_irqb = state;
 	update_irqs();
 }
-

@@ -112,7 +112,7 @@ UINT8 a2bus_lang_device::read_c0nx(address_space &space, UINT8 offset)
 	// likely to be interrupt-safe.
 	if (state->m_machinetype == APPLE_II)
 	{
-		switch (offset & 0x03) 
+		switch (offset & 0x03)
 		{
 			case 1:
 			case 3:

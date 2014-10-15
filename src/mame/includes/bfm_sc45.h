@@ -585,7 +585,7 @@ public:
 	void bfm_sc4_68307_portb_w(address_space &space, bool dedicated, UINT16 data, UINT16 line_mask);
 	UINT8 bfm_sc4_68307_porta_r(address_space &space, bool dedicated, UINT8 line_mask);
 	UINT16 bfm_sc4_68307_portb_r(address_space &space, bool dedicated, UINT16 line_mask);
-	
+
 	void find_mbus(UINT16* rom);
 
 

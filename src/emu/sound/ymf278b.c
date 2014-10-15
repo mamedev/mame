@@ -75,7 +75,7 @@
 
 // default address map
 static ADDRESS_MAP_START( ymf278b, AS_0, 8, ymf278b_device )
-        AM_RANGE(0x000000, 0x3fffff) AM_ROM
+		AM_RANGE(0x000000, 0x3fffff) AM_ROM
 ADDRESS_MAP_END
 
 

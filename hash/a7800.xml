@@ -1318,8 +1318,8 @@ the buttons not work in emulators.
 	</software>
 
 <!--
-The code has some race conditions for NMIs (related to input readings) 
-and often fails to boot on real systems too. To successfully start the 
+The code has some race conditions for NMIs (related to input readings)
+and often fails to boot on real systems too. To successfully start the
 game, you can keep pressed Button 1 during Atari logo (thanks to Mike
 Saarna for debugging the problem)
 -->
@@ -2369,7 +2369,7 @@ almost nothing like the prototype.
 
 <!-- This version features a lot *LESS* sounds than the newer version:
      e.g. no sound in bobsled ans ski jump games!
-     Dump is confirmed from multiple carts, and it was probably used in 
+     Dump is confirmed from multiple carts, and it was probably used in
      some erlier production run, until they found out the mistake and
      replaced it with the complete version  -->
 	<software name="wingameso" cloneof="wingames">

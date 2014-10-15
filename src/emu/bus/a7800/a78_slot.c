@@ -21,7 +21,7 @@
     - read_40xx/write_40xx for accesses in the $4000 to $ffff range
     even if not all carts use all of them (in particular no cart type
     seems to use access to the ranges $0500 to $0fff and $2800 to $2fff)
- 
+
 
  ***********************************************************************************************************/
 
@@ -70,15 +70,15 @@ void device_a78_cart_interface::rom_alloc(UINT32 size, const char *tag)
 		tempstring.cat(A78SLOT_ROM_REGION_TAG);
 		m_rom = device().machine().memory().region_alloc(tempstring, size, 1, ENDIANNESS_LITTLE)->base();
 		m_rom_size = size;
-		
+
 		// setup other helpers
 		if ((size / 0x4000) & 1) // compensate for SuperGame carts with 9 x 16K banks (to my knowledge no other cart has m_bank_mask != power of 2)
 			m_bank_mask = (size / 0x4000) - 2;
 		else
 			m_bank_mask = (size / 0x4000) - 1;
-		
+
 		// the rom is mapped to the top of the memory area
-		// so we store the starting point of data to simplify 
+		// so we store the starting point of data to simplify
 		// the access handling
 		m_base_rom = 0x10000 - size;
 	}
@@ -272,7 +272,7 @@ int a78_cart_slot_device::validate_header(int head, bool log)
 		}
 		head &= 0xff00;
 	}
-	
+
 	if ((head & 0xff00) > 0x300)
 	{
 		if (log)
@@ -282,7 +282,7 @@ int a78_cart_slot_device::validate_header(int head, bool log)
 		}
 		head &= 0x00ff;
 	}
-	
+
 	return head;
 }
 
@@ -329,7 +329,7 @@ static int a78_get_pcb_id(const char *slot)
 		if (!core_stricmp(slot_list[i].slot_option, slot))
 			return slot_list[i].pcb_id;
 	}
-	
+
 	return 0;
 }
 
@@ -340,7 +340,7 @@ static const char *a78_get_slot(int type)
 		if (slot_list[i].pcb_id == type)
 			return slot_list[i].slot_option;
 	}
-	
+
 	return "a78_rom";
 }
 
@@ -349,17 +349,17 @@ bool a78_cart_slot_device::call_load()
 	if (m_cart)
 	{
 		UINT32 len;
-		
+
 		if (software_entry() != NULL)
 		{
 			const char *pcb_name;
 			bool has_ram = get_software_region("ram") ? TRUE : FALSE;
 			bool has_nvram = get_software_region("nvram") ? TRUE : FALSE;
 			len = get_software_region_length("rom");
-			
+
 			m_cart->rom_alloc(len, tag());
 			memcpy(m_cart->get_rom_base(), get_software_region("rom"), len);
-			
+
 			if ((pcb_name = get_feature("slot")) != NULL)
 				m_type = a78_get_pcb_id(pcb_name);
 			else
@@ -377,19 +377,19 @@ bool a78_cart_slot_device::call_load()
 		{
 			// Load and check the header
 			int mapper;
-			char head[128];		
+			char head[128];
 			fread(head, 128);
-			
+
 			if (verify_header((char *)head) == IMAGE_VERIFY_FAIL)
 				return IMAGE_INIT_FAIL;
-			
+
 			len = (head[49] << 24) | (head[50] << 16) | (head[51] << 8) | head[52];
 			if (len + 128 > length())
 			{
 				logerror("Invalid length in the header. The game might be corrupted.\n");
 				len = length() - 128;
 			}
-			
+
 			// let's try to auto-fix some common errors in the header
 			mapper = validate_header((head[53] << 8) | head[54], TRUE);
 
@@ -415,7 +415,7 @@ bool a78_cart_slot_device::call_load()
 						m_type = A78_VERSABOARD;
 					break;
 			}
-			
+
 			// check if cart has a POKEY at $0450 (typically a VersaBoard variant)!
 			if (mapper & 0x40)
 			{
@@ -425,7 +425,7 @@ bool a78_cart_slot_device::call_load()
 					m_type += A78_POKEY0450;
 				}
 			}
-			
+
 			// check special bits, which override the previous
 			if ((mapper & 0xff00) == 0x0100)
 				m_type = A78_ACTIVISION;
@@ -452,10 +452,10 @@ bool a78_cart_slot_device::call_load()
 			}
 
 			internal_header_logging((UINT8 *)head, length());
-			
+
 			m_cart->rom_alloc(len, tag());
 			fread(m_cart->get_rom_base(), len);
-			
+
 			if (m_type == A78_TYPE6)
 				m_cart->ram_alloc(0x4000);
 			if (m_type == A78_MEGACART || (m_type >= A78_VERSABOARD && m_type <= A78_VERSA_POK450))
@@ -468,7 +468,7 @@ bool a78_cart_slot_device::call_load()
 				battery_load(m_cart->get_nvram_base(), 0x800, 0xff);
 			}
 		}
-		
+
 		//printf("Type: %s\n", a78_get_slot(m_type));
 	}
 	return IMAGE_INIT_PASS;
@@ -476,7 +476,7 @@ bool a78_cart_slot_device::call_load()
 
 
 void a78_partialhash(hash_collection &dest, const unsigned char *data,
-					 unsigned long length, const char *functions)
+						unsigned long length, const char *functions)
 {
 	if (length <= 128)
 		return;
@@ -537,13 +537,13 @@ void a78_cart_slot_device::get_default_card_software(astring &result)
 		const char *slot_string = "a78_rom";
 		dynamic_buffer head(128);
 		int type = A78_TYPE0, mapper;
-		
+
 		// Load and check the header
-		core_fread(m_file, head, 128);		
+		core_fread(m_file, head, 128);
 
 		// let's try to auto-fix some common errors in the header
 		mapper = validate_header((head[53] << 8) | head[54], FALSE);
-		
+
 		switch (mapper & 0x2e)
 		{
 			case 0x0000:
@@ -566,7 +566,7 @@ void a78_cart_slot_device::get_default_card_software(astring &result)
 					type = A78_VERSABOARD;
 				break;
 		}
-		
+
 		// check if cart has a POKEY at $0450 (typically a VersaBoard variant)!
 		if (mapper & 0x40)
 		{
@@ -576,18 +576,18 @@ void a78_cart_slot_device::get_default_card_software(astring &result)
 				type += A78_POKEY0450;
 			}
 		}
-		
+
 		// check special bits, which override the previous
 		if ((mapper & 0xff00) == 0x0100)
 			type = A78_ACTIVISION;
 		else if ((mapper & 0xff00) == 0x0200)
 			type = A78_ABSOLUTE;
-		
+
 		logerror("Cart type: %x\n", type);
 		slot_string = a78_get_slot(type);
-		
+
 		clear();
-		
+
 		result.cpy(slot_string);
 	}
 	else
@@ -663,9 +663,9 @@ WRITE8_MEMBER(a78_cart_slot_device::write_40xx)
 
 /*-------------------------------------------------
  A78 header logging
- 
+
  A78 HEADER FORMAT
- 
+
  Bytes  | Content           | Length
  ========================================
  0      | Header version    |  1 byte
@@ -679,7 +679,7 @@ WRITE8_MEMBER(a78_cart_slot_device::write_40xx)
  53..54 | Cart type [*]     |  2 bytes
  -------|-------------------|------------
  55     | Controller 1 type |  1 byte
-		|                   |
+        |                   |
         | 0 = None          |
         | 1 = Joystick      |
         | 2 = Light Gun     |
@@ -690,23 +690,23 @@ WRITE8_MEMBER(a78_cart_slot_device::write_40xx)
  -------|-------------------|------------
  57     | TV System         |  1 byte
         |                   |
-		| 0 = NTSC/1 = PAL  |
+        | 0 = NTSC/1 = PAL  |
  -------|-------------------|------------
  58     | Save data         |  1 byte
         |                   |  (only v2)
         | 0 = None / Unk    |
         | 1 = High Score    |
         | 2 = Savekey       |
- -------|-------------------|----------- 
+ -------|-------------------|-----------
  63     | Expansion module  |  1 byte
         |                   |
         | 0 = No expansion  |
         |     module        |
         | 1 = Expansion     |
         |     required      |
- -------|-------------------|----------- 
- 
- 
+ -------|-------------------|-----------
+
+
  [*] Cart type:
 
  bit 0-7 - Hardware "flags"
@@ -716,13 +716,13 @@ WRITE8_MEMBER(a78_cart_slot_device::write_40xx)
  bit 3 [0x08] - bank 0 of 144K ROM at $4000
  bit 4 [0x10] - bank 6 at $4000
  bit 5 [0x20] - banked RAM at $4000
- 
+
  bit 8-15 - Special values
  0 = Normal cart
  1 = Absolute (F18 Hornet)
  2 = Activision (Double Dragon & Rampage)
  3 = POKEY at $0450
- 
+
  -------------------------------------------------*/
 
 void a78_cart_slot_device::internal_header_logging(UINT8 *header, UINT32 len)
@@ -788,7 +788,7 @@ void a78_cart_slot_device::internal_header_logging(UINT8 *header, UINT32 len)
 			ctrl1.cpy("Unknown controller");
 			break;
 	}
-	
+
 	switch (head_ctrl2)
 	{
 		case 0x00:
@@ -804,10 +804,10 @@ void a78_cart_slot_device::internal_header_logging(UINT8 *header, UINT32 len)
 			ctrl2.cpy("Unknown controller");
 			break;
 	}
-	
+
 	logerror( "ROM DETAILS\n" );
 	logerror( "===========\n\n" );
-	logerror( "\tTotal length (with header):  0x%x (%dK + 128b header)\n\n", len, len/0x400);	
+	logerror( "\tTotal length (with header):  0x%x (%dK + 128b header)\n\n", len, len/0x400);
 	logerror( "HEADER DETAILS\n" );
 	logerror( "==============\n\n" );
 	logerror( "\tTitle:           %.32s\n", head_title);
@@ -829,5 +829,5 @@ void a78_cart_slot_device::internal_header_logging(UINT8 *header, UINT32 len)
 		logerror( "\n");
 	logerror( "\tController 1:    0x%.2X [%s]\n", head_ctrl1, ctrl1.cstr());
 	logerror( "\tController 2:    0x%.2X [%s]\n", head_ctrl2, ctrl2.cstr());
-	logerror( "\tVideo:           %s\n", (head_ispal) ? "PAL" : "NTSC");	
+	logerror( "\tVideo:           %s\n", (head_ispal) ? "PAL" : "NTSC");
 }

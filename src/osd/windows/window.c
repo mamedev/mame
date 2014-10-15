@@ -245,7 +245,7 @@ bool windows_osd_interface::window_init()
 
 	// set up the window list
 	last_window_ptr = &win_window_list;
-	
+
 	return true;
 }
 
@@ -313,7 +313,7 @@ win_window_info::win_window_info(running_machine &machine)
 		m_target(NULL),
 		m_targetview(0),
 		m_targetorient(0),
-		m_primlist(NULL),    	
+		m_primlist(NULL),
 		m_lastclicktime(0),
 		m_lastclickx(0),
 		m_lastclicky(0),
@@ -321,9 +321,9 @@ win_window_info::win_window_info(running_machine &machine)
 		m_machine(machine)
 {
 	memset(m_title,0,sizeof(m_title));
-	m_non_fullscreen_bounds.left = 0;  
-	m_non_fullscreen_bounds.top = 0;  
-	m_non_fullscreen_bounds.right  = 0;  
+	m_non_fullscreen_bounds.left = 0;
+	m_non_fullscreen_bounds.top = 0;
+	m_non_fullscreen_bounds.right  = 0;
 	m_non_fullscreen_bounds.bottom = 0;
 }
 
@@ -331,7 +331,7 @@ win_window_info::~win_window_info()
 {
 }
 
-	
+
 //============================================================
 //  winwindow_process_events_periodic
 //  (main thread)

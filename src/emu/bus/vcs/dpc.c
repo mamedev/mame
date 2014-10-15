@@ -37,7 +37,7 @@ void dpc_device::device_reset()
 		m_df[data_fetcher].music_mode = 0;
 	}
 	m_oscillator->adjust(attotime::from_hz(18400), 0, attotime::from_hz(18400));
-	
+
 }
 
 void dpc_device::check_flag(UINT8 data_fetcher)
@@ -60,7 +60,7 @@ void dpc_device::decrement_counter(UINT8 data_fetcher)
 		if (data_fetcher > 4 && m_df[data_fetcher].music_mode)
 			m_df[data_fetcher].low = m_df[data_fetcher].top;
 	}
-	
+
 	check_flag(data_fetcher);
 }
 
@@ -149,7 +149,7 @@ READ8_MEMBER(dpc_device::read)
 				data = m_df[data_fetcher].flag ? 0xff : 0x00;
 				break;
 		}
-		
+
 		if (data_fetcher < 5 || !m_df[data_fetcher].osc_clk)
 		{
 			decrement_counter(data_fetcher);
@@ -161,7 +161,7 @@ READ8_MEMBER(dpc_device::read)
 WRITE8_MEMBER(dpc_device::write)
 {
 	UINT8 data_fetcher = offset & 0x07;
-	
+
 	switch (offset & 0x38)
 	{
 		case 0x00:          // Top count
@@ -235,7 +235,7 @@ void a26_rom_dpc_device::device_reset()
 	m_base_bank = 0;
 }
 
-void a26_rom_dpc_device::setup_addon_ptr(UINT8 *ptr) 
+void a26_rom_dpc_device::setup_addon_ptr(UINT8 *ptr)
 {
 	m_dpc->set_display_data(ptr);
 }
@@ -279,4 +279,3 @@ DIRECT_UPDATE_MEMBER(a26_rom_dpc_device::cart_opbase)
 	}
 	return address;
 }
-

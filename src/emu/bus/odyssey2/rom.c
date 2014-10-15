@@ -50,12 +50,12 @@ o2_rom16_device::o2_rom16_device(const machine_config &mconfig, const char *tag,
 //-------------------------------------------------
 
 void o2_rom_device::device_start()
-{	
+{
 	save_item(NAME(m_bank_base));
 }
 
 void o2_rom_device::device_reset()
-{	
+{
 	m_bank_base = 0;
 }
 
@@ -94,4 +94,3 @@ READ8_MEMBER(o2_rom16_device::read_rom0c)
 {
 	return m_rom[offset + 0xc00 + (m_bank_base & 0x03) * 0x1000];
 }
-

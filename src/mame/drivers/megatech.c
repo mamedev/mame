@@ -131,7 +131,7 @@ public:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( mt_cart6 ) { return load_cart(image, m_cart6, 5); }
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( mt_cart7 ) { return load_cart(image, m_cart7, 6); }
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( mt_cart8 ) { return load_cart(image, m_cart8, 7); }
-	
+
 	UINT32 screen_update_main(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_menu(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void screen_eof_main(screen_device &screen, bool state);
@@ -424,7 +424,7 @@ void mtech_state::switch_cart(int gameno)
 	if (m_cart_reg[gameno])
 	{
 		memcpy(memregion("maincpu")->base(), m_cart_reg[gameno]->base(), 0x400000);
-		
+
 		if (!m_cart_is_genesis[gameno])
 		{
 			logerror("enabling SMS Z80\n");
@@ -442,7 +442,7 @@ void mtech_state::switch_cart(int gameno)
 			//m_maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 		}
 	}
-	else	/* else, no cart.. */
+	else    /* else, no cart.. */
 	{
 		memset(memregion("mtbios")->base() + 0x8000, 0x00, 0x8000);
 		memset(memregion("maincpu")->base(), 0x00, 0x400000);
@@ -594,7 +594,7 @@ DRIVER_INIT_MEMBER(mtech_state,mt_slot)
 	m_banked_ram = auto_alloc_array(machine(), UINT8, 0x1000*8);
 
 	DRIVER_INIT_CALL(megadriv);
-	
+
 	// this gets set in DEVICE_IMAGE_LOAD
 	memset(m_cart_is_genesis, 0, sizeof(m_cart_is_genesis));
 }
@@ -641,7 +641,7 @@ MACHINE_RESET_MEMBER(mtech_state, megatech)
 {
 	m_mt_bank_addr = 0;
 	MACHINE_RESET_CALL_MEMBER(megadriv);
-	
+
 	astring region_tag;
 	if (m_cart1)
 		m_cart_reg[0] = memregion(region_tag.cpy(m_cart1->tag()).cat(GENERIC_ROM_REGION_TAG));
@@ -730,10 +730,10 @@ int mtech_state::load_cart(device_image_interface &image, generic_slot_device *s
 	UINT8 *ROM;
 	const char  *pcb_name;
 	UINT32 size = slot->common_get_size("rom");
-	
+
 	if (image.software_entry() == NULL)
 		return IMAGE_INIT_FAIL;
-	
+
 	slot->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
 	ROM = slot->get_rom_base();
 	memcpy(ROM, image.get_software_region("rom"), size);
@@ -753,9 +753,9 @@ int mtech_state::load_cart(device_image_interface &image, generic_slot_device *s
 			m_cart_is_genesis[gameno] = 0;
 		}
 		else
-			osd_printf_debug("cart%d is invalid\n", gameno + 1);		
+			osd_printf_debug("cart%d is invalid\n", gameno + 1);
 	}
-	
+
 	return IMAGE_INIT_PASS;
 }
 

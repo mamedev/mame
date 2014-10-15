@@ -12,7 +12,7 @@ static ADDRESS_MAP_START(gamepock_mem, AS_PROGRAM, 8, gamepock_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000,0x0fff) AM_ROM
 	AM_RANGE(0x1000,0x3fff) AM_NOP
-	//AM_RANGE(0x4000,0xbfff) AM_ROM		// mapped by the cartslot
+	//AM_RANGE(0x4000,0xbfff) AM_ROM        // mapped by the cartslot
 	AM_RANGE(0xc000,0xc7ff) AM_MIRROR(0x0800) AM_RAM
 	AM_RANGE(0xff80,0xffff) AM_RAM              /* 128 bytes microcontroller RAM */
 ADDRESS_MAP_END

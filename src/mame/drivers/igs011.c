@@ -96,12 +96,12 @@ public:
 	optional_device<okim6295_device> m_oki;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-	
+
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_priority_ram;
 	optional_shared_ptr<UINT16> m_vbowl_trackball;
 	required_shared_ptr<UINT16> m_generic_paletteram_16;
-		
+
 	UINT8 *m_layer[8];
 	UINT16 m_priority;
 	UINT8 m_lhb2_pen_hi;
@@ -277,7 +277,7 @@ void igs011_state::video_start()
 	}
 
 	m_lhb2_pen_hi = 0;
-	
+
 	save_item(NAME(m_priority));
 	save_item(NAME(m_lhb2_pen_hi));
 	save_item(NAME(m_blitter.x));

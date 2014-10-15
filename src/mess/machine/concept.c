@@ -154,7 +154,7 @@ WRITE8_MEMBER(concept_state::via_out_b)
 
 WRITE_LINE_MEMBER(concept_state::via_out_cb2)
 {
-//	LOG(("via_out_cb2: Sound control written: data=0x%2.2x\n", state));
+//  LOG(("via_out_cb2: Sound control written: data=0x%2.2x\n", state));
 	m_speaker->level_w(state);
 }
 
@@ -210,7 +210,7 @@ READ16_MEMBER(concept_state::concept_io_r)
 
 			if (card)
 			{
-				return card->read_cnxx(space, offset & 0xff); 
+				return card->read_cnxx(space, offset & 0xff);
 			}
 		}
 		break;
@@ -245,7 +245,7 @@ READ16_MEMBER(concept_state::concept_io_r)
 
 		case 3:
 			/* NVIA versatile system interface */
-//	LOG(("concept_io_r: VIA read at address 0x03%4.4x\n", offset << 1));
+//  LOG(("concept_io_r: VIA read at address 0x03%4.4x\n", offset << 1));
 			{
 				via6522_device *via_0 = machine().device<via6522_device>("via6522_0");
 				return via_0->read(space, offset & 0xf);
@@ -301,7 +301,7 @@ WRITE16_MEMBER(concept_state::concept_io_w)
 
 					if (card)
 					{
-						return card->write_c0nx(space, offset & 0x0f, data); 
+						return card->write_c0nx(space, offset & 0x0f, data);
 					}
 				}
 				break;

@@ -379,7 +379,7 @@ int running_machine::run(bool firstrun)
 			#endif
 
 			manager().web()->serve();
-			
+
 			// execute CPUs if not paused
 			if (!m_paused)
 				m_scheduler.timeslice();

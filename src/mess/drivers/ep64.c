@@ -320,7 +320,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dave_64k_mem, AS_PROGRAM, 8, ep64_state )
 	AM_RANGE(0x000000, 0x007fff) AM_ROM AM_REGION(Z80_TAG, 0)
-	//AM_RANGE(0x010000, 0x01ffff)		// mapped by the cartslot
+	//AM_RANGE(0x010000, 0x01ffff)      // mapped by the cartslot
 	AM_RANGE(0x3f0000, 0x3fffff) AM_DEVICE(NICK_TAG, nick_device, vram_map)
 ADDRESS_MAP_END
 

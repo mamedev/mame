@@ -9,7 +9,7 @@ UINT8 macs_cart_slot;
 
 static ADDRESS_MAP_START(st0016_cpu_internal_map, AS_PROGRAM, 8, st0016_cpu_device)
 	AM_RANGE(0xc000, 0xcfff) AM_READ(st0016_sprite_ram_r) AM_WRITE(st0016_sprite_ram_w)
-	AM_RANGE(0xd000, 0xdfff) AM_READ(st0016_sprite2_ram_r) AM_WRITE(st0016_sprite2_ram_w)	
+	AM_RANGE(0xd000, 0xdfff) AM_READ(st0016_sprite2_ram_r) AM_WRITE(st0016_sprite2_ram_w)
 	AM_RANGE(0xea00, 0xebff) AM_READ(st0016_palette_ram_r) AM_WRITE(st0016_palette_ram_w)
 	AM_RANGE(0xec00, 0xec1f) AM_READ(st0016_character_ram_r) AM_WRITE(st0016_character_ram_w)
 	AM_RANGE(0xe900, 0xe9ff) AM_DEVREADWRITE("stsnd", st0016_device, st0016_snd_r, st0016_snd_w) /* sound regs 8 x $20 bytes, see notes */
@@ -29,22 +29,22 @@ ADDRESS_MAP_END
 
 st0016_cpu_device::st0016_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: z80_device(mconfig, ST0016_CPU, "ST0016", tag, owner, clock, "st0016_cpu", __FILE__),
-	  st0016_game(-1),
-	  st0016_spr_bank(0), 
-	  st0016_spr2_bank(0),
-	  st0016_pal_bank(0),
-	  st0016_char_bank(0),
-	  spr_dx(0),
-	  spr_dy(0),
-	  st0016_ramgfx(0),
-	
-	  m_io_space_config("io", ENDIANNESS_LITTLE, 8, 16, 0, ADDRESS_MAP_NAME(st0016_cpu_internal_io_map)),
-	  m_space_config("regs", ENDIANNESS_LITTLE, 8, 16, 0, ADDRESS_MAP_NAME(st0016_cpu_internal_map)),
+		st0016_game(-1),
+		st0016_spr_bank(0),
+		st0016_spr2_bank(0),
+		st0016_pal_bank(0),
+		st0016_char_bank(0),
+		spr_dx(0),
+		spr_dy(0),
+		st0016_ramgfx(0),
+
+		m_io_space_config("io", ENDIANNESS_LITTLE, 8, 16, 0, ADDRESS_MAP_NAME(st0016_cpu_internal_io_map)),
+		m_space_config("regs", ENDIANNESS_LITTLE, 8, 16, 0, ADDRESS_MAP_NAME(st0016_cpu_internal_map)),
 
 
-	  m_screen(*this, ":screen"),
-	  m_gfxdecode(*this, "gfxdecode"),
-	  m_palette(*this, "palette")
+		m_screen(*this, ":screen"),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette")
 
 {
 	for (int i = 0; i < 0xc0; i++)
@@ -302,7 +302,7 @@ WRITE8_MEMBER(st0016_cpu_device::st0016_vregs_w)
 		UINT32 srcadr=(st0016_vregs[0xa0]|(st0016_vregs[0xa1]<<8)|(st0016_vregs[0xa2]<<16))<<1;
 		UINT32 dstadr=(st0016_vregs[0xa3]|(st0016_vregs[0xa4]<<8)|(st0016_vregs[0xa5]<<16))<<1;
 		UINT32 length=((st0016_vregs[0xa6]|(st0016_vregs[0xa7]<<8)|((st0016_vregs[0xa8]&0x1f)<<16))+1)<<1;
-		
+
 		// todo : dma callback so macs_cart_slot can be local to MACs driver?
 
 		UINT32 srclen = (memregion(":maincpu")->bytes());
@@ -354,7 +354,7 @@ void st0016_cpu_device::draw_sprites(bitmap_ind16 &bitmap, const rectangle &clip
 	o - sublist offset (*8 to get real offset)
 	f - end of list  flag
 	x,y - sprite coords
-	
+
 	(complete guess)
 	g - use tile sizes specified in list (global / fixed ones if not set?) (gostop)
 	X = global X size?
@@ -455,7 +455,7 @@ void st0016_cpu_device::draw_sprites(bitmap_ind16 &bitmap, const rectangle &clip
 				sx += x;
 				sy += y;
 				color = st0016_spriteram[offset + 2] & 0x3f;
-				
+
 				if (use_sizes)
 				{
 					lx = (st0016_spriteram[offset + 5] >> 2) & 3;
@@ -469,12 +469,12 @@ void st0016_cpu_device::draw_sprites(bitmap_ind16 &bitmap, const rectangle &clip
 				}
 
 				/*
-					if(plx |ply) //parent
-					{
-					lx=plx;
-					ly=ply;
-					}
-					*/
+				    if(plx |ply) //parent
+				    {
+				    lx=plx;
+				    ly=ply;
+				    }
+				    */
 
 				flipx = st0016_spriteram[offset + 3] & 0x80;
 				flipy = st0016_spriteram[offset + 3] & 0x40;
@@ -737,4 +737,3 @@ UINT32 st0016_cpu_device::update(screen_device &screen, bitmap_ind16 &bitmap, co
 	st0016_draw_screen(screen, bitmap, cliprect);
 	return 0;
 }
-

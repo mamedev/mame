@@ -16,7 +16,7 @@
                 The 68705 code for this one was not available; I made it up from
                 the current A75-06.IC16 changing the level data pointer table.
     arkanoidj   Japanese version.  Final revision, MCU code not dumped.
-	arkanoidja  Japanese version. A later revision with level selector.
+    arkanoidja  Japanese version. A later revision with level selector.
                 The 68705 code for this one was not available; I made it up from
                 the current A75-06.IC16 changing the level data pointer table.
     arkanoidjbl Bootleg of the early Japanese version. The only difference is
@@ -809,7 +809,7 @@ ADDRESS_MAP_END
 
 READ8_MEMBER(arkanoid_state::hexaa_f000_r)
 {
-//	return hexaa_from_sub;
+//  return hexaa_from_sub;
 	return rand();
 }
 
@@ -844,7 +844,7 @@ WRITE8_MEMBER(arkanoid_state::hexaa_sub_80_w)
 READ8_MEMBER(arkanoid_state::hexaa_sub_90_r)
 {
 	return hexaa_from_main;
-//	return rand();
+//  return rand();
 }
 
 static ADDRESS_MAP_START( hexaa_sub_iomap, AS_IO, 8, arkanoid_state )
@@ -853,7 +853,7 @@ static ADDRESS_MAP_START( hexaa_sub_iomap, AS_IO, 8, arkanoid_state )
 	AM_RANGE(0x80, 0x80) AM_WRITE(hexaa_sub_80_w)
 	AM_RANGE(0x90, 0x90) AM_READ(hexaa_sub_90_r)
 ADDRESS_MAP_END
-	
+
 
 
 static ADDRESS_MAP_START( brixian_map, AS_PROGRAM, 8, arkanoid_state )
@@ -1832,7 +1832,7 @@ ROM_START( hexaa )
 	ROM_LOAD( "sub1.bin",      0x00000, 0x8000, CRC(82c091fa) SHA1(e509ab4d9372f93d81df70772a4632100081ffd7) )
 	ROM_LOAD( "main4.bin",     0x10000, 0x8000, CRC(3d5d006c) SHA1(ad4eadab82024b122182eacb5a322cfd6e476a70) )
 
-	ROM_REGION( 0x18000, "subcpu", 0 )  
+	ROM_REGION( 0x18000, "subcpu", 0 )
 	ROM_LOAD( "sub2.bin",      0x00000, 0x2000, CRC(c3bb9661) SHA1(e4bccb822d6eba77bb9cba75125cddb740775a2c)) // 1ST AND 2ND HALF IDENTICAL (contains just 0x55 bytes of code)
 
 

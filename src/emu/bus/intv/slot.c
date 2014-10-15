@@ -3,18 +3,18 @@
     Mattel Intellivision cart emulation
     (through slot devices)
 
- 
+
     This is a strange beast, because INTV carts had potentially access to
     a *LOT* of memory ranges!
     Quoting Joe Zbiciak's documentation for his emu (jzIntv):
- 
- 
+
+
       The Intellivision leaves many addresses available to cartridges.  However,
       several address ranges come with caveats, such as interactions with other
-      devices in the system, or incompatibilities with various peripherals.  
- 
+      devices in the system, or incompatibilities with various peripherals.
+
       Below is a summary.
- 
+
       ADDRESSES      NOTES
       -------------- --------------------------------------------------------------
       $0400 - $04FF  RAM/ROM ok on all but Intellivision 2.
@@ -26,7 +26,7 @@
       $4800          ROM ok.  RAM ok only if boot ROM at $7000.
       $4801 - $4FFF  RAM/ROM ok.
       $5000 - $5014  ROM ok.  RAM ok only if boot ROM at $7000 or $4800.
-      $5015 - $6FFF  RAM/ROM ok.  
+      $5015 - $6FFF  RAM/ROM ok.
       $7000          ROM ok if no ECS.  RAM at $7000 confuses EXEC boot sequence.
       $7001 - $77FF  RAM/ROM ok if no ECS.
       $7800 - $7FFF  ROM ok if no ECS.  Do not map RAM here due to GRAM alias.
@@ -38,8 +38,8 @@
       $E000 - $EFFF  RAM/ROM ok if no ECS.
       $F000 - $F7FF  RAM/ROM ok.
       $F800 - $FFFF  ROM ok.  Do not map RAM here due to GRAM alias.
- 
- 
+
+
     We handle this, by always creating a 0x10000 wide ROM region to load the
     cart image and exposing the following (long list of) read handlers:
       read_rom04
@@ -58,7 +58,7 @@
       read_rome0
       read_romf0
     Each pcb types will then use the correct ones for its wiring setup.
- 
+
     The BIN+CFG format introduced by INTVPC emulator includes metadata about where to
     load ROM into memory in the CFG file, but we don't support it (because we don't parse
     the CFG at all) and we rely instead on the intv.hsi metadata for fullpath loading of
@@ -69,7 +69,7 @@
  TODO:
     - Convert also the keyboard component to be a passthru slot device
     - Merge some of the ROM accessor above, once it is clear which ones can be merged
- 
+
  ***********************************************************************************************************/
 
 
@@ -239,16 +239,16 @@ int intv_cart_slot_device::load_fullpath()
 	UINT8 num_segments;
 	UINT8 start_seg;
 	UINT8 end_seg;
-	
+
 	UINT32 current_address;
 	UINT32 end_address;
-	
+
 	UINT8 high_byte;
 	UINT8 low_byte;
-	
+
 	UINT8 *ROM;
 	const char *file_type = filetype();
-	
+
 	/* if it is in .rom format, we enter here */
 	if (!core_stricmp (file_type, "rom"))
 	{
@@ -256,9 +256,9 @@ int intv_cart_slot_device::load_fullpath()
 		fread(&temp, 1);
 		if (temp != 0xa8)
 			return IMAGE_INIT_FAIL;
-		
+
 		fread(&num_segments, 1);
-		
+
 		fread(&temp, 1);
 		if (temp != (num_segments ^ 0xff))
 			return IMAGE_INIT_FAIL;
@@ -270,10 +270,10 @@ int intv_cart_slot_device::load_fullpath()
 		{
 			fread(&start_seg, 1);
 			current_address = start_seg * 0x100;
-			
+
 			fread(&end_seg, 1);
 			end_address = end_seg * 0x100 + 0xff;
-			
+
 			while (current_address <= end_address)
 			{
 				fread(&low_byte, 1);
@@ -282,12 +282,12 @@ int intv_cart_slot_device::load_fullpath()
 				ROM[current_address << 1] = high_byte;
 				current_address++;
 			}
-			
+
 			// Here we should calculate and compare the CRC16...
 			fread(&temp, 1);
 			fread(&temp, 1);
 		}
-		
+
 		// Access tables and fine address restriction tables are not supported ATM
 		for (int i = 0; i < (16 + 32 + 2); i++)
 		{
@@ -300,7 +300,7 @@ int intv_cart_slot_device::load_fullpath()
 	{
 		// This code is a blatant hack, due to impossibility to load a separate .cfg file in MESS.
 		// It shall be eventually replaced by the .xml loading
-		
+
 		// extrainfo format
 		// 1. mapper number (to deal with bankswitch). no bankswitch is mapper 0 (most games).
 		// 2.->5. current images have at most 4 chunks of data. we store here block size and location to load
@@ -314,7 +314,7 @@ int intv_cart_slot_device::load_fullpath()
 
 		m_cart->rom_alloc(0x20000, tag());
 		ROM = (UINT8 *)m_cart->get_rom_base();
-		
+
 		if (!hashfile_extrainfo(*this, extrainfo))
 		{
 			// If no extrainfo, we assume a single 0x2000 chunk at 0x5000
@@ -329,12 +329,12 @@ int intv_cart_slot_device::load_fullpath()
 		else
 		{
 			sscanf(extrainfo.cstr() ,"%d %d %d %d %d %d %d", &mapper, &rom[0], &rom[1], &rom[2],
-				   &rom[3], &ram, &extra);			
+					&rom[3], &ram, &extra);
 			//printf("extrainfo: %d %d %d %d %d %d %d \n", mapper, rom[0], rom[1], rom[2], rom[3], ram, extra);
-			
+
 			if (mapper)
 				logerror("Bankswitch not yet implemented!\n");
-			
+
 			if (ram)
 			{
 				start = ((ram & 0xf0) >> 4) * 0x1000;
@@ -355,25 +355,25 @@ int intv_cart_slot_device::load_fullpath()
 			}
 			if (extra & INTELLIVOICE_MASK)
 			{
-				 printf("WARNING: This game requires emulation of the IntelliVoice module.\n");
+					printf("WARNING: This game requires emulation of the IntelliVoice module.\n");
 			}
-			
+
 			if (extra & ECS_MASK)
 			{
 				printf("WARNING: This game requires emulation of the ECS module.\n");
 			}
-			
+
 			for (int j = 0; j < 4; j++)
 			{
 				start = ((rom[j] & 0xf0) >> 4) * 0x1000;
 				size = (rom[j] & 0x0f) * 0x800;
 
-				// some cart has to be loaded to 0x4800, but none of the available ones goes to 0x4000. 
+				// some cart has to be loaded to 0x4800, but none of the available ones goes to 0x4000.
 				// Hence, we use 0x04 << 4 in extrainfo (to reduce the stored values) and fix the value here.
 				if (start == 0x4000) start += 0x800;
-				
+
 //              logerror("step %d: %d %d \n", j, start / 0x1000, size / 0x1000);
-				
+
 				for (int i = 0; i < size; i++)
 				{
 					fread(&low_byte, 1);
@@ -383,7 +383,7 @@ int intv_cart_slot_device::load_fullpath()
 				}
 			}
 		}
-		
+
 		return IMAGE_INIT_PASS;
 	}
 }
@@ -408,7 +408,7 @@ bool intv_cart_slot_device::call_load()
 			// so if we are loading one of these, we allocate additional 0x2000 bytes for the paged bank
 			if (m_type == INTV_WSMLB)
 				extra_bank = true;
-			
+
 			UINT32 size = 0;
 			UINT16 address = 0;
 			UINT8 *ROM, *region;
@@ -423,7 +423,7 @@ bool intv_cart_slot_device::call_load()
 				if (size)
 				{
 					region = get_software_region(region_name[i]);
-					
+
 					for (int j = 0; j < size / 2; j++)
 					{
 						ROM[((address + j) << 1) + 1] = region[2 * j];
@@ -467,7 +467,7 @@ void intv_cart_slot_device::get_default_card_software(astring &result)
 		UINT32 len = core_fsize(m_file);
 		dynamic_buffer rom(len);
 		int type = INTV_STD;
-		
+
 		core_fread(m_file, rom, len);
 
 		if (rom[0] == 0xa8 && (rom[1] == (rom[2] ^ 0xff)))
@@ -480,12 +480,12 @@ void intv_cart_slot_device::get_default_card_software(astring &result)
 			int start;
 			int mapper, rom[5], ram, extra;
 			astring extrainfo;
-			
+
 			if (hashfile_extrainfo(*this, extrainfo))
 			{
 				sscanf(extrainfo.cstr() ,"%d %d %d %d %d %d %d", &mapper, &rom[0], &rom[1], &rom[2],
-					   &rom[3], &ram, &extra);			
-				
+						&rom[3], &ram, &extra);
+
 				if (ram)
 				{
 					start = ((ram & 0xf0) >> 4) * 0x1000;
@@ -495,7 +495,7 @@ void intv_cart_slot_device::get_default_card_software(astring &result)
 						type = INTV_GFACT;
 				}
 			}
-				
+
 		}
 
 		slot_string = intv_get_slot(type);
@@ -567,6 +567,5 @@ SLOT_INTERFACE_START(intv_cart)
 	SLOT_INTERFACE_INTERNAL("intv_wsmlb",   INTV_ROM_WSMLB)
 	SLOT_INTERFACE_INTERNAL("intv_voice",   INTV_ROM_VOICE)
 	SLOT_INTERFACE_INTERNAL("intv_ecs",     INTV_ROM_ECS)
-//	SLOT_INTERFACE_INTERNAL("intv_keycomp", INTV_ROM_KEYCOMP)
+//  SLOT_INTERFACE_INTERNAL("intv_keycomp", INTV_ROM_KEYCOMP)
 SLOT_INTERFACE_END
-

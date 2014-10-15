@@ -65,7 +65,7 @@ void advision_state::vh_update(int x)
 
 		for (int i = 0; i < 8; i++)
 		{
-			if (!BIT(data, 7 - i)) 
+			if (!BIT(data, 7 - i))
 				dst[i * 256] = 8;
 		}
 

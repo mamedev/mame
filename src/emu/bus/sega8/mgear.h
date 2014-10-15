@@ -12,11 +12,11 @@ class sega8_mgear_device : public sega8_rom_device
 public:
 	// construction/destruction
 	sega8_mgear_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
-	
+
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read_cart) { return m_subslot->read_cart(space, offset); }
 	virtual DECLARE_WRITE8_MEMBER(write_cart) { m_subslot->write_cart(space, offset, data); }

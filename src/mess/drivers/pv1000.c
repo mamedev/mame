@@ -185,7 +185,7 @@ public:
 
 
 static ADDRESS_MAP_START( pv1000, AS_PROGRAM, 8, pv1000_state )
-	//AM_RANGE(0x0000, 0x7fff)		// mapped by the cartslot
+	//AM_RANGE(0x0000, 0x7fff)      // mapped by the cartslot
 	AM_RANGE(0xb800, 0xbbff) AM_RAM AM_SHARE("p_videoram")
 	AM_RANGE(0xbc00, 0xbfff) AM_RAM_WRITE(gfxram_w) AM_REGION("gfxram", 0)
 ADDRESS_MAP_END
@@ -312,16 +312,16 @@ PALETTE_INIT_MEMBER(pv1000_state, pv1000)
 DEVICE_IMAGE_LOAD_MEMBER( pv1000_state, pv1000_cart )
 {
 	UINT32 size = m_cart->common_get_size("rom");
-	
+
 	if (size != 0x2000 && size != 0x4000)
 	{
 		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
 		return IMAGE_INIT_FAIL;
 	}
-	
+
 	m_cart->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
-	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");			
-	
+	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
+
 	return IMAGE_INIT_PASS;
 }
 
@@ -407,7 +407,7 @@ void pv1000_state::machine_start()
 		// FIXME: this is needed for gfx decoding, but there is probably a cleaner solution!
 		astring region_tag;
 		memcpy(memregion("gfxrom")->base(), memregion(region_tag.cpy(m_cart->tag()).cat(GENERIC_ROM_REGION_TAG))->base(), m_cart->get_rom_size());
-	}		
+	}
 
 	save_item(NAME(m_io_regs));
 	save_item(NAME(m_fd_data));

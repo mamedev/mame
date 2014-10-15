@@ -1073,7 +1073,7 @@ static MACHINE_CONFIG_START( zunit, midyunit_state )
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_TMS340X0_HALT_ON_RESET(FALSE) /* halt on reset */
 	MCFG_TMS340X0_PIXEL_CLOCK(MEDRES_PIXEL_CLOCK) /* pixel clock */
-	MCFG_TMS340X0_PIXELS_PER_CLOCK(2) /* pixels per clock */	
+	MCFG_TMS340X0_PIXELS_PER_CLOCK(2) /* pixels per clock */
 	MCFG_TMS340X0_SCANLINE_IND16_CB(midyunit_state, scanline_update)       /* scanline updater (indexed16) */
 	MCFG_TMS340X0_TO_SHIFTREG_CB(midyunit_state, to_shiftreg)           /* write to shiftreg function */
 	MCFG_TMS340X0_FROM_SHIFTREG_CB(midyunit_state, from_shiftreg)          /* read from shiftreg function */
@@ -1115,7 +1115,7 @@ static MACHINE_CONFIG_START( yunit_core, midyunit_state )
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_TMS340X0_HALT_ON_RESET(FALSE) /* halt on reset */
 	MCFG_TMS340X0_PIXEL_CLOCK(STDRES_PIXEL_CLOCK) /* pixel clock */
-	MCFG_TMS340X0_PIXELS_PER_CLOCK(2) /* pixels per clock */	
+	MCFG_TMS340X0_PIXELS_PER_CLOCK(2) /* pixels per clock */
 	MCFG_TMS340X0_SCANLINE_IND16_CB(midyunit_state, scanline_update)       /* scanline updater (indexed16) */
 	MCFG_TMS340X0_TO_SHIFTREG_CB(midyunit_state, to_shiftreg)           /* write to shiftreg function */
 	MCFG_TMS340X0_FROM_SHIFTREG_CB(midyunit_state, from_shiftreg)          /* read from shiftreg function */

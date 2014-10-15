@@ -45,21 +45,21 @@ UINT8 trident_vga_device::READPIXEL8(INT16 x, INT16 y)
 UINT16 trident_vga_device::READPIXEL15(INT16 x, INT16 y)
 {
 	return (vga.memory[((y & 0xfff)*offset() + (x & 0xfff)*2) % vga.svga_intf.vram_size] |
-           (vga.memory[((y & 0xfff)*offset() + ((x & 0xfff)*2)+1) % vga.svga_intf.vram_size] << 8));
+			(vga.memory[((y & 0xfff)*offset() + ((x & 0xfff)*2)+1) % vga.svga_intf.vram_size] << 8));
 }
 
 UINT16 trident_vga_device::READPIXEL16(INT16 x, INT16 y)
 {
 	return (vga.memory[((y & 0xfff)*offset() + (x & 0xfff)*2) % vga.svga_intf.vram_size] |
-           (vga.memory[((y & 0xfff)*offset() + ((x & 0xfff)*2)+1) % vga.svga_intf.vram_size] << 8));
+			(vga.memory[((y & 0xfff)*offset() + ((x & 0xfff)*2)+1) % vga.svga_intf.vram_size] << 8));
 }
 
 UINT32 trident_vga_device::READPIXEL32(INT16 x, INT16 y)
 {
 	return (vga.memory[((y & 0xfff)*offset() + (x & 0xfff)*4) % vga.svga_intf.vram_size] |
-		   (vga.memory[((y & 0xfff)*offset() + ((x & 0xfff)*4)+1) % vga.svga_intf.vram_size] << 8) |
-		   (vga.memory[((y & 0xfff)*offset() + ((x & 0xfff)*4)+2) % vga.svga_intf.vram_size] << 16) |
-		   (vga.memory[((y & 0xfff)*offset() + ((x & 0xfff)*4)+3) % vga.svga_intf.vram_size] << 24));
+			(vga.memory[((y & 0xfff)*offset() + ((x & 0xfff)*4)+1) % vga.svga_intf.vram_size] << 8) |
+			(vga.memory[((y & 0xfff)*offset() + ((x & 0xfff)*4)+2) % vga.svga_intf.vram_size] << 16) |
+			(vga.memory[((y & 0xfff)*offset() + ((x & 0xfff)*4)+3) % vga.svga_intf.vram_size] << 24));
 }
 
 void trident_vga_device::WRITEPIXEL8(INT16 x, INT16 y, UINT8 data)
@@ -249,9 +249,9 @@ UINT32 trident_vga_device::screen_update(screen_device &screen, bitmap_rgb32 &bi
 			for(x=0;x<cursor_size;x++)
 			{
 				UINT32 bitb = (vga.memory[(src+3) % vga.svga_intf.vram_size]
-				            | ((vga.memory[(src+2) % vga.svga_intf.vram_size]) << 8)
-				            | ((vga.memory[(src+1) % vga.svga_intf.vram_size]) << 16)
-				            | ((vga.memory[(src+0) % vga.svga_intf.vram_size]) << 24));
+							| ((vga.memory[(src+2) % vga.svga_intf.vram_size]) << 8)
+							| ((vga.memory[(src+1) % vga.svga_intf.vram_size]) << 16)
+							| ((vga.memory[(src+0) % vga.svga_intf.vram_size]) << 24));
 				UINT32 bita = (vga.memory[(src+7) % vga.svga_intf.vram_size]
 							| ((vga.memory[(src+6) % vga.svga_intf.vram_size]) << 8)
 							| ((vga.memory[(src+5) % vga.svga_intf.vram_size]) << 16)
@@ -1131,60 +1131,60 @@ UINT8 trident_vga_device::old_mmio_r(address_space& space, UINT32 offset)
 /*
 Graphics Engine for 9440/9660/9680
 
-#define GER_STATUS	0x2120
-#define		GE_BUSY	0x80
-#define GER_OPERMODE	0x2122		 Byte for 9440, Word for 96xx
-#define		DST_ENABLE	0x200	// Destination Transparency
-#define GER_COMMAND	0x2124
-#define		GE_NOP		0x00	// No Operation
-#define		GE_BLT		0x01	// BitBLT ROP3 only
-#define		GE_BLT_ROP4	0x02	// BitBLT ROP4 (96xx only)
-#define		GE_SCANLINE	0x03	// Scan Line
-#define		GE_BRESLINE	0x04	// Bresenham Line
-#define		GE_SHVECTOR	0x05	// Short Vector
-#define		GE_FASTLINE	0x06	// Fast Line (96xx only)
-#define		GE_TRAPEZ	0x07	// Trapezoidal fill (96xx only)
-#define		GE_ELLIPSE	0x08	// Ellipse (96xx only) (RES)
-#define		GE_ELLIP_FILL	0x09	// Ellipse Fill (96xx only) (RES)
-#define	GER_FMIX	0x2127
-#define GER_DRAWFLAG	0x2128		// long
-#define		FASTMODE	1<<28
-#define		STENCIL		0x8000
-#define		SOLIDFILL	0x4000
-#define		TRANS_ENABLE	0x1000
-#define 	TRANS_REVERSE	0x2000
-#define		YMAJ		0x0400
-#define		XNEG		0x0200
-#define		YNEG		0x0100
-#define		SRCMONO		0x0040
-#define		PATMONO		0x0020
-#define		SCR2SCR		0x0004
-#define		PAT2SCR		0x0002
-#define GER_FCOLOUR	0x212C		// Word for 9440, long for 96xx
-#define GER_BCOLOUR	0x2130		// Word for 9440, long for 96xx
-#define GER_PATLOC	0x2134		// Word
-#define GER_DEST_XY	0x2138
-#define GER_DEST_X	0x2138		// Word
-#define GER_DEST_Y	0x213A		// Word
-#define GER_SRC_XY	0x213C
-#define GER_SRC_X	0x213C		// Word
-#define GER_SRC_Y	0x213E		// Word
-#define GER_DIM_XY	0x2140
-#define GER_DIM_X	0x2140		// Word
-#define GER_DIM_Y	0x2142		// Word
-#define GER_STYLE	0x2144		// Long
-#define GER_CKEY	0x2168		// Long
-#define GER_FPATCOL	0x2178
-#define GER_BPATCOL	0x217C
-#define GER_PATTERN	0x2180		// from 0x2180 to 0x21FF
+#define GER_STATUS  0x2120
+#define     GE_BUSY 0x80
+#define GER_OPERMODE    0x2122       Byte for 9440, Word for 96xx
+#define     DST_ENABLE  0x200   // Destination Transparency
+#define GER_COMMAND 0x2124
+#define     GE_NOP      0x00    // No Operation
+#define     GE_BLT      0x01    // BitBLT ROP3 only
+#define     GE_BLT_ROP4 0x02    // BitBLT ROP4 (96xx only)
+#define     GE_SCANLINE 0x03    // Scan Line
+#define     GE_BRESLINE 0x04    // Bresenham Line
+#define     GE_SHVECTOR 0x05    // Short Vector
+#define     GE_FASTLINE 0x06    // Fast Line (96xx only)
+#define     GE_TRAPEZ   0x07    // Trapezoidal fill (96xx only)
+#define     GE_ELLIPSE  0x08    // Ellipse (96xx only) (RES)
+#define     GE_ELLIP_FILL   0x09    // Ellipse Fill (96xx only) (RES)
+#define GER_FMIX    0x2127
+#define GER_DRAWFLAG    0x2128      // long
+#define     FASTMODE    1<<28
+#define     STENCIL     0x8000
+#define     SOLIDFILL   0x4000
+#define     TRANS_ENABLE    0x1000
+#define     TRANS_REVERSE   0x2000
+#define     YMAJ        0x0400
+#define     XNEG        0x0200
+#define     YNEG        0x0100
+#define     SRCMONO     0x0040
+#define     PATMONO     0x0020
+#define     SCR2SCR     0x0004
+#define     PAT2SCR     0x0002
+#define GER_FCOLOUR 0x212C      // Word for 9440, long for 96xx
+#define GER_BCOLOUR 0x2130      // Word for 9440, long for 96xx
+#define GER_PATLOC  0x2134      // Word
+#define GER_DEST_XY 0x2138
+#define GER_DEST_X  0x2138      // Word
+#define GER_DEST_Y  0x213A      // Word
+#define GER_SRC_XY  0x213C
+#define GER_SRC_X   0x213C      // Word
+#define GER_SRC_Y   0x213E      // Word
+#define GER_DIM_XY  0x2140
+#define GER_DIM_X   0x2140      // Word
+#define GER_DIM_Y   0x2142      // Word
+#define GER_STYLE   0x2144      // Long
+#define GER_CKEY    0x2168      // Long
+#define GER_FPATCOL 0x2178
+#define GER_BPATCOL 0x217C
+#define GER_PATTERN 0x2180      // from 0x2180 to 0x21FF
 
  Additional - Graphics Engine for 96xx
-#define GER_SRCCLIP_XY	0x2148
-#define GER_SRCCLIP_X	0x2148		// Word
-#define GER_SRCCLIP_Y	0x214A		// Word
-#define GER_DSTCLIP_XY	0x214C
-#define GER_DSTCLIP_X	0x214C		// Word
-#define GER_DSTCLIP_Y	0x214E		// Word
+#define GER_SRCCLIP_XY  0x2148
+#define GER_SRCCLIP_X   0x2148      // Word
+#define GER_SRCCLIP_Y   0x214A      // Word
+#define GER_DSTCLIP_XY  0x214C
+#define GER_DSTCLIP_X   0x214C      // Word
+#define GER_DSTCLIP_Y   0x214E      // Word
 */
 
 READ8_MEMBER(trident_vga_device::accel_r)

@@ -156,7 +156,7 @@ tc0480scp_device::tc0480scp_device(const machine_config &mconfig, const char *ta
 	m_palette(*this)
 {
 	memset(m_ctrl, 0, sizeof(m_ctrl));
-	
+
 	for (int i = 0; i < 4; i++)
 	{
 		m_bg_ram[i] = NULL;

@@ -232,9 +232,9 @@ void bmcpokr_state::draw_layer(screen_device &screen, bitmap_ind16 &bitmap, cons
 
 	switch (layer)
 	{
-		case 1:		tmap = m_tilemap_1;	scroll = m_scrollram_1;	ctrl = (m_layerctrl[0] >> 8) & 0xff; break;
-		case 2:		tmap = m_tilemap_2;	scroll = m_scrollram_2; ctrl = (m_layerctrl[0] >> 0) & 0xff; break;
-		default:	tmap = 0;			scroll = m_scrollram_3; ctrl = (m_layerctrl[1] >> 8) & 0xff; break;
+		case 1:     tmap = m_tilemap_1; scroll = m_scrollram_1; ctrl = (m_layerctrl[0] >> 8) & 0xff; break;
+		case 2:     tmap = m_tilemap_2; scroll = m_scrollram_2; ctrl = (m_layerctrl[0] >> 0) & 0xff; break;
+		default:    tmap = 0;           scroll = m_scrollram_3; ctrl = (m_layerctrl[1] >> 8) & 0xff; break;
 	}
 
 	if (ctrl == 0x00)
@@ -292,22 +292,22 @@ UINT32 bmcpokr_state::screen_update_bmcpokr(screen_device &screen, bitmap_ind16 
 
 	bitmap.fill(m_palette->black_pen(), cliprect);
 
-	if (layers_ctrl & 2)	draw_layer(screen, bitmap, cliprect, 2);
+	if (layers_ctrl & 2)    draw_layer(screen, bitmap, cliprect, 2);
 /*
-	title:		17, 13/17
-	dogs:		1b, 13, 17
-	service:	17
-	game:		17
+    title:      17, 13/17
+    dogs:       1b, 13, 17
+    service:    17
+    game:       17
 */
 	if (*m_priority & 0x0008)
 	{
-		if (layers_ctrl & 4)	draw_layer(screen, bitmap, cliprect, 3);
-		if (layers_ctrl & 1)	draw_layer(screen, bitmap, cliprect, 1);
+		if (layers_ctrl & 4)    draw_layer(screen, bitmap, cliprect, 3);
+		if (layers_ctrl & 1)    draw_layer(screen, bitmap, cliprect, 1);
 	}
 	else
 	{
-		if (layers_ctrl & 1)	draw_layer(screen, bitmap, cliprect, 1);
-		if (layers_ctrl & 4)	draw_layer(screen, bitmap, cliprect, 3);
+		if (layers_ctrl & 1)    draw_layer(screen, bitmap, cliprect, 1);
+		if (layers_ctrl & 4)    draw_layer(screen, bitmap, cliprect, 3);
 	}
 	return 0;
 }
@@ -326,15 +326,15 @@ READ16_MEMBER(bmcpokr_state::prot_r)
 {
 	switch (m_prot_val >> 8)
 	{
-		case 0x00:	return 0x1d << 8;
-		case 0x94:	return 0x81 << 8;
+		case 0x00:  return 0x1d << 8;
+		case 0x94:  return 0x81 << 8;
 	}
 	return 0x00 << 8;
 }
 WRITE16_MEMBER(bmcpokr_state::prot_w)
 {
 	COMBINE_DATA(&m_prot_val);
-//	logerror("%s: prot val = %04x\n", machine().describe_context(), m_prot_val);
+//  logerror("%s: prot val = %04x\n", machine().describe_context(), m_prot_val);
 }
 
 /***************************************************************************
@@ -346,14 +346,14 @@ WRITE16_MEMBER(bmcpokr_state::mux_w)
 	COMBINE_DATA(&m_mux);
 	if (ACCESSING_BITS_0_7)
 	{
-		m_hopper->write(space, 0,   (data & 0x0001) ? 0x80 : 0x00);	// hopper motor
-		coin_counter_w(machine(), 1, data & 0x0002);				// coin-in / key-in
-		coin_counter_w(machine(), 2, data & 0x0004);				// pay-out
-		//                           data & 0x0060					// DSW mux
-		//                           data & 0x0080					// ? always on
+		m_hopper->write(space, 0,   (data & 0x0001) ? 0x80 : 0x00); // hopper motor
+		coin_counter_w(machine(), 1, data & 0x0002);                // coin-in / key-in
+		coin_counter_w(machine(), 2, data & 0x0004);                // pay-out
+		//                           data & 0x0060                  // DSW mux
+		//                           data & 0x0080                  // ? always on
 	}
 
-//	popmessage("mux %04x", m_mux);
+//  popmessage("mux %04x", m_mux);
 }
 READ16_MEMBER(bmcpokr_state::dsw_r)
 {
@@ -402,24 +402,24 @@ static ADDRESS_MAP_START( bmcpokr_mem, AS_PROGRAM, 16, bmcpokr_state )
 
 	AM_RANGE(0x2a0000, 0x2dffff) AM_RAM_WRITE(pixram_w) AM_SHARE("pixram")
 
-	AM_RANGE(0x2ff800, 0x2ff9ff) AM_RAM	AM_SHARE("scrollram_1")
-	AM_RANGE(0x2ffa00, 0x2ffbff) AM_RAM	AM_SHARE("scrollram_2")
-	AM_RANGE(0x2ffc00, 0x2ffdff) AM_RAM	AM_SHARE("scrollram_3")
+	AM_RANGE(0x2ff800, 0x2ff9ff) AM_RAM AM_SHARE("scrollram_1")
+	AM_RANGE(0x2ffa00, 0x2ffbff) AM_RAM AM_SHARE("scrollram_2")
+	AM_RANGE(0x2ffc00, 0x2ffdff) AM_RAM AM_SHARE("scrollram_3")
 	AM_RANGE(0x2ffe00, 0x2fffff) AM_RAM
 
 	AM_RANGE(0x320000, 0x320003) AM_RAM AM_SHARE("layerctrl")
 
 	AM_RANGE(0x330000, 0x330001) AM_READWRITE(prot_r, prot_w)
 
-	AM_RANGE(0x340000, 0x340001) AM_RAM	// 340001.b, rw
-	AM_RANGE(0x340002, 0x340003) AM_RAM	// 340003.b, w(9d)
+	AM_RANGE(0x340000, 0x340001) AM_RAM // 340001.b, rw
+	AM_RANGE(0x340002, 0x340003) AM_RAM // 340003.b, w(9d)
 	AM_RANGE(0x340006, 0x340007) AM_WRITE(irq_ack_w)
 	AM_RANGE(0x340008, 0x340009) AM_WRITE(irq_enable_w)
-	AM_RANGE(0x34000e, 0x34000f) AM_RAM AM_SHARE("priority")	// 34000f.b, w (priority?)
+	AM_RANGE(0x34000e, 0x34000f) AM_RAM AM_SHARE("priority")    // 34000f.b, w (priority?)
 	AM_RANGE(0x340016, 0x340017) AM_WRITE(pixpal_w)
-	AM_RANGE(0x340018, 0x340019) AM_RAM	// 340019.b, w
-	AM_RANGE(0x34001a, 0x34001b) AM_READ(unk_r)	AM_WRITENOP
-	AM_RANGE(0x34001c, 0x34001d) AM_RAM	// 34001d.b, w(0)
+	AM_RANGE(0x340018, 0x340019) AM_RAM // 340019.b, w
+	AM_RANGE(0x34001a, 0x34001b) AM_READ(unk_r) AM_WRITENOP
+	AM_RANGE(0x34001c, 0x34001d) AM_RAM // 34001d.b, w(0)
 
 	AM_RANGE(0x350000, 0x350001) AM_DEVWRITE8("ramdac",ramdac_device, index_w, 0x00ff )
 	AM_RANGE(0x350002, 0x350003) AM_DEVWRITE8("ramdac",ramdac_device, pal_w,   0x00ff )
@@ -453,7 +453,7 @@ static INPUT_PORTS_START( bmcpokr )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL   ) PORT_CONDITION("DSW4",0x80,EQUALS,0x80) // n.a.            [START, ESC in service mode]
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE   ) PORT_CONDITION("DSW4",0x80,EQUALS,0x80) // SCORE
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_POKER_BET     ) PORT_CONDITION("DSW4",0x80,EQUALS,0x80) // BET             [BET, credit -1]
-	PORT_BIT( 0x0200, IP_ACTIVE_HIGH,IPT_SPECIAL       ) PORT_CUSTOM_MEMBER(DEVICE_SELF, bmcpokr_state,hopper_r, NULL)	// HP [HOPPER, credit -100]
+	PORT_BIT( 0x0200, IP_ACTIVE_HIGH,IPT_SPECIAL       ) PORT_CUSTOM_MEMBER(DEVICE_SELF, bmcpokr_state,hopper_r, NULL)  // HP [HOPPER, credit -100]
 	PORT_SERVICE_NO_TOGGLE( 0x0400, IP_ACTIVE_LOW      ) PORT_CONDITION("DSW4",0x80,EQUALS,0x80) // ACCOUNT         [SERVICE MODE]
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT ) PORT_CONDITION("DSW4",0x80,EQUALS,0x80) // KEY-OUT         [KEY-OUT, no hopper]
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP   ) PORT_CONDITION("DSW4",0x80,EQUALS,0x80) // DOUBLE-UP
@@ -471,7 +471,7 @@ static INPUT_PORTS_START( bmcpokr )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL   )                PORT_CONDITION("DSW4",0x80,EQUALS,0x00) // n.a.            [START, ESC in service mode]
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2) PORT_CONDITION("DSW4",0x80,EQUALS,0x00) // <Left>2 (3rd)
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_POKER_BET     )                PORT_CONDITION("DSW4",0x80,EQUALS,0x00) // <Down>1 (2nd)   [BET, credit -1]
-//	PORT_BIT( 0x0200, IP_ACTIVE_HIGH,IPT_SPECIAL       ) PORT_CUSTOM_MEMBER(DEVICE_SELF, bmcpokr_state,hopper_r, NULL)	// HP [HOPPER, credit -100]
+//  PORT_BIT( 0x0200, IP_ACTIVE_HIGH,IPT_SPECIAL       ) PORT_CUSTOM_MEMBER(DEVICE_SELF, bmcpokr_state,hopper_r, NULL)  // HP [HOPPER, credit -100]
 	PORT_SERVICE_NO_TOGGLE( 0x0400, IP_ACTIVE_LOW      )                PORT_CONDITION("DSW4",0x80,EQUALS,0x00) // A2              [SERVICE MODE]
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )                PORT_CONDITION("DSW4",0x80,EQUALS,0x00) // C2              [KEY-OUT, no hopper]
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP   )                PORT_CONDITION("DSW4",0x80,EQUALS,0x00) // S1              [START, ESC in service mode]
@@ -480,7 +480,7 @@ static INPUT_PORTS_START( bmcpokr )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_COIN1         )                PORT_CONDITION("DSW4",0x80,EQUALS,0x00) PORT_IMPULSE(5) // <coin-in> (1st) [COIN-IN, credit +100, coin-jam]
 
 	PORT_START("INPUTS2")
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) // <coin-out> (2nd)	[COIN-OUT, hopper (otherwise pay-error)]
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) // <coin-out> (2nd)    [COIN-OUT, hopper (otherwise pay-error)]
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("DIP1:1")
@@ -602,12 +602,12 @@ static ADDRESS_MAP_START( ramdac_map, AS_0, 8, bmcpokr_state )
 ADDRESS_MAP_END
 
 static MACHINE_CONFIG_START( bmcpokr, bmcpokr_state )
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_42MHz / 4)	// 68000 @10.50MHz (42/4)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_42MHz / 4) // 68000 @10.50MHz (42/4)
 	MCFG_CPU_PROGRAM_MAP(bmcpokr_mem)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", bmcpokr_state, interrupt, "screen", 0, 1)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(58.935)	// HSync - 15.440kHz, VSync - 58.935Hz
+	MCFG_SCREEN_REFRESH_RATE(58.935)    // HSync - 15.440kHz, VSync - 58.935Hz
 
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_UPDATE_DRIVER(bmcpokr_state, screen_update_bmcpokr)
@@ -621,15 +621,15 @@ static MACHINE_CONFIG_START( bmcpokr, bmcpokr_state )
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(10), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW)	// hopper stuck low if too slow
+	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(10), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW)    // hopper stuck low if too slow
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_42MHz / 12)	// UM3567 @3.50MHz (42/12)
+	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_42MHz / 12)    // UM3567 @3.50MHz (42/12)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_42MHz / 40, OKIM6295_PIN7_HIGH)	// M6295 @1.05MHz (42/40), pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", XTAL_42MHz / 40, OKIM6295_PIN7_HIGH)   // M6295 @1.05MHz (42/40), pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 MACHINE_CONFIG_END

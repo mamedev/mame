@@ -234,7 +234,7 @@ WRITE8_MEMBER(punchout_state::spunchout_exp_w)
 {
 	// d0-d3: D0-D3 to RP5C01
 	m_rtc->write(space, offset >> 4 & 0xf, data & 0xf);
-	
+
 	// d0: 74LS74 1D + 74LS74 2D
 	// 74LS74 1Q -> RP5H01 DATA CLOCK + TEST
 	// 74LS74 2Q -> RP5H01 RESET
@@ -516,7 +516,7 @@ bit 3210 5432  L  R  C
 	1110 1xxx  20 20 0*
 
 	1111 xxxx  "Freeplay"
-	
+
 	0*: Not a "Freeplay": you MUST insert a coin!
 
 	*/
@@ -682,7 +682,7 @@ static MACHINE_CONFIG_DERIVED( spnchout, punchout )
 	MCFG_DEVICE_ADD("rtc", RP5C01, 0) // OSCIN -> Vcc
 	MCFG_RP5C01_REMOVE_BATTERY()
 	MCFG_RP5H01_ADD("rp5h01")
-	
+
 	MCFG_MACHINE_RESET_OVERRIDE(punchout_state, spnchout)
 MACHINE_CONFIG_END
 
@@ -743,7 +743,7 @@ ROM_START( punchout )
 	ROM_CONTINUE(             0x03800, 0x0800 )
 
 	ROM_REGION( 0x30000, "gfx3", ROMREGION_ERASEFF )
-	ROM_LOAD( "chp1-v.2r",    0x00000, 0x4000, CRC(bd1d4b2e) SHA1(492ae301a9890c2603d564c9048b1b67895052dd) )	/* chars #3 */ /* Labeled Rev B, but same as Rev A */
+	ROM_LOAD( "chp1-v.2r",    0x00000, 0x4000, CRC(bd1d4b2e) SHA1(492ae301a9890c2603d564c9048b1b67895052dd) )   /* chars #3 */ /* Labeled Rev B, but same as Rev A */
 	ROM_LOAD( "chp1-v.2t",    0x04000, 0x4000, CRC(dd9a688a) SHA1(fbb98eebfbaab445928da939846a2d07a8046afb) )
 	ROM_LOAD( "chp1-v.2u",    0x08000, 0x2000, CRC(da6a3c4b) SHA1(e03469fb6f552f41a9b7f4b3e51c15a52b61cf84) )
 	/* 0a000-0bfff empty (space for 16k ROM) */
@@ -762,20 +762,20 @@ ROM_START( punchout )
 	/* 2c000-2ffff empty (4v doesn't exist, it is seen as a 0xff fill) */
 
 	ROM_REGION( 0x10000, "gfx4", ROMREGION_ERASEFF )
-	ROM_LOAD( "chp1-v.6p",    0x00000, 0x0800, CRC(75be7aae) SHA1(396bc1d301b99e064de4dad699882618b1b9c958) )	/* chars #4 */ /* Revision B */
+	ROM_LOAD( "chp1-v.6p",    0x00000, 0x0800, CRC(75be7aae) SHA1(396bc1d301b99e064de4dad699882618b1b9c958) )   /* chars #4 */ /* Revision B */
 	ROM_CONTINUE(             0x01000, 0x0800 )
 	ROM_CONTINUE(             0x00800, 0x0800 )
 	ROM_CONTINUE(             0x01800, 0x0800 )
-	ROM_LOAD( "chp1-v.6n",    0x02000, 0x0800, CRC(daf74de0) SHA1(9373d4527b675b3128a5a830f42e1dc5dcb85307) )	/* Revision B */
+	ROM_LOAD( "chp1-v.6n",    0x02000, 0x0800, CRC(daf74de0) SHA1(9373d4527b675b3128a5a830f42e1dc5dcb85307) )   /* Revision B */
 	ROM_CONTINUE(             0x03000, 0x0800 )
 	ROM_CONTINUE(             0x02800, 0x0800 )
 	ROM_CONTINUE(             0x03800, 0x0800 )
 	/* 04000-07fff empty (space for 6l and 6k) */
-	ROM_LOAD( "chp1-v.8p",    0x08000, 0x0800, CRC(4cb7ea82) SHA1(213b7c1431f4c92e5519a8771035bda28b3bab8a) )	/* Revision B */
+	ROM_LOAD( "chp1-v.8p",    0x08000, 0x0800, CRC(4cb7ea82) SHA1(213b7c1431f4c92e5519a8771035bda28b3bab8a) )   /* Revision B */
 	ROM_CONTINUE(             0x09000, 0x0800 )
 	ROM_CONTINUE(             0x08800, 0x0800 )
 	ROM_CONTINUE(             0x09800, 0x0800 )
-	ROM_LOAD( "chp1-v.8n",    0x0a000, 0x0800, CRC(1c0d09aa) SHA1(3276bae7400453f3612f53d7b47fb199cbe53e6d) )	/* Revision B */
+	ROM_LOAD( "chp1-v.8n",    0x0a000, 0x0800, CRC(1c0d09aa) SHA1(3276bae7400453f3612f53d7b47fb199cbe53e6d) )   /* Revision B */
 	ROM_CONTINUE(             0x0b000, 0x0800 )
 	ROM_CONTINUE(             0x0a800, 0x0800 )
 	ROM_CONTINUE(             0x0b800, 0x0800 )
@@ -798,7 +798,7 @@ ROM_START( punchout )
 	ROM_LOAD( "chp1-b-8f_white.8f", 0x1a00, 0x0200, CRC(1ffd894a) SHA1(9e8c1c28b4c12acf42f814bc109d353729a25652) )  /* B */
 	ROM_LOAD( "chp1-v-2d.2d",       0x2000, 0x0100, CRC(71dc0d48) SHA1(dd6609f547d74887f520d7e71a1a00317ff181d0) )  /* timing - not used */
 
-	ROM_REGION( 0x4000, "vlm", 0 )	/* 16k for the VLM5030 data */
+	ROM_REGION( 0x4000, "vlm", 0 )  /* 16k for the VLM5030 data */
 	ROM_LOAD( "chp1-c.6p",    0x0000, 0x4000, CRC(ea0bbb31) SHA1(b1da024cb688341d39791a78d1144fe09acb00cf) )
 ROM_END
 
@@ -1184,7 +1184,7 @@ ROM_START( spnchouta )
 	ROM_LOAD( "chs1-b-8f_white.8f", 0x1a00, 0x0200, CRC(1663eed7) SHA1(90ff876a6b885f8a80c17531cde8b91864f1a6a5) )  /* B */
 	ROM_LOAD( "chs1-v.2d",          0x2000, 0x0100, CRC(71dc0d48) SHA1(dd6609f547d74887f520d7e71a1a00317ff181d0) )  /* timing - not used */
 
-	ROM_REGION( 0x4000, "vlm", 0 )	/* 16k for the VLM5030 data */
+	ROM_REGION( 0x4000, "vlm", 0 )  /* 16k for the VLM5030 data */
 	ROM_LOAD( "chs1-c.6p",    0x0000, 0x4000, CRC(ad8b64b8) SHA1(0f1232a10faf71b782f9f6653cca8570243c17e0) )
 ROM_END
 

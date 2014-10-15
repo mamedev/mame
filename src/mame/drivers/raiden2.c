@@ -134,20 +134,20 @@ Current Problem(s) - in order of priority
 
  High Priority
 
- Protection 
+ Protection
  - zeroteam has bogus collision detection;
  - raiden2 has a weird movement after that the ship completes animation from the aircraft. Probably 42c2 should be floating point rounded ...
  - (and probably more)
- 
+
  Unemulated 0-0x3ffff ROM banking for raidendx, but it's unknown if/where it's used (hopefully NOT on getting perfect on Alpha course).
 
  zeroteam - sort-DMA doesn't seem to work too well, sprite-sprite priorities are broken as per now
- 
+
  xsedae - do an "8-liner"-style scroll during attract, doesn't work too well.
- 
+
  sprite chip is the same as seibuspi.c and feversoc.c, needs device-ification and merging.
- 
- sprite chip also uses first entry for "something" that isn't sprite, some of them looks clipping 
+
+ sprite chip also uses first entry for "something" that isn't sprite, some of them looks clipping
  regions (150 - ff in zeroteam, 150 - 0 and 150 - 80 in raiden2). Latter probably do double buffering
  on odd/even frames, by updating only top or bottom part of screen.
 
@@ -180,7 +180,7 @@ void raiden2_state::machine_start()
 	save_item(NAME(cop_spr_maxx));
 	save_item(NAME(cop_spr_off));
 
-	
+
 	save_item(NAME(scrollvals));
 
 	save_item(NAME(sprite_prot_src_addr));
@@ -190,12 +190,12 @@ void raiden2_state::machine_start()
 /*
 UINT16 raiden2_state::rps()
 {
-	return m_maincpu->state_int(NEC_CS);
+    return m_maincpu->state_int(NEC_CS);
 }
 
 UINT16 raiden2_state::rpc()
 {
-	return m_maincpu->state_int(NEC_IP);
+    return m_maincpu->state_int(NEC_IP);
 }
 */
 
@@ -843,7 +843,7 @@ WRITE16_MEMBER(raiden2_state::sprite_prot_src_w)
 		dst1 += 8;
 	}
 	//printf("[%08x] %08x %08x %04x %04x\n",src,dx,dy,dst1,dst2);
-	//	debugger_break(machine());
+	//  debugger_break(machine());
 }
 
 READ16_MEMBER(raiden2_state::sprite_prot_dst1_r)

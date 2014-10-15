@@ -55,11 +55,11 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
 	required_device<tms34010_device> m_tms;
-	
+
 	required_shared_ptr<UINT32> m_blitter_regs;
 	required_shared_ptr<UINT32> m_fpga_ctrl;
 	required_shared_ptr<UINT16> m_fg_buffer;
-	
+
 	UINT32 *m_bg_buffer;
 	UINT32 *m_bg_buffer_front;
 	UINT32 *m_bg_buffer_back;
@@ -69,7 +69,7 @@ public:
 	UINT32 m_blitter_src_dx;
 	UINT32 m_blitter_src_y;
 	UINT32 m_blitter_src_dy;
-	
+
 	DECLARE_WRITE32_MEMBER(skimaxx_blitter_w);
 	DECLARE_READ32_MEMBER(skimaxx_blitter_r);
 	DECLARE_WRITE32_MEMBER(skimaxx_fpga_ctrl_w);
@@ -79,11 +79,11 @@ public:
 	DECLARE_WRITE32_MEMBER(skimaxx_sub_ctrl_w);
 	DECLARE_READ32_MEMBER(skimaxx_analog_r);
 	DECLARE_WRITE_LINE_MEMBER(tms_irq);
-	
+
 	TMS340X0_TO_SHIFTREG_CB_MEMBER(to_shiftreg);
 	TMS340X0_FROM_SHIFTREG_CB_MEMBER(from_shiftreg);
 	TMS340X0_SCANLINE_IND16_CB_MEMBER(scanline_update);
-	
+
 	virtual void machine_reset();
 	virtual void video_start();
 };

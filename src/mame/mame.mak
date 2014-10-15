@@ -1210,7 +1210,7 @@ $(MAMEOBJ)/igs.a: \
 	$(DRIVERS)/igs_m036.o \
 	$(DRIVERS)/iqblock.o $(VIDEO)/iqblock.o \
 	$(DRIVERS)/lordgun.o $(VIDEO)/lordgun.o \
-	$(DRIVERS)/pgm.o $(VIDEO)/pgm.o	$(MACHINE)/pgmprot_igs027a_type1.o $(MACHINE)/pgmprot_igs027a_type2.o $(MACHINE)/pgmprot_igs027a_type3.o $(MACHINE)/pgmprot_igs025_igs012.o $(MACHINE)/pgmprot_igs025_igs022.o $(MACHINE)/pgmprot_igs025_igs028.o $(MACHINE)/pgmprot_orlegend.o \
+	$(DRIVERS)/pgm.o $(VIDEO)/pgm.o $(MACHINE)/pgmprot_igs027a_type1.o $(MACHINE)/pgmprot_igs027a_type2.o $(MACHINE)/pgmprot_igs027a_type3.o $(MACHINE)/pgmprot_igs025_igs012.o $(MACHINE)/pgmprot_igs025_igs022.o $(MACHINE)/pgmprot_igs025_igs028.o $(MACHINE)/pgmprot_orlegend.o \
 	$(DRIVERS)/pgm2.o \
 	$(DRIVERS)/spoker.o \
 	$(MACHINE)/igs036crypt.o \

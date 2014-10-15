@@ -178,7 +178,7 @@ static ADDRESS_MAP_START( chqflag_sound_map, AS_PROGRAM, 8, chqflag_state )
 	AM_RANGE(0x8000, 0x87ff) AM_RAM /* RAM */
 	AM_RANGE(0x9000, 0x9000) AM_WRITE(k007232_bankswitch_w) /* 007232 bankswitch */
 	AM_RANGE(0xa000, 0xa00d) AM_DEVREADWRITE("k007232_1", k007232_device, read, write)  /* 007232 (chip 1) */
-	AM_RANGE(0xa01c, 0xa01c) AM_WRITE(k007232_extvolume_w)	/* extra volume, goes to the 007232 w/ A4 */
+	AM_RANGE(0xa01c, 0xa01c) AM_WRITE(k007232_extvolume_w)  /* extra volume, goes to the 007232 w/ A4 */
 															/* selecting a different latch for the external port */
 	AM_RANGE(0xb000, 0xb00d) AM_DEVREADWRITE("k007232_2", k007232_device, read, write)  /* 007232 (chip 2) */
 	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)   /* YM2151 */

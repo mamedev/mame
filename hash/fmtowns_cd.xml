@@ -2,8 +2,8 @@
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <softwarelist name="fmtowns" description="FM Towns CD-ROMs">
 <!-- skeleton test list -->
-  
-  <!-- works well on fmtmarty, keyboard seems to interfere with movements on fmtowns -->
+
+	<!-- works well on fmtmarty, keyboard seems to interfere with movements on fmtowns -->
 	<software name="raiden">
 		<description>Raiden Densetsu / Raiden Trad</description>
 		<year>1991</year>

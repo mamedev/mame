@@ -1023,7 +1023,7 @@ READ16_MEMBER(splash_state::funystrp_protection_r)
 
 	int ofst = offset+(0x100000/2);
 
-//	logerror ("PROTR: %5.5x, pc: %5.5x\n", ofst*2, pc);
+//  logerror ("PROTR: %5.5x, pc: %5.5x\n", ofst*2, pc);
 
 	// don't interfere with ram check.
 	if (pc == 0x04770) return 0x00;
@@ -1071,8 +1071,8 @@ READ16_MEMBER(splash_state::funystrp_protection_r)
 
 		//-----------------------------------------------------------------
 		// sub $7F70, $8038, $116E2, no subtractions, straight compare!, original value from 68k
-		// increase ff3cc8 value in sub $116e2 
-	
+		// increase ff3cc8 value in sub $116e2
+
 		case ((0x100001 / 2) + 0x0010): // $7F72
 			funystrp_val = funystrp_ff3cc8_val;
 			return 0;
@@ -1102,8 +1102,8 @@ READ16_MEMBER(splash_state::funystrp_protection_r)
 			return (funystrp_val + 0x12) & 0xff;
 
 		// first case... weird?
-	//	case ((0x104801 / 2) + 0x013A): // $857E
-	//		return (funystrp_val + 0x00) & 0xff;
+	//  case ((0x104801 / 2) + 0x013A): // $857E
+	//      return (funystrp_val + 0x00) & 0xff;
 
 		case ((0x104801 / 2) + 0x0277): // $85A4
 			return (funystrp_val + 0x04) & 0xff;
@@ -1136,7 +1136,7 @@ READ16_MEMBER(splash_state::funystrp_protection_r)
 
 		//-----------------------------------------------------------------
 		// sub $9DD2, subtractions, original value from protection device
-	
+
 		case ((0x170001 / 2) + 0x006B): // $9DD4
 			funystrp_val = 0;
 			return 0;
@@ -1176,19 +1176,19 @@ READ16_MEMBER(splash_state::funystrp_protection_r)
 		//-----------------------------------------------------------------
 		// sub $C5E4, subtractions, original value from 68k
 
-	//	these cases are already in sub $7ACC, last one is new!!
-	//	case ((0x107001 / 2) + 0x0030): // $7ACE
-	//		funystrp_val = funystrp_ff3cc7_val & 0x7f;
-	//		return 0;
+	//  these cases are already in sub $7ACC, last one is new!!
+	//  case ((0x107001 / 2) + 0x0030): // $7ACE
+	//      funystrp_val = funystrp_ff3cc7_val & 0x7f;
+	//      return 0;
 
-	//	case ((0x107001 / 2) + 0x013e): // $7AFC
-	//		return (funystrp_val + 0x13) & 0xff;
+	//  case ((0x107001 / 2) + 0x013e): // $7AFC
+	//      return (funystrp_val + 0x13) & 0xff;
 
-	//	case ((0x107001 / 2) + 0x0279): // $7B38
-	//		return (funystrp_val + 0x22) & 0xff;
+	//  case ((0x107001 / 2) + 0x0279): // $7B38
+	//      return (funystrp_val + 0x22) & 0xff;
 
-	//	case ((0x107001 / 2) + 0x0357): // $7B6E
-	//		return (funystrp_val + 0x44) & 0xff;
+	//  case ((0x107001 / 2) + 0x0357): // $7B6E
+	//      return (funystrp_val + 0x44) & 0xff;
 
 		case ((0x107001 / 2) + 0x0381): // $7BA4
 			return (funystrp_val + 0x6a) & 0xff;
@@ -1215,7 +1215,7 @@ READ16_MEMBER(splash_state::funystrp_protection_r)
 		//-----------------------------------------------------------------
 		// sub $F72C, subtractions, original value from protection device,
 		// routine verified working!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-	
+
 		case ((0x100001 / 2) + 0x0017): // $F72E
 			funystrp_val = 0;
 			return 0;
@@ -1233,8 +1233,8 @@ READ16_MEMBER(splash_state::funystrp_protection_r)
 			return (funystrp_val + 0x70) & 0xff;
 
 		//-----------------------------------------------------------------
-		// sub $F82E, subtractions, original value from protection device, 
-	
+		// sub $F82E, subtractions, original value from protection device,
+
 		case ((0x100001 / 2) + 0x0013): // $F830
 			funystrp_val = 0;
 			return 0;
@@ -1242,21 +1242,21 @@ READ16_MEMBER(splash_state::funystrp_protection_r)
 		case ((0x100001 / 2) + 0x0125): // $F84E
 			return (funystrp_val + 0x17) & 0xff;
 
-	//	used in sub $7E76
-	//	case ((0x110001 / 2) + 0x0261): // $F88A
-	//		return (funystrp_val + 0x0f) & 0xff;
+	//  used in sub $7E76
+	//  case ((0x110001 / 2) + 0x0261): // $F88A
+	//      return (funystrp_val + 0x0f) & 0xff;
 
-	//	case ((0x110001 / 2) + 0x0322): // $F8C0
-	//		return (funystrp_val + 0x12) & 0xff;
+	//  case ((0x110001 / 2) + 0x0322): // $F8C0
+	//      return (funystrp_val + 0x12) & 0xff;
 
-	//	case ((0x110001 / 2) + 0x039B): // $F8F6
-	//		return (funystrp_val + 0x70) & 0xff;
+	//  case ((0x110001 / 2) + 0x039B): // $F8F6
+	//      return (funystrp_val + 0x70) & 0xff;
 
 		//-----------------------------------------------------------------
 		// sub $10FE2, subtractions, original value from protection device
 		// routine is different from rest, unoptimized or just poorly coded?
 		// examine later to verify this is right
-	
+
 		case ((0x105001 / 2) + 0x0021): // $10FF6
 			funystrp_val = 0;
 			return 0;
@@ -1274,10 +1274,10 @@ READ16_MEMBER(splash_state::funystrp_protection_r)
 			return (funystrp_val + 0x03) & 0xff;
 
 		//-----------------------------------------------------------------
-		// sub $11F2C, subtractions, original value from protection device, 
+		// sub $11F2C, subtractions, original value from protection device,
 		// routine is different from rest, unoptimized or just poorly coded?
 		// examine later to verify this is right
-	
+
 		case ((0x183001 / 2) + 0x0088): // $11F3C
 			funystrp_val = 0;
 			return 0;
@@ -1302,9 +1302,9 @@ WRITE16_MEMBER(splash_state::funystrp_protection_w)
 {
 	int ofst = (0x100000/2)+offset;
 
-//	logerror ("PROTW: %5.5x, %4.4x, PC: %5.5x m: %4.4x\n", ofst*2, data, space.device().safe_pc(), mem_mask);
+//  logerror ("PROTW: %5.5x, %4.4x, PC: %5.5x m: %4.4x\n", ofst*2, data, space.device().safe_pc(), mem_mask);
 
-//	if (ACCESSING_BITS_0_7) // ??
+//  if (ACCESSING_BITS_0_7) // ??
 	{
 		switch (ofst)
 		{
@@ -1320,7 +1320,7 @@ WRITE16_MEMBER(splash_state::funystrp_protection_w)
 			case (0x1007e5/2):
 				funystrp_ff3cc8_val = data;
 			return;
-	
+
 			case (0x1007e7/2):
 				funystrp_ff3cc7_val = data;
 			return;

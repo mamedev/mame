@@ -106,20 +106,20 @@ static ADDRESS_MAP_START( legionna_cop_mem, AS_PROGRAM, 16, legionna_state )
 	AM_RANGE(0x100428, 0x100429) AM_DEVWRITE("raiden2cop", raiden2cop_device, cop_dma_v1_w)
 	AM_RANGE(0x10042a, 0x10042b) AM_DEVWRITE("raiden2cop", raiden2cop_device, cop_dma_v2_w)
 	AM_RANGE(0x10042c, 0x10042d) AM_DEVREADWRITE("raiden2cop", raiden2cop_device, cop_prng_maxvalue_r, cop_prng_maxvalue_w)
-	
+
 	AM_RANGE(0x100432, 0x100433) AM_DEVWRITE("raiden2cop", raiden2cop_device, cop_pgm_data_w)
 	AM_RANGE(0x100434, 0x100435) AM_DEVWRITE("raiden2cop", raiden2cop_device, cop_pgm_addr_w)
 	AM_RANGE(0x100436, 0x100437) AM_DEVWRITE("raiden2cop", raiden2cop_device, cop_hitbox_baseadr_w)
 	AM_RANGE(0x100438, 0x100439) AM_DEVWRITE("raiden2cop", raiden2cop_device, cop_pgm_value_w)
 	AM_RANGE(0x10043a, 0x10043b) AM_DEVWRITE("raiden2cop", raiden2cop_device, cop_pgm_mask_w)
 	AM_RANGE(0x10043c, 0x10043d) AM_DEVWRITE("raiden2cop", raiden2cop_device, cop_pgm_trigger_w)
-	//AM_RANGE(0x10043e, 0x10043f) AM_DEVWRITE("raiden2cop", raiden2cop_device,)	/*	0 in all 68k based games, 	0xffff in raiden2 / raidendx, 	0x2000 in zeroteam / xsedae , it's always set up just before the 0x474 register */
+	//AM_RANGE(0x10043e, 0x10043f) AM_DEVWRITE("raiden2cop", raiden2cop_device,)    /*  0 in all 68k based games,   0xffff in raiden2 / raidendx,   0x2000 in zeroteam / xsedae , it's always set up just before the 0x474 register */
 
 	AM_RANGE(0x100444, 0x100445) AM_DEVWRITE("raiden2cop", raiden2cop_device, cop_scale_w)
 	AM_RANGE(0x100446, 0x100447) AM_DEVWRITE("raiden2cop", raiden2cop_device, cop_rom_addr_unk_w) // 68k
 	AM_RANGE(0x100448, 0x100449) AM_DEVWRITE("raiden2cop", raiden2cop_device, cop_rom_addr_lo_w) // 68k
 	AM_RANGE(0x10044a, 0x10044b) AM_DEVWRITE("raiden2cop", raiden2cop_device, cop_rom_addr_hi_w) // 68k
-	
+
 	AM_RANGE(0x100450, 0x100451) AM_DEVWRITE("raiden2cop", raiden2cop_device, cop_sort_ram_addr_hi_w)
 	AM_RANGE(0x100452, 0x100453) AM_DEVWRITE("raiden2cop", raiden2cop_device, cop_sort_ram_addr_lo_w)
 	AM_RANGE(0x100454, 0x100455) AM_DEVWRITE("raiden2cop", raiden2cop_device, cop_sort_lookup_hi_w)
@@ -128,8 +128,8 @@ static ADDRESS_MAP_START( legionna_cop_mem, AS_PROGRAM, 16, legionna_state )
 	AM_RANGE(0x10045a, 0x10045b) AM_DEVWRITE("raiden2cop", raiden2cop_device, cop_pal_brightness_val_w) //palette DMA brightness val, used by X Se Dae / Zero Team
 	AM_RANGE(0x10045c, 0x10045d) AM_DEVWRITE("raiden2cop", raiden2cop_device, cop_pal_brightness_mode_w)  //palette DMA brightness mode, used by X Se Dae / Zero Team (sets to 5)
 
-//	AM_RANGE(0x100470, 0x100471) AM_READWRITE(cop_tile_bank_2_r,cop_tile_bank_2_w)
-//	AM_RANGE(0x100474, 0x100475) AM_DEVWRITE("raiden2cop", raiden2cop_device,) // this gets set to a pointer to spriteram (relative to start of ram) on all games excecpt raiden 2, where it isn't set
+//  AM_RANGE(0x100470, 0x100471) AM_READWRITE(cop_tile_bank_2_r,cop_tile_bank_2_w)
+//  AM_RANGE(0x100474, 0x100475) AM_DEVWRITE("raiden2cop", raiden2cop_device,) // this gets set to a pointer to spriteram (relative to start of ram) on all games excecpt raiden 2, where it isn't set
 	AM_RANGE(0x100476, 0x100477) AM_DEVWRITE("raiden2cop", raiden2cop_device, cop_dma_adr_rel_w)
 	AM_RANGE(0x100478, 0x100479) AM_DEVWRITE("raiden2cop", raiden2cop_device,cop_dma_src_w)
 	AM_RANGE(0x10047a, 0x10047b) AM_DEVWRITE("raiden2cop", raiden2cop_device,cop_dma_size_w)
@@ -142,7 +142,7 @@ static ADDRESS_MAP_START( legionna_cop_mem, AS_PROGRAM, 16, legionna_state )
 	AM_RANGE(0x1004a0, 0x1004ad) AM_DEVREADWRITE("raiden2cop", raiden2cop_device, cop_reg_high_r, cop_reg_high_w)
 	AM_RANGE(0x1004c0, 0x1004cd) AM_DEVREADWRITE("raiden2cop", raiden2cop_device, cop_reg_low_r, cop_reg_low_w)
 
-//	AM_RANGE(0x100500, 0x100505) AM_WRITE(cop_cmd_w) // ADD ME
+//  AM_RANGE(0x100500, 0x100505) AM_WRITE(cop_cmd_w) // ADD ME
 	AM_RANGE(0x100500, 0x100505) AM_DEVWRITE("raiden2cop", raiden2cop_device,LEGACY_cop_cmd_w) // REMOVE ME
 
 	AM_RANGE(0x100580, 0x100581) AM_DEVREAD("raiden2cop", raiden2cop_device, cop_collision_status_r)
@@ -222,7 +222,7 @@ static ADDRESS_MAP_START( godzilla_map, AS_PROGRAM, 16, legionna_state )
 	AM_RANGE(0x101800, 0x101fff) AM_RAM // _WRITE(legionna_foreground_w) AM_SHARE("fore_data")
 	AM_RANGE(0x102000, 0x1027ff) AM_RAM // _WRITE(legionna_midground_w) AM_SHARE("mid_data")
 	AM_RANGE(0x102800, 0x1037ff) AM_RAM // _WRITE(legionna_text_w) AM_SHARE("textram")
-	AM_RANGE(0x103800, 0x103fff) AM_RAM // check? 
+	AM_RANGE(0x103800, 0x103fff) AM_RAM // check?
 	AM_RANGE(0x104000, 0x104fff) AM_RAM // _DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x105000, 0x105fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x106000, 0x1067ff) AM_RAM

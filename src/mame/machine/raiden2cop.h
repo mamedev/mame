@@ -87,7 +87,7 @@ public:
 	DECLARE_WRITE16_MEMBER( cop_itoa_high_w );
 	DECLARE_WRITE16_MEMBER( cop_itoa_digit_count_w );
 	DECLARE_READ16_MEMBER ( cop_itoa_digits_r );
-	
+
 	UINT32 cop_itoa;
 	UINT16 cop_itoa_digit_count;
 	UINT8 cop_itoa_digits[10];
@@ -122,14 +122,13 @@ public:
 
 	UINT32 cop_regs[8];
 	UINT16 cop_status, cop_scale, cop_angle, cop_dist;
-	
+
 
 	UINT16 cop_angle_target;
 	UINT16 cop_angle_step;
 
 
 	struct colinfo {
-
 		colinfo()
 		{
 			pos[0] = pos[1] = pos[2] = 0;
@@ -140,7 +139,7 @@ public:
 			spradr = 0;
 			min[0] = min[1] = min[2] = 0;
 			max[0] = max[1] = max[2] = 0;
-		
+
 		}
 
 

@@ -4405,14 +4405,14 @@ DRIVER_INIT_MEMBER(itech32_state,gt2kp)
 
 	/* The protection code is:
 
-        addq #1,    1132.w
-        clr.l       d0
-        clr.l       d1
-        move.b      680002,d0       ; Read protection result
-        move.b      112f.w,d1
-        andi.b      #$01,d0
+	    addq #1,    1132.w
+	    clr.l       d0
+	    clr.l       d1
+	    move.b      680002,d0       ; Read protection result
+	    move.b      112f.w,d1
+	    andi.b      #$01,d0
 Label1  bne.s       Label1          ; Infinite loop if result isn't 0x01
-        nop                         ; Otherwise just return to the game :-)
+	    nop                         ; Otherwise just return to the game :-)
 
 	*/
 }
@@ -4426,14 +4426,14 @@ DRIVER_INIT_MEMBER(itech32_state,gtclasscp)
 
 	/* The protection code is:
 
-        addq #1,    1132.w
-        clr.l       d0
-        clr.l       d1
-        move.b      680002,d0       ; Read protection result
-        andi.b      #$C0,d0
-        cmpi.b      #$80,d0
+	    addq #1,    1132.w
+	    clr.l       d0
+	    clr.l       d1
+	    move.b      680002,d0       ; Read protection result
+	    andi.b      #$C0,d0
+	    cmpi.b      #$80,d0
 Label1  bne.s       Label1          ; Infinite loop if result isn't 0x80
-        rts                         ; Otherwise just return to the game :-)
+	    rts                         ; Otherwise just return to the game :-)
 
 	*/
 }

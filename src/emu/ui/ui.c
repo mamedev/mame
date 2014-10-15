@@ -1554,7 +1554,7 @@ UINT32 ui_manager::handler_ingame(running_machine &machine, render_container *co
 			machine.pause();
 		return machine.ui().set_handler(ui_gfx_ui_handler, is_paused);
 	}
-	
+
 	// handle a tape control key
 	if (ui_input_pressed(machine, IPT_UI_TAPE_START))
 	{
@@ -1574,7 +1574,7 @@ UINT32 ui_manager::handler_ingame(running_machine &machine, render_container *co
 			return 0;
 		}
 	}
-	
+
 	// handle a save state request
 	if (ui_input_pressed(machine, IPT_UI_SAVE_STATE))
 	{

@@ -173,7 +173,7 @@ void skyfox_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect
 			for (dx = xstart; dx != xend; dx += xinc, code++)
 			{
 				gfx->transpen(bitmap, cliprect, code, 0, flipx, flipy, dx*8 + x, dy*8 + y, 0xff);
-				
+
 				// wraparound y - BTANB: large sprites exiting the screen sometimes reappear on the other edge
 				gfx->transpen(bitmap, cliprect, code, 0, flipx, flipy, dx*8 + x, dy*8 + y - 256, 0xff);
 			}

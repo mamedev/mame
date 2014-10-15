@@ -194,7 +194,7 @@ ROM_START(electron)
 	/* 24000  9 keyboard mirror                              */
 	/* 28000 10 Basic rom                                    */
 	ROM_LOAD( "basic.rom", 0x28000, 0x4000, CRC(79434781) SHA1(4a7393f3a45ea309f744441c16723e2ef447a281) )
-	/* 2c000 11 Basic rom mirror                             */ 
+	/* 2c000 11 Basic rom mirror                             */
 	ROM_COPY( "user1", 0x28000, 0x2c000, 0x4000 )
 	/* 30000 12 available for cartridges with a language ROM */
 	/* 34000 13 available for cartridges with a language ROM */

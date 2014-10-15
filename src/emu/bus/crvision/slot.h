@@ -104,6 +104,5 @@ extern const device_type CRVISION_CART_SLOT;
 
 #define MCFG_CRVISION_CARTRIDGE_ADD(_tag,_slot_intf,_def_slot) \
 	MCFG_DEVICE_ADD(_tag, CRVISION_CART_SLOT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false) \
-
+	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
 #endif

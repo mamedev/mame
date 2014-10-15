@@ -759,7 +759,7 @@ void gl4004_state::machine_start()
 	UINT8 *cart = memregion(region_tag.cpy(m_cart->tag()).cat(GENERIC_ROM_REGION_TAG))->base();
 	if (!cart)
 		cart = memregion("bios")->base();
-	
+
 	m_bank0->configure_entries(0, 0x20, bios, 0x4000);
 	m_bank1->configure_entries(0, 0x20, bios, 0x4000);
 	m_bank2->configure_entries(0, 0x20, bios, 0x4000);
@@ -814,8 +814,8 @@ DEVICE_IMAGE_LOAD_MEMBER( pc2000_state, pc2000_cart )
 	// we always allocate a 0x40000 region, even if most carts span only 0x20000,
 	// because the bankswitch code accesses up to 16 x 16K banks...
 	m_cart->rom_alloc(0x40000, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
-	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");			
-	
+	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
+
 	return IMAGE_INIT_PASS;
 }
 

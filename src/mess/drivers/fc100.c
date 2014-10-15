@@ -114,7 +114,7 @@ private:
 static ADDRESS_MAP_START( fc100_mem, AS_PROGRAM, 8, fc100_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x5fff ) AM_ROM AM_REGION("roms", 0)
-	//AM_RANGE(0x6000, 0x6fff)		// mapped by the cartslot
+	//AM_RANGE(0x6000, 0x6fff)      // mapped by the cartslot
 	AM_RANGE( 0x7800, 0x7fff ) AM_READ_BANK("bankr") AM_WRITE_BANK("bankw") // Banked RAM/ROM
 	AM_RANGE( 0x8000, 0xbfff ) AM_RAM // expansion ram pack - if omitted you get a 'Pages?' prompt at boot
 	AM_RANGE( 0xc000, 0xffff ) AM_RAM AM_SHARE("videoram")

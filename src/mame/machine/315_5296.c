@@ -1,7 +1,7 @@
 /**********************************************************************
 
     Sega 315-5296 I/O chip
-    
+
     Sega 100-pin QFP, with 8 bidirectional I/O ports, and 3 output pins.
     It also has chip select(/FMCS) and clock(CKOT) for a peripheral device.
     Commonly used from the late 80s up until Sega Model 2.
@@ -68,7 +68,7 @@ void sega_315_5296_device::device_start()
 	m_in_pf_cb.resolve_safe(0xff); m_in_port_cb[5] = &m_in_pf_cb;
 	m_in_pg_cb.resolve_safe(0xff); m_in_port_cb[6] = &m_in_pg_cb;
 	m_in_ph_cb.resolve_safe(0xff); m_in_port_cb[7] = &m_in_ph_cb;
-	
+
 	m_out_pa_cb.resolve_safe(); m_out_port_cb[0] = &m_out_pa_cb;
 	m_out_pb_cb.resolve_safe(); m_out_port_cb[1] = &m_out_pb_cb;
 	m_out_pc_cb.resolve_safe(); m_out_port_cb[2] = &m_out_pc_cb;
@@ -77,11 +77,11 @@ void sega_315_5296_device::device_start()
 	m_out_pf_cb.resolve_safe(); m_out_port_cb[5] = &m_out_pf_cb;
 	m_out_pg_cb.resolve_safe(); m_out_port_cb[6] = &m_out_pg_cb;
 	m_out_ph_cb.resolve_safe(); m_out_port_cb[7] = &m_out_ph_cb;
-	
+
 	m_out_cnt0_cb.resolve_safe(); m_out_cnt_cb[0] = &m_out_cnt0_cb;
 	m_out_cnt1_cb.resolve_safe(); m_out_cnt_cb[1] = &m_out_cnt1_cb;
 	m_out_cnt2_cb.resolve_safe(); m_out_cnt_cb[2] = &m_out_cnt2_cb;
-	
+
 	// register for savestates
 	save_item(NAME(m_output_latch));
 	save_item(NAME(m_cnt));
@@ -96,7 +96,7 @@ void sega_315_5296_device::device_reset()
 {
 	// all ports are set to input
 	m_dir = 0;
-	
+
 	// clear output ports
 	memset(m_output_latch, 0, sizeof(m_output_latch));
 	m_cnt = 0;
@@ -113,7 +113,7 @@ void sega_315_5296_device::device_reset()
 READ8_MEMBER( sega_315_5296_device::read )
 {
 	offset &= 0x3f;
-	
+
 	switch (offset)
 	{
 		// port A to H
@@ -121,10 +121,10 @@ READ8_MEMBER( sega_315_5296_device::read )
 			// if the port is configured as an output, return the last thing written
 			if (m_dir & 1 << offset)
 				return m_output_latch[offset];
-			
+
 			// otherwise, return an input port
 			return (*m_in_port_cb[offset])(offset);
-		
+
 		// 'SEGA' protection
 		case 0x8:
 			return 'S';
@@ -142,11 +142,11 @@ READ8_MEMBER( sega_315_5296_device::read )
 		// port direction register & mirror
 		case 0xd: case 0xf:
 			return m_dir;
-		
+
 		default:
 			break;
 	}
-	
+
 	return 0xff;
 }
 
@@ -165,7 +165,7 @@ WRITE8_MEMBER( sega_315_5296_device::write )
 
 			m_output_latch[offset] = data;
 			break;
-		
+
 		// CNT register
 		case 0xe:
 			// d0-2: CNT0-2 output pins
@@ -173,7 +173,7 @@ WRITE8_MEMBER( sega_315_5296_device::write )
 			// no effect on the output level of CNT2.
 			for (int i = 0; i < 3; i++)
 				(*m_out_cnt_cb[i])(data >> i & 1);
-			
+
 			// d3: CNT2 output mode (1= Clock output, 0= Programmable output)
 			// d4,5: CNT2 clock divider (0= CLK/4, 1= CLK/8, 2= CLK/16, 3= CLK/2)
 			// d6,7: CKOT clock divider (0= CLK/4, 1= CLK/8, 2= CLK/16, 3= CLK/2)
@@ -189,10 +189,10 @@ WRITE8_MEMBER( sega_315_5296_device::write )
 				if ((m_dir ^ data) & (1 << i))
 					(*m_out_port_cb[i])((offs_t)i, (data & 1 << i) ? m_output_latch[i] : 0);
 			}
-			
+
 			m_dir = data;
 			break;
-		
+
 		default:
 			break;
 	}

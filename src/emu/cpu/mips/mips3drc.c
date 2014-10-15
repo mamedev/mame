@@ -2483,7 +2483,7 @@ int mips3_device::generate_get_cop0_reg(drcuml_block *block, compiler_state *com
 void mips3_device::generate_badcop(drcuml_block *block, const int cop)
 {
 	UML_TEST(block, CPR032(COP0_Status), SR_COP0 << cop);               // test    [Status], SR_COP0 << cop
-	UML_EXHc(block, COND_Z, *m_exception[EXCEPTION_BADCOP], cop);		// exh     badcop,cop,Z
+	UML_EXHc(block, COND_Z, *m_exception[EXCEPTION_BADCOP], cop);       // exh     badcop,cop,Z
 }
 
 /*-------------------------------------------------------------------------

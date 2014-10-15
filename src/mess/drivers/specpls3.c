@@ -217,13 +217,13 @@ void spectrum_state::spectrum_plus3_update_memory()
 		int ram_page = m_port_7ffd_data & 0x07;
 		unsigned char *ram_data = messram + (ram_page<<14);
 		membank("bank4")->set_base(ram_data);
-		
+
 		logerror("RAM at 0xc000: %02x\n", ram_page);
-		
+
 		/* Reset memory between 0x4000 - 0xbfff in case extended paging was being used */
 		/* Bank 5 in 0x4000 - 0x7fff */
 		membank("bank2")->set_base(messram + (5 << 14));
-		
+
 		/* Bank 2 in 0x8000 - 0xbfff */
 		membank("bank3")->set_base(messram + (2 << 14));
 
@@ -231,13 +231,13 @@ void spectrum_state::spectrum_plus3_update_memory()
 		{
 			/* ROM switching */
 			int ROMSelection = BIT(m_port_7ffd_data, 4) | ((m_port_1ffd_data >> 1) & 0x02);
-			
+
 			/* rom 0 is editor, rom 1 is syntax, rom 2 is DOS, rom 3 is 48 BASIC */
 			unsigned char *ChosenROM = memregion("maincpu")->base() + 0x010000 + (ROMSelection << 14);
-			
+
 			membank("bank1")->set_base(ChosenROM);
 			space.unmap_write(0x0000, 0x3fff);
-			
+
 			logerror("rom switch: %02x\n", ROMSelection);
 		}
 	}
@@ -247,20 +247,20 @@ void spectrum_state::spectrum_plus3_update_memory()
 		int MemorySelection = (m_port_1ffd_data >> 1) & 0x03;
 		const int *memory_selection = &spectrum_plus3_memory_selections[(MemorySelection << 2)];
 		unsigned char *ram_data = messram + (memory_selection[0] << 14);
-		
+
 		membank("bank1")->set_base(ram_data);
 		/* allow writes to 0x0000-0x03fff */
 		space.install_write_bank(0x0000, 0x3fff, "bank1");
-		
+
 		ram_data = messram + (memory_selection[1] << 14);
 		membank("bank2")->set_base(ram_data);
-		
+
 		ram_data = messram + (memory_selection[2] << 14);
 		membank("bank3")->set_base(ram_data);
-		
+
 		ram_data = messram + (memory_selection[3] << 14);
 		membank("bank4")->set_base(ram_data);
-		
+
 		logerror("extended memory paging: %02x\n", MemorySelection);
 	}
 }

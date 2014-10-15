@@ -841,7 +841,7 @@ ROM_START( jumping )
 
 	ROM_REGION( 0x200, "pals", 0 )
 	ROM_LOAD( "jumping-pal16r6.bin",             0x000, 0x104, CRC(12e9a7b8) SHA1(a0ce8b6083c9adfcb4bdbca87f63a01f292525f3) )
-	ROM_LOAD( "jumping-pal20l8.bin",             0x000, 0x144, CRC(76944f81) SHA1(ab78e4e157ffdc13aea5dc360268b2640e60d19c) )	
+	ROM_LOAD( "jumping-pal20l8.bin",             0x000, 0x144, CRC(76944f81) SHA1(ab78e4e157ffdc13aea5dc360268b2640e60d19c) )
 ROM_END
 
 ROM_START( jumpinga )
@@ -887,7 +887,7 @@ ROM_START( jumpinga )
 
 	ROM_REGION( 0x200, "pals", 0 )
 	ROM_LOAD( "jumping-pal16r6.bin",             0x000, 0x104, CRC(12e9a7b8) SHA1(a0ce8b6083c9adfcb4bdbca87f63a01f292525f3) )
-	ROM_LOAD( "jumping-pal20l8.bin",             0x000, 0x144, CRC(76944f81) SHA1(ab78e4e157ffdc13aea5dc360268b2640e60d19c) )	
+	ROM_LOAD( "jumping-pal20l8.bin",             0x000, 0x144, CRC(76944f81) SHA1(ab78e4e157ffdc13aea5dc360268b2640e60d19c) )
 ROM_END
 
 

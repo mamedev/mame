@@ -107,7 +107,7 @@ static ADDRESS_MAP_START(pencil2_mem, AS_PROGRAM, 8, pencil2_state)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x5fff) AM_WRITENOP  // stop error log filling up
 	AM_RANGE(0x6000, 0x67ff) AM_MIRROR(0x1800) AM_RAM
-	//AM_RANGE(0x8000, 0xffff)		// mapped by the cartslot
+	//AM_RANGE(0x8000, 0xffff)      // mapped by the cartslot
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(pencil2_io, AS_IO, 8, pencil2_state)

@@ -33,7 +33,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER( bartop_interrupt );
 
 	virtual void machine_reset();
-	//required_device<cpu_device> m_maincpu;	// maincpu is already contained in atari_common_state
+	//required_device<cpu_device> m_maincpu;    // maincpu is already contained in atari_common_state
 };
 
 

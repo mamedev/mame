@@ -344,7 +344,7 @@ void electron_state::machine_reset()
 }
 
 void electron_state::machine_start()
-{	
+{
 	UINT8 *lo_rom, *up_rom;
 	astring region_tag;
 	memory_region *cart_rom = memregion(region_tag.cpy(m_cart->tag()).cat(GENERIC_ROM_REGION_TAG));
@@ -357,7 +357,7 @@ void electron_state::machine_start()
 		lo_rom = cart_rom->base() + 0x4000;
 	else
 		lo_rom = memregion("user1")->base();
-	
+
 	membank("bank2")->configure_entries(0,  1, lo_rom, 0x4000);
 	membank("bank2")->configure_entries(1, 11, memregion("user1")->base() + 0x04000, 0x4000);
 	membank("bank2")->configure_entries(12, 1, up_rom, 0x4000);
@@ -389,13 +389,13 @@ DEVICE_IMAGE_LOAD_MEMBER( electron_state, electron_cart )
 	{
 		int upsize = image.get_software_region_length("uprom");
 		int losize = image.get_software_region_length("lorom");
-		
+
 		if (upsize != 16384 && upsize != 0)
 		{
 			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Invalid size for uprom");
 			return IMAGE_INIT_FAIL;
 		}
-		
+
 		if (losize != 16384 && losize != 0)
 		{
 			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Invalid size for lorom");
@@ -406,7 +406,7 @@ DEVICE_IMAGE_LOAD_MEMBER( electron_state, electron_cart )
 
 		if (upsize)
 			memcpy(m_cart->get_rom_base(), image.get_software_region("uprom"), upsize);
-		
+
 		if (losize)
 			memcpy(m_cart->get_rom_base() + upsize, image.get_software_region("lorom"), losize);
 

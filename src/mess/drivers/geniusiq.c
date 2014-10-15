@@ -759,10 +759,10 @@ void geniusiq_state::machine_reset()
 DEVICE_IMAGE_LOAD_MEMBER(geniusiq_state,iq128_cart)
 {
 	UINT32 size = m_cart->common_get_size("rom");
-	
+
 	// we always a 0x100000 region, for easier mapping in the memory map
 	m_cart->rom_alloc(0x100000, GENERIC_ROM16_WIDTH, ENDIANNESS_LITTLE);
-	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");			
+	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
 
 	m_cart_state = IQ128_ROM_CART;
 

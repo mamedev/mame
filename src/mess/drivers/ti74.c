@@ -5,11 +5,11 @@
   Texas Instruments TI-74 BASICALC
   Texas Instruments TI-95 PROCALC
   hardware family: CC-40 -> TI-74 BASICALC -> TI-95 PROCALC
-  
+
   TI-74 PCB layout:
   note: TI-95 PCB is nearly the same, just with a different size LCD screen,
   its CPU is labeled C70011, and the system ROM is labeled HN61256PC95.
-  
+
           DOCK-BUS
         --||||||||---
     C  ==           |
@@ -49,16 +49,16 @@
 
   *               - indicates that it's on the other side of the PCB
 
-  
+
   Overall, the hardware is very similar to TI CC-40. A lot has been shuffled around
   to cut down on complexity (and probably for protection too). To reduce power usage
   even more, the OS often idles while waiting for any keypress that triggers an interrupt
   and wakes the processor up.
-  
+
   The machine is powered by 4 AAA batteries. These will also save internal RAM,
   provided that the machine is turned off properly.
-  
-  
+
+
   TODO:
   - it runs too fast due to missing clock divider emulation in TMS70C46
   - external ram cartridge
@@ -131,10 +131,10 @@ DEVICE_IMAGE_LOAD_MEMBER(ti74_state, ti74_cartridge)
 		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Invalid file size");
 		return IMAGE_INIT_FAIL;
 	}
-	
+
 	m_cart->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
-	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");			
-	
+	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
+
 	return IMAGE_INIT_PASS;
 }
 
@@ -165,7 +165,7 @@ void ti74_state::update_lcd_indicator(UINT8 y, UINT8 x, int state)
 	// TI-95 ref._________________...
 	// output#  |  40   43     41   44   42     12  11  10/13/14  0    1    2
 	// above    | _LOW _ERROR  2nd  INV  ALPHA  LC  INS  DEGRAD  HEX  OCT  I/O
-    // screen-  | _P{70} <{71}                                             RUN{3}
+	// screen-  | _P{70} <{71}                                             RUN{3}
 	//   area   .                                                          SYS{4}
 	output_set_lamp_value(y * 10 + x, state);
 }
@@ -175,7 +175,7 @@ static HD44780_PIXEL_UPDATE(ti74_pixel_update)
 	// char size is 5x7 + cursor
 	if (x > 4 || y > 7)
 		return;
-	
+
 	if (line == 1 && pos == 15)
 	{
 		// the last char is used to control the 14 lcd indicators
@@ -236,7 +236,7 @@ READ8_MEMBER(ti74_state::keyboard_r)
 		if (m_key_select >> i & 1)
 			ret |= m_key_matrix[i]->read();
 	}
-	
+
 	return ret;
 }
 
@@ -250,14 +250,14 @@ WRITE8_MEMBER(ti74_state::bankswitch_w)
 {
 	// d0-d1: system rom bankswitch
 	membank("sysbank")->set_entry(data & 3);
-	
+
 	// d2: power-on latch
 	if (~data & 4 && m_power)
 	{
 		m_power = 0;
 		m_maincpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE); // stop running
 	}
-	
+
 	// d3: N/C
 }
 
@@ -265,7 +265,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, ti74_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x1000, 0x1001) AM_DEVREADWRITE("hd44780", hd44780_device, read, write)
 	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_SHARE("sysram.ic3")
-	//AM_RANGE(0x4000, 0xbfff)		// mapped by the cartslot
+	//AM_RANGE(0x4000, 0xbfff)      // mapped by the cartslot
 	AM_RANGE(0xc000, 0xdfff) AM_ROMBANK("sysbank")
 ADDRESS_MAP_END
 
@@ -486,7 +486,7 @@ void ti74_state::update_battery_status(int state)
 void ti74_state::machine_reset()
 {
 	m_power = 1;
-	
+
 	update_battery_status(m_battery_inp->read());
 }
 

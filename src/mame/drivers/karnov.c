@@ -832,8 +832,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( chelnovjbl_mcu_io_map, AS_IO, 8, karnov_state )
 	//internal port
-//	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_READWRITE(p1_r, p1_w)
-//	AM_RANGE(MCS51_PORT_P3, MCS51_PORT_P3) AM_READWRITE(p3_r, p3_w)
+//  AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_READWRITE(p1_r, p1_w)
+//  AM_RANGE(MCS51_PORT_P3, MCS51_PORT_P3) AM_READWRITE(p3_r, p3_w)
 ADDRESS_MAP_END
 
 
@@ -1181,7 +1181,7 @@ ROM_START( chelnovjbl ) // code is the same as the regular chelnovj set
 	ROM_LOAD( "a-c5.bin",     0x00000, 0x08000, CRC(1abf2c6d) SHA1(86d625ae94cd9ea69e4e613895410640efb175b3) )  /* Characters */
 
 	ROM_REGION( 0x40000, "gfx2", 0 ) /* Backgrounds */ // same content split into more roms
-	ROM_LOAD( "8.bin",    0x00000, 0x08000, CRC(a78b174a) SHA1(e0d82b600a154b81d7e1a787f0e20eb1a341894f) )  
+	ROM_LOAD( "8.bin",    0x00000, 0x08000, CRC(a78b174a) SHA1(e0d82b600a154b81d7e1a787f0e20eb1a341894f) )
 	ROM_LOAD( "9.bin",    0x08000, 0x08000, CRC(97d2c146) SHA1(075bb9afc4f0623cd413883ec2bca574d7ff88d4) )
 	ROM_LOAD( "2.bin",    0x10000, 0x08000, CRC(8c45e7de) SHA1(d843b7dcc64ed3a5b8717af172a1f22c4c599480) )
 	ROM_LOAD( "3.bin",    0x18000, 0x08000, CRC(504cc95c) SHA1(97e5e9f8cd8ebf5e0c18f27f2988a45c4d3809b3) )
@@ -1233,7 +1233,7 @@ ROM_START( chelnovjbla )
 	ROM_LOAD( "a-c5.bin",     0x00000, 0x08000, CRC(1abf2c6d) SHA1(86d625ae94cd9ea69e4e613895410640efb175b3) )  /* Characters */
 
 	ROM_REGION( 0x40000, "gfx2", 0 ) /* Backgrounds */ // same content split into more roms
-	ROM_LOAD( "8.bin",    0x00000, 0x08000, CRC(a78b174a) SHA1(e0d82b600a154b81d7e1a787f0e20eb1a341894f) )  
+	ROM_LOAD( "8.bin",    0x00000, 0x08000, CRC(a78b174a) SHA1(e0d82b600a154b81d7e1a787f0e20eb1a341894f) )
 	ROM_LOAD( "9.bin",    0x08000, 0x08000, CRC(97d2c146) SHA1(075bb9afc4f0623cd413883ec2bca574d7ff88d4) )
 	ROM_LOAD( "2.bin",    0x10000, 0x08000, CRC(8c45e7de) SHA1(d843b7dcc64ed3a5b8717af172a1f22c4c599480) )
 	ROM_LOAD( "3.bin",    0x18000, 0x08000, CRC(504cc95c) SHA1(97e5e9f8cd8ebf5e0c18f27f2988a45c4d3809b3) )

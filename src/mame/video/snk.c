@@ -835,7 +835,7 @@ byte3: attributes
     -xx-x--- (bank number)
     x------- (x offset bit8)
 */
-void snk_state::tdfever_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect,	const int xscroll, const int yscroll, const UINT8 *source, const int gfxnum, 
+void snk_state::tdfever_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect,   const int xscroll, const int yscroll, const UINT8 *source, const int gfxnum,
 										const int hw_xflip, const int from, const int to)
 {
 	gfx_element *gfx = m_gfxdecode->gfx(gfxnum);

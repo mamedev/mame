@@ -1,4 +1,4 @@
-/* 
+/*
 */
 
 #include "emu.h"
@@ -65,7 +65,7 @@ void fuukivid_device::device_reset()
 
         6.w                             Tile Code
 
-		for FG3 hardware
+        for FG3 hardware
 
         6.w     fe-- ---- ---- ----     Tile Bank
                 --dc ba98 7654 3210     Tile Code

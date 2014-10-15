@@ -196,8 +196,8 @@ INPUT_PORTS_END
 
 SLOT_INTERFACE_START( concept_a2_cards )
 	SLOT_INTERFACE("fchdd", A2BUS_CORVUS)  /* Corvus flat-cable HDD interface (see notes in a2corvus.c) */
-	SLOT_INTERFACE("fdc01", A2BUS_CORVFDC01)	/* Corvus WD1793 floppy controller */
-	SLOT_INTERFACE("fdc02", A2BUS_CORVFDC02)	/* Corvus NEC765 buffered floppy controller */
+	SLOT_INTERFACE("fdc01", A2BUS_CORVFDC01)    /* Corvus WD1793 floppy controller */
+	SLOT_INTERFACE("fdc02", A2BUS_CORVFDC02)    /* Corvus NEC765 buffered floppy controller */
 SLOT_INTERFACE_END
 
 

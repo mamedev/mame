@@ -73,7 +73,7 @@ c64_dela_ep256_cartridge_device::c64_dela_ep256_cartridge_device(const machine_c
 		char str[6];
 		sprintf(str, "rom%i", i + 1);
 		m_eproms[i] = subdevice<generic_slot_device>(str);
-	}	
+	}
 }
 
 

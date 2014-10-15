@@ -1,10 +1,10 @@
 /***************************************************************************
 
- Atari 2600 cart Spectravideo Compumate (Cart + keyboard!) 
+ Atari 2600 cart Spectravideo Compumate (Cart + keyboard!)
 
  This is tricky to implement and it is only a skeleton ATM.
  The device needs to interface with both the TIA and the RIOT.
- 
+
 ***************************************************************************/
 
 

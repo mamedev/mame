@@ -3465,7 +3465,7 @@ static INPUT_PORTS_START( vmetal )
 
 	PORT_START("DSW0")
 	// DSW1, stored at 0xff0085.b (cpl'ed)
-	PORT_DIPNAME( 0x0007, 0x0007, DEF_STR( Coinage ) )	PORT_DIPLOCATION("SW1:1,2,3")
+	PORT_DIPNAME( 0x0007, 0x0007, DEF_STR( Coinage ) )  PORT_DIPLOCATION("SW1:1,2,3")
 	PORT_DIPSETTING(      0x0005, DEF_STR( 3C_1C )  )
 	PORT_DIPSETTING(      0x0006, DEF_STR( 2C_1C )  )
 	PORT_DIPSETTING(      0x0007, DEF_STR( 1C_1C )  )
@@ -3475,10 +3475,10 @@ static INPUT_PORTS_START( vmetal )
 	PORT_DIPSETTING(      0x0001, DEF_STR( 1C_5C )  )
 	PORT_DIPSETTING(      0x0000, DEF_STR( 1C_6C )  )
 	PORT_DIPUNUSED_DIPLOC( 0x0008, IP_ACTIVE_LOW, "SW1:4" ) /* 0x01 (OFF) or 0x02 (ON) written to 0xff0112.b but NEVER read back - old credits for 2 players game ? */
-	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Flip_Screen ) )	PORT_DIPLOCATION("SW1:5")  /* 0x07c1 written to 0x1788ac.w (screen control ?) at first (code at 0x0001b8) */
+	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Flip_Screen ) )  PORT_DIPLOCATION("SW1:5")  /* 0x07c1 written to 0x1788ac.w (screen control ?) at first (code at 0x0001b8) */
 	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )          /* 0x07c1 written to 0xff0114.w (then 0x1788ac.w) during initialisation (code at 0x000436) */
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )           /* 0x07c0 written to 0xff0114.w (then 0x1788ac.w) during initialisation (code at 0x000436) */
-	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("SW1:6")
+	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0020, DEF_STR( On ) )
 	PORT_DIPUNUSED_DIPLOC( 0x0040, IP_ACTIVE_LOW, "SW1:7" )
@@ -3486,17 +3486,17 @@ static INPUT_PORTS_START( vmetal )
 
 	PORT_START("IN2")
 	// DSW2, stored at 0xff0084.b (cpl'ed)
-	PORT_DIPNAME( 0x0003, 0x0003, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SW2:1,2")
+	PORT_DIPNAME( 0x0003, 0x0003, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(      0x0002, DEF_STR( Easy ) )
 	PORT_DIPSETTING(      0x0003, DEF_STR( Normal ) )
 	PORT_DIPSETTING(      0x0001, DEF_STR( Hard ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x000c, 0x000c, DEF_STR( Lives ) )	PORT_DIPLOCATION("SW2:3,4")
+	PORT_DIPNAME( 0x000c, 0x000c, DEF_STR( Lives ) )    PORT_DIPLOCATION("SW2:3,4")
 	PORT_DIPSETTING(      0x0008, "1"  )
 	PORT_DIPSETTING(      0x0004, "2"  )
 	PORT_DIPSETTING(      0x000c, "3"  )
 	PORT_DIPSETTING(      0x0000, "4"  )
-	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Bonus_Life ) )	PORT_DIPLOCATION("SW2:5")   /* code at 0x0004a4 */
+	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("SW2:5")   /* code at 0x0004a4 */
 	PORT_DIPSETTING(      0x0010, "Every 30000" )
 	PORT_DIPSETTING(      0x0000, "Every 60000" )
 	PORT_DIPUNUSED_DIPLOC( 0x0020, IP_ACTIVE_LOW, "SW2:6" )

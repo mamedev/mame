@@ -42,7 +42,7 @@ public:
 
 static ADDRESS_MAP_START( bbcbc_prg, AS_PROGRAM, 8, bbcbc_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	//AM_RANGE(0x4000, 0xbfff)	// mapped by the cartslot
+	//AM_RANGE(0x4000, 0xbfff)  // mapped by the cartslot
 	AM_RANGE(0xe000, 0xe02f) AM_RAM
 	AM_RANGE(0xe030, 0xe030) AM_READ_PORT("LINE01")
 	AM_RANGE(0xe031, 0xe031) AM_READ_PORT("LINE02")

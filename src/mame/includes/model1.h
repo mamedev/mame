@@ -36,7 +36,7 @@ public:
 	required_shared_ptr<UINT16> m_display_list0;
 	required_shared_ptr<UINT16> m_display_list1;
 	required_shared_ptr<UINT16> m_color_xlat;
-	
+
 	struct view *m_view;
 	struct point *m_pointdb;
 	struct point *m_pointpt;
@@ -274,7 +274,7 @@ public:
 	void sort_quads();
 	void unsort_quads();
 	void draw_quads(bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void fclip_push_quad_next(int level, struct quad_m1 *q,	struct point *p1, struct point *p2, struct point *p3, struct point *p4);
+	void fclip_push_quad_next(int level, struct quad_m1 *q, struct point *p1, struct point *p2, struct point *p3, struct point *p4);
 	void fclip_push_quad(int level, struct quad_m1 *q);
 	void push_object(UINT32 tex_adr, UINT32 poly_adr, UINT32 size);
 	UINT16 *push_direct(UINT16 *list);

@@ -2503,26 +2503,26 @@ MACHINE_CONFIG_END
     requires 2 linked system32 pcbs
     requires additional math DSP to be emulated
 
-	The link PCB attaches 2 System 32 mainboards together, then ROM boards for each mainboard attaches to the link PCB.
-	This provides a direct connection between the PCBs (NOT a network link) so they effectively operate as a single boardset
-	sharing RAM (we should emulate it as such)
+    The link PCB attaches 2 System 32 mainboards together, then ROM boards for each mainboard attaches to the link PCB.
+    This provides a direct connection between the PCBs (NOT a network link) so they effectively operate as a single boardset
+    sharing RAM (we should emulate it as such)
 
-	Link PCB is a single sparsely populated romless PCB but contains
-	
-	Left side
-	1x MB8431-12LP (IC2)
-	2x HD74LS74AP (IC6, IC7)
-	2x GAL16V8A-25LP (stamped 315-5545) (IC3)
+    Link PCB is a single sparsely populated romless PCB but contains
 
-	Right side
-	1x MB8421-12LP (IC1)
-	1x GAL16V8A-25LP (stamped xxx-xxxx) (IC5)
-	1x HD74LS74AP (IC8)
-	1x GAL16V8A-25LP (stamped 315-5545) (IC4)
+    Left side
+    1x MB8431-12LP (IC2)
+    2x HD74LS74AP (IC6, IC7)
+    2x GAL16V8A-25LP (stamped 315-5545) (IC3)
 
-	(todo, full layout)
+    Right side
+    1x MB8421-12LP (IC1)
+    1x GAL16V8A-25LP (stamped xxx-xxxx) (IC5)
+    1x HD74LS74AP (IC8)
+    1x GAL16V8A-25LP (stamped 315-5545) (IC4)
 
-	The left Rom PCB (master?) contains a sub-board on the ROM board with the math DSP, the right Rom PCB does not have this.
+    (todo, full layout)
+
+    The left Rom PCB (master?) contains a sub-board on the ROM board with the math DSP, the right Rom PCB does not have this.
 
 */
 ROM_START( arescue )

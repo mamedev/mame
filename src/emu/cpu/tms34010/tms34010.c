@@ -37,7 +37,7 @@ tms340x0_device::tms340x0_device(const machine_config &mconfig, device_type type
 	, m_program_config("program", ENDIANNESS_LITTLE, 16, 32, 3)
 	, m_reset_deferred(FALSE)
 	, m_pixclock(0)
-	, m_pixperclock(0)     
+	, m_pixperclock(0)
 	, m_output_int_cb(*this)
 {
 }
@@ -574,7 +574,7 @@ void tms340x0_device::device_start()
 	m_output_int_cb.resolve();
 	m_to_shiftreg_cb.bind_relative_to(*owner());
 	m_from_shiftreg_cb.bind_relative_to(*owner());
-	
+
 	m_external_host_access = FALSE;
 
 	m_program = &space(AS_PROGRAM);

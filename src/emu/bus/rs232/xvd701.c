@@ -93,7 +93,7 @@ void jvc_xvd701_device::send_response()
 {
 	if (m_response_index < sizeof(m_response) && is_transmit_register_empty())
 	{
-//		printf("sending %02x\n", m_response[m_response_index]);
+//      printf("sending %02x\n", m_response[m_response_index]);
 		transmit_register_setup(m_response[m_response_index++]);
 	}
 }
@@ -115,7 +115,7 @@ void jvc_xvd701_device::rcv_complete()
 		// printf("xvd701");
 
 		//for (int i = 0; i < sizeof(m_command); i++)
-		//	printf(" %02x", m_command[i]);
+		//  printf(" %02x", m_command[i]);
 
 		//printf("\n");
 

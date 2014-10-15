@@ -1167,10 +1167,10 @@ WRITE_LINE_MEMBER( tandy200_state::i8155_to_w )
 void kc85_state::machine_start()
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
-	
+
 	astring region_tag;
 	m_opt_region = memregion(region_tag.cpy(m_opt_cart->tag()).cat(GENERIC_ROM_REGION_TAG));
-	
+
 	/* initialize RTC */
 	m_rtc->cs_w(1);
 	m_rtc->oe_w(1);
@@ -1210,10 +1210,10 @@ void kc85_state::machine_start()
 void pc8201_state::machine_start()
 {
 	UINT8 *ram = m_ram->pointer();
-	
+
 	astring region_tag;
 	m_opt_region = memregion(region_tag.cpy(m_opt_cart->tag()).cat(GENERIC_ROM_REGION_TAG));
-	
+
 	/* initialize RTC */
 	m_rtc->cs_w(1);
 	m_rtc->oe_w(1);
@@ -1244,10 +1244,10 @@ void pc8201_state::machine_start()
 void trsm100_state::machine_start()
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
-	
+
 	astring region_tag;
 	m_opt_region = memregion(region_tag.cpy(m_opt_cart->tag()).cat(GENERIC_ROM_REGION_TAG));
-	
+
 	/* initialize RTC */
 	m_rtc->cs_w(1);
 	m_rtc->oe_w(1);

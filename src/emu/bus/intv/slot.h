@@ -11,7 +11,7 @@ enum
 {
 	INTV_STD = 0,
 	INTV_RAM,
-	INTV_GFACT,	// has RAM too but at diff offset
+	INTV_GFACT, // has RAM too but at diff offset
 	INTV_WSMLB,
 	INTV_VOICE,
 	INTV_ECS,
@@ -51,7 +51,7 @@ public:
 
 	virtual DECLARE_READ16_MEMBER(read_ram) { return 0xffff; }
 	virtual DECLARE_WRITE16_MEMBER(write_ram) {}
-	
+
 	// Used by IntelliVoice & ECS
 	virtual DECLARE_READ16_MEMBER(read_ay) { return 0xffff; }
 	virtual DECLARE_WRITE16_MEMBER(write_ay) {}
@@ -71,7 +71,7 @@ public:
 	UINT32 get_rom_size() { return m_rom_size; }
 	UINT32 get_ram_size() { return m_ram.count(); }
 
-	void save_ram()	{ device().save_item(NAME(m_ram)); }
+	void save_ram() { device().save_item(NAME(m_ram)); }
 	virtual void late_subslot_setup() {}
 
 protected:
@@ -105,7 +105,7 @@ public:
 	int get_type() { return m_type; }
 	int load_fullpath();
 
-	void save_ram()	{ if (m_cart && m_cart->get_ram_size()) m_cart->save_ram(); }
+	void save_ram() { if (m_cart && m_cart->get_ram_size()) m_cart->save_ram(); }
 
 	virtual iodevice_t image_type() const { return IO_CARTSLOT; }
 	virtual bool is_readable()  const { return 1; }
@@ -136,7 +136,7 @@ public:
 	virtual DECLARE_READ16_MEMBER(read_romd0) { if (m_cart) return m_cart->read_romd0(space, offset, mem_mask); else return 0xffff; }
 	virtual DECLARE_READ16_MEMBER(read_rome0) { if (m_cart) return m_cart->read_rome0(space, offset, mem_mask); else return 0xffff; }
 	virtual DECLARE_READ16_MEMBER(read_romf0) { if (m_cart) return m_cart->read_romf0(space, offset, mem_mask); else return 0xffff; }
-	
+
 	virtual DECLARE_READ16_MEMBER(read_ay);
 	virtual DECLARE_WRITE16_MEMBER(write_ay);
 	virtual DECLARE_READ16_MEMBER(read_speech);
@@ -176,8 +176,7 @@ extern const device_type INTV_CART_SLOT;
 
 #define MCFG_INTV_CARTRIDGE_ADD(_tag,_slot_intf,_def_slot) \
 	MCFG_DEVICE_ADD(_tag, INTV_CART_SLOT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false) \
-
+	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
 
 SLOT_INTERFACE_EXTERN(intv_cart);
 

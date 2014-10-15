@@ -56,7 +56,7 @@ public:
 		m_speaker(*this, "speaker"),
 		m_i2cmem(*this, "i2cmem"),
 		m_cart(*this, "cartslot"),
-		m_inputs(*this, "INPUTS") 
+		m_inputs(*this, "INPUTS")
 	{ }
 
 	UINT8 m_pm_reg[0x100];
@@ -1506,7 +1506,7 @@ DEVICE_IMAGE_LOAD_MEMBER( pokemini_state, pokemini_cart )
 		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Invalid ROM image: ROM image is too small");
 		return IMAGE_INIT_FAIL;
 	}
-	
+
 	/* Verify that the image is not too big */
 	if (size > 0x1fffff)
 	{
@@ -1515,7 +1515,7 @@ DEVICE_IMAGE_LOAD_MEMBER( pokemini_state, pokemini_cart )
 	}
 
 	m_cart->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
-	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");			
+	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
 
 	return IMAGE_INIT_PASS;
 }

@@ -11,7 +11,7 @@
 
 ToDo:
 - Everything!
-- Each machine has 4 players, 7-digit, 12-segment florescent display  
+- Each machine has 4 players, 7-digit, 12-segment florescent display
 
 ********************************************************************************/
 

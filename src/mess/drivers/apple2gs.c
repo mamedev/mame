@@ -576,7 +576,7 @@ ROM_START(apple2gsr0p2)  // 3/10/1986 Cortland prototype, boots as "Apple //'ing
 	ROM_LOAD ( "apple2gs.chr", 0x0000, 0x1000, CRC(91e53cd8) SHA1(34e2443e2ef960a36c047a09ed5a93f471797f89))
 
 	ROM_REGION(0x20000,"maincpu",0)
-	ROM_LOAD( "apple iigs alpha rom 2.0 19860310.bin", 0x000000, 0x020000, CRC(a47d275f) SHA1(c5836adcfc8be69c7351b84afa94c814e8d92b81) ) 
+	ROM_LOAD( "apple iigs alpha rom 2.0 19860310.bin", 0x000000, 0x020000, CRC(a47d275f) SHA1(c5836adcfc8be69c7351b84afa94c814e8d92b81) )
 
 	ROM_REGION(0x20000, "es5503", ROMREGION_ERASE00)
 

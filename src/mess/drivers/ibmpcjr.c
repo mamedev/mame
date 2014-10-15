@@ -464,7 +464,7 @@ int pcjr_state::load_cart(device_image_interface &image, generic_slot_device *sl
 		size -= header_size;
 		image.fseek(header_size, SEEK_SET);
 	}
-	
+
 	slot->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
 	slot->common_load_rom(slot->get_rom_base(), size, "rom");
 

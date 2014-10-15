@@ -16,12 +16,12 @@ public:
 
 	required_shared_ptr<UINT8> m_videoram;
 	required_shared_ptr<UINT8> m_characterram;
-	
+
 	required_device<cpu_device> m_maincpu;
 	required_device<samples_device> m_samples;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	
+
 	int m_freq1;
 	int m_freq2;
 	int m_channel_playing1;
@@ -35,7 +35,7 @@ public:
 	int m_channel2_const;
 	timer_device* m_timer;
 	int m_last;
-	
+
 	DECLARE_WRITE8_MEMBER(polyplay_sound_channel);
 	DECLARE_WRITE8_MEMBER(polyplay_start_timer2);
 	DECLARE_READ8_MEMBER(polyplay_random_read);

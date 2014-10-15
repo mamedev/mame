@@ -3,26 +3,26 @@
 /***********************************************************************************************************
 
  A7800 CPUWIZ's homebrew boards (MegaCart+ and VersaBoard)
- 
+
  Here we emulate the base configurations of these two boards:
 
  MegaCart+ = up to 512K (31 banks at $8000, 1 at $C000) of ROM and 2 x 16K RAM @ $4000
  VersaBoard = up to 256K of ROM and 2 x 16K RAM
- 
- Plus, for the moment, a VersaBoard with POKEY mapped at 0x0450 and support for 144K ROM, 
- since a few demo homebrew programs seems to use this to combine compatibility with 
+
+ Plus, for the moment, a VersaBoard with POKEY mapped at 0x0450 and support for 144K ROM,
+ since a few demo homebrew programs seems to use this to combine compatibility with
  XBoarD & XM expansions
 
  Note that the VersaBoard can be configured to work with different banking hardware
  e.g. with SG 9bank games or with SG + RAM (so to allow reproduction of games which
- could have worked on old carts without sacrifying original carts), but games running 
+ could have worked on old carts without sacrifying original carts), but games running
  on those "standard" variants can be emulated with the standard code from rom.c ;-)
- 
- 
+
+
  TO DO:
  - investigate whether the POKEY detection routines in homebrew do fail due to emulation
    issues or not
- 
+
 ***********************************************************************************************************/
 
 
@@ -86,7 +86,7 @@ READ8_MEMBER(a78_versaboard_device::read_40xx)
 	else if (offset < 0x8000)
 		return m_rom[(offset & 0x3fff) + (m_bank * 0x4000)];
 	else
-		return m_rom[(offset & 0x3fff) + (m_bank_mask * 0x4000)];	// last bank
+		return m_rom[(offset & 0x3fff) + (m_bank_mask * 0x4000)];   // last bank
 }
 
 WRITE8_MEMBER(a78_versaboard_device::write_40xx)
@@ -130,5 +130,3 @@ machine_config_constructor a78_rom_p450_vb_device::device_mconfig_additions() co
 {
 	return MACHINE_CONFIG_NAME( a78_pokeyvb );
 }
-
-

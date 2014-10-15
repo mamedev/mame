@@ -14536,12 +14536,12 @@ kept for now until finding out what those bytes affect...
 			<feature name="mapper" value="NOMAPPER" />
 			<dataarea name="rom" size="131072">
 				<!--
-					20140725:
-					There are 3 versions of this rom floating around:
-					930eae7057af1652abae794072b296a59decd61b - a "dirty" dump; it seems to be a direct memory copy made on an MSX and contains RAM contents at 3000-3FFF and 7000-7FFF
-					a45692849acf29ddb653707a62747985439f6d4f - RAM areas are set to FFs
-					36d47cf70618fdb460f97a8ceb75013ec4529063 - A dump made using an eeprom reader. This dump differs one bit with the dump above (offset 8a49, bit 3)
-					By looking the code it is not yet possible to say which one is 100% correct, so marking it as baddump for the moment.
+				    20140725:
+				    There are 3 versions of this rom floating around:
+				    930eae7057af1652abae794072b296a59decd61b - a "dirty" dump; it seems to be a direct memory copy made on an MSX and contains RAM contents at 3000-3FFF and 7000-7FFF
+				    a45692849acf29ddb653707a62747985439f6d4f - RAM areas are set to FFs
+				    36d47cf70618fdb460f97a8ceb75013ec4529063 - A dump made using an eeprom reader. This dump differs one bit with the dump above (offset 8a49, bit 3)
+				    By looking the code it is not yet possible to say which one is 100% correct, so marking it as baddump for the moment.
 				-->
 				<rom name="msx audio (japan) (fs-ca1) (program).rom" size="131072" crc="78584d2e" sha1="a45692849acf29ddb653707a62747985439f6d4f" status="baddump" offset="0" />
 			</dataarea>
@@ -17109,8 +17109,8 @@ legacy FM implementations cannot find it.
 		</part>
 		<!-- The package came with a copy of MSX-DOS -->
 <!--
-		<part name="flop1" interface="floppy_3_5">
-		</part>
+        <part name="flop1" interface="floppy_3_5">
+        </part>
 -->
 	</software>
 
@@ -17126,9 +17126,9 @@ legacy FM implementations cannot find it.
 			</dataarea>
 		</part>
 <!--
-		The floppy drive was most likely bundled with a copy of MSX-DOS, but we are not 100% sure yet
-		<part name="flop1" interface="floppy_3_5">
-		</part>
+        The floppy drive was most likely bundled with a copy of MSX-DOS, but we are not 100% sure yet
+        <part name="flop1" interface="floppy_3_5">
+        </part>
 -->
 	</software>
 

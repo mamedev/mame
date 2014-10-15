@@ -41,7 +41,7 @@ void epic12_device::device_start()
 	m_bitmaps = auto_bitmap_rgb32_alloc(machine(), 0x2000, 0x1000);
 	m_clip = m_bitmaps->cliprect();
 	m_clip.set(0, 0x2000-1, 0, 0x1000-1);
-	
+
 	m_ram16_copy = auto_alloc_array(machine(), UINT16, m_main_ramsize/2);
 
 	m_blitter_delay_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(epic12_device::blitter_delay_callback),this));

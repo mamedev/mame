@@ -245,7 +245,7 @@ static MACHINE_CONFIG_START( midxunit, midxunit_state )
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_TMS340X0_HALT_ON_RESET(FALSE) /* halt on reset */
 	MCFG_TMS340X0_PIXEL_CLOCK(PIXEL_CLOCK) /* pixel clock */
-	MCFG_TMS340X0_PIXELS_PER_CLOCK(1) /* pixels per clock */	
+	MCFG_TMS340X0_PIXELS_PER_CLOCK(1) /* pixels per clock */
 	MCFG_TMS340X0_SCANLINE_IND16_CB(midxunit_state, scanline_update)       /* scanline updater (indexed16) */
 	MCFG_TMS340X0_TO_SHIFTREG_CB(midtunit_state, to_shiftreg)           /* write to shiftreg function */
 	MCFG_TMS340X0_FROM_SHIFTREG_CB(midtunit_state, from_shiftreg)          /* read from shiftreg function */

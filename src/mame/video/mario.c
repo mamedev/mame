@@ -193,7 +193,7 @@ void mario_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, 
 
 				y = y ^ (m_flip ? 0xFF : 0x00); /* physical screen location */
 				x = x ^ (m_flip ? 0xFF : 0x00); /* physical screen location */
-				
+
 				code = m_spriteram[offs + 2];
 				color = (m_spriteram[offs + 1] & 0x0f) + 16 * m_palette_bank + 32 * m_monitor;
 				flipx = (m_spriteram[offs + 1] & 0x80);
@@ -216,8 +216,8 @@ void mario_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, 
 				x = m_spriteram[offs + 0];
 				y = 240 - y; /* logical screen position */
 
-			//	y = y ^ (m_flip ? 0xFF : 0x00); /* physical screen location */
-			//	x = x ^ (m_flip ? 0xFF : 0x00); /* physical screen location */
+			//  y = y ^ (m_flip ? 0xFF : 0x00); /* physical screen location */
+			//  x = x ^ (m_flip ? 0xFF : 0x00); /* physical screen location */
 
 				code = (m_spriteram[offs + 2] & 0x7f) | ((m_spriteram[offs + 1] & 0x40) << 1); // upper tile bit is where the flipy bit goes on mario
 				color = (m_spriteram[offs + 1] & 0x0f) + 16 * m_palette_bank + 32 * m_monitor;
@@ -237,7 +237,6 @@ void mario_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, 
 			}
 			else
 			{
-
 				m_gfxdecode->gfx(1)->transpen(bitmap, cliprect,
 					code,
 					color,

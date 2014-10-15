@@ -16,7 +16,7 @@ public:
 		m_regs(*this, "regs"),
 		m_spriteram(*this, "spriteram") { }
 
-	
+
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<okim6295_device> m_oki;
@@ -28,7 +28,7 @@ public:
 	optional_shared_ptr<UINT16> m_tx_tileram;
 	required_shared_ptr<UINT16> m_regs;
 	required_shared_ptr<UINT16> m_spriteram;
-	
+
 	emu_timer *m_music_timer;
 
 	int m_sound;

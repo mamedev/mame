@@ -3,7 +3,7 @@
   OLD Seibu Cop simulation code.
 
   this is currently only used by the Seibu Cup Soccer BOOTLEG
- 
+
 */
 
 /********************************************************************************************
@@ -25,8 +25,6 @@ seibu_cop_bootleg_device::seibu_cop_bootleg_device(const machine_config &mconfig
 	m_cop_mcu_ram(NULL),
 	m_raiden2cop(*this, ":raiden2cop")
 {
-
-
 }
 
 #define seibu_cop_log logerror
@@ -101,7 +99,7 @@ WRITE16_MEMBER( seibu_cop_bootleg_device::copdxbl_0_w )
 			break;
 		}
 
-		
+
 		case (0x500/2):
 		case (0x502/2):
 		case (0x504/2):
@@ -152,7 +150,7 @@ WRITE16_MEMBER( seibu_cop_bootleg_device::copdxbl_0_w )
 
 					space.write_dword(m_raiden2cop->cop_regs[0] + 4 + offs, npos);
 					space.write_word(m_raiden2cop->cop_regs[0] + 0x1c + offs, space.read_word(m_raiden2cop->cop_regs[0] + 0x1c + offs) + delta);
-				
+
 					break;
 				}
 				case 0x130e:
@@ -199,7 +197,7 @@ WRITE16_MEMBER( seibu_cop_bootleg_device::copdxbl_0_w )
 					break;
 			}
 			break;
-		
+
 		/*TODO: kludge on x-axis.*/
 		case (0x660/2): { state->m_scrollram16[0] = m_cop_mcu_ram[offset] - 0x1f0; break; }
 		case (0x662/2): { state->m_scrollram16[1] = m_cop_mcu_ram[offset]; break; }
@@ -218,5 +216,3 @@ WRITE16_MEMBER( seibu_cop_bootleg_device::copdxbl_0_w )
 		}
 	}
 }
-
-

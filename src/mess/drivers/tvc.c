@@ -47,7 +47,7 @@ public:
 	m_palette(*this, "palette"),
 	m_keyboard(*this, "LINE")
 	{ }
-	
+
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
 	required_device<tvc_sound_device> m_sound;
@@ -65,7 +65,7 @@ public:
 
 	void machine_start();
 	void machine_reset();
-	
+
 	void set_mem_page(UINT8 data);
 	DECLARE_WRITE8_MEMBER(bank_w);
 	DECLARE_WRITE8_MEMBER(vram_bank_w);
@@ -80,17 +80,17 @@ public:
 	DECLARE_READ8_MEMBER(_5b_r);
 	DECLARE_WRITE_LINE_MEMBER(int_ff_set);
 	DECLARE_WRITE_LINE_MEMBER(centronics_ack);
-	
+
 	// expansions
 	DECLARE_WRITE8_MEMBER(expansion_w);
 	DECLARE_READ8_MEMBER(expansion_r);
 	DECLARE_READ8_MEMBER(exp_id_r);
 	DECLARE_WRITE8_MEMBER(expint_ack_w);
-	
+
 	DECLARE_QUICKLOAD_LOAD_MEMBER( tvc64);
-	
+
 	MC6845_UPDATE_ROW(crtc_update_row);
-	
+
 	UINT8       m_video_mode;
 	UINT8       m_keyline;
 	UINT8       m_active_slot;

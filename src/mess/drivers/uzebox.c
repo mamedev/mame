@@ -273,7 +273,7 @@ UINT32 uzebox_state::screen_update_uzebox(screen_device &screen, bitmap_rgb32 &b
 DEVICE_IMAGE_LOAD_MEMBER(uzebox_state, uzebox_cart)
 {
 	UINT32 size = m_cart->common_get_size("rom");
-	
+
 	m_cart->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
 
 	if (image.software_entry() == NULL)

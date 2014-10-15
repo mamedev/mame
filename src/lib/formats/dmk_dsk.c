@@ -226,4 +226,3 @@ bool dmk_format::supports_save() const
 
 
 const floppy_format_type FLOPPY_DMK_FORMAT = &floppy_image_format_creator<dmk_format>;
-

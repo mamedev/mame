@@ -57,7 +57,7 @@ public:
 	optional_device<williams_narc_sound_device> m_narc_sound;
 	optional_device<williams_cvsd_sound_device> m_cvsd_sound;
 	optional_device<williams_adpcm_sound_device> m_adpcm_sound;
-	
+
 	required_shared_ptr<UINT16> m_generic_paletteram_16;
 	optional_shared_ptr<UINT8> m_gfx_rom;
 
@@ -130,7 +130,7 @@ public:
 	DECLARE_VIDEO_START(common);
 	TIMER_CALLBACK_MEMBER(dma_callback);
 	TIMER_CALLBACK_MEMBER(autoerase_line);
-	
+
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 	void dma_draw(UINT16 command);

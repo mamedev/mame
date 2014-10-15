@@ -344,7 +344,7 @@ MACHINE_RESET_MEMBER(speglsht_state,speglsht)
 VIDEO_START_MEMBER(speglsht_state,speglsht)
 {
 	m_bitmap = auto_bitmap_ind16_alloc(machine(), 512, 5122 );
-//	VIDEO_START_CALL_MEMBER(st0016);
+//  VIDEO_START_CALL_MEMBER(st0016);
 }
 
 #define PLOT_PIXEL_RGB(x,y,r,g,b)   if(y>=0 && x>=0 && x<512 && y<512) \

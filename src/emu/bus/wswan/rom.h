@@ -53,11 +53,11 @@ class ws_rom_sram_device : public ws_rom_device
 public:
 	// construction/destruction
 	ws_rom_sram_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
-	
+
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read_ram);
 	virtual DECLARE_WRITE8_MEMBER(write_ram);
@@ -75,11 +75,11 @@ class ws_rom_eeprom_device : public ws_rom_device
 public:
 	// construction/destruction
 	ws_rom_eeprom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
-	
+
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read_io);
 	virtual DECLARE_WRITE8_MEMBER(write_io);

@@ -73,7 +73,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(mcu_timer_proc);
 	int atari_input_disabled();
 	virtual void machine_reset();
-	//required_device<cpu_device> m_maincpu;	// maincpu is already contained in atari_common_state
+	//required_device<cpu_device> m_maincpu;    // maincpu is already contained in atari_common_state
 	required_device<cpu_device> m_mcu;
 	required_device<speaker_sound_device> m_speaker;
 	required_memory_region m_region_maincpu;
@@ -408,7 +408,7 @@ void maxaflex_state::machine_reset()
 	m_portC_in = m_portC_out = m_ddrC = 0;
 	m_tdr = m_tcr = 0;
 	m_mcu_timer = machine().device<timer_device>("mcu_timer");
-	
+
 	output_set_lamp_value(0, 0);
 	output_set_lamp_value(1, 0);
 	output_set_lamp_value(2, 0);

@@ -161,9 +161,9 @@ void device_nes_cart_interface::prg_alloc(size_t size, const char *tag)
 			printf("Warning! The loaded PRG has size not a multiple of 8KB (0x%X)\n", (UINT32)size);
 			m_prg_chunks--;
 		}
-		
+
 		m_prg_mask = ((m_prg_chunks << 1) - 1);
-		
+
 //      printf("first mask %x!\n", m_prg_mask);
 		if ((m_prg_chunks << 1) & m_prg_mask)
 		{
@@ -172,7 +172,7 @@ void device_nes_cart_interface::prg_alloc(size_t size, const char *tag)
 			// only half a dozen of NES carts have PRG which is not a power of 2
 			// so we use this bank_map only as an exception
 //          printf("uneven rom!\n");
-			
+
 			// 1. redefine mask as (next power of 2)-1
 			for (; temp; )
 			{
@@ -182,15 +182,15 @@ void device_nes_cart_interface::prg_alloc(size_t size, const char *tag)
 			m_prg_mask = (1 << mask_bits) - 1;
 //          printf("new mask %x!\n", m_prg_mask);
 			mapsize = (1 << mask_bits)/2;
-			
+
 			// 2. create a bank_map for banks in the range mask/2 -> mask
 			m_prg_bank_map.resize(mapsize);
-			
+
 			// 3. fill the bank_map accounting for mirrors
 			int j;
 			for (j = mapsize; j < (m_prg_chunks << 1); j++)
 				m_prg_bank_map[j - mapsize] = j;
-			
+
 			while (j % mapsize)
 			{
 				int k = 0, repeat_banks;
@@ -201,7 +201,7 @@ void device_nes_cart_interface::prg_alloc(size_t size, const char *tag)
 					m_prg_bank_map[(j - mapsize) + l] = m_prg_bank_map[(j - mapsize) + l - repeat_banks];
 				j += repeat_banks;
 			}
-			
+
 			// check bank map!
 //          for (int i = 0; i < mapsize; i++)
 //          {
@@ -674,7 +674,7 @@ void device_nes_cart_interface::pcb_start(running_machine &machine, UINT8 *ciram
 	// main NES CPU here, even if it does not belong to this device.
 	m_maincpu = machine.device<cpu_device>("maincpu");
 
-	if (cart_mounted)		// disksys expansion can arrive here without the memory banks!
+	if (cart_mounted)       // disksys expansion can arrive here without the memory banks!
 	{
 		// Setup PRG
 		m_prg_bank_mem[0] = machine.root_device().membank("prg0");
@@ -691,11 +691,11 @@ void device_nes_cart_interface::pcb_start(running_machine &machine, UINT8 *ciram
 			}
 		}
 	}
-	
+
 	// Setup CHR (VRAM can be present also without PRG rom)
 	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	chr8(0, m_chr_source);
-	
+
 	// Setup NT
 	m_ciram = ciram_ptr;
 

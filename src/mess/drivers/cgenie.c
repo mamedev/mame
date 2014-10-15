@@ -492,16 +492,16 @@ static const floppy_interface cgenie_floppy_interface =
 DEVICE_IMAGE_LOAD_MEMBER( cgenie_state, cgenie_cart )
 {
 	UINT32 size = m_cart->common_get_size("rom");
-	
+
 	if (size > 0x1000)
 	{
 		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
 		return IMAGE_INIT_FAIL;
 	}
-	
+
 	m_cart->rom_alloc(0x1000, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
-	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");			
-	
+	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
+
 	return IMAGE_INIT_PASS;
 }
 

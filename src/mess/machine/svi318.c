@@ -60,7 +60,7 @@ DEVICE_IMAGE_LOAD_MEMBER( svi318_state, svi318_cart )
 	}
 
 	m_cart->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
-	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");			
+	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
 
 	if (image.software_entry() == NULL && !cart_verify(m_cart->get_rom_base()))
 		return IMAGE_INIT_FAIL;
@@ -407,10 +407,10 @@ DRIVER_INIT_MEMBER(svi318_state, svi318)
 	/* memory */
 	m_empty_bank = auto_alloc_array(machine(), UINT8, 0x8000);
 	memset(m_empty_bank, 0xff, 0x8000);
-	
+
 	m_bank_low_ptr = m_empty_bank;
 	m_bank_high1_ptr = m_empty_bank;
-	m_bank_high2_ptr = m_empty_bank;	
+	m_bank_high2_ptr = m_empty_bank;
 }
 
 DRIVER_INIT_MEMBER(svi318_state, svi328_806)
@@ -434,9 +434,9 @@ void svi318_state::machine_start()
 		save_item(NAME(m_svi806_ram));
 		memset(m_svi806_ram, 0x00, 0x800);
 		memset(m_svi806_ram + 0x800, 0xff, 0x800);
-		
+
 		m_svi806_gfx = memregion("gfx1")->base();
-		
+
 		// Set SVI-806 80 column card palette
 		m_palette->set_pen_color(TMS9928A_PALETTE_SIZE, 0, 0, 0);     /* Monochrome black */
 		m_palette->set_pen_color(TMS9928A_PALETTE_SIZE+1, 0, 224, 0); /* Monochrome green */
@@ -459,7 +459,7 @@ void svi318_state::machine_start()
 
 	save_item(NAME(m_svi806_present));
 	save_item(NAME(m_svi806_ram_enabled));
-	
+
 	machine().save().register_postload(save_prepost_delegate(FUNC(svi318_state::postload), this));
 }
 
@@ -485,7 +485,7 @@ static void svi318_load_proc(device_image_interface &image)
 }
 
 void svi318_state::machine_reset()
-{	
+{
 	m_keyboard_row = 0;
 	m_centronics_busy = 0;
 	m_svi806_present = 0;
@@ -587,7 +587,7 @@ void svi318_state::set_banks()
 	}
 
 	m_bank_high1_ptr = m_empty_bank;
-	m_bank_high1_read_only = 1; 
+	m_bank_high1_read_only = 1;
 	m_bank_high2_ptr = m_empty_bank;
 	m_bank_high2_read_only = 1;
 

@@ -70,9 +70,9 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_cassette(*this, "cassette"),
-		m_beeper(*this, "beeper"), 
+		m_beeper(*this, "beeper"),
 		m_cart(*this, "cartslot"),
-		m_keybd(*this, "LINE")   
+		m_keybd(*this, "LINE")
 	{ }
 
 	ULA m_ula;

@@ -58,11 +58,11 @@ void antic_device::device_start()
 {
 	m_gtia = machine().device<gtia_device>(m_gtia_tag);
 	assert(m_gtia);
-	
+
 	m_bitmap = auto_bitmap_ind16_alloc(machine(), machine().first_screen()->width(), machine().first_screen()->height());
-	
+
 	m_cclk_expand = auto_alloc_array_clear(machine(), UINT32, 21 * 256);
-	
+
 	m_pf_21       = &m_cclk_expand[ 0 * 256];
 	m_pf_x10b     = &m_cclk_expand[ 1 * 256];
 	m_pf_3210b2   = &m_cclk_expand[ 3 * 256];
@@ -72,11 +72,11 @@ void antic_device::device_start()
 	m_pf_gtia1    = &m_cclk_expand[18 * 256];
 	m_pf_gtia2    = &m_cclk_expand[19 * 256];
 	m_pf_gtia3    = &m_cclk_expand[20 * 256];
-	
+
 	m_used_colors = auto_alloc_array(machine(), UINT8, 21 * 256);
-	
+
 	memset(m_used_colors, 0, 21 * 256 * sizeof(UINT8));
-	
+
 	m_uc_21       = &m_used_colors[ 0 * 256];
 	m_uc_x10b     = &m_used_colors[ 1 * 256];
 	m_uc_3210b2   = &m_used_colors[ 3 * 256];
@@ -86,24 +86,24 @@ void antic_device::device_start()
 	m_uc_g1       = &m_used_colors[18 * 256];
 	m_uc_g2       = &m_used_colors[19 * 256];
 	m_uc_g3       = &m_used_colors[20 * 256];
-	
+
 	LOG(("atari cclk_init\n"));
 	cclk_init();
-	
+
 	for (int i = 0; i < 64; i++)
 		m_prio_table[i] = auto_alloc_array_clear(machine(), UINT8, 8*256);
-	
+
 	LOG(("atari prio_init\n"));
 	prio_init();
-	
+
 	for (int i = 0; i < machine().first_screen()->height(); i++)
 		m_video[i] = auto_alloc_clear(machine(), VIDEO);
-	
+
 	/* save states */
 	save_pointer(NAME((UINT8 *) &m_r), sizeof(m_r));
 	save_pointer(NAME((UINT8 *) &m_w), sizeof(m_w));
 	// TODO: save VIDEO items
-	
+
 	save_item(NAME(m_tv_artifacts));
 	save_item(NAME(m_render1));
 	save_item(NAME(m_render2));
@@ -556,7 +556,7 @@ void antic_device::prio_init()
 {
 	int i, j, pm, p, c;
 	const UINT8 * prio;
-	
+
 	/* 32 priority bit combinations */
 	for( i = 0; i < 32; i++ )
 	{
@@ -575,10 +575,10 @@ void antic_device::prio_init()
 				}
 				m_prio_table[i][(j << 8) + pm] = c;
 				if( (c==PL0 || c==P000 || c==P001 || c==P010 || c==P011) &&
-				   (pm & (P0+P1))==(P0+P1))
+					(pm & (P0+P1))==(P0+P1))
 					c = EOR;
 				if( (c==PL2 || c==P200 || c==P201 || c==P210 || c==P211) &&
-				   (pm & (P2+P3))==(P2+P3))
+					(pm & (P2+P3))==(P2+P3))
 					c = EOR;
 				m_prio_table[32 + i][(j << 8) + pm] = c;
 			}
@@ -598,7 +598,7 @@ void antic_device::cclk_init()
 	static const UINT8 _pf_310b[4] = {PBK,PF0,PF1,PF3};
 	int i;
 	UINT8 * dst;
-	
+
 	/* setup color translation for the ANTIC modes */
 	for( i = 0; i < 256; i++ )
 	{
@@ -608,7 +608,7 @@ void antic_device::cclk_init()
 		*dst++ = _pf_21[(i>>4)&3];
 		*dst++ = _pf_21[(i>>2)&3];
 		*dst++ = _pf_21[(i>>0)&3];
-		
+
 		/****** 4 color text (4,5) with pf2, D, E **********/
 		dst = (UINT8 *)&m_pf_x10b[0x000+i];
 		*dst++ = _pf_210b[(i>>6)&3];
@@ -620,7 +620,7 @@ void antic_device::cclk_init()
 		*dst++ = _pf_310b[(i>>4)&3];
 		*dst++ = _pf_310b[(i>>2)&3];
 		*dst++ = _pf_310b[(i>>0)&3];
-		
+
 		/****** pf0 color text (6,7), 9, B, C **********/
 		dst = (UINT8 *)&m_pf_3210b2[0x000+i*2];
 		*dst++ = (i&0x80)?PF0:PBK;
@@ -631,7 +631,7 @@ void antic_device::cclk_init()
 		*dst++ = (i&0x04)?PF0:PBK;
 		*dst++ = (i&0x02)?PF0:PBK;
 		*dst++ = (i&0x01)?PF0:PBK;
-		
+
 		/****** pf1 color text (6,7), 9, B, C **********/
 		dst = (UINT8 *)&m_pf_3210b2[0x200+i*2];
 		*dst++ = (i&0x80)?PF1:PBK;
@@ -642,7 +642,7 @@ void antic_device::cclk_init()
 		*dst++ = (i&0x04)?PF1:PBK;
 		*dst++ = (i&0x02)?PF1:PBK;
 		*dst++ = (i&0x01)?PF1:PBK;
-		
+
 		/****** pf2 color text (6,7), 9, B, C **********/
 		dst = (UINT8 *)&m_pf_3210b2[0x400+i*2];
 		*dst++ = (i&0x80)?PF2:PBK;
@@ -653,7 +653,7 @@ void antic_device::cclk_init()
 		*dst++ = (i&0x04)?PF2:PBK;
 		*dst++ = (i&0x02)?PF2:PBK;
 		*dst++ = (i&0x01)?PF2:PBK;
-		
+
 		/****** pf3 color text (6,7), 9, B, C **********/
 		dst = (UINT8 *)&m_pf_3210b2[0x600+i*2];
 		*dst++ = (i&0x80)?PF3:PBK;
@@ -664,7 +664,7 @@ void antic_device::cclk_init()
 		*dst++ = (i&0x04)?PF3:PBK;
 		*dst++ = (i&0x02)?PF3:PBK;
 		*dst++ = (i&0x01)?PF3:PBK;
-		
+
 		/****** 4 color graphics 4 cclks (8) **********/
 		dst = (UINT8 *)&m_pf_210b4[i*4];
 		*dst++ = _pf_210b[(i>>6)&3];
@@ -683,7 +683,7 @@ void antic_device::cclk_init()
 		*dst++ = _pf_210b[(i>>0)&3];
 		*dst++ = _pf_210b[(i>>0)&3];
 		*dst++ = _pf_210b[(i>>0)&3];
-		
+
 		/****** 4 color graphics 2 cclks (A) **********/
 		dst = (UINT8 *)&m_pf_210b2[i*2];
 		*dst++ = _pf_210b[(i>>6)&3];
@@ -694,43 +694,43 @@ void antic_device::cclk_init()
 		*dst++ = _pf_210b[(i>>2)&3];
 		*dst++ = _pf_210b[(i>>0)&3];
 		*dst++ = _pf_210b[(i>>0)&3];
-		
+
 		/****** high resolution graphics (F) **********/
 		dst = (UINT8 *)&m_pf_1b[i];
 		*dst++ = _pf_1b[(i>>6)&3];
 		*dst++ = _pf_1b[(i>>4)&3];
 		*dst++ = _pf_1b[(i>>2)&3];
 		*dst++ = _pf_1b[(i>>0)&3];
-		
+
 		/****** gtia mode 1 **********/
 		dst = (UINT8 *)&m_pf_gtia1[i];
 		*dst++ = GT1+((i>>4)&15);
 		*dst++ = GT1+((i>>4)&15);
 		*dst++ = GT1+(i&15);
 		*dst++ = GT1+(i&15);
-		
+
 		/****** gtia mode 2 **********/
 		dst = (UINT8 *)&m_pf_gtia2[i];
 		*dst++ = GT2+((i>>4)&15);
 		*dst++ = GT2+((i>>4)&15);
 		*dst++ = GT2+(i&15);
 		*dst++ = GT2+(i&15);
-		
+
 		/****** gtia mode 3 **********/
 		dst = (UINT8 *)&m_pf_gtia3[i];
 		*dst++ = GT3+((i>>4)&15);
 		*dst++ = GT3+((i>>4)&15);
 		*dst++ = GT3+(i&15);
 		*dst++ = GT3+(i&15);
-		
+
 	}
-	
+
 	/* setup used color tables */
 	for( i = 0; i < 256; i++ )
 	{
 		/* used colors in text modes 2,3 */
 		m_uc_21[i] = (i) ? PF2 | PF1 : PF2;
-		
+
 		/* used colors in text modes 4,5 and graphics modes D,E */
 		switch( i & 0x03 )
 		{
@@ -756,7 +756,7 @@ void antic_device::cclk_init()
 			case 0x80: m_uc_x10b[0x000+i] |= PF1; m_uc_x10b[0x100+i] |= PF1; break;
 			case 0xc0: m_uc_x10b[0x000+i] |= PF2; m_uc_x10b[0x100+i] |= PF3; break;
 		}
-		
+
 		/* used colors in text modes 6,7 and graphics modes 9,B,C */
 		if( i )
 		{
@@ -765,7 +765,7 @@ void antic_device::cclk_init()
 			m_uc_3210b2[0x400+i*2] |= PF2;
 			m_uc_3210b2[0x600+i*2] |= PF3;
 		}
-		
+
 		/* used colors in graphics mode 8 */
 		switch( i & 0x03 )
 		{
@@ -791,7 +791,7 @@ void antic_device::cclk_init()
 			case 0x80: m_uc_210b4[i*4] |= PF1; break;
 			case 0xc0: m_uc_210b4[i*4] |= PF2; break;
 		}
-		
+
 		/* used colors in graphics mode A */
 		switch( i & 0x03 )
 		{
@@ -817,11 +817,11 @@ void antic_device::cclk_init()
 			case 0x80: m_uc_210b2[i*2] |= PF1; break;
 			case 0xc0: m_uc_210b2[i*2] |= PF2; break;
 		}
-		
+
 		/* used colors in graphics mode F */
 		if( i )
 			m_uc_1b[i] |= PF1;
-		
+
 		/* used colors in GTIA graphics modes */
 		/* GTIA 1 is 16 different luminances with hue of colbk */
 		m_uc_g1[i] = 0x00;
@@ -838,7 +838,7 @@ void antic_device::cclk_init()
 			case 0x07: m_uc_g2[i] = 0x08; break;
 			default:   m_uc_g2[i] = 0x00;
 		}
-		
+
 		/* GTIA 3 is 16 different hues with luminance of colbk */
 		m_uc_g3[i] = 0x00;
 	}
@@ -1293,16 +1293,16 @@ void antic_device::render(address_space &space, int param1, int param2, int para
 {
 	VIDEO *video = m_video[m_scanline];
 	int add_bytes = 0, erase = 0;
-	
+
 	if (param3 == 0 || param2 <= 1)
 	{
 		mode_0(space, video);
 		return;
 	}
-	
+
 	if ((param3 == 1 || param3 == 2) && param1)
 		param3++;
-	
+
 	switch (param3)
 	{
 		case 1:
@@ -1318,7 +1318,7 @@ void antic_device::render(address_space &space, int param1, int param2, int para
 			erase = 0;
 			break;
 	}
-	
+
 	switch (param2)
 	{
 		case 0x02:
@@ -1387,10 +1387,10 @@ UINT32 antic_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, 
 {
 	UINT32 new_tv_artifacts = screen.ioport("artifacts")->read_safe(0);
 	copybitmap(bitmap, *m_bitmap, 0, 0, 0, 0, cliprect);
-	
+
 	if (m_tv_artifacts != new_tv_artifacts)
 		m_tv_artifacts = new_tv_artifacts;
-	
+
 	return 0;
 }
 
@@ -1404,7 +1404,7 @@ void antic_device::artifacts_gfx(UINT8 *src, UINT8 *dst, int width)
 	UINT8 atari_C = b + c;
 	UINT8 atari_D = m_gtia->get_w_colbk();
 	UINT16 *color_lookup = m_gtia->get_color_lookup();
-	
+
 	for (int x = 0; x < width * 4; x++)
 	{
 		n = *src++;
@@ -1478,7 +1478,7 @@ void antic_device::artifacts_txt(UINT8 * src, UINT8 * dst, int width)
 	UINT8 atari_C = b+c;
 	UINT8 atari_D = m_gtia->get_w_colpf2();
 	UINT16 *color_lookup = m_gtia->get_color_lookup();
-	
+
 	for (int x = 0; x < width * 4; x++)
 	{
 		n = *src++;
@@ -1550,7 +1550,7 @@ void antic_device::linerefresh()
 	UINT32 *dst;
 	UINT32 scanline[4 + (HCHARS * 2) + 4];
 	UINT16 *color_lookup = m_gtia->get_color_lookup();
-	
+
 	/* increment the scanline */
 	if( ++m_scanline == machine().first_screen()->height() )
 	{
@@ -1560,14 +1560,14 @@ void antic_device::linerefresh()
 		/* count frames gone since last write to hitclr */
 		m_gtia->count_hitclr_frames();
 	}
-	
+
 	if( m_scanline < MIN_Y || m_scanline > MAX_Y )
 		return;
-	
+
 	y = m_scanline - MIN_Y;
 	src = &m_cclock[PMOFFSET - m_hscrol_old + 12];
 	dst = scanline;
-	
+
 	if( m_tv_artifacts )
 	{
 		if( (m_cmd & 0x0f) == 2 || (m_cmd & 0x0f) == 3 )
@@ -1648,12 +1648,12 @@ void antic_device::linerefresh()
 	dst[1] = color_lookup[PBK] | color_lookup[PBK] << 16;
 	dst[2] = color_lookup[PBK] | color_lookup[PBK] << 16;
 	dst[3] = color_lookup[PBK] | color_lookup[PBK] << 16;
-	
+
 	draw_scanline8(*m_bitmap, 12, y, MIN(m_bitmap->width() - 12, sizeof(scanline)), (const UINT8 *) scanline, NULL);
 }
 
 
-#define ANTIC_TIME_FROM_CYCLES(cycles)	\
+#define ANTIC_TIME_FROM_CYCLES(cycles)  \
 (attotime)(machine().first_screen()->scan_period() * (cycles) / CYCLES_PER_LINE)
 
 void antic_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
@@ -1714,7 +1714,7 @@ TIMER_CALLBACK_MEMBER( antic_device::line_done )
 	LOG(("           @cycle #%3d release CPU\n", cycle()));
 	/* release the CPU (held for emulating cycles stolen by ANTIC DMA) */
 	machine().scheduler().trigger(TRIGGER_STEAL);
-	
+
 	/* refresh the display (translate color clocks to pixels) */
 	linerefresh();
 }
@@ -1748,11 +1748,11 @@ TIMER_CALLBACK_MEMBER( antic_device::steal_cycles )
 TIMER_CALLBACK_MEMBER( antic_device::scanline_render )
 {
 	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
-	
+
 	LOG(("           @cycle #%3d render mode $%X lines to go #%d\n", cycle(), (m_cmd & 0x0f), m_modelines));
-	
+
 	render(space, m_render1, m_render2, m_render3);
-	
+
 	/* if player/missile graphics is enabled */
 	if( m_scanline < 256 && (m_w.dmactl & (DMA_PLAYER|DMA_MISSILE)) )
 	{
@@ -1796,10 +1796,10 @@ TIMER_CALLBACK_MEMBER( antic_device::scanline_render )
 			}
 		}
 	}
-	
+
 	if (m_scanline >= VBL_END && m_scanline < 256)
 		m_gtia->render((UINT8 *)m_pmbits + PMOFFSET, (UINT8 *)m_cclock + PMOFFSET - m_hscrol_old, (UINT8 *)m_prio_table[m_gtia->get_w_prior() & 0x3f], (UINT8 *)&m_pmbits);
-	
+
 	m_steal_cycles += CYCLES_REFRESH;
 	LOG(("           run CPU for %d cycles\n", CYCLES_HSYNC - CYCLES_HSTART - m_steal_cycles));
 	timer_set(ANTIC_TIME_FROM_CYCLES(CYCLES_HSYNC - CYCLES_HSTART - m_steal_cycles), TIMER_CYCLE_STEAL);
@@ -1856,7 +1856,7 @@ void antic_device::scanline_dma(int param)
 				m_render3 = m_w.dmactl & 3;
 				UINT8 vscrol_subtract = 0;
 				UINT8 new_cmd;
-				
+
 				new_cmd = RDANTIC(space);
 				m_doffs = (m_doffs + 1) & DOFFS;
 				/* steal at one clock cycle from the CPU for fetching the command */
@@ -1894,7 +1894,7 @@ void antic_device::scanline_dma(int param)
 				}
 				/* Set the ANTIC mode renderer function */
 				m_render2 = new_cmd & ANTIC_MODE;
-				
+
 				switch( new_cmd & ANTIC_MODE )
 				{
 					case 0x00:
@@ -2048,11 +2048,11 @@ void antic_device::scanline_dma(int param)
 		m_render2 = 0;
 		m_render3 = 0;
 	}
-	
+
 	m_r.nmist &= ~DLI_NMI;
 	if (m_modelines == 1 && (m_cmd & m_w.nmien & DLI_NMI))
 		timer_set(ANTIC_TIME_FROM_CYCLES(CYCLES_DLI_NMI), TIMER_ISSUE_DLI);
-	
+
 	timer_set(ANTIC_TIME_FROM_CYCLES(CYCLES_HSTART), TIMER_LINE_REND);
 }
 
@@ -2068,24 +2068,24 @@ void antic_device::scanline_dma(int param)
 void antic_device::generic_interrupt(int button_count)
 {
 	LOG(("ANTIC #%3d @cycle #%d scanline interrupt\n", m_scanline, cycle()));
-	
+
 	if( m_scanline < VBL_START )
 	{
 		scanline_dma(0);
 		return;
 	}
-	
+
 	if( m_scanline == VBL_START )
 	{
 		/* specify buttons relevant to this Atari variant */
 		m_gtia->button_interrupt(button_count, machine().root_device().ioport("djoy_b")->read_safe(0));
-		
+
 		/* do nothing new for the rest of the frame */
 		m_modelines = machine().first_screen()->height() - VBL_START;
 		m_render1 = 0;
 		m_render2 = 0;
 		m_render3 = 0;
-		
+
 		/* if the CPU want's to be interrupted at vertical blank... */
 		if( m_w.nmien & VBL_NMI )
 		{
@@ -2095,8 +2095,7 @@ void antic_device::generic_interrupt(int button_count)
 			machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 		}
 	}
-	
+
 	/* refresh the display (translate color clocks to pixels) */
 	linerefresh();
 }
-

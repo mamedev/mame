@@ -250,7 +250,7 @@ static ADDRESS_MAP_START( atom_mem, AS_PROGRAM, 8, atom_state )
 	AM_RANGE(0x0a05, 0x7fff) AM_RAM
 	AM_RANGE(0x8000, 0x97ff) AM_RAM AM_SHARE("video_ram")
 	AM_RANGE(0x9800, 0x9fff) AM_RAM
-//  AM_RANGE(0xa000, 0xafff)		// mapped by the cartslot
+//  AM_RANGE(0xa000, 0xafff)        // mapped by the cartslot
 	AM_RANGE(0xb000, 0xb003) AM_MIRROR(0x3fc) AM_DEVREADWRITE(INS8255_TAG, i8255_device, read, write)
 //  AM_RANGE(0xb400, 0xb403) AM_DEVREADWRITE(MC6854_TAG, mc6854_device, read, write)
 //  AM_RANGE(0xb404, 0xb404) AM_READ_PORT("ECONET")
@@ -680,7 +680,7 @@ int atom_state::load_cart(device_image_interface &image, generic_slot_device *sl
 	}
 
 	slot->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
-	slot->common_load_rom(slot->get_rom_base(), size, "rom");			
+	slot->common_load_rom(slot->get_rom_base(), size, "rom");
 
 	return IMAGE_INIT_PASS;
 }
@@ -882,12 +882,12 @@ ROM_END
 DRIVER_INIT_MEMBER(atomeb_state, atomeb)
 {
 	// these have to be set here, so that we can pass m_ext[*] to device_image_load!
-	char str[8];	
+	char str[8];
 	for (int i = 0; i < 16; i++)
 	{
 		sprintf(str,"rom_a%x", i);
 		m_ext[i] = machine().device<generic_slot_device>(str);
-	}			
+	}
 }
 
 

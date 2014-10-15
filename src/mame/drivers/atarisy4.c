@@ -33,10 +33,10 @@ class atarisy4_renderer : public poly_manager<float, atarisy4_polydata, 2, 8192>
 public:
 	atarisy4_renderer(atarisy4_state &state, screen_device &screen);
 	~atarisy4_renderer() {}
-	
+
 	void draw_scanline(INT32 scanline, const extent_t &extent, const atarisy4_polydata &extradata, int threadid);
 	void draw_polygon(UINT16 color);
-	
+
 	atarisy4_state &m_state;
 };
 
@@ -54,28 +54,28 @@ public:
 		m_screen_ram(*this, "screen_ram"),
 		m_dsp0_bank1(*this, "dsp0_bank1"),
 		m_dsp1_bank1(*this, "dsp1_bank1") { }
-		
+
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_dsp0;
 	optional_device<cpu_device> m_dsp1;
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
-	
+
 	required_shared_ptr<UINT16> m_m68k_ram;
 	required_shared_ptr<UINT16> m_screen_ram;
-	
+
 	required_memory_bank m_dsp0_bank1;
 	optional_memory_bank m_dsp1_bank1;
 
 	atarisy4_renderer *m_renderer;
-	
+
 	UINT8 m_r_color_table[256];
 	UINT8 m_g_color_table[256];
 	UINT8 m_b_color_table[256];
 	UINT16 m_dsp_bank[2];
 	UINT8 m_csr[2];
 	UINT16 *m_shared_ram[2];
-	
+
 	DECLARE_WRITE16_MEMBER(gpu_w);
 	DECLARE_READ16_MEMBER(gpu_r);
 	DECLARE_READ16_MEMBER(m68k_shared_0_r);
@@ -177,7 +177,7 @@ atarisy4_renderer::atarisy4_renderer(atarisy4_state &state, screen_device &scree
 {
 }
 
- void atarisy4_state::video_start()
+	void atarisy4_state::video_start()
 {
 	m_renderer = auto_alloc(machine(), atarisy4_renderer(*this, *m_screen));
 }

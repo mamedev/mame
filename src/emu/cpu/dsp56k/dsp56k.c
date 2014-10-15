@@ -106,13 +106,13 @@ const device_type DSP56156 = &device_creator<dsp56k_device>;
  *  Internal Memory Maps
  ****************************************************************************/
 static ADDRESS_MAP_START( dsp56156_program_map, AS_PROGRAM, 16, dsp56k_device )
-    AM_RANGE(0x0000,0x07ff) AM_READWRITE(program_r, program_w)   /* 1-5 */
+	AM_RANGE(0x0000,0x07ff) AM_READWRITE(program_r, program_w)   /* 1-5 */
 //  AM_RANGE(0x2f00,0x2fff) AM_ROM                              /* 1-5 PROM reserved memory.  Is this the right spot for it? */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dsp56156_x_data_map, AS_DATA, 16, dsp56k_device )
-    AM_RANGE(0x0000,0x07ff) AM_RAM                              /* 1-5 */
-    AM_RANGE(0xffc0,0xffff) AM_READWRITE(peripheral_register_r, peripheral_register_w)   /* 1-5 On-chip peripheral registers memory mapped in data space */
+	AM_RANGE(0x0000,0x07ff) AM_RAM                              /* 1-5 */
+	AM_RANGE(0xffc0,0xffff) AM_READWRITE(peripheral_register_r, peripheral_register_w)   /* 1-5 On-chip peripheral registers memory mapped in data space */
 ADDRESS_MAP_END
 
 
@@ -288,7 +288,7 @@ void dsp56k_device::device_start()
 	save_item(NAME(m_dsp56k_core.HI.trxh));
 	save_item(NAME(m_dsp56k_core.HI.trxl));
 	save_item(NAME(m_dsp56k_core.HI.bootstrap_offset));
-	
+
 	save_item(NAME(m_dsp56k_core.peripheral_ram));
 	save_item(NAME(m_dsp56k_core.program_ram));
 
@@ -514,4 +514,3 @@ offs_t dsp56k_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *o
 	extern CPU_DISASSEMBLE( dsp56k );
 	return CPU_DISASSEMBLE_NAME(dsp56k)(this, buffer, pc, oprom, opram, options);
 }
-

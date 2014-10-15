@@ -49,7 +49,7 @@ protected:
 
 private:
 	generic_slot_device *m_eproms[8];
-	
+
 	UINT8 m_bank, m_socket;
 	int m_reset;
 };

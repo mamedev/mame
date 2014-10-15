@@ -95,7 +95,7 @@ public:
 	DECLARE_DRIVER_INIT(pegasus);
 	TIMER_DEVICE_CALLBACK_MEMBER(pegasus_firq);
 	void pegasus_decrypt_rom(UINT8 *ROM, bool force_decrypt);
-	
+
 	int load_cart(device_image_interface &image, generic_slot_device *slot, const char *reg_tag);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(exp00_load) { return load_cart(image, m_exp_00, "0000"); }
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(exp01_load) { return load_cart(image, m_exp_01, "1000"); }
@@ -183,10 +183,10 @@ READ8_MEMBER( pegasus_state::pegasus_protection_r )
 
 static ADDRESS_MAP_START(pegasus_mem, AS_PROGRAM, 8, pegasus_state)
 	ADDRESS_MAP_UNMAP_HIGH
-	//AM_RANGE(0x0000, 0x2fff)		// mapped by the cartslots 1-3
+	//AM_RANGE(0x0000, 0x2fff)      // mapped by the cartslots 1-3
 	AM_RANGE(0xb000, 0xbdff) AM_RAM
 	AM_RANGE(0xbe00, 0xbfff) AM_RAM AM_SHARE("p_videoram")
-	//AM_RANGE(0xc000, 0xdfff)		// mapped by the cartslots 4-5
+	//AM_RANGE(0xc000, 0xdfff)      // mapped by the cartslots 4-5
 	AM_RANGE(0xe000, 0xe1ff) AM_READ(pegasus_protection_r)
 	AM_RANGE(0xe200, 0xe3ff) AM_READWRITE(pegasus_pcg_r,pegasus_pcg_w)
 	AM_RANGE(0xe400, 0xe403) AM_MIRROR(0x1fc) AM_DEVREADWRITE("pia_u", pia6821_device, read, write)
@@ -413,13 +413,13 @@ int pegasus_state::load_cart(device_image_interface &image, generic_slot_device 
 {
 	UINT32 size = slot->common_get_size(reg_tag);
 	bool any_socket = false;
-	
+
 	if (size > 0x1000)
 	{
 		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
 		return IMAGE_INIT_FAIL;
 	}
-	
+
 	if (image.software_entry() != NULL && size == 0)
 	{
 		// we might be loading a cart compatible with all sockets!
@@ -436,12 +436,12 @@ int pegasus_state::load_cart(device_image_interface &image, generic_slot_device 
 		}
 	}
 
-	slot->rom_alloc(0x1000, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);	// we alloc 0x1000 also for smaller roms!
+	slot->rom_alloc(0x1000, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE); // we alloc 0x1000 also for smaller roms!
 	slot->common_load_rom(slot->get_rom_base(), size, any_socket ? "rom" : reg_tag);
-	
+
 	// raw images have to be decrypted (in particular the ones from softlist)
 	pegasus_decrypt_rom(slot->get_rom_base(), image.software_entry() != NULL);
-	
+
 	return IMAGE_INIT_PASS;
 }
 

@@ -136,7 +136,7 @@ public:
 		m_k1ge(*this, "k1ge"),
 		m_io_controls(*this, "Controls"),
 		m_io_power(*this, "Power") ,
-		m_maincpu(*this, "maincpu") 
+		m_maincpu(*this, "maincpu")
 		{
 			m_flash_chip[0].present = 0;
 			m_flash_chip[0].state = F_READ;
@@ -651,7 +651,7 @@ void ngp_state::machine_start()
 		m_maincpu->space(AS_PROGRAM).install_read_bank(0x800000, 0x9fffff, "flash1");
 		membank("flash0")->set_base(cart);
 		membank("flash1")->set_base(cart + 0x200000);
-		
+
 		m_flash_chip[0].data = cart;
 		m_flash_chip[0].org_data[0] = m_flash_chip[0].data[0];
 		m_flash_chip[0].org_data[1] = m_flash_chip[0].data[1];
@@ -669,7 +669,7 @@ void ngp_state::machine_start()
 		m_flash_chip[0].org_data[13] = m_flash_chip[0].data[0x1fc001];
 		m_flash_chip[0].org_data[14] = m_flash_chip[0].data[0x1fc002];
 		m_flash_chip[0].org_data[15] = m_flash_chip[0].data[0x1fc003];
-		
+
 		m_flash_chip[1].data = cart + 0x200000;
 		m_flash_chip[1].org_data[0] = m_flash_chip[1].data[0];
 		m_flash_chip[1].org_data[1] = m_flash_chip[1].data[1];
@@ -739,17 +739,17 @@ UINT32 ngp_state::screen_update_ngp(screen_device &screen, bitmap_ind16 &bitmap,
 DEVICE_IMAGE_LOAD_MEMBER( ngp_state, ngp_cart )
 {
 	UINT32 size = m_cart->common_get_size("rom");
-	
+
 	if (size != 0x8000 && size != 0x80000 && size != 0x100000 && size != 0x200000 && size != 0x400000)
 	{
 		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
 		return IMAGE_INIT_FAIL;
 	}
-	
+
 	// alloc 0x400000 ROM to simplify mapping in the address map
 	m_cart->rom_alloc(0x400000, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
-	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");			
-	
+	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
+
 	//printf("%2x%2x - %x - %x\n", (unsigned int) memregion("cart")->u8(0x20), (unsigned int) memregion("cart")->u8(0x21),
 	//        (unsigned int) memregion("cart")->u8(0x22), (unsigned int) memregion("cart")->u8(0x23));
 	m_flash_chip[0].manufacturer_id = 0x98;

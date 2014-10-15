@@ -156,15 +156,15 @@ bool sat_cart_slot_device::call_load()
 			// from fullpath, only ROM carts
 			UINT32 len = (software_entry() != NULL) ? get_software_region_length("rom") : length();
 			UINT32 *ROM;
-			
+
 			m_cart->rom_alloc(len, tag());
 			ROM = m_cart->get_rom_base();
-			
+
 			if (software_entry() != NULL)
 				memcpy(ROM, get_software_region("rom"), len);
 			else
 				fread(ROM, len);
-			
+
 			// fix endianness....
 			for (int i = 0; i < len/4; i ++)
 				ROM[i] = BITSWAP32(ROM[i],7,6,5,4,3,2,1,0,15,14,13,12,11,10,9,8,23,22,21,20,19,18,17,16,31,30,29,28,27,26,25,24);

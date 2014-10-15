@@ -19,7 +19,7 @@ Bruce Tomlin (hardware info)
 
 
 static ADDRESS_MAP_START(vectrex_map, AS_PROGRAM, 8, vectrex_state )
-	AM_RANGE(0x0000, 0x7fff) AM_NOP	// cart area, handled at machine_start
+	AM_RANGE(0x0000, 0x7fff) AM_NOP // cart area, handled at machine_start
 	AM_RANGE(0xc800, 0xcbff) AM_RAM AM_MIRROR(0x0400) AM_SHARE("gce_vectorram")
 	AM_RANGE(0xd000, 0xd7ff) AM_READWRITE(vectrex_via_r, vectrex_via_w)
 	AM_RANGE(0xe000, 0xffff) AM_ROM AM_REGION("maincpu", 0)

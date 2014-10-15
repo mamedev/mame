@@ -1269,7 +1269,7 @@ int k056832_device::update_linemap( screen_device &screen, _BitmapClass &bitmap,
         */
 		{
 			bitmap_ind16 *pixmap;
-			
+
 			UINT8 code_transparent, code_opaque;
 			const pen_t *pal_ptr;
 			const UINT8  *src_ptr;

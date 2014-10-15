@@ -42,7 +42,7 @@ public:
 	UINT32 get_nvram_size() { return m_nvram.bytes(); }
 	void set_rom_size(UINT32 val) { m_rom_size = val; }
 
-	void save_nvram()	{ device().save_item(NAME(m_nvram)); }
+	void save_nvram()   { device().save_item(NAME(m_nvram)); }
 
 	// internal state
 	UINT32 *m_rom;  // this points to the cart rom region
@@ -77,7 +77,7 @@ public:
 	void setup_ram(UINT8 banks);
 	void internal_header_logging(UINT8 *ROM, UINT32 len);
 
-	void save_nvram()	{ if (m_cart && m_cart->get_nvram_size()) m_cart->save_nvram(); }
+	void save_nvram()   { if (m_cart && m_cart->get_nvram_size()) m_cart->save_nvram(); }
 
 	virtual iodevice_t image_type() const { return IO_CARTSLOT; }
 	virtual bool is_readable()  const { return 1; }
@@ -175,7 +175,7 @@ static const gba_chip_fix_conflict_item gba_chip_fix_conflict_list[] =
 	{ "BR4J", GBA_CHIP_FLASH      }, // 1586 - Rockman EXE 4.5 - Real Operation (JPN)
 	{ "BG8J", GBA_CHIP_EEPROM_64K }, // 1853 - Ganbare! Dodge Fighters (JPN)
 	{ "AROP", GBA_CHIP_EEPROM_4K  }, // 1862 - Rocky (EUR)
-//	"A2YE" - 1906 - Top Gun - Combat Zones (USA) - multiple NVRAM chips detected, but none present (protection against emu?)
+//  "A2YE" - 1906 - Top Gun - Combat Zones (USA) - multiple NVRAM chips detected, but none present (protection against emu?)
 	{ "BKMJ", GBA_CHIP_EEPROM_4K  }, // 2039 - Kim Possible (JPN)
 	{ "BKEJ", GBA_CHIP_EEPROM_64K }, // 2047 - Konjiki no Gashbell - The Card Battle for GBA (JPN)
 	{ "BKMP", GBA_CHIP_EEPROM_4K  }, // 2297 - Kim Possible 2 - Drakken's Demise (EUR)

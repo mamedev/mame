@@ -13,29 +13,29 @@ public:
 		  mid_data(*this, "mid_data"),
 		  text_data(*this, "text_data"),
 		  */
-		  sprites(*this, "sprites") ,
-		  m_maincpu(*this, "maincpu"),
-		  m_seibu_sound(*this, "seibu_sound"),
-		  m_gfxdecode(*this, "gfxdecode"),
-		  m_palette(*this, "palette"),
-		
-		  bg_bank(0),
-		  fg_bank(0),
-		  mid_bank(0),
-		  tx_bank(0),
-		  raiden2_tilemap_enable(0),
-		  prg_bank(0),
-		  cop_bank(0),
+			sprites(*this, "sprites") ,
+			m_maincpu(*this, "maincpu"),
+			m_seibu_sound(*this, "seibu_sound"),
+			m_gfxdecode(*this, "gfxdecode"),
+			m_palette(*this, "palette"),
 
-		  sprite_prot_x(0),
-		  sprite_prot_y(0),
-		  dst1(0),
-		  cop_spr_maxx(0),
-		  cop_spr_off(0),
-	
-		  tile_buffer(320, 256),
-		  sprite_buffer(320, 256),
-		  m_raiden2cop(*this, "raiden2cop")
+			bg_bank(0),
+			fg_bank(0),
+			mid_bank(0),
+			tx_bank(0),
+			raiden2_tilemap_enable(0),
+			prg_bank(0),
+			cop_bank(0),
+
+			sprite_prot_x(0),
+			sprite_prot_y(0),
+			dst1(0),
+			cop_spr_maxx(0),
+			cop_spr_off(0),
+
+			tile_buffer(320, 256),
+			sprite_buffer(320, 256),
+			m_raiden2cop(*this, "raiden2cop")
 	{
 		memset(scrollvals, 0, sizeof(UINT16)*6);
 		memset(sprite_prot_src_addr, 0, sizeof(UINT16)*2);
@@ -87,8 +87,8 @@ public:
 	bool blend_active[0x800]; // cfg
 
 	tilemap_t *background_layer,*midground_layer,*foreground_layer,*text_layer;
-	
-	
+
+
 	int bg_bank, fg_bank, mid_bank, tx_bank;
 	UINT16 raiden2_tilemap_enable;
 	UINT8 prg_bank;

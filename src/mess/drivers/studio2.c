@@ -201,7 +201,7 @@ Notes:
 class studio2_state : public driver_device
 {
 public:
-	
+
 	studio2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, CDP1802_TAG),
@@ -213,7 +213,7 @@ public:
 			m_b(*this, "B"),
 			m_screen(*this, "screen")
 	{ }
-	
+
 	required_device<cosmac_device> m_maincpu;
 	required_device<beep_device> m_beeper;
 	optional_device<cdp1861_device> m_vdc;
@@ -222,10 +222,10 @@ public:
 	required_ioport m_a;
 	required_ioport m_b;
 	required_device<screen_device> m_screen;
-	
+
 	virtual void machine_start();
 	virtual void machine_reset();
-	
+
 	DECLARE_READ8_MEMBER( cart_400 );
 	DECLARE_READ8_MEMBER( cart_a00 );
 	DECLARE_READ8_MEMBER( cart_e00 );
@@ -238,7 +238,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( q_w );
 	DECLARE_INPUT_CHANGED_MEMBER( reset_w );
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( studio2_cart_load );
-	
+
 	/* keyboard state */
 	UINT8 m_keylatch;
 	DECLARE_DRIVER_INIT(studio2);
@@ -252,12 +252,12 @@ public:
 			m_color0_ram(*this, "color0_ram"),
 			m_color1_ram(*this, "color1_ram")
 	{ }
-	
+
 	virtual UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	
+
 	required_shared_ptr<UINT8> m_color0_ram;
 	required_shared_ptr<UINT8> m_color1_ram;
-	
+
 	DECLARE_WRITE8_MEMBER( dma_w );
 };
 
@@ -269,18 +269,18 @@ public:
 			m_cti(*this, CDP1864_TAG),
 			m_color_ram(*this, "color_ram")
 	{ }
-	
+
 	required_device<cdp1864_device> m_cti;
-	
+
 	virtual void machine_start();
 	virtual void machine_reset();
-	
+
 	DECLARE_READ8_MEMBER( cart_c00 );
 	DECLARE_WRITE8_MEMBER( dma_w );
 	DECLARE_READ_LINE_MEMBER( rdata_r );
 	DECLARE_READ_LINE_MEMBER( bdata_r );
 	DECLARE_READ_LINE_MEMBER( gdata_r );
-	
+
 	/* video state */
 	required_shared_ptr<UINT8> m_color_ram;
 	UINT8 m_color;
@@ -511,7 +511,7 @@ void mpt02_state::machine_start()
 		m_maincpu->space(AS_PROGRAM).install_read_handler(0x0400, 0x07ff, read8_delegate(FUNC(studio2_state::cart_400), this));
 		m_maincpu->space(AS_PROGRAM).install_read_handler(0x0c00, 0x0fff, read8_delegate(FUNC(mpt02_state::cart_c00), this));
 	}
-	
+
 	// register for state saving
 	save_item(NAME(m_keylatch));
 }
@@ -529,10 +529,10 @@ void mpt02_state::machine_reset()
 DEVICE_IMAGE_LOAD_MEMBER( studio2_state, studio2_cart_load )
 {
 	UINT32 size;
-	
+
 	// always alloc 3K, even if range $400-$600 is not read by the system (RAM is present there)
 	m_cart->rom_alloc(0xc00, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
-	
+
 	if (image.software_entry() == NULL)
 	{
 		if (!strcmp(image.filetype(), "st2"))
@@ -540,8 +540,8 @@ DEVICE_IMAGE_LOAD_MEMBER( studio2_state, studio2_cart_load )
 			UINT8 header[0x100];
 			UINT8 catalogue[10], title[32], pages[64];
 			UINT8 blocks;
-		
-			if (image.length() <= 0x100) 
+
+			if (image.length() <= 0x100)
 			{
 				image.seterror(IMAGE_ERROR_UNSPECIFIED, "Invalid ROM file");
 				return IMAGE_INIT_FAIL;
@@ -560,7 +560,7 @@ DEVICE_IMAGE_LOAD_MEMBER( studio2_state, studio2_cart_load )
 			memcpy(&catalogue, &header[16], 10);
 			memcpy(&title, &header[32], 32);
 			memcpy(&pages, &header[64], 64);
-			
+
 			/* read ST2 cartridge into memory */
 			for (int block = 0; block < (blocks - 1); block++)
 			{

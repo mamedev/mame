@@ -259,7 +259,7 @@ WRITE8_MEMBER( rx78_state::vdp_pri_mask_w )
 static ADDRESS_MAP_START(rx78_mem, AS_PROGRAM, 8, rx78_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	//AM_RANGE(0x2000, 0x5fff)		// mapped by the cartslot
+	//AM_RANGE(0x2000, 0x5fff)      // mapped by the cartslot
 	AM_RANGE(0x6000, 0xafff) AM_RAM //ext RAM
 	AM_RANGE(0xb000, 0xebff) AM_RAM
 	AM_RANGE(0xec00, 0xffff) AM_READWRITE(rx78_vram_r, rx78_vram_w)
@@ -409,7 +409,7 @@ INPUT_PORTS_END
 
 void rx78_state::machine_reset()
 {
-	address_space &prg = m_maincpu->space(AS_PROGRAM);	
+	address_space &prg = m_maincpu->space(AS_PROGRAM);
 	if (m_cart->exists())
 		prg.install_read_handler(0x2000, 0x5fff, read8_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_cart));
 }
@@ -417,16 +417,16 @@ void rx78_state::machine_reset()
 DEVICE_IMAGE_LOAD_MEMBER( rx78_state, rx78_cart )
 {
 	UINT32 size = m_cart->common_get_size("rom");
-	
+
 	if (size != 0x2000 && size != 0x4000)
 	{
 		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
 		return IMAGE_INIT_FAIL;
 	}
-	
+
 	m_cart->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
-	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");			
-	
+	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
+
 	return IMAGE_INIT_PASS;
 }
 

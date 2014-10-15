@@ -482,7 +482,7 @@ ROM_START( prose2k )
 	//      0 - to /CE of ROMs 12(U27) and 13(U50)
 	//
 	// Note U81 is optional; it can be replaced by a 74s138 instead of a prom,
-	// with A19, A18, A17 as inputs, for decoding the roms as:      
+	// with A19, A18, A17 as inputs, for decoding the roms as:
 	//      7 - to /CE of ROMs 0(U21) and 1(U44)   (0xE0000-0xE3FFF)
 	//      6 - to /CE of ROMs 2(U22) and 3(U45)   (0xE4000-0xE7FFF)
 	//      5 - to /CE of ROMs 4(U23) and 5(U46)   (0xE8000-0xEBFFF)
@@ -490,8 +490,8 @@ ROM_START( prose2k )
 	//      3 - to /CE of ROMs 8(U25) and 9(U48)   (0xF0000-0xF3FFF)
 	//      2 - to /CE of ROMs 10(U26) and 11(U49) (0xF4000-0xF7FFF)
 	//      1 - to /CE of ROMs 12(U27) and 13(U50) (0xF8000-0xFBFFF)
-	//      0 - to /CE of ROMs 14(U28) and 15(U51) (0xFC000-0xFFFFF)                                               
-	
+	//      0 - to /CE of ROMs 14(U28) and 15(U51) (0xFC000-0xFFFFF)
+
 	ROM_REGION(0x1000, "proms", 0)
 	ROM_LOAD( "am27s19.u77", 0x0000, 0x0020, CRC(A88757FC) SHA1(9066D6DBC009D7A126D75B8461CA464DDF134412))
 	ROM_LOAD( "am27s19.u79", 0x0020, 0x0020, CRC(A165B090) SHA1(BFC413C79915C68906033741318C070AD5DD0F6B))

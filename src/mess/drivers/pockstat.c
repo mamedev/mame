@@ -961,7 +961,7 @@ DEVICE_IMAGE_LOAD_MEMBER( pockstat_state, pockstat_flash )
 
 	if (size != 0x20f40)
 		return IMAGE_INIT_FAIL;
-	
+
 	image.fread(cart_id, 0xf40);
 
 	for (int i = 0; i < strlen(gme_id); i++)

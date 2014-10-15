@@ -175,11 +175,11 @@ bool scv_cart_slot_device::call_load()
 			seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
 			return IMAGE_INIT_FAIL;
 		}
-		
+
 		m_cart->rom_alloc(len, tag());
 		if (has_ram)
 			m_cart->ram_alloc(get_software_region_length("ram"));
-			
+
 		ROM = m_cart->get_rom_base();
 
 		if (software_entry() == NULL)
@@ -317,4 +317,3 @@ WRITE8_MEMBER(scv_cart_slot_device::write_bank)
 	if (m_cart)
 		m_cart->write_bank(space, offset, data);
 }
-

@@ -304,7 +304,7 @@ static MACHINE_CONFIG_START( btoads, btoads_state )
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_TMS340X0_HALT_ON_RESET(FALSE) /* halt on reset */
 	MCFG_TMS340X0_PIXEL_CLOCK(VIDEO_CLOCK/2) /* pixel clock */
-	MCFG_TMS340X0_PIXELS_PER_CLOCK(1) /* pixels per clock */	
+	MCFG_TMS340X0_PIXELS_PER_CLOCK(1) /* pixels per clock */
 	MCFG_TMS340X0_SCANLINE_RGB32_CB(btoads_state, scanline_update)     /* scanline updater (RGB32) */
 	MCFG_TMS340X0_TO_SHIFTREG_CB(btoads_state, to_shiftreg)  /* write to shiftreg function */
 	MCFG_TMS340X0_FROM_SHIFTREG_CB(btoads_state, from_shiftreg) /* read from shiftreg function */

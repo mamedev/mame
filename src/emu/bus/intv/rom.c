@@ -47,4 +47,3 @@ intv_wsmlb_device::intv_wsmlb_device(const machine_config &mconfig, const char *
 					: intv_rom_device(mconfig, INTV_ROM_WSMLB, "Intellivision World Series Baseball Cart", tag, owner, clock, "intv_wsmlb", __FILE__)
 {
 }
-

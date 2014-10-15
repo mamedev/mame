@@ -15,10 +15,10 @@ public:
 	// construction/destruction
 	vboy_rom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 	vboy_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	// device-level overrides
 	virtual void device_start() {}
-	
+
 	// reading and writing
 	virtual DECLARE_READ32_MEMBER(read_cart);
 };

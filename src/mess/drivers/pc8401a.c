@@ -521,7 +521,7 @@ void pc8401a_state::machine_start()
 
 	/* bank switch */
 	bankswitch(0);
-	
+
 	/* register for state saving */
 	save_item(NAME(m_mmr));
 	save_item(NAME(m_io_addr));

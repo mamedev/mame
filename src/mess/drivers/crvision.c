@@ -712,7 +712,7 @@ void crvision_pal_state::machine_start()
 	// state saving
 	save_item(NAME(m_keylatch));
 	save_item(NAME(m_joylatch));
-	
+
 	if (m_cart->exists())
 	{
 		m_maincpu->space(AS_PROGRAM).install_read_handler(0x4000, 0x7fff, read8_delegate(FUNC(crvision_cart_slot_device::read_rom40),(crvision_cart_slot_device*)m_cart));
@@ -729,7 +729,7 @@ void laser2001_state::machine_start()
 	// state saving
 	save_item(NAME(m_keylatch));
 	save_item(NAME(m_joylatch));
-	
+
 	if (m_cart->exists())
 	{
 		m_maincpu->space(AS_PROGRAM).install_read_handler(0x4000, 0x7fff, read8_delegate(FUNC(crvision_cart_slot_device::read_rom40),(crvision_cart_slot_device*)m_cart));

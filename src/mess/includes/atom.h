@@ -108,9 +108,9 @@ public:
 	/* devices */
 	int m_previous_i8271_int_state;
 	TIMER_DEVICE_CALLBACK_MEMBER(cassette_output_tick);
-	
+
 	int load_cart(device_image_interface &image, generic_slot_device *slot);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load) { return load_cart(image, m_cart); }	
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load) { return load_cart(image, m_cart); }
 	DECLARE_QUICKLOAD_LOAD_MEMBER(atom_atm);
 };
 
@@ -121,7 +121,7 @@ public:
 		: atom_state(mconfig, type, tag),
 		m_e0(*this, "rom_e0"),
 		m_e1(*this, "rom_e1")
-	{ 
+	{
 	}
 
 	virtual void machine_start();
@@ -132,10 +132,10 @@ public:
 	DECLARE_READ8_MEMBER(dos_r);
 
 	DECLARE_DRIVER_INIT(atomeb);
-	
+
 	/* eprom state */
 	int m_eprom;
-	
+
 	generic_slot_device *m_ext[16];
 	required_device<generic_slot_device> m_e0;
 	required_device<generic_slot_device> m_e1;

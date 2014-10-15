@@ -67,10 +67,10 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-	
+
 	optional_shared_ptr<UINT32> m_f3_ram;
 	optional_shared_ptr<UINT32> m_paletteram32;
-	
+
 	UINT16 *m_videoram;
 	UINT16 *m_spriteram;
 	UINT16 *m_f3_vram;
@@ -364,7 +364,7 @@ private:
 	inline void dpix_bg(UINT32 bgcolor);
 	void init_alpha_blend_func();
 	inline void draw_scanlines(bitmap_rgb32 &bitmap, int xsize, INT16 *draw_line_num, const struct f3_playfield_line_inf **line_t, const int *sprite, UINT32 orient, int skip_layer_num);
-	void visible_tile_check(struct f3_playfield_line_inf *line_t, int line,	UINT32 x_index_fx,UINT32 y_index, UINT16 *f3_pf_data_n);
+	void visible_tile_check(struct f3_playfield_line_inf *line_t, int line, UINT32 x_index_fx,UINT32 y_index, UINT16 *f3_pf_data_n);
 	void calculate_clip(int y, UINT16 pri, UINT32* clip0, UINT32* clip1, int* line_enable);
 	void get_spritealphaclip_info();
 	void get_line_ram_info(tilemap_t *tmap, int sx, int sy, int pos, UINT16 *f3_pf_data_n);

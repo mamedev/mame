@@ -414,7 +414,6 @@ static void set_ea(address_space &space, int ea)
 
 void mario_state::sound_start()
 {
-
 	device_t *audiocpu = machine().device("audiocpu");
 
 	if (!audiocpu) return;

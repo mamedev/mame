@@ -39,7 +39,7 @@ public:
 	required_device<okim6295_device> m_oki;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	
+
 	optional_shared_ptr<UINT16> m_videoram;
 	optional_shared_ptr<UINT16> m_cyclwarr_cpua_ram;
 	optional_shared_ptr<UINT16> m_cyclwarr_cpub_ram;
@@ -58,7 +58,7 @@ public:
 	optional_shared_ptr<UINT16> m_roundup_p_ram;
 	optional_shared_ptr<UINT16> m_roundup_l_ram;
 	required_shared_ptr<UINT16> m_spriteram;
-	
+
 	UINT16 m_bigfight_a20000[8];
 	UINT16 m_bigfight_a60000[2];
 	UINT16 m_bigfight_a40000[2];

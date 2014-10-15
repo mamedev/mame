@@ -79,11 +79,11 @@ class scv_rom64_device : public scv_rom8_device
 public:
 	// construction/destruction
 	scv_rom64_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
-	
+
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read_cart);
 	virtual DECLARE_WRITE8_MEMBER(write_bank);
@@ -100,15 +100,15 @@ class scv_rom128_device : public scv_rom8_device
 public:
 	// construction/destruction
 	scv_rom128_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
-	
+
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read_cart);
 	virtual DECLARE_WRITE8_MEMBER(write_bank);
-	
+
 private:
 	UINT8 m_bank_base;
 };
@@ -121,16 +121,16 @@ class scv_rom128ram4_device : public scv_rom8_device
 public:
 	// construction/destruction
 	scv_rom128ram4_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
-	
+
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read_cart);
 	virtual DECLARE_WRITE8_MEMBER(write_cart);
 	virtual DECLARE_WRITE8_MEMBER(write_bank);
-	
+
 private:
 	UINT8 m_bank_base, m_ram_enabled;
 };

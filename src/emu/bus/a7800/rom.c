@@ -10,7 +10,7 @@
  - 9 banks or not
  etc...
  But we might merge many of these if they become too many
- 
+
  TODO:
  - Are POKEY regs readable somewhere in SG 144K + POKEY homebrew? How do they detect
    the POKEY otherwise?!?
@@ -232,11 +232,11 @@ READ8_MEMBER(a78_rom_device::read_40xx)
 /*-------------------------------------------------
 
  Carts with no bankswitch + POKEY chip
- The Pokey chips is accessed by writing at 
+ The Pokey chips is accessed by writing at
  0x4000-0x7fff.
- 
+
  GAMES: Ballblazer, Beef Drop (homebrew)
- 
+
  -------------------------------------------------*/
 
 READ8_MEMBER(a78_rom_pokey_device::read_40xx)
@@ -274,19 +274,19 @@ machine_config_constructor a78_rom_pokey_device::device_mconfig_additions() cons
  some test is run)
  Note that the code is written so that also
  homebrew games with larger ROMs work!
- 
+
  GAMES: Crack'd, Fatal Run, Ikari Warriors...
- 
+
  -------------------------------------------------*/
 
 READ8_MEMBER(a78_rom_sg_device::read_40xx)
 {
 	if (offset < 0x4000)
-		return m_rom[(offset & 0x3fff) + ((m_bank_mask - 1) * 0x4000)];	// second to last bank (is this always ok?!?)
+		return m_rom[(offset & 0x3fff) + ((m_bank_mask - 1) * 0x4000)]; // second to last bank (is this always ok?!?)
 	else if (offset < 0x8000)
 		return m_rom[(offset & 0x3fff) + (m_bank * 0x4000)];
 	else
-		return m_rom[(offset & 0x3fff) + (m_bank_mask * 0x4000)];	// last bank
+		return m_rom[(offset & 0x3fff) + (m_bank_mask * 0x4000)];   // last bank
 }
 
 WRITE8_MEMBER(a78_rom_sg_device::write_40xx)
@@ -300,9 +300,9 @@ WRITE8_MEMBER(a78_rom_sg_device::write_40xx)
 
  Carts with SuperGame bankswitch + POKEY chip
  As above + Pokey chip access
- 
+
  GAMES: Commando
- 
+
  -------------------------------------------------*/
 
 READ8_MEMBER(a78_rom_sg_pokey_device::read_40xx)
@@ -312,7 +312,7 @@ READ8_MEMBER(a78_rom_sg_pokey_device::read_40xx)
 	else if (offset < 0x8000)
 		return m_rom[(offset & 0x3fff) + (m_bank * 0x4000)];
 	else
-		return m_rom[(offset & 0x3fff) + (m_bank_mask * 0x4000)];	// last bank
+		return m_rom[(offset & 0x3fff) + (m_bank_mask * 0x4000)];   // last bank
 }
 
 WRITE8_MEMBER(a78_rom_sg_pokey_device::write_40xx)
@@ -332,12 +332,12 @@ machine_config_constructor a78_rom_sg_pokey_device::device_mconfig_additions() c
 /*-------------------------------------------------
 
  Carts with SuperGame bankswitch + 16K RAM
- FIXME: Some games contained only 8K of RAM, but 
+ FIXME: Some games contained only 8K of RAM, but
  for the moment we treat all as 16K of RAM even if
  from softlist we shall differentiate between them.
- 
+
  GAMES: Impossible Mission, Jinks and some protos
- 
+
  -------------------------------------------------*/
 
 READ8_MEMBER(a78_rom_sg_ram_device::read_40xx)
@@ -347,7 +347,7 @@ READ8_MEMBER(a78_rom_sg_ram_device::read_40xx)
 	else if (offset < 0x8000)
 		return m_rom[(offset & 0x3fff) + (m_bank * 0x4000)];
 	else
-		return m_rom[(offset & 0x3fff) + (m_bank_mask * 0x4000)];	// last bank
+		return m_rom[(offset & 0x3fff) + (m_bank_mask * 0x4000)];   // last bank
 }
 
 WRITE8_MEMBER(a78_rom_sg_ram_device::write_40xx)
@@ -364,11 +364,11 @@ WRITE8_MEMBER(a78_rom_sg_ram_device::write_40xx)
  Carts with SuperGame bankswitch 9banks:
  9 x 16K banks mappable in 0x8000-0xbfff
  bank 7 is always mapped in 0xc000-0xffff
- 
- GAMES: Alien Brigade & Crossbow + some homebrew 
- like Donkey Kong XM demo, Bentley Bear's Crystal 
+
+ GAMES: Alien Brigade & Crossbow + some homebrew
+ like Donkey Kong XM demo, Bentley Bear's Crystal
  Quest
- 
+
  -------------------------------------------------*/
 
 READ8_MEMBER(a78_rom_sg9_device::read_40xx)
@@ -378,7 +378,7 @@ READ8_MEMBER(a78_rom_sg9_device::read_40xx)
 	else if (offset < 0x8000)
 		return m_rom[(offset & 0x3fff) + (m_bank * 0x4000)];
 	else
-		return m_rom[(offset & 0x3fff) + ((m_bank_mask + 1) * 0x4000)];	// last bank
+		return m_rom[(offset & 0x3fff) + ((m_bank_mask + 1) * 0x4000)]; // last bank
 }
 
 WRITE8_MEMBER(a78_rom_sg9_device::write_40xx)
@@ -388,14 +388,14 @@ WRITE8_MEMBER(a78_rom_sg9_device::write_40xx)
 }
 
 /*-------------------------------------------------
- 
+
  Carts with Absolute bankswitch:
  64K games. Lower 32K are 2 banks of 16K to be mapped
  in 0x4000-0x7fff, depending on the value written
  at 0x8000. Higher 32K are fixed in 0x8000-0xffff
- 
+
  GAMES: F-18 Hornet
- 
+
  -------------------------------------------------*/
 
 READ8_MEMBER(a78_rom_abs_device::read_40xx)
@@ -431,9 +431,9 @@ WRITE8_MEMBER(a78_rom_abs_device::write_40xx)
  0x6000-0x7fff first 8kb of bank 6
  0x8000-0x9fff second 8kb of bank 7
  0xe000-0xffff first 8kb of bank 7
- 
+
  GAMES: Double Dragon, Rampage.
- 
+
  -------------------------------------------------*/
 
 READ8_MEMBER(a78_rom_act_device::read_40xx)
@@ -495,4 +495,3 @@ machine_config_constructor a78_rom_p450_sg9_device::device_mconfig_additions() c
 {
 	return MACHINE_CONFIG_NAME( a78_pokey450 );
 }
-

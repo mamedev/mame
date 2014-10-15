@@ -98,10 +98,10 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
-	
+
 	required_shared_ptr<UINT8> m_videoram;
 	required_shared_ptr<UINT8> m_workram;
-	
+
 	tilemap_t   *m_text_tilemap;
 	tilemap_t   *m_starfield_tilemap;
 	UINT8       m_regs[0x28];

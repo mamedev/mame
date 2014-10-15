@@ -52,7 +52,7 @@ public:
 	UINT8 m_schaser_background_disable;
 	UINT8 m_schaser_background_select;
 	UINT16 m_claybust_gun_pos;
-	
+
 	int m_invmulti_bank;
 
 

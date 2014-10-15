@@ -102,7 +102,7 @@ inline void apple2_state::apple2_plot_text_character(bitmap_ind16 &bitmap, int x
 		switch (m_sysconfig->read() & 0x03)
 		{
 			case 0:
-				break;	// leave alone
+				break;  // leave alone
 
 			case 1:
 				if ((m_machinetype == APPLE_II) || (m_machinetype == LABA2P) || (m_machinetype == SPACE84))
@@ -182,7 +182,7 @@ inline void apple2_state::apple2_plot_text_character(bitmap_ind16 &bitmap, int x
 
 				for (i = 0; i < xscale; i++)
 				{
-					bitmap.pix16(ypos + y, xpos + (x * xscale) + i) = color; 
+					bitmap.pix16(ypos + y, xpos + (x * xscale) + i) = color;
 				}
 			}
 		}
@@ -352,7 +352,7 @@ void apple2_state::apple2_hires_draw(bitmap_ind16 &bitmap, const rectangle &clip
 					{
 						case 0:
 							artifact_map_ptr = &m_hires_artifact_map[((vram_row[col+1] & 0x80) >> 7) * 16];
-							for (b = 0; b < 7; b++) 
+							for (b = 0; b < 7; b++)
 							{
 								v = artifact_map_ptr[((w >> (b + 7-1)) & 0x07) | (((b ^ col) & 0x01) << 3)];
 								*(p++) = v;
@@ -362,7 +362,7 @@ void apple2_state::apple2_hires_draw(bitmap_ind16 &bitmap, const rectangle &clip
 
 						case 1:
 							w >>= 7;
-							for (b = 0; b < 7; b++) 
+							for (b = 0; b < 7; b++)
 							{
 								v = (w & 1);
 								w >>= 1;
@@ -373,7 +373,7 @@ void apple2_state::apple2_hires_draw(bitmap_ind16 &bitmap, const rectangle &clip
 
 						case 2:
 							w >>= 7;
-							for (b = 0; b < 7; b++) 
+							for (b = 0; b < 7; b++)
 							{
 								v = (w & 1);
 								w >>= 1;
@@ -384,7 +384,7 @@ void apple2_state::apple2_hires_draw(bitmap_ind16 &bitmap, const rectangle &clip
 
 						case 3:
 							w >>= 7;
-							for (b = 0; b < 7; b++) 
+							for (b = 0; b < 7; b++)
 							{
 								v = (w & 1);
 								w >>= 1;
@@ -411,7 +411,7 @@ void apple2_state::apple2_hires_draw(bitmap_ind16 &bitmap, const rectangle &clip
 						switch (mon_type)
 						{
 							case 0:
-								for (b = 0; b < 7; b++) 
+								for (b = 0; b < 7; b++)
 								{
 									v = m_dhires_artifact_map[((((w >> (b + 7-1)) & 0x0F) * 0x11) >> (((2-(col*7+b))) & 0x03)) & 0x0F];
 									*(p++) = v;

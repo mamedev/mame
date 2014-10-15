@@ -85,7 +85,7 @@ public:
 		m_priority_buffer(*this, "priority_buffer"),
 		m_sprregs(*this, "sprregs"),
 		m_sprite_bitmap_1(1024, 1024)
-		
+
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -94,14 +94,14 @@ public:
 	required_device<kaneko_grap2_device> m_grap2_2;
 	required_device<palette_device> m_palette;
 	required_device<sknsspr_device> m_spritegen;
-	
+
 	required_shared_ptr<UINT16> m_paletteram;
 	optional_shared_ptr<UINT16> m_spriteram;
 	required_shared_ptr<UINT16> m_priority_buffer;
 	required_shared_ptr<UINT16> m_sprregs;
 
 	bitmap_ind16 m_sprite_bitmap_1;
-	
+
 	UINT16 m_priority_buffer_scrollx;
 	UINT16 m_priority_buffer_scrolly;
 

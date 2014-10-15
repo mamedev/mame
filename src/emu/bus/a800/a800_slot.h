@@ -20,11 +20,11 @@ enum
 	A800_OSSM091,
 	A800_OSS8K,
 	A800_PHOENIX,
-	A800_XEGS,   
-	A800_BBSB,   
+	A800_XEGS,
+	A800_BBSB,
 	A800_DIAMOND,
 	A800_WILLIAMS,
-	A800_EXPRESS, 
+	A800_EXPRESS,
 	A800_SPARTADOS,
 	A800_BLIZZARD,
 	A800_TURBO64,
@@ -71,7 +71,7 @@ protected:
 	UINT8 *m_rom;
 	UINT32 m_rom_size;
 	dynamic_buffer m_ram;
-	dynamic_buffer m_nvram;	// HiScore cart can save scores!
+	dynamic_buffer m_nvram; // HiScore cart can save scores!
 	// helpers
 	int m_bank_mask;
 };
@@ -101,7 +101,7 @@ public:
 	int get_cart_type() { return m_type; };
 	int identify_cart_type(UINT8 *header);
 	bool has_cart() { return m_cart != NULL; }
-	
+
 	virtual iodevice_t image_type() const { return IO_CARTSLOT; }
 	virtual bool is_readable()  const { return 1; }
 	virtual bool is_writeable() const { return 0; }
@@ -120,7 +120,7 @@ public:
 	virtual DECLARE_READ8_MEMBER(read_d5xx);
 	virtual DECLARE_WRITE8_MEMBER(write_80xx);
 	virtual DECLARE_WRITE8_MEMBER(write_d5xx);
-	
+
 private:
 	device_a800_cart_interface*       m_cart;
 	int m_type;
@@ -138,9 +138,9 @@ public:
 	// construction/destruction
 	a5200_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	virtual ~a5200_cart_slot_device();
-	
+
 	virtual const char *file_extensions() const { return "bin,rom,car,a52"; }
-	
+
 	// slot interface overrides
 	virtual void get_default_card_software(astring &result);
 };
@@ -155,7 +155,7 @@ public:
 	virtual ~xegs_cart_slot_device();
 
 	virtual const char *file_extensions() const { return "bin,rom,car"; }
-	
+
 	// slot interface overrides
 	virtual void get_default_card_software(astring &result);
 };

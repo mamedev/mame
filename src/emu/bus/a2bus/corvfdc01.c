@@ -3,10 +3,10 @@
     corvfdc01.c
 
     Implemention of the Corvus Systems CORVUS01 floppy controller
- 
+
     Boot PROM 0.8 fixes this at: 8", 500 blocks total, 128 bytes/block,
-							     26 sectors/track, 77 tracks.
- 
+                                 26 sectors/track, 77 tracks.
+
 *********************************************************************/
 
 #include "corvfdc01.h"
@@ -21,8 +21,8 @@
 
 const device_type A2BUS_CORVFDC01 = &device_creator<a2bus_corvfdc01_device>;
 
-#define FDC01_ROM_REGION	"fdc01_rom"
-#define FDC01_FDC_TAG		"fdc01_fdc"
+#define FDC01_ROM_REGION    "fdc01_rom"
+#define FDC01_FDC_TAG       "fdc01_fdc"
 
 FLOPPY_FORMATS_MEMBER( a2bus_corvfdc01_device::corv_floppy_formats )
 	FLOPPY_IMD_FORMAT
@@ -161,7 +161,7 @@ UINT8 a2bus_corvfdc01_device::read_c0nx(address_space &space, UINT8 offset)
 {
 	switch (offset)
 	{
-		case 0:	// local status
+		case 0: // local status
 			if (m_curfloppy)
 			{
 				m_fdc_local_status &= ~LS_DSKCHG_mask;
@@ -169,7 +169,7 @@ UINT8 a2bus_corvfdc01_device::read_c0nx(address_space &space, UINT8 offset)
 			}
 			return m_fdc_local_status | LS_8IN_mask;
 
-		case  8:	// WD1793 at 8-11
+		case  8:    // WD1793 at 8-11
 			return m_wdfdc->status_r(space, offset);
 
 		case  9:
@@ -225,7 +225,7 @@ void a2bus_corvfdc01_device::write_c0nx(address_space &space, UINT8 offset, UINT
 			if (m_curfloppy != NULL)
 			{
 				// side select
-				m_curfloppy->ss_w((data & LC_FLPSD1_mask) != 0); 
+				m_curfloppy->ss_w((data & LC_FLPSD1_mask) != 0);
 
 				// motor control (active low)
 				m_curfloppy->mon_w((data & LC_MOTOROF_mask) ? 1 : 0);
@@ -278,4 +278,3 @@ WRITE_LINE_MEMBER(a2bus_corvfdc01_device::drq_w)
 	else
 		m_fdc_local_status &= ~LS_DRQ_mask;
 }
-

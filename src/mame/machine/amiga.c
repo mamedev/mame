@@ -358,7 +358,7 @@ TIMER_CALLBACK_MEMBER( amiga_state::scanline_callback )
 			m_pot1y += !(m_potgo_port->read() & 0x4000);
 		}
 	}
-	
+
 	// render up to this scanline
 	if (!m_screen->update_partial(scanline))
 	{

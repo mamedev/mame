@@ -351,24 +351,24 @@ ROM_END
 DRIVER_INIT_MEMBER(speedbal_state,musicbal)
 {
 	UINT8* rom = memregion("maincpu")->base();
-    
-    const UINT8 xorTable[8] = {0x05, 0x06, 0x84, 0x84, 0x00, 0x87, 0x84, 0x84};     // XORs affecting bits #0, #1, #2 & #7
-    const int swapTable[4][4] = {                                                   // 4 possible swaps affecting bits #0, #1, #2 & #7
-        {1,0,7,2},
-        {2,7,0,1},
-        {7,2,1,0},
-        {0,2,1,7}
-    };
-    
+
+	const UINT8 xorTable[8] = {0x05, 0x06, 0x84, 0x84, 0x00, 0x87, 0x84, 0x84};     // XORs affecting bits #0, #1, #2 & #7
+	const int swapTable[4][4] = {                                                   // 4 possible swaps affecting bits #0, #1, #2 & #7
+		{1,0,7,2},
+		{2,7,0,1},
+		{7,2,1,0},
+		{0,2,1,7}
+	};
+
 	for (int i=0;i<0x8000;i++)
 	{
-        int addIdx = BIT(i,3)^(BIT(i,5)<<1)^(BIT(i,9)<<2);  // 3 bits of address...
-        int xorMask = xorTable[addIdx];                     // ... control the xor...
-        int bswIdx = xorMask & 3;                           // ... and the bitswap
+		int addIdx = BIT(i,3)^(BIT(i,5)<<1)^(BIT(i,9)<<2);  // 3 bits of address...
+		int xorMask = xorTable[addIdx];                     // ... control the xor...
+		int bswIdx = xorMask & 3;                           // ... and the bitswap
 
-        // only bits #0, #1, #2 & #7 are affected
-        rom[i] = BITSWAP8(rom[i], swapTable[bswIdx][3], 6,5,4,3, swapTable[bswIdx][2], swapTable[bswIdx][1], swapTable[bswIdx][0]) ^ xorTable[addIdx];
-    }
+		// only bits #0, #1, #2 & #7 are affected
+		rom[i] = BITSWAP8(rom[i], swapTable[bswIdx][3], 6,5,4,3, swapTable[bswIdx][2], swapTable[bswIdx][1], swapTable[bswIdx][0]) ^ xorTable[addIdx];
+	}
 
 	DRIVER_INIT_CALL(speedbal);
 }

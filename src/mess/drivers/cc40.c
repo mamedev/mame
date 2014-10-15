@@ -51,7 +51,7 @@
   provided that the machine is turned off properly. If a program is running,
   you may have to press [BREAK] before turning the CC-40 off. If RAM contents
   ends up dodgy somehow, just delete the nvram files.
-  
+
   Officially, minimum total RAM size is 6KB. The system will still boot with less,
   but don't expect all software to work properly.
 
@@ -114,7 +114,7 @@ public:
 	UINT8 m_clock_control;
 	UINT8 m_clock_divider;
 	UINT8 m_key_select;
-	
+
 	UINT8 *m_sysram[2];
 	UINT16 m_sysram_size[2];
 	UINT16 m_sysram_end[2];
@@ -165,8 +165,8 @@ DEVICE_IMAGE_LOAD_MEMBER(cc40_state, cc40_cartridge)
 		return IMAGE_INIT_FAIL;
 	}
 
-	m_cart->rom_alloc(0x20000, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);	// allocate a larger ROM region to have 4x32K banks
-	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");			
+	m_cart->rom_alloc(0x20000, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);  // allocate a larger ROM region to have 4x32K banks
+	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
 
 	return IMAGE_INIT_PASS;
 }
@@ -265,7 +265,7 @@ WRITE8_MEMBER(cc40_state::bus_control_w)
 	m_sysram_mask[0] = d3 - 1;
 	m_sysram_end[1] = d3 + d2;
 	m_sysram_mask[1] = d2 - 1;
-	
+
 	// d4,d5: cartridge memory addressing
 	// 00: 2K @ $5000-$57ff & $5800-$5fff
 	// 01: 8K @ $5000-$6fff & $7000-$8fff
@@ -524,12 +524,12 @@ void cc40_state::init_sysram(int chip, UINT16 size)
 		// init to largest possible
 		m_sysram[chip] = auto_alloc_array(machine(), UINT8, 0x2000);
 		save_pointer(NAME(m_sysram[chip]), 0x2000, chip);
-		
+
 		save_item(NAME(m_sysram_size[chip]), chip);
 		save_item(NAME(m_sysram_end[chip]), chip);
 		save_item(NAME(m_sysram_mask[chip]), chip);
 	}
-	
+
 	m_nvram[chip]->set_base(m_sysram[chip], size);
 	m_sysram_size[chip] = size;
 }

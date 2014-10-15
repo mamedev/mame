@@ -6,7 +6,7 @@ driver by smf and R. Belmont
 
 TODO:
 
-dvd check for bmiidx, bmiidxa, bmiidxc & bmiidxca 
+dvd check for bmiidx, bmiidxa, bmiidxc & bmiidxca
 finish sound board emulation and remove response hle
 emulate dvd player and video mixing
 16seg led font
@@ -1038,7 +1038,7 @@ static MACHINE_CONFIG_START( twinkle, twinkle_state )
 
 	MCFG_DEVICE_ADD("rs232", RS232_PORT, 0)
 	MCFG_SLOT_OPTION_ADD("xvd701", JVC_XVD701)
-//	MCFG_SLOT_OPTION_ADD("xvs1100", JVC_XVS1100) // 8th mix only
+//  MCFG_SLOT_OPTION_ADD("xvs1100", JVC_XVS1100) // 8th mix only
 	MCFG_SLOT_DEFAULT_OPTION("xvd701")
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("fdc37c665gt:uart2", ins8250_uart_device, rx_w))
 	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("fdc37c665gt:uart2", ins8250_uart_device, dcd_w))

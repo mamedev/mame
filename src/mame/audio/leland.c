@@ -257,7 +257,7 @@ void leland_80186_sound_device::device_start()
 	save_item(NAME(m_ext_active));
 	save_item(NAME(m_dac_sample));
 	save_item(NAME(m_dac_volume));
-	
+
 	// zerofill
 	m_peripheral = 0;
 	m_last_control = 0;
@@ -566,7 +566,7 @@ WRITE16_MEMBER( leland_80186_sound_device::ataxx_dac_control )
 			if (ACCESSING_BITS_0_7)
 				dac_w(space, 1, data, mem_mask);
 			return;
-		
+
 		default:
 			break;
 	}
@@ -599,7 +599,7 @@ WRITE16_MEMBER( leland_80186_sound_device::ataxx_dac_control )
 				m_ext_stop <<= 4;
 				if (LOG_EXTERN) logerror("External DAC stop = %05X\n", m_ext_stop);
 				return;
-			
+
 			default:
 				break;
 		}

@@ -4,18 +4,18 @@
 
 
  Generic ROM emulation (for carts and ROM sockets)
- 
+
  This offers generic access to a ROM
- 
+
  generic_rom_plain  : returns 0xff when the system reads beyond the end of the ROM
  generic_rom_linear : maps linearly the ROM in the accessed area (i.e., read offset is masked with (ROM size - 1) )
 
  generic_romram_plain  : allows support for carts always containing ROM + RAM (e.g. X07)
 
- 
+
  TODO:
    - possibly support linear mapping when non-power of 2 ROMs are mapped
- 
+
  ***********************************************************************************************************/
 
 
@@ -120,4 +120,3 @@ WRITE8_MEMBER(generic_romram_plain_device::write_ram)
 	if (offset < m_ram.bytes())
 		m_ram[offset] = data;
 }
-

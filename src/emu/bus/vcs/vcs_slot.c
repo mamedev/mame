@@ -186,14 +186,14 @@ bool vcs_cart_slot_device::call_load()
 	{
 		UINT8 *ROM;
 		UINT32 len;
-		
+
 		if (software_entry() != NULL)
 			len = get_software_region_length("rom");
 		else
 			len = length();
-		
+
 		//printf("Size: 0x%X\n", len);
-		
+
 		// check that filesize is among the supported ones
 		switch (len)
 		{
@@ -208,21 +208,21 @@ bool vcs_cart_slot_device::call_load()
 			case 0x10000:
 			case 0x80000:
 				break;
-				
+
 			default:
 				seterror(IMAGE_ERROR_UNSUPPORTED, "Invalid rom file size" );
 				return IMAGE_INIT_FAIL;
 		}
-		
+
 		m_cart->rom_alloc(len, tag());
 		ROM = m_cart->get_rom_base();
-		
+
 		if (software_entry() != NULL)
 		{
 			const char *pcb_name;
 			bool has_ram = get_software_region("ram") ? TRUE : FALSE;
 			memcpy(ROM, get_software_region("rom"), len);
-			
+
 			if ((pcb_name = get_feature("slot")) != NULL)
 				m_type = vcs_get_pcb_id(pcb_name);
 			else
@@ -272,7 +272,7 @@ bool vcs_cart_slot_device::call_load()
 		{
 			fread(ROM, len);
 			m_type = identify_cart_type(ROM, len);
-			
+
 			// check for Special Chip (128bytes of RAM)
 			if (len == 0x2000 || len == 0x4000 || len == 0x8000)
 				if (detect_super_chip(ROM, len))
@@ -284,7 +284,7 @@ bool vcs_cart_slot_device::call_load()
 			// dig dig, crystal castles, millipede, stargate, defender ii, jr. Pac Man,
 			// desert falcon, dark chambers, super football, sprintmaster, fatal run,
 			// off the wall, shooting arcade, secret quest, radar lock, save mary, klax
-			
+
 			// add CBS RAM+ (256bytes of RAM)
 			if (m_type == A26_FA)
 				m_cart->ram_alloc(0x100);
@@ -301,16 +301,16 @@ bool vcs_cart_slot_device::call_load()
 			else if (m_type == A26_3E)
 				m_cart->ram_alloc(0x8000);
 		}
-		
+
 		//printf("Type: %s\n", vcs_get_slot(m_type));
-		
+
 		// pass a pointer to the now allocated ROM for the DPC chip
 		if (m_type == A26_DPC)
 			m_cart->setup_addon_ptr((UINT8 *)m_cart->get_rom_base() + 0x2000);
-		
+
 		return IMAGE_INIT_PASS;
 	}
-	
+
 	return IMAGE_INIT_PASS;
 }
 
@@ -356,7 +356,7 @@ int vcs_cart_slot_device::detect_modeDC(UINT8 *cart, UINT32 len)
 			}
 		}
 	}
-	if (numfound) 
+	if (numfound)
 		return 1;
 	return 0;
 }
@@ -376,7 +376,7 @@ int vcs_cart_slot_device::detect_modeF6(UINT8 *cart, UINT32 len)
 			}
 		}
 	}
-	if (numfound) 
+	if (numfound)
 		return 1;
 	return 0;
 }
@@ -408,7 +408,7 @@ int vcs_cart_slot_device::detect_mode3E(UINT8 *cart, UINT32 len)
 			}
 		}
 	}
-	if (numfound) 
+	if (numfound)
 		return 1;
 	return 0;
 }
@@ -428,7 +428,7 @@ int vcs_cart_slot_device::detect_modeSS(UINT8 *cart, UINT32 len)
 			}
 		}
 	}
-	if (numfound) 
+	if (numfound)
 		return 1;
 	return 0;
 }
@@ -456,7 +456,7 @@ int vcs_cart_slot_device::detect_modeFE(UINT8 *cart, UINT32 len)
 			}
 		}
 	}
-	if (numfound) 
+	if (numfound)
 		return 1;
 	return 0;
 }
@@ -486,7 +486,7 @@ int vcs_cart_slot_device::detect_modeE0(UINT8 *cart, UINT32 len)
 			}
 		}
 	}
-	if (numfound) 
+	if (numfound)
 		return 1;
 	return 0;
 }
@@ -512,7 +512,7 @@ int vcs_cart_slot_device::detect_modeCV(UINT8 *cart, UINT32 len)
 			}
 		}
 	}
-	if (numfound) 
+	if (numfound)
 		return 1;
 	return 0;
 }
@@ -535,7 +535,7 @@ int vcs_cart_slot_device::detect_modeFV(UINT8 *cart, UINT32 len)
 			}
 		}
 	}
-	if (numfound) 
+	if (numfound)
 		return 1;
 	return 0;
 }
@@ -561,7 +561,7 @@ int vcs_cart_slot_device::detect_modeJVP(UINT8 *cart, UINT32 len)
 			}
 		}
 	}
-	if (numfound) 
+	if (numfound)
 		return 1;
 	return 0;
 }
@@ -587,7 +587,7 @@ int vcs_cart_slot_device::detect_modeE7(UINT8 *cart, UINT32 len)
 			}
 		}
 	}
-	if (numfound) 
+	if (numfound)
 		return 1;
 	return 0;
 }
@@ -607,7 +607,7 @@ int vcs_cart_slot_device::detect_modeUA(UINT8 *cart, UINT32 len)
 			}
 		}
 	}
-	if (numfound) 
+	if (numfound)
 		return 1;
 	return 0;
 }
@@ -633,7 +633,7 @@ int vcs_cart_slot_device::detect_8K_mode3F(UINT8 *cart, UINT32 len)
 			}
 		}
 	}
-	if (numfound == 0x03) 
+	if (numfound == 0x03)
 		return 1;
 	return 0;
 }
@@ -653,7 +653,7 @@ int vcs_cart_slot_device::detect_32K_mode3F(UINT8 *cart, UINT32 len)
 			}
 		}
 	}
-	if (numfound > 1) 
+	if (numfound > 1)
 		return 1;
 	return 0;
 }
@@ -705,33 +705,33 @@ int vcs_cart_slot_device::identify_cart_type(UINT8 *ROM, UINT32 len)
 	int type = 0xff;
 
 	// auto-detect bank mode
-	if (detect_modeDC(ROM, len)) 
+	if (detect_modeDC(ROM, len))
 		type = A26_DC;
-	else if (detect_mode3E(ROM, len)) 
+	else if (detect_mode3E(ROM, len))
 		type = A26_3E;
-	else if (detect_modeFE(ROM, len)) 
+	else if (detect_modeFE(ROM, len))
 		type = A26_FE;
-	else if (detect_modeSS(ROM, len)) 
+	else if (detect_modeSS(ROM, len))
 		type = A26_SS;
-	else if (detect_modeE0(ROM, len)) 
+	else if (detect_modeE0(ROM, len))
 		type = A26_E0;
 	else if (detect_modeCV(ROM, len))
 		type = A26_CV;
-	else if (detect_modeFV(ROM, len)) 
+	else if (detect_modeFV(ROM, len))
 		type = A26_FV;
-	else if (detect_modeJVP(ROM, len)) 
+	else if (detect_modeJVP(ROM, len))
 		type = A26_JVP;
-	else if (detect_modeUA(ROM, len)) 
+	else if (detect_modeUA(ROM, len))
 		type = A26_UA;
-	else if (detect_8K_mode3F(ROM, len)) 
+	else if (detect_8K_mode3F(ROM, len))
 		type = A26_3F;
-	else if (detect_32K_mode3F(ROM, len)) 
+	else if (detect_32K_mode3F(ROM, len))
 		type = A26_3F;
-	else if (detect_modeE7(ROM, len)) 
+	else if (detect_modeE7(ROM, len))
 		type = A26_E7;
 	else if (detect_snowhite(ROM, len))
 		type = A26_F8SW;
-	
+
 	// otherwise, choose based on size
 	if (type == 0xff)
 	{
@@ -771,7 +771,7 @@ int vcs_cart_slot_device::identify_cart_type(UINT8 *ROM, UINT32 len)
 				break;
 		}
 	}
-	
+
 	return type;
 }
 
@@ -787,14 +787,14 @@ void vcs_cart_slot_device::get_default_card_software(astring &result)
 		UINT32 len = core_fsize(m_file);
 		dynamic_buffer rom(len);
 		int type;
-		
+
 		core_fread(m_file, rom, len);
-		
+
 		type = identify_cart_type(rom, len);
 		slot_string = vcs_get_slot(type);
-		
+
 		clear();
-		
+
 		result.cpy(slot_string);
 	}
 	else

@@ -1275,4 +1275,3 @@ WRITE_LINE_MEMBER(apple3_state::a2bus_nmi_w)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, state);
 	}
 }
-

@@ -17,12 +17,12 @@ public:
 	// construction/destruction
 	a78_xboard_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 	a78_xboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	// device-level overrides
 	virtual void device_start();
 	virtual machine_config_constructor device_mconfig_additions() const;
 	virtual void device_reset();
-	
+
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read_04xx);
 	virtual DECLARE_WRITE8_MEMBER(write_04xx);
@@ -43,19 +43,19 @@ class a78_xm_device : public a78_xboard_device
 public:
 	// construction/destruction
 	a78_xm_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	// device-level overrides
 	virtual void device_start();
 	virtual machine_config_constructor device_mconfig_additions() const;
 	virtual void device_reset();
-	
+
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read_04xx);
 	virtual DECLARE_WRITE8_MEMBER(write_04xx);
 	virtual DECLARE_READ8_MEMBER(read_10xx);
 	virtual DECLARE_WRITE8_MEMBER(write_10xx);
 	virtual DECLARE_READ8_MEMBER(read_30xx);
-	
+
 protected:
 	required_device<ym2151_device> m_ym;
 	int m_ym_enabled;

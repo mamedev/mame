@@ -19,7 +19,7 @@ struct df_t {
 	UINT8   osc_clk;        /* Only used by data fetchers 5,6, and 7 */
 };
 
-//	m_dpc.oscillator = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(a2600_state::modeDPC_timer_callback),this));
+//  m_dpc.oscillator = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(a2600_state::modeDPC_timer_callback),this));
 
 class dpc_device : public device_t
 {
@@ -74,16 +74,16 @@ public:
 	virtual void device_reset();
 
 	required_device<dpc_device> m_dpc;
-	
+
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read_rom);
 	virtual DECLARE_WRITE8_MEMBER(write_bank);
 	virtual DECLARE_DIRECT_UPDATE_MEMBER(cart_opbase);
 
 	virtual void setup_addon_ptr(UINT8 *ptr);
-	
+
 protected:
-//	int m_reset_bank;
+//  int m_reset_bank;
 };
 
 

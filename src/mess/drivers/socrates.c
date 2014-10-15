@@ -319,7 +319,7 @@ void socrates_state::machine_reset()
 {
 	astring region_tag;
 	m_cart_reg = memregion(region_tag.cpy(m_cart->tag()).cat(GENERIC_ROM_REGION_TAG));
-	
+
 	m_rom_bank = 0xF3; // actually set semi-randomly on real console but we need to initialize it somewhere...
 	socrates_set_rom_bank();
 	m_ram_bank = 0;  // the actual console sets it semi randomly on power up, and the bios cleans it up.
@@ -898,7 +898,7 @@ void iqunlim_state::machine_start()
 {
 	astring region_tag;
 	m_cart_reg = memregion(region_tag.cpy(m_cart->tag()).cat(GENERIC_ROM_REGION_TAG));
-	
+
 	UINT8 *bios = m_bios_reg->base();
 	UINT8 *cart = m_cart_reg ? m_cart_reg->base() : m_bios_reg->base();
 	UINT8 *ram  = m_vram_reg->base();

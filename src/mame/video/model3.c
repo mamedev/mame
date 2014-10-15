@@ -3,7 +3,7 @@
 #include "video/rgbutil.h"
 #include "includes/model3.h"
 
-#define ENABLE_BILINEAR		1
+#define ENABLE_BILINEAR     1
 
 #define TRI_PARAM_TEXTURE_PAGE          0x1
 #define TRI_PARAM_TEXTURE_MIRROR_U      0x2
@@ -27,7 +27,7 @@ public:
 		: poly_manager<float, model3_polydata, 6, 50000>(state.machine())//, m_state(state)
 	{
 		m_fb = auto_bitmap_rgb32_alloc(state.machine(), width, height);
-		m_zb = auto_bitmap_ind32_alloc(state.machine(), width, height);		
+		m_zb = auto_bitmap_ind32_alloc(state.machine(), width, height);
 	}
 
 	void draw(bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -67,61 +67,61 @@ void model3_state::model3_exit()
 	FILE* file;
 	int i;
 	file = fopen("m3_texture_ram.bin","wb");
-    for (i=0; i < 0x200000; i++)
-    {
-        fputc((UINT8)(m_texture_ram[0][i] >> 8), file);
-        fputc((UINT8)(m_texture_ram[0][i] >> 0), file);
-    }
 	for (i=0; i < 0x200000; i++)
-    {
-        fputc((UINT8)(m_texture_ram[1][i] >> 8), file);
-        fputc((UINT8)(m_texture_ram[1][i] >> 0), file);
-    }
-    fclose(file);
+	{
+		fputc((UINT8)(m_texture_ram[0][i] >> 8), file);
+		fputc((UINT8)(m_texture_ram[0][i] >> 0), file);
+	}
+	for (i=0; i < 0x200000; i++)
+	{
+		fputc((UINT8)(m_texture_ram[1][i] >> 8), file);
+		fputc((UINT8)(m_texture_ram[1][i] >> 0), file);
+	}
+	fclose(file);
 
-    file = fopen("m3_displist.bin","wb");
-    for (i=0; i < 0x40000; i++)
-    {
-        fputc((UINT8)(m_display_list_ram[i] >> 24), file);
-        fputc((UINT8)(m_display_list_ram[i] >> 16), file);
-        fputc((UINT8)(m_display_list_ram[i] >> 8), file);
-        fputc((UINT8)(m_display_list_ram[i] >> 0), file);
-    }
-    fclose(file);
+	file = fopen("m3_displist.bin","wb");
+	for (i=0; i < 0x40000; i++)
+	{
+		fputc((UINT8)(m_display_list_ram[i] >> 24), file);
+		fputc((UINT8)(m_display_list_ram[i] >> 16), file);
+		fputc((UINT8)(m_display_list_ram[i] >> 8), file);
+		fputc((UINT8)(m_display_list_ram[i] >> 0), file);
+	}
+	fclose(file);
 
 	file = fopen("m3_culling_ram.bin","wb");
-    for (i=0; i < 0x100000; i++)
-    {
-        fputc((UINT8)(m_culling_ram[i] >> 24), file);
-        fputc((UINT8)(m_culling_ram[i] >> 16), file);
-        fputc((UINT8)(m_culling_ram[i] >> 8), file);
-        fputc((UINT8)(m_culling_ram[i] >> 0), file);
-    }
-    fclose(file);
+	for (i=0; i < 0x100000; i++)
+	{
+		fputc((UINT8)(m_culling_ram[i] >> 24), file);
+		fputc((UINT8)(m_culling_ram[i] >> 16), file);
+		fputc((UINT8)(m_culling_ram[i] >> 8), file);
+		fputc((UINT8)(m_culling_ram[i] >> 0), file);
+	}
+	fclose(file);
 
 	file = fopen("m3_polygon_ram.bin","wb");
-    for (i=0; i < 0x100000; i++)
-    {
-        fputc((UINT8)(m_polygon_ram[i] >> 24), file);
-        fputc((UINT8)(m_polygon_ram[i] >> 16), file);
-        fputc((UINT8)(m_polygon_ram[i] >> 8), file);
-        fputc((UINT8)(m_polygon_ram[i] >> 0), file);
-    }
-    fclose(file);
+	for (i=0; i < 0x100000; i++)
+	{
+		fputc((UINT8)(m_polygon_ram[i] >> 24), file);
+		fputc((UINT8)(m_polygon_ram[i] >> 16), file);
+		fputc((UINT8)(m_polygon_ram[i] >> 8), file);
+		fputc((UINT8)(m_polygon_ram[i] >> 0), file);
+	}
+	fclose(file);
 
 	file = fopen("m3_vrom.bin","wb");
-    for (i=0; i < 0x1000000; i++)
-    {
-        fputc((UINT8)(m_vrom[i] >> 24), file);
-        fputc((UINT8)(m_vrom[i] >> 16), file);
-        fputc((UINT8)(m_vrom[i] >> 8), file);
-        fputc((UINT8)(m_vrom[i] >> 0), file);
-    }
-    fclose(file);
+	for (i=0; i < 0x1000000; i++)
+	{
+		fputc((UINT8)(m_vrom[i] >> 24), file);
+		fputc((UINT8)(m_vrom[i] >> 16), file);
+		fputc((UINT8)(m_vrom[i] >> 8), file);
+		fputc((UINT8)(m_vrom[i] >> 0), file);
+	}
+	fclose(file);
 #endif
 
-//	invalidate_texture(0, 0, 0, 6, 5);
-//	invalidate_texture(1, 0, 0, 6, 5);
+//  invalidate_texture(0, 0, 0, 6, 5);
+//  invalidate_texture(1, 0, 0, 6, 5);
 }
 
 void model3_state::video_start()
@@ -197,18 +197,18 @@ void model3_state::video_start()
 	init_matrix_stack();
 }
 
-#define MODEL3_TILE_INFO4(address)	\
+#define MODEL3_TILE_INFO4(address)  \
 do { \
-	UINT16 *tiles = (UINT16*)&m_m3_tile_ram[address + (tile_index / 4)];	\
+	UINT16 *tiles = (UINT16*)&m_m3_tile_ram[address + (tile_index / 4)];    \
 	UINT16 t = BYTE_REVERSE16(tiles[(tile_index & 3) ^ NATIVE_ENDIAN_VALUE_LE_BE(2,0)]); \
 	int tile = ((t << 1) & 0x7ffe) | ((t >> 15) & 0x1); \
 	int color = (t & 0x7ff0) >> 4; \
 	SET_TILE_INFO_MEMBER(0, tile, color, 0); \
 } while (0)
 
-#define MODEL3_TILE_INFO8(address)	\
+#define MODEL3_TILE_INFO8(address)  \
 do { \
-	UINT16 *tiles = (UINT16*)&m_m3_tile_ram[address + (tile_index / 4)];	\
+	UINT16 *tiles = (UINT16*)&m_m3_tile_ram[address + (tile_index / 4)];    \
 	UINT16 t = BYTE_REVERSE16(tiles[(tile_index & 3) ^ NATIVE_ENDIAN_VALUE_LE_BE(2,0)]); \
 	int tile = ((t << 1) & 0x7ffe) | ((t >> 15) & 0x1); \
 	int color = (t & 0x7f00) >> 8; \
@@ -400,48 +400,48 @@ WRITE64_MEMBER(model3_state::model3_tile_w)
 }
 
 /*
-	Video registers:
+    Video registers:
 
-	0xF1180000:			?
-	0xF1180004:			?
-	0xF1180008:			?
+    0xF1180000:         ?
+    0xF1180004:         ?
+    0xF1180008:         ?
 
-	0xF1180010:												VBL IRQ acknowledge
+    0xF1180010:                                             VBL IRQ acknowledge
 
-	0xF1180020:			-------- x------- -------- -------- Layer 3 bitdepth (0 = 8-bit, 1 = 4-bit)
-						-------- -x------ -------- -------- Layer 2 bitdepth (0 = 8-bit, 1 = 4-bit)
-						-------- --x----- -------- -------- Layer 1 bitdepth (0 = 8-bit, 1 = 4-bit)
-						-------- ---x---- -------- -------- Layer 0 bitdepth (0 = 8-bit, 1 = 4-bit)
-						-------- ----x--- -------- -------- Layer 3 priority (0 = below 3D, 1 = above 3D)
-						-------- -----x-- -------- -------- Layer 2 priority (0 = below 3D, 1 = above 3D)
-						-------- ------x- -------- -------- Layer 1 priority (0 = below 3D, 1 = above 3D)
-						-------- -------x -------- -------- Layer 0 priority (0 = below 3D, 1 = above 3D)
+    0xF1180020:         -------- x------- -------- -------- Layer 3 bitdepth (0 = 8-bit, 1 = 4-bit)
+                        -------- -x------ -------- -------- Layer 2 bitdepth (0 = 8-bit, 1 = 4-bit)
+                        -------- --x----- -------- -------- Layer 1 bitdepth (0 = 8-bit, 1 = 4-bit)
+                        -------- ---x---- -------- -------- Layer 0 bitdepth (0 = 8-bit, 1 = 4-bit)
+                        -------- ----x--- -------- -------- Layer 3 priority (0 = below 3D, 1 = above 3D)
+                        -------- -----x-- -------- -------- Layer 2 priority (0 = below 3D, 1 = above 3D)
+                        -------- ------x- -------- -------- Layer 1 priority (0 = below 3D, 1 = above 3D)
+                        -------- -------x -------- -------- Layer 0 priority (0 = below 3D, 1 = above 3D)
 
-	0xF1180040:												Foreground layer color modulation?
-						-------- xxxxxxxx -------- -------- Red component
-						-------- -------- xxxxxxxx -------- Green component
-						-------- -------- -------- xxxxxxxx Blue component
+    0xF1180040:                                             Foreground layer color modulation?
+                        -------- xxxxxxxx -------- -------- Red component
+                        -------- -------- xxxxxxxx -------- Green component
+                        -------- -------- -------- xxxxxxxx Blue component
 
-	0xF1180044:												Background layer color modulation?
-						-------- xxxxxxxx -------- -------- Red component
-						-------- -------- xxxxxxxx -------- Green component
-						-------- -------- -------- xxxxxxxx Blue component
+    0xF1180044:                                             Background layer color modulation?
+                        -------- xxxxxxxx -------- -------- Red component
+                        -------- -------- xxxxxxxx -------- Green component
+                        -------- -------- -------- xxxxxxxx Blue component
 
-	0xF1180060:			x------- -------- -------- -------- Layer 0 enable
-						-------x xxxxxxxx -------- -------- Layer 0 Y scroll position
-						-------- -------- -------x xxxxxxxx Layer 0 X scroll position
+    0xF1180060:         x------- -------- -------- -------- Layer 0 enable
+                        -------x xxxxxxxx -------- -------- Layer 0 Y scroll position
+                        -------- -------- -------x xxxxxxxx Layer 0 X scroll position
 
-	0xF1180064:			x------- -------- -------- -------- Layer 1 enable
-						-------x xxxxxxxx -------- -------- Layer 1 Y scroll position
-						-------- -------- -------x xxxxxxxx Layer 1 X scroll position
+    0xF1180064:         x------- -------- -------- -------- Layer 1 enable
+                        -------x xxxxxxxx -------- -------- Layer 1 Y scroll position
+                        -------- -------- -------x xxxxxxxx Layer 1 X scroll position
 
-	0xF1180068:			x------- -------- -------- -------- Layer 2 enable
-						-------x xxxxxxxx -------- -------- Layer 2 Y scroll position
-						-------- -------- -------x xxxxxxxx Layer 2 X scroll position
+    0xF1180068:         x------- -------- -------- -------- Layer 2 enable
+                        -------x xxxxxxxx -------- -------- Layer 2 Y scroll position
+                        -------- -------- -------x xxxxxxxx Layer 2 X scroll position
 
-	0xF118006C:			x------- -------- -------- -------- Layer 3 enable
-						-------x xxxxxxxx -------- -------- Layer 3 Y scroll position
-						-------- -------- -------x xxxxxxxx Layer 3 X scroll position
+    0xF118006C:         x------- -------- -------- -------- Layer 3 enable
+                        -------x xxxxxxxx -------- -------- Layer 3 Y scroll position
+                        -------- -------- -------x xxxxxxxx Layer 3 X scroll position
 */
 
 
@@ -634,233 +634,233 @@ cached_texture *model3_state::get_texture(int page, int texx, int texy, int texw
 /* Real3D Graphics stuff */
 
 /*
-	Real3D Pro-1000 capabilities:
+    Real3D Pro-1000 capabilities:
 
-	Coordinate sets
-	- 4096 matrices (matrix base pointer in viewport node)
+    Coordinate sets
+    - 4096 matrices (matrix base pointer in viewport node)
 
-	Polygons
-	- 32MB max polygon memory. VROM in Model 3, the low 4MB of VROM is overlaid by Polygon RAM for runtime generated content.
+    Polygons
+    - 32MB max polygon memory. VROM in Model 3, the low 4MB of VROM is overlaid by Polygon RAM for runtime generated content.
 
-	Texture
-	- 2 texture sheets of 2048x1024
-	- Mipmaps located in the bottom right corner
-	- Texture size 32x32 to 1024x1024
-	- Microtextures (is this featured in Model 3?)
+    Texture
+    - 2 texture sheets of 2048x1024
+    - Mipmaps located in the bottom right corner
+    - Texture size 32x32 to 1024x1024
+    - Microtextures (is this featured in Model 3?)
 
-	LODs
-	- 127 blend types per viewport with 4 sets of min/max angle or range (where is this in the viewport node?)
+    LODs
+    - 127 blend types per viewport with 4 sets of min/max angle or range (where is this in the viewport node?)
 
-	Lighting
-	- Self-luminous lighting (enable and luminosity parameter in polygon structure)
-	- Fixed polygon shading, fixed shading weight per vertex (not found in Model 3, yet)
-	- Flat sun shading (lighting parameters in viewport node) needs a separate enable?
-	- Smooth polygon shading (lighting parameters in viewport, use vertex normals)
+    Lighting
+    - Self-luminous lighting (enable and luminosity parameter in polygon structure)
+    - Fixed polygon shading, fixed shading weight per vertex (not found in Model 3, yet)
+    - Flat sun shading (lighting parameters in viewport node) needs a separate enable?
+    - Smooth polygon shading (lighting parameters in viewport, use vertex normals)
 
-	Gamma table
-	- 256 entry 8-bit table, possibly in Polygon RAM
+    Gamma table
+    - 256 entry 8-bit table, possibly in Polygon RAM
 */
 
 /*
-	Real3D Memory Structures:
-	
-	Culling Nodes:
-	- Located in Culling RAM (0x8E000000)
-	- Limit of 15 child nodes (nesting), not including polygon nodes
-	- Color table (is this featured in Model 3?)
+    Real3D Memory Structures:
 
-	0x00:	-------- -------- ------xx -------- Viewport number 0-3
-			-------- -------- -------- ---xx--- Viewport priority
+    Culling Nodes:
+    - Located in Culling RAM (0x8E000000)
+    - Limit of 15 child nodes (nesting), not including polygon nodes
+    - Color table (is this featured in Model 3?)
 
-	0x01:	Child node pointer (inherits parameters from this node)
-	0x02:	Sibling node pointer
-	0x03:	Unknown (float)
-	0x04:	Sun light vector Z-component (float)
-	0x05:	Sun light vector X-component (float)
-	0x06:	Sun light vector Y-component (float)
-	0x07:	Sun light intensity (float)
-	0x08:	Far Clip plane Z
-	0x09:	Far Clip plane Distance
-	0x0a:	Near Clip plane Z
-	0x0b:	Near Clip plane Distance
-	0x0c:	Left Clip plane Z
-	0x0d:	Left Clip plane X
-	0x0e:	Top Clip plane Z
-	0x0f:	Top Clip plane Y
-	0x10:	Right Clip plane Z
-	0x11:	Right Clip plane X
-	0x12:	Bottom Clip plane Z
-	0x13:	Bottom Clip plane Y
+    0x00:   -------- -------- ------xx -------- Viewport number 0-3
+            -------- -------- -------- ---xx--- Viewport priority
 
-	0x14:	xxxxxxxx xxxxxxxx -------- -------- Viewport height (14.2 fixed-point)
-			-------- -------- xxxxxxxx xxxxxxxx Viewport width (14.2 fixed-point)
+    0x01:   Child node pointer (inherits parameters from this node)
+    0x02:   Sibling node pointer
+    0x03:   Unknown (float)
+    0x04:   Sun light vector Z-component (float)
+    0x05:   Sun light vector X-component (float)
+    0x06:   Sun light vector Y-component (float)
+    0x07:   Sun light intensity (float)
+    0x08:   Far Clip plane Z
+    0x09:   Far Clip plane Distance
+    0x0a:   Near Clip plane Z
+    0x0b:   Near Clip plane Distance
+    0x0c:   Left Clip plane Z
+    0x0d:   Left Clip plane X
+    0x0e:   Top Clip plane Z
+    0x0f:   Top Clip plane Y
+    0x10:   Right Clip plane Z
+    0x11:   Right Clip plane X
+    0x12:   Bottom Clip plane Z
+    0x13:   Bottom Clip plane Y
 
-	0x15:	?
-	0x16:	Matrix base pointer
-	0x17:	LOD blend type table pointer?		(seems to be 8x float per entry)
-	0x18:	?
-	0x19:	?
+    0x14:   xxxxxxxx xxxxxxxx -------- -------- Viewport height (14.2 fixed-point)
+            -------- -------- xxxxxxxx xxxxxxxx Viewport width (14.2 fixed-point)
 
-	0x1a:	xxxxxxxx xxxxxxxx -------- -------- Viewport Y coordinate (12.4 fixed-point)
-			-------- -------- xxxxxxxx xxxxxxxx Viewport X coordinate (12.4 fixed-point)
+    0x15:   ?
+    0x16:   Matrix base pointer
+    0x17:   LOD blend type table pointer?       (seems to be 8x float per entry)
+    0x18:   ?
+    0x19:   ?
 
-	0x1b:	Copy of word 0x00
-	0x1c:	?
+    0x1a:   xxxxxxxx xxxxxxxx -------- -------- Viewport Y coordinate (12.4 fixed-point)
+            -------- -------- xxxxxxxx xxxxxxxx Viewport X coordinate (12.4 fixed-point)
 
-	0x1d:	xxxxxxxx xxxxxxxx -------- -------- Spotlight Y size
-			-------- -------- xxxxxxxx xxxxxxxx Spotlight Y position (13.3 fixed-point?)
+    0x1b:   Copy of word 0x00
+    0x1c:   ?
 
-	0x1e:	xxxxxxxx xxxxxxxx -------- -------- Spotlight X size
-			-------- -------- xxxxxxxx xxxxxxxx Spotlight X position (13.3 fixed-point?)
+    0x1d:   xxxxxxxx xxxxxxxx -------- -------- Spotlight Y size
+            -------- -------- xxxxxxxx xxxxxxxx Spotlight Y position (13.3 fixed-point?)
 
-	0x1f:	Light extent (float)
+    0x1e:   xxxxxxxx xxxxxxxx -------- -------- Spotlight X size
+            -------- -------- xxxxxxxx xxxxxxxx Spotlight X position (13.3 fixed-point?)
 
-	0x20:	xxxxxxxx -------- -------- -------- ?
-			-------- xxxxxxxx -------- -------- ?
-			-------- -------- --xxx--- -------- Light RGB (RGB111?)
-			-------- -------- -----xxx -------- Light RGB Fog (RGB111?)
-			-------- -------- -------- xxxxxxxx Scroll Fog (0.8 fixed-point?) What is this???
+    0x1f:   Light extent (float)
 
-	0x21:	?
-	0x22:	Fog Color (RGB888)
-	0x23:	Fog Density (float)
+    0x20:   xxxxxxxx -------- -------- -------- ?
+            -------- xxxxxxxx -------- -------- ?
+            -------- -------- --xxx--- -------- Light RGB (RGB111?)
+            -------- -------- -----xxx -------- Light RGB Fog (RGB111?)
+            -------- -------- -------- xxxxxxxx Scroll Fog (0.8 fixed-point?) What is this???
 
-	0x24:	xxxxxxxx xxxxxxxx -------- -------- ?
-			-------- -------- xxxxxxxx -------- Sun light ambient (0.8 fixed-point)
-			-------- -------- -------- xxxxxxxx Scroll attenuation (0.8 fixed-point) What is this???
+    0x21:   ?
+    0x22:   Fog Color (RGB888)
+    0x23:   Fog Density (float)
 
-	0x25:	Fog offset
-	0x26:	?
-	0x27:	?
-	0x28:	?
-	0x29:	?
-	0x2a:	?
-	0x2b:	?
-	0x2c:	?
-	0x2d:	?
-	0x2e:	?
-	0x2f:	?
+    0x24:   xxxxxxxx xxxxxxxx -------- -------- ?
+            -------- -------- xxxxxxxx -------- Sun light ambient (0.8 fixed-point)
+            -------- -------- -------- xxxxxxxx Scroll attenuation (0.8 fixed-point) What is this???
+
+    0x25:   Fog offset
+    0x26:   ?
+    0x27:   ?
+    0x28:   ?
+    0x29:   ?
+    0x2a:   ?
+    0x2b:   ?
+    0x2c:   ?
+    0x2d:   ?
+    0x2e:   ?
+    0x2f:   ?
 
 
-	Sub types:
-	LOD Culling Node. Up to 4 LODs.
+    Sub types:
+    LOD Culling Node. Up to 4 LODs.
 
-	Articulated Part Culling Node (is this used by Model 3?)
-	- An Articulated Part culling node, or six degree–of–freedom node, is used to define
+    Articulated Part Culling Node (is this used by Model 3?)
+    - An Articulated Part culling node, or six degree?of?freedom node, is used to define
       geometry that can move relative to the parent coordinate set to which it is attached.
       Fifteen levels of coordinate set nesting (levels of articulation) are supported.
-	
-	Animation Culling Node
-	- Animation culling nodes are used to build a culling hierarchy for an object with different
+
+    Animation Culling Node
+    - Animation culling nodes are used to build a culling hierarchy for an object with different
       representations, or animation frames. which can be turned on and off by the
       application. Each child (culling node or polygon) added to an Animation culling node
       specifies the frame for which the child is valid.
-	
-	Instance Culling Node
-	- Instance culling nodes define the top of a shared display list segment that can be
-	  referenced from other parts of the scene display list.
 
-	Instance Reference Culling Node
-	- An Instance Reference node is considered a leaf node; its
-	  "child" is the shared geometry segment. An Instance Reference may be attached to
-	  a parent node and may not have any other children, but may have siblings.
+    Instance Culling Node
+    - Instance culling nodes define the top of a shared display list segment that can be
+      referenced from other parts of the scene display list.
 
-	Point Light
-	- A Point Light is used to create an instance of a point luminous feature. The size,
+    Instance Reference Culling Node
+    - An Instance Reference node is considered a leaf node; its
+      "child" is the shared geometry segment. An Instance Reference may be attached to
+      a parent node and may not have any other children, but may have siblings.
+
+    Point Light
+    - A Point Light is used to create an instance of a point luminous feature. The size,
       feature type, and number of sides of the point light model may be customized.
 
-	Instance Set
-	- An Instance Set is a culling node which defines a set of point features. Each feature
+    Instance Set
+    - An Instance Set is a culling node which defines a set of point features. Each feature
       is positioned individually. This type of culling node can be used to simulate particles.
 
 
 
-	Instance Node?
+    Instance Node?
 
-	0x00:	xxxxxxxx xxxxxxxx xxxxxx-- -------- Node number/ID?, num of bits unknown
-			-------- -------- -------- ---x---- This node applies translation, else matrix
-			-------- -------- -------- ----x--- LOD enable?
-			-------- -------- -------- -----x-- ?
-			-------- -------- -------- ------x- ?
-			-------- -------- -------- -------x ?
-
-	
-	0x01:	? (not present on Step 1.0)
-	0x02:	? (not present on Step 1.0)			Scud Race has 0x00000101
-
-	0x03:	--x----- -------- -------- -------- ?
-			-------- -xxxxxxx xxxx---- -------- LOD?
-			-------- -------- ----xxxx xxxxxxxx Node matrix
-	
-	0x04:	Translation X coordinate
-	0x05:	Translation Y coordinate
-	0x06:	Translation Z coordinate
-	0x07:	Child node pointer
-	0x08:	Sibling node pointer
-
-	0x09:	xxxxxxxx xxxxxxxx -------- -------- Culling or sorting related?
-			-------- -------- xxxxxxxx xxxxxxxx Culling or sorting related?
+    0x00:   xxxxxxxx xxxxxxxx xxxxxx-- -------- Node number/ID?, num of bits unknown
+            -------- -------- -------- ---x---- This node applies translation, else matrix
+            -------- -------- -------- ----x--- LOD enable?
+            -------- -------- -------- -----x-- ?
+            -------- -------- -------- ------x- ?
+            -------- -------- -------- -------x ?
 
 
-	Polygon Data
+    0x01:   ? (not present on Step 1.0)
+    0x02:   ? (not present on Step 1.0)         Scud Race has 0x00000101
 
-	0x00:	-------- xxxxxxxx xxxxxx-- -------- Polygon ID
-			-------- -------- -------- -x------ 0 = Triangle, 1 = Quad
-			-------- -------- -------- ----x--- Vertex 3 shared from previous polygon
-			-------- -------- -------- -----x-- Vertex 2 shared from previous polygon
-			-------- -------- -------- ------x- Vertex 1 shared from previous polygon
-			-------- -------- -------- -------x Vertex 0 shared from previous polygon
-			xxxxxxxx -------- -------- x-xx---- ?
-			-------- -------- ------xx -------- Broken polygons in srally2 set these (a way to mark them for HW to not render?)
+    0x03:   --x----- -------- -------- -------- ?
+            -------- -xxxxxxx xxxx---- -------- LOD?
+            -------- -------- ----xxxx xxxxxxxx Node matrix
 
-	0x01:	xxxxxxxx xxxxxxxx xxxxxxxx -------- Polygon normal X coordinate (2.22 fixed point)
-			-------- -------- -------- -x------ UV format (0 = 13.3, 1 = 16.0)
-			-------- -------- -------- -----x-- If set, this is the last polygon
-			-------- -------- -------- x-xxx-xx ?
+    0x04:   Translation X coordinate
+    0x05:   Translation Y coordinate
+    0x06:   Translation Z coordinate
+    0x07:   Child node pointer
+    0x08:   Sibling node pointer
 
-	0x02:	xxxxxxxx xxxxxxxx xxxxxxxx -------- Polygon normal Y coordinate (2.22 fixed point)
-			-------- -------- -------- ------x- Texture U mirror enable
-			-------- -------- -------- -------x Texture V mirror enable
-			-------- -------- -------- xxxxxx-- ?
-
-	0x03:	xxxxxxxx xxxxxxxx xxxxxxxx -------- Polygon normal Z coordinate (2.22 fixed point)
-			-------- -------- -------- --xxx--- Texture width (in 8-pixel tiles)
-			-------- -------- -------- -----xxx Texture height (in 8-pixel tiles)
-
-	0x04:	xxxxxxxx xxxxxxxx xxxxxxxx -------- Color (RGB888)
-			-------- -------- -------- -x------ Texture page
-			-------- -------- -------- ---xxxxx Upper 5 bits of texture U coordinate
-			-------- -------- -------- x-x----- ?
-
-	0x05:	xxxxxxxx xxxxxxxx xxxxxxxx -------- Specular color?
-			-------- -------- -------- x------- Low bit of texture U coordinate
-			-------- -------- -------- ---xxxxx Low 5 bits of texture V coordinate
-			-------- -------- -------- -xx----- ?
-
-	0x06:	x------- -------- -------- -------- Texture contour enable
-			-----x-- -------- -------- -------- Texture enable
-			-------- x------- -------- -------- 1 = disable transparency?
-			-------- -xxxxx-- -------- -------- Polygon transparency (0 = fully transparent)
-			-------- -------x -------- -------- 1 = disable lighting
-			-------- -------- xxxxx--- -------- Polygon luminosity
-			-------- -------- ------xx x------- Texture format
-			-------- -------- -------- -------x Alpha enable?
-			-xxxx-xx ------x- -----x-- -xxxxxx- ?
+    0x09:   xxxxxxxx xxxxxxxx -------- -------- Culling or sorting related?
+            -------- -------- xxxxxxxx xxxxxxxx Culling or sorting related?
 
 
-	Vertex entry
+    Polygon Data
 
-	0x00:	xxxxxxxx xxxxxxxx xxxxxxxx -------- Vertex X coordinate (17.7 fixed-point in Step 1.0, 13.11 otherwise)
-			-------- -------- -------- xxxxxxxx Vertex normal X (offset from polygon normal)
+    0x00:   -------- xxxxxxxx xxxxxx-- -------- Polygon ID
+            -------- -------- -------- -x------ 0 = Triangle, 1 = Quad
+            -------- -------- -------- ----x--- Vertex 3 shared from previous polygon
+            -------- -------- -------- -----x-- Vertex 2 shared from previous polygon
+            -------- -------- -------- ------x- Vertex 1 shared from previous polygon
+            -------- -------- -------- -------x Vertex 0 shared from previous polygon
+            xxxxxxxx -------- -------- x-xx---- ?
+            -------- -------- ------xx -------- Broken polygons in srally2 set these (a way to mark them for HW to not render?)
 
-	0x01:	xxxxxxxx xxxxxxxx xxxxxxxx -------- Vertex Y coordinate
-			-------- -------- -------- xxxxxxxx Vertex normal Y
+    0x01:   xxxxxxxx xxxxxxxx xxxxxxxx -------- Polygon normal X coordinate (2.22 fixed point)
+            -------- -------- -------- -x------ UV format (0 = 13.3, 1 = 16.0)
+            -------- -------- -------- -----x-- If set, this is the last polygon
+            -------- -------- -------- x-xxx-xx ?
 
-	0x02:	xxxxxxxx xxxxxxxx xxxxxxxx -------- Vertex Z coordinate
-			-------- -------- -------- xxxxxxxx Vertex normal Z
+    0x02:   xxxxxxxx xxxxxxxx xxxxxxxx -------- Polygon normal Y coordinate (2.22 fixed point)
+            -------- -------- -------- ------x- Texture U mirror enable
+            -------- -------- -------- -------x Texture V mirror enable
+            -------- -------- -------- xxxxxx-- ?
 
-	0x03:	xxxxxxxx xxxxxxxx -------- -------- Vertex U coordinate
-			-------- -------- xxxxxxxx xxxxxxxx Vertex V coordinate
+    0x03:   xxxxxxxx xxxxxxxx xxxxxxxx -------- Polygon normal Z coordinate (2.22 fixed point)
+            -------- -------- -------- --xxx--- Texture width (in 8-pixel tiles)
+            -------- -------- -------- -----xxx Texture height (in 8-pixel tiles)
+
+    0x04:   xxxxxxxx xxxxxxxx xxxxxxxx -------- Color (RGB888)
+            -------- -------- -------- -x------ Texture page
+            -------- -------- -------- ---xxxxx Upper 5 bits of texture U coordinate
+            -------- -------- -------- x-x----- ?
+
+    0x05:   xxxxxxxx xxxxxxxx xxxxxxxx -------- Specular color?
+            -------- -------- -------- x------- Low bit of texture U coordinate
+            -------- -------- -------- ---xxxxx Low 5 bits of texture V coordinate
+            -------- -------- -------- -xx----- ?
+
+    0x06:   x------- -------- -------- -------- Texture contour enable
+            -----x-- -------- -------- -------- Texture enable
+            -------- x------- -------- -------- 1 = disable transparency?
+            -------- -xxxxx-- -------- -------- Polygon transparency (0 = fully transparent)
+            -------- -------x -------- -------- 1 = disable lighting
+            -------- -------- xxxxx--- -------- Polygon luminosity
+            -------- -------- ------xx x------- Texture format
+            -------- -------- -------- -------x Alpha enable?
+            -xxxx-xx ------x- -----x-- -xxxxxx- ?
+
+
+    Vertex entry
+
+    0x00:   xxxxxxxx xxxxxxxx xxxxxxxx -------- Vertex X coordinate (17.7 fixed-point in Step 1.0, 13.11 otherwise)
+            -------- -------- -------- xxxxxxxx Vertex normal X (offset from polygon normal)
+
+    0x01:   xxxxxxxx xxxxxxxx xxxxxxxx -------- Vertex Y coordinate
+            -------- -------- -------- xxxxxxxx Vertex normal Y
+
+    0x02:   xxxxxxxx xxxxxxxx xxxxxxxx -------- Vertex Z coordinate
+            -------- -------- -------- xxxxxxxx Vertex normal Z
+
+    0x03:   xxxxxxxx xxxxxxxx -------- -------- Vertex U coordinate
+            -------- -------- xxxxxxxx xxxxxxxx Vertex V coordinate
 
 */
 
@@ -891,8 +891,8 @@ WRITE64_MEMBER(model3_state::real3d_polygon_ram_w)
 
 static const UINT8 texture_decode[64] =
 {
-	 0,  1,  4,  5,  8,  9, 12, 13,
-	 2,  3,  6,  7, 10, 11, 14, 15,
+		0,  1,  4,  5,  8,  9, 12, 13,
+		2,  3,  6,  7, 10, 11, 14, 15,
 	16, 17, 20, 21, 24, 25, 28, 29,
 	18, 19, 22, 23, 26, 27, 30, 31,
 	32, 33, 36, 37, 40, 41, 44, 45,
@@ -1003,8 +1003,8 @@ void model3_state::real3d_display_list_end()
 	m_texture_fifo_pos = 0;
 
 	m_renderer->clear_buffers();
-	
-	real3d_traverse_display_list();	
+
+	real3d_traverse_display_list();
 }
 
 void model3_state::real3d_display_list1_dma(UINT32 src, UINT32 dst, int length, int byteswap)
@@ -1041,7 +1041,7 @@ void model3_state::real3d_display_list2_dma(UINT32 src, UINT32 dst, int length, 
 
 void model3_state::real3d_vrom_texture_dma(UINT32 src, UINT32 dst, int length, int byteswap)
 {
-	address_space &space = m_maincpu->space(AS_PROGRAM);	
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 	if ((dst & 0xff) == 0)
 	{
 		for (int i=0; i < length; i+=12)
@@ -1286,11 +1286,11 @@ void model3_state::draw_model(UINT32 addr)
 	MATRIX transform_matrix;
 	float center_x, center_y;
 
-	if (m_step < 0x15)		// position coordinates are 17.7 fixed-point in Step 1.0
+	if (m_step < 0x15)      // position coordinates are 17.7 fixed-point in Step 1.0
 		fixed_point_fraction = 1.0f / 128.0f;
-	else					// 13.11 fixed-point in other Steps
+	else                    // 13.11 fixed-point in other Steps
 		fixed_point_fraction = 1.0f / 2048.0f;
-	
+
 	get_top_matrix(&transform_matrix);
 
 	/* current viewport center coordinates on screen */
@@ -1323,7 +1323,7 @@ void model3_state::draw_model(UINT32 addr)
 		if (header[1] & 0x4)
 			last_polygon = TRUE;
 
-		if ((header[0] & 0x300) == 0x300)		// TODO: broken polygons in srally2 have these bits set
+		if ((header[0] & 0x300) == 0x300)       // TODO: broken polygons in srally2 have these bits set
 			return;
 
 		num_vertices = (header[0] & 0x40) ? 4 : 3;
@@ -1354,9 +1354,9 @@ void model3_state::draw_model(UINT32 addr)
 			vertex[vi].z = (float)((INT32)(zw) >> 8) * fixed_point_fraction;
 			vertex[vi].u = (UINT16)(model[index] >> 16);
 			vertex[vi].v = (UINT16)(model[index++]);
-//			vertex[vi].nx = normal[0] + ((float)((INT8)(xw)) / 127.0f);
-//			vertex[vi].ny = normal[1] + ((float)((INT8)(yw)) / 127.0f);
-//			vertex[vi].nz = normal[2] + ((float)((INT8)(zw)) / 127.0f);
+//          vertex[vi].nx = normal[0] + ((float)((INT8)(xw)) / 127.0f);
+//          vertex[vi].ny = normal[1] + ((float)((INT8)(yw)) / 127.0f);
+//          vertex[vi].nz = normal[2] + ((float)((INT8)(zw)) / 127.0f);
 
 			vertex[vi].nx = ((float)((INT8)(xw)) / 127.0f);
 			vertex[vi].ny = ((float)((INT8)(yw)) / 127.0f);
@@ -1408,16 +1408,16 @@ void model3_state::draw_model(UINT32 addr)
 			// transform vertex normal
 			VECTOR3 n;
 			n[0] = (vertex[i].nx * transform_matrix[0][0]) +
-				   (vertex[i].ny * transform_matrix[1][0]) + 
-				   (vertex[i].nz * transform_matrix[2][0]);
+					(vertex[i].ny * transform_matrix[1][0]) +
+					(vertex[i].nz * transform_matrix[2][0]);
 			n[0] *= m_coordinate_system[0][1];
 			n[1] = (vertex[i].nx * transform_matrix[0][1]) +
-				   (vertex[i].ny * transform_matrix[1][1]) + 
-				   (vertex[i].nz * transform_matrix[2][1]);
+					(vertex[i].ny * transform_matrix[1][1]) +
+					(vertex[i].nz * transform_matrix[2][1]);
 			n[1] *= m_coordinate_system[1][2];
 			n[2] = (vertex[i].nx * transform_matrix[0][2]) +
-				   (vertex[i].ny * transform_matrix[1][2]) + 
-				   (vertex[i].nz * transform_matrix[2][2]);
+					(vertex[i].ny * transform_matrix[1][2]) +
+					(vertex[i].nz * transform_matrix[2][2]);
 			n[2] *= m_coordinate_system[2][0];
 
 			// lighting
@@ -1484,7 +1484,7 @@ void model3_state::draw_model(UINT32 addr)
 				int tex_height = (header[3] & 0x7);
 				int tex_format = (header[6] >> 7) & 0x7;
 
-				if (tex_width >= 6 || tex_height >= 6)		// srally2 poly ram has degenerate polys with 2k tex size (cpu bug or intended?)
+				if (tex_width >= 6 || tex_height >= 6)      // srally2 poly ram has degenerate polys with 2k tex size (cpu bug or intended?)
 					return;
 
 				texture = get_texture((header[4] & 0x40) ? 1 : 0, tex_x, tex_y, tex_width, tex_height, tex_format);
@@ -1761,7 +1761,7 @@ void model3_renderer::clear_buffers()
 	cliprect.max_y = 383;
 
 	m_fb->fill(0x00000000, cliprect);
-	
+
 	float zvalue = 10000000000.0f;
 	m_zb->fill(*(int*)&zvalue, cliprect);
 }
@@ -1779,14 +1779,14 @@ void model3_renderer::draw_triangle(const m3_triangle *tri)
 	if (tri->param & TRI_PARAM_TEXTURE_ENABLE)
 	{
 		for (int i=0; i < 3; i++)
-		{ 
+		{
 			v[i].x = tri->v[i].x;
 			v[i].y = tri->v[i].y;
 			v[i].p[0] = tri->v[i].z;
 			v[i].p[1] = 1.0f / tri->v[i].z;
-			v[i].p[2] = tri->v[i].u * 256.0f;		// 8 bits of subtexel precision for bilinear filtering
+			v[i].p[2] = tri->v[i].u * 256.0f;       // 8 bits of subtexel precision for bilinear filtering
 			v[i].p[3] = tri->v[i].v * 256.0f;
-			v[i].p[4] =	tri->v[i].i;
+			v[i].p[4] = tri->v[i].i;
 		}
 
 		model3_polydata &extra = object_data_alloc();
@@ -1821,7 +1821,7 @@ void model3_renderer::draw_triangle(const m3_triangle *tri)
 			v[i].x = tri->v[i].x;
 			v[i].y = tri->v[i].y;
 			v[i].p[0] = tri->v[i].z;
-			v[i].p[1] =	tri->v[i].i;
+			v[i].p[1] = tri->v[i].i;
 		}
 
 		model3_polydata &extra = object_data_alloc();
@@ -1881,30 +1881,30 @@ void model3_renderer::draw_scanline_solid(INT32 scanline, const extent_t &extent
 	}
 }
 
-#define TEX_FETCH_NOFILTER()								\
-do {														\
-	float intz = 1.0f / ooz;								\
-	UINT32 u = uoz * intz;									\
-	UINT32 v = voz * intz;									\
-	UINT32 u1 = (u >> 8) & umask;							\
-	UINT32 v1 = (v >> 8) & vmask;							\
-	texel = texture->data[(v1 << width) + u1];				\
+#define TEX_FETCH_NOFILTER()                                \
+do {                                                        \
+	float intz = 1.0f / ooz;                                \
+	UINT32 u = uoz * intz;                                  \
+	UINT32 v = voz * intz;                                  \
+	UINT32 u1 = (u >> 8) & umask;                           \
+	UINT32 v1 = (v >> 8) & vmask;                           \
+	texel = texture->data[(v1 << width) + u1];              \
 } while(0);
 
-#define TEX_FETCH_BILINEAR()													\
-do {																			\
-	float intz = 1.0f / ooz;													\
-	UINT32 u = uoz * intz;														\
-	UINT32 v = voz * intz;														\
-	UINT32 u1 = (u >> 8) & umask;												\
-	UINT32 v1 = (v >> 8) & vmask;												\
-	UINT32 u2 = (u1 + 1) & umask;												\
-	UINT32 v2 = (v1 + 1) & vmask;												\
-	UINT32 pix00 = texture->data[(v1 << width) + u1];							\
-	UINT32 pix01 = texture->data[(v1 << width) + u2];							\
-	UINT32 pix10 = texture->data[(v2 << width) + u1];							\
-	UINT32 pix11 = texture->data[(v2 << width) + u2];							\
-	texel = rgba_bilinear_filter(pix00, pix01, pix10, pix11, u, v);				\
+#define TEX_FETCH_BILINEAR()                                                    \
+do {                                                                            \
+	float intz = 1.0f / ooz;                                                    \
+	UINT32 u = uoz * intz;                                                      \
+	UINT32 v = voz * intz;                                                      \
+	UINT32 u1 = (u >> 8) & umask;                                               \
+	UINT32 v1 = (v >> 8) & vmask;                                               \
+	UINT32 u2 = (u1 + 1) & umask;                                               \
+	UINT32 v2 = (v1 + 1) & vmask;                                               \
+	UINT32 pix00 = texture->data[(v1 << width) + u1];                           \
+	UINT32 pix01 = texture->data[(v1 << width) + u2];                           \
+	UINT32 pix10 = texture->data[(v2 << width) + u1];                           \
+	UINT32 pix11 = texture->data[(v2 << width) + u2];                           \
+	texel = rgba_bilinear_filter(pix00, pix01, pix10, pix11, u, v);             \
 } while(0);
 
 #if ENABLE_BILINEAR
@@ -1989,19 +1989,19 @@ void model3_renderer::draw_scanline_contour(INT32 scanline, const extent_t &exte
 
 			UINT32 fa = texel >> 24;
 			if (fa >= 0xf8)
-			{				
+			{
 				UINT32 r = ((texel & 0x00ff0000) * fa) >> 8;
 				UINT32 g = ((texel & 0x0000ff00) * fa) >> 8;
 				UINT32 b = ((texel & 0x000000ff) * fa) >> 8;
-				
+
 				UINT32 orig = fb[x];
-				
+
 				int minalpha = 255 - fa;
-				
+
 				r += ((orig & 0x00ff0000) * minalpha) >> 8;
 				g += ((orig & 0x0000ff00) * minalpha) >> 8;
 				b += ((orig & 0x000000ff) * minalpha) >> 8;
-				
+
 				fb[x] = 0xff000000 | (r & 0xff0000) | (g & 0xff00) | (b & 0xff);
 				zb[x] = z;
 			}
@@ -2055,9 +2055,9 @@ void model3_renderer::draw_scanline_tex_trans(INT32 scanline, const extent_t &ex
 			r = (r * srctrans) >> 5;
 			g = (g * srctrans) >> 5;
 			b = (b * srctrans) >> 5;
-			
+
 			UINT32 orig = fb[x];
-			
+
 			r += ((orig & 0x00ff0000) * desttrans) >> 5;
 			g += ((orig & 0x0000ff00) * desttrans) >> 5;
 			b += ((orig & 0x000000ff) * desttrans) >> 5;
@@ -2091,8 +2091,8 @@ void model3_renderer::draw_scanline_tex_alpha(INT32 scanline, const extent_t &ex
 	float in = extent.param[4].start;
 	float inz = extent.param[4].dpdx;
 
-//	int srctrans = polydata.transparency;
-//	int desttrans = 32 - polydata.transparency;
+//  int srctrans = polydata.transparency;
+//  int desttrans = 32 - polydata.transparency;
 
 	UINT32 umask = (((polydata.texture_param & TRI_PARAM_TEXTURE_MIRROR_U) ? 64 : 32) << texture->width) - 1;
 	UINT32 vmask = (((polydata.texture_param & TRI_PARAM_TEXTURE_MIRROR_V) ? 64 : 32) << texture->height) - 1;

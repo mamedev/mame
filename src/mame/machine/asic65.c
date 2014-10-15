@@ -251,7 +251,7 @@ READ16_MEMBER( asic65_device::read )
 	}
 
 	int command = (m_command < MAX_COMMANDS) ? command_map[m_asic65_type][m_command] : OP_UNKNOWN;
-	
+
 	/* update results */
 	switch (command)
 	{

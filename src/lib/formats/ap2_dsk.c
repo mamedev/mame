@@ -624,7 +624,7 @@ bool a2_16sect_format::load(io_generic *io, UINT32 form_factor, floppy_image *im
 			if (!memcmp("PRODOS", &sector_data[0x103], 6))
 			{
 				m_prodos_order = true;
-			}	// check for alternate version ProDOS boot block
+			}   // check for alternate version ProDOS boot block
 			if (!memcmp("PRODOS", &sector_data[0x121], 6))
 			{
 				m_prodos_order = true;
@@ -654,7 +654,7 @@ bool a2_16sect_format::load(io_generic *io, UINT32 form_factor, floppy_image *im
 			else if (!memcmp(dos33_block1, &sector_data[0x100], 4))
 			{
 				m_prodos_order = true;
-			}	// check for a later version of the Pascal boot block
+			}   // check for a later version of the Pascal boot block
 			else if (!memcmp(pascal2_block1, &sector_data[0x100], 4))
 			{
 				m_prodos_order = true;

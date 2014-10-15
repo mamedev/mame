@@ -38,4 +38,3 @@ cpu_device::cpu_device(const machine_config &mconfig, device_type type, const ch
 cpu_device::~cpu_device()
 {
 }
-

@@ -134,7 +134,7 @@ bool sdl_osd_interface::video_init()
 void sdl_osd_interface::video_exit()
 {
 	window_exit();
-	
+
 	// free all of our monitor information
 	while (sdl_monitor_list != NULL)
 	{

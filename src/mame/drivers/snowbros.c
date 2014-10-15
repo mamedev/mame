@@ -2368,7 +2368,7 @@ ROM_START( suhosong )
 	ROM_LOAD( "87c52.mcu", 0x00000, 0x10000 , NO_DUMP ) /* can't be dumped */
 
 	ROM_REGION16_BE( 0x200, "user1", ROMREGION_ERASE00 ) /* Data from Shared RAM */
-//	ROM_LOAD16_WORD( "protdata.bin", 0x00000, 0x200 , CRC(1) SHA1(1) )
+//  ROM_LOAD16_WORD( "protdata.bin", 0x00000, 0x200 , CRC(1) SHA1(1) )
 
 	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
 	ROM_LOAD( "su_ho_sung.uj15", 0x00000, 0x40000, CRC(266fcae8) SHA1(0f15f880bde0c12b5c663ed387f9353c13b731b6) )

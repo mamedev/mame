@@ -1776,9 +1776,9 @@ static void amiga_image_info(imgtool_image *img, char *string, size_t len)
 	t_v = amiga_crack_time(&root.v);
 	t_r = amiga_crack_time(&root.r);
 
-	strftime(c, sizeof(c), "%d-%b-%y %H:%M:%S",	localtime(&t_c));
-	strftime(v, sizeof(v), "%d-%b-%y %H:%M:%S",	localtime(&t_v));
-	strftime(r, sizeof(r), "%d-%b-%y %H:%M:%S",	localtime(&t_r));
+	strftime(c, sizeof(c), "%d-%b-%y %H:%M:%S", localtime(&t_c));
+	strftime(v, sizeof(v), "%d-%b-%y %H:%M:%S", localtime(&t_v));
+	strftime(r, sizeof(r), "%d-%b-%y %H:%M:%S", localtime(&t_r));
 
 	strcpy(info, "Volume     name: ");
 	strncat(info, (char *)root.diskname, root.name_len);

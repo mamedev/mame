@@ -2415,54 +2415,54 @@ TIMER_CALLBACK_MEMBER( tlcs90_device::t90_timer_callback )
 	if ( (m_internal_registers[ T90_TRUN - T90_IOBASE ] & (1 << i)) == 0 )
 		return;
 
-  timer_fired = 0;
+	timer_fired = 0;
 
 	mode = (m_internal_registers[ T90_TMOD - T90_IOBASE ] >> ((i & ~1) + 2)) & 0x03;
 	// Match
-  switch (mode)
-  {
-    case 0x02: // 8bit PPG
-    case 0x03: // 8bit PWM
-      logerror("CPU Timer %d expired with unhandled mode %d\n", i, mode);
-      // TODO: hmm...
-    case 0x00: // 8bit
-      m_timer_value[i]++;
-      if ( m_timer_value[i] == m_internal_registers[ T90_TREG0+i - T90_IOBASE ] )
-        timer_fired = 1;
-      break;
+	switch (mode)
+	{
+	case 0x02: // 8bit PPG
+	case 0x03: // 8bit PWM
+		logerror("CPU Timer %d expired with unhandled mode %d\n", i, mode);
+		// TODO: hmm...
+	case 0x00: // 8bit
+		m_timer_value[i]++;
+		if ( m_timer_value[i] == m_internal_registers[ T90_TREG0+i - T90_IOBASE ] )
+		timer_fired = 1;
+		break;
 
-    case 0x01: // 16bit
-      if(i & 1)
-        break;
-      m_timer_value[i]++;
-      if(m_timer_value[i] == 0) m_timer_value[i+1]++;
-      if(m_timer_value[i+1] == m_internal_registers[ T90_TREG0+i+1 - T90_IOBASE ])
-        if(m_timer_value[i] == m_internal_registers[ T90_TREG0+i - T90_IOBASE ])
-          timer_fired = 1;
-      break;
-  }
+	case 0x01: // 16bit
+		if(i & 1)
+		break;
+		m_timer_value[i]++;
+		if(m_timer_value[i] == 0) m_timer_value[i+1]++;
+		if(m_timer_value[i+1] == m_internal_registers[ T90_TREG0+i+1 - T90_IOBASE ])
+		if(m_timer_value[i] == m_internal_registers[ T90_TREG0+i - T90_IOBASE ])
+			timer_fired = 1;
+		break;
+	}
 
-  if(timer_fired) {
-    // special stuff handling
-    switch(mode) {
-      case 0x02: // 8bit PPG
-      case 0x03: // 8bit PWM
-        // TODO: hmm...
-      case 0x00: // 8bit
-        if(i & 1)
-          break;
-        if ( (m_internal_registers[ T90_TCLK - T90_IOBASE ] & (0x0C << (i * 2))) == 0 ) // T0/T1 match signal clocks T1/T3
-          t90_timer_callback(ptr, i+1);
-        break;
-      case 0x01: // 16bit, only can happen for i=0,2
-        m_timer_value[i+1] = 0;
-        set_irq_line(INTT0 + i+1, 1);
-        break;
-    }
-    // regular handling
-    m_timer_value[i] = 0;
-    set_irq_line(INTT0 + i, 1);
-  }
+	if(timer_fired) {
+	// special stuff handling
+	switch(mode) {
+		case 0x02: // 8bit PPG
+		case 0x03: // 8bit PWM
+		// TODO: hmm...
+		case 0x00: // 8bit
+		if(i & 1)
+			break;
+		if ( (m_internal_registers[ T90_TCLK - T90_IOBASE ] & (0x0C << (i * 2))) == 0 ) // T0/T1 match signal clocks T1/T3
+			t90_timer_callback(ptr, i+1);
+		break;
+		case 0x01: // 16bit, only can happen for i=0,2
+		m_timer_value[i+1] = 0;
+		set_irq_line(INTT0 + i+1, 1);
+		break;
+	}
+	// regular handling
+	m_timer_value[i] = 0;
+	set_irq_line(INTT0 + i, 1);
+	}
 }
 
 TIMER_CALLBACK_MEMBER( tlcs90_device::t90_timer4_callback )

@@ -238,7 +238,7 @@ static INPUT_PORTS_START( gogomile )
 INPUT_PORTS_END
 
 
-static INPUT_PORTS_START( gogomileo )	/* The ealier version has different coinage settings. */
+static INPUT_PORTS_START( gogomileo )   /* The ealier version has different coinage settings. */
 	PORT_INCLUDE( gogomile )
 
 	PORT_MODIFY("DSW")      // $880000.w

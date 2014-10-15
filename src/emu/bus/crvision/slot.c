@@ -163,9 +163,9 @@ bool crvision_cart_slot_device::call_load()
 			seterror(IMAGE_ERROR_UNSPECIFIED, "Image extends beyond the expected size for an APF cart");
 			return IMAGE_INIT_FAIL;
 		}
-		
+
 		m_cart->rom_alloc(size, tag());
-			
+
 		if (software_entry() == NULL)
 			fread(m_cart->get_rom_base(), size);
 		else
@@ -295,4 +295,3 @@ READ8_MEMBER(crvision_cart_slot_device::read_rom80)
 	else
 		return 0xff;
 }
-

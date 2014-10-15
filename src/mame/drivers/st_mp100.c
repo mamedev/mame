@@ -500,7 +500,7 @@ WRITE_LINE_MEMBER( st_mp100_state::u10_ca2_w )
 	if (!state)
 		m_counter = 0;
 }
-		
+
 WRITE_LINE_MEMBER( st_mp100_state::u10_cb2_w )
 {
 }

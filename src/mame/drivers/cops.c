@@ -4,19 +4,19 @@
     (hardware developed by Nova Productions Limited)
     Preliminary driver by Mariusz Wojcieszek, James Wallace
 
-	Cops uses a Sony CD-ROM in addition to the regular setup, purely to play
-	Bad Boys by Inner Circle, so there is muscial accompaniment to areas 
-	where the laserdisc audio is muted.
+    Cops uses a Sony CD-ROM in addition to the regular setup, purely to play
+    Bad Boys by Inner Circle, so there is muscial accompaniment to areas
+    where the laserdisc audio is muted.
 
-	NOTES: To boot up Revelations, turn the refill key (R) and press button A.
+    NOTES: To boot up Revelations, turn the refill key (R) and press button A.
     TODO: There are probably more ROMs for Revelations, the disc contains
-    full data for a picture based memory game called 'Vision Quest'.	
-	
-	LaserMax memory map needs sorting out, Cops uses a subset of what's
-	actually available
+    full data for a picture based memory game called 'Vision Quest'.
+
+    LaserMax memory map needs sorting out, Cops uses a subset of what's
+    actually available
 
     The UK version COPS appears to want to communicate with the LDP in a
-	different way.
+    different way.
 ***************************************************************************/
 
 
@@ -355,7 +355,7 @@ void cops_state::laserdisc_w(UINT8 data)
  *
  *************************************/
 
- void cops_state::update_dacia_irq()
+	void cops_state::update_dacia_irq()
 {
 	UINT8 isr = generate_isr();
 	//remove bits
@@ -390,11 +390,11 @@ void cops_state::dacia_receive(UINT8 data)
 UINT8 cops_state::generate_isr()
 {
 	UINT8 isr =0;
-	
+
 	isr |= m_dacia_receiver_full;
 	isr |= (m_dacia_cmp1 << 1);
-	isr |= (m_dacia_trans <<4); 
-			
+	isr |= (m_dacia_trans <<4);
+
 	if (isr)
 	{
 		isr |= 0x40;
@@ -413,17 +413,17 @@ READ8_MEMBER(cops_state::dacia_r)
 			m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 			return isr;
 		}
-			
+
 		case 1: /* CSR1: Control Status Register */
 		{
 			UINT8 csr =0;
 			csr |= m_dacia_rts1;
 			csr |= (m_dacia_dtr1 << 1);
-			csr |= (m_dacia_cts <<4); 
-			csr |= (m_dacia_fe1 <<7); 
+			csr |= (m_dacia_cts <<4);
+			csr |= (m_dacia_fe1 <<7);
 			if (LOG_DACIA) logerror("CSR1 %02x\n",csr);
 			return csr;
-		}		
+		}
 
 		case 3: /* RDR1: Receive data register */
 			m_dacia_receiver_full = 0;
@@ -463,8 +463,8 @@ WRITE8_MEMBER(cops_state::dacia_w)
 			{
 				m_dacia_rts1 = (data & 0x01);
 				m_dacia_dtr1 = (data & 0x02 ? 1:0);
-				m_parity_1 = (data & 0x04);				
-				m_parity_mode_1 = ((data & 0x18) >> 3);				
+				m_parity_1 = (data & 0x04);
+				m_parity_mode_1 = ((data & 0x18) >> 3);
 				m_bpc_1 = ((data & 0x60) >> 5) +5;
 				if (LOG_DACIA) logerror("DACIA Format Register: %02x\n", data);
 			}
@@ -479,29 +479,29 @@ WRITE8_MEMBER(cops_state::dacia_w)
 				}
 				else
 				{
-					m_dacia_reg1 = CMP_REGISTER;				
+					m_dacia_reg1 = CMP_REGISTER;
 				}
 				if (LOG_DACIA) logerror("DACIA TIME %02d\n", XTAL_3_6864MHz / m_dacia_ic_div_1);
-				
+
 				m_ld_timer->adjust(attotime::from_hz(XTAL_3_6864MHz / m_dacia_ic_div_1), 0, attotime::from_hz(XTAL_3_6864MHz / m_dacia_ic_div_1));
 
 				if (LOG_DACIA) logerror("DACIA Ctrl Register: %02x\n", data);
-			
+
 			}
 			break;
-		}		
+		}
 		case 2: /* Compare / Aux Ctrl Register 1 */
 		{
-			if (m_dacia_reg1 == CMP_REGISTER)				
+			if (m_dacia_reg1 == CMP_REGISTER)
 			{
 				m_dacia_cmp1 =1;
 				m_dacia_cmpval1=data;
-				if (LOG_DACIA) logerror("DACIA Compare mode: %02x \n", data);				
-//				update_dacia_irq();
+				if (LOG_DACIA) logerror("DACIA Compare mode: %02x \n", data);
+//              update_dacia_irq();
 			}
 			else
 			{
-				if (LOG_DACIA) logerror("DACIA Aux ctrl: %02x \n", data);			
+				if (LOG_DACIA) logerror("DACIA Aux ctrl: %02x \n", data);
 			}
 		}
 		case 3: /* Transmit Data Register 1 */
@@ -869,7 +869,7 @@ static MACHINE_CONFIG_START( cops, cops_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	
+
 		/* TODO: Verify clock */
 	MCFG_SOUND_ADD("snsnd", SN76489, MAIN_CLOCK/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
@@ -908,6 +908,6 @@ ROM_START( revlatns )
 ROM_END
 
 
-GAMEL( 1994, cops,  	0,   cops,  cops,  	   cops_state, cops,       ROT0, "Atari Games",      				"Cops (USA)",	GAME_NOT_WORKING | GAME_NO_SOUND, layout_cops )
-GAMEL( 1994, copsuk,  	cops,cops,  cops, 	   cops_state, cops,       ROT0, "Nova Productions / Deith Leisure","Cops (UK)",	GAME_NOT_WORKING | GAME_NO_SOUND, layout_cops )
-GAMEL( 1994, revlatns,  0,   cops,  revlatns,  cops_state, cops,       ROT0, "Nova Productions",      			"Revelations", 	GAME_NOT_WORKING | GAME_NO_SOUND, layout_cops )
+GAMEL( 1994, cops,      0,   cops,  cops,      cops_state, cops,       ROT0, "Atari Games",                     "Cops (USA)",   GAME_NOT_WORKING | GAME_NO_SOUND, layout_cops )
+GAMEL( 1994, copsuk,    cops,cops,  cops,      cops_state, cops,       ROT0, "Nova Productions / Deith Leisure","Cops (UK)",    GAME_NOT_WORKING | GAME_NO_SOUND, layout_cops )
+GAMEL( 1994, revlatns,  0,   cops,  revlatns,  cops_state, cops,       ROT0, "Nova Productions",                "Revelations",  GAME_NOT_WORKING | GAME_NO_SOUND, layout_cops )

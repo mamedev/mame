@@ -351,7 +351,7 @@ void intv_state::machine_start()
 	save_item(NAME(m_ram16));
 	save_item(NAME(m_sr1_int_pending));
 	save_item(NAME(m_ram8));
-	
+
 	// intvkbd
 	if (m_is_keybd)
 	{
@@ -388,7 +388,7 @@ void intv_state::machine_start()
 			case INTV_VOICE:
 				m_cart->late_subslot_setup();
 				m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x0080, 0x0081, read16_delegate(FUNC(intv_cart_slot_device::read_speech),(intv_cart_slot_device*)m_cart), write16_delegate(FUNC(intv_cart_slot_device::write_speech),(intv_cart_slot_device*)m_cart));
-				
+
 				// passthru for RAM-equipped carts
 				m_maincpu->space(AS_PROGRAM).install_write_handler(0x8800, 0x8fff, write16_delegate(FUNC(intv_cart_slot_device::write_88),(intv_cart_slot_device*)m_cart));
 				m_maincpu->space(AS_PROGRAM).install_write_handler(0xd000, 0xd7ff, write16_delegate(FUNC(intv_cart_slot_device::write_d0),(intv_cart_slot_device*)m_cart));
@@ -402,10 +402,10 @@ void intv_state::machine_start()
 				m_maincpu->space(AS_PROGRAM).install_write_handler(0x7000, 0x7fff, write16_delegate(FUNC(intv_cart_slot_device::write_rom70),(intv_cart_slot_device*)m_cart));
 				m_maincpu->space(AS_PROGRAM).install_write_handler(0xe000, 0xefff, write16_delegate(FUNC(intv_cart_slot_device::write_rome0),(intv_cart_slot_device*)m_cart));
 				m_maincpu->space(AS_PROGRAM).install_write_handler(0xf000, 0xffff, write16_delegate(FUNC(intv_cart_slot_device::write_romf0),(intv_cart_slot_device*)m_cart));
-				
+
 				// passthru for Intellivoice expansion
 				m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x0080, 0x0081, read16_delegate(FUNC(intv_cart_slot_device::read_speech),(intv_cart_slot_device*)m_cart), write16_delegate(FUNC(intv_cart_slot_device::write_speech),(intv_cart_slot_device*)m_cart));
-				
+
 				// passthru for RAM-equipped carts
 				m_maincpu->space(AS_PROGRAM).install_write_handler(0x8800, 0x8fff, write16_delegate(FUNC(intv_cart_slot_device::write_88),(intv_cart_slot_device*)m_cart));
 				m_maincpu->space(AS_PROGRAM).install_write_handler(0xd000, 0xd7ff, write16_delegate(FUNC(intv_cart_slot_device::write_d0),(intv_cart_slot_device*)m_cart));

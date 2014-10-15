@@ -13,7 +13,7 @@ public:
 	// construction/destruction
 	intv_rom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 	intv_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	// reading and writing
 	virtual DECLARE_READ16_MEMBER(read_rom04) { return INTV_ROM16_READ(offset + 0x0400); }
 	virtual DECLARE_READ16_MEMBER(read_rom20) { return INTV_ROM16_READ(offset + 0x2000); }
@@ -30,7 +30,7 @@ public:
 	virtual DECLARE_READ16_MEMBER(read_romd0) { return INTV_ROM16_READ(offset + 0xd000); }
 	virtual DECLARE_READ16_MEMBER(read_rome0) { return INTV_ROM16_READ(offset + 0xe000); }
 	virtual DECLARE_READ16_MEMBER(read_romf0) { return INTV_ROM16_READ(offset + 0xf000); }
-	
+
 	// device-level overrides
 	virtual void device_start() {}
 	virtual void device_reset() {}
@@ -43,7 +43,7 @@ class intv_ram_device : public intv_rom_device
 public:
 	// construction/destruction
 	intv_ram_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	// reading and writing
 	virtual DECLARE_READ16_MEMBER(read_ram) { return (int)m_ram[offset & (m_ram.count() - 1)]; }
 	virtual DECLARE_WRITE16_MEMBER(write_ram) { m_ram[offset & (m_ram.count() - 1)] = data & 0xff; }
@@ -56,7 +56,7 @@ class intv_gfact_device : public intv_rom_device
 public:
 	// construction/destruction
 	intv_gfact_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	// reading and writing
 	virtual DECLARE_READ16_MEMBER(read_ram) { return (int)m_ram[offset & (m_ram.count() - 1)]; }
 	virtual DECLARE_WRITE16_MEMBER(write_ram) { m_ram[offset & (m_ram.count() - 1)] = data & 0xff; }

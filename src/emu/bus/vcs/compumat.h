@@ -19,10 +19,10 @@ public:
 	virtual void device_start();
 	virtual ioport_constructor device_input_ports() const;
 	virtual void device_reset();
-	
+
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read_rom);
-	
+
 private:
 };
 

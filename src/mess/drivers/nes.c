@@ -752,10 +752,10 @@ void nes_state::setup_disk(nes_disksys_device *slot)
 		space.install_write_handler(0x6000, 0x7fff, write8_delegate(FUNC(nes_disksys_device::write_m), (nes_disksys_device *)slot));
 		space.install_read_handler(0x8000, 0xffff, read8_delegate(FUNC(nes_disksys_device::read_h), (nes_disksys_device *)slot));
 		space.install_write_handler(0x8000, 0xffff, write8_delegate(FUNC(nes_disksys_device::write_h), (nes_disksys_device *)slot));
-		
+
 		slot->vram_alloc(0x2000);
 		slot->prgram_alloc(0x8000);
-		
+
 		slot->pcb_start(machine(), m_ciram, FALSE);
 		slot->pcb_reg_postload(machine());
 		m_ppu->space(AS_PROGRAM).install_readwrite_handler(0, 0x1fff, read8_delegate(FUNC(device_nes_cart_interface::chr_r),(device_nes_cart_interface *)slot), write8_delegate(FUNC(device_nes_cart_interface::chr_w),(device_nes_cart_interface *)slot));
@@ -768,7 +768,7 @@ void nes_state::setup_disk(nes_disksys_device *slot)
 
 
 MACHINE_START_MEMBER( nes_state, fds )
-{	
+{
 	m_ciram = auto_alloc_array(machine(), UINT8, 0x800);
 	setup_ioports();
 	setup_disk(m_disk);
@@ -778,14 +778,14 @@ MACHINE_RESET_MEMBER( nes_state, fds )
 {
 	// Reset the mapper variables
 	m_disk->pcb_reset();
-	
+
 	// the rest is the same as for nes/famicom/dendy
 	m_maincpu->reset();
-	
+
 	memset(m_pad_latch, 0, sizeof(m_pad_latch));
 	memset(m_zapper_latch, 0, sizeof(m_zapper_latch));
 	m_paddle_latch = 0;
-	m_paddle_btn_latch = 0;	
+	m_paddle_btn_latch = 0;
 }
 
 static MACHINE_CONFIG_DERIVED( fds, famicom )
@@ -810,7 +810,7 @@ MACHINE_START_MEMBER( nes_state, famitwin )
 	if (!m_cartslot->exists())
 	{
 		setup_disk(m_disk);
-		
+
 		// replace the famicom disk ROM with the famicom twin one (until we modernize the floppy drive)
 		m_maincpu->space(AS_PROGRAM).install_read_bank(0xe000, 0xffff, "ftbios");
 		membank("ftbios")->set_base(machine().root_device().memregion("maincpu")->base() + 0xe000);
@@ -824,14 +824,14 @@ MACHINE_RESET_MEMBER( nes_state, famitwin )
 	// if there is no cart inserted, initialize the disk expansion instead
 	if (!m_cartslot->exists())
 		m_disk->pcb_reset();
-	
+
 	// the rest is the same as for nes/famicom/dendy
 	m_maincpu->reset();
-	
+
 	memset(m_pad_latch, 0, sizeof(m_pad_latch));
 	memset(m_zapper_latch, 0, sizeof(m_zapper_latch));
 	m_paddle_latch = 0;
-	m_paddle_btn_latch = 0;	
+	m_paddle_btn_latch = 0;
 }
 
 static MACHINE_CONFIG_DERIVED( famitwin, famicom )

@@ -4915,7 +4915,7 @@ void voodoo_device::common_start_voodoo(UINT8 type)
 		}
 	}
 
-	v->tmu_config = 0x11;	// revision 1
+	v->tmu_config = 0x11;   // revision 1
 
 	/* configure type-specific values */
 	switch (v->type)
@@ -4969,7 +4969,7 @@ void voodoo_device::common_start_voodoo(UINT8 type)
 	assert_always(v->cpu != NULL, "Unable to find CPU attached to voodoo");
 
 	if (m_tmumem1 != 0)
-		v->tmu_config |= 0xc0;	// two TMUs
+		v->tmu_config |= 0xc0;  // two TMUs
 
 	v->chipmask = 0x01;
 	v->attoseconds_per_cycle = ATTOSECONDS_PER_SECOND / v->freq;

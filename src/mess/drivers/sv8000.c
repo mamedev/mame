@@ -94,7 +94,7 @@ private:
 
 static ADDRESS_MAP_START(sv8000_mem, AS_PROGRAM, 8, sv8000_state)
 	ADDRESS_MAP_UNMAP_HIGH
-	//AM_RANGE(0x0000, 0x0fff)		// mapped by the cartslot
+	//AM_RANGE(0x0000, 0x0fff)      // mapped by the cartslot
 	AM_RANGE( 0x8000, 0x83ff ) AM_RAM // Work RAM??
 	AM_RANGE( 0xc000, 0xcbff ) AM_RAM AM_SHARE("videoram")
 ADDRESS_MAP_END
@@ -197,16 +197,16 @@ void sv8000_state::machine_reset()
 DEVICE_IMAGE_LOAD_MEMBER( sv8000_state, cart )
 {
 	UINT32 size = m_cart->common_get_size("rom");
-	
+
 	if (size != 0x1000)
 	{
 		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Incorrect or not support cartridge size");
 		return IMAGE_INIT_FAIL;
 	}
-	
+
 	m_cart->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
-	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");			
-	
+	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
+
 	return IMAGE_INIT_PASS;
 }
 

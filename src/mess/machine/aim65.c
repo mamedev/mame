@@ -149,7 +149,7 @@ void aim65_state::machine_start()
 		space.install_read_handler(0xc000, 0xcfff, read8_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_z25));
 	if (m_z26->exists())
 		space.install_read_handler(0xb000, 0xbfff, read8_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_z26));
-	
+
 	// Init RAM
 	space.install_ram(0x0000, ram->size() - 1, ram->pointer());
 

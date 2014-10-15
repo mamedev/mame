@@ -52,7 +52,7 @@ public:
 		m_shared_ram(*this, "shared_ram"),
 		m_mac_sram(*this, "mac_sram"),
 		m_sprite_vram(*this, "sprite_vram") { }
-		
+
 	required_device<cpu_device> m_maincpu;
 	required_device<i8051_device> m_audiocpu;
 	required_device<upd7759_device> m_upd7759;
@@ -172,7 +172,7 @@ public:
 	void rasterise_spans(UINT32 min_y, UINT32 max_y, UINT32 attr);
 	int clip_triangle(micro3d_vtx *v, micro3d_vtx *vout, int num_vertices, enum planes plane);
 	void draw_triangles(UINT32 attr);
-	
+
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);

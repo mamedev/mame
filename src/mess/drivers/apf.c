@@ -246,7 +246,7 @@ void apf_state::machine_start()
 				m_has_cart_ram = true;
 				break;
 		}
-		
+
 		m_cart->save_ram();
 	}
 }
@@ -310,7 +310,7 @@ static ADDRESS_MAP_START( apfm1000_map, AS_PROGRAM, 8, apf_state )
 	AM_RANGE(0x0000, 0x03ff) AM_MIRROR(0x1c00) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0x2000, 0x3fff) AM_MIRROR(0x1ffc) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
 	AM_RANGE(0x4000, 0x4fff) AM_MIRROR(0x1000) AM_ROM AM_REGION("roms", 0)
-	AM_RANGE(0x6800, 0x7fff) AM_NOP	// BASIC accesses ROM here too, but this is installed at machine_start
+	AM_RANGE(0x6800, 0x7fff) AM_NOP // BASIC accesses ROM here too, but this is installed at machine_start
 	AM_RANGE(0x8000, 0x9fff) AM_DEVREAD("cartslot", apf_cart_slot_device, read_rom)
 	AM_RANGE(0xe000, 0xefff) AM_MIRROR(0x1000) AM_ROM AM_REGION("roms", 0)
 ADDRESS_MAP_END

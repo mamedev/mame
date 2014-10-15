@@ -2,22 +2,22 @@
 
   Atari MARIA video emulation
 
- 
+
   - some history:
-    2014-10-05 Mike Saarna, Robert Tuccitto Last Line DMA value corrected 
-                to 6. GCC and Atari docs both show a difference between 
-                Other Line and Last Line as +6 at the lowest part of the 
+    2014-10-05 Mike Saarna, Robert Tuccitto Last Line DMA value corrected
+                to 6. GCC and Atari docs both show a difference between
+                Other Line and Last Line as +6 at the lowest part of the
                 range.
-                Blank scanlines are drawn when DMA is off, like real 
+                Blank scanlines are drawn when DMA is off, like real
                 hardware.
-                If MARIA hits the DMA limit, the CPU doesn't run until 
+                If MARIA hits the DMA limit, the CPU doesn't run until
                 the next scanline.
 
-    2014-09-03 Mike Saarna, Robert Tuccitto reorganized DMA penalties to 
+    2014-09-03 Mike Saarna, Robert Tuccitto reorganized DMA penalties to
                 support new rendering timeout code.
 
     2014-08-29 Mike Saarna Timeout rendering added.
- 
+
     2014-08-26 Fabio Priuli Converted to device
 
     2014-05-06 Mike Saarna Added interrupts to DMA cycle eating. Updates to
@@ -61,7 +61,7 @@ atari_maria_device::atari_maria_device(const machine_config &mconfig, const char
 
 
 void atari_maria_device::device_start()
-{	
+{
 	m_cpu = machine().device<cpu_device>(m_cpu_tag);
 	m_screen = machine().first_screen();
 	m_screen->register_screen_bitmap(m_bitmap);
@@ -181,7 +181,7 @@ void atari_maria_device::draw_scanline()
 		// All lines in a zone have the same initial DMA startup time. We'll adjust
 		// cycles for the special last zone line later, as those penalties happen after
 		// MARIA is done rendering, or after its hit the maximum rendering time.
-		maria_cycles = 16; 
+		maria_cycles = 16;
 
 
 		/* Process this DLL entry */
@@ -232,7 +232,7 @@ void atari_maria_device::draw_scanline()
 					data_addr = (m_charbase | c) + (m_offset << 8);
 					if (is_holey(data_addr))
 						continue;
-				
+
 					maria_cycles += 3;
 					if (m_cwidth) // two data bytes per map byte
 					{
@@ -260,9 +260,9 @@ void atari_maria_device::draw_scanline()
 				}
 			}
 		}
-	
+
 		// Last Line post-render DMA cycle penalties...
-		if (m_offset == 0) 
+		if (m_offset == 0)
 		{
 			maria_cycles += 6; // extra shutdown time
 			if (READ_MEM(m_dll + 3) & 0x80)
@@ -443,7 +443,7 @@ WRITE8_MEMBER(atari_maria_device::write)
 			m_color_kill = data & 0x80;
 			switch ((data >> 5) & 3)
 			{
-				case 0x00: 
+				case 0x00:
 				case 01:
 					logerror("dma test mode, do not use.\n");
 					break;

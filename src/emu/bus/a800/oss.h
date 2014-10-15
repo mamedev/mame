@@ -13,14 +13,14 @@ class a800_rom_oss8k_device : public a800_rom_device
 public:
 	// construction/destruction
 	a800_rom_oss8k_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
-	
+
 	virtual DECLARE_READ8_MEMBER(read_80xx);
 	virtual DECLARE_WRITE8_MEMBER(write_d5xx);
-	
+
 protected:
 	int m_bank;
 };
@@ -53,14 +53,14 @@ class a800_rom_oss43_device : public a800_rom_device
 public:
 	// construction/destruction
 	a800_rom_oss43_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
-	
+
 	virtual DECLARE_READ8_MEMBER(read_80xx);
 	virtual DECLARE_WRITE8_MEMBER(write_d5xx);
-	
+
 protected:
 	int m_bank;
 };
@@ -73,14 +73,14 @@ class a800_rom_oss91_device : public a800_rom_device
 public:
 	// construction/destruction
 	a800_rom_oss91_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
 
 	virtual DECLARE_READ8_MEMBER(read_80xx);
 	virtual DECLARE_WRITE8_MEMBER(write_d5xx);
-	
+
 protected:
 	int m_bank;
 };

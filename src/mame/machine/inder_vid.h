@@ -29,7 +29,7 @@ public:
 	required_shared_ptr<UINT16> m_vram;
 	required_device<palette_device> m_palette;
 	required_device<tms34010_device> m_tms;
-	
+
 	DECLARE_WRITE_LINE_MEMBER(m68k_gen_int);
 
 	int m_shiftfull; // this might be a driver specific hack for a TMS bug.
@@ -41,7 +41,7 @@ protected:
 	virtual machine_config_constructor device_mconfig_additions() const;
 	virtual void device_start();
 	virtual void device_reset();
-	
+
 private:
 };
 

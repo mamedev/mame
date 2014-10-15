@@ -361,7 +361,7 @@ WRITE8_MEMBER(exelv_state::tms7041_portd_w)
 
 
 /*
-	CARTRIDGE ACCESS
+    CARTRIDGE ACCESS
 */
 READ8_MEMBER(exelv_state::rom_r)
 {
@@ -466,7 +466,7 @@ PALETTE_INIT_MEMBER(exelv_state, exelv)
 /* Machine Initialization */
 
 MACHINE_START_MEMBER( exelv_state, exl100)
-{	
+{
 	/* register for state saving */
 	save_item(NAME(m_tms7020_portb));
 	save_item(NAME(m_tms7041_portb));
@@ -481,7 +481,7 @@ MACHINE_START_MEMBER( exelv_state, exeltel)
 	UINT8 *rom = memregion("user1")->base() + 0x0200;
 	membank("bank1")->configure_entry(0, rom);
 	membank("bank1")->set_entry(0);
-	
+
 	/* register for state saving */
 	save_item(NAME(m_tms7020_portb));
 	save_item(NAME(m_tms7041_portb));

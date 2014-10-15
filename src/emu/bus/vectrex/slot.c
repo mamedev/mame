@@ -156,44 +156,44 @@ bool vectrex_cart_slot_device::call_load()
 	{
 		UINT32 size = (software_entry() == NULL) ? length() : get_software_region_length("rom");
 		UINT8 *ROM;
-		
+
 		if (size > 0x10000)
 		{
 			seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
 			return IMAGE_INIT_FAIL;
 		}
-		
+
 		m_cart->rom_alloc((size < 0x1000) ? 0x1000 : size, tag());
 		ROM = m_cart->get_rom_base();
-		
+
 		if (software_entry() == NULL)
 			fread(ROM, size);
 		else
 			memcpy(ROM, get_software_region("rom"), size);
-		
+
 		// Verify the file is accepted by the Vectrex bios
 		if (memcmp(ROM, "g GCE", 5))
 		{
 			seterror(IMAGE_ERROR_UNSPECIFIED, "Invalid image");
 			return IMAGE_INIT_FAIL;
 		}
-		
+
 		// determine type
 		m_type = VECTREX_STD;
 		if (!memcmp(ROM + 0x06, "SRAM", 4))
-			m_type = VECTREX_SRAM;		
+			m_type = VECTREX_SRAM;
 		if (size > 0x8000)
 			m_type = VECTREX_64K;
-		
+
 		//printf("Type: %s\n", vectrex_get_slot(m_type));
 
 		// determine 3D setup (to help video setup at machine_start)
 		if (!memcmp(ROM + 0x11, "NARROW", 6) && (ROM[0x39] == 0x0c))
 			m_vec3d = VEC3D_NARROW;
-		
+
 		if (!memcmp(ROM + 0x11, "CRAZY COASTER", 13))
 			m_vec3d = VEC3D_CCOAST;
-		
+
 		if (!memcmp(ROM + 0x11, "3D MINE STORM", 13))
 			m_vec3d = VEC3D_MINEST;
 
@@ -229,9 +229,9 @@ void vectrex_cart_slot_device::get_default_card_software(astring &result)
 		int type = VECTREX_STD;
 
 		core_fread(m_file, rom, size);
-		
+
 		if (!memcmp(rom + 0x06, "SRAM", 4))
-			type = VECTREX_SRAM;		
+			type = VECTREX_SRAM;
 		if (size > 0x8000)
 			type = VECTREX_64K;
 
@@ -278,5 +278,3 @@ WRITE8_MEMBER(vectrex_cart_slot_device::write_bank)
 	if (m_cart)
 		m_cart->write_bank(space, offset, data);
 }
-
-

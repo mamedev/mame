@@ -158,7 +158,7 @@ int aim65_state::load_cart(device_image_interface &image, generic_slot_device *s
 	{
 		astring errmsg;
 		errmsg.printf("Attempted to load file with wrong extension\nSocket '%s' only accepts files with '.%s' extension",
-					  slot_tag, slot_tag);
+						slot_tag, slot_tag);
 		image.seterror(IMAGE_ERROR_UNSPECIFIED, errmsg.cstr());
 		return IMAGE_INIT_FAIL;
 	}

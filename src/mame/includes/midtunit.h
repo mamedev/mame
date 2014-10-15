@@ -104,7 +104,7 @@ public:
 	const UINT8 *jdredd_prot_table;
 	UINT8    jdredd_prot_index;
 	UINT8    jdredd_prot_max;
-	
+
 	UINT8 m_gfx_rom_large;
 
 protected:

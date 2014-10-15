@@ -244,14 +244,14 @@ WRITE8_MEMBER(a2600_state::cart_over_riot_w)
 {
 	m_cart->write_bank(space, offset, 0);
 	m_riot_ram[0x20 + offset] = data;
-	
+
 }
 
 WRITE8_MEMBER(a2600_state::cart_over_tia_w)
 {
 	// Both Cart & TIA see these addresses
 	m_cart->write_bank(space, offset, data);
-	m_tia->write(space, offset, data);	
+	m_tia->write(space, offset, data);
 }
 
 MACHINE_START_MEMBER(a2600_state,a2600)
@@ -313,7 +313,7 @@ MACHINE_START_MEMBER(a2600_state,a2600)
 			m_maincpu->space(AS_PROGRAM).install_read_handler(0x1000, 0x1fff, read8_delegate(FUNC(vcs_cart_slot_device::read_rom),(vcs_cart_slot_device*)m_cart));
 			break;
 	}
-	
+
 	/* Banks may have changed, reset the cpu so it uses the correct reset vector */
 	m_maincpu->reset();
 }

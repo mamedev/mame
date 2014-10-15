@@ -26,7 +26,7 @@ void seibuspi_state::set_layer_offsets()
 		m_midl_layer_offset = 0x2000 / 4 / 2;
 		m_text_layer_offset = 0x3000 / 4 / 2;
 	}
-	
+
 	m_fore_layer_d13 = m_layer_bank >> 14 & 0x2000;
 	m_back_layer_d14 = m_rf2_layer_bank << 14 & 0x4000;
 	m_midl_layer_d14 = m_rf2_layer_bank << 13 & 0x4000;
@@ -657,7 +657,7 @@ VIDEO_START_MEMBER(seibuspi_state,sys386f)
 	m_rf2_layer_bank = 0;
 	m_rowscroll_enable = 0;
 	set_layer_offsets();
-	
+
 	m_tilemap_ram_size = 0;
 	m_palette_ram_size = 0x4000;
 	m_sprite_ram_size = 0x2000;

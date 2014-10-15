@@ -3,18 +3,18 @@
     mouse.c
 
     Implemention of the Apple II Mouse Card
- 
+
     Apple II Mouse Interface PCB
-	Apple 1983
+    Apple 1983
 
-	This is a mouse interface for the Apple II
+    This is a mouse interface for the Apple II
 
-	PCB Layout
-	----------
-	apple computer
-	MOUSE INTERFACE
-	670-0030-C (C) 1983
-	Printed on back side - MOUSE INTERFACE 820-0104-B (C) 1983 APPLE COMPUTER
+    PCB Layout
+    ----------
+    apple computer
+    MOUSE INTERFACE
+    670-0030-C (C) 1983
+    Printed on back side - MOUSE INTERFACE 820-0104-B (C) 1983 APPLE COMPUTER
     |-----------------------------------|
     |            PAL16R4       6821     |
     |                                   |
@@ -25,40 +25,40 @@
     |-------------------|             |-|
                         |-------------|
 
-	Notes:
-		  J1      - 9 pin flat cable with female DB9 connector
-		  68705P3 - Motorola MC68705P3 microcontroller (DIP28) labelled '341-0269 (C) APPLE'
-					PCB printed '(C) APPLE 1983 341-0269 or 342-0285'
-		  8516    - Fujitsu MB8516 2k x8-bit EPROM (DIP24) labelled '341-0270-C (C) APPLE 1983'
-					PCB printed '(C) APPLE 1983 342-0270'
-		  PAL16R4 - MMI PAL16R4ACN (DIP20) marked '341-0268-A'
-					PCB printed '(C) APPLE 1983 342-0268'
-		  6821    - AMI 6821 Peripheral Interface Adapter (DIP40)
-		  X1/X2   - Jumper pads. X1 is open, X2 is closed.
- 
- 
+    Notes:
+          J1      - 9 pin flat cable with female DB9 connector
+          68705P3 - Motorola MC68705P3 microcontroller (DIP28) labelled '341-0269 (C) APPLE'
+                    PCB printed '(C) APPLE 1983 341-0269 or 342-0285'
+          8516    - Fujitsu MB8516 2k x8-bit EPROM (DIP24) labelled '341-0270-C (C) APPLE 1983'
+                    PCB printed '(C) APPLE 1983 342-0270'
+          PAL16R4 - MMI PAL16R4ACN (DIP20) marked '341-0268-A'
+                    PCB printed '(C) APPLE 1983 342-0268'
+          6821    - AMI 6821 Peripheral Interface Adapter (DIP40)
+          X1/X2   - Jumper pads. X1 is open, X2 is closed.
+
+
     Hookup notes:
-		PIA port A connects to 68705 port A in its entirety (bi-directional)
-		PIA PB4-PB7 connects to 68705 PC0-3 (bi-directional)
-		PIA PB0 is 'sync latch'
-		PIA PB1 is A8 on the EPROM
-		PIA PB2 is A9 on the EPROM
-		PIA PB3 is A10 on the EPROM
- 
-		68705 PB0 is mouse X1
-		68705 PB1 is mouse X0
-		68705 PB2 is mouse Y0
-		68705 PB3 is mouse Y1
-		68705 PB4 and 5 are N/C
-		68705 PB6 is IRQ for the slot
-		68705 PB7 is the mouse button
- 
-		68705 is clocked at 2M
-    	PIA is clocked at 1M
- 
+        PIA port A connects to 68705 port A in its entirety (bi-directional)
+        PIA PB4-PB7 connects to 68705 PC0-3 (bi-directional)
+        PIA PB0 is 'sync latch'
+        PIA PB1 is A8 on the EPROM
+        PIA PB2 is A9 on the EPROM
+        PIA PB3 is A10 on the EPROM
+
+        68705 PB0 is mouse X1
+        68705 PB1 is mouse X0
+        68705 PB2 is mouse Y0
+        68705 PB3 is mouse Y1
+        68705 PB4 and 5 are N/C
+        68705 PB6 is IRQ for the slot
+        68705 PB7 is the mouse button
+
+        68705 is clocked at 2M
+        PIA is clocked at 1M
+
     See the schematic at:
-	http://mirrors.apple2.org.za/Apple%20II%20Documentation%20Project/Interface%20Cards/Digitizers/Apple%20Mouse%20Interface%20Card/Schematics/
- 
+    http://mirrors.apple2.org.za/Apple%20II%20Documentation%20Project/Interface%20Cards/Digitizers/Apple%20Mouse%20Interface%20Card/Schematics/
+
 *********************************************************************/
 
 #include "mouse.h"
@@ -73,17 +73,17 @@
 
 const device_type A2BUS_MOUSE = &device_creator<a2bus_mouse_device>;
 
-#define MOUSE_ROM_REGION	"a2mse_rom"
-#define MOUSE_PIA_TAG		"a2mse_pia"
-#define MOUSE_MCU_TAG		"a2mse_mcu"
-#define MOUSE_MCU_ROM		"a2mse_mcurom"
+#define MOUSE_ROM_REGION    "a2mse_rom"
+#define MOUSE_PIA_TAG       "a2mse_pia"
+#define MOUSE_MCU_TAG       "a2mse_mcu"
+#define MOUSE_MCU_ROM       "a2mse_mcurom"
 
-#define MOUSE_BUTTON_TAG	"a2mse_button"
-#define MOUSE_XAXIS_TAG		"a2mse_x"
-#define MOUSE_YAXIS_TAG		"a2mse_y"
+#define MOUSE_BUTTON_TAG    "a2mse_button"
+#define MOUSE_XAXIS_TAG     "a2mse_x"
+#define MOUSE_YAXIS_TAG     "a2mse_y"
 
-#define TIMER_68705			0
-#define TIMER_QUADRATURE	1
+#define TIMER_68705         0
+#define TIMER_QUADRATURE    1
 
 static ADDRESS_MAP_START( mcu_mem, AS_PROGRAM, 8, a2bus_mouse_device )
 	ADDRESS_MAP_GLOBAL_MASK(0x7ff)
@@ -113,14 +113,14 @@ MACHINE_CONFIG_END
 
 ROM_START( mouse )
 	ROM_REGION(0x800, MOUSE_ROM_REGION, 0)
-	ROM_LOAD( "341-0270-c.4b", 0x000000, 0x000800, CRC(0bcd1e8e) SHA1(3a9d881a8a8d30f55b9719aceebbcf717f829d6f) ) 
+	ROM_LOAD( "341-0270-c.4b", 0x000000, 0x000800, CRC(0bcd1e8e) SHA1(3a9d881a8a8d30f55b9719aceebbcf717f829d6f) )
 
 	ROM_REGION(0x800, MOUSE_MCU_ROM, 0)
-	ROM_LOAD( "341-0269.2b",  0x000000, 0x000800, CRC(94067f16) SHA1(3a2baa6648efe4456d3ec3721216e57c64f7acfc) ) 
+	ROM_LOAD( "341-0269.2b",  0x000000, 0x000800, CRC(94067f16) SHA1(3a2baa6648efe4456d3ec3721216e57c64f7acfc) )
 
 	ROM_REGION(0xc00, "pal", 0)
-	ROM_LOAD( "mmi_pal16r4a(jedec).2a", 0x000000, 0x000b04, CRC(1d620ee5) SHA1(5aa9a515c919ff7a18878649cac5d44f0c2abf28) ) 
-	ROM_LOAD( "mmi_pal16r4a(binary).2a", 0x000000, 0x000100, CRC(1da5c745) SHA1(ba267b69a2fda2a2348b140979ece562411bb37b) ) 
+	ROM_LOAD( "mmi_pal16r4a(jedec).2a", 0x000000, 0x000b04, CRC(1d620ee5) SHA1(5aa9a515c919ff7a18878649cac5d44f0c2abf28) )
+	ROM_LOAD( "mmi_pal16r4a(binary).2a", 0x000000, 0x000100, CRC(1da5c745) SHA1(ba267b69a2fda2a2348b140979ece562411bb37b) )
 ROM_END
 
 static INPUT_PORTS_START( mouse )
@@ -241,7 +241,7 @@ void a2bus_mouse_device::device_reset()
 	m_rom_bank = 0;
 	last_mx = last_my = count_x = count_y = 0;
 	m_timer_cnt = 0xff;
-	m_timer_ctl = 0x40;	// disable interrupt, everything else clear
+	m_timer_ctl = 0x40; // disable interrupt, everything else clear
 	m_port_a_in = 0;
 	m_port_b_in = 0x80;
 	m_port_c_in = 0;
@@ -261,7 +261,7 @@ void a2bus_mouse_device::device_reset()
 
 UINT8 a2bus_mouse_device::read_c0nx(address_space &space, UINT8 offset)
 {
-	return m_pia->read(space, offset & 3); 
+	return m_pia->read(space, offset & 3);
 }
 
 
@@ -394,10 +394,10 @@ WRITE8_MEMBER(a2bus_mouse_device::mcu_timer_w)
 		m_timer_cnt = data;
 		recalc = true;
 	}
-    // offset 1 = timer control:  b7 = IRQ, b6 = IRQ mask (1=suppress), 
-	//                            b5 = input select (0=CPU clk, 1=ext), 
-    //                            b4 = enable external timer input, 
-    //                            b3 = clear, b2-b0 = scaler (1/2/4/8/16/32/64/128)
+	// offset 1 = timer control:  b7 = IRQ, b6 = IRQ mask (1=suppress),
+	//                            b5 = input select (0=CPU clk, 1=ext),
+	//                            b4 = enable external timer input,
+	//                            b3 = clear, b2-b0 = scaler (1/2/4/8/16/32/64/128)
 	else
 	{
 		// clearing the interrupt?
@@ -425,7 +425,7 @@ WRITE8_MEMBER(a2bus_mouse_device::mcu_timer_w)
 				recalc = true;
 			}
 
-			m_timer_ctl = data; 
+			m_timer_ctl = data;
 		}
 
 	}
@@ -445,15 +445,15 @@ WRITE8_MEMBER(a2bus_mouse_device::mcu_timer_w)
     X1 = gate, must go 0/1 for each pixel moved
     Y0 = direction, 0 = up, 1 = down
     Y1 = gate, must go 0/1 for each pixel moved
- 
+
     The direction must stay constant for a given train of gate pulses or the MCU will get confused.
 */
 void a2bus_mouse_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	if (id == TIMER_68705)	// 68705's built-in timer
+	if (id == TIMER_68705)  // 68705's built-in timer
 	{
 		m_timer_ctl |= 0x80;    // indicate timer expired
-		if (!(m_timer_ctl & 0x40))	// if interrupt not suppressed, fire!
+		if (!(m_timer_ctl & 0x40))  // if interrupt not suppressed, fire!
 		{
 			m_mcu->set_input_line(M68705_INT_TIMER, ASSERT_LINE);
 		}
@@ -509,9 +509,9 @@ void a2bus_mouse_device::device_timer(emu_timer &timer, device_timer_id id, int 
 			else
 			{
 				count_x--;
-				m_port_b_in |= 0x01;	// X1
+				m_port_b_in |= 0x01;    // X1
 			}
-			m_port_b_in |= 0x02;	// X0
+			m_port_b_in |= 0x02;    // X0
 		}
 		else if (count_y)
 		{
@@ -522,9 +522,9 @@ void a2bus_mouse_device::device_timer(emu_timer &timer, device_timer_id id, int 
 			else
 			{
 				count_y--;
-				m_port_b_in |= 0x04;	// Y0
+				m_port_b_in |= 0x04;    // Y0
 			}
-			m_port_b_in |= 0x08;	// Y1
+			m_port_b_in |= 0x08;    // Y1
 		}
 	}
 }

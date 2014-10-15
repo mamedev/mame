@@ -6,12 +6,12 @@
     Atari 8 bit cart emulation
     (through slot devices)
 
-    Emulation of the cartslot(s) for Atari 8bit series of home computers 
- 
+    Emulation of the cartslot(s) for Atari 8bit series of home computers
+
     Accessors to ROM are typically given in the area 0xa000-0xbfff, but some
     carts (and the right slot in A800) maps ROM to 0x8000-0x9fff too
     Bankswitch typically happens by accessing addresses in 0xd500-0xd5ff
- 
+
     Accordingly, this device offers the following handlers
     - read_80xx/write_80xx
     - read_d5xx/write_d5xx
@@ -67,9 +67,9 @@ void device_a800_cart_interface::rom_alloc(UINT32 size, const char *tag)
 		tempstring.cat(A800SLOT_ROM_REGION_TAG);
 		m_rom = device().machine().memory().region_alloc(tempstring, size, 1, ENDIANNESS_LITTLE)->base();
 		m_rom_size = size;
-		
+
 		// setup other helpers
-		m_bank_mask = (size / 0x2000) - 1;	// code for XEGS carts makes use of this to simplify banking
+		m_bank_mask = (size / 0x2000) - 1;  // code for XEGS carts makes use of this to simplify banking
 	}
 }
 
@@ -243,15 +243,15 @@ bool a800_cart_slot_device::call_load()
 	if (m_cart)
 	{
 		UINT32 len;
-		
+
 		if (software_entry() != NULL)
 		{
 			const char *pcb_name;
 			len = get_software_region_length("rom");
-			
+
 			m_cart->rom_alloc(len, tag());
 			memcpy(m_cart->get_rom_base(), get_software_region("rom"), len);
-			
+
 			if ((pcb_name = get_feature("slot")) != NULL)
 				m_type = a800_get_pcb_id(pcb_name);
 			else
@@ -267,9 +267,9 @@ bool a800_cart_slot_device::call_load()
 				UINT8 header[16];
 				fread(header, 0x10);
 				m_type = identify_cart_type(header);
-				len -= 0x10;	// in identify_cart_type the first 0x10 bytes are read, so we need to adjust here
+				len -= 0x10;    // in identify_cart_type the first 0x10 bytes are read, so we need to adjust here
 			}
-			else	// otherwise try to guess based on size
+			else    // otherwise try to guess based on size
 			{
 				if (len == 0x8000)
 					m_type = A5200_32K;
@@ -323,7 +323,7 @@ int a800_cart_slot_device::identify_cart_type(UINT8 *header)
 	// check CART format
 	if (strncmp((const char *)header, "CART", 4))
 		fatalerror("Invalid header detected!\n");
-	
+
 	switch ((header[4] << 24) + (header[5] << 16) +  (header[6] << 8) + (header[7] << 0))
 	{
 		case 1:
@@ -400,7 +400,7 @@ int a800_cart_slot_device::identify_cart_type(UINT8 *header)
 			osd_printf_info("Cart type \"%d\" is currently unsupported.\n", (header[4] << 24) + (header[5] << 16) +  (header[6] << 8) + (header[7] << 0));
 			break;
 	}
-	
+
 	return type;
 }
 
@@ -420,10 +420,10 @@ void a800_cart_slot_device::get_default_card_software(astring &result)
 		// check whether there is an header, to identify the cart type
 		if ((len % 0x1000) == 0x10)
 		{
-			core_fread(m_file, head, 0x10);		
+			core_fread(m_file, head, 0x10);
 			type = identify_cart_type(head);
 		}
-		else	// otherwise try to guess based on size
+		else    // otherwise try to guess based on size
 		{
 			if (len == 0x4000)
 				type = A800_16K;
@@ -435,9 +435,9 @@ void a800_cart_slot_device::get_default_card_software(astring &result)
 			osd_printf_info("This game is not designed for A800. You might want to run it in A5200.\n");
 
 		slot_string = a800_get_slot(type);
-		
+
 		clear();
-		
+
 		result.cpy(slot_string);
 	}
 	else
@@ -453,11 +453,11 @@ void a5200_cart_slot_device::get_default_card_software(astring &result)
 		dynamic_buffer head(0x10);
 		UINT32 len = core_fsize(m_file);
 		int type = A5200_8K;
-		
+
 		// check whether there is an header, to identify the cart type
 		if ((len % 0x1000) == 0x10)
 		{
-			core_fread(m_file, head, 0x10);		
+			core_fread(m_file, head, 0x10);
 			type = identify_cart_type(head);
 
 			astring info;
@@ -466,11 +466,11 @@ void a5200_cart_slot_device::get_default_card_software(astring &result)
 		}
 		if (type < A5200_4K)
 			osd_printf_info("This game is not designed for A5200. You might want to run it in A800 or A800XL.\n");
-		
+
 		slot_string = a800_get_slot(type);
-		
+
 		clear();
-		
+
 		result.cpy(slot_string);
 	}
 	else
@@ -486,11 +486,11 @@ void xegs_cart_slot_device::get_default_card_software(astring &result)
 		dynamic_buffer head(0x10);
 		UINT32 len = core_fsize(m_file);
 		int type = A800_8K;
-		
+
 		// check whether there is an header, to identify the cart type
 		if ((len % 0x1000) == 0x10)
 		{
-			core_fread(m_file, head, 0x10);		
+			core_fread(m_file, head, 0x10);
 			type = identify_cart_type(head);
 		}
 		if (type != A800_XEGS)
@@ -501,11 +501,11 @@ void xegs_cart_slot_device::get_default_card_software(astring &result)
 			else
 				osd_printf_info("You might want to run it in A800 or A800XL.\n");
 		}
-		
+
 		slot_string = a800_get_slot(type);
-		
+
 		clear();
-		
+
 		result.cpy(slot_string);
 	}
 	else
@@ -549,4 +549,3 @@ WRITE8_MEMBER(a800_cart_slot_device::write_d5xx)
 	if (m_cart)
 		m_cart->write_d5xx(space, offset, data, mem_mask);
 }
-

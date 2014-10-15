@@ -1941,16 +1941,16 @@ WRITE8_MEMBER(bbc_state::bbc_disc_w)
 int bbc_state::bbc_load_cart(device_image_interface &image, generic_slot_device *slot)
 {
 	UINT32 size = slot->common_get_size("rom");
-	
+
 	if (size != 0x2000 && size != 0x4000)
 	{
 		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
 		return IMAGE_INIT_FAIL;
 	}
-	
+
 	slot->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
 	slot->common_load_rom(slot->get_rom_base(), size, "rom");
-	
+
 	return IMAGE_INIT_PASS;
 }
 
@@ -1969,7 +1969,7 @@ int bbc_state::bbcm_load_cart(device_image_interface &image, generic_slot_device
 			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
 			return IMAGE_INIT_FAIL;
 		}
-		
+
 		slot->rom_alloc(filesize, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
 		image.fread(slot->get_rom_base(), filesize);
 		return IMAGE_INIT_PASS;
@@ -1978,18 +1978,18 @@ int bbc_state::bbcm_load_cart(device_image_interface &image, generic_slot_device
 	{
 		UINT32 size_lo = image.get_software_region_length("lorom");
 		UINT32 size_hi = image.get_software_region_length("uprom");
-		
+
 		if (size_lo + size_hi != 0x8000)
 		{
 			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
 			return IMAGE_INIT_FAIL;
 		}
-		
+
 		slot->rom_alloc(size_lo + size_hi, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
 		memcpy(slot->get_rom_base() + 0,       image.get_software_region("uprom"), size_hi);
 		memcpy(slot->get_rom_base() + size_hi, image.get_software_region("lorom"), size_lo);
 	}
-	
+
 	return IMAGE_INIT_PASS;
 }
 
@@ -2052,7 +2052,7 @@ void bbc_state::bbc_setup_banks(memory_bank *membank, int banks, UINT32 shift, U
 		eprom[3] = tmp_reg->base() + shift;
 	else
 		eprom[3] = m_region_opt->base() + 0xc000 + shift;
-	
+
 	membank->configure_entries(0, 1,  eprom[0], size);
 	membank->configure_entries(1, 1,  eprom[1], size);
 	membank->configure_entries(2, 1,  eprom[2], size);
@@ -2078,12 +2078,12 @@ void bbc_state::bbcm_setup_banks(memory_bank *membank, int banks, UINT32 shift, 
 		eprom[1] = tmp_reg->base() + shift;
 	else
 		eprom[1] = m_region_opt->base() + 0x8000 + shift;
-	
+
 	membank->configure_entries(0, 1,  eprom[0], size);
 	membank->configure_entries(1, 1,  eprom[0] + 0x4000, size);
 	membank->configure_entries(2, 1,  eprom[1], size);
 	membank->configure_entries(3, 1,  eprom[1] + 0x4000, size);
-	
+
 	if (banks > 4)
 	{
 		for (int i = 0; i < banks - 4; i++)
@@ -2127,7 +2127,7 @@ MACHINE_START_MEMBER(bbc_state, bbcb)
 	m_previous_wd177x_int_state=1;
 	bbc_setup_banks(m_bank4, 16, 0, 0x4000);
 	if (m_region_dfs)
-		m_bank4->configure_entries(16, 8, m_region_dfs->base(), 0x4000);	// additional bank for paged ram
+		m_bank4->configure_entries(16, 8, m_region_dfs->base(), 0x4000);    // additional bank for paged ram
 }
 
 MACHINE_RESET_MEMBER(bbc_state, bbcb)
@@ -2155,7 +2155,7 @@ MACHINE_START_MEMBER(bbc_state, bbcbp)
 	m_maincpu->space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(FUNC(bbc_state::bbcbp_direct_handler), this));
 
 	bbc_setup_banks(m_bank4, 16, 0, 0x3000);
-	m_bank4->configure_entries(16, 1, m_region_maincpu->base() + 0x8000, 0x3000);	// additional bank for paged ram
+	m_bank4->configure_entries(16, 1, m_region_maincpu->base() + 0x8000, 0x3000);   // additional bank for paged ram
 	bbc_setup_banks(m_bank6, 16, 0x3000, 0x1000);
 }
 
@@ -2180,7 +2180,7 @@ MACHINE_START_MEMBER(bbc_state, bbcm)
 	m_maincpu->space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(FUNC(bbc_state::bbcm_direct_handler), this));
 
 	bbcm_setup_banks(m_bank4, 16, 0, 0x1000);
-	m_bank4->configure_entries(16, 1, m_region_maincpu->base() + 0x8000, 0x1000);	// additional bank for paged ram
+	m_bank4->configure_entries(16, 1, m_region_maincpu->base() + 0x8000, 0x1000);   // additional bank for paged ram
 	bbcm_setup_banks(m_bank5, 16, 0x1000, 0x3000);
 
 	/* Set ROM/IO bank to point to rom */

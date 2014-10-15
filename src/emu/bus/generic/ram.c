@@ -1,21 +1,21 @@
 // license:BSD-3-Clause
 // copyright-holders:etabeta
 /***********************************************************************************************************
- 
- 
+
+
  Generic RAM socket emulation
- 
+
  This offers generic access to RAM
- 
+
  generic_ram_plain  : returns 0xff when the system reads beyond the end of the RAM
- generic_ram_linear : maps linearly the RAM in the accessed area (i.e., read/write offset is masked with 
+ generic_ram_linear : maps linearly the RAM in the accessed area (i.e., read/write offset is masked with
  (RAM size - 1) )
- 
+
  TODO:
    - support variable RAM size
    - possibly support linear mapping when non-power of 2 RAMs are mapped
    - add support for 16bit & 32bit RAM access
- 
+
  ***********************************************************************************************************/
 
 
@@ -121,4 +121,3 @@ WRITE8_MEMBER(generic_ram_linear_device::write_ram)
 {
 	m_ram[offset % m_ram.bytes()] = data;
 }
-

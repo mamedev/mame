@@ -154,7 +154,7 @@ void ws_rom_device::device_timer(emu_timer &timer, device_timer_id id, int param
 		m_rtc_second++;
 		if ((m_rtc_second & 0x0f) > 9)
 			m_rtc_second = (m_rtc_second & 0xf0) + 0x10;
-		
+
 		// check for minute passed
 		if (m_rtc_second >= 0x60)
 		{
@@ -163,7 +163,7 @@ void ws_rom_device::device_timer(emu_timer &timer, device_timer_id id, int param
 			if ((m_rtc_minute & 0x0f) > 9)
 				m_rtc_minute = (m_rtc_minute & 0xf0) + 0x10;
 		}
-		
+
 		// check for hour passed
 		if (m_rtc_minute >= 0x60)
 		{
@@ -174,7 +174,7 @@ void ws_rom_device::device_timer(emu_timer &timer, device_timer_id id, int param
 			if (m_rtc_hour == 0x12)
 				m_rtc_hour |= 0x80;
 		}
-		
+
 		// check for day passed
 		if (m_rtc_hour >= 0x24)
 		{
@@ -217,7 +217,7 @@ READ8_MEMBER(ws_rom_device::read_io)
 		case 0x0b:      // RTC data
 			if (!m_has_rtc)
 				break;
-			
+
 			if (m_io_regs[0x0a] == 0x95 && (m_rtc_index < 7))
 			{
 				switch (m_rtc_index)
@@ -307,7 +307,7 @@ WRITE8_MEMBER(ws_rom_device::write_io)
 		case 0x0b:  // RTC Data
 			if (!m_has_rtc)
 				break;
-			
+
 			if (m_io_regs[0x0a] == 0x94 && m_rtc_index < 7)
 			{
 				switch (m_rtc_index)
@@ -339,7 +339,7 @@ WRITE8_MEMBER(ws_rom_sram_device::write_ram)
 }
 
 WRITE8_MEMBER(ws_rom_sram_device::write_io)
-{	
+{
 	switch (offset)
 	{
 		case 0x01:  // SRAM bank to select
@@ -354,7 +354,7 @@ WRITE8_MEMBER(ws_rom_sram_device::write_io)
 READ8_MEMBER(ws_rom_eeprom_device::read_io)
 {
 	UINT8 value = m_io_regs[offset];
-	
+
 	switch (offset)
 	{
 		case 0x04:
@@ -368,29 +368,29 @@ READ8_MEMBER(ws_rom_eeprom_device::read_io)
 			value = ws_rom_device::read_io(space, offset);
 			break;
 	}
-	
+
 	return value;
 }
 
 WRITE8_MEMBER(ws_rom_eeprom_device::write_io)
-{	
+{
 	switch (offset)
 	{
 		case 0x06:  /* EEPROM address lower bits port/EEPROM address and command port
-					 1KBit EEPROM:
-					 Bit 0-5 - EEPROM address bit 1-6
-					 Bit 6-7 - Command
-					 00 - Extended command address bit 4-5:
-					 00 - Write disable
-					 01 - Write all
-					 10 - Erase all
-					 11 - Write enable
-					 01 - Write
-					 10 - Read
-					 11 - Erase
-					 16KBit EEPROM:
-					 Bit 0-7 - EEPROM address bit 1-8
-					 */
+                     1KBit EEPROM:
+                     Bit 0-5 - EEPROM address bit 1-6
+                     Bit 6-7 - Command
+                     00 - Extended command address bit 4-5:
+                     00 - Write disable
+                     01 - Write all
+                     10 - Erase all
+                     11 - Write enable
+                     01 - Write
+                     10 - Read
+                     11 - Erase
+                     16KBit EEPROM:
+                     Bit 0-7 - EEPROM address bit 1-8
+                     */
 			switch (m_eeprom_mode)
 			{
 				case EEPROM_1K:
@@ -412,23 +412,23 @@ WRITE8_MEMBER(ws_rom_eeprom_device::write_io)
 			break;
 
 		case 0x07:  /* EEPROM higher bits/command bits port
-					 1KBit EEPROM:
-					 Bit 0   - Start
-					 Bit 1-7 - Unknown
-					 16KBit EEPROM:
-					 Bit 0-1 - EEPROM address bit 9-10
-					 Bit 2-3 - Command
-					 00 - Extended command address bit 0-1:
-					 00 - Write disable
-					 01 - Write all
-					 10 - Erase all
-					 11 - Write enable
-					 01 - Write
-					 10 - Read
-					 11 - Erase
-					 Bit 4   - Start
-					 Bit 5-7 - Unknown
-					 */
+                     1KBit EEPROM:
+                     Bit 0   - Start
+                     Bit 1-7 - Unknown
+                     16KBit EEPROM:
+                     Bit 0-1 - EEPROM address bit 9-10
+                     Bit 2-3 - Command
+                     00 - Extended command address bit 0-1:
+                     00 - Write disable
+                     01 - Write all
+                     10 - Erase all
+                     11 - Write enable
+                     01 - Write
+                     10 - Read
+                     11 - Erase
+                     Bit 4   - Start
+                     Bit 5-7 - Unknown
+                     */
 			switch (m_eeprom_mode)
 			{
 				case EEPROM_1K:
@@ -450,7 +450,7 @@ WRITE8_MEMBER(ws_rom_eeprom_device::write_io)
 						m_eeprom_command = m_eeprom_command & 0x0c;
 					m_eeprom_start = (data >> 4) & 0x01;
 					break;
-					
+
 				default:
 					logerror( "Write EEPROM address/command register C7 for unsupported EEPROM type\n" );
 				break;
@@ -458,19 +458,19 @@ WRITE8_MEMBER(ws_rom_eeprom_device::write_io)
 			break;
 
 		case 0x08:  /* EEPROM command
-					 Bit 0   - Read complete (read only)
-					 Bit 1   - Write complete (read only)
-					 Bit 2-3 - Unknown
-					 Bit 4   - Read
-					 Bit 5   - Write
-					 Bit 6   - Protect
-					 Bit 7   - Initialize
-					 */
-			if (data & 0x80)	// Initialize
+                     Bit 0   - Read complete (read only)
+                     Bit 1   - Write complete (read only)
+                     Bit 2-3 - Unknown
+                     Bit 4   - Read
+                     Bit 5   - Write
+                     Bit 6   - Protect
+                     Bit 7   - Initialize
+                     */
+			if (data & 0x80)    // Initialize
 				logerror("Unsupported EEPROM command 'Initialize'\n");
 
-			if (data & 0x40)	// Protect
-			{   
+			if (data & 0x40)    // Protect
+			{
 				switch (m_eeprom_command)
 				{
 					case 0x00:
@@ -487,7 +487,7 @@ WRITE8_MEMBER(ws_rom_eeprom_device::write_io)
 				}
 			}
 
-			if (data & 0x20)	// Write
+			if (data & 0x20)    // Write
 			{
 				if (m_eeprom_write_enabled)
 				{
@@ -505,7 +505,7 @@ WRITE8_MEMBER(ws_rom_eeprom_device::write_io)
 				}
 			}
 
-			if (data & 0x10)	// Read
+			if (data & 0x10)    // Read
 			{
 				m_io_regs[0x04] = m_nvram[(m_eeprom_address << 1) + 1];
 				m_io_regs[0x05] = m_nvram[m_eeprom_address << 1];

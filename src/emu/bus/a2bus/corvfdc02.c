@@ -4,10 +4,10 @@
 
     Implemention of the Corvus Systems CORVUS02 floppy controller
     aka the "Buffered Floppy Controller"
- 
+
     Boot PROM 0.8 says 8" SSDD or 5.25" DSDD; we stick with 5.25" here
     and let the FDC01 handle 8".
- 
+
 *********************************************************************/
 
 #include "corvfdc02.h"
@@ -23,8 +23,8 @@
 
 const device_type A2BUS_CORVFDC02 = &device_creator<a2bus_corvfdc02_device>;
 
-#define FDC02_ROM_REGION	"fdc02_rom"
-#define FDC02_FDC_TAG		"fdc02_fdc"
+#define FDC02_ROM_REGION    "fdc02_rom"
+#define FDC02_FDC_TAG       "fdc02_fdc"
 
 FLOPPY_FORMATS_MEMBER( a2bus_corvfdc02_device::corv_floppy_formats )
 	FLOPPY_CONCEPT_525DSDD_FORMAT,
@@ -86,7 +86,6 @@ a2bus_corvfdc02_device::a2bus_corvfdc02_device(const machine_config &mconfig, de
 	m_con3(*this, FDC02_FDC_TAG":2"),
 	m_con4(*this, FDC02_FDC_TAG":3")
 {
-	
 }
 
 a2bus_corvfdc02_device::a2bus_corvfdc02_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
@@ -143,20 +142,20 @@ UINT8 a2bus_corvfdc02_device::read_c0nx(address_space &space, UINT8 offset)
 {
 	switch (offset)
 	{
-		case 0:	// 765 FIFO
+		case 0: // 765 FIFO
 			return m_fdc->fifo_r(space, 0);
 
-		case 1:	// 765 MSR
+		case 1: // 765 MSR
 			return m_fdc->msr_r(space, 0);
 
-		case 2:	// buffer address
+		case 2: // buffer address
 			return (m_bufptr>>1) & 0xff;
 
-		case 3: 
-//			printf("Read buffer @ %x = %02x\n", m_bufptr, m_buffer[m_bufptr]);
+		case 3:
+//          printf("Read buffer @ %x = %02x\n", m_bufptr, m_buffer[m_bufptr]);
 			return m_buffer[m_bufptr--];
 
-		case 4:	// local status
+		case 4: // local status
 			if (m_curfloppy)
 			{
 				m_fdc_local_status &= ~(1 | 0x40);
@@ -188,13 +187,13 @@ void a2bus_corvfdc02_device::write_c0nx(address_space &space, UINT8 offset, UINT
 		case 1:    // FDC ???
 			break;
 
-		case 2:	// buffer address
+		case 2: // buffer address
 			m_bufptr = (data << 1) | (data & 1);
-//			printf("%02x to buffer address yields %x\n", data, m_bufptr);
+//          printf("%02x to buffer address yields %x\n", data, m_bufptr);
 			break;
 
-		case 3:	// buffer write
-//			printf("%02x to buffer[%x]\n", data, m_bufptr);
+		case 3: // buffer write
+//          printf("%02x to buffer[%x]\n", data, m_bufptr);
 			m_buffer[m_bufptr--] = data;
 			break;
 
@@ -233,12 +232,12 @@ void a2bus_corvfdc02_device::write_c0nx(address_space &space, UINT8 offset, UINT
 			{
 				// motor control (active low)
 				m_curfloppy->mon_w((data & 8) ? 1 : 0);
-//				printf("Cur drive %p motor %s\n", m_curfloppy, (data & 8) ? "OFF" : "ON");
+//              printf("Cur drive %p motor %s\n", m_curfloppy, (data & 8) ? "OFF" : "ON");
 			}
 
 			if (data & 0x80)
 			{
-//				printf("Reset NEC765\n");
+//              printf("Reset NEC765\n");
 				m_fdc->reset();
 			}
 			break;
@@ -266,7 +265,7 @@ WRITE_LINE_MEMBER(a2bus_corvfdc02_device::intrq_w)
 	}
 	else
 	{
-		m_fdc_local_status |= 2;	// clear IRQ
+		m_fdc_local_status |= 2;    // clear IRQ
 		lower_slot_irq();
 	}
 }
@@ -279,7 +278,7 @@ WRITE_LINE_MEMBER(a2bus_corvfdc02_device::drq_w)
 		if (m_fdc_local_command & 0x40)
 		{
 			m_buffer[m_bufptr] = m_fdc->dma_r();
-//			printf("DMA %02x to buffer[%x]\n", m_buffer[m_bufptr], m_bufptr);
+//          printf("DMA %02x to buffer[%x]\n", m_buffer[m_bufptr], m_bufptr);
 
 			if (!m_bufptr)
 			{
@@ -296,4 +295,3 @@ WRITE_LINE_MEMBER(a2bus_corvfdc02_device::drq_w)
 		}
 	}
 }
-

@@ -12,19 +12,19 @@
 /* PCB */
 enum
 {
-	A78_TYPE0 = 0,		// standard 8K/16K/32K games, no bankswitch
-	A78_TYPE1,			// as TYPE0 + POKEY chip on the PCB
-	A78_TYPE2,			// Atari SuperGame pcb (8x16K banks with bankswitch)
-	A78_TYPE3,			// as TYPE1 + POKEY chip on the PCB
-	A78_TYPE6,			// as TYPE1 + RAM IC on the PCB
-	A78_TYPEA,			// Alien Brigade, Crossbow (9x16K banks with diff bankswitch)
-	A78_ABSOLUTE,		// F18 Hornet
-	A78_ACTIVISION,		// Double Dragon, Rampage
-	A78_HSC,			// Atari HighScore cart
-	A78_XB_BOARD,		// A7800 Expansion Board (it shall more or less apply to the Expansion Module too, but this is not officially released yet)
-	A78_XM_BOARD,		// A7800 XM Expansion Module (theoretical specs only, since this is not officially released yet)
-	A78_MEGACART,				// Homebrew by CPUWIZ, consists of SuperGame bank up to 512K + 32K RAM banked
-	A78_VERSABOARD = 0x10,		// Homebrew by CPUWIZ, consists of SuperGame bank up to 256K + 32K RAM banked
+	A78_TYPE0 = 0,      // standard 8K/16K/32K games, no bankswitch
+	A78_TYPE1,          // as TYPE0 + POKEY chip on the PCB
+	A78_TYPE2,          // Atari SuperGame pcb (8x16K banks with bankswitch)
+	A78_TYPE3,          // as TYPE1 + POKEY chip on the PCB
+	A78_TYPE6,          // as TYPE1 + RAM IC on the PCB
+	A78_TYPEA,          // Alien Brigade, Crossbow (9x16K banks with diff bankswitch)
+	A78_ABSOLUTE,       // F18 Hornet
+	A78_ACTIVISION,     // Double Dragon, Rampage
+	A78_HSC,            // Atari HighScore cart
+	A78_XB_BOARD,       // A7800 Expansion Board (it shall more or less apply to the Expansion Module too, but this is not officially released yet)
+	A78_XM_BOARD,       // A7800 XM Expansion Module (theoretical specs only, since this is not officially released yet)
+	A78_MEGACART,               // Homebrew by CPUWIZ, consists of SuperGame bank up to 512K + 32K RAM banked
+	A78_VERSABOARD = 0x10,      // Homebrew by CPUWIZ, consists of SuperGame bank up to 256K + 32K RAM banked
 	// VersaBoard variants configured as Type 1/3/A or VersaBoard + POKEY at $0450
 	A78_TYPE0_POK450 = 0x20,
 	A78_TYPE1_POK450 = 0x21,
@@ -68,7 +68,7 @@ protected:
 	UINT8 *m_rom;
 	UINT32 m_rom_size;
 	dynamic_buffer m_ram;
-	dynamic_buffer m_nvram;	// HiScore cart can save scores!
+	dynamic_buffer m_nvram; // HiScore cart can save scores!
 	// helpers
 	UINT32 m_base_rom;
 	int m_bank_mask;
@@ -101,7 +101,7 @@ public:
 	int get_cart_type() { return m_type; };
 	int identify_cart_type(UINT8 *ROM, UINT32 len);
 	bool has_cart() { return m_cart != NULL; }
-	
+
 	virtual iodevice_t image_type() const { return IO_CARTSLOT; }
 	virtual bool is_readable()  const { return 1; }
 	virtual bool is_writeable() const { return 0; }
@@ -125,7 +125,7 @@ public:
 	virtual DECLARE_WRITE8_MEMBER(write_10xx);
 	virtual DECLARE_WRITE8_MEMBER(write_30xx);
 	virtual DECLARE_WRITE8_MEMBER(write_40xx);
-	
+
 private:
 	device_a78_cart_interface*       m_cart;
 	int m_type;

@@ -638,40 +638,40 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( endless )
 	PORT_INCLUDE(snes_common)
 
-    PORT_START("DSW1")
-    PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coinage ) )
-    PORT_DIPSETTING(    0x01, DEF_STR( 4C_1C ) )
-    PORT_DIPSETTING(    0x02, DEF_STR( 3C_1C ) )
-    PORT_DIPSETTING(    0x03, DEF_STR( 2C_1C ) )
-    PORT_DIPSETTING(    0x07, DEF_STR( 1C_1C ) )
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coinage ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x07, DEF_STR( 1C_1C ) )
 //  PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )            /* duplicate setting */
-    PORT_DIPSETTING(    0x06, DEF_STR( 1C_2C ) )
-    PORT_DIPSETTING(    0x05, DEF_STR( 1C_3C ) )
-    PORT_DIPSETTING(    0x04, DEF_STR( 1C_4C ) )
-    PORT_DIPNAME( 0x38, 0x38, DEF_STR( Difficulty ) )       /* "LEVEL" */
-    PORT_DIPSETTING(    0x38, "0 (Easiest)" )               /* "EASY" */
-    PORT_DIPSETTING(    0x30, "1" )                         /* "NORMAL" */
-    PORT_DIPSETTING(    0x28, "2" )                         /* "HARD" */
-    PORT_DIPSETTING(    0x20, "3" )                         /* undefined */
-    PORT_DIPSETTING(    0x18, "4" )                         /* undefined */
-    PORT_DIPSETTING(    0x10, "5" )                         /* undefined */
-    PORT_DIPSETTING(    0x08, "6" )                         /* undefined */
-    PORT_DIPSETTING(    0x00, "7 (Hardest)" )               /* undefined */
-    PORT_DIPNAME( 0xc0, 0xc0, "Time" )                      /* "TIME" */
-    PORT_DIPSETTING(    0xc0, "99" )                        /* "LIMIT" */
-    PORT_DIPSETTING(    0x80, "60" )                        /* undefined */
-    PORT_DIPSETTING(    0x40, "30" )                        /* undefined */
-    PORT_DIPSETTING(    0x00, "Infinite" )                  /* "NO LIMIT" */
+	PORT_DIPSETTING(    0x06, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x05, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 1C_4C ) )
+	PORT_DIPNAME( 0x38, 0x38, DEF_STR( Difficulty ) )       /* "LEVEL" */
+	PORT_DIPSETTING(    0x38, "0 (Easiest)" )               /* "EASY" */
+	PORT_DIPSETTING(    0x30, "1" )                         /* "NORMAL" */
+	PORT_DIPSETTING(    0x28, "2" )                         /* "HARD" */
+	PORT_DIPSETTING(    0x20, "3" )                         /* undefined */
+	PORT_DIPSETTING(    0x18, "4" )                         /* undefined */
+	PORT_DIPSETTING(    0x10, "5" )                         /* undefined */
+	PORT_DIPSETTING(    0x08, "6" )                         /* undefined */
+	PORT_DIPSETTING(    0x00, "7 (Hardest)" )               /* undefined */
+	PORT_DIPNAME( 0xc0, 0xc0, "Time" )                      /* "TIME" */
+	PORT_DIPSETTING(    0xc0, "99" )                        /* "LIMIT" */
+	PORT_DIPSETTING(    0x80, "60" )                        /* undefined */
+	PORT_DIPSETTING(    0x40, "30" )                        /* undefined */
+	PORT_DIPSETTING(    0x00, "Infinite" )                  /* "NO LIMIT" */
 
-    PORT_START("DSW2")
-    PORT_DIPUNUSED( 0x01, IP_ACTIVE_LOW )
-    PORT_DIPUNUSED( 0x02, IP_ACTIVE_LOW )
-    PORT_DIPUNUSED( 0x04, IP_ACTIVE_LOW )
-    PORT_DIPUNUSED( 0x08, IP_ACTIVE_LOW )
-    PORT_DIPUNUSED( 0x10, IP_ACTIVE_LOW )
-    PORT_DIPUNUSED( 0x20, IP_ACTIVE_LOW )
-    PORT_DIPUNUSED( 0x40, IP_ACTIVE_LOW )
-    PORT_DIPUNUSED( 0x80, IP_ACTIVE_LOW )
+	PORT_START("DSW2")
+	PORT_DIPUNUSED( 0x01, IP_ACTIVE_LOW )
+	PORT_DIPUNUSED( 0x02, IP_ACTIVE_LOW )
+	PORT_DIPUNUSED( 0x04, IP_ACTIVE_LOW )
+	PORT_DIPUNUSED( 0x08, IP_ACTIVE_LOW )
+	PORT_DIPUNUSED( 0x10, IP_ACTIVE_LOW )
+	PORT_DIPUNUSED( 0x20, IP_ACTIVE_LOW )
+	PORT_DIPUNUSED( 0x40, IP_ACTIVE_LOW )
+	PORT_DIPUNUSED( 0x80, IP_ACTIVE_LOW )
 
 	PORT_START("COIN")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )

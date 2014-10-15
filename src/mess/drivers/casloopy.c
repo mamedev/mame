@@ -478,13 +478,13 @@ DEVICE_IMAGE_LOAD_MEMBER( casloopy_state, loopy_cart )
 	UINT8 *SRC, *DST;
 	dynamic_buffer temp;
 	temp.resize(0x200000);
-	
+
 	m_cart->rom_alloc(size, GENERIC_ROM32_WIDTH, ENDIANNESS_LITTLE);
 
 	SRC = temp;
 	DST = m_cart->get_rom_base();
-	m_cart->common_load_rom(temp, size, "rom");			
-	
+	m_cart->common_load_rom(temp, size, "rom");
+
 	// fix endianness
 	for (int i = 0; i < 0x200000; i += 4)
 	{
@@ -495,7 +495,7 @@ DEVICE_IMAGE_LOAD_MEMBER( casloopy_state, loopy_cart )
 		DST[i + 2] = tempa;
 		DST[i + 3] = tempb;
 	}
-	
+
 	return IMAGE_INIT_PASS;
 }
 

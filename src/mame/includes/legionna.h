@@ -21,7 +21,7 @@ public:
 		m_palette(*this, "palette"),
 		m_wordswapram(*this, "wordswapram"),
 		m_raiden2cop(*this, "raiden2cop")
-	{ 
+	{
 		memset(scrollvals, 0, sizeof(UINT16)*6);
 	}
 
@@ -91,5 +91,3 @@ public:
 	optional_device<raiden2cop_device> m_raiden2cop;
 
 };
-
-

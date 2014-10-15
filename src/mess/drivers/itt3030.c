@@ -324,18 +324,18 @@ READ8_MEMBER(itt3030_state::i8078_r)
 {
 	if (offset)
 	{
-//		printf("Read 8078 status\n");
+//      printf("Read 8078 status\n");
 		if (!m_keyskip)
 		{
-			return 0x10; 
+			return 0x10;
 		}
 	}
 	else
 	{
-//		printf("Read 8078 data\n");
+//      printf("Read 8078 data\n");
 		if (!m_keyskip)
 		{
-			m_keyskip = true;	// don't keep reporting the 'b' key, just the once to trick the boot ROM
+			m_keyskip = true;   // don't keep reporting the 'b' key, just the once to trick the boot ROM
 			return 0x0c;
 		}
 	}
@@ -433,21 +433,21 @@ WRITE_LINE_MEMBER(itt3030_state::fdchld_w)
 }
 
 /*
-	7 Data Request (DRQ - inverted 1791-Signal)
-	6 Interrupt Request (INTRQ - 1791-Signal)
-	5 Head Load (HLD - inverted 1791-Signal)
-	4 Ready 3 (Drive 3 ready)
-	3 Ready 2 (Drive 2 ready)
-	2 Ready l (Drive 1 ready)
-	1 Write protect (the disk in the selected drive is write protected)
-	0 HLT (Halt signal during head load and track change)
+    7 Data Request (DRQ - inverted 1791-Signal)
+    6 Interrupt Request (INTRQ - 1791-Signal)
+    5 Head Load (HLD - inverted 1791-Signal)
+    4 Ready 3 (Drive 3 ready)
+    3 Ready 2 (Drive 2 ready)
+    2 Ready l (Drive 1 ready)
+    1 Write protect (the disk in the selected drive is write protected)
+    0 HLT (Halt signal during head load and track change)
 */
 READ8_MEMBER(itt3030_state::fdc_stat_r)
 {
 	UINT8 res = 0;
-	floppy_image_device *floppy1 = m_con1 ? m_con1->get_device() : 0; 
-	floppy_image_device *floppy2 = m_con2 ? m_con2->get_device() : 0; 
-	floppy_image_device *floppy3 = m_con3 ? m_con3->get_device() : 0; 
+	floppy_image_device *floppy1 = m_con1 ? m_con1->get_device() : 0;
+	floppy_image_device *floppy2 = m_con2 ? m_con2->get_device() : 0;
+	floppy_image_device *floppy3 = m_con3 ? m_con3->get_device() : 0;
 
 	res = m_fdc_drq ? 0x80 : 0x00;
 	res |= m_fdc_irq ? 0x40 : 0x00;
@@ -472,14 +472,14 @@ WRITE8_MEMBER(itt3030_state::fdc_w)
 }
 
 /*
-	7 SEL1 - Select drive 1
-	6 SEL2 - Select drive 2
-	5 SEL3 - Select drive 3
-	4 MOTOR - Motor on
-	3 DOOR - Drive door lock drives 1 + 2 (not possible with all drives)
-	2 SIDESEL - Select disk side
-	1 KOMP - write comp on/off
-	0 RG J - Change separator stage to read
+    7 SEL1 - Select drive 1
+    6 SEL2 - Select drive 2
+    5 SEL3 - Select drive 3
+    4 MOTOR - Motor on
+    3 DOOR - Drive door lock drives 1 + 2 (not possible with all drives)
+    2 SIDESEL - Select disk side
+    1 KOMP - write comp on/off
+    0 RG J - Change separator stage to read
 */
 WRITE8_MEMBER(itt3030_state::fdc_cmd_w)
 {

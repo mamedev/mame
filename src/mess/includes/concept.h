@@ -21,7 +21,7 @@
 #define ACIA_0_TAG  "acia0"
 #define ACIA_1_TAG  "acia1"
 #define KBD_ACIA_TAG "kbacia"
-#define SPEAKER_TAG	"spkr"
+#define SPEAKER_TAG "spkr"
 #define A2BUS_TAG "a2bus"
 
 class concept_state : public driver_device

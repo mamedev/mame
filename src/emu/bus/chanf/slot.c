@@ -178,9 +178,9 @@ bool channelf_cart_slot_device::call_load()
 			// we default to "chess" slot because some homebrew programs have been written to run
 			// on PCBs with RAM at $2000-$2800 as Saba Schach!
 			if (len == 0x40000)
-				m_type = CF_MULTI;	// TODO1: differentiate multicart final and earlier from fullpath
+				m_type = CF_MULTI;  // TODO1: differentiate multicart final and earlier from fullpath
 			else
-				m_type = CF_CHESS;	// TODO2: is there any way to detect Maze and Hangman from fullpath?
+				m_type = CF_CHESS;  // TODO2: is there any way to detect Maze and Hangman from fullpath?
 
 			m_cart->ram_alloc(0x800);
 		}
@@ -226,17 +226,17 @@ void channelf_cart_slot_device::get_default_card_software(astring &result)
 		const char *slot_string = "chess";
 		UINT32 len = core_fsize(m_file);
 		int type;
-		
+
 		if (len == 0x40000)
 			type = CF_MULTI;
 		else
-			type = CF_CHESS;	// is there any way to detect the other carts from fullpath?
-		
+			type = CF_CHESS;    // is there any way to detect the other carts from fullpath?
+
 		slot_string = chanf_get_slot(type);
-		
+
 		//printf("type: %s\n", slot_string);
 		clear();
-		
+
 		result.cpy(slot_string);
 		return;
 	}

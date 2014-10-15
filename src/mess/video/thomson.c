@@ -412,7 +412,7 @@ UPDATE_HI( mo5alt )
 	int i;
 	pen_t c[2];
 	c[0] = pal[ (ramb & 15) ^ 8 ];
-        c[1] = pal[ (ramb >> 4) ^ 8 ];
+		c[1] = pal[ (ramb >> 4) ^ 8 ];
 	for ( i = 0; i < 16; i += 2, rama >>= 1 )
 		dst[ 15 - i ] = dst[ 14 - i ] = c[ rama & 1 ];
 }
@@ -715,11 +715,11 @@ UPDATE_HI( overlayhalf )
 	c[0][0] = pal[ 0 ];
 	c[0][1] = c[1][1] = pal[ 1 ];
 	c[1][0] = pal[ 2 ];
-        rama >>= 4; 
-        ramb >>= 4;
+		rama >>= 4;
+		ramb >>= 4;
 	for ( i = 0; i < 16; i += 4, rama >>= 1, ramb >>= 1 )
-		dst[ 15 - i ] =  dst[ 14 - i ] = dst[ 13 - i ] =  dst[ 12 - i ] = 
-                        c[ ramb & 1 ] [ rama & 1 ];
+		dst[ 15 - i ] =  dst[ 14 - i ] = dst[ 13 - i ] =  dst[ 12 - i ] =
+						c[ ramb & 1 ] [ rama & 1 ];
 }
 END_UPDATE
 
@@ -730,8 +730,8 @@ UPDATE_LOW( overlayhalf )
 	c[0][0] = pal[ 0 ];
 	c[0][1] = c[1][1] = pal[ 1 ];
 	c[1][0] = pal[ 2 ];
-        rama >>= 4; 
-        ramb >>= 4;
+		rama >>= 4;
+		ramb >>= 4;
 	for ( i = 0; i < 8; i += 2, rama >>= 1, ramb >>= 1 )
 		dst[ 7 - i ] = dst[ 6 - i ] = c[ ramb & 1 ] [ rama & 1 ];
 }
@@ -782,7 +782,7 @@ static const thom_scandraw thom_scandraw_funcs[THOM_VMODE_NB][2] =
 	FUN(to770),    FUN(mo5),    FUN(bitmap4), FUN(bitmap4alt),  FUN(mode80),
 	FUN(bitmap16), FUN(page1),  FUN(page2),   FUN(overlay),     FUN(overlay3),
 	FUN(to9), FUN(mode80_to9),
-        FUN(bitmap4althalf), FUN(mo5alt), FUN(overlayhalf),
+		FUN(bitmap4althalf), FUN(mo5alt), FUN(overlayhalf),
 };
 
 
@@ -1199,27 +1199,27 @@ PALETTE_INIT_MEMBER(thomson_state, thom)
 {
 	LOG (( "thom: palette init called\n" ));
 
-        /* TO8 and later use an EF9369 color palette chip
-           The spec shows a built-in gamma correction for gamma=2.8
-           i.e., output is out = in ^ (1/2.8)
+		/* TO8 and later use an EF9369 color palette chip
+		   The spec shows a built-in gamma correction for gamma=2.8
+		   i.e., output is out = in ^ (1/2.8)
 
-           For the TO7, the gamma correction is irrelevant.
-           
-           For the TO7/70, we use the same palette and gamma has the TO8,
-           which gives good results (but is not verified).
-         */
-        thom_configure_palette(1.0 / 2.8, thom_pal_init, palette);
+		   For the TO7, the gamma correction is irrelevant.
+
+		   For the TO7/70, we use the same palette and gamma has the TO8,
+		   which gives good results (but is not verified).
+		 */
+		thom_configure_palette(1.0 / 2.8, thom_pal_init, palette);
 }
 
 PALETTE_INIT_MEMBER(thomson_state, mo5)
 {
 	LOG (( "thom: MO5 palette init called\n" ));
 
-        /* The MO5 has a different fixed palette than the TO7/70.
-           We use a smaller gamma correction which gives intutively better
-           results (but is not verified).
-         */
-        thom_configure_palette(1.0, mo5_pal_init, palette);
+		/* The MO5 has a different fixed palette than the TO7/70.
+		   We use a smaller gamma correction which gives intutively better
+		   results (but is not verified).
+		 */
+		thom_configure_palette(1.0, mo5_pal_init, palette);
 }
 
 

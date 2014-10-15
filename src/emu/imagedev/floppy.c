@@ -885,7 +885,7 @@ void ui_menu_control_floppy_image::hook_load(astring filename, bool softlist)
 	input_filename = filename;
 	input_format = static_cast<floppy_image_device *>(image)->identify(filename);
 
-	if (!input_format) 
+	if (!input_format)
 	{
 		popmessage("Error: %s\n", image->error());
 		ui_menu::stack_pop(machine());

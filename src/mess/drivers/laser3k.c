@@ -1,31 +1,31 @@
 /***************************************************************************
- 
+
   laser3k.c
   Driver for VTech Laser 3000 / Dick Smith Electronics "The Cat"
- 
+
   This machine is somewhat similar to a 48K Apple II if you blur your eyes
   a lot, but it generally fits in poorly with 100% compatible machines
   (no chance of a compatible language card or auxmem) so it gets its own driver.
- 
+
   An "emulation cartridge" is required to run Apple II software; it's unclear
   what that consists of.
- 
+
   Banking theory:
   - 6502 has 4 banking windows, 0000-3FFF, 4000-7FFF, 8000-BFFF, C000-FFFF
   - Physical address space is 0x00000-0x3FFFF.  ROM and I/O at the top, RAM
     up to 0x2FFFF (192k max).
   - Each window has a bank number register at physical 3C07C/D/E/F
- 
+
   Technical manual at:
   http://mirrors.apple2.org.za/Apple%20II%20Documentation%20Project/Computers/LASER/LASER%203000/Manuals/The%20Cat%20Technical%20Reference%20Manual.pdf
- 
+
   TODO:
     - Finish keyboard
     - RGB graphics mode
     - FDC C800 page appears to be inside the FDC cartridge, need a dump :(  (can hack to use IWM in the meantime)
     - Centronics printer port (data at 3c090, read ack at 3c1c0, read busy at 3c1c2)
     - cassette
- 
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -248,78 +248,78 @@ void laser3k_state::do_io(int offset)
 {
 	switch (offset)
 	{
-		case 0x08:	// set border color to black
+		case 0x08:  // set border color to black
 			m_border_color = 0;
 			break;
-		case 0x09:	// set border color to red
+		case 0x09:  // set border color to red
 			m_border_color = 1;
 			break;
-		case 0x0a:	// set border color to green
+		case 0x0a:  // set border color to green
 			m_border_color = 12;
 			break;
-		case 0x0b:	// set border color to yellow
+		case 0x0b:  // set border color to yellow
 			m_border_color = 13;
 			break;
-		case 0x0c:	// set border color to blue
+		case 0x0c:  // set border color to blue
 			m_border_color = 6;
 			break;
-		case 0x0d:	// set border color to magenta
+		case 0x0d:  // set border color to magenta
 			m_border_color = 3;
 			break;
-		case 0x0e:	// set border color to cyan
+		case 0x0e:  // set border color to cyan
 			m_border_color = 14;
 			break;
-		case 0x0f:	// set border color to white
+		case 0x0f:  // set border color to white
 			m_border_color = 15;
 			break;
 
-		case 0x18:	// set bg color to black
+		case 0x18:  // set bg color to black
 			m_bg_color = 0;
 			break;
-		case 0x19:	// set bg color to red
+		case 0x19:  // set bg color to red
 			m_bg_color = 1;
 			break;
-		case 0x1a:	// set bg color to green
+		case 0x1a:  // set bg color to green
 			m_bg_color = 12;
 			break;
-		case 0x1b:	// set bg color to yellow
+		case 0x1b:  // set bg color to yellow
 			m_bg_color = 13;
 			break;
-		case 0x1c:	// set bg color to blue
+		case 0x1c:  // set bg color to blue
 			m_bg_color = 6;
 			break;
-		case 0x1d:	// set bg color to magenta
+		case 0x1d:  // set bg color to magenta
 			m_bg_color = 3;
 			break;
-		case 0x1e:	// set bg color to cyan
+		case 0x1e:  // set bg color to cyan
 			m_bg_color = 14;
 			break;
-		case 0x1f:	// set bg color to white
+		case 0x1f:  // set bg color to white
 			m_bg_color = 15;
 			break;
 
-		case 0x28:	// set fg color to normal
+		case 0x28:  // set fg color to normal
 			m_fg_color = 15;
 			break;
-		case 0x29:	// set fg color to red
+		case 0x29:  // set fg color to red
 			m_fg_color = 1;
 			break;
-		case 0x2a:	// set fg color to green
+		case 0x2a:  // set fg color to green
 			m_fg_color = 12;
 			break;
-		case 0x2b:	// set fg color to yellow
+		case 0x2b:  // set fg color to yellow
 			m_fg_color = 13;
 			break;
-		case 0x2c:	// set fg color to blue
+		case 0x2c:  // set fg color to blue
 			m_fg_color = 6;
 			break;
-		case 0x2d:	// set fg color to magenta
+		case 0x2d:  // set fg color to magenta
 			m_fg_color = 3;
 			break;
-		case 0x2e:	// set fg color to cyan
+		case 0x2e:  // set fg color to cyan
 			m_fg_color = 14;
 			break;
-		case 0x2f:	// set fg color to white
+		case 0x2f:  // set fg color to white
 			m_fg_color = 15;
 			break;
 
@@ -328,51 +328,51 @@ void laser3k_state::do_io(int offset)
 			m_speaker->level_w(m_speaker_state);
 			break;
 
-		case 0x4c:	// low resolution (40 column)
+		case 0x4c:  // low resolution (40 column)
 			m_80col = false;
 			m_maincpu->set_unscaled_clock(1021800);
 			break;
 
-		case 0x4d:	// RGB mode
+		case 0x4d:  // RGB mode
 			m_gfxmode = RGB;
 			break;
 
-		case 0x4e:	// double hi-res
+		case 0x4e:  // double hi-res
 			m_80col = true;
 			m_gfxmode = DHIRES;
 			m_maincpu->set_unscaled_clock(1021800*2);
 			break;
-			
-		case 0x4f:	// high resolution (80 column).  Yes, the CPU clock also doubles when the pixel clock does (!)
+
+		case 0x4f:  // high resolution (80 column).  Yes, the CPU clock also doubles when the pixel clock does (!)
 			m_80col = true;
 			m_maincpu->set_unscaled_clock(1021800*2);
 			break;
 
-		case 0x50:	// graphics mode
+		case 0x50:  // graphics mode
 			m_gfxmode = HIRES;
 			break;
 
-		case 0x51:	// text mode
+		case 0x51:  // text mode
 			m_gfxmode = TEXT;
 			break;
 
-		case 0x52:	// no mix
+		case 0x52:  // no mix
 			m_mix = false;
 			break;
 
-		case 0x53:	// mixed mode
+		case 0x53:  // mixed mode
 			m_mix = true;
 			break;
 
-		case 0x54:	// set page 1
+		case 0x54:  // set page 1
 			m_disp_page = 0;
 			break;
 
-		case 0x55:	// set page 2
+		case 0x55:  // set page 2
 			m_disp_page = 1;
 			break;
 
-		case 0x56:	// disable emulation (?)
+		case 0x56:  // disable emulation (?)
 			break;
 
 		default:
@@ -385,10 +385,10 @@ READ8_MEMBER( laser3k_state::io_r )
 {
 	switch (offset)
 	{
-		case 0x00:	// keyboard latch
+		case 0x00:  // keyboard latch
 			return m_transchar | m_strobe;
 
-		case 0x10:	// keyboard strobe
+		case 0x10:  // keyboard strobe
 			{
 				UINT8 rv = m_transchar | m_strobe;
 				m_strobe = 0;
@@ -397,16 +397,16 @@ READ8_MEMBER( laser3k_state::io_r )
 
 		case 0x7c:
 			return m_bank0val;
-			
+
 		case 0x7d:
 			return m_bank1val;
-			
+
 		case 0x7e:
 			return m_bank2val;
-			
+
 		case 0x7f:
 			return m_bank3val;
-			
+
 		default:
 			do_io(offset);
 			break;
@@ -419,18 +419,18 @@ WRITE8_MEMBER( laser3k_state::io_w )
 {
 	switch (offset)
 	{
-		case 0x10:	// clear keyboard latch
+		case 0x10:  // clear keyboard latch
 			m_strobe = 0;
 			break;
 
-		case 0x68:	// SN76489 sound
+		case 0x68:  // SN76489 sound
 			m_sn->write(space, 0, data);
 			break;
 
-		case 0x78:	// called "SYSTEM" in the boot ROM listing, but unsure what it does
+		case 0x78:  // called "SYSTEM" in the boot ROM listing, but unsure what it does
 			break;
 
-		case 0x7c:	// bank 0
+		case 0x7c:  // bank 0
 			m_bank0val = data & 0xf;
 			m_bank0->set_bank(m_bank0val);
 			break;
@@ -440,12 +440,12 @@ WRITE8_MEMBER( laser3k_state::io_w )
 			m_bank1->set_bank(m_bank1val);
 			break;
 
-		case 0x7e:	// bank 2
+		case 0x7e:  // bank 2
 			m_bank2val = data & 0xf;
 			m_bank2->set_bank(m_bank2val);
 			break;
 
-		case 0x7f:	// bank 3
+		case 0x7f:  // bank 3
 			m_bank3val = data & 0xf;
 			m_bank3->set_bank(m_bank3val);
 			break;
@@ -460,15 +460,15 @@ READ8_MEMBER( laser3k_state::io2_r )
 {
 	switch (offset)
 	{
-		case 0xc2:	// h-blank status
+		case 0xc2:  // h-blank status
 			return space.machine().first_screen()->hblank() ? 0x80 : 0x00;
 
-		case 0xc3:	// v-blank status
+		case 0xc3:  // v-blank status
 			return space.machine().first_screen()->vblank() ? 0x80 : 0x00;
 
-		case 0xc5:	// CPU 1/2 MHz status?
+		case 0xc5:  // CPU 1/2 MHz status?
 			return 0x00;
-			
+
 		default:
 			printf("io2_r @ unknown %x\n", offset);
 			break;
@@ -505,7 +505,7 @@ void laser3k_state::plot_text_character(bitmap_ind16 &bitmap, int xpos, int ypos
 
 			for (i = 0; i < xscale; i++)
 			{
-				bitmap.pix16(ypos + y, xpos + (x * xscale) + i) = color; 
+				bitmap.pix16(ypos + y, xpos + (x * xscale) + i) = color;
 			}
 		}
 	}
@@ -520,11 +520,11 @@ void laser3k_state::text_update(screen_device &screen, bitmap_ind16 &bitmap, con
 
 	if (m_80col)
 	{
-		start_address = (m_disp_page == 0) ? 0x1000 : 0x1800; 
+		start_address = (m_disp_page == 0) ? 0x1000 : 0x1800;
 	}
 	else
 	{
-		start_address = (m_disp_page == 0) ? 0x400 : 0x800; 
+		start_address = (m_disp_page == 0) ? 0x400 : 0x800;
 	}
 
 	m_flash = ((machine().time() * 4).seconds & 1) ? 1 : 0;
@@ -541,9 +541,9 @@ void laser3k_state::text_update(screen_device &screen, bitmap_ind16 &bitmap, con
 				/* calculate address */
 				address = start_address + ((((row/8) & 0x07) << 7) | (((row/8) & 0x18) * 5 + col));
 
-				plot_text_character(bitmap, col * 7, row, 1, m_a2_videoram[address], 
+				plot_text_character(bitmap, col * 7, row, 1, m_a2_videoram[address],
 					memregion("gfx1")->base(), memregion("gfx1")->bytes());
-				plot_text_character(bitmap, (col + 40) * 7, row, 1, m_a2_videoram[address+0x400], 
+				plot_text_character(bitmap, (col + 40) * 7, row, 1, m_a2_videoram[address+0x400],
 					memregion("gfx1")->base(), memregion("gfx1")->bytes());
 			}
 		}
@@ -553,7 +553,7 @@ void laser3k_state::text_update(screen_device &screen, bitmap_ind16 &bitmap, con
 			{
 				/* calculate address */
 				address = start_address + ((((row/8) & 0x07) << 7) | (((row/8) & 0x18) * 5 + col));
-				plot_text_character(bitmap, col * 14, row, 2, m_a2_videoram[address], 
+				plot_text_character(bitmap, col * 14, row, 2, m_a2_videoram[address],
 					memregion("gfx1")->base(), memregion("gfx1")->bytes());
 			}
 		}
@@ -565,7 +565,7 @@ void laser3k_state::hgr_update(screen_device &screen, bitmap_ind16 &bitmap, cons
 	const UINT8 *vram;
 	int row, col, b;
 	int offset;
-	UINT8 vram_row[42]	;
+	UINT8 vram_row[42]  ;
 	UINT16 v;
 	UINT16 *p;
 	UINT32 w;
@@ -601,7 +601,7 @@ void laser3k_state::hgr_update(screen_device &screen, bitmap_ind16 &bitmap, cons
 				|   (((UINT32) vram_row[col+2] & 0x7f) << 14);
 
 			artifact_map_ptr = &m_hires_artifact_map[((vram_row[col+1] & 0x80) >> 7) * 16];
-			for (b = 0; b < 7; b++) 
+			for (b = 0; b < 7; b++)
 			{
 				v = artifact_map_ptr[((w >> (b + 7-1)) & 0x07) | (((b ^ col) & 0x01) << 3)];
 				*(p++) = v;
@@ -629,7 +629,7 @@ void laser3k_state::dhgr_update(screen_device &screen, bitmap_ind16 &bitmap, con
 	if (endrow < beginrow)
 		return;
 
-   	vram = m_ram->pointer() + (m_disp_page ? 0x8000 : 0x4000);
+	vram = m_ram->pointer() + (m_disp_page ? 0x8000 : 0x4000);
 
 	vram_row[0] = 0;
 	vram_row[81] = 0;
@@ -641,12 +641,12 @@ void laser3k_state::dhgr_update(screen_device &screen, bitmap_ind16 &bitmap, con
 			offset = ((((row/8) & 0x07) << 7) | (((row/8) & 0x18) * 5 + col)) | ((row & 7) << 10);
 			if (col < 40)
 			{
-				vram_row[1+(col*2)+0] = vram[offset]; 
+				vram_row[1+(col*2)+0] = vram[offset];
 				vram_row[1+(col*2)+1] = vram[offset+1];
 			}
 			else
 			{
-				vram_row[1+(col*2)+0] = vram[offset+0x2000]; 
+				vram_row[1+(col*2)+0] = vram[offset+0x2000];
 				vram_row[1+(col*2)+1] = vram[offset+0x2001];
 			}
 		}
@@ -659,7 +659,7 @@ void laser3k_state::dhgr_update(screen_device &screen, bitmap_ind16 &bitmap, con
 				|   (((UINT32) vram_row[col+1] & 0x7f) <<  7)
 				|   (((UINT32) vram_row[col+2] & 0x7f) << 14);
 
-			for (b = 0; b < 7; b++) 
+			for (b = 0; b < 7; b++)
 			{
 				v = m_dhires_artifact_map[((((w >> (b + 7-1)) & 0x0F) * 0x11) >> (((2-(col*7+b))) & 0x03)) & 0x0F];
 				*(p++) = v;
@@ -673,18 +673,18 @@ UINT32 laser3k_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 	switch (m_gfxmode)
 	{
 		case TEXT:
-			text_update(screen, bitmap, cliprect, 0, 191); 
+			text_update(screen, bitmap, cliprect, 0, 191);
 			break;
 
 		case HIRES:
 			if (m_mix)
 			{
-				hgr_update(screen, bitmap, cliprect, 0, 159); 
-				text_update(screen, bitmap, cliprect, 160, 191); 
+				hgr_update(screen, bitmap, cliprect, 0, 159);
+				text_update(screen, bitmap, cliprect, 160, 191);
 			}
 			else
 			{
-				hgr_update(screen, bitmap, cliprect, 0, 191); 
+				hgr_update(screen, bitmap, cliprect, 0, 191);
 			}
 			break;
 
@@ -694,12 +694,12 @@ UINT32 laser3k_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 		case DHIRES:
 			if (m_mix)
 			{
-				dhgr_update(screen, bitmap, cliprect, 0, 159); 
-				text_update(screen, bitmap, cliprect, 160, 191); 
+				dhgr_update(screen, bitmap, cliprect, 0, 159);
+				text_update(screen, bitmap, cliprect, 160, 191);
 			}
 			else
 			{
-				dhgr_update(screen, bitmap, cliprect, 0, 191); 
+				dhgr_update(screen, bitmap, cliprect, 0, 191);
 			}
 			break;
 	}
@@ -793,14 +793,14 @@ WRITE_LINE_MEMBER(laser3k_state::ay3600_data_ready_w)
 		mod = (m_kbspecial->read() & 0x06) ? 0x01 : 0x00;
 		mod |= (m_kbspecial->read() & 0x08) ? 0x02 : 0x00;
 
-//		printf("lastchar = %02x\n", m_lastchar & 0x3f);
+//      printf("lastchar = %02x\n", m_lastchar & 0x3f);
 
 		m_transchar = key_remap[m_lastchar&0x3f][mod];
 
 		if (m_transchar != 0)
 		{
 			m_strobe = 0x80;
-//			printf("new char = %04x (%02x)\n", m_lastchar&0x3f, m_transchar);
+//          printf("new char = %04x (%02x)\n", m_lastchar&0x3f, m_transchar);
 		}
 	}
 }
@@ -865,7 +865,7 @@ static INPUT_PORTS_START( laser3k )
 	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Esc")      PORT_CODE(KEYCODE_ESC)      PORT_CHAR(27)
 	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_A)          PORT_CHAR('A') PORT_CHAR('a')
 	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_SPACE)  PORT_CHAR(' ')
-	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_QUOTE)  PORT_CHAR('\'') PORT_CHAR('\"') 
+	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_QUOTE)  PORT_CHAR('\'') PORT_CHAR('\"')
 	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Return")   PORT_CODE(KEYCODE_ENTER)    PORT_CHAR(13)

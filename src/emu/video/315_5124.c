@@ -677,7 +677,7 @@ WRITE8_MEMBER( sega315_5124_device::register_write )
 			reg_num = data & 0x0f;
 			m_reg[reg_num] = m_addr & 0xff;
 			//logerror("%s: %s: setting register %x to %02x\n", machine().describe_context(), tag(), reg_num, m_addr & 0xf );
-			
+
 			switch (reg_num)
 			{
 			case 0:

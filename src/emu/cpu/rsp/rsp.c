@@ -466,30 +466,30 @@ void rsp_device::device_start()
 		m_regmap[regnum] = (regnum == 0) ? uml::parameter(0) : uml::parameter::make_memory(&m_rsp_state->r[regnum]);
 	}
 
-    /*
-    drcbe_info beinfo;
-    m_drcuml->get_backend_info(beinfo);
-    if (beinfo.direct_iregs > 2)
-    {
-        m_regmap[30] = I2;
-    }
-    if (beinfo.direct_iregs > 3)
-    {
-        m_regmap[31] = I3;
-    }
-    if (beinfo.direct_iregs > 4)
-    {
-        m_regmap[2] = I4;
-    }
-    if (beinfo.direct_iregs > 5)
-    {
-        m_regmap[3] = I5;
-    }
-    if (beinfo.direct_iregs > 6)
-    {
-        m_regmap[4] = I6;
-    }
-    */
+	/*
+	drcbe_info beinfo;
+	m_drcuml->get_backend_info(beinfo);
+	if (beinfo.direct_iregs > 2)
+	{
+	    m_regmap[30] = I2;
+	}
+	if (beinfo.direct_iregs > 3)
+	{
+	    m_regmap[31] = I3;
+	}
+	if (beinfo.direct_iregs > 4)
+	{
+	    m_regmap[2] = I4;
+	}
+	if (beinfo.direct_iregs > 5)
+	{
+	    m_regmap[3] = I5;
+	}
+	if (beinfo.direct_iregs > 6)
+	{
+	    m_regmap[4] = I6;
+	}
+	*/
 
 	/* mark the cache dirty so it is updated on next execute */
 	m_cache_dirty = TRUE;
@@ -870,7 +870,7 @@ void rsp_device::device_stop()
 	}
 	if (m_drcfe )
 	{
-  	  auto_free(machine(), m_drcfe);
+		auto_free(machine(), m_drcfe);
 	}
 }
 
@@ -3565,5 +3565,3 @@ void rsp_device::execute_run()
 
 	}
 }
-
-

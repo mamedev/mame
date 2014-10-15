@@ -49,7 +49,7 @@ DEVICE_IMAGE_LOAD_MEMBER( nc_state, nc_pcmcia_card )
 	UINT32 size = m_card->common_get_size("rom");
 
 	m_card->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
-	m_card->common_load_rom(m_card->get_rom_base(), size, "rom");			
+	m_card->common_load_rom(m_card->get_rom_base(), size, "rom");
 
 	set_card_present_state(1);
 	m_membank_card_ram_mask = card_calculate_mask(size);
@@ -64,14 +64,14 @@ DEVICE_IMAGE_UNLOAD_MEMBER( nc_state, nc_pcmcia_card )
 	// if there is no data to write, quit
 	if (!m_card_size)
 		return;
-	
+
 	logerror("attempting card save\n");
-	
+
 	// write data
 	image.fwrite(m_card_ram, m_card_size);
-	
+
 	logerror("write succeeded!\r\n");
-	
+
 	// set card not present state
 	set_card_present_state(0);
 	m_card_size = 0;
@@ -83,4 +83,3 @@ DRIVER_INIT_MEMBER( nc_state, nc )
 	set_card_present_state(0);
 	m_card_size = 0;
 }
-

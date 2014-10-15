@@ -1726,8 +1726,8 @@ struct voodoo_state
 	raster_info         rasterizer[MAX_RASTERIZERS]; /* array of rasterizers */
 	raster_info *       raster_hash[RASTER_HASH_SIZE]; /* hash table of rasterizers */
 
-	bool				send_config;
-	UINT32				tmu_config;
+	bool                send_config;
+	UINT32              tmu_config;
 };
 
 
@@ -3646,18 +3646,18 @@ static void raster_##name(void *destbase, INT32 y, const poly_extent *extent, co
 		/* result in texel */                                                   \
 		/* note that they set LOD min to 8 to "disable" a TMU */                \
 		if (TMUS >= 1 && v->tmu[0].lodmin < (8 << 8))                           \
-                {                                                                   \
+				{                                                                   \
 			if (!v->send_config)                                                \
-                        {                                                                   \
+						{                                                                   \
 				TEXTURE_PIPELINE(&v->tmu[0], x, dither4, TEXMODE0, texel,           \
 									v->tmu[0].lookup, extra->lodbase0,              \
 									iters0, itert0, iterw0, texel);                 \
-                        }                                                                   \
-                        else                                                                \
-                        {                                                                   \
+						}                                                                   \
+						else                                                                \
+						{                                                                   \
 				texel.u=v->tmu_config;                                              \
-                        }                                                                   \
-                }                                                                   \
+						}                                                                   \
+				}                                                                   \
 																				\
 		/* colorpath pipeline selects source colors and does blending */        \
 		CLAMPED_ARGB(iterr, iterg, iterb, itera, FBZCOLORPATH, iterargb);       \

@@ -134,7 +134,7 @@ private:
 		UINT16 tim;
 		UINT16 prd;
 	} m_timer;
-	
+
 	struct
 	{
 		UINT16 drr;

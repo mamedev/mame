@@ -52,7 +52,7 @@ public:
 		m_bank3(*this, "bank3"),
 		m_bank4(*this, "bank4")
 	{ }
-	
+
 	// FDC
 	UINT8 m_driveselect;
 	int m_drq;
@@ -91,7 +91,7 @@ public:
 	MC6845_UPDATE_ROW(crtc_update_row);
 	memory_region *m_cart_rom;
 	memory_region *m_bios_rom;
-	
+
 protected:
 	required_device<z80_device> m_maincpu;
 	required_device<cassette_image_device> m_cassette;
@@ -111,30 +111,30 @@ protected:
 	optional_device<palette_device> m_palette;
 
 private:
-	
+
 	void set_banks();
 	void postload();
-	
+
 	// memory banking
 	UINT8   m_bank_switch;
 	UINT8   m_bank_low;
 	UINT8   m_bank_high;
-	
+
 	UINT8   m_bank_low_read_only;
 	UINT8   m_bank_high1_read_only;
 	UINT8   m_bank_high2_read_only;
-	
+
 	UINT8   *m_empty_bank;
 	UINT8   *m_bank_low_ptr;
 	UINT8   *m_bank_high1_ptr;
 	UINT8   *m_bank_high2_ptr;
-	
+
 	// keyboard
 	UINT8   m_keyboard_row;
-	
+
 	// centronics
 	int m_centronics_busy;
-	
+
 	// SVI-806 80 column card
 	UINT8   m_svi806_present;
 	UINT8   m_svi806_ram_enabled;

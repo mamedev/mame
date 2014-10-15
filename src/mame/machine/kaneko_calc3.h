@@ -16,7 +16,7 @@ public:
 
 	void reset_run_timer();
 	void mcu_run();
-	
+
 protected:
 	virtual void device_start();
 	virtual void device_reset();
@@ -43,12 +43,12 @@ private:
 	UINT16 m_poll_addr;
 	UINT16 m_checksumaddress;
 	emu_timer* m_runtimer;
-	
+
 	enum
 	{
 		MCU_RUN_TIMER
 	};
-	
+
 	void mcu_init();
 	void initial_scan_tables();
 	void mcu_com_w(offs_t offset, UINT16 data, UINT16 mem_mask, int _n_);

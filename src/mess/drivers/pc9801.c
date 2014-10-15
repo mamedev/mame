@@ -38,9 +38,9 @@
     - Dies on ARTIC check;
     - Presumably one ROM is undumped?
 
-	TODO: (PC-9821AP)
-	- No way to exit the initial loop. Code looks broken/bad dump?
-	
+    TODO: (PC-9821AP)
+    - No way to exit the initial loop. Code looks broken/bad dump?
+
     floppy issues TODO (certain fail)
     - Unsupported disk types: *.nfd, *.fdd, *.nhd
     - 46 Okunen Monogatari - The Shinkaron
@@ -553,7 +553,7 @@ public:
 	UINT8 m_joy_sel;
 	UINT8 m_ext2_ff;
 	UINT8 m_sys_type;
-	
+
 	DECLARE_WRITE_LINE_MEMBER( keyboard_irq );
 	DECLARE_WRITE_LINE_MEMBER( write_uart_clock );
 	DECLARE_READ8_MEMBER(pc9801_xx_r);
@@ -702,7 +702,7 @@ public:
 	DECLARE_MACHINE_START(pc9801bx2);
 	DECLARE_MACHINE_START(pc9821);
 	DECLARE_MACHINE_START(pc9821ap2);
-	
+
 	DECLARE_MACHINE_RESET(pc9801_common);
 	DECLARE_MACHINE_RESET(pc9801f);
 	DECLARE_MACHINE_RESET(pc9801rs);
@@ -1938,7 +1938,7 @@ WRITE8_MEMBER(pc9801_state::pc9801rs_knjram_w)
 WRITE8_MEMBER(pc9801_state::pc9801rs_bank_w)
 {
 	if(offset == 1)
-	{	
+	{
 		if((data & 0xf0) == 0x00 || (data & 0xf0) == 0x10)
 		{
 			if((data & 0xed) == 0x00)
@@ -3375,7 +3375,7 @@ MACHINE_START_MEMBER(pc9801_state,pc9821)
 MACHINE_START_MEMBER(pc9801_state,pc9821ap2)
 {
 	MACHINE_START_CALL_MEMBER(pc9821);
-	
+
 	// ...
 }
 
@@ -3891,7 +3891,7 @@ static MACHINE_CONFIG_DERIVED( pc9821ap2, pc9821)
 	MCFG_CPU_IO_MAP(pc9821_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", pc9801_state, pc9801_vrtc_irq)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259_master", pic8259_device, inta_cb)
-	
+
 	MCFG_MACHINE_START_OVERRIDE(pc9801_state,pc9821ap2)
 MACHINE_CONFIG_END
 

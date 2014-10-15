@@ -185,7 +185,7 @@ public:
 			m_vfd0(*this, "vfd0"),
 			m_vfd1(*this, "vfd1"),
 			m_dm01(*this, "dm01") { }
-	
+
 	required_device<cpu_device> m_maincpu;
 	required_device<upd7759_device> m_upd7759;
 	optional_device<bfm_bd1_t> m_vfd0;
@@ -1389,7 +1389,7 @@ READ8_MEMBER(bfm_sc2_state::direct_input_r)
 void bfm_sc2_state::save_state()
 {
 	/* TODO: Split between the different machine types */
-	
+
 	save_item(NAME(m_key));
 	save_item(NAME(m_mmtr_latch));
 	save_item(NAME(m_irq_status));
@@ -2147,7 +2147,7 @@ MACHINE_START_MEMBER(bfm_sc2_state,bfm_sc2)
 	nvram_device *e2ram = subdevice<nvram_device>("e2ram");
 	if (e2ram != NULL)
 		e2ram->set_base(m_e2ram, sizeof(m_e2ram));
-	
+
 	save_state();
 }
 

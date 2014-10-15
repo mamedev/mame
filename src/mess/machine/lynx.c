@@ -1019,7 +1019,7 @@ READ8_MEMBER(lynx_state::suzy_read)
 		case RCART:
 			if (m_cart->exists())
 				value = m_cart->read_rom(space, (m_suzy.high * m_granularity) + m_suzy.low);
-			else 
+			else
 				value = 0;
 			m_suzy.low = (m_suzy.low + 1) & (m_granularity - 1);
 			break;
@@ -2078,29 +2078,29 @@ DEVICE_IMAGE_LOAD_MEMBER( lynx_state, lynx_cart )
 			// 22 chars manufacturer
 			UINT8 header[0x40];
 			image.fread(header, 0x40);
-			
+
 			// Check the image
 			if (lynx_verify_cart((char*)header, LYNX_CART) == IMAGE_VERIFY_FAIL)
 				return IMAGE_INIT_FAIL;
-			
+
 			/* 2008-10 FP: According to Handy source these should be page_size_bank0. Are we using
 			 it correctly in MESS? Moreover, the next two values should be page_size_bank1. We should
 			 implement this as well */
 			gran = header[4] | (header[5] << 8);
-			
+
 			logerror ("%s %dkb cartridge with %dbyte granularity from %s\n", header + 10, size / 1024, gran, header + 42);
 			size -= 0x40;
 		}
-	}	
+	}
 
 	m_cart->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
-	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");			
+	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
 
 	// set-up granularity
 	if (image.software_entry() == NULL)
 	{
 		const char *filetype = image.filetype();
-		if (!core_stricmp(filetype, "lnx"))		// from header
+		if (!core_stricmp(filetype, "lnx"))     // from header
 			m_granularity = gran;
 		else if (!core_stricmp(filetype, "lyx"))
 		{
@@ -2122,7 +2122,7 @@ DEVICE_IMAGE_LOAD_MEMBER( lynx_state, lynx_cart )
 		else
 			m_granularity = 0x400; // Homebrew roms not using all 256 banks (T-Tris) (none currently in softlist)
 	}
-	
+
 	// set-up rotation from softlist
 	if (image.software_entry() != NULL)
 	{
@@ -2140,4 +2140,3 @@ DEVICE_IMAGE_LOAD_MEMBER( lynx_state, lynx_cart )
 
 	return IMAGE_INIT_PASS;
 }
-

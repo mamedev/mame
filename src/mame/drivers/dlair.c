@@ -769,7 +769,7 @@ ROM_START( dlair_1 )     /* Serial #001, courtesy Jason Finn */
 	DISK_IMAGE_READONLY( "dlair", 0, NO_DUMP )
 ROM_END
 
-ROM_START( dlair_2 )     
+ROM_START( dlair_2 )
 	ROM_REGION( 0xa000, "maincpu", 0 )
 	ROM_LOAD( "dlu1.bin", 0x0000, 0x2000,  CRC(ea6d5498) SHA1(1d854c04e0074e693e791e22a4c9cc21d5175d95) )
 	ROM_LOAD( "dlu2.bin", 0x2000, 0x2000,  CRC(ffe84a95) SHA1(675ce2e68e43beb1f389bc6ab1a55bee862a1440) )

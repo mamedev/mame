@@ -99,8 +99,8 @@ int mfi_format::identify(io_generic *io, UINT32 form_factor)
 
 	io_generic_read(io, &h, 0, sizeof(header));
 	if(memcmp( h.sign, sign, 16 ) == 0 &&
-	   (h.cyl_count & CYLINDER_MASK) <= 84 &&
-	   (h.cyl_count >> RESOLUTION_SHIFT) < 3 &&
+		(h.cyl_count & CYLINDER_MASK) <= 84 &&
+		(h.cyl_count >> RESOLUTION_SHIFT) < 3 &&
 		h.head_count <= 2 &&
 		(!form_factor || !h.form_factor || h.form_factor == form_factor))
 		return 100;

@@ -4,7 +4,7 @@
 
     Fujitsu MB8421/22/31/32-90/-90L/-90LL/-12/-12L/-12LL
     CMOS 16K-bit (2KB) dual-port SRAM
-    
+
     MB84x2 lacks interrupt pins, it's basically as simple as AM_RAM AM_SHARE("x")
     MB843x is same as MB842x, except that it supports slave mode. It makes
     sure there are no clashes, with the _BUSY pin.
@@ -70,7 +70,7 @@ READ8_MEMBER(mb8421_device::left_r)
 
 	if (offset == 0x7fe && !space.debugger_access())
 		m_intl_handler(0);
-	
+
 	return m_ram[offset];
 }
 
@@ -89,6 +89,6 @@ READ8_MEMBER(mb8421_device::right_r)
 
 	if (offset == 0x7ff && !space.debugger_access())
 		m_intr_handler(0);
-	
+
 	return m_ram[offset];
 }

@@ -31,4 +31,3 @@ public:
 extern const floppy_format_type FLOPPY_DMK_FORMAT;
 
 #endif /* DMK_DSK_H */
-

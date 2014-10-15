@@ -24,10 +24,10 @@ public:
 	required_device<cpu_device> m_audioslave;
 	required_device<tms34010_device> m_slave;
 	required_device<dac_device> m_dac;
-	
+
 	required_shared_ptr<UINT16> m_master_videoram;
 	required_shared_ptr<UINT16> m_slave_videoram;
-	
+
 	UINT8 m_aimpos[2];
 	UINT8 m_trackball_old[2];
 	UINT8 m_master_sound_latch;

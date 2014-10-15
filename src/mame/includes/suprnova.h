@@ -43,7 +43,7 @@ public:
 	required_device<sknsspr_device> m_spritegen;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	
+
 	required_shared_ptr<UINT32> m_spriteram;
 	required_shared_ptr<UINT32> m_spc_regs;
 	required_shared_ptr<UINT32> m_v3_regs;
@@ -55,7 +55,7 @@ public:
 	required_shared_ptr<UINT32> m_v3t_ram;
 	required_shared_ptr<UINT32> m_main_ram;
 	required_shared_ptr<UINT32> m_cache_ram;
-	
+
 	hit_t m_hit;
 	UINT32 m_timer_0_temp[4];
 	bitmap_ind16 m_sprite_bitmap;

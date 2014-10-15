@@ -268,7 +268,7 @@ ROM_START( dlair2_200 )
 
 	ROM_REGION( 0x2000, "bios", 0 ) /* BIOS for proto board */
 	ROM_LOAD( "dl2_amoa_proto_bios_mod_56ee.bin",0x00000, 0x2000, CRC(1fc21576) SHA1(dc5443f6a8d80ec8148314244f05ac0290e380ea) )
-	
+
 ROM_END
 
 ROM_START( spacea91 )

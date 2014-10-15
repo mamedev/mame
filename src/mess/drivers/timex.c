@@ -598,7 +598,7 @@ DEVICE_IMAGE_LOAD_MEMBER( spectrum_state, timex_cart )
 		int chunks_in_file = 0;
 		dynamic_buffer header;
 		header.resize(9);
-		
+
 		if (size % 0x2000 != 9)
 		{
 			image.seterror(IMAGE_ERROR_UNSPECIFIED, "File corrupted");
@@ -609,22 +609,22 @@ DEVICE_IMAGE_LOAD_MEMBER( spectrum_state, timex_cart )
 			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Loading from softlist is not supported yet");
 			return IMAGE_INIT_FAIL;
 		}
-		
+
 		m_dock->rom_alloc(0x10000, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
 		DOCK = m_dock->get_rom_base();
-		
+
 		// check header
 		image.fread(header, 9);
-		
+
 		for (int i = 0; i < 8; i++)
 			if (header[i + 1] & 0x02) chunks_in_file++;
-		
+
 		if (chunks_in_file * 0x2000 + 0x09 != size)
 		{
 			image.seterror(IMAGE_ERROR_UNSPECIFIED, "File corrupted");
 			return IMAGE_INIT_FAIL;
 		}
-		
+
 		switch (header[0])
 		{
 			case 0x00:  logerror ("DOCK cart\n");
@@ -643,7 +643,7 @@ DEVICE_IMAGE_LOAD_MEMBER( spectrum_state, timex_cart )
 					}
 				}
 				break;
-				
+
 			default:
 				image.seterror(IMAGE_ERROR_UNSPECIFIED, "Cart type not supported");
 				return IMAGE_INIT_FAIL;

@@ -95,11 +95,11 @@ void a800_rom_oss91_device::device_reset()
  -------------------------------------------------*/
 
 /*-------------------------------------------------
- 
+
  OSS 8K
- 
+
  This is used by The Writer's Tool only.
- 
+
  -------------------------------------------------*/
 
 READ8_MEMBER(a800_rom_oss8k_device::read_80xx)
@@ -128,12 +128,12 @@ WRITE8_MEMBER(a800_rom_oss8k_device::write_d5xx)
 
 
 /*-------------------------------------------------
- 
+
  OSS 034M
- 
+
  This apparently comes from a dump with the wrong bank order...
  investigate whether we should remove it!
- 
+
  -------------------------------------------------*/
 
 READ8_MEMBER(a800_rom_oss34_device::read_80xx)
@@ -156,7 +156,7 @@ WRITE8_MEMBER(a800_rom_oss34_device::write_d5xx)
 			break;
 		case 2:
 		case 6:
-			m_bank = 3;	// in this case the ROM gets disabled and 0xff is returned in 0xa000-0xafff
+			m_bank = 3; // in this case the ROM gets disabled and 0xff is returned in 0xa000-0xafff
 			break;
 		case 3:
 		case 7:
@@ -173,11 +173,11 @@ WRITE8_MEMBER(a800_rom_oss34_device::write_d5xx)
 
 
 /*-------------------------------------------------
- 
+
  OSS 043M
- 
+
  Same as above but with correct bank order
- 
+
  -------------------------------------------------*/
 
 READ8_MEMBER(a800_rom_oss43_device::read_80xx)
@@ -200,7 +200,7 @@ WRITE8_MEMBER(a800_rom_oss43_device::write_d5xx)
 			break;
 		case 2:
 		case 6:
-			m_bank = 3;	// in this case the ROM gets disabled and 0xff is returned in 0xa000-0xafff
+			m_bank = 3; // in this case the ROM gets disabled and 0xff is returned in 0xa000-0xafff
 			break;
 		case 3:
 		case 7:
@@ -217,12 +217,12 @@ WRITE8_MEMBER(a800_rom_oss43_device::write_d5xx)
 
 
 /*-------------------------------------------------
- 
+
  OSS M091
- 
- Simplified banking system which only uses two 
+
+ Simplified banking system which only uses two
  address lines (A0 & A3)
- 
+
  -------------------------------------------------*/
 
 READ8_MEMBER(a800_rom_oss91_device::read_80xx)
@@ -250,4 +250,3 @@ WRITE8_MEMBER(a800_rom_oss91_device::write_d5xx)
 			break;
 	}
 }
-

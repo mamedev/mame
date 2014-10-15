@@ -112,8 +112,8 @@ void mcs96_device::execute_run()
 {
 	internal_update(total_cycles());
 
-	//	if(inst_substate)
-	//		do_exec_partial();
+	//  if(inst_substate)
+	//      do_exec_partial();
 
 	while(icount > 0) {
 		while(icount > bcount) {
@@ -125,8 +125,8 @@ void mcs96_device::execute_run()
 		}
 		while(bcount && icount <= bcount)
 			internal_update(total_cycles() + icount - bcount);
-		//		if(inst_substate)
-		//			do_exec_partial();
+		//      if(inst_substate)
+		//          do_exec_partial();
 	}
 }
 

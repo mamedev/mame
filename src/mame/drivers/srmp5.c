@@ -66,11 +66,11 @@ class srmp5_state : public driver_device
 public:
 	srmp5_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		 m_gfxdecode(*this, "gfxdecode"),
-		 m_palette(*this, "palette"),
+			m_gfxdecode(*this, "gfxdecode"),
+			m_palette(*this, "palette"),
 		m_maincpu(*this,"maincpu"),
-		 m_subcpu(*this, "sub")
-	
+			m_subcpu(*this, "sub")
+
 	{ }
 
 	UINT32 m_databank;

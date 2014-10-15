@@ -24,7 +24,7 @@ public:
 		m_videoram(*this, "videoram")
 	{
 	}
-	
+
 	required_device<s2650_device> m_maincpu;
 	optional_device<s2650_device> m_audiocpu;
 	optional_device<dac_device> m_dac;
@@ -35,7 +35,7 @@ public:
 
 	optional_shared_ptr<UINT8> m_spriteram;
 	required_shared_ptr<UINT8> m_videoram;
-	
+
 	UINT8 m_dac_data;
 	int m_dac_enable;
 	int m_channel;

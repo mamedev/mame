@@ -1038,12 +1038,12 @@ inline void x07_state::draw_udk()
 DEVICE_IMAGE_LOAD_MEMBER( x07_state, x07_card )
 {
 	UINT32 size = m_card->common_get_size("rom");
-	
+
 	// check card type
 	if (image.software_entry() != NULL)
 	{
 		const char *card_type = image.get_feature("card_type");
-		
+
 		if (strcmp(card_type, "xp140"))
 		{
 			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported card type");
@@ -1052,7 +1052,7 @@ DEVICE_IMAGE_LOAD_MEMBER( x07_state, x07_card )
 	}
 
 	m_card->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_BIG);
-	m_card->common_load_rom(m_card->get_rom_base(), size, "rom");			
+	m_card->common_load_rom(m_card->get_rom_base(), size, "rom");
 
 	m_card->ram_alloc(0x1000);
 

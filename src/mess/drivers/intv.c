@@ -380,11 +380,11 @@ static ADDRESS_MAP_START( intv_mem, AS_PROGRAM, 16, intv_state )
 	AM_RANGE(0x01f0, 0x01ff) AM_DEVREADWRITE8("ay8914", ay8914_device, read, write, 0x00ff)
 	AM_RANGE(0x0200, 0x035f) AM_READWRITE(intv_ram16_r, intv_ram16_w)
 	AM_RANGE(0x0400, 0x04ff) AM_DEVREAD("cartslot", intv_cart_slot_device, read_rom04)
-	AM_RANGE(0x1000, 0x1fff) AM_ROM AM_REGION("maincpu", 0x1000 << 1)	// Exec ROM, 10-bits wide
+	AM_RANGE(0x1000, 0x1fff) AM_ROM AM_REGION("maincpu", 0x1000 << 1)   // Exec ROM, 10-bits wide
 	AM_RANGE(0x2000, 0x2fff) AM_DEVREAD("cartslot", intv_cart_slot_device, read_rom20)
 	AM_RANGE(0x3000, 0x37ff) AM_DEVREAD("stic", stic_device, grom_read) // GROM,     8-bits wide
-	AM_RANGE(0x3800, 0x39ff) AM_READWRITE(intv_gram_r, intv_gram_w)		// GRAM,     8-bits wide
-	AM_RANGE(0x3a00, 0x3bff) AM_READWRITE(intv_gram_r, intv_gram_w)		// GRAM Alias, 8-bits wide
+	AM_RANGE(0x3800, 0x39ff) AM_READWRITE(intv_gram_r, intv_gram_w)     // GRAM,     8-bits wide
+	AM_RANGE(0x3a00, 0x3bff) AM_READWRITE(intv_gram_r, intv_gram_w)     // GRAM Alias, 8-bits wide
 	AM_RANGE(0x4000, 0x47ff) AM_DEVREAD("cartslot", intv_cart_slot_device, read_rom40)
 	AM_RANGE(0x4800, 0x4fff) AM_DEVREAD("cartslot", intv_cart_slot_device, read_rom48)
 	AM_RANGE(0x5000, 0x5fff) AM_DEVREAD("cartslot", intv_cart_slot_device, read_rom50)
@@ -407,11 +407,11 @@ static ADDRESS_MAP_START( intvoice_mem, AS_PROGRAM, 16, intv_state )
 	AM_RANGE(0x01f0, 0x01ff) AM_DEVREADWRITE8("ay8914", ay8914_device, read, write, 0x00ff)
 	AM_RANGE(0x0200, 0x035f) AM_READWRITE(intv_ram16_r, intv_ram16_w)
 	AM_RANGE(0x0400, 0x04ff) AM_DEVREAD("voice", intv_voice_device, read_rom04)
-	AM_RANGE(0x1000, 0x1fff) AM_ROM AM_REGION("maincpu", 0x1000 << 1)	// Exec ROM, 10-bits wide
+	AM_RANGE(0x1000, 0x1fff) AM_ROM AM_REGION("maincpu", 0x1000 << 1)   // Exec ROM, 10-bits wide
 	AM_RANGE(0x2000, 0x2fff) AM_DEVREAD("voice", intv_voice_device, read_rom20)
 	AM_RANGE(0x3000, 0x37ff) AM_DEVREAD("stic", stic_device, grom_read) // GROM,     8-bits wide
-	AM_RANGE(0x3800, 0x39ff) AM_READWRITE(intv_gram_r, intv_gram_w)		// GRAM,     8-bits wide
-	AM_RANGE(0x3a00, 0x3bff) AM_READWRITE(intv_gram_r, intv_gram_w)		// GRAM Alias, 8-bits wide
+	AM_RANGE(0x3800, 0x39ff) AM_READWRITE(intv_gram_r, intv_gram_w)     // GRAM,     8-bits wide
+	AM_RANGE(0x3a00, 0x3bff) AM_READWRITE(intv_gram_r, intv_gram_w)     // GRAM Alias, 8-bits wide
 	AM_RANGE(0x4000, 0x47ff) AM_DEVREAD("voice", intv_voice_device, read_rom40)
 	AM_RANGE(0x4800, 0x4fff) AM_DEVREAD("voice", intv_voice_device, read_rom48)
 	AM_RANGE(0x5000, 0x5fff) AM_DEVREAD("voice", intv_voice_device, read_rom50)
@@ -432,12 +432,12 @@ static ADDRESS_MAP_START( intv2_mem , AS_PROGRAM, 16, intv_state )
 	AM_RANGE(0x0100, 0x01ef) AM_READWRITE(intv_ram8_r, intv_ram8_w)
 	AM_RANGE(0x01f0, 0x01ff) AM_DEVREADWRITE8("ay8914", ay8914_device, read, write, 0x00ff)
 	AM_RANGE(0x0200, 0x035f) AM_READWRITE(intv_ram16_r, intv_ram16_w)
-	AM_RANGE(0x0400, 0x04ff) AM_ROM AM_REGION("maincpu", 0x400 << 1)	// Exec ROM, 10-bits wide
-	AM_RANGE(0x1000, 0x1fff) AM_ROM AM_REGION("maincpu", 0x1000 << 1)	// Exec ROM, 10-bits wide
+	AM_RANGE(0x0400, 0x04ff) AM_ROM AM_REGION("maincpu", 0x400 << 1)    // Exec ROM, 10-bits wide
+	AM_RANGE(0x1000, 0x1fff) AM_ROM AM_REGION("maincpu", 0x1000 << 1)   // Exec ROM, 10-bits wide
 	AM_RANGE(0x2000, 0x2fff) AM_DEVREAD("cartslot", intv_cart_slot_device, read_rom20)
-	AM_RANGE(0x3000, 0x37ff) AM_DEVREAD("stic", stic_device, grom_read)	// GROM,     8-bits wide
-	AM_RANGE(0x3800, 0x39ff) AM_READWRITE(intv_gram_r, intv_gram_w)	// GRAM,     8-bits wide
-	AM_RANGE(0x3a00, 0x3bff) AM_READWRITE(intv_gram_r, intv_gram_w)	// GRAM Alias, 8-bits wide
+	AM_RANGE(0x3000, 0x37ff) AM_DEVREAD("stic", stic_device, grom_read) // GROM,     8-bits wide
+	AM_RANGE(0x3800, 0x39ff) AM_READWRITE(intv_gram_r, intv_gram_w) // GRAM,     8-bits wide
+	AM_RANGE(0x3a00, 0x3bff) AM_READWRITE(intv_gram_r, intv_gram_w) // GRAM Alias, 8-bits wide
 	AM_RANGE(0x4000, 0x47ff) AM_DEVREAD("cartslot", intv_cart_slot_device, read_rom40)
 	AM_RANGE(0x4800, 0x4fff) AM_DEVREAD("cartslot", intv_cart_slot_device, read_rom48)
 	AM_RANGE(0x5000, 0x5fff) AM_DEVREAD("cartslot", intv_cart_slot_device, read_rom50)

@@ -142,7 +142,7 @@ void zsg2_device::device_reset()
 		prepare_samples(i);
 
 	FILE* f;
-	
+
 	f = fopen("zoom_samples.bin","wb");
 	fwrite(m_mem_copy,1,m_mem_blocks*4,f);
 	fclose(f);

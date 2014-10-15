@@ -57,7 +57,7 @@ public:
 		m_io_lpenx(*this, "LPENX"),
 		m_io_lpeny(*this, "LPENY"),
 		m_io_coin(*this, "COIN"),
-		m_screen(*this, "screen") 
+		m_screen(*this, "screen")
 	{ }
 
 	required_shared_ptr<UINT8> m_gce_vectorram;

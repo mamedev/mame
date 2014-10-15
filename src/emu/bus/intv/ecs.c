@@ -4,10 +4,10 @@
  Mattel Intellivision Entertainment Computer System expansion emulation
 
  TODO:
-   - Make paged rom emulation more accurate (according to 
+   - Make paged rom emulation more accurate (according to
    http://spatula-city.org/~im14u2c/intv/tech/ecs.html
-   writes to $xa5y should be available for every x and every y, i.e. we shall 
-   have writes to every 4K chunk of the memory map, and there shall be 16 pages 
+   writes to $xa5y should be available for every x and every y, i.e. we shall
+   have writes to every 4K chunk of the memory map, and there shall be 16 pages
    for each)
    Current emulation is instead tailored around the minimal usage necessary to
    make the main expansion and World Series Major League Baseball happy
@@ -67,12 +67,12 @@ void intv_ecs_device::device_start()
 }
 
 void intv_ecs_device::device_reset()
-{	
+{
 	memset(m_bank_base, 0, sizeof(m_bank_base));
 }
 
 void intv_ecs_device::late_subslot_setup()
-{	
+{
 	switch (m_subslot->get_type())
 	{
 		case INTV_RAM:
@@ -107,13 +107,13 @@ UINT8 intv_ecs_device::intv_control_r(int hand)
 		0xFF, 0x3F, 0x9F, 0x5F, 0xD7, 0xB7, 0x77, 0xDB,
 		0xBB, 0x7B, 0xDD, 0xBD, 0x7D, 0xDE, 0xBE, 0x7E
 	};
-	
+
 	static const UINT8 disc_table[] =
 	{
 		0xF3, 0xE3, 0xE7, 0xF7, 0xF6, 0xE6, 0xEE, 0xFE,
 		0xFC, 0xEC, 0xED, 0xFD, 0xF9, 0xE9, 0xEB, 0xFB
 	};
-	
+
 	static const UINT8 discyx_table[5][5] =
 	{
 		{ 0xE3, 0xF3, 0xFB, 0xEB, 0xE9 },
@@ -122,10 +122,10 @@ UINT8 intv_ecs_device::intv_control_r(int hand)
 		{ 0xF6, 0xE6, 0xFE, 0xEC, 0xED },
 		{ 0xE6, 0xEE, 0xFE, 0xFC, 0xEC }
 	};
-	
+
 	int x, y;
 	UINT8 val = 0xff;
-	
+
 	/* keypad */
 	x = m_keypad[hand]->read();
 	for (y = 0; y < 16; y++)
@@ -135,12 +135,12 @@ UINT8 intv_ecs_device::intv_control_r(int hand)
 			val &= keypad_table[y];
 		}
 	}
-	
+
 	switch ((m_options->read() >> hand) & 4)
 	{
 		case 0: /* disc == digital */
 		default:
-			
+
 			x = m_disc[hand]->read();
 			for (y = 0; y < 16; y++)
 			{
@@ -150,14 +150,14 @@ UINT8 intv_ecs_device::intv_control_r(int hand)
 				}
 			}
 			break;
-			
+
 		case 1: /* disc == _fake_ analog */
-			
+
 			x = m_discx[hand]->read();
 			y = m_discy[hand]->read();
 			val &= discyx_table[y / 32][x / 32];
 	}
-	
+
 	return val;
 }
 
@@ -252,7 +252,7 @@ static INPUT_PORTS_START( intv_ecs_kbd )
  Bit 4  D       E       2       3       W       S       Z       X
  Bit 5  A       CTL     (right) 1       Q       (up)    (down)  (space)
  Bit 6  SHIFT   NC      NC      NC      NC      NC      NC      NC
- 
+
  Shifted keys that differ from pc:
  Key        : 1 2 5 6 7 (left) (right) (up) (down)
  Shift + key: = " + - /  %      '       ^    ?
@@ -530,32 +530,32 @@ ioport_constructor intv_ecs_device::device_input_ports() const
  Paged ROM handling
  -------------------------------------------------*/
 
-READ16_MEMBER(intv_ecs_device::read_rom20) 
-{ 
+READ16_MEMBER(intv_ecs_device::read_rom20)
+{
 	if (m_bank_base[2])
-		return INTV_ROM16_READ(offset + 0x2000); 
+		return INTV_ROM16_READ(offset + 0x2000);
 	else
 		return 0xffff;
 }
 
-READ16_MEMBER(intv_ecs_device::read_rom70) 
-{ 
+READ16_MEMBER(intv_ecs_device::read_rom70)
+{
 	if (m_bank_base[7])
 		return 0xffff;
 	else
-		return INTV_ROM16_READ(offset + 0x7000); 
+		return INTV_ROM16_READ(offset + 0x7000);
 }
 
-READ16_MEMBER(intv_ecs_device::read_rome0) 
-{ 
+READ16_MEMBER(intv_ecs_device::read_rome0)
+{
 	if (m_bank_base[14])
-		return INTV_ROM16_READ(offset + 0xe000); 
-	else	// if WSMLB is loaded, it shall go here, otherwise 0xffff
+		return INTV_ROM16_READ(offset + 0xe000);
+	else    // if WSMLB is loaded, it shall go here, otherwise 0xffff
 		return m_subslot->read_rome0(space, offset, mem_mask);
 }
 
-READ16_MEMBER(intv_ecs_device::read_romf0) 
-{ 
+READ16_MEMBER(intv_ecs_device::read_romf0)
+{
 	// only WSMLB should come here with bank_base = 1
 	if (m_bank_base[15])
 		return m_subslot->read_romf0(space, offset + 0x1000, mem_mask);
@@ -585,4 +585,3 @@ WRITE16_MEMBER(intv_ecs_device::write_ay)
 	if (ACCESSING_BITS_0_7)
 		return m_snd->write(space, offset, data, mem_mask);
 }
-

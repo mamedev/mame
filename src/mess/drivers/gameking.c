@@ -103,16 +103,16 @@ DRIVER_INIT_MEMBER(gameking_state, gameking)
 DEVICE_IMAGE_LOAD_MEMBER( gameking_state, gameking_cart )
 {
 	UINT32 size = m_cart->common_get_size("rom");
-	
+
 	if (size > 0x20000)
 	{
 		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
 		return IMAGE_INIT_FAIL;
 	}
-	
+
 	m_cart->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
-	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");			
-	
+	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
+
 	return IMAGE_INIT_PASS;
 }
 

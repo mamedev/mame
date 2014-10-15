@@ -27,7 +27,7 @@ public:
 	virtual DECLARE_READ8_MEMBER(read_rom04) { if (m_subslot->exists()) return m_subslot->read_rom04(space, offset); else return 0xff; }
 	virtual DECLARE_READ8_MEMBER(read_rom0c) { if (m_subslot->exists()) return m_subslot->read_rom0c(space, offset); else return 0xff; }
 
-	virtual void write_bank(int bank) 	{ if (m_subslot->exists()) m_subslot->write_bank(bank); }
+	virtual void write_bank(int bank)   { if (m_subslot->exists()) m_subslot->write_bank(bank); }
 
 	DECLARE_WRITE_LINE_MEMBER(lrq_callback);
 	DECLARE_WRITE8_MEMBER(io_write);

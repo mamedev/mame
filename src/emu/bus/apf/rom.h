@@ -43,7 +43,7 @@ class apf_spacedst_device : public apf_rom_device
 public:
 	// construction/destruction
 	apf_spacedst_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read_ram);
 	virtual DECLARE_WRITE8_MEMBER(write_ram);

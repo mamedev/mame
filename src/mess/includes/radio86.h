@@ -88,7 +88,7 @@ public:
 
 protected:
 	required_device<cassette_image_device> m_cassette;
-	optional_device<generic_slot_device> m_cart;	// for ROMDisk - only Radio86K & Orion?
+	optional_device<generic_slot_device> m_cart;    // for ROMDisk - only Radio86K & Orion?
 	optional_device<i8257_device> m_dma8257;
 	required_device<i8255_device> m_ppi8255_1;
 	optional_device<i8255_device> m_ppi8255_2;

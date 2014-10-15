@@ -23,11 +23,11 @@
 
 #define MCFG_SAMPLES_NAMES(_names) \
 	samples_device::static_set_samples_names(*device, _names);
-	
+
 typedef device_delegate<void ()> samples_start_cb_delegate;
 
 #define SAMPLES_START_CB_MEMBER(_name) void _name()
-	
+
 #define MCFG_SAMPLES_START_CB(_class, _method) \
 	samples_device::set_samples_start_callback(*device, samples_start_cb_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
 
@@ -74,7 +74,7 @@ public:
 		dynamic_array<INT16> data;      // 16-bit signed data
 	};
 	static bool read_sample(emu_file &file, sample_t &sample);
-	
+
 	// interface
 	UINT8       m_channels;         // number of discrete audio channels needed
 	const char *const *m_names;     // array of sample names

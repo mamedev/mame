@@ -7,7 +7,7 @@
     with a mask of %1010111. For example if the 8 dummy bits are $7c,
     bits 64 to 127 are read as $7c $7c $00 $00 $7c $7c $00 $00.
     To simplify this, our emulation expects 'overdumps', 128bits total.
-    
+
     TODO:
     - not sure if the polarity of our PROM dumps (playch10) is correct,
       same goes for the bit order (note: does not require new dumps)

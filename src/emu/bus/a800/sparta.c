@@ -43,14 +43,14 @@ void a800_rom_spartados_device::device_reset()
  -------------------------------------------------*/
 
 /*-------------------------------------------------
- 
+
  SpartaDOS 64K carts
- 
- Similar to Express / Diamond carts, because 
- bankswitch is controlled by writing to 7 diff 
- offsets in reverse order, but writes to offsets 
+
+ Similar to Express / Diamond carts, because
+ bankswitch is controlled by writing to 7 diff
+ offsets in reverse order, but writes to offsets
  0x8-0xf also enable/disable subslot
- 
+
  -------------------------------------------------*/
 
 READ8_MEMBER(a800_rom_spartados_device::read_80xx)
@@ -58,7 +58,7 @@ READ8_MEMBER(a800_rom_spartados_device::read_80xx)
 	if (!m_subslot_enabled)
 		return m_rom[(offset & 0x1fff) + (m_bank * 0x2000)];
 	else
-		return 0xff;	// subslot, currently not implemented
+		return 0xff;    // subslot, currently not implemented
 }
 
 WRITE8_MEMBER(a800_rom_spartados_device::write_d5xx)
@@ -69,4 +69,3 @@ WRITE8_MEMBER(a800_rom_spartados_device::write_d5xx)
 		m_bank = (offset ^ 0x07) & 0x0f;
 
 }
-

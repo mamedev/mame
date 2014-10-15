@@ -1697,8 +1697,8 @@ static ADDRESS_MAP_START( froggeram_map, AS_PROGRAM, 8, galaxian_state )
 	AM_RANGE(0xb801, 0xb801) AM_WRITE(irq_enable_w)
 	AM_RANGE(0xb806, 0xb806) AM_WRITE(galaxian_flip_screen_x_w)
 	AM_RANGE(0xb807, 0xb807) AM_WRITE(galaxian_flip_screen_y_w)
-//	AM_RANGE(0xb818, 0xb818) AM_WRITE(coin_count_0_w) /* IOPC7 */
-//	AM_RANGE(0xb81c, 0xb81c) AM_WRITE(coin_count_1_w) /* POUT1 */
+//  AM_RANGE(0xb818, 0xb818) AM_WRITE(coin_count_0_w) /* IOPC7 */
+//  AM_RANGE(0xb81c, 0xb81c) AM_WRITE(coin_count_1_w) /* POUT1 */
 	// todo, map inputs properly for this version
 ADDRESS_MAP_END
 
@@ -6578,7 +6578,7 @@ DRIVER_INIT_MEMBER(galaxian_state,scorpion)
 //  space.nop_write(0x6803, 0x6803);
 
 	m_audiocpu->space(AS_PROGRAM).install_read_handler(0x3000, 0x3000, read8_delegate(FUNC(galaxian_state::scorpion_digitalker_intr_r),this));
-	
+
 	save_item(NAME(m_protection_state));
 /*
 {
@@ -6697,7 +6697,7 @@ ROM_START( spcwarp )
 /* ROMCMP reports "BADADDR            xxxxxx-xxxxx".  Observed data sequence repeated every 32 bytes */
 	ROM_LOAD( "swarpt7m.bin", 0x2000, 0x1000, BAD_DUMP CRC(a2dff6c8) SHA1(d1c72848450dc5ff386dc94a26e4bf704ccc7121) )
 /* Stripped "repaired" rom.  Was original rom supposed to be 0x1000 or 0x800? */
-//	ROM_LOAD( "swarpt7m-repair.bin", 0x2000, 0x0800, CRC(109f95cf) SHA1(d99171ffd6639fec28966edaf7cce3a4df5e948d) )
+//  ROM_LOAD( "swarpt7m-repair.bin", 0x2000, 0x0800, CRC(109f95cf) SHA1(d99171ffd6639fec28966edaf7cce3a4df5e948d) )
 
 	ROM_REGION( 0x1000, "gfx1", 0 )
 	ROM_LOAD( "swarpb1h.bin", 0x0000, 0x0800, CRC(6ee3b5f7) SHA1(8150f2ecd59d3a165c0541b550664c56d049edd5) )

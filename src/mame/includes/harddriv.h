@@ -331,7 +331,7 @@ public:
 	DECLARE_WRITE16_MEMBER( hdgsp_io_w );
 
 	DECLARE_WRITE16_MEMBER( hdgsp_protection_w );
-	
+
 	DECLARE_WRITE_LINE_MEMBER( hdgsp_irq_gen );
 	DECLARE_WRITE_LINE_MEMBER( hdmsp_irq_gen );
 
@@ -385,7 +385,7 @@ public:
 
 	void hdds3sdsp_reset_timer();
 	void hdds3xdsp_reset_timer();
-	
+
 	TIMER_CALLBACK_MEMBER( xsdp_sport1_irq_off_callback );
 
 	/* DSK board */
@@ -441,9 +441,9 @@ public:
 	/*----------- defined in video/harddriv.c -----------*/
 	TMS340X0_TO_SHIFTREG_CB_MEMBER(hdgsp_write_to_shiftreg);
 	TMS340X0_FROM_SHIFTREG_CB_MEMBER(hdgsp_read_from_shiftreg);
-	
+
 	void update_palette_bank(int newbank);
-	
+
 	DECLARE_READ16_MEMBER( hdgsp_control_lo_r );
 	DECLARE_WRITE16_MEMBER( hdgsp_control_lo_w );
 	DECLARE_READ16_MEMBER( hdgsp_control_hi_r );
@@ -454,7 +454,7 @@ public:
 	DECLARE_WRITE16_MEMBER( hdgsp_vram_2bpp_w );
 
 	inline void gsp_palette_change(int offset);
-	
+
 	DECLARE_READ16_MEMBER( hdgsp_paletteram_lo_r );
 	DECLARE_WRITE16_MEMBER( hdgsp_paletteram_lo_w );
 	DECLARE_READ16_MEMBER( hdgsp_paletteram_hi_r );
@@ -466,7 +466,7 @@ public:
 	/* DS III/IV board */
 	TIMER_DEVICE_CALLBACK_MEMBER( ds3sdsp_internal_timer_callback );
 	TIMER_DEVICE_CALLBACK_MEMBER( ds3xdsp_internal_timer_callback );
-	
+
 	TMS340X0_SCANLINE_IND16_CB_MEMBER(scanline_driver);
 	TMS340X0_SCANLINE_IND16_CB_MEMBER(scanline_multisync);
 };

@@ -3043,7 +3043,7 @@ static MACHINE_CONFIG_START( contcirc, taitoz_state )
 	MCFG_TC0100SCN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("tc0150rod", TC0150ROD, 0)
-	
+
 	MCFG_TC0110PCR_ADD("tc0110pcr")
 	MCFG_TC0110PCR_PALETTE("palette")
 
@@ -3121,7 +3121,7 @@ static MACHINE_CONFIG_START( chasehq, taitoz_state )
 	MCFG_TC0100SCN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("tc0150rod", TC0150ROD, 0)
-	
+
 	MCFG_TC0110PCR_ADD("tc0110pcr")
 	MCFG_TC0110PCR_PALETTE("palette")
 
@@ -3201,7 +3201,7 @@ static MACHINE_CONFIG_START( enforce, taitoz_state )
 	MCFG_TC0100SCN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("tc0150rod", TC0150ROD, 0)
-	
+
 	MCFG_TC0110PCR_ADD("tc0110pcr")
 	MCFG_TC0110PCR_PALETTE("palette")
 
@@ -3277,7 +3277,7 @@ static MACHINE_CONFIG_START( bshark, taitoz_state )
 	MCFG_TC0100SCN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("tc0150rod", TC0150ROD, 0)
-	
+
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
@@ -3358,7 +3358,7 @@ static MACHINE_CONFIG_START( sci, taitoz_state )
 	MCFG_TC0100SCN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("tc0150rod", TC0150ROD, 0)
-	
+
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
@@ -3434,7 +3434,7 @@ static MACHINE_CONFIG_START( nightstr, taitoz_state )
 	MCFG_TC0100SCN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("tc0150rod", TC0150ROD, 0)
-	
+
 	MCFG_TC0110PCR_ADD("tc0110pcr")
 	MCFG_TC0110PCR_PALETTE("palette")
 
@@ -3514,7 +3514,7 @@ static MACHINE_CONFIG_START( aquajack, taitoz_state )
 	MCFG_TC0100SCN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("tc0150rod", TC0150ROD, 0)
-	
+
 	MCFG_TC0110PCR_ADD("tc0110pcr")
 	MCFG_TC0110PCR_PALETTE("palette")
 
@@ -3664,7 +3664,7 @@ static MACHINE_CONFIG_START( dblaxle, taitoz_state )
 	MCFG_TC0480SCP_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("tc0150rod", TC0150ROD, 0)
-	
+
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
@@ -3740,7 +3740,7 @@ static MACHINE_CONFIG_START( racingb, taitoz_state )
 	MCFG_TC0480SCP_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("tc0150rod", TC0150ROD, 0)
-	
+
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 

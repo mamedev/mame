@@ -136,7 +136,7 @@ public:
 	{
 		//There needs to be some way of connecting these values to stepper coils, or doing the MCU properly
 		// We should be able to see an enable clock, a sense and a full/half step selector, we don't have the half step visible it seems.
-		
+
 		//3 1 16 14
 		int phases[] = {0x05,0x01,0x09,0x08,0x0a,0x02,0x06,0x04,};
 		for (int reel=0; reel <4; reel++)
@@ -165,11 +165,11 @@ public:
 					logerror("Reel %x Enable %x \n",reel, clock  );
 				}
 			}
-//			logerror("Reel %x Enable %x Sense %i \n",reel, (data & (1<<reel)), (data & (4 + (1<<reel))) ? 1:-1  );
+//          logerror("Reel %x Enable %x Sense %i \n",reel, (data & (1<<reel)), (data & (4 + (1<<reel))) ? 1:-1  );
 		}
-		
-		
-//	  printf("reels, extender strobe %02x\n", data);
+
+
+//    printf("reels, extender strobe %02x\n", data);
 	}
 
 	DECLARE_READ8_MEMBER( ic37_read_a )
@@ -194,7 +194,7 @@ public:
 			if (stepper_optic_state(reel)) pattern |= 1<<reel;
 			if (m_reel_count[reel]) action |= 1<<reel;
 		}
-		
+
 		return ((pattern << 4) | action);
 	}
 
@@ -313,7 +313,7 @@ static INPUT_PORTS_START( aces1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
-	
+
 	PORT_START("IO4")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -353,7 +353,7 @@ static INPUT_PORTS_START( aces1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
-	
+
 	PORT_START("IO8")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -363,7 +363,7 @@ static INPUT_PORTS_START( aces1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
-	
+
 	PORT_START("DSWA")
 	PORT_DIPNAME( 0x01, 0x01, "DSWA" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )

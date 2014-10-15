@@ -768,9 +768,9 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 	</software>
 
 <!-- some disassembling performed by Paul Baker suggests that this version is a prototype
-e.g.  the mapper control register at $fffc gets set to $80, you cannot switch characters 
-on the pause screen, some messages are not displayed ("Sorry boys, no tickets, no show!" 
-to explain why it is not possible to progress beyond a certain point in the game without 
+e.g.  the mapper control register at $fffc gets set to $80, you cannot switch characters
+on the pause screen, some messages are not displayed ("Sorry boys, no tickets, no show!"
+to explain why it is not possible to progress beyond a certain point in the game without
 a certain item) -->
 	<software name="beavisp" cloneof="beavis">
 		<description>Beavis and Butt-head (Prototype?)</description>
@@ -7285,7 +7285,7 @@ a certain item) -->
 	</software>
 
 	<software name="soniclab">
-    <!-- A final pre-release version of this same dump was found on a proto board with 4x128K sockets and no labels -->
+	<!-- A final pre-release version of this same dump was found on a proto board with 4x128K sockets and no labels -->
 		<description>Sonic Labyrinth (World)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
@@ -7594,7 +7594,7 @@ a certain item) -->
 	</software>
 
 	<software name="sonic2d" cloneof="sonic2">
-    <!-- This predates the final release and contains some different tiles & sprites compared to the final game -->
+	<!-- This predates the final release and contains some different tiles & sprites compared to the final game -->
 		<description>Sonic The Hedgehog 2 (Rolling Demo)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
@@ -7609,7 +7609,7 @@ a certain item) -->
 			<feature name="batt" value="" />
 			<feature name="sw" value="ON = 1M / OFF = 256" />
 			<dataarea name="rom" size="262144">
-            <!-- The ROM should be split in two halves -->
+			<!-- The ROM should be split in two halves -->
 				<rom name="sonic_2_auto_demo_prototype_(1991-12-05)_tmr_sega_cb06_ffff.bin" size="262144" crc="15ad37a5" sha1="b780c6f059b48d1bb48ee2ad521552dab1487c88" offset="000000" />
 			</dataarea>
 		</part>
@@ -8634,7 +8634,7 @@ a certain item) -->
 	</software>
 
 	<software name="tailsadv">
-    <!-- A final pre-release version of this same dump was found on a proto board with 4x128K sockets and no labels -->
+	<!-- A final pre-release version of this same dump was found on a proto board with 4x128K sockets and no labels -->
 		<description>Tails Adventures (World)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>

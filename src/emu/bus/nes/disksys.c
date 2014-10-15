@@ -11,7 +11,7 @@
  Famicom Disk System.
 
  Based on info from NESDev wiki ( http://wiki.nesdev.com/w/index.php/Family_Computer_Disk_System )
- 
+
  TODO:
    - convert floppy drive + fds format to modern code!
    - add sound bits
@@ -124,14 +124,14 @@ void nes_disksys_device::device_start()
 
 	irq_timer = timer_alloc(TIMER_IRQ);
 	irq_timer->adjust(attotime::zero, 0, machine().device<cpu_device>("maincpu")->cycles_to_attotime(1));
-	
+
 	save_item(NAME(m_fds_motor_on));
 	save_item(NAME(m_fds_door_closed));
 	save_item(NAME(m_fds_current_side));
 	save_item(NAME(m_fds_head_position));
 	save_item(NAME(m_fds_status0));
 	save_item(NAME(m_read_mode));
-	save_item(NAME(m_drive_ready));	
+	save_item(NAME(m_drive_ready));
 	save_item(NAME(m_irq_enable));
 	save_item(NAME(m_irq_transfer));
 	save_item(NAME(m_irq_count));
@@ -173,8 +173,8 @@ void nes_disksys_device::pcb_reset()
 
  RAM is in 0x6000-0xdfff (32K)
  ROM is in 0xe000-0xffff (8K)
- 
- registers + disk drive are accessed in 
+
+ registers + disk drive are accessed in
  0x4020-0x403f (read_ex/write_ex below)
 
  -------------------------------------------------*/
@@ -210,7 +210,7 @@ READ8_MEMBER(nes_disksys_device::read_m)
 }
 
 void nes_disksys_device::hblank_irq(int scanline, int vblank, int blanked)
-{	
+{
 	if (m_irq_transfer)
 		m_maincpu->set_input_line(M6502_IRQ_LINE, HOLD_LINE);
 }
@@ -218,7 +218,7 @@ void nes_disksys_device::hblank_irq(int scanline, int vblank, int blanked)
 WRITE8_MEMBER(nes_disksys_device::write_ex)
 {
 	LOG_MMC(("Famicom Disk System write_ex, offset: %04x, data: %02x\n", offset, data));
-	
+
 	if (offset >= 0x20 && offset < 0x60)
 	{
 		// wavetable
@@ -255,34 +255,34 @@ WRITE8_MEMBER(nes_disksys_device::write_ex)
 			// bit4 - CRC control (set during CRC calculation of transfer)
 			// bit5 - Always set to '1'
 			// bit6 - Read/Write Start (Set to 1 when the drive becomes ready for read/write)
-			// bit7 - Interrupt Transfer (0: Transfer without using IRQ; 1: Enable IRQ when 
+			// bit7 - Interrupt Transfer (0: Transfer without using IRQ; 1: Enable IRQ when
 			//        the drive becomes ready)
 			m_fds_motor_on = BIT(data, 0);
-			
+
 			if (BIT(data, 1))
 				m_fds_head_position = 0;
-			
+
 			if (!(data & 0x40) && m_drive_ready && m_fds_head_position > 2)
 				m_fds_head_position -= 2; // ??? is this some sort of compensation??
-			
+
 			m_read_mode = BIT(data, 2);
-			set_nt_mirroring(BIT(data, 3) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);			
+			set_nt_mirroring(BIT(data, 3) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 			m_drive_ready = data & 0x40;
 			m_irq_transfer = BIT(data, 7);
 			break;
 		case 0x06:
 			// external connector
 			break;
-		case 0x60:	// $4080 - Volume envelope - read through $4090
-		case 0x62:	// $4082 - Frequency low
-		case 0x63:	// $4083 - Frequency high
-		case 0x64:	// $4084 - Mod envelope - read through $4092
-		case 0x65:	// $4085 - Mod counter
-		case 0x66:	// $4086 - Mod frequency low
-		case 0x67:	// $4087 - Mod frequency high
-		case 0x68:	// $4088 - Mod table write
-		case 0x69:	// $4089 - Wave write / master volume
-		case 0x6a:	// $408a - Envelope speed
+		case 0x60:  // $4080 - Volume envelope - read through $4090
+		case 0x62:  // $4082 - Frequency low
+		case 0x63:  // $4083 - Frequency high
+		case 0x64:  // $4084 - Mod envelope - read through $4092
+		case 0x65:  // $4085 - Mod counter
+		case 0x66:  // $4086 - Mod frequency low
+		case 0x67:  // $4087 - Mod frequency high
+		case 0x68:  // $4088 - Mod table write
+		case 0x69:  // $4089 - Wave write / master volume
+		case 0x6a:  // $408a - Envelope speed
 			break;
 	}
 }
@@ -299,11 +299,11 @@ READ8_MEMBER(nes_disksys_device::read_ex)
 
 	switch (offset)
 	{
-		case 0x10: 
+		case 0x10:
 			// $4030 - disk status 0
 			// bit0 - Timer Interrupt (1: an IRQ occurred)
-			// bit1 - Byte transfer flag (Set to 1 every time 8 bits have been transfered between 
-			//        the RAM adaptor & disk drive through $4024/$4031; Reset to 0 when $4024, 
+			// bit1 - Byte transfer flag (Set to 1 every time 8 bits have been transfered between
+			//        the RAM adaptor & disk drive through $4024/$4031; Reset to 0 when $4024,
 			//        $4031, or $4030 has been serviced)
 			// bit4 - CRC control (0: CRC passed; 1: CRC error)
 			// bit6 - End of Head (1 when disk head is on the most inner track)
@@ -312,7 +312,7 @@ READ8_MEMBER(nes_disksys_device::read_ex)
 			// clear the disk IRQ detect flag
 			m_fds_status0 &= ~0x01;
 			break;
-		case 0x11: 
+		case 0x11:
 			// $4031 - data latch
 			// don't read data if disk is unloaded
 			if (!m_fds_data)
@@ -330,8 +330,8 @@ READ8_MEMBER(nes_disksys_device::read_ex)
 			else
 				ret = 0;
 			break;
-		case 0x12: 
-			// $4032 - disk status 1: 
+		case 0x12:
+			// $4032 - disk status 1:
 			// bit0 - Disk flag  (0: Disk inserted; 1: Disk not inserted)
 			// bit1 - Ready flag (0: Disk ready; 1: Disk not ready)
 			// bit2 - Protect flag (0: Not write protected; 1: Write protected or disk ejected)
@@ -351,17 +351,17 @@ READ8_MEMBER(nes_disksys_device::read_ex)
 			else
 				ret = (m_fds_current_side == 0) ? 1 : 0; // 0 if a disk is inserted
 			break;
-		case 0x13: 
+		case 0x13:
 			// $4033 - external connector (bits 0-6) + battery status (bit 7)
 			ret = 0x80;
 			break;
-		case 0x70:	// $4090 - Volume gain - write through $4080
-		case 0x72: 	// $4092 - Mod gain - read through $4084
+		case 0x70:  // $4090 - Volume gain - write through $4080
+		case 0x72:  // $4092 - Mod gain - read through $4084
 		default:
 			ret = 0x00;
 			break;
 	}
-	
+
 	return ret;
 }
 
@@ -372,7 +372,7 @@ READ8_MEMBER(nes_disksys_device::read_ex)
 void nes_disksys_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
 	if (id == TIMER_IRQ)
-	{		
+	{
 		if (m_irq_enable && m_irq_count)
 		{
 			m_irq_count--;
@@ -381,7 +381,7 @@ void nes_disksys_device::device_timer(emu_timer &timer, device_timer_id id, int 
 				m_maincpu->set_input_line(M6502_IRQ_LINE, HOLD_LINE);
 				m_irq_enable = 0;
 				m_fds_status0 |= 0x01;
-				m_irq_count_latch = 0;	// used in Kaettekita Mario Bros
+				m_irq_count_latch = 0;  // used in Kaettekita Mario Bros
 			}
 		}
 	}
@@ -399,7 +399,7 @@ void nes_disksys_device::disk_flip_side()
 	if (m_fds_current_side == 0)
 		popmessage("No disk inserted.");
 	else
-		popmessage("Disk set to side %d", m_fds_current_side);	
+		popmessage("Disk set to side %d", m_fds_current_side);
 }
 
 
@@ -410,15 +410,15 @@ void nes_disksys_device::load_disk(device_image_interface &image)
 {
 	int header = 0;
 	m_fds_sides = 0;
-	
+
 	if (image.length() % 65500)
 		header = 0x10;
-	
+
 	m_fds_sides = (image.length() - header) / 65500;
-	
+
 	if (!m_fds_data)
 		m_fds_data = auto_alloc_array(machine(), UINT8, m_fds_sides * 65500);
-	
+
 	// if there is an header, skip it
 	image.fseek(header, SEEK_SET);
 	image.fread(m_fds_data, 65500 * m_fds_sides);
@@ -430,4 +430,3 @@ void nes_disksys_device::unload_disk(device_image_interface &image)
 	/* TODO: should write out changes here as well */
 	m_fds_sides =  0;
 }
-

@@ -26,7 +26,7 @@
 
 #define IIC_ACIA1_TAG "acia1"
 #define IIC_ACIA2_TAG "acia2"
-#define IICP_IWM_TAG	"iwm"
+#define IICP_IWM_TAG    "iwm"
 
 #define LASER128_UDC_TAG "l128udc"
 
@@ -83,7 +83,7 @@ enum machine_type_t
 	APPLE_IIC,          // Apple IIc
 	APPLE_IICPLUS,      // Apple IIc+
 	TK2000,             // Microdigital TK2000
-	TK3000,				// Microdigital TK3000
+	TK3000,             // Microdigital TK3000
 	LASER128,           // Laser 128/128EX/128EX2
 	SPACE84,            // "Space 84" with flipped text mode
 	LABA2P              // lab equipment (?) II Plus with flipped text mode

@@ -66,7 +66,7 @@ private:
 
 static ADDRESS_MAP_START(myvision_mem, AS_PROGRAM, 8, myvision_state)
 	ADDRESS_MAP_UNMAP_HIGH
-	//AM_RANGE(0x0000, 0x5fff)		// mapped by the cartslot
+	//AM_RANGE(0x0000, 0x5fff)      // mapped by the cartslot
 	AM_RANGE(0xa000, 0xa7ff) AM_RAM
 	AM_RANGE(0xe000, 0xe000) AM_DEVREADWRITE("tms9918", tms9918a_device, vram_read, vram_write)
 	AM_RANGE(0xe002, 0xe002) AM_DEVREADWRITE("tms9918", tms9918a_device, register_read, register_write)
@@ -144,15 +144,15 @@ void myvision_state::machine_reset()
 DEVICE_IMAGE_LOAD_MEMBER( myvision_state, cart )
 {
 	UINT32 size = m_cart->common_get_size("rom");
-	
+
 	if (size != 0x4000 && size != 0x6000)
 	{
 		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
 		return IMAGE_INIT_FAIL;
 	}
-	
+
 	m_cart->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
-	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");			
+	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
 
 	return IMAGE_INIT_PASS;
 }

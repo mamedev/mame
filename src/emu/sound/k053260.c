@@ -385,7 +385,7 @@ void k053260_device::KDSC_Voice::key_on()
 
 	else if (m_start + m_length >= m_device->m_rom_size)
 		logerror("K053260: Attempting to play past the end of the ROM ( start = %06x, length = %06x )\n",
-				 m_start, m_length);
+					m_start, m_length);
 
 	else
 	{
@@ -464,7 +464,7 @@ UINT8 k053260_device::KDSC_Voice::read_rom()
 	if (offs >= m_device->m_rom_size)
 	{
 		logerror("%s: K053260: Attempting to read past the end of the ROM (offs = %06x, size = %06x)\n",
-				 m_device->machine().describe_context(), offs, m_device->m_rom_size);
+					m_device->machine().describe_context(), offs, m_device->m_rom_size);
 		return 0;
 	}
 

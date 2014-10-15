@@ -53,7 +53,7 @@ public:
 	DECLARE_WRITE8_MEMBER(st0016_vregs_w);
 	DECLARE_READ8_MEMBER(soundram_read);
 
-	
+
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void st0016_save_init();
 	void draw_bgmap(bitmap_ind16 &bitmap,const rectangle &cliprect, int priority);

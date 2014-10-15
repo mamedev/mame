@@ -3,7 +3,7 @@
     Atari 400/800
 
     ANTIC video controller
- 
+
     Juergen Buchmueller, June 1998
 
 ***************************************************************************/
@@ -293,12 +293,11 @@
 		m_w.chbasl++
 
 /* erase a number of color clocks to background color PBK */
-#define ERASE(size)							\
-	for (int i = 0; i < size; i++)			\
-	{										\
+#define ERASE(size)                         \
+	for (int i = 0; i < size; i++)          \
+	{                                       \
 		*dst++ = (PBK << 24) | (PBK << 16) | (PBK << 8) | PBK;  \
-	}										\
-
+	}
 #define ZAP48()                                                 \
 	dst = (UINT32 *)&antic.cclock[PMOFFSET];                    \
 	dst[ 0] = (PBK << 24) | (PBK << 16) | (PBK << 8) | PBK;     \
@@ -309,11 +308,10 @@
 	dst[47] = (PBK << 24) | (PBK << 16) | (PBK << 8) | PBK
 
 #define REP(FUNC, size)                     \
-	for (int i = 0; i < size; i++)			\
-	{										\
-		FUNC(i);							\
-	}										\
-
+	for (int i = 0; i < size; i++)          \
+	{                                       \
+		FUNC(i);                            \
+	}
 
 
 struct ANTIC_R {
@@ -379,7 +377,7 @@ public:
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void generic_interrupt(int button_count);
-	
+
 private:
 	static const device_timer_id TIMER_CYCLE_STEAL = 0;
 	static const device_timer_id TIMER_ISSUE_DLI = 1;
@@ -454,7 +452,7 @@ private:
 	UINT8   *m_uc_g2;             /* used colors for gfx GTIA 2 */
 	UINT8   *m_uc_g3;             /* used colors for gfx GTIA 3 */
 	bitmap_ind16 *m_bitmap;
-	
+
 	void prio_init();
 	void cclk_init();
 

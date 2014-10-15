@@ -1229,9 +1229,9 @@ software_part *device_image_interface::find_software_item(const char *path, bool
 
 		if (swinfo_name == swlistdev->list_name())
 		{
-			// ad hoc handling for the case path = swlist_name:swinfo_name (e.g. 
-			// gameboy:sml) which is not handled properly by software_name_split 
-			// since the function cannot distinguish between this and the case 
+			// ad hoc handling for the case path = swlist_name:swinfo_name (e.g.
+			// gameboy:sml) which is not handled properly by software_name_split
+			// since the function cannot distinguish between this and the case
 			// path = swinfo_name:swpart_name
 			software_info *info = swlistdev->find(swpart_name);
 			if (info != NULL)

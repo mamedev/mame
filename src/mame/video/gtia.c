@@ -131,7 +131,7 @@ void gtia_device::device_start()
 {
 	m_read_cb.resolve();
 	m_write_cb.resolve();
-	
+
 	save_item(NAME(m_r.m0pf));
 	save_item(NAME(m_r.m1pf));
 	save_item(NAME(m_r.m2pf));
@@ -218,7 +218,7 @@ void gtia_device::device_start()
 	save_item(NAME(m_h.vdelay_p1));
 	save_item(NAME(m_h.vdelay_p2));
 	save_item(NAME(m_h.vdelay_p3));
-	
+
 	save_item(NAME(m_lumpf1));
 	save_item(NAME(m_huepm0));
 	save_item(NAME(m_huepm1));
@@ -226,9 +226,9 @@ void gtia_device::device_start()
 	save_item(NAME(m_huepm3));
 	save_item(NAME(m_huepm4));
 	save_item(NAME(m_huepf2));
-	save_item(NAME(m_huebk));	
+	save_item(NAME(m_huebk));
 
-	save_item(NAME(m_color_lookup));	
+	save_item(NAME(m_color_lookup));
 
 	machine().save().register_postload(save_prepost_delegate(FUNC(gtia_device::gtia_postload), this));
 }
@@ -291,14 +291,14 @@ void gtia_device::button_interrupt(int button_count, UINT8 button_port)
 			m_r.but[i] = 1;
 		m_r.but[i] &= BIT(button_port, i);
 	}
-	
+
 	/* button registers for xl/xe */
 	if (button_count == 2)
 	{
 		m_r.but[2] = 1;  /* not used on xl/xe */
 		m_r.but[3] = 0;  /* 1 if external cartridge is inserted */
 	}
-	
+
 }
 
 
@@ -967,7 +967,7 @@ void gtia_device::render(UINT8 *src, UINT8 *dst, UINT8 *prio, UINT8 *pmbits)
 		player_render(m_h.grafp2, m_w.sizep2 + 1, GTIA_P2, &pmbits[m_w.hposp2]);
 	if (m_h.grafp3)
 		player_render(m_h.grafp3, m_w.sizep3 + 1, GTIA_P3, &pmbits[m_w.hposp3]);
-	
+
 	if (m_h.grafm0)
 		missile_render(m_h.grafm0, m_w.sizem + 1, GTIA_M0, &pmbits[m_w.hposm0]);
 	if (m_h.grafm1)

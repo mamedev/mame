@@ -376,10 +376,10 @@ public:
 	virtual DECLARE_WRITE8_MEMBER(write_m);
 	virtual DECLARE_WRITE8_MEMBER(write_h);
 	virtual DECLARE_WRITE8_MEMBER(write_ex);
-	
+
 	// hack until disk system is made modern!
 	virtual void disk_flip_side() { if (m_cart) m_cart->disk_flip_side(); }
-	
+
 	int get_pcb_id() { return m_pcb_id; };
 
 	void pcb_start(UINT8 *ciram_ptr);

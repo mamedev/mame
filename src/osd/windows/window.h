@@ -36,12 +36,12 @@ class win_window_info
 {
 public:
 	win_window_info(running_machine &machine);
-	virtual ~win_window_info();		
+	virtual ~win_window_info();
 
 	running_machine &machine() const { return m_machine; }
 
 	void update();
-	
+
 	win_window_info *   m_next;
 	volatile int        m_init_state;
 

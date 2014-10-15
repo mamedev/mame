@@ -32,7 +32,7 @@
     7) When the format completes, type "RUN APPLESOFT BOOT PREP" and press Enter.
     8) Once it finishes, quit MESS.  Remove the diskii(ng) from slot 7 and
        the system will boot into DOS 3.3 from the Corvus HD.
- 
+
     TODO: but there are no Corvus drivers present after that, only
     Disk II?
 

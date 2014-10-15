@@ -4,7 +4,7 @@
 
 California Chase (c) 1999 The Game Room
 Host Invaders (c) 1998 The Game Room
- 
+
 driver by Angelo Salese & Grull Osgo
 
 TODO:
@@ -50,7 +50,7 @@ SMC FD37C669QF (QFP100)
 connectors for COM1, COM2, LPT1, IDE0, IDE1, floppy etc
 uses standard AT PSU
 
-Video card is Trident TGUI9680 with 512k on-board VRAM 
+Video card is Trident TGUI9680 with 512k on-board VRAM
 Card is branded "Union UTD73" - these are all over eBay, for instance
 RAM is AS4C256K16EO-50JC (x2)
 Trident BIOS V5.5 (DIP28). Actual size unknown, dumped as 64k, 128k, 256k and 512k (can only be one of these sizes)
@@ -78,11 +78,11 @@ HDD is WD Caviar 2170. C/H/S = 1010/6/55. Capacity = 170.6MB
 The HDD is DOS-readable and in fact the OS is just Windows 98 DOS and can
 be easily copied. Tested with another HDD.... formatted with DOS, copied
 all files across to new HDD, boots up fine.
- 
- 
-Host Invaders is the same motherboard and video card as above, but instead of an HDD, 
-there is a CD-ROM drive. 
- 
+
+
+Host Invaders is the same motherboard and video card as above, but instead of an HDD,
+there is a CD-ROM drive.
+
 ************************************************************************************/
 /*
 Grull Osgo - Improvements
@@ -744,7 +744,7 @@ ROM_END
 
 ROM_START( hostinv )
 	ROM_REGION( 0x40000, "bios", 0 )
-	ROM_LOAD( "hostinv_bios.bin", 0x000000, 0x020000, CRC(5111e4b8) SHA1(20ab93150b61fd068f269368450734bba5dcb284) ) 
+	ROM_LOAD( "hostinv_bios.bin", 0x000000, 0x020000, CRC(5111e4b8) SHA1(20ab93150b61fd068f269368450734bba5dcb284) )
 
 	ROM_REGION( 0x8000, "video_bios", 0 )
 	ROM_LOAD16_BYTE( "trident_tgui9680_bios.bin", 0x0000, 0x4000, CRC(1eebde64) SHA1(67896a854d43a575037613b3506aea6dae5d6a19) )
@@ -759,7 +759,7 @@ ROM_END
 
 ROM_START( eggsplc )
 	ROM_REGION( 0x40000, "bios", 0 )
-	ROM_LOAD( "hostinv_bios.bin", 0x000000, 0x020000, CRC(5111e4b8) SHA1(20ab93150b61fd068f269368450734bba5dcb284) ) 
+	ROM_LOAD( "hostinv_bios.bin", 0x000000, 0x020000, CRC(5111e4b8) SHA1(20ab93150b61fd068f269368450734bba5dcb284) )
 
 	ROM_REGION( 0x8000, "video_bios", 0 )
 	ROM_LOAD16_BYTE( "trident_tgui9680_bios.bin", 0x0000, 0x4000, CRC(1eebde64) SHA1(67896a854d43a575037613b3506aea6dae5d6a19) )
@@ -775,4 +775,3 @@ ROM_END
 GAME( 1998, hostinv,   0,    hostinv,  calchase, calchase_state,  hostinv,  ROT0, "The Game Room", "Host Invaders", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
 GAME( 1999, calchase,  0,    calchase, calchase, calchase_state,  calchase, ROT0, "The Game Room", "California Chase", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
 GAME( 2002, eggsplc,   0,    calchase, calchase, calchase_state,  hostinv,  ROT0, "The Game Room", "Eggs Playing Chicken", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
-

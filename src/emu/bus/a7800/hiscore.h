@@ -14,10 +14,10 @@ class a78_hiscore_device : public a78_rom_device
 public:
 	// construction/destruction
 	a78_hiscore_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	// device-level overrides
 	virtual machine_config_constructor device_mconfig_additions() const;
-	
+
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read_04xx);
 	virtual DECLARE_WRITE8_MEMBER(write_04xx);

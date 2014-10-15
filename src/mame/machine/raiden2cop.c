@@ -27,7 +27,7 @@ raiden2cop_device::raiden2cop_device(const machine_config &mconfig, const char *
 	cop_latch_addr(0),
 	cop_latch_trigger(0),
 	cop_latch_value(0),
-	cop_latch_mask(0),		
+	cop_latch_mask(0),
 	cop_dma_v1(0),
 	cop_dma_v2(0),
 	cop_dma_mode(0),
@@ -78,7 +78,7 @@ raiden2cop_device::raiden2cop_device(const machine_config &mconfig, const char *
 	memset(cop_func_value, 0, sizeof(UINT16)*(0x100/8));
 	memset(cop_func_mask, 0, sizeof(UINT16)*(0x100/8));
 	memset(cop_program, 0, sizeof(UINT16)*(0x100));
-	
+
 	memset(cop_dma_src, 0, sizeof(UINT16)*(0x200));
 	memset(cop_dma_dst, 0, sizeof(UINT16)*(0x200));
 	memset(cop_dma_size, 0, sizeof(UINT16)*(0x200));
@@ -362,7 +362,7 @@ int raiden2cop_device::find_trigger_match(UINT16 triggerval, UINT16 mask)
 	/* search the uploaded 'trigger' table for a matching trigger*/
 	/* note, I don't know what the 'mask' or 'value' tables are... probably important, might determine what actually gets executed! */
 	/* note: Zero Team triggers macro 0x904 instead of 0x905, Seibu Cup Soccer triggers 0xe30e instead of 0xe38e. I highly doubt that AT LEAST
-		it isn't supposed to do anything, especially in the former case (it definitely NEEDS that sprites have an arc movement when they are knocked down). */
+	    it isn't supposed to do anything, especially in the former case (it definitely NEEDS that sprites have an arc movement when they are knocked down). */
 	// we currently pass in mask 0xff00 to look at only match the top bits, but this is wrong, only specific bits are ignored (maybe depends on the 'mask' value uploaded with each trigger?)
 	int matched = 0;
 	int command = -1;
@@ -374,7 +374,7 @@ int raiden2cop_device::find_trigger_match(UINT16 triggerval, UINT16 mask)
 		if ((triggerval & mask) == (cop_func_trigger[i] & mask) && cop_func_trigger[i] != 0) /* cop_func_trigger[i] != 0 is just being used to prevent matching against empty / unused slots */
 		{
 			int otherlog = 1;
-			
+
 			// just some per-game debug code so that we have a record of exactly which triggers each game is known to use
 
 
@@ -382,7 +382,7 @@ int raiden2cop_device::find_trigger_match(UINT16 triggerval, UINT16 mask)
 			{
 				// enemies often walk on the spot, bosses often walk above / below playable game area (the >>16 in the sqrt commands seems responsible)
 				// player doesn't walk off screen after end of level (walks on spot, different cause?)
-				if (triggerval == 0x0205 || triggerval == 0x0905 || 
+				if (triggerval == 0x0205 || triggerval == 0x0905 ||
 					triggerval == 0x8100 || triggerval == 0x8900 || /* sin / cos */
 					triggerval == 0x138e || // atan?
 					triggerval == 0x3bb0 || // distance?
@@ -413,7 +413,7 @@ int raiden2cop_device::find_trigger_match(UINT16 triggerval, UINT16 mask)
 
 				if (triggerval == 0x0205 ||
 					triggerval == 0x8100 || triggerval == 0x8900 || /* sin / cos */
-					triggerval == 0x138e || 
+					triggerval == 0x138e ||
 					triggerval == 0x3bb0 ||
 					triggerval == 0x42c2 ||
 					triggerval == 0xa100 || triggerval == 0xa900 || triggerval == 0xb080 || triggerval == 0xb880) /* collisions */
@@ -494,13 +494,13 @@ int raiden2cop_device::find_trigger_match(UINT16 triggerval, UINT16 mask)
 			{
 				if (triggerval == 0x0205 || triggerval == 0x0905 ||
 					triggerval == 0x8100 || triggerval == 0x8900 || /* sin / cos */
-					triggerval == 0x130e ||	triggerval == 0x138e ||
+					triggerval == 0x130e || triggerval == 0x138e ||
 					triggerval == 0x2a05 ||
-					triggerval == 0x2208 ||	triggerval == 0x2288 ||	
+					triggerval == 0x2208 || triggerval == 0x2288 ||
 					triggerval == 0x338e ||
-					triggerval == 0x39b0 || triggerval == 0x3bb0 ||	
-					triggerval == 0x4aa0 ||	
-					triggerval == 0x42c2 ||	
+					triggerval == 0x39b0 || triggerval == 0x3bb0 ||
+					triggerval == 0x4aa0 ||
+					triggerval == 0x42c2 ||
 					triggerval == 0x5205 ||
 					triggerval == 0x5a05 ||
 					triggerval == 0x6200 ||
@@ -508,7 +508,7 @@ int raiden2cop_device::find_trigger_match(UINT16 triggerval, UINT16 mask)
 					triggerval == 0xa100 || triggerval == 0xa900 || triggerval == 0xb100 || triggerval == 0xb900 /* collisions */
 					)
 					otherlog = 0;
-			}		
+			}
 			else
 			{
 				otherlog = 0;
@@ -525,7 +525,6 @@ int raiden2cop_device::find_trigger_match(UINT16 triggerval, UINT16 mask)
 
 	if (matched == 1)
 	{
-
 		int j;
 		seibu_cop_log("     Sequence: ");
 		for (j=0;j<0x8;j++)
@@ -554,9 +553,9 @@ int raiden2cop_device::check_command_matches(int command, UINT16 seq0, UINT16 se
 	command *= 8;
 
 	if (cop_program[command+0] == seq0 && cop_program[command+1] == seq1 && cop_program[command+2] == seq2 && cop_program[command+3] == seq3 &&
-	    cop_program[command+4] == seq4 && cop_program[command+5] == seq5 && cop_program[command+6] == seq6 && cop_program[command+7] == seq7 &&
-	    cop_func_value[command/8] == _funcval_ &&
-	    cop_func_mask[command/8] == _funcmask_)
+		cop_program[command+4] == seq4 && cop_program[command+5] == seq5 && cop_program[command+6] == seq6 && cop_program[command+7] == seq7 &&
+		cop_func_value[command/8] == _funcval_ &&
+		cop_func_mask[command/8] == _funcmask_)
 		return 1;
 	else
 		return 0;
@@ -877,7 +876,7 @@ WRITE16_MEMBER(raiden2cop_device::cop_dma_trigger_w)
 
 /* Number Conversion */
 
-// according to score display in  https://www.youtube.com/watch?v=T1M8sxYgt9A 
+// according to score display in  https://www.youtube.com/watch?v=T1M8sxYgt9A
 // we should return 0x30 for unused digits? according to Raiden 2 and Zero
 // Team the value should be 0x20, can this be configured?
 // grainbow doesn't like this implementation at all (21 credits, 2 digit high scores etc.)
@@ -890,7 +889,7 @@ WRITE16_MEMBER(raiden2cop_device::cop_itoa_low_w)
 
 	if(digits > 9)
 		digits = 9;
-	
+
 	for (int i = 0; i < digits; i++)
 	{
 		if (!val && i)
@@ -903,7 +902,7 @@ WRITE16_MEMBER(raiden2cop_device::cop_itoa_low_w)
 			val = val / 10;
 		}
 	}
-	
+
 	cop_itoa_digits[9] = 0;
 }
 
@@ -1106,7 +1105,7 @@ void raiden2cop_device::execute_338e(address_space &space, int offset, UINT16 da
 
 /*
 ## - trig (up5) (low11) :  (sq0, sq1, sq2, sq3, sq4, sq5, sq6, sq7)  valu  mask
-07 - 3bb0 ( 07) (  3b0) :  (f9c, b9c, b9c, b9c, b9c, b9c, b9c, 99c)  4     007f   (legionna, heatbrl, cupsoc, grainbow, godzilla, denjinmk, raiden2, raidendx, 
+07 - 3bb0 ( 07) (  3b0) :  (f9c, b9c, b9c, b9c, b9c, b9c, b9c, 99c)  4     007f   (legionna, heatbrl, cupsoc, grainbow, godzilla, denjinmk, raiden2, raidendx,
 07 - 3b30 ( 07) (  330) :  (f9c, b9c, b9c, b9c, b9c, b9c, b9c, 99c)  4     007f   (zeroteam, xsedae)
 */
 
@@ -1262,7 +1261,7 @@ void raiden2cop_device::execute_6200(address_space &space, int offset, UINT16 da
 		else
 			angle -= cop_angle_step;
 	}
-	
+
 	cop_write_word(space, cop_regs[primary_reg], flags);
 
 	if (!m_cpu_is_68k)
@@ -1304,7 +1303,7 @@ void raiden2cop_device::LEGACY_execute_6200(address_space &space, int offset, UI
 		else
 			angle -= cop_angle_step;
 	}
-	
+
 	cop_write_word(space, cop_regs[primary_reg], flags);
 
 	if (!m_cpu_is_68k)
@@ -1716,7 +1715,7 @@ void  raiden2cop_device::cop_collision_update_hitbox(address_space &space, UINT1
 	//printf("%02x %02x %02x %02x %02x %02x\n", (UINT8)size[i], (UINT8)dx[i], (UINT8)size[1], (UINT8)dx[1], (UINT8)size[2], (UINT8)dx[2]);
 
 	int j = slot;
-	
+
 	UINT8 res;
 
 	if (num_axis==3) res = 7;
@@ -1791,7 +1790,7 @@ WRITE16_MEMBER( raiden2cop_device::cop_cmd_w)
 	case 0x39b0:
 	case 0x3b30:
 	case 0x3bb0: { // 3bb0 0004 007f 0038 - 0f9c 0b9c 0b9c 0b9c 0b9c 0b9c 0b9c 099c
-		execute_3b30(space, offset, data); 
+		execute_3b30(space, offset, data);
 
 		break;
 	}
@@ -1829,7 +1828,7 @@ WRITE16_MEMBER( raiden2cop_device::cop_cmd_w)
 	case 0x5a05:   // 5a05 0006 fff7 0058 - 0180 02e0 03a0 00a0 03a0 0000 0000 0000
 		//      fprintf(stderr, "sprcpt 5a05 %04x %04x %04x %08x %08x\n", cop_regs[0], cop_regs[1], cop_regs[3], space.read_dword(cop_regs[0]), space.read_dword(cop_regs[3]));
 		execute_5a05(space, offset, data);
-	
+
 		break;
 
 	case 0xf205:   // f205 0006 fff7 00f0 - 0182 02e0 03c0 00c0 03c0 0000 0000 0000
@@ -2064,7 +2063,7 @@ WRITE16_MEMBER(raiden2cop_device::cop_sprite_dma_abs_x_w)
 WRITE16_MEMBER(raiden2cop_device::LEGACY_cop_cmd_w)
 {
 	int command;
-	
+
 
 	seibu_cop_log("%06x: COPX execute table macro command %04x | regs %08x %08x %08x %08x %08x\n", space.device().safe_pc(), data,  cop_regs[0], cop_regs[1], cop_regs[2], cop_regs[3], cop_regs[4]);
 
@@ -2117,16 +2116,16 @@ WRITE16_MEMBER(raiden2cop_device::LEGACY_cop_cmd_w)
 
 	/* SINE math - 0x8100 */
 	/*
-			00000-0ffff:
-			amp = x/256
-			ang = x & 255
-			s = sin(ang*2*pi/256)
-			val = trunc(s*amp)
-			if(s<0)
-			val--
-			if(s == 192)
-			val = -2*amp
-			*/
+	        00000-0ffff:
+	        amp = x/256
+	        ang = x & 255
+	        s = sin(ang*2*pi/256)
+	        val = trunc(s*amp)
+	        if(s<0)
+	        val--
+	        if(s == 192)
+	        val = -2*amp
+	        */
 	if (check_command_matches(command, 0xb9a, 0xb88, 0x888, 0x000, 0x000, 0x000, 0x000, 0x000, 7, 0xfdfb))
 	{
 		executed = 1;
@@ -2136,16 +2135,16 @@ WRITE16_MEMBER(raiden2cop_device::LEGACY_cop_cmd_w)
 
 	/* COSINE math - 0x8900 */
 	/*
-		10000-1ffff:
-		amp = x/256
-		ang = x & 255
-		s = cos(ang*2*pi/256)
-		val = trunc(s*amp)
-		if(s<0)
-		val--
-		if(s == 128)
-		val = -2*amp
-		*/
+	    10000-1ffff:
+	    amp = x/256
+	    ang = x & 255
+	    s = cos(ang*2*pi/256)
+	    val = trunc(s*amp)
+	    if(s<0)
+	    val--
+	    if(s == 128)
+	    val = -2*amp
+	    */
 	if (check_command_matches(command, 0xb9a, 0xb8a, 0x88a, 0x000, 0x000, 0x000, 0x000, 0x000, 7, 0xfdfb))
 	{
 		executed = 1;
@@ -2173,11 +2172,11 @@ WRITE16_MEMBER(raiden2cop_device::LEGACY_cop_cmd_w)
 	/* Pythagorean theorem, hypotenuse length - 0x3bb0 */
 	//(grainbow) | 4 | 007f | 3bb0 | f9c b9c b9c b9c b9c b9c b9c 99c
 	/*
-		40000-7ffff:
-		v1 = (x / 32768)*64
-		v2 = (x & 255)*32767/255
-		val = sqrt(v1*v1+v2*v2) (unsigned)
-		*/
+	    40000-7ffff:
+	    v1 = (x / 32768)*64
+	    v2 = (x & 255)*32767/255
+	    val = sqrt(v1*v1+v2*v2) (unsigned)
+	    */
 	if (check_command_matches(command, 0xf9c, 0xb9c, 0xb9c, 0xb9c, 0xb9c, 0xb9c, 0xb9c, 0x99c, 4, 0x007f))
 	{
 		executed = 1;
@@ -2187,15 +2186,15 @@ WRITE16_MEMBER(raiden2cop_device::LEGACY_cop_cmd_w)
 
 	/* Division - 0x42c2 */
 	/*
-		20000-2ffff:
-		v1 = x / 1024
-		v2 = x & 1023
-		val = !v1 ? 32767 : trunc(v2/v1+0.5)
-		30000-3ffff:
-		v1 = x / 1024
-		v2 = (x & 1023)*32
-		val = !v1 ? 32767 : trunc(v2/v1+0.5)
-		*/
+	    20000-2ffff:
+	    v1 = x / 1024
+	    v2 = x & 1023
+	    val = !v1 ? 32767 : trunc(v2/v1+0.5)
+	    30000-3ffff:
+	    v1 = x / 1024
+	    v2 = (x & 1023)*32
+	    val = !v1 ? 32767 : trunc(v2/v1+0.5)
+	    */
 	if (check_command_matches(command, 0xf9a, 0xb9a, 0xb9c, 0xb9c, 0xb9c, 0x29c, 0x000, 0x000, 5, 0xfcdd))
 	{
 		executed = 1;
@@ -2204,17 +2203,17 @@ WRITE16_MEMBER(raiden2cop_device::LEGACY_cop_cmd_w)
 	}
 
 	/*
-		collision detection:
+	    collision detection:
 
-		int dy_0 = space.read_dword(cop_regs[0]+4);
-		int dx_0 = space.read_dword(cop_regs[0]+8);
-		int dy_1 = space.read_dword(cop_regs[1]+4);
-		int dx_1 = space.read_dword(cop_regs[1]+8);
-		int hitbox_param1 = space.read_dword(cop_regs[2]);
-		int hitbox_param2 = space.read_dword(cop_regs[3]);
+	    int dy_0 = space.read_dword(cop_regs[0]+4);
+	    int dx_0 = space.read_dword(cop_regs[0]+8);
+	    int dy_1 = space.read_dword(cop_regs[1]+4);
+	    int dx_1 = space.read_dword(cop_regs[1]+8);
+	    int hitbox_param1 = space.read_dword(cop_regs[2]);
+	    int hitbox_param2 = space.read_dword(cop_regs[3]);
 
-		TODO: we are ignoring the funcval / funcmask params for now
-		*/
+	    TODO: we are ignoring the funcval / funcmask params for now
+	    */
 
 	if (check_command_matches(command, 0xb80, 0xb82, 0xb84, 0xb86, 0x000, 0x000, 0x000, 0x000, funcval, funcmask))
 	{
@@ -2287,7 +2286,7 @@ WRITE16_MEMBER(raiden2cop_device::LEGACY_cop_cmd_w)
 	if (check_command_matches(command, 0x380, 0x39a, 0x380, 0xa80, 0x29a, 0x000, 0x000, 0x000, 8, 0xf3e7))
 	{
 		executed = 1;
-		execute_6200(space, offset, data);	
+		execute_6200(space, offset, data);
 		return;
 	}
 
@@ -2311,7 +2310,3 @@ WRITE16_MEMBER(raiden2cop_device::LEGACY_cop_cmd_w)
 	if (executed == 0)
 		printf("did not execute %04x\n", data); // cup soccer triggers this a lot (and others)
 }
-
-
-
-

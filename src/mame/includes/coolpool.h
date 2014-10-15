@@ -19,7 +19,7 @@ public:
 	required_device<cpu_device> m_dsp;
 	required_device<dac_device> m_dac;
 	optional_device<tlc34076_device> m_tlc34076;
-	
+
 	required_shared_ptr<UINT16> m_vram_base;
 	required_shared_ptr<UINT16> m_nvram;
 
@@ -37,7 +37,7 @@ public:
 
 	UINT16 m_result;
 	UINT16 m_lastresult;
-	
+
 	UINT16 m_nvram_write_seq[NVRAM_UNLOCK_SEQ_LEN];
 	UINT8 m_nvram_write_enable;
 	UINT8 m_old_cmd;

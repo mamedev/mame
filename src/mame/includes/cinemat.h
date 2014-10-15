@@ -30,9 +30,9 @@ public:
 	optional_shared_ptr<UINT16> m_rambase;
 
 	typedef void (cinemat_state::*sound_func)(UINT8 sound_val, UINT8 bits_changed);
-	
+
 	sound_func m_sound_handler;
-	UINT8 m_sound_control;	
+	UINT8 m_sound_control;
 	UINT32 m_current_shift;
 	UINT32 m_last_shift;
 	UINT32 m_last_shift2;

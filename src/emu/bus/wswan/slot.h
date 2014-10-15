@@ -40,7 +40,7 @@ public:
 	UINT32 get_rom_size() { return m_rom_size; }
 	UINT32 get_nvram_size() { return m_nvram.count(); }
 
-	void save_nvram()	{ device().save_item(NAME(m_nvram)); }
+	void save_nvram()   { device().save_item(NAME(m_nvram)); }
 	void set_has_rtc(bool val) { m_has_rtc = val; }
 	void set_is_rotated(bool val) { m_is_rotated = val; }
 	int get_is_rotated() { return m_is_rotated ? 1 : 0; }
@@ -81,7 +81,7 @@ public:
 	int get_cart_type(UINT8 *ROM, UINT32 len, UINT32 &nvram_len);
 	void internal_header_logging(UINT8 *ROM, UINT32 offs, UINT32 len);
 
-	void save_nvram()	{ if (m_cart && m_cart->get_nvram_size()) m_cart->save_nvram(); }
+	void save_nvram()   { if (m_cart && m_cart->get_nvram_size()) m_cart->save_nvram(); }
 
 	virtual iodevice_t image_type() const { return IO_CARTSLOT; }
 	virtual bool is_readable()  const { return 1; }
@@ -125,6 +125,5 @@ extern const device_type WS_CART_SLOT;
 
 #define MCFG_WSWAN_CARTRIDGE_ADD(_tag,_slot_intf,_def_slot) \
 	MCFG_DEVICE_ADD(_tag, WS_CART_SLOT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false) \
-
+	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
 #endif

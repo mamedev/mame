@@ -490,7 +490,7 @@ void namcos21_state::transfer_dsp_data()
 void namcos21_kickstart(running_machine &machine, int internal)
 {
 	namcos21_state *state = machine.driver_data<namcos21_state>();
-	
+
 	/* patch dsp watchdog */
 	switch( state->m_gametype )
 	{

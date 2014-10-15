@@ -63,10 +63,10 @@ WRITE16_MEMBER(legionna_state::denjinmk_setgfxbank)
 
 WRITE16_MEMBER(legionna_state::videowrite_cb_w)
 {
-	//	AM_RANGE(0x101000, 0x1017ff) AM_RAM // _WRITE(legionna_background_w) AM_SHARE("back_data")
-	//	AM_RANGE(0x101800, 0x101fff) AM_RAM // _WRITE(legionna_foreground_w) AM_SHARE("fore_data")
-	//	AM_RANGE(0x102000, 0x1027ff) AM_RAM // _WRITE(legionna_midground_w) AM_SHARE("mid_data")
-	//	AM_RANGE(0x102800, 0x1037ff) AM_RAM // _WRITE(legionna_text_w) AM_SHARE("textram")
+	//  AM_RANGE(0x101000, 0x1017ff) AM_RAM // _WRITE(legionna_background_w) AM_SHARE("back_data")
+	//  AM_RANGE(0x101800, 0x101fff) AM_RAM // _WRITE(legionna_foreground_w) AM_SHARE("fore_data")
+	//  AM_RANGE(0x102000, 0x1027ff) AM_RAM // _WRITE(legionna_midground_w) AM_SHARE("mid_data")
+	//  AM_RANGE(0x102800, 0x1037ff) AM_RAM // _WRITE(legionna_text_w) AM_SHARE("textram")
 
 	if (offset < 0x800 / 2)
 	{
@@ -194,7 +194,6 @@ TILE_GET_INFO_MEMBER(legionna_state::get_text_tile_info)
 
 VIDEO_START_MEMBER(legionna_state,legionna)
 {
-
 	m_back_data = auto_alloc_array_clear(machine(), UINT16, 0x800/2);
 	m_fore_data =  auto_alloc_array_clear(machine(), UINT16, 0x800/2);
 	m_mid_data =  auto_alloc_array_clear(machine(), UINT16, 0x800/2);
@@ -220,7 +219,6 @@ VIDEO_START_MEMBER(legionna_state,legionna)
 
 VIDEO_START_MEMBER(legionna_state,denjinmk)
 {
-
 	m_back_data = auto_alloc_array_clear(machine(), UINT16, 0x800/2);
 	m_fore_data =  auto_alloc_array_clear(machine(), UINT16, 0x800/2);
 	m_mid_data =  auto_alloc_array_clear(machine(), UINT16, 0x800/2);
@@ -499,9 +497,6 @@ UINT32 legionna_state::screen_update_legionna(screen_device &screen, bitmap_ind1
 
 UINT32 legionna_state::screen_update_godzilla(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
-
-
 	bitmap.fill(0x0200, cliprect);
 	screen.priority().fill(0, cliprect);
 
@@ -521,8 +516,6 @@ UINT32 legionna_state::screen_update_godzilla(screen_device &screen, bitmap_ind1
 
 UINT32 legionna_state::screen_update_grainbow(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
-
 	bitmap.fill(m_palette->black_pen(), cliprect);
 	screen.priority().fill(0, cliprect);
 

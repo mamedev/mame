@@ -31,14 +31,14 @@ class a800_rom_bbsb_device : public a800_rom_device
 public:
 	// construction/destruction
 	a800_rom_bbsb_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
-	
+
 	virtual DECLARE_READ8_MEMBER(read_80xx);
 	virtual DECLARE_WRITE8_MEMBER(write_80xx);
-	
+
 protected:
 	int m_banks[2];
 };
@@ -51,14 +51,14 @@ class a800_rom_williams_device : public a800_rom_device
 public:
 	// construction/destruction
 	a800_rom_williams_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
-	
+
 	virtual DECLARE_READ8_MEMBER(read_80xx);
 	virtual DECLARE_WRITE8_MEMBER(write_d5xx);
-	
+
 protected:
 	int m_bank;
 };
@@ -71,14 +71,14 @@ class a800_rom_express_device : public a800_rom_device
 public:
 	// construction/destruction
 	a800_rom_express_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
-	
+
 	virtual DECLARE_READ8_MEMBER(read_80xx);
 	virtual DECLARE_WRITE8_MEMBER(write_d5xx);
-	
+
 protected:
 	int m_bank;
 };
@@ -91,11 +91,11 @@ class a800_rom_blizzard_device : public a800_rom_device
 public:
 	// construction/destruction
 	a800_rom_blizzard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
-	
+
 	virtual DECLARE_READ8_MEMBER(read_80xx);
 };
 
@@ -107,14 +107,14 @@ class a800_rom_turbo_device : public a800_rom_device
 public:
 	// construction/destruction
 	a800_rom_turbo_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
-	
+
 	virtual DECLARE_READ8_MEMBER(read_80xx);
 	virtual DECLARE_WRITE8_MEMBER(write_d5xx);
-	
+
 protected:
 	int m_bank;
 };
@@ -127,7 +127,7 @@ class a800_rom_telelink2_device : public a800_rom_device
 public:
 	// construction/destruction
 	a800_rom_telelink2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	virtual DECLARE_READ8_MEMBER(read_80xx);
 	virtual DECLARE_WRITE8_MEMBER(write_80xx);
 	virtual DECLARE_READ8_MEMBER(read_d5xx);
@@ -142,14 +142,14 @@ class a800_rom_microcalc_device : public a800_rom_device
 public:
 	// construction/destruction
 	a800_rom_microcalc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
-	
+
 	virtual DECLARE_READ8_MEMBER(read_80xx);
 	virtual DECLARE_WRITE8_MEMBER(write_d5xx);
-	
+
 protected:
 	int m_bank;
 };
@@ -162,14 +162,14 @@ class xegs_rom_device : public a800_rom_device
 public:
 	// construction/destruction
 	xegs_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
-	
+
 	virtual DECLARE_READ8_MEMBER(read_80xx);
 	virtual DECLARE_WRITE8_MEMBER(write_d5xx);
-	
+
 protected:
 	int m_bank;
 };
@@ -182,7 +182,7 @@ class a5200_rom_2chips_device : public a800_rom_device
 public:
 	// construction/destruction
 	a5200_rom_2chips_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	virtual DECLARE_READ8_MEMBER(read_80xx);
 };
 
@@ -194,14 +194,14 @@ class a5200_rom_bbsb_device : public a800_rom_device
 public:
 	// construction/destruction
 	a5200_rom_bbsb_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
-	
+
 	virtual DECLARE_READ8_MEMBER(read_80xx);
 	virtual DECLARE_WRITE8_MEMBER(write_80xx);
-	
+
 protected:
 	int m_banks[2];
 };

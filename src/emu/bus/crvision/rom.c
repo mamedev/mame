@@ -88,7 +88,7 @@ READ8_MEMBER(crvision_rom6k_device::read_rom80)
 	offset &= 0x1fff;
 	if (offset < 0x1000)
 		return m_rom[0x1000 + (offset & 0x7ff)];
-	
+
 	return m_rom[offset & 0xfff];
 }
 

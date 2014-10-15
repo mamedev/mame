@@ -53,17 +53,17 @@ public:
 	optional_device<okim6295_device> m_oki;
 	required_device<screen_device> m_screen;
 	required_device<tlc34076_device> m_tlc34076;
-	
+
 	required_shared_ptr<UINT16> m_vram;
 	optional_shared_ptr<UINT16> m_control;
-	
+
 	emu_timer *m_setup_gun_timer;
 	int m_beamxadd;
 	int m_beamyadd;
 	int m_palette_bank;
 	UINT8 m_gunx[2];
 	void get_crosshair_xy(int player, int &x, int &y);
-	
+
 	DECLARE_WRITE16_MEMBER(rapidfir_transparent_w);
 	DECLARE_READ16_MEMBER(rapidfir_transparent_r);
 	DECLARE_WRITE16_MEMBER(tickee_control_w);
@@ -80,7 +80,7 @@ public:
 	TIMER_CALLBACK_MEMBER(trigger_gun_interrupt);
 	TIMER_CALLBACK_MEMBER(clear_gun_interrupt);
 	TIMER_CALLBACK_MEMBER(setup_gun_interrupts);
-	
+
 	TMS340X0_TO_SHIFTREG_CB_MEMBER(rapidfir_to_shiftreg);
 	TMS340X0_FROM_SHIFTREG_CB_MEMBER(rapidfir_from_shiftreg);
 	TMS340X0_SCANLINE_RGB32_CB_MEMBER(scanline_update);
@@ -746,7 +746,7 @@ static MACHINE_CONFIG_START( tickee, tickee_state )
 	MCFG_CPU_PROGRAM_MAP(tickee_map)
 	MCFG_TMS340X0_HALT_ON_RESET(FALSE) /* halt on reset */
 	MCFG_TMS340X0_PIXEL_CLOCK(VIDEO_CLOCK/2) /* pixel clock */
-	MCFG_TMS340X0_PIXELS_PER_CLOCK(1) /* pixels per clock */	
+	MCFG_TMS340X0_PIXELS_PER_CLOCK(1) /* pixels per clock */
 	MCFG_TMS340X0_SCANLINE_RGB32_CB(tickee_state, scanline_update) /* scanline callback (rgb32) */
 
 	MCFG_MACHINE_RESET_OVERRIDE(tickee_state,tickee)
@@ -791,10 +791,10 @@ static MACHINE_CONFIG_START( rapidfir, tickee_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS34010, XTAL_50MHz)
-	MCFG_CPU_PROGRAM_MAP(rapidfir_map)          
+	MCFG_CPU_PROGRAM_MAP(rapidfir_map)
 	MCFG_TMS340X0_HALT_ON_RESET(FALSE) /* halt on reset */
 	MCFG_TMS340X0_PIXEL_CLOCK(VIDEO_CLOCK/2) /* pixel clock */
-	MCFG_TMS340X0_PIXELS_PER_CLOCK(1) /* pixels per clock */	
+	MCFG_TMS340X0_PIXELS_PER_CLOCK(1) /* pixels per clock */
 	MCFG_TMS340X0_SCANLINE_RGB32_CB(tickee_state, rapidfir_scanline_update)       /* scanline callback (rgb32) */
 	MCFG_TMS340X0_TO_SHIFTREG_CB(tickee_state, rapidfir_to_shiftreg)           /* write to shiftreg function */
 	MCFG_TMS340X0_FROM_SHIFTREG_CB(tickee_state, rapidfir_from_shiftreg)          /* read from shiftreg function */
@@ -826,7 +826,7 @@ static MACHINE_CONFIG_START( mouseatk, tickee_state )
 	MCFG_CPU_PROGRAM_MAP(mouseatk_map)
 	MCFG_TMS340X0_HALT_ON_RESET(FALSE) /* halt on reset */
 	MCFG_TMS340X0_PIXEL_CLOCK(VIDEO_CLOCK/2) /* pixel clock */
-	MCFG_TMS340X0_PIXELS_PER_CLOCK(1) /* pixels per clock */	
+	MCFG_TMS340X0_PIXELS_PER_CLOCK(1) /* pixels per clock */
 	MCFG_TMS340X0_SCANLINE_RGB32_CB(tickee_state, scanline_update) /* scanline callback (rgb32) */
 
 	MCFG_MACHINE_RESET_OVERRIDE(tickee_state,tickee)

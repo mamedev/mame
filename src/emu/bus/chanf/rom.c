@@ -164,7 +164,7 @@ UINT8 chanf_rom_device::common_read_2102(UINT32 offset)
 			m_data0 = m_ram[m_addr] & 1;
 			return (m_latch[0] & 0x7f) | (m_data0 << 7);
 		}
-		
+
 		return m_latch[0];
 	}
 	else
@@ -176,10 +176,10 @@ void chanf_rom_device::common_write_2102(UINT32 offset, UINT8 data)
 	if (offset == 0)
 	{
 		m_latch[0] = data;
-		
+
 		m_read_write = BIT(data, 0);
 
-		m_addr_latch = (m_addr_latch & 0x3f3) | (BIT(data, 2) << 2) | (BIT(data, 1) << 3);	// bits 2,3 come from this write!
+		m_addr_latch = (m_addr_latch & 0x3f3) | (BIT(data, 2) << 2) | (BIT(data, 1) << 3);  // bits 2,3 come from this write!
 		m_addr = m_addr_latch;
 
 		m_data0 = BIT(data, 3);
@@ -199,7 +199,7 @@ void chanf_rom_device::common_write_2102(UINT32 offset, UINT8 data)
 
 // These are shared among Schach & Multigame cart types (not directly used by base chanf_rom_device)
 UINT8 chanf_rom_device::common_read_3853(UINT32 offset)
-{ 
+{
 	if (offset < m_ram.count())
 		return m_ram[offset];
 	else
@@ -207,7 +207,7 @@ UINT8 chanf_rom_device::common_read_3853(UINT32 offset)
 }
 
 void chanf_rom_device::common_write_3853(UINT32 offset, UINT8 data)
-{ 
+{
 	if (offset < m_ram.count())
 		m_ram[offset] = data;
 }
@@ -240,4 +240,3 @@ WRITE8_MEMBER(chanf_multi_final_device::write_bank)
 	m_base_bank = data & 0x1f;
 	m_half_bank = BIT(data, 5);
 }
-

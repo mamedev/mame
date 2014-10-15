@@ -60,7 +60,7 @@ public:
 		m_q8(*this, "Q8"),
 		m_q9(*this, "Q9")
 	{ }
-	
+
 	required_device<cpu_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<generic_slot_device> m_eprom;
@@ -68,18 +68,18 @@ public:
 	required_ioport m_q7;
 	required_ioport m_q8;
 	required_ioport m_q9;
-	
+
 	virtual void machine_start();
-	
+
 	DECLARE_READ8_MEMBER( riot_pa_r );
 	DECLARE_WRITE8_MEMBER( riot_pa_w );
 	DECLARE_READ8_MEMBER( riot_pb_r );
 	DECLARE_WRITE8_MEMBER( riot_pb_w );
 	DECLARE_INPUT_CHANGED_MEMBER( trigger_reset );
-	
+
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( beta_eprom );
 	DECLARE_DEVICE_IMAGE_UNLOAD_MEMBER( beta_eprom );
-	
+
 	/* EPROM state */
 	int m_eprom_oe;
 	int m_eprom_ce;
@@ -87,11 +87,11 @@ public:
 	UINT8 m_eprom_data;
 	UINT8 m_old_data;
 	dynamic_buffer m_eprom_rom;
-	
+
 	/* display state */
 	UINT8 m_ls145_p;
 	UINT8 m_segment;
-	
+
 	emu_timer *m_led_refresh_timer;
 	TIMER_CALLBACK_MEMBER(led_refresh);
 };
@@ -285,16 +285,16 @@ WRITE8_MEMBER( beta_state::riot_pb_w )
 DEVICE_IMAGE_LOAD_MEMBER( beta_state, beta_eprom )
 {
 	UINT32 size = m_eprom->common_get_size("rom");
-	
+
 	if (size != 0x800)
 	{
 		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
 		return IMAGE_INIT_FAIL;
 	}
-	
+
 	m_eprom->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
-	m_eprom->common_load_rom(m_eprom->get_rom_base(), size, "rom");			
-	
+	m_eprom->common_load_rom(m_eprom->get_rom_base(), size, "rom");
+
 	return IMAGE_INIT_PASS;
 }
 

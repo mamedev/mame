@@ -26,7 +26,7 @@ class speaker_sound_device : public device_t,
 public:
 	speaker_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~speaker_sound_device() {}
-	
+
 	// static configuration
 	static void static_set_levels(device_t &device, int num_levels, const INT16 *levels) { downcast<speaker_sound_device &>(device).m_num_levels = num_levels; downcast<speaker_sound_device &>(device).m_levels = levels;}
 
@@ -80,7 +80,7 @@ private:
 
 	// DC blocker state
 	double  m_prevx, m_prevy;
-	
+
 	int          m_num_levels;  /* optional: number of levels (if not two) */
 	const INT16  *m_levels;     /* optional: pointer to level lookup table */
 };

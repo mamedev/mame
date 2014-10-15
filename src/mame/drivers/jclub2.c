@@ -114,7 +114,7 @@ public:
 		m_gamecpu(*this, "gamecpu"),
 		m_eeprom(*this, "eeprom"),
 		m_palette(*this, "palette"),
-	    m_gfxdecode(*this, "gfxdecode")
+		m_gfxdecode(*this, "gfxdecode")
 	{ }
 
 	tilemap_t *m_tmap;

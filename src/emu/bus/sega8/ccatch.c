@@ -1,10 +1,10 @@
 /***********************************************************************************************************
 
  SG-1000 Card Catcher emulation
- 
+
  Sega Card Catcher is a passthrough adapter for
  SG-1000 to load games in MyCard format into the
- main cartslot 
+ main cartslot
 
  ***********************************************************************************************************/
 

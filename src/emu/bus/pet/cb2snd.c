@@ -65,4 +65,3 @@ DECLARE_WRITE_LINE_MEMBER( pet_userport_cb2_sound_device::input_m )
 {
 	m_dac->write_unsigned8(state ? 0xff : 0x00);
 }
-

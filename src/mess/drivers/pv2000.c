@@ -179,7 +179,7 @@ static ADDRESS_MAP_START( pv2000_map, AS_PROGRAM, 8, pv2000_state )
 
 	AM_RANGE(0x7000, 0x7fff) AM_RAM
 	//AM_RANGE(0x8000, 0xbfff) ext ram?
-	//AM_RANGE(0xc000, 0xffff)		// mapped by the cartslot
+	//AM_RANGE(0xc000, 0xffff)      // mapped by the cartslot
 ADDRESS_MAP_END
 
 
@@ -361,16 +361,16 @@ void pv2000_state::machine_reset()
 DEVICE_IMAGE_LOAD_MEMBER( pv2000_state, pv2000_cart )
 {
 	UINT32 size = m_cart->common_get_size("rom");
-	
+
 	if (size != 0x2000 && size != 0x4000)
 	{
 		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
 		return IMAGE_INIT_FAIL;
 	}
-	
+
 	m_cart->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
-	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");			
-	
+	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
+
 	return IMAGE_INIT_PASS;
 }
 

@@ -172,7 +172,7 @@ void saturn_state::stv_select_game(int gameno)
 			memcpy(memregion("abus")->base(), m_cart_reg[gameno]->base(), 0x3000000);
 		else
 			memset(memregion("abus")->base(), 0x00, 0x3000000);
-		
+
 		m_prev_bankswitch = gameno;
 	}
 }

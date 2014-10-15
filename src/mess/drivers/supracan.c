@@ -1125,7 +1125,7 @@ WRITE16_MEMBER( supracan_state::vram_w )
 }
 
 static ADDRESS_MAP_START( supracan_mem, AS_PROGRAM, 16, supracan_state )
-	//AM_RANGE( 0x000000, 0x3fffff )		// mapped by the cartslot
+	//AM_RANGE( 0x000000, 0x3fffff )        // mapped by the cartslot
 	AM_RANGE( 0xe80200, 0xe80201 ) AM_READ_PORT("P1")
 	AM_RANGE( 0xe80202, 0xe80203 ) AM_READ_PORT("P2")
 	AM_RANGE( 0xe80208, 0xe80209 ) AM_READ_PORT("P3")
@@ -1754,7 +1754,7 @@ WRITE16_MEMBER( supracan_state::video_w )
 DEVICE_IMAGE_LOAD_MEMBER( supracan_state, supracan_cart )
 {
 	UINT32 size = m_cart->common_get_size("rom");
-	
+
 	if (size > 0x400000)
 	{
 		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
@@ -1762,8 +1762,8 @@ DEVICE_IMAGE_LOAD_MEMBER( supracan_state, supracan_cart )
 	}
 
 	m_cart->rom_alloc(size, GENERIC_ROM16_WIDTH, ENDIANNESS_BIG);
-	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");			
-	
+	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
+
 	return IMAGE_INIT_PASS;
 }
 

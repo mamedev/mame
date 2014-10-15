@@ -961,13 +961,13 @@ INPUT_PORTS_END
 void vii_state::test_centered(UINT8 *ROM)
 {
 	if (ROM[0x3cd808] == 0x99 &&
-	    ROM[0x3cd809] == 0x99 &&
-	    ROM[0x3cd80a] == 0x83 &&
-	    ROM[0x3cd80b] == 0x5e &&
-	    ROM[0x3cd80c] == 0x52 &&
-	    ROM[0x3cd80d] == 0x6b &&
-	    ROM[0x3cd80e] == 0x78 &&
-	    ROM[0x3cd80f] == 0x7f)
+		ROM[0x3cd809] == 0x99 &&
+		ROM[0x3cd80a] == 0x83 &&
+		ROM[0x3cd80b] == 0x5e &&
+		ROM[0x3cd80c] == 0x52 &&
+		ROM[0x3cd80d] == 0x6b &&
+		ROM[0x3cd80e] == 0x78 &&
+		ROM[0x3cd80f] == 0x7f)
 	{
 		m_centered_coordinates = 0;
 	}
@@ -982,10 +982,10 @@ DEVICE_IMAGE_LOAD_MEMBER( vii_state, vii_cart )
 		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
 		return IMAGE_INIT_FAIL;
 	}
-	
+
 	m_cart->rom_alloc(size, GENERIC_ROM16_WIDTH, ENDIANNESS_LITTLE);
-	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");			
-	
+	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
+
 	test_centered(m_cart->get_rom_base());
 
 	return IMAGE_INIT_PASS;
@@ -994,10 +994,10 @@ DEVICE_IMAGE_LOAD_MEMBER( vii_state, vii_cart )
 DEVICE_IMAGE_LOAD_MEMBER( vii_state, vsmile_cart )
 {
 	UINT32 size = m_cart->common_get_size("rom");
-	
+
 	m_cart->rom_alloc(size, GENERIC_ROM16_WIDTH, ENDIANNESS_LITTLE);
-	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");			
-	
+	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
+
 	return IMAGE_INIT_PASS;
 }
 
@@ -1031,11 +1031,11 @@ void vii_state::machine_start()
 		m_cart_rom = memregion(region_tag.cpy(m_cart->tag()).cat(GENERIC_ROM_REGION_TAG));
 		memcpy(m_p_cart, m_cart_rom->base(), 0x400000 * 2);
 	}
-	else if (m_spg243_mode == SPG243_VII)	// Vii bios is banked
+	else if (m_spg243_mode == SPG243_VII)   // Vii bios is banked
 		memcpy(m_p_cart, m_bios_rom->base(), 0x400000 * 2);
 	else
 		memcpy(m_p_cart, memregion("maincpu")->base(), 0x400000 * 2);
-	
+
 	m_video_regs[0x36] = 0xffff;
 	m_video_regs[0x37] = 0xffff;
 

@@ -80,7 +80,7 @@ void wozfdc_device::device_start()
 	save_item(NAME(cur_lss.data_reg));
 	save_item(NAME(cur_lss.address));
 	save_item(NAME(cur_lss.write_start_time));
-//	save_item(NAME(cur_lss.write_buffer));
+//  save_item(NAME(cur_lss.write_buffer));
 	save_item(NAME(cur_lss.write_position));
 	save_item(NAME(cur_lss.write_line_active));
 	save_item(NAME(predicted_lss.tm));
@@ -88,7 +88,7 @@ void wozfdc_device::device_start()
 	save_item(NAME(predicted_lss.data_reg));
 	save_item(NAME(predicted_lss.address));
 	save_item(NAME(predicted_lss.write_start_time));
-//	save_item(NAME(predicted_lss.write_buffer));
+//  save_item(NAME(predicted_lss.write_buffer));
 	save_item(NAME(predicted_lss.write_position));
 	save_item(NAME(predicted_lss.write_line_active));
 	save_item(NAME(drvsel));
@@ -582,6 +582,6 @@ void appleiii_fdc::control_dx(int offset)
 
 	if (offset < 8)
 	{
-		a3_update_drive_sel(); 
+		a3_update_drive_sel();
 	}
 }

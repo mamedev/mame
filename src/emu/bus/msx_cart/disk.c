@@ -164,7 +164,7 @@ msx_cart_fsfd1::msx_cart_fsfd1(const machine_config &mconfig, const char *tag, d
 
 
 msx_cart_fscf351::msx_cart_fscf351(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : msx_cart_disk_type2(mconfig, MSX_CART_FSCF351, "MSX Cartridge - FS-CF351", tag, owner, clock, "msx_cart_fscf351")
+	: msx_cart_disk_type2(mconfig, MSX_CART_FSCF351, "MSX Cartridge - FS-CF351", tag, owner, clock, "msx_cart_fscf351")
 {
 }
 
@@ -624,4 +624,3 @@ WRITE8_MEMBER(msx_cart_fsfd1a::write_cart)
 			break;
 	}
 }
-

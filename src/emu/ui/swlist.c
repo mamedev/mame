@@ -68,7 +68,7 @@ void ui_menu_software_parts::populate()
 		entry2->part = 0;
 		item_append("[file manager]", 0, 0, entry2);
 
-		
+
 		software_part_menu_entry *entry3 = (software_part_menu_entry *) m_pool_alloc(sizeof(*entry3));
 		entry3->type = T_SWLIST;
 		entry3->part = 0;

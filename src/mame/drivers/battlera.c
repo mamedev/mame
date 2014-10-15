@@ -72,7 +72,7 @@ static ADDRESS_MAP_START( battlera_map, AS_PROGRAM, 8, battlera_state )
 	AM_RANGE( 0x1FE400, 0x1FE7FF) AM_DEVREADWRITE( "huc6260", huc6260_device, read, write )
 	AM_RANGE( 0x1FEC00, 0x1FEFFF) AM_DEVREADWRITE( "maincpu", h6280_device, timer_r, timer_w )
 	AM_RANGE( 0x1FF400, 0x1FF7FF) AM_DEVREADWRITE( "maincpu", h6280_device, irq_status_r, irq_status_w )
-	
+
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( battlera_portmap, AS_IO, 8, battlera_state )

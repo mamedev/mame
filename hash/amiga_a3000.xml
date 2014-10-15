@@ -31,9 +31,9 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<!-- A3000 Installation disks -->
-	
+
 	<software name="a3kin203">
 		<description>A3000 Install Disk 2.03</description>
 		<year>1991</year>
@@ -44,11 +44,11 @@
 				<rom name="335603-04_install.adf" size="901120" crc="9a3cc466" sha1="b12a225890a3957bb01dcbfba44c046c19e19c8f" offset="0"/>
 			</dataarea>
 		</part>
-	</software>	
+	</software>
 
 	<!-- Amiga UNIX System V Release 4 -->
 	<!-- TODO: Part numbers -->
-	
+
 	<software name="amix11">
 		<description>UNIX System V Release 4 Amiga Version 1.1</description>
 		<year>1990</year>

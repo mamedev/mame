@@ -353,7 +353,7 @@ private:
 	UINT16 m_mcu_com[4];
 	int m_gametype;
 	int m_tabletype;
-	
+
 	void mcu_com_w(offs_t offset, UINT16 data, UINT16 mem_mask, int _n_);
 	void decrypt_rom();
 	void handle_04_subcommand(UINT8 mcu_subcmd, UINT16 *mcu_ram);
@@ -366,6 +366,6 @@ extern const device_type KANEKO_TOYBOX;
 
 #define MCFG_TOYBOX_TABLE_TYPE(_type) \
 	kaneko_toybox_device::set_table(*device, _type);
-	
+
 #define MCFG_TOYBOX_GAME_TYPE(_type) \
 	kaneko_toybox_device::set_game_type(*device, _type);

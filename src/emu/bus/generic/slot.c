@@ -3,7 +3,7 @@
 /***********************************************************************************************************
 
    Generic ROM / RAM Socket and Cartslot device
- 
+
    This device offers basic RAM / ROM allocation and access
 
    The available handlers are suited for any situation where a system opens a
@@ -12,12 +12,12 @@
    This device is not suited whenever the system exposes additional lines to
    the socket/slot: e.g. whenever input/output lines are present, whenever
    there are lines controlling bankswitch / paging, and whenever different
-   cart configurations have to be supported (like some PCBs containing ROM 
+   cart configurations have to be supported (like some PCBs containing ROM
    only, and other containing both ROM and RAM)
    In the latter situations, per-system slot devices have to be created (see
    e.g. APF cart slot device for an example of a simple device with multiple
    pcbs supported)
- 
+
  ***********************************************************************************************************/
 
 
@@ -136,15 +136,15 @@ void generic_slot_device::device_config_complete()
 bool generic_slot_device::call_load()
 {
 	if (m_cart)
-	{		
+	{
 		if (!m_device_image_load.isnull())
 			return m_device_image_load(*this);
 		else
 		{
 			UINT32 len = common_get_size("rom");
-			
+
 			rom_alloc(len, m_width, m_endianness);
-			common_load_rom(get_rom_base(), len, "rom");			
+			common_load_rom(get_rom_base(), len, "rom");
 
 			return IMAGE_INIT_PASS;
 		}
@@ -189,13 +189,13 @@ void generic_slot_device::get_default_card_software(astring &result)
 
 /**************************************************
 
- Implementation 
- 
+ Implementation
+
  **************************************************/
 
 
 /*-------------------------------------------------
- common_get_size - it gets image file size both 
+ common_get_size - it gets image file size both
  for fullpath and for softlist
  -------------------------------------------------*/
 
@@ -208,7 +208,7 @@ UINT32 generic_slot_device::common_get_size(const char *region)
 }
 
 /*-------------------------------------------------
- common_load_rom - it loads from image file both 
+ common_load_rom - it loads from image file both
  for fullpath and for softlist
  -------------------------------------------------*/
 
@@ -283,4 +283,3 @@ WRITE8_MEMBER(generic_slot_device::write_ram)
 	if (m_cart)
 		m_cart->write_ram(space, offset, data);
 }
-

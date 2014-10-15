@@ -313,7 +313,7 @@ public:
 
 	DECLARE_READ8_MEMBER(control_r);
 	DECLARE_WRITE8_MEMBER(control_w);
-	
+
 	DECLARE_READ8_MEMBER(dockbus_status_r);
 	DECLARE_WRITE8_MEMBER(dockbus_status_w);
 	DECLARE_READ8_MEMBER(dockbus_data_r);

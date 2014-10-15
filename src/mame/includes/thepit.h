@@ -14,12 +14,12 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	
+
 	required_shared_ptr<UINT8> m_videoram;
 	required_shared_ptr<UINT8> m_colorram;
 	required_shared_ptr<UINT8> m_attributesram;
 	required_shared_ptr<UINT8> m_spriteram;
-	
+
 	int m_question_address;
 	int m_question_rom;
 	int m_remap_address[16];

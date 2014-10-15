@@ -148,7 +148,7 @@ public:
 	DECLARE_WRITE8_MEMBER(suna8_samples_number_w);
 	void play_sample(int index);
 	SAMPLES_START_CB_MEMBER(sh_start);
-	
+
 	void draw_normal_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect, int which);
 	void draw_text_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
 	UINT8 *brickzn_decrypt();

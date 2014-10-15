@@ -155,7 +155,7 @@ public:
 
 	void konamigx_esc_alert(UINT32 *srcbase, int srcoffs, int count, int mode);
 	void konamigx_precache_registers(void);
-	
+
 	void wipezbuf(int noshadow);
 
 	void dmastart_callback(int data);

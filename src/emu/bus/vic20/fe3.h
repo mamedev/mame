@@ -27,7 +27,7 @@
 // ======================> vic20_final_expansion_3_t
 
 class vic20_final_expansion_3_t :  public device_t,
-								   public device_vic20_expansion_card_interface
+									public device_vic20_expansion_card_interface
 {
 public:
 	// construction/destruction

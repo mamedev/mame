@@ -432,7 +432,7 @@ WRITE8_MEMBER(segac2_state::io_portd_w)
 	 D0 : To CN1 pin 8. (Coin meter 1)
 	*/
 	//coin_lockout_w(space.machine(), 1, data & 0x08);
-    //coin_lockout_w(space.machine(), 0, data & 0x04);
+	//coin_lockout_w(space.machine(), 0, data & 0x04);
 	coin_counter_w(space.machine(), 1, data & 0x02);
 	coin_counter_w(space.machine(), 0, data & 0x01);
 }

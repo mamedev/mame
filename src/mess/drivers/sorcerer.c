@@ -163,7 +163,7 @@ static ADDRESS_MAP_START( sorcerer_mem, AS_PROGRAM, 8, sorcerer_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x07ff) AM_RAMBANK("boot")
 	AM_RANGE(0x0800, 0xbfff) AM_RAM
-	//AM_RANGE(0xc000, 0xdfff)		// mapped by the cartslot
+	//AM_RANGE(0xc000, 0xdfff)      // mapped by the cartslot
 	AM_RANGE(0xe000, 0xefff) AM_ROM                     /* rom pac and bios */
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_REGION("maincpu", 0xf000)        /* screen ram */
 	AM_RANGE(0xf800, 0xfbff) AM_ROM                     /* char rom */
@@ -176,7 +176,7 @@ static ADDRESS_MAP_START( sorcererd_mem, AS_PROGRAM, 8, sorcerer_state)
 	AM_RANGE(0x0800, 0xbbff) AM_RAM
 	AM_RANGE(0xbc00, 0xbcff) AM_ROM
 	AM_RANGE(0xbe00, 0xbe03) AM_DEVREADWRITE("fdc", micropolis_device, read, write)
-	//AM_RANGE(0xc000, 0xdfff)		// mapped by the cartslot
+	//AM_RANGE(0xc000, 0xdfff)      // mapped by the cartslot
 	AM_RANGE(0xe000, 0xefff) AM_ROM                     /* rom pac and bios */
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_REGION("maincpu", 0xf000)        /* screen ram */
 	AM_RANGE(0xf800, 0xfbff) AM_ROM                     /* char rom */

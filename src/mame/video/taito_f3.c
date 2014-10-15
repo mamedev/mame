@@ -1398,7 +1398,7 @@ void taito_f3_state::init_alpha_blend_func()
 
 /*============================================================================*/
 
-inline void taito_f3_state::draw_scanlines(	
+inline void taito_f3_state::draw_scanlines(
 							bitmap_rgb32 &bitmap,int xsize,INT16 *draw_line_num,
 							const struct f3_playfield_line_inf **line_t,
 							const int *sprite,

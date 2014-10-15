@@ -833,7 +833,7 @@ static MACHINE_CONFIG_START( coolpool, coolpool_state )
 	MCFG_TMS340X0_SCANLINE_RGB32_CB(coolpool_state, coolpool_scanline) /* scanline callback (rgb32) */
 	MCFG_TMS340X0_TO_SHIFTREG_CB(coolpool_state, to_shiftreg)  /* write to shiftreg function */
 	MCFG_TMS340X0_FROM_SHIFTREG_CB(coolpool_state, from_shiftreg) /* read from shiftreg function */
-	
+
 	MCFG_CPU_ADD("dsp", TMS32026,XTAL_40MHz)
 	MCFG_CPU_PROGRAM_MAP(coolpool_dsp_pgm_map)
 	MCFG_CPU_IO_MAP(coolpool_dsp_io_map)

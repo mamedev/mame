@@ -186,7 +186,7 @@ static ADDRESS_MAP_START( mariobl_map, AS_PROGRAM, 8, mario_state)
 	//AM_RANGE(0xa000, 0xa000) AM_READ_PORT("IN1")
 	AM_RANGE(0xa000, 0xa000) AM_READNOP   /* watchdog? */
 	AM_RANGE(0xa100, 0xa100) AM_READ_PORT("DSW")    /* DSW */
-	AM_RANGE(0xa206, 0xa206) AM_WRITE(mario_gfxbank_w) 
+	AM_RANGE(0xa206, 0xa206) AM_WRITE(mario_gfxbank_w)
 
 	AM_RANGE(0x8000, 0x9fff) AM_ROM
 	AM_RANGE(0xb000, 0xbfff) AM_ROM
@@ -457,12 +457,12 @@ static const gfx_layout spritelayout_bl =
 	16,16,  /* 16*16 sprites */
 	RGN_FRAC(1,3),    /* 256 sprites */
 	3,  /* 3 bits per pixel */
-	{ RGN_FRAC(2,3),RGN_FRAC(1,3),RGN_FRAC(0,3) }, 
-	{ 0, 1, 2, 3, 4, 5, 6, 7,      
+	{ RGN_FRAC(2,3),RGN_FRAC(1,3),RGN_FRAC(0,3) },
+	{ 0, 1, 2, 3, 4, 5, 6, 7,
 			64,65,66,67,68,69,70,71 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
 			16*8, 17*8, 18*8, 19*8, 20*8, 21*8, 22*8, 23*8 },
-	16*16 
+	16*16
 };
 
 static GFXDECODE_START( mariobl )
@@ -475,12 +475,12 @@ static const gfx_layout spritelayout_bl2 =
 	16,16,  /* 16*16 sprites */
 	RGN_FRAC(1,2),    /* 256 sprites */
 	2,  /* 3 bits per pixel */
-	{ RGN_FRAC(1,2),RGN_FRAC(0,2) }, 
-	{ 0, 1, 2, 3, 4, 5, 6, 7,      
+	{ RGN_FRAC(1,2),RGN_FRAC(0,2) },
+	{ 0, 1, 2, 3, 4, 5, 6, 7,
 			64,65,66,67,68,69,70,71 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
 			16*8, 17*8, 18*8, 19*8, 20*8, 21*8, 22*8, 23*8 },
-	16*16 
+	16*16
 };
 
 static GFXDECODE_START( dkong3abl )
@@ -548,7 +548,7 @@ static MACHINE_CONFIG_DERIVED( masao, mario_base )
 MACHINE_CONFIG_END
 
 /*
-Mario Bros japan bootleg on Ambush hardware 
+Mario Bros japan bootleg on Ambush hardware
 
 This romset (japanese version) comes from a faulty bootleg pcb.Game differences are none.
 Note:it runs on a modified (extended) Tecfri's Ambush hardware.
@@ -582,16 +582,16 @@ static MACHINE_CONFIG_START( mariobl, mario_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	
+
 	MCFG_SOUND_ADD("ay1", AY8910, XTAL_18_432MHz/6/2)   /* XTAL confirmed, divisor guessed */
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("SYSTEM"))
-//	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(mario_state, ay1_outputb_w))
+//  MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(mario_state, ay1_outputb_w))
 
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
 
 	MCFG_SOUND_ADD("ay2", AY8910, XTAL_18_432MHz/6/2)   /* XTAL confirmed, divisor guessed */
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("INPUTS"))
-//	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(mario_state, ay2_outputb_w))
+//  MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(mario_state, ay2_outputb_w))
 
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
 

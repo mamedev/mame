@@ -363,7 +363,7 @@ void _20pacgal_state::common_save_state()
 	save_item(NAME(m_sprite_ram));
 	save_item(NAME(m_sprite_color_lookup));
 }
- 
+
 void _20pacgal_state::machine_start()
 {
 	common_save_state();

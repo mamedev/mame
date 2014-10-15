@@ -18,7 +18,7 @@ public:
 		m_msm2(*this, "msm2"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
-		
+
 		funystrp_val(0),
 		funystrp_ff3cc7_val(0),
 		funystrp_ff3cc8_val(0)

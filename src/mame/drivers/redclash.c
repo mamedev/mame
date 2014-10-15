@@ -470,7 +470,7 @@ ROM_START( zerohouri )
 	ROM_LOAD( "zhi.c7", 0x0800, 0x0800, CRC(dcfefb4c) SHA1(9d8f57f5f09368225bae06a64971b82a848b1a7e) )
 	ROM_LOAD( "zhi.c6", 0x1000, 0x0800, CRC(ddc66d36) SHA1(1cbf6e27e7b2ccd39199c1a26783d53d6d90d195) )
 	ROM_LOAD( "zhi.c5", 0x1800, 0x0800, CRC(25c5872d) SHA1(df008db607b72a92c4284d6a8127eafec2432ca4) ) // == ze4_4.c5
-//	ROM_LOAD( "zhi.c4", 0x2000, 0x0800, CRC(9b70464b) SHA1(ccd173e12630ba044fe659915dfce21f2b5e0e39) ) // corrupt
+//  ROM_LOAD( "zhi.c4", 0x2000, 0x0800, CRC(9b70464b) SHA1(ccd173e12630ba044fe659915dfce21f2b5e0e39) ) // corrupt
 	ROM_LOAD( "zhi.c4", 0x2000, 0x0800, CRC(d7ce3add) SHA1(d8dd7ad98e7a0a4f35de181549b2e88a9e0a73d6) ) // use rom from above sets instead
 	ROM_LOAD( "zhi.c3", 0x2800, 0x0800, CRC(29dee5e4) SHA1(13c1778d427a11f5c24ce8116fe55d60e98e3d83) )
 

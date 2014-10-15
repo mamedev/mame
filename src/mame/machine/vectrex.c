@@ -328,11 +328,11 @@ void vectrex_state::machine_start()
 			m_maincpu->space(AS_PROGRAM).install_read_handler(0x0000, 0x7fff, read8_delegate(FUNC(vectrex_cart_slot_device::read_rom),(vectrex_cart_slot_device*)m_cart));
 
 		// setup 3d imager and refresh timer
-		
+
 		// If VIA T2 starts, reset refresh timer. This is the best strategy for most games.
 		m_reset_refresh = 1;
 		m_imager_angles = narrow_escape_angles;
-		
+
 		// let's do this 3D detection
 		switch (m_cart->get_vec3d())
 		{

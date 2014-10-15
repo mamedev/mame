@@ -922,7 +922,7 @@ WRITE8_MEMBER(pc6001_state::nec_ppi8255_w)
 static ADDRESS_MAP_START(pc6001_map, AS_PROGRAM, 8, pc6001_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x3fff) AM_ROM AM_WRITENOP
-	//AM_RANGE(0x4000, 0x5fff)		// mapped by the cartslot
+	//AM_RANGE(0x4000, 0x5fff)      // mapped by the cartslot
 	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0xffff) AM_RAM AM_SHARE("ram")
 ADDRESS_MAP_END
@@ -1639,7 +1639,7 @@ WRITE8_MEMBER(pc6001_state::necsr_ppi8255_w)
 		if(0)
 		{
 			//printf("%02x\n",data);
-			
+
 			if ((data & 0x0f) == 0x05 && m_cart_rom)
 				m_bank1->set_base(m_cart_rom->base() + 0x2000);
 			if ((data & 0x0f) == 0x04)
@@ -2074,13 +2074,13 @@ void pc6001_state::machine_start()
 void pc6001_state::machine_reset()
 {
 	m_video_ram = m_region_maincpu->base() + 0xc000;
-	
+
 	if (m_cart->exists())
 		m_maincpu->space(AS_PROGRAM).install_read_handler(0x4000, 0x5fff, read8_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_cart));
 
 	astring region_tag;
 	m_cart_rom = memregion(region_tag.cpy(m_cart->tag()).cat(GENERIC_ROM_REGION_TAG));
-	
+
 	m_port_c_8255=0;
 
 	m_cas_switch = 0;
@@ -2095,13 +2095,13 @@ void pc6001_state::machine_reset()
 MACHINE_RESET_MEMBER(pc6001_state,pc6001m2)
 {
 	m_video_ram = m_region_maincpu->base() + 0xc000 + 0x28000;
-	
+
 	astring region_tag;
 	m_cart_rom = memregion(region_tag.cpy(m_cart->tag()).cat(GENERIC_ROM_REGION_TAG));
 	// hackish way to simplify bankswitch handling
 	if (m_cart_rom)
 		memcpy(m_region_maincpu->base() + 0x48000, m_cart_rom->base(), 0x4000);
-	
+
 	m_port_c_8255=0;
 
 	m_cas_switch = 0;
@@ -2134,11 +2134,11 @@ MACHINE_RESET_MEMBER(pc6001_state,pc6001m2)
 MACHINE_RESET_MEMBER(pc6001_state,pc6001sr)
 {
 	m_video_ram = m_region_maincpu->base() + 0x70000;
-	
+
 	astring region_tag;
 	m_cart_rom = memregion(region_tag.cpy(m_cart->tag()).cat(GENERIC_ROM_REGION_TAG));
 	// should this be mirrored into the EXROM regions? hard to tell without an actual cart dump...
-	
+
 	m_port_c_8255=0;
 
 	m_cas_switch = 0;

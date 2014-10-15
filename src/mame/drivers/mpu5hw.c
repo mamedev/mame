@@ -17,8 +17,8 @@
 
      -- Much of the communication is done via a 68681 DUART.
 
-	 -- The ASIC acts as the main I/O control, including an interface to a Z89321 DSP and a 16bit DAC. 
-	 
+     -- The ASIC acts as the main I/O control, including an interface to a Z89321 DSP and a 16bit DAC.
+
      -- Help wanted, the MFME sources (which are based on MAME anyway) should be of some help here, if somebody
         in the FM emu community wants to adopt this driver they're welcome to it.
 
@@ -68,7 +68,7 @@ public:
 	UINT8 m_pic_stored_input;
 	UINT8 m_pic_output_bit;
 	UINT8 m_input_strobe;
-	
+
 	DECLARE_READ32_MEMBER(mpu5_mem_r);
 	DECLARE_WRITE32_MEMBER(mpu5_mem_w);
 
@@ -101,7 +101,7 @@ READ8_MEMBER(mpu5_state::asic_r8)
 			//send init and ready for now - need to work on full DSP
 			return 0x85;
 		}
-	
+
 		case 0x0b:
 		{
 			return 0;
@@ -148,19 +148,19 @@ READ32_MEMBER(mpu5_state::mpu5_mem_r)
 					logerror("%08x DUART read\n", pc);
 					break;
 				}
-				
+
 				case 0xf0:
 				{
 					return asic_r32(space, offset&3,mem_mask);
 				}
-				
+
 				default:
 				logerror("%08x maincpu read access offset %08x mem_mask %08x cs %d\n", pc, offset*4, mem_mask, cs);
 				break;
 			}
 		}
 		break;
-		
+
 		case 3:
 		case 4:
 			offset &=0x3fff;
@@ -188,7 +188,7 @@ WRITE8_MEMBER(mpu5_state::asic_w8)
 			if (m_led_strobe_temp != data)
 			{
 				m_led_strobe_temp = data;
-				
+
 				switch (m_led_strobe_temp)
 				{
 					case 0x00:
@@ -222,7 +222,7 @@ WRITE8_MEMBER(mpu5_state::asic_w8)
 			}
 			break;
 		}
-				
+
 		case 0x09:
 		{
 			//Assume SEC fitted for now
@@ -233,12 +233,12 @@ WRITE8_MEMBER(mpu5_state::asic_w8)
 		case 0x0b:
 		{
 			output_set_value("statuslamp1", ((data&0x10) != 0));
-			
+
 			output_set_value("statuslamp2", ((data&0x20) != 0));
-			
+
 			if (data & 0x40)
 			{
-//				m_dsp_pin =1;
+//              m_dsp_pin =1;
 			}
 		}
 		break;
@@ -280,7 +280,7 @@ WRITE32_MEMBER(mpu5_state::pic_w)
 			m_pic_bit1 = (data & 0x01);
 			break;
 		}
-		
+
 		case 0x06:
 		case 0x07:
 		{
@@ -291,17 +291,17 @@ WRITE32_MEMBER(mpu5_state::pic_w)
 				m_pic_data |= m_pic_bit1;
 				m_pic_stored_input <<= 1;
 				m_pic_clocked_bits ++;
-				
+
 				if (m_pic_clocked_bits >=8)
 				{
 					m_pic_data =0;
 					m_pic_clocked_bits =0;
-					
+
 					if (m_input_strobe <4)
 					{
 						m_input_strobe +=1;
 					}
-					
+
 				}
 			}
 			else
@@ -319,7 +319,7 @@ WRITE32_MEMBER(mpu5_state::pic_w)
 			break;
 		}
 	}
-	
+
 }
 
 WRITE32_MEMBER(mpu5_state::mpu5_mem_w)
@@ -344,13 +344,13 @@ WRITE32_MEMBER(mpu5_state::mpu5_mem_w)
 					logerror("%08x DUART write\n", pc);
 					break;
 				}
-				
+
 				case 0xf0:
 				{
 					asic_w32(space, offset&3,data,mem_mask);
 					break;
 				}
-				
+
 				default:
 					logerror("%08x maincpu write access offset %08x data %08x mem_mask %08x cs %d\n", pc, offset*4, data, mem_mask, cs);
 				break;

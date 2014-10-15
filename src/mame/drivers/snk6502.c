@@ -827,7 +827,7 @@ static MACHINE_CONFIG_START( sasuke, snk6502_state )
 	MCFG_SOUND_ADD("snk6502", SNK6502, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	
+
 	MCFG_SOUND_ADD("samples", SAMPLES, 0)
 	MCFG_SAMPLES_CHANNELS(4)
 	MCFG_SAMPLES_NAMES(sasuke_sample_names)

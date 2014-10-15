@@ -73,7 +73,7 @@ public:
 
 	// static configuration
 	static void static_set_rc(device_t &device, int type, double R1, double R2, double R3, double C);
-	
+
 	void filter_rc_set_RC(int type, double R1, double R2, double R3, double C);
 
 protected:
@@ -91,10 +91,10 @@ private:
 	int            m_k;
 	int            m_memory;
 	int            m_type;
-	double		   m_R1;
-	double		   m_R2;
-	double		   m_R3;
-	double		   m_C;
+	double         m_R1;
+	double         m_R2;
+	double         m_R3;
+	double         m_C;
 };
 
 extern const device_type FILTER_RC;

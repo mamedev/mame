@@ -30,4 +30,3 @@ extern const device_type SEIBU_COP_BOOTLEG;
 
 #define MCFG_SEIBU_COP_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, SEIBU_COP_BOOTLEG, 0)
-

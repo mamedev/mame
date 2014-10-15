@@ -9029,4 +9029,3 @@ void rsp_device::log_add_disasm_comment(drcuml_block *block, UINT32 pc, UINT32 o
 	block->append_comment("%08X: %s", pc, buffer);                                  // comment
 #endif
 }
-

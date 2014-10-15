@@ -47,11 +47,11 @@ static INPUT_PORTS_START(cpc_symbiface2)
 	PORT_BIT(0x00000010, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("PS/2 Mouse forward button") PORT_CODE(MOUSECODE_BUTTON5) PORT_CHANGED_MEMBER(DEVICE_SELF,cpc_symbiface2_device,mouse_change_x,NULL)
 
 	// TODO: mouse scroll wheel support
-//	PORT_START("sf2_mouse_scroll")
-//	PORT_BIT(0x1f , 0, IPT_TRACKBALL_Y)
-//	PORT_SENSITIVITY(100)
-//	PORT_KEYDELTA(10)
-//	PORT_PLAYER(1)
+//  PORT_START("sf2_mouse_scroll")
+//  PORT_BIT(0x1f , 0, IPT_TRACKBALL_Y)
+//  PORT_SENSITIVITY(100)
+//  PORT_KEYDELTA(10)
+//  PORT_PLAYER(1)
 INPUT_PORTS_END
 
 
@@ -189,26 +189,26 @@ WRITE8_MEMBER(cpc_symbiface2_device::rtc_w)
 // PS/2 Mouse connector
 // #FD10 (read only) read mouse status
 /*
-	Status byte
-	Bit 76543210
-	Use mmDDDDDD
+    Status byte
+    Bit 76543210
+    Use mmDDDDDD
 
-	m: Mode
-	D: Use-Data
+    m: Mode
+    D: Use-Data
 
-	If read and...
+    If read and...
 
-	m = 00 -> no more data available, you can stop reading the status for a while
-	m = 01 -> D = X offset (signed); you will receive positive values, if the user
-									 is moving the mouse to the right
-	m = 10 -> D = Y offset (signed); you will receive positive values, if the user
-									 is moving the mouse upwards
-	m = 11 -> D[bit5] = 0 -> D[bit0]   = left button
-							 D[bit1]   = right button
-							 D[bit2]   = middle button
-							 D[bit3]   = forward button
-							 D[bit4]   = backward button
-			  D[bit5] = 1 -> D[bit0-4] = scroll wheel offset (signed)
+    m = 00 -> no more data available, you can stop reading the status for a while
+    m = 01 -> D = X offset (signed); you will receive positive values, if the user
+                                     is moving the mouse to the right
+    m = 10 -> D = Y offset (signed); you will receive positive values, if the user
+                                     is moving the mouse upwards
+    m = 11 -> D[bit5] = 0 -> D[bit0]   = left button
+                             D[bit1]   = right button
+                             D[bit2]   = middle button
+                             D[bit3]   = forward button
+                             D[bit4]   = backward button
+              D[bit5] = 1 -> D[bit0-4] = scroll wheel offset (signed)
  */
 READ8_MEMBER(cpc_symbiface2_device::mouse_r)
 {

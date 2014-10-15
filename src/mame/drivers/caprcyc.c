@@ -3,13 +3,13 @@
 /***************************************************************************
 
   Taito Capriccio Cyclone crane hardware
-  
+
   Main PCB: NEC uPD30200GD-100-MBB VR4300, Galileo GT-64111 (system controller?), ...
   Sound PCB: Panasonic MN1020819 (has internal ROM), Zoom ZSG-2. No effects DSP!
-  
+
   Like most other Taito Capriccio cabinets, it has two cranes. There are
   no 7seg leds on the cranes this time, some colour lamps instead.
-  
+
 TODO:
 - everything
 

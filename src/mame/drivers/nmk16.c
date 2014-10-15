@@ -72,7 +72,7 @@ NOT BUGS:
 - Vandyke: Many enemies make very strange sounds because they seem to have no
   rate limit for making their sound effect. This is normal, it's like this on all
   PCB recordings.
-  
+
 
 ----
 
@@ -354,11 +354,11 @@ static ADDRESS_MAP_START( vandykeb_map, AS_PROGRAM, 16, nmk16_state )
 	AM_RANGE(0x080002, 0x080003) AM_READ_PORT("IN1")
 	AM_RANGE(0x080008, 0x080009) AM_READ_PORT("DSW1")
 	AM_RANGE(0x08000a, 0x08000b) AM_READ_PORT("DSW2")
-//	AM_RANGE(0x08000e, 0x08000f) AM_DEVREAD8("nmk004", nmk004_device, read, 0x00ff)
+//  AM_RANGE(0x08000e, 0x08000f) AM_DEVREAD8("nmk004", nmk004_device, read, 0x00ff)
 	AM_RANGE(0x080016, 0x080017) AM_WRITENOP    /* IRQ enable? */
 	AM_RANGE(0x080018, 0x080019) AM_WRITE(nmk_tilebank_w)
 	AM_RANGE(0x080010, 0x08001d) AM_WRITE(vandykeb_scroll_w) /* 10, 12, 1a, 1c */
-//	AM_RANGE(0x08001e, 0x08001f) AM_DEVWRITE8("nmk004", nmk004_device, write, 0x00ff)
+//  AM_RANGE(0x08001e, 0x08001f) AM_DEVWRITE8("nmk004", nmk004_device, write, 0x00ff)
 	AM_RANGE(0x088000, 0x0887ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x08c000, 0x08c007) AM_WRITENOP    /* just in case... */
 	AM_RANGE(0x090000, 0x093fff) AM_RAM_WRITE(nmk_bgvideoram0_w) AM_SHARE("nmk_bgvideoram0")
@@ -625,37 +625,37 @@ WRITE16_MEMBER(nmk16_state::hachamf_mainram_w)
 		case 0xe51e/2: PROT_INPUT(0xe51e/2,0x0f82,0xe008/2,0x00080008); break;
 		case 0xe6b4/2: PROT_INPUT(0xe6b4/2,0x79be,0xe00c/2,0x0008000a); break;
 		case 0xe10e/2: PROT_JSR(0xe10e,0x8007,0x870a);//870a not 9d66
-					   PROT_JSR(0xe10e,0x8000,0xd9c6); break;
+						PROT_JSR(0xe10e,0x8000,0xd9c6); break;
 		case 0xe11e/2: PROT_JSR(0xe11e,0x8038,DUMMYA);//972a - (unused)
-					   PROT_JSR(0xe11e,0x8031,0x7a54); break;
+						PROT_JSR(0xe11e,0x8031,0x7a54); break;
 		case 0xe12e/2: PROT_JSR(0xe12e,0x8019,0x9642);//OK-9642
-				       PROT_JSR(0xe12e,0x8022,0xda06); break;
+						PROT_JSR(0xe12e,0x8022,0xda06); break;
 		case 0xe13e/2: PROT_JSR(0xe13e,0x802a,0x9d66);//9d66 not 9400 - OK
-					   PROT_JSR(0xe13e,0x8013,0x81aa); break;
+						PROT_JSR(0xe13e,0x8013,0x81aa); break;
 		case 0xe14e/2: PROT_JSR(0xe14e,0x800b,0xb3f2);//b3f2 - OK
-					   PROT_JSR(0xe14e,0x8004,0x8994); break;
+						PROT_JSR(0xe14e,0x8004,0x8994); break;
 		case 0xe15e/2: PROT_JSR(0xe15e,0x803c,0xb59e);//b59e - OK
-					   PROT_JSR(0xe15e,0x8035,0x8c36); break;
+						PROT_JSR(0xe15e,0x8035,0x8c36); break;
 		case 0xe16e/2: PROT_JSR(0xe16e,0x801d,0x9ac2);//9ac2 - OK
-				       PROT_JSR(0xe16e,0x8026,0x8d0c); break;
+						PROT_JSR(0xe16e,0x8026,0x8d0c); break;
 		case 0xe17e/2: PROT_JSR(0xe17e,0x802e,0xc366);//c366 - OK
-					   PROT_JSR(0xe17e,0x8017,0x870a); break;
+						PROT_JSR(0xe17e,0x8017,0x870a); break;
 		case 0xe18e/2: PROT_JSR(0xe18e,0x8004,DUMMYA);        //unused
-					   PROT_JSR(0xe18e,0x8008,DUMMYA); break; //unused
+						PROT_JSR(0xe18e,0x8008,DUMMYA); break; //unused
 		case 0xe19e/2: PROT_JSR(0xe19e,0x8030,0xd9c6);//OK-d9c6
-					   PROT_JSR(0xe19e,0x8039,0x9642); break;
+						PROT_JSR(0xe19e,0x8039,0x9642); break;
 		case 0xe1ae/2: PROT_JSR(0xe1ae,0x8011,0x7a54);//d1f8 not c67e
-					   PROT_JSR(0xe1ae,0x802a,0x9d66); break;
+						PROT_JSR(0xe1ae,0x802a,0x9d66); break;
 		case 0xe1be/2: PROT_JSR(0xe1be,0x8022,0xda06);//da06
-					   PROT_JSR(0xe1be,0x801b,0xb3f2); break;
+						PROT_JSR(0xe1be,0x801b,0xb3f2); break;
 		case 0xe1ce/2: PROT_JSR(0xe1ce,0x8003,0x81aa);//81aa
-					   PROT_JSR(0xe1ce,0x800c,0xb59e); break;
+						PROT_JSR(0xe1ce,0x800c,0xb59e); break;
 		case 0xe1de/2: PROT_JSR(0xe1de,0x8034,0x8994);//8994 - OK
-					   PROT_JSR(0xe1de,0x803d,0x9ac2); break;
+						PROT_JSR(0xe1de,0x803d,0x9ac2); break;
 		case 0xe1ee/2: PROT_JSR(0xe1ee,0x8015,0x8c36);//8d0c not 82f6
-					   PROT_JSR(0xe1ee,0x802e,0xc366); break;
+						PROT_JSR(0xe1ee,0x802e,0xc366); break;
 		case 0xe1fe/2: PROT_JSR(0xe1fe,0x8026,0x8d0c);//8c36
-					   PROT_JSR(0xe1fe,0x8016,DUMMYA); break;  //unused
+						PROT_JSR(0xe1fe,0x8016,DUMMYA); break;  //unused
 		case 0xef00/2:
 			if(m_mainram[0xef00/2] == 0x60fe)
 			{
@@ -667,7 +667,7 @@ WRITE16_MEMBER(nmk16_state::hachamf_mainram_w)
 			}
 			break;
 	}
-#undef DUMMYA	
+#undef DUMMYA
 }
 
 
@@ -3809,7 +3809,7 @@ LV4         LV2 LV1        LV1
  |   | DMA | |
 
  CPU is stopped during DMA
- 
+
  */
 
 // todo:total scanlines is 263, adjust according to that!
@@ -3820,37 +3820,36 @@ TIMER_DEVICE_CALLBACK_MEMBER(nmk16_state::nmk16_scanline)
 	const int IRQ1_SCANLINE = 25; // guess
 	const int VBIN_SCANLINE = 0;
 	const int VBOUT_sCANLINE = 240;
-	const int SPRDMA_SCANLINE = 241; // 256 USEC after VBOUT 
+	const int SPRDMA_SCANLINE = 241; // 256 USEC after VBOUT
 
 	int scanline = param;
 
-   if(scanline == VBOUT_sCANLINE) // vblank-out irq
-      m_maincpu->set_input_line(4, HOLD_LINE);
+	if(scanline == VBOUT_sCANLINE) // vblank-out irq
+		m_maincpu->set_input_line(4, HOLD_LINE);
 
-   if (scanline == SPRDMA_SCANLINE)
-   {
-	   // 2 buffers confirmed on PCB
-	   memcpy(m_spriteram_old2,m_spriteram_old, 0x1000);
-	   memcpy(m_spriteram_old, m_mainram + m_sprdma_base / 2, 0x1000);
-   }
+	if (scanline == SPRDMA_SCANLINE)
+	{
+		// 2 buffers confirmed on PCB
+		memcpy(m_spriteram_old2,m_spriteram_old, 0x1000);
+		memcpy(m_spriteram_old, m_mainram + m_sprdma_base / 2, 0x1000);
+	}
 
-   /* Vblank-in irq, Vandyke definitely relies that irq fires at scanline ~0 instead of 112 (as per previous
-      cpu_getiloops function implementation), mostly noticeable with sword collisions and related attract mode behaviour. */
-   if(scanline == VBIN_SCANLINE)
-      m_maincpu->set_input_line(2, HOLD_LINE);
+	/* Vblank-in irq, Vandyke definitely relies that irq fires at scanline ~0 instead of 112 (as per previous
+	  cpu_getiloops function implementation), mostly noticeable with sword collisions and related attract mode behaviour. */
+	if(scanline == VBIN_SCANLINE)
+		m_maincpu->set_input_line(2, HOLD_LINE);
 
-  /* time from IRQ2 to first IRQ1 fire. is not stated, 25 is a guess */
-   if(scanline == IRQ1_SCANLINE)
-      m_maincpu->set_input_line(1, HOLD_LINE);
+	/* time from IRQ2 to first IRQ1 fire. is not stated, 25 is a guess */
+	if(scanline == IRQ1_SCANLINE)
+		m_maincpu->set_input_line(1, HOLD_LINE);
 
-  /* 8.9ms from first IRQ1 to second IRQ1 fire. approx 128 lines (half frame time) */
-   if(scanline == IRQ1_SCANLINE+(NUM_SCANLINES/2)) // if this happens too late bioship sprites will glitch on the left edge
-      m_maincpu->set_input_line(1, HOLD_LINE);
+	/* 8.9ms from first IRQ1 to second IRQ1 fire. approx 128 lines (half frame time) */
+	if(scanline == IRQ1_SCANLINE+(NUM_SCANLINES/2)) // if this happens too late bioship sprites will glitch on the left edge
+		m_maincpu->set_input_line(1, HOLD_LINE);
 }
 
 #define NMK_HACKY_INTERRUPT_TIMING \
-   MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", nmk16_state, nmk16_scanline, "screen", 0, 1) \
-
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", nmk16_state, nmk16_scanline, "screen", 0, 1)
 #define NMK_HACKY_SCREEN_LOWRES \
 	MCFG_SCREEN_ADD("screen", RASTER) \
 	MCFG_SCREEN_REFRESH_RATE(56.18) \
@@ -3884,7 +3883,7 @@ static MACHINE_CONFIG_START( tharrier, nmk16_state )
 	/* video hardware */
 	NMK_HACKY_SCREEN_LOWRES
 	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_tharrier)
-	 
+
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tharrier)
 	MCFG_PALETTE_ADD("palette", 512)
@@ -3918,7 +3917,7 @@ static MACHINE_CONFIG_START( mustang, nmk16_state )
 	/* video hardware */
 	NMK_HACKY_SCREEN_LOWRES
 	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_macross)
-	 
+
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", macross)
 	MCFG_PALETTE_ADD("palette", 1024)
@@ -3957,7 +3956,7 @@ static MACHINE_CONFIG_START( mustangb, nmk16_state )
 	/* video hardware */
 	NMK_HACKY_SCREEN_LOWRES
 	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_macross)
-	 
+
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", macross)
 	MCFG_PALETTE_ADD("palette", 1024)
@@ -3983,7 +3982,7 @@ static MACHINE_CONFIG_START( bioship, nmk16_state )
 	/* video hardware */
 	NMK_HACKY_SCREEN_LOWRES
 	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_bioship)
-	 
+
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bioship)
 	MCFG_PALETTE_ADD("palette", 1024)
@@ -4020,7 +4019,7 @@ static MACHINE_CONFIG_START( vandyke, nmk16_state )
 	/* video hardware */
 	NMK_HACKY_SCREEN_LOWRES
 	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_macross)
-	 
+
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", macross)
 	MCFG_PALETTE_ADD("palette", 1024)
@@ -4060,7 +4059,7 @@ static MACHINE_CONFIG_START( vandykeb, nmk16_state )
 	/* video hardware */
 	NMK_HACKY_SCREEN_LOWRES
 	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_macross)
-	 
+
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", macross)
 	MCFG_PALETTE_ADD("palette", 1024)
@@ -4085,7 +4084,7 @@ static MACHINE_CONFIG_START( acrobatm, nmk16_state )
 	/* video hardware */
 	NMK_HACKY_SCREEN_LOWRES
 	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_macross)
-	 
+
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", macross)
 	MCFG_PALETTE_ADD("palette", 1024)
@@ -4125,7 +4124,7 @@ static MACHINE_CONFIG_START( tdragonb, nmk16_state )    /* bootleg using Raiden 
 	/* video hardware */
 	NMK_HACKY_SCREEN_LOWRES
 	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_macross)
-	 
+
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", macross)
 	MCFG_PALETTE_ADD("palette", 1024)
@@ -4147,7 +4146,7 @@ static MACHINE_CONFIG_START( tdragon, nmk16_state )
 	/* video hardware */
 	NMK_HACKY_SCREEN_LOWRES
 	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_macross)
-	 
+
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", macross)
 	MCFG_PALETTE_ADD("palette", 1024)
@@ -4190,7 +4189,7 @@ static MACHINE_CONFIG_START( ssmissin, nmk16_state )
 	/* video hardware */
 	NMK_HACKY_SCREEN_LOWRES
 	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_macross)
-	 
+
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", macross)
 	MCFG_PALETTE_ADD("palette", 1024)
@@ -4216,7 +4215,7 @@ static MACHINE_CONFIG_START( strahl, nmk16_state )
 	/* video hardware */
 	NMK_HACKY_SCREEN_LOWRES
 	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_strahl)
-	
+
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", strahl)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
@@ -4252,7 +4251,7 @@ static MACHINE_CONFIG_START( hachamf, nmk16_state )
 	/* video hardware */
 	NMK_HACKY_SCREEN_LOWRES
 	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_macross)
-	 
+
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", macross)
 	MCFG_PALETTE_ADD("palette", 1024)
@@ -4293,7 +4292,7 @@ static MACHINE_CONFIG_START( macross, nmk16_state )
 	/* video hardware */
 	NMK_HACKY_SCREEN_LOWRES
 	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_macross)
-	 
+
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", macross)
 	MCFG_PALETTE_ADD("palette", 1024)
@@ -4330,7 +4329,7 @@ static MACHINE_CONFIG_START( blkheart, nmk16_state )
 	/* video hardware */
 	NMK_HACKY_SCREEN_LOWRES
 	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_macross)
-	 
+
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", macross)
 	MCFG_PALETTE_ADD("palette", 1024)
@@ -4367,7 +4366,7 @@ static MACHINE_CONFIG_START( gunnail, nmk16_state )
 	/* video hardware */
 	NMK_HACKY_SCREEN_HIRES
 	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_gunnail)
-	 
+
 
 
 
@@ -4410,7 +4409,7 @@ static MACHINE_CONFIG_START( macross2, nmk16_state )
 	/* video hardware */
 	NMK_HACKY_SCREEN_HIRES
 	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_gunnail)
-	 
+
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", macross2)
 	MCFG_PALETTE_ADD("palette", 1024)
@@ -4453,7 +4452,7 @@ static MACHINE_CONFIG_START( tdragon2, nmk16_state )
 	/* video hardware */
 	NMK_HACKY_SCREEN_HIRES
 	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_tdragon2)
-	 
+
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", macross2)
 	MCFG_PALETTE_ADD("palette", 1024)
@@ -4495,7 +4494,7 @@ static MACHINE_CONFIG_START( raphero, nmk16_state )
 	/* video hardware */
 	NMK_HACKY_SCREEN_HIRES
 	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_tdragon2)
-	 
+
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", macross2)
 	MCFG_PALETTE_ADD("palette", 1024)
@@ -4534,7 +4533,7 @@ static MACHINE_CONFIG_START( bjtwin, nmk16_state )
 	/* video hardware */
 	NMK_HACKY_SCREEN_HIRES
 	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_bjtwin)
-	 
+
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bjtwin)
 	MCFG_PALETTE_ADD("palette", 1024)
@@ -4568,7 +4567,7 @@ static MACHINE_CONFIG_START( atombjt, nmk16_state )
 	/* video hardware */
 	NMK_HACKY_SCREEN_HIRES
 	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_bjtwin)
-	 
+
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", atombjt)
 	MCFG_PALETTE_ADD("palette", 1024)
@@ -4624,7 +4623,7 @@ static MACHINE_CONFIG_START( manybloc, nmk16_state )
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_manybloc)
-	 
+
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tharrier)
@@ -5095,7 +5094,7 @@ static MACHINE_CONFIG_START( stagger1, nmk16_state )
 	/* video hardware */
 	NMK_HACKY_SCREEN_LOWRES
 	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_afega)
-	 
+
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", stagger1)
 	MCFG_PALETTE_ADD("palette", 768)
@@ -5177,7 +5176,7 @@ static MACHINE_CONFIG_START( firehawk, nmk16_state )
 	/* video hardware */
 	NMK_HACKY_SCREEN_LOWRES
 	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_firehawk)
-	 
+
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", grdnstrm)
 	MCFG_PALETTE_ADD("palette", 768)
@@ -5208,7 +5207,7 @@ static MACHINE_CONFIG_START( twinactn, nmk16_state )
 	/* video hardware */
 	NMK_HACKY_SCREEN_LOWRES
 	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_macross)
-	 
+
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", macross)
 	MCFG_PALETTE_ADD("palette", 1024)
@@ -6001,14 +6000,14 @@ ROM_START( strahl )
 
 	ROM_REGION( 0xa0000, "oki1", 0 )    /* Oki sample data */
 	ROM_LOAD( "str8pmw1.540", 0x00000, 0x20000, CRC(01d6bb6a) SHA1(b157f6f921483ed8067a7e13e370f73fdb60d136) )
-  /* this is a mess */
+	/* this is a mess */
 	ROM_CONTINUE(             0x80000, 0x20000 )    /* banked */
 	ROM_CONTINUE(             0x60000, 0x20000 )    /* banked */
 	ROM_CONTINUE(             0x40000, 0x20000 )    /* banked */
 
 	ROM_REGION( 0xa0000, "oki2", 0 )    /* Oki sample data */
 	ROM_LOAD( "str9pew1.639", 0x00000, 0x20000, CRC(6bb3eb9f) SHA1(9c1394df4f8a08f9098c85eb3d38fb862d6eabbb) )
-  /* this is a mess */
+	/* this is a mess */
 	ROM_CONTINUE(             0x80000, 0x20000 )    /* banked */
 	ROM_CONTINUE(             0x60000, 0x20000 )    /* banked */
 	ROM_CONTINUE(             0x40000, 0x20000 )    /* banked */
@@ -6038,14 +6037,14 @@ ROM_START( strahla )
 
 	ROM_REGION( 0xa0000, "oki1", 0 )    /* Oki sample data */
 	ROM_LOAD( "str8pmw1.540", 0x00000, 0x20000, CRC(01d6bb6a) SHA1(b157f6f921483ed8067a7e13e370f73fdb60d136) )
-  /* this is a mess */
+	/* this is a mess */
 	ROM_CONTINUE(             0x80000, 0x20000 )    /* banked */
 	ROM_CONTINUE(             0x60000, 0x20000 )    /* banked */
 	ROM_CONTINUE(             0x40000, 0x20000 )    /* banked */
 
 	ROM_REGION( 0xa0000, "oki2", 0 )    /* Oki sample data */
 	ROM_LOAD( "str9pew1.639", 0x00000, 0x20000, CRC(6bb3eb9f) SHA1(9c1394df4f8a08f9098c85eb3d38fb862d6eabbb) )
-  /* this is a mess */
+	/* this is a mess */
 	ROM_CONTINUE(             0x80000, 0x20000 )    /* banked */
 	ROM_CONTINUE(             0x60000, 0x20000 )    /* banked */
 	ROM_CONTINUE(             0x40000, 0x20000 )    /* banked */

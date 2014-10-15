@@ -18,7 +18,7 @@ enum
 	A26_F8SW,
 	A26_FA,
 	A26_FE,
-	A26_3E,		// to test
+	A26_3E,     // to test
 	A26_3F,
 	A26_E0,
 	A26_E7,
@@ -26,7 +26,7 @@ enum
 	A26_DC,
 	A26_CV,
 	A26_FV,
-	A26_JVP,	// to test
+	A26_JVP,    // to test
 	A26_32IN1,
 	A26_8IN1,
 	A26_4IN1,
@@ -49,7 +49,7 @@ public:
 	virtual DECLARE_READ8_MEMBER(read_rom) { return 0xff; }
 	// writing to RAM chips (sometimes it is in a different range than write_bank!)
 	virtual DECLARE_WRITE8_MEMBER(write_ram) {}
-	
+
 	// read/write to bankswitch address
 	virtual DECLARE_READ8_MEMBER(read_bank) { return 0xff; }
 	virtual DECLARE_WRITE8_MEMBER(write_bank) {}

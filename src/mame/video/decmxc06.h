@@ -16,7 +16,7 @@ public:
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, UINT16* spriteram16, int pri_mask, int pri_val, int col_mask );
 	void draw_sprites_bootleg( bitmap_ind16 &bitmap, const rectangle &cliprect, UINT16* spriteram, int pri_mask, int pri_val, int col_mask );
 	void set_pri_type( int type ) { m_priority_type = type; }
-	
+
 protected:
 	virtual void device_start();
 	virtual void device_reset();

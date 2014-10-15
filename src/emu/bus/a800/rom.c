@@ -3,7 +3,7 @@
 /***********************************************************************************************************
 
  A800/A5200/XEGS ROM cart emulation
- 
+
  Basic carts work the same (in addition of being mostly compatible) for all these systems
  and thus we deal with them in a single file
 
@@ -196,7 +196,7 @@ void a5200_rom_bbsb_device::device_reset()
 /*-------------------------------------------------
 
  Carts with no bankswitch (8K, 16K)
- 
+
  The cart accessors are mapped in the correct
  range at driver start
 
@@ -210,14 +210,14 @@ READ8_MEMBER(a800_rom_device::read_80xx)
 
 
 /*-------------------------------------------------
- 
+
  Bounty Bob Strikes Back! cart (40K)
- 
+
  Area 0xa000-0xbfff always point to last 8K bank
- Areas 0x8000-0x8fff and 0x9000-0x9fff are 
+ Areas 0x8000-0x8fff and 0x9000-0x9fff are
  separate banks of 4K mapped either in the first
  16K chunk or in the second 16K chunk
- Bankswitch is controlled by data written in 
+ Bankswitch is controlled by data written in
  0x8000-0x8fff and 0x9000-0x9fff respectively
 
  -------------------------------------------------*/
@@ -240,12 +240,12 @@ WRITE8_MEMBER(a800_rom_bbsb_device::write_80xx)
 }
 
 /*-------------------------------------------------
- 
+
  XEGS carts (32K, 64K or 128K)
- 
- Bankswitch is controlled by data written in 
+
+ Bankswitch is controlled by data written in
  0xd500-0xd5ff
- 
+
  -------------------------------------------------*/
 
 READ8_MEMBER(xegs_rom_device::read_80xx)
@@ -253,8 +253,8 @@ READ8_MEMBER(xegs_rom_device::read_80xx)
 	if (offset < 0x2000)
 		return m_rom[(offset & 0x1fff) + (m_bank * 0x2000)];
 	else
-		return m_rom[(offset & 0x1fff) + (m_bank_mask * 0x2000)];	// always last 8K bank
-		
+		return m_rom[(offset & 0x1fff) + (m_bank_mask * 0x2000)];   // always last 8K bank
+
 }
 
 WRITE8_MEMBER(xegs_rom_device::write_d5xx)
@@ -264,16 +264,16 @@ WRITE8_MEMBER(xegs_rom_device::write_d5xx)
 
 
 /*-------------------------------------------------
- 
+
  Williams 64K
- 
+
  The rom is accessed in 8K chunks at 0xa000-0xbfff
  Bankswitch is controlled by writing to 7 diff
- offsets (their location varies with the cart type): 
- offs 0 points to bank 0, offs 1 points to bank 1, 
- and so on... the rom can be disabled by writing to 
+ offsets (their location varies with the cart type):
+ offs 0 points to bank 0, offs 1 points to bank 1,
+ and so on... the rom can be disabled by writing to
  the offsets 0x8-0xf of the same range as the bankswitch
- 
+
  -------------------------------------------------*/
 
 READ8_MEMBER(a800_rom_williams_device::read_80xx)
@@ -287,16 +287,16 @@ WRITE8_MEMBER(a800_rom_williams_device::write_d5xx)
 }
 
 /*-------------------------------------------------
- 
+
  Express 64K / Diamond 64K carts
- 
+
  The rom is accessed in 8K chunks at 0xa000-0xbfff
- Bankswitch is the same as above, but writes trigger 
- banks in reverse order: offs 7 points to bank 0, offs 6 
+ Bankswitch is the same as above, but writes trigger
+ banks in reverse order: offs 7 points to bank 0, offs 6
  points to bank 1, and so on... the rom can be disabled
  by writing to the offsets 0x8-0xf of the same range
  as the bankswitch
- 
+
  -------------------------------------------------*/
 
 READ8_MEMBER(a800_rom_express_device::read_80xx)
@@ -311,10 +311,10 @@ WRITE8_MEMBER(a800_rom_express_device::write_d5xx)
 
 
 /*-------------------------------------------------
- 
+
  Turbosoft 64K / 128K
- 
- 
+
+
  -------------------------------------------------*/
 
 READ8_MEMBER(a800_rom_turbo_device::read_80xx)
@@ -329,10 +329,10 @@ WRITE8_MEMBER(a800_rom_turbo_device::write_d5xx)
 
 
 /*-------------------------------------------------
- 
+
  Telelink II
- 
- 
+
+
  -------------------------------------------------*/
 
 READ8_MEMBER(a800_rom_telelink2_device::read_80xx)
@@ -347,7 +347,7 @@ READ8_MEMBER(a800_rom_telelink2_device::read_80xx)
 
 WRITE8_MEMBER(a800_rom_telelink2_device::write_80xx)
 {
-	m_nvram[offset & 0xff] = data | 0xf0;	// low 4bits only
+	m_nvram[offset & 0xff] = data | 0xf0;   // low 4bits only
 }
 
 READ8_MEMBER(a800_rom_telelink2_device::read_d5xx)
@@ -364,10 +364,10 @@ WRITE8_MEMBER(a800_rom_telelink2_device::write_d5xx)
 
 
 /*-------------------------------------------------
- 
+
  SITSA Microcalc
- 
- 
+
+
  -------------------------------------------------*/
 
 READ8_MEMBER(a800_rom_microcalc_device::read_80xx)
@@ -386,21 +386,21 @@ WRITE8_MEMBER(a800_rom_microcalc_device::write_d5xx)
 
 
 /*-------------------------------------------------
- 
+
  Carts with no bankswitch (4K, 8K, 16K, 32K)
- 
+
  Same as base carts above
- 
+
  -------------------------------------------------*/
 
 /*-------------------------------------------------
- 
+
  Carts with 2x8K (16K) with A13 line not connected
- 
+
  Range 0x4000-0x7fff contains two copies of the low
  8K, range 0x8000-0xbfff contains two copies of the
  high 8K
- 
+
  -------------------------------------------------*/
 
 READ8_MEMBER(a5200_rom_2chips_device::read_80xx)
@@ -413,18 +413,18 @@ READ8_MEMBER(a5200_rom_2chips_device::read_80xx)
 
 
 /*-------------------------------------------------
- 
+
  Bounty Bob Strikes Back! cart (40K)
- 
+
  Similar to the A800 version, but:
  Area 0x8000-0xbfff always point to last 8K bank
  (repeated twice)
- Areas 0x4000-0x4fff and 0x5000-0x5fff are 
+ Areas 0x4000-0x4fff and 0x5000-0x5fff are
  separate banks of 4K mapped either in the first
  16K chunk or in the second 16K chunk
- Bankswitch is controlled by data written in 
+ Bankswitch is controlled by data written in
  0x4000-0x4fff and 0x5000-0x5fff respectively
- 
+
  -------------------------------------------------*/
 
 READ8_MEMBER(a5200_rom_bbsb_device::read_80xx)
@@ -445,4 +445,3 @@ WRITE8_MEMBER(a5200_rom_bbsb_device::write_80xx)
 	if (addr >= 0xff6 && addr <= 0xff9)
 		m_banks[BIT(offset, 12)] = (addr - 0xff6);
 }
-

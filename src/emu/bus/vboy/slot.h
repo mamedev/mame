@@ -37,7 +37,7 @@ public:
 	UINT32 get_rom_size() { return m_rom_size; }
 	UINT32 get_eeprom_size() { return m_eeprom.count(); }
 
-	void save_eeprom()	{ device().save_item(NAME(m_eeprom)); }
+	void save_eeprom()  { device().save_item(NAME(m_eeprom)); }
 
 protected:
 	// internal state
@@ -71,7 +71,7 @@ public:
 	int get_type() { return m_type; }
 	int get_cart_type(UINT8 *ROM, UINT32 len);
 
-	void save_eeprom()	{ if (m_cart && m_cart->get_eeprom_size()) m_cart->save_eeprom(); }
+	void save_eeprom()  { if (m_cart && m_cart->get_eeprom_size()) m_cart->save_eeprom(); }
 
 	virtual iodevice_t image_type() const { return IO_CARTSLOT; }
 	virtual bool is_readable()  const { return 1; }
@@ -111,6 +111,5 @@ extern const device_type VBOY_CART_SLOT;
 
 #define MCFG_VBOY_CARTRIDGE_ADD(_tag,_slot_intf,_def_slot) \
 	MCFG_DEVICE_ADD(_tag, VBOY_CART_SLOT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false) \
-
+	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
 #endif

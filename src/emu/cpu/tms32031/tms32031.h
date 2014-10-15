@@ -775,7 +775,7 @@ protected:
 	devcb_write8        m_xf0_cb;
 	devcb_write8        m_xf1_cb;
 	devcb_write8        m_iack_cb;
-	
+
 	// tables
 	static void (tms3203x_device::*const s_tms32031ops[])(UINT32 op);
 	static UINT32 (tms3203x_device::*const s_indirect_d[0x20])(UINT32, UINT8);

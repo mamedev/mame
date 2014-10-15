@@ -437,7 +437,7 @@
 
 	<software name="choplift">
 		<!-- Choplifter (1984)(Coleco)[a].bin -->
-        <!-- Other available dump has corrupted gfx -->
+		<!-- Other available dump has corrupted gfx -->
 		<description>Choplifter!</description>
 		<year>1984</year>
 		<publisher>Coleco / CBS</publisher>
@@ -699,7 +699,7 @@
 		<part name="cart" interface="coleco_cart">
 			<dataarea name="rom" size="16384">
 				<rom name="apshai.1" size="8192" crc="aa3ec181" sha1="7f79628c298ad6e410af82eeb33871869ad23de8" offset="0x0000" />
-                <!-- 2nd 8K chunk containes two copies of the same 4K data -->
+				<!-- 2nd 8K chunk containes two copies of the same 4K data -->
 				<rom name="apshai.2" size="8192" crc="0e440f8f" sha1="09ffaeb79cdd8173882b77a8398a4e00ba826de1" offset="0x2000" />
 			</dataarea>
 		</part>
@@ -2262,7 +2262,7 @@
 			<dataarea name="rom" size="24576">
 				<rom name="subroc.1" size="8192" crc="ff56b769" sha1="612a0abd13c4c7790890cbcb265a7fd786c7ec5c" offset="0x0000" />
 				<rom name="subroc.2" size="8192" crc="e9e60d4c" sha1="bfc94db65985b7a906099465a47d900f7a9a9106" offset="0x2000" />
-                <!-- 3rd 8K chunk containes two copies of the same 4K data -->
+				<!-- 3rd 8K chunk containes two copies of the same 4K data -->
 				<rom name="subroc.3" size="8192" crc="abe18f08" sha1="6ebdc68397c7b20dceba12ff754f88c955d5f98a" offset="0x4000" />
 			</dataarea>
 		</part>
@@ -2369,9 +2369,9 @@
 	</software>
 
 	<software name="zaxxont" cloneof="zaxxon">
-		<!-- The Taiwan Cooper cart contains a 32K ROM, the last 8K of which was found to 
-             contain 0x4000-0x4fff from Super Action Baseball followed by 0x1000-0x1fff 
-             from Meteoric Shower! -->
+		<!-- The Taiwan Cooper cart contains a 32K ROM, the last 8K of which was found to
+		     contain 0x4000-0x4fff from Super Action Baseball followed by 0x1000-0x1fff
+		     from Meteoric Shower! -->
 		<description>Zaxxon (Taiwan Cooper)</description>
 		<year>198?</year>
 		<publisher>Taiwan Cooper</publisher>

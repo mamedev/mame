@@ -899,7 +899,7 @@ void tms70c46_device::device_start()
 {
 	// init/zerofill
 	m_control = 0;
-	
+
 	// register for savestates
 	save_item(NAME(m_control));
 
@@ -910,7 +910,7 @@ void tms70c46_device::device_reset()
 {
 	m_control = 0;
 	m_io->write_byte(TMS7000_PORTE, 0xff);
-	
+
 	tms7000_device::device_reset();
 }
 

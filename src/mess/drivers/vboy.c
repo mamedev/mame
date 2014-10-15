@@ -1112,7 +1112,7 @@ static ADDRESS_MAP_START( vboy_mem, AS_PROGRAM, 32, vboy_state )
 	//AM_RANGE( 0x04000000, 0x04ffffff ) // Expansion area
 	AM_RANGE( 0x05000000, 0x0500ffff ) AM_MIRROR(0x0ff0000) AM_RAM AM_SHARE("wram")// Main RAM - 64K mask 0xffff
 	AM_RANGE( 0x06000000, 0x06003fff ) AM_DEVREADWRITE("cartslot", vboy_cart_slot_device, read_eeprom, write_eeprom) // Cart RAM - 8K NVRAM
-//	AM_RANGE( 0x07000000, 0x071fffff ) AM_MIRROR(0x0e00000) AM_DEVREAD("cartslot", vboy_cart_slot_device, read_cart) /* ROM */
+//  AM_RANGE( 0x07000000, 0x071fffff ) AM_MIRROR(0x0e00000) AM_DEVREAD("cartslot", vboy_cart_slot_device, read_cart) /* ROM */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( vboy_io, AS_IO, 32, vboy_state )
@@ -1141,7 +1141,7 @@ static ADDRESS_MAP_START( vboy_io, AS_IO, 32, vboy_state )
 //  AM_RANGE( 0x04000000, 0x04ffffff ) // Expansion area
 	AM_RANGE( 0x05000000, 0x0500ffff ) AM_MIRROR(0x0ff0000) AM_RAM AM_SHARE("wram") // Main RAM - 64K mask 0xffff
 	AM_RANGE( 0x06000000, 0x06003fff ) AM_NOP // Cart RAM - 8K NVRAM ?
-//	AM_RANGE( 0x07000000, 0x071fffff ) AM_MIRROR(0x0e00000) AM_DEVREAD("cartslot", vboy_cart_slot_device, read_cart) /* ROM */
+//  AM_RANGE( 0x07000000, 0x071fffff ) AM_MIRROR(0x0e00000) AM_DEVREAD("cartslot", vboy_cart_slot_device, read_cart) /* ROM */
 ADDRESS_MAP_END
 
 /* Input ports */

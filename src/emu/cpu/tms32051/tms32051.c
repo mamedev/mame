@@ -45,7 +45,7 @@ const device_type TMS32051 = &device_creator<tms32051_device>;
  **************************************************************************/
 
 static ADDRESS_MAP_START( internal_pgm, AS_PROGRAM, 16, tms32051_device )
-//	AM_RANGE(0x0000, 0x1fff) AM_ROM                         // ROM          TODO: is off-chip if MP/_MC = 0
+//  AM_RANGE(0x0000, 0x1fff) AM_ROM                         // ROM          TODO: is off-chip if MP/_MC = 0
 	AM_RANGE(0x2000, 0x23ff) AM_RAM AM_SHARE("saram")       // SARAM        TODO: is off-chip if RAM bit = 0
 	AM_RANGE(0xfe00, 0xffff) AM_RAM AM_SHARE("daram_b0")    // DARAM B0     TODO: is off-chip if CNF = 0
 ADDRESS_MAP_END
@@ -406,7 +406,7 @@ READ16_MEMBER( tms32051_device::cpuregs_r )
 		case 0x1d: return m_cber2;
 		case 0x1e: return m_cbcr;
 		case 0x1f: return m_bmar;
-		
+
 		case 0x20: return m_serial.drr;
 		case 0x21: return m_serial.dxr;
 

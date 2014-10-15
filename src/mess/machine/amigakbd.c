@@ -8,20 +8,20 @@
     We currently emulate the Amiga 500 keyboard controller, which was
     also used in later Amiga 2000 keyboards.
 
-	TODO: - Natural keyboard mode doesn't work with shifted characters,
-	        they get sent in the wrong order (core bug?)
-	      - Move 6500/1 to its own CPU core so that it can be shared with
-	        other systems
-	      - Add support for more keyboard controllers (pending on them
-	        getting dumped)
+    TODO: - Natural keyboard mode doesn't work with shifted characters,
+            they get sent in the wrong order (core bug?)
+          - Move 6500/1 to its own CPU core so that it can be shared with
+            other systems
+          - Add support for more keyboard controllers (pending on them
+            getting dumped)
 
-	Amiga 1000 keyboard part numbers (manufactured by Mitsumi):
+    Amiga 1000 keyboard part numbers (manufactured by Mitsumi):
 
-	- 327063-01  R56-2144  English
-	- 327063-02            British
-	- 327063-03  R56-2153  German
-	- 327063-04  R56-2152  French
-	- 327063-05  R56-2154  Italian
+    - 327063-01  R56-2144  English
+    - 327063-02            British
+    - 327063-03  R56-2153  German
+    - 327063-04  R56-2152  French
+    - 327063-05  R56-2154  Italian
 
 ***************************************************************************/
 
@@ -335,8 +335,8 @@ void amigakbd_device::device_reset()
 	m_kclk = 1;
 	m_port_c = 0xff;
 	m_port_d = 0xff;
-	m_latch = 0xffff;	// not initialized by hardware
-	m_counter = 0xffff;	// not initialized by hardware
+	m_latch = 0xffff;   // not initialized by hardware
+	m_counter = 0xffff; // not initialized by hardware
 	m_control = 0x00;
 
 	m_timer->adjust(attotime::zero, 0, attotime::from_hz(XTAL_3MHz / 2));

@@ -62,13 +62,13 @@ a26_rom_4k_device::a26_rom_4k_device(const machine_config &mconfig, const char *
 
 a26_rom_f6_device::a26_rom_f6_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 					: a26_rom_2k_device(mconfig, type, name, tag, owner, clock, shortname, source),
-						m_base_bank(-1)	// set to -1 to help the Xin1 multicart...
+						m_base_bank(-1) // set to -1 to help the Xin1 multicart...
 {
 }
 
 a26_rom_f6_device::a26_rom_f6_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: a26_rom_2k_device(mconfig, A26_ROM_F6, "Atari VCS 2600 ROM Carts w/F6 bankswitch", tag, owner, clock, "vcs_f6", __FILE__),
-						m_base_bank(-1)	// set to -1 to help the Xin1 multicart...
+						m_base_bank(-1) // set to -1 to help the Xin1 multicart...
 {
 }
 
@@ -337,7 +337,7 @@ READ8_MEMBER(a26_rom_2k_device::read_rom)
 
 /*-------------------------------------------------
  "F4 Bankswitch" Carts:
- read/write access to 0x1ff4-0x1ffb determines the 
+ read/write access to 0x1ff4-0x1ffb determines the
  4K ROM bank to be read
 
  GAMES: Fatal Run
@@ -350,7 +350,7 @@ READ8_MEMBER(a26_rom_f4_device::read_rom)
 	{
 		return m_ram[offset & (m_ram.count() - 1)];
 	}
-	
+
 	// update banks
 	if (!space.debugger_access())
 	{
@@ -368,7 +368,7 @@ READ8_MEMBER(a26_rom_f4_device::read_rom)
 				break;
 		}
 	}
-	
+
 	return m_rom[offset + (m_base_bank * 0x1000)];
 }
 
@@ -380,7 +380,7 @@ WRITE8_MEMBER(a26_rom_f4_device::write_bank)
 		m_ram[offset & (m_ram.count() - 1)] = data;
 		return;
 	}
-	
+
 	switch (offset)
 	{
 		case 0x0ff4:
@@ -401,10 +401,10 @@ WRITE8_MEMBER(a26_rom_f4_device::write_bank)
 
 /*-------------------------------------------------
  "F6 Bankswitch" Carts:
- read/write access to 0x1ff6-0x1ff9 determines the 
+ read/write access to 0x1ff6-0x1ff9 determines the
  4K ROM bank to be read
 
- GAMES: Atari 16K games, like Crossbow, Crystal 
+ GAMES: Atari 16K games, like Crossbow, Crystal
  Castles and the 2-in-1 carts
 
  -------------------------------------------------*/
@@ -469,7 +469,7 @@ DIRECT_UPDATE_MEMBER(a26_rom_f6_device::cart_opbase)
 
 /*-------------------------------------------------
  "F8 Bankswitch" Carts:
- read/write access to 0x1ff8-0x1ff9 determines the 
+ read/write access to 0x1ff8-0x1ff9 determines the
  4K ROM bank to be read
 
  GAMES: Atari 8K games, like Asteroids, Battlezone
@@ -484,7 +484,7 @@ READ8_MEMBER(a26_rom_f8_device::read_rom)
 	{
 		return m_ram[offset & (m_ram.count() - 1)];
 	}
-	
+
 	// update banks
 	if (!space.debugger_access())
 	{
@@ -496,7 +496,7 @@ READ8_MEMBER(a26_rom_f8_device::read_rom)
 				break;
 		}
 	}
-	
+
 	return m_rom[offset + (m_base_bank * 0x1000)];
 }
 
@@ -508,7 +508,7 @@ WRITE8_MEMBER(a26_rom_f8_device::write_bank)
 		m_ram[offset & (m_ram.count() - 1)] = data;
 		return;
 	}
-	
+
 	switch (offset)
 	{
 		case 0x0ff8:
@@ -523,12 +523,12 @@ WRITE8_MEMBER(a26_rom_f8_device::write_bank)
 
 /*-------------------------------------------------
  "FA Bankswitch" Carts:
- read/write access to 0x1ff8-0x1ffa determines the 
+ read/write access to 0x1ff8-0x1ffa determines the
  4K ROM bank to be read
- These games contained the CBS RAM+ chip (256bytes 
+ These games contained the CBS RAM+ chip (256bytes
  of RAM)
- 
- GAMES: CBS RAM Plus games like Omega Race and Tunnel 
+
+ GAMES: CBS RAM Plus games like Omega Race and Tunnel
  Runner
 
  -------------------------------------------------*/
@@ -540,7 +540,7 @@ READ8_MEMBER(a26_rom_fa_device::read_rom)
 	{
 		return m_ram[offset & (m_ram.count() - 1)];
 	}
-	
+
 	// update banks
 	if (!space.debugger_access())
 	{
@@ -553,7 +553,7 @@ READ8_MEMBER(a26_rom_fa_device::read_rom)
 				break;
 		}
 	}
-	
+
 	return m_rom[offset + (m_base_bank * 0x1000)];
 }
 
@@ -563,8 +563,8 @@ WRITE8_MEMBER(a26_rom_fa_device::write_bank)
 	if (m_ram && offset < 0x100)
 	{
 		m_ram[offset & (m_ram.count() - 1)] = data;
-	}	
-	
+	}
+
 	switch (offset)
 	{
 		case 0x0ff8:
@@ -580,22 +580,22 @@ WRITE8_MEMBER(a26_rom_fa_device::write_bank)
 
 /*-------------------------------------------------
  "FE Bankswitch" Carts:
- read/write access to 0x01fe-0x1ff determines the 
+ read/write access to 0x01fe-0x1ff determines the
  4K ROM bank to be read
- 
+
  GAMES: Activision 8K games like Decathlon
 
  -------------------------------------------------*/
 /*
- 
+
  There seems to be a kind of lag between the writing to address 0x1FE and the
  Activision switcher springing into action. It waits for the next byte to arrive
  on the data bus, which is the new PCH in the case of a JSR, and the PCH of the
  stored PC on the stack in the case of an RTS.
- 
+
  depending on last byte & 0x20 -> 0x00 -> switch to bank #1
  -> 0x20 -> switch to bank #0
- 
+
  */
 
 READ8_MEMBER(a26_rom_fe_device::read_rom)
@@ -607,9 +607,9 @@ READ8_MEMBER(a26_rom_fe_device::read_rom)
 	{
 		return m_ram[offset & (m_ram.count() - 1)];
 	}
-	
+
 	data = m_rom[offset + (m_base_bank * 0x1000)];
-	
+
 	if (!space.debugger_access())
 	{
 		if (m_trigger_on_next_access)
@@ -618,7 +618,7 @@ READ8_MEMBER(a26_rom_fe_device::read_rom)
 			m_trigger_on_next_access = 0;
 		}
 	}
-	
+
 	return data;
 }
 
@@ -634,7 +634,7 @@ WRITE8_MEMBER(a26_rom_fe_device::write_ram)
 READ8_MEMBER(a26_rom_fe_device::read_bank)
 {
 	UINT8 data = space.read_byte(0xfe + offset);
-	
+
 	if (!space.debugger_access())
 	{
 		switch (offset & 1)
@@ -643,7 +643,7 @@ READ8_MEMBER(a26_rom_fe_device::read_bank)
 				// The next byte on the data bus determines which bank to switch to
 				m_trigger_on_next_access = 1;
 				break;
-				
+
 			case 1:
 				if (m_trigger_on_next_access)
 				{
@@ -667,11 +667,11 @@ WRITE8_MEMBER(a26_rom_fe_device::write_bank)
 }
 
 /*-------------------------------------------------
- "3E Bankswitch" Carts: 
- write access to 0x3e determines the 2K ROM bank to 
- be read, write access to 0x3f determines the RAM bank 
+ "3E Bankswitch" Carts:
+ write access to 0x3e determines the 2K ROM bank to
+ be read, write access to 0x3f determines the RAM bank
  to be read
- 
+
  GAMES: Boulder Dash (Homebrew)
 
  -------------------------------------------------*/
@@ -680,7 +680,7 @@ READ8_MEMBER(a26_rom_3e_device::read_rom)
 {
 	if (m_ram && m_ram_enable && offset < 0x400)
 		return m_ram[offset + (m_ram_bank * 0x400)];
-	
+
 	if (offset >= 0x800)
 		return m_rom[(offset & 0x7ff) + (m_num_bank - 1) * 0x800];
 	else
@@ -709,11 +709,11 @@ WRITE8_MEMBER(a26_rom_3e_device::write_ram)
 
 
 /*-------------------------------------------------
- "3F Bankswitch" Carts: 
- write access to 0x00-0x3f determines the 2K ROM bank 
+ "3F Bankswitch" Carts:
+ write access to 0x00-0x3f determines the 2K ROM bank
  to be read
 
- GAMES: Tigervision 8K games like Espial and Miner 
+ GAMES: Tigervision 8K games like Espial and Miner
  2049er. Extended version with bankswitch up to 512K
  shall be supported as well (but we lack a test case)
 
@@ -733,8 +733,8 @@ WRITE8_MEMBER(a26_rom_3f_device::write_bank)
 }
 
 /*-------------------------------------------------
- "E0 Bankswitch" Carts: 
- read/write access to 0x1fe0-0x1ff8 determines the 
+ "E0 Bankswitch" Carts:
+ read/write access to 0x1fe0-0x1ff8 determines the
  1K ROM bank to be read in each 1K chunk (0x1c00-0x1fff
  always points to the last 1K of the ROM)
 
@@ -769,16 +769,16 @@ WRITE8_MEMBER(a26_rom_e0_device::write_bank)
  1800-19ff is RAM
  1a00-1fff is fixed to the last 0x600 of ROM
 
- The selectable bank can be ROM (if selected by 
- 0x1fe0-0x1fe6 access) or a first 1K of RAM (if 
+ The selectable bank can be ROM (if selected by
+ 0x1fe0-0x1fe6 access) or a first 1K of RAM (if
  selected by 0x1fe7 access).
- The other 256byte RAM bank can be one of the 
+ The other 256byte RAM bank can be one of the
  four different chunks forming the other 1K of RAM
  (the bank is selected by accessing 0x1fe8-0x1feb)
 
- GAMES: M Network 16K games like Burgertime and 
+ GAMES: M Network 16K games like Burgertime and
  Bump'n Jump
- 
+
  -------------------------------------------------*/
 
 READ8_MEMBER(a26_rom_e7_device::read_rom)
@@ -833,12 +833,12 @@ WRITE8_MEMBER(a26_rom_e7_device::write_bank)
 }
 
 /*-------------------------------------------------
- "UA Bankswitch" Carts: 
- read/write access to 0x200-0x27f determines the 
+ "UA Bankswitch" Carts:
+ read/write access to 0x200-0x27f determines the
  4K ROM bank to be read (0x220-0x23f for low 4K,
  0x240-0x27f for high 4K)
 
- GAMES: UA Ltd. 8K games like Funky Flash and 
+ GAMES: UA Ltd. 8K games like Funky Flash and
  Pleaides
 
  -------------------------------------------------*/
@@ -863,9 +863,9 @@ WRITE8_MEMBER(a26_rom_ua_device::write_bank)
 
 
 /*-------------------------------------------------
- Commavid Carts: 
+ Commavid Carts:
  It allows for both ROM and RAM on the cartridge,
- without using bankswitching.  There's 2K of ROM 
+ without using bankswitching.  There's 2K of ROM
  and 1K of RAM.
 
  GAMES: Magicard and Video Life by Commavid
@@ -894,8 +894,8 @@ WRITE8_MEMBER(a26_rom_cv_device::write_bank)
 
 
 /*-------------------------------------------------
- Dynacom Megaboy Carts (aka "F0 Banswitch"): 
- read/write access to 0x1ff0 determines the 4K ROM 
+ Dynacom Megaboy Carts (aka "F0 Banswitch"):
+ read/write access to 0x1ff0 determines the 4K ROM
  bank to be read (each access increases the bank index
  up to 16, since the cart was 64K wide)
 
@@ -925,8 +925,8 @@ WRITE8_MEMBER(a26_rom_dc_device::write_bank)
 
 
 /*-------------------------------------------------
- "FV Bankswitch" Carts: 
- The first access to 0x1fd0 switch the bank, but 
+ "FV Bankswitch" Carts:
+ The first access to 0x1fd0 switch the bank, but
  only if pc() & 0x1f00 == 0x1f00!
 
  GAMES: Challenge by HES
@@ -964,14 +964,14 @@ WRITE8_MEMBER(a26_rom_fv_device::write_bank)
 
 
 /*-------------------------------------------------
- "JVP Bankswitch" Carts: 
- read/write access to 0x0fa0-0x0fc0 determines the 
+ "JVP Bankswitch" Carts:
+ read/write access to 0x0fa0-0x0fc0 determines the
  4K ROM bank to be read (notice that this overlaps
  the RIOT, currently handled in the main driver until
  I can better investigate the behavior)
- 
+
  GAMES: No test case!?!
- 
+
  -------------------------------------------------*/
 
 READ8_MEMBER(a26_rom_jvp_device::read_rom)
@@ -997,9 +997,9 @@ WRITE8_MEMBER(a26_rom_jvp_device::write_bank)
 /*-------------------------------------------------
  4 in 1 Carts (Reset based):
  the 4K bank changes at each reset
- 
+
  GAMES: 4 in 1 carts
- 
+
  -------------------------------------------------*/
 
 READ8_MEMBER(a26_rom_4in1_device::read_rom)
@@ -1012,9 +1012,9 @@ READ8_MEMBER(a26_rom_4in1_device::read_rom)
  8 in 1 Carts (Reset based):
  the 8K banks change at each reset, and internally
  each game runs as a F8-bankswitched cart
- 
+
  GAMES: 8 in 1 cart
- 
+
  -------------------------------------------------*/
 
 READ8_MEMBER(a26_rom_8in1_device::read_rom)
@@ -1029,7 +1029,7 @@ READ8_MEMBER(a26_rom_8in1_device::read_rom)
 				break;
 		}
 	}
-	
+
 	return m_rom[offset + (m_base_bank * 0x1000) + (m_reset_bank * 0x2000)];
 }
 
@@ -1037,13 +1037,12 @@ READ8_MEMBER(a26_rom_8in1_device::read_rom)
 /*-------------------------------------------------
  32 in 1 Carts (Reset based):
  the 2K banks change at each reset
- 
+
  GAMES: 32 in 1 cart
- 
+
  -------------------------------------------------*/
 
 READ8_MEMBER(a26_rom_32in1_device::read_rom)
 {
 	return m_rom[(offset & 0x7ff) + (m_base_bank * 0x800)];
 }
-

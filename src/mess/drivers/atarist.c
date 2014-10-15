@@ -1228,7 +1228,7 @@ static ADDRESS_MAP_START( st_map, AS_PROGRAM, 16, st_state )
 	AM_RANGE(0x000008, 0x1fffff) AM_RAM
 	AM_RANGE(0x200000, 0x3fffff) AM_RAM
 	AM_RANGE(0x400000, 0xf9ffff) AM_READWRITE(berr_r, berr_w)
-	//AM_RANGE(0xfa0000, 0xfbffff)		// mapped by the cartslot
+	//AM_RANGE(0xfa0000, 0xfbffff)      // mapped by the cartslot
 	AM_RANGE(0xfc0000, 0xfeffff) AM_ROM AM_REGION(M68000_TAG, 0) AM_WRITE(berr_w)
 	AM_RANGE(0xff8000, 0xff8001) AM_READWRITE8(mmu_r, mmu_w, 0x00ff)
 	AM_RANGE(0xff8200, 0xff8203) AM_READWRITE8(shifter_base_r, shifter_base_w, 0x00ff)
@@ -1272,7 +1272,7 @@ static ADDRESS_MAP_START( megast_map, AS_PROGRAM, 16, megast_state )
 	AM_RANGE(0x000000, 0x000007) AM_ROM AM_REGION(M68000_TAG, 0)
 	AM_RANGE(0x000008, 0x1fffff) AM_RAM
 	AM_RANGE(0x200000, 0x3fffff) AM_RAM
-	//AM_RANGE(0xfa0000, 0xfbffff)		// mapped by the cartslot
+	//AM_RANGE(0xfa0000, 0xfbffff)      // mapped by the cartslot
 	AM_RANGE(0xfc0000, 0xfeffff) AM_ROM AM_REGION(M68000_TAG, 0)
 //  AM_RANGE(0xff7f30, 0xff7f31) AM_READWRITE(blitter_dst_inc_y_r, blitter_dst_inc_y_w) // for TOS 1.02
 	AM_RANGE(0xff8000, 0xff8001) AM_READWRITE8(mmu_r, mmu_w, 0x00ff)

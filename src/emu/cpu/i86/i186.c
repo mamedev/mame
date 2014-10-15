@@ -594,14 +594,14 @@ void i80186_cpu_device::device_start()
 	save_item(NAME(m_mem.middle_size));
 	save_item(NAME(m_mem.peripheral));
 	save_item(NAME(m_reloc));
-	
+
 	// zerofill
 	memset(m_timer, 0, sizeof(m_timer));
 	memset(m_dma, 0, sizeof(m_dma));
 	memset(&m_intr, 0, sizeof(intr_state));
 	memset(&m_mem, 0, sizeof(mem_state));
 	m_reloc = 0;
-	
+
 	m_timer[0].int_timer = timer_alloc(TIMER_INT0);
 	m_timer[1].int_timer = timer_alloc(TIMER_INT1);
 	m_timer[2].int_timer = timer_alloc(TIMER_INT2);
@@ -633,7 +633,7 @@ void i80186_cpu_device::device_reset()
 	m_intr.poll_status      = 0x0000;
 	m_intr.ext_state        = 0x00;
 	m_reloc = 0x20ff;
-	
+
 	for (int i = 0; i < ARRAY_LENGTH(m_dma); i++)
 	{
 		m_dma[i].drq_state = false;
@@ -1477,7 +1477,7 @@ READ16_MEMBER(i80186_cpu_device::internal_port_r)
 WRITE16_MEMBER(i80186_cpu_device::internal_port_w)
 {
 	int which;
-	
+
 	switch (offset)
 	{
 		case 0x11:

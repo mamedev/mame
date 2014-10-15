@@ -1325,7 +1325,7 @@ static ADDRESS_MAP_START( pengojpm_map, AS_PROGRAM, 8, pacman_state )
 	AM_RANGE(0x8400, 0x87ff) AM_RAM_WRITE(pacman_colorram_w) AM_SHARE("colorram")
 
 	AM_RANGE(0x8800, 0x8bff) AM_RAM
-//	AM_RANGE(0x8800, 0x8bff) AM_READ(pacman_read_nop) AM_WRITENOP
+//  AM_RANGE(0x8800, 0x8bff) AM_READ(pacman_read_nop) AM_WRITENOP
 	AM_RANGE(0x8c00, 0x8fef) AM_RAM
 	AM_RANGE(0x8ff0, 0x8fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x9000, 0x9000) AM_WRITE(irq_mask_w)
@@ -2935,7 +2935,7 @@ static INPUT_PORTS_START( numcrash )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 )
 
-	PORT_MODIFY("DSW1") 
+	PORT_MODIFY("DSW1")
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 3C_1C ) )
@@ -3952,7 +3952,7 @@ ROM_START( mspacmanblt )
 	ROM_CONTINUE(0x1800,0x800)
 
 	ROM_REGION( 0x0120, "proms", 0 )
-	ROM_LOAD( "82s123.h7",    0x0000, 0x0020, CRC(3545e7e9) SHA1(b866b02579438afb11296e5c53a32c6425bd044d) ) 
+	ROM_LOAD( "82s123.h7",    0x0000, 0x0020, CRC(3545e7e9) SHA1(b866b02579438afb11296e5c53a32c6425bd044d) )
 	ROM_LOAD( "82s129-3.d1",  0x0020, 0x0100, CRC(3eb3a8e4) SHA1(19097b5f60d1030f8b82d9f1d3a241f93e5c75d6) )
 
 	ROM_REGION( 0x0200, "namco", 0 )    /* sound PROMs */
@@ -4234,7 +4234,7 @@ ROM_START( pengopac )
 	ROM_LOAD( "pengopac.4",      0x4000, 0x1000, CRC(1519d59b) SHA1(13b99780fcccac61b16201500e309c9b442406c8) )
 	ROM_LOAD( "pengopac.5",      0x5000, 0x1000, CRC(1b90c32c) SHA1(1761add93d71d29840b1462b9747a3d463b7148d) )
 	ROM_LOAD( "pengopac.6",      0x6000, 0x2000, CRC(8d2994ee) SHA1(1f16b32c4574107a4a15d40113b966581b374a81) )
-	
+
 	ROM_REGION( 0x2000, "gfx1", 0 )
 	ROM_LOAD( "pengopac.5e",      0x0000, 0x0800, CRC(ad88978a) SHA1(a568baf751753660223958b722980f031310eba1) )
 	ROM_LOAD( "pengopac.5f",      0x0800, 0x0800, CRC(cb208b9f) SHA1(63b64b52c9c3e18b2d2823e79095160fb1a71f00) )
@@ -6544,7 +6544,7 @@ DRIVER_INIT_MEMBER(pacman_state,rocktrv2)
 
 	ROM[0x7ffe] = 0xa7;
 	ROM[0x7fee] = 0x6d;
-	
+
 	save_item(NAME(m_rocktrv2_question_bank));
 }
 

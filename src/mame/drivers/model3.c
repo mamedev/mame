@@ -32,16 +32,16 @@
     von2/von254g - works
     fvipers2 - waiting for decrementer (same code as eca)
     vs298 - works, hangs with an onscreen error code
-	vs299/vs2v991 - works
-	oceanhun - same as daytona2
-	lamachin - works
+    vs299/vs2v991 - works
+    oceanhun - same as daytona2
+    lamachin - works
 
     dayto2pe - bug in DRC MMU page-fault handling, causes infinite loop at PC:0x2270 (or debug assert)
     daytona2 - As above.
     spikeout/spikeofe - As above.
     dirtdvls/dirtdvla - works
-    swtrilgy - 
-    swtrilga - 
+    swtrilgy -
+    swtrilga -
     magtruck - works, broken FPU values in matrices during 2nd part of attract mode (cpu core bug?)
     eca/ecax - cabinet network error
 
@@ -1615,7 +1615,7 @@ READ8_MEMBER(model3_state::model3_sound_r)
 		{
 			UINT8 res = 0;
 			res |= 1;
-			res |= 0x2;		// magtruck country check
+			res |= 0x2;     // magtruck country check
 			return res;
 		}
 	}
@@ -5401,8 +5401,8 @@ WRITE8_MEMBER(model3_state::scsp_irq)
     0x02: Video (VBLANK start?)
     0x01: Video (unused?)
 
-	IRQ 0x08 and 0x04 directly affect the game speed in magtruck, once per scanline seems fast enough
-	Un-syncing the interrupts breaks the progress bar in magtruck
+    IRQ 0x08 and 0x04 directly affect the game speed in magtruck, once per scanline seems fast enough
+    Un-syncing the interrupts breaks the progress bar in magtruck
 */
 TIMER_DEVICE_CALLBACK_MEMBER(model3_state::model3_interrupt)
 {
@@ -5694,8 +5694,8 @@ DRIVER_INIT_MEMBER(model3_state,lemans24)
 	DRIVER_INIT_CALL(model3_15);
 
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xc1000000, 0xc10000ff, read64_delegate(FUNC(model3_state::scsi_r),this), write64_delegate(FUNC(model3_state::scsi_w),this));
-	
-//	rom[(0x73fe38^4)/4] = 0x38840004;       /* This seems to be an actual bug in the original code */
+
+//  rom[(0x73fe38^4)/4] = 0x38840004;       /* This seems to be an actual bug in the original code */
 }
 
 DRIVER_INIT_MEMBER(model3_state,vf3)
@@ -5826,11 +5826,11 @@ DRIVER_INIT_MEMBER(model3_state,harleya)
 
 
 DRIVER_INIT_MEMBER(model3_state,srally2)
-{	
+{
 	DRIVER_INIT_CALL(model3_20);
 
 
-	UINT32 *rom = (UINT32*)memregion("user1")->base();	
+	UINT32 *rom = (UINT32*)memregion("user1")->base();
 	rom[(0x7c0c4^4)/4] = 0x60000000;
 	rom[(0x7c0c8^4)/4] = 0x60000000;
 	rom[(0x7c0cc^4)/4] = 0x60000000;
@@ -5850,7 +5850,7 @@ DRIVER_INIT_MEMBER(model3_state,swtrilgy)
 	rom[(0xf7770^4)/4] = 0x60000000;
 	rom[(0xf7774^4)/4] = 0x60000000;
 
-	rom[(0x043dc^4)/4] = 0x48000090;		// skip force feedback setup
+	rom[(0x043dc^4)/4] = 0x48000090;        // skip force feedback setup
 	rom[(0xf6e44^4)/4] = 0x60000000;
 }
 
@@ -5865,7 +5865,7 @@ DRIVER_INIT_MEMBER(model3_state,swtrilga)
 DRIVER_INIT_MEMBER(model3_state,von2)
 {
 	m_step20_with_old_real3d = true;
-	
+
 	DRIVER_INIT_CALL(model3_20);
 }
 

@@ -3080,8 +3080,8 @@ void sh4_base_device::device_reset()
 
 inline void sh34_base_device::execute_one_0000(const UINT16 opcode)
 {
-    switch(opcode & 0xff)
-    {
+	switch(opcode & 0xff)
+	{
 		// 0x00
 		case 0x00:  NOP(opcode); break;
 		case 0x10:  NOP(opcode); break;

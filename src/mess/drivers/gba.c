@@ -1896,7 +1896,7 @@ READ32_MEMBER(gba_state::gba_bios_r)
 
 	if (m_bios_protected != 0)
 		offset = (m_bios_last_address + 8) / 4;
-	
+
 	return rom[offset & 0x3fff];
 }
 

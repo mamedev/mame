@@ -1000,8 +1000,8 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( dkongx )
 	/* Supposedly the physical DIPS are read as defaults for the NVRAM when it's initially created.
-		The settings here match those from the default DSW0 settings.  Beyond the initial NVRAM
-		creation, DIPS (other than CABINET) can only be adjusted from the Service Mode */
+	    The settings here match those from the default DSW0 settings.  Beyond the initial NVRAM
+	    creation, DIPS (other than CABINET) can only be adjusted from the Service Mode */
 	PORT_INCLUDE( dkong )
 
 	PORT_MODIFY("DSW0")

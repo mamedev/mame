@@ -31,11 +31,11 @@ class vectrex_rom64k_device : public vectrex_rom_device
 public:
 	// construction/destruction
 	vectrex_rom64k_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
-	
+
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read_rom);
 	virtual DECLARE_WRITE8_MEMBER(write_bank);
@@ -51,7 +51,7 @@ class vectrex_sram_device : public vectrex_rom_device
 public:
 	// construction/destruction
 	vectrex_sram_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	// reading and writing
 	virtual DECLARE_WRITE8_MEMBER(write_ram);
 };

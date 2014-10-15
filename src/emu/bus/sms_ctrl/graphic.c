@@ -9,18 +9,18 @@ I/O 3f write | this method
         0x20 | 0x7f
         0x00 | 0x3f
         0x30 | 0xff
-   
+
 Typical sequence:
 - 3f write 0x20
 - read dc
 - 3f write 0x00
-- read dc    
+- read dc
 - 3f write 0x20
 - read dc
 - 3f write 0x30
 Suspect from kind of counter that is reset by a 0x30 write to I/O port 0x3f.
 Once reset reads from i/O port dc expect to see 0xE0.
-And then any write with differing bits goes through several internal I/O ports 
+And then any write with differing bits goes through several internal I/O ports
 with the first port being the one with the buttons
 
 In the reset/start state the lower four/five bits are 0.
@@ -45,11 +45,11 @@ const device_type SMS_GRAPHIC = &device_creator<sms_graphic_device>;
 
 
 static INPUT_PORTS_START( sms_graphic )
-    PORT_START("BUTTONS")
-    PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) // MENU
-    PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) // DO
-    PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) // PEN
-    PORT_BIT( 0xf8, IP_ACTIVE_LOW, IPT_UNUSED ) 
+	PORT_START("BUTTONS")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) // MENU
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) // DO
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) // PEN
+	PORT_BIT( 0xf8, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("X")
 	PORT_BIT( 0xff, 0x00, IPT_LIGHTGUN_X) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(15)
@@ -110,8 +110,8 @@ UINT8 sms_graphic_device::peripheral_r()
 	{
 		case 0:     // Initial state / "I am a board"
 			// If any regular button is pressed raise/lower TL ?
-//			if ((m_buttons->read() & 0x07) != 0x07)
-//				return 0xf0;
+//          if ((m_buttons->read() & 0x07) != 0x07)
+//              return 0xf0;
 			return 0xd0;
 
 		case 1:    // Read buttons (active low)
@@ -155,4 +155,3 @@ void sms_graphic_device::peripheral_w(UINT8 data)
 
 	m_previous_write = data;
 }
-

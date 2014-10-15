@@ -252,7 +252,7 @@ public:
 		m_8000(*this, "8000"),
 		m_a000(*this, "a000"),
 		m_cart(*this, "cartleft"),
-		m_cart2(*this, "cartright")	{ }
+		m_cart2(*this, "cartright") { }
 
 	DECLARE_MACHINE_START(a400);
 	DECLARE_MACHINE_START(a800);
@@ -267,7 +267,7 @@ public:
 	DECLARE_WRITE8_MEMBER(a600xl_pia_pb_w);
 	DECLARE_WRITE8_MEMBER(a800xl_pia_pb_w);
 
-	DECLARE_READ8_MEMBER(read_d5xx);	// at least one cart type can enable/disable roms when reading
+	DECLARE_READ8_MEMBER(read_d5xx);    // at least one cart type can enable/disable roms when reading
 	DECLARE_WRITE8_MEMBER(disable_cart);
 
 	// these are needed to handle carts which can disable ROM without
@@ -290,13 +290,13 @@ public:
 	DECLARE_WRITE8_MEMBER(xegs_low_w);
 	DECLARE_READ8_MEMBER(xegs_high_r);
 	DECLARE_WRITE8_MEMBER(xegs_high_w);
-	
+
 	TIMER_DEVICE_CALLBACK_MEMBER(a400_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(a800xl_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(a5200_interrupt);
-	
+
 protected:
-	//required_device<cpu_device> m_maincpu;	// maincpu is already contained in atari_common_state
+	//required_device<cpu_device> m_maincpu;    // maincpu is already contained in atari_common_state
 	required_device<ram_device> m_ram;
 	required_device<pia6821_device> m_pia;
 	optional_device<dac_device> m_dac;
@@ -310,7 +310,7 @@ protected:
 	int m_cart_disabled, m_cart_helper;
 	int m_last_offs;
 	UINT8 m_mmu, m_ext_bank;
-	
+
 	void setup_ram(int bank,UINT32 size);
 	void setup_cart(a800_cart_slot_device *slot);
 };
@@ -334,18 +334,18 @@ READ8_MEMBER(a400_state::a600xl_low_r)
 
 READ8_MEMBER(a400_state::a1200xl_low_r)
 {
-	if (offset < 0x5000)	// 0x0000-0x4fff
+	if (offset < 0x5000)    // 0x0000-0x4fff
 		return m_ram->pointer()[offset];
-	else if (offset < 0x5800)	// 0x5000-0x57ff
+	else if (offset < 0x5800)   // 0x5000-0x57ff
 	{
 		if (m_mmu & 0x80)
 			return m_ram->pointer()[offset];
 		else
 			return m_region_maincpu->base()[0xd000 + (offset & 0x7ff)];
 	}
-	else if (offset < 0xc000)	// 0x5800-0xbfff
+	else if (offset < 0xc000)   // 0x5800-0xbfff
 		return m_ram->pointer()[offset];
-	else	// 0xc000-0xcfff
+	else    // 0xc000-0xcfff
 	{
 		if (!(m_mmu & 0x01))
 			return m_ram->pointer()[offset];
@@ -356,25 +356,25 @@ READ8_MEMBER(a400_state::a1200xl_low_r)
 
 READ8_MEMBER(a400_state::a800xl_low_r)
 {
-	if (offset < 0x5000)	// 0x0000-0x4fff
+	if (offset < 0x5000)    // 0x0000-0x4fff
 		return m_ram->pointer()[offset];
-	else if (offset < 0x5800)	// 0x5000-0x57ff
+	else if (offset < 0x5800)   // 0x5000-0x57ff
 	{
 		if (m_mmu & 0x80)
 			return m_ram->pointer()[offset];
 		else
 			return m_region_maincpu->base()[0xd000 + (offset & 0x7ff)];
 	}
-	else if (offset < 0xa000)	// 0x5800-0x9fff
+	else if (offset < 0xa000)   // 0x5800-0x9fff
 		return m_ram->pointer()[offset];
-	else if (offset < 0xc000)	// 0xa000-0xbfff
+	else if (offset < 0xc000)   // 0xa000-0xbfff
 	{
 		if (m_mmu & 0x02)
 			return m_ram->pointer()[offset];
 		else
 			return m_region_maincpu->base()[(offset & 0x1fff) + 0xa000];
 	}
-	else	// 0xc000-0xcfff
+	else    // 0xc000-0xcfff
 	{
 		if (!(m_mmu & 0x01))
 			return m_ram->pointer()[offset];
@@ -385,21 +385,21 @@ READ8_MEMBER(a400_state::a800xl_low_r)
 
 WRITE8_MEMBER(a400_state::a800xl_low_w)
 {
-	if (offset < 0x5000)	// 0x0000-0x4fff
+	if (offset < 0x5000)    // 0x0000-0x4fff
 		m_ram->pointer()[offset] = data;
-	else if (offset < 0x5800)	// 0x5000-0x57ff
+	else if (offset < 0x5800)   // 0x5000-0x57ff
 	{
 		if (m_mmu & 0x80)
 			m_ram->pointer()[offset] = data;
 	}
-	else if (offset < 0xa000)	// 0x5800-0x7fff
+	else if (offset < 0xa000)   // 0x5800-0x7fff
 		m_ram->pointer()[offset] = data;
-	else if (offset < 0xc000)	// 0xa000-0xbfff
+	else if (offset < 0xc000)   // 0xa000-0xbfff
 	{
 		if (m_mmu & 0x02)
 			m_ram->pointer()[offset] = data;
 	}
-	else	// 0xc000-0xcfff
+	else    // 0xc000-0xcfff
 	{
 		if (!(m_mmu & 0x01))
 			m_ram->pointer()[offset] = data;
@@ -422,9 +422,9 @@ WRITE8_MEMBER(a400_state::a800xl_high_w)
 
 READ8_MEMBER(a400_state::a130xe_low_r)
 {
-	if (offset < 0x4000)	// 0x0000-0x3fff
+	if (offset < 0x4000)    // 0x0000-0x3fff
 		return m_ram->pointer()[offset];
-	else if (offset < 0x8000)	// 0x4000-0x7fff
+	else if (offset < 0x8000)   // 0x4000-0x7fff
 	{
 		// NOTE: ANTIC accesses to extra RAM are not supported yet!
 		if (!(m_mmu & 0x80) && offset >= 0x5000 && offset < 0x5800)
@@ -434,16 +434,16 @@ READ8_MEMBER(a400_state::a130xe_low_r)
 		else
 			return m_ram->pointer()[offset];
 	}
-	else if (offset < 0xa000)	// 0x8000-0x9fff
+	else if (offset < 0xa000)   // 0x8000-0x9fff
 		return m_ram->pointer()[offset];
-	else if (offset < 0xc000)	// 0xa000-0xbfff
+	else if (offset < 0xc000)   // 0xa000-0xbfff
 	{
 		if (m_mmu & 0x02)
 			return m_ram->pointer()[offset];
 		else
 			return m_region_maincpu->base()[(offset & 0x1fff) + 0xa000];
 	}
-	else	// 0xc000-0xcfff
+	else    // 0xc000-0xcfff
 	{
 		if (!(m_mmu & 0x01))
 			return m_ram->pointer()[offset];
@@ -454,9 +454,9 @@ READ8_MEMBER(a400_state::a130xe_low_r)
 
 WRITE8_MEMBER(a400_state::a130xe_low_w)
 {
-	if (offset < 0x4000)	// 0x0000-0x3fff
+	if (offset < 0x4000)    // 0x0000-0x3fff
 		m_ram->pointer()[offset] = data;
-	else if (offset < 0x8000)	// 0x4000-0x7fff
+	else if (offset < 0x8000)   // 0x4000-0x7fff
 	{
 		// NOTE: ANTIC accesses to extra RAM are not supported yet!
 		if (!(m_mmu & 0x80) && offset >= 0x5000 && offset < 0x5800)
@@ -466,14 +466,14 @@ WRITE8_MEMBER(a400_state::a130xe_low_w)
 		else
 			m_ram->pointer()[offset] = data;
 	}
-	else if (offset < 0xa000)	// 0x5800-0x7fff
+	else if (offset < 0xa000)   // 0x5800-0x7fff
 		m_ram->pointer()[offset] = data;
-	else if (offset < 0xc000)	// 0xa000-0xbfff
+	else if (offset < 0xc000)   // 0xa000-0xbfff
 	{
 		if (m_mmu & 0x02)
 			m_ram->pointer()[offset] = data;
 	}
-	else	// 0xc000-0xcfff
+	else    // 0xc000-0xcfff
 	{
 		if (!(m_mmu & 0x01))
 			m_ram->pointer()[offset] = data;
@@ -482,22 +482,22 @@ WRITE8_MEMBER(a400_state::a130xe_low_w)
 
 READ8_MEMBER(a400_state::xegs_low_r)
 {
-	if (offset < 0x5000)	// 0x0000-0x4fff
+	if (offset < 0x5000)    // 0x0000-0x4fff
 		return m_ram->pointer()[offset];
-	else if (offset < 0x5800)	// 0x5000-0x57ff
+	else if (offset < 0x5800)   // 0x5000-0x57ff
 	{
 		if (m_mmu & 0x80)
 			return m_ram->pointer()[offset];
 		else
 			return m_region_maincpu->base()[0xd000 + (offset & 0x7ff)];
 	}
-	else if (offset < 0x8000)	// 0x5800-0x7fff
+	else if (offset < 0x8000)   // 0x5800-0x7fff
 		return m_ram->pointer()[offset];
-	else if (offset < 0xa000)	// 0x8000-0x9fff
+	else if (offset < 0xa000)   // 0x8000-0x9fff
 		return m_region_maincpu->base()[0x8000 + (offset & 0x1fff)];
-	else if (offset < 0xc000)	// 0xa000-0xbfff
+	else if (offset < 0xc000)   // 0xa000-0xbfff
 		return m_region_maincpu->base()[0x8000 + (offset & 0x1fff)];
-	else	// 0xc000-0xcfff
+	else    // 0xc000-0xcfff
 	{
 		if (!(m_mmu & 0x01))
 			return m_ram->pointer()[offset];
@@ -508,18 +508,18 @@ READ8_MEMBER(a400_state::xegs_low_r)
 
 WRITE8_MEMBER(a400_state::xegs_low_w)
 {
-	if (offset < 0x5000)	// 0x0000-0x4fff
+	if (offset < 0x5000)    // 0x0000-0x4fff
 		m_ram->pointer()[offset] = data;
-	else if (offset < 0x5800)	// 0x5000-0x57ff
+	else if (offset < 0x5800)   // 0x5000-0x57ff
 	{
 		if (m_mmu & 0x80)
 			m_ram->pointer()[offset] = data;
 	}
-	else if (offset < 0x8000)	// 0x5800-0x7fff
+	else if (offset < 0x8000)   // 0x5800-0x7fff
 		m_ram->pointer()[offset] = data;
-	else if (offset < 0xc000)	// 0xa000-0xbfff
+	else if (offset < 0xc000)   // 0xa000-0xbfff
 		return;
-	else	// 0xc000-0xcfff
+	else    // 0xc000-0xcfff
 	{
 		if (!(m_mmu & 0x01))
 			m_ram->pointer()[offset] = data;
@@ -1705,14 +1705,14 @@ void a400_state::setup_ram(int bank, UINT32 size)
 
 	switch (bank)
 	{
-		case 0:	// 0x0000-0x7fff
+		case 0: // 0x0000-0x7fff
 			ram_top = MIN(size, 0x8000) - 1;
 			m_maincpu->space(AS_PROGRAM).install_readwrite_bank(0x0000, ram_top, "0000");
 			if (m_0000 == NULL)
 				m_0000.findit();
 			m_0000->set_base(m_ram->pointer());
 			break;
-		case 1:	// 0x8000-0x9fff
+		case 1: // 0x8000-0x9fff
 			ram_top = MIN(size, 0xa000) - 1;
 			if (ram_top > 0x8000)
 			{
@@ -1720,9 +1720,9 @@ void a400_state::setup_ram(int bank, UINT32 size)
 				if (m_8000 == NULL)
 					m_8000.findit();
 				m_8000->set_base(m_ram->pointer() + 0x8000);
-			}	
+			}
 			break;
-		case 2:	// 0xa000-0xbfff
+		case 2: // 0xa000-0xbfff
 			ram_top = MIN(size, 0xc000) - 1;
 			if (ram_top > 0xa000)
 			{
@@ -1730,7 +1730,7 @@ void a400_state::setup_ram(int bank, UINT32 size)
 				if (m_a000 == NULL)
 					m_a000.findit();
 				m_a000->set_base(m_ram->pointer() + 0xa000);
-			}	
+			}
 			break;
 	}
 }
@@ -1745,7 +1745,7 @@ READ8_MEMBER(a400_state::special_read_8000)
 	{
 		offset += 0x8000;
 		if (m_ram->size() < offset)
-			return 0;		
+			return 0;
 		else
 			return m_ram->pointer()[offset];
 	}
@@ -1769,7 +1769,7 @@ READ8_MEMBER(a400_state::special_read_a000)
 	{
 		offset += 0xa000;
 		if (m_ram->size() < offset)
-			return 0;		
+			return 0;
 		else
 			return m_ram->pointer()[offset];
 	}
@@ -1808,7 +1808,7 @@ WRITE8_MEMBER(a400_state::disable_cart)
 			case A800_EXPRESS:
 			case A800_DIAMOND:
 			case A800_WILLIAMS:
-				// use m_cart_disabled & m_last_offs to avoid continuous remapping of 
+				// use m_cart_disabled & m_last_offs to avoid continuous remapping of
 				// the memory space in some games (e.g. dropzone)
 				if (offset & 0x8 && !m_cart_disabled)
 					m_cart_disabled = 1;
@@ -1816,7 +1816,7 @@ WRITE8_MEMBER(a400_state::disable_cart)
 				{
 					if (m_cart_disabled)
 						m_cart_disabled = 0;
-					
+
 					if ((offset & 0x7) != m_last_offs)
 					{
 						// we enter here only if we are writing to a different offset than last time
@@ -1833,7 +1833,7 @@ WRITE8_MEMBER(a400_state::disable_cart)
 				{
 					if (m_cart_disabled)
 						m_cart_disabled = 0;
-					
+
 					if ((offset & 0x0f) != m_last_offs)
 					{
 						// we enter here only if we are writing to a different offset than last time
@@ -1845,7 +1845,7 @@ WRITE8_MEMBER(a400_state::disable_cart)
 			case A800_SPARTADOS:
 				// writes with offset & 8 are also used to enable/disable the subcart, so they go through!
 				m_cart->write_d5xx(space, offset, data);
-				break;			
+				break;
 			case A800_OSSM091:
 			case A800_OSS8K:
 				if ((offset & 0x9) == 0x08)
@@ -1868,7 +1868,7 @@ WRITE8_MEMBER(a400_state::disable_cart)
 				break;
 			default:
 				break;
-		}	
+		}
 	}
 }
 
@@ -1958,7 +1958,7 @@ void a400_state::setup_cart(a800_cart_slot_device *slot)
 				m_maincpu->space(AS_PROGRAM).install_write_handler(0x4000, 0x5fff, write8_delegate(FUNC(a800_cart_slot_device::write_80xx),(a800_cart_slot_device*)slot));
 				m_maincpu->space(AS_PROGRAM).unmap_write(0x6000, 0xbfff);
 				break;
-		}	
+		}
 	}
 }
 
@@ -2014,7 +2014,7 @@ MACHINE_START_MEMBER( a400_state, a800 )
 MACHINE_START_MEMBER( a400_state, a800xl )
 {
 	m_mmu = 0xfd;
-	m_ext_bank = 0x03;	// only used by a130xe
+	m_ext_bank = 0x03;  // only used by a130xe
 	setup_cart(m_cart);
 
 	save_item(NAME(m_cart_disabled));
@@ -2056,8 +2056,8 @@ WRITE8_MEMBER(a400_state::gtia_cb)
  **************************************************************/
 
 WRITE8_MEMBER(a400_state::a600xl_pia_pb_w)
-{ 
-	m_mmu = data; 
+{
+	m_mmu = data;
 }
 
 WRITE8_MEMBER(a400_state::a800xl_pia_pb_w)

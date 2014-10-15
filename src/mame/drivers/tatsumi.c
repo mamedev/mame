@@ -1397,7 +1397,7 @@ DRIVER_INIT_MEMBER(tatsumi_state,cyclwarr)
 	int len1 = memregion("gfx2")->bytes();
 	UINT8 *src2 = memregion("gfx3")->base();
 	int len2 = memregion("gfx3")->bytes();
-	
+
 	for (int i=0; i<len1; i+=32)
 	{
 		memcpy(dst,src1,32);

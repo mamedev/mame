@@ -1926,8 +1926,8 @@ static MACHINE_CONFIG_DERIVED( cpc50b, msx_ntsc )
 	// 1? Cartridge slot
 	// No keyboard?
 	// No cassette port?
-	// No printer port? 
-    
+	// No printer port?
+
 	MCFG_MSX_LAYOUT_ROM("bios", 0, 0, 0, 2, "maincpu", 0x0000)
 	MCFG_MSX_LAYOUT_CARTRIDGE("cartslot1", 1, 0)
 	MCFG_MSX_LAYOUT_RAM("ram", 2, 0, 3, 1)  /* 16KB RAM */
@@ -2142,7 +2142,7 @@ static MACHINE_CONFIG_DERIVED( gfc1080a, msx_ntsc )
 	MCFG_MSX_LAYOUT_CARTRIDGE("cartslot1", 1, 0)
 	MCFG_MSX_LAYOUT_RAM("ram", 2, 0, 0, 4) // 64KB RAM
 	MCFG_MSX_LAYOUT_CARTRIDGE("cartslot2", 3, 0)
-    
+
 	MCFG_FRAGMENT_ADD( msx1_cartlist )
 MACHINE_CONFIG_END
 
@@ -4009,7 +4009,7 @@ static MACHINE_CONFIG_DERIVED( hc6, msx_ntsc )
 	// AY8910/YM2149?
 	// FDC: None, 0 drives,
 	// 2 Cartridge slots?
-    
+
 	MCFG_MSX_LAYOUT_ROM("bios", 0, 0, 0, 2, "maincpu", 0x0000)
 	MCFG_MSX_LAYOUT_CARTRIDGE("cartslot1", 1, 0)
 	MCFG_MSX_LAYOUT_RAM("ram", 2, 0, 2, 2) // 32KB RAM
@@ -4029,7 +4029,7 @@ static MACHINE_CONFIG_DERIVED( hc7, msx_ntsc )
 	// AY8910/YM2149?
 	// FDC: None, 0 drives,
 	// 2 Cartridge slots?
-    
+
 	MCFG_MSX_LAYOUT_ROM("bios", 0, 0, 0, 2, "maincpu", 0x0000)
 	MCFG_MSX_LAYOUT_CARTRIDGE("cartslot1", 1, 0)
 	MCFG_MSX_LAYOUT_RAM("ram", 2, 0, 0, 4) // 64KB RAM
@@ -4062,7 +4062,7 @@ MACHINE_CONFIG_END
 
 /* MSX - Yamaha CX5F (with SFG05) */
 
-ROM_START (cx5f)   
+ROM_START (cx5f)
 	ROM_REGION (0x8000, "maincpu", 0)
 	ROM_LOAD ("cx5fbios.rom", 0x0000, 0x8000, CRC(dc662057) SHA1(36d77d357a5fd15af2ab266ee66e5091ba4770a3))
 ROM_END
@@ -6036,30 +6036,30 @@ MACHINE_CONFIG_END
 /* MSX2 - Sanyo MPC-2500FD */
 
 ROM_START (mpc2500f)
-    ROM_REGION (0x10000, "maincpu", 0)
-    ROM_LOAD ("mpc2500fdbios.rom", 0x0000, 0x8000, CRC(e7d08e29) SHA1(0f851ee7a1cf79819f61cc89e9948ee72a413802))
-    ROM_LOAD ("mpc2500fdext.rom",  0x8000, 0x4000, CRC(3d7dc718) SHA1(e1f834b28c3ee7c9f79fe6fbf2b23c8a0617892b))
+	ROM_REGION (0x10000, "maincpu", 0)
+	ROM_LOAD ("mpc2500fdbios.rom", 0x0000, 0x8000, CRC(e7d08e29) SHA1(0f851ee7a1cf79819f61cc89e9948ee72a413802))
+	ROM_LOAD ("mpc2500fdext.rom",  0x8000, 0x4000, CRC(3d7dc718) SHA1(e1f834b28c3ee7c9f79fe6fbf2b23c8a0617892b))
 	ROM_LOAD ("mpc2500fddisk.rom", 0xc000, 0x4000, CRC(38454059) SHA1(58ac78bba29a06645ca8d6a94ef2ac68b743ad32))
 ROM_END
 
 static MACHINE_CONFIG_DERIVED( mpc2500f, msx2 )
-    // YM2149
-    // FDC: wd2793?, 1? 3.5" DSDD drive?
-    // 2 Cartridge slots?
+	// YM2149
+	// FDC: wd2793?, 1? 3.5" DSDD drive?
+	// 2 Cartridge slots?
 	// S-3527 MSX Eninge
 
-    MCFG_MSX_LAYOUT_ROM("bios", 0, 0, 0, 2, "maincpu", 0x0000)
-    MCFG_MSX_LAYOUT_CARTRIDGE("cartslot1", 1, 0)
-    MCFG_MSX_LAYOUT_CARTRIDGE("cartslot2", 2, 0)
+	MCFG_MSX_LAYOUT_ROM("bios", 0, 0, 0, 2, "maincpu", 0x0000)
+	MCFG_MSX_LAYOUT_CARTRIDGE("cartslot1", 1, 0)
+	MCFG_MSX_LAYOUT_CARTRIDGE("cartslot2", 2, 0)
 	MCFG_MSX_LAYOUT_ROM("ext", 2, 3, 0, 1, "maincpu", 0x8000)
 	MCFG_MSX_LAYOUT_DISK1("disk", 3, 1, 1, 1, "maincpu", 0xC000)
-    MCFG_MSX_LAYOUT_RAM_MM("ram_mm", 3, 2, 0x10000)   /* 64KB?? Mapper RAM */
+	MCFG_MSX_LAYOUT_RAM_MM("ram_mm", 3, 2, 0x10000)   /* 64KB?? Mapper RAM */
 
 	MCFG_FRAGMENT_ADD( msx_wd2793_force_ready )
 	MCFG_FRAGMENT_ADD( msx_1_35_dd_drive )
 	MCFG_FRAGMENT_ADD( msx2_floplist )
 
-    MCFG_FRAGMENT_ADD( msx2_cartlist )
+	MCFG_FRAGMENT_ADD( msx2_cartlist )
 MACHINE_CONFIG_END
 
 /* MSX2 - Sanyo Wavy MPC-25FD */
@@ -7202,7 +7202,7 @@ ROM_START (victhc95a)
 	ROM_LOAD ("hc95aext.rom",   0x8000, 0x4000, CRC(4a48779c) SHA1(b8e30d604d319d511cbfbc61e5d8c38fbb9c5a33))
 	ROM_LOAD ("hc95adisk.rom",  0xc000, 0x4000, CRC(11bca2ed) SHA1(a7a34671bddb48fa6c74182e2977f9129558ec32))
 	ROM_LOAD ("hc95afirm.rom", 0x10000, 0x4000, CRC(53791d91) SHA1(caeffdd654394726c8c0824b21af7ff51c0b1031))
-    
+
 	ROM_REGION (0x20000, "kanji", 0)
 	ROM_LOAD ("hc95akfn.rom", 0x0000, 0x20000, CRC(d23d4d2d) SHA1(db03211b7db46899df41db2b1dfbec972109a967))
 ROM_END
@@ -7215,7 +7215,7 @@ static MACHINE_CONFIG_DERIVED( victhc95a, msx2 )
 	// 1 Cartridge slot (slot 1 or 2?)
 	// S-1985 MSX Engine
 	// V9958 VDP
-    
+
 	MCFG_MSX_LAYOUT_ROM("bios", 0, 0, 0, 2, "maincpu", 0x0000)
 	MCFG_MSX_LAYOUT_ROM("ext", 0, 1, 0, 1, "maincpu", 0x8000)
 	MCFG_MSX_LAYOUT_ROM("firm", 0, 1, 1, 1, "maincpu", 0x10000)
@@ -7387,7 +7387,7 @@ ROM_END
 
 static MACHINE_CONFIG_DERIVED( yis604, msx2 )
 	// YM2149 (in S-3527)
-	// FDC: None, 0 drives  
+	// FDC: None, 0 drives
 	// 2 Cartridge slots
 	// S-3527 MSX Engine
 
@@ -7398,7 +7398,7 @@ static MACHINE_CONFIG_DERIVED( yis604, msx2 )
 	MCFG_MSX_LAYOUT_ROM("yrm502", 3, 1, 1, 1, "maincpu", 0xc000)
 	MCFG_MSX_LAYOUT_RAM_MM("ram_mm", 3, 2, 0x10000) // 64KB Mapper RAM
 	MCFG_MSX_LAYOUT_YAMAHA_EXPANSION("expansion", 3, 3, "sfg05")
-    
+
 	MCFG_FRAGMENT_ADD( msx2_cartlist )
 MACHINE_CONFIG_END
 
@@ -8433,4 +8433,3 @@ COMP(19??, hbf9sp,     0,        0, hbf9sp,     msx2jp,   driver_device, 0, "Son
 /* Temporary placeholders, Turbo-R hardware is not supported yet */
 COMP(19??, fsa1gt,     0,        0, fsa1gt,     msx2jp,   driver_device, 0, "Panasonic", "FS-A1GT (MSX Turbo-R)", GAME_NOT_WORKING)
 COMP(19??, fsa1st,     0,        0, fsa1st,     msx2jp,   driver_device, 0, "Panasonic", "FS-A1ST (MSX Turbo-R)", GAME_NOT_WORKING)
-

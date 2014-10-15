@@ -27,12 +27,12 @@ public:
 	potgold_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu") { }
-	
+
 		required_device<cpu_device> m_maincpu;
-	
+
 	virtual void machine_reset();
 	virtual void video_start();
-	
+
 	TMS340X0_SCANLINE_RGB32_CB_MEMBER(scanline_update);
 };
 

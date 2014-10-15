@@ -1,11 +1,11 @@
 /*
  * digiblst.h
  *
- *	Digiblaster - a DIY printer port DAC for the Amstrad CPC
- *	Printed in the German magazine CPC Amstrad International issue 8-9/1991
- *	Uses Strobe (inverted on the CPC) for the 8th bit (CPCs only have 7-bit printer ports)
+ *  Digiblaster - a DIY printer port DAC for the Amstrad CPC
+ *  Printed in the German magazine CPC Amstrad International issue 8-9/1991
+ *  Uses Strobe (inverted on the CPC) for the 8th bit (CPCs only have 7-bit printer ports)
  *
- *	Code borrows from the Covox Speech Thing device.
+ *  Code borrows from the Covox Speech Thing device.
  *
  *  Created on: 23/08/2014
  */

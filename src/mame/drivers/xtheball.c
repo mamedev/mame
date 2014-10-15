@@ -327,7 +327,7 @@ static MACHINE_CONFIG_START( xtheball, xtheball_state )
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_TMS340X0_HALT_ON_RESET(FALSE) /* halt on reset */
 	MCFG_TMS340X0_PIXEL_CLOCK(10000000) /* pixel clock */
-	MCFG_TMS340X0_PIXELS_PER_CLOCK(1) /* pixels per clock */	
+	MCFG_TMS340X0_PIXELS_PER_CLOCK(1) /* pixels per clock */
 	MCFG_TMS340X0_SCANLINE_RGB32_CB(xtheball_state, scanline_update)     /* scanline updater (rgb32) */
 	MCFG_TMS340X0_TO_SHIFTREG_CB(xtheball_state, to_shiftreg)  /* write to shiftreg function */
 	MCFG_TMS340X0_FROM_SHIFTREG_CB(xtheball_state, from_shiftreg) /* read from shiftreg function */

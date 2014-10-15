@@ -60,7 +60,7 @@ private:
 	UINT32          m_rom_size;
 
 	// live state
-    UINT8           m_portdata[4];
+	UINT8           m_portdata[4];
 	UINT8           m_keyon;
 	UINT8           m_mode;
 

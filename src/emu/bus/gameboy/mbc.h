@@ -183,11 +183,11 @@ class gb_rom_188in1_device : public gb_rom_mbc1_device
 public:
 	// construction/destruction
 	gb_rom_188in1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	// device-level overrides
 	virtual void device_start() { shared_start(); save_item(NAME(m_game_base)); };
 	virtual void device_reset() { shared_reset(); m_game_base = 0; };
-	
+
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read_rom);
 	virtual DECLARE_WRITE8_MEMBER(write_bank);

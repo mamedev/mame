@@ -264,7 +264,7 @@ void samples_device::device_start()
 
 	// initialize any custom handlers
 	m_samples_start_cb.bind_relative_to(*owner());
-	
+
 	if (!m_samples_start_cb.isnull())
 		m_samples_start_cb();
 }

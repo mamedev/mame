@@ -30,11 +30,11 @@ public:
 	required_device<okim6295_device> m_oki;
 	required_device<tms34010_device> m_tms;
 	required_device<tlc34076_device> m_tlc34076;
-	
+
 	required_shared_ptr<UINT16> m_control;
 	required_shared_ptr<UINT16> m_vram0;
 	required_shared_ptr<UINT16> m_vram1;
-	
+
 	UINT8 m_tms_irq;
 	UINT8 m_hack_irq;
 	UINT8 m_prot_input[16];
@@ -49,7 +49,7 @@ public:
 	void ultennis_protection();
 	void cheesech_protection();
 	void stonebal_protection();
-	
+
 	int m_xor[16];
 	int m_is_stoneball;
 	UINT16 *m_blitter_base;
@@ -80,7 +80,7 @@ public:
 	void execute_blit();
 	void update_irq_state();
 	inline UINT16 *address_to_vram(offs_t *address);
-	
+
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };

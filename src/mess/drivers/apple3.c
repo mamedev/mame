@@ -33,7 +33,7 @@ static SLOT_INTERFACE_START(apple3_cards)
 	SLOT_INTERFACE("cffa2", A2BUS_CFFA2_6502)  /* CFFA2000 Compact Flash for Apple II (www.dreher.net), 6502 firmware */
 	SLOT_INTERFACE("applicard", A2BUS_APPLICARD)    /* PCPI Applicard */
 	SLOT_INTERFACE("thclock", A2BUS_THUNDERCLOCK)    /* ThunderWare ThunderClock Plus - driver assumes slot 2 by default */
-	SLOT_INTERFACE("mouse", A2BUS_MOUSE)	/* Apple II Mouse Card */
+	SLOT_INTERFACE("mouse", A2BUS_MOUSE)    /* Apple II Mouse Card */
 SLOT_INTERFACE_END
 
 static SLOT_INTERFACE_START( a3_floppies )

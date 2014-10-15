@@ -167,10 +167,10 @@ bool ws_cart_slot_device::call_load()
 		UINT8 *ROM;
 		UINT32 size = (software_entry() == NULL) ? length() : get_software_region_length("rom");
 		UINT32 nvram_size = 0;
-		
+
 		m_cart->rom_alloc(size, tag());
 		ROM = m_cart->get_rom_base();
-			
+
 		if (software_entry() == NULL)
 			fread(ROM, size);
 		else
@@ -261,35 +261,35 @@ int ws_cart_slot_device::get_cart_type(UINT8 *ROM, UINT32 len, UINT32 &nvram_len
 	{
 		case 0x00:
 			break;
-		case 0x01:	// SRAM 64Kbit
+		case 0x01:  // SRAM 64Kbit
 			type = WS_SRAM;
 			nvram_len = 0x2000;
 			break;
-		case 0x02:	// SRAM 256Kbit
+		case 0x02:  // SRAM 256Kbit
 			type = WS_SRAM;
 			nvram_len = 0x8000;
 			break;
-		case 0x05:	// SRAM 512Kbit
+		case 0x05:  // SRAM 512Kbit
 			type = WS_SRAM;
 			nvram_len = 0x10000;
 			break;
-		case 0x03:	// SRAM 1Mbit
+		case 0x03:  // SRAM 1Mbit
 			type = WS_SRAM;
 			nvram_len = 0x20000;
 			break;
-		case 0x04:	// SRAM 2Mbit
+		case 0x04:  // SRAM 2Mbit
 			type = WS_SRAM;
 			nvram_len = 0x40000;
 			break;
-		case 0x10:	// EEPROM 1Kbit
+		case 0x10:  // EEPROM 1Kbit
 			type = WS_EEPROM;
 			nvram_len = 0x80;
 			break;
-		case 0x50:	// EEPROM 8Kbit
+		case 0x50:  // EEPROM 8Kbit
 			type = WS_EEPROM;
 			nvram_len = 0x400;
 			break;
-		case 0x20:	// EEPROM 16Kbit
+		case 0x20:  // EEPROM 16Kbit
 			type = WS_EEPROM;
 			nvram_len = 0x800;
 			break;
@@ -298,7 +298,7 @@ int ws_cart_slot_device::get_cart_type(UINT8 *ROM, UINT32 len, UINT32 &nvram_len
 			logerror("Unknown RAM size [0x%X]\n", ROM[(chunks - 1) * 0x10000 + 0xfffb]);
 			break;
 	}
-	
+
 	return type;
 }
 
@@ -315,7 +315,7 @@ void ws_cart_slot_device::get_default_card_software(astring &result)
 		dynamic_buffer rom(size);
 		int type;
 		UINT32 nvram;
-		
+
 		core_fread(m_file, rom, size);
 
 		// nvram size is not really used here, but we set it up nevertheless
@@ -427,9 +427,9 @@ void ws_cart_slot_device::internal_header_logging(UINT8 *ROM, UINT32 offs, UINT3
 	int sum = 0, banks = len / 0x10000;
 	UINT8 romsize, ramtype, ramsize;
 	romsize = ROM[offs + 0xfffa];
-	ramtype = (ROM[offs + 0xfffb] & 0xf0) ? 1 : 0;	// 1 = EEPROM, 0 = SRAM
+	ramtype = (ROM[offs + 0xfffb] & 0xf0) ? 1 : 0;  // 1 = EEPROM, 0 = SRAM
 	ramsize = ramtype ? ((ROM[offs + 0xfffb] & 0xf0) >> 4) : (ROM[offs + 0xfffb] & 0x0f);
-	
+
 
 	logerror( "ROM DETAILS\n" );
 	logerror( "===========\n\n" );

@@ -201,21 +201,21 @@ void wswan_state::common_start()
 {
 	m_ws_bios_bank = auto_alloc_array(machine(), UINT8, 0x10000);
 	memcpy(m_ws_bios_bank + 0xffc0, ws_fake_bios_code, 0x40);
-	
+
 	m_vdp.timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(wswan_state::wswan_scanline_interrupt),this), &m_vdp);
 	m_vdp.timer->adjust(attotime::from_ticks(256, 3072000), 0, attotime::from_ticks(256, 3072000));
-	
+
 	wswan_register_save();
-	
+
 	machine().device<nvram_device>("nvram")->set_base(m_internal_eeprom, INTERNAL_EEPROM_SIZE);
-	
+
 	if (m_cart->exists())
-	{		
+	{
 		// ROM
 		m_maincpu->space(AS_PROGRAM).install_read_handler(0x20000, 0x2ffff, read8_delegate(FUNC(ws_cart_slot_device::read_rom20),(ws_cart_slot_device*)m_cart));
 		m_maincpu->space(AS_PROGRAM).install_read_handler(0x30000, 0x3ffff, read8_delegate(FUNC(ws_cart_slot_device::read_rom30),(ws_cart_slot_device*)m_cart));
 		m_maincpu->space(AS_PROGRAM).install_read_handler(0x40000, 0xeffff, read8_delegate(FUNC(ws_cart_slot_device::read_rom40),(ws_cart_slot_device*)m_cart));
-		
+
 		// SRAM
 		if (m_cart->get_type() == WS_SRAM)
 		{
@@ -249,7 +249,7 @@ void wswan_state::machine_reset()
 	if (m_cart->exists())
 		m_rotate = m_cart->get_is_rotated();
 	else
-		m_rotate = 0;		
+		m_rotate = 0;
 
 	/* Intialize ports */
 	memcpy(m_ws_portram, ws_portram_init, 256);
@@ -332,14 +332,14 @@ READ8_MEMBER( wswan_state::port_r )
 		case 0xc1:
 		case 0xc2:
 		case 0xc3:
-		case 0xc4:	// EEPROM data
-		case 0xc5:	// EEPROM data
+		case 0xc4:  // EEPROM data
+		case 0xc5:  // EEPROM data
 		case 0xc6:
 		case 0xc7:
 		case 0xc8:
 		case 0xc9:
 		case 0xca:
-		case 0xcb:	// RTC data
+		case 0xcb:  // RTC data
 		case 0xcc:
 		case 0xcd:
 		case 0xce:
@@ -1034,18 +1034,18 @@ WRITE8_MEMBER( wswan_state::port_w )
 				logerror( "Unsupported internal EEPROM command: %X\n", data );
 			}
 			break;
-		case 0xc0:	// ROM bank $40000-$fffff
-		case 0xc1:	// SRAM bank
-		case 0xc2:	// ROM bank $20000-$2ffff
-		case 0xc3:	// ROM bank $30000-$3ffff
+		case 0xc0:  // ROM bank $40000-$fffff
+		case 0xc1:  // SRAM bank
+		case 0xc2:  // ROM bank $20000-$2ffff
+		case 0xc3:  // ROM bank $30000-$3ffff
 		case 0xc4:
 		case 0xc5:
-		case 0xc6:	// EEPROM address / command
-		case 0xc7:	// EEPROM address / command
-		case 0xc8:	// EEPROM command
+		case 0xc6:  // EEPROM address / command
+		case 0xc7:  // EEPROM address / command
+		case 0xc8:  // EEPROM command
 		case 0xc9:
-		case 0xca:	// RTC command
-		case 0xcb:	// RTC data
+		case 0xca:  // RTC command
+		case 0xcb:  // RTC data
 		case 0xcc:
 		case 0xcd:
 		case 0xce:

@@ -248,7 +248,7 @@ READ8_MEMBER( pet_state::read )
 				data = m_rom->base()[offset - 0x9000];
 		}
 		break;
-			
+
 	case SELB:
 		if (norom)
 		{
@@ -258,7 +258,7 @@ READ8_MEMBER( pet_state::read )
 				data = m_rom->base()[offset - 0x9000];
 		}
 		break;
-			
+
 	case SELC: case SELD: case SELF:
 		if (norom)
 		{

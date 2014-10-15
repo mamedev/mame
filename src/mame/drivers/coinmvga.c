@@ -187,7 +187,7 @@
 
   - Added Colorama (P521 V13, Spanish).
   - Changed the Colorama parent set description to Colorama (P521, English).
-  - Added technical notes.       	
+  - Added technical notes.
 
 
   [2009-08-18]

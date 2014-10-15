@@ -1411,7 +1411,7 @@ void mazerbla_state::machine_start()
 
 	save_item(NAME(m_vsb_ls273));
 	save_item(NAME(m_soundlatch));
-	
+
 	machine().save().register_postload(save_prepost_delegate(FUNC(mazerbla_state::rom_bank_select), this));
 }
 

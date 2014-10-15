@@ -76,7 +76,7 @@ public:
 	template<class _Object> static devcb_base &set_kb_read_callback(device_t &device, _Object object) { return downcast<hd61700_cpu_device &>(device).m_kb_read_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_port_write_callback(device_t &device, _Object object) { return downcast<hd61700_cpu_device &>(device).m_port_write_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_port_read_callback(device_t &device, _Object object) { return downcast<hd61700_cpu_device &>(device).m_port_read_cb.set_callback(object); }
-	
+
 protected:
 	// device-level overrides
 	virtual void device_start();
@@ -155,7 +155,7 @@ protected:
 	devcb_write8    m_kb_write_cb;      //keyboard matrix write
 	devcb_read8     m_port_read_cb;     //8 bit port read
 	devcb_write8    m_port_write_cb;    //8 bit port write
-	
+
 	// flag definitions
 	static const int FLAG_Z     = 0x80;
 	static const int FLAG_C     = 0x40;

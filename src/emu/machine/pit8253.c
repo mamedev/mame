@@ -103,7 +103,7 @@ void pit8253_device::device_start()
 	for (int timerno = 0; timerno < PIT8253_MAX_TIMER; timerno++)
 	{
 		pit8253_timer *timer = get_timer(timerno);
-		
+
 		/* initialize timer */
 		timer->updatetimer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pit8253_device::update_timer_cb),this));
 		timer->updatetimer->adjust(attotime::never, timerno);

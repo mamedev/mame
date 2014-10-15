@@ -243,7 +243,7 @@ WRITE8_MEMBER( m5_state::fd5_tc_w )
 static ADDRESS_MAP_START( m5_mem, AS_PROGRAM, 8, m5_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	//AM_RANGE(0x2000, 0x6fff)		// mapped by the cartslot
+	//AM_RANGE(0x2000, 0x6fff)      // mapped by the cartslot
 	AM_RANGE(0x7000, 0x7fff) AM_RAM
 	AM_RANGE(0x8000, 0xffff) AM_RAM
 ADDRESS_MAP_END

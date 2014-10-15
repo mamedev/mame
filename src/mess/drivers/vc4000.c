@@ -378,12 +378,12 @@ void vc4000_state::machine_start()
 				m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x1800, 0x1bff, read8_delegate(FUNC(vc4000_cart_slot_device::read_ram),(vc4000_cart_slot_device*)m_cart), write8_delegate(FUNC(vc4000_cart_slot_device::write_ram),(vc4000_cart_slot_device*)m_cart));
 				break;
 			// undumped Radofin Hobby Module
-//			case VC4000_HOBBY:
-//				m_maincpu->space(AS_PROGRAM).install_read_handler(0x0000, 0x07ff, read8_delegate(FUNC(vc4000_cart_slot_device::read_rom),(vc4000_cart_slot_device*)m_cart));
-//				m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x0800, 0x0fff, read8_delegate(FUNC(vc4000_cart_slot_device::read_ram),(vc4000_cart_slot_device*)m_cart), write8_delegate(FUNC(vc4000_cart_slot_device::write_ram),(vc4000_cart_slot_device*)m_cart));
-//				break;
+//          case VC4000_HOBBY:
+//              m_maincpu->space(AS_PROGRAM).install_read_handler(0x0000, 0x07ff, read8_delegate(FUNC(vc4000_cart_slot_device::read_rom),(vc4000_cart_slot_device*)m_cart));
+//              m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x0800, 0x0fff, read8_delegate(FUNC(vc4000_cart_slot_device::read_ram),(vc4000_cart_slot_device*)m_cart), write8_delegate(FUNC(vc4000_cart_slot_device::write_ram),(vc4000_cart_slot_device*)m_cart));
+//              break;
 		}
-		
+
 		m_cart->save_ram();
 	}
 }
@@ -398,7 +398,7 @@ QUICKLOAD_LOAD_MEMBER( vc4000_state,vc4000)
 	dynamic_buffer quick_data;
 	int read_;
 	int result = IMAGE_INIT_FAIL;
-	
+
 	quick_length = image.length();
 	quick_data.resize(quick_length);
 	read_ = image.fread( quick_data, quick_length);
@@ -420,7 +420,7 @@ QUICKLOAD_LOAD_MEMBER( vc4000_state,vc4000)
 			{
 				int quick_addr = quick_data[1] * 256 + quick_data[2];
 				exec_addr = quick_data[3] * 256 + quick_data[4];
-				
+
 				if (quick_length < 0x5)
 				{
 					image.seterror(IMAGE_ERROR_INVALIDIMAGE, "File too short");
@@ -436,13 +436,13 @@ QUICKLOAD_LOAD_MEMBER( vc4000_state,vc4000)
 					{
 						space.write_byte(0x08be, quick_data[3]);
 						space.write_byte(0x08bf, quick_data[4]);
-						
+
 						for (i = 5; i < quick_length; i++)
 							space.write_byte(i - 5 + quick_addr, quick_data[i]);
-						
+
 						/* display a message about the loaded quickload */
 						image.message(" Quickload: size=%04X : start=%04X : end=%04X : exec=%04X",quick_length-5,quick_addr,quick_addr+quick_length-5,exec_addr);
-						
+
 						// Start the quickload
 						m_maincpu->set_state_int(S2650_PC, exec_addr);
 						result = IMAGE_INIT_PASS;
@@ -460,7 +460,7 @@ QUICKLOAD_LOAD_MEMBER( vc4000_state,vc4000)
 				else
 				{
 					exec_addr = quick_data[1] * 256 + quick_data[2];
-					
+
 					if (exec_addr >= quick_length)
 					{
 						image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Exec address beyond end of file");
@@ -482,14 +482,14 @@ QUICKLOAD_LOAD_MEMBER( vc4000_state,vc4000)
 							{
 								space.write_byte(0x08be, quick_data[1]);
 								space.write_byte(0x08bf, quick_data[2]);
-								
+
 								// load to 08C0-15FF (standard ram + extra)
 								int read_ = 0x1600;
 								if (quick_length < 0x1600)
 									read_ = quick_length;
 								for (i = 0x8c0; i < read_; i++)
 									space.write_byte(i, quick_data[i]);
-								
+
 								// load to 1F50-1FAF (PVI regs)
 								read_ = 0x1FB0;
 								if (quick_length < 0x1FB0)
@@ -497,10 +497,10 @@ QUICKLOAD_LOAD_MEMBER( vc4000_state,vc4000)
 								if (quick_length > 0x1FC0)
 									for (i = 0x1F50; i < read_; i++)
 										vc4000_video_w(space, i-0x1f00, quick_data[i]);
-								
+
 								/* display a message about the loaded quickload */
 								image.message(" Quickload: size=%04X : exec=%04X",quick_length,exec_addr);
-								
+
 								// Start the quickload
 								m_maincpu->set_state_int(S2650_PC, exec_addr);
 								result = IMAGE_INIT_PASS;

@@ -44,7 +44,7 @@ public:
 		m_io_options(*this, "OPTIONS"),
 		m_io_test(*this, "TEST"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")  
+		m_palette(*this, "palette")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -66,7 +66,7 @@ public:
 
 	DECLARE_READ8_MEMBER(intv_right_control_r);
 	DECLARE_READ8_MEMBER(intv_left_control_r);
-	
+
 	UINT8 m_bus_copy_mode;
 	UINT8 m_backtab_row;
 	UINT16 m_ram16[0x160];

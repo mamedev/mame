@@ -138,7 +138,7 @@ void hd61700_cpu_device::device_start()
 	m_kb_write_cb.resolve_safe();
 	m_port_read_cb.resolve_safe(0xff);
 	m_port_write_cb.resolve_safe();
-	
+
 	// save state
 	save_item(NAME(m_ppc));
 	save_item(NAME(m_curpc));

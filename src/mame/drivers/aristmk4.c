@@ -1703,7 +1703,7 @@ static MACHINE_CONFIG_START( aristmk4, aristmk4_state )
 
 	MCFG_SOUND_ADD("samples", SAMPLES, 0)
 	MCFG_SAMPLES_CHANNELS(5)  /* one for each meter - can pulse simultaneously */
-	MCFG_SAMPLES_NAMES(meter_sample_names)	
+	MCFG_SAMPLES_NAMES(meter_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.05)
 
 MACHINE_CONFIG_END

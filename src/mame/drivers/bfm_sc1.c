@@ -1054,7 +1054,7 @@ static MACHINE_CONFIG_START( scorpion1, bfm_sc1_state )
 	MCFG_CPU_PERIODIC_INT_DRIVER(bfm_sc1_state, timer_irq,  1000)               // generate 1000 IRQ's per second
 	MCFG_WATCHDOG_TIME_INIT(PERIOD_OF_555_MONOSTABLE(120000,100e-9))
 
-	
+
 	MCFG_BFMBD1_ADD("vfd0",0)
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("aysnd",AY8912, MASTER_CLOCK/4)

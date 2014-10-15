@@ -383,12 +383,12 @@ READ32_MEMBER(vamphalf_state::yorizori_10_r)
 }
 READ32_MEMBER(vamphalf_state::yorizori_1c_r)
 {
-//	printf("yorizori_1c_r %08x\n", space.device().safe_pc());
+//  printf("yorizori_1c_r %08x\n", space.device().safe_pc());
 	return 0x00;// 0xaa;
 }
 WRITE32_MEMBER(vamphalf_state::yorizori_1c_w)
 {
-//	printf("yorizori_1c_w %08x %08x\n", space.device().safe_pc(), data);
+//  printf("yorizori_1c_w %08x %08x\n", space.device().safe_pc(), data);
 }
 
 WRITE32_MEMBER( vamphalf_state::wyvernwg_snd_w )
@@ -2078,7 +2078,7 @@ ROMs:
 ROM_START( yorizori )
 	ROM_REGION32_BE( 0x200000, "user1", ROMREGION_ERASE00 ) /* Hyperstone CPU Code */
 	ROM_LOAD( "prg1", 0x000000, 0x200000, CRC(0e04eb40) SHA1(0cec9dc91aaf9cf7c459c7baac200cf0fcfddc18) )
-	
+
 	ROM_REGION( 0x080000, "qs1000:cpu", 0 ) /* QDSP (8052) Code */
 	ROM_LOAD( "snd5", 0x00000, 0x20000, CRC(79067367) SHA1(a8f0c02dd616ff8c5fb49dea1a116fea2aced19c) )
 	ROM_RELOAD(      0x20000, 0x20000 )

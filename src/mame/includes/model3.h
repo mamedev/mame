@@ -94,7 +94,7 @@ public:
 	required_shared_ptr<UINT64> m_work_ram;
 	required_shared_ptr<UINT64> m_paletteram64;
 	optional_device<dsbz80_device> m_dsbz80;    // Z80-based MPEG Digital Sound Board
-	required_shared_ptr<UINT16> m_soundram;	
+	required_shared_ptr<UINT16> m_soundram;
 
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
@@ -261,7 +261,7 @@ public:
 	DECLARE_DRIVER_INIT(spikeout);
 	DECLARE_DRIVER_INIT(magtruck);
 	DECLARE_DRIVER_INIT(lamachin);
-	DECLARE_DRIVER_INIT(model3_15);	
+	DECLARE_DRIVER_INIT(model3_15);
 	DECLARE_MACHINE_START(model3_10);
 	DECLARE_MACHINE_RESET(model3_10);
 	DECLARE_MACHINE_START(model3_15);

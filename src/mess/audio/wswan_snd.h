@@ -25,7 +25,7 @@ struct CHAN
 	vol_right(0),
 	on(0),
 	signal(0) { }
-	
+
 	UINT16  freq;           /* frequency */
 	UINT32  period;         /* period */
 	UINT32  pos;            /* position */
@@ -44,21 +44,21 @@ class wswan_sound_device : public device_t,
 public:
 	wswan_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~wswan_sound_device() { }
-	
+
 protected:
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
-	
+
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
-	
+
 public:
 	DECLARE_WRITE8_MEMBER( port_w );
-	
+
 private:
 	void wswan_ch_set_freq( CHAN *ch, UINT16 freq );
-	
+
 private:
 	sound_stream *m_channel;
 	CHAN m_audio1;     /* Audio channel 1 */
