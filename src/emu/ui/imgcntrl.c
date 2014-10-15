@@ -132,6 +132,7 @@ void ui_menu_control_device_image::test_create(bool &can_create, bool &need_conf
 void ui_menu_control_device_image::load_software_part()
 {
 	astring temp_name(sld->list_name(), ":", swi->shortname(), ":", swp->name());
+	image->set_init_phase();
 	hook_load(temp_name, true);
 }
 
