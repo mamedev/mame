@@ -45,7 +45,7 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/pit8253.h"
-#include "machine/315-5296.h"
+#include "machine/315_5296.h"
 #include "sound/2612intf.h"
 
 
