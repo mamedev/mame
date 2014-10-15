@@ -344,6 +344,7 @@ void info_xml_creator::output_one_device(device_t &device, const char *devtag)
 	fprintf(m_output, " sourcefile=\"%s\"", xml_normalize_string(device.source()));
 	fprintf(m_output, " isdevice=\"yes\"");
 	fprintf(m_output, " runnable=\"no\"");
+	output_sampleof();
 	fprintf(m_output, ">\n");
 	fprintf(m_output, "\t\t<description>%s</description>\n", xml_normalize_string(device.name()));
 
