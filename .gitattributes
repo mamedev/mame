@@ -5559,6 +5559,7 @@ src/mame/drivers/segas16b.c svneol=native#text/plain
 src/mame/drivers/segas18.c svneol=native#text/plain
 src/mame/drivers/segas24.c svneol=native#text/plain
 src/mame/drivers/segas32.c svneol=native#text/plain
+src/mame/drivers/segaufo.c svneol=native#text/plain
 src/mame/drivers/segaxbd.c svneol=native#text/plain
 src/mame/drivers/segaybd.c svneol=native#text/plain
 src/mame/drivers/seibuspi.c svneol=native#text/plain
