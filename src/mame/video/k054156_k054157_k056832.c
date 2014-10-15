@@ -186,7 +186,6 @@ k056832_device::k056832_device(const machine_config &mconfig, const char *tag, d
 	//m_regs[0x20],
 	//m_regsb[4],
 	m_rombase(NULL),
-	m_videoram(NULL),
 	m_num_gfx_banks(0),
 	m_cur_gfx_banks(0),
 	m_gfx_memory_region(NULL),
@@ -280,7 +279,7 @@ void k056832_device::create_tilemaps()
 
 
 
-	m_videoram = auto_alloc_array_clear(machine(), UINT16, 0x2000 * (K056832_PAGE_COUNT + 1) / 2);
+	m_videoram.resize_and_clear(0x2000 * (K056832_PAGE_COUNT + 1) / 2);
 
 	m_tilemap[0x0] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(k056832_device::get_tile_info0),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
 	m_tilemap[0x1] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(k056832_device::get_tile_info1),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
@@ -319,7 +318,7 @@ void k056832_device::finalize_init()
 	change_rambank();
 	change_rombank();
 
-	save_pointer(NAME(m_videoram), 0x10000);
+	save_item(NAME(m_videoram));
 	save_item(NAME(m_regs));
 	save_item(NAME(m_regsb));
 	save_item(NAME(m_x));

@@ -125,11 +125,13 @@ private:
 	tilemap_t   *m_tilemap[K056832_PAGE_COUNT];
 	bitmap_ind16  *m_pixmap[K056832_PAGE_COUNT];
 
+	dynamic_array<UINT16> m_videoram;
+
 	UINT16    m_regs[0x20];   // 157/832 regs group 1
 	UINT16    m_regsb[4]; // 157/832 regs group 2, board dependent
 
 	UINT8 *   m_rombase;  // pointer to tile gfx data
-	UINT16 *  m_videoram;
+
 	int       m_num_gfx_banks;    // depends on size of graphics ROMs
 	int       m_cur_gfx_banks;        // cached info for K056832_regs[0x1a]
 
