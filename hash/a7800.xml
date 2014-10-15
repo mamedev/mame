@@ -193,7 +193,6 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 		<publisher>Atari</publisher>
 		<info name="serial" value="C300358"/>
 		<part name="cart" interface="a7800_cart">
-			<feature name="pcb_type" value="TYPE-1" />
 			<feature name="slot" value="a78_pokey" />
 			<dataarea name="rom" size="16384">
 				<rom name="devcard.bin" size="16384" crc="3fbe74ce" sha1="4df3657f57e3086bee26fb5c6ea946c509d08553" offset="0" />
@@ -221,7 +220,6 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 		<info name="serial" value="CX7846"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
-			<feature name="pcb_type" value="TYPE-2" />
 			<feature name="slot" value="a78_sg" />
 			<dataarea name="rom" size="131072">
 				<rom name="aceoface.bin" size="131072" crc="05a2b94c" sha1="efd20bd321a81d67fb6430d9ba93d23fb90d8029" offset="0" />
@@ -236,7 +234,6 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 		<info name="serial" value="CX7846"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a7800_cart">
-			<feature name="pcb_type" value="TYPE-2" />
 			<feature name="slot" value="a78_sg" />
 			<dataarea name="rom" size="131072">
 				<rom name="aceofaeu.bin" size="131072" crc="20c5db80" sha1="c43249ba2d38441461e5ffe07ad2e0b46ab1c6df" offset="0" />
@@ -251,7 +248,6 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 		<info name="serial" value="CX7855"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
-			<feature name="pcb_type" value="TYPE-A" />
 			<feature name="slot" value="a78_sg9" />
 			<feature name="peripheral" value="lightgun" /> <!-- Works with Lightgun -->
 			<dataarea name="rom" size="147456">
@@ -267,7 +263,6 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 		<info name="serial" value="CX7855"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a7800_cart">
-			<feature name="pcb_type" value="TYPE-A" />
 			<feature name="slot" value="a78_sg9" />
 			<dataarea name="rom" size="147456">
 				<rom name="alienbeu.bin" size="147456" crc="6a19f0fe" sha1="990711ae451d901a960af8ad9ae70813f16257b1" offset="0" />
@@ -285,7 +280,6 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 		<info name="serial" value="CX7802"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
-			<feature name="pcb_type" value="TYPE-0" />
 			<feature name="slot" value="a78_rom" />
 			<dataarea name="rom" size="16384">
 				<rom name="astroids.bin" size="16384" crc="dfb93f40" sha1="d96ec4e043fcdacab367d8a69d29904b3b2896f1" offset="0" />
@@ -300,7 +294,6 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 		<info name="developer" value="Bob DeCrescenzo" />
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
-			<feature name="pcb_type" value="TYPE-0" />
 			<feature name="slot" value="a78_rom" />
 			<dataarea name="rom" size="32768">
 				<rom name="asteroids deluxe (ntsc).bin" size="32768" crc="56239d62" sha1="514fb53dcd8c47251fcbe5047bb2d9d13ccf6aef" offset="0" />
@@ -315,7 +308,6 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 		<info name="developer" value="Bob DeCrescenzo" />
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a7800_cart">
-			<feature name="pcb_type" value="TYPE-0" />
 			<feature name="slot" value="a78_rom" />
 			<dataarea name="rom" size="32768">
 				<rom name="asteroids deluxe (pal).bin" size="32768" crc="ab72ea89" sha1="341c7be2823e69e95a61567cb79042c140278c4c" offset="0" />
@@ -330,7 +322,6 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 		<info name="serial" value="CX7815"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
-			<feature name="pcb_type" value="TYPE-1" />
 			<feature name="slot" value="a78_pokey" />
 			<dataarea name="rom" size="32768">
 				<rom name="ballblzr.bin" size="32768" crc="a4c4808b" sha1="4eb5424360691a38b199d91a0e2c9095d0862dbe" offset="0" />
@@ -345,7 +336,6 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 		<info name="serial" value="CX7815"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a7800_cart">
-			<feature name="pcb_type" value="TYPE-1" />
 			<feature name="slot" value="a78_pokey" />
 			<dataarea name="rom" size="32768">
 				<rom name="ballbleu.bin" size="32768" crc="aff85565" sha1="1aa1a508ada1521ae1d373a6860681093e3f851c" offset="0" />
@@ -365,7 +355,6 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 		<info name="serial" value="CX7859"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
-			<feature name="pcb_type" value="TYPE-2" />
 			<feature name="slot" value="a78_sg" />
 			<feature name="peripheral" value="lightgun" /> <!-- Works with Lightgun -->
 			<dataarea name="rom" size="131072">
@@ -381,7 +370,6 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 		<info name="serial" value="CX7859"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a7800_cart">
-			<feature name="pcb_type" value="TYPE-2" />
 			<feature name="slot" value="a78_sg" />
 			<dataarea name="rom" size="131072">
 				<rom name="barnyaeu.bin" size="131072" crc="02764a86" sha1="a5797cf7e747bbd755c99fde6936caa15fbba6b1" offset="0" />
@@ -397,7 +385,6 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 		<info name="serial" value="AV-045-04"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a7800_cart">
-			<feature name="pcb_type" value="TYPE-0" />
 			<feature name="slot" value="a78_rom" />
 			<dataarea name="rom" size="32768">
 				<rom name="bseblleu.bin" size="32768" crc="68d48fdc" sha1="c44fe244206590abc26fbbd520a5726353899e35" offset="0" />
@@ -412,7 +399,6 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 		<info name="developer" value="Ken Siders" />
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
-			<feature name="pcb_type" value="TYPE-1" />
 			<feature name="slot" value="a78_pokey" />
 			<dataarea name="rom" size="32768">
 				<rom name="bd7800demo.bin" size="32768" crc="7873b949" sha1="a3eaff991cec95040aff53e0c26a862c3dfcc05e" offset="0" />
@@ -427,7 +413,6 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 		<info name="developer" value="Ken Siders" />
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
-			<feature name="pcb_type" value="TYPE-0" />
 			<feature name="slot" value="a78_rom" />
 			<dataarea name="rom" size="49152">
 				<rom name="bonq.bin" size="49152" crc="3124b41c" sha1="379ae22a8c8a1c518ba5eb29ad0826dd2daca954" offset="0" />
@@ -442,7 +427,6 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 		<info name="serial" value="CX7880"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
-			<feature name="pcb_type" value="TYPE-2" />
 			<feature name="slot" value="a78_sg" />
 			<dataarea name="rom" size="131072">
 				<rom name="bsktbrwl.bin" size="131072" crc="c8b9d7b5" sha1="39877a4c88498bf6656451e3d1acaf7e8638bdfd" offset="0" />
@@ -457,7 +441,6 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 		<info name="serial" value="CX7880"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a7800_cart">
-			<feature name="pcb_type" value="TYPE-2" />
 			<feature name="slot" value="a78_sg" />
 			<dataarea name="rom" size="131072">
 				<rom name="bsktbreu.bin" size="131072" crc="a4265d4b" sha1="e7ef6b11bb6836ff7d11a25f8d4e2c9361fa69b3" offset="0" />
@@ -472,7 +455,6 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 		<info name="serial" value="CX7801"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
-			<feature name="pcb_type" value="TYPE-0" />
 			<feature name="slot" value="a78_rom" />
 			<dataarea name="rom" size="16384">
 				<rom name="centpede.bin" size="16384" crc="020efe25" sha1="c8377ad7fb6afec5c88c14a23a68e2ecebba4e5a" offset="0" />
@@ -487,7 +469,6 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 		<info name="serial" value="CX7801"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a7800_cart">
-			<feature name="pcb_type" value="TYPE-0" />
 			<feature name="slot" value="a78_rom" />
 			<dataarea name="rom" size="16384">
 				<rom name="centpeeu.bin" size="16384" crc="33f8a8f6" sha1="323f9fc4fde9aa6fcbaac8ae300aaa06bafa745a" offset="0" />
@@ -502,7 +483,6 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 		<info name="serial" value="CX7821"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
-			<feature name="pcb_type" value="TYPE-0" />
 			<feature name="slot" value="a78_rom" />
 			<dataarea name="rom" size="32768">
 				<rom name="choplift.bin" size="32768" crc="419bff61" sha1="6df15e73494d0a498dd044753a27544214210b14" offset="0" />
@@ -517,7 +497,6 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 		<info name="serial" value="CX7821"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a7800_cart">
-			<feature name="pcb_type" value="TYPE-0" />
 			<feature name="slot" value="a78_rom" />
 			<dataarea name="rom" size="49152">
 				<rom name="choplieu.bin" size="49152" crc="12efeb07" sha1="f2fe1c82e5b333f4c59f76a28a9d379228596d89" offset="0" />
@@ -532,7 +511,6 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 		<info name="serial" value="CX7838"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
-			<feature name="pcb_type" value="TYPE-3" />
 			<feature name="slot" value="a78_sg_pokey" />
 			<dataarea name="rom" size="131072">
 				<rom name="commando.bin" size="131072" crc="cd1a98c5" sha1="f8ae7da650ad38675b81675b77096794a9cd52e8" offset="0" />
@@ -547,7 +525,6 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 		<info name="serial" value="CX7838"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a7800_cart">
-			<feature name="pcb_type" value="TYPE-3" />
 			<feature name="slot" value="a78_sg_pokey" />
 			<dataarea name="rom" size="131072">
 				<rom name="commaneu.bin" size="131072" crc="7c211612" sha1="2bdad24967fe4f5492ae294b1ccf8f148930a419" offset="0" />
@@ -562,7 +539,6 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 		<info name="serial" value="CX7836"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
-			<feature name="pcb_type" value="TYPE-2" />
 			<feature name="slot" value="a78_sg" />
 			<dataarea name="rom" size="131072">
 				<rom name="cracked.bin" size="131072" crc="e645fd1f" sha1="664d267d1245d5698cbf6ff0622ee0d629da3a11" offset="0" />
@@ -577,7 +553,6 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 		<info name="serial" value="CX7836"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a7800_cart">
-			<feature name="pcb_type" value="TYPE-2" />
 			<feature name="slot" value="a78_sg" />
 			<dataarea name="rom" size="131072">
 				<rom name="crackeu.bin" size="131072" crc="50fd19cb" sha1="0c1a7806e431efbf0c826a11b92d74eb45e08661" offset="0" />
@@ -592,7 +567,6 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 		<info name="serial" value="CX7844"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
-			<feature name="pcb_type" value="TYPE-A" />
 			<feature name="slot" value="a78_sg9" />
 			<feature name="peripheral" value="lightgun" /> <!-- Works with Lightgun -->
 			<dataarea name="rom" size="147456">
@@ -608,7 +582,6 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 		<info name="serial" value="CX7844"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a7800_cart">
-			<feature name="pcb_type" value="TYPE-A" />
 			<feature name="slot" value="a78_sg9" />
 			<feature name="peripheral" value="lightgun" /> <!-- Works with Lightgun -->
 			<dataarea name="rom" size="147456">
@@ -624,7 +597,6 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 		<info name="serial" value="CX7837"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
-			<feature name="pcb_type" value="TYPE-2" />
 			<feature name="slot" value="a78_sg" />
 			<dataarea name="rom" size="131072">
 				<rom name="darkchmb.bin" size="131072" crc="366777f1" sha1="848077f15114fec31f8290be2583566f4486fe65" offset="0" />
@@ -639,7 +611,6 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 		<info name="serial" value="CX7837"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a7800_cart">
-			<feature name="pcb_type" value="TYPE-2" />
 			<feature name="slot" value="a78_sg" />
 			<dataarea name="rom" size="131072">
 				<rom name="darkcheu.bin" size="131072" crc="c93a563e" sha1="2b888c95b31109ffd0441f586ba18f21a3a4f22e" offset="0" />
@@ -658,7 +629,6 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 		<info name="serial" value="CX7811"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
-			<feature name="pcb_type" value="TYPE-0" />
 			<feature name="slot" value="a78_rom" />
 			<dataarea name="rom" size="49152">
 				<rom name="dsrtflcn.bin" size="49152" crc="a1dc0899" sha1="725f893f9a98926c627ef37eacc3f241620c3ffc" offset="0" />
@@ -673,7 +643,6 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 		<info name="serial" value="CX7811"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
-			<feature name="pcb_type" value="TYPE-0" />
 			<feature name="slot" value="a78_rom" />
 			<dataarea name="rom" size="49152">
 				<rom name="dsrtflcp.bin" size="49152" crc="53e277f6" sha1="bbb8aa88879f2ec6039673ccdbbebebc565346bc" offset="0" />
@@ -688,7 +657,6 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 		<info name="serial" value="CX7811"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a7800_cart">
-			<feature name="pcb_type" value="TYPE-0" />
 			<feature name="slot" value="a78_rom" />
 			<dataarea name="rom" size="49152">
 				<rom name="dsrtfleu.bin" size="49152" crc="33991ee8" sha1="185d104614e23699e074e850d5ab8c36a159071c" offset="0" />
@@ -706,7 +674,6 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 		<info name="serial" value="CX7803"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
-			<feature name="pcb_type" value="TYPE-0" />
 			<feature name="slot" value="a78_rom" />
 			<dataarea name="rom" size="16384">
 				<rom name="digdugp.bin" size="16384" crc="50cb13f3" sha1="19cee8dc40fabd7022bedc27e4896c09e3cadfdd" offset="0" />
@@ -721,7 +688,6 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 		<info name="serial" value="CX7803"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a7800_cart">
-			<feature name="pcb_type" value="TYPE-0" />
 			<feature name="slot" value="a78_rom" />
 			<dataarea name="rom" size="32768">
 				<rom name="digdugeu.bin" size="32768" crc="efab7077" sha1="ce05d3270b0e0d36d80a4f0731d0173cb5921bce" offset="0" />
@@ -736,7 +702,6 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 		<info name="serial" value="CX7848"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
-			<feature name="pcb_type" value="TYPE-0" />
 			<feature name="slot" value="a78_rom" />
 			<dataarea name="rom" size="49152">
 				<rom name="dnkykong.bin" size="49152" crc="065e063f" sha1="820c852caa7957179bf7d6faf2e6922dde5a1a8e" offset="0" />
@@ -751,7 +716,6 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 		<info name="serial" value="CX7848"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a7800_cart">
-			<feature name="pcb_type" value="TYPE-0" />
 			<feature name="slot" value="a78_rom" />
 			<dataarea name="rom" size="49152">
 				<rom name="dnkykoeu.bin" size="49152" crc="0a43d1c5" sha1="dc69fa8fdf3fcba8557195358b8d206463652e0f" offset="0" />
@@ -766,7 +730,6 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 		<info name="serial" value="CX7849"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
-			<feature name="pcb_type" value="TYPE-0" />
 			<feature name="slot" value="a78_rom" />
 			<dataarea name="rom" size="49152">
 				<rom name="dnkykgjr.bin" size="49152" crc="1c5a1082" sha1="e9392259fff682fcc3476009771a3cfd7d5bdb6d" offset="0" />
@@ -781,7 +744,6 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 		<info name="serial" value="CX7849"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a7800_cart">
-			<feature name="pcb_type" value="TYPE-0" />
 			<feature name="slot" value="a78_rom" />
 			<dataarea name="rom" size="49152">
 				<rom name="dnkykjeu.bin" size="49152" crc="c784dbac" sha1="2626a9cd3326b8ce0ee0e834e17a0eedae005669" offset="0" />
@@ -796,7 +758,6 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 		<info name="serial" value="AM-050-04"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
-			<feature name="pcb_type" value="ACTIVISION" />
 			<feature name="slot" value="a78_act" />
 			<dataarea name="rom" size="131072">
 				<rom name="dbledrgn.bin" size="131072" crc="aa265865" sha1="c3fb140836a4ed84cda7a999832703e8b72c0d21" offset="0" />
@@ -811,7 +772,6 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 		<info name="serial" value="AM-050-04"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a7800_cart">
-			<feature name="pcb_type" value="ACTIVISION" />
 			<feature name="slot" value="a78_act" />
 			<dataarea name="rom" size="131072">
 				<rom name="dbledreu.bin" size="131072" crc="f29abdb2" sha1="210f3ac989549e89425e7677127715aee713af32" offset="0" />
@@ -826,7 +786,6 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 		<info name="serial" value="AP-044-04"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
-			<feature name="pcb_type" value="ABSOLUTE" />
 			<feature name="slot" value="a78_abs" />
 			<dataarea name="rom" size="65536">
 				<rom name="f18hornt.bin" size="65536" crc="63d1c7c1" sha1="13a18a6b85db6222b01d37800e5e57db616a85a6" offset="0" />
@@ -841,7 +800,6 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 		<info name="serial" value="AP044-04"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a7800_cart">
-			<feature name="pcb_type" value="ABSOLUTE" />
 			<feature name="slot" value="a78_abs" />
 			<dataarea name="rom" size="65536">
 				<rom name="f18horeu.bin" size="65536" crc="e5d714b0" sha1="673d912b2f9ab7a43f95e0e90bd80249b360fe0d" offset="0" />
@@ -856,7 +814,6 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 		<info name="serial" value="CX7854"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
-			<feature name="pcb_type" value="TYPE-2" />
 			<feature name="slot" value="a78_sg" />
 			<dataarea name="rom" size="131072">
 				<rom name="fatalrun.bin" size="131072" crc="a44df354" sha1="69aab1e6ef332c6844c693ac41965e4c33ff822a" offset="0" />
@@ -871,7 +828,6 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 		<info name="serial" value="CX7854"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a7800_cart">
-			<feature name="pcb_type" value="TYPE-2" />
 			<feature name="slot" value="a78_sg" />
 			<dataarea name="rom" size="131072">
 				<rom name="fatalreu.bin" size="131072" crc="2a0a93be" sha1="f23173d2e42bca0767f3d8ecb6bb1c0d23dde996" offset="0" />
@@ -886,7 +842,6 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 		<info name="serial" value="CX7851"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
-			<feature name="pcb_type" value="TYPE-2" />
 			<feature name="slot" value="a78_sg" />
 			<dataarea name="rom" size="131072">
 				<rom name="fghtnght.bin" size="131072" crc="720ebc74" sha1="1e8a8704a77b15e70cbc72b0ae9bc25fb91d7c21" offset="0" />
@@ -901,7 +856,6 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 		<info name="serial" value="CX7851"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a7800_cart">
-			<feature name="pcb_type" value="TYPE-2" />
 			<feature name="slot" value="a78_sg" />
 			<dataarea name="rom" size="131072">
 				<rom name="fghtngeu.bin" size="131072" crc="64d9c4be" sha1="ded89f3a4ac0d95aa158c98302b7939e5b89e4c6" offset="0" />
@@ -916,7 +870,6 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 		<info name="serial" value="CX7804"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
-			<feature name="pcb_type" value="TYPE-0" />
 			<feature name="slot" value="a78_rom" />
 			<dataarea name="rom" size="32768">
 				<rom name="foodfght.bin" size="32768" crc="e64a5cde" sha1="3f5f42d5aaf6ccd4979658a1387aac5933549357" offset="0" />
@@ -931,7 +884,6 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 		<info name="serial" value="CX7804"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a7800_cart">
-			<feature name="pcb_type" value="TYPE-0" />
 			<feature name="slot" value="a78_rom" />
 			<dataarea name="rom" size="49152">
 				<rom name="foodfgeu.bin" size="49152" crc="c64549ec" sha1="40b8e5eeb9e9ad7239963ed79dc085092ccbec4c" offset="0" />
@@ -946,7 +898,6 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 		<info name="serial" value="CX7805"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
-			<feature name="pcb_type" value="TYPE-0" />
 			<feature name="slot" value="a78_rom" />
 			<dataarea name="rom" size="32768">
 				<rom name="galagap.bin" size="32768" crc="1a0a3eb3" sha1="33178d682564d70955e13d0633359e87b512253b" offset="0" />
@@ -961,7 +912,6 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 		<info name="serial" value="CX7805"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a7800_cart">
-			<feature name="pcb_type" value="TYPE-0" />
 			<feature name="slot" value="a78_rom" />
 			<dataarea name="rom" size="49152">
 				<rom name="galagaeu.bin" size="49152" crc="5990a9f8" sha1="f1ae5df03cf90041380d77c1b49c94611443330b" offset="0" />
@@ -976,7 +926,6 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 		<info name="serial" value="CX7827"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
-			<feature name="pcb_type" value="TYPE-0" />
 			<feature name="slot" value="a78_rom" />
 			<dataarea name="rom" size="49152">
 				<rom name="gatop1.bin" size="49152" crc="715e1a2f" sha1="e153927b3463148d3fbeef2d28980c281562cc09" offset="0" />
@@ -991,7 +940,6 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 		<info name="serial" value="CX7827"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
-			<feature name="pcb_type" value="TYPE-0" />
 			<feature name="slot" value="a78_rom" />
 			<dataarea name="rom" size="49152">
 				<rom name="gatop2.bin" size="49152" crc="0f2f66f8" sha1="5784f40216dbc487e80dabd532ae89b2de4bdcc4" offset="0" />
@@ -1006,7 +954,6 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 		<info name="serial" value="CX7827"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
-			<feature name="pcb_type" value="TYPE-0" />
 			<feature name="slot" value="a78_rom" />
 			<dataarea name="rom" size="49152">
 				<rom name="gatop3.bin" size="49152" crc="3796705f" sha1="b365d2bf0a5b238eff5f1a4cdc9b7ece2cace38d" offset="0" />
@@ -1021,7 +968,6 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 		<info name="serial" value="CX7827"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
-			<feature name="pcb_type" value="TYPE-0" />
 			<feature name="slot" value="a78_rom" />
 			<dataarea name="rom" size="49152">
 				<rom name="gatop4.bin" size="49152" crc="15de2327" sha1="c5793c362a69c7e82191caffa0a830e67fe21dc5" offset="0" />
@@ -1036,7 +982,6 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 		<info name="serial" value="CX7827"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
-			<feature name="pcb_type" value="TYPE-0" />
 			<feature name="slot" value="a78_rom" />
 			<dataarea name="rom" size="49152">
 				<rom name="gatop5.bin" size="49152" crc="9fa0fbda" sha1="1c536bb5870f315eecbdea6660beb7de9371f0f8" offset="0" />
@@ -1051,7 +996,6 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 		<info name="serial" value="CX7827"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
-			<feature name="pcb_type" value="TYPE-0" />
 			<feature name="slot" value="a78_rom" />
 			<dataarea name="rom" size="49152">
 				<rom name="gatop6.bin" size="49152" crc="40b629a1" sha1="f644c5d071c49d75e1487cd06b91da778697ff23" offset="0" />
@@ -1067,7 +1011,6 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 		<info name="serial" value="CX7827"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
-			<feature name="pcb_type" value="TYPE-0" />
 			<feature name="slot" value="a78_rom" />
 			<dataarea name="rom" size="49152">
 				<rom name="gatop7.bin" size="49152" crc="b05cf8d2" sha1="78eaa5c8e89129596f2f9a7a4517e51eefbd857f" offset="0" />
@@ -1082,7 +1025,6 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 		<info name="serial" value="CX7827"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
-			<feature name="pcb_type" value="TYPE-0" />
 			<feature name="slot" value="a78_rom" />
 			<dataarea name="rom" size="49152">
 				<rom name="gatop8.bin" size="49152" crc="e51eb3bc" sha1="e8d29920fe466ea8bfe292e0f135c0e24a48aaad" offset="0" />
@@ -1115,7 +1057,6 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 		<info name="serial" value="CX7829"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
-			<feature name="pcb_type" value="TYPE-0" />
 			<feature name="slot" value="a78_rom" />
 			<dataarea name="rom" size="49152">
 				<rom name="hattrick.bin" size="49152" crc="cf6f4a6c" sha1="14c0cfd01df1c725f399c23810e4854a639fce52" offset="0" />
@@ -1130,7 +1071,6 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 		<info name="serial" value="CX7829"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a7800_cart">
-			<feature name="pcb_type" value="TYPE-0" />
 			<feature name="slot" value="a78_rom" />
 			<dataarea name="rom" size="49152">
 				<rom name="hattrieu.bin" size="49152" crc="057d9c3c" sha1="0e9fa678bb4aedc7bb7cf5d38fe27556c4c2bbbd" offset="0" />
@@ -1145,7 +1085,6 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 		<info name="serial" value="CX7862"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
-			<feature name="pcb_type" value="TYPE-2" />
 			<feature name="slot" value="a78_sg" />
 			<dataarea name="rom" size="131072">
 				<rom name="ikariwar.bin" size="131072" crc="8a6c1f15" sha1="e368c6c7ffca5ffac314dec1effea4e2c809519a" offset="0" />
@@ -1160,7 +1099,6 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 		<info name="serial" value="CX7862"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a7800_cart">
-			<feature name="pcb_type" value="TYPE-2" />
 			<feature name="slot" value="a78_sg" />
 			<dataarea name="rom" size="131072">
 				<rom name="ikariweu.bin" size="131072" crc="cb621cdc" sha1="275cae6c693d9bd1906fdc684460ec596869bbad" offset="0" />
@@ -1175,7 +1113,6 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 		<info name="serial" value="CX7832"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
-			<feature name="pcb_type" value="TYPE-6" />
 			<feature name="slot" value="a78_sg_ram" />
 			<dataarea name="rom" size="131072">
 				<rom name="impssble.bin" size="131072" crc="3b1f2f47" sha1="5437c0efb63a349953ec047efe6ec24144ed6914" offset="0" />
@@ -1192,7 +1129,6 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 		<info name="serial" value="CX7832"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a7800_cart">
-			<feature name="pcb_type" value="TYPE-6" />
 			<feature name="slot" value="a78_sg_ram" />
 			<dataarea name="rom" size="131072">
 				<rom name="impssbeu.bin" size="131072" crc="994af6e0" sha1="9770b61472510aba1cf3ea35ceca1859c3493676" offset="0" />
@@ -1209,7 +1145,6 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 		<info name="serial" value="CX7857"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
-			<feature name="pcb_type" value="TYPE-6" />
 			<feature name="slot" value="a78_sg_ram" />
 			<dataarea name="rom" size="131072">
 				<rom name="jinks.bin" size="131072" crc="0818d8cd" sha1="472bc12c437b015a9e317bac092529f3295033b8" offset="0" />
@@ -1226,7 +1161,6 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 		<info name="serial" value="CX7857"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a7800_cart">
-			<feature name="pcb_type" value="TYPE-6" />
 			<feature name="slot" value="a78_sg_ram" />
 			<dataarea name="rom" size="131072">
 				<rom name="jinkseu.bin" size="131072" crc="9207ed3b" sha1="eb16de0c3d5c4e769ae2314ba21c4dd3bca33c88" offset="0" />
@@ -1257,7 +1191,6 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 		<info name="serial" value="CX7806"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
-			<feature name="pcb_type" value="TYPE-0" />
 			<feature name="slot" value="a78_rom" />
 			<dataarea name="rom" size="32768">
 				<rom name="joust.bin" size="32768" crc="2c430bce" sha1="1ccd7c232bcfd5a65d26b9decfe4eceadcbe314c" offset="0" />
@@ -1272,7 +1205,6 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 		<info name="serial" value="CX7806"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a7800_cart">
-			<feature name="pcb_type" value="TYPE-0" />
 			<feature name="slot" value="a78_rom" />
 			<dataarea name="rom" size="49152">
 				<rom name="jousteu.bin" size="49152" crc="9b3be616" sha1="aae5b9ee00c39d577858aba9d1fd791194be2c0c" offset="0" />
@@ -1294,7 +1226,6 @@ the buttons not work in emulators.
 		<info name="serial" value="CX7822"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
-			<feature name="pcb_type" value="TYPE-0" />
 			<feature name="slot" value="a78_rom" />
 			<dataarea name="rom" size="49152">
 				<rom name="karateka.bin" size="49152" crc="fec21472" sha1="9fb97bbc7dcc610251cee1695c48b82a087f32d2" offset="0" />
@@ -1309,7 +1240,6 @@ the buttons not work in emulators.
 		<info name="serial" value="CX7822"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a7800_cart">
-			<feature name="pcb_type" value="TYPE-2" />
 			<feature name="slot" value="a78_sg" />
 			<dataarea name="rom" size="65536">
 				<rom name="karateeu.bin" size="65536" crc="6c8d9e68" sha1="c5f25c88eefe0c7b3571ab3c3ec5185e537eb151" offset="0" />
@@ -1331,7 +1261,6 @@ Saarna for debugging the problem)
 		<info name="usage" value="Keep Button 1 pressed during Atari logo"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
-			<feature name="pcb_type" value="TYPE-2" />
 			<feature name="slot" value="a78_sg" />
 			<dataarea name="rom" size="131072">
 				<rom name="klax.bin" size="131072" crc="f26621e3" sha1="0ea6a04b8f9713040ce57b6f23a6589f98409d46" offset="0" />
@@ -1346,7 +1275,6 @@ Saarna for debugging the problem)
 		<info name="serial" value="AM-039-04"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
-			<feature name="pcb_type" value="TYPE-0" />
 			<feature name="slot" value="a78_rom" />
 			<dataarea name="rom" size="32768">
 				<rom name="kungfums.bin" size="32768" crc="297899bb" sha1="8824bffdf4f30a8191e581752a75259a663092ca" offset="0" />
@@ -1361,7 +1289,6 @@ Saarna for debugging the problem)
 		<info name="serial" value="AM-039-04"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a7800_cart">
-			<feature name="pcb_type" value="TYPE-0" />
 			<feature name="slot" value="a78_rom" />
 			<dataarea name="rom" size="32768">
 				<rom name="kungfueu.bin" size="32768" crc="c1531fc4" sha1="0f0e24246d9e684b7f900a362fb08878b232580c" offset="0" />
@@ -1376,7 +1303,6 @@ Saarna for debugging the problem)
 		<info name="serial" value="CX7850"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
-			<feature name="pcb_type" value="TYPE-0" />
 			<feature name="slot" value="a78_rom" />
 			<dataarea name="rom" size="49152">
 				<rom name="mariobro.bin" size="49152" crc="8021a13b" sha1="12e04b67094af622641c536379c69ecad2ee98ed" offset="0" />
@@ -1391,7 +1317,6 @@ Saarna for debugging the problem)
 		<info name="serial" value="CX7850"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a7800_cart">
-			<feature name="pcb_type" value="TYPE-0" />
 			<feature name="slot" value="a78_rom" />
 			<dataarea name="rom" size="49152">
 				<rom name="mariobeu.bin" size="49152" crc="efad3d9d" sha1="881beff5103713e655fed80b32e0bbd774e78ee8" offset="0" />
@@ -1406,7 +1331,6 @@ Saarna for debugging the problem)
 		<info name="serial" value="CX7863"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
-			<feature name="pcb_type" value="TYPE-2" />
 			<feature name="slot" value="a78_sg" />
 			<dataarea name="rom" size="131072">
 				<rom name="matmania.bin" size="131072" crc="aba91829" sha1="bb849b603cf1091e4f032936b209ff33fc3b714e" offset="0" />
@@ -1421,7 +1345,6 @@ Saarna for debugging the problem)
 		<info name="serial" value="CX7863"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a7800_cart">
-			<feature name="pcb_type" value="TYPE-2" />
 			<feature name="slot" value="a78_sg" />
 			<dataarea name="rom" size="131072">
 				<rom name="matmaneu.bin" size="131072" crc="065f3873" sha1="119bb784f1a0638cc6778841131ca1766e94a112" offset="0" />
@@ -1436,7 +1359,6 @@ Saarna for debugging the problem)
 		<info name="serial" value="CX7847"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
-			<feature name="pcb_type" value="TYPE-2" />
 			<feature name="slot" value="a78_sg" />
 			<dataarea name="rom" size="131072">
 				<rom name="mean18.bin" size="131072" crc="cf21d9ac" sha1="a3e50c0e56c9675ffb1b6439f40789bc64c606b2" offset="0" />
@@ -1451,7 +1373,6 @@ Saarna for debugging the problem)
 		<info name="serial" value="CX7847"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a7800_cart">
-			<feature name="pcb_type" value="TYPE-2" />
 			<feature name="slot" value="a78_sg" />
 			<dataarea name="rom" size="131072">
 				<rom name="mean18eu.bin" size="131072" crc="3cec4be8" sha1="47702ee71c64af4ada09cd41122c779c7d8d94f1" offset="0" />
@@ -1466,7 +1387,6 @@ Saarna for debugging the problem)
 		<info name="serial" value="CX7875"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
-			<feature name="pcb_type" value="TYPE-2" />
 			<feature name="slot" value="a78_sg" />
 			<feature name="peripheral" value="lightgun" /> <!-- Works with Lightgun -->
 			<dataarea name="rom" size="131072">
@@ -1482,7 +1402,6 @@ Saarna for debugging the problem)
 		<info name="serial" value="CX7875"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a7800_cart">
-			<feature name="pcb_type" value="TYPE-2" />
 			<feature name="slot" value="a78_sg" />
 			<feature name="peripheral" value="lightgun" /> <!-- Works with Lightgun -->
 			<dataarea name="rom" size="131072">
@@ -1498,7 +1417,6 @@ Saarna for debugging the problem)
 		<publisher>TNT Games</publisher>
 		<info name="serial" value="CX7890"/>
 		<part name="cart" interface="a7800_cart">
-			<feature name="pcb_type" value="TYPE-2" />
 			<feature name="slot" value="a78_sg9" />
 			<dataarea name="rom" size="147456">
 				<rom name="miaproto.bin" size="147456" crc="ff7a4c60" sha1="26b0b187a43bf9a9397cb5e8b0033e8833f48f88" offset="0" />
@@ -1513,7 +1431,6 @@ Saarna for debugging the problem)
 		<info name="serial" value="CX7879"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
-			<feature name="pcb_type" value="TYPE-2" />
 			<feature name="slot" value="a78_sg" />
 			<dataarea name="rom" size="131072">
 				<rom name="midmutnt.bin" size="131072" crc="187ec84e" sha1="db5ea4c1456f3b403f6b8978432ecbcdac89d432" offset="0" />
@@ -1528,7 +1445,6 @@ Saarna for debugging the problem)
 		<info name="serial" value="CX7879"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a7800_cart">
-			<feature name="pcb_type" value="TYPE-2" />
 			<feature name="slot" value="a78_sg" />
 			<dataarea name="rom" size="131072">
 				<rom name="midmuteu.bin" size="131072" crc="7ca6d521" sha1="85f0e0556df65c0732f71ab3f2bbde3615355f72" offset="0" />
@@ -1552,7 +1468,6 @@ almost nothing like the prototype.
 		<info name="serial" value="CX7852"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
-			<feature name="pcb_type" value="TYPE-2" />
 			<feature name="slot" value="a78_sg" />
 			<dataarea name="rom" size="131072">
 				<rom name="mtrpsych.bin" size="131072" crc="1e219482" sha1="b9381f4d0413b6c48e27f26ed94c7a9eb1a49624" offset="0" />
@@ -1567,7 +1482,6 @@ almost nothing like the prototype.
 		<info name="serial" value="CX7852"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a7800_cart">
-			<feature name="pcb_type" value="TYPE-2" />
 			<feature name="slot" value="a78_sg" />
 			<dataarea name="rom" size="131072">
 				<rom name="mtrpsyeu.bin" size="131072" crc="38bb45ba" sha1="3b72d6b3e28ca9182f1f25dc57115d2ec33aa63e" offset="0" />
@@ -1596,7 +1510,6 @@ almost nothing like the prototype.
 		<info name="serial" value="CX7807"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
-			<feature name="pcb_type" value="TYPE-0" />
 			<feature name="slot" value="a78_rom" />
 			<dataarea name="rom" size="16384">
 				<rom name="mspacman.bin" size="16384" crc="e42fc700" sha1="ff22e21fc953a288453c40eb6fc5378d42b871f6" offset="0" />
@@ -1611,7 +1524,6 @@ almost nothing like the prototype.
 		<info name="serial" value="CX7807"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a7800_cart">
-			<feature name="pcb_type" value="TYPE-0" />
 			<feature name="slot" value="a78_rom" />
 			<dataarea name="rom" size="32768">
 				<rom name="mspacmeu.bin" size="32768" crc="8421033a" sha1="a5b0826a130acf8b8dbc59ef980d40b802c22b30" offset="0" />
@@ -1626,7 +1538,6 @@ almost nothing like the prototype.
 		<info name="serial" value="CX7870"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
-			<feature name="pcb_type" value="TYPE-2" />
 			<feature name="slot" value="a78_sg" />
 			<dataarea name="rom" size="131072">
 				<rom name="ninjaglf.bin" size="131072" crc="cb48e8dc" sha1="96d0e59e703770eea8d8d9c2c4e5a87ce6f2de76" offset="0" />
@@ -1641,7 +1552,6 @@ almost nothing like the prototype.
 		<info name="serial" value="CX7870"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a7800_cart">
-			<feature name="pcb_type" value="TYPE-2" />
 			<feature name="slot" value="a78_sg" />
 			<dataarea name="rom" size="131072">
 				<rom name="ninjageu.bin" size="131072" crc="2b5382b7" sha1="99ce5711e38ff7ef3311216f954cf0ab70e289cf" offset="0" />
@@ -1657,7 +1567,6 @@ almost nothing like the prototype.
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
-			<feature name="pcb_type" value="TYPE-0" />
 			<feature name="slot" value="a78_rom" />
 			<dataarea name="rom" size="49152">
 				<rom name="oneonone.bin" size="49152" crc="7d9370fb" sha1="5173f892a8d70aeca6c324c138c56208e0db2b98" offset="0" />
@@ -1673,7 +1582,6 @@ almost nothing like the prototype.
 		<sharedfeat name="compatibility" value="PAL"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a7800_cart">
-			<feature name="pcb_type" value="TYPE-0" />
 			<feature name="slot" value="a78_rom" />
 			<dataarea name="rom" size="49152">
 				<rom name="oneonoeu.bin" size="49152" crc="7a628295" sha1="01dfc5e4e615cf20ee4f07245285f85684ee445d" offset="0" />
@@ -1688,7 +1596,6 @@ almost nothing like the prototype.
 		<info name="serial" value="AV-045-04"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
-			<feature name="pcb_type" value="TYPE-0" />
 			<feature name="slot" value="a78_rom" />
 			<dataarea name="rom" size="32768">
 				<rom name="peterose.bin" size="32768" crc="f33d4dfa" sha1="ffb4fbed8d8f28ea71668542b7ebd019955c5a11" offset="0" />
@@ -1786,7 +1693,6 @@ almost nothing like the prototype.
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX7891"/>
 		<part name="cart" interface="a7800_cart">
-			<feature name="pcb_type" value="TYPE-2" />
 			<feature name="slot" value="a78_sg" />
 			<dataarea name="rom" size="65536">
 				<rom name="pitfghtr.bin" size="65536" crc="a5e75537" sha1="378addef67aca55500f0f5f9f0075dcb177406b5" offset="0" />
@@ -1801,7 +1707,6 @@ almost nothing like the prototype.
 		<info name="serial" value="CX7868"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
-			<feature name="pcb_type" value="TYPE-2" />
 			<feature name="slot" value="a78_sg" />
 			<dataarea name="rom" size="131072">
 				<rom name="planetsm.bin" size="131072" crc="4e3b9e64" sha1="503b975fc1f8edc16110ac2c5b884c4e8b2b6efb" offset="0" />
@@ -1816,7 +1721,6 @@ almost nothing like the prototype.
 		<info name="serial" value="CX7868"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a7800_cart">
-			<feature name="pcb_type" value="TYPE-2" />
 			<feature name="slot" value="a78_sg" />
 			<dataarea name="rom" size="131072">
 				<rom name="planeteu.bin" size="131072" crc="95dc7e96" sha1="f12cbb576607ec38d6111f4346412ccc5bfbcf42" offset="0" />
@@ -1829,7 +1733,6 @@ almost nothing like the prototype.
 		<year>1990</year>
 		<publisher>Tynesoft</publisher>
 		<part name="cart" interface="a7800_cart">
-			<feature name="pcb_type" value="TYPE-6" />
 			<feature name="slot" value="a78_sg_ram" />
 			<dataarea name="rom" size="131072">
 				<rom name="plutos.bin" size="131072" crc="2f211f7f" sha1="fa55d6a366b237917f18487fc51817394839a3bc" offset="0" />
@@ -1846,7 +1749,6 @@ almost nothing like the prototype.
 		<info name="serial" value="CX7808"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
-			<feature name="pcb_type" value="TYPE-0" />
 			<feature name="slot" value="a78_rom" />
 			<dataarea name="rom" size="32768">
 				<rom name="polepos2.bin" size="32768" crc="a85fb962" sha1="ccfa6f3f83ddbed2a2fb32735fea316a718fbaaa" offset="0" />
@@ -1861,7 +1763,6 @@ almost nothing like the prototype.
 		<info name="serial" value="CX7808"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a7800_cart">
-			<feature name="pcb_type" value="TYPE-0" />
 			<feature name="slot" value="a78_rom" />
 			<dataarea name="rom" size="32768">
 				<rom name="pleps2eu.bin" size="32768" crc="d751c7a6" sha1="268e53b5b2117bf853e0aae6adb0b2d3aad8ad5c" offset="0" />
@@ -1876,7 +1777,6 @@ almost nothing like the prototype.
 		<info name="serial" value="AM-049-03"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
-			<feature name="pcb_type" value="ACTIVISION" />
 			<feature name="slot" value="a78_act" />
 			<dataarea name="rom" size="131072">
 				<rom name="rampage.bin" size="131072" crc="39a316aa" sha1="13745b5eaaab7e2c992f3312285e112cdeb424f6" offset="0" />
@@ -1891,7 +1791,6 @@ almost nothing like the prototype.
 		<publisher>Imagitec Design</publisher>
 		<info name="serial" value="CX7892"/>
 		<part name="cart" interface="a7800_cart">
-			<feature name="pcb_type" value="TYPE-2" />
 			<feature name="slot" value="a78_sg" />
 			<dataarea name="rom" size="131072">
 				<rom name="rampart.bin" size="131072" crc="e8c2a662" sha1="53516794cb442208af5d54760324c006510553b3" offset="0" />
@@ -1907,7 +1806,6 @@ almost nothing like the prototype.
 		<info name="serial" value="CX7816"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
-			<feature name="pcb_type" value="TYPE-6" />
 			<feature name="slot" value="a78_sg_ram" />
 			<dataarea name="rom" size="32768">
 				<rom name="rescuefr.bin" size="32768" crc="9a74fbf2" sha1="6653022f38e553d475896a918850158eaf8f77ff" offset="0" />
@@ -1924,7 +1822,6 @@ almost nothing like the prototype.
 		<info name="serial" value="CX7809"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
-			<feature name="pcb_type" value="TYPE-0" />
 			<feature name="slot" value="a78_rom" />
 			<dataarea name="rom" size="32768">
 				<rom name="robotron.bin" size="32768" crc="cb22305d" sha1="ccc9753cdcbd2a2f8cb7966b8227801ba0bfd41d" offset="0" />
@@ -1939,7 +1836,6 @@ almost nothing like the prototype.
 		<info name="serial" value="CX7834"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
-			<feature name="pcb_type" value="TYPE-2" />
 			<feature name="slot" value="a78_sg" />
 			<dataarea name="rom" size="65536">
 				<rom name="rsbsebll.bin" size="65536" crc="b1508030" sha1="9a9f60251d049630099f56d2d3efb013828b8a2c" offset="0" />
@@ -1968,7 +1864,6 @@ almost nothing like the prototype.
 		<info name="serial" value="CX7879"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
-			<feature name="pcb_type" value="TYPE-2" />
 			<feature name="slot" value="a78_sg" />
 			<dataarea name="rom" size="131072">
 				<rom name="scrpyard.bin" size="131072" crc="5cc8c34f" sha1="f2249321d0cc296b9f9e516bbc5ecc9aab56ca22" offset="0" />
@@ -1983,7 +1878,6 @@ almost nothing like the prototype.
 		<info name="serial" value="CX7879"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a7800_cart">
-			<feature name="pcb_type" value="TYPE-2" />
 			<feature name="slot" value="a78_sg" />
 			<dataarea name="rom" size="131072">
 				<rom name="scrpyrde.bin" size="131072" crc="46dd9662" sha1="ebfed67cfeebc6a558dbb087e4784e5e5258c2e1" offset="0" />
@@ -1998,7 +1892,6 @@ almost nothing like the prototype.
 		<info name="serial" value="CX7869"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
-			<feature name="pcb_type" value="TYPE-2" />
 			<feature name="slot" value="a78_sg" />
 			<feature name="peripheral" value="lightgun" /> <!-- Works with Lightgun -->
 			<dataarea name="rom" size="131072">
@@ -2014,7 +1907,6 @@ almost nothing like the prototype.
 		<info name="serial" value="CX7869"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a7800_cart">
-			<feature name="pcb_type" value="TYPE-2" />
 			<feature name="slot" value="a78_sg" />
 			<feature name="peripheral" value="lightgun" /> <!-- Works with Lightgun -->
 			<dataarea name="rom" size="131072">
@@ -2028,7 +1920,6 @@ almost nothing like the prototype.
 		<year>1990</year>
 		<publisher>Tynesoft</publisher>
 		<part name="cart" interface="a7800_cart">
-			<feature name="pcb_type" value="TYPE-6" />
 			<feature name="slot" value="a78_sg_ram" />
 			<dataarea name="rom" size="131072">
 				<rom name="sirius.bin" size="131072" crc="65ae616e" sha1="cd9f6dea96f102262065d7472e73121b67f9e244" offset="0" />
@@ -2128,7 +2019,6 @@ almost nothing like the prototype.
 		<info name="serial" value="CX7826"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
-			<feature name="pcb_type" value="TYPE-6" />
 			<feature name="slot" value="a78_sg_ram" />
 			<dataarea name="rom" size="131072">
 				<rom name="smmrgame.bin" size="131072" crc="65c6df3f" sha1="31d46b32a2aa8d5bd6028cff1f41037426b22409" offset="0" />
@@ -2145,7 +2035,6 @@ almost nothing like the prototype.
 		<info name="serial" value="CX7828"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
-			<feature name="pcb_type" value="TYPE-0" />
 			<feature name="slot" value="a78_rom" />
 			<dataarea name="rom" size="49152">
 				<rom name="suprhuey.bin" size="49152" crc="71846500" sha1="29aea9e90c446942001fd08d3c4c929f4ce048d7" offset="0" />
@@ -2160,7 +2049,6 @@ almost nothing like the prototype.
 		<info name="serial" value="CX7828"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a7800_cart">
-			<feature name="pcb_type" value="TYPE-0" />
 			<feature name="slot" value="a78_rom" />
 			<dataarea name="rom" size="49152">
 				<rom name="suprhueu.bin" size="49152" crc="6b27ea2c" sha1="469e03ee1e22ef0978c8095a38d662d34a413723" offset="0" />
@@ -2175,7 +2063,6 @@ almost nothing like the prototype.
 		<info name="serial" value="AV-047-04"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
-			<feature name="pcb_type" value="TYPE-0" />
 			<feature name="slot" value="a78_rom" />
 			<dataarea name="rom" size="32768">
 				<rom name="sprskate.bin" size="32768" crc="13b68650" sha1="666d9383c112b66026898e6002b803801e269c51" offset="0" />
@@ -2190,7 +2077,6 @@ almost nothing like the prototype.
 		<info name="serial" value="AV-047-04"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a7800_cart">
-			<feature name="pcb_type" value="TYPE-0" />
 			<feature name="slot" value="a78_rom" />
 			<dataarea name="rom" size="32768">
 				<rom name="sprskaeu.bin" size="32768" crc="8f167ba9" sha1="fab349584af7b6b3f9b034af3034f43257e2c25f" offset="0" />
@@ -2205,7 +2091,6 @@ almost nothing like the prototype.
 		<info name="serial" value="FG2003"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
-			<feature name="pcb_type" value="TYPE-2" />
 			<feature name="slot" value="a78_sg" />
 			<dataarea name="rom" size="65536">
 				<rom name="tankcmnd.bin" size="65536" crc="db91b181" sha1="1d2975d754806416a25a821db6a9fe389bf5d946" offset="0" />
@@ -2220,7 +2105,6 @@ almost nothing like the prototype.
 		<info name="serial" value="AV-041-04"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
-			<feature name="pcb_type" value="TYPE-0" />
 			<feature name="slot" value="a78_rom" />
 			<dataarea name="rom" size="32768">
 				<rom name="titlemat.bin" size="32768" crc="bc23c57b" sha1="80d11bcbb953ccd8bf3c3e64162711e7edb95090" offset="0" />
@@ -2235,7 +2119,6 @@ almost nothing like the prototype.
 		<info name="serial" value="AV-041-04"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a7800_cart">
-			<feature name="pcb_type" value="TYPE-0" />
 			<feature name="slot" value="a78_rom" />
 			<dataarea name="rom" size="32768">
 				<rom name="titlemeu.bin" size="32768" crc="16b54d5b" sha1="7ab281c9b69692823b3b6b594856172363c507b5" offset="0" />
@@ -2250,7 +2133,6 @@ almost nothing like the prototype.
 		<info name="serial" value="AV-046-04"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
-			<feature name="pcb_type" value="TYPE-0" />
 			<feature name="slot" value="a78_rom" />
 			<dataarea name="rom" size="32768">
 				<rom name="tomcat.bin" size="32768" crc="513cb9ee" sha1="80c615fb60d0004c1accde25e42759572e030928" offset="0" />
@@ -2265,7 +2147,6 @@ almost nothing like the prototype.
 		<info name="serial" value="AV-046-04"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a7800_cart">
-			<feature name="pcb_type" value="TYPE-0" />
 			<feature name="slot" value="a78_rom" />
 			<dataarea name="rom" size="32768">
 				<rom name="tomcateu.bin" size="32768" crc="b01205bf" sha1="825381773593365b5ca7eeca968cca00879eee71" offset="0" />
@@ -2279,7 +2160,6 @@ almost nothing like the prototype.
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX7823"/>
 		<part name="cart" interface="a7800_cart">
-			<feature name="pcb_type" value="TYPE-2" />
 			<feature name="slot" value="a78_sg" />
 			<dataarea name="rom" size="131072">
 				<rom name="tchdown.bin" size="131072" crc="aae12695" sha1="364bf0fef8a67f7e66761c76a3a6a0dd186f04aa" offset="0" />
@@ -2294,7 +2174,6 @@ almost nothing like the prototype.
 		<info name="serial" value="CX7856"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
-			<feature name="pcb_type" value="TYPE-6" />
 			<feature name="slot" value="a78_sg_ram" />
 			<dataarea name="rom" size="65536">
 				<rom name="twrtpllr.bin" size="65536" crc="4407ba04" sha1="53976013986e0ad3694ab9c021420b8172465de7" offset="0" />
@@ -2311,7 +2190,6 @@ almost nothing like the prototype.
 		<info name="serial" value="CX7856"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a7800_cart">
-			<feature name="pcb_type" value="TYPE-6" />
 			<feature name="slot" value="a78_sg_ram" />
 			<dataarea name="rom" size="65536">
 				<rom name="twrtpleu.bin" size="65536" crc="0f87fd7b" sha1="56e1b795e80382edb376e4536d1dee539d4ac548" offset="0" />
@@ -2342,7 +2220,6 @@ almost nothing like the prototype.
 		<info name="serial" value="FG2002"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
-			<feature name="pcb_type" value="TYPE-2" />
 			<feature name="slot" value="a78_sg" />
 			<dataarea name="rom" size="65536">
 				<rom name="waterski.bin" size="65536" crc="930b30df" sha1="621c67c2228843405445222743ba3d7c1f04a3c4" offset="0" />
@@ -2357,7 +2234,6 @@ almost nothing like the prototype.
 		<info name="serial" value="CX7831"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
-			<feature name="pcb_type" value="TYPE-6" />
 			<feature name="slot" value="a78_sg_ram" />
 			<dataarea name="rom" size="131072">
 				<rom name="wingames.bin" size="131072" crc="8981b531" sha1="b3725d6f0834c68ac62ce13eb9eb0d01d1124e5e" offset="0" />
@@ -2379,7 +2255,6 @@ almost nothing like the prototype.
 		<info name="serial" value="CX7831"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
-			<feature name="pcb_type" value="TYPE-6" />
 			<feature name="slot" value="a78_sg_ram" />
 			<dataarea name="rom" size="131072">
 				<rom name="wingameso.bin" size="131072" crc="cf648e88" sha1="361501982f4795c2d79fb6519e5c56452ebc5774" offset="0" />
@@ -2396,7 +2271,6 @@ almost nothing like the prototype.
 		<info name="serial" value="CX7858"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
-			<feature name="pcb_type" value="TYPE-2" />
 			<feature name="slot" value="a78_sg" />
 			<dataarea name="rom" size="131072">
 				<rom name="xnophobe.bin" size="131072" crc="5fd9a141" sha1="867adbfd7539ff81e68726ed6f5ff7326409539f" offset="0" />
@@ -2411,7 +2285,6 @@ almost nothing like the prototype.
 		<info name="serial" value="CX7858"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a7800_cart">
-			<feature name="pcb_type" value="TYPE-2" />
 			<feature name="slot" value="a78_sg" />
 			<dataarea name="rom" size="131072">
 				<rom name="xnophoeu.bin" size="131072" crc="cf0e44f1" sha1="b2cf7d6164d6e5acd47e9f6d7cf60bb0f775b4a3" offset="0" />
@@ -2426,7 +2299,6 @@ almost nothing like the prototype.
 		<info name="serial" value="CX7810"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
-			<feature name="pcb_type" value="TYPE-0" />
 			<feature name="slot" value="a78_rom" />
 			<dataarea name="rom" size="32768">
 				<rom name="xevious.bin" size="32768" crc="75fc124f" sha1="1d4f0335b152239553534fcbbacdca273802e3bd" offset="0" />
@@ -2441,7 +2313,6 @@ almost nothing like the prototype.
 		<info name="serial" value="CX7810"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a7800_cart">
-			<feature name="pcb_type" value="TYPE-0" />
 			<feature name="slot" value="a78_rom" />
 			<dataarea name="rom" size="49152">
 				<rom name="xevioeu.bin" size="49152" crc="d5ac738b" sha1="81647c8ce432f891328631b57dd3268dd315f8e8" offset="0" />
@@ -2507,7 +2378,6 @@ almost nothing like the prototype.
 		<info name="programmer" value="TEP392" />
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a7800_cart">
-			<feature name="pcb_type" value="TYPE-XM" />
 			<feature name="slot" value="a78_sg9" />
 			<dataarea name="rom" size="147456">
 				<rom name="dkxm_final_demo_pal.bin" size="147456" crc="d362712e" sha1="118c462d6698bd23c378785f80062fdd7d65ca00" offset="0" />
@@ -2522,7 +2392,6 @@ almost nothing like the prototype.
 		<info name="programmer" value="TEP392" />
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
-			<feature name="pcb_type" value="TYPE-XM" />
 			<feature name="slot" value="a78_sg9" />
 			<dataarea name="rom" size="147456">
 				<rom name="dkxm_final_demo_ntsc.bin" size="147456" crc="6e170055" sha1="f4da231312da06ff9e8af5681b5013b14886b455" offset="0" />
