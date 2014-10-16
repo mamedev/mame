@@ -265,7 +265,7 @@ static ADDRESS_MAP_START( ufo_map, AS_PROGRAM, 8, ufo_state )
 	AM_RANGE(0xe000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ufo_portmap, AS_PROGRAM, 8, ufo_state )
+static ADDRESS_MAP_START( ufo_portmap, AS_IO, 8, ufo_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("pit", pit8254_device, read, write)
