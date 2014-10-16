@@ -532,7 +532,8 @@ ROM_START( topsecrt ) /* "Not for use in any other country but Japan" */
 	ROM_LOAD( "ts_01.4e",    0x00000, 0x8000, CRC(8ea07917) SHA1(e9ace70d89482fc3669860450a41aacacbee9083) )
 
 	ROM_REGION( 0x1000, "mcu", 0 )  /* i8751 microcontroller */
-	ROM_LOAD( "c8751h-88",     0x0000, 0x1000, NO_DUMP )
+	//ROM_LOAD( "c8751h-88",     0x0000, 0x1000, NO_DUMP )
+	ROM_LOAD( "d8751h.bin",     0x0000, 0x1000, CRC(3ed7f0be) SHA1(db9e972065c8e60b5d74762dc3424271ea9524cb) )
 
 	ROM_REGION( 0x08000, "gfx1", 0 )
 	ROM_LOAD( "ts_08.8l",    0x00000, 0x8000, CRC(96ad379e) SHA1(accd3a560b259c186bc28cdc004ed8de0b12f9d5) )    /* VIDEORAM (text layer) tiles */

@@ -754,6 +754,21 @@ static ADDRESS_MAP_START( sf2mdt_map, AS_PROGRAM, 16, cps_state )
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( sf2b_map, AS_PROGRAM, 16, cps_state )
+	AM_RANGE(0x000000, 0x3fffff) AM_ROM
+	AM_RANGE(0x708100, 0x7081ff) AM_WRITE(sf2mdta_layer_w)
+	AM_RANGE(0x70c000, 0x70c001) AM_READ_PORT("IN1")
+	AM_RANGE(0x70c008, 0x70c009) AM_READ_PORT("IN2")
+	AM_RANGE(0x70c018, 0x70c01f) AM_READ(cps1_hack_dsw_r)
+	AM_RANGE(0x70c106, 0x70c107) AM_WRITE(cawingbl_soundlatch_w)
+	AM_RANGE(0x70d000, 0x70d001) AM_WRITENOP // writes FFFF
+	//AM_RANGE(0x800030, 0x800031) AM_WRITE(cps1_coinctrl_w)
+	AM_RANGE(0x800100, 0x80013f) AM_RAM AM_SHARE("cps_a_regs")  /* CPS-A custom */
+	AM_RANGE(0x800140, 0x80017f) AM_READWRITE(cps1_cps_b_r, cps1_cps_b_w)  AM_SHARE("cps_b_regs")  /* CPS-B custom */
+	AM_RANGE(0x900000, 0x92ffff) AM_RAM_WRITE(cps1_gfxram_w) AM_SHARE("gfxram")
+	AM_RANGE(0xff0000, 0xffffff) AM_RAM
+ADDRESS_MAP_END
+
 static ADDRESS_MAP_START( sgyxz_map, AS_PROGRAM, 16, cps_state )
 	AM_RANGE(0x000000, 0x3fffff) AM_ROM
 	AM_RANGE(0x800030, 0x800031) AM_WRITE(cps1_coinctrl_w)
@@ -1682,6 +1697,11 @@ static MACHINE_CONFIG_START( sf2mdt, cps_state )
 	MCFG_MSM5205_VCLK_CB(WRITELINE(cps_state, m5205_int2)) /* interrupt function */
 	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S96_4B)      /* 4KHz 4-bit */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( sf2b, sf2mdt)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(sf2b_map)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( knightsb, cps_state )
@@ -2640,7 +2660,7 @@ ROM_START( sf2mdtb )
 	ROM_RELOAD(            0x10000, 0x20000 )
 ROM_END
 
-ROM_START( sf2mdtc )
+ROM_START( sf2b )
 	ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code */
 	ROM_LOAD16_WORD_SWAP( "pf1-2-sg076.bin",  0x000000, 0x100000, CRC(1d15bc7a) SHA1(834627545f191f39de6beb008c89623f2b88c13b) )
 
@@ -2765,7 +2785,14 @@ DRIVER_INIT_MEMBER(cps_state, sf2mdta)
 	DRIVER_INIT_CALL(cps1);
 }
 
+DRIVER_INIT_MEMBER(cps_state, sf2b)
+{
+	/* bootleg sprite ram */
+	m_bootleg_sprite_ram = (UINT16*)m_maincpu->space(AS_PROGRAM).install_ram(0x700000, 0x703fff);
+	m_maincpu->space(AS_PROGRAM).install_ram(0x704000, 0x707fff, m_bootleg_sprite_ram); 
 
+	DRIVER_INIT_CALL(cps1);
+}
 
 // ************************************************************************* SLAMPIC
 
@@ -2886,9 +2913,10 @@ GAME( 1992, sf2m1,     sf2ce,    sf2m1,     sf2,      cps_state, sf2m1,    ROT0,
 GAME( 1992, sf2mdt,    sf2ce,    sf2mdt,    sf2mdt,   cps_state, sf2mdt,   ROT0,   "bootleg", "Street Fighter II': Magic Delta Turbo (bootleg, set 1)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )   // 920313 - based on (heavily modified) World version
 GAME( 1992, sf2mdta,   sf2ce,    sf2mdt,    sf2mdt,   cps_state, sf2mdta,  ROT0,   "bootleg", "Street Fighter II': Magic Delta Turbo (bootleg, set 2)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )   // 920313 - based on World version
 GAME( 1992, sf2mdtb,   sf2ce,    sf2mdt,    sf2mdtb,  cps_state, sf2mdtb,  ROT0,   "bootleg", "Street Fighter II': Magic Delta Turbo (bootleg, set 3)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )   // 920313 - based on World version
-GAME( 1992, sf2mdtc,   sf2ce,    sf2mdt,    sf2mdt,   cps_state, sf2mdta,  ROT0,   "bootleg", "Street Fighter II': Magic Delta Turbo (bootleg, set 4)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
 
-GAME( 1992, sf2m9,     sf2ce,    sf2m1,     sf2,      cps_state, dinopic,    ROT0,   "bootleg", "Street Fighter II': Champion Edition (M9, bootleg)",  GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE ) // 920313 ETC
+GAME( 1992, sf2b,  	   sf2,   	 sf2b,    	sf2mdt,   cps_state, sf2b,     ROT0,   "bootleg", "Street Fighter II: The World Warrior (bootleg)",  GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )	//910204 - based on World version
+
+GAME( 1992, sf2m9,     sf2ce,    sf2m1,     sf2,      cps_state, dinopic,  ROT0,   "bootleg", "Street Fighter II': Champion Edition (M9, bootleg)",  GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE ) // 920313 ETC
 
 GAME( 1993, slampic,   slammast, slampic,   slammast, cps_state, dinopic,  ROT0,   "bootleg", "Saturday Night Slam Masters (bootleg with PIC16c57)", GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND | GAME_SUPPORTS_SAVE ) // 930713 ETC
 
