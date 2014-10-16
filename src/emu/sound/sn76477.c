@@ -32,7 +32,6 @@
 #include "sn76477.h"
 
 
-
 /*****************************************************************************
  *
  *  Debugging
@@ -79,53 +78,15 @@
  *
  *  Test Mode
  *
- *  in test mode, the interface structure
- *  passed in by the driver is not used.
- *  Instead, the values for all the inputs
- *  can be specified by modifing the structure
- *  below.  Calls by the driver to the input
- *  setter functions are ignored. Use the
- *  space bar to enable/disable the chip.
+ *  in test mode, calls by the driver to
+ *  the input setter functions are ignored.
+ *  Interface values can be set in device_start
+ *  to any desired test value.
+ *  Use the space bar to enable/disable the chip.
  *
  *****************************************************************************/
 
 #define TEST_MODE   0
-
-
-#if TEST_MODE
-
-static const sn76477_interface empty_interface =
-{
-	0,          /*  4 noise_clock_res  */
-	0,          /*  5 filter_res       */
-	0,          /*  6 filter_cap       */
-	0,          /*  7 decay_res        */
-	0,          /*  8 attack_decay_cap */
-	0,          /* 10 attack_res       */
-	0,          /* 11 amplitude_res    */
-	0,          /* 12 feedback_res     */
-	0,          /* 16 vco_voltage      */
-	0,          /* 17 vco_cap          */
-	0,          /* 18 vco_res          */
-	0,          /* 19 pitch_voltage    */
-	0,          /* 20 slf_res          */
-	0,          /* 21 slf_cap          */
-	0,          /* 23 oneshot_cap      */
-	0,          /* 24 oneshot_res      */
-	0,          /* 22 vco              */
-	0,          /* 26 mixer A          */
-	0,          /* 25 mixer B          */
-	0,          /* 27 mixer C          */
-	0,          /* 1  envelope 1       */
-	0,          /* 28 envelope 2       */
-	0           /* 9  enable           */
-};
-
-#define test_interface empty_interface
-
-#endif
-
-
 
 /*****************************************************************************
  *
@@ -231,56 +192,15 @@ sn76477_device::sn76477_device(const machine_config &mconfig, const char *tag, d
 		m_noise_gen_count(0),
 		m_attack_decay_cap_voltage(0),
 		m_rng(0),
+		m_mixer_a(0),
+		m_mixer_b(0),
+		m_mixer_c(0),
+		m_envelope_1(0),
+		m_envelope_2(0),
 		m_channel(NULL),
 		m_our_sample_rate(0),
 		m_file(NULL)
 {
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void sn76477_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const sn76477_interface *intf = reinterpret_cast<const sn76477_interface *>(static_config());
-	if (intf != NULL)
-	#if TEST_MODE == 0
-	*static_cast<sn76477_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-		m_intf_noise_clock_res = 0.0;
-		m_intf_noise_filter_res = 0.0;
-		m_intf_noise_filter_cap = 0.0;
-		m_intf_decay_res = 0.0;
-		m_intf_attack_decay_cap = 0.0;
-		m_intf_attack_res = 0.0;
-		m_intf_amplitude_res = 0.0;
-		m_intf_feedback_res = 0.0;
-		m_intf_vco_voltage = 0.0;
-		m_intf_vco_cap = 0.0;
-		m_intf_vco_res = 0.0;
-		m_intf_pitch_voltage = 0.0;
-		m_intf_slf_res = 0.0;
-		m_intf_slf_cap = 0.0;
-		m_intf_one_shot_cap = 0.0;
-		m_intf_one_shot_res = 0.0;
-		m_intf_vco = 0;
-		m_intf_mixer_a = 0;
-		m_intf_mixer_b = 0;
-		m_intf_mixer_c = 0;
-		m_intf_envelope_1 = 0;
-		m_intf_envelope_2 = 0;
-		m_intf_enable = 0;
-	}
-	#else
-	intf = &test_interface;
-	#endif
 }
 
 //-------------------------------------------------
@@ -302,30 +222,12 @@ void sn76477_device::device_start()
 
 	intialize_noise();
 
-	/* set up interface values */
-	_SN76477_enable_w(m_intf_enable);
-	_SN76477_vco_w(m_intf_vco);
-	_SN76477_mixer_a_w(m_intf_mixer_a);
-	_SN76477_mixer_b_w(m_intf_mixer_b);
-	_SN76477_mixer_c_w(m_intf_mixer_c);
-	_SN76477_envelope_1_w(m_intf_envelope_1);
-	_SN76477_envelope_2_w(m_intf_envelope_2);
-	_SN76477_one_shot_res_w(m_intf_one_shot_res);
-	_SN76477_one_shot_cap_w(m_intf_one_shot_cap);
-	_SN76477_slf_res_w(m_intf_slf_res);
-	_SN76477_slf_cap_w(m_intf_slf_cap);
-	_SN76477_vco_res_w(m_intf_vco_res);
-	_SN76477_vco_cap_w(m_intf_vco_cap);
-	_SN76477_vco_voltage_w(m_intf_vco_voltage);
-	_SN76477_noise_clock_res_w(m_intf_noise_clock_res);
-	_SN76477_noise_filter_res_w(m_intf_noise_filter_res);
-	_SN76477_noise_filter_cap_w(m_intf_noise_filter_cap);
-	_SN76477_decay_res_w(m_intf_decay_res);
-	_SN76477_attack_res_w(m_intf_attack_res);
-	_SN76477_attack_decay_cap_w(m_intf_attack_decay_cap);
-	_SN76477_amplitude_res_w(m_intf_amplitude_res);
-	_SN76477_feedback_res_w(m_intf_feedback_res);
-	_SN76477_pitch_voltage_w(m_intf_pitch_voltage);
+	// set up mixer and envelope modes, based on interface values
+	_SN76477_mixer_a_w(m_mixer_a);
+	_SN76477_mixer_b_w(m_mixer_b);
+	_SN76477_mixer_c_w(m_mixer_c);
+	_SN76477_envelope_1_w(m_envelope_1);
+	_SN76477_envelope_2_w(m_envelope_2);
 
 	m_one_shot_cap_voltage = ONE_SHOT_CAP_VOLTAGE_MIN;
 	m_slf_cap_voltage = SLF_CAP_VOLTAGE_MIN;

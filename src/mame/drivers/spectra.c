@@ -218,33 +218,6 @@ TIMER_DEVICE_CALLBACK_MEMBER( spectra_state::outtimer)
 		m_out_offs = 0xff;
 }
 
-static const sn76477_interface sn76477_intf =
-{
-	RES_M(1000),    /*  4  noise_res        */
-	RES_M(1000),    /*  5  filter_res       */
-	CAP_N(0),   /*  6  filter_cap       */
-	RES_K(470), /*  7  decay_res        */
-	CAP_N(1),   /*  8  attack_decay_cap */
-	RES_K(22),  /* 10  attack_res       */
-	RES_K(100), /* 11  amplitude_res    */
-	RES_K(52),  /* 12  feedback_res     */
-	5.0,    /* 16  vco_voltage      */
-	CAP_U(0.01),    /* 17  vco_cap          */
-	RES_K(390), /* 18  vco_res          */
-	0.0,  /* 19  pitch_voltage  */
-	RES_M(1),   /* 20  slf_res          */
-	CAP_U(0.1), /* 21  slf_cap          */
-	CAP_U(0.47),    /* 23  oneshot_cap      */
-	RES_K(470),     /* 24  oneshot_res  */
-	0,              /* 22  vco (variable)               */
-	0,              /* 26  mixer A (grounded)           */
-	0,              /* 25  mixer B (variable)           */
-	0,              /* 27  mixer C (variable)           */
-	0,              /* 1   envelope 1 (variable)        */
-	0,              /* 28  envelope 2 (grounded)        */
-	1               /* 9   enable (variable)            */
-};
-
 
 static MACHINE_CONFIG_START( spectra, spectra_state )
 	/* basic machine hardware */
@@ -268,9 +241,22 @@ static MACHINE_CONFIG_START( spectra, spectra_state )
 
 	/* Sound */
 	MCFG_FRAGMENT_ADD( genpin_audio )
+
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("snsnd", SN76477, 0)
-	MCFG_SOUND_CONFIG(sn76477_intf)
+	MCFG_SN76477_NOISE_PARAMS(RES_M(1000), RES_M(1000), CAP_N(0)) // noise + filter
+	MCFG_SN76477_DECAY_RES(RES_K(470))                    // decay_res
+	MCFG_SN76477_ATTACK_PARAMS(CAP_N(1), RES_K(22))       // attack_decay_cap + attack_res
+	MCFG_SN76477_AMP_RES(RES_K(100))                      // amplitude_res
+	MCFG_SN76477_FEEDBACK_RES(RES_K(52))                  // feedback_res
+	MCFG_SN76477_VCO_PARAMS(5.0, CAP_U(0.01), RES_K(390)) // VCO volt + cap + res
+	MCFG_SN76477_PITCH_VOLTAGE(0.0)                       // pitch_voltage
+	MCFG_SN76477_SLF_PARAMS(CAP_U(0.1), RES_M(1))         // slf caps + res
+	MCFG_SN76477_ONESHOT_PARAMS(CAP_U(0.47), RES_K(470))  // oneshot caps + res
+	MCFG_SN76477_VCO_MODE(0)                              // VCO mode
+	MCFG_SN76477_MIXER_PARAMS(0, 0, 0)                    // mixer A, B, C
+	MCFG_SN76477_ENVELOPE_PARAMS(0, 0)                    // envelope 1, 2
+	MCFG_SN76477_ENABLE(1)                                // enable
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 

@@ -530,34 +530,6 @@ UINT32 laserbat_state::screen_update_laserbat(screen_device &screen, bitmap_ind1
 	return 0;
 }
 
-/* Laser Battle sound **********************************/
-
-static const sn76477_interface laserbat_sn76477_interface =
-{
-	RES_K(47),      /*  4 noise_res         R21    47K */
-	0,              /*  5 filter_res (variable) */
-	CAP_P(1000),    /*  6 filter_cap        C21    1000 pF */
-	0,              /*  7 decay_res         */
-	0,              /*  8 attack_decay_cap  */
-	0,              /* 10 attack_res        */
-	RES_K(47),      /* 11 amplitude_res     R26    47K */
-	0,              /* 12 feedback_res (variable) */
-	5.0 * RES_K(2.2) / (RES_K(2.2) + RES_K(4.7)),   /* 16  vco_voltage       */
-	0,              /* 17 vco_cap           */
-	0,              /* 18 vco_res (variable) */
-	5.0,            /* 19 pitch_voltage     */
-	0,              /* 20 slf_res (variable) */
-	CAP_U(4.7),     /* 21 slf_cap           C24    4.7 uF */
-	0,              /* 23 oneshot_cap       */
-	0,              /* 24 oneshot_res       */
-	0,              /* 22 vco (variable) */
-	0,              /* 26 mixer A           */
-	0,              /* 25 mixer B (variable) */
-	0,              /* 27 mixer C           */
-	0,              /* 1  envelope 1        */
-	1,              /* 28 envelope 2        */
-	1               /* 9  enable (variable) */
-};
 
 /* Cat'N Mouse sound ***********************************/
 
@@ -683,7 +655,6 @@ static MACHINE_CONFIG_START( laserbat, laserbat_state )
 	MCFG_CPU_IO_MAP(laserbat_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", laserbat_state,  laserbat_interrupt)
 
-
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
@@ -712,7 +683,19 @@ static MACHINE_CONFIG_START( laserbat, laserbat_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("snsnd", SN76477, 0) // output not connected
-	MCFG_SOUND_CONFIG(laserbat_sn76477_interface)
+	MCFG_SN76477_NOISE_PARAMS(RES_K(47), 0, CAP_P(1000)) // noise + filter: R21 47K + N/C + C21 1000 pF
+	MCFG_SN76477_DECAY_RES(0)                            // decay_res
+	MCFG_SN76477_ATTACK_PARAMS(0, 0)                     // attack_decay_cap + attack_res
+	MCFG_SN76477_AMP_RES(RES_K(47))                      // amplitude_res: R26 47K
+	MCFG_SN76477_FEEDBACK_RES(RES_K(200))                // feedback_res
+	MCFG_SN76477_VCO_PARAMS(5.0 * RES_K(2.2) / (RES_K(2.2) + RES_K(4.7)), 0, 0) // VCO volt + cap + res
+	MCFG_SN76477_PITCH_VOLTAGE(5.0)                      // pitch_voltage
+	MCFG_SN76477_SLF_PARAMS(CAP_U(4.7), 0)               // slf caps + res: C24 4.7 uF + (variable)
+	MCFG_SN76477_ONESHOT_PARAMS(0,0)                     // oneshot caps + res
+	MCFG_SN76477_VCO_MODE(0)                             // VCO mode
+	MCFG_SN76477_MIXER_PARAMS(0, 0, 0)                   // mixer A, B, C
+	MCFG_SN76477_ENVELOPE_PARAMS(0, 1)                   // envelope 1, 2
+	MCFG_SN76477_ENABLE(1)                               // enable
 
 	MCFG_TMS3615_ADD("tms1", 4000000/8/2) // 250 kHz, from second chip's clock out
 	MCFG_SOUND_ROUTE(TMS3615_FOOTAGE_8, "mono", 1.0)

@@ -761,32 +761,6 @@ WRITE8_MEMBER(_8080bw_state::polaris_sh_port_3_w)
 #define SCHASER_4V      SCHASER_HSYNC /2 /4
 #define SCHASER_8V      SCHASER_HSYNC /2 /8
 
-const sn76477_interface schaser_sn76477_interface =
-{
-	RES_K( 47), /*  4 noise_res         */
-	RES_K(330), /*  5 filter_res        */
-	CAP_P(470), /*  6 filter_cap        */
-	RES_M(2.2), /*  7 decay_res         */
-	CAP_U(1.0), /*  8 attack_decay_cap  */
-	RES_K(4.7), /* 10 attack_res        */
-	0,          /* 11 amplitude_res (variable)  */
-	RES_K(33),  /* 12 feedback_res      */
-	0,          /* 16 vco_voltage       */
-	CAP_U(0.1), /* 17 vco_cap           */
-	RES_K(39),  /* 18 vco_res           */
-	5.0,        /* 19 pitch_voltage     */
-	RES_K(120), /* 20 slf_res           */
-	CAP_U(1.0), /* 21 slf_cap           */
-	CAP_U(0.1), /* 23 oneshot_cap       */
-	RES_K(220), /* 24 oneshot_res       */
-	1,          /* 22 vco               */
-	0,          /* 26 mixer A           */
-	0,          /* 25 mixer B           */
-	0,          /* 27 mixer C           */
-	1,          /* 1  envelope 1        */
-	0,          /* 28 envelope 2        */
-	1           /* 9  enable (variable) */
-};
 
 /* Nodes - Inputs */
 #define SCHASER_DOT_EN      NODE_01
@@ -1067,33 +1041,6 @@ WRITE8_MEMBER(_8080bw_state::rollingc_sh_port_w)
 /* Lupin III preliminary sound           */
 /* Correct samples not available         */
 /*****************************************/
-
-const sn76477_interface lupin3_sn76477_interface =
-{
-	0,          /*  4 noise_res (N/C)        */
-	0,          /*  5 filter_res (N/C)       */
-	0,          /*  6 filter_cap (N/C)       */
-	0,          /*  7 decay_res (N/C)        */
-	0,          /*  8 attack_decay_cap (N/C) */
-	RES_K(100), /* 10 attack_res             */
-	RES_K(56),  /* 11 amplitude_res          */
-	RES_K(10),  /* 12 feedback_res           */
-	0,          /* 16 vco_voltage (N/C)      */
-	CAP_U(0.1), /* 17 vco_cap                */
-	RES_K(8.2), /* 18 vco_res                */
-	5.0,        /* 19 pitch_voltage          */
-	RES_K(120), /* 20 slf_res                */
-	CAP_U(1.0), /* 21 slf_cap                */
-	0,          /* 23 oneshot_cap (N/C)      */
-	0,          /* 24 oneshot_res (N/C)      */
-	1,          /* 22 vco                    */
-	0,          /* 26 mixer A                */
-	0,          /* 25 mixer B                */
-	0,          /* 27 mixer C                */
-	1,          /* 1  envelope 1             */
-	0,          /* 28 envelope 2             */
-	1           /* 9  enable (variable)      */
-};
 
 const char *const lupin3_sample_names[] =
 {

@@ -192,37 +192,21 @@ WRITE8_MEMBER(astrof_state::tomahawk_audio_w)
 }
 
 
-static const sn76477_interface tomahawk_sn76477_interface =
-{
-	0,              /*  4 noise_res (N/C)        */
-	0,              /*  5 filter_res (N/C)       */
-	0,              /*  6 filter_cap (N/C)       */
-	0,              /*  7 decay_res (N/C)        */
-	0,              /*  8 attack_decay_cap (N/C) */
-	0,              /* 10 attack_res (N/C)       */
-	RES_K(47),      /* 11 amplitude_res          */
-	RES_K(47),      /* 12 feedback_res           */
-	0,              /* 16 vco_voltage (N/C)      */
-	CAP_U(0.033),   /* 17 vco_cap                */
-	RES_K(33),      /* 18 vco_res                */
-	5.0,            /* 19 pitch_voltage          */
-	RES_K(47),      /* 20 slf_res                */
-	CAP_U(2.2),     /* 21 slf_cap                */
-	0,              /* 23 oneshot_cap (N/C)      */
-	0,              /* 24 oneshot_res (N/C)      */
-	1,              /* 22 vco                    */
-	0,              /* 26 mixer A                */
-	0,              /* 25 mixer B                */
-	0,              /* 27 mixer C                */
-	0,              /* 1  envelope 1             */
-	0,              /* 28 envelope 2             */
-	1               /* 9  enable (variable)      */
-};
-
-
 MACHINE_CONFIG_FRAGMENT( tomahawk_audio )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("snsnd", SN76477, 0)
-	MCFG_SOUND_CONFIG(tomahawk_sn76477_interface)
+	MCFG_SN76477_NOISE_PARAMS(0, 0, 0)                   // noise + filter: N/C
+	MCFG_SN76477_DECAY_RES(0)                            // decay_res N/C
+	MCFG_SN76477_ATTACK_PARAMS(0, 0)                     // attack_decay_cap + attack_res: N/C
+	MCFG_SN76477_AMP_RES(RES_K(47))                      // amplitude_res
+	MCFG_SN76477_FEEDBACK_RES(RES_K(47))                 // feedback_res
+	MCFG_SN76477_VCO_PARAMS(0, CAP_U(0.033), RES_K(33))  // VCO volt + cap + res
+	MCFG_SN76477_PITCH_VOLTAGE(5.0)                      // pitch_voltage
+	MCFG_SN76477_SLF_PARAMS(CAP_U(2.2), RES_K(47))       // slf caps + res
+	MCFG_SN76477_ONESHOT_PARAMS(0, 0)                    // oneshot caps + res: N/C
+	MCFG_SN76477_VCO_MODE(1)                             // VCO mode
+	MCFG_SN76477_MIXER_PARAMS(0, 0, 0)                   // mixer A, B, C
+	MCFG_SN76477_ENVELOPE_PARAMS(0, 0)                   // envelope 1, 2
+	MCFG_SN76477_ENABLE(1)                               // enable
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END

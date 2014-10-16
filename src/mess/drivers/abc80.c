@@ -246,31 +246,6 @@ INPUT_PORTS_END
 //**************************************************************************
 
 //-------------------------------------------------
-//  sn76477_interface csg_intf
-//-------------------------------------------------
-
-static const sn76477_interface csg_intf =
-{
-	RES_K(47),      //  4  noise_res        R26 47k
-	RES_K(330),     //  5  filter_res       R24 330k
-	CAP_P(390),     //  6  filter_cap       C52 390p
-	RES_K(47),      //  7  decay_res        R23 47k
-	CAP_U(10),      //  8  attack_decay_cap C50 10u/35V
-	RES_K(2.2),     // 10  attack_res       R21 2.2k
-	RES_K(33),      // 11  amplitude_res    R19 33k
-	RES_K(10),      // 12  feedback_res     R18 10k
-	0,              // 16  vco_voltage      0V or 2.5V
-	CAP_N(10) ,     // 17  vco_cap          C48 10n
-	RES_K(100),     // 18  vco_res          R20 100k
-	0,              // 19  pitch_voltage    N/C
-	RES_K(220),     // 20  slf_res          R22 220k
-	CAP_U(1),       // 21  slf_cap          C51 1u/35V
-	CAP_U(0.1),     // 23  oneshot_cap      C53 0.1u
-	RES_K(330)      // 24  oneshot_res      R25 330k
-};
-
-
-//-------------------------------------------------
 //  Z80PIO
 //-------------------------------------------------
 
@@ -523,7 +498,15 @@ static MACHINE_CONFIG_START( abc80, abc80_state )
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD(SN76477_TAG, SN76477, 0)
-	MCFG_SOUND_CONFIG(csg_intf)
+	MCFG_SN76477_NOISE_PARAMS(RES_K(47), RES_K(330), CAP_P(390)) // noise + filter: R26 47k - R24 330k - C52 390p
+	MCFG_SN76477_DECAY_RES(RES_K(47))                   //  decay_res: R23 47k
+	MCFG_SN76477_ATTACK_PARAMS(CAP_U(10), RES_K(2.2))   // attack_decay_cap + attack_res: C50 10u/35V - R21 2.2k
+	MCFG_SN76477_AMP_RES(RES_K(33))                     // amplitude_res: R19 33k
+	MCFG_SN76477_FEEDBACK_RES(RES_K(10))                // feedback_res: R18 10k
+	MCFG_SN76477_VCO_PARAMS(0, CAP_N(10), RES_K(100))   // VCO volt + cap + res: 0V or 2.5V - C48 10n - R20 100k
+	MCFG_SN76477_PITCH_VOLTAGE(0)                       // pitch_voltage: N/C
+	MCFG_SN76477_SLF_PARAMS(CAP_U(1), RES_K(220))       // slf caps + res: C51 1u/35V - R22 220k
+	MCFG_SN76477_ONESHOT_PARAMS(CAP_U(0.1), RES_K(330)) // oneshot caps + res: C53 0.1u - R25 330k
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	// devices

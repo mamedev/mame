@@ -818,26 +818,6 @@ void hec2hrp_state::Update_Sound(address_space &space, UINT8 data)
 	m_sn->enable_w(m_Pin_Value[9][m_AU[14]]);
 }
 
-const sn76477_interface hector_sn76477_interface =
-{
-	RES_K(47),      /*  4  noise_res*/
-	RES_K(330),     /*  5  filter_res*/
-	CAP_P(390),     /*  6  filter_cap*/
-	RES_K(680),     /*  7  decay_res*/
-	CAP_U(47),      /*  8  attack_decay_cap*/
-	RES_K(180),     /* 10  attack_res*/
-	RES_K(33),      /* 11  amplitude_res*/
-	RES_K(100),     /* 12  feedback_res*/
-	2,              /* 16  vco_voltage*/
-	CAP_N(47) ,     /* 17  vco_cap*/
-	RES_K(1000),    /* 18  vco_res*/
-	2,              /* 19  pitch_voltage*/
-	RES_K(180),     /* 20  slf_res*/
-	CAP_U(0.1),     /* 21  slf_cap*/
-	CAP_U(1.00001), /* 23  oneshot_cap*/
-	RES_K(10000)    /* 24  oneshot_res*/
-};
-
 void hec2hrp_state::hector_reset(int hr, int with_D2 )
 {
 	// Initialization Hector

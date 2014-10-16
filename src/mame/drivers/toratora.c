@@ -192,34 +192,6 @@ WRITE8_MEMBER(toratora_state::clear_timer_w)
  *
  *************************************/
 
-static const sn76477_interface sn76477_intf =
-{
-	RES_K(47),  /*  4 noise_res                */
-//  RES_K(120), /*  5 filter_res               */
-	RES_M(1.2), /*  5 filter_res               */
-	CAP_P(470), /*  6 filter_cap               */
-	RES_K(680), /*  7 decay_res                */
-	CAP_U(0.2), /*  8 attack_decay_cap         */
-	RES_K(3.3), /* 10 attack_res               */
-	0,          /* 11 amplitude_res (variable) */
-	RES_K(50),  /* 12 feedback_res             */
-	0,          /* 16 vco_voltage (variable)   */
-	CAP_U(0.1), /* 17 vco_cap                  */
-	RES_K(51),  /* 18 vco_res                  */
-	5.0,        /* 19 pitch_voltage (N/C)      */
-	RES_K(470), /* 20 slf_res                  */
-	CAP_U(0.1), /* 21 slf_cap                  */
-	CAP_U(0.1), /* 23 oneshot_cap              */
-	RES_M(1),   /* 24 oneshot_res              */
-	0,          /* 22 vco (variable)           */
-	0,          /* 26 mixer A (variable)       */
-	0,          /* 25 mixer B (variable)       */
-	0,          /* 27 mixer C (variable)       */
-	0,          /* 1  envelope 1 (variable)    */
-	0,          /* 28 envelope 2 (variable)    */
-	1           /* 9  enable (variable)        */
-};
-
 
 WRITE8_MEMBER(toratora_state::sn1_port_a_u2_u3_w)
 {
@@ -415,11 +387,35 @@ static MACHINE_CONFIG_START( toratora, toratora_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("sn1", SN76477, 0)
-	MCFG_SOUND_CONFIG(sn76477_intf)
+	MCFG_SN76477_NOISE_PARAMS(RES_K(47), RES_M(1.2) /* RES_K(120) */, CAP_P(470)) // noise + filter
+	MCFG_SN76477_DECAY_RES(RES_K(680))                   // decay_res
+	MCFG_SN76477_ATTACK_PARAMS(CAP_U(0.2),  RES_K(3.3))  // attack_decay_cap + attack_res
+	MCFG_SN76477_AMP_RES(0)                              // amplitude_res
+	MCFG_SN76477_FEEDBACK_RES(RES_K(50))                 // feedback_res
+	MCFG_SN76477_VCO_PARAMS(0, CAP_U(0.1), RES_K(51))    // VCO volt + cap + res
+	MCFG_SN76477_PITCH_VOLTAGE(5.0)                      // pitch_voltage
+	MCFG_SN76477_SLF_PARAMS(CAP_U(0.1), RES_K(470))      // slf caps + res
+	MCFG_SN76477_ONESHOT_PARAMS(CAP_U(0.1), RES_M(1))    // oneshot caps + res
+	MCFG_SN76477_VCO_MODE(0)                             // VCO mode
+	MCFG_SN76477_MIXER_PARAMS(0, 0, 0)                   // mixer A, B, C
+	MCFG_SN76477_ENVELOPE_PARAMS(0, 0)                   // envelope 1, 2
+	MCFG_SN76477_ENABLE(1)                               // enable
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_SOUND_ADD("sn2", SN76477, 0)
-	MCFG_SOUND_CONFIG(sn76477_intf)
+	MCFG_SN76477_NOISE_PARAMS(RES_K(47), RES_M(1.2) /* RES_K(120) */, CAP_P(470)) // noise + filter
+	MCFG_SN76477_DECAY_RES(RES_K(680))                   // decay_res
+	MCFG_SN76477_ATTACK_PARAMS(CAP_U(0.2),  RES_K(3.3))  // attack_decay_cap + attack_res
+	MCFG_SN76477_AMP_RES(0)                              // amplitude_res
+	MCFG_SN76477_FEEDBACK_RES(RES_K(50))                 // feedback_res
+	MCFG_SN76477_VCO_PARAMS(0, CAP_U(0.1), RES_K(51))    // VCO volt + cap + res
+	MCFG_SN76477_PITCH_VOLTAGE(5.0)                      // pitch_voltage
+	MCFG_SN76477_SLF_PARAMS(CAP_U(0.1), RES_K(470))      // slf caps + res
+	MCFG_SN76477_ONESHOT_PARAMS(CAP_U(0.1), RES_M(1))    // oneshot caps + res
+	MCFG_SN76477_VCO_MODE(0)                             // VCO mode
+	MCFG_SN76477_MIXER_PARAMS(0, 0, 0)                   // mixer A, B, C
+	MCFG_SN76477_ENVELOPE_PARAMS(0, 0)                   // envelope 1, 2
+	MCFG_SN76477_ENABLE(1)                               // enable
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 MACHINE_CONFIG_END

@@ -321,182 +321,7 @@ WRITE8_MEMBER(dai3wksi_state::dai3wksi_audio_3_w)
 	m_ic81->vco_w((~data >> 3) & 0x01);       /* player shoot vco control */
 }
 
-
-/* Invader Hit */
-static const sn76477_interface dai3wksi_sn76477_ic76 =
-{
-	0,              /*  4 noise_res (N/C)        */
-	0,              /*  5 filter_res (N/C)       */
-	0,              /*  6 filter_cap (N/C)       */
-	RES_K(4.7),     /*  7 decay_res              */
-	CAP_U(0.1),     /*  8 attack_decay_cap       */
-	RES_K(4.7),     /* 10 attack_res             */
-	RES_K(150),     /* 11 amplitude_res          */
-	RES_K(47),      /* 12 feedback_res           */
-	0,              /* 16 vco_voltage (variable) */
-	CAP_U(0.022),   /* 17 vco_cap                */
-	RES_K(33),      /* 18 vco_res                */
-	5.0,            /* 19 pitch_voltage          */
-	0,              /* 20 slf_res (N/C)          */
-	0,              /* 21 slf_cap (N/C)          */
-	0,              /* 23 oneshot_cap (N/C)      */
-	0,              /* 24 oneshot_res (N/C)      */
-	0,              /* 22 vco                    */
-	0,              /* 26 mixer A                */
-	0,              /* 25 mixer B                */
-	0,              /* 27 mixer C                */
-	0,              /* 1  envelope 1             */
-	0,              /* 28 envelope 2             */
-	0               /* 9  enable                 */
-};
-
-
-/* Ship Movement */
-static const sn76477_interface dai3wksi_sn76477_ic77 =
-{
-	0,              /*  4 noise_res (N/C)      */
-	0,              /*  5 filter_res (N/C)     */
-	0,              /*  6 filter_cap (N/C)     */
-	RES_K(4.7),     /*  7 decay_res            */
-	CAP_U(0.1),     /*  8 attack_decay_cap     */
-	RES_K(4.7),     /* 10 attack_res           */
-	RES_K(150),     /* 11 amplitude_res        */
-	RES_K(47),      /* 12 feedback_res         */
-	0,              /* 16 vco_voltage (N/C)    */
-	0,              /* 17 vco_cap (N/C)        */
-	0,              /* 18 vco_res (N/C)        */
-	0,              /* 19 pitch_voltage        */
-	RES_K(200),     /* 20 slf_res              */
-	CAP_U(0.0022),  /* 21 slf_cap              */
-	CAP_U(10),      /* 23 oneshot_cap          */
-	RES_K(4.7),     /* 24 oneshot_res          */
-	5,              /* 22 vco                  */
-	5,              /* 26 mixer A              */
-	0,              /* 25 mixer B              */
-	0,              /* 27 mixer C              */
-	5,              /* 1  envelope 1           */
-	0,              /* 28 envelope 2           */
-	1               /* 9  enable (variable)    */
-};
-
-
-/* Danger */
-static const sn76477_interface dai3wksi_sn76477_ic78 =
-{
-	RES_K(47),      /*  4 noise_res            */
-	0,              /*  5 filter_res (N/C)     */
-	0,              /*  6 filter_cap (N/C)     */
-	RES_K(200),     /*  7 decay_res            */
-	CAP_U(0.1),     /*  8 attack_decay_cap     */
-	RES_K(4.7),     /* 10 attack_res           */
-	RES_K(150),     /* 11 amplitude_res        */
-	RES_K(47),      /* 12 feedback_res         */
-	0,              /* 16 vco_voltage (N/C)    */
-	CAP_U(0.47),    /* 17 vco_cap              */
-	RES_K(75),      /* 18 vco_res              */
-	5.0,            /* 19 pitch_voltage        */
-	RES_K(47),      /* 20 slf_res              */
-	CAP_N(1),       /* 21 slf_cap              */
-	CAP_U(10),      /* 23 oneshot_cap          */
-	RES_K(22),      /* 24 oneshot_res          */
-	5,              /* 22 vco                  */
-	0,              /* 26 mixer A              */
-	0,              /* 25 mixer B              */
-	0,              /* 27 mixer C              */
-	5,              /* 1  envelope 1           */
-	0,              /* 28 envelope 2           */
-	1               /* 9  enable (variable)    */
-};
-
-
-/* Invader Marching Noise */
-static const sn76477_interface dai3wksi_sn76477_ic79 =
-{
-	0,              /*  4 noise_res (N/C)      */
-	0,              /*  5 filter_res (N/C)     */
-	0,              /*  6 filter_cap (N/C)     */
-	RES_K(56),      /*  7 decay_res            */
-	CAP_U(0.1),     /*  8 attack_decay_cap     */
-	RES_K(4.7),     /* 10 attack_res           */
-	RES_K(150),     /* 11 amplitude_res        */
-	RES_K(47),      /* 12 feedback_res         */
-	0,              /* 16 vco_voltage (N/C)    */
-	CAP_U(0.01),    /* 17 vco_cap              */
-	RES_K(100),     /* 18 vco_res              */
-	5.0,            /* 19 pitch_voltage        */
-	RES_K(150),     /* 20 slf_res              */
-	CAP_N(1),       /* 21 slf_cap              */
-	CAP_U(10),      /* 23 oneshot_cap          */
-	RES_K(22),      /* 24 oneshot_res          */
-	5,              /* 22 vco                  */
-	0,              /* 26 mixer A              */
-	0,              /* 25 mixer B              */
-	0,              /* 27 mixer C              */
-	5,              /* 1  envelope 1 (variable)*/
-	5,              /* 28 envelope 2           */
-	1               /* 9  enable (variable)    */
-};
-
-
-/* Big Planet Explosion */
-static const sn76477_interface dai3wksi_sn76477_ic80 =
-{
-	RES_K(47),      /*  4 noise_res            */
-	RES_K(330),     /*  5 filter_res           */
-	CAP_P(470),     /*  6 filter_cap           */
-	RES_M(2),       /*  7 decay_res            */
-	CAP_U(1),       /*  8 attack_decay_cap     */
-	RES_K(4.7),     /* 10 attack_res           */
-	RES_K(150),     /* 11 amplitude_res        */
-	RES_K(47),      /* 12 feedback_res         */
-	0,              /* 16 vco_voltage (N/C)    */
-	0,              /* 17 vco_cap (N/C)        */
-	0,              /* 18 vco_res (N/C)        */
-	5.0,            /* 19 pitch_voltage        */
-	0,              /* 20 slf_res (N/C)        */
-	0,              /* 21 slf_cap (N/C)        */
-	CAP_U(10),      /* 23 oneshot_cap          */
-	RES_K(55),      /* 24 oneshot_res          */
-	5,              /* 22 vco                  */
-	0,              /* 26 mixer A              */
-	5,              /* 25 mixer B              */
-	0,              /* 27 mixer C              */
-	5,              /* 1  envelope 1           */
-	0,              /* 28 envelope 2           */
-	1               /* 9  enable (variable)    */
-};
-
-
-/* Plane Shoot noise */
-static const sn76477_interface dai3wksi_sn76477_ic81 =
-{
-	0,              /*  4 noise_res (N/C)      */
-	0,              /*  5 filter_res (N/C)     */
-	0,              /*  6 filter_cap (N/C)     */
-	RES_K(200),     /*  7 decay_res            */
-	CAP_U(10),      /*  8 attack_decay_cap     */
-	RES_K(4.7),     /* 10 attack_res           */
-	RES_K(150),     /* 11 amplitude_res        */
-	RES_K(47),      /* 12 feedback_res         */
-	2.5,            /* 16 vco_voltage    */
-	CAP_U(0.01),    /* 17 vco_cap              */
-	RES_K(100),     /* 18 vco_res              */
-	5.0,            /* 19 pitch_voltage        */
-	RES_K(100),     /* 20 slf_res              */
-	CAP_N(0.47),    /* 21 slf_cap              */
-	CAP_U(10),      /* 23 oneshot_cap          */
-	RES_K(6.8),     /* 24 oneshot_res          */
-	0,              /* 22 vco (variable)       */
-	0,              /* 26 mixer A              */
-	5,              /* 25 mixer B              */
-	5,              /* 27 mixer C              */
-	5,              /* 1  envelope 1           */
-	0,              /* 28 envelope 2           */
-	1               /* 9  enable (variable)    */
-};
-
 #endif
-
 
 
 /*************************************
@@ -609,28 +434,106 @@ static MACHINE_CONFIG_START( dai3wksi, dai3wksi_state )
 	MCFG_SAMPLES_NAMES(dai3wksi_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 #else
+	// Invader Hit
 	MCFG_SOUND_ADD("ic76", SN76477, 0)
-	MCFG_SOUND_CONFIG(dai3wksi_sn76477_ic76)
+	MCFG_SN76477_NOISE_PARAMS(0, 0, 0)                   // noise + filter: N/C
+	MCFG_SN76477_DECAY_RES(RES_K(4.7))                   // decay_res
+	MCFG_SN76477_ATTACK_PARAMS(CAP_U(0.1), RES_K(4.7))   // attack_decay_cap + attack_res
+	MCFG_SN76477_AMP_RES(RES_K(150))                     // amplitude_res
+	MCFG_SN76477_FEEDBACK_RES(RES_K(47))                 // feedback_res
+	MCFG_SN76477_VCO_PARAMS(0, CAP_U(0.022), RES_K(33))  // VCO volt + cap + res
+	MCFG_SN76477_PITCH_VOLTAGE(5.0)                      // pitch_voltage
+	MCFG_SN76477_SLF_PARAMS(0, 0)                        // slf caps + res: N/C
+	MCFG_SN76477_ONESHOT_PARAMS(0, 0)                    // oneshot caps + res: N/C
+	MCFG_SN76477_VCO_MODE(0)                             // VCO mode
+	MCFG_SN76477_MIXER_PARAMS(0, 0, 0)                   // mixer A, B, C
+	MCFG_SN76477_ENVELOPE_PARAMS(0, 0)                   // envelope 1, 2
+	MCFG_SN76477_ENABLE(0)                               // enable
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.4)
 
+	// Ship Movement
 	MCFG_SOUND_ADD("ic77", SN76477, 0)
-	MCFG_SOUND_CONFIG(dai3wksi_sn76477_ic77)
+	MCFG_SN76477_NOISE_PARAMS(0, 0, 0)                   // noise + filter: N/C
+	MCFG_SN76477_DECAY_RES(RES_K(4.7))                   // decay_res
+	MCFG_SN76477_ATTACK_PARAMS(CAP_U(0.1), RES_K(4.7))   // attack_decay_cap + attack_res
+	MCFG_SN76477_AMP_RES(RES_K(150))                     // amplitude_res
+	MCFG_SN76477_FEEDBACK_RES(RES_K(47))                 // feedback_res
+	MCFG_SN76477_VCO_PARAMS(0, 0, 0)                     // VCO volt + cap + res: N/C
+	MCFG_SN76477_PITCH_VOLTAGE(0)                        // pitch_voltage
+	MCFG_SN76477_SLF_PARAMS(CAP_U(0.0022), RES_K(200))   // slf caps + res
+	MCFG_SN76477_ONESHOT_PARAMS(CAP_U(10), RES_K(4.7))   // oneshot caps + res
+	MCFG_SN76477_VCO_MODE(5)                             // VCO mode
+	MCFG_SN76477_MIXER_PARAMS(5, 0, 0)                   // mixer A, B, C
+	MCFG_SN76477_ENVELOPE_PARAMS(5, 0)                   // envelope 1, 2
+	MCFG_SN76477_ENABLE(1)                               // enable
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.4)
 
+	// Danger
 	MCFG_SOUND_ADD("ic78", SN76477, 0)
-	MCFG_SOUND_CONFIG(dai3wksi_sn76477_ic78)
+	MCFG_SN76477_NOISE_PARAMS(RES_K(47), 0, 0)           // noise + filter
+	MCFG_SN76477_DECAY_RES(RES_K(200))                   // decay_res
+	MCFG_SN76477_ATTACK_PARAMS(CAP_U(0.1), RES_K(4.7))   // attack_decay_cap + attack_res
+	MCFG_SN76477_AMP_RES(RES_K(150))                     // amplitude_res
+	MCFG_SN76477_FEEDBACK_RES(RES_K(47))                 // feedback_res
+	MCFG_SN76477_VCO_PARAMS(0, CAP_U(0.47), RES_K(75))   // VCO volt + cap + res
+	MCFG_SN76477_PITCH_VOLTAGE(5.0)                      // pitch_voltage
+	MCFG_SN76477_SLF_PARAMS(CAP_N(1), RES_K(47))         // slf caps + res
+	MCFG_SN76477_ONESHOT_PARAMS(CAP_U(10), RES_K(22))    // oneshot caps + res
+	MCFG_SN76477_VCO_MODE(5)                             // VCO mode
+	MCFG_SN76477_MIXER_PARAMS(0, 0, 0)                   // mixer A, B, C
+	MCFG_SN76477_ENVELOPE_PARAMS(5, 0)                   // envelope 1, 2
+	MCFG_SN76477_ENABLE(1)                               // enable
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.4)
 
+	// Invader Marching Noise
 	MCFG_SOUND_ADD("ic79", SN76477, 0)
-	MCFG_SOUND_CONFIG(dai3wksi_sn76477_ic79)
+	MCFG_SN76477_NOISE_PARAMS(0, 0, 0)                   // noise + filter: N/C
+	MCFG_SN76477_DECAY_RES(RES_K(56))                    // decay_res
+	MCFG_SN76477_ATTACK_PARAMS(CAP_U(0.1), RES_K(4.7))   // attack_decay_cap + attack_res
+	MCFG_SN76477_AMP_RES(RES_K(150))                     // amplitude_res
+	MCFG_SN76477_FEEDBACK_RES(RES_K(47))                 // feedback_res
+	MCFG_SN76477_VCO_PARAMS(0, CAP_U(0.01), RES_K(100))  // VCO volt + cap + res
+	MCFG_SN76477_PITCH_VOLTAGE(5.0)                      // pitch_voltage
+	MCFG_SN76477_SLF_PARAMS(CAP_N(1), RES_K(150))        // slf caps + res
+	MCFG_SN76477_ONESHOT_PARAMS(CAP_U(10), RES_K(22))    // oneshot caps + res
+	MCFG_SN76477_VCO_MODE(5)                             // VCO mode
+	MCFG_SN76477_MIXER_PARAMS(0, 0, 0)                   // mixer A, B, C
+	MCFG_SN76477_ENVELOPE_PARAMS(5, 5)                   // envelope 1, 2
+	MCFG_SN76477_ENABLE(1)                               // enable
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.4)
 
+	// Big Planet Explosion
 	MCFG_SOUND_ADD("ic80", SN76477, 0)
-	MCFG_SOUND_CONFIG(dai3wksi_sn76477_ic80)
+	MCFG_SN76477_NOISE_PARAMS(RES_K(47), RES_K(330), CAP_P(470)) // noise + filter
+	MCFG_SN76477_DECAY_RES(RES_M(2))                     // decay_res
+	MCFG_SN76477_ATTACK_PARAMS(CAP_U(1.0), RES_K(4.7))   // attack_decay_cap + attack_res
+	MCFG_SN76477_AMP_RES(RES_K(150))                     // amplitude_res
+	MCFG_SN76477_FEEDBACK_RES(RES_K(47))                 // feedback_res
+	MCFG_SN76477_VCO_PARAMS(0, 0, 0)                     // VCO volt + cap + res: N/C
+	MCFG_SN76477_PITCH_VOLTAGE(5.0)                      // pitch_voltage
+	MCFG_SN76477_SLF_PARAMS(0, 0)                        // slf caps + res: N/C
+	MCFG_SN76477_ONESHOT_PARAMS(CAP_U(10), RES_K(55))    // oneshot caps + res
+	MCFG_SN76477_VCO_MODE(5)                             // VCO mode
+	MCFG_SN76477_MIXER_PARAMS(0, 5, 0)                   // mixer A, B, C
+	MCFG_SN76477_ENVELOPE_PARAMS(5, 0)                   // envelope 1, 2
+	MCFG_SN76477_ENABLE(1)                               // enable
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.4)
 
+	// Plane Shoot noise
 	MCFG_SOUND_ADD("ic81", SN76477, 0)
-	MCFG_SOUND_CONFIG(dai3wksi_sn76477_ic81)
+	MCFG_SN76477_NOISE_PARAMS(0, 0, 0)                    // noise + filter: N/C
+	MCFG_SN76477_DECAY_RES(RES_K(200))                    // decay_res
+	MCFG_SN76477_ATTACK_PARAMS(CAP_U(10), RES_K(4.7))     // attack_decay_cap + attack_res
+	MCFG_SN76477_AMP_RES(RES_K(150))                      // amplitude_res
+	MCFG_SN76477_FEEDBACK_RES(RES_K(47))                  // feedback_res
+	MCFG_SN76477_VCO_PARAMS(2.5, CAP_U(0.01), RES_K(100)) // VCO volt + cap + res
+	MCFG_SN76477_PITCH_VOLTAGE(5.0)                       // pitch_voltage
+	MCFG_SN76477_SLF_PARAMS(CAP_N(0.47), RES_K(100))      // slf caps + res
+	MCFG_SN76477_ONESHOT_PARAMS(CAP_U(10), RES_K(6.8))    // oneshot caps + res
+	MCFG_SN76477_VCO_MODE(0)                              // VCO mode
+	MCFG_SN76477_MIXER_PARAMS(0, 5, 5)                    // mixer A, B, C
+	MCFG_SN76477_ENVELOPE_PARAMS(5, 0)                    // envelope 1, 2
+	MCFG_SN76477_ENABLE(1)                                // enable
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.4)
 #endif
 MACHINE_CONFIG_END

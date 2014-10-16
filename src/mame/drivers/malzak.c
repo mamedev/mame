@@ -271,33 +271,6 @@ PALETTE_INIT_MEMBER(malzak_state, malzak)
 }
 
 
-static const sn76477_interface sn76477_intf =
-{
-	0,  /* N/C */       /*  4  noise_res         */
-	0,  /* N/C */       /*  5  filter_res        */
-	0,  /* N/C */       /*  6  filter_cap        */
-	0,  /* N/C */       /*  7  decay_res         */
-	0,  /* N/C */       /*  8  attack_decay_cap  */
-	RES_K(100),         /* 10  attack_res        */
-	RES_K(56),          /* 11  amplitude_res     */
-	RES_K(10),          /* 12  feedback_res      */
-	0,  /* N/C */       /* 16  vco_voltage       */
-	CAP_U(0.1),         /* 17  vco_cap           */
-	RES_K(8.2),         /* 18  vco_res           */
-	5.0,                /* 19  pitch_voltage     */
-	RES_K(120),         /* 20  slf_res           */
-	CAP_U(1.0),         /* 21  slf_cap           */
-	0,  /* N/C */       /* 23  oneshot_cap       */
-	0,  /* N/C */       /* 24  oneshot_res       */
-	0,                  /* 22    vco             */
-	1,                  /* 26 mixer A           */
-	1,                  /* 25 mixer B           */
-	1,                  /* 27 mixer C           */
-	1,                  /* 1  envelope 1        */
-	1,                  /* 28 envelope 2        */
-	1                   /* 9     enable          */
-};
-
 READ8_MEMBER(malzak_state::videoram_r)
 {
 	return m_videoram[offset];
@@ -359,11 +332,35 @@ static MACHINE_CONFIG_START( malzak, malzak_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("sn1", SN76477, 0)
-	MCFG_SOUND_CONFIG(sn76477_intf)
+	MCFG_SN76477_NOISE_PARAMS(0, 0, 0)                  // noise + filter: N/C
+	MCFG_SN76477_DECAY_RES(0)                           // decay_res: N/C
+	MCFG_SN76477_ATTACK_PARAMS(0, RES_K(100))           // attack_decay_cap + attack_res
+	MCFG_SN76477_AMP_RES(RES_K(56))                     // amplitude_res
+	MCFG_SN76477_FEEDBACK_RES(RES_K(10))                // feedback_res
+	MCFG_SN76477_VCO_PARAMS(0, CAP_U(0.1), RES_K(8.2))  // VCO volt + cap + res
+	MCFG_SN76477_PITCH_VOLTAGE(5.0)                     // pitch_voltage
+	MCFG_SN76477_SLF_PARAMS(CAP_U(1.0), RES_K(120))     // slf caps + res
+	MCFG_SN76477_ONESHOT_PARAMS(0, 0)                   // oneshot caps + res: N/C
+	MCFG_SN76477_VCO_MODE(0)                            // VCO mode
+	MCFG_SN76477_MIXER_PARAMS(1, 1, 1)                  // mixer A, B, C
+	MCFG_SN76477_ENVELOPE_PARAMS(1, 1)                  // envelope 1, 2
+	MCFG_SN76477_ENABLE(1)                              // enable
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MCFG_SOUND_ADD("sn2", SN76477, 0)
-	MCFG_SOUND_CONFIG(sn76477_intf)
+	MCFG_SN76477_NOISE_PARAMS(0, 0, 0)                  // noise + filter: N/C
+	MCFG_SN76477_DECAY_RES(0)                           // decay_res: N/C
+	MCFG_SN76477_ATTACK_PARAMS(0, RES_K(100))           // attack_decay_cap + attack_res
+	MCFG_SN76477_AMP_RES(RES_K(56))                     // amplitude_res
+	MCFG_SN76477_FEEDBACK_RES(RES_K(10))                // feedback_res
+	MCFG_SN76477_VCO_PARAMS(0, CAP_U(0.1), RES_K(8.2))  // VCO volt + cap + res
+	MCFG_SN76477_PITCH_VOLTAGE(5.0)                     // pitch_voltage
+	MCFG_SN76477_SLF_PARAMS(CAP_U(1.0), RES_K(120))     // slf caps + res
+	MCFG_SN76477_ONESHOT_PARAMS(0, 0)                   // oneshot caps + res: N/C
+	MCFG_SN76477_VCO_MODE(0)                            // VCO mode
+	MCFG_SN76477_MIXER_PARAMS(1, 1, 1)                  // mixer A, B, C
+	MCFG_SN76477_ENVELOPE_PARAMS(1, 1)                  // envelope 1, 2
+	MCFG_SN76477_ENABLE(1)                              // enable
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 MACHINE_CONFIG_END

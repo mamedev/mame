@@ -41,34 +41,6 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(rotaryf_interrupt);
 };
 
-static const sn76477_interface rotaryf_sn76477_interface =
-{
-	0,          /*  4 noise_res (N/C)        */
-	0,          /*  5 filter_res (N/C)       */
-	0,          /*  6 filter_cap (N/C)       */
-	0,          /*  7 decay_res (N/C)        */
-	0,          /*  8 attack_decay_cap (N/C) */
-	RES_K(100), /* 10 attack_res             */
-	RES_K(56),  /* 11 amplitude_res          */
-	RES_K(10),  /* 12 feedback_res           */
-	0,          /* 16 vco_voltage (N/C)      */
-	CAP_U(0.1), /* 17 vco_cap                */
-	RES_K(8.2), /* 18 vco_res                */
-	5.0,        /* 19 pitch_voltage          */
-	RES_K(120), /* 20 slf_res                */
-	CAP_U(1.0), /* 21 slf_cap                */
-	0,          /* 23 oneshot_cap (N/C)      */
-	0,          /* 24 oneshot_res (N/C)      */
-	1,          /* 22 vco                    */
-	0,          /* 26 mixer A                */
-	0,          /* 25 mixer B                */
-	0,          /* 27 mixer C                */
-	1,          /* 1  envelope 1             */
-	0,          /* 28 envelope 2             */
-	1           /* 9  enable (variable)      */
-};
-
-
 
 static const char *const rotaryf_sample_names[] =
 {
@@ -269,9 +241,23 @@ static MACHINE_CONFIG_START( rotaryf, rotaryf_state )
 	MCFG_SCREEN_UPDATE_DRIVER(rotaryf_state, screen_update_rotaryf)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
 	MCFG_SOUND_ADD("snsnd", SN76477, 0)
-	MCFG_SOUND_CONFIG(rotaryf_sn76477_interface)
+	MCFG_SN76477_NOISE_PARAMS(0, 0, 0)                 // noise + filter: N/C
+	MCFG_SN76477_DECAY_RES(0)                          // decay_res: N/C
+	MCFG_SN76477_ATTACK_PARAMS(0, RES_K(100))          // attack_decay_cap + attack_res
+	MCFG_SN76477_AMP_RES(RES_K(56))                    // amplitude_res
+	MCFG_SN76477_FEEDBACK_RES(RES_K(10))               // feedback_res
+	MCFG_SN76477_VCO_PARAMS(0, CAP_U(0.1), RES_K(8.2)) // VCO volt + cap + res
+	MCFG_SN76477_PITCH_VOLTAGE(5.0)                    // pitch_voltage
+	MCFG_SN76477_SLF_PARAMS(CAP_U(1.0), RES_K(120))    // slf caps + res
+	MCFG_SN76477_ONESHOT_PARAMS(0, 0)                  // oneshot caps + res: N/C
+	MCFG_SN76477_VCO_MODE(1)                           // VCO mode
+	MCFG_SN76477_MIXER_PARAMS(0, 0, 0)                 // mixer A, B, C
+	MCFG_SN76477_ENVELOPE_PARAMS(1, 0)                 // envelope 1, 2
+	MCFG_SN76477_ENABLE(1)                             // enable
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
+
 	MCFG_SOUND_ADD("samples", SAMPLES, 0)
 	MCFG_SAMPLES_CHANNELS(6)
 	MCFG_SAMPLES_NAMES(rotaryf_sample_names)

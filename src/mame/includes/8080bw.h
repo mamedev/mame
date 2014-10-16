@@ -165,7 +165,4 @@ extern const char *const lupin3_sample_names[];
 DISCRETE_SOUND_EXTERN( ballbomb );
 DISCRETE_SOUND_EXTERN( indianbt );
 DISCRETE_SOUND_EXTERN( polaris );
-
-extern const sn76477_interface lupin3_sn76477_interface;
-extern const sn76477_interface schaser_sn76477_interface;
 DISCRETE_SOUND_EXTERN( schaser );

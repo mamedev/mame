@@ -41,48 +41,112 @@
 #include "machine/rescap.h"
 
 
-
 /*****************************************************************************
  *
  *  Interface definition
  *
  *****************************************************************************/
 
-struct sn76477_interface
-{
-	double m_intf_noise_clock_res;
-	double m_intf_noise_filter_res;
-	double m_intf_noise_filter_cap;
-	double m_intf_decay_res;
-	double m_intf_attack_decay_cap;
-	double m_intf_attack_res;
-	double m_intf_amplitude_res;
-	double m_intf_feedback_res;
-	double m_intf_vco_voltage;
-	double m_intf_vco_cap;
-	double m_intf_vco_res;
-	double m_intf_pitch_voltage;
-	double m_intf_slf_res;
-	double m_intf_slf_cap;
-	double m_intf_one_shot_cap;
-	double m_intf_one_shot_res;
-	UINT32 m_intf_vco;
-	UINT32 m_intf_mixer_a;
-	UINT32 m_intf_mixer_b;
-	UINT32 m_intf_mixer_c;
-	UINT32 m_intf_envelope_1;
-	UINT32 m_intf_envelope_2;
-	UINT32 m_intf_enable;
-};
+
+#define MCFG_SN76477_NOISE_PARAMS(_clock_res, _filter_res, _filter_cap) \
+	sn76477_device::set_noise_params(*device, _clock_res, _filter_res, _filter_cap);
+
+#define MCFG_SN76477_DECAY_RES(_decay_res) \
+	sn76477_device::set_decay_res(*device, _decay_res);
+
+#define MCFG_SN76477_ATTACK_PARAMS(_decay_cap, _res) \
+	sn76477_device::set_attack_params(*device, _decay_cap, _res);
+
+#define MCFG_SN76477_AMP_RES(_amp_res) \
+	sn76477_device::set_amp_res(*device, _amp_res);
+
+#define MCFG_SN76477_FEEDBACK_RES(_feedback_res) \
+	sn76477_device::set_feedack_res(*device, _feedback_res);
+
+#define MCFG_SN76477_VCO_PARAMS(_volt, _cap, _res) \
+	sn76477_device::set_vco_params(*device, _volt, _cap, _res);
+
+#define MCFG_SN76477_PITCH_VOLTAGE(_volt) \
+	sn76477_device::set_pitch_voltage(*device, _volt);
+
+#define MCFG_SN76477_SLF_PARAMS(_cap, _res) \
+	sn76477_device::set_slf_params(*device, _cap, _res);
+
+#define MCFG_SN76477_ONESHOT_PARAMS(_cap, _res) \
+	sn76477_device::set_oneshot_params(*device, _cap, _res);
+
+#define MCFG_SN76477_VCO_MODE(_mode) \
+	sn76477_device::set_vco_mode(*device, _mode);
+
+#define MCFG_SN76477_MIXER_PARAMS(_a, _b, _c) \
+	sn76477_device::set_mixer_params(*device, _a, _b, _c);
+
+#define MCFG_SN76477_ENVELOPE_PARAMS(_env1, _env2) \
+	sn76477_device::set_envelope_params(*device, _env1, _env2);
+
+#define MCFG_SN76477_ENABLE(_enable) \
+	sn76477_device::set_enable(*device, _enable);
 
 class sn76477_device : public device_t,
-									public device_sound_interface,
-									public sn76477_interface
+						public device_sound_interface
 {
 public:
 	sn76477_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~sn76477_device() {}
 
+	static void set_noise_params(device_t &device, double clock_res, double filter_res, double filter_cap)
+	{
+		sn76477_device &dev = downcast<sn76477_device &>(device);
+		dev.m_noise_clock_res = clock_res;
+		dev.m_noise_filter_res = filter_res;
+		dev.m_noise_filter_cap = filter_cap;
+	}
+	static void set_decay_res(device_t &device, double decay_res) { downcast<sn76477_device &>(device).m_decay_res = decay_res; }
+	static void set_attack_params(device_t &device, double decay_cap, double res)
+	{
+		sn76477_device &dev = downcast<sn76477_device &>(device);
+		dev.m_attack_decay_cap = decay_cap;
+		dev.m_attack_res = res;
+	}
+	static void set_amp_res(device_t &device, double amp_res) { downcast<sn76477_device &>(device).m_amplitude_res = amp_res; }
+	static void set_feedack_res(device_t &device, double feedback_res) { downcast<sn76477_device &>(device).m_feedback_res = feedback_res; }
+	static void set_vco_params(device_t &device, double volt, double cap, double res)
+	{
+		sn76477_device &dev = downcast<sn76477_device &>(device);
+		dev.m_vco_voltage = volt;
+		dev.m_vco_cap = cap;
+		dev.m_vco_res = res;
+	}	
+	static void set_pitch_voltage(device_t &device, double volt) { downcast<sn76477_device &>(device).m_pitch_voltage = volt; }
+	static void set_slf_params(device_t &device, double cap, double res)
+	{
+		sn76477_device &dev = downcast<sn76477_device &>(device);
+		dev.m_slf_cap = cap;
+		dev.m_slf_res = res;
+	}
+	static void set_oneshot_params(device_t &device, double cap, double res)
+	{
+		sn76477_device &dev = downcast<sn76477_device &>(device);
+		dev.m_one_shot_cap = cap;
+		dev.m_one_shot_res = res;
+	}
+	static void set_vco_mode(device_t &device, UINT32 mode) { downcast<sn76477_device &>(device).m_vco_mode = mode; }
+	static void set_mixer_params(device_t &device, UINT32 a, UINT32 b, UINT32 c)
+	{
+		sn76477_device &dev = downcast<sn76477_device &>(device);
+		dev.m_mixer_a = a;
+		dev.m_mixer_b = b;
+		dev.m_mixer_c = c;
+	}	
+	static void set_envelope_params(device_t &device, UINT32 env1, UINT32 env2)
+	{
+		sn76477_device &dev = downcast<sn76477_device &>(device);
+		dev.m_envelope_1 = env1;
+		dev.m_envelope_2 = env2;
+	}	
+	static void set_enable(device_t &device, UINT32 enable) { downcast<sn76477_device &>(device).m_enable = enable; }
+	
+	
 	/* these functions take 0 or 1 as a logic input */
 	WRITE_LINE_MEMBER( enable_w );      /* active LO, 0 = enabled, 1 = disabled */
 	WRITE_LINE_MEMBER( mixer_a_w );
@@ -125,7 +189,6 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_stop();
 
@@ -188,6 +251,13 @@ private:
 
 	UINT32 m_rng;                         /* current value of the random number generator */
 
+	// configured by the drivers and used to setup m_mixer_mode & m_envelope_mode at start
+	UINT32 m_mixer_a;
+	UINT32 m_mixer_b;
+	UINT32 m_mixer_c;
+	UINT32 m_envelope_1;
+	UINT32 m_envelope_2;
+	
 	/* others */
 	sound_stream *m_channel;              /* returned by stream_create() */
 	int m_our_sample_rate;                    /* from machine.sample_rate() */

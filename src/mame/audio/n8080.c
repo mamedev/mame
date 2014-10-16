@@ -10,61 +10,6 @@
 static const double ATTACK_RATE = 10e-6 * 500;
 static const double DECAY_RATE = 10e-6 * 16000;
 
-static const sn76477_interface sheriff_sn76477_interface =
-{
-	RES_K(36)  ,  /* 04 */
-	RES_K(100) ,  /* 05 */
-	CAP_N(1)   ,  /* 06 */
-	RES_K(620) ,  /* 07 */
-	CAP_U(1)   ,  /* 08 */
-	RES_K(20)  ,  /* 10 */
-	RES_K(150) ,  /* 11 */
-	RES_K(47)  ,  /* 12 */
-	0          ,  /* 16 */
-	CAP_N(1)   ,  /* 17 */
-	RES_M(1.5) ,  /* 18 */
-	0          ,  /* 19 */
-	RES_M(1.5) ,  /* 20 */
-	CAP_N(47)  ,  /* 21 */
-	CAP_N(47)  ,  /* 23 */
-	RES_K(560) ,  /* 24 */
-	0,            /* 22 vco */
-	0,            /* 26 mixer A */
-	0,            /* 25 mixer B */
-	0,            /* 27 mixer C */
-	1,            /* 1  envelope 1 */
-	0,            /* 28 envelope 2 */
-	1             /* 9  enable */
-};
-
-
-static const sn76477_interface spacefev_sn76477_interface =
-{
-	RES_K(36)  ,  /* 04 */
-	RES_K(150) ,  /* 05 */
-	CAP_N(1)   ,  /* 06 */
-	RES_M(1)   ,  /* 07 */
-	CAP_U(1)   ,  /* 08 */
-	RES_K(20)  ,  /* 10 */
-	RES_K(150) ,  /* 11 */
-	RES_K(47)  ,  /* 12 */
-	0          ,  /* 16 */
-	CAP_N(1)   ,  /* 17 */
-	RES_M(1.5) ,  /* 18 */
-	0          ,  /* 19 */
-	RES_M(1)   ,  /* 20 */
-	CAP_N(47)  ,  /* 21 */
-	CAP_N(47)  ,  /* 23 */
-	RES_K(820) ,  /* 24 */
-	0,            /* 22 vco */
-	0,            /* 26 mixer A */
-	0,            /* 25 mixer B */
-	0,            /* 27 mixer C */
-	1,            /* 1  envelope 1 */
-	0,            /* 28 envelope 2 */
-	1             /* 9  enable */
-};
-
 
 void n8080_state::spacefev_update_SN76477_status()
 {
@@ -564,7 +509,19 @@ MACHINE_CONFIG_FRAGMENT( spacefev_sound )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
 	MCFG_SOUND_ADD("snsnd", SN76477, 0)
-	MCFG_SOUND_CONFIG(spacefev_sn76477_interface)
+	MCFG_SN76477_NOISE_PARAMS(RES_K(36), RES_K(150), CAP_N(1)) // noise + filter
+	MCFG_SN76477_DECAY_RES(RES_M(1))                    // decay_res
+	MCFG_SN76477_ATTACK_PARAMS(CAP_U(1.0), RES_K(20))   // attack_decay_cap + attack_res
+	MCFG_SN76477_AMP_RES(RES_K(150))                    // amplitude_res
+	MCFG_SN76477_FEEDBACK_RES(RES_K(47))                // feedback_res
+	MCFG_SN76477_VCO_PARAMS(0, CAP_N(1), RES_M(1.5))    // VCO volt + cap + res
+	MCFG_SN76477_PITCH_VOLTAGE(0)                       // pitch_voltage
+	MCFG_SN76477_SLF_PARAMS(CAP_N(47), RES_M(1))        // slf caps + res
+	MCFG_SN76477_ONESHOT_PARAMS(CAP_N(47), RES_K(820))  // oneshot caps + res
+	MCFG_SN76477_VCO_MODE(0)                            // VCO mode
+	MCFG_SN76477_MIXER_PARAMS(0, 0, 0)                  // mixer A, B, C
+	MCFG_SN76477_ENVELOPE_PARAMS(1, 0)                  // envelope 1, 2
+	MCFG_SN76477_ENABLE(1)                              // enable
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)
 MACHINE_CONFIG_END
 
@@ -586,7 +543,19 @@ MACHINE_CONFIG_FRAGMENT( sheriff_sound )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
 	MCFG_SOUND_ADD("snsnd", SN76477, 0)
-	MCFG_SOUND_CONFIG(sheriff_sn76477_interface)
+	MCFG_SN76477_NOISE_PARAMS(RES_K(36), RES_K(100), CAP_N(1)) // noise + filter
+	MCFG_SN76477_DECAY_RES(RES_K(620))                  // decay_res
+	MCFG_SN76477_ATTACK_PARAMS(CAP_U(1.0), RES_K(20))   // attack_decay_cap + attack_res
+	MCFG_SN76477_AMP_RES(RES_K(150))                    // amplitude_res
+	MCFG_SN76477_FEEDBACK_RES(RES_K(47))                // feedback_res
+	MCFG_SN76477_VCO_PARAMS(0, CAP_N(1), RES_M(1.5))    // VCO volt + cap + res
+	MCFG_SN76477_PITCH_VOLTAGE(0)                       // pitch_voltage
+	MCFG_SN76477_SLF_PARAMS(CAP_N(47), RES_M(1.5))      // slf caps + res
+	MCFG_SN76477_ONESHOT_PARAMS(CAP_N(47), RES_K(560))  // oneshot caps + res
+	MCFG_SN76477_VCO_MODE(0)                            // VCO mode
+	MCFG_SN76477_MIXER_PARAMS(0, 0, 0)                  // mixer A, B, C
+	MCFG_SN76477_ENVELOPE_PARAMS(1, 0)                  // envelope 1, 2
+	MCFG_SN76477_ENABLE(1)                              // enable
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)
 MACHINE_CONFIG_END
 

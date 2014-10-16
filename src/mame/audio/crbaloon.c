@@ -135,42 +135,24 @@ static DISCRETE_SOUND_START(crbaloon)
 DISCRETE_SOUND_END
 
 
-
-static const sn76477_interface crbaloon_sn76477_interface =
-{
-	RES_K( 47), /*  4 noise_res          */
-	RES_K(330), /*  5 filter_res         */
-	CAP_P(470), /*  6 filter_cap         */
-	RES_K(220), /*  7 decay_res          */
-	CAP_U(1.0), /*  8 attack_decay_cap   */
-	RES_K(4.7), /* 10 attack_res         */
-	RES_M(  1), /* 11 amplitude_res      */
-	RES_K(200), /* 12 feedback_res       */
-	5.0,        /* 16 vco_voltage        */
-	CAP_P(470), /* 17 vco_cap            */
-	RES_K(330), /* 18 vco_res            */
-	5.0,        /* 19 pitch_voltage      */
-	RES_K( 20), /* 20 slf_res (variable) */
-	CAP_P(420), /* 21 slf_cap            */
-	CAP_U(1.0), /* 23 oneshot_cap        */
-	RES_K( 47), /* 24 oneshot_res        */
-	0,          /* 22 vco                */
-	0,          /* 26 mixer A            */
-	0,          /* 25 mixer B (variable) */
-	1,          /* 27 mixer C            */
-	1,          /* 1  envelope 1         */
-	0,          /* 28 envelope 2         */
-	0           /* 9  enable (variable)  */
-};
-
-
-
 MACHINE_CONFIG_FRAGMENT( crbaloon_audio )
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("snsnd", SN76477, 0)
-	MCFG_SOUND_CONFIG(crbaloon_sn76477_interface)
+	MCFG_SN76477_NOISE_PARAMS(RES_K(47), RES_K(330), CAP_P(470)) // noise + filter
+	MCFG_SN76477_DECAY_RES(RES_K(220))                   // decay_res
+	MCFG_SN76477_ATTACK_PARAMS(CAP_U(1.0), RES_K(4.7))   // attack_decay_cap + attack_res
+	MCFG_SN76477_AMP_RES(RES_M(1))                       // amplitude_res
+	MCFG_SN76477_FEEDBACK_RES(RES_K(200))                // feedback_res
+	MCFG_SN76477_VCO_PARAMS(5.0, CAP_P(470), RES_K(330)) // VCO volt + cap + res
+	MCFG_SN76477_PITCH_VOLTAGE(5.0)                      // pitch_voltage
+	MCFG_SN76477_SLF_PARAMS(CAP_P(420), RES_K(20))       // slf caps + res
+	MCFG_SN76477_ONESHOT_PARAMS(CAP_U(1.0), RES_K(47))   // oneshot caps + res
+	MCFG_SN76477_VCO_MODE(0)                             // VCO mode
+	MCFG_SN76477_MIXER_PARAMS(0, 0, 1)                   // mixer A, B, C
+	MCFG_SN76477_ENVELOPE_PARAMS(1, 0)                   // envelope 1, 2
+	MCFG_SN76477_ENABLE(0)                               // enable
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.0)
 
 	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
