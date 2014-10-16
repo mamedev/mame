@@ -366,6 +366,9 @@ int running_machine::run(bool firstrun)
 		if (strcmp(config().m_gamedrv.name, "___empty") != 0)
 			g_tagmap_counter_enabled = true;
 #endif
+		// handle initial load
+		if (m_saveload_schedule != SLS_NONE)
+			handle_saveload();
 
 		// run the CPUs until a reset or exit
 		m_hard_reset_pending = false;
