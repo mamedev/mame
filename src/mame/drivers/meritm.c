@@ -1,5 +1,5 @@
 /*
-  Merit CRT250 and CRT260 hardware
+  Merit CRT-250 and CRT-260 hardware
 
   Driver by Mariusz Wojcieszek
 
@@ -63,14 +63,14 @@ J3 - 65 Pin connector:
 
 Power & Common Ground wires are 18 gauge, all other wires are 20 or 22 gauge.
 
-  Optional addon boards for the CRT 250:
-  - CRT 254: Connects to a Dallas DS1204 electronic key
-  - CRT 256: Stores question roms (aka Memory Expansion board)
-  - CRT 258: Microtouch touch screen controller:
+  Optional addon boards for the CRT-250:
+  - CRT-254: Connects to a Dallas DS1204 electronic key
+  - CRT-256: Stores question roms (aka Memory Expansion board)
+  - CRT-258: Microtouch touch screen controller:
               Connects through the Z80 socket & contains a PC16550DN UART,
               relocated Z80, 1.8432MHz OSC, PAL labeled SC3980 & RS232C port
 
-  CRT 260 same basic components as CRT 250 with these additional components:
+  CRT-260 same basic components as CRT-250 with these additional components:
   - Microtouch touch screen controller (SMT-3)
   - PC16550 UART (for communication with touch screen controller)
   - DS1204 Electronic Key (for protection)
@@ -84,7 +84,7 @@ Power & Common Ground wires are 18 gauge, all other wires are 20 or 22 gauge.
 
   Known Games:
 
-  CRT 250:
+  CRT-250:
   Americana (c) 1987
   Dodge City (c) 1988
   Pit Boss II (c)1988
@@ -108,7 +108,7 @@ PROGRAM#    Program Version      Program Differences
 9234-00-07  New Jersey Version   Excludes Sex Trivia and includes 2-Coin Limit with Lockout Coil (Only for Supertouch 30 & Megastar)
 
 
-  CRT 260:
+  CRT-260:
   *Megatouch Video (c)1994?
   Megatouch II (c)1994
   Megatouch III (c)1995
@@ -697,13 +697,12 @@ static INPUT_PORTS_START(mtjpoker)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_C) PORT_NAME("Calibrate Touchsceen")
 
 	PORT_MODIFY("DSW")
-	PORT_DIPNAME( 0x01, 0x00, "Enable Touch Screen" ) PORT_DIPLOCATION("SW1:1") /* MUST be ON or "touches" don't register */
+	PORT_DIPNAME( 0x01, 0x00, "Enable Touchscreen" ) PORT_DIPLOCATION("SW1:1") /* MUST be ON or "touches" don't register */
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x10, 0x10, "Points Per Coin" ) PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(    0x10, "1 Point / Coin" )
 	PORT_DIPSETTING(    0x00, "5 Points / Coin" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x20, IP_ACTIVE_LOW, "SW1:6" )
 	PORT_DIPNAME( 0xc0, 0xc0, "Max Play" )       PORT_DIPLOCATION("SW1:7,8")
 	PORT_DIPSETTING(    0x40, "10" )
 	PORT_DIPSETTING(    0xc0, "20" )
@@ -844,7 +843,7 @@ static INPUT_PORTS_START(pbst30)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_C) PORT_NAME("Calibrate Touchsceen")
 
 	PORT_MODIFY("DSW")
-	PORT_DIPNAME( 0x01, 0x00, "Touch Screen Type" ) PORT_DIPLOCATION("SW1:1")
+	PORT_DIPNAME( 0x01, 0x00, "Touchscreen Type" ) PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x00, "13 Inch" )
 	PORT_DIPSETTING(    0x01, "19 Inch (Inverts Screen Coordinates)" )
 	PORT_DIPNAME( 0x20, 0x20, "Balls (Pit Pong) / Paddles (Breakin' Bricks)" ) PORT_DIPLOCATION("SW1:6")
@@ -1187,9 +1186,9 @@ MACHINE_CONFIG_END
 /*
 
 This set seems odd, it doesn't really have a title sequence or demo mode.
- NOT 100% this is "Americana" or just a no name touch Joker poker
+ NOT 100% sure this is "Americana" or just a no name touch Joker poker
 
-The Touch Screen Calibration routine doesn't seem to work?
+The Touchscreen Calibration routine doesn't seem to work?
 
 */
 
@@ -1514,7 +1513,7 @@ ROM_END
 
     System Info
     -----------
-     This is a counter top Touch screen game.
+     This is a counter top Touchscreen game.
 
     processor.. Z80 (Z0840006PSC)
     sound chip Yamaha YM2149F
@@ -2282,7 +2281,7 @@ DRIVER_INIT_MEMBER(meritm_state,megat3te)
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xfff8, 0xffff, read8_delegate(FUNC(meritm_state::meritm_ds1644_r), this), write8_delegate(FUNC(meritm_state::meritm_ds1644_w), this));
 };
 
-/* CRT 250 */
+/* CRT-250 */
 GAME( 1987, americna,  0,        meritm_crt250, americna,  driver_device, 0,        ROT0, "Merit", "Americana (9131-00)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1988, dodgecty,  0,        meritm_crt250, dodgecty,  driver_device, 0,        ROT0, "Merit", "Dodge City (9131-02)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1988, pitboss2,  0,        meritm_crt250, pitboss2,  driver_device, 0,        ROT0, "Merit", "Pit Boss II (9221-01C)", GAME_IMPERFECT_GRAPHICS )
@@ -2291,20 +2290,20 @@ GAME( 1990, pitbosss,  0,        meritm_crt250, pitbosss,  driver_device, 0,    
 GAME( 1990, pitbosssa, pitbosss, meritm_crt250, pitbosss,  driver_device, 0,        ROT0, "Merit", "Pit Boss Superstar (9221-10-00A)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1992, pitbosssc, pitbosss, meritm_crt250, pitbosss,  driver_device, 0,        ROT0, "Merit", "Pit Boss Superstar (9221-12-01)", GAME_IMPERFECT_GRAPHICS )
 
-/* CRT 250 + CRT 252 + CRT 256 + CRT 258 */
+/* CRT-250 + CRT-252 + CRT-256 + CRT-258 */
 GAME( 1994, mtjpoker,  0,        meritm_crt250_crt252_crt258, mtjpoker,   driver_device, 0,  ROT0, "Merit", "Merit Touch Joker Poker (9132-00)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1994, pbst30,    0,        meritm_crt250_crt252_crt258, pbst30,     driver_device, 0,  ROT0, "Merit", "Pit Boss Supertouch 30 (9234-10-01)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1993, pbst30b,   pbst30,   meritm_crt250_crt252_crt258, pbst30,     driver_device, 0,  ROT0, "Merit", "Pit Boss Supertouch 30 (9234-00-01)", GAME_IMPERFECT_GRAPHICS )
 
-/* CRT 250 + CRT 254 + CRT 256 */
+/* CRT-250 + CRT-254 + CRT-256 */
 GAME( 1993, pbss330,   0,        meritm_crt250_questions, pbss330,  driver_device, 0, ROT0, "Merit", "Pit Boss Superstar III 30 (9233-00-01)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1994, pitbossm,  0,        meritm_crt250_questions, pitbossm, driver_device, 0, ROT0, "Merit", "Pit Boss Megastar (9244-00-01)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1994, pitbossma, pitbossm, meritm_crt250_questions, pitbossa, driver_device, 0, ROT0, "Merit", "Pit Boss Megastar (9243-00-01)", GAME_IMPERFECT_GRAPHICS )
 
-/* CRT 260 NON-touchscreen based */
+/* CRT-260 NON-touchscreen based */
 GAME( 1995, realbrod,  0,        meritm_crt260, realbrod,    driver_device, 0,        ROT0, "Merit", "The Real Broadway (9131-20-00 R0A)", GAME_IMPERFECT_GRAPHICS )
 
-/* CRT 260 */
+/* CRT-260 */
 GAME( 1994, megat2,    0,      meritm_crt260, meritm_crt260, driver_device, 0,        ROT0, "Merit", "Pit Boss Megatouch II (9255-10-01 ROG, Standard version)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1994, megat2a ,  megat2, meritm_crt260, meritm_crt260, driver_device, 0,        ROT0, "Merit", "Pit Boss Megatouch II (9255-10-01 ROE, Standard version)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1994, megat2b ,  megat2, meritm_crt260, meritm_crt260, driver_device, 0,        ROT0, "Merit", "Pit Boss Megatouch II (9255-10-01 ROD, Standard version)", GAME_IMPERFECT_GRAPHICS )
