@@ -250,35 +250,18 @@ WRITE8_MEMBER( k051960_device::k051960_w )
 	m_ram[offset] = data;
 }
 
-READ16_MEMBER( k051960_device::k051960_word_r )
-{
-	return k051960_r(space, offset * 2 + 1) | (k051960_r(space, offset * 2) << 8);
-}
-
-WRITE16_MEMBER( k051960_device::k051960_word_w )
-{
-	if (ACCESSING_BITS_8_15)
-		k051960_w(space, offset * 2, (data >> 8) & 0xff);
-	if (ACCESSING_BITS_0_7)
-		k051960_w(space, offset * 2 + 1, data & 0xff);
-}
-
 
 /* should this be split by k051960? */
 READ8_MEMBER( k051960_device::k051937_r )
 {
 	if (m_readroms && offset >= 4 && offset < 8)
 		return k051960_fetchromdata(offset & 3);
-	else
-	{
-		if (offset == 0)
-		{
-			/* some games need bit 0 to pulse */
-			return (m_k051937_counter++) & 1;
-		}
-		//logerror("%04x: read unknown 051937 address %x\n", device->cpu->safe_pc(), offset);
-		return 0;
-	}
+	else if (offset == 0)
+		/* some games need bit 0 to pulse */
+		return (m_k051937_counter++) & 1;
+
+	//logerror("%04x: read unknown 051937 address %x\n", device->cpu->safe_pc(), offset);
+	return 0;
 }
 
 WRITE8_MEMBER( k051960_device::k051937_w )
@@ -330,19 +313,6 @@ int k051960_device::k051960_is_nmi_enabled( )
 	return m_nmi_enabled;
 }
 
-
-READ16_MEMBER( k051960_device::k051937_word_r )
-{
-	return k051937_r(space, offset * 2 + 1) | (k051937_r(space, offset * 2) << 8);
-}
-
-WRITE16_MEMBER( k051960_device::k051937_word_w )
-{
-	if (ACCESSING_BITS_8_15)
-		k051937_w(space, offset * 2,(data >> 8) & 0xff);
-	if (ACCESSING_BITS_0_7)
-		k051937_w(space, offset * 2 + 1,data & 0xff);
-}
 
 /*
  * Sprite Format

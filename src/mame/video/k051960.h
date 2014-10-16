@@ -54,13 +54,9 @@ public:
 
 	DECLARE_READ8_MEMBER( k051960_r );
 	DECLARE_WRITE8_MEMBER( k051960_w );
-	DECLARE_READ16_MEMBER( k051960_word_r );
-	DECLARE_WRITE16_MEMBER( k051960_word_w );
 
 	DECLARE_READ8_MEMBER( k051937_r );
 	DECLARE_WRITE8_MEMBER( k051937_w );
-	DECLARE_READ16_MEMBER( k051937_word_r );
-	DECLARE_WRITE16_MEMBER( k051937_word_w );
 
 	void k051960_sprites_draw(bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap, int min_priority, int max_priority);
 	int k051960_is_irq_enabled();
