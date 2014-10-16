@@ -181,7 +181,7 @@ void nycaptor_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
    x - no bg/sprite pri.
 */
 
-#define mKEY_MASK(x,y) if (machine.input().code_pressed_once(x)) { state->m_mask |= y; state->m_bg_tilemap->mark_all_dirty(); }
+#define mKEY_MASK(x,y) if (machine().input().code_pressed_once(x)) { m_mask |= y; m_bg_tilemap->mark_all_dirty(); }
 
 void nycaptor_state::nycaptor_setmask(  )
 {
@@ -207,7 +207,7 @@ void nycaptor_state::nycaptor_setmask(  )
 UINT32 nycaptor_state::screen_update_nycaptor(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 #if NYCAPTOR_DEBUG
-	nycaptor_setmask(machine());
+	nycaptor_setmask();
 	if (m_mask & 0x1000)
 	{
 		m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER1 | 3, 0);
@@ -218,14 +218,14 @@ UINT32 nycaptor_state::screen_update_nycaptor(screen_device &screen, bitmap_ind1
 		m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER0 | 1, 0);
 		m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER1 | 0, 0);
 		m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER0 | 0, 0);
-		draw_sprites(machine(), bitmap, cliprect, 0);
-		draw_sprites(machine(), bitmap, cliprect, 1);
-		draw_sprites(machine(), bitmap, cliprect, 2);
-		draw_sprites(machine(), bitmap, cliprect, 3);
-		draw_sprites(machine(), bitmap, cliprect, 4);
-		draw_sprites(machine(), bitmap, cliprect, 5);
-		draw_sprites(machine(), bitmap, cliprect, 6);
-		draw_sprites(machine(), bitmap, cliprect, 7);
+		draw_sprites(bitmap, cliprect, 0);
+		draw_sprites(bitmap, cliprect, 1);
+		draw_sprites(bitmap, cliprect, 2);
+		draw_sprites(bitmap, cliprect, 3);
+		draw_sprites(bitmap, cliprect, 4);
+		draw_sprites(bitmap, cliprect, 5);
+		draw_sprites(bitmap, cliprect, 6);
+		draw_sprites(bitmap, cliprect, 7);
 	}
 	else
 #endif

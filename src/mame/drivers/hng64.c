@@ -568,21 +568,19 @@ READ32_MEMBER(hng64_state::hng64_sysregs_r)
 }
 
 /* preliminary dma code, dma is used to copy program code -> ram */
-static void hng64_do_dma(address_space &space)
+void hng64_state::do_dma(address_space &space)
 {
-	hng64_state *state = space.machine().driver_data<hng64_state>();
+	//printf("Performing DMA Start %08x Len %08x Dst %08x\n", m_dma_start, m_dma_len, m_dma_dst);
 
-	//printf("Performing DMA Start %08x Len %08x Dst %08x\n", state->m_dma_start, state->m_dma_len, state->m_dma_dst);
-
-	while (state->m_dma_len >= 0)
+	while (m_dma_len >= 0)
 	{
 		UINT32 dat;
 
-		dat = space.read_dword(state->m_dma_start);
-		space.write_dword(state->m_dma_dst, dat);
-		state->m_dma_start += 4;
-		state->m_dma_dst += 4;
-		state->m_dma_len--;
+		dat = space.read_dword(m_dma_start);
+		space.write_dword(m_dma_dst, dat);
+		m_dma_start += 4;
+		m_dma_dst += 4;
+		m_dma_len--;
 	}
 }
 
@@ -626,7 +624,7 @@ WRITE32_MEMBER(hng64_state::hng64_sysregs_w)
 		case 0x1214: m_dma_dst = m_sysregs[offset]; break;
 		case 0x1224:
 			m_dma_len = m_sysregs[offset];
-			hng64_do_dma(space);
+			do_dma(space);
 			break;
 		//default:
 		//  printf("HNG64 writing to SYSTEM Registers 0x%08x == 0x%08x. (PC=%08x)\n", offset*4, m_sysregs[offset], space.device().safe_pc());

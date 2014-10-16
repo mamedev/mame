@@ -367,10 +367,10 @@ master-slave algorithm
 -executes a wai (i.e. halt) opcode then expects to receive another irq...
 */
 
-#define MAIN_Z80_RUN   if(offset == 2) state->m_z80_latch = 0x00
-#define MAIN_Z80_HALT  if(offset == 2) state->m_z80_latch = 0x80
-//#define SUB_NCS_RUN state->m_ncs_latch = 0x00
-//#define SUB_NCS_HALT state->m_ncs_latch = 0x80
+#define MAIN_Z80_RUN   if(offset == 2) m_z80_latch = 0x00
+#define MAIN_Z80_HALT  if(offset == 2) m_z80_latch = 0x80
+//#define SUB_NCS_RUN m_ncs_latch = 0x00
+//#define SUB_NCS_HALT m_ncs_latch = 0x80
 #ifdef UNUSED_CODE
 WRITE8_MEMBER(nightgal_state::nsc_latch_w)
 {

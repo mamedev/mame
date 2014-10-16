@@ -217,6 +217,7 @@ public:
 	UINT32 screen_update_hng64(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void screen_eof_hng64(screen_device &screen, bool state);
 	TIMER_DEVICE_CALLBACK_MEMBER(hng64_irq);
+	void do_dma(address_space &space);
 
 
 	DECLARE_CUSTOM_INPUT_MEMBER(left_handle_r);

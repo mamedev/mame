@@ -241,33 +241,32 @@ WRITE8_MEMBER(midyunit_state::cvsd_protection_w)
 }
 
 
-static void init_generic(running_machine &machine, int bpp, int sound, int prot_start, int prot_end)
+void midyunit_state::init_generic(int bpp, int sound, int prot_start, int prot_end)
 {
-	midyunit_state *state = machine.driver_data<midyunit_state>();
-	offs_t gfx_chunk = state->m_gfx_rom.bytes() / 4;
+	offs_t gfx_chunk = m_gfx_rom.bytes() / 4;
 	UINT8 d1, d2, d3, d4, d5, d6;
 	UINT8 *base;
 	int i;
 
 	/* load graphics ROMs */
-	base = state->memregion("gfx1")->base();
+	base = memregion("gfx1")->base();
 	switch (bpp)
 	{
 		case 4:
-			for (i = 0; i < state->m_gfx_rom.bytes(); i += 2)
+			for (i = 0; i < m_gfx_rom.bytes(); i += 2)
 			{
 				d1 = ((base[0 * gfx_chunk + (i + 0) / 4]) >> (2 * ((i + 0) % 4))) & 3;
 				d2 = ((base[1 * gfx_chunk + (i + 0) / 4]) >> (2 * ((i + 0) % 4))) & 3;
 				d3 = ((base[0 * gfx_chunk + (i + 1) / 4]) >> (2 * ((i + 1) % 4))) & 3;
 				d4 = ((base[1 * gfx_chunk + (i + 1) / 4]) >> (2 * ((i + 1) % 4))) & 3;
 
-				state->m_gfx_rom[i + 0] = d1 | (d2 << 2);
-				state->m_gfx_rom[i + 1] = d3 | (d4 << 2);
+				m_gfx_rom[i + 0] = d1 | (d2 << 2);
+				m_gfx_rom[i + 1] = d3 | (d4 << 2);
 			}
 			break;
 
 		case 6:
-			for (i = 0; i < state->m_gfx_rom.bytes(); i += 2)
+			for (i = 0; i < m_gfx_rom.bytes(); i += 2)
 			{
 				d1 = ((base[0 * gfx_chunk + (i + 0) / 4]) >> (2 * ((i + 0) % 4))) & 3;
 				d2 = ((base[1 * gfx_chunk + (i + 0) / 4]) >> (2 * ((i + 0) % 4))) & 3;
@@ -276,41 +275,41 @@ static void init_generic(running_machine &machine, int bpp, int sound, int prot_
 				d5 = ((base[1 * gfx_chunk + (i + 1) / 4]) >> (2 * ((i + 1) % 4))) & 3;
 				d6 = ((base[2 * gfx_chunk + (i + 1) / 4]) >> (2 * ((i + 1) % 4))) & 3;
 
-				state->m_gfx_rom[i + 0] = d1 | (d2 << 2) | (d3 << 4);
-				state->m_gfx_rom[i + 1] = d4 | (d5 << 2) | (d6 << 4);
+				m_gfx_rom[i + 0] = d1 | (d2 << 2) | (d3 << 4);
+				m_gfx_rom[i + 1] = d4 | (d5 << 2) | (d6 << 4);
 			}
 			break;
 
 		case 8:
-			for (i = 0; i < state->m_gfx_rom.bytes(); i += 4)
+			for (i = 0; i < m_gfx_rom.bytes(); i += 4)
 			{
-				state->m_gfx_rom[i + 0] = base[0 * gfx_chunk + i / 4];
-				state->m_gfx_rom[i + 1] = base[1 * gfx_chunk + i / 4];
-				state->m_gfx_rom[i + 2] = base[2 * gfx_chunk + i / 4];
-				state->m_gfx_rom[i + 3] = base[3 * gfx_chunk + i / 4];
+				m_gfx_rom[i + 0] = base[0 * gfx_chunk + i / 4];
+				m_gfx_rom[i + 1] = base[1 * gfx_chunk + i / 4];
+				m_gfx_rom[i + 2] = base[2 * gfx_chunk + i / 4];
+				m_gfx_rom[i + 3] = base[3 * gfx_chunk + i / 4];
 			}
 			break;
 	}
 
 	/* load sound ROMs and set up sound handlers */
-	state->m_chip_type = sound;
+	m_chip_type = sound;
 	switch (sound)
 	{
 		case SOUND_CVSD_SMALL:
-			machine.device("cvsd:cpu")->memory().space(AS_PROGRAM).install_write_handler(prot_start, prot_end, write8_delegate(FUNC(midyunit_state::cvsd_protection_w),state));
-			state->m_cvsd_protection_base = machine.root_device().memregion("cvsd:cpu")->base() + 0x10000 + (prot_start - 0x8000);
+			machine().device("cvsd:cpu")->memory().space(AS_PROGRAM).install_write_handler(prot_start, prot_end, write8_delegate(FUNC(midyunit_state::cvsd_protection_w), this));
+			m_cvsd_protection_base = memregion("cvsd:cpu")->base() + 0x10000 + (prot_start - 0x8000);
 			break;
 
 		case SOUND_CVSD:
-			machine.device("cvsd:cpu")->memory().space(AS_PROGRAM).install_ram(prot_start, prot_end);
+			machine().device("cvsd:cpu")->memory().space(AS_PROGRAM).install_ram(prot_start, prot_end);
 			break;
 
 		case SOUND_ADPCM:
-			machine.device("adpcm:cpu")->memory().space(AS_PROGRAM).install_ram(prot_start, prot_end);
+			machine().device("adpcm:cpu")->memory().space(AS_PROGRAM).install_ram(prot_start, prot_end);
 			break;
 
 		case SOUND_NARC:
-			machine.device("narcsnd:cpu0")->memory().space(AS_PROGRAM).install_ram(prot_start, prot_end);
+			machine().device("narcsnd:cpu0")->memory().space(AS_PROGRAM).install_ram(prot_start, prot_end);
 			break;
 
 		case SOUND_YAWDIM:
@@ -332,7 +331,7 @@ static void init_generic(running_machine &machine, int bpp, int sound, int prot_
 DRIVER_INIT_MEMBER(midyunit_state,narc)
 {
 	/* common init */
-	init_generic(machine(), 8, SOUND_NARC, 0xcdff, 0xce29);
+	init_generic(8, SOUND_NARC, 0xcdff, 0xce29);
 }
 
 
@@ -362,7 +361,7 @@ DRIVER_INIT_MEMBER(midyunit_state,trog)
 	m_prot_data = &trog_protection_data;
 
 	/* common init */
-	init_generic(machine(), 4, SOUND_CVSD_SMALL, 0x9eaf, 0x9ed9);
+	init_generic(4, SOUND_CVSD_SMALL, 0x9eaf, 0x9ed9);
 }
 
 
@@ -371,7 +370,7 @@ DRIVER_INIT_MEMBER(midyunit_state,trog)
 DRIVER_INIT_MEMBER(midyunit_state,smashtv)
 {
 	/* common init */
-	init_generic(machine(), 6, SOUND_CVSD_SMALL, 0x9cf6, 0x9d21);
+	init_generic(6, SOUND_CVSD_SMALL, 0x9cf6, 0x9d21);
 }
 
 
@@ -389,7 +388,7 @@ DRIVER_INIT_MEMBER(midyunit_state,hiimpact)
 	m_prot_data = &hiimpact_protection_data;
 
 	/* common init */
-	init_generic(machine(), 6, SOUND_CVSD, 0x9b79, 0x9ba3);
+	init_generic(6, SOUND_CVSD, 0x9b79, 0x9ba3);
 }
 
 
@@ -407,7 +406,7 @@ DRIVER_INIT_MEMBER(midyunit_state,shimpact)
 	m_prot_data = &shimpact_protection_data;
 
 	/* common init */
-	init_generic(machine(), 6, SOUND_CVSD, 0x9c06, 0x9c15);
+	init_generic(6, SOUND_CVSD, 0x9c06, 0x9c15);
 }
 
 
@@ -423,7 +422,7 @@ DRIVER_INIT_MEMBER(midyunit_state,strkforc)
 	m_prot_data = &strkforc_protection_data;
 
 	/* common init */
-	init_generic(machine(), 4, SOUND_CVSD_SMALL, 0x9f7d, 0x9fa7);
+	init_generic(4, SOUND_CVSD_SMALL, 0x9f7d, 0x9fa7);
 }
 
 
@@ -452,13 +451,13 @@ DRIVER_INIT_MEMBER(midyunit_state,mkyunit)
 	m_prot_data = &mk_protection_data;
 
 	/* common init */
-	init_generic(machine(), 6, SOUND_ADPCM, 0xfb9c, 0xfbc6);
+	init_generic(6, SOUND_ADPCM, 0xfb9c, 0xfbc6);
 }
 
 DRIVER_INIT_MEMBER(midyunit_state,mkyawdim)
 {
 	/* common init */
-	init_generic(machine(), 6, SOUND_YAWDIM, 0, 0);
+	init_generic(6, SOUND_YAWDIM, 0, 0);
 }
 
 
@@ -485,33 +484,32 @@ DRIVER_INIT_MEMBER(midyunit_state,mkyturbo)
 
 /********************** Terminator 2 **********************/
 
-static void term2_init_common(running_machine &machine, write16_delegate hack_w)
+void midyunit_state::term2_init_common(write16_delegate hack_w)
 {
-	midyunit_state *state = machine.driver_data<midyunit_state>();
 	/* protection */
 	static const struct protection_data term2_protection_data =
 	{
 		{ 0x0f00, 0x0f00, 0x0f00 },
 		{ 0x4000, 0xf000, 0xa000 }
 	};
-	state->m_prot_data = &term2_protection_data;
+	m_prot_data = &term2_protection_data;
 
 	/* common init */
-	init_generic(machine, 6, SOUND_ADPCM, 0xfa8d, 0xfa9c);
+	init_generic(6, SOUND_ADPCM, 0xfa8d, 0xfa9c);
 
 	/* special inputs */
-	state->m_maincpu->space(AS_PROGRAM).install_read_handler(0x01c00000, 0x01c0005f, read16_delegate(FUNC(midyunit_state::term2_input_r),state));
-	state->m_maincpu->space(AS_PROGRAM).install_write_handler(0x01e00000, 0x01e0001f, write16_delegate(FUNC(midyunit_state::term2_sound_w),state));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x01c00000, 0x01c0005f, read16_delegate(FUNC(midyunit_state::term2_input_r), this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x01e00000, 0x01e0001f, write16_delegate(FUNC(midyunit_state::term2_sound_w), this));
 
 	/* HACK: this prevents the freeze on the movies */
 	/* until we figure whats causing it, this is better than nothing */
-	state->m_t2_hack_mem = state->m_maincpu->space(AS_PROGRAM).install_write_handler(0x010aa0e0, 0x010aa0ff, hack_w);
+	m_t2_hack_mem = m_maincpu->space(AS_PROGRAM).install_write_handler(0x010aa0e0, 0x010aa0ff, hack_w);
 }
 
-DRIVER_INIT_MEMBER(midyunit_state,term2)    { term2_init_common(machine(), write16_delegate(FUNC(midyunit_state::term2_hack_w),this)); }
-DRIVER_INIT_MEMBER(midyunit_state,term2la3) { term2_init_common(machine(), write16_delegate(FUNC(midyunit_state::term2la3_hack_w),this)); }
-DRIVER_INIT_MEMBER(midyunit_state,term2la2) { term2_init_common(machine(), write16_delegate(FUNC(midyunit_state::term2la2_hack_w),this)); }
-DRIVER_INIT_MEMBER(midyunit_state,term2la1) { term2_init_common(machine(), write16_delegate(FUNC(midyunit_state::term2la1_hack_w),this)); }
+DRIVER_INIT_MEMBER(midyunit_state,term2)    { term2_init_common(write16_delegate(FUNC(midyunit_state::term2_hack_w),this)); }
+DRIVER_INIT_MEMBER(midyunit_state,term2la3) { term2_init_common(write16_delegate(FUNC(midyunit_state::term2la3_hack_w),this)); }
+DRIVER_INIT_MEMBER(midyunit_state,term2la2) { term2_init_common(write16_delegate(FUNC(midyunit_state::term2la2_hack_w),this)); }
+DRIVER_INIT_MEMBER(midyunit_state,term2la1) { term2_init_common(write16_delegate(FUNC(midyunit_state::term2la1_hack_w),this)); }
 
 
 
@@ -529,7 +527,7 @@ DRIVER_INIT_MEMBER(midyunit_state,totcarn)
 	m_prot_data = &totcarn_protection_data;
 
 	/* common init */
-	init_generic(machine(), 6, SOUND_ADPCM, 0xfc04, 0xfc2e);
+	init_generic(6, SOUND_ADPCM, 0xfc04, 0xfc2e);
 }
 
 

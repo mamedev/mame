@@ -263,7 +263,7 @@ TODO: check this register,doesn't seem to be 100% correct.
 */
 
 /*63 at post test,6d all the time.*/
-#define SCC_CSR_VREG    (state->m_pcab_vregs[0x00/2] & 0xffff)
+#define SCC_CSR_VREG    (m_pcab_vregs[0x00/2] & 0xffff)
 #define SCC_CG_VREG     ((SCC_CSR_VREG & 0x10)>>4)
 
 /*

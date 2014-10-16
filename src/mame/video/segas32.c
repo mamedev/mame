@@ -878,7 +878,7 @@ void segas32_state::update_tilemap_zoom(screen_device &screen, struct segas32_st
 
 	/* configure the layer */
 	opaque = 0;
-//opaque = (state->m_system32_videoram[0x1ff8e/2] >> (8 + bgnum)) & 1;
+//opaque = (m_system32_videoram[0x1ff8e/2] >> (8 + bgnum)) & 1;
 //if (screen.machine().input().code_pressed(KEYCODE_Z) && bgnum == 0) opaque = 1;
 //if (screen.machine().input().code_pressed(KEYCODE_X) && bgnum == 1) opaque = 1;
 

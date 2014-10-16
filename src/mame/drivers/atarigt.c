@@ -312,7 +312,7 @@ void atarigt_state::tmek_protection_r(address_space &space, offs_t offset, UINT1
 		/* status register; the code spins on this waiting for the high bit to be set */
 		case 0xdb8700:
 		case 0xdb87c0:
-//          if (state->m_protmode != 0)
+//          if (m_protmode != 0)
 			{
 				*data = -1;//0x8000;
 			}

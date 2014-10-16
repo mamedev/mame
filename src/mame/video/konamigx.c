@@ -1649,11 +1649,11 @@ WRITE32_MEMBER(konamigx_state::konamigx_palette2_w)
 {
 	int r,g,b;
 
-	COMBINE_DATA(&state->m_subpaletteram32[offset]);
+	COMBINE_DATA(&m_subpaletteram32[offset]);
 
-	r = (state->m_subpaletteram32[offset] >>16) & 0xff;
-	g = (state->m_subpaletteram32[offset] >> 8) & 0xff;
-	b = (state->m_subpaletteram32[offset] >> 0) & 0xff;
+	r = (m_subpaletteram32[offset] >>16) & 0xff;
+	g = (m_subpaletteram32[offset] >> 8) & 0xff;
+	b = (m_subpaletteram32[offset] >> 0) & 0xff;
 
 	offset += (0x8000/4);
 
@@ -1683,8 +1683,8 @@ WRITE32_MEMBER(konamigx_state::konamigx_555_palette_w)
 WRITE32_MEMBER(konamigx_state::konamigx_555_palette2_w)
 {
 	UINT32 coldat;
-	COMBINE_DATA(&state->m_subpaletteram32[offset]);
-	coldat = state->m_subpaletteram32[offset];
+	COMBINE_DATA(&m_subpaletteram32[offset]);
+	coldat = m_subpaletteram32[offset];
 
 	offset += (0x4000/4);
 

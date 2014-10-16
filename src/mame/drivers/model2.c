@@ -247,7 +247,7 @@ UINT32 model2_state::copro_fifoout_pop(address_space &space,UINT32 offset, UINT3
 
 	m_copro_fifoout_num--;
 
-//  logerror("COPRO FIFOOUT POP %08X, %f, %d\n", r, *(float*)&r,state->m_copro_fifoout_num);
+//  logerror("COPRO FIFOOUT POP %08X, %f, %d\n", r, *(float*)&r,m_copro_fifoout_num);
 
 	// set SHARC flag 1: 0 if space available, 1 if FIFO full
 	if (m_dsp_type == DSP_TYPE_SHARC)
@@ -272,7 +272,7 @@ void model2_state::copro_fifoout_push(device_t *device, UINT32 data,UINT32 offse
 		fatalerror("Copro FIFOOUT overflow (at %08X)\n", device->safe_pc());
 	}
 
-//  logerror("COPRO FIFOOUT PUSH %08X, %f, %d\n", data, *(float*)&data,state->m_copro_fifoout_num);
+//  logerror("COPRO FIFOOUT PUSH %08X, %f, %d\n", data, *(float*)&data,m_copro_fifoout_num);
 
 	m_copro_fifoout_data[m_copro_fifoout_wpos++] = data;
 	if (m_copro_fifoout_wpos == COPRO_FIFOOUT_SIZE)

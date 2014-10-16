@@ -181,6 +181,10 @@ class cybertnk_state : public driver_device
 public:
 	cybertnk_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu"),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette"),
 		m_spr_ram(*this, "spr_ram"),
 		m_tilemap0_vram(*this, "tilemap0_vram"),
 		m_tilemap1_vram(*this, "tilemap1_vram"),
@@ -188,20 +192,12 @@ public:
 		m_tilemap0scroll(*this, "tilemap1_scroll"),
 		m_tilemap1scroll(*this, "tilemap1_scroll"),
 		m_tilemap2scroll(*this, "tilemap2_scroll"),
-		m_roadram(*this, "roadram"),
-		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")  { }
+		m_roadram(*this, "roadram")  { }
 
-	tilemap_t *m_tilemap0_tilemap;
-	tilemap_t *m_tilemap1_tilemap;
-	tilemap_t *m_tilemap2_tilemap;
-
-	DECLARE_WRITE16_MEMBER(tilemap0_vram_w);
-	DECLARE_WRITE16_MEMBER(tilemap1_vram_w);
-	DECLARE_WRITE16_MEMBER(tilemap2_vram_w);
-
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 
 	required_shared_ptr<UINT16> m_spr_ram;
 	required_shared_ptr<UINT16> m_tilemap0_vram;
@@ -211,6 +207,14 @@ public:
 	required_shared_ptr<UINT16> m_tilemap1scroll;
 	required_shared_ptr<UINT16> m_tilemap2scroll;
 	required_shared_ptr<UINT16> m_roadram;
+	
+	tilemap_t *m_tilemap0_tilemap;
+	tilemap_t *m_tilemap1_tilemap;
+	tilemap_t *m_tilemap2_tilemap;
+
+	DECLARE_WRITE16_MEMBER(tilemap0_vram_w);
+	DECLARE_WRITE16_MEMBER(tilemap1_vram_w);
+	DECLARE_WRITE16_MEMBER(tilemap2_vram_w);
 
 	UINT8 m_mux_data;
 	DECLARE_WRITE8_MEMBER(cybertnk_sound_cmd_w);
@@ -224,12 +228,11 @@ public:
 	TILE_GET_INFO_MEMBER(get_tilemap1_tile_info);
 	TILE_GET_INFO_MEMBER(get_tilemap2_tile_info);
 	virtual void video_start();
+	void draw_road(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int screen_shift, int pri);
+	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int screen_shift);
+	UINT32 update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int screen_shift);
 	UINT32 screen_update_cybertnk_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_cybertnk_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_audiocpu;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
 };
 
 /* tile format
@@ -293,18 +296,16 @@ void cybertnk_state::video_start()
 
 
 
-static void draw_road(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int screen_shift, int pri)
+void cybertnk_state::draw_road(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int screen_shift, int pri)
 {
-	cybertnk_state *state = screen.machine().driver_data<cybertnk_state>();
-	int i;
-	gfx_element *gfx = state->m_gfxdecode->gfx(3);
+	gfx_element *gfx = m_gfxdecode->gfx(3);
 
 
-	for (i=0;i<0x1000/4;i+=4)
+	for (int i = 0; i < 0x1000/4; i+=4)
 	{
-		UINT16 param1 = state->m_roadram[i+2];
-		UINT16 param2 = state->m_roadram[i+1];
-		UINT16 param3 = state->m_roadram[i+0];
+		UINT16 param1 = m_roadram[i+2];
+		UINT16 param2 = m_roadram[i+1];
+		UINT16 param3 = m_roadram[i+0];
 
 		int col = (param2 & 0x3f);
 
@@ -319,11 +320,10 @@ static void draw_road(screen_device &screen, bitmap_ind16 &bitmap, const rectang
 }
 
 // check if these are similar / the same as weclemans
-static void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int screen_shift)
+void cybertnk_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int screen_shift)
 {
-	cybertnk_state *state = screen.machine().driver_data<cybertnk_state>();
-	const UINT32 *sprrom = (UINT32*)screen.memregion(":spr_gfx")->base();
-	const pen_t *paldata = state->m_palette->pens();
+	const UINT32 *sprrom = (UINT32*)memregion("spr_gfx")->base();
+	const pen_t *paldata = m_palette->pens();
 
 	int miny = cliprect.min_y;
 	int maxy = cliprect.max_y;
@@ -355,24 +355,24 @@ static void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rect
 
 	for(int offs=0;offs<0x1000/2;offs+=8)
 	{
-		if ((state->m_spr_ram[offs+0x0] & 8) == 0)
+		if ((m_spr_ram[offs+0x0] & 8) == 0)
 			continue;
 
-		int x = (state->m_spr_ram[offs+0x5] & 0x3ff);
+		int x = (m_spr_ram[offs+0x5] & 0x3ff);
 		if (x&0x200) x-=0x400;
 
-		int y = (state->m_spr_ram[offs+0x2] & 0x1ff);
+		int y = (m_spr_ram[offs+0x2] & 0x1ff);
 		if (y&0x100) y-=0x200;
 
 
-		UINT32 spr_offs = (((state->m_spr_ram[offs+0x0] & 7) << 16) | (state->m_spr_ram[offs+0x1]));
-		int xsize = ((state->m_spr_ram[offs+0x6] & 0x000f)+1) << 3;
-		int ysize = (state->m_spr_ram[offs+0x4] & 0x00ff)+1;
-		int fx = (state->m_spr_ram[offs+0x5] & 0x8000) >> 15;
-		int zoom = (state->m_spr_ram[offs+0x6] & 0xff00) >> 8;
+		UINT32 spr_offs = (((m_spr_ram[offs+0x0] & 7) << 16) | (m_spr_ram[offs+0x1]));
+		int xsize = ((m_spr_ram[offs+0x6] & 0x000f)+1) << 3;
+		int ysize = (m_spr_ram[offs+0x4] & 0x00ff)+1;
+		int fx = (m_spr_ram[offs+0x5] & 0x8000) >> 15;
+		int zoom = (m_spr_ram[offs+0x6] & 0xff00) >> 8;
 
 
-		int col_bank = (state->m_spr_ram[offs+0x0] & 0xff00) >> 8;
+		int col_bank = (m_spr_ram[offs+0x0] & 0xff00) >> 8;
 
 		int xf = 0;
 		int yf = 0;
@@ -472,35 +472,33 @@ static void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rect
 }
 
 
-static UINT32 update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int screen_shift)
+UINT32 cybertnk_state::update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int screen_shift)
 {
-	cybertnk_state *state = screen.machine().driver_data<cybertnk_state>();
+	m_tilemap0_tilemap->set_scrolldx(screen_shift, screen_shift);
+	m_tilemap1_tilemap->set_scrolldx(screen_shift, screen_shift);
+	m_tilemap2_tilemap->set_scrolldx(screen_shift, screen_shift);
 
-	state->m_tilemap0_tilemap->set_scrolldx(screen_shift, screen_shift);
-	state->m_tilemap1_tilemap->set_scrolldx(screen_shift, screen_shift);
-	state->m_tilemap2_tilemap->set_scrolldx(screen_shift, screen_shift);
+	m_tilemap1_tilemap->set_scrolly(m_tilemap1scroll[2]);
+	m_tilemap2_tilemap->set_scrolly(m_tilemap2scroll[2]);
 
-	state->m_tilemap1_tilemap->set_scrolly(state->m_tilemap1scroll[2]);
-	state->m_tilemap2_tilemap->set_scrolly(state->m_tilemap2scroll[2]);
-
-	state->m_tilemap1_tilemap->set_scrollx(state->m_tilemap1scroll[0]);
-	state->m_tilemap2_tilemap->set_scrollx(state->m_tilemap2scroll[0]);
+	m_tilemap1_tilemap->set_scrollx(m_tilemap1scroll[0]);
+	m_tilemap2_tilemap->set_scrollx(m_tilemap2scroll[0]);
 
 
 
-	bitmap.fill(state->m_palette->black_pen(), cliprect);
+	bitmap.fill(m_palette->black_pen(), cliprect);
 
 
 	draw_road(screen,bitmap,cliprect,screen_shift, 0x00);
 
-	state->m_tilemap2_tilemap->draw(screen, bitmap, cliprect, 0,0);
-	state->m_tilemap1_tilemap->draw(screen, bitmap, cliprect, 0,0);
+	m_tilemap2_tilemap->draw(screen, bitmap, cliprect, 0,0);
+	m_tilemap1_tilemap->draw(screen, bitmap, cliprect, 0,0);
 
 	draw_road(screen,bitmap,cliprect,screen_shift, 0x80);
 
 	draw_sprites(screen,bitmap,cliprect,screen_shift);
 
-	state->m_tilemap0_tilemap->draw(screen, bitmap, cliprect, 0,0);
+	m_tilemap0_tilemap->draw(screen, bitmap, cliprect, 0,0);
 
 
 	return 0;
