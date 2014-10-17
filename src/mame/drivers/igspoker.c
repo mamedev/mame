@@ -97,7 +97,7 @@ public:
 	tilemap_t *m_fg_tilemap;
 	tilemap_t *m_bg_tilemap;
 	UINT8 m_out[3];
-	size_t m_protection_res;
+	UINT8 m_protection_res;
 
 	DECLARE_READ8_MEMBER(igs_irqack_r);
 	DECLARE_WRITE8_MEMBER(igs_irqack_w);
@@ -300,7 +300,7 @@ WRITE8_MEMBER(igspoker_state::igs_lamps_w)
 READ8_MEMBER(igspoker_state::custom_io_r)
 {
 #if VERBOSE
-	logerror("PC %06X: Protection read %02x\n",space.device().safe_pc(), (int) m_protection_res);
+	logerror("PC %06X: Protection read %02x\n",space.device().safe_pc(), m_protection_res);
 #endif
 	return m_protection_res;
 }

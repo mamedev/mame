@@ -536,7 +536,7 @@ UINT16 namcos21_state::read_word_from_slave_input()
 	return data;
 }
 
-size_t namcos21_state::get_input_bytes_advertised_for_slave()
+UINT16 namcos21_state::get_input_bytes_advertised_for_slave()
 {
 	if( m_mpDspState->slaveBytesAdvertised < m_mpDspState->slaveBytesAvailable )
 	{

@@ -172,7 +172,7 @@ public:
 	void transmit_word_to_slave(UINT16 data);
 	void transfer_dsp_data();
 	UINT16 read_word_from_slave_input();
-	size_t get_input_bytes_advertised_for_slave();
+	UINT16 get_input_bytes_advertised_for_slave();
 	int init_dsp();
 	void render_slave_output(UINT16 data);
 	void winrun_flush_poly();
