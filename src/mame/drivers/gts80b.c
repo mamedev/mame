@@ -1,92 +1,398 @@
-/*
+/****************************************************************************************************************
 
-    Gottlieb System 80B
+  PINBALL
+  Gottlieb System 80B
 
-*/
+  Same as system 80, except that the displays are 20-digit alphanumeric driven by Rockwell 10939/10941 chips.
 
+  Nothing works
 
-#include "emu.h"
-#include "cpu/m6502/m6502.h"
+*****************************************************************************************************************/
 
-class gts80b_state : public driver_device
+#include "machine/genpin.h"
+#include "audio/gottlieb.h"
+#include "cpu/i86/i86.h"
+#include "gts80b.lh"
+
+class gts80b_state : public genpin_class
 {
 public:
 	gts80b_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu")
+		: genpin_class(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_r0_sound(*this, "r0sound")
+		, m_r1_sound(*this, "r1sound")
 	{ }
 
-protected:
-
-	// devices
-	required_device<cpu_device> m_maincpu;
-
-	// driver_device overrides
-	virtual void machine_reset();
-public:
 	DECLARE_DRIVER_INIT(gts80b);
+	DECLARE_READ8_MEMBER(port1a_r);
+	DECLARE_READ8_MEMBER(port2a_r);
+	DECLARE_WRITE8_MEMBER(port1b_w);
+	DECLARE_WRITE8_MEMBER(port2a_w);
+	DECLARE_WRITE8_MEMBER(port2b_w);
+	DECLARE_WRITE8_MEMBER(port3a_w);
+	DECLARE_WRITE8_MEMBER(port3b_w);
+private:
+	UINT8 m_port2;
+	UINT8 m_segment;
+	UINT8 m_lamprow;
+	UINT8 m_swrow;
+	virtual void machine_reset();
+	required_device<cpu_device> m_maincpu;
+	optional_device<gottlieb_sound_r0_device> m_r0_sound;
+	optional_device<gottlieb_sound_r1_device> m_r1_sound;
 };
 
 static ADDRESS_MAP_START( gts80b_map, AS_PROGRAM, 8, gts80b_state )
-	AM_RANGE(0x0000, 0xffff) AM_NOP
-	AM_RANGE(0x1000, 0x17ff) AM_MIRROR(0xc000) AM_ROM   /* PROM */
-	AM_RANGE(0x2000, 0x2fff) AM_MIRROR(0xc000) AM_ROM   /* u2 ROM */
-	AM_RANGE(0x3000, 0x3fff) AM_MIRROR(0xc000) AM_ROM   /* u3 ROM */
+	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
+	AM_RANGE(0x0000, 0x017f) AM_RAM
+	AM_RANGE(0x0200, 0x027f) AM_DEVREADWRITE("riot1", riot6532_device, read, write)
+	AM_RANGE(0x0280, 0x02ff) AM_DEVREADWRITE("riot2", riot6532_device, read, write)
+	AM_RANGE(0x0300, 0x037f) AM_DEVREADWRITE("riot3", riot6532_device, read, write)
+	AM_RANGE(0x1000, 0x17ff) AM_ROM
+	AM_RANGE(0x1800, 0x18ff) AM_RAM AM_SHARE("nvram") // 5101L-1 256x4
+	AM_RANGE(0x2000, 0x2fff) AM_ROM
+	AM_RANGE(0x3000, 0x3fff) AM_ROM
 ADDRESS_MAP_END
 
-
 static INPUT_PORTS_START( gts80b )
+	PORT_START("DSW.0")
+	PORT_DIPNAME( 0x80, 0x00, "SW 1")
+	PORT_DIPSETTING(    0x00, DEF_STR(Off))
+	PORT_DIPSETTING(    0x80, DEF_STR(On))
+	PORT_DIPNAME( 0x40, 0x00, "SW 2")
+	PORT_DIPSETTING(    0x00, DEF_STR(Off))
+	PORT_DIPSETTING(    0x40, DEF_STR(On))
+	PORT_DIPNAME( 0x20, 0x00, "SW 3")
+	PORT_DIPSETTING(    0x00, DEF_STR(Off))
+	PORT_DIPSETTING(    0x20, DEF_STR(On))
+	PORT_DIPNAME( 0x10, 0x00, "SW 4")
+	PORT_DIPSETTING(    0x00, DEF_STR(Off))
+	PORT_DIPSETTING(    0x10, DEF_STR(On))
+	PORT_DIPNAME( 0x08, 0x00, "SW 5")
+	PORT_DIPSETTING(    0x00, DEF_STR(Off))
+	PORT_DIPSETTING(    0x08, DEF_STR(On))
+	PORT_DIPNAME( 0x04, 0x00, "SW 6")
+	PORT_DIPSETTING(    0x00, DEF_STR(Off))
+	PORT_DIPSETTING(    0x04, DEF_STR(On))
+	PORT_DIPNAME( 0x02, 0x00, "SW 7")
+	PORT_DIPSETTING(    0x00, DEF_STR(Off))
+	PORT_DIPSETTING(    0x02, DEF_STR(On))
+	PORT_DIPNAME( 0x01, 0x00, "SW 8")
+	PORT_DIPSETTING(    0x00, DEF_STR(Off))
+	PORT_DIPSETTING(    0x01, DEF_STR(On))
+
+	PORT_START("DSW.1")
+	PORT_DIPNAME( 0x80, 0x00, "SW 9")
+	PORT_DIPSETTING(    0x00, DEF_STR(Off))
+	PORT_DIPSETTING(    0x80, DEF_STR(On))
+	PORT_DIPNAME( 0x40, 0x00, "SW 10")
+	PORT_DIPSETTING(    0x00, DEF_STR(Off))
+	PORT_DIPSETTING(    0x40, DEF_STR(On))
+	PORT_DIPNAME( 0x20, 0x00, "SW 11")
+	PORT_DIPSETTING(    0x00, DEF_STR(Off))
+	PORT_DIPSETTING(    0x20, DEF_STR(On))
+	PORT_DIPNAME( 0x10, 0x00, "SW 12")
+	PORT_DIPSETTING(    0x00, DEF_STR(Off))
+	PORT_DIPSETTING(    0x10, DEF_STR(On))
+	PORT_DIPNAME( 0x08, 0x00, "SW 13")
+	PORT_DIPSETTING(    0x00, DEF_STR(Off))
+	PORT_DIPSETTING(    0x08, DEF_STR(On))
+	PORT_DIPNAME( 0x04, 0x00, "SW 14")
+	PORT_DIPSETTING(    0x00, DEF_STR(Off))
+	PORT_DIPSETTING(    0x04, DEF_STR(On))
+	PORT_DIPNAME( 0x02, 0x02, "SW 15")
+	PORT_DIPSETTING(    0x00, DEF_STR(Off))
+	PORT_DIPSETTING(    0x02, DEF_STR(On))
+	PORT_DIPNAME( 0x01, 0x00, "SW 16")
+	PORT_DIPSETTING(    0x00, DEF_STR(Off))
+	PORT_DIPSETTING(    0x01, DEF_STR(On))
+
+	PORT_START("DSW.2")
+	PORT_DIPNAME( 0x80, 0x80, "SW 17")
+	PORT_DIPSETTING(    0x00, DEF_STR(Off))
+	PORT_DIPSETTING(    0x80, DEF_STR(On))
+	PORT_DIPNAME( 0x40, 0x40, "SW 18")
+	PORT_DIPSETTING(    0x00, DEF_STR(Off))
+	PORT_DIPSETTING(    0x40, DEF_STR(On))
+	PORT_DIPNAME( 0x20, 0x00, "SW 19")
+	PORT_DIPSETTING(    0x00, DEF_STR(Off))
+	PORT_DIPSETTING(    0x20, DEF_STR(On))
+	PORT_DIPNAME( 0x10, 0x00, "SW 20")
+	PORT_DIPSETTING(    0x00, DEF_STR(Off))
+	PORT_DIPSETTING(    0x10, DEF_STR(On))
+	PORT_DIPNAME( 0x08, 0x00, "SW 21")
+	PORT_DIPSETTING(    0x00, DEF_STR(Off))
+	PORT_DIPSETTING(    0x08, DEF_STR(On))
+	PORT_DIPNAME( 0x04, 0x00, "SW 22")
+	PORT_DIPSETTING(    0x00, DEF_STR(Off))
+	PORT_DIPSETTING(    0x04, DEF_STR(On))
+	PORT_DIPNAME( 0x02, 0x02, "SW 23")
+	PORT_DIPSETTING(    0x00, DEF_STR(Off))
+	PORT_DIPSETTING(    0x02, DEF_STR(On))
+	PORT_DIPNAME( 0x01, 0x01, "SW 24")
+	PORT_DIPSETTING(    0x00, DEF_STR(Off))
+	PORT_DIPSETTING(    0x01, DEF_STR(On))
+
+	PORT_START("DSW.3")
+	PORT_DIPNAME( 0x80, 0x80, "SW 25")
+	PORT_DIPSETTING(    0x00, DEF_STR(Off))
+	PORT_DIPSETTING(    0x80, DEF_STR(On))
+	PORT_DIPNAME( 0x40, 0x40, "SW 26")
+	PORT_DIPSETTING(    0x00, DEF_STR(Off))
+	PORT_DIPSETTING(    0x40, DEF_STR(On))
+	PORT_DIPNAME( 0x20, 0x20, "SW 27")
+	PORT_DIPSETTING(    0x00, DEF_STR(Off))
+	PORT_DIPSETTING(    0x20, DEF_STR(On))
+	PORT_DIPNAME( 0x10, 0x10, "SW 28")
+	PORT_DIPSETTING(    0x00, DEF_STR(Off))
+	PORT_DIPSETTING(    0x10, DEF_STR(On))
+	PORT_DIPNAME( 0x08, 0x08, "SW 29")
+	PORT_DIPSETTING(    0x00, DEF_STR(Off))
+	PORT_DIPSETTING(    0x08, DEF_STR(On))
+	PORT_DIPNAME( 0x04, 0x04, "SW 30")
+	PORT_DIPSETTING(    0x00, DEF_STR(Off))
+	PORT_DIPSETTING(    0x04, DEF_STR(On))
+	PORT_DIPNAME( 0x02, 0x00, "SW 31")
+	PORT_DIPSETTING(    0x00, DEF_STR(Off))
+	PORT_DIPSETTING(    0x02, DEF_STR(On))
+	PORT_DIPNAME( 0x01, 0x00, "SW 32")
+	PORT_DIPSETTING(    0x00, DEF_STR(Off))
+	PORT_DIPSETTING(    0x01, DEF_STR(On))
+
+	PORT_START("X0")
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("X1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_1_PAD)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_2_PAD)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_3_PAD)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_4_PAD)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_5_PAD)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_6_PAD)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_7_PAD)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SERVICE1 )
+
+	PORT_START("X2")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_A)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_S)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_D)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_F)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_G)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_H)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_J)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN1 )
+
+	PORT_START("X4")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_L)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_Z)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_C)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_V)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_B)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_N)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_M)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN2 )
+
+	PORT_START("X8")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_STOP)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_SLASH)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_COLON)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_QUOTE)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_COMMA)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_MINUS)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_EQUALS)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN3 )
+
+	PORT_START("X10")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_OPENBRACE)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_CLOSEBRACE)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_BACKSLASH)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_ENTER)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_LEFT)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_RIGHT)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_UP)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_START )
+
+	PORT_START("X20")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_K)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_8_PAD)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_9_PAD)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_BACKSPACE)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_ASTERISK)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_MINUS_PAD)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_PLUS_PAD)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_TILT ) // won't boot if closed
+
+	PORT_START("X40")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_SLASH_PAD)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_ENTER_PAD)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_0_PAD)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_DEL_PAD)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_HOME)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_END)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_PGUP)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_X)
+
+	PORT_START("X80")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_Q)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_W)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_E)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_R)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_Y)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_U)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_I)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_O)
 INPUT_PORTS_END
+
+READ8_MEMBER( gts80b_state::port1a_r )
+{
+	char kbdrow[8];
+	UINT8 data = 0;
+	if ((m_lamprow < 4) && (m_segment==0x80))
+	{
+		sprintf(kbdrow,"DSW.%d",m_lamprow);
+		data = ioport(kbdrow)->read();
+	}
+	else
+	{
+		sprintf(kbdrow,"X%X",m_swrow);
+		data = ioport(kbdrow)->read();
+	}
+
+	return data;
+}
+
+READ8_MEMBER( gts80b_state::port2a_r )
+{
+	return m_port2 | 0x80; // slam tilt off
+}
+
+// sw strobes
+WRITE8_MEMBER( gts80b_state::port1b_w )
+{
+	m_swrow = data;
+}
+
+// schematic and pinmame say '1' is indicated by m_segment !bits 4,5,6, but it is !bit 7
+WRITE8_MEMBER( gts80b_state::port2a_w )
+{
+	m_port2 = data;
+	static const UINT8 patterns[16] = { 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7c,0x07,0x7f,0x67,0x58,0x4c,0x62,0x69,0x78,0 }; // 7448
+	UINT16 seg1 = (UINT16)patterns[m_segment & 15];
+	UINT16 seg2 = BITSWAP16(seg1, 8, 8, 8, 8, 8, 8, 7, 7, 6, 6, 5, 4, 3, 2, 1, 0);
+	switch (data & 0x70)
+	{
+		case 0x10: // player 1&2
+			if (!BIT(m_segment, 7)) seg2 |= 0x300; // put '1' in the middle
+			output_set_digit_value(data & 15, seg2);
+			break;
+		case 0x20: // player 3&4
+			if (!BIT(m_segment, 7)) seg2 |= 0x300; // put '1' in the middle
+			output_set_digit_value((data & 15)+20, seg2);
+			break;
+		case 0x40: // credits & balls
+			if (!BIT(m_segment, 7)) m_segment = 1; // turn '1' back to normal
+			output_set_digit_value((data & 15)+40, patterns[m_segment & 15]);
+			break;
+	}
+}
+
+//d0-3 bcd data; d4-6 = centre segment; d7 = dipsw enable
+WRITE8_MEMBER( gts80b_state::port2b_w )
+{
+	m_segment = data;//printf("%s:%X ",machine().describe_context(),data);
+}
+
+// solenoids
+WRITE8_MEMBER( gts80b_state::port3a_w )
+{
+}
+
+//pb0-3 = sound; pb4-7 = lamprow
+WRITE8_MEMBER( gts80b_state::port3b_w )
+{
+	UINT8 sndcmd = data & 15;
+	m_lamprow = data >> 4;
+	if (m_r0_sound)
+		m_r0_sound->write(space, offset, sndcmd);
+	if (m_r1_sound)
+		m_r1_sound->write(space, offset, sndcmd);
+}
 
 void gts80b_state::machine_reset()
 {
 }
 
-DRIVER_INIT_MEMBER(gts80b_state,gts80b)
+DRIVER_INIT_MEMBER( gts80b_state, gts80b )
 {
 }
 
-/* with Old Style Sound Board */
-static MACHINE_CONFIG_START( gts80b_s, gts80b_state )
+/* with Sound Board */
+static MACHINE_CONFIG_START( gts80b, gts80b_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, 850000)
+	MCFG_CPU_ADD("maincpu", M6502, XTAL_3_579545MHz/4)
 	MCFG_CPU_PROGRAM_MAP(gts80b_map)
 
-	/* related to src/mame/audio/gottlieb.c */
-//  MCFG_IMPORT_FROM(gts80s_s)
+	MCFG_NVRAM_ADD_1FILL("nvram") // must be 1
+
+	/* Video */
+	MCFG_DEFAULT_LAYOUT(layout_gts80b)
+
+	/* Devices */
+	MCFG_DEVICE_ADD("riot1", RIOT6532, XTAL_3_579545MHz/4)
+	MCFG_RIOT6532_IN_PA_CB(READ8(gts80b_state, port1a_r)) // sw_r
+	//MCFG_RIOT6532_OUT_PA_CB(WRITE8(gts80b_state, port1a_w))
+	//MCFG_RIOT6532_IN_PB_CB(READ8(gts80b_state, port1b_r))
+	MCFG_RIOT6532_OUT_PB_CB(WRITE8(gts80b_state, port1b_w)) // sw_w
+	MCFG_RIOT6532_IRQ_CB(INPUTLINE("maincpu", M6502_IRQ_LINE))
+	MCFG_DEVICE_ADD("riot2", RIOT6532, XTAL_3_579545MHz/4)
+	MCFG_RIOT6532_IN_PA_CB(READ8(gts80b_state, port2a_r)) // pa7 - slam tilt
+	MCFG_RIOT6532_OUT_PA_CB(WRITE8(gts80b_state, port2a_w)) // digit select
+	//MCFG_RIOT6532_IN_PB_CB(READ8(gts80b_state, port2b_r))
+	MCFG_RIOT6532_OUT_PB_CB(WRITE8(gts80b_state, port2b_w)) // seg
+	MCFG_RIOT6532_IRQ_CB(INPUTLINE("maincpu", M6502_IRQ_LINE))
+	MCFG_DEVICE_ADD("riot3", RIOT6532, XTAL_3_579545MHz/4)
+	//MCFG_RIOT6532_IN_PA_CB(READ8(gts80b_state, port3a_r))
+	MCFG_RIOT6532_OUT_PA_CB(WRITE8(gts80b_state, port3a_w)) // sol, snd
+	//MCFG_RIOT6532_IN_PB_CB(READ8(gts80b_state, port3b_r))
+	MCFG_RIOT6532_OUT_PB_CB(WRITE8(gts80b_state, port3b_w)) // lamps
+	MCFG_RIOT6532_IRQ_CB(INPUTLINE("maincpu", M6502_IRQ_LINE))
+
+	/* Sound */
+	MCFG_FRAGMENT_ADD( genpin_audio )
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( gts80b_s1, gts80b_state )
-	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, 850000)
-	MCFG_CPU_PROGRAM_MAP(gts80b_map)
+static MACHINE_CONFIG_DERIVED( gts80b_s, gts80b )
+	MCFG_GOTTLIEB_SOUND_R0_ADD("r0sound")
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+MACHINE_CONFIG_END
+
+//static MACHINE_CONFIG_DERIVED( gts80b_ss, gts80b )
+//	MCFG_GOTTLIEB_SOUND_R1_ADD("r1sound")
+//	//MCFG_GOTTLIEB_SOUND_R1_ADD_VOTRAX("r1sound")  // votrax crashes
+//	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+//MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( gts80b_s1, gts80b )
 
 	/* related to src/mame/audio/gottlieb.c? */
 //  MCFG_IMPORT_FROM(gts80s_b1)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( gts80b_s2, gts80b_state )
-	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, 850000)
-	MCFG_CPU_PROGRAM_MAP(gts80b_map)
+static MACHINE_CONFIG_DERIVED( gts80b_s2, gts80b )
 
 	/* related to src/mame/audio/gottlieb.c? */
 //  MCFG_IMPORT_FROM(gts80s_b2)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( gts80b_s3, gts80b_state )
-	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, 850000)
-	MCFG_CPU_PROGRAM_MAP(gts80b_map)
+static MACHINE_CONFIG_DERIVED( gts80b_s3, gts80b )
 
 	/* related to src/mame/audio/gottlieb.c? */
 //  MCFG_IMPORT_FROM(gts80s_b3)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( bonebstr, gts80b_state )
-	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, 850000)
-	MCFG_CPU_PROGRAM_MAP(gts80b_map)
+static MACHINE_CONFIG_DERIVED( bonebstr, gts80b )
 
 	/* related to src/mame/audio/gottlieb.c? */
 //  MCFG_IMPORT_FROM(gts80s_b3a)
@@ -94,11 +400,15 @@ MACHINE_CONFIG_END
 
 
 /*-------------------------------------------------------------------
+/ Ace High (#700) 1985 (Prototype)
+/-------------------------------------------------------------------*/
+
+/*-------------------------------------------------------------------
 / Amazon Hunt II 05/85
 /-------------------------------------------------------------------*/
 
 /*-------------------------------------------------------------------
-/ Arena
+/ Arena (#709)
 /-------------------------------------------------------------------*/
 ROM_START(arena)
 	ROM_REGION(0x10000, "maincpu", 0)
@@ -120,7 +430,7 @@ ROM_START(arena)
 ROM_END
 
 /*-------------------------------------------------------------------
-/ Bad Girls
+/ Bad Girls (#717)
 /-------------------------------------------------------------------*/
 ROM_START(badgirls)
 	ROM_REGION(0x10000, "maincpu", 0)
@@ -141,7 +451,7 @@ ROM_START(badgirls)
 ROM_END
 
 /*-------------------------------------------------------------------
-/ Big House
+/ Big House (#713)
 /-------------------------------------------------------------------*/
 ROM_START(bighouse)
 	ROM_REGION(0x10000, "maincpu", 0)
@@ -162,7 +472,7 @@ ROM_START(bighouse)
 ROM_END
 
 /*-------------------------------------------------------------------
-/ Bone Busters Inc.
+/ Bone Busters Inc. (#719)
 /-------------------------------------------------------------------*/
 ROM_START(bonebstr)
 	ROM_REGION(0x10000, "maincpu", 0)
@@ -216,9 +526,8 @@ ROM_START(bountyh)
 	ROM_RELOAD(0xa000, 0x2000)
 	ROM_RELOAD(0xe000, 0x2000)
 
-	ROM_REGION(0x10000, "cpu2", 0)
+	ROM_REGION(0x1000, "r0sound:audiocpu", 0)
 	ROM_LOAD("694-s.snd", 0x0800, 0x0800, CRC(a0383e41) SHA1(156514d2b52fcd89b608b85991c5066780949979))
-	ROM_RELOAD( 0xf800, 0x0800)
 ROM_END
 
 /*-------------------------------------------------------------------
@@ -231,13 +540,12 @@ ROM_START(triplay)
 	ROM_RELOAD(0xa000, 0x2000)
 	ROM_RELOAD(0xe000, 0x2000)
 
-	ROM_REGION(0x10000, "cpu2", 0)
+	ROM_REGION(0x1000, "r0sound:audiocpu", 0)
 	ROM_LOAD("696-s.snd", 0x0800, 0x0800, CRC(deedea61) SHA1(6aec221397f250d5dd99faefa313e8028c8818f7))
-	ROM_RELOAD( 0xf800, 0x0800)
 ROM_END
 
 /*-------------------------------------------------------------------
-/ Diamond Lady
+/ Diamond Lady (#711)
 /-------------------------------------------------------------------*/
 ROM_START(diamondp)
 	ROM_REGION(0x10000, "maincpu", 0)
@@ -258,7 +566,7 @@ ROM_START(diamondp)
 ROM_END
 
 /*-------------------------------------------------------------------
-/ Excalibur
+/ Excalibur (#715)
 /-------------------------------------------------------------------*/
 ROM_START(excalibr)
 	ROM_REGION(0x10000, "maincpu", 0)
@@ -323,7 +631,7 @@ ROM_START(goldwing)
 ROM_END
 
 /*-------------------------------------------------------------------
-/ Hollywood Heat
+/ Hollywood Heat (#703)
 /-------------------------------------------------------------------*/
 ROM_START(hlywoodh)
 	ROM_REGION(0x10000, "maincpu", 0)
@@ -345,7 +653,7 @@ ROM_START(hlywoodh)
 ROM_END
 
 /*-------------------------------------------------------------------
-/ Hot Shots
+/ Hot Shots (#718)
 /-------------------------------------------------------------------*/
 ROM_START(hotshots)
 	ROM_REGION(0x10000, "maincpu", 0)
@@ -366,7 +674,7 @@ ROM_START(hotshots)
 ROM_END
 
 /*-------------------------------------------------------------------
-/ Monte Carlo
+/ Monte Carlo (#708)
 /-------------------------------------------------------------------*/
 ROM_START(mntecrlo)
 	ROM_REGION(0x10000, "maincpu", 0)
@@ -409,7 +717,7 @@ ROM_START(nmoves)
 ROM_END
 
 /*-------------------------------------------------------------------
-/ Raven
+/ Raven (#702)
 /-------------------------------------------------------------------*/
 ROM_START(raven)
 	ROM_REGION(0x10000, "maincpu", 0)
@@ -430,7 +738,7 @@ ROM_START(raven)
 ROM_END
 
 /*-------------------------------------------------------------------
-/ Robo-War
+/ Robo-War (#714)
 /-------------------------------------------------------------------*/
 ROM_START(robowars)
 	ROM_REGION(0x10000, "maincpu", 0)
@@ -486,7 +794,7 @@ ROM_START(rock_enc)
 ROM_END
 
 /*-------------------------------------------------------------------
-/ Spring Break
+/ Spring Break (#706)
 /-------------------------------------------------------------------*/
 ROM_START(sprbreak)
 	ROM_REGION(0x10000, "maincpu", 0)
@@ -498,8 +806,10 @@ ROM_START(sprbreak)
 	ROM_RELOAD(0x6000, 0x2000)
 	ROM_RELOAD(0xa000, 0x2000)
 	ROM_RELOAD(0xe000, 0x2000)
+
 	ROM_REGION(0x10000, "cpu3", 0)
 	ROM_LOAD("drom1.snd",0xe000,0x2000, CRC(97d3f9ba) SHA1(1b34c7e51373c26d29d757c57a2b0333fe38d19e))
+
 	ROM_REGION(0x10000, "cpu2", 0)
 	ROM_LOAD("yrom1.snd",0xe000,0x2000, CRC(5ea89df9) SHA1(98ce7661a4d862fd02c77e69b0f6e9372c3ade2b))
 	ROM_LOAD("yrom2.snd",0xc000,0x2000, CRC(0fb0128e) SHA1(3bdc5ed11b8e062f71f2a78b955830bd985e80a3))
@@ -515,8 +825,10 @@ ROM_START(sprbreaks)
 	ROM_RELOAD(0x6000, 0x2000)
 	ROM_RELOAD(0xa000, 0x2000)
 	ROM_RELOAD(0xe000, 0x2000)
+
 	ROM_REGION(0x10000, "cpu3", 0)
 	ROM_LOAD("drom1.snd",0xe000,0x2000, CRC(97d3f9ba) SHA1(1b34c7e51373c26d29d757c57a2b0333fe38d19e))
+
 	ROM_REGION(0x10000, "cpu2", 0)
 	ROM_LOAD("yrom1.snd",0xe000,0x2000, CRC(5ea89df9) SHA1(98ce7661a4d862fd02c77e69b0f6e9372c3ade2b))
 	ROM_LOAD("yrom2.snd",0xc000,0x2000, CRC(0fb0128e) SHA1(3bdc5ed11b8e062f71f2a78b955830bd985e80a3))
@@ -536,9 +848,8 @@ ROM_START(tagteamp)
 	ROM_RELOAD(0xa000, 0x2000)
 	ROM_RELOAD(0xe000, 0x2000)
 
-	ROM_REGION(0x10000, "cpu2", 0)
+	ROM_REGION(0x1000, "r0sound:audiocpu", 0)
 	ROM_LOAD("698-s.snd", 0x0800, 0x0800, CRC(9c8191b7) SHA1(12b017692f078dcdc8e4bbf1ffcea1c5d0293d06))
-	ROM_RELOAD( 0xf800, 0x0800)
 ROM_END
 
 ROM_START(tagteamp2)
@@ -552,13 +863,12 @@ ROM_START(tagteamp2)
 	ROM_RELOAD(0xa000, 0x2000)
 	ROM_RELOAD(0xe000, 0x2000)
 
-	ROM_REGION(0x10000, "cpu2", 0)
+	ROM_REGION(0x1000, "r0sound:audiocpu", 0)
 	ROM_LOAD("698-s.snd", 0x0800, 0x0800, CRC(9c8191b7) SHA1(12b017692f078dcdc8e4bbf1ffcea1c5d0293d06))
-	ROM_RELOAD( 0xf800, 0x0800)
 ROM_END
 
 /*-------------------------------------------------------------------
-/ TX-Sector
+/ TX-Sector (#712)
 /-------------------------------------------------------------------*/
 ROM_START(txsector)
 	ROM_REGION(0x10000, "maincpu", 0)
@@ -579,7 +889,7 @@ ROM_START(txsector)
 ROM_END
 
 /*-------------------------------------------------------------------
-/ Victory
+/ Victory (#710)
 /-------------------------------------------------------------------*/
 ROM_START(victoryp)
 	ROM_REGION(0x10000, "maincpu", 0)
@@ -600,28 +910,28 @@ ROM_START(victoryp)
 ROM_END
 
 
-GAME(1987,  arena,  0,      gts80b_s1,  gts80b, gts80b_state,   gts80b, ROT0,   "Gottlieb",             "Arena",                GAME_IS_SKELETON_MECHANICAL)
-GAME(1988,  badgirls,   0,      gts80b_s3,  gts80b, gts80b_state,   gts80b, ROT0,   "Gottlieb",             "Bad Girls",            GAME_IS_SKELETON_MECHANICAL)
-GAME(1989,  bighouse,   0,      gts80b_s3,  gts80b, gts80b_state,   gts80b, ROT0,   "Gottlieb",             "Big House",            GAME_IS_SKELETON_MECHANICAL)
-GAME(1989,  bonebstr,   0,      bonebstr,   gts80b, gts80b_state,   gts80b, ROT0,   "Gottlieb",             "Bone Busters Inc.",        GAME_IS_SKELETON_MECHANICAL)
-GAME(1989,  bonebstrf,  bonebstr,bonebstr,  gts80b, gts80b_state,   gts80b, ROT0,   "Gottlieb",             "Bone Busters Inc. (French)",        GAME_IS_SKELETON_MECHANICAL)
-GAME(1985,  bountyh,    0,      gts80b_s,   gts80b, gts80b_state,   gts80b, ROT0,   "Gottlieb",             "Bounty Hunter",            GAME_IS_SKELETON_MECHANICAL)
-GAME(1985,  triplay,    0,      gts80b_s,   gts80b, gts80b_state,   gts80b, ROT0,   "Gottlieb",             "Triple Play",          GAME_IS_SKELETON_MECHANICAL)
-GAME(1988,  diamondp,   0,      gts80b_s2,  gts80b, gts80b_state,   gts80b, ROT0,   "Gottlieb",             "Diamond Lady",         GAME_IS_SKELETON_MECHANICAL)
-GAME(1988,  excalibr,   0,      gts80b_s3,  gts80b, gts80b_state,   gts80b, ROT0,   "Gottlieb",             "Excalibur",            GAME_IS_SKELETON_MECHANICAL)
-GAME(1986,  genesisp,   0,      gts80b_s1,  gts80b, gts80b_state,   gts80b, ROT0,   "Gottlieb",             "Genesis",              GAME_IS_SKELETON_MECHANICAL)
-GAME(1986,  goldwing,   0,      gts80b_s1,  gts80b, gts80b_state,   gts80b, ROT0,   "Gottlieb",             "Gold Wings",           GAME_IS_SKELETON_MECHANICAL)
-GAME(1986,  hlywoodh,   0,      gts80b_s1,  gts80b, gts80b_state,   gts80b, ROT0,   "Gottlieb",             "Hollywood Heat",           GAME_IS_SKELETON_MECHANICAL)
-GAME(1989,  hotshots,   0,      gts80b_s2,  gts80b, gts80b_state,   gts80b, ROT0,   "Gottlieb",             "Hot Shots",            GAME_IS_SKELETON_MECHANICAL)
-GAME(1987,  mntecrlo,   0,      gts80b_s1,  gts80b, gts80b_state,   gts80b, ROT0,   "Gottlieb",             "Monte Carlo (Pinball)",            GAME_IS_SKELETON_MECHANICAL)
-GAME(1989,  nmoves, 0,      gts80b_s2,  gts80b, gts80b_state,   gts80b, ROT0,   "International Concepts",   "Night Moves",          GAME_IS_SKELETON_MECHANICAL)
-GAME(1986,  raven,  0,      gts80b_s1,  gts80b, gts80b_state,   gts80b, ROT0,   "Gottlieb",             "Raven",                GAME_IS_SKELETON_MECHANICAL)
-GAME(1988,  robowars,   0,      gts80b_s2,  gts80b, gts80b_state,   gts80b, ROT0,   "Gottlieb",             "Robo-War",             GAME_IS_SKELETON_MECHANICAL)
-GAME(1985,  rock,       0,      gts80b_s1,  gts80b, gts80b_state,   gts80b, ROT0,   "Gottlieb",             "Rock",             GAME_IS_SKELETON_MECHANICAL)
-GAME(1986,  rock_enc,   rock,       gts80b_s1,  gts80b, gts80b_state,   gts80b, ROT0,   "Gottlieb",             "Rock Encore",          GAME_IS_SKELETON_MECHANICAL)
-GAME(1987,  sprbreak,   0,      gts80b_s1,  gts80b, gts80b_state,   gts80b, ROT0,   "Gottlieb",             "Spring Break",         GAME_IS_SKELETON_MECHANICAL)
-GAME(19??,  sprbreaks,  sprbreak,gts80b_s1, gts80b, gts80b_state,   gts80b, ROT0,   "Gottlieb",             "Spring Break (single ball game)",          GAME_IS_SKELETON_MECHANICAL)
-GAME(1985,  tagteamp,   0,      gts80b_s,   gts80b, gts80b_state,   gts80b, ROT0,   "Gottlieb",             "Tag-Team Wrestling",       GAME_IS_SKELETON_MECHANICAL)
-GAME(1985,  tagteamp2,  tagteamp,   gts80b_s,   gts80b, gts80b_state,   gts80b, ROT0,   "Gottlieb",             "Tag-Team Wrestling (rev.2)",   GAME_IS_SKELETON_MECHANICAL)
-GAME(1988,  txsector,   0,      gts80b_s2,  gts80b, gts80b_state,   gts80b, ROT0,   "Gottlieb",             "TX-Sector",            GAME_IS_SKELETON_MECHANICAL)
-GAME(1987,  victoryp,   0,      gts80b_s2,  gts80b, gts80b_state,   gts80b, ROT0,   "Gottlieb",             "Victory (Pinball)",                GAME_IS_SKELETON_MECHANICAL)
+GAME(1985, bountyh,   0,        gts80b_s,  gts80b, gts80b_state, gts80b, ROT0, "Gottlieb",               "Bounty Hunter",        GAME_IS_SKELETON_MECHANICAL)
+GAME(1985, triplay,   0,        gts80b_s,  gts80b, gts80b_state, gts80b, ROT0, "Gottlieb",               "Triple Play",          GAME_IS_SKELETON_MECHANICAL)
+GAME(1985, rock,      0,        gts80b_s1, gts80b, gts80b_state, gts80b, ROT0, "Gottlieb",               "Rock",             GAME_IS_SKELETON_MECHANICAL)
+GAME(1985, tagteamp,  0,        gts80b_s,  gts80b, gts80b_state, gts80b, ROT0, "Gottlieb",               "Tag-Team Wrestling",   GAME_IS_SKELETON_MECHANICAL)
+GAME(1985, tagteamp2, tagteamp, gts80b_s,  gts80b, gts80b_state, gts80b, ROT0, "Gottlieb",               "Tag-Team Wrestling (rev.2)", GAME_IS_SKELETON_MECHANICAL)
+GAME(1986, raven,     0,        gts80b_s1, gts80b, gts80b_state, gts80b, ROT0, "Gottlieb",               "Raven",                GAME_IS_SKELETON_MECHANICAL)
+GAME(1986, hlywoodh,  0,        gts80b_s1, gts80b, gts80b_state, gts80b, ROT0, "Gottlieb",               "Hollywood Heat",       GAME_IS_SKELETON_MECHANICAL)
+GAME(1986, rock_enc,  rock,     gts80b_s1, gts80b, gts80b_state, gts80b, ROT0, "Gottlieb",               "Rock Encore",          GAME_IS_SKELETON_MECHANICAL)
+GAME(1986, genesisp,  0,        gts80b_s1, gts80b, gts80b_state, gts80b, ROT0, "Gottlieb",               "Genesis",              GAME_IS_SKELETON_MECHANICAL)
+GAME(1987, sprbreak,  0,        gts80b_s1, gts80b, gts80b_state, gts80b, ROT0, "Gottlieb",               "Spring Break",         GAME_IS_SKELETON_MECHANICAL)
+GAME(19??, sprbreaks, sprbreak, gts80b_s1, gts80b, gts80b_state, gts80b, ROT0, "Gottlieb",               "Spring Break (single ball game)", GAME_IS_SKELETON_MECHANICAL)
+GAME(1986, goldwing,  0,        gts80b_s1, gts80b, gts80b_state, gts80b, ROT0, "Gottlieb",               "Gold Wings",           GAME_IS_SKELETON_MECHANICAL)
+GAME(1987, mntecrlo,  0,        gts80b_s1, gts80b, gts80b_state, gts80b, ROT0, "Gottlieb",               "Monte Carlo (Pinball)", GAME_IS_SKELETON_MECHANICAL)
+GAME(1987, arena,     0,        gts80b_s1, gts80b, gts80b_state, gts80b, ROT0, "Gottlieb",               "Arena",                GAME_IS_SKELETON_MECHANICAL)
+GAME(1987, victoryp,  0,        gts80b_s2, gts80b, gts80b_state, gts80b, ROT0, "Gottlieb",               "Victory (Pinball)",    GAME_IS_SKELETON_MECHANICAL)
+GAME(1988, diamondp,  0,        gts80b_s2, gts80b, gts80b_state, gts80b, ROT0, "Gottlieb",               "Diamond Lady",         GAME_IS_SKELETON_MECHANICAL)
+GAME(1988, txsector,  0,        gts80b_s2, gts80b, gts80b_state, gts80b, ROT0, "Gottlieb",               "TX-Sector",            GAME_IS_SKELETON_MECHANICAL)
+GAME(1989, bighouse,  0,        gts80b_s3, gts80b, gts80b_state, gts80b, ROT0, "Gottlieb",               "Big House",            GAME_IS_SKELETON_MECHANICAL)
+GAME(1988, robowars,  0,        gts80b_s2, gts80b, gts80b_state, gts80b, ROT0, "Gottlieb",               "Robo-War",             GAME_IS_SKELETON_MECHANICAL)
+GAME(1988, excalibr,  0,        gts80b_s3, gts80b, gts80b_state, gts80b, ROT0, "Gottlieb",               "Excalibur",            GAME_IS_SKELETON_MECHANICAL)
+GAME(1988, badgirls,  0,        gts80b_s3, gts80b, gts80b_state, gts80b, ROT0, "Gottlieb",               "Bad Girls",            GAME_IS_SKELETON_MECHANICAL)
+GAME(1989, hotshots,  0,        gts80b_s2, gts80b, gts80b_state, gts80b, ROT0, "Gottlieb",               "Hot Shots",            GAME_IS_SKELETON_MECHANICAL)
+GAME(1989, bonebstr,  0,        bonebstr,  gts80b, gts80b_state, gts80b, ROT0, "Gottlieb",               "Bone Busters Inc.",    GAME_IS_SKELETON_MECHANICAL)
+GAME(1989, bonebstrf, bonebstr, bonebstr,  gts80b, gts80b_state, gts80b, ROT0, "Gottlieb",               "Bone Busters Inc. (French)", GAME_IS_SKELETON_MECHANICAL)
+GAME(1989, nmoves,    0,        gts80b_s2, gts80b, gts80b_state, gts80b, ROT0, "International Concepts", "Night Moves",          GAME_IS_SKELETON_MECHANICAL)

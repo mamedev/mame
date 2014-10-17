@@ -34,7 +34,7 @@
 
 		<!-- Background -->
 		<backdrop element="background">
-			<bounds left="0" top="20" right="318" bottom="394" />
+			<bounds left="0" top="25" right="400" bottom="220" />
 		</backdrop>
 
 		<!-- LEDs -->
