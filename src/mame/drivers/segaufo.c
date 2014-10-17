@@ -372,7 +372,7 @@ void ufo_state::machine_start()
 {
 	// init/zerofill
 	static const float motor_speeds[4] =
-		{ (float) (1.0/CABINET_WIDTH), (float) (1.0/CABINET_DEPTH), (float) (1.0/CABINET_HEIGHT), (float) (1.0/CRANE_SIZE) };
+		{ 1.0f/CABINET_WIDTH, 1.0f/CABINET_DEPTH, 1.0f/CABINET_HEIGHT, 1.0f/CRANE_SIZE };
 	
 	for (int p = 0; p < 2; p++)
 	{
