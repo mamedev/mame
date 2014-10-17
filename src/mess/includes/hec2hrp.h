@@ -187,3 +187,5 @@ public:
 };
 
 extern const floppy_interface minidisc_floppy_interface;
+
+MACHINE_CONFIG_EXTERN( hector_audio );

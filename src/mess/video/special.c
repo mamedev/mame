@@ -54,7 +54,7 @@ UINT32 special_state::screen_update_specialp(screen_device &screen, bitmap_ind16
 }
 
 
-const rgb_t specimx_palette[16] = {
+static const rgb_t specimx_palette[16] = {
 	rgb_t(0x00, 0x00, 0x00), // 0
 	rgb_t(0x00, 0x00, 0xaa), // 1
 	rgb_t(0x00, 0xaa, 0x00), // 2

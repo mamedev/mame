@@ -97,11 +97,6 @@ static ADDRESS_MAP_START(interact_mem, AS_PROGRAM, 8, interact_state )
 
 ADDRESS_MAP_END
 
-/* Discrete Sound */
-static DISCRETE_SOUND_START( hec2hrp )
-	DISCRETE_INPUT_LOGIC(NODE_01)
-	DISCRETE_OUTPUT(NODE_01, 5000)
-DISCRETE_SOUND_END
 
 MACHINE_RESET_MEMBER(interact_state,interact)
 {
@@ -143,28 +138,10 @@ static MACHINE_CONFIG_START( interact, interact_state )
 	MCFG_PALETTE_ADD("palette", 16)             /* 8 colours, but only 4 at a time*/
 
 	MCFG_VIDEO_START_OVERRIDE(interact_state,hec2hrp)
-		/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(0, "mono", 0.25)  /* Sound level for cassette, as it is in mono => output channel=0*/
 
-	MCFG_SOUND_ADD("sn76477", SN76477, 0)
-	MCFG_SN76477_NOISE_PARAMS(RES_K(47), RES_K(330), CAP_P(390)) // noise + filter
-	MCFG_SN76477_DECAY_RES(RES_K(680))                  // decay_res
-	MCFG_SN76477_ATTACK_PARAMS(CAP_U(47), RES_K(180))   // attack_decay_cap + attack_res
-	MCFG_SN76477_AMP_RES(RES_K(33))                     // amplitude_res
-	MCFG_SN76477_FEEDBACK_RES(RES_K(100))               // feedback_res
-	MCFG_SN76477_VCO_PARAMS(2, CAP_N(47), RES_K(1000))  // VCO volt + cap + res
-	MCFG_SN76477_PITCH_VOLTAGE(2)                       // pitch_voltage
-	MCFG_SN76477_SLF_PARAMS(CAP_U(0.1), RES_K(180))     // slf caps + res
-	MCFG_SN76477_ONESHOT_PARAMS(CAP_U(1.00001), RES_K(10000))   // oneshot caps + res
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.1)
+	MCFG_FRAGMENT_ADD(hector_audio)
 
-	MCFG_SOUND_ADD("discrete", DISCRETE, 0) /* Son 1bit*/
-	MCFG_DISCRETE_INTF( hec2hrp )
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-
-	MCFG_CASSETTE_ADD( "cassette" )
+	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_FORMATS(hector_cassette_formats)
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MASK_SPEAKER)
 	MCFG_CASSETTE_INTERFACE("interact_cass")
@@ -198,28 +175,10 @@ static MACHINE_CONFIG_START( hector1, interact_state )
 	MCFG_PALETTE_ADD("palette", 16)             /* 8 colours, but only 4 at a time*/
 
 	MCFG_VIDEO_START_OVERRIDE(interact_state,hec2hrp)
-		/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(0, "mono", 0.25)/* Sound level for cassette, as it is in mono => output channel=0*/
 
-	MCFG_SOUND_ADD("sn76477", SN76477, 0)
-	MCFG_SN76477_NOISE_PARAMS(RES_K(47), RES_K(330), CAP_P(390)) // noise + filter
-	MCFG_SN76477_DECAY_RES(RES_K(680))                  // decay_res
-	MCFG_SN76477_ATTACK_PARAMS(CAP_U(47), RES_K(180))   // attack_decay_cap + attack_res
-	MCFG_SN76477_AMP_RES(RES_K(33))                     // amplitude_res
-	MCFG_SN76477_FEEDBACK_RES(RES_K(100))               // feedback_res
-	MCFG_SN76477_VCO_PARAMS(2, CAP_N(47), RES_K(1000))  // VCO volt + cap + res
-	MCFG_SN76477_PITCH_VOLTAGE(2)                       // pitch_voltage
-	MCFG_SN76477_SLF_PARAMS(CAP_U(0.1), RES_K(180))     // slf caps + res
-	MCFG_SN76477_ONESHOT_PARAMS(CAP_U(1.00001), RES_K(10000))   // oneshot caps + res
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.1)
+	MCFG_FRAGMENT_ADD(hector_audio)
 
-	MCFG_SOUND_ADD("discrete", DISCRETE, 0) /* Son 1bit*/
-	MCFG_DISCRETE_INTF( hec2hrp )
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-
-	MCFG_CASSETTE_ADD( "cassette" )
+	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_FORMATS(hector_cassette_formats)
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MASK_SPEAKER)
 	MCFG_CASSETTE_INTERFACE("interact_cass")

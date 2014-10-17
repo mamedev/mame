@@ -4,6 +4,9 @@
     PC-Engine / Turbografx-16 cart emulation
     (through slot devices)
 
+ TODO:
+   - reimplement cart mirroring in a better way
+ 
  ***********************************************************************************************************/
 
 
@@ -82,6 +85,18 @@ void device_pce_cart_interface::rom_map_setup(UINT32 size)
 		rom_bank_map[3] = 1;
 		rom_bank_map[4] = 2;
 		rom_bank_map[5] = 2;
+		rom_bank_map[6] = 2;
+		rom_bank_map[7] = 2;
+	}
+	else if (size == 0x30000)
+	{
+		// 192K images (some demos)
+		rom_bank_map[0] = 0;
+		rom_bank_map[1] = 1;
+		rom_bank_map[2] = 2;
+		rom_bank_map[3] = 2;
+		rom_bank_map[4] = 0;
+		rom_bank_map[5] = 1;
 		rom_bank_map[6] = 2;
 		rom_bank_map[7] = 2;
 	}
