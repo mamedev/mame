@@ -37,10 +37,35 @@ finder_base::~finder_base()
 
 
 //-------------------------------------------------
-//  find_memory - find memory
+//  find_memregion - find memory region
 //-------------------------------------------------
 
-void *finder_base::find_memory(UINT8 width, size_t &bytes, bool required)
+void *finder_base::find_memregion(UINT8 width, size_t &length, bool required)
+{
+	// look up the region and return NULL if not found
+	memory_region *region = m_base.memregion(m_tag);
+	if (region == NULL)
+		return NULL;
+
+	// check the width and warn if not correct
+	if (region->width() != width)
+	{
+		if (required)
+			osd_printf_warning("Region '%s' found but is width %d, not %d as requested\n", m_tag, region->width()*8, width*8);
+		return NULL;
+	}
+
+	// return results
+	length = region->bytes() / width;
+	return region->base();
+}
+
+
+//-------------------------------------------------
+//  find_memshare - find memory share
+//-------------------------------------------------
+
+void *finder_base::find_memshare(UINT8 width, size_t &bytes, bool required)
 {
 	// look up the share and return NULL if not found
 	memory_share *share = m_base.memshare(m_tag);

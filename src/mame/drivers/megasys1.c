@@ -312,6 +312,10 @@ static ADDRESS_MAP_START( megasys1D_map, AS_PROGRAM, 16, megasys1_state )
 	AM_RANGE(0x1f0000, 0x1fffff) AM_RAM AM_SHARE("ram")
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( megasys1D_oki_map, AS_0, 8, megasys1_state )
+	AM_RANGE(0x00000, 0x1ffff) AM_ROM
+	AM_RANGE(0x20000, 0x3ffff) AM_ROMBANK("okibank")
+ADDRESS_MAP_END
 
 /*************************************
  *
@@ -1382,16 +1386,7 @@ WRITE16_MEMBER(megasys1_state::protection_peekaboo_w)
 	COMBINE_DATA(&m_protection_val);
 
 	if ((m_protection_val & 0x90) == 0x90)
-	{
-		UINT8 *RAM = m_region_oki1->base();
-		int new_bank = (m_protection_val & 0x7) % 7;
-
-		if (m_bank != new_bank)
-		{
-			memcpy(&RAM[0x20000],&RAM[0x40000 + 0x20000*new_bank],0x20000);
-			m_bank = new_bank;
-		}
-	}
+		membank("okibank")->set_entry(m_protection_val & 7);
 
 	m_maincpu->set_input_line(4, HOLD_LINE);
 }
@@ -1621,6 +1616,7 @@ static MACHINE_CONFIG_START( system_D, megasys1_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_OKIM6295_ADD("oki1", SYS_D_CPU_CLOCK/4, OKIM6295_PIN7_HIGH)    /* 2MHz (8MHz / 4) */
+	MCFG_DEVICE_ADDRESS_MAP(AS_0, megasys1D_oki_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -3145,9 +3141,8 @@ ROM_START( peekaboo )
 	ROM_REGION( 0x080000, "gfx4", 0 ) /* Sprites */
 	ROM_LOAD( "1",       0x000000, 0x080000, CRC(5a444ecf) SHA1(38a7a6e91d0635a7f82a1c9a04efe1586ed3d856) )
 
-	ROM_REGION( 0x120000, "oki1", 0 )       /* Samples */
-	ROM_LOAD( "peeksamp.124", 0x000000, 0x020000, CRC(e1206fa8) SHA1(339d5a4fa2af7fb4ab2e9c6c66f4848fa8774832) )
-	ROM_CONTINUE(             0x040000, 0x0e0000 )
+	ROM_REGION( 0x100000, "oki1", 0 )       /* Samples */
+	ROM_LOAD( "peeksamp.124", 0x000000, 0x100000, CRC(e1206fa8) SHA1(339d5a4fa2af7fb4ab2e9c6c66f4848fa8774832) )
 
 	ROM_REGION( 0x0200, "proms", 0 )        /* Priority PROM */
 	ROM_LOAD( "priority.69",    0x000000, 0x200, CRC(b40bff56) SHA1(39c95eed79328ef2df754988db83e07909e848f8) )
@@ -3173,9 +3168,8 @@ ROM_START( peekaboou )
 	ROM_REGION( 0x080000, "gfx4", 0 ) /* Sprites */
 	ROM_LOAD( "1",       0x000000, 0x080000, CRC(5a444ecf) SHA1(38a7a6e91d0635a7f82a1c9a04efe1586ed3d856) )
 
-	ROM_REGION( 0x120000, "oki1", 0 )       /* Samples */
-	ROM_LOAD( "peeksamp.124", 0x000000, 0x020000, CRC(e1206fa8) SHA1(339d5a4fa2af7fb4ab2e9c6c66f4848fa8774832) )
-	ROM_CONTINUE(             0x040000, 0x0e0000 )
+	ROM_REGION( 0x100000, "oki1", 0 )       /* Samples */
+	ROM_LOAD( "peeksamp.124", 0x000000, 0x100000, CRC(e1206fa8) SHA1(339d5a4fa2af7fb4ab2e9c6c66f4848fa8774832) )
 
 	ROM_REGION( 0x0200, "proms", 0 )        /* Priority PROM */
 	ROM_LOAD( "priority.69",    0x000000, 0x200, CRC(b40bff56) SHA1(39c95eed79328ef2df754988db83e07909e848f8) )
@@ -3793,8 +3787,6 @@ DRIVER_INIT_MEMBER(megasys1_state,64street)
 
 READ16_MEMBER(megasys1_state::megasys1A_mcu_hs_r)
 {
-	UINT16 *ROM  = (UINT16 *) m_region_maincpu->base();
-
 	if(m_mcu_hs && ((m_mcu_hs_ram[8/2] << 6) & 0x3ffc0) == ((offset*2) & 0x3ffc0))
 	{
 		if(MCU_HS_LOG && !space.debugger_access())
@@ -3803,7 +3795,7 @@ READ16_MEMBER(megasys1_state::megasys1A_mcu_hs_r)
 		return 0x889e;
 	}
 
-	return ROM[offset];
+	return m_rom_maincpu[offset];
 }
 
 WRITE16_MEMBER(megasys1_state::megasys1A_mcu_hs_w)
@@ -3922,8 +3914,6 @@ DRIVER_INIT_MEMBER(megasys1_state,hayaosi1)
 
 READ16_MEMBER(megasys1_state::iganinju_mcu_hs_r)
 {
-	UINT16 *ROM  = (UINT16 *) m_region_maincpu->base();
-
 	if(m_mcu_hs && ((m_mcu_hs_ram[8/2] << 6) & 0x3ffc0) == ((offset*2) & 0x3ffc0))
 	{
 		if(MCU_HS_LOG && !space.debugger_access())
@@ -3932,7 +3922,7 @@ READ16_MEMBER(megasys1_state::iganinju_mcu_hs_r)
 		return 0x835d;
 	}
 
-	return ROM[offset];
+	return m_rom_maincpu[offset];
 }
 
 WRITE16_MEMBER(megasys1_state::iganinju_mcu_hs_w)
@@ -3957,33 +3947,27 @@ WRITE16_MEMBER(megasys1_state::iganinju_mcu_hs_w)
 
 DRIVER_INIT_MEMBER(megasys1_state,iganinju)
 {
-	//UINT16 *ROM;
-
 	phantasm_rom_decode(machine(), "maincpu");
 
-	//ROM  = (UINT16 *) m_region_maincpu->base();
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00000, 0x3ffff, read16_delegate(FUNC(megasys1_state::iganinju_mcu_hs_r),this));
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x2f000, 0x2f009, write16_delegate(FUNC(megasys1_state::iganinju_mcu_hs_w),this));
 
-	//ROM[0x00006e/2] = 0x0420; // the only game that does
-								// not like lev 3 interrupts
+	//m_rom_maincpu[0x00006e/2] = 0x0420; // the only game that does
+										// not like lev 3 interrupts
 }
 
+// jitsupro writes oki commands to both the lsb and msb; it works because of byte smearing
 WRITE16_MEMBER(megasys1_state::okim6295_both_1_w)
 {
-	if (ACCESSING_BITS_0_7) m_oki1->write_command((data >> 0) & 0xff );
-	else                    m_oki1->write_command((data >> 8) & 0xff );
+	m_oki1->write_command(data & 0xff);
 }
 WRITE16_MEMBER(megasys1_state::okim6295_both_2_w)
 {
-	if (ACCESSING_BITS_0_7) m_oki2->write_command((data >> 0) & 0xff );
-	else                    m_oki2->write_command((data >> 8) & 0xff );
+	m_oki2->write_command(data & 0xff);
 }
 
 DRIVER_INIT_MEMBER(megasys1_state,jitsupro)
 {
-	//UINT16 *ROM  = (UINT16 *) m_region_maincpu->base();
-
 	astyanax_rom_decode(machine(), "maincpu");      // Code
 
 	jitsupro_gfx_unmangle("gfx1");   // Gfx
@@ -3991,13 +3975,18 @@ DRIVER_INIT_MEMBER(megasys1_state,jitsupro)
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00000, 0x3ffff, read16_delegate(FUNC(megasys1_state::megasys1A_mcu_hs_r),this));
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x20000, 0x20009, write16_delegate(FUNC(megasys1_state::megasys1A_mcu_hs_w),this));
 
-	/* the sound code writes oki commands to both the lsb and msb */
 	m_audiocpu->space(AS_PROGRAM).install_write_handler(0xa0000, 0xa0003, write16_delegate(FUNC(megasys1_state::okim6295_both_1_w),this));
 	m_audiocpu->space(AS_PROGRAM).install_write_handler(0xc0000, 0xc0003, write16_delegate(FUNC(megasys1_state::okim6295_both_2_w),this));
 }
 
 DRIVER_INIT_MEMBER(megasys1_state,peekaboo)
 {
+	UINT8 *ROM = memregion("oki1")->base();
+	memory_bank *okibank = membank("okibank");
+
+	okibank->configure_entry(7, &ROM[0x20000]);
+	okibank->configure_entries(0, 7, &ROM[0x20000], 0x20000);
+
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x100000, 0x100001, read16_delegate(FUNC(megasys1_state::protection_peekaboo_r),this), write16_delegate(FUNC(megasys1_state::protection_peekaboo_w),this));
 }
 
@@ -4046,8 +4035,6 @@ DRIVER_INIT_MEMBER(megasys1_state,soldam)
 
 READ16_MEMBER(megasys1_state::stdragon_mcu_hs_r)
 {
-	UINT16 *ROM  = (UINT16 *) m_region_maincpu->base();
-
 	if(m_mcu_hs && ((m_mcu_hs_ram[8/2] << 6) & 0x3ffc0) == ((offset*2) & 0x3ffc0))
 	{
 		if(MCU_HS_LOG && !space.debugger_access())
@@ -4056,7 +4043,7 @@ READ16_MEMBER(megasys1_state::stdragon_mcu_hs_r)
 		return 0x835d;
 	}
 
-	return ROM[offset];
+	return m_rom_maincpu[offset];
 }
 
 WRITE16_MEMBER(megasys1_state::stdragon_mcu_hs_w)
@@ -4114,8 +4101,7 @@ DRIVER_INIT_MEMBER(megasys1_state,monkelf)
 {
 	DRIVER_INIT_CALL(avspirit);
 
-	UINT16 *ROM = (UINT16*)m_region_maincpu->base();
-	ROM[0x00744/2] = 0x4e71; // weird check, 0xe000e R is a port-based trap?
+	m_rom_maincpu[0x00744/2] = 0x4e71; // weird check, 0xe000e R is a port-based trap?
 
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xe0000, 0xe000f, read16_delegate(FUNC(megasys1_state::monkelf_input_r),this));
 }

@@ -59,7 +59,7 @@ Known Issues:
 
 
 
-int twin16_state::twin16_spriteram_process_enable(  )
+int twin16_state::spriteram_process_enable(  )
 {
 	return (m_CPUA_register & 0x40) == 0;
 }
@@ -68,17 +68,7 @@ int twin16_state::twin16_spriteram_process_enable(  )
 
 /* Read/Write Handlers */
 
-READ16_MEMBER(twin16_state::twin16_gfx_rom1_r)
-{
-	return m_gfx_rom[offset + ((m_CPUB_register&0x04)?0x40000:0)];
-}
-
-READ16_MEMBER(twin16_state::twin16_gfx_rom2_r)
-{
-	return m_gfx_rom[offset + 0x80000 + ((m_CPUB_register&0x04)?0x40000:0)];
-}
-
-WRITE16_MEMBER(twin16_state::twin16_CPUA_register_w)
+WRITE16_MEMBER(twin16_state::CPUA_register_w)
 {
 	/*
 	7   6   5   4   3   2   1   0
@@ -88,17 +78,21 @@ WRITE16_MEMBER(twin16_state::twin16_CPUA_register_w)
 	                X               0->1 trigger IRQ on sound CPU
 	                    x   x   x   coin counters
 	*/
-	UINT16 old = m_CPUA_register;
+	int old = m_CPUA_register;
 	COMBINE_DATA(&m_CPUA_register);
+
 	if (m_CPUA_register != old)
 	{
-		if ((old & 0x08) == 0 && (m_CPUA_register & 0x08))
+		int rising_edge = ~old & m_CPUA_register;
+		int falling_edge = old & ~m_CPUA_register;
+		
+		if (rising_edge & 0x08)
 			m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
 
-		if ((old & 0x40) && (m_CPUA_register & 0x40) == 0)
-			twin16_spriteram_process();
+		if (falling_edge & 0x40)
+			spriteram_process();
 
-		if ((old & 0x10) == 0 && (m_CPUA_register & 0x10))
+		if (rising_edge & 0x10)
 			m_subcpu->set_input_line(M68K_IRQ_6, HOLD_LINE);
 
 		coin_counter_w(machine(), 0, m_CPUA_register & 0x01);
@@ -107,7 +101,7 @@ WRITE16_MEMBER(twin16_state::twin16_CPUA_register_w)
 	}
 }
 
-WRITE16_MEMBER(twin16_state::twin16_CPUB_register_w)
+WRITE16_MEMBER(twin16_state::CPUB_register_w)
 {
 	/*
 	7   6   5   4   3   2   1   0
@@ -115,19 +109,24 @@ WRITE16_MEMBER(twin16_state::twin16_CPUB_register_w)
 	                        X       IRQ5 enable
 	                            X   0->1 trigger IRQ6 on CPUA
 	*/
-	UINT16 old = m_CPUB_register;
+	int old = m_CPUB_register;
 	COMBINE_DATA(&m_CPUB_register);
-	if( m_CPUB_register!=old )
+
+	if (m_CPUB_register != old)
 	{
-		if ((old & 0x01) == 0 && (m_CPUB_register & 0x01))
+		int rising_edge = ~old & m_CPUB_register;
+		if (rising_edge & 0x01)
 			m_maincpu->set_input_line(M68K_IRQ_6, HOLD_LINE);
+
+		m_gfxrombank->set_entry(BIT(m_CPUB_register, 2));
 	}
 }
 
-WRITE16_MEMBER(twin16_state::fround_CPU_register_w)
+WRITE16_MEMBER(fround_state::fround_CPU_register_w)
 {
 	/*
 	7   6   5   4   3   2   1   0
+	        X                       IRQ5 enable
 	                X               0->1 trigger IRQ on sound CPU
 	                        x   x   coin counters
 	*/
@@ -143,17 +142,17 @@ WRITE16_MEMBER(twin16_state::fround_CPU_register_w)
 	}
 }
 
-READ8_MEMBER(twin16_state::twin16_upd_busy_r)
+READ8_MEMBER(twin16_state::upd_busy_r)
 {
 	return m_upd7759->busy_r();
 }
 
-WRITE8_MEMBER(twin16_state::twin16_upd_reset_w)
+WRITE8_MEMBER(twin16_state::upd_reset_w)
 {
 	m_upd7759->reset_w(data & 2);
 }
 
-WRITE8_MEMBER(twin16_state::twin16_upd_start_w)
+WRITE8_MEMBER(twin16_state::upd_start_w)
 {
 	m_upd7759->start_w(data & 1);
 }
@@ -163,13 +162,13 @@ WRITE8_MEMBER(twin16_state::twin16_upd_start_w)
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, twin16_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x9000, 0x9000) AM_WRITE(twin16_upd_reset_w)
+	AM_RANGE(0x9000, 0x9000) AM_WRITE(upd_reset_w)
 	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0xb000, 0xb00d) AM_DEVREADWRITE("k007232", k007232_device, read, write)
 	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 	AM_RANGE(0xd000, 0xd000) AM_DEVWRITE("upd", upd7759_device, port_w)
-	AM_RANGE(0xe000, 0xe000) AM_WRITE(twin16_upd_start_w)
-	AM_RANGE(0xf000, 0xf000) AM_READ(twin16_upd_busy_r) // miaj writes 0 to it
+	AM_RANGE(0xe000, 0xe000) AM_WRITE(upd_start_w)
+	AM_RANGE(0xf000, 0xf000) AM_READ(upd_busy_r) // miaj writes 0 to it
 	ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, twin16_state )
@@ -179,7 +178,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, twin16_state )
 	AM_RANGE(0x060000, 0x063fff) AM_RAM
 	AM_RANGE(0x080000, 0x080fff) AM_DEVREADWRITE8("palette", palette_device, read, write, 0x00ff) AM_SHARE("palette")
 	AM_RANGE(0x081000, 0x081fff) AM_WRITENOP
-	AM_RANGE(0x0a0000, 0x0a0001) AM_READ_PORT("SYSTEM") AM_WRITE(twin16_CPUA_register_w)
+	AM_RANGE(0x0a0000, 0x0a0001) AM_READ_PORT("SYSTEM") AM_WRITE(CPUA_register_w)
 	AM_RANGE(0x0a0002, 0x0a0003) AM_READ_PORT("P1")
 	AM_RANGE(0x0a0004, 0x0a0005) AM_READ_PORT("P2")
 	AM_RANGE(0x0a0006, 0x0a0007) AM_READ_PORT("P3")
@@ -187,11 +186,12 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, twin16_state )
 	AM_RANGE(0x0a0010, 0x0a0011) AM_READ_PORT("DSW2") AM_WRITE(watchdog_reset16_w)
 	AM_RANGE(0x0a0012, 0x0a0013) AM_READ_PORT("DSW1")
 	AM_RANGE(0x0a0018, 0x0a0019) AM_READ_PORT("DSW3")
-	AM_RANGE(0x0c0000, 0x0c000f) AM_WRITE(twin16_video_register_w)
-	AM_RANGE(0x0c000e, 0x0c000f) AM_READ(twin16_sprite_status_r)
-	AM_RANGE(0x100000, 0x103fff) AM_RAM_WRITE(twin16_text_ram_w) AM_SHARE("text_ram")
+	AM_RANGE(0x0c0000, 0x0c000f) AM_WRITE(video_register_w)
+	AM_RANGE(0x0c000e, 0x0c000f) AM_READ(sprite_status_r)
+	AM_RANGE(0x100000, 0x103fff) AM_RAM_WRITE(fixram_w) AM_SHARE("fixram")
 //  AM_RANGE(0x104000, 0x105fff) AM_NOP             // miaj
-	AM_RANGE(0x120000, 0x123fff) AM_RAM AM_SHARE("videoram")
+	AM_RANGE(0x120000, 0x121fff) AM_RAM_WRITE(videoram0_w) AM_SHARE("videoram.0")
+	AM_RANGE(0x122000, 0x123fff) AM_RAM_WRITE(videoram1_w) AM_SHARE("videoram.1")
 	AM_RANGE(0x140000, 0x143fff) AM_RAM AM_SHARE("spriteram")
 ADDRESS_MAP_END
 
@@ -200,17 +200,18 @@ static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 16, twin16_state )
 	AM_RANGE(0x040000, 0x043fff) AM_RAM AM_SHARE("comram")
 //  AM_RANGE(0x044000, 0x04ffff) AM_NOP             // miaj
 	AM_RANGE(0x060000, 0x063fff) AM_RAM
-	AM_RANGE(0x080000, 0x09ffff) AM_ROM AM_REGION("gfx3", 0)
-	AM_RANGE(0x0a0000, 0x0a0001) AM_WRITE(twin16_CPUB_register_w)
+	AM_RANGE(0x080000, 0x09ffff) AM_ROM AM_REGION("data", 0)
+	AM_RANGE(0x0a0000, 0x0a0001) AM_WRITE(CPUB_register_w)
 	AM_RANGE(0x400000, 0x403fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x480000, 0x483fff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0x500000, 0x53ffff) AM_RAM AM_SHARE("tile_gfx_ram")
-	AM_RANGE(0x600000, 0x6fffff) AM_READ(twin16_gfx_rom1_r)
-	AM_RANGE(0x700000, 0x77ffff) AM_READ(twin16_gfx_rom2_r)
+	AM_RANGE(0x480000, 0x481fff) AM_RAM_WRITE(videoram0_w) AM_SHARE("videoram.0")
+	AM_RANGE(0x482000, 0x483fff) AM_RAM_WRITE(videoram1_w) AM_SHARE("videoram.1")
+	AM_RANGE(0x500000, 0x53ffff) AM_RAM_WRITE(zipram_w) AM_SHARE("zipram")
+	AM_RANGE(0x600000, 0x6fffff) AM_ROM AM_REGION("gfxrom", 0)
+	AM_RANGE(0x700000, 0x77ffff) AM_ROMBANK("gfxrombank")
 	AM_RANGE(0x780000, 0x79ffff) AM_RAM AM_SHARE("sprite_gfx_ram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( fround_map, AS_PROGRAM, 16, twin16_state )
+static ADDRESS_MAP_START( fround_map, AS_PROGRAM, 16, fround_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x040000, 0x043fff) AM_RAM AM_SHARE("comram")
 	AM_RANGE(0x060000, 0x063fff) AM_RAM
@@ -222,13 +223,15 @@ static ADDRESS_MAP_START( fround_map, AS_PROGRAM, 16, twin16_state )
 	AM_RANGE(0x0a0010, 0x0a0011) AM_READ_PORT("DSW2") AM_WRITE(watchdog_reset16_w)
 	AM_RANGE(0x0a0012, 0x0a0013) AM_READ_PORT("DSW1")
 	AM_RANGE(0x0a0018, 0x0a0019) AM_READ_PORT("DSW3")
-	AM_RANGE(0x0c0000, 0x0c000f) AM_WRITE(twin16_video_register_w)
-	AM_RANGE(0x0c000e, 0x0c000f) AM_READ(twin16_sprite_status_r)
-	AM_RANGE(0x0e0000, 0x0e0001) AM_WRITE(fround_gfx_bank_w)
-	AM_RANGE(0x100000, 0x103fff) AM_RAM_WRITE(twin16_text_ram_w) AM_SHARE("text_ram")
-	AM_RANGE(0x120000, 0x123fff) AM_RAM AM_SHARE("videoram")
+	AM_RANGE(0x0c0000, 0x0c000f) AM_WRITE(video_register_w)
+	AM_RANGE(0x0c000e, 0x0c000f) AM_READ(sprite_status_r)
+	AM_RANGE(0x0e0000, 0x0e0001) AM_WRITE(gfx_bank_w)
+	AM_RANGE(0x100000, 0x103fff) AM_RAM_WRITE(fixram_w) AM_SHARE("fixram")
+	AM_RANGE(0x120000, 0x121fff) AM_RAM_WRITE(videoram0_w) AM_SHARE("videoram.0")
+	AM_RANGE(0x122000, 0x123fff) AM_RAM_WRITE(videoram1_w) AM_SHARE("videoram.1")
 	AM_RANGE(0x140000, 0x143fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x500000, 0x6fffff) AM_ROM AM_REGION("gfx2", 0)
+	AM_RANGE(0x500000, 0x5fffff) AM_ROM AM_REGION("tiles", 0)
+	AM_RANGE(0x600000, 0x6fffff) AM_ROM AM_REGION("gfxrom", 0)
 ADDRESS_MAP_END
 
 /* Input Ports */
@@ -595,21 +598,27 @@ INPUT_PORTS_END
 
 /* Graphics Layouts */
 
-static const gfx_layout alpha_layout =
+static const gfx_layout tile_layout =
 {
 	8,8,
-	0x200,
+	RGN_FRAC(1,1),
 	4,
 	{ 0,1,2,3 },
-	{ 0*4,1*4,2*4,3*4,4*4,5*4,6*4,7*4 },
-	{ 0*32,1*32,2*32,3*32,4*32,5*32,6*32,7*32 },
-	8*32
+	{ STEP8(0, 4) },
+	{ STEP8(0, 4*8) },
+	4*8*8
 };
 
 /* Graphics Decode Info */
 
 static GFXDECODE_START( twin16 )
-	GFXDECODE_ENTRY( "gfx1", 0x00000, alpha_layout, 0, 16 )
+	GFXDECODE_ENTRY( "fixed", 0, tile_layout,   0, 16 )
+	GFXDECODE_RAM(  "zipram", 0, tile_layout, 512, 16 )
+GFXDECODE_END
+
+static GFXDECODE_START( fround )
+	GFXDECODE_ENTRY( "fixed", 0, tile_layout,   0, 16 )
+	GFXDECODE_ENTRY( "tiles", 0, tile_layout, 512, 16 )
 GFXDECODE_END
 
 /* Sound Interfaces */
@@ -634,13 +643,13 @@ INTERRUPT_GEN_MEMBER(twin16_state::CPUB_interrupt)
 
 /* Machine Drivers */
 
-MACHINE_RESET_MEMBER(twin16_state,twin16)
+void twin16_state::machine_reset()
 {
 	m_CPUA_register = 0;
 	m_CPUB_register = 0;
 }
 
-MACHINE_START_MEMBER(twin16_state,twin16)
+void twin16_state::machine_start()
 {
 	/* register for savestates */
 	save_item(NAME(m_CPUA_register));
@@ -651,19 +660,16 @@ static MACHINE_CONFIG_START( twin16, twin16_state )
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_18_432MHz/2)
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", twin16_state,  CPUA_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", twin16_state, CPUA_interrupt)
 
 	MCFG_CPU_ADD("sub", M68000, XTAL_18_432MHz/2)
 	MCFG_CPU_PROGRAM_MAP(sub_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", twin16_state,  CPUB_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", twin16_state, CPUB_interrupt)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
-
-	MCFG_MACHINE_START_OVERRIDE(twin16_state,twin16)
-	MCFG_MACHINE_RESET_OVERRIDE(twin16_state,twin16)
 
 	// video hardware
 	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
@@ -676,12 +682,10 @@ static MACHINE_CONFIG_START( twin16, twin16_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", twin16)
 
-	MCFG_PALETTE_ADD("palette", 0x400)
+	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 	MCFG_PALETTE_MEMBITS(8)
 	MCFG_PALETTE_ENABLE_SHADOWS()
-
-	MCFG_VIDEO_START_OVERRIDE(twin16_state,twin16)
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -706,19 +710,16 @@ static MACHINE_CONFIG_DERIVED( devilw, twin16 )
 	MCFG_QUANTUM_TIME(attotime::from_hz(60000)) // watchdog reset otherwise
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( fround, twin16_state )
+static MACHINE_CONFIG_START( fround, fround_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_18_432MHz/2)
 	MCFG_CPU_PROGRAM_MAP(fround_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", twin16_state,  CPUA_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", twin16_state, CPUA_interrupt)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
-
-	MCFG_MACHINE_START_OVERRIDE(twin16_state,twin16)
-	MCFG_MACHINE_RESET_OVERRIDE(twin16_state,twin16)
 
 	/* video hardware */
 	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
@@ -729,14 +730,12 @@ static MACHINE_CONFIG_START( fround, twin16_state )
 	MCFG_SCREEN_VBLANK_DRIVER(twin16_state, screen_eof_twin16)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", twin16)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", fround)
 
-	MCFG_PALETTE_ADD("palette", 0x400)
+	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 	MCFG_PALETTE_MEMBITS(8)
 	MCFG_PALETTE_ENABLE_SHADOWS()
-
-	MCFG_VIDEO_START_OVERRIDE(twin16_state,twin16)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -783,19 +782,19 @@ ROM_START( devilw )
 	ROM_LOAD16_BYTE( "687_q13.10s", 0x20000, 0x10000, CRC(36ae6014) SHA1(102d4c3215fb5f199ce6f93ce92725b5cce0b01d) )
 	ROM_LOAD16_BYTE( "687_q12.8s",  0x20001, 0x10000, CRC(6d012167) SHA1(d608e29e0b2e834c099386b6ebb667e4bfc40ce7) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )    // Z80 code (sound CPU)
+	ROM_REGION( 0x8000, "audiocpu", 0 )    // Z80 code (sound CPU)
 	ROM_LOAD( "687_l03.10a", 0x00000,  0x8000, CRC(7201983c) SHA1(06d089406d2f702e8d51ffdfbf34e4727a28d506) )
 
-	ROM_REGION( 0x4000, "gfx1", 0 )
-	ROM_LOAD( "687_m14.d8", 0x0000, 0x4000, CRC(d7338557) SHA1(9b384baafabaab3888a0139674f0b530303684ca) ) /* Title screen graphics & characters */
+	ROM_REGION( 0x4000, "fixed", 0 )  // title screen graphics & characters
+	ROM_LOAD( "687_m14.d8", 0x0000, 0x4000, CRC(d7338557) SHA1(9b384baafabaab3888a0139674f0b530303684ca) )
 
-	ROM_REGION16_BE( 0x200000, "gfx2", 0 )  // gfx data used at runtime
+	ROM_REGION16_BE( 0x200000, "gfxrom", 0 )  // gfx data used at runtime
 	ROM_LOAD32_WORD_SWAP( "687i15.p13", 0x000000, 0x80000, CRC(eec8c5b2) SHA1(c400dd8c7bb85d233815572acd547acf626e4c73) )
 	ROM_LOAD32_WORD_SWAP( "687i17.p16", 0x000002, 0x80000, CRC(66cb3923) SHA1(3c1fc1dff77201cf8d8c4594c965695066c1701c) )
 	ROM_LOAD32_WORD_SWAP( "687i16.p15", 0x100000, 0x80000, CRC(746cf48b) SHA1(8f51df931b1de928f402f51bbaf02e37dfec1d6d) )
 	ROM_LOAD32_WORD_SWAP( "687i18.p18", 0x100002, 0x80000, CRC(a1c7d0db) SHA1(901bc6e1982b9a8c2150a802995256d0168cc605) )
 
-	ROM_REGION16_BE( 0x20000, "gfx3", 0 )   // tile data; mapped at 0x80000 on CPUB
+	ROM_REGION16_BE( 0x20000, "data", 0 )   // tile data; mapped at 0x80000 on CPUB
 	ROM_LOAD16_BYTE( "687_l11.10r", 0x00000, 0x10000, CRC(399deee8) SHA1(dcc65e95f28ae4e9b671e70ce0bd5ba0fe178506) )
 	ROM_LOAD16_BYTE( "687_l10.8r",  0x00001, 0x10000, CRC(117c91ee) SHA1(dcf8efb25fc73cff916b66b7bcfd3c1fb2556a53) )
 
@@ -819,19 +818,19 @@ ROM_START( majuu )
 	ROM_LOAD16_BYTE( "687_q13.10s", 0x20000, 0x10000, CRC(36ae6014) SHA1(102d4c3215fb5f199ce6f93ce92725b5cce0b01d) )
 	ROM_LOAD16_BYTE( "687_q12.8s",  0x20001, 0x10000, CRC(6d012167) SHA1(d608e29e0b2e834c099386b6ebb667e4bfc40ce7) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )    // Z80 code (sound CPU)
+	ROM_REGION( 0x8000, "audiocpu", 0 )    // Z80 code (sound CPU)
 	ROM_LOAD( "687_l03.10a", 0x00000,  0x8000, CRC(7201983c) SHA1(06d089406d2f702e8d51ffdfbf34e4727a28d506) )
 
-	ROM_REGION( 0x4000, "gfx1", 0 )
-	ROM_LOAD( "687_l14.d8", 0x0000, 0x4000, CRC(20ecccd6) SHA1(b8ac3186de5ea81ae1c64b9511b7a0718aabab48) ) /* Title screen graphics & characters */
+	ROM_REGION( 0x4000, "fixed", 0 )  // title screen graphics & characters
+	ROM_LOAD( "687_l14.d8", 0x0000, 0x4000, CRC(20ecccd6) SHA1(b8ac3186de5ea81ae1c64b9511b7a0718aabab48) )
 
-	ROM_REGION16_BE( 0x200000, "gfx2", 0 )  // gfx data used at runtime
+	ROM_REGION16_BE( 0x200000, "gfxrom", 0 )  // gfx data used at runtime
 	ROM_LOAD32_WORD_SWAP( "687i15.p13", 0x000000, 0x80000, CRC(eec8c5b2) SHA1(c400dd8c7bb85d233815572acd547acf626e4c73) )
 	ROM_LOAD32_WORD_SWAP( "687i17.p16", 0x000002, 0x80000, CRC(66cb3923) SHA1(3c1fc1dff77201cf8d8c4594c965695066c1701c) )
 	ROM_LOAD32_WORD_SWAP( "687i16.p15", 0x100000, 0x80000, CRC(746cf48b) SHA1(8f51df931b1de928f402f51bbaf02e37dfec1d6d) )
 	ROM_LOAD32_WORD_SWAP( "687i18.p18", 0x100002, 0x80000, CRC(a1c7d0db) SHA1(901bc6e1982b9a8c2150a802995256d0168cc605) )
 
-	ROM_REGION16_BE( 0x20000, "gfx3", 0 )   // tile data; mapped at 0x80000 on CPUB
+	ROM_REGION16_BE( 0x20000, "data", 0 )   // tile data; mapped at 0x80000 on CPUB
 	ROM_LOAD16_BYTE( "687_l11.10r", 0x00000, 0x10000, CRC(399deee8) SHA1(dcc65e95f28ae4e9b671e70ce0bd5ba0fe178506) )
 	ROM_LOAD16_BYTE( "687_l10.8r",  0x00001, 0x10000, CRC(117c91ee) SHA1(dcf8efb25fc73cff916b66b7bcfd3c1fb2556a53) )
 
@@ -855,19 +854,19 @@ ROM_START( darkadv )
 	ROM_LOAD16_BYTE( "687_n13.10s", 0x20000, 0x10000, CRC(f1c252af) SHA1(dbe78352ae5b284870becc92139773f66c52ed7d) )
 	ROM_LOAD16_BYTE( "687_n12.8s",  0x20001, 0x10000, CRC(da221944) SHA1(c288ee583414a077f0d8b815b8e01b7f19a5fafe) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )    // Z80 code (sound CPU)
+	ROM_REGION( 0x8000, "audiocpu", 0 )    // Z80 code (sound CPU)
 	ROM_LOAD( "687_n03.10a", 0x00000,  0x8000, CRC(a24c682f) SHA1(cf053270d3f77448ff802db832598ae3cf7dae6c) )
 
-	ROM_REGION( 0x4000, "gfx1", 0 )
-	ROM_LOAD( "687_n14.d8", 0x0000, 0x4000, CRC(c76ac6d2) SHA1(d8fec255f1f7177a3716a5894fb679cbe172b6ea) ) /* Title screen graphics & characters */
+	ROM_REGION( 0x4000, "fixed", 0 )  // title screen graphics & characters
+	ROM_LOAD( "687_n14.d8", 0x0000, 0x4000, CRC(c76ac6d2) SHA1(d8fec255f1f7177a3716a5894fb679cbe172b6ea) )
 
-	ROM_REGION16_BE( 0x200000, "gfx2", 0 )  // gfx data used at runtime
+	ROM_REGION16_BE( 0x200000, "gfxrom", 0 )  // gfx data used at runtime
 	ROM_LOAD32_WORD_SWAP( "687i15.p13", 0x000000, 0x80000, CRC(eec8c5b2) SHA1(c400dd8c7bb85d233815572acd547acf626e4c73) )
 	ROM_LOAD32_WORD_SWAP( "687i17.p16", 0x000002, 0x80000, CRC(66cb3923) SHA1(3c1fc1dff77201cf8d8c4594c965695066c1701c) )
 	ROM_LOAD32_WORD_SWAP( "687i16.p15", 0x100000, 0x80000, CRC(746cf48b) SHA1(8f51df931b1de928f402f51bbaf02e37dfec1d6d) )
 	ROM_LOAD32_WORD_SWAP( "687i18.p18", 0x100002, 0x80000, CRC(a1c7d0db) SHA1(901bc6e1982b9a8c2150a802995256d0168cc605) )
 
-	ROM_REGION16_BE( 0x20000, "gfx3", 0 )   // tile data; mapped at 0x80000 on CPUB
+	ROM_REGION16_BE( 0x20000, "data", 0 )   // tile data; mapped at 0x80000 on CPUB
 	ROM_LOAD16_BYTE( "687_l11.10r", 0x00000, 0x10000, CRC(399deee8) SHA1(dcc65e95f28ae4e9b671e70ce0bd5ba0fe178506) )
 	ROM_LOAD16_BYTE( "687_l10.8r",  0x00001, 0x10000, CRC(117c91ee) SHA1(dcf8efb25fc73cff916b66b7bcfd3c1fb2556a53) )
 
@@ -891,19 +890,19 @@ ROM_START( vulcan )
 	ROM_LOAD16_BYTE( "785_p13.10s", 0x20000, 0x10000, CRC(478fdb0a) SHA1(2e285ad6dcfc67f3e24d231e0e1be19036ce64d2) )
 	ROM_LOAD16_BYTE( "785_p12.8s",  0x20001, 0x10000, CRC(38ea402a) SHA1(90ff2bd71435988cde967704ce3b1401de206683) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )    // Z80 code (sound CPU)
+	ROM_REGION( 0x8000, "audiocpu", 0 )    // Z80 code (sound CPU)
 	ROM_LOAD( "785_g03.10a", 0x00000,  0x8000, CRC(67a3b50d) SHA1(3c83f3b0df73d9361ec3cda26a6c4c603a088419) )
 
-	ROM_REGION( 0x4000, "gfx1", 0 )
-	ROM_LOAD( "785_h14.d8", 0x0000, 0x4000, CRC(02f4b16f) SHA1(45addc99f520770f38c6aa69aef9af59cfc410b5) ) /* Title screen graphics & characters */
+	ROM_REGION( 0x4000, "fixed", 0 )  // title screen graphics & characters
+	ROM_LOAD( "785_h14.d8", 0x0000, 0x4000, CRC(02f4b16f) SHA1(45addc99f520770f38c6aa69aef9af59cfc410b5) )
 
-	ROM_REGION16_BE( 0x200000, "gfx2", 0 )  // gfx data used at runtime
+	ROM_REGION16_BE( 0x200000, "gfxrom", 0 )  // gfx data used at runtime
 	ROM_LOAD32_WORD_SWAP( "785f15.p13", 0x000000, 0x80000, CRC(5bd239ac) SHA1(9c96f6069d06a1d80c04650ed56bc5e1508db657) )
 	ROM_LOAD32_WORD_SWAP( "785f17.p16", 0x000002, 0x80000, CRC(4e7a7b82) SHA1(520b5ebd400954042d55cf243842a6d6b6d10210) )
 	ROM_LOAD32_WORD_SWAP( "785f16.p15", 0x100000, 0x80000, CRC(95c6b8a3) SHA1(0a906af72d08993fd83f23d72ffb919801aa17af) )
 	ROM_LOAD32_WORD_SWAP( "785f18.p18", 0x100002, 0x80000, CRC(3f604e9a) SHA1(c5e0b6f6dd506209e8c07cbae89c821828f488ff) )
 
-	ROM_REGION( 0x20000, "gfx3", ROMREGION_ERASE00 )    // tile data; mapped at 0x80000 on CPUB
+	ROM_REGION16_BE( 0x20000, "data", ROMREGION_ERASE00 )    // tile data; mapped at 0x80000 on CPUB
 
 	ROM_REGION( 0x20000, "k007232", 0 )  // samples
 	ROM_LOAD( "785_f01.5a", 0x00000, 0x20000, CRC(a0d8d69e) SHA1(2994e5740b7c099d55fb162a363a26ef1995c756) )
@@ -925,19 +924,19 @@ ROM_START( vulcana )
 	ROM_LOAD16_BYTE( "785_p13.10s", 0x20000, 0x10000, CRC(478fdb0a) SHA1(2e285ad6dcfc67f3e24d231e0e1be19036ce64d2) )
 	ROM_LOAD16_BYTE( "785_p12.8s",  0x20001, 0x10000, CRC(38ea402a) SHA1(90ff2bd71435988cde967704ce3b1401de206683) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )    // Z80 code (sound CPU)
+	ROM_REGION( 0x8000, "audiocpu", 0 )    // Z80 code (sound CPU)
 	ROM_LOAD( "785_g03.10a", 0x00000,  0x8000, CRC(67a3b50d) SHA1(3c83f3b0df73d9361ec3cda26a6c4c603a088419) )
 
-	ROM_REGION( 0x4000, "gfx1", 0 )
-	ROM_LOAD( "785_h14.d8", 0x0000, 0x4000, CRC(02f4b16f) SHA1(45addc99f520770f38c6aa69aef9af59cfc410b5) ) /* Title screen graphics & characters */
+	ROM_REGION( 0x4000, "fixed", 0 )  // title screen graphics & characters
+	ROM_LOAD( "785_h14.d8", 0x0000, 0x4000, CRC(02f4b16f) SHA1(45addc99f520770f38c6aa69aef9af59cfc410b5) )
 
-	ROM_REGION16_BE( 0x200000, "gfx2", 0 )  // gfx data used at runtime
+	ROM_REGION16_BE( 0x200000, "gfxrom", 0 )  // gfx data used at runtime
 	ROM_LOAD32_WORD_SWAP( "785f15.p13", 0x000000, 0x80000, CRC(5bd239ac) SHA1(9c96f6069d06a1d80c04650ed56bc5e1508db657) )
 	ROM_LOAD32_WORD_SWAP( "785f17.p16", 0x000002, 0x80000, CRC(4e7a7b82) SHA1(520b5ebd400954042d55cf243842a6d6b6d10210) )
 	ROM_LOAD32_WORD_SWAP( "785f16.p15", 0x100000, 0x80000, CRC(95c6b8a3) SHA1(0a906af72d08993fd83f23d72ffb919801aa17af) )
 	ROM_LOAD32_WORD_SWAP( "785f18.p18", 0x100002, 0x80000, CRC(3f604e9a) SHA1(c5e0b6f6dd506209e8c07cbae89c821828f488ff) )
 
-	ROM_REGION( 0x20000, "gfx3", ROMREGION_ERASE00 )    // tile data; mapped at 0x80000 on CPUB
+	ROM_REGION16_BE( 0x20000, "data", ROMREGION_ERASE00 )    // tile data; mapped at 0x80000 on CPUB
 
 	ROM_REGION( 0x20000, "k007232", 0 )  // samples
 	ROM_LOAD( "785_f01.5a", 0x00000, 0x20000, CRC(a0d8d69e) SHA1(2994e5740b7c099d55fb162a363a26ef1995c756) )
@@ -959,19 +958,19 @@ ROM_START( vulcanb )
 	ROM_LOAD16_BYTE( "785_g13.10s", 0x20000, 0x10000, CRC(274f325d) SHA1(1076efa204eff0fc8a8788706b17b9a128023d35) )
 	ROM_LOAD16_BYTE( "785_g12.8s",  0x20001, 0x10000, CRC(1625f933) SHA1(3f25d7396af46e75e3ae8456414e31935de43d34) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )    // Z80 code (sound CPU)
+	ROM_REGION( 0x8000, "audiocpu", 0 )    // Z80 code (sound CPU)
 	ROM_LOAD( "785_g03.10a", 0x00000,  0x8000, CRC(67a3b50d) SHA1(3c83f3b0df73d9361ec3cda26a6c4c603a088419) )
 
-	ROM_REGION( 0x4000, "gfx1", 0 )
-	ROM_LOAD( "785_h14.d8", 0x0000, 0x4000, CRC(02f4b16f) SHA1(45addc99f520770f38c6aa69aef9af59cfc410b5) ) /* Title screen graphics & characters */
+	ROM_REGION( 0x4000, "fixed", 0 )  // title screen graphics & characters
+	ROM_LOAD( "785_h14.d8", 0x0000, 0x4000, CRC(02f4b16f) SHA1(45addc99f520770f38c6aa69aef9af59cfc410b5) )
 
-	ROM_REGION16_BE( 0x200000, "gfx2", 0 )  // gfx data used at runtime
+	ROM_REGION16_BE( 0x200000, "gfxrom", 0 )  // gfx data used at runtime
 	ROM_LOAD32_WORD_SWAP( "785f15.p13", 0x000000, 0x80000, CRC(5bd239ac) SHA1(9c96f6069d06a1d80c04650ed56bc5e1508db657) )
 	ROM_LOAD32_WORD_SWAP( "785f17.p16", 0x000002, 0x80000, CRC(4e7a7b82) SHA1(520b5ebd400954042d55cf243842a6d6b6d10210) )
 	ROM_LOAD32_WORD_SWAP( "785f16.p15", 0x100000, 0x80000, CRC(95c6b8a3) SHA1(0a906af72d08993fd83f23d72ffb919801aa17af) )
 	ROM_LOAD32_WORD_SWAP( "785f18.p18", 0x100002, 0x80000, CRC(3f604e9a) SHA1(c5e0b6f6dd506209e8c07cbae89c821828f488ff) )
 
-	ROM_REGION( 0x20000, "gfx3", ROMREGION_ERASE00 )    // tile data; mapped at 0x80000 on CPUB
+	ROM_REGION16_BE( 0x20000, "data", ROMREGION_ERASE00 )    // tile data; mapped at 0x80000 on CPUB
 
 	ROM_REGION( 0x20000, "k007232", 0 )  // samples
 	ROM_LOAD( "785_f01.5a", 0x00000, 0x20000, CRC(a0d8d69e) SHA1(2994e5740b7c099d55fb162a363a26ef1995c756) )
@@ -993,19 +992,19 @@ ROM_START( gradius2 )
 	ROM_LOAD16_BYTE( "785_p13.10s", 0x20000, 0x10000, CRC(478fdb0a) SHA1(2e285ad6dcfc67f3e24d231e0e1be19036ce64d2) )
 	ROM_LOAD16_BYTE( "785_p12.8s",  0x20001, 0x10000, CRC(38ea402a) SHA1(90ff2bd71435988cde967704ce3b1401de206683) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )    // Z80 code (sound CPU)
+	ROM_REGION( 0x8000, "audiocpu", 0 )    // Z80 code (sound CPU)
 	ROM_LOAD( "785_g03.10a", 0x00000,  0x8000, CRC(67a3b50d) SHA1(3c83f3b0df73d9361ec3cda26a6c4c603a088419) )
 
-	ROM_REGION( 0x4000, "gfx1", 0 )
-	ROM_LOAD( "785_g14.d8", 0x0000, 0x4000, CRC(9dcdad9d) SHA1(22f457408b453a71b7e91974aee1b1e735ff887f) ) /* Title screen graphics & characters */
+	ROM_REGION( 0x4000, "fixed", 0 )  // title screen graphics & characters
+	ROM_LOAD( "785_g14.d8", 0x0000, 0x4000, CRC(9dcdad9d) SHA1(22f457408b453a71b7e91974aee1b1e735ff887f) )
 
-	ROM_REGION16_BE( 0x200000, "gfx2", 0 )  // gfx data used at runtime
+	ROM_REGION16_BE( 0x200000, "gfxrom", 0 )  // gfx data used at runtime
 	ROM_LOAD32_WORD_SWAP( "785f15.p13", 0x000000, 0x80000, CRC(5bd239ac) SHA1(9c96f6069d06a1d80c04650ed56bc5e1508db657) )
 	ROM_LOAD32_WORD_SWAP( "785f17.p16", 0x000002, 0x80000, CRC(4e7a7b82) SHA1(520b5ebd400954042d55cf243842a6d6b6d10210) )
 	ROM_LOAD32_WORD_SWAP( "785f16.p15", 0x100000, 0x80000, CRC(95c6b8a3) SHA1(0a906af72d08993fd83f23d72ffb919801aa17af) )
 	ROM_LOAD32_WORD_SWAP( "785f18.p18", 0x100002, 0x80000, CRC(3f604e9a) SHA1(c5e0b6f6dd506209e8c07cbae89c821828f488ff) )
 
-	ROM_REGION( 0x20000, "gfx3", ROMREGION_ERASE00 )    // tile data; mapped at 0x80000 on CPUB
+	ROM_REGION16_BE( 0x20000, "data", ROMREGION_ERASE00 )    // tile data; mapped at 0x80000 on CPUB
 
 	ROM_REGION( 0x20000, "k007232", 0 )  // samples
 	ROM_LOAD( "785_f01.5a", 0x00000, 0x20000, CRC(a0d8d69e) SHA1(2994e5740b7c099d55fb162a363a26ef1995c756) )
@@ -1027,19 +1026,19 @@ ROM_START( gradius2a )
 	ROM_LOAD16_BYTE( "785_p13.10s", 0x20000, 0x10000, CRC(478fdb0a) SHA1(2e285ad6dcfc67f3e24d231e0e1be19036ce64d2) )
 	ROM_LOAD16_BYTE( "785_p12.8s",  0x20001, 0x10000, CRC(38ea402a) SHA1(90ff2bd71435988cde967704ce3b1401de206683) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )    // Z80 code (sound CPU)
+	ROM_REGION( 0x8000, "audiocpu", 0 )    // Z80 code (sound CPU)
 	ROM_LOAD( "785_g03.10a", 0x00000,  0x8000, CRC(67a3b50d) SHA1(3c83f3b0df73d9361ec3cda26a6c4c603a088419) )
 
-	ROM_REGION( 0x4000, "gfx1", 0 )
-	ROM_LOAD( "785_g14.d8", 0x0000, 0x4000, CRC(9dcdad9d) SHA1(22f457408b453a71b7e91974aee1b1e735ff887f) ) /* Title screen graphics & characters */
+	ROM_REGION( 0x4000, "fixed", 0 )  // title screen graphics & characters
+	ROM_LOAD( "785_g14.d8", 0x0000, 0x4000, CRC(9dcdad9d) SHA1(22f457408b453a71b7e91974aee1b1e735ff887f) )
 
-	ROM_REGION16_BE( 0x200000, "gfx2", 0 )  // gfx data used at runtime
+	ROM_REGION16_BE( 0x200000, "gfxrom", 0 )  // gfx data used at runtime
 	ROM_LOAD32_WORD_SWAP( "785f15.p13", 0x000000, 0x80000, CRC(5bd239ac) SHA1(9c96f6069d06a1d80c04650ed56bc5e1508db657) )
 	ROM_LOAD32_WORD_SWAP( "785f17.p16", 0x000002, 0x80000, CRC(4e7a7b82) SHA1(520b5ebd400954042d55cf243842a6d6b6d10210) )
 	ROM_LOAD32_WORD_SWAP( "785f16.p15", 0x100000, 0x80000, CRC(95c6b8a3) SHA1(0a906af72d08993fd83f23d72ffb919801aa17af) )
 	ROM_LOAD32_WORD_SWAP( "785f18.p18", 0x100002, 0x80000, CRC(3f604e9a) SHA1(c5e0b6f6dd506209e8c07cbae89c821828f488ff) )
 
-	ROM_REGION( 0x20000, "gfx3", ROMREGION_ERASE00 )    // tile data; mapped at 0x80000 on CPUB
+	ROM_REGION16_BE( 0x20000, "data", ROMREGION_ERASE00 )    // tile data; mapped at 0x80000 on CPUB
 
 	ROM_REGION( 0x20000, "k007232", 0 )  // samples
 	ROM_LOAD( "785_f01.5a", 0x00000, 0x20000, CRC(a0d8d69e) SHA1(2994e5740b7c099d55fb162a363a26ef1995c756) )
@@ -1061,19 +1060,19 @@ ROM_START( gradius2b )
 	ROM_LOAD16_BYTE( "785_p13.10s", 0x20000, 0x10000, CRC(478fdb0a) SHA1(2e285ad6dcfc67f3e24d231e0e1be19036ce64d2) )
 	ROM_LOAD16_BYTE( "785_p12.8s",  0x20001, 0x10000, CRC(38ea402a) SHA1(90ff2bd71435988cde967704ce3b1401de206683) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )    // Z80 code (sound CPU)
+	ROM_REGION( 0x8000, "audiocpu", 0 )    // Z80 code (sound CPU)
 	ROM_LOAD( "785_g03.10a", 0x00000,  0x8000, CRC(67a3b50d) SHA1(3c83f3b0df73d9361ec3cda26a6c4c603a088419) )
 
-	ROM_REGION( 0x4000, "gfx1", 0 )
-	ROM_LOAD( "785_g14.d8", 0x0000, 0x4000, CRC(9dcdad9d) SHA1(22f457408b453a71b7e91974aee1b1e735ff887f) ) /* Title screen graphics & characters */
+	ROM_REGION( 0x4000, "fixed", 0 )  // title screen graphics & characters
+	ROM_LOAD( "785_g14.d8", 0x0000, 0x4000, CRC(9dcdad9d) SHA1(22f457408b453a71b7e91974aee1b1e735ff887f) )
 
-	ROM_REGION16_BE( 0x200000, "gfx2", 0 )  // gfx data used at runtime
+	ROM_REGION16_BE( 0x200000, "gfxrom", 0 )  // gfx data used at runtime
 	ROM_LOAD32_WORD_SWAP( "785f15.p13", 0x000000, 0x80000, CRC(5bd239ac) SHA1(9c96f6069d06a1d80c04650ed56bc5e1508db657) )
 	ROM_LOAD32_WORD_SWAP( "785f17.p16", 0x000002, 0x80000, CRC(4e7a7b82) SHA1(520b5ebd400954042d55cf243842a6d6b6d10210) )
 	ROM_LOAD32_WORD_SWAP( "785f16.p15", 0x100000, 0x80000, CRC(95c6b8a3) SHA1(0a906af72d08993fd83f23d72ffb919801aa17af) )
 	ROM_LOAD32_WORD_SWAP( "785f18.p18", 0x100002, 0x80000, CRC(3f604e9a) SHA1(c5e0b6f6dd506209e8c07cbae89c821828f488ff) )
 
-	ROM_REGION( 0x20000, "gfx3", ROMREGION_ERASE00 )    // tile data; mapped at 0x80000 on CPUB
+	ROM_REGION16_BE( 0x20000, "data", ROMREGION_ERASE00 )    // tile data; mapped at 0x80000 on CPUB
 
 	ROM_REGION( 0x20000, "k007232", 0 )  // samples
 	ROM_LOAD( "785_f01.5a", 0x00000, 0x20000, CRC(a0d8d69e) SHA1(2994e5740b7c099d55fb162a363a26ef1995c756) )
@@ -1087,17 +1086,19 @@ ROM_START( fround )
 	ROM_LOAD16_BYTE( "870_m21.bin", 0x00000, 0x20000, CRC(436dbffb) SHA1(be8c8544f4d8ae86f216095753c6178a3cbf0e8d) )
 	ROM_LOAD16_BYTE( "870_m20.bin", 0x00001, 0x20000, CRC(b1c79d6a) SHA1(76e95e87eaa96ba694675fde7706540c584a36fb) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )    // Z80 code (sound CPU)
+	ROM_REGION( 0x8000, "audiocpu", 0 )    // Z80 code (sound CPU)
 	ROM_LOAD( "870_f03.10a", 0x00000,  0x8000, CRC(a645c727) SHA1(e173e79130f187d090766664f1c478d47062749c) )
 
-	ROM_REGION( 0x4000, "gfx1", 0 )
-	ROM_LOAD( "870_f14.d8", 0x0000, 0x4000, CRC(c9b46615) SHA1(c0cddb1af47b8e0865055624cf4e89a111ac1b0f) ) /* Title screen graphics & characters */
+	ROM_REGION( 0x4000, "fixed", 0 )  // title screen graphics & characters
+	ROM_LOAD( "870_f14.d8", 0x0000, 0x4000, CRC(c9b46615) SHA1(c0cddb1af47b8e0865055624cf4e89a111ac1b0f) )
 
-	ROM_REGION16_BE( 0x200000, "gfx2", 0 )  // gfx data used at runtime
-	ROM_LOAD32_WORD_SWAP( "870c16.p15", 0x000000, 0x80000, CRC(41df6a1b) SHA1(32e0fdeb53628d18adde851e4496dd01ac6ec68f) )
-	ROM_LOAD32_WORD_SWAP( "870c18.p18", 0x000002, 0x80000, CRC(07927fe8) SHA1(0ab5e0e785347fbed5c4b930a32876d6ce2bef4a) )
-	ROM_LOAD32_WORD_SWAP( "870c15.p13", 0x100000, 0x80000, CRC(8c9281df) SHA1(5e3d80be414db108d5363d0ea1b74021ba942c33) )
-	ROM_LOAD32_WORD_SWAP( "870c17.p16", 0x100002, 0x80000, CRC(2bc99ff8) SHA1(9a06502317a71ca5662b79aedf47379b8e5434a9) )
+	ROM_REGION16_BE( 0x100000, "tiles", 0 )  // tile gfx data
+	ROM_LOAD32_WORD_SWAP( "870c16.p15", 0x00000, 0x80000, CRC(41df6a1b) SHA1(32e0fdeb53628d18adde851e4496dd01ac6ec68f) )
+	ROM_LOAD32_WORD_SWAP( "870c18.p18", 0x00002, 0x80000, CRC(07927fe8) SHA1(0ab5e0e785347fbed5c4b930a32876d6ce2bef4a) )
+
+	ROM_REGION16_BE( 0x100000, "gfxrom", 0 )  // sprite gfx data
+	ROM_LOAD32_WORD_SWAP( "870c15.p13", 0x00000, 0x80000, CRC(8c9281df) SHA1(5e3d80be414db108d5363d0ea1b74021ba942c33) )
+	ROM_LOAD32_WORD_SWAP( "870c17.p16", 0x00002, 0x80000, CRC(2bc99ff8) SHA1(9a06502317a71ca5662b79aedf47379b8e5434a9) )
 
 	ROM_REGION( 0x20000, "k007232", 0 )  // samples
 	ROM_LOAD( "870_c01.5a", 0x00000, 0x20000, CRC(6af96546) SHA1(63b49b28c0f2ef8f52bc4c5955ad6a633dd553cf) )
@@ -1111,17 +1112,19 @@ ROM_START( froundl )
 	ROM_LOAD16_BYTE( "870_l21.bin", 0x00000, 0x20000, CRC(e21a3a19) SHA1(5f5793c88093bc8632eab673f5e0d954ac9b9177) )
 	ROM_LOAD16_BYTE( "870_l20.bin", 0x00001, 0x20000, CRC(0ce9786f) SHA1(0fb0eef999ed09dd50eed403255887103fc35461) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )    // Z80 code (sound CPU)
+	ROM_REGION( 0x8000, "audiocpu", 0 )    // Z80 code (sound CPU)
 	ROM_LOAD( "870_f03.10a", 0x00000,  0x8000, CRC(a645c727) SHA1(e173e79130f187d090766664f1c478d47062749c) )
 
-	ROM_REGION( 0x4000, "gfx1", 0 )
-	ROM_LOAD( "870_f14.d8", 0x0000, 0x4000, CRC(c9b46615) SHA1(c0cddb1af47b8e0865055624cf4e89a111ac1b0f) ) /* Title screen graphics & characters */
+	ROM_REGION( 0x4000, "fixed", 0 )  // title screen graphics & characters
+	ROM_LOAD( "870_f14.d8", 0x0000, 0x4000, CRC(c9b46615) SHA1(c0cddb1af47b8e0865055624cf4e89a111ac1b0f) )
 
-	ROM_REGION16_BE( 0x200000, "gfx2", 0 )  // gfx data used at runtime
-	ROM_LOAD32_WORD_SWAP( "870c16.p15", 0x000000, 0x80000, CRC(41df6a1b) SHA1(32e0fdeb53628d18adde851e4496dd01ac6ec68f) )
-	ROM_LOAD32_WORD_SWAP( "870c18.p18", 0x000002, 0x80000, CRC(07927fe8) SHA1(0ab5e0e785347fbed5c4b930a32876d6ce2bef4a) )
-	ROM_LOAD32_WORD_SWAP( "870c15.p13", 0x100000, 0x80000, CRC(8c9281df) SHA1(5e3d80be414db108d5363d0ea1b74021ba942c33) )
-	ROM_LOAD32_WORD_SWAP( "870c17.p16", 0x100002, 0x80000, CRC(2bc99ff8) SHA1(9a06502317a71ca5662b79aedf47379b8e5434a9) )
+	ROM_REGION16_BE( 0x100000, "tiles", 0 )  // tile gfx data
+	ROM_LOAD32_WORD_SWAP( "870c16.p15", 0x00000, 0x80000, CRC(41df6a1b) SHA1(32e0fdeb53628d18adde851e4496dd01ac6ec68f) )
+	ROM_LOAD32_WORD_SWAP( "870c18.p18", 0x00002, 0x80000, CRC(07927fe8) SHA1(0ab5e0e785347fbed5c4b930a32876d6ce2bef4a) )
+
+	ROM_REGION16_BE( 0x100000, "gfxrom", 0 )  // sprite gfx data
+	ROM_LOAD32_WORD_SWAP( "870c15.p13", 0x00000, 0x80000, CRC(8c9281df) SHA1(5e3d80be414db108d5363d0ea1b74021ba942c33) )
+	ROM_LOAD32_WORD_SWAP( "870c17.p16", 0x00002, 0x80000, CRC(2bc99ff8) SHA1(9a06502317a71ca5662b79aedf47379b8e5434a9) )
 
 	ROM_REGION( 0x20000, "k007232", 0 )  // samples
 	ROM_LOAD( "870_c01.5a", 0x00000, 0x20000, CRC(6af96546) SHA1(63b49b28c0f2ef8f52bc4c5955ad6a633dd553cf) )
@@ -1141,19 +1144,19 @@ ROM_START( hpuncher )
 	ROM_LOAD16_BYTE( "870_h07.10n", 0x00000, 0x10000, CRC(b4dda612) SHA1(e9612af11a151de1f0236629c84679f80936cae9) )
 	ROM_LOAD16_BYTE( "870_h06.8n",  0x00001, 0x10000, CRC(696ba702) SHA1(e35c9aeab4305d828a347eaddf4abc806a889fa3) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )    // Z80 code (sound CPU)
+	ROM_REGION( 0x8000, "audiocpu", 0 )    // Z80 code (sound CPU)
 	ROM_LOAD( "870_g03.10a", 0x00000,  0x8000, CRC(db9c10c8) SHA1(b2ec4d6800a4ab00dfcc8d3cd4abf9b9d7c5544a) )
 
-	ROM_REGION( 0x4000, "gfx1", 0 )
-	ROM_LOAD( "870_f14.d8", 0x0000, 0x4000, CRC(c9b46615) SHA1(c0cddb1af47b8e0865055624cf4e89a111ac1b0f) ) /* Title screen graphics & characters */
+	ROM_REGION( 0x4000, "fixed", 0 )  // title screen graphics & characters
+	ROM_LOAD( "870_f14.d8", 0x0000, 0x4000, CRC(c9b46615) SHA1(c0cddb1af47b8e0865055624cf4e89a111ac1b0f) )
 
-	ROM_REGION16_BE( 0x200000, "gfx2", 0 )  // gfx data used at runtime
+	ROM_REGION16_BE( 0x200000, "gfxrom", 0 )  // gfx data used at runtime
 	ROM_LOAD32_WORD_SWAP( "870c15.p13", 0x000000, 0x80000, CRC(8c9281df) SHA1(5e3d80be414db108d5363d0ea1b74021ba942c33) )
 	ROM_LOAD32_WORD_SWAP( "870c17.p16", 0x000002, 0x80000, CRC(2bc99ff8) SHA1(9a06502317a71ca5662b79aedf47379b8e5434a9) )
 	ROM_LOAD32_WORD_SWAP( "870c16.p15", 0x100000, 0x80000, CRC(41df6a1b) SHA1(32e0fdeb53628d18adde851e4496dd01ac6ec68f) )
 	ROM_LOAD32_WORD_SWAP( "870c18.p18", 0x100002, 0x80000, CRC(07927fe8) SHA1(0ab5e0e785347fbed5c4b930a32876d6ce2bef4a) )
 
-	ROM_REGION( 0x20000, "gfx3", ROMREGION_ERASE00 )    // tile data; mapped at 0x80000 on CPUB
+	ROM_REGION16_BE( 0x20000, "data", ROMREGION_ERASE00 )    // tile data; mapped at 0x80000 on CPUB
 
 	ROM_REGION( 0x20000, "k007232", 0 )  // samples
 	ROM_LOAD( "870_c01.5a", 0x00000, 0x20000, CRC(6af96546) SHA1(63b49b28c0f2ef8f52bc4c5955ad6a633dd553cf) )
@@ -1175,17 +1178,17 @@ ROM_START( miaj )
 	ROM_LOAD16_BYTE("808_e13.10s", 0x20000, 0x10000, CRC(1fa708f4) SHA1(9511a19f50fb61571c2986c72d1a85e87b8d0495) )
 	ROM_LOAD16_BYTE("808_e12.8s",  0x20001, 0x10000, CRC(d62f1fde) SHA1(1e55084f1294b6ac7c152fcd1800511fcab5d360) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )    // Z80 code (sound CPU)
+	ROM_REGION( 0x8000, "audiocpu", 0 )    // Z80 code (sound CPU)
 	ROM_LOAD( "808_e03.10a", 0x00000,  0x8000, CRC(3d93a7cd) SHA1(dcdd327e78f32436b276d0666f62a5b733b296e8) )
 
-	ROM_REGION( 0x4000, "gfx1", 0 )
-	ROM_LOAD("808_e14.d8", 0x0000, 0x4000, CRC(b9d36525) SHA1(53291c4911d7e1a5110539e4c57a11d0d530dc6f) ) /* Title screen graphics & characters */
+	ROM_REGION( 0x4000, "fixed", 0 )  // title screen graphics & characters
+	ROM_LOAD("808_e14.d8", 0x0000, 0x4000, CRC(b9d36525) SHA1(53291c4911d7e1a5110539e4c57a11d0d530dc6f) )
 
-	ROM_REGION16_BE( 0x200000, "gfx2", 0 )  // gfx data used at runtime
+	ROM_REGION16_BE( 0x200000, "gfxrom", 0 )  // gfx data used at runtime
 	ROM_LOAD32_WORD_SWAP("808d15.p13", 0x000000, 0x80000, CRC(2b22a6b6) SHA1(8e1af0627a4eac045128c4096e2cfb59c3d2f5ef) )
 	ROM_LOAD32_WORD_SWAP("808d17.p16", 0x000002, 0x80000, CRC(d1299082) SHA1(c3c07b0517e7428ccd1cdf9e15aaf16d98e7c4cd) )
 
-	ROM_REGION( 0x20000, "gfx3", ROMREGION_ERASE00 )    // tile data; mapped at 0x80000 on CPUB
+	ROM_REGION16_BE( 0x20000, "data", ROMREGION_ERASE00 )    // tile data; mapped at 0x80000 on CPUB
 
 	ROM_REGION( 0x20000, "k007232", 0 )  // samples
 	ROM_LOAD("808_d01.5a", 0x00000, 0x20000, CRC(fd4d37c0) SHA1(ef91c6e7bb57c27a9a51729fffd1bfe3e806fb61) )
@@ -1206,16 +1209,16 @@ ROM_START( cuebrickj )
 	ROM_LOAD16_BYTE( "903_e13.10s", 0x20000, 0x10000, CRC(4fb5fb80) SHA1(3a59dae3846341289c31aa106684ebc45488ca45) )
 	ROM_LOAD16_BYTE( "903_e12.8s",  0x20001, 0x10000, CRC(883e3097) SHA1(fe0fa1a2881a67223d741c400bb8c1a0c67946c1) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )    // Z80 code (sound CPU)
+	ROM_REGION( 0x8000, "audiocpu", 0 )    // Z80 code (sound CPU)
 	ROM_LOAD( "903_d03.10a", 0x00000,  0x8000, CRC(455e855a) SHA1(cfdd54a5071862653ee94c0455301f4a7245fbd8) )
 
-	ROM_REGION( 0x4000, "gfx1", 0 )
-	ROM_LOAD( "903_e14.d8", 0x0000, 0x4000, CRC(ddbebbd5) SHA1(df532f19a08cabb28d693e4cd445c47c9e35e5ff) ) /* Title screen graphics & characters */
+	ROM_REGION( 0x4000, "fixed", 0 )  // title screen graphics & characters
+	ROM_LOAD( "903_e14.d8", 0x0000, 0x4000, CRC(ddbebbd5) SHA1(df532f19a08cabb28d693e4cd445c47c9e35e5ff) )
 
-	ROM_REGION( 0x200000, "gfx2", ROMREGION_ERASE00 )   // gfx data used at runtime
+	ROM_REGION16_BE( 0x200000, "gfxrom", ROMREGION_ERASE00 )   // gfx data used at runtime
 	// unpopulated
 
-	ROM_REGION16_BE( 0x20000, "gfx3", 0 )   // tile data; mapped at 0x80000 on CPUB
+	ROM_REGION16_BE( 0x20000, "data", 0 )   // tile data; mapped at 0x80000 on CPUB
 	ROM_LOAD16_BYTE( "903_e11.10r", 0x00000, 0x10000, CRC(5c41faf8) SHA1(f9eee6a7b92d3b3aa4320747da6390310522a2cf) )
 	ROM_LOAD16_BYTE( "903_e10.8r",  0x00001, 0x10000, CRC(417576d4) SHA1(e84762743e3a1117b6ef7ea0b304877e4a719f75) )
 
@@ -1230,12 +1233,14 @@ ROM_END
 
 DRIVER_INIT_MEMBER(twin16_state,twin16)
 {
-	m_custom_video = 0;
+	m_is_fround = false;
+	m_gfxrombank->configure_entries(0, 2, memregion("gfxrom")->base() + 0x100000, 0x80000);
+	m_gfxrombank->set_entry(0);
 }
 
-DRIVER_INIT_MEMBER(twin16_state,fround)
+DRIVER_INIT_MEMBER(fround_state,fround)
 {
-	m_custom_video = 1;
+	m_is_fround = true;
 }
 
 WRITE8_MEMBER(cuebrickj_state::nvram_bank_w)
@@ -1245,6 +1250,8 @@ WRITE8_MEMBER(cuebrickj_state::nvram_bank_w)
 
 DRIVER_INIT_MEMBER(cuebrickj_state,cuebrickj)
 {
+	DRIVER_INIT_CALL(twin16);
+
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
 	space.install_readwrite_bank(0x0b0000, 0x0b03ff, "nvrambank");
@@ -1255,8 +1262,6 @@ DRIVER_INIT_MEMBER(cuebrickj_state,cuebrickj)
 	machine().device<nvram_device>("nvram")->set_base(m_nvram, sizeof(m_nvram));
 
 	save_item(NAME(m_nvram));
-
-	m_custom_video = 0;
 }
 
 /* Game Drivers */
@@ -1272,8 +1277,8 @@ GAME( 1988, gradius2,  vulcan,   twin16,    gradius2, twin16_state,  twin16,    
 GAME( 1988, gradius2a, vulcan,   twin16,    vulcan, twin16_state,    twin16,    ROT0,   "Konami", "Gradius II - GOFER no Yabou (Japan Old Ver.)", GAME_SUPPORTS_SAVE )
 GAME( 1988, gradius2b, vulcan,   twin16,    vulcan, twin16_state,    twin16,    ROT0,   "Konami", "Gradius II - GOFER no Yabou (Japan Older Ver.)", GAME_SUPPORTS_SAVE )
 
-GAME( 1988, fround,    0,        fround,    fround, twin16_state,    fround,    ROT0,   "Konami", "The Final Round (version M)", GAME_SUPPORTS_SAVE )
-GAME( 1988, froundl,   fround,   fround,    fround, twin16_state,    fround,    ROT0,   "Konami", "The Final Round (version L)", GAME_SUPPORTS_SAVE )
+GAME( 1988, fround,    0,        fround,    fround, fround_state,    fround,    ROT0,   "Konami", "The Final Round (version M)", GAME_SUPPORTS_SAVE )
+GAME( 1988, froundl,   fround,   fround,    fround, fround_state,    fround,    ROT0,   "Konami", "The Final Round (version L)", GAME_SUPPORTS_SAVE )
 GAME( 1988, hpuncher,  fround,   twin16,    fround, twin16_state,    twin16,    ROT0,   "Konami", "Hard Puncher (Japan)", GAME_SUPPORTS_SAVE )
 GAME( 1989, miaj,      mia,      miaj,      miaj,   twin16_state,    twin16,    ROT0,   "Konami", "M.I.A. - Missing in Action (Japan)", GAME_SUPPORTS_SAVE )
 GAME( 1989, cuebrickj, cuebrick, cuebrickj, cuebrickj, cuebrickj_state, cuebrickj, ROT0, "Konami", "Cue Brick (Japan)", GAME_SUPPORTS_SAVE )

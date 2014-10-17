@@ -53,7 +53,8 @@ public:
 
 protected:
 	// helpers
-	void *find_memory(UINT8 width, size_t &bytes, bool required);
+	void *find_memregion(UINT8 width, size_t &length, bool required);
+	void *find_memshare(UINT8 width, size_t &bytes, bool required);
 	bool report_missing(bool found, const char *objname, bool required);
 
 	// internal state
@@ -304,6 +305,56 @@ public:
 };
 
 
+// ======================> rom_ptr_finder
+
+// ROM region pointer finder template
+template<typename _PointerType, bool _Required>
+class rom_ptr_finder : public object_finder_base<_PointerType>
+{
+public:
+	// construction/destruction
+	rom_ptr_finder(device_t &base, const char *tag)
+		: object_finder_base<_PointerType>(base, tag),
+			m_length(0) { }
+
+	// operators to make use transparent
+	_PointerType operator[](int index) const { return this->m_target[index]; }
+	_PointerType &operator[](int index) { return this->m_target[index]; }
+
+	// getter for explicit fetching
+	UINT32 length() const { return m_length; }
+	UINT32 mask() const { return m_length - 1; }
+
+	// finder
+	virtual bool findit(bool isvalidation = false)
+	{
+		if (isvalidation) return true;
+		this->m_target = reinterpret_cast<_PointerType *>(this->find_memregion(sizeof(_PointerType), m_length, _Required));
+		return this->report_missing(this->m_target != NULL, "memory region", _Required);
+	}
+
+protected:
+	// internal state
+	size_t m_length;
+};
+
+// optional ROM pointer finder
+template<class _PointerType>
+class optional_rom_ptr : public rom_ptr_finder<_PointerType, false>
+{
+public:
+	optional_rom_ptr(device_t &base, const char *tag = FINDER_DUMMY_TAG) : rom_ptr_finder<_PointerType, false>(base, tag) { }
+};
+
+// required ROM pointer finder
+template<class _PointerType>
+class required_rom_ptr : public rom_ptr_finder<_PointerType, true>
+{
+public:
+	required_rom_ptr(device_t &base, const char *tag = FINDER_DUMMY_TAG) : rom_ptr_finder<_PointerType, true>(base, tag) { }
+};
+
+
 // ======================> shared_ptr_finder
 
 // shared pointer finder template
@@ -342,7 +393,7 @@ public:
 	virtual bool findit(bool isvalidation = false)
 	{
 		if (isvalidation) return true;
-		this->m_target = reinterpret_cast<_PointerType *>(this->find_memory(m_width, m_bytes, _Required));
+		this->m_target = reinterpret_cast<_PointerType *>(this->find_memshare(m_width, m_bytes, _Required));
 		return this->report_missing(this->m_target != NULL, "shared pointer", _Required);
 	}
 
