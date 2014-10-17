@@ -1141,7 +1141,7 @@ WRITE64_MEMBER(model3_state::real3d_dma_w)
 					m_dma_data = m_dma_status;
 				}
 				m_dma_busy = 0x80000000;
-				m_real3d_dma_timer->adjust(attotime::from_nsec(20000));
+				m_real3d_dma_timer->adjust(attotime::from_nsec(50000));
 				return;
 			}
 			if(ACCESSING_BITS_0_31) {       /* ??? */
