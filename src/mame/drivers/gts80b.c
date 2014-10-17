@@ -5,7 +5,9 @@
 
   Same as system 80, except that the displays are 20-digit alphanumeric driven by Rockwell 10939/10941 chips.
 
-  Nothing works
+  Nothing works.
+
+  PinMAME used for the display character generator.
 
 *****************************************************************************************************************/
 
@@ -33,10 +35,13 @@ public:
 	DECLARE_WRITE8_MEMBER(port3a_w);
 	DECLARE_WRITE8_MEMBER(port3b_w);
 private:
-	UINT8 m_port2;
-	UINT8 m_segment;
+	UINT8 m_dispcmd;
+	UINT8 m_port2a;
+	UINT8 m_port2b;
 	UINT8 m_lamprow;
 	UINT8 m_swrow;
+	bool m_in_cmd_mode[2];
+	UINT8 m_digit[2];
 	virtual void machine_reset();
 	required_device<cpu_device> m_maincpu;
 	optional_device<gottlieb_sound_r0_device> m_r0_sound;
@@ -244,11 +249,30 @@ static INPUT_PORTS_START( gts80b )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_O)
 INPUT_PORTS_END
 
+static const UINT16 patterns[] = {
+  /* 0x00-0x07 */ 0x0000, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff,
+  /* 0x08-0x0f */ 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff,
+  /* 0x10-0x17 */ 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff,
+  /* 0x18-0x1f */ 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff,
+  /* 0x20-0x27 */ 0x0000, 0x0309, 0x0220, 0x2A4E, 0x2A6D, 0x6E65, 0x135D, 0x0400,
+  /* 0x28-0x2f */ 0x1400, 0x4100, 0x7F40, 0x2A40, 0x0000, 0x0840, 0x0000, 0x4400,
+  /* 0x30-0x37 */ 0x003f, 0x2200, 0x085B, 0x084f, 0x0866, 0x086D, 0x087D, 0x0007,
+  /* 0x38-0x3f */ 0x087F, 0x086F, 0x0009, 0x4001, 0x4408, 0x0848, 0x1108, 0x2803,
+  /* 0x40-0x47 */ 0x205F, 0x0877, 0x2A0F, 0x0039, 0x220F, 0x0079, 0x0071, 0x083D,
+  /* 0x48-0x4f */ 0x0876, 0x2209, 0x001E, 0x1470, 0x0038, 0x0536, 0x1136, 0x003f,
+  /* 0x50-0x57 */ 0x0873, 0x103F, 0x1873, 0x086D, 0x2201, 0x003E, 0x4430, 0x5036,
+  /* 0x58-0x5f */ 0x5500, 0x2500, 0x4409, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff,
+  /* 0x60-0x67 */ 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff,
+  /* 0x68-0x6f */ 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff,
+  /* 0x70-0x77 */ 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff,
+  /* 0x78-0x7f */ 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff,
+};
+
 READ8_MEMBER( gts80b_state::port1a_r )
 {
 	char kbdrow[8];
 	UINT8 data = 0;
-	if ((m_lamprow < 4) && (m_segment==0x80))
+	if ((m_lamprow < 4) && (m_port2b==0x80))
 	{
 		sprintf(kbdrow,"DSW.%d",m_lamprow);
 		data = ioport(kbdrow)->read();
@@ -264,7 +288,7 @@ READ8_MEMBER( gts80b_state::port1a_r )
 
 READ8_MEMBER( gts80b_state::port2a_r )
 {
-	return m_port2 | 0x80; // slam tilt off
+	return m_port2a | 0x80; // slam tilt off
 }
 
 // sw strobes
@@ -273,34 +297,47 @@ WRITE8_MEMBER( gts80b_state::port1b_w )
 	m_swrow = data;
 }
 
-// schematic and pinmame say '1' is indicated by m_segment !bits 4,5,6, but it is !bit 7
 WRITE8_MEMBER( gts80b_state::port2a_w )
 {
-	m_port2 = data;
-	static const UINT8 patterns[16] = { 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7c,0x07,0x7f,0x67,0x58,0x4c,0x62,0x69,0x78,0 }; // 7448
-	UINT16 seg1 = (UINT16)patterns[m_segment & 15];
-	UINT16 seg2 = BITSWAP16(seg1, 8, 8, 8, 8, 8, 8, 7, 7, 6, 6, 5, 4, 3, 2, 1, 0);
-	switch (data & 0x70)
-	{
-		case 0x10: // player 1&2
-			if (!BIT(m_segment, 7)) seg2 |= 0x300; // put '1' in the middle
-			output_set_digit_value(data & 15, seg2);
-			break;
-		case 0x20: // player 3&4
-			if (!BIT(m_segment, 7)) seg2 |= 0x300; // put '1' in the middle
-			output_set_digit_value((data & 15)+20, seg2);
-			break;
-		case 0x40: // credits & balls
-			if (!BIT(m_segment, 7)) m_segment = 1; // turn '1' back to normal
-			output_set_digit_value((data & 15)+40, patterns[m_segment & 15]);
-			break;
-	}
+	m_port2a = data;
+	if BIT(data, 4)
+		m_dispcmd = (m_dispcmd & 0xf0) | m_port2b;
+	if BIT(data, 5)
+		m_dispcmd = (m_dispcmd & 0x0f) | (m_port2b << 4);
 }
 
-//d0-3 bcd data; d4-6 = centre segment; d7 = dipsw enable
+//d0-3 data; d4-5 = which display enabled; d6 = display reset; d7 = dipsw enable
 WRITE8_MEMBER( gts80b_state::port2b_w )
 {
-	m_segment = data;//printf("%s:%X ",machine().describe_context(),data);
+	m_port2b = data & 15;
+	UINT16 segment;
+
+	// crude approximation of the Rockwell display chips
+	for (UINT8 i = 0; i < 2; i++) // 2 chips
+	{
+		if (!BIT(data, i+4)) // are we addressing the chip?
+		{
+			if (m_in_cmd_mode[i]) // in command mode?
+			{
+				if ((m_dispcmd >= 0xc0) && (m_dispcmd < 0xd4)) // we only support one command
+					m_digit[i] = data & 0x1f;
+				m_in_cmd_mode[i] = false;
+			}
+			else
+			if (m_dispcmd == 1) // 01 = enter command mode
+			{
+				m_in_cmd_mode[i] = true;
+			}
+			else
+			{ // display a character
+				segment = patterns[m_dispcmd & 0x7f]; // ignore blank/inverse bit
+				segment = BITSWAP16(segment, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 3, 2, 1, 0, 0);
+				output_set_digit_value(m_digit[i]+i*20, segment);
+				m_digit[i]++; // auto-increment pointer
+				if (m_digit[i] > 19) m_digit[i] = 0; // check for overflow
+			}
+		}
+	}
 }
 
 // solenoids
@@ -321,6 +358,8 @@ WRITE8_MEMBER( gts80b_state::port3b_w )
 
 void gts80b_state::machine_reset()
 {
+	m_in_cmd_mode[0] = false;
+	m_in_cmd_mode[1] = false;
 }
 
 DRIVER_INIT_MEMBER( gts80b_state, gts80b )
