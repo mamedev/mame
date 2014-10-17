@@ -39,8 +39,7 @@ class taitowlf_state : public pcat_base_state
 public:
 	taitowlf_state(const machine_config &mconfig, device_type type, const char *tag)
 		: pcat_base_state(mconfig, type, tag),
-		m_region_user1(*this, "user1"),
-		m_region_user5(*this, "user5"),
+		m_bootscreen_rom(*this, "bootscreen"),
 		m_bank1(*this, "bank1"),
 		m_palette(*this, "palette") { }
 
@@ -48,8 +47,7 @@ public:
 	UINT8 m_mxtc_config_reg[256];
 	UINT8 m_piix4_config_reg[4][256];
 
-	required_memory_region m_region_user1;
-	required_memory_region m_region_user5;
+	required_region_ptr<UINT8> m_bootscreen_rom;
 	required_memory_bank m_bank1;
 	required_device<palette_device> m_palette;
 	DECLARE_WRITE32_MEMBER(pnp_config_w);
@@ -69,7 +67,6 @@ public:
 UINT32 taitowlf_state::screen_update_taitowlf(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int x,y,count;
-	const UINT8 *blit_ram = m_region_user5->base();
 
 	bitmap.fill(m_palette->black_pen(), cliprect);
 
@@ -81,7 +78,7 @@ UINT32 taitowlf_state::screen_update_taitowlf(screen_device &screen, bitmap_rgb3
 		{
 			UINT32 color;
 
-			color = (blit_ram[count] & 0xff);
+			color = (m_bootscreen_rom[count] & 0xff);
 
 			if(cliprect.contains(x+0, y))
 				bitmap.pix32(y, x+0) = m_palette->pen(color);
@@ -116,11 +113,11 @@ static void mxtc_config_w(device_t *busdevice, device_t *device, int function, i
 		{
 			if (data & 0x10)        // enable RAM access to region 0xf0000 - 0xfffff
 			{
-				state->m_bank1->set_base(state->m_bios_ram);
+				state->m_bank1->set_entry(1);
 			}
 			else                    // disable RAM access (reads go to BIOS ROM)
 			{
-				state->m_bank1->set_base(state->m_region_user1->base() + 0x30000);
+				state->m_bank1->set_entry(0);
 			}
 			break;
 		}
@@ -284,7 +281,7 @@ static ADDRESS_MAP_START( taitowlf_map, AS_PROGRAM, 32, taitowlf_state )
 	AM_RANGE(0x000f0000, 0x000fffff) AM_WRITE(bios_ram_w)
 	AM_RANGE(0x00100000, 0x01ffffff) AM_RAM
 //  AM_RANGE(0xf8000000, 0xf83fffff) AM_ROM AM_REGION("user3", 0)
-	AM_RANGE(0xfffc0000, 0xffffffff) AM_ROM AM_REGION("user1", 0)   /* System BIOS */
+	AM_RANGE(0xfffc0000, 0xffffffff) AM_ROM AM_REGION("bios", 0)   /* System BIOS */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(taitowlf_io, AS_IO, 32, taitowlf_state )
@@ -347,7 +344,8 @@ void taitowlf_state::machine_start()
 
 void taitowlf_state::machine_reset()
 {
-	m_bank1->set_base(m_region_user1->base() + 0x30000);
+	// disable RAM access (reads go to BIOS ROM)
+	m_bank1->set_entry(0);
 }
 
 
@@ -398,13 +396,15 @@ DRIVER_INIT_MEMBER(taitowlf_state,taitowlf)
 {
 	m_bios_ram = auto_alloc_array(machine(), UINT32, 0x10000/4);
 
+	m_bank1->configure_entry(1, m_bios_ram);
+	m_bank1->configure_entry(0, memregion("bios")->base() + 0x30000);
 	intel82439tx_init();
 }
 
 /*****************************************************************************/
 
 ROM_START(pf2012)
-	ROM_REGION32_LE(0x40000, "user1", 0)
+	ROM_REGION32_LE(0x40000, "bios", 0)
 	ROM_LOAD("p5tx-la.bin", 0x00000, 0x40000, CRC(072e6d51) SHA1(70414349b37e478fc28ecbaba47ad1033ae583b7))
 
 	#if ENABLE_VGA
@@ -438,7 +438,7 @@ ROM_START(pf2012)
 	ROM_LOAD("e59-14.u14", 0x100000, 0x40000, CRC(d440887c) SHA1(d965871860d757bc9111e9adb2303a633c662d6b) )
 	ROM_LOAD("e59-15.u16", 0x140000, 0x40000, CRC(eae8e523) SHA1(8a054d3ded7248a7906c4f0bec755ddce53e2023) )
 
-	ROM_REGION(0x20000, "user5", 0)         // bootscreen
+	ROM_REGION(0x20000, "bootscreen", 0)         // bootscreen
 	ROM_LOAD("e58-04.u71", 0x000000, 0x20000, CRC(500e6113) SHA1(93226706517c02e336f96bdf9443785158e7becf) )
 ROM_END
 

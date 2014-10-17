@@ -79,7 +79,7 @@ public:
 	{ }
 
 	optional_device<eeprom_serial_93cxx_device> m_eeprom;
-	required_memory_region m_math;
+	required_region_ptr<UINT8> m_math;
 
 	DECLARE_WRITE16_MEMBER(r2dx_angle_w);
 	DECLARE_WRITE16_MEMBER(r2dx_dx_w);
@@ -309,7 +309,7 @@ WRITE16_MEMBER(r2dx_v33_state::r2dx_dy_w)
 
 READ16_MEMBER(r2dx_v33_state::r2dx_angle_r)
 {
-	return m_math->base()[((r2dx_i_dy & 0xff) << 8) | (r2dx_i_dx & 0xff)];
+	return m_math[((r2dx_i_dy & 0xff) << 8) | (r2dx_i_dx & 0xff)];
 }
 
 READ16_MEMBER(r2dx_v33_state::r2dx_dist_r)
@@ -320,13 +320,13 @@ READ16_MEMBER(r2dx_v33_state::r2dx_dist_r)
 READ16_MEMBER(r2dx_v33_state::r2dx_sin_r)
 {
 	int off = 65536 + (r2dx_i_angle & 0xff)*4;
-	return (m_math->base()[off+0]) | (m_math->base()[off+1] << 8);
+	return (m_math[off+0]) | (m_math[off+1] << 8);
 }
 
 READ16_MEMBER(r2dx_v33_state::r2dx_cos_r)
 {
 	int off = 65536 + (r2dx_i_angle & 0xff)*4;
-	return (m_math->base()[off+2]) | (m_math->base()[off+3] << 8);
+	return (m_math[off+2]) | (m_math[off+3] << 8);
 }
 
 WRITE16_MEMBER(r2dx_v33_state::r2dx_sdistl_w)
@@ -976,7 +976,7 @@ ROM_START( r2dx_v33 )
 	ROM_REGION( 0x100000, "oki", 0 ) /* ADPCM samples */
 	ROM_LOAD( "pcm.099", 0x00000, 0x100000, CRC(97ca2907) SHA1(bfe8189300cf72089d0beaeab8b1a0a1a4f0a5b6) )
 
-	ROM_REGION( 0x40000, "math", 0 ) /* SEI333 (AKA COPX-D3) data */
+	ROM_REGION( 0x20000, "math", 0 ) /* SEI333 (AKA COPX-D3) data */
 	ROM_LOAD( "copx_d3.357", 0x00000, 0x20000, CRC(fa2cf3ad) SHA1(13eee40704d3333874b6e3da9ee7d969c6dc662a) )
 
 	ROM_REGION16_BE( 0x80, "eeprom", 0 )
@@ -1003,7 +1003,7 @@ ROM_START( r2dx_v33_r2 )
 	ROM_REGION( 0x100000, "oki", 0 ) /* ADPCM samples */
 	ROM_LOAD( "pcm.099", 0x00000, 0x100000, CRC(97ca2907) SHA1(bfe8189300cf72089d0beaeab8b1a0a1a4f0a5b6) )
 
-	ROM_REGION( 0x40000, "math", 0 ) /* SEI333 (AKA COPX-D3) data */
+	ROM_REGION( 0x20000, "math", 0 ) /* SEI333 (AKA COPX-D3) data */
 	ROM_LOAD( "copx_d3.357", 0x00000, 0x20000, CRC(fa2cf3ad) SHA1(13eee40704d3333874b6e3da9ee7d969c6dc662a) )
 
 	ROM_REGION16_BE( 0x80, "eeprom", 0 )
@@ -1018,7 +1018,7 @@ ROM_START( nzeroteam ) /* V33 SYSTEM TYPE_B hardware, uses SEI333 (AKA COPX-D3) 
 
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF ) /* v33 main cpu */
 
-	ROM_REGION( 0x40000, "math", 0 ) /* SEI333 (AKA COPX-D3) data */
+	ROM_REGION( 0x20000, "math", 0 ) /* SEI333 (AKA COPX-D3) data */
 	ROM_LOAD( "copx-d3.bin", 0x00000, 0x20000, CRC(fa2cf3ad) SHA1(13eee40704d3333874b6e3da9ee7d969c6dc662a) ) /* Not from this set, but same data as Zero Team 2000 & Raiden II New */
 
 	ROM_REGION( 0x20000, "audiocpu", 0 ) /* 64k code for sound Z80 */
@@ -1050,7 +1050,7 @@ ROM_START( zerotm2k ) /* V33 SYSTEM TYPE_C VER2 hardware, uses SEI333 (AKA COPX-
 
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF ) /* v33 main cpu */
 
-	ROM_REGION( 0x40000, "math", 0 ) /* SEI333 (AKA COPX-D3) data */
+	ROM_REGION( 0x20000, "math", 0 ) /* SEI333 (AKA COPX-D3) data */
 	ROM_LOAD( "mx27c1000mc.u0366", 0x00000, 0x20000, CRC(fa2cf3ad) SHA1(13eee40704d3333874b6e3da9ee7d969c6dc662a) ) /* PCB silkscreened 333ROM */
 
 	ROM_REGION( 0x20000, "audiocpu", 0 ) /* 64k code for sound Z80 */

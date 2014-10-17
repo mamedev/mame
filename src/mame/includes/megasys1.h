@@ -47,7 +47,7 @@ public:
 	optional_device<cpu_device> m_audiocpu;
 	optional_device<okim6295_device> m_oki1;
 	optional_device<okim6295_device> m_oki2;
-	required_rom_ptr<UINT16> m_rom_maincpu;
+	required_region_ptr<UINT16> m_rom_maincpu;
 	required_ioport m_io_system;
 	required_ioport m_io_p1;
 	required_ioport m_io_p2;

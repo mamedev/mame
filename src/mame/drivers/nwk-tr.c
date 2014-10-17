@@ -829,7 +829,7 @@ ROM_START(racingj)
 	ROM_REGION(0x80000, "audiocpu", 0)  /* 68k program roms */
 	ROM_LOAD16_WORD_SWAP( "676gna08.7s", 0x000000, 0x080000, CRC(8973f6f2) SHA1(f5648a7e0205f7e979ccacbb52936809ce14a184) )
 
-	ROM_REGION(0x1000000, "rfsnd", 0)   /* PCM sample roms */
+	ROM_REGION16_LE(0x1000000, "rfsnd", 0)   /* PCM sample roms */
 	ROM_LOAD( "676a09.16p", 0x000000, 0x400000, CRC(f85c8dc6) SHA1(8b302c80be309b5cc68b75945fcd7b87a56a4c9b) )
 	ROM_LOAD( "676a10.14p", 0x400000, 0x400000, CRC(7b5b7828) SHA1(aec224d62e4b1e8fdb929d7947ce70d84ba676cf) )
 
@@ -853,7 +853,7 @@ ROM_START(racingj2j)
 	ROM_REGION(0x80000, "audiocpu", 0)  /* 68k program roms */
 	ROM_LOAD16_WORD_SWAP( "888a08.7s", 0x000000, 0x080000, CRC(55fbea65) SHA1(ad953f758181731efccadcabc4326e6634c359e8) )
 
-	ROM_REGION(0x1000000, "rfsnd", 0)   /* PCM sample roms */
+	ROM_REGION16_LE(0x1000000, "rfsnd", 0)   /* PCM sample roms */
 	ROM_LOAD( "888a09.16p",   0x000000, 0x400000, CRC(11e2fed2) SHA1(24b8a367b59fedb62c56f066342f2fa87b135fc5) )
 	ROM_LOAD( "888a10.14p",   0x400000, 0x400000, CRC(328ce610) SHA1(dbbc779a1890c53298c0db129d496df048929496) )
 
@@ -877,7 +877,7 @@ ROM_START(racingj2)
 	ROM_REGION(0x80000, "audiocpu", 0)  /* 68k program roms */
 	ROM_LOAD16_WORD_SWAP( "888a08.7s", 0x000000, 0x080000, CRC(55fbea65) SHA1(ad953f758181731efccadcabc4326e6634c359e8) )
 
-	ROM_REGION(0x1000000, "rfsnd", 0)   /* PCM sample roms */
+	ROM_REGION16_LE(0x1000000, "rfsnd", 0)   /* PCM sample roms */
 	ROM_LOAD( "888a09.16p", 0x000000, 0x400000, CRC(11e2fed2) SHA1(24b8a367b59fedb62c56f066342f2fa87b135fc5) )
 	ROM_LOAD( "888a10.14p", 0x400000, 0x400000, CRC(328ce610) SHA1(dbbc779a1890c53298c0db129d496df048929496) )
 
@@ -900,7 +900,7 @@ ROM_START(thrilld)
 	ROM_REGION(0x80000, "audiocpu", 0)  /* 68k program roms */
 	ROM_LOAD16_WORD_SWAP( "713a08.7s", 0x000000, 0x080000, CRC(6a72a825) SHA1(abeac99c5343efacabcb0cdff6d34f9f967024db) )
 
-	ROM_REGION(0x1000000, "rfsnd", 0)   /* PCM sample roms */
+	ROM_REGION16_LE(0x1000000, "rfsnd", 0)   /* PCM sample roms */
 	ROM_LOAD( "713a09.16p", 0x000000, 0x400000, CRC(058f250a) SHA1(63b8e60004ec49009633e86b4992c00083def9a8) )
 	ROM_LOAD( "713a10.14p", 0x400000, 0x400000, CRC(27f9833e) SHA1(1540f00d2571ecb81b914c553682b67fca94bbbd) )
 
@@ -923,7 +923,7 @@ ROM_START(thrilldb)
 	ROM_REGION(0x80000, "audiocpu", 0)  /* 68k program roms */
 	ROM_LOAD16_WORD_SWAP( "713a08.7s", 0x000000, 0x080000, CRC(6a72a825) SHA1(abeac99c5343efacabcb0cdff6d34f9f967024db) )
 
-	ROM_REGION(0x1000000, "rfsnd", 0)   /* PCM sample roms */
+	ROM_REGION16_LE(0x1000000, "rfsnd", 0)   /* PCM sample roms */
 	ROM_LOAD( "713a09.16p", 0x000000, 0x400000, CRC(058f250a) SHA1(63b8e60004ec49009633e86b4992c00083def9a8) )
 	ROM_LOAD( "713a10.14p", 0x400000, 0x400000, CRC(27f9833e) SHA1(1540f00d2571ecb81b914c553682b67fca94bbbd) )
 
@@ -946,7 +946,7 @@ ROM_START(thrilldae)
 	ROM_REGION(0x80000, "audiocpu", 0)  /* 68k program roms */
 	ROM_LOAD16_WORD_SWAP( "713a08.7s", 0x000000, 0x080000, CRC(6a72a825) SHA1(abeac99c5343efacabcb0cdff6d34f9f967024db) )
 
-	ROM_REGION(0x1000000, "rfsnd", 0)   /* PCM sample roms */
+	ROM_REGION16_LE(0x1000000, "rfsnd", 0)   /* PCM sample roms */
 	ROM_LOAD( "713a09.16p", 0x000000, 0x400000, CRC(058f250a) SHA1(63b8e60004ec49009633e86b4992c00083def9a8) )
 	ROM_LOAD( "713a10.14p", 0x400000, 0x400000, CRC(27f9833e) SHA1(1540f00d2571ecb81b914c553682b67fca94bbbd) )
 

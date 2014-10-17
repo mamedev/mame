@@ -125,7 +125,7 @@ private:
 	void process_control_character(UINT8 data);
 	void get_character_data(UINT8 data);
 
-	required_memory_region m_char_rom;
+	required_region_ptr<UINT8> m_char_rom;
 
 	devcb_read8    m_read_d;
 

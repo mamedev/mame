@@ -371,8 +371,7 @@ void saa5050_device::get_character_data(UINT8 data)
 	if (m_double_height) ra >>= 1;
 	if (m_double_height && m_double_height_bottom_row) ra += 5;
 
-	offs_t char_rom_addr = (data * 10) + ra;
-	m_char_data = m_char_rom->base()[char_rom_addr];
+	m_char_data = m_char_rom[(data * 10) + ra];
 }
 
 

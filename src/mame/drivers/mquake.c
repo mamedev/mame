@@ -58,7 +58,7 @@ public:
 
 private:
 	required_device<es5503_device> m_es5503;
-	required_memory_region m_es5503_rom;
+	required_region_ptr<UINT8> m_es5503_rom;
 };
 
 
@@ -72,7 +72,7 @@ private:
 
 READ8_MEMBER( mquake_state::es5503_sample_r )
 {
-	return m_es5503_rom->base()[offset + (m_es5503->get_channel_strobe() * 0x10000)];
+	return m_es5503_rom[offset + (m_es5503->get_channel_strobe() * 0x10000)];
 }
 
 static ADDRESS_MAP_START( mquake_es5503_map, AS_0, 8, mquake_state )

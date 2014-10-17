@@ -1155,7 +1155,7 @@ ROM_START( gticlub ) /* Euro version EAA - Reports: GTI CLUB(TM) System ver 1.00
 	ROM_REGION(0x80000, "audiocpu", 0)      /* 68k program */
 	ROM_LOAD16_WORD_SWAP( "688a07.13k", 0x000000, 0x040000, CRC(f0805f06) SHA1(4b87e02b89e7ea812454498603767668e4619025) )
 
-	ROM_REGION(0x800000, "rfsnd", 0)    /* sound roms */
+	ROM_REGION16_LE(0x800000, "rfsnd", 0)    /* sound roms */
 	ROM_LOAD( "688a09.9s", 0x000000, 0x200000, CRC(fb582963) SHA1(ce8fe6a4d7ac7d7f4b6591f9150b1d351e636354) )
 	ROM_LOAD( "688a10.7s", 0x200000, 0x200000, CRC(b3ddc5f1) SHA1(a3f76c86e85eb17f20efb037c1ad64e9cb8566c8) )
 	ROM_LOAD( "688a11.5s", 0x400000, 0x200000, CRC(fc706183) SHA1(c8ce6de0588be1023ef48577bc88a4e5effdcd25) )
@@ -1185,7 +1185,7 @@ ROM_START( gticlubu ) /* USA version UAA - Reports: GTI CLUB(TM) System ver 1.02
 	ROM_REGION(0x80000, "audiocpu", 0)      /* 68k program */
 	ROM_LOAD16_WORD_SWAP( "688a07.13k", 0x000000, 0x040000, CRC(f0805f06) SHA1(4b87e02b89e7ea812454498603767668e4619025) )
 
-	ROM_REGION(0x800000, "rfsnd", 0)    /* sound roms */
+	ROM_REGION16_LE(0x800000, "rfsnd", 0)    /* sound roms */
 	ROM_LOAD( "688a09.9s", 0x000000, 0x200000, CRC(fb582963) SHA1(ce8fe6a4d7ac7d7f4b6591f9150b1d351e636354) )
 	ROM_LOAD( "688a10.7s", 0x200000, 0x200000, CRC(b3ddc5f1) SHA1(a3f76c86e85eb17f20efb037c1ad64e9cb8566c8) )
 	ROM_LOAD( "688a11.5s", 0x400000, 0x200000, CRC(fc706183) SHA1(c8ce6de0588be1023ef48577bc88a4e5effdcd25) )
@@ -1215,7 +1215,7 @@ ROM_START( gticluba ) /* Asia version AAA - Reports: GTI CLUB(TM) System ver 1.0
 	ROM_REGION(0x80000, "audiocpu", 0)      /* 68k program */
 	ROM_LOAD16_WORD_SWAP( "688a07.13k", 0x000000, 0x040000, CRC(f0805f06) SHA1(4b87e02b89e7ea812454498603767668e4619025) )
 
-	ROM_REGION(0x800000, "rfsnd", 0)    /* sound roms */
+	ROM_REGION16_LE(0x800000, "rfsnd", 0)    /* sound roms */
 	ROM_LOAD( "688a09.9s", 0x000000, 0x200000, CRC(fb582963) SHA1(ce8fe6a4d7ac7d7f4b6591f9150b1d351e636354) )
 	ROM_LOAD( "688a10.7s", 0x200000, 0x200000, CRC(b3ddc5f1) SHA1(a3f76c86e85eb17f20efb037c1ad64e9cb8566c8) )
 	ROM_LOAD( "688a11.5s", 0x400000, 0x200000, CRC(fc706183) SHA1(c8ce6de0588be1023ef48577bc88a4e5effdcd25) )
@@ -1245,7 +1245,7 @@ ROM_START( gticlubj ) /* Japan version JAA - Reports: GTI CLUB(TM) System ver 1.
 	ROM_REGION(0x80000, "audiocpu", 0)      /* 68k program */
 	ROM_LOAD16_WORD_SWAP( "688a07.13k", 0x000000, 0x040000, CRC(f0805f06) SHA1(4b87e02b89e7ea812454498603767668e4619025) )
 
-	ROM_REGION(0x800000, "rfsnd", 0)    /* sound roms */
+	ROM_REGION16_LE(0x800000, "rfsnd", 0)    /* sound roms */
 	ROM_LOAD( "688a09.9s", 0x000000, 0x200000, CRC(fb582963) SHA1(ce8fe6a4d7ac7d7f4b6591f9150b1d351e636354) )
 	ROM_LOAD( "688a10.7s", 0x200000, 0x200000, CRC(b3ddc5f1) SHA1(a3f76c86e85eb17f20efb037c1ad64e9cb8566c8) )
 	ROM_LOAD( "688a11.5s", 0x400000, 0x200000, CRC(fc706183) SHA1(c8ce6de0588be1023ef48577bc88a4e5effdcd25) )
@@ -1278,7 +1278,7 @@ ROM_START( thunderh ) /* Euro version EAA */
 	ROM_REGION(0x20000, "dsp", 0)       /* 68k program for outboard sound? network? board */
 	ROM_LOAD16_WORD_SWAP( "680c22.20k", 0x000000, 0x020000, CRC(d93c0ee2) SHA1(4b58418cbb01b51e12d6e7c86b2c81cd35d86248) )
 
-	ROM_REGION(0x800000, "rfsnd", 0)    /* sound roms */
+	ROM_REGION16_LE(0x800000, "rfsnd", 0)    /* sound roms */
 	ROM_LOAD( "680a09.9s", 0x000000, 0x200000, CRC(71c2b049) SHA1(ce360172c8774b31edf16a80104c35b1caf26cd9) )
 	ROM_LOAD( "680a10.7s", 0x200000, 0x200000, CRC(19882bf3) SHA1(7287da58853c84cbadbfb42bed37f2b0032c4b4d) )
 	ROM_LOAD( "680a11.5s", 0x400000, 0x200000, CRC(0c74fe3f) SHA1(2e69f8d37552a74bbda65b134f747b4380ed33b0) )
@@ -1308,7 +1308,7 @@ ROM_START( thunderhu ) /* USA version UAA */
 	ROM_REGION(0x20000, "dsp", 0)       /* 68k program for outboard sound? network? board */
 	ROM_LOAD16_WORD_SWAP( "680c22.20k", 0x000000, 0x020000, CRC(d93c0ee2) SHA1(4b58418cbb01b51e12d6e7c86b2c81cd35d86248) )
 
-	ROM_REGION(0x800000, "rfsnd", 0)    /* sound roms */
+	ROM_REGION16_LE(0x800000, "rfsnd", 0)    /* sound roms */
 	ROM_LOAD( "680a09.9s", 0x000000, 0x200000, CRC(71c2b049) SHA1(ce360172c8774b31edf16a80104c35b1caf26cd9) )
 	ROM_LOAD( "680a10.7s", 0x200000, 0x200000, CRC(19882bf3) SHA1(7287da58853c84cbadbfb42bed37f2b0032c4b4d) )
 	ROM_LOAD( "680a11.5s", 0x400000, 0x200000, CRC(0c74fe3f) SHA1(2e69f8d37552a74bbda65b134f747b4380ed33b0) )
@@ -1335,7 +1335,7 @@ ROM_START( slrasslt ) /* USA version UAA */
 	ROM_REGION(0x80000, "audiocpu", 0)      /* 68k program */
 	ROM_LOAD16_WORD_SWAP( "792a07.10k", 0x000000, 0x080000, CRC(89a65ad1) SHA1(d814ef0b560c8e68da57ad5c6096e4fc05e9913e) )
 
-	ROM_REGION(0x800000, "rfsnd", 0)    /* sound roms */
+	ROM_REGION16_LE(0x800000, "rfsnd", 0)    /* sound roms */
 	ROM_LOAD( "792a09.9s", 0x000000, 0x200000, CRC(7d7ea427) SHA1(a9a311a7c17223cc87140fe2890e20a321464831) )
 	ROM_LOAD( "792a10.7s", 0x200000, 0x200000, CRC(e585e5d9) SHA1(ec44ad324a66eeea4c45933dda5a8a9a4398879d) )
 	ROM_LOAD( "792a11.5s", 0x400000, 0x200000, CRC(c9c3a04c) SHA1(f834659f67712c9fcd93b7407669d7f35517b790) )
@@ -1365,7 +1365,7 @@ ROM_START( hangplt ) /* Japan version JAB */
 	ROM_REGION(0x80000, "audiocpu", 0)  /* 68k program */
 	ROM_LOAD16_WORD_SWAP( "685a07.13k", 0x000000, 0x080000, CRC(5b72fd80) SHA1(a150837fa0d66dc0c3832495a4c8ce4f9b92cd98) )
 
-	ROM_REGION(0x1000000, "rfsnd", 0)   /* sound roms */
+	ROM_REGION16_LE(0x1000000, "rfsnd", 0)   /* sound roms */
 	ROM_LOAD( "685a09.9s", 0x000000, 0x400000, CRC(b8ae40aa) SHA1(eee27a8929e0e805f1045fd9638e661b36a1e3c7) )
 	ROM_LOAD( "685a10.7s", 0x400000, 0x400000, CRC(fef3dc36) SHA1(566c7469fc452b5965a31fa42291082ec8e48a24) )
 
@@ -1391,7 +1391,7 @@ ROM_START( hangpltu ) /* USA version UAA */
 	ROM_REGION(0x80000, "audiocpu", 0)  /* 68k program */
 	ROM_LOAD16_WORD_SWAP( "685a07.13k", 0x000000, 0x080000, CRC(5b72fd80) SHA1(a150837fa0d66dc0c3832495a4c8ce4f9b92cd98) )
 
-	ROM_REGION(0x1000000, "rfsnd", 0)   /* sound roms */
+	ROM_REGION16_LE(0x1000000, "rfsnd", 0)   /* sound roms */
 	ROM_LOAD( "685a09.9s", 0x000000, 0x400000, CRC(b8ae40aa) SHA1(eee27a8929e0e805f1045fd9638e661b36a1e3c7) )
 	ROM_LOAD( "685a10.7s", 0x400000, 0x400000, CRC(fef3dc36) SHA1(566c7469fc452b5965a31fa42291082ec8e48a24) )
 

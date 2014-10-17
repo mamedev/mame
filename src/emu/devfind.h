@@ -305,25 +305,26 @@ public:
 };
 
 
-// ======================> rom_ptr_finder
+// ======================> region_ptr_finder
 
-// ROM region pointer finder template
+// memory region pointer finder template
 template<typename _PointerType, bool _Required>
-class rom_ptr_finder : public object_finder_base<_PointerType>
+class region_ptr_finder : public object_finder_base<_PointerType>
 {
 public:
 	// construction/destruction
-	rom_ptr_finder(device_t &base, const char *tag)
+	region_ptr_finder(device_t &base, const char *tag)
 		: object_finder_base<_PointerType>(base, tag),
 			m_length(0) { }
 
 	// operators to make use transparent
-	_PointerType operator[](int index) const { return this->m_target[index]; }
-	_PointerType &operator[](int index) { return this->m_target[index]; }
+	_PointerType operator[](int index) const { assert(index < m_length); return this->m_target[index]; }
+	_PointerType &operator[](int index) { assert(index < m_length); return this->m_target[index]; }
 
 	// getter for explicit fetching
 	UINT32 length() const { return m_length; }
-	UINT32 mask() const { return m_length - 1; }
+	UINT32 bytes() const { return m_length * sizeof(_PointerType); }
+	UINT32 mask() const { return m_length - 1; } // only valid if length is known to be a power of 2
 
 	// finder
 	virtual bool findit(bool isvalidation = false)
@@ -338,20 +339,20 @@ protected:
 	size_t m_length;
 };
 
-// optional ROM pointer finder
+// optional region pointer finder
 template<class _PointerType>
-class optional_rom_ptr : public rom_ptr_finder<_PointerType, false>
+class optional_region_ptr : public region_ptr_finder<_PointerType, false>
 {
 public:
-	optional_rom_ptr(device_t &base, const char *tag = FINDER_DUMMY_TAG) : rom_ptr_finder<_PointerType, false>(base, tag) { }
+	optional_region_ptr(device_t &base, const char *tag = FINDER_DUMMY_TAG) : region_ptr_finder<_PointerType, false>(base, tag) { }
 };
 
-// required ROM pointer finder
+// required region pointer finder
 template<class _PointerType>
-class required_rom_ptr : public rom_ptr_finder<_PointerType, true>
+class required_region_ptr : public region_ptr_finder<_PointerType, true>
 {
 public:
-	required_rom_ptr(device_t &base, const char *tag = FINDER_DUMMY_TAG) : rom_ptr_finder<_PointerType, true>(base, tag) { }
+	required_region_ptr(device_t &base, const char *tag = FINDER_DUMMY_TAG) : region_ptr_finder<_PointerType, true>(base, tag) { }
 };
 
 
@@ -374,7 +375,7 @@ public:
 
 	// getter for explicit fetching
 	UINT32 bytes() const { return m_bytes; }
-	UINT32 mask() const { return m_bytes - 1; }
+	UINT32 mask() const { return m_bytes - 1; } // FIXME: wrong when sizeof(_PointerType) != 1
 
 	// setter for setting the object
 	void set_target(_PointerType *target, size_t bytes) { this->m_target = target; m_bytes = bytes; }

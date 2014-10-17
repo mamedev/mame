@@ -172,7 +172,7 @@ public:
 	required_device<ptm6840_device> m_6840ptm_2;
 	required_device<palette_device> m_palette;
 	required_memory_bank m_bank1;
-	required_memory_region m_prom;
+	required_region_ptr<UINT8> m_prom;
 	required_ioport m_in0;
 
 	UINT64      m_coin_start_cycles;
@@ -294,11 +294,10 @@ WRITE8_MEMBER(sigmab52_state::audiocpu_irq_ack_w)
 WRITE8_MEMBER(sigmab52_state::palette_bank_w)
 {
 	int bank = data & 0x0f;
-	UINT8 *prom = (UINT8*)*m_prom;
 
 	for (int i = 0; i<m_palette->entries(); i++)
 	{
-		UINT8 d = prom[(bank << 4) | i];
+		UINT8 d = m_prom[(bank << 4) | i];
 		m_palette->set_pen_color(i, pal3bit(d >> 5), pal3bit(d >> 2), pal2bit(d >> 0));
 	}
 }

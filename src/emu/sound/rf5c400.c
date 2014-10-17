@@ -66,8 +66,7 @@ const device_type RF5C400 = &device_creator<rf5c400_device>;
 rf5c400_device::rf5c400_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, RF5C400, "RF5C400", tag, owner, clock, "rf5c400", __FILE__),
 		device_sound_interface(mconfig, *this),
-		m_rom(NULL),
-		m_rom_length(0),
+		m_rom(*this, DEVICE_SELF),
 		m_stream(NULL)
 {
 	memset(m_env_ar_table, 0, sizeof(double)*0x9f);
@@ -198,7 +197,7 @@ void rf5c400_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 			*buf1++ += sample * pan_table[rvol];
 
 			pos += channel->step;
-			if ( (pos>>16) > m_rom_length || (pos>>16) > end)
+			if ( (pos>>16) > m_rom.length() || (pos>>16) > end)
 			{
 				pos -= loop<<16;
 				pos &= U64(0xFFFFFF0000);
@@ -229,9 +228,6 @@ UINT8 rf5c400_device::decode80(UINT8 val)
 void rf5c400_device::rf5c400_init_chip()
 {
 	int i;
-
-	m_rom = *region();
-	m_rom_length = region()->bytes() / 2;
 
 	// init volume table
 	{

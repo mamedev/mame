@@ -249,7 +249,7 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_am53cf96(*this, "am53cf96"),
 		m_ata(*this, "ata"),
-		m_rfsnd(*this, "rfsnd"),
+		m_waveram(*this, "rfsnd"),
 		m_spu_ata_dma(0),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu")
@@ -260,7 +260,7 @@ public:
 
 	required_device<am53cf96_device> m_am53cf96;
 	required_device<ata_interface_device> m_ata;
-	required_memory_region m_rfsnd;
+	required_region_ptr<UINT16> m_waveram;
 
 	UINT16 m_spu_ctrl;      // SPU board control register
 	UINT8 m_spu_shared[0x400];  // SPU/PSX shared dual-ported RAM
@@ -855,8 +855,6 @@ WRITE_LINE_MEMBER(twinkle_state::spu_ata_dmarq)
 
 		if (m_spu_ata_dmarq)
 		{
-			UINT16 *waveram = (UINT16 *)m_rfsnd->base();
-
 			m_ata->write_dmack(ASSERT_LINE);
 
 			while (m_spu_ata_dmarq)
@@ -866,7 +864,7 @@ WRITE_LINE_MEMBER(twinkle_state::spu_ata_dmarq)
 				//waveram[m_spu_ata_dma++] = (data >> 8) | (data << 8);
 				// bp 4a0e ;bmiidx4 checksum
 				// bp 4d62 ;bmiidx4 dma
-				waveram[m_spu_ata_dma++] = data;
+				m_waveram[m_spu_ata_dma++] = data;
 			}
 
 			m_ata->write_dmack(CLEAR_LINE);
@@ -876,16 +874,12 @@ WRITE_LINE_MEMBER(twinkle_state::spu_ata_dmarq)
 
 READ16_MEMBER(twinkle_state::twinkle_waveram_r)
 {
-	UINT16 *waveram = (UINT16 *)m_rfsnd->base();
-
-	return waveram[offset];
+	return m_waveram[offset];
 }
 
 WRITE16_MEMBER(twinkle_state::twinkle_waveram_w)
 {
-	UINT16 *waveram = (UINT16 *)m_rfsnd->base();
-
-	COMBINE_DATA(&waveram[offset]);
+	COMBINE_DATA(&m_waveram[offset]);
 }
 
 READ16_MEMBER(twinkle_state::shared_68k_r)
@@ -1155,7 +1149,7 @@ INPUT_PORTS_END
 	ROM_REGION32_LE( 0x080000, "audiocpu", 0 )\
 	ROM_LOAD16_WORD_SWAP( "863a05.2x",    0x000000, 0x080000, CRC(6f42a09e) SHA1(cab5209f90f47b9ee6e721479913ad74e3ba84b1) )\
 \
-	ROM_REGION(0x1800000, "rfsnd", ROMREGION_ERASE00)
+	ROM_REGION16_LE(0x1800000, "rfsnd", ROMREGION_ERASE00)
 
 ROM_START( gq863 )
 	TWINKLE_BIOS

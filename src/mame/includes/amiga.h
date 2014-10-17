@@ -340,7 +340,6 @@ public:
 	m_screen(*this, "screen"),
 	m_palette(*this, "palette"),
 	m_overlay(*this, "overlay"),
-	m_kickstart(*this, "kickstart"),
 	m_input_device(*this, "input"),
 	m_joy0dat_port(*this, "joy_0_dat"),
 	m_joy1dat_port(*this, "joy_1_dat"),
@@ -563,7 +562,6 @@ protected:
 	optional_device<palette_device> m_palette;
 	required_device<address_map_bank_device> m_overlay;
 
-	optional_memory_region m_kickstart;
 
 	// i/o ports
 	optional_ioport m_input_device;

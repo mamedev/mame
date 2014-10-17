@@ -37,7 +37,7 @@ public:
 	required_shared_ptr_array<UINT16, 2> m_videoram;
 	optional_shared_ptr<UINT16> m_zipram;
 	optional_shared_ptr<UINT16> m_sprite_gfx_ram;
-	required_rom_ptr<UINT16> m_gfxrom;
+	required_region_ptr<UINT16> m_gfxrom;
 
 	UINT16 m_CPUA_register;
 	UINT16 m_CPUB_register;

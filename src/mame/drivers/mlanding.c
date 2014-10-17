@@ -101,8 +101,8 @@ public:
 	required_device<z80ctc_device> m_ctc;
 
 	required_memory_bank    m_dma_bank;
-	required_memory_region  m_msm1_rom;
-	required_memory_region  m_msm2_rom;
+	required_region_ptr<UINT8> m_msm1_rom;
+	required_region_ptr<UINT8> m_msm2_rom;
 
 	required_shared_ptr<UINT16> m_g_ram;
 	required_shared_ptr<UINT16> m_cha_ram;
@@ -576,7 +576,7 @@ void mlanding_state::msm5205_update(int chip)
 	if (m_msm_reset[chip])
 		return;
 
-	const UINT8 *rom = chip ? m_msm2_rom->base() : m_msm1_rom->base();
+	const UINT8 *rom = chip ? m_msm2_rom : m_msm1_rom;
 	UINT8 data = rom[m_msm_pos[chip]];
 	msm5205_device *msm = chip ? m_msm2 : m_msm1;
 
