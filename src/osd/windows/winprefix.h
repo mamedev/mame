@@ -18,6 +18,17 @@
 #if _MSC_VER < 1500
 #define vsnprintf _vsnprintf
 #endif
+#if _MSC_VER < 1900
+#define snprintf _snprintf
+#else
+#pragma warning (disable: 4091)
+#pragma warning (disable: 4267)
+#pragma warning (disable: 4456 4457 4458 4459)
+#pragma warning (disable: 4463)
+#pragma warning (disable: 4838)
+#pragma warning (disable: 5025 5026 5027)
+#define _CRT_STDIO_LEGACY_WIDE_SPECIFIERS
+#endif
 #endif
 
 #ifdef __GNUC__
