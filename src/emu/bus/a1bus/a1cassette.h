@@ -1,8 +1,10 @@
+// license:BSD-3-Clause
+// copyright-holders:R. Belmont
 /*********************************************************************
 
     a1cassette.h
 
-    Apple II 6850 MIDI card, as made by Passport, Yamaha, and others.
+    Apple I Cassette Interface
 
 *********************************************************************/
 
