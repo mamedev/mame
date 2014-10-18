@@ -1,33 +1,39 @@
-/*
-    Gottlieb System 3
-*/
+/****************************************************************************************************
 
+  PINBALL
+  Gottlieb System 3
 
-#include "emu.h"
+*****************************************************************************************************/
+
+#include "machine/genpin.h"
 #include "cpu/m6502/m65c02.h"
+#include "machine/6522via.h"
+#include "gts3.lh"
 
 class gts3_state : public driver_device
 {
 public:
 	gts3_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_u4(*this, "u4")
+		, m_u5(*this, "u5")
 	{ }
 
-protected:
-
-	// devices
-	required_device<cpu_device> m_maincpu;
-
-	// driver_device overrides
-	virtual void machine_reset();
-public:
 	DECLARE_DRIVER_INIT(gts3);
+private:
+	virtual void machine_reset();
+	required_device<m65c02_device> m_maincpu;
+	required_device<via6522_device> m_u4;
+	required_device<via6522_device> m_u5;
 };
 
 
 static ADDRESS_MAP_START( gts3_map, AS_PROGRAM, 8, gts3_state )
-	AM_RANGE(0x0000, 0xffff) AM_NOP
+	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_SHARE("nvram")
+	AM_RANGE(0x2000, 0x200f) AM_DEVREADWRITE("u4", via6522_device, read, write)
+	AM_RANGE(0x2010, 0x201f) AM_DEVREADWRITE("u5", via6522_device, read, write)
+	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( gts3 )
@@ -37,18 +43,41 @@ void gts3_state::machine_reset()
 {
 }
 
-DRIVER_INIT_MEMBER(gts3_state,gts3)
+DRIVER_INIT_MEMBER( gts3_state, gts3 )
 {
 }
 
 static MACHINE_CONFIG_START( gts3, gts3_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M65C02, 2000000)
+	MCFG_CPU_ADD("maincpu", M65C02, XTAL_4MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(gts3_map)
+
+	/* Video */
+	MCFG_DEFAULT_LAYOUT(layout_gts3)
+
+	/* Sound */
+	MCFG_FRAGMENT_ADD( genpin_audio )
+
+	MCFG_DEVICE_ADD("u4", VIA6522, 0)
+	MCFG_VIA6522_IRQ_HANDLER(DEVWRITELINE("maincpu", m65c02_device, irq_line))
+	//MCFG_VIA6522_READPA_HANDLER(WRITE8(gts3_state, u4a_r))
+	//MCFG_VIA6522_READPB_HANDLER(WRITE8(gts3_state, u4b_r))
+	//MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(gts3_state, u4b_w))
+	//MCFG_VIA6522_CA2_HANDLER(WRITELINE(gts3_state, u4ca2_w))
+	MCFG_VIA6522_CB2_HANDLER(DEVWRITELINE("maincpu", m65c02_device, nmi_line))
+
+	MCFG_DEVICE_ADD("u5", VIA6522, 0)
+	MCFG_VIA6522_IRQ_HANDLER(DEVWRITELINE("maincpu", m65c02_device, irq_line))
+	//MCFG_VIA6522_READPA_HANDLER(WRITE8(gts3_state, u5a_r))
+	//MCFG_VIA6522_READPB_HANDLER(WRITE8(gts3_state, u5b_r))
+	//MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(gts3_state, u5b_w))
+	//MCFG_VIA6522_CA2_HANDLER(WRITELINE(gts3_state, u5ca2_w))
+	//MCFG_VIA6522_CB1_HANDLER(WRITELINE(gts3_state, u5cb1_w))
+	//MCFG_VIA6522_CB2_HANDLER(WRITELINE(gts3_state, u5cb2_w))
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------------------------
-/ Amazon Hunt III
+/ Amazon Hunt III (#684D)
 /-------------------------------------------------------------------*/
 
 /*-------------------------------------------------------------------
