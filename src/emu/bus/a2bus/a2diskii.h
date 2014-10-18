@@ -11,6 +11,7 @@
 
 #include "emu.h"
 #include "a2bus.h"
+#include "machine/applefdc.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS

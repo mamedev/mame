@@ -11,7 +11,6 @@
 #include "imagedev/flopdrv.h"
 #include "formats/ap2_dsk.h"
 #include "machine/appldriv.h"
-#include "machine/applefdc.h"
 #include "a2diskii.h"
 
 
