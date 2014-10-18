@@ -32,6 +32,13 @@ static MACHINE_CONFIG_DERIVED_CLASS( neogeo_noslot, neogeo_arcade, neogeo_noslot
 	MCFG_SBP_PROT_ADD("sbp_prot")
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED_CLASS( neogeo_noslot_kog, neogeo_arcade, neogeo_noslot_kog_state )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(main_map_noslot)
+
+	MCFG_NGBOOTLEG_PROT_ADD("bootleg_prot")
+	MCFG_KOG_PROT_ADD("kog_prot")
+MACHINE_CONFIG_END
 
 
 /*************************************
@@ -149,19 +156,6 @@ static INPUT_PORTS_START( dualbios )
 	PORT_DIPNAME( 0x0004, 0x0000, DEF_STR( Region ) ) PORT_DIPLOCATION("SW:3") PORT_CHANGED_MEMBER(DEVICE_SELF, neogeo_state, select_bios, 0)
 	PORT_DIPSETTING(    0x0000, DEF_STR( Asia ) )
 	PORT_DIPSETTING(    0x0004, DEF_STR( Japan ) )
-INPUT_PORTS_END
-
-
-static INPUT_PORTS_START( kog )
-	PORT_INCLUDE( neogeo )
-
-	/* a jumper on the pcb overlays a ROM address, very strange but that's how it works. */
-	PORT_START("JUMPER")
-	PORT_DIPNAME( 0x0001, 0x0001, "Title Language" ) PORT_DIPLOCATION("CART-JUMPER:1")
-	PORT_DIPSETTING(      0x0001, DEF_STR( English ) )
-	PORT_DIPSETTING(      0x0000, "Non-English" )
-	PORT_BIT( 0x00fe, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 
@@ -8908,15 +8902,14 @@ DRIVER_INIT_MEMBER(neogeo_noslot_state,kof10th) // copied to slot
 }
 
 
-DRIVER_INIT_MEMBER(neogeo_noslot_state,kog) // copied to slot
+DRIVER_INIT_MEMBER(neogeo_noslot_kog_state,kog) // copied to slot
 {
 	DRIVER_INIT_CALL(neogeo);
-	/* overlay cartridge ROM */
-	m_maincpu->space(AS_PROGRAM).install_read_port(0x0ffffe, 0x0fffff, "JUMPER");
 
-	m_bootleg_prot->kog_px_decrypt(cpuregion, cpuregion_size);
+	m_kog_prot->kog_px_decrypt(cpuregion, cpuregion_size);
 	m_bootleg_prot->neogeo_bootleg_sx_decrypt(fix_region, fix_region_size,1);
 	m_bootleg_prot->neogeo_bootleg_cx_decrypt(spr_region, spr_region_size);
+	m_kog_prot->kog_install_protection(m_maincpu);
 }
 
 
@@ -9591,7 +9584,7 @@ GAME( 1997, kof97h,     kof97,    neogeo_noslot,   neogeo, neogeo_state,   neoge
 GAME( 1997, kof97k,     kof97,    neogeo_noslot,   neogeo, neogeo_state,   neogeo,   ROT0, "SNK", "The King of Fighters '97 (Korean release)", GAME_SUPPORTS_SAVE )
 GAME( 1997, kof97pls,   kof97,    neogeo_noslot,   neogeo, neogeo_state,   neogeo,   ROT0, "bootleg", "The King of Fighters '97 Plus (bootleg)", GAME_SUPPORTS_SAVE )
 GAME( 1997, kof97oro,   kof97,    neogeo_noslot,   neogeo, neogeo_noslot_state,   kof97oro, ROT0, "bootleg", "The King of Fighters '97 Oroshi Plus 2003 (bootleg)", GAME_SUPPORTS_SAVE )
-GAME( 1997, kog,        kof97,    neogeo_noslot,   kog,    neogeo_noslot_state,   kog,      ROT0, "bootleg", "King of Gladiator (The King of Fighters '97 bootleg)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) // protected bootleg
+GAME( 1997, kog,        kof97,    neogeo_noslot_kog,   neogeo,    neogeo_noslot_kog_state,   kog,      ROT0, "bootleg", "King of Gladiator (The King of Fighters '97 bootleg)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) // protected bootleg
 GAME( 1997, lastblad,   neogeo,   neogeo_noslot,   neogeo, neogeo_state,   neogeo,   ROT0, "SNK", "The Last Blade / Bakumatsu Roman - Gekka no Kenshi (NGM-2340)", GAME_SUPPORTS_SAVE )
 GAME( 1997, lastbladh,  lastblad, neogeo_noslot,   neogeo, neogeo_state,   neogeo,   ROT0, "SNK", "The Last Blade / Bakumatsu Roman - Gekka no Kenshi (NGH-2340)", GAME_SUPPORTS_SAVE )
 GAME( 1997, lastsold,   lastblad, neogeo_noslot,   neogeo, neogeo_state,   neogeo,   ROT0, "SNK", "The Last Soldier (Korean release of The Last Blade)", GAME_SUPPORTS_SAVE )

@@ -26,7 +26,7 @@ neogeo_bootleg_cart::neogeo_bootleg_cart(const machine_config &mconfig, device_t
 }
 
 neogeo_bootleg_cart::neogeo_bootleg_cart(const machine_config &mconfig, const char *tag, device_t *owner, UINT16 clock)
-	: device_t(mconfig, NEOGEO_BOOTLEG_CART, "NEOGEO SMA Cart", tag, owner, clock, "neogeo_rom", __FILE__),
+	: device_t(mconfig, NEOGEO_BOOTLEG_CART, "NEOGEO Bootleg Cart", tag, owner, clock, "neogeo_rom", __FILE__),
 	device_neogeo_cart_interface(mconfig, *this),
 	m_banked_cart(*this, "banked_cart"),
 	m_bootleg_prot(*this, "bootleg_prot")
@@ -346,18 +346,31 @@ void neogeo_bootleg_kof10th_cart::decrypt_all(DECRYPT_ALL_PARAMS)
 
 const device_type NEOGEO_BOOTLEG_KOG_CART = &device_creator<neogeo_bootleg_kog_cart>;
 
-neogeo_bootleg_kog_cart::neogeo_bootleg_kog_cart(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : neogeo_bootleg_cart(mconfig, NEOGEO_BOOTLEG_KOG_CART, "NEOGEO BOOT kog Cart", tag, owner, clock, "boot_kog_cart", __FILE__) {}
+neogeo_bootleg_kog_cart::neogeo_bootleg_kog_cart(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : neogeo_bootleg_cart(mconfig, NEOGEO_BOOTLEG_KOG_CART, "NEOGEO BOOT kog Cart", tag, owner, clock, "boot_kog_cart", __FILE__),
+	m_kog_prot(*this, "kog_prot")
+{}
+
+static MACHINE_CONFIG_FRAGMENT( kog_bootleg_cart )
+	MCFG_NEOGEO_BANKED_CART_ADD("banked_cart")
+	MCFG_NGBOOTLEG_PROT_ADD("bootleg_prot")
+	MCFG_KOG_PROT_ADD("kog_prot")
+MACHINE_CONFIG_END
+
+machine_config_constructor neogeo_bootleg_kog_cart::device_mconfig_additions() const
+{
+	return MACHINE_CONFIG_NAME( kog_bootleg_cart );
+}
+
 
 void neogeo_bootleg_kog_cart::activate_cart(ACTIVATE_CART_PARAMS)
 {
 	m_banked_cart->install_banks(machine, maincpu, cpuregion, cpuregion_size);
-	/* overlay cartridge ROM */ // this should be part of the device
-	//m_maincpu->space(AS_PROGRAM).install_read_port(0x0ffffe, 0x0fffff, "JUMPER");
+	m_kog_prot->kog_install_protection(maincpu);
 }
 
 void neogeo_bootleg_kog_cart::decrypt_all(DECRYPT_ALL_PARAMS)
 {
-	m_bootleg_prot->kog_px_decrypt(cpuregion, cpuregion_size);
+	m_kog_prot->kog_px_decrypt(cpuregion, cpuregion_size);
 	m_bootleg_prot->neogeo_bootleg_sx_decrypt(fix_region, fix_region_size,1);
 	m_bootleg_prot->neogeo_bootleg_cx_decrypt(spr_region, spr_region_size);
 }

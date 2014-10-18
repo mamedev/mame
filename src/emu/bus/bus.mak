@@ -1118,6 +1118,7 @@ BUSOBJS += $(BUSOBJ)/neogeo/bootleg_prot.o
 BUSOBJS += $(BUSOBJ)/neogeo/bootleg_cart.o
 BUSOBJS += $(BUSOBJ)/neogeo/bootleg_hybrid_cart.o
 BUSOBJS += $(BUSOBJ)/neogeo/sbp_prot.o
+BUSOBJS += $(BUSOBJ)/neogeo/kog_prot.o
 BUSOBJS += $(BUSOBJ)/neogeo/rom.o
 endif
 

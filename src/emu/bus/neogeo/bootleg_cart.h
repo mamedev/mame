@@ -5,6 +5,7 @@
 #include "banked_cart.h"
 #include "sma_prot.h"
 #include "bootleg_prot.h"
+#include "kog_prot.h"
 
 // ======================> neogeo_bootleg_cart
 
@@ -231,6 +232,10 @@ public:
 	void activate_cart(ACTIVATE_CART_PARAMS);
 	virtual void decrypt_all(DECRYPT_ALL_PARAMS);
 	virtual int get_fixed_bank_type(void) { return 0; }
+
+	virtual machine_config_constructor device_mconfig_additions() const;
+
+	required_device<kog_prot_device> m_kog_prot;
 };
 extern const device_type NEOGEO_BOOTLEG_KOG_CART;
 

@@ -17,6 +17,7 @@
 #include "bus/neogeo/fatfury2_prot.h"
 #include "bus/neogeo/kof98_prot.h"
 #include "bus/neogeo/sbp_prot.h"
+#include "bus/neogeo/kog_prot.h"
 
 // On scanline 224, /VBLANK goes low 56 mclks (14 pixels) from the rising edge of /HSYNC.
 // Two mclks after /VBLANK goes low, the hardware sets a pending IRQ1 flip-flop.
@@ -299,7 +300,6 @@ class neogeo_noslot_state : public neogeo_state
 	DECLARE_DRIVER_INIT(samsh5sp);
 	DECLARE_DRIVER_INIT(jockeygp);
 	DECLARE_DRIVER_INIT(vliner);
-	DECLARE_DRIVER_INIT(kog);
 	DECLARE_DRIVER_INIT(kof97oro);
 	DECLARE_DRIVER_INIT(lans2004);
 	DECLARE_DRIVER_INIT(sbp);
@@ -326,7 +326,22 @@ class neogeo_noslot_state : public neogeo_state
 	optional_device<sbp_prot_device> m_sbp_prot;
 };
 
+class neogeo_noslot_kog_state : public neogeo_state
+{
+public:
+	neogeo_noslot_kog_state(const machine_config &mconfig, device_type type, const char *tag)
+		: neogeo_state(mconfig, type, tag),
+		/* legacy cartridge specifics */
+		m_bootleg_prot(*this, "bootleg_prot"),
+		m_kog_prot(*this, "kog_prot") {}
 
+
+	DECLARE_DRIVER_INIT(kog);
+
+	// legacy
+	optional_device<ngbootleg_prot_device> m_bootleg_prot;
+	optional_device<kog_prot_device> m_kog_prot;
+};
 
 /*----------- defined in drivers/neogeo.c -----------*/
 
