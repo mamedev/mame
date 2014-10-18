@@ -2573,14 +2573,14 @@ static void do_extract_ld(parameters_t &params)
 			// read the hunk into the buffers
 			chd_error err = input_chd.read_hunk(framenum, NULL);
 			if (err != CHDERR_NONE)
-				report_error(1, "Error reading hunk %"I64FMT"d from CHD file (%s): %s\n", framenum, params.find(OPTION_INPUT)->cstr(), chd_file::error_string(err));
+				report_error(1, "Error reading hunk %" I64FMT "d from CHD file (%s): %s\n", framenum, params.find(OPTION_INPUT)->cstr(), chd_file::error_string(err));
 
 			// write audio
 			for (int chnum = 0; chnum < channels; chnum++)
 			{
 				avi_error avierr = avi_append_sound_samples(output_file, chnum, avconfig.audio[chnum], actsamples, 0);
 				if (avierr != AVIERR_NONE)
-					report_error(1, "Error writing samples for hunk %"I64FMT"d to file (%s): %s\n", framenum, output_file_str->cstr(), avi_error_string(avierr));
+					report_error(1, "Error writing samples for hunk %" I64FMT "d to file (%s): %s\n", framenum, output_file_str->cstr(), avi_error_string(avierr));
 			}
 
 			// write video
@@ -2588,7 +2588,7 @@ static void do_extract_ld(parameters_t &params)
 			{
 				avi_error avierr = avi_append_video_frame(output_file, fullbitmap);
 				if (avierr != AVIERR_NONE)
-					report_error(1, "Error writing video for hunk %"I64FMT"d to file (%s): %s\n", framenum, output_file_str->cstr(), avi_error_string(avierr));
+					report_error(1, "Error writing video for hunk %" I64FMT "d to file (%s): %s\n", framenum, output_file_str->cstr(), avi_error_string(avierr));
 			}
 		}
 
