@@ -2119,6 +2119,7 @@ $(MAMEOBJ)/pinball.a: \
 	$(DRIVERS)/gp_2.o \
 	$(DRIVERS)/gts1.o \
 	$(DRIVERS)/gts3.o \
+	$(DRIVERS)/gts3a.o \
 	$(DRIVERS)/gts80.o \
 	$(DRIVERS)/gts80a.o \
 	$(DRIVERS)/gts80b.o \
@@ -2634,6 +2635,7 @@ $(DRIVERS)/goldnpkr.o:  $(LAYOUT)/goldnpkr.lh \
 			$(LAYOUT)/pmpoker.lh \
 			$(LAYOUT)/upndown.lh
 
+$(DRIVERS)/gts3.o:      $(LAYOUT)/gts3.lh
 $(DRIVERS)/gts80.o:     $(LAYOUT)/gts80.lh
 $(DRIVERS)/gts80a.o:    $(LAYOUT)/gts80a.lh
 $(DRIVERS)/gts80b.o:    $(LAYOUT)/gts80b.lh
