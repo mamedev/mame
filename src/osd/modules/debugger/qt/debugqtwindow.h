@@ -69,7 +69,7 @@ public:
 		WIN_TYPE_DASM         = 0x04,
 		WIN_TYPE_LOG          = 0x08,
 		WIN_TYPE_BREAK_POINTS = 0x10,
-		WIN_TYPE_UNKNOWN      = 0x20,
+		WIN_TYPE_UNKNOWN      = 0x20
 	};
 
 public:

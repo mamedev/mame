@@ -38,8 +38,8 @@ DasmWindow::DasmWindow(running_machine* machine, QWidget* parent) :
 
 	// The main disasm window
 	m_dasmView = new DebuggerView(DVT_DISASSEMBLY,
-									m_machine,
-									this);
+								  m_machine,
+								  this);
 
 	// Force a recompute of the disassembly region
 	downcast<debug_view_disasm*>(m_dasmView->view())->set_expression("curpc");
@@ -136,8 +136,8 @@ void DasmWindow::toggleBreakpointAtCursor(bool changedTo)
 			// Find an existing breakpoint at this address
 			INT32 bpindex = -1;
 			for (device_debug::breakpoint* bp = cpuinfo->breakpoint_first();
-					bp != NULL;
-					bp = bp->next())
+				 bp != NULL;
+				 bp = bp->next())
 			{
 				if (address == bp->address())
 				{

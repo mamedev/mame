@@ -3,8 +3,8 @@
 #include "debugqtview.h"
 
 DebuggerView::DebuggerView(const debug_view_type& type,
-							running_machine* machine,
-							QWidget* parent) :
+						   running_machine* machine,
+						   QWidget* parent) :
 	QAbstractScrollArea(parent),
 	m_preferBottom(false),
 	m_view(NULL),
@@ -45,17 +45,24 @@ void DebuggerView::paintEvent(QPaintEvent* event)
 
 
 	// Handle the scroll bars
+	const int horizontalScrollCharDiff = m_view->total_size().x - m_view->visible_size().x;
+	const int horizontalScrollSize = horizontalScrollCharDiff < 0 ? 0 : horizontalScrollCharDiff;
+	horizontalScrollBar()->setRange(0, horizontalScrollSize);
+
+	// If the horizontal scroll bar appears, make sure to adjust the vertical scrollbar accordingly
+	const int verticalScrollAdjust = horizontalScrollSize > 0 ? 1 : 0;
+
 	const int verticalScrollCharDiff = m_view->total_size().y - m_view->visible_size().y;
-	const int scrollSize = verticalScrollCharDiff < 0 ? 0 : verticalScrollCharDiff;
+	const int verticalScrollSize = verticalScrollCharDiff < 0 ? 0 : verticalScrollCharDiff+verticalScrollAdjust;
 	bool atEnd = false;
 	if (verticalScrollBar()->value() == verticalScrollBar()->maximum())
 	{
 		atEnd = true;
 	}
-	verticalScrollBar()->setRange(0, scrollSize);
+	verticalScrollBar()->setRange(0, verticalScrollSize);
 	if (m_preferBottom && atEnd)
 	{
-		verticalScrollBar()->setValue(scrollSize);
+		verticalScrollBar()->setValue(verticalScrollSize);
 	}
 
 
@@ -115,8 +122,8 @@ void DebuggerView::paintEvent(QPaintEvent* event)
 				if(textAttr & DCA_DISABLED)
 				{
 					fgColor.setRgb((fgColor.red()   + bgColor.red())   >> 1,
-									(fgColor.green() + bgColor.green()) >> 1,
-									(fgColor.blue()  + bgColor.blue())  >> 1);
+								   (fgColor.green() + bgColor.green()) >> 1,
+								   (fgColor.blue()  + bgColor.blue())  >> 1);
 				}
 				if(textAttr & DCA_COMMENT)
 				{
@@ -134,8 +141,8 @@ void DebuggerView::paintEvent(QPaintEvent* event)
 			// There is a touchy interplay between font height, drawing difference, visible position, etc
 			// Fonts don't get drawn "down and to the left" like boxes, so some wiggling is needed.
 			painter.drawText(x*fontWidth,
-								(y*fontHeight + (fontHeight*0.80)),
-								QString(m_view->viewdata()[viewDataOffset].byte));
+							 (y*fontHeight + (fontHeight*0.80)),
+							 QString(m_view->viewdata()[viewDataOffset].byte));
 			viewDataOffset++;
 		}
 	}
@@ -151,17 +158,24 @@ void DebuggerView::paintEvent(QPaintEvent* event)
 
 
 	// Handle the scroll bars
+	const int horizontalScrollCharDiff = m_view->total_size().x - m_view->visible_size().x;
+	const int horizontalScrollSize = horizontalScrollCharDiff < 0 ? 0 : horizontalScrollCharDiff;
+	horizontalScrollBar()->setRange(0, horizontalScrollSize);
+
+	// If the horizontal scroll bar appears, make sure to adjust the vertical scrollbar accordingly
+	const int verticalScrollAdjust = horizontalScrollSize > 0 ? 1 : 0;
+
 	const int verticalScrollCharDiff = m_view->total_size().y - m_view->visible_size().y;
-	const int scrollSize = verticalScrollCharDiff < 0 ? 0 : verticalScrollCharDiff;
+	const int verticalScrollSize = verticalScrollCharDiff < 0 ? 0 : verticalScrollCharDiff+verticalScrollAdjust;
 	bool atEnd = false;
 	if (verticalScrollBar()->value() == verticalScrollBar()->maximum())
 	{
 		atEnd = true;
 	}
-	verticalScrollBar()->setRange(0, scrollSize);
+	verticalScrollBar()->setRange(0, verticalScrollSize);
 	if (m_preferBottom && atEnd)
 	{
-		verticalScrollBar()->setValue(scrollSize);
+		verticalScrollBar()->setValue(verticalScrollSize);
 	}
 
 
@@ -360,6 +374,7 @@ void DebuggerView::debuggerViewUpdate(debug_view& debugView, void* osdPrivate)
 	// Get a handle to the DebuggerView being updated & redraw
 	DebuggerView* dView = (DebuggerView*)osdPrivate;
 	dView->verticalScrollBar()->setValue(dView->view()->visible_position().y);
+	dView->horizontalScrollBar()->setValue(dView->view()->visible_position().x);
 	dView->viewport()->update();
 	dView->update();
 }

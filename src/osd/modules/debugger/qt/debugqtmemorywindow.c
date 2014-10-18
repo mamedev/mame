@@ -234,8 +234,8 @@ void MemoryWindow::populateComboBox()
 
 	m_memoryComboBox->clear();
 	for (const debug_view_source* source = m_memTable->view()->first_source();
-			source != NULL;
-			source = source->next())
+		 source != NULL;
+		 source = source->next())
 	{
 		m_memoryComboBox->addItem(source->name());
 	}
@@ -300,12 +300,12 @@ void DebuggerMemView::mousePressEvent(QMouseEvent* event)
 			address_space* addressSpace = source->space();
 			const int nativeDataWidth = addressSpace->data_width() / 8;
 			const UINT64 memValue = debug_read_memory(*addressSpace,
-														addressSpace->address_to_byte(address),
-														nativeDataWidth,
-														true);
+													  addressSpace->address_to_byte(address),
+													  nativeDataWidth,
+													  true);
 			const offs_t pc = source->device()->debug()->track_mem_pc_from_space_address_data(addressSpace->spacenum(),
-																								address,
-																								memValue);
+																							  address,
+																							  memValue);
 			if (pc != (offs_t)(-1))
 			{
 				// TODO: You can specify a box that the tooltip stays alive within - might be good?
