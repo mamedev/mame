@@ -606,7 +606,7 @@ static void execute_one(dsp56k_core* cpustate)
 	/* Drop out if you've already completed your work. */
 	if (size != 0x1337)
 	{
-		PC += size;
+		PC += (UINT16)size;
 
 		dsp56k_process_loop(cpustate);
 		dsp56k_process_rep(cpustate, size);
@@ -1091,7 +1091,7 @@ static void execute_one(dsp56k_core* cpustate)
 	}
 
 	/* Must have been a good opcode */
-	PC += size;
+	PC += (UINT16)size;
 
 	dsp56k_process_loop(cpustate);
 	dsp56k_process_rep(cpustate, size);
