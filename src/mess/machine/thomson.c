@@ -1517,7 +1517,7 @@ DEVICE_IMAGE_LOAD_MEMBER( thomson_state, mo5_cartridge )
 	else
 	{
 		astring errmsg;
-		errmsg.printf("Invalid cartridge size %"I64FMT"d", size);
+		errmsg.printf("Invalid cartridge size %" I64FMT "d", size);
 		image.seterror(IMAGE_ERROR_UNSUPPORTED, errmsg.cstr());
 		return IMAGE_INIT_FAIL;
 	}
