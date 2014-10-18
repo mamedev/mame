@@ -151,7 +151,7 @@ void ti85_state::update_ti85_memory ()
 
 void ti85_state::update_ti83p_memory ()
 {
-	address_space &space = m_maincpu->space(AS_PROGRAM);
+	//address_space &space = m_maincpu->space(AS_PROGRAM);
 
 	m_membank1->set_bank(0); //Always flash page 0, well allmost
 	
@@ -179,7 +179,7 @@ void ti85_state::update_ti83p_memory ()
 
 void ti85_state::update_ti83pse_memory ()
 {
-	address_space &space = m_maincpu->space(AS_PROGRAM);
+	//address_space &space = m_maincpu->space(AS_PROGRAM);
 	
 	m_membank1->set_bank(m_ti8x_memory_page_0);
 	
@@ -304,7 +304,7 @@ MACHINE_RESET_MEMBER(ti85_state,ti83pse)
 
 MACHINE_START_MEMBER(ti85_state,ti83p)
 {
-	address_space &space = m_maincpu->space(AS_PROGRAM);
+	//address_space &space = m_maincpu->space(AS_PROGRAM);
 	//m_bios = memregion("flash")->base();
 
 	m_timer_interrupt_mask = 0;
@@ -342,7 +342,7 @@ MACHINE_START_MEMBER(ti85_state,ti83p)
 
 MACHINE_START_MEMBER(ti85_state,ti83pse)
 {
-	address_space &space = m_maincpu->space(AS_PROGRAM);
+	//address_space &space = m_maincpu->space(AS_PROGRAM);
 	//address_space &asic =  ADDRESS_MAP_NAME(ti83p_asic_mem);
 
 	m_timer_interrupt_mask = 0;
