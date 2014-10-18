@@ -87,7 +87,7 @@ public:
 	UINT8 m_port379;
 	int m_hasp_passmode;
 
-	UINT8 m_mxtc_config_reg[256];
+	UINT8 m_mtxc_config_reg[256];
 	UINT8 m_piix4_config_reg[8][256];
 
 	DECLARE_WRITE32_MEMBER( bios_f0000_ram_w );
@@ -115,23 +115,23 @@ public:
 	void intel82439tx_init();
 };
 
-// Intel 82439TX System Controller (MXTC)
+// Intel 82439TX System Controller (MTXC)
 
-static UINT8 mxtc_config_r(device_t *busdevice, device_t *device, int function, int reg)
+static UINT8 mtxc_config_r(device_t *busdevice, device_t *device, int function, int reg)
 {
 	savquest_state *state = busdevice->machine().driver_data<savquest_state>();
-//  osd_printf_debug("MXTC: read %d, %02X\n", function, reg);
+//  osd_printf_debug("MTXC: read %d, %02X\n", function, reg);
 
 	if((reg & 0xfe) == 0)
 		return (reg & 1) ? 0x80 : 0x86; // Vendor ID, Intel
 
 	if((reg & 0xfe) == 2)
-		return (reg & 1) ? 0x70 : 0x00; // Device ID, MXTC
+		return (reg & 1) ? 0x70 : 0x00; // Device ID, MTXC
 
-	return state->m_mxtc_config_reg[reg];
+	return state->m_mtxc_config_reg[reg];
 }
 
-static void mxtc_config_w(device_t *busdevice, device_t *device, int function, int reg, UINT8 data)
+static void mtxc_config_w(device_t *busdevice, device_t *device, int function, int reg, UINT8 data)
 {
 	savquest_state *state = busdevice->machine().driver_data<savquest_state>();
 //  osd_printf_debug("%s:MXTC: write %d, %02X, %02X\n", machine.describe_context(), function, reg, data);
@@ -198,17 +198,17 @@ static void mxtc_config_w(device_t *busdevice, device_t *device, int function, i
 	}
 	#endif
 
-	state->m_mxtc_config_reg[reg] = data;
+	state->m_mtxc_config_reg[reg] = data;
 }
 
 void savquest_state::intel82439tx_init()
 {
-	m_mxtc_config_reg[0x60] = 0x02;
-	m_mxtc_config_reg[0x61] = 0x02;
-	m_mxtc_config_reg[0x62] = 0x02;
-	m_mxtc_config_reg[0x63] = 0x02;
-	m_mxtc_config_reg[0x64] = 0x02;
-	m_mxtc_config_reg[0x65] = 0x02;
+	m_mtxc_config_reg[0x60] = 0x02;
+	m_mtxc_config_reg[0x61] = 0x02;
+	m_mtxc_config_reg[0x62] = 0x02;
+	m_mtxc_config_reg[0x63] = 0x02;
+	m_mtxc_config_reg[0x64] = 0x02;
+	m_mtxc_config_reg[0x65] = 0x02;
 	m_smram = auto_alloc_array(machine(), UINT8, 0x20000);
 }
 
@@ -217,19 +217,19 @@ static UINT32 intel82439tx_pci_r(device_t *busdevice, device_t *device, int func
 	UINT32 r = 0;
 	if (ACCESSING_BITS_24_31)
 	{
-		r |= mxtc_config_r(busdevice, device, function, reg + 3) << 24;
+		r |= mtxc_config_r(busdevice, device, function, reg + 3) << 24;
 	}
 	if (ACCESSING_BITS_16_23)
 	{
-		r |= mxtc_config_r(busdevice, device, function, reg + 2) << 16;
+		r |= mtxc_config_r(busdevice, device, function, reg + 2) << 16;
 	}
 	if (ACCESSING_BITS_8_15)
 	{
-		r |= mxtc_config_r(busdevice, device, function, reg + 1) << 8;
+		r |= mtxc_config_r(busdevice, device, function, reg + 1) << 8;
 	}
 	if (ACCESSING_BITS_0_7)
 	{
-		r |= mxtc_config_r(busdevice, device, function, reg + 0) << 0;
+		r |= mtxc_config_r(busdevice, device, function, reg + 0) << 0;
 	}
 	return r;
 }
@@ -238,19 +238,19 @@ static void intel82439tx_pci_w(device_t *busdevice, device_t *device, int functi
 {
 	if (ACCESSING_BITS_24_31)
 	{
-		mxtc_config_w(busdevice, device, function, reg + 3, (data >> 24) & 0xff);
+		mtxc_config_w(busdevice, device, function, reg + 3, (data >> 24) & 0xff);
 	}
 	if (ACCESSING_BITS_16_23)
 	{
-		mxtc_config_w(busdevice, device, function, reg + 2, (data >> 16) & 0xff);
+		mtxc_config_w(busdevice, device, function, reg + 2, (data >> 16) & 0xff);
 	}
 	if (ACCESSING_BITS_8_15)
 	{
-		mxtc_config_w(busdevice, device, function, reg + 1, (data >> 8) & 0xff);
+		mtxc_config_w(busdevice, device, function, reg + 1, (data >> 8) & 0xff);
 	}
 	if (ACCESSING_BITS_0_7)
 	{
-		mxtc_config_w(busdevice, device, function, reg + 0, (data >> 0) & 0xff);
+		mtxc_config_w(busdevice, device, function, reg + 0, (data >> 0) & 0xff);
 	}
 }
 
@@ -327,9 +327,9 @@ static void intel82371ab_pci_w(device_t *busdevice, device_t *device, int functi
 
 WRITE32_MEMBER(savquest_state::bios_f0000_ram_w)
 {
-	//if (m_mxtc_config_reg[0x59] & 0x20)       // write to RAM if this region is write-enabled
+	//if (m_mtxc_config_reg[0x59] & 0x20)       // write to RAM if this region is write-enabled
 	#if 1
-	if (m_mxtc_config_reg[0x59] & 0x20)     // write to RAM if this region is write-enabled
+	if (m_mtxc_config_reg[0x59] & 0x20)     // write to RAM if this region is write-enabled
 	{
 		COMBINE_DATA(m_bios_f0000_ram + offset);
 	}
@@ -338,9 +338,9 @@ WRITE32_MEMBER(savquest_state::bios_f0000_ram_w)
 
 WRITE32_MEMBER(savquest_state::bios_e0000_ram_w)
 {
-	//if (m_mxtc_config_reg[0x5e] & 2)       // write to RAM if this region is write-enabled
+	//if (m_mtxc_config_reg[0x5e] & 2)       // write to RAM if this region is write-enabled
 	#if 1
-	if (m_mxtc_config_reg[0x5e] & 2)        // write to RAM if this region is write-enabled
+	if (m_mtxc_config_reg[0x5e] & 2)        // write to RAM if this region is write-enabled
 	{
 		COMBINE_DATA(m_bios_e0000_ram + offset);
 	}
@@ -349,9 +349,9 @@ WRITE32_MEMBER(savquest_state::bios_e0000_ram_w)
 
 WRITE32_MEMBER(savquest_state::bios_e4000_ram_w)
 {
-	//if (m_mxtc_config_reg[0x5e] & 0x20)       // write to RAM if this region is write-enabled
+	//if (m_mtxc_config_reg[0x5e] & 0x20)       // write to RAM if this region is write-enabled
 	#if 1
-	if (m_mxtc_config_reg[0x5e] & 0x20)     // write to RAM if this region is write-enabled
+	if (m_mtxc_config_reg[0x5e] & 0x20)     // write to RAM if this region is write-enabled
 	{
 		COMBINE_DATA(m_bios_e4000_ram + offset);
 	}
@@ -360,9 +360,9 @@ WRITE32_MEMBER(savquest_state::bios_e4000_ram_w)
 
 WRITE32_MEMBER(savquest_state::bios_e8000_ram_w)
 {
-	//if (m_mxtc_config_reg[0x5f] & 2)       // write to RAM if this region is write-enabled
+	//if (m_mtxc_config_reg[0x5f] & 2)       // write to RAM if this region is write-enabled
 	#if 1
-	if (m_mxtc_config_reg[0x5f] & 2)        // write to RAM if this region is write-enabled
+	if (m_mtxc_config_reg[0x5f] & 2)        // write to RAM if this region is write-enabled
 	{
 		COMBINE_DATA(m_bios_e8000_ram + offset);
 	}
@@ -371,9 +371,9 @@ WRITE32_MEMBER(savquest_state::bios_e8000_ram_w)
 
 WRITE32_MEMBER(savquest_state::bios_ec000_ram_w)
 {
-	//if (m_mxtc_config_reg[0x5f] & 0x20)       // write to RAM if this region is write-enabled
+	//if (m_mtxc_config_reg[0x5f] & 0x20)       // write to RAM if this region is write-enabled
 	#if 1
-	if (m_mxtc_config_reg[0x5f] & 0x20)     // write to RAM if this region is write-enabled
+	if (m_mtxc_config_reg[0x5f] & 0x20)     // write to RAM if this region is write-enabled
 	{
 		COMBINE_DATA(m_bios_ec000_ram + offset);
 	}
@@ -579,7 +579,7 @@ WRITE32_MEMBER(savquest_state::parallel_port_w)
 READ8_MEMBER(savquest_state::smram_r)
 {
 	/* TODO: way more complex than this */
-	if(m_mxtc_config_reg[0x72] & 0x40)
+	if(m_mtxc_config_reg[0x72] & 0x40)
 		return m_smram[offset];
 	else
 		return m_vga->mem_r(space,offset,0xff);
@@ -588,7 +588,7 @@ READ8_MEMBER(savquest_state::smram_r)
 WRITE8_MEMBER(savquest_state::smram_w)
 {
 	/* TODO: way more complex than this */
-	if(m_mxtc_config_reg[0x72] & 0x40)
+	if(m_mtxc_config_reg[0x72] & 0x40)
 		m_smram[offset] = data;
 	else
 		m_vga->mem_w(space,offset,data,0xff);

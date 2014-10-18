@@ -83,7 +83,7 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	UINT32 *m_bios_ram;
-	UINT8 m_mxtc_config_reg[256];
+	UINT8 m_mtxc_config_reg[256];
 	UINT8 m_piix4_config_reg[4][256];
 
 	DECLARE_WRITE32_MEMBER(pnp_config_w);
@@ -162,19 +162,19 @@ UINT32 gamecstl_state::screen_update_gamecstl(screen_device &screen, bitmap_ind1
 	return 0;
 }
 
-// Intel 82439TX System Controller (MXTC)
+// Intel 82439TX System Controller (MTXC)
 
-static UINT8 mxtc_config_r(device_t *busdevice, device_t *device, int function, int reg)
+static UINT8 mtxc_config_r(device_t *busdevice, device_t *device, int function, int reg)
 {
 	gamecstl_state *state = busdevice->machine().driver_data<gamecstl_state>();
-	printf("MXTC: read %d, %02X\n", function, reg);
-	return state->m_mxtc_config_reg[reg];
+	printf("MTXC: read %d, %02X\n", function, reg);
+	return state->m_mtxc_config_reg[reg];
 }
 
-static void mxtc_config_w(device_t *busdevice, device_t *device, int function, int reg, UINT8 data)
+static void mtxc_config_w(device_t *busdevice, device_t *device, int function, int reg, UINT8 data)
 {
 	gamecstl_state *state = busdevice->machine().driver_data<gamecstl_state>();
-	printf("%s:MXTC: write %d, %02X, %02X\n", busdevice->machine().describe_context(), function, reg, data);
+	printf("%s:MTXC: write %d, %02X, %02X\n", busdevice->machine().describe_context(), function, reg, data);
 
 	switch(reg)
 	{
@@ -192,17 +192,17 @@ static void mxtc_config_w(device_t *busdevice, device_t *device, int function, i
 		}
 	}
 
-	state->m_mxtc_config_reg[reg] = data;
+	state->m_mtxc_config_reg[reg] = data;
 }
 
 void gamecstl_state::intel82439tx_init()
 {
-	m_mxtc_config_reg[0x60] = 0x02;
-	m_mxtc_config_reg[0x61] = 0x02;
-	m_mxtc_config_reg[0x62] = 0x02;
-	m_mxtc_config_reg[0x63] = 0x02;
-	m_mxtc_config_reg[0x64] = 0x02;
-	m_mxtc_config_reg[0x65] = 0x02;
+	m_mtxc_config_reg[0x60] = 0x02;
+	m_mtxc_config_reg[0x61] = 0x02;
+	m_mtxc_config_reg[0x62] = 0x02;
+	m_mtxc_config_reg[0x63] = 0x02;
+	m_mtxc_config_reg[0x64] = 0x02;
+	m_mtxc_config_reg[0x65] = 0x02;
 }
 
 static UINT32 intel82439tx_pci_r(device_t *busdevice, device_t *device, int function, int reg, UINT32 mem_mask)
@@ -210,19 +210,19 @@ static UINT32 intel82439tx_pci_r(device_t *busdevice, device_t *device, int func
 	UINT32 r = 0;
 	if (ACCESSING_BITS_24_31)
 	{
-		r |= mxtc_config_r(busdevice, device, function, reg + 3) << 24;
+		r |= mtxc_config_r(busdevice, device, function, reg + 3) << 24;
 	}
 	if (ACCESSING_BITS_16_23)
 	{
-		r |= mxtc_config_r(busdevice, device, function, reg + 2) << 16;
+		r |= mtxc_config_r(busdevice, device, function, reg + 2) << 16;
 	}
 	if (ACCESSING_BITS_8_15)
 	{
-		r |= mxtc_config_r(busdevice, device, function, reg + 1) << 8;
+		r |= mtxc_config_r(busdevice, device, function, reg + 1) << 8;
 	}
 	if (ACCESSING_BITS_0_7)
 	{
-		r |= mxtc_config_r(busdevice, device, function, reg + 0) << 0;
+		r |= mtxc_config_r(busdevice, device, function, reg + 0) << 0;
 	}
 	return r;
 }
@@ -231,19 +231,19 @@ static void intel82439tx_pci_w(device_t *busdevice, device_t *device, int functi
 {
 	if (ACCESSING_BITS_24_31)
 	{
-		mxtc_config_w(busdevice, device, function, reg + 3, (data >> 24) & 0xff);
+		mtxc_config_w(busdevice, device, function, reg + 3, (data >> 24) & 0xff);
 	}
 	if (ACCESSING_BITS_16_23)
 	{
-		mxtc_config_w(busdevice, device, function, reg + 2, (data >> 16) & 0xff);
+		mtxc_config_w(busdevice, device, function, reg + 2, (data >> 16) & 0xff);
 	}
 	if (ACCESSING_BITS_8_15)
 	{
-		mxtc_config_w(busdevice, device, function, reg + 1, (data >> 8) & 0xff);
+		mtxc_config_w(busdevice, device, function, reg + 1, (data >> 8) & 0xff);
 	}
 	if (ACCESSING_BITS_0_7)
 	{
-		mxtc_config_w(busdevice, device, function, reg + 0, (data >> 0) & 0xff);
+		mtxc_config_w(busdevice, device, function, reg + 0, (data >> 0) & 0xff);
 	}
 }
 
@@ -326,7 +326,7 @@ WRITE32_MEMBER(gamecstl_state::pnp_data_w)
 
 WRITE32_MEMBER(gamecstl_state::bios_ram_w)
 {
-	if (m_mxtc_config_reg[0x59] & 0x20)     // write to RAM if this region is write-enabled
+	if (m_mtxc_config_reg[0x59] & 0x20)     // write to RAM if this region is write-enabled
 	{
 		COMBINE_DATA(m_bios_ram + offset);
 	}
