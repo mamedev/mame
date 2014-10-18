@@ -82,7 +82,10 @@ const device_type ATMEL_29C010 = &device_creator<atmel_29c010_device>;
 const device_type AMD_29F010 = &device_creator<amd_29f010_device>;
 const device_type AMD_29F040 = &device_creator<amd_29f040_device>;
 const device_type AMD_29F080 = &device_creator<amd_29f080_device>;
+const device_type AMD_29F400T = &device_creator<amd_29f400t_device>;
+const device_type AMD_29F800T = &device_creator<amd_29f800t_device>;
 const device_type AMD_29LV200T = &device_creator<amd_29lv200t_device>;
+const device_type FUJITSU_29F160T = &device_creator<fujitsu_29f160t_device>;
 const device_type FUJITSU_29F016A = &device_creator<fujitsu_29f016a_device>;
 const device_type FUJITSU_29DL16X = &device_creator<fujitsu_29dl16x_device>;
 const device_type INTEL_E28F400B = &device_creator<intel_e28f400b_device>;
@@ -163,6 +166,7 @@ intelfsh_device::intelfsh_device(const machine_config &mconfig, device_type type
 		m_maker_id(0),
 		m_sector_is_4k(false),
 		m_sector_is_16k(false),
+		m_top_boot_sector(false),
 		m_status(0x80),
 		m_erase_sector(0),
 		m_flash_mode(FM_NORMAL),
@@ -211,6 +215,22 @@ intelfsh_device::intelfsh_device(const machine_config &mconfig, device_type type
 		m_device_id = 0xd5;
 		map = ADDRESS_MAP_NAME( memory_map8_8Mb );
 		break;
+	case FLASH_AMD_29F400T:
+		m_bits = 8;
+		m_size = 0x80000;
+		m_maker_id = MFG_AMD;
+		m_device_id = 0x23;
+		m_top_boot_sector = true;
+		map = ADDRESS_MAP_NAME( memory_map8_4Mb );
+		break;
+	case FLASH_AMD_29F800T:
+		m_bits = 8;
+		m_size = 0x100000;
+		m_maker_id = MFG_AMD;
+		m_device_id = 0xda;
+		m_top_boot_sector = true;
+		map = ADDRESS_MAP_NAME( memory_map8_8Mb );
+		break;
 	case FLASH_AMD_29LV200T:
 		m_bits = 8;
 		m_size = 0x40000;
@@ -255,6 +275,14 @@ intelfsh_device::intelfsh_device(const machine_config &mconfig, device_type type
 		m_maker_id = MFG_INTEL;
 		m_device_id = 0x4471;
 		map = ADDRESS_MAP_NAME( memory_map16_4Mb );
+		break;
+	case FLASH_FUJITSU_29F160T:
+		m_bits = 8;
+		m_size = 0x200000;
+		m_maker_id = MFG_FUJITSU;
+		m_device_id = 0xad;
+		m_top_boot_sector = true;
+		map = ADDRESS_MAP_NAME( memory_map8_16Mb );
 		break;
 	case FLASH_FUJITSU_29F016A:
 		m_bits = 8;
@@ -349,6 +377,9 @@ intelfsh16_device::intelfsh16_device(const machine_config &mconfig, device_type 
 intel_28f016s5_device::intel_28f016s5_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: intelfsh8_device(mconfig, INTEL_28F016S5, "Intel 28F016S5 Flash", tag, owner, clock, FLASH_INTEL_28F016S5, "intel_28f016s5", __FILE__) { }
 
+fujitsu_29f160t_device::fujitsu_29f160t_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: intelfsh8_device(mconfig, FUJITSU_29F160T, "Fujitsu 29F160 Flash", tag, owner, clock, FLASH_FUJITSU_29F160T, "fujitsu_29f160t", __FILE__) { }
+	
 fujitsu_29f016a_device::fujitsu_29f016a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: intelfsh8_device(mconfig, FUJITSU_29F016A, "Fujitsu 29F016A Flash", tag, owner, clock, FLASH_FUJITSU_29F016A, "fujitsu_29f016a", __FILE__) { }
 
@@ -369,6 +400,12 @@ amd_29f040_device::amd_29f040_device(const machine_config &mconfig, const char *
 
 amd_29f080_device::amd_29f080_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: intelfsh8_device(mconfig, AMD_29F080, "AMD 29F080 Flash", tag, owner, clock, FLASH_AMD_29F080, "amd_29f080", __FILE__) { }
+	
+amd_29f400t_device::amd_29f400t_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: intelfsh8_device(mconfig, AMD_29F080, "AMD 29F400 Flash", tag, owner, clock, FLASH_AMD_29F400T, "amd_29f400t", __FILE__) { }
+	
+amd_29f800t_device::amd_29f800t_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: intelfsh8_device(mconfig, AMD_29F080, "AMD 29F800 Flash", tag, owner, clock, FLASH_AMD_29F080, "amd_29f800t", __FILE__) { }
 
 amd_29lv200t_device::amd_29lv200t_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: intelfsh8_device(mconfig, AMD_29LV200T, "AMD 29LV200T Flash", tag, owner, clock, FLASH_AMD_29LV200T, "amd_29lv200t", __FILE__) { }
@@ -877,6 +914,30 @@ void intelfsh_device::write_full(UINT32 address, UINT32 data)
 					m_addrspace[0]->write_byte((base & ~0x3fff) + offs, 0xff);
 				m_erase_sector = address & ((m_bits == 16) ? ~0x1fff : ~0x3fff);
 				m_timer->adjust( attotime::from_msec( 500 ) );
+			}
+			else if(m_top_boot_sector && address >= (m_size - 64*1024))
+			{
+				if (address >= (m_size - (16*1024)))
+				{
+					for (offs_t offs = 0; offs < 16 * 1024; offs++)
+						m_addrspace[0]->write_byte((base & ~0x3fff) + offs, 0xff);
+					m_erase_sector = address & ((m_bits == 16) ? ~0x1fff : ~0x3fff);
+					m_timer->adjust( attotime::from_msec( 500 ) );
+				}
+				else if (address >= (m_size - (32*1024)))
+				{
+					for (offs_t offs = 0; offs < 8 * 1024; offs++)
+						m_addrspace[0]->write_byte((base & ~0x1fff) + offs, 0xff);
+					m_erase_sector = address & ((m_bits == 16) ? ~0xfff : ~0x1fff);
+					m_timer->adjust( attotime::from_msec( 250 ) );
+				}
+				else
+				{
+					for (offs_t offs = 0; offs < 32 * 1024; offs++)
+						m_addrspace[0]->write_byte((base & ~0x7fff) + offs, 0xff);
+					m_erase_sector = address & ((m_bits == 16) ? ~0x3fff : ~0x7fff);
+					m_timer->adjust( attotime::from_msec( 500 ) );
+				}
 			}
 			else
 			{

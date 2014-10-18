@@ -28,9 +28,18 @@
 #define MCFG_AMD_29F080_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, AMD_29F080, 0)
 
+#define MCFG_AMD_29F400T_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, AMD_29F400T, 0)
+
+#define MCFG_AMD_29F800T_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, AMD_29F800T, 0)
+
 #define MCFG_AMD_29LV200T_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, AMD_29LV200T, 0)
 
+#define MCFG_FUJITSU_29F160T_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, FUJITSU_29F160T, 0)
+	
 #define MCFG_FUJITSU_29F016A_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, FUJITSU_29F016A, 0)
 
@@ -94,12 +103,15 @@ public:
 	{
 		// 8-bit variants
 		FLASH_INTEL_28F016S5 = 0x0800,
+		FLASH_FUJITSU_29F160T,
 		FLASH_FUJITSU_29F016A,
 		FLASH_FUJITSU_29DL16X,
 		FLASH_ATMEL_29C010,
 		FLASH_AMD_29F010,
 		FLASH_AMD_29F040,
 		FLASH_AMD_29F080,
+		FLASH_AMD_29F400T,
+		FLASH_AMD_29F800T,
 		FLASH_AMD_29LV200T,
 		FLASH_SHARP_LH28F016S,
 		FLASH_INTEL_E28F008SA,
@@ -149,6 +161,7 @@ protected:
 	UINT8                   m_maker_id;
 	bool                    m_sector_is_4k;
 	bool                    m_sector_is_16k;
+	bool					m_top_boot_sector;
 	UINT8                   m_page_size;
 
 	// internal state
@@ -211,6 +224,12 @@ public:
 	intel_28f016s5_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
+class fujitsu_29f160t_device : public intelfsh8_device
+{
+public:
+	fujitsu_29f160t_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
 class fujitsu_29f016a_device : public intelfsh8_device
 {
 public:
@@ -245,6 +264,18 @@ class amd_29f080_device : public intelfsh8_device
 {
 public:
 	amd_29f080_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
+class amd_29f400t_device : public intelfsh8_device
+{
+public:
+	amd_29f400t_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
+class amd_29f800t_device : public intelfsh8_device
+{
+public:
+	amd_29f800t_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 class amd_29lv200t_device : public intelfsh8_device
@@ -346,7 +377,10 @@ extern const device_type ATMEL_29C010;
 extern const device_type AMD_29F010;
 extern const device_type AMD_29F040;
 extern const device_type AMD_29F080;
+extern const device_type AMD_29F400T;
+extern const device_type AMD_29F800T;
 extern const device_type AMD_29LV200T;
+extern const device_type FUJITSU_29F160T;
 extern const device_type FUJITSU_29F016A;
 extern const device_type FUJITSU_29DL16X;
 extern const device_type INTEL_E28F400B;
