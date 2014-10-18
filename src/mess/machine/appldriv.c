@@ -164,10 +164,10 @@ static void apple525_disk_set_lines(device_t *device,device_t *image, UINT8 new_
 int apple525_get_count(device_t *device)
 {
 	int cnt = 0;
-	if ((device->subdevice("^"FLOPPY_0)!=NULL) && (device->subdevice<legacy_floppy_image_device>("^"FLOPPY_0)->floppy_get_drive_type() == FLOPPY_TYPE_APPLE) && (get_device(device->subdevice(PARENT_FLOPPY_0))!=NULL)) cnt++;
-	if ((device->subdevice("^"FLOPPY_1)!=NULL) && (device->subdevice<legacy_floppy_image_device>("^"FLOPPY_1)->floppy_get_drive_type() == FLOPPY_TYPE_APPLE) && (get_device(device->subdevice(PARENT_FLOPPY_1))!=NULL)) cnt++;
-	if ((device->subdevice("^"FLOPPY_2)!=NULL) && (device->subdevice<legacy_floppy_image_device>("^"FLOPPY_2)->floppy_get_drive_type() == FLOPPY_TYPE_APPLE) && (get_device(device->subdevice(PARENT_FLOPPY_2))!=NULL)) cnt++;
-	if ((device->subdevice("^"FLOPPY_3)!=NULL) && (device->subdevice<legacy_floppy_image_device>("^"FLOPPY_3)->floppy_get_drive_type() == FLOPPY_TYPE_APPLE) && (get_device(device->subdevice(PARENT_FLOPPY_3))!=NULL)) cnt++;
+	if ((device->subdevice("^" FLOPPY_0)!=NULL) && (device->subdevice<legacy_floppy_image_device>("^" FLOPPY_0)->floppy_get_drive_type() == FLOPPY_TYPE_APPLE) && (get_device(device->subdevice(PARENT_FLOPPY_0))!=NULL)) cnt++;
+	if ((device->subdevice("^" FLOPPY_1)!=NULL) && (device->subdevice<legacy_floppy_image_device>("^" FLOPPY_1)->floppy_get_drive_type() == FLOPPY_TYPE_APPLE) && (get_device(device->subdevice(PARENT_FLOPPY_1))!=NULL)) cnt++;
+	if ((device->subdevice("^" FLOPPY_2)!=NULL) && (device->subdevice<legacy_floppy_image_device>("^" FLOPPY_2)->floppy_get_drive_type() == FLOPPY_TYPE_APPLE) && (get_device(device->subdevice(PARENT_FLOPPY_2))!=NULL)) cnt++;
+	if ((device->subdevice("^" FLOPPY_3)!=NULL) && (device->subdevice<legacy_floppy_image_device>("^" FLOPPY_3)->floppy_get_drive_type() == FLOPPY_TYPE_APPLE) && (get_device(device->subdevice(PARENT_FLOPPY_3))!=NULL)) cnt++;
 
 	return cnt;
 }
