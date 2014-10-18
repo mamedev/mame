@@ -404,7 +404,11 @@ WRITE64_MEMBER(model3_state::model3_tile_w)
 
     0xF1180000:         ?
     0xF1180004:         ?
-    0xF1180008:         ?
+	0xF1180008:			?									lostwsga: writes 0x7f010000
+															lemans24, magtruck, von2, lamachin: writes 0xee000000
+															bass, vs2, harley, scud, skichamp, fvipers2, eca: writes 0xef000000
+															srally2, swtrilgy: writes 0x70010000
+															daytona2: writes 0x4f010000
 
     0xF1180010:                                             VBL IRQ acknowledge
 
@@ -838,14 +842,15 @@ cached_texture *model3_state::get_texture(int page, int texx, int texy, int texw
             -------- -------- -------- -xx----- ?
 
     0x06:   x------- -------- -------- -------- Texture contour enable
-            -----x-- -------- -------- -------- Texture enable
+            -xxxxxxx -------- -------- -------- Specularity?
             -------- x------- -------- -------- 1 = disable transparency?
             -------- -xxxxx-- -------- -------- Polygon transparency (0 = fully transparent)
             -------- -------x -------- -------- 1 = disable lighting
             -------- -------- xxxxx--- -------- Polygon luminosity
+			-------- -------- -----x-- -------- Texture enable
             -------- -------- ------xx x------- Texture format
             -------- -------- -------- -------x Alpha enable?
-            -xxxx-xx ------x- -----x-- -xxxxxx- ?
+            -------- ------x- -------- -xxxxxx- ?
 
 
     Vertex entry
@@ -1302,7 +1307,7 @@ void model3_state::draw_model(UINT32 addr)
 	while (!last_polygon)
 	{
 		float texture_coord_scale;
-		UINT16 color;
+		UINT32 color;
 		VECTOR3 normal;
 		VECTOR3 sn;
 		VECTOR p[4];
@@ -1476,7 +1481,7 @@ void model3_state::draw_model(UINT32 addr)
 
 			cached_texture* texture;
 
-			if (header[6] & 0x4000000)
+			if (header[6] & 0x0000400)
 			{
 				int tex_x = ((header[4] & 0x1f) << 1) | ((header[5] >> 7) & 0x1);
 				int tex_y = (header[5] & 0x1f);
@@ -1502,11 +1507,11 @@ void model3_state::draw_model(UINT32 addr)
 
 				tri.texture = texture;
 				tri.transparency = polygon_transparency;
-				tri.color = color >> 8;
+				tri.color = color;
 
 				tri.param   = 0;
 				tri.param   |= (header[4] & 0x40) ? TRI_PARAM_TEXTURE_PAGE : 0;
-				tri.param   |= (header[6] & 0x4000000) ? TRI_PARAM_TEXTURE_ENABLE : 0;
+				tri.param   |= (header[6] & 0x00000400) ? TRI_PARAM_TEXTURE_ENABLE : 0;
 				tri.param   |= (header[2] & 0x2) ? TRI_PARAM_TEXTURE_MIRROR_U : 0;
 				tri.param   |= (header[2] & 0x1) ? TRI_PARAM_TEXTURE_MIRROR_V : 0;
 				tri.param   |= (header[6] & 0x80000000) ? TRI_PARAM_ALPHA_TEST : 0;
@@ -1844,9 +1849,9 @@ void model3_renderer::draw_scanline_solid(INT32 scanline, const extent_t &extent
 	float in = extent.param[1].start;
 	float inz = extent.param[1].dpdx;
 
-	int r = polydata.color & 0xff0000;
-	int g = polydata.color & 0xff00;
-	int b = polydata.color & 0xff;
+	int pr = polydata.color & 0xff0000;
+	int pg = polydata.color & 0xff00;
+	int pb = polydata.color & 0xff;
 
 	int srctrans = polydata.transparency;
 	int desttrans = 32 - polydata.transparency;
@@ -1857,9 +1862,9 @@ void model3_renderer::draw_scanline_solid(INT32 scanline, const extent_t &extent
 		{
 			int ii = (int)(in);
 
-			r = (r * ii) >> 8;
-			g = (g * ii) >> 8;
-			b = (b * ii) >> 8;
+			int r = (pr * ii) >> 8;
+			int g = (pg * ii) >> 8;
+			int b = (pb * ii) >> 8;
 
 			if (srctrans != 0x1f)
 			{
