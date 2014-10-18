@@ -2330,9 +2330,9 @@ UINT32 namcos22_state::screen_update_namcos22(screen_device &screen, bitmap_rgb3
 	draw_text_layer(screen, bitmap, cliprect);
 
 	// apply gamma
-	const UINT8 *rlut = (const UINT8 *)m_gamma_proms->base();
-	const UINT8 *glut = (const UINT8 *)m_gamma_proms->base() + 0x100;
-	const UINT8 *blut = (const UINT8 *)m_gamma_proms->base() + 0x200;
+	const UINT8 *rlut = &m_gamma_proms[0x000];
+	const UINT8 *glut = &m_gamma_proms[0x100];
+	const UINT8 *blut = &m_gamma_proms[0x200];
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		UINT32 *dest = &bitmap.pix32(y);

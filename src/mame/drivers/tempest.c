@@ -310,7 +310,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<mathbox_device> m_mathbox;
 	required_device<avg_tempest_device> m_avg;
-	required_memory_region m_rom;
+	required_region_ptr<UINT8> m_rom;
 
 	required_ioport m_knob_p1;
 	required_ioport m_knob_p2;
@@ -428,8 +428,7 @@ READ8_MEMBER(tempest_state::rom_ae1f_r)
 	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(100));
 	machine().scheduler().abort_timeslice();
 
-	const UINT8 *rom = m_rom->base();
-	return rom[0xae1f];
+	return m_rom[0xae1f];
 }
 
 

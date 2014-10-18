@@ -512,7 +512,7 @@ inline offs_t namcos1_state::direct_handler(int whichcpu, direct_read_data &dire
 	// calculate the base of the 8KB ROM page
 	remapped_address &= 0x3fe000;
 
-	direct.explicit_configure(address & 0xe000, address | 0x1fff, 0x1fff, &m_rom->base()[remapped_address]);
+	direct.explicit_configure(address & 0xe000, address | 0x1fff, 0x1fff, &m_rom[remapped_address]);
 	return ~0;
 }
 
@@ -617,16 +617,14 @@ WRITE8_MEMBER(namcos1_state::namcos1_mcu_patch_w)
 *******************************************************************************/
 void namcos1_state::namcos1_driver_init()
 {
-	UINT8 *rom = m_rom->base();
-
 	// bit 16 of the address is inverted for PRG7 (and bits 17,18 just not connected)
 	for (int i = 0x380000;i < 0x400000;i++)
 	{
 		if ((i & 0x010000) == 0)
 		{
-			UINT8 t = rom[i];
-			rom[i] = rom[i + 0x010000];
-			rom[i + 0x010000] = t;
+			UINT8 t = m_rom[i];
+			m_rom[i] = m_rom[i + 0x010000];
+			m_rom[i + 0x010000] = t;
 		}
 	}
 

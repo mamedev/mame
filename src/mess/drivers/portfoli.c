@@ -465,8 +465,7 @@ WRITE8_MEMBER( portfolio_state::ncc1_w )
 	if (BIT(data, 0))
 	{
 		// system ROM
-		UINT8 *rom = m_rom->base();
-		program.install_rom(0xc0000, 0xdffff, rom);
+		program.install_rom(0xc0000, 0xdffff, m_rom);
 	}
 	else
 	{
@@ -665,7 +664,7 @@ PALETTE_INIT_MEMBER(portfolio_state, portfolio)
 READ8_MEMBER( portfolio_state::hd61830_rd_r )
 {
 	UINT16 address = ((offset & 0xff) << 3) | ((offset >> 12) & 0x07);
-	UINT8 data = m_char_rom->base()[address];
+	UINT8 data = m_char_rom[address];
 
 	return data;
 }

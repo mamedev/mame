@@ -61,7 +61,7 @@ READ8_MEMBER( vic20_state::read )
 		switch ((offset >> 10) & 0x07)
 		{
 		default:
-			data = m_charom->base()[offset & 0xfff];
+			data = m_charom[offset & 0xfff];
 			break;
 
 		case IO0:
@@ -91,11 +91,11 @@ READ8_MEMBER( vic20_state::read )
 	case BLK5: blk5 = 0; break;
 
 	case BLK6:
-		data = m_basic->base()[offset & 0x1fff];
+		data = m_basic[offset & 0x1fff];
 		break;
 
 	case BLK7:
-		data = m_kernal->base()[offset & 0x1fff];
+		data = m_kernal[offset & 0x1fff];
 		break;
 	}
 
@@ -201,7 +201,7 @@ READ8_MEMBER( vic20_state::vic_videoram_r )
 	}
 	else
 	{
-		data = m_charom->base()[offset & 0xfff];
+		data = m_charom[offset & 0xfff];
 	}
 
 	return m_exp->cd_r(space, offset & 0x1fff, data, ram1, ram2, ram3, blk1, blk2, blk3, blk5, io2, io3);

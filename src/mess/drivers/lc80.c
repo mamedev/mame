@@ -272,20 +272,22 @@ void lc80_state::machine_start()
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 
+	UINT8 *ROM = memregion(Z80_TAG)->base();
+
 	/* setup memory banking */
-	membank("bank1")->configure_entry(0, m_rom->base()); // TODO
-	membank("bank1")->configure_entry(1, m_rom->base());
+	membank("bank1")->configure_entry(0, &ROM[0]); // TODO
+	membank("bank1")->configure_entry(1, &ROM[0]);
 	membank("bank1")->set_entry(1);
 
-	membank("bank2")->configure_entry(0, m_rom->base() + 0x800); // TODO
-	membank("bank2")->configure_entry(1, m_rom->base() + 0x800);
+	membank("bank2")->configure_entry(0, &ROM[0x800]); // TODO
+	membank("bank2")->configure_entry(1, &ROM[0x800]);
 	membank("bank2")->set_entry(1);
 
-	membank("bank3")->configure_entry(0, m_rom->base() + 0x1000); // TODO
-	membank("bank3")->configure_entry(1, m_rom->base() + 0x1000);
+	membank("bank3")->configure_entry(0, &ROM[0x1000]); // TODO
+	membank("bank3")->configure_entry(1, &ROM[0x1000]);
 	membank("bank3")->set_entry(1);
 
-	membank("bank4")->configure_entry(0, m_rom->base() + 0x2000);
+	membank("bank4")->configure_entry(0, &ROM[0x2000]);
 	membank("bank4")->set_entry(0);
 
 	program.install_readwrite_bank(0x0000, 0x07ff, "bank1");

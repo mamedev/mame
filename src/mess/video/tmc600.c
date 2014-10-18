@@ -78,7 +78,7 @@ CDP1869_CHAR_RAM_READ_MEMBER( tmc600_state::tmc600_char_ram_r )
 	UINT16 pageaddr = pma & TMC600_PAGE_RAM_MASK;
 	UINT8 color = get_color(pageaddr);
 	UINT16 charaddr = ((cma & 0x08) << 8) | (pmd << 3) | (cma & 0x07);
-	UINT8 cdb = m_char_rom->base()[charaddr] & 0x3f;
+	UINT8 cdb = m_char_rom[charaddr] & 0x3f;
 
 	int ccb0 = BIT(color, 2);
 	int ccb1 = BIT(color, 1);

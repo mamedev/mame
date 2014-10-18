@@ -30,7 +30,6 @@ public:
 			m_cassette(*this, "cassette"),
 			m_speaker(*this, "speaker"),
 			m_ram(*this, RAM_TAG),
-			m_rom(*this, Z80_TAG),
 			m_y0(*this, "Y0"),
 			m_y1(*this, "Y1"),
 			m_y2(*this, "Y2"),
@@ -42,7 +41,6 @@ public:
 	required_device<cassette_image_device> m_cassette;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<ram_device> m_ram;
-	required_memory_region m_rom;
 	required_ioport m_y0;
 	required_ioport m_y1;
 	required_ioport m_y2;

@@ -264,7 +264,7 @@ inline UINT32 turbo_state::sprite_xscale(UINT8 dacinput, double vr1, double vr2,
 
 void turbo_state::turbo_prepare_sprites(UINT8 y, sprite_info *info)
 {
-	const UINT8 *pr1119 = memregion("proms")->base() + 0x200;
+	const UINT8 *pr1119 = &m_proms[0x200];
 	int sprnum;
 
 	/* initialize the line enable signals to 0 */
@@ -328,7 +328,7 @@ void turbo_state::turbo_prepare_sprites(UINT8 y, sprite_info *info)
 }
 
 
-UINT32 turbo_state::turbo_get_sprite_bits(const UINT8 *sprite_gfxdata, UINT8 road, sprite_info *sprinfo)
+UINT32 turbo_state::turbo_get_sprite_bits(UINT8 road, sprite_info *sprinfo)
 {
 	UINT8 sprlive = sprinfo->lst;
 	UINT32 sprdata = 0;
@@ -355,7 +355,7 @@ UINT32 turbo_state::turbo_get_sprite_bits(const UINT8 *sprite_gfxdata, UINT8 roa
 				/* bit 0 controls which half of the byte to use */
 				/* bits 1-13 go to address lines */
 				/* bit 14 selects which of the two ROMs to read from */
-				pixdata = sprite_gfxdata[(level << 14) | ((offs >> 1) & 0x3fff)] >> ((~offs & 1) * 4);
+				pixdata = m_spriteroms[(level << 14) | ((offs >> 1) & 0x3fff)] >> ((~offs & 1) * 4);
 				sprinfo->latched[level] = sprite_expand[pixdata & 0x0f] << level;
 
 				/* if bit 3 is 0 and bit 2 is 1, the enable flip/flip is reset */
@@ -385,16 +385,14 @@ UINT32 turbo_state::turbo_get_sprite_bits(const UINT8 *sprite_gfxdata, UINT8 roa
 UINT32 turbo_state::screen_update_turbo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap_ind16 &fgpixmap = m_fg_tilemap->pixmap();
-	const UINT8 *road_gfxdata = memregion("gfx3")->base();
-	const UINT8 *prom_base = memregion("proms")->base();
-	const UINT8 *pr1114 = prom_base + 0x000;
-	const UINT8 *pr1115 = prom_base + 0x020;
-	const UINT8 *pr1116 = prom_base + 0x040;
-	const UINT8 *pr1117 = prom_base + 0x060;
-	const UINT8 *pr1118 = prom_base + 0x100;
-	const UINT8 *pr1121 = prom_base + 0x600;
-	const UINT8 *pr1122 = prom_base + 0x800;
-	const UINT8 *pr1123 = prom_base + 0xc00;
+	const UINT8 *pr1114 = &m_proms[0x000];
+	const UINT8 *pr1115 = &m_proms[0x020];
+	const UINT8 *pr1116 = &m_proms[0x040];
+	const UINT8 *pr1117 = &m_proms[0x060];
+	const UINT8 *pr1118 = &m_proms[0x100];
+	const UINT8 *pr1121 = &m_proms[0x600];
+	const UINT8 *pr1122 = &m_proms[0x800];
+	const UINT8 *pr1123 = &m_proms[0xc00];
 	int x, y;
 
 	/* loop over rows */
@@ -451,11 +449,11 @@ UINT32 turbo_state::screen_update_turbo(screen_device &screen, bitmap_ind16 &bit
 			offs = va |                         /*  A0- A7 = VA0-VA7 */
 					((sel & 0x0f) << 8);            /*  A8-A11 = SEL0-3 */
 
-			areatmp = road_gfxdata[0x0000 | offs];
+			areatmp = m_roadroms[0x0000 | offs];
 			areatmp = ((areatmp + xx) >> 8) & 0x01;
 			area = areatmp << 0;
 
-			areatmp = road_gfxdata[0x1000 | offs];
+			areatmp = m_roadroms[0x1000 | offs];
 			areatmp = ((areatmp + xx) >> 8) & 0x01;
 			area |= areatmp << 1;
 
@@ -463,11 +461,11 @@ UINT32 turbo_state::screen_update_turbo(screen_device &screen, bitmap_ind16 &bit
 			offs = va |                         /*  A0- A7 = VA0-VA7 */
 					((sel & 0xf0) << 4);            /*  A8-A11 = SEL4-7 */
 
-			areatmp = road_gfxdata[0x2000 | offs];
+			areatmp = m_roadroms[0x2000 | offs];
 			areatmp = ((areatmp + xx) >> 8) & 0x01;
 			area |= areatmp << 2;
 
-			areatmp = road_gfxdata[0x3000 | offs];
+			areatmp = m_roadroms[0x3000 | offs];
 			areatmp = ((areatmp + xx) >> 8) & 0x01;
 			area |= areatmp << 3;
 
@@ -475,7 +473,7 @@ UINT32 turbo_state::screen_update_turbo(screen_device &screen, bitmap_ind16 &bit
 			offs = (xx >> 3) |                          /*  A0- A4 = H3-H7 */
 					((m_turbo_opc & 0x3f) << 5);    /*  A5-A10 = OPC0-5 */
 
-			areatmp = road_gfxdata[0x4000 | offs];
+			areatmp = m_roadroms[0x4000 | offs];
 			areatmp = (areatmp << (xx & 7)) & 0x80;
 			area |= areatmp >> 3;
 
@@ -510,7 +508,7 @@ UINT32 turbo_state::screen_update_turbo(screen_device &screen, bitmap_ind16 &bit
 				/*    CDG0-7 = D8 -D15 */
 				/*    CDR0-7 = D16-D23 */
 				/*    PLB0-7 = D24-D31 */
-				sprbits = turbo_get_sprite_bits(m_gfx1->base(), road, &sprinfo);
+				sprbits = turbo_get_sprite_bits(road, &sprinfo);
 
 				/* perform collision detection here via lookup in IC20/PR1116 (p. 144) */
 				m_turbo_collision |= pr1116[((sprbits >> 24) & 7) | (slipar_acciar >> 1)];
@@ -621,7 +619,7 @@ UINT32 turbo_state::screen_update_turbo(screen_device &screen, bitmap_ind16 &bit
 
 void turbo_state::subroc3d_prepare_sprites(UINT8 y, sprite_info *info)
 {
-	const UINT8 *pr1449 = memregion("proms")->base() + 0x300;
+	const UINT8 *pr1449 = &m_proms[0x300];
 	int sprnum;
 
 	/* initialize the line enable signals to 0 */
@@ -679,7 +677,7 @@ void turbo_state::subroc3d_prepare_sprites(UINT8 y, sprite_info *info)
 }
 
 
-UINT32 turbo_state::subroc3d_get_sprite_bits(const UINT8 *sprite_gfxdata, sprite_info *sprinfo, UINT8 *plb)
+UINT32 turbo_state::subroc3d_get_sprite_bits(sprite_info *sprinfo, UINT8 *plb)
 {
 	/* see logic on each sprite:
 	    END = (CDA == 1 && (CDA ^ CDB) == 0 && (CDC ^ CDD) == 0)
@@ -710,7 +708,7 @@ UINT32 turbo_state::subroc3d_get_sprite_bits(const UINT8 *sprite_gfxdata, sprite
 				/* bit 0 controls which half of the byte to use */
 				/* bits 1-13 go to address lines */
 				/* bit 14 selects which of the two ROMs to read from */
-				pixdata = sprite_gfxdata[(level << 15) | ((offs >> 1) & 0x7fff)] >> ((~offs & 1) * 4);
+				pixdata = m_spriteroms[(level << 15) | ((offs >> 1) & 0x7fff)] >> ((~offs & 1) * 4);
 				sprinfo->latched[level] = sprite_expand[pixdata & 0x0f] << level;
 				sprinfo->plb[level] = (plb_end[pixdata & 0x0f] & 1) << level;
 
@@ -738,11 +736,10 @@ UINT32 turbo_state::subroc3d_get_sprite_bits(const UINT8 *sprite_gfxdata, sprite
 UINT32 turbo_state::screen_update_subroc3d(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap_ind16 &fgpixmap = m_fg_tilemap->pixmap();
-	const UINT8 *prom_base = memregion("proms")->base();
-	const UINT8 *pr1419 = prom_base + 0x000;
-	const UINT8 *pr1620 = prom_base + 0x200;
-	const UINT8 *pr1450 = prom_base + 0x500;
-	const UINT8 *pr1454 = prom_base + 0x920;
+	const UINT8 *pr1419 = &m_proms[0x000];
+	const UINT8 *pr1620 = &m_proms[0x200];
+	const UINT8 *pr1450 = &m_proms[0x500];
+	const UINT8 *pr1454 = &m_proms[0x920];
 	int x, y;
 
 	/* loop over rows */
@@ -794,7 +791,7 @@ UINT32 turbo_state::screen_update_subroc3d(screen_device &screen, bitmap_ind16 &
 				/*    CDB0-7 = D8 -D15 */
 				/*    CDC0-7 = D16-D23 */
 				/*    CDD0-7 = D24-D31 */
-				sprbits = subroc3d_get_sprite_bits(m_gfx1->base(), &sprinfo, &plb);
+				sprbits = subroc3d_get_sprite_bits(&sprinfo, &plb);
 
 				/* MUX0-3 is selected by PLY0-3 and the sprite enable bits, and is the output */
 				/* of IC21/PR1450 (p. 141), unless MPLB = 0, in which case the values are grounded (p. 141) */
@@ -838,7 +835,7 @@ UINT32 turbo_state::screen_update_subroc3d(screen_device &screen, bitmap_ind16 &
 
 void turbo_state::buckrog_prepare_sprites(UINT8 y, sprite_info *info)
 {
-	const UINT8 *pr5196 = memregion("proms")->base() + 0x100;
+	const UINT8 *pr5196 = &m_proms[0x100];
 	int sprnum;
 
 	/* initialize the line enable signals to 0 */
@@ -897,7 +894,7 @@ void turbo_state::buckrog_prepare_sprites(UINT8 y, sprite_info *info)
 }
 
 
-UINT32 turbo_state::buckrog_get_sprite_bits(const UINT8 *sprite_gfxdata, sprite_info *sprinfo, UINT8 *plb)
+UINT32 turbo_state::buckrog_get_sprite_bits(sprite_info *sprinfo, UINT8 *plb)
 {
 	/* see logic on each sprite:
 	    END = (CDA == 1 && (CDA ^ CDB) == 0 && (CDC ^ CDD) == 0)
@@ -928,7 +925,7 @@ UINT32 turbo_state::buckrog_get_sprite_bits(const UINT8 *sprite_gfxdata, sprite_
 				/* bit 0 controls which half of the byte to use */
 				/* bits 1-13 go to address lines */
 				/* bit 14 selects which of the two ROMs to read from */
-				pixdata = sprite_gfxdata[(level << 15) | ((offs >> 1) & 0x7fff)] >> ((~offs & 1) * 4);
+				pixdata = m_spriteroms[(level << 15) | ((offs >> 1) & 0x7fff)] >> ((~offs & 1) * 4);
 				sprinfo->latched[level] = sprite_expand[pixdata & 0x0f] << level;
 				sprinfo->plb[level] = (plb_end[pixdata & 0x0f] & 1) << level;
 
@@ -956,11 +953,9 @@ UINT32 turbo_state::buckrog_get_sprite_bits(const UINT8 *sprite_gfxdata, sprite_
 UINT32 turbo_state::screen_update_buckrog(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap_ind16 &fgpixmap = m_fg_tilemap->pixmap();
-	const UINT8 *bgcolor = memregion("gfx3")->base();
-	const UINT8 *prom_base = memregion("proms")->base();
-	const UINT8 *pr5194 = prom_base + 0x000;
-	const UINT8 *pr5198 = prom_base + 0x500;
-	const UINT8 *pr5199 = prom_base + 0x700;
+	const UINT8 *pr5194 = &m_proms[0x000];
+	const UINT8 *pr5198 = &m_proms[0x500];
+	const UINT8 *pr5199 = &m_proms[0x700];
 	int x, y;
 
 	/* loop over rows */
@@ -1009,7 +1004,7 @@ UINT32 turbo_state::screen_update_buckrog(screen_device &screen, bitmap_ind16 &b
 				/*    CDB0-7 = D8 -D15 */
 				/*    CDC0-7 = D16-D23 */
 				/*    CDD0-7 = D24-D31 */
-				sprbits = buckrog_get_sprite_bits(m_gfx1->base(), &sprinfo, &plb);
+				sprbits = buckrog_get_sprite_bits(&sprinfo, &plb);
 
 				/* the PLB bits go into an LS148 8-to-1 decoder and become MUX0-3 (PROM board SH 2/10) */
 				if (plb == 0)
@@ -1064,7 +1059,7 @@ UINT32 turbo_state::screen_update_buckrog(screen_device &screen, bitmap_ind16 &b
 				/* otherwise, CHNG = 3 */
 				else
 				{
-					palbits = bgcolor[y | ((m_buckrog_mov & 0x1f) << 8)];
+					palbits = m_bgcolorrom[y | ((m_buckrog_mov & 0x1f) << 8)];
 					palbits = (palbits & 0xc0) | ((palbits & 0x30) << 4) | ((palbits & 0x0f) << 2);
 				}
 

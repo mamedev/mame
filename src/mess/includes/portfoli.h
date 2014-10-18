@@ -59,8 +59,8 @@ public:
 	required_device<ins8250_device> m_uart;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<timer_device> m_timer_tick;
-	required_memory_region m_rom;
-	required_memory_region m_char_rom;
+	required_region_ptr<UINT8> m_rom;
+	required_region_ptr<UINT8> m_char_rom;
 	required_ioport m_y0;
 	required_ioport m_y1;
 	required_ioport m_y2;

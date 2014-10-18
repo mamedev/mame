@@ -486,7 +486,7 @@ private:
 	UINT32 m_control;
 	UINT16 m_n_security_control;
 
-	required_memory_region m_h8_response;
+	required_region_ptr<UINT8> m_h8_response;
 	int m_h8_index;
 	int m_h8_clk;
 
@@ -793,7 +793,7 @@ WRITE_LINE_MEMBER( ksys573_state::h8_clk_w )
 	{
 		if( state )
 		{
-			if( m_h8_index < m_h8_response->bytes() - 1 )
+			if( m_h8_index < m_h8_response.length() - 1 )
 			{
 				m_h8_index++;
 			}
@@ -805,22 +805,22 @@ WRITE_LINE_MEMBER( ksys573_state::h8_clk_w )
 
 READ_LINE_MEMBER( ksys573_state::h8_d0_r )
 {
-	return ( m_h8_response->base()[ m_h8_index ] >> 0 ) & 1;
+	return ( m_h8_response[ m_h8_index ] >> 0 ) & 1;
 }
 
 READ_LINE_MEMBER( ksys573_state::h8_d1_r )
 {
-	return ( m_h8_response->base()[ m_h8_index ] >> 1 ) & 1;
+	return ( m_h8_response[ m_h8_index ] >> 1 ) & 1;
 }
 
 READ_LINE_MEMBER( ksys573_state::h8_d2_r )
 {
-	return ( m_h8_response->base()[ m_h8_index ] >> 2 ) & 1;
+	return ( m_h8_response[ m_h8_index ] >> 2 ) & 1;
 }
 
 READ_LINE_MEMBER( ksys573_state::h8_d3_r )
 {
-	return ( m_h8_response->base()[ m_h8_index ] >> 3 ) & 1;
+	return ( m_h8_response[ m_h8_index ] >> 3 ) & 1;
 }
 
 

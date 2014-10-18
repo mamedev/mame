@@ -218,7 +218,7 @@ public:
 	required_shared_ptr<UINT32> m_textram;
 	required_shared_ptr<UINT32> m_polygonram;
 	required_shared_ptr<UINT32> m_mixer;
-	optional_memory_region m_gamma_proms;
+	optional_region_ptr<UINT8> m_gamma_proms;
 	optional_shared_ptr<UINT32> m_vics_data;
 	optional_shared_ptr<UINT32> m_vics_control;
 	optional_shared_ptr<UINT32> m_czattr;

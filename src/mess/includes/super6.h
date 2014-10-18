@@ -56,7 +56,7 @@ public:
 	required_device<ram_device> m_ram;
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
-	required_memory_region m_rom;
+	required_region_ptr<UINT8> m_rom;
 	required_ioport m_j7;
 
 	virtual void machine_start();

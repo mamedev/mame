@@ -41,14 +41,7 @@ public:
 			m_sync_rom(*this, "video"),
 			m_char_rom(*this, "chargen"),
 			m_video_ram(*this, "video_ram"),
-			m_y0(*this, "Y0"),
-			m_y1(*this, "Y1"),
-			m_y2(*this, "Y2"),
-			m_y3(*this, "Y3"),
-			m_y4(*this, "Y4"),
-			m_y5(*this, "Y5"),
-			m_y6(*this, "Y6"),
-			m_y7(*this, "Y7"),
+			m_key(*this, "KEY"),
 			m_cmd_d1(0),
 			m_fdint(0),
 			m_vsync(0),
@@ -69,18 +62,11 @@ public:
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
 	required_device<rs232_port_device> m_rs232;
-	required_memory_region m_rom;
-	required_memory_region m_sync_rom;
-	required_memory_region m_char_rom;
+	required_region_ptr<UINT8> m_rom;
+	required_region_ptr<UINT8> m_sync_rom;
+	required_region_ptr<UINT8> m_char_rom;
 	required_shared_ptr<UINT8> m_video_ram;
-	required_ioport m_y0;
-	required_ioport m_y1;
-	required_ioport m_y2;
-	required_ioport m_y3;
-	required_ioport m_y4;
-	required_ioport m_y5;
-	required_ioport m_y6;
-	required_ioport m_y7;
+	required_ioport_array<8> m_key;
 
 	virtual void machine_start();
 	virtual void machine_reset();

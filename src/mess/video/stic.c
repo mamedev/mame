@@ -20,7 +20,7 @@ const device_type STIC = &device_creator<stic_device>;
 
 stic_device::stic_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 				device_t(mconfig, STIC, "STIC (Standard Television Interface Chip) Video Chip", tag, owner, clock, "stic", __FILE__),
-				m_grom_region(*this, "grom"),
+				m_grom(*this, "grom"),
 				m_x_scale(1),
 				m_y_scale(1)
 {
@@ -247,8 +247,6 @@ void stic_device::render_sprites()
 	INT32 nextY;
 	INT32 xInc;
 
-	UINT8* memory = m_grom_region->base();
-
 	for (int i = 0; i < STIC_MOBS; i++)
 	{
 		intv_sprite_type* s = &m_sprite[i];
@@ -265,7 +263,7 @@ void stic_device::render_sprites()
 		{
 			nextMemoryLocation = (cardMemoryLocation + (j/pixelSize));
 			if (s->grom)
-				nextData = memory[nextMemoryLocation];
+				nextData = m_grom[nextMemoryLocation];
 			else if (nextMemoryLocation < 0x200)
 				nextData = m_gram[nextMemoryLocation];
 			else
@@ -307,7 +305,6 @@ void stic_device::render_color_stack_mode(bitmap_ind16 &bitmap)
 	INT16 w, h, nextx, nexty;
 	UINT8 csPtr = 0;
 	UINT16 nextCard;
-	UINT8 *ram = m_grom_region->base();
 
 	for (h = 0, nexty = (STIC_OVERSCAN_TOP_HEIGHT + m_row_delay) * STIC_Y_SCALE;
 			h < STIC_BACKTAB_HEIGHT;
@@ -353,7 +350,7 @@ void stic_device::render_color_stack_mode(bitmap_ind16 &bitmap)
 				if (isGrom)
 				{
 					memoryLocation = nextCard & STIC_CSTM_C;
-					memory = ram;
+					memory = m_grom;
 					for (int j = 0; j < STIC_CARD_HEIGHT; j++)
 						render_line(bitmap, memory[memoryLocation + j],
 									nextx, nexty + j * STIC_Y_SCALE, fgcolor, bgcolor);
@@ -377,7 +374,6 @@ void stic_device::render_fg_bg_mode(bitmap_ind16 &bitmap)
 	UINT8 isGrom, fgcolor, bgcolor;
 	UINT16 nextCard, memoryLocation;
 	UINT8* memory;
-	UINT8* ram = m_grom_region->base();
 
 	for (h = 0, nexty = (STIC_OVERSCAN_TOP_HEIGHT + m_row_delay) * STIC_Y_SCALE;
 			h < STIC_BACKTAB_HEIGHT;
@@ -396,7 +392,7 @@ void stic_device::render_fg_bg_mode(bitmap_ind16 &bitmap)
 			if (isGrom)
 			{
 				memoryLocation = nextCard & STIC_FBM_C;
-				memory = ram;
+				memory = m_grom;
 				for (int j = 0; j < STIC_CARD_HEIGHT; j++)
 					render_line(bitmap, memory[memoryLocation + j],
 								nextx, nexty + j * STIC_Y_SCALE, fgcolor, bgcolor);

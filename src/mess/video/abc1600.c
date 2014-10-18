@@ -100,16 +100,16 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 ROM_START( abc1600_mover )
-	ROM_REGION( 0x2000, "wrmsk", 0 )
-	ROM_LOAD( "wrmskl 6490362-01.1g", 0x0000, 0x1000, CRC(bc737538) SHA1(80e2c3757eb7f713018808d6e41ebef612425028) )
-	ROM_LOAD( "wrmskh 6490363-01.1j", 0x1000, 0x1000, CRC(6b7c9f0b) SHA1(7155a993adcf08a5a8a2f22becf9fd66fda698be) )
+	ROM_REGION16_BE( 0x2000, "wrmsk", 0 )
+	ROM_LOAD16_BYTE( "wrmskl 6490362-01.1g", 0x0001, 0x1000, CRC(bc737538) SHA1(80e2c3757eb7f713018808d6e41ebef612425028) )
+	ROM_LOAD16_BYTE( "wrmskh 6490363-01.1j", 0x0000, 0x1000, CRC(6b7c9f0b) SHA1(7155a993adcf08a5a8a2f22becf9fd66fda698be) )
 
 	ROM_REGION( 0x200, "shinf", 0 )
 	ROM_LOAD( "shinf 6490361-01.1f", 0x000, 0x200, CRC(20260f8f) SHA1(29bf49c64e7cc7592e88cde2768ac57c7ce5e085) )
 
-	ROM_REGION( 0x40, "drmsk", 0 )
-	ROM_LOAD( "drmskl 6490359-01.1k", 0x00, 0x20, CRC(6e71087c) SHA1(0acf67700d6227f4b315cf8fb0fb31c0e7fb9496) )
-	ROM_LOAD( "drmskh 6490358-01.1l", 0x20, 0x20, CRC(a4a9a9dc) SHA1(d8575c0335d6021cbb5f7bcd298b41c35294a80a) )
+	ROM_REGION16_BE( 0x40, "drmsk", 0 )
+	ROM_LOAD16_BYTE( "drmskl 6490359-01.1k", 0x01, 0x20, CRC(6e71087c) SHA1(0acf67700d6227f4b315cf8fb0fb31c0e7fb9496) )
+	ROM_LOAD16_BYTE( "drmskh 6490358-01.1l", 0x00, 0x20, CRC(a4a9a9dc) SHA1(d8575c0335d6021cbb5f7bcd298b41c35294a80a) )
 
 	ROM_REGION( 0x104, "plds", 0 )
 	ROM_LOAD( "drmsk 6490360-01.1m", 0x000, 0x104, CRC(5f7143c1) SHA1(1129917845f8e505998b15288f02bf907487e4ac) ) // mover word mixer @ 1m,1n,1t,2t
@@ -1091,7 +1091,7 @@ inline void abc1600_mover_device::get_shinf()
 	*/
 
 	UINT16 shinf_addr = (m_udx << 8) | ((m_xto & 0x0f) << 4) | (m_xfrom & 0x0f);
-	UINT8 shinf = m_shinf_rom->base()[shinf_addr];
+	UINT8 shinf = m_shinf_rom[shinf_addr];
 
 	m_sh = shinf & 0x0f;
 	m_hold_1w_cyk = BIT(shinf, 5);
@@ -1117,11 +1117,7 @@ inline UINT16 abc1600_mover_device::get_drmsk()
 	*/
 
 	UINT16 drmsk_addr = (m_udx << 4) | (m_sh & 0x0f);
-	UINT8 drmskl = m_drmsk_rom->base()[drmsk_addr];
-	UINT8 drmskh = m_drmsk_rom->base()[drmsk_addr + 0x20];
-	UINT16 drmsk = (drmskh << 8) | drmskl;
-
-	return drmsk;
+	return m_drmsk_rom[drmsk_addr];
 }
 
 
@@ -1151,11 +1147,7 @@ inline UINT16 abc1600_mover_device::get_wrmsk()
 	*/
 
 	UINT16 wrmsk_addr = (m_wrms1 << 11) | (m_wrms0 << 10) | ((!m_wrms1 && !m_wrms0) << 9) | (m_udx << 8) | ((m_xsize & 0x0f) << 4) | (m_xto & 0x0f);
-	UINT8 wrmskl = m_wrmsk_rom->base()[wrmsk_addr];
-	UINT8 wrmskh = m_wrmsk_rom->base()[wrmsk_addr + 0x1000];
-	UINT16 wrmsk = (wrmskh << 8) | wrmskl;
-
-	return wrmsk ^ 0xffff;
+	return m_wrmsk_rom[wrmsk_addr] ^ 0xffff;
 }
 
 

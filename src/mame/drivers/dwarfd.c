@@ -323,7 +323,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
 	required_device<i8275_device> m_crtc;
-	required_memory_region m_charmap;
+	required_region_ptr<UINT16> m_charmap;
 	required_ioport m_dsw2;
 
 	DECLARE_READ8_MEMBER(dwarfd_ram_r);
@@ -574,7 +574,7 @@ I8275_DRAW_CHARACTER_MEMBER(dwarfd_state::display_pixels)
 	int i;
 	int bank = ((gpa & 2) ? 0 : 4) + (gpa & 1) + ((m_dsw2->read() & 4) >> 1);
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	UINT16 pixels = m_charmap->u16((linecount & 7) + ((charcode + (bank * 128)) << 3));
+	UINT16 pixels = m_charmap[(linecount & 7) + ((charcode + (bank * 128)) << 3)];
 	if(!x)
 		m_back_color = false;
 
@@ -598,7 +598,7 @@ I8275_DRAW_CHARACTER_MEMBER(dwarfd_state::qc_display_pixels)
 	int i;
 	int bank = gpa;
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	UINT16 pixels = m_charmap->u16((linecount & 7) + ((charcode + (bank * 128)) << 3));
+	UINT16 pixels = m_charmap[(linecount & 7) + ((charcode + (bank * 128)) << 3)];
 	if(!x)
 		m_back_color = false;
 
@@ -637,8 +637,8 @@ static const gfx_layout tiles8x8_layout =
 	4,8,
 	RGN_FRAC(1,1),
 	4,
-	{ 0,1,2,3},
-	{8,0,24,16 },
+	{ 0,1,2,3 },
+	{ 0, 8, 16, 24 },
 	//{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16 },
 	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
 	8*32
@@ -650,11 +650,11 @@ static const gfx_layout tiles8x8_layout =
 	8,8,
 	RGN_FRAC(1,1),
 	4,
-	{ 0,1,2,3},
-	{8,12,0,4,24,28,16,20 },
+	{ 0,1,2,3 },
+	{ STEP8(0, 4) },
 //  {12,8,4,0,28,24,20,16 },
 	//{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
+	{ STEP8(0, 32) },
 	8*32
 };
 
@@ -665,9 +665,9 @@ static const gfx_layout tiles8x8_layout0 =
 	RGN_FRAC(1,1),
 	1,
 	{ 0 },
-	{8,0,24,16 },
+	{ 0, 8, 16, 24 },
 	//{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
+	{ STEP8(0, 32) },
 	8*32
 };
 
@@ -677,9 +677,9 @@ static const gfx_layout tiles8x8_layout1 =
 	RGN_FRAC(1,1),
 	1,
 	{ 1 },
-	{8,0,24,16 },
+	{ 0, 8, 16, 24 },
 	//{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
+	{ STEP8(0, 32) },
 	8*32
 };
 
@@ -689,9 +689,9 @@ static const gfx_layout tiles8x8_layout2 =
 	RGN_FRAC(1,1),
 	1,
 	{ 2 },
-	{8,0,24,16 },
+	{ 0, 8, 16, 24 },
 	//{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
+	{ STEP8(0, 32) },
 	8*32
 };
 
@@ -701,9 +701,9 @@ static const gfx_layout tiles8x8_layout3 =
 	RGN_FRAC(1,1),
 	1,
 	{ 3 },
-	{8,0,24,16 },
+	{ 0, 8, 16, 24 },
 	//{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
+	{ STEP8(0, 32) },
 	8*32
 };
 /*
@@ -834,7 +834,7 @@ ROM_START( dwarfd )
 	ROM_LOAD( "9j_pd_50-3192_mbm2732.bin",  0x2000, 0x1000, CRC(9c66ee6e) SHA1(49c20fa276508b3c7b0134909295ae04ee46890f) )
 	ROM_LOAD( "9h_pd_50-3375_2732.bin",     0x3000, 0x1000, CRC(daf5551d) SHA1(933e3453c9e74ca6695137c9f6b1abc1569ad019) )
 
-	ROM_REGION( 0x4000, "gfx1", 0 )
+	ROM_REGION16_LE( 0x4000, "gfx1", 0 )
 	ROM_LOAD16_BYTE( "6a_pd_50_1991_2732.bin"      ,0x0000, 0x1000, CRC(6da494bc) SHA1(0323eaa5f81e3b8561225ccdd4654c9a11f2167c) )
 	ROM_LOAD16_BYTE( "6b_pd_50-1992_tms2732ajl.bin",0x2000, 0x1000, CRC(69208e1a) SHA1(8706f8f0d2dfeba5cebc71985ea46a67de13bc7d) )
 	ROM_LOAD16_BYTE( "6c_pd_50-1993_tms2732ajl.bin",0x0001, 0x1000, CRC(cd8e5e54) SHA1(0961739d72d80e0ac00e6cbf9643bcebfe74830d) )
@@ -857,7 +857,7 @@ ROM_START( dwarfda )
 	ROM_LOAD( "9j_pd_50-3192_mbm2732.bin",  0x2000, 0x1000, CRC(9c66ee6e) SHA1(49c20fa276508b3c7b0134909295ae04ee46890f) )
 	ROM_LOAD( "9h_pd_50-3375_2732.bin",     0x3000, 0x1000, CRC(daf5551d) SHA1(933e3453c9e74ca6695137c9f6b1abc1569ad019) )
 
-	ROM_REGION( 0x4000, "gfx1", 0 )
+	ROM_REGION16_LE( 0x4000, "gfx1", 0 )
 	ROM_LOAD16_BYTE( "6a_pd_50_1991_2732.bin"      ,0x0000, 0x1000, CRC(6da494bc) SHA1(0323eaa5f81e3b8561225ccdd4654c9a11f2167c) )
 	ROM_LOAD16_BYTE( "50-1814-tms2732ajl.6b",0x2000, 0x1000, CRC(BAA78A2E) SHA1(F7B61BAE8919ED58C12D9F80F4133A722DF08AC4) )
 	ROM_LOAD16_BYTE( "6c_pd_50-1993_tms2732ajl.bin",0x0001, 0x1000, CRC(cd8e5e54) SHA1(0961739d72d80e0ac00e6cbf9643bcebfe74830d) )
@@ -884,7 +884,7 @@ ROM_START( quarterh )
 	ROM_LOAD( "9j_qh_60-2400_9193.bin",  0x2000, 0x1000, CRC(90efa26e) SHA1(aa29e2d90692cd97a9d18c93d8a2ea13ef1eab71) )
 	ROM_LOAD( "9h_qh_80-2399_10193.bin", 0x3000, 0x1000, CRC(20be3f2f) SHA1(b6a67b664cc899e997742fb4350e3c8c1e23664a) )
 
-	ROM_REGION( 0x4000, "gfx1", 0 )
+	ROM_REGION16_LE( 0x4000, "gfx1", 0 )
 	ROM_LOAD16_BYTE( "6a_qh_01-2395_14193.bin",0x1000, 0x0800, CRC(98b8e844) SHA1(c8a2ec3cb61d6cdc3e8fadba23a9850afd8db05b) )
 	ROM_LOAD16_BYTE( "6b_qh_01-2396_13193.bin",0x0000, 0x0800, CRC(03a21561) SHA1(0f6d8d13d81712e3e1971fe41e48ce5dff888dfd) )
 	ROM_LOAD16_BYTE( "6c_qh_01-2397_12193.bin",0x1001, 0x0800, CRC(b0306417) SHA1(d8322009f39c937b6dc8fe3f591734f06213a9a3) )
@@ -913,7 +913,7 @@ ROM_START( quarterha )
 	ROM_LOAD( "9j_qh_10-2400_9193.bin",  0x2000, 0x1000, CRC(0b90860f) SHA1(6e5f79e1a7e1b477da8e0483f75e23129604564c) )
 	ROM_LOAD( "9h_qh_50-2399_10193.bin", 0x3000, 0x1000, CRC(7d96c776) SHA1(e97080b0b0f524c3f313d5f7b7f3b093fb071bf9) )
 
-	ROM_REGION( 0x4000, "gfx1", 0 )
+	ROM_REGION16_LE( 0x4000, "gfx1", 0 )
 	ROM_LOAD16_BYTE( "6a_qh_01-2395_14193.bin",0x1000, 0x0800, CRC(98b8e844) SHA1(c8a2ec3cb61d6cdc3e8fadba23a9850afd8db05b) )
 	ROM_LOAD16_BYTE( "6b_qh_01-2396_13193.bin",0x0000, 0x0800, CRC(03a21561) SHA1(0f6d8d13d81712e3e1971fe41e48ce5dff888dfd) )
 	ROM_LOAD16_BYTE( "6c_qh_01-2397_12193.bin",0x1001, 0x0800, CRC(b0306417) SHA1(d8322009f39c937b6dc8fe3f591734f06213a9a3) )
@@ -939,11 +939,11 @@ ROM_START( quarterhb )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "a1.bin",  0x0000, 0x4000, CRC(9eace6a3) SHA1(285945034b73ff660a5a138d7be2fa431c0872e1) )
 
-	ROM_REGION( 0x8000, "gfx_data", 0 )
+	ROM_REGION16_LE( 0x8000, "gfx_data", 0 )
 	ROM_LOAD16_BYTE( "a2.bin",0x0001, 0x4000, CRC(b8cf5e27) SHA1(a5b451ab94ea1f2dda18a2d8ef9b8e0e46621420) ) // - oversized dumps perhaps?
 	ROM_LOAD16_BYTE( "a3.bin",0x0000, 0x4000, CRC(8b5296b1) SHA1(9d27d85f2edb44b96acce3c3f3e611217dcef70d) ) // /
 
-	ROM_REGION( 0x4000, "gfx1", 0 )
+	ROM_REGION16_LE( 0x4000, "gfx1", 0 )
 	ROM_COPY("gfx_data", 0x0000, 0x1000, 0x0800 )
 	ROM_COPY("gfx_data", 0x0800, 0x0000, 0x0800 )
 	ROM_COPY("gfx_data", 0x1000, 0x1800, 0x0800 )
@@ -969,11 +969,11 @@ ROM_START( qc )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "qc.a10", 0x0000, 0x8000, CRC(4e0327de) SHA1(543d89f2e808e48041c6c10ad4686c7f7113ed88) )
 
-	ROM_REGION( 0x8000, "gfx_data", 0 )
+	ROM_REGION16_LE( 0x8000, "gfx_data", 0 )
 	ROM_LOAD16_BYTE( "qc.h6", 0x0001, 0x4000, CRC(a091526e) SHA1(58507414ae0d02c6adee80987f66fb8894e169b0) )
 	ROM_LOAD16_BYTE( "qc.k6", 0x0000, 0x4000, CRC(eb583b44) SHA1(c23ad0037472c5bcb30fb030e4d13a6e5fde4b30) )
 
-	ROM_REGION( 0x4000, "gfx1", 0 )
+	ROM_REGION16_LE( 0x4000, "gfx1", 0 )
 	ROM_COPY("gfx_data", 0x6000, 0x1000, 0x800 )
 	ROM_COPY("gfx_data", 0x6800, 0x0000, 0x800 )
 	ROM_COPY("gfx_data", 0x7000, 0x1800, 0x800 )
@@ -990,40 +990,36 @@ ROM_END
 
 DRIVER_INIT_MEMBER(dwarfd_state,dwarfd)
 {
-	int i;
-	UINT8 *src, *dst;
-
 	/* expand gfx roms */
-	src = memregion("gfx1")->base();
-	dst = memregion("gfx2")->base();
+	UINT8 *dst = memregion("gfx2")->base();
 
-	for (i = 0; i < 0x4000; i++)
+	for (int i = 0; i < 0x4000/2; i++)
 	{
-		UINT8 dat;
-		dat = (src[i] & 0xf0) >> 0;
-		dst[i * 2] = dat;
+		dst[i * 4 + 0] = (m_charmap[i] & 0x000f) << 4;
 
-		dat = (src[i] & 0x0f)<<4;
-		dst[i * 2 + 1] = dat;
+		dst[i * 4 + 1] = (m_charmap[i] & 0x00f0) >> 0;
+
+		dst[i * 4 + 2] = (m_charmap[i] & 0x0f00) >> 4;
+
+		dst[i * 4 + 3] = (m_charmap[i] & 0xf000) >> 8;
 	}
 
 	/* use low bit as 'interpolation' bit */
-	src = memregion("gfx2")->base();
-	for (i = 0; i < 0x8000; i++)
+	for (int i = 0; i < 0x8000; i++)
 	{
-		if (src[i] & 0x10)
+		if (dst[i] & 0x10)
 		{
-			src[i] = (src[i] & 0xe0) >> 1;
-	//      src[i] |= ((src[(i + 1) & 0x7fff] & 0xe0) >> 4);
+			dst[i] = (dst[i] & 0xe0) >> 1;
+	//      dst[i] |= ((dst[(i + 1) & 0x7fff] & 0xe0) >> 4);
 
 		}
 		else
 		{
-			src[i] = (src[i] & 0xe0) >> 1;
-			src[i] |= (src[i] >> 4);
+			dst[i] = (dst[i] & 0xe0) >> 1;
+			dst[i] |= (dst[i] >> 4);
 
 		}
-	//      src[i] = src[i] & 0xe0;
+	//      dst[i] = dst[i] & 0xe0;
 	}
 
 	save_item(NAME(m_dw_ram));

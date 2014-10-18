@@ -76,7 +76,7 @@ public:
 	//required_device<cpu_device> m_maincpu;    // maincpu is already contained in atari_common_state
 	required_device<cpu_device> m_mcu;
 	required_device<speaker_sound_device> m_speaker;
-	required_memory_region m_region_maincpu;
+	required_region_ptr<UINT8> m_region_maincpu;
 	required_ioport m_dsw;
 	required_ioport m_coin;
 	required_ioport m_console;
@@ -96,9 +96,8 @@ void maxaflex_state::mmu(UINT8 new_mmu)
 	else
 	{
 		logerror("%s MMU SELFTEST ROM\n", machine().system().name);
-		m_maincpu->space(AS_PROGRAM).install_read_bank(0x5000, 0x57ff, "bank2");
+		m_maincpu->space(AS_PROGRAM).install_rom(0x5000, 0x57ff, &m_region_maincpu[0xd000]);
 		m_maincpu->space(AS_PROGRAM).unmap_write(0x5000, 0x57ff);
-		machine().root_device().membank("bank2")->set_base(m_region_maincpu->base() + 0xd000);
 	}
 }
 

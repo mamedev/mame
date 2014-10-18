@@ -75,7 +75,7 @@ public:
 	required_ioport m_io_row1;
 	required_ioport m_io_row2;
 	required_ioport m_io_row3;
-	required_memory_region m_charset;
+	required_region_ptr<UINT16> m_charset;
 
 	virtual void machine_start();
 	virtual void machine_reset();
@@ -114,9 +114,7 @@ WRITE8_MEMBER(midcoin24cdjuke_state::kb_col_w)
 
 WRITE8_MEMBER(midcoin24cdjuke_state::digit_w)
 {
-	UINT8* charset = (UINT8*)(*m_charset);
-	UINT16 char_offset = (((data & 0x60) << 1) | (data & 0x1f)) << 1;
-	UINT16 char_data = ((charset[char_offset + 1] << 8) | charset[char_offset]);
+	UINT16 char_data = m_charset[((data & 0x60) << 1) | (data & 0x1f)];
 
 	char_data = BITSWAP16(char_data, 13,11,9,15,14,10,12,8,7,6,5,4,3,2,1,0);
 
@@ -304,7 +302,7 @@ ROM_START( 24cdjuke )
 	ROM_REGION( 0x4000, "maincpu", 0 )
 	ROM_LOAD( "1.ic5", 0x0000, 0x4000,  CRC(df2419ad) SHA1(dd9dd85011d46581dccabcfdb5959a8b018df937)  )
 
-	ROM_REGION( 0x200, "charset", 0 )
+	ROM_REGION16_LE( 0x200, "charset", 0 )
 	ROM_LOAD16_BYTE( "dm74ls471n.ic20", 0x000, 0x100, CRC(d05765e6) SHA1(119ec6ca1a4afa0ea6ab1020ba2a8b02fd434e3f) )
 	ROM_LOAD16_BYTE( "dm74ls471n.ic21", 0x001, 0x100, CRC(e12d5a04) SHA1(be52ee4e4a5ea225fce39c759645a7cf49cea370) )
 

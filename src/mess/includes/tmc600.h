@@ -51,7 +51,7 @@ public:
 	required_device<cassette_image_device> m_cassette;
 	required_device<centronics_device> m_centronics;
 	required_device<ram_device> m_ram;
-	required_memory_region m_char_rom;
+	required_region_ptr<UINT8> m_char_rom;
 	required_shared_ptr<UINT8> m_page_ram;
 	optional_shared_ptr<UINT8> m_color_ram;
 	required_ioport m_run;

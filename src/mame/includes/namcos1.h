@@ -38,7 +38,7 @@ public:
 	required_shared_ptr<UINT8> m_playfield_control;
 	required_shared_ptr<UINT8> m_triram;
 
-	required_memory_region m_rom;
+	required_region_ptr<UINT8> m_rom;
 
 	int m_dac0_value;
 	int m_dac1_value;

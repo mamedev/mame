@@ -479,7 +479,7 @@ public:
 
 	DECLARE_READ16_MEMBER(read);
 	DECLARE_READ16_MEMBER(gram_read);
-	DECLARE_READ16_MEMBER(grom_read) { if (offset > 0x800) printf("help! %X\n", offset); return (0xff00 | m_grom_region->base()[offset]); }
+	DECLARE_READ16_MEMBER(grom_read) { if (offset > 0x800) printf("help! %X\n", offset); return (0xff00 | m_grom[offset]); }
 	DECLARE_WRITE16_MEMBER(write);
 	DECLARE_WRITE16_MEMBER(gram_write);
 
@@ -499,7 +499,7 @@ public:
 
 private:
 
-	required_memory_region m_grom_region;
+	required_region_ptr<UINT8> m_grom;
 
 	void intv_set_pixel(bitmap_ind16 &bitmap, int x, int y, UINT32 color);
 	UINT32 intv_get_pixel(bitmap_ind16 &bitmap, int x, int y);
