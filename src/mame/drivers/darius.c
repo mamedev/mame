@@ -529,39 +529,20 @@ ADDRESS_MAP_END
 ***********************************************************/
 
 
-#define TAITO_COINAGE_WORLD_16 \
-	PORT_DIPNAME( 0x0030, 0x0030, DEF_STR( Coin_A ) ) \
-	PORT_DIPSETTING(      0x0000, DEF_STR( 4C_1C ) ) \
-	PORT_DIPSETTING(      0x0010, DEF_STR( 3C_1C ) ) \
-	PORT_DIPSETTING(      0x0020, DEF_STR( 2C_1C ) ) \
-	PORT_DIPSETTING(      0x0030, DEF_STR( 1C_1C ) ) \
-	PORT_DIPNAME( 0x00c0, 0x00c0, DEF_STR( Coin_B ) ) \
-	PORT_DIPSETTING(      0x00c0, DEF_STR( 1C_2C ) ) \
-	PORT_DIPSETTING(      0x0080, DEF_STR( 1C_3C ) ) \
-	PORT_DIPSETTING(      0x0040, DEF_STR( 1C_4C ) ) \
-	PORT_DIPSETTING(      0x0000, DEF_STR( 1C_6C ) )
-
 #define TAITO_COINAGE_JAPAN_16 \
-	PORT_DIPNAME( 0x0030, 0x0030, DEF_STR( Coin_A ) ) \
+	PORT_DIPNAME( 0x0030, 0x0030, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW1:5,6") \
 	PORT_DIPSETTING(      0x0010, DEF_STR( 2C_1C ) ) \
 	PORT_DIPSETTING(      0x0030, DEF_STR( 1C_1C ) ) \
 	PORT_DIPSETTING(      0x0000, DEF_STR( 2C_3C ) ) \
 	PORT_DIPSETTING(      0x0020, DEF_STR( 1C_2C ) ) \
-	PORT_DIPNAME( 0x00c0, 0x00c0, DEF_STR( Coin_B ) ) \
+	PORT_DIPNAME( 0x00c0, 0x00c0, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("SW1:7,8") \
 	PORT_DIPSETTING(      0x0040, DEF_STR( 2C_1C ) ) \
 	PORT_DIPSETTING(      0x00c0, DEF_STR( 1C_1C ) ) \
 	PORT_DIPSETTING(      0x0000, DEF_STR( 2C_3C ) ) \
 	PORT_DIPSETTING(      0x0080, DEF_STR( 1C_2C ) )
 
-#define TAITO_DIFFICULTY_16 \
-	PORT_DIPNAME( 0x0300, 0x0300, DEF_STR( Difficulty ) ) \
-	PORT_DIPSETTING(      0x0200, DEF_STR( Easy ) ) \
-	PORT_DIPSETTING(      0x0300, DEF_STR( Medium ) ) \
-	PORT_DIPSETTING(      0x0100, DEF_STR( Hard ) ) \
-	PORT_DIPSETTING(      0x0000, DEF_STR( Hardest ) )
 
-
-static INPUT_PORTS_START( darius_common )
+static INPUT_PORTS_START( darius )
 	PORT_START("P1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1) PORT_8WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1) PORT_8WAY
@@ -591,106 +572,65 @@ static INPUT_PORTS_START( darius_common )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_TILT )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( darius )
-	PORT_INCLUDE( darius_common )
 
 	PORT_START("DSW")   /* DSW */
-	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0002, 0x0002, "Autofire" )
+	PORT_DIPNAME( 0x0002, 0x0002, "Autofire" )		PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(      0x0002, DEF_STR( Normal ) )
 	PORT_DIPSETTING(      0x0000, "Fast" )
-	PORT_SERVICE( 0x0004, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Demo_Sounds ) )
+	PORT_SERVICE_DIPLOC(  0x0004, IP_ACTIVE_LOW, "SW1:3" )
+	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0008, DEF_STR( On ) )
-	TAITO_COINAGE_WORLD_16
-	TAITO_DIFFICULTY_16
-	PORT_DIPNAME( 0x0c00, 0x0c00, DEF_STR( Bonus_Life ) )
+	PORT_DIPNAME( 0x0030, 0x0030, DEF_STR( Coin_A ) )	PORT_DIPLOCATION("SW1:5,6")
+	PORT_DIPSETTING(      0x0000, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(      0x0010, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(      0x0020, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(      0x0030, DEF_STR( 1C_1C ) )
+	PORT_DIPNAME( 0x00c0, 0x00c0, DEF_STR( Coin_B ) )	PORT_DIPLOCATION("SW1:7,8")
+	PORT_DIPSETTING(      0x00c0, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(      0x0080, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(      0x0040, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( 1C_6C ) )
+
+	PORT_DIPNAME( 0x0300, 0x0300, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SW2:1,2")
+	PORT_DIPSETTING(      0x0200, DEF_STR( Easy ) )
+	PORT_DIPSETTING(      0x0300, DEF_STR( Medium ) )
+	PORT_DIPSETTING(      0x0100, DEF_STR( Hard ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Hardest ) )
+	PORT_DIPNAME( 0x0c00, 0x0c00, DEF_STR( Bonus_Life ) )	PORT_DIPLOCATION("SW2:3,4")
 	PORT_DIPSETTING(      0x0800, "every 600k" )
 	PORT_DIPSETTING(      0x0c00, "600k only" )
 	PORT_DIPSETTING(      0x0400, "800k only" )
 	PORT_DIPSETTING(      0x0000, DEF_STR( None ) )
-	PORT_DIPNAME( 0x3000, 0x3000, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x3000, 0x3000, DEF_STR( Lives ) )	PORT_DIPLOCATION("SW2:5,6")
 	PORT_DIPSETTING(      0x3000, "3" )
 	PORT_DIPSETTING(      0x2000, "4" )
 	PORT_DIPSETTING(      0x1000, "5" )
 	PORT_DIPSETTING(      0x0000, "6" )
-	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Allow_Continue ) )
+	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Allow_Continue ) ) PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(      0x0000, DEF_STR( No ) )
 	PORT_DIPSETTING(      0x8000, DEF_STR( Yes ) )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( dariuse )
-	PORT_INCLUDE( darius_common )
+static INPUT_PORTS_START( dariusu ) /* The US version uses the Japan coinage settings & Extra Version has continue */
+	PORT_INCLUDE( darius )
 
-	PORT_START("DSW")   /* DSW */
-	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0002, 0x0002, "Autofire" )
-	PORT_DIPSETTING(      0x0002, DEF_STR( Normal ) )
-	PORT_DIPSETTING(      0x0000, "Fast" )
-	PORT_SERVICE( 0x0004, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Demo_Sounds ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0008, DEF_STR( On ) )
+	PORT_MODIFY("DSW")   /* DSW */
 	TAITO_COINAGE_JAPAN_16
-	TAITO_DIFFICULTY_16
-	PORT_DIPNAME( 0x0c00, 0x0c00, DEF_STR( Bonus_Life ) )
-	PORT_DIPSETTING(      0x0800, "every 600k" )
-	PORT_DIPSETTING(      0x0c00, "600k only" )
-	PORT_DIPSETTING(      0x0400, "800k only" )
-	PORT_DIPSETTING(      0x0000, DEF_STR( None ) )
-	PORT_DIPNAME( 0x3000, 0x3000, DEF_STR( Lives ) )
-	PORT_DIPSETTING(      0x3000, "3" )
-	PORT_DIPSETTING(      0x2000, "4" )
-	PORT_DIPSETTING(      0x1000, "5" )
-	PORT_DIPSETTING(      0x0000, "6" )
-	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Allow_Continue ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( No ) )
-	PORT_DIPSETTING(      0x8000, DEF_STR( Yes ) )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( dariusj )
-	PORT_INCLUDE( darius_common )
+	PORT_INCLUDE( darius )
 
-	PORT_START("DSW")   /* DSW */
-	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0002, 0x0002, "Autofire" )
-	PORT_DIPSETTING(      0x0002, DEF_STR( Normal ) )
-	PORT_DIPSETTING(      0x0000, "Fast" )
-	PORT_SERVICE( 0x0004, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Demo_Sounds ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0008, DEF_STR( On ) )
+	PORT_MODIFY("DSW")   /* DSW */
 	TAITO_COINAGE_JAPAN_16
-	TAITO_DIFFICULTY_16
-	PORT_DIPNAME( 0x0c00, 0x0c00, DEF_STR( Bonus_Life ) )
-	PORT_DIPSETTING(      0x0800, "every 600k" )
-	PORT_DIPSETTING(      0x0c00, "600k only" )
-	PORT_DIPSETTING(      0x0400, "800k only" )
-	PORT_DIPSETTING(      0x0000, DEF_STR( None ) )
-	PORT_DIPNAME( 0x3000, 0x3000, DEF_STR( Lives ) )
-	PORT_DIPSETTING(      0x3000, "3" )
-	PORT_DIPSETTING(      0x2000, "4" )
-	PORT_DIPSETTING(      0x1000, "5" )
-	PORT_DIPSETTING(      0x0000, "6" )
-	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:8") /* No Continue for this version */
 	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -1227,8 +1167,8 @@ ROM_START( dariuse )
 ROM_END
 
 
-GAME( 1986, darius,   0,        darius,   darius,  driver_device, 0, ROT0, "Taito Corporation Japan", "Darius (World)", GAME_SUPPORTS_SAVE )
-GAME( 1986, dariusu,  darius,   darius,   darius,  driver_device, 0, ROT0, "Taito America Corporation", "Darius (US)", GAME_SUPPORTS_SAVE )
-GAME( 1986, dariusj,  darius,   darius,   dariusj, driver_device, 0, ROT0, "Taito Corporation", "Darius (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1986, dariuso,  darius,   darius,   dariusj, driver_device, 0, ROT0, "Taito Corporation", "Darius (Japan old version)", GAME_SUPPORTS_SAVE )
-GAME( 1986, dariuse,  darius,   darius,   dariuse, driver_device, 0, ROT0, "Taito Corporation", "Darius (Extra) (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1986, darius,   0,        darius,   darius,  driver_device, 0, ROT0, "Taito Corporation Japan",   "Darius (World, rev 2)", GAME_SUPPORTS_SAVE )
+GAME( 1986, dariusu,  darius,   darius,   dariusu, driver_device, 0, ROT0, "Taito America Corporation", "Darius (US, rev 2)", GAME_SUPPORTS_SAVE )
+GAME( 1986, dariusj,  darius,   darius,   dariusj, driver_device, 0, ROT0, "Taito Corporation",         "Darius (Japan, rev 1)", GAME_SUPPORTS_SAVE )
+GAME( 1986, dariuso,  darius,   darius,   dariusj, driver_device, 0, ROT0, "Taito Corporation",         "Darius (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1986, dariuse,  darius,   darius,   dariusu, driver_device, 0, ROT0, "Taito Corporation",         "Darius Extra Version (Japan)", GAME_SUPPORTS_SAVE )
