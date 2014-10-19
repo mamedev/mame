@@ -99,8 +99,8 @@ public:
 	optional_device<rs232_port_device> m_rs232;
 	optional_device<coco_vhd_image_device> m_vhd_0;
 	optional_device<coco_vhd_image_device> m_vhd_1;
-	required_device<beckerport_device> m_beckerport;
-	required_ioport                    m_beckerportconfig;
+	optional_device<beckerport_device> m_beckerport;
+	optional_ioport                    m_beckerportconfig;
 
 	// driver update handlers
 	DECLARE_INPUT_CHANGED_MEMBER(keyboard_changed);
