@@ -426,9 +426,6 @@
 			<feature name="game" value="0" />
 			<feature name="exrom" value="0" />
 			<feature name="pcb" value="T-40" />
-			<dataarea name="rom" size="0x40000">
-				<rom name="chase hq 2 (1990)(ocean).80" size="0x40000" status="baddump" crc="fed59f99" sha1="7740e7c97c5d4babb77daa57b3929149dfd12714" offset="0x0000" />
-			</dataarea>
 			<dataarea name="roml" size="0x20000">
 				<rom name="l.u3" size="0x20000" crc="03765554" sha1="c87bd2ba565177a6668c49ae2b2a373924d2414b" offset="0x0000" />
 			</dataarea>
