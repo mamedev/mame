@@ -212,7 +212,7 @@ void amiga_sound_device::sound_stream_update(sound_stream &stream, stream_sample
 					chan->curlocation++;
 				if (chan->dma_enabled && !(chan->curlocation & 1))
 				{
-					CUSTOM_REG(REG_AUD0DAT + channum * 8) = (*state->m_chip_ram_r)(state, chan->curlocation);
+					CUSTOM_REG(REG_AUD0DAT + channum * 8) = state->chip_ram_r(chan->curlocation);
 					if (chan->curlength != 0)
 						chan->curlength--;
 

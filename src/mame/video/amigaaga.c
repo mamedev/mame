@@ -92,35 +92,35 @@ INLINE void fetch_sprite_data(amiga_state *state, int scanline, int sprite)
 	switch((CUSTOM_REG(REG_FMODE) >> 2) & 0x03)
 	{
 		case 0:
-			state->m_aga_sprdata[sprite][0] = (*state->m_chip_ram_r)(state, CUSTOM_REG_LONG(REG_SPR0PTH + 2 * sprite) + 0);
-			state->m_aga_sprdatb[sprite][0] = (*state->m_chip_ram_r)(state, CUSTOM_REG_LONG(REG_SPR0PTH + 2 * sprite) + 2);
+			state->m_aga_sprdata[sprite][0] = state->chip_ram_r(CUSTOM_REG_LONG(REG_SPR0PTH + 2 * sprite) + 0);
+			state->m_aga_sprdatb[sprite][0] = state->chip_ram_r(CUSTOM_REG_LONG(REG_SPR0PTH + 2 * sprite) + 2);
 			CUSTOM_REG_LONG(REG_SPR0PTH + 2 * sprite) += 4;
 			state->m_aga_sprite_fetched_words = 1;
 			if (LOG_SPRITE_DMA) logerror("%3d:sprite %d fetch: data=%04X-%04X\n", scanline, sprite, state->m_aga_sprdata[sprite][0], state->m_aga_sprdatb[sprite][0]);
 			break;
 		case 1:
 		case 2:
-			state->m_aga_sprdata[sprite][0] = (*state->m_chip_ram_r)(state, CUSTOM_REG_LONG(REG_SPR0PTH + 2 * sprite) + 0);
-			state->m_aga_sprdata[sprite][1] = (*state->m_chip_ram_r)(state, CUSTOM_REG_LONG(REG_SPR0PTH + 2 * sprite) + 2);
+			state->m_aga_sprdata[sprite][0] = state->chip_ram_r(CUSTOM_REG_LONG(REG_SPR0PTH + 2 * sprite) + 0);
+			state->m_aga_sprdata[sprite][1] = state->chip_ram_r(CUSTOM_REG_LONG(REG_SPR0PTH + 2 * sprite) + 2);
 			CUSTOM_REG_LONG(REG_SPR0PTH + 2 * sprite) += 4;
-			state->m_aga_sprdatb[sprite][0] = (*state->m_chip_ram_r)(state, CUSTOM_REG_LONG(REG_SPR0PTH + 2 * sprite) + 0);
-			state->m_aga_sprdatb[sprite][1] = (*state->m_chip_ram_r)(state, CUSTOM_REG_LONG(REG_SPR0PTH + 2 * sprite) + 2);
+			state->m_aga_sprdatb[sprite][0] = state->chip_ram_r(CUSTOM_REG_LONG(REG_SPR0PTH + 2 * sprite) + 0);
+			state->m_aga_sprdatb[sprite][1] = state->chip_ram_r(CUSTOM_REG_LONG(REG_SPR0PTH + 2 * sprite) + 2);
 			CUSTOM_REG_LONG(REG_SPR0PTH + 2 * sprite) += 4;
 			state->m_aga_sprite_fetched_words = 2;
 			if (LOG_SPRITE_DMA) logerror("%3d:sprite %d fetch: data=%04X-%04X %04X-%04X\n", scanline, sprite, state->m_aga_sprdata[sprite][0], state->m_aga_sprdatb[sprite][0], state->m_aga_sprdata[sprite][1], state->m_aga_sprdatb[sprite][1] );
 			break;
 		case 3:
-			state->m_aga_sprdata[sprite][0] = (*state->m_chip_ram_r)(state, CUSTOM_REG_LONG(REG_SPR0PTH + 2 * sprite) + 0);
-			state->m_aga_sprdata[sprite][1] = (*state->m_chip_ram_r)(state, CUSTOM_REG_LONG(REG_SPR0PTH + 2 * sprite) + 2);
+			state->m_aga_sprdata[sprite][0] = state->chip_ram_r(CUSTOM_REG_LONG(REG_SPR0PTH + 2 * sprite) + 0);
+			state->m_aga_sprdata[sprite][1] = state->chip_ram_r(CUSTOM_REG_LONG(REG_SPR0PTH + 2 * sprite) + 2);
 			CUSTOM_REG_LONG(REG_SPR0PTH + 2 * sprite) += 4;
-			state->m_aga_sprdata[sprite][2] = (*state->m_chip_ram_r)(state, CUSTOM_REG_LONG(REG_SPR0PTH + 2 * sprite) + 0);
-			state->m_aga_sprdata[sprite][3] = (*state->m_chip_ram_r)(state, CUSTOM_REG_LONG(REG_SPR0PTH + 2 * sprite) + 2);
+			state->m_aga_sprdata[sprite][2] = state->chip_ram_r(CUSTOM_REG_LONG(REG_SPR0PTH + 2 * sprite) + 0);
+			state->m_aga_sprdata[sprite][3] = state->chip_ram_r(CUSTOM_REG_LONG(REG_SPR0PTH + 2 * sprite) + 2);
 			CUSTOM_REG_LONG(REG_SPR0PTH + 2 * sprite) += 4;
-			state->m_aga_sprdatb[sprite][0] = (*state->m_chip_ram_r)(state, CUSTOM_REG_LONG(REG_SPR0PTH + 2 * sprite) + 0);
-			state->m_aga_sprdatb[sprite][1] = (*state->m_chip_ram_r)(state, CUSTOM_REG_LONG(REG_SPR0PTH + 2 * sprite) + 2);
+			state->m_aga_sprdatb[sprite][0] = state->chip_ram_r(CUSTOM_REG_LONG(REG_SPR0PTH + 2 * sprite) + 0);
+			state->m_aga_sprdatb[sprite][1] = state->chip_ram_r(CUSTOM_REG_LONG(REG_SPR0PTH + 2 * sprite) + 2);
 			CUSTOM_REG_LONG(REG_SPR0PTH + 2 * sprite) += 4;
-			state->m_aga_sprdatb[sprite][2] = (*state->m_chip_ram_r)(state, CUSTOM_REG_LONG(REG_SPR0PTH + 2 * sprite) + 0);
-			state->m_aga_sprdatb[sprite][3] = (*state->m_chip_ram_r)(state, CUSTOM_REG_LONG(REG_SPR0PTH + 2 * sprite) + 2);
+			state->m_aga_sprdatb[sprite][2] = state->chip_ram_r(CUSTOM_REG_LONG(REG_SPR0PTH + 2 * sprite) + 0);
+			state->m_aga_sprdatb[sprite][3] = state->chip_ram_r(CUSTOM_REG_LONG(REG_SPR0PTH + 2 * sprite) + 2);
 			CUSTOM_REG_LONG(REG_SPR0PTH + 2 * sprite) += 4;
 			state->m_aga_sprite_fetched_words = 4;
 			if (LOG_SPRITE_DMA) logerror("%3d:sprite %d fetch: data=%04X-%04X %04X-%04X %04X-%04X %04X-%04X\n",
@@ -158,8 +158,8 @@ static void update_sprite_dma(amiga_state *state, int scanline)
 			state->m_sprite_dma_reload_mask &= ~bitmask;
 
 			/* fetch data into the control words */
-			CUSTOM_REG(REG_SPR0POS + 4 * num) = (*state->m_chip_ram_r)(state, CUSTOM_REG_LONG(REG_SPR0PTH + 2 * num) + 0);
-			CUSTOM_REG(REG_SPR0CTL + 4 * num) = (*state->m_chip_ram_r)(state, CUSTOM_REG_LONG(REG_SPR0PTH + 2 * num) + 2);
+			CUSTOM_REG(REG_SPR0POS + 4 * num) = state->chip_ram_r(CUSTOM_REG_LONG(REG_SPR0PTH + 2 * num) + 0);
+			CUSTOM_REG(REG_SPR0CTL + 4 * num) = state->chip_ram_r(CUSTOM_REG_LONG(REG_SPR0PTH + 2 * num) + 2);
 			CUSTOM_REG_LONG(REG_SPR0PTH + 2 * num) += 4;
 			/* fetch additional words */
 			switch((CUSTOM_REG(REG_FMODE) >> 2) & 0x03)
@@ -376,24 +376,24 @@ INLINE void fetch_bitplane_data(amiga_state *state, int plane)
 	switch (CUSTOM_REG(REG_FMODE) & 0x03)
 	{
 		case 0:
-			aga_bpldat[plane] = (UINT64)(*state->m_chip_ram_r)(state, CUSTOM_REG_LONG(REG_BPL1PTH + plane * 2));
+			aga_bpldat[plane] = (UINT64)state->chip_ram_r(CUSTOM_REG_LONG(REG_BPL1PTH + plane * 2));
 			CUSTOM_REG_LONG(REG_BPL1PTH + plane * 2) += 2;
 			break;
 		case 1:
 		case 2:
-			aga_bpldat[plane] = (UINT64)(*state->m_chip_ram_r)(state, CUSTOM_REG_LONG(REG_BPL1PTH + plane * 2)) << 16;
+			aga_bpldat[plane] = (UINT64)state->chip_ram_r(CUSTOM_REG_LONG(REG_BPL1PTH + plane * 2)) << 16;
 			CUSTOM_REG_LONG(REG_BPL1PTH + plane * 2) += 2;
-			aga_bpldat[plane] |= ((UINT64)(*state->m_chip_ram_r)(state, CUSTOM_REG_LONG(REG_BPL1PTH + plane * 2)));
+			aga_bpldat[plane] |= ((UINT64)state->chip_ram_r(CUSTOM_REG_LONG(REG_BPL1PTH + plane * 2)));
 			CUSTOM_REG_LONG(REG_BPL1PTH + plane * 2) += 2;
 			break;
 		case 3:
-			aga_bpldat[plane] = (UINT64)(*state->m_chip_ram_r)(state, CUSTOM_REG_LONG(REG_BPL1PTH + plane * 2)) << 48;
+			aga_bpldat[plane] = (UINT64)state->chip_ram_r(CUSTOM_REG_LONG(REG_BPL1PTH + plane * 2)) << 48;
 			CUSTOM_REG_LONG(REG_BPL1PTH + plane * 2) += 2;
-			aga_bpldat[plane] |= ((UINT64)(*state->m_chip_ram_r)(state, CUSTOM_REG_LONG(REG_BPL1PTH + plane * 2))) << 32;
+			aga_bpldat[plane] |= ((UINT64)state->chip_ram_r(CUSTOM_REG_LONG(REG_BPL1PTH + plane * 2))) << 32;
 			CUSTOM_REG_LONG(REG_BPL1PTH + plane * 2) += 2;
-			aga_bpldat[plane] |= ((UINT64)(*state->m_chip_ram_r)(state, CUSTOM_REG_LONG(REG_BPL1PTH + plane * 2))) << 16;
+			aga_bpldat[plane] |= ((UINT64)state->chip_ram_r(CUSTOM_REG_LONG(REG_BPL1PTH + plane * 2))) << 16;
 			CUSTOM_REG_LONG(REG_BPL1PTH + plane * 2) += 2;
-			aga_bpldat[plane] |= (UINT64)(*state->m_chip_ram_r)(state, CUSTOM_REG_LONG(REG_BPL1PTH + plane * 2));
+			aga_bpldat[plane] |= (UINT64)state->chip_ram_r(CUSTOM_REG_LONG(REG_BPL1PTH + plane * 2));
 			CUSTOM_REG_LONG(REG_BPL1PTH + plane * 2) += 2;
 			break;
 	}

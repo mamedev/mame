@@ -216,7 +216,7 @@ static ADDRESS_MAP_START( a500_mem, AS_PROGRAM, 16, upscope_state )
 	AM_RANGE(0xc00000, 0xd7ffff) AM_READWRITE(custom_chip_r, custom_chip_w)
 	AM_RANGE(0xd80000, 0xddffff) AM_NOP
 	AM_RANGE(0xde0000, 0xdeffff) AM_READWRITE(custom_chip_r, custom_chip_w)
-	AM_RANGE(0xdf0000, 0xdfffff) AM_READWRITE(custom_chip_r, custom_chip_w) AM_SHARE("custom_regs")
+	AM_RANGE(0xdf0000, 0xdfffff) AM_READWRITE(custom_chip_r, custom_chip_w)
 	AM_RANGE(0xe00000, 0xe7ffff) AM_WRITENOP AM_READ(rom_mirror_r)
 	AM_RANGE(0xe80000, 0xefffff) AM_NOP // autoconfig space (installed by devices)
 	AM_RANGE(0xf80000, 0xffffff) AM_ROM AM_REGION("kickstart", 0)

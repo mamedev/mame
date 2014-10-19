@@ -360,7 +360,7 @@ private:
 
 	typedef void (cubo_state::*input_hack_func)();
 	input_hack_func m_input_hack;
-
+	void chip_ram_w8_hack(offs_t byteoffs, UINT8 data);
 	void cndypuzl_input_hack();
 	void haremchl_input_hack();
 	void lsrquiz_input_hack();
@@ -415,7 +415,7 @@ static ADDRESS_MAP_START( cubo_mem, AS_PROGRAM, 32, cubo_state )
 	AM_RANGE(0x800010, 0x800013) AM_READ_PORT("DIPSW2")
 	AM_RANGE(0xb80000, 0xb8003f) AM_DEVREADWRITE("akiko", akiko_device, read, write)
 	AM_RANGE(0xbf0000, 0xbfffff) AM_READWRITE16(cia_r, gayle_cia_w, 0xffffffff)
-	AM_RANGE(0xc00000, 0xdfffff) AM_READWRITE16(custom_chip_r, custom_chip_w, 0xffffffff) AM_SHARE("custom_regs")
+	AM_RANGE(0xc00000, 0xdfffff) AM_READWRITE16(custom_chip_r, custom_chip_w, 0xffffffff)
 	AM_RANGE(0xe00000, 0xe7ffff) AM_ROM AM_REGION("kickstart", 0x80000)
 	AM_RANGE(0xa00000, 0xf7ffff) AM_NOP
 	AM_RANGE(0xf80000, 0xffffff) AM_ROM AM_REGION("kickstart", 0)
@@ -1170,12 +1170,24 @@ ROM_END
  *
  *************************************/
 
+void cubo_state::chip_ram_w8_hack(offs_t byteoffs, UINT8 data)
+{
+	UINT16 word = chip_ram_r(byteoffs);
+
+	if (byteoffs & 1)
+		word = (word & 0xff00) | data;
+	else
+		word = (word & 0x00ff) | (((UINT16)data) << 8);
+
+	chip_ram_w(byteoffs, word);
+}
+
 void cubo_state::cndypuzl_input_hack()
 {
 	if (m_maincpu->pc < m_chip_ram.bytes())
 	{
 		UINT32 r_A5 = m_maincpu->state_int(M68K_A5);
-		(*m_chip_ram_w)(this, r_A5 - 0x7ebe, 0x0000);
+		chip_ram_w(r_A5 - 0x7ebe, 0x0000);
 	}
 }
 
@@ -1190,8 +1202,8 @@ void cubo_state::haremchl_input_hack()
 	if (m_maincpu->pc < m_chip_ram.bytes())
 	{
 		UINT32 r_A5 = m_maincpu->state_int(M68K_A5);
-		UINT32 r_A2 = ((*m_chip_ram_r)(this, r_A5 - 0x7f00 + 0) << 16) | ((*m_chip_ram_r)(this, r_A5 - 0x7f00 + 2));
-		amiga_chip_ram_w8(this, r_A2 + 0x1f, 0x00);
+		UINT32 r_A2 = (chip_ram_r(r_A5 - 0x7f00 + 0) << 16) | (chip_ram_r(r_A5 - 0x7f00 + 2));
+		chip_ram_w8_hack(r_A2 + 0x1f, 0x00);
 	}
 }
 
@@ -1206,8 +1218,8 @@ void cubo_state::lsrquiz_input_hack()
 	if (m_maincpu->pc < m_chip_ram.bytes())
 	{
 		UINT32 r_A5 = m_maincpu->state_int(M68K_A5);
-		UINT32 r_A2 = ((*m_chip_ram_r)(this, r_A5 - 0x7fe0 + 0) << 16) | ((*m_chip_ram_r)(this, r_A5 - 0x7fe0 + 2));
-		amiga_chip_ram_w8(this, r_A2 + 0x13, 0x00);
+		UINT32 r_A2 = (chip_ram_r(r_A5 - 0x7fe0 + 0) << 16) | (chip_ram_r(r_A5 - 0x7fe0 + 2));
+		chip_ram_w8_hack(r_A2 + 0x13, 0x00);
 	}
 }
 
@@ -1223,8 +1235,8 @@ void cubo_state::lsrquiz2_input_hack()
 	if (m_maincpu->pc < m_chip_ram.bytes())
 	{
 		UINT32 r_A5 = m_maincpu->state_int(M68K_A5);
-		UINT32 r_A2 = ((*m_chip_ram_r)(this, r_A5 - 0x7fdc + 0) << 16) | ((*m_chip_ram_r)(this, r_A5 - 0x7fdc + 2));
-		amiga_chip_ram_w8(this, r_A2 + 0x17, 0x00);
+		UINT32 r_A2 = (chip_ram_r(r_A5 - 0x7fdc + 0) << 16) | (chip_ram_r(r_A5 - 0x7fdc + 2));
+		chip_ram_w8_hack(r_A2 + 0x17, 0x00);
 	}
 }
 
@@ -1239,8 +1251,8 @@ void cubo_state::lasstixx_input_hack()
 	if (m_maincpu->pc < m_chip_ram.bytes())
 	{
 		UINT32 r_A5 = m_maincpu->state_int(M68K_A5);
-		UINT32 r_A2 = ((*m_chip_ram_r)(this, r_A5 - 0x7fa2 + 0) << 16) | ((*m_chip_ram_r)(this, r_A5 - 0x7fa2 + 2));
-		amiga_chip_ram_w8(this, r_A2 + 0x24, 0x00);
+		UINT32 r_A2 = (chip_ram_r(r_A5 - 0x7fa2 + 0) << 16) | (chip_ram_r(r_A5 - 0x7fa2 + 2));
+		chip_ram_w8_hack(r_A2 + 0x24, 0x00);
 	}
 }
 
@@ -1255,7 +1267,7 @@ void cubo_state::mgnumber_input_hack()
 	if (m_maincpu->pc < m_chip_ram.bytes())
 	{
 		UINT32 r_A5 = m_maincpu->state_int(M68K_A5);
-		(*m_chip_ram_w)(this, r_A5 - 0x7ed8, 0x0000);
+		chip_ram_w(r_A5 - 0x7ed8, 0x0000);
 	}
 }
 
@@ -1270,7 +1282,7 @@ void cubo_state::mgprem11_input_hack()
 	if (m_maincpu->pc < m_chip_ram.bytes())
 	{
 		UINT32 r_A5 = m_maincpu->state_int(M68K_A5);
-		amiga_chip_ram_w8(this, r_A5 - 0x7eca, 0x00);
+		chip_ram_w8_hack(r_A5 - 0x7eca, 0x00);
 	}
 }
 

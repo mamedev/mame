@@ -510,7 +510,7 @@ TIMER_CALLBACK_MEMBER(akiko_device::dma_proc)
 			data <<= 8;
 			data |= buf[i+1];
 
-			(*amiga->m_chip_ram_w)( amiga, m_cdrom_address[0] + (index*4096) + i, data );
+			amiga->chip_ram_w(m_cdrom_address[0] + (index*4096) + i, data );
 		}
 
 		m_cdrom_readmask |= ( 1 << index );

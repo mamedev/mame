@@ -74,7 +74,7 @@ void amiga_fdc::dma_done()
 void amiga_fdc::dma_write(UINT16 value)
 {
 	amiga_state *state = machine().driver_data<amiga_state>();
-	(*state->m_chip_ram_w)(state, dskpt, value);
+	state->chip_ram_w(dskpt, value);
 
 	dskpt += 2;
 	dsklen--;
@@ -88,7 +88,7 @@ void amiga_fdc::dma_write(UINT16 value)
 UINT16 amiga_fdc::dma_read()
 {
 	amiga_state *state = machine().driver_data<amiga_state>();
-	UINT16 res = (*state->m_chip_ram_r)(state, dskpt);
+	UINT16 res = state->chip_ram_r(dskpt);
 
 	dskpt += 2;
 	dsklen--;

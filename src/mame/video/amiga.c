@@ -240,12 +240,12 @@ int amiga_copper_execute_next(running_machine &machine, int xpos)
 	}
 
 	/* fetch the first data word */
-	word0 = (*state->m_chip_ram_r)(state, state->m_copper_pc);
+	word0 = state->chip_ram_r(state->m_copper_pc);
 	state->m_copper_pc += 2;
 	xpos += COPPER_CYCLES_TO_PIXELS(1);
 
 	/* fetch the second data word */
-	word1 = (*state->m_chip_ram_r)(state, state->m_copper_pc);
+	word1 = state->chip_ram_r(state->m_copper_pc);
 	state->m_copper_pc += 2;
 	xpos += COPPER_CYCLES_TO_PIXELS(1);
 
@@ -381,8 +381,8 @@ void amiga_sprite_enable_comparitor(running_machine &machine, int which, int ena
 
 INLINE void fetch_sprite_data(amiga_state *state, int scanline, int sprite)
 {
-	CUSTOM_REG(REG_SPR0DATA + 4 * sprite) = (*state->m_chip_ram_r)(state, CUSTOM_REG_LONG(REG_SPR0PTH + 2 * sprite) + 0);
-	CUSTOM_REG(REG_SPR0DATB + 4 * sprite) = (*state->m_chip_ram_r)(state, CUSTOM_REG_LONG(REG_SPR0PTH + 2 * sprite) + 2);
+	CUSTOM_REG(REG_SPR0DATA + 4 * sprite) = state->chip_ram_r(CUSTOM_REG_LONG(REG_SPR0PTH + 2 * sprite) + 0);
+	CUSTOM_REG(REG_SPR0DATB + 4 * sprite) = state->chip_ram_r(CUSTOM_REG_LONG(REG_SPR0PTH + 2 * sprite) + 2);
 	CUSTOM_REG_LONG(REG_SPR0PTH + 2 * sprite) += 4;
 	if (LOG_SPRITE_DMA) logerror("%3d:sprite %d fetch: data=%04X-%04X\n", scanline, sprite, CUSTOM_REG(REG_SPR0DATA + 4 * sprite), CUSTOM_REG(REG_SPR0DATB + 4 * sprite));
 }
@@ -411,8 +411,8 @@ static void update_sprite_dma(amiga_state *state, int scanline)
 			state->m_sprite_dma_reload_mask &= ~bitmask;
 
 			/* fetch data into the control words */
-			CUSTOM_REG(REG_SPR0POS + 4 * num) = (*state->m_chip_ram_r)(state, CUSTOM_REG_LONG(REG_SPR0PTH + 2 * num) + 0);
-			CUSTOM_REG(REG_SPR0CTL + 4 * num) = (*state->m_chip_ram_r)(state, CUSTOM_REG_LONG(REG_SPR0PTH + 2 * num) + 2);
+			CUSTOM_REG(REG_SPR0POS + 4 * num) = state->chip_ram_r(CUSTOM_REG_LONG(REG_SPR0PTH + 2 * num) + 0);
+			CUSTOM_REG(REG_SPR0CTL + 4 * num) = state->chip_ram_r(CUSTOM_REG_LONG(REG_SPR0PTH + 2 * num) + 2);
 			CUSTOM_REG_LONG(REG_SPR0PTH + 2 * num) += 4;
 			if (LOG_SPRITE_DMA) logerror("%3d:sprite %d fetch: pos=%04X ctl=%04X\n", scanline, num, CUSTOM_REG(REG_SPR0POS + 4 * num), CUSTOM_REG(REG_SPR0CTL + 4 * num));
 		}
@@ -586,7 +586,7 @@ INLINE UINT8 assemble_even_bitplanes(amiga_state *state, int planes, int ebitoff
 
 INLINE void fetch_bitplane_data(amiga_state *state, int plane)
 {
-	CUSTOM_REG(REG_BPL1DAT + plane) = (*state->m_chip_ram_r)(state, CUSTOM_REG_LONG(REG_BPL1PTH + plane * 2));
+	CUSTOM_REG(REG_BPL1DAT + plane) = state->chip_ram_r(CUSTOM_REG_LONG(REG_BPL1PTH + plane * 2));
 	CUSTOM_REG_LONG(REG_BPL1PTH + plane * 2) += 2;
 }
 
