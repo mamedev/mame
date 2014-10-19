@@ -512,6 +512,7 @@ MACHINE_CONFIG_EXTERN( pgm_arm_type3 );
 INPUT_PORTS_EXTERN(theglad);
 INPUT_PORTS_EXTERN(happy6);
 INPUT_PORTS_EXTERN(svg);
+INPUT_PORTS_EXTERN(svgtw);
 
 /*----------- defined in machine/pgmprot4.c -----------*/
 
