@@ -254,11 +254,13 @@ void DebuggerView::paintEvent(QPaintEvent* event)
 					break;
 				text.append(QChar(viewdata[viewDataOffset + width].byte));
 			}
+            
 			// Your characters are not guaranteed to take up the entire length x fontWidth x fontHeight, so fill before.
 			painter.fillRect(x*fontWidth, y*fontHeight, width*fontWidth, fontHeight, bgBrush);
-			// Static text object
-			QStaticText staticText(text);
-			painter.drawStaticText(x*fontWidth, y*fontHeight, staticText);
+
+			// There is a touchy interplay between font height, drawing difference, visible position, etc
+			// Fonts don't get drawn "down and to the left" like boxes, so some wiggling is needed.
+			painter.drawText(x*fontWidth, (y*fontHeight + (fontHeight*0.80)), text);
 		}
 	}
 }

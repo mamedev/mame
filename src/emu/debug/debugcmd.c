@@ -268,7 +268,7 @@ void debug_command_init(running_machine &machine)
 	}
 
 	/* add all the commands */
-	debug_console_register_command(machine, "help",      CMDFLAG_NONE, 0, 0, 2, execute_help);
+	debug_console_register_command(machine, "help",      CMDFLAG_NONE, 0, 0, 1, execute_help);
 	debug_console_register_command(machine, "print",     CMDFLAG_NONE, 0, 1, MAX_COMMAND_PARAMS, execute_print);
 	debug_console_register_command(machine, "printf",    CMDFLAG_NONE, 0, 1, MAX_COMMAND_PARAMS, execute_printf);
 	debug_console_register_command(machine, "logerror",  CMDFLAG_NONE, 0, 1, MAX_COMMAND_PARAMS, execute_logerror);
@@ -678,14 +678,8 @@ static void execute_help(running_machine &machine, int ref, int params, const ch
 {
 	if (params == 0)
 		debug_console_printf_wrap(machine, 80, "%s\n", debug_get_help(""));
-	else if (params == 1)
+	else
 		debug_console_printf_wrap(machine, 80, "%s\n", debug_get_help(param[0]));
-	else if (params == 2)
-	{
-		UINT64 width;
-		debug_command_parameter_number(machine, param[1], &width);
-		debug_console_printf_wrap(machine, (int)width, "%s\n", debug_get_help(param[0]));
-	}
 }
 
 
