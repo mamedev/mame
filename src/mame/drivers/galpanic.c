@@ -999,21 +999,21 @@ ROM_START( wownfant)
 	ROM_LOAD( "ep-4001 42750001 u1.bin",    0xc0000, 0x80000, CRC(864167c2) SHA1(c454b26b6dea993e6bd64546f92beef05e46d7d7) )
 ROM_END
 
-ROM_START( galhustl )
+ROM_START( galhustl ) // An original PCB has been seen with genuine AFEGA labels
 	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 Code */
-	ROM_LOAD16_BYTE( "ue17.3", 0x00000, 0x80000, CRC(b2583dbb) SHA1(536f4aa2246ec816c4f270f9d42acc090718ee8b) )
-	ROM_LOAD16_BYTE( "ud17.4", 0x00001, 0x80000, CRC(470a3668) SHA1(ad86e96ab8f1f5da23fb1feaabfb9c757965418e) )
+	ROM_LOAD16_BYTE( "ue17.3", 0x00000, 0x80000, CRC(b2583dbb) SHA1(536f4aa2246ec816c4f270f9d42acc090718ee8b) ) // Also found as AFEGA 3
+	ROM_LOAD16_BYTE( "ud17.4", 0x00001, 0x80000, CRC(470a3668) SHA1(ad86e96ab8f1f5da23fb1feaabfb9c757965418e) ) // Also found as AFEGA 4
 
 	ROM_REGION16_BE( 0x100000, "maincpudata", ROMREGION_ERASEFF ) /* 68000 Data */
 
 	ROM_REGION( 0x140000, "oki", 0 )    /* OKIM6295 samples */
 	/* 00000-2ffff is fixed, 30000-3ffff is bank switched from all the ROMs */
-	ROM_LOAD( "galhstl1.ub6", 0x00000, 0x80000,  CRC(23848790) SHA1(2e77fbe04f46e258daecb4c5917e383c7c06a306) )
+	ROM_LOAD( "galhstl1.ub6", 0x00000, 0x80000,  CRC(23848790) SHA1(2e77fbe04f46e258daecb4c5917e383c7c06a306) ) // Also found as AFEGA 1
 	ROM_RELOAD(               0x40000, 0x80000 )
-	ROM_LOAD( "galhstl2.uc6", 0xc0000, 0x80000,  CRC(2168e54a) SHA1(87534334b16d3ddc3daefcb1b8086aff44157ccf) )
+	ROM_LOAD( "galhstl2.uc6", 0xc0000, 0x80000,  CRC(2168e54a) SHA1(87534334b16d3ddc3daefcb1b8086aff44157ccf) ) // Also found as AFEGA 2
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
-	ROM_LOAD( "galhstl5.u5", 0x00000, 0x80000, CRC(44a18f15) SHA1(1217cf7fbbb442358b15016099efeface5dcbd22) )
+	ROM_LOAD( "galhstl5.u5", 0x00000, 0x80000, CRC(44a18f15) SHA1(1217cf7fbbb442358b15016099efeface5dcbd22) ) // Also found as AFEGA 5
 ROM_END
 
 ROM_START( pgalvip ) // this set has extra data roms for the gfx
