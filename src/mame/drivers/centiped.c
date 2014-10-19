@@ -2185,8 +2185,8 @@ DRIVER_INIT_MEMBER(centiped_state,multiped)
  *************************************/
 
 // Centipede, Millipede, and clones
-GAME( 1980, centiped,  0,        centiped, centiped, driver_device,  0,        ROT270, "Atari", "Centipede (revision 4)", GAME_SUPPORTS_SAVE )
-GAME( 1980, centiped3, centiped, centiped, centiped4,driver_device,  0,        ROT270, "Atari", "Centipede (revision 3)", GAME_SUPPORTS_SAVE )
+GAME( 1980, centiped,  0,        centiped, centiped4,driver_device,  0,        ROT270, "Atari", "Centipede (revision 4)", GAME_SUPPORTS_SAVE ) /* 1 Player Only with Timer Options */
+GAME( 1980, centiped3, centiped, centiped, centiped, driver_device,  0,        ROT270, "Atari", "Centipede (revision 3)", GAME_SUPPORTS_SAVE )
 GAME( 1980, centiped2, centiped, centiped, centiped, driver_device,  0,        ROT270, "Atari", "Centipede (revision 2)", GAME_SUPPORTS_SAVE )
 GAME( 1980, centiped1, centiped, centiped, centiped, driver_device,  0,        ROT270, "Atari", "Centipede (revision 1)", GAME_SUPPORTS_SAVE )
 GAME( 1980, centipdb,  centiped, centipdb, centiped, driver_device,  0,        ROT270, "bootleg", "Centipede (bootleg)", GAME_SUPPORTS_SAVE )
