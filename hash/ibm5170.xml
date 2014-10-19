@@ -3389,6 +3389,18 @@ Missing files come here
 
 	<!-- Application Disks -->
 
+	<software name="aftdark">
+		<!-- Dumped via Kryoflux, shows as good and unmodified -->
+		<description>After Dark for Windows</description>
+		<year>1990</year>
+		<publisher>Berkeley Systems</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="after dark.img" size="1474560" crc="0b6222f5" sha1="2a61d82ef15ee9fba2a738632da7626e935e5683" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="dos7demo">
 		<description>IBM PC-Dos 7 (Demonstration)</description>
 		<year>1994</year>
@@ -3700,6 +3712,30 @@ Missing files come here
 		</part>
 	</software>
 
+	<software name="keen6">
+		<!-- Dumped via Kryoflux, almost all tracks show as modified -->
+		<!-- Also includes shareware episode of Commander Keen 4 -->
+		<description>Commander Keen in: Aliens Ate My Baby Sitter</description>
+		<year>1991</year>
+		<publisher>FormGen</publisher>
+		<info name="developer" value="id Software" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="disk1.img" size="737280" crc="841adabf" sha1="8253cd16647975ee2675adffd81c79a31946f080" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="disk2.img" size="737280" crc="1065229a" sha1="0f13f841cc267d5b6cd49af077ddb6b9e4dfe133" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="disk3.img" size="737280" crc="fd482d9e" sha1="6aafbe6d819bb9ea8410a811b2bc253543809858" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="creepers">
 		<!-- Dumped via Kryoflux, track 0 shows as modified -->
 		<description>Creepers</description>
@@ -3759,11 +3795,15 @@ Missing files come here
 		<year>1988</year>
 		<publisher>MicroProse</publisher>
 		<part name="flop1" interface="floppy_3_5">
+			<feature name="disk_serial" value="4341A" />
+			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="737280">
 				<rom name="diska.img" size="737280" crc="a12af0f0" sha1="bcc52d222f1067fb90b2c9c53c8da14b350e60d6" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
+			<feature name="disk_serial" value="4341B" />
+			<feature name="part_id" value="Disk B" />
 			<dataarea name="flop" size="737280">
 				<rom name="diskb.img" size="737280" crc="2b0662a2" sha1="5843c7bb6e4d6ad998042cfe53a6c6f07d3fd3e5" offset="0" />
 			</dataarea>
@@ -3854,11 +3894,13 @@ Missing files come here
 		<year>1990</year>
 		<publisher>MicroProse</publisher>
 		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="737280">
 				<rom name="diska.img" size="737280" crc="d1724b34" sha1="cd0108296bf47addf36b4b6dbfd9cbafe4d3eb37" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk B" />
 			<dataarea name="flop" size="737280">
 				<rom name="diskb.img" size="737280" crc="f2a89364" sha1="54bae8483683e631cb0dc15fba208c1719a4b2bd" offset="0" />
 			</dataarea>
@@ -3930,13 +3972,17 @@ Missing files come here
 		<year>1990</year>
 		<publisher>MicroProse</publisher>
 		<part name="flop1" interface="floppy_3_5">
+			<feature name="disk_serial" value="4561 A" />
+			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="737280">
-				<rom name="disk1.img" size="737280" crc="d21eeeb5" sha1="196d053414c08bff51936a669025cb933b4b9096" offset="0" />
+				<rom name="diska.img" size="737280" crc="d21eeeb5" sha1="196d053414c08bff51936a669025cb933b4b9096" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
+			<feature name="disk_serial" value="4561 B" />
+			<feature name="part_id" value="Disk B" />
 			<dataarea name="flop" size="737280">
-				<rom name="disk2.img" size="737280" crc="e3d92c3d" sha1="787b795422552c413bfe14465bc06b152943ce91" offset="0" />
+				<rom name="diskb.img" size="737280" crc="e3d92c3d" sha1="787b795422552c413bfe14465bc06b152943ce91" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -4049,6 +4095,7 @@ Missing files come here
 		<year>1992</year>
 		<publisher>Velocity Development Corporation</publisher>
 		<info name="developer" value="Peninsula Gameworks" />
+		<info name="serial" value="333-3025" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="spectre challenger.img" size="737280" crc="d37944f9" sha1="2afddfbe00625def681655236b545e62cf54c296" offset="0" status="baddump" />
@@ -4211,6 +4258,7 @@ Missing files come here
 		<year>1993</year>
 		<publisher>GT Software</publisher>
 		<info name="developer" value="id Software" />
+		<info name="serial" value="04-30471"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="disk1.img" size="737280" crc="9da675e7" sha1="677a5cc1f96aadefc456782f88277787fa5ed1fa" offset="0" status="baddump" />
@@ -4219,6 +4267,39 @@ Missing files come here
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="disk2.img" size="737280" crc="6e8597bf" sha1="a5a44ce14a04a75104814d501afe54a38965d082" offset="0" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wndrland" supported="no">
+		<!-- Dumped via Kryoflux, track 0 shows as modified on all disks -->
+		<description>Wonderland</description>
+		<year>1990</year>
+		<publisher>Virgin Mastertronic</publisher>
+		<info name="developer" value="Magnetic Scrolls" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="disk1.img" size="737280" crc="d2cccf93" sha1="1749b90c93d9b9971fe0105db33698cf235ab917" offset="0" status="baddump" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="disk2.img" size="737280" crc="cee9a425" sha1="d875185535f46cb51a0ce290c0e56859ab9ed8d3" offset="0" status="baddump" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="disk3.img" size="737280" crc="67d63e0a" sha1="698497d30cbff3057a232ba94f818417b216791f" offset="0" status="baddump" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="disk4.img" size="737280" crc="3d98b783" sha1="a45ba0faea1e62757582449ce86c3b76e36a4b10" offset="0" status="baddump" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="disk5.img" size="737280" crc="3c52c940" sha1="f383946bcf6c93a04011ae55203366150af7d920" offset="0" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
