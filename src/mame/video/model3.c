@@ -11,6 +11,9 @@
 #define TRI_PARAM_TEXTURE_ENABLE        0x8
 #define TRI_PARAM_ALPHA_TEST            0x10
 
+#define TRI_BUFFER_SIZE					35000
+#define TRI_ALPHA_BUFFER_SIZE			15000
+
 struct model3_polydata
 {
 	cached_texture *texture;
@@ -24,23 +27,25 @@ class model3_renderer : public poly_manager<float, model3_polydata, 6, 50000>
 {
 public:
 	model3_renderer(model3_state &state, int width, int height)
-		: poly_manager<float, model3_polydata, 6, 50000>(state.machine())//, m_state(state)
+		: poly_manager<float, model3_polydata, 6, 50000>(state.machine())
 	{
 		m_fb = auto_bitmap_rgb32_alloc(state.machine(), width, height);
 		m_zb = auto_bitmap_ind32_alloc(state.machine(), width, height);
 	}
 
 	void draw(bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void draw_triangle(const m3_triangle* tri);
-	void clear_buffers();
+	void draw_opaque_triangles(const m3_triangle* tris, int num_tris);
+	void draw_alpha_triangles(const m3_triangle* tris, int num_tris);
+	void clear_fb();
+	void clear_zb();
 	void draw_scanline_solid(INT32 scanline, const extent_t &extent, const model3_polydata &extradata, int threadid);
 	void draw_scanline_tex(INT32 scanline, const extent_t &extent, const model3_polydata &extradata, int threadid);
-	void draw_scanline_contour(INT32 scanline, const extent_t &extent, const model3_polydata &extradata, int threadid);
+	void draw_scanline_tex_contour(INT32 scanline, const extent_t &extent, const model3_polydata &extradata, int threadid);
 	void draw_scanline_tex_trans(INT32 scanline, const extent_t &extent, const model3_polydata &extradata, int threadid);
 	void draw_scanline_tex_alpha(INT32 scanline, const extent_t &extent, const model3_polydata &extradata, int threadid);
+	void wait_for_polys();
 
 private:
-	//model3_state &m_state;
 	bitmap_rgb32 *m_fb;
 	bitmap_ind32 *m_zb;
 };
@@ -152,6 +157,9 @@ void model3_state::video_start()
 	int height = m_screen->height();
 
 	m_renderer = auto_alloc(machine(), model3_renderer(*this, width, height));
+
+	m_tri_buffer = auto_alloc_array_clear(machine(), m3_triangle, TRI_BUFFER_SIZE);
+	m_tri_alpha_buffer = auto_alloc_array_clear(machine(), m3_triangle, TRI_ALPHA_BUFFER_SIZE);
 
 	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(model3_state::model3_exit), this));
 
@@ -1007,9 +1015,42 @@ void model3_state::real3d_display_list_end()
 	}
 	m_texture_fifo_pos = 0;
 
-	m_renderer->clear_buffers();
+	m_renderer->clear_fb();
 
+	reset_triangle_buffers();
 	real3d_traverse_display_list();
+
+	/*
+	m_renderer->draw_opaque_triangles(m_tri_buffer, m_tri_buffer_ptr);
+	m_renderer->draw_alpha_triangles(m_tri_alpha_buffer, m_tri_alpha_buffer_ptr);
+
+	m_renderer->wait_for_polys();
+	*/
+
+	for (int i=0; i < 4; i++)
+	{
+		int ticount, tiacount;
+		int ti = m_viewport_tri_index[i];
+		int tia = m_viewport_tri_alpha_index[i];
+		if (i < 3)
+		{			
+			ticount = m_viewport_tri_index[i+1] - ti;
+			tiacount = m_viewport_tri_alpha_index[i+1] - tia;
+		}
+		else
+		{
+			ticount = m_tri_buffer_ptr - ti;
+			tiacount = m_tri_alpha_buffer_ptr - tia;
+		}
+
+		if (ticount > 0 || tiacount > 0)
+		{
+			m_renderer->clear_zb();
+			m_renderer->draw_opaque_triangles(&m_tri_buffer[ti], ticount);
+			m_renderer->draw_alpha_triangles(&m_tri_alpha_buffer[tia], tiacount);
+			m_renderer->wait_for_polys();
+		}
+	}
 }
 
 void model3_state::real3d_display_list1_dma(UINT32 src, UINT32 dst, int length, int byteswap)
@@ -1273,6 +1314,42 @@ static int clip_polygon(const m3_clip_vertex *v, int num_vertices, m3_plane cp, 
 	return clip_verts;
 }
 
+void model3_state::reset_triangle_buffers()
+{
+	m_tri_buffer_ptr = 0;
+	m_tri_alpha_buffer_ptr = 0;
+}
+
+m3_triangle *model3_state::push_triangle(bool alpha)
+{
+	if (!alpha)
+	{
+		int i = m_tri_buffer_ptr;
+
+		if (m_tri_buffer_ptr >= TRI_BUFFER_SIZE)
+		{
+			return NULL;
+			//fatalerror("push_triangle: tri buffer max exceeded");
+		}
+		
+		m_tri_buffer_ptr++;
+		return &m_tri_buffer[i];
+	}
+	else
+	{
+		int i = m_tri_alpha_buffer_ptr;
+
+		if (m_tri_alpha_buffer_ptr >= TRI_ALPHA_BUFFER_SIZE)
+		{
+			return NULL;
+			//fatalerror("push_triangle: tri alpha buffer max exceeded");
+		}
+
+		m_tri_alpha_buffer_ptr++;
+		return &m_tri_alpha_buffer[i];
+	}
+}
+
 void model3_state::draw_model(UINT32 addr)
 {
 	// Polygon RAM is mapped to the low 4MB of VROM
@@ -1311,8 +1388,6 @@ void model3_state::draw_model(UINT32 addr)
 		VECTOR3 normal;
 		VECTOR3 sn;
 		VECTOR p[4];
-		m3_triangle tri;
-		float dot;
 		int polygon_transparency;
 
 		for (i = 0; i < 7; i++)
@@ -1429,7 +1504,7 @@ void model3_state::draw_model(UINT32 addr)
 			float intensity;
 			if ((header[6] & 0x10000) == 0)
 			{
-				dot = dot_product3(n, m_parallel_light);
+				float dot = dot_product3(n, m_parallel_light);
 				intensity = ((dot * m_parallel_light_intensity) + m_ambient_light_intensity) * 255.0f;
 				if (intensity > 255.0f)
 				{
@@ -1500,23 +1575,28 @@ void model3_state::draw_model(UINT32 addr)
 			}
 
 			for (i=2; i < num_vertices; i++)
-			{
-				memcpy(&tri.v[0], &clip_vert[0], sizeof(m3_clip_vertex));
-				memcpy(&tri.v[1], &clip_vert[i-1], sizeof(m3_clip_vertex));
-				memcpy(&tri.v[2], &clip_vert[i], sizeof(m3_clip_vertex));
+			{				
+				bool alpha = (header[6] & 0x1) || (header[6] & 0x80000000);		// put to alpha buffer if there's any transparency involved
+				m3_triangle* tri = push_triangle(alpha);
 
-				tri.texture = texture;
-				tri.transparency = polygon_transparency;
-				tri.color = color;
+				// bail out if tri buffer is maxed out (happens during harley boot)
+				if (!tri)
+					return;
 
-				tri.param   = 0;
-				tri.param   |= (header[4] & 0x40) ? TRI_PARAM_TEXTURE_PAGE : 0;
-				tri.param   |= (header[6] & 0x00000400) ? TRI_PARAM_TEXTURE_ENABLE : 0;
-				tri.param   |= (header[2] & 0x2) ? TRI_PARAM_TEXTURE_MIRROR_U : 0;
-				tri.param   |= (header[2] & 0x1) ? TRI_PARAM_TEXTURE_MIRROR_V : 0;
-				tri.param   |= (header[6] & 0x80000000) ? TRI_PARAM_ALPHA_TEST : 0;
+				memcpy(&tri->v[0], &clip_vert[0], sizeof(m3_clip_vertex));
+				memcpy(&tri->v[1], &clip_vert[i-1], sizeof(m3_clip_vertex));
+				memcpy(&tri->v[2], &clip_vert[i], sizeof(m3_clip_vertex));
 
-				m_renderer->draw_triangle(&tri);
+				tri->texture = texture;
+				tri->transparency = polygon_transparency;
+				tri->color = color;
+
+				tri->param   = 0;
+				tri->param   |= (header[4] & 0x40) ? TRI_PARAM_TEXTURE_PAGE : 0;
+				tri->param   |= (header[6] & 0x00000400) ? TRI_PARAM_TEXTURE_ENABLE : 0;
+				tri->param   |= (header[2] & 0x2) ? TRI_PARAM_TEXTURE_MIRROR_U : 0;
+				tri->param   |= (header[2] & 0x1) ? TRI_PARAM_TEXTURE_MIRROR_V : 0;
+				tri->param   |= (header[6] & 0x80000000) ? TRI_PARAM_ALPHA_TEST : 0;
 			}
 		}
 	}
@@ -1714,9 +1794,9 @@ void model3_state::draw_viewport(int pri, UINT32 address)
 	/* TODO: where does node[23] point to ? LOD table ? */
 
 	/* set lighting parameters */
-	m_parallel_light[0] = -*(float *)&node[5];
+	m_parallel_light[0] = *(float *)&node[5];
 	m_parallel_light[1] = *(float *)&node[6];
-	m_parallel_light[2] = *(float *)&node[4];
+	m_parallel_light[2] = -*(float *)&node[4];
 	m_parallel_light_intensity = *(float *)&node[7];
 	m_ambient_light_intensity = (UINT8)(node[36] >> 8) / 256.0f;
 
@@ -1735,7 +1815,11 @@ void model3_state::real3d_traverse_display_list()
 	m_list_depth = 0;
 
 	for (int pri = 0; pri < 4; pri++)
+	{
+		m_viewport_tri_index[pri] = m_tri_buffer_ptr;
+		m_viewport_tri_alpha_index[pri] = m_tri_alpha_buffer_ptr;
 		draw_viewport(pri, 0x800000);
+	}
 }
 
 void model3_renderer::draw(bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -1757,7 +1841,7 @@ void model3_renderer::draw(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 	}
 }
 
-void model3_renderer::clear_buffers()
+void model3_renderer::clear_fb()
 {
 	rectangle cliprect;
 	cliprect.min_x = 0;
@@ -1766,12 +1850,26 @@ void model3_renderer::clear_buffers()
 	cliprect.max_y = 383;
 
 	m_fb->fill(0x00000000, cliprect);
+}
 
+void model3_renderer::clear_zb()
+{
+	rectangle cliprect;
+	cliprect.min_x = 0;
+	cliprect.min_y = 0;
+	cliprect.max_x = 495;
+	cliprect.max_y = 383;
+	
 	float zvalue = 10000000000.0f;
 	m_zb->fill(*(int*)&zvalue, cliprect);
 }
 
-void model3_renderer::draw_triangle(const m3_triangle *tri)
+void model3_renderer::wait_for_polys()
+{
+	wait();
+}
+
+void model3_renderer::draw_opaque_triangles(const m3_triangle* tris, int num_tris)
 {
 	rectangle cliprect;
 	cliprect.min_x = 0;
@@ -1779,62 +1877,111 @@ void model3_renderer::draw_triangle(const m3_triangle *tri)
 	cliprect.max_x = 495;
 	cliprect.max_y = 383;
 
+//	printf("draw opaque: %d\n", num_tris);
+
 	vertex_t v[3];
 
-	if (tri->param & TRI_PARAM_TEXTURE_ENABLE)
+	for (int t=0; t < num_tris; t++)
 	{
-		for (int i=0; i < 3; i++)
-		{
-			v[i].x = tri->v[i].x;
-			v[i].y = tri->v[i].y;
-			v[i].p[0] = tri->v[i].z;
-			v[i].p[1] = 1.0f / tri->v[i].z;
-			v[i].p[2] = tri->v[i].u * 256.0f;       // 8 bits of subtexel precision for bilinear filtering
-			v[i].p[3] = tri->v[i].v * 256.0f;
-			v[i].p[4] = tri->v[i].i;
-		}
+		const m3_triangle* tri = &tris[t];
 
-		model3_polydata &extra = object_data_alloc();
-		extra.texture = tri->texture;
-		extra.transparency = tri->transparency;
-		extra.intensity = tri->intensity;
-		extra.texture_param = tri->param;
+		if (tri->param & TRI_PARAM_TEXTURE_ENABLE)
+		{
+			for (int i=0; i < 3; i++)
+			{
+				v[i].x = tri->v[i].x;
+				v[i].y = tri->v[i].y;
+				v[i].p[0] = tri->v[i].z;
+				v[i].p[1] = 1.0f / tri->v[i].z;
+				v[i].p[2] = tri->v[i].u * 256.0f;       // 8 bits of subtexel precision for bilinear filtering
+				v[i].p[3] = tri->v[i].v * 256.0f;
+				v[i].p[4] = tri->v[i].i;
+			}
+	
+			model3_polydata &extra = object_data_alloc();
+			extra.texture = tri->texture;
+			extra.transparency = tri->transparency;
+			extra.texture_param = tri->param;
 
-		render_delegate rd;
-		if (tri->param & TRI_PARAM_ALPHA_TEST)
-		{
-			rd = render_delegate(FUNC(model3_renderer::draw_scanline_contour), this);
-		}
-		else if (extra.texture->alpha == 0xff)
-		{
-			if (tri->transparency >= 32)
-				rd = render_delegate(FUNC(model3_renderer::draw_scanline_tex), this);
-			else
-				rd = render_delegate(FUNC(model3_renderer::draw_scanline_tex_trans), this);
+			render_triangle(cliprect, render_delegate(FUNC(model3_renderer::draw_scanline_tex), this), 5, v[0], v[1], v[2]);
 		}
 		else
 		{
-			rd = render_delegate(FUNC(model3_renderer::draw_scanline_tex_alpha), this);
-		}
+			for (int i=0; i < 3; i++)
+			{
+				v[i].x = tri->v[i].x;
+				v[i].y = tri->v[i].y;
+				v[i].p[0] = tri->v[i].z;
+				v[i].p[1] = tri->v[i].i;
+			}
 
-		render_triangle(cliprect, rd, 5, v[0], v[1], v[2]);
+			model3_polydata &extra = object_data_alloc();
+			extra.color = tri->color;
+
+			render_triangle(cliprect, render_delegate(FUNC(model3_renderer::draw_scanline_solid), this), 2, v[0], v[1], v[2]);
+		}
 	}
-	else
+}
+
+void model3_renderer::draw_alpha_triangles(const m3_triangle* tris, int num_tris)
+{
+	rectangle cliprect;
+	cliprect.min_x = 0;
+	cliprect.min_y = 0;
+	cliprect.max_x = 495;
+	cliprect.max_y = 383;
+
+//	printf("draw alpha: %d\n", num_tris);
+
+	vertex_t v[3];
+
+	for (int t=num_tris-1; t >= 0; t--)
 	{
-		for (int i=0; i < 3; i++)
+		const m3_triangle* tri = &tris[t];
+
+		if (tri->param & TRI_PARAM_TEXTURE_ENABLE)
 		{
-			v[i].x = tri->v[i].x;
-			v[i].y = tri->v[i].y;
-			v[i].p[0] = tri->v[i].z;
-			v[i].p[1] = tri->v[i].i;
+			for (int i=0; i < 3; i++)
+			{
+				v[i].x = tri->v[i].x;
+				v[i].y = tri->v[i].y;
+				v[i].p[0] = tri->v[i].z;
+				v[i].p[1] = 1.0f / tri->v[i].z;
+				v[i].p[2] = tri->v[i].u * 256.0f;       // 8 bits of subtexel precision for bilinear filtering
+				v[i].p[3] = tri->v[i].v * 256.0f;
+				v[i].p[4] = tri->v[i].i;
+			}
+	
+			model3_polydata &extra = object_data_alloc();
+			extra.texture = tri->texture;
+			extra.transparency = tri->transparency;
+			extra.texture_param = tri->param;
+
+			if (tri->param & TRI_PARAM_ALPHA_TEST)
+			{
+				render_triangle(cliprect, render_delegate(FUNC(model3_renderer::draw_scanline_tex_contour), this), 5, v[0], v[1], v[2]);
+			}
+			else
+			{
+				render_triangle(cliprect, render_delegate(FUNC(model3_renderer::draw_scanline_tex_alpha), this), 5, v[0], v[1], v[2]);
+			}
 		}
+		else
+		{
+			for (int i=0; i < 3; i++)
+			{
+				v[i].x = tri->v[i].x;
+				v[i].y = tri->v[i].y;
+				v[i].p[0] = tri->v[i].z;
+				v[i].p[1] = tri->v[i].i;
+			}
 
-		model3_polydata &extra = object_data_alloc();
+			model3_polydata &extra = object_data_alloc();
+			extra.color = tri->color;
 
-		extra.intensity = tri->intensity;
-		extra.color = tri->color;
-
-		render_triangle(cliprect, render_delegate(FUNC(model3_renderer::draw_scanline_solid), this), 2, v[0], v[1], v[2]);
+			// TODO: scanline renderer for solid /w transparency
+			render_triangle(cliprect, render_delegate(FUNC(model3_renderer::draw_scanline_solid), this), 2, v[0], v[1], v[2]);
+		}
 	}
 }
 
@@ -1964,7 +2111,7 @@ void model3_renderer::draw_scanline_tex(INT32 scanline, const extent_t &extent, 
 	}
 }
 
-void model3_renderer::draw_scanline_contour(INT32 scanline, const extent_t &extent, const model3_polydata &polydata, int threadid)
+void model3_renderer::draw_scanline_tex_contour(INT32 scanline, const extent_t &extent, const model3_polydata &polydata, int threadid)
 {
 	UINT32 *fb = &m_fb->pix32(scanline);
 	float *zb = (float*)&m_zb->pix32(scanline);
@@ -2068,7 +2215,6 @@ void model3_renderer::draw_scanline_tex_trans(INT32 scanline, const extent_t &ex
 			b += ((orig & 0x000000ff) * desttrans) >> 5;
 
 			fb[x] = 0xff000000 | (r & 0xff0000) | (g & 0xff00) | (b & 0xff);
-			zb[x] = z;
 		}
 
 		ooz += dooz;
@@ -2131,7 +2277,6 @@ void model3_renderer::draw_scanline_tex_alpha(INT32 scanline, const extent_t &ex
 				b += ((orig & 0x000000ff) * minalpha) >> 8;
 
 				fb[x] = 0xff000000 | (r & 0xff0000) | (g & 0xff00) | (b & 0xff);
-				zb[x] = z;
 			}
 		}
 

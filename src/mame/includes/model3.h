@@ -56,7 +56,6 @@ struct m3_triangle
 	cached_texture *texture;
 	int param;
 	int transparency;
-	int intensity;
 	int color;
 };
 
@@ -181,6 +180,12 @@ public:
 	cached_texture *m_texcache[2][1024/32][2048/32];
 
 	model3_renderer *m_renderer;
+	m3_triangle* m_tri_buffer;
+	m3_triangle* m_tri_alpha_buffer;
+	int m_tri_buffer_ptr;
+	int m_tri_alpha_buffer_ptr;
+	int m_viewport_tri_index[4];
+	int m_viewport_tri_alpha_index[4];
 
 	DECLARE_READ32_MEMBER(rtc72421_r);
 	DECLARE_WRITE32_MEMBER(rtc72421_w);
@@ -292,6 +297,8 @@ public:
 	TILE_GET_INFO_MEMBER(tile_info_layer1_8bit);
 	TILE_GET_INFO_MEMBER(tile_info_layer2_8bit);
 	TILE_GET_INFO_MEMBER(tile_info_layer3_8bit);
+	void reset_triangle_buffers();
+	m3_triangle* push_triangle(bool alpha);
 	void draw_layers(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void draw_layer(bitmap_rgb32 &bitmap, const rectangle &cliprect, int layer, int bitdepth, int sx, int sy);
 	void draw_3d_layer(bitmap_rgb32 &bitmap, const rectangle &cliprect);

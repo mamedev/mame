@@ -26,11 +26,11 @@
     vs29815 - massive memory trashing and page faults
 
     vs2 - works
-    harley - works, wrong textures in many places, correct textures uploaded when the game ends
+    harley - works
     skichamp - boots after skipping the drive board errors, massive slowdowns
     srally2/sraly2dx - works
     von2/von254g - works
-    fvipers2 - waiting for decrementer (same code as eca)
+    fvipers2 - crashes after player selection
     vs298 - works, hangs with an onscreen error code
     vs299/vs2v991 - works
     oceanhun - same as daytona2
@@ -6005,8 +6005,8 @@ GAME( 1999, vs299,    vs2v991, model3_20, model3, model3_state,      vs299, ROT0
 /* Model 3 Step 2.1 */
 GAME( 1998, daytona2,         0, model3_21, daytona2, model3_state, daytona2, ROT0, "Sega", "Daytona USA 2 (Revision A)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1998, dayto2pe,         0, model3_21, daytona2, model3_state, dayto2pe, ROT0, "Sega", "Daytona USA 2 Power Edition", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1998, dirtdvls,         0, model3_21, model3, model3_state,   dirtdvls, ROT0, "Sega", "Dirt Devils (set 1) (Revision A)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1998, dirtdvlsa, dirtdvls, model3_21, model3, model3_state,   dirtdvls, ROT0, "Sega", "Dirt Devils (set 2) (Revision A)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1998, dirtdvls,         0, model3_21, scud, model3_state,     dirtdvls, ROT0, "Sega", "Dirt Devils (set 1) (Revision A)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1998, dirtdvlsa, dirtdvls, model3_21, scud, model3_state,     dirtdvls, ROT0, "Sega", "Dirt Devils (set 2) (Revision A)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1998, swtrilgy,         0, model3_21, swtrilgy, model3_state, swtrilgy, ROT0, "Sega / LucasArts", "Star Wars Trilogy (Revision A)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1998, swtrilgya, swtrilgy, model3_21, swtrilgy, model3_state, swtrilga, ROT0, "Sega / LucasArts", "Star Wars Trilogy", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1998, spikeout,         0, model3_21, model3, model3_state,   spikeout, ROT0, "Sega", "Spikeout (Revision C)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
