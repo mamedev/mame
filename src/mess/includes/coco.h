@@ -18,6 +18,7 @@
 #include "machine/6821pia.h"
 #include "bus/coco/cococart.h"
 #include "machine/coco_vhd.h"
+#include "bus/coco/coco_dwsock.h"
 #include "machine/ram.h"
 #include "sound/dac.h"
 #include "sound/wave.h"
@@ -31,6 +32,7 @@
 INPUT_PORTS_EXTERN( coco_analog_control );
 INPUT_PORTS_EXTERN( coco_cart_autostart );
 INPUT_PORTS_EXTERN( coco_rtc );
+INPUT_PORTS_EXTERN( coco_beckerport );
 
 SLOT_INTERFACE_EXTERN( coco_cart );
 
@@ -48,6 +50,7 @@ SLOT_INTERFACE_EXTERN( coco_cart );
 #define DAC_TAG                     "dac"
 #define CARTRIDGE_TAG               "ext"
 #define RS232_TAG                   "rs232"
+#define DWSOCK_TAG                  "dwsock"
 #define VHD0_TAG                    "vhd0"
 #define VHD1_TAG                    "vhd1"
 
@@ -55,6 +58,7 @@ SLOT_INTERFACE_EXTERN( coco_cart );
 #define CTRL_SEL_TAG                "ctrl_sel"
 #define HIRES_INTF_TAG              "hires_intf"
 #define CART_AUTOSTART_TAG          "cart_autostart"
+#define BECKERPORT_TAG              "beckerport"
 #define JOYSTICK_RX_TAG             "joystick_rx"
 #define JOYSTICK_RY_TAG             "joystick_ry"
 #define JOYSTICK_LX_TAG             "joystick_lx"
@@ -95,6 +99,8 @@ public:
 	optional_device<rs232_port_device> m_rs232;
 	optional_device<coco_vhd_image_device> m_vhd_0;
 	optional_device<coco_vhd_image_device> m_vhd_1;
+	required_device<beckerport_device> m_beckerport;
+	required_ioport                    m_beckerportconfig;
 
 	// driver update handlers
 	DECLARE_INPUT_CHANGED_MEMBER(keyboard_changed);

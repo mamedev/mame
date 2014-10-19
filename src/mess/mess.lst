@@ -1213,6 +1213,7 @@ coco2b  // Color Computer 2B (uses M6847T1 video chip)
 coco3    // Color Computer 3 (NTSC)
 coco3p  // Color Computer 3 (PAL)
 coco3h  // Hacked Color Computer 3 (6309)
+coco3dw1  // Coco 3 with HDB-DOS
 dragon32  // Dragon 32
 dragon64  // Dragon 64
 dragon200 // Dragon 200

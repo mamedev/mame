@@ -89,7 +89,9 @@ coco_state::coco_state(const machine_config &mconfig, device_type type, const ch
 	m_cassette(*this, "cassette"),
 	m_rs232(*this, RS232_TAG),
 	m_vhd_0(*this, VHD0_TAG),
-	m_vhd_1(*this, VHD1_TAG)
+	m_vhd_1(*this, VHD1_TAG),
+	m_beckerport(*this, DWSOCK_TAG),
+	m_beckerportconfig(*this, BECKERPORT_TAG)
 {
 }
 
@@ -1016,8 +1018,6 @@ INPUT_CHANGED_MEMBER(coco_state::joystick_mode_changed)
 	poll_keyboard();
 }
 
-
-
 //-------------------------------------------------
 //  poll_hires_joystick
 //-------------------------------------------------
@@ -1159,6 +1159,11 @@ WRITE8_MEMBER( coco_state::ff60_write )
 
 READ8_MEMBER( coco_state::ff40_read )
 {
+    if (offset >= 1 && offset <= 2 && m_beckerportconfig->read_safe(0) == 1)
+    {
+        return m_beckerport->read(space, offset-1, mem_mask);
+    }
+
 	return m_cococart->read(space, offset, mem_mask);
 }
 
@@ -1170,6 +1175,11 @@ READ8_MEMBER( coco_state::ff40_read )
 
 WRITE8_MEMBER( coco_state::ff40_write )
 {
+    if (offset >= 1 && offset <= 2 && m_beckerportconfig->read_safe(0) == 1)
+    {
+        return m_beckerport->write(space, offset-1, data, mem_mask);
+    }
+
 	m_cococart->write(space, offset, data, mem_mask);
 }
 
@@ -1183,8 +1193,6 @@ void coco_state::cart_w(bool state)
 {
 	m_pia_1->cb1_w(state);
 }
-
-
 
 /***************************************************************************
   DISASSEMBLY OVERRIDE (OS9 syscalls)

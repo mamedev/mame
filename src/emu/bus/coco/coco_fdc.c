@@ -639,6 +639,30 @@ const rom_entry *coco_fdc_v11_device::device_rom_region() const
 }
 
 //**************************************************************************
+//              COCO-3 HDB-DOS
+//**************************************************************************
+
+ROM_START( coco3_hdb1 )
+	ROM_REGION(0x8000,"eprom",ROMREGION_ERASE00)
+	ROM_LOAD("hdbdw3bc3.rom",   0x0000, 0x2000, CRC(309a9efd) SHA1(671605d61811953860466f771c1594bbade331f4))
+	ROM_RELOAD(0x2000, 0x2000)
+	ROM_RELOAD(0x4000, 0x2000)
+	ROM_RELOAD(0x6000, 0x2000)
+ROM_END
+
+const device_type COCO3_HDB1 = &device_creator<coco3_hdb1_device>;
+
+coco3_hdb1_device::coco3_hdb1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+		: coco_fdc_device(mconfig, COCO3_HDB1, "CoCo3 HDB-DOS", tag, owner, clock, "coco3_hdb1", __FILE__)
+{
+}
+
+const rom_entry *coco3_hdb1_device::device_rom_region() const
+{
+	return ROM_NAME( coco3_hdb1 );
+}
+
+//**************************************************************************
 //              CP400 FDC
 //**************************************************************************
 

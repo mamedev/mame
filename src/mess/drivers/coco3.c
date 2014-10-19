@@ -222,6 +222,7 @@ static INPUT_PORTS_START( coco3 )
 	PORT_INCLUDE( coco_rat_mouse )
 	PORT_INCLUDE( coco_lightgun )
 	PORT_INCLUDE( coco_rtc )
+	PORT_INCLUDE( coco_beckerport )
 INPUT_PORTS_END
 
 static DEVICE_INPUT_DEFAULTS_START( printer )
@@ -260,6 +261,9 @@ static MACHINE_CONFIG_START( coco3, coco3_state )
 	MCFG_PIA_CB2_HANDLER(WRITELINE(coco_state, pia1_cb2_w))
 	MCFG_PIA_IRQA_HANDLER(WRITELINE(coco_state, pia1_firq_a))
 	MCFG_PIA_IRQB_HANDLER(WRITELINE(coco_state, pia1_firq_b))
+
+	// Becker Port device
+	MCFG_DEVICE_ADD(DWSOCK_TAG, COCO_DWSOCK, 0)
 
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_FORMATS(coco_cassette_formats)
@@ -337,7 +341,10 @@ static MACHINE_CONFIG_DERIVED( coco3h, coco3 )
 	MCFG_CPU_PROGRAM_MAP(coco3_mem)
 MACHINE_CONFIG_END
 
-
+static MACHINE_CONFIG_DERIVED( coco3dw1, coco3 )
+	MCFG_COCO_CARTRIDGE_REMOVE(CARTRIDGE_TAG)
+	MCFG_COCO_CARTRIDGE_ADD(CARTRIDGE_TAG, coco_cart, "cc3hdb1")
+MACHINE_CONFIG_END
 
 //**************************************************************************
 //  ROMS
@@ -354,8 +361,7 @@ ROM_START(coco3p)
 ROM_END
 
 #define rom_coco3h  rom_coco3
-
-
+#define rom_coco3dw1 rom_coco3
 
 //**************************************************************************
 //  SYSTEM DRIVERS
@@ -364,3 +370,4 @@ ROM_END
 COMP(  1986,    coco3,      coco,   0,      coco3,     coco3, driver_device,     0,      "Tandy Radio Shack",            "Color Computer 3 (NTSC)", 0)
 COMP(  1986,    coco3p,     coco,   0,      coco3p,    coco3, driver_device,     0,      "Tandy Radio Shack",            "Color Computer 3 (PAL)", 0)
 COMP(  19??,    coco3h,     coco,   0,      coco3h,    coco3, driver_device,     0,      "Tandy Radio Shack",            "Color Computer 3 (NTSC; HD6309)", GAME_UNOFFICIAL)
+COMP(  19??,    coco3dw1,   coco,   0,      coco3dw1,  coco3, driver_device,     0,      "Tandy Radio Shack",            "Color Computer 3 (NTSC; HDB-DOS)", GAME_UNOFFICIAL)

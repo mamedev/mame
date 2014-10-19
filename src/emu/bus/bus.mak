@@ -1250,6 +1250,7 @@ BUSOBJS += $(BUSOBJ)/coco/coco_orch90.o
 BUSOBJS += $(BUSOBJ)/coco/coco_pak.o
 BUSOBJS += $(BUSOBJ)/coco/coco_fdc.o
 BUSOBJS += $(BUSOBJ)/coco/coco_multi.o
+BUSOBJS += $(BUSOBJ)/coco/coco_dwsock.o
 endif
 
 #-------------------------------------------------

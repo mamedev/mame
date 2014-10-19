@@ -29,6 +29,7 @@
 #include "bus/coco/coco_pak.h"
 #include "bus/coco/coco_fdc.h"
 #include "bus/coco/coco_multi.h"
+#include "bus/coco/coco_dwsock.h"
 #include "formats/coco_cas.h"
 
 //**************************************************************************
@@ -112,6 +113,17 @@ INPUT_PORTS_START( coco_cart_autostart )
 INPUT_PORTS_END
 
 
+
+//-------------------------------------------------
+//  INPUT_PORTS( coco_beckerport )
+//-------------------------------------------------
+
+INPUT_PORTS_START( coco_beckerport )
+	PORT_START(BECKERPORT_TAG)
+	PORT_CONFNAME( 0x01, 0x01, "Becker Port" )
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ))
+	PORT_CONFSETTING(    0x01, DEF_STR( On ))
+INPUT_PORTS_END
 
 //-------------------------------------------------
 //  INPUT_PORTS( coco_rtc )
@@ -223,6 +235,7 @@ static INPUT_PORTS_START( coco )
 	PORT_INCLUDE( coco_analog_control )
 	PORT_INCLUDE( coco_cart_autostart )
 	PORT_INCLUDE( coco_rtc )
+	PORT_INCLUDE( coco_beckerport )
 INPUT_PORTS_END
 
 
@@ -238,6 +251,7 @@ INPUT_PORTS_END
 SLOT_INTERFACE_START( coco_cart )
 	SLOT_INTERFACE("fdc", COCO_FDC)
 	SLOT_INTERFACE("fdcv11", COCO_FDC_V11)
+	SLOT_INTERFACE("cc3hdb1", COCO3_HDB1)
 	SLOT_INTERFACE("cp400_fdc", CP400_FDC)
 	SLOT_INTERFACE("rs232", COCO_232)
 	SLOT_INTERFACE("orch90", COCO_ORCH90)
@@ -299,6 +313,9 @@ static MACHINE_CONFIG_START( coco, coco12_state )
 
 	MCFG_SAM6883_ADD(SAM_TAG, XTAL_3_579545MHz, MAINCPU_TAG, AS_PROGRAM)
 	MCFG_SAM6883_RES_CALLBACK(READ8(coco12_state, sam_read))
+
+	// Becker Port device
+	MCFG_DEVICE_ADD(DWSOCK_TAG, COCO_DWSOCK, 0)
 
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_FORMATS(coco_cassette_formats)

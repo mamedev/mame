@@ -95,6 +95,23 @@ public:
 // device type definition
 extern const device_type COCO_FDC_V11;
 
+// ======================> coco3_hdb1_device
+
+class coco3_hdb1_device :
+		public coco_fdc_device
+{
+public:
+		// construction/destruction
+		coco3_hdb1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+		// optional information overrides
+		virtual const rom_entry *device_rom_region() const;
+};
+
+
+// device type definition
+extern const device_type COCO3_HDB1;
+
 // ======================> cp400_fdc_device
 
 class cp400_fdc_device :
