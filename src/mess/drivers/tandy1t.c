@@ -598,6 +598,9 @@ static MACHINE_CONFIG_DERIVED( t1000sx, t1000hx )
 	MCFG_ISA8_SLOT_ADD("mb:isa", "isa2", pc_isa8_cards, NULL, false)
 	MCFG_ISA8_SLOT_ADD("mb:isa", "isa3", pc_isa8_cards, NULL, false)
 	MCFG_ISA8_SLOT_ADD("mb:isa", "isa4", pc_isa8_cards, NULL, false)
+
+	/* software lists */
+	MCFG_SOFTWARE_LIST_ADD("disk_list","ibm5150")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( t1000_16, tandy1000_state )

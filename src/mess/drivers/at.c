@@ -428,6 +428,14 @@ static MACHINE_CONFIG_FRAGMENT( at_motherboard )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_FRAGMENT( at_softlists )
+	/* software lists */
+	MCFG_SOFTWARE_LIST_ADD("pc_disk_list","ibm5150")
+	MCFG_SOFTWARE_LIST_ADD("xt_disk_list","ibm5160_flop")
+	MCFG_SOFTWARE_LIST_ADD("at_disk_list","ibm5170")
+	MCFG_SOFTWARE_LIST_ADD("at_cdrom_list","ibm5170_cdrom")
+MACHINE_CONFIG_END
+
 static MACHINE_CONFIG_START( ibm5170, at_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I80286, XTAL_12MHz/2 /*6000000*/)
@@ -447,15 +455,12 @@ static MACHINE_CONFIG_START( ibm5170, at_state )
 	MCFG_ISA16_SLOT_ADD("isabus","isa4", pc_isa16_cards, "ide", false)
 	MCFG_PC_KBDC_SLOT_ADD("pc_kbdc", "kbd", pc_at_keyboards, STR_KBD_IBM_PC_AT_84)
 
-	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("pc_disk_list","ibm5150")
-	MCFG_SOFTWARE_LIST_ADD("xt_disk_list","ibm5160_flop")
-	MCFG_SOFTWARE_LIST_ADD("at_disk_list","ibm5170")
-
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("1664K")
 	MCFG_RAM_EXTRA_OPTIONS("2M,4M,8M,15M")
+
+	MCFG_FRAGMENT_ADD( at_softlists )
 MACHINE_CONFIG_END
 
 
@@ -491,6 +496,8 @@ static MACHINE_CONFIG_START( ibmps1, at_state )
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("1664K")
 	MCFG_RAM_EXTRA_OPTIONS("2M,4M,8M,15M")
+
+	MCFG_FRAGMENT_ADD( at_softlists )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( ibm5162, at_state )
@@ -516,6 +523,8 @@ static MACHINE_CONFIG_START( ibm5162, at_state )
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("1664K")
 	MCFG_RAM_EXTRA_OPTIONS("2M,4M,8M,15M")
+
+	MCFG_FRAGMENT_ADD( at_softlists )
 MACHINE_CONFIG_END
 
 
@@ -542,6 +551,8 @@ static MACHINE_CONFIG_START( ps2m30286, at_state )
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("1664K")
 	MCFG_RAM_EXTRA_OPTIONS("2M,4M,8M,15M")
+
+	MCFG_FRAGMENT_ADD( at_softlists )
 MACHINE_CONFIG_END
 
 
@@ -568,6 +579,8 @@ static MACHINE_CONFIG_START( neat, at_state )
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("1664K")
 	MCFG_RAM_EXTRA_OPTIONS("2M,4M,8M,15M")
+
+	MCFG_FRAGMENT_ADD( at_softlists )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( atvga, at_state )
@@ -592,6 +605,8 @@ static MACHINE_CONFIG_START( atvga, at_state )
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("1664K")
 	MCFG_RAM_EXTRA_OPTIONS("2M,4M,8M,15M")
+
+	MCFG_FRAGMENT_ADD( at_softlists )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( xb42639, at_state )
@@ -615,6 +630,8 @@ static MACHINE_CONFIG_START( xb42639, at_state )
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("1664K")
 	MCFG_RAM_EXTRA_OPTIONS("2M,4M,8M,15M")
+
+	MCFG_FRAGMENT_ADD( at_softlists )
 MACHINE_CONFIG_END
 
 
@@ -645,11 +662,7 @@ static MACHINE_CONFIG_START( at386, at_state )
 	MCFG_RAM_DEFAULT_SIZE("1664K")
 	MCFG_RAM_EXTRA_OPTIONS("2M,4M,8M,15M,16M,32M,64M,128M,256M")
 
-	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("pc_disk_list","ibm5150")
-	MCFG_SOFTWARE_LIST_ADD("xt_disk_list","ibm5160_flop")
-	MCFG_SOFTWARE_LIST_ADD("at_disk_list","ibm5170")
-	MCFG_SOFTWARE_LIST_ADD("at_cdrom_list","ibm5170_cdrom")
+	MCFG_FRAGMENT_ADD( at_softlists )
 MACHINE_CONFIG_END
 
 
@@ -688,6 +701,8 @@ static MACHINE_CONFIG_START( k286i, at_state )
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("1M")
 	MCFG_RAM_EXTRA_OPTIONS("2M,4M,8M,16M")
+
+	MCFG_FRAGMENT_ADD( at_softlists )
 MACHINE_CONFIG_END
 
 
@@ -725,6 +740,8 @@ static MACHINE_CONFIG_START( at586, at586_state )
 	MCFG_ISA16_SLOT_ADD(":pcibus:1:i82371ab:isabus","isa4", pc_isa16_cards, NULL, false)
 	MCFG_ISA16_SLOT_ADD(":pcibus:1:i82371ab:isabus","isa5", pc_isa16_cards, NULL, false)
 	MCFG_PC_KBDC_SLOT_ADD("pc_kbdc", "kbd", pc_at_keyboards, STR_KBD_MICROSOFT_NATURAL)
+
+	MCFG_FRAGMENT_ADD( at_softlists )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( at586x3, at586_state )
@@ -749,6 +766,8 @@ static MACHINE_CONFIG_START( at586x3, at586_state )
 	MCFG_ISA16_SLOT_ADD(":pcibus:1:i82371sb:isabus","isa4", pc_isa16_cards, NULL, false)
 	MCFG_ISA16_SLOT_ADD(":pcibus:1:i82371sb:isabus","isa5", pc_isa16_cards, NULL, false)
 	MCFG_PC_KBDC_SLOT_ADD("pc_kbdc", "kbd", pc_at_keyboards, STR_KBD_MICROSOFT_NATURAL)
+
+	MCFG_FRAGMENT_ADD( at_softlists )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( at386sx, atvga )
@@ -839,10 +858,7 @@ static MACHINE_CONFIG_START( megapc, megapc_state )
 	MCFG_PALETTE_ADD("palette", 256) // todo: really needed?
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("pc_disk_list","ibm5150")
-	MCFG_SOFTWARE_LIST_ADD("xt_disk_list","ibm5160_flop")
-	MCFG_SOFTWARE_LIST_ADD("at_disk_list","ibm5170")
-	MCFG_SOFTWARE_LIST_ADD("at_cdrom_list","ibm5170_cdrom")
+	MCFG_FRAGMENT_ADD( at_softlists )
 	MCFG_SOFTWARE_LIST_ADD("disk_list","megapc")
 MACHINE_CONFIG_END
 
@@ -881,10 +897,7 @@ static MACHINE_CONFIG_START( megapcpla, at_state )
 	MCFG_RAM_EXTRA_OPTIONS("2M,8M,15M,16M,32M,64M,128M,256M")
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("pc_disk_list","ibm5150")
-	MCFG_SOFTWARE_LIST_ADD("xt_disk_list","ibm5160_flop")
-	MCFG_SOFTWARE_LIST_ADD("at_disk_list","ibm5170")
-	MCFG_SOFTWARE_LIST_ADD("at_cdrom_list","ibm5170_cdrom")
+	MCFG_FRAGMENT_ADD( at_softlists )
 	MCFG_SOFTWARE_LIST_ADD("disk_list","megapc")
 MACHINE_CONFIG_END
 

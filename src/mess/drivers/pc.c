@@ -194,6 +194,9 @@ static MACHINE_CONFIG_START( pccga, pc_state )
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("640K")
+
+	/* software lists */
+	MCFG_SOFTWARE_LIST_ADD("disk_list","ibm5150")
 MACHINE_CONFIG_END
 
 static DEVICE_INPUT_DEFAULTS_START( iskr3104 )
@@ -258,6 +261,9 @@ static MACHINE_CONFIG_START( zenith, pc_state )
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("640K")
+
+	/* software lists */
+	MCFG_SOFTWARE_LIST_ADD("disk_list","ibm5150")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( olivetti, pc_state )
@@ -277,6 +283,9 @@ static MACHINE_CONFIG_START( olivetti, pc_state )
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("640K")
+
+	/* software lists */
+	MCFG_SOFTWARE_LIST_ADD("disk_list","ibm5150")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( ibm5550, pc_state )
