@@ -3,6 +3,10 @@
   PINBALL
   Gottlieb System 3
 
+Status:
+- Display works
+- Attract mode works
+
 *****************************************************************************************************/
 
 #include "machine/genpin.h"
@@ -21,7 +25,13 @@ public:
 	{ }
 
 	DECLARE_DRIVER_INIT(gts3);
+	DECLARE_WRITE8_MEMBER(segbank_w);
+	DECLARE_WRITE8_MEMBER(u4b_w);
+	DECLARE_WRITE_LINE_MEMBER(nmi_w);
 private:
+	bool m_dispclk;
+	UINT32 m_digit;
+	UINT8 m_segment[4];
 	virtual void machine_reset();
 	required_device<m65c02_device> m_maincpu;
 	required_device<via6522_device> m_u4;
@@ -33,14 +43,53 @@ static ADDRESS_MAP_START( gts3_map, AS_PROGRAM, 8, gts3_state )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x2000, 0x200f) AM_DEVREADWRITE("u4", via6522_device, read, write)
 	AM_RANGE(0x2010, 0x201f) AM_DEVREADWRITE("u5", via6522_device, read, write)
+	AM_RANGE(0x2020, 0x2023) AM_MIRROR(0x0c) AM_WRITE(segbank_w)
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( gts3 )
 INPUT_PORTS_END
 
+// This trampoline needed - DEVWRITELINE("maincpu", m65c02_device, nmi_line) does not work
+WRITE_LINE_MEMBER( gts3_state::nmi_w )
+{
+	m_maincpu->set_input_line(INPUT_LINE_NMI, (state) ? CLEAR_LINE : HOLD_LINE);
+}
+
+WRITE8_MEMBER( gts3_state::segbank_w )
+{
+	m_segment[offset] = data;
+	UINT8 i;
+	UINT32 seg1,seg2;
+	offset &= 2;
+	for (i = 0;i < 20; i++)
+	{
+		if BIT(m_digit, i)
+		{
+			seg1 = m_segment[offset] | (m_segment[offset+1] << 8);
+			seg2 = BITSWAP32(seg1, 16,16,16,16,16,16,16,16,16,16,16,16,16,16,15,14,9,7,13,11,10,6,8,12,5,4,3,3,2,1,0,0);
+			output_set_digit_value(i+(offset ? 0 : 20), seg2);
+		}
+	}
+}
+
+WRITE8_MEMBER( gts3_state::u4b_w )
+{
+	bool dispclk = BIT(data, 6);
+	if ((!m_dispclk) && dispclk) // 0->1 is valid
+	{
+		m_digit = (m_digit << 1) | BIT(data, 5);
+	}
+	m_dispclk = dispclk;
+
+
+//	printf("B=%s=%X ",machine().describe_context(),data&0xe0);
+}
+
 void gts3_state::machine_reset()
 {
+	m_digit = 0;
+	m_dispclk = 0;
 }
 
 DRIVER_INIT_MEMBER( gts3_state, gts3 )
@@ -62,9 +111,9 @@ static MACHINE_CONFIG_START( gts3, gts3_state )
 	MCFG_VIA6522_IRQ_HANDLER(DEVWRITELINE("maincpu", m65c02_device, irq_line))
 	//MCFG_VIA6522_READPA_HANDLER(WRITE8(gts3_state, u4a_r))
 	//MCFG_VIA6522_READPB_HANDLER(WRITE8(gts3_state, u4b_r))
-	//MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(gts3_state, u4b_w))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(gts3_state, u4b_w))
 	//MCFG_VIA6522_CA2_HANDLER(WRITELINE(gts3_state, u4ca2_w))
-	MCFG_VIA6522_CB2_HANDLER(DEVWRITELINE("maincpu", m65c02_device, nmi_line))
+	MCFG_VIA6522_CB2_HANDLER(WRITELINE(gts3_state, nmi_w))
 
 	MCFG_DEVICE_ADD("u5", VIA6522, 0)
 	MCFG_VIA6522_IRQ_HANDLER(DEVWRITELINE("maincpu", m65c02_device, irq_line))
@@ -330,6 +379,7 @@ ROM_END
 
 /*-------------------------------------------------------------------
 / Unnamed game? by Toptronic HGmbH, Germany
+/ Shows as "GAME NAME" in display, (#7**)
 /-------------------------------------------------------------------*/
 ROM_START(tt_game)
 	ROM_REGION(0x10000, "maincpu", 0)
@@ -352,19 +402,19 @@ ROM_START(tt_game)
 	ROM_LOAD("yrom1.bin", 0x8000, 0x8000, NO_DUMP)
 ROM_END
 
-GAME(1989,  lca,        0,          gts3,   gts3, gts3_state,   gts3,   ROT0,   "Gottlieb",             "Lights...Camera...Action!",                GAME_IS_SKELETON_MECHANICAL)
-GAME(1989,  lca2,       lca,        gts3,   gts3, gts3_state,   gts3,   ROT0,   "Gottlieb",             "Lights...Camera...Action! (rev.2)",                GAME_IS_SKELETON_MECHANICAL)
-GAME(1990,  silvslug,   0,          gts3,   gts3, gts3_state,   gts3,   ROT0,   "Gottlieb",             "Silver Slugger",               GAME_IS_SKELETON_MECHANICAL)
-GAME(1990,  vegas,      0,          gts3,   gts3, gts3_state,   gts3,   ROT0,   "Gottlieb",             "Vegas",                GAME_IS_SKELETON_MECHANICAL)
-GAME(1990,  deadweap,   0,          gts3,   gts3, gts3_state,   gts3,   ROT0,   "Gottlieb",             "Deadly Weapon",                GAME_IS_SKELETON_MECHANICAL)
-GAME(1990,  tfight,     0,          gts3,   gts3, gts3_state,   gts3,   ROT0,   "Gottlieb",             "Title Fight",              GAME_IS_SKELETON_MECHANICAL)
-GAME(1990,  nudgeit,    0,          gts3,   gts3, gts3_state,   gts3,   ROT0,   "Gottlieb",             "Nudge-It",             GAME_IS_SKELETON_MECHANICAL)
-GAME(1990,  bellring,   0,          gts3,   gts3, gts3_state,   gts3,   ROT0,   "Gottlieb",             "Bell Ringer",              GAME_IS_SKELETON_MECHANICAL)
-GAME(1991,  carhop,     0,          gts3,   gts3, gts3_state,   gts3,   ROT0,   "Gottlieb",             "Car Hop",              GAME_IS_SKELETON_MECHANICAL)
-GAME(1991,  hoops,      0,          gts3,   gts3, gts3_state,   gts3,   ROT0,   "Gottlieb",             "Hoops",                GAME_IS_SKELETON_MECHANICAL)
-GAME(1991,  cactjack,   0,          gts3,   gts3, gts3_state,   gts3,   ROT0,   "Gottlieb",             "Cactus Jack's",                GAME_IS_SKELETON_MECHANICAL)
-GAME(1991,  clas1812,   0,          gts3,   gts3, gts3_state,   gts3,   ROT0,   "Gottlieb",             "Class of 1812",                GAME_IS_SKELETON_MECHANICAL)
-GAME(1991,  surfnsaf,   0,          gts3,   gts3, gts3_state,   gts3,   ROT0,   "Gottlieb",             "Surf'n Safari",                GAME_IS_SKELETON_MECHANICAL)
-GAME(1992,  opthund,    0,          gts3,   gts3, gts3_state,   gts3,   ROT0,   "Gottlieb",             "Operation: Thunder",               GAME_IS_SKELETON_MECHANICAL)
-GAME(19??,  tt_game,    0,          gts3,   gts3, gts3_state,   gts3,   ROT0,   "Toptronic",            "unknown Toptronic pinball game",               GAME_IS_SKELETON_MECHANICAL)
-GAME(1989,  ccruise,    0,          gts3,   gts3, gts3_state,   gts3,   ROT0,   "International Concepts","Caribbean Cruise",                GAME_IS_SKELETON_MECHANICAL)
+GAME(1989,  lca,        0,          gts3,   gts3, gts3_state,   gts3,   ROT0,   "Gottlieb", "Lights...Camera...Action!", GAME_IS_SKELETON_MECHANICAL)
+GAME(1989,  lca2,       lca,        gts3,   gts3, gts3_state,   gts3,   ROT0,   "Gottlieb", "Lights...Camera...Action! (rev.2)", GAME_IS_SKELETON_MECHANICAL)
+GAME(1990,  silvslug,   0,          gts3,   gts3, gts3_state,   gts3,   ROT0,   "Gottlieb", "Silver Slugger", GAME_IS_SKELETON_MECHANICAL)
+GAME(1990,  vegas,      0,          gts3,   gts3, gts3_state,   gts3,   ROT0,   "Gottlieb", "Vegas", GAME_IS_SKELETON_MECHANICAL)
+GAME(1990,  deadweap,   0,          gts3,   gts3, gts3_state,   gts3,   ROT0,   "Gottlieb", "Deadly Weapon", GAME_IS_SKELETON_MECHANICAL)
+GAME(1990,  tfight,     0,          gts3,   gts3, gts3_state,   gts3,   ROT0,   "Gottlieb", "Title Fight", GAME_IS_SKELETON_MECHANICAL)
+GAME(1990,  nudgeit,    0,          gts3,   gts3, gts3_state,   gts3,   ROT0,   "Gottlieb", "Nudge-It", GAME_IS_SKELETON_MECHANICAL)
+GAME(1990,  bellring,   0,          gts3,   gts3, gts3_state,   gts3,   ROT0,   "Gottlieb", "Bell Ringer", GAME_IS_SKELETON_MECHANICAL)
+GAME(1991,  carhop,     0,          gts3,   gts3, gts3_state,   gts3,   ROT0,   "Gottlieb", "Car Hop", GAME_IS_SKELETON_MECHANICAL)
+GAME(1991,  hoops,      0,          gts3,   gts3, gts3_state,   gts3,   ROT0,   "Gottlieb", "Hoops", GAME_IS_SKELETON_MECHANICAL)
+GAME(1991,  cactjack,   0,          gts3,   gts3, gts3_state,   gts3,   ROT0,   "Gottlieb", "Cactus Jack's", GAME_IS_SKELETON_MECHANICAL)
+GAME(1991,  clas1812,   0,          gts3,   gts3, gts3_state,   gts3,   ROT0,   "Gottlieb", "Class of 1812", GAME_IS_SKELETON_MECHANICAL)
+GAME(1991,  surfnsaf,   0,          gts3,   gts3, gts3_state,   gts3,   ROT0,   "Gottlieb", "Surf'n Safari", GAME_IS_SKELETON_MECHANICAL)
+GAME(1992,  opthund,    0,          gts3,   gts3, gts3_state,   gts3,   ROT0,   "Gottlieb", "Operation: Thunder", GAME_IS_SKELETON_MECHANICAL)
+GAME(19??,  tt_game,    0,          gts3,   gts3, gts3_state,   gts3,   ROT0,   "Toptronic", "unknown Toptronic pinball game", GAME_IS_SKELETON_MECHANICAL)
+GAME(1989,  ccruise,    0,          gts3,   gts3, gts3_state,   gts3,   ROT0,   "International Concepts","Caribbean Cruise", GAME_IS_SKELETON_MECHANICAL)
