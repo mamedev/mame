@@ -3700,13 +3700,39 @@ Missing files come here
 		</part>
 	</software>
 
+	<software name="creepers">
+		<!-- Dumped via Kryoflux, track 0 shows as modified -->
+		<description>Creepers</description>
+		<year>1993</year>
+		<publisher>Psygnosis</publisher>
+		<info name="developer" value="Destiny Software Productions" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="creepers.img" size="1474560" crc="5cb378bb" sha1="320fe4b87d79be7f60ebd2868a77acf5eafa64db" offset="0" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="cybrstrk">
 		<description>Cyberstrike</description>
 		<year>1994</year>
-		<publisher>Microprose</publisher>
+		<publisher>MicroProse</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="cyberstrike (1994) (microprose).img" size="1474560" crc="d10eeefd" sha1="2d33e7078b9b1c83fbc223d26c7fbbc53e0406a1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="duke">
+		<!-- Dumped via Kryoflux, all tracks show as modified - most likely not professionally duplicated -->
+		<!-- from a registered version ordered circa 2004 -->
+		<description>Duke Nukum (V 2.0)</description>
+		<year>1991</year>
+		<publisher>Apogee</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="duke nukum.img" size="1474560" crc="3332d232" sha1="306b2802adbdbfe6655679c01a187582a05255ac" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -3723,6 +3749,23 @@ Missing files come here
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
 				<rom name="disk2.img" size="368640" crc="ac41fa21" sha1="37b354219a8db98f6e45f17ca938189078afffb0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="f19">
+		<!-- Dumped via Kryoflux, shows as good and unmodified -->
+		<description>F-19 Stealth Fighter (Version 435.04)</description>
+		<year>1988</year>
+		<publisher>MicroProse</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="diska.img" size="737280" crc="a12af0f0" sha1="bcc52d222f1067fb90b2c9c53c8da14b350e60d6" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="diskb.img" size="737280" crc="2b0662a2" sha1="5843c7bb6e4d6ad998042cfe53a6c6f07d3fd3e5" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -3793,6 +3836,35 @@ Missing files come here
 		</part>
 	</software>
 
+	<software name="kingboun">
+		<!-- Dumped via Kryoflux, track 0 shows as modified -->
+		<description>King's Bounty</description>
+		<year>1991</year>
+		<publisher>New World Computing</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="king's bounty.img" size="737280" crc="267624e2" sha1="763a5014008f46f93a13c822377c41965c09a1f8" offset="0" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="m1tank" supported="no">
+		<!-- Dumped via Kryoflux, shows as good and unmodified -->
+		<description>M1 Tank Platoon</description>
+		<year>1990</year>
+		<publisher>MicroProse</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="diska.img" size="737280" crc="d1724b34" sha1="cd0108296bf47addf36b4b6dbfd9cbafe4d3eb37" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="diskb.img" size="737280" crc="f2a89364" sha1="54bae8483683e631cb0dc15fba208c1719a4b2bd" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="msroa">
 		<description>Microsoft Return of Arcade</description>
 		<year>1993</year>
@@ -3848,6 +3920,23 @@ Missing files come here
 		<part name="flop3" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="disk3.img" size="1474560" crc="05443ceb" sha1="3b8bd610d90677a830f9b4e297e4a89343cb86a2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sserv2">
+		<!-- Dumped via Kryoflux, shows as good and unmodified -->
+		<description>Silent Service II (Version 457.01)</description>
+		<year>1990</year>
+		<publisher>MicroProse</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="disk1.img" size="737280" crc="d21eeeb5" sha1="196d053414c08bff51936a669025cb933b4b9096" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="disk2.img" size="737280" crc="e3d92c3d" sha1="787b795422552c413bfe14465bc06b152943ce91" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -3950,6 +4039,19 @@ Missing files come here
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="scenario vol 1.img" size="1474560" crc="0eacae3e" sha1="398bfef77a18ac6650be433b0988b9620442d9d8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spectrec">
+		<!-- Dumped via Kryoflux, track 0 shows as modified -->
+		<description>Spectre Challenger</description>
+		<year>1992</year>
+		<publisher>Velocity Development Corporation</publisher>
+		<info name="developer" value="Peninsula Gameworks" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="spectre challenger.img" size="737280" crc="d37944f9" sha1="2afddfbe00625def681655236b545e62cf54c296" offset="0" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -4099,6 +4201,24 @@ Missing files come here
 			<feature name="Disc Code" value="4861C" />
 			<dataarea name="flop" size="1474560">
 				<rom name="diskc.img" size="1474560" crc="9ad130ca" sha1="a3414cb53382402b5cb8908983a0e10dc4542e3e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wolf3d">
+		<!-- Dumped via Kryoflux, track 0 shows as modified on both disks -->
+		<description>Wolfenstein 3D (Ver. 1.4)</description>
+		<year>1993</year>
+		<publisher>GT Software</publisher>
+		<info name="developer" value="id Software" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="disk1.img" size="737280" crc="9da675e7" sha1="677a5cc1f96aadefc456782f88277787fa5ed1fa" offset="0" status="baddump" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="disk2.img" size="737280" crc="6e8597bf" sha1="a5a44ce14a04a75104814d501afe54a38965d082" offset="0" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
