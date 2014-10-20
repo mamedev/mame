@@ -4,6 +4,7 @@ B-Wings  (c) 1984 Data East Corporation
 Zaviga   (c) 1984 Data East Corporation
 
 drivers by Acho A. Tang
+revised by Alex W. Jackson
 
 *****************************************************************************/
 // Directives
@@ -12,53 +13,9 @@ drivers by Acho A. Tang
 #include "includes/bwing.h"
 
 
-#define BW_DEBUG 0
-
-#define BW_NTILES_L2    7
-#define BW_NTILES      (1<<BW_NTILES_L2)
-
-
-//****************************************************************************
-// Local Functions
-
-void bwing_state::fill_srxlat( int *xlat )
-{
-	unsigned base, offset, i;
-
-	for (base = 0; base < 0x2000; base += 0x400)
-	{
-		for(i = 0; i < 0x100; i++)
-		{
-			offset = base + (i<<2 & ~0x3f) + (i & 0x0f);
-
-			xlat[base + i] = offset;
-			xlat[base + i + 0x100] = offset + 0x10;
-			xlat[base + i + 0x200] = offset + 0x20;
-			xlat[base + i + 0x300] = offset + 0x30;
-		}
-	}
-}
-
 //****************************************************************************
 // Exports
 
-const gfx_layout bwing_tilelayout =
-{
-	16, 16,
-	BW_NTILES,
-	3,
-	{ 0x4000*8, 0x2000*8, 0 },
-	{ 7, 6, 5, 4, 3, 2, 1, 0, 128+7, 128+6, 128+5, 128+4, 128+3, 128+2, 128+1, 128+0 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
-		8*8, 9*8,10*8,11*8,12*8,13*8,14*8,15*8 },
-	32*8
-};
-
-
-WRITE8_MEMBER(bwing_state::bwing_spriteram_w)
-{
-	m_spriteram[offset] = data;
-}
 
 WRITE8_MEMBER(bwing_state::bwing_videoram_w)
 {
@@ -67,41 +24,25 @@ WRITE8_MEMBER(bwing_state::bwing_videoram_w)
 }
 
 
-READ8_MEMBER(bwing_state::bwing_scrollram_r)
+WRITE8_MEMBER(bwing_state::fgscrollram_w)
 {
-	int offs;
-
-	if (!m_srbank)
-		offs = m_srxlat[offset];
-	else
-		offs = offset;
-
-	return ((m_srbase[m_srbank])[offs]);
+	m_fgscrollram[offset] = data;
+	m_fgmap->mark_tile_dirty(offset);
 }
 
 
-WRITE8_MEMBER(bwing_state::bwing_scrollram_w)
+WRITE8_MEMBER(bwing_state::bgscrollram_w)
 {
-	int offs;
+	m_bgscrollram[offset] = data;
+	m_bgmap->mark_tile_dirty(offset);
+}
 
-	if (!m_srbank)
-	{
-		offs = m_srxlat[offset];
-		if (offs >> 12)
-			m_bgmap->mark_tile_dirty(offs & 0xfff);
-		else
-			m_fgmap->mark_tile_dirty(offs & 0xfff);
-	}
-	else
-	{
-		offs = offset;
-		if (offset < 0x1000)
-			m_gfxdecode->gfx(2)->mark_dirty(offset / 32);
-		else
-			m_gfxdecode->gfx(3)->mark_dirty(offset / 32);
-	}
 
-	(m_srbase[m_srbank])[offs] = data;
+WRITE8_MEMBER(bwing_state::gfxram_w)
+{
+	m_gfxram[offset] = data;
+	int whichgfx = (offset & 0x1000) ? 3 : 2;
+	m_gfxdecode->gfx(whichgfx)->mark_dirty((offset & 0xfff) / 32);
 }
 
 
@@ -114,19 +55,10 @@ WRITE8_MEMBER(bwing_state::bwing_scrollreg_w)
 		case 6: m_palatch = data; break; // one of the palette components is latched through I/O(yike)
 
 		case 7:
-			// tile graphics are decoded in RAM on the fly and tile codes are banked + interleaved(ouch)
 			m_mapmask = data;
-			m_srbank = data >> 6;
-
-			#if BW_DEBUG
-				logerror("(%s)%04x: w=%02x a=%04x f=%d\n", device().tag, space.device().safe_pc(), data, 0x1b00 + offset, m_screen->frame_number());
-			#endif
+			m_vrambank->set_bank(data >> 6);
 		break;
 	}
-
-	#if BW_DEBUG
-		(memregion(REGION_CPU1)->base())[0x1b10 + offset] = data;
-	#endif
 }
 
 
@@ -161,10 +93,6 @@ WRITE8_MEMBER(bwing_state::bwing_paletteram_w)
 	}
 
 	m_palette->set_pen_color(offset, rgb_t(r, g, b));
-
-	#if BW_DEBUG
-		m_paletteram[offset + 0x40] = m_palatch;
-	#endif
 }
 
 //****************************************************************************
@@ -172,12 +100,12 @@ WRITE8_MEMBER(bwing_state::bwing_paletteram_w)
 
 TILE_GET_INFO_MEMBER(bwing_state::get_fgtileinfo)
 {
-	SET_TILE_INFO_MEMBER(2, m_fgdata[tile_index] & 0x7f, m_fgdata[tile_index] >> 7, 0);
+	SET_TILE_INFO_MEMBER(2, m_fgscrollram[tile_index] & 0x7f, m_fgscrollram[tile_index] >> 7, 0);
 }
 
 TILE_GET_INFO_MEMBER(bwing_state::get_bgtileinfo)
 {
-	SET_TILE_INFO_MEMBER(3, m_bgdata[tile_index] & 0x7f, m_bgdata[tile_index] >> 7, 0);
+	SET_TILE_INFO_MEMBER(3, m_bgscrollram[tile_index] & 0x7f, m_bgscrollram[tile_index] >> 7, 0);
 }
 
 TILE_GET_INFO_MEMBER(bwing_state::get_charinfo)
@@ -187,13 +115,12 @@ TILE_GET_INFO_MEMBER(bwing_state::get_charinfo)
 
 TILEMAP_MAPPER_MEMBER(bwing_state::bwing_scan_cols)
 {
-	return ((col << 6) + row);
+	return (row & 0xf) | ((col & 0xf) << 4) | ((row & 0x30) << 4) | ((col & 0x30) << 6);
 }
 
 
 void bwing_state::video_start()
 {
-//  UINT32 *dwptr;
 	int i;
 
 	m_charmap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(bwing_state::get_charinfo),this), TILEMAP_SCAN_COLS, 8, 8, 32, 32);
@@ -203,25 +130,8 @@ void bwing_state::video_start()
 	m_charmap->set_transparent_pen(0);
 	m_fgmap->set_transparent_pen(0);
 
-	m_srxlat = auto_alloc_array(machine(), int, 0x2000);
-	save_pointer(NAME(m_srxlat), 0x2000);
-
-	fill_srxlat(m_srxlat);
-
-	m_fgdata = memregion("gpu")->base();
-	m_bgdata = m_fgdata + 0x1000;
-
-	for (i = 0; i < 4; i++)
-		m_srbase[i] = m_fgdata + i * 0x2000;
-
 	for (i = 0; i < 8; i++)
 		m_sreg[i] = 0;
-
-//  m_fgfx = m_gfxdecode->gfx(2);
-	m_gfxdecode->gfx(2)->set_source(m_srbase[1]);
-
-//  m_bgfx = m_gfxdecode->gfx(3);
-	m_gfxdecode->gfx(3)->set_source(m_srbase[1] + 0x1000);
 }
 
 //****************************************************************************
@@ -270,23 +180,23 @@ void bwing_state::draw_sprites( bitmap_ind16 &bmp, const rectangle &clip, UINT8 
 
 UINT32 bwing_state::screen_update_bwing(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	unsigned x, y, shiftx;
+	unsigned flip, x, y, shiftx;
 
 	if (m_mapmask & 0x20)
 	{
-		m_mapflip = TILEMAP_FLIPX;
+		flip = TILEMAP_FLIPX;
 		shiftx = -8;
 	}
 	else
 	{
-		m_mapflip = TILEMAP_FLIPY;
+		flip = TILEMAP_FLIPY;
 		shiftx = 8;
 	}
 
 	// draw background
 	if (!(m_mapmask & 1))
 	{
-		m_bgmap->set_flip(m_mapflip);
+		m_bgmap->set_flip(flip);
 		x = ((m_sreg[1]<<2 & 0x300) + m_sreg[2] + shiftx) & 0x3ff;
 		m_bgmap->set_scrollx(0, x);
 		y = (m_sreg[1]<<4 & 0x300) + m_sreg[3];
@@ -302,7 +212,7 @@ UINT32 bwing_state::screen_update_bwing(screen_device &screen, bitmap_ind16 &bit
 	// draw foreground
 	if (!(m_mapmask & 2))
 	{
-		m_fgmap->set_flip(m_mapflip);
+		m_fgmap->set_flip(flip);
 		x = ((m_sreg[1] << 6 & 0x300) + m_sreg[4] + shiftx) & 0x3ff;
 		m_fgmap->set_scrollx(0, x);
 		y = (m_sreg[1] << 8 & 0x300) + m_sreg[5];
@@ -316,7 +226,7 @@ UINT32 bwing_state::screen_update_bwing(screen_device &screen, bitmap_ind16 &bit
 	// draw text layer
 //  if (m_mapmask & 4)
 	{
-		m_charmap->set_flip(m_mapflip);
+		m_charmap->set_flip(flip);
 		m_charmap->draw(screen, bitmap, cliprect, 0, 0);
 	}
 	return 0;

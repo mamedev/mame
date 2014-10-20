@@ -4,6 +4,7 @@ B-Wings  (c) 1984 Data East Corporation
 Zaviga   (c) 1984 Data East Corporation
 
 driver by Acho A. Tang
+revised by Alex W. Jackson
 
 Known issues:
 
@@ -40,11 +41,6 @@ INTERRUPT_GEN_MEMBER(bwing_state::bwp3_interrupt)
 
 //****************************************************************************
 // Memory and I/O Handlers
-
-WRITE8_MEMBER(bwing_state::bwp12_sharedram1_w)
-{
-	m_bwp1_sharedram1[offset] = m_bwp2_sharedram1[offset] = data;
-}
 
 WRITE8_MEMBER(bwing_state::bwp3_u8F_w)
 {
@@ -110,10 +106,6 @@ WRITE8_MEMBER(bwing_state::bwp1_ctrl_w)
 		// hardwired to SWAP
 		case 7: break;
 	}
-
-	#if BW_DEBUG
-		(m_bwp123_membase[0])[0x1c00 + offset] = data;
-	#endif
 }
 
 
@@ -129,12 +121,6 @@ WRITE8_MEMBER(bwing_state::bwp2_ctrl_w)
 
 		case 3: m_subcpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE); break;
 	}
-
-	#if BW_DEBUG
-	{
-		(m_bwp123_membase[1])[0x1800 + offset] = data;
-	}
-	#endif
 }
 
 //****************************************************************************
@@ -143,22 +129,28 @@ WRITE8_MEMBER(bwing_state::bwp2_ctrl_w)
 // Main CPU
 static ADDRESS_MAP_START( bwp1_map, AS_PROGRAM, 8, bwing_state )
 	AM_RANGE(0x1b00, 0x1b07) AM_READ(bwp1_io_r)
-	AM_RANGE(0x0000, 0x07ff) AM_RAM_WRITE(bwp12_sharedram1_w) AM_SHARE("bwp1_sharedram1")
+	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("sharedram")
 	AM_RANGE(0x0800, 0x0fff) AM_RAM
 	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(bwing_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x1400, 0x17ff) AM_RAM
-	AM_RANGE(0x1800, 0x19ff) AM_RAM_WRITE(bwing_spriteram_w) AM_SHARE("spriteram")
+	AM_RANGE(0x1800, 0x19ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x1a00, 0x1aff) AM_RAM_WRITE(bwing_paletteram_w) AM_SHARE("paletteram")
 	AM_RANGE(0x1b00, 0x1b07) AM_RAM_WRITE(bwing_scrollreg_w)
 	AM_RANGE(0x1c00, 0x1c07) AM_RAM_WRITE(bwp1_ctrl_w)
-	AM_RANGE(0x2000, 0x3fff) AM_READWRITE(bwing_scrollram_r, bwing_scrollram_w)
+	AM_RANGE(0x2000, 0x3fff) AM_DEVICE("vrambank", address_map_bank_device, amap8)
 	AM_RANGE(0x4000, 0xffff) AM_ROM // "B-Wings US" writes to 9631-9632(debug?)
 ADDRESS_MAP_END
 
+// Banked video RAM
+static ADDRESS_MAP_START( bank_map, AS_PROGRAM, 8, bwing_state )
+	AM_RANGE(0x0000, 0x0fff) AM_RAM_WRITE(fgscrollram_w) AM_SHARE("fgscrollram")
+	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(bgscrollram_w) AM_SHARE("bgscrollram")
+	AM_RANGE(0x2000, 0x7fff) AM_RAM_WRITE(gfxram_w) AM_SHARE("gfxram")
+ADDRESS_MAP_END
 
 // Sub CPU
 static ADDRESS_MAP_START( bwp2_map, AS_PROGRAM, 8, bwing_state )
-	AM_RANGE(0x0000, 0x07ff) AM_RAM_WRITE(bwp12_sharedram1_w) AM_SHARE("bwp2_sharedram1")
+	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("sharedram")
 	AM_RANGE(0x0800, 0x0fff) AM_RAM
 	AM_RANGE(0x1800, 0x1803) AM_WRITE(bwp2_ctrl_w)
 	AM_RANGE(0xa000, 0xffff) AM_ROM
@@ -176,7 +168,7 @@ static ADDRESS_MAP_START( bwp3_map, AS_PROGRAM, 8, bwing_state )
 	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE("ay2", ay8910_device, address_w)
 	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0xd000, 0xd000) AM_WRITE(bwp3_nmimask_w)
-	AM_RANGE(0xe000, 0xffff) AM_ROM AM_SHARE("bwp3_rombase")
+	AM_RANGE(0xe000, 0xffff) AM_ROM AM_REGION("audiocpu", 0)
 ADDRESS_MAP_END
 
 
@@ -298,9 +290,9 @@ INPUT_PORTS_END
 static const gfx_layout charlayout =
 {
 	8, 8,
-	256,
+	RGN_FRAC(1,2),
 	2,
-	{ 0, 0x4000 },
+	{ 0, RGN_FRAC(1,2) },
 	{ 7, 6, 5, 4, 3, 2, 1, 0 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
 	8*8
@@ -309,21 +301,32 @@ static const gfx_layout charlayout =
 static const gfx_layout spritelayout =
 {
 	16, 16,
-	512,
+	RGN_FRAC(1,3),
 	3,
-	{ 0x40000, 0x20000, 0 },
+	{ RGN_FRAC(2,3), RGN_FRAC(1,3), 0 },
 	{ 7, 6, 5, 4, 3, 2, 1, 0, 128+7, 128+6, 128+5, 128+4, 128+3, 128+2, 128+1, 128+0 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
 		8*8, 9*8,10*8,11*8,12*8,13*8,14*8,15*8 },
 	32*8
 };
 
+static const gfx_layout ram_tilelayout =
+{
+	16, 16,
+	RGN_FRAC(1,6), // two sets interleaved in the same RAM
+	3,
+	{ RGN_FRAC(2,3), RGN_FRAC(1,3), 0 },
+	{ 7, 6, 5, 4, 3, 2, 1, 0, 128+7, 128+6, 128+5, 128+4, 128+3, 128+2, 128+1, 128+0 },
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
+		8*8, 9*8,10*8,11*8,12*8,13*8,14*8,15*8 },
+	32*8
+};
 
 static GFXDECODE_START( bwing )
-	GFXDECODE_ENTRY( "gfx1",  0, charlayout,       0x00, 1 ) // chars
-	GFXDECODE_ENTRY( "gfx2",  0, spritelayout,     0x20, 2 ) // sprites
-	GFXDECODE_ENTRY( "gpu",   0, bwing_tilelayout, 0x10, 2 ) // foreground tiles place holder
-	GFXDECODE_ENTRY( "gpu",   0, bwing_tilelayout, 0x30, 2 ) // background tiles place holder
+	GFXDECODE_ENTRY( "gfx1",      0, charlayout,     0x00, 1 ) // chars
+	GFXDECODE_ENTRY( "gfx2",      0, spritelayout,   0x20, 2 ) // sprites
+	GFXDECODE_RAM( "gfxram",      0, ram_tilelayout, 0x10, 2 ) // foreground tiles
+	GFXDECODE_RAM( "gfxram", 0x1000, ram_tilelayout, 0x30, 2 ) // background tiles
 GFXDECODE_END
 
 //****************************************************************************
@@ -332,9 +335,7 @@ GFXDECODE_END
 void bwing_state::machine_start()
 {
 	save_item(NAME(m_palatch));
-	save_item(NAME(m_srbank));
 	save_item(NAME(m_mapmask));
-	save_item(NAME(m_mapflip));
 	save_item(NAME(m_bwp3_nmimask));
 	save_item(NAME(m_bwp3_u8F_d));
 
@@ -344,9 +345,7 @@ void bwing_state::machine_start()
 void bwing_state::machine_reset()
 {
 	m_palatch = 0;
-	m_srbank = 0;
 	m_mapmask = 0;
-	m_mapflip = 0;
 
 	m_bwp3_nmimask = 0;
 	m_bwp3_u8F_d = 0;
@@ -368,6 +367,12 @@ static MACHINE_CONFIG_START( bwing, bwing_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(18000))     // high enough?
 
+	MCFG_DEVICE_ADD("vrambank", ADDRESS_MAP_BANK, 0)
+	MCFG_DEVICE_PROGRAM_MAP(bank_map)
+	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
+	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_ADDRBUS_WIDTH(15)
+	MCFG_ADDRESS_MAP_BANK_STRIDE(0x2000)
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -411,8 +416,8 @@ ROM_START( bwings )
 	ROM_LOAD( "bw_bv-05-.9d", 0x0c000, 0x02000, CRC(1e393300) SHA1(8d847256eb5dbccf5f524ec3aa836073d70b4edc) )  // different
 	ROM_LOAD( "bw_bv-04-.7d", 0x0e000, 0x02000, CRC(6548c5bb) SHA1(d12cc8d0d5692c3de766f5c42c818dd8f685760a) )  // different
 
-	ROM_REGION( 0x10000, "audiocpu", 0 ) // sound CPU(encrypted)
-	ROM_LOAD( "bw_bv-03.13a", 0x0e000, 0x02000, CRC(e8ac9379) SHA1(aaf5c20aa33ed05747a8a27739e9d09e094a518d) )
+	ROM_REGION( 0x2000, "audiocpu", 0 ) // sound CPU(encrypted)
+	ROM_LOAD( "bw_bv-03.13a", 0x00000, 0x02000, CRC(e8ac9379) SHA1(aaf5c20aa33ed05747a8a27739e9d09e094a518d) )
 
 	// Bottom Board(CCU-01)
 	ROM_REGION( 0x01000, "gfx1", 0 ) // chars
@@ -423,9 +428,6 @@ ROM_START( bwings )
 	ROM_LOAD( "bw_bv-07.1l",  0x00000, 0x04000, CRC(3d5ab2be) SHA1(2b3a039914ebfcc3993da74853a67546fc22c191) )
 	ROM_LOAD( "bw_bv-08.1k",  0x04000, 0x04000, CRC(7a585f1e) SHA1(99e5d947b6b1fa96b90c676a282376d67fc377f0) )
 	ROM_LOAD( "bw_bv-09.1h",  0x08000, 0x04000, CRC(a14c0b57) SHA1(5033354793d77922f5ef7f268cbe212e551efadf) )
-
-	// GPU Banks
-	ROM_REGION( 0x08000, "gpu", ROMREGION_ERASE00 )
 ROM_END
 
 
@@ -441,8 +443,8 @@ ROM_START( bwingso )
 	ROM_LOAD( "bw_bv-05.9d",  0x0c000, 0x02000, CRC(f283f39a) SHA1(9f7f4c39d49f4dfff73fe74cd457480e8a43a3c5) )
 	ROM_LOAD( "bw_bv-04.7d",  0x0e000, 0x02000, CRC(29ae75b6) SHA1(48c94e996857f2ac995bcd25f0e67b9f7c17d807) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 ) // sound CPU(encrypted)
-	ROM_LOAD( "bw_bv-03.13a", 0x0e000, 0x02000, CRC(e8ac9379) SHA1(aaf5c20aa33ed05747a8a27739e9d09e094a518d) )
+	ROM_REGION( 0x2000, "audiocpu", 0 ) // sound CPU(encrypted)
+	ROM_LOAD( "bw_bv-03.13a", 0x00000, 0x02000, CRC(e8ac9379) SHA1(aaf5c20aa33ed05747a8a27739e9d09e094a518d) )
 
 	// Bottom Board(CCU-01)
 	ROM_REGION( 0x01000, "gfx1", 0 ) // chars
@@ -453,9 +455,6 @@ ROM_START( bwingso )
 	ROM_LOAD( "bw_bv-07.1l",  0x00000, 0x04000, CRC(3d5ab2be) SHA1(2b3a039914ebfcc3993da74853a67546fc22c191) )
 	ROM_LOAD( "bw_bv-08.1k",  0x04000, 0x04000, CRC(7a585f1e) SHA1(99e5d947b6b1fa96b90c676a282376d67fc377f0) )
 	ROM_LOAD( "bw_bv-09.1h",  0x08000, 0x04000, CRC(a14c0b57) SHA1(5033354793d77922f5ef7f268cbe212e551efadf) )
-
-	// GPU Banks
-	ROM_REGION( 0x08000, "gpu", ROMREGION_ERASE00 )
 ROM_END
 
 
@@ -472,8 +471,8 @@ ROM_START( bwingsa )
 	ROM_LOAD( "bw_bv-05.9d",  0x0c000, 0x02000, CRC(f283f39a) SHA1(9f7f4c39d49f4dfff73fe74cd457480e8a43a3c5) )
 	ROM_LOAD( "bw_bv-04.7d",  0x0e000, 0x02000, CRC(29ae75b6) SHA1(48c94e996857f2ac995bcd25f0e67b9f7c17d807) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 ) // sound CPU(encrypted)
-	ROM_LOAD( "bw_bv-03.13a", 0x0e000, 0x02000, CRC(e8ac9379) SHA1(aaf5c20aa33ed05747a8a27739e9d09e094a518d) )
+	ROM_REGION( 0x2000, "audiocpu", 0 ) // sound CPU(encrypted)
+	ROM_LOAD( "bw_bv-03.13a", 0x00000, 0x02000, CRC(e8ac9379) SHA1(aaf5c20aa33ed05747a8a27739e9d09e094a518d) )
 
 	// Bottom Board(CCU-01)
 	ROM_REGION( 0x01000, "gfx1", 0 ) // chars
@@ -484,9 +483,6 @@ ROM_START( bwingsa )
 	ROM_LOAD( "bw_bv-07.1l",  0x00000, 0x04000, CRC(3d5ab2be) SHA1(2b3a039914ebfcc3993da74853a67546fc22c191) )
 	ROM_LOAD( "bw_bv-08.1k",  0x04000, 0x04000, CRC(7a585f1e) SHA1(99e5d947b6b1fa96b90c676a282376d67fc377f0) )
 	ROM_LOAD( "bw_bv-09.1h",  0x08000, 0x04000, CRC(a14c0b57) SHA1(5033354793d77922f5ef7f268cbe212e551efadf) )
-
-	// GPU Banks
-	ROM_REGION( 0x08000, "gpu", ROMREGION_ERASE00 )
 ROM_END
 
 ROM_START( zaviga )
@@ -501,8 +497,8 @@ ROM_START( zaviga )
 	ROM_LOAD( "as07.9d", 0x0c000, 0x02000, CRC(dc1170e3) SHA1(c8e4d1564fd272d726d0e4ffd4f33f67f1b37cd7) )
 	ROM_LOAD( "as06.7d", 0x0e000, 0x02000, CRC(ba888f84) SHA1(f94de8553cd4704d9b3349ded881a7cc62fa9b57) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 ) // sound CPU(encrypted)
-	ROM_LOAD( "as05.13a", 0x0e000, 0x02000, CRC(afe9b0ac) SHA1(3c653cd4fff7f4e00971249900b5a810b6e74dfe) )
+	ROM_REGION( 0x2000, "audiocpu", 0 ) // sound CPU(encrypted)
+	ROM_LOAD( "as05.13a", 0x00000, 0x02000, CRC(afe9b0ac) SHA1(3c653cd4fff7f4e00971249900b5a810b6e74dfe) )
 
 	// Bottom Board(DE-0170-0)
 	ROM_REGION( 0x01000, "gfx1", 0 ) // chars
@@ -513,9 +509,6 @@ ROM_START( zaviga )
 	ROM_LOAD( "as11.1l", 0x00000, 0x04000, CRC(aa84af24) SHA1(af4ff085dc44b3d1493ec1c8b4a8d18dccecc872) )
 	ROM_LOAD( "as12.1k", 0x04000, 0x04000, CRC(84af9041) SHA1(8fbd5995ca8e708cd7fb9cdfcdb174e12084f526) )
 	ROM_LOAD( "as13.1h", 0x08000, 0x04000, CRC(15d0922b) SHA1(b8d715a9e610531472d516c19f6035adbce93c84) )
-
-	// GPU Banks
-	ROM_REGION( 0x08000, "gpu", ROMREGION_ERASE00 )
 ROM_END
 
 
@@ -531,8 +524,8 @@ ROM_START( zavigaj )
 	ROM_LOAD( "as07.9d",  0x0c000, 0x02000, CRC(dc1170e3) SHA1(c8e4d1564fd272d726d0e4ffd4f33f67f1b37cd7) )
 	ROM_LOAD( "as06-.7d", 0x0e000, 0x02000, CRC(b02d270c) SHA1(beea3d44d367543b5b5075c5892580e690691e75) )  // different
 
-	ROM_REGION( 0x10000, "audiocpu", 0 ) // sound CPU(encrypted)
-	ROM_LOAD( "as05.13a", 0x0e000, 0x02000, CRC(afe9b0ac) SHA1(3c653cd4fff7f4e00971249900b5a810b6e74dfe) )
+	ROM_REGION( 0x2000, "audiocpu", 0 ) // sound CPU(encrypted)
+	ROM_LOAD( "as05.13a", 0x00000, 0x02000, CRC(afe9b0ac) SHA1(3c653cd4fff7f4e00971249900b5a810b6e74dfe) )
 
 	// Bottom Board(DE-0170-0)
 	ROM_REGION( 0x01000, "gfx1", 0 ) // chars
@@ -543,9 +536,6 @@ ROM_START( zavigaj )
 	ROM_LOAD( "as11.1l", 0x00000, 0x04000, CRC(aa84af24) SHA1(af4ff085dc44b3d1493ec1c8b4a8d18dccecc872) )
 	ROM_LOAD( "as12.1k", 0x04000, 0x04000, CRC(84af9041) SHA1(8fbd5995ca8e708cd7fb9cdfcdb174e12084f526) )
 	ROM_LOAD( "as13.1h", 0x08000, 0x04000, CRC(15d0922b) SHA1(b8d715a9e610531472d516c19f6035adbce93c84) )
-
-	// GPU Banks
-	ROM_REGION( 0x08000, "gpu", ROMREGION_ERASE00 )
 ROM_END
 
 //****************************************************************************
@@ -553,11 +543,11 @@ ROM_END
 
 void bwing_state::fix_bwp3(  )
 {
-	UINT8 *rom = m_bwp3_rombase;
-	int i, j = m_bwp3_rombase.bytes();
+	UINT8 *rom = memregion("audiocpu")->base();
+	int j = memregion("audiocpu")->bytes();
 
 	// swap nibbles
-	for (i = 0; i < j; i++)
+	for (int i = 0; i < j; i++)
 		rom[i] = ((rom[i] & 0xf0) >> 4) | ((rom[i] & 0xf) << 4);
 
 	// relocate vectors
