@@ -890,7 +890,7 @@ bool x68k_state::x68k_draw_gfx_scanline( bitmap_ind16 &bitmap, rectangle cliprec
 void x68k_state::x68k_draw_gfx(bitmap_rgb32 &bitmap,rectangle cliprect)
 {
 	int priority, scanline, pixel;
-	bool gfxblend;
+	bool gfxblend=false;
 	//rectangle rect;
 	//int xscr,yscr;
 	//int gpage;
