@@ -17341,8 +17341,11 @@ but dumps still have to be confirmed.
 		<year>1997</year>
 		<publisher>Electronic Arts</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="madden nfl 98 (usa).bin" size="2097152" crc="e051ea62" sha1="761e0903798a8d0ad9e7ab72e6d2762fc9d366d2" offset="0x000000"/>
+			</dataarea>
+			<dataarea name="sram" size="65536"> <!-- Size to be confirmed. It does not work without SRAM. -->
 			</dataarea>
 		</part>
 	</software>
@@ -19663,8 +19666,11 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<year>1997</year>
 		<publisher>Electronic Arts</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="nhl 98 (usa).bin" size="2097152" crc="7b64cd98" sha1="6771e9b660bde010cf28656cafb70f69249a3591" offset="0x000000"/>
+			</dataarea>
+			<dataarea name="sram" size="65536"> <!-- Size to be confirmed. It does not work without SRAM. -->
 			</dataarea>
 		</part>
 	</software>
@@ -30695,8 +30701,11 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="nhlpa 2003 (unl).bin" size="2097152" crc="4591571b" sha1="4e6dd50d0f671b89c4ce3f7d1a63ecb68208dc8e" offset="0x000000"/>
+			</dataarea>
+			<dataarea name="sram" size="65536"> <!-- Size to be confirmed. It does not work without SRAM. -->
 			</dataarea>
 		</part>
 	</software>
