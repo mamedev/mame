@@ -209,6 +209,7 @@ private:
 		UINT8 m_dir;                // figs param 0: drawing direction
 		UINT8 m_figure_type;        // figs param 1: figure type
 		UINT16 m_dc;                // figs param 2:
+		UINT8  m_gd;                // mixed mode only
 		UINT16 m_d;                 // figs param 3:
 		UINT16 m_d1;                // figs param 4:
 		UINT16 m_d2;                // figs param 5:

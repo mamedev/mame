@@ -100,6 +100,24 @@ READ16_MEMBER( compis_state::isbx1_tdma_r )
 		if (offset < 2)
 			return m_crtc->read(space, offset & 0x01);
 		else
+			// monochrome only, hblank? vblank?
+			if(offset == 2)
+			{
+				switch(m_unk_video)
+				{
+					case 0x04:
+						m_unk_video = 0x44;
+						break;
+					case 0x44:
+						m_unk_video = 0x64;
+						break;
+					default:
+						m_unk_video = 0x04;
+						break;
+				}
+				return m_unk_video;
+			}
+		else
 			return 0;
 	}
 	else
@@ -115,7 +133,9 @@ WRITE16_MEMBER( compis_state::isbx1_tdma_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
+		// 0x336 is likely the color plane register
 		if (offset < 2) m_crtc->write(space, offset & 0x01, data);
+
 	}
 	else
 	{
@@ -221,27 +241,6 @@ WRITE16_MEMBER( compis_state::isbx1_dack_w )
 }
 
 
-//-------------------------------------------------
-//  vram_r -
-//-------------------------------------------------
-
-READ8_MEMBER( compis_state::vram_r )
-{
-	return m_video_ram[offset];
-}
-
-
-//-------------------------------------------------
-//  vram_w -
-//-------------------------------------------------
-
-WRITE8_MEMBER( compis_state::vram_w )
-{
-	m_video_ram[offset] = data;
-}
-
-
-
 //**************************************************************************
 //  ADDRESS MAPS
 //**************************************************************************
@@ -253,7 +252,6 @@ WRITE8_MEMBER( compis_state::vram_w )
 static ADDRESS_MAP_START( compis_mem, AS_PROGRAM, 16, compis_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000, 0x1ffff) AM_RAM
-	AM_RANGE(0x40000, 0x5ffff) AM_READWRITE8(vram_r, vram_w, 0xffff)
 	AM_RANGE(0x60000, 0x63fff) AM_MIRROR(0x1c000) AM_DEVICE(I80130_TAG, i80130_device, rom_map)
 	AM_RANGE(0xe0000, 0xeffff) AM_MIRROR(0x10000) AM_ROM AM_REGION(I80186_TAG, 0)
 ADDRESS_MAP_END
@@ -265,9 +263,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( compis2_mem, AS_PROGRAM, 16, compis_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00000, 0x3ffff) AM_RAM
-	AM_RANGE(0x40000, 0x5ffff) AM_READWRITE8(vram_r, vram_w, 0xffff)
-	AM_RANGE(0x60000, 0xbffff) AM_RAM
+	AM_RANGE(0x00000, 0xbffff) AM_RAM
 	AM_RANGE(0xe0000, 0xeffff) AM_MIRROR(0x10000) AM_ROM AM_REGION(I80186_TAG, 0)
 ADDRESS_MAP_END
 
@@ -317,8 +313,8 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 static ADDRESS_MAP_START( upd7220_map, AS_0, 8, compis_state )
-	ADDRESS_MAP_GLOBAL_MASK(0x1ffff)
-	AM_RANGE(0x00000, 0x1ffff) AM_RAM AM_SHARE("video_ram")
+	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
+	AM_RANGE(0x00000, 0x7fff) AM_RAM AM_SHARE("video_ram")
 ADDRESS_MAP_END
 
 
@@ -455,11 +451,11 @@ INPUT_PORTS_END
 
 UPD7220_DISPLAY_PIXELS_MEMBER( compis_state::hgdc_display_pixels )
 {
-	UINT8 i,gfx = m_video_ram[address];
+	UINT8 i,gfx = m_video_ram[(address & 0x7fff)];
 	const pen_t *pen = m_palette->pens();
 
 	for(i=0; i<8; i++)
-		bitmap.pix32(y, x + i) = pen[BIT(gfx, i)];
+		bitmap.pix32(y, x + i) = pen[BIT(gfx, 7 - i)];
 }
 
 
