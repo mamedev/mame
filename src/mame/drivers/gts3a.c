@@ -1,50 +1,289 @@
-/*
-    Gottlieb System 3
-*/
+/****************************************************************************************************
 
+  PINBALL
+  Gottlieb System 3
+  Dot Matrix Display
 
-#include "emu.h"
+Status:
+- Nothing works
+- The code here has been copied from gts3 but not yet adjusted for this hardware
+
+ToDo:
+- Everything
+- There's an undumped GAL 16V8-25L on the DMD board (position U8)
+
+*****************************************************************************************************/
+
+#include "machine/genpin.h"
 #include "cpu/m6502/m65c02.h"
+#include "machine/6522via.h"
 
 class gts3a_state : public driver_device
 {
 public:
 	gts3a_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_u4(*this, "u4")
+		, m_u5(*this, "u5")
+		, m_switches(*this, "X")
 	{ }
 
-protected:
-
-	// devices
-	required_device<cpu_device> m_maincpu;
-
-	// driver_device overrides
-	virtual void machine_reset();
-public:
 	DECLARE_DRIVER_INIT(gts3a);
+	DECLARE_WRITE8_MEMBER(segbank_w);
+	DECLARE_READ8_MEMBER(u4a_r);
+	DECLARE_READ8_MEMBER(u4b_r);
+	DECLARE_WRITE8_MEMBER(u4b_w);
+	DECLARE_WRITE_LINE_MEMBER(nmi_w);
+	DECLARE_INPUT_CHANGED_MEMBER(test_inp);
+private:
+	bool m_dispclk;
+	bool m_lampclk;
+	UINT8 m_digit;
+	UINT8 m_row; // for lamps and switches
+	UINT8 m_segment[4];
+	UINT8 m_u4b;
+	virtual void machine_reset();
+	required_device<m65c02_device> m_maincpu;
+	required_device<via6522_device> m_u4;
+	required_device<via6522_device> m_u5;
+	required_ioport_array<12> m_switches;
 };
 
 
 static ADDRESS_MAP_START( gts3a_map, AS_PROGRAM, 8, gts3a_state )
-	AM_RANGE(0x0000, 0xffff) AM_NOP
+	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_SHARE("nvram")
+	AM_RANGE(0x2000, 0x200f) AM_DEVREADWRITE("u4", via6522_device, read, write)
+	AM_RANGE(0x2010, 0x201f) AM_DEVREADWRITE("u5", via6522_device, read, write)
+	AM_RANGE(0x2020, 0x2023) AM_MIRROR(0x0c) AM_WRITE(segbank_w)
+	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( gts3a )
+	PORT_START("TTS")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE) PORT_NAME("Test") PORT_CHANGED_MEMBER(DEVICE_SELF, gts3a_state, test_inp, 1)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Slam Tilt") PORT_CODE(KEYCODE_7_PAD)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_TILT)
+
+	PORT_START("X.0")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_COIN1)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_COIN3)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_COIN2)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_START)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_SERVICE1) PORT_NAME("Left Advance")
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_SERVICE2) PORT_NAME("Right Advance")
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER) PORT_CODE(KEYCODE_MINUS)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER) PORT_CODE(KEYCODE_EQUALS)
+
+	PORT_START("X.1")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_CODE(KEYCODE_A)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_CODE(KEYCODE_S)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_CODE(KEYCODE_D)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_CODE(KEYCODE_F)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER) PORT_CODE(KEYCODE_G)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER) PORT_CODE(KEYCODE_H)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER) PORT_CODE(KEYCODE_J)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER) PORT_CODE(KEYCODE_K)
+
+	PORT_START("X.2")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_CODE(KEYCODE_Q)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_CODE(KEYCODE_W)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_CODE(KEYCODE_E)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_CODE(KEYCODE_R)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER) PORT_CODE(KEYCODE_Y)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER) PORT_CODE(KEYCODE_U)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER) PORT_CODE(KEYCODE_I)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER) PORT_CODE(KEYCODE_O)
+
+	PORT_START("X.3")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_CODE(KEYCODE_Z)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_CODE(KEYCODE_X)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_CODE(KEYCODE_C)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_CODE(KEYCODE_V)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER) PORT_CODE(KEYCODE_B)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER) PORT_CODE(KEYCODE_N)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER) PORT_CODE(KEYCODE_M)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER) PORT_CODE(KEYCODE_COMMA)
+
+	PORT_START("X.4")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_CODE(KEYCODE_L)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_CODE(KEYCODE_BACKSPACE)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_CODE(KEYCODE_OPENBRACE)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_CODE(KEYCODE_CLOSEBRACE)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER) PORT_CODE(KEYCODE_BACKSLASH)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER) PORT_CODE(KEYCODE_COLON)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER) PORT_CODE(KEYCODE_QUOTE)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER) PORT_CODE(KEYCODE_ENTER)
+
+	PORT_START("X.5")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_CODE(KEYCODE_STOP)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_CODE(KEYCODE_SLASH)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_CODE(KEYCODE_SPACE)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_CODE(KEYCODE_CAPSLOCK)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER) PORT_CODE(KEYCODE_UP)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER) PORT_CODE(KEYCODE_DOWN)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER) PORT_CODE(KEYCODE_LEFT)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER) PORT_CODE(KEYCODE_RIGHT)
+
+	PORT_START("X.6")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER)
+
+	PORT_START("X.7")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER)
+
+	PORT_START("X.8")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER)
+
+	PORT_START("X.9")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER)
+
+	PORT_START("X.10")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER)
+
+	PORT_START("X.11")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER)
 INPUT_PORTS_END
+
+INPUT_CHANGED_MEMBER( gts3a_state::test_inp )
+{
+	m_u4->write_ca1(newval);
+}
+
+// This trampoline needed; DEVWRITELINE("maincpu", m65c02_device, nmi_line) does not work
+WRITE_LINE_MEMBER( gts3a_state::nmi_w )
+{
+	m_maincpu->set_input_line(INPUT_LINE_NMI, (state) ? CLEAR_LINE : HOLD_LINE);
+}
+
+WRITE8_MEMBER( gts3a_state::segbank_w )
+{ // this is all wrong
+	UINT32 seg1,seg2;
+	m_segment[offset] = data;
+	seg1 = m_segment[offset&2] | (m_segment[offset|1] << 8);
+	seg2 = BITSWAP32(seg1,16,16,16,16,16,16,16,16,16,16,16,16,16,16,15,14,9,7,13,11,10,6,8,12,5,4,3,3,2,1,0,0);
+	output_set_digit_value(m_digit+(BIT(offset, 1) ? 0 : 20), seg2);
+}
+
+WRITE8_MEMBER( gts3a_state::u4b_w )
+{
+	m_u4b = data & 0xe7;
+	bool clk_bit = BIT(data, 6);
+	if ((!m_dispclk) && clk_bit) // 0->1 is valid
+	{
+		if BIT(data, 5)
+			m_digit = 0;
+		else
+			m_digit++;
+	}
+	m_dispclk = clk_bit;
+
+	clk_bit = BIT(data, 1);
+	if ((!m_lampclk) && clk_bit) // 0->1 is valid
+	{
+		if BIT(data, 0)
+			m_row = 0;
+		else
+			m_row++;
+	}
+	m_lampclk = clk_bit;
+
+
+//	printf("B=%s=%X ",machine().describe_context(),data&0xe0);
+}
+
+READ8_MEMBER( gts3a_state::u4a_r )
+{
+	if (m_row < 12)
+		return m_switches[m_row]->read();
+	else
+		return 0xff;
+}
+
+READ8_MEMBER( gts3a_state::u4b_r )
+{
+	return m_u4b | (ioport("TTS")->read() & 0x18);
+}
 
 void gts3a_state::machine_reset()
 {
+	m_digit = 0;
+	m_dispclk = 0;
 }
 
-DRIVER_INIT_MEMBER(gts3a_state,gts3a)
+DRIVER_INIT_MEMBER( gts3a_state, gts3a )
 {
 }
 
 static MACHINE_CONFIG_START( gts3a, gts3a_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M65C02, 2000000)
+	MCFG_CPU_ADD("maincpu", M65C02, XTAL_4MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(gts3a_map)
+	MCFG_NVRAM_ADD_0FILL("nvram")
+
+	/* Video */
+	// to be done
+
+	/* Sound */
+	MCFG_FRAGMENT_ADD( genpin_audio )
+
+	MCFG_DEVICE_ADD("u4", VIA6522, 0)
+	MCFG_VIA6522_IRQ_HANDLER(DEVWRITELINE("maincpu", m65c02_device, irq_line))
+	MCFG_VIA6522_READPA_HANDLER(READ8(gts3a_state, u4a_r))
+	MCFG_VIA6522_READPB_HANDLER(READ8(gts3a_state, u4b_r))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(gts3a_state, u4b_w))
+	//MCFG_VIA6522_CA2_HANDLER(WRITELINE(gts3a_state, u4ca2_w))
+	MCFG_VIA6522_CB2_HANDLER(WRITELINE(gts3a_state, nmi_w))
+
+	MCFG_DEVICE_ADD("u5", VIA6522, 0)
+	MCFG_VIA6522_IRQ_HANDLER(DEVWRITELINE("maincpu", m65c02_device, irq_line))
+	//MCFG_VIA6522_READPA_HANDLER(READ8(gts3a_state, u5a_r))
+	//MCFG_VIA6522_READPB_HANDLER(READ8(gts3a_state, u5b_r))
+	//MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(gts3a_state, u5b_w))
+	//MCFG_VIA6522_CA2_HANDLER(WRITELINE(gts3a_state, u5ca2_w))
+	//MCFG_VIA6522_CB1_HANDLER(WRITELINE(gts3a_state, u5cb1_w))
+	//MCFG_VIA6522_CB2_HANDLER(WRITELINE(gts3a_state, u5cb2_w))
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------------------------
@@ -72,7 +311,7 @@ ROM_START(barbwire)
 ROM_END
 
 /*-------------------------------------------------------------------
-/ Brooks & Dunn (#749)
+/ Brooks & Dunn (#749T1)
 /-------------------------------------------------------------------*/
 ROM_START(brooks)
 	ROM_REGION(0x10000, "maincpu", 0)

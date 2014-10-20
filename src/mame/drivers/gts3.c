@@ -2,6 +2,7 @@
 
   PINBALL
   Gottlieb System 3
+  Alpha-Numeric Display
 
 Setting up:
 - Press F2
