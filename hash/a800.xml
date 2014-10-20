@@ -975,8 +975,8 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="aschreib" cloneof="awriterc">
-		<description>AtariScreiber (Ger)</description>
+	<software name="aschreib" cloneof="awriterc" supported="no">
+		<description>AtariSchreiber (Ger)</description>
 		<year>1982</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="RXG8036" />
@@ -1058,6 +1058,7 @@ Compiled by K1W1
 		<description>Basic XE Programming Language v7.2</description>
 		<year>1986</year>
 		<publisher>OSS</publisher>
+		<sharedfeat name="compatibility" value="XL/XE"/>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_ossm091" />
 			<dataarea name="rom" size="16384">
@@ -1071,11 +1072,12 @@ Compiled by K1W1
 			</dataarea>
 		</part>
 	</software>
-
+	
 	<software name="basxe41" cloneof="basxe72">
 		<description>Basic XE Programming Language v4.1</description>
 		<year>1985</year>
 		<publisher>OSS</publisher>
+		<sharedfeat name="compatibility" value="XL/XE"/>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_ossm091" />
 			<dataarea name="rom" size="16384">
@@ -1968,7 +1970,7 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="diamonde" cloneof="diamond3">
+	<software name="diamonde" cloneof="diamond3" supported="partial">
 		<description>Diamond Graphic OS v1.0 (Earlier Release)</description>
 		<year>1988</year>
 		<publisher>Reeve Software</publisher>
@@ -3244,7 +3246,7 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="mac65100" cloneof="mac65102" supported="no">
+	<software name="mac65100" cloneof="mac65102">
 		<description>MAC-65 Macro Assembler v1.00</description>
 		<year>1984</year>
 		<publisher>OSS</publisher>
@@ -4187,12 +4189,12 @@ Compiled by K1W1
 			</dataarea>
 		</part>
 	</software>
-
+	
 	<software name="plato" supported="no">
 		<description>PLATO (Access Software for the PLATO Service Network)</description>
 		<year>1984</year>
 		<publisher>Atari</publisher>
-		<info name="usage" value="Requires Atari 850 interface and 1200 baud modem to run."
+		<info name="usage" value="Requires Atari 850 interface and 1200 baud modem to run." />
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_8k" />
 			<dataarea name="rom" size="8192">
@@ -5254,21 +5256,21 @@ Compiled by K1W1
 			</dataarea>
 		</part>
 	</software>
-
+	
 	<software name="synass">
 		<description>Synassembler</description>
-		<!-- Possible Bad dump -->
+		<!-- Possible bad dump -->
 		<year>1982</year>
 		<publisher>Synapse</publisher>
 		<sharedfeat name="compatibility" value="OSb"/>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_8k" />
 			<dataarea name="rom" size="8192">
-				<rom name="synassmbler.rom" size="8192" crc="6aa6b6d6" sha1="4a7232b4e121a546cbb6b7e11a2d7cf7ebd7a300" offset="0" status="baddump" />
+				<rom name="synassmbler.rom" size="8192" crc="6aa6b6d6" sha1="4a7232b4e121a546cbb6b7e11a2d7cf7ebd7a300" offset="0" status="baddump" /> 
 			</dataarea>
 		</part>
 	</software>
-
+	
 	<software name="szaxxon">
 		<description>Super Zaxxon</description>
 		<year>1983</year>
@@ -5901,6 +5903,7 @@ Compiled by K1W1
 		<description>VisiCopy III</description>
 		<year>1993</year>
 		<publisher>JRC</publisher>
+		<sharedfeat name="compatibility" value="XL/XE"/>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_phoenix" />
 			<dataarea name="rom" size="8192">
