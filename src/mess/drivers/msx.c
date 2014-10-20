@@ -63,7 +63,6 @@
 ** - perfect1: Firmware broken
 ** - mpc2500f: Fix keyboard layout?
 ** - nms8260: HDD not emulated
-** - nms8270: MSX-Audio not emulated
 ** - mpc27: Light pen not emulated
 ** - phc77: firmware not emulated
 ** - phc77: printer not emulated
@@ -216,7 +215,7 @@ Philips NMS-8250J - MSX2 - nms8250j
 Philips NMS-8255 - MSX2 - nms8255
 Philips NMS-8255F - MSX2 - nms8255f
 Philips NMS-8260 - MSX2 - nms8260
-Philips NMS-8270 - MSX2 - nms8270
+Philips NMS-8270 - MSX2 - nms8270 - not confirmed to exist yet
 Philips NMS-8280 - MSX2 - nms8280
 Philips NMS-8280F - MSX2 - nms8280f
 Philips NMS-8280G - MSX2 - nms8280g
@@ -5741,38 +5740,7 @@ static MACHINE_CONFIG_DERIVED( nms8260, msx2_pal )
 	MCFG_FRAGMENT_ADD( msx2_cartlist )
 MACHINE_CONFIG_END
 
-/* MSX2 - Philips NMS-8270 */
-
-ROM_START (nms8270)
-	ROM_REGION (0x18000, "maincpu", 0)
-	ROM_LOAD ("nms8270bios.rom",   0x0000, 0x8000, CRC(6cdaf3a5) SHA1(6103b39f1e38d1aa2d84b1c3219c44f1abb5436e))
-	ROM_LOAD ("nms8270ext.rom",    0x8000, 0x4000, CRC(66237ecf) SHA1(5c1f9c7fb655e43d38e5dd1fcc6b942b2ff68b02))
-	ROM_LOAD ("nms8270disk.rom",   0xc000, 0x4000, CRC(ca3307d3) SHA1(c3efedda7ab947a06d9345f7b8261076fa7ceeef))
-	ROM_LOAD ("nms8270audio.rom", 0x10000, 0x8000, CRC(d8a17006) SHA1(f081a884505af9a1080b2b57e86b6da93b784301))
-ROM_END
-
-static MACHINE_CONFIG_DERIVED( nms8270, msx2_pal )
-	// YM2149 (in S-3527 MSX Engine)
-	// FDC: wd2793, 1 3.5" DSDD drives
-	// 2 Cartridge slots
-	// S-3527 MSX Engine
-	// MSX-Audio builtin
-
-	MCFG_MSX_LAYOUT_ROM("bios", 0, 0, 0, 2, "maincpu", 0x0000)
-	MCFG_MSX_LAYOUT_CARTRIDGE("cartslot1", 1, 0)
-	MCFG_MSX_LAYOUT_CARTRIDGE("cartslot2", 2, 0)
-	MCFG_MSX_LAYOUT_ROM("ext", 3, 0, 0, 1, "maincpu", 0x8000)
-	MCFG_MSX_LAYOUT_ROM("msxaudio", 3, 1, 1, 2, "maincpu", 0x10000)
-	MCFG_MSX_LAYOUT_RAM_MM("ram_mm", 3, 2, 0x20000)   /* 128KB Mapper RAM */
-	MCFG_MSX_RAMIO_SET_BITS(0xf8)
-	MCFG_MSX_LAYOUT_DISK1("disk", 3, 3, 1, 1, "maincpu", 0xc000)
-
-	MCFG_FRAGMENT_ADD( msx_wd2793_force_ready )
-	MCFG_FRAGMENT_ADD( msx_1_35_dd_drive )
-	MCFG_FRAGMENT_ADD( msx2_floplist )
-
-	MCFG_FRAGMENT_ADD( msx2_cartlist )
-MACHINE_CONFIG_END
+/* MSX2 - Philips NMS-8270 - Not confirmed to exist yet */
 
 /* MSX2 - Philips NMS-8280 - 2 possible sets (/00 /16) */
 
@@ -8358,7 +8326,6 @@ COMP(19??, nms8250j,   nms8255,  0, nms8250j,   msx2jp,   driver_device, 0, "Phi
 COMP(1986, nms8255,    0,        0, nms8255,    msx2,     driver_device, 0, "Philips", "NMS-8255 (MSX2)", 0)
 COMP(1986, nms8255f,   nms8255,  0, nms8255f,   msx2,     driver_device, 0, "Philips", "NMS-8255F (MSX2)", 0) // French keyboard
 COMP(1986, nms8260,    0,        0, nms8260,    msx2,     driver_device, 0, "Philips", "NMS-8260 (Prototype) (MSX2)", GAME_NOT_WORKING)
-COMP(198?, nms8270,    0,        0, nms8270,    msx2,     driver_device, 0, "Philips", "NMS-8270 (Prototype) (MSX2)", GAME_NOT_WORKING)
 COMP(1986, nms8280,    0,        0, nms8280,    msx2,     driver_device, 0, "Philips", "NMS-8280 (MSX2)", 0)
 COMP(1986, nms8280f,   nms8280,  0, nms8280f,   msx2,     driver_device, 0, "Philips", "NMS-8280F (MSX2)", 0) // French keyboard
 COMP(1986, nms8280g,   nms8280,  0, nms8280g,   msx2,     driver_device, 0, "Philips", "NMS-8280G (MSX2)", 0)
