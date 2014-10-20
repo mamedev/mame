@@ -11,9 +11,17 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 
 
 V.Reader:                     80-28****
-V.Smile Motion:               80-08****
-V.Smile Smartbook Software:   80-089***
-V.Smile:                      80-092***
+V.Smile Motion:               80-08****  (Smartridges are orange)
+V.Smile Smartbook Software:   80-089***  (Smartridges are red)
+V.Smile:                      80-092***  (Smartridges are purple, some are gray because of plastic defects)
+
+Addons (w/ yellow Smartridges)
+V.Smile Smart Keyboard    80-091440
+V.Smile PC Pal            80-03600
+V.Smile Art Studio        80-67000
+V.Smile Jamming Gym Class 80-91320
+
+- Not compatible with V.Smile games, left as documentation
 V.Flash (V.Smile Pro):        80-093***
 
 
@@ -85,9 +93,11 @@ Language:
 80-084604(GER)  | Cinderella - Lernen im Märchenland
 80-084624(GER)  | Findet Nemo - Nemos Unterwasserabenteuer
 
+
 80-089000(US)   | Spider-Man &amp; Friends Where is Hulk?
 80-089020(US)   | Toy Story 2
-80-089040(US)   | Dora the Explorer
+80-089040(US)   | Dora's Fix It Adventure
+80-089060(US)   | Scooby-Doo! - A Night of Fright is no Delight
 
 80-090000(US)   | Up
 80-090000(GER)  | Oben
@@ -105,14 +115,14 @@ Language:
 80-092004(GER)  | Abenteuer im ABC Park
 80-092020(US)   | The Adventures of Little Red Riding Hood
 80-092024(GER)  | Entdecke die Welt von Rotkäppchen
-80-092060(US)   | Winnie The Pooh: Honey Hunt
+80-092060(US)   | Winnie The Pooh: The Honey Hunt
 80-092064(GER)  | Winnie Puuh - Die Honigjagd
 80-092080(US)   | Mickey Mouse - Mickey's Magical Adventures
 80-092087(SPA)  | Mickey - La Aventura Magica de Mickey
 80-092084(GER)  | Micky - Mickys magisches Abenteuer
 80-092100(US)   | The Lion King: Simba's Big Adventure
 80-092104(GER)  | Der König der Löwen - Simbas großes Abenteuer
-80-092120(US)   | The Little Mermaid
+80-092120(US)   | The Little Mermaid - Ariel's Majestic Journey
 80-092124(GER)  | Arielle die Meerjungfrau - Arielles aufregendes Abenteuer
 80-092127(SPA)  | La Sirenita - El Vieje Fantástico de Ariel
 80-092140(US)   | Spider-Man & Friends - Secret Missions
@@ -129,11 +139,14 @@ Language:
 80-092264(GER)  | Elmo's großes Abenteuer
 80-092265(FRA)  | Le Monde d'ELMO - Les Grandes Decouvertes D'Elmo
 80-092280(US)   | Dora The Explorer
-80-092300(US)   | Bob the Builder: Bob's busy day
+80-092300(US)   | Bob the Builder: Bob's Busy Day
 80-092304(GER)  | Bob der Baumeister - Achtung Baustelle
 80-092320(US)   | The Wiggles - It's Wiggle Time!
 80-092340(US)   | Thomas The Tank: Engines Working Together
+80-092340-101(US)   | Thomas The Tank: Engines Working Together (ALT)
 80-092360(US)   | Zayzoo My Alien Classmate
+80-092360-101(US)   | Zayzoo - An Earth Adventure
+80-092380(US)   | Barney - The Land of Make Believe
 80-092384(GER)  | Barney - Erlebnis-Reise
 80-092400(US)   | Blue's Clues Collection Day
 80-092420(US)   | Finding Nemo
@@ -143,15 +156,16 @@ Language:
 80-092480(US)   | Batman: Gotham City Rescue
 80-092500(US)   | Whiz Kid Wheels
 80-092520(US)   | Spider-Man & Friends Doc Ock's Challenge
-80-092540(US)   | Noddy
+80-092540(US)   | Noddy - Detective for a Day
 80-092544(GER)  | Noddy
 80-092564(GER)  | 101 Dalmatiner
-80-092580(US)   | Backyardigans
-80-092600(US)   | Shrek 2
+80-092580(US)   | Backyardigans - Viking Voyage
+80-092600(US)   | Shrek - Dragon's Tale
 80-092620(US)   | Lil' Bratz - Friends, Fashion and Fun
-80-092640(US)   | Superman
+80-092640(US)   | Superman - The Greatest Hero
 80-092660(US)   | Cars: Rev It Up In Radiator Springs
 80-092662(NL)   | Cars - Spektakel in Radiator Springs
+80-092666(SPA)  | Cars: Acelera El Motor En Radiador Springs
 80-092664(GER)  | Cars
 80-092820(US)   | Soccer
 80-092824(GER)  | Fußball Schule
@@ -161,9 +175,9 @@ Language:
 80-092882(NL)   | Ratatouille
 80-092884(GER)  | Ratatouille - Remys neue Rezepte
 80-092885(FRA)  | Ratatouille - Les nouvelles recettes de Rémy
-80-092900(US)   | Go Diego Go
+80-092900(US)   | Go Diego Go - Save the Animal Familes!
 80-092920(US)   | Cranium - Partyland Park
-80-092960(US)   | Kung Fu Panda
+80-092960(US)   | Kung Fu Panda - Path of the Panda
 80-092980(US)   | Little Einsteins
 
 80-093000(US)   | The Crystal Ball Adventure
