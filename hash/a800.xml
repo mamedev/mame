@@ -148,11 +148,9 @@ Compiled by K1W1
    - Hacked/Pirate/Homemeade         ER       COS 32T v3.1c
    - Hacked/Pirate/Homemeade         ER 1988  Turbo Loaders Dadok
    - Hacked/Pirate/Homemeade         ER       Turbo Loaders Dadok (hacked)
-   - Hacked/Pirate/Homemeade         ER       Turbo Loader 2k
    - Hacked/Pirate/Homemeade         ER 1990  TurBasCop 3.0 (black case, pink label)
    - Hacked/Pirate/Homemeade                  Wing Wars
    - Hacked/Pirate/Homemeade         ER       Phoenix (black case, red label)
-   - Hacked/Pirate/Homemeade         ER       Turbo Blizzard (black case, green label)
    - Hacked/Pirate/Homemeade         ER       Chaos Utils 2
 
    - Alpha Systems                   ER       Impersonator Back-Up Cart
@@ -178,7 +176,6 @@ Compiled by K1W1
    - Atari                              1981  Paddle Jitter Test (REV A)
    - Atari                              1982  Paddle Jitter Test (REV C with games)
    - Atari                                    RAM Extension Module Test Rev 1.0
-   - Atari Germany        RXG8036    ER 1982  AtariSchreiber
    - Atari Mexico                    U        LOGO Computing Language
 
    - Atrax                           ER       Atrax (#01)
@@ -241,13 +238,11 @@ Compiled by K1W1
    - JRC                             ER       VisiCopy II
 
    - LJK                             R        Data Perfect
-   - LJK                             R  1981  Letter Perfect (80 col)
 
    - Logic One                       PR       Jump Start
 
    - O.S.S.                          U  1983  Basic XL (1.00)
    - O.S.S.                          U  1983  Basic XL (1.01)
-   - O.S.S.                          U  1984  Mac/65 (1.02)
 
    - Protonics                          1982  The Block
 
@@ -466,12 +461,13 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="ace80xl" supported="no">
+	<software name="ace80xl">
 		<description>ACE-80XL: Eighty Column Display for Atari Computers v1.1</description>
 		<!-- Once this cartridge is installed, most text based software loaded will be displayed in 80 column format. -->
 		<year>1985</year>
 		<publisher>Amiable Computer Enhancements</publisher>
 		<info name="serial" value="DT-80" />
+		<sharedfeat name="compatibility" value="XL/XE"/>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_ossm091" />
 			<dataarea name="rom" size="16384">
@@ -493,7 +489,7 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="action36" supported="no">
+	<software name="action36">
 		<description>Action! Programming Language v3.6</description>
 		<!-- One chip cartridge. -->
 		<year>1983</year>
@@ -506,7 +502,7 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="action36a" cloneof="action36" supported="no">
+	<software name="action36a" cloneof="action36">
 		<description>Action! Programming Language v3.6 (Alt)</description>
 		<!-- Two chip cartridge. -->
 		<year>1983</year>
@@ -519,7 +515,7 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="action35" cloneof="action36" supported="no">
+	<software name="action35" cloneof="action36">
 		<description>Action! Programming Language v3.5</description>
 		<year>1983</year>
 		<publisher>OSS</publisher>
@@ -866,7 +862,7 @@ Compiled by K1W1
 	</software>
 
 	<software name="alogof" cloneof="alogo">
-		<description>Atari LOGO Computing Language (France)</description>
+		<description>Atari LOGO Computing Language (Fra)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="RXF80??" />
@@ -911,7 +907,7 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="awriterc" supported="partial">
+	<software name="awriterc">
 		<description>AtariWriter (Rev. C)</description>
 		<year>1984</year>
 		<publisher>Atari</publisher>
@@ -924,7 +920,7 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="awriterb" cloneof="awriterc" supported="partial">
+	<software name="awriterb" cloneof="awriterc">
 		<description>AtariWriter (Rev. B)</description>
 		<year>1982</year>
 		<publisher>Atari</publisher>
@@ -937,7 +933,7 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="awritera" cloneof="awriterc" supported="partial">
+	<software name="awritera" cloneof="awriterc">
 		<description>AtariWriter (Rev. A)</description>
 		<!-- Contains a joystick-checking routine at $8563. While in the main menu, it checks if the value under $8278 (stick 0) equals $8.
 		     If so, it displays the author's name on the screen. However, the author's name (stored at $8585) is erased from this image, so nothing gets displayed.
@@ -953,8 +949,8 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="atexte" cloneof="awriterc" supported="partial">
-		<description>AtariTexte (France)</description>
+	<software name="atexte" cloneof="awriterc">
+		<description>AtariTexte (Fra)</description>
 		<year>1984</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="RXF8036" />
@@ -966,8 +962,8 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="atexte1" cloneof="awriterc" supported="partial">
-		<description>AtariTexte (Prototype)(France)</description>
+	<software name="atexte1" cloneof="awriterc">
+		<description>AtariTexte (Fra, Prototype)</description>
 		<year>1984</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="RXF8036" />
@@ -975,6 +971,19 @@ Compiled by K1W1
 			<feature name="slot" value="a800_16k" />
 			<dataarea name="rom" size="16384">
 				<rom name="ataritexte (proto).rom" size="16384" crc="fabaf286" sha1="9f552aeafdcb4a1feb89df8ae391f2fea1306de9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aschreib" cloneof="awriterc">
+		<description>AtariScreiber (Ger)</description>
+		<year>1982</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="RXG8036" />
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a800_16k" />
+			<dataarea name="rom" size="16384">
+				<rom name="atarischreiber.rom" size="16384" crc="de1c1d12" sha1="8c0f7be263e3c30bcf34adf3dddee15d62ac62cc" />
 			</dataarea>
 		</part>
 	</software>
@@ -1045,14 +1054,14 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="basxe41" supported="no">
-		<description>Basic XE Programming Language v4.1</description>
-		<year>1985</year>
+	<software name="basxe72">
+		<description>Basic XE Programming Language v7.2</description>
+		<year>1986</year>
 		<publisher>OSS</publisher>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_ossm091" />
 			<dataarea name="rom" size="16384">
-				<rom name="basic xe programming language v4.1.rom" size="16384" crc="003d3a36" sha1="76f06d212c5f972f9540bee26b23ecc010f3b535" offset="0" /> <!-- Verified -->
+				<rom name="basic xe programming language v7.2.rom" size="16384" crc="3f06b111" sha1="ac80e12fcd7e228e0329ba1a2f3408b37af0b7ff" offset="0" />
 			</dataarea>
 		</part>
 			<part name="flop1" interface="floppy_5_25">
@@ -1063,7 +1072,19 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="bxl103" supported="no">
+	<software name="basxe41" cloneof="basxe72">
+		<description>Basic XE Programming Language v4.1</description>
+		<year>1985</year>
+		<publisher>OSS</publisher>
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a800_ossm091" />
+			<dataarea name="rom" size="16384">
+				<rom name="basic xe programming language v4.1.rom" size="16384" crc="003d3a36" sha1="76f06d212c5f972f9540bee26b23ecc010f3b535" offset="0" /> <!-- Verified -->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bxl103">
 		<description>Basic XL Programming Language v1.03</description>
 		<year>1983</year>
 		<publisher>OSS</publisher>
@@ -1076,7 +1097,7 @@ Compiled by K1W1
 	</software>
 
 
-	<software name="bxl102" cloneof="bxl103" supported="no">
+	<software name="bxl102" cloneof="bxl103">
 		<description>Basic XL Programming Language v1.02</description>
 		<year>1983</year>
 		<publisher>OSS</publisher>
@@ -1088,7 +1109,7 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="bxl102a" cloneof="bxl103" supported="no">
+	<software name="bxl102a" cloneof="bxl103">
 		<description>Basic XL Programming Language v1.02 (Alt)</description>
 		<!-- Different cartridge mapping. -->
 		<year>1983</year>
@@ -1339,10 +1360,37 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="turbo2k" supported="no">
+	<software name="turboblz">
+		<description>Turbo Blizzard</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Requires Lower-Silesian Turbo 2000 hardware modification installed in a tape recorder." />
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a800_blizzard" />
+			<dataarea name="rom" size="16384">
+				<rom name="turbo blizzard.bin" size="16384" crc="318ed507" sha1="ad2adde7decaa2e40bc0dcb8db0d6d8977a5af22" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cturbo2k">
+		<description>Cartridge Turbo 2000 v3.16</description>
+		<year>199?</year>
+		<publisher>Info-Cell</publisher>
+		<info name="developer" value="Pawel Mironczuk" />
+		<info name="usage" value="Requires Lower-Silesian Turbo 2000 hardware modification installed in a tape recorder." />
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a800_blizzard" />
+			<dataarea name="rom" size="16384">
+				<rom name="cartridge turbo 2000 v3.16.bin" size="16384" crc="f25da498" sha1="5b36306165a221930ac9e9fdc46396714b93224c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="turbo2k">
 		<description>Cartridge dla Turbo 2000 v1.0</description>
 		<year>1991</year>
-		<publisher>DOMAISOFT</publisher>
+		<publisher>DOMAIN SOFT</publisher>
 		<info name="developer" value="Tomasz Rolewski" />
 		<info name="usage" value="Requires Lower-Silesian Turbo 2000 hardware modification installed in a tape recorder." />
 		<part name="cart" interface="a8bit_cart">
@@ -1353,8 +1401,22 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="turbo2k1" cloneof="turbo2k" supported="no">
-		<description>Cartridge Systemowy Turbo 2000</description>
+	<software name="turbo2ka" cloneof="turbo2k">
+		<description>Cartridge dla Turbo 2000 v1.0 (Alt)</description>
+		<year>1991</year>
+		<publisher>DOMAIN SOFT</publisher>
+		<info name="developer" value="Tomasz Rolewski" />
+		<info name="usage" value="Requires Lower-Silesian Turbo 2000 hardware modification installed in a tape recorder." />
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a800_blizzard" />
+			<dataarea name="rom" size="16384">
+				<rom name="cartridge dla turbo 2000 v1.0 (a).rom" size="16384" crc="9ca5d00d" sha1="9a545bbdab0edb1fc42a052e08a90db3617fc602" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="turbo2k1">
+		<description>Cartridge Systemowy Turbo 2000 (v.1)</description>
 		<year>1991</year>
 		<publisher>ROBOsoft</publisher>
 		<info name="developer" value="Tomasz Rolewski" />
@@ -1362,13 +1424,13 @@ Compiled by K1W1
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_blizzard" />
 			<dataarea name="rom" size="16384">
-				<rom name="cartridge turbo 2000.rom" size="16384" crc="60787a1a" sha1="5dfead5e2fa59d22d795f5c544adb5007dd5dbee" offset="0" />
+				<rom name="cartridge turbo 2000 (v.1).rom" size="16384" crc="60787a1a" sha1="5dfead5e2fa59d22d795f5c544adb5007dd5dbee" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="turbo2k2" cloneof="turbo2k" supported="no">
-		<description>Cartridge Systemowy Turbo 2000 (Alt)</description>
+	<software name="turbo2k2" cloneof="turbo2k1">
+		<description>Cartridge Systemowy Turbo 2000 (v.2)</description>
 		<year>1991</year>
 		<publisher>ROBOsoft</publisher>
 		<info name="developer" value="Tomasz Rolewski" />
@@ -1376,12 +1438,12 @@ Compiled by K1W1
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_blizzard" />
 			<dataarea name="rom" size="16384">
-				<rom name="cartridge turbo 2000 (alt).rom" size="16384" crc="45a8b12e" sha1="7a85f67ff2c491d900ea1b8afd2cdef42f99ac81" offset="0" />
+				<rom name="cartridge turbo 2000 (v.2).rom" size="16384" crc="45a8b12e" sha1="7a85f67ff2c491d900ea1b8afd2cdef42f99ac81" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="jturbo2k" supported="no">
+	<software name="jturbo2k">
 		<description>Cartridge System Turbo 2000 (JK Soft)</description>
 		<year>1991</year>
 		<publisher>JK Soft</publisher>
@@ -1395,7 +1457,7 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="sturbo2k" supported="no">
+	<software name="sturbo2k">
 		<description>Cartridge System Turbo 2000</description>
 		<year>1991</year>
 		<publisher>Bartek Selinger</publisher>
@@ -1517,7 +1579,7 @@ Compiled by K1W1
 	</software>
 
 	<software name="chiffres">
-		<description>Des Chiffres et des Lettres (France)</description>
+		<description>Des Chiffres et des Lettres (Fra)</description>
 		<year>1983</year>
 		<publisher>Atari France</publisher>
 		<info name="serial" value="RXF52001" />
@@ -1530,7 +1592,7 @@ Compiled by K1W1
 	</software>
 
 	<software name="chifresa" cloneof="chiffres">
-		<description>Des Chiffres et des Lettres (France) (Alt)</description>
+		<description>Des Chiffres et des Lettres (Fra, Alt)</description>
 		<!-- Probably an earlier version. Attempts to boot from disk on restart. -->
 		<year>1983</year>
 		<publisher>Atari France</publisher>
@@ -1906,7 +1968,7 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="diamonde" cloneof="diamond3" supported="no">
+	<software name="diamonde" cloneof="diamond3">
 		<description>Diamond Graphic OS v1.0 (Earlier Release)</description>
 		<year>1988</year>
 		<publisher>Reeve Software</publisher>
@@ -1994,6 +2056,19 @@ Compiled by K1W1
 			<feature name="slot" value="a800_16k" />
 			<dataarea name="rom" size="16384">
 				<rom name="direct access.rom" size="16384" crc="0b5c7bd3" sha1="0030ed9f16ab9b5a8e547b914c8dc28960dc1eaa" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="daccessa" cloneof="daccess">
+		<description>Direct Access (Alt)</description>
+		<!-- Cartridge dated 12/24/84. -->
+		<year>1984</year>
+		<publisher>Citibank</publisher>
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a800_16k" />
+			<dataarea name="rom" size="16384">
+				<rom name="direct access (a).rom" size="16384" crc="bbdabfcb" sha1="b57b6f5bd41a3e075d242504d27e7ff4b162ea98" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -3018,13 +3093,13 @@ Compiled by K1W1
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_8k" />
 			<dataarea name="rom" size="8192">
-				<rom name="letter perfect [40 column].rom" size="8192" crc="34c1701a" sha1="325fad1512c8cff544f0e706eecd0c98ef2e0d1e" offset="0" />
+				<rom name="letter perfect (40 column).rom" size="8192" crc="34c1701a" sha1="325fad1512c8cff544f0e706eecd0c98ef2e0d1e" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="lprfct40a" cloneof="lprfct40">
-		<description>Letter Perfect (40 Column Version) (Alt)</description>
+		<description>Letter Perfect (40 Column Version, Alt)</description>
 		<year>1981</year>
 		<publisher>LJK</publisher>
 		<sharedfeat name="compatibility" value="OSb"/>
@@ -3032,6 +3107,20 @@ Compiled by K1W1
 			<feature name="slot" value="a800_8k" />
 			<dataarea name="rom" size="8192">
 				<rom name="letter perfect (40 column)(alt).rom" size="8192" crc="88f5375f" sha1="a00370c48876b688d2b0cf6267510c18f88d89fd" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lprfct80" supported ="no">
+		<description>Letter Perfect (80 Column Version)</description>
+		<year>1981</year>
+		<publisher>LJK</publisher>
+		<info name="usage" value="Needs an Bit-3 80 Column Board or Austin-Franklin 80-Column Board to run." />
+		<sharedfeat name="compatibility" value="OSb"/>
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a800_8k" />
+			<dataarea name="rom" size="8192">
+				<rom name="letter perfect (80 column).rom" size="8192" crc="616e6cb0" sha1="c1e29309e28cfdefc3d1b32d08ca8ac84a479c84" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -3131,7 +3220,19 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="mac65101" supported="no">
+	<software name="mac65102">
+		<description>MAC-65 Macro Assembler v1.02</description>
+		<year>1984</year>
+		<publisher>OSS</publisher>
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a800_oss034m" />
+			<dataarea name="rom" size="16384">
+				<rom name="mac-65 macro assembler v1.02.rom" size="16384" crc="51931a08" sha1="48e5d5e71d6c7b00f9429e90ef7514d3226a2bcf" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mac65101" cloneof="mac65102">
 		<description>MAC-65 Macro Assembler v1.01</description>
 		<year>1984</year>
 		<publisher>OSS</publisher>
@@ -3143,7 +3244,7 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="mac65100" cloneof="mac65101" supported="no">
+	<software name="mac65100" cloneof="mac65102" supported="no">
 		<description>MAC-65 Macro Assembler v1.00</description>
 		<year>1984</year>
 		<publisher>OSS</publisher>
@@ -3527,7 +3628,7 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="microcal" supported="no">
+	<software name="microcal">
 		<description>Microcalc XE v2.2 (Mex)</description>
 		<year>19??</year>
 		<publisher>Grupo SITSA</publisher>
@@ -3846,7 +3947,7 @@ Compiled by K1W1
 	</software>
 
 	<software name="fischa">
-		<description>Multi Fischa (Mexico)</description>
+		<description>Multi Fischa (Mex)</description>
 		<year>1985</year>
 		<publisher>Grupo SITSA</publisher>
 		<part name="cart" interface="a8bit_cart">
@@ -4087,6 +4188,19 @@ Compiled by K1W1
 		</part>
 	</software>
 
+	<software name="plato" supported="no">
+		<description>PLATO (Access Software for the PLATO Service Network)</description>
+		<year>1984</year>
+		<publisher>Atari</publisher>
+		<info name="usage" value="Requires Atari 850 interface and 1200 baud modem to run."
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a800_8k" />
+			<dataarea name="rom" size="8192">
+				<rom name="plato.rom" size="8192" crc="47b49425" sha1="7b54326d07b93c1969f6321679c1199a47216f27" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="platter">
 		<description>PlatterMania</description>
 		<year>1983</year>
@@ -4140,7 +4254,7 @@ Compiled by K1W1
 	</software>
 
 	<software name="popeye">
-		<description>Popeye (US)</description>
+		<description>Popeye (USA)</description>
 		<year>1983</year>
 		<publisher>Parker Brothers</publisher>
 		<info name="serial" value="1150" />
@@ -4152,8 +4266,8 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="popeyeu" cloneof="popeye">
-		<description>Popeye (EU)</description>
+	<software name="popeyee" cloneof="popeye">
+		<description>Popeye (Euro)</description>
 		<year>1983</year>
 		<publisher>Parker Brothers</publisher>
 		<info name="serial" value="1150" />
@@ -5077,7 +5191,7 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="sprcart" supported="no">
+	<software name="sprcart">
 		<description>Super Cartridge</description>
 		<year>199?</year>
 		<publisher>Unerring Master</publisher>
@@ -5137,6 +5251,20 @@ Compiled by K1W1
 			<feature name="slot" value="a800_8k" />
 			<dataarea name="rom" size="8192">
 				<rom name="super sketch graphics master.rom" size="8192" crc="0e1c20c5" sha1="73272680f87ae4af625b99144b561864eb59f596" offset="0" /> <!-- Verified -->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="synass">
+		<description>Synassembler</description>
+		<!-- Possible Bad dump -->
+		<year>1982</year>
+		<publisher>Synapse</publisher>
+		<sharedfeat name="compatibility" value="OSb"/>
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a800_8k" />
+			<dataarea name="rom" size="8192">
+				<rom name="synassmbler.rom" size="8192" crc="6aa6b6d6" sha1="4a7232b4e121a546cbb6b7e11a2d7cf7ebd7a300" offset="0" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -5307,7 +5435,7 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="mwrnchxl" supported="no">
+	<software name="mwrnchxl">
 		<description>The Monkey Wrench II XL</description>
 		<!-- Manual can be found here http://retrobits.net/atari/monkey.shtml -->
 		<year>1984</year>
@@ -5321,7 +5449,7 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="mwrench2" cloneof="mwrnchxl" supported="no">
+	<software name="mwrench2" cloneof="mwrnchxl">
 		<description>The Monkey Wrench II</description>
 		<!-- This cartridge could only be used in the A800 Right Cartridge Slot. -->
 		<year>1983</year>
@@ -5335,7 +5463,7 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="mwrench2a" cloneof="mwrnchxl" supported="no">
+	<software name="mwrench2a" cloneof="mwrnchxl">
 		<description>The Monkey Wrench II (Alt)</description>
 		<!-- This cartridge could only be used in the A800 Right Cartridge Slot. -->
 		<year>1983</year>
@@ -5349,7 +5477,7 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="mwrench" cloneof="mwrnchxl" supported="no">
+	<software name="mwrench" cloneof="mwrnchxl">
 		<description>The Monkey Wrench</description>
 		<!-- This cartridge could only be used in the A800 Right Cartridge Slot. -->
 		<year>1981</year>
@@ -5769,7 +5897,7 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="viscopy3" supported="no">
+	<software name="viscopy3">
 		<description>VisiCopy III</description>
 		<year>1993</year>
 		<publisher>JRC</publisher>
@@ -5807,7 +5935,7 @@ Compiled by K1W1
 	</software>
 
 	<software name="weltraum">
-		<description>Weltraumkolonie (German)</description>
+		<description>Weltraumkolonie (Ger)</description>
 		<year>1984</year>
 		<publisher>Spinnaker / Ravensburger</publisher>
 		<part name="cart" interface="a8bit_cart">
@@ -5910,6 +6038,7 @@ Compiled by K1W1
 		<description>Zybex</description>
 		<year>1999</year>
 		<publisher>Video 61 / Williams</publisher>
+		<sharedfeat name="compatibility" value="XL/XE"/>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_williams" />
 			<dataarea name="rom" size="65536">
