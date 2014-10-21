@@ -221,7 +221,7 @@ WRITE8_MEMBER( mm1_state::ls259_w )
 	case 1: // RECALL
 		if (LOG) logerror("RECALL %u\n", d);
 		m_recall = d;
-		if (d) m_fdc->reset();
+		if (d) m_fdc->soft_reset();
 		break;
 
 	case 2: // _RV28/RX21
