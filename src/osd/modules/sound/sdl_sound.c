@@ -489,7 +489,7 @@ static int sdl_init(running_machine &machine)
 	}
 
 	// compute the buffer sizes
-	stream_buffer_size = machine.sample_rate() * 2 * sizeof(INT16) * audio_latency / MAX_AUDIO_LATENCY;
+	stream_buffer_size = (machine.sample_rate() * 2 * sizeof(INT16) * (2 + audio_latency)) / 30;
 	stream_buffer_size = (stream_buffer_size / 1024) * 1024;
 	if (stream_buffer_size < 1024)
 		stream_buffer_size = 1024;
