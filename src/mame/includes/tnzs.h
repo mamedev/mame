@@ -117,5 +117,5 @@ public:
 	optional_device<dac_device> m_dac;
 	optional_device<samples_device> m_samples;
 	required_device<palette_device> m_palette;
-	required_device<address_map_bank_device> m_mainbank;
+	optional_device<address_map_bank_device> m_mainbank;
 };
