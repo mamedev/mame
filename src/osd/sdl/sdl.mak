@@ -83,17 +83,17 @@ SDL_FRAMEWORK_PATH = /Library/Frameworks/
 OSDSRC = $(SRC)/osd
 OSDOBJ = $(OBJ)/osd
 
-# auto-select SDL2 for non-OS/2 builds now
+# default to SDL2 for non-OS/2 builds now
+ifndef SDL_LIBVER
 ifneq ($(TARGETOS),os2)
 SDL_LIBVER = sdl2
+else
+SDL_LIBVER = sdl
+endif
 endif
 
 ifndef NO_USE_QTDEBUG
 OBJDIRS += $(OSDOBJ)/modules/debugger/qt
-endif
-
-ifndef SDL_LIBVER
-SDL_LIBVER = sdl
 endif
 
 ifdef SDL_INSTALL_ROOT
