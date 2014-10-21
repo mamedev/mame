@@ -2190,14 +2190,13 @@ void layout_view::recompute(render_layer_config layerconfig)
 	if (m_expbounds.x1 > m_expbounds.x0)
 		m_bounds = m_expbounds;
 
-	// compute the aspect ratio of the view
-	m_aspect = (m_bounds.x1 - m_bounds.x0) / (m_bounds.y1 - m_bounds.y0);
-	m_scraspect = (m_scrbounds.x1 - m_scrbounds.x0) / (m_scrbounds.y1 - m_scrbounds.y0);
-
 	// if we're handling things normally, the target bounds are (0,0)-(1,1)
 	render_bounds target_bounds;
 	if (!layerconfig.zoom_to_screen() || m_screens.count() == 0)
 	{
+		// compute the aspect ratio of the view
+		m_aspect = (m_bounds.x1 - m_bounds.x0) / (m_bounds.y1 - m_bounds.y0);
+
 		target_bounds.x0 = target_bounds.y0 = 0.0f;
 		target_bounds.x1 = target_bounds.y1 = 1.0f;
 	}
@@ -2205,6 +2204,9 @@ void layout_view::recompute(render_layer_config layerconfig)
 	// if we're cropping, we want the screen area to fill (0,0)-(1,1)
 	else
 	{
+		// compute the aspect ratio of the screen
+		m_scraspect = (m_scrbounds.x1 - m_scrbounds.x0) / (m_scrbounds.y1 - m_scrbounds.y0);
+
 		float targwidth = (m_bounds.x1 - m_bounds.x0) / (m_scrbounds.x1 - m_scrbounds.x0);
 		float targheight = (m_bounds.y1 - m_bounds.y0) / (m_scrbounds.y1 - m_scrbounds.y0);
 		target_bounds.x0 = (m_bounds.x0 - m_scrbounds.x0) / (m_bounds.x1 - m_bounds.x0) * targwidth;
