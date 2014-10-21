@@ -554,7 +554,6 @@ CCOMFLAGS += -msse2
 endif
 
 ifdef OPENMP
-DEFS += -DHAS_OPENMP
 CCOMFLAGS += -fopenmp
 else
 CCOMFLAGS += -Wno-unknown-pragmas
