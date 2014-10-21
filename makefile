@@ -262,8 +262,8 @@ BUILD_MIDILIB = 1
 # uncomment next line to enable LTO (link-time optimizations)
 # LTO = 1
 
-# uncomment next line to enable networking
-# USE_NETWORK = 1
+# uncomment next line to disable networking
+# DONT_USE_NETWORK = 1
 
 # uncomment to enable SSE2 optimized code and SSE2 code generation (implicitly enabled by 64-bit compilers)
 # SSE2 = 1
@@ -463,9 +463,11 @@ ifdef PROFILER
 DEFS += -DMAME_PROFILER
 endif
 
-# define USE_NETWORK if we are a making network enabled build
-ifdef USE_NETWORK
+# dine USE_NETWORK if networking is enabled (not OS/2 and hasn't been disabled)
+ifneq ($(TARGETOS),os2)
+ifndef DONT_USE_NETWORK
 DEFS += -DUSE_NETWORK
+endif
 endif
 
 # need to ensure FLAC functions are statically linked

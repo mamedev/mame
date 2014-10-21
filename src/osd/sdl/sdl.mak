@@ -58,9 +58,6 @@ USE_DISPATCH_GL = 1
 # There is no need to play with this option unless you are doing
 # active development on sdlmame or SDL.
 
-# uncomment the next line to compile and link against SDL2.0
-# SDL_LIBVER = sdl2
-
 # uncomment the next line to use couriersud's multi-keyboard patch for SDL 2.1? (this API was removed prior to the 2.0 release)
 # SDL2_MULTIAPI = 1
 
@@ -85,6 +82,11 @@ SDL_FRAMEWORK_PATH = /Library/Frameworks/
 ###########################################################################
 OSDSRC = $(SRC)/osd
 OSDOBJ = $(OBJ)/osd
+
+# auto-select SDL2 for non-OS/2 builds now
+ifneq ($(TARGETOS),os2)
+SDL_LIBVER = sdl2
+endif
 
 ifndef NO_USE_QTDEBUG
 OBJDIRS += $(OSDOBJ)/modules/debugger/qt
