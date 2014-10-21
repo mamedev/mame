@@ -756,7 +756,7 @@ endif # USE_XINPUT
 # Network (TAP/TUN)
 #-------------------------------------------------
 
-ifdef USE_NETWORK
+ifndef DONT_USE_NETWORK
 ifeq ($(SDL_NETWORK),taptun)
 OSDOBJS += \
 	$(SDLOBJ)/netdev.o \

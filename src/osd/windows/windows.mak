@@ -367,7 +367,7 @@ OSDOBJS += \
 	$(OSDOBJ)/modules/sound/sdl_sound.o
 endif
 
-ifdef USE_NETWORK
+ifndef DONT_USE_NETWORK
 OSDOBJS += \
 	$(WINOBJ)/netdev.o \
 	$(WINOBJ)/netdev_pcap.o
