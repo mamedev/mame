@@ -4,7 +4,7 @@
 #define __PSXCPORT_H__
 
 #include "cpu/psx/siodev.h"
-#include "machine/psxcard.h"
+#include "memcard.h"
 
 #define MCFG_PSX_CTRL_PORT_ADD(_tag, _slot_intf, _def_slot) \
 	MCFG_DEVICE_ADD(_tag, PSX_CONTROLLER_PORT, 0) \

@@ -1,4 +1,4 @@
-#include "machine/psxanalog.h"
+#include "analogue.h"
 
 const device_type PSX_ANALOG_JOYSTICK = &device_creator<psx_analog_joystick_device>;
 const device_type PSX_DUALSHOCK = &device_creator<psx_dualshock_device>;

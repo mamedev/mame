@@ -1817,7 +1817,7 @@ $(MAMEOBJ)/snk.a: \
 	$(DRIVERS)/snk68.o $(VIDEO)/snk68.o \
 
 $(MAMEOBJ)/sony.a: \
-	$(DRIVERS)/zn.o $(MACHINE)/zndip.o $(MACHINE)/znsec.o \
+	$(DRIVERS)/zn.o $(MACHINE)/zndip.o $(MACHINE)/cat702.o \
 
 $(MAMEOBJ)/stern.a: \
 	$(DRIVERS)/astinvad.o \

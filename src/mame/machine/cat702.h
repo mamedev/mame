@@ -2,17 +2,17 @@
 
 #pragma once
 
-#ifndef __ZNSEC_H__
-#define __ZNSEC_H__
+#ifndef __CAT702_H__
+#define __CAT702_H__
 
 #include "cpu/psx/siodev.h"
 
-extern const device_type ZNSEC;
+extern const device_type CAT702;
 
-class znsec_device : public psxsiodev_device
+class cat702_device : public psxsiodev_device
 {
 public:
-	znsec_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	cat702_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	void init(const UINT8 *transform);
 	void select(int select);

@@ -1,6 +1,6 @@
 // psx multitap emulation
 
-#include "machine/psxmultitap.h"
+#include "multitap.h"
 
 const device_type PSX_MULTITAP = &device_creator<psx_multitap_device>;
 

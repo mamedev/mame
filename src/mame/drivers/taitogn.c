@@ -336,7 +336,7 @@ Type 3 (PCMCIA Compact Flash Adaptor + Compact Flash card, sealed together with 
 #include "machine/intelfsh.h"
 #include "machine/mb3773.h"
 #include "machine/rf5c296.h"
-#include "machine/znsec.h"
+#include "machine/cat702.h"
 #include "machine/zndip.h"
 #include "sound/spu.h"
 #include "video/psx.h"
@@ -346,8 +346,8 @@ class taitogn_state : public driver_device
 public:
 	taitogn_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
-		m_znsec0(*this,"maincpu:sio0:znsec0"),
-		m_znsec1(*this,"maincpu:sio0:znsec1"),
+		m_cat702_1(*this,"maincpu:sio0:cat702_1"),
+		m_cat702_2(*this,"maincpu:sio0:cat702_2"),
 		m_zndip(*this,"maincpu:sio0:zndip"),
 		m_maincpu(*this, "maincpu"),
 		m_mn10200(*this, "mn10200"),
@@ -384,8 +384,8 @@ protected:
 	virtual void machine_reset();
 
 private:
-	required_device<znsec_device> m_znsec0;
-	required_device<znsec_device> m_znsec1;
+	required_device<cat702_device> m_cat702_1;
+	required_device<cat702_device> m_cat702_2;
 	required_device<zndip_device> m_zndip;
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_mn10200;
@@ -511,8 +511,8 @@ READ8_MEMBER(taitogn_state::znsecsel_r)
 
 WRITE8_MEMBER(taitogn_state::znsecsel_w)
 {
-	m_znsec0->select( ( data >> 2 ) & 1 );
-	m_znsec1->select( ( data >> 3 ) & 1 );
+	m_cat702_1->select( ( data >> 2 ) & 1 );
+	m_cat702_2->select( ( data >> 3 ) & 1 );
 	m_zndip->select( ( data & 0x8c ) != 0x8c );
 
 	m_n_znsecsel = data;
@@ -579,8 +579,8 @@ READ32_MEMBER(taitogn_state::zsg2_ext_r)
 
 void taitogn_state::driver_start()
 {
-	m_znsec0->init(tt10);
-	m_znsec1->init(tt16);
+	m_cat702_1->init(tt10);
+	m_cat702_2->init(tt16);
 }
 
 void taitogn_state::machine_reset()
@@ -657,8 +657,8 @@ static MACHINE_CONFIG_START( coh3002t, taitogn_state )
 	MCFG_RAM_MODIFY("maincpu:ram")
 	MCFG_RAM_DEFAULT_SIZE("4M")
 
-	MCFG_DEVICE_ADD("maincpu:sio0:znsec0", ZNSEC, 0)
-	MCFG_DEVICE_ADD("maincpu:sio0:znsec1", ZNSEC, 0)
+	MCFG_DEVICE_ADD("maincpu:sio0:cat702_1", CAT702, 0)
+	MCFG_DEVICE_ADD("maincpu:sio0:cat702_2", CAT702, 0)
 	MCFG_DEVICE_ADD("maincpu:sio0:zndip", ZNDIP, 0)
 	MCFG_ZNDIP_DATA_HANDLER(IOPORT(":DSW"))
 

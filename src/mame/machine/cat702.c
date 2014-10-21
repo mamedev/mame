@@ -82,16 +82,16 @@
                       = Shift(c[n-1, 6])^Shift(c[n-1, 7])
 */
 
-#include "znsec.h"
+#include "cat702.h"
 
-const device_type ZNSEC = &device_creator<znsec_device>;
+const device_type CAT702 = &device_creator<cat702_device>;
 
-znsec_device::znsec_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	psxsiodev_device(mconfig, ZNSEC, "ZNSEC", tag, owner, clock, "znsec", __FILE__)
+cat702_device::cat702_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+	psxsiodev_device(mconfig, CAT702, "CAT702", tag, owner, clock, "cat702", __FILE__)
 {
 }
 
-void znsec_device::device_start()
+void cat702_device::device_start()
 {
 	psxsiodev_device::device_start();
 
@@ -117,7 +117,7 @@ static int c_linear(UINT8 x, UINT8 a)
 #endif
 
 // Derive the sbox xor mask for a given input and select bit
-UINT8 znsec_device::compute_sbox_coef(int sel, int bit)
+UINT8 cat702_device::compute_sbox_coef(int sel, int bit)
 {
 	if(!sel)
 		return m_transform[bit];
@@ -131,7 +131,7 @@ UINT8 znsec_device::compute_sbox_coef(int sel, int bit)
 }
 
 // Apply the sbox for a input 0 bit
-void znsec_device::apply_bit_sbox(int sel)
+void cat702_device::apply_bit_sbox(int sel)
 {
 	int i;
 	UINT8 r = 0;
@@ -143,7 +143,7 @@ void znsec_device::apply_bit_sbox(int sel)
 }
 
 // Apply a sbox
-void znsec_device::apply_sbox(const UINT8 *sbox)
+void cat702_device::apply_sbox(const UINT8 *sbox)
 {
 	int i;
 	UINT8 r = 0;
@@ -154,12 +154,12 @@ void znsec_device::apply_sbox(const UINT8 *sbox)
 	m_state = r;
 }
 
-void znsec_device::init(const UINT8 *transform)
+void cat702_device::init(const UINT8 *transform)
 {
 	m_transform = transform;
 }
 
-void znsec_device::select(int select)
+void cat702_device::select(int select)
 {
 	if (m_select != select)
 	{
@@ -177,7 +177,7 @@ void znsec_device::select(int select)
 	}
 }
 
-void znsec_device::data_in( int data, int mask )
+void cat702_device::data_in( int data, int mask )
 {
 	static const UINT8 initial_sbox[8] = { 0xff, 0xfe, 0xfc, 0xf8, 0xf0, 0xe0, 0xc0, 0x7f };
 

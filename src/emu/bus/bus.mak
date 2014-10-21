@@ -1463,3 +1463,15 @@ BUSOBJS += $(BUSOBJ)/wswan/slot.o
 BUSOBJS += $(BUSOBJ)/wswan/rom.o
 endif
 
+#-------------------------------------------------
+#
+#@src/emu/bus/psx/ctlrport.h,BUSES += PSX_CONTROLLER
+#-------------------------------------------------
+
+ifneq ($(filter PSX_CONTROLLER,$(BUSES)),)
+OBJDIRS += $(BUSOBJ)/psx
+BUSOBJS += $(BUSOBJ)/psx/ctlrport.o
+BUSOBJS += $(BUSOBJ)/psx/analogue.o
+BUSOBJS += $(BUSOBJ)/psx/multitap.o
+BUSOBJS += $(BUSOBJ)/psx/memcard.o
+endif

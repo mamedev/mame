@@ -6,8 +6,8 @@
 */
 
 #include "emu.h"
-#include "psxcard.h"
-#include "machine/psxcport.h"
+#include "memcard.h"
+#include "ctlrport.h"
 
 //
 //

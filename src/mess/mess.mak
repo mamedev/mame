@@ -613,6 +613,7 @@ BUSES += PC_JOY
 BUSES += PC_KBD
 BUSES += PET
 BUSES += PLUS4
+BUSES += PSX_CONTROLLER
 BUSES += QL
 BUSES += RS232
 BUSES += S100
@@ -1620,7 +1621,7 @@ $(MESSOBJ)/snk.a:               \
 	$(MESS_DRIVERS)/ngp.o $(MESS_VIDEO)/k1ge.o \
 
 $(MESSOBJ)/sony.a:              \
-	$(MESS_DRIVERS)/pockstat.o $(MESS_DRIVERS)/psx.o $(MESS_MACHINE)/psxanalog.o $(MESS_MACHINE)/psxcard.o $(MESS_MACHINE)/psxcd.o $(MESS_MACHINE)/psxcport.o $(MESS_MACHINE)/psxmultitap.o \
+	$(MESS_DRIVERS)/pockstat.o $(MESS_DRIVERS)/psx.o $(MESS_MACHINE)/psxcd.o \
 	$(MESS_DRIVERS)/pve500.o    \
 	$(MESS_DRIVERS)/smc777.o    \
 

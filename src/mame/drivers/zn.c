@@ -17,7 +17,7 @@
 #include "machine/nvram.h"
 #include "machine/mb3773.h"
 #include "machine/7200fifo.h"
-#include "machine/znsec.h"
+#include "machine/cat702.h"
 #include "machine/zndip.h"
 #include "machine/ataintf.h"
 #include "machine/vt83c461.h"
@@ -38,8 +38,8 @@ public:
 		driver_device(mconfig, type, tag),
 		m_gpu(*this, "gpu"),
 		m_gpu_screen(*this, "gpu:screen"),
-		m_znsec0(*this,"maincpu:sio0:znsec0"),
-		m_znsec1(*this,"maincpu:sio0:znsec1"),
+		m_cat702_1(*this,"maincpu:sio0:cat702_1"),
+		m_cat702_2(*this,"maincpu:sio0:cat702_2"),
 		m_zndip(*this,"maincpu:sio0:zndip"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
@@ -124,8 +124,8 @@ private:
 
 	required_device<psxgpu_device> m_gpu;
 	required_device<screen_device> m_gpu_screen;
-	required_device<znsec_device> m_znsec0;
-	required_device<znsec_device> m_znsec1;
+	required_device<cat702_device> m_cat702_1;
+	required_device<cat702_device> m_cat702_2;
 	required_device<zndip_device> m_zndip;
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
@@ -333,8 +333,8 @@ WRITE8_MEMBER(zn_state::znsecsel_w)
 {
 	verboselog(2, "znsecsel_w( %08x, %08x, %08x )\n", offset, data, mem_mask );
 
-	m_znsec0->select( ( data >> 2 ) & 1 );
-	m_znsec1->select( ( data >> 3 ) & 1 );
+	m_cat702_1->select( ( data >> 2 ) & 1 );
+	m_cat702_2->select( ( data >> 3 ) & 1 );
 	m_zndip->select( ( data & 0x8c ) != 0x8c );
 
 	m_n_znsecsel = data;
@@ -432,8 +432,8 @@ void zn_state::driver_start()
 	{
 		if( strcmp( machine().system().name, zn_config_table[ n_game ].s_name ) == 0 )
 		{
-			m_znsec0->init( zn_config_table[ n_game ].p_n_mainsec );
-			m_znsec1->init( zn_config_table[ n_game ].p_n_gamesec );
+			m_cat702_1->init( zn_config_table[ n_game ].p_n_mainsec );
+			m_cat702_2->init( zn_config_table[ n_game ].p_n_gamesec );
 			break;
 		}
 		n_game++;
@@ -449,8 +449,8 @@ static MACHINE_CONFIG_START( zn1_1mb_vram, zn_state )
 	MCFG_RAM_MODIFY("maincpu:ram")
 	MCFG_RAM_DEFAULT_SIZE("4M")
 
-	MCFG_DEVICE_ADD("maincpu:sio0:znsec0", ZNSEC, 0)
-	MCFG_DEVICE_ADD("maincpu:sio0:znsec1", ZNSEC, 0)
+	MCFG_DEVICE_ADD("maincpu:sio0:cat702_1", CAT702, 0)
+	MCFG_DEVICE_ADD("maincpu:sio0:cat702_2", CAT702, 0)
 	MCFG_DEVICE_ADD("maincpu:sio0:zndip", ZNDIP, 0)
 	MCFG_ZNDIP_DATA_HANDLER(IOPORT(":DSW"))
 
@@ -483,8 +483,8 @@ static MACHINE_CONFIG_START( zn2, zn_state )
 	MCFG_RAM_MODIFY("maincpu:ram")
 	MCFG_RAM_DEFAULT_SIZE("4M")
 
-	MCFG_DEVICE_ADD("maincpu:sio0:znsec0", ZNSEC, 0)
-	MCFG_DEVICE_ADD("maincpu:sio0:znsec1", ZNSEC, 0)
+	MCFG_DEVICE_ADD("maincpu:sio0:cat702_1", CAT702, 0)
+	MCFG_DEVICE_ADD("maincpu:sio0:cat702_2", CAT702, 0)
 	MCFG_DEVICE_ADD("maincpu:sio0:zndip", ZNDIP, 0)
 	MCFG_ZNDIP_DATA_HANDLER(IOPORT(":DSW"))
 

@@ -17,7 +17,7 @@
 #include "debugger.h"
 #include <zlib.h>
 #include "machine/psxcd.h"
-#include "machine/psxcport.h"
+#include "bus/psx/ctlrport.h"
 
 #define PSXCD_TAG   "psxcd"
 

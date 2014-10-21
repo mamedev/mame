@@ -1,7 +1,7 @@
 #ifndef PSXANALOG_H_
 #define PSXANALOG_H_
 
-#include "machine/psxcport.h"
+#include "ctlrport.h"
 
 extern const device_type PSX_DUALSHOCK;
 extern const device_type PSX_ANALOG_JOYSTICK;

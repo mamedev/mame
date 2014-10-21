@@ -1,8 +1,8 @@
 /* PAD emulation */
 
-#include "machine/psxcport.h"
-#include "machine/psxanalog.h"
-#include "machine/psxmultitap.h"
+#include "ctlrport.h"
+#include "analogue.h"
+#include "multitap.h"
 
 const device_type PSX_CONTROLLER_PORT = &device_creator<psx_controller_port_device>;
 

@@ -1,7 +1,7 @@
 #ifndef PSXMULTITAP_H_
 #define PSXMULTITAP_H_
 
-#include "machine/psxcport.h"
+#include "ctlrport.h"
 
 SLOT_INTERFACE_EXTERN(psx_controllers_nomulti);
 
