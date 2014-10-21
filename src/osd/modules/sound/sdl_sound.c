@@ -355,6 +355,15 @@ void sound_sdl::set_mastervolume(int _attenuation)
 		_attenuation = -32;
 
 	attenuation = _attenuation;
+
+	if ((attenuation == -32) && (stream_in_initialized))
+	{
+		SDL_PauseAudio(1);
+	}
+	else if (stream_in_initialized)
+	{
+		SDL_PauseAudio(0);
+	}
 }
 
 //============================================================
