@@ -86,13 +86,10 @@ DRIVER_INIT_MEMBER(suna8_state,hardhedb)
 
 UINT8 *suna8_state::brickzn_decrypt()
 {
-	address_space &space = m_maincpu->space(AS_PROGRAM);
 	UINT8   *RAM    =   memregion("maincpu")->base();
 	size_t  size    =   memregion("maincpu")->bytes();
 	UINT8   *decrypt = auto_alloc_array(machine(), UINT8, size);
 	int i;
-
-	space.set_decrypted_region(0x0000, 0x7fff, decrypt);
 
 	/* Opcodes and data */
 	for (i = 0; i < 0x50000; i++)
@@ -133,80 +130,59 @@ UINT8 *suna8_state::brickzn_decrypt()
 
 DRIVER_INIT_MEMBER(suna8_state,brickzn)
 {
-	UINT8   *RAM    =   memregion("maincpu")->base();
-	UINT8   *decrypt = brickzn_decrypt();
-	int i;
-
-	// Opcodes decrypted as data (to do: activated at run-time)
-	for (i = 0; i < 0x8000; i++)
-	{
-		if (    ((i >= 0x072b) && (i <= 0x076f)) ||
-				((i >= 0x45c5) && (i <= 0x45e4)) ||
-				((i >= 0x7393) && (i <= 0x73ba)) ||
-				((i >= 0x7a79) && (i <= 0x7aa9)) )
-		{
-			decrypt[i] = RAM[i];
-		}
-	}
+	m_decrypt = brickzn_decrypt();
 
 	// !!!!!! PATCHES !!!!!!
 
 	// To do: ROM banking should be disabled here
-	decrypt[0x11bb] = 0x00; // LD ($C040),A -> NOP
-	decrypt[0x11bc] = 0x00; // LD ($C040),A -> NOP
-	decrypt[0x11bd] = 0x00; // LD ($C040),A -> NOP
+	m_decrypt[0x11bb] = 0x00; // LD ($C040),A -> NOP
+	m_decrypt[0x11bc] = 0x00; // LD ($C040),A -> NOP
+	m_decrypt[0x11bd] = 0x00; // LD ($C040),A -> NOP
 
-	decrypt[0x3349] = 0xc9; // RET Z -> RET (to avoid: jp $C800)
+	m_decrypt[0x3349] = 0xc9; // RET Z -> RET (to avoid: jp $C800)
 
 	// NMI enable / source??
-	decrypt[0x1431] = 0xc9; // HALT -> RET
-	decrypt[0x24b5] = 0x00; // HALT -> NOP
-	decrypt[0x2593] = 0x00; // HALT -> NOP
+	m_decrypt[0x1431] = 0xc9; // HALT -> RET
+	m_decrypt[0x24b5] = 0x00; // HALT -> NOP
+	m_decrypt[0x2593] = 0x00; // HALT -> NOP
+
+	// Non-banked opcodes
+	address_space &space = m_maincpu->space(AS_PROGRAM);
+	space.set_decrypted_region(0x0000, 0x7fff, m_decrypt);
 
 	// Data banks: 00-0f normal data decryption, 10-1f alternate data decryption:
 	membank("bank1")->configure_entries(0, 16*2, memregion("maincpu")->base() + 0x10000, 0x4000);
 	// Opcode banks: 00-1f normal opcode decryption:
-	membank("bank1")->configure_decrypted_entries(0, 16, decrypt + 0x10000, 0x4000);
-	membank("bank1")->configure_decrypted_entries(16, 16, decrypt + 0x10000, 0x4000);
+	membank("bank1")->configure_decrypted_entries(0, 16, m_decrypt + 0x10000, 0x4000);
+	membank("bank1")->configure_decrypted_entries(16, 16, m_decrypt + 0x10000, 0x4000);
 }
 
 DRIVER_INIT_MEMBER(suna8_state,brickznv4)
 {
-	UINT8   *RAM    =   memregion("maincpu")->base();
-	UINT8   *decrypt = brickzn_decrypt();
-	int i;
-
-	// Opcodes decrypted as data (to do: activated at run-time)
-	for (i = 0; i < 0x8000; i++)
-	{
-		if (    ((i >= 0x072b) && (i <= 0x076f)) ||
-				((i >= 0x4541) && (i <= 0x4560)) ||
-				((i >= 0x72f3) && (i <= 0x7322)) ||
-				((i >= 0x79d9) && (i <= 0x7a09)) )
-		{
-			decrypt[i] = RAM[i];
-		}
-	}
-
+	m_decrypt = brickzn_decrypt();
 	// !!!!!! PATCHES !!!!!!
 
 	// To do: ROM banking should be disabled here
-	decrypt[0x1190] = 0x00; // LD ($C040),A -> NOP
-	decrypt[0x1191] = 0x00; // LD ($C040),A -> NOP
-	decrypt[0x1192] = 0x00; // LD ($C040),A -> NOP
+	m_decrypt[0x1190] = 0x00; // LD ($C040),A -> NOP
+	m_decrypt[0x1191] = 0x00; // LD ($C040),A -> NOP
+	m_decrypt[0x1192] = 0x00; // LD ($C040),A -> NOP
 
-	decrypt[0x3337] = 0xc9; // RET Z -> RET (to avoid: jp $C800)
+	m_decrypt[0x3337] = 0xc9; // RET Z -> RET (to avoid: jp $C800)
 
 	// NMI enable / source??
-	decrypt[0x1406] = 0xc9; // HALT -> RET
-	decrypt[0x2487] = 0x00; // HALT -> NOP
-	decrypt[0x256c] = 0x00; // HALT -> NOP
+	m_decrypt[0x1406] = 0xc9; // HALT -> RET
+	m_decrypt[0x2487] = 0x00; // HALT -> NOP
+	m_decrypt[0x256c] = 0x00; // HALT -> NOP
+
+	// Non-banked opcodes
+	address_space &space = m_maincpu->space(AS_PROGRAM);
+	space.set_decrypted_region(0x0000, 0x7fff, m_decrypt);
 
 	// Data banks: 00-0f normal data decryption, 10-1f alternate data decryption:
 	membank("bank1")->configure_entries(0, 16*2, memregion("maincpu")->base() + 0x10000, 0x4000);
 	// Opcode banks: 00-1f normal opcode decryption:
-	membank("bank1")->configure_decrypted_entries(0, 16, decrypt + 0x10000, 0x4000);
-	membank("bank1")->configure_decrypted_entries(16, 16, decrypt + 0x10000, 0x4000);
+	membank("bank1")->configure_decrypted_entries(0, 16, m_decrypt + 0x10000, 0x4000);
+	membank("bank1")->configure_decrypted_entries(16, 16, m_decrypt + 0x10000, 0x4000);
 }
 
 
@@ -700,7 +676,9 @@ READ8_MEMBER(suna8_state::brickzn_cheats_r)
 */
 WRITE8_MEMBER(suna8_state::brickzn_multi_w)
 {
-	if ((m_protection_val & 0xfc) == 0x88 || (m_protection_val & 0xfc) == 0x8c)
+	int protselect = m_protection_val & 0xfc;
+
+	if ((protselect == 0x88) || (protselect == 0x8c))
 	{
 		m_palettebank = data & 0x01;
 
@@ -713,7 +691,7 @@ WRITE8_MEMBER(suna8_state::brickzn_multi_w)
 
 		logerror("CPU #0 - PC %04X: soundlatch = %02X\n",space.device().safe_pc(),data);
 	}
-	else if ((m_protection_val & 0xfc) == 0x04)
+	else if (protselect == 0x04)
 	{
 		set_led_status(machine(), 0, data & 0x01);
 		set_led_status(machine(), 1, data & 0x02);
@@ -722,16 +700,7 @@ WRITE8_MEMBER(suna8_state::brickzn_multi_w)
 		logerror("CPU #0 - PC %04X: leds = %02X\n",space.device().safe_pc(),data);
 		if (data & ~0x07)   logerror("CPU #0 - PC %04X: unknown leds bits: %02X\n",space.device().safe_pc(),data);
 	}
-	else if ((m_protection_val & 0xfc) == 0x9c)
-	{
-		// controls opcode decryption
-		// see code at 71b, 45b7, 7380, 7a6b
-
-		// To be done: run-time opcode decryption change. Done in driver_init for now.
-
-		logerror("CPU #0 - PC %04X: op-decrypt = %02X\n",space.device().safe_pc(),data);
-	}
-	else if ((m_protection_val & 0xfc) == 0x80)
+	else if (protselect == 0x80)
 	{
 		// disables rom banking?
 		// see code at 11b1:
@@ -742,6 +711,28 @@ WRITE8_MEMBER(suna8_state::brickzn_multi_w)
 	{
 		logerror("CPU #0 - PC %04X: ignore = %02X\n",space.device().safe_pc(),data);
 	}
+
+	if ((m_protection_val & 0x1f) == 0x1c)
+	{
+		// controls opcode decryption
+		// see code at 71b, 45b7, 7380, 7a6b
+		//printf("CPU #0 - PC %04X: alt op-decrypt tog = %02X\n",space.device().safe_pc(),data);
+		m_prot_opcode_toggle ^= 1;
+
+		if (m_prot_opcode_toggle == 0)
+		{
+			address_space &space = m_maincpu->space(AS_PROGRAM);
+			space.set_decrypted_region(0x0000, 0x7fff, m_decrypt);
+		}
+		else
+		{
+			address_space &space = m_maincpu->space(AS_PROGRAM);
+			space.set_decrypted_region(0x0000, 0x7fff, memregion("maincpu")->base());
+		}
+
+
+	}
+
 }
 
 /*
