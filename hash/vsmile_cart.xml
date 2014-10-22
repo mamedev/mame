@@ -10,10 +10,9 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 - Known V.Smile games (thanks to Team Europe and Cowering)
 
 
-V.Reader:                     80-28****
 V.Smile Motion:               80-08****  (Smartridges are orange)
 V.Smile Smartbook Software:   80-089***  (Smartridges are red)
-V.Smile:                      80-092***  (Smartridges are purple, some are gray because of plastic defects)
+V.Smile:                      80-09****  (Smartridges are purple, some are gray because of plastic defects)
 
 Addons (w/ yellow Smartridges)
 V.Smile Smart Keyboard    80-091440
@@ -23,7 +22,7 @@ V.Smile Jamming Gym Class 80-91320
 
 - Not compatible with V.Smile games, left as documentation
 V.Flash (V.Smile Pro):        80-093***
-
+V.Reader:                     80-28****
 
 
 Language:
@@ -69,13 +68,19 @@ Language:
 80-084220(US)   | Snow Park Challenge
 80-084224(GER)  | Wintersport
 80-084240(US)   | Ni Hao Kai Lan
+80-084260(US)   | My Pet Puppy (unreleased??)
+80-084263(UK)   | My Pet Puppy
 80-084264(GER)  | Mein erster Hund
 80-084280(US)   | Wild Waves
 80-084300(US)   | Soccer Challenge
 80-084304(GER)  | Fußball Meisterschaft
+80-084305(FRE)  | Football Challenge
+80-084320(US)   | Disney Fairies: Tinker Bell
 80-084324(GER)  | TinkerBell
+80-084325(FRE)  | La fée Clochette 
 80-084340(US)   | Up!
 80-084344(GER)  | Oben
+80-084345(FRE)  | La-Haut
 80-084360(US)   | Handy Manny
 80-084364(GER)  | Meister Manny's Werkzeugkiste
 80-084380(US)   | Winnie the Pooh - Honey Hunt
@@ -84,12 +89,20 @@ Language:
 80-084404(GER)  | Cars - Vollgas in Radiator Springs
 80-084420(US)   | Toy Story 3
 80-084424(GER)  | Toy Story 3
-80-084440(USA)  | Monsters vs. Aliens
+80-084440(US)   | Monsters vs. Aliens
 80-084444(GER)  | Monsters vs. Aliens
+80-084460(US)   | Noddy (unreleased??)
+80-084467(SPA)  | Noddy - Detective por un Dia
+80-084480(US)   | The Princess and the Frog
 80-084484(GER)  | Küss den Frosch
 80-084500(US)   | Shrek 4
 80-084504(GER)  | Für immer Shrek
+80-084520(US)   | <Unknown>
 80-084540(US)   | Super Why to the Rescue! The Beach Day Mystery
+80-084560(US)   | <Unknown>
+80-084580(US)   | Cars 2
+80-084600(US)   | <Unknown> would be Cinderella - Cinderella's Magic Wishes
+80-084603(UK)   | Cinderella - Cinderella's Magic Wishes
 80-084604(GER)  | Cinderella - Lernen im Märchenland
 80-084624(GER)  | Findet Nemo - Nemos Unterwasserabenteuer
 
@@ -134,16 +147,19 @@ Language:
 80-092207(SPA)  | Aladdin - El Maravilloso Mundo de Aladdin
 80-092220(US)   | Toy Story 2
 80-092240(US)   | Cinderella - Cinderella's Magic Wishes
+80-092243(UK)   | Cinderella - Cinderella's Magic Wishes
 80-092244(GER)  | Cinderella - Lernen im Märchenland | 2007
 80-092260(US)   | Elmo's World - Elmo's Big Discoveries
 80-092264(GER)  | Elmo's großes Abenteuer
 80-092265(FRA)  | Le Monde d'ELMO - Les Grandes Decouvertes D'Elmo
 80-092280(US)   | Dora The Explorer
 80-092300(US)   | Bob the Builder: Bob's Busy Day
+80-092305(FRA)  | Bob Bricoleur: Les P'tits Chantiers de Bob
 80-092304(GER)  | Bob der Baumeister - Achtung Baustelle
 80-092320(US)   | The Wiggles - It's Wiggle Time!
 80-092340(US)   | Thomas The Tank: Engines Working Together
 80-092340-101(US)   | Thomas The Tank: Engines Working Together (ALT)
+80-092343(UK)   | Thomas and Friends: Engines Working Together
 80-092360(US)   | Zayzoo My Alien Classmate
 80-092360-101(US)   | Zayzoo - An Earth Adventure
 80-092380(US)   | Barney - The Land of Make Believe
@@ -167,10 +183,12 @@ Language:
 80-092662(NL)   | Cars - Spektakel in Radiator Springs
 80-092666(SPA)  | Cars: Acelera El Motor En Radiador Springs
 80-092664(GER)  | Cars
-80-092820(US)   | Soccer
+80-092820(US)   | Soccer Challenge
+80-092823(UK)   | Football Challenge
 80-092824(GER)  | Fußball Schule
 80-092840(US)   | Wall-E
 80-092860(US)   | Shrek the Third: Arthur's School Day Adventure
+80-092863(UK)   | Shrek the Third: Arthur's School Day Adventure
 80-092880(US)   | Ratatouille
 80-092882(NL)   | Ratatouille
 80-092884(GER)  | Ratatouille - Remys neue Rezepte
@@ -193,13 +211,16 @@ Language:
 80-093140(US)   | Shrek 3
 80-093144(GER)  | Shrek - Der Dritte
 80-093160(US)   | Bratz - The Secret Necklace
+80-093180(US)   | <Unknown>
+80-093200(US)   | Ratatouille (according to vtech site, can't confirm)
 80-093204(GER)  | Multisports
+80-093220(US)   | National Geographic Kids
 
 80-280000(US)   | Animated E-Book Cartridge - Shrek's Vacation
 80-280100(US)   | Animated E-Book Cartridge - Toy Story 3
 80-280200(US)   | Animated E-Book Cartridge - Mr. Men/Little Miss
 80-280300(US)   | Animated E-Book Cartridge - Tinkerbell and The Great Fairy Rescue
-80-280400(US)   | Animated E-Book Cartridge - Scooby Doo
+80-280400(US)   | Animated E-Book Cartridge - Scooby Doo! - Scooby Doo and a Mummy, Too!
 80-280600(US)   | Animated E-Book Cartridge - Olivia
 80-280700(US)   | Animated E-Book Cartridge - The Little Engine That Could
 80-280900(US)   | Animated E-Book Cartridge - Dora and the Three Little Pigs
@@ -214,6 +235,11 @@ Language:
 80-281800(US)   | Animated E-Book Cartridge - Kung Fu Panda 2
 80-281900(US)   | Animated E-Book Cartridge - Cars 2
 80-282000(US)   | Animated E-Book Cartridge - Winnie the Pooh
+80-282100(US)   | Animated E-Book Cartridge - Super Why! - Attack of the Eraser
+80-282200(US)   | Animated E-Book Cartridge - Madagascar 3
+80-282300(US)   | Animated E-Book Cartridge - Dinosaur Train - T.Rex Teeth
+80-282400(US)   | Animated E-Book Cartridge - Hello Kitty's Surprise
+
 
 -->
 
