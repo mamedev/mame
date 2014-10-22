@@ -100,6 +100,13 @@ void maygay1b_state::machine_reset()
 
 ///////////////////////////////////////////////////////////////////////////
 
+/* 6809 IRQ handler */
+void maygay1b_state::cpu0_firq(int data)
+{
+	m_maincpu->set_input_line(M6809_FIRQ_LINE, data ? ASSERT_LINE : CLEAR_LINE);
+}
+
+
 // IRQ from Duart (hopper?)
 WRITE_LINE_MEMBER(maygay1b_state::duart_irq_handler)
 {
@@ -110,34 +117,39 @@ WRITE_LINE_MEMBER(maygay1b_state::duart_irq_handler)
 // FIRQ, related to the sample playback?
 READ8_MEMBER( maygay1b_state::m1_firq_trg_r )
 {
-	static int i = 0xff;
-	i ^= 0xff;
-	m_maincpu->set_input_line(M6809_FIRQ_LINE, HOLD_LINE);
-	LOG(("6809 firq\n"));
-	return i;
+	int nar = m_msm6376->nar_r();
+	if (nar)
+	{
+		cpu0_firq(1);
+	}
+	return nar;
 }
 
 READ8_MEMBER( maygay1b_state::m1_firq_clr_r )
 {
-	static int i = 0xff;
-	i ^= 0xff;
-	m_maincpu->set_input_line(M6809_FIRQ_LINE, CLEAR_LINE);
-	LOG(("6809 firq clr\n"));
-	return i;
+	cpu0_firq(0);
+	return 0;
 }
 
 // NMI is periodic? or triggered by a write?
 TIMER_DEVICE_CALLBACK_MEMBER( maygay1b_state::maygay1b_nmitimer_callback )
 {
+//disabling for now
 	if (m_NMIENABLE)
 	{
 		LOG(("6809 nmi\n"));
-		m_maincpu->set_input_line(INPUT_LINE_NMI, HOLD_LINE);
+		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_NMIENABLE=0;
 	}
+
 }
 
-
-
+/*
+void maygay1b_state::cpu0_nmi(int data)
+{
+	m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+}
+*/
 /***************************************************************************
     6821 PIA
 ***************************************************************************/
@@ -145,9 +157,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( maygay1b_state::maygay1b_nmitimer_callback )
 // some games might differ..
 WRITE8_MEMBER(maygay1b_state::m1_pia_porta_w)
 {
-//  printf("m1_pia_porta_w %02x\n",data);
-
-	m_vfd->por(!(data & 0x40));
+	m_vfd->por(data & 0x40);
 	m_vfd->data(data & 0x10);
 	m_vfd->sclk(data & 0x20);
 }
@@ -156,7 +166,12 @@ WRITE8_MEMBER(maygay1b_state::m1_pia_portb_w)
 {
 	int i;
 	for (i=0; i<8; i++)
-		if ( data & (1 << i) )      output_set_indexed_value("triac", i, data & (1 << i));
+	{
+		if ( data & (1 << i) )      
+		{
+			output_set_indexed_value("triac", i, data & (1 << i));
+		}
+	}
 }
 
 // input ports for M1 board ////////////////////////////////////////
@@ -361,8 +376,11 @@ WRITE8_MEMBER(maygay1b_state::m1_latch_w)
 		m_ALARMEN = (data & 1);
 		break;
 		case 2: // Enable
-		//printf("nmi enable %02x\n",data);
-		m_NMIENABLE = (data & 1);
+        if ( m_NMIENABLE == 0 && ( data & 1 ) )
+		{
+			m_NMIENABLE = (data & 1);
+			//cpu0_nmi(1);
+		}
 		break;
 		case 3: // RTS
 		{

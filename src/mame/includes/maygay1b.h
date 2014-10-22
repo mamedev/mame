@@ -94,5 +94,7 @@ public:
 	DECLARE_DRIVER_INIT(m1);
 	virtual void machine_start();
 	virtual void machine_reset();
+	void cpu0_firq(int data);
+	void cpu0_nmi(int data);
 	void m1_stepper_reset();
 };
