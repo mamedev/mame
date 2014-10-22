@@ -15,10 +15,13 @@ V.Smile Smartbook Software:   80-089***  (Smartridges are red)
 V.Smile:                      80-09****  (Smartridges are purple, some are gray because of plastic defects)
 
 Addons (w/ yellow Smartridges)
-V.Smile Smart Keyboard    80-091440
-V.Smile PC Pal            80-03600
-V.Smile Art Studio        80-67000
-V.Smile Jamming Gym Class 80-91320
+V.Smile Smart Keyboard    80-091440 (US)
+V.Smile Smart Keyboard    80-091443 (UK)
+V.Smile PC Pal            80-03600 (US)
+V.Smile Art Studio        80-67000 (US)
+V.Smile Art Studio        80-67003 (UK)
+V.Smile Jamming Gym Class 80-91320 (US)
+V.Smile Dance'n'Learn     80-91323 (UK)
 
 - Not compatible with V.Smile games, left as documentation
 V.Flash (V.Smile Pro):        80-093***
@@ -44,10 +47,10 @@ Language:
 80-084025(FRA)  | Les Adventures De Dora Apprentie Mecano
 80-084024(GER)  | Doras Reparatur-Abenteuer
 80-084040(US)   | Scooby-Doo! - Funland Frenzy
-80-084043(UK)   | Scooby-Doo - Funland Frenzy
+80-084043(UK)   | Scooby-Doo! - Funland Frenzy
 80-084045(FRA)  | Scooby-Doo - Panique A Funland
-80-084060(US)   | Thomas - Engines Working Together
-80-084063(UK)   | Thomas - Engines Working Together
+80-084060(US)   | Thomas and Friends - Engines Working Together
+80-084063(UK)   | Thomas and Friends - Engines Working Together
 80-084064(GER)  | Thomas - Freunde halten zusammen
 80-084080(US)   | Wall-E
 80-084083(UK)   | Wall-E
@@ -55,6 +58,7 @@ Language:
 80-084085(FRA)  | Wall-E
 80-084087(SPA)  | Wall-E
 80-084100(US)   | Wonder Pets - Save the Animals!
+80-084103(UK)   | Wonder Pets - Save the Animals!
 80-084120(US)   | Kung Fu Panda
 80-084124(GER)  | Kung Fu Panda - Der Weg des Panda
 80-084125(FRA)  | Kung Fu Panda - La mission de Po
@@ -76,24 +80,30 @@ Language:
 80-084304(GER)  | Fußball Meisterschaft
 80-084305(FRE)  | Football Challenge
 80-084320(US)   | Disney Fairies: Tinker Bell
+80-084323(UK)   | TinkerBell
 80-084324(GER)  | TinkerBell
 80-084325(FRE)  | La fée Clochette 
 80-084340(US)   | Up!
 80-084344(GER)  | Oben
 80-084345(FRE)  | La-Haut
 80-084360(US)   | Handy Manny
+80-084363(UK)   | Handy Manny
 80-084364(GER)  | Meister Manny's Werkzeugkiste
-80-084380(US)   | Winnie the Pooh - Honey Hunt
+80-084380(US)   | Winnie the Pooh - The Honey Hunt
+80-084383(UK)   | Winnie the Pooh - The Honey Hunt
 80-084384(GER)  | Winnie Puuh - Die Honigjagd
-80-084400(US)   | Cars
+80-084400(US)   | Cars - Rev it up in Radiator Springs
+80-084403(UK)   | Cars - Rev it up in Radiator Springs
 80-084404(GER)  | Cars - Vollgas in Radiator Springs
 80-084420(US)   | Toy Story 3
+80-084423(US)   | Toy Story 3
 80-084424(GER)  | Toy Story 3
 80-084440(US)   | Monsters vs. Aliens
 80-084444(GER)  | Monsters vs. Aliens
 80-084460(US)   | Noddy (unreleased??)
 80-084467(SPA)  | Noddy - Detective por un Dia
 80-084480(US)   | The Princess and the Frog
+80-084483(UK)   | The Princess and the Frog
 80-084484(GER)  | Küss den Frosch
 80-084500(US)   | Shrek 4
 80-084504(GER)  | Für immer Shrek
@@ -101,6 +111,7 @@ Language:
 80-084540(US)   | Super Why to the Rescue! The Beach Day Mystery
 80-084560(US)   | <Unknown>
 80-084580(US)   | Cars 2
+80-084583(UK)   | Cars 2
 80-084600(US)   | <Unknown> would be Cinderella - Cinderella's Magic Wishes
 80-084603(UK)   | Cinderella - Cinderella's Magic Wishes
 80-084604(GER)  | Cinderella - Lernen im Märchenland
@@ -141,6 +152,8 @@ Language:
 80-092140(US)   | Spider-Man & Friends - Secret Missions
 80-092144(GER)  | Spider-Man & Freunde - Geheime Missionen
 80-092160(US)   | Scooby-Doo! - Funland Frenzy
+80-092163(UK)   | Scooby-Doo! - Funland Frenzy
+80-092163-293(UK)   | Scooby-Doo! - Funland Frenzy (ALT)
 80-092167(SPA)  | Scooby-Doo - Mysterio En El Parque
 80-092180(US)   | Care Bears - A Lesson in Caring
 80-092200(US)   | Aladdin - Aladdin's Wonders of the World
@@ -168,17 +181,21 @@ Language:
 80-092420(US)   | Finding Nemo
 80-092424(GER)  | Findet Nemo
 80-092440(US)   | Spongebob Squarepants: A Day In The Life of A Sponge
+80-092443(UK)   | Spongebob Squarepants: A Day In The Life of A Sponge
 80-092460(US)   | Sesame Street
 80-092480(US)   | Batman: Gotham City Rescue
 80-092500(US)   | Whiz Kid Wheels
 80-092520(US)   | Spider-Man & Friends Doc Ock's Challenge
 80-092540(US)   | Noddy - Detective for a Day
+80-092540(UK)   | Noddy - Detective for a Day
+80-092540-103(UK)   | Noddy - Detective for a Day (ALT)
 80-092544(GER)  | Noddy
 80-092564(GER)  | 101 Dalmatiner
 80-092580(US)   | Backyardigans - Viking Voyage
 80-092600(US)   | Shrek - Dragon's Tale
 80-092620(US)   | Lil' Bratz - Friends, Fashion and Fun
 80-092640(US)   | Superman - The Greatest Hero
+80-092643(US)   | Superman - The Greatest Hero
 80-092660(US)   | Cars: Rev It Up In Radiator Springs
 80-092662(NL)   | Cars - Spektakel in Radiator Springs
 80-092666(SPA)  | Cars: Acelera El Motor En Radiador Springs
@@ -187,6 +204,7 @@ Language:
 80-092823(UK)   | Football Challenge
 80-092824(GER)  | Fußball Schule
 80-092840(US)   | Wall-E
+80-092843(UK)   | Wall-E
 80-092860(US)   | Shrek the Third: Arthur's School Day Adventure
 80-092863(UK)   | Shrek the Third: Arthur's School Day Adventure
 80-092880(US)   | Ratatouille
