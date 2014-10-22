@@ -406,7 +406,7 @@ void osd_interface::init_subsystems()
 	machine().add_notifier(MACHINE_NOTIFY_RESUME, machine_notify_delegate(FUNC(osd_interface::input_resume), this));
 
 	output_init();
-#ifdef USE_NETWORK
+#ifndef DONT_USE_NETWORK
 	network_init();
 #endif
 	midi_init();
@@ -489,7 +489,7 @@ void osd_interface::exit_subsystems()
 	sound_exit();
 	input_exit();
 	output_exit();
-	#ifdef USE_NETWORK
+	#ifndef DONT_USE_NETWORK
 	network_exit();
 	#endif
 	midi_exit();

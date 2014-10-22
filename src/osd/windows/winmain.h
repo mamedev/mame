@@ -266,7 +266,7 @@ public:
 	virtual void input_pause();
 	virtual void input_resume();
 	virtual bool output_init();
-	#ifdef USE_NETWORK
+	#ifndef DONT_USE_NETWORK
 	virtual bool network_init();
 	#endif
 
@@ -274,7 +274,7 @@ public:
 	virtual void window_exit();
 	virtual void input_exit();
 	virtual void output_exit();
-	#ifdef USE_NETWORK
+	#ifndef DONT_USE_NETWORK
 	virtual void network_exit();
 	#endif
 
