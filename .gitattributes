@@ -1,4 +1,5 @@
 * text=auto !eol
+*.jed binary
 *.png -text svneol=unset#image/png
 *.txt svneol=native#text/plain
 *.xml svneol=native#text/xml

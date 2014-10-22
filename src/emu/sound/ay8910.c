@@ -431,17 +431,21 @@ static const ay8910_device::mosfet_param ay8910_mosfet_param =
 
 INLINE void build_3D_table(double rl, const ay8910_device::ay_ym_param *par, const ay8910_device::ay_ym_param *par_env, int normalize, double factor, int zero_is_off, INT32 *tab)
 {
-	int j, j1, j2, j3, e, indx;
-	double rt, rw, n;
 	double min = 10.0,  max = 0.0;
 
 	dynamic_array<double> temp(8*32*32*32);
 
-	for (e=0; e < 8; e++)
-		for (j1=0; j1 < 32; j1++)
-			for (j2=0; j2 < 32; j2++)
-				for (j3=0; j3 < 32; j3++)
+	for (int e=0; e < 8; e++)
+	{
+		const ay8910_device::ay_ym_param *par_ch1 = (e & 0x01) ? par_env : par;
+		const ay8910_device::ay_ym_param *par_ch2 = (e & 0x02) ? par_env : par;
+		const ay8910_device::ay_ym_param *par_ch3 = (e & 0x04) ? par_env : par;
+
+		for (int j1=0; j1 < par_ch1->res_count; j1++)
+			for (int j2=0; j2 < par_ch2->res_count; j2++)
+				for (int j3=0; j3 < par_ch3->res_count; j3++)
 				{
+					double n;
 					if (zero_is_off)
 					{
 						n  = (j1 != 0 || (e & 0x01)) ? 1 : 0;
@@ -451,32 +455,33 @@ INLINE void build_3D_table(double rl, const ay8910_device::ay_ym_param *par, con
 					else
 						n = 3.0;
 
-					rt = n / par->r_up + 3.0 / par->r_down + 1.0 / rl;
-					rw = n / par->r_up;
+					double rt = n / par->r_up + 3.0 / par->r_down + 1.0 / rl;
+					double rw = n / par->r_up;
 
-					rw += 1.0 / ( (e & 0x01) ? par_env->res[j1] : par->res[j1]);
-					rt += 1.0 / ( (e & 0x01) ? par_env->res[j1] : par->res[j1]);
-					rw += 1.0 / ( (e & 0x02) ? par_env->res[j2] : par->res[j2]);
-					rt += 1.0 / ( (e & 0x02) ? par_env->res[j2] : par->res[j2]);
-					rw += 1.0 / ( (e & 0x04) ? par_env->res[j3] : par->res[j3]);
-					rt += 1.0 / ( (e & 0x04) ? par_env->res[j3] : par->res[j3]);
+					rw += 1.0 / par_ch1->res[j1];
+					rt += 1.0 / par_ch1->res[j1];
+					rw += 1.0 / par_ch2->res[j2];
+					rt += 1.0 / par_ch2->res[j2];
+					rw += 1.0 / par_ch3->res[j3];
+					rt += 1.0 / par_ch3->res[j3];
 
-					indx = (e << 15) | (j3<<10) | (j2<<5) | j1;
+					int indx = (e << 15) | (j3<<10) | (j2<<5) | j1;
 					temp[indx] = rw / rt;
 					if (temp[indx] < min)
 						min = temp[indx];
 					if (temp[indx] > max)
 						max = temp[indx];
 				}
+	}
 
 	if (normalize)
 	{
-		for (j=0; j < 32*32*32*8; j++)
+		for (int j=0; j < 32*32*32*8; j++)
 			tab[j] = MAX_OUTPUT * (((temp[j] - min)/(max-min))) * factor;
 	}
 	else
 	{
-		for (j=0; j < 32*32*32*8; j++)
+		for (int j=0; j < 32*32*32*8; j++)
 			tab[j] = MAX_OUTPUT * temp[j];
 	}
 

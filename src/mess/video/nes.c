@@ -50,7 +50,7 @@ UINT32 nes_state::screen_update_nes(screen_device &screen, bitmap_ind16 &bitmap,
 			m_last_frame_flip = 1;
 		}
 
-		if (!m_io_disksel->read_safe(1) & 0x01)
+		if (!(m_io_disksel->read_safe(1) & 0x01))
 			m_last_frame_flip = 0;
 	}
 	return 0;

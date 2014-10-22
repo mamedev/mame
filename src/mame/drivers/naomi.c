@@ -438,7 +438,7 @@ Games known to use this PCB include....
                                                Sticker    EPROM   MASKROMs   25LC040  A54SX32
 Game                                           on cart    IC11#   # of SOP44 IC13S#   IC1#          Notes
 ----------------------------------------------------------------------------------------------------------------------------
-Club Kart Prize                                840-0129C  ?       16 (64Mb)  present  317-0368-COM  no sticker on ic11
+Club Kart Prize                                840-0129C  24082A  16 (64Mb)  present  317-0368-COM
 Club Kart Prize Ver. B                         840-0137C  24149   16 (64Mb)  present  317-0368-COM
 Giant Gram 2000                                840-0039C  23377   20 (64Mb)  present  317-0296-COM
 Kick '4' Cash                                  840-0140C  24212   16 (64Mb)  present  317-0397-COM
@@ -2852,7 +2852,9 @@ Scan ROM for the text string "LOADING TEST MODE NOW" back up four (4) bytes for 
 	ROM_SYSTEM_BIOS( 0, "bios0", "HOTD2 (Export)" ) \
 	ROM_LOAD16_WORD_SWAP_BIOS( 0,  "epr-21331.ic27", 0x000000, 0x200000, CRC(065f8500) SHA1(49a3881e8d76f952ef5e887200d77b4a415d47fe) ) \
 	ROM_SYSTEM_BIOS( 1, "bios1", "HOTD2 (USA)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 1,  "epr-21330.ic27", 0x000000, 0x200000, CRC(9e3bfa1b) SHA1(b539d38c767b0551b8e7956c1ff795de8bbe2fbc) )
+	ROM_LOAD16_WORD_SWAP_BIOS( 1,  "epr-21330.ic27", 0x000000, 0x200000, CRC(9e3bfa1b) SHA1(b539d38c767b0551b8e7956c1ff795de8bbe2fbc) ) \
+	ROM_SYSTEM_BIOS( 2, "bios2", "HOTD2 (Proto)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 2,  "hotd2biosproto.ic27", 0x000000, 0x200000, CRC(ea74e967) SHA1(e4d037480eb6555d335a8ab9cd6c56122335586d) )
 
 #define F355_BIOS \
 	ROM_REGION( 0x200000, "maincpu", 0) \
@@ -7937,7 +7939,7 @@ ROM_START( clubkprz )
 	NAOMI_DEFAULT_EEPROM
 
 	ROM_REGION( 0x9000000, "rom_board", ROMREGION_ERASEFF)
-	ROM_LOAD( "epr-24065.ic11", 0x000000, 0x400000, CRC(7c331cb8) SHA1(f7e1cffbad576482a91bc1dc9129c689f0bebb25) )
+	ROM_LOAD( "epr-24082a.ic11", 0x000000, 0x400000, CRC(7c331cb8) SHA1(f7e1cffbad576482a91bc1dc9129c689f0bebb25) )
 	ROM_LOAD32_WORD( "opr-24066.17s", 0x1000000, 0x800000, CRC(b22cfa7b) SHA1(e0f795dc9d3a2dd1869f85f3eedd0f8d703a1be8) )
 	ROM_LOAD32_WORD( "opr-24067.18",  0x1000002, 0x800000, CRC(0d2d1290) SHA1(a26fa82fc87d6ed60095b2e778b649fcbb8bb1ee) )
 	ROM_LOAD32_WORD( "opr-24068.19s", 0x2000000, 0x800000, CRC(d320009b) SHA1(76677eacd18770d091fc19e31be3d84410ed3256) )

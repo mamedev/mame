@@ -16,7 +16,10 @@ public:
 		m_samples(*this, "samples"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette"),
+		
+		m_prot_opcode_toggle(0)
+		{ }
 
 	required_device<cpu_device> m_maincpu;
 	optional_shared_ptr<UINT8> m_hardhead_ip;
@@ -41,7 +44,9 @@ public:
 	UINT8 m_nmi_enable;
 	UINT8 m_spritebank_latch;
 	UINT8 m_write_disable;
-
+	UINT8 m_prot_opcode_toggle;
+	UINT8* m_decrypt;
+	
 	enum GFXBANK_TYPE_T
 	{
 		GFXBANK_TYPE_SPARKMAN,

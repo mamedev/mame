@@ -234,6 +234,14 @@ static MACHINE_CONFIG_DERIVED_CLASS( pentagon, spectrum_128, pentagon_state )
 	MCFG_BETA_DISK_ADD(BETA_DISK_TAG)
 	MCFG_GFXDECODE_MODIFY("gfxdecode", pentagon)
 
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+
+	MCFG_SOUND_REPLACE("ay8912", AY8912, XTAL_14MHz / 8)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
+	MCFG_SOUND_ROUTE(1, "lspeaker", 0.25)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 0.25)
+	MCFG_SOUND_ROUTE(2, "rspeaker", 0.50)
+
 	MCFG_SOFTWARE_LIST_ADD("cass_list_pen","pentagon_cass")
 MACHINE_CONFIG_END
 

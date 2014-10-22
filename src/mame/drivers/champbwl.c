@@ -155,15 +155,23 @@ Notes:
 #include "sound/x1_010.h"
 #include "machine/nvram.h"
 #include "machine/ticket.h"
-#include "includes/tnzs.h"
+#include "video/seta001.h"
 
-class champbwl_state : public tnzs_state
+class champbwl_state : public driver_device
 {
 public:
 	champbwl_state(const machine_config &mconfig, device_type type, const char *tag)
-		: tnzs_state(mconfig, type, tag),
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_seta001(*this, "spritegen"),
+		m_palette(*this, "palette"),
 		m_x1(*this, "x1snd") { }
 
+	int      m_screenflip;
+
+	required_device<cpu_device> m_maincpu;
+	required_device<seta001_device> m_seta001;
+	required_device<palette_device> m_palette;
 	required_device<x1_010_device> m_x1;
 	UINT8    m_last_trackball_val[2];
 	DECLARE_READ8_MEMBER(trackball_r);
@@ -172,12 +180,24 @@ public:
 	DECLARE_MACHINE_START(champbwl);
 	DECLARE_MACHINE_RESET(champbwl);
 	DECLARE_MACHINE_START(doraemon);
+	DECLARE_PALETTE_INIT(champbwl);
 	UINT32 screen_update_champbwl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_doraemon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_champbwl(screen_device &screen, bool state);
 	void screen_eof_doraemon(screen_device &screen, bool state);
 };
 
+PALETTE_INIT_MEMBER(champbwl_state,champbwl)
+{
+	const UINT8 *color_prom = memregion("proms")->base();
+	int i, col;
+
+	for (i = 0; i < palette.entries(); i++)
+	{
+		col = (color_prom[i] << 8) + color_prom[i + 512];
+		palette.set_pen_color(i, pal5bit(col >> 10), pal5bit(col >> 5), pal5bit(col >> 0));
+	}
+}
 
 
 READ8_MEMBER(champbwl_state::trackball_r)
@@ -443,7 +463,6 @@ MACHINE_START_MEMBER(champbwl_state,champbwl)
 MACHINE_RESET_MEMBER(champbwl_state,champbwl)
 {
 	m_screenflip = 0;
-	m_mcu_type = -1;
 	m_last_trackball_val[0] = 0;
 	m_last_trackball_val[1] = 0;
 
@@ -497,7 +516,7 @@ static MACHINE_CONFIG_START( champbwl, champbwl_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", champbwl)
 	MCFG_PALETTE_ADD("palette", 512)
 
-	MCFG_PALETTE_INIT_OWNER(champbwl_state,arknoid2)
+	MCFG_PALETTE_INIT_OWNER(champbwl_state,champbwl)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -562,7 +581,7 @@ static MACHINE_CONFIG_START( doraemon, champbwl_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", champbwl)
 	MCFG_PALETTE_ADD("palette", 512)
 
-	MCFG_PALETTE_INIT_OWNER(champbwl_state,arknoid2)
+	MCFG_PALETTE_INIT_OWNER(champbwl_state,champbwl)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -197,22 +197,17 @@ void spectrum_state::spectrum_UpdateBorderBitmap()
 
 		do
 		{
-			if (m_previous_border_y < height)
-			{
-				UINT16* bm = &m_border_bitmap.pix16(m_previous_border_y);
-
-				if (m_previous_border_x < width)
-					bm[m_previous_border_x] = colour;
-			}
+			UINT16* bm = &m_border_bitmap.pix16(m_previous_border_y);
+			bm[m_previous_border_x] = colour;
 
 			m_previous_border_x += 1;
 
-			if (m_previous_border_x > width)
+			if (m_previous_border_x >= width)
 			{
 				m_previous_border_x = 0;
 				m_previous_border_y += 1;
 
-				if (m_previous_border_y > height)
+				if (m_previous_border_y >= height)
 				{
 					m_previous_border_y = 0;
 				}

@@ -9,6 +9,7 @@
 /cfg
 /depend_*.mak
 /diff
+/ini
 /nvram
 /obj
 /snap
