@@ -151,7 +151,7 @@ UINT8 intv_ecs_device::intv_control_r(int hand)
 			}
 			break;
 
-		case 1: /* disc == _fake_ analog */
+		case 4: /* disc == _fake_ analog */
 
 			x = m_discx[hand]->read();
 			y = m_discy[hand]->read();
