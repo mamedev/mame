@@ -5029,7 +5029,7 @@ PayTable   Js+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
      Programs Available: PP0002, X000002P
 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "xp000038.u67",   0x00000, 0x10000, CRC(8707ab9e) SHA1(3e00a2ad8017e1495c6d6fe900d0efa68a1772b8) ) /* 07/01/96   @IGT  L96-1119 */
+	ROM_LOAD( "xp000038.u67",   0x00000, 0x10000, CRC(8707ab9e) SHA1(3e00a2ad8017e1495c6d6fe900d0efa68a1772b8) ) /* 09/05/95   @ IGT  L95-2452 */
 
 	ROM_REGION( 0x10000, "user1", 0 )
 	ROM_LOAD( "x000002p.u66",   0x00000, 0x10000, CRC(17cee391) SHA1(173e5775c3e887e16b4f0330d21873331dfb7c33) ) /* Standard Draw Poker */
@@ -5077,7 +5077,7 @@ PayTable   Js+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
      Programs Available: PP0040, X000040P
 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "xp000038.u67",   0x00000, 0x10000, CRC(8707ab9e) SHA1(3e00a2ad8017e1495c6d6fe900d0efa68a1772b8) ) /* 07/01/96   @IGT  L96-1119 */
+	ROM_LOAD( "xp000038.u67",   0x00000, 0x10000, CRC(8707ab9e) SHA1(3e00a2ad8017e1495c6d6fe900d0efa68a1772b8) ) /* 09/05/95   @ IGT  L95-2452 */
 
 	ROM_REGION( 0x10000, "user1", 0 )
 	ROM_LOAD( "x000040p.u66",   0x00000, 0x10000, CRC(f672c36e) SHA1(c44d78070b8f858cb2ef27c84b62acc8eec1bea8) ) /* Standard Draw Poker */
@@ -5101,7 +5101,7 @@ PayTable  10s+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
      Programs Available: PP0045, X000045P
 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "xp000038.u67",   0x00000, 0x10000, CRC(8707ab9e) SHA1(3e00a2ad8017e1495c6d6fe900d0efa68a1772b8) ) /* 07/01/96   @IGT  L96-1119 */
+	ROM_LOAD( "xp000038.u67",   0x00000, 0x10000, CRC(8707ab9e) SHA1(3e00a2ad8017e1495c6d6fe900d0efa68a1772b8) ) /* 09/05/95   @ IGT  L95-2452 */
 
 	ROM_REGION( 0x10000, "user1", 0 )
 	ROM_LOAD( "x000045p.u66",   0x00000, 0x10000, CRC(5412e1f9) SHA1(a962b7731df2f534ea79b6d3e376abf45104df37) ) /* Standard Draw Poker (10's or Better) */
@@ -5125,7 +5125,7 @@ PayTable  10s+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
      Programs Available: PP0046, X000046P
 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "xp000038.u67",   0x00000, 0x10000, CRC(8707ab9e) SHA1(3e00a2ad8017e1495c6d6fe900d0efa68a1772b8) ) /* 07/01/96   @IGT  L96-1119 */
+	ROM_LOAD( "xp000038.u67",   0x00000, 0x10000, CRC(8707ab9e) SHA1(3e00a2ad8017e1495c6d6fe900d0efa68a1772b8) ) /* 09/05/95   @ IGT  L95-2452 */
 
 	ROM_REGION( 0x10000, "user1", 0 )
 	ROM_LOAD( "x000046p.u66",   0x00000, 0x10000, CRC(f19cdab4) SHA1(4502a8660100be69625e215610cf918e3ffc5e4f) ) /* Standard Draw Poker (10's or Better) */
@@ -5150,7 +5150,7 @@ PayTable   As   2P  3K  STR  FL  FH  4K  SF  RF  5K  RF  (Bonus)
      Programs Available: PP0053, X000053P
 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "xp000038.u67",   0x00000, 0x10000, CRC(8707ab9e) SHA1(3e00a2ad8017e1495c6d6fe900d0efa68a1772b8) ) /* 07/01/96   @IGT  L96-1119 */
+	ROM_LOAD( "xp000038.u67",   0x00000, 0x10000, CRC(8707ab9e) SHA1(3e00a2ad8017e1495c6d6fe900d0efa68a1772b8) ) /* 09/05/95   @ IGT  L95-2452 */
 
 	ROM_REGION( 0x10000, "user1", 0 )
 	ROM_LOAD( "x000053p.u66",   0x00000, 0x10000, CRC(b247e455) SHA1(8d311956e46be62ee17de6fb2ae1594e623a78c0) ) /* Joker Poker */
@@ -5175,10 +5175,10 @@ PayTable   3K   STR  FL  FH  4K  SF  5K  RF  4D  RF  (Bonus)
      Programs Available: PP0054, X000054P
 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "xp000038.u67",   0x00000, 0x10000, CRC(8707ab9e) SHA1(3e00a2ad8017e1495c6d6fe900d0efa68a1772b8) ) /* 07/01/96   @IGT  L96-1119 */
+	ROM_LOAD( "xp000038.u67",   0x00000, 0x10000, CRC(8707ab9e) SHA1(3e00a2ad8017e1495c6d6fe900d0efa68a1772b8) ) /* 09/05/95   @ IGT  L95-2452 */
 
 	ROM_REGION( 0x10000, "user1", 0 )
-	ROM_LOAD( "x000054p.u66",   0x00000, 0x10000, CRC(820b3738) SHA1(dfa389df0d27b69072b5ece5b624ef97551f4af1) ) /* Deuces Wild Poker - 03/22/95   @IGT  L95-1142 */
+	ROM_LOAD( "x000054p.u66",   0x00000, 0x10000, CRC(820b3738) SHA1(dfa389df0d27b69072b5ece5b624ef97551f4af1) ) /* Deuces Wild Poker - 03/22/95   @ IGT  L95-1142 */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
 	ROM_LOAD( "mro-cg2185.u77",  0x00000, 0x8000, CRC(7e64bd1a) SHA1(e988a380ee58078bf5bdc7747e83aed1393cfad8) ) /*  07/10/95   @ IGT  L95-1506  */
@@ -5225,7 +5225,7 @@ PayTable   3K   STR  FL  FH  4K  SF  5K  RF  4D  RF  (Bonus)
      Programs Available: PP0055, X000055P, PP0723
 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "xp000022.u67",   0x00000, 0x10000, CRC(7930741b) SHA1(d3b83fd08a458cc794301ef612f8c7b13d4b2050) ) /*  09/28/95   @IGT  L95-2028  */
+	ROM_LOAD( "xp000022.u67",   0x00000, 0x10000, CRC(7930741b) SHA1(d3b83fd08a458cc794301ef612f8c7b13d4b2050) ) /*  09/28/95   @ IGT  L95-2028  */
 
 	ROM_REGION( 0x10000, "user1", 0 )
 	ROM_LOAD( "x000055p.u66",   0x00000, 0x10000, CRC(e06819df) SHA1(36590c4588b8036908e63714fbb3e77d23e60eae) ) /* Deuces Wild Poker */
@@ -5275,7 +5275,7 @@ PayTable   3K   STR  FL  FH  4K  SF  5K  RF  4D  RF  (Bonus)
      Programs Available: PP0055, X000055P, PP0723
 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "xp000028.u67",   0x00000, 0x10000, CRC(1407fe54) SHA1(4615efbba9a58698e2cfd53c93fa133678101441) ) /* 01/15/96   @IGT  L96-0716 */
+	ROM_LOAD( "xp000028.u67",   0x00000, 0x10000, CRC(1407fe54) SHA1(4615efbba9a58698e2cfd53c93fa133678101441) ) /* 01/15/96   @ IGT  L96-0716 */
 
 	ROM_REGION( 0x10000, "user1", 0 )
 	ROM_LOAD( "x000055p.u66",   0x00000, 0x10000, CRC(e06819df) SHA1(36590c4588b8036908e63714fbb3e77d23e60eae) ) /* Deuces Wild Poker */
@@ -5300,7 +5300,7 @@ PayTable   3K   STR  FL  FH  4K  SF  5K  RF  4D  RF  (Bonus)
      Programs Available: PP0055, X000055P, PP0723
 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "xp000035.u67",   0x00000, 0x10000, CRC(aa16e53b) SHA1(5a37c7af2c09be26e8734b36da765fd408754771) ) /* 07/08/96   @IGT  L96-1587 */
+	ROM_LOAD( "xp000035.u67",   0x00000, 0x10000, CRC(aa16e53b) SHA1(5a37c7af2c09be26e8734b36da765fd408754771) ) /* 07/08/96   @ IGT  L96-1587 */
 
 	ROM_REGION( 0x10000, "user1", 0 )
 	ROM_LOAD( "x000055p.u66",   0x00000, 0x10000, CRC(e06819df) SHA1(36590c4588b8036908e63714fbb3e77d23e60eae) ) /* Deuces Wild Poker */
@@ -5325,7 +5325,7 @@ PayTable   3K   STR  FL  FH  4K  SF  5K  RF  4D  RF  (Bonus)
      Programs Available: PP0055, X000055P, PP0723
 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "xp000038.u67",   0x00000, 0x10000, CRC(8707ab9e) SHA1(3e00a2ad8017e1495c6d6fe900d0efa68a1772b8) ) /* 07/01/96   @IGT  L96-1119 */
+	ROM_LOAD( "xp000038.u67",   0x00000, 0x10000, CRC(8707ab9e) SHA1(3e00a2ad8017e1495c6d6fe900d0efa68a1772b8) ) /* 09/05/95   @ IGT  L95-2452 */
 
 	ROM_REGION( 0x10000, "user1", 0 )
 	ROM_LOAD( "x000055p.u66",   0x00000, 0x10000, CRC(e06819df) SHA1(36590c4588b8036908e63714fbb3e77d23e60eae) ) /* Deuces Wild Poker */
@@ -5600,7 +5600,7 @@ PayTable   3K   STR  FL  FH  4K  SF  5K  RF  4D  RF  (Bonus)
      Programs Available: PP0055, X000055P, PP0723
 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "xp000104.u67",   0x00000, 0x10000, CRC(53dbef8a) SHA1(0be0d0f0ac33ae86e79ba7a1151a281774f80af9) ) /*  04/06/98   @IGT  L98-0910  */
+	ROM_LOAD( "xp000104.u67",   0x00000, 0x10000, CRC(53dbef8a) SHA1(0be0d0f0ac33ae86e79ba7a1151a281774f80af9) ) /*  04/06/98   @ IGT  L98-0910  */
 
 	ROM_REGION( 0x10000, "user1", 0 )
 	ROM_LOAD( "x000055p.u66",   0x00000, 0x10000, CRC(e06819df) SHA1(36590c4588b8036908e63714fbb3e77d23e60eae) ) /* Deuces Wild Poker */
@@ -5674,7 +5674,7 @@ PayTable   Js+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
      Programs Available: PP0060, X000060P & PP0420 - Non Double-up Only
 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "xp000038.u67",   0x00000, 0x10000, CRC(8707ab9e) SHA1(3e00a2ad8017e1495c6d6fe900d0efa68a1772b8) ) /* 07/01/96   @IGT  L96-1119 */
+	ROM_LOAD( "xp000038.u67",   0x00000, 0x10000, CRC(8707ab9e) SHA1(3e00a2ad8017e1495c6d6fe900d0efa68a1772b8) ) /* 09/05/95   @ IGT  L95-2452 */
 
 	ROM_REGION( 0x10000, "user1", 0 )
 	ROM_LOAD( "x000060p.u66",   0x00000, 0x10000, CRC(1ec1ad4d) SHA1(19bc46fe86e0ff23c43ffc072b1c461b60481f0f) ) /* Standard Draw Poker */
@@ -5723,7 +5723,7 @@ PayTable   Js+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
      Programs Available: PP0150, X000150P
 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "xp000038.u67",   0x00000, 0x10000, CRC(8707ab9e) SHA1(3e00a2ad8017e1495c6d6fe900d0efa68a1772b8) ) /* 07/01/96   @IGT  L96-1119 */
+	ROM_LOAD( "xp000038.u67",   0x00000, 0x10000, CRC(8707ab9e) SHA1(3e00a2ad8017e1495c6d6fe900d0efa68a1772b8) ) /* 09/05/95   @ IGT  L95-2452 */
 
 	ROM_REGION( 0x10000, "user1", 0 )
 	ROM_LOAD( "x000150p.u66",   0x00000, 0x10000, CRC(d10759fa) SHA1(eae633d03ac9db86520a70825ac0a59ee9ebc819) ) /* Standard Draw Poker */
@@ -5748,7 +5748,7 @@ PayTable   Js+  2PR  3K   STR  FL  FH  4K  4K  4A  SF  RF  (Bonus)
      Programs Available: PP0158, X000158P
 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "xp000038.u67",   0x00000, 0x10000, CRC(8707ab9e) SHA1(3e00a2ad8017e1495c6d6fe900d0efa68a1772b8) ) /* 07/01/96   @IGT  L96-1119 */
+	ROM_LOAD( "xp000038.u67",   0x00000, 0x10000, CRC(8707ab9e) SHA1(3e00a2ad8017e1495c6d6fe900d0efa68a1772b8) ) /* 09/05/95   @ IGT  L95-2452 */
 
 	ROM_REGION( 0x10000, "user1", 0 )
 	ROM_LOAD( "x000158p.u66",   0x00000, 0x10000, CRC(51a8a294) SHA1(f76992729ceaca18af82ab2fb3403dc5a48b7e8a) ) /* 4 of a Kind Bonus Poker */
@@ -5773,7 +5773,7 @@ PayTable   Ks+  2P  3K  STR  FL  FH  4K  SF  RF  5K  RF  (Bonus)
      Programs Available: PP0171, X000171P
 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "xp000038.u67",   0x00000, 0x10000, CRC(8707ab9e) SHA1(3e00a2ad8017e1495c6d6fe900d0efa68a1772b8) ) /* 07/01/96   @IGT  L96-1119 */
+	ROM_LOAD( "xp000038.u67",   0x00000, 0x10000, CRC(8707ab9e) SHA1(3e00a2ad8017e1495c6d6fe900d0efa68a1772b8) ) /* 09/05/95   @ IGT  L95-2452 */
 
 	ROM_REGION( 0x10000, "user1", 0 )
 	ROM_LOAD( "x000171p.u66",   0x00000, 0x10000, CRC(01e7a3f7) SHA1(a81018fd0b659b3d83cfdc9e6db1f387779bbe98) ) /* Joker Poker */
@@ -5797,7 +5797,7 @@ PayTable   Js+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
      Programs Available: PP0188, X000188P
 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "xp000038.u67",   0x00000, 0x10000, CRC(8707ab9e) SHA1(3e00a2ad8017e1495c6d6fe900d0efa68a1772b8) ) /* 07/01/96   @IGT  L96-1119 */
+	ROM_LOAD( "xp000038.u67",   0x00000, 0x10000, CRC(8707ab9e) SHA1(3e00a2ad8017e1495c6d6fe900d0efa68a1772b8) ) /* 09/05/95   @ IGT  L95-2452 */
 
 	ROM_REGION( 0x10000, "user1", 0 )
 	ROM_LOAD( "x000188p.u66",   0x00000, 0x10000, CRC(3eb7580e) SHA1(86f2280542fb8a55767efd391d0fb04a12ed9408) ) /* Standard Draw Poker */
@@ -5846,7 +5846,7 @@ PayTable   Js+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
      Programs Available: PP0197, X000197P & PP0419 - Non Double-up Only
 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "xp000038.u67",   0x00000, 0x10000, CRC(8707ab9e) SHA1(3e00a2ad8017e1495c6d6fe900d0efa68a1772b8) ) /* 07/01/96   @IGT  L96-1119 */
+	ROM_LOAD( "xp000038.u67",   0x00000, 0x10000, CRC(8707ab9e) SHA1(3e00a2ad8017e1495c6d6fe900d0efa68a1772b8) ) /* 09/05/95   @ IGT  L95-2452 */
 
 	ROM_REGION( 0x10000, "user1", 0 )
 	ROM_LOAD( "x000197p.u66",   0x00000, 0x10000, CRC(13394826) SHA1(c9325b2ed47267b2918a3bf365b90338134ce9c7) ) /* Standard Draw Poker */
@@ -5871,7 +5871,7 @@ PayTable   Js+  2PR  3K   STR  FL  FH  4K  4K  4A  SF  RF  (Bonus)
      Programs Available: PP0203, X000203P, PP0590 & PP0409 - Non Double-up Only
 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "xp000038.u67",   0x00000, 0x10000, CRC(8707ab9e) SHA1(3e00a2ad8017e1495c6d6fe900d0efa68a1772b8) ) /* 07/01/96   @IGT  L96-1119 */
+	ROM_LOAD( "xp000038.u67",   0x00000, 0x10000, CRC(8707ab9e) SHA1(3e00a2ad8017e1495c6d6fe900d0efa68a1772b8) ) /* 09/05/95   @ IGT  L95-2452 */
 
 	ROM_REGION( 0x10000, "user1", 0 )
 	ROM_LOAD( "x000203p.u66",   0x00000, 0x10000, CRC(8e5dc66e) SHA1(e3030598e42e7a76e608d5edfaf263aadc2caf85) ) /* 4 of a Kind Bonus Poker */
@@ -5972,7 +5972,7 @@ PayTable   Js+  2PR  3K   STR  FL  FH  4K  4K  4A  SF  RF  (Bonus)
      Programs Available: PP0265, X000265P, PP0403 & PP0410 - Non Double-up Only
 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "xp000038.u67",   0x00000, 0x10000, CRC(8707ab9e) SHA1(3e00a2ad8017e1495c6d6fe900d0efa68a1772b8) ) /* 07/01/96   @IGT  L96-1119 */
+	ROM_LOAD( "xp000038.u67",   0x00000, 0x10000, CRC(8707ab9e) SHA1(3e00a2ad8017e1495c6d6fe900d0efa68a1772b8) ) /* 09/05/95   @ IGT  L95-2452 */
 
 	ROM_REGION( 0x10000, "user1", 0 )
 	ROM_LOAD( "x000265p.u66",   0x00000, 0x10000, CRC(70a7ab9b) SHA1(3574f89406da12e6a48e5e2c45cad0ba7ee4caf3) ) /* 4 of a Kind Bonus Poker */
@@ -6072,7 +6072,7 @@ PayTable   Js+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
      Programs Available: PP0434, X000434P & PP0713 - Non Double-up Only
 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "xp000038.u67",   0x00000, 0x10000, CRC(8707ab9e) SHA1(3e00a2ad8017e1495c6d6fe900d0efa68a1772b8) ) /* 07/01/96   @IGT  L96-1119 */
+	ROM_LOAD( "xp000038.u67",   0x00000, 0x10000, CRC(8707ab9e) SHA1(3e00a2ad8017e1495c6d6fe900d0efa68a1772b8) ) /* 09/05/95   @ IGT  L95-2452 */
 
 	ROM_REGION( 0x10000, "user1", 0 )
 	ROM_LOAD( "x000434p.u66",   0x00000, 0x10000, CRC(5a3ad28b) SHA1(d4f103c7ce3c4f72728450ab015aca8ef10cd79c) ) /* Bonus Poker Deluxe */
@@ -6096,7 +6096,7 @@ PayTable   Js+  2PR  3K  STR  FL  FH  4K  SF  RF  (Bonus)
      Programs Available: PP0447, X000447P
 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "xp000038.u67",   0x00000, 0x10000, CRC(8707ab9e) SHA1(3e00a2ad8017e1495c6d6fe900d0efa68a1772b8) ) /* 07/01/96   @IGT  L96-1119 */
+	ROM_LOAD( "xp000038.u67",   0x00000, 0x10000, CRC(8707ab9e) SHA1(3e00a2ad8017e1495c6d6fe900d0efa68a1772b8) ) /* 09/05/95   @ IGT  L95-2452 */
 
 	ROM_REGION( 0x10000, "user1", 0 )
 	ROM_LOAD( "x000447p.u66",   0x00000, 0x10000, CRC(4d3ab095) SHA1(337255658242816dc552432aee328fa52e556793) ) /* Standard Draw Poker */
@@ -6120,7 +6120,7 @@ PayTable   Js+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
      Programs Available: PP0221, PP0449, X000449P & PP0585 - Non Double-up Only
 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "xp000038.u67",   0x00000, 0x10000, CRC(8707ab9e) SHA1(3e00a2ad8017e1495c6d6fe900d0efa68a1772b8) ) /* 07/01/96   @IGT  L96-1119 */
+	ROM_LOAD( "xp000038.u67",   0x00000, 0x10000, CRC(8707ab9e) SHA1(3e00a2ad8017e1495c6d6fe900d0efa68a1772b8) ) /* 09/05/95   @ IGT  L95-2452 */
 
 	ROM_REGION( 0x10000, "user1", 0 )
 	ROM_LOAD( "x000449p.u66",   0x00000, 0x10000, CRC(6c22b0b3) SHA1(47cb1b8edb3e1d5d2055a7a31a1dfb46b4fd6391) ) /* Standard Draw Poker */
@@ -6144,7 +6144,7 @@ PayTable   Js+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
      Programs Available: PP0451, X000451P
 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "xp000038.u67",   0x00000, 0x10000, CRC(8707ab9e) SHA1(3e00a2ad8017e1495c6d6fe900d0efa68a1772b8) ) /* 07/01/96   @IGT  L96-1119 */
+	ROM_LOAD( "xp000038.u67",   0x00000, 0x10000, CRC(8707ab9e) SHA1(3e00a2ad8017e1495c6d6fe900d0efa68a1772b8) ) /* 09/05/95   @ IGT  L95-2452 */
 
 	ROM_REGION( 0x10000, "user1", 0 )
 	ROM_LOAD( "x000451p.u66",   0x00000, 0x10000, CRC(4f11e26c) SHA1(6cea3cbef530ef4ece2a4351cbd9ead5b66bb359) ) /* Bonus Poker Deluxe */
@@ -6169,7 +6169,7 @@ PayTable   3K   STR  FL  FH  4K  SF  5K  RF  4D  RF  (Bonus)
      Programs Available: PP0452, X000452P
 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "xp000038.u67",   0x00000, 0x10000, CRC(8707ab9e) SHA1(3e00a2ad8017e1495c6d6fe900d0efa68a1772b8) ) /* 07/01/96   @IGT  L96-1119 */
+	ROM_LOAD( "xp000038.u67",   0x00000, 0x10000, CRC(8707ab9e) SHA1(3e00a2ad8017e1495c6d6fe900d0efa68a1772b8) ) /* 09/05/95   @ IGT  L95-2452 */
 
 	ROM_REGION( 0x10000, "user1", 0 )
 	ROM_LOAD( "x000452p.u66",   0x00000, 0x10000, CRC(a96c7a71) SHA1(6be1012e68035fbc9aa5e0e6ea3a6c54c1864b1b) ) /* Double Deuces Wild Poker */
@@ -6193,7 +6193,7 @@ PayTable   Js+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
      Programs Available: PP0454, X000454P
 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "xp000038.u67",   0x00000, 0x10000, CRC(8707ab9e) SHA1(3e00a2ad8017e1495c6d6fe900d0efa68a1772b8) ) /* 07/01/96   @IGT  L96-1119 */
+	ROM_LOAD( "xp000038.u67",   0x00000, 0x10000, CRC(8707ab9e) SHA1(3e00a2ad8017e1495c6d6fe900d0efa68a1772b8) ) /* 09/05/95   @ IGT  L95-2452 */
 
 	ROM_REGION( 0x10000, "user1", 0 )
 	ROM_LOAD( "x000454p.u66",   0x00000, 0x10000, CRC(93934ae4) SHA1(f243c66e23269e5509bf1306e9e37a579b08fda4) ) /* Bonus Poker Deluxe */
@@ -6218,7 +6218,7 @@ PayTable   As   2P  3K  STR  FL  FH  4K  SF  RF  5K  RF  (Bonus)
      Programs Available: PP0458, X000458P & PP0429 - Non Double-up Only
 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "xp000038.u67",   0x00000, 0x10000, CRC(8707ab9e) SHA1(3e00a2ad8017e1495c6d6fe900d0efa68a1772b8) ) /* 07/01/96   @IGT  L96-1119 */
+	ROM_LOAD( "xp000038.u67",   0x00000, 0x10000, CRC(8707ab9e) SHA1(3e00a2ad8017e1495c6d6fe900d0efa68a1772b8) ) /* 09/05/95   @ IGT  L95-2452 */
 
 	ROM_REGION( 0x10000, "user1", 0 )
 	ROM_LOAD( "x000458p.u66",   0x00000, 0x10000, CRC(dcd20558) SHA1(22c99a265431b0ef8199d3cb69fbbc4aff822dc0) ) /* Joker Poker */
@@ -6243,7 +6243,7 @@ PayTable   Ks+  2P  3K  STR  FL  FH  4K  SF  RF  5K  RF  (Bonus)
      Programs Available: PP0459, X000459P & PP0428 - Non Double-up Only
 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "xp000038.u67",   0x00000, 0x10000, CRC(8707ab9e) SHA1(3e00a2ad8017e1495c6d6fe900d0efa68a1772b8) ) /* 07/01/96   @IGT  L96-1119 */
+	ROM_LOAD( "xp000038.u67",   0x00000, 0x10000, CRC(8707ab9e) SHA1(3e00a2ad8017e1495c6d6fe900d0efa68a1772b8) ) /* 09/05/95   @ IGT  L95-2452 */
 
 	ROM_REGION( 0x10000, "user1", 0 )
 	ROM_LOAD( "x000459p.u66",   0x00000, 0x10000, CRC(03cef341) SHA1(3813c4781ca6d164880f6d06a7d6dbae29012e7d) ) /* Joker Poker */
@@ -6293,7 +6293,7 @@ PayTable   3K  STR  FL  FH  4K  SF  5K  RF  4D  RF  (Bonus)
      Programs Available: PP0508, X000508P
 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "xp000038.u67",   0x00000, 0x10000, CRC(8707ab9e) SHA1(3e00a2ad8017e1495c6d6fe900d0efa68a1772b8) ) /* 07/01/96   @IGT  L96-1119 */
+	ROM_LOAD( "xp000038.u67",   0x00000, 0x10000, CRC(8707ab9e) SHA1(3e00a2ad8017e1495c6d6fe900d0efa68a1772b8) ) /* 09/05/95   @ IGT  L95-2452 */
 
 	ROM_REGION( 0x10000, "user1", 0 )
 	ROM_LOAD( "x000508p.u66",   0x00000, 0x10000, CRC(5efde4b4) SHA1(ead7448464aecc03748f04e4d6e9f346d262cd96) ) /* Loose Deuce Deuces Wild Poker */
@@ -6318,7 +6318,7 @@ PayTable   Js+  2PR  3K  STR  FL  FH  4K  4K  4A  SF  RF  (Bonus)
      Programs Available: PP0514, X000514P & PP0538 - Non Double-up Only
 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "xp000038.u67",   0x00000, 0x10000, CRC(8707ab9e) SHA1(3e00a2ad8017e1495c6d6fe900d0efa68a1772b8) ) /* 07/01/96   @IGT  L96-1119 */
+	ROM_LOAD( "xp000038.u67",   0x00000, 0x10000, CRC(8707ab9e) SHA1(3e00a2ad8017e1495c6d6fe900d0efa68a1772b8) ) /* 09/05/95   @ IGT  L95-2452 */
 
 	ROM_REGION( 0x10000, "user1", 0 )
 	ROM_LOAD( "x000514p.u66",   0x00000, 0x10000, CRC(32cf8696) SHA1(83992695d3af4de10d0e53e01558faad18cdc221) ) /* Double Bonus Poker */
@@ -6343,7 +6343,7 @@ PayTable   Js+  2PR  3K  STR  FL  FH  4K  4K  4A  SF  RF  (Bonus)
      Programs Available: PP0515, X000515P & PP0539 - Non Double-up Only
 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "xp000038.u67",   0x00000, 0x10000, CRC(8707ab9e) SHA1(3e00a2ad8017e1495c6d6fe900d0efa68a1772b8) ) /* 07/01/96   @IGT  L96-1119 */
+	ROM_LOAD( "xp000038.u67",   0x00000, 0x10000, CRC(8707ab9e) SHA1(3e00a2ad8017e1495c6d6fe900d0efa68a1772b8) ) /* 09/05/95   @ IGT  L95-2452 */
 
 	ROM_REGION( 0x10000, "user1", 0 )
 	ROM_LOAD( "x000515p.u66",   0x00000, 0x10000, CRC(4311224a) SHA1(69e6657dacd6e09c2d1514417994adc561f63a83) ) /* Double Bonus Poker */
@@ -6368,7 +6368,7 @@ PayTable   Js+  2PR  3K  STR  FL  FH  4K  4K  4A  SF  RF  (Bonus)
      Programs Available: PP0516, X000516P & PP0540 - Non Double-up Only
 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "xp000038.u67",   0x00000, 0x10000, CRC(8707ab9e) SHA1(3e00a2ad8017e1495c6d6fe900d0efa68a1772b8) ) /* 07/01/96   @IGT  L96-1119 */
+	ROM_LOAD( "xp000038.u67",   0x00000, 0x10000, CRC(8707ab9e) SHA1(3e00a2ad8017e1495c6d6fe900d0efa68a1772b8) ) /* 09/05/95   @ IGT  L95-2452 */
 
 	ROM_REGION( 0x10000, "user1", 0 )
 	ROM_LOAD( "x000516p.u66",   0x00000, 0x10000, CRC(37f84ce7) SHA1(2e5157d02febec0ff31eb5a23254f7c49a486cf5) ) /* Double Bonus Poker */
@@ -6393,7 +6393,7 @@ PayTable   Ks+  2P  3K  STR  FL  FH  4K  SF  RF  5K  RF  (Bonus)
      Programs Available: PP0536, X000536P
 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "xp000038.u67",   0x00000, 0x10000, CRC(8707ab9e) SHA1(3e00a2ad8017e1495c6d6fe900d0efa68a1772b8) ) /* 07/01/96   @IGT  L96-1119 */
+	ROM_LOAD( "xp000038.u67",   0x00000, 0x10000, CRC(8707ab9e) SHA1(3e00a2ad8017e1495c6d6fe900d0efa68a1772b8) ) /* 09/05/95   @ IGT  L95-2452 */
 
 	ROM_REGION( 0x10000, "user1", 0 )
 	ROM_LOAD( "x000536p.u66",   0x00000, 0x10000, CRC(0b18dc1b) SHA1(07350fe258441f8565bfd875342823149b7757f1) ) /* Joker Poker */
@@ -6420,7 +6420,7 @@ Some call this a 4 of a Kind Bonus Poker with all 4K paying the same. Internally
 
 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "xp000038.u67",   0x00000, 0x10000, CRC(8707ab9e) SHA1(3e00a2ad8017e1495c6d6fe900d0efa68a1772b8) ) /* 07/01/96   @IGT  L96-1119 */
+	ROM_LOAD( "xp000038.u67",   0x00000, 0x10000, CRC(8707ab9e) SHA1(3e00a2ad8017e1495c6d6fe900d0efa68a1772b8) ) /* 09/05/95   @ IGT  L95-2452 */
 
 	ROM_REGION( 0x10000, "user1", 0 )
 	ROM_LOAD( "x000537p.u66",   0x00000, 0x10000, CRC(a0c97fde) SHA1(a152b5e99a425127246b2200b7599c17e28479bd) ) /* Standard Draw Poker */
@@ -6473,7 +6473,7 @@ PayTable   Ks+  2P  3K  STR  FL  FH  4K  SF  RF  5K  RF  (Bonus)
      Programs Available: PP0568, X000568P & PP0426 - Non Double-up Only
 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "xp000038.u67",   0x00000, 0x10000, CRC(8707ab9e) SHA1(3e00a2ad8017e1495c6d6fe900d0efa68a1772b8) ) /* 07/01/96   @IGT  L96-1119 */
+	ROM_LOAD( "xp000038.u67",   0x00000, 0x10000, CRC(8707ab9e) SHA1(3e00a2ad8017e1495c6d6fe900d0efa68a1772b8) ) /* 09/05/95   @ IGT  L95-2452 */
 
 	ROM_REGION( 0x10000, "user1", 0 )
 	ROM_LOAD( "x000568p.u66",   0x00000, 0x10000, CRC(570e941d) SHA1(db9227d044f55e8d038e3ea0ba72e42e68efcb30) ) /* Joker Poker */
@@ -6498,7 +6498,7 @@ PayTable   Js+  2PR  3K  STR  FL  FH  4K  4K  4A  SF  RF  (Bonus)
      Programs Available: X000581P, PP0581 - Non Double-up Only
 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "xp000038.u67",   0x00000, 0x10000, CRC(8707ab9e) SHA1(3e00a2ad8017e1495c6d6fe900d0efa68a1772b8) ) /* 07/01/96   @IGT  L96-1119 */
+	ROM_LOAD( "xp000038.u67",   0x00000, 0x10000, CRC(8707ab9e) SHA1(3e00a2ad8017e1495c6d6fe900d0efa68a1772b8) ) /* 09/05/95   @ IGT  L95-2452 */
 
 	ROM_REGION( 0x10000, "user1", 0 )
 	ROM_LOAD( "x000581p.u66",   0x00000, 0x10000, CRC(a4cfecc3) SHA1(b2c805781ba43bda9e208d8c16578dc96b6f58f7) ) /* 4 of a Kind Bonus Poker */
@@ -6523,7 +6523,7 @@ PayTable   Ks+  2P  3K  STR  FL  FH  4K  SF  RF  5K  RF  (Bonus)
      Programs Available: PP0588, X000588
 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "xp000038.u67",   0x00000, 0x10000, CRC(8707ab9e) SHA1(3e00a2ad8017e1495c6d6fe900d0efa68a1772b8) ) /* 07/01/96   @IGT  L96-1119 */
+	ROM_LOAD( "xp000038.u67",   0x00000, 0x10000, CRC(8707ab9e) SHA1(3e00a2ad8017e1495c6d6fe900d0efa68a1772b8) ) /* 09/05/95   @ IGT  L95-2452 */
 
 	ROM_REGION( 0x10000, "user1", 0 )
 	ROM_LOAD( "x000588p.u66",   0x00000, 0x10000, CRC(baa448cc) SHA1(0f1da407304f7dafbe06119d068f7caf99404cb4) ) /* Joker Poker */
@@ -6548,7 +6548,7 @@ PayTable   Js+  2PR  3K  STR  FL  FH  4K  4K  4A  SF  RF  (Bonus)
      Programs Available: PP0725, X000725P
 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "xp000038.u67",   0x00000, 0x10000, CRC(8707ab9e) SHA1(3e00a2ad8017e1495c6d6fe900d0efa68a1772b8) ) /* 07/01/96   @IGT  L96-1119 */
+	ROM_LOAD( "xp000038.u67",   0x00000, 0x10000, CRC(8707ab9e) SHA1(3e00a2ad8017e1495c6d6fe900d0efa68a1772b8) ) /* 09/05/95   @ IGT  L95-2452 */
 
 	ROM_REGION( 0x10000, "user1", 0 )
 	ROM_LOAD( "x000725p.u66",   0x00000, 0x10000, CRC(a56f3910) SHA1(06d0d4a8722e033ff1fbe0947135952ce8274725) ) /* Double Bonus Poker */
@@ -6573,7 +6573,7 @@ PayTable   Js+  2PR  3K  STR  FL  FH  4K  4K  4A  SF  RF  (Bonus)
      Programs Available: PP0726, X000726P
 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "xp000038.u67",   0x00000, 0x10000, CRC(8707ab9e) SHA1(3e00a2ad8017e1495c6d6fe900d0efa68a1772b8) ) /* 07/01/96   @IGT  L96-1119 */
+	ROM_LOAD( "xp000038.u67",   0x00000, 0x10000, CRC(8707ab9e) SHA1(3e00a2ad8017e1495c6d6fe900d0efa68a1772b8) ) /* 09/05/95   @ IGT  L95-2452 */
 
 	ROM_REGION( 0x10000, "user1", 0 )
 	ROM_LOAD( "x000726p.u66",   0x00000, 0x10000, CRC(800eb7e5) SHA1(cb4c2749d025ab093f26967909d5f366f1cc9cba) ) /* Double Bonus Poker */
@@ -6598,7 +6598,7 @@ PayTable   Js+  2PR  3K  STR  FL  FH  4K  4K  4A  SF  RF  (Bonus)
      Programs Available: PP0727, X000727P
 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "xp000038.u67",   0x00000, 0x10000, CRC(8707ab9e) SHA1(3e00a2ad8017e1495c6d6fe900d0efa68a1772b8) ) /* 07/01/96   @IGT  L96-1119 */
+	ROM_LOAD( "xp000038.u67",   0x00000, 0x10000, CRC(8707ab9e) SHA1(3e00a2ad8017e1495c6d6fe900d0efa68a1772b8) ) /* 09/05/95   @ IGT  L95-2452 */
 
 	ROM_REGION( 0x10000, "user1", 0 )
 	ROM_LOAD( "x000727p.u66",   0x00000, 0x10000, CRC(4828474c) SHA1(9836b76113a71802df30ca15f7c9a5790e6f1c5b) ) /* Double Bonus Poker */
@@ -6623,7 +6623,7 @@ PayTable   Js+  2PR  3K   STR  FL  FH  4K  4K  4A  SF  RF  (Bonus)
      Programs Available: PP0763, X000763P
 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "xp000038.u67",   0x00000, 0x10000, CRC(8707ab9e) SHA1(3e00a2ad8017e1495c6d6fe900d0efa68a1772b8) ) /* 07/01/96   @IGT  L96-1119 */
+	ROM_LOAD( "xp000038.u67",   0x00000, 0x10000, CRC(8707ab9e) SHA1(3e00a2ad8017e1495c6d6fe900d0efa68a1772b8) ) /* 09/05/95   @ IGT  L95-2452 */
 
 	ROM_REGION( 0x10000, "user1", 0 )
 	ROM_LOAD( "x000763p.u66",   0x00000, 0x10000, CRC(bf7dda7d) SHA1(1a6089d1159c199199e608f3dd2ba7b45a29b31c) ) /* 4 of a Kind Bonus Poker */
@@ -6648,7 +6648,7 @@ PayTable   Js+  2PR  3K  STR  FL  FH  4K  4K  4A  SF  RF  (Bonus)
      Programs Available: X002018P
 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "xp000038.u67",   0x00000, 0x10000, CRC(8707ab9e) SHA1(3e00a2ad8017e1495c6d6fe900d0efa68a1772b8) ) /* 07/01/96   @IGT  L96-1119 */
+	ROM_LOAD( "xp000038.u67",   0x00000, 0x10000, CRC(8707ab9e) SHA1(3e00a2ad8017e1495c6d6fe900d0efa68a1772b8) ) /* 09/05/95   @ IGT  L95-2452 */
 
 	ROM_REGION( 0x10000, "user1", 0 )
 	ROM_LOAD( "x002018p.u66",   0x00000, 0x10000, CRC(a7b79cfa) SHA1(89216fafffc64fda22a016a906483b76174c3f02) ) /* Full House Bonus Poker */
@@ -6851,7 +6851,7 @@ PayTable   Js+  2PR  3K  3A  STR  FL  FH  4K  4A  SF  RF  (Bonus)
      Programs Available: X002038P
 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "xp000038.u67",   0x00000, 0x10000, CRC(8707ab9e) SHA1(3e00a2ad8017e1495c6d6fe900d0efa68a1772b8) ) /* 07/01/96   @IGT  L96-1119 */
+	ROM_LOAD( "xp000038.u67",   0x00000, 0x10000, CRC(8707ab9e) SHA1(3e00a2ad8017e1495c6d6fe900d0efa68a1772b8) ) /* 09/05/95   @ IGT  L95-2452 */
 
 	ROM_REGION( 0x10000, "user1", 0 )
 	ROM_LOAD( "x002038p.u66",   0x00000, 0x10000, CRC(58d01ba5) SHA1(6d4cde9c9e55967db2b661c7123cce9958a00639) ) /* Nevada Bonus Poker */
@@ -6876,7 +6876,7 @@ PayTable   Js+  2PR  3K  3A  STR  FL  FH  4K  4A  SF  RF  (Bonus)
      Programs Available: X002040P
 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "xp000038.u67",   0x00000, 0x10000, CRC(8707ab9e) SHA1(3e00a2ad8017e1495c6d6fe900d0efa68a1772b8) ) /* 07/01/96   @IGT  L96-1119 */
+	ROM_LOAD( "xp000038.u67",   0x00000, 0x10000, CRC(8707ab9e) SHA1(3e00a2ad8017e1495c6d6fe900d0efa68a1772b8) ) /* 09/05/95   @ IGT  L95-2452 */
 
 	ROM_REGION( 0x10000, "user1", 0 )
 	ROM_LOAD( "x002040p.u66",   0x00000, 0x10000, CRC(38acb477) SHA1(894f5861ac84323e50e8972602251f2873988e6c) ) /* Nevada Bonus Poker */
@@ -6901,7 +6901,7 @@ PayTable   Js+  2PR  3K  STR  FL  FH  4K  4K  4A  SF  RF  (Bonus)
      Programs Available: X002042P
 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "xp000038.u67",   0x00000, 0x10000, CRC(8707ab9e) SHA1(3e00a2ad8017e1495c6d6fe900d0efa68a1772b8) ) /* 07/01/96   @IGT  L96-1119 */
+	ROM_LOAD( "xp000038.u67",   0x00000, 0x10000, CRC(8707ab9e) SHA1(3e00a2ad8017e1495c6d6fe900d0efa68a1772b8) ) /* 09/05/95   @ IGT  L95-2452 */
 
 	ROM_REGION( 0x10000, "user1", 0 )
 	ROM_LOAD( "x002042p.u66",   0x00000, 0x10000, CRC(12787a36) SHA1(4ef478cc5c23694ffa6733e2fc47c2b6f545c30a) ) /* Triple Bonus Poker */
@@ -6926,7 +6926,7 @@ PayTable   Js+  2PR  3K  STR  FL  FH  4K  4K  4A  SF  RF  (Bonus)
      Programs Available: X002043P
 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "xp000038.u67",   0x00000, 0x10000, CRC(8707ab9e) SHA1(3e00a2ad8017e1495c6d6fe900d0efa68a1772b8) ) /* 07/01/96   @IGT  L96-1119 */
+	ROM_LOAD( "xp000038.u67",   0x00000, 0x10000, CRC(8707ab9e) SHA1(3e00a2ad8017e1495c6d6fe900d0efa68a1772b8) ) /* 09/05/95   @ IGT  L95-2452 */
 
 	ROM_REGION( 0x10000, "user1", 0 )
 	ROM_LOAD( "x002043p.u66",   0x00000, 0x10000, CRC(2cec81ab) SHA1(d28fa9075c63e49d34c463f19e7741609b0b3343) ) /* Triple Bonus Poker */
@@ -6951,7 +6951,7 @@ PayTable   Js+  2PR  3K  STR  FL  FH  4K  4K  4A  SF  RF  (Bonus)
      Programs Available: X002044P
 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "xp000038.u67",   0x00000, 0x10000, CRC(8707ab9e) SHA1(3e00a2ad8017e1495c6d6fe900d0efa68a1772b8) ) /* 07/01/96   @IGT  L96-1119 */
+	ROM_LOAD( "xp000038.u67",   0x00000, 0x10000, CRC(8707ab9e) SHA1(3e00a2ad8017e1495c6d6fe900d0efa68a1772b8) ) /* 09/05/95   @ IGT  L95-2452 */
 
 	ROM_REGION( 0x10000, "user1", 0 )
 	ROM_LOAD( "x002044p.u66",   0x00000, 0x10000, CRC(158af97f) SHA1(452247d981f1202da8c44a31f0d3343184d3db41) ) /* Triple Bonus Poker */
@@ -6976,7 +6976,7 @@ PayTable   Js+  2PR  3K  STR  FL  FH  4K  4K  4A  SF  RF  (Bonus)
      Programs Available: X002045P
 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "xp000038.u67",   0x00000, 0x10000, CRC(8707ab9e) SHA1(3e00a2ad8017e1495c6d6fe900d0efa68a1772b8) ) /* 07/01/96   @IGT  L96-1119 */
+	ROM_LOAD( "xp000038.u67",   0x00000, 0x10000, CRC(8707ab9e) SHA1(3e00a2ad8017e1495c6d6fe900d0efa68a1772b8) ) /* 09/05/95   @ IGT  L95-2452 */
 
 	ROM_REGION( 0x10000, "user1", 0 )
 	ROM_LOAD( "x002045p.u66",   0x00000, 0x10000, CRC(75fe81db) SHA1(980bcc06b54a1ef78e3beac1db83b73e17a04818) ) /* Triple Bonus Poker */
@@ -7003,7 +7003,7 @@ PayTable   Js+  2PR  3K  STR  FL  FH  4K  4K  4A  A,2-4  2-4  SF  RF  (Bonus)
      Programs Available: X002066P
 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "xp000038.u67",   0x00000, 0x10000, CRC(8707ab9e) SHA1(3e00a2ad8017e1495c6d6fe900d0efa68a1772b8) ) /* 07/01/96   @IGT  L96-1119 */
+	ROM_LOAD( "xp000038.u67",   0x00000, 0x10000, CRC(8707ab9e) SHA1(3e00a2ad8017e1495c6d6fe900d0efa68a1772b8) ) /* 09/05/95   @ IGT  L95-2452 */
 
 	ROM_REGION( 0x10000, "user1", 0 )
 	ROM_LOAD( "x002066p.u66",   0x00000, 0x10000, CRC(01236011) SHA1(3edfee014705b3540386c5e42026ab93628b2597) ) /* Double Double Bonus Poker */
@@ -7030,7 +7030,7 @@ PayTable   Js+  2PR  3K  STR  FL  FH  4K  4K  4A  A,2-4  2-4  SF  RF  (Bonus)
      Programs Available: X002067P
 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "xp000038.u67",   0x00000, 0x10000, CRC(8707ab9e) SHA1(3e00a2ad8017e1495c6d6fe900d0efa68a1772b8) ) /* 07/01/96   @IGT  L96-1119 */
+	ROM_LOAD( "xp000038.u67",   0x00000, 0x10000, CRC(8707ab9e) SHA1(3e00a2ad8017e1495c6d6fe900d0efa68a1772b8) ) /* 09/05/95   @ IGT  L95-2452 */
 
 	ROM_REGION( 0x10000, "user1", 0 )
 	ROM_LOAD( "x002067p.u66",   0x00000, 0x10000, CRC(c62adf21) SHA1(25e037f91ef1860d1d45cae12f21bdd1c39ba264) ) /* Double Double Bonus Poker */
@@ -7056,7 +7056,7 @@ PayTable   Js+  2PR  3K  STR  FL  FH  4K  4K  4A  with A  2-4  SF  RF  (Bonus)
      Programs Available: X002068P
 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "xp000038.u67",   0x00000, 0x10000, CRC(8707ab9e) SHA1(3e00a2ad8017e1495c6d6fe900d0efa68a1772b8) ) /* 07/01/96   @IGT  L96-1119 */
+	ROM_LOAD( "xp000038.u67",   0x00000, 0x10000, CRC(8707ab9e) SHA1(3e00a2ad8017e1495c6d6fe900d0efa68a1772b8) ) /* 09/05/95   @ IGT  L95-2452 */
 
 	ROM_REGION( 0x10000, "user1", 0 )
 	ROM_LOAD( "x002068p.u66",   0x00000, 0x10000, CRC(a5e4279d) SHA1(c4dfd1e77a03a94d9911d1754b5874200bfe6c71) ) /* Double Double Bonus Poker */
@@ -7083,7 +7083,7 @@ PayTable   Js+  2PR  3K  STR  FL  FH  4K  4K  4A  A,2-4  2-4  SF  RF  (Bonus)
      Programs Available: X002069P
 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "xp000038.u67",   0x00000, 0x10000, CRC(8707ab9e) SHA1(3e00a2ad8017e1495c6d6fe900d0efa68a1772b8) ) /* 07/01/96   @IGT  L96-1119 */
+	ROM_LOAD( "xp000038.u67",   0x00000, 0x10000, CRC(8707ab9e) SHA1(3e00a2ad8017e1495c6d6fe900d0efa68a1772b8) ) /* 09/05/95   @ IGT  L95-2452 */
 
 	ROM_REGION( 0x10000, "user1", 0 )
 	ROM_LOAD( "x002069p.u66",   0x00000, 0x10000, CRC(875ecfcf) SHA1(80472cb43b36e518216e60a9b4883a81163718a2) ) /* Double Double Bonus Poker - 08/17/95   @ IGT  L95-2088 */
@@ -7110,7 +7110,7 @@ PayTable   Js+  2PR  3K  STR  FL  FH  4K  4K  4A  A,2-4  2-4  SF  RF  (Bonus)
      Programs Available: X002070P
 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "xp000038.u67",   0x00000, 0x10000, CRC(8707ab9e) SHA1(3e00a2ad8017e1495c6d6fe900d0efa68a1772b8) ) /* 07/01/96   @IGT  L96-1119 */
+	ROM_LOAD( "xp000038.u67",   0x00000, 0x10000, CRC(8707ab9e) SHA1(3e00a2ad8017e1495c6d6fe900d0efa68a1772b8) ) /* 09/05/95   @ IGT  L95-2452 */
 
 	ROM_REGION( 0x10000, "user1", 0 )
 	ROM_LOAD( "x002070p.u66",   0x00000, 0x10000, CRC(e7732ff9) SHA1(de1a68040d46e78831a6c806f26f253b4ab014b5) ) /* Double Double Bonus Poker */
@@ -7134,7 +7134,7 @@ PayTable   Js+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
      Programs Available: PP0038, X002121P
 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "xp000038.u67",   0x00000, 0x10000, CRC(8707ab9e) SHA1(3e00a2ad8017e1495c6d6fe900d0efa68a1772b8) ) /* 07/01/96   @IGT  L96-1119 */
+	ROM_LOAD( "xp000038.u67",   0x00000, 0x10000, CRC(8707ab9e) SHA1(3e00a2ad8017e1495c6d6fe900d0efa68a1772b8) ) /* 09/05/95   @ IGT  L95-2452 */
 
 	ROM_REGION( 0x10000, "user1", 0 )
 	ROM_LOAD( "x002121p.u66",   0x00000, 0x10000, CRC(53e5853b) SHA1(a66dc531ac762d8acd2ac5d4228c9c04fc9758df) ) /* Standard Draw Poker */
@@ -7183,7 +7183,7 @@ PayTable   Js+  2PR  3K  STR  FL  FH  4K  4K  4A  SF  RF  (Bonus)
      Programs Available: X002150P
 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "xp000038.u67",   0x00000, 0x10000, CRC(8707ab9e) SHA1(3e00a2ad8017e1495c6d6fe900d0efa68a1772b8) ) /* 07/01/96   @IGT  L96-1119 */
+	ROM_LOAD( "xp000038.u67",   0x00000, 0x10000, CRC(8707ab9e) SHA1(3e00a2ad8017e1495c6d6fe900d0efa68a1772b8) ) /* 09/05/95   @ IGT  L95-2452 */
 
 	ROM_REGION( 0x10000, "user1", 0 )
 	ROM_LOAD( "x002150p.u66",   0x00000, 0x10000, CRC(b4b531c4) SHA1(f5fa988d963cb0fe00aebc4eb99043d1b70f9516) ) /* 4 of a Kind Bonus Poker */
@@ -7223,8 +7223,35 @@ SA$ - Sequential ACE$ pays the same as RF
 	ROM_LOAD( "mxo-cg2172.u80",  0x18000, 0x8000, CRC(cc9d64e4) SHA1(4bf78e49150ca6fb4a05f3320f712bbbabcacf56) )
 
 	ROM_REGION( 0x200, "proms", 0 )
-	ROM_LOAD( "capx2172.u43", 0x0000, 0x0200, NO_DUMP ) /* Original version came with CG2172 + CAPX2172 */
-	ROM_LOAD( "capx1321.u43", 0x0000, 0x0200, CRC(4b57569f) SHA1(fa29c0f627e7ce79951ec6dadec114864144f37d) ) /* WRONG!! */
+	ROM_LOAD( "capx2172.u43", 0x0000, 0x0200, CRC(c9b4f1da) SHA1(c911da564cfb33218441de0f91e67a02191d76c2) ) /* Philips N82S147N */
+ROM_END
+
+ROM_START( pex2173p ) /* Superboard : Ace$ Bonus Poker (X002173P+XP000038) */
+/*
+                                      5-K 2-4
+PayTable   Js+  2PR  3K  STR  FL  FH  4K  4K  4A  SA$  SF  RF  (Bonus)
+----------------------------------------------------------------------
+  P790AM    1    2    3   4    5   6  25  40  80  250  50 250    800
+  % Range: 93.1-95.1%  Optimum: 97.1%  Hit Frequency: 45.5%
+     Programs Available: X002173P
+
+SA$ - Sequential ACE$ pays the same as RF
+
+*/
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "xp000038.u67",   0x00000, 0x10000, CRC(8707ab9e) SHA1(3e00a2ad8017e1495c6d6fe900d0efa68a1772b8) ) /* 09/05/95   @ IGT  L95-2452 */
+
+	ROM_REGION( 0x10000, "user1", 0 )
+	ROM_LOAD( "x002173p.u66",   0x00000, 0x10000, CRC(509e50e1) SHA1(db4ee11f29107ff48ee5f5410c9d0e1a6a6fd567) ) /* Ace$ Bonus Poker */
+
+	ROM_REGION( 0x020000, "gfx1", 0 )
+	ROM_LOAD( "mro-cg2172.u77",  0x00000, 0x8000, CRC(45c84d0b) SHA1(796b6ff14adacf1cbca6acd9b4903d7420519f2b) ) /*  06/05/95   @ IGT  L95-1494  */
+	ROM_LOAD( "mgo-cg2172.u78",  0x08000, 0x8000, CRC(fff049bc) SHA1(d4b340e0c932db767cade56a55b649c80750fee4) )
+	ROM_LOAD( "mbo-cg2172.u79",  0x10000, 0x8000, CRC(1665c6be) SHA1(4650b9d8336434ce531c31b63e7780b47ef4e985) )
+	ROM_LOAD( "mxo-cg2172.u80",  0x18000, 0x8000, CRC(cc9d64e4) SHA1(4bf78e49150ca6fb4a05f3320f712bbbabcacf56) )
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "capx2172.u43", 0x0000, 0x0200, CRC(c9b4f1da) SHA1(c911da564cfb33218441de0f91e67a02191d76c2) ) /* Philips N82S147N */
 ROM_END
 
 ROM_START( pex2180p ) /* Superboard : Double Bonus Poker (X002180P+XP000038) */
@@ -7237,7 +7264,7 @@ PayTable   Js+  2PR  3K  STR  FL  FH  4K  4K  4A  SF  RF  (Bonus)
      Programs Available: X002180P
 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "xp000038.u67",   0x00000, 0x10000, CRC(8707ab9e) SHA1(3e00a2ad8017e1495c6d6fe900d0efa68a1772b8) ) /* 07/01/96   @IGT  L96-1119 */
+	ROM_LOAD( "xp000038.u67",   0x00000, 0x10000, CRC(8707ab9e) SHA1(3e00a2ad8017e1495c6d6fe900d0efa68a1772b8) ) /* 09/05/95   @ IGT  L95-2452 */
 
 	ROM_REGION( 0x10000, "user1", 0 )
 	ROM_LOAD( "x002180p.u66",   0x00000, 0x10000, CRC(c929b3a5) SHA1(6b47c67275f6894bfcd52640aa32fbe1270dba9c) ) /* Double Bonus Poker */
@@ -7562,7 +7589,7 @@ PayTable   Js+  2PR  3K  STR  FL  FH  4K  SF  RF  (Bonus)
      Programs Available: X002302P
 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "xp000038.u67",   0x00000, 0x10000, CRC(8707ab9e) SHA1(3e00a2ad8017e1495c6d6fe900d0efa68a1772b8) ) /* 07/01/96   @IGT  L96-1119 */
+	ROM_LOAD( "xp000038.u67",   0x00000, 0x10000, CRC(8707ab9e) SHA1(3e00a2ad8017e1495c6d6fe900d0efa68a1772b8) ) /* 09/05/95   @ IGT  L95-2452 */
 
 	ROM_REGION( 0x10000, "user1", 0 )
 	ROM_LOAD( "x002302p.u66",   0x00000, 0x10000, CRC(8e52646e) SHA1(f6722778eb7e2981a00f8e4e5ea32f71a35e20e5) ) /* Bonus Poker Deluxe */
@@ -8260,7 +8287,7 @@ Double Bonus Poker   P324A    100.20%
 	/* Known to be found with XMP00003, XMP00006 or XMP00024 programs */
 
 	ROM_REGION( 0x10000, "user1", 0 )
-	ROM_LOAD( "xm00001p.u66",   0x00000, 0x10000, CRC(b1569f05) SHA1(c94409ad74c4585288780cc2f96957592554a250) ) /*  07/18/95   @IGT  L95-1613  */
+	ROM_LOAD( "xm00001p.u66",   0x00000, 0x10000, CRC(b1569f05) SHA1(c94409ad74c4585288780cc2f96957592554a250) ) /*  07/18/95   @ IGT  L95-1613  */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
 	ROM_LOAD( "mro-cg2174.u77",  0x00000, 0x8000, CRC(bb666733) SHA1(dcaa1980b051a554cb0f443b1183a680edc9ad3f) ) /*  07/26/95   @ IGT  L95-1616  */
@@ -8285,11 +8312,11 @@ Jacks or Better      BA        97.30%
 Double Bonus Poker   P323A     99.10%
 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "xmp00006.u67",   0x00000, 0x10000, CRC(d61f1677) SHA1(2eca1315d6aa310a54de2dfa369e443a07495b76) ) /*  07/25/96   @IGT L96-2041  - Linkable Progressive */
+	ROM_LOAD( "xmp00006.u67",   0x00000, 0x10000, CRC(d61f1677) SHA1(2eca1315d6aa310a54de2dfa369e443a07495b76) ) /*  07/25/96   @ IGT L96-2041  - Linkable Progressive */
 	/* Known to be found with XMP00003, XMP00006 or XMP00024 programs */
 
 	ROM_REGION( 0x10000, "user1", 0 )
-	ROM_LOAD( "xm00002p.u66",   0x00000, 0x10000, CRC(96cf471c) SHA1(9597bf6a80c392ee22dc4606db610fdaf032377f) ) /*  07/18/95   @IGT  L95-1614  */
+	ROM_LOAD( "xm00002p.u66",   0x00000, 0x10000, CRC(96cf471c) SHA1(9597bf6a80c392ee22dc4606db610fdaf032377f) ) /*  07/18/95   @ IGT  L95-1614  */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
 	ROM_LOAD( "mro-cg2174.u77",  0x00000, 0x8000, CRC(bb666733) SHA1(dcaa1980b051a554cb0f443b1183a680edc9ad3f) ) /*  07/26/95   @ IGT  L95-1616  */
@@ -8318,7 +8345,7 @@ Double Bonus Poker   P325A     97.80%
 	/* Known to be found with XMP00003, XMP00006 or XMP00024 programs */
 
 	ROM_REGION( 0x10000, "user1", 0 )
-	ROM_LOAD( "xm00003p.u66",   0x00000, 0x10000, CRC(55b44732) SHA1(8e0bbad3aaa7deca85ae641c444be3a513bdce50) ) /*  07/18/95   @IGT  L95-1615  */
+	ROM_LOAD( "xm00003p.u66",   0x00000, 0x10000, CRC(55b44732) SHA1(8e0bbad3aaa7deca85ae641c444be3a513bdce50) ) /*  07/18/95   @ IGT  L95-1615  */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
 	ROM_LOAD( "mro-cg2174.u77",  0x00000, 0x8000, CRC(bb666733) SHA1(dcaa1980b051a554cb0f443b1183a680edc9ad3f) ) /*  07/26/95   @ IGT  L95-1616  */
@@ -8400,11 +8427,11 @@ Jacks or Better      CA        99.50%
 Double Bonus Poker   P323A     99.10%
 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "xmp00006.u67",   0x00000, 0x10000, CRC(d61f1677) SHA1(2eca1315d6aa310a54de2dfa369e443a07495b76) ) /*  07/25/96   @IGT L96-2041  - Linkable Progressive */
+	ROM_LOAD( "xmp00006.u67",   0x00000, 0x10000, CRC(d61f1677) SHA1(2eca1315d6aa310a54de2dfa369e443a07495b76) ) /*  07/25/96   @ IGT L96-2041  - Linkable Progressive */
 	/* Known to be found with XMP00003, XMP00006 or XMP00024 programs */
 
 	ROM_REGION( 0x10000, "user1", 0 )
-	ROM_LOAD( "xm00006p.u66",   0x00000, 0x10000, CRC(b464ee79) SHA1(8768e52c66881c8f327055124ff31bcad79fd027) ) /*  03/08/96   @IGT  NV  */
+	ROM_LOAD( "xm00006p.u66",   0x00000, 0x10000, CRC(b464ee79) SHA1(8768e52c66881c8f327055124ff31bcad79fd027) ) /*  03/08/96   @ IGT  NV  */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
 	ROM_LOAD( "mro-cg2174.u77",  0x00000, 0x8000, CRC(bb666733) SHA1(dcaa1980b051a554cb0f443b1183a680edc9ad3f) ) /*  07/26/95   @ IGT  L95-1616  */
@@ -8429,7 +8456,7 @@ Jacks or Better      BA        97.30%
 Double Bonus Poker   P325A     97.80%
 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "xmp00006.u67",   0x00000, 0x10000, CRC(d61f1677) SHA1(2eca1315d6aa310a54de2dfa369e443a07495b76) ) /*  07/25/96   @IGT L96-2041  - Linkable Progressive */
+	ROM_LOAD( "xmp00006.u67",   0x00000, 0x10000, CRC(d61f1677) SHA1(2eca1315d6aa310a54de2dfa369e443a07495b76) ) /*  07/25/96   @ IGT L96-2041  - Linkable Progressive */
 
 	ROM_REGION( 0x10000, "user1", 0 )
 	ROM_LOAD( "xm00007p.u66",   0x00000, 0x10000, CRC(85a76416) SHA1(1bc3b9c2f687e68a085bfc5cf86d99fbd18cb9c7) )
@@ -8457,7 +8484,7 @@ Double Bonus Poker   P324A    100.20%
 Double Double Bonus  P505A     97.80%
 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "xmp00006.u67",   0x00000, 0x10000, CRC(d61f1677) SHA1(2eca1315d6aa310a54de2dfa369e443a07495b76) ) /*  07/25/96   @IGT L96-2041  - Linkable Progressive */
+	ROM_LOAD( "xmp00006.u67",   0x00000, 0x10000, CRC(d61f1677) SHA1(2eca1315d6aa310a54de2dfa369e443a07495b76) ) /*  07/25/96   @ IGT L96-2041  - Linkable Progressive */
 
 	ROM_REGION( 0x10000, "user1", 0 )
 	ROM_LOAD( "xm00008p.u66",   0x00000, 0x10000, CRC(37ff1a79) SHA1(5b15245e79d8f1b984d254f4307f1a2219ce3ed2) )
@@ -9040,7 +9067,8 @@ GAMEL(1995, pex2070p,  0,         peplus,  peplus_poker, peplus_state, peplussb,
 GAMEL(1995, pex2121p,  0,         peplus,  peplus_poker, peplus_state, peplussb, ROT0,  "IGT - International Game Technology", "Player's Edge Plus (X002121P+XP000038) Standard Draw Poker", 0,layout_pe_poker )
 GAMEL(1995, pex2121pa, pex2121p,  peplus,  peplus_poker, peplus_state, peplussb, ROT0,  "IGT - International Game Technology", "Player's Edge Plus (X002121P+XP000037) Standard Draw Poker", 0,layout_pe_poker )
 GAMEL(1995, pex2150p,  0,         peplus,  peplus_poker, peplus_state, peplussb, ROT0,  "IGT - International Game Technology", "Player's Edge Plus (X002150P+XP000038) 4 of a Kind Bonus Poker", 0,layout_pe_poker )
-GAMEL(1995, pex2172p,  0,         peplus,  peplus_poker, peplus_state, peplussb, ROT0,  "IGT - International Game Technology", "Player's Edge Plus (X002172P+XP000112) Ace$ Bonus Poker",   0, layout_pe_poker ) /* Undumped color CAP but should have correct colors anyways */
+GAMEL(1995, pex2172p,  0,         peplus,  peplus_poker, peplus_state, peplussb, ROT0,  "IGT - International Game Technology", "Player's Edge Plus (X002172P+XP000112) Ace$ Bonus Poker",   0, layout_pe_poker )
+GAMEL(1995, pex2173p,  0,         peplus,  peplus_poker, peplus_state, peplussb, ROT0,  "IGT - International Game Technology", "Player's Edge Plus (X002173P+XP000038) Ace$ Bonus Poker",   0, layout_pe_poker )
 GAMEL(1995, pex2180p,  0,         peplus,  peplus_poker, peplus_state, peplussb, ROT0,  "IGT - International Game Technology", "Player's Edge Plus (X002180P+XP000038) Double Bonus Poker", 0, layout_pe_poker )
 GAMEL(1995, pex2241p,  0,         peplus,  peplus_poker, peplus_state, peplussb, ROT0,  "IGT - International Game Technology", "Player's Edge Plus (X002241P+XP000079) 4 of a Kind Bonus Poker", 0,layout_pe_poker )
 GAMEL(1995, pex2244p,  0,         peplus,  peplus_poker, peplus_state, peplussb, ROT0,  "IGT - International Game Technology", "Player's Edge Plus (X002244P+XP000079) Double Bonus Poker", 0, layout_pe_poker )
