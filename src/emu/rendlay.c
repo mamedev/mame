@@ -452,19 +452,22 @@ layout_element::layout_element(running_machine &machine, xml_data_node &elemnode
 			m_maxstate = 65536;
 	}
 
-	// determine the scale/offset for normalization
-	float xoffs = bounds.x0;
-	float yoffs = bounds.y0;
-	float xscale = 1.0f / (bounds.x1 - bounds.x0);
-	float yscale = 1.0f / (bounds.y1 - bounds.y0);
-
-	// normalize all the component bounds
-	for (component *curcomp = m_complist.first(); curcomp != NULL; curcomp = curcomp->next())
+	if (m_complist.first() != NULL)
 	{
-		curcomp->m_bounds.x0 = (curcomp->m_bounds.x0 - xoffs) * xscale;
-		curcomp->m_bounds.x1 = (curcomp->m_bounds.x1 - xoffs) * xscale;
-		curcomp->m_bounds.y0 = (curcomp->m_bounds.y0 - yoffs) * yscale;
-		curcomp->m_bounds.y1 = (curcomp->m_bounds.y1 - yoffs) * yscale;
+		// determine the scale/offset for normalization
+		float xoffs = bounds.x0;
+		float yoffs = bounds.y0;
+		float xscale = 1.0f / (bounds.x1 - bounds.x0);
+		float yscale = 1.0f / (bounds.y1 - bounds.y0);
+
+		// normalize all the component bounds
+		for (component *curcomp = m_complist.first(); curcomp != NULL; curcomp = curcomp->next())
+		{
+			curcomp->m_bounds.x0 = (curcomp->m_bounds.x0 - xoffs) * xscale;
+			curcomp->m_bounds.x1 = (curcomp->m_bounds.x1 - xoffs) * xscale;
+			curcomp->m_bounds.y0 = (curcomp->m_bounds.y0 - yoffs) * yscale;
+			curcomp->m_bounds.y1 = (curcomp->m_bounds.y1 - yoffs) * yscale;
+		}
 	}
 
 	// allocate an array of element textures for the states
