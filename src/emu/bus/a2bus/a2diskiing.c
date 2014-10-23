@@ -40,7 +40,7 @@ ROM_START( diskiing )
 ROM_END
 
 FLOPPY_FORMATS_MEMBER( a2bus_diskiing_device::floppy_formats )
-	FLOPPY_A216S_FORMAT, FLOPPY_RWTS18_FORMAT
+	FLOPPY_A216S_FORMAT, FLOPPY_RWTS18_FORMAT, FLOPPY_EDD_FORMAT
 FLOPPY_FORMATS_END
 
 //-------------------------------------------------

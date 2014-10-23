@@ -1647,11 +1647,11 @@ void floppy_image_format_t::normalize_times(UINT32 *buffer, int bitlen)
 	}
 }
 
-void floppy_image_format_t::generate_track_from_bitstream(int track, int head, const UINT8 *trackbuf, int track_size, floppy_image *image)
+void floppy_image_format_t::generate_track_from_bitstream(int track, int head, const UINT8 *trackbuf, int track_size, floppy_image *image, int subtrack)
 {
 	// Maximal number of cells which happens when the buffer is all 1
-	image->set_track_size(track, head, track_size+1);
-	UINT32 *dest = image->get_buffer(track, head);
+	image->set_track_size(track, head, track_size+1, subtrack);
+	UINT32 *dest = image->get_buffer(track, head, subtrack);
 	UINT32 *base = dest;
 
 	UINT32 cbit = floppy_image::MG_A;
@@ -1669,8 +1669,8 @@ void floppy_image_format_t::generate_track_from_bitstream(int track, int head, c
 
 	int size = dest - base;
 	normalize_times(base, size);
-	image->set_track_size(track, head, size);
-	image->set_write_splice_position(track, head, 0);
+	image->set_track_size(track, head, size, subtrack);
+	image->set_write_splice_position(track, head, 0, subtrack);
 }
 
 void floppy_image_format_t::generate_track_from_levels(int track, int head, UINT32 *trackbuf, int track_size, int splice_pos, floppy_image *image)
@@ -2166,9 +2166,9 @@ const floppy_image_format_t::desc_e floppy_image_format_t::amiga_22[] = {
 	{ END }
 };
 
-void floppy_image_format_t::generate_bitstream_from_track(int track, int head, int cell_size, UINT8 *trackbuf, int &track_size, floppy_image *image)
+void floppy_image_format_t::generate_bitstream_from_track(int track, int head, int cell_size, UINT8 *trackbuf, int &track_size, floppy_image *image, int subtrack)
 {
-	int tsize = image->get_track_size(track, head);
+	int tsize = image->get_track_size(track, head, subtrack);
 	if(!tsize || tsize == 1) {
 		// Unformatted track
 		track_size = 200000000/cell_size;
@@ -2177,8 +2177,8 @@ void floppy_image_format_t::generate_bitstream_from_track(int track, int head, i
 	}
 
 	// Start at the write splice
-	const UINT32 *tbuf = image->get_buffer(track, head);
-	UINT32 splice = image->get_write_splice_position(track, head);
+	const UINT32 *tbuf = image->get_buffer(track, head, subtrack);
+	UINT32 splice = image->get_write_splice_position(track, head, subtrack);
 	int cur_pos = splice;
 	int cur_entry = 0;
 	while(cur_entry < tsize-1 && (tbuf[cur_entry+1] & floppy_image::TIME_MASK) < cur_pos)
