@@ -3435,7 +3435,8 @@ UINT16 *address_table::subtable_open(offs_t l1index)
 		for (int i=0; i<size; i++)
 			subptr[i] = subentry;
 		m_table[l1index] = newentry;
-		m_subtable[newentry - SUBTABLE_BASE].m_checksum = (subentry + (subentry << 8) + (subentry << 16) + (subentry << 24)) * ((1 << level2_bits())/4);
+		UINT32 subkey = subentry + (subentry << 8) + (subentry << 16) + (subentry << 24); 
+		m_subtable[newentry - SUBTABLE_BASE].m_checksum = subkey * (((1 << level2_bits())/4));
 		subentry = newentry;
 	}
 
