@@ -111,6 +111,7 @@ void wozfdc_device::device_reset()
 	cur_lss.write_position = 0;
 	cur_lss.write_line_active = false;
 	predicted_lss.tm = attotime::never;
+	external_io_select = false;
 }
 
 void wozfdc_device::a3_update_drive_sel()
