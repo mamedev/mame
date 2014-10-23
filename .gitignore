@@ -17,3 +17,5 @@ src/regtests/chdman/temp
 src/regtests/jedutil/output
 /sta
 /*.bat
+/*.sln
+/*.suo
