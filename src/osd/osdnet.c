@@ -105,3 +105,27 @@ int netdev_count()
 {
 	return netdev_list.count();
 }
+
+void osd_list_network_adapters(void)
+{
+	#ifdef USE_NETWORK
+	int num_devs = netdev_list.count();
+
+	if (num_devs == 0)
+	{
+		printf("No network adapters were found\n");
+		return;
+	}
+
+	printf("Available network adapters:\n");
+	const netdev_entry_t *entry = netdev_first();
+	while(entry) {	
+		printf("	%s\n", entry->description);
+		entry = entry->m_next;
+	}
+	
+	#else
+	printf("Network is not supported in this build\n");
+	#endif
+}
+

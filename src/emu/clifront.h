@@ -50,6 +50,7 @@
 #define CLICOMMAND_GETSOFTLIST          "getsoftlist"
 #define CLICOMMAND_VERIFYSOFTLIST       "verifysoftlist"
 #define CLICOMMAND_LIST_MIDI_DEVICES    "listmidi"
+#define CLICOMMAND_LIST_NETWORK_ADAPTERS "listnetwork"
 
 
 //**************************************************************************
@@ -102,6 +103,7 @@ public:
 	void getsoftlist(const char *gamename = "*");
 	void verifysoftlist(const char *gamename = "*");
 	void listmididevices(const char *gamename = "*");
+	void listnetworkadapters(const char *gamename = "*");
 
 private:
 	// internal helpers
