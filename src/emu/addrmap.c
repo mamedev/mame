@@ -540,8 +540,8 @@ void address_map::uplift_submaps(running_machine &machine, device_t &device, dev
 
 				// Remap start and end
 
-				int start_offset = subentry->m_addrstart / entry_bytes;
-				int start_slot = start_offset % slot_count;
+				unsigned int start_offset = subentry->m_addrstart / entry_bytes;
+				unsigned int start_slot = start_offset % slot_count;
 				subentry->m_addrstart = entry->m_addrstart + (start_offset / slot_count) * databytes;
 
 				// Drop the entry if it ends up outside the range
@@ -551,8 +551,8 @@ void address_map::uplift_submaps(running_machine &machine, device_t &device, dev
 					continue;
 				}
 
-				int end_offset = subentry->m_addrend / entry_bytes;
-				int end_slot = end_offset % slot_count;
+				unsigned int end_offset = subentry->m_addrend / entry_bytes;
+				unsigned int end_slot = end_offset % slot_count;
 				subentry->m_addrend = entry->m_addrstart + (end_offset / slot_count) * databytes + databytes - 1;
 
 				// Clip the entry to the end of the range
