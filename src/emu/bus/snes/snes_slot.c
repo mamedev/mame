@@ -1360,7 +1360,10 @@ void base_sns_cart_slot_device::internal_header_logging(UINT8 *ROM, UINT32 len)
 	logerror( "\tSize:          %d megabits [%d]\n", 1 << (ROM[hilo_mode + 0x17] - 7), ROM[hilo_mode + 0x17]);
 	logerror( "\tSRAM:          %d kilobits [%d]\n", ROM[hilo_mode + 0x18] * 8, ROM[hilo_mode + 0x18] );
 	assert(ROM[hilo_mode + 0x19] < ARRAY_LENGTH(countries));
-	logerror( "\tCountry:       %s [%d]\n", countries[ROM[hilo_mode + 0x19]], ROM[hilo_mode + 0x19]);
+	if (ROM[hilo_mode + 0x19] < 0x10)
+		logerror( "\tCountry:       %s [%d]\n", countries[ROM[hilo_mode + 0x19]], ROM[hilo_mode + 0x19]);
+	else
+		logerror( "\tCountry:       Unknown [%d]\n", ROM[hilo_mode + 0x19]);
 	logerror( "\tLicense:       %s [%X]\n", companies[ROM[hilo_mode + 0x1a]], ROM[hilo_mode + 0x1a]);
 	logerror( "\tVersion:       1.%d\n", ROM[hilo_mode + 0x1b]);
 	logerror( "\tInv Checksum:  %X %X\n", ROM[hilo_mode + 0x1d], ROM[hilo_mode + 0x1c]);
