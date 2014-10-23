@@ -1,3 +1,4 @@
+*~
 /*.exe
 /*.ini
 /*.log
@@ -22,3 +23,22 @@ src/regtests/jedutil/output
 mame64
 mess64
 ume64
+mame
+mess
+ume
+castool
+chdman
+floptool
+imgtool
+jedutil
+ldresample
+ldverify
+nltool
+pngcmp
+regrep
+romcmp
+split
+src2html
+srcclean
+testkeys
+unidasm
