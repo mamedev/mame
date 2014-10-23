@@ -238,18 +238,18 @@ void sonson_state::machine_reset()
 static MACHINE_CONFIG_START( sonson, sonson_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809,12000000/6)   /* 2 MHz ??? */
+	MCFG_CPU_ADD("maincpu", M6809, XTAL_12MHz/8)   /* 1.5 MHz */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", sonson_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", M6809,12000000/6)  /* 2 MHz ??? */
+	MCFG_CPU_ADD("audiocpu", M6809, XTAL_12MHz/8)  /* 1.5 MHz */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(sonson_state, irq0_line_hold, 4*60)    /* FIRQs are triggered by the main CPU */
 
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_REFRESH_RATE(57.37)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(sonson_state, screen_update_sonson)
@@ -264,10 +264,10 @@ static MACHINE_CONFIG_START( sonson, sonson_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ay1", AY8910, 12000000/8)
+	MCFG_SOUND_ADD("ay1", AY8910, XTAL_12MHz/8)   /* 1.5 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MCFG_SOUND_ADD("ay2", AY8910, 12000000/8)
+	MCFG_SOUND_ADD("ay2", AY8910, XTAL_12MHz/8)   /* 1.5 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 
