@@ -19,3 +19,6 @@ src/regtests/jedutil/output
 /*.bat
 /*.sln
 /*.suo
+mame64
+mess64
+ume64
