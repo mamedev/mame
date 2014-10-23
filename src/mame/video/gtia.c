@@ -240,12 +240,15 @@ void gtia_device::device_start()
 
 void gtia_device::device_reset()
 {
-	/* reset the GTIA read/write/helper registers */
-	for (int i = 0; i < 32; i++)
-		write(machine().driver_data()->generic_space(), i, 0);
 	memset(&m_r, 0, sizeof(m_r));
 	memset(&m_h, 0, sizeof(m_h));
 	memset(m_color_lookup, 0, sizeof(m_color_lookup));
+
+	m_lumpf1 = 0;
+
+	/* reset the GTIA read/write/helper registers */
+	for (int i = 0; i < 32; i++)
+		write(machine().driver_data()->generic_space(), i, 0);
 
 	if (is_ntsc())
 		m_r.pal = 0xff;
@@ -265,7 +268,6 @@ void gtia_device::device_reset()
 	SETCOL_B(ILL, 0x3e);     /* bright red */
 	SETCOL_B(EOR, 0xff);     /* yellow */
 
-	m_lumpf1 = 0;
 	m_huepm0 = 0;
 	m_huepm1 = 0;
 	m_huepm2 = 0;
