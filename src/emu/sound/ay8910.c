@@ -828,7 +828,7 @@ void ay8910_device::build_mixer_table()
 			build_mosfet_resistor_table(ay8910_mosfet_param, m_res_load[chan], m_env_table[chan]);
 		}
 	}
-	else
+	else if (m_streams == AY8910_NUM_CHANNELS)
 	{
 		for (chan=0; chan < AY8910_NUM_CHANNELS; chan++)
 		{
@@ -840,7 +840,10 @@ void ay8910_device::build_mixer_table()
 	 * The previous implementation added all three channels up instead of averaging them.
 	 * The factor of 3 will force the same levels if normalizing is used.
 	 */
-	build_3D_table(m_res_load[0], m_par, m_par_env, normalize, 3, m_zero_is_off, m_vol3d_table);
+	else
+	{
+		build_3D_table(m_res_load[0], m_par, m_par_env, normalize, 3, m_zero_is_off, m_vol3d_table);
+	}
 }
 
 void ay8910_device::ay8910_statesave()

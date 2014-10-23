@@ -884,6 +884,9 @@ bool osd_poll_midi_channel(osd_midi_device *dev);
 int osd_read_midi_channel(osd_midi_device *dev, UINT8 *pOut);
 void osd_write_midi_channel(osd_midi_device *dev, UINT8 data);
 
+
+void osd_list_network_adapters(void);
+
 /***************************************************************************
     UNCATEGORIZED INTERFACES
 ***************************************************************************/

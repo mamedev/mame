@@ -775,7 +775,7 @@ void upd7220_device::device_timer(emu_timer &timer, device_timer_id id, int para
 
 void upd7220_device::draw_pixel(int x, int y, int xi, UINT16 tile_data)
 {
-	UINT32 addr = ((y * m_pitch * 2) + (x >> 3)) & 0x3ffff;
+	UINT32 addr = ((y * (m_pitch << (m_figs.m_gd ? 0 : 1))) + (x >> 3)) & 0x3ffff;
 	UINT8 data = readbyte(addr);
 	UINT8 new_pixel = (xi & 8 ? tile_data >> 8 : tile_data & 0xff) & (0x80 >> (xi & 7));
 	new_pixel = new_pixel ? (0xff & (0x80 >> (x & 7))) : 0;
@@ -1584,7 +1584,7 @@ void upd7220_device::update_graphics(bitmap_rgb32 &bitmap, const rectangle &clip
 				         Quarth (PC-98xx) doesn't seem to use pitch here and it definitely wants bsy to be /2 to make scrolling to work.
 				         Xevious (PC-98xx) wants the pitch to be fixed at 80, and wants bsy to be /1
 				         Dragon Buster (PC-98xx) contradicts with Xevious with regards of the pitch tho ... */
-				addr = ((sad << 1) & 0x3ffff) + (y * m_pitch * 2);
+				addr = ((sad << 1) & 0x3ffff) + (y * (m_pitch << (im ? 0 : 1)));
 
 				if (!m_display_cb.isnull())
 					draw_graphics_line(bitmap, addr, y + (im ? bsy : (bsy >> 1)), wd);

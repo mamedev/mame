@@ -220,6 +220,12 @@ endif
 # explicitly set the entry point for UNICODE builds
 LDFLAGS += /ENTRY:wmainCRTStartup
 
+ifdef MSVC_BUILD
+ifdef DEBUG
+LDFLAGS += /NODEFAULTLIB:LIBCMT
+endif
+endif
+
 # add some VC++-specific defines
 DEFS += -D_CRT_SECURE_NO_DEPRECATE -D_CRT_NONSTDC_NO_DEPRECATE -DXML_STATIC -DWIN32
 
@@ -417,6 +423,11 @@ OSDOBJS += \
 	$(OSDOBJ)/modules/debugger/qt/debugqtmemorywindow.moc.o \
 	$(OSDOBJ)/modules/debugger/qt/debugqtbreakpointswindow.moc.o
 endif
+
+#-------------------------------------------------
+# WinPCap
+#-------------------------------------------------
+INCPATH += -I$(SRC)/lib/winpcap
 
 #-------------------------------------------------
 # rules for building the libaries
