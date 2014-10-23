@@ -598,7 +598,9 @@ endif
 ifneq (,$(findstring undefined,$(SANITIZE)))
 ifneq (,$(findstring clang,$(CC)))
 # TODO: check if linker is clang++
-CCOMFLAGS += -fno-sanitize=alignment -fno-sanitize=function -fno-sanitize=shift -fno-sanitize=null -fno-sanitize=signed-integer-overflow -fno-sanitize=vptr -fno-sanitize=float-cast-overflow -fno-sanitize=integer-divide-by-zero -fno-sanitize=float-divide-by-zero -fno-sanitize=object-size
+CCOMFLAGS += -fno-sanitize=alignment -fno-sanitize=function -fno-sanitize=shift -fno-sanitize=null  -fno-sanitize=vptr -fno-sanitize=object-size
+# clang takes forever to compile src/emu/cpu/tms57002/tms57002.c when this isn't disabled
+CCOMFLAGS += -fno-sanitize=signed-integer-overflow
 endif
 endif
 endif
