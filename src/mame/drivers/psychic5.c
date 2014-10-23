@@ -655,7 +655,7 @@ static MACHINE_CONFIG_START( psychic5, psychic5_state )
 	MCFG_CPU_PROGRAM_MAP(psychic5_main_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", psychic5_state, psychic5_scanline, "screen", 0, 1)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_12MHz/2)
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_5MHz)
 	MCFG_CPU_PROGRAM_MAP(psychic5_sound_map)
 	MCFG_CPU_IO_MAP(psychic5_soundport_map)
 
