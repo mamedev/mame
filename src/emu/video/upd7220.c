@@ -965,7 +965,7 @@ void upd7220_device::draw_char(int x, int y)
 	int isize,psize;
 	UINT16 tile_data = 0;
 
-	LOG(("uPD7220 char check: %d %d %02x %08x %d %d\n",x,y,m_figs.m_dir,m_ead,m_figs.m_d,m_figs.m_dc));
+	LOG(("uPD7220 char check: %d %d %02x %08x %d %d %02x\n",x,y,m_figs.m_dir,m_ead,m_figs.m_d,m_figs.m_dc,m_figs.m_figure_type));
 
 	isize = m_figs.m_d & 0x3ff;
 	/* Guess: D has presumably upper bits for ysize, QX-10 relies on this (TODO: check this on any real HW) */
@@ -985,8 +985,16 @@ void upd7220_device::draw_char(int x, int y)
 					curpixel++;
 				}
 			}
-			x += x_dir[(m_figs.m_dir + 2) & 7];
-			y += y_dir[(m_figs.m_dir + 2) & 7];
+			if(m_figs.m_figure_type == 2)
+			{
+				x += x_dir[(m_figs.m_dir + 2) & 7];
+				y += y_dir[(m_figs.m_dir + 2) & 7];
+			}
+			else
+			{
+				x += x_dir[(m_figs.m_dir + 1) & 7];
+				y += y_dir[(m_figs.m_dir + 1) & 7];
+			}
 		}
 	}
 
@@ -1332,7 +1340,7 @@ void upd7220_device::process_fifo()
 		break;
 
 	case COMMAND_GCHRD: /* graphics character draw and area filling start */
-		if(m_figs.m_figure_type == 2)
+		if((m_figs.m_figure_type & 0xf) == 2)
 			draw_char(((m_ead % eff_pitch) << 4) | (m_dad & 0xf),(m_ead / eff_pitch));
 		else
 			logerror("uPD7220 '%s' Unimplemented command GCHRD %02x\n", tag(),m_figs.m_figure_type);
@@ -1350,16 +1358,19 @@ void upd7220_device::process_fifo()
 		break;
 
 	case COMMAND_CURD: /* cursor address read */
+	{
+		UINT16 dad = 1 << m_dad;
 		fifo_set_direction(FIFO_READ);
 
 		queue(m_ead & 0xff, 0);
 		queue((m_ead >> 8) & 0xff, 0);
 		queue(m_ead >> 16, 0);
-		queue(m_dad & 0xff, 0);
-		queue(m_dad >> 8, 0);
+		queue(dad & 0xff, 0);
+		queue(dad >> 8, 0);
 
 		m_sr |= UPD7220_SR_DATA_READY;
 		break;
+	}
 
 	case COMMAND_LPRD: /* light pen address read */
 		fifo_set_direction(FIFO_READ);
@@ -1530,7 +1541,7 @@ void upd7220_device::update_text(bitmap_rgb32 &bitmap, const rectangle &cliprect
 			addr = sad + (y * m_pitch);
 
 			if (!m_draw_text_cb.isnull())
-				m_draw_text_cb(bitmap, addr, y, wd, m_pitch, m_lr, m_dc, m_ead);
+				m_draw_text_cb(bitmap, addr, (y * m_lr), wd, m_pitch, m_lr, m_dc, m_ead);
 		}
 
 		sy = y + 1;
@@ -1601,7 +1612,7 @@ void upd7220_device::update_graphics(bitmap_rgb32 &bitmap, const rectangle &clip
 					addr = (sad & 0x3ffff) + ((y / m_lr) * m_pitch);
 
 					if (!m_draw_text_cb.isnull())
-						m_draw_text_cb(bitmap, addr, (y + tsy) / m_lr, wd, m_pitch, m_lr, m_dc, m_ead);
+						m_draw_text_cb(bitmap, addr, y + tsy, wd, m_pitch, m_lr, m_dc, m_ead);
 				}
 			}
 		}

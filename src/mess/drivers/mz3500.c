@@ -215,7 +215,7 @@ UPD7220_DRAW_TEXT_LINE_MEMBER( mz3500_state::hgdc_draw_text )
 				}
 
 				res_x = x * 8 + xi;
-				res_y = y * lr + yi;
+				res_y = y + yi;
 
 				if(pen != -1)
 				{

@@ -79,7 +79,7 @@ UPD7220_DRAW_TEXT_LINE_MEMBER( vt240_state::hgdc_draw_text )
 				if(yi >= 8) { pen = 0; }
 
 				res_x = x * 8 + xi;
-				res_y = y * lr + yi;
+				res_y = y + yi;
 
 				if(res_x > screen_max_x || res_y > screen_max_y)
 					continue;

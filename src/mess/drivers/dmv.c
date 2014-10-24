@@ -314,7 +314,7 @@ UPD7220_DRAW_TEXT_LINE_MEMBER( dmv_state::hgdc_draw_text )
 				int pen = (tile_data >> xi) & 1 ? 1 : 0;
 
 				res_x = x * 8 + xi;
-				res_y = y * lr + yi;
+				res_y = y + yi;
 
 				if(!machine().first_screen()->visible_area().contains(res_x, res_y))
 					continue;
