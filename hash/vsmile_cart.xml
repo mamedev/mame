@@ -7,21 +7,23 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 
 <!--
 
-- Known V.Smile games (thanks to Team Europe and Cowering)
+- Known V.Smile Edutainment Smartridges (thanks to Cowering and Team Europe)
 
 
 V.Smile Motion:               80-08****  (Smartridges are orange)
 V.Smile Smartbook Software:   80-089***  (Smartridges are red)
 V.Smile:                      80-09****  (Smartridges are purple, some are gray because of plastic defects)
+V.Smile Baby                  80-099***  (Smartridges are yellow, incompatible with TV based V.Smile consoles) 
 
 Addons (w/ yellow Smartridges)
-V.Smile Smart Keyboard    80-091440 (US)
-V.Smile Smart Keyboard    80-091443 (UK)
-V.Smile PC Pal            80-03600 (US)
-V.Smile Art Studio        80-67000 (US)
-V.Smile Art Studio        80-67003 (UK)
-V.Smile Jamming Gym Class 80-91320 (US)
-V.Smile Dance'n'Learn     80-91323 (UK)
+V.Smile Smart Keyboard    80-091440(US)
+V.Smile Smart Keyboard    80-091443(UK)
+V.Smile PC Pal            80-03600(US)
+V.Smile Art Studio        80-67000(US)
+V.Smile Art Studio        80-67003(UK)
+V.Smile Jamming Gym Class 80-91320(US)
+V.Smile Dance'n'Learn     80-91323(UK)
+V.Smile Defi Gym          80-91325(GE) 
 
 - Not compatible with V.Smile games, left as documentation
 V.Flash (V.Smile Pro):        80-093***
@@ -30,93 +32,135 @@ V.Reader:                     80-28****
 
 Language:
 ********0 = US
-********1 =
+********1 = Italy
 ********2 = Netherlands
 ********3 = UK
 ********4 = Germany
 ********5 = France
+********6 = 
 ********7 = Spain
 
 
 
 80-084000(US)   | Action Mania
-80-084004(GER)  | Sportskanone
-80-084005(FRA)  | Sporti Folies
+80-084004(GE)   | Sportskanone
+80-084005(FR)   | Sporti Folies
 80-084020(US)   | Dora's Fix It Adventure
+80-084022(NL)   | Dora's Reparatie Avontuur
 80-084023(UK)   | Dora's Fix-It Adventure
-80-084025(FRA)  | Les Adventures De Dora Apprentie Mecano
-80-084024(GER)  | Doras Reparatur-Abenteuer
-80-084040(US)   | Scooby-Doo! - Funland Frenzy
+80-084025(FR)   | Les Adventures De Dora Apprentie Mecano
+80-084024(GE)   | Doras Reparatur-Abenteuer
+80-084040(US)   | Scooby-Doo! - Funland Frenzy (is V.Motion)
 80-084043(UK)   | Scooby-Doo! - Funland Frenzy
-80-084045(FRA)  | Scooby-Doo - Panique A Funland
+80-084044(US)   | Scooby-Doo! - Im Lernpark
+80-084045(FR)   | Scooby-Doo - Panique A Funland
 80-084060(US)   | Thomas and Friends - Engines Working Together
 80-084063(UK)   | Thomas and Friends - Engines Working Together
-80-084064(GER)  | Thomas - Freunde halten zusammen
+80-084064(GE)   | Thomas - Freunde halten zusammen
 80-084080(US)   | Wall-E
 80-084083(UK)   | Wall-E
-80-084084(GER)  | Wall-E
-80-084085(FRA)  | Wall-E
-80-084087(SPA)  | Wall-E
+80-084084(GE)   | Wall-E
+80-084085(FR)   | Wall-E
+80-084087(SP)   | Wall-E
 80-084100(US)   | Wonder Pets - Save the Animals!
 80-084103(UK)   | Wonder Pets - Save the Animals!
-80-084120(US)   | Kung Fu Panda
-80-084124(GER)  | Kung Fu Panda - Der Weg des Panda
-80-084125(FRA)  | Kung Fu Panda - La mission de Po
+80-084120(US)   | Kung Fu Panda - Path of the Panda
+80-084123(UK)   | Kung Fu Panda - Path of the Panda
+80-084124(GE)   | Kung Fu Panda - Der Weg des Panda
+80-084125(FR)   | Kung Fu Panda - La mission de Po
 80-084140(US)   | Spidey & Friends
-80-084144(GER)  | Spider-Man & Freunde - Geheime Missionen
+80-084144(GE)   | Spider-Man & Freunde - Geheime Missionen
+-
 80-084160(US)   | Little Einsteins
-80-084164(GER)  | Kleine Einsteins
+80-084164(GE)   | Kleine Einsteins
+80-084167(SP)   | Little Einsteins
+-
 80-084180(US)   | Mickey Mouse Clubhouse
-80-084184(GER)  | Micky Maus Wunderhaus
+80-084184(GE)   | Micky Maus Wunderhaus
+-
 80-084200(US)   | Nascar Academy - Race Car Superstar
+-
 80-084220(US)   | Snow Park Challenge
-80-084224(GER)  | Wintersport
+80-084224(GE)   | Wintersport
+-
 80-084240(US)   | Ni Hao Kai Lan
+-
 80-084260(US)   | My Pet Puppy (unreleased??)
 80-084263(UK)   | My Pet Puppy
-80-084264(GER)  | Mein erster Hund
+80-084264(GE)   | Mein erster Hund
+80-084267(SP)   | Dakota y su mascota
+-
 80-084280(US)   | Wild Waves
+80-084285(FR)   | Martin le Dauphin
+-
 80-084300(US)   | Soccer Challenge
-80-084304(GER)  | Fußball Meisterschaft
-80-084305(FRE)  | Football Challenge
+80-084304(GE)   | Fußball Meisterschaft
+80-084305(FR)   | Football Challenge
+-
 80-084320(US)   | Disney Fairies: Tinker Bell
 80-084323(UK)   | TinkerBell
-80-084324(GER)  | TinkerBell
-80-084325(FRE)  | La fée Clochette 
+80-084324(GE)   | TinkerBell
+80-084325(FR)   | La fée Clochette 
+-
 80-084340(US)   | Up!
-80-084344(GER)  | Oben
-80-084345(FRE)  | La-Haut
+80-084344(GE)   | Oben
+80-084342(NL)   | Up!  (with motion?)
+80-084345(FR)   | La-Haut
+-
 80-084360(US)   | Handy Manny
 80-084363(UK)   | Handy Manny
-80-084364(GER)  | Meister Manny's Werkzeugkiste
+80-084364(GE)   | Meister Manny's Werkzeugkiste
+80-084365(FR)   | Manny Et Ses Outils
+80-084367(SP)   | Manny Manitas 
+-
 80-084380(US)   | Winnie the Pooh - The Honey Hunt
 80-084383(UK)   | Winnie the Pooh - The Honey Hunt
-80-084384(GER)  | Winnie Puuh - Die Honigjagd
+         (ITA)  | Winnie the Pooh - e la caccia al miele
+80-084384(GE)   | Winnie Puuh - Die Honigjagd
+80-084385(FR)   | Winnie Rourson - La Chasse au miel de Winnie
+80-084387(SP)   | Winnie the Pooh - En busca de la miel
+-
 80-084400(US)   | Cars - Rev it up in Radiator Springs
 80-084403(UK)   | Cars - Rev it up in Radiator Springs
-80-084404(GER)  | Cars - Vollgas in Radiator Springs
+80-084404(GE)   | Cars - Vollgas in Radiator Springs
+80-084407(SP)   | Cars - Acelera el Motor en Radiador Springs
+-
 80-084420(US)   | Toy Story 3
-80-084423(US)   | Toy Story 3
-80-084424(GER)  | Toy Story 3
-80-084440(US)   | Monsters vs. Aliens
-80-084444(GER)  | Monsters vs. Aliens
+80-084423(UK)   | Toy Story 3
+80-084424(GE)   | Toy Story 3
+-
+80-084440(US)   | Monsters vs. Aliens  (Actually a v.motion cart)
+80-084444(GE)   | Monsters vs. Aliens
 80-084460(US)   | Noddy (unreleased??)
-80-084467(SPA)  | Noddy - Detective por un Dia
+80-084467(SP)   | Noddy - Detective por un Dia
+-
 80-084480(US)   | The Princess and the Frog
 80-084483(UK)   | The Princess and the Frog
-80-084484(GER)  | Küss den Frosch
+80-084484(GE)   | Küss den Frosch
+80-084485(FR)   | La Princesse Et La Grenouille
+-
 80-084500(US)   | Shrek 4
-80-084504(GER)  | Für immer Shrek
+80-084504(GE)   | Für immer Shrek
+80-084505(FR)   | Shrek 4 - Il Etait une Fin
+-
 80-084520(US)   | <Unknown>
+-
 80-084540(US)   | Super Why to the Rescue! The Beach Day Mystery
+-
 80-084560(US)   | <Unknown>
+-
 80-084580(US)   | Cars 2
+80-084584(GE)   | Cars 2
 80-084583(UK)   | Cars 2
+-
 80-084600(US)   | <Unknown> would be Cinderella - Cinderella's Magic Wishes
 80-084603(UK)   | Cinderella - Cinderella's Magic Wishes
-80-084604(GER)  | Cinderella - Lernen im Märchenland
-80-084624(GER)  | Findet Nemo - Nemos Unterwasserabenteuer
-
+80-084604(GE)   | Cinderella - Lernen im Märchenland
+-
+80-084620(US)   | <Unknown> 
+80-084624(GE)   | Findet Nemo - Nemos Unterwasserabenteuer
+80-084644(GE)   | Spongebob Schwammkopf - Der Tag des Schwamms
+80-084647(SP)   | Bob Epsonja - Un dia en la vida de una esponja
 
 80-089000(US)   | Spider-Man &amp; Friends Where is Hulk?
 80-089020(US)   | Toy Story 2
@@ -124,115 +168,236 @@ Language:
 80-089060(US)   | Scooby-Doo! - A Night of Fright is no Delight
 
 80-090000(US)   | Up
-80-090000(GER)  | Oben
+80-090004(GE)   | Oben
+-
 80-090020(US)   | Handy Manny
-80-090024(GER)  | Meister Manny's Werkzeugkiste
+80-090024(GE)   | Meister Manny's Werkzeugkiste
+80-090025(FR)   | Manny Et Ses Outils
+-
 80-090040(US)   | Wow Wow Wubbzy
-80-090144(GER)  | Mein erster Hund
-80-090164(GER)  | Monsters vs. Aliens
+80-090144(GE)   | Mein erster Hund
+80-090145(FR)   | Mon Toutou Tout Fou!
+-
+80-090160(US)   | <unknown> Should be Monsters vs. Aliens #80-084440
+80-090164(GE)   | Monsters vs. Aliens
+80-090165(FR)   | Monsters Contre Aliens
+-
+80-090180(US)   | <Unknown>
 80-090183(UK)   | Wonder Pets! - Save the Animals
-80-090224(GER)  | Dolphis Wasserabenteuer
+-
+80-090200(US)   | <Unknown>
+-
+80-090220(US)   | <Unknown>
+80-090224(GE)   | Dolphis Wasserabenteuer
 80-090260(US)   | Disney Fairies: Tinker Bell
 
 80-092000(US)   | Alphabet Park Adventure (Red Haired Girl Version)
 80-092000(US)   | Alphabet Park Adventure (Blond Haired Girl Version)
-80-092004(GER)  | Abenteuer im ABC Park
+80-092004(GE)   | Abenteuer im ABC Park
+80-092005(FR)   | ABC Land Aventure
+80-092007(SP)   | Aventuras en el Parque Alfabeto 
+-
 80-092020(US)   | The Adventures of Little Red Riding Hood
-80-092024(GER)  | Entdecke die Welt von Rotkäppchen
+80-092024(GE)   | Entdecke die Welt von Rotkäppchen
+-
 80-092060(US)   | Winnie The Pooh: The Honey Hunt
-80-092064(GER)  | Winnie Puuh - Die Honigjagd
+80-092064(GE)   | My Friends Tigger and Pooh - Die Honigjagd
+-
 80-092080(US)   | Mickey Mouse - Mickey's Magical Adventures
-80-092087(SPA)  | Mickey - La Aventura Magica de Mickey
-80-092084(GER)  | Micky - Mickys magisches Abenteuer
+         (ITA)  | Topolino - Le Magiche Avventure di Topolino
+80-092084(GE)   | Micky - Mickys magisches Abenteuer
+80-092085(FR)   | Mickey - Mickey a la recherche de Pluto
+80-092087(SP)   | Mickey - La Aventura Magica de Mickey
+-
 80-092100(US)   | The Lion King: Simba's Big Adventure
-80-092104(GER)  | Der König der Löwen - Simbas großes Abenteuer
+80-092104(GE)   | Der König der Löwen - Simbas großes Abenteuer
+-
 80-092120(US)   | The Little Mermaid - Ariel's Majestic Journey
-80-092124(GER)  | Arielle die Meerjungfrau - Arielles aufregendes Abenteuer
-80-092127(SPA)  | La Sirenita - El Vieje Fantástico de Ariel
+80-092124(GE)   | Arielle die Meerjungfrau - Arielles aufregendes Abenteuer
+80-092125(FR)   | La Petite Sirene - Ariel devient une princesse
+80-092127(SP)   | La Sirenita - El Vieje Fantástico de Ariel
+-
 80-092140(US)   | Spider-Man & Friends - Secret Missions
-80-092144(GER)  | Spider-Man & Freunde - Geheime Missionen
+80-092144(GE)   | Spider-Man & Freunde - Geheime Missionen
+-
 80-092160(US)   | Scooby-Doo! - Funland Frenzy
 80-092163(UK)   | Scooby-Doo! - Funland Frenzy
 80-092163-293(UK)   | Scooby-Doo! - Funland Frenzy (ALT)
-80-092167(SPA)  | Scooby-Doo - Mysterio En El Parque
+80-092167(SP)   | Scooby-Doo - Mysterio En El Parque
+-
 80-092180(US)   | Care Bears - A Lesson in Caring
 80-092200(US)   | Aladdin - Aladdin's Wonders of the World
-80-092207(SPA)  | Aladdin - El Maravilloso Mundo de Aladdin
+80-092204(GE)   | Aladdin - Aladdins Welt der Wunder
+80-092207(SP)   | Aladdin - El Maravilloso Mundo de Aladdin
 80-092220(US)   | Toy Story 2
+80-092224(GE)   | Toy Story 2 - Woodys Spannende Rettung
+         (ITA)  | Toy Story 2 - Operazione: Salvataggio di Woody! 
+80-092225(FR)   | Toy Story 2 - Buzz à la Rescousse
+-
 80-092240(US)   | Cinderella - Cinderella's Magic Wishes
 80-092243(UK)   | Cinderella - Cinderella's Magic Wishes
-80-092244(GER)  | Cinderella - Lernen im Märchenland | 2007
+80-092243-103(UK)   | Cinderella - Cinderella's Magic Wishes | 2007
+         (ITA)  | Cenerentala - I desideri magici di Cenerentala
+80-092244(GE)   | Cinderella - Lernen im Märchenland | 2005
+80-092244-104(GE)   | Cinderella - Lernen im Märchenland | 2007
+80-092245-105(FR)   | Cendrillon - Le rêve enchanté de Cendrillon
+-
 80-092260(US)   | Elmo's World - Elmo's Big Discoveries
-80-092264(GER)  | Elmo's großes Abenteuer
-80-092265(FRA)  | Le Monde d'ELMO - Les Grandes Decouvertes D'Elmo
+80-092264(GE)   | Elmo's großes Abenteuer
+80-092265(FR)   | Le Monde d'ELMO - Les Grandes Decouvertes D'Elmo
+-
 80-092280(US)   | Dora The Explorer
+80-092284(GE)   | Dora - Doras Reparatur-Abenteuer
+80-092285(FR)   | Dora L'Exploratrice - Les aventures de Dora Apprentie Mecano
+-
 80-092300(US)   | Bob the Builder: Bob's Busy Day
-80-092305(FRA)  | Bob Bricoleur: Les P'tits Chantiers de Bob
-80-092304(GER)  | Bob der Baumeister - Achtung Baustelle
+80-092305(FR)   | Bob Bricoleur: Les P'tits Chantiers de Bob
+80-092304(GE)   | Bob der Baumeister - Achtung Baustelle
+80-092304-104(GE)   | Bob der Baumeister - Bobs Spannender Arbeitstag
+-
 80-092320(US)   | The Wiggles - It's Wiggle Time!
+-
 80-092340(US)   | Thomas The Tank: Engines Working Together
 80-092340-101(US)   | Thomas The Tank: Engines Working Together (ALT)
 80-092343(UK)   | Thomas and Friends: Engines Working Together
+80-092344(GE)   | Thomas and Seine Freunde - Freunde Halten Zusammen
+80-092347(SP)   | Thomas and Friends: Juego de Aprendizaje
+-
 80-092360(US)   | Zayzoo My Alien Classmate
+80-092363(UK)   | Zayzoo My Alien Classmate
+80-092365(FR)   | Zezou : Notre ami venu d'ailleurs
 80-092360-101(US)   | Zayzoo - An Earth Adventure
+80-092363-101(UK)   | Zayzoo - An Earth Adventure
+80-092364(GE)   | Zayzoo Lernall
+-
 80-092380(US)   | Barney - The Land of Make Believe
-80-092384(GER)  | Barney - Erlebnis-Reise
+80-092384(GE)   | Barney - Erlebnis-Reise
+-
 80-092400(US)   | Blue's Clues Collection Day
+-
 80-092420(US)   | Finding Nemo
-80-092424(GER)  | Findet Nemo
+80-092424(GE)   | Findet Nemo
+-
 80-092440(US)   | Spongebob Squarepants: A Day In The Life of A Sponge
 80-092443(UK)   | Spongebob Squarepants: A Day In The Life of A Sponge
+80-092444(GE)   | Spongebob Schwammkopf - Der Tag des Schwamms
+-
 80-092460(US)   | Sesame Street
+80-092464(GE)   | Sesame Street : Ernie and Berts Fantastisches Abenteuer
+-
 80-092480(US)   | Batman: Gotham City Rescue
+80-092485(FR)   | Batman: Panique a Gotham City
+80-092484(GE)   | Batman - Rettung von Gotham City
+80-09248?(ITA)  | Batman: Il Salvataggio di Gotham City
+-
 80-092500(US)   | Whiz Kid Wheels
+80-092503(UK)   | Whiz Kid Wheels
+80-092504(GE)   | Flitzers Schlaue Staedtetour (diff color!?)
+80-092505(FR)   | Mission Pilote
+80-092507(SP)   | Conduccion Divertida
+-
 80-092520(US)   | Spider-Man & Friends Doc Ock's Challenge
+         (ITA)  | Spider-Man la sfida del dottor Ock
+80-092524(GE)   | Spider-Man & Freunde Wettkampf im Space Labor
+-
 80-092540(US)   | Noddy - Detective for a Day
-80-092540(UK)   | Noddy - Detective for a Day
-80-092540-103(UK)   | Noddy - Detective for a Day (ALT)
-80-092544(GER)  | Noddy
-80-092564(GER)  | 101 Dalmatiner
+80-092543(UK)   | Noddy - Detective for a Day
+80-092543-103(UK)   | Noddy - Detective for a Day (ALT)
+80-092544(GE)   | Noddy
+80-092564(GE)   | 101 Dalmatiner
+-
 80-092580(US)   | Backyardigans - Viking Voyage
 80-092600(US)   | Shrek - Dragon's Tale
+80-092604(GE)   | Shrek - Die Geschichte des Drachen
 80-092620(US)   | Lil' Bratz - Friends, Fashion and Fun
+-
 80-092640(US)   | Superman - The Greatest Hero
-80-092643(US)   | Superman - The Greatest Hero
+80-092643(UK)   | Superman - The Greatest Hero
+-
 80-092660(US)   | Cars: Rev It Up In Radiator Springs
 80-092662(NL)   | Cars - Spektakel in Radiator Springs
-80-092666(SPA)  | Cars: Acelera El Motor En Radiador Springs
-80-092664(GER)  | Cars
+80-092664(GE)   | Cars: Vollgas in Radiator Springs
+         (ITA)  | Cars: Motori Ruggenti
+80-092665(GE)   | Cars: Quatre Roues
+80-092667(SP)   | Cars: Acelera El Motor En Radiador Springs
+-
 80-092820(US)   | Soccer Challenge
 80-092823(UK)   | Football Challenge
-80-092824(GER)  | Fußball Schule
+80-092824(GE)   | Fußball Schule
+80-092831(IT)   | Football Club
+-
 80-092840(US)   | Wall-E
 80-092843(UK)   | Wall-E
+80-092844(GE)   | Wall-E
+         (ITA)  | Wall-E
 80-092860(US)   | Shrek the Third: Arthur's School Day Adventure
 80-092863(UK)   | Shrek the Third: Arthur's School Day Adventure
-80-092880(US)   | Ratatouille
+         (ITA)  | Shrek Terzo L'Advventura Do Artu in un Giorno do Scuola
+80-092864(GE)   | Shrek der Dritte - Ein Spannender Schultag
+80-092865(FR)   | Shrek Troisieme : L'aventure d'Arthur
+80-092880(US)   | Ratatouille - Remy's New Recipes
 80-092882(NL)   | Ratatouille
-80-092884(GER)  | Ratatouille - Remys neue Rezepte
-80-092885(FRA)  | Ratatouille - Les nouvelles recettes de Rémy
+80-092883(UK)   | Ratatouille - Remy's New Recipes
+80-092884(GE)   | Ratatouille - Remys neue Rezepte
+80-092884-104(GE)   | Ratatouille - Remys neue Rezepte (ALT)
+80-092885(FR)   | Ratatouille - Les nouvelles recettes de Rémy
 80-092900(US)   | Go Diego Go - Save the Animal Familes!
 80-092920(US)   | Cranium - Partyland Park
+
+80-092944(GE)   | Micky Maus Wunderhaus
+         (ITA)  | La Casa di Topolino
+80-092945(FR)   | La Maison de Mickey
 80-092960(US)   | Kung Fu Panda - Path of the Panda
+80-092964(GE)   | Kung Fu Panda - Der Weg des Panda
 80-092980(US)   | Little Einsteins
+80-092984(GE)   | Kleine Einsteins
+
+
+V.Flash
 
 80-093000(US)   | The Crystal Ball Adventure
 80-093020(US)   | The Incredibles - Mission Incredibles
-80-093040(US)   | Spongebob - Idea Sponge
-80-093044(GER)  | SpongeBob - Ein Schwamm voller Ideen
+80-093040(US)   | SpongeBob - Idea Sponge
+80-093044(GE)   | SpongeBob - Ein Schwamm voller Ideen
 80-093060(US)   | The Amazing Spider-Man - Countdown to Doom
 80-093080(US)   | Scooby-Doo! - Ancient Adventure
 80-093100(US)   | Cars - In The Fast Lane
-80-093104(GER)  | Cars - Auf der Überholspur
+80-093104(GE)   | Cars - Auf der Überholspur
+80-093105(FR)   | Cars - A Fond la Caisse!
 80-093120(US)   | Wacky Race on Jumpin' Bean Island
-80-093124(GER)  | Das verrückte Rennen auf der Hüpf-Bohnen-Insel
+80-093124(GE)   | Das verrückte Rennen auf der Hüpf-Bohnen-Insel
 80-093140(US)   | Shrek 3
-80-093144(GER)  | Shrek - Der Dritte
+80-093144(GE)   | Shrek - Der Dritte
 80-093160(US)   | Bratz - The Secret Necklace
 80-093180(US)   | <Unknown>
 80-093200(US)   | Ratatouille (according to vtech site, can't confirm)
-80-093204(GER)  | Multisports
+80-093204(GE)   | Multisports
 80-093220(US)   | National Geographic Kids
+
+
+V.Baby
+
+80-099000(US)   | Learn and Discover Home (white background on title) (the packin)
+80-099000(US)   | Learn and Discover Home (green background on title) (standalone)
+80-099020(US)   | Pooh's Hundred Acre Wood Adventure
+80-099040(US)   | Baby Einstein - World of Discoveries
+80-099040(US)   | Baby Einstein - World of Discoveries (no # on front label)
+80-099060(US)   | A Day On The Farm
+80-099080(US)   | <Unknown>
+80-099100(US)   | Noah's Ark Animal Adventure
+80-099120(US)   | Barney
+80-099140(US)   | Teletubbies
+80-099160(US)   | Baby Mickey
+80-099180(US)   |Bailey Goes To Town (Included Bailey Plush Bear Controller)
+80-099200(US)   | Mother Goose
+80-099220(US)   | Care Bears Play Day
+80-099240(US)   | Backyardigans: Big Backyard Adventures
+
+80-220000(US)   | The World of Eric Carle - The Very Hungry Caterpillar
+80-107100-001(US) | Meet Me at the Zoo (Orange, V.Baby V2 packin)
+
+
+V.Reader
 
 80-280000(US)   | Animated E-Book Cartridge - Shrek's Vacation
 80-280100(US)   | Animated E-Book Cartridge - Toy Story 3
@@ -262,7 +427,7 @@ Language:
 -->
 
 	<software name="aladdin">
-		<description>Aladdin - Aladdins Welt der Wunder (Ger)</description>
+		<description>Aladdin - Aladdins Welt der Wunder (GE) </description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
 		<part name="cart" interface="vsmile_cart">
@@ -273,7 +438,7 @@ Language:
 	</software>
 
 	<software name="ariel">
-		<description>Arielle Die Meerjungfrau - Arielles aufregendes Abenteuer (Ger)</description>
+		<description>Arielle Die Meerjungfrau - Arielles aufregendes Abenteuer (GE) </description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
 		<part name="cart" interface="vsmile_cart">
@@ -284,7 +449,7 @@ Language:
 	</software>
 
 	<software name="bobbuild">
-		<description>Bob der Baumeister - Bobs spannender Arbeitstag (Ger)</description>
+		<description>Bob der Baumeister - Bobs spannender Arbeitstag (GE) </description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
 		<part name="cart" interface="vsmile_cart">
@@ -317,7 +482,7 @@ Language:
 	</software>
 
 	<software name="footschl">
-		<description>Fußball Schule (Ger)</description>
+		<description>Fußball Schule (GE) </description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
 		<part name="cart" interface="vsmile_cart">
@@ -328,7 +493,7 @@ Language:
 	</software>
 
 	<software name="fred">
-		<description>Freds Zahlen Rallye (Ger)</description>
+		<description>Freds Zahlen Rallye (GE) </description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
 		<part name="cart" interface="vsmile_cart">
@@ -339,7 +504,7 @@ Language:
 	</software>
 
 	<software name="manny">
-		<description>Meister Manny's Werkzeugkiste (Ger)</description>
+		<description>Meister Manny's Werkzeugkiste (GE) </description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
 		<part name="cart" interface="vsmile_cart">
@@ -350,7 +515,7 @@ Language:
 	</software>
 
 	<software name="monstaln">
-		<description>Monsters vs Aliens (Ger)</description>
+		<description>Monsters vs Aliens (GE) </description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
 		<part name="cart" interface="vsmile_cart">
@@ -361,7 +526,7 @@ Language:
 	</software>
 
 	<software name="oben">
-		<description>Oben (Ger)</description>
+		<description>Oben (GE) </description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
 		<part name="cart" interface="vsmile_cart">
@@ -372,7 +537,7 @@ Language:
 	</software>
 
 	<software name="ratat">
-		<description>Ratatouille - Remys Neue Rezepte (Ger)</description>
+		<description>Ratatouille - Remys Neue Rezepte (GE) </description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
 		<part name="cart" interface="vsmile_cart">
@@ -383,7 +548,7 @@ Language:
 	</software>
 
 	<software name="shrek">
-		<description>Shrek - Die Geschichte des Drache (Ger)</description>
+		<description>Shrek - Die Geschichte des Drache (GE) </description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
 		<part name="cart" interface="vsmile_cart">
@@ -405,7 +570,7 @@ Language:
 	</software>
 
 	<software name="spongeb1" cloneof="spongeb">
-		<description>Spongebob Schwammkopf - Der Tag des Schwamms (Ger)</description>
+		<description>Spongebob Schwammkopf - Der Tag des Schwamms (GE) </description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
 		<part name="cart" interface="vsmile_cart">
@@ -416,7 +581,7 @@ Language:
 	</software>
 
 	<software name="superman">
-		<description>Superman - Der Superheld (Ger)</description>
+		<description>Superman - Der Superheld (GE) </description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
 		<part name="cart" interface="vsmile_cart">
@@ -427,7 +592,7 @@ Language:
 	</software>
 
 	<software name="thomas">
-		<description>Thomas &amp; seine Freunde - Freunde halten zusammen (Ger)</description>
+		<description>Thomas &amp; seine Freunde - Freunde halten zusammen (GE) </description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
 		<part name="cart" interface="vsmile_cart">
@@ -438,7 +603,7 @@ Language:
 	</software>
 
 	<software name="toystor2">
-		<description>Toy Story 2 - Woodys Spannende Rettung (Ger)</description>
+		<description>Toy Story 2 - Woodys Spannende Rettung (GE) </description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
 		<part name="cart" interface="vsmile_cart">
@@ -449,7 +614,7 @@ Language:
 	</software>
 
 	<software name="walle">
-		<description>Wall-E (Ger)</description>
+		<description>Wall-E (GE) </description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
 		<part name="cart" interface="vsmile_cart">
@@ -460,7 +625,7 @@ Language:
 	</software>
 
 	<software name="pooh">
-		<description>Winnie Puhh - Die Honigjagd (Ger)</description>
+		<description>Winnie Puhh - Die Honigjagd (GE) </description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="vsmile_cart">
