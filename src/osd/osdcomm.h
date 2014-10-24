@@ -36,7 +36,11 @@
 #define ATTR_MALLOC             __attribute__((malloc))
 #define ATTR_PURE               __attribute__((pure))
 #define ATTR_CONST              __attribute__((const))
+#ifdef __LIBRETRO__
+#define ATTR_FORCE_INLINE		
+#else
 #define ATTR_FORCE_INLINE       __attribute__((always_inline))
+#endif
 #define ATTR_NONNULL(...)       __attribute__((nonnull(__VA_ARGS__)))
 #define ATTR_DEPRECATED         __attribute__((deprecated))
 /* not supported in GCC prior to 4.4.x */
