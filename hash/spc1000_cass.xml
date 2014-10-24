@@ -76,11 +76,11 @@
 		</part>
 	</software>
 
-<!-- LOAD twice -->
 	<software name="astbelt">
 		<description>Asteroid Belt</description>
 		<year>1985</year>
 		<publisher>Static Soft</publisher>
+		<info name="usage" value="LOAD twice" />
 		<part name="cass" interface="spc1000_cass">
 			<dataarea name="cass" size="196633">
 				<rom name="asteroid.tap" size="196633" crc="cd1d84d0" sha1="6279aead257e1abbaf1bfd545d827c2a8bfe48b7" offset="0" />
@@ -88,11 +88,11 @@
 		</part>
 	</software>
 
-<!-- LOAD twice -->
 	<software name="astbelta" cloneof="astbelt">
 		<description>Asteroid Belt (Alt)</description>
 		<year>1985</year>
 		<publisher>Static Soft</publisher>
+		<info name="usage" value="LOAD twice" />
 		<part name="cass" interface="spc1000_cass">
 			<dataarea name="cass" size="132276">
 				<rom name="asteroid belt.tap" size="132276" crc="9aefdaff" sha1="2274393bb92378468606dceb6193c28b79fc1f7a" offset="0" />
@@ -230,11 +230,11 @@
 		</part>
 	</software>
 
-<!-- LOAD twice -->
 	<software name="crshcirc">
 		<description>Crush Circles</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="LOAD twice" />
 		<part name="cass" interface="spc1000_cass">
 			<dataarea name="cass" size="119930">
 				<rom name="crushcircle-mayhouse.tap" size="119930" crc="ebcc8d56" sha1="a1659504857500f170f8347e47d899ae94e58808" offset="0" />
@@ -266,12 +266,12 @@
 		</part>
 	</software>
 
-<!-- LOAD three times -->
 	<software name="deungsan">
 		<description>Deungsan Peoleideu</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="alt_title" value="등산퍼레이드" />
+		<info name="usage" value="LOAD three times" />
 		<part name="cass" interface="spc1000_cass">
 			<dataarea name="cass" size="595926">
 				<rom name="mtclimbing.tap" size="595926" crc="67490b71" sha1="5ebfcf6537bf1956cec508baea2c25a53fe38018" offset="0" />
@@ -279,11 +279,11 @@
 		</part>
 	</software>
 
-<!-- LOAD twice -->
 	<software name="dex">
 		<description>DEX</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="LOAD twice" />
 		<part name="cass" interface="spc1000_cass">
 			<dataarea name="cass" size="315377">
 				<rom name="dex.tap" size="315377" crc="2c12b89a" sha1="f69b64a5cf6820ad8883e9b61d847f7399ae541f" offset="0" />
@@ -291,11 +291,11 @@
 		</part>
 	</software>
 
-<!-- LOAD twice -->
 	<software name="dexa" cloneof="dex">
 		<description>DEX (Alt)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="LOAD twice" />
 		<part name="cass" interface="spc1000_cass">
 			<dataarea name="cass" size="208385">
 				<rom name="dex alt.tap" size="208385" crc="88bd7ed1" sha1="f5ada47e7db4c84ce4dd8eb95fe0f144bb26b024" offset="0" />
@@ -354,12 +354,12 @@
 		</part>
 	</software>
 
-<!-- LOAD twice -->
 	<software name="dooli">
 		<description>Dooli</description>
 		<year>1987</year>
 		<publisher>Softvision</publisher>
 		<info name="alt_title" value="둘리" />
+		<info name="usage" value="LOAD twice" />
 		<part name="cass" interface="spc1000_cass">
 			<dataarea name="cass" size="176815">
 				<rom name="dooli.tap" size="176815" crc="741e0d60" sha1="afa322cc2e9dbe0979fb3f315666206fc74d0c20" offset="0" />
@@ -404,11 +404,11 @@
 		</part>
 	</software>
 
-<!-- LOAD twice -->
 	<software name="fight201">
 		<description>Fighter 201</description>
 		<year>1985</year>
 		<publisher>Index</publisher>
+		<info name="usage" value="LOAD twice" />
 		<part name="cass" interface="spc1000_cass">
 			<dataarea name="cass" size="201058">
 				<rom name="fighter 201.tap" size="201058" crc="024808dc" sha1="25aba8f553fa131d71d478c6013080b8dab4a6c7" offset="0" />
@@ -451,12 +451,12 @@
 		</part>
 	</software>
 
-<!-- LOAD twice -->
 	<software name="goldcave">
 		<description>Gold Cavern</description>
 		<year>198?</year>
 		<publisher>Samsung Software</publisher>
 		<info name="alt_title" value="황금동굴 ~ Hwang Geum Dong Gul" />
+		<info name="usage" value="LOAD twice" />
 		<part name="cass" interface="spc1000_cass">
 			<dataarea name="cass" size="488201">
 				<rom name="goldcavern.tap" size="488201" crc="b7f3707c" sha1="108dc61b342399a1a0aab726419f7155455f0a21" offset="0" />
@@ -746,12 +746,12 @@
 		</part>
 	</software>
 
-<!-- LOAD twice -->
 	<software name="pengo">
 		<description>Pengo</description>
 		<year>198?</year>
 		<publisher>Samsung Software</publisher>
 		<info name="alt_title" value="펭고" />
+		<info name="usage" value="LOAD twice" />
 		<part name="cass" interface="spc1000_cass">
 			<dataarea name="cass" size="457126">
 				<rom name="pengo.tap" size="457126" crc="d3ea0b9e" sha1="b38139eddebb9630a83c119a7e0dc80877e7859b" offset="0" />
@@ -759,12 +759,12 @@
 		</part>
 	</software>
 
-<!-- LOAD twice -->
 	<software name="golf">
 		<description>Pro Golf</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="alt_title" value="골프" />
+		<info name="usage" value="LOAD twice" />
 		<part name="cass" interface="spc1000_cass">
 			<dataarea name="cass" size="310377">
 				<rom name="golf.tap" size="310377" crc="e49d27bf" sha1="a01dce8373d7a3e1884da0f81df28a212075e384" offset="0" />
@@ -795,11 +795,11 @@
 		</part>
 	</software>
 
-<!-- LOAD twice -->
 	<software name="redball">
 		<description>Red Ball</description>
 		<year>1985</year>
 		<publisher>Index</publisher>
+		<info name="usage" value="LOAD twice" />
 		<part name="cass" interface="spc1000_cass">
 			<dataarea name="cass" size="152312">
 				<rom name="red ball.tap" size="152312" crc="3d229544" sha1="1ebec05b07db79019809a1b4f6d619fa5a9067d1" offset="0" />
@@ -975,12 +975,12 @@
 		</part>
 	</software>
 
-<!-- LOAD twice -->
 <!-- Inputs are not detected? -->
 	<software name="toilradv" supported="partial">
 		<description>Toiler Adventure</description>
 		<year>1985</year>
 		<publisher>Index</publisher>
+		<info name="usage" value="LOAD twice" />
 		<part name="cass" interface="spc1000_cass">
 			<dataarea name="cass" size="312954">
 				<rom name="adventure.tap" size="312954" crc="24b175cd" sha1="adae14342d1deafb674a120610fc4bbeadea217c" offset="0" />
