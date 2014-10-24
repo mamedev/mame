@@ -54,6 +54,7 @@ public:
 		, m_pio(*this, "d8255_master")
 		, m_ram(*this, RAM_TAG)
 		, m_cass(*this, "cassette")
+		, m_io_joy(*this, "JOY")
 	{}
 
 	DECLARE_WRITE8_MEMBER(spc1000_iplk_w);
@@ -69,8 +70,8 @@ public:
 	DECLARE_WRITE8_MEMBER(fdc_8255_b_w);
 	DECLARE_READ8_MEMBER(fdc_8255_c_r);
 	DECLARE_WRITE8_MEMBER(fdc_8255_c_w);
-	DECLARE_READ8_MEMBER( upd765_tc_r );
-	DECLARE_WRITE8_MEMBER( fdc_control_w );
+	DECLARE_READ8_MEMBER(upd765_tc_r);
+	DECLARE_WRITE8_MEMBER(fdc_control_w);
 	MC6847_GET_CHARROM_MEMBER(get_char_rom)
 	{
 		return m_p_videoram[0x1000 + (ch & 0x7f) * 16 + line];
@@ -82,6 +83,7 @@ private:
 	UINT8 m_GMODE;
 	UINT16 m_page;
 	UINT8 *m_work_ram;
+	virtual void machine_start();
 	virtual void machine_reset();
 	required_device<mc6847_base_device> m_vdg;
 	required_device<cpu_device> m_maincpu;
@@ -90,6 +92,7 @@ private:
 	required_device<i8255_device> m_pio;
 	required_device<ram_device> m_ram;
 	required_device<cassette_image_device> m_cass;
+	required_ioport m_io_joy;
 
 	floppy_image_device *m_fd0;
 	floppy_image_device *m_fd1;
@@ -110,36 +113,23 @@ void spc1000_state::device_timer(emu_timer &timer, device_timer_id id, int param
 
 static ADDRESS_MAP_START(spc1000_mem, AS_PROGRAM, 8, spc1000_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x0000, 0x7fff ) AM_READ_BANK("bank1") AM_WRITE_BANK("bank2")
-	AM_RANGE( 0x8000, 0xffff ) AM_READ_BANK("bank3") AM_WRITE_BANK("bank4")
+	AM_RANGE(0x0000, 0x7fff) AM_READ_BANK("bank1") AM_WRITE_BANK("bank2")
+	AM_RANGE(0x8000, 0xffff) AM_READ_BANK("bank3") AM_WRITE_BANK("bank4")
 ADDRESS_MAP_END
 
 WRITE8_MEMBER(spc1000_state::spc1000_iplk_w)
 {
 	m_IPLK = m_IPLK ? 0 : 1;
-	if (m_IPLK == 1) {
-		UINT8 *mem = memregion("maincpu")->base();
-		membank("bank1")->set_base(mem);
-		membank("bank3")->set_base(mem);
-	} else {
-		UINT8 *ram = m_ram->pointer();
-		membank("bank1")->set_base(ram);
-		membank("bank3")->set_base(ram + 0x8000);
-	}
+	membank("bank1")->set_entry(m_IPLK);
+	membank("bank3")->set_entry(m_IPLK);
 }
 
 READ8_MEMBER(spc1000_state::spc1000_iplk_r)
 {
 	m_IPLK = m_IPLK ? 0 : 1;
-	if (m_IPLK == 1) {
-		UINT8 *mem = memregion("maincpu")->base();
-		membank("bank1")->set_base(mem);
-		membank("bank3")->set_base(mem);
-	} else {
-		UINT8 *ram = m_ram->pointer();
-		membank("bank1")->set_base(ram);
-		membank("bank3")->set_base(ram + 0x8000);
-	}
+	membank("bank1")->set_entry(m_IPLK);
+	membank("bank3")->set_entry(m_IPLK);
+
 	return 0;
 }
 
@@ -350,25 +340,38 @@ static INPUT_PORTS_START( spc1000 )
 		PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("L") PORT_CODE(KEYCODE_L) PORT_CHAR('l') PORT_CHAR('L') PORT_CHAR(0x0c)
 		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("O") PORT_CODE(KEYCODE_O) PORT_CHAR('o') PORT_CHAR('O') PORT_CHAR(0x0e)
 		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("9 )") PORT_CODE(KEYCODE_9) PORT_CHAR('9') PORT_CHAR(')')
+
+	PORT_START("JOY")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_UNUSED) // Button 2?
+	PORT_BIT(0xc0, IP_ACTIVE_HIGH, IPT_UNUSED) // Cassette related
 INPUT_PORTS_END
 
 
-void spc1000_state::machine_reset()
+void spc1000_state::machine_start()
 {
-	address_space &space = m_maincpu->space(AS_PROGRAM);
 	UINT8 *mem = memregion("maincpu")->base();
 	UINT8 *ram = m_ram->pointer();
 
-	space.install_read_bank(0x0000, 0x7fff, "bank1");
-	space.install_read_bank(0x8000, 0xffff, "bank3");
+	// configure and intialize banks 1 & 3 (read banks)
+	membank("bank1")->configure_entry(0, ram);
+	membank("bank1")->configure_entry(1, mem);
+	membank("bank3")->configure_entry(0, ram + 0x8000);
+	membank("bank3")->configure_entry(1, mem);
+	membank("bank1")->set_entry(1);
+	membank("bank3")->set_entry(1);
 
-	space.install_write_bank(0x0000, 0x7fff, "bank2");
-	space.install_write_bank(0x8000, 0xffff, "bank4");
-
-	membank("bank1")->set_base(mem);
+	// intialize banks 2 & 4 (write banks)
 	membank("bank2")->set_base(ram);
-	membank("bank3")->set_base(mem);
 	membank("bank4")->set_base(ram + 0x8000);
+}
+
+void spc1000_state::machine_reset()
+{
 
 	m_work_ram = auto_alloc_array_clear(machine(), UINT8, 0x10000);
 	m_fdccpu->set_input_line_vector(0, 0);
@@ -407,10 +410,11 @@ READ8_MEMBER(spc1000_state::mc6847_videoram_r)
 
 READ8_MEMBER( spc1000_state::porta_r )
 {
-	UINT8 data = 0;
+	UINT8 data = 0x3f;
 	data |= (m_cass->input() > 0.0038) ? 0x80 : 0;
 	data |= ((m_cass->get_state() & CASSETTE_MASK_UISTATE) == CASSETTE_PLAY) ? 0x00 : 0x40;
-
+	data &= ~(m_io_joy->read() & 0x3f);
+	
 	return data;
 }
 
@@ -490,6 +494,8 @@ static MACHINE_CONFIG_START( spc1000, spc1000_state )
 	MCFG_CASSETTE_ADD( "cassette" )
 	MCFG_CASSETTE_FORMATS(spc1000_cassette_formats)
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED)
+
+	MCFG_SOFTWARE_LIST_ADD("cass_list", "spc1000_cass")
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
