@@ -140,16 +140,10 @@ UPD7220_DRAW_TEXT_LINE_MEMBER( a5105_state::hgdc_draw_text )
 
 				if(yi >= 8) { pen = 0; }
 
-				/* TODO: pitch is currently 40, this should actually go in the upd7220 device */
-				if(!machine().first_screen()->visible_area().contains(res_x*2+0, res_y))
+				if(!machine().first_screen()->visible_area().contains(res_x+0, res_y))
 					continue;
 
-				bitmap.pix32(res_y, res_x*2+0) = palette[pen];
-
-				if(!machine().first_screen()->visible_area().contains(res_x*2+1, res_y))
-					continue;
-
-				bitmap.pix32(res_y, res_x*2+1) = palette[pen];
+				bitmap.pix32(res_y, res_x) = palette[pen];
 			}
 		}
 	}
