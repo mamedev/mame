@@ -1,5 +1,6 @@
 /***************************************************************************
 TI-85 and TI-86 drivers by Krzysztof Strzecha
+TI-83 Plus, TI-84 Plus, and Siliver Edition support by Jon Sturm
 
 Notes:
 1. After start TI-85 waits for ON key interrupt, so press ON key to start
@@ -339,6 +340,12 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ti83pse_banked_mem , AS_PROGRAM, 8, ti85_state )
 	AM_RANGE(0x0000, 0x1fffff) AM_DEVREADWRITE("flash", intelfsh8_device, read, write)
+	AM_RANGE(0x200000, 0x21BFFF) AM_RAM AM_SHARE("nvram")
+ADDRESS_MAP_END
+
+
+static ADDRESS_MAP_START( ti84p_banked_mem , AS_PROGRAM, 8, ti85_state )
+	AM_RANGE(0x0000, 0xfffff) AM_DEVREADWRITE("flash", intelfsh8_device, read, write)
 	AM_RANGE(0x200000, 0x21BFFF) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
 
@@ -730,17 +737,31 @@ static MACHINE_CONFIG_DERIVED( ti83pse, ti83p )
 	MCFG_DEVICE_PROGRAM_MAP(ti83pse_banked_mem)
 
 	MCFG_MACHINE_START_OVERRIDE(ti85_state, ti83pse )
-	MCFG_MACHINE_RESET_OVERRIDE(ti85_state, ti83pse )
 	MCFG_DEVICE_REPLACE("flash", FUJITSU_29F160T, 0)
 
 	//MCFG_TI83PSERIAL_ADD( "tiserial" )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( ti84p, ti83pse )
-	MCFG_DEVICE_REPLACE("flash", AMD_29F800T , 0)
-	//MCFG_TI83PSERIAL_ADD( "tiserial" )
+    MCFG_DEVICE_MODIFY("membank1")
+	MCFG_DEVICE_PROGRAM_MAP(ti84p_banked_mem)
+
+	MCFG_DEVICE_MODIFY("membank2")
+	MCFG_DEVICE_PROGRAM_MAP(ti84p_banked_mem)
+
+	MCFG_DEVICE_MODIFY("membank3")
+	MCFG_DEVICE_PROGRAM_MAP(ti84p_banked_mem)
+
+	MCFG_DEVICE_MODIFY("membank4")
+	MCFG_DEVICE_PROGRAM_MAP(ti84p_banked_mem)
+
+	MCFG_MACHINE_START_OVERRIDE(ti85_state, ti84p )
+    MCFG_DEVICE_REPLACE("flash", AMD_29F800T , 0)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( ti84pse, ti83pse )
+	MCFG_MACHINE_START_OVERRIDE(ti85_state, ti84pse )
+MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( ti73, ti83p )
 	//MCFG_DEVICE_REMOVE( "tiserial" )
@@ -888,12 +909,11 @@ ROM_START (ti84pse)
 ROM_END
 
 ROM_START (ti84p)
-	ROM_REGION (0x100000, "flash",0)
-	ROM_DEFAULT_BIOS("v241")
-	ROM_SYSTEM_BIOS( 0, "v241", "V 2.41" )
-	ROMX_LOAD( "ti84v241.bin", 0x00000, 0x100000, CRC(5758db36) SHA1(7daa4f22e9b5dc8a1cc8fd31bceece9fa8b43515), ROM_BIOS(1) )
+    ROM_REGION (0x100000, "flash",0)
+    ROM_DEFAULT_BIOS("b100v255mp")
+    ROM_SYSTEM_BIOS( 0, "b100v255mp", "Boot 1.00 OS V 2.55MP" )
+    ROMX_LOAD( "ti84pb100v255mp.bin", 0x00000, 0x100000, CRC(4AF31251) SHA1(8F67269346644B87E7CD0F353F5F4030E787CF57), ROM_BIOS(1) )
 ROM_END
-
 
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE INPUT   INIT   COMPANY                 FULLNAME                        FLAGS */
 COMP( 1990, ti81,       0,      0,      ti81,   ti81, driver_device,   0,     "Texas Instruments",    "TI-81",                        GAME_NO_SOUND )
@@ -906,4 +926,4 @@ COMP( 1998, ti73,       0,      0,      ti73,   ti82, driver_device,   0,     "T
 COMP( 1999, ti83p,      0,      0,      ti83p,  ti82, driver_device,   0,     "Texas Instruments",    "TI-83 Plus",                   GAME_NO_SOUND )
 COMP( 2001, ti83pse,    0,      0,      ti83pse,   ti82, driver_device,   0,     "Texas Instruments",    "TI-83 Plus Silver Edition", GAME_NO_SOUND )
 COMP( 2004, ti84p,      0,      0,      ti84p,   ti82, driver_device,   0,   "Texas Instruments",    "TI-84 Plus",                    GAME_NO_SOUND )
-COMP( 2004, ti84pse,    0,      0,      ti83pse,   ti82, driver_device,   0,     "Texas Instruments",    "TI-84 Plus Silver Edition", GAME_NO_SOUND )
+COMP( 2004, ti84pse,    0,      0,      ti84pse,   ti82, driver_device,   0,     "Texas Instruments",    "TI-84 Plus Silver Edition", GAME_NO_SOUND )

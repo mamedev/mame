@@ -16,7 +16,7 @@
 
 
 /* model */
-typedef enum {
+enum ti85_model {
 	TI81,
 	TI81v2,
 	TI82,
@@ -27,7 +27,7 @@ typedef enum {
 	TI83PSE,
 	TI84P,
 	TI84PSE
-} ti85_models;
+};
 
 typedef struct
 {
@@ -73,6 +73,8 @@ public:
 	optional_device<address_map_bank_device> m_membank2;
 	optional_device<address_map_bank_device> m_membank3;
 	optional_device<address_map_bank_device> m_membank4;
+
+	ti85_model m_model;
 
 	UINT8 m_LCD_memory_base;
 	UINT8 m_LCD_contrast;
@@ -167,11 +169,14 @@ public:
 	DECLARE_PALETTE_INIT(ti85);
 	DECLARE_MACHINE_RESET(ti85);
 	DECLARE_MACHINE_RESET(ti83p);
-	DECLARE_MACHINE_RESET(ti83pse);
 	DECLARE_PALETTE_INIT(ti82);
 	DECLARE_MACHINE_START(ti86);
 	DECLARE_MACHINE_START(ti83p);
 	DECLARE_MACHINE_START(ti83pse);
+	DECLARE_MACHINE_START(ti84pse);
+	DECLARE_MACHINE_START(ti84p);
+	void ti8xpse_init_common();
+
 	UINT32 screen_update_ti85(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(ti85_timer_callback);
 	TIMER_CALLBACK_MEMBER(ti83_timer1_callback);
