@@ -3,6 +3,8 @@
   PINBALL
   Gottlieb System 3
   Dot Matrix Display
+  
+  You need to pick "Pixel Aspect (4:1)" video option in the tab menu.
 
 Status:
 - Nothing works
@@ -17,13 +19,16 @@ ToDo:
 #include "machine/genpin.h"
 #include "cpu/m6502/m65c02.h"
 #include "machine/6522via.h"
+#include "video/mc6845.h"
 
 class gts3a_state : public driver_device
 {
 public:
 	gts3a_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
+		, m_palette(*this, "palette")
 		, m_maincpu(*this, "maincpu")
+		, m_dmdcpu(*this, "dmdcpu")
 		, m_u4(*this, "u4")
 		, m_u5(*this, "u5")
 		, m_switches(*this, "X")
@@ -34,8 +39,13 @@ public:
 	DECLARE_READ8_MEMBER(u4a_r);
 	DECLARE_READ8_MEMBER(u4b_r);
 	DECLARE_WRITE8_MEMBER(u4b_w);
+	DECLARE_READ8_MEMBER(dmd_r);
+	DECLARE_WRITE8_MEMBER(dmd_w);
 	DECLARE_WRITE_LINE_MEMBER(nmi_w);
 	DECLARE_INPUT_CHANGED_MEMBER(test_inp);
+	MC6845_UPDATE_ROW(crtc_update_row);
+	DECLARE_PALETTE_INIT(gts3a);
+	required_device<palette_device> m_palette;
 private:
 	bool m_dispclk;
 	bool m_lampclk;
@@ -43,8 +53,10 @@ private:
 	UINT8 m_row; // for lamps and switches
 	UINT8 m_segment[4];
 	UINT8 m_u4b;
+	UINT8 m_dmd;
 	virtual void machine_reset();
 	required_device<m65c02_device> m_maincpu;
+	required_device<m65c02_device> m_dmdcpu;
 	required_device<via6522_device> m_u4;
 	required_device<via6522_device> m_u5;
 	required_ioport_array<12> m_switches;
@@ -57,6 +69,18 @@ static ADDRESS_MAP_START( gts3a_map, AS_PROGRAM, 8, gts3a_state )
 	AM_RANGE(0x2010, 0x201f) AM_DEVREADWRITE("u5", via6522_device, read, write)
 	AM_RANGE(0x2020, 0x2023) AM_MIRROR(0x0c) AM_WRITE(segbank_w)
 	AM_RANGE(0x4000, 0xffff) AM_ROM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( gts3a_dmd_map, AS_PROGRAM, 8, gts3a_state )
+	AM_RANGE(0x0000, 0x1fff) AM_RAM
+	AM_RANGE(0x2000, 0x2000) AM_DEVREAD("crtc", mc6845_device, status_r)
+	AM_RANGE(0x2001, 0x2001) AM_DEVREAD("crtc", mc6845_device, register_r)
+	AM_RANGE(0x2800, 0x2800) AM_DEVWRITE("crtc", mc6845_device, address_w)
+	AM_RANGE(0x2801, 0x2801) AM_DEVWRITE("crtc", mc6845_device, register_w)
+	AM_RANGE(0x3000, 0x3000) AM_READ(dmd_r)
+	AM_RANGE(0x3800, 0x3800) AM_WRITE(dmd_w)
+	AM_RANGE(0x4000, 0x7fff) AM_READ_BANK("bank1")
+	AM_RANGE(0x8000, 0xffff) AM_ROM AM_REGION("dmdcpu", 0x78000)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( gts3a )
@@ -254,6 +278,50 @@ void gts3a_state::machine_reset()
 
 DRIVER_INIT_MEMBER( gts3a_state, gts3a )
 {
+	UINT8 *dmd = memregion("dmdcpu")->base();
+
+	membank("bank1")->configure_entries(0, 32, &dmd[0x0000], 0x4000);
+}
+
+READ8_MEMBER( gts3a_state::dmd_r )
+{
+	return 0;
+}
+
+WRITE8_MEMBER( gts3a_state::dmd_w )
+{
+	m_dmd = data;
+	membank("bank1")->set_entry(data & 0x1f);
+}
+
+PALETTE_INIT_MEMBER( gts3a_state, gts3a )
+{
+	palette.set_pen_color(0, rgb_t(0x00, 0x00, 0x00));
+	palette.set_pen_color(1, rgb_t(0xf7, 0x00, 0x00));
+}
+
+MC6845_UPDATE_ROW( gts3a_state::crtc_update_row )
+{
+	const rgb_t *palette = m_palette->palette()->entry_list_raw();
+	UINT8 gfx=0;
+	UINT16 mem,x;
+	UINT32 *p = &bitmap.pix32(y);
+
+	for (x = 0; x < x_count; x++)
+	{
+		mem = (ma + x) & 0xfff;mem++;
+		gfx = 4;//m_p_chargen[(chr<<4) | ra] ^ inv;
+
+		/* Display a scanline of a character */
+		*p++ = palette[BIT(gfx, 7)];
+		*p++ = palette[BIT(gfx, 6)];
+		*p++ = palette[BIT(gfx, 5)];
+		*p++ = palette[BIT(gfx, 4)];
+		*p++ = palette[BIT(gfx, 3)];
+		*p++ = palette[BIT(gfx, 2)];
+		*p++ = palette[BIT(gfx, 1)];
+		*p++ = palette[BIT(gfx, 0)];
+	}
 }
 
 static MACHINE_CONFIG_START( gts3a, gts3a_state )
@@ -262,8 +330,23 @@ static MACHINE_CONFIG_START( gts3a, gts3a_state )
 	MCFG_CPU_PROGRAM_MAP(gts3a_map)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
+	MCFG_CPU_ADD("dmdcpu", M65C02, XTAL_3_579545MHz / 2)
+	MCFG_CPU_PROGRAM_MAP(gts3a_dmd_map)
+
 	/* Video */
-	// to be done
+	MCFG_SCREEN_ADD("screen", LCD)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
+	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
+	MCFG_SCREEN_SIZE(128, 32)
+	MCFG_SCREEN_VISIBLE_AREA(0, 127, 0, 31)
+	MCFG_PALETTE_ADD( "palette", 2 )
+	MCFG_PALETTE_INIT_OWNER(gts3a_state, gts3a)
+
+	MCFG_MC6845_ADD("crtc", MC6845, "screen", XTAL_3_579545MHz / 2)
+	MCFG_MC6845_SHOW_BORDER_AREA(false)
+	MCFG_MC6845_CHAR_WIDTH(8)
+	MCFG_MC6845_UPDATE_ROW_CB(gts3a_state, crtc_update_row)
 
 	/* Sound */
 	MCFG_FRAGMENT_ADD( genpin_audio )
@@ -295,7 +378,7 @@ ROM_START(barbwire)
 
 	ROM_REGION(0x10000, "cpu2", ROMREGION_ERASEFF)
 
-	ROM_REGION(0x80000, "user1", 0)
+	ROM_REGION(0x80000, "dmdcpu", 0)
 	ROM_LOAD("dsprom.bin", 0x00000, 0x80000, CRC(2b9533cd) SHA1(2b154550006e37a9dd1acb0cb832535415a7266b))
 
 	ROM_REGION(0x10000, "cpu4", 0)
@@ -319,7 +402,7 @@ ROM_START(brooks)
 
 	ROM_REGION(0x10000, "cpu2", ROMREGION_ERASEFF)
 
-	ROM_REGION(0x80000, "user1", 0)
+	ROM_REGION(0x80000, "dmdcpu", 0)
 	ROM_LOAD("dsprom.bin", 0x00000, 0x80000, NO_DUMP)
 
 	ROM_REGION(0x10000, "cpu4", 0)
@@ -347,7 +430,7 @@ ROM_START(cueball)
 
 	ROM_REGION(0x10000, "cpu2", ROMREGION_ERASEFF)
 
-	ROM_REGION(0x80000, "user1", 0)
+	ROM_REGION(0x80000, "dmdcpu", 0)
 	ROM_LOAD("dsprom.bin", 0x00000, 0x40000, CRC(3cc7f470) SHA1(6adf8ac2ff93eb19c7b1dbbcf8fff6cd926dc563))
 	ROM_RELOAD( 0x40000, 0x40000)
 
@@ -373,7 +456,7 @@ ROM_START(bighurt)
 
 	ROM_REGION(0x10000, "cpu2", ROMREGION_ERASEFF)
 
-	ROM_REGION(0x80000, "user1", 0)
+	ROM_REGION(0x80000, "dmdcpu", 0)
 	ROM_LOAD("dsprom.bin", 0x00000, 0x80000, CRC(bbe96c5e) SHA1(4aaac8d88e739ccb22a7d87a820b14b6d40d3ff8))
 
 	ROM_REGION(0x10000, "cpu4", 0)
@@ -397,7 +480,7 @@ ROM_START(freddy)
 
 	ROM_REGION(0x10000, "cpu2", ROMREGION_ERASEFF)
 
-	ROM_REGION(0x80000, "user1", 0)
+	ROM_REGION(0x80000, "dmdcpu", 0)
 	ROM_LOAD("dsprom.bin", 0x00000, 0x80000, CRC(d78d0fa3) SHA1(132c05e71cf5ad53184f044873fb3dd71f6da15f))
 
 	ROM_REGION(0x10000, "cpu4", 0)
@@ -418,7 +501,7 @@ ROM_START(freddy4)
 
 	ROM_REGION(0x10000, "cpu2", ROMREGION_ERASEFF)
 
-	ROM_REGION(0x80000, "user1", 0)
+	ROM_REGION(0x80000, "dmdcpu", 0)
 	ROM_LOAD("dsprom.bin", 0x00000, 0x80000, CRC(d78d0fa3) SHA1(132c05e71cf5ad53184f044873fb3dd71f6da15f))
 
 	ROM_REGION(0x10000, "cpu4", 0)
@@ -441,7 +524,7 @@ ROM_START(gladiatp)
 
 	ROM_REGION(0x10000, "cpu2", ROMREGION_ERASEFF)
 
-	ROM_REGION(0x80000, "user1", 0)
+	ROM_REGION(0x80000, "dmdcpu", 0)
 	ROM_LOAD("dsprom.bin", 0x00000, 0x80000, CRC(fdc8baed) SHA1(d8ad96665cd9d8b2a6ce94653753c692384685ff))
 
 	ROM_REGION(0x10000, "cpu4", 0)
@@ -466,7 +549,7 @@ ROM_START(andretti)
 
 	ROM_REGION(0x10000, "cpu2", ROMREGION_ERASEFF)
 
-	ROM_REGION(0x80000, "user1", 0)
+	ROM_REGION(0x80000, "dmdcpu", 0)
 	ROM_LOAD("dsprom.bin", 0x00000, 0x80000, CRC(1f70baae) SHA1(cf07bb057093b2bd18e6ee45009245ea62094e53))
 
 	ROM_REGION(0x10000, "cpu4", 0)
@@ -487,7 +570,7 @@ ROM_START(andretti4)
 
 	ROM_REGION(0x10000, "cpu2", ROMREGION_ERASEFF)
 
-	ROM_REGION(0x80000, "user1", 0)
+	ROM_REGION(0x80000, "dmdcpu", 0)
 	ROM_LOAD("dsprom.bin", 0x00000, 0x80000, CRC(1f70baae) SHA1(cf07bb057093b2bd18e6ee45009245ea62094e53))
 
 	ROM_REGION(0x10000, "cpu4", 0)
@@ -511,7 +594,7 @@ ROM_START(rescu911)
 
 	ROM_REGION(0x10000, "cpu2", ROMREGION_ERASEFF)
 
-	ROM_REGION(0x80000, "user1", 0)
+	ROM_REGION(0x80000, "dmdcpu", 0)
 	ROM_LOAD("dsprom.bin", 0x00000, 0x80000, CRC(9657ebd5) SHA1(b716daa71f8ec4332bf338f1f976425b6ec781ab))
 
 	ROM_REGION(0x10000, "cpu4", 0)
@@ -535,7 +618,7 @@ ROM_START(shaqattq)
 
 	ROM_REGION(0x10000, "cpu2", ROMREGION_ERASEFF)
 
-	ROM_REGION(0x80000, "user1", 0)
+	ROM_REGION(0x80000, "dmdcpu", 0)
 	ROM_LOAD("dsprom.bin", 0x00000, 0x80000, CRC(d6cca842) SHA1(0498ab558d252e42dee9636e6736d159c7d06275))
 
 	ROM_REGION(0x10000, "cpu4", 0)
@@ -556,7 +639,7 @@ ROM_START(shaqattq2)
 
 	ROM_REGION(0x10000, "cpu2", ROMREGION_ERASEFF)
 
-	ROM_REGION(0x80000, "user1", 0)
+	ROM_REGION(0x80000, "dmdcpu", 0)
 	ROM_LOAD("dsprom.bin", 0x00000, 0x80000, CRC(d6cca842) SHA1(0498ab558d252e42dee9636e6736d159c7d06275))
 
 	ROM_REGION(0x10000, "cpu4", 0)
@@ -580,7 +663,7 @@ ROM_START(stargatp)
 
 	ROM_REGION(0x10000, "cpu2", ROMREGION_ERASEFF)
 
-	ROM_REGION(0x80000, "user1", 0)
+	ROM_REGION(0x80000, "dmdcpu", 0)
 	ROM_LOAD("dsprom.bin", 0x00000, 0x80000, CRC(17b89750) SHA1(927702f88013945cb9f2ea8389800b925182c347))
 
 	ROM_REGION(0x10000, "cpu4", 0)
@@ -600,7 +683,7 @@ ROM_START(stargatp1)
 
 	ROM_REGION(0x10000, "cpu2", ROMREGION_ERASEFF)
 
-	ROM_REGION(0x80000, "user1", 0)
+	ROM_REGION(0x80000, "dmdcpu", 0)
 	ROM_LOAD("dsprom1.bin", 0x00000, 0x80000, CRC(91c1b01a) SHA1(96eec2e9e52c8278c102f433a554327d420fe131))
 
 	ROM_REGION(0x10000, "cpu4", 0)
@@ -620,7 +703,7 @@ ROM_START(stargatp2)
 
 	ROM_REGION(0x10000, "cpu2", ROMREGION_ERASEFF)
 
-	ROM_REGION(0x80000, "user1", 0)
+	ROM_REGION(0x80000, "dmdcpu", 0)
 	ROM_LOAD("dsprom2.bin", 0x00000, 0x80000, CRC(d0205e03) SHA1(d8dea47f0fa0e46e2bd107a1f57121372fdef0d8))
 
 	ROM_REGION(0x10000, "cpu4", 0)
@@ -640,7 +723,7 @@ ROM_START(stargatp3)
 
 	ROM_REGION(0x10000, "cpu2", ROMREGION_ERASEFF)
 
-	ROM_REGION(0x80000, "user1", 0)
+	ROM_REGION(0x80000, "dmdcpu", 0)
 	ROM_LOAD("dsprom3.bin", 0x00000, 0x80000, CRC(db483524) SHA1(ea14e8b04c32fc403ce2ff060caed5562104a862))
 
 	ROM_REGION(0x10000, "cpu4", 0)
@@ -660,7 +743,7 @@ ROM_START(stargatp4)
 
 	ROM_REGION(0x10000, "cpu2", ROMREGION_ERASEFF)
 
-	ROM_REGION(0x80000, "user1", 0)
+	ROM_REGION(0x80000, "dmdcpu", 0)
 	ROM_LOAD("dsprom3.bin", 0x00000, 0x80000, CRC(db483524) SHA1(ea14e8b04c32fc403ce2ff060caed5562104a862))
 
 	ROM_REGION(0x10000, "cpu4", 0)
@@ -683,7 +766,7 @@ ROM_START(sfight2)
 
 	ROM_REGION(0x10000, "cpu2", ROMREGION_ERASEFF)
 
-	ROM_REGION(0x80000, "user1", 0)
+	ROM_REGION(0x80000, "dmdcpu", 0)
 	ROM_LOAD("dsprom.bin", 0x00000, 0x80000, CRC(e565e5e9) SHA1(c37abf28918feb38bbad6ebb610023d52ba96957))
 
 	ROM_REGION(0x10000, "cpu4", 0)
@@ -705,7 +788,7 @@ ROM_START(sfight2a)
 
 	ROM_REGION(0x10000, "cpu2", ROMREGION_ERASEFF)
 
-	ROM_REGION(0x80000, "user1", 0)
+	ROM_REGION(0x80000, "dmdcpu", 0)
 	ROM_LOAD("dsprom2.bin", 0x00000, 0x80000, CRC(80eb7513) SHA1(d13d44545c7b177e27b596bac6eba173b34a017b))
 
 	ROM_REGION(0x10000, "cpu4", 0)
@@ -727,7 +810,7 @@ ROM_START(sfight2b)
 
 	ROM_REGION(0x10000, "cpu2", ROMREGION_ERASEFF)
 
-	ROM_REGION(0x80000, "user1", 0)
+	ROM_REGION(0x80000, "dmdcpu", 0)
 	ROM_LOAD("dsprom2.bin", 0x00000, 0x80000, CRC(80eb7513) SHA1(d13d44545c7b177e27b596bac6eba173b34a017b))
 
 	ROM_REGION(0x10000, "cpu4", 0)
@@ -752,7 +835,7 @@ ROM_START(snspares)
 
 	ROM_REGION(0x10000, "cpu2", ROMREGION_ERASEFF)
 
-	ROM_REGION(0x80000, "user1", 0)
+	ROM_REGION(0x80000, "dmdcpu", 0)
 	ROM_LOAD("dsprom.bin", 0x00000, 0x40000, CRC(5c901899) SHA1(d106561b2e382afdb16e938072c9c8f1d1ccdae6))
 	ROM_RELOAD( 0x40000, 0x40000)
 
@@ -771,7 +854,7 @@ ROM_START(snspares1)
 
 	ROM_REGION(0x10000, "cpu2", ROMREGION_ERASEFF)
 
-	ROM_REGION(0x80000, "user1", 0)
+	ROM_REGION(0x80000, "dmdcpu", 0)
 	ROM_LOAD("dsprom.bin", 0x00000, 0x40000, CRC(5c901899) SHA1(d106561b2e382afdb16e938072c9c8f1d1ccdae6))
 	ROM_RELOAD( 0x40000, 0x40000)
 
@@ -794,7 +877,7 @@ ROM_START(smb)
 
 	ROM_REGION(0x10000, "cpu2", ROMREGION_ERASEFF)
 
-	ROM_REGION(0x80000, "user1", 0)
+	ROM_REGION(0x80000, "dmdcpu", 0)
 	ROM_LOAD("dsprom2.bin", 0x00000, 0x40000, CRC(181e8234) SHA1(9b22681f61cae401269a88c3cfd783d683390877))
 	ROM_RELOAD( 0x40000, 0x40000)
 
@@ -817,7 +900,7 @@ ROM_START(smb1)
 
 	ROM_REGION(0x10000, "cpu2", ROMREGION_ERASEFF)
 
-	ROM_REGION(0x80000, "user1", 0)
+	ROM_REGION(0x80000, "dmdcpu", 0)
 	ROM_LOAD("dsprom2.bin", 0x00000, 0x40000, CRC(181e8234) SHA1(9b22681f61cae401269a88c3cfd783d683390877))
 	ROM_RELOAD( 0x40000, 0x40000)
 
@@ -840,7 +923,7 @@ ROM_START(smb2)
 
 	ROM_REGION(0x10000, "cpu2", ROMREGION_ERASEFF)
 
-	ROM_REGION(0x80000, "user1", 0)
+	ROM_REGION(0x80000, "dmdcpu", 0)
 	ROM_LOAD("dsprom2.bin", 0x00000, 0x40000, CRC(181e8234) SHA1(9b22681f61cae401269a88c3cfd783d683390877))
 	ROM_RELOAD( 0x40000, 0x40000)
 
@@ -863,7 +946,7 @@ ROM_START(smb3)
 
 	ROM_REGION(0x10000, "cpu2", ROMREGION_ERASEFF)
 
-	ROM_REGION(0x80000, "user1", 0)
+	ROM_REGION(0x80000, "dmdcpu", 0)
 	ROM_LOAD("dsprom2.bin", 0x00000, 0x40000, CRC(181e8234) SHA1(9b22681f61cae401269a88c3cfd783d683390877))
 	ROM_RELOAD( 0x40000, 0x40000)
 
@@ -889,7 +972,7 @@ ROM_START(smbmush)
 
 	ROM_REGION(0x10000, "cpu2", ROMREGION_ERASEFF)
 
-	ROM_REGION(0x80000, "user1", 0)
+	ROM_REGION(0x80000, "dmdcpu", 0)
 	ROM_LOAD("dsprom.bin", 0x00000, 0x40000, CRC(dda6c8be) SHA1(b64f73b81afe973674f9543a704b498e31d26c12))
 	ROM_RELOAD( 0x40000, 0x40000)
 
@@ -915,7 +998,7 @@ ROM_START(teedoffp)
 
 	ROM_REGION(0x10000, "cpu2", ROMREGION_ERASEFF)
 
-	ROM_REGION(0x80000, "user1", 0)
+	ROM_REGION(0x80000, "dmdcpu", 0)
 	ROM_LOAD("dsprom.bin", 0x00000, 0x80000, CRC(340b8a49) SHA1(3ac76faf920b00b77c77023c42595307840ed3a7))
 
 	ROM_REGION(0x10000, "cpu4", 0)
@@ -937,7 +1020,7 @@ ROM_START(teedoffp1)
 
 	ROM_REGION(0x10000, "cpu2", ROMREGION_ERASEFF)
 
-	ROM_REGION(0x80000, "user1", 0)
+	ROM_REGION(0x80000, "dmdcpu", 0)
 	ROM_LOAD("dsprom1.bin", 0x00000, 0x80000, CRC(24f10ad2) SHA1(15f44f69d39ca9782410a75070edf348f64dba62))
 
 	ROM_REGION(0x10000, "cpu4", 0)
@@ -959,7 +1042,7 @@ ROM_START(teedoffp3)
 
 	ROM_REGION(0x10000, "cpu2", ROMREGION_ERASEFF)
 
-	ROM_REGION(0x80000, "user1", 0)
+	ROM_REGION(0x80000, "dmdcpu", 0)
 	ROM_LOAD("dsprom1.bin", 0x00000, 0x80000, CRC(24f10ad2) SHA1(15f44f69d39ca9782410a75070edf348f64dba62))
 
 	ROM_REGION(0x10000, "cpu4", 0)
@@ -984,7 +1067,7 @@ ROM_START(waterwld)
 
 	ROM_REGION(0x10000, "cpu2", ROMREGION_ERASEFF)
 
-	ROM_REGION(0x80000, "user1", 0)
+	ROM_REGION(0x80000, "dmdcpu", 0)
 	ROM_LOAD("dsprom.bin", 0x00000, 0x80000, CRC(79164099) SHA1(fa048fb7aa91cadd6c0758c570a4c74337bd7cd5))
 
 	ROM_REGION(0x10000, "cpu4", 0)
@@ -1004,7 +1087,7 @@ ROM_START(waterwld2)
 
 	ROM_REGION(0x10000, "cpu2", ROMREGION_ERASEFF)
 
-	ROM_REGION(0x80000, "user1", 0)
+	ROM_REGION(0x80000, "dmdcpu", 0)
 	ROM_LOAD("dsprom.bin", 0x00000, 0x80000, CRC(79164099) SHA1(fa048fb7aa91cadd6c0758c570a4c74337bd7cd5))
 
 	ROM_REGION(0x10000, "cpu4", 0)
@@ -1027,7 +1110,7 @@ ROM_START(wipeout)
 
 	ROM_REGION(0x10000, "cpu2", ROMREGION_ERASEFF)
 
-	ROM_REGION(0x80000, "user1", 0)
+	ROM_REGION(0x80000, "dmdcpu", 0)
 	ROM_LOAD("dsprom.bin", 0x00000, 0x80000, CRC(cbdec3ab) SHA1(2d70d436783830bf074a7a0590d5c48432136595))
 
 	ROM_REGION(0x10000, "cpu4", 0)
@@ -1052,7 +1135,7 @@ ROM_START(wcsoccer)
 
 	ROM_REGION(0x10000, "cpu2", ROMREGION_ERASEFF)
 
-	ROM_REGION(0x80000, "user1", 0)
+	ROM_REGION(0x80000, "dmdcpu", 0)
 	ROM_LOAD("dsprom.bin", 0x00000, 0x80000, CRC(71ba5263) SHA1(e86c2cc89d31534fb2d9d24fab2fcdb0af7cc73d))
 
 	ROM_REGION(0x10000, "cpu4", 0)
@@ -1074,7 +1157,7 @@ ROM_START(wcsoccerd2)
 
 	ROM_REGION(0x10000, "cpu2", ROMREGION_ERASEFF)
 
-	ROM_REGION(0x80000, "user1", 0)
+	ROM_REGION(0x80000, "dmdcpu", 0)
 	ROM_LOAD("dsprom2.bin", 0x00000, 0x80000, CRC(4c8ea71d) SHA1(ce751b84e2033e4de2f2c57490867ecafd423aaa))
 
 	ROM_REGION(0x10000, "cpu4", 0)
