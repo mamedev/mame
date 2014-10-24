@@ -96,12 +96,23 @@ void dave_device::device_start()
 	save_item(NAME(m_level_and));
 	save_item(NAME(m_mame_volumes));
 
-	for (int i = 0; i < 3; i++)
-	{
-		m_period[i] = (STEP * machine().sample_rate()) / 125000;
+	for (int i = 0; i < ARRAY_LENGTH(m_period); i++)
+		m_period[i] = (STEP * machine().sample_rate()) / 125000;	
+
+	for (int i = 0; i < ARRAY_LENGTH(m_count); i++)
 		m_count[i] = (STEP * machine().sample_rate()) / 125000;
+
+	for (int i = 0; i < ARRAY_LENGTH(m_level); i++)
 		m_level[i] = 0;
-	}
+
+	for (int i = 0; i < ARRAY_LENGTH(m_level_or); i++)
+		m_level_or[i] = 0;
+
+	for (int i = 0; i < ARRAY_LENGTH(m_level_and); i++)
+		m_level_and[i] = 0;
+
+	for (int i = 0; i < ARRAY_LENGTH(m_mame_volumes); i++)
+		m_mame_volumes[i] = 0;
 
 	/* dave has 3 tone channels and 1 noise channel.
 	 the volumes are mixed internally and output as left and right volume */
