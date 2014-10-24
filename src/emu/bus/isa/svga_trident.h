@@ -16,15 +16,15 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> isa8_vga_device
+// ======================> isa16_vga_device
 
-class isa8_svga_tgui9680_device :
+class isa16_svga_tgui9680_device :
 		public device_t,
-		public device_isa8_card_interface
+		public device_isa16_card_interface
 {
 public:
 		// construction/destruction
-		isa8_svga_tgui9680_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+		isa16_svga_tgui9680_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 		// optional information overrides
 		virtual machine_config_constructor device_mconfig_additions() const;
@@ -41,7 +41,7 @@ private:
 
 
 // device type definition
-extern const device_type ISA8_SVGA_TGUI9680;
+extern const device_type ISA16_SVGA_TGUI9680;
 
 
 #endif /* SVGA_TRIDENT_H_ */

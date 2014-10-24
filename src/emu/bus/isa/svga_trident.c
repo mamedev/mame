@@ -19,7 +19,7 @@ ROM_END
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type ISA8_SVGA_TGUI9680 = &device_creator<isa8_svga_tgui9680_device>;
+const device_type ISA16_SVGA_TGUI9680 = &device_creator<isa16_svga_tgui9680_device>;
 
 
 static MACHINE_CONFIG_FRAGMENT( vga_trident )
@@ -37,7 +37,7 @@ MACHINE_CONFIG_END
 //  machine configurations
 //-------------------------------------------------
 
-machine_config_constructor isa8_svga_tgui9680_device::device_mconfig_additions() const
+machine_config_constructor isa16_svga_tgui9680_device::device_mconfig_additions() const
 {
 	return MACHINE_CONFIG_NAME( vga_trident );
 }
@@ -46,7 +46,7 @@ machine_config_constructor isa8_svga_tgui9680_device::device_mconfig_additions()
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *isa8_svga_tgui9680_device::device_rom_region() const
+const rom_entry *isa16_svga_tgui9680_device::device_rom_region() const
 {
 	return ROM_NAME( tgui9680 );
 }
@@ -59,18 +59,18 @@ const rom_entry *isa8_svga_tgui9680_device::device_rom_region() const
 //  isa8_vga_device - constructor
 //-------------------------------------------------
 
-isa8_svga_tgui9680_device::isa8_svga_tgui9680_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-		device_t(mconfig, ISA8_SVGA_TGUI9680, "Trident TGUI9680 Graphics Card (BIOS X5.5 (02) 02/13/96)", tag, owner, clock, "tgui9680", __FILE__),
-		device_isa8_card_interface(mconfig, *this)
+isa16_svga_tgui9680_device::isa16_svga_tgui9680_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+		device_t(mconfig, ISA16_SVGA_TGUI9680, "Trident TGUI9680 Graphics Card (BIOS X5.5 (02) 02/13/96)", tag, owner, clock, "tgui9680", __FILE__),
+		device_isa16_card_interface(mconfig, *this)
 {
 }
 
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
-READ8_MEMBER(isa8_svga_tgui9680_device::input_port_0_r ) { return 0xff; } //return space.machine().root_device().ioport("IN0")->read(); }
+READ8_MEMBER(isa16_svga_tgui9680_device::input_port_0_r ) { return 0xff; } //return space.machine().root_device().ioport("IN0")->read(); }
 
-void isa8_svga_tgui9680_device::device_start()
+void isa16_svga_tgui9680_device::device_start()
 {
 	set_isa_device();
 
@@ -100,6 +100,6 @@ void isa8_svga_tgui9680_device::device_start()
 //  device_reset - device-specific reset
 //-------------------------------------------------
 
-void isa8_svga_tgui9680_device::device_reset()
+void isa16_svga_tgui9680_device::device_reset()
 {
 }
