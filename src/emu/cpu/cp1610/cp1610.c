@@ -1009,12 +1009,12 @@ void cp1610_cpu_device::cp1610_besc(int dir)
  *  S Z C OV 1 000 s1e e p ppp ppp ppp ppp ppp
  *  - - - -  BEXT ADDR, eeee
  ***************************************************/
-void cp1610_cpu_device::cp1610_bext(int ext, int dir)
+ void cp1610_cpu_device::cp1610_bext(int ext, int dir)
 {
 	UINT16 offset = cp1610_readop(m_r[7]);
 	m_r[7]++;
-	/* TBD */
-	if (0)
+	
+	if (m_read_bext(ext))
 	{
 		m_r[7] += (offset ^ dir);
 		m_icount -= 9;
@@ -3360,6 +3360,7 @@ void cp1610_cpu_device::execute_run()
 
 void cp1610_cpu_device::device_start()
 {
+	m_read_bext.resolve_safe(0);
 	m_intr_enabled = 0;
 	m_reset_pending = 0;
 	m_intr_pending = 0;
@@ -3421,6 +3422,7 @@ void cp1610_cpu_device::execute_set_input(int irqline, int state)
 cp1610_cpu_device::cp1610_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: cpu_device(mconfig, CP1610, "CP1610", tag, owner, clock, "cp1610", __FILE__)
 	, m_program_config("program", ENDIANNESS_BIG, 16, 16, -1)
+	, m_read_bext(*this)
 {
 }
 
