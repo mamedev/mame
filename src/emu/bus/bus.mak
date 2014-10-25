@@ -122,6 +122,18 @@ endif
 
 #-------------------------------------------------
 #
+#@src/emu/bus/astrocde/slot.h,BUSES += ASTROCADE
+#-------------------------------------------------
+
+ifneq ($(filter ASTROCADE,$(BUSES)),)
+OBJDIRS += $(BUSOBJ)/astrocde
+BUSOBJS += $(BUSOBJ)/astrocde/slot.o
+BUSOBJS += $(BUSOBJ)/astrocde/rom.o
+endif
+
+
+#-------------------------------------------------
+#
 #@src/emu/bus/bw2/exp.h,BUSES += BW2
 #-------------------------------------------------
 

@@ -12,8 +12,8 @@
 #include "includes/astrocde.h"
 #include "machine/ram.h"
 #include "sound/astrocde.h"
-#include "bus/generic/slot.h"
-#include "bus/generic/carts.h"
+#include "bus/astrocde/slot.h"
+#include "bus/astrocde/rom.h"
 
 class astrocde_mess_state : public astrocde_state
 {
@@ -23,7 +23,7 @@ public:
 		m_cart(*this, "cartslot")
 		{ }
 
-	required_device<generic_slot_device> m_cart;
+	required_device<astrocade_cart_slot_device> m_cart;
 	void get_ram_expansion_settings(int &ram_expansion_installed, int &write_protect_on, int &expansion_ram_start, int &expansion_ram_end, int &shadow_ram_end);
 	DECLARE_MACHINE_START(astrocde);
 	DECLARE_MACHINE_RESET(astrocde);
@@ -251,6 +251,13 @@ INPUT_PORTS_END
  *
  *************************************/
 
+static SLOT_INTERFACE_START(astrocade_cart)
+	SLOT_INTERFACE_INTERNAL("rom",       ASTROCADE_ROM_STD)
+	SLOT_INTERFACE_INTERNAL("rom_256k",  ASTROCADE_ROM_256K)
+	SLOT_INTERFACE_INTERNAL("rom_512k",  ASTROCADE_ROM_512K)
+SLOT_INTERFACE_END
+
+
 static MACHINE_CONFIG_START( astrocde, astrocde_mess_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, ASTROCADE_CLOCK/4)        /* 1.789 MHz */
@@ -279,7 +286,7 @@ static MACHINE_CONFIG_START( astrocde, astrocde_mess_state )
 	MCFG_RAM_DEFAULT_SIZE("32k")
 
 	/* cartridge */
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "astrocde_cart")
+	MCFG_ASTROCADE_CARTRIDGE_ADD("cartslot", astrocade_cart, NULL)
 
 	/* Software lists */
 	MCFG_SOFTWARE_LIST_ADD("cart_list","astrocde")
@@ -321,7 +328,7 @@ DRIVER_INIT_MEMBER(astrocde_state,astrocde)
 MACHINE_START_MEMBER(astrocde_mess_state, astrocde)
 {
 	if (m_cart->exists())
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0x2000, 0x3fff, read8_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_cart));
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0x2000, 0x3fff, read8_delegate(FUNC(astrocade_cart_slot_device::read_rom),(astrocade_cart_slot_device*)m_cart));
 }
 
 MACHINE_RESET_MEMBER(astrocde_mess_state, astrocde)

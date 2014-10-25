@@ -5,7 +5,7 @@
 	<software name="280zzap">
 		<description>280 Zzzap / Dodgem</description>
 		<year>1978</year>
-		<publisher>Bally Mfg. Corp.</publisher>
+		<publisher>Bally</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="2048">
 				<rom name="280zzap.bin" size="2048" crc="e4d285e5" sha1="0de670d6f78e3011e84fefc65f70544cdad3320e" offset="0" />
@@ -28,7 +28,7 @@
 		<description>ADS System Monitor (Prototype)</description>
 <!-- <note>This prototype was found in the collection of Arcadian editor Bob Fabris.</note> -->
 		<year>19??</year>
-		<publisher>Larry Hanson</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="2048">
 				<rom name="adssm.bin" size="2048" crc="b8d4df61" sha1="93ffa31d308e62a1f0b09f20489bd620a08de37b" offset="0" />
@@ -39,7 +39,7 @@
 	<software name="amazmaze">
 		<description>Amazing Maze / Tic-Tac-Toe</description>
 		<year>1979</year>
-		<publisher>Bally Mfg. Corp.</publisher>
+		<publisher>Bally</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="2048">
 				<rom name="amazmaze.bin" size="2048" crc="cd57c485" sha1="8c833f077830db847caad91a3f040ac7ddcd33f8" offset="0" />
@@ -50,10 +50,43 @@
 	<software name="artiduel">
 		<description>Artillery Duel</description>
 		<year>1982</year>
-		<publisher>Astrocade Inc.</publisher>
+		<publisher>Astrocade</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="artiduel.bin" size="4096" crc="4f372019" sha1="24f6accc59301773e7471a831a5e3312c61694b0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="artiduelp1" cloneof="artiduel">
+		<description>Artillery Duel (Prototype 19820523)</description>
+		<year>1982</year>
+		<publisher>Astrocade</publisher>
+		<part name="cart" interface="astrocde_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="artillery duel (5-23) (1982)(astrocade inc.)(proto).bin" size="4096" crc="2227f488" sha1="e8b9a13b5b712ff5e2269813271777956d69be3c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="artiduelp2" cloneof="artiduel">
+		<description>Artillery Duel (Prototype Alt)</description>
+		<year>1982</year>
+		<publisher>Astrocade</publisher>
+		<part name="cart" interface="astrocde_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="artillery duel (1982)(astrocade inc.)(proto).bin" size="4096" crc="53f75720" sha1="376027b2974aa73e523dc0c139f723168a379ece" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="artiduelp3" cloneof="artiduel">
+		<description>Artillery Duel (Prototype Alt 2)</description>
+		<year>1982</year>
+		<publisher>Astrocade</publisher>
+		<part name="cart" interface="astrocde_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="artillery duel (1982)(astrocade inc.)(proto)[a].bin" size="2048" crc="2521a6ec" sha1="4b02162dd5503e08479929be36de5a6648410310" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -73,7 +106,7 @@
 	<software name="astrobat">
 		<description>Astro Battle</description>
 		<year>1979</year>
-		<publisher>Bally Mfg. Corp.</publisher>
+		<publisher>Bally</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="astrobat.bin" size="4096" crc="0b5298bc" sha1="cdf7a2a8608c3e90d0cc8a4b751276b76de72f8c" offset="0" />
@@ -85,7 +118,7 @@
 		<description>Bally BASIC</description>
 <!-- <note>The original release of BASIC used an external 300 baud interface (not emulated) to load and save programs.</note> -->
 		<year>1978</year>
-		<publisher>Bally Mfg. Corp.</publisher>
+		<publisher>Bally</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="bbasic.bin" size="4096" crc="90e276aa" sha1="abb85bc19419a1d81c698884f81a53d85806885d" offset="0" />
@@ -97,7 +130,7 @@
 		<description>Bally BASIC (Astrovision)</description>
 <!-- <note>The updated release of BASIC used an internal 2000 baud interface (not emulated) to load and save programs.</note> -->
 		<year>1981</year>
-		<publisher>Astrovision Inc.</publisher>
+		<publisher>Astrovision</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="astrobas.bin" size="4096" crc="70514687" sha1="a2ac8995a6217b7190aa9b18f49261c0ed3c6b5a" offset="0" />
@@ -108,7 +141,7 @@
 	<software name="bbasdemo">
 		<description>Bally BASIC Demo</description>
 		<year>1978</year>
-		<publisher>Bally Mfg. Corp.</publisher>
+		<publisher>Bally</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="8192">
 				<rom name="bbasdemo.bin" size="8192" crc="007e70d5" sha1="6ed1f49e6581ecea5328e3c5f99026afd7f1f7e4" offset="0" />
@@ -142,9 +175,9 @@
 
 	<software name="colorbas">
 		<description>Bally Color BASIC (Prototype)</description>
-<!-- <note>This prototype comes from the collection of Arcadian editor Bob Fabris. While the name Color BASIC was sometimes used to refer to what eventually became Hot Rod Bally BASIC by Jay Fenton (eventually sold on tape in limited quantities), this appears to be an unrelated modification of Bally BASIC by Larry Hanson. Support for the 300 baud interface isn't fully enabled in this version.</note> -->
+<!-- <note>This prototype was sent to Arcadian editor Bob Fabris from Jay Fenton. Support for the 300 baud interface isn't fully enabled in this version.</note> -->
 		<year>19??</year>
-		<publisher>Larry Hanson and Bally Mfg. Corp.</publisher>
+		<publisher>Bally</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="colorbas.bin" size="4096" crc="e1c30ede" sha1="7b5fa4cd585081c5d51127d32d02a33ed44b5843" offset="0" />
@@ -155,7 +188,7 @@
 	<software name="ballypin">
 		<description>Bally Pin</description>
 		<year>1979</year>
-		<publisher>Bally Mfg. Corp.</publisher>
+		<publisher>Bally</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="ballypin.bin" size="4096" crc="3f431613" sha1="05b680777aa9639620c790f0590d96416d49bf94" offset="0" />
@@ -178,7 +211,7 @@
 	<software name="biorhy">
 		<description>BioRhythm</description>
 		<year>1981</year>
-		<publisher>Astrovision Inc.</publisher>
+		<publisher>Astrovision</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="biorhy.bin" size="4096" crc="fc4bd27c" sha1="1ba84a04ea5d7d87c213d978fecc188a4a8517a6" offset="0" />
@@ -189,7 +222,7 @@
 	<software name="blckjack">
 		<description>Black Jack / Acey Deucey / Poker</description>
 		<year>1979</year>
-		<publisher>Bally Mfg. Corp.</publisher>
+		<publisher>Bally</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="blckjack.bin" size="4096" crc="78d45a11" sha1="7b92e3ad161e31926a730780d1f28015310dd7d7" offset="0" />
@@ -197,7 +230,19 @@
 		</part>
 	</software>
 
-	<software name="brbsic10">
+	<software name="brb10p" cloneof="brb10">
+		<description>Blue RAM BASIC 1.0 (Prototype)</description>
+		<!-- <note>Requires RAM expansion</note> -->
+		<year>1980</year>
+		<publisher>Perkins Engineering</publisher>
+		<part name="cart" interface="astrocde_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="blue ram basic 1.0 (1980)(perkins engineering)(proto)[not playable].bin" size="4096" crc="2fa59f1e" sha1="ef27b8863b05afe58259fdf5755e919699485e4f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="brb10">
 		<description>Blue RAM BASIC 1.0</description>
 		<!-- <note>Requires RAM expansion</note> -->
 		<year>1980</year>
@@ -209,7 +254,7 @@
 		</part>
 	</software>
 
-	<software name="brbsic11">
+	<software name="brb11">
 		<description>Blue RAM BASIC 1.1</description>
 		<!-- <note>Requires RAM expansion</note> -->
 		<year>1981</year>
@@ -247,7 +292,7 @@
 	<software name="bowling">
 		<description>Bowling (Prototype)</description>
 		<year>198?</year>
-		<publisher>Astrocade Inc.</publisher>
+		<publisher>Astrocade</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="bowling.bin" size="4096" crc="1f8bc8ba" sha1="de27100803a414989d538ca34fc1b3e122dfac78" offset="0" />
@@ -258,7 +303,7 @@
 	<software name="brckyard">
 		<description>Brickyard / Clowns</description>
 		<year>1978</year>
-		<publisher>Bally Mfg. Corp.</publisher>
+		<publisher>Bally</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="brckyard.bin" size="4096" crc="28f9e502" sha1="4c1a9efcd4435f6a79dc2212c4d0d17ea753809c" offset="0" />
@@ -292,7 +337,7 @@
 	<software name="checkers">
 		<description>Checkers (Prototype)</description>
 		<year>19??</year>
-		<publisher>Bally Mfg. Corp.</publisher>
+		<publisher>Bally</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="2048">
 				<rom name="checkers.bin" size="2048" crc="757bab8f" sha1="9ef927e88e3f799276966b569c2402f6b25be416" offset="0" />
@@ -339,7 +384,7 @@
 	<software name="colbook">
 		<description>Coloring Book (Prototype)</description>
 		<year>198?</year>
-		<publisher>Astrocade Inc.</publisher>
+		<publisher>Astrocade</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="8192">
 				<rom name="colbook.bin" size="8192" crc="14f36aba" sha1="41eaaa061ed47996219b70bc0ed7d6a19c4b3c28" offset="0" />
@@ -349,9 +394,9 @@
 
 	<software name="conan">
 		<description>Conan The Barbarian!</description>
-<!-- <note>While Astrocade Inc. never completed Conan, it was eventually published in incomplete form by Dave Carson Software, which added its own copyright screen.</note> -->
+<!-- <note>While Astrocade never completed Conan, it was eventually published in incomplete form by Dave Carson Software, which added its own copyright screen.</note> -->
 		<year>1985</year>
-		<publisher>Astrocade Inc. and Dave Carson Software</publisher>
+		<publisher>Astrocade and Dave Carson Software</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="8192">
 				<rom name="conan.bin" size="8192" crc="8a6adbfe" sha1="8b0d3125b805d57b9958b0e7a4f0e9d1a70f6353" offset="0" />
@@ -362,7 +407,7 @@
 	<software name="conanp" cloneof="conan">
 		<description>Conan The Barbarian! (Prototype)</description>
 		<year>1982</year>
-		<publisher>Astrocade Inc.</publisher>
+		<publisher>Astrocade</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="8192">
 				<rom name="conanp.bin" size="8192" crc="15b1afea" sha1="bc4f757271fca69e0de3973f43d363c4474e2fb7" offset="0" />
@@ -385,7 +430,7 @@
 	<software name="cosmicrd">
 		<description>Cosmic Raiders</description>
 		<year>1983</year>
-		<publisher>Astrocade Inc.</publisher>
+		<publisher>Astrocade</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="8192">
 				<rom name="cosmicrd.bin" size="8192" crc="2a77b3fb" sha1="09ae145e3dbfd132f5130a0cbb508f4fbcf35bee" offset="0" />
@@ -396,7 +441,7 @@
 	<software name="cosmicrda" cloneof="cosmicrd">
 		<description>Cosmic Raiders (Proto, Alt)</description>
 		<year>198?</year>
-		<publisher>Astrocade Inc.</publisher>
+		<publisher>Astrocade</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="8192">
 				<rom name="cosmicra.bin" size="8192" crc="869b692e" sha1="b71b81eeaf10b59efb1b51d88b1e758305d5f1e4" offset="0" />
@@ -407,7 +452,7 @@
 	<software name="cosmicrdb" cloneof="cosmicrd">
 		<description>Cosmic Raiders (Proto, Alt 2)</description>
 		<year>198?</year>
-		<publisher>Astrocade Inc.</publisher>
+		<publisher>Astrocade</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="8192">
 				<rom name="cosmica2.bin" size="8192" crc="37670f78" sha1="30044130dd3b41295351fa3905d53e26e52b3745" offset="0" />
@@ -419,7 +464,7 @@
 		<description>Cosmic Raiders (Proto v3.5)</description>
 <!-- <note>An identical ROM was dumped from a cart labeled version 2.8.</note> -->
 		<year>198?</year>
-		<publisher>Astrocade Inc.</publisher>
+		<publisher>Astrocade</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="8192">
 				<rom name="cosmic35.bin" size="8192" crc="e3d723a0" sha1="337cdffe2260dc6d36d674fa35047cb5a3598bf9" offset="0" />
@@ -430,7 +475,7 @@
 	<software name="cosmicrd36" cloneof="cosmicrd">
 		<description>Cosmic Raiders (Proto v3.6)</description>
 		<year>198?</year>
-		<publisher>Astrocade Inc.</publisher>
+		<publisher>Astrocade</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="8192">
 				<rom name="cosmic36.bin" size="8192" crc="00b6fe88" sha1="5a3772b8524361b174c761ef759659b4a63166fa" offset="0" />
@@ -438,10 +483,21 @@
 		</part>
 	</software>
 
+	<software name="cclimber">
+		<description>Crazy Climber</description>
+		<year>2011</year>
+		<publisher>Riff Raff Games</publisher>
+		<part name="cart" interface="astrocde_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="crazy climber (2011)(riff raff games)[ccv054f].bin" size="8187" crc="bf864c44" sha1="3fc71a3061ddc39788920b27ce11d0ea545e3da6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="dealdemo">
 		<description>Dealer Demo</description>
 		<year>1978</year>
-		<publisher>Bally Mfg. Corp.</publisher>
+		<publisher>Bally</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="dealdemo.bin" size="4096" crc="16b77b44" sha1="302ad18ea17b12a474ebbba1a882d8aad8cf5e94" offset="0" />
@@ -452,7 +508,7 @@
 	<software name="dogpatch">
 		<description>Dogpatch</description>
 		<year>1980</year>
-		<publisher>Bally Mfg. Corp.</publisher>
+		<publisher>Bally</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="2048">
 				<rom name="dogpatch.bin" size="2048" crc="77bed6ba" sha1="263e6372392bc37a2228eb455d1477dcd41d9104" offset="0" />
@@ -472,7 +528,7 @@
 	</software>
 
 	<software name="fawn">
-		<description>Fawn Dungeon (Prototype)</description>
+		<description>Fawn Dungeon (Prototype, first version)</description>
 <!-- <note>Barry McCleave sent two prototype versions of this game to Arcadian editor Bob Fabris, but it was never completed.</note> -->
 		<year>1981</year>
 		<publisher>Barry McCleave</publisher>
@@ -484,7 +540,7 @@
 	</software>
 
 	<software name="fawna" cloneof="fawn">
-		<description>Fawn Dungeon (Prototype, Alt)</description>
+		<description>Fawn Dungeon (Prototype, second version)</description>
 <!-- <note>Barry McCleave sent two prototype versions of this game to Arcadian editor Bob Fabris, but it was never completed.</note> -->
 		<year>1981</year>
 		<publisher>Barry McCleave</publisher>
@@ -510,7 +566,7 @@
 	<software name="football">
 		<description>Football</description>
 		<year>1978</year>
-		<publisher>Bally Mfg. Corp.</publisher>
+		<publisher>Bally</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="football.bin" size="4096" crc="fc8998a9" sha1="1d07b45162fab5497fe0a3d4ccb1b33bfd47177a" offset="0" />
@@ -519,7 +575,7 @@
 	</software>
 
 	<software name="ziggyjx">
-		<description>Fun With Vectors - Ziggy (JX label) (Prototype)</description>
+		<description>Fun With Vectors - Ziggy (Prototype JX label)</description>
 <!-- <note>This demo comes from a collection of old ROMs released by Richard Degler.</note> -->
 		<year>1985</year>
 		<publisher>Richard Degler</publisher>
@@ -531,7 +587,7 @@
 	</software>
 
 	<software name="ziggymo">
-		<description>Fun With Vectors - Ziggy (MO label) (Prototype)</description>
+		<description>Fun With Vectors - Ziggy (Prototype MO label)</description>
 <!-- <note>This demo comes from a collection of old ROMs released by Richard Degler.</note> -->
 		<year>1985</year>
 		<publisher>Richard Degler</publisher>
@@ -545,7 +601,7 @@
 	<software name="galactic">
 		<description>Galactic Invasion</description>
 		<year>1981</year>
-		<publisher>Astrovision Inc.</publisher>
+		<publisher>Astrovision</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="galactic.bin" size="4096" crc="ba558eb7" sha1="939857d621715b831d558bcb2fd2f0f9e9b37676" offset="0" />
@@ -556,7 +612,7 @@
 	<software name="galaxian">
 		<description>Galaxian</description>
 		<year>1981</year>
-		<publisher>Astrovision Inc.</publisher>
+		<publisher>Astrovision</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="galaxian.bin" size="4096" crc="d75e9672" sha1="fb13e40c9ebadcb68beb7294a732ecf1b2f2ec30" offset="0" />
@@ -564,10 +620,43 @@
 		</part>
 	</software>
 
+	<software name="golddig">
+		<description>Golddigger, Goldrush (Prototype, 19840811))</description>
+		<year>1984</year>
+		<publisher>Dave Carson and Ken Lill</publisher>
+		<part name="cart" interface="astrocde_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="golddigger, goldrush (8-11-84) (1984)(dave carson and ken lill)(proto).bin" size="2048" crc="20755476" sha1="3537ded59d46a539e05a5f178a409346f1673bd9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="golddiga" cloneof="golddig">
+		<description>Golddigger, Goldrush (Prototype Alt)</description>
+		<year>198?</year>
+		<publisher>Dave Carson and Ken Lill</publisher>
+		<part name="cart" interface="astrocde_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="golddigger, goldrush (198x)(dave carson and ken lill)(proto).bin" size="2048" crc="994661a1" sha1="ca71326eb5cd243d2240804bb314235d96b45380" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="golddigb" cloneof="golddig">
+		<description>Golddigger, Goldrush (Prototype Alt 2)</description>
+		<year>198?</year>
+		<publisher>Dave Carson and Ken Lill</publisher>
+		<part name="cart" interface="astrocde_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="golddigger, goldrush (198x)(dave carson and ken lill)(proto)[a].bin" size="2048" crc="face3b05" sha1="a54d2eb5f304fb83ad125560b0e555b0d1beb9ae" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="grandprx">
 		<description>Grand Prix</description>
 		<year>1981</year>
-		<publisher>Astrovision Inc.</publisher>
+		<publisher>Astrovision</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="grandprx.bin" size="4096" crc="7b3b7b70" sha1="fd133dc402b6ecbcc718ffb895a16e07979ab329" offset="0" />
@@ -636,7 +725,7 @@
 	<software name="lttrmtch">
 		<description>Letter Match / Spell 'n Score / Crosswords</description>
 		<year>1978</year>
-		<publisher>Bally Mfg. Corp.</publisher>
+		<publisher>Bally</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="lttrmtch.bin" size="4096" crc="2cf68f93" sha1="266f6978b8f9e6bad36dc21031193ca93cd55be4" offset="0" />
@@ -678,6 +767,17 @@
 		</part>
 	</software>
 
+	<software name="mazemanp" cloneof="mazeman">
+		<description>Mazeman (Prototype)</description>
+		<year>1984</year>
+		<publisher>Dave Carson Software</publisher>
+		<part name="cart" interface="astrocde_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="mazeman (1984)(dave carson software)(proto).bin" size="4096" crc="af649678" sha1="f296ebdfe1a8c4f1dacf06914be1918b92f4d2b3" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="matk">
 		<description>Missile Attack</description>
 		<!-- <note>Mike White sold a version of ICBM Attack hacked to work with a regular controller.</note> -->
@@ -703,9 +803,9 @@
 
 	<software name="muncher">
 		<description>Muncher</description>
-		<!-- <note>This Pac-Man clone was originally developed by Astrocade Inc., but never released by them due to legal challenges.  Phillip Harris and Alternative Engineering took the prototype, changed the name to Muncher, and manufactured some for sale through the Arcadian newsletter.  More copies were later sold by Esoterica.</note> -->
+		<!-- <note>This Pac-Man clone was originally developed by Astrocade, but never released by them due to legal challenges.  Phillip Harris and Alternative Engineering took the prototype, changed the name to Muncher, and manufactured some for sale through the Arcadian newsletter.  More copies were later sold by Esoterica.</note> -->
 		<year>1983</year>
-		<publisher>Astrocade Inc., Phillip Harris, and Alternative Engineering</publisher>
+		<publisher>Astrocade, Phillip Harris, and Alternative Engineering</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="8192">
 				<rom name="muncher.bin" size="8192" crc="e4726657" sha1="02f37ded48b1fb9ba0a2d7e45f5b0a85eaecb1c8" offset="0" />
@@ -715,9 +815,9 @@
 
 	<software name="musicmak">
 		<description>Music Maker</description>
-<!-- <note>While Astrocade Inc. never released Music Maker, it was eventually published by Dave Carson Software, which added its own copyright screen.</note> -->
+<!-- <note>While Astrocade never released Music Maker, it was eventually published by Dave Carson Software, which added its own copyright screen.</note> -->
 		<year>1985</year>
-		<publisher>Astrocade Inc. and Dave Carson Software</publisher>
+		<publisher>Astrocade and Dave Carson Software</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="8192">
 				<rom name="musicmak.bin" size="8192" crc="b242ef84" sha1="8101424ebbc2a31d7e750b6d00f01e657fd97cf8" offset="0" />
@@ -726,12 +826,23 @@
 	</software>
 
 	<software name="musicmakp" cloneof="musicmak">
-		<description>Music Maker v3.7 (Prototype)</description>
+		<description>Music Maker (Prototype v3.7)</description>
 		<year>1982</year>
-		<publisher>Astrocade Inc.</publisher>
+		<publisher>Astrocade</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="8192">
 				<rom name="musicmap.bin" size="8192" crc="a76828d0" sha1="924cecf006f91bf49f2bcc1e14c55646a0ee93ff" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="musicmakp2" cloneof="musicmak">
+		<description>Music Maker (Prototype Alt)</description>
+		<year>1982</year>
+		<publisher>Astrocade</publisher>
+		<part name="cart" interface="astrocde_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="music maker (1981)(astrocade inc.)(proto).bin" size="7376" crc="cc97a150" sha1="6a35509709497151f4f810a958fc5abf3852afc6" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -740,22 +851,10 @@
 		<description>No-Die!</description>
 <!-- <note>Dave Carson detailed how to hack Muncher to give infinite lives in the Arcadian newsletter.  Mike White sold this hacked version as No-Die!.</note> -->
 		<year>1984</year>
-		<publisher>Astrocade Inc., Dave Carson, and Mike White</publisher>
+		<publisher>Astrocade, Dave Carson, and Mike White</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="8192">
 				<rom name="nodie.bin" size="8192" crc="784b256a" sha1="8dd34f2428a65ac590a26b25904a96e6f04e01d2" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="pacman">
-		<description>Pac-Man (Prototype)</description>
-<!-- <note>This prototype was eventually renamed Muncher and sold through the Arcadian newsletter.</note> -->
-		<year>198?</year>
-		<publisher>Astrocade Inc.</publisher>
-		<part name="cart" interface="astrocde_cart">
-			<dataarea name="rom" size="8192">
-				<rom name="pacman.bin" size="8192" crc="17363546" sha1="3d0e2b3fc4adfd0297a609bd78eb8b557414ea23" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -784,6 +883,40 @@
 		</part>
 	</software>
 
+	<software name="pacman">
+		<description>Pac-Man (Prototype)</description>
+<!-- <note>This prototype was eventually renamed Muncher and sold through the Arcadian newsletter.</note> -->
+		<year>198?</year>
+		<publisher>Astrocade</publisher>
+		<part name="cart" interface="astrocde_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="pacman.bin" size="8192" crc="17363546" sha1="3d0e2b3fc4adfd0297a609bd78eb8b557414ea23" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pacmana" cloneof="pacman">
+		<description>Pac-Man (Prototype Alt)</description>
+		<year>198?</year>
+		<publisher>Astrocade</publisher>
+		<part name="cart" interface="astrocde_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="pac-man (198x)(astrocade inc.)(proto)[a].bin" size="8192" crc="ca3a67dd" sha1="fc5cd6ec56e0f2d3acf7acfd4dbc560bdf63c768" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pacmaze">
+		<description>Pacmaze (Prototype)</description>
+		<year>198?</year>
+		<publisher>Dave Carson Software</publisher>
+		<part name="cart" interface="astrocde_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="pacmaze (198x)(dave carson software)(proto).bin" size="4096" crc="cff3a6cc" sha1="f8d1b6eb9c4e148b76a46bda7ca3e976abeba056" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="paperbck">
 		<description>Paperback Writer (Prototype)</description>
 		<year>1986</year>
@@ -798,7 +931,7 @@
 	<software name="pirate">
 		<description>Pirate's Chase</description>
 		<year>1982</year>
-		<publisher>Astrocade Inc.</publisher>
+		<publisher>Astrocade</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="pirate.bin" size="4096" crc="7b1b206a" sha1="3ad79a4381441c7f28479ad6b50c9105ca1ba7e4" offset="0" />
@@ -826,9 +959,9 @@
 
 	<software name="rainbow2">
 		<description>Rainbow v2 (Prototype)</description>
-<!-- <note>This prototype was found in the collection of Arcadian editor Bob Fabris. The first version has not been found.</note> -->
+<!-- <note>This prototype was found in the collection of Arcadian editor Bob Fabris. The full name of the author is unknown, and the first version has not been found.</note> -->
 		<year>19??</year>
-		<publisher>Larry Hanson</publisher>
+		<publisher>Hanson</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="2048">
 				<rom name="rainbow2.bin" size="2048" crc="3883484a" sha1="888d0de155b53606466393560119ea355edd11ce" offset="0" />
@@ -839,7 +972,7 @@
 	<software name="redbaron">
 		<description>Red Baron / Panzer Attack</description>
 		<year>1978</year>
-		<publisher>Bally Mfg. Corp.</publisher>
+		<publisher>Bally</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="redbaron.bin" size="4096" crc="a1c7e129" sha1="e0602c7485f511d6aa29d669967b101de79ddb15" offset="0" />
@@ -873,7 +1006,7 @@
 	<software name="seawolf">
 		<description>Seawolf / Missile</description>
 		<year>1978</year>
-		<publisher>Bally Mfg. Corp.</publisher>
+		<publisher>Bally</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="2048">
 				<rom name="seawolf.bin" size="2048" crc="a021735e" sha1="4c2ca46ab5a00dc2eb252ee900b2760b758a2162" offset="0" />
@@ -942,7 +1075,7 @@
 	<software name="soccerp">
 		<description>Soccer (Prototype)</description>
 		<year>198?</year>
-		<publisher>Astrocade Inc.</publisher>
+		<publisher>Astrocade</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="8192">
 				<rom name="soccerp.bin" size="8192" crc="7de08d9a" sha1="955b138b4db95e8a7c35ff958724440bd75d5fc2" offset="0" />
@@ -954,7 +1087,7 @@
 		<description>Soccer (Prototype, Alt)</description>
 <!-- <note>Dumped from a cart labeled 'Soccer / Dribbling'.</note> -->
 		<year>198?</year>
-		<publisher>Astrocade Inc.</publisher>
+		<publisher>Astrocade</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="soccera.bin" size="4096" crc="fd633ca9" sha1="39ac51f18eb6ceb8e1f766f4d13d4c0ed7af1f85" offset="0" />
@@ -966,7 +1099,7 @@
 		<description>Soccer (Prototype, Alt 2)</description>
 <!-- <note>Dumped from a cart labeled 'Soccer 8-5'.</note> -->
 		<year>198?</year>
-		<publisher>Astrocade Inc.</publisher>
+		<publisher>Astrocade</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="8192">
 				<rom name="soccera2.bin" size="8192" crc="7c2858dd" sha1="a6fd25d85124e4c3f005f25c067a0b60a7a617c3" offset="0" />
@@ -977,7 +1110,7 @@
 	<software name="soccera3">
 		<description>Soccer (Prototype, Alt 3)</description>
 		<year>198?</year>
-		<publisher>Astrocade Inc.</publisher>
+		<publisher>Astrocade</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="8192">
 				<rom name="soccera3.bin" size="8192" crc="5cb41426" sha1="a6cee6a0bc7a7bfe506b1089b431629e8b57dc04" offset="0" />
@@ -988,7 +1121,7 @@
 	<software name="soccera4">
 		<description>Soccer (Prototype, Alt 4)</description>
 		<year>198?</year>
-		<publisher>Astrocade Inc.</publisher>
+		<publisher>Astrocade</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="8192">
 				<rom name="soccera4.bin" size="8192" crc="4f5e93d5" sha1="5ea2b708df06b09abd63b58e03229efecb98d464" offset="0" />
@@ -999,7 +1132,7 @@
 	<software name="solarcnq">
 		<description>Solar Conqueror</description>
 		<year>1983</year>
-		<publisher>Astrocade Inc.</publisher>
+		<publisher>Astrocade</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="8192">
 				<rom name="scnquer.bin" size="8192" crc="d15ce025" sha1="3185285687a1b4f643329bea94cba398e1b3ed4b" offset="0" />
@@ -1010,7 +1143,7 @@
 	<software name="solarcnqp28" cloneof="solarcnq">
 		<description>Solar Conqueror (Prototype v2.8)</description>
 		<year>198?</year>
-		<publisher>Astrocade Inc.</publisher>
+		<publisher>Astrocade</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="8192">
 				<rom name="scquer28.bin" size="8192" crc="0709b022" sha1="90900ec2c1fb9d476db22fd479400a6315230f9f" offset="0" />
@@ -1021,7 +1154,7 @@
 	<software name="solarcnqp39" cloneof="solarcnq">
 		<description>Solar Conqueror (Prototype v3.9)</description>
 		<year>198?</year>
-		<publisher>Astrocade Inc.</publisher>
+		<publisher>Astrocade</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="8192">
 				<rom name="scquer39.bin" size="8192" crc="8612cc7a" sha1="eba87f0296ff0759eb25a094ea98fd05d9eb91b6" offset="0" />
@@ -1033,7 +1166,7 @@
 		<description>Solar Conqueror (Prototype)</description>
 <!-- <note>Dumped from a cart labeled 'Solar Conquer CES Chicago 1982'.</note> -->
 		<year>1982</year>
-		<publisher>Astrocade Inc.</publisher>
+		<publisher>Astrocade</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="8192">
 				<rom name="scquerp.bin" size="8192" crc="4a229478" sha1="99139da1e5b8a52251033de6902b537d3f9ab6bc" offset="0" />
@@ -1044,10 +1177,21 @@
 	<software name="songs">
 		<description>Songs (Prototype)</description>
 		<year>19??</year>
-		<publisher>Bally Mfg. Corp.</publisher>
+		<publisher>Bally</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="songs.bin" size="4096" crc="fe6182b3" sha1="a269b21309b7849b6a3e248417be9316db31e4e6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="songsa" cloneof="songs">
+		<description>Songs (Prototype Alt)</description>
+		<year>19??</year>
+		<publisher>Bally</publisher>
+		<part name="cart" interface="astrocde_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="songs (19xx)(bally mfg. corp.)(proto)[a].bin" size="8192" crc="36a3d077" sha1="892720fb69a1d7bb158d857176374c113ab545ca" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1056,7 +1200,7 @@
 		<description>Songs (Prototype, Unfinished)</description>
 <!-- <note>This was dumped from a ROM in Richard Degler's collection.  At some point, it's had data from the Blue RAM Utility added to the end of it.</note> -->
 		<year>19??</year>
-		<publisher>Bally Mfg. Corp.</publisher>
+		<publisher>Bally</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="8192">
 				<rom name="songsu.bin" size="8192" crc="16326f8c" sha1="c2f980f59367f4ff80c96fc173c83c0b29c1bc8f" offset="0" />
@@ -1067,7 +1211,7 @@
 	<software name="spacefrt">
 		<description>Space Fortress</description>
 		<year>1981</year>
-		<publisher>Astrocade Inc.</publisher>
+		<publisher>Astrocade</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="spacefrt.bin" size="4096" crc="519cc707" sha1="d1d4527128cad5446cdd4d4f0dfa7194cb50aaef" offset="0" />
@@ -1075,10 +1219,21 @@
 		</part>
 	</software>
 
-	<software name="invaders">
+	<software name="spacefrtp" cloneof="spacefrt">
+		<description>Space Fortress (Prototype)</description>
+		<year>1981</year>
+		<publisher>Astrocade</publisher>
+		<part name="cart" interface="astrocde_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="space fortress (1981)(astrocade inc.)(proto).bin" size="2048" crc="cf5012bd" sha1="08510e05c81192908bb62330dc825e1f63052584" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spaceinv">
 		<description>Space Invaders</description>
 		<year>1979</year>
-		<publisher>Bally Mfg. Corp.</publisher>
+		<publisher>Bally</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="invaders.bin" size="4096" crc="52964c1f" sha1="aecaa45ed1d74ebf882120da75c006ae502e94c1" offset="0" />
@@ -1086,10 +1241,21 @@
 		</part>
 	</software>
 
+	<software name="spaceinvp" cloneof="spaceinv">
+		<description>Space Invaders (Prototype)</description>
+		<year>197?</year>
+		<publisher>Bally</publisher>
+		<part name="cart" interface="astrocde_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="space invaders (197x)(bally mfg. corp.)(proto).bin" size="2048" crc="a542f4b2" sha1="46b2396ce3223a8e709a819e674726e6bf0d026e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="spedmath">
 		<description>Speed Math / Bingo Math</description>
 		<year>1978</year>
-		<publisher>Bally Mfg. Corp.</publisher>
+		<publisher>Bally</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="2048">
 				<rom name="spedmath.bin" size="2048" crc="7d30312a" sha1="8f500f1e2144169bb94214eaa2863dcf6590b926" offset="0" />
@@ -1100,7 +1266,7 @@
 	<software name="starbttl">
 		<description>Star Battle</description>
 		<year>1979</year>
-		<publisher>Bally Mfg. Corp.</publisher>
+		<publisher>Bally</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="2048">
 				<rom name="starbttl.bin" size="2048" crc="d54a74c8" sha1="00f8c65ed73f6ce134c1e4e0af7c5aa91a287951" offset="0" />
@@ -1112,7 +1278,7 @@
 		<description>Stweek</description>
 <!-- <note>This was an internal tool for developing sound effects.</note> -->
 		<year>19??</year>
-		<publisher>Bally Mfg. Corp.</publisher>
+		<publisher>Bally</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="2048">
 				<rom name="stweek.bin" size="2048" crc="e4f3766a" sha1="a8170dba7126ff6acb56686a46362bb36bebd799" offset="0" />
@@ -1136,7 +1302,7 @@
 		<description>Tests</description>
 <!-- <note>This was an internal tool for testing hardware.</note> -->
 		<year>19??</year>
-		<publisher>Bally Mfg. Corp.</publisher>
+		<publisher>Bally</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="tests.bin" size="4096" crc="49df19eb" sha1="581f592845ffca65f1336b521d03c57309a6f91c" offset="0" />
@@ -1159,7 +1325,7 @@
 	<software name="wizard">
 		<description>The Incredible Wizard</description>
 		<year>1982</year>
-		<publisher>Astrocade Inc.</publisher>
+		<publisher>Astrocade</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="8192">
 				<rom name="wizard.bin" size="8192" crc="1395b130" sha1="da366390c91e24206b5034bc525e98f2a3ce5f86" offset="0" />
@@ -1168,10 +1334,10 @@
 	</software>
 
 	<software name="wizardp" cloneof="wizard" supported="no">
-		<description>The Incredible Wizard (Prototype)</description>
+		<description>The Incredible Wizard (Prototype, Bad Dump)</description>
 <!-- <note>This was dumped from a working prototype cart, but the cart was sold before it was realized that the dump was bad.</note> -->
 		<year>198?</year>
-		<publisher>Astrocade Inc.</publisher>
+		<publisher>Astrocade</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="8192">
 				<rom name="wizardp.bin" size="8192" crc="a0cba256" sha1="262c731967b193ece4e1d395e7cb3e8ce9c4fc2c" offset="0" status="baddump"/>
@@ -1182,7 +1348,7 @@
 	<software name="baseball">
 		<description>Tornado Baseball / Handball / Hockey / Tennis</description>
 		<year>1978</year>
-		<publisher>Bally Mfg. Corp.</publisher>
+		<publisher>Bally</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="baseball.bin" size="4096" crc="5be548cc" sha1="4dda98d6cf257652fd179eca137b69b67e38b8c6" offset="0" />
@@ -1249,6 +1415,17 @@
 		</part>
 	</software>
 
+	<software name="war">
+		<description>War (Second Printing)</description>
+		<year>2012</year>
+		<publisher>Riff Raff Games</publisher>
+		<part name="cart" interface="astrocde_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="war (2012)(riff raff games)[second printing].bin" size="7931" crc="c1faf1bf" sha1="bca64e756b1f1c23a6b78d90a14541e44161371b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="yahtgold" supported="no">
 		<description>Yahtzee / Golddigger</description>
 <!-- <note>This is one of several BASIC conversions sold by Mike White.  It requires cartridge swapping and a RAM expansion.</note> -->
@@ -1262,7 +1439,7 @@
 	</software>
 
 	<software name="yesternv">
-		<description>Yesterday (no vibrato) (Prototype)</description>
+		<description>Yesterday (Prototype, no vibrato)</description>
 <!-- <note>Of all Richard Degler's adaptations of George Moses' Beatles tape programs, only this one was actually sold in limited quantities.  The version sold hadn't had vibrato added yet, though.</note> -->
 		<year>1986</year>
 		<publisher>Richard Degler and George Moses</publisher>
@@ -1274,7 +1451,7 @@
 	</software>
 
 	<software name="yesterv">
-		<description>Yesterday (with vibrato) (Prototype)</description>
+		<description>Yesterday (Prototype, with vibrato)</description>
 		<year>1986</year>
 		<publisher>Richard Degler and George Moses</publisher>
 		<part name="cart" interface="astrocde_cart">
