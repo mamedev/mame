@@ -148,7 +148,7 @@ static void extract_directory(char *buf, const char *path, size_t size);
 //============================================================
 int pauseg=0;
 
-#include "libco/libco.h"
+#include <libco.h>
 
 cothread_t mainThread;
 cothread_t emuThread;

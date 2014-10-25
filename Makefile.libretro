@@ -585,7 +585,7 @@ INCPATH += \
 	-I$(SRC)/lib \
 	-I$(SRC)/osd \
 	-I$(SRC)/osd/$(OSD) \
-
+	-I$(SRC)/osd/$(OSD)/libretro-sdk/include
 
 
 #-------------------------------------------------
@@ -728,7 +728,8 @@ BUILDOUT = $(BUILDOBJ)
 #-------------------------------------------------
 
 # include OSD-specific rules first
-include $(SRC)/osd/$(OSD)/$(OSD).mak
+#include $(SRC)/osd/$(OSD)/$(OSD).mak
+include $(SRC)/osd/$(OSD)/mak/$(OSD).mak
 
 # then the various core pieces
 include $(SRC)/osd/$(OSD)/mak/build.mak
@@ -856,7 +857,7 @@ $(EMULATOR): $(EMUINFOOBJ) $(DRIVLISTOBJ) $(DRVLIBS) $(LIBOSD) $(LIBBUS) $(LIBOP
 
 ifeq ($(armplatform), 1)
 $(LIBCOOBJ)/armeabi_asm.o:
-	$(CC_AS) -c $(SRC)/osd/$(OSD)/libco/armeabi_asm.S -o $(LIBCOOBJ)/armeabi_asm.o
+	$(CC_AS) -c $(SRC)/osd/$(OSD)/libretro-sdk/libco/armeabi_asm.S -o $(LIBCOOBJ)/armeabi_asm.o
 endif
 
 $(OBJ)/%.o: $(SRC)/%.c | $(OSPREBUILD)
