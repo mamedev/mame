@@ -212,8 +212,9 @@ void x1_010_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 				volL     = ((reg->volume>>4)&0xf)*VOL_BASE;
 				volR     = ((reg->volume>>0)&0xf)*VOL_BASE;
 				smp_offs = m_smp_offset[ch];
-				freq     = reg->frequency&0x1f;
-				// Meta Fox does not write the frequency register. Ever
+				freq     = reg->frequency;
+				// Meta Fox does write the frequency register, but this is a hack to make it "work" with the current setup
+				// This is broken for Arbalester (it writes 8), but that'll be fixed later.
 				if( freq == 0 ) freq = 4;
 				smp_step = (UINT32)((float)m_base_clock/8192.0
 							*freq*(1<<FREQ_BASE_BITS)/(float)m_rate);
