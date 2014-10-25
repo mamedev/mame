@@ -1,3 +1,5 @@
+// license:MAME
+// copyright-holders:Robbbert
 /***************************************************************************************************
 
   PINBALL
@@ -572,13 +574,13 @@ UINT32 spinb_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 	if (m_game)
 	{
 		ma = ((ma - 0x200) & 0x1c00) + 0x200;
+		if (ma > 0x1c00) return 1; // not initialised yet
 
 		for(y=0; y<32; y++)
 		{
 			UINT16 *p = &bitmap.pix16(sy++);
 			for(x = 0; x < 16; x++)
 			{
-				assert((ma + 0x200) > 0 && (ma + 0x200) < ARRAY_LENGTH(m_dmdram));
 				gfx = m_dmdram[ma+0x200];
 				gfx1 = m_dmdram[ma++];
 
