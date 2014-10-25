@@ -1058,6 +1058,9 @@ void video_manager::recompute_speed(const attotime &emutime)
 //  given screen
 //-------------------------------------------------
 
+typedef software_renderer<UINT32, 0,0,0, 16,8,0, false, true> snap_renderer_bilinear;
+typedef software_renderer<UINT32, 0,0,0, 16,8,0, false, false> snap_renderer;
+
 void video_manager::create_snapshot_bitmap(screen_device *screen)
 {
 	// select the appropriate view in our dummy target
@@ -1083,7 +1086,10 @@ void video_manager::create_snapshot_bitmap(screen_device *screen)
 	// render the screen there
 	render_primitive_list &primlist = m_snap_target->get_primitives();
 	primlist.acquire_lock();
-	software_renderer<UINT32, 0,0,0, 16,8,0, false, true>::draw_primitives(primlist, &m_snap_bitmap.pix32(0), width, height, m_snap_bitmap.rowpixels());
+	if (machine().options().snap_bilinear())
+		snap_renderer_bilinear::draw_primitives(primlist, &m_snap_bitmap.pix32(0), width, height, m_snap_bitmap.rowpixels());
+	else
+		snap_renderer::draw_primitives(primlist, &m_snap_bitmap.pix32(0), width, height, m_snap_bitmap.rowpixels());
 	primlist.release_lock();
 }
 
