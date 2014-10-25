@@ -633,7 +633,8 @@ public:
 	DECLARE_WRITE64_MEMBER(main_fifo_w);
 	DECLARE_READ64_MEMBER(main_mpc106_r);
 	DECLARE_WRITE64_MEMBER(main_mpc106_w);
-
+	DECLARE_WRITE32_MEMBER(main_cpu_dc_store);
+	
 	DECLARE_READ32_MEMBER(sub_comram_r);
 	DECLARE_WRITE32_MEMBER(sub_comram_w);
 	DECLARE_READ32_MEMBER(sub_sound_r);
@@ -653,6 +654,7 @@ public:
 	DECLARE_READ32_MEMBER(sub_psac2_r);
 	DECLARE_WRITE32_MEMBER(sub_psac2_w);
 	DECLARE_WRITE32_MEMBER(sub_psac_palette_w);
+	DECLARE_WRITE32_MEMBER(sub_sound_dma_w);
 
 	DECLARE_WRITE64_MEMBER(gfx_fifo0_w);
 	DECLARE_WRITE64_MEMBER(gfx_fifo1_w);
@@ -662,6 +664,9 @@ public:
 	DECLARE_WRITE64_MEMBER(gfx_unk1_w);
 	DECLARE_READ64_MEMBER(gfx_fifo_r);
 	DECLARE_WRITE64_MEMBER(gfx_buf_w);
+	DECLARE_WRITE32_MEMBER(gfx_cpu_dc_store);
+	
+	DECLARE_WRITE8_MEMBER(sub_jvs_w);
 
 	DECLARE_WRITE_LINE_MEMBER(ide_interrupt);
 
@@ -1599,14 +1604,12 @@ WRITE64_MEMBER(cobra_state::main_comram_w)
 	m_comram[page][(offset << 1) + 1] = (w2 & ~m2) | (d2 & m2);
 }
 
-static void main_cpu_dc_store(device_t *device, UINT32 address)
+WRITE32_MEMBER(cobra_state::main_cpu_dc_store)
 {
-	cobra_state *cobra = device->machine().driver_data<cobra_state>();
-
-	if ((address & 0xf0000000) == 0xc0000000)
+	if ((offset & 0xf0000000) == 0xc0000000)
 	{
 		// force sync when writing to GFX board main ram
-		cobra->m_maincpu->spin_until_time(attotime::from_usec(80));
+		m_maincpu->spin_until_time(attotime::from_usec(80));
 	}
 }
 
@@ -1888,9 +1891,9 @@ WRITE32_MEMBER(cobra_state::sub_psac2_w)
 {
 }
 
-static void sub_sound_dma_w(device_t *device, int width, UINT32 data)
+WRITE32_MEMBER(cobra_state::sub_sound_dma_w)
 {
-	//printf("DMA write to unknown: size %d, data %08X\n", width, data);
+	//printf("DMA write to unknown: size %d, data %08X\n", address, data);
 
 	/*
 	static FILE *out;
@@ -1903,28 +1906,25 @@ static void sub_sound_dma_w(device_t *device, int width, UINT32 data)
 	fputc((data >> 0) & 0xff, out);
 	*/
 
-	cobra_state *cobra = device->machine().driver_data<cobra_state>();
-
 	INT16 ldata = (INT16)(data >> 16);
 	INT16 rdata = (INT16)(data);
 
-	cobra->m_sound_dma_buffer_l[cobra->m_sound_dma_ptr] = ldata;
-	cobra->m_sound_dma_buffer_r[cobra->m_sound_dma_ptr] = rdata;
-	cobra->m_sound_dma_ptr++;
+	m_sound_dma_buffer_l[m_sound_dma_ptr] = ldata;
+	m_sound_dma_buffer_r[m_sound_dma_ptr] = rdata;
+	m_sound_dma_ptr++;
 
-	if (cobra->m_sound_dma_ptr >= DMA_SOUND_BUFFER_SIZE)
+	if (m_sound_dma_ptr >= DMA_SOUND_BUFFER_SIZE)
 	{
-		cobra->m_sound_dma_ptr = 0;
+		m_sound_dma_ptr = 0;
 
-		dmadac_transfer(&cobra->m_dmadac[0], 1, 0, 1, DMA_SOUND_BUFFER_SIZE, cobra->m_sound_dma_buffer_l);
-		dmadac_transfer(&cobra->m_dmadac[1], 1, 0, 1, DMA_SOUND_BUFFER_SIZE, cobra->m_sound_dma_buffer_r);
+		dmadac_transfer(&m_dmadac[0], 1, 0, 1, DMA_SOUND_BUFFER_SIZE, m_sound_dma_buffer_l);
+		dmadac_transfer(&m_dmadac[1], 1, 0, 1, DMA_SOUND_BUFFER_SIZE, m_sound_dma_buffer_r);
 	}
 }
 
-static void sub_jvs_w(device_t *device, UINT8 data)
+WRITE8_MEMBER(cobra_state::sub_jvs_w)
 {
-	cobra_state *cobra = device->machine().driver_data<cobra_state>();
-	cobra_jvs_host *jvs = downcast<cobra_jvs_host *>(device->machine().device("cobra_jvs_host"));
+	cobra_jvs_host *jvs = machine().device<cobra_jvs_host>("cobra_jvs_host");
 
 #if LOG_JVS
 	printf("sub_jvs_w: %02X\n", data);
@@ -1948,7 +1948,7 @@ static void sub_jvs_w(device_t *device, UINT8 data)
 
 		for (int i=0; i < rec_size; i++)
 		{
-			cobra->m_subcpu->ppc4xx_spu_receive_byte(rec_data[i]);
+			m_subcpu->ppc4xx_spu_receive_byte(rec_data[i]);
 		}
 	}
 }
@@ -2991,32 +2991,30 @@ WRITE64_MEMBER(cobra_state::gfx_buf_w)
 	}
 }
 
-static void gfx_cpu_dc_store(device_t *device, UINT32 address)
+WRITE32_MEMBER(cobra_state::gfx_cpu_dc_store)
 {
-	cobra_state *cobra = device->machine().driver_data<cobra_state>();
-
-	UINT32 addr = address >> 24;
+	UINT32 addr = offset >> 24;
 	if (addr == 0x10 || addr == 0x18 || addr == 0x1e)
 	{
-		UINT64 i = (UINT64)(cobra->m_gfx_fifo_cache_addr) << 32;
-		cobra_fifo *fifo_in = cobra->m_gfxfifo_in;
+		UINT64 i = (UINT64)(m_gfx_fifo_cache_addr) << 32;
+		cobra_fifo *fifo_in = m_gfxfifo_in;
 
-		UINT32 a = (address / 8) & 0xff;
+		UINT32 a = (offset / 8) & 0xff;
 
-		fifo_in->push(device, (UINT32)(cobra->m_gfx_fifo_mem[a+0] >> 32) | i);
-		fifo_in->push(device, (UINT32)(cobra->m_gfx_fifo_mem[a+0] >>  0) | i);
-		fifo_in->push(device, (UINT32)(cobra->m_gfx_fifo_mem[a+1] >> 32) | i);
-		fifo_in->push(device, (UINT32)(cobra->m_gfx_fifo_mem[a+1] >>  0) | i);
-		fifo_in->push(device, (UINT32)(cobra->m_gfx_fifo_mem[a+2] >> 32) | i);
-		fifo_in->push(device, (UINT32)(cobra->m_gfx_fifo_mem[a+2] >>  0) | i);
-		fifo_in->push(device, (UINT32)(cobra->m_gfx_fifo_mem[a+3] >> 32) | i);
-		fifo_in->push(device, (UINT32)(cobra->m_gfx_fifo_mem[a+3] >>  0) | i);
+		fifo_in->push(&space.device(), (UINT32)(m_gfx_fifo_mem[a+0] >> 32) | i);
+		fifo_in->push(&space.device(), (UINT32)(m_gfx_fifo_mem[a+0] >>  0) | i);
+		fifo_in->push(&space.device(), (UINT32)(m_gfx_fifo_mem[a+1] >> 32) | i);
+		fifo_in->push(&space.device(), (UINT32)(m_gfx_fifo_mem[a+1] >>  0) | i);
+		fifo_in->push(&space.device(), (UINT32)(m_gfx_fifo_mem[a+2] >> 32) | i);
+		fifo_in->push(&space.device(), (UINT32)(m_gfx_fifo_mem[a+2] >>  0) | i);
+		fifo_in->push(&space.device(), (UINT32)(m_gfx_fifo_mem[a+3] >> 32) | i);
+		fifo_in->push(&space.device(), (UINT32)(m_gfx_fifo_mem[a+3] >>  0) | i);
 
-		cobra->m_renderer->gfx_fifo_exec();
+		m_renderer->gfx_fifo_exec();
 	}
 	else
 	{
-		logerror("gfx: data cache store at %08X\n", address);
+		logerror("gfx: data cache store at %08X\n", offset);
 	}
 }
 
@@ -3263,12 +3261,12 @@ DRIVER_INIT_MEMBER(cobra_state, cobra)
 								cobra_fifo::event_delegate(FUNC(cobra_state::s2mfifo_event_callback), this))
 								);
 
-	m_maincpu->ppc_set_dcstore_callback(main_cpu_dc_store);
+	m_maincpu->ppc_set_dcstore_callback(write32_delegate(FUNC(cobra_state::main_cpu_dc_store),this));
 
-	m_gfxcpu->ppc_set_dcstore_callback(gfx_cpu_dc_store);
+	m_gfxcpu->ppc_set_dcstore_callback(write32_delegate(FUNC(cobra_state::gfx_cpu_dc_store), this));
 
-	m_subcpu->ppc4xx_set_dma_write_handler(0, sub_sound_dma_w, 44100);
-	m_subcpu->ppc4xx_spu_set_tx_handler(sub_jvs_w);
+	m_subcpu->ppc4xx_set_dma_write_handler(0, write32_delegate(FUNC(cobra_state::sub_sound_dma_w), this), 44100);
+	m_subcpu->ppc4xx_spu_set_tx_handler(write8_delegate(FUNC(cobra_state::sub_jvs_w), this));
 
 
 	m_comram[0] = auto_alloc_array(machine(), UINT32, 0x40000/4);

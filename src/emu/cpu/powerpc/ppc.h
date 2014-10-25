@@ -162,18 +162,6 @@ enum
 
 
 /***************************************************************************
-    STRUCTURES AND TYPEDEFS
-***************************************************************************/
-
-typedef void (*ppc4xx_spu_tx_handler)(device_t *device, UINT8 data);
-
-
-typedef void (*ppc_dcstore_handler)(device_t *device, UINT32 address);
-typedef UINT32 (*ppc4xx_dma_read_handler)(device_t *device, int width);
-typedef void (*ppc4xx_dma_write_handler)(device_t *device, int width, UINT32 data);
-
-
-/***************************************************************************
     PUBLIC FUNCTIONS
 ***************************************************************************/
 
@@ -228,8 +216,8 @@ public:
 
 	static void set_bus_frequency(device_t &device, UINT32 bus_frequency) { downcast<ppc_device &>(device).c_bus_frequency = bus_frequency; }
 
-	void ppc_set_dcstore_callback(ppc_dcstore_handler handler);
-
+	void ppc_set_dcstore_callback(write32_delegate callback);
+	
 	void ppcdrc_set_options(UINT32 options);
 	void ppcdrc_add_fastram(offs_t start, offs_t end, UINT8 readonly, void *base);
 	void ppcdrc_add_hotspot(offs_t pc, UINT32 opcode, UINT32 cycles);
@@ -494,7 +482,7 @@ protected:
 		emu_timer *     timer;
 		UINT8           rxbuffer[256];
 		UINT32          rxin, rxout;
-		ppc4xx_spu_tx_handler tx_handler;
+		write8_delegate tx_cb;
 	};
 
 	ppc4xx_spu_state m_spu;
@@ -518,10 +506,10 @@ protected:
 	read32_delegate  m_dcr_read_func;
 	write32_delegate m_dcr_write_func;
 
-	ppc_dcstore_handler m_dcstore_handler;
+	write32_delegate m_dcstore_cb;
 
-	ppc4xx_dma_read_handler m_ext_dma_read_handler[4];
-	ppc4xx_dma_write_handler m_ext_dma_write_handler[4];
+	read32_delegate m_ext_dma_read_cb[4];
+	write32_delegate m_ext_dma_write_cb[4];
 
 	/* PowerPC function pointers for memory accesses/exceptions */
 	jmp_buf m_exception_jmpbuf;
@@ -766,11 +754,11 @@ class ppc4xx_device : public ppc_device
 public:
 	ppc4xx_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, powerpc_flavor flavor, UINT32 cap, UINT32 tb_divisor);
 
-	void ppc4xx_spu_set_tx_handler(ppc4xx_spu_tx_handler handler);
+	void ppc4xx_spu_set_tx_handler(write8_delegate callback);
 	void ppc4xx_spu_receive_byte(UINT8 byteval);
 
-	void ppc4xx_set_dma_read_handler(int channel, ppc4xx_dma_read_handler handler, int rate);
-	void ppc4xx_set_dma_write_handler(int channel, ppc4xx_dma_write_handler handler, int rate);
+	void ppc4xx_set_dma_read_handler(int channel, read32_delegate callback, int rate);
+	void ppc4xx_set_dma_write_handler(int channel, write32_delegate callback, int rate);
 	void ppc4xx_set_dcr_read_handler(read32_delegate dcr_read_func);
 	void ppc4xx_set_dcr_write_handler(write32_delegate dcr_write_func);
 

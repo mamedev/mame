@@ -217,7 +217,6 @@ ppc_device::ppc_device(const machine_config &mconfig, device_type type, const ch
 	, m_flavor(flavor)
 	, m_cap(cap)
 	, m_tb_divisor(tb_divisor)
-	, m_dcstore_handler(NULL)
 	, m_cache(CACHE_SIZE + sizeof(internal_ppc_state))
 	, m_drcuml(NULL)
 	, m_drcfe(NULL)
@@ -225,8 +224,6 @@ ppc_device::ppc_device(const machine_config &mconfig, device_type type, const ch
 {
 	m_program_config.m_logaddr_width = 32;
 	m_program_config.m_page_shift = POWERPC_MIN_PAGE_SHIFT;
-	memset(m_ext_dma_read_handler, 0, sizeof(m_ext_dma_read_handler));
-	memset(m_ext_dma_write_handler, 0, sizeof(m_ext_dma_write_handler));
 }
 
 //ppc403_device::ppc403_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
@@ -1244,9 +1241,9 @@ offs_t ppc_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *opro
 
 void ppc_device::ppccom_dcstore_callback()
 {
-	if (m_dcstore_handler != NULL)
+	if (!m_dcstore_cb.isnull())
 	{
-		m_dcstore_handler(this, m_core->param0);
+		m_dcstore_cb(*m_program, m_core->param0, 0, 0xffffffff);
 	}
 }
 
@@ -2064,9 +2061,9 @@ TIMER_CALLBACK_MEMBER( ppc_device::decrementer_int_callback )
     for detecting datacache stores with dcbst
 -------------------------------------------------*/
 
-void ppc_device::ppc_set_dcstore_callback(ppc_dcstore_handler handler)
+void ppc_device::ppc_set_dcstore_callback(write32_delegate callback)
 {
-	m_dcstore_handler = handler;
+	m_dcstore_cb = callback;
 }
 
 
@@ -2291,8 +2288,8 @@ TIMER_CALLBACK_MEMBER( ppc_device::ppc4xx_buffered_dma_callback )
 			do
 			{
 				UINT8 data = 0;
-				if (m_ext_dma_read_handler[dmachan] != NULL)
-					data = (*m_ext_dma_read_handler[dmachan])(this, 1);
+				if (!m_ext_dma_read_cb[dmachan].isnull())
+					data = (m_ext_dma_read_cb[dmachan])(*m_program, 1, 0xffffffff);
 				m_program->write_byte(dmaregs[DCR4XX_DMADA0], data);
 				dmaregs[DCR4XX_DMADA0] += destinc;
 			} while (!ppc4xx_dma_decrement_count(dmachan));
@@ -2303,8 +2300,8 @@ TIMER_CALLBACK_MEMBER( ppc_device::ppc4xx_buffered_dma_callback )
 			do
 			{
 				UINT16 data = 0;
-				if (m_ext_dma_read_handler[dmachan] != NULL)
-					data = (*m_ext_dma_read_handler[dmachan])(this, 2);
+				if (!m_ext_dma_read_cb[dmachan].isnull())
+					data = (m_ext_dma_read_cb[dmachan])(*m_program, 2, 0xffffffff);
 				m_program->write_word(dmaregs[DCR4XX_DMADA0], data);
 				dmaregs[DCR4XX_DMADA0] += destinc;
 			} while (!ppc4xx_dma_decrement_count(dmachan));
@@ -2315,8 +2312,8 @@ TIMER_CALLBACK_MEMBER( ppc_device::ppc4xx_buffered_dma_callback )
 			do
 			{
 				UINT32 data = 0;
-				if (m_ext_dma_read_handler[dmachan] != NULL)
-					data = (*m_ext_dma_read_handler[dmachan])(this, 4);
+				if (!m_ext_dma_read_cb[dmachan].isnull())
+					data = (m_ext_dma_read_cb[dmachan])(*m_program, 4, 0xffffffff);
 				m_program->write_dword(dmaregs[DCR4XX_DMADA0], data);
 				dmaregs[DCR4XX_DMADA0] += destinc;
 			} while (!ppc4xx_dma_decrement_count(dmachan));
@@ -2335,8 +2332,8 @@ TIMER_CALLBACK_MEMBER( ppc_device::ppc4xx_buffered_dma_callback )
 			do
 			{
 				UINT8 data = m_program->read_byte(dmaregs[DCR4XX_DMADA0]);
-				if (m_ext_dma_write_handler[dmachan] != NULL)
-					(*m_ext_dma_write_handler[dmachan])(this, 1, data);
+				if (!m_ext_dma_write_cb[dmachan].isnull())
+					(m_ext_dma_write_cb[dmachan])(*m_program, 1, data, 0xffffffff);
 				dmaregs[DCR4XX_DMADA0] += destinc;
 			} while (!ppc4xx_dma_decrement_count(dmachan));
 			break;
@@ -2346,8 +2343,8 @@ TIMER_CALLBACK_MEMBER( ppc_device::ppc4xx_buffered_dma_callback )
 			do
 			{
 				UINT16 data = m_program->read_word(dmaregs[DCR4XX_DMADA0]);
-				if (m_ext_dma_write_handler[dmachan] != NULL)
-					(*m_ext_dma_write_handler[dmachan])(this, 2, data);
+				if (!m_ext_dma_write_cb[dmachan].isnull())
+					(m_ext_dma_write_cb[dmachan])(*m_program, 2, data, 0xffffffff);
 				dmaregs[DCR4XX_DMADA0] += destinc;
 			} while (!ppc4xx_dma_decrement_count(dmachan));
 			break;
@@ -2357,8 +2354,8 @@ TIMER_CALLBACK_MEMBER( ppc_device::ppc4xx_buffered_dma_callback )
 			do
 			{
 				UINT32 data = m_program->read_dword(dmaregs[DCR4XX_DMADA0]);
-				if (m_ext_dma_write_handler[dmachan] != NULL)
-					(*m_ext_dma_write_handler[dmachan])(this, 4, data);
+				if (!m_ext_dma_write_cb[dmachan].isnull())
+					(m_ext_dma_write_cb[dmachan])(*m_program, 4, data, 0xffffffff);
 				dmaregs[DCR4XX_DMADA0] += destinc;
 			} while (!ppc4xx_dma_decrement_count(dmachan));
 			break;
@@ -2680,8 +2677,8 @@ TIMER_CALLBACK_MEMBER( ppc_device::ppc4xx_spu_callback )
 		if (!(m_spu.regs[SPU4XX_LINE_STATUS] & 0x04))
 		{
 			/* if we have a transmit handler, send it that way */
-			if (m_spu.tx_handler != NULL)
-				(*m_spu.tx_handler)(this, m_spu.txbuf);
+			if (!m_spu.tx_cb.isnull())
+				(m_spu.tx_cb)(*m_program, 0, m_spu.txbuf, 0xff);
 
 			/* indicate that we have moved it to the shift register */
 			m_spu.regs[SPU4XX_LINE_STATUS] |= 0x04;
@@ -2826,9 +2823,9 @@ WRITE8_MEMBER( ppc4xx_device::ppc4xx_spu_w )
     specific TX handler configuration
 -------------------------------------------------*/
 
-void ppc4xx_device::ppc4xx_spu_set_tx_handler(ppc4xx_spu_tx_handler handler)
+void ppc4xx_device::ppc4xx_spu_set_tx_handler(write8_delegate callback)
 {
-	m_spu.tx_handler = handler;
+	m_spu.tx_cb = callback;
 }
 
 
@@ -2847,9 +2844,9 @@ void ppc4xx_device::ppc4xx_spu_receive_byte(UINT8 byteval)
     specific external DMA read handler configuration
 -------------------------------------------------*/
 
-void ppc4xx_device::ppc4xx_set_dma_read_handler(int channel, ppc4xx_dma_read_handler handler, int rate)
+void ppc4xx_device::ppc4xx_set_dma_read_handler(int channel, read32_delegate callback, int rate)
 {
-	m_ext_dma_read_handler[channel] = handler;
+	m_ext_dma_read_cb[channel] = callback;
 	m_buffered_dma_rate[channel] = rate;
 }
 
@@ -2858,9 +2855,9 @@ void ppc4xx_device::ppc4xx_set_dma_read_handler(int channel, ppc4xx_dma_read_han
     specific external DMA write handler configuration
 -------------------------------------------------*/
 
-void ppc4xx_device::ppc4xx_set_dma_write_handler(int channel, ppc4xx_dma_write_handler handler, int rate)
+void ppc4xx_device::ppc4xx_set_dma_write_handler(int channel, write32_delegate callback, int rate)
 {
-	m_ext_dma_write_handler[channel] = handler;
+	m_ext_dma_write_cb[channel] = callback;
 	m_buffered_dma_rate[channel] = rate;
 }
 

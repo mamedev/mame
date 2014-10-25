@@ -405,6 +405,7 @@ public:
 	DECLARE_WRITE16_MEMBER(soundtimer_en_w);
 	DECLARE_WRITE16_MEMBER(soundtimer_count_w);
 	ADC12138_IPT_CONVERT_CB(adc12138_input_callback);
+	DECLARE_WRITE8_MEMBER(jamma_jvs_w);
 
 	DECLARE_DRIVER_INIT(hornet);
 	DECLARE_DRIVER_INIT(hornet_2board);
@@ -1138,16 +1139,15 @@ MACHINE_CONFIG_END
 
 /*****************************************************************************/
 
-static void jamma_jvs_w(device_t *device, UINT8 data)
+WRITE8_MEMBER(hornet_state::jamma_jvs_w)
 {
-	hornet_state *state = device->machine().driver_data<hornet_state>();
-	if (state->m_jvs_sdata_ptr == 0 && data != 0xe0)
+	if (m_jvs_sdata_ptr == 0 && data != 0xe0)
 		return;
-	state->m_jvs_sdata[state->m_jvs_sdata_ptr] = data;
-	state->m_jvs_sdata_ptr++;
+	m_jvs_sdata[m_jvs_sdata_ptr] = data;
+	m_jvs_sdata_ptr++;
 
-	if (state->m_jvs_sdata_ptr >= 3 && state->m_jvs_sdata_ptr >= 3 + state->m_jvs_sdata[2])
-		state->jamma_jvs_cmd_exec();
+	if (m_jvs_sdata_ptr >= 3 && m_jvs_sdata_ptr >= 3 + m_jvs_sdata[2])
+		jamma_jvs_cmd_exec();
 }
 
 int hornet_state::jvs_encode_data(UINT8 *in, int length)
@@ -1283,7 +1283,7 @@ DRIVER_INIT_MEMBER(hornet_state,hornet)
 	m_konppc->set_cgboard_texture_bank(0, "bank5", memregion("user5")->base());
 	m_led_reg0 = m_led_reg1 = 0x7f;
 
-	m_maincpu->ppc4xx_spu_set_tx_handler(jamma_jvs_w);
+	m_maincpu->ppc4xx_spu_set_tx_handler(write8_delegate(FUNC(hornet_state::jamma_jvs_w), this));
 }
 
 DRIVER_INIT_MEMBER(hornet_state,hornet_2board)
@@ -1292,7 +1292,7 @@ DRIVER_INIT_MEMBER(hornet_state,hornet_2board)
 	m_konppc->set_cgboard_texture_bank(1, "bank6", memregion("user5")->base());
 	m_led_reg0 = m_led_reg1 = 0x7f;
 
-	m_maincpu->ppc4xx_spu_set_tx_handler(jamma_jvs_w);
+	m_maincpu->ppc4xx_spu_set_tx_handler(write8_delegate(FUNC(hornet_state::jamma_jvs_w), this));
 }
 
 /*****************************************************************************/

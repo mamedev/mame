@@ -259,6 +259,7 @@ public:
 	void GCU_w(int chip, UINT32 offset, UINT32 data, UINT32 mem_mask);
 	void set_ibutton(UINT8 *data);
 	int ibutton_w(UINT8 data);
+	DECLARE_WRITE8_MEMBER(security_w);
 	void init_lights(write32_delegate out1, write32_delegate out2, write32_delegate out3);
 	void init_firebeat();
 	void init_keyboard();
@@ -1949,12 +1950,11 @@ int firebeat_state::ibutton_w(UINT8 data)
 	return r;
 }
 
-static void security_w(device_t *device, UINT8 data)
+WRITE8_MEMBER(firebeat_state::security_w)
 {
-	firebeat_state *state = device->machine().driver_data<firebeat_state>();
-	int r = state->ibutton_w(data);
+	int r = ibutton_w(data);
 	if (r >= 0)
-		state->m_maincpu->ppc4xx_spu_receive_byte(r);
+		m_maincpu->ppc4xx_spu_receive_byte(r);
 }
 
 /*****************************************************************************/
@@ -1982,7 +1982,7 @@ void firebeat_state::init_firebeat()
 
 	m_cur_cab_data = cab_data;
 
-	m_maincpu->ppc4xx_spu_set_tx_handler(security_w);
+	m_maincpu->ppc4xx_spu_set_tx_handler(write8_delegate(FUNC(firebeat_state::security_w), this));
 
 	set_ibutton(rom);
 
