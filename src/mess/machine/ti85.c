@@ -1,5 +1,6 @@
 /***************************************************************************
   TI-85 driver by Krzysztof Strzecha
+  TI-83 Plus, TI-84 Plus, and Siliver Edition support by Jon Sturm
 
   Functions to emulate general aspects of the machine (RAM, ROM, interrupts,
   I/O ports)
@@ -236,6 +237,8 @@ void ti85_state::update_ti86_memory ()
 
 void ti85_state::machine_start()
 {
+	m_model = TI85;
+
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	m_bios = memregion("bios")->base();
 
@@ -277,33 +280,38 @@ MACHINE_RESET_MEMBER(ti85_state,ti83p)
 	m_PCR = 0xc0;
 
 	m_ti8x_memory_page_0 = 0;//0x1f;
-	m_ti8x_memory_page_1 = 0x1f;
+
+    if (m_model == TI83P)
+    {
+        m_ti8x_memory_page_1 = 0x1f;
+    }
+    else if (m_model == TI84P)
+    {
+        m_ti8x_memory_page_1 = 0x3f;
+    }
+    else
+    {
+	    m_ti8x_memory_page_1 = 0x7f;
+    }
+
 	m_ti8x_memory_page_2 = 0;
 	m_ti8x_memory_page_3 = 0;
 	m_ti83p_port4 = 1;
-	update_ti83p_memory();
-
-	m_maincpu->set_pc(0x8000);
-}
-
-MACHINE_RESET_MEMBER(ti85_state,ti83pse)
-{
-	m_red_out = 0x00;
-	m_white_out = 0x00;
-	m_PCR = 0xc0;
-
-	m_ti8x_memory_page_0 = 0;//0x1f;
-	m_ti8x_memory_page_1 = 0x7f;
-	m_ti8x_memory_page_2 = 0;
-	m_ti8x_memory_page_3 = 0;
-	m_ti83p_port4 = 1;
-	update_ti83pse_memory();
+	if (m_model == TI83P)
+    {
+        update_ti83p_memory();
+    }
+    else
+    {
+        update_ti83pse_memory();
+    }
 
 	m_maincpu->set_pc(0x8000);
 }
 
 MACHINE_START_MEMBER(ti85_state,ti83p)
 {
+	m_model = TI83P;
 	//address_space &space = m_maincpu->space(AS_PROGRAM);
 	//m_bios = memregion("flash")->base();
 
@@ -326,13 +334,17 @@ MACHINE_START_MEMBER(ti85_state,ti83p)
 	m_ti83p_port4 = 1;
 	m_flash_unlocked = 0;
 
-	ti85_state::update_ti83p_memory ();
+    ti85_state::update_ti83p_memory();
+	m_maincpu->set_pc(0x8000); //this is a hack due to incomplete memory mapping emulation
+
 
 	machine().scheduler().timer_pulse(attotime::from_hz(256), timer_expired_delegate(FUNC(ti85_state::ti83_timer1_callback),this));
 	machine().scheduler().timer_pulse(attotime::from_hz(512), timer_expired_delegate(FUNC(ti85_state::ti83_timer2_callback),this));
 
-		/* save states and debugging */
-	save_item(NAME(m_timer_interrupt_mask));
+
+	/* save states and debugging */
+	save_item(NAME(m_timer_interrupt_status));
+    save_item(NAME(m_timer_interrupt_mask));
 	save_item(NAME(m_ti8x_memory_page_0));
 	save_item(NAME(m_ti8x_memory_page_1));
 	save_item(NAME(m_ti8x_memory_page_2));
@@ -340,7 +352,7 @@ MACHINE_START_MEMBER(ti85_state,ti83p)
 	save_item(NAME(m_ti83p_port4));
 }
 
-MACHINE_START_MEMBER(ti85_state,ti83pse)
+void ti85_state::ti8xpse_init_common()
 {
 	//address_space &space = m_maincpu->space(AS_PROGRAM);
 	//address_space &asic =  ADDRESS_MAP_NAME(ti83p_asic_mem);
@@ -352,7 +364,7 @@ MACHINE_START_MEMBER(ti85_state,ti83pse)
 	m_ON_interrupt_status = 0;
 	m_ON_pressed = 0;
 	m_ti8x_memory_page_0 = 00;//0x7f;
-	m_ti8x_memory_page_1 = 0x7f;
+	m_ti8x_memory_page_1 = (m_model != TI84P ) ? 0x7f : 0x3f ;
 	m_ti8x_memory_page_2 = 0;
 	m_ti8x_memory_page_3 = 0;
 	m_LCD_memory_base = 0;
@@ -365,8 +377,8 @@ MACHINE_START_MEMBER(ti85_state,ti83pse)
 	m_ti83p_port4 = 1;
 	m_flash_unlocked = 0;
 
-	ti85_state::update_ti83p_memory();
-	m_maincpu->set_pc(0x8000);
+	ti85_state::update_ti83pse_memory();
+	m_maincpu->set_pc(0x8000);//same as above, hack to work around incomplete memory mapping emulation
 
 
 	machine().scheduler().timer_pulse(attotime::from_hz(256), timer_expired_delegate(FUNC(ti85_state::ti83_timer1_callback),this));
@@ -376,7 +388,7 @@ MACHINE_START_MEMBER(ti85_state,ti83pse)
 	m_crystal_timer2 = timer_alloc(CRYSTAL_TIMER2);
 	m_crystal_timer3 = timer_alloc(CRYSTAL_TIMER3);
 
-	/* save states and debugging */
+		/* save states and debugging */
 	save_item(NAME(m_ctimer_interrupt_status));
 	save_item(NAME(m_timer_interrupt_status));
 	save_item(NAME(m_ti8x_memory_page_0));
@@ -384,6 +396,28 @@ MACHINE_START_MEMBER(ti85_state,ti83pse)
 	save_item(NAME(m_ti8x_memory_page_2));
 	save_item(NAME(m_ti8x_memory_page_3));
 	save_item(NAME(m_ti83p_port4));
+}
+
+
+MACHINE_START_MEMBER(ti85_state,ti83pse)
+{
+    m_model = TI84PSE;
+
+    ti8xpse_init_common();
+}
+
+MACHINE_START_MEMBER(ti85_state,ti84pse)
+{
+    m_model = TI83PSE;
+
+    ti8xpse_init_common();
+}
+
+MACHINE_START_MEMBER(ti85_state,ti84p)
+{
+    m_model = TI84P;
+
+	ti8xpse_init_common();
 }
 
 MACHINE_START_MEMBER(ti85_state,ti86)
@@ -763,13 +797,28 @@ WRITE8_MEMBER(ti85_state::ti83pse_port_0005_w)
 
 WRITE8_MEMBER(ti85_state::ti83pse_port_0006_w)
 {
-	m_ti8x_memory_page_1 = data; //& ((data&0x80) ? 0x41 : 0x7f);
+
+	if ((m_model == TI84P) && (data < 0x80))
+	{
+		m_ti8x_memory_page_1 = data & 0x3f;
+	}
+	else
+	{
+		m_ti8x_memory_page_1 = data;
+	}
 	update_ti83pse_memory();
 }
 
 WRITE8_MEMBER(ti85_state::ti83pse_port_0007_w)
 {
-	m_ti8x_memory_page_2 = data; //& ((data&0x80) ? 0x41 : 0x7f);
+	if ((m_model == TI84P) && (data < 0x80))
+	{
+		m_ti8x_memory_page_2 = data & 0x3f;
+	}
+	else
+	{
+		m_ti8x_memory_page_2 = data;
+	}
 	update_ti83pse_memory();
 }
 
