@@ -33,13 +33,21 @@ enum
 #define CP1610_RESET        INPUT_LINE_RESET    /* Non-Maskable */
 #define CP1610_INT_INTR     INPUT_LINE_NMI      /* Non-Maskable */
 
-
+#define MCFG_CP1610_BEXT_CALLBACK(_read) \
+	downcast<cp1610_cpu_device *>(device)->set_bext_callback(DEVCB_##_read);
+	
+	
 class cp1610_cpu_device :  public cpu_device
 {
 public:
 	// construction/destruction
 	cp1610_cpu_device(const machine_config &mconfig, const char *_tag, device_t *_owner, UINT32 _clock);
 
+	template<class _read> void set_bext_callback(_read rd)
+	{
+		m_read_bext.set_callback(rd);
+	}
+	
 protected:
 	// device-level overrides
 	virtual void device_start();
@@ -79,6 +87,8 @@ private:
 	int     m_mask_interrupts;
 	address_space *m_program;
 	int m_icount;
+	
+	devcb_read8 m_read_bext;
 
 	void cp1610_illegal();
 	void cp1610_hlt();
