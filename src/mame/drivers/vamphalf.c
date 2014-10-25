@@ -167,8 +167,6 @@ public:
 	DECLARE_WRITE32_MEMBER(yorizori_1c_w);
 	DECLARE_READ32_MEMBER(yorizori_10_r);
 
-
-
 	DECLARE_READ8_MEMBER(qs1000_p1_r);
 	DECLARE_WRITE8_MEMBER(qs1000_p3_w);
 	DECLARE_DRIVER_INIT(vamphalf);
@@ -192,6 +190,9 @@ public:
 	DECLARE_DRIVER_INIT(yorizori);
 	UINT32 screen_update_common(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_aoh(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap);
+	void draw_sprites_aoh(screen_device &screen, bitmap_ind16 &bitmap);
+	void handle_flipped_visible_area(screen_device &screen);
 };
 
 READ16_MEMBER(vamphalf_state::eeprom_r)
@@ -608,10 +609,9 @@ or
 Offset+3
 -------x xxxxxxxx X offs
 */
-static void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap)
+void vamphalf_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap)
 {
-	vamphalf_state *state = screen.machine().driver_data<vamphalf_state>();
-	gfx_element *gfx = state->m_gfxdecode->gfx(0);
+	gfx_element *gfx = m_gfxdecode->gfx(0);
 	UINT32 cnt;
 	int block, offs;
 	int code,color,x,y,fx,fy;
@@ -622,7 +622,7 @@ static void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap)
 
 	for (block=0; block<0x8000; block+=0x800)
 	{
-		if(state->m_flipscreen)
+		if(m_flipscreen)
 		{
 			clip.min_y = 256 - (16-(block/0x800))*16;
 			clip.max_y = 256 - ((16-(block/0x800))*16)+15;
@@ -644,43 +644,43 @@ static void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap)
 			offs = (block + cnt) / 2;
 
 			// 16bit version
-			if(state->m_tiles != NULL)
+			if(m_tiles != NULL)
 			{
-				if(state->m_tiles[offs] & 0x0100) continue;
+				if(m_tiles[offs] & 0x0100) continue;
 
-				code  = state->m_tiles[offs+1];
-				color = (state->m_tiles[offs+2] >> state->m_palshift) & 0x7f;
+				code  = m_tiles[offs+1];
+				color = (m_tiles[offs+2] >> m_palshift) & 0x7f;
 
 				// boonggab
-				if(state->m_has_extra_gfx)
+				if(m_has_extra_gfx)
 				{
-					code  |= ((state->m_tiles[offs+2] & 0x100) << 8);
+					code  |= ((m_tiles[offs+2] & 0x100) << 8);
 				}
 
-				x = state->m_tiles[offs+3] & 0x01ff;
-				y = 256 - (state->m_tiles[offs] & 0x00ff);
+				x = m_tiles[offs+3] & 0x01ff;
+				y = 256 - (m_tiles[offs] & 0x00ff);
 
-				fx = state->m_tiles[offs] & 0x8000;
-				fy = state->m_tiles[offs] & 0x4000;
+				fx = m_tiles[offs] & 0x8000;
+				fy = m_tiles[offs] & 0x4000;
 			}
 			// 32bit version
 			else
 			{
 				offs /= 2;
 
-				if(state->m_tiles32[offs] & 0x01000000) continue;
+				if(m_tiles32[offs] & 0x01000000) continue;
 
-				code  = state->m_tiles32[offs] & 0xffff;
-				color = ((state->m_tiles32[offs+1] >> state->m_palshift) & 0x7f0000) >> 16;
+				code  = m_tiles32[offs] & 0xffff;
+				color = ((m_tiles32[offs+1] >> m_palshift) & 0x7f0000) >> 16;
 
-				x = state->m_tiles32[offs+1] & 0x01ff;
-				y = 256 - ((state->m_tiles32[offs] & 0x00ff0000) >> 16);
+				x = m_tiles32[offs+1] & 0x01ff;
+				y = 256 - ((m_tiles32[offs] & 0x00ff0000) >> 16);
 
-				fx = state->m_tiles32[offs] & 0x80000000;
-				fy = state->m_tiles32[offs] & 0x40000000;
+				fx = m_tiles32[offs] & 0x80000000;
+				fy = m_tiles32[offs] & 0x40000000;
 			}
 
-			if(state->m_flipscreen)
+			if(m_flipscreen)
 			{
 				fx = !fx;
 				fy = !fy;
@@ -694,10 +694,9 @@ static void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap)
 	}
 }
 
-static void draw_sprites_aoh(screen_device &screen, bitmap_ind16 &bitmap)
+void vamphalf_state::draw_sprites_aoh(screen_device &screen, bitmap_ind16 &bitmap)
 {
-	vamphalf_state *state = screen.machine().driver_data<vamphalf_state>();
-	gfx_element *gfx = state->m_gfxdecode->gfx(0);
+	gfx_element *gfx = m_gfxdecode->gfx(0);
 	UINT32 cnt;
 	int block, offs;
 	int code,color,x,y,fx,fy;
@@ -708,7 +707,7 @@ static void draw_sprites_aoh(screen_device &screen, bitmap_ind16 &bitmap)
 
 	for (block=0; block<0x8000; block+=0x800)
 	{
-		if(state->m_flipscreen)
+		if(m_flipscreen)
 		{
 			clip.min_y = 256 - (16-(block/0x800))*16;
 			clip.max_y = 256 - ((16-(block/0x800))*16)+15;
@@ -731,17 +730,17 @@ static void draw_sprites_aoh(screen_device &screen, bitmap_ind16 &bitmap)
 			offs = (block + cnt) / 2;
 			{
 				offs /= 2;
-				code  = (state->m_tiles32[offs] & 0xffff) | ((state->m_tiles32[offs] & 0x3000000) >> 8);
-				color = ((state->m_tiles32[offs+1] >> state->m_palshift) & 0x7f0000) >> 16;
+				code  = (m_tiles32[offs] & 0xffff) | ((m_tiles32[offs] & 0x3000000) >> 8);
+				color = ((m_tiles32[offs+1] >> m_palshift) & 0x7f0000) >> 16;
 
-				x = state->m_tiles32[offs+1] & 0x01ff;
-				y = 256 - ((state->m_tiles32[offs] & 0x00ff0000) >> 16);
+				x = m_tiles32[offs+1] & 0x01ff;
+				y = 256 - ((m_tiles32[offs] & 0x00ff0000) >> 16);
 
-				fx = state->m_tiles32[offs] & 0x4000000;
-				fy = 0; // not used ? or it's state->m_tiles32[offs] & 0x8000000?
+				fx = m_tiles32[offs] & 0x4000000;
+				fy = 0; // not used ? or it's m_tiles32[offs] & 0x8000000?
 			}
 
-			if(state->m_flipscreen)
+			if(m_flipscreen)
 			{
 				fx = !fx;
 				fy = !fy;
@@ -756,11 +755,10 @@ static void draw_sprites_aoh(screen_device &screen, bitmap_ind16 &bitmap)
 }
 
 
-void vamphalf_handle_flipped_visible_area( screen_device &screen )
+void vamphalf_state::handle_flipped_visible_area( screen_device &screen )
 {
-	vamphalf_state *state = screen.machine().driver_data<vamphalf_state>();
 	// are there actually registers to handle this?
-	if(!state->m_flipscreen)
+	if(!m_flipscreen)
 	{
 		rectangle visarea;
 		visarea.set(31, 350, 16, 251);
@@ -777,7 +775,7 @@ void vamphalf_handle_flipped_visible_area( screen_device &screen )
 
 UINT32 vamphalf_state::screen_update_common(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	vamphalf_handle_flipped_visible_area(screen);
+	handle_flipped_visible_area(screen);
 	bitmap.fill(0, cliprect);
 	draw_sprites(screen, bitmap);
 	return 0;
@@ -785,7 +783,7 @@ UINT32 vamphalf_state::screen_update_common(screen_device &screen, bitmap_ind16 
 
 UINT32 vamphalf_state::screen_update_aoh(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-//  vamphalf_handle_flipped_visible_area(screen); // not on this?
+//  handle_flipped_visible_area(screen); // not on this?
 	bitmap.fill(0, cliprect);
 	draw_sprites_aoh(screen, bitmap);
 	return 0;
