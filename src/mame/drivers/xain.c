@@ -729,7 +729,7 @@ ROM_START( xsleenaj )
 	ROM_LOAD( "pt-0.ic59",    0x00000, 0x0100, CRC(fed32888) SHA1(4e9330456b20f7198c1e27ca1ae7200f25595599) ) /* BPROM type MB7114E  Priority (not used) */
 ROM_END
 
-ROM_START( solarwar )
+ROM_START( solrwarr )
 	ROM_REGION( 0x14000, "maincpu", 0 )
 	ROM_LOAD( "p9-02.ic66",   0x08000, 0x8000, CRC(8ff372a8) SHA1(0fc396e662419fb9cb5bea11748aa8e0e8d072e6) )
 	ROM_LOAD( "pa-03.ic65",   0x04000, 0x4000, CRC(154f946f) SHA1(25b776eb9c494e5302795ae79e494cbfc7c104b1) )
@@ -837,5 +837,5 @@ ROM_END
 
 GAME( 1986, xsleena,  0,       xsleena,  xsleena, driver_device, 0, ROT0, "Technos Japan (Taito license)", "Xain'd Sleena (World)", 0 )
 GAME( 1986, xsleenaj, xsleena, xsleena,  xsleena, driver_device, 0, ROT0, "Technos Japan", "Xain'd Sleena (Japan)", 0 )
-GAME( 1986, solarwar, xsleena, xsleena,  xsleena, driver_device, 0, ROT0, "Technos Japan (Taito / Memetron license)", "Solar-Warrior (US)", 0 )
+GAME( 1986, solrwarr, xsleena, xsleena,  xsleena, driver_device, 0, ROT0, "Technos Japan (Taito / Memetron license)", "Solar-Warrior (US)", 0 )
 GAME( 1986, xsleenab, xsleena, xsleenab, xsleena, driver_device, 0, ROT0, "bootleg", "Xain'd Sleena (bootleg)", 0 )

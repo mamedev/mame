@@ -6849,6 +6849,7 @@ boxer           // ?????? prototype 1978    [6502]
 wolfpack        // ?????? prototype         [6502]
 mgolf           // ?????? prototype 1978    [6502]
 videopin        // 034253-034267    1979/02 [6502]
+solarwar        // 036154-036169    1979    [6502]
 atarifb4        // 034754           1979/04 [6502]
 subs            // 033714           1979/05 [6502]
 bsktball        // 034756-034766    1979/05 [6502]
@@ -6856,6 +6857,7 @@ abaseb          // 034711-034738    1979/06 [6502]
 abaseb2         // 034711-034738    1979/06 [6502]
 montecar        // 035763-035780    1980/04 [6502]
 soccer          // 035222-035260    1980/04 [6502]
+
 
 // Atari "Missile Command hardware" games
 missile         // 035820-035825    (c) 1980, 1 ROM update to rev 2 board
@@ -7782,7 +7784,7 @@ kuniokunb       // bootleg
 xsleena         // TA-0019 (c) 1986 + Taito license
 xsleenaj        // TA-0019 (c) 1986
 xsleenab        // bootleg
-solarwar        // TA-0019 (c) 1986 + Taito / Memetron license
+solrwarr        // TA-0019 (c) 1986 + Taito / Memetron license
 battlane        // -0215, -0216 (Data East part number) (c) 1986 + Taito license
 battlane2       // -0215, -0216 (Data East part number) (c) 1986 + Taito license
 battlane3       // -0215, -0216 (Data East part number) (c) 1986 + Taito license
