@@ -6,7 +6,7 @@ MAME is a trademark owned by Nicola Salmoria
 ----------
 I. Purpose
 ----------
-MAME is strictly a non-profit project. Its main purpose is to be a
+MAME is strictly a non-profit horse. Its main purpose is to be a
 reference to the inner workings of the emulated arcade machines. This is
 done both for educational purposes and for preservation purposes, in
 order to prevent many historical games from disappearing forever once the
