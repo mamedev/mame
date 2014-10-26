@@ -506,6 +506,18 @@
 		</part>
 	</software>
 
+	<software name="gunfrigh">
+		<description>Gun Fright</description>
+		<year>1986</year>
+		<publisher>Sammi Computer</publisher>
+		<info name="usage" value="Requires VDP unit in -ext1 expansion" />
+		<part name="cass" interface="spc1000_cass">
+			<dataarea name="cass" size="614352">
+				<rom name="gunfright.tap" size="614352" crc="73cc58ef" sha1="ab09466a1cf2fc12faa2e18252e348b9cc56a7ff" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="headon">
 		<description>Head-On</description>
 		<year>198?</year>
@@ -1000,6 +1012,18 @@
 		</part>
 	</software>
 
+	<software name="twinbee">
+		<description>TwinBee</description>
+		<year>1986</year>
+		<publisher>Static Soft</publisher>
+		<info name="usage" value="Requires VDP unit in -ext1 expansion" />
+		<part name="cass" interface="spc1000_cass">
+			<dataarea name="cass" size="55619">
+				<rom name="vdp+twinbee.cas" size="55619" crc="b1882952" sha1="cee9e0e060ce3f17b0bcc1fa1ba5d86590cae4c3" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="vela">
 		<description>Vela</description>
 		<year>198?</year>
@@ -1070,35 +1094,11 @@
 		</part>
 	</software>
 
-	<software name="zexas">
-		<description>Zexas</description>
-		<year>198?</year>
-		<publisher>Aloe?</publisher>
-		<part name="cass" interface="spc1000_cass">
-			<dataarea name="cass" size="702072">
-				<rom name="zexas-5461-mayhouse.tap" size="702072" crc="9367b51e" sha1="d6da8e4ae2275dbd3ba1b9c7137944f5674daf26" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-
-<!-- Requires VDP Unit emulation -->
-	<software name="twinbee" supported="no">
-		<description>TwinBee</description>
-		<year>198?</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cass" interface="spc1000_cass">
-			<dataarea name="cass" size="55619">
-				<rom name="vdp+twinbee.cas" size="55619" crc="b1882952" sha1="cee9e0e060ce3f17b0bcc1fa1ba5d86590cae4c3" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-<!-- Requires VDP Unit emulation -->
-	<software name="zanac" supported="no">
+	<software name="zanac">
 		<description>Zanac</description>
 		<year>198?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>A.I.</publisher>
+		<info name="usage" value="Requires VDP unit in -ext1 expansion" />
 		<part name="cass" interface="spc1000_cass">
 			<dataarea name="cass" size="774330">
 				<rom name="vdp-zanac-mayhouse.tap" size="774330" crc="c4b6ea48" sha1="c6d85f1e43285d42b00d47cf69d14629520595c7" offset="0" />
@@ -1106,14 +1106,13 @@
 		</part>
 	</software>
 
-<!-- Requires VDP Unit emulation -->
-	<software name="gunfrigh" supported="no">
-		<description>Gun Fright</description>
+	<software name="zexas">
+		<description>Zexas</description>
 		<year>198?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Aloe?</publisher>
 		<part name="cass" interface="spc1000_cass">
-			<dataarea name="cass" size="614352">
-				<rom name="gunfright.tap" size="614352" crc="73cc58ef" sha1="ab09466a1cf2fc12faa2e18252e348b9cc56a7ff" offset="0" />
+			<dataarea name="cass" size="702072">
+				<rom name="zexas-5461-mayhouse.tap" size="702072" crc="9367b51e" sha1="d6da8e4ae2275dbd3ba1b9c7137944f5674daf26" offset="0" />
 			</dataarea>
 		</part>
 	</software>

@@ -684,6 +684,19 @@ endif
 
 #-------------------------------------------------
 #
+#@src/emu/bus/spc1000/exp.h,BUSES += SPC1000
+#-------------------------------------------------
+
+ifneq ($(filter SPC1000,$(BUSES)),)
+OBJDIRS += $(BUSOBJ)/spc1000
+BUSOBJS += $(BUSOBJ)/spc1000/exp.o
+BUSOBJS += $(BUSOBJ)/spc1000/fdd.o
+BUSOBJS += $(BUSOBJ)/spc1000/vdp.o
+endif
+
+
+#-------------------------------------------------
+#
 #@src/emu/bus/tvc/tvc.h,BUSES += TVC
 #-------------------------------------------------
 
