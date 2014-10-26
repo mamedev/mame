@@ -493,9 +493,16 @@ static MACHINE_CONFIG_START( psj, psx1_state )
 	MCFG_RAM_MODIFY("maincpu:ram")
 	MCFG_RAM_DEFAULT_SIZE("2M")
 
-	MCFG_DEVICE_ADD("maincpu:sio0:controllers", PSXCONTROLLERPORTS, 0)
+	MCFG_DEVICE_ADD("controllers", PSXCONTROLLERPORTS, 0)
+	MCFG_PSX_CONTROLLER_PORTS_RXD_HANDLER(DEVWRITELINE("maincpu:sio0", psxsio0_device, write_rxd))
+	MCFG_PSX_CONTROLLER_PORTS_DSR_HANDLER(DEVWRITELINE("maincpu:sio0", psxsio0_device, write_dsr))
 	MCFG_PSX_CTRL_PORT_ADD("port1", psx_controllers, "digital_pad")
 	MCFG_PSX_CTRL_PORT_ADD("port2", psx_controllers, "digital_pad")
+
+	MCFG_DEVICE_MODIFY("maincpu:sio0")
+	MCFG_PSX_SIO_DTR_HANDLER(DEVWRITELINE("^controllers", psxcontrollerports_device, write_dtr))
+	MCFG_PSX_SIO_SCK_HANDLER(DEVWRITELINE("^controllers", psxcontrollerports_device, write_sck))
+	MCFG_PSX_SIO_TXD_HANDLER(DEVWRITELINE("^controllers", psxcontrollerports_device, write_txd))
 
 	/* video hardware */
 	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8561Q, 0x100000, XTAL_53_693175MHz )
@@ -534,9 +541,16 @@ static MACHINE_CONFIG_START( pse, psx1_state )
 	MCFG_RAM_MODIFY("maincpu:ram")
 	MCFG_RAM_DEFAULT_SIZE("2M")
 
-	MCFG_DEVICE_ADD("maincpu:sio0:controllers", PSXCONTROLLERPORTS, 0)
+	MCFG_DEVICE_ADD("controllers", PSXCONTROLLERPORTS, 0)
+	MCFG_PSX_CONTROLLER_PORTS_RXD_HANDLER(DEVWRITELINE("maincpu:sio0", psxsio0_device, write_rxd))
+	MCFG_PSX_CONTROLLER_PORTS_DSR_HANDLER(DEVWRITELINE("maincpu:sio0", psxsio0_device, write_dsr))
 	MCFG_PSX_CTRL_PORT_ADD("port1", psx_controllers, "digital_pad")
 	MCFG_PSX_CTRL_PORT_ADD("port2", psx_controllers, "digital_pad")
+
+	MCFG_DEVICE_MODIFY("maincpu:sio0")
+	MCFG_PSX_SIO_DTR_HANDLER(DEVWRITELINE("^controllers", psxcontrollerports_device, write_dtr))
+	MCFG_PSX_SIO_SCK_HANDLER(DEVWRITELINE("^controllers", psxcontrollerports_device, write_sck))
+	MCFG_PSX_SIO_TXD_HANDLER(DEVWRITELINE("^controllers", psxcontrollerports_device, write_txd))
 
 	/* video hardware */
 	/* TODO: visible area and refresh rate */

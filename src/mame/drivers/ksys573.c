@@ -2038,9 +2038,8 @@ static MACHINE_CONFIG_START( konami573, ksys573_state )
 	MCFG_SLOT_OPTION_MACHINE_CONFIG( "cr589", cr589_config )
 	MCFG_SLOT_DEFAULT_OPTION( "cr589" )
 
-	MCFG_DEVICE_ADD( "maincpu:sio1:cassette", KONAMI573_CASSETTE_SLOT_SERIAL, 0 )
-
 	MCFG_DEVICE_ADD( "cassette", KONAMI573_CASSETTE_SLOT, 0 )
+	MCFG_KONAMI573_CASSETTE_DSR_HANDLER(DEVWRITELINE( "maincpu:sio1", psxsio1_device, write_dsr ) )
 
 	// onboard flash
 	MCFG_FUJITSU_29F016A_ADD( "29f016a.31m" )

@@ -10,16 +10,63 @@
 #ifndef __K573CASS_H__
 #define __K573CASS_H__
 
-#include "cpu/psx/siodev.h"
 #include "machine/adc083x.h"
 #include "machine/ds2401.h"
 #include "machine/x76f041.h"
 #include "machine/x76f100.h"
 #include "machine/zs01.h"
 
-class konami573_cassette_interface
+#define MCFG_KONAMI573_CASSETTE_DSR_HANDLER(_devcb) \
+	devcb = &konami573_cassette_slot_device::set_dsr_handler(*device, DEVCB_##_devcb);
+
+
+extern const device_type KONAMI573_CASSETTE_SLOT;
+
+class konami573_cassette_interface;
+
+class konami573_cassette_slot_device : public device_t,
+	public device_slot_interface
 {
+	friend class konami573_cassette_interface;
+
 public:
+	konami573_cassette_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	template<class _Object> static devcb_base &set_dsr_handler(device_t &device, _Object object) { return downcast<konami573_cassette_slot_device &>(device).m_dsr_handler.set_callback(object); }
+
+	DECLARE_WRITE_LINE_MEMBER(write_line_d0);
+	DECLARE_WRITE_LINE_MEMBER(write_line_d1);
+	DECLARE_WRITE_LINE_MEMBER(write_line_d2);
+	DECLARE_WRITE_LINE_MEMBER(write_line_d3);
+	DECLARE_WRITE_LINE_MEMBER(write_line_d4);
+	DECLARE_WRITE_LINE_MEMBER(write_line_d5);
+	DECLARE_WRITE_LINE_MEMBER(write_line_d6);
+	DECLARE_WRITE_LINE_MEMBER(write_line_d7);
+	DECLARE_WRITE_LINE_MEMBER(write_line_zs01_sda);
+	DECLARE_READ_LINE_MEMBER(read_line_ds2401);
+	DECLARE_READ_LINE_MEMBER(read_line_secflash_sda);
+	DECLARE_READ_LINE_MEMBER(read_line_adc083x_do);
+	DECLARE_READ_LINE_MEMBER(read_line_adc083x_sars);
+
+protected:
+	virtual void device_start();
+
+	devcb_write_line m_dsr_handler;
+
+private:
+	konami573_cassette_interface *m_dev;
+};
+
+class konami573_cassette_interface : public device_slot_card_interface
+{
+	friend class konami573_cassette_slot_device;
+
+public:
+	konami573_cassette_interface(const machine_config &mconfig, device_t &device);
+	virtual ~konami573_cassette_interface();
+
+	DECLARE_WRITE_LINE_MEMBER(output_dsr) { m_slot->m_dsr_handler(state); }
+
 	virtual DECLARE_WRITE_LINE_MEMBER(write_line_d0);
 	virtual DECLARE_WRITE_LINE_MEMBER(write_line_d1) = 0;
 	virtual DECLARE_WRITE_LINE_MEMBER(write_line_d2) = 0;
@@ -31,19 +78,17 @@ public:
 	virtual DECLARE_WRITE_LINE_MEMBER(write_line_zs01_sda);
 	virtual DECLARE_READ_LINE_MEMBER(read_line_ds2401);
 	virtual DECLARE_READ_LINE_MEMBER(read_line_secflash_sda) = 0;
-	virtual DECLARE_READ_LINE_MEMBER(read_line_dsr);
 	virtual DECLARE_READ_LINE_MEMBER(read_line_adc083x_do);
 	virtual DECLARE_READ_LINE_MEMBER(read_line_adc083x_sars);
 
-	virtual ~konami573_cassette_interface() {}
+	konami573_cassette_slot_device *m_slot;
 };
 
 
 extern const device_type KONAMI573_CASSETTE_X;
 
 class konami573_cassette_x_device: public device_t,
-	public konami573_cassette_interface,
-	public device_slot_card_interface
+	public konami573_cassette_interface
 {
 public:
 	konami573_cassette_x_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
@@ -119,8 +164,7 @@ extern const device_type KONAMI573_CASSETTE_Y;
 	devcb = &konami573_cassette_y_device::set_d7_handler(*device, DEVCB_##_devcb);
 
 class konami573_cassette_y_device: public device_t,
-	public konami573_cassette_interface,
-	public device_slot_card_interface
+	public konami573_cassette_interface
 {
 public:
 	konami573_cassette_y_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
@@ -184,8 +228,7 @@ private:
 extern const device_type KONAMI573_CASSETTE_ZI;
 
 class konami573_cassette_zi_device: public device_t,
-	public konami573_cassette_interface,
-	public device_slot_card_interface
+	public konami573_cassette_interface
 {
 public:
 	konami573_cassette_zi_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
@@ -205,54 +248,6 @@ protected:
 private:
 	required_device<zs01_device> m_zs01;
 	required_device<ds2401_device> m_ds2401;
-};
-
-
-extern const device_type KONAMI573_CASSETTE_SLOT_SERIAL;
-
-class konami573_cassette_slot_serial_device : public psxsiodev_device
-{
-public:
-	konami573_cassette_slot_serial_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-
-	void _data_out( int data, int mask );
-
-protected:
-	virtual void device_start();
-
-private:
-	virtual void data_in( int data, int mask );
-};
-
-
-extern const device_type KONAMI573_CASSETTE_SLOT;
-
-class konami573_cassette_slot_device : public device_t,
-	public device_slot_interface
-{
-public:
-	konami573_cassette_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-
-	DECLARE_WRITE_LINE_MEMBER(write_line_d0);
-	DECLARE_WRITE_LINE_MEMBER(write_line_d1);
-	DECLARE_WRITE_LINE_MEMBER(write_line_d2);
-	DECLARE_WRITE_LINE_MEMBER(write_line_d3);
-	DECLARE_WRITE_LINE_MEMBER(write_line_d4);
-	DECLARE_WRITE_LINE_MEMBER(write_line_d5);
-	DECLARE_WRITE_LINE_MEMBER(write_line_d6);
-	DECLARE_WRITE_LINE_MEMBER(write_line_d7);
-	DECLARE_WRITE_LINE_MEMBER(write_line_zs01_sda);
-	DECLARE_READ_LINE_MEMBER(read_line_ds2401);
-	DECLARE_READ_LINE_MEMBER(read_line_secflash_sda);
-	DECLARE_READ_LINE_MEMBER(read_line_adc083x_do);
-	DECLARE_READ_LINE_MEMBER(read_line_adc083x_sars);
-
-protected:
-	virtual void device_start();
-
-private:
-	required_device<konami573_cassette_slot_serial_device> m_serial;
-	konami573_cassette_interface *m_cassette;
 };
 
 
