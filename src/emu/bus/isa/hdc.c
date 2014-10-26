@@ -426,6 +426,26 @@ void isa8_hdc_device::pc_hdc_dack_w(int data)
 
 
 
+void isa8_hdc_device::pc_hdc_dack_ws(int data)
+{
+	*(hdcdma_dst++) = data;
+
+	if( --hdcdma_write == 0 )
+	{
+		hdcdma_write = 512;
+		hdcdma_size -= 512;
+		hdcdma_dst = hdcdma_data;
+	}
+
+	if (!no_dma())
+	{
+		m_isa->drq3_w(hdcdma_size ? 1 : 0);
+		if(!hdcdma_size) pc_hdc_result(1);
+	}
+}
+
+
+
 void isa8_hdc_device::execute_read()
 {
 	hard_disk_file *disk = NULL;
@@ -474,6 +494,28 @@ void isa8_hdc_device::execute_write()
 		do
 		{
 			pc_hdc_dack_w(buffer[data_cnt++]);
+		}
+		while (hdcdma_write || hdcdma_size);
+	}
+	else
+	{
+		m_isa->drq3_w(1);
+	}
+}
+
+
+
+void isa8_hdc_device::execute_writesbuff()
+{
+	hdcdma_dst = hdcdma_data;
+	hdcdma_write = 512;
+	hdcdma_size = 512;
+
+	if (no_dma())
+	{
+		do
+		{
+			pc_hdc_dack_ws(buffer[data_cnt++]);
 		}
 		while (hdcdma_write || hdcdma_size);
 	}
@@ -595,6 +637,15 @@ void isa8_hdc_device::hdc_command()
 				execute_write();
 			break;
 
+		case CMD_WRITESBUFF:
+			if (LOG_HDC_STATUS)
+			{
+				logerror("%s hdc write sector buffer\n", machine().describe_context());
+			}
+
+			execute_writesbuff();
+			break;
+
 		case CMD_SETPARAM:
 			get_chsn();
 			cylinders[drv] = ((buffer[6]&3)<<8) | buffer[7];
@@ -609,7 +660,6 @@ void isa8_hdc_device::hdc_command()
 			break;
 
 		case CMD_READSBUFF:
-		case CMD_WRITESBUFF:
 		case CMD_RAMDIAG:
 		case CMD_INTERNDIAG:
 			break;
@@ -852,5 +902,8 @@ UINT8 isa8_hdc_device::dack_r(int line)
 
 void isa8_hdc_device::dack_w(int line,UINT8 data)
 {
-	pc_hdc_dack_w(data);
+	if (buffer[0] == CMD_WRITESBUFF)
+		pc_hdc_dack_ws(data);
+	else
+		pc_hdc_dack_w(data);
 }
