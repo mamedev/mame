@@ -323,6 +323,7 @@ static MACHINE_CONFIG_START( ibm5150, ibmpc_state )
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("disk_list","ibm5150")
+	MCFG_SOFTWARE_LIST_ADD("cass_list","ibm5150_cass")
 MACHINE_CONFIG_END
 
 
