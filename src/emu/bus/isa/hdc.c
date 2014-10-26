@@ -121,6 +121,29 @@ ROM_START( hdc )
 	ROM_LOAD("wdbios.rom",  0x00000, 0x02000, CRC(8e9e2bd4) SHA1(601d7ceab282394ebab50763c267e915a6a2166a)) /* WDC IDE Superbios 2.0 (06/28/89) Expansion Rom C8000-C9FFF  */
 ROM_END
 
+static INPUT_PORTS_START( isa_hdc )
+	PORT_START("HDD")
+	PORT_BIT(     0xb0, 0xb0, IPT_UNUSED )
+	PORT_DIPNAME( 0x40, 0x40, "IRQ level")
+	PORT_DIPSETTING(    0x40, "5" )
+	PORT_DIPSETTING(    0x00, "2" )
+	PORT_DIPNAME( 0x0c, 0x0c, "Type of 1st drive")
+	PORT_DIPSETTING(    0x0c, "0" )
+	PORT_DIPSETTING(    0x08, "1" )
+	PORT_DIPSETTING(    0x04, "2" )
+	PORT_DIPSETTING(    0x00, "3" )
+	PORT_DIPNAME( 0x03, 0x03, "Type of 2nd drive")
+	PORT_DIPSETTING(    0x03, "0" )
+	PORT_DIPSETTING(    0x02, "1" )
+	PORT_DIPSETTING(    0x01, "2" )
+	PORT_DIPSETTING(    0x00, "3" )
+
+	PORT_START("ROM")
+	PORT_DIPNAME( 0x01, 0x01, "Install ROM?")
+	PORT_DIPSETTING(    0x01, DEF_STR(Yes) )
+	PORT_DIPSETTING(    0x00, DEF_STR(No) )
+INPUT_PORTS_END
+
 //**************************************************************************
 //  GLOBAL VARIABLES
 //**************************************************************************
@@ -146,6 +169,15 @@ const rom_entry *isa8_hdc_device::device_rom_region() const
 	return ROM_NAME( hdc );
 }
 
+//-------------------------------------------------
+//  input_ports - device-specific input ports
+//-------------------------------------------------
+
+ioport_constructor isa8_hdc_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME( isa_hdc );
+}
+
 //**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
@@ -167,7 +199,6 @@ isa8_hdc_device::isa8_hdc_device(const machine_config &mconfig, const char *tag,
 void isa8_hdc_device::device_start()
 {
 	set_isa_device();
-	m_isa->install_rom(this, 0xc8000, 0xc9fff, 0, 0, "hdc", "hdc");
 	m_isa->install_device(0x0320, 0x0323, 0, 0, read8_delegate( FUNC(isa8_hdc_device::pc_hdc_r), this ), write8_delegate( FUNC(isa8_hdc_device::pc_hdc_w), this ) );
 	m_isa->set_dma_channel(3, this, FALSE);
 	buffer.resize(17*4*512);
@@ -203,8 +234,10 @@ void isa8_hdc_device::device_reset()
 	csb = 0;
 	status = 0;
 	error = 0;
-	dip = 0xff;
+	dip = ioport("HDD")->read();
 
+	if (ioport("ROM")->read() == 1)
+		m_isa->install_rom(this, 0xc8000, 0xc9fff, 0, 0, "hdc", "hdc");
 }
 
 hard_disk_file *isa8_hdc_device::pc_hdc_file(int id)
