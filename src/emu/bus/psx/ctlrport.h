@@ -3,7 +3,6 @@
 #ifndef __PSXCPORT_H__
 #define __PSXCPORT_H__
 
-#include "cpu/psx/siodev.h"
 #include "memcard.h"
 
 #define MCFG_PSX_CTRL_PORT_ADD(_tag, _slot_intf, _def_slot) \
@@ -25,7 +24,7 @@ public:
 	device_psx_controller_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_psx_controller_interface();
 
-	void clock_w(bool state) { if(m_clock && !m_sel && !state && !m_memcard) do_pad(); m_clock = state; }
+	void clock_w(bool state) { if(!m_clock && !m_sel && state && !m_memcard) do_pad(); m_clock = state; }
 	void sel_w(bool state);
 
 	bool rx_r() { return m_rx; }
@@ -78,20 +77,34 @@ private:
 	required_ioport m_pad1;
 };
 
-class psxcontrollerports_device : public psxsiodev_device
+#define MCFG_PSX_CONTROLLER_PORTS_DSR_HANDLER(_devcb) \
+	devcb = &psxcontrollerports_device::set_dsr_handler(*device, DEVCB_##_devcb);
+
+#define MCFG_PSX_CONTROLLER_PORTS_RXD_HANDLER(_devcb) \
+	devcb = &psxcontrollerports_device::set_rxd_handler(*device, DEVCB_##_devcb);
+
+class psxcontrollerports_device : public device_t
 {
 public:
 	psxcontrollerports_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	void ack();
 
+	template<class _Object> static devcb_base &set_dsr_handler(device_t &device, _Object object) { return downcast<psxcontrollerports_device &>(device).m_dsr_handler.set_callback(object); }
+	template<class _Object> static devcb_base &set_rxd_handler(device_t &device, _Object object) { return downcast<psxcontrollerports_device &>(device).m_rxd_handler.set_callback(object); }
+
+	DECLARE_WRITE_LINE_MEMBER(write_sck);
+	DECLARE_WRITE_LINE_MEMBER(write_dtr);
+	DECLARE_WRITE_LINE_MEMBER(write_txd);
+
 protected:
 	virtual void device_start();
 
 private:
-	virtual void data_in(int data, int mask);
-
 	psx_controller_port_device *m_port0;
 	psx_controller_port_device *m_port1;
+
+	devcb_write_line m_dsr_handler;
+	devcb_write_line m_rxd_handler;
 };
 
 class psx_controller_port_device :  public device_t,

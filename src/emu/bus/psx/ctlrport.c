@@ -37,18 +37,22 @@ void psx_controller_port_device::disable_card(bool state)
 
 const device_type PSXCONTROLLERPORTS = &device_creator<psxcontrollerports_device>;
 
-psxcontrollerports_device::psxcontrollerports_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-		psxsiodev_device(mconfig, PSXCONTROLLERPORTS, "PSXCONTROLLERPORTS", tag, owner, clock, "psxcontrollerports", __FILE__)
+psxcontrollerports_device::psxcontrollerports_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, PSXCONTROLLERPORTS, "PSXCONTROLLERPORTS", tag, owner, clock, "psxcontrollerports", __FILE__),
+	m_dsr_handler(*this),
+	m_rxd_handler(*this)
 {
 }
 
 void psxcontrollerports_device::device_start()
 {
+	m_dsr_handler.resolve_safe();
+	m_rxd_handler.resolve_safe();
+
 	m_port0 = machine().device<psx_controller_port_device>("port1");
 	m_port1 = machine().device<psx_controller_port_device>("port2");
 	m_port0->setup_ack_cb(psx_controller_port_device::void_cb(FUNC(psxcontrollerports_device::ack), this));
 	m_port1->setup_ack_cb(psx_controller_port_device::void_cb(FUNC(psxcontrollerports_device::ack), this));
-	psxsiodev_device::device_start();
 }
 
 // add controllers to define so they can be connected to the multitap
@@ -66,22 +70,28 @@ SLOT_INTERFACE_START(psx_controllers_nomulti)
 	PSX_CONTROLLERS
 SLOT_INTERFACE_END
 
-void psxcontrollerports_device::data_in( int data, int mask )
+WRITE_LINE_MEMBER(psxcontrollerports_device::write_dtr)
 {
-	m_port0->sel_w((data & PSX_SIO_OUT_DTR)?1:0);
-	m_port0->tx_w((data & PSX_SIO_OUT_DATA)?1:0);
-	m_port0->clock_w((data & PSX_SIO_OUT_CLOCK)?1:0); // clock must be last
+	m_port0->sel_w(!state);
+	m_port1->sel_w(state);
+}
 
-	m_port1->tx_w((data & PSX_SIO_OUT_DATA)?1:0);
-	m_port1->sel_w((data & PSX_SIO_OUT_DTR)?0:1); // not dtr
-	m_port1->clock_w((data & PSX_SIO_OUT_CLOCK)?1:0);
+WRITE_LINE_MEMBER(psxcontrollerports_device::write_sck)
+{
+	m_port0->clock_w(state);
+	m_port1->clock_w(state);
+	m_rxd_handler(m_port0->rx_r() && m_port1->rx_r());
+}
 
-	data_out(((m_port0->rx_r() && m_port1->rx_r()) * PSX_SIO_IN_DATA), PSX_SIO_IN_DATA);
+WRITE_LINE_MEMBER(psxcontrollerports_device::write_txd)
+{
+	m_port0->tx_w(state);
+	m_port1->tx_w(state);
 }
 
 void psxcontrollerports_device::ack()
 {
-	data_out((!(m_port0->ack_r() && m_port1->ack_r()) * PSX_SIO_IN_DSR), PSX_SIO_IN_DSR);
+	m_dsr_handler(m_port0->ack_r() && m_port1->ack_r());
 }
 
 device_psx_controller_interface::device_psx_controller_interface(const machine_config &mconfig, device_t &device) :

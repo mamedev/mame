@@ -39,7 +39,13 @@ psxsio1_device::psxsio1_device(const machine_config &mconfig, const char *tag, d
 
 psxsio_device::psxsio_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-	m_irq_handler(*this)
+	m_status(SIO_STATUS_TX_EMPTY | SIO_STATUS_TX_RDY),
+	m_rxd(1),
+	m_irq_handler(*this),
+	m_sck_handler(*this),
+	m_txd_handler(*this),
+	m_dtr_handler(*this),
+	m_rts_handler(*this)
 {
 }
 
@@ -51,16 +57,15 @@ void psxsio_device::device_post_load()
 void psxsio_device::device_start()
 {
 	m_irq_handler.resolve_safe();
+	m_sck_handler.resolve_safe();
+	m_txd_handler.resolve_safe();
+	m_dtr_handler.resolve_safe();
+	m_rts_handler.resolve_safe();
 
 	m_timer = timer_alloc( 0 );
-	m_status = SIO_STATUS_TX_EMPTY | SIO_STATUS_TX_RDY;
 	m_mode = 0;
 	m_control = 0;
 	m_baud = 0;
-	m_tx = 0;
-	m_rx = 0;
-	m_tx_prev = 0;
-	m_rx_prev = 0;
 	m_rx_data = 0;
 	m_tx_data = 0;
 	m_rx_shift = 0;
@@ -72,30 +77,13 @@ void psxsio_device::device_start()
 	save_item( NAME( m_mode ) );
 	save_item( NAME( m_control ) );
 	save_item( NAME( m_baud ) );
-	save_item( NAME( m_tx ) );
-	save_item( NAME( m_rx ) );
-	save_item( NAME( m_tx_prev ) );
-	save_item( NAME( m_rx_prev ) );
+	save_item( NAME( m_rxd ) );
 	save_item( NAME( m_rx_data ) );
 	save_item( NAME( m_tx_data ) );
 	save_item( NAME( m_rx_shift ) );
 	save_item( NAME( m_tx_shift ) );
 	save_item( NAME( m_rx_bits ) );
 	save_item( NAME( m_tx_bits ) );
-
-	deviceCount = 0;
-
-	for( device_t *device = first_subdevice(); device != NULL; device = device->next() )
-	{
-		psxsiodev_device *psxsiodev = dynamic_cast<psxsiodev_device *>(device);
-		if( psxsiodev != NULL )
-		{
-			devices[ deviceCount++ ] = psxsiodev;
-			psxsiodev->m_psxsio = this;
-		}
-	}
-
-	input_update();
 }
 
 void psxsio_device::sio_interrupt()
@@ -149,22 +137,6 @@ void psxsio_device::sio_timer_adjust()
 	m_timer->adjust( n_time );
 }
 
-void psxsio_device::output( int data, int mask )
-{
-	int new_outputdata = ( m_outputdata & ~mask ) | ( data & mask );
-	int new_mask = m_outputdata ^ new_outputdata;
-
-	if( new_mask != 0 )
-	{
-		m_outputdata = new_outputdata;
-
-		for( int i = 0; i < deviceCount; i++ )
-		{
-			devices[ i ]->data_in( m_outputdata, new_mask );
-		}
-	}
-}
-
 void psxsio_device::device_timer(emu_timer &timer, device_timer_id tid, int param, void *ptr)
 {
 	verboselog( machine(), 2, "sio tick\n" );
@@ -188,18 +160,19 @@ void psxsio_device::device_timer(emu_timer &timer, device_timer_id tid, int para
 
 	if( m_tx_bits != 0 )
 	{
-		m_tx = ( m_tx & ~PSX_SIO_OUT_DATA ) | ( ( m_tx_shift & 1 ) * PSX_SIO_OUT_DATA );
+		if( type() == PSX_SIO0 )
+		{
+			m_sck_handler(0);
+		}
+
+		m_txd_handler( m_tx_shift & 1 );
 		m_tx_shift >>= 1;
 		m_tx_bits--;
 
 		if( type() == PSX_SIO0 )
 		{
-			m_tx &= ~PSX_SIO_OUT_CLOCK;
-			output( m_tx, PSX_SIO_OUT_CLOCK | PSX_SIO_OUT_DATA );
-			m_tx |= PSX_SIO_OUT_CLOCK;
+			m_sck_handler(1);
 		}
-
-		output( m_tx, PSX_SIO_OUT_CLOCK | PSX_SIO_OUT_DATA );
 
 		if( m_tx_bits == 0 &&
 			( m_control & SIO_CONTROL_TX_IENA ) != 0 )
@@ -210,7 +183,7 @@ void psxsio_device::device_timer(emu_timer &timer, device_timer_id tid, int para
 
 	if( m_rx_bits != 0 )
 	{
-		m_rx_shift = ( m_rx_shift >> 1 ) | ( ( ( m_rx & PSX_SIO_IN_DATA ) / PSX_SIO_IN_DATA ) << 7 );
+		m_rx_shift = ( m_rx_shift >> 1 ) | ( m_rxd << 7 );
 		m_rx_bits--;
 
 		if( m_rx_bits == 0 )
@@ -265,31 +238,33 @@ WRITE32_MEMBER( psxsio_device::write )
 				verboselog( machine(), 1, "psx_sio_w reset\n" );
 				m_status |= SIO_STATUS_TX_EMPTY | SIO_STATUS_TX_RDY;
 				m_status &= ~( SIO_STATUS_RX_RDY | SIO_STATUS_OVERRUN | SIO_STATUS_IRQ );
+				m_irq_handler(0);
 
 				// toggle DTR to reset controllers, Star Ocean 2, at least, requires it
 				// the precise mechanism of the reset is unknown
 				// maybe it's related to the bottom 2 bits of control which are usually set
-				output( m_tx ^ PSX_SIO_OUT_DTR, PSX_SIO_OUT_DTR );
+				m_dtr_handler(0);
+				m_dtr_handler(1);
+
+				m_tx_bits = 0;
+				m_rx_bits = 0;
+				m_txd_handler(1);
 			}
 			if( ( m_control & SIO_CONTROL_IACK ) != 0 )
 			{
 				verboselog( machine(), 1, "psx_sio_w iack\n" );
 				m_status &= ~( SIO_STATUS_IRQ );
 				m_control &= ~( SIO_CONTROL_IACK );
+				m_irq_handler(0);
 			}
 			if( ( m_control & SIO_CONTROL_DTR ) != 0 )
 			{
-				m_tx |= PSX_SIO_OUT_DTR;
+				m_dtr_handler(0);
 			}
 			else
 			{
-				m_tx &= ~PSX_SIO_OUT_DTR;
+				m_dtr_handler(1);
 			}
-
-			output( m_tx, PSX_SIO_OUT_DTR );
-
-			m_tx_prev = m_tx;
-
 		}
 		break;
 	case 3:
@@ -362,33 +337,24 @@ READ32_MEMBER( psxsio_device::read )
 	return data;
 }
 
-void psxsio_device::input_update()
+WRITE_LINE_MEMBER(psxsio_device::write_rxd)
 {
-	int data = 0;
+	m_rxd = state;
+}
 
-	for( int i = 0; i < deviceCount; i++ )
+WRITE_LINE_MEMBER(psxsio_device::write_dsr)
+{
+	if (state)
 	{
-		data |= devices[ i ]->m_dataout;
+		m_status &= ~SIO_STATUS_DSR;
 	}
-
-	int mask = data ^ m_rx;
-
-	verboselog( machine(), 1, "input_update( %s, %02x, %02x )\n", tag(), mask, data );
-
-	m_rx = data;
-
-	if( ( m_rx & PSX_SIO_IN_DSR ) != 0 )
+	else if ((m_status & SIO_STATUS_DSR) == 0)
 	{
 		m_status |= SIO_STATUS_DSR;
-		if( ( m_rx_prev & PSX_SIO_IN_DSR ) == 0 &&
-			( m_control & SIO_CONTROL_DSR_IENA ) != 0 )
+
+		if( ( m_control & SIO_CONTROL_DSR_IENA ) != 0 )
 		{
 			sio_interrupt();
 		}
 	}
-	else
-	{
-		m_status &= ~SIO_STATUS_DSR;
-	}
-	m_rx_prev = m_rx;
 }

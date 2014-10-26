@@ -38,9 +38,10 @@ public:
 		driver_device(mconfig, type, tag),
 		m_gpu(*this, "gpu"),
 		m_gpu_screen(*this, "gpu:screen"),
-		m_cat702_1(*this,"maincpu:sio0:cat702_1"),
-		m_cat702_2(*this,"maincpu:sio0:cat702_2"),
-		m_zndip(*this,"maincpu:sio0:zndip"),
+		m_sio0(*this, "maincpu:sio0"),
+		m_cat702_1(*this, "cat702_1"),
+		m_cat702_2(*this, "cat702_2"),
+		m_zndip(*this, "zndip"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_ram(*this, "maincpu:ram"),
@@ -48,10 +49,19 @@ public:
 		m_cbaj_fifo2(*this, "cbaj_fifo2"),
 		m_mb3773(*this, "mb3773"),
 		m_zoom(*this, "taito_zoom"),
-		m_vt83c461(*this, "ide")
+		m_vt83c461(*this, "ide"),
+		m_cat702_1_dataout(1),
+		m_cat702_2_dataout(1),
+		m_zndip_dataout(1)
 	{
 	}
 
+	DECLARE_WRITE_LINE_MEMBER(sio0_sck){ m_cat702_1->write_clock(state);  m_cat702_2->write_clock(state); m_zndip->write_clock(state); }
+	DECLARE_WRITE_LINE_MEMBER(sio0_txd){ m_cat702_1->write_datain(state);  m_cat702_2->write_datain(state); }
+	DECLARE_WRITE_LINE_MEMBER(cat702_1_dataout){ m_cat702_1_dataout = state; update_sio0_rxd(); }
+	DECLARE_WRITE_LINE_MEMBER(cat702_2_dataout){ m_cat702_2_dataout = state; update_sio0_rxd(); }
+	DECLARE_WRITE_LINE_MEMBER(zndip_dataout){ m_zndip_dataout = state; update_sio0_rxd(); }
+	void update_sio0_rxd() { m_sio0->write_rxd( m_cat702_1_dataout && m_cat702_2_dataout && m_zndip_dataout ); }
 	DECLARE_CUSTOM_INPUT_MEMBER(jdredd_gun_mux_read);
 	DECLARE_READ8_MEMBER(znsecsel_r);
 	DECLARE_WRITE8_MEMBER(znsecsel_w);
@@ -124,6 +134,7 @@ private:
 
 	required_device<psxgpu_device> m_gpu;
 	required_device<screen_device> m_gpu_screen;
+	required_device<psxsio0_device> m_sio0;
 	required_device<cat702_device> m_cat702_1;
 	required_device<cat702_device> m_cat702_2;
 	required_device<zndip_device> m_zndip;
@@ -135,6 +146,10 @@ private:
 	optional_device<mb3773_device> m_mb3773;
 	optional_device<taito_zoom_device> m_zoom;
 	optional_device<vt83c461_device> m_vt83c461;
+
+	int m_cat702_1_dataout;
+	int m_cat702_2_dataout;
+	int m_zndip_dataout;
 };
 
 inline void ATTR_PRINTF(3,4) zn_state::verboselog( int n_level, const char *s_fmt, ... )
@@ -333,9 +348,9 @@ WRITE8_MEMBER(zn_state::znsecsel_w)
 {
 	verboselog(2, "znsecsel_w( %08x, %08x, %08x )\n", offset, data, mem_mask );
 
-	m_cat702_1->select( ( data >> 2 ) & 1 );
-	m_cat702_2->select( ( data >> 3 ) & 1 );
-	m_zndip->select( ( data & 0x8c ) != 0x8c );
+	m_cat702_1->write_select((data >> 2) & 1);
+	m_cat702_2->write_select((data >> 3) & 1);
+	m_zndip->write_select((data & 0x8c) != 0x8c);
 
 	m_n_znsecsel = data;
 }
@@ -449,9 +464,19 @@ static MACHINE_CONFIG_START( zn1_1mb_vram, zn_state )
 	MCFG_RAM_MODIFY("maincpu:ram")
 	MCFG_RAM_DEFAULT_SIZE("4M")
 
-	MCFG_DEVICE_ADD("maincpu:sio0:cat702_1", CAT702, 0)
-	MCFG_DEVICE_ADD("maincpu:sio0:cat702_2", CAT702, 0)
-	MCFG_DEVICE_ADD("maincpu:sio0:zndip", ZNDIP, 0)
+	MCFG_DEVICE_MODIFY("maincpu:sio0")
+	MCFG_PSX_SIO_SCK_HANDLER(DEVWRITELINE(DEVICE_SELF_OWNER, zn_state, sio0_sck))
+	MCFG_PSX_SIO_TXD_HANDLER(DEVWRITELINE(DEVICE_SELF_OWNER, zn_state, sio0_txd))
+
+	MCFG_DEVICE_ADD("cat702_1", CAT702, 0)
+	MCFG_CAT702_DATAOUT_HANDLER(WRITELINE(zn_state, cat702_1_dataout))
+
+	MCFG_DEVICE_ADD("cat702_2", CAT702, 0)
+	MCFG_CAT702_DATAOUT_HANDLER(WRITELINE(zn_state, cat702_2_dataout))
+
+	MCFG_DEVICE_ADD("zndip", ZNDIP, 0)
+	MCFG_ZNDIP_DATAOUT_HANDLER(WRITELINE(zn_state, zndip_dataout))
+	MCFG_ZNDIP_DSR_HANDLER(DEVWRITELINE("maincpu:sio0", psxsio0_device, write_dsr))
 	MCFG_ZNDIP_DATA_HANDLER(IOPORT(":DSW"))
 
 	// 5MHz NEC uPD78081 MCU:
@@ -483,9 +508,19 @@ static MACHINE_CONFIG_START( zn2, zn_state )
 	MCFG_RAM_MODIFY("maincpu:ram")
 	MCFG_RAM_DEFAULT_SIZE("4M")
 
-	MCFG_DEVICE_ADD("maincpu:sio0:cat702_1", CAT702, 0)
-	MCFG_DEVICE_ADD("maincpu:sio0:cat702_2", CAT702, 0)
-	MCFG_DEVICE_ADD("maincpu:sio0:zndip", ZNDIP, 0)
+	MCFG_DEVICE_MODIFY("maincpu:sio0")
+	MCFG_PSX_SIO_SCK_HANDLER(DEVWRITELINE(DEVICE_SELF_OWNER, zn_state, sio0_sck))
+	MCFG_PSX_SIO_TXD_HANDLER(DEVWRITELINE(DEVICE_SELF_OWNER, zn_state, sio0_txd))
+
+	MCFG_DEVICE_ADD("cat702_1", CAT702, 0)
+	MCFG_CAT702_DATAOUT_HANDLER(WRITELINE(zn_state, cat702_1_dataout))
+
+	MCFG_DEVICE_ADD("cat702_2", CAT702, 0)
+	MCFG_CAT702_DATAOUT_HANDLER(WRITELINE(zn_state, cat702_2_dataout))
+
+	MCFG_DEVICE_ADD("zndip", ZNDIP, 0)
+	MCFG_ZNDIP_DATAOUT_HANDLER(WRITELINE(zn_state, zndip_dataout))
+	MCFG_ZNDIP_DSR_HANDLER(DEVWRITELINE("maincpu:sio0", psxsio0_device, write_dsr))
 	MCFG_ZNDIP_DATA_HANDLER(IOPORT(":DSW"))
 
 	// 5MHz NEC uPD78081 MCU:
