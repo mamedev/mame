@@ -1897,6 +1897,7 @@ void sega_32x_device::device_reset()
 // moved from init
 
 	m_32x_adapter_enabled = 0;
+	m_32x_access_auth = 0;
 
 	if (m_32x_adapter_enabled == 0)
 	{
