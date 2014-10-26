@@ -1171,6 +1171,7 @@ void m6800_cpu_device::device_reset()
 	OCD = 0xffff;
 	TOD = 0xffff;
 	m_ram_ctrl |= 0x40;
+	m_latch09 = 0;
 
 	m_trcsr = M6800_TRCSR_TDRE;
 
