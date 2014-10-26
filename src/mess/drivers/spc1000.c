@@ -29,14 +29,16 @@ NOTE: 2014-09-13: added code from someone's modified MESS driver for floppy
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "video/mc6847.h"
+#include "machine/ram.h"
 #include "sound/ay8910.h"
 #include "sound/wave.h"
+#include "video/mc6847.h"
 #include "imagedev/cassette.h"
-#include "machine/ram.h"
 #include "formats/spc1000_cas.h"
-#include "machine/i8255.h"
-#include "machine/upd765.h"
+
+#include "bus/spc1000/exp.h"
+#include "bus/spc1000/fdd.h"
+#include "bus/spc1000/vdp.h"
 
 
 class spc1000_state : public driver_device
@@ -44,14 +46,11 @@ class spc1000_state : public driver_device
 public:
 	spc1000_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
-		, m_p_videoram(*this, "videoram")
-		, m_vdg(*this, "mc6847")
 		, m_maincpu(*this, "maincpu")
-		, m_fdccpu(*this, "fdccpu")
-		, m_fdc(*this, "upd765")
-		, m_pio(*this, "d8255_master")
-		, m_ram(*this, RAM_TAG)
+		, m_vdg(*this, "mc6847")
 		, m_cass(*this, "cassette")
+		, m_ram(*this, RAM_TAG)
+		, m_p_videoram(*this, "videoram")
 		, m_io_kb(*this, "LINE")
 		, m_io_joy(*this, "JOY")
 	{}
@@ -64,20 +63,12 @@ public:
 	DECLARE_READ8_MEMBER(porta_r);
 	DECLARE_READ8_MEMBER(mc6847_videoram_r);
 	DECLARE_WRITE8_MEMBER(cass_w);
-	DECLARE_WRITE8_MEMBER(sd725_w);
-	DECLARE_READ8_MEMBER(sd725_r);
-	DECLARE_WRITE8_MEMBER(fdc_8255_b_w);
-	DECLARE_READ8_MEMBER(fdc_8255_c_r);
-	DECLARE_WRITE8_MEMBER(fdc_8255_c_w);
-	DECLARE_READ8_MEMBER(upd765_tc_r);
-	DECLARE_WRITE8_MEMBER(fdc_control_w);
 	DECLARE_READ8_MEMBER(keyboard_r);
 	MC6847_GET_CHARROM_MEMBER(get_char_rom)
 	{
 		return m_p_videoram[0x1000 + (ch & 0x7f) * 16 + line];
 	}
 
-	required_shared_ptr<UINT8> m_p_videoram;
 private:
 	UINT8 m_IPLK;
 	UINT8 m_GMODE;
@@ -85,32 +76,14 @@ private:
 	UINT8 *m_work_ram;
 	virtual void machine_start();
 	virtual void machine_reset();
+	required_device<z80_device> m_maincpu;
 	required_device<mc6847_base_device> m_vdg;
-	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_fdccpu;
-	required_device<upd765a_device> m_fdc;
-	required_device<i8255_device> m_pio;
-	required_device<ram_device> m_ram;
 	required_device<cassette_image_device> m_cass;
+	required_device<ram_device> m_ram;
+	required_shared_ptr<UINT8> m_p_videoram;
 	required_ioport_array<10> m_io_kb;
 	required_ioport m_io_joy;
-
-	floppy_image_device *m_fd0;
-	floppy_image_device *m_fd1;
-
-	emu_timer *m_timer_tc;
-
-	UINT8 m_i8255_0_pc;
-	UINT8 m_i8255_1_pc;
-	UINT8 m_i8255_portb;
-
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };
-
-void spc1000_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
-{
-	m_fdc->tc_w(false);
-}
 
 static ADDRESS_MAP_START(spc1000_mem, AS_PROGRAM, 8, spc1000_state )
 	ADDRESS_MAP_UNMAP_HIGH
@@ -157,75 +130,6 @@ READ8_MEMBER(spc1000_state::gmode_r)
 	return m_GMODE;
 }
 
-READ8_MEMBER(spc1000_state::sd725_r)
-{
-	UINT8 data = 0;
-	switch (offset)
-	{
-		case 1:
-			data = m_i8255_portb;
-			break;
-		case 2:
-			data = m_i8255_1_pc >> 4;
-			break;
-	}
-	return data;
-}
-
-WRITE8_MEMBER(spc1000_state::sd725_w)
-{
-	switch (offset)
-	{
-		case 0:
-			m_pio->write(space, offset+1, data);
-			break;
-		case 2:
-			m_i8255_0_pc = data;
-			break;
-	}
-}
-
-READ8_MEMBER(spc1000_state::fdc_8255_c_r)
-{
-	return m_i8255_0_pc >> 4;
-}
-
-WRITE8_MEMBER(spc1000_state::fdc_8255_b_w)
-{
-	m_i8255_portb = data;
-}
-
-WRITE8_MEMBER(spc1000_state::fdc_8255_c_w)
-{
-	m_i8255_1_pc = data;
-}
-
-//-------------------------------------------------
-//  fdc interrupt
-//-------------------------------------------------
-
-READ8_MEMBER( spc1000_state::upd765_tc_r )
-{
-	logerror("%s: upd765_tc_r\n", space.machine().describe_context());
-
-	// toggle tc on read
-	m_fdc->tc_w(true);
-	m_timer_tc->adjust(attotime::zero);
-
-	return 0xff;
-}
-
-WRITE8_MEMBER( spc1000_state::fdc_control_w )
-{
-	logerror("%s: sd725_fdc_control_w(%02x)\n", space.machine().describe_context(), data);
-
-	// bit 0, motor on signal
-	if (m_fd0)
-		m_fd0->mon_w(!BIT(data, 0));
-	if (m_fd1)
-		m_fd1->mon_w(!BIT(data, 0));
-}
-
 READ8_MEMBER( spc1000_state::keyboard_r )
 {
 	// most games just read kb in $8000-$8009 but a few of them
@@ -248,8 +152,7 @@ static ADDRESS_MAP_START( spc1000_io , AS_IO, 8, spc1000_state )
 	AM_RANGE(0x6000, 0x6000) AM_WRITE(cass_w)
 	AM_RANGE(0x8000, 0x9fff) AM_READ(keyboard_r)
 	AM_RANGE(0xa000, 0xa000) AM_READWRITE(iplk_r, iplk_w)
-	AM_RANGE(0xc000, 0xc002) AM_READWRITE(sd725_r, sd725_w)
-//  AM_RANGE(0xc000, 0xc003) AM_DEVREADWRITE("d8255_master", i8255_device, read, write)
+	AM_RANGE(0xc000, 0xdfff) AM_DEVREADWRITE("ext1", spc1000_exp_device, read, write)
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -385,35 +288,24 @@ void spc1000_state::machine_start()
 
 void spc1000_state::machine_reset()
 {
-
 	m_work_ram = auto_alloc_array_clear(machine(), UINT8, 0x10000);
-	m_fdccpu->set_input_line_vector(0, 0);
-
-	m_fd0 = machine().device<floppy_connector>("upd765:0")->get_device();
-	m_fd1 = machine().device<floppy_connector>("upd765:1")->get_device();
-
-	m_timer_tc = timer_alloc(1, NULL);
-	m_timer_tc->adjust(attotime::never);
-
-	// enable rom
-	m_fdccpu->space(AS_PROGRAM).install_rom(0x0000, 0xfff, 0, 0x2000, memregion("rom")->base());
-
 	m_IPLK = 1;
 }
 
 READ8_MEMBER(spc1000_state::mc6847_videoram_r)
 {
-	if (offset == ~0) return 0xff;
+	if (offset == ~0) 
+		return 0xff;
 
 	// m_GMODE layout: CSS|NA|PS2|PS1|~A/G|GM0|GM1|NA
-	if ( !BIT(m_GMODE, 3) )
+	if (!BIT(m_GMODE, 3))
 	{   // text mode (~A/G set to A)
-		UINT8 data = m_p_videoram[offset+m_page+0x800];
+		UINT8 data = m_p_videoram[offset + m_page + 0x800];
 		m_vdg->inv_w(BIT(data, 0));
 		m_vdg->css_w(BIT(data, 1));
 		m_vdg->as_w (BIT(data, 2));
 		m_vdg->intext_w(BIT(data, 3));
-		return m_p_videoram[offset+m_page];
+		return m_p_videoram[offset + m_page];
 	}
 	else
 	{    // graphics mode: uses full 6KB of VRAM
@@ -437,54 +329,20 @@ WRITE_LINE_MEMBER( spc1000_state::irq_w )
 	m_maincpu->set_input_line(0, state ? CLEAR_LINE : HOLD_LINE);
 }
 
-static SLOT_INTERFACE_START( sd725_floppies )
-	SLOT_INTERFACE( "sd320", EPSON_SD_320 )
-SLOT_INTERFACE_END
-
 //-------------------------------------------------
 //  address maps
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( sd725_mem, AS_PROGRAM, 8, spc1000_state )
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0xffff) AM_RAM
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( sd725_io, AS_IO, 8, spc1000_state )
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0xf8, 0xf8) AM_READWRITE(upd765_tc_r,fdc_control_w) // (R) Terminal Count Port (W) Motor Control Port
-	AM_RANGE(0xfa, 0xfb) AM_DEVICE("upd765", upd765a_device, map )
-	AM_RANGE(0xfc, 0xff) AM_DEVREADWRITE("d8255_master", i8255_device, read, write)
-ADDRESS_MAP_END
+extern SLOT_INTERFACE_START(spc1000_exp)
+	SLOT_INTERFACE("fdd", SPC1000_FDD_EXP)
+	SLOT_INTERFACE("vdp", SPC1000_VDP_EXP)
+SLOT_INTERFACE_END
 
 static MACHINE_CONFIG_START( spc1000, spc1000_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(spc1000_mem)
 	MCFG_CPU_IO_MAP(spc1000_io)
-
-	/* sub CPU(5 inch floppy drive) */
-	MCFG_CPU_ADD("fdccpu", Z80, XTAL_4MHz)       /* 4 MHz */
-	MCFG_CPU_PROGRAM_MAP(sd725_mem)
-	MCFG_CPU_IO_MAP(sd725_io)
-
-	MCFG_DEVICE_ADD("d8255_master", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(DEVREAD8("d8255_master", i8255_device, pb_r))
-	MCFG_I8255_IN_PORTB_CB(DEVREAD8("d8255_master", i8255_device, pa_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(spc1000_state, fdc_8255_b_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(spc1000_state, fdc_8255_c_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(spc1000_state, fdc_8255_c_w))
-
-	// floppy disk controller
-	MCFG_UPD765A_ADD("upd765", true, true)
-	MCFG_UPD765_INTRQ_CALLBACK(INPUTLINE("fdccpu", INPUT_LINE_IRQ0))
-
-	// floppy drives
-	MCFG_FLOPPY_DRIVE_ADD("upd765:0", sd725_floppies, "sd320", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("upd765:1", sd725_floppies, "sd320", floppy_image_device::default_floppy_formats)
-	//CFG_SOFTWARE_LIST_ADD("disk_list","spc1000_flop")
 
 	/* video hardware */
 	MCFG_SCREEN_MC6847_NTSC_ADD("screen", "mc6847")
@@ -504,7 +362,10 @@ static MACHINE_CONFIG_START( spc1000, spc1000_state )
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_CASSETTE_ADD( "cassette" )
+	MCFG_DEVICE_ADD("ext1", SPC1000_EXP_SLOT, 0)
+	MCFG_DEVICE_SLOT_INTERFACE(spc1000_exp, NULL, false)
+
+	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_FORMATS(spc1000_cassette_formats)
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED)
 
@@ -517,17 +378,14 @@ MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( spc1000 )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "spcall.rom", 0x0000, 0x8000, CRC(19638fc9) SHA1(489f1baa7aebf3c8c660325fb1fd790d84203284))
-
-	ROM_REGION( 0x10000, "fdccpu", 0)
-	ROM_LOAD("sd725a.bin", 0x0000, 0x1000, CRC(96ac2eb8) SHA1(8e9d8f63a7fb87af417e95603e71cf537a6e83f1))
+	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD("spcall.rom", 0x0000, 0x8000, CRC(19638fc9) SHA1(489f1baa7aebf3c8c660325fb1fd790d84203284))
 ROM_END
 
 #if 0
 ROM_START( spc1000 )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "spcall.rom", 0x0000, 0x8000, CRC(2FBB6ECA) SHA1(cc9a076b0f00d54b2aec31f1f558b10f43ef61c8))
+	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD("spcall.rom", 0x0000, 0x8000, CRC(2FBB6ECA) SHA1(cc9a076b0f00d54b2aec31f1f558b10f43ef61c8))
 	/// more roms to come...
 ROM_END
 #endif
