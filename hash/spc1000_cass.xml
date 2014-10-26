@@ -182,13 +182,14 @@
 		</part>
 	</software>
 
-<!-- inputs does not seems fully responding (Z and X should be 1P inputs, but X dies not seem to work) -->
+<!-- scrolling does not seem ok after a while, not sure if it works as intended -->
 	<software name="boat" supported="partial">
 		<description>Boat</description>
 		<year>2006</year>
 		<publisher>&lt;homebrew&gt;</publisher>
 		<info name="developer" value="Mayhouse" />
 		<info name="alt_title" value="보트" />
+		<info name="usage" value="LOAD twice" />
 		<part name="cass" interface="spc1000_cass">
 			<dataarea name="cass" size="207723">
 				<rom name="boat-5239-mayhouse.tap" size="207723" crc="e913793c" sha1="1a7eb9c96a9c075e8444fabb1bd7d933d1048f43" offset="0" />
@@ -975,8 +976,7 @@
 		</part>
 	</software>
 
-<!-- Inputs are not detected? -->
-	<software name="toilradv" supported="partial">
+	<software name="toilradv">
 		<description>Toiler Adventure</description>
 		<year>1985</year>
 		<publisher>Index</publisher>
@@ -1000,8 +1000,7 @@
 		</part>
 	</software>
 
-<!-- Inputs are not detected. Needs special input handling? -->
-	<software name="vela" supported="partial">
+	<software name="vela">
 		<description>Vela</description>
 		<year>198?</year>
 		<publisher>Sammi Computer</publisher>
