@@ -63,9 +63,9 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_hle(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER( scanline_callback );
 	DECLARE_WRITE16_MEMBER( kbd_put );
+	DECLARE_PALETTE_INIT( ie15 );
 
 	DECLARE_WRITE_LINE_MEMBER( serial_rx_callback );
 	virtual void rcv_complete();
@@ -600,6 +600,12 @@ static GFXDECODE_START( ie15 )
 	GFXDECODE_ENTRY("chargen", 0x0000, ie15_charlayout, 0, 1)
 GFXDECODE_END
 
+PALETTE_INIT_MEMBER( ie15_state, ie15 )
+{
+	palette.set_pen_color(0, rgb_t::black); // black
+	palette.set_pen_color(1, 0x00, 0xc0, 0x00); // green
+}
+
 static MACHINE_CONFIG_START( ie15, ie15_state )
 	/* Basic machine hardware */
 	MCFG_CPU_ADD("maincpu", IE15, XTAL_30_8MHz / 10)
@@ -625,10 +631,8 @@ static MACHINE_CONFIG_START( ie15, ie15_state )
 	MCFG_DEVICE_ADD("keyboard", IE15_KEYBOARD, 0)
 	MCFG_IE15_KEYBOARD_CB(WRITE16(ie15_state, kbd_put))
 
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, NULL)
+	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "null_modem")
 	MCFG_RS232_RXD_HANDLER(WRITELINE(ie15_state, serial_rx_callback))
-	MCFG_DEVICE_MODIFY("rs232")
-	MCFG_SLOT_DEFAULT_OPTION("null_modem")
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("beeper", BEEP, 0)
