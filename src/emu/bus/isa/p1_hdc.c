@@ -56,13 +56,15 @@ MACHINE_CONFIG_END
 
 ROM_START( p1_hdc )
 	ROM_REGION( 0x0800, "p1_hdc", 0 )
-	ROM_DEFAULT_BIOS("v14")
-	ROM_SYSTEM_BIOS(0, "v11", "ver 1.1")
+	ROM_DEFAULT_BIOS("v17")
+	ROM_SYSTEM_BIOS(0, "v11", "ver 1.1") // (c) S. Kovalenko, 1990
 	ROMX_LOAD( "b_hd_v11.rf2", 0x00000, 0x0800, CRC(a19c39b2) SHA1(57faa56b320abf801fedbed578cf97d253e5b777), ROM_BIOS(1))
-	ROM_SYSTEM_BIOS(1, "v12", "ver 1.2")
+	ROM_SYSTEM_BIOS(1, "v12", "ver 1.2") // (c) S. Kovalenko, 1991
 	ROMX_LOAD( "p_hdd_nm.bin", 0x00000, 0x0800, CRC(d5f8e4cc) SHA1(5b533642df30958539715f87a7f25b0d66dd0861), ROM_BIOS(2))
 	ROM_SYSTEM_BIOS(2, "v14", "ver 1.4") // (c) `.lesnyh. , 1992
 	ROMX_LOAD( "b942_5mb.bin", 0x00000, 0x0800, CRC(a3cfa240) SHA1(0b0aa1ce839a957153bfbbe70310480ca9fe21b6), ROM_BIOS(3))
+	ROM_SYSTEM_BIOS(3, "v17", "ver 1.7") // (c) S. Kovalenko, 1992
+	ROMX_LOAD( "b942_v17.rom", 0x00000, 0x0800, CRC(869672e3) SHA1(5cf2ae0ec1fa3edb3fe882c805da0bbc3ac21792), ROM_BIOS(4))
 ROM_END
 
 
