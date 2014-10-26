@@ -643,13 +643,7 @@ upd7220_device::upd7220_device(const machine_config &mconfig, const char *tag, d
 		m_pr[i] = 0;
 	}
 
-	m_figs.m_dir = 0;
-	m_figs.m_figure_type = 0;
-	m_figs.m_dc = 0;
-	m_figs.m_d = 0;
-	m_figs.m_d1 = 0;
-	m_figs.m_d2 = 0;
-	m_figs.m_dm = 0;
+	memset(&m_figs, 0x00, sizeof(m_figs));
 }
 
 

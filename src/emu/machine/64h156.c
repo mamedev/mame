@@ -75,10 +75,10 @@ c64h156_device::c64h156_device(const machine_config &mconfig, const char *tag, d
 	m_atna(0),
 	m_period(attotime::from_hz(clock))
 {
+	memset(&cur_live, 0x00, sizeof(cur_live));
 	cur_live.tm = attotime::never;
 	cur_live.state = IDLE;
 	cur_live.next_state = -1;
-	cur_live.write_position = 0;
 	cur_live.write_start_time = attotime::never;
 }
 

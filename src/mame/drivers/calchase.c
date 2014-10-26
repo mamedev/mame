@@ -443,10 +443,10 @@ static ADDRESS_MAP_START( calchase_io, AS_IO, 32, calchase_state )
 	AM_RANGE(0x0a78, 0x0a7b) AM_WRITENOP//AM_WRITE(pnp_data_w)
 	AM_RANGE(0x0cf8, 0x0cff) AM_DEVREADWRITE("pcibus", pci_bus_legacy_device, read, write)
 	AM_RANGE(0x42e8, 0x43ef) AM_NOP //To debug
-	AM_RANGE(0x43c0, 0x43cf) AM_RAM AM_SHARE("share1")
+	AM_RANGE(0x43c4, 0x43cb) AM_DEVREADWRITE8("vga", trident_vga_device, port_43c6_r, port_43c6_w, 0xffffffff)  // Trident Memory and Video Clock register
 	AM_RANGE(0x46e8, 0x46ef) AM_NOP //To debug
 	AM_RANGE(0x4ae8, 0x4aef) AM_NOP //To debug
-	AM_RANGE(0x83c0, 0x83cf) AM_RAM AM_SHARE("share1")
+	AM_RANGE(0x83c4, 0x83cb) AM_DEVREADWRITE8("vga", trident_vga_device, port_83c6_r, port_83c6_w, 0xffffffff)  // Trident LUTDAC
 	AM_RANGE(0x92e8, 0x92ef) AM_NOP //To debug
 ADDRESS_MAP_END
 
