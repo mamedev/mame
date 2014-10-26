@@ -1202,6 +1202,22 @@ ROM_END
 
 
 /*********************************************************
+   Windjammer
+**********************************************************/
+
+ROM_START( windjamr ) // 021216 possibly patched for use banking port F9
+	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
+	ROM_LOAD( "wj_021216_f9.rom", 0x00000, 0x40000, CRC(8ad9357d) SHA1(b6daf44a35075b771350145772d7c701049b0d28) )
+
+	ROM_REGION( 0x400000, "gfx", 0 )
+	ROM_LOAD( "windjammer.001", 0x000000, 0x80000, CRC(84067a47) SHA1(de98a2ff35034565c98f6493ccc945abd97cb2a8) )
+	ROM_LOAD( "windjammer.002", 0x100000, 0x80000, CRC(c03939ce) SHA1(18e18987813eb996ad0a33089210653fe4c0c8ce) )
+	ROM_LOAD( "windjammer.003", 0x200000, 0x80000, CRC(209b8a30) SHA1(f85b3af92f11b0beefe275a74279ea7978f85998) )
+	ROM_LOAD( "windjammer.004", 0x300000, 0x80000, CRC(04f3a1f3) SHA1(6f3a267619c010395ff4c00d1dab3efb3202e591) )
+ROM_END
+
+
+/*********************************************************
    Crazy Monkey
 
     "Russia" sets use different gfx roms 1-4.
@@ -2690,6 +2706,8 @@ GAME( 2002, mfish_8,     mfish_parent,    igrosoft_gamble, igrosoft_gamble, driv
 GAME( 2002, mfish_11,    mfish_parent,    igrosoft_gamble, igrosoft_gamble, driver_device,  0,               ROT0, "Igrosoft", "Multi Fish (031124)", GAME_SUPPORTS_SAVE ) /* World */
 GAME( 2002, mfish_12,    mfish_parent,    igrosoft_gamble, igrosoft_gamble, driver_device,  0,               ROT0, "Igrosoft", "Multi Fish (040308)", GAME_SUPPORTS_SAVE ) /* World */
 GAME( 2002, mfish_13,    0,               igrosoft_gamble, igrosoft_gamble, driver_device,  0,               ROT0, "Igrosoft", "Multi Fish (040316)", GAME_SUPPORTS_SAVE ) /* World */
+
+GAME( 2002, windjamr,    0,               igrosoft_gamble, igrosoft_gamble, driver_device,  0,               ROT0, "Igrosoft", "Windjammer (021216)", GAME_SUPPORTS_SAVE ) /* World */
 
 GAME( 2003, czmon_5,    czmon_parent,     igrosoft_gamble, igrosoft_gamble, driver_device,  0,               ROT0, "Igrosoft", "Crazy Monkey (030421 World)", GAME_SUPPORTS_SAVE ) /* World */
 GAME( 2003, czmon_7,    czmon_parent,     igrosoft_gamble, igrosoft_gamble, driver_device,  0,               ROT0, "Igrosoft", "Crazy Monkey (031110 World)", GAME_SUPPORTS_SAVE ) /* World */
