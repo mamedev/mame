@@ -80,8 +80,7 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 static MACHINE_CONFIG_FRAGMENT( ec_1841_keyboard )
-	// XXX check
-	MCFG_CPU_ADD(I8048_TAG, I8048, MCS48_LC_CLOCK(IND_U(47), CAP_P(20.7)))
+	MCFG_CPU_ADD(I8048_TAG, I8048, XTAL_5_46MHz)
 	MCFG_CPU_IO_MAP(ec_1841_keyboard_io)
 MACHINE_CONFIG_END
 
