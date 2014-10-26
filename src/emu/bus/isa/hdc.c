@@ -749,7 +749,12 @@ void isa8_hdc_device::pc_hdc_data_w(int data)
 			logerror("hdc_data_w $%02x\n", data);
 
 		*buffer_ptr++ = data;
-		status |= STA_READY;
+		// XXX ec1841 wants this
+		if (buffer[0] == CMD_SETPARAM && data_cnt == 9) {
+			status &= ~STA_READY;
+		} else {
+			status |= STA_READY;
+		}
 		if (--data_cnt == 0)
 		{
 			if (LOG_HDC_STATUS)
@@ -758,8 +763,7 @@ void isa8_hdc_device::pc_hdc_data_w(int data)
 			status &= ~STA_COMMAND;
 			status &= ~STA_REQUEST;
 			status &= ~STA_READY;
-			status |= STA_INPUT;
-
+			status &= ~STA_INPUT;
 			timer->adjust(attotime::from_msec(1),0);
 		}
 	}
@@ -851,6 +855,9 @@ UINT8 isa8_hdc_device::pc_hdc_status_r()
 
 UINT8 isa8_hdc_device::pc_hdc_dipswitch_r()
 {
+	status |= STA_READY; // XXX
+	if (LOG_HDC_STATUS)
+		logerror("%s: pc_hdc_dipswitch_r: status $%02X\n", machine().describe_context(), status);
 	return dip;
 }
 
