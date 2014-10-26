@@ -141,6 +141,7 @@ Standard PE+
   PPnnnn Poker games. Several different types of poker require specific CG graphics + CAP color prom
   IPnnnn International Poker games. Several different types of poker require specific CG graphics + CAP color prom
   PSnnnn Slot games. Each slot game requires specific CG graphics + CAP color prom
+  MGnnnn Multi Game programs for the Player's Choice machines that had optional touchscreens and or printers
 
 Super PE+
  Program Types
@@ -8952,7 +8953,7 @@ GAMEL(1987, peip0118,  peip0031, peplus,  peplus_poker, peplus_state, nonplus,  
 GAMEL(1987, peip0120,  peip0031, peplus,  peplus_poker, peplus_state, nonplus,  ROT0,  "IGT - International Game Technology", "Player's Edge Plus (IP0120) Standard Draw Poker - French",  0, layout_pe_poker )
 
 /* Normal board : Blackjack */
-GAMEL(1994, pebe0014, 0,      peplus,  peplus_bjack, peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (BE0014) Blackjack",                        0,   layout_pe_bjack )
+GAMEL(1994, pebe0014, 0,      peplus,  peplus_bjack, peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (BE0014) Blackjack",                        0, layout_pe_bjack )
 
 /* Normal board : Keno */
 GAMEL(1994, peke1012,  0,        peplus, peplus_keno, peplus_state, peplus, ROT0,  "IGT - International Game Technology", "Player's Edge Plus (KE1012) Keno",                              0, layout_pe_keno )
