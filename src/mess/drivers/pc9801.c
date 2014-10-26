@@ -1908,6 +1908,12 @@ READ8_MEMBER(pc9801_state::pc9801rs_knjram_r)
 	pcg_offset|= offset & 0x1e;
 	pcg_offset|= m_font_lr;
 
+	if(!(m_font_addr & 0xff))
+	{
+		int char_size = m_video_ff[FONTSEL_REG];
+		return m_char_rom[(m_font_addr >> 8) * (8 << char_size) + (char_size * 0x800) + ((offset >> 1) & 0xf)];
+	}
+
 	/* TODO: investigate on this difference */
 	if((m_font_addr & 0xff00) == 0x5600 || (m_font_addr & 0xff00) == 0x5700)
 		return m_kanji_rom[pcg_offset];

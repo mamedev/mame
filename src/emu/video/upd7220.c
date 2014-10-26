@@ -1592,7 +1592,7 @@ void upd7220_device::update_graphics(bitmap_rgb32 &bitmap, const rectangle &clip
 				addr = ((sad << 1) & 0x3ffff) + (y * (m_pitch << (im ? 0 : 1)));
 
 				if (!m_display_cb.isnull())
-					draw_graphics_line(bitmap, addr, y + (im ? bsy : (bsy >> 1)), wd);
+					draw_graphics_line(bitmap, addr, y + (bsy / m_lr), wd);
 			}
 		}
 		else
