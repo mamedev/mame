@@ -82,8 +82,10 @@ protected:
 		int get_lbasector();
 		int pc_hdc_dack_r();
 		void pc_hdc_dack_w(int data);
+		void pc_hdc_dack_ws(int data);
 		void execute_read();
 		void execute_write();
+		void execute_writesbuff();
 		void get_drive();
 		void get_chsn();
 		int test_ready();
