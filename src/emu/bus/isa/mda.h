@@ -97,4 +97,34 @@ public:
 // device type definition
 extern const device_type ISA8_HERCULES;
 
+// ======================> isa8_ec1840_0002_device
+
+class isa8_ec1840_0002_device :
+		public isa8_mda_device
+{
+public:
+	// construction/destruction
+	isa8_ec1840_0002_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	// optional information overrides
+	virtual machine_config_constructor device_mconfig_additions() const;
+
+	virtual DECLARE_WRITE8_MEMBER(mode_control_w);
+
+	virtual MC6845_UPDATE_ROW( crtc_update_row );
+	MC6845_UPDATE_ROW( mda_lowres_text_inten_update_row );
+	MC6845_UPDATE_ROW( mda_lowres_text_blink_update_row );
+
+protected:
+	// device-level overrides
+	virtual void device_start();
+	virtual void device_reset();
+
+public:
+	UINT8   *m_soft_chr_gen;
+
+};
+
+// device type definition
+extern const device_type ISA8_EC1840_0002;
+
 #endif  /* __ISA_MDA_H__ */

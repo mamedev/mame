@@ -198,8 +198,6 @@ class isa8_ec1841_0002_device :
 public:
 	// construction/destruction
 	isa8_ec1841_0002_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	// optional information overrides
-	virtual const rom_entry *device_rom_region() const;
 
 protected:
 	// device-level overrides
@@ -217,6 +215,34 @@ public:
 
 // device type definition
 extern const device_type ISA8_EC1841_0002;
+
+// ======================> isa8_cga_iskr1031_device
+
+class isa8_cga_iskr1030m_device :
+		public isa8_cga_device
+{
+public:
+	// construction/destruction
+	isa8_cga_iskr1030m_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	virtual const rom_entry *device_rom_region() const;
+};
+
+// device type definition
+extern const device_type ISA8_CGA_ISKR1030M;
+
+// ======================> isa8_cga_iskr1031_device
+
+class isa8_cga_iskr1031_device :
+		public isa8_cga_device
+{
+public:
+	// construction/destruction
+	isa8_cga_iskr1031_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	virtual const rom_entry *device_rom_region() const;
+};
+
+// device type definition
+extern const device_type ISA8_CGA_ISKR1031;
 
 // ======================> isa8_cga_mc1502_device
 
