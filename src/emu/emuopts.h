@@ -66,7 +66,8 @@ enum
 #define OPTION_SNAPSHOT_DIRECTORY   "snapshot_directory"
 #define OPTION_DIFF_DIRECTORY       "diff_directory"
 #define OPTION_COMMENT_DIRECTORY    "comment_directory"
-
+//MKCHAMP - DECLARING THE DIRECTORY OPTION FOR HIGH SCORES TO BE SAVED TO
+#define OPTION_HISCORE_DIRECTORY	  "hiscore_directory"
 // core state/playback options
 #define OPTION_STATE                "state"
 #define OPTION_AUTOSAVE             "autosave"
@@ -173,6 +174,11 @@ enum
 #define OPTION_AUTOBOOT_DELAY       "autoboot_delay"
 #define OPTION_AUTOBOOT_SCRIPT      "autoboot_script"
 
+/* MKChamp Hiscore Diff Options */
+#define OPTION_DISABLE_HISCORE_PATCH		"disable_hiscore_patch"
+//#define OPTION_DISABLE_NAGSCREEN_PATCH		"disable_nagscreen_patch"
+//#define OPTION_DISABLE_LOADING_PATCH		"disable_loading_patch"
+
 #define OPTION_HTTP                 "http"
 #define OPTION_HTTP_PORT            "http_port"
 #define OPTION_HTTP_PATH            "http_path"
@@ -228,7 +234,9 @@ public:
 	const char *snapshot_directory() const { return value(OPTION_SNAPSHOT_DIRECTORY); }
 	const char *diff_directory() const { return value(OPTION_DIFF_DIRECTORY); }
 	const char *comment_directory() const { return value(OPTION_COMMENT_DIRECTORY); }
-
+	// MKCHAMP - hiscore directory options
+	const char *hiscore_directory() const { return value(OPTION_HISCORE_DIRECTORY); }
+ 
 	// core state/playback options
 	const char *state() const { return value(OPTION_STATE); }
 	bool autosave() const { return bool_value(OPTION_AUTOSAVE); }
@@ -326,6 +334,11 @@ public:
 	const char *ui_font() const { return value(OPTION_UI_FONT); }
 	const char *ram_size() const { return value(OPTION_RAMSIZE); }
 
+	// MKChamp Hiscore Diff options 
+	bool disable_hiscore_patch() const { return bool_value(OPTION_DISABLE_HISCORE_PATCH); }
+	//bool disable_nagscreen_patch() const { return bool_value(OPTION_DISABLE_NAGSCREEN_PATCH); }
+	//bool disable_loading_patch() const { return bool_value(OPTION_DISABLE_LOADING_PATCH); }
+ 
 	bool confirm_quit() const { return bool_value(OPTION_CONFIRM_QUIT); }
 	bool ui_mouse() const { return bool_value(OPTION_UI_MOUSE); }
 

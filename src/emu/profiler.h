@@ -51,6 +51,8 @@ enum profile_type
 	PROFILER_BLIT,
 	PROFILER_SOUND,
 	PROFILER_TIMER_CALLBACK,
+	//MKCHAMP - INCLUDING THE HISCORE ENGINE TO THE PROFILER
+	PROFILER_HISCORE,
 	PROFILER_INPUT,             // input.c and inptport.c
 	PROFILER_MOVIE_REC,         // movie recording
 	PROFILER_LOGERROR,          // logerror

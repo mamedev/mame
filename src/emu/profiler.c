@@ -156,6 +156,8 @@ void real_profiler_state::update_text(running_machine &machine)
 		{ PROFILER_BLIT,             "OSD Blitting" },
 		{ PROFILER_SOUND,            "Sound Generation" },
 		{ PROFILER_TIMER_CALLBACK,   "Timer Callbacks" },
+		//MKCHAMP - INCLUDING THE HISCORE ENGINE TO THE PROFILER
+		{ PROFILER_HISCORE,          "Hiscore" },
 		{ PROFILER_INPUT,            "Input Processing" },
 		{ PROFILER_MOVIE_REC,        "Movie Recording" },
 		{ PROFILER_LOGERROR,         "Error Logging" },

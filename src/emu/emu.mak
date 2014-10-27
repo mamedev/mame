@@ -48,7 +48,6 @@ OBJDIRS += \
 # emulator core objects
 # MKCHAMP - ADDED hiscore.o TO LIST TO COMPILE THE HISCORE PIECE
 #-------------------------------------------------
-#	$(EMUOBJ)/hiscore.o 
 
 EMUOBJS = \
 	$(EMUOBJ)/hashfile.o \
@@ -89,6 +88,7 @@ EMUOBJS = \
 	$(EMUOBJ)/emupal.o \
 	$(EMUOBJ)/fileio.o \
 	$(EMUOBJ)/hash.o \
+	$(EMUOBJ)/hiscore.o \
 	$(EMUOBJ)/image.o \
 	$(EMUOBJ)/info.o \
 	$(EMUOBJ)/input.o \

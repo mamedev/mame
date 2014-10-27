@@ -52,7 +52,11 @@ const options_entry emu_options::s_option_entries[] =
 	{ OPTION_SNAPSHOT_DIRECTORY,                         "snap",      OPTION_STRING,     "directory to save screenshots" },
 	{ OPTION_DIFF_DIRECTORY,                             "diff",      OPTION_STRING,     "directory to save hard drive image difference files" },
 	{ OPTION_COMMENT_DIRECTORY,                          "comments",  OPTION_STRING,     "directory to save debugger comments" },
-
+	
+	// MKCHAMP - ADDING CFG OPTION TO SPECIFY HISCORE DIRECTORY..."hi" BY DEFAULT
+	{ NULL,                                              NULL,        OPTION_HEADER,     "CORE OUTPUT DIRECTORY OPTIONS" },
+	{ OPTION_HISCORE_DIRECTORY,                          "hi",        OPTION_STRING,     "directory to save hiscores" },
+ 
 	// state/playback options
 	{ NULL,                                              NULL,        OPTION_HEADER,     "CORE STATE/PLAYBACK OPTIONS" },
 	{ OPTION_STATE,                                      NULL,        OPTION_STRING,     "saved state to load" },
@@ -171,6 +175,11 @@ const options_entry emu_options::s_option_entries[] =
 	{ OPTION_HTTP_PORT,                                  "8080",      OPTION_STRING,     "http server listener port" },
 	{ OPTION_HTTP_PATH,                                  "web",       OPTION_STRING,     "path to web files" },
 	{ OPTION_CONSOLE,                                    "0",         OPTION_BOOLEAN,    "enable emulator LUA console" },
+	// MKChamp Hiscore Diff options
+	{ NULL,                                              NULL,        OPTION_HEADER,     "CORE MKChamp OPTIONS" },
+	{ OPTION_DISABLE_HISCORE_PATCH,                      "0",         OPTION_BOOLEAN,    "disable hiscore saving" },
+	//{ OPTION_DISABLE_NAGSCREEN_PATCH,                    "0",         OPTION_BOOLEAN,    "disable suppression of nagscreens" },
+	//{ OPTION_DISABLE_LOADING_PATCH,                      "0",         OPTION_BOOLEAN,    "disable suppression of loading screens /white box" },
 	{ NULL }
 };
 
