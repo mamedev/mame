@@ -35,11 +35,6 @@ V.Smile Lern - und Tanzmatte 80-91324(GE)
 V.Smile Defi Gym             80-91325(FR)
 V.Smile Gimnasio Interactivo 80-91327(SP)
 
-- Not compatible with V.Smile games, left as documentation
-V.Flash (V.Smile Pro):        80-093***
-V.Reader:                     80-28****
-
-
 Language:
 ********0 = US
 ********1 = Italy
@@ -51,7 +46,6 @@ Language:
 ********7 = Spain
 
 
-
 80-084000(US)   | Action Mania
 80-084002(NL)   | Sports Games 
 80-084003(UK)   | Action Mania
@@ -61,9 +55,9 @@ Language:
 80-084007(SP)   | Action Mania
 -
 80-084020(US)   | Dora the Explorer : Dora's Fix It Adventure
-80-084022(NL)   | DORA: Dora's Reparatie Avontuur
+80-084022(NL)   | Dora: Dora's Reparatie Avontuur
 80-084023(UK)   | Dora the Explorer : Dora's Fix It Adventure
-80-084024(GE)   | DORA: Doras Reparatur-Abenteuer
+80-084024(GE)   | Dora: Doras Reparatur-Abenteuer
 80-084025(FR)   | Dora L'Exploratrice : Les Adventures De Dora Apprentie Mecano
 80-084026(PT)   | Dora - em busca das peças perdidas
 -
@@ -71,6 +65,7 @@ Language:
 80-084043(UK)   | Scooby-Doo! - Funland Frenzy
 80-084044(GE)   | Scooby-Doo! - Im Lernpark
 80-084045(FR)   | Scooby-Doo - Panique A Funland
+80-084047(SP)   | Scooby-Doo - Misterio en el Parque
 -
 80-084060(US)   | Thomas and Friends - Engines Working Together
 80-084063(UK)   | Thomas and Friends - Engines Working Together
@@ -135,11 +130,13 @@ Language:
 80-084323(UK)   | TinkerBell
 80-084324(GE)   | TinkerBell
 80-084325(FR)   | La fée Clochette 
+80-084327(SP)   | Campanilla
 -
 80-084340(US)   | Up!
 80-084342(NL)   | Up!
 80-084344(GE)   | Oben
 80-084345(FR)   | La-Haut
+80-084347(SP)   | Up!
 -
 80-084360(US)   | Handy Manny
 80-084362(NL)   | Handy Manny
@@ -170,6 +167,7 @@ Language:
 80-084422(NL)   | Toy Story 3
 80-084423(UK)   | Toy Story 3
 80-084424(GE)   | Toy Story 3
+80-084427(SP)   | Toy Story 3
 -
 80-084440(US)   | Monsters vs. Aliens 
 80-084442(NL)   | Monsters vs. Aliens 
@@ -178,6 +176,7 @@ Language:
 80-084445(FR)   | Monsters vs. Aliens
 -
 80-084460(US)   | Noddy (unreleased??)
+80-084465(FR)   | Oui-Oui - Detective d'un jour
 80-084467(SP)   | Noddy - Detective por un Dia
 -
 80-084480(US)   | The Princess and the Frog
@@ -247,6 +246,7 @@ Vtech ran out of UPC codes at 92999, these are wraparound
 80-090163(UK)   | Monsters vs. Aliens
 80-090164(GE)   | Monsters vs. Aliens
 80-090165(FR)   | Monsters Contre Aliens
+80-090167(SP)   | Monstruos contra Alienigenas
 -
 80-090180(US)   | <Unknown>
 80-090183(UK)   | Wonder Pets! - Save the Animals
@@ -519,7 +519,7 @@ confirmed.. damn italians :)
 80-092920(US)   | Cranium - Partyland Park
 
 ****
-80-092924(GE)   | Freds Zahlen Rally  (note to self, guy in this blue car or wrong serial#)
+80-092924(GE)   | Freds Zahlen Rally  (note to self, guy in blue car wrong serial#)
 something wrong here
 ****
 80-092924(GE)   | Cranium - Freizeit Park
@@ -539,62 +539,6 @@ something wrong here
 80-092980(US)   | Disney's Little Einsteins: The Glass Slipper Ball
 80-092983(UK)   | Disney's Little Einsteins: The Glass Slipper Ball
 80-092984(GE)   | Kleine Einsteins
-
-
-V.Flash
-
-
-Jumping Beans (USA Packin)
-Carrera Loca en la Isla de las Vainas Fritas (Spanish Jumping Beans packin)
-
-
-80-093000(US)   | The Crystal Ball Adventures
-80-093004(GE)   | Das zauberhafte Märchenabenteuer
-80-093005(FR)   | L'aventure enchantée
-80-093007(SP)   | El Castillo de las Princesas
--
-80-093020(US)   | The Incredibles - Mission Incredible
-80-093023(UK)   | The Incredibles - Mission Incredible
-80-093024(GE)   | Die Unglaublichen - unglaublicher Mission
-80-093027(SP)   | Los Increibles - Mision Increible
--
-80-093040(US)   | SpongeBob - Idea Sponge
-80-093044(GE)   | SpongeBob - Ein Schwamm voller Ideen
--
-80-093060(US)   | The Amazing Spider-Man - Countdown to Doom
-80-093064(GE)   | Spiderman - Angriff der Superschurken
-80-093065(FR)   | Spider-Man - Course-poursuite à Manhattan
-80-093067(SP)   | El Asombroso Spider-Man - Persecucion en la Cuidad
--
-80-093080(US)   | Scooby-Doo! - Ancient Adventure
-80-093083(UK)   | Scooby-Doo! - Ancient Adventure
-80-093085(FR)   | Scooby-Doo! - Les Civilisations Perdues
-80-093087(SP)   | Scooby-Doo - Viaje al Pasdao
--
-80-093100(US)   | Cars - In The Fast Lane
-80-093104(GE)   | Cars - Auf der Überholspur
-80-093105(FR)   | Cars - A Fond la Caisse!
-80-093107(SP)   | Cars - El Carril Rapido
--
-80-093120(US)   | Wacky Race on Jumpin' Bean Island
-80-093124(GE)   | Das verrückte Rennen auf der Hüpf-Bohnen-Insel
--
-80-093140(US)   | Shrek The Third - The Search for Arthur
-80-093143(UK)   | Shrek The Third - The Search for Arthur
-80-093144(GE)   | Shrek - Der Dritte
-80-093147(SP)   | Shrek Tercero - Donde esta Arturo?
--
-80-093160(US)   | Bratz - The Secret Necklace
--
-80-093180(US)   | <Unknown>
--
-80-093200(US)   | Ratatouille (according to vtech site, can't confirm)
-80-093204(GE)   | Multisports
--
-80-093220(US)   | National Geographic Kids
--
-80-093600(US)   | <Unknown>
-80-093604(GE)   | Multisports
 
 
 V.Smile Baby
@@ -655,34 +599,6 @@ V.Smile Baby
 80-220700(US)   | Noah's Ark - Animal Adventures
 80-220800(US)   | Mother Goose
 */
-
-
-V.Reader
-
-80-280000(US)   | Animated E-Book Cartridge - Shrek's Vacation
-80-280100(US)   | Animated E-Book Cartridge - Toy Story 3
-80-280200(US)   | Animated E-Book Cartridge - Mr. Men/Little Miss
-80-280300(US)   | Animated E-Book Cartridge - Tinkerbell and The Great Fairy Rescue
-80-280400(US)   | Animated E-Book Cartridge - Scooby Doo! - Scooby Doo and a Mummy, Too!
-80-280600(US)   | Animated E-Book Cartridge - Olivia
-80-280700(US)   | Animated E-Book Cartridge - The Little Engine That Could
-80-280900(US)   | Animated E-Book Cartridge - Dora and the Three Little Pigs
-80-281000(US)   | Animated E-Book Cartridge - Mickey Mouse Clubhouse
-80-281100(US)   | Animated E-Book Cartridge - Disney Princess
-80-281200(US)   | Animated E-Book Cartridge - Cars
-80-281300(US)   | Animated E-Book Cartridge - Sesame Street The Happy Scientists
-80-281400(US)   | Animated E-Book Cartridge - SpongeBob SquarePants Model Sponge
-80-281500(US)   | Animated E-Book Cartridge - Tangled
-80-281600(US)   | Animated E-Book Cartridge - Chuggington - Babysitter Brewster
-80-281700(US)   | Animated E-Book Cartridge - Penguins of Madagascar
-80-281800(US)   | Animated E-Book Cartridge - Kung Fu Panda 2
-80-281900(US)   | Animated E-Book Cartridge - Cars 2
-80-282000(US)   | Animated E-Book Cartridge - Winnie the Pooh
-80-282100(US)   | Animated E-Book Cartridge - Super Why! - Attack of the Eraser
-80-282200(US)   | Animated E-Book Cartridge - Madagascar 3
-80-282300(US)   | Animated E-Book Cartridge - Dinosaur Train - T.Rex Teeth
-80-282400(US)   | Animated E-Book Cartridge - Hello Kitty's Surprise
-
 
 -->
 
