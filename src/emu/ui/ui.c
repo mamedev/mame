@@ -304,6 +304,11 @@ UINT32 ui_manager::set_handler(ui_callback callback, UINT32 param)
 //  various startup screens
 //-------------------------------------------------
 
+#ifdef __LIBRETRO__
+extern bool hide_nagscreen;
+extern bool hide_warnings;
+#endif
+
 void ui_manager::display_startup_screens(bool first_time, bool show_disclaimer)
 {
 	const int maxstate = 3;
@@ -320,6 +325,13 @@ void ui_manager::display_startup_screens(bool first_time, bool show_disclaimer)
 	#ifdef SDLMAME_EMSCRIPTEN
 	// also disable for the JavaScript port since the startup screens do not run asynchronously
 	show_gameinfo = show_warnings = show_disclaimer = FALSE;
+	#endif
+
+	#ifdef __LIBRETRO__
+	if(hide_nagscreen)
+		show_disclaimer = FALSE;
+	if(hide_warnings)
+		show_warnings = FALSE;
 	#endif
 
 	// loop over states
