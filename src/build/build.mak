@@ -32,17 +32,6 @@ MAKELIST = $(MAKELIST_TARGET)
 PNG2BDC = $(PNG2BDC_TARGET)
 VERINFO = $(VERINFO_TARGET)
 
-ifneq ($(TERM),cygwin)
-ifeq ($(TARGETOS),win32)
-FILE2STR = $(subst /,\,$(FILE2STR_TARGET))
-MAKEDEP = $(subst /,\,$(MAKEDEP_TARGET))
-MAKEMAK = $(subst /,\,$(MAKEMAK_TARGET))
-MAKELIST = $(subst /,\,$(MAKELIST_TARGET))
-PNG2BDC = $(subst /,\,$(PNG2BDC_TARGET))
-VERINFO = $(subst /,\,$(VERINFO_TARGET))
-endif
-endif
-
 ifneq ($(CROSS_BUILD),1)
 BUILD += \
 	$(FILE2STR_TARGET) \
@@ -63,7 +52,7 @@ FILE2STROBJS = \
 
 $(FILE2STR_TARGET): $(FILE2STROBJS) $(LIBOCORE)
 	@echo Linking $@...
-	$(LD) $(LDFLAGS) $^ $(LIBS) -o $@
+	$(NATIVELD) $(NATIVELDFLAGS) $^ $(LIBS) -o $@
 
 
 
@@ -74,9 +63,9 @@ $(FILE2STR_TARGET): $(FILE2STROBJS) $(LIBOCORE)
 MAKEDEPOBJS = \
 	$(BUILDOBJ)/makedep.o \
 
-$(MAKEDEP_TARGET): $(MAKEDEPOBJS) $(LIBUTIL) $(LIBOCORE) $(ZLIB)
+$(MAKEDEP_TARGET): $(MAKEDEPOBJS) $(LIBUTIL) $(LIBOCORE) $(ZLIB) $(FLAC_LIB)
 	@echo Linking $@...
-	$(LD) $(LDFLAGS) $^ $(LIBS) -o $@
+	$(NATIVELD) $(NATIVELDFLAGS) $^ $(LIBS) -o $@
 
 
 
@@ -90,7 +79,7 @@ MAKEMAKOBJS = \
 # TODO: 7z and flac - really?
 $(MAKEMAK_TARGET): $(MAKEMAKOBJS) $(LIBUTIL) $(LIBOCORE) $(ZLIB) $(FLAC_LIB) $(7Z_LIB)
 	@echo Linking $@...
-	$(LD) $(LDFLAGS) $^ $(LIBS) -o $@
+	$(NATIVELD) $(NATIVELDFLAGS) $^ $(LIBS) -o $@
 
 
 
@@ -104,7 +93,7 @@ MAKELISTOBJS = \
 # TODO: 7z and flac - really?
 $(MAKELIST_TARGET): $(MAKELISTOBJS) $(LIBUTIL) $(LIBOCORE) $(ZLIB) $(FLAC_LIB) $(7Z_LIB)
 	@echo Linking $@...
-	$(LD) $(LDFLAGS) $^ $(LIBS) -o $@
+	$(NATIVELD) $(NATIVELDFLAGS) $^ $(LIBS) -o $@
 
 
 
@@ -115,9 +104,9 @@ $(MAKELIST_TARGET): $(MAKELISTOBJS) $(LIBUTIL) $(LIBOCORE) $(ZLIB) $(FLAC_LIB) $
 PNG2BDCOBJS = \
 	$(BUILDOBJ)/png2bdc.o \
 
-$(PNG2BDC_TARGET): $(PNG2BDCOBJS) $(LIBUTIL) $(LIBOCORE) $(ZLIB)
+$(PNG2BDC_TARGET): $(PNG2BDCOBJS) $(LIBUTIL) $(LIBOCORE) $(ZLIB) $(FLAC_LIB) $(7Z_LIB)
 	@echo Linking $@...
-	$(LD) $(LDFLAGS) $^ $(LIBS) -o $@
+	$(NATIVELD) $(NATIVELDFLAGS) $^ $(LIBS) -o $@
 
 
 
@@ -128,27 +117,8 @@ $(PNG2BDC_TARGET): $(PNG2BDCOBJS) $(LIBUTIL) $(LIBOCORE) $(ZLIB)
 VERINFOOBJS = \
 	$(BUILDOBJ)/verinfo.o
 
-$(VERINFO_TARGET): $(VERINFOOBJS) $(LIBOCORE)
+$(VERINFO_TARGET): $(VERINFOOBJS) $(LIBOCORE) $(FLAC_LIB) $(7Z_LIB)
 	@echo Linking $@...
-	$(LD) $(LDFLAGS) $^ $(LIBS) -o $@
-
-else
-#-------------------------------------------------
-# It's a CROSS_BUILD. Ensure the targets exist.
-#-------------------------------------------------
-$(FILE2STR_TARGET):
-	@echo $@ should be built natively. Nothing to do.
-
-$(MAKEDEP_TARGET):
-	@echo $@ should be built natively. Nothing to do.
-
-$(MAKELIST_TARGET):
-	@echo $@ should be built natively. Nothing to do.
-
-$(PNG2BDC_TARGET):
-	@echo $@ should be built natively. Nothing to do.
-
-$(VERINFO_TARGET):
-	@echo $@ should be built natively. Nothing to do.
+	$(NATIVELD) $(NATIVELDFLAGS) $^ $(LIBS) -o $@
 
 endif # CROSS_BUILD

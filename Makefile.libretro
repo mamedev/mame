@@ -728,18 +728,14 @@ BUILDOUT = $(BUILDOBJ)
 #-------------------------------------------------
 
 # include OSD-specific rules first
-#include $(SRC)/osd/$(OSD)/$(OSD).mak
-include $(SRC)/osd/$(OSD)/mak/$(OSD).mak
+include $(SRC)/osd/$(OSD)/$(OSD).mak
 
 # then the various core pieces
-include $(SRC)/osd/$(OSD)/mak/build.mak
-#include $(SRC)/build/build.mak
+include $(SRC)/build/build.mak
 include $(SRC)/$(TARGET)/$(SUBTARGET).mak
 -include $(SRC)/$(TARGET)/osd/$(OSD)/$(OSD).mak
-#include $(SRC)/emu/emu.mak
-include $(SRC)/osd/$(OSD)/mak/emu.mak
-#include $(SRC)/lib/lib.mak
-include $(SRC)/osd/$(OSD)/mak/lib.mak
+include $(SRC)/emu/emu.mak
+include $(SRC)/lib/lib.mak
 -include $(SRC)/osd/$(CROSS_BUILD_OSD)/build.mak
 include $(SRC)/tools/tools.mak
 include $(SRC)/regtests/regtests.mak

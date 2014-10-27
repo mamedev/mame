@@ -46,7 +46,9 @@ OBJDIRS += \
 
 #-------------------------------------------------
 # emulator core objects
+# MKCHAMP - ADDED hiscore.o TO LIST TO COMPILE THE HISCORE PIECE
 #-------------------------------------------------
+#	$(EMUOBJ)/hiscore.o 
 
 EMUOBJS = \
 	$(EMUOBJ)/hashfile.o \
@@ -143,7 +145,7 @@ EMUOBJS = \
 	$(EMUOBJ)/debug/express.o \
 	$(EMUOBJ)/debug/textbuf.o \
 	$(EMUOBJ)/profiler.o \
-	$(EMUOBJ)/webengine.o \
+	$(EMUOBJ)/webengine_retro.o \
 	$(OSDOBJ)/osdcore.o \
 	$(OSDOBJ)/osdepend.o \
 	$(OSDOBJ)/osdnet.o \
@@ -207,7 +209,8 @@ $(LIBEMU): $(LIBEMUOBJS)
 # CPU core objects
 #-------------------------------------------------
 
-include $(EMUSRC)/cpu/cpu.mak
+#include $(EMUSRC)/cpu/cpu.mak
+include $(SRC)/osd/$(OSD)/mak/cpu.mak
 
 $(LIBDASM): $(DASMOBJS)
 
@@ -246,7 +249,8 @@ include $(EMUSRC)/bus/bus.mak
 # core optional library
 #-------------------------------------------------
 
-$(LIBOPTIONAL): $(CPUOBJS) $(SOUNDOBJS) $(VIDEOOBJS) $(MACHINEOBJS) $(NETLISTOBJS)
+$(LIBOPTIONAL): $(CPUOBJS) $(SOUNDOBJS) $(VIDEOOBJS) 
+$(LIBOPTIONAL2): $(MACHINEOBJS) $(NETLISTOBJS)
 $(LIBBUS): $(BUSOBJS)
 
 #-------------------------------------------------

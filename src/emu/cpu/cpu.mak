@@ -1174,7 +1174,7 @@ $(CPUOBJ)/mips/mips3drc.o:  $(CPUSRC)/mips/mips3drc.c \
 
 ifneq ($(filter PSX,$(CPUS)),)
 OBJDIRS += $(CPUOBJ)/psx
-CPUOBJS += $(CPUOBJ)/psx/psx.o $(CPUOBJ)/psx/gte.o $(CPUOBJ)/psx/dma.o $(CPUOBJ)/psx/irq.o $(CPUOBJ)/psx/mdec.o $(CPUOBJ)/psx/rcnt.o $(CPUOBJ)/psx/sio.o
+CPUOBJS += $(CPUOBJ)/psx/psx.o $(CPUOBJ)/psx/gte.o $(CPUOBJ)/psx/dma.o $(CPUOBJ)/psx/irq.o $(CPUOBJ)/psx/mdec.o $(CPUOBJ)/psx/rcnt.o $(CPUOBJ)/psx/sio.o 
 DASMOBJS += $(CPUOBJ)/psx/psxdasm.o
 endif
 
@@ -1520,9 +1520,9 @@ OBJDIRS += $(CPUOBJ)/m68000
 CPUOBJS += $(CPUOBJ)/m68000/m68kcpu.o $(CPUOBJ)/m68000/m68kops.o \
 
 DASMOBJS += $(CPUOBJ)/m68000/m68kdasm.o
-ifndef M68KMAKE
-M68KMAKE = $(BUILDOUT)/m68kmake$(BUILD_EXE)
-endif
+#ifndef M68KMAKE
+#M68KMAKE = $(BUILDOUT)/m68kmake$(BUILD_EXE)
+#endif
 endif
 
 # when we compile source files we need to include generated files from the OBJ directory
@@ -1536,27 +1536,27 @@ $(CPUOBJ)/m68000/%.o: $(CPUOBJ)/m68000/%.c | $(OSPREBUILD)
 	$(CC) $(CDEFS) $(CFLAGS) -I$(CPUSRC)/m68000 -I$(CPUOBJ)/m68000 -c $< -o $@
 
 # rule to generate the C files
-$(CPUOBJ)/m68000/m68kops.c: $(M68KMAKE) $(CPUSRC)/m68000/m68k_in.c
-	@echo Generating M68K source files...
-	$(M68KMAKE) $(CPUOBJ)/m68000 $(CPUSRC)/m68000/m68k_in.c
-
+#$(CPUOBJ)/m68000/m68kops.c: $(M68KMAKE) $(CPUSRC)/m68000/m68k_in.c
+#	@echo Generating M68K source files...
+#	$(M68KMAKE) $(CPUOBJ)/m68000 $(CPUSRC)/m68000/m68k_in.c
+#
 # rule to build the generator
-ifneq ($(CROSS_BUILD),1)
-
-BUILD += $(M68KMAKE)
-
-$(M68KMAKE): $(CPUOBJ)/m68000/m68kmake.o $(LIBOCORE)
-	@echo Linking $@...
-	$(LD) $(LDFLAGS) $(OSDBGLDFLAGS) $^ $(LIBS) -o $@
-endif
+#ifneq ($(CROSS_BUILD),1)
+#
+#BUILD += $(M68KMAKE)
+#
+#$(M68KMAKE): $(CPUOBJ)/m68000/m68kmake.o $(LIBOCORE)
+#	@echo Linking $@...
+#	$(LD) $(LDFLAGS) $(OSDBGLDFLAGS) $^ $(LIBS) -o $@
+#endif
 
 # rule to ensure we build the header before building the core CPU file
-$(CPUOBJ)/m68000/m68kcpu.o:     $(CPUOBJ)/m68000/m68kops.c \
+#$(CPUOBJ)/m68000/m68kcpu.o:     $(CPUOBJ)/m68000/m68kops.c \
+$(CPUOBJ)/m68000/m68kcpu.o:     $(CPUSRC)/m68000/m68kops.c \
 								$(CPUSRC)/m68000/m68kcpu.h $(CPUSRC)/m68000/m68kfpu.inc $(CPUSRC)/m68000/m68kmmu.h
 
 # m68kcpu.h now includes m68kops.h; m68kops.h won't exist until m68kops.c has been made
-$(CPUSRC)/m68000/m68kcpu.h: $(CPUOBJ)/m68000/m68kops.c
-
+$(CPUSRC)/m68000/m68kcpu.h: $(CPUSRC)/m68000/m68kops.c
 
 
 #-------------------------------------------------
