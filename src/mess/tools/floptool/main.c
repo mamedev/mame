@@ -70,6 +70,7 @@ static floppy_format_type floppy_formats[] = {
 	FLOPPY_DC42_FORMAT,
 	FLOPPY_A216S_FORMAT,
 	FLOPPY_RWTS18_FORMAT,
+	FLOPPY_EDD_FORMAT,
 
 	FLOPPY_ORIC_DSK_FORMAT,
 

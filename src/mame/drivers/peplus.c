@@ -206,7 +206,13 @@ public:
 
 	peplus_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-			m_cmos_ram(*this, "cmos") ,
+		m_maincpu(*this, "maincpu"),
+		m_crtc(*this, "crtc"),
+		m_i2cmem(*this, "i2cmem"),
+		m_screen(*this, "screen"),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette"),
+		m_cmos_ram(*this, "cmos"),
 		m_program_ram(*this, "prograram"),
 		m_s3000_ram(*this, "s3000_ram"),
 		m_s5000_ram(*this, "s5000_ram"),
@@ -215,14 +221,17 @@ public:
 		m_sb000_ram(*this, "sb000_ram"),
 		m_sd000_ram(*this, "sd000_ram"),
 		m_sf000_ram(*this, "sf000_ram"),
-		m_io_port(*this, "io_port"),
-		m_maincpu(*this, "maincpu"),
-		m_i2cmem(*this, "i2cmem"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")
+		m_io_port(*this, "io_port")
 	{
 	}
 
+	required_device<cpu_device> m_maincpu;
+	required_device<r6545_1_device> m_crtc;
+	required_device<i2cmem_device> m_i2cmem;
+	required_device<screen_device> m_screen;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+	
 	required_shared_ptr<UINT8> m_cmos_ram;
 	required_shared_ptr<UINT8> m_program_ram;
 	required_shared_ptr<UINT8> m_s3000_ram;
@@ -233,6 +242,7 @@ public:
 	required_shared_ptr<UINT8> m_sd000_ram;
 	required_shared_ptr<UINT8> m_sf000_ram;
 	required_shared_ptr<UINT8> m_io_port;
+	
 	tilemap_t *m_bg_tilemap;
 	UINT8 m_wingboard;
 	UINT8 m_doorcycle;
@@ -260,29 +270,15 @@ public:
 	UINT8 m_bv_data_bit;
 	UINT8 m_bv_loop_count;
 	UINT16 id023_data;
+	
 	DECLARE_WRITE8_MEMBER(peplus_bgcolor_w);
 	DECLARE_WRITE8_MEMBER(peplus_crtc_display_w);
-	DECLARE_WRITE8_MEMBER(peplus_io_w);
 	DECLARE_WRITE8_MEMBER(peplus_duart_w);
 	DECLARE_WRITE8_MEMBER(peplus_cmos_w);
-	DECLARE_WRITE8_MEMBER(peplus_s3000_w);
-	DECLARE_WRITE8_MEMBER(peplus_s5000_w);
-	DECLARE_WRITE8_MEMBER(peplus_s7000_w);
-	DECLARE_WRITE8_MEMBER(peplus_sb000_w);
-	DECLARE_WRITE8_MEMBER(peplus_sd000_w);
-	DECLARE_WRITE8_MEMBER(peplus_sf000_w);
 	DECLARE_WRITE8_MEMBER(peplus_output_bank_a_w);
 	DECLARE_WRITE8_MEMBER(peplus_output_bank_b_w);
 	DECLARE_WRITE8_MEMBER(peplus_output_bank_c_w);
-	DECLARE_READ8_MEMBER(peplus_io_r);
 	DECLARE_READ8_MEMBER(peplus_duart_r);
-	DECLARE_READ8_MEMBER(peplus_cmos_r);
-	DECLARE_READ8_MEMBER(peplus_s3000_r);
-	DECLARE_READ8_MEMBER(peplus_s5000_r);
-	DECLARE_READ8_MEMBER(peplus_s7000_r);
-	DECLARE_READ8_MEMBER(peplus_sb000_r);
-	DECLARE_READ8_MEMBER(peplus_sd000_r);
-	DECLARE_READ8_MEMBER(peplus_sf000_r);
 	DECLARE_READ8_MEMBER(peplus_bgcolor_r);
 	DECLARE_READ8_MEMBER(peplus_dropdoor_r);
 	DECLARE_READ8_MEMBER(peplus_watchdog_r);
@@ -303,10 +299,7 @@ public:
 	UINT32 screen_update_peplus(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void peplus_load_superdata(const char *bank_name);
 	DECLARE_PALETTE_INIT(peplus);
-	required_device<cpu_device> m_maincpu;
-	required_device<i2cmem_device> m_i2cmem;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
+	void handle_lightpen();
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
@@ -392,7 +385,7 @@ void peplus_state::device_timer(emu_timer &timer, device_timer_id id, int param,
 	switch (id)
 	{
 	case TIMER_ASSERT_LP:
-		downcast<mc6845_device *>((device_t*)ptr)->assert_light_pen_input();
+		m_crtc->assert_light_pen_input();
 		break;
 	default:
 		assert_always(FALSE, "Unknown id in peplus_state::device_timer");
@@ -400,25 +393,23 @@ void peplus_state::device_timer(emu_timer &timer, device_timer_id id, int param,
 }
 
 
-static void handle_lightpen( mc6845_device *device )
+void peplus_state::handle_lightpen()
 {
-	peplus_state *state = device->machine().driver_data<peplus_state>();
-	int x_val = device->machine().root_device().ioport("TOUCH_X")->read_safe(0x00);
-	int y_val = device->machine().root_device().ioport("TOUCH_Y")->read_safe(0x00);
-	const rectangle &vis_area = device->screen().visible_area();
+	int x_val = ioport("TOUCH_X")->read_safe(0x00);
+	int y_val = ioport("TOUCH_Y")->read_safe(0x00);
+	const rectangle &vis_area = m_screen->visible_area();
 	int xt, yt;
 
 	xt = x_val * vis_area.width() / 1024 + vis_area.min_x;
 	yt = y_val * vis_area.height() / 1024 + vis_area.min_y;
 
-	state->timer_set(device->screen().time_until_pos(yt, xt), peplus_state::TIMER_ASSERT_LP, 0, device);
+	timer_set(m_screen->time_until_pos(yt, xt), TIMER_ASSERT_LP, 0);
 }
 
 WRITE_LINE_MEMBER(peplus_state::crtc_vsync)
 {
-	mc6845_device *device = machine().device<mc6845_device>("crtc");
 	m_maincpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
-	handle_lightpen(device);
+	handle_lightpen();
 }
 
 WRITE8_MEMBER(peplus_state::peplus_crtc_display_w)
@@ -431,12 +422,7 @@ WRITE8_MEMBER(peplus_state::peplus_crtc_display_w)
 	m_bg_tilemap->mark_tile_dirty(m_vid_address);
 
 	/* An access here triggers a device read !*/
-	machine().device<mc6845_device>("crtc")->register_r(space, 0);
-}
-
-WRITE8_MEMBER(peplus_state::peplus_io_w)
-{
-	m_io_port[offset] = data;
+	m_crtc->register_r(space, 0);
 }
 
 WRITE8_MEMBER(peplus_state::peplus_duart_w)
@@ -456,36 +442,6 @@ WRITE8_MEMBER(peplus_state::peplus_cmos_w)
 	}
 
 	m_cmos_ram[offset] = data;
-}
-
-WRITE8_MEMBER(peplus_state::peplus_s3000_w)
-{
-	m_s3000_ram[offset] = data;
-}
-
-WRITE8_MEMBER(peplus_state::peplus_s5000_w)
-{
-	m_s5000_ram[offset] = data;
-}
-
-WRITE8_MEMBER(peplus_state::peplus_s7000_w)
-{
-	m_s7000_ram[offset] = data;
-}
-
-WRITE8_MEMBER(peplus_state::peplus_sb000_w)
-{
-	m_sb000_ram[offset] = data;
-}
-
-WRITE8_MEMBER(peplus_state::peplus_sd000_w)
-{
-	m_sd000_ram[offset] = data;
-}
-
-WRITE8_MEMBER(peplus_state::peplus_sf000_w)
-{
-	m_sf000_ram[offset] = data;
 }
 
 WRITE8_MEMBER(peplus_state::peplus_output_bank_a_w)
@@ -542,50 +498,10 @@ WRITE8_MEMBER(peplus_state::i2c_nvram_w)
 * Read Handlers *
 ****************/
 
-READ8_MEMBER(peplus_state::peplus_io_r)
-{
-	return m_io_port[offset];
-}
-
 READ8_MEMBER(peplus_state::peplus_duart_r)
 {
 	// Used for Slot Accounting System Communication
 	return 0x00;
-}
-
-READ8_MEMBER(peplus_state::peplus_cmos_r)
-{
-	return m_cmos_ram[offset];
-}
-
-READ8_MEMBER(peplus_state::peplus_s3000_r)
-{
-	return m_s3000_ram[offset];
-}
-
-READ8_MEMBER(peplus_state::peplus_s5000_r)
-{
-	return m_s5000_ram[offset];
-}
-
-READ8_MEMBER(peplus_state::peplus_s7000_r)
-{
-	return m_s7000_ram[offset];
-}
-
-READ8_MEMBER(peplus_state::peplus_sb000_r)
-{
-	return m_sb000_ram[offset];
-}
-
-READ8_MEMBER(peplus_state::peplus_sd000_r)
-{
-	return m_sd000_ram[offset];
-}
-
-READ8_MEMBER(peplus_state::peplus_sf000_r)
-{
-	return m_sf000_ram[offset];
 }
 
 /* Last Color in Every Palette is bgcolor */
@@ -1056,7 +972,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( peplus_iomap, AS_IO, 8, peplus_state )
 	// Battery-backed RAM (0x1000-0x01fff Extended RAM for Superboards Only)
-	AM_RANGE(0x0000, 0x1fff) AM_READWRITE(peplus_cmos_r, peplus_cmos_w) AM_SHARE("cmos")
+	AM_RANGE(0x0000, 0x1fff) AM_RAM_WRITE(peplus_cmos_w) AM_SHARE("cmos")
 
 	// CRT Controller
 	AM_RANGE(0x2008, 0x2008) AM_WRITE(peplus_crtc_mode_w)
@@ -1065,14 +981,14 @@ static ADDRESS_MAP_START( peplus_iomap, AS_IO, 8, peplus_state )
 	AM_RANGE(0x2083, 0x2083) AM_DEVREAD("crtc", mc6845_device, register_r) AM_WRITE(peplus_crtc_display_w)
 
 	// Superboard Data
-	AM_RANGE(0x3000, 0x3fff) AM_READWRITE(peplus_s3000_r, peplus_s3000_w) AM_SHARE("s3000_ram")
+	AM_RANGE(0x3000, 0x3fff) AM_RAM AM_SHARE("s3000_ram")
 
 	// Sound and Dipswitches
 	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE("aysnd", ay8910_device, address_w)
 	AM_RANGE(0x4004, 0x4004) AM_READ_PORT("SW1")/* likely ay8910 input port, not direct */ AM_DEVWRITE("aysnd", ay8910_device, data_w)
 
 	// Superboard Data
-	AM_RANGE(0x5000, 0x5fff) AM_READWRITE(peplus_s5000_r, peplus_s5000_w) AM_SHARE("s5000_ram")
+	AM_RANGE(0x5000, 0x5fff) AM_RAM AM_SHARE("s5000_ram")
 
 	// Background Color Latch
 	AM_RANGE(0x6000, 0x6000) AM_READ(peplus_bgcolor_r) AM_WRITE(peplus_bgcolor_w)
@@ -1081,7 +997,7 @@ static ADDRESS_MAP_START( peplus_iomap, AS_IO, 8, peplus_state )
 	AM_RANGE(0x06001, 0x06400) AM_RAM AM_SHARE("videoram")
 
 	// Superboard Data
-	AM_RANGE(0x7000, 0x7fff) AM_READWRITE(peplus_s7000_r, peplus_s7000_w) AM_SHARE("s7000_ram")
+	AM_RANGE(0x7000, 0x7fff) AM_RAM AM_SHARE("s7000_ram")
 
 	// Input Bank A, Output Bank C
 	AM_RANGE(0x8000, 0x8000) AM_READ(peplus_input_bank_a_r) AM_WRITE(peplus_output_bank_c_w)
@@ -1093,22 +1009,22 @@ static ADDRESS_MAP_START( peplus_iomap, AS_IO, 8, peplus_state )
 	AM_RANGE(0xa000, 0xa000) AM_READ(peplus_input0_r) AM_WRITE(peplus_output_bank_b_w)
 
 	// Superboard Data
-	AM_RANGE(0xb000, 0xbfff) AM_READWRITE(peplus_sb000_r, peplus_sb000_w) AM_SHARE("sb000_ram")
+	AM_RANGE(0xb000, 0xbfff) AM_RAM AM_SHARE("sb000_ram")
 
 	// Output Bank A
 	AM_RANGE(0xc000, 0xc000) AM_READ(peplus_watchdog_r) AM_WRITE(peplus_output_bank_a_w)
 
 	// Superboard Data
-	AM_RANGE(0xd000, 0xdfff) AM_READWRITE(peplus_sd000_r, peplus_sd000_w) AM_SHARE("sd000_ram")
+	AM_RANGE(0xd000, 0xdfff) AM_RAM AM_SHARE("sd000_ram")
 
 	// DUART
 	AM_RANGE(0xe000, 0xe00f) AM_READWRITE(peplus_duart_r, peplus_duart_w)
 
 	// Superboard Data
-	AM_RANGE(0xf000, 0xffff) AM_READWRITE(peplus_sf000_r, peplus_sf000_w) AM_SHARE("sf000_ram")
+	AM_RANGE(0xf000, 0xffff) AM_RAM AM_SHARE("sf000_ram")
 
 	/* Ports start here */
-	AM_RANGE(MCS51_PORT_P0, MCS51_PORT_P3) AM_READ(peplus_io_r) AM_WRITE(peplus_io_w) AM_SHARE("io_port")
+	AM_RANGE(MCS51_PORT_P0, MCS51_PORT_P3) AM_RAM AM_SHARE("io_port")
 ADDRESS_MAP_END
 
 

@@ -149,6 +149,7 @@ INPUT_PORTS_END
 //**************************************************************************
 
 const device_type ISA8_HDC = &device_creator<isa8_hdc_device>;
+const device_type ISA8_HDC_EC1841 = &device_creator<isa8_hdc_ec1841_device>;
 
 //-------------------------------------------------
 //  machine_config_additions - device-specific
@@ -190,6 +191,19 @@ isa8_hdc_device::isa8_hdc_device(const machine_config &mconfig, const char *tag,
 		device_t(mconfig, ISA8_HDC, "Fixed Disk Controller Card", tag, owner, clock, "hdc", __FILE__),
 		device_isa8_card_interface(mconfig, *this)
 {
+	m_type = STANDARD;
+}
+
+isa8_hdc_device::isa8_hdc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+		device_isa8_card_interface(mconfig, *this)
+{
+}
+
+isa8_hdc_ec1841_device::isa8_hdc_ec1841_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+		isa8_hdc_device( mconfig, ISA8_HDC_EC1841, "EC1841 HDC", tag, owner, clock, "hdc_ec1841", __FILE__)
+{
+	m_type = EC1841;
 }
 
 //-------------------------------------------------
@@ -750,7 +764,11 @@ void isa8_hdc_device::pc_hdc_data_w(int data)
 
 		*buffer_ptr++ = data;
 		// XXX ec1841 wants this
+<<<<<<< HEAD
 		if (buffer[0] == CMD_SETPARAM && data_cnt == 9) {
+=======
+		if (buffer[0] == CMD_SETPARAM && data_cnt == 9 && (m_type == EC1841)) {
+>>>>>>> 8da3b4f1ef8bc374ef62c6b5e8390f71bd3777c6
 			status &= ~STA_READY;
 		} else {
 			status |= STA_READY;

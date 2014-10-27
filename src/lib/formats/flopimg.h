@@ -381,7 +381,7 @@ protected:
 	    @param track_size in cells, not bytes.
 	    @param image
 	*/
-	void generate_track_from_bitstream(int track, int head, const UINT8 *trackbuf, int track_size, floppy_image *image);
+	void generate_track_from_bitstream(int track, int head, const UINT8 *trackbuf, int track_size, floppy_image *image, int subtrack = 0);
 
 	//! @brief Generate a track from cell level values (0/1/W/D/N).
 
@@ -477,7 +477,7 @@ protected:
 	 @endverbatim
 	 */
 
-	void generate_bitstream_from_track(int track, int head, int cell_size,  UINT8 *trackbuf, int &track_size, floppy_image *image);
+	void generate_bitstream_from_track(int track, int head, int cell_size, UINT8 *trackbuf, int &track_size, floppy_image *image, int subtrack = 0);
 
 	//! Defines a standard sector for extracting.
 	struct desc_xs {

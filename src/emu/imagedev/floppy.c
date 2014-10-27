@@ -623,14 +623,14 @@ attotime floppy_image_device::get_next_transition(const attotime &from_when)
 	if(!image || mon)
 		return attotime::never;
 
-	int cells = image->get_track_size(cyl, ss);
+	int cells = image->get_track_size(cyl, ss, subcyl);
 	if(cells <= 1)
 		return attotime::never;
 
 	attotime base;
 	UINT32 position = find_position(base, from_when);
 
-	const UINT32 *buf = image->get_buffer(cyl, ss);
+	const UINT32 *buf = image->get_buffer(cyl, ss, subcyl);
 	int index = find_index(position, buf, cells);
 
 	if(index == -1)
@@ -661,16 +661,16 @@ void floppy_image_device::write_flux(const attotime &start, const attotime &end,
 	for(int i=0; i != transition_count; i++)
 		trans_pos[i] = find_position(base, transitions[i]);
 
-	int cells = image->get_track_size(cyl, ss);
-	UINT32 *buf = image->get_buffer(cyl, ss);
+	int cells = image->get_track_size(cyl, ss, subcyl);
+	UINT32 *buf = image->get_buffer(cyl, ss, subcyl);
 
 	int index;
 	if(cells)
 		index = find_index(start_pos, buf, cells);
 	else {
 		index = 0;
-		image->set_track_size(cyl, ss, 1);
-		buf = image->get_buffer(cyl, ss);
+		image->set_track_size(cyl, ss, 1, subcyl);
+		buf = image->get_buffer(cyl, ss, subcyl);
 		buf[cells++] = floppy_image::MG_N;
 	}
 
@@ -684,9 +684,9 @@ void floppy_image_device::write_flux(const attotime &start, const attotime &end,
 	UINT32 pos = start_pos;
 	int ti = 0;
 	while(pos != end_pos) {
-		if(image->get_track_size(cyl, ss) < cells+10) {
-			image->set_track_size(cyl, ss, cells+200);
-			buf = image->get_buffer(cyl, ss);
+		if(image->get_track_size(cyl, ss, subcyl) < cells+10) {
+			image->set_track_size(cyl, ss, cells+200, subcyl);
+			buf = image->get_buffer(cyl, ss, subcyl);
 		}
 		UINT32 next_pos;
 		if(ti != transition_count)
@@ -704,7 +704,7 @@ void floppy_image_device::write_flux(const attotime &start, const attotime &end,
 		cur_mg = cur_mg == floppy_image::MG_A ? floppy_image::MG_B : floppy_image::MG_A;
 	}
 
-	image->set_track_size(cyl, ss, cells);
+	image->set_track_size(cyl, ss, cells, subcyl);
 }
 
 void floppy_image_device::write_zone(UINT32 *buf, int &cells, int &index, UINT32 spos, UINT32 epos, UINT32 mg)
@@ -812,7 +812,7 @@ void floppy_image_device::set_write_splice(const attotime &when)
 		image_dirty = true;
 		attotime base;
 		int splice_pos = find_position(base, when);
-		image->set_write_splice_position(cyl, ss, splice_pos);
+		image->set_write_splice_position(cyl, ss, splice_pos, subcyl);
 	}
 }
 

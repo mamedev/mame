@@ -96,6 +96,7 @@ void maygay1b_state::machine_reset()
 {
 	m_vfd->reset(); // reset display1
 	m1_stepper_reset();
+	m_Vmm=false;
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -111,7 +112,6 @@ void maygay1b_state::cpu0_firq(int data)
 WRITE_LINE_MEMBER(maygay1b_state::duart_irq_handler)
 {
 	m_maincpu->set_input_line(M6809_IRQ_LINE,  state?ASSERT_LINE:CLEAR_LINE);
-	LOG(("6809 irq%d \n",state));
 }
 
 // FIRQ, related to the sample playback?
@@ -122,34 +122,34 @@ READ8_MEMBER( maygay1b_state::m1_firq_trg_r )
 	{
 		cpu0_firq(1);
 	}
-	return nar;
+	return 0xff;
 }
 
 READ8_MEMBER( maygay1b_state::m1_firq_clr_r )
 {
 	cpu0_firq(0);
-	return 0;
+	return 0xff;
 }
 
 // NMI is periodic? or triggered by a write?
 TIMER_DEVICE_CALLBACK_MEMBER( maygay1b_state::maygay1b_nmitimer_callback )
 {
-//disabling for now
-	if (m_NMIENABLE)
-	{
-		LOG(("6809 nmi\n"));
-		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-		m_NMIENABLE=0;
-	}
-
+	m_Vmm = !m_Vmm;
+	cpu0_nmi();
 }
 
-/*
-void maygay1b_state::cpu0_nmi(int data)
+void maygay1b_state::cpu0_nmi()
 {
-	m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if (m_Vmm && m_NMIENABLE)
+	{
+		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+	}
+	else
+	{
+		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+	}
 }
-*/
+
 /***************************************************************************
     6821 PIA
 ***************************************************************************/
@@ -286,7 +286,7 @@ INPUT_PORTS_START( maygay_m1 )
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("68")
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("69")
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("70")
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("72")
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("RESET")
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("73")
 
 INPUT_PORTS_END
@@ -376,10 +376,13 @@ WRITE8_MEMBER(maygay1b_state::m1_latch_w)
 		m_ALARMEN = (data & 1);
 		break;
 		case 2: // Enable
-        if ( m_NMIENABLE == 0 && ( data & 1 ) )
 		{
-			m_NMIENABLE = (data & 1);
-			//cpu0_nmi(1);
+            if ( m_NMIENABLE == 0 && ( data & 1 ))
+			{
+				m_NMIENABLE = (data & 1);
+				cpu0_nmi();
+			}
+			m_NMIENABLE = (data & 1);		
 		}
 		break;
 		case 3: // RTS
@@ -395,7 +398,7 @@ WRITE8_MEMBER(maygay1b_state::m1_latch_w)
 		case 6: // Srsel
 		// this is the ROM banking?
 		printf("rom bank %02x\n",data);
-		m_SRSEL = (data & 1);
+		m_bank1->set_entry(data & 1);
 		break;
 	}
 }
@@ -410,13 +413,13 @@ WRITE8_MEMBER(maygay1b_state::latch_ch2_w)
 READ8_MEMBER(maygay1b_state::latch_st_hi)
 {
 	m_msm6376->st_w(1);
-	return 0;
+	return 0xff;
 }
 
 READ8_MEMBER(maygay1b_state::latch_st_lo)
 {
 	m_msm6376->st_w(0);
-	return 0;
+	return 0xff;
 }
 
 READ8_MEMBER(maygay1b_state::m1_meter_r)
@@ -469,7 +472,92 @@ static ADDRESS_MAP_START( m1_memmap, AS_PROGRAM, 8, maygay1b_state )
 
 	AM_RANGE(0x2420, 0x2421) AM_WRITE(latch_ch2_w ) // oki
 
-	AM_RANGE(0x2800, 0xffff) AM_ROM
+	AM_RANGE(0x2800, 0xdfff) AM_ROM
+	AM_RANGE(0xe000, 0xffff) AM_ROMBANK("bank1")    /* 64k  paged ROM (4 pages)  */
+
+ADDRESS_MAP_END
+
+/*************************************************
+ *
+ *  NEC uPD7759 handling (used as OKI replacement)
+ *
+ *************************************************/
+READ8_MEMBER(maygay1b_state::m1_firq_nec_r)
+{
+	int busy = m_upd7759->busy_r();
+	if (!busy)
+	{
+		cpu0_firq(1);
+	}
+	return 0xff;
+}
+
+READ8_MEMBER(maygay1b_state::nec_reset_r)
+{
+	m_upd7759->reset_w(0);
+	m_upd7759->reset_w(1);	
+	return 0xff;
+}
+
+WRITE8_MEMBER(maygay1b_state::nec_bank0_w)
+{
+	m_upd7759->set_bank_base(0x00000);
+	m_upd7759->port_w(space, 0, data);
+	m_upd7759->start_w(0);
+	m_upd7759->start_w(1);	
+}
+
+WRITE8_MEMBER(maygay1b_state::nec_bank1_w)
+{
+	m_upd7759->set_bank_base(0x20000);
+	m_upd7759->port_w(space, 0, data);
+	m_upd7759->start_w(0);
+	m_upd7759->start_w(1);	
+}
+
+static ADDRESS_MAP_START( m1_nec_memmap, AS_PROGRAM, 8, maygay1b_state )
+	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_SHARE("nvram")
+
+	AM_RANGE(0x2000, 0x2000) AM_WRITE(reel12_w)
+	AM_RANGE(0x2010, 0x2010) AM_WRITE(reel34_w)
+	AM_RANGE(0x2020, 0x2020) AM_WRITE(reel56_w)
+
+	// there is actually an 8279 and an 8051 (which I guess is the MCU?).
+	AM_RANGE(0x2030, 0x2030) AM_DEVREADWRITE("i8279", i8279_device, data_r, data_w )
+	AM_RANGE(0x2031, 0x2031) AM_DEVREADWRITE("i8279", i8279_device, status_r, cmd_w)
+
+	//8051
+	AM_RANGE(0x2040, 0x2040) AM_DEVREADWRITE("i8279_2", i8279_device, data_r, data_w )
+	AM_RANGE(0x2041, 0x2041) AM_DEVREADWRITE("i8279_2", i8279_device, status_r, cmd_w)
+//  AM_RANGE(0x2050, 0x2050)// SCAN on M1B
+
+	AM_RANGE(0x2070, 0x207f) AM_DEVREADWRITE("duart68681", mc68681_device, read, write )
+
+	AM_RANGE(0x2090, 0x2091) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
+	AM_RANGE(0x20B0, 0x20B0) AM_READ(m1_meter_r)
+
+	AM_RANGE(0x20A0, 0x20A3) AM_DEVWRITE("pia", pia6821_device, write)
+	AM_RANGE(0x20A0, 0x20A3) AM_DEVREAD("pia", pia6821_device, read)
+
+	AM_RANGE(0x20C0, 0x20C7) AM_WRITE(m1_latch_w)
+
+	AM_RANGE(0x2400, 0x2401) AM_DEVWRITE("ymsnd", ym2413_device, write)
+	AM_RANGE(0x2404, 0x2405) AM_WRITE(nec_bank0_w)
+	AM_RANGE(0x2406, 0x2407) AM_WRITE(nec_bank1_w)
+
+	AM_RANGE(0x2408, 0x2409) AM_READ(nec_reset_r)
+
+	AM_RANGE(0x240c, 0x240d) AM_READ(m1_firq_clr_r)
+
+	AM_RANGE(0x240e, 0x240f) AM_READ(m1_firq_nec_r)
+	
+	AM_RANGE(0x2412, 0x2412) AM_READ(m1_firq_trg_r) // firq, sample playback?
+
+	AM_RANGE(0x2420, 0x2421) AM_WRITE(latch_ch2_w ) // oki
+
+	AM_RANGE(0x2800, 0xdfff) AM_ROM
+	AM_RANGE(0xe000, 0xffff) AM_ROMBANK("bank1")    /* 64k  paged ROM (4 pages)  */
+
 ADDRESS_MAP_END
 
 
@@ -530,8 +618,6 @@ WRITE8_MEMBER( maygay1b_state::lamp_data_2_w )
 
 // machine driver for maygay m1 board /////////////////////////////////
 
-
-
 MACHINE_CONFIG_START( maygay_m1, maygay1b_state )
 
 	MCFG_CPU_ADD("maincpu", M6809, M1_MASTER_CLOCK/2)
@@ -546,16 +632,20 @@ MACHINE_CONFIG_START( maygay_m1, maygay1b_state )
 	MCFG_PIA_WRITEPB_HANDLER(WRITE8(maygay1b_state, m1_pia_portb_w))
 
 	MCFG_S16LF01_ADD("vfd",0)
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MCFG_SOUND_ADD("aysnd", YM2149, M1_MASTER_CLOCK)
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(maygay1b_state, m1_meter_w))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(maygay1b_state, m1_lockout_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
 	MCFG_SOUND_ADD("ymsnd", YM2413, M1_MASTER_CLOCK/4)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
-	MCFG_SOUND_ADD("msm6376", OKIM6376, M1_MASTER_CLOCK/4) //?
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("msm6376", OKIM6376, 102400) //? Seems to work well with samples, but unconfirmed
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("nmitimer", maygay1b_state, maygay1b_nmitimer_callback, attotime::from_hz(75)) // freq?
 	MCFG_DEVICE_ADD("i8279", I8279, M1_MASTER_CLOCK/4)    // unknown clock
@@ -571,27 +661,29 @@ MACHINE_CONFIG_START( maygay_m1, maygay1b_state )
 MACHINE_CONFIG_END
 
 
+MACHINE_CONFIG_DERIVED( maygay_m1_nec, maygay_m1 )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(m1_nec_memmap)
 
-
-
-
-
+	MCFG_DEVICE_REMOVE("msm6376")
+	
+	MCFG_SOUND_ADD("upd", UPD7759, UPD7759_STANDARD_CLOCK)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+MACHINE_CONFIG_END
 
 WRITE8_MEMBER(maygay1b_state::m1ab_no_oki_w)
 {
 	popmessage("write to OKI, but no OKI rom");
 }
 
-DRIVER_INIT_MEMBER(maygay1b_state,m1)
+DRIVER_INIT_MEMBER(maygay1b_state,m1common)
 {
-	//AM_RANGE(0x2420, 0x2421) AM_WRITE(latch_ch2_w ) // oki
-	// if there is no OKI region disable writes here, the rom might be missing, so alert user
+	//Initialise paging for non-extended ROM space
+	UINT8 *rom = memregion("maincpu")->base();
+	membank("bank1")->configure_entries(0, 1, &rom[0x0e000], 0x10000);
+	membank("bank1")->set_entry(0);
 
-	UINT8 *okirom = memregion( "msm6376" )->base();
-
-	if (!okirom) {
-		m_maincpu->space(AS_PROGRAM).install_write_handler(0x2420, 0x2421, write8_delegate(FUNC(maygay1b_state::m1ab_no_oki_w), this));
-	}
 	// print out the rom id / header info to give us some hints
 	// note this isn't always correct, alley cat has 'Calpsyo' still in the ident string?
 	{
@@ -616,5 +708,25 @@ DRIVER_INIT_MEMBER(maygay1b_state,m1)
 			}
 			printf("\n");
 		}
+	}
+}
+
+
+DRIVER_INIT_MEMBER(maygay1b_state,m1nec)
+{
+	DRIVER_INIT_CALL(m1common);
+}
+
+DRIVER_INIT_MEMBER(maygay1b_state,m1)
+{
+	DRIVER_INIT_CALL(m1common);
+
+	//AM_RANGE(0x2420, 0x2421) AM_WRITE(latch_ch2_w ) // oki
+	// if there is no OKI region disable writes here, the rom might be missing, so alert user
+
+	UINT8 *okirom = memregion( "msm6376" )->base();
+
+	if (!okirom) {
+		m_maincpu->space(AS_PROGRAM).install_write_handler(0x2420, 0x2421, write8_delegate(FUNC(maygay1b_state::m1ab_no_oki_w), this));
 	}
 }

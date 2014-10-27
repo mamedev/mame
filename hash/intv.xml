@@ -26,8 +26,8 @@
 		</part>
 	</software>
 
-	<software name="addc">
-		<description>Advanced Dungeons &amp; Dragons Cartridge</description>
+	<software name="add">
+		<description>Advanced Dungeons &amp; Dragons</description>
 		<year>1982</year>
 		<publisher>Mattel Electronics</publisher>
 		<info name="serial" value="3410"/>
@@ -40,7 +40,7 @@
 	</software>
 
 	<software name="addtot">
-		<description>Advanced Dungeons &amp; Dragons: Treasure of Tarmin</description>
+		<description>Advanced Dungeons &amp; Dragons - Treasure of Tarmin</description>
 		<year>1982</year>
 		<publisher>Mattel Electronics</publisher>
 		<info name="serial" value="5300"/>
@@ -65,8 +65,8 @@
 		</part>
 	</software>
 
-	<software name="astrosm">
-		<description>Astro Smash</description>
+	<software name="astrosms">
+		<description>AstroSmash</description>
 		<year>1981</year>
 		<publisher>Mattel Electronics</publisher>
 		<info name="serial" value="3605"/>
@@ -74,6 +74,18 @@
 			<feature name="slot" value="intv_rom" />
 			<dataarea name="5000" size="0x2000">
 				<rom name="astro smash.50" size="0x2000" crc="fab2992c" sha1="d3529cad339b3fd5c67b4f503e9360188be9d3e8" offset="0x0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="astrosmsc" cloneof="astrosms">
+		<description>AstroSmash Competition</description>
+		<year>1981</year>
+		<publisher>Mattel Electronics</publisher>
+		<part name="cart" interface="intv_cart">
+			<feature name="slot" value="intv_rom" />
+			<dataarea name="5000" size="8192">
+				<rom name="astrosmash competition.50" size="8192" crc="d0f83698" sha1="fbb2df69cfda87976cf279be6ad028e00c47ce9d" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1756,7 +1768,7 @@
 	<software name="voice">
 		<description>Intellivoice</description>
 		<year>19??</year>
-		<publisher>Mattel</publisher>
+		<publisher>Mattel Electronics</publisher>
 		<part name="cart" interface="intv_cart">
 			<feature name="slot" value="intv_voice" />
 			<dataarea name="5000" size="0x4000">
@@ -1769,7 +1781,7 @@
 	<software name="ecs">
 		<description>Entertainment Computer System</description>
 		<year>19??</year>
-		<publisher>Mattel</publisher>
+		<publisher>Mattel Electronics</publisher>
 		<part name="cart" interface="intv_cart">
 			<feature name="slot" value="intv_ecs" />
 			<dataarea name="2000" size="0x2000">
@@ -1790,17 +1802,35 @@
 
 <!-- Unreleased / Prototypes / Homebrew -->
 
-	<software name="allstar">
-		<description>All Star Major League Baseball (Prototype)</description>
+	<software name="addtom">
+		<description>Advanced Dungeons &amp; Dragons - Tower of Mystery (Unreleased)</description>
 		<year>1983</year>
 		<publisher>Mattel Electronics</publisher>
 		<part name="cart" interface="intv_cart">
 			<feature name="slot" value="intv_rom" />
-			<dataarea name="5000" size="0x4000">
-				<rom name="all star major league baseball.50" size="0x4000" crc="4a7e080a" sha1="ee2edd084c371d39dfcd725ed4aa5679e0c34a27" offset="0x0000"/>
+			<dataarea name="5000" size="16384">
+				<rom name="ad&amp;d tower of mystery.50" size="16384" crc="4d7022c4" sha1="968875dbb5c9af72b746cde4f9a6dc4677d8aceb" offset="0x0000" />
 			</dataarea>
-			<dataarea name="D000" size="0x2000">
-				<rom name="all star major league baseball.d0" size="0x2000" crc="31325854" sha1="fe7b5f3969e214ac23d20c5c137dc23f4515108d" offset="0x0000"/>
+			<dataarea name="9000" size="16384">
+				<rom name="ad&amp;d tower of mystery.90" size="16384" crc="69ea443d" sha1="5348845531a326cf66991697c55efd9287b4874b" offset="0x0000" />
+			</dataarea>
+			<dataarea name="D000" size="8192">
+				<rom name="ad&amp;d tower of mystery.d0" size="8192" crc="35f27a1e" sha1="2cfdee85347c1226c48d15cdfd6b8819136db130" offset="0x0000" />
+			</dataarea>
+			<dataarea name="F000" size="8192">
+				<rom name="ad&amp;d tower of mystery.f0" size="8192" crc="c60bb7f6" sha1="9f53d330453807c18dcb4c0ed37ad0e77251213a" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="advtron">
+		<description>Adventures of TRON (Unreleased)</description>
+		<year>1982</year>
+		<publisher>Mattel Electronics</publisher>
+		<part name="cart" interface="intv_cart">
+			<feature name="slot" value="intv_rom" />
+			<dataarea name="5000" size="16384">
+				<rom name="adventures of tron.50" size="16384" crc="5a144835" sha1="c2125776338cbce61aabce80fbdb911a9814e564" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1813,6 +1843,21 @@
 			<feature name="slot" value="intv_rom" />
 			<dataarea name="5000" size="0x2000">
 				<rom name="air strike.50" size="0x2000" crc="2c668249" sha1="45d4cc27ccb966b007c3c2d32766f568f613319f" offset="0x0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="allstar">
+		<description>All Star Major League Baseball (Prototype)</description>
+		<year>1983</year>
+		<publisher>Mattel Electronics</publisher>
+		<part name="cart" interface="intv_cart">
+			<feature name="slot" value="intv_rom" />
+			<dataarea name="5000" size="0x4000">
+				<rom name="all star major league baseball.50" size="0x4000" crc="4a7e080a" sha1="ee2edd084c371d39dfcd725ed4aa5679e0c34a27" offset="0x0000"/>
+			</dataarea>
+			<dataarea name="D000" size="0x2000">
+				<rom name="all star major league baseball.d0" size="0x2000" crc="31325854" sha1="fe7b5f3969e214ac23d20c5c137dc23f4515108d" offset="0x0000"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1919,6 +1964,24 @@
 		</part>
 	</software>
 
+	<software name="hvrfor3d">
+		<description>Hover Force 3D (Unreleased)</description>
+		<year>1984</year>
+		<publisher>Mattel Electronics</publisher>
+		<part name="cart" interface="intv_cart">
+			<feature name="slot" value="intv_rom" />
+			<dataarea name="5000" size="16384">
+				<rom name="hover force_3d.50" size="16384" crc="37772f79" sha1="fa8f02330397fc47665e727fb7f214b551130b29" offset="0x0000" />
+			</dataarea>
+			<dataarea name="9000" size="24576">
+				<rom name="hover force_3d.90" size="24576" crc="1cf011ef" sha1="5cfc7a9bb09937d499b3cdfd5e84a3e975f543a6" offset="0x0000" />
+			</dataarea>
+			<dataarea name="D000" size="8192">
+				<rom name="hover force_3d.d0" size="8192" crc="d6e96ddc" sha1="2833c891028772d2a3acf23dce67e3cd597d486f" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="hlights">
 		<description>Hypnotic Lights (Prototype)</description>
 		<year>1981</year>
@@ -1927,6 +1990,18 @@
 			<feature name="slot" value="intv_rom" />
 			<dataarea name="5000" size="0x2000">
 				<rom name="hypnotic lights.50" size="0x2000" crc="a3147630" sha1="7aa48d1249d52a51223e99a98799b01f46cfc3d9" offset="0x0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="illusion">
+		<description>Illusions (Unreleased)</description>
+		<year>1983</year>
+		<publisher>Mattel Electronics</publisher>
+		<part name="cart" interface="intv_cart">
+			<feature name="slot" value="intv_rom" />
+			<dataarea name="5000" size="16384">
+				<rom name="illusions.50" size="16384" crc="851f3ccb" sha1="fd7bb50812e207b03295ff2abf973b935a0d28de" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -2000,6 +2075,21 @@
 		</part>
 	</software>
 
+	<software name="mycastle" cloneof="thcastle">
+		<description>Mystic Castle (Prototype)</description>
+		<year>1982</year>
+		<publisher>Mattel Electronics</publisher>
+		<part name="cart" interface="intv_cart">
+			<feature name="slot" value="intv_rom" />
+			<dataarea name="5000" size="16384">
+				<rom name="mystic castle.50" size="16384" crc="7751256b" sha1="73f61c7dce233a605c8cecd49aec13b1d5985315" offset="0x0000" />
+			</dataarea>
+			<dataarea name="9000" size="16384">
+				<rom name="mystic castle.90" size="16384" crc="4acbeb19" sha1="65c2ec11e5d1a9d8d8f2e044428cbf5bf2022532" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="blowout">
 		<description>Party Line: Blow Out (Unreleased)</description>
 		<year>1983</year>
@@ -2011,6 +2101,21 @@
 			</dataarea>
 			<dataarea name="D000" size="0x2000">
 				<rom name="blowout.d0" size="0x2000" crc="f257a189" sha1="3bfc013252af2b05c35be21b01ebaeadd5ce4d0b" offset="0x0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="blowouta" cloneof="blowout">
+		<description>Party Line: Blow Out (Unreleased, Alt)</description>
+		<year>1983</year>
+		<publisher>Mattel Electronics</publisher>
+		<part name="cart" interface="intv_cart">
+			<feature name="slot" value="intv_rom" />
+			<dataarea name="5000" size="0x2000">
+				<rom name="blowouta.50" size="0x2000" crc="25b7aa92" sha1="a232a43407bfa5781b30c5afded8df4af75e1788" offset="0x0000"/>
+			</dataarea>
+			<dataarea name="D000" size="0x2000">
+				<rom name="blowouta.d0" size="0x2000" crc="b7e29589" sha1="4e1b1c2bf93952d52827b13752e61584a66672ea" offset="0x0000"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2027,6 +2132,18 @@
 		</part>
 	</software>
 
+	<software name="spacecad">
+		<description>Party Line: Space Cadet (Unreleased)</description>
+		<year>1983</year>
+		<publisher>Mattel Electronics</publisher>
+		<part name="cart" interface="intv_cart">
+			<feature name="slot" value="intv_rom" />
+			<dataarea name="5000" size="0x4000">
+				<rom name="space cadet.50" size="0x4000" crc="f8ef3e5a" sha1="f3cfbe285a12194ef2f6087fc70d0ed887c4ec91" offset="0x0000"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="rrubble">
 		<description>Robot Rubble (Prototype)</description>
 		<year>1983</year>
@@ -2039,14 +2156,44 @@
 		</part>
 	</software>
 
-	<software name="spacecad">
-		<description>Party Line: Space Cadet (Unreleased)</description>
+	<software name="rockybw">
+		<description>Rocky &amp; Bullwinckle (Unreleased)</description>
 		<year>1983</year>
 		<publisher>Mattel Electronics</publisher>
 		<part name="cart" interface="intv_cart">
 			<feature name="slot" value="intv_rom" />
-			<dataarea name="5000" size="0x4000">
-				<rom name="space cadet.50" size="0x4000" crc="f8ef3e5a" sha1="f3cfbe285a12194ef2f6087fc70d0ed887c4ec91" offset="0x0000"/>
+			<dataarea name="5000" size="16384">
+				<rom name="rockey &amp; bullwinckle.50" size="16384" crc="867f1941" sha1="86053c388dbee82216159fa7f4d95756ffd9d37d" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="scarfing">
+		<description>Scarfinger (Unfinished)</description>
+		<year>1982</year>
+		<publisher>Mattel Electronics</publisher>
+		<part name="cart" interface="intv_cart">
+			<feature name="slot" value="intv_rom" />
+			<dataarea name="5000" size="16384">
+				<rom name="scarfinger.50" size="16384" crc="a57862f7" sha1="a691ad56285526738760f18b8d86b07195039df0" offset="0x0000" />
+			</dataarea>
+			<dataarea name="9000" size="16384">
+				<rom name="scarfinger.90" size="16384" crc="d3d5e5af" sha1="3a4dddbcb04aeacea15a03267dc55d8a913434a6" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="soccer2" cloneof="worldcup">
+		<description>Soccer 2 (Prototype)</description>
+		<year>198?</year>
+		<publisher>Mattel Electronics</publisher>
+		<part name="cart" interface="intv_cart">
+			<feature name="slot" value="intv_rom" />
+			<dataarea name="5000" size="16384">
+				<rom name="soccer_2.50" size="16384" crc="4d4af24e" sha1="dd08e16ba509cd1761e1007f616267e5f96f9127" offset="0x0000" />
+			</dataarea>
+			<dataarea name="9000" size="16384">
+				<rom name="soccer_2.90" size="16384" crc="c6889d72" sha1="4507d0159b1fc2c18d44330eaa70d677629b5d82" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -2096,6 +2243,25 @@
 		</part>
 	</software>
 
+	<software name="yogi">
+		<description>Yogi's Frustration (Unreleased)</description>
+		<year>1983</year>
+		<publisher>Mattel Electronics</publisher>
+		<part name="cart" interface="intv_cart">
+			<feature name="slot" value="intv_rom" />
+			<dataarea name="5000" size="16384">
+				<rom name="yogi's frustration.50" size="16384" crc="7f4ba6ad" sha1="277a3ad0bdbad4fa8086655bb7508ff4bb0dde5c" offset="0x0000" />
+			</dataarea>
+			<dataarea name="D000" size="8192">
+				<rom name="yogi's frustration.d0" size="8192" crc="cf15e8c5" sha1="bbc103a8fc3d979a05dc42aa5b773355ab11df60" offset="0x0000" />
+			</dataarea>
+			<dataarea name="F000" size="8192">
+				<rom name="yogi's frustration.f0" size="8192" crc="2bc63759" sha1="463b7a8f2e139fcb8434c565b2b275b313a9d52e" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+
 	<software name="imitc">
 		<description>IMI Test Cartridge</description>
 		<year>1978</year>
@@ -2123,6 +2289,7 @@
 		</part>
 	</software>
 
+
 	<software name="4tris">
 		<description>4-Tris (Download Version)</description>
 		<year>2000</year>
@@ -2136,7 +2303,40 @@
 		</part>
 	</software>
 
-	<software name="minehntr">
+	<software name="dkongarc" supported="partial">
+		<description>Donkey Kong Arcade</description>
+		<year>200?</year>
+		<publisher>IntelligentVision</publisher>
+		<part name="cart" interface="intv_cart">
+			<feature name="slot" value="intv_rom" />
+			<dataarea name="5000" size="16384">
+				<rom name="dkinty.50" size="16384" crc="93a9826c" sha1="477ab844aaea8fd18fc8b8c846dbfb78280b924d" offset="0x0000" />
+			</dataarea>
+			<dataarea name="9000" size="16384">
+				<rom name="dkinty.90" size="16384" crc="a927412f" sha1="acb7359db142c1b77c3a17d1547ecc8a259d3f02" offset="0x0000" />
+			</dataarea>
+			<dataarea name="D000" size="8192">
+				<rom name="dkinty.d0" size="8192" crc="642d6557" sha1="5a2fa6bd9a6c173581da5d08699a44198da0231c" offset="0x0000" />
+			</dataarea>
+			<dataarea name="F000" size="8192">
+				<rom name="dkinty.f0" size="8192" crc="3e39ee68" sha1="c266e320a9b2266c7db44bc0965e2b68ffa18e27" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="istar">
+		<description>Istar</description>
+		<year>2010?</year>
+		<publisher>IntelligentVision</publisher>
+		<part name="cart" interface="intv_cart">
+			<feature name="slot" value="intv_rom" />
+			<dataarea name="5000" size="12288">
+				<rom name="istar.50" size="12288" crc="7899e5ba" sha1="997d1b679768296fc2db120a93cc1880318637cf" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="minehunt">
 		<description>Minehunter (Download Version)</description>
 		<year>2004</year>
 		<publisher>IntelligentVision</publisher>
@@ -2144,7 +2344,20 @@
 		<part name="cart" interface="intv_cart">
 			<feature name="slot" value="intv_rom" />
 			<dataarea name="5000" size="0x4000">
+			<!-- cutting this at 0x3e00 gives crc32 594c230e -->
 				<rom name="minehunter.50" size="0x4000" crc="a9f1d874" sha1="4bbac2b5264f4d357e7223b2373b078c622c08a9" offset="0x0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="minehunta" cloneof="minehunt">
+		<description>Minehunter (Download Version, Alt?)</description>
+		<year>2004</year>
+		<publisher>IntelligentVision</publisher>
+		<part name="cart" interface="intv_cart">
+			<feature name="slot" value="intv_rom" />
+			<dataarea name="5000" size="16384">
+				<rom name="minehunta.50" size="15872" crc="94096229" sha1="a351edd058431ed2aeccc0554041a17258c01c28" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -2168,6 +2381,49 @@
 		</part>
 	</software>
 
+	<software name="spina">
+		<description>ZZZZZ! Spina the Bee</description>
+		<year>200?</year>
+		<publisher>IntelligentVision</publisher>
+		<part name="cart" interface="intv_cart">
+			<feature name="slot" value="intv_rom" />
+			<dataarea name="5000" size="16384">
+				<rom name="zzzzz! spina the bee.50" size="16384" crc="01efa214" sha1="1a70d73512da0f78957bbd74b14077303e4fb905" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spacecnt">
+		<description>Space Cunt</description>
+		<year>200?</year>
+		<publisher>IntelligentVision</publisher>
+		<info name="usage" value="Uses Intellivoice"/>
+		<part name="cart" interface="intv_cart">
+			<feature name="slot" value="intv_rom" />
+			<dataarea name="5000" size="16384">
+				<rom name="space cunt.50" size="16384" crc="4542d593" sha1="c946b40ba51c48d8fedc4cdb40c27e3779e2b84b" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spatrol">
+		<description>Space Patrol Teaser Edition</description>
+		<year>2007?</year>
+		<publisher>IntelligentVision</publisher>
+		<part name="cart" interface="intv_cart">
+			<feature name="slot" value="intv_rom" />
+			<dataarea name="5000" size="16384">
+				<rom name="space patrol teaser edition.50" size="16384" crc="3c3d75bf" sha1="761e379d43ba1551198dab8199764356fc615b1b" offset="0x0000" />
+			</dataarea>
+			<dataarea name="D000" size="8192">
+				<rom name="space patrol teaser edition.d0" size="8192" crc="04101767" sha1="54f8dfe0d5413097c280f72b45f6684bc9e1a3d5" offset="0x0000" />
+			</dataarea>
+			<dataarea name="F000" size="8192">
+				<rom name="space patrol teaser edition.f0" size="8192" crc="a6950b88" sha1="27891c3026f0a1fb34a13438502960485d33b24f" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="stonix">
 		<description>Stonix (Download Version)</description>
 		<year>2005</year>
@@ -2186,4 +2442,69 @@
 			</dataarea>
 		</part>
 	</software>
+
+	<software name="suprchef">
+		<description>Super Chef BT</description>
+		<year>2013?</year>
+		<publisher>IntelligentVision</publisher>
+		<part name="cart" interface="intv_cart">
+			<feature name="slot" value="intv_rom" />
+			<dataarea name="5000" size="16384">
+				<rom name="burgrtm2.50" size="16384" crc="54848723" sha1="e791fe7ae0af267689fc831e60c407c02c5ee280" offset="0x0000" />
+			</dataarea>
+			<dataarea name="D000" size="24576">
+				<rom name="burgrtm2.d0" size="24576" crc="53feb216" sha1="d462c44ddbe91fdbfad8ef26658dc07cea4a6dbc" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="todd">
+		<description>Tag Along Todd (Unfinished)</description>
+		<year>200?</year>
+		<publisher>IntelligentVision</publisher>
+		<part name="cart" interface="intv_cart">
+			<feature name="slot" value="intv_rom" />
+			<dataarea name="5000" size="16384">
+				<rom name="tag-along-todd.50" size="10752" crc="1ecdd51b" sha1="9e1666a68d50bb4a1f618cc2f9bcd7dfbadc8188" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+
+
+<!-- TODO: Investigate these files -->
+
+	<software name="kingotmf" cloneof="kingotm" supported="no">
+		<description>King of the Mountain (Fixed?)</description>
+		<year>200?</year>
+		<publisher>IntelligentVision</publisher>
+		<part name="cart" interface="intv_cart">
+			<feature name="slot" value="intv_rom" />
+			<dataarea name="5000" size="16384">
+				<rom name="king of the mountain (alt).50" size="16384" crc="3634697b" sha1="c20c17bd68e92b7f81a522c4c1d0dd4ae8926bdd" offset="0x0000" />
+			</dataarea>
+			<dataarea name="D000" size="16896">
+				<rom name="king of the mountain (alt).d0" size="16896" crc="2c7f5de1" sha1="c86a04a969542a08b46ef50dd30c649ad6ef5b47" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="quest" supported="no">
+		<description>Quest</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="intv_cart">
+			<feature name="slot" value="intv_rom" />
+			<dataarea name="0000" size="16384">
+				<rom name="quest.00" size="16384" crc="540281d5" sha1="30a3c0d4cf1d939f8a1b4e6ff3fc18a2e13f3e7e" offset="0x0000" />
+			</dataarea>
+			<dataarea name="5000" size="16384">
+				<rom name="quest.50" size="16384" crc="6d5013df" sha1="c1535a9dd54d621ca3d44fd9ca1b5d5c745eb3ad" offset="0x0000" />
+			</dataarea>
+			<dataarea name="D000" size="16384">
+				<rom name="quest.d0" size="16384" crc="869ce44f" sha1="43196b47bde3fccf281c355f2966c71099a6a436" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
