@@ -83,6 +83,7 @@ void retro_set_environment(retro_environment_t cb)
    sprintf(option_saves,"%s_%s",core,"saves");
    sprintf(option_throttle,"%s_%s",core,"throttle");
    sprintf(option_nobuffer,"%s_%s",core,"nobuffer");
+
    static const struct retro_variable vars[] = {
     //some ifdefs are redundant but I wanted to have these options in a logical order
     //common for MAME/MESS/UME
