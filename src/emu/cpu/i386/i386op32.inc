@@ -2939,9 +2939,14 @@ void i386_device::i386_group0F00_32()          // Opcode 0x0f 00
 				memset(&seg, 0, sizeof(seg));
 				seg.selector = m_task.segment;
 				i386_load_protected_mode_segment(&seg,NULL);
+
+				UINT32 addr = ((seg.selector & 4) ? m_ldtr.base : m_gdtr.base) + (seg.selector & ~7) + 5;
+				i386_translate_address(TRANSLATE_READ, &addr, NULL);
+				m_program->write_byte(addr, (seg.flags & 0xff) | 2);
+
 				m_task.limit = seg.limit;
 				m_task.base = seg.base;
-				m_task.flags = seg.flags;
+				m_task.flags = seg.flags | 2;
 			}
 			else
 			{
