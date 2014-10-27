@@ -369,7 +369,7 @@ enum ioport_type
 		IPT_UI_LOAD_STATE,
 		IPT_UI_TAPE_START,
 		IPT_UI_TAPE_STOP,
-
+		IPT_UI_TOGGLE_AUTOFIRE,			// autofire toggle button
 		// additional OSD-specified UI port types (up to 16)
 		IPT_OSD_1,
 		IPT_OSD_2,
@@ -1033,6 +1033,8 @@ public:
 	bool analog_invert() const { return ((m_flags & ANALOG_FLAG_INVERT) != 0); }
 
 	UINT8 impulse() const { return m_impulse; }
+	int autofire() const { return m_autofire; }
+	int autopressed() const { return m_autopressed; }
 	const char *name() const;
 	const char *specific_name() const { return m_name; }
 	const input_seq &seq(input_seq_type seqtype = SEQ_TYPE_STANDARD) const;
@@ -1083,6 +1085,8 @@ public:
 	{
 		ioport_value    value;                  // for DIP switches
 		input_seq       seq[SEQ_TYPE_TOTAL];    // sequences of all types
+		int				autofire;				// autofire
+		int				autopressed;			// autofire
 		INT32           sensitivity;            // for analog controls
 		INT32           delta;                  // for analog controls
 		INT32           centerdelta;            // for analog controls
@@ -1124,6 +1128,8 @@ private:
 	// data relevant to analog control types
 	ioport_value                m_min;              // minimum value for absolute axes
 	ioport_value                m_max;              // maximum value for absolute axes
+	int							m_autofire;			// autofire
+	int							m_autopressed;		// autofire
 	INT32                       m_sensitivity;      // sensitivity (100=normal)
 	INT32                       m_delta;            // delta to apply each frame a digital inc/dec key is pressed
 	INT32                       m_centerdelta;      // delta to apply each frame no digital inputs are pressed
@@ -1837,5 +1843,7 @@ inline running_machine &ioport_field::machine() const { return m_port.machine();
 inline device_t &ioport_setting::device() const { return m_field.device(); }
 inline running_machine &ioport_setting::machine() const { return m_field.machine(); }
 
+extern int autofire_delay;
+extern int autofire_toggle;
 
 #endif  // __INPTPORT_H__ */

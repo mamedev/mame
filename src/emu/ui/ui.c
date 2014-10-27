@@ -1634,6 +1634,13 @@ UINT32 ui_manager::handler_ingame(running_machine &machine, render_container *co
 	if (ui_input_pressed(machine, IPT_UI_THROTTLE))
 		machine.video().toggle_throttle();
 
+	// toggle autofire
+	if (ui_input_pressed(machine, IPT_UI_TOGGLE_AUTOFIRE))
+	{
+		autofire_toggle ^= 1;
+		popmessage("Autofire %s", autofire_toggle ? "Disabled" : "Enabled");
+	}
+	
 	// check for fast forward
 	if (machine.ioport().type_pressed(IPT_UI_FAST_FORWARD))
 	{

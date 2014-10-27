@@ -302,4 +302,15 @@ public:
 private:
 };
 
+class ui_menu_autofire : public ui_menu {
+public:
+	ui_menu_autofire(running_machine &machine, render_container *container);
+	virtual ~ui_menu_autofire();
+	virtual void populate();
+	virtual void handle();
+
+private:
+	int refresh;
+};
+
 #endif  /* __UI_MISCMENU_H__ */
