@@ -850,7 +850,7 @@ MACHINE_START_MEMBER(mystwarr_state,mystwarr)
 	m_mw_irq_control = 0;
 
 	/* konamigx_mixer uses this, so better initialize it */
-	konamigx_wrport1_0 = 0;
+	m_gx_wrport1_0 = 0;
 
 	save_item(NAME(m_mw_irq_control));
 	save_item(NAME(m_sound_ctrl));

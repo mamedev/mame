@@ -2483,7 +2483,7 @@ void i386_device::i386_wait()              // Opcode 0x9B
 void i386_device::i386_lock()              // Opcode 0xf0
 {
 	// lock doesn't depend on iopl on 386
-	// TODO: lock causes UD on unlockable opcodes
+	m_lock = true;
 	CYCLES(CYCLES_LOCK);       // TODO: Determine correct cycle count
 	i386_decode_opcode();
 }

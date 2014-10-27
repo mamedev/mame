@@ -41,13 +41,11 @@ Has word-wide registers as follows:
 */
 
 // K055550/K053990 protection chips, perform simple memset() and other game logic operations
-static UINT16 prot_data[0x20];
-
 
 
 READ16_MEMBER(konamigx_state::K055550_word_r)
 {
-	return(prot_data[offset]);
+	return(m_prot_data[offset]);
 }
 
 WRITE16_MEMBER(konamigx_state::K055550_word_w)
@@ -56,7 +54,7 @@ WRITE16_MEMBER(konamigx_state::K055550_word_w)
 	int src, tgt, srcend, tgtend, skip, cx1, sx1, wx1, cy1, sy1, wy1, cz1, sz1, wz1, c2, s2, w2;
 	int dx, dy, angle;
 
-	COMBINE_DATA(prot_data+offset);
+	COMBINE_DATA(m_prot_data+offset);
 
 	if (offset == 0 && ACCESSING_BITS_8_15)
 	{
@@ -65,13 +63,13 @@ WRITE16_MEMBER(konamigx_state::K055550_word_w)
 		{
 			case 0x97: // memset() (Dadandarn at 0x639dc)
 			case 0x9f: // memset() (Violent Storm at 0x989c)
-				adr   = (prot_data[7] << 16) | prot_data[8];
-				bsize = (prot_data[10] << 16) | prot_data[11];
-				count = (prot_data[0] & 0xff) + 1;
+				adr   = (m_prot_data[7] << 16) | m_prot_data[8];
+				bsize = (m_prot_data[10] << 16) | m_prot_data[11];
+				count = (m_prot_data[0] & 0xff) + 1;
 
 				lim = adr+bsize*count;
 				for(i=adr; i<lim; i+=2)
-					space.write_word(i, prot_data[0x1a/2]);
+					space.write_word(i, m_prot_data[0x1a/2]);
 			break;
 
 			// WARNING: The following cases are speculation based with questionable accuracy!(AAT)
@@ -82,19 +80,19 @@ WRITE16_MEMBER(konamigx_state::K055550_word_w)
 				// gameplay. It refers to a 32x8-word list at 0x210e00 and seems to
 				// be tied with another 13x128-byte table at 0x205080.
 				// Both tables appear "check-only" and have little effect on gameplay.
-				count =(prot_data[0] & 0xff) + 1;          // unknown ( byte 0x00)
-				i     = prot_data[1];                      // unknown ( byte 0x1f)
-				adr   = prot_data[7]<<16 | prot_data[8];   // address (dword 0x210e00)
-				lim   = prot_data[9];                      // unknown ( word 0x0010)
-				src   = prot_data[10]<<16 | prot_data[11]; // unknown (dword zero)
-				tgt   = prot_data[12]<<16 | prot_data[13]; // unknown (dword zero)
+				count =(m_prot_data[0] & 0xff) + 1;          // unknown ( byte 0x00)
+				i     = m_prot_data[1];                      // unknown ( byte 0x1f)
+				adr   = m_prot_data[7]<<16 | m_prot_data[8];   // address (dword 0x210e00)
+				lim   = m_prot_data[9];                      // unknown ( word 0x0010)
+				src   = m_prot_data[10]<<16 | m_prot_data[11]; // unknown (dword zero)
+				tgt   = m_prot_data[12]<<16 | m_prot_data[13]; // unknown (dword zero)
 			break;
 
 			case 0xa0: // update collision detection table (Violent Storm at 0x018b42)
-				count = prot_data[0] & 0xff;             // number of objects - 1
-				skip  = prot_data[1]>>(8-1);             // words to skip in each entry to reach the "hit list"
-				adr   = prot_data[2]<<16 | prot_data[3]; // where the table is located
-				bsize = prot_data[5]<<16 | prot_data[6]; // object entry size in bytes
+				count = m_prot_data[0] & 0xff;             // number of objects - 1
+				skip  = m_prot_data[1]>>(8-1);             // words to skip in each entry to reach the "hit list"
+				adr   = m_prot_data[2]<<16 | m_prot_data[3]; // where the table is located
+				bsize = m_prot_data[5]<<16 | m_prot_data[6]; // object entry size in bytes
 
 				srcend = adr + bsize * count;
 				tgtend = srcend + bsize;
@@ -142,8 +140,8 @@ WRITE16_MEMBER(konamigx_state::K055550_word_w)
 			break;
 
 			case 0xc0: // calculate object "homes-in" vector (Violent Storm at 0x03da9e)
-				dx = (short)prot_data[0xc];
-				dy = (short)prot_data[0xd];
+				dx = (short)m_prot_data[0xc];
+				dy = (short)m_prot_data[0xd];
 
 				// it's not necessary to use lookup tables because Violent Storm
 				// only calls the service once per enemy per frame.
@@ -165,7 +163,7 @@ WRITE16_MEMBER(konamigx_state::K055550_word_w)
 				else
 					i = machine().rand() & 0xff; // vector direction indeterminate
 
-				prot_data[0x10] = i;
+				m_prot_data[0x10] = i;
 			break;
 
 			default:
@@ -183,27 +181,27 @@ WRITE16_MEMBER(konamigx_state::K053990_martchmp_word_w)
 	int mode, i, element_size = 1;
 	UINT16 mod_val, mod_data;
 
-	COMBINE_DATA(prot_data+offset);
+	COMBINE_DATA(m_prot_data+offset);
 
 	if (offset == 0x0c && ACCESSING_BITS_8_15)
 	{
-		mode  = (prot_data[0x0d]<<8 & 0xff00) | (prot_data[0x0f] & 0xff);
+		mode  = (m_prot_data[0x0d]<<8 & 0xff00) | (m_prot_data[0x0f] & 0xff);
 
 		switch (mode)
 		{
 			case 0xffff: // word copy
 				element_size = 2;
 			case 0xff00: // byte copy
-				src_addr  = prot_data[0x0];
-				src_addr |= prot_data[0x1]<<16 & 0xff0000;
-				dst_addr  = prot_data[0x2];
-				dst_addr |= prot_data[0x3]<<16 & 0xff0000;
-				src_count = prot_data[0x8]>>8;
-				//dst_count = prot_data[0x9]>>8;
-				src_skip  = prot_data[0xa] & 0xff;
-				dst_skip  = prot_data[0xb] & 0xff;
+				src_addr  = m_prot_data[0x0];
+				src_addr |= m_prot_data[0x1]<<16 & 0xff0000;
+				dst_addr  = m_prot_data[0x2];
+				dst_addr |= m_prot_data[0x3]<<16 & 0xff0000;
+				src_count = m_prot_data[0x8]>>8;
+				//dst_count = m_prot_data[0x9]>>8;
+				src_skip  = m_prot_data[0xa] & 0xff;
+				dst_skip  = m_prot_data[0xb] & 0xff;
 
-				if ((prot_data[0x8] & 0xff) == 2) src_count <<= 1;
+				if ((m_prot_data[0x8] & 0xff) == 2) src_count <<= 1;
 				src_skip += element_size;
 				dst_skip += element_size;
 
@@ -223,16 +221,16 @@ WRITE16_MEMBER(konamigx_state::K053990_martchmp_word_w)
 			break;
 
 			case 0x00ff: // sprite list modifier
-				src_addr  = prot_data[0x0];
-				src_addr |= prot_data[0x1]<<16 & 0xff0000;
-				src_skip  = prot_data[0x1]>>8;
-				dst_addr  = prot_data[0x2];
-				dst_addr |= prot_data[0x3]<<16 & 0xff0000;
-				dst_skip  = prot_data[0x3]>>8;
-				mod_addr  = prot_data[0x4];
-				mod_addr |= prot_data[0x5]<<16 & 0xff0000;
-				mod_skip  = prot_data[0x5]>>8;
-				mod_offs  = prot_data[0x8] & 0xff;
+				src_addr  = m_prot_data[0x0];
+				src_addr |= m_prot_data[0x1]<<16 & 0xff0000;
+				src_skip  = m_prot_data[0x1]>>8;
+				dst_addr  = m_prot_data[0x2];
+				dst_addr |= m_prot_data[0x3]<<16 & 0xff0000;
+				dst_skip  = m_prot_data[0x3]>>8;
+				mod_addr  = m_prot_data[0x4];
+				mod_addr |= m_prot_data[0x5]<<16 & 0xff0000;
+				mod_skip  = m_prot_data[0x5]>>8;
+				mod_offs  = m_prot_data[0x8] & 0xff;
 				mod_offs<<= 1;
 				mod_count = 0x100;
 

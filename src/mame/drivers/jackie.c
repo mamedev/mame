@@ -267,7 +267,7 @@ void jackie_state::machine_reset()
 void jackie_state::show_out()
 {
 #ifdef MAME_DEBUG
-//  popmessage("%02x %02x %02x", state->m_out[0], state->m_out[1], state->m_out[2]);
+//  popmessage("%02x %02x %02x", m_out[0], m_out[1], m_out[2]);
 	popmessage("520: %04x %04x %04x %04x %04x\n560: %04x %04x %04x %04x %04x\n5A0: %04x %04x %04x %04x %04x",
 		m_unk_reg[0][0],m_unk_reg[0][1],m_unk_reg[0][2],m_unk_reg[0][3],m_unk_reg[0][4],
 		m_unk_reg[1][0],m_unk_reg[1][1],m_unk_reg[1][2],m_unk_reg[1][3],m_unk_reg[1][4],

@@ -1,7 +1,5 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
-
-
 <softwarelist name="intvecs" description="Intellivision ECS cartridges">
 
 	<software name="jetsons">
@@ -147,6 +145,23 @@
 			</dataarea>
 			<dataarea name="F000" size="0x2000">
 				<rom name="number jumble.f0" size="0x2000" crc="c5dac500" sha1="ff4a42b95f99f02cabcf8018b55f4d113404833a" offset="0x0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+
+	<software name="flintkf">
+		<description>Flintstones Keyboard Fun (Unreleased)</description>
+		<year>200?</year>
+		<publisher>IntelligentVision</publisher>
+		<info name="usage" value="Requires ECS and Keyboard"/>
+		<part name="cart" interface="intv_cart">
+			<feature name="slot" value="intv_rom" />
+			<dataarea name="5000" size="16384">
+				<rom name="flintstones keyboard fun.50" size="16384" crc="87996f3a" sha1="ffc8986782a461e1c99de24f92578295216e7b5f" offset="0x0000" />
+			</dataarea>
+			<dataarea name="D000" size="8192">
+				<rom name="flintstones keyboard fun.d0" size="8192" crc="e813510b" sha1="fa6203172faf46d89fd3a9276f642cbaf6b6f2ab" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>

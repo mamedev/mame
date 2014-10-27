@@ -563,9 +563,9 @@ int a2_16sect_format::identify(io_generic *io, UINT32 form_factor)
 		UINT32 expected_size = 35 * 16 * 256;
 
 		// check standard size plus some oddball sizes in our softlist
-		if ((size = expected_size) || (size == 143403) || (size == 143363) || (size == 143358))
+		if ((size == expected_size) || (size == 143403) || (size == 143363) || (size == 143358))
 		{
-			return 1;
+			return 50;
 		}
 
 		return 0;
@@ -1513,3 +1513,114 @@ bool a2_rwts18_format::save(io_generic *io, floppy_image *image)
 }
 
 const floppy_format_type FLOPPY_RWTS18_FORMAT = &floppy_image_format_creator<a2_rwts18_format>;
+
+a2_edd_format::a2_edd_format() : floppy_image_format_t()
+{
+}
+
+const char *a2_edd_format::name() const
+{
+	return "a2_edd";
+}
+
+const char *a2_edd_format::description() const
+{
+	return "Apple II EDD Image";
+}
+
+const char *a2_edd_format::extensions() const
+{
+	return "edd";
+}
+
+bool a2_edd_format::supports_save() const
+{
+	return true;
+}
+
+int a2_edd_format::identify(io_generic *io, UINT32 form_factor)
+{
+	return io_generic_size(io) == 2244608 ? 50 : 0;
+}
+
+UINT8 a2_edd_format::pick(const UINT8 *data, int pos)
+{
+	return ((data[pos>>3] << 8) | data[(pos>>3)+1]) >> (8-(pos & 7));
+}
+
+bool a2_edd_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
+{
+	UINT8 img[2244608];
+	UINT8 nibble[16384], stream[16384];
+	int npos[16384];
+	io_generic_read(io, img, 0, 2244608);
+
+	for(int i=0; i<137; i++) {
+		const UINT8 *trk = img + 16384*i;
+		int pos = 0;
+		int wpos = 0;
+		while(pos < 16383*8) {
+			UINT8 acc = pick(trk, pos);
+			pos += 8;
+			while(!(acc & 0x80) && pos < 16384*8) {
+				acc <<= 1;
+				if(trk[pos >> 3] & (0x80 >> (pos & 7)))
+					acc |= 0x01;
+				pos++;
+			}
+			if(acc & 0x80) {
+				nibble[wpos] = acc;
+				npos[wpos] = pos;
+				wpos++;
+			}
+		}
+		int nm = 0, nmj = 0, nmk = 0;
+		for(int j=0; j<wpos-1; j++)
+			for(int k=j+6200; k<wpos && k<j+6400; k++) {
+				int m = 0;
+				for(int l=0; k+l<wpos && nibble[j+l] == nibble[k+l]; l++)
+					m++;
+				if(m > nm) {
+					nm = m;
+					nmj = j;
+					nmk = k;
+				}
+			}
+		int delta = nmk - nmj;
+		int spos = (wpos-delta)/2;
+		int zpos = npos[spos];
+		int epos = npos[spos+delta];
+		int len = epos-zpos;
+		int part1_size = zpos % len;
+		int part1_bsize = part1_size >> 3;
+		int part1_spos = epos-part1_size;
+		int part2_offset = zpos - part1_size;
+		int total_bsize = (len+7) >> 3;
+
+		for(int j=0; j<part1_bsize; j++)
+			stream[j] = pick(trk, part1_spos + 8*j);
+		stream[part1_bsize] =
+			(pick(trk, part1_spos + 8*part1_bsize) & (0xff00 >> (part1_size & 7))) |
+			(pick(trk, part2_offset + 8*part1_bsize) & (0x00ff >> (part1_size & 7)));
+		for(int j=part1_bsize+1; j<total_bsize; j++)
+			stream[j] = pick(trk, part2_offset + 8*j);
+
+		bool odd = false;
+		for(int j=0; j<len; j++)
+			if(stream[j>>3] & (0x80 >> (j & 7)))
+				odd = !odd;
+
+		int splice_byte = spos;
+		while(splice_byte < spos+delta && (npos[splice_byte+1] - npos[splice_byte] != 8 || npos[splice_byte+2] - npos[splice_byte+1] == 8 || npos[splice_byte+2] - npos[splice_byte+2] == 8))
+			splice_byte++;
+		int splice = (npos[splice_byte+2]-1) % len;
+		if(odd)
+			stream[splice >> 3] ^= 0x80 >> (splice & 7);
+
+		generate_track_from_bitstream(i >> 2, 0, stream, len, image, i & 3);
+		image->set_write_splice_position(i >> 2, 0, UINT32(U64(200000000)*splice/len), i & 3);
+	}
+	return true;
+}
+
+const floppy_format_type FLOPPY_EDD_FORMAT = &floppy_image_format_creator<a2_edd_format>;
