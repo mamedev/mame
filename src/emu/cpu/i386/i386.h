@@ -138,6 +138,7 @@ struct I386_CALL_GATE
 		UINT32 flags;
 		i386_op_func handler16;
 		i386_op_func handler32;
+		bool lockable;
 	};
 	static const X86_OPCODE s_x86_opcode_table[];
 
@@ -244,6 +245,8 @@ struct I386_CALL_GATE
 	i386_op_func m_opcode_table3f3_16[256];
 	i386_op_func m_opcode_table3f3_32[256];
 
+	bool m_lock_table[2][256];
+
 	UINT8 *m_cycle_table_pm;
 	UINT8 *m_cycle_table_rm;
 
@@ -256,6 +259,7 @@ struct I386_CALL_GATE
 	bool m_nmi_latched;
 	UINT32 m_smbase;
 	devcb_write_line m_smiact;
+	bool m_lock;
 
 	// bytes in current opcode, debug only
 	UINT8 m_opcode_bytes[16];

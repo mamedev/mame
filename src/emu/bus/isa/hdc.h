@@ -25,6 +25,7 @@ class isa8_hdc_device :
 public:
 		// construction/destruction
 		isa8_hdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+		isa8_hdc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 		// optional information overrides
 		virtual machine_config_constructor device_mconfig_additions() const;
@@ -89,6 +90,12 @@ protected:
 		void get_drive();
 		void get_chsn();
 		int test_ready();
+
+		enum {
+			STANDARD,
+			EC1841
+		};
+		int m_type;
 public:
 		void hdc_command();
 		void pc_hdc_data_w(int data);
@@ -101,7 +108,14 @@ public:
 };
 
 
+class isa8_hdc_ec1841_device : public isa8_hdc_device
+{
+public:
+	isa8_hdc_ec1841_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
 // device type definition
 extern const device_type ISA8_HDC;
+extern const device_type ISA8_HDC_EC1841;
 
 #endif  /* ISA_HDC_H */

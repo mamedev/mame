@@ -1,15 +1,1204 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
 <softwarelist name="pet_cass" description="Commodore PET cassettes">
 
-	<software name="lunarlnd">
-		<description>Lunar Lander</description>
-		<year>197?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+	<software name="acquire">
+		<description>Acquire</description>
+		<year>1982</year>
+		<publisher>Microcomputer Games</publisher>
 
+		<!-- pet2001n16 Side A: Acquire -->
+		<part name="cass" interface="cbm_cass">
+			<dataarea name="cass" size="24368704">
+				<rom name="acquire (1982)(avalon hill).wav" size="24368704" crc="65ceaa57" sha1="e8b1d072356526c31a509a267507e9aaa74f17fa" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="androm">
+		<description>Andromeda Conquest</description>
+		<year>1982</year>
+
+		<!-- pet2001n16 Side A: Andromeda -->
+		<publisher>Microcomputer Games</publisher>
+		<part name="cass" interface="cbm_cass">
+			<dataarea name="cass" size="22685838">
+				<rom name="andromeda conquest (1982)(avalon hill).wav" size="22685838" crc="8716b6d9" sha1="7d21e69fe5c1831b3f3244d1236b7e7ed57a2fb4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="b1bomb">
+		<description>B-1 Bomber Game</description>
+		<year>1982</year>
+
+		<!-- pet2001n16 Side A: B-1 Bomber -->
+		<publisher>Microcomputer Games</publisher>
+		<part name="cass" interface="cbm_cass">
+			<dataarea name="cass" size="15154010">
+				<rom name="b-1 nuclear bomber (1981)(avalon hill).wav" size="15154010" crc="69fcf587" sha1="de3cb18e63a45943e7357af16d4b3994c3dbae46" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bbstrat">
+		<description>Baseball Strategy</description>
+		<year>1982</year>
+
+		<!-- pet4032 Side A: Baseball Strateg -->
+		<publisher>Microcomputer Games</publisher>
+		<part name="cass" interface="cbm_cass">
+			<dataarea name="cass" size="30735222">
+				<rom name="baseball strategy (1982)(avalon hill).wav" size="30735222" crc="1d50607d" sha1="dcb6571346f8da9777d6a4654413303d6320f55e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bjack">
+		<!-- 321009 -->
+		<description>Blackjack</description>
+		<year>1978</year>
+
+		<!-- pet20018 Side A: Blackjack -->
+		<publisher>Commodore Business Machines, Inc.</publisher>
+		<part name="cass" interface="cbm_cass">
+			<dataarea name="cass" size="11284678">
+				<rom name="blackjack (1978)(commodore business machines).wav" size="11284678" crc="b65acc8b" sha1="a5a3261a04bde04309e539b72ddaadd462e21c70" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bomba">
+		<description>Arcade Pak #3 Bomber Attack</description>
+		<year>1982</year>
+
+		<!-- pet2001n Side A: Bomber Attack -->
+		<publisher>Avalon Hill</publisher>
+		<part name="cass" interface="cbm_cass">
+			<dataarea name="cass" size="10001002">
+				<rom name="Bomber Attack (1982)(avalon hill).wav" size="10001002" crc="4ff57e9c" sha1="b795a4d8c2f7891088ee6cf7147d785948d7b887" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bullb">
+		<description>Bulls and Bears</description>
+		<year>1978</year>
+
+		<!-- pet20018 Side A: Bulls and Bears -->
+		<publisher>Speakeasy Software</publisher>
+		<part name="cass" interface="cbm_cass">
+			<dataarea name="cass" size="10926558">
+				<rom name="bulls and bears (1978)(speakeasy software).wav" size="10926558" crc="8fbd037f" sha1="20527ee4b6528c0daf31994bfed028583faa049f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bjack1">
+		<description>Casino Blackjack 5.7</description>
+		<year>1979</year>
+
+		<!-- pet20018 Side A: Blackjack -->
+		<publisher>Speakeasy Software</publisher>
+		<part name="cass" interface="cbm_cass">
+			<dataarea name="cass" size="11929950">
+				<rom name="casino blackjack 5.7 (1979)(cms software systems).wav" size="11929950" crc="de4f4383" sha1="2ac7ee53dc74a4696bf9dd72103e4ef569d94ec4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="conflict">
+		<description>Conflict 2500</description>
+		<year>1981</year>
+
+		<!-- pet2001n16 Side A: Conflict 2500 -->
+		<publisher>Microcomputer Games</publisher>
+		<part name="cass" interface="cbm_cass">
+			<dataarea name="cass" size="23419766">
+				<rom name="conflict 2500 (1981)(avalon hill).wav" size="23419766" crc="872b73d6" sha1="c3941f3ce51bff8d0571ce2b43b7ccdd9a212733" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cur1">
+		<description>Cursor 1</description>
+		<year>1978</year>
+
+		<!-- pet20018 Side A: Cover, Brick, Wander, Shark, Plot, Typer -->
+		<publisher>The Code Works</publisher>
+		<part name="cass" interface="cbm_cass">
+			<dataarea name="cass" size="34540096">
+				<rom name="cursor 1 (1978)(code works).wav" size="34540096" crc="c2a429f0" sha1="f732bdd48c4a7764352355098d01de3e950c2d9c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cur2">
+		<description>Cursor 2</description>
+		<year>1978</year>
+
+		<!-- pet20018 Side A: Cover, Race, Zap, Est, Guess, Mad -->
+		<publisher>The Code Works</publisher>
+		<part name="cass" interface="cbm_cass">
+			<dataarea name="cass" size="38802738">
+				<rom name="cursor 2 (1978)(code works).wav" size="38802738" crc="9925f292" sha1="a0f553dc3e052fe3556183bfd82318b92dd72642" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cur3">
+		<description>Cursor 3</description>
+		<year>1978</year>
+
+		<!-- pet20018 Side A: Cover, Bar, Dots, Quix!, Flash, Cards -->
+		<publisher>The Code Works</publisher>
+		<part name="cass" interface="cbm_cass">
+			<dataarea name="cass" size="47849882">
+				<rom name="cursor 3 (1978)(code works).wav" size="47849882" crc="95283cb2" sha1="604f61d0f209aaef32e82bceaa67530511ef60c1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cur4">
+		<description>Cursor 4</description>
+		<year>1978</year>
+
+		<!-- pet20018 Side A: Cover!, Bop, Calc, Clock!, Inp, Ced -->
+		<publisher>The Code Works</publisher>
+		<part name="cass" interface="cbm_cass">
+			<dataarea name="cass" size="55455514">
+				<rom name="cursor 4 (1978)(code works).wav" size="55455514" crc="df747916" sha1="16640a5223a644dca3ef713cac6e70d1348cd6ef" offset="0" />
+			</dataarea>
+		</part>
+
+	</software>
+
+	<software name="cur5">
+		<description>Cursor 5</description>
+		<year>1978</year>
+
+		<!-- pet20018 Side A: Cover, Hanoi, Shoot, Bship, Face, Hman -->
+		<publisher>The Code Works</publisher>
+		<part name="cass" interface="cbm_cass">
+			<dataarea name="cass" size="46403528">
+				<rom name="cursor 5 (1978)(code works).wav" size="46403528" crc="c0c8f3ff" sha1="3f888f080e59853e5f89b0f3d565e125d1e5e852" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cur6">
+		<description>Cursor 6</description>
+		<year>1979</year>
+
+		<!-- pet2001n Side A: Cover, Box, Bjack, pet20018: Pack, List, Cedpr -->
+		<publisher>The Code Works</publisher>
+		<part name="cass" interface="cbm_cass">
+			<dataarea name="cass" size="46753010">
+				<rom name="cursor 6 (1979)(code works).wav" size="46753010" crc="2f6ef813" sha1="750cd291f2653c03b6e2fd707cc1ededf97d5477" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cur7">
+		<description>Cursor 7</description>
+		<year>1979</year>
+
+		<!-- pet2001n Side A: Cover, Pricer, Sound!, Mind, Fball, Paper -->
+		<publisher>The Code Works</publisher>
+		<part name="cass" interface="cbm_cass">
+			<dataarea name="cass" size="54620302">
+				<rom name="cursor 7 (1979)(code works).wav" size="54620302" crc="6f2bf0a4" sha1="44f13108e3945abbc432ed4cce166848661adf1d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cur8">
+		<description>Cursor 8</description>
+		<year>1979</year>
+
+		<!-- pet2001n Side A: Cover, Revers!, Dbook, Space!, Maze, Add, X -->
+		<publisher>The Code Works</publisher>
+		<part name="cass" interface="cbm_cass">
+			<dataarea name="cass" size="58017788">
+				<rom name="cursor 8 (1979)(code works).wav" size="58017788" crc="f6118fbf" sha1="e415cb0d26702836a44a798546960c21bcd96299" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cur9">
+		<description>Cursor 9</description>
+		<year>1979</year>
+
+		<!-- pet2001n16 Side A: pet2001n: Cover, Yahtzee, Slot!, Flip, Circle, pet2001n16: Gammon -->
+		<publisher>The Code Works</publisher>
+		<part name="cass" interface="cbm_cass">
+			<dataarea name="cass" size="69494314">
+				<rom name="cursor 9 (1979)(code works).wav" size="69494314" crc="8abf8e8c" sha1="98e0b0f9d16a055cb2d11f2aff84a6c1884f7acf" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cur10">
+		<description>Cursor 10</description>
+		<year>1979</year>
+
+		<!-- pet2001n Side A: Cover!, pet20018: Titrate, pet2001n: Finance, Course, pet20018: Asm, Reader -->
+		<publisher>The Code Works</publisher>
+		<part name="cass" interface="cbm_cass">
+			<dataarea name="cass" size="52635502">
+				<rom name="cursor 10 (1979)(code works).wav" size="52635502" crc="e64a1066" sha1="0559d40f259cf149f0bc88dfe19d64caeae7902b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cur11">
+		<description>Cursor 11</description>
+		<year>1979</year>
+
+		<!-- pet2001n Side A: Cover, Demon!, Hi calc, Wipeout, Peg, States -->
+		<publisher>The Code Works</publisher>
+		<part name="cass" interface="cbm_cass">
+			<dataarea name="cass" size="52073122">
+				<rom name="cursor 11 (1979)(code works).wav" size="52073122" crc="b4a6843a" sha1="1ef4ff08f02e140d5c74fed7fdcce4b332f933a4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cur12">
+		<description>Cursor 12</description>
+		<year>1979</year>
+
+		<!-- pet2001n Side A: Cover12, Canyon!, Gauss!, Pickup, Piegram, Flight! -->
+		<publisher>The Code Works</publisher>
+		<part name="cass" interface="cbm_cass">
+			<dataarea name="cass" size="60014980">
+				<rom name="cursor 12 (1979)(code works).wav" size="60014980" crc="6ceecff0" sha1="391e5c114dc60beec739908666e04b4f82000ce8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cur13">
+		<description>Cursor 13</description>
+		<year>1979</year>
+
+		<!-- pet2001n Side A: Cover13, Ratrun, Cars, Ferry!, Leap, Tcard -->
+		<publisher>The Code Works</publisher>
+		<part name="cass" interface="cbm_cass">
+			<dataarea name="cass" size="57500730">
+				<rom name="cursor 13 (1979)(code works).wav" size="57500730" crc="fd7dd623" sha1="779a6b763de8efd69942e5a89e220c4d670d63f0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cur14">
+		<description>Cursor 14</description>
+		<year>1979</year>
+
+		<!-- pet2001n Side A: Cover14, Match, Search, Bat!, Morse!, Cops, Coming -->
+		<publisher>The Code Works</publisher>
+		<part name="cass" interface="cbm_cass">
+			<dataarea name="cass" size="56915420">
+				<rom name="cursor 14 (1979)(code works).wav" size="56915420" crc="43442da6" sha1="e6b31659181da8bebe2b7e2d66b982030014192e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cur15">
+		<description>Cursor 15</description>
+		<year>1979</year>
+
+		<!-- pet2001n Side A: Cover15!, Dungeon, Fifteen, Gomoku, Everest, Hawaii! -->
+		<publisher>The Code Works</publisher>
+		<part name="cass" interface="cbm_cass">
+			<dataarea name="cass" size="54585328">
+				<rom name="cursor 15 (1979)(code works).wav" size="54585328" crc="3e176c08" sha1="9b133685dac34826b9505407aefa27c1affa3427" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cur16">
+		<description>Cursor 16</description>
+		<year>1980</year>
+
+		<!-- pet2001n Side A: Cover16, Nab!, Fire!, Aliens!, Bonzo!, Catch! -->
+		<publisher>The Code Works</publisher>
+		<part name="cass" interface="cbm_cass">
+			<dataarea name="cass" size="45885486">
+				<rom name="cursor 16 (1980)(code works).wav" size="45885486" crc="53903b5a" sha1="db92181ea1c4cf65b93bda621b2d7a7c32c3bc7e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cur17">
+		<description>Cursor 17</description>
+		<year>1980</year>
+
+		<!-- pet2001n Side A: Cover17, Police!, Spot, Ruler, Letter, Merge, Npack -->
+		<publisher>The Code Works</publisher>
+		<part name="cass" interface="cbm_cass">
+			<dataarea name="cass" size="54618936">
+				<rom name="cursor 17 (1980)(code works).wav" size="54618936" crc="c8492708" sha1="2638641d44437b595d17fc9ca8f91a1432b78164" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cur18">
+		<description>Cursor 18</description>
+		<year>1980</year>
+
+		<!-- pet2001n Side A: Cover18, Dromeda!, Joust, Weather, Hi-res, Sheep -->
+		<publisher>The Code Works</publisher>
+		<part name="cass" interface="cbm_cass">
+			<dataarea name="cass" size="56023512">
+				<rom name="cursor 18 (1980)(code works).wav" size="56023512" crc="399cee6b" sha1="3930f54ffc12e09dc3e651642ee8f0bac6d9dde8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cur19">
+		<description>Cursor 19</description>
+		<year>1980</year>
+
+		<!-- pet2001n Side A: Cover19, Frog!, Godzilla!, Miner!, Rail, Gbooka, Gbookb -->
+		<publisher>The Code Works</publisher>
+		<part name="cass" interface="cbm_cass">
+			<dataarea name="cass" size="66518600">
+				<rom name="cursor 19 (1980)(code works).wav" size="66518600" crc="9a1386b2" sha1="5c98728358ac6167f7e7e3c07b2362eedc1b0161" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cur20">
+		<description>Cursor 20</description>
+		<year>1980</year>
+
+		<!-- pet2001n Side A: Cover20, Music!, Bets, Checkers!, Curves, Equip -->
+		<publisher>The Code Works</publisher>
+		<part name="cass" interface="cbm_cass">
+			<dataarea name="cass" size="53527416">
+				<rom name="cursor 20 (1980)(code works).wav" size="53527416" crc="2401c9e9" sha1="c2be524ba8a66b4c0a7541a09f29a839acadac8f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cur21">
+		<description>Cursor 21</description>
+		<year>1980</year>
+
+		<!-- pet2001n Side A: Cover21, Capture!, Dance!, Boswain, Ouranos!, Drag -->
+		<publisher>The Code Works</publisher>
+		<part name="cass" interface="cbm_cass">
+			<dataarea name="cass" size="58273484">
+				<rom name="cursor 21 (1980)(code works).wav" size="58273484" crc="7d2f858a" sha1="49cab5acfc20c7d86d25aaf4c8790cc2b2ffd32c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cur22">
+		<description>Cursor 22</description>
+		<year>1980</year>
+
+		<!-- pet2001n Side A: Cover22, Kalah, Poker, Match, Thunt!, Compare -->
+		<publisher>The Code Works</publisher>
+		<part name="cass" interface="cbm_cass">
+			<dataarea name="cass" size="53405634">
+				<rom name="cursor 22 (1980)(code works).wav" size="53405634" crc="c6e434ad" sha1="dfb03ed9a3cc51a0e75b884519d26f15e4e0de4b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cur23">
+		<description>Cursor 23</description>
+		<year>1980</year>
+
+		<!-- pet2001n16 Side A: pet2001n: Cover23, Recipe, Ambush!, pet2001n16: Orrey, pet2001n: Enigma, Mwhiz! -->
+		<publisher>The Code Works</publisher>
+		<part name="cass" interface="cbm_cass">
+			<dataarea name="cass" size="52482130">
+				<rom name="cursor 23 (1980)(code works).wav" size="52482130" crc="aace87f0" sha1="e8f566cbfdb28b3fbd508f806a09b57081830a78" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cur24">
+		<description>Cursor 24</description>
+		<year>1981</year>
+
+		<!-- pet2001n Side A: Cover24, Defend!, G-word, Racer!, Printsit, Re-num -->
+		<publisher>The Code Works</publisher>
+		<part name="cass" interface="cbm_cass">
+			<dataarea name="cass" size="45591486">
+				<rom name="cursor 24 (1981)(code works).wav" size="45591486" crc="413fe583" sha1="7ac7333db71a6c6f363f26437961e50fb443dd12" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cur25">
+		<description>Cursor 25</description>
+		<year>1981</year>
+
+		<!-- pet2001n16 Side A: pet2001n: Cover25, Maxit, pet2001n16: Mail, pet2001n: Rescue!, pet2001n16: Repair, pet2001n: Xref -->
+		<publisher>The Code Works</publisher>
+		<part name="cass" interface="cbm_cass">
+			<dataarea name="cass" size="58594030">
+				<rom name="cursor 25 (1981)(code works).wav" size="58594030" crc="ff3aa594" sha1="db60a8b2c751aeeffe5fcd9c7fc2ac1965e4ccc2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cur26">
+		<description>Cursor 26</description>
+		<year>1981</year>
+
+		<!-- pet2001n16 Side A: pet2001n: Cover26, Lawn!, Tank!, Ram, Safe!, pet2001n16: Test -->
+		<publisher>The Code Works</publisher>
+		<part name="cass" interface="cbm_cass">
+			<dataarea name="cass" size="59355380">
+				<rom name="cursor 26 (1981)(code works).wav" size="59355380" crc="5dbb9096" sha1="4ad21ed698ff0162b12615276daf2ebca14d5c97" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cur27">
+		<description>Cursor 27</description>
+		<year>1981</year>
+
+		<!-- pet2001n Side A: Cover27!, Attack!, Emaze!, Duel!, Miser, Prochar -->
+		<publisher>The Code Works</publisher>
+		<part name="cass" interface="cbm_cass">
+			<dataarea name="cass" size="68273716">
+				<rom name="cursor 27 (1981)(code works).wav" size="68273716" crc="b87e72c4" sha1="3ca92d7de8cdb085759388cb7cb4a72b1d5438a9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cur28">
+		<description>Cursor 28</description>
+		<year>1981</year>
+
+		<!-- pet2001n Side A: Cover28!, Skeet!, Blasto!, Stop!, Voz, Flags -->
+		<publisher>The Code Works</publisher>
+		<part name="cass" interface="cbm_cass">
+			<dataarea name="cass" size="51620292">
+				<rom name="cursor 28 (1981)(code works).wav" size="51620292" crc="3cceca70" sha1="9430875aa6370e940c7b88351bccba7e27be5640" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cur29">
+		<description>Cursor 29</description>
+		<year>1982</year>
+
+		<!-- pet2001n16 Side A: pet2001n: Cover29, Pong!, Clone!, pet2001n16: Drone!, pet2001n: Contact, Krypto -->
+		<publisher>The Code Works</publisher>
+		<part name="cass" interface="cbm_cass">
+			<dataarea name="cass" size="72864822">
+				<rom name="cursor 29 (1982)(code works).wav" size="72864822" crc="16fa7e17" sha1="d1f88d1e696b7b1c6488104a70ef372969521de6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cur30">
+		<description>Cursor 30</description>
+		<year>1982</year>
+
+		<!-- pet2001n Side A: Cover30, Dive, Slide, Break, Rebound, Zip -->
+		<publisher>The Code Works</publisher>
+		<part name="cass" interface="cbm_cass">
+			<dataarea name="cass" size="44679544">
+				<rom name="cursor 30 (1982)(code works).wav" size="44679544" crc="bdb20dfb" sha1="12be82c0122f53718bfb2b634c85663c47a6a7e6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dpoker">
+		<!-- 321008 -->
+		<description>Draw Poker</description>
+		<year>1978</year>
+		<publisher>Commodore Business Machines, Inc.</publisher>
+
+		<!-- pet20018 -->
+		<part name="cass" interface="cbm_cass">
+			<dataarea name="cass" size="10220420">
+				<rom name="draw poker (1978)(commodore busines machines).wav" size="10220420" crc="82f7871d" sha1="973cdc5d8ede2dffa6fb25abfadf8b5daabe6949" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="eaadj1n">
+		<description>Adjectives 1</description>
+		<year>1980</year>
+
+		<!-- pet2001n Side A: Adjectives 1 -->
+		<publisher>Activity Records, Inc.</publisher>
+		<part name="cass" interface="cbm_cass">
+			<dataarea name="cass" size="11189514">
+				<rom name="adjectives 1 (1980)(activity records, inc.).wav" size="11189514" crc="5cd88b03" sha1="2976ab72d36a8654a33c1f8220d9c862ae4849f7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="eaadj2n">
+		<description>Adjectives 2</description>
+		<year>1980</year>
+
+		<!-- pet2001n Side A: Adjectives 2 -->
+		<publisher>Activity Records, Inc.</publisher>
+		<part name="cass" interface="cbm_cass">
+			<dataarea name="cass" size="11398034">
+				<rom name="adjectives 2 (1980)(activity records, inc.).wav" size="11398034" crc="beb939fa" sha1="3b3b7ef2118263a8bb7fa85bb0010ae2d1ed89d8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="eaadj3n">
+		<description>Adjectives 3</description>
+		<year>1980</year>
+
+		<!-- pet2001n Side A: Adjectives 3 -->
+		<publisher>Activity Records, Inc.</publisher>
+		<part name="cass" interface="cbm_cass">
+			<dataarea name="cass" size="10179592">
+				<rom name="adjectives 3 (1980)(activity records, inc.).wav" size="10179592" crc="7019b74f" sha1="36ed0aac8f1c8ae9de7fc01c29d73d841a398d80" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="eaadj4n">
+		<description>Adjectives 4</description>
+		<year>1980</year>
+
+		<!-- pet2001n Side A: Adjectives 4 -->
+		<publisher>Activity rRecords, Inc.</publisher>
+		<part name="cass" interface="cbm_cass">
+			<dataarea name="cass" size="11520634">
+				<rom name="adjectives 4 (1980)(activity records, inc.).wav" size="11520634" crc="5a564aa4" sha1="2d7dad3d450158331ecfdc7289e70b3f0cfd68a5" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="eaadv1n">
+		<description>Adverbs 1</description>
+		<year>1980</year>
+
+		<!-- pet2001n Side A: Adverbs 1 -->
+		<publisher>Activity Records, Inc.</publisher>
+		<part name="cass" interface="cbm_cass">
+			<dataarea name="cass" size="11171990">
+				<rom name="adverbs 1 (1980)(activity records, inc.).wav" size="11171990" crc="4a264aa0" sha1="021f1f264130a46509c46ae46cefafda819deeb7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="eaadv2n">
+		<description>Adverbs 2</description>
+		<year>1980</year>
+
+		<!-- pet2001n Side A: Adverbs 2 -->
+		<publisher>Activity Records, Inc.</publisher>
+		<part name="cass" interface="cbm_cass">
+			<dataarea name="cass" size="10775102">
+				<rom name="adverbs 2 (1980)(activity records, inc.).wav" size="10775102" crc="b52be4be" sha1="806da1c924aebf856a5d6236700d91b3b29a0b6f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="eaadv3n">
+		<description>Adverbs 3</description>
+		<year>1980</year>
+
+		<!-- pet2001n Side A: Adverbs 3 -->
+		<publisher>Activity Records, Inc.</publisher>
+		<part name="cass" interface="cbm_cass">
+			<dataarea name="cass" size="7315782">
+				<rom name="adverbs 3 (1980)(activity records, inc.).wav" size="7315782" crc="5e2de1e4" sha1="12608f5ead991e9eb46705ff14f6a5c974c0c504" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="eaadv4n">
+		<description>Adverbs 4</description>
+		<year>1980</year>
+
+		<!-- pet2001n Side A: Adverbs 4 -->
+		<publisher>Activity Records, Inc.</publisher>
+		<part name="cass" interface="cbm_cass">
+			<dataarea name="cass" size="8865608">
+				<rom name="adverbs 4 (1980)(activity records, inc.).wav" size="8865608" crc="ecfddb13" sha1="f79db1d8fa625252f6c7dea8ae4556e5ce722e33" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="eacon1n">
+		<description>Contractions 1</description>
+		<year>1980</year>
+
+		<!-- pet2001n Side A: Contractions 1 -->
+		<publisher>Activity Records, Inc.</publisher>
+		<part name="cass" interface="cbm_cass">
+			<dataarea name="cass" size="8741664">
+				<rom name="contractions 1 (1980)(activity records, inc.).wav" size="8741664" crc="b05cebce" sha1="c38311bf71973d7bbc89754d46feb48e738f0cb4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="eacon2n">
+		<description>Contractions 2</description>
+		<year>1980</year>
+
+		<!-- pet2001n Side A: Contractions 2 -->
+		<publisher>Activity Records, Inc.</publisher>
+		<part name="cass" interface="cbm_cass">
+			<dataarea name="cass" size="7618740">
+				<rom name="contractions 2 (1980)(activity records, inc.).wav" size="7618740" crc="10107694" sha1="fc27866f351a18f41e4c4528b53495a908694061" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="eacon3n">
+		<description>Contractions 3</description>
+		<year>1980</year>
+
+		<!-- pet2001n Side A: Contractions 3 -->
+		<publisher>Activity Records, Inc.</publisher>
+		<part name="cass" interface="cbm_cass">
+			<dataarea name="cass" size="8523464">
+				<rom name="contractions 3 (1980)(activity records, inc.).wav" size="8523464" crc="ab728b0b" sha1="f4e8e1c4745e40fe133e5c20104c929b4b693b56" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="eacon4n">
+		<description>Contractions 4</description>
+		<year>1980</year>
+
+		<!-- pet2001n Side A: Contractions 4 -->
+		<publisher>Activity Records, Inc.</publisher>
+		<part name="cass" interface="cbm_cass">
+			<dataarea name="cass" size="11211668">
+				<rom name="contractions 4 (1980)(activity records, inc.).wav" size="11211668" crc="707797e8" sha1="4b70d42f40037b707f5c56956cc5e2dd01b9b663" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="eaflasn">
+		<description>Flash Spelling</description>
+		<year>1980</year>
+
+		<!-- pet2001n Side A: Flash Spelling -->
+		<publisher>Activity Records, Inc.</publisher>
+		<part name="cass" interface="cbm_cass">
+			<dataarea name="cass" size="10924002">
+				<rom name="flash spelling (1980)(activity records, inc.).wav" size="10924002" crc="c848cf8d" sha1="274ed732a2878d61751558f601c1d47b6f62a027" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="eahom1n">
+		<description>Homonyms 1</description>
+		<year>1980</year>
+
+		<!-- pet2001n Side A: Homonyms 1 -->
+		<publisher>Activity Records, Inc.</publisher>
+		<part name="cass" interface="cbm_cass">
+			<dataarea name="cass" size="11327432">
+				<rom name="homonyms 1 (1980)(activity records, inc.).wav" size="11327432" crc="b7b4b906" sha1="b4e17fe21d43e4ad951bdfa93ea9963b714f4f40" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="eahom2n">
+		<description>Homonyms 2</description>
+		<year>1980</year>
+
+		<!-- pet2001n Side A: Homonyms 2 -->
+		<publisher>Activity Records, Inc.</publisher>
+		<part name="cass" interface="cbm_cass">
+			<dataarea name="cass" size="11861540">
+				<rom name="homonyms 2 (1980)(activity records, inc.).wav" size="11861540" crc="0975d654" sha1="eb16abd7711449966ad7517fd21afec0e629b7cd" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="eahom3n">
+		<description>Homonyms 3</description>
+		<year>1980</year>
+
+		<!-- pet2001n Side A: Homonyms 3 -->
+		<publisher>Activity Records, Inc.</publisher>
+		<part name="cass" interface="cbm_cass">
+			<dataarea name="cass" size="11615978">
+				<rom name="homonyms 3 (1980)(activity records, inc.).wav" size="11615978" crc="29ee6920" sha1="7f73f30e0403356a89a1febf8ff89deff7068fa6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="eahom4n">
+		<description>Homonyms 4</description>
+		<year>1980</year>
+
+		<!-- pet2001n Side A: Homonyms 4 -->
+		<publisher>Activity Records, Inc.</publisher>
+		<part name="cass" interface="cbm_cass">
+			<dataarea name="cass" size="11683890">
+				<rom name="homonyms 4 (1980)(activity records, inc.).wav" size="11683890" crc="37dc7bc2" sha1="4337c812232055e81488a8fc9a56db374fa12147" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="eanou1n">
+		<description>Nouns 1</description>
+		<year>1980</year>
+
+		<!-- pet2001n Side A: Nouns 1 -->
+		<publisher>Activity Records, Inc.</publisher>
+		<part name="cass" interface="cbm_cass">
+			<dataarea name="cass" size="9658096">
+				<rom name="nouns 1 (1980)(activity records, inc.).wav" size="9658096" crc="c1f58189" sha1="0d99300bdecbc7b3e0dc88dec92e0904d3730636" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="eanou2n">
+		<description>Nouns 2</description>
+		<year>1980</year>
+
+		<!-- pet2001n Side A: Nouns 2 -->
+		<publisher>Activity Records, Inc.</publisher>
+		<part name="cass" interface="cbm_cass">
+			<dataarea name="cass" size="8256024">
+				<rom name="nouns 2 (1980)(activity records, inc.).wav" size="8256024" crc="9fd2c09e" sha1="12dfd01ed34811d35bda22049814521b694bdd1e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="eanou3n">
+		<description>Nouns 3</description>
+		<year>1980</year>
+
+		<!-- pet2001n Side A: Nouns 3 -->
+		<publisher>Activity Records, Inc.</publisher>
+		<part name="cass" interface="cbm_cass">
+			<dataarea name="cass" size="10382360">
+				<rom name="nouns 3 (1980)(activity records, inc.).wav" size="10382360" crc="526391fd" sha1="7c9b6d8c8c07415e06d89188cf4abd06131f9c05" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="eanou4n">
+		<description>Nouns 4</description>
+		<year>1980</year>
+
+		<!-- pet2001n Side A: Nouns 4 -->
+		<publisher>Activity Records, Inc.</publisher>
+		<part name="cass" interface="cbm_cass">
+			<dataarea name="cass" size="10670724">
+				<rom name="nouns 4 (1980)(activity records, inc.).wav" size="10670724" crc="19f240f3" sha1="dfc672a27119b070440dacd9bdfe45fca36c49e6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="eapro1n">
+		<description>Pronouns 1</description>
+		<year>1980</year>
+
+		<!-- pet2001n Side A: Pronouns 1 -->
+		<publisher>Activity Records, Inc.</publisher>
+		<part name="cass" interface="cbm_cass">
+			<dataarea name="cass" size="8304786">
+				<rom name="pronouns 1 (1980)(activity records, inc.).wav" size="8304786" crc="f19b0449" sha1="df5877f923b89a65619692e3bbda60540eac225f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="eapro2n">
+		<description>Pronouns 2</description>
+		<year>1980</year>
+
+		<!-- pet2001n Side A: Pronouns 2 -->
+		<publisher>Activity Records, Inc.</publisher>
+		<part name="cass" interface="cbm_cass">
+			<dataarea name="cass" size="8766592">
+				<rom name="pronouns 2 (1980)(activity records, inc.).wav" size="8766592" crc="369ebd25" sha1="c21773b0807136aa48852b21f6395069a9daa38e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="eapro3n">
+		<description>Pronouns 3</description>
+		<year>1980</year>
+
+		<!-- pet2001n Side A: Pronouns 3 -->
+		<publisher>Activity Records, Inc.</publisher>
+		<part name="cass" interface="cbm_cass">
+			<dataarea name="cass" size="11746820">
+				<rom name="pronouns 3 (1980)(activity records, inc.).wav" size="11746820" crc="32331088" sha1="dd8b94cef82c34fab6802a4962c6089c13d2003f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="eapro4n">
+		<description>Pronouns 4</description>
+		<year>1980</year>
+
+		<!-- pet2001n Side A: Pronouns 4 -->
+		<publisher>Activity Records, Inc.</publisher>
+		<part name="cass" interface="cbm_cass">
+			<dataarea name="cass" size="11164358">
+				<rom name="pronouns 4 (1980)(activity records, inc.).wav" size="11164358" crc="3e59fc0a" sha1="9c7f23385261ebee93ea0cef13145683af0119eb" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="eascrln">
+		<description>Scrambled Letters</description>
+		<year>1980</year>
+
+		<!-- pet2001n Side A: Scrambled Letter -->
+		<publisher>Activity Records, Inc.</publisher>
+		<part name="cass" interface="cbm_cass">
+			<dataarea name="cass" size="10495222">
+				<rom name="scrambled letters (1980)(activity records, inc.).wav" size="10495222" crc="1d22b476" sha1="47b5c68929acc4542442a065a13d4de6bbfbd8dc" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="easyn1n">
+		<description>Synonyms 1</description>
+		<year>1980</year>
+
+		<!-- pet2001n Side A: Synonyms 1 -->
+		<publisher>Activity Records, Inc.</publisher>
+		<part name="cass" interface="cbm_cass">
+			<dataarea name="cass" size="10756002">
+				<rom name="synonyms 1 (1980)(activity records, inc.).wav" size="10756002" crc="84775373" sha1="7056dd8f4114b6da432ba60238e1c25577e03a56" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="easyn2n">
+		<description>Synonyms 2</description>
+		<year>1980</year>
+
+		<!-- pet2001n Side A: Synonyms 2 -->
+		<publisher>Activity Records, Inc.</publisher>
+		<part name="cass" interface="cbm_cass">
+			<dataarea name="cass" size="11090060">
+				<rom name="synonyms 2 (1980)(activity records, inc.).wav" size="11090060" crc="97b76ece" sha1="58b5180d0a4bc1ea7660f177b2ef474c83213f75" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="easyn3n">
+		<description>Synonyms 3</description>
+		<year>1980</year>
+
+		<!-- pet2001n Side A: Synonyms 3 -->
+		<publisher>Activity Records, Inc.</publisher>
+		<part name="cass" interface="cbm_cass">
+			<dataarea name="cass" size="11520754">
+				<rom name="synonyms 3 (1980)(activity records, inc.).wav" size="11520754" crc="b03171be" sha1="39dc6de8545160656b306d4b767140b055bbc426" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="easyn4n">
+		<description>Synonyms 4</description>
+		<year>1980</year>
+
+		<!-- pet2001n Side A: Synonyms 4 -->
+		<publisher>Activity Records, Inc.</publisher>
+		<part name="cass" interface="cbm_cass">
+			<dataarea name="cass" size="11056074">
+				<rom name="synonyms 4 (1980)(activity records, inc.).wav" size="11056074" crc="221953dc" sha1="0d9914a7f01ebbd5c3397f5dbc31b39daf3954c6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="eaver1n">
+		<description>Verbs 1</description>
+		<year>1980</year>
+
+		<!-- pet2001n Side A: Verbs 1 -->
+		<publisher>Activity Records, Inc.</publisher>
+		<part name="cass" interface="cbm_cass">
+			<dataarea name="cass" size="11064470">
+				<rom name="verbs 1 (1980)(activity records, inc.).wav" size="11064470" crc="e0374a46" sha1="605b1965f4e801942674ad9dc809e753157d0144" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="eaver2n">
+		<description>Verbs 2</description>
+		<year>1980</year>
+
+		<!-- pet2001n Side A: Verbs 2 -->
+		<publisher>Activity Records, Inc.</publisher>
+		<part name="cass" interface="cbm_cass">
+			<dataarea name="cass" size="11635338">
+				<rom name="verbs 2 (1980)(activity records, inc.).wav" size="11635338" crc="0935674a" sha1="ecab049a8f243d669f000e2782621fb6b98443e9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="eaver3n">
+		<description>Verbs 3</description>
+		<year>1980</year>
+
+		<!-- pet2001n Side A: Verbs 3 -->
+		<publisher>Activity Records, Inc.</publisher>
+		<part name="cass" interface="cbm_cass">
+			<dataarea name="cass" size="11407390">
+				<rom name="verbs 3 (1980)(activity records, inc.).wav" size="11407390" crc="0564d783" sha1="41e30fa7b480714f735fb6ad8933cd4a187d227a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="eaver4n">
+		<description>Verbs 4</description>
+		<year>1980</year>
+
+		<!-- pet2001n Side A: Verbs 4 -->
+		<publisher>Activity Records, Inc.</publisher>
+		<part name="cass" interface="cbm_cass">
+			<dataarea name="cass" size="12043578">
+				<rom name="verbs 4 (1980)(activity records, inc.).wav" size="12043578" crc="84f2e68f" sha1="ba1a92a613cbaf1db870ee864d097c90c7842fc7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="galaxy">
+		<description>GALAXY!</description>
+		<year>1982</year>
+
+		<!-- pet2001n16 Side A: Galaxy! -->
+		<publisher>Microcomputer Games</publisher>
+		<part name="cass" interface="cbm_cass">
+			<dataarea name="cass" size="21505180">
+				<rom name="galaxy! (1982)(avalon hill).wav" size="21505180" crc="d9475975" sha1="56532c57ebf8935212c410eebc7d9192c3c6578c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+
+	<software name="galxyg">
+		<!-- 321006 -->
+		<description>Galaxy Games</description>
+		<year>1978</year>
+
+		<!-- pet20018 Side A: Galaxy Games -->
+		<publisher>Commodore Business Machines, Inc.</publisher>
+		<part name="cass" interface="cbm_cass">
+			<dataarea name="cass" size="10910060">
+				<rom name="galaxy games (1978)(commodore business machines).wav" size="10910060" crc="42d61509" sha1="50111ae9ff9384c07f4abce2bb9630409673c96b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gunsfd">
+		<description>The Guns of Fort Defiance</description>
+		<year>1981</year>
+
+		<!-- pet2001n16 Side A: Guns of Fort D -->
+		<publisher>Commodore Business Machines, Inc.</publisher>
+		<part name="cass" interface="cbm_cass">
+			<dataarea name="cass" size="23077818">
+				<rom name="guns of fort defiance (1981)(avalon hill).wav" size="23077818" crc="cfd4e5fc" sha1="7a63c28e46ebd6893d7ea02aef0b9665b6e9dc8f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mchess2">
+		<description>Microchess 2.0</description>
+		<year>1978</year>
+
+		<!-- pet2001n Side A: Microchess 2.0 -->
+		<publisher>Micro-ware</publisher>
+		<part name="cass" interface="cbm_cass">
+			<dataarea name="cass" size="12645082">
+				<rom name="microchess 2.0 (1978)(micro-ware).wav" size="12645082" crc="8b93c40b" sha1="9863092ba8e435749d98ad69e395c577dfc3cadf" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="midway">
+		<description>Midway Campaign</description>
+		<year>1980</year>
+		<publisher>Microcomputer Games</publisher>
+
+		<!-- pet2001n16 Side A: Midway -->
+		<part name="cass" interface="cbm_cass">
+			<dataarea name="cass" size="23443232">
+				<rom name="midway campaign (1980)(avalon hill).wav" size="23443232" crc="7aa50725" sha1="420fadf2b52613860e5496284e97da229d67447e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nacr">
+		<description>North Atlantic Convoy Raider</description>
+		<year>1980</year>
+
+		<!-- pet2001n16 Side A: North Atlant.c.r -->
+		<publisher>Microcomputer Games</publisher>
+		<part name="cass" interface="cbm_cass">
+			<dataarea name="cass" size="12074650">
+				<rom name="north atlantic convoy raider (1980)(avalon hill).wav" size="12074650" crc="fe5dc36a" sha1="8fb15474102d5cc3ce133f3688adb8ffa15704a7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="oserev">
+		<!-- 321001 -->
+		<description>Osero / Reverse</description>
+		<year>1978</year>
+		<publisher>Commodore Business Machines, Inc.</publisher>
+
+		<!-- pet20018 Side A: Osero  -->
 		<part name="cass1" interface="cbm_cass">
-			<dataarea name="cass" size="342602">
-				<rom name="lunar-lander.tap" size="342602" crc="b4a77f48" sha1="28e2d8d4adce42968173996fac92365dcfc67b07" offset="0" />
+			<dataarea name="cass" size="9777552">
+				<rom name="osero (1978)(commodore business machines).wav" size="9777552" crc="f52d600f" sha1="57b0e42a4eb3dd7587f5a248bb549be752109f24" offset="0" />
+			</dataarea>
+		</part>
+
+		<!-- pet20018 Side B: Reverse -->
+		<part name="cass2" interface="cbm_cass">
+			<dataarea name="cass" size="5270380">
+				<rom name="reverse (1978)(commodore business machines).wav" size="5270380" crc="890a53ec" sha1="a2280df2113b2aa250850eadb9247ca1a0d06079" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="checkers">
+		<description>PET Checkers</description>
+		<year>1980</year>
+
+		<!-- pet20018 Side A: Checkers -->
+		<publisher>CMS Software Systems</publisher>
+		<part name="cass" interface="cbm_cass">
+			<dataarea name="cass" size="10467148">
+				<rom name="pet checkers (1980)(cms software systems).wav" size="10467148" crc="e3529a46" sha1="3fa8de3a8374e14f0d2b3bd97ff2d8393b3797f0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="planet">
+		<description>The Planet Miners</description>
+		<year>1979</year>
+
+		<!-- pet2001n16 Side A: Planet Miners -->
+		<publisher>Microcomputer Games</publisher>
+		<part name="cass" interface="cbm_cass">
+			<dataarea name="cass" size="22746580">
+				<rom name="planet miners (1979)(avalon hill).wav" size="22746580" crc="0f09b3ac" sha1="6914d25f928fa3f6a1f185744ada904eadea06ac" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="santap">
+		<description>Santa Paravia and Fiumaccio</description>
+		<year>1978</year>
+
+		<!-- pet2001n16 Side A: Santa Paravia -->
+		<publisher>Folklife Terminal Club</publisher>
+		<part name="cass" interface="cbm_cass">
+			<dataarea name="cass" size="22263674">
+				<rom name="santa paravia and fiumaccio (1978)(folklife terminal club).wav" size="22263674" crc="4081b629" sha1="a46eac2ef42904d2b9778c697b36e23dbdcecf31" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spacef">
+		<!-- 321010 -->
+		<description>Space Fight</description>
+		<year>1978</year>
+		<publisher>Commodore Business Machines, Inc.</publisher>
+
+		<!-- pet20018 Side A: Space Fight -->
+		<part name="cass" interface="cbm_cass">
+			<dataarea name="cass" size="6234532">
+				<rom name="space fight (1978)(commodore business machines).wav" size="6234532" crc="38618c0a" sha1="f100e751f41899ed6e157ed7a0d1d7d569676c7f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tankt">
+		<description>Tanktics</description>
+		<year>1981</year>
+
+		<!-- pet2001n16 Side A: Tanktics -->
+		<publisher>Microcomputer Games</publisher>
+		<part name="cass" interface="cbm_cass">
+			<dataarea name="cass" size="22165844">
+				<rom name="tanktics (1981)(avalon hill).wav" size="22165844" crc="3a332c04" sha1="95bb207109f08e2cf95e12aa50b9d5840fc54656" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="targoff">
+		<!-- 321002 -->
+		<description>Target Pong/Off-The-Wall</description>
+		<year>1978</year>
+		<publisher>Commodore Business Machines, Inc.</publisher>
+
+		<!-- pet20018 Side A: Target Pong -->
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="6928406">
+				<rom name="target pong (1978)(commodore business machines).wav" size="6928406" crc="a9b1fc5b" sha1="449149f0e5312b66b7296535e5b4840b0fd28556" offset="0" />
+			</dataarea>
+		</part>
+
+		<!-- pet20018 Side B: Off-The-Wall -->
+		<part name="cass2" interface="cbm_cass">
+			<dataarea name="cass" size="7515688">
+				<rom name="off-the-wall (1978)(commodore business machines).wav" size="7515688" crc="afd30b2d" sha1="cc0c4c10fc6ad1dda4012740a20406693c1aa271" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="telng">
+		<description>Telengard</description>
+		<year>1982</year>
+
+		<!-- pet2001n32 Side A: Telengard -->
+		<publisher>Microcomputer Games</publisher>
+		<part name="cass" interface="cbm_cass">
+			<dataarea name="cass" size="49824646">
+				<rom name="telengard (1982)(avalon hill).wav" size="49824646" crc="b6a459cb" sha1="1db22543cab974b7efa36134ee608d31511e06a1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="apshai">
+		<description>Temple of Apshai</description>
+		<year>1979</year>
+		<publisher>Automated Simulations</publisher>
+
+		<!-- pet2001n32 Side A: Apshai, level 1.seq, level 2.seq, level 3.seq, level 4.seq -->
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="76924190">
+				<rom name="temple of apshai (1979)(automated simulations).wav" size="76924190" crc="faecb03c" sha1="be38fb082fa74c33f280bda401b215001670d54f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ttgames">
+		<!-- 321004 -->
+		<description>A Treasure Trove of Games</description>
+		<year>1978</year>
+		<publisher>Commodore Business Machines, Inc.</publisher>
+
+		<!-- pet20018 Side A: Lunar Lander, Rotate -->
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="14443032">
+				<rom name="lunar lander, rotate (1978)(commodore business machines).wav" size="14443032" crc="9ec18354" sha1="5099624623d83a38bc211be86213d493e672291d" offset="0" />
+			</dataarea>
+		</part>
+
+		<!-- pet20018 Side B: Wumpus, Tic Tac Toe -->
+		<part name="cass2" interface="cbm_cass">
+			<dataarea name="cass" size="16588594">
+				<rom name="wumpus, tic-tac-toe (1978)(commodore business machines).wav" size="16588594" crc="5345b9be" sha1="2c9ec6f68468b608f68926285f4367b6677e76e0" offset="0" />
 			</dataarea>
 		</part>
 	</software>
