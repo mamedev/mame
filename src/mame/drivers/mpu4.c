@@ -2501,9 +2501,9 @@ GAME(199?, m4wildtm ,0          ,mod4oki    ,mpu4               , mpu4_state,m4a
 
 GAME(199?, m4frtgm  ,0          ,mod4oki    ,mpu4               , mpu4_state,m4altreels         ,ROT0,   "Barcrest","Fruit Game (Barcrest) (MPU4)",GAME_FLAGS ) // SAMPLE EEPROM ALARM (and has a weird sample rom..)
 GAME(199?, m4reeltm ,0          ,mod4oki    ,mpu4               , mpu4_state,m4altreels         ,ROT0,   "Barcrest","Reel Timer (Barcrest) (MPU4) (DWT)",GAME_FLAGS ) // SAMPLE EEPROM ALARM
-GAME(199?, m4fortcb     ,0                  ,mod4oki    ,mpu4               , mpu4_state,m4altreels         ,ROT0,   "Barcrest","Fortune Club (Barcrest) (MPU4) (set 1)",GAME_FLAGS ) // INVALID ALARM
-GAME(199?, m4fortcba    ,m4fortcb           ,mod4oki    ,mpu4               , mpu4_state,m4altreels         ,ROT0,   "Barcrest","Fortune Club (Barcrest) (MPU4) (set 2)",GAME_FLAGS ) // INVALID ALARM
-GAME(199?, m4fortcbb    ,m4fortcb           ,mod4oki    ,mpu4               , mpu4_state,m4altreels         ,ROT0,   "Barcrest","Fortune Club (Barcrest) (MPU4) (set 3)",GAME_FLAGS ) // INVALID ALARM
+GAME(199?, m4fortcb ,0          ,mod4oki    ,mpu4               , mpu4_state,m4altreels         ,ROT0,   "Barcrest","Fortune Club (Barcrest) (MPU4) (set 1)",GAME_FLAGS ) // INVALID ALARM
+GAME(199?, m4fortcba,m4fortcb   ,mod4oki    ,mpu4               , mpu4_state,m4altreels         ,ROT0,   "Barcrest","Fortune Club (Barcrest) (MPU4) (set 2)",GAME_FLAGS ) // INVALID ALARM
+GAME(199?, m4fortcbb,m4fortcb   ,mod4oki    ,mpu4               , mpu4_state,m4altreels         ,ROT0,   "Barcrest","Fortune Club (Barcrest) (MPU4) (set 3)",GAME_FLAGS ) // INVALID ALARM
 
 
 
