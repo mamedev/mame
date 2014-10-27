@@ -63,9 +63,9 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_hle(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER( scanline_callback );
 	DECLARE_WRITE16_MEMBER( kbd_put );
+	DECLARE_PALETTE_INIT( ie15 );
 
 	DECLARE_WRITE_LINE_MEMBER( serial_rx_callback );
 	virtual void rcv_complete();
@@ -387,12 +387,12 @@ WRITE8_MEMBER( ie15_state::flag_w ) {
 	}
 }
 
-static ADDRESS_MAP_START(ie15_mem, AS_PROGRAM, 8, ie15_state)
+static ADDRESS_MAP_START( ie15_mem, AS_PROGRAM, 8, ie15_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x0000, 0x0fff ) AM_ROM
+	AM_RANGE(0x0000, 0x0fff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(ie15_io, AS_IO, 8, ie15_state)
+static ADDRESS_MAP_START( ie15_io, AS_IO, 8, ie15_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(000, 000) AM_READ(mem_r) AM_WRITE(mem_w)   // 00h W: memory request, R: memory data [6.1.2.2]
 	AM_RANGE(001, 001) AM_READ(serial_rx_ready_r) AM_WRITENOP   // 01h W: memory latch [6.1.2.2]
@@ -568,9 +568,9 @@ TIMER_DEVICE_CALLBACK_MEMBER(ie15_state::scanline_callback)
 	if (y >= IE15_DISP_VERT) return;
 
 	if (!m_video.enable || (y < IE15_STATUSLINE && m_video.line25)) {
-		copybitmap( m_tmpbmp, m_offbmp, 0, 0, 0, y, m_tmpclip );
+		copybitmap(m_tmpbmp, m_offbmp, 0, 0, 0, y, m_tmpclip);
 	} else {
-		draw_scanline( &m_tmpbmp.pix16(y), m_video.ptr2, y%11 );
+		draw_scanline(&m_tmpbmp.pix16(y), m_video.ptr2, y%11);
 	}
 }
 
@@ -600,9 +600,15 @@ static GFXDECODE_START( ie15 )
 	GFXDECODE_ENTRY("chargen", 0x0000, ie15_charlayout, 0, 1)
 GFXDECODE_END
 
+PALETTE_INIT_MEMBER( ie15_state, ie15 )
+{
+	palette.set_pen_color(0, rgb_t::black); // black
+	palette.set_pen_color(1, 0x00, 0xc0, 0x00); // green
+}
+
 static MACHINE_CONFIG_START( ie15, ie15_state )
 	/* Basic machine hardware */
-	MCFG_CPU_ADD("maincpu", IE15, XTAL_30_8MHz / 10)
+	MCFG_CPU_ADD("maincpu", IE15, XTAL_30_8MHz/10)
 	MCFG_CPU_PROGRAM_MAP(ie15_mem)
 	MCFG_CPU_IO_MAP(ie15_io)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("scantimer", ie15_state, scanline_callback, attotime::from_hz(50*28*11))
@@ -611,47 +617,46 @@ static MACHINE_CONFIG_START( ie15, ie15_state )
 	/* Video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_UPDATE_DRIVER(ie15_state, screen_update)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_30_8MHz/2,IE15_TOTAL_HORZ,IE15_HORZ_START,
-		IE15_HORZ_START+IE15_DISP_HORZ,IE15_TOTAL_VERT,IE15_VERT_START,
+	MCFG_SCREEN_RAW_PARAMS(XTAL_30_8MHz/2, IE15_TOTAL_HORZ, IE15_HORZ_START,
+		IE15_HORZ_START+IE15_DISP_HORZ, IE15_TOTAL_VERT, IE15_VERT_START,
 		IE15_VERT_START+IE15_DISP_VERT);
+
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ie15)
 	MCFG_PALETTE_ADD_MONOCHROME_GREEN("palette")
 
-	MCFG_DEFAULT_LAYOUT( layout_ie15 )
+	MCFG_DEFAULT_LAYOUT(layout_ie15)
 
 	/* Devices */
 	MCFG_DEVICE_ADD("keyboard", IE15_KEYBOARD, 0)
 	MCFG_IE15_KEYBOARD_CB(WRITE16(ie15_state, kbd_put))
 
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, NULL)
+	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "null_modem")
 	MCFG_RS232_RXD_HANDLER(WRITELINE(ie15_state, serial_rx_callback))
-	MCFG_DEVICE_MODIFY("rs232")
-	MCFG_SLOT_DEFAULT_OPTION("null_modem")
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("beeper", BEEP, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.15)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 MACHINE_CONFIG_END
 
 
 /* ROM definition */
 ROM_START( ie15 )
-	ROM_REGION( 0x1000, "maincpu", ROMREGION_ERASE00 )
+	ROM_REGION(0x1000, "maincpu", ROMREGION_ERASE00)
 	ROM_DEFAULT_BIOS("5chip")
 	ROM_SYSTEM_BIOS(0, "5chip", "5-chip firmware (newer)")
-	ROMX_LOAD( "dump1.bin", 0x0000, 0x1000, CRC(14b82284) SHA1(5ac4159fbb1c3b81445605e26cd97a713ae12b5f),ROM_BIOS(1) )
+	ROMX_LOAD("dump1.bin", 0x0000, 0x1000, CRC(14b82284) SHA1(5ac4159fbb1c3b81445605e26cd97a713ae12b5f), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS(1, "6chip", "6-chip firmware (older)")
-	ROMX_LOAD( "dump5.bin", 0x0000, 0x1000, CRC(01f2e065) SHA1(2b72dc0594e38a528400cd25aed0c47e0c432895),ROM_BIOS(2) )
+	ROMX_LOAD("dump5.bin", 0x0000, 0x1000, CRC(01f2e065) SHA1(2b72dc0594e38a528400cd25aed0c47e0c432895), ROM_BIOS(2))
 
-	ROM_REGION( 0x1000, "video", ROMREGION_ERASE00 )
+	ROM_REGION(0x1000, "video", ROMREGION_ERASE00)
 
-	ROM_REGION( 0x0800, "chargen", ROMREGION_ERASE00 )
-	ROM_LOAD( "chargen-15ie.bin", 0x0000, 0x0800, CRC(ed16bf6b) SHA1(6af9fb75f5375943d5c0ce9ed408e0fb4621b17e) )
+	ROM_REGION(0x0800, "chargen", ROMREGION_ERASE00)
+	ROM_LOAD("chargen-15ie.bin", 0x0000, 0x0800, CRC(ed16bf6b) SHA1(6af9fb75f5375943d5c0ce9ed408e0fb4621b17e))
 ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME      PARENT  COMPAT   MACHINE    INPUT                       INIT   COMPANY     FULLNAME       FLAGS */
+/*    YEAR  NAME      PARENT  COMPAT   MACHINE    INPUT    INIT                      COMPANY     FULLNAME       FLAGS */
 COMP( 1980, ie15,     0,      0,       ie15,      ie15,    driver_device,     0,     "USSR",     "15IE-00-013", 0)
