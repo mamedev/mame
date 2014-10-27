@@ -687,6 +687,7 @@ void i386_device::i386_trap(int irq, int irq_gate, int trap_level)
 	UINT16 segment;
 	int entry = irq * (PROTECTED_MODE ? 8 : 4);
 	int SetRPL = 0;
+	m_lock = false;
 
 	if( !(PROTECTED_MODE) )
 	{
@@ -2811,7 +2812,7 @@ void i386_device::build_cycle_table()
 void i386_device::report_invalid_opcode()
 {
 #ifndef DEBUG_MISSING_OPCODE
-	logerror("i386: Invalid opcode %02X at %08X\n", m_opcode, m_pc - 1);
+	logerror("i386: Invalid opcode %02X at %08X %s\n", m_opcode, m_pc - 1, m_lock ? "with lock" : "");
 #else
 	logerror("i386: Invalid opcode");
 	for (int a = 0; a < m_opcode_bytes_length; a++)
@@ -2845,6 +2846,10 @@ void i386_device::report_invalid_modrm(const char* opcode, UINT8 modrm)
 void i386_device::i386_decode_opcode()
 {
 	m_opcode = FETCH();
+
+	if(m_lock && !m_lock_table[0][m_opcode])
+		return i386_invalid();
+
 	if( m_operand_size )
 		(this->*m_opcode_table1_32[m_opcode])();
 	else
@@ -2855,6 +2860,10 @@ void i386_device::i386_decode_opcode()
 void i386_device::i386_decode_two_byte()
 {
 	m_opcode = FETCH();
+
+	if(m_lock && !m_lock_table[1][m_opcode])
+		return i386_invalid();
+
 	if( m_operand_size )
 		(this->*m_opcode_table2_32[m_opcode])();
 	else
@@ -3178,6 +3187,7 @@ void i386_device::i386_common_init(int tlbsize)
 	save_item(NAME(m_nmi_masked));
 	save_item(NAME(m_nmi_latched));
 	save_item(NAME(m_smbase));
+	save_item(NAME(m_lock));
 	machine().save().register_postload(save_prepost_delegate(FUNC(i386_device::i386_postload), this));
 
 	m_smiact.resolve_safe();
@@ -3392,6 +3402,8 @@ void i386_device::build_opcode_table(UINT32 features)
 		m_opcode_table3f2_32[i] = &i386_device::i386_invalid;
 		m_opcode_table3f3_16[i] = &i386_device::i386_invalid;
 		m_opcode_table3f3_32[i] = &i386_device::i386_invalid;
+		m_lock_table[0][i] = false;
+		m_lock_table[1][i] = false;
 	}
 
 	for (i=0; i < sizeof(s_x86_opcode_table)/sizeof(X86_OPCODE); i++)
@@ -3406,6 +3418,7 @@ void i386_device::build_opcode_table(UINT32 features)
 				m_opcode_table2_16[op->opcode] = op->handler16;
 				m_opcode_table366_32[op->opcode] = op->handler32;
 				m_opcode_table366_16[op->opcode] = op->handler16;
+				m_lock_table[1][op->opcode] = op->lockable;
 			}
 			else if (op->flags & OP_3BYTE66)
 			{
@@ -3426,6 +3439,7 @@ void i386_device::build_opcode_table(UINT32 features)
 			{
 				m_opcode_table1_32[op->opcode] = op->handler32;
 				m_opcode_table1_16[op->opcode] = op->handler16;
+				m_lock_table[0][op->opcode] = op->lockable;
 			}
 		}
 	}
@@ -3531,6 +3545,7 @@ void i386_device::device_reset()
 	m_smi_latched = false;
 	m_nmi_masked = false;
 	m_nmi_latched = false;
+	m_lock = false;
 
 	m_a20_mask = ~0;
 
@@ -3754,7 +3769,8 @@ void i386_device::execute_run()
 				m_ext = 1;
 				i386_trap(1,0,0);
 			}
-
+			if(m_lock && (m_opcode != 0xf0))
+				m_lock = false;
 		}
 		catch(UINT64 e)
 		{
