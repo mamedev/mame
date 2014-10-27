@@ -125,6 +125,16 @@ UINT32 i386_device::i386_load_protected_mode_segment(I386_SREG *seg, UINT64 *des
 	UINT32 base, limit;
 	int entry;
 
+	if(!seg->selector)
+	{
+		seg->flags = 0;
+		seg->base = 0;
+		seg->limit = 0;
+		seg->d = 0;
+		seg->valid = false;
+		return 0;
+	}
+
 	if ( seg->selector & 0x4 )
 	{
 		base = m_ldtr.base;
@@ -147,7 +157,7 @@ UINT32 i386_device::i386_load_protected_mode_segment(I386_SREG *seg, UINT64 *des
 	if (seg->flags & 0x8000)
 		seg->limit = (seg->limit << 12) | 0xfff;
 	seg->d = (seg->flags & 0x4000) ? 1 : 0;
-	seg->valid = (seg->selector & ~3)?(true):(false);
+	seg->valid = true;
 
 	if(desc)
 		*desc = ((UINT64)v2<<32)|v1;
@@ -212,7 +222,8 @@ void i386_device::i386_load_segment_descriptor(int segment )
 		if (!V8086_MODE)
 		{
 			i386_load_protected_mode_segment(&m_sreg[segment], NULL );
-			i386_set_descriptor_accessed(m_sreg[segment].selector);
+			if(m_sreg[segment].selector)
+				i386_set_descriptor_accessed(m_sreg[segment].selector);
 		}
 		else
 		{
@@ -3132,26 +3143,32 @@ void i386_device::i386_common_init(int tlbsize)
 	save_item(NAME(m_sreg[ES].base));
 	save_item(NAME(m_sreg[ES].limit));
 	save_item(NAME(m_sreg[ES].flags));
+	save_item(NAME(m_sreg[ES].d));
 	save_item(NAME(m_sreg[CS].selector));
 	save_item(NAME(m_sreg[CS].base));
 	save_item(NAME(m_sreg[CS].limit));
 	save_item(NAME(m_sreg[CS].flags));
+	save_item(NAME(m_sreg[CS].d));
 	save_item(NAME(m_sreg[SS].selector));
 	save_item(NAME(m_sreg[SS].base));
 	save_item(NAME(m_sreg[SS].limit));
 	save_item(NAME(m_sreg[SS].flags));
+	save_item(NAME(m_sreg[SS].d));
 	save_item(NAME(m_sreg[DS].selector));
 	save_item(NAME(m_sreg[DS].base));
 	save_item(NAME(m_sreg[DS].limit));
 	save_item(NAME(m_sreg[DS].flags));
+	save_item(NAME(m_sreg[DS].d));
 	save_item(NAME(m_sreg[FS].selector));
 	save_item(NAME(m_sreg[FS].base));
 	save_item(NAME(m_sreg[FS].limit));
 	save_item(NAME(m_sreg[FS].flags));
+	save_item(NAME(m_sreg[FS].d));
 	save_item(NAME(m_sreg[GS].selector));
 	save_item(NAME(m_sreg[GS].base));
 	save_item(NAME(m_sreg[GS].limit));
 	save_item(NAME(m_sreg[GS].flags));
+	save_item(NAME(m_sreg[GS].d));
 	save_item(NAME(m_eip));
 	save_item(NAME(m_prev_eip));
 	save_item(NAME(m_CF));
