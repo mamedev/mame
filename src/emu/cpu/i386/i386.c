@@ -1727,9 +1727,9 @@ void i386_device::i386_protected_mode_call(UINT16 seg, UINT32 off, int indirect,
 					logerror("CALL: TSS: TSS is busy.\n");
 					FAULT(FAULT_TS,selector & ~0x03) // #TS(selector)
 				}
-				if(desc.flags & 0x0080)
+				if((desc.flags & 0x0080) == 0)
 				{
-					logerror("CALL: TSS: Segment is not present.\n");
+					logerror("CALL: TSS: Segment %02x is not present.\n",selector);
 					FAULT(FAULT_NP,selector & ~0x03) // #NP(selector)
 				}
 				if(desc.flags & 0x08)
