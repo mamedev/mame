@@ -42,7 +42,6 @@ private:
 
 	int m_select;
 	int m_clock;
-	int m_datain;
 
 	UINT8 m_bit;
 	emu_timer *m_dip_timer;
