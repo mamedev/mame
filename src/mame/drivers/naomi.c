@@ -259,6 +259,7 @@ Inu No Osanpo / Dog Walking (Rev A)  840-0073C  22294A  16 (64Mb)   present  pre
 Soul Surfer (Rev A)                  840-0095C  23838C  21 (64Mb)   present  present   not present   todo: verify if it's Rev A or Rev C
 Star Horse (server)                  840-0055C  23626   17 (64Mb)   present  present   not present
 The King of Route 66 (Rev A)         840-0087C  23819A  20 (64Mb)   present  present   not present
+Club Kart European Session (2003, prototype) ?  *       21 (64Mb)   present  present   not present   *instead of EPROM have tiny PCB with 2 flashroms on it
 
 
 
@@ -493,9 +494,9 @@ Alien Front (Rev T)                             840-0048C  23586T   5 (128Mb)  3
 Capcom Vs. SNK Millennium Fight 2000            841-0011C  23511    7 (128Mb)  315-6219   present   317-5059-COM  (000802)
 Capcom Vs. SNK Millennium Fight 2000 (Rev A)    841-0011C  23511A   7 (128Mb)  315-6219   present   317-5059-COM  (000804)
 Capcom Vs. SNK Millennium Fight 2000 (Rev C)    841-0011C  23511C   7 (128Mb)  315-6319   present   317-5059-COM  (000904)
-Club Kart: European Session (Rev E)             840-0062C  23704E  11 (128Mb)  315-6319A  present   317-0313-COM
+Club Kart: European Session                     840-0062C  23704   11 (128Mb)  315-6319A  present   317-0313-COM
 Club Kart: European Session (Rev D)             840-0062C  23704D  11 (128Mb)  315-6319A  present   317-0313-COM
-Club Kart: European Session (Rev C)             840-0062C  23704C  11 (128Mb)  315-6319A  present   317-0313-COM
+Club Kart: European Session (Rev C)             840-0062C          11 (128Mb)  315-6319A  present   317-0313-COM  EPR have handwritten Japanese label possible readable as 'teteto 74 lcl'
 Crackin' DJ                                     840-0043C  23450D  10 (128Mb)  315-6319   present   ?
 Derby Owners Club II (Rev B)                    840-0083C  22306B  11 (128Mb)  315-6319A  present   not present
 Derby Owners Club World Edition (Rev C)         840-0088C  22336C   7 (128Mb)  315-6319A  present   not present
@@ -505,10 +506,11 @@ Mobile Suit Gundam: Federation Vs. Zeon         841-0017C  23638   10 (128Mb)  3
 Moero Justice Gakuen / Project Justice (Rev A)  841-0015C  23548A  11 (128Mb)  315-6319A  present   317-5065-COM
 Mushiking 2K5 1ST (Ver 1.000)                   840-0158C  24286    7 (128Mb)  315-6319A  present   not present
 Oinori-daimyoujin Matsuri                       840-0126B  24053    5 (128Mb)  315-6319A  present   not present
-Samba de Amigo Ver. 2000                        840-0047C  23600   21  (64Mb)  315-6319A  present   317-0295-COM
+Samba de Amigo Ver. 2000                        840-0047C  23600   21  (64Mb)* 315-6319A  present   317-0295-COM  most likely MaskROM size is wrong, needs verification
 Star Horse (big screens)                        840-0054C  23625    4 (128Mb)  315-6319   present   not present
 Star Horse (client)                             840-0056C  23627    6 (128Mb)* 315-6319   present   not present   * +1 (64Mb)
 Star Horse Progress (Rev A)                     840-0123C  24122A   7 (128Mb)  315-6319A  present   not present   requires an additional middle board n? 837-13785
+The King of Route 66 (Rev A)                    840-0087C  23819A  10 (128Mb)  315-6319A  present   not present
 Virtua Striker 3 (Rev B)                        840-0061C  23663B  11 (128Mb)  315-6319A  present   317-0310-COM
 Virtua Striker 3 (Rev C)                        840-0061C  23663C  11 (128Mb)  315-6319A  present   317-0310-COM
 Wave Runner GP                                  840-0064C  24059    6 (128Mb)  315-6319A  present   not present
@@ -7786,27 +7788,17 @@ ROM_START( kingrt66 )
 	NAOMI_DEFAULT_EEPROM
 
 	ROM_REGION( 0xa800000, "rom_board", ROMREGION_ERASEFF)
-	ROM_LOAD( "epr-23819a.ic22", 0x0000000, 0x400000, CRC(92f11b29) SHA1(b33f7eefb849754cfe194be1d48d770ed77ff69a) )
-	ROM_LOAD( "ic1s.bin",  0x0800000, 0x800000, CRC(03da8f81) SHA1(01f9b33ffc485d8ccb2630c8cc1fcc0d90da171d) )
-	ROM_LOAD( "ic2s.bin",  0x1000000, 0x800000, CRC(1bbbf549) SHA1(0c5269f3e8a88298408bb612dc8da4d545ce329e) )
-	ROM_LOAD( "ic3s.bin",  0x1800000, 0x800000, CRC(6c81d0a9) SHA1(2301350098062e16afd6d4c13eeb1e46040d398f) )
-	ROM_LOAD( "ic4s.bin",  0x2000000, 0x800000, CRC(fe245803) SHA1(3b5c4d20c447ca02306a74914c027c9193d2bb48) )
-	ROM_LOAD( "ic5s.bin",  0x2800000, 0x800000, CRC(d8376c76) SHA1(62a64d0ff4b63a2de3b8668c0ca1d69d4cdac00e) )
-	ROM_LOAD( "ic6s.bin",  0x3000000, 0x800000, CRC(d184a4b3) SHA1(db00cf005da52b8add695ec89f8a81cf21fc9bad) )
-	ROM_LOAD( "ic7s.bin",  0x3800000, 0x800000, CRC(6e92fb39) SHA1(d992272e474424221c87bb71e269e10cbba1cac9) )
-	ROM_LOAD( "ic8s.bin",  0x4000000, 0x800000, CRC(fd4c128f) SHA1(7778920f59b8bc1e9718d685bfd556f73e5c3895) )
-	ROM_LOAD( "ic9s.bin",  0x4800000, 0x800000, CRC(5bcb3759) SHA1(57baa595eaee826ffadc17c885cb73174558feb1) )
-	ROM_LOAD( "ic10s.bin", 0x5000000, 0x800000, CRC(7d66c409) SHA1(fa8d08587ebcd70ec39237366c5de6948efce881) )
-	ROM_LOAD( "ic11s.bin", 0x5800000, 0x800000, CRC(322abecc) SHA1(476a751dc9849a5167e7e7e17e27987b96b1cb00) )
-	ROM_LOAD( "ic12s.bin", 0x6000000, 0x800000, CRC(a47fff36) SHA1(5c0088e140654b89749c5dd5d729c4799afc224e) )
-	ROM_LOAD( "ic13s.bin", 0x6800000, 0x800000, CRC(f502b666) SHA1(fa483f327cab15d10861efcbf6bdf4a2c5d0a763) )
-	ROM_LOAD( "ic14s.bin", 0x7000000, 0x800000, CRC(ed664a57) SHA1(54421ce642208fd1f14fbbe2e326d9c8da7c9944) )
-	ROM_LOAD( "ic15s.bin", 0x7800000, 0x800000, CRC(3f905393) SHA1(d63bbe8099b323ad4fd95401e0097b4c7151b44c) )
-	ROM_LOAD( "ic16s.bin", 0x8000000, 0x800000, CRC(80756e62) SHA1(9b2f14ed10775ee56f245c75ee23534c99db23d4) )
-	ROM_LOAD( "ic17s.bin", 0x8800000, 0x800000, CRC(7404e74e) SHA1(a427bf9f5e8338d34d1091de69460e374ddc6ee6) )
-	ROM_LOAD( "ic18s.bin", 0x9000000, 0x800000, CRC(58a7fbac) SHA1(7132e018e73e68a355f92fe26121da7c3c0c927a) )
-	ROM_LOAD( "ic19s.bin", 0x9800000, 0x800000, CRC(fd6fb2cf) SHA1(b2bf8a11d42141237db0254506ee73d9cef8b9d1) )
-	ROM_LOAD( "ic20s.bin", 0xa000000, 0x800000, CRC(be902c2b) SHA1(1f1aa6933da528bdcef45942a0caa33cb24e7ddd) )
+	ROM_LOAD( "epr-23819a.ic22", 0x0000000, 0x00400000, CRC(92f11b29) SHA1(b33f7eefb849754cfe194be1d48d770ed77ff69a) )
+	ROM_LOAD("mpr-23808.ic1",  0x00800000,	0x01000000, CRC(e911bc86) SHA1(0dc658851e20425b2e697e538bb4297a221f6ae8) )
+	ROM_LOAD("mpr-23809.ic2",  0x01800000,	0x01000000, CRC(2716aba0) SHA1(4c245874da244926bf9ac6636af4fa67e07a21e8) )
+	ROM_LOAD("mpr-23810.ic3",  0x02800000,	0x01000000, CRC(2226accb) SHA1(c4dc71e87c2ccd866f4180129181b7ced8caf22c) )
+	ROM_LOAD("mpr-23811.ic4",  0x03800000,	0x01000000, CRC(bbad4a93) SHA1(724c3376102b2dc79b852af1e90748b2e0023b82) )
+	ROM_LOAD("mpr-23812.ic5",  0x04800000,	0x01000000, CRC(7beabe22) SHA1(d3cd926fc768d480ff45f1e30024bb0e31bd7d2c) )
+	ROM_LOAD("mpr-23813.ic6",  0x05800000,	0x01000000, CRC(fe0b94ea) SHA1(0e46dff932036bec49c78a612bcfd27e07b516e8) )
+	ROM_LOAD("mpr-23814.ic7",  0x06800000,	0x01000000, CRC(0cdf7325) SHA1(41668f873b7842dac1bc85aa2b6bd6512edc9b64) )
+	ROM_LOAD("mpr-23815.ic8",  0x07800000,	0x01000000, CRC(ef327ab8) SHA1(9dfc564084a75b9c3935374347f1709d2e86e469) )
+	ROM_LOAD("mpr-23816.ic9",  0x08800000,	0x01000000, CRC(bbaf0765) SHA1(3b79a4eff504b2156bea8b86c6cdd8e41e7bf268) )
+	ROM_LOAD("mpr-23817.ic10", 0x09800000,	0x01000000, CRC(e179cfb6) SHA1(1120036238439f8ac1041150396e4b60e4a243bc) )
 
 	ROM_REGION( 4, "rom_key", ROMREGION_ERASE00 )
 ROM_END
@@ -8055,9 +8047,8 @@ ROM_START( clubk2k3 )
 	ROM_LOAD( "clubk2k3-key.bin", 0x000000, 0x000004, CRC(96c3b4f6) SHA1(9b85a418153c70f56aaeeb1ed0bbbbd31a1bbad7) )
 ROM_END
 
-// source was some kind of (developer/proto?) flash cart, needs verification
-// uses the same mask roms as clubk2k3, but EPR doesn't have checksumms for them, so rom test shows all roms as BAD
-ROM_START( clubk2kf )
+// uses the same mask roms data as clubk2k3, but most likely not in 32bit dissected form, EPR doesn't have checksumms for them, so rom test shows all roms as BAD
+ROM_START( clubk2kp )
 	NAOMI2_BIOS
 	NAOMI_DEFAULT_EEPROM
 
@@ -8952,7 +8943,7 @@ GAME( 2003, puyofevp, naomi, naomim1, naomi, naomi_state, naomi, ROT0, "Sega", "
 /* 0046 */ GAME( 2001, wldrider, naomi2,  naomi2m2, naomi, naomi_state, naomi2,   ROT0, "Sega", "Wild Riders (JPN, USA, EXP, KOR, AUS)", GAME_FLAGS )
 /* 0061 */ GAME( 2001, vstrik3c, naomi2,  naomi2m2, naomi, naomi_state, naomi2,   ROT0, "Sega", "Virtua Striker 3 (USA, EXP, KOR, AUS) (Cart, Rev C)", GAME_FLAGS )
 /* 0061 */ GAME( 2001, vstrik3cb,vstrik3c,naomi2m2, naomi, naomi_state, naomi2,   ROT0, "Sega", "Virtua Striker 3 (USA, EXP, KOR, AUS) (Cart, Rev B)", GAME_FLAGS )
-/* 0062 */ GAME( 2001, clubkrte, naomi2,  naomi2m2, naomi, naomi_state, naomi2,   ROT0, "Sega", "Club Kart: European Session (Rev E)", GAME_FLAGS )
+/* 0062 */ GAME( 2001, clubkrte, naomi2,  naomi2m2, naomi, naomi_state, naomi2,   ROT0, "Sega", "Club Kart: European Session", GAME_FLAGS )
 /* 0062 */ GAME( 2001, clubkrtd, clubkrte,naomi2m2, naomi, naomi_state, naomi2,   ROT0, "Sega", "Club Kart: European Session (Rev D)", GAME_FLAGS )
 /* 0062 */ GAME( 2001, clubkrtc, clubkrte,naomi2m2, naomi, naomi_state, naomi2,   ROT0, "Sega", "Club Kart: European Session (Rev C)", GAME_FLAGS )
 /* 0080 */ GAME( 2002, vf4cart,  naomi2,  naomi2m2, naomi, naomi_state, naomi2,   ROT0, "Sega", "Virtua Fighter 4 (Cartridge)", GAME_FLAGS )
@@ -8964,8 +8955,7 @@ GAME( 2003, puyofevp, naomi, naomim1, naomi, naomi_state, naomi, ROT0, "Sega", "
 /* 0137 */ GAME( 2004, clubkpzb, naomi2,  naomi2m1, naomi, naomi_state, naomi2,   ROT0, "Sega", "Club Kart Prize Ver. B", GAME_FLAGS )
 // needs verification is this dump really from 840-0139C cart
 /* 0139 */ GAME( 2003, clubk2k3, naomi2,  naomi2m1, naomi, naomi_state, naomi2,   ROT0, "Sega", "Club Kart: European Session (2003)", GAME_FLAGS )
-// source is some kind of (developer/proto?) flash cart, needs verification
-/* ???  */ GAME( 2003, clubk2kf, clubk2k3,naomi2,   naomi, naomi_state, naomi2,   ROT0, "Sega", "Club Kart: European Session (2003, not protected)", GAME_FLAGS )
+/* ???  */ GAME( 2003, clubk2kp, clubk2k3,naomi2,   naomi, naomi_state, naomi2,   ROT0, "Sega", "Club Kart: European Session (2003, prototype)", GAME_FLAGS )
 
 /* 841-xxxxx ("Licensed by Sega" Naomi cart games)*/
 /* 0001 */ GAME( 1999, pstone,   naomi, naomim2, naomi,   naomi_state, naomi,  ROT0,  "Capcom",          "Power Stone (JPN, USA, EUR, ASI, AUS)", GAME_FLAGS )
@@ -9092,7 +9082,6 @@ GAME( 2003, puyofevp, naomi, naomim1, naomi, naomi_state, naomi, ROT0, "Sega", "
 // 00??  Dragon Treasure
 // 00??  Dragon Treasure 2
 // 00??  Get Bass 2
-// 00??  Kodai Ouja Kyouryuu King
 
 /* GDL-xxxx ("licensed by Sega" GD-ROM games) */
 /* 0001  */ GAME( 2001, gundmgd, naomigd, naomigd, naomi, naomi_state,  naomigd,  ROT0,"Capcom / Banpresto","Mobile Suit Gundam: Federation Vs. Zeon (GDL-0001)", GAME_FLAGS )
@@ -9158,13 +9147,6 @@ GAME( 2003, puyofevp, naomi, naomim1, naomi, naomi_state, naomi, ROT0, "Sega", "
 // 10015  CD  - World Club Champion Football European Clubs 2004-2005 Ver.1.1 (Sega, 2005)
 // 10015P CD  - World Club Champion Football European Clubs 2004-2005 Ver.3.22 (Sega, 2005)
 // 10027  CD  - World Club Champion Football European Clubs 2005-2006 (Sega, 2006)
-// 10030  DVD - Mobile Suit Gundam 0083 Card Builder (Banpresto, 2007)
-// ?????  ??? - Mobile Suit Gundam 0079 Card Builder (Banpresto, 2005)
-// ?????  ??? - Mobile Suit Gundam 0079 Card Builder (Ver.1.007) (Banpresto, 2006)
-// ?????  ??? - Mobile Suit Gundam 0079 Card Builder (Ver.2.00) (Banpresto, 2006)
-// ?????  ??? - Mobile Suit Gundam 0079 Card Builder (Ver.2.01) (Banpresto, 2006)
-// ?????  ??? - Mobile Suit Gundam 0079 Card Builder (Ver.2.02) (Banpresto, 2006)
-// ?????  ??? - Mobile Suit Gundam 0083 Card Builder Ryouyuu Gekitotsu (Banpresto, 2007)
 // ?????  ??? - World Club Champion Football Serie A 2001-2002 (Sega, 2002)
 // ?????  ??? - World Club Champion Football Serie A 2001-2002 Ver.1.2 (Sega, 2002)
 // ?????  ??? - World Club Champion Football Serie A 2001-2002 Ver.2 (Sega, 2003)
@@ -9173,6 +9155,11 @@ GAME( 2003, puyofevp, naomi, naomim1, naomi, naomi_state, naomi, ROT0, "Sega", "
 // ?????  ??? - World Club Champion Football European Clubs 2004-2005 Ver.1.2 (Sega, 2005)
 // ?????  ??? - World Club Champion Football European Clubs 2005-2006 bugfix (Sega, 2006)
 
+/* MDA-Gxxxx (Compact Flash replacement of Naomi 2 GD-ROM releases) */
+// 0001 - Club Kart Cycraft Edition (GDS-0029)
+// 0003 - Initial D Arcade Stage Ver. 1 (Export) (GDS-0025A)
+// 0005 - Initial D Arcade Stage Ver. 2 (Export) (GDS-0027)
+// 0007 - Initial D Arcade Stage Ver. 3 (Export) (GDS-0033)
 
 
 /* Atomiswave */
