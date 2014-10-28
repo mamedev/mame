@@ -1029,7 +1029,7 @@ $(MESSOBJ)/bally.a:             \
 $(MESSOBJ)/bandai.a:            \
 	$(MESS_DRIVERS)/sv8000.o    \
 	$(MESS_DRIVERS)/rx78.o      \
-	$(MESS_DRIVERS)/wswan.o $(MESS_AUDIO)/wswan_snd.o $(MESS_MACHINE)/wswan.o $(MESS_VIDEO)/wswan.o \
+	$(MESS_DRIVERS)/wswan.o $(MESS_AUDIO)/wswan_snd.o $(MESS_MACHINE)/wswan.o $(MESS_VIDEO)/wswan_video.o \
 
 $(MESSOBJ)/be.a:                \
 	$(MESS_DRIVERS)/bebox.o $(MESS_MACHINE)/bebox.o \
