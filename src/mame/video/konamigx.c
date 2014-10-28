@@ -276,11 +276,6 @@ void konamigx_state::wipezbuf(int noshadow)
 #define GX_MAX_OBJECTS (GX_MAX_SPRITES + GX_MAX_LAYERS)
 
 static struct GX_OBJ { int order, offs, code, color; } *gx_objpool;
-static UINT16 *gx_spriteram;
-
-// mirrored K054338 settings
-static int *K054338_shdRGB;
-
 
 void konamigx_state::konamigx_mixer_init(screen_device &screen, int objdma)
 {
@@ -291,15 +286,15 @@ void konamigx_state::konamigx_mixer_init(screen_device &screen, int objdma)
 	m_gx_shdzbuf = auto_alloc_array(machine(), UINT8, GX_ZBUFSIZE);
 	gx_objpool = auto_alloc_array(machine(), struct GX_OBJ, GX_MAX_OBJECTS);
 
-	m_k054338->export_config(&K054338_shdRGB);
+	m_k054338->export_config(&m_K054338_shdRGB);
 
 	if (objdma)
 	{
-		gx_spriteram = auto_alloc_array(machine(), UINT16, 0x1000/2);
+		m_gx_spriteram = auto_alloc_array(machine(), UINT16, 0x1000/2);
 		m_gx_objdma = 1;
 	}
 	else
-		m_k055673->k053247_get_ram(&gx_spriteram);
+		m_k055673->k053247_get_ram(&m_gx_spriteram);
 
 	m_palette->set_shadow_dRGB32(3,-80,-80,-80, 0);
 	m_k054338->invert_alpha(1);
@@ -315,7 +310,7 @@ void konamigx_state::konamigx_objdma(void)
 	UINT16* k053247_ram;
 	m_k055673->k053247_get_ram(&k053247_ram);
 
-	if (m_gx_objdma && gx_spriteram && k053247_ram) memcpy(gx_spriteram, k053247_ram, 0x1000);
+	if (m_gx_objdma && m_gx_spriteram && k053247_ram) memcpy(m_gx_spriteram, k053247_ram, 0x1000);
 }
 
 void konamigx_state::konamigx_mixer(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect,
@@ -416,9 +411,9 @@ void konamigx_state::konamigx_mixer(screen_device &screen, bitmap_rgb32 &bitmap,
 		// only enable shadows beyond a +/-7 RGB threshold
 		for (j=0,i=0; i<3; j+=3,i++)
 		{
-			k = K054338_shdRGB[j  ]; if (k < -7 || k > 7) { shadowon[i] = 1; continue; }
-			k = K054338_shdRGB[j+1]; if (k < -7 || k > 7) { shadowon[i] = 1; continue; }
-			k = K054338_shdRGB[j+2]; if (k < -7 || k > 7) { shadowon[i] = 1; }
+			k = m_K054338_shdRGB[j  ]; if (k < -7 || k > 7) { shadowon[i] = 1; continue; }
+			k = m_K054338_shdRGB[j+1]; if (k < -7 || k > 7) { shadowon[i] = 1; continue; }
+			k = m_K054338_shdRGB[j+2]; if (k < -7 || k > 7) { shadowon[i] = 1; }
 		}
 
 		// SHDON specifies layers on which shadows can be projected (see detail on p.65 7.2.8)
@@ -496,16 +491,16 @@ void konamigx_state::konamigx_mixer(screen_device &screen, bitmap_rgb32 &bitmap,
 	{
 		int pri = 0;
 
-		if (!(gx_spriteram[offs] & 0x8000)) continue;
+		if (!(m_gx_spriteram[offs] & 0x8000)) continue;
 
-		int zcode = gx_spriteram[offs] & 0xff;
+		int zcode = m_gx_spriteram[offs] & 0xff;
 
 		// invert z-order when opset_pri is set (see p.51 OPSET PRI)
 		if (m_k053247_opset & 0x10) zcode = 0xff - zcode;
 
-		int code  = gx_spriteram[offs+1];
-		int color = k = gx_spriteram[offs+6];
-		l     = gx_spriteram[offs+7];
+		int code  = m_gx_spriteram[offs+1];
+		int color = k = m_gx_spriteram[offs+6];
+		l     = m_gx_spriteram[offs+7];
 
 		m_k055673->m_k053247_cb(&code, &color, &pri);
 
@@ -869,7 +864,7 @@ void konamigx_state::konamigx_mixer_draw(screen_device &screen, bitmap_rgb32 &bi
 
 
 			m_k055673->k053247_draw_single_sprite_gxcore(bitmap, cliprect,
-				m_gx_objzbuf, m_gx_shdzbuf, code, gx_spriteram, offs,
+				m_gx_objzbuf, m_gx_shdzbuf, code, m_gx_spriteram, offs,
 				color, alpha, drawmode, zcode, pri,
 				/* non-gx only */
 				0,0,NULL,NULL,0
@@ -927,21 +922,19 @@ TILE_GET_INFO_MEMBER(konamigx_state::get_gx_psac_tile_info)
 	SET_TILE_INFO_MEMBER(0, tileno, colour, TILE_FLIPYX(flip));
 }
 
-static int konamigx_type3_psac2_actual_bank;
-//int konamigx_type3_psac2_actual_last_bank = 0;
 
 WRITE32_MEMBER(konamigx_state::konamigx_type3_psac2_bank_w)
 {
 	// other bits are used for something...
 
 	COMBINE_DATA(&m_konamigx_type3_psac2_bank[offset]);
-	konamigx_type3_psac2_actual_bank = (m_konamigx_type3_psac2_bank[0] & 0x10000000) >> 28;
+	m_konamigx_type3_psac2_actual_bank = (m_konamigx_type3_psac2_bank[0] & 0x10000000) >> 28;
 
 	/* handle this by creating 2 roz tilemaps instead, otherwise performance dies completely on dual screen mode
-	if (konamigx_type3_psac2_actual_bank!=konamigx_type3_psac2_actual_last_bank)
+	if (m_konamigx_type3_psac2_actual_bank!=m_konamigx_type3_psac2_actual_last_bank)
 	{
 	    m_gx_psac_tilemap->mark_all_dirty();
-	    konamigx_type3_psac2_actual_last_bank = konamigx_type3_psac2_actual_bank;
+	    m_konamigx_type3_psac2_actual_last_bank = m_konamigx_type3_psac2_actual_bank;
 	}
 	*/
 }
@@ -956,7 +949,7 @@ TILE_GET_INFO_MEMBER(konamigx_state::get_gx_psac3_tile_info)
 
 	int base_index = tile_index;
 
-//  if (konamigx_type3_psac2_actual_bank)
+//  if (m_konamigx_type3_psac2_actual_bank)
 //      base_index+=0x20000/2;
 
 
@@ -977,7 +970,7 @@ TILE_GET_INFO_MEMBER(konamigx_state::get_gx_psac3_alt_tile_info)
 
 	int base_index = tile_index;
 
-//  if (konamigx_type3_psac2_actual_bank)
+//  if (m_konamigx_type3_psac2_actual_bank)
 //      base_index+=0x20000/2;
 
 
@@ -1432,7 +1425,7 @@ UINT32 konamigx_state::screen_update_konamigx(screen_device &screen, bitmap_rgb3
 		temprect = cliprect;
 		temprect.max_x = cliprect.min_x+320;
 
-		if (konamigx_type3_psac2_actual_bank == 1) K053936_0_zoom_draw(screen, *m_type3_roz_temp_bitmap, temprect,m_gx_psac_tilemap_alt, 0,0,0); // soccerss playfield
+		if (m_konamigx_type3_psac2_actual_bank == 1) K053936_0_zoom_draw(screen, *m_type3_roz_temp_bitmap, temprect,m_gx_psac_tilemap_alt, 0,0,0); // soccerss playfield
 		else K053936_0_zoom_draw(screen, *m_type3_roz_temp_bitmap, temprect,m_gx_psac_tilemap, 0,0,0); // soccerss playfield
 
 

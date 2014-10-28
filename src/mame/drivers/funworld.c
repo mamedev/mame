@@ -6352,8 +6352,9 @@ DRIVER_INIT_MEMBER(funworld_state, rcdino4)
 	}
 
 	j = 1;
+	i = 0x81;
 
-	for (i = 0x81; i < (0x81 + ARRAY_LENGTH(rcdino4_keys80));)
+	do
 	{
 		UINT8 key;
 
@@ -6418,9 +6419,14 @@ DRIVER_INIT_MEMBER(funworld_state, rcdino4)
 		while (j < 0x100);
 
 		j &= 0xff;
-		do {
-			assert((i+1 - 0x81) >= 0 && (i+1 - 0x81) < ARRAY_LENGTH(rcdino4_keys80));
-		} while (!rcdino4_keys80[++i - 0x81]);
+
+		do {} while (((++i - 0x81) < ARRAY_LENGTH(rcdino4_keys80))
+				&& !rcdino4_keys80[i - 0x81]);
+
+		if ((i - 0x81) == ARRAY_LENGTH(rcdino4_keys80))
+		{
+			break;
+		}
 
 		if ((i == 0xa4)
 			|| (i == 0xb0)
@@ -6430,6 +6436,7 @@ DRIVER_INIT_MEMBER(funworld_state, rcdino4)
 			j = 0; /* re-align offset after skipping some pages */
 		}
 	}
+	while (1);
 }
 
 DRIVER_INIT_MEMBER(funworld_state, rcdinch)

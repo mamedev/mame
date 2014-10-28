@@ -681,6 +681,7 @@ void grip_device::device_reset()
 {
 	m_base = m_j7->read();
 	m_page = 0;
+	m_lps = 0;
 }
 
 

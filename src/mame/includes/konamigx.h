@@ -199,6 +199,11 @@ public:
 	
 	UINT16 m_prot_data[0x20];
 	
+	UINT16 *m_gx_spriteram;
+	
+	// mirrored K054338 settings
+	int *m_K054338_shdRGB;
+	
 	// 1st-Tier GX/MW Variables
 	// frequently used registers
 	int m_k053247_vrcbk[4];
@@ -236,14 +241,17 @@ public:
        unsupported flipping modes (probably due to the way it's hooked up to the
        rest of the chips) which is causing entirely the wrong output.
 
-    -- furthermore video/konamigx.c contains it's own implementation of
-       the K053936_zoom_draw named K053936GP_zoom_draw ...
+    -- furthermore video\k053936.c contains an implementation of
+       the K053936_zoom_draw named K053936GP_zoom_draw that's only used in konamigx ...
 
 
     */
 	bitmap_ind16 *m_gxtype1_roz_dstbitmap;
 	bitmap_ind16 *m_gxtype1_roz_dstbitmap2;
 	rectangle m_gxtype1_roz_dstbitmapclip;
+	
+	int m_konamigx_type3_psac2_actual_bank;
+	//int m_konamigx_type3_psac2_actual_last_bank = 0;
 };
 
 // Sprite Callbacks

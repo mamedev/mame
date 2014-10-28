@@ -212,20 +212,21 @@
 		</part>
 	</software>
 
-	<software name="wb133r3434" cloneof="wbenc133">
-		<description>Workbench 1.3.3 (Rev. 34.34)</description>
+	<!-- 317746-01 Workbench 1.3 (US) -->
+	<!-- 317746-03 Workbench 1.3.2 (US) -->
+
+	<software name="wbenc133_us" cloneof="wbenc133">
+		<description>Workbench 1.3.3 (US)</description>
 		<year>1990</year>
 		<publisher>Commodore</publisher>
-
 		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="Amiga Workbench Version 1.3.3 (Rev. 34.34)" />
+			<feature name="part_id" value="Workbench 1.3.3" />
 			<dataarea name="flop" size="901120">
-				<rom name="317746-04_workbench.adf" size="901120" crc="bf299bca" sha1="8bac53a89cd1fe5a7762de9bd61a1592f10af2df" offset="0"/>
+				<rom name="317746-04_workbench.adf" size="901120" crc="bf299bca" sha1="8bac53a89cd1fe5a7762de9bd61a1592f10af2df" status="baddump" offset="0"/>
 			</dataarea>
 		</part>
-
 		<part name="flop2" interface="floppy_3_5">
-			<feature name="part_id" value="Amiga Extras Amiga Basic Printer Drivers Version 1.3" />
+			<feature name="part_id" value="Extras 1.3" />
 			<dataarea name="flop" size="901120">
 				<rom name="317748-02_extras.adf" size="901120" crc="256a4b82" sha1="465a65aa89fe4b016fee968ef75ab08de9bdfbc6" offset="0"/>
 			</dataarea>

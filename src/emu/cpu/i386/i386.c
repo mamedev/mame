@@ -1977,7 +1977,7 @@ void i386_device::i386_protected_mode_call(UINT16 seg, UINT32 off, int indirect,
 					logerror("CALL: Task Gate: Gate DPL is less than RPL.\n");
 					FAULT(FAULT_TS,selector & ~0x03) // #TS(selector)
 				}
-				if(gate.ar & 0x0080)
+				if((gate.ar & 0x0080) == 0)
 				{
 					logerror("CALL: Task Gate: Gate is not present.\n");
 					FAULT(FAULT_NP,selector & ~0x03) // #NP(selector)
@@ -2003,7 +2003,7 @@ void i386_device::i386_protected_mode_call(UINT16 seg, UINT32 off, int indirect,
 					logerror("CALL: Task Gate: TSS is busy.\n");
 					FAULT(FAULT_TS,gate.selector & ~0x03) // #TS(selector)
 				}
-				if(desc.flags & 0x0080)
+				if((desc.flags & 0x0080) == 0)
 				{
 					logerror("CALL: Task Gate: TSS is not present.\n");
 					FAULT(FAULT_NP,gate.selector & ~0x03) // #TS(selector)
