@@ -54,7 +54,11 @@
 #define UNEXPECTED(exp)         __builtin_expect(!!(exp), 0)
 #define EXPECTED(exp)           __builtin_expect(!!(exp), 1)
 #define RESTRICT                __restrict__
+#ifdef RETRO_SETJMP_HACK
+#define SETJMP_GNUC_PROTECT()   (void)__builtin_return_address(0)
+#else
 #define SETJMP_GNUC_PROTECT()   (void)__builtin_return_address(1)
+#endif
 #else
 #define ATTR_UNUSED
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)

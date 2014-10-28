@@ -38,6 +38,15 @@ delegate_mfp::raw_mfp_data delegate_mfp::s_null_mfp = { 0 };
 
 delegate_generic_function delegate_mfp::convert_to_generic(delegate_generic_class *&object) const
 {
+#ifdef USE_ARM_HACK
+    object = reinterpret_cast<delegate_generic_class *>(reinterpret_cast<UINT8 *>(object));
+
+    if (!(m_is_virtual))
+        return reinterpret_cast<delegate_generic_function>(m_function);
+
+    UINT8 *vtable_base = *reinterpret_cast<UINT8 **>(object);
+    return *reinterpret_cast<delegate_generic_function *>(vtable_base + m_function);
+#else
 	// apply the "this" delta to the object first
 	object = reinterpret_cast<delegate_generic_class *>(reinterpret_cast<UINT8 *>(object) + m_this_delta);
 
@@ -48,6 +57,7 @@ delegate_generic_function delegate_mfp::convert_to_generic(delegate_generic_clas
 	// otherwise, it is the byte index into the vtable where the actual function lives
 	UINT8 *vtable_base = *reinterpret_cast<UINT8 **>(object);
 	return *reinterpret_cast<delegate_generic_function *>(vtable_base + m_function - 1);
+#endif
 }
 
 #endif
