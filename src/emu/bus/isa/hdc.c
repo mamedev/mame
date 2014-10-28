@@ -764,11 +764,8 @@ void isa8_hdc_device::pc_hdc_data_w(int data)
 
 		*buffer_ptr++ = data;
 		// XXX ec1841 wants this
-<<<<<<< HEAD
-		if (buffer[0] == CMD_SETPARAM && data_cnt == 9) {
-=======
+
 		if (buffer[0] == CMD_SETPARAM && data_cnt == 9 && (m_type == EC1841)) {
->>>>>>> 8da3b4f1ef8bc374ef62c6b5e8390f71bd3777c6
 			status &= ~STA_READY;
 		} else {
 			status |= STA_READY;
