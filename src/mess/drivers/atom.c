@@ -725,7 +725,7 @@ static MACHINE_CONFIG_START( atom, atom_state )
 	MCFG_I8271_FLOPPIES(FLOPPY_0, FLOPPY_1)
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(atom_floppy_interface)
 
-	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_printers, "printer")
+	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_devices, "printer")
 	MCFG_CENTRONICS_ACK_HANDLER(DEVWRITELINE(R6522_TAG, via6522_device, write_ca1))
 	MCFG_CENTRONICS_BUSY_HANDLER(DEVWRITELINE(R6522_TAG, via6522_device, write_pa7))
 
@@ -822,7 +822,7 @@ static MACHINE_CONFIG_START( atombb, atom_state )
 	MCFG_I8255_IN_PORTC_CB(READ8(atom_state, ppi_pc_r))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(atom_state, ppi_pc_w))
 
-	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_printers, "printer")
+	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_devices, "printer")
 	MCFG_CENTRONICS_ACK_HANDLER(DEVWRITELINE(R6522_TAG, via6522_device, write_ca1))
 	MCFG_CENTRONICS_BUSY_HANDLER(DEVWRITELINE(R6522_TAG, via6522_device, write_pa7))
 

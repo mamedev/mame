@@ -218,6 +218,6 @@ protected:
 };
 
 
-SLOT_INTERFACE_EXTERN( centronics_printers );
+SLOT_INTERFACE_EXTERN( centronics_devices );
 
 #endif

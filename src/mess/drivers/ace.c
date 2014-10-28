@@ -711,7 +711,7 @@ static MACHINE_CONFIG_START( ace, ace_state )
 	MCFG_Z80PIO_OUT_PA_CB(WRITE8(ace_state, pio_pa_w))
 	MCFG_Z80PIO_OUT_PB_CB(DEVWRITE8("cent_data_out", output_latch_device, write))
 
-	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_printers, "printer")
+	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_devices, "printer")
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
 
 	// internal ram

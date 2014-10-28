@@ -618,7 +618,7 @@ static MACHINE_CONFIG_START( bw2, bw2_state )
 	MCFG_DEVICE_ADDRESS_MAP(AS_0, lcdc_map)
 	MCFG_VIDEO_SET_SCREEN(SCREEN_TAG)
 
-	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_printers, "printer")
+	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(bw2_state, write_centronics_busy))
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)

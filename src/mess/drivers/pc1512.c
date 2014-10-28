@@ -1259,7 +1259,7 @@ static MACHINE_CONFIG_START( pc1512, pc1512_state )
 	MCFG_INS8250_OUT_RTS_CB(DEVWRITELINE(RS232_TAG, rs232_port_device, write_rts))
 	MCFG_INS8250_OUT_INT_CB(DEVWRITELINE(I8259A2_TAG, pic8259_device, ir4_w))
 
-	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "printer")
+	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
 	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(pc1512_state, write_centronics_ack))
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(pc1512_state, write_centronics_busy))
 	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(pc1512_state, write_centronics_perror))
@@ -1380,7 +1380,7 @@ static MACHINE_CONFIG_START( pc1640, pc1640_state )
 	MCFG_INS8250_OUT_INT_CB(DEVWRITELINE(I8259A2_TAG, pic8259_device, ir4_w))
 
 
-	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "printer")
+	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
 	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(pc1512_state, write_centronics_ack))
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(pc1512_state, write_centronics_busy))
 	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(pc1512_state, write_centronics_perror))

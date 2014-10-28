@@ -294,7 +294,7 @@ static MACHINE_CONFIG_START( act_f1, f1_state )
 	MCFG_Z80CTC_ZC1_CB(WRITELINE(f1_state, ctc_z1_w))
 	MCFG_Z80CTC_ZC2_CB(WRITELINE(f1_state, ctc_z2_w))
 
-	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "printer")
+	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(DEVWRITELINE(Z80SIO2_TAG, z80dart_device, ctsa_w))
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)

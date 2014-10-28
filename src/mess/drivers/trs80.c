@@ -601,7 +601,7 @@ static MACHINE_CONFIG_DERIVED( model1, trs80 )      // model I, level II
 
 	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(trs80_floppy_interface)
 
-	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "printer")
+	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(DEVWRITELINE("cent_status_in", input_buffer_device, write_bit7))
 	MCFG_CENTRONICS_PERROR_HANDLER(DEVWRITELINE("cent_status_in", input_buffer_device, write_bit6))
 	MCFG_CENTRONICS_SELECT_HANDLER(DEVWRITELINE("cent_status_in", input_buffer_device, write_bit5))
