@@ -129,6 +129,8 @@ ifneq ($(filter ASTROCADE,$(BUSES)),)
 OBJDIRS += $(BUSOBJ)/astrocde
 BUSOBJS += $(BUSOBJ)/astrocde/slot.o
 BUSOBJS += $(BUSOBJ)/astrocde/rom.o
+BUSOBJS += $(BUSOBJ)/astrocde/exp.o
+BUSOBJS += $(BUSOBJ)/astrocde/ram.o
 endif
 
 
