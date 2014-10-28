@@ -304,7 +304,7 @@ static MACHINE_CONFIG_START( pencil2, pencil2_state )
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "pencil2_cart")
 
 	/* printer */
-	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "printer")
+	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
 	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(pencil2_state, write_centronics_ack))
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(pencil2_state, write_centronics_busy))
 

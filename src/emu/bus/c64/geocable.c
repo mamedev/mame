@@ -33,7 +33,7 @@ const device_type C64_GEOCABLE = &device_creator<c64_geocable_device>;
 //-------------------------------------------------
 
 static MACHINE_CONFIG_FRAGMENT( c64_geocable )
-	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "printer")
+	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(c64_geocable_device, output_b))
 MACHINE_CONFIG_END
 

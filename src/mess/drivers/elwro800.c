@@ -573,7 +573,7 @@ static MACHINE_CONFIG_START( elwro800, elwro800_state )
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(elwro800_state, i8255_port_c_w))
 
 	/* printer */
-	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "printer")
+	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
 	MCFG_CENTRONICS_DATA_INPUT_BUFFER("cent_data_in")
 	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(elwro800_state, write_centronics_ack))
 
