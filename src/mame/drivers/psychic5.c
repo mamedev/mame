@@ -489,8 +489,7 @@ static ADDRESS_MAP_START( bombsa_soundport_map, AS_IO, 8, psychic5_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bombsa_vrambank_map, AS_PROGRAM, 8, psychic5_state )
-	AM_RANGE(0x0000, 0x0fff) AM_RAM_WRITE(bg_videoram_w) AM_SHARE("bg_videoram")
-	AM_RANGE(0x1000, 0x1fff) AM_RAM
+	AM_RANGE(0x0000, 0x1fff) AM_RAM_WRITE(bg_videoram_w) AM_SHARE("bg_videoram")
 
 	AM_RANGE(0x2000, 0x2000) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x2001, 0x2001) AM_READ_PORT("P1")
