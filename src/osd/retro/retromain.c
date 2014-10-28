@@ -429,11 +429,11 @@ void Set_Path_Option(){
         Add_Option((char*)(opt_name[i]));
 
         if(opt_type[i]==0){
-            if(retro_save_directory!=NULL)sprintf(tmp_dir, "%s%c%s%c%s%c", retro_save_directory, slash, core, slash,dir_name[i],slash);
+            if(retro_save_directory!=NULL)sprintf(tmp_dir, "%s%c%s%c%s", retro_save_directory, slash, core, slash,dir_name[i]);
             else sprintf(tmp_dir, "%s%c%s%c%s%c", ".", slash, core, slash,dir_name[i],slash);
         }
         else {
-            if(retro_system_directory!=NULL)sprintf(tmp_dir, "%s%c%s%c%s%c", retro_system_directory, slash, core, slash,dir_name[i],slash);
+            if(retro_system_directory!=NULL)sprintf(tmp_dir, "%s%c%s%c%s", retro_system_directory, slash, core, slash,dir_name[i]);
             else sprintf(tmp_dir, "%s%c%s%c%s%c", ".", slash, core, slash,dir_name[i],slash);
         }
 
