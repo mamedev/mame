@@ -12,7 +12,7 @@
 #include "machine/msm6242.h"
 #include "machine/ram.h"
 
-#ifdef RETRO_AND
+#ifdef __ANDROID__
 #undef PAGE_MASK
 #endif
 
