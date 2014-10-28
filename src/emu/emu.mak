@@ -209,8 +209,7 @@ $(LIBEMU): $(LIBEMUOBJS)
 # CPU core objects
 #-------------------------------------------------
 
-#include $(EMUSRC)/cpu/cpu.mak
-include $(SRC)/osd/$(OSD)/mak/cpu.mak
+include $(EMUSRC)/cpu/cpu.mak
 
 $(LIBDASM): $(DASMOBJS)
 
