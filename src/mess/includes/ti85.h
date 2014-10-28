@@ -86,10 +86,10 @@ public:
 	UINT8 m_ON_interrupt_status;
 	UINT8 m_ON_pressed;
 	UINT8 m_flash_unlocked;
-	UINT8 m_ti8x_memory_page_0;
 	UINT8 m_ti8x_memory_page_1;
 	UINT8 m_ti8x_memory_page_2;
 	UINT8 m_ti8x_memory_page_3;
+	bool m_booting;
 	UINT8 m_LCD_mask;
 	UINT8 m_power_mode;
 	UINT8 m_cpu_speed;
@@ -217,6 +217,7 @@ public:
 	void ti85_setup_snapshot (UINT8 * data);
 	void ti86_setup_snapshot (UINT8 * data);
 	DECLARE_SNAPSHOT_LOAD_MEMBER( ti8x );
+	DECLARE_DIRECT_UPDATE_MEMBER( ti83p_direct_update_handler );
 	
 	ti83pse_timer m_ctimer[3];
 	

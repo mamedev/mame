@@ -154,7 +154,7 @@ void ti85_state::update_ti83p_memory ()
 {
 	//address_space &space = m_maincpu->space(AS_PROGRAM);
 
-	m_membank1->set_bank(0); //Always flash page 0, well allmost
+	m_membank1->set_bank(m_booting ? 0x1f : 0); //Always flash page 0, well allmost
 	
 	if (m_ti83p_port4 & 1)
 	{
@@ -182,7 +182,7 @@ void ti85_state::update_ti83pse_memory ()
 {
 	//address_space &space = m_maincpu->space(AS_PROGRAM);
 	
-	m_membank1->set_bank(m_ti8x_memory_page_0);
+	m_membank1->set_bank(m_booting ? (m_model==TI84P ? 0x3f : 0x7f) : 0);
 	
 	if (m_ti83p_port4 & 1)
  	{
@@ -273,30 +273,32 @@ MACHINE_RESET_MEMBER(ti85_state,ti85)
 	m_PCR = 0xc0;
 }
 
+DIRECT_UPDATE_MEMBER(ti85_state::ti83p_direct_update_handler)
+{
+	if (m_booting)
+	{
+        if (((m_ti83p_port4 & 1) && (address >= 0x4000 && address < 0xc000)) || (address >= 0x4000 && address < 0x8000))
+        {
+            m_booting = false;
+			update_ti83p_memory();
+		}
+    }
+	return address;
+}
+
+
 MACHINE_RESET_MEMBER(ti85_state,ti83p)
 {
 	m_red_out = 0x00;
 	m_white_out = 0x00;
 	m_PCR = 0xc0;
 
-	m_ti8x_memory_page_0 = 0;//0x1f;
 
-    if (m_model == TI83P)
-    {
-        m_ti8x_memory_page_1 = 0x1f;
-    }
-    else if (m_model == TI84P)
-    {
-        m_ti8x_memory_page_1 = 0x3f;
-    }
-    else
-    {
-	    m_ti8x_memory_page_1 = 0x7f;
-    }
-
+    m_ti8x_memory_page_1 = 0;
 	m_ti8x_memory_page_2 = 0;
 	m_ti8x_memory_page_3 = 0;
 	m_ti83p_port4 = 1;
+	m_booting = true;
 	if (m_model == TI83P)
     {
         update_ti83p_memory();
@@ -305,8 +307,6 @@ MACHINE_RESET_MEMBER(ti85_state,ti83p)
     {
         update_ti83pse_memory();
     }
-
-	m_maincpu->set_pc(0x8000);
 }
 
 MACHINE_START_MEMBER(ti85_state,ti83p)
@@ -314,14 +314,14 @@ MACHINE_START_MEMBER(ti85_state,ti83p)
 	m_model = TI83P;
 	//address_space &space = m_maincpu->space(AS_PROGRAM);
 	//m_bios = memregion("flash")->base();
+	m_maincpu->space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(FUNC(ti85_state::ti83p_direct_update_handler), this));
 
 	m_timer_interrupt_mask = 0;
 	m_timer_interrupt_status = 0;
 	m_ON_interrupt_mask = 0;
 	m_ON_interrupt_status = 0;
 	m_ON_pressed = 0;
-	m_ti8x_memory_page_0 = 0;//0x1f;
-	m_ti8x_memory_page_1 = 0x1f;
+	m_ti8x_memory_page_1 = 0;
 	m_ti8x_memory_page_2 = 0;
 	m_ti8x_memory_page_3 = 0;
 	m_LCD_memory_base = 0;
@@ -334,8 +334,9 @@ MACHINE_START_MEMBER(ti85_state,ti83p)
 	m_ti83p_port4 = 1;
 	m_flash_unlocked = 0;
 
+	m_booting = true;
+
     ti85_state::update_ti83p_memory();
-	m_maincpu->set_pc(0x8000); //this is a hack due to incomplete memory mapping emulation
 
 
 	machine().scheduler().timer_pulse(attotime::from_hz(256), timer_expired_delegate(FUNC(ti85_state::ti83_timer1_callback),this));
@@ -345,11 +346,11 @@ MACHINE_START_MEMBER(ti85_state,ti83p)
 	/* save states and debugging */
 	save_item(NAME(m_timer_interrupt_status));
     save_item(NAME(m_timer_interrupt_mask));
-	save_item(NAME(m_ti8x_memory_page_0));
 	save_item(NAME(m_ti8x_memory_page_1));
 	save_item(NAME(m_ti8x_memory_page_2));
 	save_item(NAME(m_ti8x_memory_page_3));
 	save_item(NAME(m_ti83p_port4));
+	save_item(NAME(m_booting));
 }
 
 void ti85_state::ti8xpse_init_common()
@@ -363,8 +364,7 @@ void ti85_state::ti8xpse_init_common()
 	m_ON_interrupt_mask = 0;
 	m_ON_interrupt_status = 0;
 	m_ON_pressed = 0;
-	m_ti8x_memory_page_0 = 00;//0x7f;
-	m_ti8x_memory_page_1 = (m_model != TI84P ) ? 0x7f : 0x3f ;
+	m_ti8x_memory_page_1 = 0;
 	m_ti8x_memory_page_2 = 0;
 	m_ti8x_memory_page_3 = 0;
 	m_LCD_memory_base = 0;
@@ -378,7 +378,7 @@ void ti85_state::ti8xpse_init_common()
 	m_flash_unlocked = 0;
 
 	ti85_state::update_ti83pse_memory();
-	m_maincpu->set_pc(0x8000);//same as above, hack to work around incomplete memory mapping emulation
+	m_maincpu->space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(FUNC(ti85_state::ti83p_direct_update_handler), this));
 
 
 	machine().scheduler().timer_pulse(attotime::from_hz(256), timer_expired_delegate(FUNC(ti85_state::ti83_timer1_callback),this));
@@ -391,7 +391,6 @@ void ti85_state::ti8xpse_init_common()
 		/* save states and debugging */
 	save_item(NAME(m_ctimer_interrupt_status));
 	save_item(NAME(m_timer_interrupt_status));
-	save_item(NAME(m_ti8x_memory_page_0));
 	save_item(NAME(m_ti8x_memory_page_1));
 	save_item(NAME(m_ti8x_memory_page_2));
 	save_item(NAME(m_ti8x_memory_page_3));
