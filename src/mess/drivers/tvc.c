@@ -788,7 +788,7 @@ static MACHINE_CONFIG_START( tvc, tvc_state )
 	MCFG_TVC_SOUND_SNDINT_CALLBACK(WRITELINE(tvc_state, int_ff_set))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
-	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_printers, "printer")
+	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_devices, "printer")
 	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(tvc_state, centronics_ack))
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")

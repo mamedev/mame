@@ -25,7 +25,7 @@ const device_type PRINTER_INTERFACE = &device_creator<printer_interface_device>;
 //-------------------------------------------------
 
 static MACHINE_CONFIG_FRAGMENT( printer_interface )
-	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "printer")
+	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(printer_interface_device, busy_w))
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("latch", "centronics")
 MACHINE_CONFIG_END

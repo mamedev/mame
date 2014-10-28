@@ -267,7 +267,7 @@ static MACHINE_CONFIG_START( tmc600, tmc600_state )
 	MCFG_FRAGMENT_ADD(tmc600_video)
 
 	/* devices */
-	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_printers, "printer")
+	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_devices, "printer")
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
 

@@ -887,7 +887,7 @@ static MACHINE_CONFIG_FRAGMENT( c1541pdc )
 	MCFG_PIA_WRITEPB_HANDLER(WRITE8(c1541_prologic_dos_classic_device, pia_pb_w))
 	MCFG_PIA_CA2_HANDLER(DEVWRITELINE(CENTRONICS_TAG, centronics_device, write_strobe))
 
-	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_printers, "printer")
+	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_devices, "printer")
 	MCFG_CENTRONICS_ACK_HANDLER(DEVWRITELINE(MC6821_TAG, pia6821_device, ca1_w))
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 MACHINE_CONFIG_END

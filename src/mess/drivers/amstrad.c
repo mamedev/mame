@@ -817,7 +817,7 @@ SLOT_INTERFACE_START(cpcplus_exp_cards)
 	SLOT_INTERFACE("amdrum", CPC_AMDRUM)
 SLOT_INTERFACE_END
 
-SLOT_INTERFACE_START(amstrad_printers)
+SLOT_INTERFACE_START(amstrad_centronics_devices)
 	SLOT_INTERFACE("pl80", COMX_PL80)
 	SLOT_INTERFACE("ex800", EPSON_EX800)
 	SLOT_INTERFACE("lx800", EPSON_LX800)
@@ -874,7 +874,7 @@ static MACHINE_CONFIG_START( amstrad_nofdc, amstrad_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* printer */
-	MCFG_CENTRONICS_ADD("centronics", amstrad_printers, "printer")
+	MCFG_CENTRONICS_ADD("centronics", amstrad_centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(amstrad_state, write_centronics_busy))
 
 	/* snapshot */
@@ -969,7 +969,7 @@ static MACHINE_CONFIG_START( cpcplus, amstrad_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* printer */
-	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "printer")
+	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(amstrad_state, write_centronics_busy))
 
 	/* snapshot */

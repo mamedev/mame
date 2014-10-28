@@ -283,7 +283,7 @@ static MACHINE_CONFIG_START( isbc286, isbc_state )
 	MCFG_I8255_IN_PORTB_CB(DEVREAD8("cent_status_in", input_buffer_device, read))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(isbc_state, ppi_c_w))
 
-	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "printer")
+	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
 	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(isbc_state, write_centronics_ack))
 	MCFG_CENTRONICS_BUSY_HANDLER(DEVWRITELINE("cent_status_in", input_buffer_device, write_bit7))
 	MCFG_CENTRONICS_FAULT_HANDLER(DEVWRITELINE("cent_status_in", input_buffer_device, write_bit6))

@@ -500,7 +500,7 @@ static MACHINE_CONFIG_FRAGMENT( grip )
 	MCFG_Z80STI_OUT_TCO_CB(DEVWRITELINE(Z80STI_TAG, z80sti_device, tc_w))
 	MCFG_Z80STI_OUT_TDO_CB(DEVWRITELINE(Z80STI_TAG, z80sti_device, tc_w))
 
-	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_printers, "printer")
+	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(grip_device, write_centronics_busy))
 	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE(grip_device, write_centronics_fault))
 

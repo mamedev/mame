@@ -426,8 +426,7 @@ static MACHINE_CONFIG_START( sorcerer, sorcerer_state )
 	MCFG_AY31015_RX_CLOCK(4800.0)
 
 	/* printer */
-	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "covox")
-	MCFG_SLOT_OPTION_ADD( "covox", CENTRONICS_COVOX )
+	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "covox")
 
 	/* The use of the parallel port as a general purpose port is not emulated.
 	Currently the only use is to read the printer status in the Centronics CENDRV bios routine. */
