@@ -120,7 +120,7 @@ endif
 	AR = @ar
 	LD = g++ 
 	CCOMFLAGS += $(PLATCFLAGS) -ffast-math  
-	LIBS += -lstdc++ -lpthread
+	LIBS += -lstdc++ -lpthread -ldl
 ifeq ($(firstword $(filter x86_64,$(UNAME))),x86_64)
 PTR64 = 1
 endif
@@ -671,18 +671,7 @@ JPEG_LIB =
 endif
 
 # add SQLite3 library
-ifeq ($(TARGETOS), win32)
-SQLITE3_LIB = $(OBJ)/libsqlite3.a
-else ifeq ($(platform), android)
-SQLITE3_LIB = $(OBJ)/libsqlite3.a
-else ifeq ($(platform), osx)
-SQLITE3_LIB = $(OBJ)/libsqlite3.a
-else ifeq ($(platform), ios)
-SQLITE3_LIB = $(OBJ)/libsqlite3.a
-else
-SQLITE3_LIB = $(OBJ)/libsqlite3.a -ldl
-endif
-
+SQLITE3_LIB = $(OBJ)/libsqlite3.a 
 
 # add SoftFloat floating point emulation library
 SOFTFLOAT = $(OBJ)/libsoftfloat.a
