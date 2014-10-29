@@ -380,6 +380,8 @@ void snes_ppu_device::device_reset()
 	m_cgram_address = 0;
 	m_read_ophct = 0;
 	m_read_opvct = 0;
+
+	m_vmadd = 0;
 	
 	PPU_REG(VMAIN) = 0x80;
 	// what about other regs?

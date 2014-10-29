@@ -47,6 +47,9 @@
 #include "machine/pit8253.h"
 #include "machine/315_5296.h"
 #include "sound/2612intf.h"
+#include "sound/upd7759.h"
+
+#include "segaufo.lh"
 
 
 /* simulation parameters */
@@ -69,10 +72,12 @@ class ufo_state : public driver_device
 public:
 	ufo_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu")
+		m_maincpu(*this, "maincpu"),
+		m_upd(*this, "upd")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
+	optional_device<upd7759_device> m_upd;
 	
 	struct Player
 	{
@@ -103,6 +108,7 @@ public:
 	virtual void machine_reset();
 	virtual void machine_start();
 	TIMER_DEVICE_CALLBACK_MEMBER(simulate_xyz);
+	TIMER_DEVICE_CALLBACK_MEMBER(update_info);
 };
 
 
@@ -123,13 +129,19 @@ void ufo_state::motor_tick(int p, int m)
 		m_player[p].motor[m].position = 1;
 }
 
-
 TIMER_DEVICE_CALLBACK_MEMBER(ufo_state::simulate_xyz)
 {
 	for (int p = 0; p < 2; p++)
 		for (int m = 0; m < 3; m++)
 			motor_tick(p, m);
 }
+
+
+TIMER_DEVICE_CALLBACK_MEMBER(ufo_state::update_info)
+{
+	;
+}
+
 
 /***************************************************************************
 
@@ -144,14 +156,14 @@ WRITE_LINE_MEMBER(ufo_state::pit_out0)
 
 WRITE_LINE_MEMBER(ufo_state::pit_out1)
 {
-	// ?
+	// NMI?
+	if (state)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 WRITE_LINE_MEMBER(ufo_state::pit_out2)
 {
-	// NMI?
-	if (state)
-		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	// ?
 }
 
 
@@ -370,20 +382,31 @@ void ufo_state::machine_reset()
 
 void ufo_state::machine_start()
 {
-	// init/zerofill
+	// init/zerofill/register for savestates
 	static const float motor_speeds[4] =
 		{ 1.0f/CABINET_WIDTH, 1.0f/CABINET_DEPTH, 1.0f/CABINET_HEIGHT, 1.0f/CRANE_SIZE };
 	
-	for (int p = 0; p < 2; p++)
+	for (int m = 0; m < 4; m++)
 	{
-		for (int m = 0; m < 4; m++)
+		for (int p = 0; p < 2; p++)
 		{
 			m_player[p].motor[m].running = 0;
 			m_player[p].motor[m].direction = 0;
 			m_player[p].motor[m].position = 0.5;
 			m_player[p].motor[m].speed = motor_speeds[m];
 		}
+
+		save_item(NAME(m_player[0].motor[m].running), m);
+		save_item(NAME(m_player[0].motor[m].direction), m);
+		save_item(NAME(m_player[0].motor[m].position), m);
+
+		save_item(NAME(m_player[1].motor[m].running), m);
+		save_item(NAME(m_player[1].motor[m].direction), m);
+		save_item(NAME(m_player[1].motor[m].position), m);
 	}
+	
+	m_stepper = 0;
+	save_item(NAME(m_stepper));
 }
 
 WRITE_LINE_MEMBER(ufo_state::ym3438_irq)
@@ -399,6 +422,7 @@ static MACHINE_CONFIG_START( ufo, ufo_state )
 	MCFG_CPU_IO_MAP(ufo_portmap)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("motor_timer", ufo_state, simulate_xyz, attotime::from_hz(MOTOR_SPEED))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("update_timer", ufo_state, update_info, attotime::from_hz(60))
 	
 	MCFG_DEVICE_ADD("io1", SEGA_315_5296, 16000000)
 	// all ports set to input
@@ -490,10 +514,10 @@ ROM_START( ufo800 )
 ROM_END
 
 
-GAME (1991, newufo,       0,      ufo, ufo, driver_device, 0, ROT0, "Sega", "New UFO Catcher (standard)", GAME_MECHANICAL )
-GAME (1991, newufo_sonic, newufo, ufo, ufo, driver_device, 0, ROT0, "Sega", "New UFO Catcher (Sonic The Hedgehog)", GAME_MECHANICAL )
-GAME (1991, newufo_nfl,   newufo, ufo, ufo, driver_device, 0, ROT0, "Sega", "New UFO Catcher (Team NFL)", GAME_MECHANICAL )
-GAME (1991, newufo_xmas,  newufo, ufo, ufo, driver_device, 0, ROT0, "Sega", "New UFO Catcher (Christmas season ROM kit)", GAME_MECHANICAL )
-GAME (1991, ufomini,      0,      ufo, ufo, driver_device, 0, ROT0, "Sega", "UFO Catcher Mini", GAME_NOT_WORKING | GAME_MECHANICAL )
-GAME (1996, ufo21,        0,      ufo, ufo, driver_device, 0, ROT0, "Sega", "UFO Catcher 21", GAME_NOT_WORKING | GAME_MECHANICAL )
-GAME (1998, ufo800,       0,      ufo, ufo, driver_device, 0, ROT0, "Sega", "UFO Catcher 800", GAME_NOT_WORKING | GAME_MECHANICAL )
+GAMEL( 1991, newufo,       0,      ufo, ufo, driver_device, 0, ROT0, "Sega", "New UFO Catcher (standard)", GAME_MECHANICAL | GAME_SUPPORTS_SAVE, layout_segaufo )
+GAMEL( 1991, newufo_sonic, newufo, ufo, ufo, driver_device, 0, ROT0, "Sega", "New UFO Catcher (Sonic The Hedgehog)", GAME_MECHANICAL | GAME_SUPPORTS_SAVE, layout_segaufo )
+GAMEL( 1991, newufo_nfl,   newufo, ufo, ufo, driver_device, 0, ROT0, "Sega", "New UFO Catcher (Team NFL)", GAME_MECHANICAL | GAME_SUPPORTS_SAVE, layout_segaufo )
+GAMEL( 1991, newufo_xmas,  newufo, ufo, ufo, driver_device, 0, ROT0, "Sega", "New UFO Catcher (Christmas season ROM kit)", GAME_MECHANICAL | GAME_SUPPORTS_SAVE, layout_segaufo )
+GAMEL( 1991, ufomini,      0,      ufo, ufo, driver_device, 0, ROT0, "Sega", "UFO Catcher Mini", GAME_NOT_WORKING | GAME_MECHANICAL | GAME_SUPPORTS_SAVE, layout_segaufo )
+GAMEL( 1996, ufo21,        0,      ufo, ufo, driver_device, 0, ROT0, "Sega", "UFO Catcher 21", GAME_NOT_WORKING | GAME_MECHANICAL | GAME_SUPPORTS_SAVE, layout_segaufo )
+GAMEL( 1998, ufo800,       0,      ufo, ufo, driver_device, 0, ROT0, "Sega", "UFO Catcher 800", GAME_NOT_WORKING | GAME_MECHANICAL | GAME_SUPPORTS_SAVE, layout_segaufo )

@@ -2833,6 +2833,8 @@ $(DRIVERS)/segaorun.o:  $(LAYOUT)/outrun.lh
 
 $(DRIVERS)/segas32.o:   $(LAYOUT)/radr.lh
 
+$(DRIVERS)/segaufo.o:   $(LAYOUT)/segaufo.lh
+
 $(DRIVERS)/segaybd.o:   $(LAYOUT)/pdrift.lh
 
 $(DRIVERS)/sigmab52.o:  $(LAYOUT)/sigmab52.lh
