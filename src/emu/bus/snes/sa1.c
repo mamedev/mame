@@ -96,11 +96,15 @@ sns_sa1_device::sns_sa1_device(const machine_config &mconfig, const char *tag, d
 
 void sns_sa1_device::device_start()
 {
+	m_scpu_ctrl = 0;
+	m_nmi_vector = 0;
+	m_bank_c_hi = 0;
+	m_bank_c_rom = 0;
 }
 
 void sns_sa1_device::device_reset()
 {
-	memset(m_internal_ram, 0, 0x800);
+	memset(m_internal_ram, 0, sizeof(m_internal_ram));
 
 	m_sa1_ctrl = 0x20;
 	m_scpu_ctrl = 0;
@@ -127,7 +131,7 @@ void sns_sa1_device::device_reset()
 	m_iram_write_sa1 = 1;
 	m_src_addr = 0;
 	m_dst_addr = 0;
-	memset(m_brf_reg, 0, 0x10);
+	memset(m_brf_reg, 0, sizeof(m_brf_reg));
 	m_math_ctlr = 0;
 	m_math_overflow = 0;
 	m_math_a = 0;
