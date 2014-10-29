@@ -73,10 +73,14 @@ public:
 	ufo_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_io1(*this, "io1"),
+		m_io2(*this, "io2"),
 		m_upd(*this, "upd")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
+	required_device<sega_315_5296_device> m_io1;
+	required_device<sega_315_5296_device> m_io2;
 	optional_device<upd7759_device> m_upd;
 	
 	struct Player
@@ -113,7 +117,6 @@ public:
 
 
 
-
 void ufo_state::motor_tick(int p, int m)
 {
 	float delta = m_player[p].motor[m].speed;
@@ -139,8 +142,23 @@ TIMER_DEVICE_CALLBACK_MEMBER(ufo_state::simulate_xyz)
 
 TIMER_DEVICE_CALLBACK_MEMBER(ufo_state::update_info)
 {
-	;
+#if 0
+	char msg1[0x100]={0};
+	char msg2[0x100]={0};
+	for (int i = 0; i < 8; i++)
+	{
+		sprintf(msg2, "%02X ", m_io2->debug_peek_output(i));
+		strcat(msg1, msg2);
+	}
+	for (int i = 0; i < 4; i++)
+	{
+		sprintf(msg2, "\n%d %05f", i, m_player[0].motor[i].position);
+		strcat(msg1, msg2);
+	}
+	popmessage("%s", msg1);
+#endif
 }
+
 
 
 /***************************************************************************
@@ -246,7 +264,7 @@ WRITE8_MEMBER(ufo_state::ufo_lamps_w)
 READ8_MEMBER(ufo_state::crane_limits_r)
 {
 	int p = offset & 1;
-	UINT8 ret = 0xff;
+	UINT8 ret = 0x7f;
 
 	// d0: left limit sw (right for p2)
 	// d1: right limit sw (left for p2)
@@ -264,11 +282,11 @@ READ8_MEMBER(ufo_state::crane_limits_r)
 	if (m_player[p].motor[3].position >= 0.97)
 		ret ^= 0x40;
 	
-	// d7: ?
+	// d7: prize sensor (mirror?)
+	ret |= (ioport(p ? "P2" : "P1")->read() & 0x80);
 
 	return ret;
 }
-
 
 
 
@@ -294,7 +312,7 @@ ADDRESS_MAP_END
 
 ***************************************************************************/
 
-static INPUT_PORTS_START( ufo )
+static INPUT_PORTS_START( newufo )
 	PORT_START("P1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_NAME("P1 Coin 1")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_NAME("P1 Coin 2")
@@ -354,7 +372,7 @@ static INPUT_PORTS_START( ufo )
 	PORT_DIPNAME( 0x08, 0x08, "UNK2-08" )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "UNK2-10 Enable Prize Sensor" )
+	PORT_DIPNAME( 0x10, 0x10, "UNK2-10 Disable Prize Sensor" )
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x20, 0x20, "UNK2-20" )
@@ -366,6 +384,13 @@ static INPUT_PORTS_START( ufo )
 	PORT_DIPNAME( 0x80, 0x80, "UNK2-80" )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( ufomini )
+	PORT_INCLUDE( newufo )
+
+	PORT_MODIFY("P2")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 
@@ -414,7 +439,7 @@ WRITE_LINE_MEMBER(ufo_state::ym3438_irq)
 	m_maincpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static MACHINE_CONFIG_START( ufo, ufo_state )
+static MACHINE_CONFIG_START( newufo, ufo_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 8000000)
@@ -428,8 +453,6 @@ static MACHINE_CONFIG_START( ufo, ufo_state )
 	// all ports set to input
 	MCFG_315_5296_IN_PORTA_CB(READ8(ufo_state, crane_limits_r))
 	MCFG_315_5296_IN_PORTB_CB(READ8(ufo_state, crane_limits_r))
-//	MCFG_315_5296_IN_PORTC_CB(NOOP)
-//	MCFG_315_5296_IN_PORTD_CB(NOOP)
 	MCFG_315_5296_IN_PORTE_CB(IOPORT("P1"))
 	MCFG_315_5296_IN_PORTF_CB(IOPORT("DSW1"))
 	MCFG_315_5296_IN_PORTG_CB(IOPORT("DSW2"))
@@ -444,7 +467,6 @@ static MACHINE_CONFIG_START( ufo, ufo_state )
 	MCFG_315_5296_OUT_PORTE_CB(WRITE8(ufo_state, crane_xyz_w))
 	MCFG_315_5296_OUT_PORTF_CB(WRITE8(ufo_state, crane_xyz_w))
 	MCFG_315_5296_OUT_PORTG_CB(WRITE8(ufo_state, ufo_lamps_w))
-//	MCFG_315_5296_OUT_PORTH_CB(NOOP)
 
 	MCFG_DEVICE_ADD("pit", PIT8254, 0) // uPD71054C, configuration is unknown
 	MCFG_PIT8253_CLK0(8000000/256)
@@ -463,6 +485,15 @@ static MACHINE_CONFIG_START( ufo, ufo_state )
 	MCFG_YM2612_IRQ_HANDLER(WRITELINE(ufo_state, ym3438_irq))
 	MCFG_SOUND_ROUTE(0, "mono", 0.40)
 	MCFG_SOUND_ROUTE(1, "mono", 0.40)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( ufomini, newufo )
+
+	/* basic machine hardware */
+	MCFG_DEVICE_MODIFY("io1")
+	MCFG_315_5296_IN_PORTC_CB(IOPORT("P1"))
+	MCFG_315_5296_IN_PORTE_CB(NOOP)
+	MCFG_315_5296_IN_PORTH_CB(NOOP)
 MACHINE_CONFIG_END
 
 
@@ -514,10 +545,10 @@ ROM_START( ufo800 )
 ROM_END
 
 
-GAMEL( 1991, newufo,       0,      ufo, ufo, driver_device, 0, ROT0, "Sega", "New UFO Catcher (standard)", GAME_MECHANICAL | GAME_SUPPORTS_SAVE, layout_segaufo )
-GAMEL( 1991, newufo_sonic, newufo, ufo, ufo, driver_device, 0, ROT0, "Sega", "New UFO Catcher (Sonic The Hedgehog)", GAME_MECHANICAL | GAME_SUPPORTS_SAVE, layout_segaufo )
-GAMEL( 1991, newufo_nfl,   newufo, ufo, ufo, driver_device, 0, ROT0, "Sega", "New UFO Catcher (Team NFL)", GAME_MECHANICAL | GAME_SUPPORTS_SAVE, layout_segaufo )
-GAMEL( 1991, newufo_xmas,  newufo, ufo, ufo, driver_device, 0, ROT0, "Sega", "New UFO Catcher (Christmas season ROM kit)", GAME_MECHANICAL | GAME_SUPPORTS_SAVE, layout_segaufo )
-GAMEL( 1991, ufomini,      0,      ufo, ufo, driver_device, 0, ROT0, "Sega", "UFO Catcher Mini", GAME_NOT_WORKING | GAME_MECHANICAL | GAME_SUPPORTS_SAVE, layout_segaufo )
-GAMEL( 1996, ufo21,        0,      ufo, ufo, driver_device, 0, ROT0, "Sega", "UFO Catcher 21", GAME_NOT_WORKING | GAME_MECHANICAL | GAME_SUPPORTS_SAVE, layout_segaufo )
-GAMEL( 1998, ufo800,       0,      ufo, ufo, driver_device, 0, ROT0, "Sega", "UFO Catcher 800", GAME_NOT_WORKING | GAME_MECHANICAL | GAME_SUPPORTS_SAVE, layout_segaufo )
+GAMEL( 1991, newufo,       0,      newufo,  newufo,  driver_device, 0, ROT0, "Sega", "New UFO Catcher (standard)", GAME_MECHANICAL | GAME_SUPPORTS_SAVE, layout_segaufo )
+GAMEL( 1991, newufo_sonic, newufo, newufo,  newufo,  driver_device, 0, ROT0, "Sega", "New UFO Catcher (Sonic The Hedgehog)", GAME_MECHANICAL | GAME_SUPPORTS_SAVE, layout_segaufo )
+GAMEL( 1991, newufo_nfl,   newufo, newufo,  newufo,  driver_device, 0, ROT0, "Sega", "New UFO Catcher (Team NFL)", GAME_MECHANICAL | GAME_SUPPORTS_SAVE, layout_segaufo )
+GAMEL( 1991, newufo_xmas,  newufo, newufo,  newufo,  driver_device, 0, ROT0, "Sega", "New UFO Catcher (Christmas season ROM kit)", GAME_MECHANICAL | GAME_SUPPORTS_SAVE, layout_segaufo )
+GAMEL( 1991, ufomini,      0,      ufomini, ufomini, driver_device, 0, ROT0, "Sega", "UFO Catcher Mini", GAME_MECHANICAL | GAME_SUPPORTS_SAVE, layout_segaufo )
+GAMEL( 1996, ufo21,        0,      newufo,  newufo,  driver_device, 0, ROT0, "Sega", "UFO Catcher 21", GAME_NOT_WORKING | GAME_MECHANICAL | GAME_SUPPORTS_SAVE, layout_segaufo )
+GAMEL( 1998, ufo800,       0,      newufo,  newufo,  driver_device, 0, ROT0, "Sega", "UFO Catcher 800", GAME_NOT_WORKING | GAME_MECHANICAL | GAME_SUPPORTS_SAVE, layout_segaufo )
