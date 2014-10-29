@@ -1005,6 +1005,7 @@
 		<description>Toiyar</description>
 		<year>198?</year>
 		<publisher>Sammi Computer</publisher>
+		<info name="alt_title" value="토이야" />
 		<part name="cass" interface="spc1000_cass">
 			<dataarea name="cass" size="68050">
 				<rom name="toyar-4852-mayhouse.cas" size="68050" crc="ed454d5c" sha1="18b1ac12709136e4e03d3a7d4ead4a1d00c232ca" offset="0" />
