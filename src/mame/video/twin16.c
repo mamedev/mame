@@ -21,10 +21,10 @@ enum
 {
 	TWIN16_SCREEN_FLIPY     = 0x01,
 	TWIN16_SCREEN_FLIPX     = 0x02, // confirmed: Hard Puncher Intro
-	TWIN16_UNKNOWN1         = 0x04, // ? Hard Puncher uses this
+	TWIN16_UNKNOWN_PRI0     = 0x04, // ? Hard Puncher uses this
 	TWIN16_PLANE_ORDER      = 0x08, // confirmed: Devil Worlds
-	TWIN16_TILE_FLIPX       = 0x10, // unused?
-	TWIN16_TILE_FLIPY       = 0x20  // confirmed? Vulcan Venture
+	TWIN16_UNKNOWN_PRI2     = 0x10, // unused?
+	TWIN16_TILE_FLIPY       = 0x20  // confirmed: Vulcan Venture
 };
 
 enum
@@ -107,7 +107,7 @@ WRITE16_MEMBER(twin16_state::video_register_w)
 				flip |= (m_video_register&TWIN16_SCREEN_FLIPY) ? TILEMAP_FLIPY : 0;
 				machine().tilemap().set_flip_all(flip);
 			}
-			if (changed & (TWIN16_TILE_FLIPX | TWIN16_TILE_FLIPY))
+			if (changed & TWIN16_TILE_FLIPY)
 			{
 				m_scroll_tmap[0]->mark_all_dirty();
 				m_scroll_tmap[1]->mark_all_dirty();
@@ -418,7 +418,6 @@ void twin16_state::tile_get_info(tile_data &tileinfo, UINT16 data, int color_bas
 	int code = (data & 0x1fff);
 	int color = color_base + (data >> 13);
 	int flags = 0;
-	if (m_video_register & TWIN16_TILE_FLIPX) flags |= TILE_FLIPX;
 	if (m_video_register & TWIN16_TILE_FLIPY) flags |= TILE_FLIPY;
 	SET_TILE_INFO_MEMBER(1, code, color, flags);
 }
@@ -434,7 +433,6 @@ void fround_state::tile_get_info(tile_data &tileinfo, UINT16 data, int color_bas
 	int code = (m_gfx_bank[bank] << 11) | (data & 0x7ff);
 	int color = color_base | (data >> 13);
 	int flags = 0;
-	if (m_video_register & TWIN16_TILE_FLIPX) flags |= TILE_FLIPX;
 	if (m_video_register & TWIN16_TILE_FLIPY) flags |= TILE_FLIPY;
 	SET_TILE_INFO_MEMBER(1, code, color, flags);
 }
