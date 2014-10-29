@@ -22,10 +22,12 @@ class astrocde_mess_state : public astrocde_state
 public:
 	astrocde_mess_state(const machine_config &mconfig, device_type type, const char *tag)
 		: astrocde_state(mconfig, type, tag),
-		m_cart(*this, "cartslot")
+		m_cart(*this, "cartslot"),
+		m_exp(*this, "exp")
 		{ }
 
 	required_device<astrocade_cart_slot_device> m_cart;
+	required_device<astrocade_exp_device> m_exp;
 	DECLARE_MACHINE_START(astrocde);
 };
 
@@ -47,7 +49,7 @@ static ADDRESS_MAP_START( astrocade_mem, AS_PROGRAM, 8, astrocde_mess_state )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM AM_WRITE(astrocade_funcgen_w)
 	AM_RANGE(0x1000, 0x3fff) AM_ROM /* Star Fortress writes in here?? */
 	AM_RANGE(0x4000, 0x4fff) AM_RAM AM_SHARE("videoram") /* ASG */
-	AM_RANGE(0x5000, 0xffff) AM_DEVREADWRITE("exp", astrocade_exp_device, read, write)
+	//AM_RANGE(0x5000, 0xffff) AM_DEVREADWRITE("exp", astrocade_exp_device, read, write)
 ADDRESS_MAP_END
 
 
@@ -252,6 +254,11 @@ MACHINE_START_MEMBER(astrocde_mess_state, astrocde)
 {
 	if (m_cart->exists())
 		m_maincpu->space(AS_PROGRAM).install_read_handler(0x2000, 0x3fff, read8_delegate(FUNC(astrocade_cart_slot_device::read_rom),(astrocade_cart_slot_device*)m_cart));
+
+	// if no RAM is mounted and the handlers are installed, the system starts with garbage on screen and a RESET is necessary
+	// thus, install RAM only if an expansion is mounted
+	if (m_exp->get_card_mounted())
+		m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x5000, 0xffff, read8_delegate(FUNC(astrocade_exp_device::read),(astrocade_exp_device*)m_exp), write8_delegate(FUNC(astrocade_exp_device::write),(astrocade_exp_device*)m_exp));
 }
 
 /*************************************
