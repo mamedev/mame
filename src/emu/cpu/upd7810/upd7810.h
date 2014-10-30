@@ -308,6 +308,8 @@ protected:
 	UINT8   m_edges;  /* rising/falling edge flag for serial I/O */
 	UINT16  m_adcnt;  /* A/D converter cycle count */
 	UINT8   m_adtot;  /* A/D converter total cycles per conversion */
+	UINT8   m_tmpcr;  /* temporary analog digital conversion register */
+	int     m_shdone; /* A/D converter sample and hold done */
 	int     m_adout;  /* currently selected A/D converter output register */
 	int     m_adin;   /* currently selected A/D converter input */
 	int     m_adrange;/* in scan mode, A/D converter range (AN0-AN3 or AN4-AN7) */

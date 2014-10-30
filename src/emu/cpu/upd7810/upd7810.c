@@ -1524,62 +1524,70 @@ void upd7810_device::handle_timers(int cycles)
 	if (ANM & 0x01)
 	{
 		/* select mode */
-		while (m_adcnt > m_adtot)
+		if (m_shdone == 0)
 		{
-			UINT8 cr = 0;
-			m_adcnt -= m_adtot;
 			switch (m_adin)
 			{
-				case 0: cr = m_an0_func(); break;
-				case 1: cr = m_an1_func(); break;
-				case 2: cr = m_an2_func(); break;
-				case 3: cr = m_an3_func(); break;
-				case 4: cr = m_an4_func(); break;
-				case 5: cr = m_an5_func(); break;
-				case 6: cr = m_an6_func(); break;
-				case 7: cr = m_an7_func(); break;
+				case 0: m_tmpcr = m_an0_func(); break;
+				case 1: m_tmpcr = m_an1_func(); break;
+				case 2: m_tmpcr = m_an2_func(); break;
+				case 3: m_tmpcr = m_an3_func(); break;
+				case 4: m_tmpcr = m_an4_func(); break;
+				case 5: m_tmpcr = m_an5_func(); break;
+				case 6: m_tmpcr = m_an6_func(); break;
+				case 7: m_tmpcr = m_an7_func(); break;
 			}
+			m_shdone = 1;
+		}
+		if (m_adcnt > m_adtot)
+		{
+			m_adcnt -= m_adtot;
 			switch (m_adout)
 			{
-				case 0: CR0 = cr; break;
-				case 1: CR1 = cr; break;
-				case 2: CR2 = cr; break;
-				case 3: CR3 = cr; break;
+				case 0: CR0 = m_tmpcr; break;
+				case 1: CR1 = m_tmpcr; break;
+				case 2: CR2 = m_tmpcr; break;
+				case 3: CR3 = m_tmpcr; break;
 			}
 			m_adout = (m_adout + 1) & 0x03;
 			if (m_adout == 0)
 				IRR |= INTFAD;
+			m_shdone = 0;
 		}
 	}
 	else
 	{
 		/* scan mode */
-		while (m_adcnt > m_adtot)
+		if (m_shdone == 0)
 		{
-			UINT8 cr = 0;
-			m_adcnt -= m_adtot;
 			switch (m_adin | m_adrange)
 			{
-				case 0: cr = m_an0_func(); break;
-				case 1: cr = m_an1_func(); break;
-				case 2: cr = m_an2_func(); break;
-				case 3: cr = m_an3_func(); break;
-				case 4: cr = m_an4_func(); break;
-				case 5: cr = m_an5_func(); break;
-				case 6: cr = m_an6_func(); break;
-				case 7: cr = m_an7_func(); break;
+				case 0: m_tmpcr = m_an0_func(); break;
+				case 1: m_tmpcr = m_an1_func(); break;
+				case 2: m_tmpcr = m_an2_func(); break;
+				case 3: m_tmpcr = m_an3_func(); break;
+				case 4: m_tmpcr = m_an4_func(); break;
+				case 5: m_tmpcr = m_an5_func(); break;
+				case 6: m_tmpcr = m_an6_func(); break;
+				case 7: m_tmpcr = m_an7_func(); break;
 			}
+			m_shdone = 1;
+		}
+		if (m_adcnt > m_adtot)
+		{
+			m_adcnt -= m_adtot;
 			switch (m_adout)
 			{
-				case 0: CR0 = cr; break;
-				case 1: CR1 = cr; break;
-				case 2: CR2 = cr; break;
-				case 3: CR3 = cr; break;
+				case 0: CR0 = m_tmpcr; break;
+				case 1: CR1 = m_tmpcr; break;
+				case 2: CR2 = m_tmpcr; break;
+				case 3: CR3 = m_tmpcr; break;
 			}
 			m_adin  = (m_adin  + 1) & 0x07;
 			m_adout = (m_adout + 1) & 0x03;
 			if (m_adout == 0)
 				IRR |= INTFAD;
+			m_shdone = 0;
 		}
 	}
 
@@ -1902,6 +1910,8 @@ void upd7810_device::device_reset()
 	m_edges = 0;
 	m_adcnt = 0;
 	m_adtot = 0;
+	m_tmpcr = 0;
+	m_shdone = 0;
 	m_adout = 0;
 	m_adin = 0;
 	m_adrange = 0;
