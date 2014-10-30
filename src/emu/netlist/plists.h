@@ -10,12 +10,6 @@
 #ifndef PLISTS_H_
 #define PLISTS_H_
 
-#ifdef __LIBRETRO__
-#ifdef __ANDROID__
-#undef _C
-#endif
-#endif
-
 #include "nl_config.h"
 #include "pstring.h"
 

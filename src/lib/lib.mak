@@ -520,6 +520,10 @@ ifeq ($(TARGETOS),macosx)
 LUA_FLAGS += -DLUA_USE_POSIX
 endif
 
+ifeq ($(platform),android)
+LUA_FLAGS += -D"getlocaledecpoint() ='.'"
+endif
+
 $(LIBOBJ)/lua/%.o: $(LIBSRC)/lua/%.c | $(OSPREBUILD)
 	@echo Compiling $<...
 	$(CC_AS) $(CDEFS) $(CCOMFLAGS) $(CONLYFLAGS) -DLUA_COMPAT_ALL $(LUA_FLAGS) -c $< -o $@

@@ -52,6 +52,12 @@ empty
 #define atomic_increment32(ptr) (atomic_add32(ptr, 1))
 #define atomic_decrement32(ptr) (atomic_add32(ptr, -1))
 #define get_profile_ticks() (osd_ticks())
+#else
+//undef some android marco (netlist&samcoupe&n64)
+#undef _C
+#undef _L
+#undef PAGE_MASK
+#undef si_status
 #endif
 
 #include "eminline.h"
