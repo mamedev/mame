@@ -202,3 +202,8 @@ void ata_flash_pccard_device::process_buffer()
 		ide_hdd_device::process_buffer();
 	}
 }
+
+attotime ata_flash_pccard_device::seek_time()
+{
+	return attotime::zero;
+}
