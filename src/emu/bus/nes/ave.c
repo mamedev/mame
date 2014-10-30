@@ -79,7 +79,6 @@ void nes_nina006_device::pcb_reset()
 	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	prg32(0);
 	chr8(0, m_chr_source);
-	set_nt_mirroring(PPU_MIRROR_HORZ);
 }
 
 
@@ -164,7 +163,7 @@ WRITE8_MEMBER(nes_nina006_device::write_l)
 	if (!(offset & 0x0100))
 	{
 		prg32(data >> 3);
-		chr8(data, CHRROM);
+		chr8(data & 7, CHRROM);
 	}
 }
 
