@@ -17,7 +17,7 @@ Four cartridges were made for this computer one of which was a hardware device, 
 	<software name="basicpac">
 		<description>Exidy Standard Basic v1.0</description>
 		<year>1978</year>
-		<publisher>Exidy Inc.</publisher>
+		<publisher>Exidy</publisher>
 		<info name="serial" value="DP 2002" />
 		<part name="cart" interface="sorcerer_cart">
 			<dataarea name="rom" size="8192">
@@ -29,7 +29,7 @@ Four cartridges were made for this computer one of which was a hardware device, 
 	<software name="devpac">
 		<description>Exidy Z80 Development Pac</description>
 		<year>1979</year>
-		<publisher>Exidy Inc.</publisher>
+		<publisher>Exidy</publisher>
 		<info name="serial" value="DP 2003" />
 		<part name="cart" interface="sorcerer_cart">
 			<dataarea name="rom" size="8192">
@@ -41,7 +41,7 @@ Four cartridges were made for this computer one of which was a hardware device, 
 	<software name="wordpac">
 		<description>Exidy Word Processor Pac</description>
 		<year>1978</year>
-		<publisher>Exidy Inc.</publisher>
+		<publisher>Exidy</publisher>
 		<info name="serial" value="DP 2004" />
 		<part name="cart" interface="sorcerer_cart">
 			<dataarea name="rom" size="8192">
@@ -50,7 +50,7 @@ Four cartridges were made for this computer one of which was a hardware device, 
 		</part>
 	</software>
 
-	<software name="basicm">
+	<software name="basicmod">
 		<description>Exidy Standard Modified Basic v1.01</description>
 		<!-- Unofficial Hack Release -->
 		<year>1980</year>
