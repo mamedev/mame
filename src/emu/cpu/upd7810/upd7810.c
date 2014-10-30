@@ -1546,7 +1546,7 @@ void upd7810_device::handle_timers(int cycles)
 				case 2: CR2 = cr; break;
 				case 3: CR3 = cr; break;
 			}
-			m_adout = (m_adout + 1) & 0x07;
+			m_adout = (m_adout + 1) & 0x03;
 			if (m_adout == 0)
 				IRR |= INTFAD;
 		}
@@ -1577,7 +1577,7 @@ void upd7810_device::handle_timers(int cycles)
 				case 3: CR3 = cr; break;
 			}
 			m_adin  = (m_adin  + 1) & 0x07;
-			m_adout = (m_adout + 1) & 0x07;
+			m_adout = (m_adout + 1) & 0x03;
 			if (m_adout == 0)
 				IRR |= INTFAD;
 		}
