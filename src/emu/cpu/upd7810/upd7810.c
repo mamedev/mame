@@ -1300,6 +1300,12 @@ void upd7810_device::handle_timers(int cycles)
 		{
 			OVCE -= 12;
 			ECNT++;
+			/* Interrupt Control Circuit */
+			if (ETM0 == ECNT)
+				IRR |= INTFE0;
+			if (ETM1 == ECNT)
+				IRR |= INTFE1;
+			/* How and When ECNT is Cleared */
 			switch (ETMM & 0x0c)
 			{
 			case 0x00:              /* clear ECNT */
