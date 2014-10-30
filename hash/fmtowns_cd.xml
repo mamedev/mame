@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
-<softwarelist name="fmtowns" description="FM Towns CD-ROMs">
+<softwarelist name="fmtowns_cd" description="FM Towns CD-ROMs">
 <!-- skeleton test list -->
 
 	<!-- works well on fmtmarty, keyboard seems to interfere with movements on fmtowns -->
