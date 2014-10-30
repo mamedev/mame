@@ -25,7 +25,104 @@ NOTE: 2014-09-13: added code from someone's modified MESS driver for floppy
 2014-10-11: Replaced above code with MESS-compliant code [Meeso Kim]
 
 ****************************************************************************/
-
+/*
+ * SAMSUNG SPC-1000 Series (info from zannylim)
+ *
+ * YEAR MODEL           MainVideo       PRT     FDD
+ * ---- --------------  ------  -----   ------  -------
+ * 1982 SPC-1000        S68047  RGB     buffer  -
+ * 1983 SPC-1000        S68047  RF-TV   buffer  -
+ * 1983 SPC-1100        S68047  RF-TV   -       -
+ * 1983 SPC-1000/1100   MC6847  RF-TV   direct  support
+ * 1985 SPC-1000A       MC6847  RF-TV   direct  support
+ *
+ * 2nd Video Display Processor type 1 : VDP UNIT (TMS9918 + 4KB VRAM) by staticsoft
+ * 2nd Video Display Processor type 2 : SOFT BOX (TMS9918 + 4KB VRAM with BIOS) by sammi computer
+ *
+ * Intelligence FDD : SD-725(2FDD, RS232C), SD-720(1FDD), SD-725A(2FDD), SD-725B(Desktop 2FDD, RS232C) - EPSON TF20 F100
+ * External FDD with Expansion slot : KWE-1000 by kyungwoo
+ *
+ * Network device : ISAM-1000 by samsung
+ *
+ *              +---------PRT------RGB----TVRF--+   SPC-1000
+ *              +                               +
+ *              +   ROM0                        +   CPU : Z80A (4MHz)
+ *              +   ROM1                        +   RAM : 64KB
+ *      +-------+   ROM2  AY-3-8910             +   VRAM : 6KB
+ *      +                             SPC-1000  +   VDG : AMI S68047 with TTL RGB output
+ *     IPL                                      +   PSG : AY-3-8910
+ *     RESET                          S68047    +
+ *      +           Z80A                        +   Include Internal Data-recorder
+ *      +    ROM3                               +
+ *      +                                       +   ROM : 32KB (8KB x 4)
+ *      +---------------------------------------+
+ *
+ *              +---------PRT----VIDEO----TVRF--+   SPC-1000
+ *              +                               +
+ *              +   ROM0                 LM1889 +   Support RF TV Support, but Removed RGB output
+ *              +   ROM1                        +
+ *      +-------+   ROM2  AY-3-8910   SPC-1000  +
+ *      +                                 1100  +
+ *     IPL                                      +
+ *     RESET                          S68047    +
+ *      +           Z80A                        +
+ *      +    ROM3                               +
+ *      +                                       +
+ *      +---------------------------------------+
+ *
+ *              +----------------VIDEO----TVRF--+   SPC-1100
+ *              +                               +
+ *              +   ROM0                 LM1889 +   Removed Printer port
+ *              +   ROM1       LM386(5V)        +
+ *      +-------+   ROM2  AY-3-8910   SPC-1000  +
+ *      +                                 1100  +
+ *     IPL                                      +
+ *     RESET                          S68047    +
+ *      +           Z80A                        +
+ *      +    ROM3                               +
+ *      +                                       +
+ *      +---------------------------------------+
+ *
+ *              +---------PRT----VIDEO----TVRF--+   SPC-1000, SPC-1100
+ *              +                               +
+ *              +   ROM0                 MC1372 +   New Video Display Generator : MC6847
+ *              +   ROM1       LM386(5V)        +
+ *      +-------+   ROM2  AY-3-8910             +
+ *      +           ROM3         SPC-1000/1100  +
+ *     IPL                                      +
+ *     RESET                          MC6847    +
+ *      +           Z80A                        +
+ *      +                                       +
+ *      +                                       +
+ *      +---------------------------------------+
+ *
+ *              +---------PRT----VIDEO----TVRF--+   SPC-1000, SPC-1100
+ *              +                               +
+ *              +   ROM0              S4 MC1372 +   REV PCB No.839291
+ *              +   ROM1       LM386(5V)        +
+ *      +-------+   ROM2  AY-3-8910             +   Add composite color on/off switch
+ *      +           ROM3         SPC-1000/1100  +
+ *     IPL                                      +
+ *     RESET                          MC6847    +
+ *      +           Z80A                        +
+ *      +                                       +
+ *      +                                       +
+ *      +---------------------------------------+
+ *
+ *              +---------PRT----VIDEO----TVRF--+   SPC-1000A
+ *              +                               +
+ *              +   ROM0              S4 MC1372 +   Internal Data-recorder with Cassette Audio Player
+ *              +   ROM1       LM386(12V)       +   Add FDD auto detect
+ *      +-------+   ROM2  AY-3-8910             +   Remove IPL button
+ *      + SPC-1000A ROM3                        +   Change DRAM refresh circuit
+ *     IPL                                      +   Use 64K DRAM made by Samsung
+ *      +                             MC6847    +   Use TTL IC made by Goldstar
+ *      +           Z80A                        +
+ *      +                                       +
+ *      +                                       +
+ *      +---------------------------------------+
+ *
+ */
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
