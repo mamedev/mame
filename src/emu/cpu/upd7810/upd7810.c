@@ -1315,117 +1315,43 @@ void upd7810_device::handle_timers(int cycles)
 					ECNT = 0;
 				break;
 			}
-			switch (ETMM & 0x30)
+			/* Conditions When ECNT Causes a CO0 Output Change */
+			if (((0x00 == (ETMM & 0x30)) && (ETM0 == ECNT)) || /* set CO0 if ECNT == ETM0 */
+			 /* ((0x10 == (ETMM & 0x30)) prohibited */
+			    ((0x20 == (ETMM & 0x30)) && (ETM0 == ECNT)) || /* set CO0 if ECNT == ETM0 or at falling CI input */
+			    ((0x30 == (ETMM & 0x30)) && (ETM0 == ECNT || ETM1 == ECNT))) /* latch CO0 if ECNT == ETM0 or ECNT == ETM1 */
 			{
-			case 0x00:  /* set CO0 if ECNT == ETM0 */
-				if (ETM0 == ECNT)
+				switch (EOM & 0x0e)
 				{
-					switch (EOM & 0x0e)
-					{
-					case 0x02:  /* toggle CO0 */
-						CO0 = (CO0 >> 1) | ((CO0 ^ 2) & 2);
-						break;
-					case 0x04:  /* reset CO0 */
-						CO0 = 0;
-						break;
-					case 0x08:  /* set CO0 */
-						CO0 = 1;
-						break;
-					}
+				case 0x02:  /* toggle CO0 */
+					CO0 = (CO0 >> 1) | ((CO0 ^ 2) & 2);
+					break;
+				case 0x04:  /* reset CO0 */
+					CO0 = 0;
+					break;
+				case 0x08:  /* set CO0 */
+					CO0 = 1;
+					break;
 				}
-				break;
-			case 0x10:  /* prohibited */
-				break;
-			case 0x20:  /* set CO0 if ECNT == ETM0 or at falling CI input */
-				if (ETM0 == ECNT)
-				{
-					switch (EOM & 0x0e)
-					{
-					case 0x02:  /* toggle CO0 */
-						CO0 = (CO0 >> 1) | ((CO0 ^ 2) & 2);
-						break;
-					case 0x04:  /* reset CO0 */
-						CO0 = 0;
-						break;
-					case 0x08:  /* set CO0 */
-						CO0 = 1;
-						break;
-					}
-				}
-				break;
-			case 0x30:  /* latch CO0 if ECNT == ETM0 or ECNT == ETM1 */
-				if (ETM0 == ECNT || ETM1 == ECNT)
-				{
-					switch (EOM & 0x0e)
-					{
-					case 0x02:  /* toggle CO0 */
-						CO0 = (CO0 >> 1) | ((CO0 ^ 2) & 2);
-						break;
-					case 0x04:  /* reset CO0 */
-						CO0 = 0;
-						break;
-					case 0x08:  /* set CO0 */
-						CO0 = 1;
-						break;
-					}
-				}
-				break;
 			}
-			switch (ETMM & 0xc0)
+			/* Conditions When ECNT Causes a CO1 Output Change */
+			if (((0x00 == (ETMM & 0xc0)) && (ETM0 == ECNT)) || /* set CO1 if ECNT == ETM0 */
+			 /* ((0x40 == (ETMM & 0xc0)) prohibited */
+			    ((0x80 == (ETMM & 0xc0)) && (ETM0 == ECNT)) || /* set CO1 if ECNT == ETM0 or at falling CI input */
+			    ((0xc0 == (ETMM & 0xc0)) && (ETM0 == ECNT || ETM1 == ECNT))) /* latch CO1 if ECNT == ETM0 or ECNT == ETM1 */
 			{
-			case 0x00:  /* lacth CO1 if ECNT == ETM1 */
-				if (ETM1 == ECNT)
+				switch (EOM & 0xe0)
 				{
-					switch (EOM & 0xe0)
-					{
-					case 0x20:  /* toggle CO1 */
-						CO1 = (CO1 >> 1) | ((CO1 ^ 2) & 2);
-						break;
-					case 0x40:  /* reset CO1 */
-						CO1 = 0;
-						break;
-					case 0x80:  /* set CO1 */
-						CO1 = 1;
-						break;
-					}
+				case 0x20:  /* toggle CO1 */
+					CO1 = (CO1 >> 1) | ((CO1 ^ 2) & 2);
+					break;
+				case 0x40:  /* reset CO1 */
+					CO1 = 0;
+					break;
+				case 0x80:  /* set CO1 */
+					CO1 = 1;
+					break;
 				}
-				break;
-			case 0x40:  /* prohibited */
-				break;
-			case 0x80:  /* latch CO1 if ECNT == ETM1 or falling edge of CI input */
-				if (ETM1 == ECNT)
-				{
-					switch (EOM & 0xe0)
-					{
-					case 0x20:  /* toggle CO1 */
-						CO1 = (CO1 >> 1) | ((CO1 ^ 2) & 2);
-						break;
-					case 0x40:  /* reset CO1 */
-						CO1 = 0;
-						break;
-					case 0x80:  /* set CO1 */
-						CO1 = 1;
-						break;
-					}
-				}
-				break;
-			case 0xc0:  /* latch CO1 if ECNT == ETM0 or ECNT == ETM1 */
-				if (ETM0 == ECNT || ETM1 == ECNT)
-				{
-					switch (EOM & 0xe0)
-					{
-					case 0x20:  /* toggle CO1 */
-						CO1 = (CO1 >> 1) | ((CO1 ^ 2) & 2);
-						break;
-					case 0x40:  /* reset CO1 */
-						CO1 = 0;
-						break;
-					case 0x80:  /* set CO1 */
-						CO1 = 1;
-						break;
-					}
-				}
-				break;
 			}
 		}
 	}
