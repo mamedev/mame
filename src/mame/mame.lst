@@ -441,6 +441,7 @@ ckongalc        // bootleg (Alca)
 bigkong         // bootleg
 monkeyd         // bootleg
 dking           // Crazy Kong Bootleg
+ckongdks		// Spanish Crazy Kong bootleg
 ckongpt2        // (c) 1981 Falcon
 ckongpt2a       // (c) 1981 Falcon
 ckongpt2j       // (c) 1981 Falcon
@@ -1475,6 +1476,7 @@ claybust        // (c) 1978 Model Racing
 gunchamp        // (c) 1980 Model Racing
 gunchamps       // (c) 1980 Model Racing (sshot.c)
 spaceatt        // (c) 1978 Video Games GMBH
+galmonst		// (c) Laguna S.A.
 spaceat2        // (c) 1980 Zenitone-Microsec Ltd
 spacecom        // bootleg
 sinvzen         // Zenitone-Microsec Ltd
@@ -7910,6 +7912,7 @@ ninjakd2        // UPL-????? (c) 1987
 ninjakd2a       // UPL-????? (c) 1987
 ninjakd2b       // UPL-????? (c) 1987
 rdaction        // UPL-87003?(c) 1987 + World Games license
+jt104			// hack?
 mnight          // UPL-????? (c) 1987 distributed by Kawakus
 arkarea         // UPL-87007 (c) 1988 (Arcade TV Game List - P.67, Right, 2 from top)
 robokid         // UPL-88013 (c) 1988
@@ -8301,7 +8304,8 @@ supdrapoa       // (c) 1983 + Jeutel license?
 supdrapob       // bootleg
 sbagman         // (c) 1984
 sbagmans        // (c) 1984 + Stern license
-botanic         // (c) 1985
+botanic         // (c) 1983
+botanicf		// (c) 1984
 squaitsa        // (c) 1985
 tankbust        // (c) 1985
 

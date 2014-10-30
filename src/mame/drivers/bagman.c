@@ -256,16 +256,45 @@ static INPUT_PORTS_START( pickin )
 	PORT_DIPSETTING(    0x00, DEF_STR( French ) )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( botanic )
+static INPUT_PORTS_START( botanicf )
 	PORT_INCLUDE( bagman )
 
 	PORT_MODIFY("DSW")
+	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Lives ) )            PORT_DIPLOCATION("SW1:1,2")
+	PORT_DIPSETTING(    0x00, "1" )
+	PORT_DIPSETTING(    0x03, "2" )
+	PORT_DIPSETTING(    0x02, "3" )
+	PORT_DIPSETTING(    0x01, "4" )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Coinage ) )          PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x00, "1C/1C 1C/2C 1C/6C 1C/14C" )
+	PORT_DIPSETTING(    0x04, "2C/1C 1C/2C 1C/3C 1C/7C" )
 	PORT_DIPNAME( 0x08, 0x08, "Invulnerability Fruits" )    PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x08, "3" )
 	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
 	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SW1:5" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SW1:6" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "SW1:7" )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( botanici )
+	PORT_INCLUDE( botanicf )
+
+	PORT_MODIFY("P2") // only seems to have 2 coin slots
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_MODIFY("DSW") // dipswitches are a bit messy on this set
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Coinage ) )          PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x00, "1C/1C 1C/2C" )
+	PORT_DIPSETTING(    0x04, "2C/1C 1C/2C" )
+	PORT_DIPNAME( 0x18, 0x18, "Invulnerability Fruits" )    PORT_DIPLOCATION("SW1:4,5")
+	PORT_DIPSETTING(    0x00, "2" )
+	PORT_DIPSETTING(    0x08, "3" )
+	PORT_DIPSETTING(    0x10, "3 (duplicate 1)" )
+	PORT_DIPSETTING(    0x18, "3 (duplicate 2)" )
+	PORT_DIPNAME( 0x20, 0x20, "Language / Disable Invlunerability Fruits" )          PORT_DIPLOCATION("SW1:6") // changing this off, even in game, seems to remove all fruits you have?
+	PORT_DIPSETTING(    0x20, "Fruits On, English" )
+	PORT_DIPSETTING(    0x00, "Fruits Off, Spanish" )
 INPUT_PORTS_END
 
 
@@ -834,7 +863,32 @@ ROM_START( pickin )
 	ROM_LOAD( "6331-1.3r",    0x0020, 0x0020, CRC(14ee1603) SHA1(f3c071399606b727ae7dd0bfc21e1c6ca2d43c7c) )
 ROM_END
 
+
+
+
 ROM_START( botanic )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "5.9e",     0x0000, 0x1000, CRC(907f01c7) SHA1(156b6b6bbc2176998fb0c18ad453fc42185ae490) )
+	ROM_LOAD( "06.9f",    0x1000, 0x1000, CRC(ff2533fb) SHA1(808a1555c16470b87fca0aea73e0291dbe0b9355) )
+	ROM_LOAD( "07.9j",    0x2000, 0x1000, CRC(b7c544ef) SHA1(75b5224c313e97c2c02ca7e9bc3f682278cb7a5c) )
+	ROM_LOAD( "08.9k",    0x3000, 0x1000, CRC(2df22793) SHA1(d1f27c915e7563abba4d14ec3fd6757a4d6137be) )
+	ROM_LOAD( "09.9m",    0x4000, 0x1000, CRC(f7d908ec) SHA1(ee5827f84505c1f37bebf48181d3e7759421fada) )
+	ROM_LOAD( "10.9n",    0x5000, 0x1000, CRC(7ce9fbc8) SHA1(cd2ba01470964640fad9ccf6ff23cbd76c0c2aeb) )
+
+	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_LOAD( "2.1e",   0x0000, 0x1000, CRC(bea449a6) SHA1(fe06208996d15a4d50753fb62a3020063a0a6620) )
+	ROM_LOAD( "4.1j",   0x1000, 0x1000, CRC(a5deb8ed) SHA1(b6b38daffdda263a366656168a6d094ad2b1458f) )
+
+	ROM_REGION( 0x2000, "gfx2", 0 )
+	ROM_LOAD( "1.1c",    0x0000, 0x1000, CRC(a1148d89) SHA1(b1424693cebc410749216457d07bae54b903bc07) )
+	ROM_LOAD( "3.1f",    0x1000, 0x1000, CRC(70be5565) SHA1(a7eab667a82d3e7321f393073f29c6e5e865ec6b) )
+
+	ROM_REGION( 0x0040, "proms", 0 )
+	ROM_LOAD( "prom.3p",    0x0000, 0x0020, CRC(a8a2ddd2) SHA1(fc2da863d13e92f7682f393a08bc9357841ae7ea) )
+	ROM_LOAD( "prom.3r",    0x0020, 0x0020, CRC(edf88f34) SHA1(b9c342d51303d552f87df2543a34e38c30acd07c) )
+ROM_END
+
+ROM_START( botanicf )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "bota_05.9e",    0x0000, 0x1000, CRC(cc66e6f8) SHA1(251481b16f8925a11f02f49e5a79f6524460aa6c) )
 	ROM_LOAD( "bota_06.9f",    0x1000, 0x1000, CRC(59892f41) SHA1(eb01601a9163679560b878366aaf7cc0fb54a3e9) )
@@ -934,6 +988,7 @@ GAME( 1984, sbagmans, sbagman, bagman,  sbagman, driver_device, 0,       ROT270,
 
 GAME( 1983, pickin,   0,       pickin,  pickin, driver_device,  0,       ROT270, "Valadon Automation", "Pickin'", 0 )
 
-GAME( 1984, botanic,  0,       botanic, botanic, driver_device, 0,       ROT270, "Itisa (Valadon Automation license)", "Botanic (French)", 0 ) // the game was made by Itisa, there is a Spanish original (not yet dumped)
+GAME( 1983, botanic,  0,       botanic, botanici,driver_device, 0,       ROT90,  "Itisa",                              "Botanic (English / Spanish)", 0 )
+GAME( 1984, botanicf, botanic, botanic, botanicf,driver_device, 0,       ROT270, "Itisa (Valadon Automation license)", "Botanic (French)", 0 )
 
 GAME( 1984, squaitsa, 0,       squaitsa,squaitsa, driver_device,0,       ROT0,   "Itisa", "Squash (Itisa)", 0 )
