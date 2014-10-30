@@ -169,6 +169,9 @@ protected:
 	virtual void handle_timers(int cycles);
 	virtual void upd7810_take_irq();
 
+	void upd7810_handle_timer0(int cycles, int clkdiv);
+	void upd7810_handle_timer1(int cycles, int clkdiv);
+
 	devcb_write_line  m_to_func;
 	devcb_write_line  m_txd_func;
 	devcb_read_line   m_rxd_func;

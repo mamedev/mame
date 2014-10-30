@@ -1174,6 +1174,64 @@ void upd7810_device::upd7810_sio_input()
 	}
 }
 
+void upd7810_device::upd7810_handle_timer0(int cycles, int clkdiv)
+{
+	OVC0 += cycles;
+	while (OVC0 >= clkdiv)
+	{
+		OVC0 -= clkdiv;
+		CNT0++;
+		if (CNT0 == TM0)
+		{
+			CNT0 = 0;
+			IRR |= INTFT0;
+			/* timer F/F source is timer 0 ? */
+			if (0x00 == (TMM & 0x03))
+			{
+				TO ^= 1;
+				m_to_func(TO);
+			}
+			/* timer 1 chained with timer 0 ? */
+			if ((TMM & 0xe0) == 0x60)
+			{
+				CNT1++;
+				if (CNT1 == TM1)
+				{
+					CNT1 = 0;
+					IRR |= INTFT1;
+					/* timer F/F source is timer 1 ? */
+					if (0x01 == (TMM & 0x03))
+					{
+						TO ^= 1;
+						m_to_func(TO);
+					}
+				}
+			}
+		}
+	}
+}
+
+void upd7810_device::upd7810_handle_timer1(int cycles, int clkdiv)
+{
+	OVC1 += cycles;
+	while (OVC1 >= clkdiv)
+	{
+		OVC1 -= clkdiv;
+		CNT1++;
+		if (CNT1 == TM1)
+		{
+			CNT1 = 0;
+			IRR |= INTFT1;
+			/* timer F/F source is timer 1 ? */
+			if (0x01 == (TMM & 0x03))
+			{
+				TO ^= 1;
+				m_to_func(TO);
+			}
+		}
+	}
+}
+
 void upd7810_device::handle_timers(int cycles)
 {
 	/**** TIMER 0 ****/
@@ -1184,74 +1242,10 @@ void upd7810_device::handle_timers(int cycles)
 		switch (TMM & 0x0c) /* timer 0 clock source */
 		{
 		case 0x00:  /* clock divided by 12 */
-			OVC0 += cycles;
-			while (OVC0 >= 12)
-			{
-				OVC0 -= 12;
-				CNT0++;
-				if (CNT0 == TM0)
-				{
-					CNT0 = 0;
-					IRR |= INTFT0;
-					/* timer F/F source is timer 0 ? */
-					if (0x00 == (TMM & 0x03))
-					{
-						TO ^= 1;
-						m_to_func(TO);
-					}
-					/* timer 1 chained with timer 0 ? */
-					if ((TMM & 0xe0) == 0x60)
-					{
-						CNT1++;
-						if (CNT1 == TM1)
-						{
-							IRR |= INTFT1;
-							CNT1 = 0;
-							/* timer F/F source is timer 1 ? */
-							if (0x01 == (TMM & 0x03))
-							{
-								TO ^= 1;
-								m_to_func(TO);
-							}
-						}
-					}
-				}
-			}
+			upd7810_handle_timer0(cycles, 12);
 			break;
 		case 0x04:  /* clock divided by 384 */
-			OVC0 += cycles;
-			while (OVC0 >= 384)
-			{
-				OVC0 -= 384;
-				CNT0++;
-				if (CNT0 == TM0)
-				{
-					CNT0 = 0;
-					IRR |= INTFT0;
-					/* timer F/F source is timer 0 ? */
-					if (0x00 == (TMM & 0x03))
-					{
-						TO ^= 1;
-						m_to_func(TO);
-					}
-					/* timer 1 chained with timer 0 ? */
-					if ((TMM & 0xe0) == 0x60)
-					{
-						CNT1++;
-						if (CNT1 == TM1)
-						{
-							CNT1 = 0;
-							IRR |= INTFT1;
-							/* timer F/F source is timer 1 ? */
-							if (0x01 == (TMM & 0x03))
-							{
-								TO ^= 1;
-								m_to_func(TO);
-							}
-						}
-					}
-				}
-			}
+			upd7810_handle_timer0(cycles, 384);
 			break;
 		case 0x08:  /* external signal at TI */
 			break;
@@ -1268,42 +1262,10 @@ void upd7810_device::handle_timers(int cycles)
 		switch (TMM & 0x60) /* timer 1 clock source */
 		{
 		case 0x00:  /* clock divided by 12 */
-			OVC1 += cycles;
-			while (OVC1 >= 12)
-			{
-				OVC1 -= 12;
-				CNT1++;
-				if (CNT1 == TM1)
-				{
-					CNT1 = 0;
-					IRR |= INTFT1;
-					/* timer F/F source is timer 1 ? */
-					if (0x01 == (TMM & 0x03))
-					{
-						TO ^= 1;
-						m_to_func(TO);
-					}
-				}
-			}
+			upd7810_handle_timer1(cycles, 12);
 			break;
 		case 0x20:  /* clock divided by 384 */
-			OVC1 += cycles;
-			while (OVC1 >= 384)
-			{
-				OVC1 -= 384;
-				CNT1++;
-				if (CNT1 == TM1)
-				{
-					CNT1 = 0;
-					IRR |= INTFT1;
-					/* timer F/F source is timer 1 ? */
-					if (0x01 == (TMM & 0x03))
-					{
-						TO ^= 1;
-						m_to_func(TO);
-					}
-				}
-			}
+			upd7810_handle_timer1(cycles, 384);
 			break;
 		case 0x40:  /* external signal at TI */
 			break;
