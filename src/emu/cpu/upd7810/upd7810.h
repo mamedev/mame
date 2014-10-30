@@ -172,14 +172,14 @@ protected:
 	devcb_write_line  m_to_func;
 	devcb_write_line  m_txd_func;
 	devcb_read_line   m_rxd_func;
-	devcb_read_line   m_an0_func;
-	devcb_read_line   m_an1_func;
-	devcb_read_line   m_an2_func;
-	devcb_read_line   m_an3_func;
-	devcb_read_line   m_an4_func;
-	devcb_read_line   m_an5_func;
-	devcb_read_line   m_an6_func;
-	devcb_read_line   m_an7_func;
+	devcb_read8       m_an0_func;
+	devcb_read8       m_an1_func;
+	devcb_read8       m_an2_func;
+	devcb_read8       m_an3_func;
+	devcb_read8       m_an4_func;
+	devcb_read8       m_an5_func;
+	devcb_read8       m_an6_func;
+	devcb_read8       m_an7_func;
 
 	typedef void (upd7810_device::*opcode_func)();
 
