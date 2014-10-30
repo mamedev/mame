@@ -1133,6 +1133,45 @@ ROM_START( rdaction )
 	ROM_LOAD( "nk2_09.rom",   0x0000, 0x10000, CRC(c1d2d170) SHA1(0f325815086fde90fd85360d3660042b0b68ba96) )   // 9.6c  unsigned 8-bit pcm samples
 ROM_END
 
+// Is this official? works with any program rom set, but nowhere in any program roms is the title JT-104 mentioned.
+//
+// In addition to the title screen text change the new graphic ROM has 'UNITED AMUSEMENTS' license text replacing
+// the regular UPL copyright (used on the interludes) but strangely it appears to be derived from the RAD ACTION
+// gfx rom (it still has the interlude text for that in tiles that are unused / empty in Ninja Kid 2)
+//
+// Maybe this is actually meant to be used with a different program rom set altogether and the board had been
+// upgraded / repaired?
+
+ROM_START( jt104 ) // identical to ninjakid2 set with different gfx rom
+	ROM_REGION( 0x30000, "maincpu", 0 )
+	ROM_LOAD( "nk2_01.rom",   0x00000, 0x8000, CRC(3cdbb906) SHA1(f48f82528b5fc581ee3b1ccd0ef9cdecc7249bb3) )
+	ROM_LOAD( "nk2_02.rom",   0x10000, 0x8000, CRC(b5ce9a1a) SHA1(295a7e1d41e1a8ee45f1250086a0c9314837eded) )   // banked at 8000-bfff
+	ROM_LOAD( "nk2_03.rom",   0x18000, 0x8000, CRC(ad275654) SHA1(7d29a17132adb19aeee9b98be5b76bd6e91f308e) )
+	ROM_LOAD( "nk2_04.rom",   0x20000, 0x8000, CRC(e7692a77) SHA1(84beb8b02c564bffa9cc00313214e8f109bd40f9) )
+	ROM_LOAD( "nk2_05.rom",   0x28000, 0x8000, CRC(5dac9426) SHA1(0916cddbbe1e93c32b96fe28e145d34b2a892e80) )
+
+	ROM_REGION( 0x10000, "soundcpu", 0 )
+	ROM_LOAD( "nk2_06.rom",   0x00000, 0x10000, CRC(d3a18a79) SHA1(e4df713f89d8a8b43ef831b14864c50ec9b53f0b) )  // encrypted
+
+	ROM_REGION( 0x2000, "user1", 0 ) /* MC8123 key */
+	ROM_LOAD( "ninjakd2.key",  0x0000, 0x2000, CRC(ec25318f) SHA1(619da3f69f9919e1457f79ee1d38e7ec80c4ebb0) )
+
+	ROM_REGION( 0x08000, "gfx1", 0 )    // fg tiles (need lineswapping)
+	ROM_LOAD( "jt_104_12.bin",        0x00000, 0x08000, CRC(c038fadb) SHA1(59e9b125ead3e9bdc9d66de75dffd58956eb922e) )  // only this rom differs from the regular sets
+
+	ROM_REGION( 0x20000, "gfx2", 0 )    // sprites (need lineswapping)
+	ROM_LOAD( "nk2_08.rom",   0x00000, 0x10000, CRC(1b79c50a) SHA1(8954bc51cb9fbbe16b09381f35c84ccc56a803f3) )
+	ROM_LOAD( "nk2_07.rom",   0x10000, 0x10000, CRC(0be5cd13) SHA1(8f94a8fef6668aaf13329715fee81302dbd6c685) )
+
+	ROM_REGION( 0x20000, "gfx3", 0 )    // bg tiles (need lineswapping)
+	ROM_LOAD( "nk2_11.rom",   0x00000, 0x10000, CRC(41a714b3) SHA1(b05f48d71a9837914c12c13e0b479c8a6dc8c25e) )
+	ROM_LOAD( "nk2_10.rom",   0x10000, 0x10000, CRC(c913c4ab) SHA1(f822c5621b3e32c1a284f6367bdcace81c1c74b3) )
+
+	ROM_REGION( 0x10000, "pcm", 0 )
+	ROM_LOAD( "nk2_09.rom",   0x0000, 0x10000, CRC(c1d2d170) SHA1(0f325815086fde90fd85360d3660042b0b68ba96) )   // unsigned 8-bit pcm samples
+ROM_END
+
+
 ROM_START( mnight )
 	ROM_REGION( 0x30000, "maincpu", 0 )
 	ROM_LOAD( "mn6-j19.bin",  0x00000, 0x8000, CRC(56678d14) SHA1(acf3a97ca29db8ab9cad69599c5567464af3ae44) )
@@ -1490,7 +1529,8 @@ DRIVER_INIT_MEMBER(ninjakd2_state,robokidj)
 GAME( 1987, ninjakd2,  0,        ninjakd2, ninjakd2, ninjakd2_state, ninjakd2, ROT0,   "UPL", "Ninja-Kid II / NinjaKun Ashura no Shou (set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1987, ninjakd2a, ninjakd2, ninjakd2, ninjakd2, ninjakd2_state, bootleg,  ROT0,   "UPL", "Ninja-Kid II / NinjaKun Ashura no Shou (set 2, bootleg?)", GAME_SUPPORTS_SAVE )
 GAME( 1987, ninjakd2b, ninjakd2, ninjakd2, rdaction, ninjakd2_state, bootleg,  ROT0,   "UPL", "Ninja-Kid II / NinjaKun Ashura no Shou (set 3, bootleg?)", GAME_SUPPORTS_SAVE )
-GAME( 1987, rdaction,  ninjakd2, ninjakd2, rdaction, ninjakd2_state, ninjakd2, ROT0,   "UPL (World Games license)", "Rad Action / NinjaKun Ashura no Shou", GAME_SUPPORTS_SAVE )
+GAME( 1987, rdaction,  ninjakd2, ninjakd2, rdaction, ninjakd2_state, ninjakd2, ROT0,   "UPL (World Games license)",       "Rad Action / NinjaKun Ashura no Shou", GAME_SUPPORTS_SAVE )
+GAME( 1987, jt104,     ninjakd2, ninjakd2, rdaction, ninjakd2_state, ninjakd2, ROT0,   "UPL (United Amusements license)", "JT-104 (title screen modification of Ninja-Kid II)", GAME_SUPPORTS_SAVE )
 GAME( 1987, mnight,    0,        mnight,   mnight,   ninjakd2_state, mnight,   ROT0,   "UPL (Kawakus license)", "Mutant Night", GAME_SUPPORTS_SAVE )
 GAME( 1988, arkarea,   0,        arkarea,  arkarea,  ninjakd2_state, mnight,   ROT0,   "UPL", "Ark Area", GAME_SUPPORTS_SAVE )
 GAME( 1988, robokid,   0,        robokid,  robokid,  ninjakd2_state, robokid,  ROT0,   "UPL", "Atomic Robo-kid", GAME_SUPPORTS_SAVE )
