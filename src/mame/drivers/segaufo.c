@@ -37,8 +37,10 @@
 
 
   TODO:
-  - make the other games work (for now only newufo+clones work)
+  - why doesn't ufo800 work?
   - add layout
+  - add dipswitches
+  - add upd sound for ufo21
 
 ***************************************************************************/
 
@@ -62,7 +64,7 @@
 #define MOTOR_SPEED     100
 
 // crane size (stepper motor range)
-// note: the game expects this to be around 350 steps per quarter rotation
+// note: UFO board/EX board expects this to be around 350 steps per quarter rotation
 #define CRANE_SIZE      350
 
 
@@ -102,11 +104,16 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(pit_out1);
 	DECLARE_WRITE_LINE_MEMBER(pit_out2);
 	DECLARE_WRITE_LINE_MEMBER(ym3438_irq);
+	DECLARE_READ8_MEMBER(ufo_0_r) { return 0; }
 	DECLARE_READ8_MEMBER(crane_limits_r);
+	DECLARE_READ8_MEMBER(ex_crane_limits_r);
+	DECLARE_READ8_MEMBER(ex_crane_open_r);
 	DECLARE_WRITE8_MEMBER(stepper_w);
+	DECLARE_WRITE8_MEMBER(ex_stepper_w);
 	DECLARE_WRITE8_MEMBER(cp_lamps_w);
 	DECLARE_WRITE8_MEMBER(cp_digits_w);
 	DECLARE_WRITE8_MEMBER(crane_xyz_w);
+	DECLARE_WRITE8_MEMBER(ex_crane_xyz_w);
 	DECLARE_WRITE8_MEMBER(ufo_lamps_w);
 	
 	virtual void machine_reset();
@@ -184,6 +191,8 @@ WRITE_LINE_MEMBER(ufo_state::pit_out2)
 	// ?
 }
 
+
+/* generic / UFO board handlers */
 
 WRITE8_MEMBER(ufo_state::stepper_w)
 {
@@ -283,12 +292,91 @@ READ8_MEMBER(ufo_state::crane_limits_r)
 		ret ^= 0x40;
 	
 	// d7: prize sensor (mirror?)
-	ret |= (ioport(p ? "P2" : "P1")->read() & 0x80);
+	ret |= (ioport(p ? "IN2" : "IN1")->read() & 0x80);
 
 	return ret;
 }
 
 
+/* EX board specific handlers */
+
+WRITE8_MEMBER(ufo_state::ex_stepper_w)
+{
+	// stepper motor sequence is: 6 c 9 3 6 c 9 3..
+	// which means d0 and d3 are swapped when compared with UFO board hardware
+	stepper_w(space, offset, BITSWAP8(data,4,6,5,7,0,2,1,3));
+}
+
+WRITE8_MEMBER(ufo_state::ex_crane_xyz_w)
+{
+	int p = offset & 1;
+	
+	// more straightforward setup than on UFO board hardware
+	// d0: move left
+	// d1: move right
+	// d2: move back
+	// d3: move front
+	// d4: move down
+	// d5: move up
+	for (int i = 0; i < 3; i++)
+	{
+		int bits = data >> (i*2) & 3;
+		m_player[p].motor[i].running = (bits == 1 || bits == 2) ? 1 : 0;
+		m_player[p].motor[i].direction = bits & 2;
+	}
+}
+
+
+READ8_MEMBER(ufo_state::ex_crane_limits_r)
+{
+	int p = offset & 1;
+	UINT8 ret = 0xf0;
+
+	// d0: left limit sw (invert)
+	// d1: right limit sw (invert)
+	// d2: back limit sw (invert)
+	// d3: front limit sw (invert)
+	// d4: ..
+	// d5: down limit sw
+	// d6: up limit sw
+	for (int i = 0; i < 3; i++)
+	{
+		int shift = (i*2) + (i == 2);
+		ret ^= (m_player[p].motor[i].position >= 1) << (shift + 0);
+		ret ^= (m_player[p].motor[i].position <= 0) << (shift + 1);
+	}
+	
+	// d4: crane open or closed sensor
+	// d7: crane open or closed sensor (another one?)
+	if (m_player[p].motor[3].position >= 0.97)
+		ret ^= 0x10;
+	if (m_player[p].motor[3].position <= 0.03)
+		ret ^= 0x80;
+	
+	return ret;
+}
+
+READ8_MEMBER(ufo_state::ex_crane_open_r)
+{
+	// d0-d3: p1, d4-d7: p2
+	UINT8 ret = 0xff;
+	
+	for (int p = 0; p < 2; p++)
+	{
+		// unlike ex_crane_limits_r, this sensor can determine whether the crane is open or closed
+		if (m_player[p].motor[3].position >= 0.97)
+			ret ^= (1 << (p*4));
+		if (m_player[p].motor[3].position <= 0.03)
+			ret ^= (2 << (p*4));
+		
+		// d2,d3: ?
+	}
+	
+	return ret;
+}
+
+
+/* memory maps */
 
 static ADDRESS_MAP_START( ufo_map, AS_PROGRAM, 8, ufo_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
@@ -300,8 +388,8 @@ static ADDRESS_MAP_START( ufo_portmap, AS_IO, 8, ufo_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("pit", pit8254_device, read, write)
 	AM_RANGE(0x40, 0x43) AM_DEVREADWRITE("ym", ym3438_device, read, write)
-	AM_RANGE(0x80, 0x8f) AM_DEVREADWRITE("io1", sega_315_5296_device, read, write)
-	AM_RANGE(0xc0, 0xcf) AM_DEVREADWRITE("io2", sega_315_5296_device, read, write)
+	AM_RANGE(0x80, 0xbf) AM_DEVREADWRITE("io1", sega_315_5296_device, read, write)
+	AM_RANGE(0xc0, 0xff) AM_DEVREADWRITE("io2", sega_315_5296_device, read, write)
 ADDRESS_MAP_END
 
 
@@ -313,7 +401,7 @@ ADDRESS_MAP_END
 ***************************************************************************/
 
 static INPUT_PORTS_START( newufo )
-	PORT_START("P1")
+	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_NAME("P1 Coin 1")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_NAME("P1 Coin 2")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("P1 Test")
@@ -323,7 +411,7 @@ static INPUT_PORTS_START( newufo )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("P1 Prize Fell")
 
-	PORT_START("P2")
+	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_NAME("P2 Coin 1")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN4 ) PORT_NAME("P2 Coin 2")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P2 Test") PORT_CODE(KEYCODE_F1)
@@ -389,8 +477,151 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( ufomini )
 	PORT_INCLUDE( newufo )
 
-	PORT_MODIFY("P2")
+	PORT_MODIFY("IN2")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( ufo21 )
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Test Button")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("P1 Service Coin")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_NAME("P1 Coin 1")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("P2 Service Coin")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_NAME("P2 Coin 1")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_PLAYER(2)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_PLAYER(2)
+
+	PORT_START("DSW1") // coinage
+	PORT_DIPNAME( 0x01, 0x01, "UNK1-01" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, "UNK1-02" )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, "UNK1-04" )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "UNK1-08" )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, "UNK1-10" )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, "UNK1-20" )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, "UNK1-40" )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "UNK1-80" )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("DSW2")
+	PORT_DIPNAME( 0x01, 0x01, "UNK2-01" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, "UNK2-02" )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, "UNK2-04" )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "UNK2-08 Demo Music On" )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, "UNK2-10" )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, "UNK2-20" )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, "UNK2-40" )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "UNK2-80" )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( ufo800 )
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Test Button")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("P1 Service Coin")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_NAME("P1 Coin 1")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_NAME("P1 Coin 2")
+	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("DSW1") // coinage
+	PORT_DIPNAME( 0x01, 0x01, "UNK1-01" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, "UNK1-02" )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, "UNK1-04" )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "UNK1-08" )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, "UNK1-10" )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, "UNK1-20" )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, "UNK1-40" )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "UNK1-80" )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("DSW2")
+	PORT_DIPNAME( 0x01, 0x01, "UNK2-01 BGM Select" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, "UNK2-02 BGM Select" )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, "UNK2-04" )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "UNK2-08" )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, "UNK2-10" )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, "UNK2-20" )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, "UNK2-40" )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "UNK2-80" )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
 
@@ -453,10 +684,10 @@ static MACHINE_CONFIG_START( newufo, ufo_state )
 	// all ports set to input
 	MCFG_315_5296_IN_PORTA_CB(READ8(ufo_state, crane_limits_r))
 	MCFG_315_5296_IN_PORTB_CB(READ8(ufo_state, crane_limits_r))
-	MCFG_315_5296_IN_PORTE_CB(IOPORT("P1"))
+	MCFG_315_5296_IN_PORTE_CB(IOPORT("IN1"))
 	MCFG_315_5296_IN_PORTF_CB(IOPORT("DSW1"))
 	MCFG_315_5296_IN_PORTG_CB(IOPORT("DSW2"))
-	MCFG_315_5296_IN_PORTH_CB(IOPORT("P2"))
+	MCFG_315_5296_IN_PORTH_CB(IOPORT("IN2"))
 
 	MCFG_DEVICE_ADD("io2", SEGA_315_5296, 16000000)
 	// all ports set to output
@@ -491,9 +722,37 @@ static MACHINE_CONFIG_DERIVED( ufomini, newufo )
 
 	/* basic machine hardware */
 	MCFG_DEVICE_MODIFY("io1")
-	MCFG_315_5296_IN_PORTC_CB(IOPORT("P1"))
-	MCFG_315_5296_IN_PORTE_CB(NOOP)
-	MCFG_315_5296_IN_PORTH_CB(NOOP)
+	MCFG_315_5296_IN_PORTC_CB(IOPORT("IN1"))
+	MCFG_315_5296_IN_PORTE_CB(NULL)
+	MCFG_315_5296_IN_PORTH_CB(NULL)
+MACHINE_CONFIG_END
+
+
+static MACHINE_CONFIG_DERIVED( ufo21, newufo )
+
+	/* basic machine hardware */
+	MCFG_DEVICE_MODIFY("io1")
+	MCFG_315_5296_IN_PORTA_CB(READ8(ufo_state, ex_crane_limits_r))
+	MCFG_315_5296_IN_PORTB_CB(READ8(ufo_state, ex_crane_limits_r))
+	MCFG_315_5296_IN_PORTC_CB(READ8(ufo_state, ex_crane_open_r))
+
+	MCFG_DEVICE_MODIFY("io2")
+	MCFG_315_5296_OUT_PORTA_CB(WRITE8(ufo_state, ex_stepper_w))
+	MCFG_315_5296_OUT_PORTE_CB(WRITE8(ufo_state, ex_crane_xyz_w))
+	MCFG_315_5296_OUT_PORTF_CB(WRITE8(ufo_state, ex_crane_xyz_w))
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( ufo800, ufo21 )
+
+	/* basic machine hardware */
+	MCFG_DEVICE_MODIFY("io1")
+	MCFG_315_5296_IN_PORTB_CB(IOPORT("IN2"))
+	MCFG_315_5296_IN_PORTD_CB(IOPORT("IN1"))
+	MCFG_315_5296_IN_PORTE_CB(NULL)
+	MCFG_315_5296_IN_PORTH_CB(NULL)
+
+	MCFG_DEVICE_MODIFY("io2")
+	MCFG_315_5296_OUT_PORTF_CB(NULL) // ufo lamps?
 MACHINE_CONFIG_END
 
 
@@ -550,5 +809,5 @@ GAMEL( 1991, newufo_sonic, newufo, newufo,  newufo,  driver_device, 0, ROT0, "Se
 GAMEL( 1991, newufo_nfl,   newufo, newufo,  newufo,  driver_device, 0, ROT0, "Sega", "New UFO Catcher (Team NFL)", GAME_MECHANICAL | GAME_SUPPORTS_SAVE, layout_segaufo )
 GAMEL( 1991, newufo_xmas,  newufo, newufo,  newufo,  driver_device, 0, ROT0, "Sega", "New UFO Catcher (Christmas season ROM kit)", GAME_MECHANICAL | GAME_SUPPORTS_SAVE, layout_segaufo )
 GAMEL( 1991, ufomini,      0,      ufomini, ufomini, driver_device, 0, ROT0, "Sega", "UFO Catcher Mini", GAME_MECHANICAL | GAME_SUPPORTS_SAVE, layout_segaufo )
-GAMEL( 1996, ufo21,        0,      newufo,  newufo,  driver_device, 0, ROT0, "Sega", "UFO Catcher 21", GAME_NOT_WORKING | GAME_MECHANICAL | GAME_SUPPORTS_SAVE, layout_segaufo )
-GAMEL( 1998, ufo800,       0,      newufo,  newufo,  driver_device, 0, ROT0, "Sega", "UFO Catcher 800", GAME_NOT_WORKING | GAME_MECHANICAL | GAME_SUPPORTS_SAVE, layout_segaufo )
+GAMEL( 1996, ufo21,        0,      ufo21,   ufo21,   driver_device, 0, ROT0, "Sega", "UFO Catcher 21", GAME_IMPERFECT_SOUND | GAME_MECHANICAL | GAME_SUPPORTS_SAVE, layout_segaufo )
+GAMEL( 1998, ufo800,       0,      ufo800,  ufo800,  driver_device, 0, ROT0, "Sega", "UFO Catcher 800", GAME_NOT_WORKING | GAME_MECHANICAL | GAME_SUPPORTS_SAVE, layout_segaufo )
