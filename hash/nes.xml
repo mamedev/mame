@@ -11218,6 +11218,7 @@
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="nina006" />
 			<feature name="pcb" value="AVE-NINA-06" />
+			<feature name="mirroring" value="horizontal" />
 			<dataarea name="prg" size="32768">
 				<rom name="f-15 pgm rev 11 db78" size="32768" crc="e1b511cf" sha1="de66004bd0d88aee42c9efe6c65fb1937ab6b9bb" offset="00000" />
 			</dataarea>
@@ -20454,7 +20455,7 @@
 		</part>
 	</software>
 
-	<software name="krazykr" supported="no">
+	<software name="krazykr">
 		<description>Krazy Kreatures (USA, v1.1)</description>
 		<year>1990</year>
 		<publisher>American Video Entertainment</publisher>
@@ -20473,7 +20474,7 @@
 	</software>
 
 <!-- this was originally included as proto, but it's documented at bootgod's place as v1.0... was it really a prototype? track down the dump... -->
-	<software name="krazykrp" cloneof="krazykr" supported="no">
+	<software name="krazykrp" cloneof="krazykr">
 		<description>Krazy Kreatures (USA, v1.0)</description>
 		<year>1990</year>
 		<publisher>American Video Entertainment</publisher>
@@ -23815,7 +23816,7 @@
 		</part>
 	</software>
 
-	<software name="mermatl" supported="no">
+	<software name="mermatl">
 		<description>Mermaids of Atlantis - The Riddle of the Magic Bubble (USA)</description>
 		<year>1991</year>
 		<publisher>American Video Entertainment</publisher>
@@ -45717,6 +45718,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="nina006" />
 			<feature name="pcb" value="AVE-NINA-06" />
+			<feature name="mirroring" value="horizontal" />
 			<dataarea name="chr" size="65536">
 				<rom name="futebol (brazil) (unl).chr" size="65536" crc="9fddfc61" sha1="feb234b9cb39996542ab4f9a0d76e0c6239fccc3" offset="00000" status="baddump" />
 			</dataarea>
@@ -48398,6 +48400,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="nina006" />
 			<feature name="pcb" value="AVE-NINA-06" />
+			<feature name="mirroring" value="vertical" />
 			<dataarea name="chr" size="32768">
 				<rom name="robert byrnes pool challenge (usa) (proto) (unl).chr" size="32768" crc="01005a00" sha1="e47a5a225990eca7aa6dc3853ca2c243f7d29136" offset="00000" status="baddump" />
 			</dataarea>
@@ -49911,6 +49914,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="nina006" />
 			<feature name="pcb" value="AVE-NINA-03" />
+			<feature name="mirroring" value="horizontal" />
 			<dataarea name="chr" size="65536">
 				<rom name="ultimate league soccer (italy) (unl).chr" size="65536" crc="201e9c71" sha1="3ede735b03708783b1ebb9c203d6e702e90cf0c6" offset="00000" status="baddump" />
 			</dataarea>
@@ -52745,6 +52749,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="nina006" />
 			<feature name="pcb" value="AVE-NINA-06" />
+			<feature name="mirroring" value="horizontal" />
 			<dataarea name="chr" size="32768">
 				<rom name="poke block (asia) (unl).chr" size="32768" crc="edce1b2f" sha1="2628650db3c27b2b3232b627db4ed2bcc69d6e17" offset="00000" status="baddump" />
 			</dataarea>
@@ -57136,6 +57141,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="nina006" />
 			<feature name="pcb" value="AVE-NINA-03" />
+			<feature name="mirroring" value="horizontal" />
 			<dataarea name="chr" size="65536">
 				<rom name="av dragon mahjang (japan) (unl).chr" size="65536" crc="a203df20" sha1="2a24122bfb37b9a62771e740c911a5cbb349178e" offset="00000" status="baddump" />
 			</dataarea>
@@ -57443,7 +57449,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="nina006" />
 			<feature name="pcb" value="AVE-NINA-06" />
-			<feature name="mirroring" value="horizontal" />
+			<feature name="mirroring" value="vertical" />
 			<dataarea name="chr" size="32768">
 				<rom name="metal fighter (asia) (hacker) (unl).chr" size="32768" crc="fe69de4b" sha1="11bcf115fa146923a87763f8f5f224a8ddb027ce" offset="00000" status="baddump" />
 			</dataarea>

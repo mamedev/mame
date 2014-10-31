@@ -44,6 +44,7 @@ protected:
 
 	virtual int read_sector(UINT32 lba, void *buffer) = 0;
 	virtual int write_sector(UINT32 lba, const void *buffer) = 0;
+	virtual attotime seek_time();
 
 	void ide_build_identify_device();
 
@@ -72,7 +73,6 @@ private:
 	void security_error();
 	void read_first_sector();
 	void soft_reset();
-	attotime seek_time();
 
 	UINT32          m_cur_lba;
 	UINT16          m_block_count;
@@ -93,9 +93,6 @@ public:
 	ide_hdd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	ide_hdd_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
-	virtual int read_sector(UINT32 lba, void *buffer) { if (m_disk == NULL) return 0; return hard_disk_read(m_disk, lba, buffer); }
-	virtual int write_sector(UINT32 lba, const void *buffer) { if (m_disk == NULL) return 0; return hard_disk_write(m_disk, lba, buffer); }
-
 protected:
 	// device-level overrides
 	virtual void device_start();
@@ -104,6 +101,8 @@ protected:
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const;
 
+	virtual int read_sector(UINT32 lba, void *buffer) { if (m_disk == NULL) return 0; return hard_disk_read(m_disk, lba, buffer); }
+	virtual int write_sector(UINT32 lba, const void *buffer) { if (m_disk == NULL) return 0; return hard_disk_write(m_disk, lba, buffer); }
 	virtual UINT8 calculate_status();
 
 	chd_file       *m_handle;

@@ -1,0 +1,175 @@
+<?xml version="1.0"?>
+<mamelayout version="2">
+
+
+<!-- define elements -->
+
+	<element name="static_black"><rect><color red="0.0" green="0.0" blue="0.0" /></rect></element>
+	<element name="static_grey"><rect><color red="0.6" green="0.6" blue="0.6" /></rect></element>
+	<element name="static_pink"><rect><color red="0.9" green="0.55" blue="0.75" /></rect></element>
+
+	<element name="text_ufored">
+		<text string="~UFO~">
+			<color red="1.0" green="0.3" blue="0.2" />
+		</text>
+	</element>
+	<element name="text_ufoblue">
+		<text string="~UFO~">
+			<color red="0.2" green="0.3" blue="1.0" />
+		</text>
+	</element>
+
+	<element name="text_x">
+		<text string="X:" align="1">
+			<color red="0.85" green="0.85" blue="0.85" />
+		</text>
+	</element>
+	<element name="text_y">
+		<text string="Y:" align="1">
+			<color red="0.85" green="0.85" blue="0.85" />
+		</text>
+	</element>
+	<element name="text_z">
+		<text string="Z:" align="1">
+			<color red="0.85" green="0.85" blue="0.85" />
+		</text>
+	</element>
+	<element name="text_c">
+		<text string="C:" align="1">
+			<color red="0.85" green="0.85" blue="0.85" />
+		</text>
+	</element>
+
+	<element name="digit" defstate="0">
+		<led7seg>
+			<color red="1.0" green="0.3" blue="0.2" />
+		</led7seg>
+	</element>
+
+	<element name="counter" defstate="0">
+		<simplecounter maxstate="999" digits="3" align="1">
+			<color red="0.95" green="0.95" blue="0.95" />
+		</simplecounter>
+	</element>
+
+	<element name="lamp_b1" defstate="0">
+		<disk><color red="0.0" green="0.0" blue="0.0" /></disk>
+		<disk state="1">
+			<color red="1.0" green="1.0" blue="1.0" />
+			<bounds x="0.05" y="0.05" width="0.9" height="0.9" />
+		</disk>
+		<disk state="0">
+			<color red="0.7" green="0.7" blue="0.7" />
+			<bounds x="0.05" y="0.05" width="0.9" height="0.9" />
+		</disk>
+		<text string="1">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.2" width="1.0" height="0.6" />
+		</text>
+	</element>
+	<element name="lamp_b2" defstate="0">
+		<disk><color red="0.0" green="0.0" blue="0.0" /></disk>
+		<disk state="1">
+			<color red="1.0" green="1.0" blue="1.0" />
+			<bounds x="0.05" y="0.05" width="0.9" height="0.9" />
+		</disk>
+		<disk state="0">
+			<color red="0.7" green="0.7" blue="0.7" />
+			<bounds x="0.05" y="0.05" width="0.9" height="0.9" />
+		</disk>
+		<text string="2">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.2" width="1.0" height="0.6" />
+		</text>
+	</element>
+
+	<element name="lamp_red" defstate="0">
+		<disk state="0">
+			<color red="0.2" green="0.05" blue="0.0" />
+		</disk>
+		<disk state="1">
+			<color red="1.0" green="0.4" blue="0.3" />
+		</disk>
+	</element>
+
+
+<!-- build screen -->
+
+	<view name="Internal Layout">
+		<bounds left="0" right="100" top="0" bottom="90" />
+		<bezel element="static_black">
+			<bounds left="0" right="100" top="0" bottom="90" />
+		</bezel>
+
+	<!-- control panel -->
+
+		<bezel element="static_pink">
+			<bounds x="0" y="60" width="100" height="30" />
+		</bezel>
+
+		<bezel name="lamp0" element="lamp_b1" inputtag="IN2" inputmask="0x01" >
+			<bounds x="30" y="70" width="10" height="10"/>
+		</bezel>
+		<bezel name="lamp1" element="lamp_b2" inputtag="IN2" inputmask="0x02" >
+			<bounds x="43" y="70" width="10" height="10"/>
+		</bezel>
+
+		<bezel element="static_black">
+			<bounds x="60" y="70" width="12" height="17" />
+		</bezel>
+		<bezel name="digit0" element="digit">
+			<bounds x="61" y="71" width="10" height="15" />
+		</bezel>
+
+
+	<!-- left ufo info -->
+
+		<bezel element="text_x">
+			<bounds x="5" y="5" width="10" height="4" />
+		</bezel>
+		<bezel element="text_y">
+			<bounds x="5" y="10" width="10" height="4" />
+		</bezel>
+		<bezel element="text_z">
+			<bounds x="5" y="15" width="10" height="4" />
+		</bezel>
+		<bezel element="text_c">
+			<bounds x="5" y="20" width="10" height="4" />
+		</bezel>
+
+		<bezel name="counter0" element="counter">
+			<bounds x="12" y="5" width="20" height="4" />
+		</bezel>
+		<bezel name="counter1" element="counter">
+			<bounds x="12" y="10" width="20" height="4" />
+		</bezel>
+		<bezel name="counter2" element="counter">
+			<bounds x="12" y="15" width="20" height="4" />
+		</bezel>
+		<bezel name="counter3" element="counter">
+			<bounds x="12" y="20" width="20" height="4" />
+		</bezel>
+
+		<bezel element="text_ufored">
+			<bounds x="25" y="25" width="50" height="14" />
+		</bezel>
+
+		<bezel name="lamp10" element="lamp_red">
+			<bounds x="34" y="44" width="3" height="3" />
+		</bezel>
+		<bezel name="lamp11" element="lamp_red">
+			<bounds x="41" y="44" width="3" height="3" />
+		</bezel>
+		<bezel name="lamp12" element="lamp_red">
+			<bounds x="48" y="44" width="3" height="3" />
+		</bezel>
+		<bezel name="lamp13" element="lamp_red">
+			<bounds x="55" y="44" width="3" height="3" />
+		</bezel>
+		<bezel name="lamp14" element="lamp_red">
+			<bounds x="62" y="44" width="3" height="3" />
+		</bezel>
+
+
+	</view>
+</mamelayout>

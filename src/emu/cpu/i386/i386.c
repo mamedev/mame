@@ -3135,6 +3135,7 @@ void i386_device::i386_common_init(int tlbsize)
 	m_vtlb = vtlb_alloc(this, AS_PROGRAM, 0, tlbsize);
 	m_smi = false;
 	m_debugger_temp = 0;
+	m_lock = false;
 
 	zero_state();
 
@@ -3562,7 +3563,6 @@ void i386_device::device_reset()
 	m_smi_latched = false;
 	m_nmi_masked = false;
 	m_nmi_latched = false;
-	m_lock = false;
 
 	m_a20_mask = ~0;
 
