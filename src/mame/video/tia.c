@@ -269,13 +269,13 @@ Phase Shift 26.2
 			double G = Y - 0.272 * I - 0.647 * Q;
 			double B = Y - 1.106 * I + 1.703 * Q;
 
-			R = pow(R, 0.9) / pow(1, 0.9);
-			G = pow(G, 0.9) / pow(1, 0.9);
-			B = pow(B, 0.9) / pow(1, 0.9);
-
 			if (R < 0) R = 0;
 			if (G < 0) G = 0;
 			if (B < 0) B = 0;
+
+			R = pow(R, 0.9);
+			G = pow(G, 0.9);
+			B = pow(B, 0.9);
 
 			if (R > 1) R = 1;
 			if (G > 1) G = 1;
@@ -328,13 +328,13 @@ PALETTE_INIT_MEMBER(tia_pal_video_device, tia_pal)
 			double G = Y - 0.344 * U - 0.714 * V;
 			double B = Y + 1.770 * U;
 
-			R = pow(R, 1.2) / pow(1, 1.2);
-			G = pow(G, 1.2) / pow(1, 1.2);
-			B = pow(B, 1.2) / pow(1, 1.2);
-
 			if (R < 0) R = 0;
 			if (G < 0) G = 0;
 			if (B < 0) B = 0;
+
+			R = pow(R, 1.2);
+			G = pow(G, 1.2);
+			B = pow(B, 1.2);
 
 			if (R > 1) R = 1;
 			if (G > 1) G = 1;
