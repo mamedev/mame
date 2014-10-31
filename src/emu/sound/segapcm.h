@@ -61,6 +61,7 @@ private:
 	int m_bankmask;
 	int m_rgnmask;
 	sound_stream* m_stream;
+	UINT16 m_vgm_idx;
 };
 
 extern const device_type SEGAPCM;

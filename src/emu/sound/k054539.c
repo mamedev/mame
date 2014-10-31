@@ -8,6 +8,7 @@
 *********************************************************/
 
 #include "emu.h"
+#include "vgmwrite.h"
 #include "k054539.h"
 
 const device_type K054539 = &device_creator<k054539_device>;
@@ -65,6 +66,7 @@ k054539_device::k054539_device(const machine_config &mconfig, const char *tag, d
 
 void k054539_device::init_flags(int _flags)
 {
+	vgm_header_set(vgm_idx, 0x01, _flags);
 	flags = _flags;
 }
 
@@ -320,6 +322,10 @@ void k054539_device::init_chip()
 
 	stream = stream_alloc(0, 2, clock() / 384);
 
+	vgm_idx = vgm_open(VGMC_K054539, clock());
+	vgm_header_set(vgm_idx, 0x01, flags);
+	vgm_write_large_data(vgm_idx, 0x01, rom_size, 0x00, 0x00, rom);
+
 	save_item(NAME(regs));
 	save_pointer(NAME(ram), 0x4000);
 	save_item(NAME(cur_ptr));
@@ -327,6 +333,8 @@ void k054539_device::init_chip()
 
 WRITE8_MEMBER(k054539_device::write)
 {
+	vgm_write(vgm_idx, 0x00, offset, data);
+
 	if(0) {
 		int voice, reg;
 

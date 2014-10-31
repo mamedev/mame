@@ -118,6 +118,7 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "vgmwrite.h"
 #include "sn76496.h"
 
 #define MAX_OUTPUT 0x7fff
@@ -150,6 +151,15 @@ void sn76496_base_device::device_start()
 	m_ready_handler.resolve_safe();
 
 	m_sound = machine().sound().stream_alloc(*this, 0, (m_stereo? 2:1), sample_rate);
+
+	m_vgm_idx = vgm_open(VGMC_SN76496, clock());
+	vgm_header_set(m_vgm_idx, 0x01, m_feedback_mask);
+	vgm_header_set(m_vgm_idx, 0x02, m_whitenoise_tap1);
+	vgm_header_set(m_vgm_idx, 0x03, m_whitenoise_tap2);
+	vgm_header_set(m_vgm_idx, 0x04, m_negate);
+	vgm_header_set(m_vgm_idx, 0x05, m_stereo);
+	vgm_header_set(m_vgm_idx, 0x06, m_clock_divider);
+	vgm_header_set(m_vgm_idx, 0x07, m_freq0_is_max);
 
 	for (i = 0; i < 4; i++) m_volume[i] = 0;
 
@@ -203,6 +213,7 @@ void sn76496_base_device::device_start()
 WRITE8_MEMBER( sn76496_base_device::stereo_w )
 {
 	m_sound->update();
+	vgm_write(m_vgm_idx, 0x01, data, 0x00);
 	if (m_stereo) m_stereo_mask = data;
 	else fatalerror("sn76496_base_device: Call to stereo write with mono chip!\n");
 }
@@ -225,6 +236,8 @@ void sn76496_base_device::write(UINT8 data)
 	// longer be an issue.
 
 	m_cycles_to_ready = 2;
+
+	vgm_write(m_vgm_idx, 0x00, data, 0x00);
 
 	if (data & 0x80)
 	{

@@ -68,6 +68,7 @@ Revision History:
 */
 
 #include "emu.h"
+#include "vgmwrite.h"
 #include "ymdeltat.h"
 #include "fmopl.h"
 
@@ -318,6 +319,7 @@ struct FM_OPL
 	UINT32 rate;                    /* sampling rate (Hz)           */
 	double freqbase;                /* frequency base               */
 	attotime TimerBase;         /* Timer base time (==sampling time)*/
+	UINT16 vgm_idx;                 /* VGM index */
 	device_t *device;
 
 	signed int phase_modulation;    /* phase modulation input (SLOT 2) */
@@ -2038,6 +2040,7 @@ static int OPLWrite(FM_OPL *OPL,int a,int v)
 	else
 	{   /* data port */
 		if(OPL->UpdateHandler) OPL->UpdateHandler(OPL->UpdateParam,0);
+		vgm_write(OPL->vgm_idx, 0x00, OPL->address, v);
 		OPLWriteReg(OPL,OPL->address,v);
 	}
 	return OPL->status>>7;
@@ -2159,6 +2162,7 @@ void * ym3812_init(device_t *device, UINT32 clock, UINT32 rate)
 	{
 		OPL_save_state(YM3812, device);
 		ym3812_reset_chip(YM3812);
+		YM3812->vgm_idx = vgm_open(VGMC_YM3812, clock);
 	}
 	return YM3812;
 }
@@ -2287,6 +2291,7 @@ void *ym3526_init(device_t *device, UINT32 clock, UINT32 rate)
 	{
 		OPL_save_state(YM3526, device);
 		ym3526_reset_chip(YM3526);
+		YM3526->vgm_idx = vgm_open(VGMC_YM3526, clock);
 	}
 	return YM3526;
 }
@@ -2435,6 +2440,7 @@ void *y8950_init(device_t *device, UINT32 clock, UINT32 rate)
 		/* reset */
 		OPL_save_state(Y8950, device);
 		y8950_reset_chip(Y8950);
+		Y8950->vgm_idx = vgm_open(VGMC_Y8950, clock);
 	}
 
 	return Y8950;
@@ -2490,6 +2496,7 @@ void y8950_set_delta_t_memory(void *chip, void * deltat_mem_ptr, int deltat_mem_
 	FM_OPL      *OPL = (FM_OPL *)chip;
 	OPL->deltat->memory = (UINT8 *)(deltat_mem_ptr);
 	OPL->deltat->memory_size = deltat_mem_size;
+	vgm_write_large_data(OPL->vgm_idx, 0x01, OPL->deltat->memory_size, 0x00, 0x00, OPL->deltat->memory);
 }
 
 /*

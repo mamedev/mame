@@ -68,6 +68,7 @@ private:
 	UINT32 m_sample_rom_length;
 	INT8 *m_sample_rom;     // Q-Sound sample ROM
 	dsp16_device *m_cpu;
+	UINT16 m_vgm_idx;        // VGM index
 
 	inline INT8 read_sample(UINT32 offset) { return m_sample_rom[offset % m_sample_rom_length]; }
 	void write_data(UINT8 address, UINT16 data);

@@ -156,6 +156,7 @@ EMUSOUNDOBJS = \
 	$(EMUOBJ)/sound/flt_vol.o \
 	$(EMUOBJ)/sound/flt_rc.o \
 	$(EMUOBJ)/sound/wavwrite.o \
+	$(EMUOBJ)/sound/vgmwrite.o \
 	$(EMUOBJ)/sound/samples.o   \
 
 EMUDRIVEROBJS = \

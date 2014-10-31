@@ -23,6 +23,7 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "vgmwrite.h"
 #include "k051649.h"
 
 #define FREQ_BITS   16
@@ -71,6 +72,8 @@ void k051649_device::device_start()
 
 	// build the mixer table
 	make_mixer_table(5);
+
+	m_vgm_idx = vgm_open(VGMC_K051649, m_mclock);
 }
 
 
@@ -150,6 +153,8 @@ void k051649_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 
 WRITE8_MEMBER( k051649_device::k051649_waveform_w )
 {
+	vgm_write(m_vgm_idx, 0x00, offset, data);
+
 	// waveram is read-only?
 	if (m_test & 0x40 || (m_test & 0x80 && offset >= 0x60))
 		return;
@@ -185,6 +190,8 @@ READ8_MEMBER ( k051649_device::k051649_waveform_r )
 
 WRITE8_MEMBER( k051649_device::k052539_waveform_w )
 {
+	vgm_write(m_vgm_idx, 0x04, offset, data);
+
 	// waveram is read-only?
 	if (m_test & 0x40)
 		return;
@@ -209,6 +216,7 @@ READ8_MEMBER ( k051649_device::k052539_waveform_r )
 WRITE8_MEMBER( k051649_device::k051649_volume_w )
 {
 	m_stream->update();
+	vgm_write(m_vgm_idx, 0x02, offset, data);
 	m_channel_list[offset&0x7].volume=data&0xf;
 }
 
@@ -216,6 +224,7 @@ WRITE8_MEMBER( k051649_device::k051649_volume_w )
 WRITE8_MEMBER( k051649_device::k051649_frequency_w )
 {
 	int freq_hi = offset & 1;
+	vgm_write(m_vgm_idx, 0x01, offset, data);
 	offset >>= 1;
 
 	m_stream->update();
@@ -239,6 +248,8 @@ WRITE8_MEMBER( k051649_device::k051649_keyonoff_w )
 	int i;
 	m_stream->update();
 
+	vgm_write(m_vgm_idx, 0x03, offset, data);
+
 	for (i = 0; i < 5; i++)
 	{
 		m_channel_list[i].key=data&1;
@@ -249,6 +260,7 @@ WRITE8_MEMBER( k051649_device::k051649_keyonoff_w )
 
 WRITE8_MEMBER( k051649_device::k051649_test_w )
 {
+	vgm_write(m_vgm_idx, 0x05, offset, data);
 	m_test = data;
 }
 
