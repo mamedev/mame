@@ -14,8 +14,6 @@
 #include "emu.h"
 #include "machine/pic8259.h"
 
-#define IRQ_COUNT   8
-
 #define LOG_ICW     0
 #define LOG_OCW     0
 #define LOG_GENERAL  0
@@ -24,20 +22,17 @@ ALLOW_SAVE_TYPE(pic8259_device::pic8259_state_t); // allow save_item on a non-fu
 
 void pic8259_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	int irq;
-	UINT8 mask;
-
 	/* check the various IRQs */
-	for (irq = 0; irq < IRQ_COUNT; irq++)
+	for (int n = 0, irq = m_prio; n < 8; n++, irq = (irq + 1) & 7)
 	{
-		mask = 1 << irq;
+		UINT8 mask = 1 << irq;
 
-		/* is this IRQ in service? */
-		if (m_isr & mask)
+		/* is this IRQ in service and not cascading and sfnm? */
+		if ((m_isr & mask) && !(m_master && m_cascade && m_nested && (m_slave & mask)))
 		{
 			if (LOG_GENERAL)
 			{
-				logerror("pic8259_timerproc(): PIC IRQ #%d still in service\n", irq);
+				logerror("pic8259_timerproc() %s: PIC IRQ #%d still in service\n", tag(), irq);
 			}
 			break;
 		}
@@ -47,7 +42,7 @@ void pic8259_device::device_timer(emu_timer &timer, device_timer_id id, int para
 		{
 			if (LOG_GENERAL)
 			{
-				logerror("pic8259_timerproc(): PIC triggering IRQ #%d\n", irq);
+				logerror("pic8259_timerproc() %s: PIC triggering IRQ #%d\n", tag(), irq);
 			}
 			if (!BIT(m_ocw3, 2))
 			{
@@ -55,6 +50,9 @@ void pic8259_device::device_timer(emu_timer &timer, device_timer_id id, int para
 			}
 			return;
 		}
+		// if sfnm and in-service don't continue
+		if((m_isr & mask) && m_master && m_cascade && m_nested && (m_slave & mask))
+			break;
 	}
 	if (!BIT(m_ocw3, 2))
 	{
@@ -71,7 +69,7 @@ void pic8259_device::set_irq_line(int irq, int state)
 	{
 		/* setting IRQ line */
 		if (LOG_GENERAL)
-			logerror("pic8259_set_irq_line(): PIC set IRQ line #%d\n", irq);
+			logerror("pic8259_set_irq_line() %s: PIC set IRQ line #%d\n", tag(), irq);
 
 		if(m_level_trig_mode || (!m_level_trig_mode && !(m_irq_lines & mask)))
 		{
@@ -84,7 +82,7 @@ void pic8259_device::set_irq_line(int irq, int state)
 		/* clearing IRQ line */
 		if (LOG_GENERAL)
 		{
-			logerror("pic8259_device::set_irq_line(): PIC cleared IRQ line #%d\n", irq);
+			logerror("pic8259_device::set_irq_line() %s: PIC cleared IRQ line #%d\n", tag(), irq);
 		}
 
 		m_irq_lines &= ~mask;
@@ -96,19 +94,16 @@ void pic8259_device::set_irq_line(int irq, int state)
 
 UINT32 pic8259_device::acknowledge()
 {
-	UINT8 mask;
-	int irq;
-
-	for (irq = 0; irq < IRQ_COUNT; irq++)
+	for (int n = 0, irq = m_prio; n < 8; n++, irq = (irq + 1) & 7)
 	{
-		mask = 1 << irq;
+		UINT8 mask = 1 << irq;
 
 		/* is this IRQ pending and enabled? */
 		if ((m_irr & mask) && !(m_imr & mask))
 		{
 			if (LOG_GENERAL)
 			{
-				logerror("pic8259_acknowledge(): PIC acknowledge IRQ #%d\n", irq);
+				logerror("pic8259_acknowledge() %s: PIC acknowledge IRQ #%d\n", tag(), irq);
 			}
 			if (!m_level_trig_mode)
 			{
@@ -170,8 +165,8 @@ READ8_MEMBER( pic8259_device::read )
 
 				if ( m_irr & ~m_imr )
 				{
-					int irq;
-					for ( irq = 0; irq < IRQ_COUNT; irq++ )
+					/* check the various IRQs */
+					for (int n = 0, irq = m_prio; n < 8; n++, irq = (irq + 1) & 7)
 					{
 						if ( ( 1 << irq ) & m_irr & ~m_imr )
 						{
@@ -216,7 +211,7 @@ WRITE8_MEMBER( pic8259_device::write )
 				/* write ICW1 - this pretty much resets the chip */
 				if (LOG_ICW)
 				{
-					logerror("pic8259_device::write(): ICW1; data=0x%02X\n", data);
+					logerror("pic8259_device::write() %s: ICW1; data=0x%02X\n", tag(), data);
 				}
 
 				m_imr                = 0x00;
@@ -237,7 +232,7 @@ WRITE8_MEMBER( pic8259_device::write )
 					/* write OCW3 */
 					if (LOG_OCW)
 					{
-						logerror("pic8259_device::write(): OCW3; data=0x%02X\n", data);
+						logerror("pic8259_device::write() %s: OCW3; data=0x%02X\n", tag(), data);
 					}
 
 					m_ocw3 = data;
@@ -250,7 +245,7 @@ WRITE8_MEMBER( pic8259_device::write )
 					/* write OCW2 */
 					if (LOG_OCW)
 					{
-						logerror("pic8259_device::write(): OCW2; data=0x%02X\n", data);
+						logerror("pic8259_device::write() %s: OCW2; data=0x%02X\n", tag(), data);
 					}
 
 					switch (data & 0xe0)
@@ -291,13 +286,13 @@ WRITE8_MEMBER( pic8259_device::write )
 							}
 							break;
 						case 0xc0:
-							m_prio = n & 7;
+							m_prio = (n + 1) & 7;
 							break;
 						case 0xe0:
 							if( m_isr & mask )
 							{
 								m_isr &= ~mask;
-								m_prio = (m_prio + 1) & 7;
+								m_prio = (n + 1) & 7;
 							}
 							break;
 					}
@@ -315,7 +310,7 @@ WRITE8_MEMBER( pic8259_device::write )
 					/* write ICW2 */
 					if (LOG_ICW)
 					{
-						logerror("pic8259_device::write(): ICW2; data=0x%02X\n", data);
+						logerror("pic8259_device::write() %s: ICW2; data=0x%02X\n", tag(), data);
 					}
 
 					m_base = data & 0xf8;
@@ -334,7 +329,7 @@ WRITE8_MEMBER( pic8259_device::write )
 					/* write ICW3 */
 					if (LOG_ICW)
 					{
-						logerror("pic8259_device::write(): ICW3; data=0x%02X\n", data);
+						logerror("pic8259_device::write() %s: ICW3; data=0x%02X\n", tag(), data);
 					}
 
 					m_slave = data;
@@ -345,7 +340,7 @@ WRITE8_MEMBER( pic8259_device::write )
 					/* write ICW4 */
 					if (LOG_ICW)
 					{
-						logerror("pic8259_device::write(): ICW4; data=0x%02X\n", data);
+						logerror("pic8259_device::write() %s: ICW4; data=0x%02X\n", tag(), data);
 					}
 
 					m_nested = (data & 0x10) ? 1 : 0;
