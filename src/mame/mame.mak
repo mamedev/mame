@@ -2833,7 +2833,10 @@ $(DRIVERS)/segaorun.o:  $(LAYOUT)/outrun.lh
 
 $(DRIVERS)/segas32.o:   $(LAYOUT)/radr.lh
 
-$(DRIVERS)/segaufo.o:   $(LAYOUT)/segaufo.lh
+$(DRIVERS)/segaufo.o:   $(LAYOUT)/newufo.lh \
+			$(LAYOUT)/ufomini.lh \
+			$(LAYOUT)/ufo21.lh \
+			$(LAYOUT)/ufo800.lh
 
 $(DRIVERS)/segaybd.o:   $(LAYOUT)/pdrift.lh
 
