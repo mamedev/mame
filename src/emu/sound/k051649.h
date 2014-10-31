@@ -85,6 +85,8 @@ private:
 
 	/* chip registers */
 	UINT8 m_test;
+
+	UINT16 m_vgm_idx;	/* VGM index */
 };
 
 extern const device_type K051649;

@@ -18,6 +18,10 @@
 	MCFG_DEVICE_ADD(_tag, RF5C68, _clock)
 #define MCFG_RF5C68_REPLACE(_tag, _clock) \
 	MCFG_DEVICE_REPLACE(_tag, RF5C68, _clock)
+#define MCFG_RF5C164_ADD(_tag, _clock) \
+	MCFG_DEVICE_ADD(_tag, RF5C164, _clock)
+#define MCFG_RF5C164_REPLACE(_tag, _clock) \
+	MCFG_DEVICE_REPLACE(_tag, RF5C164, _clock)
 
 #define MCFG_RF5C68_SAMPLE_END_CB(_class, _method) \
 	rf5c68_device::set_end_callback(*device, rf5c68_sample_end_cb_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
@@ -58,6 +62,7 @@ class rf5c68_device : public device_t,
 						public device_sound_interface
 {
 public:
+	rf5c68_device(const machine_config &mconfig, device_type type, const char* name, const char *tag, device_t *owner, UINT32 clock, const char *shortname);
 	rf5c68_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~rf5c68_device() { }
 
@@ -84,11 +89,18 @@ private:
 	UINT8                m_wbank;
 	UINT8                m_enable;
 	UINT8                m_data[0x10000];
+	UINT16               m_vgm_idx;
 
 	rf5c68_sample_end_cb_delegate m_sample_end_cb;
 };
 
+class rf5c164_device : public rf5c68_device
+{
+public:
+	rf5c164_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+ 
 extern const device_type RF5C68;
-
+extern const device_type RF5C164;
 
 #endif /* __RF5C68_H__ */

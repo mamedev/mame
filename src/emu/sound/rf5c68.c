@@ -3,11 +3,13 @@
 /*********************************************************/
 
 #include "emu.h"
+#include "vgmwrite.h"
 #include "rf5c68.h"
 
 
 // device type definition
 const device_type RF5C68 = &device_creator<rf5c68_device>;
+const device_type RF5C164 = &device_creator<rf5c164_device>;
 
 
 //**************************************************************************
@@ -18,6 +20,21 @@ const device_type RF5C68 = &device_creator<rf5c68_device>;
 //  rf5c68_device - constructor
 //-------------------------------------------------
 
+rf5c68_device::rf5c68_device(const machine_config &mconfig, device_type type, const char* name, const char *tag, device_t *owner, UINT32 clock, const char *shortname)
+	: device_t(mconfig, type, name, tag, owner, clock, shortname, __FILE__),
+		device_sound_interface(mconfig, *this),
+		m_stream(NULL),
+		m_cbank(0),
+		m_wbank(0),
+		m_enable(0)
+{
+	memset(m_data, 0, sizeof(UINT8)*0x10000);
+	if (this->type() == RF5C68)
+		m_vgm_idx = vgm_open(VGMC_RF5C68, clock);
+	else
+		m_vgm_idx = vgm_open(VGMC_RF5C164, clock);
+}
+
 rf5c68_device::rf5c68_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, RF5C68, "RF5C68", tag, owner, clock, "rf5c68", __FILE__),
 		device_sound_interface(mconfig, *this),
@@ -27,6 +44,15 @@ rf5c68_device::rf5c68_device(const machine_config &mconfig, const char *tag, dev
 		m_enable(0)
 {
 	memset(m_data, 0, sizeof(UINT8)*0x10000);
+	if (this->type() == RF5C68)
+		m_vgm_idx = vgm_open(VGMC_RF5C68, clock);
+	else
+		m_vgm_idx = vgm_open(VGMC_RF5C164, clock);
+}
+
+rf5c164_device::rf5c164_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: rf5c68_device(mconfig, RF5C164, "RF5C164", tag, owner, clock, "rf5c164")
+{
 }
 
 
@@ -158,6 +184,8 @@ WRITE8_MEMBER( rf5c68_device::rf5c68_w )
 	/* force the stream to update first */
 	m_stream->update();
 
+	vgm_write(m_vgm_idx, 0x00, offset & 0xFF, data);
+
 	/* switch off the address */
 	switch (offset)
 	{
@@ -227,5 +255,6 @@ READ8_MEMBER( rf5c68_device::rf5c68_mem_r )
 
 WRITE8_MEMBER( rf5c68_device::rf5c68_mem_w )
 {
+	vgm_write(m_vgm_idx, 0x01, offset & 0xFFFF, data);
 	m_data[m_wbank * 0x1000 + offset] = data;
 }

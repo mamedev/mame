@@ -83,6 +83,8 @@ protected:
 
 	devcb_write_line m_drqcallback;
 
+	UINT16      m_vgm_idx;                    /* VGM index */
+
 	void update_adpcm(int data);
 	void advance_state();
 };
