@@ -193,7 +193,24 @@ public:
 	DECLARE_PALETTE_INIT(fstation);
 	DECLARE_WRITE_LINE_MEMBER(duart_irq_handler);
 	//INTERRUPT_GEN_MEMBER(adp_int);
+	void skattva_nvram_init(nvram_device &nvram, void *base, size_t size);
 };
+
+void adp_state::skattva_nvram_init(nvram_device &nvram, void *base, size_t size)
+{
+/*
+    00F6FA: 4EB9 0001 A4B2             jsr     $1a4b2.l
+    00F700: 0CB8 2400 0018 E450        cmpi.l  #$24000018, $e450.w
+    00F708: 6606                       bne     $f710
+    00F70A: 4EB9 0001 D7F4             jsr     $1d7f4.l                 ; initializes the HD63484
+    00F710: 11FC 0010 E8AD             move.b  #$10, $e8ad.w
+*/
+	UINT16 *ram = (UINT16 *)base;
+	ram[0x2450 >> 1] = 0x2400;
+	ram[0x2452 >> 1] = 0x0018;
+	ram[0x0000 >> 1] = 0x3141;
+	ram[0x0002 >> 1] = 0x5926;
+}
 
 
 
@@ -277,6 +294,17 @@ static ADDRESS_MAP_START( skattv_mem, AS_PROGRAM, 16, adp_state )
 	AM_RANGE(0xffc000, 0xffffff) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( skattva_mem, AS_PROGRAM, 16, adp_state )
+	AM_RANGE(0x000000, 0x03ffff) AM_ROM
+	AM_RANGE(0x400000, 0x40001f) AM_DEVREADWRITE8("rtc",msm6242_device, read, write, 0x00ff)
+	AM_RANGE(0x800080, 0x800081) AM_DEVREADWRITE("h63484", h63484_device, status_r, address_w)
+	AM_RANGE(0x800082, 0x800083) AM_DEVREADWRITE("h63484", h63484_device, data_r, data_w)
+	AM_RANGE(0x800100, 0x800101) AM_READ_PORT("IN0")
+	AM_RANGE(0x800140, 0x800143) AM_DEVREADWRITE8("aysnd", ay8910_device, data_r, address_data_w, 0x00ff) //18b too
+	AM_RANGE(0x800180, 0x80019f) AM_DEVREADWRITE8("duart68681", mc68681_device, read, write, 0xff )
+	AM_RANGE(0xffc000, 0xffffff) AM_RAM AM_SHARE("nvram")
+ADDRESS_MAP_END
+
 static ADDRESS_MAP_START( quickjac_mem, AS_PROGRAM, 16, adp_state )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 	AM_RANGE(0x400000, 0x40001f) AM_DEVREADWRITE8("rtc",msm6242_device, read, write, 0x00ff)
@@ -313,7 +341,6 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( fstation_mem, AS_PROGRAM, 16, adp_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	//400000-40001f?
 	AM_RANGE(0x800080, 0x800081) AM_DEVREADWRITE("h63484", h63484_device, status_r, address_w)
 	AM_RANGE(0x800082, 0x800083) AM_DEVREADWRITE("h63484", h63484_device, data_r, data_w)
 	AM_RANGE(0x800100, 0x800101) AM_READWRITE(input_r, input_w)
@@ -398,6 +425,28 @@ static INPUT_PORTS_START( skattv )
 	PORT_DIPSETTING(     0x0000, DEF_STR( On ) )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_COIN1 )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( skattva )
+	PORT_START("PA")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_HBLANK("screen")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
+	PORT_BIT( 0x9e, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	PORT_START("IN0")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_BUTTON3 )
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON2 )
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_START1 )
+	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	PORT_START("DSW1")
+	PORT_BIT( 0x3f, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( fstation )
@@ -525,6 +574,13 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( skattv, quickjac )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(skattv_mem)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( skattva, quickjac )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(skattva_mem)
+
+	MCFG_NVRAM_REPLACE_CUSTOM_DRIVER("nvram", adp_state, skattva_nvram_init)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( backgamn, skattv )
@@ -664,7 +720,7 @@ ROM_END
 GAME( 1990, backgamn,  0,        backgamn,    skattv, driver_device,    0, ROT0,  "ADP",     "Backgammon", GAME_NOT_WORKING )
 GAME( 1993, quickjac,  0,        quickjac,    quickjac, driver_device,  0, ROT0,  "ADP",     "Quick Jack", GAME_NOT_WORKING )
 GAME( 1994, skattv,    0,        skattv,      skattv, driver_device,    0, ROT0,  "ADP",     "Skat TV", GAME_NOT_WORKING )
-GAME( 1995, skattva,   skattv,   skattv,      skattv, driver_device,    0, ROT0,  "ADP",     "Skat TV (version TS3)", GAME_NOT_WORKING )
+GAME( 1995, skattva,   skattv,   skattva,     skattva, driver_device,   0, ROT0,  "ADP",     "Skat TV (version TS3)", GAME_NOT_WORKING )
 GAME( 1997, fashiong,  0,        fashiong,    skattv, driver_device,    0, ROT0,  "ADP",     "Fashion Gambler (set 1)", GAME_NOT_WORKING )
 GAME( 1997, fashiong2, fashiong, fashiong,    skattv, driver_device,    0, ROT0,  "ADP",     "Fashion Gambler (set 2)", GAME_NOT_WORKING )
 GAME( 1999, funlddlx,  0,        funland,     skattv, driver_device,    0, ROT0,  "Stella",  "Funny Land de Luxe", GAME_NOT_WORKING )
