@@ -4,6 +4,10 @@
 #include "cpu/rsp/rsp.h"
 #include "sound/dmadac.h"
 
+#ifdef __ANDROID__
+#undef si_status
+#endif
+
 /*----------- forward decls -----------*/
 
 /*----------- driver state -----------*/
