@@ -485,7 +485,8 @@ void gimix_state::machine_reset()
 	m_floppy0_ready = false;
 	m_floppy1_ready = false;
 	membank("lower_ram")->set_base(m_ram->pointer());
-	membank("upper_ram")->set_base(m_ram->pointer()+0x10000);
+	if(m_ram->size() > 65536)
+		membank("upper_ram")->set_base(m_ram->pointer()+0x10000);
 
 	// initialise FDC clock based on DIP Switch S2-9 (5.25"/8" drive select)
 	if(m_dma_dip->read() & 0x00000100)
