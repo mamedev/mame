@@ -160,11 +160,20 @@ opcode_desc *drc_frontend::describe_one(offs_t curpc, const opcode_desc *prevdes
 {
 	// initialize the description
 	opcode_desc *desc = m_desc_allocator.alloc();
-	// TODO: this kills the opcode_desc.delay vptr
-	memset(desc, 0, sizeof(*desc));
+	desc->m_next = NULL;
+	desc->branch = NULL;
 	desc->pc = curpc;
 	desc->physpc = curpc;
 	desc->targetpc = BRANCH_TARGET_DYNAMIC;
+	desc->opptr = { NULL };
+	desc->length = 0;
+	desc->delayslots = 0;
+	desc->skipslots = 0;
+	desc->flags = 0;
+	desc->cycles = 0;
+	memset(desc->regin, 0x00, sizeof(desc->regin));
+	memset(desc->regout, 0x00, sizeof(desc->regout));
+	memset(desc->regreq, 0x00, sizeof(desc->regreq));
 
 	// call the callback to describe an instruction
 	if (!describe(*desc, prevdesc))
