@@ -43068,7 +43068,7 @@ List of unclassified roms
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="2621440">
-				<rom name="pawafurupuroyakyu.29b03.sfc" size="2097152" crc="855e3deb" sha1="508b86da019645e787a87ead558b7f8c24864f68" offset="0x000000" />
+				<rom name="pawafurupuroyakyu.29b03.sfc" size="2621440" crc="855e3deb" sha1="508b86da019645e787a87ead558b7f8c24864f68" offset="0x000000" />
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
