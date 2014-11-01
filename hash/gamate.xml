@@ -3,7 +3,7 @@
 
 <softwarelist name="gamate" description="Bit Corp Gamate cartridges">
 
-	<software name="cubeup">
+	<software name="cubeup" supported="no">
 		<description>Cube Up</description>
 		<year>19??</year>
 		<publisher>Bit Corp</publisher>
