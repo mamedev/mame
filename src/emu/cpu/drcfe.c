@@ -165,7 +165,7 @@ opcode_desc *drc_frontend::describe_one(offs_t curpc, const opcode_desc *prevdes
 	desc->pc = curpc;
 	desc->physpc = curpc;
 	desc->targetpc = BRANCH_TARGET_DYNAMIC;
-	desc->opptr = { NULL };
+	memset(&desc->opptr, 0x00, sizeof(desc->opptr));
 	desc->length = 0;
 	desc->delayslots = 0;
 	desc->skipslots = 0;

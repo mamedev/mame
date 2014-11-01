@@ -181,6 +181,7 @@ static INPUT_PORTS_START( gamate )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SELECT) PORT_NAME("select")
 INPUT_PORTS_END
 
+#if 0
 static const struct gfx_layout gamate_charlayout =
 {
 		4,      /* width of object */
@@ -199,6 +200,7 @@ static const unsigned short gamate_palette[4] =
 {
 	0,1,2,3
 };
+#endif
 
 /* palette in red, green, blue tribles */
 static const unsigned char gamate_colors[4][3] =
@@ -209,9 +211,11 @@ static const unsigned char gamate_colors[4][3] =
 	{ 0, 0, 0 }
 };
 
+#if 0
 static GFXDECODE_START( gamate_charlayout )
 		GFXDECODE_ENTRY( "gfx1", 0x0000, gamate_charlayout, 0, 0x100 )
 GFXDECODE_END
+#endif
 
 PALETTE_INIT_MEMBER(gamate_state, gamate)
 {
