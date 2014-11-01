@@ -7,7 +7,6 @@ The following games existed according to VGRebirth
   - NFL Quarterback Club 95 (Jpn) by Acclaim
   - Robocop 3 (Jpn) by Acclaim
   - Sonic Drift (Euro) by Sega
-  - Super Golf (USA) by Sage's Creations
   - Terminator 2 - Judgement Day (Jpn) by Acclaim
 
 Other undumped games:
@@ -8415,6 +8414,17 @@ a certain item) -->
 	</software>
 
 	<software name="supgolf">
+		<description>Super Golf (USA)</description>
+		<year>1991</year>
+		<publisher>Sage's Creations</publisher>
+		<part name="cart" interface="gamegear_cart">
+			<dataarea name="rom" size="131072">
+				<rom name="super golf (usa).bin" size="131072" crc="e9570f36" sha1="ed9b5e1264b4ed6d8969ba1c4e3f2d9446c3c9ca" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="supgolfj" cloneof="supgolf">
 		<description>Super Golf (Jpn)</description>
 		<year>1991</year>
 		<publisher>Sigma Enterprises</publisher>
