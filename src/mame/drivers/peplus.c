@@ -142,7 +142,8 @@ Super PE+
    XnnnnnnP Poker Data. Contains poker game + paytable percentages
              Data roms will not work with every Program rom. Incompatible combos report: Incompatible Data EPROM
              X000055P is a good example, it works with 19 XP000xxx Program roms. Others may be as few as 2.
-  XMPnnnnn  Multi-Poker Programs. Different options for each set, but all use the same XMnnnnnP data roms
+  XMPnnnnn  Multi-Poker Programs. Different options for each set, but all use the same XMnnnnnP data 
+             XMP00002 through XMP00006 & XMP00024 Use the XM000xxP Multi-Poker Data
              XMP00014, XMP00017 & XMP00030 Use the WING Board add-on and use the XnnnnnnP Poker Data (Not all are compatible!)
              XMP00013, XMP00022 & XMP00026 Use the WING Board add-on & CG2346 + CAPX2346 for Spanish paytables
              XMP00025 Uses the Wing Board add-on and is for the International markets. Auto Hold always enabled.
