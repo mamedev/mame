@@ -434,7 +434,7 @@ UINT32 cb2001_state::screen_update_cb2001(screen_device &screen, bitmap_rgb32 &b
 		}
 	}
 
-	popmessage("%02x %02x %02x %02x\n",m_videobank,m_videomode, m_other1, m_other2);
+	//popmessage("%02x %02x %02x %02x\n",m_videobank,m_videomode, m_other1, m_other2);
 
 	return 0;
 }
@@ -447,7 +447,7 @@ WRITE16_MEMBER(cb2001_state::cb2001_vidctrl_w)
 {
 	if (mem_mask&0xff00) // video control?
 	{
-		printf("cb2001_vidctrl_w %04x %04x\n", data, mem_mask);
+		//printf("cb2001_vidctrl_w %04x %04x\n", data, mem_mask);
 		m_videobank = (data & 0x0800)>>11;
 	}
 	else // something else
@@ -458,7 +458,7 @@ WRITE16_MEMBER(cb2001_state::cb2001_vidctrl2_w)
 {
 	if (mem_mask&0xff00) // video control?
 	{
-		printf("cb2001_vidctrl2_w %04x %04x\n", data, mem_mask); // i think this switches to 'reels' mode
+		//printf("cb2001_vidctrl2_w %04x %04x\n", data, mem_mask); // i think this switches to 'reels' mode
 		m_videomode = (data>>8) & 0x03; // which bit??
 	}
 	else // something else
