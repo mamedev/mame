@@ -763,6 +763,15 @@ void i386_device::i386_trap(int irq, int irq_gate, int trap_level)
 				logerror("IRQ (%08x): Software IRQ - gate DPL is less than CPL.\n",m_pc);
 				FAULT_EXP(FAULT_GP,entry+2)
 			}
+			if(V8086_MODE)
+			{
+				if((!m_IOP1 || !m_IOP2) && (m_opcode != 0xcc))
+				{
+					logerror("IRQ (%08x): Is in Virtual 8086 mode and IOPL != 3.\n",m_pc);
+					FAULT(FAULT_GP,0)
+				}
+
+			}
 		}
 
 		if((flags & 0x0080) == 0)
