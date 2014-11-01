@@ -262,7 +262,7 @@ void svga_device::device_start()
 
 void cirrus_vga_device::device_start()
 {
-	memset(&vga, 0, sizeof(vga));
+	vga_device::zero();
 	memset(&svga, 0, sizeof(svga));
 
 	int i;
