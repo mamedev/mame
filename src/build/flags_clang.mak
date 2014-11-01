@@ -20,8 +20,6 @@ ifeq ($(findstring 3.5,$(TEST_CLANG)),3.5)
 CCOMFLAGS += -Wno-inline-new-delete
 # caused by src/mess/drivers/x07.c, src/osd/sdl/window.c, src/emu/sound/disc_mth.inc
 CCOMFLAGS += -Wno-absolute-value
-# caused by src/emu/bus/isa/s3virge.c, src/emu/bus/isa/trident.c, src/emu/video/pc_vga.c
-CCOMFLAGS +=-Wno-dynamic-class-memaccess
 # these were disabled because of bugs in older clang versions
 CCOMFLAGS += -Wformat-security
 # these show up when compiling as c++11
