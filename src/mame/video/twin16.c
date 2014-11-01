@@ -19,23 +19,20 @@
 
 enum
 {
-	TWIN16_SCREEN_FLIPY     = 0x01,
-	TWIN16_SCREEN_FLIPX     = 0x02, // confirmed: Hard Puncher Intro
-	TWIN16_UNKNOWN_PRI0     = 0x04, // ? Hard Puncher uses this
-	TWIN16_PLANE_ORDER      = 0x08, // confirmed: Devil Worlds
-	TWIN16_UNKNOWN_PRI2     = 0x10, // unused?
-	TWIN16_TILE_FLIPY       = 0x20  // confirmed: Vulcan Venture
+	TWIN16_SCREEN_FLIPY = 0x01,
+	TWIN16_SCREEN_FLIPX = 0x02, // confirmed: Hard Puncher Intro
+	TWIN16_PRI0         = 0x04, // PRI0 input into 007789 PAL
+	TWIN16_PRI1         = 0x08, // PRI1 input into 007789 PAL
+	TWIN16_PRI2_UNUSED  = 0x10, // schematic shows as PRI2 input, but unused
+	TWIN16_TILE_FLIPY   = 0x20  // confirmed: Vulcan Venture
 };
 
 enum
 {
 	// user-defined priorities
-	TWIN16_BG_LAYER1            = 0x01,
-	TWIN16_SPRITE_PRI_L1        = 0x02,
-	TWIN16_BG_LAYER2            = 0x04,
-	TWIN16_SPRITE_PRI_L2        = 0x08,
-	TWIN16_SPRITE_OCCUPIED      = 0x10, // sprite on screen pixel
-	TWIN16_SPRITE_CAST_SHADOW   = 0x20
+	TWIN16_BG_OVER_SPRITES = 0x01, // BG pixel has priority over opaque sprite pixels
+	TWIN16_BG_NO_SHADOW    = 0x02, // BG pixel has priority over shadow sprite pixels
+	TWIN16_SPRITE_OCCUPIED = 0x04
 };
 
 
@@ -177,8 +174,7 @@ WRITE16_MEMBER(twin16_state::video_register_w)
  *   2  | -------xxxxxxxxx | xpos
  * -----+------------------+
  *   3  | x--------------- | enable
- *   3  | -x-------------- | priority   ?
- *   3  | -----x---------- | no shadow  ?
+ *   3  | -xxxxx---------- | ?
  *   3  | ------x--------- | yflip  ?
  *   3  | -------x-------- | xflip
  *   3  | --------xx------ | height
@@ -230,34 +226,22 @@ void twin16_state::spriteram_process(  )
 			UINT32 xpos = (0x10000*source[4])|source[5];
 			UINT32 ypos = (0x10000*source[6])|source[7];
 
-			/* notes on uncertain attributes:
-			shadows: pen $F only (like other Konami hw), used in devilw, fround,
-			 miaj? (shadows are solid in tmnt hw version),
-			 gradius2? (ship exhaust)
+			/* notes on sprite attributes:
 
-			sprite-background priority: in devilw, most sprites look best at high priority,
-			in gradius2, most sprites look best at low priority. exceptions:
-			- devilw prologue: sprites behind crowd (maybe more, haven't completed the game)
-			- gradius2 intro showing earlier games: sprites above layers
+			The only inputs from the sprite hardware into the mixer PAL are four bits of
+			pixel data, with 0000 being transparent, 1111 being shadow, and anything else
+			opaque. Sprite to background priority, and whether shadows are visible, depends
+			entirely on the priority mode bits in m_video_register and on the underlying
+			background pixel, and not on any of the sprite attribute bits.
 
-			currently using (priority&0x200), broken:
-			- devilw prologue: sprites should be behind crowd
-			- gradius2 level 7: bosses should be behind portal (ok except brain boss and mouth boss)
-			- gradius2 ending: sun should be behind planet
+			Shadows in the devilw lava stages look a bit strange; the shadows "punch holes"
+			in the platforms and reveal the lava underneath. As far as I can tell from the
+			schematics this has to be correct; unlike later Konami hardware there seems to
+			be no way for a sprite to cast a shadow onto another sprite.
 
-			does TWIN16_PLANE_ORDER affect it?
-
-			more?
-			devilw monster dens exploding monochrome, players fading to white in prologue, and trees in
-			the 1st level shrinking with a solid green color look odd, maybe alpha blended?
-
-			fround, hpuncher, miaj, cuebrickj, don't use the preprocessor. all sprites are expected
-			to be high priority, and shadows are enabled
+			fround, hpuncher, miaj, cuebrickj, don't use the preprocessor.
 			*/
-			UINT16 attributes = 0x8000| // enabled
-				(source[2]&0x03ff)| // scale,size,color
-				(source[2]&0x4000)>>4|  // no-shadow? (gradius2 level 7 boss sets this bit and appears to expect pen $F to be solid)
-				(priority&0x200)<<5;    // sprite-background priority?
+			UINT16 attributes = 0x8000 | (source[2]&0x03ff); // scale,size,color
 
 			dest[0] = source[3]; /* gfx data */
 			dest[1] = ((xpos>>8) - dx)&0xffff;
@@ -291,7 +275,6 @@ void twin16_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap )
 			const UINT16 *pen_data = 0;
 			int flipy = attributes&0x0200;
 			int flipx = attributes&0x0100;
-			int priority = (attributes&0x4000)?TWIN16_SPRITE_PRI_L1:TWIN16_SPRITE_PRI_L2;
 
 			if( m_is_fround ) {
 				/* fround board */
@@ -360,26 +343,20 @@ void twin16_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap )
 						{
 							UINT16 pen = pen_data[x>>2]>>((~x&3)<<2)&0xf;
 
-							if( pen )
+							if( pen && !(pdest[sx] & TWIN16_SPRITE_OCCUPIED))
 							{
-								int shadow = (pen==0xf) & ((attributes&0x400)==0);
+								pdest[sx] |= TWIN16_SPRITE_OCCUPIED;
 
-								if (pdest[sx]<priority) {
-									if (shadow) {
+								if (pen==0xf) // shadow
+								{
+									if (!(pdest[sx] & TWIN16_BG_NO_SHADOW))
 										dest[sx] = m_palette->shadow_table()[dest[sx]];
-										pdest[sx]|=TWIN16_SPRITE_CAST_SHADOW;
-									}
-									else {
+								}
+								else // opaque pixel
+								{
+									if (!(pdest[sx] & TWIN16_BG_OVER_SPRITES))
 										dest[sx] = pal_base + pen;
-									}
 								}
-								else if (!shadow && pdest[sx]&TWIN16_SPRITE_CAST_SHADOW && (pdest[sx]&0xf)<priority) {
-									// shadow cast onto sprite below, evident in devilw lava level
-									dest[sx] = m_palette->shadow_table()[pal_base + pen];
-									pdest[sx]^=TWIN16_SPRITE_CAST_SHADOW;
-								}
-
-								pdest[sx]|=TWIN16_SPRITE_OCCUPIED;
 							}
 						}
 					}
@@ -412,7 +389,7 @@ TILE_GET_INFO_MEMBER(twin16_state::fix_tile_info)
 void twin16_state::tile_get_info(tile_data &tileinfo, UINT16 data, int color_base)
 {
 	/* fedcba9876543210
-	   xxx------------- color
+	   xxx------------- color; high bit is also priority over sprites
 	   ---xxxxxxxxxxxxx tile number
 	*/
 	int code = (data & 0x1fff);
@@ -420,12 +397,13 @@ void twin16_state::tile_get_info(tile_data &tileinfo, UINT16 data, int color_bas
 	int flags = 0;
 	if (m_video_register & TWIN16_TILE_FLIPY) flags |= TILE_FLIPY;
 	SET_TILE_INFO_MEMBER(1, code, color, flags);
+	tileinfo.category = BIT(data, 15);
 }
 
 void fround_state::tile_get_info(tile_data &tileinfo, UINT16 data, int color_base)
 {
 	/* fedcba9876543210
-	   xxx------------- color
+	   xxx------------- color; high bit is also priority over sprites
 	   ---xx----------- tile bank
 	   -----xxxxxxxxxxx tile number
 	*/
@@ -435,6 +413,7 @@ void fround_state::tile_get_info(tile_data &tileinfo, UINT16 data, int color_bas
 	int flags = 0;
 	if (m_video_register & TWIN16_TILE_FLIPY) flags |= TILE_FLIPY;
 	SET_TILE_INFO_MEMBER(1, code, color, flags);
+	tileinfo.category = BIT(data, 15);
 }
 
 TILE_GET_INFO_MEMBER(twin16_state::layer0_tile_info)
@@ -483,10 +462,58 @@ void fround_state::video_start()
 
 UINT32 twin16_state::screen_update_twin16(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int layer = m_video_register & TWIN16_PLANE_ORDER ? 0 : 1;
+/*
+    PAL equations (007789 @ 11J):
 
-	m_scroll_tmap[layer]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, TWIN16_BG_LAYER1, 0);
-	m_scroll_tmap[layer^1]->draw(screen, bitmap, cliprect, 0, TWIN16_BG_LAYER2);
+    /SHAD = /FIX * /PRI1 * OCO0 * OCO1 * OCO2 * OCO3
+          + /FIX * /PRI0 * OCO0 * OCO1 * OCO2 * OCO3 * /V1C0
+          + /FIX * PRI0 * OCO0 * OCO1 * OCO2 * OCO3 * /V2C6
+          + /FIX * PRI0 * /V2C0 * /V2C3 * OCO0 * /V2C2 * OCO1 * /V2C1 * OCO2 * OCO3
+
+    /SELB = /FIX * OCO0 * OCO1 * OCO2 * OCO3
+          + /FIX * /OCO0 * /OCO1 * /OCO2 * /OCO3
+          + /FIX * PRI0 * /PRI1 * V1C0
+          + /FIX * PRI0 * PRI1 * V2C0 * V2C6
+          + /FIX * PRI0 * PRI1 * V2C1 * V2C6
+          + /FIX * PRI0 * PRI1 * V2C2 * V2C6
+          + /FIX * PRI0 * PRI1 * V2C3 * V2C6
+
+     SELA = FIX
+          + PRI0 * /PRI1 * V1C0
+          + /PRI1 * OCO0 * OCO1 * OCO2 * OCO3 * V1C0
+          + /PRI1 * /OCO0 * /OCO1 * /OCO2 * /OCO3 * V1C0
+          + PRI1 * /V2C0 * /V2C3 * OCO0 * /V2C2 * OCO1 * /V2C1 * OCO2 * OCO3
+          + PRI1 * /V2C0 * /V2C3 * /OCO0 * /V2C2 * /OCO1 * /V2C1 * /OCO2 * /OCO3
+
+     SELB  SELA  Visible layer
+      0     0    VRAM2
+      0     1    VRAM1
+      1     0    Object
+      1     1    Fix
+*/
+	screen.priority().fill(0, cliprect);
+
+	switch ((m_video_register >> 2) & 0x3)
+	{
+		case 0: // PRI1 = 0, PRI0 = 0
+			m_scroll_tmap[1]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_ALL_CATEGORIES | TILEMAP_DRAW_OPAQUE);
+			m_scroll_tmap[0]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_ALL_CATEGORIES);
+			break;
+		case 1: // PRI1 = 0, PRI0 = 1
+			m_scroll_tmap[1]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_ALL_CATEGORIES | TILEMAP_DRAW_OPAQUE);
+			m_scroll_tmap[0]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_ALL_CATEGORIES, TWIN16_BG_OVER_SPRITES);
+			break;
+		case 2: // PRI1 = 1, PRI0 = 0
+			m_scroll_tmap[0]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_ALL_CATEGORIES | TILEMAP_DRAW_OPAQUE);
+			m_scroll_tmap[0]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_ALL_CATEGORIES, TWIN16_BG_NO_SHADOW);
+			m_scroll_tmap[1]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_ALL_CATEGORIES);
+			break;
+		case 3: // PRI1 = 1, PRI0 = 1
+			m_scroll_tmap[0]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_ALL_CATEGORIES | TILEMAP_DRAW_OPAQUE);
+			m_scroll_tmap[1]->draw(screen, bitmap, cliprect, 0);
+			m_scroll_tmap[1]->draw(screen, bitmap, cliprect, 1, TWIN16_BG_OVER_SPRITES | TWIN16_BG_NO_SHADOW);
+			break;
+	}
 
 	draw_sprites( screen, bitmap );
 

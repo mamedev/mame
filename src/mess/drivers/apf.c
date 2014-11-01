@@ -259,10 +259,6 @@ void apf_state::machine_reset()
 	m_ca2 = 0;
 
 	// apfimag only
-	if (m_cass)
-		m_cass->change_state(CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
-
-	// apfimag only
 	if (m_ram)
 	{
 		/* if we specified 8K of RAM, delete the extended RAM */
@@ -554,7 +550,7 @@ static MACHINE_CONFIG_START( apfm1000, apf_state )
 	MCFG_APF_CARTRIDGE_ADD("cartslot", apf_cart, NULL)
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("cart_list","apfm1000")
+	MCFG_SOFTWARE_LIST_ADD("cart_list", "apfm1000")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( apfimag, apfm1000 )
@@ -574,13 +570,15 @@ static MACHINE_CONFIG_DERIVED( apfimag, apfm1000 )
 	MCFG_PIA_READPB_HANDLER(READ8(apf_state, pia1_portb_r))
 	MCFG_PIA_WRITEPB_HANDLER(WRITE8(apf_state, pia1_portb_w))
 
-	MCFG_CASSETTE_ADD( "cassette" )
+	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_FORMATS(apf_cassette_formats)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY)
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_DISABLED)
 
 	MCFG_FD1771x_ADD("fdc", 1000000) // guess
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", apf_floppies, "525dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", apf_floppies, "525dd", floppy_image_device::default_floppy_formats)
+
+	MCFG_SOFTWARE_LIST_ADD("cass_list", "apfimag_cass")
 MACHINE_CONFIG_END
 
 

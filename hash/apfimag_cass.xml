@@ -1,0 +1,1214 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<softwarelist name="apfimag_cass" description="APF Imagination cassettes">
+
+<!-- To load a tape, just start APF Imagination with the BASIC cart inserted, and type CLOAD followed by <Return> 
+(by default mapped to your ']' key). Then start the tape from the Internal UI and press <Return>.
+
+If you don't press <Return>, the system won't read the tape (this is fairly unusual but it's the way the system works)
+
+Once the tape has finished loading, just type RUN to start the loaded program -->
+
+
+<!-- Games & Programs -->
+
+	<software name="16letter">
+		<description>16K Letter Writter</description>
+		<year>1982</year>
+		<publisher>Milt Perry</publisher>
+		<feature name="usage" value="Requires 16K RAM" />
+		<part name="cass" interface="apf_cass">
+			<dataarea name="cass" size="1743020">
+				<rom name="m_perry_16k_letter_writter(16k).wav" size="1743020" crc="d1ca5e2d" sha1="4c844e54836d4f1de0bf4d653860c5c20444d304" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="advmurdr">
+		<description>An Adventure in Murder</description>
+		<year>198?</year>
+		<publisher>R. Eisman</publisher>
+		<feature name="usage" value="Requires 16K RAM" />
+		<part name="cass" interface="apf_cass">
+			<dataarea name="cass" size="2030598">
+				<rom name="r_eisman_adventure_in_murder(16k).wav" size="2030598" crc="5fbd2aed" sha1="aca54da042c60b96fd7288f6a5df54d7239757c8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="alphabit">
+		<description>ALPHAbit</description>
+		<year>19??</year>
+		<publisher>MR R's</publisher>
+		<feature name="usage" value="Requires 16K RAM" />
+		<part name="cass" interface="apf_cass">
+			<dataarea name="cass" size="1750444">
+				<rom name="mr_rs_alphabit(16k).wav" size="1750444" crc="f7eb904d" sha1="19dfca668cc5c54af0278553f5600ba3e8bdd9ee" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- glitched gfx -->
+	<software name="alphacnt" supported="partial">
+		<description>Alpha Centurion</description>
+		<year>1983</year>
+		<publisher>G. Karabin</publisher>
+		<part name="cass" interface="apf_cass">
+			<dataarea name="cass" size="1735100">
+				<rom name="g_karabin_alpha_centurion.wav" size="1735100" crc="1ac5af69" sha1="d174a8bb9c739210e294fed005feabeb95b8c50d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- glitched gfx -->
+	<software name="alpinski" supported="partial">
+		<description>Alpine Skiing</description>
+		<year>19??</year>
+		<publisher>York 10 Computerware</publisher>
+		<part name="cass" interface="apf_cass">
+			<dataarea name="cass" size="1004972">
+				<rom name="york_10_computerware_alpine_skiing.wav" size="1004972" crc="1980dd7a" sha1="d919ae9c2cc90867321086fb7163353e5010a431" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="apfman">
+		<description>APF-MAN</description>
+		<year>1982</year>
+		<publisher>Carl A. Echols</publisher>
+		<part name="cass" interface="apf_cass">
+			<dataarea name="cass" size="1075884">
+				<rom name="carl_echols_apf-man.wav" size="1075884" crc="748df00d" sha1="01c70f9090f1d32a5b2493cfb70ba58574b92896" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- it keeps telling "START ME WITH: GOTO100", but it does not recognize the command -->
+	<software name="artist" supported="no">
+		<description>Artist and Easel</description>
+		<year>1979</year>
+		<publisher>APF Electronics</publisher>
+		<part name="cass" interface="apf_cass">
+			<dataarea name="cass" size="3580144">
+				<rom name="apf_artistandeasel.wav" size="3580144" crc="268b1b70" sha1="587050373ea8582ffcd25214a734f47d89e35ce2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- glitched gfx -->
+	<software name="asteroid" supported="partial">
+		<description>Asteroids</description>
+		<year>19??</year>
+		<publisher>York 10 Computerware</publisher>
+		<part name="cass" interface="apf_cass">
+			<dataarea name="cass" size="1039532">
+				<rom name="york_10_computerware_asteroids.wav" size="1039532" crc="89564571" sha1="f71d83afce14586ac507f74f2e2b82338ac02b4c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="astpatrl">
+		<description>Astroid Patrol</description>
+		<year>198?</year>
+		<publisher>Rief Games</publisher>
+		<part name="cass" interface="apf_cass">
+			<dataarea name="cass" size="906668">
+				<rom name="rief_games_astroid_patrol.wav" size="906668" crc="426ee685" sha1="5d6ee999b1868bb23686fb4a5fb6503e107a3bd1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- glitched gfx -->
+	<software name="baja" supported="partial">
+		<description>Baja</description>
+		<year>19??</year>
+		<publisher>York 10 Computerware</publisher>
+		<part name="cass" interface="apf_cass">
+			<dataarea name="cass" size="1009324">
+				<rom name="york_10_computerware_baja.wav" size="1009324" crc="45d6e690" sha1="090462adcb96c2525e7f3ecd981902b815eab5e7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- This requires the BASIC Tutor manual to be used in a profitable way. The program
+checks whether the user is typing the program printed in the manual, for each lesson -->
+	<software name="bastutor">
+		<description>Basic Tutor</description>
+		<year>1980</year>
+		<publisher>APF Electronics</publisher>
+		<part name="cass1" interface="apf_cass">
+			<feature name="part_id" value="Lessons 1-12"/>
+			<dataarea name="cass" size="41412556">
+				<rom name="apf_basictutor_tape1_lessons1-12.wav" size="41412556" crc="c712ccae" sha1="8aec7bc57edd9eac64c5b866d61c3522507ebcf2" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="apf_cass">
+			<feature name="part_id" value="Lessons 13-22"/>
+			<dataarea name="cass" size="29458552">
+				<rom name="apf_basictutor_tape2_lessons13-22.wav" size="29458552" crc="969a7c6d" sha1="95aae528297016c8a01af537b4747cac838b110b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bzone">
+		<description>Battle Zone</description>
+		<year>19??</year>
+		<publisher>IM-1 Games</publisher>
+		<part name="cass" interface="apf_cass">
+			<dataarea name="cass" size="961708">
+				<rom name="im-1_games_battle_zone.wav" size="961708" crc="83f8b84d" sha1="d22e8ea1326fd12448d4ddc547e6496459789c36" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="biplane">
+		<description>Bi-Plane Rescue</description>
+		<year>19??</year>
+		<publisher>York 10 Computerware</publisher>
+		<part name="cass" interface="apf_cass">
+			<dataarea name="cass" size="1007788">
+				<rom name="york_10_computerware_bi-plane_rescue.wav" size="1007788" crc="f1dbccb6" sha1="b73651da4b73b170cc7e68e8076f9977febf0854" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- how to trigger the actual program instead of the demo? -->
+	<software name="billbord">
+		<description>Electronic Billboard</description>
+		<year>1979</year>
+		<publisher>APF Electronics</publisher>
+		<part name="cass" interface="apf_cass">
+			<dataarea name="cass" size="1323044">
+				<rom name="apf_billboard.wav" size="1323044" crc="79d80e2d" sha1="08bc1e907ce7082041c475ed7bf91d792282d9ab" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="boxing">
+		<description>Boxing</description>
+		<year>198?</year>
+		<publisher>Millivision</publisher>
+		<part name="cass" interface="apf_cass">
+			<dataarea name="cass" size="1288876">
+				<rom name="millivision_boxing.wav" size="1288876" crc="881ab481" sha1="c9e1b34dab520c763c14af7e7203761c6ba9a567" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- LINE XXX NO LINE REFERENCED error -->
+	<software name="bugger">
+		<description>Bugger (Bad?)</description>
+		<year>19??</year>
+		<publisher>MR R's</publisher>
+		<part name="cass" interface="apf_cass">
+			<dataarea name="cass" size="1089196">
+				<rom name="mr_rs_bugger.wav" size="1089196" crc="39bf5e65" sha1="29cb8ee3fc263126db659fffd34271015e6efc38" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="burgman">
+		<description>Burger Man</description>
+		<year>198?</year>
+		<publisher>Rief Games</publisher>
+		<part name="cass" interface="apf_cass">
+			<dataarea name="cass" size="1181612">
+				<rom name="rief_games_of_course_burgerman.wav" size="1181612" crc="a263bd55" sha1="212a77dac4a0533bf7f9bf67eae51a313dbdbdfe" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="centiped">
+		<description>Centipeed</description>
+		<year>198?</year>
+		<publisher>John Mechalas</publisher>
+		<part name="cass" interface="apf_cass">
+			<dataarea name="cass" size="1089452">
+				<rom name="john_machalas_centipeed.wav" size="1089452" crc="0cc4b9ae" sha1="b02402b99cefa0692cc4d37d7a3e5a62f6a85e82" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- glitched gfx -->
+	<software name="choplift" supported="partial">
+		<description>Choplifter</description>
+		<year>19??</year>
+		<publisher>York 10 Computerware</publisher>
+		<part name="cass" interface="apf_cass">
+			<dataarea name="cass" size="1050796">
+				<rom name="york_10_computerware_choplifter.wav" size="1050796" crc="d42f556c" sha1="4c67a68ba328709bca14a9df724f57c2916e1468" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="choppint">
+		<description>Chopper Interceptor</description>
+		<year>19??</year>
+		<publisher>York 10 Computerware</publisher>
+		<part name="cass" interface="apf_cass">
+			<dataarea name="cass" size="1069484">
+				<rom name="york_10_computerware_chopper_interceptor.wav" size="1069484" crc="be8d0f60" sha1="8012bd1a1454526951f26ad3339044ebc932467b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- glitched gfx -->
+	<software name="concentr" supported="partial">
+		<description>Concentration</description>
+		<year>198?</year>
+		<publisher>G. R. Jones</publisher>
+		<part name="cass" interface="apf_cass">
+			<dataarea name="cass" size="1073188">
+				<rom name="g_r_jones_concentration.wav" size="1073188" crc="eafe98f5" sha1="c065c228d361e25b3074d94d9977acddf09c4249" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="copycat">
+		<description>Copy Cat</description>
+		<year>198?</year>
+		<publisher>R. Eisman</publisher>
+		<part name="cass" interface="apf_cass">
+			<dataarea name="cass" size="961964">
+				<rom name="r_eisman_copy_cat.wav" size="961964" crc="f4854e40" sha1="ef78ccb2dc2552be3026a5b309afe8877b718e96" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- glitched gfx -->
+	<software name="deathtnk">
+		<description>Death Tank</description>
+		<year>19??</year>
+		<publisher>York 10 Computerware</publisher>
+		<part name="cass" interface="apf_cass">
+			<dataarea name="cass" size="1038252">
+				<rom name="york_10_computerware_death_tank.wav" size="1038252" crc="e9ed81f0" sha1="a357ec0e0acc06008570428f28a68cdb01cd4acb" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="defender">
+		<description>Defender (MR R)</description>
+		<year>19??</year>
+		<publisher>MR R's</publisher>
+		<part name="cass" interface="apf_cass">
+			<dataarea name="cass" size="1013676">
+				<rom name="mr_rs_defender.wav" size="1013676" crc="ac655b82" sha1="cfba2b58c3d2090467218505293c2b753b4ae377" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- glitched gfx -->
+	<software name="defendyc" supported="partial">
+		<description>Defender (York 10 Computerware)</description>
+		<year>19??</year>
+		<publisher>York 10 Computerware</publisher>
+		<feature name="alt_title" value="Allien Defender II?" />
+		<part name="cass" interface="apf_cass">
+			<dataarea name="cass" size="1158572">
+				<rom name="york_10_computerware_allien_defender_ii.wav" size="1158572" crc="9a614370" sha1="9e626a3e32da1a5d2149c7c07b9554532857550f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- glitched gfx -->
+	<software name="defendyca" cloneof="defendyc" supported="partial">
+		<description>Defender (York 10 Computerware, Alt)</description>
+		<year>19??</year>
+		<publisher>York 10 Computerware</publisher>
+		<part name="cass" interface="apf_cass">
+			<dataarea name="cass" size="1150636">
+				<rom name="york_10_computerware_defender.wav" size="1150636" crc="1364f5e7" sha1="0ababf7ae66bc0c0f78be42de26a0132712f6d2a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="demo">
+		<description>Demo</description>
+		<year>197?</year>
+		<publisher>APF Electronics</publisher>
+		<part name="cass" interface="apf_cass">
+			<dataarea name="cass" size="1202476">
+				<rom name="apf_demo.wav" size="1202476" crc="9dc09935" sha1="6ae8511a79cb62c1a8c61243b3b830fca8e47255" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="depthchg">
+		<description>Depth Charge!!</description>
+		<year>19??</year>
+		<publisher>MR R's</publisher>
+		<part name="cass" interface="apf_cass">
+			<dataarea name="cass" size="1067180">
+				<rom name="mr_rs_depth_charge.wav" size="1067180" crc="aecaabf0" sha1="095bab2792175e17c1fe0bd0f2bd23b82fcdd676" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dkong2">
+		<description>Donkey Kong II</description>
+		<year>198?</year>
+		<publisher>Rief Games</publisher>
+		<part name="cass" interface="apf_cass">
+			<dataarea name="cass" size="1993004">
+				<rom name="rief_games_of_course_donkey_kong_ii.wav" size="1993004" crc="2428fdf1" sha1="393bb1a136ffa6afcd846b9ca588f2cc6950e0c9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dkong">
+		<description>Donki-Kong</description>
+		<year>198?</year>
+		<publisher>Millivision</publisher>
+		<part name="cass" interface="apf_cass">
+			<dataarea name="cass" size="1214636">
+				<rom name="millivision_donki-kong.wav" size="1214636" crc="941cb740" sha1="53cd0e2e0655c0a02654581a5d101952694dc3f3" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dkongjr">
+		<description>Donki-Kong Jr</description>
+		<year>198?</year>
+		<publisher>Millivision</publisher>
+		<part name="cass" interface="apf_cass">
+			<dataarea name="cass" size="972972">
+				<rom name="millivision_donki-kong_jr.wav" size="972972" crc="ba1c0f50" sha1="afbeeec2ee6da4b6fe1fe70c6689b3937ca2001a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- I have not been able to paly the game! am I doing something wrong, or is the tape at fault? -->
+	<software name="drawdraw" supported="no">
+		<description>Draw Draw</description>
+		<year>198?</year>
+		<publisher>Rief Games</publisher>
+		<part name="cass" interface="apf_cass">
+			<dataarea name="cass" size="1102508">
+				<rom name="rief_games_draw_draw.wav" size="1102508" crc="9542e1b3" sha1="476183d19adccdb3e47d8efdad5784fb044a39e2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- Not sure whether I don't know how to play, or the game does not load correctly... -->
+	<software name="dungtres" supported="partial">
+		<description>Dungeon_Treasure</description>
+		<year>19??</year>
+		<publisher>IM-1 Games</publisher>
+		<part name="cass" interface="apf_cass">
+			<dataarea name="cass" size="1055148">
+				<rom name="im-1_games_dungeon_treasure.wav" size="1055148" crc="1cf4b27a" sha1="249bf24c3a50884d09368d661241ce14374ac9be" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="et">
+		<description>E.T.</description>
+		<year>19??</year>
+		<publisher>York 10 Computerware</publisher>
+		<part name="cass" interface="apf_cass">
+			<dataarea name="cass" size="1045164">
+				<rom name="york_10_computerware_et.wav" size="1045164" crc="13ed31b4" sha1="097a916acc88f27c75560a3d8736a28a98a8fca9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- Escape 2 does not load correctly -->
+	<software name="lg3in1" supported="partial">
+		<description>Escape + 21 + Escape 2 (Bad?)</description>
+		<year>198?</year>
+		<publisher>Lacroix Games</publisher>
+		<feature name="usage" value="Wait 1 or 2 secs from PLAY press and Return" />
+		<part name="cass" interface="apf_cass">
+			<dataarea name="cass" size="3539884">
+				<rom name="lacroix_games_(escape_21_escape2).wav" size="3539884" crc="3a799a9e" sha1="d3486a021c7ef45db0e5f553153affbb2accf09a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- LINE <>40 WHAT -->
+	<software name="escape" supported="no">
+		<description>Escape!!!</description>
+		<year>198?</year>
+		<publisher>E. Beckett</publisher>
+		<part name="cass" interface="apf_cass">
+			<dataarea name="cass" size="1271980">
+				<rom name="e_beckett_escape!!!.wav" size="1271980" crc="07d54612" sha1="866eba13c2cd0d051e927362b1d20b938107b1f2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="emt">
+		<description>Excape Mommies Tumb</description>
+		<year>19??</year>
+		<publisher>Handy Dandy Games</publisher>
+		<part name="cass" interface="apf_cass">
+			<dataarea name="cass" size="1034156">
+				<rom name="handy_dandy_games_excape_mommies_tumb.wav" size="1034156" crc="abf7fd14" sha1="2ab25b82a6c9373f5561b698d20ba4ddf2c825bd" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ferzerx">
+		<description>Ferzerx</description>
+		<year>1983</year>
+		<publisher>G. R. Jones</publisher>
+		<part name="cass" interface="apf_cass">
+			<dataarea name="cass" size="1503848">
+				<rom name="g_r_jones_ferzerx.wav" size="1503848" crc="0b90827a" sha1="9685d8d437bae8101c44da9ab5c0da8c056cfdd1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fire">
+		<description>Fire!</description>
+		<year>19??</year>
+		<publisher>MR R's</publisher>
+		<part name="cass" interface="apf_cass">
+			<dataarea name="cass" size="1056172">
+				<rom name="mr_rs_fire.wav" size="1056172" crc="516c170b" sha1="d8a7937fd947c1dc76e87909ee87fca5c3485b85" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="foosebal">
+		<description>FooseBall</description>
+		<year>198?</year>
+		<publisher>E. Beckett</publisher>
+		<part name="cass" interface="apf_cass">
+			<dataarea name="cass" size="1167276">
+				<rom name="e_beckett_fooseball.wav" size="1167276" crc="471f4623" sha1="99a65036eb1c9ccb9e648beb3af8b535b4b08b35" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- glitched gfx -->
+	<software name="frogger" supported="partial">
+		<description>Frogger</description>
+		<year>19??</year>
+		<publisher>York 10 Computerware</publisher>
+		<part name="cass" interface="apf_cass">
+			<dataarea name="cass" size="1050796">
+				<rom name="york_10_computerware_frogger.wav" size="1050796" crc="5daf7f16" sha1="b0929f68c54f78ece0c7a3611c168647385ccfc0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="froggy" supported="no">
+		<description>Froggy (Bad?)</description>
+		<year>198?</year>
+		<publisher>E. Beckett</publisher>
+		<part name="cass" interface="apf_cass">
+			<dataarea name="cass" size="1224492">
+				<rom name="e_beckett_froggy.wav" size="1224492" crc="ef0bf4b9" sha1="b35f53062117c98fbff2903cbd9ae52df91bf80e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- Saucer Shoot does not load correctly -->
+	<software name="mrr2in1" supported="partial">
+		<description>Gondola Pitts + Saucer Shoot</description>
+		<year>19??</year>
+		<publisher>MR R's</publisher>
+		<part name="cass" interface="apf_cass">
+			<dataarea name="cass" size="2550572">
+				<rom name="mr_rs_gondola_pitts_saucer_shoot.wav" size="2550572" crc="94d89b01" sha1="6e7441b143c4dec1f6795e4d710dcfe45c61edaf" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gfxhelp">
+		<description>Graphics Helper</description>
+		<year>1982</year>
+		<publisher>Carl A. Echols</publisher>
+		<part name="cass" interface="apf_cass">
+			<dataarea name="cass" size="1162156">
+				<rom name="carl_echols_graphics_editor.wav" size="1162156" crc="d8160190" sha1="9e2f4a91aabf442191495085fd4dc05daafc1454" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- glitched gfx -->
+	<software name="gskull" supported="partial">
+		<description>GraySkull</description>
+		<year>1984</year>
+		<publisher>G. Karabin</publisher>
+		<part name="cass" interface="apf_cass">
+			<dataarea name="cass" size="2033578">
+				<rom name="g_karabin_greyskull.wav" size="2033578" crc="977a672d" sha1="d35924b4b64d085a1b9e122d34ed2bcff6310898" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- LINE XXX NO LINE REFERENCED error -->
+	<software name="headhunt" supported="no">
+		<description>Head-Hunter</description>
+		<year>198?</year>
+		<publisher>G. R. Jones</publisher>
+		<part name="cass" interface="apf_cass">
+			<dataarea name="cass" size="1388952">
+				<rom name="g_r_jones_head-hunter.wav" size="1388952" crc="f510ddc7" sha1="f83f55a8534571ba7a227b221772870d5a7decd0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="heartatk">
+		<description>Heart Attack</description>
+		<year>1983</year>
+		<publisher>MR R's</publisher>
+		<part name="cass" interface="apf_cass">
+			<dataarea name="cass" size="1147052">
+				<rom name="mr_rs_ekg.wav" size="1147052" crc="95d1da13" sha1="e204cfaede58ef9df5d13b9162318a419191a28a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- It does not load properly -->
+	<software name="tape4" supported="no">
+		<description>IM-1 in a Million Club Newsletter Tape 4</description>
+		<year>19??</year>
+		<publisher>IM-1 in a Million Club Newsletter</publisher>
+		<part name="cass" interface="apf_cass">
+			<dataarea name="cass" size="5163564">
+				<rom name="im-1_in-a-million_club_tape_4.wav" size="5163564" crc="6b0f57f0" sha1="fc5673baa591dab4e18f4d2c34e13fd1f896ccf5" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tape9">
+		<description>IM-1 in a Million Club Newsletter Tape 9</description>
+		<year>19??</year>
+		<publisher>IM-1 in a Million Club Newsletter</publisher>
+		<part name="cass" interface="apf_cass">
+			<dataarea name="cass" size="5218092">
+				<rom name="im-1_in-a-million_club_tape_9.wav" size="5218092" crc="55ec9fd7" sha1="c1ffc604183ce81d51c12143414ca44665cc3817" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="logiclck">
+		<description>Lord Logic-Locks</description>
+		<year>19??</year>
+		<publisher>IM-1 in a Million Club Newsletter</publisher>
+		<part name="cass" interface="apf_cass">
+			<dataarea name="cass" size="1042092">
+				<rom name="im-1_in-a-million_lord_logic-locks.wav" size="1042092" crc="17793917" sha1="84df70d73adb5ab04b2730362b3d3cfe1ab492f5" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- It does not load properly -->
+	<software name="llander" supported="no">
+		<description>Lunar Lander (Bad?)</description>
+		<year>19??</year>
+		<publisher>IM-1 in a Million Club Newsletter</publisher>
+		<part name="cass" interface="apf_cass">
+			<dataarea name="cass" size="1356204">
+				<rom name="im-1_in_a_million_lunar_lander.wav" size="1356204" crc="327e6934" sha1="e8a9b9805c485342275dad13b5c47fb7bcc6877d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="maze">
+		<description>Maze</description>
+		<year>198?</year>
+		<publisher>R. Eisman</publisher>
+		<part name="cass" interface="apf_cass">
+			<dataarea name="cass" size="1112748">
+				<rom name="r_eisman_maze.wav" size="1112748" crc="cdaa77d5" sha1="993f9b676e028186847208312af97aea1bea6a14" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mimicmus">
+		<description>Mimic My Music</description>
+		<year>19??</year>
+		<publisher>IM-1 in a Million Club Newsletter</publisher>
+		<part name="cass" interface="apf_cass">
+			<dataarea name="cass" size="1036204">
+				<rom name="im-1_in-a-million_mimic_my_music.wav" size="1036204" crc="99595de5" sha1="c3628b1dae626e46da6697c17d9c07251faea99a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="minotaur">
+		<description>Minotaur</description>
+		<year>1982</year>
+		<publisher>G. R. Jones</publisher>
+		<part name="cass" interface="apf_cass">
+			<dataarea name="cass" size="1082868">
+				<rom name="g_r_jones_minotaur.wav" size="1082868" crc="de2ac0a7" sha1="aaa79e082076bbffed958d9b61bf181f150ac883" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="missimpa">
+		<description>Mission: Improbable - Mission Alpha</description>
+		<year>1982</year>
+		<publisher>Geo-Grafix</publisher>
+		<feature name="usage" value="Requires 16K RAM" />
+		<part name="cass" interface="apf_cass">
+			<dataarea name="cass" size="10269596">
+				<rom name="geo_grafix_mission-improbable_alpha(16k).wav" size="10269596" crc="29a0d823" sha1="75e7b305f2004af57fa9b1347c3e2f12cb68d525" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- LINE XXX NO LINE REFERENCED error -->
+	<software name="missimpb" supported="no">
+		<description>Mission: Improbable - Mission Bravo</description>
+		<year>198?</year>
+		<publisher>Geo-Grafix</publisher>
+		<part name="cass" interface="apf_cass">
+			<dataarea name="cass" size="1372972">
+				<rom name="geo_grafix_mission-improbable_bravo.wav" size="1372972" crc="cbe6c418" sha1="1565f15ffd3b1c5fb1d4df2e522e7ffce082acdf" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- it complains about missing data and keeps asking to reload the tape -->
+	<software name="musicomp" supported="no">
+		<description>Music Composer Player Piano</description>
+		<year>1979</year>
+		<publisher>APF Electronics</publisher>
+		<part name="cass" interface="apf_cass">
+			<dataarea name="cass" size="3403952">
+				<rom name="apf_musiccomposer_playerpiano.wav" size="3403952" crc="c7507a6c" sha1="e5681cd13d79730c7f3118d451c0efa697899fde" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mystmans">
+		<description>Mystry Mansion</description>
+		<year>19??</year>
+		<publisher>Handy Dandy Games</publisher>
+		<part name="cass" interface="apf_cass">
+			<dataarea name="cass" size="1070054">
+				<rom name="handy_dandy_games_mystry_mansion.wav" size="1070054" crc="2fc4c320" sha1="2c4eaef013f1d501accb6ec34bcec6b27995e229" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pacrat">
+		<description>Pac-Rat</description>
+		<year>19??</year>
+		<publisher>MR R's</publisher>
+		<part name="cass" interface="apf_cass">
+			<dataarea name="cass" size="957868">
+				<rom name="mr_rs_pack_rat(audio lost).wav" size="957868" crc="dbb4f160" sha1="4d8e3475ee20eff4d25f23da816b5cb46ea12514" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pakman">
+		<description>Pak-Man</description>
+		<year>198?</year>
+		<publisher>E. Beckett</publisher>
+		<part name="cass" interface="apf_cass">
+			<dataarea name="cass" size="1267116">
+				<rom name="e_beckett_pak-man.wav" size="1267116" crc="ea2e7f8f" sha1="a68f2d69ce5670485c0f9a65ed1bdfa64499fed2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- glitched gfx -->
+	<software name="pinbwiz" supported="partial">
+		<description>Pinball Wiz</description>
+		<year>1983</year>
+		<publisher>G. Karabin</publisher>
+		<part name="cass" interface="apf_cass">
+			<dataarea name="cass" size="1732970">
+				<rom name="g_karabin_wiz.wav" size="1732970" crc="f028bfc9" sha1="cfc24963a37a4e6a2e65a7b71806f0329a3efb4f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="planetat">
+		<description>Planet Atack</description>
+		<year>198?</year>
+		<publisher>Rief Games</publisher>
+		<part name="cass" interface="apf_cass">
+			<dataarea name="cass" size="956076">
+				<rom name="rief_games_planet_atack.wav" size="956076" crc="ac2c4bd8" sha1="e42f49ec42d9c831f6eb43546e54568de11f9802" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rattler">
+		<description>Rattler</description>
+		<year>198?</year>
+		<publisher>Geo-Grafix</publisher>
+		<part name="cass" interface="apf_cass">
+			<dataarea name="cass" size="1199276">
+				<rom name="geo_grafix_rattler.wav" size="1199276" crc="e69724fa" sha1="a997ecd76f164dd4762a5cde6cfb3a3192f47dc7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="recollct">
+		<description>Recollection</description>
+		<year>19??</year>
+		<publisher>IM-1 in a Million Club Newsletter</publisher>
+		<part name="cass" interface="apf_cass">
+			<dataarea name="cass" size="1076652">
+				<rom name="im-1_in-a-million_recollection.wav" size="1076652" crc="02020981" sha1="0d83fff9da0ef86f52352238910a5a5f4ae97fc5" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="roadrunn">
+		<description>RoadRunner</description>
+		<year>19??</year>
+		<publisher>MR R's</publisher>
+		<part name="cass" interface="apf_cass">
+			<dataarea name="cass" size="1027884">
+				<rom name="mr_rs_roadrunner.wav" size="1027884" crc="dcdd8fbd" sha1="cbe17a0848fdff532fc9e8419b59732a3a8c9992" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="runar">
+		<description>Run Around</description>
+		<year>198?</year>
+		<publisher>Millivision</publisher>
+		<part name="cass" interface="apf_cass">
+			<dataarea name="cass" size="1010604">
+				<rom name="millivision_run_around.wav" size="1010604" crc="4a758098" sha1="46dea87e682d3df86cd970b9d0702005370a8c38" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="safari">
+		<description>Safari in Africa</description>
+		<year>198?</year>
+		<publisher>DataComp</publisher>
+		<part name="cass" interface="apf_cass">
+			<dataarea name="cass" size="1751482">
+				<rom name="datacomp_safari_in_africa.wav" size="1751482" crc="4025fe24" sha1="184c3751a99fcbcb15b1b4b769d74de0fb867592" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- glitched gfx -->
+	<software name="sailing" supported="partial">
+		<description>Sailing</description>
+		<year>19??</year>
+		<publisher>York 10 Computerware</publisher>
+		<part name="cass" interface="apf_cass">
+			<dataarea name="cass" size="999340">
+				<rom name="york_10_computerware_sailing.wav" size="999340" crc="5113726f" sha1="210b76a4ef4945ed8a70c9d203f336953a31cd2d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- glitched gfx -->
+	<software name="skydiver" supported="partial">
+		<description>Sky Diver</description>
+		<year>19??</year>
+		<publisher>York 10 Computerware</publisher>
+		<part name="cass" interface="apf_cass">
+			<dataarea name="cass" size="1000108">
+				<rom name="york_10_computerware_sky_diver.wav" size="1000108" crc="0f396e8b" sha1="91b9425b1c7cb96020850b5c79eb24a8c97d9502" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- Not sure if controls work fine... to investigate! -->
+	<software name="solarwar">
+		<description>Solar Wars!</description>
+		<year>1983</year>
+		<publisher>Handmade Games</publisher>
+		<part name="cass" interface="apf_cass">
+			<dataarea name="cass" size="2183084">
+				<rom name="r_k_kretschmer_solar_wars.wav" size="2183084" crc="6b1ad7f1" sha1="22fcc8b21279fad381b4357fb81df44ec8f9e680" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- I have not been able to generate any sound! am I doing something wrong, or is the tape at fault? -->
+	<software name="soundfx" supported="partial">
+		<description>Sound Effects Demo Program</description>
+		<year>19??</year>
+		<publisher>Ralph A. Rodriguez</publisher>
+		<part name="cass" interface="apf_cass">
+			<dataarea name="cass" size="1219510">
+				<rom name="r_a_rodriguez_sound_effects_sub_porgram.wav" size="1219510" crc="30e5ae25" sha1="051306fd38482b36eaba75792ba01ce09da10ad2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- glitched gfx -->
+	<software name="spacedst" supported="partial">
+		<description>Space Destroyers</description>
+		<year>1980</year>
+		<publisher>APF Electronics</publisher>
+		<part name="cass" interface="apf_cass">
+			<dataarea name="cass" size="1672014">
+				<rom name="apf_space_destroyers.wav" size="1672014" crc="aa380a7f" sha1="2defa25ccac8fbbf594b2238d5f97bdf6188f312" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- glitched gfx -->
+	<software name="sshuttle" supported="partial">
+		<description>Space Shuttle</description>
+		<year>19??</year>
+		<publisher>York 10 Computerware</publisher>
+		<feature name="usage" value="Requires 16K RAM" />
+		<part name="cass" interface="apf_cass">
+			<dataarea name="cass" size="1759916">
+				<rom name="york_10_computerware_space_shuttle(16k).wav" size="1759916" crc="66a43b5a" sha1="1644bc35920e81876de630feb59d4ab761b87563" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="starbtle">
+		<description>Star Battle</description>
+		<year>19??</year>
+		<publisher>Handy Dandy Games</publisher>
+		<part name="cass" interface="apf_cass">
+			<dataarea name="cass" size="1126572">
+				<rom name="handy_dandy_games_star_battle.wav" size="1126572" crc="2b5853b5" sha1="1f80dc16bf4d988fce82074e5f44d2075f3a7a43" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- glitched gfx -->
+	<software name="starcstl" supported="partial">
+		<description>Star Castle</description>
+		<year>19??</year>
+		<publisher>York 10 Computerware</publisher>
+		<part name="cass" interface="apf_cass">
+			<dataarea name="cass" size="1021100">
+				<rom name="york_10_computerware_star_castle.wav" size="1021100" crc="be300f87" sha1="02b65e64bfa6b6e5779bed28163035def10f663f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- glitched gfx -->
+	<software name="starship" supported="partial">
+		<description>Star Ship</description>
+		<year>198?</year>
+		<publisher>R. Eisman</publisher>
+		<part name="cass" interface="apf_cass">
+			<dataarea name="cass" size="1064200">
+				<rom name="r_eisman_star_ship.wav" size="1064200" crc="5b36c175" sha1="287af2d590b308437b31a8ab71b8d827c7a6255e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="startrex">
+		<description>Star Trex</description>
+		<year>1981</year>
+		<publisher>G. R. Jones</publisher>
+		<part name="cass" interface="apf_cass">
+			<dataarea name="cass" size="2250738">
+				<rom name="g_r_jones_star_trex.wav" size="2250738" crc="d8989166" sha1="3a71d7899c72d08e7ce15c4f12c03f8777b5664d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gg2in1">
+		<description>Super 21 + Space Hunt</description>
+		<year>1983</year>
+		<publisher>Geo-Grafix</publisher>
+		<part name="cass" interface="apf_cass">
+			<dataarea name="cass" size="2496414">
+				<rom name="geo_grafix_super_21_space_hunt.wav" size="2496414" crc="c937f096" sha1="9652b6478cf554062d6d6e6e8fb558873a8097f2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- Space Hunt does not seem to load fine, it was listed as an "Improved version of the above"... -->
+	<software name="gg2in1a" cloneof="gg2in1" supported="partial">
+		<description>Super 21 + Space Hunt (Alt?)</description>
+		<year>1983</year>
+		<publisher>Geo-Grafix</publisher>
+		<part name="cass" interface="apf_cass">
+			<dataarea name="cass" size="3931560">
+				<rom name="geo_grafix_super_21ii_space_huntii.wav" size="3931560" crc="d80d3a1b" sha1="41b90a8989a90fb36d1d52b780e7499f192e8519" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- LINE <218 WHAT -->
+	<software name="suprfrog" supported="no">
+		<description>Super Frog</description>
+		<year>198?</year>
+		<publisher>E. Beckett</publisher>
+		<part name="cass" interface="apf_cass">
+			<dataarea name="cass" size="1244332">
+				<rom name="e_beckett_super_frog.wav" size="1244332" crc="30080597" sha1="349731435e305a117e9ad44b762f9ae852d0e81a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- LINE XXX NO LINE REFERENCED error -->
+	<software name="sy50diag" supported="no">
+		<description>SY-50 IM-1 Diagnostics</description>
+		<year>1979</year>
+		<publisher>APF Electronics</publisher>
+		<part name="cass" interface="apf_cass">
+			<dataarea name="cass" size="3598780">
+				<rom name="apf_sy-50_im-1_diagnostics.wav" size="3598780" crc="0b3f3d4e" sha1="9185dc1801d50538b636e9fe5a071fc40425a9ec" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- LINE XXX NO LINE REFERENCED error -->
+	<software name="theftam" supported="no">
+		<description>Theft at the Art Museum</description>
+		<year>1982</year>
+		<publisher>Carl A. Echols</publisher>
+		<part name="cass" interface="apf_cass">
+			<dataarea name="cass" size="1106348">
+				<rom name="carl_echols_theft_at_the_art_museum.wav" size="1106348" crc="e4e408e6" sha1="b944b36ebc8b6ef9abdb1d560bc30418796e2e8d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="thief">
+		<description>Thief</description>
+		<year>198?</year>
+		<publisher>Millivision</publisher>
+		<part name="cass" interface="apf_cass">
+			<dataarea name="cass" size="988972">
+				<rom name="millivision_thief.wav" size="988972" crc="df0cb1b5" sha1="b1933b1a7e923e57547b0abab3d1ce99f3628d4b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- I cannot load correctly either game -->
+	<software name="c2in1" supported="no">
+		<description>Transport + 15 Matches</description>
+		<year>19??</year>
+		<publisher>R. T. Carman</publisher>
+		<part name="cass" interface="apf_cass">
+		<feature name="usage" value="Transport requires 16K RAM" />
+			<dataarea name="cass" size="3680094">
+				<rom name="r_t_carman_transport(16k)_15_matches.wav" size="3680094" crc="5673884c" sha1="538ea35a11ce95243da6cb6bf568b8f840bbe40d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- it does not complete loading -->
+	<software name="treashnt" supported="no">
+		<description>Treasure Hunt (Bad?)</description>
+		<year>1982</year>
+		<publisher>Carl A. Echols</publisher>
+		<part name="cass" interface="apf_cass">
+			<dataarea name="cass" size="1079468">
+				<rom name="carl_echols_treasure_hunt.wav" size="1079468" crc="7a3cbeb9" sha1="3661cf83211758cb6c5827169c077b17953924ef" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- third game does not load correctly -->
+	<software name="3for1" supported="partial">
+		<description>Three-for-One : Space War + Air Fortress + Squeeze Play</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cass" interface="apf_cass">
+			<dataarea name="cass" size="4647596">
+				<rom name="three_for_one.wav" size="4647596" crc="a5abc06d" sha1="e21a0276ccdbf07dbc84b61a79dcf1d494b2b293" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tronn">
+		<description>Tronn</description>
+		<year>19??</year>
+		<publisher>MR R's</publisher>
+		<part name="cass" interface="apf_cass">
+			<dataarea name="cass" size="921452">
+				<rom name="mr_rs_tronn.wav" size="921452" crc="69971170" sha1="45f0342cc55ceab089a3dfe6260da6ab4c505319" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="turbo">
+		<description>Turbo</description>
+		<year>19??</year>
+		<publisher>York 10 Computerware</publisher>
+		<part name="cass" interface="apf_cass">
+			<dataarea name="cass" size="1019052">
+				<rom name="york_10_computerware_turbo.wav" size="1019052" crc="6b7dd4b4" sha1="d572934ed4752d78d527714f57944a81e3114eae" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ubet">
+		<description>UBet</description>
+		<year>19??</year>
+		<publisher>MR R's</publisher>
+		<part name="cass" interface="apf_cass">
+			<dataarea name="cass" size="1092076">
+				<rom name="mr_rs_ubet.wav" size="1092076" crc="c93dd547" sha1="795b321ca67a36a63c5cf58cb42433c316366f73" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wallstrt">
+		<description>Wall Street Cartel</description>
+		<year>19??</year>
+		<publisher>IM-1 in a Million Club Newsletter</publisher>
+		<part name="cass" interface="apf_cass">
+			<dataarea name="cass" size="1125804">
+				<rom name="im-1_in-a-million_wall_street_cartel.wav" size="1125804" crc="7fdef1c7" sha1="ada3b0fa518cd71c8522b391685562b0dedb5899" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zap">
+		<description>Zap</description>
+		<year>198?</year>
+		<publisher>R. Eisman</publisher>
+		<part name="cass" interface="apf_cass">
+			<dataarea name="cass" size="1558316">
+				<rom name="r_eisman_zap!!.wav" size="1558316" crc="6828de41" sha1="3f2e43c96a473c95e219e5605db682fdf4e574af" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+
+
+<!-- Utils -->
+
+	<software name="40tkinit">
+		<description>40 Track Initialization Program</description>
+		<year>1983</year>
+		<publisher>Hex-Mart Software</publisher>
+		<part name="cass" interface="apf_cass">
+			<dataarea name="cass" size="1056684">
+				<rom name="hex_mart_init40v.wav" size="1056684" crc="5b729323" sha1="fe7510d16f21d76d28a31b83099248b440c759bc" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="basnum">
+		<description>BasNum</description>
+		<year>1983</year>
+		<publisher>Hex-Mart Software</publisher>
+		<part name="cass" interface="apf_cass">
+			<dataarea name="cass" size="1183404">
+				<rom name="hex_mart_super_basnum.wav" size="1183404" crc="d46bfbd5" sha1="7aba4ab227b838492b3c61f36fd149d6dd64ef10" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bastrace">
+		<description>Basic Trace</description>
+		<year>1982</year>
+		<publisher>Carl A. Echols</publisher>
+		<part name="cass" interface="apf_cass">
+			<dataarea name="cass" size="983724">
+				<rom name="carl_echols_basic_trace_function.wav" size="983724" crc="f5ab7059" sha1="43c90cfe44ec866e14ca9d520f6122419ddc1446" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="diskmod">
+		<description>Disk Modification Program</description>
+		<year>1983</year>
+		<publisher>Hex-Mart Software</publisher>
+		<part name="cass" interface="apf_cass">
+			<dataarea name="cass" size="1083308">
+				<rom name="hex_mart_diskmod.wav" size="1083308" crc="8fd9a616" sha1="96eee304a5a64a1d42c12dfcfee600578d81e1b5" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="disktest">
+		<description>Disk Test</description>
+		<year>19??</year>
+		<publisher>IM-1 in a Million Club Newsletter</publisher>
+		<part name="cass" interface="apf_cass">
+			<dataarea name="cass" size="1268736">
+				<rom name="im-1_in-a-million_disk_test.wav" size="1268736" crc="79ef0a19" sha1="9052bcd301c26c1aad8039c5066cfe3e1b32829c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gfxtablt">
+		<description>Graphics Tablet</description>
+		<year>19??</year>
+		<publisher>IM-1 in a Million Club Newsletter</publisher>
+		<part name="cass" interface="apf_cass">
+			<dataarea name="cass" size="1210540">
+				<rom name="im-1_in-a-million_graphics_tablet.wav" size="1210540" crc="7550af5a" sha1="4a0a6e8f0c818c29f12f8867af1c7ee9af8f09ba" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hiresplt">
+		<description>Hi-res Plot</description>
+		<year>19??</year>
+		<publisher>IM-1 in a Million Club Newsletter</publisher>
+		<part name="cass" interface="apf_cass">
+			<dataarea name="cass" size="997036">
+				<rom name="im-1_in-a-million_hi-res_plot.wav" size="997036" crc="cfb5a4ed" sha1="466deacb1d28ab9bd62ac8401b10c2899d6633ad" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="loresplt">
+		<description>Lo-res Plot</description>
+		<year>19??</year>
+		<publisher>IM-1 in a Million Club Newsletter</publisher>
+		<part name="cass" interface="apf_cass">
+			<dataarea name="cass" size="983980">
+				<rom name="im-1_in-a-million_lo-res_plot.wav" size="983980" crc="1e0a5894" sha1="54464ff325787478eca7bed1118350c37c8144a2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- MAE stands for MacroAssemblerEditor -->
+	<software name="mae">
+		<description>MAE</description>
+		<year>1981</year>
+		<publisher>David Donnelly</publisher>
+		<part name="cass" interface="apf_cass">
+			<dataarea name="cass" size="5422378">
+				<rom name="mae(macroassemblereditor).wav" size="5422378" crc="29c99097" sha1="b749f5d7a394f030001ec6e35882a6bb93a6dca0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="renumber">
+		<description>Renumber</description>
+		<year>1982</year>
+		<publisher>Carl A. Echols</publisher>
+		<part name="cass" interface="apf_cass">
+			<dataarea name="cass" size="1035948">
+				<rom name="carl_echols_basic_renumber.wav" size="1035948" crc="83a60951" sha1="e62769ffb7f85bd7948508f35f0a5d04c612c00d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sy40dasm">
+		<description>SY-40 Disassembler</description>
+		<year>1979</year>
+		<publisher>APF Electronics</publisher>
+		<part name="cass" interface="apf_cass">
+			<dataarea name="cass" size="1729574">
+				<rom name="apf_sy-40 disassembler.wav" size="1729574" crc="601088a8" sha1="ce364a5e7544239b5167c70e5575568e225ab0bc" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+
+<!-- Unsure what this is... Investigate! -->
+
+	<software name="primera">
+		<description>Primera? (Bad?)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cass" interface="apf_cass">
+			<dataarea name="cass" size="226280">
+				<rom name="primera.apt" size="226280" crc="15505290" sha1="c71e0fbc4dce843ef7c8be52109790a836af2bc7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>
